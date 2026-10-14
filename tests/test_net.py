@@ -6,6 +6,7 @@ import os
 import socket
 import threading
 import urllib.error
+import urllib.parse
 import urllib.request
 
 import pytest
@@ -14,6 +15,7 @@ from conftest import closed_port, ipv4_only
 from fakeproxy import HttpConnect, Socks5, no_leaks
 from soundboard import net
 
+ROUTER, NAS = "192.168.1.1", "10.0.0.5"  # sensitive-scan: allow (test address)
 F = "app_update"   # the feature these tests' requests are for (any switched-on one)
 
 
@@ -39,6 +41,11 @@ class Site:
                 if self.path == "/away":
                     self.send_response(302)
                     self.send_header("Location", "ftp://files.test/x")
+                    self.end_headers()
+                    return
+                if self.path.startswith("/go?"):   # /go?<where>: a redirect there
+                    self.send_response(302)
+                    self.send_header("Location", urllib.parse.unquote(self.path[4:]))
                     self.end_headers()
                     return
                 body = f"hello {self.path}".encode()
@@ -206,6 +213,49 @@ def test_a_redirect_cant_leave_http(site, socks):
     with pytest.raises(urllib.error.URLError):
         net.urlopen(f"http://site.test:{site.port}/away", timeout=5, feature=F)
     assert socks.hosts_asked() == {"site.test"}
+
+
+def test_a_redirect_cant_lead_into_this_pc_or_the_home_network(site, socks):
+    """A site's 30x to 127.0.0.1 or the LAN is refused, in every mode: connect() lets
+    this PC through unchecked only when the caller named it."""
+    home = urllib.parse.quote(f"http://127.0.0.1:{site.port}/plain", safe="")
+    for mode in (net.DIRECT, net.PROXY):
+        net.configure(mode, socks.url())
+        for start in (f"http://site.test:{site.port}", f"http://127.0.0.1:{site.port}"):
+            if mode == net.DIRECT and "site.test" in start:
+                continue   # no fake DNS without the proxy
+            for to in (home, f"http%3A%2F%2F{ROUTER}%2Fx.png", "http%3A%2F%2Frouter.lan%2F"):
+                site.paths.clear()
+                with pytest.raises(OSError, match="home network"):
+                    net.urlopen(f"{start}/go?{to}", timeout=5, feature=F)
+                assert site.paths == [f"/go?{to}"]   # the redirect was never followed
+    assert ("site.test", site.port) in socks.asked
+    assert not any(h in ("127.0.0.1", ROUTER, "router.lan") for h, __ in socks.asked)
+
+
+def test_a_lan_address_is_refused_before_connecting(monkeypatch):
+    """An og:image (or any address a site names) on the home network never makes
+    the app reach into the LAN; this PC, named by the caller, still can."""
+    def no(*a, **k):
+        pytest.fail(f"connected: {a}")
+    monkeypatch.setattr(socket, "create_connection", no)
+    for url in (f"http://{ROUTER}/x.png", f"https://{NAS}/", "http://[fe80::1]/",
+                "http://169.254.169.254/latest", "http://nas.lan/", "http://evil.localhost/"):
+        with pytest.raises(OSError, match="home network"):
+            net.urlopen(url, timeout=5, feature="sounds_web.other")
+
+
+def test_a_custom_voice_server_may_be_on_the_lan_but_redirects_stay_checked(site):
+    """voice_servers is the one feature allowed home; a redirect to this PC still asks
+    the switches (Offline refuses it), it doesn't ride on loopback's free pass."""
+    home = urllib.parse.quote(f"http://127.0.0.1:{site.port}/plain", safe="")
+    with net.urlopen(f"http://127.0.0.1:{site.port}/go?{home}", timeout=5,
+                     feature="voice_servers") as r:
+        assert r.read() == b"hello /plain"
+    net.configure_features([], offline=True)
+    with pytest.raises(net.FeatureOff, match="Offline"):
+        net.urlopen(f"http://127.0.0.1:{site.port}/go?{home}", timeout=5,
+                    feature="voice_servers")
 
 
 def test_environment_proxies_dont_steer_the_proxy_opener(site, socks, monkeypatch):
@@ -391,10 +441,14 @@ def relay_get(feature: str, url: str) -> bytes:
 def test_the_relay_refuses_a_switched_off_features_login(mode, site, socks, monkeypatch):
     net.configure(mode, socks.url())
     net.configure_features(["radio"])
-    # in Direct mode the relay connects straight: let it reach the test site by name
-    real = socket.create_connection
+    # in Direct mode the relay looks the name up and connects straight to the address
+    # it checked: a public one for the name, which reaches the test site
+    real_gai, real = socket.getaddrinfo, socket.create_connection
+    monkeypatch.setattr(socket, "getaddrinfo", lambda h, *a, **k: real_gai(
+        "93.184.216.34" if h == "site.test" else h, *a, **k))
     monkeypatch.setattr(socket, "create_connection", lambda addr, *a, **k: real(
-        ("127.0.0.1", addr[1]) if addr[0] == "site.test" else addr, *a, **k))
+        ("127.0.0.1", addr[1]) if addr[0] in ("site.test", "93.184.216.34") else addr,
+        *a, **k))
     off = relay_get("radio", f"http://site.test:{site.port}/radio")
     assert off.startswith(b"HTTP/1.1 403") and b"Radio is switched off" in off
     assert site.paths == [] and socks.asked == []

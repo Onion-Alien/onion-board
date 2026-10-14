@@ -1219,14 +1219,21 @@ class SetupWizard(QDialog):
         if by_user:
             self._user_picked.add("mic_device")
         self.win.cfg.mic_device = name
-        self.win.engine.set_mic_device(name)
         self._mic_peak_seen = False
+        self._reopen("mic_device", self.win.engine.set_mic_device)
 
     def _pick_headphones(self, name: str, by_user: bool = False):
         if by_user:
             self._user_picked.add("mon_device")
         self.win.cfg.mon_device = name
-        self.win.engine.set_mon_device(name)
+        self._reopen("mon_device", self.win.engine.set_mon_device)
+
+    def _reopen(self, attr: str, open_it):
+        """The picked device is opened on the device thread (the window never waits on
+        a slow driver), with the one in the config when its turn comes: quick clicks
+        through the list open only where they ended up."""
+        cfg = self.win.cfg
+        self.win._device_job(lambda: (lambda n=getattr(cfg, attr): open_it(n)))
 
     def _flash_hint(self, text: str, ms: int):
         self.test_hint.setText(text)

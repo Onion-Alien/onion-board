@@ -79,6 +79,11 @@ DIRECT_LOGIN = "direct-"   # relay login "direct-<feature>": not through the pro
 # features with nothing on this PC: the relay refuses them 127.x / localhost in every
 # mode (every station comes from Radio Browser, so one leading here is a redirect)
 NEVER_THIS_PC = frozenset({"radio"})
+# features whose urlopen() may reach this PC / the home network: a custom voice server
+# is one the user typed in, often on their own PC or LAN. For every other feature only
+# a URL the caller names on this PC is (the "explicit loopback" API); a redirect or a
+# LAN address is refused.
+HOME_OK = frozenset({"voice_servers"})
 
 # Everything that goes online, by the key its requests carry: its switch in Settings >
 # Privacy & security (cfg.net_off lists the ones switched off). The names as written
@@ -169,6 +174,11 @@ class FeatureOff(ProxyError):
     """Refused because what asked is switched off in Settings > Privacy & security (or
     Offline mode is on, or the request didn't say what it's for). Nothing was looked
     up or sent. The message is fit to show the user."""
+
+
+class LeadsHome(ProxyError):
+    """Refused because a name going direct was looked up and leads into this PC or the
+    home network. Nothing was sent. The message is fit to show the user."""
 
 
 @dataclass(frozen=True)
@@ -381,6 +391,15 @@ def web_url(url: str) -> str:
     return url.strip()
 
 
+def home_url(url: str) -> bool:
+    """Does `url` point at this PC or the home network (loopback, a private, link-local
+    or .lan / .local address)? Without a lookup: for addresses a web page names."""
+    try:
+        return _local_target(urllib.parse.urlsplit(url.strip()).hostname or "")
+    except ValueError:
+        return False
+
+
 def offline() -> bool:
     return _offline
 
@@ -491,9 +510,10 @@ def connect(host: str, port: int, timeout: float | None = CONNECT_TIMEOUT_S,
 
 def _open(host: str, port: int, timeout: float | None = CONNECT_TIMEOUT_S,
           via: Proxy | None = None, feature: str | None = None, direct: bool = False,
-          how: str = netlog.APP) -> tuple[socket.socket, netlog.Entry]:
+          how: str = netlog.APP, away: bool = False) -> tuple[socket.socket, netlog.Entry]:
     """connect(), and its entry in the activity list (netlog) for the caller to add
-    to (bytes, requests) and close."""
+    to (bytes, requests) and close. `away`: going direct, a name that leads into this
+    PC / the home network is refused with LeadsHome (see _connect_away)."""
     host = str(host).strip("[]")
     entry = netlog.begin(feature, host, port, how)
     try:
@@ -506,7 +526,11 @@ def _open(host: str, port: int, timeout: float | None = CONNECT_TIMEOUT_S,
         entry.failed(str(e) or type(e).__name__)
         raise
     try:
-        sock, route = _route(host, port, timeout, via, direct)
+        sock, route = _route(host, port, timeout, via, direct, away)
+    except LeadsHome as e:
+        entry.route = _route_name(via, direct, host)
+        entry.refused(str(e))
+        raise
     except BaseException as e:   # OSError, or e.g. a host name IDNA can't encode
         entry.route = _route_name(via, direct, host)
         entry.failed(str(e) if isinstance(e, ProxyError)
@@ -534,9 +558,11 @@ def _route_name(via: Proxy | None, direct: bool, host: str) -> str:
 
 
 def _route(host: str, port: int, timeout: float | None, via: Proxy | None,
-           direct: bool) -> tuple[socket.socket, str]:
+           direct: bool, away: bool = False) -> tuple[socket.socket, str]:
     if via is None:
         if direct or not active() or is_loopback(host):
+            if away and not is_loopback(host):
+                return _connect_away(host, port, timeout), _route_name(via, direct, host)
             return (socket.create_connection((host, port), timeout),
                     _route_name(via, direct, host))
         if _mode == TOR:
@@ -548,6 +574,28 @@ def _route(host: str, port: int, timeout: float | None, via: Proxy | None,
                             "isn't usable ({error})", error=_bad))
         via = _proxy
     return _via(via, host, port, timeout), _route_name(via, direct, host)
+
+
+def _connect_away(host: str, port: int, timeout: float | None) -> socket.socket:
+    """A direct connection to `host` that never lands on this PC or the home network:
+    the name is looked up once, refused (LeadsHome) if any address it gives is local,
+    and the connection goes to those checked addresses. Never to a second lookup of
+    the name, which could answer differently (DNS rebinding: a public address for the
+    check, then the router's). The name itself stays in what the client sends (the
+    Host header, TLS SNI): those bytes pass through unchanged."""
+    infos = socket.getaddrinfo(host, port, type=socket.SOCK_STREAM,
+                               proto=socket.IPPROTO_TCP)
+    ips = [str(info[4][0]) for info in infos]
+    if any(_local_target(ip) for ip in ips):
+        raise LeadsHome(_("Not connecting to {host}: it leads to this PC or your home "
+                          "network", host=host))
+    error: OSError = OSError(f"no address for {host}")
+    for ip in dict.fromkeys(ips):   # in the resolver's order, each once
+        try:
+            return socket.create_connection((ip, port), timeout)
+        except OSError as e:
+            error = e
+    raise error
 
 
 def _via(via: Proxy, host: str, port: int, timeout: float | None,
@@ -926,14 +974,46 @@ def _tls_context() -> ssl.SSLContext:
     return ctx
 
 
+def _refuse_home(feature: str, u: urllib.parse.SplitResult) -> ProxyError:
+    """The error (logged, and kept for explain()) for a request to this PC or the
+    home network that `feature` may not make."""
+    host = (u.hostname or "").strip("[]")
+    why = _("Not connecting to {host}: it's on this PC or your home network", host=host)
+    try:
+        port = u.port or (443 if u.scheme.lower() == "https" else 80)
+    except ValueError:
+        port = 0
+    netlog.blocked(feature, host, port, why)
+    return _failed(why)
+
+
+class _RedirectHandler(urllib.request.HTTPRedirectHandler):
+    """A site's redirect never leads into this PC or the home network (except for
+    HOME_OK features), and one to this PC is still checked against the switches:
+    connect() lets loopback through unchecked only because the caller named it."""
+
+    def __init__(self, feature: str):
+        super().__init__()
+        self.feature = feature
+
+    def redirect_request(self, req, fp, code, msg, headers, newurl):
+        u = urllib.parse.urlsplit(newurl)
+        host = u.hostname or ""
+        if _local_target(host):
+            if self.feature not in HOME_OK:
+                raise _refuse_home(self.feature, u)
+            check(self.feature)
+        return super().redirect_request(req, fp, code, msg, headers, newurl)
+
+
 def _opener(feature: str, direct: bool = False) -> urllib.request.OpenerDirector:
     """http / https only, connections made by connect() for `feature`: no ftp:// or
     file:// handler, and environment proxies are ignored (they point at the relay, and
-    a redirect can't step around the setting)."""
+    a redirect can't step around the setting, or into this PC / the home network)."""
     o = urllib.request.OpenerDirector()
     for h in (urllib.request.UnknownHandler(), _HTTPHandler(feature, direct),
               _HTTPSHandler(feature, _tls_context(), direct),
-              urllib.request.HTTPDefaultErrorHandler(), urllib.request.HTTPRedirectHandler(),
+              urllib.request.HTTPDefaultErrorHandler(), _RedirectHandler(feature),
               urllib.request.HTTPErrorProcessor()):
         o.add_handler(h)
     return o
@@ -942,7 +1022,9 @@ def _opener(feature: str, direct: bool = False) -> urllib.request.OpenerDirector
 def urlopen(req, timeout: float = 30, feature: str | None = None, direct: bool = False):
     """urllib.request.urlopen for `feature` (a key of FEATURES), the way the Connection
     setting says. Raises FeatureOff, before anything is looked up, when that's switched
-    off or no feature is named (a URL on this PC is always allowed). `direct` connects
+    off or no feature is named (a URL on this PC is always allowed). Any other address
+    on the home network (192.168.x, .lan…) is refused, except for HOME_OK features,
+    and so is a redirect into this PC or the home network. `direct` connects
     straight to the site whatever the Connection setting (the switches still hold):
     only for a click on "Try this one without Tor" (the user's own choice for that one
     request)."""
@@ -963,6 +1045,9 @@ def urlopen(req, timeout: float = 30, feature: str | None = None, direct: bool =
             netlog.blocked(feature, u.hostname or "", port, str(e))
             raise
     assert feature is not None   # check() raised for None
+    if (feature not in HOME_OK and not is_loopback(u.hostname or "")
+            and _local_target(u.hostname or "")):
+        raise _refuse_home(feature, u)
     try:
         return _opener(feature, direct).open(req, timeout=timeout)
     except urllib.error.URLError as e:
@@ -1134,17 +1219,15 @@ class _Relay:
                         host=host)
                 netlog.blocked(feature, host, int(port), why, netlog.RELAY)
                 return self._refuse(c, 403, str(_failed(why)))
-            if (_mode == DIRECT or direct) and _name_leads_home(host):
-                # going direct, the name is looked up on this PC anyway: one that leads
-                # into this PC / the home network (a stream redirecting there) is refused
-                self.seen.append((feature, host, "local"))
-                why = _("Not connecting to {host}: it leads to this PC or your home "
-                        "network", host=host)
-                netlog.blocked(feature, host, int(port), why, netlog.RELAY)
-                return self._refuse(c, 403, str(_failed(why)))
             try:
+                # going direct, the name is looked up on this PC anyway: one that leads
+                # into this PC / the home network (a stream redirecting there) is
+                # refused, and the connection goes to the address that was checked
                 up, entry = _open(host, int(port), feature=feature, direct=direct,
-                                  how=netlog.RELAY)
+                                  how=netlog.RELAY, away=True)
+            except LeadsHome as e:
+                self.seen.append((feature, host, "local"))
+                return self._refuse(c, 403, str(_failed(str(e))))
             except OSError as e:
                 self.seen.append((feature, host, "failed"))
                 return self._refuse(c, 502, str(e))
@@ -1268,24 +1351,6 @@ def _local_target(host: str) -> bool:
     ip = getattr(ip, "ipv4_mapped", None) or ip
     return (ip.is_private or ip.is_loopback or ip.is_link_local or ip.is_unspecified
             or ip.is_multicast or ip.is_reserved)
-
-
-def _name_leads_home(host: str) -> bool:
-    """Does the name `host` resolve to an address on this PC or the home network? Only
-    for connections that go direct (the lookup is made on this PC either way). An
-    address, "localhost", or a name that doesn't resolve isn't refused here."""
-    if is_loopback(host):
-        return False
-    try:
-        ipaddress.ip_address(host.split("%")[0])
-        return False   # an address: _local_target decides
-    except ValueError:
-        pass
-    try:
-        infos = socket.getaddrinfo(host, None, proto=socket.IPPROTO_TCP)
-    except (OSError, UnicodeError):
-        return False
-    return any(_local_target(str(info[4][0])) for info in infos)
 
 
 _relay: _Relay | None = None

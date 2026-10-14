@@ -902,11 +902,37 @@ def _write_privacy(text: str):
     except OSError:
         pass
     try:
-        tmp = path.with_suffix(".tmp")
-        tmp.write_text(text, encoding="utf-8")
-        tmp.replace(path)
+        atomic_write_text(path, text)
     except OSError:
         log.warning("couldn't save %s", path, exc_info=True)
+
+
+def _durable_tmp(path: Path, text: str) -> Path:
+    """`text` in a new temp file next to `path`, flushed to the disk (fsync) before it
+    returns: renamed over `path` without that, a power cut could leave `path` empty or
+    full of NULs. The temp file is removed if writing it fails."""
+    fd, name = tempfile.mkstemp(prefix=path.name + ".", suffix=".tmp", dir=path.parent)
+    tmp = Path(name)
+    try:
+        with os.fdopen(fd, "w", encoding="utf-8", newline="\n") as f:
+            f.write(text)
+            f.flush()
+            os.fsync(f.fileno())
+    except BaseException:
+        tmp.unlink(missing_ok=True)
+        raise
+    return tmp
+
+
+def atomic_write_text(path: Path, text: str):
+    """Replace `path` with `text` so a crash or power cut leaves the old file or the new
+    one, never a broken one. Raises OSError."""
+    tmp = _durable_tmp(Path(path), text)
+    try:
+        _replace(tmp, Path(path))
+    except BaseException:
+        tmp.unlink(missing_ok=True)
+        raise
 
 
 def _replace(tmp: Path, path: Path, tries: int = 6):
@@ -948,15 +974,18 @@ def _write(snap: tuple[int, dict, str]) -> bool:
                 damaged = True
             except OSError:
                 pass
-            tmp = CONFIG_PATH.with_suffix(".tmp")
-            tmp.write_text(text, encoding="utf-8")
-            if CONFIG_PATH.exists() and not damaged and _rotate_due():
-                try:
-                    _rotate_backups()
-                    _rotated[CONFIG_PATH] = time.monotonic()
-                except OSError:   # a backup locked for a moment mustn't block the save
-                    log.warning("couldn't rotate the config backups", exc_info=True)
-            _replace(tmp, CONFIG_PATH)
+            tmp = _durable_tmp(CONFIG_PATH, text)
+            try:
+                if CONFIG_PATH.exists() and not damaged and _rotate_due():
+                    try:
+                        _rotate_backups()
+                        _rotated[CONFIG_PATH] = time.monotonic()
+                    except OSError:   # a backup locked for a moment mustn't block the save
+                        log.warning("couldn't rotate the config backups", exc_info=True)
+                _replace(tmp, CONFIG_PATH)
+            except BaseException:
+                tmp.unlink(missing_ok=True)
+                raise
             _written_seq = seq
             return True
         except OSError:
@@ -1465,7 +1494,9 @@ def _stream(pieces, rate: int, sid: str, store: Path | None, via_ffmpeg: bool) -
     rs = soxr.ResampleStream(rate, SR, 2, dtype="float32", quality="VHQ") if rate != SR else None
     CACHE_DIR.mkdir(parents=True, exist_ok=True)
     dest = cache_path(sid)
-    tmp = {False: dest.with_suffix(".tmp.npy"), True: dest.with_name(f"{sid}.lim.tmp.npy")}
+    tag = uuid.uuid4().hex[:8]   # unique: another thread may be writing this sound's cache
+    tmp = {False: dest.with_name(f"{sid}.{tag}.tmp.npy"),
+           True: dest.with_name(f"{sid}.{tag}.lim.tmp.npy")}
     lim = Limiter(SR, ceiling_db=-0.05)
     st = {"n": 0, "lim_n": 0, "skip": lim.la, "peak": 0.0}
     rms: list[np.ndarray] = []
@@ -1606,9 +1637,12 @@ def store_cached(sid: str, data: np.ndarray, fx_key: str = "") -> np.ndarray:
     try:
         CACHE_DIR.mkdir(parents=True, exist_ok=True)
         dest = cache_path(sid, fx_key)
-        tmp = dest.with_suffix(".tmp.npy")
-        np.save(tmp, i16)
-        tmp.replace(dest)
+        tmp = dest.with_name(f"{dest.stem}.{uuid.uuid4().hex[:8]}.tmp.npy")   # unique per writer
+        try:
+            np.save(tmp, i16)
+            _replace(tmp, dest)   # another writer's replace can hold dest a moment
+        finally:
+            tmp.unlink(missing_ok=True)
         _refused.discard(dest)   # a new file there: in use again, not a leftover
     except OSError:   # e.g. dest is mapped by audio still in use: prune_cache tidies up
         log.warning("couldn't write cache for %s", sid, exc_info=True)

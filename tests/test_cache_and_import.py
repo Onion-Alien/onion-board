@@ -1,6 +1,10 @@
 """Phase 2: bounded decoding, the int16 cache, imports, clips and dedupe."""
+import io
+import logging
 import os
+import threading
 import time
+from types import SimpleNamespace
 from pathlib import Path
 
 import numpy as np
@@ -55,7 +59,7 @@ def test_decode_resamples_and_widens_mono(app_dir):
 def test_cache_round_trip_and_damage_tolerance(app_dir):
     x = (np.random.default_rng(1).standard_normal((SR, 2)) * 0.2).astype(np.float32)
     i = store_cached("abc", x)
-    assert cache_path("abc").exists() and not cache_path("abc").with_suffix(".tmp.npy").exists()
+    assert cache_path("abc").exists() and not list(library.CACHE_DIR.glob("*.tmp.npy"))
     back = load_cached("abc")
     assert back.dtype == np.int16 and np.array_equal(back, i)
     cache_path("abc").write_bytes(b"garbage")
@@ -63,6 +67,79 @@ def test_cache_round_trip_and_damage_tolerance(app_dir):
     np.save(cache_path("abc"), np.zeros((10, 3), np.int16))     # wrong shape
     assert load_cached("abc") is None
     assert load_cached("nope") is None
+
+
+def test_two_writers_of_one_cache_leave_a_whole_file_and_no_temp(app_dir, monkeypatch, caplog):
+    """A pack import or Undo during a slow first load could store one sound's cache on
+    two threads at once. With one shared temp name the second writer overwrote the
+    first's half-written file and then found it gone; each has its own now."""
+    a = np.full((SR, 2), 0.25, np.float32)
+    b = np.full((SR, 2), -0.5, np.float32)
+    both = threading.Barrier(2, timeout=10)
+    real = library.np.save
+
+    def save(path, arr, *k, **kw):   # both are halfway through writing when they meet
+        buf = io.BytesIO()
+        real(buf, arr, *k, **kw)
+        data = buf.getvalue()
+        with open(path, "wb") as f:
+            f.write(data[:len(data) // 2])
+            f.flush()
+            both.wait()
+            f.write(data[len(data) // 2:])
+    monkeypatch.setattr(library.np, "save", save)
+    got = {}
+    ts = [threading.Thread(target=lambda n=n, x=x: got.__setitem__(n, store_cached("dup", x)))
+          for n, x in (("a", a), ("b", b))]
+    with caplog.at_level(logging.WARNING, logger=library.log.name):
+        for t in ts:
+            t.start()
+        for t in ts:
+            t.join(10)
+    assert not [r for r in caplog.records if "couldn't write cache" in r.getMessage()]
+    back = load_cached("dup")
+    assert back is not None and any(np.array_equal(back, to_int16(x)) for x in (a, b))
+    assert np.array_equal(got["a"], to_int16(a)) and np.array_equal(got["b"], to_int16(b))
+    assert not list(library.CACHE_DIR.glob("*.tmp.npy"))
+
+
+def test_load_all_skips_sounds_an_earlier_load_is_still_decoding(app_dir, monkeypatch):
+    """_load_all again while the first is still on a slow sound (a pack import, Undo)
+    doesn't decode that sound a second time; its thread ends after the first one's."""
+    from soundboard.ui import mainwindow as mw
+    slow, other = (SoundMeta(id="slow", name="slow", file="slow.wav"),
+                    SoundMeta(id="other", name="other", file="o.wav"))
+    started, go = threading.Event(), threading.Event()
+    decoded = []
+
+    def load(m):
+        decoded.append(m.id)
+        if m.id == "slow":
+            started.set()
+            go.wait(10)
+        return np.zeros((10, 2), np.int16)
+    monkeypatch.setattr(mw, "load_sound", load)
+    for f in ("prune_cache", "cache_keep"):
+        monkeypatch.setattr(mw, f, lambda *a: set())
+    monkeypatch.setattr(mw.thumbs, "prune", lambda *a: None)
+    monkeypatch.setattr(mw.trash, "prune", lambda *a: None)
+    sounds = [slow]
+    w = SimpleNamespace(cfg=SimpleNamespace(sounds=sounds), audio={}, _loading=set(),
+                        _load_thread=None, _live_metas=lambda: list(sounds),
+                        engine=SimpleNamespace(prepare=lambda *a: None),
+                        bridge=SimpleNamespace(loaded=SimpleNamespace(emit=lambda *a: None)))
+    mw.MainWindow._load_all(w)
+    first = w._load_thread
+    assert started.wait(10)
+    sounds.append(other)   # added while "slow" is still loading
+    mw.MainWindow._load_all(w)
+    second = w._load_thread
+    second.join(0.5)
+    assert second.is_alive()   # waits for the sound it left to the first
+    go.set()
+    first.join(10)
+    second.join(10)
+    assert sorted(decoded) == ["other", "slow"] and not w._loading
 
 
 def test_load_sound_decodes_once_then_uses_the_cache(app_dir, monkeypatch):

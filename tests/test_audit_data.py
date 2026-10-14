@@ -233,6 +233,22 @@ def test_resanance_negative_lengths_dont_loop_forever():
         resanance._bson(struct.pack("<i", -8) + b"\0" * 8, 0)
 
 
+def _nested(levels: int) -> bytes:
+    """A BSON document holding a document holding a document… `levels` deep."""
+    doc = struct.pack("<i", 5) + b"\0"
+    for _ in range(levels):
+        body = b"\x03k\0" + doc
+        doc = struct.pack("<i", 4 + len(body) + 1) + body + b"\0"
+    return doc
+
+
+def test_resanance_deeply_nested_document_is_damaged_not_a_crash():
+    with pytest.raises(ValueError):   # was a RecursionError, which nothing catches
+        resanance._bson(_nested(1200), 0)
+    out, end = resanance._bson(_nested(3), 0)   # a real row's nesting still reads
+    assert out == {"k": {"k": {"k": {}}}} and end == len(_nested(3))
+
+
 @pytest.mark.parametrize("data", [None, [], "x", 3])
 def test_soundux_odd_data_is_not_a_config(tmp_path, data):
     p = tmp_path / "soundux.json"

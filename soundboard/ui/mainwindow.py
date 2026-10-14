@@ -173,7 +173,7 @@ FF_ASK_OFF = "ffmpeg-offer"   # in Config.tips_seen: the FFmpeg bar's Don't ask 
 SEARCH_MIN_W = 220    # the Sounds tab's search box, until the window gets narrow
 # ...and its most: a few words go in it, so past this it's only a longer empty bar
 # (456 px at 1180x720, so normal windows are unchanged). The seek bar, the levels and
-# the drop box still follow the window: wider is useful there (U11).
+# the drop box still follow the window: wider is useful there.
 SEARCH_MAX_W = 480
 VOICE_POLL_MS = 3000  # how often the game in front is looked at (soundboard.voicesdk)
 VOICE_POLL_IDLE_S = 15   # ...while nobody sees the hint and nothing switches by itself
@@ -319,6 +319,7 @@ class Bridge(QObject):
     loaded = Signal(str, object, str)          # id, data|None, error
     exported = Signal(str, int, str)           # file, sounds written, error
     unpacked = Signal(object, object, str)     # backup.Imported|None, backup.Package, error
+    worked = Signal(object, object, object)    # _on_worker: then, result|None, error|None
     update = Signal(object, str, bool)         # updates.Release|None, error, asked by the user
     update_progress = Signal(object, object)   # bytes of the new version downloaded, of
                                                # how many (0: not known)
@@ -396,6 +397,9 @@ class MainWindow(QMainWindow):
     remote_changed = Signal()           # a remote control server started or stopped
     cable_setup_found = Signal(bool)    # VB-Cable's setup program is on this PC (asked on a thread)
     video_found = Signal(str, object)   # a sound's video (Path|None), looked up on a thread
+    board_read = Signal(object, str, bool, object)   # import_other read on a thread: Source,
+                                        # its board's path ("" = not found), ask, otherboards
+                                        # .importable()'s (ok, bad) and entries, or the error
     config_saved = Signal(bool)         # the background save finished: ok
     voice_engine = Signal(object)       # the voice engine of the game in front (a mode key|None)
     default_found = Signal(object)      # Windows' default output, asked on a thread (str|None)
@@ -403,6 +407,7 @@ class MainWindow(QMainWindow):
     tab_switched = Signal(str, bool)    # Settings > Tabs: a tab (taboff.KEYS) off / on again
     category_programs_changed = Signal()   # a program -> category rule added / removed
     app_setup_changed = Signal()   # an app remembered / forgotten (appsetup)
+    bin_filled = Signal(object)    # removed sounds are in the bin: its sound count|None
 
     # the slim bars across the top of the window (urgent fix, tip, app offer, FFmpeg, language)
     TOP_BARS = ("urgent_bar", "tip_bar", "setup_bar", "ff_bar", "lang_bar")
@@ -462,6 +467,7 @@ class MainWindow(QMainWindow):
         self.bridge.preview.connect(self._on_fx_preview)
         self.bridge.exported.connect(self._on_exported)
         self.bridge.unpacked.connect(self._on_unpacked)
+        self.bridge.worked.connect(self._on_worked)
         self.bridge.update.connect(self._on_update)
         self.bridge.update_progress.connect(self._on_update_progress)
         self.bridge.update_ready.connect(self._on_update_ready)
@@ -472,7 +478,7 @@ class MainWindow(QMainWindow):
         self.bridge.ffmpeg.connect(self._on_ffmpeg)
         self.bridge.ffmpeg_progress.connect(self._on_ffmpeg_progress)
         self._removed: list[tuple[SoundMeta, int, np.ndarray | None]] = []   # undo-able
-        # windows beside the board, not over it (U4): the one Settings, and an Edit
+        # windows beside the board, not over it: the one Settings, and an Edit
         # sound for each sound being edited
         self._settings_dlg: SettingsDialog | None = None
         self._editors: dict[str, EditDialog] = {}
@@ -480,6 +486,7 @@ class MainWindow(QMainWindow):
         self._settings_kept: SettingsDialog | None = None   # closed Settings, reused
         self._settings_kept_print = None
         self._packs_removed: set[str] = set()   # sound packs to stop keeping after Undo
+        self._bin_thread: threading.Thread | None = None   # the newest _finish_removals work
         self._render_gen: dict[str, int] = {}   # sid -> newest effects render (_rerender)
         self.shuffle = ShuffleBag()       # the random-sound hotkeys
         self._last_sid: str | None = None   # the last sound played (its replay hotkey)
@@ -569,6 +576,7 @@ class MainWindow(QMainWindow):
         self._talk_shown: bool | None = None
         self.virtual_mic: str | None = None
         self._load_thread: threading.Thread | None = None
+        self._loading: set[str] = set()   # sids a load thread is decoding right now
         self.engine.latency = self.cfg.latency if self.cfg.latency in ("low", "high") else "low"
         self._save_timer = QTimer(self)
         self._save_timer.setSingleShot(True)
@@ -580,6 +588,7 @@ class MainWindow(QMainWindow):
         # written on a background thread: a slow disk froze the window for seconds
         self._saver = library.Saver(self.cfg, done=self.config_saved.emit)
         self.config_saved.connect(self._on_saved)
+        self.bin_filled.connect(self._label_bin)
 
         self.setup_state = ""
         self._pill_long = ""              # the setup pill's whole text (its tip, its name)
@@ -1923,6 +1932,7 @@ class MainWindow(QMainWindow):
         self._video_for: tuple[str | None, Path | None] = ("", None)   # (sid, its video)
         self._video_asking: str | None = None   # the sound whose video a thread looks up
         self.video_found.connect(self._video_found)
+        self.board_read.connect(self._board_read)
         self._video_win = None   # ui/videowindow.VideoWindow, made on first use
         th.addWidget(self.btn_video)
         self.speed_btn = SpeedPitchButton(
@@ -2700,10 +2710,13 @@ class MainWindow(QMainWindow):
             return
         self.cfg.latency = mode
         self.engine.latency = mode
-        self.engine.reopen_all()
         self._save_now()
-        self._update_status()
-        self._say_back_on_mic()
+        e = self.engine
+
+        def reopened(_):
+            self._update_status()
+            self._say_back_on_mic()
+        self._device_job(lambda: e.reopen_all, reopened)   # (on the device thread)
 
     def _say_back_on_mic(self):
         """After a restart or an audio buffering change: tell them the board is on the
@@ -3207,14 +3220,24 @@ class MainWindow(QMainWindow):
         """The stream output: Setup -> Devices -> Also send to -> a row set to Clean,
         for streaming. None switches it off."""
         self.cfg.obs_device = name
-        self.engine.set_obs_device(self._obs_name(name))
-        copies = self._copy_names()   # (a copy row on it may be free to open again)
-        if list(self.engine.copy_names) != copies:
-            self.engine.set_copy_devices(copies)
         self._show_route()            # the rows
         self._save_now()
-        self._update_status()
-        self._prepare_all()
+        e = self.engine
+
+        def plan():   # the streams are opened on the device thread (_device_job)
+            obs = self._obs_name(name)
+            copies = self._copy_names()   # (a copy row on it may be free to open again)
+
+            def work():
+                e.set_obs_device(obs)
+                if list(e.copy_names) != copies:
+                    e.set_copy_devices(copies)
+            return work
+
+        def opened(_):
+            self._update_status()
+            self._prepare_all()
+        self._device_job(plan, opened)
 
     def set_send_kind(self, name: str, stream: bool):
         """Also send to: the row on `name` gets the clean stream mix (`stream`; the
@@ -7138,7 +7161,11 @@ class MainWindow(QMainWindow):
             meta.tags.append(self.cfg.category)
 
     def _load_all(self):
-        todo = [m for m in self.cfg.sounds if m.id not in self.audio]
+        # one still being loaded by an earlier call (a pack import or Undo during a slow
+        # first load) isn't decoded again: two writers of one cache file garble it
+        todo = [m for m in self.cfg.sounds if m.id not in self.audio and m.id not in self._loading]
+        self._loading.update(m.id for m in todo)
+        prev = self._load_thread
 
         def run():
             t0 = time.monotonic()
@@ -7150,6 +7177,10 @@ class MainWindow(QMainWindow):
                 except Exception as e:  # noqa: BLE001
                     log.warning("can't load %s: %s", m.file, e)
                     self.bridge.loaded.emit(m.id, None, errors.plain(e))
+                finally:
+                    self._loading.discard(m.id)
+            if prev is not None:   # done only once the sounds it skipped are, too
+                prev.join()
             live = self._live_metas()   # as of now, not of the start
             prune_cache(cache_keep(live))
             thumbs.prune({m.image for m in live if m.image})
@@ -7287,15 +7318,31 @@ class MainWindow(QMainWindow):
             if (src := otherboards.for_file(f)) is not None:
                 files.remove(f)   # another soundboard's saved board dropped on the window
                 self.import_other(src, f)
-        zips = {}   # a plain zip of sound files: unpacked, then imported like the rest
-        # a backup / sound pack (a .zip, or a folder with its JSON) is unpacked instead
-        for f in [f for f in files if self._is_package(f)]:
-            files.remove(f)
-            names = backup.loose_audio(f)
-            if names:
-                zips[f] = names
-            else:
-                self.import_package(f)
+        packages = [f for f in files if self._is_package(f)]
+        if not packages:
+            self._import_now(files, extras, {})
+            return
+        files = [f for f in files if f not in packages]
+
+        def look():   # opening each zip: on the worker (a big one, or on OneDrive)
+            return {f: backup.loose_audio(f) for f in packages}
+
+        def then(found, err):
+            if err is not None:
+                log.warning("couldn't look into %s: %r", packages, err)
+            found = found or {}
+            # a plain zip of sound files: unpacked, then imported like the rest; a
+            # backup / sound pack (a .zip, or a folder with its JSON) is read instead
+            zips = {f: found[f] for f in packages if found.get(f)}
+            for f in packages:
+                if f not in zips:
+                    self.import_package(f)
+            self._import_now(files, extras, zips)
+        self._on_worker(look, then, "import-look")
+
+    def _import_now(self, files: list[str], extras: dict[str, otherboards.Entry],
+                    zips: dict[str, list[str]]):
+        """import_files once the zips are sorted: `zips` maps a plain zip to its sounds."""
         count = len(files) + sum(len(n) for n in zips.values())
         if not count:
             return
@@ -8041,18 +8088,37 @@ class MainWindow(QMainWindow):
         # (soundboard.mapped) while an array still points into it
         done, self._removed = [(m, i) for m, i, _d in self._removed], []
         toastmod.close(self, UNDO_KEY)   # (its on_close comes back here: nothing left)
-        for m, i in done:
-            trash.put_sound(m, i)
-        if done:
-            self._label_bin()
-        for pid in self._packs_removed:   # not undone: the pack is no longer kept
-            if not any(m.pack == pid for m in self.cfg.sounds):
-                backup.forget_pack(pid)
+        # not undone: the pack is no longer kept
+        packs = [p for p in self._packs_removed
+                 if not any(m.pack == p for m in self.cfg.sounds)]
         self._packs_removed.clear()
+        if not done and not packs:
+            return
+        prev = self._bin_thread
 
-    def _label_bin(self):
-        """Keep the compatibility button's count; Library holds the visible action."""
-        n = len(trash.items(trash.SOUND))
+        def work():   # file moves, the bin's list (retried while locked): off the UI thread
+            if prev is not None:
+                prev.join()   # an earlier removal's sounds go in first
+            n = trash.put_sounds(done) if done else None
+            for pid in packs:
+                backup.forget_pack(pid)
+            return worker.SKIP if n is None else n
+        # (nothing waits on it: the bin's count shows next time)
+        self._bin_thread = worker.run(work, self.bin_filled, "to-bin", error=worker.SKIP,
+                                      owner=self)
+
+    def _wait_bin(self):
+        """Let removed sounds finish going into the bin (before the bin is listed,
+        and on quitting)."""
+        if self._bin_thread is not None:
+            self._bin_thread.join()
+            self._bin_thread = None
+
+    def _label_bin(self, n: int | None = None):
+        """Keep the compatibility button's count; Library holds the visible action.
+        `n`: the sounds in the bin, if known (None reads it)."""
+        if n is None:
+            n = len(trash.items(trash.SOUND))
         self.btn_bin.setText(_("Recently deleted ({n})", n=n))
         self.btn_bin.hide()   # Recently deleted is in the Library menu
 
@@ -8060,6 +8126,7 @@ class MainWindow(QMainWindow):
         """Library → Recently deleted sounds"""
         from soundboard.ui.deleted import DeletedDialog
         self._finish_removals()   # the ones on the Undo bar are listed too
+        self._wait_bin()
         d = DeletedDialog(trash.SOUND, "sounds", self._restore_deleted, self)
         d.exec()
         free_dialog(d)
@@ -8532,12 +8599,34 @@ class MainWindow(QMainWindow):
         own), names, categories and the hotkeys nothing here uses yet. `ask`: False
         when they already said yes (the installer's box): no questions or pop-ups."""
         usage.used("import-board")
+        self._read_board(src, path, ask)
+
+    def _read_board(self, src: otherboards.Source, path: str, ask: bool):
+        # finding and reading the board, and checking every sound file is there, run on
+        # a thread: the board file can be tens of MB and its sounds on a network drive
+        # that's gone, which takes seconds a file (the window froze, even at start-up)
+        where = [path]
+
+        def run():
+            if not where[0]:
+                try:
+                    where[0] = str(src.find() or "")
+                except OSError:
+                    where[0] = ""
+            if not where[0]:
+                return src, "", ask, None
+            entries = src.read(Path(where[0]))
+            return src, where[0], ask, (*otherboards.importable(entries), entries)
+        # a board that can't be read (or a bad one) comes back as what it raised
+        worker.run(run, self.board_read, "import-board",
+                   error=lambda e: (src, where[0], ask, e), owner=self)
+
+    def _board_read(self, src: otherboards.Source, path: str, ask: bool, result):
+        """import_other's read is back: the question, then the import, here on the UI
+        thread (the window may have closed in the meantime)."""
+        if self._shut_down:
+            return
         title = _("Import from {name}", name=src.name)
-        if not path:
-            try:
-                path = str(src.find() or "")
-            except OSError:
-                path = ""
         if not path and not ask:
             return   # its board went away since the install
         if not path:
@@ -8545,11 +8634,11 @@ class MainWindow(QMainWindow):
                 self, _("{title}: pick a saved board", title=title), str(Path.home()),
                 _("{name} board ({patterns})", name=src.name,
                   patterns=" ".join("*" + x for x in src.suffixes)))
-            if not path:
-                return
-        try:
-            entries = src.read(Path(path))
-        except (OSError, ValueError) as e:
+            if path:
+                self._read_board(src, path, ask)
+            return
+        if isinstance(result, Exception):
+            e = result
             if not ask:
                 log.warning("can't read %s's board: %s", src.name, e)
                 self.toast(_("Couldn't bring your {name} sounds over: {e}",
@@ -8558,7 +8647,7 @@ class MainWindow(QMainWindow):
             else:
                 errors.warn(self, _("Couldn't read the {name} board", name=src.name), e)
             return
-        ok, bad = otherboards.importable(entries)
+        ok, bad, entries = result
         if not ok:
             msg = (_("No sounds to bring over: the sound files {name} points at have been moved "
                      "or deleted.", name=src.name) if entries else
@@ -8603,23 +8692,21 @@ class MainWindow(QMainWindow):
 
     def import_package(self, path: str):
         """Add the sounds from a backup / sound pack (ones already here are skipped).
-        A full backup's settings are only applied if the user says so."""
-        # reading a big zip takes a moment
-        QApplication.setOverrideCursor(Qt.CursorShape.WaitCursor)
-        try:
-            pkg = backup.read(path)
-        except backup.BackupError as e:
-            QApplication.restoreOverrideCursor()
-            errors.warn(self, _("Can't import"), e)
+        A full backup's settings are only applied if the user says so.
+        Reading it (a big zip takes a moment) runs on a worker; this returns at once."""
+        self._on_worker(lambda: backup.read(path),
+                        lambda pkg, err: self._package_read(path, pkg, err), "import-read")
+
+    def _package_read(self, path: str, pkg, err):
+        if isinstance(err, backup.BackupError):
+            errors.warn(self, _("Can't import"), err)
             return
-        except Exception as e:  # noqa: BLE001 - a damaged or odd file, never a crash
-            QApplication.restoreOverrideCursor()
-            log.warning("couldn't read %s", path, exc_info=True)
+        if err is not None:   # a damaged or odd file, never a crash
+            log.warning("couldn't read %s: %r", path, err)
             self.tell(_("Can't import"),
                       _("{name} is damaged or in a format Onion Board can't read ({e}).",
-                        name=Path(path).name, e=errors.plain(e)), "error")
+                        name=Path(path).name, e=errors.plain(err)), "error")
             return
-        QApplication.restoreOverrideCursor()
         use_settings = False
         if pkg.settings:
             box = QMessageBox(QMessageBox.Icon.Question, _("Import backup"),
@@ -8865,13 +8952,21 @@ class MainWindow(QMainWindow):
 
     def reset_pack(self, pid: str, ask: bool = True):
         """Put a sound pack back how it came: its sounds' names, hotkeys, volume,
-        effects, categories and pictures, and its removed sounds come back."""
-        try:
+        effects, categories and pictures, and its removed sounds come back.
+        The pack is read, and its pictures put back, on a worker; this returns at once."""
+        def read():
             pkg = backup.read_pack(pid)
-        except backup.BackupError as e:
-            errors.warn(self, _("Can't reset the sound pack"), e)
+            return pkg, self._pack_name(pkg)
+        self._on_worker(read, lambda got, err: self._pack_read(pid, got, err, ask),
+                        "reset-read")
+
+    def _pack_read(self, pid: str, got, err, ask: bool):
+        if err is not None:
+            if not isinstance(err, backup.BackupError):
+                log.warning("couldn't read the sound pack %s: %r", pid, err)
+            errors.warn(self, _("Can't reset the sound pack"), err)
             return
-        name = self._pack_name(pkg)
+        pkg, name = got
         if ask and QMessageBox.question(
                 self, _("Reset sound pack"),
                 _("Put the sounds from “{name}” back how they came?\n\nChanges you made to "
@@ -8884,34 +8979,67 @@ class MainWindow(QMainWindow):
         for m in self.cfg.sounds:
             if m.pack == pid:
                 on_board.setdefault(m.pack_item, m)
-        fx_before = {m.id: soundfx.key(m.fx) for m in on_board.values()}
-        try:
-            pkg.restored = backup.reset_sounds(pkg, on_board)
-        except (OSError, backup.BackupError) as e:
-            errors.warn(self, _("Can't reset the sound pack"), e)
-            return
-        for m in pkg.restored:
-            if soundfx.key(m.fx) != fx_before[m.id]:
-                self._rerender(m)
-            if p := self.pads.get(m.id):
-                p.update()
+        # put back on copies (the pictures are re-encoded: disk), copied over here
+        copies = {k: copy.copy(m) for k, m in on_board.items()}
         missing = [ps for ps in pkg.sounds if ps.folder not in on_board]
-        if not missing:
-            self._on_unpacked(backup.Imported(), pkg, "")
-            return
-        full = list(pkg.sounds)
-        pkg.sounds = missing
         start = len(self.cfg.sounds)
 
         def run():
+            restored = backup.reset_sounds(pkg, copies)
+            if not missing:
+                return restored, backup.Imported(), ""
+            full = list(pkg.sounds)
+            pkg.sounds = missing
             try:
                 res = backup.install(
                     pkg, set(), lambda i: PAD_COLORS[(start + i) % len(PAD_COLORS)])
+            except Exception as e:  # noqa: BLE001
+                log.exception("reset of the sound pack %s failed", pid)
+                res, err = None, errors.plain(e)
+            else:
+                err = ""
             finally:
                 pkg.sounds = full   # for _pack_spot's order
-            return res, pkg, ""
-        worker.run(run, self.bridge.unpacked, "reset-pack",
-                   error=lambda e: (None, pkg, errors.plain(e)), owner=self)
+            return restored, res, err
+
+        def then(got, err):
+            if err is not None:
+                if not isinstance(err, (OSError, backup.BackupError)):
+                    log.warning("reset of the sound pack %s failed: %r", pid, err)
+                errors.warn(self, _("Can't reset the sound pack"), err)
+                return
+            restored, res, failed = got
+            pkg.restored = []
+            for c in restored:
+                m = on_board[c.pack_item]
+                if m not in self.cfg.sounds:   # removed while it ran
+                    continue
+                fx_before = soundfx.key(m.fx)
+                for k in (*backup.SOUND_FIELDS, "image"):
+                    setattr(m, k, getattr(c, k))
+                pkg.restored.append(m)
+                if soundfx.key(m.fx) != fx_before:
+                    self._rerender(m)
+                if p := self.pads.get(m.id):
+                    p.update()
+            self._on_unpacked(res, pkg, failed)
+        self._on_worker(run, then, "reset-pack")
+
+    def _on_worker(self, work, then, name: str):
+        """work() (reading a backup or pack: disk) on a worker thread with the busy
+        cursor up, then then(its result, None) or then(None, what it raised) back on
+        the UI thread."""
+        QApplication.setOverrideCursor(Qt.CursorShape.WaitCursor)
+
+        # what it raised is said by then(); the window gone (quitting): nothing
+        worker.run(lambda: (then, work(), None), self.bridge.worked, name,
+                   error=lambda e: (then, None, e), owner=self)
+
+    def _on_worked(self, then, res, err):
+        QApplication.restoreOverrideCursor()
+        if self._shut_down:   # closed while it ran
+            return
+        then(res, err)
 
     def remove_pack(self, pid: str, ask: bool = True):
         """Take every sound of a sound pack off the board (one Undo brings them back);
@@ -9186,6 +9314,8 @@ class MainWindow(QMainWindow):
 
     def _on_update(self, rel, err: str, asked: bool):
         self._save_later()   # update_checked
+        if updates.recheck_s > 0:   # the newest is still settling: offer it once it has
+            QTimer.singleShot(round(updates.recheck_s * 1000), self, self.check_updates)
         busy = self._downloading or self._update_file is not None
         if rel is not None and not busy:
             if self.release is None or self.release.version != rel.version:
@@ -10433,7 +10563,7 @@ class MainWindow(QMainWindow):
             return
         self._shut_down = True
         exitwatch.quitting()   # a run that dies from here on died closing (exitwatch.py)
-        for step in (self._finish_removals, self.timer.stop, self._voice_timer.stop,
+        for step in (self._finish_removals, self._wait_bin, self.timer.stop, self._voice_timer.stop,
                      self._default_poll.stop, self._discord_poll.stop,
                      self._release_ptt,
                      self._remember_usage, self.cfg.save, self.overlay.shutdown,
