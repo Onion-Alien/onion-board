@@ -10,6 +10,7 @@ root in PowerShell unless noted.
 py -3.13 -m venv .venv                 # Python 3.12+ works
 .venv\Scripts\pip install -r requirements.txt -r requirements-dev.txt
 git config core.hooksPath .githooks    # secrets check, commit times in UTC (required)
+git config merge.langjson.driver "python scripts/merge_json.py %O %A %B"   # catalogs merge by key (precommit sets it too)
 ```
 
 Build tools, only needed for step 4 (and for the mic effect's own tests):

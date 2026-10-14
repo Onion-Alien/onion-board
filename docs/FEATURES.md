@@ -85,7 +85,7 @@ The full list. The [README](../README.md) has the short version and how to get s
   sounds, and the stream output if you set one). With another device the app never puts
   the cable back, never asks you to install it, and the header pill gets a tick once
   it's sending. With nowhere nothing nags. The choice is per PC and isn't in backups.
-- **Stream output for OBS** (Setup → Devices → *Also send to* → a device set to *Clean,
+- **Stream output for OBS** (Setup → Devices → *Also play on* → a device set to *Clean,
   for streaming*; one at a time, with its volume and *Include my voice* under it): what others hear,
   without the voice chat shaping, on a device of its own (a second virtual cable such
   as VB-Cable A+B, or any output you don't listen on). In OBS add it as an *Audio
@@ -127,7 +127,7 @@ The full list. The [README](../README.md) has the short version and how to get s
   it is; drag to move, scroll to zoom: zoomed in, the cities and towns with stations
   are named), or search by name, genre, country or city. Star stations for
   *★ Favorites*; *Popular* and *Recent* list the most played and the ones you had on. One click plays a station; it plays in your headphones, goes out through
-  your mic when you press **Send**, and can *Record* or save the *Last 15s* as a pad.
+  your mic when you press **Send**, and can *Record* it as a pad.
   The bar's live controls change the pitch (up to ±36 semitones with *Redline*) and
   add bass, treble, muffle, reverb, echo, distortion or a preset.
 - **Apps tab:** send one program's sound (a music player, a browser, a video, a
@@ -210,7 +210,7 @@ The full list. The [README](../README.md) has the short version and how to get s
   settings that stop it chopping up your sounds, with a check that listens to what
   Discord does to them), *Set up game voice chat*, *Zoom, Teams or a browser call*,
   *Game has no microphone setting?*, and the *Step-by-step guide* with Bun (mic,
-  headphones, where your sounds go, then Discord). **Also send to** (Setup → Devices)
+  headphones, where your sounds go, then Discord). **Also play on** (Setup → Devices)
   gives extra outputs a copy of what others hear, each with a − to remove it.
 - **Search the web for sounds** from the Sounds tab: Enter in *Search sounds* lists
   results (thumbnail, title, length) in place of the pads, from YouTube, YouTube

@@ -1,0 +1,1 @@
+- Settings: the back arrow and cog beside the "Settings" heading line up with the word in every theme, also in the ones with their own font (Hacker, Amber Terminal, Retro 98, Comic Sans), where they sat up to 2 px low.

@@ -879,16 +879,72 @@ def test_studio_polish_runs_last_and_reports_its_delay():
     assert 0.001 < REGISTRY["polish"](RATE).latency() < 0.003
 
 
-def test_chanting_monk_holds_a_note():
-    """Whatever you say comes out on a note: a tone gliding a third ends on one pitch."""
-    t = np.arange(int(RATE * 2.0)) / RATE
-    f = 140 * 2 ** (np.linspace(0, 4, len(t)) / 12)
-    x = (0.2 * np.sin(2 * np.pi * np.cumsum(f) / RATE)).astype(np.float32)
-    chain = VoiceChain()
-    chain.configure(spec_for(**voicefx.PRESETS["Chanting monk"]))
-    y = np.concatenate([chain.process(np.repeat(x[i:i + 480, None], 2, 1), RATE)[:, 0]
-                        for i in range(0, len(x), 480)])
-    assert np.all(np.isfinite(y)) and np.max(np.abs(y)) < 1.5
+def _monk_pitch(y: np.ndarray, secs: float = 0.5) -> float:
+    """The lowest strong harmonic of the last `secs`: his note."""
+    seg = y[-int(RATE * secs):].astype(np.float64)
+    spec = np.abs(np.fft.rfft(seg * np.hanning(len(seg)), 8 * len(seg)))
+    fr = np.fft.rfftfreq(8 * len(seg), 1 / RATE)
+    band = (fr > 60) & (fr < 400)
+    peaks = np.flatnonzero(band & (spec > 0.3 * spec[band].max()))
+    return float(fr[peaks[0]])
+
+
+def _monk(x, **cfg):
+    e = REGISTRY["monk"](RATE, {"words": 0, **cfg})
+    return run_blocks(e, x, 480)
+
+
+def test_singing_monk_sings_his_own_low_note():
+    """Talk at any steady pitch and he sings his note (C3), with a voice of his own:
+    a full set of harmonics, not your sine."""
+    for hz in (110, 220):
+        t = np.arange(RATE * 2) / RATE
+        x = (0.1 * np.sin(2 * np.pi * hz * t)).astype(np.float32)
+        y = _monk(x)
+        assert np.all(np.isfinite(y)) and np.max(np.abs(y)) < 1.5
+        assert abs(_monk_pitch(y) / 130.81 - 1) < 0.03
+        spec = np.abs(np.fft.rfft(y[-RATE // 2:]))
+        fr = np.fft.rfftfreq(RATE // 2, 1 / RATE)
+        assert spec[(fr > 600) & (fr < 1500)].max() > 0.1 * spec.max()   # his "a"
+
+
+def test_singing_monk_pitch_slider_moves_his_note():
+    t = np.arange(RATE * 2) / RATE
+    x = (0.1 * np.sin(2 * np.pi * 150 * t)).astype(np.float32)
+    assert abs(_monk_pitch(_monk(x, note=-5)) / (130.81 * 2 ** (-5 / 12)) - 1) < 0.03
+
+
+def test_singing_monk_follows_your_tune_on_his_scale():
+    """Go up and he goes up too, landing on a note of his five-note scale (held
+    long, he slowly takes it as your usual pitch again: talking isn't held notes)."""
+    t = np.arange(int(RATE * 2.38)) / RATE
+    hz = np.where(t < 2, 150.0, 150 * 2 ** (7 / 12))
+    x = (0.1 * np.sin(2 * np.pi * np.cumsum(hz) / RATE)).astype(np.float32)
+    e = REGISTRY["monk"](RATE, {"words": 0, "follow": 1})
+    y = run_blocks(e, x, 480)
+    assert np.max(np.abs(y[-RATE // 10:])) > 0.01           # still singing
+    steps = 12 * np.log2(e.f / 130.81)
+    assert steps > 2 and min(abs(steps - s) for s in (3, 5, 7, 10, 12)) < 0.3
+
+
+def test_singing_monk_is_quiet_when_you_are():
+    x = np.zeros(RATE, np.float32)
+    assert np.max(np.abs(_monk(x))) == 0
+    t = np.arange(RATE) / RATE
+    talk = (0.1 * np.sin(2 * np.pi * 150 * t)).astype(np.float32)
+    y = _monk(np.concatenate([talk, np.zeros(RATE, np.float32)]))
+    assert np.max(np.abs(y[-RATE // 2:])) < 1e-3       # he stops when you do
+
+
+def test_singing_monk_any_block_size_and_rate():
+    for rate in (16000, 44100, 48000, 96000):
+        t = np.arange(rate) / rate
+        x = (0.1 * np.sin(2 * np.pi * 150 * t)).astype(np.float32)
+        for block in (64, 441, 2048):
+            e = REGISTRY["monk"](rate)
+            y = np.concatenate([e.run(x[i:i + block], rate) for i in range(0, len(x), block)]
+                               + [e.run(x[:0], rate)])
+            assert len(y) == len(x) and np.all(np.isfinite(y)) and np.max(np.abs(y)) < 2
 
 
 # ---------------------------------------------------------------- phase 2: the room
@@ -990,8 +1046,7 @@ def test_flanger_feedback_is_stable_and_sweeps():
     assert max(lvl) > 3 * min(lvl)
 
 
-@pytest.mark.parametrize("name", ["Dalek", "Whisper", "Child", "Underwater", "Drunk",
-                                  "Old film", "Choir"])
+@pytest.mark.parametrize("name", ["Singing monk", "Dalek", "Haunted radio", "Underwater"])
 def test_new_voices_keep_speech_about_as_loud(name):
     x = _vowel(secs=1.0)
     chain = VoiceChain()

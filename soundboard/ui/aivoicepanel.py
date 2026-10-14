@@ -85,6 +85,21 @@ def install_step(line: str) -> str | None:
 BOX_MAX_W = 560   # px: the voice and pitch box at its widest
 
 
+class _CappedGrid(QGridLayout):
+    """The layout of a frame with a maximum width, working out its height at that width.
+    The layout around asks for the height at the whole row's width (it goes straight
+    to the frame's layout, ignoring the frame's maximum), so a wrapped line inside (the
+    voice's description) counted as one line and the voice list was squashed to make
+    room. Call the frame's updateGeometry() when that text changes."""
+
+    def heightForWidth(self, w: int) -> int:
+        box = self.parentWidget()
+        if box is not None:
+            m = box.contentsMargins()
+            w = min(w, box.maximumWidth() - m.left() - m.right())
+        return super().heightForWidth(w)
+
+
 class AiVoicePanel(QWidget):
     changed = Signal(dict)
     live_changed = Signal(bool)
@@ -147,7 +162,7 @@ class AiVoicePanel(QWidget):
         action.addWidget(self.lbl_state, 1)
         rv.addLayout(action)
         rv.addWidget(self.intro)
-        grid = QGridLayout()
+        grid = _CappedGrid()
         grid.setHorizontalSpacing(12)
         grid.setVerticalSpacing(10)
         grid.addWidget(section_label(_("Voice")), 0, 0, 1, 2)
@@ -189,7 +204,7 @@ class AiVoicePanel(QWidget):
         grid.addLayout(prow, 4, 0, 1, 2)
         grid.setColumnStretch(1, 1)
         # the voice and its pitch, together in one inner area under Start
-        box = QFrame()
+        box = self.voicebox = QFrame()
         box.setObjectName("voicebox")
         box.setMaximumWidth(BOX_MAX_W)   # a list and a slider, not bars across the card
         grid.setContentsMargins(14, 4, 14, 14)
@@ -369,6 +384,8 @@ class AiVoicePanel(QWidget):
         tags = avl.tag_line(vo) if vo else ""
         text = str(vo.get("about") or vo.get("description") or "")
         self.lbl_about.setText(f"{tags}. {text}" if tags and text else tags or text)
+        # its height for its width changed: the layouts around keep the old one until told
+        self.voicebox.updateGeometry()
 
     # ------------------------------------------------------------ all voices
     def _resync(self) -> list[dict]:

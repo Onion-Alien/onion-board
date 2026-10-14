@@ -367,7 +367,7 @@ class Config:
     obs_device: str | None = None
     obs_vol: float = 1.0
     obs_voice: bool = True            # your mic goes to the stream output too
-    # Setup -> Devices -> Also send to: more devices that get a copy of what others hear,
+    # Setup -> Devices -> Also play on: more devices that get a copy of what others hear,
     # on top of "Send my sounds to" (streamers: Voicemeeter, OBS, a second cable...;
     # engine.Engine.set_copy_devices)
     also_send: list[str] = field(default_factory=list)

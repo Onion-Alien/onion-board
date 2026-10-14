@@ -62,7 +62,7 @@ from soundboard.ui.speedpitch import SpeedPitchButton
 from soundboard.ui.panel import (BAR_H, CONTROL_H, EqPanel, Flow, VolumeControl, bar,
                                  alt_tile, capped, card, hint_label, icon_label,
                                  info_button,
-                                 steady_number, vsep)
+                                 steady_number, TileRow, vsep)
 from soundboard.ui.downloadbar import DownloadBar
 from soundboard.ui.linkbar import PLAY_ID as LINK_ID
 from soundboard.ui.linkbar import LinkBar
@@ -2172,6 +2172,10 @@ class MainWindow(QMainWindow):
         top.addStretch(1)
         # working: a fresh copy or off, right here (Settings → Audio has every mic)
         from soundboard.ui.audiorecovery import explanation
+        self.btn_michange = QPushButton(_("Change mic"))
+        self.btn_michange.setProperty("quiet", True)
+        self.btn_michange.setToolTip(_("Put your sounds into another mic instead"))
+        self.btn_michange.clicked.connect(self._pick_mic)
         self.btn_micredo = QPushButton(_("Reinstall"))
         self.btn_micredo.setProperty("quiet", True)
         self.btn_micredo.setToolTip(explanation("reinstall"))
@@ -2190,7 +2194,7 @@ class MainWindow(QMainWindow):
         lines.addWidget(self.mic_reason)
         self.mic_ways = Flow(gap=8)
         lines.addLayout(self.mic_ways)
-        for b in (self.btn_micredo, self.btn_micoff):   # (under the line: wraps when narrow)
+        for b in (self.btn_michange, self.btn_micredo, self.btn_micoff):   # (wraps when narrow)
             b.hide()
             self.mic_ways.addWidget(b)
         box.hide()
@@ -2300,19 +2304,19 @@ class MainWindow(QMainWindow):
         head.setObjectName("section")
         head.setProperty("head", True)
         al.addWidget(head)
-        tiles = QHBoxLayout()
-        tiles.setSpacing(12)
+        tiles = self.mic_alt_tiles = TileRow()   # stacked when narrow, never clipped
         self.alt_cable, self.alt_cable_words = alt_tile(
             "cable", _("Virtual cable"), "", self.btn_usecable, self.btn_rmcable)
-        tiles.addWidget(self.alt_cable, 1)
+        tiles.addTile(self.alt_cable)
         self.btn_pickdev = QPushButton(_("Pick a device"))
         icons.set_icon(self.btn_pickdev, "sliders")
         self.btn_pickdev.clicked.connect(self._pick_send_device)
-        tiles.addWidget(alt_tile(
+        self.alt_device = alt_tile(
             "sliders", _("Another device"),
             _("For streamers and mixers: send your sounds to Voicemeeter, OBS, a mixer or a "
-              "capture card, or to nobody."), self.btn_pickdev)[0], 1)
-        al.addLayout(tiles)
+              "capture card, or to nobody."), self.btn_pickdev)[0]
+        tiles.addTile(self.alt_device)
+        al.addWidget(tiles)
         alt.hide()
         cv.addWidget(alt)
         helpcard, hv = card(_("Connect your chat"), roomy=True, icon="speech")
@@ -3114,7 +3118,7 @@ class MainWindow(QMainWindow):
         return self._cable_ends(plan["main"], plan["vm"]) if "main" in plan else None
 
     def _copy_names(self) -> list[str]:
-        """Setup -> Devices -> Also send to: the devices that get a copy of what others
+        """Setup -> Devices -> Also play on: the devices that get a copy of what others
         hear. None while sending to nobody; never the headphones (you'd hear it twice),
         and never a device that gets it already (what others hear, the cable alongside
         the mic, the stream output, or another end of one of those cables)."""
@@ -3131,12 +3135,12 @@ class MainWindow(QMainWindow):
 
     def sending_to(self) -> list[str]:
         """The devices that get what others hear already: the picked one, the cable
-        alongside the mic, and the stream output ("Also send to" can't add them again)."""
+        alongside the mic, and the stream output ("Also play on" can't add them again)."""
         return [t for t in (self._main_name(), self._tap_name(),
                             self._obs_name(self.cfg.obs_device)) if t]
 
     def set_also_send_at(self, i: int, name: str | None):
-        """Setup -> Devices -> Also send to: row `i` sends to `name` (one past the last
+        """Setup -> Devices -> Also play on: row `i` sends to `name` (one past the last
         row adds one; None removes that row)."""
         c = self.cfg
         lst = list(c.also_send)
@@ -3173,7 +3177,7 @@ class MainWindow(QMainWindow):
         return name
 
     def set_obs_device(self, name: str | None):
-        """The stream output: Setup -> Devices -> Also send to -> a row set to Clean,
+        """The stream output: Setup -> Devices -> Also play on -> a row set to Clean,
         for streaming. None switches it off."""
         self.cfg.obs_device = name
         self._show_route()            # the rows
@@ -3196,7 +3200,7 @@ class MainWindow(QMainWindow):
         self._device_job(plan, opened)
 
     def set_send_kind(self, name: str, stream: bool):
-        """Also send to: the row on `name` gets the clean stream mix (`stream`; the
+        """Also play on: the row on `name` gets the clean stream mix (`stream`; the
         one that had it before goes back to a copy of the call, in its place) or the
         same as the call."""
         c = self.cfg
@@ -3270,7 +3274,7 @@ class MainWindow(QMainWindow):
         if c.route == "off":
             self.setup_hint.setText(_("Sending to others is off: your sounds play in your "
                                       "headphones and on a device set to Clean, for streaming "
-                                      "(Also send to) only."))
+                                      "(Also play on) only."))
         elif c.route == "device" and c.main_device and c.main_device == c.mon_device:
             self.setup_hint.setText(_("<span style='color:{status}'>That's your headphones too, "
                                       "so nothing is sent (you'd hear everything twice). Pick "
@@ -3316,7 +3320,7 @@ class MainWindow(QMainWindow):
             devices = ", ".join(f"<b>{html.escape(n)}</b>" for n in down)
             self.setup_hint.setText(
                 self.setup_hint.text()
-                + _("<br><span style='color:{status}'>Can't open {devices} (under Also send to). "
+                + _("<br><span style='color:{status}'>Can't open {devices} (under Also play on). "
                     "Plugged in? It's tried again by itself.</span>",
                     status=theme.status('warn'), devices=devices))
         self.setup_hint.setVisible(bool(self.setup_hint.text()))   # (no empty gap)
@@ -3565,6 +3569,7 @@ class MainWindow(QMainWindow):
             self._show_bun = False
         effect_on = (mic_route and not mic_busy and not self.setup_show.on
                      and directmic.works(direct))
+        self.btn_michange.setVisible(effect_on)
         self.btn_micredo.setVisible(effect_on)
         self.btn_micoff.setVisible(effect_on)
         said = self._done_toast
@@ -4027,6 +4032,13 @@ class MainWindow(QMainWindow):
         self.setup_page.ensureWidgetVisible(self.cb_route)
         self.cb_route.setFocus()
         self.cb_route.showPopup()
+
+    def _pick_mic(self):
+        """Your mic -> Change mic: Devices' "My mic", opened (the effect follows the mic
+        picked there)."""
+        self.setup_page.ensureWidgetVisible(self.cb_mic)
+        self.cb_mic.setFocus()
+        self.cb_mic.showPopup()
 
     def use_cable_instead(self):
         """Straight into my mic isn't working here: send through the virtual cable (set
