@@ -1,0 +1,40 @@
+name: pin-bumps
+
+# Pinned downloads the app fetches itself (not pip packages or actions: Dependabot does
+# those) are bumped here: one script per pin in scripts/pinbump/. Each finds the newest
+# release, verifies it, rewrites the pin and opens its own PR on pin-bump/<name>-<version>,
+# skipping one that's already waiting. One failing checker doesn't stop the others.
+on:
+  schedule:
+    - cron: "37 6 * * 1"   # Mondays 06:37 UTC
+  workflow_dispatch:
+  pull_request:
+    paths:
+      - scripts/pinbump/**
+      - .github/workflows/pin-bumps.yml
+
+permissions:
+  contents: read
+
+jobs:
+  bump:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    permissions:
+      contents: write        # push pin-bump/* branches
+      pull-requests: write   # open their PRs
+      actions: write         # start checks.yml on them
+    strategy:
+      fail-fast: false
+      matrix:
+        checker: [tor]
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-python@v7
+        with:
+          python-version: "3.13"
+      # On a PR touching the bumpers: check and verify only, change nothing.
+      - env:
+          GH_TOKEN: ${{ github.token }}
+          DRY_RUN: ${{ github.event_name == 'pull_request' && '--dry-run' || '' }}
+        run: python scripts/pinbump/${{ matrix.checker }}.py $DRY_RUN
