@@ -3385,5 +3385,9 @@
   "resonant": "umaalingawngaw",
   "rumble": "dagundong",
   "seasick": "nahihilo",
-  "steady": "matatag"
+  "steady": "matatag",
+  "{n} sound couldn't be read and was left out.": [
+    "Hindi nabasa ang {n} sound kaya hindi ito isinama.",
+    "Hindi nabasa ang {n} sound kaya hindi sila isinama."
+  ]
 }

@@ -3385,5 +3385,9 @@
   "resonant": "tınlayan",
   "rumble": "gümbürtü",
   "seasick": "deniz tutmuş",
-  "steady": "sabit"
+  "steady": "sabit",
+  "{n} sound couldn't be read and was left out.": [
+    "{n} ses okunamadı ve dışarıda bırakıldı.",
+    "{n} ses okunamadı ve dışarıda bırakıldı."
+  ]
 }

@@ -3310,5 +3310,8 @@
   "resonant": "共鳴",
   "rumble": "隆隆",
   "seasick": "暈船",
-  "steady": "平穩"
+  "steady": "平穩",
+  "{n} sound couldn't be read and was left out.": [
+    "有 {n} 個音效無法讀取，已略過。"
+  ]
 }

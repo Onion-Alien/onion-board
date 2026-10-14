@@ -3310,5 +3310,8 @@
   "resonant": "ก้อง",
   "rumble": "เสียงครืน",
   "seasick": "เมาเรือ",
-  "steady": "นิ่ง"
+  "steady": "นิ่ง",
+  "{n} sound couldn't be read and was left out.": [
+    "อ่าน {n} เสียงไม่ได้ จึงข้ามไป"
+  ]
 }

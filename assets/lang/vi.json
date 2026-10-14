@@ -3310,5 +3310,8 @@
   "resonant": "cộng hưởng",
   "rumble": "ầm ầm",
   "seasick": "say sóng",
-  "steady": "ổn định"
+  "steady": "ổn định",
+  "{n} sound couldn't be read and was left out.": [
+    "Không đọc được {n} âm thanh nên đã bỏ qua."
+  ]
 }
