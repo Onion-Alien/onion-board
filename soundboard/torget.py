@@ -16,7 +16,8 @@ To move to a newer Tor release: take the new tarball's line from that release's
 sha256sums-signed-build.txt, verify that file's signature once
 (gpg --verify sha256sums-signed-build.txt.asc, signed by the Tor Browser developers'
 key EF6E 286D DA85 EA2A 4BA7 DE68 4E2C 6E87 9329 8290), then update VERSION and
-SHA256. A copy with an older stamp is offered as "Update Tor" in Settings.
+SHA256 (.github/workflows/pin-bumps.yml does this weekly and opens a PR). A copy
+with an older stamp is offered as "Update Tor" in Settings.
 """
 from __future__ import annotations
 
