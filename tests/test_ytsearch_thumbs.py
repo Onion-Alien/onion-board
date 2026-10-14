@@ -2,9 +2,10 @@
 decoded off the UI thread."""
 import http.server
 import threading
+import time
 
 import pytest
-from PySide6.QtCore import QBuffer, QByteArray
+from PySide6.QtCore import QBuffer, QByteArray, QTimer
 from PySide6.QtGui import QImage
 
 from conftest import process_events
@@ -83,13 +84,22 @@ def panel_with(monkeypatch, url):
 
 
 def test_a_thumbnail_that_never_ends_is_aborted_and_never_decoded(qapp, server, monkeypatch):
+    # a loaded machine: the UI thread (where the size check runs) keeps stalling while
+    # Qt's network thread could read on, so only a read-buffer limit holds the size down
+    lag = QTimer()
+    lag.setInterval(5)
+    lag.timeout.connect(lambda: time.sleep(0.2))
     port = server.server_address[1]
     panel, decoded, finished = panel_with(monkeypatch, f"http://127.0.0.1:{port}/endless")
     shown = []
     panel.thumb_ready.connect(lambda url, pm: shown.append(url))
-    assert process_events(qapp, lambda: finished, timeout=20), server.sent
+    lag.start()
+    try:
+        assert process_events(qapp, lambda: finished, timeout=30), server.sent
+    finally:
+        lag.stop()
     assert finished[0][1] is True                       # cut off by the size cap
-    assert server.sent["endless"] < 50_000_000
+    assert server.sent["endless"] < 20_000_000          # 5 MB cap + socket buffers
     process_events(qapp, lambda: False, timeout=0.3)
     assert decoded == [] and shown == []
 

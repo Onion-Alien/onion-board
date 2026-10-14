@@ -533,7 +533,8 @@ def no_thumbnail_fetch(monkeypatch, window):  # noqa: F811
         def get(self, req):
             asked.append((req.url().toString(), self.feature))
             signal = types.SimpleNamespace(connect=lambda f: None)
-            return types.SimpleNamespace(finished=signal, downloadProgress=signal)
+            return types.SimpleNamespace(finished=signal, downloadProgress=signal,
+                                         setReadBufferSize=lambda n: None)
     monkeypatch.setattr(window.ytresults, "_nam", Nam)
     return asked
 
