@@ -242,7 +242,7 @@ class AlertControl(Controller):
         if now is None:
             return
         if now[0].startswith("discord"):
-            mw.show_chat_guide("discord")
+            mw.statusctl.show_chat_guide("discord")
             self._show_urgent()   # fixed meanwhile, or still to do
             return
         if now[0].startswith("board"):

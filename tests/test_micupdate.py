@@ -149,7 +149,7 @@ def test_cancel_and_failure_and_success_feedback(outdated, monkeypatch):
     monkeypatch.setattr(w.engine, "main_stream", object())   # ...it runs now
     monkeypatch.setattr(type(w.engine), "effect_alive", lambda self: True)
     monkeypatch.setattr(w.micctl, "_direct_not_running", lambda: False)
-    w._update_flow()
+    w.statusctl._update_flow()
     assert state["toasts"][-1] == ("Mic updated: games, calls and browsers hear your "
                                    "sounds.", "ok")
 
@@ -168,13 +168,13 @@ def test_setup_card_says_update_and_does_the_same_update(outdated, monkeypatch):
         monkeypatch.setattr(e, k, object(), raising=False)
     monkeypatch.setattr(e, "effect_alive", lambda: True, raising=False)
     monkeypatch.setattr(w.micctl, "_direct_not_running", lambda: False)
-    w._update_status()
+    w.statusctl._update_status()
     assert not w.mic_update_note.isHidden() and w.step_lbl.isHidden()
     assert "Update your mic part" in w.mic_update_text.text()
     assert w.btn_install.isHidden()   # one button: the banner's
     w.btn_micupdate.click()
     assert state["tried"] == [("My mic", True)]
     state["status"] = "ready"   # updated: the card is back to normal
-    w._update_status()
+    w.statusctl._update_status()
     assert w.mic_update_note.isHidden()
     assert w.mic_line.text() == "Your sounds go into your mic"

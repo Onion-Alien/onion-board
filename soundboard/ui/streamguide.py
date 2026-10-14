@@ -30,7 +30,7 @@ def copy_prompt(mw, with_key: bool) -> str:
     """Put the AI setup prompt on the clipboard; returns what to say about it."""
     cfg = mw.cfg
     token = cfg.api_token if with_key and cfg.api_enabled else ""
-    voices = remote.voice_names(mw) if mw.tab_on("voice") else None
+    voices = remote.voice_names(mw) if mw.tabctl.tab_on("voice") else None
     QApplication.clipboard().setText(remote.setup_prompt(cfg, cfg.api_port, token, voices))
     if token:
         return _("Copied, with your key in it. Paste it into ChatGPT, Claude or any AI "

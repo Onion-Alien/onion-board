@@ -667,8 +667,12 @@ class DirectMicStream:
         need = due - self._made
         if ring.effect_alive(now):
             # the effect reads the ring on its own clock (no clean mic from it): keep
-            # the ring as full as it can be, in small steps
-            self._due_at = None
+            # the ring full, a whole block ahead as soon as one is started, and sleep
+            # till the next one starts. (In small steps every POLL_S it ran the engine
+            # 400 times a second, not 100: four times the CPU, and the window waited.)
+            if need > 0:
+                need += -need % BLOCK
+            self._due_at = self._start + (self._made + max(need, 0)) / RATE
         else:
             # nobody listens: render whole blocks as they come due, and sleep between
             need -= need % BLOCK

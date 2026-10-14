@@ -184,7 +184,8 @@ def test_everything_spoken_lands_in_the_log(panel, monkeypatch):
 
 def test_changer_starts_off_even_if_it_was_left_on(qapp, monkeypatch):
     monkeypatch.setattr(tts.SapiTTS, "warm_up", lambda self: [])
-    from soundboard.ui.voicepanel import POWER_TEXT, VoicePanel
+    from soundboard.ui.voicefxpanel import POWER_TEXT
+    from soundboard.ui.voicepanel import VoicePanel
     p = VoicePanel(FakeEngine(), {"enabled": True, "preset": "Old telephone", "effects": {}}, {})
     try:
         assert not p.fx.btn_power.isChecked() and not p.chain.enabled
@@ -472,7 +473,7 @@ def test_a_saved_voice_that_was_uninstalled_falls_back_to_the_default(qapp, monk
 @pytest.mark.parametrize("q", [voicefx.Param("k", "K", 1, 1, 1),
                                voicefx.Param("k", "K", 0, 1, 0, "", 2)])
 def test_a_slider_with_no_room_to_move_doesnt_divide_by_zero(qapp, q):
-    from soundboard.ui.voicepanel import ParamSlider
+    from soundboard.ui.voicefxpanel import ParamSlider
     s = ParamSlider(q, q.default)
     s.set_value(float("nan"))
     assert s.steps >= 1 and s.value() == q.lo
@@ -577,7 +578,7 @@ def test_voice_tiles_reflow_in_a_narrow_window(qapp, monkeypatch):
     monkeypatch.setattr(tts.SapiTTS, "warm_up", lambda self: [])
     from PySide6.QtWidgets import QWidget
 
-    from soundboard.ui.voicepanel import MAX_COLS, VoiceFxPanel
+    from soundboard.ui.voicefxpanel import MAX_COLS, VoiceFxPanel
     holder = QWidget()                 # inside the tab, it gets the width there is
     fx = VoiceFxPanel({})
     fx.setParent(holder)
@@ -985,7 +986,7 @@ def test_a_slider_step_lays_nothing_out_and_its_value_always_fits(panel, qapp):
 
 
 def test_every_value_a_slider_shows_fits_its_label(panel):
-    from soundboard.ui.voicepanel import param_text
+    from soundboard.ui.voicefxpanel import param_text
     p, _ = panel
     p.show()
     for row in p.fx.rows.values():
@@ -1530,7 +1531,7 @@ def test_say_bar_has_no_volume_of_its_own(qapp, monkeypatch):
 def test_voice_reload_and_install_keep_focus(panel, qapp, monkeypatch):
     from PySide6.QtCore import Qt
     from PySide6.QtTest import QTest
-    from soundboard.ui import busy, voicepanel
+    from soundboard.ui import busy, speechpanel
     p, _ = panel
     s = p.speech
     _chinese_without_a_voice(s, qapp)
@@ -1541,7 +1542,7 @@ def test_voice_reload_and_install_keep_focus(panel, qapp, monkeypatch):
     class Thread:
         def __init__(self, target, **kw): self.target = target
         def start(self): workers.append(self.target)
-    monkeypatch.setattr(voicepanel, "threading", type("Threads", (), {"Thread": Thread}))
+    monkeypatch.setattr(speechpanel, "threading", type("Threads", (), {"Thread": Thread}))
     for btn, finish in (
             (s.b_voices_check, lambda: s._fill_voices(["Microsoft Zira Desktop"], "")),
             (s.b_voice_install, lambda: s._on_voice_installed("", "offline"))):
@@ -1559,7 +1560,7 @@ def test_voice_reload_and_install_keep_focus(panel, qapp, monkeypatch):
 def test_speech_install_and_cancel_keep_focus(panel, qapp, monkeypatch):
     from PySide6.QtCore import Qt
     from PySide6.QtTest import QTest
-    from soundboard.ui import busy, voicepanel
+    from soundboard.ui import busy, speechpanel
     p, _ = panel
     s = p.speech
     assert process_events(qapp, lambda: not s._loading())
@@ -1572,7 +1573,7 @@ def test_speech_install_and_cancel_keep_focus(panel, qapp, monkeypatch):
     class Thread:
         def __init__(self, target, **kw): self.target = target
         def start(self): workers.append(self.target)
-    monkeypatch.setattr(voicepanel, "threading", type("Threads", (), {"Thread": Thread}))
+    monkeypatch.setattr(speechpanel, "threading", type("Threads", (), {"Thread": Thread}))
     s.b_update.setFocus()
     QTest.mouseClick(s.b_update, Qt.LeftButton)
     assert busy.is_busy(s.b_update) and p.focusWidget() is s.b_update
@@ -1595,15 +1596,15 @@ def test_translation_download_keeps_focus(panel, qapp, monkeypatch):
     from PySide6.QtTest import QTest
     from soundboard import net
     from soundboard.speech import translation
-    from soundboard.ui import busy, voicepanel
+    from soundboard.ui import busy, speechpanel
     monkeypatch.setattr(net, "allowed", lambda key: True)
     monkeypatch.setattr(net, "offline", lambda: False)
     p, _ = panel
     s = p.speech
     assert process_events(qapp, lambda: not s._loading())
     monkeypatch.setattr(translation, "is_downloaded", lambda info: False)
-    installed = voicepanel.mods.ModuleInfo.installed.fget
-    monkeypatch.setattr(voicepanel.mods.ModuleInfo, "installed", property(
+    installed = speechpanel.mods.ModuleInfo.installed.fget
+    monkeypatch.setattr(speechpanel.mods.ModuleInfo, "installed", property(
         lambda info: True if info.id == "live-voice" else installed(info)))
     s._fill_langs()
     s.cb_lang.setCurrentIndex(s.cb_lang.findData("zh"))
@@ -1614,7 +1615,7 @@ def test_translation_download_keeps_focus(panel, qapp, monkeypatch):
     class Thread:
         def __init__(self, target, **kw): self.target = target
         def start(self): workers.append(self.target)
-    monkeypatch.setattr(voicepanel, "threading", type("Threads", (), {"Thread": Thread}))
+    monkeypatch.setattr(speechpanel, "threading", type("Threads", (), {"Thread": Thread}))
     s.b_dl.setFocus()
     QTest.mouseClick(s.b_dl, Qt.LeftButton)
     assert s.b_dl.isVisible() and busy.is_busy(s.b_dl) and p.focusWidget() is s.b_dl

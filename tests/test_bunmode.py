@@ -163,7 +163,7 @@ def test_a_tabs_right_click_menu_turns_the_full_board_into_bun_and_back(window, 
     window.resize(1180, 720)
     window._refit()
     assert not window.is_mini()
-    menu = window.tab_menu(0)
+    menu = window.tabctl.tab_menu(0)
     act = next(a for a in menu.actions() if a.text() == "Turn into Bun")
     act.trigger()
     bun = window.bunctl.bun_mode

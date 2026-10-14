@@ -75,6 +75,6 @@ def test_setup_cards_not_squeezed_after_mic_state_flips(window, monkeypatch):  #
         assert squeezed(w) == [], size
         for dead in (True, False, True, False):
             state["dead"] = dead
-            w._update_flow()
+            w.statusctl._update_flow()
             pump()
             assert squeezed(w) == [], (size, dead)

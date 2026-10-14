@@ -17,7 +17,7 @@ def offline(mw, on: bool):
 
 def test_main_window_hides_the_online_tabs_and_says_offline(window, monkeypatch):  # noqa: F811
     for key in ("radio", "triggers", "apps"):
-        window.set_tab_on(key, True)
+        window.tabctl.set_tab_on(key, True)
     bar = window.tabs
     try:
         assert window.card_lines() == [] and bar.isTabVisible(TAB_INDEX["radio"])
@@ -33,8 +33,8 @@ def test_main_window_hides_the_online_tabs_and_says_offline(window, monkeypatch)
         assert window.btn_yt.isHidden()
         assert window.search.placeholderText() == "Search your sounds"
         # + More tabs doesn't offer them either
-        window.set_tab_on("apps", False)
-        assert window._more_tab_keys() == ["apps"]
+        window.tabctl.set_tab_on("apps", False)
+        assert window.tabctl._more_tab_keys() == ["apps"]
         offline(window, False)
         assert window.card_lines() == [] and window.rail.output._lines == []
         assert bar.isTabVisible(TAB_INDEX["radio"]) and bar.isTabVisible(TAB_INDEX["triggers"])
@@ -45,11 +45,11 @@ def test_main_window_hides_the_online_tabs_and_says_offline(window, monkeypatch)
 
 
 def test_offline_start_hides_them_from_the_first_paint(window):  # noqa: F811
-    window.set_tab_on("radio", True)
+    window.tabctl.set_tab_on("radio", True)
     offline(window, True)
     try:
-        window.set_tab_on("radio", False)
-        window.set_tab_on("radio", True)   # switched on while offline: still hidden
+        window.tabctl.set_tab_on("radio", False)
+        window.tabctl.set_tab_on("radio", True)   # switched on while offline: still hidden
         assert not window.tabs.isTabVisible(TAB_INDEX["radio"])
     finally:
         offline(window, False)
@@ -58,24 +58,24 @@ def test_offline_start_hides_them_from_the_first_paint(window):  # noqa: F811
 
 def test_cable_install_button_goes_but_the_mic_setup_stays(window):  # noqa: F811
     window.cfg.route = "cable"
-    window._update_flow()
+    window.statusctl._update_flow()
     shown_online = not window.btn_install.isHidden()
     offline(window, True)
     try:
         assert window.btn_install.isHidden()   # it downloads VB-Cable
         window.cfg.route = "mic"
-        window._update_flow()
+        window.statusctl._update_flow()
         assert window.btn_install.isEnabled()   # setting up the mic goes nowhere online
     finally:
         window.cfg.route = "cable"
         offline(window, False)
-    window._update_flow()
+    window.statusctl._update_flow()
     assert (not window.btn_install.isHidden()) == shown_online
 
 
 def test_settings_hides_online_pages_and_cards(window, monkeypatch):  # noqa: F811
     monkeypatch.setattr(window, "_save_later", lambda: None)
-    window.set_tab_on("radio", True)
+    window.tabctl.set_tab_on("radio", True)
     keys = None
     d = SettingsDialog(window, "connection")
     try:
@@ -123,7 +123,7 @@ def test_settings_opened_offline_on_a_hidden_page_lands_on_privacy(window):  # n
 
 
 def test_addons_without_one_installed_goes_offline(window):  # noqa: F811
-    window.set_tab_on("triggers", True)
+    window.tabctl.set_tab_on("triggers", True)
     d = SettingsDialog(window, "help")
     try:
         card = d._addons_card_w

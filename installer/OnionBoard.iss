@@ -33,7 +33,7 @@
 ;     soundboard's board is on this PC: Soundpad's %APPDATA%\Leppsoft\soundlist.spl,
 ;     Resanance's %APPDATA%\Resanance\data\Resanance.db, Soundux's
 ;     %APPDATA%\Soundux\config.json, EXP Soundboard's last board in the registry
-;     (soundboard/otherboards.py). The last page before installing: a ticked box per
+;     (soundboard/otherboards/__init__.py). The last page before installing: a ticked box per
 ;     app found. Ticked ones are written to %APPDATA%\OnionBoard\import-from and the
 ;     app's first start copies the sounds in. Silent installs only do it for the apps
 ;     /IMPORT= names (comma-separated keys: soundpad,resanance,soundux,expboard):
@@ -211,7 +211,7 @@ var
   CableKnown, CableThere: Boolean;   // CableInstalled's answer, asked once
   ImportPage: TWizardPage;     // "Bring your sounds over": only when one is found
   ImportBoxes: array of TNewCheckBox;
-  ImportKeys: array of String; // soundboard/otherboards.py's key for each box
+  ImportKeys: array of String; // soundboard/otherboards/__init__.py's key for each box
   ImportTop: Integer;          // where the next box goes
   HeardPage: TWizardPage;      // "Where did you hear about Onion Board?": new installs
   HeardRadios: array of TNewRadioButton;
@@ -383,7 +383,7 @@ begin
   Result := FileExists(ExpandConstant('{userappdata}\Soundux\config.json'));
 end;
 
-// EXP Soundboard remembers its last board in Java's Preferences (soundboard/expboard.py)
+// EXP Soundboard remembers its last board in Java's Preferences (soundboard/otherboards/expboard.py)
 function HasExpBoard: Boolean;
 begin
   Result := RegValueExists(HKCU, 'Software\JavaSoft\Prefs\/Expenosa''s /Soundboard',
@@ -763,7 +763,7 @@ begin
 end;
 
 // The import page's boxes: one line per ticked one in a note for the app's first
-// start, which does the copying (soundboard/otherboards.py). A silent install only
+// start, which does the copying (soundboard/otherboards/__init__.py). A silent install only
 // for the apps /IMPORT= names: nobody saw the boxes.
 procedure QueueImports;
 var

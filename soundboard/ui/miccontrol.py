@@ -304,7 +304,7 @@ class MicControl(Controller):
     def _helper_known(self):
         mw = self.mw
         self._helper_checking = False
-        mw._update_flow()
+        mw.statusctl._update_flow()
 
     def attach_mic(self, clean: bool = False, auto: bool = False):
         """Put the mic effect on the mic in use (Windows asks for admin once; with the
@@ -335,7 +335,7 @@ class MicControl(Controller):
                 mw._attach_release = busy.hold(mw.btn_install, _("Setting up…"))
             if mw._show_bun:
                 mw.setup_show.start()
-        mw._update_flow()
+        mw.statusctl._update_flow()
         log.info("attaching the mic effect to %s%s", mic, " (by itself)" if auto else "")
 
         def failed(e):
@@ -398,7 +398,7 @@ class MicControl(Controller):
             # Windows takes a few seconds to load it: "starting…" meanwhile, then a
             # redraw when the wait is over (it works by then, or Repair comes back)
             mw._settle_until = time.monotonic() + mw.SETTLE_S
-            QTimer.singleShot(int(mw.SETTLE_S * 1000) + 200, mw._update_status)
+            QTimer.singleShot(int(mw.SETTLE_S * 1000) + 200, mw.statusctl._update_status)
             mw.cfg.route = "cable"   # so set_route() applies "mic" in full
             mw.routectl.set_route("mic", attached=True)
             from soundboard.ui.setupwizard import SetupWizard
@@ -413,7 +413,7 @@ class MicControl(Controller):
                              "sound effects. If nobody hears your sounds, use the headset's USB "
                              "dongle or the virtual cable."), "warn")
         mw.routectl._show_route()
-        mw._update_status()
+        mw.statusctl._update_status()
 
     def _cable_tip(self):
         """Once: straight into the mic works, and a voice app is still set to the
@@ -446,7 +446,7 @@ class MicControl(Controller):
         def go_on(dialog):
             if recovery.start(action, None, say_done=True):
                 dialog.accept()
-                mw._update_flow()
+                mw.statusctl._update_flow()
         audiorecovery.ask(mw, action, [audiorecovery.explanation(
             action, mw.cfg.mic_device or None)], go_on)
 
@@ -482,7 +482,7 @@ class MicControl(Controller):
         else:
             mw.cfg.route = "cable"
             mw.routectl._show_route()
-            mw._update_status()
+            mw.statusctl._update_status()
             self.install_cable()
 
     def _direct_health(self):
@@ -521,7 +521,7 @@ class MicControl(Controller):
             self._following_effect = False
             if ends is not None:
                 self._set_cable_bad(ends)
-            mw._update_status()
+            mw.statusctl._update_status()
             mw.routectl._prepare_all()
 
         def plan():   # worked out when its turn comes
@@ -554,7 +554,7 @@ class MicControl(Controller):
         mw._vb_setup_asking = False
         if found != mw._vb_setup:
             mw._vb_setup = found
-            mw._update_flow()
+            mw.statusctl._update_flow()
 
     def remove_cable(self):
         """Setup tab → Remove the virtual cable: VB-Audio's uninstaller, as admin (it
@@ -580,7 +580,7 @@ class MicControl(Controller):
         mw.routectl._apply_send_outputs()
         mw.toast(_("✓ The virtual cable is removed. Restart your PC to finish: until then "
                      "Windows still lists “CABLE Input” / “CABLE Output”."), "ok")
-        mw._update_status()
+        mw.statusctl._update_status()
 
     def _direct_not_running(self) -> bool:
         """Set up on the mic, the board's own mic stream open on it for a while, and the
@@ -632,7 +632,7 @@ class MicControl(Controller):
 
     def open_windows_mic(self):
         mw = self.mw
-        vm = mw.virtual_mic or _("your virtual cable")
+        vm = mw.statusctl.virtual_mic or _("your virtual cable")
         try:
             subprocess.Popen(["control", "mmsys.cpl,,1"], creationflags=0x08000000)
         except OSError:

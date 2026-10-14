@@ -208,7 +208,7 @@ class DeviceControl(Controller):
         e = mw.engine
 
         def reopened(_):
-            mw._update_status()
+            mw.statusctl._update_status()
             self._say_back_on_mic()
         self._device_job(lambda: e.reopen_all, reopened)   # (on the device thread)
 
@@ -298,7 +298,7 @@ class DeviceControl(Controller):
         """_init_devices' last part (UI thread): what the cable check found, the status."""
         mw = self.mw
         mw.micctl._set_cable_bad(ends)
-        mw._update_status()
+        mw.statusctl._update_status()
         if "--restart-after" in sys.argv:   # started again by the app (Settings > Reset)
             self._say_back_on_mic()
 
@@ -436,7 +436,7 @@ class DeviceControl(Controller):
         def opened(ends):
             if ends is not None:
                 mw.micctl._set_cable_bad(ends)
-            mw._update_status()
+            mw.statusctl._update_status()
             mw.toast(_("You hear your sounds on {name} now: it's Windows' default output.",
                          name=html.escape(name)), "ok")
         self._device_job(plan, opened)

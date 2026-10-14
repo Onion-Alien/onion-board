@@ -57,7 +57,7 @@ def _shown_setup(window, route):  # noqa: F811
     window.apply_theme("Dark")
     window.cfg.route = route
     window.routectl._show_route()
-    window._update_status()
+    window.statusctl._update_status()
     window.tabs.setCurrentWidget(window.setup_page)
     window.show()
     window.resize(1500, 920)

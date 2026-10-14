@@ -96,7 +96,7 @@ HEARD_ALIASES = {"yt": "youtube", "you tube": "youtube", "youtube.com": "youtube
                  "twitter.com": "twitter", "tiktok.com": "tiktok", "tik tok": "tiktok"}
 HEARD_MAX = 24   # characters of a typed answer, after tidying
 TIMEOUT_S = 15
-# the tabs whose use is counted (mainwindow.TABS); anything else is never sent
+# the tabs whose use is counted (tabcontrol.TAB_KEYS); anything else is never sent
 TABS = ("sounds", "radio", "apps", "triggers", "voice", "setup")
 RUNNING = "running.txt"     # in the app folder while the app runs (mark_running)
 MAX_PROBLEMS = 10           # problem events per send: a bug in a loop isn't 1000 hits

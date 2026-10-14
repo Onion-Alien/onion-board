@@ -156,7 +156,7 @@ def test_meeting_apps_get_a_show_me_how(window, monkeypatch):
     window.setup_yes.click()
     assert "noise removal" in window.setup_lbl.text()
     opened = []
-    monkeypatch.setattr(window, "show_chat_guide", opened.append)
+    monkeypatch.setattr(window.statusctl, "show_chat_guide", opened.append)
     window.setup_yes.click()
     assert opened == ["meeting"]
 

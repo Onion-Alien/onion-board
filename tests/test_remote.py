@@ -440,7 +440,7 @@ def test_voices_say_queue_and_hear(qapp, window):
     assert d("hear") == (200, {"hear": False}) and not w.engine.mic_check
     assert d("hear", on="maybe")[0] == 400
 
-    w.set_tab_on("voice", False)
+    w.tabctl.set_tab_on("voice", False)
     assert d("voices")[0] == 409 and d("say", text="hi")[0] == 409
     assert d("voice", name="Chipmunk")[0] == 409 and "voice_name" in d("status")[1]
 

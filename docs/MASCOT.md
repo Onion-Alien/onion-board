@@ -14,7 +14,7 @@ lines in the files below.
 | `soundboard/ui/setupshow.py` | `SetupShow(BunnyWidget)`: the mic set-up show (toolbox, speaker parts popping on, progress dots). |
 | `soundboard/ui/scribebun.py` | `ScribeBunny`: the download bar's picture, Bun writing the tune on a scroll in a 56 x 59 slot. Caches pictures of him in `_layer`. |
 | `soundboard/ui/bunpong.py` | The Pong Easter egg; draws Bun with his bat (or the star when he wins). |
-| `soundboard/splash.py` | The start-up splash (drawn before a theme is applied: plain Bun). |
+| `soundboard/ui/splash.py` | The start-up splash (drawn before a theme is applied: plain Bun). |
 | `scripts/pictures/make_bunny.py`, `scripts/pictures/make_favicon.py` | Installer art and icons: always plain Bun (`outfit=()`). |
 | `scripts/pictures/bun_sheet.py` | Picture sheets for checking a change by eye (below). |
 
@@ -106,4 +106,4 @@ outfit), not only the accent colour: see `ScribeBunny._layer`.
 `live` swaps `time.monotonic` for a fake clock and steps each widget's own timer
 (`_step` / `_tick`) so every act (talking, notes, the build act, begging, napping, the
 cross face and bat, Robo-Bun, the setup show, the download scribe) is caught at a known
-moment. Sheets go to `%TEMP%\bun-sheets`. Look at all three before sending pictures.
+moment. Sheets go to `%TEMP%\bun-sheets`. Look at every sheet the change touches before sending pictures.
