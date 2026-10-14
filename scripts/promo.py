@@ -564,7 +564,7 @@ def main():
     args = ap.parse_args()
     args.out.mkdir(parents=True, exist_ok=True)
     QGuiApplication([])
-    shot = QImage(str(ROOT / "docs" / "screenshots" / "triggers.png"))
+    shot = QImage(str(ROOT / "site" / "screenshots" / "triggers.png"))
     with tempfile.TemporaryDirectory() as tmp:
         wav = Path(tmp) / "track.wav"
         sf.write(wav, soundtrack(), SR)
