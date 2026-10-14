@@ -25,6 +25,10 @@ class Built:
     inherits it; it has nothing at run time."""
 
     about_version: Any
+    addon_label: Any
+    addon_remove: Any
+    _addon_titles: Any
+    _addons_card_w: Any
     app_log_box: Any
     app_setup_list: Any
     box_app_setup: Any
@@ -45,6 +49,7 @@ class Built:
     ff_box: Any
     ff_note: Any
     ff_state: Any
+    get_pocket: Any
     _has_ff: Any
     hue_now: Any
     hue_reset: Any
@@ -82,8 +87,15 @@ class Built:
     playing_background_check: Any
     playing_background_opacity: Any
     plays_box: Any
+    pocket_buttons: Any
+    _pocket_refresh: Any
+    pocket_remove: Any
+    pocket_remove_addons: Any
+    _pocket_slot: Any
+    pocket_update: Any
     problem_btn: Any
     programs_list: Any
+    remote_on: Any
     _save_video_hint: Any
     _sync_highlight: Any
     texture_off: Any
@@ -98,6 +110,8 @@ class Built:
     upd_label: Any
     voices_card: Any
     voices_show: Any
+    watch_buttons: Any
+    _watch_refresh: Any
     ytdlp_auto_box: Any
     ytdlp_btns: Any
     ytdlp_label: Any

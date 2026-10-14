@@ -354,6 +354,10 @@ class MainWindow(QMainWindow):
     wordmark: QLabel
     ytresults: SearchResults
 
+    # ---- kept by Settings → Remote across openings (ui/settingspages/addons.py)
+    pocket_checked: float
+    pocket_offer: Any
+
     update_done = Signal(object, str)   # an update check finished: Release|None, error
     update_state = Signal()             # the update card changed (Settings > Updates follows)
     mic_attached = Signal(str, str)     # attach_mic finished: the mic, error ("" = done)

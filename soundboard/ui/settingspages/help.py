@@ -44,7 +44,7 @@ class HelpPage(Page):
         cl = QVBoxLayout(col)
         cl.setContentsMargins(0, 0, 0, 0)
         cl.setSpacing(12)
-        cl.addWidget(self.dlg._addons_card())
+        cl.addWidget(self.dlg.addons._addons_card())
         row = QHBoxLayout()
         row.addWidget(col, 1)
         row.addStretch(0)
