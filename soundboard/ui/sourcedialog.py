@@ -127,7 +127,6 @@ class SourceDialog(QDialog):
         self.btn_forget = QPushButton()
         self.btn_forget.setObjectName("iconbutton")
         icons.set_icon(self.btn_forget, "trash", "danger_text")
-        self.btn_forget.setToolTip(_("Delete info"))
         self.btn_forget.setAccessibleName(_("Delete info"))
         self.btn_forget.clicked.connect(self._forget)
         row.insertWidget(0, self.btn_forget)

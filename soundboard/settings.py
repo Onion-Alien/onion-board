@@ -518,7 +518,6 @@ class SettingsDialog(QDialog):
         back = self.back_btn = QPushButton()
         back.setProperty("quiet", True)
         icons.set_icon(back, "back")
-        back.setToolTip(_("Back"))
         back.setAccessibleName(_("Back"))
         back.setAutoDefault(False)
         back.clicked.connect(self.accept)
@@ -1226,7 +1225,6 @@ class SettingsDialog(QDialog):
         x = QPushButton()
         x.setObjectName("small")
         icons.close_button(x, 24)
-        x.setToolTip(_("Clear the {label} hotkey", label=label))
         x.setAccessibleName(_("Clear the {label} hotkey", label=label))
         x.clicked.connect(lambda __=False, a=attr: self._set_hk(a, ""))
         row.addWidget(x)
@@ -2444,7 +2442,7 @@ class SettingsDialog(QDialog):
                 self._data_set(video_dir=folder)
         change.clicked.connect(pick)
         row.addWidget(change)
-        show = icon_button("folder", _("Open folder"))
+        show = icon_button("folder", _("Open folder"), hover=False)
 
         def open_folder():
             folder = quality.current.videos()

@@ -76,10 +76,15 @@ def translations(module_list: list[mods.ModuleInfo]) -> list[mods.ModuleInfo]:
 class Switch(QCheckBox):
     """An on/off switch (a pill with a knob) that behaves like a checkbox."""
 
-    def __init__(self, tip: str = ""):
+    def __init__(self, tip: str = "", *, hover: bool = True):
+        """`tip` is its screen-reader name, and its tooltip too unless `hover` is off
+        (a switch beside words that already say what it does needs no tooltip)."""
         super().__init__()
         self.setCursor(Qt.CursorShape.PointingHandCursor)
-        self.setToolTip(tip)
+        if hover:
+            self.setToolTip(tip)
+        if tip:
+            self.setAccessibleName(tip)
         self.setFixedSize(38, 22)
 
     def sizeHint(self):
@@ -264,7 +269,7 @@ class ParamSlider(QWidget):
         if _is_switch(q):
             h = QHBoxLayout(self)
             h.setContentsMargins(0, 2, 0, 2)
-            self.switch = Switch(voicefx.shown(q.label))
+            self.switch = Switch(voicefx.shown(q.label), hover=False)
             h.addWidget(self.name)
             h.addStretch(1)
             h.addWidget(self.switch)
@@ -438,10 +443,11 @@ class EffectRow(QFrame):
         head.addWidget(title)
         head.addStretch(1)
         self.btn_reset = reset_button(_("Put {effect}'s settings back to how they start",
-                                        effect=voicefx.shown(cls.name)))
+                                        effect=voicefx.shown(cls.name)), hover=False)
         self.btn_reset.clicked.connect(self.reset)
         head.addWidget(self.btn_reset)
-        self.chk = Switch(_("Turn {effect} on or off", effect=voicefx.shown(cls.name)))
+        self.chk = Switch(_("Turn {effect} on or off", effect=voicefx.shown(cls.name)),
+                          hover=False)
         self.chk.setChecked(bool(cfg.get("on")))
         head.addWidget(self.chk)
         self.arrow = QPushButton()
@@ -513,8 +519,8 @@ class EffectRow(QFrame):
         icons.set_icon(self.arrow, "fold" if self._folded else "fold_open", "muted", "text",
                        size=12)
         name = voicefx.shown(self.cls.name)
-        self.arrow.setToolTip(_("Show {effect}", effect=name) if self._folded
-                              else _("Fold {effect} away", effect=name))
+        self.arrow.setAccessibleName(_("Show {effect}", effect=name) if self._folded
+                                     else _("Fold {effect} away", effect=name))
 
     def _toggled(self, on):
         if on and self._folded:
@@ -705,9 +711,8 @@ class VoiceFxPanel(QWidget):
             pic = art.icon(art.voice_key(name)) or (art.mystery_icon() if name != CUSTOM
                                                     else None)
             b = self._make_tile(name, title, pic, VOICE_ICONS.get(name, "wave"))
-            b.setToolTip(_("Your own settings: Make it yours opens them") if name == CUSTOM
-                         else _("Sound like: {voice}. Click to turn the voice changer on "
-                                "with it.", voice=title))
+            if name == CUSTOM:
+                b.setToolTip(_("Your own settings: Make it yours opens them"))
         for c in range(self.COLS):
             grid.setColumnStretch(c, 1)
         v.addLayout(grid)
@@ -1454,7 +1459,6 @@ class VoiceFxPanel(QWidget):
     def _refresh(self):
         on = self.btn_power.isChecked()
         self.power_label.setText(_("On") if on else _("Off"))
-        self.btn_power.setToolTip(POWER_TEXT[on])
         self.btn_power.setAccessibleName(POWER_TEXT[on])
         self._show_picked()
         self.tip.setVisible(self._tip_enabled)
@@ -1781,7 +1785,7 @@ class SpeechPanel(QWidget):
         self.b_install.setToolTip(_("One-time download, about 300 MB."))
         self.b_install.clicked.connect(self._install)
         mrow.addWidget(self.b_install)
-        b_open = icon_button("folder", _("Open folder"))
+        b_open = icon_button("folder", _("Open folder"), hover=False)
         b_open.clicked.connect(lambda: self._open_folder(self.module, b_open))
         mrow.addWidget(b_open)
         mrow.addStretch(1)
@@ -2495,12 +2499,10 @@ class SpeechPanel(QWidget):
             self.lbl_missing.setText(_("Speech recognition stopped working: the Python it "
                                        "was set up with is gone from this PC. Press Repair "
                                        "to set it up again."))
-            self.lbl_missing.setToolTip(str(m.path))
         elif not ok:
             self.lbl_missing.setText(_("Speaking another language needs speech recognition "
                                        "installed first (runs on this PC; what you say never "
                                        "leaves it)."))
-            self.lbl_missing.setToolTip(str(m.path))
         if not self._installing:
             fix = m is not None and m.broken
             self.b_install.setText(_("Repair") if fix else _("Install speech recognition"))
@@ -2730,7 +2732,7 @@ class ModulesList(QWidget):
         row = QHBoxLayout()
         b = self.b_refresh = QPushButton(_("Refresh"))
         b.clicked.connect(self._refresh)
-        o = icon_button("folder", _("Open folder"))
+        o = icon_button("folder", _("Open folder"), hover=False)
         o.clicked.connect(lambda: SpeechPanel._open_folder(btn=o))
         row.addWidget(b)
         row.addWidget(o)

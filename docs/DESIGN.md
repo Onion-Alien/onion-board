@@ -372,7 +372,12 @@ These are the current reference points. Copy their structure before inventing a 
   made goes through Undo or the Recently deleted bin (`trash.py`, `ui/deleted.py`,
   `panel.UndoBar`), not a one-click loss. Keep "are you sure?" for deleting for good.
 - **Icon-only buttons** wherever the picture says it (section 4). The words become
-  the tooltip *and* the accessible name (`setToolTip`, `setAccessibleName`). Icons
+  the accessible name (`setAccessibleName`), and the tooltip only when the picture
+  needs them. **No tooltip that repeats what's on screen**: not on ▶ ■ ⏭ ✕ ← 📁 copy
+  or a star, not on a button or switch beside words that already say it ("Chipmunk"
+  → "Sound like: Chipmunk"), not on a label that shows its whole text. A tooltip
+  says something new (a size, what's kept, a shortcut) or isn't there
+  (`icon_button(..., hover=False)`, `Switch(..., hover=False)`). Icons
   come from the app's own painted set (`ui/icons.py`, `icons.set_icon`); add new ones
   there in the same style, never an image file.
 - **Keep words** on the main action of a card and on anything a new user must
