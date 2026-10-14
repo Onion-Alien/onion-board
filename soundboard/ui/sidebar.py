@@ -304,7 +304,7 @@ class OutputBlock(QFrame):
     def __init__(self, power: QPushButton, connection: QPushButton,
                  stop: QPushButton | None = None):
         super().__init__()
-        from soundboard.ui.voicepanel import Switch
+        from soundboard.ui.voicefxpanel import Switch
 
         self.setObjectName("railoutput")
         # as tall as its rows: spare room in the rail's column never pads the card (the

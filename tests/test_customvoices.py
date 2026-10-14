@@ -171,7 +171,7 @@ def test_voice_tab_lists_custom_voices_and_bad_files(vdir, qapp, monkeypatch):
                    {"voice": "custom:Kokoro"})
     try:
         s = p.speech
-        assert process_events(qapp, lambda: not s._loading())
+        assert process_events(qapp, lambda: not s.installs._loading())
         items = [s.cb_voice.itemText(i) for i in range(s.cb_voice.count())]
         assert items == ["Windows default", "Zira", "Kokoro (custom)"]
         assert s.cb_voice.currentData() == "custom:Kokoro"
