@@ -43,7 +43,7 @@ def test_a_theme_switch_stays_under_budget(settings):
     times = []
     for _ in range(3):
         t0 = time.perf_counter()
-        settings._pick_theme(_other(theme.current_name))
+        settings.appearance._pick_theme(_other(theme.current_name))
         QApplication.processEvents()
         times.append(time.perf_counter() - t0)
     assert min(times) < BUDGET_S, times
