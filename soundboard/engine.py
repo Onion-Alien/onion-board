@@ -68,9 +68,10 @@ CACHE_BUDGET = 192 << 20               # bytes of resampled copies kept for non-
 # held the GIL for seconds at a time (the app froze, the audio cut out)
 NO_COPY_S = 20 * 60
 READ_AHEAD_EVERY_S = 1.0               # how often the minutes ahead of a long sound are asked for
-# the app's own playback: the test recording, cue beeps, the setup wizard's tune. With
+# the app's own playback: the test recording, cue beeps, the setup wizard's tune, the
+# Pong game's sounds (ui/bunpong.py). With
 # previews ("<sid>:preview", "<sid>~fx:preview") they ignore the live speed / pitch
-FIXED_SIDS = frozenset({"__test__", "__cue__", "__setup__", "__check__"})
+FIXED_SIDS = frozenset({"__test__", "__cue__", "__setup__", "__check__", "__pong__"})
 
 
 def is_fixed(sid: str) -> bool:

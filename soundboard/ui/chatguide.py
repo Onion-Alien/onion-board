@@ -62,6 +62,13 @@ def _header(title: str, body: QLabel, bun: BunnyWidget) -> QHBoxLayout:
     return header(title, body, bun)
 
 
+def _bun(prop: str) -> BunnyWidget:
+    """Bun beside a guide's intro, the setup guide's size: no taller than the words,
+    so the steps start right under them."""
+    from soundboard.ui.setupwizard import BUN_H, BUN_PAD
+    return BunnyWidget(prop, height=BUN_H, pad=BUN_PAD)
+
+
 # --------------------------------------------------------------------------- the check
 
 def find_discord():
@@ -371,7 +378,7 @@ class DiscordGuide(QDialog):
             "Discord cleans up your mic for <b>talking</b>. Left on, that cleanup treats "
             "music and sound effects as background noise and chops them up, so your "
             "sounds reach your friends muffled and cut off. Two minutes, once:")),
-            BunnyWidget("headphones")))
+            _bun("headphones")))
         mic = f"<b style='color:{_ok()}'>{html.escape(vm)}</b>"
         v.addWidget(_label(_steps(
             _("In Discord, click the ⚙ gear next to your name (<b>User Settings</b>) → "
@@ -523,7 +530,7 @@ class GameGuide(QDialog):
         v.addLayout(_header(_("Game voice chat"), _label(_(
             "Games squeeze voice chat harder than Discord, and many clean up the mic the "
             "same way. In the game's <b>Audio</b> or <b>Voice chat</b> settings:")),
-            BunnyWidget("headphones")))
+            _bun("headphones")))
         mic = f"<b style='color:{_ok()}'>{html.escape(vm)}</b>"
         v.addWidget(_label(_steps(
             _("<b>Microphone / Input device</b>: keep your normal mic ({mic}). Your sounds "
@@ -581,7 +588,7 @@ class MeetingGuide(QDialog):
               "down:") if kept else
             _("Meeting apps clean up the mic for speech and treat music as background "
               "noise. Pick the mic below and turn that cleanup down:")),
-            BunnyWidget("headphones")))
+            _bun("headphones")))
         mic = f"<b style='color:{_ok()}'>{html.escape(vm)}</b>"
         v.addWidget(_label(_steps(
             _("<b>Zoom</b>: Settings → Audio → Microphone: {mic}. Untick <b>Automatically "

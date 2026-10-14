@@ -65,6 +65,8 @@ def draw_bunny(p: QPainter, rect: QRectF, prop: str | None = None, *,
     `outfit`: bunnyfit pieces to dress him in (None: the current theme's, (): none).
     Robo-Bun wears no outfit."""
     fit = () if robot else bunnyfit.outfit() if outfit is None else outfit
+    # dark glasses hide his eyes: no lids or tears under them, brows lifted clear
+    hidden = not nightcap and any(name in bunnyfit.HIDE_EYES for name in fit)
     phones = QColor(theme.T["accent"])
     phones_hi = phones.lighter(140)
     s = min(rect.width() / W, rect.height() / H)
@@ -79,6 +81,7 @@ def draw_bunny(p: QPainter, rect: QRectF, prop: str | None = None, *,
     ink.setJoinStyle(Qt.PenJoinStyle.RoundJoin)
     ink.setCapStyle(Qt.PenCapStyle.RoundCap)
 
+    bunnyfit.draw(p, fit, "behind", ink)
     # ears (behind the head): the right one flops a little for character
     for bx, cx, cy, h, a, tilt in ((36, 36, 26, 50, -10, -ears), (64, 66, 28, 48, 18, ears)):
         p.save()
@@ -167,13 +170,13 @@ def draw_bunny(p: QPainter, rect: QRectF, prop: str | None = None, *,
         _ellipse(p, x, 62, 9 + 1.5 * sad, (11.5 + 1.5 * sad) * (1 - blink), INK)
         _ellipse(p, x + 1.6, 59, 3.4 + sad, 3.8 + sad, QColor("white"))
         _ellipse(p, x - 1.6, 65.5, 1.6, 1.6, QColor("white"))
-        if smug:              # heavy lids: fur over the top half, a flat lid line
+        if smug and not hidden:   # heavy lids: fur over the top half, a flat lid line
             p.setPen(Qt.PenStyle.NoPen)
             p.setBrush(fur)
             p.drawRect(QRectF(x - 6, 54, 12, 7.5))
             p.setPen(QPen(INK, 2.4, Qt.PenStyle.SolidLine, Qt.PenCapStyle.RoundCap))
             p.drawLine(QPointF(x - 5.2, 61.5), QPointF(x + 5.2, 61.5))
-        if sad > 0.05:        # welling up
+        if sad > 0.05 and not hidden:   # welling up
             c = QColor("#8fd3ff")
             c.setAlphaF(0.8 * sad)
             _ellipse(p, x, 68.5, 8, 2.6 * sad, c)
@@ -192,10 +195,11 @@ def draw_bunny(p: QPainter, rect: QRectF, prop: str | None = None, *,
             for x, sx in ((39, -1), (61, 1)):
                 p.drawLine(QPointF(x + sx * 6, 53 + sad), QPointF(x - sx * 3, 52 - 4 * sad))
         if smug:                  # one brow flat, the other cocked up
+            up = 3.5 if hidden else 0
             p.setPen(QPen(INK, 2.2, Qt.PenStyle.SolidLine, Qt.PenCapStyle.RoundCap))
-            p.drawLine(QPointF(34, 55), QPointF(44, 55.5))
-            arch = QPainterPath(QPointF(56, 52))
-            arch.quadTo(61, 46.5, 67, 50)
+            p.drawLine(QPointF(34, 55 - up), QPointF(44, 55.5 - up))
+            arch = QPainterPath(QPointF(56, 52 - up))
+            arch.quadTo(61, 46.5 - up, 67, 50 - up)
             p.setBrush(Qt.BrushStyle.NoBrush)
             p.drawPath(arch)
         if angry > 0.05:          # cross brows, inner ends pulled down
@@ -250,7 +254,7 @@ def draw_bunny(p: QPainter, rect: QRectF, prop: str | None = None, *,
         p.setBrush(Qt.BrushStyle.NoBrush)
         p.drawPath(path)
 
-    bunnyfit.draw(p, fit, "face", ink, shut=blink > 0.6)
+    bunnyfit.draw(p, fit, "face", ink, hats=not nightcap, shut=blink > 0.6)
     _draw_prop(p, prop, ink, swing, fur=fur)
     if angry > 0.5:           # the cartoon cross-vein mark, up on his forehead
         p.setPen(QPen(CROSS, 2.4, Qt.PenStyle.SolidLine, Qt.PenCapStyle.RoundCap))
