@@ -331,6 +331,9 @@ class _Reply:
         return False
 
 
+ROUTER = "192.168.1.1"  # sensitive-scan: allow (test address)
+
+
 def fake_web(monkeypatch, pages: dict):
     """net.urlopen answering from `pages` {url: (bytes, content type)}; returns the
     list of URLs asked for (and the feature each was asked under)."""
@@ -370,7 +373,9 @@ def test_a_pages_preview_picture_is_only_fetched_from_the_web(qapp, tmp_path, mo
     # this PC, or a share on another (file:////host/share: Windows connects to it)
     pic = tmp_path / "p.png"
     pic.write_bytes(png_bytes(tmp_path))
-    for bad in (pic.as_uri(), "file:////attacker.example/share/a.png"):
+    # nor one on this PC / the home network: the page's site would reach into the LAN
+    for bad in (pic.as_uri(), "file:////attacker.example/share/a.png",
+                f"http://{ROUTER}/x.png", "http://127.0.0.1/x.png", "http://nas.lan/a.png"):
         page = f'<html><meta property="og:image" content="{bad}"></html>'.encode()
         asked = fake_web(monkeypatch, {"https://ex.com/post": (page, "text/html")})
         with pytest.raises(thumbs.LinkError, match="no picture"):

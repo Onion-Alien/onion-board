@@ -9285,6 +9285,8 @@ class MainWindow(QMainWindow):
 
     def _on_update(self, rel, err: str, asked: bool):
         self._save_later()   # update_checked
+        if updates.recheck_s > 0:   # the newest is still settling: offer it once it has
+            QTimer.singleShot(round(updates.recheck_s * 1000), self, self.check_updates)
         busy = self._downloading or self._update_file is not None
         if rel is not None and not busy:
             if self.release is None or self.release.version != rel.version:
