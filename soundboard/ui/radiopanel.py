@@ -30,7 +30,7 @@ from soundboard.library import MAX_SECONDS, trim_silence
 from soundboard.radio import RadioDirectory, RadioPlayer, Station
 from soundboard.ui import appstate, busy, icons
 from soundboard.ui.panel import Flow as _Flow
-from soundboard.ui.panel import RoundedFrame, VolumeControl, bar, icon_label, vsep
+from soundboard.ui.panel import EmptyList, RoundedFrame, VolumeControl, bar, icon_label, vsep
 from soundboard.ui.speedpitch import SpeedPitchButton
 from soundboard.ui.widgets import paint_now_playing, take_out
 from soundboard.ui.pixels import snap_to_pixels
@@ -770,7 +770,7 @@ QFrame#stations QFrame#rule { background:$border; max-height:1px; border:none; }
         rule.setFixedHeight(1)
         v.addWidget(rule)
 
-        self.list = QListWidget()
+        self.list = EmptyList(icon="radio")   # says why it's empty, centred (_show_list)
         self.list.setAccessibleName(_("Stations"))
         self.list.setMinimumSize(160, 48)
         self.list.setUniformItemSizes(True)
@@ -1206,10 +1206,7 @@ QFrame#stations QFrame#rule { background:$border; max-height:1px; border:none; }
                 empty = _("Nothing played yet.\nStations you listen to show up here.")
             else:
                 empty = self._no_stations_text()
-            if empty:
-                it = QListWidgetItem(empty)
-                it.setFlags(Qt.ItemFlag.NoItemFlags)
-                self.list.addItem(it)
+            self.list.set_empty(empty)
         self._update_buttons()
 
     @staticmethod

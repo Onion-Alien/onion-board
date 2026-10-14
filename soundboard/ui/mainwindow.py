@@ -34,7 +34,7 @@ from soundboard import (appaudio, autostart, backup, destination, library, midi,
                         remote, otherboards, reset, soundfx, thumbs, trash, videos,
                         voicesdk)
 from soundboard import (appsetup, ffmpegget, net, netlog,
-                        profiles, quality, shellicon, thumbbar, tips, tor,
+                        profiles, quality, shellicon, sourceinfo, thumbbar, tips, tor,
                         usage, watchaddon)
 from soundboard.replay import InstantReplay
 from soundboard.library import (PAD_COLORS, PRESS_MODE, Config,
@@ -350,7 +350,7 @@ class MainWindow(QMainWindow):
         # pumps events while the window is built, so its timers can run
         # before the end of __init__
         self._shut_down = False
-        self.title = _("Onion Board {version_text}", version_text=version_text())
+        self.title = "Onion Board"   # the version is on the rail, under the name
         self.setWindowTitle(self.title)
         self.setAcceptDrops(True)   # files dropped outside the pad grid: see dropEvent
         self.cfg = Config.load()
@@ -630,9 +630,10 @@ class MainWindow(QMainWindow):
         self.wordmark = QLabel("Onion Board")
         self.wordmark.setObjectName("wordmark")
         from soundboard import __version__
-        # on the rail: the name over a quiet "v1.9.28" (the title bar says "from source");
-        # who made it is a tip on all three
-        self.tagline = sidebar.ClickLabel(f"v{__version__}")
+        # on the rail: the name over a quiet "by Onion Alien · v1.9.28" (the title bar
+        # is just the name; "from source" is in the tips)
+        self.tagline = sidebar.ClickLabel(
+            f"{_('by {name}', name='Onion Alien')} · v{__version__}")
         self.tagline.setObjectName("tagline")
         about = _("an app by Onion Alien · v{version_text}", version_text=version_text())
         for w in (self.logo, self.wordmark):
@@ -3710,11 +3711,26 @@ class MainWindow(QMainWindow):
             self.select(LINK_ID)   # already in the player: Play / Space pause and resume it
             self.toggle_play_pause()
             return
+        pad = self._pad_for_link(r.url) if play else None
+        if pad is not None:   # it's on the board already: the pad plays, from the start
+            self.play(pad)
+            return
         kind = "play" if play else "add"
         self.linkbar.open(r.url, r.title, r.seconds)
         self.ytresults.mark(r.url, kind)   # its button greys out until the link bar's done
         if not (self.linkbar.play_once() if play else self.linkbar.add()):
             self.ytresults.mark(r.url, kind, False)
+
+    def _pad_for_link(self, url: str) -> str | None:
+        """The board's sound downloaded from this link (its audio loaded), or None."""
+        key = sourceinfo.link_key(url)
+        if not key:
+            return None
+        for m in self.cfg.sounds:
+            if (self.audio.get(m.id) is not None and isinstance(m.source, dict)
+                    and sourceinfo.link_key(m.source.get("link", "")) == key):
+                return m.id
+        return None
 
     def gain_for(self, m: SoundMeta, volume=None) -> float:
         v = m.volume if volume is None else volume
@@ -3758,6 +3774,11 @@ class MainWindow(QMainWindow):
             else:
                 self.toast(_("“{name}” is still loading…", name=html.escape(m.name)), "warn")
             return
+        if (sid != LINK_ID and LINK_ID in self.engine.playing()
+                and self._pad_for_link(self._link_url) == sid):
+            # the web song played from a search, now saved as this pad: one song, so
+            # it starts again from the top instead of a second copy playing over it
+            self._stop_sound(LINK_ID)
         self.select(sid)
         self._last_sid = sid
         if sid != LINK_ID:

@@ -347,6 +347,34 @@ def test_flat_map_names_towns_only_zoomed_in_and_only_in_view(qapp, monkeypatch)
     assert 0 < shown <= flatmap.TOWNS_IN_VIEW      # never more than a handful at once
 
 
+
+def test_flat_map_draws_only_the_town_names_that_fit(qapp, monkeypatch):
+    """Zooming past TOWN_ZOOM over Europe drew every town in view (hundreds), even the
+    ones then skipped for overlapping: 80 ms in one paint, and the sound skipped. Only
+    the names that fit are drawn, and new ones get a slice of a paint each."""
+    from soundboard.ui import flatmap
+    from soundboard.ui.flatmap import FlatMap
+    m = FlatMap()
+    m.resize(720, 400)
+    towns = [{"n": f"Town {i}", "la": 50 + (i % 20) * 0.05, "lo": 10 + (i // 20) * 0.05,
+              "k": 1000 - i} for i in range(400)]
+    m.set_towns(towns)
+    m.zoom, m.cx, m.cy = 6.0, 10.5, 50.5
+    drawn = []
+    real = m._town_pixmap
+    monkeypatch.setattr(m, "_town_pixmap", lambda n, dpr: drawn.append(n) or real(n, dpr))
+    pm = flatmap.QPixmap(720, 400)
+    monkeypatch.setattr(flatmap, "TOWN_SLICE_S", -1.0)   # no time left: all wait
+    p = flatmap.QPainter(pm)
+    assert m._paint_towns(p, 1.0) == 0 and drawn == []
+    assert m._towns_later.isActive()                   # ...for the next paint
+    monkeypatch.setattr(flatmap, "TOWN_SLICE_S", 10.0)
+    shown = m._paint_towns(p, 1.0)
+    p.end()
+    assert 0 < shown <= flatmap.TOWNS_IN_VIEW
+    assert len(drawn) == shown                         # none drawn just to be skipped
+
+
 def test_bad_coordinates_and_numbers_are_cleaned():
     s = Station.from_api(api_station(1, geo_lat=0, geo_long=0, bitrate="x", countrycode="J1"))
     assert s.lat is None and s.lon is None and s.bitrate == 0 and s.cc == ""
@@ -1068,10 +1096,10 @@ def test_tab_search_failure_says_so_and_can_be_retried(qapp, tab):
     tab._on_failed("search", "timed out")
     assert tab._results == []
     from soundboard.ui import toast
-    assert "Search failed" in tab.list.item(0).text()
+    assert "Search failed" in tab.list.empty_text()
     assert any("Enter" in t.text() and t.kind == "error" for t in toast.shown(tab))
     tab._search_now()                            # Enter: back to searching
-    assert tab._results is None and "Searching" in tab.list.item(0).text()
+    assert tab._results is None and "Searching" in tab.list.empty_text()
 
 
 def test_tab_search_lists_after_a_typing_pause_without_refolding(qapp, tab, monkeypatch):
@@ -1115,7 +1143,7 @@ def test_tab_keeps_a_directory_failure_up_until_a_reload_works(tab):
     stations = tab._globe_list
     tab._globe_list = []
     tab._on_failed("globe", radio.directory_unreachable())
-    assert "press ↻" in tab.list.item(0).text().lower()
+    assert "press ↻" in tab.list.empty_text().lower()
     assert "press ↻" in tab.info.text().lower()
     tab._flash_until = 0.0
     tab._refresh_info()                          # later refreshes keep saying so
@@ -1144,7 +1172,7 @@ def test_tab_filters_by_genre_country_and_quality(tab):
     tab.cmb_sort.setCurrentIndex(5)                   # best quality first
     assert [s.uuid for s in tab.visible_stations()] == [c.uuid, b.uuid]
     tab.set_genre("Latin")
-    assert tab.list.count() == 1 and "No stations match" in tab.list.item(0).text()
+    assert not tab.list.count() and "No stations match" in tab.list.empty_text()
     tab.clear_filters()
     assert tab.list.count() == 5 and not tab.btn_clear.isVisibleTo(tab)
 
@@ -1197,7 +1225,7 @@ def test_tab_play_stop_and_star_relabel_rows_without_rebuilding(tab, monkeypatch
     assert kept() and row.text().startswith("★ Station 0") and not row.font().bold()
     tab.btn_favs.click()                              # Favorites: starring changes the rows
     tab._toggle_fav("uuid-0")
-    assert "No favorites" in tab.list.item(0).text()
+    assert "No favorites" in tab.list.empty_text()
 
 
 def test_station_rows_paint_without_making_fonts_each_time(tab, monkeypatch):
@@ -1533,7 +1561,7 @@ def test_the_radio_being_down_is_sad_bun_on_the_map_and_plain_words(tab):
     list says it too, and nothing shows an address."""
     tab._globe_list = []              # none saved either: the map has nothing to show
     tab._on_failed("globe", radio.directory_down())   # no map (a narrow tab): the list says it
-    said = tab.list.item(0).text()
+    said = tab.list.empty_text()
     assert said.startswith(radio.directory_down()) and "↻" in said and "http" not in said
     tab._make_flat()                  # the map: sad Bun says it, once
     text = tab.info.text()

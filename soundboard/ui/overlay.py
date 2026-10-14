@@ -924,7 +924,7 @@ class OverlayWindow(QWidget):
         T = theme.T
         path = self._path(r)
         if meta is None:
-            p.setPen(QPen(QColor(T["border"]), 1, Qt.PenStyle.DashLine))
+            p.setPen(QPen(QColor(T["border"]), 1))
             p.setBrush(Qt.BrushStyle.NoBrush)
             p.drawPath(path)
             p.setPen(QColor(T["muted"]))   # faint was unreadable (2.6:1) in some themes
@@ -987,8 +987,10 @@ class OverlayWindow(QWidget):
         elif self._hover == f"slot:{i}":
             p.setPen(QPen(QColor(T["accent"]), 1.6))
         elif prog is not None:
-            p.setPen(QPen(QColor(meta.color), 2, Qt.PenStyle.DashLine if paused
-                          else Qt.PenStyle.SolidLine))
+            ink = QColor(meta.color)
+            if paused:   # paused: the same line, faded
+                ink.setAlpha(110)
+            p.setPen(QPen(ink, 2))
         else:
             p.setPen(QPen(QColor(T["border"]), 1))
         p.setBrush(Qt.BrushStyle.NoBrush)
