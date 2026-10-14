@@ -44,6 +44,7 @@ class UpdateControl:
         self._update_detail = ""      # what went wrong, for Copy error
         self._update_fails = 0        # failed tries in a row: from 2, Copy error
         self._update_box: QMessageBox | None = None   # "Downloading…" open over it
+        self._whats_new_later: bool | None = None   # What's new waits for the window
 
     def check_updates(self, force: bool = False, why: str = ""):
         """Look for a newer release on a thread (see updates.py). Without `force` only
