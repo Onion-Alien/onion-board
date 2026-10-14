@@ -451,9 +451,13 @@ class DirectMicStream:
     samplerate = RATE
 
     def __init__(self, callback, path: Path | None = None, mic_callback=None,
-                 mode: int = MODE_REPLACE, lead_s: float = LEAD_S, voice_delay=None):
+                 mode: int = MODE_REPLACE, lead_s: float = LEAD_S, voice_delay=None,
+                 mic_stopped=None):
         self._callback = callback
         self._mic_callback = mic_callback
+        # () called (under `lock`) when the clean mic stops coming, or the stream closes
+        # while it came: the board's mic is back on its own device and rate
+        self._mic_stopped = mic_stopped
         # () -> frames (at RATE) the voice in what was just rendered is behind the mic
         # handed over (see Engine._direct_voice_delay); None = none
         self._voice_delay = voice_delay
@@ -472,6 +476,7 @@ class DirectMicStream:
         self._stop = threading.Event()
         self._thread: threading.Thread | None = None
         self._lock = threading.Lock()
+        self.lock = self._lock   # held while a block is taken: see Engine._cb_mic
         self.active = False
         self.mic_live = False       # the board is running on the effect's clean mic
         self.mic_rate = 0
@@ -510,7 +515,17 @@ class DirectMicStream:
     def close(self):
         self.stop()
         with self._lock:
+            if self.mic_live:
+                self.mic_live = False
+                self._stopped()
             self._ring.close()
+
+    def _stopped(self):
+        if self._mic_stopped is not None:
+            try:
+                self._mic_stopped()
+            except Exception:  # noqa: BLE001 - the feed goes on regardless
+                log.exception("mic stopped callback")
 
     def set_mode(self, mode: int):
         self.mode = mode
@@ -644,6 +659,7 @@ class DirectMicStream:
             self._zeros_since = None
             self._fed_at = None
             ring.clear_sync()
+            self._stopped()
             self._start, self._made = time.perf_counter(), 0
         due = int((time.perf_counter() - self._start) * RATE)
         if due - self._made > RATE // 5:   # stalled (sleep, a hang): don't catch up

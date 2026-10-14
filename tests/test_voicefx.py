@@ -681,7 +681,8 @@ BLEND = {"semitones": -5, "mix": 0.5, "gap": 0, "size": 4, "under": 1}
     ("distortion", "drive", {}), ("polish", "warmth", {}), ("polish", "ceiling", {}),
     ("polish", "deess", {}),
     ("shout", "drive", {"threshold": -40}), ("helmet", "size", {}), ("chorus", "depth", {}),
-    ("echo", "delay", {}), ("echo", "tone", {})])
+    ("echo", "delay", {}), ("echo", "tone", {}), ("reverb", "predelay", {}),
+    ("reverb", "size", {})])
 def test_dragging_a_slider_while_you_talk_doesnt_click(etype, key, base):
     """Each of these stepped a gain, jumped a delay or restarted a stage from silence
     at every block while its slider moved: a crackle for everyone listening."""
@@ -886,3 +887,49 @@ def test_chanting_monk_holds_a_note():
     y = np.concatenate([chain.process(np.repeat(x[i:i + 480, None], 2, 1), RATE)[:, 0]
                         for i in range(0, len(x), 480)])
     assert np.all(np.isfinite(y)) and np.max(np.abs(y)) < 1.5
+
+
+# ---------------------------------------------------------------- phase 2: the room
+
+def _impulse_response(**cfg):
+    e = REGISTRY["reverb"](RATE, {"tone": 5000, "mix": 1.0, **cfg})
+    x = np.zeros(RATE, np.float32)
+    x[0] = 1.0
+    return run_blocks(e, x, 480)
+
+
+def test_reverb_predelay_holds_the_room_back():
+    """With 60 ms of pre-delay nothing but the dry voice comes out for 60 ms."""
+    ir = _impulse_response(predelay=60, size=0.5)
+    dry_share = 1 - 0.6 * 1.0
+    gap = int(RATE * 0.06)
+    assert abs(ir[0] - dry_share) < 1e-3
+    assert np.max(np.abs(ir[1:gap - 48])) < 1e-4
+    assert np.max(np.abs(ir[gap:gap + RATE // 20])) > 0.05
+
+
+def test_reverb_has_early_reflections_before_the_tail():
+    """The first bounces land within 60 ms, well before the tail has built up."""
+    ir = _impulse_response(predelay=0, size=0.5)
+    early = ir[int(RATE * 0.004):int(RATE * 0.062)]
+    assert np.max(np.abs(early)) > 0.1
+    slots = np.abs(early[:len(early) // 48 * 48]).reshape(-1, 48).max(1)
+    assert np.mean(slots > 1e-3) > 0.5
+
+
+def test_reverb_old_settings_keep_their_tail():
+    """Size, Brightness and Mix mean what they did: the decay at Size 0.5 is still
+    about a second, and highs die faster than lows."""
+    from soundboard.dsp import butter, sosfilt
+    ir = _impulse_response(predelay=0, size=0.5)
+
+    def t60(lo, hi):
+        y = sosfilt(butter(4, [lo, hi], btype="band", fs=RATE), ir[:RATE])
+        e = np.cumsum(y[::-1] ** 2)[::-1]
+        db = 10 * np.log10(e / e[0] + 1e-12)
+        t = np.arange(len(db)) / RATE
+        m = (db < -5) & (db > -25)
+        k, _ = np.polyfit(t[m], db[m], 1)
+        return -60 / k
+    assert 0.8 < t60(500, 2000) < 1.6
+    assert t60(2000, 8000) < t60(500, 2000)

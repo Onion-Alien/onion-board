@@ -722,3 +722,33 @@ def test_card_sizes_wrap_readable_controls_without_overlap(tab, qapp, width):
         assert ed.rect().contains(b.geometry())
     for i, a in enumerate(buttons):
         assert all(not a.geometry().intersects(b.geometry()) for b in buttons[i + 1:])
+
+
+def test_the_waveform_is_drawn_on_a_fixed_scale():
+    # not stretched to the loudest bit in view: Louder / Quieter show, near-silence
+    # stays small, and nothing jumps as a loud bit scrolls out of a live view
+    from soundboard.ui.clipeditor import heights
+    h = heights(np.array([0.001, 0.1, 0.5, 1.0, 2.0], np.float32), 50.0)
+    assert h[0] < 2 and h[1] < h[2] < h[3] == h[4] == 50.0
+    assert h[1] > 50.0 / 4                       # -20 dB is still easy to see
+    assert heights(np.array([0.1], np.float32), 50.0)[0] == h[1]   # same alone or not
+    louder = heights(np.array([0.5 * 10 ** (clipeditor.STEP_DB / 20)], np.float32), 50.0)
+    assert louder[0] > h[2] + 5                  # Louder visibly grows it
+
+
+def test_the_clip_editor_button_says_what_it_opens(tab, qapp):
+    run(tab, music())
+    row = tab.rows["music.exe"]
+    assert "last minute" in row.btn_clip.toolTip() and "Freeze" not in row.btn_clip.toolTip()
+
+
+def test_trim_shows_all_of_what_is_left(tab, qapp):
+    row = opened(tab, qapp)
+    row.capture.sink(tone(6.0))
+    ed = row.editor
+    ed.freeze()
+    ed.take.select(SR, 2 * SR)
+    ed._sync()
+    ed.btn_trim.click()
+    assert len(ed.take) == SR
+    assert ed.view == (0.0, float(SR))   # not a sliver at the left of a 6 s view

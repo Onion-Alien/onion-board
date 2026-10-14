@@ -1823,7 +1823,6 @@
   "GitHub's download check is temporarily unavailable (gateway error). Try Get Onion Watch again in a moment.": "GitHub'ın indirme kontrolü geçici olarak kullanılamıyor (ağ geçidi hatası). Bir süre sonra Onion Watch'ı tekrar almayı deneyin.",
   "Got it": "Anladım",
   "Growl": "hırlama",
-  "Hear": "Duymak",
   "Hear it": "Duy onu",
   "Helmet": "Kask",
   "Helmet size": "Kask boyutu",
@@ -3355,5 +3354,7 @@
   "snappy": "sert",
   "soft": "yumuşak",
   "warm": "sıcak",
-  "clean": "temiz"
+  "clean": "temiz",
+  "This program's last minute as a waveform: pick a bit out of it and keep it as a clip. It only listens while it's open.": "Bu programın son dakikası dalga formu olarak: içinden bir parça seç ve klip olarak sakla. Yalnızca açıkken dinler.",
+  "Pre-delay": "Ön gecikme"
 }
