@@ -171,6 +171,11 @@ class FeatureOff(ProxyError):
     up or sent. The message is fit to show the user."""
 
 
+class LeadsHome(ProxyError):
+    """Refused because a name going direct was looked up and leads into this PC or the
+    home network. Nothing was sent. The message is fit to show the user."""
+
+
 @dataclass(frozen=True)
 class Proxy:
     kind: str          # "socks5" (names resolved by the proxy) | "http" (CONNECT)
@@ -491,9 +496,10 @@ def connect(host: str, port: int, timeout: float | None = CONNECT_TIMEOUT_S,
 
 def _open(host: str, port: int, timeout: float | None = CONNECT_TIMEOUT_S,
           via: Proxy | None = None, feature: str | None = None, direct: bool = False,
-          how: str = netlog.APP) -> tuple[socket.socket, netlog.Entry]:
+          how: str = netlog.APP, away: bool = False) -> tuple[socket.socket, netlog.Entry]:
     """connect(), and its entry in the activity list (netlog) for the caller to add
-    to (bytes, requests) and close."""
+    to (bytes, requests) and close. `away`: going direct, a name that leads into this
+    PC / the home network is refused with LeadsHome (see _connect_away)."""
     host = str(host).strip("[]")
     entry = netlog.begin(feature, host, port, how)
     try:
@@ -506,7 +512,11 @@ def _open(host: str, port: int, timeout: float | None = CONNECT_TIMEOUT_S,
         entry.failed(str(e) or type(e).__name__)
         raise
     try:
-        sock, route = _route(host, port, timeout, via, direct)
+        sock, route = _route(host, port, timeout, via, direct, away)
+    except LeadsHome as e:
+        entry.route = _route_name(via, direct, host)
+        entry.refused(str(e))
+        raise
     except BaseException as e:   # OSError, or e.g. a host name IDNA can't encode
         entry.route = _route_name(via, direct, host)
         entry.failed(str(e) if isinstance(e, ProxyError)
@@ -534,9 +544,11 @@ def _route_name(via: Proxy | None, direct: bool, host: str) -> str:
 
 
 def _route(host: str, port: int, timeout: float | None, via: Proxy | None,
-           direct: bool) -> tuple[socket.socket, str]:
+           direct: bool, away: bool = False) -> tuple[socket.socket, str]:
     if via is None:
         if direct or not active() or is_loopback(host):
+            if away and not is_loopback(host):
+                return _connect_away(host, port, timeout), _route_name(via, direct, host)
             return (socket.create_connection((host, port), timeout),
                     _route_name(via, direct, host))
         if _mode == TOR:
@@ -548,6 +560,28 @@ def _route(host: str, port: int, timeout: float | None, via: Proxy | None,
                             "isn't usable ({error})", error=_bad))
         via = _proxy
     return _via(via, host, port, timeout), _route_name(via, direct, host)
+
+
+def _connect_away(host: str, port: int, timeout: float | None) -> socket.socket:
+    """A direct connection to `host` that never lands on this PC or the home network:
+    the name is looked up once, refused (LeadsHome) if any address it gives is local,
+    and the connection goes to those checked addresses. Never to a second lookup of
+    the name, which could answer differently (DNS rebinding: a public address for the
+    check, then the router's). The name itself stays in what the client sends (the
+    Host header, TLS SNI): those bytes pass through unchanged."""
+    infos = socket.getaddrinfo(host, port, type=socket.SOCK_STREAM,
+                               proto=socket.IPPROTO_TCP)
+    ips = [str(info[4][0]) for info in infos]
+    if any(_local_target(ip) for ip in ips):
+        raise LeadsHome(_("Not connecting to {host}: it leads to this PC or your home "
+                          "network", host=host))
+    error: OSError = OSError(f"no address for {host}")
+    for ip in dict.fromkeys(ips):   # in the resolver's order, each once
+        try:
+            return socket.create_connection((ip, port), timeout)
+        except OSError as e:
+            error = e
+    raise error
 
 
 def _via(via: Proxy, host: str, port: int, timeout: float | None,
@@ -1134,17 +1168,15 @@ class _Relay:
                         host=host)
                 netlog.blocked(feature, host, int(port), why, netlog.RELAY)
                 return self._refuse(c, 403, str(_failed(why)))
-            if (_mode == DIRECT or direct) and _name_leads_home(host):
-                # going direct, the name is looked up on this PC anyway: one that leads
-                # into this PC / the home network (a stream redirecting there) is refused
-                self.seen.append((feature, host, "local"))
-                why = _("Not connecting to {host}: it leads to this PC or your home "
-                        "network", host=host)
-                netlog.blocked(feature, host, int(port), why, netlog.RELAY)
-                return self._refuse(c, 403, str(_failed(why)))
             try:
+                # going direct, the name is looked up on this PC anyway: one that leads
+                # into this PC / the home network (a stream redirecting there) is
+                # refused, and the connection goes to the address that was checked
                 up, entry = _open(host, int(port), feature=feature, direct=direct,
-                                  how=netlog.RELAY)
+                                  how=netlog.RELAY, away=True)
+            except LeadsHome as e:
+                self.seen.append((feature, host, "local"))
+                return self._refuse(c, 403, str(_failed(str(e))))
             except OSError as e:
                 self.seen.append((feature, host, "failed"))
                 return self._refuse(c, 502, str(e))
@@ -1268,24 +1300,6 @@ def _local_target(host: str) -> bool:
     ip = getattr(ip, "ipv4_mapped", None) or ip
     return (ip.is_private or ip.is_loopback or ip.is_link_local or ip.is_unspecified
             or ip.is_multicast or ip.is_reserved)
-
-
-def _name_leads_home(host: str) -> bool:
-    """Does the name `host` resolve to an address on this PC or the home network? Only
-    for connections that go direct (the lookup is made on this PC either way). An
-    address, "localhost", or a name that doesn't resolve isn't refused here."""
-    if is_loopback(host):
-        return False
-    try:
-        ipaddress.ip_address(host.split("%")[0])
-        return False   # an address: _local_target decides
-    except ValueError:
-        pass
-    try:
-        infos = socket.getaddrinfo(host, None, proto=socket.IPPROTO_TCP)
-    except (OSError, UnicodeError):
-        return False
-    return any(_local_target(str(info[4][0])) for info in infos)
 
 
 _relay: _Relay | None = None

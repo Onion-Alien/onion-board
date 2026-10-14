@@ -391,10 +391,14 @@ def relay_get(feature: str, url: str) -> bytes:
 def test_the_relay_refuses_a_switched_off_features_login(mode, site, socks, monkeypatch):
     net.configure(mode, socks.url())
     net.configure_features(["radio"])
-    # in Direct mode the relay connects straight: let it reach the test site by name
-    real = socket.create_connection
+    # in Direct mode the relay looks the name up and connects straight to the address
+    # it checked: a public one for the name, which reaches the test site
+    real_gai, real = socket.getaddrinfo, socket.create_connection
+    monkeypatch.setattr(socket, "getaddrinfo", lambda h, *a, **k: real_gai(
+        "93.184.216.34" if h == "site.test" else h, *a, **k))
     monkeypatch.setattr(socket, "create_connection", lambda addr, *a, **k: real(
-        ("127.0.0.1", addr[1]) if addr[0] == "site.test" else addr, *a, **k))
+        ("127.0.0.1", addr[1]) if addr[0] in ("site.test", "93.184.216.34") else addr,
+        *a, **k))
     off = relay_get("radio", f"http://site.test:{site.port}/radio")
     assert off.startswith(b"HTTP/1.1 403") and b"Radio is switched off" in off
     assert site.paths == [] and socks.asked == []
