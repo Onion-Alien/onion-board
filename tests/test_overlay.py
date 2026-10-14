@@ -387,7 +387,7 @@ def test_settings_overlay_tab_shows_a_drag(window):  # noqa: F811
         assert "not connected" in d.ov_monitor.currentText()
     finally:
         d.accept()                                       # Done
-    assert d._ov_dragged not in window.overlay.listeners
+    assert d.keys._ov_dragged not in window.overlay.listeners
 
 
 def test_sounds_are_kept_until_the_list_or_category_changes(make):
