@@ -16,12 +16,13 @@ import logging
 import math
 import random
 import threading
+from concurrent.futures import ThreadPoolExecutor
 from typing import Any
 
 from PySide6.QtCore import QEvent, QPointF, QRect, QRectF, QSize, QUrl, Qt, Signal
-from PySide6.QtGui import (QAction, QActionGroup, QColor, QIcon, QPainter, QPainterPath,
-                           QPixmap, QTextLayout)
-from PySide6.QtNetwork import QNetworkAccessManager, QNetworkRequest
+from PySide6.QtGui import (QAction, QActionGroup, QColor, QIcon, QImage, QPainter,
+                           QPainterPath, QPixmap, QTextLayout)
+from PySide6.QtNetwork import QNetworkAccessManager, QNetworkReply, QNetworkRequest
 from PySide6.QtWidgets import (QBoxLayout, QFrame, QHBoxLayout, QLabel, QMenu,
                                QPushButton, QScrollArea, QSizePolicy, QVBoxLayout, QWidget)
 
@@ -46,6 +47,9 @@ THUMB_W, THUMB_H = 128, 72   # the pictures' shape (16:9); they fill the card's 
 CARD_MIN_W = 210             # results are cards, as many across as fit at this width
 LINK_CARD_MAX_W = 820        # a pasted link's card: picture beside the words, this wide at most
 PAGE = 20          # hits per search, and per Show more
+THUMB_TIMEOUT_MS = 15_000     # a picture with no bytes arriving for this long is dropped
+THUMB_MAX_BYTES = 5_000_000   # a thumbnail is ~100 kB; a page's og:image can be anything
+_decoder: ThreadPoolExecutor | None = None   # thumbnails are decoded here, not on the UI thread
 MAX_RESULTS = 200  # Show more stops here: more cards would only cost memory and scrolling
 TIPS = {"youtube": _("Search YouTube"),
         "ytmusic": _("Search YouTube Music: songs, the official versions"),
@@ -745,6 +749,21 @@ class ResultRow(HoverCard):
         self.thumb.set_pixmap(pm)
 
 
+def _cap_thumb(reply, got: int, total: int) -> None:
+    """Stop a picture that is (or says it will be) far bigger than a thumbnail: a page's
+    og:image that's huge or never ends would otherwise grow without limit."""
+    if got > THUMB_MAX_BYTES or total > THUMB_MAX_BYTES:
+        reply.setProperty("too_big", True)
+        reply.abort()
+
+
+def _thumb_decoder() -> ThreadPoolExecutor:
+    global _decoder
+    if _decoder is None:
+        _decoder = ThreadPoolExecutor(max_workers=2, thread_name_prefix="thumb-decode")
+    return _decoder
+
+
 class SearchResults(RoundedFrame):
     """`play(Result)` / `add(Result)` when a row's button is pressed; `closed()`
     when its "My sounds" back button is (the owner shows its pads again). Its site
@@ -756,6 +775,7 @@ class SearchResults(RoundedFrame):
     thumb_ready = Signal(str, object)
     source_changed = Signal(str)
     _done = Signal(int, object, str)   # worker -> UI: (search number, results, error)
+    _thumb_decoded = Signal(int, str, object)   # worker -> UI: (search number, url, QImage)
 
     def __init__(self):
         super().__init__()
@@ -770,6 +790,7 @@ class SearchResults(RoundedFrame):
         self.net = QNetworkAccessManager(self)
         net.apply_qt(self.net, "sounds_web")   # thumbnails: Settings > Privacy & security
         self._done.connect(self._on_done)
+        self._thumb_decoded.connect(self._on_thumb_decoded)
 
         v = QVBoxLayout(self)
         v.setContentsMargins(12, 12, 12, 12)   # Back sits as far in from the top as the side
@@ -1134,14 +1155,36 @@ class SearchResults(RoundedFrame):
             thumb = net.web_url(r.thumb)   # web links only
             if not quality.current.web_extras or not thumb:   # Settings > Data & quality
                 continue
-            reply = self.net.get(QNetworkRequest(QUrl(thumb)))
+            req = QNetworkRequest(QUrl(thumb))
+            req.setTransferTimeout(THUMB_TIMEOUT_MS)
+            reply = self.net.get(req)
+            reply.downloadProgress.connect(
+                lambda got, total, reply=reply: _cap_thumb(reply, got, total))
             reply.finished.connect(lambda reply=reply, row=row, g=gen: self._on_thumb(
                 reply, row, g))
 
     def _on_thumb(self, reply, row: ResultRow, gen: int):
-        data = reply.readAll()
+        """A picture came in (or failed, or was cut off): decode it on a worker, since a
+        big one would freeze the window; _on_thumb_decoded shows it."""
+        ok = (reply.error() == QNetworkReply.NetworkError.NoError
+              and not reply.property("too_big"))
+        data = bytes(reply.readAll()) if ok else b""
         reply.deleteLater()
-        pm = QPixmap()
-        if gen == self._gen and row in self._rows and pm.loadFromData(data):
-            row.set_thumb(pm)
-            self.thumb_ready.emit(row.result.url, pm)
+        if (not data or len(data) > THUMB_MAX_BYTES or gen != self._gen
+                or row not in self._rows):
+            return
+        url = row.result.url
+
+        def decode():
+            busy.emit(self._thumb_decoded, gen, url, QImage.fromData(data))
+        _thumb_decoder().submit(decode)
+
+    def _on_thumb_decoded(self, gen: int, url: str, img: QImage):
+        if gen != self._gen or img.isNull():   # a new search, or not a picture
+            return
+        row = next((r for r in self._rows if r.result.url == url), None)
+        if row is None:   # its card went meanwhile
+            return
+        pm = QPixmap.fromImage(img)
+        row.set_thumb(pm)
+        self.thumb_ready.emit(url, pm)

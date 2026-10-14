@@ -830,7 +830,7 @@ def test_heading_level_with_the_rails_name(window, qapp, theme):  # noqa: F811
 
 
 def test_live_tabs_choices_side_by_side_like_connection(window, qapp):  # noqa: F811
-    """U2: comparable short choices look alike: Live tabs' two sit in one wrapping row,
+    """Comparable short choices look alike: Live tabs' two sit in one wrapping row,
     as Connection's and Network activity's do (offscreen fonts here are too wide to
     compare positions: the pictures check that)."""
     from soundboard.ui.panel import Flow
@@ -848,7 +848,7 @@ def test_live_tabs_choices_side_by_side_like_connection(window, qapp):  # noqa: 
 
 
 def test_settings_cards_line_up(window, qapp):  # noqa: F811
-    """U6: an option's explanation sits under its box's text (General's one-click one
+    """An option's explanation sits under its box's text (General's one-click one
     sat at the card's edge); the overlay's Open overlay and Auto-hide choice are as wide
     as their words, right after what they belong to; the ducking label keeps one line."""
     from PySide6.QtWidgets import QComboBox, QPushButton

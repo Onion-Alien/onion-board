@@ -3,27 +3,6 @@
 Guidance for AI coding agents (Claude Code, Codex, Copilot, etc.) working in this repo.
 Humans: [CONTRIBUTING.md](CONTRIBUTING.md).
 
-**Start with [docs/AGENT-RULES.md](docs/AGENT-RULES.md)**: the regressions this repo keeps
-getting as rules, which docs a task needs (read only those), where each rule lives, and the
-one-command check before every commit.
-
-## Before you change anything: sync first, check open PRs
-
-Do all three before the first edit, every task. Other agents work on this repo at
-the same time, and work done on a stale copy or twice in parallel gets thrown away.
-
-1. **Start from the latest `main`.** `git fetch origin`, then work on a new branch off
-   `origin/main` (`git switch -c <branch> origin/main`). If the checkout has someone
-   else's uncommitted work or isn't on a clean `main`, don't touch it: use a worktree
-   (`git worktree add <tmp> -b <branch> origin/main`). Run
-   `git config core.hooksPath .githooks` in every new checkout or worktree.
-2. **Check you really have it.** `git status -sb` must not say `behind`, and
-   `git log -1 --oneline` must match `git log -1 --oneline origin/main`. Never edit
-   a copy that's behind `main`.
-3. **Know the open PRs.** `gh pr list --state open` (and `gh pr view N --json files`
-   for anything close to your task). If a PR already does your change, or touches the
-   same code, stop and tell the user instead of making a second version.
-
 ## This repo is public
 
 Everything written here (code, comments, docs, tests, commit messages, PR text) is
@@ -32,6 +11,14 @@ unlicensed audio or binaries, new network calls in `SECURITY.md`, loopback locke
 [CONTRIBUTING.md *Rules that aren't negotiable*](CONTRIBUTING.md#rules-that-arent-negotiable).
 On top of those, for agents:
 
+- **The maintainer's working notes stay out of the repo.** Plans, roadmaps, to-do
+  lists, audits, checklists, handoffs, test reports and agent rulebooks are kept
+  locally, outside git. Never add one to the repo (not in `docs/`, not anywhere), and
+  never link to one or cite its item numbers ("U12", "see the audit") in code,
+  comments, tests, commits or PRs. What's committed is what a user or an outside
+  contributor needs: the README, the website, CONTRIBUTING, SECURITY, the changelog
+  and the reference docs in `docs/` (DEVELOPING, CODE, DESIGN, FEATURES, ...).
+  `.gitignore` blocks the usual names; a new kind of note goes there too.
 - **Never copy content from outside the repo** (the author's other projects,
   parent-folder docs, memory files, shell history) into files here, and never name the
   author's machines, other projects, Tailscale or LAN details.
@@ -69,7 +56,6 @@ section 14 for the workflow, and go through its checklist before showing picture
 **The app has 31 themes** (`theme.THEMES`), not two or three: any colour, icon or style
 sheet change has to work and be checked in all of them (DESIGN.md section 6), with Dark
 and Light as the reference look.
-[docs/UI-AUDIT.md](docs/UI-AUDIT.md) is the only UI to-do list ("the UI audit doc").
 
 ## Working in the code
 

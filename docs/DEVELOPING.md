@@ -32,7 +32,7 @@ module's `install.bat` or `pip install -r requirements.txt`).
 ## 2. Change the code
 
 - Layout: [CODE.md](CODE.md) → *Code layout*. Rules: [CONTRIBUTING.md](../CONTRIBUTING.md)
-  and, for agents, [AGENT-RULES.md](AGENT-RULES.md) (audio callbacks, UI thread, tests).
+  (audio callbacks, UI thread, tests).
 - Anything user-visible gets a changelog line: [changelog.d/README.md](../changelog.d/README.md).
 - The Triggers tab is the [Onion Watch](https://github.com/Onion-Alien/onion-watch)
   add-on, a separate project. Onion Board's side is `ui/triggerstab.py` (the tab,
@@ -67,8 +67,7 @@ module's `install.bat` or `pip install -r requirements.txt`).
 ```
 
 Or the quick checks (ruff, the sensitive scan, translations, CODE.md) in one go,
-`scripts\precommit.ps1`: how and when to use it, and what's left to CI, is
-[AGENT-RULES.md *Before every commit*](AGENT-RULES.md#before-every-commit).
+`scripts\precommit.ps1`, before every commit. The full test suite is left to CI.
 
 The tests are fully headless: `tests/conftest.py` forces Qt's `offscreen`
 platform and a separate single-instance name, and never touches the real
@@ -90,7 +89,7 @@ half-written ring files at the effect (built with sanitizer traps);
 `fuzzhost --lead` replays a late board block by block (no timing luck) and checks the
 effect's lead grows just enough and comes back; the real-time tests can't pin that down.
 `scripts\sim_directmic.py` drives the mic effect's admin install / uninstall against a
-fake registry, killing it at every write (when to run it: AGENT-RULES *Audio path*).
+fake registry, killing it at every write (run it after any change to the mic effect's install / uninstall).
 
 **Not on Windows?** The suite also runs on Linux and macOS: `tests/offwindows.py`
 stands in for Windows' registry (every key missing) and DLLs (every call fails), so the
@@ -121,8 +120,8 @@ game is running) and `-n 0` turns them off. You don't need to rebuild to see a c
 from source.
 
 Keeping it fast: Windows takes ~2 s to refuse a connection to a closed port, even
-on 127.0.0.1, and `localhost` tries `::1` first (hence AGENT-RULES' `closed_port()` /
-`ipv4_only()` rule). `--durations=20` shows what's slow (CI lists them on every run).
+on 127.0.0.1, and `localhost` tries `::1` first (hence the tests' `closed_port()` /
+`ipv4_only()` helpers in `tests/conftest.py`). `--durations=20` shows what's slow (CI lists them on every run).
 
 Hangs and flakes: a test still running after 2 minutes is hung; every thread's stack
 is printed and its worker stopped (`faulthandler_timeout` in `pyproject.toml`), and
@@ -326,10 +325,13 @@ Get-Process OnionBoard -ErrorAction SilentlyContinue      # is it running?
    secrets scan over the full history, gitleaks, ruff and pytest. On a PR, pytest
    runs only the test files the change needs (`scripts/pick_tests.py`: the tests
    that import a changed module or name a changed file; all of them when
-   `conftest.py`, `pyproject.toml`, the requirements or the workflow change; none for
+   `conftest.py`, `pyproject.toml`, the requirements, the workflow or a hub
+   (`ui/mainwindow.py`, `engine.py`, `library.py`, `settings.py`) change; none for
    a change no test is about, like the changelog). main, after the merge, runs the
    whole suite, and so does running the workflow by hand on a branch. A newer push to
-   the PR cancels its unfinished run.
+   the PR cancels its unfinished run. Every night the whole suite runs on main too,
+   and its `flaky-trend` job fails when a test needed a rerun that didn't the night
+   before (the run's summary lists the new ones and the ones no longer flaky).
 3. `release.py` (next step) refuses to start unless the checkout is exactly
    `origin/main` (it fetches first) and main's full `checks` run passed on that
    commit (`gh run list --workflow checks.yml --branch main --commit <sha>`): a PR

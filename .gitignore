@@ -53,5 +53,21 @@ desktop.ini
 .DS_Store
 .claude/settings.local.json
 
+# the maintainer's working notes: plans, to-do lists, audits, handoffs (kept locally,
+# never published, see CLAUDE.md "This repo is public")
+docs/AGENT-RULES.md
+docs/UI-AUDIT.md
+/notes/
+/local/
+*.local.md
+HANDOFF*.md
+OPEN-WORK*.md
+LOCAL-PIPELINES.md
+*-PLAN.md
+PLAN*.md
+TODO*.md
+BUG-REPORT*.md
+*-AUDIT.md
+
 # Tor Expert Bundle, unpacked by scripts/fetch_tor.py (never committed)
 vendor/
