@@ -3309,5 +3309,9 @@
   "Get the newest yt-dlp, the part that downloads from YouTube and other sites, then try this link again": "YouTube 등 여러 사이트에서 다운로드하는 부분인 최신 yt-dlp를 받은 뒤 이 링크를 다시 시도합니다",
   "The downloader is already the newest. The site may have changed in a way it can't handle yet: try again in a few days.": "다운로더가 이미 최신이에요. 사이트가 아직 처리할 수 없는 방식으로 바뀌었을 수 있어요. 며칠 뒤에 다시 시도해 보세요.",
   "Update downloader": "다운로더 업데이트",
-  "Updating the downloader…": "다운로더 업데이트 중…"
+  "Updating the downloader…": "다운로더 업데이트 중…",
+  "Hear {name}": "{name} 듣기",
+  "Hear {name} (only you hear it)": "{name} 듣기 (나만 들려요)",
+  "Pick your headphones in Settings → Audio to hear the samples.": "샘플을 들으려면 설정 → 오디오에서 헤드폰을 고르세요.",
+  "Ready-made boards, free to use anywhere: in games, streams and videos. Press a sound to hear it first (only you hear it). Add a pack and its sounds land on your board, each category as its own tab.": "게임, 스트리밍, 비디오 등 어디에서나 무료로 사용할 수 있는 기성 보드입니다. 사운드를 눌러 먼저 들어 보세요 (나만 들려요). 하나를 추가하면 해당 사운드가 보드에 표시되고 각 카테고리는 자체 탭으로 표시됩니다."
 }

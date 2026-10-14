@@ -3309,5 +3309,9 @@
   "Get the newest yt-dlp, the part that downloads from YouTube and other sites, then try this link again": "Lấy yt-dlp mới nhất, phần tải xuống từ YouTube và các trang khác, rồi thử lại liên kết này",
   "The downloader is already the newest. The site may have changed in a way it can't handle yet: try again in a few days.": "Trình tải xuống đã là bản mới nhất. Trang web có thể đã thay đổi theo cách nó chưa xử lý được: hãy thử lại sau vài ngày.",
   "Update downloader": "Cập nhật trình tải xuống",
-  "Updating the downloader…": "Đang cập nhật trình tải xuống…"
+  "Updating the downloader…": "Đang cập nhật trình tải xuống…",
+  "Hear {name}": "Nghe {name}",
+  "Hear {name} (only you hear it)": "Nghe {name} (chỉ bạn nghe thấy)",
+  "Pick your headphones in Settings → Audio to hear the samples.": "Chọn tai nghe của bạn trong Cài đặt → Âm thanh để nghe thử.",
+  "Ready-made boards, free to use anywhere: in games, streams and videos. Press a sound to hear it first (only you hear it). Add a pack and its sounds land on your board, each category as its own tab.": "Bảng làm sẵn, miễn phí sử dụng ở mọi nơi: trong trò chơi, luồng và video. Bấm một âm thanh để nghe thử trước (chỉ bạn nghe thấy). Thêm một và âm thanh của nó sẽ xuất hiện trên bảng của bạn, mỗi danh mục là tab riêng."
 }

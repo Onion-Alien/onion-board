@@ -265,3 +265,128 @@ def test_free_packs_hands_a_download_to_the_windows_import(window, monkeypatch, 
     monkeypatch.setattr(net, "allowed", lambda f: False)   # no list fetch
     window.show_packs()
     assert got == [[str(tmp_path / "horror.zip")]]
+
+
+# ---------------------------------------------------------------- hear it first
+
+def png_bytes() -> bytes:
+    from PySide6.QtCore import QBuffer
+    from PySide6.QtGui import QColor, QImage
+    img = QImage(8, 8, QImage.Format.Format_ARGB32)
+    img.fill(QColor("#b71c1c"))
+    buf = QBuffer()
+    buf.open(QBuffer.OpenModeFlag.WriteOnly)
+    img.save(buf, "PNG")
+    return bytes(buf.data().data())
+
+
+def make_preview(names=("Door", "Dragon")) -> bytes:
+    """A pack's preview: a few of its sounds with their pictures (backup format)."""
+    buf = io.BytesIO()
+    with zipfile.ZipFile(buf, "w") as z:
+        folders = []
+        for i, n in enumerate(names):
+            folder = f"sounds/{i:03d} {n}"
+            z.writestr(f"{folder}/sound.wav", wav_bytes())
+            z.writestr(f"{folder}/picture.png", png_bytes())
+            z.writestr(f"{folder}/sound.json", json.dumps(
+                {"name": n, "audio": "sound.wav", "picture": "picture.png"}))
+            folders.append(folder)
+        z.writestr("onionboard.json", json.dumps({
+            "format": "onionboard-board", "format_version": 1, "sounds": folders}))
+    return buf.getvalue()
+
+
+def with_preview(data: bytes, preview: bytes, **kw) -> dict:
+    return entry(data, preview={"url": f"{updates.DOWNLOADS}pack-horror/horror-preview.zip",
+                                "sha256": hashlib.sha256(preview).hexdigest(),
+                                "size": len(preview)}, **kw)
+
+
+def test_our_packs_each_have_a_preview_on_their_own_release():
+    for p in packs.built_in():
+        assert p.preview_url.startswith(p.url.rsplit("/", 1)[0] + "/")
+        assert len(p.preview_sha256) == 64 and 0 < p.preview_size <= packs.PREVIEW_MAX
+
+
+def test_a_bad_preview_is_dropped_but_its_pack_stays():
+    good = with_preview(b"x", b"y")
+    p, = packs.parse([good])
+    assert p.preview_url.endswith("horror-preview.zip") and p.preview_size == 1
+    for bad in ({"url": "https://evil.example/p.zip", "sha256": "0" * 64},
+                {"url": good["preview"]["url"], "sha256": "abc"},
+                {**good["preview"], "size": packs.PREVIEW_MAX + 1},
+                "not a dict", None):
+        p, = packs.parse([entry(b"x", preview=bad)])
+        assert p.preview_url == "" and p.id == "horror"
+
+
+def test_samples_are_fetched_once_checked_and_unpacked(served):
+    preview = make_preview(("Door creak", "Dragon"))
+    p, = packs.parse([with_preview(b"x", preview)])
+    served.files[p.preview_url] = preview[:-1] + b"!"   # swapped after it was checked
+    with pytest.raises(updates.UpdateError, match="checksum"):
+        packs.samples(p)
+    served.files[p.preview_url] = preview
+    found = packs.samples(p)
+    assert [s.name for s in found] == ["Door creak", "Dragon"]
+    assert all(s.audio.is_file() and s.picture.startswith(b"\x89PNG") for s in found)
+    calls = len(served.calls)
+    assert [s.name for s in packs.samples(p)] == ["Door creak", "Dragon"]
+    assert len(served.calls) == calls   # kept: not fetched again
+    assert packs.samples(packs.parse([entry(b"x")])[0]) == []   # a pack with none
+
+
+def test_the_window_plays_a_sample_to_the_headphones_and_stops_it(qapp, served):
+    data, preview = make_pack(), make_preview()
+    p = with_preview(data, preview)
+    served.files[p["preview"]["url"]] = preview
+    played = []
+    dlg = packsdialog.PacksDialog(lambda path: None, fetch_list=False,
+                                  play=lambda d, g: played.append(d is not None) or True)
+    try:
+        dlg._show(packs.parse([p]), "")
+        card = dlg.cards[0]
+        assert process_events(qapp, lambda: card.samples[0].sample is not None, 5)
+        assert [b.isVisibleTo(dlg) for b in card.samples].count(True) == 2
+        assert card.samples[0].isEnabled() and card.samples[1].text() == "Dragon"
+        card.samples[0].click()
+        assert process_events(qapp, lambda: played == [True], 5)
+        assert card.samples[0].isChecked()
+        card.samples[1].click()   # another one: the first stops, this one plays
+        assert process_events(qapp, lambda: played == [True, False, True], 5)
+        assert not card.samples[0].isChecked() and card.samples[1].isChecked()
+        card.samples[1].click()   # pressed again: stopped
+        assert played[-1] is False and not card.samples[1].isChecked()
+    finally:
+        dlg.done(0)
+
+
+def test_no_headphones_says_where_to_set_them(qapp, served):
+    preview = make_preview()
+    p = with_preview(make_pack(), preview)
+    served.files[p["preview"]["url"]] = preview
+    dlg = packsdialog.PacksDialog(lambda path: None, fetch_list=False,
+                                  play=lambda d, g: d is None)   # nowhere to play it
+    try:
+        dlg._show(packs.parse([p]), "")
+        card = dlg.cards[0]
+        assert process_events(qapp, lambda: card.samples[0].sample is not None, 5)
+        card.samples[0].click()
+        assert process_events(qapp, lambda: dlg.note.isVisibleTo(dlg), 5)
+        assert "headphones" in dlg.note.text() and not card.samples[0].isChecked()
+    finally:
+        dlg.done(0)
+
+
+def test_samples_that_cant_be_fetched_take_their_row_away(qapp, served):
+    p = with_preview(make_pack(), make_preview())   # nothing served: the fetch fails
+    dlg = packsdialog.PacksDialog(lambda path: None, fetch_list=False,
+                                  play=lambda d, g: True)
+    try:
+        dlg._show(packs.parse([p]), "")
+        card = dlg.cards[0]
+        assert card.listen.isVisibleTo(dlg)   # placeholders while it's fetched
+        assert process_events(qapp, lambda: not card.listen.isVisibleTo(dlg), 5)
+    finally:
+        dlg.done(0)

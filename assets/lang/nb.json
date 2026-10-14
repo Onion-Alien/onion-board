@@ -3385,5 +3385,9 @@
   "Get the newest yt-dlp, the part that downloads from YouTube and other sites, then try this link again": "Henter nyeste yt-dlp, delen som laster ned fra YouTube og andre sider, og prøver denne lenken igjen",
   "The downloader is already the newest. The site may have changed in a way it can't handle yet: try again in a few days.": "Nedlasteren er allerede den nyeste. Siden kan ha endret seg på en måte den ikke takler ennå: prøv igjen om noen dager.",
   "Update downloader": "Oppdater nedlasteren",
-  "Updating the downloader…": "Oppdaterer nedlasteren…"
+  "Updating the downloader…": "Oppdaterer nedlasteren…",
+  "Hear {name}": "Hør {name}",
+  "Hear {name} (only you hear it)": "Hør {name} (bare du hører den)",
+  "Pick your headphones in Settings → Audio to hear the samples.": "Velg hodetelefonene dine under Innstillinger → Lyd for å høre prøvene.",
+  "Ready-made boards, free to use anywhere: in games, streams and videos. Press a sound to hear it first (only you hear it). Add a pack and its sounds land on your board, each category as its own tab.": "Ferdige brett, gratis å bruke hvor som helst: i spill, strømmer og videoer. Trykk på en lyd for å høre den først (bare du hører den). Legg til en og lydene lander på brettet ditt, hver kategori som sin egen fane."
 }

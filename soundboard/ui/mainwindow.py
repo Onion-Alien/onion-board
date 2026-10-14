@@ -121,6 +121,7 @@ UNDO_S = 10          # how long "Removed … · Undo" stays up
 # (soundfx.preview_part): a 2-hour song's pitch shift took minutes to start playing
 PREVIEW_WHOLE_S = 5 * 60
 PREVIEW_S = 30
+PACK_SAMPLE = "__pack_sample"   # Free packs' "hear it first" voice (headphones only)
 UNDO_KEY = "undo-sounds"   # its card (toast key)
 TOAST_EXPAND = QSize(900, 640)   # a shrunk card clicked: the window grows to this
 # shown when instant replay goes on: it records whoever is talking in a call
@@ -8608,9 +8609,19 @@ class MainWindow(QMainWindow):
         """The Free packs window (soundboard.packs): a pack it downloads is imported the
         way dropping its zip on the window is."""
         from soundboard.ui.packsdialog import PacksDialog
-        dlg = PacksDialog(lambda path: self.import_files([str(path)]), self)
+        dlg = PacksDialog(lambda path: self.import_files([str(path)]), self,
+                          play=self._pack_sample)
         dlg.exec()
         free_dialog(dlg)
+
+    def _pack_sample(self, data, gain: float) -> bool:
+        """Free packs' samples: to your headphones only (None stops it). False: no
+        headphones to play them on."""
+        if data is None:
+            self.engine.stop(PACK_SAMPLE)
+            return True
+        return self.engine.play(PACK_SAMPLE, data, gain, mode="restart",
+                                preview=True) is not None
 
     def import_dialog(self):
         files, __ = QFileDialog.getOpenFileNames(
