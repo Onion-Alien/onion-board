@@ -20,6 +20,7 @@ from soundboard import errors, library, net, packs, updates
 from soundboard.engine import SR
 from soundboard.ui import busy, fit, icons
 from soundboard.ui.panel import hint_label
+from soundboard.ui.widgets import take_out
 from soundboard.i18n import _, ngettext
 
 log = logging.getLogger(__name__)
@@ -159,8 +160,10 @@ class PackCard(QFrame):
             b.clicked.connect(lambda on, b=b: self._hear(b, on))
             grid.addWidget(b, i // SAMPLE_COLS, i % SAMPLE_COLS)
             self.samples.append(b)
-        self.listen.setVisible(bool(pack.preview_url))
+        # into the card first: shown while it has no parent, it's a window of its own
+        # for a moment (made and pulled back in: ~30 ms the sound playing waits on)
         v.addWidget(self.listen)
+        self.listen.setVisible(bool(pack.preview_url))
         self.show_idle()
 
     def show_idle(self):
@@ -300,26 +303,46 @@ class PacksDialog(QDialog):
                 "this version knows.", error=err)), "warn")
         if found is None or self._busy:   # don't pull a card out from under a download
             return
-        self._stop()
+        if found == [c.pack for c in self.cards]:
+            return   # the online list is the one shown (it usually is): nothing to redo
+        # Keep the cards of packs that didn't change and make only the new ones: making
+        # all of them again in the open window took about 250 ms of Qt work at once,
+        # and the sound playing skipped (the audio threads wait on the UI thread).
+        old = {c.pack.id: c for c in self.cards}
+        cards, new = [], []
+        for p in found:
+            c = old.get(p.id)
+            if c is not None and c.pack == p:
+                del old[p.id]
+            else:
+                c = PackCard(p)
+                if self._play is None:
+                    c.listen.hide()
+                new.append(c)
+            cards.append(c)
+        if self._playing_card() in old.values():   # its card goes: stop its sample
+            self._stop()
         while self.list.count():
-            item = self.list.takeAt(0)
-            w = item.widget() if item else None
-            if w is not None:
-                w.deleteLater()
-        self.cards = [PackCard(p) for p in found]
+            take_out(self.list)
+        for c in old.values():   # packs no longer on offer (or changed)
+            c.deleteLater()
+        self.cards = cards
         for c in self.cards:
-            if self._play is None:
-                c.listen.hide()
             self.list.addWidget(c)
         self.list.addStretch(1)
         if self._play is not None:
-            for c in self.cards:
+            for c in new:
                 if c.pack.preview_url:
                     key = (c.pack.id, c.pack.preview_sha256)
                     if key in self._samples:   # fetched for the cards this replaced
                         c.show_samples(self._samples[key])
                     elif key not in self._sampling:
                         self._fetch_samples(c)
+
+    def _playing_card(self) -> PackCard | None:
+        """The card whose sample is playing, if one is."""
+        b = self._playing
+        return next((c for c in self.cards if b is not None and b in c.samples), None)
 
     # ------------------------------------------------------------------ samples
     def _fetch_samples(self, card: PackCard):
