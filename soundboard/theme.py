@@ -413,6 +413,7 @@ QScrollBar::handle:horizontal { background:$groove; border-radius:5px; min-width
 QScrollBar::handle:horizontal:hover { background:$border_hi; }
 QScrollBar::add-line, QScrollBar::sub-line { height:0; width:0; }
 QScrollBar::add-page, QScrollBar::sub-page { background:transparent; }
+QAbstractScrollArea::corner { background:transparent; border:none; }
 QMenu { background:$card; border:1px solid $border_hi; padding:5px; }
 QMenu::item { padding:7px 22px 7px 12px; border-radius:6px; margin:1px 0; }
 QMenu::item:selected { background:$item_hover; color:$text_hi; }
