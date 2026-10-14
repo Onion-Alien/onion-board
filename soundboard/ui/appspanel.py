@@ -665,8 +665,9 @@ class AppRow(HoverCard):
         self.btn_view.toggled.connect(self._on_view)
         v.addWidget(self.view)
         self.btn_clip = fold_button(_("Clip editor"))
-        self.btn_clip.setToolTip(_("Freeze the waveform to pick a bit out of it "
-                                  "(it keeps listening behind). L goes back to live."))
+        self.btn_clip.setToolTip(_("This program's last minute as a waveform: pick a bit "
+                                   "out of it and keep it as a clip. It only listens while "
+                                   "it's open."))
         self.btn_clip.toggled.connect(lambda on: self.clip_toggled.emit(self, on))
         v.addWidget(self.btn_clip, 0, Qt.AlignmentFlag.AlignLeft)
         self._tight = 0   # how many of _TIGHTEN are applied (a narrow window)
@@ -778,8 +779,8 @@ class AppRow(HoverCard):
 
     NAME_ROOM = 0    # the name has its own line in the card: nothing to keep room for
     # narrow card, in this order: the typed volume goes, the buttons keep only their
-    # icons (their tooltips say what they are), "Hear it myself" becomes "Hear"
-    _TIGHTEN = ("spin", "send", "rec", "hear")
+    # icons (their tooltips say what they are)
+    _TIGHTEN = ("spin", "send", "rec")
 
     def resizeEvent(self, e):
         super().resizeEvent(e)
@@ -811,7 +812,6 @@ class AppRow(HoverCard):
         self._tight = n
         on = set(self._TIGHTEN[:n])
         self.vol.spin.setVisible("spin" not in on)
-        self.chk_hear.setText(_("Hear") if "hear" in on else _("Hear it myself"))
         self._label_send()
         if not self.btn_rec.isChecked():   # while recording it shows how long it's been
             self.btn_rec.setText("" if "rec" in on else _("Record"))

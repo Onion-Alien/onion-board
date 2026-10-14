@@ -89,6 +89,13 @@ def columns(peaks: np.ndarray, v0: float, v1: float, n: int) -> np.ndarray:
     return out
 
 
+def heights(peaks: np.ndarray, half: float) -> np.ndarray:
+    """How far each column's line reaches from the middle. On a fixed scale, so Louder,
+    Quieter and normalising show, and nothing jumps as a loud bit scrolls by; the square
+    root keeps quiet audio readable (-20 dB still reaches a third of the way)."""
+    return np.sqrt(np.clip(peaks, 0.0, 1.0)) * half
+
+
 class ClipWave(QWidget):
     """The waveform: paints what the editor holds and turns the mouse into
     selections. All the state lives in the editor."""
@@ -250,8 +257,7 @@ class ClipWave(QWidget):
             p.fillRect(QRectF(max(x0, r.left()), r.top() + 1,
                               max(min(x1, r.right()) - max(x0, r.left()), 1), r.height() - 2), fill)
         if len(peaks):
-            h = columns(peaks, *ed.view, n)
-            h *= half / max(float(h.max(initial=0)), 0.05)
+            h = heights(columns(peaks, *ed.view, n), half)
             xs = PAD + np.arange(n) + 0.5
             if sel is not None:
                 lit = (xs >= x0) & (xs <= x1)
@@ -374,7 +380,7 @@ class ClipEditor(QWidget):
         self.btn_edit.setMenu(self._make_menu())
         QApplication.clipboard().dataChanged.connect(self._enable_actions)
         self.btn_trim = button(_("Trim"), "edit", _("Keep only the selection"),
-                               lambda: self._edit(Take.crop))
+                               self.trim)
         self.btn_undo = button(_("Undo"), "back", _("Undo"), self.undo)
         self.btn_big = QPushButton()
         self.btn_big.setFixedSize(CONTROL_H, CONTROL_H)
@@ -423,7 +429,7 @@ class ClipEditor(QWidget):
         act("paste", _("Paste"), self.paste, QKeySequence.StandardKey.Paste)
         act("delete", _("Delete"), lambda: self._edit(Take.delete), QKeySequence.StandardKey.Delete,
             "trash")
-        act("crop", _("Keep only the selection"), lambda: self._edit(Take.crop), "Ctrl+K")
+        act("crop", _("Keep only the selection"), self.trim, "Ctrl+K")
         act("all", _("Select all"), self.select_all, QKeySequence.StandardKey.SelectAll)
         m.addSeparator()
         act("fade_in", _("Fade in"), lambda: self._edit(Take.fade_in))
@@ -573,6 +579,14 @@ class ClipEditor(QWidget):
             self._clamp_view(v0, v1)
         self._sync()
         return bool(done)
+
+    def trim(self) -> bool:
+        """Keep only the selection, and show all of what's left: in the live-wide view
+        a short bit was a sliver at the left edge."""
+        if not self._edit(Take.crop):
+            return False
+        self.fit()
+        return True
 
     def changed_selection(self):
         self._sync()
@@ -768,11 +782,6 @@ class ClipEditor(QWidget):
             b.setText(b.property("full_text"))
             icons.text_gap(b)
 
-    def resizeEvent(self, e):
-        super().resizeEvent(e)
-        if e.size().width() != e.oldSize().width():
-            self._label_buttons()
-
     def minimumSizeHint(self):
         # The toolbar wraps rather than making the card wider.
         hint = super().minimumSizeHint()
@@ -800,7 +809,7 @@ class ClipEditor(QWidget):
                 self._live_total = total
                 self.wave.update()
                 if self.btn_play.isEnabled() != (self.length() > 0):
-                    self._sync()   # the first sound heard: Play / Save / Send wake up
+                    self._sync()   # the first sound heard: Preview / Save wake up
                 elif not self._msg:
                     self.info.setText(self._describe())
         else:

@@ -396,6 +396,9 @@ class MainWindow(QMainWindow):
     remote_changed = Signal()           # a remote control server started or stopped
     cable_setup_found = Signal(bool)    # VB-Cable's setup program is on this PC (asked on a thread)
     video_found = Signal(str, object)   # a sound's video (Path|None), looked up on a thread
+    board_read = Signal(object, str, bool, object)   # import_other read on a thread: Source,
+                                        # its board's path ("" = not found), ask, otherboards
+                                        # .importable()'s (ok, bad) and entries, or the error
     config_saved = Signal(bool)         # the background save finished: ok
     voice_engine = Signal(object)       # the voice engine of the game in front (a mode key|None)
     default_found = Signal(object)      # Windows' default output, asked on a thread (str|None)
@@ -575,6 +578,7 @@ class MainWindow(QMainWindow):
         self._talk_shown: bool | None = None
         self.virtual_mic: str | None = None
         self._load_thread: threading.Thread | None = None
+        self._loading: set[str] = set()   # sids a load thread is decoding right now
         self.engine.latency = self.cfg.latency if self.cfg.latency in ("low", "high") else "low"
         self._save_timer = QTimer(self)
         self._save_timer.setSingleShot(True)
@@ -1931,6 +1935,7 @@ class MainWindow(QMainWindow):
         self._video_for: tuple[str | None, Path | None] = ("", None)   # (sid, its video)
         self._video_asking: str | None = None   # the sound whose video a thread looks up
         self.video_found.connect(self._video_found)
+        self.board_read.connect(self._board_read)
         self._video_win = None   # ui/videowindow.VideoWindow, made on first use
         th.addWidget(self.btn_video)
         self.speed_btn = SpeedPitchButton(
@@ -7152,7 +7157,11 @@ class MainWindow(QMainWindow):
             meta.tags.append(self.cfg.category)
 
     def _load_all(self):
-        todo = [m for m in self.cfg.sounds if m.id not in self.audio]
+        # one still being loaded by an earlier call (a pack import or Undo during a slow
+        # first load) isn't decoded again: two writers of one cache file garble it
+        todo = [m for m in self.cfg.sounds if m.id not in self.audio and m.id not in self._loading]
+        self._loading.update(m.id for m in todo)
+        prev = self._load_thread
 
         def run():
             t0 = time.monotonic()
@@ -7164,6 +7173,10 @@ class MainWindow(QMainWindow):
                 except Exception as e:  # noqa: BLE001
                     log.warning("can't load %s: %s", m.file, e)
                     self.bridge.loaded.emit(m.id, None, errors.plain(e))
+                finally:
+                    self._loading.discard(m.id)
+            if prev is not None:   # done only once the sounds it skipped are, too
+                prev.join()
             live = self._live_metas()   # as of now, not of the start
             prune_cache(cache_keep(live))
             thumbs.prune({m.image for m in live if m.image})
@@ -8579,12 +8592,37 @@ class MainWindow(QMainWindow):
         own), names, categories and the hotkeys nothing here uses yet. `ask`: False
         when they already said yes (the installer's box): no questions or pop-ups."""
         usage.used("import-board")
-        title = _("Import from {name}", name=src.name)
-        if not path:
+        self._read_board(src, path, ask)
+
+    def _read_board(self, src: otherboards.Source, path: str, ask: bool):
+        # finding and reading the board, and checking every sound file is there, run on
+        # a thread: the board file can be tens of MB and its sounds on a network drive
+        # that's gone, which takes seconds a file (the window froze, even at start-up)
+        def run():
+            where, result = path, None
             try:
-                path = str(src.find() or "")
-            except OSError:
-                path = ""
+                if not where:
+                    try:
+                        where = str(src.find() or "")
+                    except OSError:
+                        where = ""
+                if where:
+                    entries = src.read(Path(where))
+                    result = (*otherboards.importable(entries), entries)
+            except (OSError, ValueError) as e:
+                result = e
+            except Exception as e:   # noqa: BLE001 - a bad board mustn't kill the thread
+                log.exception("reading %s's board", src.name)
+                result = e
+            self.board_read.emit(src, where, ask, result)
+        threading.Thread(target=run, daemon=True, name="import-board").start()
+
+    def _board_read(self, src: otherboards.Source, path: str, ask: bool, result):
+        """import_other's read is back: the question, then the import, here on the UI
+        thread (the window may have closed in the meantime)."""
+        if self._shut_down:
+            return
+        title = _("Import from {name}", name=src.name)
         if not path and not ask:
             return   # its board went away since the install
         if not path:
@@ -8592,11 +8630,11 @@ class MainWindow(QMainWindow):
                 self, _("{title}: pick a saved board", title=title), str(Path.home()),
                 _("{name} board ({patterns})", name=src.name,
                   patterns=" ".join("*" + x for x in src.suffixes)))
-            if not path:
-                return
-        try:
-            entries = src.read(Path(path))
-        except (OSError, ValueError) as e:
+            if path:
+                self._read_board(src, path, ask)
+            return
+        if isinstance(result, Exception):
+            e = result
             if not ask:
                 log.warning("can't read %s's board: %s", src.name, e)
                 self.toast(_("Couldn't bring your {name} sounds over: {e}",
@@ -8605,7 +8643,7 @@ class MainWindow(QMainWindow):
             else:
                 errors.warn(self, _("Couldn't read the {name} board", name=src.name), e)
             return
-        ok, bad = otherboards.importable(entries)
+        ok, bad, entries = result
         if not ok:
             msg = (_("No sounds to bring over: the sound files {name} points at have been moved "
                      "or deleted.", name=src.name) if entries else
@@ -9280,6 +9318,8 @@ class MainWindow(QMainWindow):
 
     def _on_update(self, rel, err: str, asked: bool):
         self._save_later()   # update_checked
+        if updates.recheck_s > 0:   # the newest is still settling: offer it once it has
+            QTimer.singleShot(round(updates.recheck_s * 1000), self, self.check_updates)
         busy = self._downloading or self._update_file is not None
         if rel is not None and not busy:
             if self.release is None or self.release.version != rel.version:

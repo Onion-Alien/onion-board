@@ -119,6 +119,26 @@ def test_a_fresh_release_waits_30_minutes(monkeypatch):
     assert updates.SETTLE_S == 30 * 60
 
 
+def test_a_settling_release_is_asked_for_again_once_it_has_settled(monkeypatch):
+    answers = {updates.API: _gh("v99.0.2", 0.25), updates.RECENT: [_gh("v99.0.2", 0.25)]}
+    monkeypatch.setattr(updates, "_get", lambda url, *_f: answers[url])
+    cfg = Config()
+    assert updates.check(cfg) is None and cfg.update_checked == 0   # not counted as asked
+    # out 15 of its 30 minutes: asked again in ~15 (and a minute), not in 6 hours
+    assert 15 * 60 < updates.recheck_s < 17 * 60
+    answers[updates.API] = _gh("v99.0.2", 0.6)
+    assert updates.check(cfg).version == "99.0.2" and updates.recheck_s == 0
+
+
+def test_a_skipped_urgent_fix_is_not_held_back_by_a_settling_release(monkeypatch):
+    monkeypatch.setattr(updates, "__version__", "99.0.0")
+    answers = {updates.API: _gh("v99.2.0", 0.1),
+               updates.RECENT: [_gh("v99.2.0", 0.1), _gh("v99.1.0", 3, body="Urgent: fix")]}
+    monkeypatch.setattr(updates, "_get", lambda url, *_f: answers[url])
+    rel = updates.check(Config())
+    assert rel.version == "99.2.0" and rel.urgent == "fix" and updates.recheck_s == 0
+
+
 def test_an_urgent_fix_does_not_wait_to_settle(monkeypatch):
     monkeypatch.setattr(updates, "_get", lambda url, *_f: _gh(
         "v99.0.2", 1, body="Urgent: sounds cut out"))
