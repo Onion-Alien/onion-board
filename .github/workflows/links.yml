@@ -1,0 +1,33 @@
+name: links
+
+# Weekly check for dead links in the README, the docs and the website (dead links
+# look abandoned to people and to search engines). A red run lists each broken link.
+# Sites that refuse bots or rate-limit them (YouTube, Reddit, X, TikTok, Discord,
+# VirusTotal) are skipped: they'd fail every week while working fine for people.
+on:
+  schedule:
+    - cron: "47 5 * * 3"   # Wednesdays 05:47 UTC
+  workflow_dispatch:
+  pull_request:
+    paths: [".github/workflows/links.yml"]
+
+permissions:
+  contents: read
+
+jobs:
+  lychee:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v6
+      - uses: lycheeverse/lychee-action@v2
+        with:
+          fail: true
+          args: >-
+            --no-progress
+            --max-concurrency 4
+            --max-retries 3
+            --accept 200,206,429
+            --root-dir ${{ github.workspace }}/site
+            --exclude "youtube\.com|youtu\.be|reddit\.com|(^|\.)x\.com|twitter\.com|tiktok\.com|discord\.(com|gg)|virustotal\.com|localhost|127\.0\.0\.1"
+            README.md CONTRIBUTING.md SECURITY.md "docs/**/*.md" "site/**/*.html"

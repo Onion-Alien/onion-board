@@ -365,6 +365,18 @@ gitleaks, ruff and pytest:
 5. Run `python scripts/check_sensitive.py --history` once more before pushing the
    release. Never commit build output.
 
+**Or let GitHub build it:** after the bump is merged, `git tag vX.Y.Z <main's sha>` and
+`git push origin vX.Y.Z`. The `release` workflow builds the installer from the tag
+(`build.ps1 -Clean`), scans it and the mic helper on VirusTotal (when the `VT_API_KEY`
+secret is set) and makes a **draft** release with both assets, the SHA-256 and the scan
+line. Write the headline, install the draft's installer over your own copy, then
+publish. A tag that already has a release is left alone.
+
+**Other scheduled workflows:** `security` (weekly CodeQL + pip-audit), `links` (weekly
+dead-link check of the README, docs and website) and `packages` (each Monday, bumps
+winget and Chocolatey to the newest release once it is 2 days old; needs the
+`WINGET_TOKEN` and `CHOCO_API_KEY` secrets).
+
 **The release notes** start with a headline paragraph, then this download line
 (GitHub adds two *Source code* files that people mistake for the app):
 

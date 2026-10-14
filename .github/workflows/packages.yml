@@ -1,0 +1,109 @@
+name: packages
+
+# Keeps the winget and Chocolatey listings on the newest release, at most once a week.
+# Both are checked by a person for every version, and releases come often, so this
+# doesn't run per release: each Monday it takes the newest non-pre-release, and only if
+# it has been out 2 days (a quick follow-up fix replaces it first). A listing that
+# already has that version, or a winget PR already waiting for it, is skipped.
+# Needs two secrets; without one, that half says so and does nothing:
+#   WINGET_TOKEN    a classic token with public_repo (wingetcreate opens the PR from a fork)
+#   CHOCO_API_KEY   the API key of the Chocolatey account that owns onion-board
+# Run by hand (Actions > packages > Run workflow) to skip the 2-day wait.
+on:
+  schedule:
+    - cron: "7 8 * * 1"   # Mondays 08:07 UTC
+  workflow_dispatch:
+  pull_request:
+    paths: [".github/workflows/packages.yml", "packaging/chocolatey/**"]
+
+permissions:
+  contents: read
+
+jobs:
+  bump:
+    runs-on: windows-latest
+    timeout-minutes: 20
+    env:
+      GH_TOKEN: ${{ github.token }}
+      HAS_WINGET: ${{ secrets.WINGET_TOKEN != '' }}
+      HAS_CHOCO: ${{ secrets.CHOCO_API_KEY != '' }}
+      DRY: ${{ github.event_name == 'pull_request' && '1' || '' }}
+    steps:
+      - uses: actions/checkout@v6
+      - name: Newest release
+        id: rel
+        shell: bash
+        run: |
+          read -r tag published sha < <(gh api "repos/$GITHUB_REPOSITORY/releases/latest" --jq \
+            '[.tag_name, .published_at, (.assets[] | select(.name=="OnionBoardSetup.exe") | .digest | sub("sha256:";""))] | join(" ")')
+          v="${tag#v}"
+          age=$(( ( $(date -u +%s) - $(date -u -d "$published" +%s) ) / 3600 ))
+          echo "Newest release $v, out ${age} h, SHA-256 $sha" | tee -a "$GITHUB_STEP_SUMMARY"
+          if [ "$GITHUB_EVENT_NAME" = schedule ] && [ "$age" -lt 48 ]; then
+            echo "Under 2 days old: next week." | tee -a "$GITHUB_STEP_SUMMARY"
+            echo "go=" >> "$GITHUB_OUTPUT"
+          else
+            echo "go=1" >> "$GITHUB_OUTPUT"
+          fi
+          { echo "v=$v"; echo "tag=$tag"; echo "sha=$sha"
+            echo "url=https://github.com/$GITHUB_REPOSITORY/releases/download/$tag/OnionBoardSetup.exe"; } >> "$GITHUB_OUTPUT"
+
+      - name: winget
+        if: steps.rel.outputs.go == '1'
+        shell: bash
+        env:
+          V: ${{ steps.rel.outputs.v }}
+          URL: ${{ steps.rel.outputs.url }}
+          WINGET_TOKEN: ${{ secrets.WINGET_TOKEN }}
+        run: |
+          if gh api "repos/microsoft/winget-pkgs/contents/manifests/o/OnionAlien/OnionBoard/$V" >/dev/null 2>&1; then
+            echo "winget: already has $V" | tee -a "$GITHUB_STEP_SUMMARY"; exit 0
+          fi
+          open=$(gh pr list -R microsoft/winget-pkgs --state open --search "OnionAlien.OnionBoard $V in:title" --json number --jq 'length')
+          if [ "$open" != 0 ]; then
+            echo "winget: a PR for $V is already waiting" | tee -a "$GITHUB_STEP_SUMMARY"; exit 0
+          fi
+          if [ "$HAS_WINGET" != true ]; then
+            echo "winget: behind ($V not listed), but no WINGET_TOKEN secret: nothing sent" | tee -a "$GITHUB_STEP_SUMMARY"; exit 0
+          fi
+          curl -sfL -o wingetcreate.exe https://aka.ms/wingetcreate/latest
+          if [ -n "$DRY" ]; then
+            ./wingetcreate.exe update OnionAlien.OnionBoard --version "$V" --urls "$URL" --out manifests
+          else
+            ./wingetcreate.exe update OnionAlien.OnionBoard --version "$V" --urls "$URL" --submit --token "$WINGET_TOKEN"
+            echo "winget: PR opened for $V" | tee -a "$GITHUB_STEP_SUMMARY"
+          fi
+
+      - name: Chocolatey
+        if: steps.rel.outputs.go == '1'
+        shell: pwsh
+        env:
+          V: ${{ steps.rel.outputs.v }}
+          TAG: ${{ steps.rel.outputs.tag }}
+          URL: ${{ steps.rel.outputs.url }}
+          SHA: ${{ steps.rel.outputs.sha }}
+          CHOCO_API_KEY: ${{ secrets.CHOCO_API_KEY }}
+        run: |
+          # 200 also for a version still waiting in moderation
+          $code = curl.exe -s -o NUL -w "%{http_code}" "https://community.chocolatey.org/api/v2/Packages(Id='onion-board',Version='$env:V')"
+          if ($code -eq "200") { "Chocolatey: already has $env:V" | Tee-Object -Append $env:GITHUB_STEP_SUMMARY; exit 0 }
+          # the repo's package with this release's version, download and checksum
+          $pkg = Join-Path $env:RUNNER_TEMP onion-board
+          Copy-Item -Recurse packaging\chocolatey\onion-board $pkg
+          $n = Join-Path $pkg onion-board.nuspec
+          (Get-Content -Raw $n) -replace '<version>[^<]+</version>', "<version>$env:V</version>" `
+            -replace 'releases/tag/v[^<]+', "releases/tag/$env:TAG" | Set-Content -NoNewline $n
+          $i = Join-Path $pkg tools\chocolateyinstall.ps1
+          (Get-Content -Raw $i) -replace "releases/download/v[^/]+/", "releases/download/$env:TAG/" `
+            -replace "checksum64(\s+)= '[0-9A-Fa-f]+'", "checksum64`$1= '$($env:SHA.ToUpper())'" | Set-Content -NoNewline $i
+          Select-String -Path $n, $i -Pattern '<version>', 'url64bit', 'checksum64 '
+          Push-Location $pkg
+          choco pack --no-progress
+          if ($LASTEXITCODE -ne 0) { throw "choco pack failed" }
+          if ($env:DRY) { Pop-Location; "Chocolatey: packed $env:V (dry run)"; exit 0 }
+          if ($env:HAS_CHOCO -ne 'true') {
+            "Chocolatey: behind ($env:V not listed), but no CHOCO_API_KEY secret: nothing sent" | Tee-Object -Append $env:GITHUB_STEP_SUMMARY; exit 0
+          }
+          choco push "onion-board.$env:V.nupkg" --source https://push.chocolatey.org/ --api-key $env:CHOCO_API_KEY
+          if ($LASTEXITCODE -ne 0) { throw "choco push failed" }
+          "Chocolatey: $env:V sent for review" | Tee-Object -Append $env:GITHUB_STEP_SUMMARY
