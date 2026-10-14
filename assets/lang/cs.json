@@ -4,7 +4,6 @@
   "_meta": {
     "name": "Čeština"
   },
-  " A newer yt-dlp may fix this: Settings → Updates → Update now.": " Novější yt-dlp to možná opraví: Nastavení → Aktualizace → Aktualizovat teď.",
   " and ": " a ",
   " · right-click to rename, delete or give it a random-sound hotkey · drag to reorder": " · pravým klikem přejmenuješ, smažeš nebo dáš zkratku náhodného zvuku · tažením změníš pořadí",
   " · shows by itself when {progs} is in front": " · ukáže se samo, když je vpředu {progs}",
@@ -3431,5 +3430,11 @@
   "warm": "teple",
   "clean": "čistě",
   "This program's last minute as a waveform: pick a bit out of it and keep it as a clip. It only listens while it's open.": "Poslední minuta tohoto programu jako zvuková vlna: vyberte z ní kousek a uložte si ho jako klip. Poslouchá jen, když je otevřený.",
-  "Pre-delay": "Předzpoždění"
+  "Pre-delay": "Předzpoždění",
+  " A newer downloader may fix this.": " Novější stahovač to možná opraví.",
+  "Couldn't update the downloader: {error}": "Stahovač se nepodařilo aktualizovat: {error}",
+  "Get the newest yt-dlp, the part that downloads from YouTube and other sites, then try this link again": "Stáhne nejnovější yt-dlp, část, která stahuje z YouTube a dalších webů, a zkusí tento odkaz znovu",
+  "The downloader is already the newest. The site may have changed in a way it can't handle yet: try again in a few days.": "Stahovač je už nejnovější. Web se možná změnil tak, že si s tím zatím neporadí: zkus to znovu za pár dní.",
+  "Update downloader": "Aktualizovat stahovač",
+  "Updating the downloader…": "Aktualizuji stahovač…"
 }

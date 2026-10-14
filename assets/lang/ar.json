@@ -4,7 +4,6 @@
   "_meta": {
     "name": "العربية"
   },
-  " A newer yt-dlp may fix this: Settings → Updates → Update now.": " قد يُصلح إصدار أحدث من yt-dlp هذا: الإعدادات → التحديثات → حدّث الآن.",
   " and ": " و",
   " · right-click to rename, delete or give it a random-sound hotkey · drag to reorder": " · انقر بالزر الأيمن لإعادة التسمية أو الحذف أو لتعيين اختصار لصوت عشوائي · اسحب لإعادة الترتيب",
   " · shows by itself when {progs} is in front": " · تظهر تلقائيًا عندما يكون {progs} في المقدمة",
@@ -3656,5 +3655,11 @@
   "warm": "دافئ",
   "clean": "نظيف",
   "This program's last minute as a waveform: pick a bit out of it and keep it as a clip. It only listens while it's open.": "آخر دقيقة من هذا البرنامج كشكل موجي: اختر جزءًا منها واحتفظ به كمقطع. لا يستمع إلا وهو مفتوح.",
-  "Pre-delay": "تأخير مسبق"
+  "Pre-delay": "تأخير مسبق",
+  " A newer downloader may fix this.": " قد يحل برنامج تنزيل أحدث هذه المشكلة.",
+  "Couldn't update the downloader: {error}": "تعذّر تحديث برنامج التنزيل: {error}",
+  "Get the newest yt-dlp, the part that downloads from YouTube and other sites, then try this link again": "احصل على أحدث yt-dlp، الجزء الذي ينزّل من YouTube ومواقع أخرى، ثم جرّب هذا الرابط مرة أخرى",
+  "The downloader is already the newest. The site may have changed in a way it can't handle yet: try again in a few days.": "برنامج التنزيل هو الأحدث بالفعل. ربما تغيّر الموقع بطريقة لا يستطيع التعامل معها بعد: جرّب مرة أخرى بعد بضعة أيام.",
+  "Update downloader": "تحديث برنامج التنزيل",
+  "Updating the downloader…": "جارٍ تحديث برنامج التنزيل…"
 }

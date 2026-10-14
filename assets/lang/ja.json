@@ -4,7 +4,6 @@
   "_meta": {
     "name": "日本語"
   },
-  " A newer yt-dlp may fix this: Settings → Updates → Update now.": " 新しい yt-dlp で直るかもしれません: 設定 → アップデート → 今すぐ更新。",
   " and ": "、",
   " · right-click to rename, delete or give it a random-sound hotkey · drag to reorder": " · 右クリックで名前変更・削除・ランダムサウンドのホットキー設定 · ドラッグで並べ替え",
   " · shows by itself when {progs} is in front": " · {progs} が前面にあると自動で表示",
@@ -3281,5 +3280,11 @@
   "warm": "温かい",
   "clean": "クリーン",
   "This program's last minute as a waveform: pick a bit out of it and keep it as a clip. It only listens while it's open.": "このプログラムの直近1分間を波形で表示：一部を選んでクリップとして保存できます。開いている間だけ聞き取ります。",
-  "Pre-delay": "プリディレイ"
+  "Pre-delay": "プリディレイ",
+  " A newer downloader may fix this.": " 新しいダウンローダーで直るかもしれません。",
+  "Couldn't update the downloader: {error}": "ダウンローダーを更新できませんでした: {error}",
+  "Get the newest yt-dlp, the part that downloads from YouTube and other sites, then try this link again": "最新の yt-dlp（YouTube などのサイトからダウンロードする部分）を取得して、このリンクをもう一度試します",
+  "The downloader is already the newest. The site may have changed in a way it can't handle yet: try again in a few days.": "ダウンローダーはすでに最新です。サイトがまだ対応できない形に変わったのかもしれません。数日後にもう一度試してください。",
+  "Update downloader": "ダウンローダーを更新",
+  "Updating the downloader…": "ダウンローダーを更新中…"
 }

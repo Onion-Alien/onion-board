@@ -4,7 +4,6 @@
   "_meta": {
     "name": "ไทย"
   },
-  " A newer yt-dlp may fix this: Settings → Updates → Update now.": " yt-dlp เวอร์ชันใหม่อาจแก้ได้: การตั้งค่า → อัปเดต → อัปเดตเลย",
   " and ": " และ ",
   " · right-click to rename, delete or give it a random-sound hotkey · drag to reorder": " · คลิกขวาเพื่อเปลี่ยนชื่อ ลบ หรือตั้งปุ่มลัดสุ่มเสียง · ลากเพื่อจัดลำดับ",
   " · shows by itself when {progs} is in front": " · แสดงเองเมื่อ {progs} อยู่ด้านหน้า",
@@ -3281,5 +3280,11 @@
   "warm": "อบอุ่น",
   "clean": "สะอาด",
   "This program's last minute as a waveform: pick a bit out of it and keep it as a clip. It only listens while it's open.": "หนึ่งนาทีล่าสุดของโปรแกรมนี้เป็นรูปคลื่นเสียง: เลือกบางส่วนแล้วเก็บไว้เป็นคลิป มันจะฟังเฉพาะตอนที่เปิดอยู่เท่านั้น",
-  "Pre-delay": "พรีดีเลย์"
+  "Pre-delay": "พรีดีเลย์",
+  " A newer downloader may fix this.": " ตัวดาวน์โหลดที่ใหม่กว่าอาจแก้ปัญหานี้ได้",
+  "Couldn't update the downloader: {error}": "อัปเดตตัวดาวน์โหลดไม่ได้: {error}",
+  "Get the newest yt-dlp, the part that downloads from YouTube and other sites, then try this link again": "รับ yt-dlp ล่าสุด ซึ่งเป็นส่วนที่ดาวน์โหลดจาก YouTube และเว็บอื่น แล้วลองลิงก์นี้อีกครั้ง",
+  "The downloader is already the newest. The site may have changed in a way it can't handle yet: try again in a few days.": "ตัวดาวน์โหลดเป็นเวอร์ชันล่าสุดแล้ว เว็บไซต์อาจเปลี่ยนไปในแบบที่ยังรับมือไม่ได้ ลองใหม่อีกครั้งในอีกไม่กี่วัน",
+  "Update downloader": "อัปเดตตัวดาวน์โหลด",
+  "Updating the downloader…": "กำลังอัปเดตตัวดาวน์โหลด…"
 }

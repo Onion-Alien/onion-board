@@ -17,6 +17,12 @@ Update now / Reset), or, if they opted in (off by default: it's code the app run
 once a day and when a download fails. "Reset" deletes the copy and its cache and fetches
 a fresh one. A copy older than the bundled yt-dlp (the app itself was updated) is
 dropped at startup.
+
+An update never leaves downloads worse off than the built-in copy: it takes the
+newest release whose wheel says it runs on this app's Python (one that needs a newer
+Python is skipped, not installed), and a downloaded copy that fails to import is
+dropped on first use, remembered as bad (never fetched again) and the built-in one
+used instead.
 """
 from __future__ import annotations
 
@@ -319,10 +325,11 @@ def _tidy():
         olds = sorted((d for d in root().glob("old-*") if _moved_at(d) < cutoff),
                       key=_moved_at)
         news = [d for d in root().glob("new-*") if d.stat().st_mtime < cutoff]
+        bads = list(root().glob("bad-*"))   # a broken copy _drop_broken() couldn't delete
         if olds and not _pkg_dir().exists():
             olds.pop().rename(_pkg_dir())
             log.info("put back the yt-dlp copy an update had moved aside")
-        for d in olds + news:
+        for d in olds + news + bads:
             shutil.rmtree(d, ignore_errors=True)
     except OSError:
         log.warning("couldn't tidy %s", root(), exc_info=True)
@@ -345,10 +352,59 @@ def _get(url: str, limit: int) -> bytes:
     return data
 
 
+def _py_ok(spec: str | None, have: tuple[int, ...] = tuple(sys.version_info[:3])) -> bool:
+    """Does this Python satisfy a wheel's requires_python (">=3.10", ">=3.9,!=3.11.*")?
+    One it can't read counts as no: skipping a release is safe, a broken one isn't."""
+    def pad(t):
+        return (tuple(t) + (0, 0, 0))[:3]
+    for part in (spec or "").split(","):
+        part = part.strip()
+        if not part:
+            continue
+        m = re.fullmatch(r"(~=|==|!=|<=|>=|<|>)\s*(\d+(?:\.\d+)*)(\.\*)?", part)
+        if not m:
+            return False
+        op, want, star = m.group(1), vtuple(m.group(2)), bool(m.group(3))
+        if op == "~=":
+            ok = tuple(have[:len(want) - 1]) == want[:-1] and pad(have) >= pad(want)
+        elif star:
+            same = tuple(have[:len(want)]) == want
+            ok = same if op == "==" else not same if op == "!=" else False
+        else:
+            a, b = pad(have), pad(want)
+            ok = {"==": a == b, "!=": a != b, "<=": a <= b, ">=": a >= b,
+                  "<": a < b, ">": a > b}[op]
+        if not ok:
+            return False
+    return True
+
+
+def _fits(f: dict) -> bool:
+    """A file of a PyPI release this app can use: the pure-Python wheel, not yanked,
+    for this Python."""
+    return (f.get("packagetype") == "bdist_wheel"
+            and str(f.get("filename", "")).endswith("-py3-none-any.whl")
+            and not f.get("yanked") and _py_ok(f.get("requires_python")))
+
+
+def _pick(meta: dict) -> str:
+    """The newest final yt-dlp release (no nightlies) this app can run that hasn't
+    failed here before: PyPI's latest, unless it needs a newer Python. "" if none."""
+    bad = set(_state().get("bad") or ())
+    latest = str(meta["info"]["version"])
+    releases = meta.get("releases") or {latest: meta.get("urls") or []}
+    best = ""
+    for v, files in releases.items():
+        if (re.fullmatch(r"\d+(\.\d+)*", v) and v not in bad
+                and any(_fits(f) for f in files or ()) and vtuple(v) > vtuple(best)):
+            best = v
+    return best
+
+
 def _wheel(meta: dict) -> bytes:
     """The pure-Python wheel from a PyPI JSON release, verified by its SHA-256."""
     for f in meta.get("urls", ()):
-        if f.get("packagetype") == "bdist_wheel" and f["filename"].endswith("-py3-none-any.whl"):
+        if _fits(f):
             if not f["url"].startswith(WHEEL_HOST):
                 raise DownloadError(_("unexpected download location for {file}",
                                       file=f["filename"]))
@@ -368,12 +424,19 @@ def update(force: bool = False) -> str:
         raise SwitchedOff(net.off_message(UPDATE_FEATURE))
     try:
         meta = json.loads(_get(PYPI.format("yt-dlp"), 5 * 1024 * 1024))
-        latest = str(meta["info"]["version"])
-    except (ValueError, KeyError, TypeError) as e:
+        newest = str(meta["info"]["version"])
+        latest = _pick(meta)
+        if latest and latest != newest:   # the newest needs a newer Python, or failed here
+            log.info("yt-dlp %s can't run here: taking %s", newest, latest)
+            meta = json.loads(_get(f"https://pypi.org/pypi/yt-dlp/{latest}/json",
+                                   5 * 1024 * 1024))
+    except (ValueError, KeyError, TypeError, AttributeError) as e:
         raise DownloadError(_("PyPI sent an answer that couldn't be read")) from e
     current, __ = active_version()
     _save_state(checked=time.time())
-    if not force and current and vtuple(latest) <= vtuple(current):
+    if not latest:
+        log.info("no yt-dlp release on PyPI runs on this Python: keeping %s", current)
+    if not latest or (not force and current and vtuple(latest) <= vtuple(current)):
         return _("yt-dlp {version} is up to date.", version=current)
     wheels = [_wheel(meta)]
     pin = next((m.group(1) for r in meta["info"].get("requires_dist") or ()
@@ -698,17 +761,44 @@ def _count(v) -> int | None:
         return None
 
 
+def _drop_broken(error: BaseException):
+    """The downloaded copy doesn't import (it needs a newer Python, or a package this
+    app doesn't have): delete it and never fetch that version again. The built-in
+    copy is what imports next."""
+    with _lock.exclusive():
+        version = override_version()
+        if not version:
+            return   # dropped already (another thread, or the download helper)
+        log.warning("downloaded yt-dlp %s doesn't import (%s): using the built-in one",
+                    version, error)
+        _save_state(bad=sorted(set(_state().get("bad") or ()) | {version}), version="")
+        gone = root() / f"bad-{time.time_ns()}"
+        try:
+            _pkg_dir().rename(gone)
+        except OSError:
+            log.warning("couldn't move the broken yt-dlp aside", exc_info=True)
+        shutil.rmtree(gone, ignore_errors=True)
+        _purge()
+
+
 @contextlib.contextmanager
 def _ydl():
-    """The yt_dlp module, in shared use (an update never swaps it mid-use)."""
+    """The yt_dlp module, in shared use (an update never swaps it mid-use). A
+    downloaded copy that fails to import is dropped for the built-in one."""
     install()
-    with _lock.shared():
-        try:
-            import yt_dlp
-        except ImportError as e:
+    for retry in (False, True):
+        with _lock.shared():
+            try:
+                import yt_dlp
+            except Exception as e:  # noqa: BLE001 - a broken copy can raise anything
+                failed = e
+            else:
+                yield yt_dlp
+                return
+        if retry or not override_version():
             raise FetchError(_("The downloader (yt-dlp) isn't installed, "
-                               "Settings → Updates → Reset downloader.")) from e
-        yield yt_dlp
+                               "Settings → Updates → Reset downloader.")) from failed
+        _drop_broken(failed)
 
 
 def _download(url, dest, progress, feature: str = FEATURE,

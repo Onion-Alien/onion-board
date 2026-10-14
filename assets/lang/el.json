@@ -4,7 +4,6 @@
   "_meta": {
     "name": "Ελληνικά"
   },
-  " A newer yt-dlp may fix this: Settings → Updates → Update now.": " Μια νεότερη έκδοση του yt-dlp ίσως το διορθώσει: Ρυθμίσεις → Ενημερώσεις → Ενημέρωση τώρα.",
   " and ": " και ",
   " · right-click to rename, delete or give it a random-sound hotkey · drag to reorder": " · δεξί κλικ για μετονομασία, διαγραφή ή συντόμευση τυχαίου ήχου · σύρε για αλλαγή σειράς",
   " · shows by itself when {progs} is in front": " · εμφανίζεται μόνο του όταν το {progs} είναι μπροστά",
@@ -3356,5 +3355,11 @@
   "warm": "ζεστά",
   "clean": "καθαρά",
   "This program's last minute as a waveform: pick a bit out of it and keep it as a clip. It only listens while it's open.": "Το τελευταίο λεπτό αυτού του προγράμματος ως κυματομορφή: διάλεξε ένα κομμάτι και κράτησέ το ως κλιπ. Ακούει μόνο όσο είναι ανοιχτό.",
-  "Pre-delay": "Προ-καθυστέρηση"
+  "Pre-delay": "Προ-καθυστέρηση",
+  " A newer downloader may fix this.": " Ένα νεότερο πρόγραμμα λήψης μπορεί να το διορθώσει.",
+  "Couldn't update the downloader: {error}": "Δεν ήταν δυνατή η ενημέρωση του προγράμματος λήψης: {error}",
+  "Get the newest yt-dlp, the part that downloads from YouTube and other sites, then try this link again": "Παίρνει το νεότερο yt-dlp, το κομμάτι που κατεβάζει από το YouTube και άλλους ιστότοπους, και δοκιμάζει ξανά αυτόν τον σύνδεσμο",
+  "The downloader is already the newest. The site may have changed in a way it can't handle yet: try again in a few days.": "Το πρόγραμμα λήψης είναι ήδη το νεότερο. Ο ιστότοπος ίσως άλλαξε με τρόπο που δεν μπορεί να χειριστεί ακόμα: δοκίμασε ξανά σε λίγες μέρες.",
+  "Update downloader": "Ενημέρωση προγράμματος λήψης",
+  "Updating the downloader…": "Ενημέρωση του προγράμματος λήψης…"
 }

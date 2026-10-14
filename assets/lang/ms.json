@@ -4,7 +4,6 @@
   "_meta": {
     "name": "Bahasa Melayu"
   },
-  " A newer yt-dlp may fix this: Settings → Updates → Update now.": " yt-dlp yang lebih baharu mungkin membaiki ini: Tetapan → Kemas kini → Kemas kini sekarang.",
   " and ": " dan ",
   " · right-click to rename, delete or give it a random-sound hotkey · drag to reorder": " · klik kanan untuk menamakan semula, memadam atau memberinya hotkey bunyi rawak · seret untuk menyusun semula",
   " · shows by itself when {progs} is in front": " · ditunjukkan sendiri apabila {progs} di hadapan",
@@ -3281,5 +3280,11 @@
   "warm": "hangat",
   "clean": "bersih",
   "This program's last minute as a waveform: pick a bit out of it and keep it as a clip. It only listens while it's open.": "Minit terakhir program ini sebagai bentuk gelombang: pilih sebahagian dan simpan sebagai klip. Ia hanya mendengar semasa dibuka.",
-  "Pre-delay": "Pra-lengah"
+  "Pre-delay": "Pra-lengah",
+  " A newer downloader may fix this.": " Pemuat turun yang lebih baharu mungkin boleh membetulkannya.",
+  "Couldn't update the downloader: {error}": "Tidak dapat mengemas kini pemuat turun: {error}",
+  "Get the newest yt-dlp, the part that downloads from YouTube and other sites, then try this link again": "Dapatkan yt-dlp terbaharu, bahagian yang memuat turun dari YouTube dan laman lain, kemudian cuba pautan ini lagi",
+  "The downloader is already the newest. The site may have changed in a way it can't handle yet: try again in a few days.": "Pemuat turun sudah yang terbaharu. Laman itu mungkin berubah dengan cara yang belum boleh dikendalikannya: cuba lagi dalam beberapa hari.",
+  "Update downloader": "Kemas kini pemuat turun",
+  "Updating the downloader…": "Mengemas kini pemuat turun…"
 }

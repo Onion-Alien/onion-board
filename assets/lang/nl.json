@@ -4,7 +4,6 @@
   "_meta": {
     "name": "Nederlands"
   },
-  " A newer yt-dlp may fix this: Settings → Updates → Update now.": " Een nieuwere yt-dlp lost dit misschien op: Instellingen → Updates → Nu updaten.",
   " and ": " en ",
   " · right-click to rename, delete or give it a random-sound hotkey · drag to reorder": " · rechtsklik om te hernoemen, te verwijderen of een sneltoets voor een willekeurig geluid te geven · sleep om te ordenen",
   " · shows by itself when {progs} is in front": " · verschijnt vanzelf als {progs} vooraan staat",
@@ -3356,5 +3355,11 @@
   "warm": "warm",
   "clean": "schoon",
   "This program's last minute as a waveform: pick a bit out of it and keep it as a clip. It only listens while it's open.": "De laatste minuut van dit programma als golfvorm: kies er een stukje uit en bewaar het als clip. Het luistert alleen zolang het open is.",
-  "Pre-delay": "Pre-delay"
+  "Pre-delay": "Pre-delay",
+  " A newer downloader may fix this.": " Een nieuwere downloader lost dit misschien op.",
+  "Couldn't update the downloader: {error}": "Kon de downloader niet bijwerken: {error}",
+  "Get the newest yt-dlp, the part that downloads from YouTube and other sites, then try this link again": "Haal de nieuwste yt-dlp op, het deel dat van YouTube en andere sites downloadt, en probeer deze link daarna opnieuw",
+  "The downloader is already the newest. The site may have changed in a way it can't handle yet: try again in a few days.": "De downloader is al de nieuwste. De site is misschien veranderd op een manier die hij nog niet aankan: probeer het over een paar dagen opnieuw.",
+  "Update downloader": "Downloader bijwerken",
+  "Updating the downloader…": "Downloader bijwerken…"
 }

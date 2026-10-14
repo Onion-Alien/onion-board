@@ -4,7 +4,6 @@
   "_meta": {
     "name": "Português (Brasil)"
   },
-  " A newer yt-dlp may fix this: Settings → Updates → Update now.": " Uma versão mais nova do yt-dlp pode resolver: Configurações → Atualizações → Atualizar agora.",
   " and ": " e ",
   " · right-click to rename, delete or give it a random-sound hotkey · drag to reorder": " · clique com o botão direito para renomear, excluir ou dar um atalho de som aleatório · arraste para reordenar",
   " · shows by itself when {progs} is in front": " · aparece sozinha quando {progs} está na frente",
@@ -3356,5 +3355,11 @@
   "warm": "quente",
   "clean": "limpo",
   "This program's last minute as a waveform: pick a bit out of it and keep it as a clip. It only listens while it's open.": "O último minuto deste programa como forma de onda: escolha um trecho e guarde-o como clipe. Ele só escuta enquanto está aberto.",
-  "Pre-delay": "Pré-atraso"
+  "Pre-delay": "Pré-atraso",
+  " A newer downloader may fix this.": " Um downloader mais novo pode resolver isso.",
+  "Couldn't update the downloader: {error}": "Não foi possível atualizar o downloader: {error}",
+  "Get the newest yt-dlp, the part that downloads from YouTube and other sites, then try this link again": "Baixa o yt-dlp mais novo, a parte que baixa do YouTube e de outros sites, e tenta este link de novo",
+  "The downloader is already the newest. The site may have changed in a way it can't handle yet: try again in a few days.": "O downloader já é o mais novo. O site pode ter mudado de um jeito que ele ainda não consegue lidar: tente de novo em alguns dias.",
+  "Update downloader": "Atualizar downloader",
+  "Updating the downloader…": "Atualizando o downloader…"
 }

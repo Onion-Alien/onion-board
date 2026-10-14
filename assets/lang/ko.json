@@ -4,7 +4,6 @@
   "_meta": {
     "name": "한국어"
   },
-  " A newer yt-dlp may fix this: Settings → Updates → Update now.": " 최신 yt-dlp로 해결될 수도 있어요: 설정 → 업데이트 → 지금 업데이트.",
   " and ": ", ",
   " · right-click to rename, delete or give it a random-sound hotkey · drag to reorder": " · 우클릭으로 이름 변경, 삭제, 랜덤 사운드 단축키 지정 · 드래그로 순서 변경",
   " · shows by itself when {progs} is in front": " · {progs}이(가) 앞에 있으면 자동으로 표시",
@@ -3281,5 +3280,11 @@
   "warm": "따뜻하게",
   "clean": "깨끗하게",
   "This program's last minute as a waveform: pick a bit out of it and keep it as a clip. It only listens while it's open.": "이 프로그램의 마지막 1분을 파형으로 보여줍니다: 일부를 골라 클립으로 저장하세요. 열려 있는 동안에만 듣습니다.",
-  "Pre-delay": "프리 딜레이"
+  "Pre-delay": "프리 딜레이",
+  " A newer downloader may fix this.": " 더 새로운 다운로더로 해결될 수 있어요.",
+  "Couldn't update the downloader: {error}": "다운로더를 업데이트하지 못했어요: {error}",
+  "Get the newest yt-dlp, the part that downloads from YouTube and other sites, then try this link again": "YouTube 등 여러 사이트에서 다운로드하는 부분인 최신 yt-dlp를 받은 뒤 이 링크를 다시 시도합니다",
+  "The downloader is already the newest. The site may have changed in a way it can't handle yet: try again in a few days.": "다운로더가 이미 최신이에요. 사이트가 아직 처리할 수 없는 방식으로 바뀌었을 수 있어요. 며칠 뒤에 다시 시도해 보세요.",
+  "Update downloader": "다운로더 업데이트",
+  "Updating the downloader…": "다운로더 업데이트 중…"
 }

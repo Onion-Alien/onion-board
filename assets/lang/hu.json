@@ -4,7 +4,6 @@
   "_meta": {
     "name": "Magyar"
   },
-  " A newer yt-dlp may fix this: Settings → Updates → Update now.": " Egy újabb yt-dlp megoldhatja: Beállítások → Frissítések → Frissítés most.",
   " and ": " és ",
   " · right-click to rename, delete or give it a random-sound hotkey · drag to reorder": " · jobb klikk: átnevezés, törlés vagy véletlenhang-gyorsbillentyű · húzd az átrendezéshez",
   " · shows by itself when {progs} is in front": " · magától megjelenik, ha ez van elöl: {progs}",
@@ -3356,5 +3355,11 @@
   "warm": "meleg",
   "clean": "tiszta",
   "This program's last minute as a waveform: pick a bit out of it and keep it as a clip. It only listens while it's open.": "A program utolsó perce hullámformaként: válassz ki belőle egy részt, és tartsd meg klipként. Csak akkor figyel, amikor nyitva van.",
-  "Pre-delay": "Előkésleltetés"
+  "Pre-delay": "Előkésleltetés",
+  " A newer downloader may fix this.": " Egy újabb letöltő talán megoldja.",
+  "Couldn't update the downloader: {error}": "Nem sikerült frissíteni a letöltőt: {error}",
+  "Get the newest yt-dlp, the part that downloads from YouTube and other sites, then try this link again": "Letölti a legújabb yt-dlp-t, azt a részt, ami a YouTube-ról és más oldalakról tölt le, majd újra megpróbálja ezt a linket",
+  "The downloader is already the newest. The site may have changed in a way it can't handle yet: try again in a few days.": "A letöltő már a legújabb. Lehet, hogy az oldal úgy változott meg, amit még nem tud kezelni: próbáld újra pár nap múlva.",
+  "Update downloader": "Letöltő frissítése",
+  "Updating the downloader…": "A letöltő frissítése…"
 }
