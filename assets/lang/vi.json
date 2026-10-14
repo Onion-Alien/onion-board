@@ -3320,5 +3320,10 @@
   "No custom modes yet. Fill in the form to make one.": "Chưa có chế độ tùy chỉnh. Điền biểu mẫu để tạo một chế độ.",
   "Show the report": "Hiện báo cáo",
   "This run only. It isn't saved.": "Chỉ lần chạy này. Không được lưu.",
-  "Your own sound modes, for a voice chat the built-in ones don't cover.": "Chế độ âm thanh của riêng bạn, cho trò chuyện thoại mà các chế độ có sẵn không phù hợp."
+  "Your own sound modes, for a voice chat the built-in ones don't cover.": "Chế độ âm thanh của riêng bạn, cho trò chuyện thoại mà các chế độ có sẵn không phù hợp.",
+  "Back to the board": "Quay lại board",
+  "Drag: move him. Scroll: bigger or smaller. Hover for the buttons.": "Kéo: di chuyển cậu ấy. Cuộn: to hơn hoặc nhỏ hơn. Di chuột lên để thấy các nút.",
+  "Open the full board": "Mở toàn bộ board",
+  "Turn into Bun": "Biến thành Bun",
+  "Turn into Bun: a small Bun floating on top instead of this window. The button under him brings it back.": "Biến thành Bun: một Bun nhỏ bay lơ lửng trên cùng thay cho cửa sổ này. Nút bên dưới cậu ấy sẽ đưa cửa sổ trở lại."
 }

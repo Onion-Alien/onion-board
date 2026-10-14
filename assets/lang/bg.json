@@ -3396,5 +3396,10 @@
   "No custom modes yet. Fill in the form to make one.": "Още няма собствени режими. Попълни формуляра, за да направиш един.",
   "Show the report": "Покажи доклада",
   "This run only. It isn't saved.": "Само това пускане. Не се запазва.",
-  "Your own sound modes, for a voice chat the built-in ones don't cover.": "Твои звукови режими, за гласов чат, който вградените не покриват."
+  "Your own sound modes, for a voice chat the built-in ones don't cover.": "Твои звукови режими, за гласов чат, който вградените не покриват.",
+  "Back to the board": "Обратно към борда",
+  "Drag: move him. Scroll: bigger or smaller. Hover for the buttons.": "Влачене: мести го. Колелце: по-голям или по-малък. Посочи го за бутоните.",
+  "Open the full board": "Отвори целия борд",
+  "Turn into Bun": "Превърни се в Bun",
+  "Turn into Bun: a small Bun floating on top instead of this window. The button under him brings it back.": "Превърни се в Bun: малък Bun, който плава отгоре вместо този прозорец. Бутонът под него го връща."
 }

@@ -3396,5 +3396,10 @@
   "No custom modes yet. Fill in the form to make one.": "Még nincs egyéni mód. Töltsd ki az űrlapot, hogy készíts egyet.",
   "Show the report": "Jelentés megjelenítése",
   "This run only. It isn't saved.": "Csak ez a futás. Nincs mentve.",
-  "Your own sound modes, for a voice chat the built-in ones don't cover.": "Saját hangmódok olyan hangcsevegéshez, amit a beépítettek nem fednek le."
+  "Your own sound modes, for a voice chat the built-in ones don't cover.": "Saját hangmódok olyan hangcsevegéshez, amit a beépítettek nem fednek le.",
+  "Back to the board": "Vissza a boardhoz",
+  "Drag: move him. Scroll: bigger or smaller. Hover for the buttons.": "Húzás: mozgatás. Görgő: nagyobb vagy kisebb. Vidd fölé az egeret a gombokért.",
+  "Open the full board": "A teljes board megnyitása",
+  "Turn into Bun": "Változz Bunná",
+  "Turn into Bun: a small Bun floating on top instead of this window. The button under him brings it back.": "Változz Bunná: egy kis Bun lebeg mindenek felett ez az ablak helyett. Az alatta lévő gomb visszahozza."
 }

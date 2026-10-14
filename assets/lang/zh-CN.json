@@ -3320,5 +3320,10 @@
   "No custom modes yet. Fill in the form to make one.": "还没有自定义模式。填写表单来新建一个。",
   "Show the report": "显示报告",
   "This run only. It isn't saved.": "仅本次运行。不会保存。",
-  "Your own sound modes, for a voice chat the built-in ones don't cover.": "你自己的音效模式，用于内置模式不适合的语音聊天。"
+  "Your own sound modes, for a voice chat the built-in ones don't cover.": "你自己的音效模式，用于内置模式不适合的语音聊天。",
+  "Back to the board": "返回音效板",
+  "Drag: move him. Scroll: bigger or smaller. Hover for the buttons.": "拖动：移动他。滚轮：变大或变小。鼠标移上去会出现按钮。",
+  "Open the full board": "打开完整音效板",
+  "Turn into Bun": "变成 Bun",
+  "Turn into Bun: a small Bun floating on top instead of this window. The button under him brings it back.": "变成 Bun：一个小小的 Bun 浮在最上层，代替这个窗口。他下面的按钮能把窗口找回来。"
 }

@@ -3396,5 +3396,10 @@
   "No custom modes yet. Fill in the form to make one.": "Aún no hay modos personalizados. Rellena el formulario para crear uno.",
   "Show the report": "Mostrar el informe",
   "This run only. It isn't saved.": "Solo esta sesión. No se guarda.",
-  "Your own sound modes, for a voice chat the built-in ones don't cover.": "Tus propios modos de sonido, para un chat de voz que los incluidos no cubren."
+  "Your own sound modes, for a voice chat the built-in ones don't cover.": "Tus propios modos de sonido, para un chat de voz que los incluidos no cubren.",
+  "Back to the board": "Volver al tablero",
+  "Drag: move him. Scroll: bigger or smaller. Hover for the buttons.": "Arrastra: muévelo. Rueda: más grande o más pequeño. Pasa el ratón por encima para ver los botones.",
+  "Open the full board": "Abrir el tablero completo",
+  "Turn into Bun": "Convertir en Bun",
+  "Turn into Bun: a small Bun floating on top instead of this window. The button under him brings it back.": "Convertir en Bun: un Bun pequeño flotando encima en lugar de esta ventana. El botón de debajo la recupera."
 }

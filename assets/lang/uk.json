@@ -3472,5 +3472,10 @@
   "No custom modes yet. Fill in the form to make one.": "Власних режимів ще немає. Заповни форму, щоб створити режим.",
   "Show the report": "Показати звіт",
   "This run only. It isn't saved.": "Лише цей запуск. Не зберігається.",
-  "Your own sound modes, for a voice chat the built-in ones don't cover.": "Власні звукові режими для голосового чату, якого не покривають вбудовані."
+  "Your own sound modes, for a voice chat the built-in ones don't cover.": "Власні звукові режими для голосового чату, якого не покривають вбудовані.",
+  "Back to the board": "Назад до борду",
+  "Drag: move him. Scroll: bigger or smaller. Hover for the buttons.": "Перетягни: посунути. Коліщатко: більший чи менший. Наведи мишу, щоб побачити кнопки.",
+  "Open the full board": "Відкрити весь борд",
+  "Turn into Bun": "Перетворитися на Bun",
+  "Turn into Bun: a small Bun floating on top instead of this window. The button under him brings it back.": "Перетворитися на Bun: маленький Bun літає поверх усього замість цього вікна. Кнопка під ним повертає вікно."
 }

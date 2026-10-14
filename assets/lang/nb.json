@@ -3396,5 +3396,10 @@
   "No custom modes yet. Fill in the form to make one.": "Ingen egne moduser ennå. Fyll ut skjemaet for å lage en.",
   "Show the report": "Vis rapporten",
   "This run only. It isn't saved.": "Bare denne økten. Lagres ikke.",
-  "Your own sound modes, for a voice chat the built-in ones don't cover.": "Dine egne lydmoduser for en talechat de innebygde ikke dekker."
+  "Your own sound modes, for a voice chat the built-in ones don't cover.": "Dine egne lydmoduser for en talechat de innebygde ikke dekker.",
+  "Back to the board": "Tilbake til brettet",
+  "Drag: move him. Scroll: bigger or smaller. Hover for the buttons.": "Dra: flytt ham. Rull: større eller mindre. Hold musen over ham for knappene.",
+  "Open the full board": "Åpne hele brettet",
+  "Turn into Bun": "Bli til Bun",
+  "Turn into Bun: a small Bun floating on top instead of this window. The button under him brings it back.": "Bli til Bun: en liten Bun som svever øverst i stedet for dette vinduet. Knappen under ham henter det tilbake."
 }

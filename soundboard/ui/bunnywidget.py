@@ -112,8 +112,9 @@ class BunnyWidget(QWidget):
     def __init__(self, prop: str | None = None, height: int = 110, pad: int = 26,
                  celebrate: bool = False, parent=None, *, sad: float = 0.0,
                  lines=(), hope_lines=(), joy_lines=(), pong: bool = False,
-                 naps: bool = False, robot: bool = False):
+                 naps: bool = False, robot: bool = False, in_background: bool = False):
         super().__init__(parent)
+        self.in_background = in_background   # keeps moving with a game in front (Bun mode)
         self.robot = robot              # Robo-Bun: metal, LEDs, a wrench instead of a hammer
         self.pong = pong
         self.naps = naps
@@ -170,7 +171,8 @@ class BunnyWidget(QWidget):
         self._timer.timeout.connect(self._step)
         if pong:
             self.challenge.connect(self._open_game)
-        appstate.pause_in_background(self, self._resume, self._timer.stop)
+        if not in_background:
+            appstate.pause_in_background(self, self._resume, self._timer.stop)
 
     def sizeHint(self) -> QSize:
         return QSize(round(self.bun_h * W / H) + 2 * self.pad + 20 + 2 * self.side,
@@ -329,7 +331,8 @@ class BunnyWidget(QWidget):
 
     # ------------------------------------------------------------------ animation
     def showEvent(self, ev):
-        if appstate.active():   # behind a game it waits until the app is back in front
+        # behind a game it waits until the app is back in front
+        if self.in_background or appstate.active():
             self._resume()
         super().showEvent(ev)
 

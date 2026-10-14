@@ -3320,5 +3320,10 @@
   "No custom modes yet. Fill in the form to make one.": "Belum ada mode khusus. Isi formulir untuk membuatnya.",
   "Show the report": "Tampilkan laporan",
   "This run only. It isn't saved.": "Hanya sesi ini. Tidak disimpan.",
-  "Your own sound modes, for a voice chat the built-in ones don't cover.": "Mode suara milikmu sendiri, untuk obrolan suara yang tidak dicakup mode bawaan."
+  "Your own sound modes, for a voice chat the built-in ones don't cover.": "Mode suara milikmu sendiri, untuk obrolan suara yang tidak dicakup mode bawaan.",
+  "Back to the board": "Kembali ke board",
+  "Drag: move him. Scroll: bigger or smaller. Hover for the buttons.": "Seret: pindahkan dia. Gulir: lebih besar atau lebih kecil. Arahkan kursor untuk tombolnya.",
+  "Open the full board": "Buka board penuh",
+  "Turn into Bun": "Jadi Bun",
+  "Turn into Bun: a small Bun floating on top instead of this window. The button under him brings it back.": "Jadi Bun: Bun kecil melayang di atas menggantikan jendela ini. Tombol di bawahnya mengembalikannya."
 }

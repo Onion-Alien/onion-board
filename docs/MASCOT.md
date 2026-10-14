@@ -21,7 +21,8 @@ lines in the files below.
 ## Every place he shows up
 
 `BunnyWidget` in the setup guide (`ui/setupwizard.py`, a prop per page), the chat guides
-(`ui/chatguide.py`, `ui/streamguide.py`), the empty board (`ui/widgets.py`), the Apps tab
+(`ui/chatguide.py`, `ui/streamguide.py`), Bun mode (`ui/bunmode.py`, the window as a
+floating Bun: `in_background=True` keeps him moving behind a game), the empty board (`ui/widgets.py`), the Apps tab
 (`ui/appspanel.py`, sad and begging), the Radio map (`ui/flatmap.py`), the YouTube search
 (`ui/ytsearch.py`), the mic part update (`ui/micupdate.py`) and Robo-Bun on the AI voice
 card (`ui/aivoicepanel.py`). `SetupShow` in the setup guide; `ScribeBunny` in the
