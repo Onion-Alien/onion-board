@@ -5748,7 +5748,7 @@ class MainWindow(QMainWindow):
     def apply_theme(self, name: str):
         # a still of the window with Bun over it while every widget restyles: no frame
         # of a half-styled window, and it fades to the new theme (ui/themecover.py)
-        with themecover.covered(self):
+        with themecover.covered(self, name):
             self._apply_theme(name)
 
     def _apply_theme(self, name: str):

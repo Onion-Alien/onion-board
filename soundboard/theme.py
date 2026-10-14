@@ -9,6 +9,7 @@ from __future__ import annotations
 import hashlib
 import re
 import tempfile
+from contextlib import contextmanager
 from pathlib import Path
 from string import Template
 
@@ -644,6 +645,21 @@ def set_current(name: str) -> str:
     T.clear()
     T.update(tokens(name))
     return name
+
+
+@contextmanager
+def previewing(name: str):
+    """Theme `name` in `T` for the block, then the current one back: paints something
+    (Bun on the theme-change cover) in a theme before apply() has switched to it."""
+    global current_name
+    was, colours = current_name, dict(T)
+    set_current(name)
+    try:
+        yield
+    finally:
+        current_name = was
+        T.clear()
+        T.update(colours)
 
 
 STYLE = Template("""
