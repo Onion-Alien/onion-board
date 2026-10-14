@@ -49,11 +49,13 @@ def verify(data: bytes, sig: bytes, fpr: str) -> None:
         paths = {n: Path(home, n) for n in ("key.asc", "file", "file.asc")}
         for p, b in zip(paths.values(), (key, data, sig)):
             p.write_bytes(b)
-        gpg = ["gpg", "--batch", "--homedir", home]
+        # forward slashes: Git for Windows' gpg takes C:\... for a relative path
+        gpg = ["gpg", "--batch", "--homedir", Path(home).as_posix()]
         # its exit code is no use: a missing gpg-agent makes it 2 after a good import
-        subprocess.run([*gpg, "--import", str(paths["key.asc"])])
+        subprocess.run([*gpg, "--import", paths["key.asc"].as_posix()])
         status = subprocess.run(
-            [*gpg, "--status-fd", "1", "--verify", str(paths["file.asc"]), str(paths["file"])],
+            [*gpg, "--status-fd", "1", "--verify", paths["file.asc"].as_posix(),
+             paths["file"].as_posix()],
             text=True, stdout=subprocess.PIPE).stdout
     # VALIDSIG <signing (sub)key> ... <primary key fingerprint>
     ok = any(line.split()[-1] == fpr for line in status.splitlines()
