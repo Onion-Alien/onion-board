@@ -30,12 +30,12 @@ from soundboard import engine as eng
 from soundboard import bunny, theme, winkeys, ytdl, ytworker
 from soundboard.engine import SR, Engine
 from soundboard.engine import is_virtual as is_virtual_cable
-from soundboard import exitwatch
+from soundboard import exitwatch, sourceinfo
 from soundboard import (appaudio, autostart, backup, destination, library, midi,
                         remote, otherboards, reset, soundfx, thumbs, trash, updates, videos,
                         voicesdk)
 from soundboard import (appsetup, directmic, ffmpegget, michelper, net, netlog,
-                        profiles, quality, shellicon, thumbbar, tips, tor,
+                        profiles, quality, shellicon, sourceinfo, thumbbar, tips, tor,
                         usage, watchaddon)
 from soundboard.pollthread import PollThread
 from soundboard.replay import InstantReplay
