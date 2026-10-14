@@ -100,6 +100,7 @@ def test_a_sound_brought_back_gives_up_a_key_an_action_took_meanwhile(window, qa
         window.set_global_hotkey("stop_hotkey", "f9")
         if done is None:   # from Recently deleted
             window._finish_removals()
+            window._wait_bin()
             [it] = trash.items(trash.SOUND)
             assert window._restore_deleted(trash.take(it.id))
         else:

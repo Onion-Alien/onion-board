@@ -110,6 +110,7 @@ def test_remove_undo_and_bin_with_mapped_sounds(window, qapp, map_all):  # noqa:
     # removal finishes, as on a loaded CI runner: always so here
     held = window._removed[-1][2]
     window._finish_removals()                    # into the bin: the cache goes...
+    window._wait_bin()
     keep = library.cache_keep(window._live_metas())
     del held
 
