@@ -362,3 +362,71 @@ def test_names_arent_looked_up_through_a_proxy(monkeypatch, slow):
     _relay(f"CONNECT nowhere.test:80 HTTP/1.1\r\n"
            f"Proxy-Authorization: Basic {_auth()}\r\n\r\n".encode())
     assert looked == []
+
+
+@pytest.fixture
+def home_server(monkeypatch):
+    """A server on this PC, and the name home.example, which a lookup says is
+    127.0.0.1 (like 127.0.0.1.nip.io): "/" redirects to that name, "/x.png" is the
+    target. Returns (port, paths it was asked for)."""
+    hits: list[str] = []
+
+    class H(http.server.BaseHTTPRequestHandler):
+        def do_GET(self):
+            hits.append(self.path)
+            if self.path == "/":
+                self.send_response(302)
+                self.send_header("Location",
+                                 f"http://home.example:{self.server.server_port}/x.png")
+            else:
+                self.send_response(200)
+            self.send_header("Content-Length", "0")
+            self.end_headers()
+
+        def log_message(self, *a):
+            pass
+
+    srv = http.server.HTTPServer(("127.0.0.1", 0), H)
+    threading.Thread(target=srv.serve_forever, daemon=True).start()
+    real = socket.getaddrinfo
+
+    def gai(host, *a, **k):
+        if host == "home.example":
+            return [(socket.AF_INET, socket.SOCK_STREAM, 6, "", ("127.0.0.1", 0))]
+        return real(host, *a, **k)
+    monkeypatch.setattr(socket, "getaddrinfo", gai)
+    net.configure(net.DIRECT)
+    yield srv.server_port, hits
+    srv.shutdown()
+    srv.server_close()
+
+
+def test_urlopen_refuses_a_name_that_leads_into_this_pc(home_server):
+    port, hits = home_server
+    with pytest.raises(OSError, match="home network"):
+        net.urlopen(f"http://home.example:{port}/x.png", timeout=5,
+                    feature="sounds_web")
+    assert hits == []
+
+
+def test_urlopen_refuses_a_redirect_to_a_name_that_leads_into_this_pc(home_server):
+    port, hits = home_server
+    with pytest.raises(OSError, match="home network"):
+        net.urlopen(f"http://127.0.0.1:{port}/", timeout=5, feature="sounds_web")
+    assert hits == ["/"]   # the named server on this PC, never the redirect's target
+
+
+def test_urlopen_connects_to_the_address_it_checked(monkeypatch):
+    real, answers = socket.getaddrinfo, iter(["93.184.216.34", ROUTER])
+
+    def gai(host, *a, **k):
+        if host == "rebind.example":
+            ip = next(answers, ROUTER)
+            return [(socket.AF_INET, socket.SOCK_STREAM, 6, "", (ip, 0))]
+        return real(host, *a, **k)
+    monkeypatch.setattr(socket, "getaddrinfo", gai)
+    dialled = _dialling(monkeypatch)
+    net.configure(net.DIRECT)
+    with pytest.raises(OSError):
+        net.urlopen("http://rebind.example/admin", timeout=5, feature="sounds_web")
+    assert dialled == ["93.184.216.34"]

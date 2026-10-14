@@ -896,7 +896,8 @@ class _HTTPConnection(_Logged, http.client.HTTPConnection):
     def connect(self):
         self._connecting()
         self.sock, entry = _open(self.host, self.port, _timeout(self.timeout),
-                                 feature=self.feature, direct=self.direct)
+                                 feature=self.feature, direct=self.direct,
+                                 away=self.feature not in HOME_OK)
         self._opened(entry)
 
 
@@ -908,7 +909,8 @@ class _HTTPSConnection(_Logged, http.client.HTTPSConnection):
     def connect(self):
         self._connecting()
         sock, entry = _open(self.host, self.port, _timeout(self.timeout),
-                            feature=self.feature, direct=self.direct)
+                            feature=self.feature, direct=self.direct,
+                            away=self.feature not in HOME_OK)
         self.sock = sock
         self._opened(entry)
         try:
@@ -1028,7 +1030,8 @@ def urlopen(req, timeout: float = 30, feature: str | None = None, direct: bool =
     and so is a redirect into this PC or the home network. `direct` connects
     straight to the site whatever the Connection setting (the switches still hold):
     only for a click on "Try this one without Tor" (the user's own choice for that one
-    request)."""
+    request). Going direct, a name that leads into this PC / the home network
+    (looked up once, connected to the checked address) is refused too."""
     url = req.full_url if isinstance(req, urllib.request.Request) else str(req)
     if urllib.parse.urlsplit(url).scheme.lower() == "file":   # a file on this PC
         o = urllib.request.OpenerDirector()
