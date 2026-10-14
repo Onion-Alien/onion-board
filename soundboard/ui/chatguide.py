@@ -437,7 +437,7 @@ class DiscordGuide(QDialog):
                      "Settings → Voice & Video. The link was")))
         row.addWidget(opn)
         ptt = QPushButton(_("Auto push-to-talk"))
-        ptt.clicked.connect(lambda: mw.open_settings("hotkeys"))
+        ptt.clicked.connect(lambda: mw.setctl.open_settings("hotkeys"))
         row.addWidget(ptt)
         row.addStretch(1)
         self.btn_check = QPushButton(_("Check Discord"))
@@ -559,7 +559,7 @@ class GameGuide(QDialog):
         copy.setVisible(not kept)   # straight into the mic: nothing to pick
         row.addWidget(copy)
         ptt = QPushButton(_("Auto push-to-talk"))
-        ptt.clicked.connect(lambda: mw.open_settings("hotkeys"))
+        ptt.clicked.connect(lambda: mw.setctl.open_settings("hotkeys"))
         row.addWidget(ptt)
         row.addStretch(1)
         done = QPushButton(_("Done"))

@@ -145,7 +145,7 @@ class BunMode(QWidget):
         row.hide()
 
     def retheme(self):
-        """The button row in this theme's colours (MainWindow._apply_theme). Each button
+        """The button row in this theme's colours (ThemeControl._apply_theme). Each button
         carries every state itself: a rule shared from the row lost the plain buttons'
         fill, and Live and the mic, lit up, only went a shade lighter on hover. Now a
         hover is a clear outline in every state."""

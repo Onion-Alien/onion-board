@@ -272,7 +272,7 @@ def test_the_tab_is_shown_once_behind_the_loading_screen(qapp, app_dir, monkeypa
         qapp.processEvents()
         before, saved_tab = w.tabs.currentIndex(), w.cfg.tab
         w.triggers.panel.showEvent = lambda e: shown.append(1)
-        w.warm_triggers()
+        w.setctl.warm_triggers()
         assert shown                                       # it was shown once
         assert w.tabs.currentIndex() == before and w.cfg.tab == saved_tab
         assert w.updatesEnabled()
@@ -300,7 +300,7 @@ def test_without_onion_watch_the_tab_is_not_shown_behind_the_loading_screen(
         switched = []
         w.tabs.currentChanged.connect(switched.append)
         monkeypatch.setattr(w.tabs, "setCurrentWidget", lambda *a: switched.append(a))
-        w.warm_triggers()
+        w.setctl.warm_triggers()
         assert not switched and w.updatesEnabled()
     finally:
         close_window(qapp, w)

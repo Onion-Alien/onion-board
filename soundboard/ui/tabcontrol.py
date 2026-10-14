@@ -104,7 +104,7 @@ class TabControl(Controller):
         off = [(k, *TABS[TAB_INDEX[k]]) for k in self._more_tab_keys()]
         self._more_added = False
         usage.used("more-tabs-opened")
-        moretabs.fill(menu, off, self._add_from_more, lambda: mw.open_settings("tabs"))
+        moretabs.fill(menu, off, self._add_from_more, lambda: mw.setctl.open_settings("tabs"))
 
     def _more_tabs_hidden(self):
         """+ More tabs closed: counted when nothing was added (a pick's triggered
@@ -142,7 +142,7 @@ class TabControl(Controller):
             act.setEnabled(False)
         menu.addSeparator()
         menu.addAction(icons.icon("settings"), _("Choose tabs in Settings"),
-                       lambda: mw.open_settings("tabs"))
+                       lambda: mw.setctl.open_settings("tabs"))
         # Bun mode from the full window too (the mini player has its own Bun button)
         menu.addSeparator()
         act = menu.addAction(mw._bun_icon(), _("Turn into Bun"), mw.bunctl.enter_bun_mode)

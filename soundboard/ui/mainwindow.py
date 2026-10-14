@@ -29,10 +29,9 @@ from shiboken6 import isValid as qt_valid
 from soundboard import engine as eng
 from soundboard import bunny, theme, winkeys, ytdl, ytworker
 from soundboard.engine import SR, Engine
-from soundboard.engine import is_virtual as is_virtual_cable
 from soundboard import exitwatch
 from soundboard import (appaudio, autostart, backup, destination, library, midi,
-                        remote, otherboards, reset, soundfx, thumbs, trash, updates, videos,
+                        remote, otherboards, reset, soundfx, thumbs, trash, videos,
                         voicesdk)
 from soundboard import (appsetup, ffmpegget, net, netlog,
                         profiles, quality, shellicon, sourceinfo, thumbbar, tips, tor,
@@ -41,19 +40,21 @@ from soundboard.replay import InstantReplay
 from soundboard.library import (PAD_COLORS, PRESS_MODE, Config,
                                 SoundMeta, cache_keep, fingerprint,
                                 load_original, load_sound, prune_cache, save_clip)
-from soundboard.settings import HOTKEY_ACTIONS, HotkeyDialog, SettingsDialog, pretty_key
+from soundboard.settings import HOTKEY_ACTIONS, HotkeyDialog, pretty_key
 from soundboard.shuffle import ShuffleBag
-from soundboard.ui.crashdialog import free_dialog, rehome_crash_reports
-from soundboard.ui.dialogs import EditDialog, TabHelpPopup
+from soundboard.ui.crashdialog import free_dialog
+from soundboard.ui.dialogs import TabHelpPopup
 from soundboard.ui.iconrow import CapIcon
-from soundboard.ui import routewarn
 from soundboard.ui import worker
 from soundboard.ui.dropveil import DropVeil
 from soundboard.ui.ffmpegcontrol import FfmpegControl
+from soundboard.ui.aboutcontrol import AboutControl
+from soundboard.ui.themecontrol import ThemeControl
+from soundboard.ui.settingscontrol import SettingsControl
 from soundboard.ui.tabcontrol import TAB_INDEX, TAB_KEYS, TABS, TabControl
 from soundboard.ui.statuscontrol import StatusControl
 from soundboard.ui.miccontrol import MIC_OFFER_MS, MicControl
-from soundboard.ui.routecontrol import ROUTE_DEVICE, RouteControl
+from soundboard.ui.routecontrol import RouteControl
 from soundboard.ui.devicecontrol import DeviceControl
 from soundboard.ui.editcontrol import EditControl
 from soundboard.ui.removecontrol import RemoveControl
@@ -66,7 +67,7 @@ from soundboard.ui.importcontrol import ImportControl
 from soundboard.ui.updatecontrol import UpdateControl
 from soundboard.ui import toast as toastmod
 from soundboard.ui import (a11y, alsosend, appstate, busy, icons, responsive,
-                           splash, taboff, themecover)
+                           splash, taboff)
 from soundboard.ui.speedpitch import SpeedPitchButton
 from soundboard.ui.panel import (BAR_H, CONTROL_H, EqPanel, Flow, VolumeControl, bar,
                                  alt_tile, capped, card, hint_label, icon_label,
@@ -112,8 +113,6 @@ def version_text() -> str:
     return _("{version} from source", version=__version__)
 
 
-
-
 # an effects preview of a sound longer than this renders only its first PREVIEW_S
 # (soundfx.preview_part): a 2-hour song's pitch shift took minutes to start playing
 PREVIEW_WHOLE_S = 5 * 60
@@ -139,7 +138,6 @@ DISCORD_POLL_MS = 10000  # how often Discord's voice settings are looked at (dis
 RAW_POLL_MS = 2000       # how often the apps recording the mic are counted (rawmic)
 BODY_SIDE = 14         # the gap around the window's content (beside the tab rail too)...
 BODY_SIDE_TIGHT = 8    # ...and beside the rail in a narrow window
-SETTINGS_ROOM = QSize(480, 520)   # what Settings opened from the mini player grows it to
 MINI_SIZE = QSize(440, 380)   # below this the window becomes the mini player...
 MINI_PAD_ROWS = 1             # ...which has the pads above it when this many rows fit
 QUEUE_CHIPS = 5          # queued sounds shown by name above the pads (then "+n more")
@@ -305,25 +303,6 @@ class Bridge(QObject):
     ffmpeg_progress = Signal(int)              # percent of FFmpeg downloaded (-1: not known)
 
 
-def _holds_focus(w: QWidget) -> bool:
-    """The keyboard focus is in `w`."""
-    fw = QApplication.focusWidget()
-    return fw is not None and w.isAncestorOf(fw)
-
-
-def _polish(w: QWidget, size=None):
-    """Style a hidden widget and its children now, and lay it out at `size` (Qt waits
-    for the first show for both)."""
-    w.ensurePolished()
-    for c in w.findChildren(QWidget):
-        c.ensurePolished()
-    if size is not None:
-        w.resize(size)
-    for lay in [c.layout() for c in (w, *w.findChildren(QWidget))]:
-        if lay is not None:
-            lay.activate()
-
-
 class MainWindow(QMainWindow):
     update_done = Signal(object, str)   # an update check finished: Release|None, error
     update_state = Signal()             # the update card changed (Settings > Updates follows)
@@ -350,6 +329,9 @@ class MainWindow(QMainWindow):
 
     def __init__(self):
         super().__init__()
+        self.aboutctl = AboutControl(self)
+        self.themectl = ThemeControl(self)
+        self.setctl = SettingsControl(self)
         self.tabctl = TabControl(self)
         self.statusctl = StatusControl(self)
         self.micctl = MicControl(self)
@@ -431,12 +413,6 @@ class MainWindow(QMainWindow):
         self.ffctl = FfmpegControl(self)
         self.bridge.ffmpeg.connect(self.ffctl.on_answer)
         self.bridge.ffmpeg_progress.connect(self.ffctl.on_progress)
-        # windows beside the board, not over it: the one Settings, and an Edit
-        # sound for each sound being edited
-        self._settings_dlg: SettingsDialog | None = None
-        self._spare_editor: EditDialog | None = None   # a closed one, reused (edit)
-        self._settings_kept: SettingsDialog | None = None   # closed Settings, reused
-        self._settings_kept_print = None
         self.shuffle = ShuffleBag()       # the random-sound hotkeys
         self._last_sid: str | None = None   # the last sound played (its replay hotkey)
         self._queue: list[str] = []       # sounds waiting for the ones playing to finish
@@ -703,7 +679,7 @@ class MainWindow(QMainWindow):
         self.gear.setObjectName("settings")
         self.gear.setProperty("quiet", True)
         self.gear.setToolTip(_("Themes, hotkeys and more"))
-        self.gear.clicked.connect(lambda: self.open_settings())
+        self.gear.clicked.connect(lambda: self.setctl.open_settings())
         # (showing its page: the accent, as a selected tab's icon; on_accent was white
         # on the soft fill, all but gone in Light)
         icons.set_icon(self.gear, "settings", checked_color="accent", size=sidebar.ICON, gap=False)
@@ -717,9 +693,9 @@ class MainWindow(QMainWindow):
         self.btn_about.setProperty("railtext", _("Help and community"))
         icons.set_icon(self.btn_about, "onion", size=sidebar.ICON, gap=False)
         self.about_menu = DropdownMenu(self.btn_about)
-        self.about_menu.aboutToShow.connect(self._fill_about_menu)
-        self.btn_about.clicked.connect(self._show_about_menu)
-        self._paint_logo()
+        self.about_menu.aboutToShow.connect(self.aboutctl._fill_about_menu)
+        self.btn_about.clicked.connect(self.aboutctl._show_about_menu)
+        self.themectl._paint_logo()
 
         # only a sign: the one switch is "Hear what they hear" in the mixer at the bottom
         self.mic_banner = BannerButton(_("You're hearing your mic output: mic + sounds, "
@@ -953,7 +929,7 @@ class MainWindow(QMainWindow):
         # Proxy, Tor or Offline mode, a phone remote listening: lines in the On Air card
         # (_net_follow), each one click to its Settings page
         if self.rail.output is not None:
-            self.rail.output.lineClicked.connect(self.open_settings)
+            self.rail.output.lineClicked.connect(self.setctl.open_settings)
             self.rail.output.lineClicked.connect(lambda _p: usage.used("on-air-line"))
         self.remote_changed.connect(self._net_follow, Qt.ConnectionType.QueuedConnection)
         remote.on_change(self._remote_watch)
@@ -969,7 +945,7 @@ class MainWindow(QMainWindow):
             lambda order: self.set_option("sidebar_order", [TAB_KEYS[i] for i in order]))
         # a tab asked for (the rail, Ctrl+1..., a link) while Settings is up: back to the
         # tabs, on that one
-        self.tabs.picked.connect(self.close_settings)
+        self.tabs.picked.connect(self.setctl.close_settings)
         self._full_row.insertWidget(0, self.rail)
         # Tab goes header, rail, page (as it did with the top tabs), not page, rail; the
         # page's box holds the download bar too, so the bar's buttons come just before it
@@ -2745,7 +2721,7 @@ class MainWindow(QMainWindow):
             r.clip_ready.connect(self.on_clip)
         else:
             r = RadioOff()
-            r.open_settings.connect(lambda: self.open_settings("privacy"))
+            r.open_settings.connect(lambda: self.setctl.open_settings("privacy"))
         r.active_changed.connect(self.tabctl._radio_live)
         self.radio_page.addWidget(r)
         self.radio_page.setCurrentWidget(r)
@@ -2996,29 +2972,6 @@ class MainWindow(QMainWindow):
         for m in self.cfg.sounds:
             self.engine.set_gain(m.id, self.gain_for(m))
 
-    def set_live_color(self, colour: str) -> bool:
-        """The user's own highlight colour ("" = the theme's). Only what's drawn in it
-        is restyled (quick); False when it's the colour in use already."""
-        if theme.valid_colour(colour) == theme.live_override:
-            return False
-        self.set_option("live_color", theme.apply_live(QApplication.instance(), colour))
-        icons.retheme_live()
-        self._pill_long = ""   # forces _update_flow to repaint its icon
-        self.statusctl._update_status()
-        return True
-
-    def set_theme_texture(self, on: bool):
-        """Textured (each theme's own pattern on the panels) or Plain (flat panels)."""
-        if on == theme.textures_on:
-            return
-        self.set_option("theme_texture", on)
-        theme.textures_on = on
-        self.apply_theme(self.cfg.theme)
-
-    def set_live_tab_tint(self, on: bool):
-        self.set_option("live_tab_green", on)
-        set_live_tint(self.tabs, on)
-
     def on_top_toggle(self, b):
         self.set_option("always_on_top", b)
         self.setWindowFlag(Qt.WindowType.WindowStaysOnTopHint, b)
@@ -3209,7 +3162,8 @@ class MainWindow(QMainWindow):
             icons.set_icon(menu.addAction(f"{labels[attr]}	{key}",
                                           lambda a=attr: self._quick_set_hotkey(a)), "keyboard")
         menu.addSeparator()
-        icons.set_icon(menu.addAction(_("All hotkeys"), lambda: self.open_settings("hotkeys")),
+        icons.set_icon(menu.addAction(_("All hotkeys"),
+                                      lambda: self.setctl.open_settings("hotkeys")),
                        "settings")
 
     def _quick_set_hotkey(self, attr: str):
@@ -3354,7 +3308,7 @@ class MainWindow(QMainWindow):
         if kind == "tab":
             self.tabs.setCurrentIndex(TAB_INDEX[where])
         elif kind == "settings":
-            self.open_settings(where)
+            self.setctl.open_settings(where)
         elif kind == "search":
             self.tabs.setCurrentWidget(self.sounds_page)
             self.search.setFocus()
@@ -3372,118 +3326,14 @@ class MainWindow(QMainWindow):
             self.tip_bar.hide()
         self._save_later()
 
-    def open_settings(self, page: str | None = None):
-        """Settings as a page in the window, in the tabs' place (the rail stays, its
-        cog selected): they apply as they change, and sounds and hotkeys keep working
-        while it's up. [Done], Escape or any tab on the rail goes back to the tab you
-        were on. Asked for again while up: the same page, on `page` if one is named."""
-        dlg = self._settings_dlg
-        fresh = dlg is None or not qt_valid(dlg)
-        if dlg is not None and not fresh:
-            if page:
-                dlg.show_page(page)
-        else:
-            dlg, self._settings_kept = self._settings_kept, None
-            # nothing it shows changed since it closed: the same one, as it was left
-            if dlg is not None and qt_valid(dlg) \
-                    and self._settings_print() == self._settings_kept_print:
-                dlg.show_page(page or "privacy")
-                if getattr(dlg, "dev_combos", None):
-                    dlg._sync_devices()
-            else:
-                if dlg is not None and qt_valid(dlg):
-                    free_dialog(dlg)
-                dlg = SettingsDialog(self, page or "privacy", lazy=True)
-                dlg.finished.connect(lambda _r, d=dlg: self._settings_closed(d))
-            self._settings_dlg = dlg
-            # (what "Send my sounds to" was: a new pick is checked on the way out)
-            self._route_at_open = (self.cfg.route, self.cfg.main_device)
-            self._content.addWidget(dlg)
-        self._content.setCurrentWidget(dlg)
-        self._fit_body_top()
-        self._opening_settings = True   # (_refit: not closed again for being too small)
-        try:
-            self._board_counts(False)
-            if self.is_mini():
-                self._grow_for_settings()
-        finally:
-            self._opening_settings = False
-        self.rail.select_foot(self.gear)
-        self._show_transport()
-        # (Escape is for it now; fresh, not the back arrow: the mini player's swap
-        # handed the focus on to it, ringed)
-        if fresh or not _holds_focus(dlg):
-            dlg.categories.setFocus(Qt.FocusReason.OtherFocusReason)
-        return dlg
-
-    def _board_counts(self, on: bool):
-        """The tabs hidden behind Settings don't count towards the room the window
-        needs (a stack takes its widest page's): the board needs 464 px, Settings fits
-        in less, so a 440 px window stayed the mini player with Settings out of sight."""
-        policy = QSizePolicy.Policy.Preferred if on else QSizePolicy.Policy.Ignored
-        self._tabs_area.setSizePolicy(policy, policy)
-        if hasattr(self, "_fit"):
-            self._refit()
-
-    def _grow_for_settings(self):
-        """Settings asked for from the mini player: the window grows to the smallest
-        size that shows them (SETTINGS_ROOM, or what the window needs), on the screen."""
-        screen = self.screen().availableGeometry() if self.screen() else None
-        for _try in range(4):
-            size = self._pages.size()
-            need = self._fit.fit(size).expandedTo(SETTINGS_ROOM)
-            if (not self.is_mini() and size.width() >= need.width()
-                    and size.height() >= need.height()):
-                break
-            grow = need.expandedTo(size) - size
-            w, h = self.width() + grow.width(), self.height() + grow.height()
-            if screen is not None:
-                w, h = min(w, screen.width()), min(h, screen.height())
-            self.resize(w, h)
-            self._refit()
-
     def _body_top(self) -> int:
         """The body's top margin: none under Settings, whose heading rises level with
         the rail's name and keeps its pages where a tab's start (SettingsDialog)."""
-        return 0 if self.settings_open() else 10
+        return 0 if self.setctl.settings_open() else 10
 
     def _fit_body_top(self):
         m = self._body_lay.contentsMargins()
         self._body_lay.setContentsMargins(m.left(), self._body_top(), m.right(), m.bottom())
-
-    def settings_open(self) -> bool:
-        dlg = self._settings_dlg
-        return dlg is not None and qt_valid(dlg) and self._content.currentWidget() is dlg
-
-    def close_settings(self):
-        """Back from Settings to the tabs, as [Done] does (nothing to undo: it's live)."""
-        if self.settings_open() and self._settings_dlg is not None:   # (settings_open checked)
-            self._settings_dlg.accept()
-
-    def _settings_closed(self, dlg):
-        if self._settings_dlg is dlg:
-            self._settings_dlg = None
-        had_focus = getattr(dlg, "had_focus", False) or _holds_focus(dlg)
-        self._content.setCurrentWidget(self._tabs_area)
-        self._content.removeWidget(dlg)
-        self._fit_body_top()
-        self._board_counts(True)
-        self.rail.select_foot(None)
-        self._show_transport()
-        if had_focus:   # (not left on a page that's gone)
-            self._focus_sounds_page(self.tabs.currentIndex())
-            if not _holds_focus(self._tabs_area):
-                self.tabs.currentWidget().setFocus(Qt.FocusReason.OtherFocusReason)
-        if self._settings_reusable(dlg):   # opened again as it is: no 100-300 ms rebuild
-            rehome_crash_reports(dlg)
-            old, self._settings_kept = self._settings_kept, dlg
-            self._settings_kept_print = self._settings_print()
-            if old is not None and old is not dlg and qt_valid(old):
-                QTimer.singleShot(0, lambda: free_dialog(old))
-        else:   # freed once its finished signal is over (deleting it inside that crashed)
-            QTimer.singleShot(0, lambda: free_dialog(dlg))
-        self.register_hotkeys()   # in case a capture was cancelled
-        self._check_route_pick()
 
     # Settings pages showing state from outside the config (downloads, add-ons, Tor,
     # updates, the remote's add-ons): a kept Settings with one of them built is rebuilt
@@ -3493,125 +3343,6 @@ class MainWindow(QMainWindow):
     SETTINGS_PRINT_SKIP = ("sounds", "tab", "category", "tip_day", "tips_seen",
                            "update_checked", "whats_new_seen", "load_note", "speech",
                            "app_setup")
-
-    def _settings_reusable(self, dlg) -> bool:
-        if not qt_valid(dlg) or dlg.search_box.text():
-            return False
-        built = [k for i, k in enumerate(dlg._page_keys) if i not in dlg._unbuilt]
-        return not any(k in self.SETTINGS_LIVE_PAGES for k in built)
-
-    def _settings_print(self) -> str:
-        """What a kept Settings shows: the config (less what it doesn't show) and the
-        device lists. Anything else changed since it closed: a new one is built."""
-        from dataclasses import fields
-        c = self.cfg
-        state = {f.name: getattr(c, f.name) for f in fields(c)
-                 if f.name not in self.SETTINGS_PRINT_SKIP and not f.name.startswith("stats_")}
-        for key, cb in (("~mic", self.cb_mic), ("~mon", self.cb_mon), ("~route", self.cb_route)):
-            state[key] = (
-                [cb.itemData(i) for i in range(cb.count())], cb.currentIndex())
-        return repr(sorted(state.items()))
-
-    def _check_route_pick(self):
-        """Leaving Settings with "Send my sounds to" newly on a device that isn't a
-        virtual cable (speakers, a headset): asks whether that's meant, since Discord
-        and games don't hear it. Only for a new pick, so OBS and mixer users who chose
-        it on purpose aren't asked every time."""
-        c = self.cfg
-        before = getattr(self, "_route_at_open", None)
-        self._route_at_open = None
-        if before == (c.route, c.main_device) or not c.main_device \
-                or not routewarn.needs_warning(c.route, c.main_device, c.mon_device):
-            return
-        # (the picker already lists the outputs: no device call here)
-        names = [self.cb_route.itemData(i) or "" for i in range(self.cb_route.count())]
-        cables = [n[len(ROUTE_DEVICE):] for n in names
-                  if n.startswith(ROUTE_DEVICE) and is_virtual_cable(n[len(ROUTE_DEVICE):])]
-        box = self._route_warning = routewarn.RouteWarning(c.main_device, bool(cables), self)
-
-        def done(code, dev=c.main_device):
-            self._route_warning = None
-            QTimer.singleShot(0, lambda: free_dialog(box))   # (not inside finished)
-            # (still that device: not changed elsewhere while it was up)
-            if self.cfg.main_device != dev or self.cfg.route != "device":
-                return
-            if code == routewarn.MIC:
-                self.routectl.set_route("mic", by_hand=True)
-            elif code == routewarn.CABLE:
-                # on the cable, then Setup: it shows the cable working, or installing it
-                self.routectl.set_route("cable", cables[0] if cables else None, by_hand=True)
-                self.tabs.setCurrentWidget(self.setup_page)
-                if not cables:
-                    self.micctl.install_cable()
-        box.finished.connect(done)
-        box.open()
-
-    def apply_theme(self, name: str):
-        # a still of the window with Bun over it while every widget restyles: no frame
-        # of a half-styled window, and it fades to the new theme (ui/themecover.py)
-        with themecover.covered(self, name):
-            self._apply_theme(name)
-
-    def _apply_theme(self, name: str):
-        self.cfg.theme = theme.apply(QApplication.instance(), name)
-        self._drop_spare_dialogs()
-        icons.retheme()
-        self.radio.retheme()
-        self.apps.retheme()
-        self.triggers.retheme()
-        self.download_bar.retheme()
-        self.mini_download_bar.retheme()
-        self.ytresults.retheme()
-        self._paint_mini_bun()
-        if self.bunctl.bun_mode is not None:
-            self.bunctl.bun_mode.retheme()
-        pp, self._pp_icon = self._pp_icon, None
-        self._set_pp_icon(pp or "play")
-        self._pill_long = ""   # forces _update_flow to repaint its icon
-        self.statusctl._update_status()   # the hints and flow, in this theme's status colours
-        self.rail.refresh_output()   # its status icon is a copy of the pill's: redrawn
-        self._paint_logo()
-        self._save_later()
-
-    def _show_about_menu(self):
-        # (a foot button is checkable for Settings' "showing" fill: this one never is)
-        self.btn_about.setChecked(False)
-        # up from the rail's foot, its edge over the onion's (down, it ran off the window)
-        m = self.about_menu
-        self._fill_about_menu()
-        edge = 0 if not self.isRightToLeft() else self.btn_about.width() - m.sizeHint().width()
-        m.popup(self.btn_about.mapToGlobal(QPoint(edge, -m.sizeHint().height())))
-
-    def _fill_about_menu(self):
-        """The onion at the rail's foot: where to talk to us, and where the app lives."""
-        from soundboard import __version__, feedback
-        m = self.about_menu
-        m.clear()
-        icons.set_icon(m.addAction(_("Join the Discord"), lambda: self._open_page(
-            feedback.DISCORD_URL)), "speech")
-        icons.set_icon(m.addAction(_("Send feedback"), self.ask_feedback), "edit")
-        icons.set_icon(m.addAction(_("Report a problem"), lambda: self._open_page(
-            feedback.problem_url(__version__))), "warn")
-        m.addSeparator()
-        icons.set_icon(m.addAction(_("Onion Board on GitHub"), lambda: self._open_page(
-            f"https://github.com/{updates.REPO}")), "folder")
-        news = _("What's new")
-        icons.set_icon(m.addAction(f"{news} (v{__version__})", self.updctl.show_whats_new), "info")
-
-    def _paint_logo(self):
-        self.logo.update()   # it reads the theme colours itself
-        # title bar + taskbar follow the theme too, and so do the taskbar's right-click
-        # menu, a pin and the app's own Desktop / Start menu shortcuts (shellicon)
-        # (they stay still while sound plays: only the header logo glows. Swapping
-        # them made Windows redraw the taskbar button, which flickered its layers)
-        icon = glow_icon(theme.T["accent"], theme.T["accent2"], 0.0)
-        QApplication.setWindowIcon(icon)   # every window, dialogs too
-        self.setWindowIcon(icon)
-        tray = getattr(self, "tray", None)
-        if tray is not None:
-            tray.setIcon(icon)
-        shellicon.follow_theme(self, theme.T["accent"], theme.T["accent2"])
-        shellicon.paint_background(self, theme.T["bg"])   # fast resizes: no white edge
 
     def on_hotkey(self, action):
         if action == "__hotkeys__":
@@ -4793,82 +4524,6 @@ class MainWindow(QMainWindow):
         self.catctl._fill_categories()
         self.register_hotkeys()
 
-    def preload_dialogs(self):
-        """Behind the loading screen: Settings (its first page) and an Edit sound are
-        built now, so even the first click of the cog or Edit opens at once (each took
-        100-300 ms to build); Settings' other pages follow one at a time once it's up."""
-        if self._settings_dlg is None and self._settings_kept is None:
-            dlg = SettingsDialog(self, "privacy", lazy=True)
-            dlg.hide()
-            dlg.finished.connect(lambda _r, d=dlg: self._settings_closed(d))
-            _polish(dlg, self._content.size())
-            self._settings_kept, self._settings_kept_print = dlg, self._settings_print()
-            self._preload_pages = [i for i, k in enumerate(dlg._page_keys)
-                                   if i in dlg._unbuilt and k not in self.SETTINGS_LIVE_PAGES]
-            QTimer.singleShot(1500, self._preload_next_page)
-        if self._spare_editor is None and self.cfg.sounds:
-            d = self.editctl._new_editor(self.cfg.sounds[0], "sound")
-            d.hide()
-            _polish(d)
-            self._spare_editor = d
-
-    def warm_settings(self):
-        """Still behind the loading screen, the window up: the kept Settings goes in
-        the window's place once, with drawing off (nothing changes on screen), so Qt's
-        first-show work (~100 ms) isn't left for the first click of the cog."""
-        dlg = self._settings_kept
-        if dlg is None or not qt_valid(dlg) or not self.isVisible() or self.settings_open():
-            return
-        self.setUpdatesEnabled(False)
-        try:
-            self._content.addWidget(dlg)
-            self._content.setCurrentWidget(dlg)
-            QApplication.processEvents()
-            dlg.grab()
-        finally:
-            self._content.setCurrentWidget(self._tabs_area)
-            self._content.removeWidget(dlg)
-            dlg.hide()
-            self.setUpdatesEnabled(True)
-
-    def warm_triggers(self):
-        """Like warm_settings, for the Triggers tab: Onion Watch is loaded while the
-        window is built, but its first show at full size still lays out the list and
-        builds the editor beside it (~100-300 ms). Shown once here, with drawing off and
-        the tab's signals quiet (nothing saved or counted), then the tab picked before."""
-        t = self.triggers
-        if (not isinstance(t, TriggersTab) or t.panel is None or not self.isVisible()
-                or self.settings_open() or self.tabs.currentWidget() is t):
-            return
-        before = self.tabs.currentIndex()
-        self.setUpdatesEnabled(False)
-        self.tabs.blockSignals(True)
-        try:
-            self.tabs.setCurrentWidget(t)
-            QApplication.processEvents()
-            t.grab()
-        finally:
-            self.tabs.setCurrentIndex(before)
-            self.tabs.blockSignals(False)
-            self.setUpdatesEnabled(True)
-
-    def _preload_next_page(self):
-        """One more of the kept Settings' pages built (~20-60 ms each), while it's closed."""
-        dlg, pages = self._settings_kept, getattr(self, "_preload_pages", [])
-        if dlg is None or not qt_valid(dlg) or not pages:
-            return
-        dlg._build_page(pages.pop(0))
-        _polish(dlg, self._content.size())
-        QTimer.singleShot(60, self._preload_next_page)
-
-    def _drop_spare_dialogs(self):
-        """The kept Edit sound and Settings go (a new theme: built again in it)."""
-        for attr in ("_spare_editor", "_settings_kept"):
-            d = getattr(self, attr, None)
-            setattr(self, attr, None)
-            if d is not None and qt_valid(d):
-                free_dialog(d)
-
     # ------------------------------------------------------------------ backup
     # ------------------------------------------------------------------ tray
     def _init_tray(self):
@@ -4886,9 +4541,9 @@ class MainWindow(QMainWindow):
         menu.addSeparator()
         # the Discord opens in the browser (feedback.py); Send feedback asks first
         from soundboard import feedback
-        icons.set_icon(menu.addAction(_("Join the Discord"), lambda: self._open_page(
+        icons.set_icon(menu.addAction(_("Join the Discord"), lambda: self.aboutctl._open_page(
             feedback.DISCORD_URL)), "speech")
-        icons.set_icon(menu.addAction(_("Send feedback"), self.ask_feedback), "edit")
+        icons.set_icon(menu.addAction(_("Send feedback"), self.aboutctl.ask_feedback), "edit")
         menu.addSeparator()
         icons.set_icon(menu.addAction(_("Quit"), self.quit_app), "stop")
         t.setContextMenu(menu)
@@ -4896,15 +4551,6 @@ class MainWindow(QMainWindow):
         t.messageClicked.connect(self.show_from_tray)
         t.show()
         QApplication.setQuitOnLastWindowClosed(False)
-
-    def ask_feedback(self):
-        """*Send feedback*: "What would you improve?" (ui/feedbackdialog.py)."""
-        from soundboard.ui import feedbackdialog
-        self.show_from_tray()
-        self.feedback_box = feedbackdialog.ask(self.cfg, self)
-
-    def _open_page(self, url: str):
-        busy.open_url(url, window=self, failed=_("Couldn't open your browser. The page is"))
 
     def _on_tray(self, reason):
         if reason in (QSystemTrayIcon.ActivationReason.Trigger,
@@ -5229,7 +4875,7 @@ class MainWindow(QMainWindow):
         """The player bar: always on the Sounds tab; on the others only while a sound
         plays or is paused, so it can be stopped without going back to the pads (and
         doesn't take the room the rest of the time)."""
-        if self.tabs.currentWidget() is self.sounds_page and not self.settings_open():
+        if self.tabs.currentWidget() is self.sounds_page and not self.setctl.settings_open():
             want = True
         else:
             if playing is None:
@@ -5528,9 +5174,10 @@ class MainWindow(QMainWindow):
                 log.info("mini player at %dx%d: the window needs %dx%d (tab %s)",
                          size.width(), size.height(), need.width(), need.height(),
                          type(self.tabs.currentWidget()).__name__)
-        if mini and self.settings_open() and not getattr(self, "_opening_settings", False):
+        opening = getattr(self.setctl, "_opening_settings", False)
+        if mini and self.setctl.settings_open() and not opening:
             # made too small for Settings: they close (as Done does), the mini player shows
-            self.close_settings()
+            self.setctl.close_settings()
             # close_settings requests a refit, which the outer transaction guards.
             # Finish it here with Settings removed, before painting resumes.
             self._refit_layout()

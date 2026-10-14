@@ -55,7 +55,7 @@ class EditControl(Controller):
         if m is None:
             return None
         # a closed one shows this sound instead: building one took ~200 ms every time
-        d, mw._spare_editor = mw._spare_editor, None
+        d, mw.setctl._spare_editor = mw.setctl._spare_editor, None
         if d is not None and qt_valid(d):
             d.load(m, tab)
         else:
@@ -90,9 +90,9 @@ class EditControl(Controller):
                 mw.pads[sid].update()
                 mw.apply_filter(mw.search.text())
         finally:
-            if mw._spare_editor is None and d not in self._editors.values():
+            if mw.setctl._spare_editor is None and d not in self._editors.values():
                 rehome_crash_reports(d)
-                mw._spare_editor = d
+                mw.setctl._spare_editor = d
             else:   # freed once its finished signal is over (deleting it inside crashed)
                 QTimer.singleShot(0, lambda: free_dialog(d))
         mw.register_hotkeys()

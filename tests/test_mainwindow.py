@@ -1234,7 +1234,7 @@ def test_setup_columns_side_by_side_and_stack_when_narrow(window, qapp):
     """Wide: your mic and who's listening side by side and the same height, Devices and
     Connect your chat under your mic, the EQ under who's listening. Narrow: one column,
     mic, who's listening, then the rest. Never a sideways scroll bar."""
-    window.apply_theme("Dark")
+    window.themectl.apply_theme("Dark")
     body = window._setup_cols.parentWidget()
     body.setMaximumWidth(1500)   # the offscreen fallback font needs wider columns
     window.tabs.setCurrentWidget(window.setup_page)
@@ -1277,7 +1277,7 @@ def test_setup_two_columns_never_shut_the_rail(window, qapp):
     """Two columns that only fit with the rail shut: Setup stacks them instead. The
     page asked for their width and the narrow-window step shut the rail for it (open
     it, and it shut again)."""
-    window.apply_theme("Dark")
+    window.themectl.apply_theme("Dark")
     window.tabs.setCurrentWidget(window.setup_page)
     window.resize(1180, 720)
     window.show()
@@ -1388,7 +1388,7 @@ def test_volume_percent_sits_beside_its_slider_on_the_row_line(window, qapp):
 
 
 def test_medium_footer_uses_the_width_without_empty_control_gaps(window, qapp):
-    window.apply_theme("Dark")
+    window.themectl.apply_theme("Dark")
     window.tabs.setCurrentIndex(0)
     window.show()
     for size in ((360, 320), (440, 380), (600, 450), (800, 600)):

@@ -6,7 +6,7 @@ from PySide6.QtTest import QTest
 
 from soundboard import engine, settings, theme, winkeys
 from soundboard.ui import mainwindow as main
-from soundboard.ui import setupwizard
+from soundboard.ui import settingscontrol, setupwizard
 from soundboard.ui.livedot import set_tab_live
 
 
@@ -31,7 +31,7 @@ def test_closed_settings_and_setup_dialogs_are_freed(qapp, win, monkeypatch):
     each theme change restyled all of them."""
     monkeypatch.setattr(setupwizard.SetupWizard, "exec", lambda self: 0)
     for _ in range(3):
-        win.open_settings().done(0)   # Settings, a page in the window: Done closes it
+        win.setctl.open_settings().done(0)   # Settings, a page in the window: Done closes it
         qapp.processEvents()          # (freed just after its finished signal)
         win.run_setup()
     # (one closed Settings is kept to open again quickly: never one per opening)
@@ -42,24 +42,24 @@ def test_closed_settings_and_setup_dialogs_are_freed(qapp, win, monkeypatch):
 def test_settings_opened_again_is_the_kept_one_unless_its_config_changed(qapp, win):
     """Building Settings took 100-300 ms on every click of the cog: closed, it's kept,
     and opened again as it was. Config it shows changed meanwhile: built fresh."""
-    d = win.open_settings("audio")
+    d = win.setctl.open_settings("audio")
     d.accept()
     qapp.processEvents()
-    assert win._settings_dlg is None and not win.settings_open()
-    again = win.open_settings("appearance")
-    assert again is d and win.settings_open()
+    assert win.setctl._settings_dlg is None and not win.setctl.settings_open()
+    again = win.setctl.open_settings("appearance")
+    assert again is d and win.setctl.settings_open()
     assert d._page_keys[d.tabs.currentIndex()] == "appearance"
     again.accept()
     qapp.processEvents()
     win.cfg.always_on_top = not win.cfg.always_on_top   # changed outside Settings
-    fresh = win.open_settings("general")
-    assert fresh is not d and win.settings_open()
+    fresh = win.setctl.open_settings("general")
+    assert fresh is not d and win.setctl.settings_open()
     fresh.accept()
     qapp.processEvents()
-    d2 = win.open_settings("updates")   # shows live state: never kept
+    d2 = win.setctl.open_settings("updates")   # shows live state: never kept
     d2.accept()
     qapp.processEvents()
-    assert win.open_settings() is not d2
+    assert win.setctl.open_settings() is not d2
 
 
 def test_settings_open_as_a_page_in_place_of_the_tabs(qapp, win):
@@ -69,30 +69,30 @@ def test_settings_open_as_a_page_in_place_of_the_tabs(qapp, win):
     win.resize(1180, 720)
     win.show()
     win.tabs.setCurrentWidget(win.radio_page)
-    d = win.open_settings("audio")
-    assert win.settings_open() and not d.isWindow() and d.isVisible()
+    d = win.setctl.open_settings("audio")
+    assert win.setctl.settings_open() and not d.isWindow() and d.isVisible()
     assert win._content.currentWidget() is d and not win._tabs_area.isVisible()
     assert win.rail.isVisible() and win.mixer.isVisible()
     assert win.gear.isChecked() and not any(b.isChecked() for b in win.rail.buttons)
     assert win.isEnabled() and qapp.activeModalWidget() is None
-    assert win.open_settings("hotkeys") is d
+    assert win.setctl.open_settings("hotkeys") is d
     assert d._page_keys[d.tabs.currentIndex()] == "hotkeys"
-    assert win.open_settings() is d                          # the cog: stays on its page
+    assert win.setctl.open_settings() is d                          # the cog: stays on its page
     assert d._page_keys[d.tabs.currentIndex()] == "hotkeys"
     d.search_box.setText("zzzz-nothing")
     d._apply_search("zzzz-nothing")
-    win.open_settings("audio")                               # a page asked for: search cleared
+    win.setctl.open_settings("audio")                        # a page asked for: search cleared
     assert d.search_box.text() == "" and d._page_keys[d.tabs.currentIndex()] == "audio"
     assert d.back_btn.accessibleName() == "Back"   # no Done row: a back arrow
     assert d.back_btn.toolTip() == ""   # the arrow says it
     d.back_btn.click()                                       # back to the tab you were on
     qapp.processEvents()
-    assert not win.settings_open() and win._settings_dlg is None
+    assert not win.setctl.settings_open() and win.setctl._settings_dlg is None
     assert win._tabs_area.isVisible() and win.tabs.currentWidget() is win.radio_page
     assert not win.gear.isChecked()
     assert win.rail.buttons[win.tabs.indexOf(win.radio_page)].isChecked()
     assert win.findChildren(settings.SettingsDialog) == []
-    again = win.open_settings()                              # a new one after closing
+    again = win.setctl.open_settings()                              # a new one after closing
     assert again.isVisible()
     again.done(0)
     qapp.processEvents()
@@ -102,25 +102,25 @@ def test_escape_and_any_rail_tab_leave_settings(qapp, win):
     win.resize(1180, 720)
     win.show()
     win.tabs.setCurrentWidget(win.sounds_page)
-    d = win.open_settings("appearance")
+    d = win.setctl.open_settings("appearance")
     assert d.isAncestorOf(win.focusWidget())                 # so Escape reaches it
     QTest.keyClick(win.focusWidget(), Qt.Key_Escape)         # Escape = Done
     qapp.processEvents()
-    assert not win.settings_open() and win.tabs.currentWidget() is win.sounds_page
+    assert not win.setctl.settings_open() and win.tabs.currentWidget() is win.sounds_page
     sounds = win.rail.buttons[win.tabs.indexOf(win.sounds_page)]
-    win.open_settings()
+    win.setctl.open_settings()
     sounds.click()                                           # the tab you were on
     qapp.processEvents()
-    assert not win.settings_open() and sounds.isChecked() and not win.gear.isChecked()
-    win.open_settings()
+    assert not win.setctl.settings_open() and sounds.isChecked() and not win.gear.isChecked()
+    win.setctl.open_settings()
     setup = win.rail.buttons[win.tabs.indexOf(win.setup_page)]
     setup.click()                                            # another tab: that one
     qapp.processEvents()
-    assert not win.settings_open() and win.tabs.currentWidget() is win.setup_page
-    win.open_settings()
+    assert not win.setctl.settings_open() and win.tabs.currentWidget() is win.setup_page
+    win.setctl.open_settings()
     win.tabctl._go_tab(0, absolute=True)                            # Ctrl+1
     qapp.processEvents()
-    assert not win.settings_open()
+    assert not win.setctl.settings_open()
 
 
 def test_switching_the_open_tab_off_in_settings_keeps_settings_up(qapp, win):
@@ -128,10 +128,10 @@ def test_switching_the_open_tab_off_in_settings_keeps_settings_up(qapp, win):
     and Settings stays where it is."""
     win.tabctl.set_tab_on("voice", True)
     win.tabs.setCurrentWidget(win.voice)
-    d = win.open_settings("tabs")
+    d = win.setctl.open_settings("tabs")
     win.tabctl.set_tab_on("voice", False)
     qapp.processEvents()
-    assert win.settings_open() and win._settings_dlg is d
+    assert win.setctl.settings_open() and win.setctl._settings_dlg is d
     assert win.tabs.currentIndex() == 0
     d.done(0)
     qapp.processEvents()
@@ -143,7 +143,7 @@ def test_the_settings_page_fits_every_width(qapp, win, width):
     column (their names as tips) and the search box over the page."""
     win.show()
     win.resize(width, 720)
-    d = win.open_settings("appearance")
+    d = win.setctl.open_settings("appearance")
     for _ in range(3):
         qapp.processEvents()
     assert win.width() <= max(width, win.minimumWidth()) and win.minimumWidth() <= 440
@@ -166,27 +166,27 @@ def test_too_small_closes_settings_and_the_mini_player_grows_for_them(qapp, win)
     from the mini player: the window grows to the smallest size that shows them."""
     win.show()
     win.resize(800, 600)
-    win.open_settings("appearance")
+    win.setctl.open_settings("appearance")
     qapp.processEvents()
     win.resize(320, 300)
     qapp.processEvents()
-    assert not win.settings_open() and win.is_mini() and win._settings_dlg is None
-    d = win.open_settings("audio")
+    assert not win.setctl.settings_open() and win.is_mini() and win.setctl._settings_dlg is None
+    d = win.setctl.open_settings("audio")
     qapp.processEvents()
-    assert win.settings_open() and not win.is_mini() and d.isVisible()
+    assert win.setctl.settings_open() and not win.is_mini() and d.isVisible()
     size = win._pages.size()
-    assert size.width() >= main.SETTINGS_ROOM.width() - 1
-    assert size.height() >= min(main.SETTINGS_ROOM.height(),
+    assert size.width() >= settingscontrol.SETTINGS_ROOM.width() - 1
+    assert size.height() >= min(settingscontrol.SETTINGS_ROOM.height(),
                                 win.screen().availableGeometry().height() - 40)
     d.done(0)
     qapp.processEvents()
-    assert not win.settings_open()
+    assert not win.setctl.settings_open()
 
 
 def test_a_crash_report_open_over_a_dialog_outlives_it(qapp, win):
     from soundboard import applog
     from soundboard.ui.crashdialog import CrashDialog
-    dlg = win.open_settings()
+    dlg = win.setctl.open_settings()
     kept = CrashDialog(applog.Report(title="E: x", text="t"), None, dlg)
     dlg.done(0)
     qapp.processEvents()
@@ -231,9 +231,9 @@ def test_the_rail_keeps_up_with_the_tabs(qapp, win, monkeypatch):
     set_tab_live(tabs, vi, True, "● ON", "voice")
     same("start")
     try:
-        win.apply_theme("Light")
+        win.themectl.apply_theme("Light")
         same("theme")
-        win.set_live_color("#3399ff")
+        win.themectl.set_live_color("#3399ff")
         same("highlight colour")
         set_tab_live(tabs, vi, False)
         win.tabctl.set_tab_on("radio", True)
@@ -272,8 +272,8 @@ def test_the_rail_keeps_up_with_the_tabs(qapp, win, monkeypatch):
             b.customContextMenuRequested.emit(QPoint(5, 5))
         assert asked == [b.index for b in shown]
     finally:
-        win.set_live_color("")
-        win.apply_theme("Dark")
+        win.themectl.set_live_color("")
+        win.themectl.apply_theme("Dark")
 
 
 @pytest.mark.parametrize("green", [False, True])
@@ -281,7 +281,7 @@ def test_the_rail_mirrors_right_to_left(qapp, win, green):
     """Arabic: the rail on the right, its live bar and border on its outer / inner edge,
     and the narrow window's tight gap beside it."""
     from PySide6.QtGui import QColor
-    win.set_live_tab_tint(green)
+    win.themectl.set_live_tab_tint(green)
     vi = win.tabs.indexOf(win.voice)
     win.tabs.setTabVisible(vi, True)
     set_tab_live(win.tabs, vi, True, "● ON", "voice")
@@ -406,21 +406,21 @@ def test_every_theme_builds_a_clean_stylesheet(qapp, name):
 
 
 def test_setup_tab_uses_the_themes_status_colours(qapp, win):
-    win.apply_theme("Light")
+    win.themectl.apply_theme("Light")
     try:
         text = win.flow_mic.text() + win.flow_out.text() + win.step_lbl.text()
         assert "#13ce66" not in text and "#ffb020" not in text and "#ff4d4f" not in text
     finally:
-        win.apply_theme("Dark")
+        win.themectl.apply_theme("Dark")
 
 
 def test_clicking_the_theme_already_on_does_nothing(qapp, win, monkeypatch):
     """Restyling every widget for the same theme froze the app: a click that only
     ticks its card again."""
-    win.apply_theme("Dark")
+    win.themectl.apply_theme("Dark")
     d = settings.SettingsDialog(win, "appearance")
     calls = []
-    monkeypatch.setattr(win, "apply_theme", calls.append)
+    monkeypatch.setattr(win.themectl, "apply_theme", calls.append)
     card = next(c for c in d.theme_cards if c.name == "Dark")
     card.click()   # a checkable card: this unticks it
     assert calls == [] and card.isChecked()
@@ -436,11 +436,11 @@ def test_a_live_theme_switch_leaves_no_old_text_colours(qapp, win):
     not only a restart."""
     from PySide6.QtWidgets import QLabel
 
-    win.apply_theme("Dark")
+    win.themectl.apply_theme("Dark")
     red, amber = theme.status("error"), theme.status("warn")
     lbl = QLabel(f"<span style='color:{red}'>Oops</span>", win)
     lbl.setStyleSheet(f"color:{amber}; background:{red};")
-    win.apply_theme("Mint")
+    win.themectl.apply_theme("Mint")
     try:
         assert theme.status("error") in lbl.text() and red not in lbl.text()
         assert lbl.styleSheet() == f"color:{theme.status('warn')}; background:{red};"
@@ -450,5 +450,5 @@ def test_a_live_theme_switch_leaves_no_old_text_colours(qapp, win):
             for c in old:
                 assert f"color:{c}" not in (text + w.styleSheet()).lower(), (w, c)
     finally:
-        win.apply_theme("Dark")
+        win.themectl.apply_theme("Dark")
 

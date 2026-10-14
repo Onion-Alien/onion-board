@@ -111,8 +111,8 @@ def test_back_from_settings_by_rail_click_has_no_ring(window):  # noqa: F811
     QApplication.processEvents()
     QTest.mouseClick(w.rail.foot[0], Qt.LeftButton)   # the gear
     QApplication.processEvents()
-    assert w.settings_open()
+    assert w.setctl.settings_open()
     QTest.mouseClick(w.rail.buttons[0], Qt.LeftButton)   # Sounds
     QApplication.processEvents()
-    assert not w.settings_open()
+    assert not w.setctl.settings_open()
     assert [b.index for b in w.rail.buttons if b._kbd_focus] == []

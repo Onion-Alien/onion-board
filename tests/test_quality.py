@@ -163,8 +163,8 @@ def _ff(monkeypatch, state, why=""):
 
 
 def _data_page(window):  # noqa: F811
-    window.open_settings("data")   # Settings is a page in the window
-    return window._settings_dlg
+    window.setctl.open_settings("data")   # Settings is a page in the window
+    return window.setctl._settings_dlg
 
 
 def test_settings_always_shows_ffmpeg_and_what_to_do(window, monkeypatch):  # noqa: F811

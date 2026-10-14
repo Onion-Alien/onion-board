@@ -85,8 +85,8 @@ def test_settings_apply_immediately_and_persist(window, monkeypatch):  # noqa: F
     w = window
     w.meta("s0").image = "first.jpg"
     monkeypatch.setattr(w.engine, "playing", lambda: {"s0": (0.2, True)})
-    w.open_settings("appearance")
-    settings = w._settings_dlg
+    w.setctl.open_settings("appearance")
+    settings = w.setctl._settings_dlg
     assert not settings.playing_background_check.isChecked()
     assert not settings.playing_background_opacity.isEnabled()
     settings.playing_background_check.setChecked(True)

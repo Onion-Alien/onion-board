@@ -258,7 +258,7 @@ def test_the_tray_menu_offers_the_discord_and_feedback(window, monkeypatch):
         next(a for a in acts if a.text() == "Join the Discord").trigger()
         next(a for a in acts if a.text() == "Send feedback").trigger()
         # Send feedback asks "What would you improve?" first; its form opens from there
-        box = window.feedback_box
+        box = window.aboutctl.feedback_box
         assert box.isVisible() and opened == [feedback.DISCORD_URL]
         box.boxes["sounds"].setChecked(True)
         box.send()

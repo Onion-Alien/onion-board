@@ -491,7 +491,7 @@ def test_more_tabs_lists_the_switched_off_ones_and_adds_one(window, monkeypatch)
     assert texts[0].startswith("Radio: ") and texts[1].startswith("Triggers: ")
     assert texts[-1] == "Choose tabs in Settings" and len(texts) == 3
     opened = []
-    monkeypatch.setattr(w, "open_settings", lambda page="privacy": opened.append(page))
+    monkeypatch.setattr(w.setctl, "open_settings", lambda page="privacy": opened.append(page))
     menu.actions()[-1].trigger()
     assert opened == ["tabs"]
     [a for a in menu.actions() if a.text().startswith("Triggers")][0].trigger()

@@ -535,7 +535,7 @@ class SettingsDialog(QDialog):
     BACK_PAD = "padding:7px 0px 7px 3px"   # (the arrow is moved by _level_icons)
 
     def __init__(self, mw, page: str = "privacy", lazy: bool = False):
-        """A page in the main window, in place of the tabs (MainWindow.open_settings),
+        """A page in the main window, in place of the tabs (SettingsControl.open_settings),
         never a window of its own. `lazy`: build only `page` now and each other page
         the first time it's shown. Building all twelve under the app's style sheet took
         a second or two on every click of the cog; the tests build them all at once."""
@@ -974,7 +974,7 @@ class SettingsDialog(QDialog):
             modes.addButton(b)
             row.addWidget(b)
         (green if self.mw.cfg.live_tab_green else dot).setChecked(True)
-        green.toggled.connect(self.mw.set_live_tab_tint)
+        green.toggled.connect(self.mw.themectl.set_live_tab_tint)
         self.live_green, self.live_dot = green, dot
         cv.addLayout(row)
         v.addWidget(card)
@@ -1011,7 +1011,7 @@ class SettingsDialog(QDialog):
             group.addButton(b)
             row.addWidget(b)
         (textured if self.mw.cfg.theme_texture else plain).setChecked(True)
-        textured.toggled.connect(self.mw.set_theme_texture)
+        textured.toggled.connect(self.mw.themectl.set_theme_texture)
         self.texture_on, self.texture_off = textured, plain
         cv.addLayout(row)
         return card
@@ -1225,7 +1225,7 @@ class SettingsDialog(QDialog):
 
         def use(colour: str, btn=None, done: str = "") -> bool:
             settle.stop()
-            changed = self.mw.set_live_color(colour)
+            changed = self.mw.themectl.set_live_color(colour)
             sync()
             if btn is not None and done:
                 busy.flash(btn, done)
@@ -1260,7 +1260,7 @@ class SettingsDialog(QDialog):
             for c in self.theme_cards:   # the app for nothing (a click unticks the card)
                 c.setChecked(c.name == name)
             return
-        self.mw.apply_theme(name)
+        self.mw.themectl.apply_theme(name)
         self._category_icons()
         if getattr(self, "net_activity", None) is not None:
             self.net_activity.refresh(force=True)   # its status colours are per theme

@@ -165,7 +165,7 @@ def test_mode_controller_follows_setup_without_a_duplicate_rail_control(window):
 
 def test_picking_advanced_on_the_rail_opens_its_settings(window, monkeypatch):  # noqa: F811
     opened = []
-    monkeypatch.setattr(window, "open_settings", lambda page="privacy": opened.append(page))
+    monkeypatch.setattr(window.setctl, "open_settings", lambda page="privacy": opened.append(page))
     window.mode_btn.pick("advanced")
     QApplication.processEvents()
     assert opened == ["audio"] and window.cfg.dest["simple"] == "advanced"
