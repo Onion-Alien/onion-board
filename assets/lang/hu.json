@@ -3355,5 +3355,9 @@
   "snappy": "pattogós",
   "soft": "lágy",
   "warm": "meleg",
-  "clean": "tiszta"
+  "clean": "tiszta",
+  "Hear {name}": "{name} meghallgatása",
+  "Hear {name} (only you hear it)": "{name} meghallgatása (csak te hallod)",
+  "Pick your headphones in Settings → Audio to hear the samples.": "Válaszd ki a fejhallgatódat a Beállítások → Hang részben, hogy halld a mintákat.",
+  "Ready-made boards, free to use anywhere: in games, streams and videos. Press a sound to hear it first (only you hear it). Add a pack and its sounds land on your board, each category as its own tab.": "Kész táblák, bárhol ingyenesen használhatók: játékokban, streamekben és videókban. Nyomjon egy hangra, hogy előbb meghallgassa (csak Ön hallja). Adjon hozzá egyet, és annak hangjai a táblán landolnak, minden kategória külön lapként."
 }

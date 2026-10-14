@@ -3355,5 +3355,9 @@
   "snappy": "strak",
   "soft": "zacht",
   "warm": "warm",
-  "clean": "schoon"
+  "clean": "schoon",
+  "Hear {name}": "{name} beluisteren",
+  "Hear {name} (only you hear it)": "{name} beluisteren (alleen jij hoort het)",
+  "Pick your headphones in Settings → Audio to hear the samples.": "Kies je koptelefoon in Instellingen → Audio om de voorbeelden te horen.",
+  "Ready-made boards, free to use anywhere: in games, streams and videos. Press a sound to hear it first (only you hear it). Add a pack and its sounds land on your board, each category as its own tab.": "Kant-en-klare borden, overal gratis te gebruiken: in games, streams en video's. Klik op een geluid om het eerst te horen (alleen jij hoort het). Voeg er één toe en de geluiden ervan verschijnen op je bord, elke categorie als een eigen tabblad."
 }

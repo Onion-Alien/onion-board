@@ -3355,5 +3355,9 @@
   "snappy": "झटपट",
   "soft": "नरम",
   "warm": "गर्म",
-  "clean": "साफ़"
+  "clean": "साफ़",
+  "Hear {name}": "{name} सुनें",
+  "Hear {name} (only you hear it)": "{name} सुनें (सिर्फ़ आप सुनेंगे)",
+  "Pick your headphones in Settings → Audio to hear the samples.": "नमूने सुनने के लिए सेटिंग्स → ऑडियो में अपने हेडफ़ोन चुनें।",
+  "Ready-made boards, free to use anywhere: in games, streams and videos. Press a sound to hear it first (only you hear it). Add a pack and its sounds land on your board, each category as its own tab.": "तैयार बोर्ड, कहीं भी उपयोग करने के लिए निःशुल्क: गेम, स्ट्रीम और वीडियो में। पहले सुनने के लिए किसी ध्वनि पर दबाएँ (सिर्फ़ आप सुनेंगे)। एक जोड़ें और इसकी ध्वनियाँ आपके बोर्ड पर आ जाएँगी, प्रत्येक श्रेणी अपने स्वयं के टैब के रूप में।"
 }

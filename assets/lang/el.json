@@ -3355,5 +3355,9 @@
   "snappy": "απότομα",
   "soft": "απαλά",
   "warm": "ζεστά",
-  "clean": "καθαρά"
+  "clean": "καθαρά",
+  "Hear {name}": "Άκου {name}",
+  "Hear {name} (only you hear it)": "Άκου {name} (μόνο εσύ το ακούς)",
+  "Pick your headphones in Settings → Audio to hear the samples.": "Διάλεξε τα ακουστικά σου στις Ρυθμίσεις → Ήχος για να ακούσεις τα δείγματα.",
+  "Ready-made boards, free to use anywhere: in games, streams and videos. Press a sound to hear it first (only you hear it). Add a pack and its sounds land on your board, each category as its own tab.": "Έτοιμοι πίνακες, δωρεάν για χρήση οπουδήποτε: σε παιχνίδια, ροές και βίντεο. Πατήστε έναν ήχο για να τον ακούσετε πρώτα (μόνο εσείς τον ακούτε). Προσθέστε ένα και οι ήχοι του προσγειώνονται στον πίνακα σας, κάθε κατηγορία ως η δική της καρτέλα."
 }

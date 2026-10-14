@@ -3355,5 +3355,9 @@
   "snappy": "рязко",
   "soft": "меко",
   "warm": "топло",
-  "clean": "чисто"
+  "clean": "чисто",
+  "Hear {name}": "Чуй {name}",
+  "Hear {name} (only you hear it)": "Чуй {name} (само ти го чуваш)",
+  "Pick your headphones in Settings → Audio to hear the samples.": "Избери слушалките си в Настройки → Аудио, за да чуеш пробите.",
+  "Ready-made boards, free to use anywhere: in games, streams and videos. Press a sound to hear it first (only you hear it). Add a pack and its sounds land on your board, each category as its own tab.": "Готови дъски, безплатни за използване навсякъде: в игри, потоци и видеоклипове. Натиснете звук, за да го чуете първо (само вие го чувате). Добавете един и неговите звуци ще се появят на вашата дъска, всяка категория като отделен раздел."
 }

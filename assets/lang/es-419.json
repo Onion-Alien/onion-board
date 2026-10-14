@@ -3355,5 +3355,9 @@
   "snappy": "seco",
   "soft": "suave",
   "warm": "cálido",
-  "clean": "limpio"
+  "clean": "limpio",
+  "Hear {name}": "Escuchar {name}",
+  "Hear {name} (only you hear it)": "Escuchar {name} (solo tú lo escuchas)",
+  "Pick your headphones in Settings → Audio to hear the samples.": "Elige tus audífonos en Configuración → Audio para escuchar las muestras.",
+  "Ready-made boards, free to use anywhere: in games, streams and videos. Press a sound to hear it first (only you hear it). Add a pack and its sounds land on your board, each category as its own tab.": "Tableros listos para usar, gratuitos para usar en cualquier lugar: en juegos, transmisiones y videos. Presione un sonido para escucharlo primero (solo usted lo escucha). Agregue uno y sus sonidos aterrizarán en su tablero, cada categoría como su propia pestaña."
 }

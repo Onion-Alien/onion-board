@@ -3355,5 +3355,9 @@
   "snappy": "napakka",
   "soft": "pehmeä",
   "warm": "lämmin",
-  "clean": "puhdas"
+  "clean": "puhdas",
+  "Hear {name}": "Kuuntele {name}",
+  "Hear {name} (only you hear it)": "Kuuntele {name} (vain sinä kuulet sen)",
+  "Pick your headphones in Settings → Audio to hear the samples.": "Valitse kuulokkeesi kohdassa Asetukset → Ääni kuullaksesi näytteet.",
+  "Ready-made boards, free to use anywhere: in games, streams and videos. Press a sound to hear it first (only you hear it). Add a pack and its sounds land on your board, each category as its own tab.": "Valmiit taulut, joita voi käyttää ilmaiseksi missä tahansa: peleissä, suoratoistoissa ja videoissa. Paina ääntä kuullaksesi sen ensin (vain sinä kuulet sen). Lisää yksi ja sen äänet laskeutuvat taulullesi, jokainen luokka omana välilehtenä."
 }

@@ -3280,5 +3280,9 @@
   "snappy": "날렵하게",
   "soft": "부드럽게",
   "warm": "따뜻하게",
-  "clean": "깨끗하게"
+  "clean": "깨끗하게",
+  "Hear {name}": "{name} 듣기",
+  "Hear {name} (only you hear it)": "{name} 듣기 (나만 들려요)",
+  "Pick your headphones in Settings → Audio to hear the samples.": "샘플을 들으려면 설정 → 오디오에서 헤드폰을 고르세요.",
+  "Ready-made boards, free to use anywhere: in games, streams and videos. Press a sound to hear it first (only you hear it). Add a pack and its sounds land on your board, each category as its own tab.": "게임, 스트리밍, 비디오 등 어디에서나 무료로 사용할 수 있는 기성 보드입니다. 사운드를 눌러 먼저 들어 보세요 (나만 들려요). 하나를 추가하면 해당 사운드가 보드에 표시되고 각 카테고리는 자체 탭으로 표시됩니다."
 }

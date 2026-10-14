@@ -3355,5 +3355,9 @@
   "snappy": "sert",
   "soft": "yumuşak",
   "warm": "sıcak",
-  "clean": "temiz"
+  "clean": "temiz",
+  "Hear {name}": "{name} dinle",
+  "Hear {name} (only you hear it)": "{name} dinle (sadece sen duyarsın)",
+  "Pick your headphones in Settings → Audio to hear the samples.": "Örnekleri duymak için Ayarlar → Ses bölümünden kulaklığını seç.",
+  "Ready-made boards, free to use anywhere: in games, streams and videos. Press a sound to hear it first (only you hear it). Add a pack and its sounds land on your board, each category as its own tab.": "Her yerde ücretsiz kullanılabilen hazır panolar: oyunlarda, yayınlarda ve videolarda. Önce dinlemek için bir sese basın (sadece siz duyarsınız). Bir tane ekleyin ve sesleri panonuza gelsin; her kategori kendi sekmesidir."
 }

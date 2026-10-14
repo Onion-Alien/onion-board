@@ -3280,5 +3280,9 @@
   "snappy": "干脆",
   "soft": "柔和",
   "warm": "温暖",
-  "clean": "干净"
+  "clean": "干净",
+  "Hear {name}": "试听 {name}",
+  "Hear {name} (only you hear it)": "试听 {name}（只有你能听到）",
+  "Pick your headphones in Settings → Audio to hear the samples.": "在 设置 → 音频 里选好耳机，就能试听了。",
+  "Ready-made boards, free to use anywhere: in games, streams and videos. Press a sound to hear it first (only you hear it). Add a pack and its sounds land on your board, each category as its own tab.": "现成的图板，可在任何地方免费使用：在游戏、直播和视频中。点一个声音先试听（只有你能听到）。添加一个，它的声音就会出现在你的板上，每个类别都有自己的选项卡。"
 }

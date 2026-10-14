@@ -17,7 +17,9 @@ from __future__ import annotations
 import json
 import logging
 import re
+import shutil
 import urllib.request
+import zipfile
 from collections.abc import Callable
 from dataclasses import dataclass, field
 from pathlib import Path
@@ -32,6 +34,8 @@ CATALOG_URL = (f"https://raw.githubusercontent.com/{updates.REPO}/main/packs/cat
 SHARE_URL = f"https://github.com/{updates.REPO}/issues/new?template=sound-pack.yml"
 RULES_URL = f"https://github.com/{updates.REPO}/blob/main/packs/README.md"
 MAX_SIZE = 300 << 20     # the biggest pack the app downloads (the GM pack is ~28 MB)
+PREVIEW_MAX = 4 << 20    # a pack's preview: a few short sounds (ours are ~0.4 MB)
+SAMPLES = 6              # at most this many of a preview's sounds are shown
 CATALOG_LIMIT = 1 << 20  # the list is a few KB
 ID_RE = re.compile(r"[a-z0-9][a-z0-9-]{0,40}")
 
@@ -49,6 +53,11 @@ class Pack:
     author: str = ""
     emoji: str = "📦"   # the pack's picture in the window
     categories: list[str] = field(default_factory=list)
+    # a few of its sounds, cut short, with their pictures (a small zip in the backup
+    # format next to the pack): "Listen first" in the window. Optional.
+    preview_url: str = ""
+    preview_sha256: str = ""
+    preview_size: int = 0
 
     @property
     def path(self) -> Path:
@@ -73,6 +82,9 @@ BUILT_IN = [{
     "license": "CC0 + CC BY (credits inside)",
     "author": "Onion Board",
     "emoji": "🎲",
+    "preview": {"url": f"{updates.DOWNLOADS}gm-pack-1/gm-starter-preview.zip",
+                "sha256": "287c97df2e05a8b0aefb76381ab8bc91f28546caa0b2a1dbd8e5228b71d611db",
+                "size": 523245},
     "categories": ["Tavern", "Travel", "Weather", "Dungeon", "Combat", "Magic", "Boss",
                    "Endings"],
 }, {
@@ -89,6 +101,9 @@ BUILT_IN = [{
     "license": "CC0",
     "author": "Onion Board",
     "emoji": "🏆",
+    "preview": {"url": f"{updates.DOWNLOADS}esports-pack-1/esports-preview.zip",
+                "sha256": "81553c247a987ef7dabe7da2b8b4a4555e5fe7e09a9c73f7dd063c491cd8ea4b",
+                "size": 407620},
     "categories": ["Hype music", "Crowd", "Announcer", "Callouts", "Plays", "Memes"],
 }, {
     "id": "podcast",
@@ -104,6 +119,9 @@ BUILT_IN = [{
     "license": "CC0 (applause public domain)",
     "author": "Onion Board",
     "emoji": "🎙️",
+    "preview": {"url": f"{updates.DOWNLOADS}podcast-pack-1/podcast-preview.zip",
+                "sha256": "1a427fc256d0152b7e5d2250337971e2660595dad21b7afd5b2f8184f7af4db1",
+                "size": 392570},
     "categories": ["Show music", "Stingers", "Reactions", "Comedy", "Game show", "Studio"],
 }]
 
@@ -134,8 +152,22 @@ def parse(raw) -> list[Pack]:
             log.debug("skipped catalog entry %r", p.id)
             continue
         seen.add(p.id)
+        p.preview_url, p.preview_sha256, p.preview_size = _preview(d.get("preview"))
         out.append(p)
     return out
+
+
+def _preview(d) -> tuple[str, str, int]:
+    """A catalog entry's "preview" ({url, sha256, size}), or nothing when it isn't one
+    on our releases with a checksum (the pack itself still shows)."""
+    try:
+        url, sha, size = str(d["url"]), str(d["sha256"]).lower(), int(d.get("size") or 0)
+    except (KeyError, TypeError, ValueError):
+        return "", "", 0
+    if (not url.startswith(updates.DOWNLOADS) or not updates.SHA_RE.fullmatch(sha)
+            or not 0 <= size <= PREVIEW_MAX):
+        return "", "", 0
+    return url, sha, size
 
 
 def built_in() -> list[Pack]:
@@ -163,3 +195,50 @@ def download(pack: Pack, progress: Callable[[int, int], object] | None = None,
     netlog.cause(FEATURE, f"You pressed Add on the {netlog.quoted(pack.name)} pack")
     return updates.fetch(pack.url, pack.sha256, pack.path, (updates.DOWNLOADS,), MAX_SIZE,
                          "pack", pack.size, progress, cancelled, feature=FEATURE)
+
+
+@dataclass
+class Sample:
+    """One of a preview's sounds: its name, its tile picture (PNG / JPEG bytes, or
+    b"") and its audio file, unpacked."""
+    name: str
+    picture: bytes
+    audio: Path
+
+
+def previews_dir() -> Path:
+    return library.APP_DIR / "packs" / "previews"
+
+
+def samples(pack: Pack, cancelled: Callable[[], bool] | None = None) -> list[Sample]:
+    """A few of `pack`'s sounds to try before adding it: its preview fetched (once,
+    checked against its SHA-256) and unpacked. [] when it has none. Raises
+    updates.UpdateError (switched off, offline, a bad file). Call off the UI thread."""
+    if not pack.preview_url:
+        return []
+    d = previews_dir()
+    zpath = d / f"{pack.id}.zip"
+    if not zpath.is_file():   # the first time only: then it's served from here
+        netlog.cause(FEATURE, f"You opened Free packs: a few sounds of "
+                              f"{netlog.quoted(pack.name)} to try")
+    updates.fetch(pack.preview_url, pack.preview_sha256, zpath, (updates.DOWNLOADS,),
+                  PREVIEW_MAX, "pack", pack.preview_size, None, cancelled, feature=FEATURE)
+    from soundboard import backup   # it imports the library's heavier parts
+    try:
+        pkg = backup.read(zpath)
+    except backup.BackupError as e:
+        raise updates.UpdateError(str(e)) from e
+    out = d / pack.id
+    shutil.rmtree(out, ignore_errors=True)
+    out.mkdir(parents=True, exist_ok=True)
+    found = []
+    with zipfile.ZipFile(zpath) as z:
+        for i, ps in enumerate(pkg.sounds[:SAMPLES]):
+            if sum(z.getinfo(n).file_size for n in (ps.audio, ps.picture) if n) > PREVIEW_MAX:
+                continue   # far bigger unpacked than a short sound
+            name = str(ps.entry.get("name") or "").strip()[:60]
+            audio = out / f"{i}{Path(ps.audio).suffix.lower()}"
+            audio.write_bytes(z.read(ps.audio))
+            pic = z.read(ps.picture) if ps.picture else b""
+            found.append(Sample(name or Path(ps.folder).name, pic, audio))
+    return found

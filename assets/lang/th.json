@@ -3280,5 +3280,9 @@
   "snappy": "ฉับไว",
   "soft": "นุ่ม",
   "warm": "อบอุ่น",
-  "clean": "สะอาด"
+  "clean": "สะอาด",
+  "Hear {name}": "ฟัง {name}",
+  "Hear {name} (only you hear it)": "ฟัง {name} (มีแค่คุณที่ได้ยิน)",
+  "Pick your headphones in Settings → Audio to hear the samples.": "เลือกหูฟังของคุณใน การตั้งค่า → เสียง เพื่อฟังตัวอย่าง",
+  "Ready-made boards, free to use anywhere: in games, streams and videos. Press a sound to hear it first (only you hear it). Add a pack and its sounds land on your board, each category as its own tab.": "บอร์ดสำเร็จรูป ใช้งานฟรีได้ทุกที่: ในเกม สตรีม และวิดีโอ กดเสียงเพื่อฟังก่อน (มีแค่คุณที่ได้ยิน) เพิ่มหนึ่งรายการและเสียงของมันลงบนกระดานของคุณ โดยแต่ละหมวดหมู่จะมีแท็บของตัวเอง"
 }

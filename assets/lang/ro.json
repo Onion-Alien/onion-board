@@ -3430,5 +3430,9 @@
   "snappy": "sec",
   "soft": "moale",
   "warm": "cald",
-  "clean": "curat"
+  "clean": "curat",
+  "Hear {name}": "Ascultă {name}",
+  "Hear {name} (only you hear it)": "Ascultă {name} (doar tu auzi)",
+  "Pick your headphones in Settings → Audio to hear the samples.": "Alege-ți căștile în Setări → Audio ca să asculți mostrele.",
+  "Ready-made boards, free to use anywhere: in games, streams and videos. Press a sound to hear it first (only you hear it). Add a pack and its sounds land on your board, each category as its own tab.": "Plăci gata făcute, care pot fi folosite gratuit oriunde: în jocuri, streamuri și videoclipuri. Apasă pe un sunet ca să-l asculți întâi (doar tu îl auzi). Adaugă unul și sunetele sale ajung pe tabla ta, fiecare categorie ca filă proprie."
 }

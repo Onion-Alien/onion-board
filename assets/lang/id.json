@@ -3280,5 +3280,9 @@
   "snappy": "tangkas",
   "soft": "lembut",
   "warm": "hangat",
-  "clean": "bersih"
+  "clean": "bersih",
+  "Hear {name}": "Dengarkan {name}",
+  "Hear {name} (only you hear it)": "Dengarkan {name} (hanya kamu yang dengar)",
+  "Pick your headphones in Settings → Audio to hear the samples.": "Pilih headphone kamu di Pengaturan → Audio untuk mendengar contohnya.",
+  "Ready-made boards, free to use anywhere: in games, streams and videos. Press a sound to hear it first (only you hear it). Add a pack and its sounds land on your board, each category as its own tab.": "Papan siap pakai, bebas digunakan di mana saja: dalam game, streaming, dan video. Tekan suara untuk mendengarnya dulu (hanya Anda yang mendengar). Tambahkan satu dan suaranya akan mendarat di papan Anda, setiap kategori sebagai tabnya sendiri."
 }

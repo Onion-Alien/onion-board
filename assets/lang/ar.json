@@ -3655,5 +3655,9 @@
   "snappy": "خاطف",
   "soft": "ناعم",
   "warm": "دافئ",
-  "clean": "نظيف"
+  "clean": "نظيف",
+  "Hear {name}": "استمع إلى {name}",
+  "Hear {name} (only you hear it)": "استمع إلى {name} (أنت فقط تسمعه)",
+  "Pick your headphones in Settings → Audio to hear the samples.": "اختر سماعاتك في الإعدادات ← صوتي لتسمع العينات.",
+  "Ready-made boards, free to use anywhere: in games, streams and videos. Press a sound to hear it first (only you hear it). Add a pack and its sounds land on your board, each category as its own tab.": "لوحات جاهزة، يمكن استخدامها مجانًا في أي مكان: في الألعاب وعمليات البث ومقاطع الفيديو. اضغط على صوت لتسمعه أولًا (أنت فقط تسمعه). أضف واحدة وستهبط أصواتها على لوحتك، وستكون كل فئة علامة تبويب خاصة بها."
 }
