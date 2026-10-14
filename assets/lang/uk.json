@@ -331,7 +331,6 @@
   "Record": "Запис",
   "Record a sound": "Записати звук",
   "Record again": "Записати ще раз",
-  "Record your voice, or a bit of a sound, song or the radio while it plays, and keep it as a sound.": "Запиши свій голос або шматок звуку, пісні чи радіо, поки воно грає, і збережи як звук.",
   "Recording what's playing… play a sound, a search result or the radio now, then click Stop.": "Записую те, що грає… увімкни звук, результат пошуку чи радіо, потім натисни «Стоп».",
   "Recording… click Stop when you're done.": "Записую… натисни «Стоп», коли закінчиш.",
   "Redline": "Червона зона",
@@ -3477,5 +3476,8 @@
   "Drag: move him. Scroll: bigger or smaller. Hover for the buttons.": "Перетягни: посунути. Коліщатко: більший чи менший. Наведи мишу, щоб побачити кнопки.",
   "Open the full board": "Відкрити весь борд",
   "Turn into Bun": "Перетворитися на Bun",
-  "Turn into Bun: a small Bun floating on top instead of this window. The button under him brings it back.": "Перетворитися на Bun: маленький Bun літає поверх усього замість цього вікна. Кнопка під ним повертає вікно."
+  "Turn into Bun: a small Bun floating on top instead of this window. The button under him brings it back.": "Перетворитися на Bun: маленький Bun літає поверх усього замість цього вікна. Кнопка під ним повертає вікно.",
+  "Record your voice, a bit of a sound, song or the radio while it plays, or both at once, and keep it as a sound.": "Запишіть свій голос, шматочок звуку, пісні чи радіо, поки вони грають, або все разом, і збережіть як звук.",
+  "Recording your voice and what's playing… talk, play a sound, then click Stop.": "Записуються ваш голос і те, що грає… говоріть, увімкніть звук, потім натисніть «Стоп».",
+  "Your voice and what's playing together, as one sound. What's playing goes down while you talk, so your voice stays on top": "Ваш голос і те, що грає, разом, одним звуком. Поки ви говорите, те, що грає, стає тихішим, і ваш голос чути зверху"
 }

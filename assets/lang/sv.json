@@ -883,7 +883,6 @@
   "Record": "Spela in",
   "Record a sound": "Spela in ett ljud",
   "Record again": "Spela in igen",
-  "Record your voice, or a bit of a sound, song or the radio while it plays, and keep it as a sound.": "Spela in din röst, eller en bit av ett ljud, en låt eller radion medan det spelas, och spara det som ett ljud.",
   "Recording what's playing… play a sound, a search result or the radio now, then click Stop.": "Spelar in det som spelas… spela ett ljud, ett sökresultat eller radion nu, och klicka sedan Stoppa.",
   "Recording {n}": "Spelar in {n}",
   "Recording… click Stop when you're done.": "Spelar in… klicka Stoppa när du är klar.",
@@ -3401,5 +3400,8 @@
   "Drag: move him. Scroll: bigger or smaller. Hover for the buttons.": "Dra: flytta honom. Scrolla: större eller mindre. Håll musen över honom för knapparna.",
   "Open the full board": "Öppna hela boardet",
   "Turn into Bun": "Bli Bun",
-  "Turn into Bun: a small Bun floating on top instead of this window. The button under him brings it back.": "Bli Bun: en liten Bun som svävar överst i stället för det här fönstret. Knappen under honom tar tillbaka det."
+  "Turn into Bun: a small Bun floating on top instead of this window. The button under him brings it back.": "Bli Bun: en liten Bun som svävar överst i stället för det här fönstret. Knappen under honom tar tillbaka det.",
+  "Record your voice, a bit of a sound, song or the radio while it plays, or both at once, and keep it as a sound.": "Spela in din röst, en bit av ett ljud, en låt eller radion medan den spelas, eller båda på en gång, och spara det som ett ljud.",
+  "Recording your voice and what's playing… talk, play a sound, then click Stop.": "Spelar in din röst och det som spelas… prata, spela upp ett ljud och klicka sedan på Stoppa.",
+  "Your voice and what's playing together, as one sound. What's playing goes down while you talk, so your voice stays on top": "Din röst och det som spelas tillsammans, som ett ljud. Det som spelas sänks medan du pratar, så att din röst hörs ovanpå"
 }

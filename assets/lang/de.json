@@ -325,7 +325,6 @@
   "Record": "Aufnehmen",
   "Record a sound": "Sound aufnehmen",
   "Record again": "Nochmal aufnehmen",
-  "Record your voice, or a bit of a sound, song or the radio while it plays, and keep it as a sound.": "Nimm deine Stimme auf, oder ein Stück eines Sounds, Songs oder des Radios, während es spielt, und behalte es als Sound.",
   "Recording what's playing… play a sound, a search result or the radio now, then click Stop.": "Nehme auf, was spielt… spiel jetzt einen Sound, ein Suchergebnis oder das Radio ab und klick dann auf Stopp.",
   "Recording… click Stop when you're done.": "Nehme auf… klick auf Stopp, wenn du fertig bist.",
   "Redline": "Grenzbereich",
@@ -3401,5 +3400,8 @@
   "Drag: move him. Scroll: bigger or smaller. Hover for the buttons.": "Ziehen: verschieben. Mausrad: größer oder kleiner. Maus drauf für die Knöpfe.",
   "Open the full board": "Ganzes Board öffnen",
   "Turn into Bun": "In Bun verwandeln",
-  "Turn into Bun: a small Bun floating on top instead of this window. The button under him brings it back.": "In Bun verwandeln: ein kleiner Bun schwebt ganz oben statt dieses Fensters. Der Knopf unter ihm holt es zurück."
+  "Turn into Bun: a small Bun floating on top instead of this window. The button under him brings it back.": "In Bun verwandeln: ein kleiner Bun schwebt ganz oben statt dieses Fensters. Der Knopf unter ihm holt es zurück.",
+  "Record your voice, a bit of a sound, song or the radio while it plays, or both at once, and keep it as a sound.": "Nimm deine Stimme auf, ein Stück eines Sounds, Songs oder des Radios, während es läuft, oder beides gleichzeitig, und behalte es als Sound.",
+  "Recording your voice and what's playing… talk, play a sound, then click Stop.": "Deine Stimme und was gerade läuft werden aufgenommen… sprich, spiel einen Sound ab und klick dann auf Stopp.",
+  "Your voice and what's playing together, as one sound. What's playing goes down while you talk, so your voice stays on top": "Deine Stimme und was gerade läuft zusammen als ein Sound. Was läuft, wird leiser, während du sprichst, damit deine Stimme obenauf bleibt"
 }

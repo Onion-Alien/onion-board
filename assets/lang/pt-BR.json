@@ -325,7 +325,6 @@
   "Record": "Gravar",
   "Record a sound": "Gravar um som",
   "Record again": "Gravar de novo",
-  "Record your voice, or a bit of a sound, song or the radio while it plays, and keep it as a sound.": "Grave sua voz, ou um trecho de um som, música ou da rádio enquanto toca, e guarde como som.",
   "Recording what's playing… play a sound, a search result or the radio now, then click Stop.": "Gravando o que está tocando… toque um som, um resultado da busca ou a rádio agora, depois clique em Parar.",
   "Recording… click Stop when you're done.": "Gravando… clique em Parar quando terminar.",
   "Redline": "Zona vermelha",
@@ -3401,5 +3400,8 @@
   "Drag: move him. Scroll: bigger or smaller. Hover for the buttons.": "Arraste: move ele. Roda: maior ou menor. Passe o mouse em cima para os botões.",
   "Open the full board": "Abrir o board inteiro",
   "Turn into Bun": "Virar Bun",
-  "Turn into Bun: a small Bun floating on top instead of this window. The button under him brings it back.": "Virar Bun: um Bun pequeno flutuando por cima no lugar desta janela. O botão embaixo dele traz ela de volta."
+  "Turn into Bun: a small Bun floating on top instead of this window. The button under him brings it back.": "Virar Bun: um Bun pequeno flutuando por cima no lugar desta janela. O botão embaixo dele traz ela de volta.",
+  "Record your voice, a bit of a sound, song or the radio while it plays, or both at once, and keep it as a sound.": "Grave sua voz, um trecho de um som, música ou do rádio enquanto toca, ou os dois ao mesmo tempo, e guarde como um som.",
+  "Recording your voice and what's playing… talk, play a sound, then click Stop.": "Gravando sua voz e o que está tocando… fale, toque um som e clique em Parar.",
+  "Your voice and what's playing together, as one sound. What's playing goes down while you talk, so your voice stays on top": "Sua voz e o que está tocando juntos, como um só som. O que está tocando abaixa enquanto você fala, para sua voz ficar por cima"
 }

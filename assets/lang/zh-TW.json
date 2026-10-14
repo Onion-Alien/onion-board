@@ -319,7 +319,6 @@
   "Record": "錄音",
   "Record a sound": "錄製音效",
   "Record again": "重新錄音",
-  "Record your voice, or a bit of a sound, song or the radio while it plays, and keep it as a sound.": "錄下你的聲音，或在音效、歌曲或電台播放時錄下一段，存成音效。",
   "Recording what's playing… play a sound, a search result or the radio now, then click Stop.": "正在錄製播放中的聲音… 現在播放音效、搜尋結果或電台，然後按「停止」。",
   "Recording… click Stop when you're done.": "錄音中… 完成後按「停止」。",
   "Redline": "極限",
@@ -3325,5 +3324,8 @@
   "Drag: move him. Scroll: bigger or smaller. Hover for the buttons.": "拖曳：移動他。滾輪：變大或變小。滑鼠移上去會出現按鈕。",
   "Open the full board": "開啟完整音效板",
   "Turn into Bun": "變成 Bun",
-  "Turn into Bun: a small Bun floating on top instead of this window. The button under him brings it back.": "變成 Bun：一隻小小的 Bun 浮在最上層，取代這個視窗。他下面的按鈕能把視窗叫回來。"
+  "Turn into Bun: a small Bun floating on top instead of this window. The button under him brings it back.": "變成 Bun：一隻小小的 Bun 浮在最上層，取代這個視窗。他下面的按鈕能把視窗叫回來。",
+  "Record your voice, a bit of a sound, song or the radio while it plays, or both at once, and keep it as a sound.": "錄下你的聲音，或正在播放的音效、歌曲或電台的一段，或兩者同時錄，並儲存為音效。",
+  "Recording your voice and what's playing… talk, play a sound, then click Stop.": "正在錄製你的聲音和正在播放的內容… 說話、播放一個音效，然後按一下停止。",
+  "Your voice and what's playing together, as one sound. What's playing goes down while you talk, so your voice stays on top": "你的聲音和正在播放的內容合成一個音效。你說話時正在播放的內容會變小，讓你的聲音保持在上面"
 }

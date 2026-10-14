@@ -883,7 +883,6 @@
   "Record": "I-record",
   "Record a sound": "Mag-record ng sound",
   "Record again": "I-record ulit",
-  "Record your voice, or a bit of a sound, song or the radio while it plays, and keep it as a sound.": "I-record ang boses mo, o bahagi ng sound, kanta o radio habang nagpe-play, at itago ito bilang sound.",
   "Recording what's playing… play a sound, a search result or the radio now, then click Stop.": "Nire-record ang nagpe-play… mag-play ng sound, search result o radio ngayon, tapos i-click ang Itigil.",
   "Recording {n}": "Recording {n}",
   "Recording… click Stop when you're done.": "Nagre-record… i-click ang Itigil kapag tapos ka na.",
@@ -3401,5 +3400,8 @@
   "Drag: move him. Scroll: bigger or smaller. Hover for the buttons.": "I-drag: ilipat siya. Scroll: palakihin o paliitin. I-hover para sa mga button.",
   "Open the full board": "Buksan ang buong board",
   "Turn into Bun": "Maging Bun",
-  "Turn into Bun: a small Bun floating on top instead of this window. The button under him brings it back.": "Maging Bun: isang maliit na Bun na lumulutang sa ibabaw sa halip na window na ito. Ibinabalik ito ng button sa ilalim niya."
+  "Turn into Bun: a small Bun floating on top instead of this window. The button under him brings it back.": "Maging Bun: isang maliit na Bun na lumulutang sa ibabaw sa halip na window na ito. Ibinabalik ito ng button sa ilalim niya.",
+  "Record your voice, a bit of a sound, song or the radio while it plays, or both at once, and keep it as a sound.": "I-record ang boses mo, isang bahagi ng tunog, kanta o radyo habang tumutugtog, o pareho nang sabay, at itago ito bilang tunog.",
+  "Recording your voice and what's playing… talk, play a sound, then click Stop.": "Nire-record ang boses mo at ang tumutugtog… magsalita, magpatugtog ng tunog, saka i-click ang Itigil.",
+  "Your voice and what's playing together, as one sound. What's playing goes down while you talk, so your voice stays on top": "Ang boses mo at ang tumutugtog nang magkasama, bilang isang tunog. Humihina ang tumutugtog habang nagsasalita ka, kaya nananatiling nasa ibabaw ang boses mo"
 }

@@ -883,7 +883,6 @@
   "Record": "Ηχογράφηση",
   "Record a sound": "Ηχογράφηση ήχου",
   "Record again": "Ηχογράφηση ξανά",
-  "Record your voice, or a bit of a sound, song or the radio while it plays, and keep it as a sound.": "Ηχογράφησε τη φωνή σου, ή ένα κομμάτι από ήχο, τραγούδι ή το ραδιόφωνο όσο παίζει, και κράτα το ως ήχο.",
   "Recording what's playing… play a sound, a search result or the radio now, then click Stop.": "Ηχογραφώ ό,τι παίζει… παίξε τώρα έναν ήχο, ένα αποτέλεσμα αναζήτησης ή το ραδιόφωνο, μετά κάνε κλικ στο Στοπ.",
   "Recording {n}": "Ηχογράφηση {n}",
   "Recording… click Stop when you're done.": "Ηχογράφηση… κάνε κλικ στο Στοπ όταν τελειώσεις.",
@@ -3401,5 +3400,8 @@
   "Drag: move him. Scroll: bigger or smaller. Hover for the buttons.": "Σύρε: μετακίνησέ τον. Ροδέλα: μεγαλύτερος ή μικρότερος. Πέρνα το ποντίκι από πάνω για τα κουμπιά.",
   "Open the full board": "Άνοιγμα ολόκληρου του board",
   "Turn into Bun": "Γίνε Bun",
-  "Turn into Bun: a small Bun floating on top instead of this window. The button under him brings it back.": "Γίνε Bun: ένας μικρός Bun που αιωρείται από πάνω αντί γι' αυτό το παράθυρο. Το κουμπί από κάτω του το φέρνει πίσω."
+  "Turn into Bun: a small Bun floating on top instead of this window. The button under him brings it back.": "Γίνε Bun: ένας μικρός Bun που αιωρείται από πάνω αντί γι' αυτό το παράθυρο. Το κουμπί από κάτω του το φέρνει πίσω.",
+  "Record your voice, a bit of a sound, song or the radio while it plays, or both at once, and keep it as a sound.": "Ηχογραφήστε τη φωνή σας, ένα κομμάτι ήχου, τραγουδιού ή του ραδιοφώνου όσο παίζει, ή και τα δύο μαζί, και κρατήστε το ως ήχο.",
+  "Recording your voice and what's playing… talk, play a sound, then click Stop.": "Ηχογραφείται η φωνή σας και ό,τι παίζει… μιλήστε, παίξτε έναν ήχο και πατήστε Διακοπή.",
+  "Your voice and what's playing together, as one sound. What's playing goes down while you talk, so your voice stays on top": "Η φωνή σας και ό,τι παίζει μαζί, ως ένας ήχος. Ό,τι παίζει χαμηλώνει όταν μιλάτε, ώστε η φωνή σας να ακούγεται από πάνω"
 }

@@ -325,7 +325,6 @@
   "Record": "रिकॉर्ड",
   "Record a sound": "साउंड रिकॉर्ड करें",
   "Record again": "फिर से रिकॉर्ड करें",
-  "Record your voice, or a bit of a sound, song or the radio while it plays, and keep it as a sound.": "अपनी आवाज़ रिकॉर्ड करें, या चलते हुए किसी साउंड, गाने या रेडियो का हिस्सा, और उसे साउंड के रूप में रखें।",
   "Recording what's playing… play a sound, a search result or the radio now, then click Stop.": "जो चल रहा है वह रिकॉर्ड हो रहा है… अभी कोई साउंड, सर्च नतीजा या रेडियो चलाएँ, फिर रोकें पर क्लिक करें।",
   "Recording… click Stop when you're done.": "रिकॉर्डिंग… हो जाने पर रोकें पर क्लिक करें।",
   "Redline": "रेडलाइन",
@@ -3401,5 +3400,8 @@
   "Drag: move him. Scroll: bigger or smaller. Hover for the buttons.": "खींचें: उसे हिलाएँ। स्क्रॉल: बड़ा या छोटा। बटन के लिए उस पर माउस ले जाएँ।",
   "Open the full board": "पूरा बोर्ड खोलें",
   "Turn into Bun": "Bun बन जाएँ",
-  "Turn into Bun: a small Bun floating on top instead of this window. The button under him brings it back.": "Bun बन जाएँ: इस विंडो की जगह सबसे ऊपर तैरता एक छोटा Bun। उसके नीचे वाला बटन इसे वापस लाता है।"
+  "Turn into Bun: a small Bun floating on top instead of this window. The button under him brings it back.": "Bun बन जाएँ: इस विंडो की जगह सबसे ऊपर तैरता एक छोटा Bun। उसके नीचे वाला बटन इसे वापस लाता है।",
+  "Record your voice, a bit of a sound, song or the radio while it plays, or both at once, and keep it as a sound.": "अपनी आवाज़, या चलते समय किसी साउंड, गाने या रेडियो का हिस्सा, या दोनों एक साथ रिकॉर्ड करें, और उसे साउंड के रूप में रखें।",
+  "Recording your voice and what's playing… talk, play a sound, then click Stop.": "आपकी आवाज़ और जो चल रहा है, रिकॉर्ड हो रहा है… बोलें, कोई साउंड चलाएँ, फिर रोकें पर क्लिक करें।",
+  "Your voice and what's playing together, as one sound. What's playing goes down while you talk, so your voice stays on top": "आपकी आवाज़ और जो चल रहा है, एक साथ एक साउंड के रूप में। आपके बोलते समय जो चल रहा है वह धीमा हो जाता है, ताकि आपकी आवाज़ ऊपर रहे"
 }

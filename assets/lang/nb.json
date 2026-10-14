@@ -883,7 +883,6 @@
   "Record": "Ta opp",
   "Record a sound": "Ta opp en lyd",
   "Record again": "Ta opp igjen",
-  "Record your voice, or a bit of a sound, song or the radio while it plays, and keep it as a sound.": "Ta opp stemmen din, eller en bit av en lyd, en sang eller radioen mens den spilles, og behold den som en lyd.",
   "Recording what's playing… play a sound, a search result or the radio now, then click Stop.": "Tar opp det som spilles… spill en lyd, et søkeresultat eller radioen nå, og klikk Stopp.",
   "Recording {n}": "Opptak {n}",
   "Recording… click Stop when you're done.": "Tar opp… klikk Stopp når du er ferdig.",
@@ -3401,5 +3400,8 @@
   "Drag: move him. Scroll: bigger or smaller. Hover for the buttons.": "Dra: flytt ham. Rull: større eller mindre. Hold musen over ham for knappene.",
   "Open the full board": "Åpne hele brettet",
   "Turn into Bun": "Bli til Bun",
-  "Turn into Bun: a small Bun floating on top instead of this window. The button under him brings it back.": "Bli til Bun: en liten Bun som svever øverst i stedet for dette vinduet. Knappen under ham henter det tilbake."
+  "Turn into Bun: a small Bun floating on top instead of this window. The button under him brings it back.": "Bli til Bun: en liten Bun som svever øverst i stedet for dette vinduet. Knappen under ham henter det tilbake.",
+  "Record your voice, a bit of a sound, song or the radio while it plays, or both at once, and keep it as a sound.": "Ta opp stemmen din, en bit av en lyd, en sang eller radioen mens den spiller, eller begge deler samtidig, og behold det som en lyd.",
+  "Recording your voice and what's playing… talk, play a sound, then click Stop.": "Tar opp stemmen din og det som spilles… snakk, spill av en lyd, og klikk så Stopp.",
+  "Your voice and what's playing together, as one sound. What's playing goes down while you talk, so your voice stays on top": "Stemmen din og det som spilles sammen, som én lyd. Det som spilles, skrus ned mens du snakker, så stemmen din ligger øverst"
 }

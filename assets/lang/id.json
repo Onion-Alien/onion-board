@@ -319,7 +319,6 @@
   "Record": "Rekam",
   "Record a sound": "Rekam suara",
   "Record again": "Rekam lagi",
-  "Record your voice, or a bit of a sound, song or the radio while it plays, and keep it as a sound.": "Rekam suaramu, atau sepotong suara, lagu, atau radio selagi diputar, lalu simpan sebagai suara.",
   "Recording what's playing… play a sound, a search result or the radio now, then click Stop.": "Merekam yang sedang diputar… putar suara, hasil pencarian, atau radio sekarang, lalu klik Stop.",
   "Recording… click Stop when you're done.": "Merekam… klik Stop kalau sudah selesai.",
   "Redline": "Redline",
@@ -3325,5 +3324,8 @@
   "Drag: move him. Scroll: bigger or smaller. Hover for the buttons.": "Seret: pindahkan dia. Gulir: lebih besar atau lebih kecil. Arahkan kursor untuk tombolnya.",
   "Open the full board": "Buka board penuh",
   "Turn into Bun": "Jadi Bun",
-  "Turn into Bun: a small Bun floating on top instead of this window. The button under him brings it back.": "Jadi Bun: Bun kecil melayang di atas menggantikan jendela ini. Tombol di bawahnya mengembalikannya."
+  "Turn into Bun: a small Bun floating on top instead of this window. The button under him brings it back.": "Jadi Bun: Bun kecil melayang di atas menggantikan jendela ini. Tombol di bawahnya mengembalikannya.",
+  "Record your voice, a bit of a sound, song or the radio while it plays, or both at once, and keep it as a sound.": "Rekam suaramu, sepotong suara, lagu, atau radio saat diputar, atau keduanya sekaligus, lalu simpan sebagai suara.",
+  "Recording your voice and what's playing… talk, play a sound, then click Stop.": "Merekam suaramu dan yang sedang diputar… bicaralah, putar suara, lalu klik Berhenti.",
+  "Your voice and what's playing together, as one sound. What's playing goes down while you talk, so your voice stays on top": "Suaramu dan yang sedang diputar bersama, sebagai satu suara. Yang diputar mengecil saat kamu bicara, jadi suaramu tetap di atas"
 }

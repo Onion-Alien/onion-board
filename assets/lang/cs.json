@@ -897,7 +897,6 @@
   "Record": "Nahrát",
   "Record a sound": "Nahrát zvuk",
   "Record again": "Nahrát znovu",
-  "Record your voice, or a bit of a sound, song or the radio while it plays, and keep it as a sound.": "Nahraj svůj hlas, nebo kousek zvuku, písničky či rádia, zatímco hraje, a nech si ho jako zvuk.",
   "Recording what's playing… play a sound, a search result or the radio now, then click Stop.": "Nahrávám, co hraje… pusť teď zvuk, výsledek hledání nebo rádio a pak klikni na Zastavit.",
   "Recording {n}": "Nahrávka {n}",
   "Recording… click Stop when you're done.": "Nahrávám… na konci klikni na Zastavit.",
@@ -3477,5 +3476,8 @@
   "Drag: move him. Scroll: bigger or smaller. Hover for the buttons.": "Táhni: přesune ho. Kolečko: větší nebo menší. Najeď na něj pro tlačítka.",
   "Open the full board": "Otevřít celý board",
   "Turn into Bun": "Proměnit v Buna",
-  "Turn into Bun: a small Bun floating on top instead of this window. The button under him brings it back.": "Proměnit v Buna: malý Bun plovoucí navrchu místo tohohle okna. Tlačítko pod ním ho vrátí."
+  "Turn into Bun: a small Bun floating on top instead of this window. The button under him brings it back.": "Proměnit v Buna: malý Bun plovoucí navrchu místo tohohle okna. Tlačítko pod ním ho vrátí.",
+  "Record your voice, a bit of a sound, song or the radio while it plays, or both at once, and keep it as a sound.": "Nahrajte svůj hlas, kousek zvuku, písně nebo rádia, když hraje, nebo obojí naráz, a uložte si to jako zvuk.",
+  "Recording your voice and what's playing… talk, play a sound, then click Stop.": "Nahrává se váš hlas a to, co hraje… mluvte, pusťte zvuk a pak klikněte na Zastavit.",
+  "Your voice and what's playing together, as one sound. What's playing goes down while you talk, so your voice stays on top": "Váš hlas a to, co hraje, dohromady jako jeden zvuk. Když mluvíte, to, co hraje, se ztiší, takže váš hlas zůstane navrchu"
 }

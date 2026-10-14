@@ -319,7 +319,6 @@
   "Record": "Ghi",
   "Record a sound": "Ghi âm thanh",
   "Record again": "Ghi lại",
-  "Record your voice, or a bit of a sound, song or the radio while it plays, and keep it as a sound.": "Ghi giọng bạn, hoặc một đoạn âm thanh, bài hát hay radio khi nó đang phát, rồi giữ thành âm thanh.",
   "Recording what's playing… play a sound, a search result or the radio now, then click Stop.": "Đang ghi những gì đang phát… phát một âm thanh, kết quả tìm kiếm hoặc radio ngay, rồi bấm Dừng.",
   "Recording… click Stop when you're done.": "Đang ghi… bấm Dừng khi xong.",
   "Redline": "Vượt ngưỡng",
@@ -3325,5 +3324,8 @@
   "Drag: move him. Scroll: bigger or smaller. Hover for the buttons.": "Kéo: di chuyển cậu ấy. Cuộn: to hơn hoặc nhỏ hơn. Di chuột lên để thấy các nút.",
   "Open the full board": "Mở toàn bộ board",
   "Turn into Bun": "Biến thành Bun",
-  "Turn into Bun: a small Bun floating on top instead of this window. The button under him brings it back.": "Biến thành Bun: một Bun nhỏ bay lơ lửng trên cùng thay cho cửa sổ này. Nút bên dưới cậu ấy sẽ đưa cửa sổ trở lại."
+  "Turn into Bun: a small Bun floating on top instead of this window. The button under him brings it back.": "Biến thành Bun: một Bun nhỏ bay lơ lửng trên cùng thay cho cửa sổ này. Nút bên dưới cậu ấy sẽ đưa cửa sổ trở lại.",
+  "Record your voice, a bit of a sound, song or the radio while it plays, or both at once, and keep it as a sound.": "Ghi âm giọng của bạn, một đoạn âm thanh, bài hát hoặc radio khi đang phát, hoặc cả hai cùng lúc, rồi giữ lại làm âm thanh.",
+  "Recording your voice and what's playing… talk, play a sound, then click Stop.": "Đang ghi giọng của bạn và thứ đang phát… hãy nói, phát một âm thanh, rồi bấm Dừng.",
+  "Your voice and what's playing together, as one sound. What's playing goes down while you talk, so your voice stays on top": "Giọng của bạn và thứ đang phát cùng nhau, thành một âm thanh. Thứ đang phát nhỏ lại khi bạn nói, nên giọng bạn luôn nổi bên trên"
 }

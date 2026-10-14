@@ -883,7 +883,6 @@
   "Record": "Nauhoita",
   "Record a sound": "Nauhoita ääni",
   "Record again": "Nauhoita uudelleen",
-  "Record your voice, or a bit of a sound, song or the radio while it plays, and keep it as a sound.": "Nauhoita puheesi, tai pätkä äänestä, kappaleesta tai radiosta sen soidessa, ja säilytä se äänenä.",
   "Recording what's playing… play a sound, a search result or the radio now, then click Stop.": "Nauhoitetaan soivaa… soita nyt ääni, hakutulos tai radio, ja klikkaa sitten Pysäytä.",
   "Recording {n}": "Nauhoitus {n}",
   "Recording… click Stop when you're done.": "Nauhoitetaan… klikkaa Pysäytä, kun olet valmis.",
@@ -3401,5 +3400,8 @@
   "Drag: move him. Scroll: bigger or smaller. Hover for the buttons.": "Vedä: siirrä häntä. Rulla: isompi tai pienempi. Vie hiiri päälle, niin näet napit.",
   "Open the full board": "Avaa koko board",
   "Turn into Bun": "Muutu Buniksi",
-  "Turn into Bun: a small Bun floating on top instead of this window. The button under him brings it back.": "Muutu Buniksi: pieni Bun leijuu päällimmäisenä tämän ikkunan tilalla. Hänen alla oleva nappi tuo sen takaisin."
+  "Turn into Bun: a small Bun floating on top instead of this window. The button under him brings it back.": "Muutu Buniksi: pieni Bun leijuu päällimmäisenä tämän ikkunan tilalla. Hänen alla oleva nappi tuo sen takaisin.",
+  "Record your voice, a bit of a sound, song or the radio while it plays, or both at once, and keep it as a sound.": "Äänitä äänesi, pätkä äänestä, kappaleesta tai radiosta sen soidessa, tai molemmat kerralla, ja tallenna se ääneksi.",
+  "Recording your voice and what's playing… talk, play a sound, then click Stop.": "Äänitetään ääntäsi ja sitä, mikä soi… puhu, soita ääni ja napsauta sitten Pysäytä.",
+  "Your voice and what's playing together, as one sound. What's playing goes down while you talk, so your voice stays on top": "Äänesi ja se, mikä soi, yhdessä yhtenä äänenä. Se, mikä soi, hiljenee puhuessasi, joten äänesi kuuluu päällimmäisenä"
 }

@@ -325,7 +325,6 @@
   "Record": "Registra",
   "Record a sound": "Registra un suono",
   "Record again": "Registra di nuovo",
-  "Record your voice, or a bit of a sound, song or the radio while it plays, and keep it as a sound.": "Registra la tua voce, o un pezzo di un suono, di una canzone o della radio mentre suona, e tienilo come suono.",
   "Recording what's playing… play a sound, a search result or the radio now, then click Stop.": "Registro ciò che suona… fai partire ora un suono, un risultato di ricerca o la radio, poi clicca Stop.",
   "Recording… click Stop when you're done.": "Registrazione… clicca Stop quando hai finito.",
   "Redline": "Al limite",
@@ -3401,5 +3400,8 @@
   "Drag: move him. Scroll: bigger or smaller. Hover for the buttons.": "Trascina: spostalo. Rotella: più grande o più piccolo. Passaci sopra per i pulsanti.",
   "Open the full board": "Apri la board intera",
   "Turn into Bun": "Trasformati in Bun",
-  "Turn into Bun: a small Bun floating on top instead of this window. The button under him brings it back.": "Trasformati in Bun: un piccolo Bun che fluttua sopra tutto al posto di questa finestra. Il pulsante sotto di lui la riporta."
+  "Turn into Bun: a small Bun floating on top instead of this window. The button under him brings it back.": "Trasformati in Bun: un piccolo Bun che fluttua sopra tutto al posto di questa finestra. Il pulsante sotto di lui la riporta.",
+  "Record your voice, a bit of a sound, song or the radio while it plays, or both at once, and keep it as a sound.": "Registra la tua voce, un pezzo di un suono, di una canzone o della radio mentre suona, o entrambi insieme, e tienilo come suono.",
+  "Recording your voice and what's playing… talk, play a sound, then click Stop.": "Registrazione della tua voce e di ciò che sta suonando… parla, riproduci un suono, poi fai clic su Interrompi.",
+  "Your voice and what's playing together, as one sound. What's playing goes down while you talk, so your voice stays on top": "La tua voce e ciò che sta suonando insieme, come un unico suono. Ciò che suona si abbassa mentre parli, così la tua voce resta sopra"
 }

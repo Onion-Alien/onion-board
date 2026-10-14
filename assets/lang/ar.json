@@ -349,7 +349,6 @@
   "Record": "تسجيل",
   "Record a sound": "سجّل صوتًا",
   "Record again": "سجّل مجددًا",
-  "Record your voice, or a bit of a sound, song or the radio while it plays, and keep it as a sound.": "سجّل صوتك، أو جزءًا من صوت أو أغنية أو الراديو أثناء تشغيله، واحتفظ به كصوت.",
   "Recording what's playing… play a sound, a search result or the radio now, then click Stop.": "جارٍ تسجيل ما يُشغَّل… شغّل صوتًا أو نتيجة بحث أو الراديو الآن، ثم انقر إيقاف.",
   "Recording… click Stop when you're done.": "جارٍ التسجيل… انقر إيقاف عند الانتهاء.",
   "Redline": "الخط الأحمر",
@@ -3705,5 +3704,8 @@
   "Drag: move him. Scroll: bigger or smaller. Hover for the buttons.": "اسحب: لتحريكه. مرّر العجلة: أكبر أو أصغر. مرّر الماوس فوقه لتظهر الأزرار.",
   "Open the full board": "فتح اللوحة كاملة",
   "Turn into Bun": "تحوّل إلى Bun",
-  "Turn into Bun: a small Bun floating on top instead of this window. The button under him brings it back.": "تحوّل إلى Bun: أرنب Bun صغير يطفو فوق كل شيء بدل هذه النافذة. الزر تحته يعيدها."
+  "Turn into Bun: a small Bun floating on top instead of this window. The button under him brings it back.": "تحوّل إلى Bun: أرنب Bun صغير يطفو فوق كل شيء بدل هذه النافذة. الزر تحته يعيدها.",
+  "Record your voice, a bit of a sound, song or the radio while it plays, or both at once, and keep it as a sound.": "سجّل صوتك، أو جزءًا من صوت أو أغنية أو الراديو أثناء تشغيله، أو الاثنين معًا، واحتفظ به كصوت.",
+  "Recording your voice and what's playing… talk, play a sound, then click Stop.": "جارٍ تسجيل صوتك وما يُشغَّل… تحدّث، شغّل صوتًا، ثم انقر إيقاف.",
+  "Your voice and what's playing together, as one sound. What's playing goes down while you talk, so your voice stays on top": "صوتك وما يُشغَّل معًا، كصوت واحد. ينخفض ما يُشغَّل أثناء حديثك، فيبقى صوتك واضحًا فوقه"
 }

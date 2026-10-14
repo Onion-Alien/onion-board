@@ -325,7 +325,6 @@
   "Record": "Kaydet",
   "Record a sound": "Ses kaydet",
   "Record again": "Tekrar kaydet",
-  "Record your voice, or a bit of a sound, song or the radio while it plays, and keep it as a sound.": "Sesini ya da çalarken bir sesin, şarkının veya radyonun bir parçasını kaydet ve ses olarak sakla.",
   "Recording what's playing… play a sound, a search result or the radio now, then click Stop.": "Çalan kaydediliyor… şimdi bir ses, bir arama sonucu ya da radyoyu çal, sonra Durdur'a tıkla.",
   "Recording… click Stop when you're done.": "Kaydediliyor… bitince Durdur'a tıkla.",
   "Redline": "Kırmızı çizgi",
@@ -3401,5 +3400,8 @@
   "Drag: move him. Scroll: bigger or smaller. Hover for the buttons.": "Sürükle: onu taşı. Kaydır: büyüt veya küçült. Düğmeler için üzerine gel.",
   "Open the full board": "Tüm board'u aç",
   "Turn into Bun": "Bun'a dönüş",
-  "Turn into Bun: a small Bun floating on top instead of this window. The button under him brings it back.": "Bun'a dönüş: bu pencere yerine en üstte süzülen küçük bir Bun. Altındaki düğme pencereyi geri getirir."
+  "Turn into Bun: a small Bun floating on top instead of this window. The button under him brings it back.": "Bun'a dönüş: bu pencere yerine en üstte süzülen küçük bir Bun. Altındaki düğme pencereyi geri getirir.",
+  "Record your voice, a bit of a sound, song or the radio while it plays, or both at once, and keep it as a sound.": "Sesini, çalarken bir sesin, şarkının ya da radyonun bir kısmını veya ikisini birden kaydet ve ses olarak sakla.",
+  "Recording your voice and what's playing… talk, play a sound, then click Stop.": "Sesin ve çalan kaydediliyor… konuş, bir ses çal, sonra Durdur'a tıkla.",
+  "Your voice and what's playing together, as one sound. What's playing goes down while you talk, so your voice stays on top": "Sesin ve çalan birlikte, tek bir ses olarak. Sen konuşurken çalanın sesi kısılır, böylece sesin üstte kalır"
 }

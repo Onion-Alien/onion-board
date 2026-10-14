@@ -331,7 +331,6 @@
   "Record": "Nagraj",
   "Record a sound": "Nagraj dźwięk",
   "Record again": "Nagraj ponownie",
-  "Record your voice, or a bit of a sound, song or the radio while it plays, and keep it as a sound.": "Nagraj swój głos albo kawałek dźwięku, piosenki czy radia, gdy gra, i zachowaj go jako dźwięk.",
   "Recording what's playing… play a sound, a search result or the radio now, then click Stop.": "Nagrywanie tego, co gra… zagraj teraz dźwięk, wynik wyszukiwania albo radio, potem kliknij Stop.",
   "Recording… click Stop when you're done.": "Nagrywanie… kliknij Stop, gdy skończysz.",
   "Redline": "Redline",
@@ -3477,5 +3476,8 @@
   "Drag: move him. Scroll: bigger or smaller. Hover for the buttons.": "Przeciągnij: przesuń go. Kółko: większy lub mniejszy. Najedź na niego, żeby zobaczyć przyciski.",
   "Open the full board": "Otwórz cały board",
   "Turn into Bun": "Zamień się w Buna",
-  "Turn into Bun: a small Bun floating on top instead of this window. The button under him brings it back.": "Zamień się w Buna: mały Bun unoszący się na wierzchu zamiast tego okna. Przycisk pod nim przywraca okno."
+  "Turn into Bun: a small Bun floating on top instead of this window. The button under him brings it back.": "Zamień się w Buna: mały Bun unoszący się na wierzchu zamiast tego okna. Przycisk pod nim przywraca okno.",
+  "Record your voice, a bit of a sound, song or the radio while it plays, or both at once, and keep it as a sound.": "Nagraj swój głos, fragment dźwięku, piosenki lub radia, gdy gra, albo oba naraz, i zachowaj to jako dźwięk.",
+  "Recording your voice and what's playing… talk, play a sound, then click Stop.": "Nagrywanie twojego głosu i tego, co gra… mów, odtwórz dźwięk, a potem kliknij Zatrzymaj.",
+  "Your voice and what's playing together, as one sound. What's playing goes down while you talk, so your voice stays on top": "Twój głos i to, co gra, razem jako jeden dźwięk. To, co gra, cichnie, gdy mówisz, więc twój głos pozostaje na wierzchu"
 }

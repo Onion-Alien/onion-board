@@ -883,7 +883,6 @@
   "Record": "Gravar",
   "Record a sound": "Gravar um som",
   "Record again": "Gravar outra vez",
-  "Record your voice, or a bit of a sound, song or the radio while it plays, and keep it as a sound.": "Grava a tua voz, ou um bocado de um som, de uma música ou do rádio enquanto toca, e guarda-o como som.",
   "Recording what's playing… play a sound, a search result or the radio now, then click Stop.": "A gravar o que está a tocar… toca agora um som, um resultado da pesquisa ou o rádio e depois clica em Parar.",
   "Recording {n}": "A gravar {n}",
   "Recording… click Stop when you're done.": "A gravar… clica em Parar quando acabares.",
@@ -3401,5 +3400,8 @@
   "Drag: move him. Scroll: bigger or smaller. Hover for the buttons.": "Arrastar: movê-lo. Roda: maior ou mais pequeno. Passa o rato por cima para os botões.",
   "Open the full board": "Abrir o board completo",
   "Turn into Bun": "Tornar-se Bun",
-  "Turn into Bun: a small Bun floating on top instead of this window. The button under him brings it back.": "Tornar-se Bun: um Bun pequeno a flutuar por cima em vez desta janela. O botão por baixo dele trá-la de volta."
+  "Turn into Bun: a small Bun floating on top instead of this window. The button under him brings it back.": "Tornar-se Bun: um Bun pequeno a flutuar por cima em vez desta janela. O botão por baixo dele trá-la de volta.",
+  "Record your voice, a bit of a sound, song or the radio while it plays, or both at once, and keep it as a sound.": "Grave a sua voz, um excerto de um som, música ou da rádio enquanto toca, ou os dois ao mesmo tempo, e guarde-o como som.",
+  "Recording your voice and what's playing… talk, play a sound, then click Stop.": "A gravar a sua voz e o que está a tocar… fale, toque um som e clique em Parar.",
+  "Your voice and what's playing together, as one sound. What's playing goes down while you talk, so your voice stays on top": "A sua voz e o que está a tocar juntos, como um só som. O que está a tocar baixa enquanto fala, para a sua voz ficar por cima"
 }

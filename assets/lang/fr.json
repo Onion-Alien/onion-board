@@ -325,7 +325,6 @@
   "Record": "Enregistrer",
   "Record a sound": "Enregistrer un son",
   "Record again": "Réenregistrer",
-  "Record your voice, or a bit of a sound, song or the radio while it plays, and keep it as a sound.": "Enregistre ta voix, ou un bout de son, de chanson ou de radio pendant qu'il joue, et garde-le comme son.",
   "Recording what's playing… play a sound, a search result or the radio now, then click Stop.": "Enregistrement de ce qui joue… joue un son, un résultat de recherche ou la radio maintenant, puis clique sur Arrêter.",
   "Recording… click Stop when you're done.": "Enregistrement… clique sur Arrêter quand tu as fini.",
   "Redline": "Redline",
@@ -3401,5 +3400,8 @@
   "Drag: move him. Scroll: bigger or smaller. Hover for the buttons.": "Glisser : le déplacer. Molette : plus grand ou plus petit. Survole-le pour les boutons.",
   "Open the full board": "Ouvrir le board en entier",
   "Turn into Bun": "Se transformer en Bun",
-  "Turn into Bun: a small Bun floating on top instead of this window. The button under him brings it back.": "Se transformer en Bun : un petit Bun qui flotte par-dessus tout à la place de cette fenêtre. Le bouton sous lui la ramène."
+  "Turn into Bun: a small Bun floating on top instead of this window. The button under him brings it back.": "Se transformer en Bun : un petit Bun qui flotte par-dessus tout à la place de cette fenêtre. Le bouton sous lui la ramène.",
+  "Record your voice, a bit of a sound, song or the radio while it plays, or both at once, and keep it as a sound.": "Enregistrez votre voix, un bout d'un son, d'une chanson ou de la radio pendant qu'il passe, ou les deux à la fois, et gardez-le comme son.",
+  "Recording your voice and what's playing… talk, play a sound, then click Stop.": "Enregistrement de votre voix et de ce qui passe… parlez, lancez un son, puis cliquez sur Arrêter.",
+  "Your voice and what's playing together, as one sound. What's playing goes down while you talk, so your voice stays on top": "Votre voix et ce qui passe ensemble, en un seul son. Ce qui passe baisse pendant que vous parlez, pour que votre voix reste au-dessus"
 }
