@@ -548,12 +548,20 @@ def soft_limit(x: np.ndarray, knee: float = 0.89) -> np.ndarray:
     return x
 
 
-def loud_boost(x: np.ndarray, vol: float) -> np.ndarray:
-    """Headphones over 100 %: the extra comes from rounding the peaks off (soft_limit)
-    before the SafetyLimiter, so a song gets louder. The limiter alone turned the whole
-    song down at each peak: at 300 % a mastered song came out 2.5-4.5 dB quieter than
-    with the rounding. At 100 % and below the path stays clean (in place)."""
-    return soft_limit(x) if vol > 1.0 else x
+def loud_boost(x: np.ndarray, vol: float, ceiling: float = 1.0) -> np.ndarray:
+    """A volume over 100 %: the extra comes from rounding the peaks off (soft_limit,
+    scaled to the `ceiling` of the limiter that follows), so a song gets louder. The
+    limiter alone turned the whole song down at each peak: 300 % and 1000 % came out
+    the same. At 100 % and below the path stays clean (in place)."""
+    if vol <= 1.0:
+        return x
+    if ceiling == 1.0:
+        return soft_limit(x)
+    c = np.float32(ceiling)
+    x /= c
+    soft_limit(x)
+    x *= c
+    return x
 
 
 def peak(x: np.ndarray) -> float:
