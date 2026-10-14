@@ -625,9 +625,10 @@ def test_a_file_share_thumbnail_is_never_fetched(qapp, window):  # noqa: F811
     """A page's own og:image becomes the result's picture: one that isn't a web link
     is dropped, with no request at all."""
     asked = []
+    signal = types.SimpleNamespace(connect=lambda f: None)
     window.ytresults.net.get = lambda req: (asked.append(req.url().toString()),
-                                            types.SimpleNamespace(finished=types.SimpleNamespace(
-                                                connect=lambda f: None)))[1]
+                                            types.SimpleNamespace(finished=signal,
+                                                                  downloadProgress=signal))[1]
     bad = ytdl.Result("x", "Evil", "page", 3, source="generic",
                       link="https://evil.example/page", art="file://host/share/x.jpg")
     good = ytdl.Result("y", "Fine", "page", 3, source="generic",
