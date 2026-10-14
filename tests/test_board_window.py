@@ -157,7 +157,6 @@ def test_export_then_import_through_the_window(window, qapp, tmp_path):
     _loaded(window, qapp)
 
 
-
 def test_export_leaves_out_an_unreadable_sound_and_says_so(window, qapp, tmp_path,
                                                           monkeypatch):
     import builtins
@@ -175,10 +174,12 @@ def test_export_leaves_out_an_unreadable_sound_and_says_so(window, qapp, tmp_pat
     assert "1 sound couldn't be read and was left out" in said(window)
     assert len(backup.read(out).sounds) == 1
 
-def test_zip_files_go_to_the_importer(window, monkeypatch, tmp_path):
+
+def test_zip_files_go_to_the_importer(window, qapp, monkeypatch, tmp_path):
     got = []
     monkeypatch.setattr(window, "import_package", got.append)
-    window.import_files([str(tmp_path / "board.zip")])
+    window.import_files([str(tmp_path / "board.zip")])   # looked into on a worker
+    assert process_events(qapp, lambda: got)
     assert got == [str(tmp_path / "board.zip")]
 
 
