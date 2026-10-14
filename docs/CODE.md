@@ -289,6 +289,7 @@ the launcher the shortcuts and PyInstaller use. The app is the `soundboard` pack
 | `soundboard/quality.py` | Settings > Data & quality: download size, keeping the video, the radio's bitrate cap and patience, and web search extras (low data mode) |
 | `soundboard/radio.py` | Radio tab back end: the Radio Browser directory client (stations, search, a day's cache), the stream player (Qt Multimedia decodes, a `QAudioBufferOutput` hands 48 kHz PCM to the engine; the decoder's DLLs preload on a thread when the tab first opens) and the map's land outlines (SHA-384-checked) |
 | `soundboard/ui/radiopanel.py` | the Radio tab: search bar, the map (click a dot to play), station list, favourites, Send / record / last 15 s, the now-playing strip |
+| `soundboard/ui/radiolist.py` | the Radio tab's station list (`RadioTab.listctl`): Popular / Favorites / Recent, the genre chips, country / quality / sort filters and the painted station rows |
 | `soundboard/ui/flatmap.py` | the Radio tab's world map, painted by Qt (no web engine) |
 | `soundboard/ui/appstate.py` | stops decorative animations (logo, mascots, live dot) while another program is in front |
 | `soundboard/ui/clipeditor.py` | the Apps tab's clip editor, folded away under each card until opened: the live waveform of the program's last minute, drag to select, preview in headphones, Save to clips, the Edit menu and its keys |

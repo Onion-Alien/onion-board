@@ -24,7 +24,7 @@ def test_station_panel_texture_follows_appearance(qapp, app_dir, monkeypatch, na
         for textured in (True, False, True):
             monkeypatch.setattr(theme, "textures_on", textured)
             theme.apply(qapp, name)
-            tab._style_panel()
+            tab.listctl._style_panel()
             qapp.processEvents()
             panel = tab.station_panel
             img = panel.grab().toImage()
