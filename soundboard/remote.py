@@ -707,7 +707,7 @@ def dispatch(mw: MainWindow, action: str, params: dict) -> tuple[int, object]:
         if step:
             if step not in ("next", "prev", "previous"):
                 return 400, {"error": "step= takes next or prev"}
-            mw.step_category(1 if step == "next" else -1)
+            mw.hkctl.step_category(1 if step == "next" else -1)
         elif "name" in params:
             name = params["name"].strip()
             match = find_category(cfg, name)
@@ -753,7 +753,7 @@ def dispatch(mw: MainWindow, action: str, params: dict) -> tuple[int, object]:
         from soundboard.engine import SR
         if len(mw.replay.clip()) < int(0.2 * SR):
             return 409, {"error": mw.replay.error or "nothing has played on this PC lately"}
-        mw.save_replay()
+        mw.hkctl.save_replay()
         return 200, {"saved": True}
     # play / stop: one sound, by id or name
     if action == "stop" and not ("id" in params or "name" in params):
@@ -886,7 +886,7 @@ def dispatch_voice(mw: MainWindow, action: str, params: dict) -> tuple[int, obje
     on = on_value(params, fx.btn_power.isChecked())
     if on is None:
         return 400, BAD_ON
-    mw._set_voice(on)
+    mw.hkctl._set_voice(on)
     return 200, voice_state(mw)
 
 

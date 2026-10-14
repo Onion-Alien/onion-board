@@ -82,7 +82,7 @@ class EditControl(Controller):
             elif ok and m is not None:
                 old_key = soundfx.key(m.fx)
                 d.apply(m)
-                mw._clear_dupe_hotkey(m)
+                mw.hkctl._clear_dupe_hotkey(m)
                 mw.engine.set_gain(sid, mw.gain_for(m))
                 if soundfx.key(m.fx) != old_key:
                     self._rerender(m)
@@ -95,13 +95,13 @@ class EditControl(Controller):
                 mw.setctl._spare_editor = d
             else:   # freed once its finished signal is over (deleting it inside crashed)
                 QTimer.singleShot(0, lambda: free_dialog(d))
-        mw.register_hotkeys()
+        mw.hkctl.register_hotkeys()
 
     def _new_editor(self, m: SoundMeta, tab: str) -> EditDialog:
         mw = self.mw
         d = EditDialog(m, mw.hotkeys, mw.preview, mw, tab=tab,
                        others=lambda: list(mw._meta.values()))
-        d.hotkeys_changed.connect(mw.register_hotkeys)
+        d.hotkeys_changed.connect(mw.hkctl.register_hotkeys)
         d.source_forgotten.connect(mw._save_now)
         d.finished.connect(lambda ok, d=d: self._edit_done(d.meta.id, d, ok))
         return d
@@ -168,7 +168,7 @@ class EditControl(Controller):
             new.name = f"{m.name} (edit)"[:40]
         if new.hotkey == m.hotkey:
             new.hotkey = ""   # the original keeps its hotkey
-        mw._clear_dupe_hotkey(new)
+        mw.hkctl._clear_dupe_hotkey(new)
         mw.catctl._tag_new(new)   # stays in sight in the category showing
         mw.cfg.sounds.insert(mw.cfg.sounds.index(m) + 1, new)
         mw._index()

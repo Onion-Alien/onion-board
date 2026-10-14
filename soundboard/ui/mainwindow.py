@@ -30,9 +30,8 @@ from soundboard import engine as eng
 from soundboard import bunny, theme, winkeys, ytdl, ytworker
 from soundboard.engine import SR, Engine
 from soundboard import exitwatch
-from soundboard import (appaudio, autostart, backup, destination, library, midi,
-                        remote, otherboards, reset, soundfx, thumbs, trash, videos,
-                        voicesdk)
+from soundboard import (appaudio, autostart, backup, destination, library, remote, otherboards,
+                        reset, soundfx, thumbs, trash, videos, voicesdk)
 from soundboard import (appsetup, ffmpegget, net, netlog,
                         profiles, quality, shellicon, thumbbar, tips, tor,
                         usage, watchaddon)
@@ -40,7 +39,6 @@ from soundboard.replay import InstantReplay
 from soundboard.library import (PAD_COLORS, PRESS_MODE, Config,
                                 SoundMeta, cache_keep, fingerprint,
                                 load_original, load_sound, prune_cache, save_clip)
-from soundboard.settings import HOTKEY_ACTIONS, HotkeyDialog, pretty_key
 from soundboard.shuffle import ShuffleBag
 from soundboard.ui.crashdialog import free_dialog
 from soundboard.ui.dialogs import TabHelpPopup
@@ -48,6 +46,7 @@ from soundboard.ui.iconrow import CapIcon
 from soundboard.ui import worker
 from soundboard.ui.dropveil import DropVeil
 from soundboard.ui.ffmpegcontrol import FfmpegControl
+from soundboard.ui.hotkeycontrol import HotkeyControl
 from soundboard.ui.aboutcontrol import AboutControl
 from soundboard.ui.themecontrol import ThemeControl
 from soundboard.ui.settingscontrol import SettingsControl
@@ -99,7 +98,7 @@ from soundboard.wheelguard import AppStyle, no_wheel
 from soundboard.winkeys import Hotkeys
 from soundboard import errors
 from soundboard import i18n
-from soundboard.i18n import _, ngettext
+from soundboard.i18n import _
 
 log = logging.getLogger(__name__)
 
@@ -118,10 +117,6 @@ def version_text() -> str:
 PREVIEW_WHOLE_S = 5 * 60
 PREVIEW_S = 30
 TOAST_EXPAND = QSize(900, 640)   # a shrunk card clicked: the window grows to this
-# shown when instant replay goes on: it records whoever is talking in a call
-REPLAY_NOTE = _("Instant replay is on: your key keeps the last seconds you heard. In some "
-                "places recording a call needs everyone's OK, so only keep clips of people "
-                "who are fine with it.")
 CHIPS_GAP = 6         # between the now-playing row's chips
 CHIPS_ROW_H = 30      # the now-playing row: a chip's 24 px ■ button, its margins and border
 TICK_MS = 33         # the UI timer while the window is on screen (meters, visualisers)
@@ -144,7 +139,6 @@ QUEUE_CHIPS = 5          # queued sounds shown by name above the pads (then "+n 
 SEARCH_WAIT_MS = 100     # typing in the search box filters the pads once it pauses this long
 LINK_WAIT_MS = 400       # a link in the search box is looked up once it stays this long
 PAD_SIZE_WAIT_MS = 50    # dragging Pad size re-lays the pads at most this often
-RANDOM = "__random__:"   # hotkey action prefix: a random sound from the category after it
 TLS_WARM_MS = 2500     # Qt's TLS is set up this long after the start (_warm_tls)
 TIP_DELAY_MS = 8000    # the first tip waits this long after the start
 TIP_RETRY_MS = 60_000  # ...and is tried again this often while it can't show
@@ -329,6 +323,7 @@ class MainWindow(QMainWindow):
 
     def __init__(self):
         super().__init__()
+        self.hkctl = HotkeyControl(self)
         self.aboutctl = AboutControl(self)
         self.themectl = ThemeControl(self)
         self.setctl = SettingsControl(self)
@@ -377,10 +372,10 @@ class MainWindow(QMainWindow):
         self._meta: dict[str, SoundMeta] = {}   # id -> meta, rebuilt when the list changes
         self._index()
         self.hotkeys = Hotkeys()
-        self.hotkeys.fired.connect(self.on_hotkey)
-        self.hotkeys.released.connect(self.on_hotkey_released)
-        self.hotkeys.failed_changed.connect(self.on_hotkeys_failed)
-        self.hotkeys.midi.busy_changed.connect(self.on_midi_busy)
+        self.hotkeys.fired.connect(self.hkctl.on_hotkey)
+        self.hotkeys.released.connect(self.hkctl.on_hotkey_released)
+        self.hotkeys.failed_changed.connect(self.hkctl.on_hotkeys_failed)
+        self.hotkeys.midi.busy_changed.connect(self.hkctl.on_midi_busy)
         self.replay = InstantReplay(self.cfg.replay_seconds)
         # buttons in the taskbar's hover preview, like Discord's mute / deafen
         tb = thumbbar
@@ -393,7 +388,7 @@ class MainWindow(QMainWindow):
             tb.RANDOM: counted(self.play_random),
             tb.LIVE: counted(lambda: self.set_sending(not self.engine.sending))})
         self._radio_paused = None   # the station Pause stopped, for Play to turn back on
-        self.replay.state_changed.connect(self.on_replay_state)
+        self.replay.state_changed.connect(self.hkctl.on_replay_state)
         self.overlay = Overlay(self, self.cfg.overlay)
         self._save_failed_shown = False
         self.bridge = Bridge()
@@ -419,8 +414,6 @@ class MainWindow(QMainWindow):
         self._stopped_at = (0.0, "")       # (when, which) a ■ for one sound last stopped
         self._cool: dict[str, float] = {}   # sid -> time.monotonic() its cooldown ends
         self._waiting: dict[str, list[QTimer]] = {}   # sid -> its delayed starts
-        self._hotkeys_off = False         # "All hotkeys off": only that key still works
-        self._voice_was: bool | None = None   # voice changer state before a held key
         Pad.single_click = self.cfg.single_click
         self._quitting = False            # a real quit (not "close to the tray")
         self._tray_told = False           # the "still running in the tray" note was shown
@@ -497,8 +490,8 @@ class MainWindow(QMainWindow):
         self.load_triggers()   # behind the loading screen, not on the tab's first click
         splash.pump()
         self.impctl._watch_sounds_folder()
-        self._fit_overlay_key()
-        self.register_hotkeys()
+        self.hkctl._fit_overlay_key()
+        self.hkctl.register_hotkeys()
         # Stream Deck / scripts (Settings → Remote), only if turned on
         self.remote = remote.RemoteControl(lambda a, p: remote.dispatch(self, a, p), self)
         self.remctl.apply_remote()
@@ -1520,7 +1513,7 @@ class MainWindow(QMainWindow):
                                    "hotkey in Settings"))
         icons.set_icon(self.btn_keys, "keyboard", size=18)
         km = DropdownMenu(self.btn_keys)
-        km.aboutToShow.connect(lambda: self._fill_quick_hotkeys(km))
+        km.aboutToShow.connect(lambda: self.hkctl._fill_quick_hotkeys(km))
         self.btn_keys.setMenu(km)
         self.btn_keys.setProperty("toolbarMenu", True)
         km.setTitle(_("Quick hotkeys"))
@@ -2983,195 +2976,13 @@ class MainWindow(QMainWindow):
         self._save_later()
 
     # ------------------------------------------------------------------ hotkeys
-    def _fit_overlay_key(self):
-        """The default overlay key is the one left of 1 on a US keyboard, where it types
-        a rarely used `. On most other layouts that key types a letter or everyday
-        punctuation (ö, ñ, ù, UK '@), which a bare global hotkey would take away from
-        typing everywhere: there it becomes Alt + that key. Checked once, so a key the
-        user picks later is left alone."""
-        if self.cfg.overlay_key_checked:
-            return
-        self.cfg.overlay_key_checked = True
-        if self.cfg.overlay_hotkey == "`" and winkeys.key_char(winkeys.VK["`"]) not in ("`", ""):
-            self.cfg.overlay_hotkey = "alt+`"
-            log.info("overlay hotkey moved to Alt+` for this keyboard layout")
-        self._save_later()
-
-    def register_hotkeys(self):
-        mapping = {}
-        if self._hotkeys_off and not self.cfg.hotkeys_off_hotkey:
-            # the key that turns them back on was cleared or given to something else:
-            # nothing could turn them on again until a restart, so they're on now
-            self._hotkeys_off = False
-            self.toast(_("Hotkeys are on again."), "ok", key="hotkeys")
-        if self._hotkeys_off:   # only the key that turns them back on
-            mapping[self.cfg.hotkeys_off_hotkey] = "__hotkeys__"
-            self.hotkeys.register(mapping)
-            self.replay.set_enabled(bool(self.cfg.replay_hotkey), self.cfg.replay_seconds)
-            return
-        for attr, action, _label, _desc in HOTKEY_ACTIONS:
-            combo = getattr(self.cfg, attr)
-            if combo:
-                mapping.setdefault(combo, action)
-        for m in self.cfg.sounds:
-            if m.hotkey and self._hotkey_live(m):
-                mapping.setdefault(m.hotkey, m.id)
-        for cat, combo in self.cfg.category_hotkeys.items():
-            if combo and cat in self.cfg.categories:
-                mapping.setdefault(combo, RANDOM + cat)
-        mapping.update(self.overlay.layer())   # its keys, only while it's open
-        # the game's push-to-talk key is pressed by us (auto-PTT) and by the player: as a
-        # hotkey of ours, Windows would hand those presses to us instead of the game
-        mapping.pop(self.cfg.ptt_key, None)
-        self.hotkeys.register(mapping)
-        # instant replay listens only while its hotkey is set
-        self.replay.set_enabled(bool(self.cfg.replay_hotkey), self.cfg.replay_seconds)
-
-    def _hotkey_live(self, m: SoundMeta) -> bool:
-        """Does m's hotkey work right now? Always, unless hotkeys follow the category
-        (scoped_hotkeys): then only while a category it's in is showing (All shows
-        every sound; one in no category always keeps its key)."""
-        cat = self.cfg.category
-        return not self.cfg.scoped_hotkeys or not cat or not m.tags or cat in m.tags
-
-    def set_scoped_hotkeys(self, on: bool):
-        """Settings -> Hotkeys: a set of sound hotkeys per category."""
-        self.cfg.scoped_hotkeys = on
-        if not on:   # one key, one sound again: the first sound (in board order) keeps it
-            seen = set(self._global_combos())
-            for m in self.cfg.sounds:
-                if m.hotkey and m.hotkey in seen:
-                    m.hotkey = ""
-                    if m.id in self.pads:
-                        self.pads[m.id].update()
-                elif m.hotkey:
-                    seen.add(m.hotkey)
-        self._save_now()
-        self.register_hotkeys()
-
-    def _global_combos(self) -> list[str]:
-        """Combos the app-wide actions, the push-to-talk key and category keys hold."""
-        return ([getattr(self.cfg, a) for a, *__ in HOTKEY_ACTIONS if getattr(self.cfg, a)]
-                + [c for c in (self.cfg.ptt_key, *self.cfg.category_hotkeys.values()) if c])
-
     def set_single_click(self, on: bool):
         """Settings -> General: one click on a pad plays it."""
         self.set_option("single_click", on)
         Pad.single_click = on
 
-    def on_hotkey_released(self, action: str):
-        """A hotkey or MIDI pad was let go: a hold-to-play sound stops, and an overlay
-        in hold mode opened by a MIDI pad closes (a key's release it watches itself)."""
-        m = self._meta.get(action)
-        if action == "__voicehold__":
-            if self._voice_was is not None:
-                self._set_voice(self._voice_was)
-                self._voice_was = None
-        elif m is not None and m.hold:
-            self._cancel_waiting(action)
-            self.engine.stop(action)
-        elif (action == "__overlay__" and self.overlay.s.mode == "hold"
-              and midi.is_midi(self.cfg.overlay_hotkey) and self.overlay.is_open):
-            self.overlay.close()
-
-    def on_midi_busy(self, busy: list[str]):
-        if busy:
-            self.say(_("<span style='color:{status}'>{devices} is open in another "
-                       "program (a music app?), so its pads don't work here until "
-                       "that program lets go of it.</span>",
-                       status=theme.status('warn'),
-                       devices=html.escape(", ".join(busy))), "warn")
-
-    def on_replay_state(self):
-        if self.replay.enabled and self.replay.error:
-            self.say(_("<span style='color:{status}'>Instant replay can't listen: "
-                       "{error}</span>", status=theme.status('warn'),
-                       error=html.escape(self.replay.error)), "warn")
-
-    def save_replay(self):
-        """The instant-replay hotkey: the last seconds of what you heard become a pad."""
-        data = self.replay.clip()
-        if len(data) < int(0.2 * SR):
-            self.cue("fail")
-            why = self.replay.error or ngettext(
-                "nothing has played on this PC in the last {n} second",
-                "nothing has played on this PC in the last {n} seconds", self.replay.seconds)
-            self.say(_("<span style='color:{status}'>Nothing to save: {why}.</span>",
-                       status=theme.status('warn'), why=html.escape(why)), "warn")
-            return
-        self.on_clip(data, _("Replay {time}", time=time.strftime("%H.%M.%S")))
-        self.cue("saved")
-
-    def on_hotkeys_failed(self, failed: list[str]):
-        if not failed:
-            return
-        log.warning("hotkeys that couldn't be claimed: %s", failed)
-        self.say(_("<span style='color:{status}'>Another program is already "
-                   "using {keys}, pick a different hotkey.</span>",
-                   status=theme.status('warn'),
-                   keys=html.escape(", ".join(pretty_key(c) for c in failed))), "warn")
-
-    def set_global_hotkey(self, attr: str, combo: str):
-        """Set one of the app-wide hotkeys (or ptt_key). A combo can only do one thing,
-        so it's taken off any other action or sound that had it, and a toast says what
-        lost it: a key quietly going off a pad was a surprise the next time it was
-        pressed in a game."""
-        lost = []
-        if combo:
-            for other, _action, label, _desc in HOTKEY_ACTIONS:
-                if other != attr and getattr(self.cfg, other) == combo:
-                    setattr(self.cfg, other, "")
-                    lost.append(label)
-            for m in self.cfg.sounds:
-                if m.hotkey == combo:
-                    m.hotkey = ""
-                    lost.append(f"“{m.name}”")
-                    if m.id in self.pads:
-                        self.pads[m.id].update()
-            lost += [_("a random sound from “{name}”", name=c)
-                     for c, k in self.cfg.category_hotkeys.items() if k == combo]
-            self._clear_category_hotkey(combo)
-            if attr != "ptt_key" and self.cfg.ptt_key == combo:
-                self.cfg.ptt_key = ""
-                lost.append(_("auto push-to-talk"))
-        if attr == "replay_hotkey" and combo and not self.cfg.replay_hotkey:
-            self.toast(REPLAY_NOTE)   # instant replay just went on
-        setattr(self.cfg, attr, combo)
-        self._save_now()
-        self.register_hotkeys()
-        if lost:
-            what = (_("auto push-to-talk") if attr == "ptt_key"
-                    else next((label for a, _ac, label, _d in HOTKEY_ACTIONS if a == attr), attr))
-            self.toast(_("{hotkey} is {what} now, it was the key for {lost}",
-                         hotkey=html.escape(pretty_key(combo)), what=html.escape(what),
-                         lost=html.escape(_(" and ").join(lost))), "warn")
-
     QUICK_HOTKEYS = ("stop_hotkey", "pause_hotkey", "skip_hotkey", "random_hotkey",
                      "last_hotkey", "mic_hotkey", "hotkeys_off_hotkey", "overlay_hotkey")
-
-    def _fill_quick_hotkeys(self, menu: QMenu):
-        """The Sounds tab's keyboard button: the common hotkeys with their keys (click
-        one to set it), then a way into Settings → Hotkeys for the rest."""
-        menu.clear()
-        labels = {attr: label for attr, _a, label, _d in HOTKEY_ACTIONS}
-        labels["ptt_key"] = _("Auto push-to-talk key")
-        for attr in (*self.QUICK_HOTKEYS, "ptt_key"):
-            combo = getattr(self.cfg, attr)
-            key = pretty_key(combo) or (_("Off") if attr == "ptt_key" else _("not set"))
-            icons.set_icon(menu.addAction(f"{labels[attr]}	{key}",
-                                          lambda a=attr: self._quick_set_hotkey(a)), "keyboard")
-        menu.addSeparator()
-        icons.set_icon(menu.addAction(_("All hotkeys"),
-                                      lambda: self.setctl.open_settings("hotkeys")),
-                       "settings")
-
-    def _quick_set_hotkey(self, attr: str):
-        d = HotkeyDialog(self.hotkeys, self, pads=attr != "ptt_key")
-        if d.exec() and d.result_combo:
-            self.set_global_hotkey(attr, d.result_combo)
-        else:
-            self.register_hotkeys()   # the capture paused them
-        free_dialog(d)
 
     def _tab_info_at(self, i: int) -> tuple[str, str] | None:
         page = self.tabs.widget(i)
@@ -3342,99 +3153,6 @@ class MainWindow(QMainWindow):
     SETTINGS_PRINT_SKIP = ("sounds", "tab", "category", "tip_day", "tips_seen",
                            "update_checked", "whats_new_seen", "load_note", "speech",
                            "app_setup")
-
-    def on_hotkey(self, action):
-        if action == "__hotkeys__":
-            self.toggle_hotkeys()
-            return
-        if self._hotkeys_off:   # one already on its way when they were turned off
-            return
-        if self.overlay.handle(action):
-            return
-        if action == "__stop__":
-            self.stop_all()
-        elif action == "__last__":
-            self.play_last()
-        elif action in ("__nextcat__", "__prevcat__"):
-            self.step_category(1 if action == "__nextcat__" else -1)
-        elif action in ("__volup__", "__voldown__"):
-            self.step_sound_volume(1 if action == "__volup__" else -1)
-        elif action == "__mic__":
-            self.chk_mic.setChecked(not self.chk_mic.isChecked())   # -> on_mic_toggle
-            self.cue("start" if self.cfg.mic_enabled else "stop")
-        elif action == "__voice__":
-            on = not self.voice.fx.btn_power.isChecked()
-            self._voice_was = None
-            self._set_voice(on)
-            # the Voice tab switched off: nothing went on, so no "on" beep either
-            self.cue("fail" if not self.tabctl.tab_on("voice") else "start" if on else "stop")
-        elif action == "__voicehold__":
-            if self._voice_was is None and self.tabctl.tab_on("voice"):
-                self._voice_was = self.voice.fx.btn_power.isChecked()
-            self._set_voice(True)
-        elif action == "__replay__":
-            self.save_replay()
-        elif action == "__pause__":
-            self._pause_clicked()
-        elif action == "__skip__":
-            self.skip_next()
-        elif action == "__random__":
-            self.play_random()
-        elif action.startswith(RANDOM):
-            self.play_random(action[len(RANDOM):])
-        else:
-            self.play(action)
-
-    def _set_voice(self, on: bool):
-        """The voice changer's big ON / OFF switch, from a hotkey."""
-        if not self.tabctl.tab_on("voice"):
-            if on:
-                self.toast(_("The Voice tab is switched off (Settings > Tabs)."), "warn")
-            return
-        if self.voice.fx.btn_power.isChecked() != on:
-            self.voice.fx.btn_power.setChecked(on)   # its toggled handler applies it
-
-    def toggle_hotkeys(self):
-        """All hotkeys off (they type normally again), or back on. Not saved: the app
-        always opens with them on."""
-        if not self._hotkeys_off and not self.cfg.hotkeys_off_hotkey:
-            return   # no key to turn them back on with
-        self._hotkeys_off = not self._hotkeys_off
-        if self._hotkeys_off and self._voice_was is not None:   # a held voice key
-            self._set_voice(self._voice_was)
-            self._voice_was = None
-        self.register_hotkeys()
-        self.cue("stop" if self._hotkeys_off else "start")
-        key = pretty_key(self.cfg.hotkeys_off_hotkey)
-        if self._hotkeys_off:
-            self.say(_("<span style='color:{status}'>Hotkeys are off: {key} turns them back "
-                       "on.</span>", status=theme.status('warn'), key=html.escape(key)),
-                     "warn", key="hotkeys")
-        else:
-            self.toast(_("Hotkeys are on again."), "ok", key="hotkeys")
-
-    def step_category(self, step: int):
-        """Next / previous category (with All at the front), with a beep for each
-        place along it, so you can tell where you are without looking."""
-        names = ["", *self.cfg.categories]
-        if len(names) < 2:
-            self.cue("fail")
-            return
-        i = names.index(self.cfg.category) if self.cfg.category in names else 0
-        name = names[(i + step) % len(names)]
-        self.catctl.set_category(name)
-        n = names.index(name)
-        # All: one low beep; the 1st category one high beep, the 2nd two... (up to 5)
-        self.cue((523,) if n == 0 else ((784, 0) * min(n, 5))[:-1])
-        self.toast(_("Category: {value}", value=html.escape(name or 'All')), key="category")
-
-    def step_sound_volume(self, step: int):
-        """The louder / quieter hotkeys: the sounds' volume box by 10 % a press."""
-        pct = self.vol_sound.spin.value()
-        new = min(max((round(pct / 10) + step) * 10, 0), self.vol_sound.spin.maximum())
-        self.vol_sound.spin.setValue(new)   # -> set_option("sound_vol")
-        self.cue((880, 1175) if step > 0 else (880, 659))
-        self.toast(_("Sounds: {new}%", new=new), key="volume")
 
     def play_random(self, category: str | None = None) -> str | None:
         """Play a random loaded sound from `category` (None = the one showing, "" = all
@@ -4384,125 +4102,6 @@ class MainWindow(QMainWindow):
         if self.tabs.currentWidget() is page and (fw is None or not page.isAncestorOf(fw)):
             page.setFocus(Qt.FocusReason.OtherFocusReason)
 
-    def _hotkey_taken(self, combo: str) -> bool:
-        """Does a sound, an app-wide action, the push-to-talk key or a category's
-        random-sound key already have `combo`?"""
-        return (any(o.hotkey == combo for o in self.cfg.sounds)
-                or any(getattr(self.cfg, attr) == combo for attr, *__ in HOTKEY_ACTIONS)
-                or self.cfg.ptt_key == combo
-                or combo in self.cfg.category_hotkeys.values())
-
-    def _shares_keys(self, a: SoundMeta, b: SoundMeta) -> bool:
-        """Can a and b's hotkeys be live at the same time? With a set of hotkeys per
-        category, two sounds with no category in common can share a key."""
-        return (not self.cfg.scoped_hotkeys or not a.tags or not b.tags
-                or bool(set(a.tags) & set(b.tags)))
-
-    def _clear_dupe_hotkey(self, m) -> list[str]:
-        """A combo does one thing: m's hotkey comes off whatever else had it. Returns
-        what lost it ("“Boom”", "Stop everything"...), and says so in the status line,
-        so a key taken from another sound or action is never a silent surprise."""
-        lost = []
-        if not m.hotkey:
-            return lost
-        for o in self.cfg.sounds:
-            if (o is not m and o.hotkey and o.hotkey == m.hotkey
-                    and self._shares_keys(o, m)):
-                o.hotkey = ""
-                lost.append(f"“{o.name}”")
-                if o.id in self.pads:
-                    self.pads[o.id].update()
-        for attr, _action, label, _desc in HOTKEY_ACTIONS:
-            if m.hotkey == getattr(self.cfg, attr):
-                setattr(self.cfg, attr, "")
-                lost.append(label)
-        lost += [_("a random sound from “{name}”", name=c)
-                 for c, k in self.cfg.category_hotkeys.items() if k == m.hotkey]
-        self._clear_category_hotkey(m.hotkey)
-        if self.cfg.ptt_key == m.hotkey:   # as everywhere else a key is set
-            self.cfg.ptt_key = ""
-            lost.append(_("auto push-to-talk"))
-        if lost:
-            self.say(
-                _("<span style='color:{status}'>{hotkey} plays “{name}” now, it was the key for "
-                  "{lost}.</span>",
-                  status=theme.status('warn'), hotkey=html.escape(pretty_key(m.hotkey)),
-                  name=html.escape(m.name), lost=html.escape(_(" and ").join(lost))),
-                "warn", 8000, key="hotkey")
-        return lost
-
-    def set_sound_hotkey(self, sid: str, combo: str | None = None):
-        """The pad menu's hotkey: asks for one unless given ("" removes it)."""
-        m = self.meta(sid)
-        if m is None:
-            return
-        if combo is None:
-            d = HotkeyDialog(self.hotkeys, self)
-            combo = d.result_combo if d.exec() and d.result_combo else None
-            free_dialog(d)
-        if combo is not None and combo != m.hotkey:
-            m.hotkey = combo
-            lost = self._clear_dupe_hotkey(m)
-            self._save_now()
-            if sid in self.pads:
-                self.pads[sid].update()
-            if not lost:   # else its warning already says what the key plays now
-                self.toast(_("✓ {combo} plays “{name}”",
-                             combo=html.escape(combo), name=html.escape(m.name)) if combo
-                           else _("Hotkey removed from “{name}”", name=html.escape(m.name)),
-                           key="hotkey")
-        self.register_hotkeys()   # the capture paused them
-
-    def _clear_category_hotkey(self, combo: str, keep: str | None = None):
-        """A combo does one thing: take it off any category's random-sound hotkey."""
-        if combo:
-            for cat in [c for c, k in self.cfg.category_hotkeys.items()
-                        if k == combo and c != keep]:
-                del self.cfg.category_hotkeys[cat]
-
-    def set_category_hotkey(self, name: str, combo: str | None = None):
-        """The hotkey that plays a random sound from category `name` (asks for it
-        unless given; "" clears it)."""
-        if name not in self.cfg.categories:
-            return
-        if combo is None:
-            d = HotkeyDialog(self.hotkeys, self)
-            combo = d.result_combo if d.exec() and d.result_combo else None
-            free_dialog(d)
-            if combo is None:
-                self.register_hotkeys()   # the capture paused them
-                return
-        taken_from = []
-        if combo:
-            for attr, *__ in HOTKEY_ACTIONS:
-                if getattr(self.cfg, attr) == combo:
-                    setattr(self.cfg, attr, "")
-                    taken_from.append(_("another action"))
-            for m in self.cfg.sounds:
-                if m.hotkey == combo:
-                    taken_from.append(f"“{m.name}”")
-                    m.hotkey = ""
-                    if m.id in self.pads:
-                        self.pads[m.id].update()
-            self._clear_category_hotkey(combo, keep=name)
-            if self.cfg.ptt_key == combo:
-                self.cfg.ptt_key = ""
-            self.cfg.category_hotkeys[name] = combo
-            if taken_from:
-                msg = _("✓ {combo} plays a random “{name}” sound, it was the key for {lost}",
-                        combo=html.escape(combo), name=html.escape(name),
-                        lost=html.escape(", ".join(taken_from)))
-            else:
-                msg = _("✓ {combo} plays a random “{name}” sound",
-                        combo=html.escape(combo), name=html.escape(name))
-            self.toast(msg, "ok")
-        else:
-            self.cfg.category_hotkeys.pop(name, None)
-            self.toast(_("Random-sound hotkey for “{name}” cleared", name=html.escape(name)))
-        self._save_now()
-        self.catctl._fill_categories()
-        self.register_hotkeys()
-
     # ------------------------------------------------------------------ backup
     # ------------------------------------------------------------------ tray
     def _init_tray(self):
@@ -4785,7 +4384,7 @@ class MainWindow(QMainWindow):
                                 or e.aux_on_air())
         want = self.cfg.ptt_key if (self.cfg.ptt_key and on_air) else None
         if want != self._ptt_held:
-            if not self._release_ptt():
+            if not self.hkctl._release_ptt():
                 return   # still held: try the key-up again next tick
             if want and winkeys.press(want):
                 self._ptt_held = want
@@ -5009,16 +4608,6 @@ class MainWindow(QMainWindow):
         self._video_win.show_for(sid, m.name, path)
         if self.engine.state(sid) is None:
             self.toggle_play_pause()
-
-    def _release_ptt(self) -> bool:
-        """Let go of the PTT key we hold. False if Windows refused the key-up (an
-        admin window or a UAC prompt in front blocks it): it stays ours to release,
-        or the game's push-to-talk would stay stuck down."""
-        if self._ptt_held:
-            if not winkeys.release(self._ptt_held):
-                return False
-            self._ptt_held = None
-        return True
 
     # ------------------------------------------------------------------ small windows
     def _init_fit(self):
@@ -5270,7 +4859,7 @@ class MainWindow(QMainWindow):
             self.bunctl.bun_mode.close()
         for step in (self.rmctl._finish_removals, self.rmctl._wait_bin, self.timer.stop,
                      self._voice_timer.stop, self.devctl._default_poll.stop,
-                     self.alertctl._discord_poll.stop, self._release_ptt,
+                     self.alertctl._discord_poll.stop, self.hkctl._release_ptt,
                      self._remember_usage, self.cfg.save, self.overlay.shutdown,
                      self.hotkeys.stop, self.replay.stop, self.remote.stop,
                      self.remctl._stop_remote_addons,

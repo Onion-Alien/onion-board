@@ -348,7 +348,7 @@ class CategoryControl(Controller):
             mw.apply_filter(mw.search.text())
             mw._save_later()
             if mw.cfg.scoped_hotkeys:   # this category's set of sound hotkeys
-                mw.register_hotkeys()
+                mw.hkctl.register_hotkeys()
 
     def category_sounds(self) -> list[SoundMeta]:
         mw = self.mw
@@ -376,7 +376,7 @@ class CategoryControl(Controller):
         if m and name not in m.tags:
             m.tags.append(name)
             if mw.cfg.scoped_hotkeys:   # its key now works only in its categories
-                mw.register_hotkeys()
+                mw.hkctl.register_hotkeys()
         mw._save_now()
         self._fill_categories()
         if not sid:
@@ -418,7 +418,7 @@ class CategoryControl(Controller):
             msg = _("Took “{name}” out of {category}",
                     name=html.escape(m.name), category=html.escape(shown))
         if mw.cfg.scoped_hotkeys:   # where its key works changed with its categories
-            mw.register_hotkeys()
+            mw.hkctl.register_hotkeys()
         mw._save_now()
         self._fill_categories()
         mw.apply_filter(mw.search.text())
@@ -459,7 +459,7 @@ class CategoryControl(Controller):
             mw.cfg.category = new
         mw._save_now()
         self._fill_categories()
-        mw.register_hotkeys()   # its random-sound hotkey now plays `new`
+        mw.hkctl.register_hotkeys()   # its random-sound hotkey now plays `new`
         mw.toast(_("✓ Renamed to “{new}”", new=html.escape(new)), "ok")
 
     def delete_category(self, name: str):
@@ -492,7 +492,7 @@ class CategoryControl(Controller):
         mw._save_now()
         self._fill_categories()
         mw.apply_filter(mw.search.text())
-        mw.register_hotkeys()   # let go of its random-sound hotkey
+        mw.hkctl.register_hotkeys()   # let go of its random-sound hotkey
 
     def _category_menu(self, pos):
         mw = self.mw
@@ -527,9 +527,9 @@ class CategoryControl(Controller):
         elif act == a_sub:
             self.new_subcategory(name)
         elif act == a_hk:
-            mw.set_category_hotkey(name)
+            mw.hkctl.set_category_hotkey(name)
         elif act is not None and act == a_nohk:
-            mw.set_category_hotkey(name, "")
+            mw.hkctl.set_category_hotkey(name, "")
         elif act == a_rand:
             mw.play_random(name)
         elif act == a_exp:

@@ -40,10 +40,10 @@ def playing(monkeypatch, w, sids):
 
 def test_last_sound_hotkey_plays_it_again(window, calls):
     w = window
-    w.on_hotkey("__last__")            # nothing yet: just the fail beep
+    w.hkctl.on_hotkey("__last__")            # nothing yet: just the fail beep
     assert calls == []
     w.play("s1")
-    w.on_hotkey("__last__")
+    w.hkctl.on_hotkey("__last__")
     assert [c[0] for c in calls] == ["s1", "s1"]
 
 
@@ -52,39 +52,39 @@ def test_category_keys_cycle_through_all_and_the_categories(window):
     w.catctl.new_category(name="Memes")
     w.catctl.new_category(name="Music")
     w.catctl.set_category("")
-    w.on_hotkey("__nextcat__")
+    w.hkctl.on_hotkey("__nextcat__")
     assert w.cfg.category == "Memes"
-    w.on_hotkey("__nextcat__")
-    w.on_hotkey("__nextcat__")
+    w.hkctl.on_hotkey("__nextcat__")
+    w.hkctl.on_hotkey("__nextcat__")
     assert w.cfg.category == ""        # wraps round to All
-    w.on_hotkey("__prevcat__")
+    w.hkctl.on_hotkey("__prevcat__")
     assert w.cfg.category == "Music"
 
 
 def test_volume_keys_step_the_sounds_volume_by_ten(window):
     w = window
     w.vol_sound.spin.setValue(95)
-    w.on_hotkey("__volup__")
+    w.hkctl.on_hotkey("__volup__")
     assert w.cfg.sound_vol == pytest.approx(1.1)
     w.vol_sound.spin.setValue(0)
-    w.on_hotkey("__voldown__")
+    w.hkctl.on_hotkey("__voldown__")
     assert w.cfg.sound_vol == 0.0
 
 
 def test_mic_and_voice_changer_keys(window):
     w = window
     was = w.cfg.mic_enabled
-    w.on_hotkey("__mic__")
+    w.hkctl.on_hotkey("__mic__")
     assert w.cfg.mic_enabled is (not was)
     power = w.voice.fx.btn_power
     assert not power.isChecked()
-    w.on_hotkey("__voice__")
+    w.hkctl.on_hotkey("__voice__")
     assert power.isChecked()
-    w.on_hotkey("__voice__")
+    w.hkctl.on_hotkey("__voice__")
     assert not power.isChecked()
-    w.on_hotkey("__voicehold__")      # on while held, back as it was when let go
+    w.hkctl.on_hotkey("__voicehold__")      # on while held, back as it was when let go
     assert power.isChecked()
-    w.on_hotkey_released("__voicehold__")
+    w.hkctl.on_hotkey_released("__voicehold__")
     assert not power.isChecked()
 
 
@@ -93,13 +93,13 @@ def test_all_hotkeys_off_leaves_only_its_own_key(window, monkeypatch, calls):
     registered = []
     monkeypatch.setattr(w.hotkeys, "register", lambda m: registered.append(dict(m)))
     w.meta("s0").hotkey = "f1"
-    w.set_global_hotkey("hotkeys_off_hotkey", "f12")
+    w.hkctl.set_global_hotkey("hotkeys_off_hotkey", "f12")
     assert registered[-1]["f1"] == "s0"
-    w.on_hotkey("__hotkeys__")
+    w.hkctl.on_hotkey("__hotkeys__")
     assert registered[-1] == {"f12": "__hotkeys__"}
-    w.on_hotkey("s0")                 # one already queued when they went off
+    w.hkctl.on_hotkey("s0")                 # one already queued when they went off
     assert calls == []
-    w.on_hotkey("__hotkeys__")
+    w.hkctl.on_hotkey("__hotkeys__")
     assert registered[-1]["f1"] == "s0"
 
 
@@ -108,18 +108,18 @@ def test_clearing_the_hotkeys_off_key_while_off_turns_them_back_on(window, monke
     registered = []
     monkeypatch.setattr(w.hotkeys, "register", lambda m: registered.append(dict(m)))
     w.meta("s0").hotkey = "f1"
-    w.set_global_hotkey("hotkeys_off_hotkey", "f12")
-    w.on_hotkey("__hotkeys__")
+    w.hkctl.set_global_hotkey("hotkeys_off_hotkey", "f12")
+    w.hkctl.on_hotkey("__hotkeys__")
     assert registered[-1] == {"f12": "__hotkeys__"}
-    w.set_global_hotkey("hotkeys_off_hotkey", "")   # nothing left to turn them on
-    assert not w._hotkeys_off and registered[-1]["f1"] == "s0"
-    w.set_global_hotkey("hotkeys_off_hotkey", "f12")
-    w.on_hotkey("__hotkeys__")
-    w.set_global_hotkey("pause_hotkey", "f12")      # the key went to something else
-    assert not w._hotkeys_off and registered[-1]["f1"] == "s0"
+    w.hkctl.set_global_hotkey("hotkeys_off_hotkey", "")   # nothing left to turn them on
+    assert not w.hkctl._hotkeys_off and registered[-1]["f1"] == "s0"
+    w.hkctl.set_global_hotkey("hotkeys_off_hotkey", "f12")
+    w.hkctl.on_hotkey("__hotkeys__")
+    w.hkctl.set_global_hotkey("pause_hotkey", "f12")      # the key went to something else
+    assert not w.hkctl._hotkeys_off and registered[-1]["f1"] == "s0"
     w.cfg.hotkeys_off_hotkey = ""
-    w.toggle_hotkeys()                               # no key: they don't go off
-    assert not w._hotkeys_off
+    w.hkctl.toggle_hotkeys()                               # no key: they don't go off
+    assert not w.hkctl._hotkeys_off
 
 
 def test_a_set_of_hotkeys_per_category(window, monkeypatch, calls):
@@ -130,17 +130,17 @@ def test_a_set_of_hotkeys_per_category(window, monkeypatch, calls):
     w.catctl.new_category(name="Music")
     a, b = w.meta("s0"), w.meta("s1")
     a.tags, b.tags = ["Memes"], ["Music"]
-    w.set_scoped_hotkeys(True)
+    w.hkctl.set_scoped_hotkeys(True)
     a.hotkey = "f1"
-    w._clear_dupe_hotkey(a)
+    w.hkctl._clear_dupe_hotkey(a)
     b.hotkey = "f1"
-    w._clear_dupe_hotkey(b)           # no category in common: both keep it
+    w.hkctl._clear_dupe_hotkey(b)           # no category in common: both keep it
     assert a.hotkey == b.hotkey == "f1"
     w.catctl.set_category("Memes")
     assert registered[-1]["f1"] == "s0"
     w.catctl.set_category("Music")
     assert registered[-1]["f1"] == "s1"
-    w.set_scoped_hotkeys(False)       # one key, one sound again: the first keeps it
+    w.hkctl.set_scoped_hotkeys(False)       # one key, one sound again: the first keeps it
     assert (a.hotkey, b.hotkey) == ("f1", "")
 
 
@@ -240,7 +240,7 @@ def test_skip_with_nothing_waiting_just_stops_the_players_sound(window, monkeypa
     monkeypatch.setattr(w.engine, "stop", stopped.append)
     playing(monkeypatch, w, ["s0"])
     w.select("s0")
-    w.on_hotkey("__skip__")
+    w.hkctl.on_hotkey("__skip__")
     assert stopped == ["s0"] and calls == []
 
 
@@ -511,8 +511,8 @@ def menu_pick(monkeypatch, path):
 def test_pad_menu_is_short_grouped_and_shows_the_hotkey(window, monkeypatch):
     w = window
     shown = menu_pick(monkeypatch, ["Set hotkey"])
-    from soundboard.ui import mainwindow
-    monkeypatch.setattr(mainwindow.HotkeyDialog, "exec",
+    from soundboard.settings import HotkeyDialog
+    monkeypatch.setattr(HotkeyDialog, "exec",
                         lambda self: setattr(self, "result_combo", "ctrl+alt+7") or True)
     w.padctl.pad_menu("s0", None)
     assert shown == ["Play next", "Volume", "---", "Edit", "Rename",
@@ -565,12 +565,12 @@ def test_a_key_taken_from_another_sound_or_action_says_so(window):
     w = window
     w.cfg.stop_hotkey = "ctrl+alt+s"
     w.meta("s1").hotkey = "f2"
-    w.set_sound_hotkey("s0", "f2")
+    w.hkctl.set_sound_hotkey("s0", "f2")
     assert w.meta("s1").hotkey == "" and "it was the key for “Airhorn”" in said(w)
-    w.set_sound_hotkey("s0", "ctrl+alt+s")
+    w.hkctl.set_sound_hotkey("s0", "ctrl+alt+s")
     assert w.cfg.stop_hotkey == "" and "Stop everything" in said(w)
     unsay(w)
-    w.set_sound_hotkey("s1", "f9")         # a free key: just the green card, no warning
+    w.hkctl.set_sound_hotkey("s1", "f9")         # a free key: just the green card, no warning
     [t] = toast.shown(w)
     assert t.kind == "ok" and "f9 plays" in t.text()
 
@@ -584,14 +584,14 @@ def test_a_global_hotkey_taken_off_a_sound_is_said_out_loud(window, monkeypatch)
     w = window
     w.meta("s0").hotkey = "f1"
     w.cfg.category_hotkeys["All"] = "f1"
-    w.set_global_hotkey("stop_hotkey", "f1")
+    w.hkctl.set_global_hotkey("stop_hotkey", "f1")
     assert w.meta("s0").hotkey == ""
     assert "All" not in w.cfg.category_hotkeys
     assert w.cfg.stop_hotkey == "f1"
     text, kind = toasts[-1]
     assert kind == "warn" and "Boom" in text and "Stop everything" in text and "All" in text
     toasts.clear()
-    w.set_global_hotkey("pause_hotkey", "f2")   # nothing had F2: no warning
+    w.hkctl.set_global_hotkey("pause_hotkey", "f2")   # nothing had F2: no warning
     assert not [t for t in toasts if t[1] == "warn"]
 
 

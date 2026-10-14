@@ -37,7 +37,7 @@ from soundboard.ui.pixels import snap_to_pixels
 log = logging.getLogger(__name__)
 
 # Global hotkey actions: (config attribute, action id, label, what it does).
-# Grouped for the Settings window; the action ids go to MainWindow.on_hotkey.
+# Grouped for the Settings window; the action ids go to HotkeyControl.on_hotkey.
 HOTKEY_GROUPS = [
     (_("Sounds"), [
         ("stop_hotkey", "__stop__", _("Stop everything"),
@@ -1283,7 +1283,7 @@ class SettingsDialog(QDialog):
                                     "play that category's sounds. Sounds in no category always "
                                     "keep their keys."))
                 scoped.setChecked(self.mw.cfg.scoped_hotkeys)
-                scoped.toggled.connect(self.mw.set_scoped_hotkeys)
+                scoped.toggled.connect(self.mw.hkctl.set_scoped_hotkeys)
                 cv.addWidget(scoped)
                 hint = QLabel(_("Sound hotkeys only work in the category showing. Switch "
                                 "categories to use the same keys for different sounds."))
@@ -1360,10 +1360,10 @@ class SettingsDialog(QDialog):
         if d.exec() and d.result_combo:
             self._set_hk(attr, d.result_combo)
         else:
-            self.mw.register_hotkeys()   # capture paused them
+            self.mw.hkctl.register_hotkeys()   # capture paused them
 
     def _set_hk(self, attr, combo):
-        self.mw.set_global_hotkey(attr, combo)
+        self.mw.hkctl.set_global_hotkey(attr, combo)
         self._refresh_hk()
 
     def _overlay(self):

@@ -190,8 +190,8 @@ class Overlay:
     """What the overlay does; `OverlayWindow` only draws it.
 
     `host` is the main window. Used: host.cfg (sounds, categories, category,
-    overlay_hotkey), host.audio, host.play(sid), host.on_hotkey('__stop__' /
-    '__pause__'), host.register_hotkeys() (which asks `layer()` for the extra keys),
+    overlay_hotkey), host.audio, host.play(sid), host.hkctl.on_hotkey('__stop__' /
+    '__pause__'), host.hkctl.register_hotkeys() (which asks `layer()` for the extra keys),
     host.cue(kind or notes) and host.catctl.set_category(name) (the category key)."""
     ACTION = "__overlay__"
     PREFIX = "__ov:"
@@ -297,10 +297,10 @@ class Overlay:
         elif what == "cat":
             self.next_category()
         elif what == "stop":
-            self.host.on_hotkey("__stop__")
+            self.host.hkctl.on_hotkey("__stop__")
             self._touch()
         elif what == "pause":
-            self.host.on_hotkey("__pause__")
+            self.host.hkctl.on_hotkey("__pause__")
             self._touch()
         elif what == "close":
             self.close()
@@ -339,7 +339,7 @@ class Overlay:
         self.by_click = by_click
         self.flash = None
         self.blind = winkeys.exclusive_fullscreen()
-        self.host.register_hotkeys()      # claims layer()
+        self.host.hkctl.register_hotkeys()      # claims layer()
         if self.blind:
             log.info("overlay opened without a window: a game is in exclusive fullscreen")
             self.host.cue("start")
@@ -363,7 +363,7 @@ class Overlay:
         self.is_open = False
         for t in (self._autohide, self._close_soon, self._hold):
             t.stop()
-        self.host.register_hotkeys()      # the keys go back to the game
+        self.host.hkctl.register_hotkeys()      # the keys go back to the game
         if self.blind:
             self.host.cue("stop")
         if self._window is not None:
@@ -424,7 +424,7 @@ class Overlay:
         """New settings from the Settings window."""
         self.s = OverlaySettings.from_dict(settings)
         if self.is_open:
-            self.host.register_hotkeys()
+            self.host.hkctl.register_hotkeys()
         if self._window is not None and self._window.isVisible():
             self._window.present()        # new size / position
 

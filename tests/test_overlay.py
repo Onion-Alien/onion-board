@@ -278,12 +278,12 @@ def test_main_window_hotkey_opens_overlay_and_claims_keys(window, monkeypatch): 
     sent, played = [], []
     monkeypatch.setattr(window.hotkeys, "register", lambda m: sent.append(dict(m)))
     monkeypatch.setattr(window, "play", played.append)
-    window.on_hotkey("__overlay__")
+    window.hkctl.on_hotkey("__overlay__")
     assert window.overlay.is_open and sent[-1]["1"] == "__ov:slot:0"
     assert sent[-1]["`"] == "__overlay__"
-    window.on_hotkey("__ov:slot:1")
+    window.hkctl.on_hotkey("__ov:slot:1")
     assert played == ["s1"]
-    window.on_hotkey("__ov:close")
+    window.hkctl.on_hotkey("__ov:close")
     assert not window.overlay.is_open and "1" not in sent[-1]
 
 

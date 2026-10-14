@@ -104,7 +104,7 @@ def test_category_changes_reregister_scoped_hotkeys(window, monkeypatch):
     window.cfg.scoped_hotkeys = True
     window.catctl.new_category(name="Memes")
     calls = []
-    monkeypatch.setattr(window, "register_hotkeys", lambda: calls.append(1))
+    monkeypatch.setattr(window.hkctl, "register_hotkeys", lambda: calls.append(1))
     window.catctl.toggle_tag("s0", "Memes")
     assert calls and "Memes" in window.meta("s0").tags
     calls.clear()
@@ -116,7 +116,7 @@ def test_a_sound_hotkey_takes_the_push_to_talk_key(window):
     window.cfg.ptt_key = "f8"
     m = window.meta("s0")
     m.hotkey = "f8"
-    lost = window._clear_dupe_hotkey(m)
+    lost = window.hkctl._clear_dupe_hotkey(m)
     assert window.cfg.ptt_key == "" and lost
 
 

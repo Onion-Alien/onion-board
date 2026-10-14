@@ -356,7 +356,7 @@ class ImportControl(Controller):
             meta.tags = library.merge_tags(meta.tags, mw.cfg.categories,
                                            mw.cfg.subcategories)
             key = self._import_keys.pop(meta.id, "")
-            if key and not mw._hotkey_taken(key):
+            if key and not mw.hkctl._hotkey_taken(key):
                 meta.hotkey = key
             mw.cfg.sounds.append(meta)
             mw._index()
@@ -381,7 +381,7 @@ class ImportControl(Controller):
         mw._save_now()
         mw._rebuild_pads()
         mw.catctl._fill_categories()   # categories and hotkeys from an Import from Soundpad
-        mw.register_hotkeys()
+        mw.hkctl.register_hotkeys()
         n, self._imported_ok = self._imported_ok, 0
         short, self._imported_short = self._imported_short, False
         ids, self._import_ids = self._import_ids, []
@@ -766,7 +766,7 @@ class ImportControl(Controller):
         if "theme" in changed:
             mw.themectl.apply_theme(mw.cfg.theme)
         mw._save_now()
-        mw.register_hotkeys()
+        mw.hkctl.register_hotkeys()
         if changed:
             mw.tell(_("Settings imported"),
                       _("Done. Hotkeys and the theme apply now; everything else "
@@ -824,7 +824,7 @@ class ImportControl(Controller):
         mw._rebuild_pads()
         mw.catctl._fill_categories()
         mw._load_all()
-        mw.register_hotkeys()
+        mw.hkctl.register_hotkeys()
         n = len(res.sounds)
         if pkg.restored:   # Backup → My sound packs → Reset to how it came
             msg = _("“{name}” is back how it came", name=self._pack_name(pkg))
@@ -952,7 +952,7 @@ class ImportControl(Controller):
         mw._save_now()
         mw.catctl._fill_categories()
         mw.apply_filter(mw.search.text())
-        mw.register_hotkeys()
+        mw.hkctl.register_hotkeys()
         mw.toast(_("✓ “{name}” is one tab now", name=html.escape(name)), "ok")
 
     def reset_pack(self, pid: str, ask: bool = True):

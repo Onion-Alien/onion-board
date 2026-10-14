@@ -297,9 +297,9 @@ class PadControl(Controller):
         elif act == a_show:
             mw.editctl.show_sound_file(sid)
         elif act == a_hk:
-            mw.set_sound_hotkey(sid)
+            mw.hkctl.set_sound_hotkey(sid)
         elif act is not None and act == a_hk_clear:
-            mw.set_sound_hotkey(sid, "")
+            mw.hkctl.set_sound_hotkey(sid, "")
         elif act == a_del:
             mw.rmctl.ask_remove([sid])
 
