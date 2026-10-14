@@ -551,12 +551,9 @@ class DownloadBar(QFrame):
         h = self._cur_lay = QHBoxLayout(cur)
         h.setContentsMargins(8, 8, 6, 8)
         h.setSpacing(12)
-        self.thumb = QLabel()
-        self.thumb.setFixedSize(THUMB_W, THUMB_H)
-        self.thumb.setAlignment(Qt.AlignmentFlag.AlignCenter)
-        h.addWidget(self.thumb, 0, Qt.AlignmentFlag.AlignVCenter)
-        # no picture of its own (an MP3, a link without art): Bun writes the download down,
-        # centred in the picture's column so he lines up with the rows' pictures under him
+        # Bun first, always: he writes the download down and shows how it went (the
+        # picture beside him stays clean); then the sound's picture, or the plain
+        # placeholder the rows use, in the column the rows' pictures line up under
         self.scribe = ScribeBunny()
         self._scribe_box = QWidget()
         self._scribe_box.setObjectName("scribebox")
@@ -566,6 +563,10 @@ class DownloadBar(QFrame):
         sb.setContentsMargins(0, 0, 0, 0)
         sb.addWidget(self.scribe, 0, Qt.AlignmentFlag.AlignCenter)
         h.addWidget(self._scribe_box, 0, Qt.AlignmentFlag.AlignVCenter)
+        self.thumb = QLabel()
+        self.thumb.setFixedSize(THUMB_W, THUMB_H)
+        self.thumb.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        h.addWidget(self.thumb, 0, Qt.AlignmentFlag.AlignVCenter)
 
         col = self._col = QVBoxLayout()
         col.setSpacing(LINE_GAP)
@@ -1038,15 +1039,14 @@ class DownloadBar(QFrame):
         return _placeholder(w, h, radius, dpr)
 
     def _update_thumb(self):
-        if self._pm is not None and not self._pm.isNull():
-            self.thumb.setPixmap(self._picture(self._pm, THUMB_W, THUMB_H, 8))
+        self.thumb.setPixmap(self._picture(self._pm, THUMB_W, THUMB_H, 8))
         self._apply_art()
 
     def _apply_art(self):
-        """The sound's own picture if it has one, else Bun at his scroll."""
-        has = self._pm is not None and not self._pm.isNull()
-        self.thumb.setVisible(has and not self._tight)
-        self._scribe_box.setVisible(not has and not self._tight)
+        """Bun at his scroll, then the sound's picture (the placeholder if it has none):
+        both always, except in a narrow banner."""
+        self.thumb.setVisible(not self._tight)
+        self._scribe_box.setVisible(not self._tight)
 
     # ------------------------------------------------------------------ the rest of the list
 
@@ -1105,6 +1105,7 @@ class DownloadBar(QFrame):
         rl.setContentsMargins(8, 6, 6, 6)
         rl.setSpacing(12)
         if not self._tight:   # centred under the running row's picture, titles in line
+            rl.addSpacing(THUMB_W)   # under Bun's column
             pic = QLabel()
             pic.setFixedSize(THUMB_W, ROW_THUMB[1])
             pic.setAlignment(Qt.AlignmentFlag.AlignCenter)
@@ -1193,7 +1194,7 @@ class DownloadBar(QFrame):
         # a second of tick (or red ✗ and a red glow) over the picture so it's noticed; the
         # mini player has no picture: just the glow when it failed
         spot = QRectF()
-        art = next((w for w in (self.thumb, self.scribe) if w.isVisibleTo(self)), None)
+        art = self.scribe if self.scribe.isVisibleTo(self) else None   # on Bun, not the picture
         if art is not None:
             top_left = art.mapTo(self, art.rect().topLeft())
             spot = QRectF(top_left.x(), top_left.y(), art.width(), art.height())
