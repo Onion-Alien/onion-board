@@ -3,8 +3,8 @@ pads' keyboard and screen-reader side."""
 import pytest
 import numpy as np
 from PySide6.QtCore import QEvent, QPointF, Qt
-from PySide6.QtGui import QAccessible, QKeyEvent, QMouseEvent
-from PySide6.QtWidgets import QApplication, QMenu
+from PySide6.QtGui import QAccessible, QColor, QKeyEvent, QMouseEvent
+from PySide6.QtWidgets import QApplication, QColorDialog, QMenu
 
 from soundboard.i18n import _
 from soundboard.library import PAD_COLORS, SoundMeta
@@ -55,7 +55,7 @@ def test_bulk_colour_menu_marks_shared_value_and_applies_choice(window, colors):
         window.meta(sid).color = color
     menu = QMenu(window)
     window.selection._fill_colors(menu)
-    actions = menu.actions()
+    actions = [a for a in menu.actions() if not a.isSeparator()][:-1]   # minus Custom colour…
     assert all(action.isCheckable() for action in actions)
     # by name, not "#7c5cff"
     from soundboard.ui.dialogs import COLOUR_NAMES
@@ -93,10 +93,24 @@ def test_category_colour_menu_is_the_bulk_one_with_no_colour(window, monkeypatch
     menu_shows(monkeypatch, grab)
     w.catctl._category_menu(w.catctl.cat_tabs.tabRect(i).center())
     acts = [a for a in subs[0] if not a.isSeparator()]
-    assert [a.text() for a in acts[:-1]] == [COLOUR_NAMES[c] for c in PAD_COLORS]
+    assert [a.text() for a in acts[:-2]] == [COLOUR_NAMES[c] for c in PAD_COLORS]
+    assert acts[-2].text() == _("Custom colour…")
     assert [a.text() for a in acts if a.isChecked()] == [COLOUR_NAMES[PAD_COLORS[2]]]
     acts[-1].trigger()                                  # No colour
     assert not w.cfg.category_colors.get("Memes")
+
+    # Custom colour…: the colour wheel's pick lands on the tab, and shows ticked next time
+    monkeypatch.setattr(QColorDialog, "getColor", staticmethod(lambda *a: QColor("#123456")))
+    acts[-2].trigger()
+    assert w.cfg.category_colors["Memes"] == "#123456"
+    subs.clear()
+    w.catctl._category_menu(w.catctl.cat_tabs.tabRect(i).center())
+    acts = [a for a in subs[0] if not a.isSeparator()]
+    assert [a.text() for a in acts if a.isChecked()] == [_("Custom")]
+    # a cancelled wheel changes nothing
+    monkeypatch.setattr(QColorDialog, "getColor", staticmethod(lambda *a: QColor()))
+    acts[-2].trigger()
+    assert w.cfg.category_colors["Memes"] == "#123456"
 
 
 def test_ctrl_click_toggles_and_shift_click_picks_a_range(window):
