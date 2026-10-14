@@ -16,6 +16,7 @@ from soundboard import engine as eng
 from soundboard.engine import is_virtual as is_virtual_cable
 from soundboard.i18n import _
 from soundboard.ui import worker
+from soundboard.ui.controller import Controller
 from soundboard.ui.crashdialog import free_dialog
 
 if TYPE_CHECKING:
@@ -34,11 +35,11 @@ def is_hands_free(name: str | None) -> bool:
     return "hands-free" in n or "hands free" in n
 
 
-class RouteControl:
+class RouteControl(Controller):
     """The route and send outputs of one MainWindow (``mw``)."""
 
     def __init__(self, mw: MainWindow):
-        self.mw = mw
+        super().__init__(mw)
 
     def _fill_combo(self, cb, names, current):
         cb.blockSignals(True)
@@ -251,7 +252,7 @@ class RouteControl:
         return mw.micctl._cable_ends(plan["main"], plan["vm"]) if "main" in plan else None
 
     def _copy_names(self) -> list[str]:
-        """Setup -> Devices -> Also send to: the devices that get a copy of what others
+        """Setup -> Devices -> Also play on: the devices that get a copy of what others
         hear. None while sending to nobody; never the headphones (you'd hear it twice),
         and never a device that gets it already (what others hear, the cable alongside
         the mic, the stream output, or another end of one of those cables)."""
@@ -269,13 +270,13 @@ class RouteControl:
 
     def sending_to(self) -> list[str]:
         """The devices that get what others hear already: the picked one, the cable
-        alongside the mic, and the stream output ("Also send to" can't add them again)."""
+        alongside the mic, and the stream output ("Also play on" can't add them again)."""
         mw = self.mw
         return [t for t in (self._main_name(), self._tap_name(),
                             self._obs_name(mw.cfg.obs_device)) if t]
 
     def set_also_send_at(self, i: int, name: str | None):
-        """Setup -> Devices -> Also send to: row `i` sends to `name` (one past the last
+        """Setup -> Devices -> Also play on: row `i` sends to `name` (one past the last
         row adds one; None removes that row)."""
         mw = self.mw
         c = mw.cfg
@@ -315,7 +316,7 @@ class RouteControl:
         return name
 
     def set_obs_device(self, name: str | None):
-        """The stream output: Setup -> Devices -> Also send to -> a row set to Clean,
+        """The stream output: Setup -> Devices -> Also play on -> a row set to Clean,
         for streaming. None switches it off."""
         mw = self.mw
         mw.cfg.obs_device = name
@@ -339,7 +340,7 @@ class RouteControl:
         mw.devctl._device_job(plan, opened)
 
     def set_send_kind(self, name: str, stream: bool):
-        """Also send to: the row on `name` gets the clean stream mix (`stream`; the
+        """Also play on: the row on `name` gets the clean stream mix (`stream`; the
         one that had it before goes back to a copy of the call, in its place) or the
         same as the call."""
         mw = self.mw

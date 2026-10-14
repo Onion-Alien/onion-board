@@ -11,9 +11,9 @@ import math
 from PySide6.QtCore import QEvent, QObject, QPoint, QRect, QRectF, QSize, Qt, QTimer, Signal
 from PySide6.QtGui import QColor, QFont, QPainter, QPainterPath, QRegion
 from shiboken6 import isValid as qt_valid
-from PySide6.QtWidgets import (QCheckBox, QComboBox, QFrame, QGridLayout, QHBoxLayout, QLabel,
-                               QLayout, QListWidget, QPushButton, QSizePolicy, QSlider, QSpinBox,
-                               QStyle, QVBoxLayout, QWidget)
+from PySide6.QtWidgets import (QBoxLayout, QCheckBox, QComboBox, QFrame, QGridLayout,
+                               QHBoxLayout, QLabel, QLayout, QListWidget, QPushButton,
+                               QSizePolicy, QSlider, QSpinBox, QStyle, QVBoxLayout, QWidget)
 
 from soundboard import theme
 from soundboard.eq import BAND_LABELS as EQ_LABELS
@@ -504,6 +504,48 @@ def alt_tile(icon: str, title: str, words: str, *buttons: QPushButton
         row.addWidget(b)
     v.addLayout(row)
     return box, text
+
+
+class TileRow(QWidget):
+    """`alt_tile`s side by side, sharing the width; stacked one under the other when
+    the row is too narrow for each tile's name and buttons (a tile never clips)."""
+
+    def __init__(self, spacing: int = 12):
+        super().__init__()
+        self._box = QBoxLayout(QBoxLayout.Direction.LeftToRight, self)
+        self._box.setContentsMargins(0, 0, 0, 0)
+        self._box.setSpacing(spacing)
+        self._tiles: list[QWidget] = []   # not layout.itemAt(): its wrappers outlive the items
+
+    def addTile(self, tile: QWidget) -> None:
+        self._box.addWidget(tile, 1)
+        self._tiles.append(tile)
+        self._fit(self.width())
+
+    def stacked(self) -> bool:
+        return self._box.direction() == QBoxLayout.Direction.TopToBottom
+
+    def _need(self) -> int:
+        """The width side by side needs: each shown tile's narrowest fit, plus gaps."""
+        tiles = [t.layout() for t in self._tiles if qt_valid(t) and not t.isHidden()]
+        tiles = [lay for lay in tiles if lay is not None]
+        if not tiles:
+            return 0
+        return (sum(lay.minimumSize().width() for lay in tiles)
+                + self._box.spacing() * (len(tiles) - 1))
+
+    def _fit(self, width: int) -> None:
+        d = (QBoxLayout.Direction.TopToBottom if width < self._need()
+             else QBoxLayout.Direction.LeftToRight)
+        if self._box.direction() != d:
+            self._box.setDirection(d)
+
+    def resizeEvent(self, e) -> None:   # a Qt override: must never raise
+        try:
+            self._fit(e.size().width())
+        except Exception:   # noqa: BLE001 - keep the last shape rather than raise
+            pass
+        super().resizeEvent(e)
 
 
 def icon_button(name: str, tip: str, *, quiet: bool = True, size: int = 18,

@@ -456,6 +456,14 @@ class MicControl:
         mw.cb_route.setFocus()
         mw.cb_route.showPopup()
 
+    def _pick_mic(self):
+        """Your mic -> Change mic: Devices' "My mic", opened (the effect follows the mic
+        picked there)."""
+        mw = self.mw
+        mw.setup_page.ensureWidgetVisible(mw.cb_mic)
+        mw.cb_mic.setFocus()
+        mw.cb_mic.showPopup()
+
     def use_cable_instead(self):
         """Straight into my mic isn't working here: send through the virtual cable (set
         it up first if it isn't installed)."""

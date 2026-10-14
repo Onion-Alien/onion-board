@@ -3,7 +3,7 @@ never mixed up with the mic test's recording), its spool, and the window."""
 import numpy as np
 from PySide6.QtWidgets import QMessageBox
 
-from soundboard import library
+from soundboard import library, recorder
 from soundboard.engine import SR, Engine
 from soundboard.recorder import MicTake
 from soundboard.ui import recordmic
@@ -385,3 +385,81 @@ def test_the_record_window_leaves_the_board_usable(window):  # noqa: F811
     assert window._record_dlg is d
     d.reject()
     assert window._record_dlg is None
+
+
+# ------------------------------------------------------------------ both at once
+
+def both_engine() -> Engine:
+    e = out_engine("main")
+    e.names["mic"] = "Test mic"
+    e.mic_stream = object()
+    e.rates["mic"] = SR
+    return e
+
+
+def test_mix_voice_lowers_whats_playing_while_you_talk():
+    sound = np.full((SR, 2), 0.5, np.float32)
+    voice = np.zeros((SR, 2), np.float32)
+    voice[SR // 2:] = 0.2   # talking in the second half
+    out = recorder.mix_voice(voice, sound, -12.0)
+    assert len(out) == SR and out.dtype == np.float32
+    assert abs(float(out[SR // 4, 0]) - 0.5) < 1e-3          # quiet: the sound as it was
+    ducked = float(out[-1, 0]) - 0.2                          # talking: the sound at -12 dB
+    assert abs(ducked - 0.5 * 10 ** (-12 / 20)) < 0.01
+    loud = recorder.mix_voice(np.full((100, 2), 0.9, np.float32),
+                              np.full((200, 2), 0.9, np.float32), -12.0)
+    assert len(loud) == 200 and float(np.max(np.abs(loud))) < 0.991   # never clips
+
+
+def test_the_window_records_your_voice_and_whats_playing_together(app_dir):
+    e = both_engine()
+    e.duck_db = 0.0   # ducking off for calls: the recording still keeps the voice on top
+    saved = []
+    d = RecordDialog(e, lambda: False, lambda: ["Boom"],
+                     lambda data, name: saved.append((data, name)) or True, lambda: None)
+    d.opt_both.setChecked(True)
+    assert not d.problem.isVisibleTo(d) and d.btn_rec.isEnabled()
+    assert d.start() and d.take.both and e.taking and e.play_taking
+    for _ in range(50):
+        e._play_take.append(np.full((BLOCK, 2), 0.3, np.float32))
+    feed(e, 0.25, 50)
+    d._tick()
+    d.stop()
+    assert not e.taking and not e.play_taking
+    assert d.data is not None and abs(len(d.data) - 50 * BLOCK) <= 2
+    mid = float(d.data[len(d.data) // 2, 0])
+    assert abs(mid - (0.25 + 0.3 * 10 ** (-12 / 20))) < 0.02   # voice on top of the song
+    assert d.save() and saved[0][1] == "Recording 1"
+    assert RecordDialog.last_source == "both"
+    assert not (app_dir / "mictake.tmp.wav").exists()
+    assert not (app_dir / "playtake.tmp.wav").exists()
+    RecordDialog.last_source = "mic"
+    d.deleteLater()
+
+
+def test_both_needs_the_mic_and_an_open_device(app_dir):
+    e = out_engine("main")   # no mic picked
+    d = RecordDialog(e, lambda: False, lambda: [], lambda *a: True, lambda: None)
+    d.opt_both.setChecked(True)
+    assert "No mic" in d.problem_text.text() and not d.start()
+    d.deleteLater()
+    e = mic_engine()         # a mic, but no audio device open
+    d = RecordDialog(e, lambda: False, lambda: [], lambda *a: True, lambda: None)
+    d.opt_both.setChecked(True)
+    assert "No audio device" in d.problem_text.text() and not d.start()
+    d.deleteLater()
+
+
+def test_cancelling_both_leaves_nothing_behind(app_dir):
+    e = both_engine()
+    d = RecordDialog(e, lambda: False, lambda: [], lambda *a: True, lambda: None)
+    d.opt_both.setChecked(True)
+    assert d.start()
+    feed(e, 0.25, 5)
+    d._tick()
+    d.discard()
+    assert not e.taking and not e.play_taking
+    assert not (app_dir / "mictake.tmp.wav").exists()
+    assert not (app_dir / "playtake.tmp.wav").exists()
+    RecordDialog.last_source = "mic"
+    d.deleteLater()

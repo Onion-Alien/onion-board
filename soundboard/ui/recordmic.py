@@ -1,8 +1,8 @@
 """The Sounds tab's *Record a sound* window: record your own voice with the mic
 (raw, or through the voice changer while it's on), or a bit of whatever is playing
-(a sound, a web search result, the radio), cut the ends, listen, name it and add it
+(a sound, a web search result, the radio), or both at once, cut the ends, listen, name it and add it
 as a pad. The audio comes from Engine.start_mic_take / start_play_take via
-recorder.MicTake, spooled to disk as it's recorded. The window doesn't block the
+recorder.MicTake (BothTake for both), spooled to disk as it's recorded. The window doesn't block the
 board, so you can start the song you want a bit of while it records."""
 from __future__ import annotations
 
@@ -18,7 +18,7 @@ from PySide6.QtWidgets import (QButtonGroup, QDialog, QFrame, QHBoxLayout, QLabe
 from soundboard import library
 from soundboard.engine import SR
 from soundboard.library import MAX_SECONDS
-from soundboard.recorder import MicTake
+from soundboard.recorder import BothTake, MicTake
 from soundboard.ui import fit, icons
 from soundboard.ui.panel import hint_label
 from soundboard.ui.trim import TrimPanel
@@ -80,7 +80,7 @@ class RecordDialog(QDialog):
         self._playing_picture = playing_picture or (lambda: "")
         self._taken_name = ""   # what was playing while it recorded
         self._taken_pic = ""    # ...and its pad's picture
-        self.take: MicTake | None = None
+        self.take: MicTake | BothTake | None = None
         self.data: np.ndarray | None = None   # the finished take, (n, 2) float32 at SR
         self.saved = 0                        # pads added from this window
         self.setWindowTitle(_("Record a sound"))
@@ -101,8 +101,9 @@ class RecordDialog(QDialog):
         title.setObjectName("recordtitle")
         heading.addWidget(title, 1)
         lay.addLayout(heading)
-        lay.addWidget(hint_label(_("Record your voice, or a bit of a sound, song or the "
-                                   "radio while it plays, and keep it as a sound.")))
+        lay.addWidget(hint_label(_("Record your voice, a bit of a sound, song or the radio "
+                                   "while it plays, or both at once, and keep it as a "
+                                   "sound.")))
 
         # no mic / the mic can't open: one line and the way to fix it
         self.problem = QWidget()
@@ -130,19 +131,21 @@ class RecordDialog(QDialog):
         self.opt_play.setToolTip(_("Your sounds, a web search result or the radio as you "
                                    "hear them (not your mic): press Record, then play it, "
                                    "or record a song that's already playing"))
-        {"fx": self.opt_fx, "play": self.opt_play}.get(self.last_source,
-                                                      self.opt_raw).setChecked(True)
+        self.opt_both = QRadioButton(_("Both"))
+        self.opt_both.setToolTip(_("Your voice and what's playing together, as one sound. "
+                                   "What's playing goes down while you talk, so your voice "
+                                   "stays on top"))
+        {"fx": self.opt_fx, "play": self.opt_play,
+         "both": self.opt_both}.get(self.last_source, self.opt_raw).setChecked(True)
         group = QButtonGroup(self)
-        for b in (self.opt_raw, self.opt_fx, self.opt_play):
+        for b in (self.opt_raw, self.opt_fx, self.opt_play, self.opt_both):
             group.addButton(b)
             sr.addWidget(b)
             b.toggled.connect(lambda _on: self._show_state())
         sr.setSpacing(6)
-        for b in (self.opt_raw, self.opt_fx, self.opt_play):
+        for i, b in enumerate((self.opt_raw, self.opt_fx, self.opt_play, self.opt_both)):
             b.setObjectName("recordsource")
-        sr.setStretch(0, 1)
-        sr.setStretch(1, 1)
-        sr.setStretch(2, 1)
+            sr.setStretch(i, 1)
         lay.addWidget(self.source)
 
         self.rec_row = QFrame()
@@ -233,13 +236,18 @@ class RecordDialog(QDialog):
         """Recording what's playing, not the mic."""
         return self.opt_play.isChecked()
 
+    def from_both(self) -> bool:
+        """Recording your voice and what's playing together."""
+        return self.opt_both.isChecked()
+
     def mic_problem(self) -> str:
         """Why the mic (or, for what's playing, the sound) can't record, in one line
         ("" when it can)."""
         e = self.engine
+        if (self.from_playing() or self.from_both()) and not e.active_outputs():
+            return _("No audio device is open. Pick one in Setup → Devices.")
         if self.from_playing():
-            return ("" if e.active_outputs() else
-                    _("No audio device is open. Pick one in Setup → Devices."))
+            return ""
         if not e.names.get("mic"):
             return _("No mic is picked. Pick one in Setup → Devices.")
         if e.mic_stream is None:
@@ -285,15 +293,20 @@ class RecordDialog(QDialog):
             self._show_state()
             return False
         self.engine.stop(PREVIEW)
-        playing = self.from_playing()
+        playing, both = self.from_playing(), self.from_both()
         processed = self.opt_fx.isChecked() and not self.opt_fx.isHidden()
-        RecordDialog.last_source = "play" if playing else "fx" if processed else "mic"
-        self.take = MicTake(self.engine, processed=processed, playing=playing)
+        RecordDialog.last_source = ("play" if playing else "both" if both else
+                                    "fx" if processed else "mic")
+        # both: your voice as others hear it now (changed while the voice changer is on)
+        self.take = (BothTake(self.engine, processed=self._voice_on()) if both else
+                     MicTake(self.engine, processed=processed, playing=playing))
         self._quiet_s = 0.0
         self._taken_name = self._playing_name() if playing else ""
         self._taken_pic = self._playing_picture() if playing else ""
         self.status.setText(_("Recording what's playing… play a sound, a search result or "
                               "the radio now, then click Stop.") if playing else
+                            _("Recording your voice and what's playing… talk, play a sound, "
+                              "then click Stop.") if both else
                             _("Recording… click Stop when you're done."))
         self._show_state()
         return True
@@ -303,7 +316,7 @@ class RecordDialog(QDialog):
         if take is None:
             return
         data = take.stop()
-        if take.playing and len(data) and not np.any(data):   # silence: nothing played
+        if (take.playing or take.both) and len(data) and not np.any(data):   # silence
             data = data[:0]
         if not len(data):
             self.status.setText(_("Nothing was recorded: nothing played while it recorded.")
@@ -337,7 +350,9 @@ class RecordDialog(QDialog):
     def _tick(self):
         take = self.take
         e = self.engine
-        self.meter.set_level(e.level_play if self.from_playing() else e.level_mic)
+        self.meter.set_level(e.level_play if self.from_playing() else
+                             max(e.level_play, e.level_mic) if self.from_both() else
+                             e.level_mic)
         if take is None:
             return
         if take.playing and not self._taken_name:
