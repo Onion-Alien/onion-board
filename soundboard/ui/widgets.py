@@ -1445,8 +1445,9 @@ class PadGrid(QWidget):
                 p.hide()
             self.empty_text.setText(self.NO_MATCH if self.pads else self.HOW_TO)
             # across the whole width, however wide that is now (a fixed width here kept
-            # the grid as wide as the window once was: a shrunk window showed nothing)
-            grid.setAlignment(Qt.AlignmentFlag.AlignTop)
+            # the grid as wide as the window once was: a shrunk window showed nothing),
+            # halfway down the page rather than stuck to its top
+            grid.setAlignment(Qt.AlignmentFlag.AlignVCenter)
             grid.addWidget(self.empty, 0, 0)
             self.empty.show()
             return
