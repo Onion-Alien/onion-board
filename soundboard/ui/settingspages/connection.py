@@ -30,7 +30,7 @@ class ConnectionPage(Page):
 
     def _connection(self):
         w, v = self._page()
-        v.addWidget(self.dlg._offline_card(self._connection_card()))   # Offline: no use
+        v.addWidget(self.dlg.privacy._offline_card(self._connection_card()))   # Offline: no use
         v.addWidget(self._activity_card())
         v.addStretch(1)
         return w
@@ -526,4 +526,4 @@ class ConnectionPage(Page):
             b.setEnabled(net.allowed(torget.FEATURE))
             b.setToolTip(b.property("tip") if b.isEnabled()
                          else net.off_message(torget.FEATURE))
-        self.dlg._offline_sync()
+        self.dlg.privacy._offline_sync()
