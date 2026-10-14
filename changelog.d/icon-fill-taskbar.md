@@ -1,0 +1,1 @@
+- The taskbar, shortcut and exe icon now fill their whole square like other apps' icons, so it no longer looks smaller and slightly low next to them.
