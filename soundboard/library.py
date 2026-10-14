@@ -7,6 +7,7 @@ decoding and resampling it again.
 """
 from __future__ import annotations
 
+import collections
 import contextlib
 import hashlib
 import itertools
@@ -967,36 +968,43 @@ def _write(snap: tuple[int, dict, str]) -> bool:
 class Saver:
     """Saves a Config on a background thread, so a slow disk (an antivirus scan of
     the new file took 2-7 s) doesn't freeze the window. save() copies the settings
-    right away and returns its number; the newest copy is the one written, and
-    `done(ok, n)` is called on the saver's thread after each write, `n` the number of
-    the copy written (every save() up to it is on disk when ok)."""
+    right away; the newest copy is the one written, and `done(ok)` is called on the
+    saver's thread after each write. save(then) keeps `then` until a write covers that
+    copy; finished() hands it back with how that write went."""
 
     def __init__(self, cfg: Config, done=None):
         self.cfg = cfg
         self._done = done
         self._cond = threading.Condition()
-        self._pending: tuple | None = None   # (its number, the copy)
-        self._count = 0                     # save() calls so far
+        self._pending: tuple | None = None
+        self._pending_n = 0                  # the save() that copy is from
+        self._count = 0                      # save() calls so far
+        self._then: list[tuple[int, Callable[[bool], None]]] = []
+        self._written: collections.deque[tuple[int, bool]] = collections.deque(maxlen=64)
         self._busy = False
         self._thread: threading.Thread | None = None
 
-    def save(self) -> int:
+    def save(self, then: Callable[[bool], None] | None = None):
         with self._cond:
             self._count += 1
             n = self._count
+            if then is not None:
+                self._then.append((n, then))
         if self.cfg.read_only:   # logs it; nothing to write
+            ok = self.cfg.save()
+            with self._cond:
+                self._written.append((n, ok))
             if self._done:
-                self._done(self.cfg.save(), n)
-            return n
+                self._done(ok)
+            return
         snap = self.cfg.snapshot()
         with self._cond:
-            self._pending = (n, snap)
+            self._pending, self._pending_n = snap, n
             if self._thread is None or not self._thread.is_alive():
                 self._thread = threading.Thread(target=self._run, name="config-save",
                                                 daemon=True)
                 self._thread.start()
             self._cond.notify_all()
-        return n
 
     def _run(self):
         while True:
@@ -1008,7 +1016,7 @@ class Saver:
                     if not self._cond.wait(30) and self._pending is None:
                         self._thread = None
                         return
-                (n, snap), self._pending, self._busy = self._pending, None, True
+                snap, n, self._pending, self._busy = self._pending, self._pending_n, None, True
             try:
                 ok = _write(snap)
             except Exception:  # noqa: BLE001 - a save must never kill the saver
@@ -1016,12 +1024,27 @@ class Saver:
                 ok = False
             with self._cond:
                 self._busy = False
+                self._written.append((n, ok))   # every save() up to n is in this one
                 self._cond.notify_all()
             if self._done:
                 try:
-                    self._done(ok, n)
+                    self._done(ok)
                 except Exception:  # noqa: BLE001
                     log.exception("after saving settings")
+
+    def finished(self) -> list[tuple[Callable[[bool], None], bool]]:
+        """The save(then)s whose copy (or a newer one) has been written since, each with
+        how that write went (ok). Call it from the thread `then` belongs to."""
+        with self._cond:
+            out, keep = [], []
+            for n, then in self._then:
+                ok = next((w_ok for w_n, w_ok in self._written if w_n >= n), None)
+                if ok is None:
+                    keep.append((n, then))
+                else:
+                    out.append((then, ok))
+            self._then = keep
+            return out
 
     def flush(self, timeout: float = 10.0) -> bool:
         """Wait until everything handed to save() is written. True when it is."""

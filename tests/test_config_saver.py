@@ -16,15 +16,13 @@ def _on_disk() -> dict:
 def test_the_saver_writes_the_newest_settings(app_dir):
     cfg = Config()
     results = []
-    s = library.Saver(cfg, done=lambda ok, n: results.append((ok, n)))
+    s = library.Saver(cfg, done=results.append)
     for theme in ("Light", "Paper", "Synthwave"):
         cfg.theme = theme
-        last = s.save()
+        s.save()
     assert s.flush(10)
     assert _on_disk()["theme"] == "Synthwave"
-    assert results and all(ok for ok, __ in results)
-    # each write says which save() it was: the last one is on disk, so all before it are
-    assert last == 3 and results[-1] == (True, 3)
+    assert results and all(results)
 
 
 def test_a_slow_disk_doesnt_hold_up_the_caller(app_dir, monkeypatch):
@@ -81,12 +79,39 @@ def test_an_older_snapshot_never_overwrites_a_newer_save(app_dir):
     assert _on_disk()["theme"] == "Paper"
 
 
+def test_save_then_is_handed_back_once_its_copy_is_written(app_dir, monkeypatch):
+    """save(then): finished() gives `then` back with that write's result, only once a
+    write covers its copy, never one from an older copy that was already on its way."""
+    writing, gate = threading.Event(), threading.Event()
+    real = library._write
+    results = iter([True, False])
+
+    def slow(snap):
+        writing.set()
+        gate.wait(5)
+        real(snap)
+        return next(results)
+    monkeypatch.setattr(library, "_write", slow)
+    s = library.Saver(Config())
+    s.save()
+    assert writing.wait(5)          # the first copy is on its way to the disk
+    told = []
+    s.save(lambda ok: told.append(ok))
+    assert s.finished() == []
+    gate.set()
+    assert s.flush(10)
+    (then, ok), = s.finished()      # the second write (the one that failed) covers it
+    assert ok is False and s.finished() == []
+    then(ok)
+    assert told == [False]
+
+
 def test_a_failed_write_is_reported(app_dir, monkeypatch):
     def broken(*_a, **_k):
         raise OSError("disk full")
     monkeypatch.setattr(library.Path, "write_text", broken)
     results = []
-    s = library.Saver(Config(), done=lambda ok, n: results.append(ok))
+    s = library.Saver(Config(), done=results.append)
     s.save()
     assert s.flush(10)
     assert results == [False]
@@ -96,8 +121,8 @@ def test_a_read_only_config_isnt_written(app_dir):
     cfg = Config()
     cfg.read_only = True
     results = []
-    library.Saver(cfg, done=lambda ok, n: results.append((ok, n))).save()
-    assert results == [(False, 1)] and not library.CONFIG_PATH.exists()
+    library.Saver(cfg, done=results.append).save()
+    assert results == [False] and not library.CONFIG_PATH.exists()
 
 
 def test_a_save_as_the_idle_wait_ends_is_still_written(app_dir):
@@ -113,7 +138,7 @@ def test_a_save_as_the_idle_wait_ends_is_still_written(app_dir):
             if timeout == 30 and not raced:   # the idle wait: time it out, with a save
                 raced.append(1)               # slipping in just as it does
                 cfg.theme = "Paper"
-                s._pending = (2, cfg.snapshot())
+                s._pending = cfg.snapshot()
                 return False
             return super().wait(timeout)
     s._cond = Racy()

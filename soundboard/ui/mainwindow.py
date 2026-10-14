@@ -12,7 +12,6 @@ import tempfile
 import threading
 import time
 from pathlib import Path
-from collections.abc import Callable
 from typing import Any, Literal, overload
 
 import numpy as np
@@ -396,7 +395,7 @@ class MainWindow(QMainWindow):
     remote_changed = Signal()           # a remote control server started or stopped
     cable_setup_found = Signal(bool)    # VB-Cable's setup program is on this PC (asked on a thread)
     video_found = Signal(str, object)   # a sound's video (Path|None), looked up on a thread
-    config_saved = Signal(bool, int)    # the background save finished: ok, the save() it wrote
+    config_saved = Signal(bool)         # the background save finished: ok
     voice_engine = Signal(object)       # the voice engine of the game in front (a mode key|None)
     default_found = Signal(object)      # Windows' default output, asked on a thread (str|None)
     device_step = Signal(object)        # the device thread's next step for the UI (_off_ui)
@@ -580,7 +579,6 @@ class MainWindow(QMainWindow):
         # written on a background thread: a slow disk froze the window for seconds
         self._saver = library.Saver(self.cfg, done=self.config_saved.emit)
         self.config_saved.connect(self._on_saved)
-        self._save_waiters: list[tuple[int, Callable[[bool], None]]] = []   # _save_now(then)
 
         self.setup_state = ""
         self._pill_long = ""              # the setup pill's whole text (its tip, its name)
@@ -4953,24 +4951,20 @@ class MainWindow(QMainWindow):
             self._tor_told = say[0]
             self.toast(html.escape(say[1]), say[2])
 
-    def _save_now(self, then: Callable[[bool], None] | None = None):
+    def _save_now(self, then=None):
         """The debounced save: the settings are copied now and written on the saver's
         thread (library.Saver), then _on_saved says how it went. `then(ok)` is called on
         the UI thread once this copy (or a newer one) is written, or failed to be."""
         self._saver.cfg = self.cfg
-        n = self._saver.save()
-        if then is not None:
-            self._save_waiters.append((n, then))
+        self._saver.save(then)
 
-    def _on_saved(self, ok: bool, n: int = 0):
+    def _on_saved(self, ok: bool):
         """A failure (disk full, antivirus lock) is logged by the writer; here it's
         shown once so the user knows settings aren't sticking."""
-        due = [w for w in self._save_waiters if w[0] <= n]
-        self._save_waiters = [w for w in self._save_waiters if w[0] > n]
-        for __, then in due:
+        for then, was_ok in self._saver.finished():   # _save_now(then)s now on disk (or not)
             try:
-                then(ok)
-            except Exception:  # noqa: BLE001 - one waiter mustn't stop the report
+                then(was_ok)
+            except Exception:  # noqa: BLE001 - one mustn't stop the report
                 log.exception("after saving settings")
         if ok:
             self._save_failed_shown = False
