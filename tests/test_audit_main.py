@@ -11,7 +11,7 @@ from PySide6.QtWidgets import QDialog, QVBoxLayout, QWidget
 from conftest import own_module, said
 from soundboard import appaudio, applog, autostart, library, net
 from soundboard.ui import chatguide, crashdialog, responsive
-from soundboard.ui import importcontrol
+from soundboard.ui import importcontrol, playbackcontrol
 from soundboard.ui.dialogs import EditDialog
 from soundboard.ui import mainwindow as main
 from soundboard.ui import worker
@@ -126,13 +126,13 @@ def test_plain_preview_drops_a_render_in_flight(window, monkeypatch):
     played = []
     monkeypatch.setattr(window.engine, "play", lambda sid, *a, **k: played.append(sid))
     window.audio["s0"] = np.zeros((100, 2), np.float32)
-    window._preview_gen = 5
-    window._preview_done = lambda ok: played.append(("done", ok))
+    window.playctl._preview_gen = 5
+    window.playctl._preview_done = lambda ok: played.append(("done", ok))
     window.toast("Rendering the preview…", "busy", key="preview")
-    assert window.preview("s0") == "playing"
-    assert window._preview_gen == 6 and window._preview_done is None
+    assert window.playctl.preview("s0") == "playing"
+    assert window.playctl._preview_gen == 6 and window.playctl._preview_done is None
     assert "Rendering the preview" not in said(window)
-    window._on_fx_preview("s0", np.zeros((10, 2), np.float32), 1.0, 5)   # the old render
+    window.playctl._on_fx_preview("s0", np.zeros((10, 2), np.float32), 1.0, 5)   # the old render
     assert played == ["s0:preview"]
 
 
@@ -140,16 +140,16 @@ def test_a_long_sounds_effects_preview_renders_only_what_plays_first(window, qap
                                                                     monkeypatch):
     """A 2-hour song's pitch shift took minutes before its preview played."""
     from tests.conftest import process_events
-    monkeypatch.setattr(main, "PREVIEW_WHOLE_S", 2)
-    monkeypatch.setattr(main, "PREVIEW_S", 1)
+    monkeypatch.setattr(playbackcontrol, "PREVIEW_WHOLE_S", 2)
+    monkeypatch.setattr(playbackcontrol, "PREVIEW_S", 1)
     long_ = np.zeros((5 * main.SR, 2), np.int16)
     window.audio["s0"] = long_
-    monkeypatch.setattr(main, "load_original", lambda m: long_)
+    monkeypatch.setattr(playbackcontrol, "load_original", lambda m: long_)
     monkeypatch.setattr(library, "render_cached", lambda *a, **k: pytest.fail("whole render"))
     played = []
     monkeypatch.setattr(window.engine, "play", lambda sid, data, *a, **k: played.append(
         (sid, len(data))))
-    assert window.preview("s0", fx={"pitch": 5}) == "rendering"
+    assert window.playctl.preview("s0", fx={"pitch": 5}) == "rendering"
     assert process_events(qapp, lambda: played, timeout=10)
     assert played == [("s0~fx:preview", main.SR)]
 
@@ -159,37 +159,37 @@ def test_a_newer_preview_stops_the_render_still_going(window, monkeypatch):
 
     def render(sid, data, fx, cancel=None):
         seen.append(cancel())
-        window._preview_gen += 1          # a newer preview starts meanwhile
+        window.playctl._preview_gen += 1          # a newer preview starts meanwhile
         seen.append(cancel())
         raise library.Cancelled
     monkeypatch.setattr(library, "render_cached", render)
-    monkeypatch.setattr(main, "load_original", lambda m: np.zeros((10, 2), np.int16))
+    monkeypatch.setattr(playbackcontrol, "load_original", lambda m: np.zeros((10, 2), np.int16))
     window.audio["s0"] = np.zeros((10, 2), np.int16)
     threads = []
     own_module(monkeypatch, worker, "threading",
                Thread=lambda target, args=(), kwargs=None, **k: threads.append(
                    lambda: target(*args, **(kwargs or {}))) or type(
                    "T", (), {"start": lambda self: None})())
-    window.preview("s0", fx={"pitch": 5})
+    window.playctl.preview("s0", fx={"pitch": 5})
     threads[-1]()                         # runs the render here: no error, nothing played
     assert seen == [False, True]
 
 
 def test_closing_the_edit_dialog_mid_render_clears_the_status(window, qapp):
     d = window.editctl.edit("s0")
-    window._preview_done = lambda ok: None   # a render was going
+    window.playctl._preview_done = lambda ok: None   # a render was going
     window.toast("Rendering the preview…", "busy", key="preview")
     d.done(0)
     qapp.processEvents()
     assert "Rendering the preview" not in said(window)
-    assert window._preview_done is None
+    assert window.playctl._preview_done is None
 
 
 @pytest.mark.parametrize("ok", [0, 1])
 def test_closing_the_edit_dialog_stops_the_preview(window, monkeypatch, qapp, ok):
     window.audio["s0"] = np.zeros((48000, 2), np.float32)
     d = window.editctl.edit("s0")
-    assert window.preview("s0") == "playing"   # same effects: the plain preview
+    assert window.playctl.preview("s0") == "playing"   # same effects: the plain preview
     stopped = []
     real = window.engine.stop
     monkeypatch.setattr(window.engine, "stop", lambda sid: (stopped.append(sid), real(sid)))

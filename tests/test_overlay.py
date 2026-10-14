@@ -19,6 +19,7 @@ class Host:
         self.audio = {m.id: object() for m in sounds}
         self.played, self.actions, self.cues = [], [], []
         self.registered = 0
+        self.playctl = self   # the window's playback controller: play, cue
 
     def play(self, sid):
         self.played.append(sid)
@@ -277,7 +278,7 @@ def test_main_window_hotkey_opens_overlay_and_claims_keys(window, monkeypatch): 
     monkeypatch.setattr(winkeys, "exclusive_fullscreen", lambda: False)
     sent, played = [], []
     monkeypatch.setattr(window.hotkeys, "register", lambda m: sent.append(dict(m)))
-    monkeypatch.setattr(window, "play", played.append)
+    monkeypatch.setattr(window.playctl, "play", played.append)
     window.hkctl.on_hotkey("__overlay__")
     assert window.overlay.is_open and sent[-1]["1"] == "__ov:slot:0"
     assert sent[-1]["`"] == "__overlay__"
@@ -401,5 +402,5 @@ def test_sounds_are_kept_until_the_list_or_category_changes(make):
     ov.host.cfg.category = "Memes"
     assert [m.id for m in ov.sounds()] == ["s1"]         # the category changed
     ov.host.cfg.sounds[2].tags.append("Memes")
-    ov.sounds_changed()                                  # MainWindow.apply_filter
+    ov.sounds_changed()                                  # SearchControl.apply_filter
     assert [m.id for m in ov.sounds()] == ["s1", "s2"]

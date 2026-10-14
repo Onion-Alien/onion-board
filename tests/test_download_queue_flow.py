@@ -77,7 +77,7 @@ class Net:
     # what a person does
     def click(self, url: str, play: bool):
         r = types.SimpleNamespace(url=url, title=NAMES[url], seconds=90.0)
-        self.w._from_youtube(r, play)
+        self.w.searchctl._from_youtube(r, play)
         self.settle()
 
     def land(self, url: str):
@@ -127,7 +127,7 @@ def test_play_then_queue_and_remove_another_still_plays(net):
     assert net.bar().waiting == [] and net.bar().url == A
     net.land(A)
     assert net.played() == [480]
-    assert net.w._link_url == A and net.w._link_meta.name == "Shrek"
+    assert net.w.searchctl._link_url == A and net.w.searchctl._link_meta.name == "Shrek"
     assert net.bar().stage == "done" and net.bar().shown and "Playing" in net.bar().head
     assert (A, "play", True) in net.done
 
@@ -155,11 +155,11 @@ def test_plays_clicked_while_one_loads_all_play_in_order_never_cut_off(net):
     net.land(A)
     assert net.played() == [480]
     net.land(B)
-    assert net.played() == [480] and net.w._link_url == A   # A keeps playing
+    assert net.played() == [480] and net.w.searchctl._link_url == A   # A keeps playing
     assert net.w.linkbar.up_next() == ["Random"]
     assert (B, "play", True) in net.done
     net.end()                                         # A ends: B starts
-    assert net.played() == [480, 960] and net.w._link_url == B
+    assert net.played() == [480, 960] and net.w.searchctl._link_url == B
     assert net.w.linkbar.up_next() == []
     net.end()
     assert net.played() == [480, 960] and not net.jobs
@@ -179,17 +179,17 @@ def test_up_next_chips_play_now_or_come_out_and_stop_all_clears_them(net):
     lbl, chips, more, total = net.w._waiting_chips
     assert total == 3
     row.resize(2000, row.height())
-    net.w._fit_up_next()
+    net.w.playctl._fit_up_next()
     assert not lbl.isHidden() and all(not c.isHidden() for c in chips) and more.isHidden()
     row.resize(330, row.height())                               # narrow: Now playing only
-    net.w._fit_up_next()
+    net.w.playctl._fit_up_next()
     assert lbl.isHidden() and all(c.isHidden() for c in chips) and more.isHidden()
     net.w.linkbar.drop_up_next(0, shown)              # Random's ✕
     net.w.linkbar.drop_up_next(0, shown)              # a double click: out of date
     assert net.w.linkbar.up_next() == ["Third", "Fourth"]
     net.w.linkbar.play_next(1, ("Third", "Fourth"))   # Fourth's chip: plays now
-    assert net.played() == [480, 1920] and net.w._link_url == D
-    net.w.stop_all()
+    assert net.played() == [480, 1920] and net.w.searchctl._link_url == D
+    net.w.playctl.stop_all()
     assert net.w.linkbar.up_next() == []
     net.end()
     assert net.played() == [480, 1920]

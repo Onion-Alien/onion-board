@@ -130,7 +130,7 @@ class HotkeyControl(Controller):
                 self._set_voice(self._voice_was)
                 self._voice_was = None
         elif m is not None and m.hold:
-            mw._cancel_waiting(action)
+            mw.playctl._cancel_waiting(action)
             mw.engine.stop(action)
         elif (action == "__overlay__" and mw.overlay.s.mode == "hold"
               and midi.is_midi(mw.cfg.overlay_hotkey) and mw.overlay.is_open):
@@ -157,7 +157,7 @@ class HotkeyControl(Controller):
         mw = self.mw
         data = mw.replay.clip()
         if len(data) < int(0.2 * SR):
-            mw.cue("fail")
+            mw.playctl.cue("fail")
             why = mw.replay.error or ngettext(
                 "nothing has played on this PC in the last {n} second",
                 "nothing has played on this PC in the last {n} seconds", mw.replay.seconds)
@@ -165,7 +165,7 @@ class HotkeyControl(Controller):
                        status=theme.status('warn'), why=html.escape(why)), "warn")
             return
         mw.on_clip(data, _("Replay {time}", time=time.strftime("%H.%M.%S")))
-        mw.cue("saved")
+        mw.playctl.cue("saved")
 
     def on_hotkeys_failed(self, failed: list[str]):
         mw = self.mw
@@ -249,22 +249,22 @@ class HotkeyControl(Controller):
         if mw.overlay.handle(action):
             return
         if action == "__stop__":
-            mw.stop_all()
+            mw.playctl.stop_all()
         elif action == "__last__":
-            mw.play_last()
+            mw.playctl.play_last()
         elif action in ("__nextcat__", "__prevcat__"):
             self.step_category(1 if action == "__nextcat__" else -1)
         elif action in ("__volup__", "__voldown__"):
             self.step_sound_volume(1 if action == "__volup__" else -1)
         elif action == "__mic__":
             mw.chk_mic.setChecked(not mw.chk_mic.isChecked())   # -> on_mic_toggle
-            mw.cue("start" if mw.cfg.mic_enabled else "stop")
+            mw.playctl.cue("start" if mw.cfg.mic_enabled else "stop")
         elif action == "__voice__":
             on = not mw.voice.fx.btn_power.isChecked()
             self._voice_was = None
             self._set_voice(on)
             # the Voice tab switched off: nothing went on, so no "on" beep either
-            mw.cue("fail" if not mw.tabctl.tab_on("voice") else "start" if on else "stop")
+            mw.playctl.cue("fail" if not mw.tabctl.tab_on("voice") else "start" if on else "stop")
         elif action == "__voicehold__":
             if self._voice_was is None and mw.tabctl.tab_on("voice"):
                 self._voice_was = mw.voice.fx.btn_power.isChecked()
@@ -272,15 +272,15 @@ class HotkeyControl(Controller):
         elif action == "__replay__":
             self.save_replay()
         elif action == "__pause__":
-            mw._pause_clicked()
+            mw.playctl._pause_clicked()
         elif action == "__skip__":
-            mw.skip_next()
+            mw.playctl.skip_next()
         elif action == "__random__":
-            mw.play_random()
+            mw.playctl.play_random()
         elif action.startswith(RANDOM):
-            mw.play_random(action[len(RANDOM):])
+            mw.playctl.play_random(action[len(RANDOM):])
         else:
-            mw.play(action)
+            mw.playctl.play(action)
 
     def _set_voice(self, on: bool):
         """The voice changer's big ON / OFF switch, from a hotkey."""
@@ -303,7 +303,7 @@ class HotkeyControl(Controller):
             self._set_voice(self._voice_was)
             self._voice_was = None
         self.register_hotkeys()
-        mw.cue("stop" if self._hotkeys_off else "start")
+        mw.playctl.cue("stop" if self._hotkeys_off else "start")
         key = pretty_key(mw.cfg.hotkeys_off_hotkey)
         if self._hotkeys_off:
             mw.say(_("<span style='color:{status}'>Hotkeys are off: {key} turns them back "
@@ -318,14 +318,14 @@ class HotkeyControl(Controller):
         mw = self.mw
         names = ["", *mw.cfg.categories]
         if len(names) < 2:
-            mw.cue("fail")
+            mw.playctl.cue("fail")
             return
         i = names.index(mw.cfg.category) if mw.cfg.category in names else 0
         name = names[(i + step) % len(names)]
         mw.catctl.set_category(name)
         n = names.index(name)
         # All: one low beep; the 1st category one high beep, the 2nd two... (up to 5)
-        mw.cue((523,) if n == 0 else ((784, 0) * min(n, 5))[:-1])
+        mw.playctl.cue((523,) if n == 0 else ((784, 0) * min(n, 5))[:-1])
         mw.toast(_("Category: {value}", value=html.escape(name or 'All')), key="category")
 
     def step_sound_volume(self, step: int):
@@ -334,7 +334,7 @@ class HotkeyControl(Controller):
         pct = mw.vol_sound.spin.value()
         new = min(max((round(pct / 10) + step) * 10, 0), mw.vol_sound.spin.maximum())
         mw.vol_sound.spin.setValue(new)   # -> set_option("sound_vol")
-        mw.cue((880, 1175) if step > 0 else (880, 659))
+        mw.playctl.cue((880, 1175) if step > 0 else (880, 659))
         mw.toast(_("Sounds: {new}%", new=new), key="volume")
 
     def _hotkey_taken(self, combo: str) -> bool:

@@ -67,7 +67,7 @@ def test_stand_ins_answer_the_window(window):
     w = window
     for key in taboff.KEYS:
         w.tabctl.set_tab_on(key, False)
-    w.stop_all()
+    w.playctl.stop_all()
     w.retheme() if hasattr(w, "retheme") else None
     w.hkctl._set_voice(True)            # the voice hotkey: nothing to switch on
     assert not w.voice.fx.btn_power.isChecked()
@@ -297,7 +297,7 @@ def test_importing_settings_switches_the_tabs_live(window, qapp):
 
 def test_the_voice_hotkey_beeps_fail_with_the_tab_off(window, monkeypatch):
     cues = []
-    monkeypatch.setattr(window, "cue", lambda kind: cues.append(kind))
+    monkeypatch.setattr(window.playctl, "cue", lambda kind: cues.append(kind))
     window.tabctl.set_tab_on("voice", False)
     window.hkctl.on_hotkey("__voice__")
     window.hkctl.on_hotkey("__voicehold__")

@@ -104,10 +104,10 @@ def test_ctrl_click_toggles_and_shift_click_picks_a_range(window):
     add_sounds(w, "A", "B")
     order = [p.meta.id for p in w.grid.pads]            # s0 s1 x0 x1
     played = []
-    w.play = played.append
+    w.playctl.play = played.append
     for p in w.pads.values():                           # reconnect to the stub
         p.activated.disconnect()
-        p.activated.connect(w.play)
+        p.activated.connect(w.playctl.play)
     click(w.pads["s0"], Qt.ControlModifier)
     assert w.selection.picked == {"s0"} and w.pads["s0"].picked
     assert not w.selection.bar.isHidden()

@@ -42,7 +42,7 @@ def test_random_hotkeys_pick_from_the_right_category(window):
         w.audio[sid] = np.zeros((480, 2), np.float32)
     w._rebuild_pads()
     played = []
-    w.play = played.append
+    w.playctl.play = played.append
     for _ in range(6):
         w.hkctl.on_hotkey("__random__:Memes")
     assert set(played) == {"m0", "m1"}
@@ -51,7 +51,7 @@ def test_random_hotkeys_pick_from_the_right_category(window):
     w.hkctl.on_hotkey("__random__")                     # the global one follows the view
     assert played[0] in ("m0", "m1")
     w.catctl.set_category("")
-    assert {w.play_random() for _ in range(8)} >= {"s0", "s1"}
+    assert {w.playctl.play_random() for _ in range(8)} >= {"s0", "s1"}
 
 
 def test_category_hotkey_is_unique_and_follows_renames(window, monkeypatch):

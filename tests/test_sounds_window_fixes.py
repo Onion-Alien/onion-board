@@ -71,7 +71,7 @@ def test_a_renamed_category_keeps_its_random_hotkey(window):
     window.catctl.rename_category("Memes", "Jokes")
     assert window._registered[-1].get("f7") == hotkeycontrol.RANDOM + "Jokes"
     played = []
-    window.play = played.append
+    window.playctl.play = played.append
     window.hkctl.on_hotkey(window._registered[-1]["f7"])
     assert played == ["s0"]
 
@@ -121,7 +121,7 @@ def test_the_edit_dialog_does_not_nudge_the_volume(window):
     assert drifting
     for pct in drifting[:6]:
         m.volume = pct / 100
-        d = EditDialog(m, window.hotkeys, window.preview, window)
+        d = EditDialog(m, window.hotkeys, window.playctl.preview, window)
         d.apply()
         d.deleteLater()
         assert round(m.volume * 100) == pct

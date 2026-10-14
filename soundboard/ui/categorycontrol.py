@@ -163,7 +163,7 @@ class CategoryControl(Controller):
             mw.overlay.page = 0
             mw._save_later()
         self._fill_subcategories()
-        mw.apply_filter(mw.search.text())
+        mw.searchctl.apply_filter(mw.search.text())
 
     def new_subcategory(self, cat: str, sid: str | None = None, name: str | None = None) -> str:
         """Add a subcategory to `cat` (asking for its name unless given), with `sid`'s
@@ -243,7 +243,7 @@ class CategoryControl(Controller):
             mw.cfg.subcategory = ""
         mw._save_now()
         self._fill_subcategories()
-        mw.apply_filter(mw.search.text())
+        mw.searchctl.apply_filter(mw.search.text())
 
     def _subcategory_menu(self, sub: str, pos):
         mw = self.mw
@@ -345,7 +345,7 @@ class CategoryControl(Controller):
             self.cat_tabs.blockSignals(False)
         if changed:
             mw.overlay.page = 0
-            mw.apply_filter(mw.search.text())
+            mw.searchctl.apply_filter(mw.search.text())
             mw._save_later()
             if mw.cfg.scoped_hotkeys:   # this category's set of sound hotkeys
                 mw.hkctl.register_hotkeys()
@@ -381,7 +381,7 @@ class CategoryControl(Controller):
         self._fill_categories()
         if not sid:
             self.set_category(name)
-        mw.apply_filter(mw.search.text())
+        mw.searchctl.apply_filter(mw.search.text())
         return name
 
     @staticmethod
@@ -421,7 +421,7 @@ class CategoryControl(Controller):
             mw.hkctl.register_hotkeys()
         mw._save_now()
         self._fill_categories()
-        mw.apply_filter(mw.search.text())
+        mw.searchctl.apply_filter(mw.search.text())
         mw.toast(msg)
 
     def rename_category(self, old: str, new: str | None = None):
@@ -450,7 +450,7 @@ class CategoryControl(Controller):
             self.cat_switch.shown = new
         if self.cat_switch.before == old:
             self.cat_switch.before = new
-        mw.shuffle.forget(old)
+        mw.playctl.shuffle.forget(old)
         if old in mw.cfg.subcategories:
             mw.cfg.subcategories[new] = mw.cfg.subcategories.pop(old)
         for m in mw._live_metas():   # removed ones too, or Undo brings `old` back
@@ -482,7 +482,7 @@ class CategoryControl(Controller):
         mw.cfg.category_programs = {exe: cat for exe, cat
                                       in mw.cfg.category_programs.items() if cat != name}
         self._update_cat_timer()
-        mw.shuffle.forget(name)
+        mw.playctl.shuffle.forget(name)
         mw.cfg.subcategories.pop(name, None)
         for m in mw._live_metas():   # removed ones too, or Undo brings it back
             m.tags = [t for t in m.tags if library.split_tag(t)[0] != name]
@@ -491,7 +491,7 @@ class CategoryControl(Controller):
             mw.cfg.subcategory = ""
         mw._save_now()
         self._fill_categories()
-        mw.apply_filter(mw.search.text())
+        mw.searchctl.apply_filter(mw.search.text())
         mw.hkctl.register_hotkeys()   # let go of its random-sound hotkey
 
     def _category_menu(self, pos):
@@ -531,7 +531,7 @@ class CategoryControl(Controller):
         elif act is not None and act == a_nohk:
             mw.hkctl.set_category_hotkey(name, "")
         elif act == a_rand:
-            mw.play_random(name)
+            mw.playctl.play_random(name)
         elif act == a_exp:
             mw.impctl.export_sounds([m for m in mw.cfg.sounds if name in m.tags], name)
         elif act == a_del:
@@ -555,7 +555,7 @@ class CategoryControl(Controller):
         self.set_category(sw.category)
         names = ["", *mw.cfg.categories]
         n = names.index(sw.category) if sw.category in names else 0
-        mw.cue((523,) if n == 0 else ((784, 0) * min(n, 5))[:-1])   # as step_category
+        mw.playctl.cue((523,) if n == 0 else ((784, 0) * min(n, 5))[:-1])   # as step_category
         shown = html.escape(sw.category or ALL)
         mw.toast(_("Back to “{shown}” ({exe} closed)",
                      shown=shown, exe=html.escape(sw.exe)) if sw.back

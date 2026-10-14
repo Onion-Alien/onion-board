@@ -50,7 +50,7 @@ def test_web_results_put_a_back_button_in_place_of_the_category_tabs(window, mon
     monkeypatch.setattr(window.ytresults, "available", lambda: True)
     monkeypatch.setattr(window.ytresults, "search", lambda q: window.ytresults.show() or True)
     window.search.setText("test tone")
-    window.search_youtube()
+    window.searchctl.search_youtube()
     assert not window.catctl._cat_row.isVisibleTo(window) and window.ytresults.isVisibleTo(window)
     window.ytresults.btn_back.click()
     assert window.catctl._cat_row.isVisibleTo(window) and window._pads_scroll.isVisibleTo(window)
@@ -74,11 +74,11 @@ def test_my_sounds_shows_all_the_pads_not_the_ones_matching_the_web_search(
         return True
     monkeypatch.setattr(window.ytresults, "search", search)
     window.search.setText("cat meow")
-    window.search_youtube()
+    window.searchctl.search_youtube()
     window.ytresults.btn_back.click()
     assert window.search.text() == "" and shown() == everything
     window.search.setText("cat meow")
-    window.search_youtube()
+    window.searchctl.search_youtube()
     window.search.setText("boom")            # typed something else since: it stays
     window.ytresults.btn_back.click()
     assert window.search.text() == "boom"

@@ -70,7 +70,7 @@ class EditControl(Controller):
         mw = self.mw
         if self._editors.get(sid) is d:
             del self._editors[sid]
-        mw.drop_preview()                        # a preview still rendering
+        mw.playctl.drop_preview()                        # a preview still rendering
         mw.engine.stop(f"{sid}:preview")         # and the one playing, either kind
         mw.engine.stop(f"{sid}~fx:preview")
         # the sound as it is now: gone (removed while the window was open: nothing to
@@ -88,7 +88,7 @@ class EditControl(Controller):
                     self._rerender(m)
                 mw._save_now()
                 mw.pads[sid].update()
-                mw.apply_filter(mw.search.text())
+                mw.searchctl.apply_filter(mw.search.text())
         finally:
             if mw.setctl._spare_editor is None and d not in self._editors.values():
                 rehome_crash_reports(d)
@@ -99,7 +99,7 @@ class EditControl(Controller):
 
     def _new_editor(self, m: SoundMeta, tab: str) -> EditDialog:
         mw = self.mw
-        d = EditDialog(m, mw.hotkeys, mw.preview, mw, tab=tab,
+        d = EditDialog(m, mw.hotkeys, mw.playctl.preview, mw, tab=tab,
                        others=lambda: list(mw._meta.values()))
         d.hotkeys_changed.connect(mw.hkctl.register_hotkeys)
         d.source_forgotten.connect(mw._save_now)

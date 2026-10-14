@@ -190,9 +190,9 @@ class Overlay:
     """What the overlay does; `OverlayWindow` only draws it.
 
     `host` is the main window. Used: host.cfg (sounds, categories, category,
-    overlay_hotkey), host.audio, host.play(sid), host.hkctl.on_hotkey('__stop__' /
+    overlay_hotkey), host.audio, host.playctl.play(sid), host.hkctl.on_hotkey('__stop__' /
     '__pause__'), host.hkctl.register_hotkeys() (which asks `layer()` for the extra keys),
-    host.cue(kind or notes) and host.catctl.set_category(name) (the category key)."""
+    host.playctl.cue(kind or notes) and host.catctl.set_category(name) (the category key)."""
     ACTION = "__overlay__"
     PREFIX = "__ov:"
 
@@ -342,7 +342,7 @@ class Overlay:
         self.host.hkctl.register_hotkeys()      # claims layer()
         if self.blind:
             log.info("overlay opened without a window: a game is in exclusive fullscreen")
-            self.host.cue("start")
+            self.host.playctl.cue("start")
             if self._window is not None:
                 self._window.dismiss()
         else:
@@ -365,7 +365,7 @@ class Overlay:
             t.stop()
         self.host.hkctl.register_hotkeys()      # the keys go back to the game
         if self.blind:
-            self.host.cue("stop")
+            self.host.playctl.cue("stop")
         if self._window is not None:
             self._window.dismiss()
 
@@ -385,7 +385,7 @@ class Overlay:
         if not 0 <= tile < len(sounds):
             self._touch()
             return
-        self.host.play(sounds[tile].id)
+        self.host.playctl.play(sounds[tile].id)
         self.flash = (tile, time.monotonic() + FLASH_S)
         if self._window is not None:
             self._window.update()
@@ -400,7 +400,8 @@ class Overlay:
         self.page = (self.page + step) % n
         self.flash = None
         if self.blind and n > 1:     # 1 beep for page 1, 2 for page 2, …
-            self.host.cue(tuple(f for __ in range(min(self.page + 1, 6)) for f in (1175, 0)))
+            beeps = min(self.page + 1, 6)
+            self.host.playctl.cue(tuple(f for __ in range(beeps) for f in (1175, 0)))
         if self._window is not None:
             self._window.update()
         self._touch()
@@ -414,7 +415,7 @@ class Overlay:
         self.page = 0
         self.flash = None
         if self.blind:
-            self.host.cue("saved")
+            self.host.playctl.cue("saved")
         if self._window is not None:
             self._window.update()
         self._touch()

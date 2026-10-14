@@ -66,7 +66,7 @@ def test_background_tracks_first_active_sound(window):  # noqa: F811
     w._update_playing_background(playing)
     assert w.grid.background_image == ""
     w.cfg.playing_background = True
-    w.select("s1")
+    w.playctl.select("s1")
     w._update_playing_background(playing)
     assert w.grid.background_image == "first.jpg"
     w._update_playing_background({"s0": (0.2, True)})
@@ -76,7 +76,7 @@ def test_background_tracks_first_active_sound(window):  # noqa: F811
     w.meta("s1").image = ""
     w._update_playing_background({"s1": (0.4, False)})
     assert w.grid.background_image == ""
-    w._queue = ["s0"]
+    w.playctl._queue = ["s0"]
     w._update_playing_background({})
     assert w.grid.background_image == ""
 

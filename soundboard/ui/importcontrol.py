@@ -179,7 +179,7 @@ class ImportControl(Controller):
         copied = QApplication.clipboard().text().strip()
         if ytdl.as_link(copied):
             mw.search.setText(copied)
-            mw._show_link()
+            mw.searchctl._show_link()
         else:
             mw.toast(_("Paste a link into the search box"))
         mw.search.setFocus()
@@ -951,7 +951,7 @@ class ImportControl(Controller):
             mw.cfg.category = mw.cfg.subcategory = ""
         mw._save_now()
         mw.catctl._fill_categories()
-        mw.apply_filter(mw.search.text())
+        mw.searchctl.apply_filter(mw.search.text())
         mw.hkctl.register_hotkeys()
         mw.toast(_("✓ “{name}” is one tab now", name=html.escape(name)), "ok")
 

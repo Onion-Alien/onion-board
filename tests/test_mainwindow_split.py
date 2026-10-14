@@ -6,9 +6,10 @@ import pytest
 
 from soundboard.ui import (aboutcontrol, alertcontrol, appsetupcontrol, buncontrol, categorycontrol,
                            devicecontrol, editcontrol, ffmpegcontrol, hotkeycontrol, importcontrol,
-                           languagecontrol, mainwindow, miccontrol, padcontrol, remoteaccess,
-                           removecontrol, routecontrol, settingscontrol, statuscontrol, tabcontrol,
-                           themecontrol, tipcontrol, updatecontrol)
+                           languagecontrol, mainwindow, miccontrol, padcontrol, playbackcontrol,
+                           remoteaccess, removecontrol, routecontrol, searchcontrol,
+                           settingscontrol, statuscontrol, tabcontrol, themecontrol, tipcontrol,
+                           updatecontrol)
 from test_mainwindow import window  # noqa: F401  (the real MainWindow fixture)
 
 # (window attribute, controller class, methods that live there now)
@@ -78,6 +79,12 @@ SPLIT = [
     ("appsetctl", appsetupcontrol.AppSetupControl,
      ["_voice_tick", "_poll_voice", "_app_setup", "_undo_app_switch", "_show_setup",
       "_hide_setup", "_setup_checks", "_auto_dest"]),
+    ("playctl", playbackcontrol.PlaybackControl,
+     ["play", "queue_sound", "queue_category", "toggle_play_pause", "stop_all", "skip_next",
+      "do_seek", "preview", "drop_preview", "play_random", "cue", "_update_chips", "drop_pending"]),
+    ("searchctl", searchcontrol.SearchControl,
+     ["apply_filter", "flush_search", "search_youtube", "_show_link", "_drop_link",
+      "on_link_played", "focus_search"]),
 ]
 
 

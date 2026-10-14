@@ -643,7 +643,7 @@ def test_link_play_once_shows_in_the_transport_bar(qapp, window, monkeypatch,  #
     paused = []
     monkeypatch.setattr(window.engine, "state", lambda sid: (0.5, False))
     monkeypatch.setattr(window.engine, "set_paused", lambda sid, p: paused.append((sid, p)))
-    window.toggle_play_pause()                               # the ⏸ button pauses it
+    window.playctl.toggle_play_pause()                               # the ⏸ button pauses it
     assert paused == [("__link__", True)]
     assert window.cfg.sounds and all(m.id != "__link__" for m in window.cfg.sounds)
 
@@ -1004,8 +1004,8 @@ def test_add_on_a_second_result_while_one_downloads_adds_both(qapp, window, monk
         return p, url[-3:]
     monkeypatch.setattr(ytdl, "download_audio", slow)
     R = namedtuple("R", "url title seconds")
-    window._from_youtube(R("https://youtu.be/one", "One", 1.0), play=False)
-    window._from_youtube(R("https://youtu.be/second", "Two", 1.0), play=False)
+    window.searchctl._from_youtube(R("https://youtu.be/one", "One", 1.0), play=False)
+    window.searchctl._from_youtube(R("https://youtu.be/second", "Two", 1.0), play=False)
     assert "is next" in window.linkbar.info.text()
     gate.set()
     assert process_events(qapp, lambda: len(window.cfg.sounds) == 4, 10)
@@ -1092,7 +1092,7 @@ def test_a_pasted_link_shows_only_its_own_card(qapp, window, monkeypatch, tmp_pa
     hits = [ytdl.Result(f"id{i}", f"Hit {i}", "Chan", 3) for i in range(3)]
     monkeypatch.setattr(ytdl, "search", lambda q, **kw: hits)
     window.search.setText("vine boom")
-    window.search_youtube()
+    window.searchctl.search_youtube()
     assert process_events(qapp, lambda: len(window.ytresults._rows) == 3, 3)
     window.search.setText("https://youtu.be/abc")
     window.search.returnPressed.emit()
