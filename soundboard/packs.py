@@ -72,23 +72,24 @@ class Pack:
 
 # the packs known when this version was built: shown when the list can't be read
 BUILT_IN = [{
-    "id": "gm-starter",
-    "name": "GM starter pack",
-    "description": "For tabletop games (D&D and friends): tavern, travel, weather, "
-                   "dungeon, combat, magic, boss and ending sounds. Music loops, and "
-                   "Ctrl+Alt+1/2/3 switch tavern, battle and boss music.",
-    "url": f"{updates.DOWNLOADS}gm-pack-1/onion-board-gm-starter-pack.zip",
-    "sha256": "bfb53856bb8f225f336e5391b9ceb0773da2bca61923de0102abf888d499f09d",
-    "size": 28480681,
-    "sounds": 67,
-    "license": "CC0 + CC BY (credits inside)",
+    "id": "streamer",
+    "name": "Streamer pack",
+    "description": "For live streams: starting soon, just chatting, BRB and ending music; "
+                   "follower, sub, donation and raid alerts; air horn, cheers, fails (bonk, "
+                   "buzzer, sad trombone), chat reactions, a 3-2-1 Go announcer and transitions. "
+                   "Ctrl+Alt+3 air horn, Ctrl+Alt+4 bonk.",
+    "url": f"{updates.DOWNLOADS}streamer-pack-1/onion-board-streamer-pack.zip",
+    "sha256": "bb6b6895c3ef30f14e5a45a1b0cfc384de4691d960e1fdf1b0eae8967e1b638c",
+    "size": 18299334,
+    "sounds": 57,
+    "license": "CC0",
     "author": "Onion Board",
-    "emoji": "🎲",
-    "preview": {"url": f"{updates.DOWNLOADS}gm-pack-1/gm-starter-preview.zip",
-                "sha256": "287c97df2e05a8b0aefb76381ab8bc91f28546caa0b2a1dbd8e5228b71d611db",
-                "size": 523245},
-    "categories": ["Tavern", "Travel", "Weather", "Dungeon", "Combat", "Magic", "Boss",
-                   "Endings"],
+    "emoji": "📺",
+    "preview": {"url": f"{updates.DOWNLOADS}streamer-pack-1/streamer-preview.zip",
+                "sha256": "4baeb7fe3d9bdbd2a07db071ba89666d9b3a910118cb510325c1adef1478191c",
+                "size": 376595},
+    "categories": ["Stream music", "Alerts", "Hype", "Fails", "Chat reactions", "Announcer",
+                   "Transitions"],
 }, {
     "id": "esports",
     "name": "Esports pack",
@@ -145,24 +146,23 @@ BUILT_IN = [{
     "categories": ["Spooky music", "Screams", "Monsters", "Jump scares", "Haunted house",
                    "Night"],
 }, {
-    "id": "streamer",
-    "name": "Streamer pack",
-    "description": "For live streams: starting soon, just chatting, BRB and ending music; "
-                   "follower, sub, donation and raid alerts; air horn, cheers, fails (bonk, "
-                   "buzzer, sad trombone), chat reactions, a 3-2-1 Go announcer and transitions. "
-                   "Ctrl+Alt+3 air horn, Ctrl+Alt+4 bonk.",
-    "url": f"{updates.DOWNLOADS}streamer-pack-1/onion-board-streamer-pack.zip",
-    "sha256": "bb6b6895c3ef30f14e5a45a1b0cfc384de4691d960e1fdf1b0eae8967e1b638c",
-    "size": 18299334,
-    "sounds": 57,
-    "license": "CC0",
+    "id": "gm-starter",
+    "name": "GM starter pack",
+    "description": "For tabletop games (D&D and friends): tavern, travel, weather, "
+                   "dungeon, combat, magic, boss and ending sounds. Music loops, and "
+                   "Ctrl+Alt+1/2/3 switch tavern, battle and boss music.",
+    "url": f"{updates.DOWNLOADS}gm-pack-1/onion-board-gm-starter-pack.zip",
+    "sha256": "bfb53856bb8f225f336e5391b9ceb0773da2bca61923de0102abf888d499f09d",
+    "size": 28480681,
+    "sounds": 67,
+    "license": "CC0 + CC BY (credits inside)",
     "author": "Onion Board",
-    "emoji": "📺",
-    "preview": {"url": f"{updates.DOWNLOADS}streamer-pack-1/streamer-preview.zip",
-                "sha256": "4baeb7fe3d9bdbd2a07db071ba89666d9b3a910118cb510325c1adef1478191c",
-                "size": 376595},
-    "categories": ["Stream music", "Alerts", "Hype", "Fails", "Chat reactions", "Announcer",
-                   "Transitions"],
+    "emoji": "🎲",
+    "preview": {"url": f"{updates.DOWNLOADS}gm-pack-1/gm-starter-preview.zip",
+                "sha256": "287c97df2e05a8b0aefb76381ab8bc91f28546caa0b2a1dbd8e5228b71d611db",
+                "size": 523245},
+    "categories": ["Tavern", "Travel", "Weather", "Dungeon", "Combat", "Magic", "Boss",
+                   "Endings"],
 }]
 
 
