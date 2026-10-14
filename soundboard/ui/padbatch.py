@@ -189,7 +189,7 @@ class PadSelection(QObject):
         m.addAction(icons.icon("wave"), _("Fade in / out"), self.ask_fades)
         self._fill_cats(m.addMenu(icons.icon("tag"), _("Categories")))
         m.addAction(icons.icon("folder"), _("Export"),
-                    lambda: self.mw.export_sounds(
+                    lambda: self.mw.impctl.export_sounds(
                         self.sounds(), count(n)))
         m.addSeparator()
         m.addAction(icons.icon("stop"), _("Clear selection"), self.clear)

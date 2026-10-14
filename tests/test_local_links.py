@@ -95,8 +95,8 @@ def test_missing_link_fails_after_cache_is_cleared(app_dir):
 def test_local_import_obeys_setting_and_zip_keeps_file(window, qapp, tmp_path, copy):  # noqa: F811
     window.cfg.copy_local_sounds = copy
     src = wav(tmp_path / "local.wav", hz=880)
-    window.import_files([str(src)])
-    assert process_events(qapp, lambda: not window._pending_imports)
+    window.impctl.import_files([str(src)])
+    assert process_events(qapp, lambda: not window.impctl._pending_imports)
     added = window.cfg.sounds[-1]
     assert library.owns(added.file) == copy
     assert src.exists()
@@ -105,9 +105,9 @@ def test_local_import_obeys_setting_and_zip_keeps_file(window, qapp, tmp_path, c
     with zipfile.ZipFile(archive, "w") as z:
         z.write(other, "zipped.wav")
     before = len(window.cfg.sounds)
-    window.import_files([str(archive)])   # looked into on a worker, then imported
+    window.impctl.import_files([str(archive)])   # looked into on a worker, then imported
     assert process_events(qapp, lambda: len(window.cfg.sounds) > before
-                          and not window._pending_imports)
+                          and not window.impctl._pending_imports)
     added = window.cfg.sounds[-1]
     assert library.owns(added.file) and Path(added.file).exists()
     library.unlink_cache(added.id)

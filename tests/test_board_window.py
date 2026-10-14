@@ -101,8 +101,8 @@ def test_new_sounds_land_in_the_category_on_show(window):
     from soundboard.library import SoundMeta
     window.new_category(name="Clips")
     m = SoundMeta(id="n1", name="new", file="x.wav")
-    window._pending_imports = 1
-    window.on_imported(m, None, "")
+    window.impctl._pending_imports = 1
+    window.impctl.on_imported(m, None, "")
     assert m.tags == ["Clips"] and "n1" in _visible(window)
 
 
@@ -141,17 +141,17 @@ def test_remove_is_finished_on_close(window):
 def test_export_then_import_through_the_window(window, qapp, tmp_path):
     _loaded(window, qapp)   # loading fills in the fingerprints the import compares
     out = tmp_path / "pack.zip"
-    window._export(str(out), list(window.cfg.sounds), with_settings=False)
+    window.impctl._export(str(out), list(window.cfg.sounds), with_settings=False)
     assert process_events(qapp, lambda: "Exported" in said(window))
     assert len(backup.read(out).sounds) == 2
-    window.import_package(str(out))                # all already here: nothing added
+    window.impctl.import_package(str(out))                # all already here: nothing added
     assert process_events(qapp, lambda: "Imported" in said(window))
     assert "2 already" in said(window) and len(window.cfg.sounds) == 2
     for sid in ("s0", "s1"):
         window.remove_sound(sid)
     window._finish_removals()
     unsay(window)
-    window.import_package(str(out))
+    window.impctl.import_package(str(out))
     assert process_events(qapp, lambda: "Imported" in said(window))
     assert [m.name for m in window.cfg.sounds] == ["Boom", "Airhorn"]
     _loaded(window, qapp)
@@ -168,7 +168,7 @@ def test_export_leaves_out_an_unreadable_sound_and_says_so(window, qapp, tmp_pat
         return real_open(file, *a, **kw)
     monkeypatch.setattr(builtins, "open", fake_open)
     out = tmp_path / "pack.zip"
-    window._export(str(out), list(window.cfg.sounds), with_settings=False)
+    window.impctl._export(str(out), list(window.cfg.sounds), with_settings=False)
     assert process_events(qapp, lambda: "Exported" in said(window))
     assert "Exported 1 sound" in said(window)
     assert "1 sound couldn't be read and was left out" in said(window)
@@ -177,8 +177,8 @@ def test_export_leaves_out_an_unreadable_sound_and_says_so(window, qapp, tmp_pat
 
 def test_zip_files_go_to_the_importer(window, qapp, monkeypatch, tmp_path):
     got = []
-    monkeypatch.setattr(window, "import_package", got.append)
-    window.import_files([str(tmp_path / "board.zip")])   # looked into on a worker
+    monkeypatch.setattr(window.impctl, "import_package", got.append)
+    window.impctl.import_files([str(tmp_path / "board.zip")])   # looked into on a worker
     assert process_events(qapp, lambda: got)
     assert got == [str(tmp_path / "board.zip")]
 
@@ -202,12 +202,12 @@ def test_a_zip_of_sounds_imports_like_dropped_files(window, qapp, tmp_path):
         f.writestr("readme.txt", "hi")
     loose = tmp_path / "Oof.wav"
     loose.write_bytes(_wav_bytes(tmp_path, 700))
-    window.import_files([str(z), str(loose)])     # a multi-select: a zip and a file
-    assert process_events(qapp, lambda: not window._pending_imports
+    window.impctl.import_files([str(z), str(loose)])     # a multi-select: a zip and a file
+    assert process_events(qapp, lambda: not window.impctl._pending_imports
                           and len(window.cfg.sounds) == 5)
     assert [m.name for m in window.cfg.sounds[2:]] == ["Oof", "Bruh", "Vine boom"]
     assert all(Path(m.file).is_file() and m.duration > 0 for m in window.cfg.sounds[2:])
-    assert not window._import_errors
+    assert not window.impctl._import_errors
 
 
 def test_dropped_folders_open_up_into_sounds_and_zips(tmp_path):
@@ -289,8 +289,8 @@ def test_a_sound_on_the_undo_bar_isnt_taken_back_in_as_a_loose_file(window, qapp
     m.file, m.hotkey = str(plain), "ctrl+alt+2"
     window.remove_sound("s1")
     for _ in range(3):   # two looks at the same size = "done copying in"
-        window._loose_timer.stop()
-        window._take_loose()
+        window.impctl._loose_timer.stop()
+        window.impctl._take_loose()
     # an import runs on a thread: give one the time to land
     assert not process_events(qapp, lambda: len(window.cfg.sounds) > 1, timeout=3)
     assert [s.name for s in window.cfg.sounds] == ["Boom"]

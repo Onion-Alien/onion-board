@@ -72,15 +72,15 @@ def test_removing_a_pack_does_not_remove_a_preexisting_personal_sound(
                          fingerprint=library.fingerprint(str(own_file)), volume=1.7)
     window.cfg.sounds.append(original)
     window._rebuild_pads()
-    window.import_package(str(package))
+    window.impctl.import_package(str(package))
     assert process_events(qapp, lambda: len(window.cfg.sounds) == 5, 10)
     pid, = backup.packs()
     if reset_first:
-        window.reset_pack(pid, ask=False)
+        window.impctl.reset_pack(pid, ask=False)
         assert process_events(qapp, lambda: len(window.cfg.sounds) == 6, 10)
         assert original.name == "My own sound" and original.volume == 1.7
         assert original.pack == ""
-    window.remove_pack(pid, ask=False)
+    window.impctl.remove_pack(pid, ask=False)
     assert original in window.cfg.sounds
 
 
@@ -177,7 +177,7 @@ def test_overlapping_pack_reset_and_removal_preserve_first_pack(window, tmp_path
     from test_sounds_window_fixes import _three_pack
     first = _three_pack(tmp_path)
     baseline = len(window.cfg.sounds)
-    window.import_package(str(first))
+    window.impctl.import_package(str(first))
     assert process_events(qapp, lambda: len(window.cfg.sounds) == baseline + 3, 10)
     originals = list(window.cfg.sounds[baseline:])
     first_id = originals[0].pack
@@ -190,14 +190,14 @@ def test_overlapping_pack_reset_and_removal_preserve_first_pack(window, tmp_path
                 entry["name"] = "Second " + entry["name"]
                 content = json.dumps(entry).encode()
             dest.writestr(name, content)
-    window.import_package(str(second))
+    window.impctl.import_package(str(second))
     assert process_events(qapp, lambda: "already" in said(window), 10)
     second_id, = set(backup.packs()) - {first_id}
     assert all(m.pack == first_id for m in originals)
-    monkeypatch.setattr(window, "_take_pack_hotkeys", lambda *args: False)
-    window.reset_pack(second_id, ask=False)
+    monkeypatch.setattr(window.impctl, "_take_pack_hotkeys", lambda *args: False)
+    window.impctl.reset_pack(second_id, ask=False)
     assert process_events(qapp, lambda: len(window.cfg.sounds) == baseline + 6, 10)
-    window.remove_pack(second_id, ask=False)
+    window.impctl.remove_pack(second_id, ask=False)
     assert window.cfg.sounds[baseline:] == originals
     assert all(m.pack == first_id and not m.name.startswith("Second") for m in originals)
 

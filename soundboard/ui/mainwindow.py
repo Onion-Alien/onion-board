@@ -8,19 +8,17 @@ import logging
 import os
 import subprocess
 import sys
-import tempfile
 import threading
 import time
 from pathlib import Path
 from typing import Any, Literal, overload
 
 import numpy as np
-from PySide6.QtCore import (QEvent, QFileSystemWatcher, QObject, QPoint, QRect, QSignalBlocker,
-                            QSize, Qt, QTimer, QUrl, QVariantAnimation, Signal)
+from PySide6.QtCore import (QEvent, QObject, QPoint, QRect, QSignalBlocker,
+                            QSize, Qt, QTimer, QUrl, Signal)
 from PySide6.QtGui import (QActionGroup, QColor, QCursor, QDesktopServices, QIcon,
                            QKeySequence, QPainter, QPixmap, QShortcut)
-from PySide6.QtWidgets import (QApplication, QBoxLayout, QCheckBox, QComboBox, QDialog, QFileDialog,
-                               QFrame,
+from PySide6.QtWidgets import (QApplication, QBoxLayout, QCheckBox, QComboBox, QDialog, QFrame,
                                QGraphicsOpacityEffect, QGridLayout, QHBoxLayout, QInputDialog,
                                QLabel, QLineEdit, QMainWindow, QMenu, QMessageBox, QProgressBar,
                                QPushButton, QScrollArea, QSizePolicy, QSlider, QStackedWidget,
@@ -29,7 +27,7 @@ from PySide6.QtWidgets import (QApplication, QBoxLayout, QCheckBox, QComboBox, Q
 from shiboken6 import isValid as qt_valid
 
 from soundboard import engine as eng
-from soundboard import bunny, theme, winkeys, winpath, ytdl, ytworker
+from soundboard import bunny, theme, winkeys, ytdl, ytworker
 from soundboard.engine import SR, Engine
 from soundboard.engine import is_virtual as is_virtual_cable
 from soundboard import exitwatch
@@ -41,20 +39,19 @@ from soundboard import (appsetup, directmic, discordcfg, ffmpegget, michelper, n
                         usage, watchaddon)
 from soundboard.pollthread import PollThread
 from soundboard.replay import InstantReplay
-from soundboard.library import (AUDIO_EXTS, PAD_COLORS, PRESS_MODE, RESOURCE_DIR, Config,
-                                SoundMeta, cache_keep, clean_tags, duplicate, fingerprint,
-                                import_file, load_original, load_sound, loose_sounds,
-                                prune_cache, save_clip)
+from soundboard.library import (PAD_COLORS, PRESS_MODE, RESOURCE_DIR, Config,
+                                SoundMeta, cache_keep, duplicate, fingerprint,
+                                load_original, load_sound, prune_cache, save_clip)
 from soundboard.settings import HOTKEY_ACTIONS, HotkeyDialog, SettingsDialog, pretty_key
 from soundboard.shuffle import ShuffleBag
 from soundboard.ui.crashdialog import free_dialog, rehome_crash_reports
 from soundboard.ui.dialogs import EditDialog, TabHelpPopup
 from soundboard.ui.iconrow import CapIcon
-from soundboard.ui import importreport
 from soundboard.ui import routewarn
 from soundboard.ui import worker
 from soundboard.ui.dropveil import DropVeil
 from soundboard.ui.ffmpegcontrol import FfmpegControl
+from soundboard.ui.importcontrol import ImportControl
 from soundboard.ui.updatecontrol import UpdateControl
 from soundboard.ui import toast as toastmod
 from soundboard.ui import (a11y, alsosend, appstate, busy, clipeditor, icons, responsive,
@@ -117,13 +114,11 @@ TABS = ((_("Sounds"), _("Your sound buttons: click one to play it")),
 TAB_INDEX = {key: i for i, key in enumerate(TAB_KEYS)}
 
 
-SHORT_SOUND_S = 0.3   # an added sound shorter than this gets a "very short" note
 UNDO_S = 10          # how long "Removed … · Undo" stays up
 # an effects preview of a sound longer than this renders only its first PREVIEW_S
 # (soundfx.preview_part): a 2-hour song's pitch shift took minutes to start playing
 PREVIEW_WHOLE_S = 5 * 60
 PREVIEW_S = 30
-PACK_SAMPLE = "__pack_sample"   # Free packs' "hear it first" voice (headphones only)
 UNDO_KEY = "undo-sounds"   # its card (toast key)
 TOAST_EXPAND = QSize(900, 640)   # a shrunk card clicked: the window grows to this
 # shown when instant replay goes on: it records whoever is talking in a call
@@ -153,8 +148,6 @@ RECOVER_WAIT_S = (20, 40, 80, 160, 300)
 # ...and one Windows doesn't list (unplugged): looked for at the timer's pace for a
 # few checks (a quick re-plug), then only this often (seconds)
 GONE_CHECKS, GONE_WAIT_S = 4, 6
-LOOSE_WAIT_MS = 1500   # a file dragged into the sounds folder is looked at again (ms)
-LOOSE_EMPTY_LOOKS = 20   # an empty file that long (~30 s) waits for the folder to change
 BODY_SIDE = 14         # the gap around the window's content (beside the tab rail too)...
 BODY_SIDE_TIGHT = 8    # ...and beside the rail in a narrow window
 SETTINGS_ROOM = QSize(480, 520)   # what Settings opened from the mini player grows it to
@@ -420,6 +413,7 @@ class MainWindow(QMainWindow):
 
     def __init__(self):
         super().__init__()
+        self.impctl = ImportControl(self)
         self.updctl = UpdateControl(self)
         # shutdown() ran (app.py also calls it on aboutToQuit). Set first: the splash
         # pumps events while the window is built, so its timers can run
@@ -473,11 +467,11 @@ class MainWindow(QMainWindow):
         self._save_failed_shown = False
         self.bridge = Bridge()
         self.bridge.loaded.connect(self.on_loaded)
-        self.bridge.imported.connect(self.on_imported)
+        self.bridge.imported.connect(self.impctl.on_imported)
         self.bridge.preview.connect(self._on_fx_preview)
-        self.bridge.exported.connect(self._on_exported)
-        self.bridge.unpacked.connect(self._on_unpacked)
-        self.bridge.worked.connect(self._on_worked)
+        self.bridge.exported.connect(self.impctl._on_exported)
+        self.bridge.unpacked.connect(self.impctl._on_unpacked)
+        self.bridge.worked.connect(self.impctl._on_worked)
         self.bridge.update.connect(self.updctl._on_update)
         self.bridge.update_progress.connect(self.updctl._on_update_progress)
         self.bridge.update_ready.connect(self.updctl._on_update_ready)
@@ -496,7 +490,6 @@ class MainWindow(QMainWindow):
         self._spare_editor: EditDialog | None = None   # a closed one, reused (edit)
         self._settings_kept: SettingsDialog | None = None   # closed Settings, reused
         self._settings_kept_print = None
-        self._packs_removed: set[str] = set()   # sound packs to stop keeping after Undo
         self._bin_thread: threading.Thread | None = None   # the newest _finish_removals work
         self._render_gen: dict[str, int] = {}   # sid -> newest effects render (_rerender)
         self.shuffle = ShuffleBag()       # the random-sound hotkeys
@@ -508,7 +501,6 @@ class MainWindow(QMainWindow):
         self._hotkeys_off = False         # "All hotkeys off": only that key still works
         self._voice_was: bool | None = None   # voice changer state before a held key
         Pad.single_click = self.cfg.single_click
-        self._imported_short = False      # a sound added in this batch is under SHORT_SOUND_S
         self._quitting = False            # a real quit (not "close to the tray")
         self._tray_told = False           # the "still running in the tray" note was shown
         self.tray: QSystemTrayIcon | None = None
@@ -547,22 +539,6 @@ class MainWindow(QMainWindow):
         self._preview_gen = 0            # newest effects preview (older renders are dropped)
         self._preview_done = None         # its done(ok) callback while it renders
         self._ptt_held: str | None = None   # PTT key we're currently holding
-        self._pending_imports = 0
-        self._imported_ok = 0
-        # boards the installer's ticked box brought over: asked once they're in
-        self._ask_keep: list[str] = []
-        self._exporting = False
-        self._import_errors: list[importreport.Skipped] = []
-        self._import_total = 0      # this batch, for the toast's "3 of 12"
-        self._import_card_shut = False   # its card closed with ✕: the import goes on
-        self._import_stop = threading.Event()   # its Stop: the files not started are skipped
-        # the pads come in a few at a time while a big import runs, each playable at once
-        self._import_pads = QTimer(self, singleShot=True, interval=300,
-                                   timeout=self._rebuild_pads)   # pyright: ignore[reportCallIssue]
-        self._import_ids: list[str] = []   # added in this batch: Undo takes them off
-        # sound id -> the hotkey it had in another soundboard (Import from Soundpad),
-        # given to it once it's in if nothing here has that key
-        self._import_keys: dict[str, str] = {}
         self.current: str | None = None   # sound shown in the transport bar
         self._link_meta: SoundMeta | None = None   # the link bar's Play once
         self._link_url = ""                        # ...and the page it came from
@@ -616,7 +592,7 @@ class MainWindow(QMainWindow):
         splash.pump()
         self.load_triggers()   # behind the loading screen, not on the tab's first click
         splash.pump()
-        self._watch_sounds_folder()
+        self.impctl._watch_sounds_folder()
         self._fit_overlay_key()
         self.register_hotkeys()
         # Stream Deck / scripts (Settings → Remote), only if turned on
@@ -1625,11 +1601,11 @@ class MainWindow(QMainWindow):
                          "(or drag files onto the window)"))
         icons.set_icon(add, "music", "accent", size=18)
         am = self._add_menu = DropdownMenu(add)
-        icons.set_icon(am.addAction(_("Sound files"), self.add_dialog), "music")
-        icons.set_icon(am.addAction(_("A whole folder"), self.add_folder_dialog), "folder")
+        icons.set_icon(am.addAction(_("Sound files"), self.impctl.add_dialog), "music")
+        icons.set_icon(am.addAction(_("A whole folder"), self.impctl.add_folder_dialog), "folder")
         icons.set_icon(am.addAction(_("Record"), self.record_dialog), "mic")
-        icons.set_icon(am.addAction(_("From a link"), self.add_from_link), "link")
-        icons.set_icon(am.addAction(_("Free sound packs"), self.show_packs), "download")
+        icons.set_icon(am.addAction(_("From a link"), self.impctl.add_from_link), "link")
+        icons.set_icon(am.addAction(_("Free sound packs"), self.impctl.show_packs), "download")
         add.setMenu(am)
         add.setProperty("toolbarMenu", True)
         self.search = QLineEdit()
@@ -1672,25 +1648,26 @@ class MainWindow(QMainWindow):
                           "sound pack"))
         icons.set_icon(more, "archive", size=18)
         mm = DropdownMenu(more)
-        icons.set_icon(mm.addAction(_("Import a backup or sound pack"), self.import_dialog),
+        icons.set_icon(mm.addAction(_("Import a backup or sound pack"), self.impctl.import_dialog),
                        "folder")
-        icons.set_icon(mm.addAction(_("Free sound packs"), self.show_packs), "download")
+        icons.set_icon(mm.addAction(_("Free sound packs"), self.impctl.show_packs), "download")
         om = mm.addMenu(_("Import from another soundboard"))
         icons.set_icon(om.menuAction(), "copy")
         for src in otherboards.sources():
-            icons.set_icon(om.addAction(f"{src.name}…", lambda src=src: self.import_other(src)),
+            icons.set_icon(om.addAction(f"{src.name}…",
+                                        lambda src=src: self.impctl.import_other(src)),
                            "sounds")
         pm = self._packs_menu = mm.addMenu(_("My sound packs"))
         icons.set_icon(pm.menuAction(), "sounds")
-        pm.aboutToShow.connect(lambda: self._fill_packs_menu(pm))
+        pm.aboutToShow.connect(lambda: self.impctl._fill_packs_menu(pm))
         mm.addSeparator()
         icons.set_icon(mm.addAction(_("Export everything (sounds + settings)"),
-                                    self.export_board), "download")
-        self._act_export_cat = mm.addAction(_("Export this category"), self.export_category)
+                                    self.impctl.export_board), "download")
+        self._act_export_cat = mm.addAction(_("Export this category"), self.impctl.export_category)
         icons.set_icon(self._act_export_cat, "download")
         mm.addSeparator()
         icons.set_icon(mm.addAction(_("Recently deleted sounds"), self.show_deleted), "trash")
-        icons.set_icon(mm.addAction(_("Open the sounds folder"), self.open_sounds_folder),
+        icons.set_icon(mm.addAction(_("Open the sounds folder"), self.impctl.open_sounds_folder),
                        "folder")   # here too, for when the window's too narrow for its button
         mm.aboutToShow.connect(lambda: (
             self._act_export_cat.setEnabled(bool(self.cfg.category)),
@@ -1705,7 +1682,7 @@ class MainWindow(QMainWindow):
         self.btn_folder.setToolTip(_("Open the folder your sounds are kept in. Sound files you "
                                      "drag into it join the board by themselves."))
         icons.set_icon(self.btn_folder, "folder", size=18)
-        self.btn_folder.clicked.connect(self.open_sounds_folder)
+        self.btn_folder.clicked.connect(self.impctl.open_sounds_folder)
         self._label_bin()
         # the most-used app-wide hotkeys in one click; the full list is in Settings
         self.btn_keys = QPushButton()
@@ -1800,7 +1777,8 @@ class MainWindow(QMainWindow):
         self.grid.reorder.connect(self.on_reorder)
         # queued: the import (and any question it asks) runs after the drop returns,
         # so Explorer isn't frozen until a dialog is answered
-        self.grid.files_dropped.connect(self.import_files, Qt.ConnectionType.QueuedConnection)
+        self.grid.files_dropped.connect(self.impctl.import_files,
+                                        Qt.ConnectionType.QueuedConnection)
         self.grid.image_dropped.connect(self.set_picture, Qt.ConnectionType.QueuedConnection)
         scroll = QScrollArea()
         scroll.setWidgetResizable(True)
@@ -1910,7 +1888,7 @@ class MainWindow(QMainWindow):
         self._video_for: tuple[str | None, Path | None] = ("", None)   # (sid, its video)
         self._video_asking: str | None = None   # the sound whose video a thread looks up
         self.video_found.connect(self._video_found)
-        self.board_read.connect(self._board_read)
+        self.board_read.connect(self.impctl._board_read)
         self._video_win = None   # ui/videowindow.VideoWindow, made on first use
         th.addWidget(self.btn_video)
         self.speed_btn = SpeedPitchButton(
@@ -4243,7 +4221,7 @@ class MainWindow(QMainWindow):
         self._prepare_all()
         # the installer's "from Soundpad" box waits for this, so its progress card
         # isn't stuck over the guide (a no-op once it's done)
-        QTimer.singleShot(300, self.import_queued)
+        QTimer.singleShot(300, self.impctl.import_queued)
 
     def open_windows_mic(self):
         vm = self.virtual_mic or _("your virtual cable")
@@ -6927,7 +6905,7 @@ class MainWindow(QMainWindow):
         elif act in (a_all, a_shuf):
             self.queue_category(name, shuffled=act == a_shuf)
         elif act == a_exp:
-            self.export_sounds([m for m in self.cfg.sounds if name in m.tags], name)
+            self.impctl.export_sounds([m for m in self.cfg.sounds if name in m.tags], name)
         elif act == a_del:
             self.delete_category(name)
         elif act == a_prog:
@@ -7060,366 +7038,6 @@ class MainWindow(QMainWindow):
         """Every sound whose files must be kept: the library, and removed ones that
         can still be undone."""
         return list(self.cfg.sounds) + [m for m, _i, _d in list(self._removed)]
-
-    def open_sounds_folder(self):
-        try:
-            library.SOUNDS_DIR.mkdir(parents=True, exist_ok=True)
-            opened = QDesktopServices.openUrl(QUrl.fromLocalFile(str(library.SOUNDS_DIR)))
-        except OSError as e:
-            log.warning("can't make the sounds folder: %s", e)
-            opened = False
-        if opened:
-            self.toast(_("Opened your sounds folder"), "ok")
-        else:
-            self.toast(_("Couldn't open the sounds folder: {sounds_dir}",
-                         sounds_dir=html.escape(str(library.SOUNDS_DIR))), "warn")
-
-    def _watch_sounds_folder(self):
-        """Sound files dragged into the sounds folder in Explorer join the board,
-        even ones put there while the app was closed."""
-        self._loose_sizes: dict[Path, tuple[int, int]] = {}
-        self._loose_taken: set[Path] = set()   # imported or failed: not tried again
-        self._loose_empty: dict[Path, tuple[tuple[int, int], int]] = {}   # sig, looks
-        self._loose_timer = QTimer(self)
-        self._loose_timer.setSingleShot(True)
-        self._loose_timer.setInterval(LOOSE_WAIT_MS)
-        self._loose_timer.timeout.connect(self._take_loose)
-        try:
-            library.SOUNDS_DIR.mkdir(parents=True, exist_ok=True)
-        except OSError:
-            return
-        self._folder_watch = QFileSystemWatcher([str(library.SOUNDS_DIR)], self)
-        self._folder_watch.directoryChanged.connect(lambda _p: self._loose_timer.start())
-        self._loose_timer.start()
-
-    def _take_loose(self):
-        """Import the sounds folder's loose files once they're done copying in (the
-        same size on two looks in a row)."""
-        seen, ready, empty = {}, [], {}
-        # a sound on the Undo bar is off the board but its file is still here: not a
-        # new one (it came back as a copy, without its hotkey, and its bin entry broke)
-        undoable = {os.path.normcase(m.file) for m, *_rest in self._removed}
-        for p in loose_sounds(self.cfg):
-            if p in self._loose_taken or os.path.normcase(str(p)) in undoable:
-                continue
-            try:
-                st = p.stat()
-            except OSError:
-                continue
-            sig = (st.st_size, st.st_mtime_ns)
-            if not st.st_size:   # never "ready": don't look again every 1.5 s forever
-                was = self._loose_empty.get(p)
-                looks = was[1] + 1 if was and was[0] == sig else 0
-                empty[p] = (sig, looks)
-                if looks >= LOOSE_EMPTY_LOOKS:
-                    continue   # the folder changing (it's written to) looks again
-            if st.st_size and self._loose_sizes.get(p) == sig:
-                ready.append(p)
-            else:
-                seen[p] = sig
-        self._loose_sizes, self._loose_empty = seen, empty
-        if seen:
-            self._loose_timer.start()   # still copying: look again
-        if ready:
-            self._loose_taken.update(ready)
-            log.info("adding %d sound(s) put in the sounds folder", len(ready))
-            self.import_files([str(p) for p in ready])
-
-    def add_dialog(self):
-        exts = " ".join(f"*{e}" for e in sorted(AUDIO_EXTS))
-        files, __ = QFileDialog.getOpenFileNames(
-            self, _("Add sounds"), str(Path.home()),
-            _("Sounds and zips ({exts} *.zip);;Audio ({exts});;Zip of sounds, backup or "
-              "sound pack (*.zip);;All files (*)", exts=exts))
-        if files:
-            self.import_files(files)
-
-    def add_folder_dialog(self):
-        """Add every sound in a folder (and its subfolders), as a drop of it would."""
-        folder = QFileDialog.getExistingDirectory(self, _("Add sounds"), str(Path.home()))
-        if folder:
-            self.import_files(expand_dropped([folder]))
-
-    def add_from_link(self):
-        """A link already copied goes straight into the search box (its card shows);
-        otherwise the box is focused for one to be pasted."""
-        copied = QApplication.clipboard().text().strip()
-        if ytdl.as_link(copied):
-            self.search.setText(copied)
-            self._show_link()
-        else:
-            self.toast(_("Paste a link into the search box"))
-        self.search.setFocus()
-        self.search.selectAll()
-
-    def import_files(self, files, extras: dict[str, otherboards.Entry] | None = None):
-        """Add sound files (and zips / backups). `extras`: file -> its name, hotkey and
-        categories from another soundboard; those already here are skipped quietly."""
-        files = [f for f in files if f]
-        extras = extras or {}
-        for f in list(files):
-            if (src := otherboards.for_file(f)) is not None:
-                files.remove(f)   # another soundboard's saved board dropped on the window
-                self.import_other(src, f)
-        packages = [f for f in files if self._is_package(f)]
-        if not packages:
-            self._import_now(files, extras, {})
-            return
-        files = [f for f in files if f not in packages]
-
-        def look():   # opening each zip: on the worker (a big one, or on OneDrive)
-            return {f: backup.loose_audio(f) for f in packages}
-
-        def then(found, err):
-            if err is not None:
-                log.warning("couldn't look into %s: %r", packages, err)
-            found = found or {}
-            # a plain zip of sound files: unpacked, then imported like the rest; a
-            # backup / sound pack (a .zip, or a folder with its JSON) is read instead
-            zips = {f: found[f] for f in packages if found.get(f)}
-            for f in packages:
-                if f not in zips:
-                    self.import_package(f)
-            self._import_now(files, extras, zips)
-        self._on_worker(look, then, "import-look")
-
-    def _import_now(self, files: list[str], extras: dict[str, otherboards.Entry],
-                    zips: dict[str, list[str]]):
-        """import_files once the zips are sorted: `zips` maps a plain zip to its sounds."""
-        count = len(files) + sum(len(n) for n in zips.values())
-        if not count:
-            return
-        self._pending_imports += count
-        start = len(self.cfg.sounds)
-        known = {m.fingerprint: m.name for m in self.cfg.sounds if m.fingerprint}
-        copy_local = self.cfg.copy_local_sounds
-        local_files = set(files)   # ZIP extraction adds temporary files later
-        stop = self._import_stop
-        sent = [0]   # answers so far: on_imported waits for `count` of them
-
-        def emit(meta, data, err):
-            sent[0] += 1
-            self.bridge.imported.emit(meta, data, err)
-
-        def failed(e):   # the rest come back as one problem, so the import ends
-            first = next(iter(zips), files[0] if files else "")
-            for i in range(count - sent[0]):
-                emit(None, None, importreport.classify(first, e) if i == 0 else None)
-            return worker.SKIP
-
-        def run():
-            with tempfile.TemporaryDirectory(prefix="onionboard-zip-") as tmp:
-                todo = list(files)
-                for k, (z, names) in enumerate(zips.items()):
-                    if stop.is_set():   # Stop: not unpacked, only counted down
-                        for __ in names:
-                            emit(None, None, None)
-                        continue
-                    try:
-                        res = backup.extract_loose(z, names, Path(tmp) / str(k))
-                    except Exception as e:  # noqa: BLE001 - too big, no room, damaged
-                        log.warning("can't unpack %s: %s", z, e)
-                        # one message for the zip; the rest only count down
-                        emit(None, None, importreport.classify(z, e))
-                        for __ in names[1:]:
-                            emit(None, None, None)
-                        continue
-                    for _n, dest, err in res:
-                        if dest is None:
-                            sk = importreport.classify(z, err)
-                            sk.file = f"{Path(z).name} → {_n}"
-                            emit(None, None, sk)
-                        else:
-                            todo.append(str(dest))
-                import_all(todo)
-
-        def import_all(files):
-            for i, shown in enumerate(files):
-                if stop.is_set():   # Stop: the rest only count down, the ones in stay
-                    emit(None, None, None)
-                    continue
-                f = shown   # read through any folder link Windows won't follow
-                try:
-                    f = str(winpath.usable(shown))
-                    fp = fingerprint(f)
-                    if fp and fp in known:
-                        if shown in extras:
-                            emit(None, None, None)   # already moved over
-                            continue
-                        raise importreport.AlreadyAdded(known[fp])
-                    x = extras.get(shown)   # from another soundboard: named as it was there
-                    meta, data = import_file(f, PAD_COLORS[(start + i) % len(PAD_COLORS)],
-                                             name=x.name if x is not None else "",
-                                             copy=copy_local or shown not in local_files
-                                             or library.owns(Path(f)))
-                    if x is not None:
-                        meta.name = x.name or meta.name
-                        meta.tags = clean_tags(x.tags)
-                        if x.hotkey:
-                            self._import_keys[meta.id] = x.hotkey
-                    meta.image = thumbs.extract_art(f, meta.id)   # cover art / first frame
-                    videos.link_import(meta.id, f)   # the player can show a video file
-                    if fp:
-                        known[fp] = meta.name   # the same file twice in one drop
-                    self.engine.prepare(meta.id, data)
-                    if Path(f).parent == library.SOUNDS_DIR and Path(meta.file) != Path(f):
-                        Path(f).unlink(missing_ok=True)   # dragged into the folder: now
-                    emit(meta, data, None)   # it's in there as ours
-                except Exception as e:  # noqa: BLE001
-                    log.warning("can't import %s: %s", f, e)
-                    emit(None, None, importreport.classify(shown, e))
-        worker.run(run, self.bridge.imported, "import", error=failed)
-        busy.set_busy(self.btn_add, True)   # back in on_imported, when they're all in
-        self._import_total += count
-        self._import_progress()
-
-    def _import_progress(self):
-        """The import's toast while it runs: "Adding 3 of 12…", with a bar. Several
-        files get a bigger card with Bun; closing it (✕) only hides it: the import goes
-        on, its sounds keep showing up, and the finished card still comes."""
-        total = self._import_total
-        done = total - self._pending_imports
-        text = (ngettext("Adding {count} sound…", "Adding {count} sounds…", total, count=total)
-                if not done else _("Adding {done} of {total}…", done=done, total=total))
-        if total <= 1:
-            self.toast(text, "busy", 0, key="import")   # up until it's in, however slow
-            return
-        if self._import_card_shut:
-            return
-        if self._ask_keep:   # the installer's box: say where they're coming from
-            text = (_("Bringing your sounds over from {name}: {done} of {total}…",
-                      name=self._ask_keep[0], done=done, total=total)
-                    if len(self._ask_keep) == 1 else
-                    _("Bringing your sounds over from your other soundboards: {done} of "
-                      "{total}…", done=done, total=total))
-        text = "<b>{}</b><br>{}".format(text, _("Each sound shows up as soon as it's in. "
-                                                 "Closing this doesn't stop it."))
-        t = self.toast(text, "busy", 0, key="import", progress=(done, total),
-                       action=(_("Stop"), self._stop_import),
-                       picture=bunny.bunny_pixmap(44, dpr=self.devicePixelRatioF()))
-        if t is not None and not t.property("import_card"):
-            t.setProperty("import_card", True)
-            t.card.btn_close.clicked.connect(self._shut_import_card)
-
-    def _shut_import_card(self):
-        if self._pending_imports > 0:
-            self._import_card_shut = True
-
-    def _stop_import(self):
-        """The card's Stop: the file being read finishes, the rest are skipped; the
-        sounds already in stay (the finished card's Undo takes them off too)."""
-        if self._pending_imports > 0:
-            usage.used("import-stopped")
-            self._import_stop.set()
-            self._import_card_shut = True
-
-    def on_imported(self, meta, data, err):
-        self._pending_imports -= 1
-        if meta is not None:
-            self._tag_new(meta)
-            meta.tags = library.merge_tags(meta.tags, self.cfg.categories,
-                                           self.cfg.subcategories)
-            key = self._import_keys.pop(meta.id, "")
-            if key and not self._hotkey_taken(key):
-                meta.hotkey = key
-            self.cfg.sounds.append(meta)
-            self._index()
-            self.audio[meta.id] = data
-            self._imported_ok += 1
-            if meta.duration < SHORT_SOUND_S:
-                self._imported_short = True
-            self._import_ids.append(meta.id)
-            usage.used("add-files")
-            usage.step(self.cfg, "added-sound")
-        elif err:
-            self._import_errors.append(err)
-        if self._pending_imports > 0:
-            if meta is not None and not self._import_pads.isActive():
-                self._import_pads.start()   # on the board soon, with the next few
-            self._import_progress()
-            return
-        self._import_pads.stop()
-        self._pending_imports = 0
-        self._import_card_shut = False
-        self._import_stop.clear()
-        self._save_now()
-        self._rebuild_pads()
-        self._fill_categories()   # categories and hotkeys from an Import from Soundpad
-        self.register_hotkeys()
-        n, self._imported_ok = self._imported_ok, 0
-        short, self._imported_short = self._imported_short, False
-        ids, self._import_ids = self._import_ids, []
-        skipped, self._import_errors = self._import_errors, []
-        self._import_total = 0
-        busy.set_busy(self.btn_add, False)
-        self.triggers.import_done()   # a trigger's sound that failed to import
-        boards, self._ask_keep = self._ask_keep, []
-        if boards and ids and not self._keep_imported(boards, ids):
-            return
-        if not n and not skipped:
-            self.toast(_("Nothing new to add"), key="import")
-            return
-        text, kind = importreport.summary(n, skipped)
-        if skipped:
-            usage.used("import-skipped")
-            action = (_("See why"), lambda: self._show_skipped(skipped))
-        else:
-            action = (_("Undo"), lambda: self.remove_sounds(ids))
-        self.toast(text, kind, 8000 if skipped else 6000, key="import", action=action)
-        self._flash_new(ids)
-        if short:
-            self.toast(_("A sound you added is very short, so it may be barely "
-                         "heard."), "warn")
-
-    def _keep_imported(self, boards: list[str], ids: list[str]) -> bool:
-        """The installer's box brought another soundboard's sounds over without asking:
-        ask now whether to keep them, so nobody has to delete a big board pad by pad.
-        False: they're removed (Undo and Recently deleted still have them)."""
-        text = (ngettext("We brought over <b>{n}</b> sound from {name}. Keep it?",
-                         "We brought over <b>{n}</b> sounds from {name}. Keep them?",
-                         len(ids), name=boards[0]) if len(boards) == 1 else
-                ngettext("We brought over <b>{n}</b> sound from your other soundboards. "
-                         "Keep it?",
-                         "We brought over <b>{n}</b> sounds from your other soundboards. "
-                         "Keep them?", len(ids)))
-        box = QMessageBox(QMessageBox.Icon.Question, _("Keep your imported sounds?"), text,
-                          QMessageBox.StandardButton.NoButton, self)
-        # Bun, smug: got your board and its settings in one go
-        box.setIconPixmap(bunny.bunny_pixmap(84, dpr=self.devicePixelRatioF(), smug=True))
-        keep = box.addButton(_("Keep"), QMessageBox.ButtonRole.YesRole)
-        remove = box.addButton(_("Remove"), QMessageBox.ButtonRole.NoRole)
-        box.setInformativeText(_("Removed sounds come back with Undo, or later from Backup "
-                                 "→ Recently deleted sounds."))
-        box.setDefaultButton(keep)
-        box.setEscapeButton(keep)   # closing it never deletes anything
-        box.exec()
-        kept = box.clickedButton() is not remove   # closed some other way: kept
-        free_dialog(box)
-        if not kept:
-            self.remove_sounds(ids)
-        return kept
-
-    def _show_skipped(self, skipped):
-        dlg = importreport.SkippedDialog(skipped, self)
-        dlg.show()   # not modal: sounds keep playing
-
-    def _flash_new(self, ids: list[str]):
-        """The pads just added light up once (their hover glow), the first scrolled
-        into view, so it's clear where they went."""
-        pads = [self.pads[i] for i in ids if i in self.pads]
-        if not pads:
-            return
-        self._pad_scroll.ensureWidgetVisible(pads[0])
-        if not toastmod.animations_on():
-            return
-        for pad in pads:
-            a = QVariantAnimation(pad)
-            a.setDuration(900)
-            a.setKeyValueAt(0.0, 0.0)
-            a.setKeyValueAt(0.3, 1.0)
-            a.setKeyValueAt(1.0, 0.0)
-            a.valueChanged.connect(lambda v, pad=pad: pad.hover or pad._on_hover_k(v))
-            a.start(QVariantAnimation.DeletionPolicy.DeleteWhenStopped)
 
     def on_clip(self, data, name) -> SoundMeta | None:
         """A clip recorded in the Radio or Apps tab (or with the mic) becomes a normal
@@ -7735,7 +7353,7 @@ class MainWindow(QMainWindow):
         elif act == a_newcat:
             self.new_category(sid)
         elif act == a_export:
-            self.export_sounds([m], m.name)
+            self.impctl.export_sounds([m], m.name)
         elif act is not None and act == a_src_open:
             sourcedialog.open_link(src, self)
         elif act is not None and act == a_src_copy:
@@ -7935,9 +7553,9 @@ class MainWindow(QMainWindow):
         done, self._removed = [(m, i) for m, i, _d in self._removed], []
         toastmod.close(self, UNDO_KEY)   # (its on_close comes back here: nothing left)
         # not undone: the pack is no longer kept
-        packs = [p for p in self._packs_removed
+        packs = [p for p in self.impctl._packs_removed
                  if not any(m.pack == p for m in self.cfg.sounds)]
-        self._packs_removed.clear()
+        self.impctl._packs_removed.clear()
         if not done and not packs:
             return
         prev = self._bin_thread
@@ -8338,590 +7956,6 @@ class MainWindow(QMainWindow):
         worker.run(run, self.bridge.loaded, "fx-render", error=failed, owner=self)
 
     # ------------------------------------------------------------------ backup
-    # Export / import: see soundboard/backup.py and docs/BACKUP-FORMAT.md. The file
-    # work runs on a thread; the result comes back through the bridge.
-    @staticmethod
-    def _is_package(path: str) -> bool:
-        p = Path(path)
-        if p.is_dir():
-            return (p / backup.MANIFEST).is_file() or (p / backup.SOUND_JSON).is_file()
-        return p.suffix.lower() == ".zip"
-
-    def _save_name(self, title: str, name: str) -> str:
-        docs = Path.home() / "Documents"
-        start = (docs if docs.is_dir() else Path.home()) / name
-        f, __ = QFileDialog.getSaveFileName(self, title, str(start), _("Zip file (*.zip)"))
-        if f and not f.lower().endswith(".zip"):
-            f += ".zip"
-        return f
-
-    def export_board(self):
-        """Everything: every sound (with its picture, effects, hotkey, categories) and
-        the app's settings, to move to another PC or keep as a backup."""
-        if not self.cfg.sounds and not QMessageBox.question(
-                self, _("Export"), _("There are no sounds yet. Export just your settings?")) \
-                == QMessageBox.StandardButton.Yes:
-            return
-        f = self._save_name(_("Export everything"),
-                            f"Onion Board backup {time.strftime('%Y-%m-%d')}.zip")
-        if f:
-            self._export(f, list(self.cfg.sounds), with_settings=True)
-
-    def export_category(self):
-        if self.cfg.category:
-            self.export_sounds(self.category_sounds(), self.cfg.category)
-
-    def export_sounds(self, sounds: list[SoundMeta], name: str):
-        """A sound pack: just these sounds (no settings), e.g. to share with friends."""
-        if not sounds:
-            self.toast(_("There are no sounds in it to export."), "warn")
-            return
-        f = self._save_name(_("Export sounds"), backup._safe(name) + ".zip")
-        if f:
-            self._export(f, sounds, with_settings=False)
-
-    def _export(self, path: str, sounds: list[SoundMeta], with_settings: bool):
-        self._save_now()
-        # snapshot on this thread: the UI keeps editing the live config (and each
-        # sound's fx dict) while the export thread would be iterating over them
-        cfg = copy.deepcopy(self.cfg) if with_settings else None
-        sounds = copy.deepcopy(sounds)
-        cats = list(self.cfg.categories)
-        if self._exporting:
-            self.toast(_("Still exporting the last one, try again when it's done"), "warn")
-            return
-        self._exporting = True
-        self.toast(ngettext("Exporting {n} sound…", "Exporting {n} sounds…", len(sounds)))
-
-        def run():
-            skipped = []   # locked or vanished files: left out, the rest still go
-            n = backup.export(path, sounds, cfg, cats, skipped)
-            return path, n, "", len(skipped)
-        # disk full, no permission…: told, and _exporting goes back
-        worker.run(run, self.bridge.exported, "export",
-                   error=lambda e: (path, 0, errors.plain(e), 0), owner=self)
-
-    def _on_exported(self, path: str, n: int, err: str, skipped: int = 0):
-        self._exporting = False
-        if err:
-            self.tell(_("Export failed"),   # in place of the "Exporting…" card
-                      _("Couldn't write {name}:\n{err}",
-                        name=Path(path).name, err=errors.plain(err)), "error")
-            return
-        msg = (ngettext("Exported {n} sound to {name}.",
-                        "Exported {n} sounds to {name}.",
-                        n, name=html.escape(Path(path).name)))
-        if skipped:
-            msg += " " + ngettext("{n} sound couldn't be read and was left out.",
-                                  "{n} sounds couldn't be read and were left out.", skipped)
-        self.toast(msg, "warn" if skipped else "ok")
-
-    def show_packs(self):
-        """The Free packs window (soundboard.packs): a pack it downloads is imported the
-        way dropping its zip on the window is."""
-        from soundboard.ui.packsdialog import PacksDialog
-        dlg = PacksDialog(lambda path: self.import_files([str(path)]), self,
-                          play=self._pack_sample)
-        dlg.exec()
-        free_dialog(dlg)
-
-    def _pack_sample(self, data, gain: float) -> bool:
-        """Free packs' samples: to your headphones only (None stops it). False: no
-        headphones to play them on."""
-        if data is None:
-            self.engine.stop(PACK_SAMPLE)
-            return True
-        return self.engine.play(PACK_SAMPLE, data, gain, mode="restart",
-                                preview=True) is not None
-
-    def import_dialog(self):
-        files, __ = QFileDialog.getOpenFileNames(
-            self, _("Import a backup, sound pack or zip of sounds"), str(Path.home()),
-            _("Zip file (*.zip)"))
-        if files:
-            self.import_files(files)   # a plain zip of sounds is imported too
-
-    def import_queued(self):
-        """The installer's "Bring my sounds over from …" boxes, ticked: they left a
-        note for this start. The tick was their yes, so nothing is asked again."""
-        note = library.APP_DIR / otherboards.QUEUED_NAME
-        if not note.is_file():
-            return
-        try:
-            keys = note.read_text(encoding="utf-8", errors="replace").split()
-        except OSError:
-            keys = []
-        note.unlink(missing_ok=True)
-        for key in dict.fromkeys(keys):
-            if (src := otherboards.by_key(key)) is not None:
-                self._ask_keep.append(src.name)
-                self.import_other(src, ask=False)
-
-    def import_other(self, src: otherboards.Source, path: str = "", ask: bool = True):
-        """Bring another soundboard's board over: its sound files (copied, it keeps its
-        own), names, categories and the hotkeys nothing here uses yet. `ask`: False
-        when they already said yes (the installer's box): no questions or pop-ups."""
-        usage.used("import-board")
-        self._read_board(src, path, ask)
-
-    def _read_board(self, src: otherboards.Source, path: str, ask: bool):
-        # finding and reading the board, and checking every sound file is there, run on
-        # a thread: the board file can be tens of MB and its sounds on a network drive
-        # that's gone, which takes seconds a file (the window froze, even at start-up)
-        where = [path]
-
-        def run():
-            if not where[0]:
-                try:
-                    where[0] = str(src.find() or "")
-                except OSError:
-                    where[0] = ""
-            if not where[0]:
-                return src, "", ask, None
-            entries = src.read(Path(where[0]))
-            return src, where[0], ask, (*otherboards.importable(entries), entries)
-        # a board that can't be read (or a bad one) comes back as what it raised
-        worker.run(run, self.board_read, "import-board",
-                   error=lambda e: (src, where[0], ask, e), owner=self)
-
-    def _board_read(self, src: otherboards.Source, path: str, ask: bool, result):
-        """import_other's read is back: the question, then the import, here on the UI
-        thread (the window may have closed in the meantime)."""
-        if self._shut_down:
-            return
-        title = _("Import from {name}", name=src.name)
-        if not path and not ask:
-            return   # its board went away since the install
-        if not path:
-            path, __ = QFileDialog.getOpenFileName(
-                self, _("{title}: pick a saved board", title=title), str(Path.home()),
-                _("{name} board ({patterns})", name=src.name,
-                  patterns=" ".join("*" + x for x in src.suffixes)))
-            if path:
-                self._read_board(src, path, ask)
-            return
-        if isinstance(result, Exception):
-            e = result
-            if not ask:
-                log.warning("can't read %s's board: %s", src.name, e)
-                self.toast(_("Couldn't bring your {name} sounds over: {e}",
-                             name=src.name, e=errors.plain(e)),
-                           "warn")
-            else:
-                errors.warn(self, _("Couldn't read the {name} board", name=src.name), e)
-            return
-        ok, bad, entries = result
-        if not ok:
-            msg = (_("No sounds to bring over: the sound files {name} points at have been moved "
-                     "or deleted.", name=src.name) if entries else
-                   _("There are no sounds on your {name} board.", name=src.name))
-            self.toast(html.escape(msg), "warn")
-            return
-        for e in ok:   # all in a category named after it too, so they're easy to find
-            e.tags = [src.name, *(t for t in e.tags if t != src.name)]
-        if ask:
-            keys = sum(1 for e in ok if e.hotkey)
-            cats = {t for e in ok for t in e.tags}
-            n_cats = ngettext("{n} category", "{n} categories", len(cats))
-            n_keys = ngettext("{n} hotkey", "{n} hotkeys", keys)
-            if cats and keys:
-                found = ngettext("Found <b>{n}</b> sound in {name} with {categories} and "
-                                 "{hotkeys}.", "Found <b>{n}</b> sounds in {name} with "
-                                 "{categories} and {hotkeys}.", len(ok), name=src.name,
-                                 categories=n_cats, hotkeys=n_keys)
-            elif cats or keys:
-                found = ngettext("Found <b>{n}</b> sound in {name} with {what}.",
-                                 "Found <b>{n}</b> sounds in {name} with {what}.", len(ok),
-                                 name=src.name, what=n_cats if cats else n_keys)
-            else:
-                found = ngettext("Found <b>{n}</b> sound in {name}.",
-                                 "Found <b>{n}</b> sounds in {name}.", len(ok), name=src.name)
-            lines = [found,
-                     _("They're copied into Onion Board; {name} keeps its own. Ones "
-                       "already here are skipped, and a hotkey something here already "
-                       "uses is left off.", name=src.name)]
-            if bad:
-                lines.append(ngettext(
-                    "{n} more can't be brought over (the file was moved or deleted, or isn't "
-                    "a sound): {names}", "{n} more can't be brought over (the file was moved "
-                    "or deleted, or isn't a sound): {names}", len(bad),
-                    names=html.escape(", ".join(e.name for e in bad[:5]))
-                    + ("…" if len(bad) > 5 else "")))
-            if QMessageBox.question(self, title, "<br><br>".join(lines),
-                                    QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No
-                                    ) != QMessageBox.StandardButton.Yes:
-                return
-        self.import_files([e.path for e in ok], {e.path: e for e in ok})
-
-    def import_package(self, path: str):
-        """Add the sounds from a backup / sound pack (ones already here are skipped).
-        A full backup's settings are only applied if the user says so.
-        Reading it (a big zip takes a moment) runs on a worker; this returns at once."""
-        self._on_worker(lambda: backup.read(path),
-                        lambda pkg, err: self._package_read(path, pkg, err), "import-read")
-
-    def _package_read(self, path: str, pkg, err):
-        if isinstance(err, backup.BackupError):
-            errors.warn(self, _("Can't import"), err)
-            return
-        if err is not None:   # a damaged or odd file, never a crash
-            log.warning("couldn't read %s: %r", path, err)
-            self.tell(_("Can't import"),
-                      _("{name} is damaged or in a format Onion Board can't read ({e}).",
-                        name=Path(path).name, e=errors.plain(err)), "error")
-            return
-        use_settings = False
-        if pkg.settings:
-            box = QMessageBox(QMessageBox.Icon.Question, _("Import backup"),
-                              ngettext("{name} has {n} sound and the settings they were saved "
-                                       "with (theme, hotkeys, overlay, voice effects…).\n\nUse "
-                                       "its settings too? Your devices stay as they are.",
-                                       "{name} has {n} sounds and the settings they were saved "
-                                       "with (theme, hotkeys, overlay, voice effects…).\n\nUse "
-                                       "its settings too? Your devices stay as they are.",
-                                       len(pkg.sounds), name=Path(path).name),
-                              QMessageBox.StandardButton.NoButton, self)
-            yes = box.addButton(_("Sounds and settings"), QMessageBox.ButtonRole.YesRole)
-            box.addButton(_("Just the sounds"), QMessageBox.ButtonRole.NoRole)
-            cancel = box.addButton(QMessageBox.StandardButton.Cancel)
-            box.exec()
-            clicked = box.clickedButton()
-            free_dialog(box)
-            if clicked is cancel:
-                return
-            use_settings = clicked is yes
-        if use_settings and pkg.settings:   # (only asked when there are some)
-            self._apply_backup_settings(pkg.settings)
-        if not pkg.sounds:
-            return
-        # only what's on the board: a sound removed a moment ago (still undo-able) must
-        # come back from its backup, or deleting all then restoring leaves nothing
-        known = {m.fingerprint for m in self.cfg.sounds if m.fingerprint}
-        have = {(m.pack, m.pack_item) for m in self.cfg.sounds if m.pack}
-        start = len(self.cfg.sounds)
-        self.toast(ngettext("Importing {n} sound…", "Importing {n} sounds…", len(pkg.sounds)))
-
-        def run():
-            if pkg.is_pack:   # kept, so it can be reset or removed in one go later
-                backup.keep_pack(pkg)
-            res = backup.install(
-                pkg, known, lambda i: PAD_COLORS[(start + i) % len(PAD_COLORS)], have)
-            return res, pkg, ""
-        worker.run(run, self.bridge.unpacked, "import-pack",
-                   error=lambda e: (None, pkg, errors.plain(e)), owner=self)
-
-    def _apply_backup_settings(self, raw: dict):
-        was_off = list(self.cfg.tabs_off)
-        had_programs = dict(self.cfg.category_programs)
-        changed = backup.apply_settings(self.cfg, raw)
-        if "category_programs" in changed:   # added to the rules here, not in their place
-            self.cfg.category_programs = {**had_programs, **self.cfg.category_programs}
-            self.cat_switch.reset()
-            self._update_cat_timer()
-            self._fill_categories()
-        if "tabs_off" in changed:   # the tabs follow now: a list saying one thing while
-            # the window shows another left the Voice tab unreachable, and Settings
-            # crashed reaching into a stand-in
-            off, self.cfg.tabs_off = self.cfg.tabs_off, was_off
-            for key in taboff.KEYS:
-                self.set_tab_on(key, key not in off)
-            self.set_option("tabs_off", off)   # with a newer version's keys
-        if self.voice.fx.merge_saved(raw.get(backup.SAVED_VOICES)):   # their own file
-            changed.append("saved voices")
-        if "theme" in changed:
-            self.apply_theme(self.cfg.theme)
-        self._save_now()
-        self.register_hotkeys()
-        if changed:
-            self.tell(_("Settings imported"),
-                      _("Done. Hotkeys and the theme apply now; everything else "
-                        "the next time Onion Board starts."), "ok")
-
-    def _take_pack_hotkeys(self, clashes: list[tuple[str, SoundMeta, SoundMeta]],
-                           name: str) -> bool:
-        """Some sounds in a pack use hotkeys sounds here already have: give those keys
-        to the pack's sounds? No (the default, and Esc) keeps them on yours."""
-        lines = "\n".join(f"{pretty_key(k)}: {old.name} → {new.name}"
-                          for k, old, new in clashes[:10])
-        if len(clashes) > 10:
-            lines += "\n…"
-        box = QMessageBox(QMessageBox.Icon.Question, _("Same hotkeys"),
-                          ngettext("A sound in “{name}” uses a hotkey one of your sounds "
-                                   "already has:\n\n{lines}\n\nGive it to the new sound?",
-                                   "{n} sounds in “{name}” use hotkeys your sounds already "
-                                   "have:\n\n{lines}\n\nGive them to the new sounds?",
-                                   len(clashes), name=name, lines=lines),
-                          QMessageBox.StandardButton.NoButton, self)
-        yes = box.addButton(_("Use the new ones"), QMessageBox.ButtonRole.YesRole)
-        keep = box.addButton(_("Keep mine"), QMessageBox.ButtonRole.NoRole)
-        box.setDefaultButton(keep)
-        box.setEscapeButton(keep)   # closing it never deletes anything
-        box.setEscapeButton(keep)
-        box.exec()
-        clicked = box.clickedButton()
-        free_dialog(box)
-        return clicked is yes
-
-    def _on_unpacked(self, res, pkg, err: str):
-        self._update_status()
-        if res is None:
-            self.tell(_("Import failed"), err, "error")
-            return
-        self._settle_hotkeys(res.sounds + pkg.restored, self._pack_name(pkg))
-        from soundboard.library import merge_tags
-        if pkg.is_pack and len({library.split_tag(t)[0].lower() for ps in pkg.sounds
-                                for t in clean_tags(ps.entry.get("tags"))}) > 1:
-            # one tab for the pack, its categories inside it as subcategories
-            library.group_pack_tags(res.sounds + pkg.restored, self._pack_name(pkg))
-        order = [ps.folder for ps in pkg.sounds]
-        for m in pkg.restored + res.sounds:
-            # "memes" goes into the "Memes" already here (and a new one gets a tab)
-            m.tags = merge_tags(m.tags, self.cfg.categories, self.cfg.subcategories)
-        for m in res.sounds:
-            self.cfg.sounds.insert(self._pack_spot(m, order), m)
-        merge_tags(pkg.categories, self.cfg.categories,   # a full backup's empty ones too
-                   self.cfg.subcategories)
-        for m in pkg.restored:
-            self.engine.set_gain(m.id, self.gain_for(m))
-        self._save_now()
-        self._rebuild_pads()
-        self._fill_categories()
-        self._load_all()
-        self.register_hotkeys()
-        n = len(res.sounds)
-        if pkg.restored:   # Backup → My sound packs → Reset to how it came
-            msg = _("“{name}” is back how it came", name=self._pack_name(pkg))
-            if n:
-                msg += ngettext(" ({n} removed sound put back)",
-                                " ({n} removed sounds put back)", n)
-        elif res.skipped:
-            msg = ngettext("Imported {n} sound ({skipped} already in your library)",
-                           "Imported {n} sounds ({skipped} already in your library)", n,
-                           skipped=len(res.skipped))
-        else:
-            msg = ngettext("Imported {n} sound", "Imported {n} sounds", n)
-        self.toast(msg, "ok" if n or pkg.restored else "")
-        if res.failed:
-            skipped = [importreport.Skipped(line, "", "unreadable") for line in res.failed]
-            self.toast(html.escape(_("Some sounds weren't imported")), "warn", 10000,
-                       action=(_("See why"), lambda: self._show_skipped(skipped)))
-
-    def _settle_hotkeys(self, incoming: list[SoundMeta], name: str):
-        """Hotkeys coming in with a pack that are already in use. Ones a sound here has:
-        ask whether the pack's sounds take them. App-wide keys, category keys and
-        push-to-talk always stay where they are. Whatever's still taken is cleared on
-        the incoming sound (and a key twice in the pack goes to the first)."""
-        taken = {getattr(self.cfg, a) for a, *__ in HOTKEY_ACTIONS if getattr(self.cfg, a)}
-        taken |= {k for k in self.cfg.category_hotkeys.values() if k}
-        if self.cfg.ptt_key:   # pressed by us for the game: never a sound's hotkey
-            taken.add(self.cfg.ptt_key)
-        ids = {m.id for m in incoming}
-        mine = {o.hotkey: o for o in self.cfg.sounds if o.hotkey and o.id not in ids}
-        clashes, seen = [], set(taken)
-        for m in incoming:
-            if m.hotkey and m.hotkey not in seen and m.hotkey in mine:
-                clashes.append((m.hotkey, mine[m.hotkey], m))
-            seen.add(m.hotkey)
-        if clashes and self._take_pack_hotkeys(clashes, name):
-            for _key, old, _new in clashes:
-                old.hotkey = ""   # the pack's sound gets it instead
-        taken |= {o.hotkey for o in self.cfg.sounds if o.hotkey and o.id not in ids}
-        for m in incoming:
-            if m.hotkey in taken:
-                m.hotkey = ""   # the sounds already here keep theirs
-            taken.add(m.hotkey)
-
-    def _pack_name(self, pkg) -> str:
-        return backup.packs().get(pkg.pack_id) or Path(pkg.path).name
-
-    def _pack_spot(self, m: SoundMeta, order: list[str]) -> int:
-        """Where a sound coming back into its pack goes: after the pack's sound before it
-        (or before the one after it) on the board; anything else goes on the end."""
-        if not m.pack or m.pack_item not in order:
-            return len(self.cfg.sounds)
-        at = {o.pack_item: i for i, o in enumerate(self.cfg.sounds) if o.pack == m.pack}
-        k = order.index(m.pack_item)
-        for f in reversed(order[:k]):
-            if f in at:
-                return at[f] + 1
-        for f in order[k + 1:]:
-            if f in at:
-                return at[f]
-        return len(self.cfg.sounds)
-
-    def _fill_packs_menu(self, menu: QMenu):
-        """Backup → My sound packs: each pack imported, to reset or remove in one go."""
-        menu.clear()
-        for pid, name in backup.packs().items():
-            n = sum(m.pack == pid for m in self.cfg.sounds)
-            sub = menu.addMenu(ngettext("{name} ({n} sound)", "{name} ({n} sounds)", n,
-                                        name=name.replace("&", "&&")))   # not a shortcut
-            sub.addAction(_("Reset to how it came"), lambda pid=pid: self.reset_pack(pid))
-            if self._ungrouped_pack_sounds(pid):
-                sub.addAction(_("Put its categories in one tab"),
-                              lambda pid=pid: self.tidy_pack(pid))
-            act = sub.addAction(_("Remove from the board"), lambda pid=pid: self.remove_pack(pid))
-            act.setEnabled(bool(n))
-
-    @staticmethod
-    def _pack_own_categories(pid: str) -> set[str]:
-        """The categories a free pack comes with (lower case); {} for any other pack."""
-        from soundboard import packs
-        return {c.lower() for p in packs.built_in() if p.id == pid for c in p.categories}
-
-    def _ungrouped_pack_sounds(self, pid: str) -> list[SoundMeta]:
-        """Sounds of pack `pid` still in its categories as tabs of their own."""
-        own = self._pack_own_categories(pid)
-        return [m for m in self.cfg.sounds if m.pack == pid and any(
-            library.split_tag(t)[0].lower() in own and not library.split_tag(t)[1]
-            for t in m.tags)] if own else []
-
-    def tidy_pack(self, pid: str):
-        """Backup → My sound packs → Put its categories in one tab: the pack's categories
-        (Tavern, Combat…) stop being tabs and become subcategories of one named after
-        the pack. Sounds you added to your own categories stay in them."""
-        moved = self._ungrouped_pack_sounds(pid)
-        name = backup.packs().get(pid, pid)
-        own = self._pack_own_categories(pid)
-        if not moved:
-            return
-        if QMessageBox.question(
-                self, _("Put its categories in one tab"),
-                _("Make one “{name}” tab, with {n} of its categories inside it as "
-                  "subcategories instead of tabs of their own?\n\nNo sound is removed or "
-                  "changed.", name=name, n=len(own)),
-                QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.Cancel
-                ) != QMessageBox.StandardButton.Yes:
-            return
-        mine = [m for m in self._live_metas() if m.pack == pid]
-        library.group_pack_tags(mine, name, own)
-        merge = library.merge_tags
-        for m in mine:
-            m.tags = merge(m.tags, self.cfg.categories, self.cfg.subcategories)
-        for c in list(self.cfg.categories):   # the old tabs, once nothing is in them
-            if c.lower() in own and not any(c in m.tags for m in self._live_metas()) and not (
-                    self.cfg.category_hotkeys.get(c)
-                    or catswitch.programs_for(self.cfg.category_programs, c)):
-                self.cfg.categories.remove(c)
-                self.cfg.category_colors.pop(c, None)
-                self.cfg.subcategories.pop(c, None)
-        if self.cfg.category not in self.cfg.categories:
-            self.cfg.category = self.cfg.subcategory = ""
-        self._save_now()
-        self._fill_categories()
-        self.apply_filter(self.search.text())
-        self.register_hotkeys()
-        self.toast(_("✓ “{name}” is one tab now", name=html.escape(name)), "ok")
-
-    def reset_pack(self, pid: str, ask: bool = True):
-        """Put a sound pack back how it came: its sounds' names, hotkeys, volume,
-        effects, categories and pictures, and its removed sounds come back.
-        The pack is read, and its pictures put back, on a worker; this returns at once."""
-        def read():
-            pkg = backup.read_pack(pid)
-            return pkg, self._pack_name(pkg)
-        self._on_worker(read, lambda got, err: self._pack_read(pid, got, err, ask),
-                        "reset-read")
-
-    def _pack_read(self, pid: str, got, err, ask: bool):
-        if err is not None:
-            if not isinstance(err, backup.BackupError):
-                log.warning("couldn't read the sound pack %s: %r", pid, err)
-            errors.warn(self, _("Can't reset the sound pack"), err)
-            return
-        pkg, name = got
-        if ask and QMessageBox.question(
-                self, _("Reset sound pack"),
-                _("Put the sounds from “{name}” back how they came?\n\nChanges you made to "
-                  "them (names, hotkeys, volume, effects, pictures…) are undone, and ones you "
-                  "removed come back. Your other sounds aren't touched.", name=name),
-                QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.Cancel
-                ) != QMessageBox.StandardButton.Yes:
-            return
-        on_board = {}
-        for m in self.cfg.sounds:
-            if m.pack == pid:
-                on_board.setdefault(m.pack_item, m)
-        # put back on copies (the pictures are re-encoded: disk), copied over here
-        copies = {k: copy.copy(m) for k, m in on_board.items()}
-        missing = [ps for ps in pkg.sounds if ps.folder not in on_board]
-        start = len(self.cfg.sounds)
-
-        def run():
-            restored = backup.reset_sounds(pkg, copies)
-            if not missing:
-                return restored, backup.Imported(), ""
-            full = list(pkg.sounds)
-            pkg.sounds = missing
-            try:
-                res = backup.install(
-                    pkg, set(), lambda i: PAD_COLORS[(start + i) % len(PAD_COLORS)])
-            except Exception as e:  # noqa: BLE001
-                log.exception("reset of the sound pack %s failed", pid)
-                res, err = None, errors.plain(e)
-            else:
-                err = ""
-            finally:
-                pkg.sounds = full   # for _pack_spot's order
-            return restored, res, err
-
-        def then(got, err):
-            if err is not None:
-                if not isinstance(err, (OSError, backup.BackupError)):
-                    log.warning("reset of the sound pack %s failed: %r", pid, err)
-                errors.warn(self, _("Can't reset the sound pack"), err)
-                return
-            restored, res, failed = got
-            pkg.restored = []
-            for c in restored:
-                m = on_board[c.pack_item]
-                if m not in self.cfg.sounds:   # removed while it ran
-                    continue
-                fx_before = soundfx.key(m.fx)
-                for k in (*backup.SOUND_FIELDS, "image"):
-                    setattr(m, k, getattr(c, k))
-                pkg.restored.append(m)
-                if soundfx.key(m.fx) != fx_before:
-                    self._rerender(m)
-                if p := self.pads.get(m.id):
-                    p.update()
-            self._on_unpacked(res, pkg, failed)
-        self._on_worker(run, then, "reset-pack")
-
-    def _on_worker(self, work, then, name: str):
-        """work() (reading a backup or pack: disk) on a worker thread with the busy
-        cursor up, then then(its result, None) or then(None, what it raised) back on
-        the UI thread."""
-        QApplication.setOverrideCursor(Qt.CursorShape.WaitCursor)
-
-        # what it raised is said by then(); the window gone (quitting): nothing
-        worker.run(lambda: (then, work(), None), self.bridge.worked, name,
-                   error=lambda e: (then, None, e), owner=self)
-
-    def _on_worked(self, then, res, err):
-        QApplication.restoreOverrideCursor()
-        if self._shut_down:   # closed while it ran
-            return
-        then(res, err)
-
-    def remove_pack(self, pid: str, ask: bool = True):
-        """Take every sound of a sound pack off the board (one Undo brings them back);
-        once the Undo bar is gone, the pack is no longer kept."""
-        gone = [m.id for m in self.cfg.sounds if m.pack == pid]
-        if not gone:
-            return
-        name = backup.packs().get(pid, pid)
-        if ask and QMessageBox.question(
-                self, _("Remove sound pack"),
-                ngettext("Remove the {n} sound from “{name}”?",
-                         "Remove the {n} sounds from “{name}”?", len(gone), name=name)
-                + "\n\n" + _("You can undo this, or bring them back from Recently deleted."),
-                QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.Cancel
-                ) != QMessageBox.StandardButton.Yes:
-            return
-        self.remove_sounds(gone)
-        self._packs_removed.add(pid)
-
     # ------------------------------------------------------------------ tray
     def _init_tray(self):
         """The tray icon: closing the window keeps the app (and its hotkeys) running
@@ -10061,7 +9095,7 @@ class MainWindow(QMainWindow):
         if files:
             e.acceptProposedAction()
             # after the drop returns, so Explorer isn't frozen until a dialog is answered
-            QTimer.singleShot(0, lambda: self.import_files(expand_dropped(files)))
+            QTimer.singleShot(0, lambda: self.impctl.import_files(expand_dropped(files)))
 
     def closeEvent(self, ev):
         hiding = (self.tray is not None and self.tray.isVisible() and self.cfg.tray

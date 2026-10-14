@@ -202,7 +202,7 @@ def test_a_downloaded_pack_lands_on_the_board(window, qapp, served):
     served.files[p.url] = data
     path = packs.download(p)
     before = len(window.cfg.sounds)
-    window.import_files([str(path)])
+    window.impctl.import_files([str(path)])
     assert process_events(qapp, lambda: len(window.cfg.sounds) == before + 2, 10)
     added = window.cfg.sounds[before:]
     assert [m.name for m in added] == ["Door", "Dragon"]
@@ -256,14 +256,14 @@ def test_free_packs_an_older_version_stored_twice_are_cleaned_up(served):
 
 def test_free_packs_hands_a_download_to_the_windows_import(window, monkeypatch, tmp_path):
     got = []
-    monkeypatch.setattr(window, "import_files", got.append)
+    monkeypatch.setattr(window.impctl, "import_files", got.append)
 
     def fake_exec(dlg):
         dlg._add(tmp_path / "horror.zip")   # as a finished download does
         return 0
     monkeypatch.setattr(packsdialog.PacksDialog, "exec", fake_exec)
     monkeypatch.setattr(net, "allowed", lambda f: False)   # no list fetch
-    window.show_packs()
+    window.impctl.show_packs()
     assert got == [[str(tmp_path / "horror.zip")]]
 
 

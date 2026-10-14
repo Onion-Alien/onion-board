@@ -2340,14 +2340,14 @@ class SettingsDialog(QDialog):
         icons.set_icon(exp, "folder")
         def export():
             mw = self.mw
-            mw.export_board()
-            if mw._exporting:   # it started (not cancelled in the save dialog)
+            mw.impctl.export_board()
+            if mw.impctl._exporting:   # it started (not cancelled in the save dialog)
                 busy.hold_until(exp, _("Exporting…"), mw.bridge.exported,
                                 lambda _p, _n, err: _("Didn't export") if err
                                 else _("✓ Exported"))
         exp.clicked.connect(export)
         imp = QPushButton(_("Import"))
-        imp.clicked.connect(self.mw.import_dialog)
+        imp.clicked.connect(self.mw.impctl.import_dialog)
         row.addWidget(exp)
         row.addWidget(imp)
         row.addStretch(1)

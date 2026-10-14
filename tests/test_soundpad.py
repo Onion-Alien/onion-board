@@ -103,11 +103,11 @@ def test_import_brings_the_board_over(main_window, qapp, tmp_path, monkeypatch):
     asked = []
     monkeypatch.setattr(QMessageBox, "question",
                         lambda _p, _t, text, *a: asked.append(text) or QMessageBox.Yes)
-    w.import_other(soundpad.SOURCE)
+    w.impctl.import_other(soundpad.SOURCE)
     assert process_events(qapp, lambda: asked)               # read on a thread
     assert "<b>3</b> sounds" in asked[0] and "3 categories" in asked[0]   # + "Soundpad"
     assert "2 hotkeys" in asked[0] and "Gone" in asked[0]
-    assert process_events(qapp, lambda: not w._pending_imports and len(w.cfg.sounds) == 5)
+    assert process_events(qapp, lambda: not w.impctl._pending_imports and len(w.cfg.sounds) == 5)
     new = {m.name: m for m in w.cfg.sounds[2:]}
     assert set(new) == {"Bruh", "Vine - Boom", "airhorn"}
     assert new["Bruh"].hotkey == "ctrl+1" and new["Vine - Boom"].hotkey == ""
@@ -121,11 +121,11 @@ def test_import_brings_the_board_over(main_window, qapp, tmp_path, monkeypatch):
         "airhorn": tmp_path / "elsewhere" / "airhorn.wav"}
     assert not any(library.SOUNDS_DIR in Path(m.file).parents for m in new.values())
     assert (tmp_path / "My sounds" / "bruh.wav").is_file()   # Soundpad's own stay put
-    assert not w._import_errors
+    assert not w.impctl._import_errors
 
-    w.import_other(soundpad.SOURCE)                          # again: nothing doubled, no error list
-    assert process_events(qapp, lambda: not w._pending_imports)
-    assert len(w.cfg.sounds) == 5 and not w._import_errors
+    w.impctl.import_other(soundpad.SOURCE)                   # again: nothing doubled, no error list
+    assert process_events(qapp, lambda: not w.impctl._pending_imports)
+    assert len(w.cfg.sounds) == 5 and not w.impctl._import_errors
 
 
 def test_reading_the_board_doesnt_block_the_window(
@@ -146,11 +146,11 @@ def test_reading_the_board_doesnt_block_the_window(
     monkeypatch.setattr(QMessageBox, "question",
                         lambda _p, _t, text, *a: asked.append(text) or QMessageBox.Yes)
     start = time.monotonic()
-    w.import_other(src, str(tmp_path / "board.slow"))
+    w.impctl.import_other(src, str(tmp_path / "board.slow"))
     assert time.monotonic() - start < 1 and not asked   # didn't wait for the read
     w.board_read.connect(lambda *a: got.append(a))   # it comes back through this
     release.set()
-    assert process_events(qapp, lambda: not w._pending_imports and len(w.cfg.sounds) == 3)
+    assert process_events(qapp, lambda: not w.impctl._pending_imports and len(w.cfg.sounds) == 3)
     assert threads and threads[0] is not threading.main_thread()
     assert len(got) == 1 and "<b>1</b> sound in Slowpad" in asked[0]
     assert w.cfg.sounds[-1].name == "Bruh"
@@ -161,14 +161,14 @@ def test_a_board_read_after_the_window_closed_is_dropped(main_window, monkeypatc
     monkeypatch.setattr(QMessageBox, "question", lambda *a: pytest.fail("asked"))
     monkeypatch.setattr(w, "_shut_down", True)
     entry = otherboards.Entry(name="x", path="C:/x.wav", exists=True)
-    w._board_read(soundpad.SOURCE, "C:/b.spl", True, ([entry], [], [entry]))
+    w.impctl._board_read(soundpad.SOURCE, "C:/b.spl", True, ([entry], [], [entry]))
     assert len(w.cfg.sounds) == 2
 
 
 def test_a_dropped_spl_goes_to_the_soundpad_import(main_window, monkeypatch):  # noqa: F811
     got = []
-    monkeypatch.setattr(main_window, "import_other", lambda src, f: got.append((src.key, f)))
-    main_window.import_files(["C:/x/list.SPL"])
+    monkeypatch.setattr(main_window.impctl, "import_other", lambda src, f: got.append((src.key, f)))
+    main_window.impctl.import_files(["C:/x/list.SPL"])
     assert got == [("soundpad", "C:/x/list.SPL")]
 
 
@@ -196,13 +196,13 @@ def test_the_installers_box_imports_on_first_start_then_asks_to_keep(
         next(b for b in box.buttons() if b.text() == answer).click()
         return 0
     monkeypatch.setattr(QMessageBox, "exec", answer_box)
-    w.import_queued()
+    w.impctl.import_queued()
     assert not note.exists()
-    assert process_events(qapp, lambda: not w._pending_imports and asked)
+    assert process_events(qapp, lambda: not w.impctl._pending_imports and asked)
     assert "<b>3</b> sounds from Soundpad" in asked[0]
     assert len(w.cfg.sounds) == kept
-    w.import_queued()                            # no note: nothing happens
-    assert not w._pending_imports and len(w.cfg.sounds) == kept and len(asked) == 1
+    w.impctl.import_queued()                            # no note: nothing happens
+    assert not w.impctl._pending_imports and len(w.cfg.sounds) == kept and len(asked) == 1
 
 
 @pytest.mark.windows   # Windows paths
@@ -213,8 +213,8 @@ def test_an_import_from_the_menu_is_not_asked_again(
     _board(tmp_path)
     monkeypatch.setattr(QMessageBox, "question", lambda *a: QMessageBox.Yes)
     monkeypatch.setattr(QMessageBox, "exec", lambda box: pytest.fail("asked to keep"))
-    w.import_other(soundpad.SOURCE)
-    assert process_events(qapp, lambda: not w._pending_imports and len(w.cfg.sounds) == 5)
+    w.impctl.import_other(soundpad.SOURCE)
+    assert process_events(qapp, lambda: not w.impctl._pending_imports and len(w.cfg.sounds) == 5)
 
 
 @pytest.mark.windows   # Windows paths
@@ -231,7 +231,7 @@ def test_the_installers_box_waits_for_the_setup_guide_and_says_where_from(
     note.write_text("soundpad", encoding="utf-8")
     during = []
     monkeypatch.setattr(setupwizard.SetupWizard, "exec",
-                        lambda self: during.append(note.exists() and not w._pending_imports))
+                        lambda self: during.append(note.exists() and not w.impctl._pending_imports))
     monkeypatch.setattr(QMessageBox, "exec", lambda box: 0)
     texts = []
     real_toast = w.toast
@@ -239,7 +239,7 @@ def test_the_installers_box_waits_for_the_setup_guide_and_says_where_from(
                                                          real_toast(text, *a, **k))[1])
     w.run_setup()
     assert during == [True] and note.exists()     # nothing started while it was up
-    assert process_events(qapp, lambda: not note.exists() and not w._pending_imports
+    assert process_events(qapp, lambda: not note.exists() and not w.impctl._pending_imports
                           and len(w.cfg.sounds) == 5)
     assert any("Bringing your sounds over from Soundpad" in t for t in texts)
 
@@ -252,7 +252,7 @@ def test_a_queued_import_with_soundpad_gone_does_nothing(
     note.write_text("soundpad", encoding="utf-8")
     monkeypatch.setattr("PySide6.QtWidgets.QFileDialog.getOpenFileName",
                         lambda *a, **k: pytest.fail("opened a file picker"))
-    main_window.import_queued()
+    main_window.impctl.import_queued()
     assert not note.exists() and len(main_window.cfg.sounds) == 2
 
 

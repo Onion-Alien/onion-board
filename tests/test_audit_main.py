@@ -11,6 +11,7 @@ from PySide6.QtWidgets import QDialog, QVBoxLayout, QWidget
 from conftest import own_module, said
 from soundboard import appaudio, applog, autostart, library, net
 from soundboard.ui import chatguide, crashdialog, responsive
+from soundboard.ui import importcontrol
 from soundboard.ui import mainwindow as main
 from soundboard.ui import worker
 from test_trim_updates_autostart import FakeReg
@@ -303,14 +304,14 @@ def test_crash_dialog_state_clears_when_its_parent_goes(qapp, tmp_path, monkeypa
 def test_an_empty_loose_file_stops_the_timer(window):
     library.SOUNDS_DIR.mkdir(parents=True, exist_ok=True)
     (library.SOUNDS_DIR / "empty.wav").write_bytes(b"")
-    for _ in range(main.LOOSE_EMPTY_LOOKS + 2):
-        window._loose_timer.stop()
-        window._take_loose()
-    assert not window._loose_timer.isActive()
+    for _ in range(importcontrol.LOOSE_EMPTY_LOOKS + 2):
+        window.impctl._loose_timer.stop()
+        window.impctl._take_loose()
+    assert not window.impctl._loose_timer.isActive()
     (library.SOUNDS_DIR / "empty.wav").write_bytes(b"RIFF")   # written to: looked at again
-    window._take_loose()
-    assert window._loose_timer.isActive()
-    window._loose_timer.stop()
+    window.impctl._take_loose()
+    assert window.impctl._loose_timer.isActive()
+    window.impctl._loose_timer.stop()
 
 
 # --------------------------------------------------------------------------- link bar
