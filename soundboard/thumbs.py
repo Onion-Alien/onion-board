@@ -179,8 +179,9 @@ def fetch(url: str) -> QImage:
         if img.isNull() and ("html" in kind or body[:500].lstrip().lower().startswith(b"<")):
             pic = link_picture(body.decode("utf-8", "replace"), url)
             # the page names it, not the user: a file:// one would open a file on this
-            # PC (or a share on another), past the switches and Tor
-            if net.web_url(pic):
+            # PC (or a share on another), past the switches and Tor; one on this PC or
+            # the home network would make the page's site reach into the LAN
+            if net.web_url(pic) and not net.home_url(pic):
                 body, kind = _get(pic)
                 img = QImage.fromData(body)
     except (LinkError, net.FeatureOff):
