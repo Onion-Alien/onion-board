@@ -928,6 +928,7 @@ class MainWindow(QMainWindow):
         others = self.routectl._main_name() is not None
         stream = bool(self.engine.names["obs"])
         voice = not on and others and self.engine.mic_only()
+        self.btn_air.setProperty("voiceonly", voice)   # the rail's word: sidebar.names
         if voice:
             text = (_("Others hear only your mic"), _("Only your mic"), "")
         elif not on:

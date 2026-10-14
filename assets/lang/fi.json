@@ -599,7 +599,6 @@
   "Mute mic during sounds": "Mykistä mikki äänien ajaksi",
   "Mute my mic while a sound plays": "Mykistä mikkini äänen soidessa",
   "Muted": "Mykistetty",
-  "Muted / live: while muted nobody hears your sounds or your mic": "Mykistetty / live: mykistettynä kukaan ei kuule ääniäsi eikä mikkiäsi",
   "Muted: others hear nothing": "Mykistetty: muut eivät kuule mitään",
   "My changed voice": "Muunnettu ääneni",
   "My headphones": "Kuulokkeeni",
@@ -3415,5 +3414,6 @@
   "That's it! Press <b>Finish</b>, and Bun shows you where to find sounds. You can open this guide again any time from the <b>Setup</b> tab (<b>Step-by-step guide</b>).": "Siinä kaikki! Paina <b>Valmis</b>, niin Bun näyttää, mistä löydät ääniä. Voit avata oppaan uudelleen milloin vain <b>Käyttöönotto</b>-välilehdeltä (<b>Vaiheittainen opas</b>).",
   "Try anything: a song, a meme, a game sound.": "Kokeile mitä vain: kappale, meemi, peliääni.",
   "Type a song you love, then press Enter": "Kirjoita kappale, jota rakastat, ja paina Enter",
-  "Your sounds are in <b style='color:{colour}'>{mic}</b> now, so there's nothing to pick in Discord or your games. One thing can still stop them: Discord's own noise filter, which is on by default.": "Äänesi ovat nyt mikissä <b style='color:{colour}'>{mic}</b>, joten Discordissa tai peleissäsi ei tarvitse valita mitään. Yksi asia voi vielä estää ne: Discordin oma kohinasuodatin, joka on oletuksena päällä."
+  "Your sounds are in <b style='color:{colour}'>{mic}</b> now, so there's nothing to pick in Discord or your games. One thing can still stop them: Discord's own noise filter, which is on by default.": "Äänesi ovat nyt mikissä <b style='color:{colour}'>{mic}</b>, joten Discordissa tai peleissäsi ei tarvitse valita mitään. Yksi asia voi vielä estää ne: Discordin oma kohinasuodatin, joka on oletuksena päällä.",
+  "Muted / live: while muted nobody hears your sounds (your mic still goes out unless a voice changer is on or Send my mic is off)": "Mykistetty / live: mykistettynä kukaan ei kuule ääniäsi (mikkisi kuuluu silti, ellei äänenmuuttaja ole päällä tai mikin lähetys pois päältä)"
 }

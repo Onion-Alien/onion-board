@@ -952,7 +952,6 @@
   "More colours": "Mehr Farben",
   "Mute mic during sounds": "Mikro bei Sounds stummschalten",
   "Mute my mic while a sound plays": "Mein Mikro stummschalten, während ein Sound spielt",
-  "Muted / live: while muted nobody hears your sounds or your mic": "Stumm / live: Im Stumm-Modus hört niemand deine Sounds oder dein Mikro",
   "My headphones": "Meine Kopfhörer",
   "My mic": "Mein Mikro",
   "My mode {n}": "Mein Modus {n}",
@@ -3415,5 +3414,6 @@
   "That's it! Press <b>Finish</b>, and Bun shows you where to find sounds. You can open this guide again any time from the <b>Setup</b> tab (<b>Step-by-step guide</b>).": "Das war's! Drück auf <b>Fertig</b>, und Bun zeigt dir, wo du Sounds findest. Du kannst diese Anleitung jederzeit wieder im Tab <b>Setup</b> öffnen (<b>Schritt-für-Schritt-Anleitung</b>).",
   "Try anything: a song, a meme, a game sound.": "Probier alles: einen Song, ein Meme, einen Game-Sound.",
   "Type a song you love, then press Enter": "Tipp einen Song ein, den du liebst, dann drück Enter",
-  "Your sounds are in <b style='color:{colour}'>{mic}</b> now, so there's nothing to pick in Discord or your games. One thing can still stop them: Discord's own noise filter, which is on by default.": "Deine Sounds sind jetzt in <b style='color:{colour}'>{mic}</b>, also musst du in Discord oder deinen Games nichts auswählen. Eins kann sie trotzdem stoppen: Discords eigener Rauschfilter, der standardmäßig an ist."
+  "Your sounds are in <b style='color:{colour}'>{mic}</b> now, so there's nothing to pick in Discord or your games. One thing can still stop them: Discord's own noise filter, which is on by default.": "Deine Sounds sind jetzt in <b style='color:{colour}'>{mic}</b>, also musst du in Discord oder deinen Games nichts auswählen. Eins kann sie trotzdem stoppen: Discords eigener Rauschfilter, der standardmäßig an ist.",
+  "Muted / live: while muted nobody hears your sounds (your mic still goes out unless a voice changer is on or Send my mic is off)": "Stumm / live: Im Stumm-Modus hört niemand deine Sounds (dein Mikro geht weiter raus, außer der Stimmverzerrer ist an oder Mikro senden ist aus)"
 }

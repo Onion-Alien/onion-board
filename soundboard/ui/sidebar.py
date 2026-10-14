@@ -700,9 +700,11 @@ class OutputBlock(QFrame):
             n.label.setStyleSheet(self.title.styleSheet())   # (the card's scale)
         self.refresh()
 
-    @staticmethod
-    def names() -> tuple[str, str]:
-        return _("Live"), _("Muted")
+    def names(self) -> tuple[str, str]:
+        """On and off. Off with your plain voice still going out (the window sets
+        "voiceonly" on the switch: engine.mic_only) says so, never "Muted"."""
+        return _("Live"), (_("Only your mic") if self.power.property("voiceonly")
+                           else _("Muted"))
 
     def _words(self):
         """Mute's and Stop all's words beside their icons ("Live" / "Muted", "Stop
@@ -746,6 +748,12 @@ class OutputBlock(QFrame):
                              "accent" if on else "danger_text", size=self.mark.width())
 
     def refresh(self):
+        # the off word follows what still goes out (a voice changer or the mic switched
+        # on or off while muted), not only the switch
+        on = self.power.isChecked()
+        self._name(on)
+        self.mute.setAccessibleName(self.names()[0 if on else 1])
+        self._words()
         self.switch.setToolTip(self.power.toolTip())
         self.mute.setToolTip(self.power.toolTip())
         self.mute.setAccessibleDescription(self.power.property("railfull") or "")

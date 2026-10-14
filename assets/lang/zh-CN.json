@@ -931,7 +931,6 @@
   "More colours": "更多颜色",
   "Mute mic during sounds": "播放音效时静音麦克风",
   "Mute my mic while a sound plays": "播放音效时静音我的麦克风",
-  "Muted / live: while muted nobody hears your sounds or your mic": "静音 / 开麦：静音时谁都听不到你的音效和麦克风",
   "My headphones": "我的耳机",
   "My mic": "我的麦克风",
   "My mode {n}": "我的模式 {n}",
@@ -3339,5 +3338,6 @@
   "That's it! Press <b>Finish</b>, and Bun shows you where to find sounds. You can open this guide again any time from the <b>Setup</b> tab (<b>Step-by-step guide</b>).": "搞定！按<b>完成</b>，Bun 会告诉你去哪儿找音效。你随时可以在<b>向导</b>标签页（<b>分步指南</b>）里再打开这个向导。",
   "Try anything: a song, a meme, a game sound.": "什么都可以试：一首歌、一个梗、一个游戏音效。",
   "Type a song you love, then press Enter": "输入一首你爱的歌，然后按 Enter",
-  "Your sounds are in <b style='color:{colour}'>{mic}</b> now, so there's nothing to pick in Discord or your games. One thing can still stop them: Discord's own noise filter, which is on by default.": "你的音效现在在 <b style='color:{colour}'>{mic}</b> 里了，所以 Discord 和游戏里什么都不用选。只有一样东西还可能挡住它们：Discord 自带的降噪，默认是开着的。"
+  "Your sounds are in <b style='color:{colour}'>{mic}</b> now, so there's nothing to pick in Discord or your games. One thing can still stop them: Discord's own noise filter, which is on by default.": "你的音效现在在 <b style='color:{colour}'>{mic}</b> 里了，所以 Discord 和游戏里什么都不用选。只有一样东西还可能挡住它们：Discord 自带的降噪，默认是开着的。",
+  "Muted / live: while muted nobody hears your sounds (your mic still goes out unless a voice changer is on or Send my mic is off)": "静音 / 开麦：静音时谁都听不到你的音效（除非开着变声器或关了发送麦克风，你的麦克风还是会发出去）"
 }

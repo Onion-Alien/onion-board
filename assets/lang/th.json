@@ -932,7 +932,6 @@
   "More colours": "สีเพิ่มเติม",
   "Mute mic during sounds": "ปิดเสียงไมโครโฟนระหว่างเสียง",
   "Mute my mic while a sound plays": "ปิดเสียงไมโครโฟนของฉันในขณะที่มีเสียงเล่น",
-  "Muted / live: while muted nobody hears your sounds or your mic": "ปิดเสียง / แสดงสด: ขณะที่ปิดเสียงจะไม่มีใครได้ยินเสียงหรือไมโครโฟนของคุณ",
   "My headphones": "หูฟังของฉัน",
   "My mic": "ไมค์ของฉัน",
   "My mode {n}": "โหมดของฉัน {n}",
@@ -3339,5 +3338,6 @@
   "That's it! Press <b>Finish</b>, and Bun shows you where to find sounds. You can open this guide again any time from the <b>Setup</b> tab (<b>Step-by-step guide</b>).": "เสร็จแล้ว! กด <b>เสร็จสิ้น</b> แล้ว Bun จะพาไปดูว่าหาเสียงได้ที่ไหน เปิดคู่มือนี้อีกครั้งได้ทุกเมื่อจากแท็บ <b>เซ็ตอัป</b> (<b>คู่มือทีละขั้น</b>)",
   "Try anything: a song, a meme, a game sound.": "ลองอะไรก็ได้: เพลง มีม เสียงเกม",
   "Type a song you love, then press Enter": "พิมพ์เพลงที่คุณรัก แล้วกด Enter",
-  "Your sounds are in <b style='color:{colour}'>{mic}</b> now, so there's nothing to pick in Discord or your games. One thing can still stop them: Discord's own noise filter, which is on by default.": "ตอนนี้เสียงของคุณอยู่ใน <b style='color:{colour}'>{mic}</b> แล้ว เลยไม่ต้องเลือกอะไรใน Discord หรือเกม มีอย่างเดียวที่ยังหยุดมันได้: ตัวกรองเสียงรบกวนของ Discord เอง ซึ่งเปิดไว้ตั้งแต่แรก"
+  "Your sounds are in <b style='color:{colour}'>{mic}</b> now, so there's nothing to pick in Discord or your games. One thing can still stop them: Discord's own noise filter, which is on by default.": "ตอนนี้เสียงของคุณอยู่ใน <b style='color:{colour}'>{mic}</b> แล้ว เลยไม่ต้องเลือกอะไรใน Discord หรือเกม มีอย่างเดียวที่ยังหยุดมันได้: ตัวกรองเสียงรบกวนของ Discord เอง ซึ่งเปิดไว้ตั้งแต่แรก",
+  "Muted / live: while muted nobody hears your sounds (your mic still goes out unless a voice changer is on or Send my mic is off)": "ปิดเสียง / แสดงสด: ขณะที่ปิดเสียงจะไม่มีใครได้ยินเสียงของคุณ (ไมค์ของคุณยังส่งออกไป เว้นแต่จะเปิดโปรแกรมเปลี่ยนเสียงหรือปิดการส่งไมค์)"
 }

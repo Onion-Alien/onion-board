@@ -974,7 +974,6 @@
   "More colours": "Більше кольорів",
   "Mute mic during sounds": "Вимкнення мікрофона під час звуку",
   "Mute my mic while a sound plays": "Вимкни мій мікрофон під час відтворення звуку",
-  "Muted / live: while muted nobody hears your sounds or your mic": "Вимкнено/наживо: коли звук вимкнено, ніхто не чує ні ваші звуки, ні ваш мікрофон",
   "My headphones": "Мої навушники",
   "My mic": "Мій мікрофон",
   "My mode {n}": "Мій режим {n}",
@@ -3491,5 +3490,6 @@
   "That's it! Press <b>Finish</b>, and Bun shows you where to find sounds. You can open this guide again any time from the <b>Setup</b> tab (<b>Step-by-step guide</b>).": "Готово! Натисни <b>Фініш</b>, і Bun покаже, де знайти звуки. Цю інструкцію можна відкрити знову будь-коли на вкладці <b>Підключення</b> (<b>Покрокова інструкція</b>).",
   "Try anything: a song, a meme, a game sound.": "Пробуй що завгодно: пісню, мем, звук із гри.",
   "Type a song you love, then press Enter": "Напиши пісню, яку любиш, і натисни Enter",
-  "Your sounds are in <b style='color:{colour}'>{mic}</b> now, so there's nothing to pick in Discord or your games. One thing can still stop them: Discord's own noise filter, which is on by default.": "Тепер твої звуки в <b style='color:{colour}'>{mic}</b>, тож у Discord та іграх нічого вибирати не треба. Зупинити їх може лише одне: власний шумоподавлювач Discord, увімкнений за замовчуванням."
+  "Your sounds are in <b style='color:{colour}'>{mic}</b> now, so there's nothing to pick in Discord or your games. One thing can still stop them: Discord's own noise filter, which is on by default.": "Тепер твої звуки в <b style='color:{colour}'>{mic}</b>, тож у Discord та іграх нічого вибирати не треба. Зупинити їх може лише одне: власний шумоподавлювач Discord, увімкнений за замовчуванням.",
+  "Muted / live: while muted nobody hears your sounds (your mic still goes out unless a voice changer is on or Send my mic is off)": "Вимкнено/наживо: коли звук вимкнено, ніхто не чує ваших звуків (мікрофон усе одно йде, якщо не ввімкнено зміну голосу і не вимкнено надсилання мікрофона)"
 }

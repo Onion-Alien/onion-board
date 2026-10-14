@@ -611,7 +611,6 @@
   "Mute mic during sounds": "Microfon mut în timpul sunetelor",
   "Mute my mic while a sound plays": "Pune-mi microfonul pe mut cât se redă un sunet",
   "Muted": "Mut",
-  "Muted / live: while muted nobody hears your sounds or your mic": "Mut / live: cât e mut, nimeni nu-ți aude sunetele sau microfonul",
   "Muted: others hear nothing": "Mut: ceilalți nu aud nimic",
   "My changed voice": "Vocea mea schimbată",
   "My headphones": "Căștile mele",
@@ -3491,5 +3490,6 @@
   "That's it! Press <b>Finish</b>, and Bun shows you where to find sounds. You can open this guide again any time from the <b>Setup</b> tab (<b>Step-by-step guide</b>).": "Gata! Apasă <b>Termină</b> și Bun îți arată unde găsești sunete. Poți deschide din nou ghidul oricând din fila <b>Configurare</b> (<b>Ghid pas cu pas</b>).",
   "Try anything: a song, a meme, a game sound.": "Încearcă orice: o melodie, un meme, un sunet din joc.",
   "Type a song you love, then press Enter": "Scrie o melodie pe care o iubești, apoi apasă Enter",
-  "Your sounds are in <b style='color:{colour}'>{mic}</b> now, so there's nothing to pick in Discord or your games. One thing can still stop them: Discord's own noise filter, which is on by default.": "Sunetele tale sunt acum în <b style='color:{colour}'>{mic}</b>, deci nu ai nimic de ales în Discord sau în jocuri. Un singur lucru le mai poate opri: filtrul de zgomot al Discord, pornit implicit."
+  "Your sounds are in <b style='color:{colour}'>{mic}</b> now, so there's nothing to pick in Discord or your games. One thing can still stop them: Discord's own noise filter, which is on by default.": "Sunetele tale sunt acum în <b style='color:{colour}'>{mic}</b>, deci nu ai nimic de ales în Discord sau în jocuri. Un singur lucru le mai poate opri: filtrul de zgomot al Discord, pornit implicit.",
+  "Muted / live: while muted nobody hears your sounds (your mic still goes out unless a voice changer is on or Send my mic is off)": "Mut / live: cât e mut, nimeni nu-ți aude sunetele (microfonul tău se aude în continuare, dacă schimbătorul de voce nu e pornit sau trimiterea microfonului oprită)"
 }

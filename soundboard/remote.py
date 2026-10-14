@@ -153,7 +153,9 @@ ENDPOINTS = {
     "category": "show a category: ?name=Memes (name= blank: All) or ?step=next / prev",
     "volume": "the sounds' volume in %: ?set=0-1000 (100: normal) or ?step=up / down "
           "(10 % a step)",
-    "live": "the Live / Muted switch (Muted: others hear nothing): ?on=1 / 0 / toggle",
+    "live": "the Live / Muted switch (Muted: others hear none of your sounds; your plain "
+            "mic still goes out unless a voice changer is on or Send my mic is off): "
+            "?on=1 / 0 / toggle",
     "voice": "the voice changer on / off: ?on=1 / 0 / toggle, or ?name=Robot picks that "
              "voice and turns the changer on (/api/voices lists them)",
     "voices": "the voice changer's voices (the built-in ones and your saved ones), and "
@@ -1241,7 +1243,8 @@ WHAT ONION BOARD CAN DO FROM A BUTTON
 - Sounds: play one, a random one (from a category), the last one again, queue one up \
 after the one playing, or play a whole category in a row; stop one or all; pause.
 - Live speed, pitch and effects (bass, echo, reverb, muffle, crunch…) on every sound.
-- A panic button: the Live / Muted switch (Muted: nobody hears my sounds or my mic).
+- A panic button: the Live / Muted switch (Muted: nobody hears my sounds; my plain \
+mic still goes out unless the voice changer is on or Send my mic is off).
 - The voice changer: on / off, or straight to a named voice (Chipmunk, Robot…).
 - Text to speech: a typed line spoken for others in the computer voice (through the \
 voice changer if it's on).
@@ -1278,7 +1281,7 @@ EXAMPLES
 - Play a sound: {base}/api/play?name={quote(example)}&token={key}
 - {rnd}{queue}
 - Stop everything: {base}/api/stop?token={key}
-- Panic button (others hear nothing until pressed again): \
+- Panic button (others hear none of my sounds until pressed again): \
 {base}/api/live?on=toggle&token={key}
 - Voice changer on / off: {base}/api/voice?on=toggle&token={key}
 - Straight to one voice: {base}/api/voice?name={quote(voice)}&token={key}

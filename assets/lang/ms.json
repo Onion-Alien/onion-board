@@ -587,7 +587,6 @@
   "Mute mic during sounds": "Senyapkan mikrofon semasa bunyi",
   "Mute my mic while a sound plays": "Senyapkan mikrofon saya semasa bunyi dimainkan",
   "Muted": "Disenyapkan",
-  "Muted / live: while muted nobody hears your sounds or your mic": "Disenyapkan / langsung: semasa disenyapkan tiada sesiapa dengar bunyi atau mikrofon anda",
   "Muted: others hear nothing": "Disenyapkan: orang lain tidak dengar apa-apa",
   "My changed voice": "Suara saya yang diubah",
   "My headphones": "Fon kepala saya",
@@ -3339,5 +3338,6 @@
   "That's it! Press <b>Finish</b>, and Bun shows you where to find sounds. You can open this guide again any time from the <b>Setup</b> tab (<b>Step-by-step guide</b>).": "Itu sahaja! Tekan <b>Selesai</b>, dan Bun tunjukkan tempat mencari bunyi. Anda boleh buka panduan ini semula bila-bila masa dari tab <b>Persediaan</b> (<b>Panduan langkah demi langkah</b>).",
   "Try anything: a song, a meme, a game sound.": "Cuba apa sahaja: lagu, meme, bunyi permainan.",
   "Type a song you love, then press Enter": "Taip lagu yang anda suka, kemudian tekan Enter",
-  "Your sounds are in <b style='color:{colour}'>{mic}</b> now, so there's nothing to pick in Discord or your games. One thing can still stop them: Discord's own noise filter, which is on by default.": "Bunyi anda kini dalam <b style='color:{colour}'>{mic}</b>, jadi tiada apa-apa perlu dipilih dalam Discord atau permainan anda. Hanya satu perkara masih boleh menghalangnya: penapis hingar Discord sendiri, yang hidup secara lalai."
+  "Your sounds are in <b style='color:{colour}'>{mic}</b> now, so there's nothing to pick in Discord or your games. One thing can still stop them: Discord's own noise filter, which is on by default.": "Bunyi anda kini dalam <b style='color:{colour}'>{mic}</b>, jadi tiada apa-apa perlu dipilih dalam Discord atau permainan anda. Hanya satu perkara masih boleh menghalangnya: penapis hingar Discord sendiri, yang hidup secara lalai.",
+  "Muted / live: while muted nobody hears your sounds (your mic still goes out unless a voice changer is on or Send my mic is off)": "Disenyapkan / langsung: semasa disenyapkan tiada sesiapa dengar bunyi anda (mikrofon anda masih dihantar, kecuali penukar suara hidup atau hantar mikrofon dimatikan)"
 }

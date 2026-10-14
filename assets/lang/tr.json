@@ -953,7 +953,6 @@
   "More colours": "Daha fazla renk",
   "Mute mic during sounds": "Sesler sırasında mikrofonu kapat",
   "Mute my mic while a sound plays": "Ses çalarken mikrofonumu kapat",
-  "Muted / live: while muted nobody hears your sounds or your mic": "Sessize alındı ​​/ canlı: sessize alındığında kimse sesinizi veya mikrofonunuzu duymaz",
   "My headphones": "Kulaklıklarım",
   "My mic": "mikrofonum",
   "My mode {n}": "Modum {n}",
@@ -3415,5 +3414,6 @@
   "That's it! Press <b>Finish</b>, and Bun shows you where to find sounds. You can open this guide again any time from the <b>Setup</b> tab (<b>Step-by-step guide</b>).": "İşte bu kadar! <b>Bitir</b>'e bas, Bun sana ses nerede bulacağını göstersin. Bu rehberi istediğin zaman <b>Kurulum</b> sekmesinden yeniden açabilirsin (<b>Adım adım rehber</b>).",
   "Try anything: a song, a meme, a game sound.": "Ne istersen dene: bir şarkı, bir meme, bir oyun sesi.",
   "Type a song you love, then press Enter": "Sevdiğin bir şarkıyı yaz, sonra Enter'a bas",
-  "Your sounds are in <b style='color:{colour}'>{mic}</b> now, so there's nothing to pick in Discord or your games. One thing can still stop them: Discord's own noise filter, which is on by default.": "Seslerin artık <b style='color:{colour}'>{mic}</b> içinde, yani Discord'da ya da oyunlarında seçecek bir şey yok. Onları hâlâ durdurabilecek tek şey: Discord'un varsayılan olarak açık olan kendi gürültü filtresi."
+  "Your sounds are in <b style='color:{colour}'>{mic}</b> now, so there's nothing to pick in Discord or your games. One thing can still stop them: Discord's own noise filter, which is on by default.": "Seslerin artık <b style='color:{colour}'>{mic}</b> içinde, yani Discord'da ya da oyunlarında seçecek bir şey yok. Onları hâlâ durdurabilecek tek şey: Discord'un varsayılan olarak açık olan kendi gürültü filtresi.",
+  "Muted / live: while muted nobody hears your sounds (your mic still goes out unless a voice changer is on or Send my mic is off)": "Sessize alındı / canlı: sessize alındığında kimse seslerinizi duymaz (ses değiştirici açık ya da mikrofon gönderme kapalı değilse mikrofonunuz yine gider)"
 }
