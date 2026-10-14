@@ -800,7 +800,6 @@ class SearchResults(RoundedFrame):
         header.setContentsMargins(0, 0, 0, 0)   # Back starts where the cards' panels do
         head = Flow(header, gap=8)
         back = self.btn_back = QPushButton(_("Back"))
-        back.setToolTip(_("Back to my sounds"))
         back.setAccessibleName(_("Back to my sounds"))
         back.setObjectName("backhome")   # the way out of the results: a plain button
         back.setCursor(Qt.CursorShape.PointingHandCursor)

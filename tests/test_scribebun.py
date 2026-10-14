@@ -392,3 +392,19 @@ def test_tab_leaves_the_network_activity_table(qapp):
     QTest.keyClick(table, Qt.Key_Tab)
     assert after.hasFocus()
     host.close()
+
+
+def test_bun_stays_after_a_download_and_unrolls_for_the_next(qapp):
+    from soundboard.ui.scribebun import HOP_S, OPEN_S, ScribeBunny
+    b = ScribeBunny()
+    b.reset()
+    b.finish(True)
+    b._t0 -= HOP_S + 1                    # long after: he sits with the tied scroll
+    assert b.settled() and b.state == "done"
+    b.reset()                             # the next download: the scroll unrolls first
+    assert b._opening() > 0.9 and b.state == "parsing"
+    b._t0 -= OPEN_S + 0.01
+    assert b._opening() == 0.0 and not b._from
+    b.finish(False)
+    b.reset()                             # after a failure the droop eases off
+    assert b._from == "failed" and b._opening() > 0.9

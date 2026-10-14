@@ -113,6 +113,16 @@ class LinkBar(QFrame):
         self.btn_direct.hide()
         self._blocked = ""            # "add" / "play" that Tor couldn't do for this link
         h.addWidget(self.btn_direct)
+        # yt-dlp itself failed and updating it is the user's call (auto-update is
+        # opt-in): one click fetches the newest and tries the link again
+        self.btn_update = QPushButton(_("Update downloader"))
+        self.btn_update.setToolTip(_("Get the newest yt-dlp, the part that downloads from "
+                                     "YouTube and other sites, then try this link again"))
+        self.btn_update.clicked.connect(self._update_downloader)
+        self.btn_update.hide()
+        self._fixable = ""            # "add" / "play" a newer yt-dlp may fix for this link
+        self._updating = False
+        h.addWidget(self.btn_update)
         self.hide()
 
     # ------------------------------------------------------------------ state
@@ -133,6 +143,7 @@ class LinkBar(QFrame):
         self.title = ""
         self._queued = ""
         self._blocked = ""
+        self._fixable = ""
         if url:
             self._via[url] = "link"
         self._drop_download()
@@ -151,6 +162,7 @@ class LinkBar(QFrame):
             self.url = url
             self._queued = ""
             self._blocked = ""
+            self._fixable = ""
             self._drop_download()
         self.title = title
         self._secs = secs
@@ -170,7 +182,9 @@ class LinkBar(QFrame):
 
     def _buttons(self):
         self.btn_direct.setVisible(bool(self._blocked) and not self._busy)
-        self.setVisible(bool(self.url) and (self._shown or not self.btn_direct.isHidden()))
+        self.btn_update.setVisible(bool(self._fixable) and not self._busy and not self._updating)
+        self.setVisible(bool(self.url) and (self._shown or not self.btn_direct.isHidden()
+                                            or not self.btn_update.isHidden()))
 
     def _drop_download(self):
         if self._got is not None:
@@ -312,8 +326,49 @@ class LinkBar(QFrame):
         if kind and self.url and not self._busy:
             self._start(kind, direct=True)
 
+    def _update_downloader(self):
+        """The user's click on "Update downloader": fetch the newest yt-dlp on a worker,
+        then try the link again if a newer one came in."""
+        kind, url = self._fixable, self.url
+        if not kind or not url or self._busy or self._updating:
+            return
+        self._fixable, self._updating = "", True
+        self._say(html.escape(_("Updating the downloader…")))
+        netlog.cause(ytdl.UPDATE_FEATURE, "You clicked Update downloader")
+
+        def work():
+            before = ytdl.active_version()[0]
+            try:
+                msg = ytdl.update()
+                busy.emit(self._msg, "updated", url,
+                          (kind, msg, ytdl.active_version()[0] != before), None)
+            except Exception as e:  # noqa: BLE001 - offline, PyPI down: said in the bar
+                log.warning("downloader update from the link bar failed: %s", e)
+                busy.emit(self._msg, "updated", url, (kind, errors.plain(e), None), None)
+        threading.Thread(target=work, daemon=True, name="ytdlp-update").start()
+
+    def _updated(self, url: str, kind: str, msg: str, newer: bool | None):
+        """update()'s answer: newer = a new copy is in (try again), False = it was the
+        newest already, None = the update failed (msg is why)."""
+        self._updating = False
+        if url != self.url:   # another link shows now: nothing to retry
+            self._buttons()
+            return
+        if newer and not self._busy:
+            self._say("")
+            self._start(kind)
+            return
+        if newer is None:
+            self._say(html.escape(_("Couldn't update the downloader: {error}", error=msg)),
+                      theme.status("error"))
+        else:
+            self._say(html.escape(_("The downloader is already the newest. The site may have "
+                                    "changed in a way it can't handle yet: try again in a "
+                                    "few days.")), theme.status("warn"))
+
     def _start(self, kind: str, direct: bool = False):
         self._blocked = ""
+        self._fixable = ""
         self._busy = kind
         self._busy_url = self.url
         self._busy_title = self.title
@@ -474,16 +529,20 @@ class LinkBar(QFrame):
                 _("Couldn't play it: {error}", error=e))))
         except Exception as e:  # noqa: BLE001 - shown in the bar, logged
             log.warning("link %s failed for %s: %s", kind, url, e)
-            # a bot check or rate limit is about the user's address, not yt-dlp
-            hint = ("" if not isinstance(e, ytdl.FetchError) or auto_update
-                    or ytdl.blocked_by_site(f"{e} {getattr(e, 'raw', '')}") else
-                    _(" A newer yt-dlp may fix this: Settings → Updates → Update now."))
+            # a bot check or rate limit is about the user's address, not yt-dlp; with
+            # auto-update on, download_audio() already tried a newer one
+            fixable = (isinstance(e, ytdl.FetchError) and not auto_update
+                       and net.allowed(ytdl.UPDATE_FEATURE)
+                       and not ytdl.blocked_by_site(f"{e} {getattr(e, 'raw', '')}"))
+            hint = _(" A newer downloader may fix this.") if fixable else ""
+            if hint and not errors.describe(e).text.rstrip().endswith((".", "!", "?", "…")):
+                hint = "." + hint   # yt-dlp's own words often end without a full stop
             doing = "add" if kind == "add" else "play"
             # rich text: the plain words, and a "Report it" link when it's one for us
             before = _("Couldn't add it: ") if kind == "add" else _("Couldn't play it: ")
-            emit("error", url, errors.html(e, before,
-                                                     where=f"Couldn't {doing} a link")
-                           + html.escape(hint))
+            text = (errors.html(e, before, where=f"Couldn't {doing} a link")
+                    + html.escape(hint))
+            emit("fixable" if fixable else "error", url, (kind, text) if fixable else text)
         finally:
             if not keep and path is not None:
                 _drop_temp(path)
@@ -505,6 +564,9 @@ class LinkBar(QFrame):
             return
         if kind == "cancelled":
             return
+        if kind == "updated":   # the Update downloader click's answer, not a download
+            self._updated(url, *payload)
+            return
         current = url == self.url
         if kind == "title":
             if current:
@@ -525,6 +587,11 @@ class LinkBar(QFrame):
             kind = "error"
             if current:
                 self._blocked = blocked_kind
+        elif kind == "fixable":   # the bar offers to update yt-dlp and try again
+            fixable_kind, payload = payload
+            kind = "error"
+            if current:
+                self._fixable = fixable_kind
         if kind == "added":
             self._added = url
             self._added_id = payload[0].id

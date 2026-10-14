@@ -55,6 +55,13 @@ libcurl-impersonate*.dll. Licences: https://github.com/lexiforest/curl-impersona
 and https://curl.se/docs/copyright.html
 
 {RULE}
+QuickJS-ng  --  MIT
+{RULE}
+YouTube's player challenge is solved with QuickJS-ng's qjs.exe (the app's qjs
+folder) when no other JavaScript engine is installed. https://github.com/quickjs-ng/quickjs
+Its licence is reproduced at the end of this file.
+
+{RULE}
 Country outlines
 {RULE}
 The Radio tab's map draws Natural Earth's country outlines (public domain), shipped
@@ -111,7 +118,7 @@ def main() -> None:
              "Onion Board itself is MIT licensed with the Commons Clause (free to use\n"
              "and share, not to sell); see LICENSE.txt.\n", EXTRA]
     parts += [section(d) for d in closure(ROOTS)]
-    for name in ("LGPL-3.0.txt", "GPL-3.0.txt"):
+    for name in ("QuickJS-ng-MIT.txt", "LGPL-3.0.txt", "GPL-3.0.txt"):
         parts += [f"{RULE}\n{name}\n{RULE}\n", (ROOT / "licenses" / name).read_text("utf-8")]
     dest.parent.mkdir(parents=True, exist_ok=True)
     dest.write_text("\n".join(parts), encoding="utf-8")

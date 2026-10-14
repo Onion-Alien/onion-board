@@ -9,6 +9,7 @@ from __future__ import annotations
 import hashlib
 import re
 import tempfile
+from contextlib import contextmanager
 from pathlib import Path
 from string import Template
 
@@ -33,26 +34,24 @@ _LIGHT_STATUS = dict(
 )
 
 THEMES: dict[str, dict[str, str]] = {
-    "Dark": dict(
-        bg="#15171f", panel="#1c1f2a", card="#232633", card_hi="#2b2f3f",
-        btn="#2a2e3d", btn_hover="#333849", btn_press="#3c4257",
-        border="#363b4e", border_hi="#5a6080", groove="#343849", inset="#1b1d26",
-        text="#e6e8f0", text_hi="#f1f3f9", muted="#8a90a6", faint="#6b7189", section="#8f96b3",
+    "Dark": dict(   # neutral charcoal: no blue cast, hairline borders
+        bg="#0f0f11", panel="#17171a", card="#1d1d21", card_hi="#25252a",
+        btn="#26262b", btn_hover="#2e2e34", btn_press="#37373e",
+        border="#2a2a30", border_hi="#4d4d56", groove="#2c2c33", inset="#131316",
+        text="#ececee", text_hi="#fafafa", muted="#8d8d95", faint="#6c6c74", section="#9c9ca5",
         accent="#7859f7", accent_hi="#8d71ff", accent2="#ff4d8d", on_accent="#ffffff",
-        texture="grain",
-        off="#4a5068", badge="#343849", badge_text="#d6d9e6",
-        danger_bg="#3a2230", danger_border="#5a2a3e", danger_text="#ff8fa3", danger_hover="#4a2a3c",
+        off="#4a4a54", badge="#2c2c33", badge_text="#d8d8de",
+        danger_bg="#3f1d27", danger_border="#5f2a3a", danger_text="#ff8fa3", danger_hover="#4f2531",
         warn_bg="#3a2e14", warn_text="#ffb020",
         ok_text="#13ce66", ok_border="#1c6b45", error_text="#ff4d4f",
     ),
-    "Light": dict(
-        bg="#eef0f6", panel="#ffffff", card="#ffffff", card_hi="#f4f5fa",
-        btn="#e7eaf2", btn_hover="#dde1ec", btn_press="#d0d6e4",
-        border="#cfd5e2", border_hi="#8f98b3", groove="#d5dae6", inset="#e3e7f0",
-        text="#1d2130", text_hi="#11141f", muted="#5c637c", faint="#8a90a6", section="#6a7190",
+    "Light": dict(   # neutral off-white, pure white cards, hairline borders
+        bg="#f4f4f6", panel="#ffffff", card="#ffffff", card_hi="#f7f7f9",
+        btn="#ededf0", btn_hover="#e2e2e7", btn_press="#d6d6dd",
+        border="#e4e4e9", border_hi="#a3a3ad", groove="#e1e1e7", inset="#f1f1f4",
+        text="#1b1b20", text_hi="#0b0b0e", muted="#6c6c77", faint="#9a9aa4", section="#72727e",
         accent="#6a4cff", accent_hi="#7d62ff", accent2="#ff3d7f", on_accent="#ffffff",
-        texture="grain",
-        off="#b3b9cc", badge="#e3e7f0", badge_text="#2a2f40",
+        off="#b6b6c0", badge="#ececf0", badge_text="#2a2a33",
         danger_bg="#ffe8ec", danger_border="#f3b3c0", danger_text="#c4213f", danger_hover="#ffd9e0",
         warn_bg="#fff1d6", warn_text="#855000",
         ok_text="#0a6634", ok_border="#7cc39a", error_text="#b01e36",
@@ -120,7 +119,7 @@ THEMES: dict[str, dict[str, str]] = {
         border="#3a4757", border_hi="#5b6e84", groove="#37434f", inset="#161c23",
         text="#e2e8ef", text_hi="#f3f6f9", muted="#8d9bab", faint="#687686", section="#9fb0c2",
         accent="#4fa3a5", accent_hi="#63b9bb", accent2="#e0a458", on_accent="#0e1a1b",
-        texture="brushed",
+        texture="diagonal",
         off="#4a5868", badge="#354251", badge_text="#d6dee7",
         **_DARK_STATUS | dict(error_text="#ff7a7c"),
     ),
@@ -171,7 +170,7 @@ THEMES: dict[str, dict[str, str]] = {
         border="#354433", border_hi="#587055", groove="#324030", inset="#101510",
         text="#e6eedf", text_hi="#f4f9ef", muted="#93a58a", faint="#6c7d64", section="#b5c98f",
         accent="#8bbf4d", accent_hi="#9fd060", accent2="#d9a441", on_accent="#122008",
-        texture="brushed",
+        texture="crosshatch",
         off="#4a5a45", badge="#2f3b2d", badge_text="#dbe6d1", **_DARK_STATUS,
     ),
     "Mocha": dict(   # coffee browns and caramel
@@ -218,7 +217,7 @@ THEMES: dict[str, dict[str, str]] = {
         border="#3a3049", border_hi="#5e5079", groove="#352c44", inset="#19141f",
         text="#ebe5f4", text_hi="#f7f2ff", muted="#9b90b0", faint="#75698b", section="#a598c4",
         accent="#8f4cf5", accent_hi="#a066ff", accent2="#ff5fa2", on_accent="#ffffff",
-        texture="grain",
+        texture="frost",
         off="#4d4262", badge="#352c44", badge_text="#e2d9f0", **_DARK_STATUS,
     ),
     "Mint": dict(   # fresh mint and white
@@ -644,6 +643,21 @@ def set_current(name: str) -> str:
     T.clear()
     T.update(tokens(name))
     return name
+
+
+@contextmanager
+def previewing(name: str):
+    """Theme `name` in `T` for the block, then the current one back: paints something
+    (Bun on the theme-change cover) in a theme before apply() has switched to it."""
+    global current_name
+    was, colours = current_name, dict(T)
+    set_current(name)
+    try:
+        yield
+    finally:
+        current_name = was
+        T.clear()
+        T.update(colours)
 
 
 STYLE = Template("""
@@ -1192,12 +1206,12 @@ def live_sheet() -> str:
     return LIVE_STYLE.substitute(T)
 
 
-# A faint accent glow behind the logo gives the window a little warmth. Cards
-# stay flat, with quiet borders instead of grain, patterns or simulated lighting.
+# Flat window and cards with quiet hairline borders. Textured adds each theme's tile on
+# the cards and a soft glow of its two accent colours behind them (paint_window_bg: the
+# root widget and opaque widgets paint it, a style sheet can't hold two gradients).
 # The colours follow each theme; High Contrast keeps its solid fills and outlines.
 POLISH_STYLE = Template("""
-QWidget#root { background:qradialgradient(cx:0.08, cy:0, radius:1.15, fx:0.08, fy:0,
-    stop:0 $bg_glow, stop:0.45 $bg, stop:1 $bg); }
+QWidget#root { background:$bg; }
 QWidget#root QTabWidget, QWidget#root QTabBar, QWidget#root QStackedWidget,
 QWidget#root QStackedWidget > QWidget, QWidget#root .QWidget { background:transparent; }
 QLabel { background:transparent; }   /* over the gradient: no flat box behind text */
@@ -1245,7 +1259,6 @@ def polish_tokens(tk: dict[str, str], light: bool) -> dict[str, str]:
     panel = tk["panel"]
     return dict(
         tk,
-        **_window_shades(tk, light),
         surface_border=_mix(panel, tk["border"], 0.55),
         edge=_mix(panel, tk["border"], 0.55),
         glass=_rgba(panel, 0.86),
@@ -1305,32 +1318,38 @@ def accent_edge() -> str:
     return f"border:1px solid {s['accent_rim_side']}; border-top-color:{s['accent_rim']};"
 
 
-def _window_shades(tk: dict[str, str], light: bool) -> dict[str, str]:
-    """Window glow shared by the stylesheet and opaque hand-painted widgets."""
-    return dict(bg_glow=_mix(tk["bg"], tk["accent"], 0.025 if light else 0.04))
-
-
 def polished(name: str | None = None) -> bool:
     """Whether theme `name` (default: the current one) gets POLISH_STYLE's depth."""
     return (name or current_name) not in OUTLINED
 
 
-def paint_window_bg(p: QPainter, rect, origin: QPointF, width: float, height: float) -> None:
-    """Paint the window's faint glow, aligned to its origin, without disk access.
+# The Textured glow: soft blobs of the theme's two accent colours behind the cards,
+# (centre x, centre y, radius) as fractions of the window, which colour, how strong.
+AURORA = (((0.12, 0.0, 0.55), "accent", 0.22), ((0.95, 1.05, 0.6), "accent2", 0.14),
+          ((0.6, 0.35, 0.45), "accent", 0.07))
 
-    Opaque widgets use this same background so scrolling leaves no seams.
-    """
-    if not polished():
-        p.fillRect(rect, QColor(T["bg"]))
+
+def paint_window_bg(p: QPainter, rect, origin: QPointF, width: float, height: float,
+                    tk: dict[str, str] | None = None, textured: bool | None = None) -> None:
+    """Paint the window background, aligned to its origin, without disk access: the flat
+    page colour, or with Textured on, the theme's soft accent glow over it. `tk`: a theme
+    other than the current one (a preview). Opaque widgets use this same background so
+    scrolling leaves no seams."""
+    tk = T if tk is None else tk
+    textured = textures_on if textured is None else textured
+    p.fillRect(rect, QColor(tk["bg"]))
+    if not textured or (tk is T and not polished()):
         return
-    light = is_light()
-    pt = dict(T, **_window_shades(T, light))
-    g = QRadialGradient(QPointF(0.08, 0), 1.15)
-    for at, key in ((0, "bg_glow"), (0.45, "bg"), (1, "bg")):
-        g.setColorAt(at, QColor(pt[key]))
-    brush = QBrush(g)
-    brush.setTransform(QTransform().translate(origin.x(), origin.y()).scale(width, height))
-    p.fillRect(rect, brush)
+    light = is_light_colour(tk["bg"])
+    side = max(width, height)
+    for (cx, cy, r), key, strength in AURORA:
+        g = QRadialGradient(QPointF(origin.x() + cx * width, origin.y() + cy * height),
+                            r * side)
+        c = QColor(tk[key])
+        c.setAlphaF(strength * (0.55 if light else 1.0))
+        g.setColorAt(0, c)
+        g.setColorAt(1, QColor(0, 0, 0, 0))
+        p.fillRect(rect, QBrush(g))
 
 
 def _check_image(colour: str, size: int) -> QImage:
@@ -1465,8 +1484,8 @@ def _carbon_tile(p: QPainter, size: int, light: QColor, dark: QColor) -> None:
 # theme's brightest text colour, "shade" = black, or a theme token like "accent2").
 TEXTURES = {
     "carbon": (14, "lift"), "scanlines": (3, "shade"), "grid": (24, "accent2"),
-    "dots": (12, "lift"), "grain": (192, "lift"), "diagonal": (12, "lift"),
-    "ruled": (24, "accent2"), "waves": (32, "accent"), "brushed": (96, "lift"),
+    "dots": (12, "lift"), "diagonal": (12, "lift"),
+    "ruled": (24, "accent2"), "waves": (32, "accent"),
     "crosshatch": (8, "lift"), "diamond": (20, "accent"), "scales": (24, "accent"),
     "embers": (96, "accent2"), "petals": (64, "accent2"), "dither": (2, "shade"),
     "halftone": (10, "shade"), "frost": (64, "lift"),
@@ -1511,24 +1530,6 @@ def texture_image(kind: str, tk: dict[str, str] | None = None, size: int | None 
         p.setBrush(a(0.09))
         for cx, cy in ((0, 0), (size, 0), (0, size), (size, size), (size / 2, size / 2)):
             p.drawEllipse(QPointF(cx, cy), size * 0.2, size * 0.2)
-    elif kind == "grain":   # soft brushed satin, without isolated bright pixels
-        columns, rows = 3, max(2, size // 3)
-        field = QImage(columns, rows, QImage.Format.Format_ARGB32_Premultiplied)
-        for y in range(rows):
-            for x in range(columns):
-                v = rng.uniform(-1, 1)
-                field.setPixelColor(x, y, a(0.05 * v) if v > 0
-                                   else _ink("#000000", -0.05 * v * k))
-        # Repeat before smoothing so the filter also sees the neighbouring tile.
-        # Cropping its centre keeps the finish continuous across tiled surfaces.
-        repeated = QImage(columns * 3, rows * 3, field.format())
-        repeated.fill(Qt.GlobalColor.transparent)
-        fp = QPainter(repeated)
-        fp.fillRect(repeated.rect(), QBrush(QPixmap.fromImage(field)))
-        fp.end()
-        smooth = repeated.scaled(size * 3, size * 3, Qt.AspectRatioMode.IgnoreAspectRatio,
-                                 Qt.TransformationMode.SmoothTransformation)
-        p.drawImage(0, 0, smooth.copy(size, size, size, size))
     elif kind in ("frost", "embers"):   # fixed-seed specks
         n, alpha = {"frost": (220, 0.10), "embers": (40, 0.30)}[kind]
         for _ in range(n):
@@ -1555,11 +1556,6 @@ def texture_image(kind: str, tk: dict[str, str] | None = None, size: int | None 
         for x in range(1, size + 1):
             path.lineTo(QPointF(x, size / 2 + math.sin(x / size * 2 * math.pi) * size / 6))
         p.drawPath(path)
-    elif kind == "brushed":     # brushed metal: long, faint horizontal streaks
-        for y in range(size):
-            v = rng.uniform(-1, 1)
-            p.fillRect(QRectF(0, y, size, 1), (a(0.035 * v) if v > 0
-                                               else _ink("#000000", -0.10 * v * k)))
     elif kind == "diamond":     # a thin lattice, like damask wallpaper
         p.setRenderHint(QPainter.RenderHint.Antialiasing)
         p.setPen(QPen(a(0.08), 1))
@@ -1610,8 +1606,6 @@ def _texture_url(tk: dict[str, str]) -> str:
         return ""
     key = (kind, tk["panel"], tk["text_hi"], tk["accent"], tk["accent2"],
            tk.get("texture_ink", ""), tk.get("texture_strength", ""))
-    if kind == "grain":
-        key += ("satin-v1",)   # don't reuse the old speckled tile from disk
     if url := _texture_urls.get(key):
         return url
     folder = Path(tempfile.gettempdir()) / "onionboard-ui"

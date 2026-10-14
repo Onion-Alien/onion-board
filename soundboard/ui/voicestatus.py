@@ -78,7 +78,7 @@ class VoiceStatusBar(QFrame):
         mh.setContentsMargins(0, 0, 0, 0)
         mh.setSpacing(8)
         # Keep the stop action compact so translated mic text and the meter fit.
-        self.stop_button = icon_button("stop", _("Stop voice effects"))
+        self.stop_button = icon_button("stop", _("Stop voice effects"), hover=False)
         self.stop_button.setFixedSize(ROW_H, ROW_H)
         mh.addWidget(self.stop_button)
         self.mic_icon = icon_label("mic", _("Your mic level"))
