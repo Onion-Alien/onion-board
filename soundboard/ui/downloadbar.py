@@ -480,8 +480,7 @@ class DownloadBar(QFrame):
     def _icon_button(self, name: str, tip: str, side: int = 28) -> QPushButton:
         b = QPushButton()
         b.setObjectName("dlicon")
-        b.setToolTip(tip)
-        b.setAccessibleName(tip)
+        b.setAccessibleName(tip)   # no tooltip: ■, ✕ and the fold arrow say it
         b.setCursor(Qt.CursorShape.PointingHandCursor)
         b.setFixedSize(side, side)
         icons.set_icon(b, name, "muted", size=18 if side >= 28 else 16)
@@ -845,9 +844,7 @@ class DownloadBar(QFrame):
             self._apply_fold()
 
     def _fold_icon(self):
-        tip = _("Show more") if self._folded() else _("Hide")
-        self.btn_min.setToolTip(tip)
-        self.btn_min.setAccessibleName(tip)
+        self.btn_min.setAccessibleName(_("Show more") if self._folded() else _("Hide"))
         icons.set_icon(self.btn_min, "fold_open" if self._folded() else "fold_up", "muted")
 
     def _running(self) -> bool:

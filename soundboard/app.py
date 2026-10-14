@@ -200,6 +200,11 @@ def selftest() -> int:
     from soundboard import engine, radio, theme  # noqa: F401
     theme.app_icon()
     QMediaPlayer()   # loads the FFmpeg multimedia plugin
+    from soundboard import jsengine   # YouTube's player challenge (build.ps1 bundles it)
+    if getattr(sys, "frozen", False) and jsengine.bundled() is None:
+        print("FAIL: the bundled QuickJS (qjs.exe) is missing or won't start",
+              file=sys.stderr)
+        return 1
     print(f"OK: Onion Board {__version__} self-test passed")
     return 0
 

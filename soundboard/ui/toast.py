@@ -189,8 +189,7 @@ class _Card(QFrame):
         b = QPushButton()
         b.setObjectName("toastclose")
         b.setFixedSize(LINE, LINE)
-        b.setToolTip(words)
-        b.setAccessibleName(words)
+        b.setAccessibleName(words)   # no tooltip: copy and ✕ say it
         b.setCursor(Qt.CursorShape.PointingHandCursor)
         icons.set_icon(b, name, "muted", size=size)
         return b
@@ -388,9 +387,9 @@ class _Toast(QWidget):
         QApplication.clipboard().setText(_strip_tags(self._text))
         btn = self.card.btn_copy
         icons.set_icon(btn, "check", "ok_text", size=13)
-        btn.setToolTip(_("✓ Copied"))
+        btn.setAccessibleName(_("✓ Copied"))
         QTimer.singleShot(1500, btn, lambda: (icons.set_icon(btn, "copy", "muted", size=13),
-                                              btn.setToolTip(_("Copy"))))
+                                              btn.setAccessibleName(_("Copy"))))
 
     def _act(self):
         cb = self._callback

@@ -47,7 +47,7 @@ from collections.abc import Callable
 from dataclasses import dataclass
 from pathlib import Path
 
-from soundboard import library, net, quality, sourceinfo, ytworker
+from soundboard import jsengine, library, net, quality, sourceinfo, ytworker
 from soundboard.library import MAX_SECONDS
 from soundboard import errors
 from soundboard.i18n import _
@@ -976,7 +976,7 @@ def _opts(dest: Path | None = None, progress=None, thumbnail: bool = False,
         "noprogress": True,
         "max_filesize": MAX_BYTES,
         "cachedir": str(cache_dir()),  # ours, so Reset can clear it
-        "js_runtimes": {"deno": {}, "node": {}},   # used when installed; works without
+        "js_runtimes": jsengine.runtimes(),   # YouTube's player challenge; works without
         "progress_hooks": [hook],
         "logger": log,
     }

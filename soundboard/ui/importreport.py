@@ -138,7 +138,6 @@ class SkippedDialog(QDialog):
         self.btn_copy = QPushButton()
         self.btn_copy.setProperty("quiet", True)
         self.btn_copy.setFixedSize(32, 32)
-        self.btn_copy.setToolTip(_("Copy"))
         self.btn_copy.setAccessibleName(_("Copy"))
         icons.set_icon(self.btn_copy, "copy")
         self.btn_copy.clicked.connect(self.copy)
@@ -198,6 +197,6 @@ class SkippedDialog(QDialog):
     def copy(self):
         QApplication.clipboard().setText(self.text())
         icons.set_icon(self.btn_copy, "check", "ok_text")
-        self.btn_copy.setToolTip(_("✓ Copied"))
+        self.btn_copy.setAccessibleName(_("✓ Copied"))
         QTimer.singleShot(1500, self.btn_copy, lambda: (
-            icons.set_icon(self.btn_copy, "copy"), self.btn_copy.setToolTip(_("Copy"))))
+            icons.set_icon(self.btn_copy, "copy"), self.btn_copy.setAccessibleName(_("Copy"))))

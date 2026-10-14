@@ -468,17 +468,21 @@ def alt_tile(icon: str, title: str, words: str, *buttons: QPushButton
     return box, text
 
 
-def icon_button(name: str, tip: str, *, quiet: bool = True, size: int = 18) -> QPushButton:
+def icon_button(name: str, tip: str, *, quiet: bool = True, size: int = 18,
+                hover: bool = True) -> QPushButton:
     """An icon-only button (section 4: a picture says it, quiet, 28-32 px).
 
     `tip` is the button's whole meaning: it is the tooltip and the screen-reader name
     (`setAccessibleName`), so nothing depends on the drawing alone. Its words stay in
-    every catalog: pass an already-translated string to `tip`."""
+    every catalog: pass an already-translated string to `tip`. With `hover` off it is
+    only the screen-reader name: for a picture anyone reads (a folder, a stop square),
+    where a tooltip would only repeat it."""
     b = QPushButton()
     b.setObjectName("iconbutton")
     b.setProperty("quiet", quiet)
     icons.set_icon(b, name, size=size)
-    b.setToolTip(tip)
+    if hover:
+        b.setToolTip(tip)
     b.setAccessibleName(tip)
     return b
 
@@ -509,16 +513,20 @@ def fold_button(text: str, body: QWidget | None = None) -> QPushButton:
     return b
 
 
-def reset_button(tip: str) -> QPushButton:
+def reset_button(tip: str, *, hover: bool = True) -> QPushButton:
     """The one look for putting a part back to how it starts, beside that part (an
     effect, Live controls, a sound's effects): small, quiet, the reset arrow and the
     word, so it reads the same everywhere (a slim muted link: it never makes a card's
-    heading row taller). `tip` says what goes back."""
+    heading row taller). `tip` says what goes back: the tooltip, or with `hover` off
+    (the part it sits on already says it) only the screen-reader name."""
     b = QPushButton(_("Reset"))
     b.setObjectName("reset")
     b.setCursor(Qt.CursorShape.PointingHandCursor)
     icons.set_icon(b, "reload", "muted", size=12)
-    b.setToolTip(tip)
+    if hover:
+        b.setToolTip(tip)
+    else:
+        b.setAccessibleName(tip)
     return b
 
 class _LevelDot(Meter):
@@ -688,7 +696,7 @@ class EqPanel(QWidget):
             s = QSlider(Qt.Orientation.Vertical)
             s.setRange(-EQ_MAX_DB * 2, EQ_MAX_DB * 2)   # half-dB steps
             s.setFixedHeight(96)
-            s.setToolTip(_("{lab} Hz", lab=lab))
+            s.setAccessibleName(_("{lab} Hz", lab=lab))   # its label is under it
             f = QLabel(lab)
             f.setAlignment(Qt.AlignmentFlag.AlignCenter)
             f.setObjectName("eqlabel")
