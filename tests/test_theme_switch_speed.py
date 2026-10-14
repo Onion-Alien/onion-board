@@ -5,6 +5,7 @@ import os
 import time
 
 from PySide6.QtCore import QEvent, QObject
+from PySide6.QtGui import QColor
 from PySide6.QtWidgets import QApplication
 from test_mainwindow import window as main_window  # noqa: F401 - the real window, offscreen
 
@@ -112,6 +113,28 @@ def test_a_switch_shows_a_still_with_bun_then_fades_to_the_new_theme(settings, m
         QApplication.processEvents()
         QApplication.sendPostedEvents(None, QEvent.Type.DeferredDelete)
     assert not main_window.findChildren(ThemeCover)
+
+
+def test_the_cover_shows_bun_in_the_theme_being_switched_to(main_window):  # noqa: F811
+    """Bun and the dimming on the cover were drawn in the theme being left (his
+    headphones in its accent): they're the new theme's, and the current one stays."""
+    from soundboard.bunny import bunny_image
+    from soundboard.ui.themecover import ThemeCover
+    old, new = "Dark", "Royal"   # different accents and bg, and Royal dresses Bun up
+    theme.set_current(old)
+    main_window.show()   # covers only go over a window on screen
+    cover = ThemeCover(main_window, new)
+    try:
+        assert theme.current_name == old and theme.T == theme.tokens(old)
+        assert cover.scrim.rgb() == QColor(theme.tokens(new)["bg"]).rgb()
+        assert cover.scrim.alpha() == 150
+        with theme.previewing(new):
+            want = bunny_image(cover.bunny.height(), dpr=1.0)
+        assert cover.bunny.toImage().convertToFormat(want.format()) == want
+        assert cover.bunny.toImage().convertToFormat(want.format()) != bunny_image(
+            cover.bunny.height(), dpr=1.0)
+    finally:
+        cover.deleteLater()
 
 
 @pytest.mark.parametrize("name", list(theme.THEMES))

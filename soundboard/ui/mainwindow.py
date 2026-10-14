@@ -82,8 +82,8 @@ from soundboard.ui.radiopanel import RadioOff, RadioTab
 from soundboard.ui.voicepanel import VoicePanel
 from soundboard.ui.playbutton import PlayButton
 from soundboard.ui.widgets import (DropdownMenu, Meter, NameAndSeek, Pad, PadGrid, SeekSlider,
-                                   SteadyTabs, expand_dropped, fmt_pos, loudness, pad_height,
-                                   spectrum, take_out, SLIM_PAD_H)
+                                   SteadyTabs, WindowRoot, expand_dropped, fmt_pos, loudness,
+                                   pad_height, spectrum, take_out, SLIM_PAD_H)
 from soundboard.wheelguard import AppStyle, no_wheel
 from soundboard.winkeys import Hotkeys
 from soundboard import errors
@@ -121,6 +121,7 @@ UNDO_S = 10          # how long "Removed … · Undo" stays up
 # (soundfx.preview_part): a 2-hour song's pitch shift took minutes to start playing
 PREVIEW_WHOLE_S = 5 * 60
 PREVIEW_S = 30
+PACK_SAMPLE = "__pack_sample"   # Free packs' "hear it first" voice (headphones only)
 UNDO_KEY = "undo-sounds"   # its card (toast key)
 TOAST_EXPAND = QSize(900, 640)   # a shrunk card clicked: the window grows to this
 # shown when instant replay goes on: it records whoever is talking in a call
@@ -231,7 +232,7 @@ class BannerButton(QPushButton):
         super().__init__(text)
         self._full, self._short = text, short
         self.setSizePolicy(QSizePolicy.Policy.Ignored, QSizePolicy.Policy.Fixed)
-        self.setToolTip(text)
+        self.setAccessibleName(text)
 
     def resizeEvent(self, e):
         super().resizeEvent(e)
@@ -243,6 +244,7 @@ class BannerButton(QPushButton):
             text = fm.elidedText(self._short, Qt.TextElideMode.ElideRight, max(0, room))
         if text != self.text():
             self.setText(text)
+            self.setToolTip("" if text == self._full else self._full)   # only when cut
 
 
 class _Moved(QObject):
@@ -805,8 +807,8 @@ class MainWindow(QMainWindow):
         # made too small to use (see _refit)
         self._pages = QStackedWidget()
         self.setCentralWidget(self._pages)
-        root = self._full = QWidget()
-        root.setObjectName("root")   # the theme's window gradient
+        root = self._full = WindowRoot()
+        root.setObjectName("root")   # the theme's window background (flat or the glow)
         self._pages.addWidget(root)
         self._full_row = QHBoxLayout(root)   # the tab rail (ui/sidebar.py), then the rest
         self._full_row.setContentsMargins(0, 0, 0, 0)
@@ -1319,16 +1321,16 @@ class MainWindow(QMainWindow):
         self.mini_pp = PlayButton()
         self.mini_pp.setObjectName("transport_play")
         self.mini_pp.setProperty("mini", True)
-        self.mini_pp.setToolTip(_("Play / pause"))
+        self.mini_pp.setAccessibleName(_("Play / pause"))
         self.mini_pp.clicked.connect(self.toggle_play_pause)
         self.mini_st = QPushButton()
         self.mini_st.setObjectName("transport_stop")
-        self.mini_st.setToolTip(_("Stop"))
+        self.mini_st.setAccessibleName(_("Stop"))
         self.mini_st.clicked.connect(self.stop_current)
         icons.set_icon(self.mini_st, "stop", size=16)
         self.mini_skip = QPushButton()
         self.mini_skip.setObjectName("transport_stop")
-        self.mini_skip.setToolTip(_("Skip to the next sound in Up next"))
+        self.mini_skip.setAccessibleName(_("Skip to the next sound in Up next"))
         self.mini_skip.clicked.connect(self.skip_next)
         icons.set_icon(self.mini_skip, "next", size=16)
         for b in (self.mini_pp, self.mini_st, self.mini_skip):
@@ -1881,17 +1883,17 @@ class MainWindow(QMainWindow):
         f, th = bar()
         self.btn_pp = PlayButton()
         self.btn_pp.setObjectName("transport_play")
-        self.btn_pp.setToolTip(_("Play / pause"))
+        self.btn_pp.setAccessibleName(_("Play / pause"))
         self.btn_pp.clicked.connect(self.toggle_play_pause)
         self._pp_icon = None
         self.btn_st = QPushButton()
         self.btn_st.setObjectName("transport_stop")
-        self.btn_st.setToolTip(_("Stop"))
+        self.btn_st.setAccessibleName(_("Stop"))
         self.btn_st.clicked.connect(self.stop_current)
         icons.set_icon(self.btn_st, "stop", size=16)
         self.btn_skip = QPushButton()
         self.btn_skip.setObjectName("transport_stop")   # the same quiet square as ■
-        self.btn_skip.setToolTip(_("Skip to the next sound in Up next"))
+        self.btn_skip.setAccessibleName(_("Skip to the next sound in Up next"))
         self.btn_skip.clicked.connect(self.skip_next)
         icons.set_icon(self.btn_skip, "next", size=16)
         for b in (self.btn_pp, self.btn_st, self.btn_skip):
@@ -2004,7 +2006,7 @@ class MainWindow(QMainWindow):
                     name.clicked.connect(lambda __=False, s=sid: self.select(s))
                     stop = QPushButton()
                     stop.setObjectName("chipstop")
-                    stop.setToolTip(_("Stop this sound"))
+                    stop.setAccessibleName(_("Stop this sound"))
                     icons.set_icon(stop, "stop", "danger_text", size=12)
                     stop.setFixedSize(24, 24)
                     stop.clicked.connect(lambda __=False, s=sid: self._stop_one(s))
@@ -4432,7 +4434,6 @@ class MainWindow(QMainWindow):
         self._setup_app, self._setup_state = app, state
         self._setup_hide.stop()
         name = html.escape(app.name)
-        self.setup_x.setToolTip(_("Hide"))
         self.setup_x.setAccessibleName(_("Hide"))
         self.setup_no.setVisible(state == "offer")
         if state == "offer":
@@ -5748,7 +5749,7 @@ class MainWindow(QMainWindow):
     def apply_theme(self, name: str):
         # a still of the window with Bun over it while every widget restyles: no frame
         # of a half-styled window, and it fades to the new theme (ui/themecover.py)
-        with themecover.covered(self):
+        with themecover.covered(self, name):
             self._apply_theme(name)
 
     def _apply_theme(self, name: str):
@@ -8608,9 +8609,19 @@ class MainWindow(QMainWindow):
         """The Free packs window (soundboard.packs): a pack it downloads is imported the
         way dropping its zip on the window is."""
         from soundboard.ui.packsdialog import PacksDialog
-        dlg = PacksDialog(lambda path: self.import_files([str(path)]), self)
+        dlg = PacksDialog(lambda path: self.import_files([str(path)]), self,
+                          play=self._pack_sample)
         dlg.exec()
         free_dialog(dlg)
+
+    def _pack_sample(self, data, gain: float) -> bool:
+        """Free packs' samples: to your headphones only (None stops it). False: no
+        headphones to play them on."""
+        if data is None:
+            self.engine.stop(PACK_SAMPLE)
+            return True
+        return self.engine.play(PACK_SAMPLE, data, gain, mode="restart",
+                                preview=True) is not None
 
     def import_dialog(self):
         files, __ = QFileDialog.getOpenFileNames(

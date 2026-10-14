@@ -320,7 +320,6 @@ class SpeedPitchButton(QPushButton):
             b.setObjectName("small")
             b.setCheckable(True)
             b.setCursor(Qt.CursorShape.PointingHandCursor)
-            b.setToolTip(_("Click again to turn it off"))
             b.clicked.connect(lambda on, a=amounts: self.set_fx(a if on else {}))
             self.fx_presets[name] = b
             grid.addWidget(b, i // 3, i % 3)

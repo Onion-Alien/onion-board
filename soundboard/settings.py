@@ -11,7 +11,7 @@ import time
 from collections.abc import Callable
 
 from PySide6.QtCore import QObject, QPoint, QRectF, QSignalBlocker, QSize, Qt, QTimer, Signal
-from PySide6.QtGui import (QColor, QFont, QKeySequence, QPainter, QPainterPath,
+from PySide6.QtGui import (QBrush, QColor, QFont, QKeySequence, QPainter, QPainterPath, QPixmap,
                            QShortcut)
 from PySide6.QtWidgets import (QAbstractButton, QApplication, QButtonGroup, QCheckBox,
                                QColorDialog, QComboBox,
@@ -322,8 +322,21 @@ class _AddonGrid(QWidget):
         super().resizeEvent(e)
 
 
+_tiles: dict[str, QBrush | None] = {}
+
+
+def _tile(name: str) -> QBrush | None:
+    """A theme's texture as a brush for its preview card (None: the theme has none)."""
+    if name not in _tiles:
+        kind = theme.THEMES[name].get("texture", "")
+        _tiles[name] = (QBrush(QPixmap.fromImage(theme.texture_image(kind, theme.THEMES[name])))
+                        if kind in theme.TEXTURES else None)
+    return _tiles[name]
+
+
 class ThemeCard(QPushButton):
-    """A clickable mini-preview of a theme."""
+    """A clickable mini-preview of a theme: its colours, and with Textured on, its
+    pattern on the panels and its glow behind them, so the switch shows what it does."""
 
     def __init__(self, name: str):
         super().__init__()
@@ -344,15 +357,25 @@ class ThemeCard(QPushButton):
         win = QPainterPath()
         win.addRoundedRect(r, 8, 8)
         p.fillPath(win, QColor(t["bg"]))
+        tile = _tile(self.name) if theme.textures_on else None
+        if theme.textures_on:
+            p.save()
+            p.setClipPath(win)
+            theme.paint_window_bg(p, r, r.topLeft(), r.width(), r.height(), tk=t)
+            p.restore()
         # side panel, pads and a slider, in the theme's own colours
         p.setPen(Qt.PenStyle.NoPen)
-        p.setBrush(QColor(t["panel"]))
-        p.drawRoundedRect(QRectF(r.right() - 44, r.top() + 6, 38, r.height() - 12), 5, 5)
+        for brush in (QColor(t["panel"]), tile):
+            if brush is not None:
+                p.setBrush(brush)
+                p.drawRoundedRect(QRectF(r.right() - 44, r.top() + 6, 38, r.height() - 12), 5, 5)
         for i, col in enumerate(("#7c5cff", "#ff5c8a", "#1fb6ff", "#13ce66")):
             x = r.left() + 7 + (i % 2) * 44
             y = r.top() + 7 + (i // 2) * 34
-            p.setBrush(QColor(t["card"]))
-            p.drawRoundedRect(QRectF(x, y, 40, 28), 5, 5)
+            for brush in (QColor(t["card"]), tile):
+                if brush is not None:
+                    p.setBrush(brush)
+                    p.drawRoundedRect(QRectF(x, y, 40, 28), 5, 5)
             p.setBrush(QColor(col))
             p.drawRoundedRect(QRectF(x + 5, y + 5, 10, 3), 1.5, 1.5)
         p.setBrush(QColor(t["groove"]))
@@ -518,7 +541,6 @@ class SettingsDialog(QDialog):
         back = self.back_btn = QPushButton()
         back.setProperty("quiet", True)
         icons.set_icon(back, "back")
-        back.setToolTip(_("Back"))
         back.setAccessibleName(_("Back"))
         back.setAutoDefault(False)
         back.clicked.connect(self.accept)
@@ -1227,7 +1249,6 @@ class SettingsDialog(QDialog):
         x = QPushButton()
         x.setObjectName("small")
         icons.close_button(x, 24)
-        x.setToolTip(_("Clear the {label} hotkey", label=label))
         x.setAccessibleName(_("Clear the {label} hotkey", label=label))
         x.clicked.connect(lambda __=False, a=attr: self._set_hk(a, ""))
         row.addWidget(x)
@@ -2445,7 +2466,7 @@ class SettingsDialog(QDialog):
                 self._data_set(video_dir=folder)
         change.clicked.connect(pick)
         row.addWidget(change)
-        show = icon_button("folder", _("Open folder"))
+        show = icon_button("folder", _("Open folder"), hover=False)
 
         def open_folder():
             folder = quality.current.videos()
