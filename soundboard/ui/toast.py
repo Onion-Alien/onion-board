@@ -684,7 +684,7 @@ def show(window: QWidget | None, text: str, kind: str = "", ms: int = TOAST_MS, 
         kind = kind or "ok"
     if kind == "" and text.rstrip().endswith("…"):
         kind = "busy"
-    seen = getattr(host, "toast_seen", None)   # Bun mode says it too (MainWindow)
+    seen = getattr(getattr(host, "bunctl", None), "toast_seen", None)   # Bun says it too
     if callable(seen):
         seen(text, kind)
     stack = _stack_for(host)

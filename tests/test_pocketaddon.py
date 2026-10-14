@@ -73,7 +73,7 @@ def test_without_it_settings_offers_it_and_a_broken_one_is_left_out(qapp, window
     monkeypatch.setattr(net, "allowed", lambda f: True)
     info = _module(tmp_path, "onion-pocket", "broken_pocket_t",
                    "def create(host):\n    raise RuntimeError('boom')\n")
-    window.remote_addons = [(info, window._start_remote_addon(info))]
+    window.remctl.remote_addons = [(info, window.remctl._start_remote_addon(info))]
     d = SettingsDialog(window, "remote")
     assert "boom" in info.error and "boom" not in _texts(d) and "didn't load" not in _texts(d)
     assert _get_button(d) is not None
@@ -87,7 +87,7 @@ def test_without_it_settings_offers_it_and_a_broken_one_is_left_out(qapp, window
 def test_getting_it_fails_and_the_card_just_goes(qapp, window, monkeypatch):  # noqa: F811
     monkeypatch.setattr(net, "allowed", lambda f: True)
     monkeypatch.setattr(pocketaddon, "get", lambda *a, **k: None)
-    window.remote_addons = []
+    window.remctl.remote_addons = []
     d = SettingsDialog(window, "remote")
     d.show()
     btn = _get_button(d)
@@ -95,7 +95,7 @@ def test_getting_it_fails_and_the_card_just_goes(qapp, window, monkeypatch):  # 
     btn.click()
     assert process_events(qapp, lambda: not qt_valid(card) or not card.isVisible(),
                           timeout=3)
-    assert window.remote_addons == []
+    assert window.remctl.remote_addons == []
     d.close()
 
 
@@ -103,15 +103,15 @@ def test_getting_it_puts_its_own_card_in_place(qapp, window, tmp_path, monkeypat
     monkeypatch.setattr(net, "allowed", lambda f: True)
     info = _module(tmp_path, "onion-pocket", "got_pocket_t", ADDON)
     monkeypatch.setattr(pocketaddon, "get", lambda *a, **k: info)
-    window.remote_addons = []
+    window.remctl.remote_addons = []
     d = SettingsDialog(window, "remote")
     d.show()
     _get_button(d).click()
     assert process_events(qapp, lambda: "the test card" in _texts(d), timeout=3)
-    assert [i.id for i, a in window.remote_addons if a is not None] == ["onion-pocket"]
+    assert [i.id for i, a in window.remctl.remote_addons if a is not None] == ["onion-pocket"]
     assert _get_button(d) is None or not _get_button(d).isVisible()
     d.close()
-    window._stop_remote_addons()
+    window.remctl._stop_remote_addons()
     modules._forget("got_pocket_t")
 
 
@@ -173,12 +173,12 @@ def _pocket_zip(tmp_path, version, fail=False):
 
 def _running_old(w, tmp_path):
     info = modules._read(_pocket_dir(tmp_path / "old", "0.1.0"))
-    w.remote_addons = [(info, w._start_remote_addon(info))]
-    assert w.remote_addons[0][1] is not None, info.error
+    w.remctl.remote_addons = [(info, w.remctl._start_remote_addon(info))]
+    assert w.remctl.remote_addons[0][1] is not None, info.error
     w.cfg.remote_addons["onion-pocket"] = {"enabled": True, "port": 8799,
                                                 "token": "keep-me"}
     w.pocket_offer, w.pocket_checked = None, 0.0
-    return info, w.remote_addons[0][1]
+    return info, w.remctl.remote_addons[0][1]
 
 
 def _update_button(d):
@@ -187,8 +187,8 @@ def _update_button(d):
 
 
 def _cleanup(w):
-    w._stop_remote_addons()
-    w.remote_addons = []
+    w.remctl._stop_remote_addons()
+    w.remctl.remote_addons = []
     modules._forget(PKG)
 
 
@@ -235,7 +235,7 @@ def test_settings_offers_the_update_and_swaps_it_in(qapp, window, tmp_path,  # n
         assert _update_button(d).text() == "Update Onion Pocket to 0.2.0"
         _update_button(d).click()
         assert process_events(qapp, lambda: "pocket card 0.2.0" in _texts(d), timeout=5)
-        (new, addon), = window.remote_addons
+        (new, addon), = window.remctl.remote_addons
         assert new.version == "0.2.0" and addon is not None and addon is not old
         assert stops == ["0.1.0"]                       # the old one let go of its port
         assert window.cfg.remote_addons["onion-pocket"] == {
@@ -263,7 +263,7 @@ def test_a_failed_update_keeps_the_old_one_running(qapp, window, tmp_path,  # no
         assert btn is not None and btn.isVisible()     # known already: nothing asked
         btn.click()
         assert process_events(qapp, lambda: "Couldn't" in btn.text(), timeout=3)
-        assert window.remote_addons == [(info, old)] and old.server is not None
+        assert window.remctl.remote_addons == [(info, old)] and old.server is not None
         assert __import__(PKG).stops == []
         assert "pocket card 0.1.0" in _texts(d)
         d.close()
@@ -276,8 +276,8 @@ def test_a_new_copy_that_wont_start_puts_the_old_one_back(window, tmp_path):  # 
         info, old = _running_old(window, tmp_path)
         mod = __import__(PKG)
         bad = modules._read(_pocket_dir(tmp_path / "new", "0.2.0", fail=True))
-        assert window.load_remote_addon(bad) is None
-        assert window.remote_addons == [(info, old)]
+        assert window.remctl.load_remote_addon(bad) is None
+        assert window.remctl.remote_addons == [(info, old)]
         assert __import__(PKG) is mod and mod.stops == ["0.1.0"] and old.applied == 1
     finally:
         _cleanup(window)

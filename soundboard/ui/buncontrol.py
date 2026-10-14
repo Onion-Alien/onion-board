@@ -1,0 +1,124 @@
+"""Bun mode in the main window: the window goes and a floating Bun (ui/bunmode.py) takes its
+place, Back brings the window back as it was, Open the full board brings the whole board,
+and Bun says the window's toasts while he's up. Starting as Bun when the app quit as Bun.
+
+MainWindow makes one ``BunControl`` (``MainWindow.bunctl``); everything here runs on the UI
+thread."""
+from __future__ import annotations
+
+import sys
+from typing import TYPE_CHECKING
+
+from PySide6.QtCore import QRect, QSize, Qt, QTimer
+from PySide6.QtWidgets import QApplication
+
+from soundboard import usage, winkeys
+
+if TYPE_CHECKING:
+    from soundboard.ui.mainwindow import MainWindow
+
+FULL_FROM_BUN = QSize(1180, 720)   # Bun grown past his biggest opens the board this big
+
+
+class BunControl:
+    """Bun mode for one MainWindow (``mw``)."""
+
+    def __init__(self, mw: MainWindow):
+        self.mw = mw
+        self.bun_mode = None   # Bun mode's floating Bun (ui/bunmode.py), once used
+
+    def bun_up(self) -> bool:
+        return self.bun_mode is not None and self.bun_mode.isVisible()
+
+    def enter_bun_mode(self):
+        """The window goes and a floating Bun takes its place (ui/bunmode.py)."""
+        mw = self.mw
+        from soundboard.ui.bunmode import BunMode
+        if self.bun_mode is None:
+            self.bun_mode = BunMode(mw)
+            self.bun_mode.back.connect(lambda: self.leave_bun_mode(False))
+            self.bun_mode.full.connect(lambda: self.leave_bun_mode(True))
+        self.bun_mode.present(mw.frameGeometry() if mw.isVisible() else None)
+        if mw.isVisible() and not mw.isMinimized():
+            # the window as it is (the mini player or the board, maximized or not),
+            # for Back: kept in the settings, so it's the same after a restart as Bun
+            g = mw.normalGeometry() if mw.isMaximized() else mw.geometry()
+            mw.cfg.bun["from"] = [g.x(), g.y(), g.width(), g.height(),
+                                    bool(mw.isMaximized())]
+        mw.cfg.bun["on"] = True
+        mw._save_later()
+        usage.used("bun-mode")
+        mw.hide()
+        mw._wake()
+
+    def leave_bun_mode(self, full: bool = False):
+        """Bun's Back button: the window back as it was. Open the full board (`full`,
+        his right-click menu): the whole board, around where he stood."""
+        mw = self.mw
+        b = self.bun_mode
+        if b is None or not b.isVisible():
+            return
+        spot = b.geometry().center()
+        if full:
+            room = (QApplication.screenAt(spot) or mw.screen()).availableGeometry()
+            want = QSize(min(FULL_FROM_BUN.width(), room.width() - 40),
+                         min(FULL_FROM_BUN.height(), room.height() - 40))
+            if mw.isMaximized() or mw.isFullScreen():
+                mw.showNormal()
+            mw.resize(want)
+            x = min(max(spot.x() - want.width() // 2, room.left()), room.right() - want.width())
+            y = min(max(spot.y() - want.height() // 2, room.top()), room.bottom() - want.height())
+            mw.move(x, y)
+            # it was the mini player: shown at once, its first frames were a blank white
+            # window while it laid the board out again; it fades in once that's done
+            mw.setWindowOpacity(0.0)
+            QTimer.singleShot(150, lambda: mw.setWindowOpacity(1.0))
+        else:
+            self._back_as_it_was()
+        mw.show_from_tray()
+        if full:
+            mw._refit()   # out of the mini player now, not after the first paints
+        if sys.platform == "win32":   # raise_/activateWindow alone left it behind the
+            winkeys.to_front(int(mw.winId()))   # app in front (Bun never has focus)
+
+    def _back_as_it_was(self):
+        """The window's size and place from before Bun mode (cfg.bun["from"]), when
+        it's on a screen still. Without it, the window started as Bun showed at its
+        default size: Back looked just like Open the full board."""
+        mw = self.mw
+        was = mw.cfg.bun.get("from")
+        if not (isinstance(was, list) and len(was) == 5):
+            return
+        x, y, w, h, maxed = was
+        rect = QRect(int(x), int(y), int(w), int(h))
+        if QApplication.screenAt(rect.center()) is None:   # that monitor's gone
+            return
+        if mw.isMaximized() or mw.isFullScreen():
+            mw.showNormal()
+        mw.setGeometry(rect)
+        if maxed:
+            mw.setWindowState(mw.windowState() | Qt.WindowState.WindowMaximized)
+
+    def _bun_away(self):
+        """Bun goes (the window's coming back, or the app's quitting)."""
+        mw = self.mw
+        b = self.bun_mode
+        if b is not None and b.isVisible():
+            b.hide()
+            mw.cfg.bun["on"] = False
+            mw._save_later()
+
+    def start_as_bun(self) -> bool:
+        """At start-up: quit as Bun last time, so Bun again (instead of the window)."""
+        mw = self.mw
+        if not (isinstance(mw.cfg.bun, dict) and mw.cfg.bun.get("on")
+                and mw.cfg.setup_done):
+            return False
+        self.enter_bun_mode()
+        return True
+
+    def toast_seen(self, text: str, kind: str):
+        """Every toast on the window (ui/toast.py): Bun says it while he's up."""
+        b = self.bun_mode
+        if b is not None and b.isVisible():
+            b.say(text, kind)

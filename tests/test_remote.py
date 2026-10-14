@@ -179,10 +179,10 @@ def test_window_starts_it_only_when_turned_on(qapp, window):
     w = window
     assert not w.remote.running and w.cfg.api_token == ""
     w.cfg.api_enabled, w.cfg.api_port = True, 0
-    assert w.apply_remote() == "" and w.remote.running
+    assert w.remctl.apply_remote() == "" and w.remote.running
     assert len(w.cfg.api_token) >= 24                    # made on first use
     w.cfg.api_enabled = False
-    w.apply_remote()
+    w.remctl.apply_remote()
     assert not w.remote.running
 
 
@@ -310,13 +310,13 @@ def test_streamer_guide_turns_it_on_and_copies_working_links(qapp, window):
     finally:
         g.close()
         w.cfg.api_enabled = False
-        w.apply_remote()
+        w.remctl.apply_remote()
 
 
 def test_the_real_window_answers_over_http(qapp, window):
     w = window
     w.cfg.api_enabled, w.cfg.api_port = True, 0
-    assert w.apply_remote() == ""
+    assert w.remctl.apply_remote() == ""
     try:
         auth = {"X-Token": w.cfg.api_token}
         status, body = call(qapp, w.remote, "/api/help", auth)
@@ -326,7 +326,7 @@ def test_the_real_window_answers_over_http(qapp, window):
         assert call(qapp, w.remote, "/api/play?name=Nope", auth)[0] == 404
     finally:
         w.cfg.api_enabled = False
-        w.apply_remote()
+        w.remctl.apply_remote()
 
 
 def test_live_speed_pitch_and_effects_go_through_the_popup(qapp, window):
@@ -465,7 +465,7 @@ def test_settings_key_show_says_hide_and_turning_off_hides_it(qapp, window):
     finally:
         d.close()
         w.cfg.api_enabled = False
-        w.apply_remote()
+        w.remctl.apply_remote()
 
 
 def test_a_volume_that_isnt_a_finite_number_is_refused(qapp):

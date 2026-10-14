@@ -14,7 +14,7 @@ from pathlib import Path
 from typing import Any, Literal, overload
 
 import numpy as np
-from PySide6.QtCore import (QEvent, QObject, QPoint, QRect, QSignalBlocker,
+from PySide6.QtCore import (QEvent, QObject, QPoint, QSignalBlocker,
                             QSize, Qt, QTimer, QUrl, Signal)
 from PySide6.QtGui import (QActionGroup, QCursor, QDesktopServices, QIcon,
                            QKeySequence, QShortcut)
@@ -51,6 +51,8 @@ from soundboard.ui import routewarn
 from soundboard.ui import worker
 from soundboard.ui.dropveil import DropVeil
 from soundboard.ui.ffmpegcontrol import FfmpegControl
+from soundboard.ui.remoteaccess import RemoteAccess
+from soundboard.ui.buncontrol import BunControl
 from soundboard.ui.alertcontrol import AlertControl
 from soundboard.ui.categorycontrol import CategoryControl
 from soundboard.ui.importcontrol import ImportControl
@@ -155,7 +157,6 @@ BODY_SIDE_TIGHT = 8    # ...and beside the rail in a narrow window
 SETTINGS_ROOM = QSize(480, 520)   # what Settings opened from the mini player grows it to
 BUN_TIP = _("Turn into Bun: a small Bun floating on top instead of this window. The "
             "button under him brings it back.")
-FULL_FROM_BUN = QSize(1180, 720)   # Bun grown past his biggest opens the board this big
 MINI_SIZE = QSize(440, 380)   # below this the window becomes the mini player...
 MINI_PAD_ROWS = 1             # ...which has the pads above it when this many rows fit
 QUEUE_CHIPS = 5          # queued sounds shown by name above the pads (then "+n more")
@@ -386,6 +387,8 @@ class MainWindow(QMainWindow):
 
     def __init__(self):
         super().__init__()
+        self.remctl = RemoteAccess(self)
+        self.bunctl = BunControl(self)
         self.alertctl = AlertControl(self)
         self.catctl = CategoryControl(self)
         self.impctl = ImportControl(self)
@@ -479,7 +482,6 @@ class MainWindow(QMainWindow):
         self._quitting = False            # a real quit (not "close to the tray")
         self._tray_told = False           # the "still running in the tray" note was shown
         self.tray: QSystemTrayIcon | None = None
-        self.bun_mode = None   # Bun mode's floating Bun (ui/bunmode.py), once used
         self.watch_offer: watchaddon.Offer | None = None   # an urgent Onion Watch fix
         # set up for the app you're using (appsetup): the bar's app and what it shows.
         # Before the Discord check below: on a slow start its answer (_on_discord) comes
@@ -561,8 +563,8 @@ class MainWindow(QMainWindow):
         self.register_hotkeys()
         # Stream Deck / scripts (Settings → Remote), only if turned on
         self.remote = remote.RemoteControl(lambda a, p: remote.dispatch(self, a, p), self)
-        self.apply_remote()
-        self.remote_addons = self._load_remote_addons()
+        self.remctl.apply_remote()
+        self.remctl.remote_addons = self.remctl._load_remote_addons()
         a11y.label_tree(self, force=True)   # names for the icon-only buttons
 
         self.timer = QTimer(self)
@@ -1292,7 +1294,7 @@ class MainWindow(QMainWindow):
         self.mini_bun.setAccessibleName(_("Turn into Bun"))
         self.mini_bun.setIconSize(QSize(20, 20))
         self._paint_mini_bun()
-        self.mini_bun.clicked.connect(self.enter_bun_mode)
+        self.mini_bun.clicked.connect(self.bunctl.enter_bun_mode)
         connection.addWidget(self.mini_bun)
         cv.addLayout(connection)
         v.addWidget(card)
@@ -4702,7 +4704,7 @@ class MainWindow(QMainWindow):
                        lambda: self.open_settings("tabs"))
         # Bun mode from the full window too (the mini player has its own Bun button)
         menu.addSeparator()
-        act = menu.addAction(self._bun_icon(), _("Turn into Bun"), self.enter_bun_mode)
+        act = menu.addAction(self._bun_icon(), _("Turn into Bun"), self.bunctl.enter_bun_mode)
         act.setToolTip(BUN_TIP)
         menu.setToolTipsVisible(True)
         return menu
@@ -5527,8 +5529,8 @@ class MainWindow(QMainWindow):
         self.mini_download_bar.retheme()
         self.ytresults.retheme()
         self._paint_mini_bun()
-        if self.bun_mode is not None:
-            self.bun_mode.retheme()
+        if self.bunctl.bun_mode is not None:
+            self.bunctl.bun_mode.retheme()
         pp, self._pp_icon = self._pp_icon, None
         self._set_pp_icon(pp or "play")
         self._pill_long = ""   # forces _update_flow to repaint its icon
@@ -7442,7 +7444,7 @@ class MainWindow(QMainWindow):
         icons.set_icon(menu.addAction(_("Open Onion Board"), self.show_from_tray), "sounds")
         icons.set_icon(menu.addAction(_("Stop all sounds"), self.stop_all), "stop")
         self._tray_bun = menu.addAction(self._bun_icon(), _("Turn into Bun"),
-                                        self.enter_bun_mode)
+                                        self.bunctl.enter_bun_mode)
         menu.addSeparator()
         # the Discord opens in the browser (feedback.py); Send feedback asks first
         from soundboard import feedback
@@ -7472,99 +7474,8 @@ class MainWindow(QMainWindow):
             self.show_from_tray()
 
     # ------------------------------------------------------------------ Bun mode
-    def bun_up(self) -> bool:
-        return self.bun_mode is not None and self.bun_mode.isVisible()
-
-    def enter_bun_mode(self):
-        """The window goes and a floating Bun takes its place (ui/bunmode.py)."""
-        from soundboard.ui.bunmode import BunMode
-        if self.bun_mode is None:
-            self.bun_mode = BunMode(self)
-            self.bun_mode.back.connect(lambda: self.leave_bun_mode(False))
-            self.bun_mode.full.connect(lambda: self.leave_bun_mode(True))
-        self.bun_mode.present(self.frameGeometry() if self.isVisible() else None)
-        if self.isVisible() and not self.isMinimized():
-            # the window as it is (the mini player or the board, maximized or not),
-            # for Back: kept in the settings, so it's the same after a restart as Bun
-            g = self.normalGeometry() if self.isMaximized() else self.geometry()
-            self.cfg.bun["from"] = [g.x(), g.y(), g.width(), g.height(),
-                                    bool(self.isMaximized())]
-        self.cfg.bun["on"] = True
-        self._save_later()
-        usage.used("bun-mode")
-        self.hide()
-        self._wake()
-
-    def leave_bun_mode(self, full: bool = False):
-        """Bun's Back button: the window back as it was. Open the full board (`full`,
-        his right-click menu): the whole board, around where he stood."""
-        b = self.bun_mode
-        if b is None or not b.isVisible():
-            return
-        spot = b.geometry().center()
-        if full:
-            room = (QApplication.screenAt(spot) or self.screen()).availableGeometry()
-            want = QSize(min(FULL_FROM_BUN.width(), room.width() - 40),
-                         min(FULL_FROM_BUN.height(), room.height() - 40))
-            if self.isMaximized() or self.isFullScreen():
-                self.showNormal()
-            self.resize(want)
-            x = min(max(spot.x() - want.width() // 2, room.left()), room.right() - want.width())
-            y = min(max(spot.y() - want.height() // 2, room.top()), room.bottom() - want.height())
-            self.move(x, y)
-            # it was the mini player: shown at once, its first frames were a blank white
-            # window while it laid the board out again; it fades in once that's done
-            self.setWindowOpacity(0.0)
-            QTimer.singleShot(150, lambda: self.setWindowOpacity(1.0))
-        else:
-            self._back_as_it_was()
-        self.show_from_tray()
-        if full:
-            self._refit()   # out of the mini player now, not after the first paints
-        if sys.platform == "win32":   # raise_/activateWindow alone left it behind the
-            winkeys.to_front(int(self.winId()))   # app in front (Bun never has focus)
-
-    def _back_as_it_was(self):
-        """The window's size and place from before Bun mode (cfg.bun["from"]), when
-        it's on a screen still. Without it, the window started as Bun showed at its
-        default size: Back looked just like Open the full board."""
-        was = self.cfg.bun.get("from")
-        if not (isinstance(was, list) and len(was) == 5):
-            return
-        x, y, w, h, maxed = was
-        rect = QRect(int(x), int(y), int(w), int(h))
-        if QApplication.screenAt(rect.center()) is None:   # that monitor's gone
-            return
-        if self.isMaximized() or self.isFullScreen():
-            self.showNormal()
-        self.setGeometry(rect)
-        if maxed:
-            self.setWindowState(self.windowState() | Qt.WindowState.WindowMaximized)
-
-    def _bun_away(self):
-        """Bun goes (the window's coming back, or the app's quitting)."""
-        b = self.bun_mode
-        if b is not None and b.isVisible():
-            b.hide()
-            self.cfg.bun["on"] = False
-            self._save_later()
-
-    def start_as_bun(self) -> bool:
-        """At start-up: quit as Bun last time, so Bun again (instead of the window)."""
-        if not (isinstance(self.cfg.bun, dict) and self.cfg.bun.get("on")
-                and self.cfg.setup_done):
-            return False
-        self.enter_bun_mode()
-        return True
-
-    def toast_seen(self, text: str, kind: str):
-        """Every toast on the window (ui/toast.py): Bun says it while he's up."""
-        b = self.bun_mode
-        if b is not None and b.isVisible():
-            b.say(text, kind)
-
     def show_from_tray(self):
-        self._bun_away()
+        self.bunctl._bun_away()
         if self.isMinimized():
             self.showNormal()
         else:
@@ -7610,112 +7521,6 @@ class MainWindow(QMainWindow):
         open would fail with "Setup was unable to close all applications"."""
         self._quitting = True
         exitwatch.closed_by_windows()   # ended before the quit finishes: not a crash
-
-    def apply_remote(self) -> str:
-        """Start / stop the local control API to match the settings; "" or an error."""
-        err = remote.apply(self, self.remote)
-        if err:
-            self.say(_("<span style='color:{status}'>Remote control is off: "
-                       "{err}.</span>",
-                       status=theme.status('warn'), err=html.escape(err)), "warn")
-        return err
-
-    def _load_remote_addons(self) -> list:
-        """[(ModuleInfo, add-on or None)] for every "remote" add-on (soundboard.modules),
-        e.g. Onion Pocket. One that fails is noted on its info (and the log;
-        Settings → Remote leaves it out) and never stops the app."""
-        from soundboard import modules
-        return [(info, self._start_remote_addon(info))
-                for info in modules.discover() if info.kind == "remote"]
-
-    def _start_remote_addon(self, info):
-        """The add-on's object, or None (the reason noted on `info`)."""
-        from soundboard import modules
-        from soundboard.ui.remotehost import RemoteHost
-        if info.error:
-            return None
-        try:
-            return modules.load_package(info).create(RemoteHost(self, info.id))
-        except Exception as e:  # noqa: BLE001 - a bad add-on can't stop the app
-            log.exception("remote add-on %s didn't start", info.id)
-            info.error = str(e) if isinstance(e, modules.ModuleError) \
-                else _("failed to start: {error}", error=errors.plain(e))
-            return None
-
-    def load_remote_addon(self, info):
-        """Start a remote add-on installed while the app runs (Settings → Remote's
-        *Get Onion Pocket*, or its *Update* button), in place of any copy of it. A
-        running copy is stopped first (its server lets go of the port) and its package
-        forgotten, so the new version's code loads; its settings in
-        Config.remote_addons are the board's and stay as they are. If the new one
-        doesn't start, the old one is started again and stays. The add-on's object,
-        or None."""
-        from soundboard import modules
-        old = next(((i, a) for i, a in self.remote_addons if i.id == info.id), None)
-        saved = {}
-        if old is not None and old[1] is not None:
-            try:
-                old[1].stop()
-            except Exception:  # noqa: BLE001
-                log.exception("remote add-on %s didn't stop cleanly", info.id)
-            pkg = old[0].package
-            saved = {n: m for n, m in sys.modules.items()
-                     if pkg and (n == pkg or n.startswith(pkg + "."))}
-            modules._forget(pkg)
-        addon = self._start_remote_addon(info)
-        if addon is None and saved and old is not None:   # (saved: only with an old one)
-            log.warning("remote add-on %s %s didn't start (%s): keeping %s",
-                        info.id, info.version, info.error, old[0].version)
-            if info.package:
-                modules._forget(info.package)
-            sys.modules.update(saved)
-            try:
-                restart = getattr(old[1], "apply", None)
-                if callable(restart):
-                    restart()
-            except Exception:  # noqa: BLE001
-                log.exception("remote add-on %s didn't start again", info.id)
-            return None
-        self.remote_addons = [(i, a) for i, a in self.remote_addons if i.id != info.id]
-        self.remote_addons.append((info, addon))
-        return addon
-
-    def remove_remote_addon(self, info, base=None):
-        """Uninstall a remote add-on (Settings' *Remove Onion Pocket*): the running
-        copy is stopped (its server lets go of the port), its folder in `base` (the
-        modules folder in %APPDATA%) deleted and its package forgotten. Its settings
-        in Config.remote_addons stay, for when it's got again. If the folder can't be
-        deleted, it's started again. Raises modules.ModuleError."""
-        from soundboard import modules
-        cur = next(((i, a) for i, a in self.remote_addons if i.id == info.id), None)
-        if cur is not None and cur[1] is not None:
-            try:
-                cur[1].stop()
-            except Exception:  # noqa: BLE001 - it's being removed anyway
-                log.exception("remote add-on %s didn't stop cleanly", info.id)
-        try:
-            modules.uninstall(info.id, base)
-        except modules.ModuleError:
-            if cur is not None and cur[1] is not None:
-                restart = getattr(cur[1], "apply", None)
-                try:
-                    if callable(restart):
-                        restart()
-                except Exception:  # noqa: BLE001
-                    log.exception("remote add-on %s didn't start again", info.id)
-            raise
-        if info.package:
-            modules._forget(info.package)
-        self.remote_addons = [(i, a) for i, a in self.remote_addons if i.id != info.id]
-        log.info("remote add-on %s %s was removed", info.id, info.version)
-
-    def _stop_remote_addons(self):
-        for info, addon in self.remote_addons:
-            if addon is not None:
-                try:
-                    addon.stop()
-                except Exception:  # noqa: BLE001
-                    log.exception("remote add-on %s didn't stop cleanly", info.id)
 
     def set_autostart(self, on: bool) -> bool:
         return autostart.set_enabled(on, self.cfg.autostart_hidden)
@@ -7833,7 +7638,7 @@ class MainWindow(QMainWindow):
             self._set_tick_rate()
 
     def _tick_pace(self) -> int:
-        if not self._ui_live and not self.overlay.is_open and not self.bun_up():
+        if not self._ui_live and not self.overlay.is_open and not self.bunctl.bun_up():
             return TICK_IDLE_MS
         if not self._tick_busy:   # nothing moves: 10 ticks a second instead of 30
             return TICK_QUIET_MS
@@ -7916,9 +7721,9 @@ class MainWindow(QMainWindow):
         if self._ui_live:
             self._tick_visuals(playing, now)
         self.overlay.tick(playing)
-        if self.bun_mode is not None and self.bun_mode.isVisible():
+        if self.bunctl.bun_mode is not None and self.bunctl.bun_mode.isVisible():
             bar = self.download_bar
-            self.bun_mode.tick(
+            self.bunctl.bun_mode.tick(
                 live=live, level=e.level_play, sending=e.sending, mic=self.cfg.mic_enabled,
                 paused=any(paused for sid, (_p, paused) in playing.items()
                            if sid in self._meta or sid == LINK_ID),
@@ -8414,14 +8219,14 @@ class MainWindow(QMainWindow):
             return
         self._shut_down = True
         exitwatch.quitting()   # a run that dies from here on died closing (exitwatch.py)
-        if self.bun_mode is not None:   # (cfg.bun["on"] stays: it starts as Bun next time)
-            self.bun_mode.close()
+        if self.bunctl.bun_mode is not None:   # (cfg.bun["on"] stays: it starts as Bun next time)
+            self.bunctl.bun_mode.close()
         for step in (self._finish_removals, self._wait_bin, self.timer.stop, self._voice_timer.stop,
                      self._default_poll.stop, self.alertctl._discord_poll.stop,
                      self._release_ptt,
                      self._remember_usage, self.cfg.save, self.overlay.shutdown,
                      self.hotkeys.stop, self.replay.stop, self.remote.stop,
-                     self._stop_remote_addons,
+                     self.remctl._stop_remote_addons,
                      self.radio.shutdown, tor.shutdown, self.apps.shutdown,
                      self.triggers.shutdown,
                      self.linkbar.shutdown, ytworker.drop_all,

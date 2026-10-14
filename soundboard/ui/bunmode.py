@@ -1,7 +1,7 @@
 """Bun mode: the mini player as a little Bun floating over everything.
 
 For people who'd rather have a small mascot on screen than the mini player. The
-mini player's Bun button turns the window into him (MainWindow.enter_bun_mode);
+mini player's Bun button turns the window into him (BunControl.enter_bun_mode);
 everything else keeps running as it does with the window in the tray: hotkeys, the
 overlay, sounds, downloads.
 
