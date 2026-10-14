@@ -348,11 +348,9 @@ class AiVoicePanel(QWidget):
             self.lbl_missing.setText(_("AI voices stopped working: the Python they were set "
                                        "up with is gone from this PC. Press Repair to set "
                                        "them up again."))
-            self.lbl_missing.setToolTip(str(m.path))
         elif not ok:
             self.lbl_missing.setText(_("AI voices need a one-time install first: about 90 MB "
                                        "(the voice model and its runtime)."))
-            self.lbl_missing.setToolTip(str(m.path))
         if not self._installing:
             fix = m is not None and m.broken
             self.b_install.setText(_("Repair") if fix else _("Install AI voices"))

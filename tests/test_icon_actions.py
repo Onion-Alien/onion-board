@@ -1,8 +1,9 @@
 """Folder actions are one consistent, icon-only family (panel.icon_button).
 
 Every plain "open this folder" action is a quiet icon-only button whose folder icon
-is backed by a tooltip and a matching screen-reader name (DESIGN section 4), instead
-of a word button here and an icon button there."""
+is backed by a screen-reader name (DESIGN section 4), instead of a word button here
+and an icon button there. No tooltip that only says "Open folder": the picture says
+it; one that adds something (the crash report's) leads with the name."""
 from PySide6.QtWidgets import QLabel, QPushButton
 
 from soundboard.ui import panel
@@ -10,20 +11,24 @@ from soundboard.settings import SettingsDialog
 from test_mainwindow import window  # noqa: F401 - the real window, offscreen
 
 
-def _assert_icon_only_folder(btn: QPushButton):
+def _assert_icon_only_folder(btn: QPushButton, more: bool = False):
     assert btn.text() == "", btn.text()               # icon only, no words
     assert btn.objectName() == "iconbutton"
     assert not btn.icon().isNull()                    # a folder is drawn
-    assert btn.toolTip()                              # the words moved to the tooltip
     assert btn.accessibleName() == "Open folder"      # a screen reader hears what it does
-    assert btn.toolTip().startswith(btn.accessibleName())  # and the tooltip leads with it
+    if more:   # a tooltip only to say more, leading with the name
+        assert btn.toolTip().startswith(btn.accessibleName() + "\n")
+    else:
+        assert btn.toolTip() == ""
     assert btn.minimumSizeHint().height() >= 24       # not a smaller click target
 
 
 def test_icon_button_is_a_named_icon_only_button(qapp):
-    b = panel.icon_button("folder", "Open folder")
+    b = panel.icon_button("folder", "Open folder", hover=False)
     assert b.property("quiet")
     _assert_icon_only_folder(b)
+    b = panel.icon_button("info", "What do these do?")   # a picture that needs words
+    assert b.toolTip() == b.accessibleName() == "What do these do?"
 
 
 def test_settings_videos_folder_is_an_icon_button(window):  # noqa: F811
@@ -47,7 +52,7 @@ def test_crash_report_folder_is_an_icon_button(qapp):
     from soundboard import applog
     from soundboard.ui import crashdialog
     dlg = crashdialog.CrashDialog(applog.Report(title="ValueError: x", text="BODY"), None)
-    _assert_icon_only_folder(dlg.folder_btn)
+    _assert_icon_only_folder(dlg.folder_btn, more=True)
     dlg.close()
 
 
@@ -57,7 +62,7 @@ def _assert_reset(btn: QPushButton):
     assert btn.text() == "Reset"
     assert btn.objectName() == "reset"
     assert not btn.icon().isNull()
-    assert btn.toolTip()                              # says what goes back
+    assert btn.toolTip() or btn.accessibleName()     # says what goes back
 
 
 def test_resets_are_one_family(window):  # noqa: F811

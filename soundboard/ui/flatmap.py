@@ -234,7 +234,7 @@ class FlatMap(QWidget):
                                 ("−", _("Zoom out"), lambda: self._zoom_by(1 / 1.5))):
             b = QPushButton(text)
             b.setObjectName("mapbtn")
-            b.setToolTip(tip)
+            b.setAccessibleName(tip)
             b.setFixedSize(30, 30)
             b.setCursor(Qt.CursorShape.PointingHandCursor)
             b.clicked.connect(slot)

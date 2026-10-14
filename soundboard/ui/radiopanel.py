@@ -539,7 +539,7 @@ class RadioTab(QWidget):
         self.search.returnPressed.connect(self._search_now)
         top.addWidget(self.search, 1)
         self.btn_refresh = QPushButton()
-        self.btn_refresh.setToolTip(_("Fetch the station list again"))
+        self.btn_refresh.setAccessibleName(_("Fetch the station list again"))
         icons.set_icon(self.btn_refresh, "reload")
         self.btn_refresh.clicked.connect(self._reload)
         top.addWidget(self.btn_refresh)
@@ -588,7 +588,6 @@ class RadioTab(QWidget):
         self.btn_fav = QPushButton()
         self.btn_fav.setObjectName("iconbutton")
         self.btn_fav.setAccessibleName(_("Favorite station"))
-        self.btn_fav.setToolTip(_("Add the selected station to Favorites"))
         icons.set_icon(self.btn_fav, "star")
         self.btn_fav.clicked.connect(lambda: self._toggle_fav())
         bh.addWidget(self.btn_fav)
@@ -745,7 +744,6 @@ QFrame#stations QFrame#rule { background:$border; max-height:1px; border:none; }
         self.cmb_country.setMinimumContentsLength(8)
         self.cmb_country.addItem(_("All countries"), "")
         self.cmb_country.setAccessibleName(_("Country"))
-        self.cmb_country.setToolTip(_("Country"))
         self.cmb_country.activated.connect(
             lambda _i: self.set_country(self.cmb_country.currentData() or ""))
         self.cmb_quality = QComboBox()
@@ -756,7 +754,6 @@ QFrame#stations QFrame#rule { background:$border; max-height:1px; border:none; }
         self.cmb_quality.activated.connect(lambda _i: self._on_filter())
         self.cmb_sort = QComboBox()
         self.cmb_sort.setAccessibleName(_("Sort by"))
-        self.cmb_sort.setToolTip(_("Sort by"))
         for label, _key in SORTS:
             self.cmb_sort.addItem(label)
         self.cmb_sort.activated.connect(lambda _i: self._show_list())
@@ -1405,7 +1402,8 @@ QFrame#stations QFrame#rule { background:$border; max-height:1px; border:none; }
         fav = s is not None and s.uuid in self._fav_ids
         icons.set_icon(self.btn_fav, "star_filled" if fav else "star",
                        "accent" if fav else "text")
-        self.btn_fav.setToolTip(_("Remove from Favorites") if fav else _("Add to Favorites"))
+        self.btn_fav.setAccessibleName(_("Remove from Favorites") if fav
+                                       else _("Add to Favorites"))
         self.btn_fav.setEnabled(s is not None)
 
     def _no_stations_text(self) -> str:

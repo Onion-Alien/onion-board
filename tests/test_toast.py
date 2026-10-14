@@ -97,7 +97,7 @@ def test_a_card_that_stays_isnt_pushed_out_by_newer_ones(qapp):
 def test_problems_can_be_copied(qapp):
     w = _host(qapp)
     t = busy.toast(w, "Couldn't open <b>x.wav</b>", "error")
-    assert t.card.btn_copy.isVisibleTo(t) and t.card.btn_copy.toolTip() == "Copy"
+    assert t.card.btn_copy.isVisibleTo(t) and t.card.btn_copy.accessibleName() == "Copy"
     t.card.btn_copy.click()
     assert QApplication.clipboard().text() == "Couldn't open x.wav"
     ok = busy.toast(w, "Saved", "ok")
@@ -129,7 +129,7 @@ def test_icon_buttons_say_what_they_do(qapp):
     w = _host(qapp)
     t = busy.toast(w, "Couldn't save", "error")
     for b in (t.card.btn_copy, t.card.btn_close):
-        assert b.toolTip() and b.accessibleName()
+        assert b.accessibleName() and not b.toolTip()   # copy and ✕ say it
     w.close()
 
 
