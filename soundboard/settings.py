@@ -1681,7 +1681,7 @@ class SettingsDialog(QDialog):
         self.box_programs = self._option(
             cv, _("Switch by itself"),
             _("When the program closes, the board goes back to what it showed before."),
-            self.mw.cfg.category_programs_on, self.mw.set_category_programs_on)
+            self.mw.cfg.category_programs_on, self.mw.catctl.set_category_programs_on)
         self.programs_list = QVBoxLayout()
         self.programs_list.setSpacing(4)
         cv.addLayout(self.programs_list)
@@ -1717,7 +1717,7 @@ class SettingsDialog(QDialog):
             rm.setToolTip(_("Stop switching to “{category}” when {program} is in front",
                             category=cat, program=exe))
             icons.set_icon(rm, "trash", "danger_text", size=12)
-            rm.clicked.connect(lambda _c=False, e=exe: self.mw.remove_category_program(e))
+            rm.clicked.connect(lambda _c=False, e=exe: self.mw.catctl.remove_category_program(e))
             h.addWidget(rm)
             lay.addWidget(row)
 

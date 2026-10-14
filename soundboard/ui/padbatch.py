@@ -309,14 +309,14 @@ class PadSelection(QObject):
                 m.tags = [t for t in m.tags if library.split_tag(t)[0] != cat]
         n = len(self.sounds())
         self.mw._save_now()
-        self.mw._fill_categories()
+        self.mw.catctl._fill_categories()
         self.mw.apply_filter(self.mw.search.text())
         self.mw.toast(_("✓ Added {count} to {name}", count=count(n), name=html.escape(name)) if on
                       else _("Took {count} out of {name}", count=count(n), name=html.escape(name)))
 
     def new_category(self, *__):
         keep = set(self.picked)   # the new, empty category shows: that unpicks them
-        name = self.mw.new_category()
+        name = self.mw.catctl.new_category()
         if not name:
             return
         self.picked = keep & {m.id for m in self.mw.cfg.sounds}

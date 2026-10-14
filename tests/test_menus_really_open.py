@@ -63,11 +63,11 @@ def test_right_click_menus_really_open(main_window):  # noqa: F811
     w = main_window
     w.resize(1100, 750)
     w.show()
-    w.new_category("s0", "Memes")      # a category tab to right-click as well
+    w.catctl.new_category("s0", "Memes")      # a category tab to right-click as well
     sounds = next(b for b in w.rail.buttons if b.accessibleName() == "Sounds")
     QTest.mouseClick(sounds, Qt.MouseButton.LeftButton)
     QApplication.processEvents()
-    w.cat_tabs.setCurrentIndex(0)      # All: every pad
+    w.catctl.cat_tabs.setCurrentIndex(0)      # All: every pad
     hand = _Hand()
     app = QApplication.instance()
     app.installEventFilter(hand)
@@ -79,7 +79,7 @@ def test_right_click_menus_really_open(main_window):  # noqa: F811
         rail = [b for b in w.rail.buttons if b.isVisible()]
         for b in rail:                                   # each sidebar tab's menu
             _context_menu(b, b.rect().center())
-        bar = w.cat_tabs
+        bar = w.catctl.cat_tabs
         for i in range(bar.count()):                     # each category tab's menu
             _context_menu(bar, bar.tabRect(i).center())
         for p in pads[:2]:                               # two picked pads: the menu for both

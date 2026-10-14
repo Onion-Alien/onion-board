@@ -1313,7 +1313,7 @@ def test_toolbar_tabs_and_pads_share_their_edges(window, qapp):
         window.resize(w, 760)
         QTest.qWait(80)
         x = lambda wid, px=0: wid.mapTo(window, QPoint(px, 0)).x()
-        bar, tabs = window.sounds_toolbar, window.cat_tabs
+        bar, tabs = window.sounds_toolbar, window.catctl.cat_tabs
         assert x(bar) == x(tabs, tabs.tabRect(0).x()) == x(g.pads[0]), w
         cols, pw = g._shape
         row_end = x(g) + m.left() + cols * pw + g.grid.horizontalSpacing() * (cols - 1)

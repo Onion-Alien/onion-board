@@ -144,34 +144,34 @@ def test_rules_go_into_a_backup_and_back():
 def test_the_board_follows_the_program_and_rename_delete_keep_rules_right(window):  # noqa: F811
     d = Desk()
     w = window
-    w.cat_switch = switcher(d)
-    w.new_category(name="Memes")
-    w.new_category(name="Game")
-    w.set_category("Memes")
-    w.add_category_program("Game", GAME)
-    assert w.cfg.category_programs == {"game.exe": "Game"} and w._cat_timer.isActive()
+    w.catctl.cat_switch = switcher(d)
+    w.catctl.new_category(name="Memes")
+    w.catctl.new_category(name="Game")
+    w.catctl.set_category("Memes")
+    w.catctl.add_category_program("Game", GAME)
+    assert w.cfg.category_programs == {"game.exe": "Game"} and w.catctl._cat_timer.isActive()
     d.show(10, GAME)
-    w._cat_tick()
+    w.catctl._cat_tick()
     assert w.cfg.category == "Game"
-    w.rename_category("Game", "Shooter")
+    w.catctl.rename_category("Game", "Shooter")
     assert w.cfg.category_programs == {"game.exe": "Shooter"}
     d.close(10)
-    w._cat_tick()
+    w.catctl._cat_tick()
     assert w.cfg.category == "Memes"   # back to what showed before
-    tip = w.cat_tabs.tabToolTip(w.cfg.categories.index("Shooter") + 1)
+    tip = w.catctl.cat_tabs.tabToolTip(w.cfg.categories.index("Shooter") + 1)
     assert "game.exe" in tip
-    w.delete_category("Shooter")
-    assert w.cfg.category_programs == {} and not w._cat_timer.isActive()
+    w.catctl.delete_category("Shooter")
+    assert w.cfg.category_programs == {} and not w.catctl._cat_timer.isActive()
 
 
 def test_switch_off_stops_following(window):  # noqa: F811
     w = window
-    w.new_category(name="Game")
-    w.add_category_program("Game", "game.exe")
-    w.set_category_programs_on(False)
-    assert not w._cat_timer.isActive() and w.cfg.category_programs == {"game.exe": "Game"}
-    w.set_category_programs_on(True)
-    assert w._cat_timer.isActive()
-    w.remove_category_program("game.exe")
-    assert not w._cat_timer.isActive()
+    w.catctl.new_category(name="Game")
+    w.catctl.add_category_program("Game", "game.exe")
+    w.catctl.set_category_programs_on(False)
+    assert not w.catctl._cat_timer.isActive() and w.cfg.category_programs == {"game.exe": "Game"}
+    w.catctl.set_category_programs_on(True)
+    assert w.catctl._cat_timer.isActive()
+    w.catctl.remove_category_program("game.exe")
+    assert not w.catctl._cat_timer.isActive()
 

@@ -64,9 +64,9 @@ def _pack(path, entry, wav):
 # ------------------------------------------------------------------ categories
 
 def test_a_renamed_category_keeps_its_random_hotkey(window):
-    window.new_category("s0", name="Memes")
+    window.catctl.new_category("s0", name="Memes")
     window.set_category_hotkey("Memes", "f7")
-    window.rename_category("Memes", "Jokes")
+    window.catctl.rename_category("Memes", "Jokes")
     assert window._registered[-1].get("f7") == main.RANDOM + "Jokes"
     played = []
     window.play = played.append
@@ -75,32 +75,32 @@ def test_a_renamed_category_keeps_its_random_hotkey(window):
 
 
 def test_a_deleted_category_lets_go_of_its_hotkey(window, monkeypatch):
-    window.new_category("s0", name="Memes")
+    window.catctl.new_category("s0", name="Memes")
     window.set_category_hotkey("Memes", "f7")
     monkeypatch.setattr(QMessageBox, "question", lambda *a, **k: QMessageBox.Yes)
-    window.delete_category("Memes")
+    window.catctl.delete_category("Memes")
     assert "f7" not in window._registered[-1]
 
 
 def test_undo_after_a_rename_or_delete_does_not_bring_the_old_category_back(window,
                                                                            monkeypatch):
-    window.new_category("s0", name="Memes")
-    window.new_category("s1", name="Loud")
+    window.catctl.new_category("s0", name="Memes")
+    window.catctl.new_category("s1", name="Loud")
     window.remove_sound("s0")
-    window.rename_category("Memes", "Jokes")
+    window.catctl.rename_category("Memes", "Jokes")
     window.undo_remove()
     assert window.cfg.categories == ["Jokes", "Loud"]
     assert window.meta("s0").tags == ["Jokes"]
     window.remove_sound("s1")
     monkeypatch.setattr(QMessageBox, "question", lambda *a, **k: QMessageBox.Yes)
-    window.delete_category("Loud")
+    window.catctl.delete_category("Loud")
     window.undo_remove()
     assert window.cfg.categories == ["Jokes"] and window.meta("s1").tags == []
 
 
 def test_save_as_new_sound_stays_in_the_category(window, monkeypatch, qapp):
-    window.new_category("s0", name="Memes")
-    window.set_category("Memes")
+    window.catctl.new_category("s0", name="Memes")
+    window.catctl.set_category("Memes")
     window.meta("s0").fade_in = 1.5
 
     d = window.edit("s0")
@@ -143,7 +143,7 @@ def test_a_backup_restores_sounds_removed_a_moment_ago(window, tmp_path, qapp, m
 
 
 def test_an_imported_tag_joins_the_category_spelled_differently(window, tmp_path, qapp):
-    window.new_category("s0", name="Memes")
+    window.catctl.new_category("s0", name="Memes")
     wav = _tone(tmp_path / "w.wav").read_bytes()
     window.impctl.import_package(str(_pack(tmp_path / "p.zip", {"name": "x", "tags": ["memes"]},
                                     wav)))
@@ -153,7 +153,7 @@ def test_an_imported_tag_joins_the_category_spelled_differently(window, tmp_path
 
 
 def test_an_imported_hotkey_does_not_take_a_categorys(window, tmp_path, qapp):
-    window.new_category("s0", name="Memes")
+    window.catctl.new_category("s0", name="Memes")
     window.set_category_hotkey("Memes", "f7")
     wav = _tone(tmp_path / "w.wav").read_bytes()
     window.impctl.import_package(str(_pack(tmp_path / "p.zip", {"name": "x", "hotkey": "f7"}, wav)))

@@ -192,7 +192,7 @@ class Overlay:
     `host` is the main window. Used: host.cfg (sounds, categories, category,
     overlay_hotkey), host.audio, host.play(sid), host.on_hotkey('__stop__' /
     '__pause__'), host.register_hotkeys() (which asks `layer()` for the extra keys),
-    host.cue(kind or notes) and host.set_category(name) (the category key)."""
+    host.cue(kind or notes) and host.catctl.set_category(name) (the category key)."""
     ACTION = "__overlay__"
     PREFIX = "__ov:"
 
@@ -410,7 +410,7 @@ class Overlay:
         cats = ["", *self.host.cfg.categories]
         cur = self.host.cfg.category
         i = cats.index(cur) if cur in cats else 0
-        self.host.set_category(cats[(i + 1) % len(cats)])
+        self.host.catctl.set_category(cats[(i + 1) % len(cats)])
         self.page = 0
         self.flash = None
         if self.blind:

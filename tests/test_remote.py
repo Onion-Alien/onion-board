@@ -257,7 +257,7 @@ def test_window_streamer_endpoints(qapp, window):
     assert f"0-{top}" in d("volume")[1]["error"]
     d("volume", set="0")
 
-    w.new_category(name="Memes")
+    w.catctl.new_category(name="Memes")
     assert d("category", name="memes") == (200, {"category": "Memes"})
     assert d("category", name="") == (200, {"category": ""})
     assert d("category", name="Nope")[0] == 404
@@ -414,10 +414,10 @@ def test_voices_say_queue_and_hear(qapp, window):
     for sid in ("s0", "s1"):
         w.audio[sid] = np.zeros((48000, 2), np.float32)
     assert d("queue") == (200, {"queue": []})
-    w.new_category(name="Memes")
+    w.catctl.new_category(name="Memes")
     assert d("queue", category="memes")[0] == 404     # nothing in it yet
     for sid in ("s0", "s1"):
-        w.toggle_tag(sid, "Memes")
+        w.catctl.toggle_tag(sid, "Memes")
     played = []
     w.play = lambda sid, now=False: played.append(sid)
     w._pads_playing = lambda: bool(played)

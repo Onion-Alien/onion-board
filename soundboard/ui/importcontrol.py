@@ -351,7 +351,7 @@ class ImportControl:
         mw = self.mw
         self._pending_imports -= 1
         if meta is not None:
-            mw._tag_new(meta)
+            mw.catctl._tag_new(meta)
             meta.tags = library.merge_tags(meta.tags, mw.cfg.categories,
                                            mw.cfg.subcategories)
             key = self._import_keys.pop(meta.id, "")
@@ -379,7 +379,7 @@ class ImportControl:
         self._import_stop.clear()
         mw._save_now()
         mw._rebuild_pads()
-        mw._fill_categories()   # categories and hotkeys from an Import from Soundpad
+        mw.catctl._fill_categories()   # categories and hotkeys from an Import from Soundpad
         mw.register_hotkeys()
         n, self._imported_ok = self._imported_ok, 0
         short, self._imported_short = self._imported_short, False
@@ -493,7 +493,7 @@ class ImportControl:
     def export_category(self):
         mw = self.mw
         if mw.cfg.category:
-            self.export_sounds(mw.category_sounds(), mw.cfg.category)
+            self.export_sounds(mw.catctl.category_sounds(), mw.cfg.category)
 
     def export_sounds(self, sounds: list[SoundMeta], name: str):
         """A sound pack: just these sounds (no settings), e.g. to share with friends."""
@@ -750,9 +750,9 @@ class ImportControl:
         changed = backup.apply_settings(mw.cfg, raw)
         if "category_programs" in changed:   # added to the rules here, not in their place
             mw.cfg.category_programs = {**had_programs, **mw.cfg.category_programs}
-            mw.cat_switch.reset()
-            mw._update_cat_timer()
-            mw._fill_categories()
+            mw.catctl.cat_switch.reset()
+            mw.catctl._update_cat_timer()
+            mw.catctl._fill_categories()
         if "tabs_off" in changed:   # the tabs follow now: a list saying one thing while
             # the window shows another left the Voice tab unreachable, and Settings
             # crashed reaching into a stand-in
@@ -821,7 +821,7 @@ class ImportControl:
             mw.engine.set_gain(m.id, mw.gain_for(m))
         mw._save_now()
         mw._rebuild_pads()
-        mw._fill_categories()
+        mw.catctl._fill_categories()
         mw._load_all()
         mw.register_hotkeys()
         n = len(res.sounds)
@@ -949,7 +949,7 @@ class ImportControl:
         if mw.cfg.category not in mw.cfg.categories:
             mw.cfg.category = mw.cfg.subcategory = ""
         mw._save_now()
-        mw._fill_categories()
+        mw.catctl._fill_categories()
         mw.apply_filter(mw.search.text())
         mw.register_hotkeys()
         mw.toast(_("✓ “{name}” is one tab now", name=html.escape(name)), "ok")
