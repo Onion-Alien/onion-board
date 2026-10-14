@@ -6,8 +6,8 @@ in the same lobby / party / proximity range:
 
   1. You, with your game's mic set to the cable (and nothing else feeding it):
 
-         python scripts/game_roundtrip.py play --out cs2           # raw, then the app
-         python scripts/game_roundtrip.py play --modes onion+game --dest game
+         python scripts/voicetests/game_roundtrip.py play --out cs2           # raw, then the app
+         python scripts/voicetests/game_roundtrip.py play --modes onion+game --dest game
 
      It sends a start chirp, then the test signals, once per mode, and saves what
      went into the cable (cs2/sent_<mode>.wav) and the timing (cs2/play.json).
@@ -19,7 +19,7 @@ in the same lobby / party / proximity range:
 
   3. You:
 
-         python scripts/game_roundtrip.py analyze cs2 listener.wav
+         python scripts/voicetests/game_roundtrip.py analyze cs2 listener.wav
 
      finds each mode's start chirp in their recording and reports what the game did
      to each signal: level, per-band change, the frequency response from the sweep,
@@ -48,7 +48,7 @@ import soundfile as sf
 import soxr
 from scipy.signal import fftconvolve
 
-sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
+sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
 
 import discord_roundtrip as rt  # noqa: E402  (same folder: its signals and analysis)
 from soundboard import destination, winkeys  # noqa: E402
@@ -155,7 +155,7 @@ def cmd_play(a) -> None:
             "track_len": len(track), "marks": marks, "song": a.song}
     (out / "play.json").write_text(json.dumps(meta, indent=1))
     print(f"saved {out}. Now the listener's recording: "
-          f"python scripts/game_roundtrip.py analyze {out} <their file>")
+          f"python scripts/voicetests/game_roundtrip.py analyze {out} <their file>")
     if rec is not None:
         _, ear = rec.result()
         sf.write(out / "listener.wav", ear, SR)

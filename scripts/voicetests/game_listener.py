@@ -11,7 +11,7 @@ It records every running copy of each named program into <out>_<exe>.wav (48 kHz
 float) until Ctrl+C, until --stop-file exists, or for --max-s seconds. Then, on the
 sending PC:
 
-    python scripts/game_roundtrip.py analyze <play dir> listener_<exe>.wav
+    python scripts/voicetests/game_roundtrip.py analyze <play dir> listener_<exe>.wav
 """
 from __future__ import annotations
 
@@ -23,7 +23,7 @@ from pathlib import Path
 
 import numpy as np
 
-sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
+sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
 
 from soundboard import appaudio  # noqa: E402
 

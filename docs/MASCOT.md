@@ -15,8 +15,8 @@ lines in the files below.
 | `soundboard/ui/scribebun.py` | `ScribeBunny`: the download bar's picture, Bun writing the tune on a scroll in a 56 x 59 slot. Caches pictures of him in `_layer`. |
 | `soundboard/ui/bunpong.py` | The Pong Easter egg; draws Bun with his bat (or the star when he wins). |
 | `soundboard/ui/splash.py` | The start-up splash (drawn before a theme is applied: plain Bun). |
-| `scripts/make_bunny.py`, `scripts/make_favicon.py` | Installer art and icons: always plain Bun (`outfit=()`). |
-| `scripts/bun_sheet.py` | Picture sheets for checking a change by eye (below). |
+| `scripts/pictures/make_bunny.py`, `scripts/pictures/make_favicon.py` | Installer art and icons: always plain Bun (`outfit=()`). |
+| `scripts/pictures/bun_sheet.py` | Picture sheets for checking a change by eye (below). |
 
 ## Every place he shows up
 
@@ -96,11 +96,11 @@ outfit), not only the accent colour: see `ScribeBunny._layer`.
 ## Checking a change
 
 ```
-.venv\Scripts\python scripts\bun_sheet.py outfits   # every theme's outfit
-.venv\Scripts\python scripts\bun_sheet.py poses     # outfits x every pose
-.venv\Scripts\python scripts\bun_sheet.py live      # the real widgets, frame by frame
-.venv\Scripts\python scripts\bun_sheet.py owls      # Hoot in every theme's outfit
-.venv\Scripts\python scripts\bun_sheet.py owl       # Hoot's poses in a few outfits
+.venv\Scripts\python scripts\pictures\bun_sheet.py outfits   # every theme's outfit
+.venv\Scripts\python scripts\pictures\bun_sheet.py poses     # outfits x every pose
+.venv\Scripts\python scripts\pictures\bun_sheet.py live      # the real widgets, frame by frame
+.venv\Scripts\python scripts\pictures\bun_sheet.py owls      # Hoot in every theme's outfit
+.venv\Scripts\python scripts\pictures\bun_sheet.py owl       # Hoot's poses in a few outfits
 ```
 
 `live` swaps `time.monotonic` for a fake clock and steps each widget's own timer

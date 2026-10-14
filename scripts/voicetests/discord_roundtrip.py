@@ -8,9 +8,9 @@ codec_bench.py simulates Discord; this measures it. Set up once:
 
 Then, with nothing else talking into the cable:
 
-    python scripts/discord_roundtrip.py                  # raw, onion, onion+discord
-    python scripts/discord_roundtrip.py --modes onion    # just the app, your settings
-    python scripts/discord_roundtrip.py --listen 20      # 20 s of you talking (mic path)
+    python scripts/voicetests/discord_roundtrip.py                  # raw, onion, onion+discord
+    python scripts/voicetests/discord_roundtrip.py --modes onion    # just the app, your settings
+    python scripts/voicetests/discord_roundtrip.py --listen 20      # 20 s of you talking (mic path)
 
 The listener is recorded by process loopback (soundboard.appaudio, the Apps tab's
 capture), so its output device and volume don't matter, muted speakers included.
@@ -36,7 +36,7 @@ import numpy as np
 import sounddevice as sd
 import soundfile as sf
 
-sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
+sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
 
 from soundboard import appaudio, codecsim, destination  # noqa: E402
 from soundboard.engine import Engine  # noqa: E402

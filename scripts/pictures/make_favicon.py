@@ -1,6 +1,6 @@
 """Render the website's tab icons (Bun the mascot, from soundboard/bunny.py) into site/.
 
-    .venv\\Scripts\\python scripts\\make_favicon.py
+    .venv\\Scripts\\python scripts\\pictures\\make_favicon.py
 """
 import os
 import struct
@@ -12,7 +12,7 @@ os.environ.setdefault("QT_QPA_PLATFORM", "offscreen")   # no window needed
 from PySide6.QtCore import QBuffer, QIODevice, QRect, Qt
 from PySide6.QtGui import QColor, QGuiApplication, QImage, QPainter
 
-ROOT = Path(__file__).resolve().parent.parent
+ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(ROOT))   # run from scripts\: make `soundboard` importable
 OUT = ROOT / "site"
 
