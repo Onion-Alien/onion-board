@@ -1417,7 +1417,7 @@ def test_first_visit_exposes_voice_presets(panel):
 
 
 def test_config_entries_sit_with_their_cards_main_controls(panel):
-    """U3: Make it yours (the big editor) is in the picked voice's bar, pinned in
+    """Make it yours (the big editor) is in the picked voice's bar, pinned in
     sight under the voices (not under 24 of them, off the bottom); Speak another
     language's More options comes before the past-lines box; both More options use
     the one fold look and show/hide their fields."""

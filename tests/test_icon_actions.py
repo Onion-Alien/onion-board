@@ -1,4 +1,4 @@
-"""U5: folder actions are one consistent, icon-only family (panel.icon_button).
+"""Folder actions are one consistent, icon-only family (panel.icon_button).
 
 Every plain "open this folder" action is a quiet icon-only button whose folder icon
 is backed by a tooltip and a matching screen-reader name (DESIGN section 4), instead

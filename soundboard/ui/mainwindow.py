@@ -172,7 +172,7 @@ FF_ASK_OFF = "ffmpeg-offer"   # in Config.tips_seen: the FFmpeg bar's Don't ask 
 SEARCH_MIN_W = 220    # the Sounds tab's search box, until the window gets narrow
 # ...and its most: a few words go in it, so past this it's only a longer empty bar
 # (456 px at 1180x720, so normal windows are unchanged). The seek bar, the levels and
-# the drop box still follow the window: wider is useful there (U11).
+# the drop box still follow the window: wider is useful there.
 SEARCH_MAX_W = 480
 VOICE_POLL_MS = 3000  # how often the game in front is looked at (soundboard.voicesdk)
 VOICE_POLL_IDLE_S = 15   # ...while nobody sees the hint and nothing switches by itself
@@ -477,7 +477,7 @@ class MainWindow(QMainWindow):
         self.bridge.ffmpeg.connect(self._on_ffmpeg)
         self.bridge.ffmpeg_progress.connect(self._on_ffmpeg_progress)
         self._removed: list[tuple[SoundMeta, int, np.ndarray | None]] = []   # undo-able
-        # windows beside the board, not over it (U4): the one Settings, and an Edit
+        # windows beside the board, not over it: the one Settings, and an Edit
         # sound for each sound being edited
         self._settings_dlg: SettingsDialog | None = None
         self._editors: dict[str, EditDialog] = {}
