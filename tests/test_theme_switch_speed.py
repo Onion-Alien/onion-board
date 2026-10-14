@@ -93,17 +93,17 @@ def test_a_switch_shows_a_still_with_bun_then_fades_to_the_new_theme(settings, m
     every widget restyles, then that fades. A quick second click never stacks two."""
     from soundboard.ui.themecover import ThemeCover
     seen = []
-    real = main_window._apply_theme
+    real = main_window.themectl._apply_theme
 
     def during(name):
         seen.extend(c for c in main_window.findChildren(ThemeCover) if c.isVisible())
         real(name)
-    main_window._apply_theme = during
+    main_window.themectl._apply_theme = during
     try:
-        main_window.apply_theme(_other(theme.current_name))
-        main_window.apply_theme(_other(theme.current_name))
+        main_window.themectl.apply_theme(_other(theme.current_name))
+        main_window.themectl.apply_theme(_other(theme.current_name))
     finally:
-        del main_window._apply_theme
+        del main_window.themectl._apply_theme
     assert len(seen) == 2 and seen[1].geometry() == main_window.rect()
     QApplication.sendPostedEvents(None, QEvent.Type.DeferredDelete)
     covers = main_window.findChildren(ThemeCover)

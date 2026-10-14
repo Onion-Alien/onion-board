@@ -62,7 +62,7 @@ def test_working_mic_card_is_one_line_with_tips_behind_info(window, monkeypatch)
     assert not b.isHidden()
     assert b.toolTip() and b.accessibleName()
     shown = []
-    monkeypatch.setattr(w, "_show_help", lambda box, beside: shown.append((box, beside)))
+    monkeypatch.setattr(w.tipctl, "_show_help", lambda box, beside: shown.append((box, beside)))
     b.click()
     box, beside = shown[0]
     assert "Noise Suppression" in box.body.text() and beside is b

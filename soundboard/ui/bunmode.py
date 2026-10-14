@@ -129,8 +129,8 @@ class BunMode(QWidget):
             h.addWidget(b)
             return b
         mw = self.host
-        self.b_play = button("play", _("Play / pause"), mw.toggle_play_pause)
-        self.b_stop = button("stop", _("Stop all sounds"), mw.stop_all)
+        self.b_play = button("play", _("Play / pause"), mw.playctl.toggle_play_pause)
+        self.b_stop = button("stop", _("Stop all sounds"), mw.playctl.stop_all)
         self.b_air = button("live", mw.btn_air.toolTip(), lambda: mw.mini_air.click(), True)
         self.b_air.setObjectName("onair")
         icons.set_icon(self.b_air, "live", "danger_text", "on_live", size=ICON)
@@ -145,7 +145,7 @@ class BunMode(QWidget):
         row.hide()
 
     def retheme(self):
-        """The button row in this theme's colours (MainWindow._apply_theme). Each button
+        """The button row in this theme's colours (ThemeControl._apply_theme). Each button
         carries every state itself: a rule shared from the row lost the plain buttons'
         fill, and Live and the mic, lit up, only went a shade lighter on hover. Now a
         hover is a clear outline in every state."""
@@ -430,7 +430,7 @@ class BunMode(QWidget):
         icons.set_icon(menu.addAction(_("Back to the board"), self.back.emit), "expand")
         icons.set_icon(menu.addAction(_("Open the full board"), self.full.emit), "sounds")
         menu.addSeparator()
-        icons.set_icon(menu.addAction(_("Stop all sounds"), self.host.stop_all), "stop")
+        icons.set_icon(menu.addAction(_("Stop all sounds"), self.host.playctl.stop_all), "stop")
         menu.addSeparator()
         icons.set_icon(menu.addAction(_("Quit"), self.host.quit_app), "stop")
         menu.popup(e.globalPos())

@@ -133,7 +133,7 @@ class BoardHost:
                          preview=True)
             return v is not None
         if not loop:
-            win.play(sid)            # like pressing its pad
+            win.playctl.play(sid)    # like pressing its pad
             if tag:
                 self._pressed.setdefault(tag, set()).add(sid)
             return True
@@ -155,7 +155,7 @@ class BoardHost:
         # and a press still waiting out the pad's wait or in the queue never starts
         for sid in self._pressed.pop(tag, ()):
             eng.stop(sid)
-            self.win.drop_pending(sid)
+            self.win.playctl.drop_pending(sid)
 
     def ringing(self) -> list[str]:
         return [sid.split(RING, 1)[1] for sid in self._ring_voices()]

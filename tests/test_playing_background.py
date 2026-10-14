@@ -66,7 +66,7 @@ def test_background_tracks_first_active_sound(window):  # noqa: F811
     w._update_playing_background(playing)
     assert w.grid.background_image == ""
     w.cfg.playing_background = True
-    w.select("s1")
+    w.playctl.select("s1")
     w._update_playing_background(playing)
     assert w.grid.background_image == "first.jpg"
     w._update_playing_background({"s0": (0.2, True)})
@@ -76,7 +76,7 @@ def test_background_tracks_first_active_sound(window):  # noqa: F811
     w.meta("s1").image = ""
     w._update_playing_background({"s1": (0.4, False)})
     assert w.grid.background_image == ""
-    w._queue = ["s0"]
+    w.playctl._queue = ["s0"]
     w._update_playing_background({})
     assert w.grid.background_image == ""
 
@@ -85,8 +85,8 @@ def test_settings_apply_immediately_and_persist(window, monkeypatch):  # noqa: F
     w = window
     w.meta("s0").image = "first.jpg"
     monkeypatch.setattr(w.engine, "playing", lambda: {"s0": (0.2, True)})
-    w.open_settings("appearance")
-    settings = w._settings_dlg
+    w.setctl.open_settings("appearance")
+    settings = w.setctl._settings_dlg
     assert not settings.playing_background_check.isChecked()
     assert not settings.playing_background_opacity.isEnabled()
     settings.playing_background_check.setChecked(True)

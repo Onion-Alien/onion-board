@@ -85,7 +85,7 @@ DisableWelcomePage=no
 WizardStyle=modern
 WizardSizePercent=110,100
 SetupIconFile=..\assets\onionboard.ico
-; Bun the mascot, rendered by scripts\make_bunny.py (build.ps1 runs it)
+; Bun the mascot, rendered by scripts\pictures\make_bunny.py (build.ps1 runs it)
 WizardImageFile=wizard-1x.bmp,wizard-2x.bmp
 WizardSmallImageFile=wizard-small-1x.bmp,wizard-small-2x.bmp
 UninstallDisplayIcon={app}\{#AppExeName}.exe

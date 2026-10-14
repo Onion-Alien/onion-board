@@ -456,16 +456,16 @@ def test_pad_colours_follow_the_theme(qapp, monkeypatch):
 
 def test_typing_in_search_filters_once_it_pauses(qapp, window):  # noqa: F811
     calls = []
-    real = window.apply_filter
-    window.apply_filter = lambda t, lazy=False: (calls.append(t), real(t, lazy))
+    real = window.searchctl.apply_filter
+    window.searchctl.apply_filter = lambda t, lazy=False: (calls.append(t), real(t, lazy))
     QTest.keyClicks(window.search, "boom")
     assert calls == [] and not window.pads["s1"].property("filtered")
     assert process_events(qapp, lambda: calls, 3)
     assert calls == ["boom"] and window.pads["s1"].property("filtered")
     QTest.keyClick(window.search, Qt.Key_Backspace)
-    window.flush_search()          # Enter / Search don't wait for it
+    window.searchctl.flush_search()          # Enter / Search don't wait for it
     assert calls == ["boom", "boo"] and not window._search_wait.isActive()
-    window.flush_search()          # nothing waiting: nothing to do
+    window.searchctl.flush_search()          # nothing waiting: nothing to do
     window.search.setText("")      # set by the app (not typed): filters at once
     assert calls[-1] == "" and not window.pads["s1"].property("filtered")
 

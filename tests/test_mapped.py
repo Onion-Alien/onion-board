@@ -101,7 +101,7 @@ def test_remove_undo_and_bin_with_mapped_sounds(window, qapp, map_all):  # noqa:
     window._load_thread.join(10)
     assert process_events(qapp, lambda: all(m.id in window.audio for m in window.cfg.sounds))
     assert all(mapped.is_mapped(window.audio[m.id]) for m in window.cfg.sounds)
-    window.play("s1", now=True)
+    window.playctl.play("s1", now=True)
     window.rmctl.remove_sound("s1")
     window.rmctl.undo_remove()                         # undo keeps the mapped audio
     assert process_events(qapp, lambda: "s1" in window.audio)

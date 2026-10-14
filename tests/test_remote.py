@@ -124,7 +124,7 @@ def test_window_endpoints(qapp, window):
     for sid in ("s0", "s1"):
         w.audio[sid] = np.zeros((480, 2), np.float32)
     played, stopped = [], []
-    w.play = played.append
+    w.playctl.play = played.append
     w.engine.stop = stopped.append
     d = lambda action, **p: remote.dispatch(w, action, p)   # noqa: E731
     status, sounds = d("sounds")
@@ -222,11 +222,11 @@ def test_window_streamer_endpoints(qapp, window):
     w = window
     w.audio["s1"] = np.zeros((480, 2), np.float32)
     played = []
-    w.play = played.append
+    w.playctl.play = played.append
     d = lambda action, **p: remote.dispatch(w, action, p)   # noqa: E731
 
     assert d("last") == (404, {"error": "nothing has played yet"})
-    w._last_sid = "s1"
+    w.playctl._last_sid = "s1"
     assert d("last")[0] == 200 and played == ["s1"]
 
     status, body = d("play", name="airhron")
@@ -419,8 +419,8 @@ def test_voices_say_queue_and_hear(qapp, window):
     for sid in ("s0", "s1"):
         w.catctl.toggle_tag(sid, "Memes")
     played = []
-    w.play = lambda sid, now=False: played.append(sid)
-    w._pads_playing = lambda: bool(played)
+    w.playctl.play = lambda sid, now=False: played.append(sid)
+    w.playctl._pads_playing = lambda: bool(played)
     st, body = d("queue", category="Memes")
     assert st == 200 and played == ["s0"] and body["queue"] == [{"id": "s1", "name": "Airhorn"}]
     st, body = d("queue", name="boom")

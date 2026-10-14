@@ -9,6 +9,7 @@ from soundboard.library import Config
 from soundboard.settings import SettingsDialog
 from soundboard.ui import mainwindow as main
 from soundboard.ui import setupwizard
+from soundboard.ui.routecontrol import ROUTE_DEVICE
 from conftest import devices_done
 from test_setupwizard import devices, resume, wizard  # noqa: F401  (fake devices)
 
@@ -142,7 +143,7 @@ def test_the_route_picker_and_its_settings_mirror(win, opened):
     assert texts[:2] == ["My mic (normal)", "Nobody: only I hear them"]
     assert CABLE in texts and "Speakers" in texts and PHONES not in texts
     assert not any("cable" in t.lower() and t != CABLE for t in texts)
-    cb.setCurrentIndex(cb.findData(main.ROUTE_DEVICE + "Speakers"))
+    cb.setCurrentIndex(cb.findData(ROUTE_DEVICE + "Speakers"))
     win.routectl.on_device(cb, "route")
     devices_done(win)
     assert win.cfg.route == "device" and opened["main"][-1] == "Speakers"
@@ -152,7 +153,7 @@ def test_the_route_picker_and_its_settings_mirror(win, opened):
     route.activated.emit(route.findData("off"))
     devices_done(win)
     assert win.cfg.route == "off" and opened["main"][-1] is None
-    route.activated.emit(route.findData(main.ROUTE_DEVICE + CABLE))
+    route.activated.emit(route.findData(ROUTE_DEVICE + CABLE))
     devices_done(win)
     assert win.cfg.route == "cable" and opened["main"][-1] == CABLE   # a cable is a cable
     assert route.currentText() == CABLE
@@ -403,25 +404,25 @@ def test_leaving_settings_on_a_new_non_cable_device_asks_once(win, monkeypatch):
     monkeypatch.setattr(win.micctl, "install_cable", lambda: installs.append(1))
 
     def leave_on(device):
-        win.open_settings("audio")
+        win.setctl.open_settings("audio")
         win.cfg.route, win.cfg.main_device = "device", device
         win.routectl._show_route()
-        win.close_settings()
-        return win._route_warning
+        win.setctl.close_settings()
+        return win.setctl._route_warning
     # the cable picked in Settings: nothing asked
-    win.open_settings("audio")
-    win.close_settings()
-    assert getattr(win, "_route_warning", None) is None
+    win.setctl.open_settings("audio")
+    win.setctl.close_settings()
+    assert getattr(win.setctl, "_route_warning", None) is None
     # speakers picked in Settings: asked on the way out, Keep leaves it be
     box = leave_on("Speakers")
     assert box is not None and box.keep.text() == "Keep it"
     assert box.to_cable.text() == "Use the virtual cable"   # one is installed
     box.keep.click()
-    assert picked == [] and win._route_warning is None
+    assert picked == [] and win.setctl._route_warning is None
     # not asked again while it stays on the speakers
-    win.open_settings("audio")
-    win.close_settings()
-    assert win._route_warning is None
+    win.setctl.open_settings("audio")
+    win.setctl.close_settings()
+    assert win.setctl._route_warning is None
     # [Use my mic]
     leave_on("Monitor (HDMI)").to_mic.click()
     assert picked[-1] == ("mic", None)
@@ -437,11 +438,11 @@ def test_without_a_cable_the_warning_offers_to_install_one(win, devices, monkeyp
     picked, installs = [], []
     monkeypatch.setattr(win.routectl, "set_route", lambda r, d=None, **k: picked.append((r, d)))
     monkeypatch.setattr(win.micctl, "install_cable", lambda: installs.append(1))
-    win.open_settings("audio")
+    win.setctl.open_settings("audio")
     win.cfg.route, win.cfg.main_device = "device", "Speakers"
     win.routectl._show_route()
-    win.close_settings()
-    box = win._route_warning
+    win.setctl.close_settings()
+    box = win.setctl._route_warning
     assert box.to_cable.text() == "Install a virtual cable"
     box.to_cable.click()
     assert picked == [("cable", None)] and installs == [1]

@@ -325,7 +325,7 @@ class PadSelection(QObject):
         n = len(self.sounds())
         self.mw._save_now()
         self.mw.catctl._fill_categories()
-        self.mw.apply_filter(self.mw.search.text())
+        self.mw.searchctl.apply_filter(self.mw.search.text())
         self.mw.toast(_("✓ Added {count} to {name}", count=count(n), name=html.escape(name)) if on
                       else _("Took {count} out of {name}", count=count(n), name=html.escape(name)))
 

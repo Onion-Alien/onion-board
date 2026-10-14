@@ -40,7 +40,7 @@ WINDOWS = ""     # Config.language: follow Windows' display language
 # The board doesn't switch to Windows' language by itself yet (that's for 2.0): until a
 # language is picked (Settings → Appearance → Language, saved as config.json's
 # `language`) it stays in English and offers Windows' language in a bar, in that
-# language (MainWindow._offer_language). ONIONBOARD_LANG overrides both.
+# language (LanguageControl._offer_language). ONIONBOARD_LANG overrides both.
 FOLLOW_WINDOWS = False
 
 # plural rules: n -> index into a catalog entry's list of forms (FORMS: how many)

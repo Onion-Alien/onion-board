@@ -168,13 +168,13 @@ def test_window_uses_only_the_temp_config(window, app_dir):
 
 def test_overlapping_sounds_each_get_a_stop_chip(window, monkeypatch):
     stopped = []
-    window._update_chips({})
+    window.playctl._update_chips({})
     assert window.playing_row.isHidden() and not window._chips   # nothing playing
     monkeypatch.setattr(window.engine, "stop", stopped.append)
-    window._update_chips({"s0": (0.2, False)})
+    window.playctl._update_chips({"s0": (0.2, False)})
     assert not window.playing_row.isHidden() and set(window._chips) == {"s0"}  # one: a chip
-    window.select("s1")
-    window._update_chips({"s0": (0.2, False), "s1": (0.1, False)})
+    window.playctl.select("s1")
+    window.playctl._update_chips({"s0": (0.2, False), "s1": (0.1, False)})
     assert not window.playing_row.isHidden() and set(window._chips) == {"s0", "s1"}
     name, stop = window._chips["s0"].findChildren(main.QPushButton)
     name.click()                        # takes s0 into the player, no restart
@@ -192,20 +192,20 @@ def test_a_web_search_sound_gets_a_chip_and_the_player_follows_it(window, monkey
     live = {"s0": (0.2, False)}
     monkeypatch.setattr(window.engine, "playing", lambda: dict(live))
     monkeypatch.setattr(window.engine, "stop", lambda sid: live.pop(sid, None))
-    window.on_link_played("Search hit", np.zeros(4800, np.int16), 1.0)
+    window.searchctl.on_link_played("Search hit", np.zeros(4800, np.int16), 1.0)
     live[PLAY_ID] = (0.1, False)
     assert window.current == PLAY_ID
-    window._update_chips(live)
+    window.playctl._update_chips(live)
     assert not window.playing_row.isHidden() and set(window._chips) == {"s0", PLAY_ID}
-    window.select("s0")       # back on the board: pick the pad, stop it
-    window.stop_current()
+    window.playctl.select("s0")       # back on the board: pick the pad, stop it
+    window.playctl.stop_current()
     assert window.current == PLAY_ID   # the player moved to what's still playing
-    window._update_chips(live)
+    window.playctl._update_chips(live)
     # one sound left, the player shows it: its chip stays (the row going made it
     # look like ■ had stopped both)
     assert not window.playing_row.isHidden() and set(window._chips) == {PLAY_ID}
-    window.select("s1")       # another pad picked while it plays: its chip stays
-    window._update_chips(live)
+    window.playctl.select("s1")       # another pad picked while it plays: its chip stays
+    window.playctl._update_chips(live)
     assert not window.playing_row.isHidden() and set(window._chips) == {PLAY_ID}
 
 
@@ -217,16 +217,16 @@ def test_a_stopped_web_song_leaves_the_player(window, monkeypatch):
     live = {}
     monkeypatch.setattr(window.engine, "playing", lambda: dict(live))
     monkeypatch.setattr(window.engine, "stop", lambda sid: live.pop(sid, None))
-    window.on_link_played("Trap Queen", np.zeros(4800, np.int16), 1.0)
+    window.searchctl.on_link_played("Trap Queen", np.zeros(4800, np.int16), 1.0)
     live[PLAY_ID] = (0.1, False)
-    window._on_site_picked("soundcloud")   # still playing: the player keeps it
+    window.searchctl._on_site_picked("soundcloud")   # still playing: the player keeps it
     assert window.current == PLAY_ID
-    window.stop_current()
+    window.playctl.stop_current()
     assert window.current is None and window.meta(PLAY_ID) is None
     assert window.np_name.text() == "Pick a sound"
     # over by itself, then another site picked: it goes too
-    window.on_link_played("Trap Queen", np.zeros(4800, np.int16), 1.0)
-    window._on_site_picked("youtube")
+    window.searchctl.on_link_played("Trap Queen", np.zeros(4800, np.int16), 1.0)
+    window.searchctl._on_site_picked("youtube")
     assert window.current is None and window.meta(PLAY_ID) is None
 
 
@@ -234,8 +234,8 @@ def test_now_playing_label_lines_up_with_its_chips(window, qapp):
     """The row's "Now playing" label sat at the chips' top edge, higher than them."""
     window.show()
     window.tabs.setCurrentWidget(window.sounds_page)
-    window.select("s1")
-    window._update_chips({"s0": (0.2, False), "s1": (0.1, False)})
+    window.playctl.select("s1")
+    window.playctl._update_chips({"s0": (0.2, False), "s1": (0.1, False)})
     qapp.processEvents()
     lbl = next(w for w in window.playing_row.findChildren(main.QLabel)
                if w.text() == "Now playing")
@@ -333,7 +333,7 @@ def test_tiny_window_becomes_mini_player_and_back(window, qapp):
     assert window.minimumSize().width() <= 260 and window.minimumSize().height() <= 120
     window.show()
     window.tabs.setCurrentWidget(window.sounds_page)
-    window.select("s1")
+    window.playctl.select("s1")
     window.resize(260, 120)
     window._refit()
     assert window.is_mini()
@@ -947,7 +947,7 @@ def test_an_empty_board_has_no_status_row(window):
 
 def test_ctrl_v_pastes_a_copied_picture_on_the_selected_pad(window):
     from PySide6.QtGui import QColor, QImage
-    window.select("s1")
+    window.playctl.select("s1")
     QApplication.clipboard().setText("just words")
     window.padctl.paste_picture()
     assert not window.meta("s1").image and "copy a picture first" in said(window)
@@ -1032,8 +1032,8 @@ def test_the_mic_banner_and_a_row_of_playing_sounds_dont_force_the_mini_player(w
     assert not window.is_mini()
     window.mic_banner.show()
     ids = list(window.pads)
-    window._queue[:] = ids * 3
-    window._update_chips(set(ids))
+    window.playctl._queue[:] = ids * 3
+    window.playctl._update_chips(set(ids))
     window._refit()
     assert window.playing_row.isVisibleTo(window)
     assert not window.is_mini()
@@ -1067,7 +1067,7 @@ def test_windows_language_is_offered_in_that_language(window, monkeypatch):
     monkeypatch.setattr(i18n, "windows_language", lambda: "de-DE")
     restarts = []
     monkeypatch.setattr(window, "restart_app", lambda: restarts.append(1))
-    window._offer_language()
+    window.langctl._offer_language()
     assert window.lang_bar.isVisibleTo(window)
     assert window.lang_lbl.text() == ("Onion Board gibt es auch auf Deutsch. Du kannst die "
                                       "Sprache jederzeit unter Einstellungen → Aussehen → "
@@ -1076,25 +1076,25 @@ def test_windows_language_is_offered_in_that_language(window, monkeypatch):
     window.lang_btn.click()
     assert window.cfg.language == "de" and restarts == [1]
     assert not window.lang_bar.isVisibleTo(window)
-    window._offer_language()                     # picked: never offered again
+    window.langctl._offer_language()                     # picked: never offered again
     assert not window.lang_bar.isVisibleTo(window)
 
 
 def test_turning_down_the_language_offer_is_remembered(window, monkeypatch):
     from soundboard import i18n
     monkeypatch.setattr(i18n, "windows_language", lambda: "ja-JP")
-    window._offer_language()
+    window.langctl._offer_language()
     assert window.lang_bar.isVisibleTo(window) and window.lang_btn.text() == "日本語に切り替えます"
     window.lang_hide.click()
     assert not window.lang_bar.isVisibleTo(window) and window.cfg.language == ""
-    window._offer_language()
+    window.langctl._offer_language()
     assert not window.lang_bar.isVisibleTo(window)
 
 
 def test_no_language_offer_on_an_english_windows(window, monkeypatch):
     from soundboard import i18n
     monkeypatch.setattr(i18n, "windows_language", lambda: "en-GB")
-    window._offer_language()
+    window.langctl._offer_language()
     assert not window.lang_bar.isVisibleTo(window)
 
 
@@ -1234,7 +1234,7 @@ def test_setup_columns_side_by_side_and_stack_when_narrow(window, qapp):
     """Wide: your mic and who's listening side by side and the same height, Devices and
     Connect your chat under your mic, the EQ under who's listening. Narrow: one column,
     mic, who's listening, then the rest. Never a sideways scroll bar."""
-    window.apply_theme("Dark")
+    window.themectl.apply_theme("Dark")
     body = window._setup_cols.parentWidget()
     body.setMaximumWidth(1500)   # the offscreen fallback font needs wider columns
     window.tabs.setCurrentWidget(window.setup_page)
@@ -1277,7 +1277,7 @@ def test_setup_two_columns_never_shut_the_rail(window, qapp):
     """Two columns that only fit with the rail shut: Setup stacks them instead. The
     page asked for their width and the narrow-window step shut the rail for it (open
     it, and it shut again)."""
-    window.apply_theme("Dark")
+    window.themectl.apply_theme("Dark")
     window.tabs.setCurrentWidget(window.setup_page)
     window.resize(1180, 720)
     window.show()
@@ -1388,7 +1388,7 @@ def test_volume_percent_sits_beside_its_slider_on_the_row_line(window, qapp):
 
 
 def test_medium_footer_uses_the_width_without_empty_control_gaps(window, qapp):
-    window.apply_theme("Dark")
+    window.themectl.apply_theme("Dark")
     window.tabs.setCurrentIndex(0)
     window.show()
     for size in ((360, 320), (440, 380), (600, 450), (800, 600)):
@@ -1500,7 +1500,7 @@ def test_add_is_a_menu_of_every_way_in(window, monkeypatch):
         _("Sound files"), _("A whole folder"), _("Record"), _("From a link"),
         _("Free sound packs")]
     shown = []
-    monkeypatch.setattr(window, "_show_link", lambda: shown.append(window.search.text()))
+    monkeypatch.setattr(window.searchctl, "_show_link", lambda: shown.append(window.search.text()))
     QApplication.clipboard().setText("https://www.youtube.com/watch?v=abc")
     window.impctl.add_from_link()
     assert window.search.text() == "https://www.youtube.com/watch?v=abc" and shown
@@ -1522,8 +1522,8 @@ def test_a_link_pasted_in_offline_mode_says_why_nothing_happens(window, monkeypa
     net.configure_features(offline=True)
     try:
         window.search.setText("https://www.youtube.com/watch?v=abc")
-        window.on_search_enter()
-        window.on_search_enter()   # Enter again: still the one note
+        window.searchctl.on_search_enter()
+        window.searchctl.on_search_enter()   # Enter again: still the one note
     finally:
         net.configure_features()
     assert len(said) == 1 and "Offline mode" in said[0]

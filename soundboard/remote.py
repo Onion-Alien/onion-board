@@ -688,26 +688,26 @@ def dispatch(mw: MainWindow, action: str, params: dict) -> tuple[int, object]:
             if cat is None:
                 return 404, {"error": f"no category called {params['category']!r}",
                              "categories": list(cfg.categories)}
-        sid = mw.play_random(cat)
+        sid = mw.playctl.play_random(cat)
         if sid is None:
             return 404, {"error": "no sound to play there"}
         m = mw.meta(sid)
         return 200, {"playing": sid, "name": m.name if m is not None else ""}
     if action == "last":
-        sid = getattr(mw, "_last_sid", None)
+        sid = getattr(mw.playctl, "_last_sid", None)
         m = mw.meta(sid) if sid is not None else None
         if sid is None or m is None:
             return 404, {"error": "nothing has played yet"}
         if sid not in mw.audio:
             return 409, {"error": "that sound hasn't loaded (yet)"}
-        mw.play(sid)
+        mw.playctl.play(sid)
         return 200, {"playing": sid, "name": m.name}
     if action == "category":
         step = (params.get("step") or "").strip().lower()
         if step:
             if step not in ("next", "prev", "previous"):
                 return 400, {"error": "step= takes next or prev"}
-            mw.step_category(1 if step == "next" else -1)
+            mw.hkctl.step_category(1 if step == "next" else -1)
         elif "name" in params:
             name = params["name"].strip()
             match = find_category(cfg, name)
@@ -753,11 +753,11 @@ def dispatch(mw: MainWindow, action: str, params: dict) -> tuple[int, object]:
         from soundboard.engine import SR
         if len(mw.replay.clip()) < int(0.2 * SR):
             return 409, {"error": mw.replay.error or "nothing has played on this PC lately"}
-        mw.save_replay()
+        mw.hkctl.save_replay()
         return 200, {"saved": True}
     # play / stop: one sound, by id or name
     if action == "stop" and not ("id" in params or "name" in params):
-        mw.stop_all()
+        mw.playctl.stop_all()
         return 200, {"stopped": "all"}
     m = find_sound(mw, params)
     if m is None:
@@ -770,7 +770,7 @@ def dispatch(mw: MainWindow, action: str, params: dict) -> tuple[int, object]:
         return 200, {"stopped": m.id}
     if m.id not in mw.audio:
         return 409, {"error": "that sound hasn't loaded (yet)"}
-    mw.play(m.id)
+    mw.playctl.play(m.id)
     return 200, {"playing": m.id, "name": m.name}
 
 
@@ -790,15 +790,15 @@ def no_sound(cfg, params: dict) -> tuple[int, dict]:
 # --------------------------------------------------------------------------- the queue
 
 def queue_state(mw: MainWindow) -> dict:
-    return {"queue": [{"id": s, "name": m.name} for s in mw._queue
+    return {"queue": [{"id": s, "name": m.name} for s in mw.playctl._queue
                       if (m := mw.meta(s)) is not None]}
 
 
 def dispatch_queue(mw: MainWindow, params: dict) -> tuple[int, object]:
     """The play queue (the pad menu's Play next, a category's Play all)."""
     if (params.get("clear") or "").strip() not in ("", "0"):
-        mw._queue.clear()
-        mw._say_queue()
+        mw.playctl._queue.clear()
+        mw.playctl._say_queue()
         return 200, queue_state(mw)
     if "category" in params:
         cat = find_category(mw.cfg, params["category"])
@@ -808,7 +808,7 @@ def dispatch_queue(mw: MainWindow, params: dict) -> tuple[int, object]:
         if not any(m.id in mw.audio for m in mw.cfg.sounds if cat in m.tags):
             return 404, {"error": "no sound to play there"}
         shuffled = (params.get("shuffle") or "").strip().lower() in ("1", "true", "on", "yes")
-        mw.queue_category(cat, shuffled)
+        mw.playctl.queue_category(cat, shuffled)
         return 200, {"category": cat, **queue_state(mw)}
     if not ("id" in params or "name" in params):
         return 200, queue_state(mw)
@@ -817,7 +817,7 @@ def dispatch_queue(mw: MainWindow, params: dict) -> tuple[int, object]:
         return no_sound(mw.cfg, params)
     if m.id not in mw.audio:
         return 409, {"error": "that sound hasn't loaded (yet)"}
-    now = mw.queue_sound(m.id)   # nothing playing: it plays at once, not after anything
+    now = mw.playctl.queue_sound(m.id)   # nothing playing: it plays at once, not after anything
     return 200, {"playing" if now else "queued": m.id, "name": m.name, **queue_state(mw)}
 
 
@@ -886,7 +886,7 @@ def dispatch_voice(mw: MainWindow, action: str, params: dict) -> tuple[int, obje
     on = on_value(params, fx.btn_power.isChecked())
     if on is None:
         return 400, BAD_ON
-    mw._set_voice(on)
+    mw.hkctl._set_voice(on)
     return 200, voice_state(mw)
 
 

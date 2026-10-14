@@ -17,9 +17,9 @@ from test_mainwindow import window  # noqa: F401  (the real MainWindow fixture)
 
 
 def test_saved_clip_retention_setting_persists(window, qapp):  # noqa: F811
-    window.open_settings("tabs")
+    window.setctl.open_settings("tabs")
     qapp.processEvents()
-    d = window._settings_dlg
+    d = window.setctl._settings_dlg
     assert not d.keep_clips.isChecked()
     d.keep_clips.click()
     assert window.cfg.app_clips_keep_forever
@@ -101,7 +101,7 @@ def test_each_page_opens_by_name_and_holds_its_cards(window):  # noqa: F811
 def _open_in_window(win, qapp, page, width=1020, height=720):
     """Settings as the cog opens it: a page in the shown window, `width` x `height`."""
     win.show()
-    d = win.open_settings(page)
+    d = win.setctl.open_settings(page)
     size_settings(win, qapp, d, width, height)
     return d
 
@@ -472,7 +472,7 @@ def test_live_tabs_comes_first_on_appearance_tint_or_dot(window, qapp):  # noqa:
 def test_theme_style_switches_textured_and_plain(window, qapp):  # noqa: F811
     """Plain (the default) leaves the panels flat; Textured puts the theme's pattern on."""
     from soundboard import theme
-    window.apply_theme("Amber Terminal")
+    window.themectl.apply_theme("Amber Terminal")
     d = SettingsDialog(window, "appearance")
     assert d.texture_off.isChecked() and window.cfg.theme_texture is False
     assert "/tex-" not in qapp.styleSheet()
@@ -588,7 +588,7 @@ def test_highlight_colour_slides_saves_and_resets(window, qapp, monkeypatch):  #
         # just this patch: monkeypatch's undo also dropped the fixtures' temp app folder,
         # so the reset below saved the test board into the real %APPDATA%\OnionBoard
         theme.stylesheet = real_stylesheet
-        window.set_live_color("")
+        window.themectl.set_live_color("")
         d.close()
 
 
@@ -688,7 +688,7 @@ def test_search_theme_and_colour_terms_shows_every_theme(window, qapp, query):  
         assert all(tile.isVisible() for grid in grids for tile in grid.cards)
         assert all(grid.columns == max(1, (grid.width() + 12) // 162) for grid in grids)
     finally:
-        window.close_settings()
+        window.setctl.close_settings()
 
 
 def test_switching_count_me_in_off_sends_one_opt_out_first(window, qapp, monkeypatch):  # noqa: F811
@@ -848,7 +848,7 @@ def test_heading_level_with_the_rails_name(window, qapp, theme):  # noqa: F811
     level with the rail's name, the arrow and cog centred on them, in every theme's
     font (where a font draws its capitals is measured: Consolas' and Tahoma's sit
     lower in the line, and the font's numbers put the cog up to 2 px off them)."""
-    window.apply_theme(theme)
+    window.themectl.apply_theme(theme)
     d = _open_in_window(window, qapp, "privacy", 1020, 680)
     # (text lands on whole screen pixels: at 125% a 1 px lower row can move it 2, so
     # the nearest place can be a pixel off the name)

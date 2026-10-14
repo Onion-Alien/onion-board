@@ -197,7 +197,7 @@ def test_card_offers_the_fix_each_state_needs(window, qapp, monkeypatch, state, 
     monkeypatch.setattr(dm, 'status', lambda mic=None: state)
     window.resize(1180, 720)
     window.show()
-    d = window.open_settings('audio')   # a page in the window, as the cog opens it
+    d = window.setctl.open_settings('audio')   # a page in the window, as the cog opens it
     card = d.findChild(RecoveryCard)
     card._checked(state)
     for _i in range(5):
@@ -243,7 +243,7 @@ def test_fix_plays_the_setup_show_and_outlines_working(window, qapp, monkeypatch
     monkeypatch.setattr(dm, 'status', lambda mic=None: 'ready')
     monkeypatch.setattr(dm, 'install', lambda *a, **kw: gate.wait(5) and error)
     window.show()
-    d = window.open_settings('audio')   # a page in the window, as the cog opens it
+    d = window.setctl.open_settings('audio')   # a page in the window, as the cog opens it
     card = d.findChild(RecoveryCard)
     card.confirm('repair', card.shown()[0])
     next(b for b in card.dialog.findChildren(QPushButton)
@@ -283,7 +283,7 @@ def card_with(window, qapp, monkeypatch, found):  # noqa: F811
     monkeypatch.setattr(dm, 'mics', lambda names=(): [dict(m) for m in found])
     monkeypatch.setattr(dm, 'status', lambda mic=None: found[0]['state'])
     window.show()
-    d = window.open_settings('audio')   # a page in the window: a hidden card doesn't check
+    d = window.setctl.open_settings('audio')   # a page in the window: a hidden card doesn't check
     card = d.findChild(RecoveryCard)
     card.check()
     wait(qapp, lambda: len(card.rows) == len(found) and not card._checking)

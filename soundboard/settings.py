@@ -37,7 +37,7 @@ from soundboard.ui.pixels import snap_to_pixels
 log = logging.getLogger(__name__)
 
 # Global hotkey actions: (config attribute, action id, label, what it does).
-# Grouped for the Settings window; the action ids go to MainWindow.on_hotkey.
+# Grouped for the Settings window; the action ids go to HotkeyControl.on_hotkey.
 HOTKEY_GROUPS = [
     (_("Sounds"), [
         ("stop_hotkey", "__stop__", _("Stop everything"),
@@ -535,7 +535,7 @@ class SettingsDialog(QDialog):
     BACK_PAD = "padding:7px 0px 7px 3px"   # (the arrow is moved by _level_icons)
 
     def __init__(self, mw, page: str = "privacy", lazy: bool = False):
-        """A page in the main window, in place of the tabs (MainWindow.open_settings),
+        """A page in the main window, in place of the tabs (SettingsControl.open_settings),
         never a window of its own. `lazy`: build only `page` now and each other page
         the first time it's shown. Building all twelve under the app's style sheet took
         a second or two on every click of the cog; the tests build them all at once."""
@@ -974,7 +974,7 @@ class SettingsDialog(QDialog):
             modes.addButton(b)
             row.addWidget(b)
         (green if self.mw.cfg.live_tab_green else dot).setChecked(True)
-        green.toggled.connect(self.mw.set_live_tab_tint)
+        green.toggled.connect(self.mw.themectl.set_live_tab_tint)
         self.live_green, self.live_dot = green, dot
         cv.addLayout(row)
         v.addWidget(card)
@@ -1011,7 +1011,7 @@ class SettingsDialog(QDialog):
             group.addButton(b)
             row.addWidget(b)
         (textured if self.mw.cfg.theme_texture else plain).setChecked(True)
-        textured.toggled.connect(self.mw.set_theme_texture)
+        textured.toggled.connect(self.mw.themectl.set_theme_texture)
         self.texture_on, self.texture_off = textured, plain
         cv.addLayout(row)
         return card
@@ -1128,7 +1128,7 @@ class SettingsDialog(QDialog):
                     _("Onion Board shows {name} after a restart.", name=i18n.name_of(code)),
                     _("Restart now")))
                 note.setText("‏" + text if i18n.is_rtl(code) else text)   # (RLM: see
-                # MainWindow._offer_language)
+                # LanguageControl._offer_language)
                 restart.setText(button)
                 note.setLayoutDirection(Qt.LayoutDirection.RightToLeft if i18n.is_rtl(code)
                                         else Qt.LayoutDirection.LeftToRight)
@@ -1143,7 +1143,7 @@ class SettingsDialog(QDialog):
             self.lang_dialog = dlg   # (tests reach it while it's open)
             dlg.setAttribute(Qt.WidgetAttribute.WA_DeleteOnClose)
             dlg.chosen.connect(lambda code: (
-                self.mw.switch_language(code, restart=False), show()))
+                self.mw.langctl.switch_language(code, restart=False), show()))
             dlg.destroyed.connect(lambda *__: setattr(self, "lang_dialog", None))
             dlg.open_under(pick)   # a drop-down, not a window: nothing waits on it
         pick.clicked.connect(open_picker)
@@ -1225,7 +1225,7 @@ class SettingsDialog(QDialog):
 
         def use(colour: str, btn=None, done: str = "") -> bool:
             settle.stop()
-            changed = self.mw.set_live_color(colour)
+            changed = self.mw.themectl.set_live_color(colour)
             sync()
             if btn is not None and done:
                 busy.flash(btn, done)
@@ -1260,7 +1260,7 @@ class SettingsDialog(QDialog):
             for c in self.theme_cards:   # the app for nothing (a click unticks the card)
                 c.setChecked(c.name == name)
             return
-        self.mw.apply_theme(name)
+        self.mw.themectl.apply_theme(name)
         self._category_icons()
         if getattr(self, "net_activity", None) is not None:
             self.net_activity.refresh(force=True)   # its status colours are per theme
@@ -1283,7 +1283,7 @@ class SettingsDialog(QDialog):
                                     "play that category's sounds. Sounds in no category always "
                                     "keep their keys."))
                 scoped.setChecked(self.mw.cfg.scoped_hotkeys)
-                scoped.toggled.connect(self.mw.set_scoped_hotkeys)
+                scoped.toggled.connect(self.mw.hkctl.set_scoped_hotkeys)
                 cv.addWidget(scoped)
                 hint = QLabel(_("Sound hotkeys only work in the category showing. Switch "
                                 "categories to use the same keys for different sounds."))
@@ -1360,10 +1360,10 @@ class SettingsDialog(QDialog):
         if d.exec() and d.result_combo:
             self._set_hk(attr, d.result_combo)
         else:
-            self.mw.register_hotkeys()   # capture paused them
+            self.mw.hkctl.register_hotkeys()   # capture paused them
 
     def _set_hk(self, attr, combo):
-        self.mw.set_global_hotkey(attr, combo)
+        self.mw.hkctl.set_global_hotkey(attr, combo)
         self._refresh_hk()
 
     def _overlay(self):
@@ -1670,11 +1670,11 @@ class SettingsDialog(QDialog):
                            _("Otherwise, double-click to play. Ctrl+click selects without "
                              "playing."), self.mw.cfg.single_click, self.mw.set_single_click)
         one.setToolTip(_("Then Ctrl+click picks a pad without playing it"))
-        if hasattr(self.mw, "set_tips_on"):
+        if hasattr(getattr(self.mw, "tipctl", None), "set_tips_on"):
             self.box_tips = self._option(
                 cv, _("Show tips"),
                 _("A short “Did you know?” about a feature, at most once a day, never while a "
-                  "game is up."), self.mw.cfg.tips_on, self.mw.set_tips_on)
+                  "game is up."), self.mw.cfg.tips_on, self.mw.tipctl.set_tips_on)
         v.addWidget(card)
         v.addWidget(self._app_setup_card())
         if self.mw.cfg.category_programs:   # rules made before the category menu lost it

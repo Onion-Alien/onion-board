@@ -444,7 +444,7 @@ class UpdateControl(Controller):
         page = dlg.page
         free_dialog(dlg)
         if page:
-            mw.open_settings(page)
+            mw.setctl.open_settings(page)
 
     def whats_new(self, updated: bool = False):
         """What's new in this version (ui/whatsnew.py), if they haven't seen it: once,
@@ -468,7 +468,7 @@ class UpdateControl(Controller):
             page = dlg.page
             free_dialog(dlg)
             if page:
-                mw.open_settings(page)
+                mw.setctl.open_settings(page)
             return
         if not updated:
             return

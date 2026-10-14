@@ -34,7 +34,7 @@ class Heard:
 
 def at(window, t):
     """One look at time `t` (a made-up clock: the tests jump it past appsetup.GONE_S)."""
-    window._app_setup(window._apps_seen(), now=t)
+    window.appsetctl._app_setup(window.appsetctl._apps_seen(), now=t)
 
 
 def hear(window, *apps):
@@ -99,18 +99,18 @@ def test_offer_set_up_then_switch_by_itself_next_time(window):
     window.cfg.dest = {"simple": "clean", "mode": "off"}
     hear(window, ("discord.exe", "discord", "Discord"))
     at(window, 0.0)
-    assert window._setup_state == "offer" and not window.setup_bar.isHidden()
+    assert window.appsetctl._setup_state == "offer" and not window.setup_bar.isHidden()
     assert "Discord" in window.setup_lbl.text()
     assert window.cfg.dest["simple"] == "clean"           # only asked
     window.setup_yes.click()
     assert window.cfg.dest["simple"] == "voice"
     assert appsetup.settings(window.cfg)["apps"] == {"discord.exe": "voice"}
-    assert window._setup_state == "done" and "Next time" in window.setup_lbl.text()
+    assert window.appsetctl._setup_state == "done" and "Next time" in window.setup_lbl.text()
 
     window.cfg.dest = {"simple": "clean", "mode": "off"}   # picked by hand meanwhile
     at(window, 5.0)
     assert window.cfg.dest["simple"] == "clean"           # still here: left alone
-    window._app_setup([], now=100.0)                      # Discord closed a while
+    window.appsetctl._app_setup([], now=100.0)                      # Discord closed a while
     at(window, 200.0)                                     # and came back
     assert window.cfg.dest["simple"] == "voice"
     [t] = [t for t in toast.shown(window) if "Discord" in t.text()]
@@ -126,16 +126,16 @@ def test_not_now_and_never(window):
     at(window, 0.0)
     window.setup_no.click()
     assert window.setup_bar.isHidden()
-    window._app_setup([], now=100.0)
+    window.appsetctl._app_setup([], now=100.0)
     at(window, 200.0)
     assert window.setup_bar.isHidden()                    # Not now: not again this run
-    window._setup_skipped.clear()
-    window._app_setup([], now=300.0)
+    window.appsetctl._setup_skipped.clear()
+    window.appsetctl._app_setup([], now=300.0)
     at(window, 400.0)
-    assert window._setup_state == "offer"
+    assert window.appsetctl._setup_state == "offer"
     window.setup_x.click()                                # never
     assert appsetup.settings(window.cfg)["never"] == ["zoom.exe"]
-    window._app_setup([], now=500.0)
+    window.appsetctl._app_setup([], now=500.0)
     at(window, 600.0)
     assert window.setup_bar.isHidden()
 
@@ -144,8 +144,8 @@ def test_the_offer_goes_when_the_app_closes(window):
     window.cfg.dest = {"simple": "clean", "mode": "off"}
     hear(window, ("valorant.exe", "game", "Valorant"))
     at(window, 100.0)
-    assert window._setup_state == "offer"
-    window._app_setup([], now=200.0)
+    assert window.appsetctl._setup_state == "offer"
+    window.appsetctl._app_setup([], now=200.0)
     assert window.setup_bar.isHidden()
 
 
@@ -190,8 +190,8 @@ def test_settings_lists_remembered_apps_and_can_forget(window):
 def test_the_voice_poll_feeds_it(window):
     window.cfg.dest = {"simple": "clean", "mode": "off"}
     hear(window, ("discord.exe", "discord", "Discord"))
-    window._poll_voice()
-    assert window._setup_state == "offer"
+    window.appsetctl._poll_voice()
+    assert window.appsetctl._setup_state == "offer"
 
 
 def _discord_warning():
@@ -213,7 +213,7 @@ def test_the_offer_stands_down_while_the_discord_warning_shows(window, monkeypat
     assert not window.urgent_bar.isHidden()
     hear(window, ("discord.exe", "discord", "Discord"))
     at(window, 0.0)
-    assert window.setup_bar.isHidden() and window._setup_state == ""
+    assert window.setup_bar.isHidden() and window.appsetctl._setup_state == ""
 
 
 def test_the_discord_warning_takes_the_offer_down(window, monkeypatch):

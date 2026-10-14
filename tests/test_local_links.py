@@ -115,7 +115,7 @@ def test_local_import_obeys_setting_and_zip_keeps_file(window, qapp, tmp_path, c
 
 
 def test_settings_toggle_applies_and_survives_reload(window):  # noqa: F811
-    d = window.open_settings("data")
+    d = window.setctl.open_settings("data")
     assert d.back_btn is not None
     assert not d.copy_local_sounds.isChecked()
     d.copy_local_sounds.setChecked(True)
@@ -123,4 +123,4 @@ def test_settings_toggle_applies_and_survives_reload(window):  # noqa: F811
     assert library.Config.from_raw(window.cfg.to_raw()).copy_local_sounds
     d.copy_local_sounds.setChecked(False)
     assert not window.cfg.copy_local_sounds
-    window.close_settings()
+    window.setctl.close_settings()

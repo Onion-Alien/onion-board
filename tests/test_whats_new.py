@@ -38,7 +38,7 @@ def shown(monkeypatch):
 def test_an_upgraded_config_sees_it_once_and_its_button_opens_the_newest_page(window, shown,
                                                                               monkeypatch):
     opened = []
-    monkeypatch.setattr(window, "open_settings", lambda page="privacy": opened.append(page))
+    monkeypatch.setattr(window.setctl, "open_settings", lambda page="privacy": opened.append(page))
     window.cfg.whats_new_seen = ""   # as loaded from an older version's config
     shown.press = "appearance"
     window.updctl.after_update()

@@ -198,12 +198,12 @@ def test_theme_change_refreshes_the_shell_icon(qapp, win, monkeypatch):
     calls = []
     monkeypatch.setattr(shellicon, "follow_theme",
                         lambda w, c1, c2: calls.append((w, c1, c2)))
-    win.apply_theme("Mint")
+    win.themectl.apply_theme("Mint")
     try:
         assert calls == [(win, theme.THEMES["Mint"]["accent"],
                           theme.THEMES["Mint"]["accent2"])]
     finally:
-        win.apply_theme("Dark")
+        win.themectl.apply_theme("Dark")
 
 
 def test_follow_theme_writes_the_icon_and_points_the_window_at_it(qapp, tmp_path,

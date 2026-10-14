@@ -9,7 +9,7 @@ from soundboard import appaudio
 from soundboard.appaudio import App
 from soundboard.engine import Engine
 from soundboard.library import Config
-from soundboard.ui import appspanel
+from soundboard.ui import appcapture, appspanel
 from soundboard.ui.appspanel import AppsTab
 from soundboard.ui.widgets import Meter
 
@@ -212,7 +212,7 @@ def test_brief_sound_between_list_refreshes_resets_idle_deadline(tab, monkeypatc
     tab.show()
     clock[0] = 599
     monkeypatch.setattr(tab.peaks, "peak", lambda pid: 0.1)
-    tab._meters()
+    tab.capctl._meters()
     monkeypatch.setattr(tab.peaks, "peak", lambda pid: 0.0)
     clock[0] = 600
     tab._on_apps([], {100: "music.exe"})
@@ -230,9 +230,9 @@ def test_idle_timeout_preserves_programs_in_use(tab, monkeypatch, using):
     elif using == "record":
         row.btn_rec.setChecked(True)
     elif using == "clip":
-        tab._on_clip(row, True)
+        tab.capctl._on_clip(row, True)
     elif using == "take":
-        monkeypatch.setattr(tab, "_has_take", lambda r: True)
+        monkeypatch.setattr(tab.capctl, "_has_take", lambda r: True)
     else:
         tab.cfg.apps["music.exe"] = {"vol": 1.0}
     clock[0] = 600
@@ -386,13 +386,13 @@ def test_a_capture_opens_without_freezing_the_window_and_can_fail_later(tab):
     assert row.sending and "Connecting" in row.sub.text()
     assert "music.exe" not in tab.cfg.apps       # remembered once it's really up
     FakeCapture.slow = False
-    tab._meters()
+    tab.capctl._meters()
     assert "Connecting" not in row.sub.text() and "music.exe" in tab.cfg.apps
     row.btn_send.setChecked(False)
     FakeCapture.slow = True
     row.btn_send.setChecked(True)
     row.capture.error = "Windows refused (fake, late)."
-    tab._meters()
+    tab.capctl._meters()
     assert not row.sending and row.capture is None and "late" in row.sub.text()
     assert "music.exe" not in tab.cfg.apps and tab.engine.aux == ()
     FakeCapture.slow = False
@@ -448,7 +448,7 @@ def test_send_off_does_not_wait_for_the_capture_to_end(tab):
     tab.stop_all()
     assert second.stopped and second.waited is False
     tab.shutdown()
-    assert getattr(second, "joined", None) is not None and tab._stopping == []
+    assert getattr(second, "joined", None) is not None and tab.capctl._stopping == []
 
 
 def test_hidden_tab_stops_rereading_when_there_is_nothing_to_watch(tab, qapp, monkeypatch):
@@ -742,11 +742,11 @@ def test_record_waits_for_sound_then_keeps_a_clip_without_sending(tab, monkeypat
     assert cap is not None and cap.started and row.src is None and tab.engine.aux == ()
     for _ in range(50):                          # 0.5 s of silence isn't recorded
         cap.sink(np.zeros((480, 2), np.float32))
-    tab._meters()
+    tab.capctl._meters()
     assert not row.rec.triggered and row.btn_rec.text().startswith("Waiting")
     for _ in range(100):                         # the program starts playing: 1 s
         cap.sink(np.full((480, 2), 0.3, np.float32))
-    tab._meters()
+    tab.capctl._meters()
     assert row.rec.triggered and row.btn_rec.text().startswith("Stop")
 
     row.btn_rec.setChecked(False)                # click again: the clip is handed over
@@ -755,7 +755,7 @@ def test_record_waits_for_sound_then_keeps_a_clip_without_sending(tab, monkeypat
     c = tab.shelf.shelf.clips[0]
     data, name = c.audio(), c.name
     assert name.startswith("Music ")
-    assert 0.9 * appspanel.SR < len(data) < 1.4 * appspanel.SR   # the silence isn't in it
+    assert 0.9 * appcapture.SR < len(data) < 1.4 * appcapture.SR   # the silence isn't in it
     from soundboard.ui import toast
     assert cap.stopped and row.capture is None
     assert any("Saved" in t.words() and t.kind == "ok" for t in toast.shown(tab))
@@ -816,7 +816,7 @@ def test_armed_recorder_keeps_a_short_preroll(tmp_path):
     rec.push(np.full((480, 2), 0.5, np.float32))
     data = rec.stop()
     pre = len(data) - 480
-    want = ArmedRecorder.PREROLL_S * appspanel.SR
+    want = ArmedRecorder.PREROLL_S * appcapture.SR
     assert want <= pre <= want + 480
     assert np.allclose(data[-480:], 0.5, atol=1e-3)
 
@@ -1054,13 +1054,13 @@ def test_card_menu_ticks_its_category_and_shows_ampersands(tab, monkeypatch):
     """The card menu's Categories: the current one ticked (it was greyed out), "Music &
     media" with its "&" (it showed "Music _media"), and Remove in the danger colour."""
     from PySide6.QtWidgets import QMenu
-    from soundboard.ui import appspanel
+    from soundboard.ui import approw
     seen = []
 
     class Shown(QMenu):
         def exec(self, *a):
             seen.append(self)
-    monkeypatch.setattr(appspanel, "QMenu", Shown)
+    monkeypatch.setattr(approw, "QMenu", Shown)
     row = tab._row("spotify.exe")
     row._show_card_menu(row.rect().center())
     cats = next(a.menu() for a in seen[0].actions() if a.menu() is not None)
@@ -1082,13 +1082,13 @@ def test_card_menu_has_a_keyboard_way(tab, monkeypatch):
     from PySide6.QtCore import Qt
     from PySide6.QtGui import QKeySequence, QShortcut
     from PySide6.QtWidgets import QMenu
-    from soundboard.ui import appspanel
+    from soundboard.ui import approw
     seen = []
 
     class Shown(QMenu):
         def exec(self, *a):
             seen.append(a)
-    monkeypatch.setattr(appspanel, "QMenu", Shown)
+    monkeypatch.setattr(approw, "QMenu", Shown)
     row = tab._row("spotify.exe")
     keys = {sc.key().toString(): sc for sc in row.findChildren(QShortcut)}
     assert QKeySequence(Qt.Key_Menu).toString() in keys and "Shift+F10" in keys

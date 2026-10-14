@@ -272,7 +272,7 @@ def test_the_tab_is_shown_once_behind_the_loading_screen(qapp, app_dir, monkeypa
         qapp.processEvents()
         before, saved_tab = w.tabs.currentIndex(), w.cfg.tab
         w.triggers.panel.showEvent = lambda e: shown.append(1)
-        w.warm_triggers()
+        w.setctl.warm_triggers()
         assert shown                                       # it was shown once
         assert w.tabs.currentIndex() == before and w.cfg.tab == saved_tab
         assert w.updatesEnabled()
@@ -300,7 +300,7 @@ def test_without_onion_watch_the_tab_is_not_shown_behind_the_loading_screen(
         switched = []
         w.tabs.currentChanged.connect(switched.append)
         monkeypatch.setattr(w.tabs, "setCurrentWidget", lambda *a: switched.append(a))
-        w.warm_triggers()
+        w.setctl.warm_triggers()
         assert not switched and w.updatesEnabled()
     finally:
         close_window(qapp, w)
@@ -650,6 +650,7 @@ class FakeWindow:
         self.tray = FakeTray()
         self.active = False
         self.impctl = self   # the board's import controller: import_files below
+        self.playctl = self   # ...and its playback one: play, drop_pending
 
     def meta(self, sid):
         return next((m for m in self.cfg.sounds if m.id == sid), None)
@@ -738,7 +739,7 @@ def test_a_tagged_one_shot_stops_by_its_tag():
     host = BoardHost(win)
     assert host.play("s1", tag="t1/s1")
     assert win.played == ["s1"]
-    win.engine.voices["s1"] = False                 # the pad playing, as win.play does
+    win.engine.voices["s1"] = False                 # the pad playing, as win.playctl.play does
     host.stop_tag("t2/s1")                          # another trigger's: left alone
     assert "s1" in win.engine.voices
     host.stop_tag("t1/s1")

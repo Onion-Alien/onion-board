@@ -205,7 +205,7 @@ class ModeButton(QPushButton):
             return
         set_simple(self.mw, key)
         if key == profiles.ADVANCED.key:   # its knobs live in Settings
-            QTimer.singleShot(0, lambda: self.mw.open_settings("audio"))
+            QTimer.singleShot(0, lambda: self.mw.setctl.open_settings("audio"))
 
 
 class DestPanel(QWidget):
@@ -398,7 +398,7 @@ class DestPanel(QWidget):
         self._cfg()["simple"] = profiles.ADVANCED.key   # it's Advanced's switch
         self.mw._save_later()
         if on:
-            self.mw._auto_dest()
+            self.mw.appsetctl._auto_dest()
             self.refresh()
 
     def _show_suggestion(self):

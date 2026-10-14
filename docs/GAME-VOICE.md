@@ -2,7 +2,7 @@
 
 Reference for the bench profiles in `soundboard/codecsim.py` (`scripts/codec_bench.py
 --list` prints them) and what the bench found. Discord was measured in a real call
-(`scripts/discord_roundtrip.py`); the game profiles come from each stack's source
+(`scripts/voicetests/discord_roundtrip.py`); the game profiles come from each stack's source
 code or SDK docs where those are public, and are marked *estimate* where not.
 
 ## The stacks
@@ -31,37 +31,32 @@ Lethal Company's occlusion and walkie-talkie filters come from its decompiled
   spectral distance of 1–2 dB in every stack; the 12 kHz (Steam, Photon) and 8 kHz
   (Unreal, Siren 7) ceilings are the only big cut.
 - **The cleanup is what hurts.** With each game's default cleanup on, the real
-  WebRTC noise suppressor pulls steady music down 12–15 dB (the old model said
-  4), and its AGC pumps quiet parts up ~7 dB.
+  WebRTC noise suppressor pulls steady music down 12–15 dB, and its AGC pumps quiet parts up ~7 dB.
 - **AI denoisers wipe out music.** RNNoise (VRChat, Simple Voice Chat) left a song
   14–21 dB quieter and badly smeared, and removed the test tones entirely. Only
   turning the denoiser off helps; no send mode saves it.
 - **Voice gates cut quiet sounds.** Unreal's noise gate, Mumble's voice activation
   and VRChat's threshold silenced quiet test sounds completely. Push-to-talk (the
   app's *Auto push-to-talk*) avoids it.
-- **The send modes are a small win, not a fix.** Across the stacks every mode keeps
-  ~4 dB more bass for ~2.7 dB of deliberate change; where the chat runs an AGC they
-  also cut its damage (6.4 → 4.5). None beats the others everywhere, so they were
-  left as they are. (Later rebuilt after the Valorant measurements: see below.)
 - **Windows' default mic.** Voice SDKs ask Windows for the *default communication
   device*, which "Set as Default Device" doesn't change; the Setup tab's
   *Game has no microphone setting?* steps (shown on the cable route) now set both.
   Straight into your mic there's nothing to switch: the game keeps the mic it has.
 
-- **Steam voice, measured** (`scripts/steam_voice_roundtrip.py`): Steamworks reports
+- **Steam voice, measured** (`scripts/voicetests/steam_voice_roundtrip.py`): Steamworks reports
   24 kHz as its voice rate, confirming the 12 kHz ceiling. Its capture gates the
   input on its own, even with Steam's threshold set to Off: steady tones never got
   through, and full-level speech only in bursts (1.4 s of 20 s). Sounds in Steam
   games need to be loud and voice-like; quiet intros and steady tones can vanish.
   The gating was too erratic to measure a full frequency response.
-- **Windows' capture path is clean** (`scripts/game_capture.py --resample
+- **Windows' capture path is clean** (`scripts/voicetests/game_capture.py --resample
   --ducking`): games opening the cable at 44.1 / 32 / 24 / 16 kHz or through MME
   lose at most 1.2 dB, with no more converter junk than the 48 kHz reference. A
   plain capture stream on the communications mic didn't duck the sounds going into
   the cable (a stream tagged as a call might; not tested).
 
-- **Valorant, measured in a real party** (`scripts/game_roundtrip.py` on one PC,
-  `scripts/game_listener.py` recording the second PC's Valorant). With push-to-talk
+- **Valorant, measured in a real party** (`scripts/voicetests/game_roundtrip.py` on one PC,
+  `scripts/voicetests/game_listener.py` recording the second PC's Valorant). With push-to-talk
   held: level kept within 2 dB, a steep high-pass near 80 Hz (-19..-25 dB at 70 Hz)
   with a slow tail above it (a bass-heavy song lost 5 dB at 80-100 Hz, 3 at 100-120,
   1.3 at 120-200), the full band up to 10 kHz and a few dB down above, no noise
@@ -87,34 +82,15 @@ Lethal Company's occlusion and walkie-talkie filters come from its decompiled
   that is the listener's slider, not the chat. The real EOS SDK on one PC (two users in
   a lobby voice room, manual audio) shows the same no-cut-outs and bass loss but only
   ~3 % dips on the low song: Fortnite's own voice settings pump more than EOS defaults.
-- **A bass-heavy song in Valorant**: sent raw it arrived 7 dB quieter, most of that the
-  lost sub-bass (the bottom band 8.5 dB down on the rest). Through the old *Game*
-  destination mode (today's *Vivox*) the bass harmonics halved that loss (4 dB), but the mode's
-  compressor and limiter sent the song 11 dB quieter to begin with, so it was heard
-  8.5 dB quieter than raw.
-- **Why, and the fix (99 songs, five pitch ranges, through the `vivox` model):** the
-  sounds' levelling measures a song *with* its sub-bass, so an 808 track was levelled
-  8–10 dB quieter than a bright one and then lost that sub-bass in the chat; the old
-  peak compressor took another 5–9 dB off everything. The modes now cut the sub-bass
-  themselves after making the harmonics (`lowcut`), give each sound back the level
-  the cut takes from it (worked out per sound when it starts, so a short clip over a
-  bass song isn't pushed up with it), and run without compression. Heard level
-  against the same song played straight into the cable (median, worst):
-
-  | Pitch range | Old Game mode | New Game mode |
-  |---|---|---|
-  | super low (808s, bass-boosted) | −11.1 dB (−13) | +0.2 dB (−3) |
-  | low | −9.8 dB (−13) | −0.6 dB (−6) |
-  | medium | −8.3 dB (−12) | −1.5 dB (−6) |
-  | high | −8.3 dB (−11) | −1.0 dB (−5) |
-  | super high (chipmunk, monk vocals) | −5.6 dB (−10) | +0.8 dB (−4) |
-
-  Every range now arrives within ~2 dB of the others, the bass reads ~2 dB fuller
-  than the raw song on 808 tracks, the mid-band pumping on kicks dropped from
-  1.0 to 0.6 dB (raw: 0.4) and the spectral distance from 2.2 to 2.0. Discord and
-  Steam got the same treatment (Discord −8.3 → +0.2 dB, Steam −8.6 → −1.8 dB); a
-  compressor lost level and added distortion in every range and every chat, so the
-  built-in modes run without one.
+- **Why bass-heavy songs arrived quiet, and the fix** (99 songs, five pitch ranges,
+  through the `vivox` model): the sounds' levelling measures a song *with* its
+  sub-bass, so an 808 track was levelled 8–10 dB quieter than a bright one and then
+  lost that sub-bass in the chat, and a peak compressor took another 5–9 dB off
+  everything. The modes now cut the sub-bass themselves after making the harmonics
+  (`lowcut`), give each sound back the level the cut takes from it (worked out per
+  sound when it starts, so a short clip over a bass song isn't pushed up with it), and
+  run without compression: every range arrives within ~2 dB of the others (results per
+  engine: the tables below).
 
 ## One mode per engine (2026-09)
 
@@ -215,9 +191,8 @@ front wins). A browser recording the cable gets the new *Browser voice (WebRTC)*
 the same 80 Hz cut as Epic Online Services, whose cleanup is the same WebRTC code (in
 the sweep above the browser profile measured −1.4 dB at 80 Hz and −1.3 at 90; the
 99-song numbers are below). With *Pick the mode by itself* ticked, the picker uses
-it as soon as it's found; with nothing listening the mode stays as it is. Since 1.9
-(sounds straight into your own mic) it looks at the programs recording your mic and,
-if you have one, the cable's far end too. The **Game** and **Voice chat** modes use
+it as soon as it's found; with nothing listening the mode stays as it is. It looks at the programs recording
+your mic (straight into the mic) and, if you have one, the cable's far end. The **Game** and **Voice chat** modes use
 the same answer to pick the exact profile by themselves.
 
 **Browser, Zoom and Teams on all 99 songs** (2026-10; same measure as the table above:

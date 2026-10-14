@@ -103,11 +103,11 @@ def test_settings_device_boxes_line_up(window):  # noqa: F811
     before, each fitting its own device name)."""
     window.resize(1280, 900)
     window.show()
-    window.open_settings("audio")
+    window.setctl.open_settings("audio")
     for __ in range(3):
         QApplication.processEvents()
-    d = window._settings_dlg
+    d = window.setctl._settings_dlg
     try:
         assert len({cb.width() for cb, _src in d.dev_combos}) == 1
     finally:
-        window.close_settings()
+        window.setctl.close_settings()

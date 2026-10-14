@@ -67,9 +67,9 @@ def test_stand_ins_answer_the_window(window):
     w = window
     for key in taboff.KEYS:
         w.tabctl.set_tab_on(key, False)
-    w.stop_all()
+    w.playctl.stop_all()
     w.retheme() if hasattr(w, "retheme") else None
-    w._set_voice(True)            # the voice hotkey: nothing to switch on
+    w.hkctl._set_voice(True)            # the voice hotkey: nothing to switch on
     assert not w.voice.fx.btn_power.isChecked()
     w.resize(500, 400)
     w._refit()
@@ -209,12 +209,12 @@ def test_a_long_voice_job_finishing_after_the_tab_is_off(window, qapp, monkeypat
     jobs = 1
     ai._get()
     if sp.module is not None:
-        sp._install()
+        sp.installs._install()
         jobs += 1
     lang = next((m for m in window.voice.modules if m.kind == "translation"), None)
     if lang is not None:
         monkeypatch.setattr(type(sp), "_lang", lambda self: lang)
-        sp._download()
+        sp.installs._download()
         jobs += 1
     assert process_events(qapp, lambda: len(started) >= jobs, timeout=5)
     window.tabctl.set_tab_on("voice", False)
@@ -297,11 +297,11 @@ def test_importing_settings_switches_the_tabs_live(window, qapp):
 
 def test_the_voice_hotkey_beeps_fail_with_the_tab_off(window, monkeypatch):
     cues = []
-    monkeypatch.setattr(window, "cue", lambda kind: cues.append(kind))
+    monkeypatch.setattr(window.playctl, "cue", lambda kind: cues.append(kind))
     window.tabctl.set_tab_on("voice", False)
-    window.on_hotkey("__voice__")
-    window.on_hotkey("__voicehold__")
-    window.on_hotkey_released("__voicehold__")
+    window.hkctl.on_hotkey("__voice__")
+    window.hkctl.on_hotkey("__voicehold__")
+    window.hkctl.on_hotkey_released("__voicehold__")
     assert cues == ["fail"]
     assert not window.voice.fx.btn_power.isChecked()
 
@@ -491,7 +491,7 @@ def test_more_tabs_lists_the_switched_off_ones_and_adds_one(window, monkeypatch)
     assert texts[0].startswith("Radio: ") and texts[1].startswith("Triggers: ")
     assert texts[-1] == "Choose tabs in Settings" and len(texts) == 3
     opened = []
-    monkeypatch.setattr(w, "open_settings", lambda page="privacy": opened.append(page))
+    monkeypatch.setattr(w.setctl, "open_settings", lambda page="privacy": opened.append(page))
     menu.actions()[-1].trigger()
     assert opened == ["tabs"]
     [a for a in menu.actions() if a.text().startswith("Triggers")][0].trigger()

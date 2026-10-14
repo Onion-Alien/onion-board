@@ -53,9 +53,9 @@ def test_a_hold_sound_stops_when_its_key_is_let_go(window, monkeypatch):
     w._index()
     stopped = []
     monkeypatch.setattr(w.engine, "stop", stopped.append)
-    w.on_hotkey_released("h")
-    w.on_hotkey_released("n")       # an ordinary sound plays on
-    w.on_hotkey_released("__stop__")
+    w.hkctl.on_hotkey_released("h")
+    w.hkctl.on_hotkey_released("n")       # an ordinary sound plays on
+    w.hkctl.on_hotkey_released("__stop__")
     assert stopped == ["h"]
 
 
@@ -66,7 +66,7 @@ def test_midi_pads_are_registered_like_keys(window, monkeypatch):
     w._index()
     sent = []
     monkeypatch.setattr(w.hotkeys, "register", lambda m: sent.append(dict(m)))
-    w.register_hotkeys()
+    w.hkctl.register_hotkeys()
     assert sent[-1]["midi:note 36:LPD8"] == "p"
 
 
@@ -78,10 +78,10 @@ def test_instant_replay_runs_only_while_its_hotkey_is_set(window, qapp, monkeypa
     assert not w.replay.enabled
     toasts = []
     monkeypatch.setattr(w, "toast", lambda text, kind="": toasts.append(text))
-    w.set_global_hotkey("replay_hotkey", "ctrl+alt+r")
+    w.hkctl.set_global_hotkey("replay_hotkey", "ctrl+alt+r")
     assert w.replay.enabled
     assert len(toasts) == 1 and "everyone's OK" in toasts[0]   # recording people: ask
-    w.set_global_hotkey("replay_hotkey", "ctrl+alt+t")
+    w.hkctl.set_global_hotkey("replay_hotkey", "ctrl+alt+t")
     assert len(toasts) == 1                                    # only when it goes on
     assert process_events(qapp, lambda: w.replay.running)
     cap = FakeCapture.made[-1]
@@ -89,11 +89,11 @@ def test_instant_replay_runs_only_while_its_hotkey_is_set(window, qapp, monkeypa
     assert cap.pid == os.getpid() and cap.include_tree is False   # everything but us
     cap.sink(noise(1.0))
     n = len(w.cfg.sounds)
-    w.on_hotkey("__replay__")
+    w.hkctl.on_hotkey("__replay__")
     assert len(w.cfg.sounds) == n + 1
     new = w.cfg.sounds[-1]
     assert new.name.startswith("Replay") and 0.9 < new.duration <= 1.05
-    w.set_global_hotkey("replay_hotkey", "")
+    w.hkctl.set_global_hotkey("replay_hotkey", "")
     assert not w.replay.enabled
     assert process_events(qapp, lambda: cap.stopped)
 
@@ -102,11 +102,11 @@ def test_instant_replay_with_nothing_heard_adds_nothing(window, qapp, monkeypatc
     w = window
     monkeypatch.setattr(w.replay, "_capture_cls", FakeCapture)
     monkeypatch.setattr(rp.appaudio, "supported", lambda: (True, ""))
-    w.set_global_hotkey("replay_hotkey", "ctrl+alt+r")
+    w.hkctl.set_global_hotkey("replay_hotkey", "ctrl+alt+r")
     process_events(qapp, lambda: w.replay.running)
     FakeCapture.made[-1].sink(np.zeros((SR, 2), np.float32))   # silence
     n = len(w.cfg.sounds)
-    w.on_hotkey("__replay__")
+    w.hkctl.on_hotkey("__replay__")
     assert len(w.cfg.sounds) == n and "Nothing to save" in said(w)
 
 
