@@ -90,7 +90,7 @@ class RouteControl:
             if attr == "mic_device" and mw.cfg.route == "mic" \
                     and directmic.status(name) == "other":
                 mw.micctl.attach_mic()   # it follows you to the new mic
-            mw._update_status()
+            mw.statusctl._update_status()
             if attr == "mic_device" and is_hands_free(name):   # after: it'd be overwritten
                 mw.say(
                     _("<span style='color:{status}'>That's a Bluetooth headset's phone-call "
@@ -136,7 +136,7 @@ class RouteControl:
             def opened(ends):
                 if ends is not None:
                     mw.micctl._set_cable_bad(ends)
-                mw._update_status()
+                mw.statusctl._update_status()
                 self._prepare_all()
 
             def plan():   # worked out when its turn comes
@@ -145,7 +145,7 @@ class RouteControl:
             mw.devctl._device_job(plan, opened)
             return
         self._apply_send_outputs(force_main=True)
-        mw._update_status()
+        mw.statusctl._update_status()
         self._prepare_all()
 
     def _show_route(self):
@@ -292,7 +292,7 @@ class RouteControl:
         self._apply_send_outputs()
         self._show_route()
         mw._save_now()
-        mw._update_status()
+        mw.statusctl._update_status()
 
     def _tap_name(self) -> str | None:
         """Straight into the mic: the cable gets the same (engine.CableTap), for a voice
@@ -334,7 +334,7 @@ class RouteControl:
             return work
 
         def opened(_):
-            mw._update_status()
+            mw.statusctl._update_status()
             self._prepare_all()
         mw.devctl._device_job(plan, opened)
 
@@ -372,7 +372,7 @@ class RouteControl:
         mw = self.mw
         mw.set_option("mic_enabled", b)
         mw._sync_mini_mic()
-        mw._update_status()
+        mw.statusctl._update_status()
 
     def _mute_does_nothing(self) -> bool:
         """Sending into the mic, but the mic effect isn't on it: voice apps take the real

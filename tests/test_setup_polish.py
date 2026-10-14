@@ -38,14 +38,14 @@ def test_cable_not_installed_says_it_once(window, monkeypatch):  # noqa: F811
     w.cfg.route = "cable"
     w.cfg.main_device = None
     w.routectl._show_route()
-    w._update_status()
+    w.statusctl._update_status()
     assert w.routectl._main_name() is None
     assert "Nothing picked" not in w.setup_hint.text()
     assert w.setup_hint.isHidden()   # no empty line's gap either
-    assert w.setup_state == "missing"
+    assert w.statusctl.setup_state == "missing"
     # nothing picked at all (another device, gone): still said
     w.cfg.route = "device"
-    w._update_status()
+    w.statusctl._update_status()
     assert not w.setup_hint.isHidden()
 
 
@@ -55,7 +55,7 @@ def test_working_mic_card_is_one_line_with_tips_behind_info(window, monkeypatch)
     w = window
     _mic_works(w, monkeypatch)
     w.routectl._show_route()
-    w._update_status()
+    w.statusctl._update_status()
     assert w.mic_line.text() == "Your sounds go into your mic"
     assert w.step_lbl.isHidden() and w.mic_reason.isHidden()
     b = w.btn_mictips
@@ -68,7 +68,7 @@ def test_working_mic_card_is_one_line_with_tips_behind_info(window, monkeypatch)
     assert "Noise Suppression" in box.body.text() and beside is b
     assert box.body.textFormat() == Qt.TextFormat.RichText   # bold, not "<b>" shown
     w.cfg.route = "off"   # not on the mic: no mic tips
-    w._update_status()
+    w.statusctl._update_status()
     assert b.isHidden()
 
 
@@ -106,7 +106,7 @@ def test_working_mic_card_offers_reinstall_and_remove(window, monkeypatch):  # n
     w = window
     _mic_works(w, monkeypatch)
     w.routectl._show_route()
-    w._update_status()
+    w.statusctl._update_status()
     assert not w.btn_micredo.isHidden() and not w.btn_micoff.isHidden()
     ran = []
     rec = audiorecovery.recovery_of(w)
@@ -120,5 +120,5 @@ def test_working_mic_card_offers_reinstall_and_remove(window, monkeypatch):  # n
     pump()
     assert ran == [("remove", None, True)] and not box.isVisible()
     monkeypatch.setattr(dm, "status", lambda name=None: "missing")
-    w._update_status()
+    w.statusctl._update_status()
     assert w.btn_micredo.isHidden() and w.btn_micoff.isHidden()

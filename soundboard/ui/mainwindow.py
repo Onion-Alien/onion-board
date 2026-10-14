@@ -34,7 +34,7 @@ from soundboard import exitwatch
 from soundboard import (appaudio, autostart, backup, destination, library, midi,
                         remote, otherboards, reset, soundfx, thumbs, trash, updates, videos,
                         voicesdk)
-from soundboard import (appsetup, directmic, ffmpegget, michelper, net, netlog,
+from soundboard import (appsetup, ffmpegget, net, netlog,
                         profiles, quality, shellicon, thumbbar, tips, tor,
                         usage, watchaddon)
 from soundboard.replay import InstantReplay
@@ -50,6 +50,7 @@ from soundboard.ui import routewarn
 from soundboard.ui import worker
 from soundboard.ui.dropveil import DropVeil
 from soundboard.ui.ffmpegcontrol import FfmpegControl
+from soundboard.ui.statuscontrol import StatusControl
 from soundboard.ui.miccontrol import MIC_OFFER_MS, MicControl
 from soundboard.ui.routecontrol import ROUTE_DEVICE, RouteControl
 from soundboard.ui.devicecontrol import DeviceControl
@@ -361,6 +362,7 @@ class MainWindow(QMainWindow):
 
     def __init__(self):
         super().__init__()
+        self.statusctl = StatusControl(self)
         self.micctl = MicControl(self)
         self.routectl = RouteControl(self)
         self.devctl = DeviceControl(self)
@@ -491,11 +493,8 @@ class MainWindow(QMainWindow):
         self._tick_busy = True            # something moves with the tick (see _busy)
         self._pads_lit: set[str] = set()  # pads showing a sound (see _tick_visuals)
         self._sounds_live = False         # the Sounds tab's live dot is shown
-        self._xruns_shown = 0             # drop-out count last told (the "audio" toast)
-        self._audio_said = ""             # what that toast says now
         self._talk_until = 0.0            # "hearing you" indicator holds until this time
         self._talk_shown: bool | None = None
-        self.virtual_mic: str | None = None
         self._load_thread: threading.Thread | None = None
         self._loading: set[str] = set()   # sids a load thread is decoding right now
         self.engine.latency = self.cfg.latency if self.cfg.latency in ("low", "high") else "low"
@@ -511,7 +510,6 @@ class MainWindow(QMainWindow):
         self.config_saved.connect(self._on_saved)
         self.bin_filled.connect(self.rmctl._label_bin)
 
-        self.setup_state = ""
         self._pill_long = ""              # the setup pill's whole text (its tip, its name)
         self._pill_good = False           # set up: the pill hides (_show_pill)
         self._default_out = appaudio.default_output_name()   # see _follow_default_output
@@ -519,7 +517,7 @@ class MainWindow(QMainWindow):
         splash.pump()
         self.devctl._init_devices()
         splash.pump()
-        if self.setup_state != "ok":
+        if self.statusctl.setup_state != "ok":
             self.tabs.blockSignals(True)
             self.tabs.setCurrentWidget(self.setup_page)
             self.tabs.blockSignals(False)
@@ -1040,7 +1038,7 @@ class MainWindow(QMainWindow):
         self.tabs.currentChanged.connect(lambda _i: self._fit_dl_bar())
         self.tabs.currentChanged.connect(self._count_tab)   # names only (usage.py)
         self._count_tab(self.tabs.currentIndex())
-        self.tabs.currentChanged.connect(lambda _i: self._update_status())
+        self.tabs.currentChanged.connect(lambda _i: self.statusctl._update_status())
         self.tabs.currentChanged.connect(self._focus_sounds_page)
         # an urgent Onion Watch fix's banner shows on the Triggers tab only
         self.tabs.currentChanged.connect(
@@ -2103,7 +2101,7 @@ class MainWindow(QMainWindow):
             self.mic_ways.addWidget(b)
         box.hide()
         self._mic_icon: tuple[str, str] | None = None
-        self._ways_in = None   # which row the set-up buttons are in (_place_ways)
+        self._ways_in: bool | None = None   # which row the set-up buttons are in (_place_ways)
         cv.addWidget(box)
         cv.addWidget(box)
         self.helper_checked.connect(self.micctl._helper_known)
@@ -2133,14 +2131,15 @@ class MainWindow(QMainWindow):
         self.mic_update_note.hide()
         cv.addWidget(self.mic_update_note)
         self.setup_show = SetupShow(height=96, left=True)   # Bun builds it, by the buttons
-        self.setup_show.done.connect(self._update_flow)   # (the button's back, if needed)
+        self.setup_show.done.connect(self.statusctl._update_flow)   # (the button's back, if needed)
         cv.addWidget(self.setup_show)
         self.btn_install = QPushButton(_("Install the free virtual cable"))
         self.btn_install.setObjectName("primary")
         self.btn_install.clicked.connect(
             lambda: self.micctl.attach_mic() if self.cfg.route == "mic"
             else self.micctl.install_cable())
-        self._install_icon = None   # what set_icon last put on it (only set when it changes)
+        # what set_icon last put on it (only set when it changes)
+        self._install_icon: tuple | None = None
         self.btn_attach = QPushButton(_("Straight into my mic instead"))   # (tip: no cable)
         self.btn_attach.setToolTip(_("Onion Board puts your sounds into your real mic, so "
                                      "Discord and games need no virtual cable and nothing picked"))
@@ -2231,15 +2230,15 @@ class MainWindow(QMainWindow):
         self.btn_chat.setToolTip(_("The Discord settings that stop it chopping up your sounds, "
                                    "and a check that listens to what Discord does to them"))
         icons.set_icon(self.btn_chat, "headphones")
-        self.btn_chat.clicked.connect(lambda: self.show_chat_guide("discord"))
+        self.btn_chat.clicked.connect(lambda: self.statusctl.show_chat_guide("discord"))
         chat.addWidget(self.btn_chat)
         self.btn_game = QPushButton(_("Set up game voice chat"))
-        self.btn_game.clicked.connect(lambda: self.show_chat_guide("game"))
+        self.btn_game.clicked.connect(lambda: self.statusctl.show_chat_guide("game"))
         chat.addWidget(self.btn_game)
         self.btn_meeting = QPushButton(_("Zoom, Teams or a browser call"))
         self.btn_meeting.setToolTip(_("The settings in Zoom, Microsoft Teams and calls in a web "
                                       "page that stop them treating your sounds as noise"))
-        self.btn_meeting.clicked.connect(lambda: self.show_chat_guide("meeting"))
+        self.btn_meeting.clicked.connect(lambda: self.statusctl.show_chat_guide("meeting"))
         chat.addWidget(self.btn_meeting)
         self.btn_nomic = QPushButton(_("Game has no microphone setting?"))
         self.btn_nomic.clicked.connect(self.micctl.open_windows_mic)
@@ -2415,477 +2414,7 @@ class MainWindow(QMainWindow):
     # ------------------------------------------------------------------ devices
     RESCAN_SHOWN_S = 3.0   # a Re-scan button shows what it found this long
 
-    def show_chat_guide(self, which: str):
-        from soundboard.ui.chatguide import show_guide
-        show_guide(which, self, self, self.virtual_mic or "CABLE Output")
-
-    def _update_status(self):
-        e = self.engine
-        c = self.cfg
-        main = self.routectl._main_name() or ""
-        self.virtual_mic = eng.virtual_mic_for(main)
-        if c.route == "off":
-            self.setup_hint.setText(_("Sending to others is off: your sounds play in your "
-                                      "headphones and on a device set to Clean, for streaming "
-                                      "(Also send to) only."))
-        elif c.route == "device" and c.main_device and c.main_device == c.mon_device:
-            self.setup_hint.setText(_("<span style='color:{status}'>That's your headphones too, "
-                                      "so nothing is sent (you'd hear everything twice). Pick "
-                                      "another device, or pick <b>Nobody</b>: your sounds "
-                                      "already play in your headphones, where OBS's Desktop "
-                                      "Audio picks them up.</span>", status=theme.status('warn')))
-        elif c.route == "mic":
-            self.setup_hint.setText(_("Your sounds go straight into <b>My mic</b>, so Discord "
-                                      "and games hear them through the mic they already use."))
-        elif self.virtual_mic:
-            hint = (_("A virtual cable is a pipe: audio goes in at <b>{main}</b> and comes out "
-                      "at <b>{virtual_mic}</b>, which Discord / the game uses as your mic.",
-                      main=main, virtual_mic=self.virtual_mic))
-            if self.micctl.cable_bad:
-                rates = [f"{x.rate / 1000:g} kHz" for x in self.micctl.cable_bad]
-                if len(rates) > 1:
-                    rates = [_("{first} and {second}", first=", ".join(rates[:-1]),
-                               second=rates[-1])]
-                hint += _("<br><span style='color:{colour}'>One end of the cable is on "
-                          "{rates}, so it converts your sound on the way through. Fix it for "
-                          "the cleanest sound.</span>", colour=theme.status('warn'),
-                          rates=rates[0])
-            self.setup_hint.setText(hint)
-        elif main and c.route == "device":
-            self.setup_hint.setText(_("Whatever listens to <b>{main}</b> gets your sounds (and "
-                                      "your voice, if you send it): OBS, Voicemeeter, a mixer or "
-                                      "a capture card.", main=html.escape(main)))
-        elif main:
-            self.setup_hint.setText(_("<span style='color:{status}'>That's a normal "
-                                      "speaker/headphone device, so only you will hear the "
-                                      "sounds. Set <b>Send my sounds to</b> back to <b>My "
-                                      "mic</b>, unless that's on purpose.</span>",
-                                      status=theme.status('warn')))
-        elif c.route == "cable":
-            # the cable is picked, just not installed yet: the line above it and Your
-            # virtual mic already say so ("Nothing picked" was wrong, and said it twice)
-            self.setup_hint.setText("")
-        else:
-            self.setup_hint.setText(_("<span style='color:{status}'>Nothing picked: only you "
-                                      "will hear sounds.</span>", status=theme.status('warn')))
-        down = [n for n in self.engine.copies_down() if n in self.routectl._copy_names()]
-        if down:
-            devices = ", ".join(f"<b>{html.escape(n)}</b>" for n in down)
-            self.setup_hint.setText(
-                self.setup_hint.text()
-                + _("<br><span style='color:{status}'>Can't open {devices} (under Also send to). "
-                    "Plugged in? It's tried again by itself.</span>",
-                    status=theme.status('warn'), devices=devices))
-        self.setup_hint.setVisible(bool(self.setup_hint.text()))   # (no empty gap)
-        self.set_sending(self.btn_air.isChecked())   # its label follows the route
-        self._update_flow()
-        where = {"main": _("sending"), "mon": _("headphones"), "mic": _("mic"),
-                 "obs": _("stream output")}
-        errs = [f"{where.get(k, k)}: {v}" for k, v in e.errors_snapshot().items()]
-        if errs and (self._attaching or time.monotonic() < self._settle_until):
-            # setting up straight into my mic restarts Windows' audio on purpose: every
-            # device drops for a few seconds and comes back by itself, so that's no error
-            # (still failing once the wait is over, it shows: _mic_attached redraws then)
-            errs = []
-        if errs:
-            self._say_audio(_("<span style='color:{status}'>Audio device problem: "
-                              "{problems}</span>", status=theme.status('error'),
-                              problems=html.escape(" · ".join(errs))), "error")
-            return
-        text = ""
-        xr = sum(e.xruns.values())
-        self._xruns_shown = xr
-        if xr:
-            tip = ("" if self.cfg.latency == "high" else
-                   _(", try Settings → Audio → Audio buffering: Safer"))
-            text += ("<br>" if text else "") + ngettext(
-                "<span style='color:{colour}'>{n} audio drop-out since start{tip}</span>",
-                "<span style='color:{colour}'>{n} audio drop-outs since start{tip}</span>",
-                xr, colour=theme.status('warn'), tip=tip)
-        self._say_audio(text, "warn")
-
-    def _say_audio(self, text: str, kind: str):
-        """The audio devices' state as one card: new text updates it, none takes it
-        down (called on every status redraw, so the same text again does nothing)."""
-        if text == self._audio_said:
-            return
-        self._audio_said = text
-        if text:
-            self.say(re.sub(r"<span style='color:[^']*'>(.*?)</span>", r"\1", text, flags=re.S),
-                     kind, 10000, key="audio")
-        else:
-            self.unsay("audio")
-
-    def _update_flow(self, talking=False):
-        e = self.engine
-        ok, bad = theme.status("ok"), theme.status("error")
-        if not self.cfg.mic_enabled:
-            mic = _("Your mic  <b style='color:{colour}'>not sent (sounds only)</b>",
-                    colour=theme.status('warn'))
-        elif e.mic_stream is None:
-            mic = _("Your mic  <b style='color:{colour}'>✗ off</b>", colour=bad)
-        elif talking:
-            mic = _("Your mic  <b style='color:{colour}'>✓ hearing you</b>", colour=ok)
-        else:
-            mic = _("Your mic  <b style='color:{colour}'>✓</b>", colour=ok)
-        vm = self.virtual_mic
-        route = self.cfg.route
-        dev = self.routectl._main_name()
-        any_cable = not self._cable_gone and bool(eng.virtual_outputs())
-        direct = directmic.status(self.cfg.mic_device) if route == "mic" else ""
-        warn = theme.status("warn")
-        # just set up: until Windows has it running, say so (not "Repair" straight away)
-        settling = (route == "mic" and not self._attaching
-                    and time.monotonic() < self._settle_until)
-        if route == "mic" and self._attaching:
-            state = "missing"
-            out = _("Into your mic  <b>setting up…</b>")
-            step = ("" if self.micctl._autofixing else
-                    _("Click <b>Yes</b> when Windows asks for permission. Your PC's sound "
-                      "drops out for a second while Windows reloads it.")
-                    if michelper.will_ask() else
-                    _("Your PC's sound drops out for a second while Windows reloads it."))
-        elif settling and not (e.main_stream is not None and directmic.works(direct)
-                               and e.effect_alive()):
-            state = "missing"
-            out = _("Into your mic  <b>starting…</b>")
-            step = _("Windows is reloading your sound with Onion Board on your mic. This "
-                     "takes a few seconds.")
-        elif route == "mic" and directmic.needs_repair(direct):
-            state = "missing"
-            out = _("Into your mic  <b style='color:{colour}'>✗ needs a quick repair</b>",
-                    colour=bad)
-            step = _("<b style='color:{colour}'>One click:</b> Windows took Onion Board off "
-                     "your mic (a driver or Windows update does that). Windows asks for "
-                     "permission once, and your sounds are back in your mic.", colour=warn)
-        elif route == "mic" and not directmic.works(direct):
-            state = "missing"
-            out = (_("Into your mic  <b style='color:{colour}'>one click to go</b>",
-                     colour=warn) if direct == "missing" else
-                   _("Into your mic  <b style='color:{colour}'>set up on another mic</b>",
-                     colour=warn))
-            step = _("<b style='color:{colour}'>One click:</b> put your sounds straight into "
-                     "your mic. Windows asks for permission once; after that Discord and "
-                     "games hear them through your normal mic, with nothing to set there.",
-                     colour=warn)
-        elif route == "mic" and e.main_stream is not None and self.micctl._direct_not_running():
-            state = "unrouted"
-            out = _("Into your mic  <b style='color:{colour}'>✗ not running</b>", colour=bad)
-            step = _("Another app may have your mic to itself (an <b>exclusive mode</b> "
-                     "setting), or Windows hasn't loaded Onion Board on it. Repair it below, "
-                     "or send through the virtual cable instead.")
-        elif route == "mic" and e.main_stream is not None:
-            state = "ok"
-            name = html.escape(self.cfg.mic_device or _("your mic"))
-            apps = e.direct_apps()
-            out = (_("<b style='color:{colour}'>{name}</b>, your sounds are in it "
-                     "<b style='color:{colour}'>✓</b>", colour=ok, name=name)
-                   + ("  " + _("<b style='color:{colour}'>(live)</b>", colour=ok)
-                      if apps else ""))
-            step = _("<b>Nothing to set.</b> Discord and games keep your normal mic, and "
-                     "your sounds are in it.").replace("</b>", "</b><br>", 1)
-            if direct == "outdated":   # works, but an old part: the banner below says so
-                out = _("<b style='color:{colour}'>{name}</b>, with an old version of "
-                        "Onion Board's mic part", colour=warn, name=name)
-                step = ""
-        elif route == "mic":
-            state = "unrouted"
-            out = _("Into your mic  <b style='color:{colour}'>✗ can't reach it</b>",
-                    colour=bad)
-            err = html.escape(e.errors_snapshot().get("main", ""))
-            step = (_("{error}. Repair it below, or send through the virtual cable instead.",
-                      error=err) if err else
-                    _("Something went wrong sending into your mic. Repair it below, or send "
-                      "through the virtual cable instead."))
-        elif route == "off":
-            state = "off"
-            out = _("Sent to others  <b>nowhere (your choice)</b>")
-            step = _("<b>Nothing goes out as a mic</b>, so Discord and games don't hear your "
-                     "sounds. They play in your headphones (OBS's <b>Desktop Audio</b> picks "
-                     "them up there) and on the <b>stream output</b> if you set one "
-                     "(Settings → Audio). To send them out, set <b>Send my sounds to</b> "
-                     "back to <b>My mic</b> under Devices.")
-        elif route == "device" and dev and e.main_stream is not None and not vm:
-            state = "ok"
-            name = html.escape(dev)
-            out = _("<b style='color:{colour}'>{name}</b>, sending "
-                    "<b style='color:{colour}'>✓</b>", colour=ok, name=name)
-            step = _("<b>Your sounds go to {name}.</b> Whatever listens there gets them. "
-                     "In OBS: Sources → + → <b>Audio Output Capture</b> → "
-                     "<b>{name}</b>. In Voicemeeter or a mixer, send that input on "
-                     "to wherever it should go. Not going on to a voice chat? Untick "
-                     "<b>Send in mono</b> under Who's listening to keep it stereo.", name=name)
-        elif route == "device" and not (dev and e.main_stream is not None):
-            state = "unrouted"
-            if self.cfg.main_device and dev is None:
-                out = _("Sending  <b style='color:{colour}'>✗ same device as your "
-                        "headphones</b>", colour=bad)
-            elif dev:
-                out = _("Sending  <b style='color:{colour}'>✗ can't open {device}</b>",
-                        colour=bad, device=html.escape(dev))
-            else:
-                out = _("Sending  <b style='color:{colour}'>✗ no device picked</b>", colour=bad)
-            step = (_("<b style='color:{colour}'>Almost:</b> under <b>Devices</b>, set <b>Send "
-                      "my sounds to</b> to another device than your headphones, or to <b>My "
-                      "mic</b>.", colour=warn)
-                    if self.cfg.main_device and dev is None else
-                    _("<b style='color:{colour}'>Almost:</b> under <b>Devices</b>, set <b>Send "
-                      "my sounds to</b> to the device that should get your sounds (and check "
-                      "it's plugged in), or to <b>My mic</b>.", colour=warn))
-        elif route == "device":   # another virtual cable: its other end is the mic
-            state = "ok"
-            out = _("<b style='color:{colour}'>{device}</b>, your new mic "
-                    "<b style='color:{colour}'>✓ working</b>", colour=ok, device=vm)
-            step = _("<b>The only thing you set:</b> in Discord, your game or OBS, pick "
-                     "<b style='color:{colour}'>{device}</b> as the <b>microphone</b> / audio "
-                     "input.", colour=ok, device=vm)
-        elif not any_cable:
-            state = "missing"
-            # not wrong, just not done yet: orange like the step below, not a red cross
-            out = _("Virtual mic  <b style='color:{colour}'>not installed yet</b>",
-                    colour=warn)
-            step = (_("<b style='color:{colour}'>One-time setup:</b> put your sounds straight "
-                      "into your mic, so Discord and games hear them (nothing to install). The "
-                      "virtual cable is a download, and Offline mode is on. Voicemeeter, a "
-                      "mixer or OBS? Pick that device under <b>Send my sounds to</b>.",
-                      colour=warn) if net.offline() else
-                    _("<b style='color:{colour}'>One-time setup:</b> install the free virtual "
-                      "cable. It's what lets Discord and games hear your sounds. Without it, "
-                      "only you can hear them. Easier: set <b>Send my sounds to</b> to "
-                      "<b>My mic</b> (nothing to install). Voicemeeter, a mixer or OBS? Pick "
-                      "that device there.", colour=warn))
-        elif vm and e.main_stream is not None:
-            state = "ok"
-            out = _("<b style='color:{colour}'>{device}</b>, your new mic "
-                    "<b style='color:{colour}'>✓ working</b>", colour=ok, device=vm)
-            step = _("<b>The only thing you set:</b> in Discord or your game, pick "
-                     "<b style='color:{colour}'>{device}</b> as your <b>microphone</b>, and "
-                     "switch off its noise suppression (Discord: <b>Input Profile → "
-                     "Studio</b>), or it chops your sounds up.", colour=ok, device=vm)
-        else:
-            state = "unrouted"
-            out = _("Virtual mic  <b style='color:{colour}'>✗ not connected</b>", colour=bad)
-            step = _("<b style='color:{colour}'>Almost:</b> under <b>Devices</b>, set "
-                     "<b>Send my sounds to</b> to your virtual cable, or to <b>My mic</b>.",
-                     colour=warn)
-        if state == "missing" and self.cfg.mic_enabled and e.mic_stream is None:
-            # nothing is set up yet: the mic being closed is part of that, not a second
-            # fault (the card showed two red crosses and the header a warning over
-            # one thing to do)
-            mic = _("Your mic  <b style='color:{colour}'>after the setup below</b>",
-                    colour=warn)
-        # the app's own painted tick and cross, not the font's ✓ / ✗ (a brushy x)
-        dpr = self.flow_out.devicePixelRatioF() or 1.0
-
-        def marks(text: str) -> str:
-            return (text.replace("✗", icons.inline("cross", bad, dpr=dpr))
-                    .replace("✓", icons.inline("check", ok, dpr=dpr)))
-        self.flow_mic.setText(marks(mic))
-        self.flow_out.setText(marks(out))
-        mic_route = route == "mic"
-        button = None   # straight into the mic: the one button, when it needs a click
-        self._place_ways(mic_route)
-        if mic_route:
-            reason, button = self.micctl._show_mic_status(direct, state, settling, step)
-            self.mic_reason.setText(reason)
-            self.mic_reason.setVisible(bool(reason))
-            step = ""   # (said in the box)
-        self.mic_flow.setVisible(not mic_route)
-        self.mic_status.setVisible(mic_route)
-        self.mic_pill.setVisible(mic_route)
-        self.step_lbl.setText(step)
-        self.btn_mictips.setVisible(route == "mic")
-        update = route == "mic" and state == "ok" and direct == "outdated"
-        self.step_lbl.setVisible(bool(step))   # (the update banner says it instead)
-        if update:
-            self.mic_update_text.setText(_(
-                "<b style='color:{colour}'>Update your mic part</b><br>It's from an older "
-                "version of Onion Board, so some games, calls and browsers may not hear "
-                "your sounds. Windows asks once, and your sound drops out for a second.",
-                colour=warn) if michelper.will_ask() else _(
-                "<b style='color:{colour}'>Update your mic part</b><br>It's from an older "
-                "version of Onion Board, so some games, calls and browsers may not hear "
-                "your sounds. Your sound drops out for a second.", colour=warn))
-        # setting up, or Windows still loading it: the button stays "Setting up…" and
-        # takes no clicks (attach_mic holds it) until it works or the wait is over
-        mic_busy = route == "mic" and (self._attaching or (settling and state != "ok"))
-        if self._attach_release is not None and not mic_busy:
-            release, self._attach_release = self._attach_release, None
-            release()
-        if self.setup_show.on and not mic_busy:
-            self.setup_show.finish(route == "mic" and state == "ok")
-        elif mic_busy and self._show_bun and not self.setup_show.on:
-            # still setting up or starting, but Bun's show ended (he left while the tab
-            # was hidden): back on, never a Repair button beside "starting…"
-            self.setup_show.start()
-        if not mic_busy:
-            self._show_bun = False
-        effect_on = (mic_route and not mic_busy and not self.setup_show.on
-                     and directmic.works(direct))
-        self.btn_micredo.setVisible(effect_on)
-        self.btn_micoff.setVisible(effect_on)
-        said = self._done_toast
-        if said and not mic_busy:
-            self._done_toast = None
-            if route != "mic" or state != "ok":
-                usage.used("mic-effect-no-load")   # set up, not working when the wait ran out
-            if route == "mic" and state == "ok":   # (the wait ran out: no "Done")
-                self.toast(_("Mic updated: games, calls and browsers hear your sounds.")
-                           if said == "updated" else
-                           _("Done: your sounds are back in your mic.") if said == "fixed" else
-                           _("Done: Discord and games hear your sounds through your mic now."),
-                           "ok")
-        # an old part: the banner and its button, until Bun's show is over
-        self.mic_update_note.setVisible(update and not self.setup_show.on)
-        self.btn_install.setVisible((button is not None if mic_route else state == "missing")
-                                    and not self.setup_show.on)   # Bun's show instead
-        if not busy.is_busy(self.btn_install):
-            self.btn_install.setText(button or _("Install the free virtual cable"))
-            # Windows' shield when its prompt comes, like Windows' own buttons
-            # white only while it's the filled main button: on the cable route it's a
-            # plain one, and white vanished on Light's grey
-            look = (("shield" if michelper.will_ask() else "mic") if mic_route else "cable",
-                    "muted" if update else "on_accent" if route == "mic" else None)
-            if look != self._install_icon:
-                self._install_icon = look
-                if look[0] == "shield":
-                    from soundboard.ui.micupdate import _shield
-                    _shield(self.btn_install)
-                else:
-                    icons.set_icon(self.btn_install, *look)
-        # the mic is the main way: on the cable route the cable's button comes second
-        self._set_primary(self.btn_install, route == "mic" and not update)   # (optional)
-        self._set_primary(self.btn_attach, route == "cable")
-        # the other ways sit beside the main button as plain words, every time
-        self.mic_alt.setVisible(route == "mic" and not mic_busy)   # also when it works
-        self.alt_cable.setVisible(not self._cable_gone)   # (back after a restart)
-        self.btn_usecable.setVisible(route == "mic" and not mic_busy and not self._cable_gone)
-        spare = route == "mic" and state == "ok" and self.micctl._spare_cable()
-        self.btn_rmcable.setVisible(spare)
-        # installed and spare: say why there's a Use and a Remove, not two puzzles
-        self.alt_cable_words.setText(
-            _("It's installed, but your sounds go into your mic now. Use it if a game skips "
-              "your mic, or remove it if nothing else needs it.") if spare else
-            _("If you'd rather not add Onion Board's audio driver to your mic, or a game "
-              "skips it: a free virtual cable you pick as the mic in Discord and games."))
-        self.rmcable_note.hide()   # (its tooltip says it)
-        if route == "mic":
-            self._direct_shown = self.micctl._direct_health()
-        self._cable_follow_switch()
-        self.btn_rescan.setVisible(state == "missing" and route != "mic")
-        self.btn_attach.setVisible(route == "cable" and not self._attaching)
-        if route == "mic":
-            self.micctl._cable_tip()
-        # Discord / the game picks a mic, or keeps its own one: help with its settings
-        mic_side = state == "ok" and (bool(vm) or route == "mic")
-        self.btn_nomic.setVisible(mic_side and route != "mic")   # (no mic to switch to)
-        self.btn_chat.setVisible(mic_side)
-        self.btn_game.setVisible(mic_side)
-        self.btn_meeting.setVisible(mic_side)
-        # one rule: Connect your chat shows when there's a chat to connect; until then
-        # its one button (the guide) sits in the mic card
-        self.helpcard.setVisible(mic_side)
-        self.btn_guide.setVisible(not mic_side)   # (Connect your chat has it then)
-        cablefix = state == "ok" and bool(vm) and bool(self.micctl.cable_bad)
-        self.btn_cablefix.setVisible(cablefix)
-        # "off" was picked on purpose: it's set up, as far as the rest of the app goes
-        self.setup_state = "ok" if state == "off" else state
-        # a device is picked to send to (not the headphones): failing is "Not working",
-        # never "Not configured"
-        picked = (self.cfg.main_device if route in ("cable", "device")
-                  and self.cfg.main_device != self.cfg.mon_device else None)
-        pills = []   # (short, whole): the open rail shows the short one
-        for short in (True, False):
-            if state == "off":
-                pill = _("Only you") if short else _("Not sending to others (only you hear sounds)")
-            elif state == "ok" and route == "mic":
-                pill = (_("Connected") if short
-                        else _("In your mic: Discord / games hear your sounds"))
-            elif mic_busy and self.micctl._autofixing:
-                pill = _("Fixing your mic…")
-            elif mic_busy:
-                pill = _("Setting up…") if short else _("Setting up your mic…")
-            elif route == "mic" and state != "missing":
-                pill = _("Not working") if short else _("Not reaching your mic, click to fix")
-            elif route == "mic" and directmic.needs_repair(direct):
-                pill = _("Repair needed") if short else _("One click needed: repair your mic")
-            elif route == "mic":
-                pill = (_("One click") if short
-                        else _("One click: put your sounds straight into your mic"))
-            elif state == "ok" and not vm:
-                pill = _("Connected") if short else _("Sending to:  {dev}", dev=dev)
-            elif state == "ok":
-                pill = _("Connected") if short else _("Your mic in Discord / games:  {vm}", vm=vm)
-            elif state == "missing":
-                pill = (_("Setup needed") if short
-                        else _("One-time setup needed, others can't hear you yet"))
-            elif picked:   # set up, but it won't open (or the cable's mic end is gone)
-                pill = (_("Not working") if short
-                        else _("Can't send to {device}, click to fix", device=picked))
-            elif route == "device":
-                pill = (_("Not configured") if short
-                        else _("Not sending: pick a device on the Setup tab"))
-            else:   # (the Setup tab offers straight into the mic first)
-                pill = (_("Not configured") if short
-                        else _("Not configured: click to fix"))
-            pills.append(pill)
-        pill_short, pill = pills
-        self.setup_connection.setText(pill)
-        self.setup_connection.setVisible(route != "mic")   # (the mic card's pill says it)
-        self.setup_connection.setProperty("tone", "ok" if state in ("ok", "off") else "warn")
-        self.setup_connection.style().unpolish(self.setup_connection)
-        self.setup_connection.style().polish(self.setup_connection)
-        if hasattr(self, "mini_connection"):
-            route_name = (_("My mic") if route == "mic" else
-                          _("Only you") if state == "off" else _("Output"))
-            self.mini_connection.setText(_("{route}: {status}",
-                                          route=route_name, status=pill_short))
-            self.mini_connection.setToolTip(pill)
-            self.mini_connection.setAccessibleName(pill)
-            self.mini_connection.setProperty("state", "ok" if state in ("ok", "off")
-                                              else "warn")
-            self.mini_connection.style().unpolish(self.mini_connection)
-            self.mini_connection.style().polish(self.mini_connection)
-        good = state in ("ok", "off")
-        if good != self._pill_good:
-            # all set: Live says it, so the pill only shows when something needs a click
-            self._pill_good = good
-            self._show_pill()
-        if self._pill_long != pill:
-            self._pill_long = pill
-            sidebar.put(self.pill, pill_short, pill,
-                        _("Where your sounds go, click for setup and testing"))
-            self.pill.setIcon(icons.icon("headphones", "live_text") if state == "off" else
-                              icons.icon("check", "live_text") if good else
-                              icons.icon("warn", "warn_text"))
-            self.pill.setProperty("state", "ok" if good else "warn")
-            self.pill.style().unpolish(self.pill)
-            self.pill.style().polish(self.pill)
-            self.set_sending(self.btn_air.isChecked())   # its tooltip carries the pill's text
-
-    def _place_ways(self, mic: bool):
-        """The set-up buttons sit in the status box on the mic route (one place for
-        the state and what to do about it), in their row under the picture otherwise."""
-        if self._ways_in == mic:
-            return
-        self._ways_in = mic
-        src, dst = (self._ways, self.mic_ways) if mic else (self.mic_ways, self._ways)
-        # (check again too: it stays last, after them)
-        for b in (self.btn_install, self.btn_guide, self.btn_rescan):
-            src.removeWidget(b)
-            dst.addWidget(b)
-        self.mic_ways.invalidate()
-        self._ways.invalidate()
-
-    @staticmethod
-    def _set_primary(btn, on: bool):
-        name = "primary" if on else ""
-        if btn.objectName() != name:
-            btn.setObjectName(name)
-            btn.style().unpolish(btn)
-            btn.style().polish(btn)
-
-    _direct_shown = None
+    _direct_shown: Any = None
 
 
     DIRECT_GRACE_S = 4.0   # the board's own mic open this long, and still no sign of it
@@ -3101,7 +2630,7 @@ class MainWindow(QMainWindow):
             self._show_setup("done", app)
             self.app_setup_changed.emit()
         elif app.guide:
-            self.show_chat_guide(app.guide)
+            self.statusctl.show_chat_guide(app.guide)
             if self._setup_state == "done":
                 self._show_setup("done", app)   # the ticks, as they are now
 
@@ -3293,7 +2822,7 @@ class MainWindow(QMainWindow):
             v.speech_changed.connect(lambda s: self.set_option("speech", s))
             v.clip_ready.connect(self.on_clip)
             v.fx.set_tip_enabled(not self.cfg.voice_discord_tip_shown)
-            v.fx.chat_help.connect(lambda: self.show_chat_guide("discord"))
+            v.fx.chat_help.connect(lambda: self.statusctl.show_chat_guide("discord"))
             v.fx.tip_dismissed.connect(
                 lambda: self.set_option("voice_discord_tip_shown", True))
         elif key == "apps":
@@ -3473,7 +3002,7 @@ class MainWindow(QMainWindow):
         """Settings > Privacy & security changed: the parts of the window that go
         online follow their switches."""
         self._radio_follow_switch()
-        self._update_flow()   # the cable's install button (_cable_follow_switch)
+        self.statusctl._update_flow()   # the cable's install button (_cable_follow_switch)
         self._search_follow_switch()
         self._offline_follow()
         if hasattr(self, "_fit"):   # buttons came or went: what fits is measured again
@@ -3653,7 +3182,7 @@ class MainWindow(QMainWindow):
         self.set_option("live_color", theme.apply_live(QApplication.instance(), colour))
         icons.retheme_live()
         self._pill_long = ""   # forces _update_flow to repaint its icon
-        self._update_status()
+        self.statusctl._update_status()
         return True
 
     def set_theme_texture(self, on: bool):
@@ -4217,7 +3746,7 @@ class MainWindow(QMainWindow):
         pp, self._pp_icon = self._pp_icon, None
         self._set_pp_icon(pp or "play")
         self._pill_long = ""   # forces _update_flow to repaint its icon
-        self._update_status()   # the hints and flow, in this theme's status colours
+        self.statusctl._update_status()   # the hints and flow, in this theme's status colours
         self.rail.refresh_output()   # its status icon is a copy of the pill's: redrawn
         self._paint_logo()
         self._save_later()
@@ -5006,7 +4535,7 @@ class MainWindow(QMainWindow):
             ordered.append(p)
         self.grid.set_pads(ordered, layout=False)   # laid out once, by the filter next
         self.apply_filter(self.search.text())
-        self._update_status()
+        self.statusctl._update_status()
 
     def _results_closed(self):
         """"My sounds": all of them. The search box also filters the pads, so the web
@@ -5754,10 +5283,10 @@ class MainWindow(QMainWindow):
         if self._tick_n % max(1, 1000 // self.timer.interval()) == 0:   # about once a second
             if self.cfg.route == "mic":
                 self.micctl._follow_mic_effect()
-            if e.check_streams() or sum(e.xruns.values()) != self._xruns_shown:
-                self._update_status()
+            if e.check_streams() or sum(e.xruns.values()) != self.statusctl._xruns_shown:
+                self.statusctl._update_status()
             elif self.cfg.route == "mic" and self.micctl._direct_health() != self._direct_shown:
-                self._update_flow()
+                self.statusctl._update_flow()
             self.voice.poll()
         playing = e.playing()
         if self._queue and LINK_ID not in playing and not any(sid in self._meta
@@ -5869,7 +5398,7 @@ class MainWindow(QMainWindow):
         talking = now < self._talk_until
         if talking != self._talk_shown:
             self._talk_shown = talking
-            self._update_flow(talking)
+            self.statusctl._update_flow(talking)
 
     def _show_transport(self, playing=None):
         """The player bar: always on the Sounds tab; on the others only while a sound

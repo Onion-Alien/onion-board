@@ -5,7 +5,8 @@ import pytest
 
 from soundboard.ui import (alertcontrol, buncontrol, categorycontrol, devicecontrol,
                            editcontrol, ffmpegcontrol, importcontrol, mainwindow, miccontrol,
-                           padcontrol, remoteaccess, removecontrol, routecontrol, updatecontrol)
+                           padcontrol, remoteaccess, removecontrol, routecontrol, statuscontrol,
+                           updatecontrol)
 from test_mainwindow import window  # noqa: F401  (the real MainWindow fixture)
 
 # (window attribute, controller class, methods that live there now)
@@ -49,6 +50,9 @@ SPLIT = [
      ["_offer_mic_update", "_accept_mic_update", "_show_mic_status", "_auto_fix", "attach_mic",
       "_mic_attached", "_check_helper", "use_cable_instead", "_follow_mic_effect",
       "fix_cable_format", "install_cable", "remove_cable", "open_windows_mic"]),
+    ("statusctl", statuscontrol.StatusControl,
+     ["_update_status", "_say_audio", "_update_flow", "_place_ways", "_set_primary",
+      "show_chat_guide"]),
 ]
 
 

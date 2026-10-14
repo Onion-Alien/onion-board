@@ -799,7 +799,7 @@ class ImportControl:
 
     def _on_unpacked(self, res, pkg, err: str):
         mw = self.mw
-        mw._update_status()
+        mw.statusctl._update_status()
         if res is None:
             mw.tell(_("Import failed"), err, "error")
             return

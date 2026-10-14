@@ -45,11 +45,11 @@ def test_chat_card_waits_for_a_chat_to_connect(window, monkeypatch):  # noqa: F8
     w = window
     _cable_missing(w, monkeypatch)
     w.routectl._show_route()
-    w._update_status()
+    w.statusctl._update_status()
     assert w.helpcard.isHidden()
     assert not w.btn_guide.isHidden()
     w.cfg.route = "off"
-    w._update_status()
+    w.statusctl._update_status()
     assert w.helpcard.isHidden() and not w.btn_guide.isHidden()
     monkeypatch.setattr(dm, "status", lambda name=None: "ready")
     monkeypatch.setattr(type(w.engine), "effect_alive", lambda self: True)
@@ -57,7 +57,7 @@ def test_chat_card_waits_for_a_chat_to_connect(window, monkeypatch):  # noqa: F8
     monkeypatch.setattr(w.engine, "main_stream", _Stream())
     w.cfg.route = "mic"
     w.routectl._show_route()
-    w._update_status()
+    w.statusctl._update_status()
     assert not w.helpcard.isHidden()
     assert w.btn_guide.isHidden()
     assert not w.btn_chat.isHidden()
