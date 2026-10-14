@@ -11,11 +11,13 @@ later depending on your CPU and the model.
 
 It comes with Onion Board (in the `modules` folder next to `OnionBoard.exe`).
 
-1. Install Python 3.12 or newer from python.org and tick "Add python.exe to PATH".
-2. In Onion Board, open the **Voice** tab and press **Install speech recognition**.
-   It creates a private Python environment in this folder's `.venv` and downloads
-   the speech model (about 300 MB in total). `install.bat` here does the same.
-3. Press **Start talking as the voice**.
+1. In Onion Board, open the **Voice** tab and press **Install speech recognition**
+   (or tick the installer's *live voice* box). It uses the PC's own Python 3.12 or
+   3.13, or downloads one into this folder's `.python` when there's none
+   (`soundboard/pyget.py`), makes a private environment in `.venv` and downloads the
+   speech model (about 300 MB in all). `install.bat` here does the same with a
+   Python already on the PC.
+2. Press **Start talking as the voice**.
 
 ## Models
 
@@ -26,8 +28,7 @@ language, both under **More options** on the Voice tab. It runs on the CPU.
 
 ## Speaking another language
 
-The `translate-*` add-ons (33 languages; `scripts/make_langnames.py` names them in every app language) let the
-voice say what you said in that language. Pick one under **Speak in** in the
+The `translate-*` add-ons (35 languages) let the voice say what you said in that language. Pick one under **Speak in** in the
 Voice tab and press **Download** (65–196 MB, once). The app then starts this
 helper with `--translate <folder>`: each English sentence is translated on your
 PC with that CTranslate2 model before it's spoken. The models come from the
