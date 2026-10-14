@@ -38,6 +38,7 @@ from __future__ import annotations
 
 import base64
 import collections
+import hashlib
 import http.client
 import ipaddress
 import logging
@@ -969,6 +970,51 @@ def urlopen(req, timeout: float = 30, feature: str | None = None, direct: bool =
         if isinstance(e.reason, FeatureOff):   # a redirect to somewhere switched off
             raise e.reason from None
         raise
+
+
+class TooBig(Exception):
+    """A download is bigger than its cap: ``listed`` is the size its Content-Length
+    gave when that's what said so, 0 when the bytes themselves kept going past it.
+    Not an OSError, so callers' network-error handling doesn't swallow it."""
+
+    def __init__(self, listed: int = 0):
+        super().__init__(f"over the size cap ({listed or 'kept going'})")
+        self.listed = listed
+
+
+def content_length(headers) -> int:
+    """Content-Length as a number; 0 (unknown) when it's missing or isn't one."""
+    try:
+        return max(int(str(headers.get("Content-Length") or 0).strip()), 0)
+    except ValueError:
+        return 0
+
+
+def read_capped(r, out, max_bytes: int, *, chunk: int = 1 << 16, total: int = 0,
+                progress: Callable[[int, int], object] | None = None,
+                check: Callable[[], object] | None = None) -> str:
+    """Copy the response ``r`` into the file ``out``, never more than ``max_bytes``;
+    returns the SHA-256 (hex) of what was written. Raises TooBig before reading when
+    its Content-Length (or the ``total`` given) is over the cap, and as soon as the
+    bytes pass it, so a bad mirror can't fill the disk. ``check`` runs before each
+    chunk (raise from it to stop: cancelled, switched off); ``progress(done, total)``
+    after. The caller deletes the partial file."""
+    total = content_length(r.headers) or total
+    if total > max_bytes:
+        raise TooBig(total)
+    h = hashlib.sha256()
+    done = 0
+    while data := r.read(chunk):
+        if check is not None:
+            check()
+        done += len(data)
+        if done > max_bytes:
+            raise TooBig()
+        h.update(data)
+        out.write(data)
+        if progress is not None:
+            progress(done, total)
+    return h.hexdigest()
 
 
 # --------------------------------------------------------------------------- yt-dlp
