@@ -3392,5 +3392,7 @@
   "Say it in your language; {voice} says it in {language}. Translation is quick but not perfect with slang.": "Sano se omalla kielelläsi; {voice} sanoo sen kielellä {language}. Käännös on nopea, mutta slangin kanssa ei täydellinen.",
   "Talk in your language and others hear another one. Turn on the switch below: the AI voice or the voice changer says it when one of them is on; otherwise press Start and a computer voice does.": "Puhu omaa kieltäsi, ja muut kuulevat toista. Laita alla oleva kytkin päälle: AI-ääni tai äänenmuunnin sanoo sen, kun jompikumpi on päällä; muuten paina Käynnistä, niin tietokoneääni sanoo sen.",
   "Translate what you say into this language. Off: every voice says it as you do, and the language stays picked.": "Kääntää sanomasi tälle kielelle. Pois: jokainen ääni sanoo sen niin kuin sinä, ja kieli pysyy valittuna.",
-  "● Listening: say it in your language, it comes out in {language}.": "● Kuuntelee: sano se omalla kielelläsi, se tulee ulos kielellä {language}."
+  "● Listening: say it in your language, it comes out in {language}.": "● Kuuntelee: sano se omalla kielelläsi, se tulee ulos kielellä {language}.",
+  "Downloading the speech model (one time only)… {done} of {total} MB": "Ladataan puhemallia (vain kerran)… {done}/{total} Mt",
+  "Speech model download": "Puhemallin lataus"
 }

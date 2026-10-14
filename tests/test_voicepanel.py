@@ -1115,6 +1115,27 @@ def test_speaking_another_language_goes_through_english(panel, monkeypatch):
     assert sp.s["spoken"] == "en" and sp._live_args()[3] == "en"
 
 
+def test_speech_model_download_shows_a_bar_until_its_ready(panel):
+    p, _ = panel
+    sp = p.speech
+    assert sp.dl_bar.isHidden() and sp.bg_bar.isHidden()
+    sp._on_event({"type": "download", "done": 121_450_000, "total": 485_800_000})
+    assert not sp.dl_bar.isHidden() and sp.dl_bar.value() == 250
+    assert "121 of 485 MB" in sp.lbl_state.text()
+    sp._on_event({"type": "status", "text": "loading translation…"})   # downloaded
+    assert sp.dl_bar.isHidden()
+    sp._on_event({"type": "download", "done": 5, "total": 0})        # no size: empty bar
+    assert not sp.dl_bar.isHidden() and sp.dl_bar.value() == 0
+    sp._set_live_ui(False, "stopped")                                  # stopped by hand
+    assert sp.dl_bar.isHidden()
+    sp.bg_for = "ai"                                                   # for another voice
+    sp._on_event({"type": "download", "done": 50_000_000, "total": 100_000_000})
+    assert not sp.bg_bar.isHidden() and sp.dl_bar.isHidden()
+    assert "50 of 100 MB" in sp.lbl_bg.text()
+    sp._on_event({"type": "ready"})
+    assert sp.bg_bar.isHidden()
+
+
 def test_languages_tab_hides_when_speech_recognition_cant_hear_the_app(qapp, monkeypatch):
     from soundboard import i18n
     monkeypatch.setattr(tts.SapiTTS, "warm_up", lambda self: ["Microsoft Zira Desktop"])

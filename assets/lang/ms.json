@@ -3316,5 +3316,7 @@
   "Say it in your language; {voice} says it in {language}. Translation is quick but not perfect with slang.": "Sebut dalam bahasa anda; {voice} menyebutnya dalam {language}. Terjemahan pantas tetapi tidak sempurna dengan slanga.",
   "Talk in your language and others hear another one. Turn on the switch below: the AI voice or the voice changer says it when one of them is on; otherwise press Start and a computer voice does.": "Bercakap dalam bahasa anda dan orang lain mendengar bahasa lain. Hidupkan suis di bawah: suara AI atau penukar suara menyebutnya apabila salah satunya hidup; jika tidak, tekan Mula dan suara komputer menyebutnya.",
   "Translate what you say into this language. Off: every voice says it as you do, and the language stays picked.": "Terjemahkan apa yang anda sebut ke bahasa ini. Mati: setiap suara menyebutnya seperti anda, dan bahasa kekal dipilih.",
-  "● Listening: say it in your language, it comes out in {language}.": "● Mendengar: sebut dalam bahasa anda, ia keluar dalam {language}."
+  "● Listening: say it in your language, it comes out in {language}.": "● Mendengar: sebut dalam bahasa anda, ia keluar dalam {language}.",
+  "Downloading the speech model (one time only)… {done} of {total} MB": "Memuat turun model pertuturan (sekali sahaja)… {done} daripada {total} MB",
+  "Speech model download": "Muat turun model pertuturan"
 }

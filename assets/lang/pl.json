@@ -3468,5 +3468,7 @@
   "Say it in your language; {voice} says it in {language}. Translation is quick but not perfect with slang.": "Powiedz to w swoim języku; {voice} powie to w języku: {language}. Tłumaczenie jest szybkie, ale ze slangiem nie idealne.",
   "Talk in your language and others hear another one. Turn on the switch below: the AI voice or the voice changer says it when one of them is on; otherwise press Start and a computer voice does.": "Mów w swoim języku, a inni usłyszą inny. Włącz przełącznik poniżej: powie to głos AI albo zmieniacz głosu, gdy jeden z nich jest włączony; w przeciwnym razie naciśnij Start i powie to głos komputerowy.",
   "Translate what you say into this language. Off: every voice says it as you do, and the language stays picked.": "Tłumaczy to, co mówisz, na ten język. Wyłączone: każdy głos mówi to tak jak ty, a język zostaje wybrany.",
-  "● Listening: say it in your language, it comes out in {language}.": "● Słucham: powiedz to w swoim języku, wyjdzie w języku: {language}."
+  "● Listening: say it in your language, it comes out in {language}.": "● Słucham: powiedz to w swoim języku, wyjdzie w języku: {language}.",
+  "Downloading the speech model (one time only)… {done} of {total} MB": "Pobieranie modelu mowy (tylko raz)… {done} z {total} MB",
+  "Speech model download": "Pobieranie modelu mowy"
 }

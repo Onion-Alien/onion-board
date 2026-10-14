@@ -3468,5 +3468,7 @@
   "Say it in your language; {voice} says it in {language}. Translation is quick but not perfect with slang.": "Řekni to svým jazykem; {voice} to řekne v jazyce {language}. Překlad je rychlý, ale se slangem není dokonalý.",
   "Talk in your language and others hear another one. Turn on the switch below: the AI voice or the voice changer says it when one of them is on; otherwise press Start and a computer voice does.": "Mluv svým jazykem a ostatní slyší jiný. Zapni přepínač níže: řekne to AI hlas nebo měnič hlasu, když je jeden z nich zapnutý; jinak stiskni Start a řekne to počítačový hlas.",
   "Translate what you say into this language. Off: every voice says it as you do, and the language stays picked.": "Překládá, co říkáš, do tohoto jazyka. Vypnuto: každý hlas to řekne tak, jak to říkáš ty, a jazyk zůstane vybraný.",
-  "● Listening: say it in your language, it comes out in {language}.": "● Poslouchám: řekni to svým jazykem, vyjde to v jazyce {language}."
+  "● Listening: say it in your language, it comes out in {language}.": "● Poslouchám: řekni to svým jazykem, vyjde to v jazyce {language}.",
+  "Downloading the speech model (one time only)… {done} of {total} MB": "Stahuje se model řeči (jen jednou)… {done} z {total} MB",
+  "Speech model download": "Stahování modelu řeči"
 }

@@ -3316,5 +3316,7 @@
   "Say it in your language; {voice} says it in {language}. Translation is quick but not perfect with slang.": "พูดเป็นภาษาของคุณ แล้ว {voice} จะพูดเป็นภาษา{language} การแปลเร็วแต่ยังไม่สมบูรณ์กับคำสแลง",
   "Talk in your language and others hear another one. Turn on the switch below: the AI voice or the voice changer says it when one of them is on; otherwise press Start and a computer voice does.": "พูดภาษาของคุณแล้วคนอื่นได้ยินอีกภาษา เปิดสวิตช์ด้านล่าง: เสียง AI หรือตัวเปลี่ยนเสียงจะพูดเมื่อเปิดอยู่อย่างใดอย่างหนึ่ง ไม่เช่นนั้นกด Start แล้วเสียงคอมพิวเตอร์จะพูด",
   "Translate what you say into this language. Off: every voice says it as you do, and the language stays picked.": "แปลสิ่งที่คุณพูดเป็นภาษานี้ ปิด: ทุกเสียงพูดตามที่คุณพูด และภาษายังคงเลือกไว้",
-  "● Listening: say it in your language, it comes out in {language}.": "● กำลังฟัง: พูดเป็นภาษาของคุณ แล้วจะออกมาเป็นภาษา{language}"
+  "● Listening: say it in your language, it comes out in {language}.": "● กำลังฟัง: พูดเป็นภาษาของคุณ แล้วจะออกมาเป็นภาษา{language}",
+  "Downloading the speech model (one time only)… {done} of {total} MB": "กำลังดาวน์โหลดโมเดลเสียงพูด (ครั้งเดียวเท่านั้น)… {done} จาก {total} MB",
+  "Speech model download": "ดาวน์โหลดโมเดลเสียงพูด"
 }

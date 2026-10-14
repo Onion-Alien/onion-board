@@ -3392,5 +3392,7 @@
   "Say it in your language; {voice} says it in {language}. Translation is quick but not perfect with slang.": "Sabihin ito sa wika mo; sasabihin ito ni {voice} sa {language}. Mabilis ang pagsasalin pero hindi perpekto sa slang.",
   "Talk in your language and others hear another one. Turn on the switch below: the AI voice or the voice changer says it when one of them is on; otherwise press Start and a computer voice does.": "Magsalita sa wika mo at ibang wika ang maririnig ng iba. I-on ang switch sa ibaba: sasabihin ito ng AI voice o ng voice changer kapag naka-on ang isa sa kanila; kung hindi, pindutin ang Start at isang computer voice ang magsasabi.",
   "Translate what you say into this language. Off: every voice says it as you do, and the language stays picked.": "Isalin sa wikang ito ang sinasabi mo. Off: sasabihin ito ng bawat boses gaya ng pagkasabi mo, at mananatiling napili ang wika.",
-  "● Listening: say it in your language, it comes out in {language}.": "● Nakikinig: sabihin ito sa wika mo, lalabas ito sa {language}."
+  "● Listening: say it in your language, it comes out in {language}.": "● Nakikinig: sabihin ito sa wika mo, lalabas ito sa {language}.",
+  "Downloading the speech model (one time only)… {done} of {total} MB": "Dina-download ang speech model (isang beses lang)… {done} sa {total} MB",
+  "Speech model download": "Download ng speech model"
 }

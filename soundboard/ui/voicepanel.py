@@ -17,7 +17,8 @@ from PySide6.QtGui import QColor, QGuiApplication, QLinearGradient, QPainter
 from PySide6.QtWidgets import (QButtonGroup, QCheckBox, QComboBox, QDialog, QMessageBox,
                                QDialogButtonBox, QFormLayout, QFrame, QGridLayout,
                                QHBoxLayout, QInputDialog, QLabel, QLineEdit, QMenu,
-                               QPlainTextEdit, QPushButton, QScrollArea, QSizePolicy,
+                               QPlainTextEdit, QProgressBar, QPushButton, QScrollArea,
+                               QSizePolicy,
                                QSlider, QStyle, QStyleOptionSlider, QToolButton,
                                QVBoxLayout, QWidget)
 from shiboken6 import isValid as qt_valid
@@ -383,6 +384,18 @@ class ParamSlider(QWidget):
     def _moved(self, _v):
         self._label()
         self.changed.emit()
+
+
+def _download_bar() -> QProgressBar:
+    """A thin download bar (the theme's `downloadprogress`), hidden until there's one."""
+    bar = QProgressBar()
+    bar.setObjectName("downloadprogress")
+    bar.setRange(0, 1000)
+    bar.setTextVisible(False)
+    bar.setFixedSize(320, 6)
+    bar.setAccessibleName(_("Speech model download"))
+    bar.hide()
+    return bar
 
 
 def _enable(w, on: bool, why: str = ""):
@@ -1601,8 +1614,11 @@ class SpeechPanel(QWidget):
         self.title = section_label(_("Speak another language"))
         v.addWidget(self.title)
         self.start_box = QWidget()   # Start and its state: shown with live_box
-        action = QHBoxLayout(self.start_box)
-        action.setContentsMargins(0, 0, 0, 0)
+        sv = QVBoxLayout(self.start_box)
+        sv.setContentsMargins(0, 0, 0, 0)
+        sv.setSpacing(8)
+        action = QHBoxLayout()
+        sv.addLayout(action)
         action.setSpacing(14)
         self.b_live = QPushButton(_("Start the computer voice"))
         icons.set_icon(self.b_live, "mic", "on_accent", "on_accent")
@@ -1617,6 +1633,9 @@ class SpeechPanel(QWidget):
         self.lbl_state.setWordWrap(True)
         self.lbl_state.setMinimumWidth(0)
         action.addWidget(self.lbl_state, 1)
+        # the speech model's first download (the helper's "download" events)
+        self.dl_bar = _download_bar()
+        sv.addWidget(self.dl_bar, 0, Qt.AlignmentFlag.AlignLeft)
         v.addWidget(self.start_box)
         self.lbl_intro = hint_label(_(
             "Talk in your language and others hear another one. Turn on the switch below: the AI "
@@ -1659,6 +1678,8 @@ class SpeechPanel(QWidget):
         self.lbl_bg.setTextFormat(Qt.TextFormat.PlainText)     # shows the helper's error text
         self.lbl_bg.hide()
         lv.addWidget(self.lbl_bg)
+        self.bg_bar = _download_bar()   # the same, while translating for another voice
+        lv.addWidget(self.bg_bar, 0, Qt.AlignmentFlag.AlignLeft)
         self.tr_box = QWidget()
         tv = QVBoxLayout(self.tr_box)
         tv.setContentsMargins(0, 0, 0, 0)
@@ -2642,6 +2663,7 @@ class SpeechPanel(QWidget):
         self.bg_for, self._bg_key, self._bg_failed = "", (), ()
         self.ctl.stop_live()
         self._bg_note("")
+        self.bg_bar.hide()
 
     def _bg_note(self, text: str, warning: bool = False):
         self.lbl_bg.setText(text)
@@ -2660,15 +2682,30 @@ class SpeechPanel(QWidget):
                 _("Stop the computer voice to change this") if on
                 else _("Waiting for the install to finish"))
         self.lbl_state.setText(state)
+        if not on:
+            self.dl_bar.hide()
         self._refresh_translation()
+
+    def _download_note(self, ev: dict) -> str:
+        """A "download" event: its bar filled, the words that go with it."""
+        done, total = int(ev.get("done") or 0), int(ev.get("total") or 0)
+        bar = self.bg_bar if self.bg_for else self.dl_bar
+        bar.setValue(min(1000, done * 1000 // total) if total > 0 else 0)
+        bar.show()
+        return _("Downloading the speech model (one time only)… {done} of {total} MB",
+                 done=done // 1_000_000, total=total // 1_000_000)
 
     def _on_event(self, ev: dict):
         t = ev.get("type")
         text = str(ev.get("text", ""))
+        if t != "download":
+            (self.bg_bar if self.bg_for else self.dl_bar).hide()
         if self.bg_for and t != "tts_error":
             self._on_bg_event(t, text, ev)
             return
-        if t == "tts_error":
+        if t == "download":
+            self.lbl_state.setText(self._download_note(ev))
+        elif t == "tts_error":
             self._tts_error(_("Couldn't speak that line: {error}", error=text))
         elif t == "status":
             self.lbl_state.setText(text)
@@ -2691,7 +2728,9 @@ class SpeechPanel(QWidget):
         name = self._bg_key[1] if self._bg_key else ""
         m = self._lang()
         name = langnames.of(m) if m is not None else name
-        if t == "ready" or (t == "vad" and not ev.get("speaking")):
+        if t == "download":
+            self._bg_note(self._download_note(ev))
+        elif t == "ready" or (t == "vad" and not ev.get("speaking")):
             self._bg_note(_("● Listening: say it in your language, it comes out in {language}.",
                             language=name))
         elif t == "vad":

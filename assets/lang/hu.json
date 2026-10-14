@@ -3392,5 +3392,7 @@
   "Say it in your language; {voice} says it in {language}. Translation is quick but not perfect with slang.": "Mondd a saját nyelveden; {voice} ezen mondja: {language}. A fordítás gyors, de szlenggel nem tökéletes.",
   "Talk in your language and others hear another one. Turn on the switch below: the AI voice or the voice changer says it when one of them is on; otherwise press Start and a computer voice does.": "Beszélj a saját nyelveden, és mások mást hallanak. Kapcsold be a lenti kapcsolót: az AI hang vagy a hangváltó mondja ki, ha valamelyik be van kapcsolva; különben nyomd meg a Start gombot, és egy gépi hang mondja ki.",
   "Translate what you say into this language. Off: every voice says it as you do, and the language stays picked.": "Lefordítja, amit mondasz, erre a nyelvre. Ki: minden hang úgy mondja, ahogy te, és a nyelv kiválasztva marad.",
-  "● Listening: say it in your language, it comes out in {language}.": "● Figyel: mondd a saját nyelveden, ezen jön ki: {language}."
+  "● Listening: say it in your language, it comes out in {language}.": "● Figyel: mondd a saját nyelveden, ezen jön ki: {language}.",
+  "Downloading the speech model (one time only)… {done} of {total} MB": "A beszédmodell letöltése (csak egyszer)… {done} / {total} MB",
+  "Speech model download": "Beszédmodell letöltése"
 }

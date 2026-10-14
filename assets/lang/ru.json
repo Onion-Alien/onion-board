@@ -3468,5 +3468,7 @@
   "Say it in your language; {voice} says it in {language}. Translation is quick but not perfect with slang.": "Говорите на своём языке; {voice} скажет это на языке: {language}. Перевод быстрый, но со сленгом неидеален.",
   "Talk in your language and others hear another one. Turn on the switch below: the AI voice or the voice changer says it when one of them is on; otherwise press Start and a computer voice does.": "Говорите на своём языке, а другие слышат другой. Включите переключатель ниже: скажет ИИ-голос или изменитель голоса, когда один из них включён; иначе нажмите «Пуск», и скажет компьютерный голос.",
   "Translate what you say into this language. Off: every voice says it as you do, and the language stays picked.": "Переводит сказанное на этот язык. Выкл.: каждый голос говорит так же, как вы, а язык остаётся выбранным.",
-  "● Listening: say it in your language, it comes out in {language}.": "● Слушаю: говорите на своём языке, на выходе будет {language}."
+  "● Listening: say it in your language, it comes out in {language}.": "● Слушаю: говорите на своём языке, на выходе будет {language}.",
+  "Downloading the speech model (one time only)… {done} of {total} MB": "Загрузка речевой модели (только один раз)… {done} из {total} МБ",
+  "Speech model download": "Загрузка речевой модели"
 }

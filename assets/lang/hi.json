@@ -3392,5 +3392,7 @@
   "Say it in your language; {voice} says it in {language}. Translation is quick but not perfect with slang.": "इसे अपनी भाषा में कहें; {voice} इसे {language} में कहता है। अनुवाद तेज़ है, पर स्लैंग के साथ पूरा सही नहीं।",
   "Talk in your language and others hear another one. Turn on the switch below: the AI voice or the voice changer says it when one of them is on; otherwise press Start and a computer voice does.": "अपनी भाषा में बोलें और दूसरे कोई और भाषा सुनते हैं। नीचे का स्विच चालू करें: AI आवाज़ या वॉइस चेंजर में से जो चालू हो, वह इसे बोलता है; नहीं तो Start दबाएँ और कंप्यूटर की आवाज़ बोलती है।",
   "Translate what you say into this language. Off: every voice says it as you do, and the language stays picked.": "आप जो कहते हैं उसे इस भाषा में अनुवाद करें। बंद: हर आवाज़ इसे वैसे ही कहती है जैसे आप, और भाषा चुनी रहती है।",
-  "● Listening: say it in your language, it comes out in {language}.": "● सुन रहा है: इसे अपनी भाषा में कहें, यह {language} में निकलता है।"
+  "● Listening: say it in your language, it comes out in {language}.": "● सुन रहा है: इसे अपनी भाषा में कहें, यह {language} में निकलता है।",
+  "Downloading the speech model (one time only)… {done} of {total} MB": "स्पीच मॉडल डाउनलोड हो रहा है (सिर्फ़ एक बार)… {total} में से {done} MB",
+  "Speech model download": "स्पीच मॉडल डाउनलोड"
 }

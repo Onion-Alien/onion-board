@@ -3316,5 +3316,7 @@
   "Say it in your language; {voice} says it in {language}. Translation is quick but not perfect with slang.": "自分の言語で話してください。{voice}が{language}で話します。翻訳は速いですが、スラングは完璧ではありません。",
   "Talk in your language and others hear another one. Turn on the switch below: the AI voice or the voice changer says it when one of them is on; otherwise press Start and a computer voice does.": "自分の言語で話すと、ほかの人には別の言語で聞こえます。下のスイッチをオンにしてください：AI ボイスかボイスチェンジャーがオンならそれが話します。どちらもオフなら「スタート」を押すとコンピューターの声が話します。",
   "Translate what you say into this language. Off: every voice says it as you do, and the language stays picked.": "話した内容をこの言語に翻訳します。オフ: どの声も話したとおりに話し、言語は選んだままです。",
-  "● Listening: say it in your language, it comes out in {language}.": "● 聞いています: 自分の言語で話すと、{language}で出てきます。"
+  "● Listening: say it in your language, it comes out in {language}.": "● 聞いています: 自分の言語で話すと、{language}で出てきます。",
+  "Downloading the speech model (one time only)… {done} of {total} MB": "音声モデルをダウンロード中（初回のみ）… {done} / {total} MB",
+  "Speech model download": "音声モデルのダウンロード"
 }

@@ -3392,5 +3392,7 @@
   "Say it in your language; {voice} says it in {language}. Translation is quick but not perfect with slang.": "Zeg het in je eigen taal; {voice} zegt het in het {language}. Vertalen gaat snel, maar is niet perfect met slang.",
   "Talk in your language and others hear another one. Turn on the switch below: the AI voice or the voice changer says it when one of them is on; otherwise press Start and a computer voice does.": "Praat in je eigen taal en anderen horen een andere. Zet de schakelaar hieronder aan: de AI-stem of de stemvervormer zegt het als een van beide aan staat; druk anders op Start en een computerstem zegt het.",
   "Translate what you say into this language. Off: every voice says it as you do, and the language stays picked.": "Vertaalt wat je zegt naar deze taal. Uit: elke stem zegt het zoals jij, en de taal blijft gekozen.",
-  "● Listening: say it in your language, it comes out in {language}.": "● Luistert: zeg het in je eigen taal, het komt eruit in het {language}."
+  "● Listening: say it in your language, it comes out in {language}.": "● Luistert: zeg het in je eigen taal, het komt eruit in het {language}.",
+  "Downloading the speech model (one time only)… {done} of {total} MB": "Spraakmodel downloaden (eenmalig)… {done} van {total} MB",
+  "Speech model download": "Download van spraakmodel"
 }

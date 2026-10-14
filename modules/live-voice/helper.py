@@ -34,6 +34,10 @@ import protocol
 
 log = logging.getLogger("live-voice")
 
+# plain downloads, written to the cache as they come (fetch_model's progress counts
+# them); Xet's put a model there only once it's whole
+os.environ.setdefault("HF_HUB_DISABLE_XET", "1")
+
 RATE = protocol.AUDIO_RATE
 FRAME = RATE * 30 // 1000          # 30 ms analysis frames
 
@@ -114,17 +118,59 @@ class FakeTranscriber:
         return f"utterance {self.n} ({len(audio) / RATE:.1f}s)"
 
 
+# each speech model's download, for its progress (the files as they land on disk)
+MODEL_BYTES = {"tiny": 75_500_000, "tiny.en": 75_500_000, "base": 147_400_000,
+               "base.en": 147_400_000, "small": 485_800_000, "small.en": 485_800_000}
+
+
+def fetch_model(name: str, progress) -> str:
+    """The speech model's folder, downloaded first when it isn't on this PC yet;
+    `progress(done, total)` (bytes) every half second meanwhile. The download's own
+    progress bars belong to huggingface_hub (unpinned, they change), so this counts
+    the model's cache folder instead: its files and the parts still coming in."""
+    from faster_whisper.utils import _MODELS, download_model
+    try:
+        return download_model(name, local_files_only=True)
+    except Exception:  # noqa: BLE001  (not there yet, or not whole)
+        pass
+    from huggingface_hub import constants
+    repo = _MODELS.get(name, name)
+    folder = os.path.join(constants.HF_HUB_CACHE, "models--" + repo.replace("/", "--"))
+    total = MODEL_BYTES.get(name, 0)
+    stop = threading.Event()
+
+    def watch():
+        while not stop.wait(0.5):
+            done = 0
+            for root, _dirs, files in os.walk(folder):
+                for f in files:
+                    try:
+                        done += os.path.getsize(os.path.join(root, f))
+                    except OSError:
+                        pass          # moved from blobs\ to snapshots\ just now
+            if done:
+                progress(done, max(total, done))
+
+    t = threading.Thread(target=watch, daemon=True)
+    t.start()
+    try:
+        return download_model(name)
+    finally:
+        stop.set()
+        t.join()
+
+
 class WhisperTranscriber:
     # things Whisper "hears" in noise or silence
     JUNK = {"", "you", "thank you.", "thanks for watching!", "thank you for watching.",
             "bye.", "."}
 
     def __init__(self, model: str, language: str | None, device: str,
-                 task: str = "transcribe"):
+                 task: str = "transcribe", progress=lambda done, total: None):
         from faster_whisper import WhisperModel
         self.language = language or None
         self.task = task
-        self.model = WhisperModel(model, device=device,
+        self.model = WhisperModel(fetch_model(model, progress), device=device,
                                   compute_type="int8" if device == "cpu" else "float16")
 
     def __call__(self, audio: np.ndarray) -> str:
@@ -242,7 +288,8 @@ def main(argv=None) -> int:
         try:
             t = FakeTranscriber() if args.fake else WhisperTranscriber(
                 args.model, None if args.language == "auto" else args.language, args.device,
-                args.task)
+                args.task, lambda done, total: link.send(type="download", done=done,
+                                                         total=total))
         except ImportError:
             fail("speech recognition isn't fully installed: press Update speech recognition "
                  "under More options, then Start again")

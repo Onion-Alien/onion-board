@@ -3316,5 +3316,7 @@
   "Say it in your language; {voice} says it in {language}. Translation is quick but not perfect with slang.": "Nói bằng ngôn ngữ của bạn; {voice} sẽ nói bằng {language}. Dịch nhanh nhưng chưa hoàn hảo với tiếng lóng.",
   "Talk in your language and others hear another one. Turn on the switch below: the AI voice or the voice changer says it when one of them is on; otherwise press Start and a computer voice does.": "Nói bằng ngôn ngữ của bạn và người khác nghe một ngôn ngữ khác. Bật công tắc bên dưới: giọng AI hoặc bộ đổi giọng sẽ nói khi một trong hai đang bật; nếu không, nhấn Bắt đầu và giọng máy tính sẽ nói.",
   "Translate what you say into this language. Off: every voice says it as you do, and the language stays picked.": "Dịch điều bạn nói sang ngôn ngữ này. Tắt: mọi giọng nói y như bạn, và ngôn ngữ vẫn được chọn.",
-  "● Listening: say it in your language, it comes out in {language}.": "● Đang nghe: nói bằng ngôn ngữ của bạn, sẽ ra bằng {language}."
+  "● Listening: say it in your language, it comes out in {language}.": "● Đang nghe: nói bằng ngôn ngữ của bạn, sẽ ra bằng {language}.",
+  "Downloading the speech model (one time only)… {done} of {total} MB": "Đang tải mô hình giọng nói (chỉ một lần)… {done} / {total} MB",
+  "Speech model download": "Tải mô hình giọng nói"
 }

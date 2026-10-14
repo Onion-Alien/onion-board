@@ -3392,5 +3392,7 @@
   "Say it in your language; {voice} says it in {language}. Translation is quick but not perfect with slang.": "Kendi dilinde söyle; {voice} bunu {language} dilinde söyler. Çeviri hızlıdır ama argoda kusursuz değildir.",
   "Talk in your language and others hear another one. Turn on the switch below: the AI voice or the voice changer says it when one of them is on; otherwise press Start and a computer voice does.": "Kendi dilinde konuş, diğerleri başka bir dil duysun. Aşağıdaki anahtarı aç: biri açıksa yapay zekâ sesi veya ses değiştirici söyler; değilse Başlat'a bas, bir bilgisayar sesi söyler.",
   "Translate what you say into this language. Off: every voice says it as you do, and the language stays picked.": "Söylediğini bu dile çevirir. Kapalı: her ses senin söylediğin gibi söyler ve dil seçili kalır.",
-  "● Listening: say it in your language, it comes out in {language}.": "● Dinliyor: kendi dilinde söyle, {language} olarak çıkar."
+  "● Listening: say it in your language, it comes out in {language}.": "● Dinliyor: kendi dilinde söyle, {language} olarak çıkar.",
+  "Downloading the speech model (one time only)… {done} of {total} MB": "Konuşma modeli indiriliyor (yalnızca bir kez)… {done} / {total} MB",
+  "Speech model download": "Konuşma modeli indirmesi"
 }

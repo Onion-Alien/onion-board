@@ -3316,5 +3316,7 @@
   "Say it in your language; {voice} says it in {language}. Translation is quick but not perfect with slang.": "用你的語言說；{voice}會用{language}說出來。翻譯很快，但對俚語不夠完美。",
   "Talk in your language and others hear another one. Turn on the switch below: the AI voice or the voice changer says it when one of them is on; otherwise press Start and a computer voice does.": "用你的語言說，別人聽到的是另一種語言。打開下面的開關：AI 聲音或變聲器開著時由它來說；否則按「開始」，由電腦聲音來說。",
   "Translate what you say into this language. Off: every voice says it as you do, and the language stays picked.": "把你說的話翻譯成這種語言。關閉：每個聲音都照你說的原樣說，語言仍保持選取。",
-  "● Listening: say it in your language, it comes out in {language}.": "● 正在聽：用你的語言說，出來的是{language}。"
+  "● Listening: say it in your language, it comes out in {language}.": "● 正在聽：用你的語言說，出來的是{language}。",
+  "Downloading the speech model (one time only)… {done} of {total} MB": "正在下載語音模型（僅此一次）… {done} / {total} MB",
+  "Speech model download": "語音模型下載"
 }

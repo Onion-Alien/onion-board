@@ -3468,5 +3468,7 @@
   "Say it in your language; {voice} says it in {language}. Translation is quick but not perfect with slang.": "Spune-o în limba ta; {voice} o spune în {language}. Traducerea e rapidă, dar nu perfectă cu argoul.",
   "Talk in your language and others hear another one. Turn on the switch below: the AI voice or the voice changer says it when one of them is on; otherwise press Start and a computer voice does.": "Vorbește în limba ta și ceilalți aud alta. Pornește comutatorul de mai jos: o spune vocea AI sau modificatorul de voce când unul dintre ele e pornit; altfel apasă Start și o spune o voce de computer.",
   "Translate what you say into this language. Off: every voice says it as you do, and the language stays picked.": "Traduce ce spui în această limbă. Oprit: fiecare voce o spune cum o spui tu, iar limba rămâne aleasă.",
-  "● Listening: say it in your language, it comes out in {language}.": "● Ascult: spune-o în limba ta, iese în {language}."
+  "● Listening: say it in your language, it comes out in {language}.": "● Ascult: spune-o în limba ta, iese în {language}.",
+  "Downloading the speech model (one time only)… {done} of {total} MB": "Se descarcă modelul de vorbire (o singură dată)… {done} din {total} MB",
+  "Speech model download": "Descărcarea modelului de vorbire"
 }

@@ -3392,5 +3392,7 @@
   "Say it in your language; {voice} says it in {language}. Translation is quick but not perfect with slang.": "Кажи го на твоя език; {voice} го казва на {language}. Преводът е бърз, но не е перфектен със сленг.",
   "Talk in your language and others hear another one. Turn on the switch below: the AI voice or the voice changer says it when one of them is on; otherwise press Start and a computer voice does.": "Говори на своя език, а другите чуват друг. Включи превключвателя отдолу: AI гласът или гласовият чейнджър го казва, когато единият е включен; иначе натисни Старт и го казва компютърен глас.",
   "Translate what you say into this language. Off: every voice says it as you do, and the language stays picked.": "Превежда казаното на този език. Изключено: всеки глас го казва както ти, а езикът остава избран.",
-  "● Listening: say it in your language, it comes out in {language}.": "● Слушам: кажи го на твоя език, излиза на {language}."
+  "● Listening: say it in your language, it comes out in {language}.": "● Слушам: кажи го на твоя език, излиза на {language}.",
+  "Downloading the speech model (one time only)… {done} of {total} MB": "Изтегляне на говорния модел (само веднъж)… {done} от {total} MB",
+  "Speech model download": "Изтегляне на говорния модел"
 }

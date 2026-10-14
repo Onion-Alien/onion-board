@@ -3696,5 +3696,7 @@
   "Say it in your language; {voice} says it in {language}. Translation is quick but not perfect with slang.": "قلها بلغتك؛ يقولها {voice} بـ{language}. الترجمة سريعة لكنها ليست مثالية مع العامية.",
   "Talk in your language and others hear another one. Turn on the switch below: the AI voice or the voice changer says it when one of them is on; otherwise press Start and a computer voice does.": "تحدث بلغتك ويسمع الآخرون لغة أخرى. شغّل المفتاح أدناه: يقولها صوت الذكاء الاصطناعي أو مغير الصوت عندما يكون أحدهما قيد التشغيل؛ وإلا اضغط ابدأ وسيقولها صوت الكمبيوتر.",
   "Translate what you say into this language. Off: every voice says it as you do, and the language stays picked.": "ترجم ما تقوله إلى هذه اللغة. إيقاف: كل صوت يقولها كما تقولها، وتبقى اللغة مختارة.",
-  "● Listening: say it in your language, it comes out in {language}.": "● أستمع: قلها بلغتك، وتخرج بـ{language}."
+  "● Listening: say it in your language, it comes out in {language}.": "● أستمع: قلها بلغتك، وتخرج بـ{language}.",
+  "Downloading the speech model (one time only)… {done} of {total} MB": "جارٍ تنزيل نموذج الكلام (مرة واحدة فقط)… {done} من {total} ميغابايت",
+  "Speech model download": "تنزيل نموذج الكلام"
 }

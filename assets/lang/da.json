@@ -3392,5 +3392,7 @@
   "Say it in your language; {voice} says it in {language}. Translation is quick but not perfect with slang.": "Sig det på dit sprog; {voice} siger det på {language}. Oversættelsen er hurtig, men ikke perfekt med slang.",
   "Talk in your language and others hear another one. Turn on the switch below: the AI voice or the voice changer says it when one of them is on; otherwise press Start and a computer voice does.": "Tal dit sprog, og andre hører et andet. Slå kontakten nedenfor til: AI-stemmen eller stemmeskifteren siger det, når en af dem er tændt; ellers tryk på Start, så siger en computerstemme det.",
   "Translate what you say into this language. Off: every voice says it as you do, and the language stays picked.": "Oversæt det, du siger, til dette sprog. Fra: hver stemme siger det, som du gør, og sproget forbliver valgt.",
-  "● Listening: say it in your language, it comes out in {language}.": "● Lytter: sig det på dit sprog, så kommer det ud på {language}."
+  "● Listening: say it in your language, it comes out in {language}.": "● Lytter: sig det på dit sprog, så kommer det ud på {language}.",
+  "Downloading the speech model (one time only)… {done} of {total} MB": "Henter talemodellen (kun én gang)… {done} af {total} MB",
+  "Speech model download": "Hentning af talemodel"
 }
