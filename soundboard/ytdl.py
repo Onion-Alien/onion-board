@@ -747,7 +747,7 @@ def _soundcloud_hit(e: dict) -> Result | None:
         return None
     # the flat entry only lists tiny cover sizes; "-t300x300" is the same art, bigger
     art = next((str(t.get("url")) for t in reversed(e.get("thumbnails") or ())
-                if t.get("url")), "")
+                if t.get("url")), str(e.get("thumbnail") or ""))
     art = re.sub(r"-(mini|tiny|small|badge|t\d+x\d+|large)\.(jpg|png)$", r"-t300x300.\2", art)
     return Result(str(e.get("id") or link), str(e.get("title") or _("Track")),
                   str(e.get("uploader") or ""), float(e.get("duration") or 0),

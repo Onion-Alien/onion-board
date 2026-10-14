@@ -1,0 +1,15 @@
+{
+  "id": "translate-fil",
+  "name": "Translate to Filipino",
+  "version": "1.0.0",
+  "kind": "translation",
+  "description": "The computer voice speaks what you say in Filipino (Tagalog). Needs live voice-to-speech. Downloads a 69 MB translation model once, when you ask for it; translating then happens on this PC.",
+  "language": "fil",
+  "language_name": "Filipino",
+  "download": {
+    "url": "https://argos-net.com/v1/translate-en_tl-1_9.argosmodel",
+    "sha256": "0915f9e7ae617b085c88bc3ac9213e4915008fd2dbb423fcfcd3724f77c5d86b",
+    "bytes": 69282709
+  },
+  "credits": "English to Tagalog model from the Argos Translate package index: OPUS-MT (Tiedemann & Thottingal, 2020), CC BY 4.0."
+}

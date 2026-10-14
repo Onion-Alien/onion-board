@@ -915,6 +915,9 @@ def _clean_speech(raw: dict) -> dict:
     lang = out.get("language")
     if not (isinstance(lang, str) and (lang == "auto" or LANGUAGE_RE.fullmatch(lang))):
         out.pop("language", None)
+    lang = out.get("spoken")
+    if not (isinstance(lang, str) and (lang in ("", "auto") or LANGUAGE_RE.fullmatch(lang))):
+        out.pop("spoken", None)
     return out
 
 

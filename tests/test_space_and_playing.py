@@ -25,6 +25,7 @@ class FakePlayer:
         monkeypatch.setattr(e, "playing", lambda: {s: tuple(v) for s, v in self.voices.items()})
         monkeypatch.setattr(e, "play", lambda sid, *a, **k: self.voices.__setitem__(
             sid, [0.0, False]) or object())
+        monkeypatch.setattr(e, "stop", lambda sid: self.voices.pop(sid, None))
 
     def paused(self, sid):
         return self.voices[sid][1] if sid in self.voices else None
@@ -169,3 +170,31 @@ def test_a_new_sound_stops_the_one_playing_unless_set_to_overlap(window, player,
     window.playctl._cool.clear()
     window.playctl.play("s0")
     assert modes["s0"] == "overlap"
+
+
+def test_a_web_song_saved_as_a_pad_plays_once_not_twice(window, player, monkeypatch):
+    """Played from a search, then added to the board and its pad pressed: one song, so
+    the web copy stops and the pad starts from the top (as a second press of a pad
+    does), never both side by side in Now playing."""
+    _link(window, "https://www.youtube.com/watch?v=abc&list=x")
+    m = window.meta("s0")
+    monkeypatch.setattr(m, "source", {"link": "https://youtu.be/abc"})
+    window.playctl.play("s0")
+    assert LINK_ID not in player.voices and "s0" in player.voices
+
+
+def test_another_pad_leaves_the_web_song_playing(window, player, monkeypatch):
+    _link(window)
+    monkeypatch.setattr(window.meta("s0"), "source", {"link": "https://youtu.be/other"})
+    window.playctl.play("s0")
+    assert LINK_ID in player.voices and "s0" in player.voices
+
+
+def test_playing_a_search_hit_already_on_the_board_plays_its_pad(window, player, monkeypatch):
+    monkeypatch.setattr(window.meta("s0"), "source",
+                        {"link": "https://www.youtube.com/watch?v=abc"})
+    fetched = []
+    monkeypatch.setattr(window.linkbar, "play_once", lambda: fetched.append(1) or True)
+    r = ytdl.Result(id="abc", title="What Is Love", channel="Haddaway", seconds=5)
+    window.searchctl._from_youtube(r, True)
+    assert "s0" in player.voices and LINK_ID not in player.voices and not fetched

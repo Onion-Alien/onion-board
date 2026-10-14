@@ -1,0 +1,15 @@
+{
+  "id": "translate-uk",
+  "name": "Translate to Ukrainian",
+  "version": "1.0.0",
+  "kind": "translation",
+  "description": "The computer voice speaks what you say in Ukrainian. Needs live voice-to-speech. Downloads a 120 MB translation model once, when you ask for it; translating then happens on this PC.",
+  "language": "uk",
+  "language_name": "Ukrainian",
+  "download": {
+    "url": "https://argos-net.com/v1/translate-en_uk-1_4.argosmodel",
+    "sha256": "037ebc690c0f7287bff01b09006f76707d7089134205a91ef3d823a3c73811e3",
+    "bytes": 119889246
+  },
+  "credits": "English to Ukrainian model from the Argos Translate package index: Argos Translate, trained on OPUS data."
+}
