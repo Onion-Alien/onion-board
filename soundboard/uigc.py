@@ -19,17 +19,31 @@ object only it holds) was freed on the worker. That corrupted the heap now and t
 and the crash came later somewhere else (switching tabs, a constructor, a teardown).
 So a finished thread hands its target and arguments over, and the same UI-thread timer
 lets go of them (hand_threads_to_ui, let_go).
+
+A collection still holds Python's lock from start to end, and the audio callbacks need
+it too: on the UI thread a pause isn't free, the sound playing waits it out. A
+gen-0 collection of 50,000 new objects took ~8 ms, a full one ~30 ms (a skip). So the
+collector keeps every pause short: gen 0 is collected small and often (YOUNG new
+objects, checked every INTERVAL_MS), and what's alive once the window is up is set
+aside (gc.freeze), so a gen-2 collection only goes through what's been made since.
+What's set aside is gone through too (a deep sweep: gc.unfreeze, collect, freeze), but
+only when nothing's playing (`quiet`), every DEEP_S; or, never quiet, after DEEP_MAX_S.
 """
 from __future__ import annotations
 
 import gc
 import threading
+import time
+from collections.abc import Callable
 
 from PySide6.QtCore import QObject, QTimer
 
 from soundboard import overridepin
 
-INTERVAL_MS = 500
+INTERVAL_MS = 100
+YOUNG = 5_000         # new objects before a gen-0 collection (~1 ms each)
+DEEP_S = 600          # the set-aside objects gone through again, when it's quiet...
+DEEP_MAX_S = 3600     # ...or after this long anyway (the radio on all day)
 
 _handed: list[tuple] = []   # (target, args, kwargs) of finished threads, until let_go
 _handed_lock = threading.Lock()
@@ -83,10 +97,20 @@ def collect_due(thresholds=None) -> int:
 
 
 class UiCollector(QObject):
-    def __init__(self, parent=None, interval_ms: int = INTERVAL_MS):
+    """`quiet`: True while nothing is playing (Engine.quiet), when a deep sweep's
+    pause can't be heard. `freeze` False: nothing is set aside (the tests' collector:
+    a test that checks something is freed by gc.collect() can't have it set aside)."""
+
+    def __init__(self, parent=None, interval_ms: int = INTERVAL_MS,
+                 quiet: Callable[[], bool] | None = None, freeze: bool = True):
         super().__init__(parent)
-        self.thresholds = gc.get_threshold()
+        self.thresholds = (YOUNG, *gc.get_threshold()[1:])
+        self._quiet = quiet or (lambda: True)
+        self._freeze = freeze
         gc.disable()
+        if freeze:
+            gc.freeze()   # what start-up made: gone through by the deep sweeps only
+        self._deep_at = time.monotonic()
         hand_threads_to_ui()
         overridepin.pin()
         self._timer = QTimer(self)
@@ -96,10 +120,26 @@ class UiCollector(QObject):
     def check(self) -> int:
         let_go()
         overridepin.pin()   # classes imported since the last tick (a tab, an add-on)
-        return collect_due(self.thresholds)
+        since = time.monotonic() - self._deep_at
+        if self._freeze and (since > DEEP_MAX_S or (since > DEEP_S and self._quiet())):
+            return self.deep()
+        gen = collect_due(self.thresholds)
+        if gen == 2 and self._freeze:
+            gc.freeze()   # what lived through it: set aside till the next deep sweep
+        return gen
+
+    def deep(self) -> int:
+        """Everything, the set-aside objects too, collected; then set aside again."""
+        self._deep_at = time.monotonic()
+        gc.unfreeze()
+        gc.collect()
+        gc.freeze()
+        return 3
 
     def stop(self):
         self._timer.stop()
         threading.Thread.run = _thread_run
         let_go()
+        if self._freeze:
+            gc.unfreeze()
         gc.enable()

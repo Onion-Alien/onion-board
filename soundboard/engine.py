@@ -682,6 +682,12 @@ class Engine(EngineTakes, EngineDevices, SoundCache):
                        and not (v.stopping and not any(v.gate.values()))
                        for v in self.voices)
 
+    def quiet(self) -> bool:
+        """Nothing is playing: no sound or sample, no captured program, no radio heard
+        in the last second (when uigc's deep sweep can pause the UI thread unheard)."""
+        return (not any(not v.finished for v in self.voices) and not self.aux
+                and time.monotonic() - self._radio_heard > 1.0)
+
     # ----------------------------------------------------------------- callbacks
     def _render(self, out: str, frames: int, previews_only=False,
                 fixed=False, makeup=True) -> np.ndarray:

@@ -53,7 +53,7 @@ def test_nothing_is_collected_before_its_threshold(qapp):
 
 
 def test_the_collector_checks_on_a_timer(qapp):
-    c = uigc.UiCollector(interval_ms=10)
+    c = uigc.UiCollector(interval_ms=10, freeze=False)
     try:
         assert c._timer.isActive() and not gc.isenabled()
         held = dropped_cycle()
@@ -104,3 +104,63 @@ def test_a_thread_run_on_the_ui_thread_lets_go_at_once(qapp):
 
     threading.Thread(target=Job().work).run()
     assert freed == [1]
+
+
+def test_full_collections_skip_whats_set_aside_till_its_quiet(qapp, monkeypatch):
+    """A collection holds Python's lock and the audio callbacks wait it out: a full
+    one over the whole app took ~30 ms, a skip in the sound playing. What's alive when
+    the collector starts is set aside, so the usual collections only go through what's
+    new, and all of it is gone through only while nothing plays (or after DEEP_MAX_S)."""
+    old = dropped_cycle()                      # made before: set aside
+    quiet = [False]
+    c = uigc.UiCollector(interval_ms=10**6, quiet=lambda: quiet[0])
+    try:
+        assert gc.get_freeze_count() > 0
+        new = dropped_cycle()
+        c.thresholds = (0, 0, 0)
+        c.check()
+        gc.collect(2)                          # even a full collection (not a deep one)...
+        assert new() is None and old() is not None   # ...goes through what's new only
+        monkeypatch.setattr(uigc, "DEEP_S", 0)
+        c.check()                              # a sound playing: still no deep sweep
+        assert old() is not None
+        quiet[0] = True
+        assert c.check() == 3 and old() is None   # quiet: everything gone through
+        assert gc.get_freeze_count() > 0       # ...and set aside again
+        quiet[0] = False
+        monkeypatch.setattr(uigc, "DEEP_MAX_S", 0)
+        old = dropped_cycle()
+        gc.freeze()
+        assert c.check() == 3 and old() is None   # never quiet: after DEEP_MAX_S anyway
+    finally:
+        c._timer.stop()                        # (not stop(): gc stays off for the suite)
+        c.deleteLater()
+        gc.unfreeze()
+
+
+def test_the_young_generation_is_collected_small():
+    c = uigc.UiCollector(interval_ms=10**6, freeze=False)
+    try:
+        assert c.thresholds[0] == uigc.YOUNG <= 5_000   # 50,000 new objects: ~8 ms
+        assert uigc.INTERVAL_MS <= 100
+    finally:
+        c._timer.stop()
+        c.deleteLater()
+
+
+def test_the_engine_is_quiet_only_with_nothing_playing():
+    import time
+    from types import SimpleNamespace
+
+    from soundboard.engine import Engine
+    e = Engine.__new__(Engine)                 # just the state quiet() reads
+    e.voices, e.aux, e._radio_heard = (), (), 0.0
+    assert e.quiet()
+    e.voices = (SimpleNamespace(finished=False),)
+    assert not e.quiet()
+    e.voices = (SimpleNamespace(finished=True),)
+    assert e.quiet()
+    e._radio_heard = time.monotonic()
+    assert not e.quiet()
+    e._radio_heard, e.aux = 0.0, (object(),)
+    assert not e.quiet()
