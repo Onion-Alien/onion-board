@@ -1,4 +1,4 @@
-"""Setup -> Devices -> Also send to: one row per extra device, each with its own box,
+"""Setup -> Devices -> Also play on: one row per extra device, each with its own box,
 what it gets, and a − button, and a + button under them for one more. A row gets
 either the same as the call (Config.also_send: a copy of what others hear) or a clean
 mix for streaming (Config.obs_device, the stream output: no voice chat shaping, its
@@ -18,9 +18,11 @@ from soundboard.ui.panel import VolumeControl, icon_label
 from soundboard.wheelguard import no_wheel
 from soundboard.i18n import _
 
-LABEL = _("Also send to")
-TIP = _("Streaming, or using more than one app? Each device here gets a copy of what "
-        "others hear too: Voicemeeter, a device OBS captures, a second cable, speakers...")
+LABEL = _("Also play on")
+# outputs only: people read "Also send to" (its old name) as "into another mic"
+TIP = _("Plays a copy of what others hear on more devices: Voicemeeter, a device OBS "
+        "captures, a second cable, speakers... Mics aren't listed here: Send my sounds to "
+        "puts your sounds into your mic.")
 CALL, STREAM = "call", "stream"
 KINDS = ((CALL, _("Same as the call"),
           _("Exactly what others in the call hear, shaped for voice chat")),
@@ -178,6 +180,7 @@ class AlsoSendRows:
             minus.setAccessibleName(_("Remove {name}", name=name))
             minus.clicked.connect(lambda _c=False, i=i, kind=kind: self._remove(i, kind))
             label = QLabel(LABEL if i == 0 else "")
+            label.setToolTip(TIP)
             label.setBuddy(box)
             self._place(r, label, i == 0, field, minus)
             self.boxes.append(box)
@@ -207,6 +210,7 @@ class AlsoSendRows:
                 r += 1
         if not self.boxes:   # no rows yet: the label goes by the + button
             label = QLabel(LABEL)
+            label.setToolTip(TIP)
             label.setBuddy(self.add)
             row = [label]
             if self.icons_col:
@@ -219,7 +223,7 @@ class AlsoSendRows:
 
 
 def build(mw, grid: QGridLayout, row: int, icons_col: bool) -> AlsoSendRows:
-    """Also send to rows in `grid` from `row` on, kept up to date by `mw`."""
+    """Also play on rows in `grid` from `row` on, kept up to date by `mw`."""
     rows = AlsoSendRows(mw, grid, row, icons_col)
     mw.also_views.append(rows)
     rows.add.destroyed.connect(lambda *__: mw.also_views.remove(rows)

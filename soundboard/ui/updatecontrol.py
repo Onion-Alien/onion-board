@@ -22,6 +22,7 @@ from shiboken6 import isValid as qt_valid
 from soundboard import errors, exitwatch, net, netlog, updates, usage, watchaddon
 from soundboard.i18n import _
 from soundboard.ui import busy, worker
+from soundboard.ui.controller import Controller
 from soundboard.ui.crashdialog import free_dialog
 
 if TYPE_CHECKING:
@@ -30,11 +31,11 @@ if TYPE_CHECKING:
 log = logging.getLogger(__name__)
 
 
-class UpdateControl:
+class UpdateControl(Controller):
     """The update check, card, download and install for one MainWindow (``mw``)."""
 
     def __init__(self, mw: MainWindow):
-        self.mw = mw
+        super().__init__(mw)
         self.release: updates.Release | None = None   # a newer version, once found
         self._update_file: Path | None = None   # its downloaded, checked installer
         self._downloading = False

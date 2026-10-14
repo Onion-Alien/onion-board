@@ -1564,3 +1564,32 @@ def test_translation_download_keeps_focus(panel, qapp, monkeypatch):
     assert len(workers) == 1
     s._on_dl_done("offline")
     assert not busy.is_busy(s.b_dl) and p.focusWidget() is s.b_dl
+
+
+@pytest.mark.parametrize("width", [900, 1600])
+def test_ai_voice_list_keeps_its_height_when_the_description_wraps(panel, qapp, width):
+    """The voice box is narrower than the card: its height must be worked out at its own
+    width, or a two-line description is counted as one and squashes the voice list."""
+    p, _eng = panel
+    ai = p.ai
+    about = "A light, high, young-sounding voice, good for cheerful characters. " * 3
+    ai.voices = [{"id": "pixie", "name": "Pixie", "about": about}]
+    ai.cb_voice.blockSignals(True)
+    ai.cb_voice.clear()
+    ai.cb_voice.addItem("Pixie", "pixie")
+    ai.cb_voice.blockSignals(False)
+    ai.ready_box.setVisible(True)
+    ai.missing.setVisible(False)
+    p.resize(width, 700)
+    p.show()
+    p.show_tab("ai")
+    for _ in range(6):
+        qapp.processEvents()
+    ai._show_about()
+    lb = ai.lbl_about
+    process_events(qapp, lambda: lb.height() >= lb.heightForWidth(lb.width())
+                   and ai.cb_voice.height() >= ai.cb_voice.sizeHint().height(), 1.0)
+    lines = ai.lbl_about.heightForWidth(ai.lbl_about.width()) // ai.lbl_about.fontMetrics().height()
+    assert lines >= 2
+    assert ai.lbl_about.height() >= ai.lbl_about.heightForWidth(ai.lbl_about.width())
+    assert ai.cb_voice.height() >= ai.cb_voice.sizeHint().height()

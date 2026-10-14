@@ -54,8 +54,8 @@ TIPS: tuple[Tip, ...] = (
         "computer voice."), "tab:voice", "voice"),
     Tip("apps", _("The Apps tab sends another program's sound (a music player, a video) "
         "to your friends, and can record it."), "tab:apps", "apps"),
-    Tip("radio", _("The Radio tab plays stations from around the world, and can save the "
-        "last 15 seconds as a pad."), "tab:radio", "radio"),
+    Tip("radio", _("The Radio tab plays stations from around the world, and can record "
+        "them as pads."), "tab:radio", "radio"),
     Tip("queue", _("Right-click a pad → Play next to queue it after the sound that's "
         "playing."), "tab:sounds"),
     Tip("deleted", _("Removed a sound by mistake? It waits in Recently deleted for 30 "
@@ -64,7 +64,7 @@ TIPS: tuple[Tip, ...] = (
         "a sound pack: the Backup button."), "settings:general"),
     Tip("themes", _("Onion Board has over 30 themes: Settings → Appearance."),
         "settings:appearance"),
-    Tip("stream", _("Streaming? Setup → Devices → Also send to → Clean, for streaming "
+    Tip("stream", _("Streaming? Setup → Devices → Also play on → Clean, for streaming "
         "gives OBS your sounds on their own track."), "settings:audio"),
     Tip("hotkeys_off", _("One key can switch every other hotkey off while you type in "
         "chat. Set it in Settings → Hotkeys."), "settings:hotkeys"),
