@@ -30,9 +30,13 @@ Once it's checked, it shows up in everyone's Free sound packs window. No app upd
 ## Checking a pack (maintainers)
 
 ```
-python scripts/check_pack.py pack.zip --id short-name --name "Pack name" --tag pack-short-name --about "..." --author "..."
-gh release create pack-short-name pack.zip --prerelease --title "Pack name (free sound pack)"
+python scripts/check_pack.py pack.zip --id short-name --name "Pack name" --tag pack-short-name --about "..." --author "..." --preview "Sound one" --preview "Sound two" ...
+gh release create pack-short-name pack.zip short-name-preview.zip --prerelease --title "Pack name (free sound pack)"
 ```
+
+`--preview` (up to six, by name) writes `short-name-preview.zip` next to the pack: those
+sounds cut to 7 seconds, with their pictures. The window shows them on the pack's card so
+people can hear a few before adding it; a pack without one just shows no samples.
 
 Listen to it, check each sound's source and licence, then add the printed entry to
 `catalog.json` in a pull request. The app only downloads packs from this project's own
