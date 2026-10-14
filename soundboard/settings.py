@@ -3492,26 +3492,38 @@ class SettingsDialog(QDialog):
                 state.setText(_("On: listening on {host}:{port}.",
                                 host=remote.HOST, port=mw.remote.port))
 
+        # saved on the saver's thread (mw._save_now: its _on_saved says when it fails),
+        # never cfg.save() here: the whole config written on the UI thread
         def set_on(b: bool):
             cfg.api_enabled = b
-            cfg.save()
+            mw._save_now()
             refresh(mw.apply_remote())
 
         def set_port():
             if port.value() != cfg.api_port:
                 cfg.api_port = port.value()
-                cfg.save()
+                mw._save_now()
                 refresh(mw.apply_remote())
 
         def new_key():
             cfg.api_token = remote.new_token()
-            cfg.save()
             refresh(mw.apply_remote())
-            busy.flash(new, _("✓ New key made"))
-            if mw.remote.running:
-                busy.toast(self, html.escape(_(
-                    "New key made: anything using the old one has stopped working. Copy the "
-                    "example link for the new one.")), "warn")
+            running = mw.remote.running
+
+            def saved(ok: bool):   # only now is it the key after a restart too
+                if not qt_valid(self) or not qt_valid(new):
+                    return
+                if not ok:   # it'd go back to the old one: no "made"
+                    busy.toast(self, html.escape(_(
+                        "Couldn't save your settings, see the log in %APPDATA%\\OnionBoard.")),
+                        "error")
+                    return
+                busy.flash(new, _("✓ New key made"))
+                if running:
+                    busy.toast(self, html.escape(_(
+                        "New key made: anything using the old one has stopped working. Copy "
+                        "the example link for the new one.")), "warn")
+            mw._save_now(saved)
 
         def copy_link():
             QApplication.clipboard().setText(

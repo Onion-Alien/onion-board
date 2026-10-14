@@ -22,7 +22,7 @@ from collections.abc import Callable
 from dataclasses import dataclass, field
 from pathlib import Path
 
-from soundboard import library, net, netlog, updates
+from soundboard import backup, library, net, netlog, updates
 
 log = logging.getLogger(__name__)
 
@@ -52,11 +52,13 @@ class Pack:
 
     @property
     def path(self) -> Path:
+        """Where it's downloaded to. Importing it moves it in as the kept pack
+        (backup.keep_pack), so it's never stored twice."""
         return library.APP_DIR / "packs" / f"{self.id}.zip"
 
     def downloaded(self) -> bool:
         """Fetched (and checked) before: adding it again just skips what's there."""
-        return self.path.is_file()
+        return self.path.is_file() or backup.kept_free_pack(self.id) is not None
 
 
 # the packs known when this version was built: shown when the list can't be read
@@ -105,6 +107,38 @@ BUILT_IN = [{
     "author": "Onion Board",
     "emoji": "🎙️",
     "categories": ["Show music", "Stingers", "Reactions", "Comedy", "Game show", "Studio"],
+}, {
+    "id": "halloween",
+    "name": "Halloween pack",
+    "description": "For Halloween parties, horror streams and pranks: screams, evil laughs and "
+                   "witch cackles, zombies and monster roars, jump scares, creaky doors, a clock "
+                   "striking midnight, thunder, wolves and owls. Spooky music loops; Ctrl+Alt+2 a "
+                   "scream, Ctrl+Alt+4 a jump scare.",
+    "url": f"{updates.DOWNLOADS}halloween-pack-1/onion-board-halloween-pack.zip",
+    "sha256": "9ac377385e2979396b132fae75ae874b39559c4b4deb7bfb38a77e3d6a6c0f9d",
+    "size": 26947272,
+    "sounds": 49,
+    "license": "CC0 + CC BY (credits inside)",
+    "author": "Onion Board",
+    "emoji": "🎃",
+    "categories": ["Spooky music", "Screams", "Monsters", "Jump scares", "Haunted house",
+                   "Night"],
+}, {
+    "id": "streamer",
+    "name": "Streamer pack",
+    "description": "For live streams: starting soon, just chatting, BRB and ending music; "
+                   "follower, sub, donation and raid alerts; air horn, cheers, fails (bonk, "
+                   "buzzer, sad trombone), chat reactions, a 3-2-1 Go announcer and transitions. "
+                   "Ctrl+Alt+3 air horn, Ctrl+Alt+4 bonk.",
+    "url": f"{updates.DOWNLOADS}streamer-pack-1/onion-board-streamer-pack.zip",
+    "sha256": "bb6b6895c3ef30f14e5a45a1b0cfc384de4691d960e1fdf1b0eae8967e1b638c",
+    "size": 18299334,
+    "sounds": 57,
+    "license": "CC0",
+    "author": "Onion Board",
+    "emoji": "📺",
+    "categories": ["Stream music", "Alerts", "Hype", "Fails", "Chat reactions", "Announcer",
+                   "Transitions"],
 }]
 
 
@@ -160,6 +194,9 @@ def download(pack: Pack, progress: Callable[[int, int], object] | None = None,
     """Fetch `pack` into the app folder's "packs", checked against its SHA-256; its
     path. Raises updates.UpdateError with a message for the user. Call off the UI
     thread."""
+    kept = backup.kept_free_pack(pack.id)
+    if kept is not None and updates._sha256(kept) == pack.sha256:
+        return kept   # added before and still kept: the same file, not fetched again
     netlog.cause(FEATURE, f"You pressed Add on the {netlog.quoted(pack.name)} pack")
     return updates.fetch(pack.url, pack.sha256, pack.path, (updates.DOWNLOADS,), MAX_SIZE,
                          "pack", pack.size, progress, cancelled, feature=FEATURE)

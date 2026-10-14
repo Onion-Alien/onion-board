@@ -90,41 +90,31 @@ class BackupError(Exception):
 # --------------------------------------------------------------------------- export
 
 def export(dest: str | Path, sounds: list[SoundMeta], cfg: Config | None = None,
-           categories: list[str] | None = None) -> int:
+           categories: list[str] | None = None, skipped: list[str] | None = None) -> int:
     """Write `sounds` (in this order) to the zip `dest`; with `cfg`, the app's settings
     too. Written to a temp file first, so a failure never leaves half an archive.
-    Returns how many sounds went in (ones whose audio file is missing are skipped)."""
+    Returns how many sounds went in. A sound whose audio file is missing or can't be
+    read (locked by another program, moved away mid-export) is left out, and its name
+    added to `skipped`: one bad file never costs the whole backup."""
     dest = Path(dest)
     tmp = dest.with_name(dest.name + ".part")
     used_cats = {t for m in sounds for t in m.tags}
     cats = [c for c in (categories or []) if c in used_cats or cfg is not None]
     folders = []
+    tried = 0   # a sound left out halfway may have files in its folder: never reused
     try:
         with zipfile.ZipFile(tmp, "w", zipfile.ZIP_DEFLATED) as z:
             for m in sounds:
-                audio = Path(m.file)
-                if not audio.is_file():
-                    log.warning("export: %s has no audio file (%s); skipped", m.name, audio)
+                tried += 1
+                folder = f"sounds/{tried:03d} {_safe(m.name)}"
+                try:
+                    entry = _add_sound(z, m, folder)
+                except _Unreadable:
+                    log.warning("export: can't read %s's files; skipped", m.name,
+                                exc_info=True)
+                    if skipped is not None:
+                        skipped.append(m.name)
                     continue
-                folder = f"sounds/{len(folders) + 1:03d} {_safe(m.name)}"
-                entry = {k: getattr(m, k) for k in SOUND_FIELDS}
-                entry["audio"] = _safe(_original_name(audio), keep_ext=True)
-                if lib_folder := library._folder_of(audio):   # comes back in it: "YouTube"
-                    entry["folder"] = lib_folder
-                entry["picture"] = ""
-                if audio.suffix.lower() in AUDIO_EXTS and not videos.is_video(str(audio)):
-                    _add_file(z, audio, f"{folder}/{entry['audio']}")
-                else:   # only AUDIO_EXTS are read back in: a .caf, .au… goes as a FLAC
-                    entry["audio"] = Path(entry["audio"]).stem + ".flac"
-                    try:
-                        _add_as_flac(z, audio, f"{folder}/{entry['audio']}")
-                    except Exception:  # noqa: BLE001 - one odd file mustn't stop the rest
-                        log.warning("export: can't convert %s; skipped", audio, exc_info=True)
-                        continue
-                pic = Path(m.image) if m.image else None
-                if pic and pic.is_file() and pic.suffix.lower() in PICTURE_EXTS:
-                    entry["picture"] = "picture" + pic.suffix.lower()
-                    _add_file(z, pic, f"{folder}/{entry['picture']}")
                 z.writestr(f"{folder}/{SOUND_JSON}", json.dumps(entry, indent=2))
                 folders.append(folder)
             if cfg is not None:
@@ -140,6 +130,40 @@ def export(dest: str | Path, sounds: list[SoundMeta], cfg: Config | None = None,
         tmp.unlink(missing_ok=True)
         raise
     return len(folders)
+
+
+class _Unreadable(OSError):
+    """A sound's own file can't be read: that sound is left out of the export. (An
+    error writing the zip itself is not this one, and fails the export.) An OSError,
+    so callers of _add_file that catch those (keep_pack) still do."""
+
+
+def _add_sound(z: zipfile.ZipFile, m: SoundMeta, folder: str) -> dict:
+    """Put one sound's audio (and picture) into `folder` and return its sound.json
+    entry. Raises _Unreadable when its audio is missing or can't be read; a picture
+    that can't be read is only left off."""
+    audio = Path(m.file)
+    if not audio.is_file():
+        raise _Unreadable(f"no audio file ({audio})")
+    entry = {k: getattr(m, k) for k in SOUND_FIELDS}
+    entry["audio"] = _safe(_original_name(audio), keep_ext=True)
+    if lib_folder := library._folder_of(audio):   # comes back in it: "YouTube"
+        entry["folder"] = lib_folder
+    entry["picture"] = ""
+    if audio.suffix.lower() in AUDIO_EXTS and not videos.is_video(str(audio)):
+        _add_file(z, audio, f"{folder}/{entry['audio']}")
+    else:   # only AUDIO_EXTS are read back in: a .caf, .au… goes as a FLAC
+        entry["audio"] = Path(entry["audio"]).stem + ".flac"
+        _add_as_flac(z, audio, f"{folder}/{entry['audio']}")
+    pic = Path(m.image) if m.image else None
+    if pic and pic.is_file() and pic.suffix.lower() in PICTURE_EXTS:
+        name = "picture" + pic.suffix.lower()
+        try:
+            _add_file(z, pic, f"{folder}/{name}")
+            entry["picture"] = name
+        except _Unreadable:
+            log.warning("export: can't read %s's picture; left off", m.name, exc_info=True)
+    return entry
 
 
 def settings_of(cfg: Config) -> dict:
@@ -180,23 +204,44 @@ def _safe(name: str, keep_ext: bool = False) -> str:
 
 
 def _add_file(z: zipfile.ZipFile, src: Path, arcname: str):
-    comp = zipfile.ZIP_STORED if src.suffix.lower() in STORED else zipfile.ZIP_DEFLATED
-    z.write(src, arcname, compress_type=comp)
+    """Copy `src` into the zip. Raises _Unreadable when `src` can't be opened or read;
+    an error writing the zip itself goes up as it is."""
+    try:
+        info = zipfile.ZipInfo.from_file(src, arcname)
+        f = open(src, "rb")   # a locked or vanished file fails here: nothing written yet
+    except OSError as e:
+        raise _Unreadable(str(src)) from e
+    info.compress_type = (zipfile.ZIP_STORED if src.suffix.lower() in STORED
+                          else zipfile.ZIP_DEFLATED)
+    with f, z.open(info, "w") as out:
+        while True:
+            try:
+                block = f.read(1 << 20)
+            except OSError as e:
+                raise _Unreadable(str(src)) from e
+            if not block:
+                break
+            out.write(block)
 
 
 def _add_as_flac(z: zipfile.ZipFile, src: Path, arcname: str):
     """Add `src` to the zip re-encoded as FLAC (at its own rate and channels when
-    libsndfile reads it, else as the app decodes it)."""
+    libsndfile reads it, else as the app decodes it). Raises _Unreadable when neither
+    can read it."""
     with tempfile.TemporaryDirectory(prefix="onionboard-export-") as td:
         tmp = Path(td) / "sound.flac"
         try:
-            with sf.SoundFile(src) as fin, sf.SoundFile(
-                    tmp, "w", fin.samplerate, fin.channels, "PCM_16", format="FLAC") as fout:
-                for block in fin.blocks(1 << 16, dtype="float32", always_2d=True):
-                    fout.write(block)
-        except Exception:  # noqa: BLE001 - too many channels for FLAC, an odd rate…
-            log.debug("export: re-encoding %s as it plays", src, exc_info=True)
-            sf.write(tmp, library.decode(str(src)), library.SR, subtype="PCM_16")
+            try:
+                with sf.SoundFile(src) as fin, sf.SoundFile(
+                        tmp, "w", fin.samplerate, fin.channels, "PCM_16",
+                        format="FLAC") as fout:
+                    for block in fin.blocks(1 << 16, dtype="float32", always_2d=True):
+                        fout.write(block)
+            except Exception:  # noqa: BLE001 - too many channels for FLAC, an odd rate…
+                log.debug("export: re-encoding %s as it plays", src, exc_info=True)
+                sf.write(tmp, library.decode(str(src)), library.SR, subtype="PCM_16")
+        except Exception as e:  # noqa: BLE001 - one odd file mustn't stop the rest
+            raise _Unreadable(f"can't convert {src}") from e
         _add_file(z, tmp, arcname)
 
 
@@ -593,38 +638,71 @@ def _put_picture(src: _Source, ps: PackedSound, meta: SoundMeta,
 # naming it), and its sounds remember it (SoundMeta.pack / pack_item), so the whole
 # pack can be removed, or put back how it came after its pads were changed or removed.
 
+PACK_ID_RE = re.compile(r"[0-9a-f]{12}")   # a kept pack's id: _pack_id()
+
+
 def packs_dir() -> Path:
     return library.APP_DIR / "packs"
 
 
-def keep_pack(pkg: Package) -> str:
-    """Keep a copy of the sound pack `pkg` and return its id (the same pack imported
-    twice gets the same id and is kept once). "" if it couldn't be kept."""
+def _pack_id(src: Path) -> str:
+    """A kept pack's id: from what's in it, not when it was zipped (the same pack
+    re-zipped, or as a folder, is one pack)."""
     import hashlib
     import zlib
-    src = Path(pkg.path)
     h = hashlib.sha1()
+    if src.is_dir():
+        for p in sorted((p for p in src.rglob("*") if p.is_file()),
+                        key=lambda p: p.relative_to(src).as_posix()):
+            crc, size = 0, 0
+            with p.open("rb") as stream:
+                while chunk := stream.read(1024 * 1024):
+                    crc = zlib.crc32(chunk, crc)
+                    size += len(chunk)
+            # Same identity as a ZIP containing these paths and contents;
+            # existing ZIP pack memberships remain valid.
+            h.update(f"{p.relative_to(src).as_posix()}\0{crc}\0{size}\0".encode())
+    else:
+        with zipfile.ZipFile(src) as z:
+            for i in sorted(z.infolist(), key=lambda i: i.filename):
+                if not i.is_dir():
+                    h.update(f"{i.filename}\0{i.CRC}\0{i.file_size}\0".encode())
+    return h.hexdigest()[:12]
+
+
+def _is_free_download(src: Path) -> bool:
+    """A free pack's download (soundboard.packs saves it as packs/<its id>.zip), not a
+    pack kept under its content id."""
+    d = packs_dir()
+    return (src.is_file() and src.suffix.lower() == ".zip" and src.parent.resolve() ==
+            d.resolve() and not PACK_ID_RE.fullmatch(src.stem))
+
+
+def keep_pack(pkg: Package) -> str:
+    """Keep a copy of the sound pack `pkg` and return its id (the same pack imported
+    twice gets the same id and is kept once). "" if it couldn't be kept. A free pack's
+    download is moved in, not copied (and pkg.path follows it): kept once, not twice."""
+    src = Path(pkg.path)
     try:
-        if src.is_dir():
-            for p in sorted((p for p in src.rglob("*") if p.is_file()),
-                            key=lambda p: p.relative_to(src).as_posix()):
-                crc, size = 0, 0
-                with p.open("rb") as stream:
-                    while chunk := stream.read(1024 * 1024):
-                        crc = zlib.crc32(chunk, crc)
-                        size += len(chunk)
-                # Same identity as a ZIP containing these paths and contents;
-                # existing ZIP pack memberships remain valid.
-                h.update(f"{p.relative_to(src).as_posix()}\0{crc}\0{size}\0".encode())
-        else:   # what's in it, not when it was zipped: the same pack re-zipped is one pack
-            with zipfile.ZipFile(src) as z:
-                for i in sorted(z.infolist(), key=lambda i: i.filename):
-                    if not i.is_dir():
-                        h.update(f"{i.filename}\0{i.CRC}\0{i.file_size}\0".encode())
-        pid = h.hexdigest()[:12]
+        pid = _pack_id(src)
         d = packs_dir()
         d.mkdir(parents=True, exist_ok=True)
         dest = d / f"{pid}.zip"
+        info = d / f"{pid}.json"
+        if src.resolve() == dest.resolve():   # a kept pack imported again (Add again)
+            if not info.is_file():
+                info.write_text(json.dumps({"name": pid}), "utf-8")
+            pkg.pack_id = pid
+            return pid
+        if _is_free_download(src):
+            if dest.is_file():
+                src.unlink()   # kept already: this download is the same pack again
+            else:
+                src.replace(dest)
+            pkg.path = dest
+            info.write_text(json.dumps({"name": src.stem[:60], "free": src.stem}), "utf-8")
+            pkg.pack_id = pid
+            return pid
         if not dest.is_file():
             tmp = dest.with_name(dest.name + ".part")
             try:
@@ -639,12 +717,56 @@ def keep_pack(pkg: Package) -> str:
                 tmp.unlink(missing_ok=True)
                 raise
         name = src.stem if not src.is_dir() else src.name
-        (d / f"{pid}.json").write_text(json.dumps({"name": name[:60]}), "utf-8")
+        info.write_text(json.dumps({"name": name[:60]}), "utf-8")
     except _ZIP_ERRORS:   # OSError, or a zip that changed since it was read
         log.warning("couldn't keep a copy of the sound pack %s", src.name, exc_info=True)
         return ""
     pkg.pack_id = pid
     return pid
+
+
+def kept_free_pack(free_id: str) -> Path | None:
+    """The kept copy of the free pack `free_id` (soundboard.packs), if it's kept."""
+    for j in packs_dir().glob("*.json") if packs_dir().is_dir() else []:
+        try:
+            free = json.loads(j.read_text("utf-8")).get("free")
+        except (OSError, ValueError, AttributeError):
+            continue
+        if free == free_id and j.with_suffix(".zip").is_file():
+            return j.with_suffix(".zip")
+    return None
+
+
+def drop_duplicate_packs() -> int:
+    """Free packs used to be stored twice: the download (packs/<id>.zip) and the copy
+    keep_pack made of it (packs/<content id>.zip). Delete a download whose pack is kept,
+    and remember which free pack the kept copy is. Returns how many went. Run off the UI
+    thread."""
+    d, gone = packs_dir(), 0
+    for z in sorted(d.glob("*.zip")) if d.is_dir() else []:
+        if not _is_free_download(z):
+            continue
+        try:
+            pid = _pack_id(z)
+            if not (d / f"{pid}.zip").is_file():
+                continue   # downloaded, never imported: Add again reuses it
+            info = d / f"{pid}.json"
+            try:
+                meta = json.loads(info.read_text("utf-8"))
+            except (OSError, ValueError):
+                meta = {}
+            meta = meta if isinstance(meta, dict) else {}
+            meta.setdefault("name", z.stem[:60])
+            meta["free"] = z.stem
+            info.write_text(json.dumps(meta), "utf-8")
+            z.unlink()
+            gone += 1
+        except _ZIP_ERRORS:
+            log.warning("couldn't check the sound pack %s for a duplicate", z.name,
+                        exc_info=True)
+    if gone:
+        log.info("removed %d duplicate free pack download(s)", gone)
+    return gone
 
 
 def packs() -> dict[str, str]:

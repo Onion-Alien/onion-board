@@ -823,6 +823,77 @@ def test_stream_runs_on_the_clean_mic(ring_file):
         s.close()
 
 
+def test_a_mic_callback_that_fails_once_doesnt_stop_the_feed(ring_file):
+    """One exception from the mic callback ended the feed's thread for good, silently:
+    that block is lost, and the next ones still go to the callback and out."""
+    got, made = [], []
+
+    def mic_cb(x, rate):
+        got.append(len(x))
+        if len(got) == 1:
+            raise RuntimeError("boom")
+
+    def cb(out, frames, t, status):
+        out.fill(0.5)
+        made.append(frames)
+
+    s = dm.DirectMicStream(cb, ring_file, mic_callback=mic_cb)
+    w = dm.RingWriter(ring_file)
+    try:
+        s.active = True   # no thread: pump by hand
+        x = np.zeros((480, 2), np.float32)
+        _publish(w, x)
+        s.pump()          # (finds where the mic is)
+        for _ in range(3):
+            _publish(w, x)
+            assert s.pump()
+        assert got == [480] * 3 and sum(made) == 3 * 480
+    finally:
+        w.close()
+        s.close()
+
+
+def test_the_feeds_thread_goes_on_after_an_exception(ring_file, monkeypatch):
+    s = dm.DirectMicStream(lambda out, *a: out.fill(0), ring_file)
+    calls = []
+
+    def pump():
+        calls.append(1)
+        if len(calls) == 1:
+            raise RuntimeError("boom")
+        if len(calls) == 3:
+            s._stop.set()
+        return True
+
+    monkeypatch.setattr(s, "pump", pump)
+    monkeypatch.setattr(dm.time, "sleep", lambda t: None)
+    try:
+        s._run()   # the thread's loop, here: it used to end at the first exception
+        assert len(calls) == 3
+    finally:
+        s.close()
+
+
+def test_the_engines_clean_mic_failing_is_counted_not_fatal():
+    """Engine._mic_direct is guarded like the device mic's callback: the failure shows
+    in cb_errors and errors (so the window can say so), and the next block goes in."""
+    from soundboard.engine import Engine
+    e = Engine()
+    seen = []
+
+    def mic(x, direct=False):
+        seen.append(direct)
+        if len(seen) == 1:
+            raise RuntimeError("boom")
+
+    e._mic = mic
+    block = np.zeros((480, 2), np.float32)
+    e._mic_direct(block, e.rates["mic"])   # raised out of the feed's thread before
+    e._mic_direct(block, e.rates["mic"])
+    assert seen == [True, True]
+    assert e.cb_errors["mic"] == 1 and "boom" in e.errors["mic"]
+
+
 def test_stream_knows_how_long_the_mic_sent_only_silence(ring_file, monkeypatch):
     """A mic stuck sending exact zeros (after an audio restart Windows thinks went fine)
     is seen for free in the clean mic the effect already hands over: how long it's been
@@ -883,6 +954,66 @@ def test_direct_fifo_keeps_a_late_wake_up_whole():
     f.write(x)
     got = np.concatenate([f.read(480) for _ in range(10)])
     assert np.array_equal(got, x) and f.count == 0
+
+
+def test_mic_rate_goes_back_to_the_devices_when_the_clean_mic_stops(ring_file):
+    """The clean mic from the mic effect switched the board's mic to the effect's rate,
+    and nothing switched it back: once it stopped, the mic device's 44.1 kHz blocks were
+    taken as 48 kHz (mic check, voice effects and recordings at the wrong pitch)."""
+    from soundboard.engine import Engine
+    e = Engine()
+    e.rates["main"] = e.rates["mon"] = e.rates["obs"] = 48000
+    e._mic_dev_rate = e.rates["mic"] = 44100   # the mic device's rate
+    e._reconfigure_mic_resamplers()
+    s = dm.DirectMicStream(lambda out, *a: out.fill(0), ring_file,
+                           mic_callback=e._mic_direct, mic_stopped=e._mic_direct_stopped)
+    w = dm.RingWriter(ring_file)
+    try:
+        s.active = True
+        block = np.zeros((480, 2), np.float32)
+        _publish(w, block)
+        s.pump()          # (finds where the mic is)
+        _publish(w, block)
+        s.pump()
+        assert s.mic_live and e.rates["mic"] == 48000 and e._rs_main.src == 48000
+        w.h[0]["mic_tick"] = dm._tick() - 10 * dm.MIC_LIVE_MS   # the clean mic stops
+        s.pump()
+        assert not s.mic_live
+        assert e.rates["mic"] == 44100
+        assert all((r.src, r.dst) == (44100, 48000) for r in (e._rs_main, e._rs_mon, e._rs_obs))
+        _publish(w, block)   # live again, then the stream closes while it is
+        s.pump()
+        _publish(w, block)
+        s.pump()
+        assert e.rates["mic"] == 48000
+    finally:
+        w.close()
+        s.close()
+    assert e.rates["mic"] == 44100 and e._rs_main.src == 44100
+
+
+def test_the_device_mic_is_taken_under_the_feeds_lock(ring_file):
+    """While straight-into-the-mic is on, the mic device's block runs under the feed's
+    lock: its thread can go live on the clean mic (and switch the mic's rate) meanwhile,
+    and _mic ran on both threads at once at that flip."""
+    from soundboard.engine import Engine
+    e = Engine()
+    s = dm.DirectMicStream(lambda out, *a: out.fill(0), ring_file)
+    e.main_direct, e.main_stream = True, s
+    held = []
+    e._mic = lambda x, direct=False: held.append(s.lock.locked())
+    try:
+        e._cb_mic(np.zeros((480, 1), np.float32), 480, None, None)
+        assert held == [True]
+        s.lock.acquire()   # the feed's thread is at it and goes live meanwhile
+        s.mic_live = True
+        threading.Timer(0.005, s.lock.release).start()
+        e._cb_mic(np.zeros((480, 1), np.float32), 480, None, None)
+        assert held == [True]   # the clean mic carries that block now
+    finally:
+        e.main_stream = None
+        s.mic_live = False
+        s.close()
 
 
 def test_late_pump_sends_all_the_voice(ring_file):
@@ -2340,7 +2471,7 @@ def test_why_a_set_up_failed_is_counted_as_its_word(window, monkeypatch, auto, c
     monkeypatch.setattr(dm, "bundled_dll", lambda: Path(dm.__file__))   # (any file)
     monkeypatch.setattr(dm, "_elevated", lambda *a, **k: code)
     w._autofixing = auto
-    w._attach_mic_work("My mic", auto=auto)   # the worker, here: its signal arrives at once
+    w._mic_attached(*w._attach_mic_work("My mic", auto=auto))   # the worker and its answer, here
     words = {k for k in usage._used if k.startswith("mic-effect-") and "failed-" in k}
     assert words == ({counted} if counted else set())
     assert not w._mic_fail_kind   # used once
@@ -2515,8 +2646,8 @@ class _NoThread:
     started = 0
     run = False
 
-    def __init__(self, target=None, args=(), **_kw):
-        self.target, self.args = target, args
+    def __init__(self, target=None, args=(), kwargs=None, **_kw):
+        self.target, self.args, self.kwargs = target, args, kwargs or {}
 
     @classmethod
     def setups(cls) -> list:
@@ -2526,16 +2657,17 @@ class _NoThread:
     def start(self):
         cls = type(self)
         cls.started += 1
-        if getattr(self.target, "__name__", "") == "_attach_mic_work":
-            cls._setups = [*cls.setups(), self.args]
+        fn = self.args[0] if self.args else None   # (worker.call's)
+        if getattr(fn, "__name__", "") == "_attach_mic_work":
+            cls._setups = [*cls.setups(), self.kwargs["args"]]
         if cls.run:
-            self.target(*self.args)
+            self.target(*self.args, **self.kwargs)
 
 
 def _no_threads(monkeypatch, run=False):
-    from soundboard.ui import mainwindow as mw
+    from soundboard.ui import worker
     t = type("T", (_NoThread,), {"started": 0, "run": run})
-    own_module(monkeypatch, mw, "threading", Thread=t)
+    own_module(monkeypatch, worker, "threading", Thread=t)
     return t
 
 
@@ -2735,6 +2867,40 @@ def test_removing_the_cable(window, monkeypatch):  # noqa: F811
     assert "Restart" in said[-1][0]
     w._update_flow()
     assert w.btn_rmcable.isHidden() and w.rmcable_note.isHidden()
+
+
+def test_a_worker_that_raises_still_clears_the_busy_state(window, monkeypatch):  # noqa: F811
+    """VB-Audio's uninstaller, the cable's set-up lookup or the mic set-up raising on
+    their thread: the answer still comes back as a failure, so the button and the
+    "already asking" flags go back instead of staying busy until a restart."""
+    from soundboard import cableremove
+    from soundboard.ui import busy
+    from soundboard.ui import mainwindow as mw
+    w = window
+    _working_on_the_mic(w, monkeypatch)
+    said = []
+    monkeypatch.setattr(w, "toast", lambda text, kind="", *a, **k: said.append((text, kind)))
+    monkeypatch.setattr(mw.QMessageBox, "warning", lambda *a, **k: None)
+    _no_threads(monkeypatch, run=True)
+
+    def boom(*_a, **_k):
+        raise OSError("the uninstaller vanished")
+    monkeypatch.setattr(cableremove, "remove", boom)
+    w.remove_cable()
+    assert not busy.is_busy(w.btn_rmcable) and not w._cable_gone
+    assert said[-1][1] == "warn"
+
+    monkeypatch.setattr(cableremove, "setup_exe", boom)
+    w._vb_setup_asking, w._vb_setup = False, None
+    w._ask_cable_setup()
+    assert not w._vb_setup_asking and w._vb_setup is False
+
+    monkeypatch.setattr(dm, "install", boom)
+    w.cfg.mic_device = "My mic"
+    w._attaching = False
+    w.attach_mic()
+    assert not w._attaching and w._attach_release is None
+    assert not busy.is_busy(w.btn_install)
 
 
 def test_a_removed_cable_is_never_sent_to(window, monkeypatch):  # noqa: F811

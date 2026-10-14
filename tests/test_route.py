@@ -126,6 +126,7 @@ def test_the_live_switch_never_says_others_hear_you_while_nothing_is_sent(win):
     win.set_route("off")
     assert said() == ("Only you", "Only you hear sounds")
     win.set_obs_device("Speakers")       # muting still silences the stream output
+    devices_done(win)
     assert said() == ("Live", "Live: stream output only")
     win.btn_air.setChecked(False)
     assert said() == ("Muted", "Muted: others hear nothing")
@@ -266,6 +267,7 @@ def test_also_send_row_can_be_the_clean_stream_mix(win, monkeypatch, devices):  
     kind = rows.kinds[0]
     kind.setCurrentIndex(kind.findData("stream"))
     kind.activated.emit(kind.currentIndex())
+    devices_done(win)                    # (opened on the device thread)
     assert win.cfg.obs_device == "Speakers" and win.cfg.also_send == []
     assert opened[-1] == "Speakers"
     assert [k.currentData() for k in rows.kinds] == ["stream"]
@@ -274,6 +276,7 @@ def test_also_send_row_can_be_the_clean_stream_mix(win, monkeypatch, devices):  
     assert win.cfg.obs_voice is False
     assert rows.add.isHidden()           # nothing left to add
     win.set_send_kind("Speakers", False)  # back to a copy of the call
+    devices_done(win)
     assert win.cfg.obs_device is None and win.cfg.also_send == ["Speakers"]
     assert opened[-1] is None and rows.stream_vol is None
     win.set_also_send_at(0, None)

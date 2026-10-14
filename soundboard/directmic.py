@@ -451,9 +451,13 @@ class DirectMicStream:
     samplerate = RATE
 
     def __init__(self, callback, path: Path | None = None, mic_callback=None,
-                 mode: int = MODE_REPLACE, lead_s: float = LEAD_S, voice_delay=None):
+                 mode: int = MODE_REPLACE, lead_s: float = LEAD_S, voice_delay=None,
+                 mic_stopped=None):
         self._callback = callback
         self._mic_callback = mic_callback
+        # () called (under `lock`) when the clean mic stops coming, or the stream closes
+        # while it came: the board's mic is back on its own device and rate
+        self._mic_stopped = mic_stopped
         # () -> frames (at RATE) the voice in what was just rendered is behind the mic
         # handed over (see Engine._direct_voice_delay); None = none
         self._voice_delay = voice_delay
@@ -472,6 +476,7 @@ class DirectMicStream:
         self._stop = threading.Event()
         self._thread: threading.Thread | None = None
         self._lock = threading.Lock()
+        self.lock = self._lock   # held while a block is taken: see Engine._cb_mic
         self.active = False
         self.mic_live = False       # the board is running on the effect's clean mic
         self.mic_rate = 0
@@ -490,6 +495,8 @@ class DirectMicStream:
         self._due_at: float | None = None
         # since when (perf_counter) the clean mic has been nothing but exact zeros
         self._zeros_since: float | None = None
+        # what has failed on the feed's thread and been logged: once each, not every block
+        self._logged: set[str] = set()
 
     def start(self):
         self._ring.set_enabled(True)
@@ -508,7 +515,17 @@ class DirectMicStream:
     def close(self):
         self.stop()
         with self._lock:
+            if self.mic_live:
+                self.mic_live = False
+                self._stopped()
             self._ring.close()
+
+    def _stopped(self):
+        if self._mic_stopped is not None:
+            try:
+                self._mic_stopped()
+            except Exception:  # noqa: BLE001 - the feed goes on regardless
+                log.exception("mic stopped callback")
 
     def set_mode(self, mode: int):
         self.mode = mode
@@ -624,7 +641,12 @@ class DirectMicStream:
             self._fed_at, self._fed_period = time.perf_counter(), min(gap / rate, BLOCK_S)
             self._fed_here = threading.current_thread() is self._thread
             if self._mic_callback is not None:
-                self._mic_callback(x, rate)
+                # guarded per block: one bad block must not end the feed (the engine's
+                # own guard counts it in cb_errors; this is for any other callback)
+                try:
+                    self._mic_callback(x, rate)
+                except Exception:  # noqa: BLE001 - that block of the mic is lost, no more
+                    self._log_once("mic callback")
             self._acc += gap * RATE / rate
             k = int(self._acc)
             self._acc -= k
@@ -637,6 +659,7 @@ class DirectMicStream:
             self._zeros_since = None
             self._fed_at = None
             ring.clear_sync()
+            self._stopped()
             self._start, self._made = time.perf_counter(), 0
         due = int((time.perf_counter() - self._start) * RATE)
         if due - self._made > RATE // 5:   # stalled (sleep, a hang): don't catch up
@@ -671,13 +694,22 @@ class DirectMicStream:
             return POLL_S
         return min(max(nxt - now, POLL_S if self.mic_live else 0.0005), BLOCK_S + POLL_S)
 
+    def _log_once(self, what: str):
+        if what not in self._logged:
+            self._logged.add(what)
+            log.exception("mic effect feed: %s failed", what)
+
     def _run(self):
-        try:
-            while not self._stop.is_set():
+        # the try is inside the loop: one exception skips that block, and the feed goes
+        # on (outside it, one stopped the thread for good, and nothing reported it)
+        while not self._stop.is_set():
+            try:
                 self.pump()
-                time.sleep(self._wait())
-        except Exception:  # noqa: BLE001 - the engine's watchdog reopens a stalled stream
-            log.exception("mic effect feed stopped")
+                wait = self._wait()
+            except Exception:  # noqa: BLE001 - logged once; the next block is tried as usual
+                self._log_once("pump")
+                wait = POLL_S
+            time.sleep(wait)
 
 
 def _pid_alive(pid: int) -> bool:

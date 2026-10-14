@@ -76,8 +76,7 @@ screen. If something truly can't be built from the kit, add the new part to
 `theme.py` **and to this section** in the same PR, so the next screen reuses it.
 
 Older code still has off-scale sizes (7pt, 9pt, 9.5pt, 10.5pt, 12pt, 15pt, 19pt and
-22-36 px icon buttons in between). They are debt tracked as U16 in
-[UI-AUDIT.md](UI-AUDIT.md): never copy a size from old code, copy it from here.
+22-36 px icon buttons in between). They are debt: never copy a size from old code, copy it from here.
 
 ### Text sizes
 
@@ -260,7 +259,7 @@ implementation. This file is the app's single design contract. The web examples
 linked below explain behaviour; they are not dependencies to embed. Our compact
 geometry, themes, bottom-right dialog actions and existing wording take precedence where
 Fluent examples differ. New UI must follow these decisions; older UI is migrated
-through [UI-AUDIT.md](UI-AUDIT.md) in small changes.
+in small changes.
 
 ### Choose the control by the user's task
 
@@ -668,13 +667,13 @@ The rules above are Onion Board's take on what the big design systems agree on n
 
 ## 13. Known gaps
 
-Open UI work, old screens that still break these rules included, is tracked only in
-[UI-AUDIT.md](UI-AUDIT.md). Fix a gap when a task touches it; don't sweep them all in one go.
+Some old screens still break these rules. Fix a gap when a task touches it; don't sweep
+them all in one go.
 
 ## 14. UI workflow for agents and reviewers
 
-1. **Read and inspect.** Follow `AGENT-RULES.md` for latest main, open PRs and an
-   isolated checkout. Read this file and the relevant audit item. Inspect the
+1. **Read and inspect.** Start from the latest main in a clean checkout. Read this
+   file. Inspect the
    existing widget and reuse its helpers before inventing another pattern.
 2. **State the contract.** In the task notes or PR, write: user task; control chosen
    from section 0; inline/menu/popup/dialog; live or draft changes; action order;
@@ -690,15 +689,14 @@ Open UI work, old screens that still break these rules included, is tracked only
    Inspect the complete page and each
    menu, expanded card and dialog affected, including empty/populated and disabled/
    busy states where relevant. Use Dark/Light, narrow/normal sizes, and German when
-   labels change; follow `AGENT-RULES.md` for full layout acceptance. Check focus,
+   labels change. Check focus,
    keyboard choice, Escape, save/cancel semantics and long labels. Inspect High
    Contrast/Retro 98 when colours or custom painting change.
 5. **Validate and deliver.** Translate user-visible changes in every catalog, run
    `scripts\precommit.ps1` on the changed scope, and show the reviewed pictures.
    Add behavioural regression checks for reported defects, not tests that merely
    repeat styling code. Follow the normal PR/CI/local UTC merge loop.
-6. **Keep the contract current.** Mark only verified audit items complete with the
-   PR and validation. Update this file when adding an approved reusable pattern;
+6. **Keep the contract current.** Update this file when adding an approved reusable pattern;
    do not leave contradictory instructions in another document.
 
 PR evidence can be one short paragraph: `Control/surface: ...; changes: live/draft;

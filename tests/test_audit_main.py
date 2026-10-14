@@ -8,10 +8,11 @@ import shiboken6
 from PySide6.QtCore import QEvent, QSize
 from PySide6.QtWidgets import QDialog, QVBoxLayout, QWidget
 
-from conftest import said
+from conftest import own_module, said
 from soundboard import appaudio, applog, autostart, library, net
 from soundboard.ui import chatguide, crashdialog, responsive
 from soundboard.ui import mainwindow as main
+from soundboard.ui import worker
 from test_trim_updates_autostart import FakeReg
 
 import test_mainwindow
@@ -163,9 +164,10 @@ def test_a_newer_preview_stops_the_render_still_going(window, monkeypatch):
     monkeypatch.setattr(main, "load_original", lambda m: np.zeros((10, 2), np.int16))
     window.audio["s0"] = np.zeros((10, 2), np.int16)
     threads = []
-    monkeypatch.setattr(main.threading, "Thread",
-                        lambda target, **k: threads.append(target) or type(
-                            "T", (), {"start": lambda self: None})())
+    own_module(monkeypatch, worker, "threading",
+               Thread=lambda target, args=(), kwargs=None, **k: threads.append(
+                   lambda: target(*args, **(kwargs or {}))) or type(
+                   "T", (), {"start": lambda self: None})())
     window.preview("s0", fx={"pitch": 5})
     threads[-1]()                         # runs the render here: no error, nothing played
     assert seen == [False, True]
@@ -195,7 +197,7 @@ def test_closing_the_edit_dialog_stops_the_preview(window, monkeypatch, qapp, ok
 
 
 def test_edit_sound_sits_beside_the_board_one_per_sound(window, qapp):
-    """Edit sound doesn't hold up the board any more (U4), but it's still a draft:
+    """Edit sound doesn't hold up the board any more, but it's still a draft:
     Save puts it on, Cancel drops it. Editing the same sound raises its window."""
     m = window.meta("s0")
     d = window.edit("s0")

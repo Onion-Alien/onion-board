@@ -864,13 +864,17 @@ def test_a_slider_step_rebuilds_the_chain_once_and_redraws_the_tab_only_on_a_fli
     real = voicefx.VoiceChain._rebuild
     monkeypatch.setattr(voicefx.VoiceChain, "_rebuild",
                         lambda self, rate: (rebuilds.append(rate), real(self, rate)))
+    gen = p.chain._gen
     s = p.fx.rows["robot"].sliders[0].slider
     for v in range(s.minimum(), s.minimum() + 10):
         s.setValue(v)
-    assert len(rebuilds) == 10 and sent == [True]   # was 2 rebuilds + a send a step
+    # one new spec a step (was 2 rebuilds + a send a step); the mic's next block builds it
+    assert p.chain._gen - gen == 10 and sent == [True] and not rebuilds
+    p.chain.process(np.zeros((480, 2), np.float32), 48000)
+    assert rebuilds == [48000]
     p.chain.errors["robot"] = "boom"                # a bypassed effect: another go
     s.setValue(s.value() + 1)
-    assert not p.chain.errors and len(rebuilds) == 11
+    assert not p.chain.errors and p.chain._gen - gen == 11
     p.fx.btn_power.setChecked(False)
     assert sent == [True, False]
 
@@ -1417,7 +1421,7 @@ def test_first_visit_exposes_voice_presets(panel):
 
 
 def test_config_entries_sit_with_their_cards_main_controls(panel):
-    """U3: Make it yours (the big editor) is in the picked voice's bar, pinned in
+    """Make it yours (the big editor) is in the picked voice's bar, pinned in
     sight under the voices (not under 24 of them, off the bottom); Speak another
     language's More options comes before the past-lines box; both More options use
     the one fold look and show/hide their fields."""

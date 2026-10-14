@@ -441,10 +441,14 @@ def relay_get(feature: str, url: str) -> bytes:
 def test_the_relay_refuses_a_switched_off_features_login(mode, site, socks, monkeypatch):
     net.configure(mode, socks.url())
     net.configure_features(["radio"])
-    # in Direct mode the relay connects straight: let it reach the test site by name
-    real = socket.create_connection
+    # in Direct mode the relay looks the name up and connects straight to the address
+    # it checked: a public one for the name, which reaches the test site
+    real_gai, real = socket.getaddrinfo, socket.create_connection
+    monkeypatch.setattr(socket, "getaddrinfo", lambda h, *a, **k: real_gai(
+        "93.184.216.34" if h == "site.test" else h, *a, **k))
     monkeypatch.setattr(socket, "create_connection", lambda addr, *a, **k: real(
-        ("127.0.0.1", addr[1]) if addr[0] == "site.test" else addr, *a, **k))
+        ("127.0.0.1", addr[1]) if addr[0] in ("site.test", "93.184.216.34") else addr,
+        *a, **k))
     off = relay_get("radio", f"http://site.test:{site.port}/radio")
     assert off.startswith(b"HTTP/1.1 403") and b"Radio is switched off" in off
     assert site.paths == [] and socks.asked == []
@@ -559,3 +563,57 @@ def test_a_closed_port_is_never_handed_to_a_later_server():
     finally:
         for s in servers:
             s.close()
+
+
+# ------------------------------------------------------------- capped downloads
+
+class _Reply:
+    def __init__(self, body: bytes, length=None):
+        import io
+        self._f = io.BytesIO(body)
+        self.headers = {} if length is None else {"Content-Length": length}
+
+    def read(self, n):
+        return self._f.read(n)
+
+
+def test_read_capped_copies_hashes_and_reports_progress():
+    import hashlib
+    import io
+    out, seen = io.BytesIO(), []
+    got = net.read_capped(_Reply(b"abc" * 10, "30"), out, 30, chunk=7,
+                          progress=lambda d, t: seen.append((d, t)))
+    assert out.getvalue() == b"abc" * 10
+    assert got == hashlib.sha256(b"abc" * 10).hexdigest()
+    assert seen[-1] == (30, 30)
+
+
+@pytest.mark.parametrize("length", [None, "nonsense", "5"])
+def test_read_capped_stops_once_the_bytes_pass_the_cap(length):
+    import io
+    out = io.BytesIO()
+    with pytest.raises(net.TooBig) as e:
+        net.read_capped(_Reply(b"x" * 100, length), out, 30, chunk=8)
+    assert e.value.listed == 0 and len(out.getvalue()) <= 30
+
+
+def test_read_capped_refuses_a_listed_size_over_the_cap_before_reading():
+    import io
+    reply = _Reply(b"x" * 100, "100")
+    with pytest.raises(net.TooBig) as e:
+        net.read_capped(reply, io.BytesIO(), 30)
+    assert e.value.listed == 100 and reply.read(1) == b"x"
+
+
+def test_read_capped_check_can_stop_it():
+    import io
+
+    class Stop(Exception):
+        pass
+
+    def check():
+        raise Stop
+    out = io.BytesIO()
+    with pytest.raises(Stop):
+        net.read_capped(_Reply(b"x" * 10), out, 30, check=check)
+    assert out.getvalue() == b""
