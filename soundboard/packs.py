@@ -24,7 +24,7 @@ from collections.abc import Callable
 from dataclasses import dataclass, field
 from pathlib import Path
 
-from soundboard import library, net, netlog, updates
+from soundboard import backup, library, net, netlog, updates
 
 log = logging.getLogger(__name__)
 
@@ -61,11 +61,13 @@ class Pack:
 
     @property
     def path(self) -> Path:
+        """Where it's downloaded to. Importing it moves it in as the kept pack
+        (backup.keep_pack), so it's never stored twice."""
         return library.APP_DIR / "packs" / f"{self.id}.zip"
 
     def downloaded(self) -> bool:
         """Fetched (and checked) before: adding it again just skips what's there."""
-        return self.path.is_file()
+        return self.path.is_file() or backup.kept_free_pack(self.id) is not None
 
 
 # the packs known when this version was built: shown when the list can't be read
@@ -192,6 +194,9 @@ def download(pack: Pack, progress: Callable[[int, int], object] | None = None,
     """Fetch `pack` into the app folder's "packs", checked against its SHA-256; its
     path. Raises updates.UpdateError with a message for the user. Call off the UI
     thread."""
+    kept = backup.kept_free_pack(pack.id)
+    if kept is not None and updates._sha256(kept) == pack.sha256:
+        return kept   # added before and still kept: the same file, not fetched again
     netlog.cause(FEATURE, f"You pressed Add on the {netlog.quoted(pack.name)} pack")
     return updates.fetch(pack.url, pack.sha256, pack.path, (updates.DOWNLOADS,), MAX_SIZE,
                          "pack", pack.size, progress, cancelled, feature=FEATURE)

@@ -229,9 +229,7 @@ class Store:
                              "effects": i.data.get("effects", {})} for i in self.deleted]}
         try:
             path().parent.mkdir(parents=True, exist_ok=True)
-            tmp = path().with_suffix(".tmp")
-            tmp.write_text(json.dumps(data, indent=1), encoding="utf-8")
-            tmp.replace(path())
+            library.atomic_write_text(path(), json.dumps(data, indent=1))
             return True
         except OSError:
             log.exception("couldn't save %s", path())

@@ -44,7 +44,7 @@ def test_pitch_zero_is_a_passthrough():
 
 
 @pytest.mark.parametrize("etype", ["pitch", "distortion", "robot", "echo", "reverb", "radio",
-                                   "tone", "chorus"])
+                                   "tone", "chorus", "ringmod", "flanger", "wobble", "harmony"])
 def test_block_size_never_changes_the_sound(etype):
     """The mic delivers whatever block size the driver likes; state must carry over."""
     vals = {**defaults(etype), "noise": 0.0, "semitones": 5, "bass": 3, "presence": -2}
@@ -631,7 +631,10 @@ BLEND = {"semitones": -5, "mix": 0.5, "gap": 0, "size": 4, "under": 1}
     ("distortion", "drive", {}), ("polish", "warmth", {}), ("polish", "ceiling", {}),
     ("polish", "deess", {}),
     ("shout", "drive", {"threshold": -40}), ("helmet", "size", {}), ("chorus", "depth", {}),
-    ("echo", "delay", {}), ("echo", "tone", {})])
+    ("echo", "delay", {}), ("echo", "tone", {}), ("reverb", "predelay", {}),
+    ("reverb", "size", {}), ("ringmod", "freq", {}), ("ringmod", "mix", {}),
+    ("flanger", "depth", {}), ("flanger", "feedback", {}), ("wobble", "vibrato", {}),
+    ("wobble", "tremolo", {}), ("harmony", "level", {})])
 def test_dragging_a_slider_while_you_talk_doesnt_click(etype, key, base):
     """Each of these stepped a gain, jumped a delay or restarted a stage from silence
     at every block while its slider moved: a crackle for everyone listening."""
@@ -836,3 +839,115 @@ def test_chanting_monk_holds_a_note():
     y = np.concatenate([chain.process(np.repeat(x[i:i + 480, None], 2, 1), RATE)[:, 0]
                         for i in range(0, len(x), 480)])
     assert np.all(np.isfinite(y)) and np.max(np.abs(y)) < 1.5
+
+
+# ---------------------------------------------------------------- phase 2: the room
+
+def _impulse_response(**cfg):
+    e = REGISTRY["reverb"](RATE, {"tone": 5000, "mix": 1.0, **cfg})
+    x = np.zeros(RATE, np.float32)
+    x[0] = 1.0
+    return run_blocks(e, x, 480)
+
+
+def test_reverb_predelay_holds_the_room_back():
+    """With 60 ms of pre-delay nothing but the dry voice comes out for 60 ms."""
+    ir = _impulse_response(predelay=60, size=0.5)
+    dry_share = 1 - 0.6 * 1.0
+    gap = int(RATE * 0.06)
+    assert abs(ir[0] - dry_share) < 1e-3
+    assert np.max(np.abs(ir[1:gap - 48])) < 1e-4
+    assert np.max(np.abs(ir[gap:gap + RATE // 20])) > 0.05
+
+
+def test_reverb_has_early_reflections_before_the_tail():
+    """The first bounces land within 60 ms, well before the tail has built up."""
+    ir = _impulse_response(predelay=0, size=0.5)
+    early = ir[int(RATE * 0.004):int(RATE * 0.062)]
+    assert np.max(np.abs(early)) > 0.1
+    slots = np.abs(early[:len(early) // 48 * 48]).reshape(-1, 48).max(1)
+    assert np.mean(slots > 1e-3) > 0.5
+
+
+def test_reverb_old_settings_keep_their_tail():
+    """Size, Brightness and Mix mean what they did: the decay at Size 0.5 is still
+    about a second, and highs die faster than lows."""
+    from soundboard.dsp import butter, sosfilt
+    ir = _impulse_response(predelay=0, size=0.5)
+
+    def t60(lo, hi):
+        y = sosfilt(butter(4, [lo, hi], btype="band", fs=RATE), ir[:RATE])
+        e = np.cumsum(y[::-1] ** 2)[::-1]
+        db = 10 * np.log10(e / e[0] + 1e-12)
+        t = np.arange(len(db)) / RATE
+        m = (db < -5) & (db > -25)
+        k, _ = np.polyfit(t[m], db[m], 1)
+        return -60 / k
+    assert 0.8 < t60(500, 2000) < 1.6
+    assert t60(2000, 8000) < t60(500, 2000)
+
+
+# ---------------------------------------------------------------- phase 3: new blocks
+
+def _peak_hz(y, lo, hi):
+    y = y[RATE // 4:]
+    sp = np.abs(np.fft.rfft(y * np.hanning(len(y))))
+    f = np.fft.rfftfreq(len(y), 1 / RATE)
+    m = (f > lo) & (f < hi)
+    return f[m][np.argmax(sp[m])]
+
+
+def test_ring_modulator_splits_a_tone_into_sidebands():
+    """A 1 kHz tone through a 100 Hz ring modulator comes out at 900 and 1100 Hz,
+    and nothing at 1 kHz: the voice's own pitch is gone."""
+    y = run_blocks(REGISTRY["ringmod"](RATE, {"freq": 100, "mix": 1}), sine(1000, 1.0), 480)
+    seg = y[RATE // 4:]
+    sp = np.abs(np.fft.rfft(seg * np.hanning(len(seg))))
+    f = np.fft.rfftfreq(len(seg), 1 / RATE)
+    at = lambda hz: sp[np.abs(f - hz) < 4].max()   # noqa: E731
+    assert at(900) > 100 * at(1000) and at(1100) > 100 * at(1000)
+
+
+def test_harmony_adds_voices_at_the_intervals():
+    y = run_blocks(REGISTRY["harmony"](RATE, {"first": 4, "second": 7, "level": 1}),
+                   sine(200, 2.0), 480)
+    for st in (4, 7):
+        want = 200 * 2 ** (st / 12)
+        assert abs(_peak_hz(y, want * 0.95, want * 1.05) - want) < want * 0.03
+    assert abs(_peak_hz(y, 150, 250) - 200) < 5          # your own voice is still there
+
+
+def test_wobble_vibrato_moves_the_pitch_and_tremolo_the_volume():
+    x = sine(1000, 2.0)
+    vib = run_blocks(REGISTRY["wobble"](RATE, {"rate": 2, "vibrato": 8, "tremolo": 0}), x, 480)
+    # 8 ms of sway at 2 Hz: the pitch swings about +-5 % (measured in 50 ms slices)
+    hz = [_peak_hz(np.concatenate([np.zeros(RATE // 4, np.float32), vib[i:i + 2400]]), 900, 1100)
+          for i in range(RATE // 2, len(vib) - 2400, 2400)]
+    assert max(hz) - min(hz) > 40
+    trem = run_blocks(REGISTRY["wobble"](RATE, {"rate": 2, "vibrato": 0, "tremolo": 1}), x, 480)
+    env = np.abs(trem[RATE // 2:]).reshape(-1, 480).max(1)
+    assert env.min() < 0.05 and env.max() > 0.25
+
+
+def test_flanger_feedback_is_stable_and_sweeps():
+    x = sine(300, 2.0) + sine(2300, 2.0, amp=0.1)
+    y = run_blocks(REGISTRY["flanger"](RATE, {"rate": 1, "depth": 5, "feedback": 0.9, "mix": 1}),
+                   x.astype(np.float32), 480)
+    assert np.all(np.isfinite(y)) and np.max(np.abs(y)) < 4
+    # the comb notches move: the 2.3 kHz partial's level changes through the sweep
+    lvl = [np.abs(np.fft.rfft(y[i:i + 2400] * np.hanning(2400)))[int(2300 * 2400 / RATE)]
+           for i in range(RATE // 2, len(y) - 2400, 1200)]
+    assert max(lvl) > 3 * min(lvl)
+
+
+@pytest.mark.parametrize("name", ["Dalek", "Whisper", "Child", "Underwater", "Drunk",
+                                  "Old film", "Choir"])
+def test_new_voices_keep_speech_about_as_loud(name):
+    x = _vowel(secs=1.0)
+    chain = VoiceChain()
+    chain.configure(spec_for(**voicefx.PRESETS[name]))
+    y = np.concatenate([chain.process(np.repeat(x[i:i + 480, None], 2, 1), SR)[:, 0]
+                        for i in range(0, len(x) - 479, 480)])
+    assert np.all(np.isfinite(y))
+    loss = np.sqrt(np.mean(y[SR // 2:] ** 2)) / np.sqrt(np.mean(x[SR // 2:len(y)] ** 2))
+    assert 0.25 < loss < 4.0, loss

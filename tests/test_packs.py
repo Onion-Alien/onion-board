@@ -10,7 +10,7 @@ import zipfile
 
 import pytest
 
-from soundboard import net, packs, updates
+from soundboard import backup, net, packs, updates
 from soundboard.ui import packsdialog
 from conftest import process_events
 from test_mainwindow import window as main_window  # noqa: F401 - the real window, offscreen
@@ -205,6 +205,51 @@ def test_a_downloaded_pack_lands_on_the_board(window, qapp, served):
     added = window.cfg.sounds[before:]
     assert [m.name for m in added] == ["Door", "Dragon"]
     assert all("Horror" in m.tags for m in added) and "Horror" in window.cfg.categories
+    # kept once: the download became the kept pack, not a second copy beside it
+    assert [z.name for z in backup.packs_dir().glob("*.zip")] == [f"{added[0].pack}.zip"]
+
+
+def _install(p: packs.Pack) -> str:
+    """Add a downloaded pack the way the window's import does: keep it, then install."""
+    pkg = backup.read(packs.download(p))
+    pid = backup.keep_pack(pkg)
+    res = backup.install(pkg, set())
+    assert [m.name for m in res.sounds] == ["Door", "Dragon"] and not res.failed
+    return pid
+
+
+def test_a_free_pack_is_stored_once_and_removing_it_leaves_none(served):
+    data = make_pack()
+    p, = packs.parse([entry(data)])
+    served.files[p.url] = data
+    pid = _install(p)
+    assert pid and [z.name for z in backup.packs_dir().glob("*.zip")] == [f"{pid}.zip"]
+    assert backup.packs() == {pid: "horror"}
+    # Add again: the kept pack is reused, not downloaded or stored again
+    assert p.downloaded()
+    served.calls.clear()
+    assert _install(p) == pid and served.calls == []
+    assert [z.name for z in backup.packs_dir().glob("*.zip")] == [f"{pid}.zip"]
+    backup.forget_pack(pid)
+    assert list(backup.packs_dir().glob("*.zip")) == [] and not p.downloaded()
+
+
+def test_free_packs_an_older_version_stored_twice_are_cleaned_up(served):
+    import shutil
+    data, other = make_pack(), make_pack(("Ghost",))
+    p, q = packs.parse([entry(data), entry(other, id="ghosts")])
+    d = backup.packs_dir()
+    d.mkdir(parents=True)
+    # how an older version left them: the download, and keep_pack's copy of it
+    p.path.write_bytes(data)
+    pid = backup._pack_id(p.path)
+    shutil.copyfile(p.path, d / f"{pid}.zip")
+    (d / f"{pid}.json").write_text(json.dumps({"name": "horror"}), "utf-8")
+    q.path.write_bytes(other)   # downloaded but never added: stays for Add again
+    assert backup.drop_duplicate_packs() == 1
+    assert sorted(z.name for z in d.glob("*.zip")) == sorted([f"{pid}.zip", "ghosts.zip"])
+    assert backup.packs() == {pid: "horror"} and p.downloaded() and q.downloaded()
+    assert backup.drop_duplicate_packs() == 0
 
 
 def test_free_packs_hands_a_download_to_the_windows_import(window, monkeypatch, tmp_path):

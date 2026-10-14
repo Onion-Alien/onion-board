@@ -7,6 +7,7 @@ decoding and resampling it again.
 """
 from __future__ import annotations
 
+import collections
 import contextlib
 import hashlib
 import itertools
@@ -902,11 +903,37 @@ def _write_privacy(text: str):
     except OSError:
         pass
     try:
-        tmp = path.with_suffix(".tmp")
-        tmp.write_text(text, encoding="utf-8")
-        tmp.replace(path)
+        atomic_write_text(path, text)
     except OSError:
         log.warning("couldn't save %s", path, exc_info=True)
+
+
+def _durable_tmp(path: Path, text: str) -> Path:
+    """`text` in a new temp file next to `path`, flushed to the disk (fsync) before it
+    returns: renamed over `path` without that, a power cut could leave `path` empty or
+    full of NULs. The temp file is removed if writing it fails."""
+    fd, name = tempfile.mkstemp(prefix=path.name + ".", suffix=".tmp", dir=path.parent)
+    tmp = Path(name)
+    try:
+        with os.fdopen(fd, "w", encoding="utf-8", newline="\n") as f:
+            f.write(text)
+            f.flush()
+            os.fsync(f.fileno())
+    except BaseException:
+        tmp.unlink(missing_ok=True)
+        raise
+    return tmp
+
+
+def atomic_write_text(path: Path, text: str):
+    """Replace `path` with `text` so a crash or power cut leaves the old file or the new
+    one, never a broken one. Raises OSError."""
+    tmp = _durable_tmp(Path(path), text)
+    try:
+        _replace(tmp, Path(path))
+    except BaseException:
+        tmp.unlink(missing_ok=True)
+        raise
 
 
 def _replace(tmp: Path, path: Path, tries: int = 6):
@@ -948,15 +975,18 @@ def _write(snap: tuple[int, dict, str]) -> bool:
                 damaged = True
             except OSError:
                 pass
-            tmp = CONFIG_PATH.with_suffix(".tmp")
-            tmp.write_text(text, encoding="utf-8")
-            if CONFIG_PATH.exists() and not damaged and _rotate_due():
-                try:
-                    _rotate_backups()
-                    _rotated[CONFIG_PATH] = time.monotonic()
-                except OSError:   # a backup locked for a moment mustn't block the save
-                    log.warning("couldn't rotate the config backups", exc_info=True)
-            _replace(tmp, CONFIG_PATH)
+            tmp = _durable_tmp(CONFIG_PATH, text)
+            try:
+                if CONFIG_PATH.exists() and not damaged and _rotate_due():
+                    try:
+                        _rotate_backups()
+                        _rotated[CONFIG_PATH] = time.monotonic()
+                    except OSError:   # a backup locked for a moment mustn't block the save
+                        log.warning("couldn't rotate the config backups", exc_info=True)
+                _replace(tmp, CONFIG_PATH)
+            except BaseException:
+                tmp.unlink(missing_ok=True)
+                raise
             _written_seq = seq
             return True
         except OSError:
@@ -968,24 +998,37 @@ class Saver:
     """Saves a Config on a background thread, so a slow disk (an antivirus scan of
     the new file took 2-7 s) doesn't freeze the window. save() copies the settings
     right away; the newest copy is the one written, and `done(ok)` is called on the
-    saver's thread after each write."""
+    saver's thread after each write. save(then) keeps `then` until a write covers that
+    copy; finished() hands it back with how that write went."""
 
     def __init__(self, cfg: Config, done=None):
         self.cfg = cfg
         self._done = done
         self._cond = threading.Condition()
         self._pending: tuple | None = None
+        self._pending_n = 0                  # the save() that copy is from
+        self._count = 0                      # save() calls so far
+        self._then: list[tuple[int, Callable[[bool], None]]] = []
+        self._written: collections.deque[tuple[int, bool]] = collections.deque(maxlen=64)
         self._busy = False
         self._thread: threading.Thread | None = None
 
-    def save(self):
+    def save(self, then: Callable[[bool], None] | None = None):
+        with self._cond:
+            self._count += 1
+            n = self._count
+            if then is not None:
+                self._then.append((n, then))
         if self.cfg.read_only:   # logs it; nothing to write
+            ok = self.cfg.save()
+            with self._cond:
+                self._written.append((n, ok))
             if self._done:
-                self._done(self.cfg.save())
+                self._done(ok)
             return
         snap = self.cfg.snapshot()
         with self._cond:
-            self._pending = snap
+            self._pending, self._pending_n = snap, n
             if self._thread is None or not self._thread.is_alive():
                 self._thread = threading.Thread(target=self._run, name="config-save",
                                                 daemon=True)
@@ -1002,7 +1045,7 @@ class Saver:
                     if not self._cond.wait(30) and self._pending is None:
                         self._thread = None
                         return
-                snap, self._pending, self._busy = self._pending, None, True
+                snap, n, self._pending, self._busy = self._pending, self._pending_n, None, True
             try:
                 ok = _write(snap)
             except Exception:  # noqa: BLE001 - a save must never kill the saver
@@ -1010,12 +1053,27 @@ class Saver:
                 ok = False
             with self._cond:
                 self._busy = False
+                self._written.append((n, ok))   # every save() up to n is in this one
                 self._cond.notify_all()
             if self._done:
                 try:
                     self._done(ok)
                 except Exception:  # noqa: BLE001
                     log.exception("after saving settings")
+
+    def finished(self) -> list[tuple[Callable[[bool], None], bool]]:
+        """The save(then)s whose copy (or a newer one) has been written since, each with
+        how that write went (ok). Call it from the thread `then` belongs to."""
+        with self._cond:
+            out, keep = [], []
+            for n, then in self._then:
+                ok = next((w_ok for w_n, w_ok in self._written if w_n >= n), None)
+                if ok is None:
+                    keep.append((n, then))
+                else:
+                    out.append((then, ok))
+            self._then = keep
+            return out
 
     def flush(self, timeout: float = 10.0) -> bool:
         """Wait until everything handed to save() is written. True when it is."""
@@ -1465,7 +1523,9 @@ def _stream(pieces, rate: int, sid: str, store: Path | None, via_ffmpeg: bool) -
     rs = soxr.ResampleStream(rate, SR, 2, dtype="float32", quality="VHQ") if rate != SR else None
     CACHE_DIR.mkdir(parents=True, exist_ok=True)
     dest = cache_path(sid)
-    tmp = {False: dest.with_suffix(".tmp.npy"), True: dest.with_name(f"{sid}.lim.tmp.npy")}
+    tag = uuid.uuid4().hex[:8]   # unique: another thread may be writing this sound's cache
+    tmp = {False: dest.with_name(f"{sid}.{tag}.tmp.npy"),
+           True: dest.with_name(f"{sid}.{tag}.lim.tmp.npy")}
     lim = Limiter(SR, ceiling_db=-0.05)
     st = {"n": 0, "lim_n": 0, "skip": lim.la, "peak": 0.0}
     rms: list[np.ndarray] = []
@@ -1606,9 +1666,12 @@ def store_cached(sid: str, data: np.ndarray, fx_key: str = "") -> np.ndarray:
     try:
         CACHE_DIR.mkdir(parents=True, exist_ok=True)
         dest = cache_path(sid, fx_key)
-        tmp = dest.with_suffix(".tmp.npy")
-        np.save(tmp, i16)
-        tmp.replace(dest)
+        tmp = dest.with_name(f"{dest.stem}.{uuid.uuid4().hex[:8]}.tmp.npy")   # unique per writer
+        try:
+            np.save(tmp, i16)
+            _replace(tmp, dest)   # another writer's replace can hold dest a moment
+        finally:
+            tmp.unlink(missing_ok=True)
         _refused.discard(dest)   # a new file there: in use again, not a leftover
     except OSError:   # e.g. dest is mapped by audio still in use: prune_cache tidies up
         log.warning("couldn't write cache for %s", sid, exc_info=True)

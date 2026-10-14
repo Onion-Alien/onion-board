@@ -1354,7 +1354,7 @@ def test_a_long_name_stays_on_one_line(window, qapp):
 
 def test_full_screen_caps_only_the_search_box(window, qapp):
     """At 1920x1080 the search box stops at SEARCH_MAX_W (the library tools stay at
-    the right); the seek bar and the drop box still follow the window (U11)."""
+    the right); the seek bar and the drop box still follow the window."""
     from PySide6.QtTest import QTest
     window.show()
     window.tabs.setCurrentIndex(0)

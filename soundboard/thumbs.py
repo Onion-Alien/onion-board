@@ -120,7 +120,6 @@ def from_clipboard(mime) -> QImage | None:
     return None
 
 
-LINK_FEATURE = "sounds_web.other"   # soundboard.net's switch: "Other pasted links"
 MAX_LINK_BYTES = 15 << 20            # a picture (or the page around one) bigger than this isn't
 _HEADERS = {"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 "
                           "(KHTML, like Gecko) Chrome/140.0 Safari/537.36",
@@ -147,9 +146,11 @@ def link_picture(page: str, base: str) -> str:
 
 
 def _get(url: str) -> tuple[bytes, str]:
-    from soundboard import net
+    """`url`'s answer, under the switch of the site it's on (ytdl.site_feature: a
+    YouTube picture is YouTube's, whatever page named it)."""
+    from soundboard import net, ytdl
     req = urllib.request.Request(url, headers=_HEADERS)
-    with net.urlopen(req, timeout=20, feature=LINK_FEATURE) as r:
+    with net.urlopen(req, timeout=20, feature=ytdl.site_feature(url)) as r:
         body = r.read(MAX_LINK_BYTES + 1)
         kind = (r.headers.get_content_type() or "").lower()
     if len(body) > MAX_LINK_BYTES:
@@ -161,7 +162,7 @@ def fetch(url: str) -> QImage:
     """The picture at a link: an image's own address, or a web page (a YouTube video,
     a post…) whose preview picture is taken. Blocks (call it off the UI thread);
     raises LinkError, or net.FeatureOff when links are switched off."""
-    from soundboard import errors, net
+    from soundboard import errors, net, netlog, ytdl
     url = url.strip()
     if url and "://" not in url:
         url = "https://" + url
@@ -173,14 +174,17 @@ def fetch(url: str) -> QImage:
     yt = _YOUTUBE.search(url)
     if yt:   # straight to the video's thumbnail: YouTube's page can ask for cookies first
         url = f"https://i.ytimg.com/vi/{yt.group(1)}/hqdefault.jpg"
+    netlog.cause(ytdl.FEATURE, f"You asked for a sound's picture from the link "
+                               f"{netlog.quoted(url)} (Edit > Picture > From a link)")
     try:
         body, kind = _get(url)
         img = QImage.fromData(body)
         if img.isNull() and ("html" in kind or body[:500].lstrip().lower().startswith(b"<")):
             pic = link_picture(body.decode("utf-8", "replace"), url)
             # the page names it, not the user: a file:// one would open a file on this
-            # PC (or a share on another), past the switches and Tor
-            if net.web_url(pic):
+            # PC (or a share on another), past the switches and Tor; one on this PC or
+            # the home network would make the page's site reach into the LAN
+            if net.web_url(pic) and not net.home_url(pic):
                 body, kind = _get(pic)
                 img = QImage.fromData(body)
     except (LinkError, net.FeatureOff):

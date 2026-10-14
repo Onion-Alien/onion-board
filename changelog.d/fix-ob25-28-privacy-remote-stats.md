@@ -1,0 +1,5 @@
+- Switching YouTube off in Privacy & security now also stops YouTube pictures: a sound's picture from a YouTube link and the thumbnails in web search results go under the switch of the site they come from, not under *Other pasted links*.
+- Network activity says why a sound's picture from a link went online.
+- Onion Pocket: a request read off the Wi-Fi can no longer be sent again after Onion Board or its phone server restarts.
+- The anonymous usage count no longer loses a tab opened or a sound downloaded while a count is being sent.
+- Settings → Remote: turning it on, a new port and *New key* are saved in the background, and *New key made* shows only once the key is really saved (a failed save says so instead).

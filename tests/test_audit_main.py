@@ -195,7 +195,7 @@ def test_closing_the_edit_dialog_stops_the_preview(window, monkeypatch, qapp, ok
 
 
 def test_edit_sound_sits_beside_the_board_one_per_sound(window, qapp):
-    """Edit sound doesn't hold up the board any more (U4), but it's still a draft:
+    """Edit sound doesn't hold up the board any more, but it's still a draft:
     Save puts it on, Cancel drops it. Editing the same sound raises its window."""
     m = window.meta("s0")
     d = window.edit("s0")

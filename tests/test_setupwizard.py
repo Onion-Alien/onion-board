@@ -430,6 +430,8 @@ def test_cancelling_the_guide_keeps_an_unplugged_device(qapp, app_dir, devices):
         saved = library.Config.load()
         assert (saved.mic_device, saved.mon_device) == ("Unplugged Mic",
                                                         "Unplugged Headphones")
+        from conftest import devices_done
+        devices_done(w)   # reopened on the device thread
         assert devices["picked"]["set_mic_device"] == "Unplugged Mic"   # engine too
     finally:
         _close(qapp, w, wiz)
@@ -1026,3 +1028,86 @@ def test_closing_on_the_question_never_asks_again(mic_wizard):
     again.done(0)
     again.deleteLater()
 
+
+
+def test_picks_open_the_device_off_the_ui_thread(wizard, devices, monkeypatch, qapp):
+    """A pick opens the stream on the device thread: with a recovery holding the
+    devices, the click comes straight back, and the device opens once it lets go."""
+    import threading
+    import time
+
+    from conftest import devices_done
+    w, wiz = wizard
+    devices_done(w)
+
+    def opener(key):
+        def open_it(self, n):
+            with engine.DEVICES:
+                devices["picked"][key] = n
+        return open_it
+    for key in ("set_mic_device", "set_mon_device"):
+        monkeypatch.setattr(engine.Engine, key, opener(key))
+    devices["picked"].clear()
+    go, held = threading.Event(), threading.Event()
+
+    def hold():
+        with engine.DEVICES:
+            held.set()
+            go.wait(10)
+    t = threading.Thread(target=hold, daemon=True)
+    t.start()
+    try:
+        assert held.wait(5)
+        t0 = time.monotonic()
+        wiz._pick_mic("Desk Mic", by_user=True)
+        wiz._pick_headphones("Speakers", by_user=True)
+        assert time.monotonic() - t0 < 0.5
+        assert w.cfg.mic_device == "Desk Mic" and devices["picked"] == {}
+    finally:
+        go.set()
+        t.join(5)
+    devices_done(w)
+    assert devices["picked"] == {"set_mic_device": "Desk Mic", "set_mon_device": "Speakers"}
+
+
+def test_the_cable_page_and_closing_never_wait_on_the_ui_thread(wizard, devices, monkeypatch,
+                                                                 qapp):
+    """The cable page opened the cable, and closing the guide reopened every device,
+    on the UI thread: a recovery holding the devices froze the window."""
+    import threading
+    import time
+
+    from conftest import devices_done
+    w, wiz = wizard
+    devices_done(w)
+
+    def opener(key):
+        def open_it(self, n):
+            with engine.DEVICES:
+                devices["picked"][key] = n
+        return open_it
+    for key in ("set_main_device", "set_mic_device", "set_mon_device"):
+        monkeypatch.setattr(engine.Engine, key, opener(key))
+    w.cfg.route = "cable"
+    devices["picked"].clear()
+    go, held = threading.Event(), threading.Event()
+
+    def hold():
+        with engine.DEVICES:
+            held.set()
+            go.wait(10)
+    t = threading.Thread(target=hold, daemon=True)
+    t.start()
+    try:
+        assert held.wait(5)
+        t0 = time.monotonic()
+        wiz.recheck_cable(rescan=False)
+        wiz.reject()
+        assert time.monotonic() - t0 < 0.5
+        assert devices["picked"] == {}
+    finally:
+        go.set()
+        t.join(5)
+    devices_done(w)
+    assert engine.is_virtual(devices["picked"]["set_main_device"])
+    assert "set_mic_device" in devices["picked"]   # every device reopened on close

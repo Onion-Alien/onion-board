@@ -892,21 +892,28 @@ def send(payload: list[dict], timeout: float = TIMEOUT_S, no_sessions: bool = Fa
         return False
 
 
-def maybe_send(cfg, saved=None, event: str = "", app_dir: Path | None = None) -> None:
+def maybe_send(cfg, on_sent=None, event: str = "", app_dir: Path | None = None) -> None:
     """The daily count if it's due (or `event` now), on a thread, when it's allowed.
     Problems since the last send go too, due or not: note()d ones, and with `app_dir`
-    the reports saved there. `saved()` is called on that thread after cfg changed."""
+    the reports saved there.
+
+    The thread only sends what was gathered here; cfg belongs to the UI thread, which
+    keeps adding to the same stats_* fields (tab_opened, downloaded, remember). Once a
+    count (not an `event`) went, `on_sent(apply)` is called on that thread: the caller
+    runs apply() on the thread that owns cfg (the main window queues it to the UI
+    thread), and apply clears exactly what was sent, keeping anything added meanwhile.
+    Without on_sent, apply runs right there (a caller with no UI thread)."""
     if not enabled() or not net.allowed(FEATURE):
         return
     now = time.time()
     settle(cfg, now)
     remember(cfg)
-    extra, taken, newest = [], 0, 0.0
+    extra, taken, newest = [], [], 0.0
     if not cfg.stats_problems_seen:   # first run with this: older reports aren't news
         cfg.stats_problems_seen = now
     if not event:
         extra = list(cfg.stats_pending)   # remember() just made it a clean list
-        taken = len(extra)
+        taken = extra[:]
         skipped = [0]
         if app_dir is not None:
             found, newest = problems(app_dir, cfg.stats_problems_seen, skipped)
@@ -930,9 +937,7 @@ def maybe_send(cfg, saved=None, event: str = "", app_dir: Path | None = None) ->
                                                      else " (once a day)" if daily
                                                      else " (problems)"))
 
-    def run():
-        if not send(payload) or event:
-            return
+    def apply():   # on the thread that owns cfg: only what this count took
         if daily:
             cfg.stats_sent = now
             cfg.stats_tabs = [t for t in cfg.stats_tabs if t not in tabs]
@@ -941,14 +946,20 @@ def maybe_send(cfg, saved=None, event: str = "", app_dir: Path | None = None) ->
             cfg.stats_open_s = max(0.0, (cfg.stats_open_s or 0) - opened)   # since then
             cfg.stats_launches = max(0, (cfg.stats_launches or 0) - launches)
             cfg.stats_downloads = max(0, (cfg.stats_downloads or 0) - downloads)
-        cfg.stats_pending = cfg.stats_pending[taken:]   # any kept meanwhile stay
+        left = [e for e in cfg.stats_pending if isinstance(e, str)]
+        for e in taken:   # each one sent, once: any kept meanwhile stay
+            if e in left:
+                left.remove(e)
+        cfg.stats_pending = left
         cfg.stats_problems_seen = max(cfg.stats_problems_seen, newest)
-        if saved is not None:
-            saved()
+
+    def run():   # the network only: never touches cfg
+        if send(payload) and not event:
+            (on_sent or (lambda f: f()))(apply)
     threading.Thread(target=run, daemon=True, name="usage-count").start()
 
 
-def step(cfg, name: str, saved=None) -> None:
+def step(cfg, name: str, on_sent=None) -> None:
     """A new install's first time doing `name` (one of STEPS): sent right away, once.
     A copy counted before these existed never sends them (settle)."""
     if name not in STEPS or not enabled() or not net.allowed(FEATURE):
@@ -957,7 +968,7 @@ def step(cfg, name: str, saved=None) -> None:
     if name in cfg.stats_steps:
         return
     cfg.stats_steps = [*cfg.stats_steps, name]
-    maybe_send(cfg, saved, event=f"step/{name}")
+    maybe_send(cfg, on_sent, event=f"step/{name}")
 
 
 def other_tag(text: str, limit: int = OTHER_MAX) -> str:
