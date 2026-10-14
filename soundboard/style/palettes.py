@@ -10,8 +10,11 @@ Part of the style kit (see __init__.py): imports nothing from either app.
 from __future__ import annotations
 
 import re
+from string import Template
 
 from PySide6.QtGui import QColor
+
+from . import hooks
 
 # Status colours (inline ok / warn / error messages, danger buttons) most themes share:
 # the bright ones read on dark backgrounds, the deep ones on light.
@@ -590,3 +593,24 @@ def valid_colour(colour: str) -> str:
     if not isinstance(colour, str) or not re.fullmatch(r"#[0-9a-fA-F]{6}", colour.strip()):
         return ""
     return colour.strip().lower()
+
+
+# The widgets drawn in the live colour (by objectName): a colour change restyles just
+# these (apply_live), not the whole app, which takes seconds on a full board.
+LIVE_NAMES = ("power", "onair", "pill", "live")
+LIVE_STYLE = Template("""
+QPushButton#power:checked, QPushButton#onair:checked, QPushButton#live:checked {
+    background:qlineargradient(x1:0, y1:0, x2:0, y2:1, stop:0 $live_top, stop:1 $live);
+    border:1px solid $live_hi; color:$on_live; }
+QPushButton#onair:checked { border-color:transparent; }
+QPushButton#power:checked:hover, QPushButton#onair:checked:hover,
+QPushButton#live:checked:hover { background:$live_hover; }
+QPushButton#pill[state="ok"] { color:$live_text; background:transparent; }
+""")
+
+
+def live_sheet(tk: dict[str, str] | None = None) -> str:
+    """The live rules in theme `tk`'s colours (default: the current one), as a widget's
+    own stylesheet (it wins over the app's, so it also beats the cards' generic
+    `:checked` rules)."""
+    return LIVE_STYLE.substitute(hooks.palette() if tk is None else tk)

@@ -1,13 +1,19 @@
-"""The themes' see-through textures (Settings: Textured), shared by Onion Board and
-Onion Watch. Each theme names one with its `texture` token; texture_image() draws a
-tile in a theme's colours.
+"""The themes' Textured style, shared by Onion Board and Onion Watch: each theme's
+see-through texture (its `texture` token; texture_image() draws a tile in a theme's
+colours, texture_style() tiles it on a stylesheet's surfaces) and the soft glow of its
+accent colours behind the window (paint_glow()).
 
 Part of the style kit (see __init__.py): imports nothing from either app.
 """
 from __future__ import annotations
 
+import hashlib
+import tempfile
+from pathlib import Path
+
 from PySide6.QtCore import QPointF, QRectF, Qt
-from PySide6.QtGui import QColor, QImage, QLinearGradient, QPainter, QPainterPath, QPen
+from PySide6.QtGui import (QBrush, QColor, QImage, QLinearGradient, QPainter, QPainterPath,
+                           QPen, QRadialGradient)
 
 from . import hooks
 from .palettes import is_light_colour
@@ -143,3 +149,60 @@ def texture_image(kind: str, tk: dict[str, str] | None = None, size: int | None 
         img.setPixelColor(1, 1, a(0.10))
     p.end()
     return img
+
+
+_texture_urls: dict[tuple, str] = {}
+
+
+def texture_style(selector: str, tk: dict[str, str] | None = None) -> str:
+    """A stylesheet rule tiling theme `tk`'s texture (default: the current theme's) on
+    `selector`; "" when it has none. Whether Textured is on is the app's to check."""
+    if url := texture_url(hooks.palette() if tk is None else tk):
+        return f'{selector} {{ background-image:url("{url}"); background-repeat:repeat-xy; }}\n'
+    return ""
+
+
+def texture_url(tk: dict[str, str]) -> str:
+    """Theme `tk`'s texture tile as a file for a stylesheet ("" when it has none): made
+    once, then remembered."""
+    kind = tk.get("texture", "")
+    if kind not in TEXTURES:
+        return ""
+    key = (kind, tk["panel"], tk["text_hi"], tk["accent"], tk["accent2"],
+           tk.get("texture_ink", ""), tk.get("texture_strength", ""))
+    if url := _texture_urls.get(key):
+        return url
+    folder = Path(tempfile.gettempdir()) / "onion-style"
+    path = folder / f"tex-{kind}-{hashlib.md5(repr(key).encode()).hexdigest()[:10]}.png"
+    try:
+        folder.mkdir(exist_ok=True)
+        if not path.exists():
+            texture_image(kind, tk).save(str(path))
+    except OSError:
+        return ""
+    _texture_urls[key] = url = path.as_posix()
+    return url
+
+
+# The Textured glow: soft blobs of the theme's two accent colours behind the cards,
+# (centre x, centre y, radius) as fractions of the window, which colour, how strong.
+AURORA = (((0.12, 0.0, 0.55), "accent", 0.22), ((0.95, 1.05, 0.6), "accent2", 0.14),
+          ((0.6, 0.35, 0.45), "accent", 0.07))
+
+
+def paint_glow(p: QPainter, rect, origin: QPointF, width: float, height: float,
+               tk: dict[str, str] | None = None) -> None:
+    """Textured's soft glow of theme `tk`'s two accent colours (default: the current
+    theme), over a window background already painted, aligned to the window's
+    `origin` and size."""
+    tk = hooks.palette() if tk is None else tk
+    light = is_light_colour(tk["bg"])
+    side = max(width, height)
+    for (cx, cy, r), key, strength in AURORA:
+        g = QRadialGradient(QPointF(origin.x() + cx * width, origin.y() + cy * height),
+                            r * side)
+        c = QColor(tk[key])
+        c.setAlphaF(strength * (0.55 if light else 1.0))
+        g.setColorAt(0, c)
+        g.setColorAt(1, QColor(0, 0, 0, 0))
+        p.fillRect(rect, QBrush(g))

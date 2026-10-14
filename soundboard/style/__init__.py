@@ -16,12 +16,12 @@ Rules, so the copy keeps working in both apps:
 - Bump KIT_VERSION with any change a host or the add-on must know about (a new hook,
   a new module, a renamed name).
 
-    palettes   THEMES, GROUPS, finish() and the colour maths
-    textures   TEXTURES and texture_image()
+    palettes   THEMES, GROUPS, finish(), the colour maths, LIVE_STYLE / live_sheet()
+    textures   Textured: TEXTURES, texture_image(), texture_style(), paint_glow()
     bunnyfit   Bun's outfit per theme and the pieces' drawing
     owl        Hoot: draw_owl(), owl_image(), OwlWidget
     appstate   active(), pause_in_background(), snap_to_pixels()
     hooks      what the app plugs in
 """
 
-KIT_VERSION = 1
+KIT_VERSION = 2   # 2: texture_style / paint_glow / live_sheet in the kit

@@ -5,7 +5,7 @@ import sys
 from pathlib import Path
 
 from soundboard import theme
-from soundboard.style import KIT_VERSION, bunnyfit, hooks, owl
+from soundboard.style import KIT_VERSION, bunnyfit, hooks, owl, palettes
 
 KIT = Path(__file__).resolve().parent.parent / "soundboard" / "style"
 
@@ -54,3 +54,19 @@ def test_board_hands_the_add_on_its_look():
         assert host.kit().KIT_VERSION == KIT_VERSION
     finally:
         theme.set_current(was)
+
+
+def test_textured_rules_follow_the_switch():
+    from soundboard.style import textures
+    was = (theme.current_name, theme.textures_on)
+    try:
+        theme.set_current("Carbon")
+        assert "background-image" in textures.texture_style("QFrame#card")
+        theme.textures_on = False
+        assert theme.texture_style("QFrame#card") == ""
+        theme.textures_on = True
+        assert "background-image" in theme.texture_style("QFrame#card")
+        assert theme.live_sheet() == palettes.live_sheet(theme.T)
+    finally:
+        theme.set_current(was[0])
+        theme.textures_on = was[1]
