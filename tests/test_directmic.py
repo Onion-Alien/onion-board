@@ -3397,7 +3397,6 @@ def test_a_failing_helper_check_backs_off(window, monkeypatch):  # noqa: F811
 
     from conftest import process_events
     from soundboard import michelper
-    from soundboard.ui import mainwindow as mw
     from soundboard.ui import miccontrol
     w = window
     _routes(w, monkeypatch, "missing")
@@ -3413,8 +3412,7 @@ def test_a_failing_helper_check_backs_off(window, monkeypatch):  # noqa: F811
         return True
     monkeypatch.setattr(michelper, "ready", ready)
     now = [1000.0]
-    for mod in (mw, miccontrol):
-        own_module(monkeypatch, mod, "time", monotonic=lambda: now[0])
+    own_module(monkeypatch, miccontrol, "time", monotonic=lambda: now[0])
     _no_threads(monkeypatch, run=True)
     app = QApplication.instance()
     for _ in range(20):
