@@ -101,6 +101,7 @@ def test_import_brings_the_board_over(main_window, qapp, tmp_path, monkeypatch):
     monkeypatch.setenv("APPDATA", str(tmp_path))
     _board(tmp_path)
     w.cfg.sounds[0].hotkey = "alt+shift+f1"    # already used here: left off the import
+    w.cfg.copy_local_sounds = False   # "Copy into library" off: linked to its files
     asked = []
     monkeypatch.setattr(QMessageBox, "question",
                         lambda _p, _t, text, *a: asked.append(text) or QMessageBox.Yes)

@@ -467,6 +467,8 @@ class SettingsDialog(QDialog, Built):
                 elif match and card.property("search_hid"):
                     card.show()
                     card.setProperty("search_hid", False)
+                if match and words and card is getattr(self, "look_box", None):
+                    self._look_pick(words)   # (the look box: show the tab with the words)
                 hits += match
             self.categories.item(i).setHidden(bool(words) and not hits)
             if hits and first is None:

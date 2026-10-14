@@ -62,6 +62,11 @@ class Built:
     lang_restart: Any
     live_dot: Any
     live_green: Any
+    look_box: Any
+    look_pages: Any
+    look_shown: Any
+    look_tabs: Any
+    _look_pick: Any
     net_activity: Any
     net_addr: Any
     _net_body: Any

@@ -1,0 +1,2 @@
+- Settings > Appearance is shorter: the language stays on top and themes, highlight colour, theme style, interface size, live tabs and the playing-sound background are now tabs in one box, and settings search jumps to the right tab.
+- Sounds added from your PC are copied into the library by default, so they keep working if the original is moved or deleted (switch it off in Data & quality to link instead).
