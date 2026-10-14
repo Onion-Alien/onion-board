@@ -607,7 +607,7 @@ class SettingsDialog(QDialog):
         self.search_box = QLineEdit()
         # (a page: "Settings" is the heading right over it)
         self.search_box.setPlaceholderText(_("Search"))
-        self.search_box.setClearButtonEnabled(True)
+        icons.clear_button(self.search_box)
         self.search_box.setAccessibleName(_("Search settings"))
         self.search_box.setFixedWidth(196)
         self._search_wait = QTimer(self, singleShot=True, interval=150)
