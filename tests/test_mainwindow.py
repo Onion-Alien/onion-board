@@ -93,6 +93,25 @@ def test_triggers_timer_during_start_up(qapp, app_dir, monkeypatch):
         qapp.sendPostedEvents(None, QEvent.DeferredDelete)
 
 
+def test_deleting_the_window_with_the_download_bar_up(qapp, app_dir, monkeypatch):
+    """Quitting mid-download: the download bar hides while the window is deleted, after
+    the window's C++ side is gone. Fitting the window for it then raised RuntimeError
+    and the crash reporter came up (the autouse guard fails the test on that)."""
+    from PySide6.QtCore import QEvent
+    for name in ("set_main_device", "set_mon_device", "set_mic_device"):
+        monkeypatch.setattr(engine.Engine, name, lambda self, n, _k=name: None)
+    monkeypatch.setattr(winkeys.Hotkeys, "register", lambda self, m: None)
+    Config(sounds=[], mic_first=True, stats_version=__version__).save()
+    w = main.MainWindow()
+    w.soundctl._load_thread.join(15)
+    w.show()
+    w.download_bar.show()
+    qapp.processEvents()
+    assert w.download_bar.isVisible()
+    w.deleteLater()
+    qapp.sendPostedEvents(None, QEvent.DeferredDelete)
+
+
 def test_window_builds_with_pads_and_index(window):
     assert set(window.pads) == {"s0", "s1"}
     assert window.meta("s1").name == "Airhorn" and window.meta("zz") is None
