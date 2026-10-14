@@ -14,8 +14,9 @@ blocked: nothing was looked up or sent for it.
 Kept in memory only, at most MAX_ENTRIES, and gone when the app closes: unless
 "Keep a history" is on (Settings > Connection, or the installer's /KEEPNETLOG=1: config
 netlog_keep), when each connection is also added to FILE_NAME in the app's folder as
-it ends, and the next start lists them again (see keep()). The list isn't written to
-the app's log (though the log can name a site something failed on, unless "Keep an
+it ends, and the next start lists them again (see keep()). The file is only read and
+written on one background thread (_io), never on the thread that asked. The list isn't
+written to the app's log (though the log can name a site something failed on, unless "Keep an
 app log" is off: soundboard.applog). Never recorded: proxy passwords, the relay's per-launch
 secret, request headers and bodies. Query values that look like keys or tokens are
 masked (see redact()).
@@ -33,10 +34,12 @@ import itertools
 import json
 import logging
 import os
+import queue
 import re
 import threading
 import time
 import urllib.parse
+from collections.abc import Callable
 from dataclasses import dataclass, field
 from pathlib import Path
 
@@ -197,14 +200,14 @@ def clear() -> None:
         _entries.clear()
         path = _keep_path
     if path is not None:
-        _remove(path)
+        _io(_remove, path)
     _changed()
 
 
 # --------------------------------------------------------------------------- kept history
 
 _keep_path: Path | None = None   # FILE_NAME while "Keep a history" is on
-_file_lock = threading.Lock()
+_keep_turn = 0                   # bumped by every keep(): a load from an older one is dropped
 _FIELDS = {f.name for f in dataclasses.fields(Entry)}
 
 
@@ -217,24 +220,42 @@ def keep(path: Path | None) -> None:
 
     On: the last MAX_ENTRIES saved there from earlier starts are listed again (oldest
     first, before this run's), and what this run listed before is added to the file,
-    so ticking it later in a run saves what's been listed so far. The file itself
+    so ticking it later in a run saves what's been listed so far. The file is read on
+    the file thread: the list changes (version()) when it's in. The file itself
     keeps everything (for the totals: history()) until it passes MAX_FILE_BYTES and
     moves to .old. Off: stops saving and deletes the file, so nothing is left on disk;
     this run's list stays, and ticking it again saves it back."""
-    global _keep_path, _count
+    global _keep_path, _keep_turn
     old = _keep_path
     if path is None:
         with _lock:
             _keep_path = None
+            _keep_turn += 1
         if old is not None:
-            _remove(old)
+            _io(_remove, old)
         _changed()
         return
     path = Path(path)
     if path == old:
         return
+    with _lock:
+        _keep_path = path
+        _keep_turn += 1
+        turn = _keep_turn
+        # ended before now, so never _save()d to this file: _load adds them
+        ended = {id(e) for e in _entries if e.state not in (CONNECTING, CONNECTED)}
+    _io(_load, path, turn, ended)
+    _changed()
+
+
+def _load(path: Path, turn: int, ended: set[int]) -> None:
+    """keep()'s file work, on the file thread: list the saved connections, and add the
+    ones this run ended before it was ticked."""
+    global _count
     saved = _read(path)
     with _lock:
+        if _keep_path != path or _keep_turn != turn:
+            return   # unticked (or another file) meanwhile
         seen = {(e.started, e.host, e.port) for e in saved}
         new = [e for e in _entries if (e.started, e.host, e.port) not in seen]
         merged = (saved + new)[-MAX_ENTRIES:]
@@ -243,18 +264,51 @@ def keep(path: Path | None) -> None:
         _count = len(merged)
         _entries.clear()
         _entries.extend(merged)
-        _keep_path = path
-        ended = [e for e in new if e.state not in (CONNECTING, CONNECTED)]
-    _add(path, ended)
+        text = "".join(_line(e) for e in new if id(e) in ended)
+    _add(path, text)
     _changed()
 
 
-def flush() -> None:
-    """At quit: save the connections still open (a radio stream, say) as they stand."""
+def flush(timeout: float = 3.0) -> None:
+    """At quit: save the connections still open (a radio stream, say) as they stand,
+    and wait (at most `timeout`) for the file thread to finish writing."""
     with _lock:
         still_open = [e for e in _entries if e.state in (CONNECTING, CONNECTED)]
     for e in still_open:
         _save(e)
+    wait(timeout)
+
+
+# the file thread: every read and write of the kept history, in the order asked, so
+# no other thread ever waits on the disk (or on a file being moved to .old)
+_jobs: queue.SimpleQueue = queue.SimpleQueue()
+_worker: threading.Thread | None = None
+_worker_lock = threading.Lock()
+
+
+def _io(fn: Callable, *args) -> None:
+    global _worker
+    with _worker_lock:
+        if _worker is None or not _worker.is_alive():
+            _worker = threading.Thread(target=_run, daemon=True, name="netlog-io")
+            _worker.start()
+    _jobs.put((fn, args))
+
+
+def _run() -> None:
+    while True:
+        fn, args = _jobs.get()
+        try:
+            fn(*args)
+        except Exception:
+            log.exception("network activity history: file work failed")
+
+
+def wait(timeout: float = 5.0) -> bool:
+    """Until the file work asked for so far is done (False if it took longer)."""
+    done = threading.Event()
+    _io(done.set)
+    return done.wait(timeout)
 
 
 def _line(e: Entry) -> str:
@@ -265,24 +319,27 @@ def _save(e: Entry) -> None:
     """Add one connection to the kept history (from whichever thread ended it)."""
     path = _keep_path
     if path is not None:
-        _add(path, [e])
+        _io(_add, path, _line(e))   # as it is now: it can still change
 
 
-def _add(path: Path, items: list[Entry]) -> None:
-    """Add connections to the end of the file, moving it to .old first once it's
-    passed MAX_FILE_BYTES (the one .old before it goes): at most about twice that on
-    disk."""
-    if not items:
+def _add(path: Path, text: str) -> None:
+    """(File thread) Add lines to the end of the file, moving it to .old first once
+    it's passed MAX_FILE_BYTES (the one .old before it goes): at most about twice that
+    on disk."""
+    if not text:
         return
-    with _file_lock:
-        try:
-            path.parent.mkdir(parents=True, exist_ok=True)
-            if path.exists() and path.stat().st_size > MAX_FILE_BYTES:
-                os.replace(path, path.with_name(path.name + ".old"))
-            with open(path, "a", encoding="utf-8") as f:
-                f.write("".join(_line(e) for e in items))
-        except OSError:
-            log.warning("couldn't add to the network activity history", exc_info=True)
+    try:
+        path.parent.mkdir(parents=True, exist_ok=True)
+        new = not path.exists()
+        if not new and path.stat().st_size > MAX_FILE_BYTES:
+            os.replace(path, path.with_name(path.name + ".old"))
+        with open(path, "a", encoding="utf-8") as f:
+            f.write(text)
+    except OSError:
+        log.warning("couldn't add to the network activity history", exc_info=True)
+        return
+    if new:
+        _changed()   # Open log can open it now
 
 
 def _read(path: Path, everything: bool = False) -> list[Entry]:
@@ -320,10 +377,17 @@ def kept_file() -> Path | None:
     return path if path is not None and path.is_file() else None
 
 
+def history_later(done: Callable[[list[Entry]], object]) -> None:
+    """history(), read on the file thread: done(items) is called there (a view hands
+    it over to the UI thread: ui.busy.emit)."""
+    _io(lambda: done(history()))
+
+
 def history() -> list[Entry]:
     """Everything there is to add up, oldest first: with a kept history, every
     connection saved in it (not just the last MAX_ENTRIES the list shows) and this
-    run's still open; without one, this run's list."""
+    run's still open; without one, this run's list. Reads the file: never on the UI
+    thread (history_later)."""
     path = _keep_path
     live = entries()
     if path is None:
@@ -334,12 +398,13 @@ def history() -> list[Entry]:
 
 
 def _remove(path: Path) -> None:
-    with _file_lock:
-        for p in (path, path.with_name(path.name + ".old")):
-            try:
-                p.unlink(missing_ok=True)
-            except OSError:
-                log.warning("couldn't delete %s", p.name, exc_info=True)
+    """(File thread)"""
+    for p in (path, path.with_name(path.name + ".old")):
+        try:
+            p.unlink(missing_ok=True)
+        except OSError:
+            log.warning("couldn't delete %s", p.name, exc_info=True)
+    _changed()
 
 
 # --------------------------------------------------------------------------- for the view
