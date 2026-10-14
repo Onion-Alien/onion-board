@@ -16,7 +16,7 @@ import subprocess
 import sys
 import time
 
-from PySide6.QtCore import Qt, QTimer, QUrl
+from PySide6.QtCore import Qt, QTimer, QUrl, Signal
 from PySide6.QtGui import QBrush, QColor, QDesktopServices, QFontDatabase
 from PySide6.QtWidgets import (QAbstractItemView, QApplication, QButtonGroup, QCheckBox,
                                QDialog, QHBoxLayout, QHeaderView, QLabel,
@@ -25,7 +25,7 @@ from PySide6.QtWidgets import (QAbstractItemView, QApplication, QButtonGroup, QC
                                QTableWidgetItem, QVBoxLayout, QWidget)
 
 from soundboard import netlog, theme
-from soundboard.ui import fit
+from soundboard.ui import busy, fit
 from soundboard.ui.panel import Flow
 from soundboard.i18n import _, ngettext
 
@@ -467,6 +467,8 @@ class TotalsDialog(QDialog):
     """Network activity added up: per site (or per server), the connections and the data
     each way, over the whole kept history (or this run's list when none is kept)."""
 
+    loaded = Signal(object)   # [netlog.Entry]: history() read on the file thread
+
     COLUMNS = [_("Site"), _("Connections"), _("Sent"), _("Received"), _("Total"), _("First"),
                _("Last")]
 
@@ -512,15 +514,32 @@ class TotalsDialog(QDialog):
         row.addWidget(self.copy)
         row.addWidget(close)
         v.addLayout(row)
-        self.by_site.toggled.connect(self.refresh)
+        self.by_site.toggled.connect(self._show)
         self.copy.clicked.connect(self._copy)
         close.clicked.connect(self.close)
         self._rows: list[netlog.Total] = []
         self._head = ""
+        self._items: list[netlog.Entry] | None = None   # None until the history is read
+        self.loaded.connect(self._loaded)
         self.refresh()
 
-    def refresh(self, _on=None):
-        items = netlog.history()
+    def refresh(self):
+        """Read the history again, on netlog's file thread (it can be ~10 MB): the
+        totals show when it's in (_loaded). busy.emit drops it if this has closed."""
+        if self._items is None:
+            self.summary.setText(_("Loading…"))
+            self.copy.setEnabled(False)
+        netlog.history_later(lambda items: busy.emit(self.loaded, items))
+
+    def _loaded(self, items: list[netlog.Entry]):
+        self._items = items
+        self._show()
+
+    def _show(self, _on=None):
+        """The totals of what was read, per site or per server (no reading here)."""
+        items = self._items
+        if items is None:
+            return
         by_site = self.by_site.isChecked()
         self._rows = rows = netlog.totals(items, by_site)
         sent = sum(r.sent for r in rows)
