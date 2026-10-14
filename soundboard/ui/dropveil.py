@@ -1,6 +1,6 @@
 """The veil over the window while files are dragged onto it: "Drop to add 4 files".
 
-Files can be dropped anywhere on the window, not only on the dashed box, so while a
+Files can be dropped anywhere on the window, not only on the outlined box, so while a
 drag is over it the whole window says so. It watches drags for the window (an
 application event filter, since the pads' grid and other children take drags before
 the window sees them) and never takes a drop itself: it lets mouse and drag events
@@ -86,7 +86,7 @@ class DropVeil(QWidget):
         bg.setAlpha(200)
         p.fillRect(self.rect(), bg)
         accent = QColor(theme.T.get("accent", "#7c5cff"))
-        pen = QPen(accent, 2, Qt.PenStyle.DashLine)
+        pen = QPen(accent, 2)
         p.setPen(pen)
         tint = QColor(accent)
         tint.setAlpha(28)

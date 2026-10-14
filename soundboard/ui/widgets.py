@@ -972,9 +972,10 @@ class Pad(QAbstractButton):
             glow.setAlpha(60 if self.paused else int(105 + 35 * math.sin(now * 5)))
             p.setPen(QPen(glow, 6))
             p.drawPath(path)
-            pen = QPen(accent, 2.2)
-            if self.paused:
-                pen.setStyle(Qt.PenStyle.DashLine)
+            ink = QColor(accent)
+            if self.paused:   # paused: the same line, faded
+                ink.setAlpha(110)
+            pen = QPen(ink, 2.2)
             p.setPen(pen)
         elif self.picked:
             p.setPen(QPen(C["accent"], 2.4))
@@ -996,7 +997,7 @@ class Pad(QAbstractButton):
                             QPointF(c.right() - 4, c.top() + 5)])
             p.setBrush(Qt.BrushStyle.NoBrush)
         if self.hasFocus() and self._kbd_focus:
-            p.setPen(QPen(C["text_hi"], 1.4, Qt.PenStyle.DashLine))
+            p.setPen(QPen(C["text_hi"], 1.4))
             p.drawRoundedRect(r.adjusted(3, 3, -3, -3), 10, 10)
         on_pic = pic is not None
         # name
@@ -1083,9 +1084,10 @@ class Pad(QAbstractButton):
                        accent)
             p.restore()
         if playing:
-            pen = QPen(accent, 1.8)
-            if self.paused:
-                pen.setStyle(Qt.PenStyle.DashLine)
+            ink = QColor(accent)
+            if self.paused:   # paused: the same line, faded
+                ink.setAlpha(110)
+            pen = QPen(ink, 1.8)
         elif self.picked:
             pen = QPen(QColor(T["accent"]), 2)
         elif self.selected:
@@ -1095,7 +1097,7 @@ class Pad(QAbstractButton):
         p.setPen(pen)
         p.drawPath(path)
         if self.hasFocus() and self._kbd_focus:
-            p.setPen(QPen(QColor(T["text_hi"]), 1.2, Qt.PenStyle.DashLine))
+            p.setPen(QPen(QColor(T["text_hi"]), 1.2))
             p.drawRoundedRect(r.adjusted(2, 2, -2, -2), 5, 5)
         p.setPen(Qt.PenStyle.NoPen)
         dot = QRectF(r.left() + 9, r.center().y() - 4, 8, 8)
@@ -1512,7 +1514,7 @@ class PadGrid(QWidget):
         if drop is not None and drop.intersects(QRectF(e.rect())):
             # the empty room under the pads says what it's for, faintly
             p.setRenderHint(QPainter.RenderHint.Antialiasing)
-            pen = QPen(QColor(theme.T["border"]), 1.4, Qt.PenStyle.DashLine)
+            pen = QPen(QColor(theme.T["border"]), 1.4)
             p.setPen(pen)
             p.drawRoundedRect(drop, PAD_RADIUS, PAD_RADIUS)
             if self._n_shown:

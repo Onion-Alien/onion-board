@@ -520,7 +520,6 @@ QPushButton#subchip { border-radius:11px; padding:2px 11px; min-height:18px; fon
     background:transparent; border:1px solid $border; color:$muted; }
 QPushButton#subchip:hover { color:$text; background:$btn_hover; }
 QPushButton#subchip:checked { background:$accent; border-color:$accent; color:$on_accent; }
-QPushButton#subchip[add="true"] { border-style:dashed; }
 QPushButton#fold { background:transparent; border:none; color:$muted; padding:3px 6px; font-size:8.5pt; font-weight:600; }
 QPushButton#fold:hover, QPushButton#fold:checked { color:$text; background:transparent; }
 QFrame#card QPushButton#fold, QFrame#card QPushButton#fold:checked { background:transparent; }
