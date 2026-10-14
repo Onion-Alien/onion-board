@@ -112,10 +112,8 @@ def _set_aside() -> bool:
 def _save(items: list[Item]) -> None:
     try:
         folder().mkdir(parents=True, exist_ok=True)
-        tmp = _index().with_suffix(".tmp")
-        tmp.write_text(json.dumps({"items": [asdict(i) for i in items]}, indent=1),
-                       encoding="utf-8")
-        tmp.replace(_index())
+        library.atomic_write_text(
+            _index(), json.dumps({"items": [asdict(i) for i in items]}, indent=1))
     except OSError:
         log.exception("couldn't save %s", _index())
 
