@@ -403,6 +403,7 @@ class MainWindow(QMainWindow):
     tab_switched = Signal(str, bool)    # Settings > Tabs: a tab (taboff.KEYS) off / on again
     category_programs_changed = Signal()   # a program -> category rule added / removed
     app_setup_changed = Signal()   # an app remembered / forgotten (appsetup)
+    bin_filled = Signal(object)    # removed sounds are in the bin: its sound count|None
 
     # the slim bars across the top of the window (urgent fix, tip, app offer, FFmpeg, language)
     TOP_BARS = ("urgent_bar", "tip_bar", "setup_bar", "ff_bar", "lang_bar")
@@ -481,6 +482,7 @@ class MainWindow(QMainWindow):
         self._settings_kept: SettingsDialog | None = None   # closed Settings, reused
         self._settings_kept_print = None
         self._packs_removed: set[str] = set()   # sound packs to stop keeping after Undo
+        self._bin_thread: threading.Thread | None = None   # the newest _finish_removals work
         self._render_gen: dict[str, int] = {}   # sid -> newest effects render (_rerender)
         self.shuffle = ShuffleBag()       # the random-sound hotkeys
         self._last_sid: str | None = None   # the last sound played (its replay hotkey)
@@ -581,6 +583,7 @@ class MainWindow(QMainWindow):
         # written on a background thread: a slow disk froze the window for seconds
         self._saver = library.Saver(self.cfg, done=self.config_saved.emit)
         self.config_saved.connect(self._on_saved)
+        self.bin_filled.connect(self._label_bin)
 
         self.setup_state = ""
         self._pill_long = ""              # the setup pill's whole text (its tip, its name)
@@ -8055,18 +8058,40 @@ class MainWindow(QMainWindow):
         # (soundboard.mapped) while an array still points into it
         done, self._removed = [(m, i) for m, i, _d in self._removed], []
         toastmod.close(self, UNDO_KEY)   # (its on_close comes back here: nothing left)
-        for m, i in done:
-            trash.put_sound(m, i)
-        if done:
-            self._label_bin()
-        for pid in self._packs_removed:   # not undone: the pack is no longer kept
-            if not any(m.pack == pid for m in self.cfg.sounds):
-                backup.forget_pack(pid)
+        # not undone: the pack is no longer kept
+        packs = [p for p in self._packs_removed
+                 if not any(m.pack == p for m in self.cfg.sounds)]
         self._packs_removed.clear()
+        if not done and not packs:
+            return
+        prev = self._bin_thread
 
-    def _label_bin(self):
-        """Keep the compatibility button's count; Library holds the visible action."""
-        n = len(trash.items(trash.SOUND))
+        def work():   # file moves, the bin's list (retried while locked): off the UI thread
+            if prev is not None:
+                prev.join()   # an earlier removal's sounds go in first
+            n = trash.put_sounds(done) if done else None
+            for pid in packs:
+                backup.forget_pack(pid)
+            if n is not None:
+                try:
+                    self.bin_filled.emit(n)
+                except RuntimeError:   # the window is gone
+                    pass
+        self._bin_thread = threading.Thread(target=work, daemon=True, name="to-bin")
+        self._bin_thread.start()
+
+    def _wait_bin(self):
+        """Let removed sounds finish going into the bin (before the bin is listed,
+        and on quitting)."""
+        if self._bin_thread is not None:
+            self._bin_thread.join()
+            self._bin_thread = None
+
+    def _label_bin(self, n: int | None = None):
+        """Keep the compatibility button's count; Library holds the visible action.
+        `n`: the sounds in the bin, if known (None reads it)."""
+        if n is None:
+            n = len(trash.items(trash.SOUND))
         self.btn_bin.setText(_("Recently deleted ({n})", n=n))
         self.btn_bin.hide()   # Recently deleted is in the Library menu
 
@@ -8074,6 +8099,7 @@ class MainWindow(QMainWindow):
         """Library → Recently deleted sounds"""
         from soundboard.ui.deleted import DeletedDialog
         self._finish_removals()   # the ones on the Undo bar are listed too
+        self._wait_bin()
         d = DeletedDialog(trash.SOUND, "sounds", self._restore_deleted, self)
         d.exec()
         free_dialog(d)
@@ -10502,7 +10528,7 @@ class MainWindow(QMainWindow):
             return
         self._shut_down = True
         exitwatch.quitting()   # a run that dies from here on died closing (exitwatch.py)
-        for step in (self._finish_removals, self.timer.stop, self._voice_timer.stop,
+        for step in (self._finish_removals, self._wait_bin, self.timer.stop, self._voice_timer.stop,
                      self._default_poll.stop, self._discord_poll.stop,
                      self._release_ptt,
                      self._remember_usage, self.cfg.save, self.overlay.shutdown,

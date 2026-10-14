@@ -328,9 +328,11 @@ def test_a_sound_pack_is_removed_in_one_go_and_undone(window, tmp_path, qapp):
     window.undo_remove()
     assert len(window.cfg.sounds) == 6
     window._finish_removals()
+    window._wait_bin()
     assert pid in backup.packs()   # undone: still kept
     window.remove_pack(pid, ask=False)
     window._finish_removals()
+    window._wait_bin()
     assert backup.packs() == {}
 
 
