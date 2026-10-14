@@ -16,6 +16,7 @@ from shiboken6 import isValid as qt_valid
 from soundboard.engine import is_virtual as is_virtual_cable
 from soundboard.settings import SettingsDialog
 from soundboard.ui import routewarn
+from soundboard.ui.controller import Controller
 from soundboard.ui.crashdialog import free_dialog, rehome_crash_reports
 from soundboard.ui.dialogs import EditDialog
 from soundboard.ui.routecontrol import ROUTE_DEVICE
@@ -46,11 +47,11 @@ def _polish(w: QWidget, size=None):
             lay.activate()
 
 
-class SettingsControl:
+class SettingsControl(Controller):
     """The Settings page of one MainWindow (``mw``)."""
 
     def __init__(self, mw: MainWindow):
-        self.mw = mw
+        super().__init__(mw)
         # windows beside the board, not over it: the one Settings, and an Edit
         # sound for each sound being edited
         self._settings_dlg: SettingsDialog | None = None

@@ -12,6 +12,7 @@ from PySide6.QtWidgets import QApplication
 
 from soundboard import shellicon, theme
 from soundboard.ui import icons, themecover
+from soundboard.ui.controller import Controller
 from soundboard.ui.livedot import set_tint as set_live_tint
 from soundboard.ui.logowidget import glow_icon
 
@@ -19,11 +20,11 @@ if TYPE_CHECKING:
     from soundboard.ui.mainwindow import MainWindow
 
 
-class ThemeControl:
+class ThemeControl(Controller):
     """The theme and look of one MainWindow (``mw``)."""
 
     def __init__(self, mw: MainWindow):
-        self.mw = mw
+        super().__init__(mw)
 
     def apply_theme(self, name: str):
         # a still of the window with Bun over it while every widget restyles: no frame

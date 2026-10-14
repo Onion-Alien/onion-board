@@ -12,16 +12,17 @@ from PySide6.QtCore import QPoint
 from soundboard import updates
 from soundboard.i18n import _
 from soundboard.ui import busy, icons
+from soundboard.ui.controller import Controller
 
 if TYPE_CHECKING:
     from soundboard.ui.mainwindow import MainWindow
 
 
-class AboutControl:
+class AboutControl(Controller):
     """The About menu of one MainWindow (``mw``)."""
 
     def __init__(self, mw: MainWindow):
-        self.mw = mw
+        super().__init__(mw)
 
     def _show_about_menu(self):
         # (a foot button is checkable for Settings' "showing" fill: this one never is)
