@@ -6,18 +6,28 @@
   var root = document.documentElement;
   // Less motion asked for: no slide-ins or smooth scrolling. Bun and Hoot still play.
   var still = matchMedia("(prefers-reduced-motion: reduce)").matches;
-  var fine = matchMedia("(pointer: fine)").matches;
   function $(s, el) { return (el || document).querySelector(s); }
   function $$(s, el) { return Array.prototype.slice.call((el || document).querySelectorAll(s)); }
   function rand(a, b) { return a + Math.random() * (b - a); }
   function pick(list) { return list[Math.floor(Math.random() * list.length)]; }
   function load(k) { try { return localStorage.getItem(k); } catch (e) { return null; } }
   function save(k, v) { try { localStorage.setItem(k, v); } catch (e) { /* private window */ } }
-  function count(path) {
+  var waiting = [];
+  function count(path) {         // GoatCounter's script loads async: hold early ones until it's there
     if (window.goatcounter && goatcounter.count) goatcounter.count({ path: path, event: true });
+    else if (waiting.push(path) === 1) (function retry(n) {
+      setTimeout(function () {
+        if (window.goatcounter && goatcounter.count) waiting.splice(0).forEach(count);
+        else if (n < 20) retry(n + 1);
+        else waiting.length = 0;  // blocked or offline: give up quietly
+      }, 500);
+    })(0);
   }
+  // What visitors do on the page: site-<what>, each counted once a visit, so a few clicks
+  // never turn into a flood of hits (Onion Stats' Website tab shows them).
   var counted = {};
   function countOnce(path) { if (!counted[path]) { counted[path] = 1; count(path); } }
+  function did(what) { countOnce("site-" + what); }
 
   // ------------------------------------------------------------------ tabs
   var TITLES = {
@@ -62,10 +72,11 @@
   function select(name, scrollUp) {
     if (name === current()) { if (scrollUp) window.scrollTo({ top: 0, behavior: still ? "auto" : "smooth" }); return; }
     history.replaceState(null, "", name === "watch" ? "#watch" : location.pathname + location.search);
-    count("tab-" + name);
-    var swap = function () { apply(name); if (scrollUp) window.scrollTo(0, 0); };
-    if (document.startViewTransition) document.startViewTransition(swap);
-    else swap();
+    did("tab-" + name);
+    apply(name);
+    if (scrollUp) window.scrollTo(0, 0);
+    var p = $(".panel.on");     // fade the new page in and drop its mascot in (CSS)
+    p.classList.remove("enter"); void p.offsetWidth; p.classList.add("enter");
   }
   tabs.forEach(function (t, i) {
     t.addEventListener("click", function () { select(t.dataset.tab, false); });
@@ -84,6 +95,10 @@
     if (location.hash === "#watch") select("watch", true);
     else if (location.hash === "#board") select("board", true);
   });
+  panels.forEach(function (p) {
+    p.addEventListener("animationend", function (e) { if (e.target === p) p.classList.remove("enter"); });
+  });
+  new Image().src = brandImg.getAttribute("data-watch-src");   // no blank logo on the first switch
   window.addEventListener("resize", placePill);
   if (document.fonts && document.fonts.ready) document.fonts.ready.then(placePill);
 
@@ -109,6 +124,7 @@
 
   // ------------------------------------------------------------------ sound
   // Made on the spot, only after a click or a key press (browsers allow nothing sooner).
+  var VOL = 0.45;                // the page plays quietly: it's a demo, not the app
   var ac = null, bus = null, an = null, master = null, noise = null, levels = null;
   var muted = load("onion-site-muted") === "1";
   var muteBtn = $("#mute");
@@ -122,7 +138,7 @@
       comp.threshold.value = -16; comp.ratio.value = 6; comp.attack.value = 0.003; comp.release.value = 0.2;
       an = ac.createAnalyser(); an.fftSize = 1024;
       levels = new Uint8Array(an.fftSize);
-      master = ac.createGain(); master.gain.value = muted ? 0 : 0.6;
+      master = ac.createGain(); master.gain.value = muted ? 0 : VOL;
       bus.connect(comp); comp.connect(an); an.connect(master); master.connect(ac.destination);
       noise = ac.createBuffer(1, ac.sampleRate * 2, ac.sampleRate);
       var d = noise.getChannelData(0);
@@ -141,8 +157,9 @@
   muteBtn.addEventListener("click", function () {
     muted = !muted;
     save("onion-site-muted", muted ? "1" : "0");
-    if (master) master.gain.setTargetAtTime(muted ? 0 : 0.6, ac.currentTime, 0.02);
+    if (master) master.gain.setTargetAtTime(muted ? 0 : VOL, ac.currentTime, 0.02);
     showMute();
+    did(muted ? "mute-on" : "mute-off");
     if (!muted) { audio(); play("coin"); }
   });
 
@@ -198,9 +215,9 @@
     },
     boom: function (t) {
       var ws = crunch(2.5);
-      tone("sine", 110, 38, t, 1.7, 0.9, 0.004, ws);
-      tone("triangle", 70, 32, t, 1.4, 0.5, 0.004, ws);
-      hiss(t, 0.08, 0.5, "lowpass", 900);
+      tone("sine", 110, 38, t, 1.7, 0.28, 0.004, ws);
+      tone("triangle", 70, 32, t, 1.4, 0.16, 0.004, ws);
+      hiss(t, 0.08, 0.3, "lowpass", 900);
       return 1.7;
     },
     boing: function (t) {
@@ -209,11 +226,11 @@
       return 0.75;
     },
     rimshot: function (t) {
-      tone("sine", 210, 110, t, 0.2, 0.8);
+      tone("sine", 210, 110, t, 0.2, 0.5);
       hiss(t, 0.05, 0.3, "bandpass", 1800, 1);
-      tone("sine", 150, 80, t + 0.17, 0.26, 0.8);
+      tone("sine", 150, 80, t + 0.17, 0.26, 0.5);
       hiss(t + 0.17, 0.05, 0.3, "bandpass", 1500, 1);
-      tone("sine", 190, 100, t + 0.38, 0.2, 0.6);
+      tone("sine", 190, 100, t + 0.38, 0.2, 0.4);
       hiss(t + 0.38, 1.2, 0.35, "highpass", 6500);
       hiss(t + 0.38, 0.9, 0.2, "bandpass", 9500, 2);
       return 1.6;
@@ -254,32 +271,28 @@
       f.frequency.exponentialRampToValueAtTime(6000, t + 0.5);
       tone("sine", 200, 900, t, 0.5, 0.15, 0.4);
       var ws = crunch(3);
-      tone("sine", 160, 34, t + 0.55, 1.8, 1, 0.004, ws);
-      tone("sawtooth", 80, 30, t + 0.55, 1.2, 0.25, 0.004, ws);
-      hiss(t + 0.55, 0.1, 0.6, "lowpass", 1200);
+      tone("sine", 160, 34, t + 0.55, 1.8, 0.24, 0.004, ws);
+      tone("sawtooth", 80, 30, t + 0.55, 1.2, 0.07, 0.004, ws);
+      hiss(t + 0.55, 0.1, 0.35, "lowpass", 1200);
       return 2.35;
     },
-    // Bun and Hoot's own noises
-    squeak: function (t) { tone("sine", 700, 1500, t, 0.14, 0.35); return 0.15; },
+    // Bun and Hoot's own noises: small and quiet, so poking them never gets loud.
+    squeak: function (t) { tone("sine", 800, 1400, t, 0.12, 0.12, 0.01); return 0.13; },
     grumble: function (t) {
-      var o = tone("square", 120, 90, t, 0.6, 0.12);
-      vibrato(o, t, 18, 25, 0.6);
-      return 0.6;
+      var o = tone("triangle", 130, 100, t, 0.45, 0.12, 0.03);
+      vibrato(o, t, 14, 12, 0.45);
+      return 0.45;
     },
-    hoot: function (t) {
-      [[0, 0.32], [0.38, 0.5]].forEach(function (n) {
-        var o = tone("sine", 430, 380, t + n[0], n[1], 0.45, 0.06);
-        vibrato(o, t + n[0], 7, 8, n[1]);
-        tone("sine", 860, 760, t + n[0], n[1], 0.05, 0.06);
-      });
-      return 0.9;
+    hoot: function (t) {               // one soft, low "hoo"
+      tone("sine", 410, 370, t, 0.42, 0.09, 0.09);
+      return 0.42;
     },
-    ring: function (t) {
-      [[0, 1046.5], [0.2, 784]].forEach(function (n) {
-        tone("sine", n[1], n[1], t + n[0], 0.7, 0.4, 0.003);
-        tone("sine", n[1] * 2.76, n[1] * 2.76, t + n[0], 0.25, 0.08, 0.002);
+    ring: function (t) {               // a gentle two-note chime
+      [[0, 1046.5], [0.18, 784]].forEach(function (n) {
+        tone("sine", n[1], n[1], t + n[0], 0.55, 0.12, 0.01);
+        tone("sine", n[1] * 2, n[1] * 2, t + n[0], 0.2, 0.015, 0.01);
       });
-      return 0.9;
+      return 0.75;
     }
   };
 
@@ -293,15 +306,20 @@
   }
 
   // The level meter and Bun's mouth follow what's playing, like he does in the app.
+  // The level is smoothed (opens fast, closes slowly) and Bun keeps talking until the
+  // sound ends, so his mouth doesn't flicker between open and smiling on quiet bits.
   var meter = $("#meter"), mouth = $("#bun .mo"), tongue = $("#bun .tongue"), bunSvg = $("#bun");
+  var smooth = 0;
   function levelLoop() {
     var lvl = 0;
     if (an) {
       an.getByteTimeDomainData(levels);
       var sum = 0;
       for (var i = 0; i < levels.length; i += 2) { var v = (levels[i] - 128) / 128; sum += v * v; }
-      lvl = Math.min(1, Math.sqrt(sum / (levels.length / 2)) * 3.2);
+      lvl = Math.min(1, Math.sqrt(sum / (levels.length / 2)) * 3.4);
     }
+    smooth += (lvl - smooth) * (lvl > smooth ? 0.45 : 0.12);
+    lvl = smooth;
     meter.style.transform = "scaleX(" + lvl.toFixed(3) + ")";
     var m = Math.min(1, lvl * 1.4), oh = 2.5 + 6.5 * m;
     mouth.setAttribute("ry", (oh / 2).toFixed(2));
@@ -309,9 +327,9 @@
     mouth.setAttribute("cy", (76 + oh / 2).toFixed(2));
     tongue.setAttribute("cy", (76 + oh * 0.78).toFixed(2));
     tongue.setAttribute("ry", (oh * 0.2).toFixed(2));
-    bunSvg.classList.toggle("talking", lvl > 0.04);
+    bunSvg.classList.add("talking");
     if (performance.now() < talkUntil) requestAnimationFrame(levelLoop);
-    else { looping = false; meter.style.transform = "scaleX(0)"; bunSvg.classList.remove("talking"); }
+    else { looping = false; smooth = 0; meter.style.transform = "scaleX(0)"; bunSvg.classList.remove("talking"); }
   }
 
   // ------------------------------------------------------------------ helpers for both
@@ -378,12 +396,13 @@
   bunBtn.addEventListener("click", function () {
     wake();
     boing(bunBtn);
-    countOnce("site-poke-bun");
+    did("poke-bun");
     if (pokes(bunPokes) >= 6) {
       bunSvg.classList.add("angry");
       clearTimeout(angryT);
       angryT = setTimeout(function () { bunSvg.classList.remove("angry"); }, 3200);
       play("grumble");
+      did("bun-angry");
       say(bunSay, pick(["Hey! Press the pads, not me.", "I bite, you know.", "Okay, that's enough poking."]), 2800);
       bunPokes.length = 0;
       return;
@@ -399,6 +418,7 @@
       bunSvg.classList.remove("asleep");
       clearInterval(zzz);
       say(bunSay, "I'm up! I'm up!", 1600);
+      did("bun-woke");
     }
   }
   function bunShown() { idleAt = performance.now(); }
@@ -422,10 +442,11 @@
 
   // the pads
   var padEls = $$("#pads .pad");
-  function hitPad(btn) {
+  function hitPad(btn, how) {
     wake();
     var d = play(btn.dataset.sfx);
-    countOnce("site-try-pad");
+    did("pads"); did("pad-" + btn.dataset.sfx);
+    if (how) did("pad-" + how);
     if (!d) return;
     btn.classList.add("on");
     btn.classList.remove("hit"); void btn.offsetWidth; btn.classList.add("hit");
@@ -446,7 +467,7 @@
     var tag = (e.target.tagName || "").toLowerCase();
     if (tag === "input" || tag === "textarea" || e.target.isContentEditable) return;
     var n = parseInt(e.key, 10);
-    if (n >= 1 && n <= 9) { e.preventDefault(); hitPad(padEls[n - 1]); }
+    if (n >= 1 && n <= 9) { e.preventDefault(); hitPad(padEls[n - 1], "key"); }
   });
 
   // ------------------------------------------------------------------ Hoot
@@ -456,9 +477,10 @@
   hootBtn.addEventListener("animationend", function (e) { if (e.animationName === "boing") hootBtn.classList.remove("boing"); });
   hootBtn.addEventListener("click", function () {
     boing(hootBtn);
-    countOnce("site-poke-hoot");
+    did("poke-hoot");
     if (pokes(hootPokes) >= 6) {
       hootPokes.length = 0;
+      did("hoot-shh");
       say(hootSay, "Shh! I'm working here.", 2400);
       return;
     }
@@ -471,12 +493,14 @@
   var win = $("#gamewin"), spawnBtn = $("#spawn-btn"), status = $("#watch-status");
   var ringing = false, ringT = 0, rings = 0, autoT = 0, demoTouched = false;
   var SPAWNS = ["RARE SPAWN!", "QUEUE POPPED!", "WHISPER!", "YOU DIED"];
+  var SCENE = { "RARE SPAWN!": "rare", "QUEUE POPPED!": "queue", "WHISPER!": "whisper", "YOU DIED": "died" };
   function setStatus(html) { status.innerHTML = "<i></i>" + html; }
   function fire(loud) {
     if (ringing) return;
     ringing = true; rings = 0;
     var what = pick(SPAWNS);
     $(".spawn", win).textContent = what;
+    win.dataset.what = SCENE[what];       // the scene reacts too: the rare one pops out, you fall over
     win.classList.add("fired");
     hootSvg.classList.add("alert");
     setStatus("<b>" + what.replace("!", "") + "</b> · ringing until you're back");
@@ -502,6 +526,7 @@
     ringing = false;
     clearTimeout(ringT);
     win.classList.remove("fired");
+    delete win.dataset.what;
     hootSvg.classList.remove("alert");
     setStatus("Hoot is watching…");
     spawnBtn.textContent = "Make it show up";
@@ -510,8 +535,8 @@
   spawnBtn.addEventListener("click", function () {
     demoTouched = true;
     clearTimeout(autoT);
-    countOnce("site-watch-demo");
-    if (ringing) { back(); say(hootSay, "Welcome back.", 1600); }
+    did("watch-demo");
+    if (ringing) { back(); say(hootSay, "Welcome back.", 1600); did("watch-back"); }
     else fire(true);
   });
   function watchShown() {        // show the trick once by itself, silently, then leave it to them
@@ -526,13 +551,9 @@
   }
 
   // ------------------------------------------------------------------ eyes follow the pointer
-  var px = -1, py = -1, raf = 0, spot = $(".spot");
+  var px = -1, py = -1, raf = 0;
   function look() {
     raf = 0;
-    if (spot) {
-      spot.style.setProperty("--sx", px + "px");
-      spot.style.setProperty("--sy", py + "px");
-    }
     var svg = current() === "watch" ? hootSvg : bunSvg, r = svg.getBoundingClientRect();
     if (!r.width || r.bottom < 0 || r.top > innerHeight) return;
     var cx = r.left + r.width / 2, cy = r.top + r.height * 0.45;
@@ -550,10 +571,8 @@
   }
   window.addEventListener("pointermove", function (e) {
     px = e.clientX; py = e.clientY;
-    if (spot && fine) spot.classList.add("on");
     if (!raf) raf = requestAnimationFrame(look);
   }, { passive: true });
-  document.addEventListener("pointerleave", function () { if (spot) spot.classList.remove("on"); });
 
   // ------------------------------------------------------------------ page bits
   var top = $("#top");
@@ -563,15 +582,6 @@
     top.classList.toggle("past", !!dl && dl.getBoundingClientRect().bottom < 60);
   }
   window.addEventListener("scroll", onScroll, { passive: true });
-
-  // Bento tiles: a soft light follows the mouse.
-  $$(".tile").forEach(function (c) {
-    c.addEventListener("pointermove", function (e) {
-      var r = c.getBoundingClientRect();
-      c.style.setProperty("--mx", (e.clientX - r.left) + "px");
-      c.style.setProperty("--my", (e.clientY - r.top) + "px");
-    });
-  });
 
   // Fade sections up as they come into view; count the stats up.
   function countUp(b) {
@@ -623,10 +633,42 @@
   $$("[data-copy]").forEach(function (b) {
     b.addEventListener("click", function () {
       var text = $("#" + b.getAttribute("data-copy")).textContent;
+      did("copy-" + b.getAttribute("data-copy"));
       var done = function () { b.textContent = "Copied ✓"; setTimeout(function () { b.textContent = "Copy"; }, 1600); };
       if (navigator.clipboard) navigator.clipboard.writeText(text).then(done, function () {});
     });
   });
 
+  // Which questions get opened, which links get followed (downloads count themselves:
+  // data-goatcounter-click), and how far down each tab people read.
+  panels.forEach(function (p) {
+    $$(".faq details", p).forEach(function (d, i) {
+      d.addEventListener("toggle", function () { if (d.open) did("faq-" + p.dataset.panel + "-" + (i + 1)); });
+    });
+  });
+  var LINKS = [[/virustotal\.com/, "virustotal"], [/releases\/latest$/, "whats-new"], [/releases$/, "releases"],
+    [/\/issues/, "issues"], [/FEATURES\.md/, "features"], [/SECURITY\.md/, "security"], [/discord\.gg/, "discord"],
+    [/tally\.so/, "feedback"], [/github\.com\/Onion-Alien\/onion-watch$/, "watch-source"],
+    [/github\.com\/Onion-Alien\/onion-board$/, "source"], [/onion-alien\.github\.io\/onion-watch/, "watch-site"]];
+  document.addEventListener("click", function (e) {
+    var a = e.target.closest && e.target.closest("a[href]");
+    if (!a || a.hasAttribute("data-goatcounter-click")) return;
+    var h = a.getAttribute("href"), name = "";
+    if (a.hasAttribute("data-tab-link")) name = "cross-" + a.getAttribute("data-tab-link");
+    else if (h.charAt(0) === "#") name = "jump-" + (h.slice(1) || "top");
+    else if (/^[\w-]+\/$/.test(h)) name = "guide-" + h.slice(0, -1);
+    else for (var i = 0; i < LINKS.length && !name; i++) if (LINKS[i][0].test(h)) name = LINKS[i][1];
+    did("link-" + (name || "other"));
+  });
+  var deepest = {};
+  window.addEventListener("scroll", function () {
+    var tab = current(), max = document.documentElement.scrollHeight - innerHeight;
+    if (max < 200) return;
+    var p = Math.floor(scrollY / max * 4) * 25;      // 25, 50, 75, 100 (%)
+    for (var q = (deepest[tab] || 0) + 25; q <= p; q += 25) did("scroll-" + tab + "-" + q);
+    deepest[tab] = Math.max(deepest[tab] || 0, p);
+  }, { passive: true });
+
   apply(location.hash === "#watch" ? "watch" : "board");
+  did("open-" + current());       // which tab they landed on
 })();

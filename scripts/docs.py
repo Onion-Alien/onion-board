@@ -11,7 +11,9 @@ between the <!-- release --> markers in README.md and docs/index.html, and the
 sitemap's dates are set to today. Every screenshot link gets ?v=<hash of the picture>,
 so nobody is shown an old cached copy after the pictures change.
 
-Screenshots are screenshots.py (offscreen, made-up data, the Retro 98 theme). Set
+Screenshots are screenshots.py (offscreen, made-up data, the Dark theme, Textured). The
+Onion Watch pictures in docs/screenshots/watch/ come from Onion Watch's own screenshots.py
+(its Hoot theme) and are copied in by hand. Set
 ONIONBOARD_ONION_WATCH_ZIP to an OnionWatch-module.zip to include the Triggers tab.
 --tour runs tour.py, which drives a real window parked off-screen for about a minute.
 """
@@ -81,8 +83,7 @@ def bust_caches():
         return f"{m.group(1)}{m.group(2)}?v={h}"
     for page in PAGES:
         text = page.read_text(encoding="utf-8")
-        # (not Onion Watch's pictures, which the home page links on its own site)
-        new = re.sub(r"(?<!onion-watch/)(screenshots/)([\w-]+\.(?:png|webp))(?:\?v=\w+)?",
+        new = re.sub(r"(?<!onion-watch/)(screenshots/)([\w/-]+\.(?:png|webp))(?:\?v=\w+)?",
                      tag, text)
         if new != text:
             page.write_text(new, encoding="utf-8")

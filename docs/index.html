@@ -7,7 +7,7 @@
 <meta name="description" content="Free Windows soundboard: play sounds into Discord and games through your mic. In-game hotkeys, an overlay, effects, a voice changer, text-to-speech, instant replay, and screen triggers that play a sound when something shows up, like YOU DIED.">
 <meta property="og:title" content="Onion Board: free soundboard for Discord and games">
 <meta property="og:description" content="Play sounds through your mic in Discord and games. Voice changer, text-to-speech, and screen triggers that play a sound when you die.">
-<meta property="og:image" content="https://onion-alien.github.io/onion-board/screenshots/sounds.png?v=e4854f5a">
+<meta property="og:image" content="https://onion-alien.github.io/onion-board/screenshots/sounds.png?v=6a40548c">
 <meta property="og:type" content="website">
 <meta name="twitter:card" content="summary_large_image">
 <link rel="icon" href="favicon.ico" sizes="16x16 32x32 48x48">
@@ -22,7 +22,7 @@
  "description": "Free Windows soundboard: play sounds into Discord and games through your mic, with a voice changer, text-to-speech, in-game hotkeys and screen triggers.",
  "url": "https://onion-alien.github.io/onion-board/",
  "downloadUrl": "https://github.com/Onion-Alien/onion-board/releases/latest/download/OnionBoardSetup.exe",
- "screenshot": "https://onion-alien.github.io/onion-board/screenshots/sounds.png?v=e4854f5a",
+ "screenshot": "https://onion-alien.github.io/onion-board/screenshots/sounds.png?v=6a40548c",
  "offers": {"@type": "Offer", "price": "0", "priceCurrency": "USD"}}
 </script>
 <link rel="stylesheet" href="home.css">
@@ -36,7 +36,6 @@
 </head>
 <body>
 <div class="bg" aria-hidden="true"><i></i><i></i><i></i></div>
-<div class="spot" aria-hidden="true"></div>
 
 <!-- Bun and Hoot, drawn once (ported from the apps' own drawing code) and reused below. -->
 <svg width="0" height="0" style="position:absolute" aria-hidden="true">
@@ -45,6 +44,80 @@
     <clipPath id="eyeL"><circle cx="36" cy="53" r="11"/></clipPath>
     <clipPath id="eyeR"><circle cx="64" cy="53" r="11"/></clipPath>
     <filter id="soft" x="-50%" y="-50%" width="200%" height="200%"><feGaussianBlur stdDeviation="3"/></filter>
+    <!-- Still copies for the small pictures (tabs, footer, cross-links): a <use> of the live
+         Bun or Hoot is rebuilt every time they move, and flickers. -->
+    <symbol id="bun-icon" overflow="visible"><g class="bun-g" stroke="#2b2340" stroke-width="2.4" stroke-linejoin="round" stroke-linecap="round">
+              <g class="ear l"><ellipse cx="36" cy="26" rx="9.5" ry="25" fill="#fbf7f2" transform="rotate(-10 36 26)"/>
+                <ellipse cx="36" cy="28" rx="4.5" ry="18" fill="#ffb3c7" stroke="none" transform="rotate(-10 36 28)"/></g>
+              <g class="ear r"><ellipse cx="66" cy="28" rx="9.5" ry="24" fill="#fbf7f2" transform="rotate(18 66 28)"/>
+                <ellipse cx="66" cy="30" rx="4.5" ry="17" fill="#ffb3c7" stroke="none" transform="rotate(18 66 30)"/></g>
+              <ellipse cx="50" cy="100" rx="25" ry="18" fill="#fbf7f2"/>
+              <ellipse cx="50" cy="104" rx="15" ry="11" fill="#ece3da" stroke="none"/>
+              <ellipse cx="37" cy="116" rx="8" ry="4" fill="#fbf7f2"/>
+              <ellipse cx="63" cy="116" rx="8" ry="4" fill="#fbf7f2"/>
+              <ellipse cx="50" cy="64" rx="34" ry="28" fill="#fbf7f2"/>
+              <path class="phones-band" d="M17 64C15 26 85 26 83 64" fill="none" stroke-width="8.5"/>
+              <path class="band-c" d="M17 64C15 26 85 26 83 64" fill="none" stroke-width="5"/>
+              <rect class="cup" x="10" y="54" width="11" height="22" rx="5"/>
+              <rect class="cup-hi" x="12.5" y="57" width="3" height="10" rx="1.5" stroke="none"/>
+              <rect class="cup" x="80" y="54" width="11" height="22" rx="5"/>
+              <rect class="cup-hi" x="82.5" y="57" width="3" height="10" rx="1.5" stroke="none"/>
+              <g class="cap">
+                <path d="M24 49C24 30 40 19 56 20C74 21 88 31 91 47C85 40 80 38 76 47Q50 40 24 49Z" fill="#7c5cff"/>
+                <g clip-path="url(#capclip)" stroke="#a996ff" stroke-width="5"><path d="M24 50L40 14M40 50L56 14M56 50L72 14M72 50L88 14"/></g>
+                <path d="M24 49C24 30 40 19 56 20C74 21 88 31 91 47C85 40 80 38 76 47Q50 40 24 49Z" fill="none"/>
+                <path d="M22 50Q50 39 78 48" fill="none" stroke-width="9"/>
+                <path d="M22 50Q50 39 78 48" fill="none" stroke="#fbf7f2" stroke-width="6"/>
+                <circle cx="91" cy="49" r="5.5" fill="#fbf7f2"/>
+              </g>
+              <g class="eyes">
+                <g class="eye"><g class="open" stroke="none"><ellipse cx="39" cy="62" rx="4.5" ry="5.75" fill="#2b2340"/>
+                  <ellipse cx="40.6" cy="59" rx="1.7" ry="1.9" fill="#fff"/><circle cx="37.4" cy="65.5" r=".8" fill="#fff"/></g>
+                  <path class="shut" d="M34.5 62Q39 65.5 43.5 62" fill="none" stroke-width="2.2"/></g>
+                <g class="eye"><g class="open" stroke="none"><ellipse cx="61" cy="62" rx="4.5" ry="5.75" fill="#2b2340"/>
+                  <ellipse cx="62.6" cy="59" rx="1.7" ry="1.9" fill="#fff"/><circle cx="59.4" cy="65.5" r=".8" fill="#fff"/></g>
+                  <path class="shut" d="M56.5 62Q61 65.5 65.5 62" fill="none" stroke-width="2.2"/></g>
+              </g>
+              <g class="brows" stroke-width="2.6" fill="none"><path d="M33 49L42 55"/><path d="M67 49L58 55"/></g>
+              <g class="cheeks" stroke="none"><ellipse cx="30" cy="72" rx="5.5" ry="3.25" fill="rgba(255,128,160,.43)"/>
+                <ellipse cx="70" cy="72" rx="5.5" ry="3.25" fill="rgba(255,128,160,.43)"/></g>
+              <path d="M46.5 69L53.5 69Q50 74 50 74Z" fill="#ff8fae" stroke="#e0708f" stroke-width="1.2"/>
+              <path class="smile" d="M44 75Q47 79.5 50 75.5Q53 79.5 56 75" fill="none" stroke-width="1.8"/>
+              <path class="frown" d="M45 78.5Q50 74.5 55 78.5" fill="none" stroke-width="1.8"/>
+              <g class="talk"><ellipse class="mo" cx="50" cy="80" rx="4.5" ry="4" fill="#5a2238" stroke-width="1.6"/>
+                <ellipse class="tongue" cx="50" cy="82.5" rx="2.25" ry="1.6" fill="#ff8fae" stroke="none"/></g>
+              <g class="mic"><rect x="76" y="88" width="7" height="20" rx="3" fill="#3a3452"/>
+                <circle cx="79.5" cy="84" r="7.5" fill="#9aa0b4"/>
+                <path d="M74 81H85M73.5 84H85.5M74 87H85" stroke="#6d7288" stroke-width="1"/>
+                <ellipse cx="76" cy="97" rx="6" ry="5" fill="#fbf7f2"/></g>
+              <path class="vein" d="M70.5 34Q70.5 38.5 66 38.5M73.5 34Q73.5 38.5 78 38.5M73.5 46Q73.5 41.5 78 41.5M70.5 46Q70.5 41.5 66 41.5"
+                    fill="none" stroke="#ff4d6d" stroke-width="2.4"/>
+            </g></symbol>
+    <symbol id="hoot-icon" overflow="visible"><g class="hoot-g"><g class="body-turn" stroke="#2b2340" stroke-width="2.4" stroke-linejoin="round" stroke-linecap="round">
+              <path class="tuft l" d="M34 34Q20 22 16 10Q14 30 16 44Z" fill="#2f9c8c"/>
+              <path class="tuft r" d="M66 34Q80 22 84 10Q86 30 84 44Z" fill="#2f9c8c"/>
+              <rect x="16" y="24" width="68" height="88" rx="34" ry="36" fill="#4fc3b0"/>
+              <ellipse cx="50" cy="88" rx="21" ry="20" fill="#f4efe6" stroke="none"/>
+              <path d="M39 80Q42 83 45 80M47 84Q50 87 53 84M55 80Q58 83 61 80M43 92Q46 95 49 92M51 92Q54 95 57 92M47 100Q50 103 53 100"
+                    fill="none" stroke="#d9cfbf" stroke-width="1.8"/>
+              <g fill="#ffb347" stroke-width="1.6"><ellipse cx="36.5" cy="113" rx="2.1" ry="3"/><ellipse cx="40" cy="113" rx="2.1" ry="3"/><ellipse cx="43.5" cy="113" rx="2.1" ry="3"/>
+                <ellipse cx="56.5" cy="113" rx="2.1" ry="3"/><ellipse cx="60" cy="113" rx="2.1" ry="3"/><ellipse cx="63.5" cy="113" rx="2.1" ry="3"/></g>
+              <g class="wing l"><ellipse cx="17" cy="80" rx="8" ry="19" fill="#2f9c8c" transform="rotate(12 17 80)"/></g>
+              <g class="wing r"><ellipse cx="83" cy="80" rx="8" ry="19" fill="#2f9c8c" transform="rotate(-12 83 80)"/></g>
+              <path d="M50 40C40 30 18 34 20 54C22 70 42 72 50 64C58 72 78 70 80 54C82 34 60 30 50 40Z" fill="rgba(255,255,255,.27)" stroke="none"/>
+              <g class="glow" stroke="none" fill="#ffc53d" filter="url(#soft)"><circle cx="36" cy="53" r="15"/><circle cx="64" cy="53" r="15"/></g>
+              <circle class="eyering" cx="36" cy="53" r="12"/>
+              <g clip-path="url(#eyeL)" stroke="none"><g class="pupils"><ellipse cx="36" cy="54" rx="6.5" ry="7" fill="#2b2340"/>
+                <ellipse cx="38.2" cy="50.5" rx="2.3" ry="2.4" fill="#fff"/><circle cx="33.6" cy="57.5" r="1" fill="#fff"/></g>
+                <rect class="lid" x="23" y="41" width="26" height="24" fill="#4fc3b0"/></g>
+              <circle class="eyering" cx="64" cy="53" r="12"/>
+              <g clip-path="url(#eyeR)" stroke="none"><g class="pupils"><ellipse cx="64" cy="54" rx="6.5" ry="7" fill="#2b2340"/>
+                <ellipse cx="66.2" cy="50.5" rx="2.3" ry="2.4" fill="#fff"/><circle cx="61.6" cy="57.5" r="1" fill="#fff"/></g>
+                <rect class="lid" x="51" y="41" width="26" height="24" fill="#4fc3b0"/></g>
+              <circle cx="36" cy="53" r="12" fill="none"/><circle cx="64" cy="53" r="12" fill="none"/>
+              <g stroke="none" fill="rgba(255,128,160,.43)"><ellipse cx="25" cy="68" rx="5" ry="3"/><ellipse cx="75" cy="68" rx="5" ry="3"/></g>
+              <path d="M45.5 62L54.5 62Q52 70 50 72Q48 70 45.5 62Z" fill="#ffb347" stroke-width="1.8"/>
+            </g></g></symbol>
   </defs>
 </svg>
 
@@ -52,14 +125,14 @@
   <div class="wrap">
     <a class="brand" href="#" aria-label="Back to the top">
       <img class="logo" src="favicon.png" alt="" width="30" height="30" data-board-src="favicon.png"
-           data-watch-src="https://onion-alien.github.io/onion-watch/screenshots/icon.png"><span data-name>Onion Board</span>
+           data-watch-src="screenshots/watch/icon.png?v=d84623f4"><span data-name>Onion Board</span>
     </a>
     <div class="switch" role="tablist" aria-label="Pick an app">
       <span class="pill" aria-hidden="true"></span>
       <button role="tab" id="tab-board" aria-controls="board" aria-selected="true" data-tab="board">
-        <svg viewBox="-6 -10 112 140" aria-hidden="true"><use href="#bun-art"/></svg>Onion Board</button>
+        <svg viewBox="-6 -10 112 140" aria-hidden="true"><use href="#bun-icon"/></svg>Onion Board</button>
       <button role="tab" id="tab-watch" aria-controls="watch" aria-selected="false" data-tab="watch" tabindex="-1">
-        <svg viewBox="-6 -10 112 140" aria-hidden="true"><use href="#hoot-art"/></svg>Onion Watch</button>
+        <svg viewBox="-6 -10 112 140" aria-hidden="true"><use href="#hoot-icon"/></svg>Onion Watch</button>
     </div>
     <div class="tools">
       <button class="icon-btn" id="mute" type="button" aria-pressed="false" aria-label="Sound on: click to mute the page" title="Sound on">🔊</button>
@@ -178,7 +251,7 @@
       <h2 class="rv">A board that looks as <em>good as it sounds.</em></h2>
       <p class="sub rv">Your sounds as pads. Click one, or hit its hotkey mid-game.</p>
       <div class="showcase"><div class="frame">
-        <img src="screenshots/sounds.png?v=e4854f5a" width="2100" height="1281" alt="Onion Board's sound pads">
+        <img src="screenshots/sounds.png?v=6a40548c" width="2100" height="1281" alt="Onion Board's sound pads">
       </div></div>
     </section>
 
@@ -226,10 +299,10 @@
       <span class="kicker rv">A closer look</span>
       <h2 class="rv">More than <em>pads.</em></h2>
       <div class="shots">
-        <figure class="rv"><img src="screenshots/voice.png?v=61f7a762" alt="The Voice tab" loading="lazy"><figcaption><b>Voice</b>Voice changer and text-to-speech</figcaption></figure>
-        <figure class="rv"><img src="screenshots/triggers.png?v=0f4d9357" alt="The Triggers tab" loading="lazy"><figcaption><b>Triggers</b>A sound when something shows up in your game</figcaption></figure>
-        <figure class="rv"><img src="screenshots/apps.png?v=eff0dd4d" alt="The Apps tab" loading="lazy"><figcaption><b>Apps</b>Send one program's sound to your friends</figcaption></figure>
-        <figure class="rv"><img src="screenshots/setup.png?v=9aa967bc" alt="The Setup tab" loading="lazy"><figcaption><b>Setup</b>Setup shows at a glance whether they can hear you</figcaption></figure>
+        <figure class="rv"><img src="screenshots/voice.png?v=dc096b81" alt="The Voice tab" loading="lazy"><figcaption><b>Voice</b>Voice changer and text-to-speech</figcaption></figure>
+        <figure class="rv"><img src="screenshots/triggers.png?v=0534ffb7" alt="The Triggers tab" loading="lazy"><figcaption><b>Triggers</b>A sound when something shows up in your game</figcaption></figure>
+        <figure class="rv"><img src="screenshots/apps.png?v=59b5ca5b" alt="The Apps tab" loading="lazy"><figcaption><b>Apps</b>Send one program's sound to your friends</figcaption></figure>
+        <figure class="rv"><img src="screenshots/setup.png?v=f37c0de8" alt="The Setup tab" loading="lazy"><figcaption><b>Setup</b>Setup shows at a glance whether they can hear you</figcaption></figure>
       </div>
     </section>
 
@@ -273,7 +346,7 @@
     </section>
 
     <aside class="cross rv">
-      <svg class="pic" viewBox="-6 -10 112 140" aria-hidden="true"><use href="#hoot-art"/></svg>
+      <svg class="pic" viewBox="-6 -10 112 140" aria-hidden="true"><use href="#hoot-icon"/></svg>
       <div><h3>Meet Onion Watch</h3><p>Our other free app: Hoot plays a sound when something shows up in your game, even while you're alt-tabbed.
         It's also Onion Board's Triggers tab.</p></div>
       <a class="go" href="#watch" data-tab-link="watch">See Onion Watch →</a>
@@ -343,9 +416,107 @@
         <div class="gamewin" id="gamewin">
           <div class="bar"><i></i><i></i><i></i><span>Your game · in the background</span><em>you're alt-tabbed</em></div>
           <div class="scene" aria-hidden="true">
-            <div class="moon"></div><div class="hill a"></div><div class="hill b"></div>
-            <div class="tree" style="left:46px"></div><div class="tree" style="left:84px;transform:scale(.8)"></div><div class="tree" style="right:40px;transform:scale(1.15)"></div>
-            <div class="hero-dot"></div>
+            <svg class="world" viewBox="0 0 460 200" preserveAspectRatio="xMidYMid slice">
+              <defs>
+                <linearGradient id="gw-sky" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="0" stop-color="#140f33"/><stop offset=".5" stop-color="#33225e"/>
+                  <stop offset=".78" stop-color="#7a3f6e"/><stop offset="1" stop-color="#c0646a"/>
+                </linearGradient>
+                <radialGradient id="gw-moon"><stop offset="0" stop-color="#fff3d1" stop-opacity=".55"/><stop offset="1" stop-color="#fff3d1" stop-opacity="0"/></radialGradient>
+                <radialGradient id="gw-portal"><stop offset="0" stop-color="#b9fff4"/><stop offset=".45" stop-color="#4fd8c6"/><stop offset="1" stop-color="#1b5e6e"/></radialGradient>
+                <radialGradient id="gw-halo"><stop offset="0" stop-color="#5fe0cf" stop-opacity=".5"/><stop offset="1" stop-color="#5fe0cf" stop-opacity="0"/></radialGradient>
+                <radialGradient id="gw-lamp"><stop offset="0" stop-color="#ffd27a" stop-opacity=".7"/><stop offset="1" stop-color="#ffd27a" stop-opacity="0"/></radialGradient>
+                <radialGradient id="gw-dead" cx=".5" cy=".55" r=".75"><stop offset=".35" stop-color="#5a0012" stop-opacity="0"/><stop offset="1" stop-color="#5a0012" stop-opacity=".85"/></radialGradient>
+              </defs>
+              <rect width="460" height="200" fill="url(#gw-sky)"/>
+              <g class="stars" fill="#fff">
+                <circle cx="30" cy="22" r="1.1"/><circle cx="74" cy="44" r=".8"/><circle cx="118" cy="16" r="1.3"/>
+                <circle cx="166" cy="38" r=".8"/><circle cx="208" cy="12" r="1"/><circle cx="262" cy="30" r=".8"/>
+                <circle cx="300" cy="14" r="1.2"/><circle cx="338" cy="52" r=".7"/><circle cx="436" cy="24" r="1.1"/>
+                <circle cx="420" cy="70" r=".7"/><circle cx="12" cy="64" r=".8"/><circle cx="96" cy="76" r=".6"/>
+              </g>
+              <circle cx="388" cy="40" r="46" fill="url(#gw-moon)"/>
+              <circle cx="388" cy="40" r="17" fill="#fff3d1"/>
+              <circle cx="382" cy="35" r="3.5" fill="#efdcae"/><circle cx="393" cy="46" r="2.4" fill="#efdcae"/><circle cx="394" cy="32" r="1.6" fill="#efdcae"/>
+              <!-- far mountains, then nearer, each a little darker -->
+              <path d="M0 132L34 104L58 118L96 82L128 112L160 96L200 124L240 100L272 116L310 88L350 116L392 94L430 112L460 98V200H0Z" fill="#59377a" opacity=".85"/>
+              <path d="M96 82L104 91L98 90L92 95L88 89Z M310 88L318 97L312 96L306 101L302 95Z" fill="#a98ac9" opacity=".55"/>
+              <path d="M0 146L40 126L80 138L126 118L170 136L214 128L262 140L300 122L346 134L392 120L460 136V200H0Z" fill="#3a2659"/>
+              <!-- the castle on the hill -->
+              <g class="castle">
+                <path d="M318 124V96H314V88H319V92H323V88H328V92H332V88H337V96H333V112H352V100H348V93H353V97H357V93H362V97H366V93H371V100H367V126Z" fill="#241938" stroke="#120c22" stroke-width="1.5" stroke-linejoin="round"/>
+                <path d="M327 102h4v7h-4z M357 104h4v6h-4z M341 114h5v12h-5z" fill="#ffc95a"/>
+                <circle cx="329" cy="105" r="9" fill="url(#gw-lamp)"/><circle cx="359" cy="107" r="8" fill="url(#gw-lamp)"/>
+                <path d="M325 88V78" stroke="#120c22" stroke-width="1.4"/><path d="M325 78L334 81L325 84Z" fill="#ff5c8a"/>
+              </g>
+              <path d="M0 160C60 146 110 152 160 150C220 148 260 142 320 150C380 157 420 148 460 152V200H0Z" fill="#251a45"/>
+              <!-- pines -->
+              <g fill="#140e28" stroke="#0b0818" stroke-width="1" stroke-linejoin="round">
+                <path d="M22 168L36 120L50 168Z"/><path d="M26 146L36 110L46 146Z"/>
+                <path d="M48 170L60 132L72 170Z"/><path d="M4 172L14 140L24 172Z"/>
+                <path d="M412 170L426 118L440 170Z"/><path d="M416 146L426 108L436 146Z"/>
+                <path d="M438 172L450 136L462 172Z"/><path d="M392 172L402 146L412 172Z"/>
+              </g>
+              <!-- the ground -->
+              <path d="M0 172C80 164 150 168 230 166C320 164 390 168 460 166V200H0Z" fill="#1a1330"/>
+              <path d="M150 200C180 186 210 176 230 172C250 176 280 186 310 200Z" fill="#2a2046"/>
+              <g stroke="#3d2f63" stroke-width="1.6" stroke-linecap="round" fill="none">
+                <path d="M84 172l2-5m2 5l-1-6M376 171l2-5m2 5l-1-6M120 182l2-5m2 5l-1-6M340 186l2-5m2 5l-1-6"/>
+              </g>
+              <!-- the stone arch with a portal in it -->
+              <circle class="halo" cx="230" cy="140" r="52" fill="url(#gw-halo)"/>
+              <g stroke="#120c22" stroke-width="2" stroke-linejoin="round">
+                <path d="M200 172V128Q200 100 230 100Q260 100 260 128V172H250V130Q250 112 230 112Q210 112 210 130V172Z" fill="#5d5480"/>
+                <ellipse class="portal" cx="230" cy="143" rx="19" ry="29" fill="url(#gw-portal)" stroke="none"/>
+                <path d="M196 174h18v-6h-18zM246 174h18v-6h-18z" fill="#4a4268"/>
+                <path d="M224 100h12l-2 8h-8z" fill="#7a70a3"/>
+              </g>
+              <path d="M205 120l3 3M254 124l-3 4M207 150h3M250 156h3" stroke="#3e3660" stroke-width="1.4" stroke-linecap="round"/>
+              <!-- the name plate the trigger watches: a rare one's name shows up here -->
+              <g class="plate">
+                <path d="M152 42h156M152 42l-6 -8M308 42l6 -8" stroke="#8f7fb8" stroke-width="1.4" fill="none" opacity=".6"/>
+                <rect x="150" y="44" width="160" height="30" rx="7" fill="#100b22" fill-opacity=".72" stroke="#6f5fa0" stroke-width="1.4"/>
+                <g class="runes" fill="#6f5fa0"><circle cx="214" cy="59" r="2"/><circle cx="230" cy="59" r="2"/><circle cx="246" cy="59" r="2"/></g>
+              </g>
+              <!-- the rare one: only out for RARE SPAWN -->
+              <g class="rare">
+                <ellipse cx="230" cy="171" rx="20" ry="3.5" fill="#000" opacity=".35"/>
+                <path d="M212 170Q210 146 230 142Q250 146 248 170Z" fill="#ffd45e" stroke="#2b2340" stroke-width="2.2" stroke-linejoin="round"/>
+                <path d="M222 148Q228 145 233 147" stroke="#fff6cf" stroke-width="2.4" stroke-linecap="round" fill="none"/>
+                <ellipse cx="224" cy="158" rx="2.4" ry="3.2" fill="#2b2340"/><ellipse cx="236" cy="158" rx="2.4" ry="3.2" fill="#2b2340"/>
+                <path d="M227 164Q230 167 233 164" stroke="#2b2340" stroke-width="1.6" fill="none" stroke-linecap="round"/>
+                <path d="M226 136l4-8 4 8-4-2z" fill="#ffe9a0" stroke="#2b2340" stroke-width="1.4" stroke-linejoin="round"/>
+                <g class="sparks" fill="#fff6cf"><path d="M206 146l1.5 3.5 3.5 1.5-3.5 1.5-1.5 3.5-1.5-3.5-3.5-1.5 3.5-1.5z"/>
+                  <path d="M254 140l1.2 2.8 2.8 1.2-2.8 1.2-1.2 2.8-1.2-2.8-2.8-1.2 2.8-1.2z"/></g>
+              </g>
+              <!-- you: a little knight -->
+              <g class="knight">
+                <g class="kb">
+                  <ellipse cx="128" cy="177" rx="15" ry="3" fill="#000" opacity=".4"/>
+                  <g stroke="#2b2340" stroke-width="2" stroke-linejoin="round" stroke-linecap="round">
+                    <path d="M118 150Q110 166 114 174L126 170Z" fill="#ff5c8a"/>
+                    <rect x="121" y="166" width="5" height="10" rx="2" fill="#3a3452"/>
+                    <rect x="130" y="166" width="5" height="10" rx="2" fill="#3a3452"/>
+                    <path d="M117 168Q116 150 128 148Q140 150 139 168Z" fill="#7c5cff"/>
+                    <path d="M120 160h16" stroke="#ffcf40" stroke-width="2.4"/>
+                    <g class="sword"><path d="M142 158L156 134" stroke="#2b2340" stroke-width="5"/><path d="M142 158L156 134" stroke="#e8ecf5" stroke-width="2.6"/>
+                      <path d="M138 154l8 5" stroke="#ffcf40" stroke-width="3"/></g>
+                    <circle cx="140" cy="158" r="3" fill="#fbf7f2"/>
+                    <circle cx="114" cy="160" r="7" fill="#4fc3b0"/><path d="M114 155v10M109 160h10" stroke="#2f9c8c" stroke-width="1.6"/>
+                    <circle cx="128" cy="138" r="12" fill="#c9cede"/>
+                    <path d="M119 137h18v5q-9 3-18 0z" fill="#2b2340"/>
+                    <path d="M128 126q2-10 10-12q-2 8-6 13" fill="#ffcf40"/>
+                  </g>
+                  <g class="eyes" fill="#ffe08a"><circle cx="124" cy="139.5" r="1.6"/><circle cx="132" cy="139.5" r="1.6"/></g>
+                </g>
+              </g>
+              <!-- fireflies -->
+              <g class="flies" fill="#ffe9a0">
+                <circle cx="96" cy="150" r="1.6"/><circle cx="176" cy="132" r="1.3"/><circle cx="292" cy="146" r="1.6"/>
+                <circle cx="352" cy="158" r="1.2"/><circle cx="66" cy="132" r="1.2"/>
+              </g>
+              <rect class="dead" width="460" height="200" fill="url(#gw-dead)"/>
+            </svg>
             <div class="watchbox"><span>Watching for this</span><div class="spawn">RARE SPAWN!</div></div>
           </div>
           <div class="ctl"><span class="status" id="watch-status" role="status"><i></i>Hoot is watching…</span>
@@ -366,7 +537,7 @@
       <h2 class="rv">Go do something else. <em>Hoot's got it.</em></h2>
       <p class="sub rv">Pick your game's window, cut out the thing to watch for, choose a sound.</p>
       <div class="showcase"><div class="frame">
-        <img src="https://onion-alien.github.io/onion-watch/screenshots/main.png" width="900" height="820" alt="Onion Watch watching a game, one trigger open" loading="lazy">
+        <img src="screenshots/watch/main.png?v=617be6ac" width="900" height="820" alt="Onion Watch watching a game, one trigger open" loading="lazy">
       </div></div>
     </section>
 
@@ -387,10 +558,10 @@
       <span class="kicker rv">A closer look</span>
       <h2 class="rv">Point it at <em>anything.</em></h2>
       <div class="shots">
-        <figure class="rv"><img src="https://onion-alien.github.io/onion-watch/screenshots/window-picker.png" alt="Picking the windows to watch" loading="lazy"><figcaption><b>Windows</b>Pick the windows, or every copy of a game</figcaption></figure>
-        <figure class="rv"><img src="https://onion-alien.github.io/onion-watch/screenshots/cut-picture.png" alt="Cutting a picture out of the game" loading="lazy"><figcaption><b>Cut picture</b>Cut out the thing to watch for</figcaption></figure>
-        <figure class="rv"><img src="https://onion-alien.github.io/onion-watch/screenshots/health-bar.png" alt="Picking a health bar and its colour" loading="lazy"><figcaption><b>Health bar</b>Or point it at a health bar</figcaption></figure>
-        <figure class="rv"><img src="https://onion-alien.github.io/onion-watch/screenshots/categories.png" alt="Categories and profiles" loading="lazy"><figcaption><b>Categories</b>Hundreds of triggers in categories and profiles</figcaption></figure>
+        <figure class="rv"><img src="screenshots/watch/window-picker.png?v=f8423919" alt="Picking the windows to watch" loading="lazy"><figcaption><b>Windows</b>Pick the windows, or every copy of a game</figcaption></figure>
+        <figure class="rv"><img src="screenshots/watch/cut-picture.png?v=d51cba47" alt="Cutting a picture out of the game" loading="lazy"><figcaption><b>Cut picture</b>Cut out the thing to watch for</figcaption></figure>
+        <figure class="rv"><img src="screenshots/watch/health-bar.png?v=79200a33" alt="Picking a health bar and its colour" loading="lazy"><figcaption><b>Health bar</b>Or point it at a health bar</figcaption></figure>
+        <figure class="rv"><img src="screenshots/watch/categories.png?v=d12b61d9" alt="Categories and profiles" loading="lazy"><figcaption><b>Categories</b>Hundreds of triggers in categories and profiles</figcaption></figure>
       </div>
     </section>
 
@@ -421,7 +592,7 @@
     </section>
 
     <aside class="cross rv">
-      <svg class="pic" viewBox="-6 -10 112 140" aria-hidden="true"><use href="#bun-art"/></svg>
+      <svg class="pic" viewBox="-6 -10 112 140" aria-hidden="true"><use href="#bun-icon"/></svg>
       <div><h3>Use Onion Board?</h3><p>Onion Watch is also its Triggers tab: click <b>Get Onion Watch</b> there and your
         triggers play the board's sounds.</p></div>
       <a class="go" href="#board" data-tab-link="board">See Onion Board →</a>
@@ -440,7 +611,7 @@
 <footer>
   <div class="wrap">
     <div class="pals" aria-hidden="true">
-      <svg viewBox="-6 -10 112 140"><use href="#bun-art"/></svg><svg viewBox="-6 -10 112 140"><use href="#hoot-art"/></svg>
+      <svg viewBox="-6 -10 112 140"><use href="#bun-icon"/></svg><svg viewBox="-6 -10 112 140"><use href="#hoot-icon"/></svg>
     </div>
     <nav>
       <a href="https://github.com/Onion-Alien/onion-board">Source code</a>
