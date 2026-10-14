@@ -991,6 +991,17 @@ def close_button(btn, side: int, color: str = "muted"):
     btn.setCursor(Qt.CursorShape.PointingHandCursor)
 
 
+def clear_button(edit, color: str = "muted"):
+    """Turn on a line edit's clear button, drawn with the painted "close" icon: Qt's
+    own grey disc only comes at 16/32 px, so at 125 % scaling it was squashed to 20 and
+    sat off-centre (blurred, half a pixel low)."""
+    from PySide6.QtGui import QAction
+    edit.setClearButtonEnabled(True)
+    act = edit.findChild(QAction, "_q_qlineeditclearaction")
+    if act is not None:
+        set_icon(act, "close", color)
+
+
 def text_gap(button):
     """Re-fit the icon's gap after a button's words were dropped or put back (a
     narrow window's icon-only step): no words, no empty space after the icon."""
