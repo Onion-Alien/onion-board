@@ -9,8 +9,8 @@ lines in the files below.
 | File | What it does |
 | --- | --- |
 | `soundboard/bunny.py` | `draw_bunny(p, rect, prop, **pose)`: one still picture of Bun on a 100 x 120 canvas. Everything else calls this. Also `bunny_image` / `bunny_pixmap` for static pictures. |
-| `soundboard/bunnyfit.py` | His outfit per theme (`OUTFITS`) and the pieces' drawing (`PIECES`), in layers `draw_bunny` calls between its own. |
-| `soundboard/ui/bunnywidget.py` | `BunnyWidget`: Bun alive. Bobs, blinks, flicks ears, talks with the mic level, music notes, begging bubbles, naps, the build act (dash, dust cloud, hammer), the Pong dare (cross face, bat). Its `pose(now)` turns the clock into `draw_bunny`'s keywords. |
+| `soundboard/style/bunnyfit.py` | His outfit per theme (`OUTFITS`) and the pieces' drawing (`PIECES`), in layers `draw_bunny` calls between its own. |
+| `soundboard/ui/bunnywidget.py` | `BunnyWidget`: Bun alive. Bobs, blinks, flicks ears, idle fidgets (yawn, look round, foot tap), talks with the mic level, music notes, begging bubbles, naps, the click cheer, the build act (dives into a dust cloud, rummages, hammers a speaker together; the snap when it fails), Robo-Bun's version (gadget screen, sparks, LED pulse), the Pong dare (cross face, bat). Its `pose(now)` turns the clock into `draw_bunny`'s keywords plus his squash (`sx`, `sy`), lean (`angle`) and fade (`alpha`). |
 | `soundboard/ui/setupshow.py` | `SetupShow(BunnyWidget)`: the mic set-up show (toolbox, speaker parts popping on, progress dots). |
 | `soundboard/ui/scribebun.py` | `ScribeBunny`: the download bar's picture, Bun writing the tune on a scroll in a 56 x 59 slot. Caches pictures of him in `_layer`. |
 | `soundboard/ui/bunpong.py` | The Pong Easter egg; draws Bun with his bat (or the star when he wins). |
@@ -32,8 +32,14 @@ download bar (`ui/downloadbar.py`); static pictures in `ui/dialogs.py` and the s
 ## Poses
 
 `draw_bunny` keywords, all 0 when he's at rest: `blink` (0..1, shut above 0.6), `mouth`
-(talking), `ears` (degrees outward), `swing` (hammer or bat), `sad`, `angry` (cross brows and
-the vein mark), `nightcap` (asleep), `robot` (Robo-Bun), `smug`. Props: `bunny.PROPS`.
+(talking), `ears` (degrees outward), `swing` (hammer or bat), `sad` (worried face, and the
+ears fold down from the middle), `angry` (cross brows and the vein mark), `nightcap`
+(asleep), `robot` (Robo-Bun), `smug`, `led` (Robo-Bun's LEDs brighter, 0..1). Props:
+`bunny.PROPS` (`hammer_broken`: the failed build's snapped plank and headless hammer).
+Everything an act shows stays inside the widget's own box: a widget is only a little wider
+than Bun, so moving him sideways out of view slices him at its edge. Squash, shrink or fade
+him instead (the build act dives into its cloud, the setup show fades out before the edge).
+What gets built is drawn on the canvas at `bunny.PLANK_SPOT` / `bunny.GADGET_SCREEN`.
 Animations never draw Bun themselves: they work out these numbers per frame and call
 `draw_bunny`, so a new piece of drawing in `bunny.py` or `bunnyfit.py` shows up in every
 animation at once.
@@ -73,15 +79,16 @@ it sits on his head), list it under the theme in `OUTFITS`, then check the sheet
 
 ### Hoot wears them too
 
-Hoot the owl (`soundboard/ui/owl.py`, the Triggers tab before Onion Watch is installed)
+Hoot the owl (`soundboard/style/owl.py`, the Triggers tab before Onion Watch is installed)
 wears the same theme outfit. He has no pieces of his own: `owl._fit` moves Bun's pieces
 onto his shape (head 12 higher, eyes 28 apart and scaled 1.3, neck pieces just under his
 beak; `OWN_PLACE` for the ones that need their own spot (tall hats stay full size: an
 oversized hat is the look); `NOT_ON_OWL` for the ones that don't suit him) and `draw_owl` calls it at
 the same five layers. `owl_image` (dialog artwork, his own
 teal) stays plain. A new piece drawn for Bun shows up on Hoot too: check it with
-`bun_sheet.py owls` and `bun_sheet.py owl`. Onion Watch's own copy of the owl
-(`onionwatch/owl.py` in that project) has no outfits.
+`bun_sheet.py owls` and `bun_sheet.py owl`. Both files are in the style kit
+(`soundboard/style/`), which Onion Watch copies whole, so Hoot wears the same outfits
+there; inside the board's Triggers tab the add-on draws him with the board's kit.
 
 **Anything that caches a picture of Bun must key it on `theme.current_name`** (his
 outfit), not only the accent colour: see `ScribeBunny._layer`.

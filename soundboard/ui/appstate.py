@@ -7,58 +7,13 @@ program is in front.
 """
 from __future__ import annotations
 
-from collections.abc import Callable
-
-from PySide6.QtCore import QEvent, QObject, Qt
+from PySide6.QtCore import QObject
 from PySide6.QtGui import QGuiApplication
 from PySide6.QtWidgets import QWidget
 
-
-def active() -> bool:
-    """Is the app in front (one of its windows has focus)?"""
-    app = QGuiApplication.instance()
-    return (not isinstance(app, QGuiApplication)
-            or app.applicationState() == Qt.ApplicationState.ApplicationActive)
-
-
-class _Pauser(QObject):
-    # a child of the widget, so the connection goes with it when the widget is deleted
-    def __init__(self, widget: QWidget, start: Callable[[], None], stop: Callable[[], None]):
-        super().__init__(widget)
-        self._widget, self._start, self._stop = widget, start, stop
-        self._watching = None   # the minimised window we wait on to be restored
-
-    def on_state(self, state):
-        if state != Qt.ApplicationState.ApplicationActive:
-            self._stop()
-        elif self._widget.isVisible():
-            win = self._widget.window()
-            if not win.isMinimized():
-                self._start()   # (a minimised window's widgets are still "visible")
-            elif self._watching is None:
-                # Restoring from the taskbar makes the app active *before* the window
-                # leaves its minimised state, so start once it actually has.
-                self._watching = win
-                win.installEventFilter(self)
-
-    def eventFilter(self, obj, e):
-        if obj is self._watching and e.type() == QEvent.Type.WindowStateChange \
-                and not obj.isMinimized():
-            obj.removeEventFilter(self)
-            self._watching = None
-            if active() and self._widget.isVisible():
-                self._start()
-        return False
-
-
-def pause_in_background(widget: QWidget, start: Callable[[], None],
-                        stop: Callable[[], None]) -> None:
-    """Call `stop` when the app goes to the background and `start` when it's back in
-    front with `widget` showing. The widget still starts / stops itself on show / hide
-    (checking `active()` before it starts)."""
-    app = QGuiApplication.instance()
-    if isinstance(app, QGuiApplication):
-        app.applicationStateChanged.connect(_Pauser(widget, start, stop).on_state)
+# active() and pause_in_background() live in the style kit, which Hoot shares with Onion
+# Watch
+from soundboard.style.appstate import active, pause_in_background  # noqa: F401
 
 
 BG_METER_MS = 250   # a meter's pace while another program (a game) is in front

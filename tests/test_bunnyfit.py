@@ -3,7 +3,8 @@ asked (installer art) or as Robo-Bun."""
 from PySide6.QtCore import QRectF, Qt
 from PySide6.QtGui import QImage, QPainter
 
-from soundboard import bunny, bunnyfit, theme
+from soundboard import bunny, theme
+from soundboard.style import bunnyfit
 
 
 def _draw(k: int = 1, **kw) -> QImage:
@@ -67,7 +68,7 @@ def test_dark_glasses_hide_his_tears_and_lift_his_brows(qapp):
 
 
 def test_hoot_wears_the_theme_outfit_but_not_in_artwork(qapp, monkeypatch):
-    from soundboard.ui import owl
+    from soundboard.style import owl
 
     def hoot(**kw):
         img = QImage(100, 120, QImage.Format.Format_ARGB32_Premultiplied)

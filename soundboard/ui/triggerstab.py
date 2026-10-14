@@ -32,7 +32,7 @@ from PySide6.QtWidgets import (QBoxLayout, QHBoxLayout, QLabel, QMessageBox, QPr
 from soundboard import modules, net, netlog, theme, updates, usage, watchaddon
 from soundboard.i18n import _, ngettext
 from soundboard.ui import art, busy, icons
-from soundboard.ui.owl import OwlWidget
+from soundboard.style.owl import OwlWidget
 from soundboard.ui.panel import Flow, HoverCard, hint_label
 from soundboard.ui.widgets import LoadingBar
 from soundboard import errors

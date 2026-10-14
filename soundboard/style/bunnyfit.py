@@ -8,7 +8,8 @@ fangs for Vampire, laser eyes for Deep Fried...). Drawn with QPainter on bunny.p
     over   on top of everything on his head (a crown, a hat)
     face   over his face and neck (glasses, a bow tie, a scarf)
 
-`outfit()` picks the current theme's pieces; `draw()` paints one layer of them.
+`outfit()` picks the current theme's pieces; `draw()` paints one layer of them. Hoot
+wears them too (owl.py). Part of the style kit (see __init__.py).
 """
 from __future__ import annotations
 
@@ -25,7 +26,7 @@ from PySide6.QtGui import (
     QRadialGradient,
 )
 
-from soundboard import theme
+from . import hooks
 
 # each theme's pieces; a theme that isn't listed is plain Bun (headphones only)
 OUTFITS: dict[str, tuple[str, ...]] = {
@@ -82,11 +83,11 @@ DARK = QColor("#1c1a26")
 
 def outfit(name: str | None = None) -> tuple[str, ...]:
     """Theme `name`'s pieces (default: the current theme)."""
-    return OUTFITS.get(name or theme.current_name, ())
+    return OUTFITS.get(name or hooks.theme_name(), ())
 
 
 def _col(key: str) -> QColor:
-    return QColor(theme.T[key])
+    return QColor(hooks.palette()[key])
 
 
 def _head() -> QPainterPath:

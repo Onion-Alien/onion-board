@@ -31,9 +31,9 @@ from soundboard.bunny import H as BUN_H
 from soundboard.bunny import W as BUN_W
 from soundboard.ui import busy, icons
 from soundboard.ui.bunnywidget import BunnyWidget
-from soundboard.ui.owl import H as OWL_H
-from soundboard.ui.owl import W as OWL_W
-from soundboard.ui.owl import OwlWidget
+from soundboard.style.owl import H as OWL_H
+from soundboard.style.owl import W as OWL_W
+from soundboard.style.owl import OwlWidget
 from soundboard.ui.panel import CardGrid, Flow, HoverCard, RoundedFrame
 from soundboard.ui.responsive import FitWidth
 from soundboard.ui.widgets import LoadingBar, fmt_time, paint_now_playing

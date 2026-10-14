@@ -1,9 +1,9 @@
 """Hoot, Onion Watch's mascot: a cartoon owl (owls keep watch), drawn with QPainter
-in the same style as Bun, so it's crisp at any size and needs no image files. The
-Triggers tab shows Hoot until the Onion Watch add-on is installed (a copy of
-onionwatch/owl.py from the Onion Watch project: the tab needs it before there's
-any Onion Watch to take it from; keep the two the same, except that this one wears
-Bun's theme outfit, see _fit and docs/MASCOT.md).
+in the same style as Bun, so it's crisp at any size and needs no image files. He
+wears Bun's theme outfit (_fit, bunnyfit.py; docs/MASCOT.md).
+
+Part of the style kit (see __init__.py): Onion Watch draws him from its copy of
+this file, and Onion Board's Triggers tab shows him until the add-on is installed.
 
     owl_image(160)             # QImage, transparent background
     OwlWidget(96, lines=...)   # Hoot alive: waiting, begging, sulking
@@ -18,10 +18,9 @@ from PySide6.QtCore import QPointF, QRectF, QSize, Qt, QTimer, Signal
 from PySide6.QtGui import QColor, QCursor, QFont, QImage, QPainter, QPainterPath, QPen
 from PySide6.QtWidgets import QSizePolicy, QWidget
 
-from soundboard import bunnyfit, theme
-from soundboard.i18n import _
-from soundboard.ui import appstate
-from soundboard.ui.pixels import snap_to_pixels
+from . import appstate, bunnyfit, hooks
+from .appstate import snap_to_pixels
+from .hooks import _
 
 # drawn on a 100 x 120 canvas, scaled to the requested height
 W, H = 100.0, 120.0
@@ -71,7 +70,7 @@ NOT_ON_OWL = {"strings", "sweater", "turtleneck"}
 
 
 def _fit(p: QPainter, fit, layer: str, ink: QPen, shut: bool = False):
-    """Hoot wears Bun's theme outfit (soundboard/bunnyfit.py, drawn for Bun's canvas):
+    """Hoot wears Bun's theme outfit (bunnyfit.py, drawn for Bun's canvas):
     each piece is moved onto Hoot's shape (HEAD, EYES_AT, NECK_AT, OWN_PLACE)."""
     for name in fit:
         if name in NOT_ON_OWL:
@@ -104,7 +103,7 @@ def draw_owl(p: QPainter, rect: QRectF, look: float = 0.0, feather=None, dark=No
     `outfit`: Bun's outfit pieces to wear (None: the current theme's, (): none)."""
     fit = bunnyfit.outfit() if outfit is None else outfit
     if feather is None:
-        feather = QColor(theme.T["accent"])
+        feather = QColor(hooks.palette()["accent"])
     if dark is None:
         dark = QColor(feather).darker(135)
     s = min(rect.width() / W, rect.height() / H)
@@ -258,9 +257,18 @@ def sparkle(p: QPainter, x: float, y: float, r: float, col: QColor):
 
 
 # ---------------------------------------------------------------------- alive
-WAIT_LINES = (_("pleeease?"), _("just one picture?"), _("I'll watch anything…"),
-              _("hoo? hoo…?"), _("so… bored…"), _("my turn yet?"))
-JOY_LINES = (_("yay!! ↓ down there!"), _("hoo-ray!"), _("let's watch something!"))
+def wait_lines() -> tuple[str, ...]:
+    """What he says while he begs, in the language picked (a function: the kit can be
+    imported before the language is)."""
+    return (_("pleeease?"), _("just one picture?"), _("I'll watch anything…"),
+            _("hoo? hoo…?"), _("so… bored…"), _("my turn yet?"))
+
+
+def joy_lines() -> tuple[str, ...]:
+    """What he shouts when he's clicked."""
+    return (_("yay!! ↓ down there!"), _("hoo-ray!"), _("let's watch something!"))
+
+
 # the little acts he does while he waits, and how long each lasts (seconds)
 ACTS = {"sigh": 1.8, "plead": 3.0, "tear": 2.6, "peek": 2.2, "doze": 5.0}
 
@@ -281,19 +289,20 @@ class OwlWidget(QWidget):
     peeks, dozes off and jolts awake. Bring the mouse near and he perks up and
     follows it with his eyes; click him and he hops for joy.
 
-    `lines` are what he says when he begs, `joy` what he shouts when clicked.
+    `lines` are what he says when he begs, `joy` what he shouts when clicked
+    (default: wait_lines() / joy_lines()).
     `left` / `right` are the room beside him, px (default: plenty both sides, for
     the speech bubble up to his right and the zzz). The timer only runs while he's
     on screen."""
 
     clicked = Signal()
 
-    def __init__(self, height: int = 96, lines=WAIT_LINES, joy=JOY_LINES, parent=None, *,
+    def __init__(self, height: int = 96, lines=None, joy=None, parent=None, *,
                  left: int | None = None, right: int | None = None):
         super().__init__(parent)
         self.owl_h = height
-        self.lines = tuple(lines)
-        self.joy_lines = tuple(joy)
+        self.lines = tuple(wait_lines() if lines is None else lines)
+        self.joy_lines = tuple(joy_lines() if joy is None else joy)
         side = round(height * 1.45)
         self.left = side if left is None else left
         self.right = side if right is None else right
@@ -561,11 +570,19 @@ class OwlWidget(QWidget):
         f.setBold(True)
         p.setFont(f)
         fm = p.fontMetrics()
-        if fm.horizontalAdvance(text) > self.width() - 20:
+        room = self.width() - 20
+        lines = [text]
+        if fm.horizontalAdvance(text) > room and " " in text:
+            # a longer translation goes on two lines, broken at the space nearest the
+            # middle
+            spaces = [i for i, c in enumerate(text) if c == " "]
+            cut = min(spaces, key=lambda i: abs(i - len(text) / 2))
+            lines = [text[:cut], text[cut + 1:]]
+        tw = max(fm.horizontalAdvance(t) for t in lines)
+        if tw > room:
             return   # no room for the whole line: say nothing rather than half of it
-        tw = fm.horizontalAdvance(text)
         pad = 7
-        bw, bh = tw + 2 * pad, fm.height() + 2 * pad - 4
+        bw, bh = tw + 2 * pad, fm.height() * len(lines) + 2 * pad - 4
         x = max(2.0, min(body.right() + 2, self.width() - bw - 2))
         y = max(2.0, body.top() - bh * 0.35)
         box = QRectF(x, y, bw, bh)
@@ -573,10 +590,11 @@ class OwlWidget(QWidget):
         tail.lineTo(body.center().x() + body.width() * 0.34, body.top() + body.height() * 0.27)
         tail.lineTo(box.left() + 22, box.bottom() - 2)
         shape = QPainterPath()
-        shape.addRoundedRect(box, bh / 2, bh / 2)
+        radius = (fm.height() + 2 * pad - 4) / 2   # one line's: two lines aren't a pill
+        shape.addRoundedRect(box, radius, radius)
         shape = shape.united(tail)
         p.setPen(QPen(INK, 1.6))
         p.setBrush(BUBBLE)
         p.drawPath(shape)
         p.setPen(INK)
-        p.drawText(box.adjusted(pad, 0, -pad, 0), Qt.AlignmentFlag.AlignCenter, text)
+        p.drawText(box.adjusted(pad, 0, -pad, 0), Qt.AlignmentFlag.AlignCenter, "\n".join(lines))

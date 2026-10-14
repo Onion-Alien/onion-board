@@ -3,7 +3,7 @@ interface the add-on talks to (onionwatch.host.Host, version TRIGGERS_API). It
 hands the add-on the board's sounds, plays them through the board, keeps the
 triggers in Config.screen and their pictures in %APPDATA%\\OnionBoard\\triggers
 (as the built-in Triggers tab did, so nothing moves), and gives it the theme's
-colours.
+colours, name and style kit (so it looks the same as the board).
 
 A trigger's sound plays like pressing its pad (into what others hear, whichever way
 it's sent, with the pad's volume and mode). A ringing trigger ("Ring until stopped") loops its sound
@@ -167,6 +167,20 @@ class BoardHost:
     # ------------------------------------------------------------------ the rest
     def palette(self) -> dict[str, str]:
         return dict(theme.T)
+
+    def style(self) -> dict:
+        """The board's look, for the add-on to follow: the theme's name (Hoot wears its
+        outfit), the user's own highlight colour ("" = the theme's) and whether
+        textures are on. Optional, like language(): an add-on asks with getattr."""
+        return {"theme": theme.current_name, "live_color": theme.live_override,
+                "textures": theme.textures_on}
+
+    def kit(self):
+        """The board's style kit (soundboard/style: themes, outfits, Hoot), for the
+        add-on to draw with instead of its own copy when the board's is newer
+        (KIT_VERSION), so Hoot in the Triggers tab always matches Bun. Optional."""
+        from soundboard import style
+        return style
 
     def language(self) -> str:
         """The board's language ("en", "de", "pt-BR", the pseudo-language "xx"…), so the

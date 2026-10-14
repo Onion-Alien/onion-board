@@ -51,7 +51,7 @@ class TabHelpPopup(QDialog):
     def __init__(self, title: str, text: str, *, owl: bool = False, parent=None):
         super().__init__(parent, Qt.WindowType.Popup | Qt.WindowType.FramelessWindowHint)
         from soundboard.bunny import bunny_pixmap
-        from soundboard.ui.owl import owl_image
+        from soundboard.style.owl import owl_image
 
         self._opener = QApplication.focusWidget()
         self.setWindowTitle(title)

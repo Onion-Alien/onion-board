@@ -6,10 +6,13 @@ different prop on each page) and by scripts/make_bunny.py for the installer's ar
 """
 from __future__ import annotations
 
-from PySide6.QtCore import QPointF, QRectF, Qt
-from PySide6.QtGui import QColor, QImage, QPainter, QPainterPath, QPen, QPixmap
+import math
 
-from soundboard import bunnyfit, theme
+from PySide6.QtCore import QPointF, QRectF, Qt
+from PySide6.QtGui import QColor, QImage, QPainter, QPainterPath, QPen, QPixmap, QTransform
+
+from soundboard import theme
+from soundboard.style import bunnyfit
 
 # drawn on a 100 x 120 canvas, scaled to the requested height
 W, H = 100.0, 120.0
@@ -21,7 +24,8 @@ PINK = QColor("#ffb3c7")
 CHEEK = QColor(255, 128, 160, 110)
 # his headphones are the current theme's accent (theme.T, read at paint time)
 
-PROPS = (None, "mic", "headphones", "plug", "star", "hammer", "bat", "wrench")
+PROPS = (None, "mic", "headphones", "plug", "star", "hammer", "bat", "wrench",
+         "hammer_broken")
 WOOD = QColor("#c98a4b")
 WOOD_DARK = QColor("#9a6532")
 STEEL = QColor("#9aa0b4")
@@ -36,6 +40,11 @@ ROBOT_CYAN = QColor("#00d4ff")
 ROBOT_CYAN_HI = QColor("#b0f4ff")
 ROBOT_CYAN_GLOW = QColor(0, 212, 255, 130)
 ROBOT_BOLT = QColor("#8e98ad")
+GADGET = QColor("#b9c2d4")
+# where things get built, on the 100 x 120 canvas (ui/bunnywidget.py draws the progress):
+# the wrench prop's gadget screen, and the spot on the hammer's plank
+GADGET_SCREEN = QRectF(70, 109, 24, 6.5)
+PLANK_SPOT = QRectF(84, 91, 17, 18)
 
 
 def _ellipse(p: QPainter, cx, cy, w, h, fill: QColor, pen: QPen | None = None, angle=0.0):
@@ -48,11 +57,54 @@ def _ellipse(p: QPainter, cx, cy, w, h, fill: QColor, pen: QPen | None = None, a
     p.restore()
 
 
+EAR_HINGE = -2.0   # where an ear folds when he's sad: just above its middle (ear frame)
+
+
+def _ear_bend(fold: float) -> QTransform:
+    """The ear frame's top half folded `fold` degrees about the hinge (+ = to his left,
+    the viewer's right)."""
+    return QTransform().translate(0, EAR_HINGE).rotate(fold).translate(0, -EAR_HINGE)
+
+
+def _ear_path(w: float, h: float, fold: float) -> QPainterPath:
+    """An ear's outline in its own frame: straight, or bent at the hinge into a lower
+    half, a rounded knee and the flap hanging from it."""
+    full = QPainterPath()
+    full.addEllipse(QRectF(-w / 2, -h / 2, w, h))
+    if abs(fold) < 0.5:
+        return full
+    below, above = QPainterPath(), QPainterPath()
+    below.addRect(QRectF(-w, EAR_HINGE, 2 * w, h))
+    above.addRect(QRectF(-w, -h, 2 * w, h + EAR_HINGE))
+    knee = QPainterPath()
+    knee.addEllipse(QRectF(-w / 2, EAR_HINGE - w / 2, w, w))
+    flap = _ear_bend(fold).map(full.intersected(above))
+    return full.intersected(below).united(knee).united(flap)
+
+
+def _fold_part(p: QPainter, bend: QTransform, top_alpha: float, w, h, col: QColor):
+    """Draw an inner-ear piece (an ellipse w x h, 2 below the ear's centre): its lower
+    half as is, its top half bent with the flap and faded by `top_alpha` (a folded
+    flap shows its back)."""
+    p.save()
+    p.setClipRect(QRectF(-30, EAR_HINGE, 60, 60))
+    _ellipse(p, 0, 2, w, h, col)
+    p.restore()
+    if top_alpha <= 0:
+        return
+    p.save()
+    p.setTransform(bend, True)
+    p.setClipRect(QRectF(-30, -60, 60, 60 + EAR_HINGE))
+    p.setOpacity(p.opacity() * top_alpha)
+    _ellipse(p, 0, 2, w, h, col)
+    p.restore()
+
+
 def draw_bunny(p: QPainter, rect: QRectF, prop: str | None = None, *,
                blink: float = 0.0, mouth: float = 0.0, ears: float = 0.0,
                swing: float = 0.0, sad: float = 0.0, angry: float = 0.0,
                nightcap: bool = False, robot: bool = False, smug: bool = False,
-               outfit: tuple[str, ...] | None = None):
+               outfit: tuple[str, ...] | None = None, led: float = 0.0):
     """Draw Bun fitted (aspect kept, centred) into `rect`. The keywords pose Bun for
     animation (ui/bunnywidget.py): `blink` 0..1 closes the eyes, `mouth` 0..1 opens
     the mouth (talking), `ears` tilts both ears outward by that many degrees,
@@ -63,7 +115,8 @@ def draw_bunny(p: QPainter, rect: QRectF, prop: str | None = None, *,
     `robot` draws him as Robo-Bun, metal with glowing LED ears, eyes and chest.
     `smug`: half-shut eyes, one brow up and a lopsided smirk (he got away with it).
     `outfit`: bunnyfit pieces to dress him in (None: the current theme's, (): none).
-    Robo-Bun wears no outfit."""
+    Robo-Bun wears no outfit. `led` 0..1 brightens Robo-Bun's LED ears and core (he
+    pulses them while he works)."""
     fit = () if robot else bunnyfit.outfit() if outfit is None else outfit
     # dark glasses hide his eyes: no lids or tears under them, brows lifted clear
     hidden = not nightcap and any(name in bunnyfit.HIDE_EYES for name in fit)
@@ -82,26 +135,50 @@ def draw_bunny(p: QPainter, rect: QRectF, prop: str | None = None, *,
     ink.setCapStyle(Qt.PenCapStyle.RoundCap)
 
     bunnyfit.draw(p, fit, "behind", ink)
-    # ears (behind the head): the right one flops a little for character
-    for bx, cx, cy, h, a, tilt in ((36, 36, 26, 50, -10, -ears), (64, 66, 28, 48, 18, ears)):
+    # ears (behind the head): the right one flops a little for character. Sad, the top
+    # half of each folds down and outward from the middle (droopy, not stuck out)
+    fold = 115 * max(0.0, min(1.0, sad))
+    for side, bx, cx, cy, h, a, tilt in ((-1, 36, 36, 26, 50, -10, -ears),
+                                         (1, 64, 66, 28, 48, 18, ears)):
         p.save()
         p.translate(bx, 48)   # pivot at the base of the ear, where it meets the head
         p.rotate(tilt)
         p.translate(-bx, -48)
-        _ellipse(p, cx, cy, 19, h, fur, ink, a)
+        p.translate(cx, cy)   # from here on: the ear's own frame, centred, upright
+        p.rotate(a)
+        bend = _ear_bend(side * fold)
+        p.setPen(ink)
+        p.setBrush(fur)
+        p.drawPath(_ear_path(19, h, side * fold))
+        inner_on = max(0.0, 1 - fold / 50)   # the folded flap shows its furry back
         if robot:
-            # glowing LED strip in the inner ear
-            _ellipse(p, cx, cy + 2, 8, h - 14, ROBOT_CYAN, None, a)
-            _ellipse(p, cx, cy + 2, 3, h - 22, ROBOT_CYAN_HI, None, a)
-            # antenna bulb at the ear tip
-            _ellipse(p, cx, cy - h / 2 + 2, 6.5, 6.5, ROBOT_CYAN, ink, a)
-            _ellipse(p, cx - 1, cy - h / 2 + 1, 2, 2, QColor("white"), None, a)
-            # pivot bolt at the ear base
-            _ellipse(p, bx, 48, 6, 6, ROBOT_BOLT, ink)
-            _ellipse(p, bx, 48, 2, 2, ROBOT_INK, None)
+            # glowing LED strip in the inner ear, pulsing brighter while he works
+            if led > 0:
+                halo = QColor(ROBOT_CYAN)
+                halo.setAlpha(round(110 * led))
+                _ellipse(p, 0, 2 - fold / 25, 15, h - 4 - fold / 6, halo)
+            strip = ROBOT_CYAN.lighter(100 + round(25 * led))
+            _fold_part(p, bend, inner_on, 8, h - 14, strip)
+            _fold_part(p, bend, inner_on, 3, h - 22, ROBOT_CYAN_HI)
+            # antenna bulb at the ear tip (which folds down with the flap)
+            tip = bend.map(QPointF(0, -h / 2 + 2))
+            if led > 0:
+                halo = QColor(ROBOT_CYAN)
+                halo.setAlpha(round(140 * led))
+                _ellipse(p, tip.x(), tip.y(), 11 + 4 * led, 11 + 4 * led, halo)
+            _ellipse(p, tip.x(), tip.y(), 6.5, 6.5, ROBOT_CYAN_HI if led > 0.6 else ROBOT_CYAN,
+                     ink)
+            _ellipse(p, tip.x() - 1, tip.y() - 1, 2, 2, QColor("white"))
         else:
-            _ellipse(p, cx, cy + 2, 9, h - 14, PINK, None, a)
+            _fold_part(p, bend, inner_on, 9, h - 14, PINK)
         p.restore()
+        if robot:   # pivot bolt at the ear base
+            p.save()
+            p.translate(bx, 48)
+            p.rotate(tilt)
+            _ellipse(p, 0, 0, 6, 6, ROBOT_BOLT, ink)
+            _ellipse(p, 0, 0, 2, 2, ROBOT_INK, None)
+            p.restore()
 
     # body, feet, head
     _ellipse(p, 50, 100, 50, 36, fur, ink)
@@ -116,6 +193,10 @@ def draw_bunny(p: QPainter, rect: QRectF, prop: str | None = None, *,
         p.drawLine(QPointF(63, 113), QPointF(63, 118))
         # glowing AI audio core on tummy
         _ellipse(p, 50, 97, 16, 16, QColor("#1c2230"), ink)
+        if led > 0:
+            halo = QColor(ROBOT_CYAN)
+            halo.setAlpha(round(120 * led))
+            _ellipse(p, 50, 97, 14 + 4 * led, 14 + 4 * led, halo)
         _ellipse(p, 50, 97, 10, 10, ROBOT_CYAN, None)
         _ellipse(p, 50, 97, 4, 4, ROBOT_CYAN_HI, None)
 
@@ -294,19 +375,38 @@ def _draw_prop(p: QPainter, prop: str | None, ink: QPen, swing: float = 0.0,
         p.drawLine(QPointF(87, 76), QPointF(87, 70))
         p.drawLine(QPointF(92, 76), QPointF(92, 70))
         _ellipse(p, 78, 100, 12, 10, fur, ink)
-    elif prop == "star":        # celebrating: paws up, sparkles
+    elif prop == "star":        # celebrating: paws up, a gold star held high, sparkles
         _ellipse(p, 20, 92, 12, 10, fur, ink, -30)
+        _star(p, 89, 79, 12.5, ink)
         _ellipse(p, 80, 92, 12, 10, fur, ink, 30)
         _sparkle(p, 10, 30, 7, QColor("#ffcf40"))
         _sparkle(p, 92, 40, 5.5, QColor("#ff8fae"))
         _sparkle(p, 88, 12, 4, QColor("#1fb6ff"))
-    elif prop == "hammer":      # building: a plank by his feet, a hammer in his paw
-        p.setPen(ink)
-        p.setBrush(WOOD)
-        p.drawRoundedRect(QRectF(56, 109, 56, 8), 2, 2)
-        p.setPen(QPen(WOOD_DARK, 1.2, Qt.PenStyle.SolidLine, Qt.PenCapStyle.RoundCap))
-        p.drawLine(QPointF(70, 113), QPointF(86, 113))
-        p.drawLine(QPointF(92, 111.5), QPointF(106, 111.5))
+    elif prop in ("hammer", "hammer_broken"):   # building: a plank by his feet, a hammer
+        # in his paw. Broken: the plank snapped in a V and the hammer's head gone
+        broken = prop == "hammer_broken"
+        if broken:
+            for pivot, x, turn in ((56, 56, 7), (112, 85, -7)):
+                p.save()
+                p.translate(pivot, 113)
+                p.rotate(turn)
+                p.translate(-pivot, -113)
+                p.setPen(ink)
+                p.setBrush(WOOD)
+                p.drawRoundedRect(QRectF(x, 109, 27, 8), 2, 2)
+                p.setPen(QPen(WOOD_DARK, 1.2, Qt.PenStyle.SolidLine, Qt.PenCapStyle.RoundCap))
+                edge = x + 27 if turn > 0 else x   # splinters along the break
+                k = 1 if turn > 0 else -1
+                p.drawLine(QPointF(edge, 110.5), QPointF(edge + 3 * k, 112))
+                p.drawLine(QPointF(edge, 115.5), QPointF(edge + 2.5 * k, 114))
+                p.restore()
+        else:
+            p.setPen(ink)
+            p.setBrush(WOOD)
+            p.drawRoundedRect(QRectF(56, 109, 56, 8), 2, 2)
+            p.setPen(QPen(WOOD_DARK, 1.2, Qt.PenStyle.SolidLine, Qt.PenCapStyle.RoundCap))
+            p.drawLine(QPointF(70, 113), QPointF(86, 113))
+            p.drawLine(QPointF(92, 111.5), QPointF(106, 111.5))
         _ellipse(p, 66, 108, 12, 10, fur, ink)                 # a paw holding the plank
         # the hammer pivots at the other paw, on his right so it never crosses his
         # face: up beside his head at 0, down on the plank at 1
@@ -316,8 +416,13 @@ def _draw_prop(p: QPainter, prop: str | None, ink: QPen, swing: float = 0.0,
         p.setPen(ink)
         p.setBrush(WOOD)
         p.drawRoundedRect(QRectF(-3, -30, 6, 34), 2.5, 2.5)
-        p.setBrush(STEEL)
-        p.drawRoundedRect(QRectF(-10, -38, 20, 10), 2.5, 2.5)
+        if broken:   # a splintered stub where the head was
+            p.setPen(QPen(WOOD_DARK, 1.2, Qt.PenStyle.SolidLine, Qt.PenCapStyle.RoundCap))
+            p.drawLine(QPointF(-2, -30), QPointF(-0.5, -33))
+            p.drawLine(QPointF(1.5, -30), QPointF(2.5, -32.5))
+        else:
+            p.setBrush(STEEL)
+            p.drawRoundedRect(QRectF(-10, -38, 20, 10), 2.5, 2.5)
         p.restore()
         _ellipse(p, 80, 92, 12, 10, fur, ink)
     elif prop == "bat":         # a baseball bat in his right paw: over his shoulder at
@@ -344,13 +449,18 @@ def _draw_prop(p: QPainter, prop: str | None, ink: QPen, swing: float = 0.0,
         p.restore()
         _ellipse(p, 80, 92, 12, 10, fur, ink)
     elif prop == "wrench":      # assembling: an AI gadget by his feet, a wrench in his paw
+        # (light metal with an ink outline and a glowing screen: it reads on dark and
+        # light themes alike)
         p.setPen(ink)
-        p.setBrush(QColor("#222838"))
-        p.drawRoundedRect(QRectF(56, 107, 54, 10), 2.5, 2.5)
-        _ellipse(p, 62, 112, 3, 3, QColor("#13ce66"))          # the gadget's LEDs
-        _ellipse(p, 68, 112, 3, 3, QColor("#00d4ff"))
-        _ellipse(p, 74, 112, 3, 3, QColor("#ffb020"))
-        _ellipse(p, 88, 110, 6, 6, QColor("#8e98ad"), ink)      # the bolt he's tightening
+        p.setBrush(GADGET)
+        p.drawRoundedRect(QRectF(56, 106, 54, 12), 3, 3)
+        p.setPen(QPen(ROBOT_CYAN, 1.2))
+        p.setBrush(QColor("#181e2b"))
+        p.drawRoundedRect(GADGET_SCREEN, 1.5, 1.5)
+        _ellipse(p, 98, 113.5, 3.2, 3.2, QColor("#13ce66"), QPen(ROBOT_INK, 0.8))   # power
+        _ellipse(p, 104, 108.5, 6, 6, ROBOT_BOLT, ink)        # the bolt he's tightening
+        p.setPen(QPen(ROBOT_INK, 1))
+        p.drawLine(QPointF(102.3, 108.5), QPointF(105.7, 108.5))
         _ellipse(p, 66, 108, 12, 10, fur, ink)                 # a paw holding the gadget
         p.save()
         p.translate(80, 92)
@@ -405,6 +515,26 @@ def _music_note(p: QPainter, x, y, k, col: QColor | None = None):
 
 
 music_note = _music_note   # for the animated widget's floating notes
+
+
+def _star(p: QPainter, x, y, r, ink: QPen):
+    """A chunky five-pointed gold star with a shine."""
+    path = QPainterPath()
+    for i in range(10):
+        a = math.radians(-90 + 36 * i)
+        rr = r if i % 2 == 0 else r * 0.48
+        pt = QPointF(x + math.cos(a) * rr, y + math.sin(a) * rr)
+        if i == 0:
+            path.moveTo(pt)
+        else:
+            path.lineTo(pt)
+    path.closeSubpath()
+    pen = QPen(ink)
+    pen.setWidthF(1.8)
+    p.setPen(pen)
+    p.setBrush(QColor("#ffcf40"))
+    p.drawPath(path)
+    _ellipse(p, x - r * 0.22, y - r * 0.22, r * 0.3, r * 0.22, QColor("#fff3c4"), None, -30)
 
 
 def _sparkle(p: QPainter, x, y, r, col: QColor):

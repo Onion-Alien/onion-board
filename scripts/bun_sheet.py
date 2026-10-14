@@ -88,7 +88,7 @@ OWL_POSES = [
 
 def owl(themes) -> QImage:
     """Hoot (the Triggers tab's owl) in every theme's outfit, then a few posed."""
-    from soundboard.ui.owl import draw_owl
+    from soundboard.style.owl import draw_owl
 
     def draw(p, rect, j):
         draw_owl(p, rect, **OWL_POSES[j][1])
@@ -97,7 +97,7 @@ def owl(themes) -> QImage:
 
 
 def owls(_themes) -> QImage:
-    from soundboard.ui.owl import draw_owl
+    from soundboard.style.owl import draw_owl
     return outfits(_themes, lambda p, rect: draw_owl(p, rect))
 
 

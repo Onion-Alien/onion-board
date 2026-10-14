@@ -12,9 +12,17 @@ speech bubble with a hopeful little hop (the widget gets room beside him for it)
 saying one of `hope_lines`; `hope(False)` and he's back to waiting. A click makes
 him hop for joy (`joy_lines`) and emits `clicked`.
 
-`build()` is for the cable install: he dashes off, a cartoon dust cloud rattles where
-he went, and he comes back with a hammer and a plank and hammers away until
-`stop_building(ok)`, which ends in a celebration (ok) or back to how he was.
+`build()` is for the cable install: he crouches and dives into a cartoon dust cloud
+(all inside his own box), rummages in it (junk flies out, his ears pop up), pops back
+out with a hammer and a plank and hammers a little speaker together on it, a part a
+blow, until `stop_building(ok)`. ok: the last part pops on, he cheers with a star and
+the speaker plays beside him. Not ok: the blow lands, SNAP (the hammer's head flies
+off, the plank breaks, smoke), he stares, his ears drop with a sigh and he puts the
+bits down in a puff, sad. Robo-Bun does it with a wrench and a gadget whose screen
+fills a bar a blow, sparks on every blow and LED ears pulsing while he works.
+
+Now and then (every 20 to 40 s) an idle Bun fidgets: a yawn, a look round, a foot tap
+to the beat.
 
 `pong=True` hides an Easter egg: poke him a few times quickly and he gets cross, and
 poke him `ANNOY_CLICKS` times and he storms off the same way, comes back with a
@@ -41,7 +49,25 @@ from PySide6.QtGui import QColor, QFont, QPainter, QPainterPath, QPen
 from PySide6.QtWidgets import QSizePolicy, QWidget
 
 from soundboard import theme, usage
-from soundboard.bunny import H, INK, W, WOOD, draw_bunny, music_note, sparkle
+from soundboard.bunny import (
+    FUR,
+    GADGET_SCREEN,
+    INK,
+    PINK,
+    PLANK_SPOT,
+    ROBOT_CYAN,
+    ROBOT_CYAN_HI,
+    ROBOT_FUR,
+    ROBOT_INK,
+    STEEL,
+    WOOD,
+    WOOD_DARK,
+    H,
+    W,
+    draw_bunny,
+    music_note,
+    sparkle,
+)
 from soundboard.i18n import _
 from soundboard.ui import appstate
 from soundboard.ui.pixels import snap_to_pixels
@@ -50,8 +76,22 @@ NOTE_COLORS = ("#7c5cff", "#a48bff", "#1fb6ff", "#ff8fae", "#13ce66")
 SPARKLE_COLORS = ("#ffcf40", "#ff8fae", "#1fb6ff", "#a48bff")
 DUST = QColor("#d9d2e6")
 DUST_INK = QColor("#b3a9c7")
+SMOKE = QColor("#a9a3b6")   # (light enough to show on dark themes)
+CABINET = QColor("#3a3452")
+SPARK = QColor("#ffe680")
+FAIL_RED = QColor("#ff4d6d")
 # build(): when each part of the act ends, in seconds from the start
 DASH_END, CLOUD_END, BACK_END = 0.45, 1.6, 2.1
+CROUCH = 0.3     # the share of the dash he spends crouching before he dives in
+PARTS = 4        # the speaker on his plank: frame, front, woofer, tweeter (the last: ok)
+SCREEN_BARS = 6  # Robo-Bun's gadget screen: a bar a blow, the last one when it worked
+# a failed build: the blow lands, SNAP, he stares, his ears drop with a sigh, then he
+# puts the bits down in a puff (seconds from stop_building(False))
+FAIL_SNAP, FAIL_DROP, FAIL_POOF, FAIL_END = 0.15, 0.85, 2.0, 2.5
+FINALE = 2.8     # a finished build: the speaker plays beside him this long
+POP = 0.35       # popping back out of the dust cloud
+FIDGETS = {"yawn": 2.4, "look": 2.6, "tap": 3.2}   # idle fidgets and how long they take
+FIDGET_EVERY = (20.0, 40.0)
 SWING = 0.55     # one hammer blow, seconds
 TALK = 0.008       # mic level that counts as talking (-42 dBFS; also the wizard's "Hearing you")
 LOUD = 0.25        # mic level that opens his mouth all the way (-12 dBFS)
@@ -97,12 +137,77 @@ class _Note:
 
 
 class _Puff:
-    """A ball of dust: grows, drifts, fades."""
-    __slots__ = ("x", "y", "vx", "vy", "r", "age", "life")
+    """A ball of dust (or smoke): grows, drifts, fades."""
+    __slots__ = ("x", "y", "vx", "vy", "r", "age", "life", "col")
 
-    def __init__(self, x, y, vx, vy, r, life):
+    def __init__(self, x, y, vx, vy, r, life, col: QColor = DUST):
         self.x, self.y, self.vx, self.vy, self.r = x, y, vx, vy, r
-        self.age, self.life = 0.0, life
+        self.age, self.life, self.col = 0.0, life, col
+
+
+class _Junk:
+    """Something flying: junk tossed out of the dust cloud, or the hammer's head. Falls,
+    spins, bounces on the floor, fades at the end of its life."""
+    __slots__ = ("kind", "x", "y", "vx", "vy", "a", "va", "age", "life")
+
+    def __init__(self, kind, x, y, vx, vy, va, life):
+        self.kind, self.x, self.y, self.vx, self.vy = kind, x, y, vx, vy
+        self.a, self.va, self.age, self.life = 0.0, va, 0.0, life
+
+
+class _Spark:
+    """A spark off Robo-Bun's wrench: a short bright streak that falls and fades."""
+    __slots__ = ("x", "y", "vx", "vy", "age", "life", "col")
+
+    def __init__(self, x, y, vx, vy, life, col: QColor = SPARK):
+        self.x, self.y, self.vx, self.vy = x, y, vx, vy
+        self.age, self.life, self.col = 0.0, life, col
+
+
+_note_cols: dict[tuple[int, int], tuple[QColor, QColor]] = {}
+
+
+def _luma(c: QColor) -> float:
+    def lin(v: float) -> float:
+        return v / 12.92 if v <= 0.04045 else ((v + 0.055) / 1.055) ** 2.4
+    return 0.2126 * lin(c.redF()) + 0.7152 * lin(c.greenF()) + 0.0722 * lin(c.blueF())
+
+
+def note_colors(col: QColor) -> tuple[QColor, QColor]:
+    """A note colour that stands out on the theme's background (lighter on dark themes,
+    darker on light ones, until the contrast is at least 3:1), and its soft rim."""
+    bg = QColor(theme.T["bg"])
+    key = (col.rgba(), bg.rgba())
+    hit = _note_cols.get(key)
+    if hit is None:
+        lb = _luma(bg)
+        dark = lb < 0.35
+        c = QColor(col)
+        for _i in range(8):
+            lc = _luma(c)
+            if (max(lc, lb) + 0.05) / (min(lc, lb) + 0.05) >= 3.0:
+                break
+            c = c.lighter(115) if dark else c.darker(115)
+        rim = QColor(255, 255, 255, 70) if dark else QColor(INK.red(), INK.green(), INK.blue(), 60)
+        hit = _note_cols[key] = (c, rim)
+    return hit
+
+
+def paint_note(p: QPainter, n) -> None:
+    """One floating note (or, `size` < 0.6, a sparkle), faded by its age."""
+    k = n.age / n.life
+    p.save()
+    p.setOpacity(min(1.0, n.age * 6) * (1 - k) ** 1.4)
+    p.translate(n.x, n.y)
+    p.rotate(n.spin * math.sin(n.age * 4))
+    col, rim = note_colors(n.col)
+    if n.size < 0.6:
+        sparkle(p, 0, 0, 5, col)
+    else:
+        for ox, oy in ((-1, 0), (1, 0), (0, -1), (0, 1)):   # a soft rim so it reads
+            music_note(p, -5 + ox, -8 + oy, n.size, rim)
+        music_note(p, -5, -8, n.size, col)
+    p.restore()
 
 
 class BunnyWidget(QWidget):
@@ -173,6 +278,20 @@ class BunnyWidget(QWidget):
             self.challenge.connect(self._open_game)
         if not in_background:
             appstate.pause_in_background(self, self._resume, self._timer.stop)
+        self.junk: list[_Junk] = []     # tossed out of the dust cloud, the hammer's head
+        self.sparks: list[_Spark] = []
+        self._junk_debt = 0.0
+        self._parts = 0                 # what's built so far (speaker parts / screen bars)
+        self._part_at = [-1.0] * SCREEN_BARS   # act time each one went on
+        self._flash_at = -1.0           # act time of the last wrench blow (a flash)
+        self._fail_t = -1.0             # seconds into the failure beat, or -1
+        self._fail_snap = False         # ... which snaps the tools (he was hammering)
+        self._fail_swing = 0.0          # where the hammer was when it failed
+        self._fin_t = -1.0              # seconds into the finished speaker playing, or -1
+        self._pop_t = -1.0              # seconds into popping out of the cloud, or -1
+        self._fidget = ""               # the idle fidget going on ("" none)
+        self._fidget_at = -1.0
+        self._next_fidget = self._t0 + self._rng.uniform(*FIDGET_EVERY)
 
     def sizeHint(self) -> QSize:
         return QSize(round(self.bun_h * W / H) + 2 * self.pad + 20 + 2 * self.side,
@@ -209,8 +328,9 @@ class BunnyWidget(QWidget):
 
     @property
     def asleep(self) -> bool:
-        """Napping right now: naps on, the small hours, not just woken, not mid-act."""
-        if not self.naps or self.building:
+        """Napping right now: naps on, the small hours, not just woken, not mid-act (nor
+        while its ending plays out)."""
+        if not self.naps or self.building or self._fail_t >= 0 or self._fin_t >= 0:
             return False
         now = time.monotonic()
         if now < self._woken_until:
@@ -281,6 +401,7 @@ class BunnyWidget(QWidget):
         self._cross_until = 0.0
         self.prop, self.celebrate = self._home_prop, self._home_celebrate
         self.say = ""
+        self.junk.clear()
 
     def _open_game(self):
         from soundboard.ui import bunpong   # only ever needed once someone finds it
@@ -304,16 +425,43 @@ class BunnyWidget(QWidget):
         self._act_t, self._blows = 0.0, 0
         self.celebrate = False
         self.sad = self._home_sad
+        self.prop = self._home_prop
+        self._parts, self._part_at = 0, [-1.0] * SCREEN_BARS
+        self._fail_t = self._fin_t = self._pop_t = -1.0
+        self.junk.clear()
 
     def stop_building(self, ok: bool):
-        """End the act: celebrate if `ok`, otherwise go back to the usual pose, looking
-        sad until the next try."""
+        """End the act: celebrate if `ok` (the build finished), otherwise the failure
+        beat plays and he's back to his usual pose, looking sad until the next try."""
+        phase = self.act_phase()
+        hammering = phase == "hammer"
         self._act_t, self._act_kind = -1.0, "build"
+        self._fail_t = self._fin_t = self._pop_t = -1.0
+        self.junk = [j for j in self.junk if j.kind == "head"]
+        if phase in ("dash", "cloud"):   # still in the cloud: he pops back out of it
+            self._pop_t = 0.0
+            r = self._bun_rect()
+            for _i in range(10):
+                self._puff(r.center().x(), r.center().y() + r.height() * 0.15, 50, 9, 0.6)
         self.prop = "star" if ok else self._home_prop
         self.celebrate = ok or self._home_celebrate
         self.sad = self._home_sad if ok else max(self._home_sad, 0.8)
         if ok:
             self.burst(8)
+            if hammering and self._parts:
+                self._add_part()          # the last part pops on: done
+                if not self.robot:
+                    self._fin_t = 0.0     # and it plays, beside him
+        else:
+            self._fail_t = 0.0
+            self._fail_snap = hammering
+            self._fail_swing = self._swing() if hammering else 0.0
+
+    def _add_part(self):
+        cap = SCREEN_BARS if self.robot else PARTS
+        if self._parts < cap:
+            self._part_at[self._parts] = max(0.0, self._act_t)
+            self._parts += 1
 
     def act_phase(self) -> str | None:
         """'dash' (running off), 'cloud' (off screen), 'back', then 'hammer' (building)
@@ -364,11 +512,53 @@ class BunnyWidget(QWidget):
         n.calm = calm
         self.notes.append(n)
 
-    def _puff(self, x, y, spread: float, r: float, life: float):
+    def _puff(self, x, y, spread: float, r: float, life: float, col: QColor = DUST):
         a = self._rng.uniform(0, 2 * math.pi)
         v = self._rng.uniform(0.3, 1.0) * spread
         self.puffs.append(_Puff(x, y, math.cos(a) * v, math.sin(a) * v - spread * 0.3,
-                                r * self._rng.uniform(0.7, 1.2), life))
+                                r * self._rng.uniform(0.7, 1.2), life, col))
+
+    def _at(self, body: QRectF, x: float, y: float) -> QPointF:
+        """A point on the 100 x 120 drawing canvas, in widget pixels."""
+        s = body.height() / H
+        return QPointF(body.left() + x * s, body.top() + y * s)
+
+    def _cloud_spot(self) -> QPointF:
+        r = self._bun_rect()
+        return QPointF(r.center().x(), r.center().y() + r.height() * 0.12)
+
+    def _toss(self):
+        """He's rummaging: something he doesn't need flies out of the cloud."""
+        c, r = self._cloud_spot(), self._bun_rect()
+        reach = max(8.0, min(self.width() / 2 - r.height() * 0.12, r.width() * 0.85))
+        side = self._rng.choice((-1, 1))
+        kind = self._rng.choice(("sock", "carrot", "spring", "plank", "duck"))
+        self.junk.append(_Junk(kind, c.x() + self._rng.uniform(-0.1, 0.1) * r.width(),
+                               c.y() - r.height() * 0.12,
+                               side * self._rng.uniform(0.35, 1.0) * reach / 0.75,
+                               -r.height() * self._rng.uniform(1.6, 2.1),
+                               self._rng.uniform(-700, 700), 1.0))
+
+    def _snap(self):
+        """The failed blow lands: the hammer's head flies off and the plank snaps (or
+        Robo-Bun's gadget shorts out in sparks), in a puff of smoke."""
+        r = self._bun_rect()
+        if self.robot:
+            c = self._at(r, GADGET_SCREEN.center().x(), GADGET_SCREEN.center().y())
+            for _i in range(16):
+                a = self._rng.uniform(math.pi * 1.05, math.pi * 1.95)
+                v = r.height() * self._rng.uniform(0.8, 1.8)
+                self.sparks.append(_Spark(c.x(), c.y(), math.cos(a) * v, math.sin(a) * v,
+                                          self._rng.uniform(0.35, 0.7)))
+        else:
+            c = self._at(r, 104, 109)
+            self.junk.append(_Junk("head", c.x(), c.y(), -r.height() * 0.4,
+                                   -r.height() * 2.0, 820, FAIL_END - FAIL_SNAP))
+            b = self._at(r, 84, 112)
+            for _i in range(3):
+                self._puff(b.x(), b.y(), 22, 4, 0.5)
+        for _i in range(7):
+            self._puff(c.x(), c.y() - r.height() * 0.04, 30, r.height() * 0.07, 1.1, SMOKE)
 
     def _step_act(self, dt: float):
         before = self._act_t
@@ -376,11 +566,20 @@ class BunnyWidget(QWidget):
         phase = self.act_phase()
         r = self._bun_rect()
         if phase == "cloud":
-            # the scuffle: dust keeps rolling off the cloud where he ran
+            # the scuffle: dust keeps rolling off the cloud, junk flies out of it
+            c = self._cloud_spot()
             if self._rng.random() < dt * 30:
-                self._puff(r.center().x() + self._rng.uniform(-18, 18),
-                           r.center().y() + self._rng.uniform(-10, 18), 40, 9, 0.6)
+                self._puff(c.x() + self._rng.uniform(-0.2, 0.2) * r.width(),
+                           c.y() + self._rng.uniform(-0.1, 0.1) * r.height(), 40,
+                           r.height() * 0.08, 0.6)
+            self._junk_debt += dt
+            if self._junk_debt >= 0.22 and self._act_t < CLOUD_END - 0.3:
+                self._junk_debt = 0.0
+                self._toss()
         elif phase == "back" and before < CLOUD_END:
+            c = self._cloud_spot()
+            for _i in range(8):   # out he pops, in a burst of dust
+                self._puff(c.x(), c.y(), 50, r.height() * 0.08, 0.5)
             if self._act_kind != "build":
                 self.prop = "bat"
             else:
@@ -394,8 +593,19 @@ class BunnyWidget(QWidget):
                 self.challenge.emit()
         elif phase == "hammer":
             blows = int((self._act_t - BACK_END) / SWING + 0.3)   # strikes at k = 0.7
-            if blows > self._blows:   # just hit the plank: a puff of sawdust, a tink
+            if blows > self._blows:   # just hit: something gets built
                 self._blows = blows
+                if self._parts < (SCREEN_BARS if self.robot else PARTS) - 1:
+                    self._add_part()
+                if self.robot:        # a spark shower off the bolt
+                    self._flash_at = self._act_t
+                    c = self._at(r, 104, 108)
+                    for _i in range(6):
+                        a = self._rng.uniform(math.pi * 1.1, math.pi * 1.9)
+                        v = r.height() * self._rng.uniform(0.7, 1.4)
+                        self.sparks.append(_Spark(c.x(), c.y(), math.cos(a) * v,
+                                                  math.sin(a) * v, self._rng.uniform(0.25, 0.5)))
+                    return
                 x = r.left() + r.width() * 1.04    # where the hammer lands
                 y = r.top() + r.height() * 0.9
                 for _i in range(3):
@@ -411,6 +621,7 @@ class BunnyWidget(QWidget):
         self._last = now
         if self.building:
             self._step_act(dt)
+        self._step_beats(now, dt)
         for f in self.puffs:
             f.age += dt
             f.x += f.vx * dt
@@ -455,8 +666,10 @@ class BunnyWidget(QWidget):
         cheering = self._joy_at >= 0 and now - self._joy_at < 1.4
         cross = now < self._cross_until or (self._act_kind == "bat" and self.building)
         self._angry += (float(cross) - self._angry) * min(1.0, dt * (10 if cross else 2))
-        target = 0.0 if self._hopeful or cheering or cross else self.sad
-        self._sad += (target - self._sad) * min(1.0, dt * (8 if target < self._sad else 1.5))
+        shocked = 0 <= self._fail_t < FAIL_DROP   # (staring at what just happened)
+        target = 0.0 if self._hopeful or cheering or cross or shocked else self.sad
+        rise = 5 if self._fail_t >= FAIL_DROP else 1.5   # the failure: ears drop at once
+        self._sad += (target - self._sad) * min(1.0, dt * (8 if target < self._sad else rise))
         if self._sad > 0.3 and now >= self._next_sigh:
             self._sigh_at = now
             self._next_sigh = now + self._rng.uniform(5, 9)
@@ -481,7 +694,76 @@ class BunnyWidget(QWidget):
             self._beg_at = now
             self._say(self.lines, BEG)
             self._next_beg = now + BEG + self._rng.uniform(3, 6)
+        self._step_fidget(now)
         self.update()
+
+    def _step_beats(self, now: float, dt: float):
+        """The failure beat, the finished speaker, popping out, and what's flying."""
+        r = self._bun_rect()
+        if self._fail_t >= 0:
+            before = self._fail_t
+            self._fail_t += dt
+            f = self._fail_t
+            if self._fail_snap and before < FAIL_SNAP <= f:
+                self._snap()
+            if before < FAIL_DROP <= f:   # ears drop, a big sigh
+                self._sigh_at = now
+                self._next_sigh = now + self._rng.uniform(5, 9)
+            if self._fail_snap and before < FAIL_POOF <= f:   # he puts the bits down
+                c = self._at(r, 84, 104)
+                for _i in range(9):
+                    self._puff(c.x(), c.y(), 45, r.height() * 0.08, 0.6)
+            if f >= FAIL_END:
+                self._fail_t = -1.0
+        if self._fin_t >= 0:
+            self._fin_t += dt
+            if self._fin_t < FINALE - 0.6 and self._rng.random() < dt * 5:   # it plays
+                c = self._at(r, PLANK_SPOT.center().x(), 102)
+                n = _Note(c.x(), c.y(), self._rng, 1.0)
+                n.vx = self._rng.uniform(10, 40)
+                self.notes.append(n)
+            if self._fin_t >= FINALE:
+                self._fin_t = -1.0
+        if self._pop_t >= 0:
+            self._pop_t += dt
+            if self._pop_t >= POP:
+                self._pop_t = -1.0
+        g, floor = r.height() * 6.5, r.bottom() - 3
+        for j in self.junk:
+            j.age += dt
+            j.vy += g * dt
+            j.x += j.vx * dt
+            j.y += j.vy * dt
+            j.a += j.va * dt
+            if j.y > floor:   # bounce on the floor, losing most of it
+                j.y, j.vy, j.vx, j.va = floor, -j.vy * 0.3, j.vx * 0.5, j.va * 0.4
+        self.junk = [j for j in self.junk if j.age < j.life]
+        for k in self.sparks:
+            k.age += dt
+            k.vy += g * 0.5 * dt
+            k.x += k.vx * dt
+            k.y += k.vy * dt
+        self.sparks = [k for k in self.sparks if k.age < k.life]
+
+    def _idle(self, now: float) -> bool:
+        return not (self.building or self._fail_t >= 0 or self._fin_t >= 0 or self.asleep
+                    or self._sad > 0.3 or self._angry > 0.05 or self._level > TALK
+                    or self._hopeful or self.celebrate or self.say
+                    or (self._joy_at >= 0 and now - self._joy_at < 1.4))
+
+    def _step_fidget(self, now: float):
+        """Now and then a bored Bun fidgets (never in the middle of anything else)."""
+        if self._fidget and now - self._fidget_at >= FIDGETS[self._fidget]:
+            self._fidget = ""
+        if now < self._next_fidget:
+            return
+        self._next_fidget = now + self._rng.uniform(*FIDGET_EVERY)
+        if not self._fidget and self._idle(now):
+            self.fidget(self._rng.choice(tuple(FIDGETS)))
+
+    def fidget(self, kind: str):
+        """Start an idle fidget: "yawn", "look" (round) or "tap" (a foot, to the beat)."""
+        self._fidget, self._fidget_at = kind, time.monotonic()
 
     def pose(self, now: float | None = None) -> dict:
         """Blink / mouth / ears / vertical offset for the current moment."""
@@ -495,37 +777,90 @@ class BunnyWidget(QWidget):
             ears += 14 * math.sin(f / 0.5 * math.pi) * math.cos(f * 30) * (1 - f / 0.5)
         ears += self._mouth * 8 * math.sin(t * 11)
         dy = 2.2 * math.sin(t * 2.2) * (1 - 0.5 * self._sad)
-        ears += 34 * self._sad    # drooping
+        ears += 8 * self._sad    # (the droop itself: draw_bunny folds them with `sad`)
+        sx = sy = 1.0
+        angle, alpha, look_dx = 0.0, 1.0, 0.0
+        mouth = self._mouth
         if self._sigh_at >= 0 and (s := now - self._sigh_at) < 1.6:
             b = math.sin(math.pi * s / 1.6) * self._sad
             dy += 4 * b
-            ears += 14 * b
+            sy -= 0.05 * b         # sagging with it
+            ears += 10 * b
             blink = max(blink, 0.5 * b)
         if self._beg_at >= 0 and (g := now - self._beg_at) < BEG:
             b = math.sin(math.pi * g / BEG)   # perks up and bounces, hoping
-            ears -= 22 * b * self._sad
+            ears -= 10 * b * self._sad
             dy -= 4 * b * abs(math.sin(g * 9))
-        if self._joy_at >= 0 and (j := now - self._joy_at) < 1.2:
-            dy -= 12 * abs(math.sin(j * math.pi * 2.5)) * (1 - j / 1.2)
-            ears -= 30 * self._sad
+        if self._joy_at >= 0 and (j := now - self._joy_at) < 1.35:
+            # three hops for joy, each lower, a squash on every landing; eyes shut
+            # happy, mouth open in a grin
+            hops = (0.17, 0.1, 0.05)
+            if j < 1.2:
+                n = int(j / 0.4)
+                u = (j - 0.4 * n) / 0.4
+                up = math.sin(u * math.pi)
+                dy -= self.bun_h * hops[n] * up
+                sy += 0.06 * up * hops[n] / hops[0]
+                ears -= 12 * up
+            for i, land in enumerate((0.4, 0.8, 1.2)):
+                if (d := abs(j - land)) < 0.1:
+                    sy -= 0.16 * hops[i] / hops[0] * (1 - d / 0.1)
+            sx += (1 - sy) * 0.8
+            ears -= 8 * self._sad
+            blink = max(blink, 1.0 if j < 1.25 else 0.0)
+            mouth = max(mouth, 0.6 * min(1.0, (1.35 - j) / 0.2))
+        if self._fidget and (f := now - self._fidget_at) < FIDGETS[self._fidget]:
+            d = FIDGETS[self._fidget]
+            env = math.sin(math.pi * f / d)
+            if self._fidget == "yawn":   # opens wide, eyes screwed shut, a stretch
+                o = max(0.0, min(1.0, f / 0.8, (d - 0.2 - f) / 0.6))
+                o = o * o * (3 - 2 * o)
+                mouth = max(mouth, 0.95 * o)
+                blink = max(blink, min(1.0, 1.5 * o))
+                sy += 0.05 * o
+                dy -= 2 * o
+                ears -= 10 * o
+            elif self._fidget == "look":   # a look round: leans one way, then the other
+                angle += 7 * math.sin(2 * math.pi * f / d) * env
+                look_dx = 3 * math.sin(2 * math.pi * f / d) * env
+                ears += 6 * math.sin(2 * math.pi * f / d + 0.6) * env
+                dy -= 1.5 * env
+            else:   # "tap": a foot tap and a sway, to whatever's in his headphones
+                beat = abs(math.sin(math.pi * f * 2.2))
+                dy -= 2.2 * beat * env
+                angle += 4 * math.sin(math.pi * f * 1.1) * env
+                ears += 6 * math.sin(math.pi * f * 4.4) * env
         if self._hopeful:
             dy -= 6 * abs(math.sin(t * 5))
         if self.celebrate:
             dy -= 7 * abs(math.sin(t * 3.4))
         dy -= self._bounce * abs(math.sin(t * 9))
-        dx, swing, shown = 0.0, 0.0, True
+        dx, swing, shown, prop = look_dx, 0.0, True, self.prop
         phase = self.act_phase()
-        away = self.width() * 0.5 + self.bun_h * W / H   # far enough to be out of view
-        if phase == "dash":      # zooms off to the right in quick hops, ears flat back
+        led = 0.0
+        if phase == "dash":      # crouches, then springs up and dives into the cloud,
+            # stretching and shrinking into it (never past the edge of his own box)
             k = self._act_t / DASH_END
-            dx, ears = away * k * k, ears - 25
-            dy -= 8 * abs(math.sin(self._act_t * 20))
+            if k < CROUCH:
+                c = math.sin(k / CROUCH * math.pi / 2)
+                sy, sx, angle = sy - 0.15 * c, sx + 0.1 * c, angle - 5 * c
+                ears += 14 * c
+            else:
+                u = (k - CROUCH) / (1 - CROUCH)
+                dy -= self.bun_h * 0.2 * math.sin(u * math.pi)
+                sy, sx = sy * (1 + 0.2 * u) * (1 - 0.35 * u), sx * (1 - 0.45 * u)
+                ears -= 25 * u
+                alpha = max(0.0, 1 - max(0.0, u - 0.5) / 0.45)
+            shown = alpha > 0.02
         elif phase == "cloud":
             shown = False
-        elif phase == "back":    # hops back in from the right with his tools
+        elif phase == "back":    # pops out of the cloud with his tools, springy
             k = (self._act_t - CLOUD_END) / (BACK_END - CLOUD_END)
-            dx = away * (1 - k) ** 2
-            dy -= 6 * abs(math.sin(self._act_t * 16))
+            sc = 1 - 0.45 * (1 - k) ** 2 + 0.14 * math.sin(k * math.pi) * (1 - k)
+            sx, sy = sx * sc, sy * sc
+            dy -= self.bun_h * 0.16 * math.sin(k * math.pi)
+            ears -= 14 * math.sin(k * math.pi)
+            alpha = 1.0   # (solid at once: small and springy is pop enough)
         elif phase == "hammer":
             swing = self._swing()
             dy += 1.5 * swing    # leans into each blow
@@ -533,9 +868,30 @@ class BunnyWidget(QWidget):
         elif phase == "bat":     # taps the bat on his paw, glaring
             swing = 0.18 * abs(math.sin((self._act_t - BACK_END) * 5))
             ears -= 8
+        if self._pop_t >= 0:     # popped out of the cloud early (the act ended)
+            k = self._pop_t / POP
+            sc = 1 - 0.4 * (1 - k) ** 2 + 0.1 * math.sin(k * math.pi)
+            sx, sy = sx * sc, sy * sc
+        if (f := self._fail_t) >= 0:
+            if self._fail_snap and f < FAIL_POOF:
+                broken = f >= FAIL_SNAP
+                prop = ("wrench" if self.robot else "hammer_broken" if broken else "hammer")
+                if not broken:   # the blow comes down
+                    s0 = self._fail_swing
+                    swing = s0 + (1 - s0) * f / FAIL_SNAP
+                else:            # ... and he lifts what's left to look at it
+                    swing = 1 - 0.35 * min(1.0, (f - FAIL_SNAP) / 0.35)
+            if FAIL_SNAP <= f < FAIL_DROP:   # frozen: ears up, mouth an "o", a tremble
+                k = (f - FAIL_SNAP) / (FAIL_DROP - FAIL_SNAP)
+                ears -= 12
+                mouth = max(mouth, 0.35)
+                dx += 1.4 * math.sin(t * 45) * (1 - k)
+                if (j := f - FAIL_SNAP) < 0.3:   # a start
+                    dy -= self.bun_h * 0.05 * math.sin(j / 0.3 * math.pi)
+        if self.robot and (self.building or 0 <= self._fail_t < FAIL_SNAP):
+            led = 0.5 + 0.5 * math.sin(t * 7)   # his LEDs pulse while he works
         if self._angry > 0.05 and phase in (None, "bat"):   # a cross little shake
             dx += 1.6 * self._angry * math.sin(t * 40)
-        mouth = self._mouth
         if self.asleep:   # eyes shut, slow deep breaths, a little snoring "o"
             blink = 1.0
             breath = math.sin(t * 1.3)
@@ -544,7 +900,8 @@ class BunnyWidget(QWidget):
             mouth = 0.1 + 0.07 * max(0.0, breath)
         return {"blink": blink, "mouth": mouth, "ears": ears, "dy": dy,
                 "dx": dx, "swing": swing, "shown": shown, "sad": self._sad,
-                "angry": self._angry}
+                "angry": self._angry, "sx": sx, "sy": sy, "angle": angle,
+                "alpha": alpha, "led": led, "prop": prop}
 
     # ------------------------------------------------------------------ paint
     def paintEvent(self, ev):
@@ -556,13 +913,16 @@ class BunnyWidget(QWidget):
         r = self._bun_rect()
         # soft shadow on the "floor", shrinking as he rises
         lift = max(0.0, -pose["dy"])
-        shade = QColor(0, 0, 0, max(20, 70 - int(lift * 6)))
-        sw = r.width() * (0.62 - lift * 0.012)
+        shade = QColor(0, 0, 0, round(max(20, 70 - int(lift * 6)) * pose["alpha"]))
+        sw = max(0.0, r.width() * (0.62 - lift * 0.012) * pose["sx"])
         p.setPen(Qt.PenStyle.NoPen)
         p.setBrush(shade)
         if pose["shown"]:
             p.drawEllipse(QRectF(r.center().x() + pose["dx"] - sw / 2, r.bottom() - 4, sw, 8))
         self._paint_puffs(p)
+        phase = self.act_phase()
+        if phase in ("cloud", "back"):   # (the cloud he pops out of is behind him)
+            self._paint_scuffle(p)
         if self.celebrate:
             t = now - self._t0
             for i, col in enumerate(SPARKLE_COLORS):
@@ -571,15 +931,27 @@ class BunnyWidget(QWidget):
                 x = r.center().x() + math.cos(a) * (r.width() * 0.78)
                 y = r.center().y() - 6 + math.sin(a) * (r.height() * 0.48)
                 sparkle(p, x, y, 3 + 4 * tw, QColor(col))
+        body = r.translated(pose["dx"], pose["dy"])
+        self._paint_build(p, body, r, pose)
         if pose["shown"]:
-            draw_bunny(p, r.translated(pose["dx"], pose["dy"]), self.prop,
+            p.save()
+            foot = QPointF(body.center().x(), body.bottom())
+            p.translate(foot)
+            p.rotate(pose["angle"])
+            p.scale(pose["sx"], pose["sy"])
+            p.translate(-foot)
+            p.setOpacity(pose["alpha"])
+            draw_bunny(p, body, pose["prop"],
                        blink=pose["blink"], mouth=pose["mouth"], ears=pose["ears"],
                        swing=pose["swing"], sad=pose["sad"], angry=pose["angry"],
-                       nightcap=self.asleep, robot=self.robot)
-        else:
+                       nightcap=self.asleep, robot=self.robot, led=pose["led"])
+            p.restore()
+        self._paint_screen(p, body, pose)
+        if phase == "dash":   # (the cloud he dives into is in front of him)
             self._paint_scuffle(p)
+        self._paint_flying(p, r)
         if self.say and pose["shown"]:
-            self._bubble(p, self.say, r.translated(pose["dx"], pose["dy"]))
+            self._bubble(p, self.say, body)
         if self.zzz:
             f = QFont(self.font())
             f.setBold(True)
@@ -592,15 +964,181 @@ class BunnyWidget(QWidget):
                 p.setPen(col)
                 p.drawText(QPointF(x, y), "z" if k < 0.35 else "Z")
         for n in self.notes:
-            k = n.age / n.life
-            alpha = min(1.0, n.age * 6) * (1 - k) ** 1.4
-            p.save()
-            p.setOpacity(alpha)
-            p.translate(n.x, n.y)
-            p.rotate(n.spin * math.sin(n.age * 4))
-            music_note(p, -5, -8, n.size, n.col)
-            p.restore()
+            paint_note(p, n)
         p.end()
+
+    def _speaker(self, p: QPainter, spot: QRectF, parts: int, at: float, thump: float = 0.0):
+        """The little speaker he builds, `parts` of it, on the canvas (each part springs
+        on a little bigger, then settles; `at` is the act time now)."""
+        def pop(i: int) -> float:
+            k = (at - self._part_at[i]) / 0.25
+            if k >= 1 or self._part_at[i] < 0:
+                return 1.0
+            return 0.4 + 0.6 * k + 0.25 * math.sin(k * math.pi)
+
+        def scaled(rect: QRectF, k: float) -> QRectF:
+            c = rect.center()
+            return QRectF(c.x() - rect.width() * k / 2, c.y() - rect.height() * k / 2,
+                          rect.width() * k, rect.height() * k)
+
+        if thump:   # thumping to the beat, from the floor up
+            k = 1 + 0.08 * thump
+            w, h = spot.width() * k, spot.height() * k
+            spot = QRectF(spot.center().x() - w / 2, spot.bottom() - h, w, h)
+        ink = QPen(INK, 1.6)
+        ink.setJoinStyle(Qt.PenJoinStyle.RoundJoin)
+        p.setPen(ink)
+        p.setBrush(WOOD)
+        frame = scaled(spot, pop(0))
+        p.drawRoundedRect(frame, 2.5, 2.5)
+        if parts >= 2:
+            p.setBrush(CABINET)
+            p.drawRoundedRect(scaled(spot.adjusted(2.2, 2.2, -2.2, -2.2), pop(1)), 2, 2)
+        cx = spot.center().x()
+        if parts >= 3:
+            rr = spot.width() * 0.3 * pop(2)
+            cy = spot.top() + spot.height() * 0.64
+            p.setPen(QPen(INK, 1.2))
+            p.setBrush(STEEL)
+            p.drawEllipse(QPointF(cx, cy), rr, rr)
+            p.setPen(Qt.PenStyle.NoPen)
+            p.setBrush(QColor(theme.T["accent"]))
+            p.drawEllipse(QPointF(cx, cy), rr * 0.55, rr * 0.55)
+        if parts >= 4:
+            rr = spot.width() * 0.14 * pop(3)
+            cy = spot.top() + spot.height() * 0.25
+            p.setPen(QPen(INK, 1.2))
+            p.setBrush(STEEL)
+            p.drawEllipse(QPointF(cx, cy), rr, rr)
+        elif parts:   # a work in progress: nails waiting
+            p.setPen(QPen(WOOD_DARK, 1.1, Qt.PenStyle.SolidLine, Qt.PenCapStyle.RoundCap))
+            p.drawLine(QPointF(frame.left() + 2.5, frame.top() + 2.5),
+                       QPointF(frame.left() + 4.5, frame.top() + 4.5))
+
+    def _canvas(self, p: QPainter, body: QRectF):
+        """Switch the painter to the 100 x 120 canvas `body` is drawn on."""
+        s = body.height() / H
+        p.translate(body.left(), body.top())
+        p.scale(s, s)
+
+    def _paint_build(self, p: QPainter, body: QRectF, rest: QRectF, pose: dict):
+        """What he's building, behind him: the speaker on his plank as the blows land,
+        toppling off when it fails, and playing on the floor beside him once done."""
+        if self.robot or not self._parts:
+            return
+        f = self._fail_t
+        if self.act_phase() == "hammer" or (self._fail_snap and 0 <= f < FAIL_POOF):
+            p.save()
+            self._canvas(p, body)
+            spot = QRectF(PLANK_SPOT)
+            if f >= FAIL_SNAP:   # the plank snapped: over it goes
+                k = min(1.0, (f - FAIL_SNAP) / 0.35)
+                pivot = QPointF(spot.right(), spot.bottom())
+                p.translate(pivot)
+                p.rotate(80 * k * k)
+                p.translate(-pivot)
+                p.translate(0, 5 * k)
+                p.setOpacity(max(0.0, 1 - (f - FAIL_SNAP) / (FAIL_POOF - FAIL_SNAP)))
+            self._speaker(p, spot, self._parts, self._act_t if self.building else 1e9)
+            p.restore()
+        elif self._fin_t >= 0:
+            e = self._fin_t
+            p.save()
+            self._canvas(p, rest)
+            p.setOpacity(max(0.0, min(1.0, (FINALE - e) / 0.7)))
+            spot = PLANK_SPOT.translated(2, 119 - PLANK_SPOT.bottom())
+            self._speaker(p, spot, PARTS, 1e9, abs(math.sin(e * 9)))
+            p.restore()
+
+    def _paint_screen(self, p: QPainter, body: QRectF, pose: dict):
+        """Robo-Bun's gadget screen: a bar lights up a blow (the last one when it
+        worked), flashing red when it shorts out."""
+        if not self.robot or pose["prop"] != "wrench":
+            return
+        p.save()
+        self._canvas(p, body)
+        p.setPen(Qt.PenStyle.NoPen)
+        scr = GADGET_SCREEN.adjusted(3, 1.4, -1.4, -1.4)
+        gap = 0.8
+        bw = (scr.width() - gap * (SCREEN_BARS - 1)) / SCREEN_BARS
+        if self._fail_t >= FAIL_SNAP:
+            on = int(self._fail_t * 8) % 2 == 0
+            col = QColor(FAIL_RED)
+            col.setAlphaF(0.9 if on else 0.35)
+            p.setBrush(col)
+            p.drawRect(scr)
+        else:
+            for i in range(SCREEN_BARS):
+                col = QColor(ROBOT_CYAN if i < self._parts else "#2c3446")
+                if i == self._parts and self.building:   # the next one: blinking
+                    col = QColor(ROBOT_CYAN)
+                    col.setAlphaF(0.25 + 0.3 * (0.5 + 0.5 * math.sin(self._act_t * 10)))
+                p.setBrush(col)
+                p.drawRect(QRectF(scr.left() + i * (bw + gap), scr.top(), bw, scr.height()))
+        if self.act_phase() == "hammer" and 0 <= self._act_t - self._flash_at < 0.12:
+            sparkle(p, 104, 106, 7, ROBOT_CYAN_HI)   # the wrench hits the bolt
+        p.restore()
+
+    def _paint_flying(self, p: QPainter, r: QRectF):
+        """Junk out of the cloud, the hammer's head, and sparks."""
+        s = r.height() / H
+        for j in self.junk:
+            p.save()
+            p.setOpacity(max(0.0, min(1.0, (j.life - j.age) / 0.35)))
+            p.translate(j.x, j.y)
+            p.rotate(j.a)
+            p.scale(s, s)
+            p.setPen(QPen(INK, 1.4))
+            if j.kind == "head":
+                p.setBrush(STEEL)
+                p.drawRoundedRect(QRectF(-10, -5, 20, 10), 2.5, 2.5)
+                p.setBrush(WOOD)
+                p.drawRect(QRectF(-3, 5, 6, 3))   # the stub of handle still in it
+            elif j.kind == "sock":
+                path = QPainterPath(QPointF(-3, -9))
+                path.lineTo(3, -9)
+                path.lineTo(3, 2)
+                path.quadTo(QPointF(10, 2), QPointF(10, 6))
+                path.quadTo(QPointF(10, 9), QPointF(4, 9))
+                path.lineTo(-1, 9)
+                path.quadTo(QPointF(-3, 9), QPointF(-3, 6))
+                path.closeSubpath()
+                p.setBrush(PINK)   # (a light sock: it shows on every theme)
+                p.drawPath(path)
+                p.setPen(QPen(FUR, 2))
+                p.drawLine(QPointF(-2, -6.5), QPointF(2, -6.5))
+            elif j.kind == "carrot":
+                path = QPainterPath(QPointF(-4, -6))
+                path.lineTo(4, -6)
+                path.lineTo(0, 10)
+                path.closeSubpath()
+                p.setBrush(QColor("#ff9a3c"))
+                p.drawPath(path)
+                p.setPen(QPen(QColor("#2fae5a"), 2, Qt.PenStyle.SolidLine, Qt.PenCapStyle.RoundCap))
+                p.drawLine(QPointF(0, -6), QPointF(-3, -11))
+                p.drawLine(QPointF(0, -6), QPointF(3, -11))
+            elif j.kind == "spring":
+                p.setPen(QPen(STEEL, 2, Qt.PenStyle.SolidLine, Qt.PenCapStyle.RoundCap))
+                path = QPainterPath(QPointF(-6, -8))
+                for i in range(1, 7):
+                    path.lineTo(6 if i % 2 else -6, -8 + i * 2.7)
+                p.setBrush(Qt.BrushStyle.NoBrush)
+                p.drawPath(path)
+            elif j.kind == "duck":
+                p.setBrush(QColor("#ffd23f"))
+                p.drawEllipse(QRectF(-8, -2, 15, 9))
+                p.drawEllipse(QRectF(-1, -9, 8, 8))
+                p.setBrush(QColor("#ff8a3c"))
+                p.drawEllipse(QRectF(5.5, -6.5, 5, 3))
+            else:   # a bit of plank
+                p.setBrush(WOOD)
+                p.drawRoundedRect(QRectF(-9, -2.5, 18, 5), 1.5, 1.5)
+            p.restore()
+        for k in self.sparks:
+            col = QColor(k.col)
+            col.setAlphaF(max(0.0, 1 - k.age / k.life))
+            p.setPen(QPen(col, max(1.2, 1.8 * s), Qt.PenStyle.SolidLine, Qt.PenCapStyle.RoundCap))
+            p.drawLine(QPointF(k.x, k.y), QPointF(k.x - k.vx * 0.035, k.y - k.vy * 0.035))
 
     def _bubble(self, p: QPainter, text: str, body: QRectF):
         """A comic speech bubble up and to the right of his head (Hoot's style)."""
@@ -631,42 +1169,72 @@ class BunnyWidget(QWidget):
 
     def _paint_puffs(self, p: QPainter):
         p.setPen(Qt.PenStyle.NoPen)
-        p.setBrush(DUST)
         for f in self.puffs:
             k = f.age / f.life
+            p.setBrush(f.col)
             p.setOpacity(0.85 * (1 - k))
             rr = f.r * (0.6 + 0.8 * k)
             p.drawEllipse(QRectF(f.x - rr, f.y - rr, 2 * rr, 2 * rr))
         p.setOpacity(1.0)
 
     def _paint_scuffle(self, p: QPainter):
-        """The cartoon dust-up while he's off fetching his tools: a jiggling cloud with
-        bits of plank and stars poking out of it."""
+        """The cartoon dust-up while he rummages for his tools: a jiggling cloud he dives
+        into, his ears popping up out of it, stars and bits of plank flying, and he
+        pops back out of it with what he went for."""
         r = self._bun_rect()
-        cx, cy = r.center().x(), r.center().y() + 8
+        c = self._cloud_spot()
+        cx, cy = c.x(), c.y()
         t = self._act_t
-        grow = max(0.0, min(1.0, (t - DASH_END) / 0.2, (CLOUD_END - t) / 0.2))
+        u = r.height() / 110   # (sized to him)
+        phase = self.act_phase()
+        if phase == "dash":    # swells round him as he dives in
+            k = (t / DASH_END - CROUCH) / (1 - CROUCH)
+            grow = max(0.0, min(1.0, (k - 0.1) / 0.6))
+            grow = grow * grow * (3 - 2 * grow)
+        elif phase == "back":  # shrinks away as he comes out
+            grow = max(0.0, 1 - (t - CLOUD_END) / (BACK_END - CLOUD_END) / 0.6)
+        else:
+            grow = 1.0
+        if grow <= 0:
+            return
+        if phase == "cloud":   # his ears pop up out of the top now and then
+            e = (t * 2.2) % 1.0
+            if e < 0.45:
+                up = math.sin(e / 0.45 * math.pi)
+                for ex, tilt in ((-7, -12), (7, 14)):
+                    p.save()
+                    p.translate(cx + ex * u + 6 * u * math.sin(t * 5), cy - 18 * u)
+                    p.rotate(tilt + 8 * math.sin(t * 13))
+                    p.translate(0, -16 * u * up)
+                    p.setPen(QPen(ROBOT_INK if self.robot else INK, 1.6))
+                    p.setBrush(ROBOT_FUR if self.robot else FUR)
+                    p.drawEllipse(QRectF(-5 * u, -12 * u, 10 * u, 26 * u))
+                    p.setPen(Qt.PenStyle.NoPen)
+                    p.setBrush(ROBOT_CYAN if self.robot else PINK)
+                    p.drawEllipse(QRectF(-2.4 * u, -8 * u, 4.8 * u, 18 * u))
+                    p.restore()
         p.setPen(QPen(DUST_INK, 1.5))
         p.setBrush(DUST)
-        for i in range(7):
-            a = i * 2 * math.pi / 7 + t * 3
-            rr = (15 + 4 * math.sin(t * 23 + i * 1.9)) * grow
-            x = cx + math.cos(a) * 20 * grow
-            y = cy + math.sin(a) * 12 * grow
+        for i in range(8):
+            a = i * 2 * math.pi / 8 + t * 3
+            rr = (16 + 4 * math.sin(t * 23 + i * 1.9)) * grow * u
+            x = cx + math.cos(a) * 25 * grow * u
+            y = cy + math.sin(a) * 14 * grow * u
             p.drawEllipse(QRectF(x - rr, y - rr, 2 * rr, 2 * rr))
         p.setPen(Qt.PenStyle.NoPen)
-        p.drawEllipse(QRectF(cx - 22 * grow, cy - 14 * grow, 44 * grow, 28 * grow))
+        p.drawEllipse(QRectF(cx - 28 * grow * u, cy - 16 * grow * u, 56 * grow * u, 32 * grow * u))
         k = int(t * 9)   # a new spot every few frames
         for j in range(2):
             a = (k * 2.4 + j * math.pi) % (2 * math.pi)
-            x, y = cx + math.cos(a) * 34 * grow, cy + math.sin(a) * 22 * grow
+            x, y = cx + math.cos(a) * 38 * grow * u, cy + math.sin(a) * 22 * grow * u
             if (k + j) % 2:
-                sparkle(p, x, y, 5 * grow, QColor(SPARKLE_COLORS[(k + j) % 4]))
+                sparkle(p, x, y, 6 * grow * u, QColor(SPARKLE_COLORS[(k + j) % 4]))
             else:
                 p.save()
                 p.translate(x, y)
                 p.rotate(math.degrees(a))
                 p.setPen(QPen(INK, 1.2))
                 p.setBrush(WOOD)
-                p.drawRoundedRect(QRectF(-8 * grow, -2.5 * grow, 16 * grow, 5 * grow), 1.5, 1.5)
+                p.drawRoundedRect(QRectF(-9 * grow * u, -2.8 * grow * u, 18 * grow * u,
+                                         5.6 * grow * u), 1.5, 1.5)
                 p.restore()

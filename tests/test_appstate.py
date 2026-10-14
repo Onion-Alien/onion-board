@@ -2,6 +2,7 @@
 from PySide6.QtCore import Qt, QTimer
 from PySide6.QtWidgets import QWidget
 
+from soundboard.style import appstate as kitstate
 from soundboard.ui import appstate
 
 
@@ -41,7 +42,8 @@ def test_an_animation_stays_paused_in_a_minimised_window(qapp):
 def test_an_animation_restarts_when_the_window_is_restored_after_activating(qapp, monkeypatch):
     # Windows makes the app active before the window leaves its minimised state;
     # the animation used to stay frozen until something else woke it.
-    monkeypatch.setattr(appstate, "active", lambda: True)
+    # (pause_in_background lives in the style kit, which checks its own active())
+    monkeypatch.setattr(kitstate, "active", lambda: True)
     w = QWidget()
     calls = []
     appstate.pause_in_background(w, lambda: calls.append("start"), lambda: calls.append("stop"))
