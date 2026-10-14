@@ -348,7 +348,7 @@ class VoicePanel(QWidget):
 
     def _ai_live(self, on: bool):
         if on:                             # one replacement for your voice at a time
-            self.speech.b_live.setChecked(False)
+            self.speech.livevoice.b_live.setChecked(False)
         self._emit_active()
 
     def _speech_live(self, on: bool):
@@ -360,13 +360,13 @@ class VoicePanel(QWidget):
         voice changer, the AI voice and the computer voice)."""
         self.controller.stop_speaking()
         self.ai.stop()
-        self.speech.b_live.setChecked(False)
+        self.speech.livevoice.b_live.setChecked(False)
         self.fx.btn_power.setChecked(False)   # its toggled handler applies it
         self.speech.sw_lang.setChecked(False)
 
     def is_active(self) -> bool:
         """Something here is changing what others hear from your mic."""
-        return (self.fx.btn_power.isChecked() or self.speech.b_live.isChecked()
+        return (self.fx.btn_power.isChecked() or self.speech.livevoice.b_live.isChecked()
                 or self.ai.is_on())
 
     def _emit_active(self):
@@ -381,8 +381,9 @@ class VoicePanel(QWidget):
     # ---- Speak in: the voice that's on says the translated lines
     def _sync_translate(self):
         sp = self.speech
+        lv = sp.livevoice
         m = sp.translating()
-        fg = sp.b_live.isChecked()     # text-to-speech's own Start translates by itself
+        fg = lv.b_live.isChecked()   # text-to-speech's own Start translates by itself
         who = ""
         if m is not None and not fg:
             if self.ai.is_on():
@@ -392,15 +393,15 @@ class VoicePanel(QWidget):
         self.ai_controller.set_dub(who == "ai")
         sp.ctl.dub = self.ai_controller if who == "ai" else None   # (typed in live.py)
         sp.ctl.fx_always = who == "fx"
-        if who and not sp.bg_for:
-            sp._bg_note("")               # "turn on a voice": one is on now
-        sp.translate_for(who)
-        if m is not None and not fg and not who and not sp._bg_warning:
-            sp._bg_note(_("Turn on the AI voice or the voice changer below, or press Start "
+        if who and not lv.bg_for:
+            lv._bg_note("")               # "turn on a voice": one is on now
+        lv.translate_for(who)
+        if m is not None and not fg and not who and not lv._bg_warning:
+            lv._bg_note(_("Turn on the AI voice or the voice changer below, or press Start "
                           "for the computer voice, to speak {language}.",
                           language=langnames.of(m)))
-        elif m is None and not sp.bg_for and not sp._bg_warning:
-            sp._bg_note("")               # switched off: no "turn on a voice" hint
+        elif m is None and not lv.bg_for and not lv._bg_warning:
+            lv._bg_note("")               # switched off: no "turn on a voice" hint
 
     # ---- cards that fold away
     def _section(self, key: str, panel: QWidget, title: QLabel,
@@ -494,7 +495,7 @@ class VoicePanel(QWidget):
                                      if st == "starting" else
                                      _("AI voice: {voice}.", voice=title)) + " "
                               + _("Click to open AI voices.")))
-        if self.speech.b_live.isChecked():
+        if self.speech.livevoice.b_live.isChecked():
             # which voice: a custom one may be a voice server on this PC (a web address)
             cb = self.speech.cb_voice
             who = cb.currentText() if cb.currentData() else _("Computer voice")
@@ -532,7 +533,7 @@ class VoicePanel(QWidget):
         lang = langnames.of(m) if m is not None else ""
         late = _("in {language}, a few seconds late", language=lang) if lang else ""
         fx, ai, tts = (self.fx.btn_power.isChecked(), self.ai.is_on(),
-                       self.speech.b_live.isChecked())
+                       self.speech.livevoice.b_live.isChecked())
         # the voice changer's switch already says On: its head only adds the language
         self._set_state("fx", fx, late if fx and not ai and not tts else "", say_on=False)
         self._set_state("ai", ai, late if ai and not tts else "")
@@ -617,7 +618,7 @@ class VoicePanel(QWidget):
         """Closing the app, or the tab switched off in Settings > Tabs. A download or
         install still running finishes quietly (busy.emit) or, a translation, stops."""
         self._meter_timer.stop()
-        self.speech._dl_cancel = True
+        self.speech.installs._dl_cancel = True
         self.ai.shutdown()
         self.controller.shutdown()
         self.engine.voice_chain = None
