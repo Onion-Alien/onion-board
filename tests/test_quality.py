@@ -175,7 +175,7 @@ def test_settings_always_shows_ffmpeg_and_what_to_do(window, monkeypatch):  # no
                                 (ffmpegget.BROKEN, "Won't start", "Fix it")):
         _ff(monkeypatch, state, "some of its files are gone")
         d = _data_page(window)
-        d._ffmpeg_sync()
+        d.privacy._ffmpeg_sync()
         assert not d.ff_box.isHidden() and d.ff_state.text() == pill
         assert not d.btn_ffmpeg.isHidden() and d.btn_ffmpeg.text() == button
         if state == ffmpegget.BROKEN:
@@ -187,7 +187,7 @@ def test_settings_says_why_it_wasnt_got_but_still_offers_it(window, monkeypatch)
     _ff(monkeypatch, ffmpegget.MISSING)
     net.configure_features(["ffmpeg_download"])
     d = _data_page(window)
-    d._ffmpeg_sync()
+    d.privacy._ffmpeg_sync()
     assert d.btn_ffmpeg.text() == "Get FFmpeg" and not d.btn_ffmpeg.isHidden()
     assert "switched off" in d.ff_note.text()
     net.configure_features()
@@ -206,7 +206,7 @@ def test_settings_follows_the_download_and_a_fix(window, monkeypatch):  # noqa: 
     from soundboard import ffmpegget
     _ff(monkeypatch, ffmpegget.MISSING)
     d = _data_page(window)
-    d._ffmpeg_sync()
+    d.privacy._ffmpeg_sync()
     assert "360p" in d._save_video_hint.text()
     window.ffctl.getting, window.ffctl.percent = True, 42
     window.ffctl.news()

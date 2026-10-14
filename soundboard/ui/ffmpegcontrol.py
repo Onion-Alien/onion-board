@@ -208,7 +208,7 @@ class FfmpegControl(Controller):
         self.show_bar()
         dlg = self.mw.setctl._settings_dlg
         if dlg is not None and qt_valid(dlg):
-            dlg._ffmpeg_sync()
+            dlg.privacy._ffmpeg_sync()
 
     def show_bar(self):
         """While FFmpeg downloads: how far, with Stop. When it's missing or won't start

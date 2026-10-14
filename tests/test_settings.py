@@ -349,7 +349,7 @@ def test_each_switch_writes_its_setting_and_applies_at_once(window, monkeypatch)
             assert box.isChecked() and net.allowed(key)
             box.setChecked(False)
             # Count me in waits for its last anonymous opt-out count first
-            # (SettingsDialog._opt_out_wait checks every 100 ms)
+            # (PrivacyPage._opt_out_wait checks every 100 ms)
             end = time.monotonic() + 5
             while net.allowed(key) and time.monotonic() < end:
                 QApplication.processEvents()
