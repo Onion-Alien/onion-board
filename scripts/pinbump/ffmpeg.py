@@ -1,6 +1,7 @@
 """Bump soundboard/ffmpegget.py to the newest FFmpeg essentials build from gyan.dev,
 once the builder's published SHA-256, GitHub's digest of the GyanD/codexffmpeg release
-file and the bytes from every source in URLS all agree. See common.py.
+file and the bytes from every source in URLS all agree, and its ffmpeg and ffprobe
+encode and read back a second of MP3 and M4A. See common.py.
 
 When the pin is already the newest, it checks that every source still serves the
 pinned zip with the pinned SHA-256 (the builder's site drops old builds; that's how
@@ -13,6 +14,7 @@ from __future__ import annotations
 import io
 import re
 import sys
+import tempfile
 import zipfile
 from pathlib import Path
 
@@ -46,22 +48,22 @@ def latest() -> str:
     return v
 
 
-def verify(version: str) -> tuple[str, int, list[str]]:
-    """(SHA-256, size, problems) for ``version``: the builder's .sha256 file, GitHub's
+def verify(version: str) -> tuple[str, bytes, list[str]]:
+    """(SHA-256, zip, problems) for ``version``: the builder's .sha256 file, GitHub's
     digest and every source's bytes must all agree, and the zip must hold KEEP."""
     zip_name, urls, members = layout(version)
     bad: list[str] = []
     try:
         want = common.fetch(SHA_URL.format(zip=zip_name), 1000).decode("ascii").split()[0]
     except Exception as e:  # noqa: BLE001 - every failure is one line in the report
-        return "", 0, [f"BROKEN {SHA_URL.format(zip=zip_name)}: {type(e).__name__}: {e}"]
+        return "", b"", [f"BROKEN {SHA_URL.format(zip=zip_name)}: {type(e).__name__}: {e}"]
     try:
         gh = common.asset_sha256(common.github_release(REPO, version), zip_name)
         if gh != want:
             bad.append(f"BROKEN GitHub digest {gh}, builder's {want}")
     except (Exception, SystemExit) as e:  # noqa: BLE001
         bad.append(f"BROKEN GitHub release {version}: {type(e).__name__}: {e}")
-    size = 0
+    good = b""
     for url in urls:
         try:
             data = common.fetch(url)
@@ -76,9 +78,26 @@ def verify(version: str) -> tuple[str, int, list[str]]:
         if missing := [m for m in members if m not in names]:
             bad.append(f"BROKEN {url}: zip lacks {', '.join(missing)}")
             continue
-        size = len(data)
+        good = data
         print(f"ok     {url}")
-    return want, size, bad
+    return want, good, bad
+
+
+def smoke(data: bytes, version: str) -> None:
+    """The KEEP members, unpacked as ffmpegget does, run: a second of tone encoded to
+    MP3 and to M4A (AAC, which only FFmpeg decodes for the app) and read back."""
+    with tempfile.TemporaryDirectory() as d:
+        members = layout(version)[2]
+        zipfile.ZipFile(io.BytesIO(data)).extractall(d, members)
+        exe = {Path(m).name: Path(d, m) for m in members}
+        common.run([exe["ffmpeg.exe"], "-version"], expect=f"ffmpeg version {version}")
+        for out in ("tone.mp3", "tone.m4a"):
+            common.run([exe["ffmpeg.exe"], "-v", "error", "-f", "lavfi",
+                        "-i", "sine=frequency=440:duration=1", Path(d, out)])
+            got = common.run([exe["ffprobe.exe"], "-v", "error", "-show_entries",
+                              "format=duration", "-of", "csv=p=0", Path(d, out)])
+            if not 0.9 < float(got.strip() or 0) < 1.2:
+                sys.exit(f"smoke FAILED: ffprobe says {out} lasts {got.strip()!r}, not 1 s")
 
 
 def main() -> int:
@@ -91,14 +110,16 @@ def main() -> int:
         if common.already_open("ffmpeg", new) and not a.dry_run:
             print(f"ffmpeg: {common.branch_for('ffmpeg', new)} already exists, skipping")
             return 0
-        digest, size, bad = verify(new)
+        digest, data, bad = verify(new)
         if bad:
             print("\n".join(bad))
             print(f"ffmpeg: {new} isn't on both sources with matching hashes yet; "
                   "checking the pinned one instead")
         else:
             zip_name = layout(new)[0]
-            print(f"ffmpeg: {zip_name} sha256 {digest}, {size} bytes, same on every source")
+            print(f"ffmpeg: {zip_name} sha256 {digest}, {len(data)} bytes, "
+                  "same on every source")
+            smoke(data, new)
             if a.dry_run:
                 return 0
             common.set_pins(SRC, {"VERSION": new, "SHA256": digest})
@@ -108,18 +129,23 @@ def main() -> int:
                 "(`soundboard/ffmpegget.py`).\n\n"
                 f"- `{zip_name}`: the builder's published SHA-256, GitHub's digest of the "
                 f"{REPO} release file and the bytes from both URLS all match.\n"
-                f"- SHA-256 `{digest}`, {size:,} bytes; the zip holds every KEEP member.\n\n"
+                f"- SHA-256 `{digest}`, {len(data):,} bytes; the zip holds every KEEP "
+                "member.\n"
+                "- Smoke test: on a Windows runner its ffmpeg encoded a second of tone to "
+                "MP3 and M4A and ffprobe read both back.\n\n"
                 "Opened by `.github/workflows/pin-bumps.yml`; the checks were started on "
                 "this branch by that run (a PR opened with GITHUB_TOKEN starts none by "
                 "itself). If they're missing, close and reopen the PR.")
             return 0
-    digest, _size, bad = verify(current)
+    digest, data, bad = verify(current)
     if digest and digest != pinned:
         bad.append(f"BROKEN builder's SHA-256 for {current} is {digest}, pinned {pinned}")
     if bad:
         print("\n".join(bad))
         return 1
     print(f"ffmpeg: pinned {current} still served by every source")
+    if a.dry_run:
+        smoke(data, current)
     return 0
 
 

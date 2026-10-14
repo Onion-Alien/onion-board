@@ -2,8 +2,10 @@ name: pin-bumps
 
 # Pinned downloads the app fetches itself (not pip packages or actions: Dependabot does
 # those) are bumped here: one script per pin in scripts/pinbump/. Each finds the newest
-# release, verifies it, rewrites the pin and opens its own PR on pin-bump/<name>-<version>,
-# skipping one that's already waiting. One failing checker doesn't stop the others.
+# release, verifies it, smoke-tests it (unpacks and runs it: these are Windows programs,
+# so the job runs on Windows), rewrites the pin and opens its own PR on
+# pin-bump/<name>-<version>; a failed smoke test opens none. Nothing merges by itself.
+# It skips a bump that's already waiting. One failing checker doesn't stop the others.
 # FFmpeg's builder drops old builds, so when its pin is already the newest the ffmpeg job
 # checks both its sites still serve the pinned zip: a red one there means bump by hand.
 on:
@@ -14,7 +16,8 @@ on:
     paths:
       - scripts/pinbump/**
       - .github/workflows/pin-bumps.yml
-      - soundboard/ffmpegget.py   # a hand-edited pin gets checked too
+      - soundboard/torget.py      # a hand-edited pin gets checked too
+      - soundboard/ffmpegget.py
       - soundboard/pyget.py
       - scripts/fetch_qjs.py
 
@@ -23,8 +26,8 @@ permissions:
 
 jobs:
   bump:
-    runs-on: ubuntu-latest
-    timeout-minutes: 15
+    runs-on: windows-latest
+    timeout-minutes: 25
     permissions:
       contents: write        # push pin-bump/* branches
       pull-requests: write   # open their PRs
@@ -38,8 +41,11 @@ jobs:
       - uses: actions/setup-python@v7
         with:
           python-version: "3.13"
-      # On a PR touching the bumpers: check and verify only, change nothing.
+      # On a PR touching the bumpers: check, verify and smoke-test only, change nothing.
+      # Git Bash puts Git for Windows' gpg on PATH (tor.py checks a signature with it).
       - env:
           GH_TOKEN: ${{ github.token }}
+          PYTHONIOENCODING: utf-8
           DRY_RUN: ${{ github.event_name == 'pull_request' && '--dry-run' || '' }}
+        shell: bash
         run: python scripts/pinbump/${{ matrix.checker }}.py $DRY_RUN
