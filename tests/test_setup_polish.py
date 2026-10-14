@@ -22,7 +22,7 @@ def _mic_works(w, monkeypatch):
     monkeypatch.setattr(dm, "status", lambda name=None: "ready")
     monkeypatch.setattr(eng, "virtual_outputs", lambda: [])
     monkeypatch.setattr(type(w.engine), "effect_alive", lambda self: True)
-    monkeypatch.setattr(w, "_direct_not_running", lambda: False)
+    monkeypatch.setattr(w.micctl, "_direct_not_running", lambda: False)
     monkeypatch.setattr(w.engine, "main_stream", _Stream())
     w.cfg.route = "mic"
     w.cfg.main_device = None

@@ -97,7 +97,7 @@ def test_a_working_cable_offers_the_mic_as_a_plain_option(wizard, monkeypatch):
     wiz.go(2)
     assert w.cfg.route == "cable" and "Installed and" in wiz.cable_status.text()
     assert wiz.btn_attach.isHidden() and not wiz.btn_mic_instead.isHidden()
-    monkeypatch.setattr(w, "attach_mic", lambda: None)
+    monkeypatch.setattr(w.micctl, "attach_mic", lambda: None)
     wiz.btn_mic_instead.click()
     assert wiz.setup_show.on and wiz.btn_mic_instead.isHidden()
     results = []
@@ -114,7 +114,7 @@ def test_mic_already_set_up_is_used_not_offered_again(wizard, monkeypatch):
     w, wiz = wizard
     monkeypatch.setattr(directmic, "status", lambda name=None: "ready")
     asked = []
-    monkeypatch.setattr(w, "attach_mic", lambda: asked.append(1))
+    monkeypatch.setattr(w.micctl, "attach_mic", lambda: asked.append(1))
     w.cfg.route = "cable"
     wiz.show()
     wiz.go(2)

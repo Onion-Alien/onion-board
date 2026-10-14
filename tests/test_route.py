@@ -400,7 +400,7 @@ def test_leaving_settings_on_a_new_non_cable_device_asks_once(win, monkeypatch):
     assert not routewarn.needs_warning("mic", "Speakers", PHONES)
     picked, installs = [], []
     monkeypatch.setattr(win.routectl, "set_route", lambda r, d=None, **k: picked.append((r, d)))
-    monkeypatch.setattr(win, "install_cable", lambda: installs.append(1))
+    monkeypatch.setattr(win.micctl, "install_cable", lambda: installs.append(1))
 
     def leave_on(device):
         win.open_settings("audio")
@@ -436,7 +436,7 @@ def test_without_a_cable_the_warning_offers_to_install_one(win, devices, monkeyp
     win.devctl.refresh_devices()
     picked, installs = [], []
     monkeypatch.setattr(win.routectl, "set_route", lambda r, d=None, **k: picked.append((r, d)))
-    monkeypatch.setattr(win, "install_cable", lambda: installs.append(1))
+    monkeypatch.setattr(win.micctl, "install_cable", lambda: installs.append(1))
     win.open_settings("audio")
     win.cfg.route, win.cfg.main_device = "device", "Speakers"
     win.routectl._show_route()

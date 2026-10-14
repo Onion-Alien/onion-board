@@ -2313,21 +2313,21 @@ def test_sounds_follow_the_mic_effect_once_it_works(window, monkeypatch):  # noq
     monkeypatch.setattr(w.engine, "set_main_device",
                         lambda name: (opened.append(name), w.engine.names.update(main=name)))
     monkeypatch.setattr(w.devctl, "_device_job", lambda plan, then=None: then(plan()()))
-    monkeypatch.setattr(w, "_cable_ends", lambda *_a: None)
+    monkeypatch.setattr(w.micctl, "_cable_ends", lambda *_a: None)
     w.engine.names["main"] = CABLE_IN
-    w._follow_mic_effect()
+    w.micctl._follow_mic_effect()
     assert opened == []   # nothing changed: nothing reopened
     monkeypatch.setattr(dm, "status", lambda name=None: "ready")
-    w._follow_mic_effect()
+    w.micctl._follow_mic_effect()
     assert opened == [dm.DEVICE]
-    w._follow_mic_effect()
+    w.micctl._follow_mic_effect()
     assert opened == [dm.DEVICE]   # only once
     monkeypatch.setattr(dm, "status", lambda name=None: "wiped")
-    w._follow_mic_effect()
+    w.micctl._follow_mic_effect()
     assert opened == [dm.DEVICE, CABLE_IN]
     w._attaching = True   # being set up: set_route applies it when it's on
     monkeypatch.setattr(dm, "status", lambda name=None: "ready")
-    w._follow_mic_effect()
+    w.micctl._follow_mic_effect()
     assert opened == [dm.DEVICE, CABLE_IN]
     w._attaching = False
 
@@ -2339,7 +2339,7 @@ def test_on_the_mic_the_setup_tab_never_talks_about_the_cable(window, monkeypatc
     only as the "Use the virtual cable instead" fallback button."""
     w = window
     _routes(w, monkeypatch, state)
-    monkeypatch.setattr(w, "_direct_not_running", lambda: False)
+    monkeypatch.setattr(w.micctl, "_direct_not_running", lambda: False)
 
     class S:
         def stop(self):
@@ -2370,8 +2370,8 @@ def test_effect_not_running_check_reads_no_registry(window, monkeypatch, state, 
     monkeypatch.setattr(dm, "installed_on", registry)
     monkeypatch.setattr(w.engine, "effect_alive", lambda: False)
     monkeypatch.setattr(w.engine, "mic_stream", object())
-    w._direct_dead_since = time.monotonic() - w.DIRECT_GRACE_S - 1
-    assert w._direct_not_running() is dead
+    w.micctl._direct_dead_since = time.monotonic() - w.DIRECT_GRACE_S - 1
+    assert w.micctl._direct_not_running() is dead
 
 
 def test_an_older_mic_part_asks_for_the_update(window, monkeypatch):  # noqa: F811
@@ -2380,7 +2380,7 @@ def test_an_older_mic_part_asks_for_the_update(window, monkeypatch):  # noqa: F8
     Update now button, never "nothing to set" or "optional"."""
     w = window
     _routes(w, monkeypatch, "outdated", cables=())
-    monkeypatch.setattr(w, "_direct_not_running", lambda: False)
+    monkeypatch.setattr(w.micctl, "_direct_not_running", lambda: False)
 
     class S:
         def stop(self):
@@ -2428,7 +2428,7 @@ def test_saying_no_to_windows_keeps_the_mic_on_offer(window, monkeypatch, cables
     meanwhile. No error box: a No isn't an error."""
     w = window
     _routes(w, monkeypatch, "missing", cables)
-    w._mic_attached("My mic", "Windows' admin prompt was turned down (or didn't finish).")
+    w.micctl._mic_attached("My mic", "Windows' admin prompt was turned down (or didn't finish).")
     assert w.cfg.route == "mic" and w.routectl._main_name() == (cables[0] if cables else None)
     assert not [t for t in toast.shown(w) if t.kind == "error"]
     assert "You clicked <b>No</b>" in w.mic_reason.text()
@@ -2445,8 +2445,8 @@ def test_an_unfinished_prompt_isnt_called_a_no(window, monkeypatch):  # noqa: F8
     _routes(w, monkeypatch, "missing")
     told = []
     monkeypatch.setattr(w, "tell", lambda *a, **k: told.append(a))
-    w._mic_attached("My mic", dm.unfinished())
-    assert not w._declined and "You clicked" not in w.mic_reason.text()
+    w.micctl._mic_attached("My mic", dm.unfinished())
+    assert not w.micctl._declined and "You clicked" not in w.mic_reason.text()
     assert told and "didn't finish" in told[0][1]
     assert w.btn_install.text() == "Put my sounds straight into my mic"
 
@@ -2470,11 +2470,12 @@ def test_why_a_set_up_failed_is_counted_as_its_word(window, monkeypatch, auto, c
     monkeypatch.setattr(dm, "endpoint_for", lambda name: GUID)
     monkeypatch.setattr(dm, "bundled_dll", lambda: Path(dm.__file__))   # (any file)
     monkeypatch.setattr(dm, "_elevated", lambda *a, **k: code)
-    w._autofixing = auto
-    w._mic_attached(*w._attach_mic_work("My mic", auto=auto))   # the worker and its answer, here
+    w.micctl._autofixing = auto
+    # the worker and its answer, here
+    w.micctl._mic_attached(*w.micctl._attach_mic_work("My mic", auto=auto))
     words = {k for k in usage._used if k.startswith("mic-effect-") and "failed-" in k}
     assert words == ({counted} if counted else set())
-    assert not w._mic_fail_kind   # used once
+    assert not w.micctl._mic_fail_kind   # used once
 
 
 def _fake_shell(monkeypatch, started: bool, error: int = 0, wait: int = 0, code: int = 0):
@@ -2679,18 +2680,18 @@ def test_setting_up_the_mic_shows_it_and_takes_one_click(window, monkeypatch):  
     _routes(w, monkeypatch, "missing")
     w.cfg.mic_device = "My mic"
     threads = _no_threads(monkeypatch)
-    w.attach_mic()
+    w.micctl.attach_mic()
     assert busy.is_busy(w.btn_install) and w.btn_install.text() == "Setting up…"
     assert w.btn_install.isHidden() and w.btn_usecable.isHidden()
     assert "setting up" in w.pill.accessibleName().lower()
     assert w.setup_show.on   # Bun's building it, in the button's place
-    w.attach_mic()
+    w.micctl.attach_mic()
     w.btn_install.click()   # spam-clicked: still the one admin prompt
     assert threads.started == 1
     # done: Windows loads it, and until the effect runs it's "starting…", still held
     monkeypatch.setattr(dm, "status", lambda name=None: "ready")
     monkeypatch.setattr(type(w.engine), "effect_alive", lambda self: False)
-    w._mic_attached("My mic", "")
+    w.micctl._mic_attached("My mic", "")
     assert "starting" in w.flow_out.text() and busy.is_busy(w.btn_install)
     assert "Repair" not in w.btn_install.text() and w.btn_usecable.isHidden()
     assert w.setup_show.on   # still at it while Windows loads it
@@ -2713,10 +2714,10 @@ def test_a_mic_left_silent_by_the_set_up_never_cheers(window, monkeypatch):  # n
     told, said = [], []
     monkeypatch.setattr(w, "tell", lambda *a, **k: told.append(a))
     monkeypatch.setattr(w, "toast", lambda text, kind="", *a, **k: said.append((text, kind)))
-    w.attach_mic()
+    w.micctl.attach_mic()
     assert w.setup_show.on
     monkeypatch.setattr(dm, "status", lambda name=None: "ready")   # (it is on the mic)
-    w._mic_attached("My mic", dm.mic_silent())
+    w.micctl._mic_attached("My mic", dm.mic_silent())
     w._update_flow()
     assert w.setup_show._result is False
     assert told and told[0][0] == "Your mic sends no sound" and "Restart your PC" in told[0][1]
@@ -2731,7 +2732,7 @@ def test_a_failed_mic_update_never_cheers(window, monkeypatch):  # noqa: F811
     w = window
     _routes(w, monkeypatch, "outdated")
     monkeypatch.setattr(w.engine, "main_stream", object())   # the old part's running
-    monkeypatch.setattr(w, "_direct_not_running", lambda: False)
+    monkeypatch.setattr(w.micctl, "_direct_not_running", lambda: False)
     monkeypatch.setattr(type(w.engine), "effect_alive", lambda self: True)
     w.cfg.mic_device = "My mic"
     _no_threads(monkeypatch)
@@ -2739,9 +2740,9 @@ def test_a_failed_mic_update_never_cheers(window, monkeypatch):  # noqa: F811
     monkeypatch.setattr(mw.QMessageBox, "warning", lambda *a, **k: None)
     said = []
     monkeypatch.setattr(w, "toast", lambda text, kind="", *a, **k: said.append((text, kind)))
-    w.attach_mic()
+    w.micctl.attach_mic()
     assert not w.setup_show.on
-    w._mic_attached("My mic", "Windows said no")
+    w.micctl._mic_attached("My mic", "Windows said no")
     w._update_flow()
     assert not w.setup_show.on and not [k for _t, k in said if k == "ok"]
 
@@ -2754,12 +2755,12 @@ def test_setting_up_the_mic_shows_no_device_error_for_the_audio_restart(window, 
     _routes(w, monkeypatch, "missing")
     w.cfg.mic_device = "My mic"
     _no_threads(monkeypatch)
-    w.attach_mic()
+    w.micctl.attach_mic()
     w.engine.errors["mon"] = "Device unavailable"
     w._update_status()
     assert "problem" not in said(w)
     monkeypatch.setattr(dm, "status", lambda name=None: "ready")
-    w._mic_attached("My mic", "")
+    w.micctl._mic_attached("My mic", "")
     assert "problem" not in said(w)
     w._settle_until = 0.0
     w._update_status()
@@ -2775,8 +2776,8 @@ def test_turning_windows_down_lets_go_of_the_button(window, monkeypatch):  # noq
     w.cfg.mic_device = "My mic"
     _no_threads(monkeypatch)
     monkeypatch.setattr(QMessageBox, "warning", lambda *a: None)
-    w.attach_mic()
-    w._mic_attached("My mic", "Windows' admin prompt was turned down (or didn't finish).")
+    w.micctl.attach_mic()
+    w.micctl._mic_attached("My mic", "Windows' admin prompt was turned down (or didn't finish).")
     assert not busy.is_busy(w.btn_install) and w._attach_release is None
 
 
@@ -2785,7 +2786,7 @@ def _working_on_the_mic(w, monkeypatch, cables=(CABLE_IN,), vbcable=True):
     from soundboard import cableremove
     _routes(w, monkeypatch, "ready", cables)
     monkeypatch.setattr(w.engine, "main_stream", object())
-    monkeypatch.setattr(w, "_direct_not_running", lambda: False)
+    monkeypatch.setattr(w.micctl, "_direct_not_running", lambda: False)
     monkeypatch.setattr(cableremove, "setup_exe",
                         lambda: Path("VBCABLE_Setup_x64.exe") if vbcable else None)
     w._vb_setup = None            # looked up again (on a thread)
@@ -2858,11 +2859,11 @@ def test_removing_the_cable(window, monkeypatch):  # noqa: F811
     monkeypatch.setattr(w, "toast", lambda text, kind="": said.append((text, kind)))
     _no_threads(monkeypatch, run=True)
     monkeypatch.setattr(cableremove, "remove", lambda: "Windows' admin prompt was turned down")
-    w.remove_cable()
+    w.micctl.remove_cable()
     assert not w._cable_gone and not busy.is_busy(w.btn_rmcable)
     assert said[-1][1] == "warn"
     monkeypatch.setattr(cableremove, "remove", lambda: None)
-    w.remove_cable()
+    w.micctl.remove_cable()
     assert w._cable_gone and w.routectl._tap_name() is None and not busy.is_busy(w.btn_rmcable)
     assert "Restart" in said[-1][0]
     w._update_flow()
@@ -2886,19 +2887,19 @@ def test_a_worker_that_raises_still_clears_the_busy_state(window, monkeypatch): 
     def boom(*_a, **_k):
         raise OSError("the uninstaller vanished")
     monkeypatch.setattr(cableremove, "remove", boom)
-    w.remove_cable()
+    w.micctl.remove_cable()
     assert not busy.is_busy(w.btn_rmcable) and not w._cable_gone
     assert said[-1][1] == "warn"
 
     monkeypatch.setattr(cableremove, "setup_exe", boom)
     w._vb_setup_asking, w._vb_setup = False, None
-    w._ask_cable_setup()
+    w.micctl._ask_cable_setup()
     assert not w._vb_setup_asking and w._vb_setup is False
 
     monkeypatch.setattr(dm, "install", boom)
     w.cfg.mic_device = "My mic"
     w._attaching = False
-    w.attach_mic()
+    w.micctl.attach_mic()
     assert not w._attaching and w._attach_release is None
     assert not busy.is_busy(w.btn_install)
 
@@ -2914,10 +2915,10 @@ def test_a_removed_cable_is_never_sent_to(window, monkeypatch):  # noqa: F811
     monkeypatch.setattr(w, "toast", lambda text, kind="": said.append((text, kind)))
     _no_threads(monkeypatch, run=True)
     monkeypatch.setattr(cableremove, "remove", lambda: None)
-    w.remove_cable()
+    w.micctl.remove_cable()
     w._update_flow()
     assert w.btn_usecable.isHidden()
-    w.use_cable_instead()   # (still there for a moment, or clicked by keyboard)
+    w.micctl.use_cable_instead()   # (still there for a moment, or clicked by keyboard)
     assert w.cfg.route == "mic" and "Restart" in said[-1][0] and said[-1][1] == "warn"
 
 
@@ -2936,15 +2937,15 @@ def test_done_is_said_when_it_works_not_while_it_starts(window, monkeypatch):  #
     w.cfg.mic_device = "My mic"
     _no_threads(monkeypatch)
     said = _toasts(w, monkeypatch)
-    w.attach_mic()
+    w.micctl.attach_mic()
     monkeypatch.setattr(dm, "status", lambda name=None: "ready")
     monkeypatch.setattr(type(w.engine), "effect_alive", lambda self: False)
-    w._mic_attached("My mic", "")
+    w.micctl._mic_attached("My mic", "")
     assert "starting" in w.flow_out.text() and w.setup_show.on
     assert not [t for t in said if t.startswith("Done")]
     monkeypatch.setattr(w.engine, "main_stream", object())   # Windows has it running
     monkeypatch.setattr(type(w.engine), "effect_alive", lambda self: True)
-    monkeypatch.setattr(w, "_direct_not_running", lambda: False)
+    monkeypatch.setattr(w.micctl, "_direct_not_running", lambda: False)
     w._update_flow()
     w._update_flow()
     assert "starting" not in w.flow_out.text()
@@ -2958,10 +2959,10 @@ def test_no_done_when_windows_never_loads_it(window, monkeypatch):  # noqa: F811
     w.cfg.mic_device = "My mic"
     _no_threads(monkeypatch)
     said = _toasts(w, monkeypatch)
-    w.attach_mic()
+    w.micctl.attach_mic()
     monkeypatch.setattr(dm, "status", lambda name=None: "ready")
     monkeypatch.setattr(type(w.engine), "effect_alive", lambda self: False)
-    w._mic_attached("My mic", "")
+    w.micctl._mic_attached("My mic", "")
     w._settle_until = 0.0   # the wait ran out and it still isn't running
     w._update_flow()
     assert not w.setup_show.on or w.setup_show._result is False
@@ -2980,10 +2981,10 @@ def test_bun_stays_on_while_it_starts(window, monkeypatch):  # noqa: F811
     _routes(w, monkeypatch, "missing")
     w.cfg.mic_device = "My mic"
     _no_threads(monkeypatch)
-    w.attach_mic()
+    w.micctl.attach_mic()
     monkeypatch.setattr(dm, "status", lambda name=None: "ready")
     monkeypatch.setattr(type(w.engine), "effect_alive", lambda self: False)
-    w._mic_attached("My mic", "")
+    w.micctl._mic_attached("My mic", "")
     w.setup_show._stop()   # (what finish() does while it can't be seen)
     assert w.setup_show.on and "starting" in w.flow_out.text()
     assert w.btn_install.isHidden() and busy.is_busy(w.btn_install)
@@ -3161,7 +3162,7 @@ def test_picking_the_mic_asks_for_admin_only_when_it_doesnt_work(window, monkeyp
     w = window
     w.cfg.mic_device = "My mic"
     tried = []
-    monkeypatch.setattr(w, "attach_mic", lambda: tried.append(1))
+    monkeypatch.setattr(w.micctl, "attach_mic", lambda: tried.append(1))
     for state in ("outdated", "ready"):
         w.cfg.route = "cable"
         monkeypatch.setattr(dm, "status", lambda name=None, s=state: s)
@@ -3238,9 +3239,9 @@ def test_windows_taking_it_off_is_fixed_by_itself(window, monkeypatch):  # noqa:
     assert len(threads.setups()) == 1   # redraws while it runs: still the one fix
     _routes(w, monkeypatch, "ready")
     monkeypatch.setattr(w.engine, "main_stream", object())
-    monkeypatch.setattr(w, "_direct_not_running", lambda: False)
+    monkeypatch.setattr(w.micctl, "_direct_not_running", lambda: False)
     monkeypatch.setattr(type(w.engine), "effect_alive", lambda self: True)
-    w._mic_attached("My mic", "")
+    w.micctl._mic_attached("My mic", "")
     w._update_flow()
     assert ("Done: your sounds are back in your mic.", "ok") in said
     assert "Your sounds go into your mic" in w.mic_line.text()
@@ -3255,7 +3256,7 @@ def test_a_mic_sending_only_silence_offers_the_repair(window, monkeypatch):  # n
     _routes(w, monkeypatch, "ready")
     w.cfg.mic_device = "My mic"
     monkeypatch.setattr(w.engine, "main_stream", object())
-    monkeypatch.setattr(w, "_direct_not_running", lambda: False)
+    monkeypatch.setattr(w.micctl, "_direct_not_running", lambda: False)
     monkeypatch.setattr(type(w.engine), "effect_alive", lambda self: True)
     silent = [w.MIC_SILENT_S - 1]
     monkeypatch.setattr(type(w.engine), "direct_mic_silent_s", lambda self: silent[0])
@@ -3263,7 +3264,7 @@ def test_a_mic_sending_only_silence_offers_the_repair(window, monkeypatch):  # n
     w._update_flow()
     assert w.mic_line.text() == "Your sounds go into your mic"
     silent[0] = w.MIC_SILENT_S + 1
-    assert w._direct_health() != w._direct_shown   # the once-a-second check redraws it
+    assert w.micctl._direct_health() != w._direct_shown   # the once-a-second check redraws it
     w._update_flow()
     assert w.mic_line.text() == "Your mic sends no sound"
     assert "Repair" in w.btn_install.text() and not w.btn_install.isHidden()
@@ -3298,7 +3299,7 @@ def test_without_the_helper_the_card_asks_for_the_click(window, monkeypatch, rea
     w.cfg.mic_device = "My mic"
     _helper(monkeypatch, ready)
     checks = []
-    monkeypatch.setattr(w, "_check_helper", lambda: checks.append(1))
+    monkeypatch.setattr(w.micctl, "_check_helper", lambda: checks.append(1))
     threads = _no_threads(monkeypatch)
     w._update_flow()
     _qt_run()
@@ -3335,10 +3336,10 @@ def test_a_helper_removed_meanwhile_is_noticed_when_the_window_comes_back(window
     monkeypatch.setattr(michelper, "installed", lambda: gone.append(1) or False)
     monkeypatch.setattr(appstate, "active", lambda: True)
     threads = _no_threads(monkeypatch, run=True)
-    w._app_state(Qt.ApplicationState.ApplicationActive)
+    w.micctl._app_state(Qt.ApplicationState.ApplicationActive)
     assert not gone   # checked a moment ago: nothing to do
     monkeypatch.setattr(michelper.state, "when", time.monotonic() - michelper.RECHECK_S - 1)
-    w._app_state(Qt.ApplicationState.ApplicationActive)
+    w.micctl._app_state(Qt.ApplicationState.ApplicationActive)
     assert process_events(QApplication.instance(), lambda: michelper.known() is False)
     _qt_run()
     assert gone and michelper.state.via == "window back"
@@ -3359,6 +3360,7 @@ def test_a_failing_helper_check_backs_off(window, monkeypatch):  # noqa: F811
     from conftest import process_events
     from soundboard import michelper
     from soundboard.ui import mainwindow as mw
+    from soundboard.ui import miccontrol
     w = window
     _routes(w, monkeypatch, "missing")
     w.cfg.mic_device = "My mic"
@@ -3373,23 +3375,24 @@ def test_a_failing_helper_check_backs_off(window, monkeypatch):  # noqa: F811
         return True
     monkeypatch.setattr(michelper, "ready", ready)
     now = [1000.0]
-    own_module(monkeypatch, mw, "time", monotonic=lambda: now[0])
+    for mod in (mw, miccontrol):
+        own_module(monkeypatch, mod, "time", monotonic=lambda: now[0])
     _no_threads(monkeypatch, run=True)
     app = QApplication.instance()
     for _ in range(20):
         w._update_flow()
-        process_events(app, lambda: not w._helper_checking, timeout=1.0)
+        process_events(app, lambda: not w.micctl._helper_checking, timeout=1.0)
     assert len(asked) == 1
-    now[0] += mw.HELPER_RETRY_S + 1
+    now[0] += miccontrol.HELPER_RETRY_S + 1
     for _ in range(5):
         w._update_flow()
-        process_events(app, lambda: not w._helper_checking, timeout=1.0)
+        process_events(app, lambda: not w.micctl._helper_checking, timeout=1.0)
     assert len(asked) == 2
     fail[0] = False
-    now[0] += mw.HELPER_RETRY_S + 1
+    now[0] += miccontrol.HELPER_RETRY_S + 1
     w._update_flow()
     process_events(app, lambda: michelper.known() is True)
-    assert len(asked) == 3 and not w._helper_failed
+    assert len(asked) == 3 and not w.micctl._helper_failed
 
 
 def test_a_failed_fix_asks_once_and_never_loops(window, monkeypatch):  # noqa: F811
@@ -3404,7 +3407,7 @@ def test_a_failed_fix_asks_once_and_never_loops(window, monkeypatch):  # noqa: F
     said = _said(w, monkeypatch)
     w._update_flow()
     _qt_run()
-    w._mic_attached("My mic", "Installing failed (code 6).")
+    w.micctl._mic_attached("My mic", "Installing failed (code 6).")
     w._update_flow()
     _qt_run()
     assert len(threads.setups()) == 1
@@ -3414,7 +3417,7 @@ def test_a_failed_fix_asks_once_and_never_loops(window, monkeypatch):  # noqa: F
     # clicked: tried again (Windows may ask now)
     w.btn_install.click()
     assert threads.setups()[-1] == ("My mic", False, False)
-    w._mic_attached("My mic", "")   # "worked", but it's still (or again) off
+    w.micctl._mic_attached("My mic", "")   # "worked", but it's still (or again) off
     w._settle_until = 0.0
     w._update_flow()
     _qt_run()
@@ -3439,7 +3442,7 @@ def test_the_yes_is_only_mentioned_when_windows_will_ask(window, monkeypatch):  
         w._attaching = False
     _routes(w, monkeypatch, "outdated")
     monkeypatch.setattr(w.engine, "main_stream", object())
-    monkeypatch.setattr(w, "_direct_not_running", lambda: False)
+    monkeypatch.setattr(w.micctl, "_direct_not_running", lambda: False)
     for ready in (False, True):
         _helper(monkeypatch, ready)
         w._update_flow()
@@ -3454,11 +3457,11 @@ def test_bun_builds_only_the_first_set_up(window, monkeypatch):  # noqa: F811
     _no_threads(monkeypatch)
     _helper(monkeypatch, False)
     _routes(w, monkeypatch, "wiped")
-    w.attach_mic()
+    w.micctl.attach_mic()
     assert not w.setup_show.on and "Setting up" in w.mic_line.text()
-    w._mic_attached("My mic", "Windows said no")
+    w.micctl._mic_attached("My mic", "Windows said no")
     _routes(w, monkeypatch, "missing")
-    w.attach_mic()
+    w.micctl.attach_mic()
     assert w.setup_show.on
 
 
@@ -3491,8 +3494,8 @@ def test_every_time_windows_takes_it_off_it_is_fixed_again(window, monkeypatch):
     _qt_run()
     _routes(w, monkeypatch, "ready")
     monkeypatch.setattr(w.engine, "main_stream", object())
-    monkeypatch.setattr(w, "_direct_not_running", lambda: False)
-    w._mic_attached("My mic", "")
+    monkeypatch.setattr(w.micctl, "_direct_not_running", lambda: False)
+    w.micctl._mic_attached("My mic", "")
     w._settle_until = 0.0
     w._update_flow()   # works
     _routes(w, monkeypatch, "wiped")
