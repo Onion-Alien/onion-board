@@ -41,12 +41,12 @@ def test_an_upgraded_config_sees_it_once_and_its_button_opens_the_newest_page(wi
     monkeypatch.setattr(window, "open_settings", lambda page="privacy": opened.append(page))
     window.cfg.whats_new_seen = ""   # as loaded from an older version's config
     shown.press = "appearance"
-    window.after_update()
+    window.updctl.after_update()
     assert len(shown) == 1 and any("Privacy & security" in t for t in shown[0])
     assert any("Update Onion Pocket" in t for t in shown[0])
     assert opened == ["appearance"]   # the newest note with a Settings page
     assert window.cfg.whats_new_seen == __version__
-    window.after_update()   # the next start: nothing new
+    window.updctl.after_update()   # the next start: nothing new
     assert len(shown) == 1
 
 
@@ -56,7 +56,7 @@ def test_after_an_update_it_replaces_the_plain_updated_note(window, shown, monke
     monkeypatch.setattr(QMessageBox, "exec", lambda box: boxes.append(box.windowTitle()))
     window.cfg.whats_new_seen = "1.6.4"
     window.cfg.update_pending = __version__
-    window.after_update()
+    window.updctl.after_update()
     assert len(shown) == 1 and any(f"Updated to Onion Board {__version__}" in t
                                    for t in shown[0])
     assert boxes == [] and window.cfg.update_pending == ""
@@ -80,13 +80,13 @@ def test_notes_for_a_version_after_this_one_wait(monkeypatch):
 def test_it_waits_for_the_tray_and_the_setup_guide(window, shown):
     window.cfg.whats_new_seen = ""
     window.cfg.setup_done = False
-    window.after_update()
+    window.updctl.after_update()
     assert shown == [] and window.cfg.whats_new_seen == ""
     window.cfg.setup_done = True
     window.hide()
-    window.after_update()
+    window.updctl.after_update()
     assert shown == []
-    window.whats_new(window._whats_new_later)   # what showEvent's timer does
+    window.updctl.whats_new(window.updctl._whats_new_later)   # what showEvent's timer does
     assert shown == []   # still hidden
     window.show()
     from conftest import process_events

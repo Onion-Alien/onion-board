@@ -60,7 +60,7 @@ def test_update_now_downloads_then_restarts_into_the_installer(window, boxes, qa
     monkeypatch.setattr(window, "quit_app", lambda: quit_.append(1))
     boxes.answers = {"Update available": "Update now", "Install the update": "Restart now"}
 
-    window._on_update(_rel(), "", True)    # "Check now" found it: the dialog opens
+    window.updctl._on_update(_rel(), "", True)    # "Check now" found it: the dialog opens
     assert boxes.shown[0][0] == "Update available" and "Release page" in boxes.shown[0][1]
     assert process_events(qapp, lambda: started)
     assert started == [setup] and quit_ == [1]
@@ -77,8 +77,8 @@ def test_later_keeps_the_download_for_the_pill(window, boxes, qapp, monkeypatch,
     monkeypatch.setattr(updates, "start_install", started.append)
     monkeypatch.setattr(window, "quit_app", lambda: None)
     boxes.answers = {"Update available": "Update now", "Install the update": "Later"}
-    window._on_update(_rel(), "", True)
-    assert process_events(qapp, lambda: window._update_file is not None)
+    window.updctl._on_update(_rel(), "", True)
+    assert process_events(qapp, lambda: window.updctl._update_file is not None)
     assert started == [] and window.cfg.update_pending == ""
     boxes.answers["Install the update"] = "Restart now"
     window.btn_update.click()              # the pill: straight to the restart question
@@ -95,8 +95,8 @@ def test_a_failed_download_says_so_and_tries_again(window, boxes, qapp, monkeypa
     monkeypatch.setattr(updates, "can_install", lambda: True)
     monkeypatch.setattr(updates, "download", download)
     boxes.answers = {"Update available": "Update now"}
-    window._on_update(_rel(), "", True)
-    assert process_events(qapp, lambda: not window._downloading)
+    window.updctl._on_update(_rel(), "", True)
+    assert process_events(qapp, lambda: not window.updctl._downloading)
     t = toast.shown(window)[-1]
     assert "Couldn't update" in t.text() and t.card.action.text() == "Open the download page"
     card = window.btn_update
@@ -104,10 +104,10 @@ def test_a_failed_download_says_so_and_tries_again(window, boxes, qapp, monkeypa
     assert card.state == "failed" and card.pct is None
     assert card.accessibleName() == "Couldn't update" and card.hint == "Click to try again"
     assert "isn't the one GitHub lists" in card.toolTip()
-    assert window._update_file is None
+    assert window.updctl._update_file is None
     assert card.copy.isHidden()                      # one failure: no Copy error yet
     card.click()                                     # "Click to try again"
-    assert process_events(qapp, lambda: len(calls) == 2 and not window._downloading)
+    assert process_events(qapp, lambda: len(calls) == 2 and not window.updctl._downloading)
     assert card.state == "failed" and not card.copy.isHidden()   # twice: Copy error
     card.copy.click()
     report = qapp.clipboard().text()
@@ -118,19 +118,19 @@ def test_a_failed_download_says_so_and_tries_again(window, boxes, qapp, monkeypa
 def test_progress_fills_the_card_the_banner_and_settings(window, boxes, qapp):
     rel = _rel()
     rel.urgent = "sounds cut out after an hour"
-    window._on_update(rel, "", False)
-    window._downloading = True                       # (as download_update sets it)
+    window.updctl._on_update(rel, "", False)
+    window.updctl._downloading = True                       # (as download_update sets it)
     mb = 1024 * 1024
-    window._on_update_progress(76 * mb, 180 * mb)
+    window.updctl._on_update_progress(76 * mb, 180 * mb)
     card = window.btn_update
     assert card.state == "downloading" and card.pct == 42
     assert card.title == "Downloading 42%" and card.hint == "76 of 180 MB"
     assert window.urgent_prog.isVisibleTo(window.urgent_bar) and window.urgent_prog.value() == 42
     assert "76 of 180 MB" in window.urgent_sub.text() and window.urgent_btn.text() == "Cancel"
-    assert window.update_status() == "Downloading 42% · 76 of 180 MB"
-    window._on_update_progress(180 * mb, 180 * mb)
+    assert window.updctl.update_status() == "Downloading 42% · 76 of 180 MB"
+    window.updctl._on_update_progress(180 * mb, 180 * mb)
     assert card.pct == 100 and window.urgent_prog.value() == 100
-    window._downloading = False
+    window.updctl._downloading = False
 
 
 def test_cancel_stops_the_download(window, boxes, qapp, monkeypatch):
@@ -146,24 +146,24 @@ def test_cancel_stops_the_download(window, boxes, qapp, monkeypatch):
         raise updates.UpdateError("cancelled")
     monkeypatch.setattr(updates, "can_install", lambda: True)
     monkeypatch.setattr(updates, "download", download)
-    window._on_update(_rel(), "", False)
-    window.download_update()
+    window.updctl._on_update(_rel(), "", False)
+    window.updctl.download_update()
     assert process_events(qapp, lambda: started)
     boxes.answers = {"Downloading the update": "Cancel download"}
     window.btn_update.click()                        # what's going on, and Cancel
     assert boxes.shown[-1][0] == "Downloading the update"
-    assert process_events(qapp, lambda: not window._downloading)
+    assert process_events(qapp, lambda: not window.updctl._downloading)
     card = window.btn_update
     assert card.state == "available" and card.accessibleName() == "Update to 99.0.0"
     assert not any("Couldn't update" in t.text() for t in toast.shown(window))
-    assert window._update_err == "" and window._update_fails == 0
+    assert window.updctl._update_err == "" and window.updctl._update_fails == 0
 
 
 def test_shut_the_update_is_one_rail_button(window, boxes):
     from soundboard.ui import sidebar
     window.resize(1180, 720)
     window.show()
-    window._on_update(_rel(), "", False)
+    window.updctl._on_update(_rel(), "", False)
     window.rail.set_open(False)
     card = window.btn_update
     assert not card.isHidden() and not card.is_card()
@@ -174,7 +174,7 @@ def test_shut_the_update_is_one_rail_button(window, boxes):
 
 def test_from_source_it_only_opens_the_page(window, boxes, monkeypatch):
     monkeypatch.setattr(updates, "can_install", lambda: False)
-    window._on_update(_rel(), "", True)
+    window.updctl._on_update(_rel(), "", True)
     assert "Open the download page" in boxes.shown[0][1]
     assert "Update now" not in boxes.shown[0][1]
 
@@ -184,15 +184,15 @@ def test_next_start_says_whether_the_update_worked(window, boxes):
     window.cfg.whats_new_seen = __version__   # What's new seen: the plain note
     window.show()
     window.cfg.update_pending = __version__
-    window.after_update()
+    window.updctl.after_update()
     t = toast.shown(window)[-1]
     assert "up to date" in t.text() and t.card.action.text() == "What's new"
     assert window.cfg.update_pending == ""
     window.cfg.update_pending = "99.0.0"
-    window.after_update()
+    window.updctl.after_update()
     assert boxes.shown[-1][0] == "The update didn't finish" and window.cfg.update_pending == ""
     n = len(boxes.shown)
-    window.after_update()                  # nothing pending: nothing to say
+    window.updctl.after_update()                  # nothing pending: nothing to say
     assert len(boxes.shown) == n
 
 
@@ -205,7 +205,7 @@ def _urgent():
 
 
 def test_a_normal_update_has_no_banner(window, boxes):
-    window._on_update(_rel(), "", False)
+    window.updctl._on_update(_rel(), "", False)
     assert window.urgent_bar.isHidden() and not window.btn_update.isHidden()
 
 
@@ -215,7 +215,7 @@ def test_an_urgent_fix_gets_a_banner_and_no_skip(window, boxes, qapp, monkeypatc
     monkeypatch.setattr(updates, "can_install", lambda: True)
     monkeypatch.setattr(updates, "download", lambda rel, p, c: setup)
     monkeypatch.setattr(window, "quit_app", lambda: None)
-    window._on_update(_urgent(), "", False)          # the timed check found it
+    window.updctl._on_update(_urgent(), "", False)          # the timed check found it
     assert not window.urgent_bar.isHidden()
     assert "sounds cut out after an hour" in window.urgent_lbl.text()
     assert window.urgent_btn.text() == "Update now"
@@ -226,16 +226,16 @@ def test_an_urgent_fix_gets_a_banner_and_no_skip(window, boxes, qapp, monkeypatc
 
     boxes.answers = {"Install the update": "Later"}
     window.urgent_btn.click()                        # the banner's Update now
-    assert process_events(qapp, lambda: window._update_file is not None)
+    assert process_events(qapp, lambda: window.updctl._update_file is not None)
     assert not window.urgent_bar.isHidden()
     assert window.urgent_btn.text() == "Restart to update"
 
 
 def test_hiding_the_banner_lasts_until_the_next_start(window, boxes):
-    window._on_update(_urgent(), "", False)
+    window.updctl._on_update(_urgent(), "", False)
     window.urgent_bar.findChild(type(window.urgent_btn), "urgenthide").click()
     assert window.urgent_bar.isHidden()
-    window._on_update(_urgent(), "", False)          # found again 6 hours later
+    window.updctl._on_update(_urgent(), "", False)          # found again 6 hours later
     assert window.urgent_bar.isHidden()
     assert not window.btn_update.isHidden()          # the pill stays
 
@@ -245,9 +245,9 @@ def test_an_urgent_onion_watch_fix_gets_the_banner_on_its_tab_only(window, monke
     calls = []
     monkeypatch.setattr(window.triggers, "offer_update", lambda o: calls.append(o))
     window.tabs.setCurrentIndex(0)                   # the Sounds tab
-    window._on_watch_update(watchaddon.Offer("9.9.9", notes="Fixes."))
+    window.updctl._on_watch_update(watchaddon.Offer("9.9.9", notes="Fixes."))
     assert window.urgent_bar.isHidden() and len(calls) == 1   # a normal one: the tab only
-    window._on_watch_update(watchaddon.Offer("9.9.9", urgent="triggers stop firing"))
+    window.updctl._on_watch_update(watchaddon.Offer("9.9.9", urgent="triggers stop firing"))
     assert window.urgent_bar.isHidden() and len(calls) == 2   # not on the Sounds tab
     window.tabs.setCurrentWidget(window.triggers)
     assert not window.urgent_bar.isHidden()
