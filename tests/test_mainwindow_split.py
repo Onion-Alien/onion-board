@@ -8,8 +8,8 @@ from soundboard.ui import (aboutcontrol, alertcontrol, appsetupcontrol, buncontr
                            devicecontrol, editcontrol, ffmpegcontrol, hotkeycontrol, importcontrol,
                            languagecontrol, mainwindow, miccontrol, padcontrol, playbackcontrol,
                            remoteaccess, removecontrol, routecontrol, searchcontrol,
-                           settingscontrol, statuscontrol, tabcontrol, themecontrol, tipcontrol,
-                           updatecontrol)
+                           settingscontrol, statuscontrol, tabcontrol, themecontrol, tickcontrol,
+                           tipcontrol, transportcontrol, updatecontrol)
 from test_mainwindow import window  # noqa: F401  (the real MainWindow fixture)
 
 # (window attribute, controller class, methods that live there now)
@@ -85,6 +85,11 @@ SPLIT = [
     ("searchctl", searchcontrol.SearchControl,
      ["apply_filter", "flush_search", "search_youtube", "_show_link", "_drop_link",
       "on_link_played", "focus_search"]),
+    ("tickctl", tickcontrol.TickControl,
+     ["tick", "_tick_pace", "_wake", "_busy", "_set_tick_rate", "_tick_visuals"]),
+    ("transctl", transportcontrol.TransportControl,
+     ["_show_transport", "_update_transport", "_update_playing_background", "_update_video",
+      "show_video"]),
 ]
 
 

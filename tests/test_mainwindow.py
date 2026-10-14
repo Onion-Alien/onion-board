@@ -131,7 +131,7 @@ def test_mic_check_pulse_runs_only_while_on(window):
 
 def test_tick_runs_without_devices(window):
     for _ in range(31):        # crosses the once-a-second watchdog branch
-        window.tick()
+        window.tickctl.tick()
 
 
 def wheel(widget):
@@ -563,22 +563,22 @@ def test_sounds_tab_lights_up_while_a_sound_plays(window, monkeypatch):
     tabs, i = window.tabs, window.tabs.indexOf(window.sounds_page)
     playing = {}
     monkeypatch.setattr(window.engine, "playing", lambda: dict(playing))
-    window.tick()
+    window.tickctl.tick()
     assert not is_tab_live(tabs, i)
     playing["s0"] = (0.3, False)
-    window.tick()
+    window.tickctl.tick()
     assert is_tab_live(tabs, i) and tabs.tabToolTip(i).startswith("● ON")
     playing["s0"] = (0.3, True)                  # paused: not live
-    window.tick()
+    window.tickctl.tick()
     assert not is_tab_live(tabs, i)
     playing.clear()
     playing["__test__"] = (0.1, False)           # the mic test's playback isn't a sound
-    window.tick()
+    window.tickctl.tick()
     assert not is_tab_live(tabs, i) and not tabs.tabToolTip(i).startswith("●")
     from soundboard.ui.linkbar import PLAY_ID   # a web search's Play lights it too
     playing.clear()
     playing[PLAY_ID] = (0.1, False)
-    window.tick()
+    window.tickctl.tick()
     assert is_tab_live(tabs, i)
 
 
@@ -594,14 +594,14 @@ def test_player_bar_follows_to_other_tabs_while_a_sound_plays(window, monkeypatc
     window.tabs.setCurrentWidget(window.setup_page)
     assert bar.isHidden()                            # nothing playing: out of the way
     playing["s0"] = (0.3, False)
-    window._show_transport(window.engine.playing())
+    window.transctl._show_transport(window.engine.playing())
     assert not bar.isHidden()
     playing["s0"] = (0.3, True)                      # paused: still there to resume
-    window._show_transport(window.engine.playing())
+    window.transctl._show_transport(window.engine.playing())
     assert not bar.isHidden()
     playing.clear()
     playing["__test__"] = (0.1, False)               # the mic test's playback isn't a sound
-    window._show_transport(window.engine.playing())
+    window.transctl._show_transport(window.engine.playing())
     assert bar.isHidden()
     window.tabs.setCurrentWidget(window.sounds_page)
     assert not bar.isHidden()

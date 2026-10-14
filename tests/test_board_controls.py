@@ -151,7 +151,7 @@ def test_queue_sound_waits_for_the_one_playing(window, monkeypatch, calls):
     w.playctl.play("s1")
     assert calls == [] and w.playctl._queue == ["s1"]
     playing(monkeypatch, w, [])
-    w.tick()
+    w.tickctl.tick()
     assert [c[0] for c in calls] == ["s1"] and calls[0][1]["mode"] == "restart"
     assert w.playctl._queue == []
 
@@ -190,10 +190,10 @@ def test_a_web_search_play_waits_for_your_sound_instead_of_playing_over_it(
     playing(monkeypatch, w, ["s0"])
     w.linkbar._play(song, 1.0, "Song", "https://example.com/a")
     assert calls == [] and w.linkbar.up_next() == ["Song"]
-    w.tick()
+    w.tickctl.tick()
     assert calls == []                                 # still waits for s0
     playing(monkeypatch, w, [])
-    w.tick()
+    w.tickctl.tick()
     assert [c[0] for c in calls] == ["__link__"] and w.linkbar.up_next() == []
 
     calls.clear()                                      # a loop is only a background
@@ -215,10 +215,10 @@ def test_play_next_waits_for_a_web_search_song(window, monkeypatch, calls):
     playing(monkeypatch, w, ["__link__"])
     w.playctl.queue_sound("s1")
     assert calls == [] and w.playctl._queue == ["s1"]
-    w.tick()
+    w.tickctl.tick()
     assert calls == []
     playing(monkeypatch, w, [])
-    w.tick()
+    w.tickctl.tick()
     assert [c[0] for c in calls] == ["s1"]
 
 
@@ -253,7 +253,7 @@ def test_play_a_whole_category_one_after_another(window, monkeypatch, calls):
     playing(monkeypatch, w, [])
     w.playctl.queue_category("Memes", shuffled=False)
     assert [c[0] for c in calls] == ["s0"] and w.playctl._queue == ["s1"]
-    w.tick()
+    w.tickctl.tick()
     assert [c[0] for c in calls] == ["s0", "s1"]
 
 
@@ -456,7 +456,7 @@ def test_the_queue_status_goes_once_the_queue_is_empty(window, monkeypatch, call
     w.playctl._unqueue(0)                     # the ✕ on Airhorn's chip
     assert said(w).startswith("Up next: “Boom”")
     playing(monkeypatch, w, [])
-    w.tick()                          # the last one starts: nothing is up next
+    w.tickctl.tick()                          # the last one starts: nothing is up next
     assert w.playctl._queue == [] and not said(w).startswith("Up next")
     playing(monkeypatch, w, ["s0"])
     w.playctl.queue_sound("s1")
@@ -654,7 +654,7 @@ def test_transport_time_is_blank_until_a_sound_is_picked(window):
     assert w.np_time.text() == "" and w.mini_time.text() == ""
     assert w.np_time.isHidden()   # blank: the seek line takes its room
     w.playctl.select("s0")
-    w._update_transport({})   # the player's timer tick
+    w.transctl._update_transport({})   # the player's timer tick
     assert w.np_time.text() and not w.np_time.isHidden()
     w.rmctl.remove_sound("s0")   # back to "Pick a sound"
     assert w.np_time.text() == "" and w.np_time.isHidden()

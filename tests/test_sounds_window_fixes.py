@@ -408,7 +408,7 @@ def test_a_backup_with_damaged_settings_still_opens(qapp, app_dir, quiet, tmp_pa
     try:
         w._load_thread.join(10)
         for _ in range(3):
-            w.tick()
+            w.tickctl.tick()
         assert w.vol_sound.value() == 10.0
     finally:
         _close(qapp, w)

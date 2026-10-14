@@ -24,11 +24,11 @@ from PySide6.QtWidgets import (QApplication, QBoxLayout, QCheckBox, QComboBox, Q
                                QSystemTrayIcon, QVBoxLayout, QWidgetItem,
                                QWidget)
 
-from soundboard import bunny, theme, winkeys, ytworker
+from soundboard import bunny, theme, ytworker
 from soundboard.engine import SR, Engine
 from soundboard import exitwatch
 from soundboard import (appaudio, autostart, backup, destination, library, remote, otherboards,
-                        reset, thumbs, trash, videos, voicesdk)
+                        reset, thumbs, trash, voicesdk)
 from soundboard import (ffmpegget, net, netlog,
                         profiles, quality, shellicon, thumbbar, tips, tor,
                         usage, watchaddon)
@@ -41,6 +41,9 @@ from soundboard.ui.iconrow import CapIcon
 from soundboard.ui import worker
 from soundboard.ui.dropveil import DropVeil
 from soundboard.ui.ffmpegcontrol import FfmpegControl
+from soundboard.ui.transportcontrol import TransportControl
+from soundboard.ui.tickcontrol import TickControl
+from soundboard.ui.tickcontrol import TICK_MS
 from soundboard.ui.searchcontrol import SearchControl
 from soundboard.ui.playbackcontrol import PlaybackControl
 from soundboard.ui.playbackcontrol import CHIPS_GAP
@@ -76,7 +79,6 @@ from soundboard.ui.panel import (BAR_H, CONTROL_H, EqPanel, Flow, VolumeControl,
 from soundboard.ui.downloadbar import DownloadBar
 from soundboard.ui.linkbar import PLAY_ID as LINK_ID
 from soundboard.ui.linkbar import LinkBar
-from soundboard.ui.livedot import set_tab_live
 from soundboard.ui.livedot import set_tint as set_live_tint
 from soundboard.ui.logowidget import LogoWidget, glow_icon
 from soundboard.ui import sidebar
@@ -93,8 +95,8 @@ from soundboard.ui.radiopanel import RadioOff, RadioTab
 from soundboard.ui.voicepanel import VoicePanel
 from soundboard.ui.playbutton import PlayButton
 from soundboard.ui.widgets import (DropdownMenu, Meter, NameAndSeek, Pad, PadGrid, SeekSlider,
-                                   SteadyTabs, WindowRoot, expand_dropped, fmt_pos, loudness,
-                                   pad_height, spectrum, take_out, SLIM_PAD_H)
+                                   SteadyTabs, WindowRoot, expand_dropped, pad_height, take_out,
+                                   SLIM_PAD_H)
 from soundboard.wheelguard import AppStyle, no_wheel
 from soundboard.winkeys import Hotkeys
 from soundboard import errors
@@ -113,10 +115,6 @@ def version_text() -> str:
 
 
 TOAST_EXPAND = QSize(900, 640)   # a shrunk card clicked: the window grows to this
-TICK_MS = 33         # the UI timer while the window is on screen (meters, visualisers)
-TICK_IDLE_MS = 250   # ...and while it's in the tray or minimised (push-to-talk, watchdog)
-TICK_QUIET_MS = 100  # on screen with nothing moving: no sound, radio, recording or level
-LEVEL_QUIET = 0.003  # a level below this (-50 dB) shows as nothing on the meters
 PULSE_MS = 1200      # the mic-check banner's throb: bright, dimmer, bright again
 PULSE_LOW = 0.55     # ...down to this opacity
 PULSE_FRAME_MS = 60  # ...a step this often (~16 a second still reads as a smooth pulse)
@@ -311,6 +309,8 @@ class MainWindow(QMainWindow):
 
     def __init__(self):
         super().__init__()
+        self.transctl = TransportControl(self)
+        self.tickctl = TickControl(self)
         self.searchctl = SearchControl(self)
         self.playctl = PlaybackControl(self)
         self.appsetctl = AppSetupControl(self)
@@ -418,13 +418,7 @@ class MainWindow(QMainWindow):
         self._ptt_held: str | None = None   # PTT key we're currently holding
         self.current: str | None = None   # sound shown in the transport bar
         self.start_frac = 0.0             # where ▶ starts if it isn't playing
-        self._tick_n = 0                  # ticks since start (the watchdog runs ~once a second)
         self._ui_live = True              # the window is on screen (see _set_tick_rate)
-        self._tick_busy = True            # something moves with the tick (see _busy)
-        self._pads_lit: set[str] = set()  # pads showing a sound (see _tick_visuals)
-        self._sounds_live = False         # the Sounds tab's live dot is shown
-        self._talk_until = 0.0            # "hearing you" indicator holds until this time
-        self._talk_shown: bool | None = None
         self._load_thread: threading.Thread | None = None
         self._loading: set[str] = set()   # sids a load thread is decoding right now
         self.engine.latency = self.cfg.latency if self.cfg.latency in ("low", "high") else "low"
@@ -467,11 +461,11 @@ class MainWindow(QMainWindow):
         a11y.label_tree(self, force=True)   # names for the icon-only buttons
 
         self.timer = QTimer(self)
-        self.timer.timeout.connect(self.tick)
+        self.timer.timeout.connect(self.tickctl.tick)
         self.timer.start(TICK_MS)
         app = QApplication.instance()
         assert isinstance(app, QApplication)   # made before the window
-        app.applicationStateChanged.connect(self._set_tick_rate)
+        app.applicationStateChanged.connect(self.tickctl._set_tick_rate)
         app.applicationStateChanged.connect(self.micctl._app_state)
         # Space plays / pauses on the Sounds and Radio tabs, wherever the focus is
         self._space = SpaceKey(self, self.playctl._space_action)
@@ -978,8 +972,8 @@ class MainWindow(QMainWindow):
 
         # the Sounds tab's player; right under the page, where it sat inside it
         rv.addWidget(self.transport)
-        self.tabs.currentChanged.connect(lambda _i: self._show_transport())
-        self._show_transport()
+        self.tabs.currentChanged.connect(lambda _i: self.transctl._show_transport())
+        self.transctl._show_transport()
         self._fit_tab = self.tabs.currentWidget()
         self.tabs.currentChanged.connect(self._fit_setup_tab)
 
@@ -1591,7 +1585,7 @@ class MainWindow(QMainWindow):
         scroll = QScrollArea()
         scroll.setWidgetResizable(True)
         scroll.setWidget(self.grid)
-        scroll.verticalScrollBar().valueChanged.connect(self._scroll_background_board)
+        scroll.verticalScrollBar().valueChanged.connect(self.transctl._scroll_background_board)
         self._pad_scroll = scroll
         scroll.setFrameShape(QFrame.Shape.NoFrame)
         # the pads fit the width
@@ -1692,13 +1686,13 @@ class MainWindow(QMainWindow):
         self.btn_video.setToolTip(_("Watch this sound's video while it plays. The sound still "
                                     "goes out as normal; the video is only for you."))
         icons.set_icon(self.btn_video, "video", size=16)
-        self.btn_video.clicked.connect(self.show_video)
+        self.btn_video.clicked.connect(self.transctl.show_video)
         self.btn_video.hide()
         self._video_for: tuple[str | None, Path | None] = ("", None)   # (sid, its video)
         self._video_asking: str | None = None   # the sound whose video a thread looks up
-        self.video_found.connect(self._video_found)
+        self.video_found.connect(self.transctl._video_found)
         self.board_read.connect(self.impctl._board_read)
-        self._video_win = None   # ui/videowindow.VideoWindow, made on first use
+        self._video_win: Any = None   # ui/videowindow.VideoWindow, made on first use
         th.addWidget(self.btn_video)
         self.speed_btn = SpeedPitchButton(
             "sounds", _("Changes every sound while it plays. To save a version, "
@@ -2199,7 +2193,7 @@ class MainWindow(QMainWindow):
         window and dialogs use."""
         setattr(self.cfg, attr, v)
         if attr in ("playing_background", "playing_background_opacity"):
-            self._update_playing_background(self.engine.playing())
+            self.transctl._update_playing_background(self.engine.playing())
         if hasattr(self.engine, attr):
             setattr(self.engine, attr, v)
         self._save_later()
@@ -3104,7 +3098,7 @@ class MainWindow(QMainWindow):
             # (again here: start-up can still switch the tab after __init__, to Setup)
             self._start_focus_set = True
             self.tabctl._focus_open_tab()
-        self._set_tick_rate()
+        self.tickctl._set_tick_rate()
         note, self._pending_note = getattr(self, "_pending_note", None), None
         if note:   # held back while the window was in the tray (see __init__)
             QTimer.singleShot(400, lambda: self._tell_load_note(note))
@@ -3124,339 +3118,12 @@ class MainWindow(QMainWindow):
 
     def hideEvent(self, ev):
         super().hideEvent(ev)
-        self._set_tick_rate()
+        self.tickctl._set_tick_rate()
 
     def changeEvent(self, ev):
         super().changeEvent(ev)
         if ev.type() == QEvent.Type.WindowStateChange:
-            self._set_tick_rate()
-
-    def _tick_pace(self) -> int:
-        if not self._ui_live and not self.overlay.is_open and not self.bunctl.bun_up():
-            return TICK_IDLE_MS
-        if not self._tick_busy:   # nothing moves: 10 ticks a second instead of 30
-            return TICK_QUIET_MS
-        # Visible and busy: meters stay smooth even when a game has focus.
-        return TICK_MS
-
-    def _wake(self):
-        """A sound started or resumed: full pace now, not after a quiet tick (auto
-        push-to-talk presses its key from the tick)."""
-        if not self._tick_busy:
-            self._tick_busy = True
-            pace = self._tick_pace()
-            if self.timer.interval() != pace and not self._shut_down:
-                self.timer.start(pace)
-
-    def _busy(self, playing) -> bool:
-        """Something on screen moves with the tick: a sound playing (not paused), the
-        radio, a meter or the mic level still showing."""
-        e = self.engine
-        return (any(not paused for _p, paused in playing.values())
-                or self.radio.is_active() or bool(e.aux)
-                or max(e.level_play, e.level_main,
-                       e.level_mic if e.mic_stream is not None else 0.0) > LEVEL_QUIET)
-
-    def _set_tick_rate(self, *__):
-        live = self.isVisible() and not self.isMinimized()
-        was, self._ui_live = self._ui_live, live
-        # the mic-check banner pulses only while it can be seen, in front
-        self._pulse.set_live(live and appstate.active())
-        pace = self._tick_pace()
-        if (live == was and self.timer.interval() == pace) or getattr(self, "_shut_down", False):
-            return
-        self.timer.start(pace)
-        if not live:   # a level frozen mid-flight would show as stuck on the next show
-            self.out_meter.set_level(0.0)
-            self.mic_meter.set_level(0.0)
-            if not self.isVisible():   # to the tray: the pads' pictures are made again
-                thumbs.trim()          # from their small files when it's back
-
-    def tick(self):
-        if self._shut_down:   # a tick already queued when the window shut down
-            return
-        e = self.engine
-        now = time.monotonic()
-        self._tick_n += 1
-        if self._tick_n % max(1, 1000 // self.timer.interval()) == 0:   # about once a second
-            if self.cfg.route == "mic":
-                self.micctl._follow_mic_effect()
-            if e.check_streams() or sum(e.xruns.values()) != self.statusctl._xruns_shown:
-                self.statusctl._update_status()
-            elif self.cfg.route == "mic" and self.micctl._direct_health() != self._direct_shown:
-                self.statusctl._update_flow()
-            self.voice.poll()
-        playing = e.playing()
-        if self.playctl._queue and LINK_ID not in playing and not any(sid in self._meta
-                                                              for sid in playing):
-            self.playctl._next_in_queue()   # it waits for a web search's song too
-            playing = e.playing()
-        if (LINK_ID not in playing and self.linkbar.up_next()
-                and not self.playctl._board_song_playing(playing) and self.linkbar.play_next()):
-            playing = e.playing()   # the web search song ended: the next one waiting
-        live = any((sid in self._meta or sid == LINK_ID) and not paused   # a web search's
-                   for sid, (_p, paused) in playing.items())                # Play too
-        if live != self._sounds_live:   # the Sounds tab glows while a sound plays
-            self._sounds_live = live
-            set_tab_live(self.tabs, self.tabs.indexOf(self.sounds_page), live,
-                         _("● ON: a sound is playing"), "sounds")
-        # the taskbar preview's Pause button turns into Play while all of it is paused
-        # (a station Pause stopped counts as paused, until anything plays again)
-        if live or self.radio.is_active():
-            self._radio_paused = None
-        self.thumbbar.set_paused(not live and not self.radio.is_active() and (
-            self._radio_paused is not None or any(
-                paused for sid, (_p, paused) in playing.items()
-                if sid in self._meta or sid == LINK_ID)))
-        self._tick_busy = self._busy(playing)
-        pace = self._tick_pace()
-        if self.timer.interval() != pace:
-            self.timer.start(pace)
-        if self._ui_live:
-            self._tick_visuals(playing, now)
-        self.overlay.tick(playing)
-        if self.bunctl.bun_mode is not None and self.bunctl.bun_mode.isVisible():
-            bar = self.download_bar
-            self.bunctl.bun_mode.tick(
-                live=live, level=e.level_play, sending=e.sending, mic=self.cfg.mic_enabled,
-                paused=any(paused for sid, (_p, paused) in playing.items()
-                           if sid in self._meta or sid == LINK_ID),
-                downloading=bar.running(), failed=bar.failed_count())
-        e.level_play *= 0.9
-        e.level_main *= 0.9
-        e.level_mic *= 0.9
-
-        # auto push-to-talk: hold the game's PTT key only while a sound (or live
-        # radio / a program) goes out. _ptt_held remembers exactly which key we pressed, so it's
-        # always released even if the setting changes mid-sound.
-        on_air = e.sending and (e.any_playing() or e.radio_on_air()
-                                or e.aux_on_air())
-        want = self.cfg.ptt_key if (self.cfg.ptt_key and on_air) else None
-        if want != self._ptt_held:
-            if not self.hkctl._release_ptt():
-                return   # still held: try the key-up again next tick
-            if want and winkeys.press(want):
-                self._ptt_held = want
-
-    def _heard_level(self) -> float:
-        """The "What others hear" meter. Sending into the mic but not in it yet (no mic
-        effect): voice apps still take the real mic as it is, so others hear your voice
-        even with nothing sent; the meter showed nothing while you talked."""
-        e = self.engine
-        if self.cfg.route == "mic" and not e.main_direct and e.mic_stream is not None:
-            return max(e.level_main, e.level_mic)
-        return e.level_main
-
-    def _tick_visuals(self, playing, now: float):
-        """The part of tick() that only matters while the window is on screen."""
-        e = self.engine
-        self._update_playing_background(playing)
-        on_board = self.tabs.currentWidget() is self.sounds_page   # no visualiser off-screen
-        shown = self.isVisible()
-        # only the pads playing now and the ones still showing a sound (cleared on the
-        # tick after it stops): going over all of them, 30 times a second, cost more
-        # than the rest of the tick on a big board with nothing playing
-        pads, lit = self.pads, set()
-        for sid in self._pads_lit.union(playing):
-            p = pads.get(sid)
-            if p is None:   # not a pad (a preview, the test recording) or gone
-                continue
-            prog, paused = playing.get(sid, (None, False))
-            if prog is not None and not paused and on_board and not p.isHidden():
-                # scrolled out of view: skip the FFT (the next tick after it scrolls
-                # back in catches up)
-                if not (shown and p.visibleRegion().isEmpty()):
-                    data = self.audio.get(sid)
-                    p.set_levels(spectrum(data, prog, p.n_bands))
-                    p.set_meter(loudness(data, prog, self.gain_for(p.meta)))
-            elif prog is None and p.bands is not None:
-                p.set_levels(None)
-                p.set_meter(None)
-            if prog != p.progress or paused != p.paused:
-                p.progress, p.paused = prog, paused
-                p.update()
-            if p.progress is not None or p.bands is not None:
-                lit.add(sid)
-        self._pads_lit = lit
-        self._update_transport(playing)
-        self._show_transport(playing)
-        if not self.ytresults.isHidden():   # the result in the player says so
-            prog, paused = playing.get(LINK_ID, (None, False))
-            self.ytresults.show_now(self.searchctl._link_url, "" if prog is None else
-                                    "paused" if paused else "playing")
-        self.playctl._update_chips(playing)
-        self.out_meter.set_level(self._heard_level())
-        self.logo.set_level(e.level_play)   # anything playing, not your voice
-        self.mic_meter.set_level(e.level_mic if e.mic_stream else 0.0)
-        if self.card_meter.isVisible():
-            self.card_meter.set_level(e.level_mic if e.mic_stream else 0.0)
-        talking = e.mic_stream is not None and e.level_mic > 0.05
-        if talking:
-            self._talk_until = now + 0.8
-        talking = now < self._talk_until
-        if talking != self._talk_shown:
-            self._talk_shown = talking
-            self.statusctl._update_flow(talking)
-
-    def _show_transport(self, playing=None):
-        """The player bar: always on the Sounds tab; on the others only while a sound
-        plays or is paused, so it can be stopped without going back to the pads (and
-        doesn't take the room the rest of the time)."""
-        if self.tabs.currentWidget() is self.sounds_page and not self.setctl.settings_open():
-            want = True
-        else:
-            if playing is None:
-                playing = self.engine.playing()
-            want = any(sid in self._meta or sid == LINK_ID for sid in playing)
-        if self.transport.isHidden() == want:
-            self.transport.setVisible(want)
-
-    def _scroll_background_board(self, value):
-        if not self.grid.background_image:
-            return
-        step = getattr(self, "_background_row_step", 0)
-        bar = self._pad_scroll.verticalScrollBar()
-        if step:
-            snapped = min(round(value / step), bar.maximum() // step) * step
-            if snapped != value:
-                bar.setValue(snapped)
-        self.grid.update()
-
-    def _update_playing_background(self, playing):
-        on = self.cfg.playing_background
-        fitted_height, step = 0, 0
-        if on and self.grid.pads and self.grid._shape is not None:
-            margins = self.grid.grid.contentsMargins()
-            height = self.grid.natural_pad_h(self.grid._shape[1])
-            spacing = self.grid.grid.spacing()
-            step = height + spacing
-            room = self._pad_scroll.height() - margins.top() - margins.bottom()
-            if room >= height:
-                rows = max(1, (room + spacing) // step)
-                fitted_height = (room - spacing * (rows - 1)) // rows
-                step = fitted_height + spacing
-        if fitted_height != self.grid.background_pad_height:
-            self.grid.background_pad_height = fitted_height
-            self.grid.relayout(force=True)
-        self._background_row_step = step
-        gap = (on, step)
-        if getattr(self, "_background_gap", None) != gap:
-            self._background_gap = gap
-            bar = self._pad_scroll.verticalScrollBar()
-            if not hasattr(self, "_background_scroll_step"):
-                self._background_scroll_step = bar.singleStep()
-            # The gap belongs outside the viewport, so the backdrop contains
-            # every card rather than cutting inside their edges.
-            rtl = self.layoutDirection() == Qt.LayoutDirection.RightToLeft
-            self._pad_scroll.setViewportMargins(12 if on and rtl else 0, 0,
-                                               12 if on and not rtl else 0, 0)
-            bar.setSingleStep(step or self._background_scroll_step)
-        image = ""
-        if on:
-            # The first active sound owns the backdrop, including while paused.
-            # Waiting sounds and a merely selected pad never claim it.
-            sid = next((sid for sid in playing if sid in self._meta), None)
-            m = self.meta(sid) if sid else None
-            image = m.image if m else ""
-        self.grid.set_background(image, self.cfg.playing_background_opacity)
-        if image and step and self._pad_scroll.verticalScrollBar().value() % step:
-            self._scroll_background_board(self._pad_scroll.verticalScrollBar().value())
-
-    def _update_transport(self, playing):
-        sid = self.current
-        m = self.meta(sid) if sid else None
-        self._update_video(sid, m, playing)
-        enabled = m is not None
-        for w in (self.btn_pp, self.btn_st, self.seek, self.mini_pp, self.mini_st,
-                  self.mini_seek):
-            w.setEnabled(enabled)
-        if not m:
-            return
-        prog, paused = playing.get(sid, (None, False))
-        live = prog is not None
-        self.playctl._set_pp_icon("pause" if live and not paused else "play")
-        if not self.playctl._seeking:
-            frac = prog if live else self.start_frac
-            for slider in (self.seek, self.mini_seek):
-                slider.blockSignals(True)
-                slider.setValue(int(frac * 1000))
-                slider.blockSignals(False)
-            self._set_np_time(fmt_pos(frac * m.duration, m.duration))
-
-    def _video_of(self, sid: str | None) -> Path | None:
-        """The current sound's video, looked up once per selection, on a thread (it
-        reads videos.json and checks the video is there, maybe on a sleeping drive):
-        None until it's known."""
-        if self._video_for[0] != sid:
-            self._video_for = (sid, None)
-            if sid:
-                self._ask_video(sid)
-        return self._video_for[1]
-
-    def _ask_video(self, sid: str):
-        if self._video_asking is not None:   # one at a time: its answer asks for the next
-            return
-        self._video_asking = sid
-
-        def look():
-            try:
-                return sid, videos.get(sid)
-            except Exception:  # noqa: BLE001 - never leave _video_asking stuck
-                log.debug("video lookup failed", exc_info=True)   # (a sleeping drive)
-                return sid, None
-        worker.run(look, self.video_found, "video-lookup", error=(sid, None))
-
-    def _video_found(self, sid: str, path):
-        self._video_asking = None
-        now = self._video_for[0]
-        if now != sid:             # another sound was picked meanwhile
-            if now:
-                self._ask_video(now)
-            return
-        self._video_for = (sid, path)
-        if self.btn_video.isHidden() == (path is not None):
-            self.btn_video.setVisible(path is not None)
-
-    def _update_video(self, sid, m, playing):
-        path = self._video_of(sid) if m else None
-        if self.btn_video.isHidden() == (path is not None):
-            self.btn_video.setVisible(path is not None)
-        w = self._video_win
-        if w is None or not w.isVisible():
-            return
-        if path is not None and w.sid != sid:   # a newly picked video pad takes it over
-            w.show_for(sid, m.name, path)
-        shown = self.meta(w.sid)
-        data = self.audio.get(w.sid)
-        if shown is None or data is None:
-            w.follow(None, 0.0)
-            return
-        w.follow(playing.get(w.sid), len(data) / SR, self.engine.sound_speed)
-
-    def show_video(self):
-        """The player's Video button: open the current sound's video (and play the
-        sound if it isn't playing)."""
-        sid = self.current
-        m = self.meta(sid) if sid else None
-        path = videos.get(sid) if m and sid else None
-        self._video_for = (sid, path)
-        if path is None or sid is None or m is None:   # (a path: there's a sound)
-            self.btn_video.hide()
-            self.toast(_("This sound's video isn't there any more"), "warn")
-            return
-        if self._video_win is None:
-            try:   # imported here: a build missing QtMultimediaWidgets must still start
-                from soundboard.ui.videowindow import VideoWindow
-            except ImportError:
-                log.exception("can't show videos")
-                self.btn_video.hide()
-                self.toast(_("Videos can't be shown in this copy of Onion Board"), "warn")
-                return
-            self._video_win = VideoWindow(self)
-            self._video_win.setWindowIcon(self.windowIcon())
-        self._video_win.show_for(sid, m.name, path)
-        if self.engine.state(sid) is None:
-            self.playctl.toggle_play_pause()
+            self.tickctl._set_tick_rate()
 
     # ------------------------------------------------------------------ small windows
     def _init_fit(self):

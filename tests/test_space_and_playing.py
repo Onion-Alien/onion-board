@@ -124,14 +124,14 @@ def test_space_on_a_web_result_playing_pauses_it_not_downloads_it_again(
 
 def test_the_web_result_in_the_player_says_so(window, player):
     row = _link(window)
-    window.tick()
+    window.tickctl.tick()
     assert row.now == "playing" and row.btn_play.text() == "Pause"
     assert row.property("playing") is True and row.thumb.now == "playing"
     window.playctl.toggle_play_pause()
-    window.tick()
+    window.tickctl.tick()
     assert row.now == "paused" and row.btn_play.text() == "Resume"
     del player.voices[LINK_ID]                    # it finished
-    window.tick()
+    window.tickctl.tick()
     assert row.now == "" and row.btn_play.text() == "Play" and not row.property("playing")
 
 

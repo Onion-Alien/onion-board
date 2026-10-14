@@ -170,6 +170,8 @@ the launcher the shortcuts and PyInstaller use. The app is the `soundboard` pack
 | `soundboard/ui/tabcontrol.py` | the main window's tabs (`MainWindow.tabctl`): which are on and shown, switching them on and off, the More tabs menu, a tab's right-click menu, moving a tab's place, the tab keys, counting which tab was opened |
 | `soundboard/ui/themecontrol.py` | the main window's look (`MainWindow.themectl`): applying a theme, the Live colour, the background texture, the live tab's tint, the onion logo |
 | `soundboard/ui/tipcontrol.py` | tips and help in the main window (`MainWindow.tipctl`): a tip once things settle, Show me, tips off, a tab's About this tab, the mic tips, the Help menu |
+| `soundboard/ui/tickcontrol.py` | the main window's tick (`MainWindow.tickctl`): the timer that moves the meters, the now-playing time and the pads' progress, how fast it runs (fast while something moves and the window is seen, slower when quiet or hidden), waking it |
+| `soundboard/ui/transportcontrol.py` | the main window's transport and what plays behind it (`MainWindow.transctl`): the play / pause / stop / seek row, the playing sound's picture as the board's background, a sound's video |
 | `soundboard/ui/updatecontrol.py` | Onion Board's own updates in the main window (`MainWindow.updctl`): the check (and Onion Watch's), the update card's states, the download with Cancel, installing it, What's new |
 | `soundboard/ui/dropveil.py` | the veil over the window while files are dragged in: "Drop to add 4 files" |
 | `soundboard/ui/themecover.py` | a still of the window with Bun over it while a theme switch restyles every widget, faded out after: never a half-styled frame |

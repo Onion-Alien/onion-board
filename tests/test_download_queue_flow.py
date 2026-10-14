@@ -90,7 +90,7 @@ class Net:
     def end(self):
         """The search song playing comes to its end; the window's next tick sees it."""
         self.now.pop(PLAY_ID, None)
-        self.w.tick()
+        self.w.tickctl.tick()
 
     def settle(self):
         """The banner's tick / red flash is over: what waited for it plays out."""
