@@ -325,10 +325,13 @@ Get-Process OnionBoard -ErrorAction SilentlyContinue      # is it running?
    secrets scan over the full history, gitleaks, ruff and pytest. On a PR, pytest
    runs only the test files the change needs (`scripts/pick_tests.py`: the tests
    that import a changed module or name a changed file; all of them when
-   `conftest.py`, `pyproject.toml`, the requirements or the workflow change; none for
+   `conftest.py`, `pyproject.toml`, the requirements, the workflow or a hub
+   (`ui/mainwindow.py`, `engine.py`, `library.py`, `settings.py`) change; none for
    a change no test is about, like the changelog). main, after the merge, runs the
    whole suite, and so does running the workflow by hand on a branch. A newer push to
-   the PR cancels its unfinished run.
+   the PR cancels its unfinished run. Every night the whole suite runs on main too,
+   and its `flaky-trend` job fails when a test needed a rerun that didn't the night
+   before (the run's summary lists the new ones and the ones no longer flaky).
 3. `release.py` (next step) refuses to start unless the checkout is exactly
    `origin/main` (it fetches first) and main's full `checks` run passed on that
    commit (`gh run list --workflow checks.yml --branch main --commit <sha>`): a PR
