@@ -24,6 +24,39 @@ def test_a_module_runs_the_tests_that_import_it():
     assert "tests/test_dsp.py" not in picked
 
 
+def test_a_hub_runs_them_all():
+    # signals and lazy imports reach these from everywhere: no import line says which
+    # tests a change to one can break, so the whole suite runs
+    for f in sorted(pick_tests.HUBS):
+        assert pick_tests.pick([f]) == ["tests"], f
+    assert pick_tests.pick(["soundboard/ui/sidebar.py"]) != ["tests"]
+
+
+def test_imports_inside_functions_and_by_name_are_followed(tmp_path, monkeypatch):
+    (tmp_path / "soundboard").mkdir()
+    (tmp_path / "tests").mkdir()
+    (tmp_path / "main.py").write_text("", encoding="utf-8")
+    for name in ("__init__", "usage", "theme", "lazy", "other"):
+        (tmp_path / "soundboard" / f"{name}.py").write_text("", encoding="utf-8")
+    tests = {
+        "test_local": "def test_it():\n    from soundboard import usage\n",
+        "test_method": "class T:\n    def test_it(self):\n"
+                       "        import soundboard.theme\n",
+        "test_byname": "import importlib\n\n\ndef test_it():\n"
+                       "    importlib.import_module('soundboard.lazy')\n"
+                       "    __import__('soundboard.theme')\n",
+        "test_other": "from soundboard import other\n",
+    }
+    for name, text in tests.items():
+        (tmp_path / "tests" / f"{name}.py").write_text(text, encoding="utf-8")
+    monkeypatch.setattr(pick_tests, "ROOT", tmp_path)
+    monkeypatch.setattr(pick_tests, "TESTS", tmp_path / "tests")
+    assert pick_tests.pick(["soundboard/usage.py"]) == ["tests/test_local.py"]
+    assert pick_tests.pick(["soundboard/theme.py"]) == [
+        "tests/test_byname.py", "tests/test_method.py"]
+    assert pick_tests.pick(["soundboard/lazy.py"]) == ["tests/test_byname.py"]
+
+
 def test_a_test_file_runs_itself_and_the_tests_that_import_it():
     picked = pick_tests.pick(["tests/test_mainwindow.py"])
     assert {"tests/test_mainwindow.py", "tests/test_audit_main.py"} <= set(picked)
