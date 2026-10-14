@@ -21,6 +21,7 @@ from soundboard import engine as eng
 from soundboard.i18n import _
 from soundboard.library import RESOURCE_DIR
 from soundboard.ui import busy, icons, worker
+from soundboard.ui.controller import Controller
 from soundboard.ui.routecontrol import is_hands_free
 
 if TYPE_CHECKING:
@@ -32,7 +33,7 @@ HELPER_RETRY_S = 60.0   # a mic helper check that failed is tried again after th
 MIC_OFFER_MS = 1000   # an older mic part's update is offered this long after the window shows
 
 
-class MicControl:
+class MicControl(Controller):
     """The mic effect and the virtual cable of one MainWindow (``mw``)."""
 
     _mic_offer = None       # the open MicUpdateOffer
@@ -50,7 +51,7 @@ class MicControl:
     _following_effect = False
 
     def __init__(self, mw: MainWindow):
-        self.mw = mw
+        super().__init__(mw)
         self.cable_bad = []               # cable ends not at 48 kHz (_check_cable_format)
 
     def _mic_update_due(self) -> bool:
