@@ -51,21 +51,35 @@ sh "$here/check_utc.sh" "origin/main..$head"
 
 tmp=$(mktemp -d "${TMPDIR:-/tmp}/merge_pr_$n.XXXXXX")
 git worktree add -q --detach "$tmp" origin/main
-now="$(date +%s) +0000"
-if ! (cd "$tmp" && GIT_AUTHOR_DATE="$now" GIT_COMMITTER_DATE="$now" \
-      git -c merge.langjson.driver="python scripts/merge_json.py %O %A %B" \
-          merge -q --no-ff -m "Merge pull request #$n from $owner/$branch" -m "$title" "$head"); then
-    (cd "$tmp" && git merge --abort) 2>/dev/null || true
-    echo "PR #$n doesn't merge cleanly with main: merge main into $branch first." >&2
-    exit 1
-fi
-(cd "$tmp" && sh "$here/check_utc.sh" -1 HEAD)
-if [ -n "$MERGE_PR_DRY_RUN" ]; then   # everything but the push
-    (cd "$tmp" && git log -1 --format="Would push %h (%ad | %cd): %s" --date=raw)
-    exit 0
-fi
-(cd "$tmp" && git push -q origin HEAD:main)
+# Many sessions merge at once: when another merge lands between our fetch and our push,
+# main moved and the push is refused. Then merge again onto the new main (up to 5 tries).
+try=1
+while :; do
+    now="$(date +%s) +0000"
+    if ! (cd "$tmp" && GIT_AUTHOR_DATE="$now" GIT_COMMITTER_DATE="$now" \
+          git -c merge.langjson.driver="python scripts/merge_json.py %O %A %B" \
+              merge -q --no-ff -m "Merge pull request #$n from $owner/$branch" -m "$title" "$head"); then
+        (cd "$tmp" && git merge --abort) 2>/dev/null || true
+        echo "PR #$n doesn't merge cleanly with main: merge main into $branch first." >&2
+        exit 1
+    fi
+    (cd "$tmp" && sh "$here/check_utc.sh" -1 HEAD)
+    if [ -n "$MERGE_PR_DRY_RUN" ]; then   # everything but the push
+        (cd "$tmp" && git log -1 --format="Would push %h (%ad | %cd): %s" --date=raw)
+        exit 0
+    fi
+    (cd "$tmp" && git push -q origin HEAD:main) && break
+    [ "$try" -lt 5 ] || { echo "PR #$n: main kept moving; run this again." >&2; exit 1; }
+    try=$((try + 1))
+    echo "main moved while merging PR #$n; merging again onto the new main ($try/5)." >&2
+    sleep 3
+    git fetch -q origin main
+    (cd "$tmp" && git reset -q --hard origin/main)
+done
 echo "Merged PR #$n into main as $(cd "$tmp" && git rev-parse --short HEAD) (UTC)."
 if [ "$del" = --delete-branch ]; then
-    git push -q origin --delete "$branch" 2>/dev/null && echo "Deleted the branch $branch."
+    # GitHub may have deleted it already (auto-delete): not a failure
+    if git push -q origin --delete "$branch" 2>/dev/null; then
+        echo "Deleted the branch $branch."
+    fi
 fi
