@@ -627,7 +627,9 @@ BLEND = {"semitones": -5, "mix": 0.5, "gap": 0, "size": 4, "under": 1}
 @pytest.mark.parametrize("etype, key, base", [
     ("cleanup", "hiss", {"gate": 0}), ("pitch", "semitones", {}), ("pitch", "size", {}),
     ("pitch", "mix", BLEND), ("pitch", "gap", BLEND), ("pitch", "semitones", BLEND),
-    ("compressor", "boost", {}), ("radio", "drive", {"noise": 0}),
+    ("compressor", "boost", {}), ("compressor", "attack", {}), ("radio", "drive", {"noise": 0}),
+    ("distortion", "drive", {}), ("polish", "warmth", {}), ("polish", "ceiling", {}),
+    ("polish", "deess", {}),
     ("shout", "drive", {"threshold": -40}), ("helmet", "size", {}), ("chorus", "depth", {}),
     ("echo", "delay", {}), ("echo", "tone", {})])
 def test_dragging_a_slider_while_you_talk_doesnt_click(etype, key, base):
@@ -703,3 +705,134 @@ def test_hothead_blows_out_on_shouting_at_any_mic_level(mic_db):
 def test_renamed_voice_keeps_its_pick():
     assert voicefx.clean_spec({"preset": "Female voice"})["preset"] == "High voice"
     assert "High voice" in voicefx.PRESETS
+
+
+# ---------------------------------------------------------------- phase 1: quality
+
+def _off_harmonic_db(y, f0):
+    """Energy away from f0's harmonics against the energy on them. A waveshaper's
+    aliasing folds harmonics back to places that aren't multiples of f0."""
+    y = y[RATE // 4:]
+    sp = np.abs(np.fft.rfft(y * np.hanning(len(y))))
+    f = np.fft.rfftfreq(len(y), 1 / RATE)
+    on = np.zeros(len(f), bool)
+    for k in range(1, int(RATE / 2 / f0) + 1):
+        on |= np.abs(f - k * f0) < 12
+    return 10 * np.log10(np.sum(sp[~on & (f > 50)] ** 2) / np.sum(sp[on] ** 2))
+
+
+def test_distortion_crunch_is_harmonics_not_aliasing():
+    """tanh at the mic's rate folded harmonics past Nyquist back down (-29 dB of fizz
+    at full drive); bent at 4x the rate they're cut off on the way back."""
+    f0 = 1037.0        # not a divisor of Nyquist: folded harmonics land off the grid
+    e = REGISTRY["distortion"](RATE, {"drive": 36, "tone": 12000, "level": 0.5})
+    y = run_blocks(e, sine(f0, 1.5), 480)
+    assert _off_harmonic_db(y, f0) < -55
+    plain = np.tanh(sine(f0, 1.5) * 10 ** (36 / 20)) * 0.5
+    assert _off_harmonic_db(plain, f0) > -35
+
+
+def _level_db(y, a, b):
+    return 20 * np.log10(np.max(np.abs(y[a:b])) + 1e-9)
+
+
+def test_compressor_attack_and_release_follow_the_sliders():
+    """-30 dB, then -6 dB for half a second, then -30 again: a snappy attack has the
+    loud part squashed within 20 ms, a soft one hasn't; a quick release lets the
+    quiet part back up within 50 ms, a slow one holds it down."""
+    q, loud = 10 ** (-30 / 20), 0.5
+    x = np.concatenate([sine(300, 0.5, amp=q), sine(300, 0.5, amp=loud), sine(300, 0.5, amp=q)])
+    s = RATE // 2
+    def run(attack, release):
+        e = REGISTRY["compressor"](RATE, {"threshold": -20, "ratio": 4, "boost": 0,
+                                         "attack": attack, "release": release})
+        return run_blocks(e, x, 480)
+    snappy, soft = run(0.5, 20), run(50, 1000)
+    assert _level_db(snappy, s + 960, s + 1056) < -15        # squashed by 20 ms
+    assert _level_db(soft, s + 960, s + 1056) > -10          # still mostly loud at 20 ms
+    assert abs(_level_db(soft, s + 19200, s + 19296) + 16.5) < 1   # both settle to -16.5
+    assert _level_db(snappy, 2 * s + 2400, 2 * s + 2496) > -31      # back up in 50 ms
+    assert _level_db(soft, 2 * s + 2400, 2 * s + 2496) < -34        # still held down
+
+
+def _vowel_then_s():
+    """A buzzy vowel, a 150 ms "sss" (noise in 5-9 kHz), the vowel again."""
+    from soundboard.dsp import butter, sosfilt
+    t = np.arange(int(RATE * 0.4)) / RATE
+    vowel = sum(np.sin(2 * np.pi * 150 * k * t) / k for k in range(1, 20)) * 0.08
+    noise = np.random.default_rng(0).standard_normal(int(RATE * 0.15))
+    ess = sosfilt(butter(4, [5000, 9000], btype="band", fs=RATE), noise) * 0.6
+    return np.concatenate([vowel, ess, vowel]).astype(np.float32)
+
+
+def _rms_db(y, a, b):
+    return 20 * np.log10(np.sqrt(np.mean(y[a:b] ** 2)) + 1e-9)
+
+
+@pytest.mark.parametrize("amount, cut", [(0, 0.5), (0.5, 5), (1, 5)])
+def test_studio_polish_turns_down_an_s_not_the_vowel(amount, cut):
+    x = _vowel_then_s()
+    e = REGISTRY["polish"](RATE, {"deess": amount, "warmth": 0, "ceiling": 0})
+    y = run_blocks(e, x, 480)
+    d = int(e.latency() * RATE)
+    vowel = _rms_db(y, RATE // 10 + d, RATE // 4 + d) - _rms_db(x, RATE // 10, RATE // 4)
+    a, b = int(RATE * 0.42), int(RATE * 0.53)
+    ess = _rms_db(y, a + d, b + d) - _rms_db(x, a, b)
+    assert abs(vowel) < 0.5
+    if amount:
+        assert ess < -cut
+    else:
+        assert abs(ess) < cut
+
+
+@pytest.mark.parametrize("ceiling", [-1, -6])
+def test_studio_polish_limiter_never_passes_the_ceiling(ceiling):
+    """A burst 14 dB over: the output peaks exactly at the ceiling, with no clipped
+    corners (the gain is down before the burst arrives), and the quiet parts stay put."""
+    x = sine(200, 1.0, amp=0.2)
+    x[RATE // 2:RATE // 2 + 2400] *= 5
+    e = REGISTRY["polish"](RATE, {"deess": 0, "warmth": 0, "ceiling": ceiling})
+    y = run_blocks(e, x, 480)
+    assert 20 * np.log10(np.max(np.abs(y))) <= ceiling + 0.01
+    assert 20 * np.log10(np.max(np.abs(y))) > ceiling - 0.3
+    assert abs(_level_db(y, RATE // 8, RATE // 4) - 20 * np.log10(0.2)) < 0.05
+    # a limiter that clipped would leave sharp corners on the loud cycles
+    burst = y[RATE // 2 + 480:RATE // 2 + 2400]
+    assert np.abs(np.diff(burst, 2)).max() < 0.02
+
+
+def test_studio_polish_warmth_is_level_neutral_and_adds_harmonics():
+    x = sine(220, 1.0, amp=0.3)
+    def spec(w):
+        e = REGISTRY["polish"](RATE, {"deess": 0, "warmth": w, "ceiling": 0})
+        y = run_blocks(e, x, 480)[RATE // 4:]
+        sp = np.abs(np.fft.rfft(y * np.hanning(len(y))))
+        f = np.fft.rfftfreq(len(y), 1 / RATE)
+        return y, sp[np.abs(f - 220) < 5].max(), sp[np.abs(f - 660) < 5].max()
+    y0, h1, h3 = spec(0)
+    assert abs(_rms_db(y0, 0, len(y0)) - _rms_db(x, RATE // 4, len(x))) < 0.05
+    assert 20 * np.log10(h3 / h1) < -80
+    y1, h1, h3 = spec(1)
+    assert abs(_rms_db(y1, 0, len(y1)) - _rms_db(x, RATE // 4, len(x))) < 1.5
+    assert 20 * np.log10(h3 / h1) > -30
+
+
+def test_studio_polish_runs_last_and_reports_its_delay():
+    chain = VoiceChain()
+    chain.configure(spec_for(reverb={}, polish={}, compressor={}))
+    x = np.repeat(sine(150, 0.1)[:, None], 2, 1)
+    chain.process(x[:480], RATE)
+    assert [e.type for e in chain._effects] == ["compressor", "reverb", "polish"]
+    assert 0.001 < REGISTRY["polish"](RATE).latency() < 0.003
+
+
+def test_chanting_monk_holds_a_note():
+    """Whatever you say comes out on a note: a tone gliding a third ends on one pitch."""
+    t = np.arange(int(RATE * 2.0)) / RATE
+    f = 140 * 2 ** (np.linspace(0, 4, len(t)) / 12)
+    x = (0.2 * np.sin(2 * np.pi * np.cumsum(f) / RATE)).astype(np.float32)
+    chain = VoiceChain()
+    chain.configure(spec_for(**voicefx.PRESETS["Chanting monk"]))
+    y = np.concatenate([chain.process(np.repeat(x[i:i + 480, None], 2, 1), RATE)[:, 0]
+                        for i in range(0, len(x), 480)])
+    assert np.all(np.isfinite(y)) and np.max(np.abs(y)) < 1.5
