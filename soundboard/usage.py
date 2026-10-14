@@ -231,7 +231,7 @@ STEPS = ("added-sound", "played-sound", "sent-to-others",
          # a tab a new user starts without (+ More tabs, Settings > Tabs)
          "added-radio-tab", "added-apps-tab", "added-triggers-tab")
 ROUTES = ("cable", "device", "off", "mic")   # library.ROUTES
-# the Apps tab's own categories (ui/appspanel.py APP_CATEGORIES + "Other"): any other
+# the Apps tab's own categories (ui/approw.py APP_CATEGORIES + "Other"): any other
 # name in Config.apps_categories is one the user made (counted as apps-own-categories)
 APPS_BUILT_IN = ("Browsers", "Music & media", "Calls & chat", "Games", "Other")
 # the feedback box's "What would you improve?" picks (ui/feedbackdialog.py)
