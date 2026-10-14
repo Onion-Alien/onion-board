@@ -15,16 +15,17 @@ from soundboard import directmic, michelper, net, theme, usage
 from soundboard import engine as eng
 from soundboard.i18n import _, ngettext
 from soundboard.ui import busy, icons, sidebar
+from soundboard.ui.controller import Controller
 
 if TYPE_CHECKING:
     from soundboard.ui.mainwindow import MainWindow
 
 
-class StatusControl:
+class StatusControl(Controller):
     """The audio status and the Setup tab's flow of one MainWindow (``mw``)."""
 
     def __init__(self, mw: MainWindow):
-        self.mw = mw
+        super().__init__(mw)
         self._xruns_shown = 0             # drop-out count last told (the "audio" toast)
         self._audio_said = ""             # what that toast says now
         self.virtual_mic: str | None = None
@@ -39,7 +40,7 @@ class StatusControl:
         if c.route == "off":
             mw.setup_hint.setText(_("Sending to others is off: your sounds play in your "
                                       "headphones and on a device set to Clean, for streaming "
-                                      "(Also send to) only."))
+                                      "(Also play on) only."))
         elif c.route == "device" and c.main_device and c.main_device == c.mon_device:
             mw.setup_hint.setText(_("<span style='color:{status}'>That's your headphones too, "
                                       "so nothing is sent (you'd hear everything twice). Pick "
@@ -85,7 +86,7 @@ class StatusControl:
             devices = ", ".join(f"<b>{html.escape(n)}</b>" for n in down)
             mw.setup_hint.setText(
                 mw.setup_hint.text()
-                + _("<br><span style='color:{status}'>Can't open {devices} (under Also send to). "
+                + _("<br><span style='color:{status}'>Can't open {devices} (under Also play on). "
                     "Plugged in? It's tried again by itself.</span>",
                     status=theme.status('warn'), devices=devices))
         mw.setup_hint.setVisible(bool(mw.setup_hint.text()))   # (no empty gap)
@@ -336,6 +337,7 @@ class StatusControl:
             mw._show_bun = False
         effect_on = (mic_route and not mic_busy and not mw.setup_show.on
                      and directmic.works(direct))
+        mw.btn_michange.setVisible(effect_on)
         mw.btn_micredo.setVisible(effect_on)
         mw.btn_micoff.setVisible(effect_on)
         said = mw._done_toast

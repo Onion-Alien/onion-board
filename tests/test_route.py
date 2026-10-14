@@ -252,7 +252,7 @@ def test_also_send_minus_stays_its_own_size(win, monkeypatch, devices, qapp):  #
 
 
 def test_also_send_row_can_be_the_clean_stream_mix(win, monkeypatch, devices):  # noqa: F811
-    """The stream output lives in the Also send to rows: a row set to Clean, for
+    """The stream output lives in the Also play on rows: a row set to Clean, for
     streaming is cfg.obs_device (its volume and voice switch under it), one at a time,
     and back to Same as the call it's a copy again. Sending to nobody, it's the only
     kind a row can be. No separate card in Settings any more."""

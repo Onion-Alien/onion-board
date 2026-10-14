@@ -85,8 +85,8 @@ class StreamerGuide(QDialog):
               "that reads out what the viewer wrote), play a whole category in a row, "
               "make every sound fast or echoey, pick a sound mode or play the radio. "
               "<b>Copy AI prompt</b> has the whole list."),
-            _("<b>Let your stream hear the sounds.</b> Setup → Devices → <b>Also send "
-              "to</b>: add a device set to <b>Clean, for streaming</b>, then add that device "
+            _("<b>Let your stream hear the sounds.</b> Setup → Devices → <b>Also play "
+              "on</b>: add a device set to <b>Clean, for streaming</b>, then add that device "
               "in OBS: Sources → + → "
               "<i>Audio Output Capture</i> (for a virtual cable: an <i>Audio Input "
               "Capture</i> of its Output end). Your sounds get their own volume slider in "

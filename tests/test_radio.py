@@ -1020,7 +1020,10 @@ def test_tab_plays_into_the_engine_and_clips_to_sounds(qapp, tab, server):
     # Radio Browser isn't told what you play unless Settings > Privacy says it may be
     assert not any(h.startswith("/json/url/") for h in server.hits)
     assert tab.cfg.radio["last"]["uuid"] == "uuid-0"
-    assert tab.clip_last() and clips[0][1].startswith("Station 0")
+    tab.btn_rec.click()
+    assert process_events(qapp, lambda: tab.recorder.rec_frames > SR // 2, timeout=15)
+    tab.btn_rec.click()
+    assert clips and clips[0][1].startswith("Station 0")
     tab.btn_live.click()
     assert tab.engine.radio_live
     tab.stop()
@@ -1347,18 +1350,13 @@ def test_tab_radio_volume_zero_is_remembered(qapp, app_dir, server):
         t2.shutdown()
 
 
-def test_last_15s_holds_only_the_station_that_played(qapp, tab, server):
-    a, b = tab._stations["uuid-0"], tab._stations["uuid-3"]
-    a.url = b.url = server.base + "/stream.wav"
-    names = []
-    tab.clip_ready.connect(lambda data, name: names.append(name))
-    tab.play(a)
+def test_radio_keeps_no_replay_buffer(qapp, tab, server):
+    """Only Record saves the radio: nothing holds the last seconds in memory."""
+    s = tab._stations["uuid-0"]
+    s.url = server.base + "/stream.wav"
+    tab.play(s)
     assert process_events(qapp, lambda: sum(map(len, tab.engine.chunks)) > SR, 15)
-    tab.stop()
-    tab.list.setCurrentRow(3)            # browsing to another station afterwards
-    assert tab.clip_last() and names[-1].startswith(a.name)
-    tab.play(b)                          # a different station: its own 15 seconds
-    assert len(tab.recorder.last()) < SR // 2
+    assert tab.recorder.replay is None and len(tab.recorder.last()) == 0
     tab.stop()
 
 

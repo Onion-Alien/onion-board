@@ -18,6 +18,7 @@ from soundboard.i18n import _
 from soundboard.ui import icons, taboff
 from soundboard.ui.appspanel import AppsTab
 from soundboard.ui.buncontrol import BUN_TIP
+from soundboard.ui.controller import Controller
 from soundboard.ui.livedot import set_tab_live
 from soundboard.ui.voicepanel import VoicePanel
 
@@ -39,11 +40,11 @@ TABS = ((_("Sounds"), _("Your sound buttons: click one to play it")),
 TAB_INDEX = {key: i for i, key in enumerate(TAB_KEYS)}
 
 
-class TabControl:
+class TabControl(Controller):
     """The tabs of one MainWindow (``mw``)."""
 
     def __init__(self, mw: MainWindow):
-        self.mw = mw
+        super().__init__(mw)
 
     def _radio_live(self, on: bool):
         mw = self.mw

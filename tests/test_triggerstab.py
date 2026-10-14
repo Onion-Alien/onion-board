@@ -685,6 +685,16 @@ def test_the_board_plays_a_trigger_like_its_pad_and_rings_in_the_headphones():
     assert host.ringing() == [] and not host.play("gone")
 
 
+def test_the_host_hands_triggers_its_categories_in_tab_order():
+    # a trigger's Play + menu lists the board's categories, each with its sounds
+    win = FakeWindow()
+    win.cfg.sounds.append(SoundMeta(id="s2", name="Bruh", file="b.wav", tags=["Memes"]))
+    win.cfg.sounds[0].tags = ["Alerts", "Memes"]
+    win.cfg.categories = ["Memes", "Alerts", "Empty"]
+    assert BoardHost(win).sound_categories() == [
+        ("Memes", ["s1", "s2"]), ("Alerts", ["s1"]), ("Empty", [])]
+
+
 def test_the_host_says_which_trigger_sounds_still_play():
     win = FakeWindow()
     host = BoardHost(win)

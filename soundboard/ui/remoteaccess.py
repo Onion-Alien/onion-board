@@ -14,6 +14,7 @@ from typing import TYPE_CHECKING
 
 from soundboard import errors, remote, theme
 from soundboard.i18n import _
+from soundboard.ui.controller import Controller
 
 if TYPE_CHECKING:
     from soundboard.ui.mainwindow import MainWindow
@@ -21,11 +22,11 @@ if TYPE_CHECKING:
 log = logging.getLogger(__name__)
 
 
-class RemoteAccess:
+class RemoteAccess(Controller):
     """The control API and phone-remote add-ons of one MainWindow (``mw``)."""
 
     def __init__(self, mw: MainWindow):
-        self.mw = mw
+        super().__init__(mw)
         self.remote_addons: list = []   # [(ModuleInfo, add-on or None)], once loaded
 
     def apply_remote(self) -> str:

@@ -176,7 +176,7 @@ def test_rescan_runs_on_the_device_thread(window, monkeypatch, qapp):
 
 
 def test_a_rescan_finding_the_same_devices_keeps_the_rows(window):
-    """Also send to's rows were made again on every re-scan and route redraw: the new
+    """Also play on's rows were made again on every re-scan and route redraw: the new
     boxes showed for a moment before the layout placed them (device names flashed
     over the Devices card)."""
     devices_done(window)

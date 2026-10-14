@@ -28,6 +28,7 @@ from soundboard.i18n import _, ngettext
 from soundboard.library import SoundMeta
 from soundboard.settings import pretty_key
 from soundboard.ui import icons
+from soundboard.ui.controller import Controller
 from soundboard.ui.padbatch import fill_colour_menu
 from soundboard.ui.panel import Flow
 
@@ -46,11 +47,11 @@ class SnugTabBar(QTabBar):
         return QSize(min(m.width(), self.sizeHint().width()), m.height())
 
 
-class CategoryControl:
+class CategoryControl(Controller):
     """The categories of one MainWindow (``mw``)."""
 
     def __init__(self, mw: MainWindow):
-        self.mw = mw
+        super().__init__(mw)
         # Switch category when a program is in front: a cheap look at the window in
         # front each second, only while a rule exists (and runs while the board is hidden)
         self.cat_switch = catswitch.Switcher()
