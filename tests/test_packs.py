@@ -390,3 +390,45 @@ def test_samples_that_cant_be_fetched_take_their_row_away(qapp, served):
         assert process_events(qapp, lambda: not card.listen.isVisibleTo(dlg), 5)
     finally:
         dlg.done(0)
+
+
+def test_samples_still_land_when_the_online_list_remakes_the_cards(qapp, served, monkeypatch):
+    """The online list arriving mid-fetch remakes the cards: the samples land on the new
+    ones, from one fetch (two at once wrote the same .part file and broke both)."""
+    preview = make_preview()
+    p = with_preview(make_pack(), preview)
+    served.files[p["preview"]["url"]] = preview
+    gate, real = threading.Event(), packs.samples
+    fetched = []
+
+    def slow(pack, cancelled=None):
+        fetched.append(pack.id)
+        gate.wait(5)
+        return real(pack, cancelled)
+    monkeypatch.setattr(packs, "samples", slow)
+    dlg = packsdialog.PacksDialog(lambda path: None, fetch_list=False,
+                                  play=lambda d, g: True)
+    try:
+        dlg._show(packs.parse([p]), "")
+        dlg._show(packs.parse([p]), "")   # the online list, while it's still fetching
+        gate.set()
+        card = dlg.cards[0]
+        assert process_events(qapp, lambda: card.samples[0].sample is not None, 5)
+        assert card.listen.isVisibleTo(dlg) and fetched.count("horror") == 1
+        dlg._show(packs.parse([p]), "")   # once more: shown at once, not fetched again
+        assert dlg.cards[0].samples[0].sample is not None and fetched.count("horror") == 1
+    finally:
+        dlg.done(0)
+
+
+def test_two_fetches_of_one_preview_at_once_both_get_its_samples(served):
+    preview = make_preview(("Door", "Dragon"))
+    p, = packs.parse([with_preview(b"x", preview)])
+    served.files[p.preview_url] = preview
+    got = []
+    ts = [threading.Thread(target=lambda: got.append(packs.samples(p))) for _ in range(4)]
+    for t in ts:
+        t.start()
+    for t in ts:
+        t.join(10)
+    assert len(got) == 4 and all([s.name for s in g] == ["Door", "Dragon"] for g in got)
