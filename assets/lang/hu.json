@@ -1820,7 +1820,6 @@
   "GitHub's download check is temporarily unavailable (gateway error). Try Get Onion Watch again in a moment.": "A GitHub letöltési ellenőrzése átmenetileg nem érhető el (átjáróhiba). Próbálja újra a Hagyma óráját egy pillanat múlva.",
   "Got it": "Értem",
   "Growl": "Morgás",
-  "Hear": "Hall",
   "Hear it": "Halld",
   "Helmet": "Sisak",
   "Helmet size": "Sisak mérete",
@@ -3356,5 +3355,6 @@
   "soft": "lágy",
   "warm": "meleg",
   "clean": "tiszta",
+  "This program's last minute as a waveform: pick a bit out of it and keep it as a clip. It only listens while it's open.": "A program utolsó perce hullámformaként: válassz ki belőle egy részt, és tartsd meg klipként. Csak akkor figyel, amikor nyitva van.",
   "Pre-delay": "Előkésleltetés"
 }

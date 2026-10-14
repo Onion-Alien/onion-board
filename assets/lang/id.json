@@ -1779,7 +1779,6 @@
   "GitHub's download check is temporarily unavailable (gateway error). Try Get Onion Watch again in a moment.": "Pemeriksaan unduhan GitHub untuk sementara tidak tersedia (kesalahan gateway). Coba Dapatkan Onion Watch lagi sebentar lagi.",
   "Got it": "Mengerti",
   "Growl": "Menggeram",
-  "Hear": "Mendengar",
   "Hear it": "Dengarkan itu",
   "Helmet": "Helm",
   "Helmet size": "Ukuran helm",
@@ -3281,5 +3280,6 @@
   "soft": "lembut",
   "warm": "hangat",
   "clean": "bersih",
+  "This program's last minute as a waveform: pick a bit out of it and keep it as a clip. It only listens while it's open.": "Satu menit terakhir program ini sebagai gelombang suara: pilih sebagian dan simpan sebagai klip. Hanya mendengarkan selama terbuka.",
   "Pre-delay": "Pra-tunda"
 }

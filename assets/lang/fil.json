@@ -1820,7 +1820,6 @@
   "GitHub's download check is temporarily unavailable (gateway error). Try Get Onion Watch again in a moment.": "Pansamantalang hindi available ang pagsusuri sa pag-download ng GitHub (error sa gateway). Subukang Kumuha muli ng Onion Watch sa ilang sandali.",
   "Got it": "Nakuha ko",
   "Growl": "Ungol",
-  "Hear": "Pakinggan",
   "Hear it": "Pakinggan mo",
   "Helmet": "helmet",
   "Helmet size": "Laki ng helmet",
@@ -3356,5 +3355,6 @@
   "soft": "malambot",
   "warm": "mainit",
   "clean": "malinis",
+  "This program's last minute as a waveform: pick a bit out of it and keep it as a clip. It only listens while it's open.": "Ang huling minuto ng programang ito bilang waveform: pumili ng bahagi nito at itago ito bilang clip. Nakikinig lang ito habang bukas.",
   "Pre-delay": "Pre-delay"
 }

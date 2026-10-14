@@ -1779,7 +1779,6 @@
   "GitHub's download check is temporarily unavailable (gateway error). Try Get Onion Watch again in a moment.": "การตรวจสอบการดาวน์โหลดของ GitHub ไม่สามารถใช้งานได้ชั่วคราว (ข้อผิดพลาดเกตเวย์) ลองรับ Onion Watch อีกครั้งในอีกสักครู่",
   "Got it": "เข้าใจแล้ว",
   "Growl": "คำราม",
-  "Hear": "ได้ยิน",
   "Hear it": "ได้ยินมัน",
   "Helmet": "หมวกนิรภัย",
   "Helmet size": "ขนาดหมวกกันน็อค",
@@ -3281,5 +3280,6 @@
   "soft": "นุ่ม",
   "warm": "อบอุ่น",
   "clean": "สะอาด",
+  "This program's last minute as a waveform: pick a bit out of it and keep it as a clip. It only listens while it's open.": "หนึ่งนาทีล่าสุดของโปรแกรมนี้เป็นรูปคลื่นเสียง: เลือกบางส่วนแล้วเก็บไว้เป็นคลิป มันจะฟังเฉพาะตอนที่เปิดอยู่เท่านั้น",
   "Pre-delay": "พรีดีเลย์"
 }
