@@ -109,7 +109,7 @@ def test_save_then_is_handed_back_once_its_copy_is_written(app_dir, monkeypatch)
 def test_a_failed_write_is_reported(app_dir, monkeypatch):
     def broken(*_a, **_k):
         raise OSError("disk full")
-    monkeypatch.setattr(library.Path, "write_text", broken)
+    monkeypatch.setattr(library.os, "fsync", broken)
     results = []
     s = library.Saver(Config(), done=results.append)
     s.save()

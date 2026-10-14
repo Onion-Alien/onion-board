@@ -903,11 +903,37 @@ def _write_privacy(text: str):
     except OSError:
         pass
     try:
-        tmp = path.with_suffix(".tmp")
-        tmp.write_text(text, encoding="utf-8")
-        tmp.replace(path)
+        atomic_write_text(path, text)
     except OSError:
         log.warning("couldn't save %s", path, exc_info=True)
+
+
+def _durable_tmp(path: Path, text: str) -> Path:
+    """`text` in a new temp file next to `path`, flushed to the disk (fsync) before it
+    returns: renamed over `path` without that, a power cut could leave `path` empty or
+    full of NULs. The temp file is removed if writing it fails."""
+    fd, name = tempfile.mkstemp(prefix=path.name + ".", suffix=".tmp", dir=path.parent)
+    tmp = Path(name)
+    try:
+        with os.fdopen(fd, "w", encoding="utf-8", newline="\n") as f:
+            f.write(text)
+            f.flush()
+            os.fsync(f.fileno())
+    except BaseException:
+        tmp.unlink(missing_ok=True)
+        raise
+    return tmp
+
+
+def atomic_write_text(path: Path, text: str):
+    """Replace `path` with `text` so a crash or power cut leaves the old file or the new
+    one, never a broken one. Raises OSError."""
+    tmp = _durable_tmp(Path(path), text)
+    try:
+        _replace(tmp, Path(path))
+    except BaseException:
+        tmp.unlink(missing_ok=True)
+        raise
 
 
 def _replace(tmp: Path, path: Path, tries: int = 6):
@@ -949,15 +975,18 @@ def _write(snap: tuple[int, dict, str]) -> bool:
                 damaged = True
             except OSError:
                 pass
-            tmp = CONFIG_PATH.with_suffix(".tmp")
-            tmp.write_text(text, encoding="utf-8")
-            if CONFIG_PATH.exists() and not damaged and _rotate_due():
-                try:
-                    _rotate_backups()
-                    _rotated[CONFIG_PATH] = time.monotonic()
-                except OSError:   # a backup locked for a moment mustn't block the save
-                    log.warning("couldn't rotate the config backups", exc_info=True)
-            _replace(tmp, CONFIG_PATH)
+            tmp = _durable_tmp(CONFIG_PATH, text)
+            try:
+                if CONFIG_PATH.exists() and not damaged and _rotate_due():
+                    try:
+                        _rotate_backups()
+                        _rotated[CONFIG_PATH] = time.monotonic()
+                    except OSError:   # a backup locked for a moment mustn't block the save
+                        log.warning("couldn't rotate the config backups", exc_info=True)
+                _replace(tmp, CONFIG_PATH)
+            except BaseException:
+                tmp.unlink(missing_ok=True)
+                raise
             _written_seq = seq
             return True
         except OSError:

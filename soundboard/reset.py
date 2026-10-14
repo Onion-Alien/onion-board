@@ -388,11 +388,12 @@ def _new_point(label: str, parts: list[str], cfg: Config, keep: str = "") -> Poi
     point = Point(f"{time.strftime('%Y%m%d-%H%M%S')}-{uuid.uuid4().hex[:6]}", time.time(),
                   label, list(parts))
     point.path.mkdir(parents=True)
-    (point.path / "config.json").write_text(json.dumps(cfg.to_raw(), indent=2),
-                                            encoding="utf-8")
-    (point.path / "point.json").write_text(
-        json.dumps({"when": point.when, "label": label, "parts": point.parts}),
-        encoding="utf-8")
+    # on the disk before an older point is removed below
+    library.atomic_write_text(point.path / "config.json",
+                              json.dumps(cfg.to_raw(), indent=2))
+    library.atomic_write_text(
+        point.path / "point.json",
+        json.dumps({"when": point.when, "label": label, "parts": point.parts}))
     for old in [p for p in points() if p.id not in (point.id, keep)][MAX_POINTS - 1:]:
         _remove(old.path)
     return point
