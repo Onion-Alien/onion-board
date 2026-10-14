@@ -282,7 +282,6 @@
   "Opened your sounds folder": "आपका साउंड फ़ोल्डर खोल दिया",
   "Others hear it": "दूसरे सुनते हैं",
   "Overlap: every press plays a new copy": "ओवरलैप: हर बार दबाने पर नई कॉपी चलती है",
-  "Pad size": "पैड साइज़",
   "Page {value} of {n}": "पेज {value} / {n}",
   "Paste a YouTube or TikTok link into the search box to add its sound as a pad.": "किसी YouTube या TikTok लिंक को सर्च बॉक्स में पेस्ट करें, उसका साउंड पैड बन जाएगा।",
   "Pause": "पॉज़",
@@ -2622,7 +2621,6 @@
   "Offer to set up for new apps": "नए ऐप्स के लिए सेटअप करने की पेशकश करें",
   "One line each: many more sounds on the screen": "प्रत्येक पंक्ति: स्क्रीन पर कई और ध्वनियाँ",
   "Order and view": "ऑर्डर करें और देखें",
-  "Pads": "पैड",
   "Save as sound": "ध्वनि के रूप में सहेजें",
   "Set up": "स्थापित करना",
   "Set up for the app you're using": "आप जिस ऐप का उपयोग कर रहे हैं उसके लिए सेट अप करें",
@@ -3401,5 +3399,11 @@
   "Drag: move him. Scroll: bigger or smaller. Hover for the buttons.": "खींचें: उसे हिलाएँ। स्क्रॉल: बड़ा या छोटा। बटन के लिए उस पर माउस ले जाएँ।",
   "Open the full board": "पूरा बोर्ड खोलें",
   "Turn into Bun": "Bun बन जाएँ",
-  "Turn into Bun: a small Bun floating on top instead of this window. The button under him brings it back.": "Bun बन जाएँ: इस विंडो की जगह सबसे ऊपर तैरता एक छोटा Bun। उसके नीचे वाला बटन इसे वापस लाता है।"
+  "Turn into Bun: a small Bun floating on top instead of this window. The button under him brings it back.": "Bun बन जाएँ: इस विंडो की जगह सबसे ऊपर तैरता एक छोटा Bun। उसके नीचे वाला बटन इसे वापस लाता है।",
+  "Row size": "पंक्ति का आकार",
+  "How tall the rows in the list are": "सूची की पंक्तियाँ कितनी ऊँची हों",
+  "Small": "छोटा",
+  "Medium": "मध्यम",
+  "Large": "बड़ा",
+  "Cards": "कार्ड"
 }

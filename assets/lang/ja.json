@@ -276,7 +276,6 @@
   "Opened your sounds folder": "サウンドフォルダーを開きました",
   "Others hear it": "相手に聞こえる",
   "Overlap: every press plays a new copy": "重ねる：押すたびに新しく再生",
-  "Pad size": "パッドのサイズ",
   "Page {value} of {n}": "{value} / {n} ページ",
   "Paste a YouTube or TikTok link into the search box to add its sound as a pad.": "YouTube や TikTok のリンクを検索欄に貼り付けると、その音をパッドとして追加できます。",
   "Pause": "一時停止",
@@ -2563,7 +2562,6 @@
   "Offer to set up for new apps": "新しいアプリのセットアップを提案する",
   "One line each: many more sounds on the screen": "それぞれ 1 行: 画面上にさらに多くのサウンドが表示されます",
   "Order and view": "注文して見る",
-  "Pads": "パッド",
   "Save as sound": "サウンドとして保存",
   "Set up": "設定",
   "Set up for the app you're using": "使用しているアプリに合わせて設定する",
@@ -3325,5 +3323,11 @@
   "Drag: move him. Scroll: bigger or smaller. Hover for the buttons.": "ドラッグ: 移動。スクロール: 大きく・小さく。マウスを乗せるとボタンが出ます。",
   "Open the full board": "ボード全体を開く",
   "Turn into Bun": "Bun に変身",
-  "Turn into Bun: a small Bun floating on top instead of this window. The button under him brings it back.": "Bun に変身: このウィンドウの代わりに小さな Bun が最前面に浮かびます。下のボタンで元に戻ります。"
+  "Turn into Bun: a small Bun floating on top instead of this window. The button under him brings it back.": "Bun に変身: このウィンドウの代わりに小さな Bun が最前面に浮かびます。下のボタンで元に戻ります。",
+  "Row size": "行のサイズ",
+  "How tall the rows in the list are": "リストの行の高さ",
+  "Small": "小",
+  "Medium": "中",
+  "Large": "大",
+  "Cards": "カード"
 }

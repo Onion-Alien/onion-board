@@ -260,7 +260,6 @@
   "Opened the folder with the log in it.": "Открыта папка с журналом.",
   "Opened your sounds folder": "Папка звуков открыта",
   "Others hear it": "Слышат другие",
-  "Pad size": "Размер кнопок",
   "Page {value} of {n}": "Страница {value} из {n}",
   "Paste a YouTube or TikTok link into the search box to add its sound as a pad.": "Вставь ссылку YouTube или TikTok в поле поиска, чтобы добавить её звук кнопкой.",
   "Pause": "Пауза",
@@ -2579,7 +2578,6 @@
   "Offer to set up for new apps": "Предложение настроить новые приложения",
   "One line each: many more sounds on the screen": "По одной строке: еще больше звуков на экране",
   "Order and view": "Заказать и посмотреть",
-  "Pads": "Колодки",
   "Save as sound": "Сохранить как звук",
   "Set up": "Настраивать",
   "Set up for the app you're using": "Настройте приложение, которое вы используете",
@@ -3477,5 +3475,11 @@
   "Drag: move him. Scroll: bigger or smaller. Hover for the buttons.": "Перетащить: подвинуть. Колесо: больше или меньше. Наведи мышь, чтобы увидеть кнопки.",
   "Open the full board": "Открыть весь борд",
   "Turn into Bun": "Превратиться в Bun",
-  "Turn into Bun: a small Bun floating on top instead of this window. The button under him brings it back.": "Превратиться в Bun: маленький Bun парит поверх всего вместо этого окна. Кнопка под ним возвращает окно."
+  "Turn into Bun: a small Bun floating on top instead of this window. The button under him brings it back.": "Превратиться в Bun: маленький Bun парит поверх всего вместо этого окна. Кнопка под ним возвращает окно.",
+  "Row size": "Размер строк",
+  "How tall the rows in the list are": "Высота строк в списке",
+  "Small": "Маленький",
+  "Medium": "Средний",
+  "Large": "Большой",
+  "Cards": "Карточки"
 }

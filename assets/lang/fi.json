@@ -778,7 +778,6 @@
   "Overlap: every press plays a new copy": "Päällekkäin: jokainen painallus soittaa uuden kopion",
   "Overlay": "Overlay",
   "Overlay hotkey": "Overlayn pikanäppäin",
-  "Pad size": "Napin koko",
   "Page {value} of {n}": "Sivu {value}/{n}",
   "Panic mute": "Paniikkimykistys",
   "Paste a YouTube or TikTok link into the search box to add its sound as a pad.": "Liitä YouTube- tai TikTok-linkki hakukenttään lisätäksesi sen äänen napiksi.",
@@ -2622,7 +2621,6 @@
   "Offer to set up for new apps": "Tarjoa uusien sovellusten käyttöönottoa",
   "One line each: many more sounds on the screen": "Yksi rivi kukin: paljon enemmän ääniä näytöllä",
   "Order and view": "Tilaa ja katso",
-  "Pads": "Pehmusteet",
   "Save as sound": "Tallenna äänenä",
   "Set up": "Määritä",
   "Set up for the app you're using": "Määritä käyttämäsi sovellus",
@@ -3401,5 +3399,11 @@
   "Drag: move him. Scroll: bigger or smaller. Hover for the buttons.": "Vedä: siirrä häntä. Rulla: isompi tai pienempi. Vie hiiri päälle, niin näet napit.",
   "Open the full board": "Avaa koko board",
   "Turn into Bun": "Muutu Buniksi",
-  "Turn into Bun: a small Bun floating on top instead of this window. The button under him brings it back.": "Muutu Buniksi: pieni Bun leijuu päällimmäisenä tämän ikkunan tilalla. Hänen alla oleva nappi tuo sen takaisin."
+  "Turn into Bun: a small Bun floating on top instead of this window. The button under him brings it back.": "Muutu Buniksi: pieni Bun leijuu päällimmäisenä tämän ikkunan tilalla. Hänen alla oleva nappi tuo sen takaisin.",
+  "Row size": "Rivien koko",
+  "How tall the rows in the list are": "Kuinka korkeita luettelon rivit ovat",
+  "Small": "Pieni",
+  "Medium": "Keskikokoinen",
+  "Large": "Suuri",
+  "Cards": "Kortit"
 }

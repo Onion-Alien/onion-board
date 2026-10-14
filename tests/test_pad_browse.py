@@ -11,7 +11,7 @@ from PySide6.QtGui import QWheelEvent
 from soundboard import library
 from soundboard.library import Config, SoundMeta, sorted_sounds
 from soundboard.speech import tts
-from soundboard.ui.widgets import PAD_SHRINK, SLIM_PAD_H, Pad, pad_height
+from soundboard.ui.widgets import LIST_ROW_H, PAD_SHRINK, SLIM_PAD_H, Pad, pad_height
 from test_mainwindow import window as main_window  # noqa: F401  (the real MainWindow)
 from tests.conftest import process_events
 
@@ -115,9 +115,9 @@ def test_view_menu_lists_orders_and_views(window):
     menu = w.btn_view.menu()
     w._fill_view_menu(menu)
     names = [a.text() for a in menu.actions() if a.text()]
-    assert names == ["My order", "A–Z", "Newest", "Most played", "Pads", "List"]
+    assert names == ["My order", "A–Z", "Newest", "Most played", "Cards", "List"]
     checked = [a.text() for a in menu.actions() if a.isChecked()]
-    assert checked == ["My order", "Pads"]
+    assert checked == ["My order", "Cards"]
 
 
 def test_list_view_rows_in_columns(window):
@@ -134,6 +134,37 @@ def test_list_view_rows_in_columns(window):
     assert not w.grid.listed
     # as tall as the picked size, however much the row stretches or squeezes it
     assert pad.height() == pad_height(min(w.grid.pad_w, round(pad.width() / PAD_SHRINK)))
+
+
+def test_list_view_swaps_card_size_for_row_size(window):
+    """Card size does nothing to the list's rows: there it's a Small / Medium / Large
+    row size instead, kept apart from the cards' size."""
+    w = window
+    w.resize(1500, 800)
+    w.grid.resize(900, 600)
+    w.set_pad_view("list")
+    assert all(x.isHidden() for x in w._pad_size)
+    assert not any(x.isHidden() for x in w._row_size)
+    assert w.btn_rows.text() == "Medium"
+    pad = w.pads["s0"]
+    for size in ("small", "large", "medium"):
+        w.set_list_rows(size)
+        assert w.cfg.list_rows == size and pad.height() == LIST_ROW_H[size]
+    w.set_list_rows("huge")   # not a size: nothing changes
+    assert w.cfg.list_rows == "medium"
+    w._fill_rows_menu(w.btn_rows.menu())
+    assert [a.text() for a in w.btn_rows.menu().actions() if a.isChecked()] == ["Medium"]
+    w.set_pad_view("grid")
+    assert not any(x.isHidden() for x in w._pad_size)
+    assert all(x.isHidden() for x in w._row_size)
+    w._fit_size_picker(True)   # a narrow window: neither
+    assert all(x.isHidden() for x in (*w._pad_size, *w._row_size))
+    w._fit_size_picker(False)
+
+
+def test_a_newer_row_size_loads_as_medium():
+    assert library.clean_setting("list_rows", "giant") == "medium"
+    assert library.clean_setting("list_rows", "small") == "small"
 
 
 def test_list_view_survives_the_mini_player(window):

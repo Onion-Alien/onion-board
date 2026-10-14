@@ -288,7 +288,6 @@
   "Opened your sounds folder": "Otwarto folder dźwięków",
   "Others hear it": "Inni to słyszą",
   "Overlap: every press plays a new copy": "Nakładanie: każde naciśnięcie gra nową kopię",
-  "Pad size": "Rozmiar padów",
   "Page {value} of {n}": "Strona {value} z {n}",
   "Paste a YouTube or TikTok link into the search box to add its sound as a pad.": "Wklej link z YouTube lub TikToka do pola wyszukiwania, by dodać jego dźwięk jako pad.",
   "Pause": "Pauza",
@@ -2681,7 +2680,6 @@
   "Offer to set up for new apps": "Zaproponuj skonfigurowanie nowych aplikacji",
   "One line each: many more sounds on the screen": "Jedna linia w każdym: o wiele więcej dźwięków na ekranie",
   "Order and view": "Zamów i obejrzyj",
-  "Pads": "Naramienniki",
   "Save as sound": "Zapisz jako dźwięk",
   "Set up": "Organizować coś",
   "Set up for the app you're using": "Skonfiguruj aplikację, której używasz",
@@ -3477,5 +3475,11 @@
   "Drag: move him. Scroll: bigger or smaller. Hover for the buttons.": "Przeciągnij: przesuń go. Kółko: większy lub mniejszy. Najedź na niego, żeby zobaczyć przyciski.",
   "Open the full board": "Otwórz cały board",
   "Turn into Bun": "Zamień się w Buna",
-  "Turn into Bun: a small Bun floating on top instead of this window. The button under him brings it back.": "Zamień się w Buna: mały Bun unoszący się na wierzchu zamiast tego okna. Przycisk pod nim przywraca okno."
+  "Turn into Bun: a small Bun floating on top instead of this window. The button under him brings it back.": "Zamień się w Buna: mały Bun unoszący się na wierzchu zamiast tego okna. Przycisk pod nim przywraca okno.",
+  "Row size": "Rozmiar wierszy",
+  "How tall the rows in the list are": "Wysokość wierszy na liście",
+  "Small": "Mały",
+  "Medium": "Średni",
+  "Large": "Duży",
+  "Cards": "Karty"
 }

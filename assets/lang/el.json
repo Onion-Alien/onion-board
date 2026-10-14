@@ -778,7 +778,6 @@
   "Overlap: every press plays a new copy": "Επικάλυψη ήχων: κάθε πάτημα παίζει νέο αντίγραφο",
   "Overlay": "Επικάλυψη",
   "Overlay hotkey": "Συντόμευση επικάλυψης",
-  "Pad size": "Μέγεθος κουμπιών",
   "Page {value} of {n}": "Σελίδα {value} από {n}",
   "Panic mute": "Σίγαση πανικού",
   "Paste a YouTube or TikTok link into the search box to add its sound as a pad.": "Επικόλλησε ένα link YouTube ή TikTok στο πεδίο αναζήτησης για να προσθέσεις τον ήχο του ως κουμπί.",
@@ -2622,7 +2621,6 @@
   "Offer to set up for new apps": "Προσφορά για ρύθμιση για νέες εφαρμογές",
   "One line each: many more sounds on the screen": "Μία γραμμή η καθεμία: πολλοί περισσότεροι ήχοι στην οθόνη",
   "Order and view": "Παραγγελία και προβολή",
-  "Pads": "Επιθέματα",
   "Save as sound": "Αποθήκευση ως ήχος",
   "Set up": "Στήνω",
   "Set up for the app you're using": "Ρύθμιση για την εφαρμογή που χρησιμοποιείτε",
@@ -3401,5 +3399,11 @@
   "Drag: move him. Scroll: bigger or smaller. Hover for the buttons.": "Σύρε: μετακίνησέ τον. Ροδέλα: μεγαλύτερος ή μικρότερος. Πέρνα το ποντίκι από πάνω για τα κουμπιά.",
   "Open the full board": "Άνοιγμα ολόκληρου του board",
   "Turn into Bun": "Γίνε Bun",
-  "Turn into Bun: a small Bun floating on top instead of this window. The button under him brings it back.": "Γίνε Bun: ένας μικρός Bun που αιωρείται από πάνω αντί γι' αυτό το παράθυρο. Το κουμπί από κάτω του το φέρνει πίσω."
+  "Turn into Bun: a small Bun floating on top instead of this window. The button under him brings it back.": "Γίνε Bun: ένας μικρός Bun που αιωρείται από πάνω αντί γι' αυτό το παράθυρο. Το κουμπί από κάτω του το φέρνει πίσω.",
+  "Row size": "Μέγεθος γραμμών",
+  "How tall the rows in the list are": "Πόσο ψηλές είναι οι γραμμές της λίστας",
+  "Small": "Μικρό",
+  "Medium": "Μεσαίο",
+  "Large": "Μεγάλο",
+  "Cards": "Κάρτες"
 }

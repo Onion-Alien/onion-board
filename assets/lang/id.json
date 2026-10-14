@@ -276,7 +276,6 @@
   "Opened your sounds folder": "Folder suaramu sudah dibuka",
   "Others hear it": "Orang lain dengar",
   "Overlap: every press plays a new copy": "Tumpuk: tiap tekan memutar salinan baru",
-  "Pad size": "Ukuran pad",
   "Page {value} of {n}": "Halaman {value} dari {n}",
   "Paste a YouTube or TikTok link into the search box to add its sound as a pad.": "Tempel link YouTube atau TikTok ke kotak pencarian untuk menambahkan suaranya sebagai pad.",
   "Pause": "Jeda",
@@ -2563,7 +2562,6 @@
   "Offer to set up for new apps": "Tawarkan untuk menyiapkan aplikasi baru",
   "One line each: many more sounds on the screen": "Masing-masing satu baris: lebih banyak suara di layar",
   "Order and view": "Pesan dan lihat",
-  "Pads": "Bantalan",
   "Save as sound": "Simpan sebagai suara",
   "Set up": "Mendirikan",
   "Set up for the app you're using": "Siapkan aplikasi yang Anda gunakan",
@@ -3325,5 +3323,11 @@
   "Drag: move him. Scroll: bigger or smaller. Hover for the buttons.": "Seret: pindahkan dia. Gulir: lebih besar atau lebih kecil. Arahkan kursor untuk tombolnya.",
   "Open the full board": "Buka board penuh",
   "Turn into Bun": "Jadi Bun",
-  "Turn into Bun: a small Bun floating on top instead of this window. The button under him brings it back.": "Jadi Bun: Bun kecil melayang di atas menggantikan jendela ini. Tombol di bawahnya mengembalikannya."
+  "Turn into Bun: a small Bun floating on top instead of this window. The button under him brings it back.": "Jadi Bun: Bun kecil melayang di atas menggantikan jendela ini. Tombol di bawahnya mengembalikannya.",
+  "Row size": "Ukuran baris",
+  "How tall the rows in the list are": "Seberapa tinggi baris dalam daftar",
+  "Small": "Kecil",
+  "Medium": "Sedang",
+  "Large": "Besar",
+  "Cards": "Kartu"
 }

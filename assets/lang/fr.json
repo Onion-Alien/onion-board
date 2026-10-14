@@ -282,7 +282,6 @@
   "Opened your sounds folder": "Dossier des sons ouvert",
   "Others hear it": "Les autres l'entendent",
   "Overlap: every press plays a new copy": "Superposer: chaque appui joue une nouvelle copie",
-  "Pad size": "Taille des pads",
   "Page {value} of {n}": "Page {value} sur {n}",
   "Paste a YouTube or TikTok link into the search box to add its sound as a pad.": "Colle un lien YouTube ou TikTok dans la barre de recherche pour ajouter son son en pad.",
   "Pause": "Pause",
@@ -2622,7 +2621,6 @@
   "Offer to set up for new apps": "Offre de configuration pour de nouvelles applications",
   "One line each: many more sounds on the screen": "Une ligne chacun : beaucoup plus de sons à l'écran",
   "Order and view": "Commander et consulter",
-  "Pads": "Coussinets",
   "Save as sound": "Enregistrer sous son",
   "Set up": "Installation",
   "Set up for the app you're using": "Configurer pour l'application que vous utilisez",
@@ -3401,5 +3399,11 @@
   "Drag: move him. Scroll: bigger or smaller. Hover for the buttons.": "Glisser : le déplacer. Molette : plus grand ou plus petit. Survole-le pour les boutons.",
   "Open the full board": "Ouvrir le board en entier",
   "Turn into Bun": "Se transformer en Bun",
-  "Turn into Bun: a small Bun floating on top instead of this window. The button under him brings it back.": "Se transformer en Bun : un petit Bun qui flotte par-dessus tout à la place de cette fenêtre. Le bouton sous lui la ramène."
+  "Turn into Bun: a small Bun floating on top instead of this window. The button under him brings it back.": "Se transformer en Bun : un petit Bun qui flotte par-dessus tout à la place de cette fenêtre. Le bouton sous lui la ramène.",
+  "Row size": "Taille des lignes",
+  "How tall the rows in the list are": "Hauteur des lignes de la liste",
+  "Small": "Petite",
+  "Medium": "Moyenne",
+  "Large": "Grande",
+  "Cards": "Cartes"
 }
