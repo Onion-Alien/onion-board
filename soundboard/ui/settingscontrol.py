@@ -26,6 +26,7 @@ if TYPE_CHECKING:
     from soundboard.ui.mainwindow import MainWindow
 
 SETTINGS_ROOM = QSize(480, 520)   # what Settings opened from the mini player grows it to
+REBUILD_MS = 2000   # after a Settings that can't be kept closes, a new one is made ahead
 
 
 def _holds_focus(w: QWidget) -> bool:
@@ -165,6 +166,9 @@ class SettingsControl(Controller):
                 QTimer.singleShot(0, lambda: free_dialog(old))
         else:   # freed once its finished signal is over (deleting it inside that crashed)
             QTimer.singleShot(0, lambda: free_dialog(dlg))
+            # a page with live state was shown: built again while nothing's going on, or
+            # every later open built Settings from scratch (80-140 ms, seconds on a busy PC)
+            QTimer.singleShot(REBUILD_MS, self._prebuild_settings)
         mw.hkctl.register_hotkeys()   # in case a capture was cancelled
         self._check_route_pick()
 
@@ -228,20 +232,28 @@ class SettingsControl(Controller):
         built now, so even the first click of the cog or Edit opens at once (each took
         100-300 ms to build); Settings' other pages follow one at a time once it's up."""
         mw = self.mw
-        if self._settings_dlg is None and self._settings_kept is None:
-            dlg = SettingsDialog(mw, "privacy", lazy=True)
-            dlg.hide()
-            dlg.finished.connect(lambda _r, d=dlg: self._settings_closed(d))
-            _polish(dlg, mw._content.size())
-            self._settings_kept, self._settings_kept_print = dlg, self._settings_print()
-            self._preload_pages = [i for i, k in enumerate(dlg._page_keys)
-                                   if i in dlg._unbuilt and k not in mw.SETTINGS_LIVE_PAGES]
-            QTimer.singleShot(1500, self._preload_next_page)
+        self._prebuild_settings()
         if self._spare_editor is None and mw.cfg.sounds:
             d = mw.editctl._new_editor(mw.cfg.sounds[0], "sound")
             d.hide()
             _polish(d)
             self._spare_editor = d
+
+    def _prebuild_settings(self):
+        """A closed Settings made ahead (its first page now, the rest one at a time),
+        unless one is up or kept already, or the window is going."""
+        mw = self.mw
+        if (self._settings_dlg is not None or self._settings_kept is not None
+                or getattr(mw, "_quitting", False) or not qt_valid(mw)):
+            return
+        dlg = SettingsDialog(mw, "privacy", lazy=True)
+        dlg.hide()
+        dlg.finished.connect(lambda _r, d=dlg: self._settings_closed(d))
+        _polish(dlg, mw._content.size())
+        self._settings_kept, self._settings_kept_print = dlg, self._settings_print()
+        self._preload_pages = [i for i, k in enumerate(dlg._page_keys)
+                               if i in dlg._unbuilt and k not in mw.SETTINGS_LIVE_PAGES]
+        QTimer.singleShot(1500, self._preload_next_page)
 
     def warm_settings(self):
         """Still behind the loading screen, the window up: the kept Settings goes in

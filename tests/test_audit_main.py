@@ -2,6 +2,7 @@
 switch, start with Windows vs Task Manager, the status line's text, hotkeys and
 categories, the effects preview, the crash dialog's state, loose empty files, the
 link bar's queue and the Discord check's clean-up. Offscreen, fake devices."""
+import os
 import numpy as np
 import pytest
 import shiboken6
@@ -389,3 +390,36 @@ def test_settings_and_edit_built_behind_the_loading_screen(window, qapp):
     assert d is spare and d.meta is window.meta(sid) and d.name.text() == window.meta(sid).name
     d.reject()
     qapp.processEvents()
+
+
+def test_settings_made_ahead_again_after_a_page_it_cant_keep(window, qapp, monkeypatch):
+    """About (or Updates, Help...) shows live state, so that Settings isn't kept when it
+    closes: a new one is made ahead while nothing's going on, and the next open of the
+    cog builds nothing (it rebuilt all of Settings each time: 80-140 ms, seconds on a
+    busy PC)."""
+    import time
+    from tests.conftest import process_events
+    from soundboard.ui import settingscontrol
+    monkeypatch.setattr(settingscontrol, "REBUILD_MS", 0, raising=False)
+    sc = window.setctl
+    sc.preload_dialogs()
+    window.show()
+    qapp.processEvents()
+    first = sc._settings_kept
+    assert sc.open_settings("about") is first
+    sc.close_settings()
+    assert process_events(qapp, lambda: sc._settings_kept not in (None, first), timeout=5)
+    kept = sc._settings_kept
+    made = []
+    real = settingscontrol.SettingsDialog
+    monkeypatch.setattr(settingscontrol, "SettingsDialog",
+                        lambda *a, **k: made.append(a) or real(*a, **k))
+    t0 = time.perf_counter()
+    assert sc.open_settings() is kept and sc.settings_open()
+    ms = (time.perf_counter() - t0) * 1000
+    assert not made
+    sc.close_settings()
+    qapp.processEvents()
+    assert sc._settings_kept is kept   # nothing live shown: kept as it was
+    if not os.environ.get("CI"):   # (wall clock: hosted runners stall on their own)
+        assert ms < 100, f"opening the made-ahead Settings took {ms:.0f} ms"
