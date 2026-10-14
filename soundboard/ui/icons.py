@@ -806,11 +806,14 @@ SHAPES = {
 
 # --------------------------------------------------------------------------- painting
 
-def pixmap(name: str, size: int, color: str) -> QPixmap:
-    pm = QPixmap(size, size)
+def pixmap(name: str, size: int, color: str, dy: float = 0.0) -> QPixmap:
+    """`dy`: drawn that fraction of a pixel lower, in a picture a pixel taller (to put
+    a picture's middle on a line between two screen pixels: SettingsDialog's heading)."""
+    pm = QPixmap(size, size + (1 if dy else 0))
     pm.fill(Qt.GlobalColor.transparent)
     p = QPainter(pm)
     p.setRenderHint(QPainter.RenderHint.Antialiasing)
+    p.translate(0, dy)
     p.scale(size / 24, size / 24)
     col = QColor(color)
     pen = QPen(col, 2.0)
@@ -901,15 +904,18 @@ def sharp_icon(draw) -> QIcon:
 _cache: dict[tuple, QIcon] = {}
 
 
+def resolve(c: str) -> str:
+    """A theme token's colour (a literal colour as it is)."""
+    # an icon is drawn on the window or a card, never on an accent fill (that's
+    # on_accent): the accent's readable shade there (Flashbang's yellow on white)
+    return theme.T.get("accent_text" if c == "accent" else c, c)
+
+
 def icon(name: str, color: str | None = None, checked_color: str | None = None,
          selected: str = "accent", pad: int = 0) -> QIcon:
     """`color`/`checked_color` are theme token names (e.g. "text", "on_accent") or
     literal colours ("#ff4d4f"). `selected` colours the current tab / a highlighted
     list item (accent, not Qt's washed-out tint)."""
-    def resolve(c: str) -> str:
-        # an icon is drawn on the window or a card, never on an accent fill (that's
-        # on_accent): the accent's readable shade there (Flashbang's yellow on white)
-        return theme.T.get("accent_text" if c == "accent" else c, c)
     normal = resolve(color or "text")
     on = resolve(checked_color or "on_accent")
     sel = resolve(selected)
