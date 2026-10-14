@@ -64,6 +64,16 @@ class DropdownMenu(QMenu):
             self.move(self.x(), new_y)
 
 
+class WindowRoot(QWidget):
+    """The main window's page: it paints the theme's window background itself (flat, or
+    the Textured accent glow), the same picture opaque widgets copy (PadGrid)."""
+
+    def paintEvent(self, e):
+        p = QPainter(self)
+        theme.paint_window_bg(p, e.rect(), QPointF(0, 0), self.width(), self.height())
+        p.end()
+
+
 class Meter(QWidget):
     def __init__(self, parent=None):
         super().__init__(parent)
@@ -1239,7 +1249,6 @@ class PadGrid(QWidget):
                    _("drop one on me!"), _("just one sound?"), _("I'm bored…")),
             hope_lines=(_("yes! drop it!"), _("ooh, for me?!")),
             joy_lines=(_("yay!!"), _("↑ Add sounds!"), _("hehe!")), pong=True, naps=True)
-        self.bun.setToolTip(_("Bun is waiting for some sounds"))
         ev.addWidget(self.bun, 0, Qt.AlignmentFlag.AlignHCenter)
         self.empty_text = QLabel(self.HOW_TO)
         # short lines: fits the mini player

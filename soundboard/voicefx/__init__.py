@@ -161,6 +161,12 @@ class VoiceChain:
         self._spec: dict = {}
         self._effects: tuple[Effect, ...] = ()
         self._rate = 0
+        # Only the audio thread builds the effects (process). The UI thread posts a new
+        # spec and bumps _gen; process() rebuilds when _gen moved past _built. (Built on
+        # both threads, the UI could install effects made for the mic's old rate, which
+        # process() then never rebuilt, or undo the mic thread's bypass of a broken one.)
+        self._gen = 0
+        self._built = 0
         self.tap: Callable[[np.ndarray, int], None] | None = None
         self.replace = False
         self.source = None
@@ -168,14 +174,15 @@ class VoiceChain:
 
     # ------------------------------------------------------------ UI thread
     def configure(self, spec: dict):
-        self._spec = spec or {}
-        self.enabled = bool(self._spec.get("enabled"))
-        self._rebuild(self._rate)
+        """Post new settings: the next mic block (process) builds the effects for them."""
+        spec = spec or {}
+        self._spec = spec   # first the spec, then the bump: process() never misses it
+        self.enabled = bool(spec.get("enabled"))
+        self._gen += 1
 
     def _rebuild(self, rate: int):
+        """(Audio thread, in process.) The effects the spec asks for, made for `rate`."""
         if not rate:
-            # no mic block yet: effects need the rate, so process() builds them on the
-            # first block (building now could fail and bypass them for good)
             self._effects = ()
             return
         wanted = self._spec.get("effects", {})
@@ -230,7 +237,7 @@ class VoiceChain:
 
     def clear_errors(self):
         self.errors.clear()
-        self._rebuild(self._rate)
+        self._gen += 1   # the next mic block gives the bypassed effects another go
 
     def render(self, mono: np.ndarray, rate: int, block: int = 1024) -> np.ndarray:
         """A whole clip (the computer voice's line) through the voice changer, with its
@@ -287,8 +294,10 @@ class VoiceChain:
             # block's level or last sample and would fail on it, which bypasses them
             # for good (a changed voice would turn back into yours mid-call)
             return np.zeros((0, 2), np.float32)
-        if rate != self._rate:          # first block, or the mic changed rate
-            self._rate = rate
+        gen = self._gen
+        if rate != self._rate or gen != self._built:   # first block, new rate or settings
+            # (the bump is read before the spec: a configure meanwhile rebuilds next block)
+            self._rate, self._built = rate, gen
             self._rebuild(rate)
         tap, replace, src = self.tap, self.replace, self.source
         effects = self._effects if self.enabled else ()

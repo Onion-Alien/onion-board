@@ -21,6 +21,7 @@ from typing import Any
 from PySide6.QtCore import QEvent, QObject, Qt, QTimer, QUrl, Signal, Slot
 from PySide6.QtGui import QDesktopServices, QIcon, QKeyEvent
 from PySide6.QtWidgets import QApplication, QWidget
+from shiboken6 import isValid as qt_valid
 
 from soundboard import errors
 from soundboard.i18n import _
@@ -241,23 +242,26 @@ def _the_carrier() -> _Carrier:
         return _carrier
 
 
-def _emit_now(signal, args) -> bool:
+def _emit_now(signal, args, owner=None) -> bool:
+    if owner is not None and not qt_valid(owner):
+        return False
     try:
         signal.emit(*args)
         return True
-    except RuntimeError:   # "Signal source has been deleted"
+    except (RuntimeError, TypeError):   # "Signal source has been deleted"
         return False
 
 
-def emit(signal, *args) -> bool:
+def emit(signal, *args, owner=None) -> bool:
     """From a worker thread: hand a result to the widget that started it, unless that
-    widget was deleted meanwhile (its tab switched off in Settings > Tabs, the app
-    closing). It's emitted on the UI thread, so the widget can't be freed under it;
-    False when it's gone (known at once on the UI thread, else True)."""
+    widget (or ``owner``, when the signal is on a helper object) was deleted meanwhile
+    (its tab switched off in Settings > Tabs, the app closing). It's emitted on the UI
+    thread, so the widget can't be freed under it; False when it's gone (known at once
+    on the UI thread, else True)."""
     if threading.current_thread() is threading.main_thread():
-        return _emit_now(signal, args)
+        return _emit_now(signal, args, owner)
     try:
-        _the_carrier().call.emit(lambda: _emit_now(signal, args))
+        _the_carrier().call.emit(lambda: _emit_now(signal, args, owner))
     except (RuntimeError, AttributeError):   # app closing: the carrier (or the app) is gone
         _forget_carrier()
         return False

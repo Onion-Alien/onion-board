@@ -24,6 +24,11 @@ winget install JRSoftware.InnoSetup    # for OnionBoardSetup.exe
 (g++ on `PATH`, winget's WinLibs folder, or `MINGW_GXX`); `--testhost` also builds
 `testhost.exe` for the tests.
 
+YouTube's player challenge uses Deno, Node or Bun if one is installed; otherwise a
+source run uses the QuickJS the build ships once `.venv\Scripts\python scripts\fetch_qjs.py`
+has put it in `build\qjs\` (pinned release, SHA-256-checked). Without either, yt-dlp
+goes without (fewer YouTube formats).
+
 A `.venv` can't be moved or copied to another folder (its launchers hard-code the
 path). If the repo moves, delete `.venv` and recreate it. The same goes for a
 module's own `.venv` (e.g. `modules\live-voice\.venv`: recreate it with that
@@ -213,7 +218,8 @@ warns and the build falls back to the stock bootloader, so a dev build still wor
 install gcc for a clean release build),
 `scripts\version_info.py` (the .exe's version resource),
 `scripts\build_directmic.py` (the mic effect; the build stops
-if g++ is missing), `scripts\build_michelper.py` (the mic helper `obmichelper.exe`,
+if g++ is missing), `scripts\fetch_qjs.py` (QuickJS for YouTube, bundled in
+`_internal\qjs\`), `scripts\build_michelper.py` (the mic helper `obmichelper.exe`,
 a `--console` build whose Python archive sits beside the .exe rather than appended to
 it — both to avoid antivirus false positives; it warns, but still builds, on the stock
 bootloader), PyInstaller (bundles `installer\install-vbcable.ps1` and

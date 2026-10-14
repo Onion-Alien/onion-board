@@ -254,7 +254,7 @@ def test_window_background_is_solid_and_near_the_page_colour(qapp):
 
 def test_window_background_never_touches_the_disk(qapp, monkeypatch):
     """The grid paints the window's background on every paint: it used to build all of
-    polish_tokens, whose grain file was checked on disk, and a slow disk froze the
+    polish_tokens, whose texture file was checked on disk, and a slow disk froze the
     window mid-paint for seconds."""
     from types import SimpleNamespace
 

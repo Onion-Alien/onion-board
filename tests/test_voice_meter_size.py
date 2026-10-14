@@ -103,8 +103,8 @@ def test_translated_mic_status_fits_with_stop_and_meter(qapp, language):
                 rect = widget.rect().translated(widget.mapTo(bar._mic, QPoint()))
                 assert bar._mic.rect().contains(rect)
             assert not bar.stop_button.icon().isNull()
-            assert bar.stop_button.toolTip() == i18n._("Stop voice effects")
-            assert bar.stop_button.accessibleName() == bar.stop_button.toolTip()
+            assert bar.stop_button.accessibleName() == i18n._("Stop voice effects")
+            assert bar.stop_button.toolTip() == ""   # ■ says it
     finally:
         bar.close()
         bar.deleteLater()
