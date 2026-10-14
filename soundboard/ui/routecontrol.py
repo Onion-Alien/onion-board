@@ -16,6 +16,7 @@ from soundboard import engine as eng
 from soundboard.engine import is_virtual as is_virtual_cable
 from soundboard.i18n import _
 from soundboard.ui import worker
+from soundboard.ui.controller import Controller
 from soundboard.ui.crashdialog import free_dialog
 
 if TYPE_CHECKING:
@@ -34,11 +35,11 @@ def is_hands_free(name: str | None) -> bool:
     return "hands-free" in n or "hands free" in n
 
 
-class RouteControl:
+class RouteControl(Controller):
     """The route and send outputs of one MainWindow (``mw``)."""
 
     def __init__(self, mw: MainWindow):
-        self.mw = mw
+        super().__init__(mw)
 
     def _fill_combo(self, cb, names, current):
         cb.blockSignals(True)

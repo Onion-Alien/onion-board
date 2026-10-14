@@ -20,6 +20,7 @@ from soundboard.engine import is_virtual as is_virtual_cable
 from soundboard.i18n import _, ngettext
 from soundboard.pollthread import PollThread
 from soundboard.ui import busy
+from soundboard.ui.controller import Controller
 
 if TYPE_CHECKING:
     from soundboard.ui.mainwindow import MainWindow
@@ -42,11 +43,11 @@ def _listed(name: str, names) -> bool:
     return any(" ".join(n.split()).lower() == squash for n in names)
 
 
-class DeviceControl:
+class DeviceControl(Controller):
     """The audio devices of one MainWindow (``mw``)."""
 
     def __init__(self, mw: MainWindow):
-        self.mw = mw
+        super().__init__(mw)
         # (PySide takes properties and signals as keywords; the stubs don't know)
         self._dev_retry = QTimer(mw, singleShot=True, interval=100, timeout=self._dev_pump)   # pyright: ignore[reportCallIssue]
         self._recover_n, self._recover_at = 0, 0.0   # see _recover_devices
