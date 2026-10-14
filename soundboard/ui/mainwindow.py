@@ -326,7 +326,7 @@ class Bridge(QObject):
     watch_update = Signal(object)              # a newer Onion Watch: watchaddon.Offer
     discord = Signal(object)                   # [discordcfg.Settings] read in the background
     mic_users = Signal(object)                 # [appaudio.App] recording the mic (rawmic)
-    counted = Signal()                         # the daily usage count was sent (usage.py)
+    counted = Signal(object)                   # a usage count went: what it clears (usage.py)
     imported = Signal(object, object, object)  # meta|None, data|None, Skipped|None
     preview = Signal(str, object, float, int)  # id, audio with unsaved effects|None, gain, gen
     ffmpeg = Signal(object, object)            # ffmpegget.Health, after a fix: "" or its error
@@ -421,6 +421,9 @@ class MainWindow(QMainWindow):
         self.setWindowTitle(self.title)
         self.setAcceptDrops(True)   # files dropped outside the pad grid: see dropEvent
         self.cfg = Config.load()
+        # sounds left on the Undo bar by a crash: into Recently deleted (before the
+        # sounds folder is scanned, or their audio joins the board again bare)
+        trash.finish_held({m.id for m in self.cfg.sounds})
         if self.cfg.netlog_keep:   # the kept network history: listed, and saved from now
             netlog.keep(library.APP_DIR / netlog.FILE_NAME)
         net.configure_from(self.cfg)   # before anything goes online
@@ -473,7 +476,7 @@ class MainWindow(QMainWindow):
         self.bridge.watch_update.connect(self._on_watch_update)
         self.bridge.discord.connect(self._on_discord)
         self.bridge.mic_users.connect(self._on_mic_users)
-        self.bridge.counted.connect(self._save_later)   # stats_sent
+        self.bridge.counted.connect(self._usage_counted)
         self.bridge.ffmpeg.connect(self._on_ffmpeg)
         self.bridge.ffmpeg_progress.connect(self._on_ffmpeg_progress)
         self._removed: list[tuple[SoundMeta, int, np.ndarray | None]] = []   # undo-able
@@ -4996,15 +4999,21 @@ class MainWindow(QMainWindow):
             self._tor_told = say[0]
             self.toast(html.escape(say[1]), say[2])
 
-    def _save_now(self):
+    def _save_now(self, then=None):
         """The debounced save: the settings are copied now and written on the saver's
-        thread (library.Saver), then _on_saved says how it went."""
+        thread (library.Saver), then _on_saved says how it went. `then(ok)` is called on
+        the UI thread once this copy (or a newer one) is written, or failed to be."""
         self._saver.cfg = self.cfg
-        self._saver.save()
+        self._saver.save(then)
 
     def _on_saved(self, ok: bool):
         """A failure (disk full, antivirus lock) is logged by the writer; here it's
         shown once so the user knows settings aren't sticking."""
+        for then, was_ok in self._saver.finished():   # _save_now(then)s now on disk (or not)
+            try:
+                then(was_ok)
+            except Exception:  # noqa: BLE001 - one mustn't stop the report
+                log.exception("after saving settings")
         if ok:
             self._save_failed_shown = False
         elif not self._save_failed_shown:
@@ -8042,6 +8051,8 @@ class MainWindow(QMainWindow):
                 self.current = None
                 self._set_np_name(_("Pick a sound"))
                 self.np_name.setToolTip(_("Select a sound pad to use these playback controls."))
+        # written down first: a crash before the Undo bar goes still bins them next start
+        trash.hold([(m, i) for m, i, _d in self._removed])
         self._save_now()
         self._rebuild_pads()
         self._fill_categories()
@@ -8064,6 +8075,7 @@ class MainWindow(QMainWindow):
             return
         done, self._removed = self._removed, []
         self._put_back(done)
+        trash.release([m.id for m, *_rest in done])   # after the save: back on the board
         # Ctrl+Z, not its button: its card goes too (after the sounds are back, so its
         # on_close finds their pack still in use)
         toastmod.close(self, UNDO_KEY)
@@ -8118,6 +8130,7 @@ class MainWindow(QMainWindow):
             if prev is not None:
                 prev.join()   # an earlier removal's sounds go in first
             n = trash.put_sounds(done) if done else None
+            trash.release([m.id for m, _i in done])   # in the bin: crash-safe now
             for pid in packs:
                 backup.forget_pack(pid)
             if n is not None:
@@ -9320,6 +9333,12 @@ class MainWindow(QMainWindow):
     def send_usage(self):
         """The anonymous daily usage count, if it's due and switched on (usage.py)."""
         usage.maybe_send(self.cfg, self.bridge.counted.emit, app_dir=library.APP_DIR)
+
+    def _usage_counted(self, apply):
+        """A usage count went: here, on the UI thread that also adds to them, its
+        stats_* are cleared (only what it sent) and saved."""
+        apply()
+        self._save_later()
 
     def _voice_fx_changed(self, spec: dict):
         if spec.get("enabled"):

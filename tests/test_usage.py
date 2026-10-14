@@ -64,7 +64,7 @@ def _hits(req, about=False) -> list[dict]:
 def test_a_new_install_counts_once_a_day(sent):
     cfg = Config()
     saved = []
-    usage.maybe_send(cfg, lambda: saved.append(1))
+    usage.maybe_send(cfg, lambda apply: (apply(), saved.append(1)))
     assert len(sent) == 1 and saved == [1]
     req, feature = sent[0]
     assert feature == usage.FEATURE and req.full_url == usage.ENDPOINT
@@ -272,6 +272,57 @@ def test_the_daily_count_says_which_tabs_were_opened_then_forgets_them(sent):
     assert len(sent) == 1 and cfg.stats_tabs == ["sounds"]
 
 
+def test_the_send_thread_never_writes_the_settings(sent, monkeypatch):
+    """The UI thread keeps adding to stats_* while a count is on its way: the thread
+    only sends, and what it sent is cleared on the UI thread (on_sent), so a tab opened
+    or a download counted meanwhile is still counted next time."""
+    import threading
+    writers = []
+
+    class Watched(Config):
+        def __setattr__(self, name, value):
+            if name.startswith("stats_"):
+                writers.append((name, threading.current_thread() is threading.main_thread()))
+            super().__setattr__(name, value)
+    monkeypatch.setattr(usage, "threading", threading)   # a real thread this time
+    go, done, queued = threading.Event(), threading.Event(), []
+    real = net.urlopen
+
+    def slow(req, timeout=None, feature=""):
+        go.wait(5)
+        return real(req, timeout, feature)
+    monkeypatch.setattr(net, "urlopen", slow)
+    cfg = Watched(stats_sent=1.0)
+    usage.tab_opened(cfg, "voice")
+    usage.downloaded(cfg, "https://www.youtube.com/watch?v=x", "link", "add", True)
+    writers.clear()
+    usage.maybe_send(cfg, lambda apply: (queued.append(apply), done.set()))
+    usage.tab_opened(cfg, "radio")           # the UI thread, while it's on its way
+    usage.downloaded(cfg, "https://www.youtube.com/watch?v=y", "link", "add", True)
+    go.set()
+    assert done.wait(5)
+    assert all(on_ui for __, on_ui in writers), writers   # the thread wrote nothing
+    assert cfg.stats_tabs == ["voice", "radio"] and cfg.stats_downloads == 2
+    (apply,) = queued
+    apply()                                  # on the UI thread (the main window queues it)
+    assert all(on_ui for __, on_ui in writers)
+    assert cfg.stats_tabs == ["radio"] and cfg.stats_downloads == 1 and cfg.stats_sent > 1
+    cfg.stats_sent -= usage.EVERY_S          # the next count: the tab opened meanwhile
+    monkeypatch.setattr(usage, "threading", SimpleNamespace(Thread=_Inline))
+    usage.maybe_send(cfg)
+    assert "tab/radio" in [h["path"] for h in _hits(sent[-1][0])]
+
+
+def test_kept_events_added_while_a_count_is_on_its_way_stay(sent):
+    cfg = Config(stats_sent=1e18, stats_pending=["warned/a"])   # daily not due
+    queued = []
+    usage.maybe_send(cfg, queued.append)
+    usage.note("warned/b")                   # meanwhile
+    usage.remember(cfg)
+    queued[0]()
+    assert cfg.stats_pending == ["warned/b"]
+
+
 def _report(app_dir, name, text, mtime):
     import os
     folder = app_dir / applog.REPORTS_DIR
@@ -290,7 +341,7 @@ def test_new_crash_and_freeze_reports_are_counted_once_never_sent(sent, app_dir)
     _report(app_dir, "crash-b.txt", "Onion Board crash report\nVersion:  1.9.6\n", 2001)
     _report(app_dir, "crash-c.txt", "Onion Board froze for 12 s\nVersion:  1.9.7\n", 2002)
     saved = []
-    usage.maybe_send(cfg, lambda: saved.append(1), app_dir=app_dir)
+    usage.maybe_send(cfg, lambda apply: (apply(), saved.append(1)), app_dir=app_dir)
     hits = _hits(sent[0][0])
     assert [h["path"] for h in hits] == ["crash/1.9.6", "error/1.9.6", "freeze/1.9.7"]
     assert "Bob" not in sent[0][0].data.decode()
