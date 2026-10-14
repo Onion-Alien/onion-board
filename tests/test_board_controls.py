@@ -349,7 +349,7 @@ def test_one_click_plays_a_pad(window, monkeypatch):
 def test_a_double_click_plays_wherever_the_two_clicks_land(window, monkeypatch):
     w = window
     played = []
-    monkeypatch.setattr(w, "play", played.append)
+    monkeypatch.setattr(w.playctl, "play", played.append)
     pad = w.pads["s0"]
 
     def click(x, y):
