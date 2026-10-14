@@ -178,6 +178,7 @@ def test_moving_a_slider_keeps_the_effect_state():
     c.process(np.zeros((64, 2), np.float32), RATE)
     first = c._effects[0]
     c.configure(spec_for(echo={"delay": 200, "mix": 0.9}))
+    c.process(np.zeros((64, 2), np.float32), RATE)
     assert c._effects[0] is first and first.p["mix"] == 0.9
 
 
@@ -187,6 +188,54 @@ def test_rate_change_rebuilds_effects():
     c.process(np.zeros((64, 2), np.float32), 48000)
     c.process(np.zeros((64, 2), np.float32), 44100)
     assert c._effects[0].rate == 44100
+
+
+def test_configure_racing_a_rate_change_ends_at_the_new_rate(monkeypatch):
+    """configure() (UI thread) used to build the effects itself, at the rate it last
+    saw. When the mic changed rate meanwhile (the mic thread rebuilt for it in between),
+    the UI's effects for the old rate went in last, and process() never rebuilt them:
+    the voice played at the wrong pitch until the next change. Now only process()
+    builds, for the rate of the block in hand."""
+    c = VoiceChain()
+    block = np.zeros((64, 2), np.float32)
+
+    class Racy(voicefx.Effect):
+        type, name = "test.racy", "Racy"
+        armed = False
+
+        def __init__(self, rate, values=None):
+            super().__init__(rate, values)
+            if rate == 48000 and Racy.armed:
+                # built at the old rate, and meanwhile the mic's next block comes at 44.1k
+                Racy.armed = False
+                c.process(block, 44100)
+
+        def run(self, x, rate):
+            return x
+
+    monkeypatch.setitem(REGISTRY, "test.racy", Racy)
+    c.configure(spec_for(robot={"mix": 0}))
+    c.process(block, 48000)
+    Racy.armed = True
+    c.configure(spec_for(robot={"mix": 0}, **{"test.racy": {}}))
+    for _ in range(2):
+        c.process(block, 44100)
+        assert [(e.type, e.rate) for e in c._effects] == [("robot", 44100),
+                                                          ("test.racy", 44100)]
+
+
+def test_a_bypass_on_the_mic_thread_isnt_undone_by_the_next_block():
+    c = VoiceChain()
+    c.configure(spec_for(robot={"mix": 0}))
+    c.process(np.zeros((64, 2), np.float32), RATE)
+    c.errors["robot"] = "boom"   # as process() records a failing effect
+    c._effects = ()
+    c.configure(spec_for(robot={"mix": 0.5}))   # a slider moved: still bypassed
+    c.process(np.zeros((64, 2), np.float32), RATE)
+    assert c._effects == ()
+    c.clear_errors()                            # another go
+    c.process(np.zeros((64, 2), np.float32), RATE)
+    assert [e.type for e in c._effects] == ["robot"]
 
 
 def test_a_broken_effect_is_bypassed_not_fatal(monkeypatch):
@@ -205,6 +254,7 @@ def test_a_broken_effect_is_bypassed_not_fatal(monkeypatch):
     assert "kaboom" in c.errors["test.boom"]
     assert [e.type for e in c._effects] == ["robot"]
     c.configure(spec_for(**{"test.boom": {}}))   # stays off until errors are cleared
+    c.process(x, RATE)
     assert c._effects == ()
 
 

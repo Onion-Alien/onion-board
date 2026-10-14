@@ -823,6 +823,77 @@ def test_stream_runs_on_the_clean_mic(ring_file):
         s.close()
 
 
+def test_a_mic_callback_that_fails_once_doesnt_stop_the_feed(ring_file):
+    """One exception from the mic callback ended the feed's thread for good, silently:
+    that block is lost, and the next ones still go to the callback and out."""
+    got, made = [], []
+
+    def mic_cb(x, rate):
+        got.append(len(x))
+        if len(got) == 1:
+            raise RuntimeError("boom")
+
+    def cb(out, frames, t, status):
+        out.fill(0.5)
+        made.append(frames)
+
+    s = dm.DirectMicStream(cb, ring_file, mic_callback=mic_cb)
+    w = dm.RingWriter(ring_file)
+    try:
+        s.active = True   # no thread: pump by hand
+        x = np.zeros((480, 2), np.float32)
+        _publish(w, x)
+        s.pump()          # (finds where the mic is)
+        for _ in range(3):
+            _publish(w, x)
+            assert s.pump()
+        assert got == [480] * 3 and sum(made) == 3 * 480
+    finally:
+        w.close()
+        s.close()
+
+
+def test_the_feeds_thread_goes_on_after_an_exception(ring_file, monkeypatch):
+    s = dm.DirectMicStream(lambda out, *a: out.fill(0), ring_file)
+    calls = []
+
+    def pump():
+        calls.append(1)
+        if len(calls) == 1:
+            raise RuntimeError("boom")
+        if len(calls) == 3:
+            s._stop.set()
+        return True
+
+    monkeypatch.setattr(s, "pump", pump)
+    monkeypatch.setattr(dm.time, "sleep", lambda t: None)
+    try:
+        s._run()   # the thread's loop, here: it used to end at the first exception
+        assert len(calls) == 3
+    finally:
+        s.close()
+
+
+def test_the_engines_clean_mic_failing_is_counted_not_fatal():
+    """Engine._mic_direct is guarded like the device mic's callback: the failure shows
+    in cb_errors and errors (so the window can say so), and the next block goes in."""
+    from soundboard.engine import Engine
+    e = Engine()
+    seen = []
+
+    def mic(x, direct=False):
+        seen.append(direct)
+        if len(seen) == 1:
+            raise RuntimeError("boom")
+
+    e._mic = mic
+    block = np.zeros((480, 2), np.float32)
+    e._mic_direct(block, e.rates["mic"])   # raised out of the feed's thread before
+    e._mic_direct(block, e.rates["mic"])
+    assert seen == [True, True]
+    assert e.cb_errors["mic"] == 1 and "boom" in e.errors["mic"]
+
+
 def test_stream_knows_how_long_the_mic_sent_only_silence(ring_file, monkeypatch):
     """A mic stuck sending exact zeros (after an audio restart Windows thinks went fine)
     is seen for free in the clean mic the effect already hands over: how long it's been

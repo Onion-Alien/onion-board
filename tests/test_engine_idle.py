@@ -183,6 +183,35 @@ def test_the_stream_output_and_the_taps_are_the_same():
     assert e.main_tap and len(e.main_tap) == 200
 
 
+def test_the_stream_output_skips_the_mixer_while_nothing_plays(monkeypatch):
+    """_obs mixed, EQ'd and limited silence every block while the stream output was
+    open: it now takes the same idle shortcut as the send device and the headphones."""
+    calls = []
+    for kind in (Limiter, SafetyLimiter):
+        real = kind.process
+        monkeypatch.setattr(kind, "process",
+                            lambda self, x, real=real: (calls.append(self), real(self, x))[1])
+
+    def setup(e):
+        e.limiter_on = True
+        e.eq_gains = [3.0, -2.0, 0.0, 4.0, 1.0, -3.0, 2.0]
+        e.eq_target = "all"
+        sounds, eq = e._sounds, e._eq
+        e._sounds = lambda out, *a, **k: (calls.append(("sounds", out)), sounds(out, *a, **k))[1]
+        e._eq = lambda out, *a: (calls.append(("eq", out)), eq(out, *a))[1]
+
+    def mark(e):
+        calls.append("mark")
+    _, _, e = run(True, {100: mark}, setup=setup, mic=False, obs=True, blocks=160)
+    stages = {e._send.get(("obs", "Limiter")), e._send.get(("obs", "SafetyLimiter"))}
+    obs = [c for c in calls if c == "mark" or c in stages
+           or (isinstance(c, tuple) and c[1] == "obs")]
+    assert len(obs) > 1 and obs[-1] == "mark"   # it did work at first, none after
+
+    # and a sound after the quiet comes out the same as mixing every block
+    same({150: play()}, setup=setup, obs=True, mic=False)
+
+
 def test_a_quiet_limiter_skips_its_work_only_once_it_rests():
     for kind in (Limiter, SafetyLimiter):
         a, b = kind(SR), kind(SR)
