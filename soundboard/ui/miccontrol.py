@@ -588,7 +588,7 @@ class MicControl:
                                                                                 "other"):
             return False
         now = time.monotonic()
-        since = getattr(mw, "_direct_dead_since", None) or now
+        since = getattr(self, "_direct_dead_since", None) or now
         self._direct_dead_since = since
         return now - since > mw.DIRECT_GRACE_S
 
