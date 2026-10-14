@@ -20,7 +20,7 @@ from soundboard import langnames, net, theme, usage, voicefx
 from soundboard.speech import spoken, translation
 from soundboard.speech.aivoice import AiVoiceController
 from soundboard.speech.live import SpeechController
-from soundboard.ui import appstate, art, busy, icons
+from soundboard.ui import a11y, appstate, art, busy, icons
 from soundboard.ui.panel import Flow, card, hint_label, icon_button, section_label
 from soundboard.ui.responsive import FitWidth
 from soundboard.ui.speechpanel import LIVE_MODULE, SpeechPanel
@@ -188,6 +188,7 @@ class VoicePanel(QWidget):
         scroll.setWidgetResizable(True)
         scroll.setFrameShape(QFrame.Shape.NoFrame)
         scroll.setHorizontalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
+        a11y.scroll_stop(scroll, _("Voice"))
         page = FitWidth()   # the voice changer fits itself to the width (_fit_width)
         body = QWidget()
         # the full width, in line with the Say bar above (the cards fill it: the voice

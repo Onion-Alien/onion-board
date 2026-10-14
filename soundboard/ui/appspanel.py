@@ -30,7 +30,7 @@ from PySide6.QtWidgets import (QFrame, QHBoxLayout, QInputDialog, QLabel, QLayou
 
 from soundboard import appaudio, library, theme, trash, usage
 from soundboard.i18n import _
-from soundboard.ui import appstate, icons
+from soundboard.ui import a11y, appstate, icons
 from soundboard.ui.appcapture import METER_MS, AppCapture
 # the cards and their helpers live in approw.py; their names stay importable from here
 from soundboard.ui.approw import (APP_CATEGORIES, APP_DRAG_MIME,  # noqa: F401
@@ -131,6 +131,7 @@ class AppsTab(QWidget):
         self.scroll_area.setWidgetResizable(True)
         self.scroll_area.setFrameShape(QFrame.Shape.NoFrame)
         self.scroll_area.setHorizontalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
+        a11y.scroll_stop(self.scroll_area, _("Apps"))
         self.list = FitWidth()   # the cards re-flow to the width they get (AppRow._fit_width)
         self.list_layout = QVBoxLayout(self.list)
         self.list_layout.setContentsMargins(0, 0, 6, 0)

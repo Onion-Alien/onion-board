@@ -497,3 +497,20 @@ def test_a_long_path_wraps_but_copies_whole(qapp):
     t.copy()
     assert QApplication.clipboard().text() == f"Settings were restored\nIt was kept as {path}."
     w.close()
+
+
+def test_a_cards_buttons_are_the_windows_last_tab_stops(main_window, qapp):  # noqa: F811
+    """The window's Tab order is a ring from the rail through the page; a notice's Undo
+    and ✕ come last, one Shift+Tab from the first stop, not among the page's controls."""
+    from PySide6.QtCore import Qt
+    w = main_window
+    w.show()
+    t = toast.show(w, "Added Boom", "ok", ms=0, action=("Undo", lambda: None))
+    qapp.processEvents()
+    stops, x = [], w.nextInFocusChain()
+    while x is not w:
+        if ((x.focusPolicy() & Qt.FocusPolicy.TabFocus) == Qt.FocusPolicy.TabFocus
+                and x.isEnabled() and x.isVisibleTo(w)):
+            stops.append(x)
+        x = x.nextInFocusChain()
+    assert stops[-2:] == [t.card.action, t.card.btn_close]
