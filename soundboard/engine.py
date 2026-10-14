@@ -1022,11 +1022,12 @@ class Engine(EngineTakes, EngineDevices, SoundCache):
         if self.main_direct:
             m = self.fifo_direct.read(frames)
             add = self.direct_mode == directmic.MODE_REPLACE
-            mix = self._send_bus("main", mix, m, add_mic=add, silent=idle)
+            mix = self._send_bus("main", mix, m, add_mic=add, silent=idle,
+                                 sounds_vol=self.sound_vol)
             self._direct_mic_gain()
         else:
             m, add = self.ring_main.read(frames), True
-            mix = self._send_bus("main", mix, m, silent=idle)
+            mix = self._send_bus("main", mix, m, silent=idle, sounds_vol=self.sound_vol)
         # still silence unless the mic went in: every stage below would only pass zeros
         silent = idle and not (add and m is not None and self.mic_enabled and not self.mic_muted)
         # muted: others get silence (faded, not cut), nothing else changes
@@ -1112,7 +1113,7 @@ class Engine(EngineTakes, EngineDevices, SoundCache):
         else:
             finite(mix)
             if check:   # you hear what others get: the same send stage, your mic in it
-                mix = self._send_bus("mon", mix, m)
+                mix = self._send_bus("mon", mix, m, sounds_vol=self.sound_vol if hear else 1.0)
                 if self._mon_ramp:   # an empty limiter starts with its delay of silence
                     self._mon_ramp = False
                     mix = mix * np.linspace(0.0, 1.0, len(mix), dtype=np.float32)[:, None]
@@ -1211,10 +1212,13 @@ class Engine(EngineTakes, EngineDevices, SoundCache):
             self._wake_bus(out)
             mix = self._vol(out, "sounds",
                             self._sounds(out, frames, previews_only, makeup=makeup), sounds_vol)
-            if sounds_vol > 1.0:
+            if sounds_vol > 1.0 and out == "obs":
                 # over 100 %: louder by rounding the peaks to where the limiter after
-                # it holds them (Limiter at CEILING_DB, or the SafetyLimiter / end clip)
-                mix = loud_boost(mix, sounds_vol, LOUD_SEND if self.limiter_on else LOUD_SAFE)
+                # it holds them (Limiter at CEILING_DB, or the SafetyLimiter / end clip).
+                # main and mon round theirs in _send_bus, after the voice chat shaping:
+                # its filters built the rounded peaks back up, and the limiter turned
+                # 1000 % down to 300 % again
+                mix = loud_boost(mix, sounds_vol, self._loud_ceiling())
             play = peak(mix)
         take = self._play_take   # read once: the UI may end it meanwhile
         took = mix.copy() if take is not None and self.play_take_out == out else None
@@ -1262,12 +1266,18 @@ class Engine(EngineTakes, EngineDevices, SoundCache):
         on = a.live if out == "main" else (a.monitor or (hear and a.live))
         return a.gain(out, lowcut) if on else 0.0
 
+    def _loud_ceiling(self) -> float:
+        """Where loud_boost rounds the peaks to: the ceiling of the limiter after it."""
+        return LOUD_SEND if self.limiter_on else LOUD_SAFE
+
     def _send_bus(self, out: str, mix: np.ndarray, m: np.ndarray | None,
-                  add_mic: bool = True, silent: bool = False) -> np.ndarray:
+                  add_mic: bool = True, silent: bool = False,
+                  sounds_vol: float = 1.0) -> np.ndarray:
         """The sounds bus shaped for voice chat (EQ, destination mode, ducking under
         your voice, phase-aware mono), with the mic block `m` added on top (unless not
         `add_mic`: the mic effect's add mode, where Windows keeps the mic itself).
-        `silent`: the bus is known to be zeros (_bus_idle), so there's nothing to shape."""
+        `silent`: the bus is known to be zeros (_bus_idle), so there's nothing to shape.
+        `sounds_vol` over 100 %: the shaped bus has its peaks rounded (loud_boost)."""
         mic_on = m is not None and self.mic_enabled and not self.mic_muted
         quiet = self._bus_quiet(out, mix, silent)
         if not quiet:
@@ -1279,6 +1289,8 @@ class Engine(EngineTakes, EngineDevices, SoundCache):
         # a mode that already made the bus mono (every built-in one) needs no second pass
         if self.send_mono and not quiet and not (self.dest is not None and self.dest.mono):
             mix = self._stage(out, SmartMono).process(mix)
+        if sounds_vol > 1.0 and not quiet:   # last, so nothing after it rebuilds the peaks
+            mix = loud_boost(mix, sounds_vol, self._loud_ceiling())
         if mic_on and add_mic and m is not None:   # (mic_on: m is not None)
             m = self._gated(out, m)
             mix += self._eq(out, "voice", self._vol(out, "mic", m, self.mic_vol))
