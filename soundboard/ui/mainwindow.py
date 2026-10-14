@@ -54,6 +54,8 @@ from soundboard.ui import importreport
 from soundboard.ui import routewarn
 from soundboard.ui import worker
 from soundboard.ui.dropveil import DropVeil
+from soundboard.ui.ffmpegcontrol import FfmpegControl
+from soundboard.ui.updatecontrol import UpdateControl
 from soundboard.ui import toast as toastmod
 from soundboard.ui import (a11y, alsosend, appstate, busy, clipeditor, icons, responsive,
                            sourcedialog, splash, taboff, themecover)
@@ -173,7 +175,6 @@ TIP_DELAY_MS = 8000    # the first tip waits this long after the start
 TIP_RETRY_MS = 60_000  # ...and is tried again this often while it can't show
 LANG_OFFER_SEEN = "language-offer"   # in Config.tips_seen: the language bar was turned down
 FF_CHECK_MS = 1500     # the FFmpeg check's answer is taken this long after the start
-FF_ASK_OFF = "ffmpeg-offer"   # in Config.tips_seen: the FFmpeg bar's Don't ask again
 SEARCH_MIN_W = 220    # the Sounds tab's search box, until the window gets narrow
 # ...and its most: a few words go in it, so past this it's only a longer empty bar
 # (456 px at 1180x720, so normal windows are unchanged). The seek bar, the levels and
@@ -419,6 +420,7 @@ class MainWindow(QMainWindow):
 
     def __init__(self):
         super().__init__()
+        self.updctl = UpdateControl(self)
         # shutdown() ran (app.py also calls it on aboutToQuit). Set first: the splash
         # pumps events while the window is built, so its timers can run
         # before the end of __init__
@@ -476,15 +478,16 @@ class MainWindow(QMainWindow):
         self.bridge.exported.connect(self._on_exported)
         self.bridge.unpacked.connect(self._on_unpacked)
         self.bridge.worked.connect(self._on_worked)
-        self.bridge.update.connect(self._on_update)
-        self.bridge.update_progress.connect(self._on_update_progress)
-        self.bridge.update_ready.connect(self._on_update_ready)
-        self.bridge.watch_update.connect(self._on_watch_update)
+        self.bridge.update.connect(self.updctl._on_update)
+        self.bridge.update_progress.connect(self.updctl._on_update_progress)
+        self.bridge.update_ready.connect(self.updctl._on_update_ready)
+        self.bridge.watch_update.connect(self.updctl._on_watch_update)
         self.bridge.discord.connect(self._on_discord)
         self.bridge.mic_users.connect(self._on_mic_users)
         self.bridge.counted.connect(self._usage_counted)
-        self.bridge.ffmpeg.connect(self._on_ffmpeg)
-        self.bridge.ffmpeg_progress.connect(self._on_ffmpeg_progress)
+        self.ffctl = FfmpegControl(self)
+        self.bridge.ffmpeg.connect(self.ffctl.on_answer)
+        self.bridge.ffmpeg_progress.connect(self.ffctl.on_progress)
         self._removed: list[tuple[SoundMeta, int, np.ndarray | None]] = []   # undo-able
         # windows beside the board, not over it: the one Settings, and an Edit
         # sound for each sound being edited
@@ -510,15 +513,6 @@ class MainWindow(QMainWindow):
         self._tray_told = False           # the "still running in the tray" note was shown
         self.tray: QSystemTrayIcon | None = None
         self.bun_mode = None   # Bun mode's floating Bun (ui/bunmode.py), once used
-        self.release: updates.Release | None = None   # a newer version, once found
-        self._update_file: Path | None = None   # its downloaded, checked installer
-        self._downloading = False
-        self._update_got = (0, 0)     # bytes downloaded, of how many (0: not known)
-        self._update_cancel = False   # Cancel was clicked: the download stops at its next chunk
-        self._update_err = ""         # why the last try failed ("" = it didn't)
-        self._update_detail = ""      # what went wrong, for Copy error
-        self._update_fails = 0        # failed tries in a row: from 2, Copy error
-        self._update_box: QMessageBox | None = None   # "Downloading…" open over it
         self.watch_offer: watchaddon.Offer | None = None   # an urgent Onion Watch fix
         self._urgent_hidden: set[str] = set()   # "board 1.9.6" / "watch 0.8.2", this run
         # set up for the app you're using (appsetup): the bar's app and what it shows.
@@ -839,7 +833,8 @@ class MainWindow(QMainWindow):
             w.setToolTip(about)
         whats_new = _("What's new")   # the version is a button to it
         self.tagline.setToolTip(f"{about}\n{whats_new}")
-        self.tagline.clicked.connect(lambda: (usage.used("whats-new"), self.show_whats_new()))
+        self.tagline.clicked.connect(
+            lambda: (usage.used("whats-new"), self.updctl.show_whats_new()))
         self.pill = QPushButton()
         self.pill.setObjectName("pill")
         self.pill.setCursor(Qt.CursorShape.PointingHandCursor)
@@ -848,8 +843,8 @@ class MainWindow(QMainWindow):
         # a new version: a card over the On Air card (an icon, shut) that follows it
         # from found to downloading to ready (_show_update_state)
         self.btn_update = sidebar.UpdateCard()
-        self.btn_update.clicked.connect(self._update_clicked)
-        self.btn_update.copy.clicked.connect(self._copy_update_error)
+        self.btn_update.clicked.connect(self.updctl._update_clicked)
+        self.btn_update.copy.clicked.connect(self.updctl._copy_update_error)
         # the two switches for everything at once, whatever tab you're on
         self.btn_air = QPushButton()
         self.btn_air.setObjectName("onair")
@@ -1004,51 +999,7 @@ class MainWindow(QMainWindow):
         self.setup_bar.hide()
         rv.addWidget(self.setup_bar)
 
-        # FFmpeg (check_ffmpeg): its download's progress with Stop, or, when the app
-        # couldn't get it by itself, what stops working and Fix it. The same slim bar as
-        # the Discord offer, never a window
-        self.ff_bar = QFrame()
-        self.ff_bar.setObjectName("tipbar")
-        fh = QHBoxLayout(self.ff_bar)
-        fh.setContentsMargins(12, 6, 6, 6)
-        fh.setSpacing(8)
-        self.ff_lbl = QLabel()
-        self.ff_lbl.setTextFormat(Qt.TextFormat.PlainText)   # winget's own words may be in it
-        self.ff_lbl.setWordWrap(True)
-        fh.addWidget(self.ff_lbl, 1)
-        self.ff_fix = QPushButton(_("Fix it"))
-        self.ff_fix.setObjectName("primary")
-        self.ff_fix.clicked.connect(self._ffmpeg_fix_clicked)
-        fh.addWidget(self.ff_fix)
-        self.ff_stop = QPushButton(_("Stop"))
-        self.ff_stop.setObjectName("small")
-        self.ff_stop.clicked.connect(self._ffmpeg_stop)
-        fh.addWidget(self.ff_stop)
-        self.ff_never = QPushButton(_("Don't ask again"))
-        self.ff_never.setObjectName("small")
-        self.ff_never.setToolTip(_("Settings → Data & quality still has it"))
-        self.ff_never.clicked.connect(self._ffmpeg_never)
-        fh.addWidget(self.ff_never)
-        hide = QPushButton()
-        hide.setObjectName("urgenthide")
-        hide.setAccessibleName(_("Hide"))
-        hide.setToolTip(_("Hide until Onion Board starts again"))
-        icons.close_button(hide, 28)
-        hide.clicked.connect(self._ffmpeg_not_now)
-        fh.addWidget(hide)
-        self.ff_hide = hide
-        self.ff_bar.hide()
-        self.ffmpeg: ffmpegget.Health | None = None   # the last check's answer
-        self._ff_checking = False
-        self._ff_not_now = False   # hidden until the next start
-        self._ff_error = ""        # the last fix's error, shown on the bar
-        self._ff_waiting: list = []   # (button, release) of fixes still going
-        self._ff_getting = False   # a fix is going (by itself or clicked)
-        self._ff_percent = -1      # ...how far its download is (-1: not known)
-        self._ff_stop_flag: threading.Event | None = None   # Stop sets it
-        self._ff_auto_tried = False   # got by itself once this start (not again)
-        self._ff_auto_now = False     # the get running now is that one (for the count)
-        self._ff_done = False         # the last fix worked (Settings says so)
+        self.ff_bar = self.ffctl.build_bar()   # FFmpeg (ui/ffmpegcontrol.py)
         rv.addWidget(self.ff_bar)
 
         # Windows is in a language the board has but isn't showing: offered in that
@@ -1799,18 +1750,36 @@ class MainWindow(QMainWindow):
         c.pad_width = min(max(c.pad_width, 110), 240)   # the pads are built with it next
         size.setValue(c.pad_width)
         size.setFixedWidth(90)
-        size.setToolTip(_("Pad size"))
+        size.setToolTip(_("Card size"))
         # a drag re-lays every pad at most every PAD_SIZE_WAIT_MS, not on each step
         self._pad_size_wait = QTimer(self, singleShot=True, interval=PAD_SIZE_WAIT_MS)
         self._pad_size_wait.timeout.connect(lambda: self.set_pad_width(size.value()))
         size.valueChanged.connect(lambda _v: self._pad_size_wait.isActive()
                                   or self._pad_size_wait.start())
         no_wheel(size)
-        size_lbl = QLabel(_("Pad size"))
+        size_lbl = QLabel(_("Card size"))
         size_lbl.setObjectName("muted")
         tb.addWidget(size_lbl)
         tb.addWidget(size)
         self._pad_size = (size_lbl, size)
+        # the list view has rows, not cards: a row size takes the slider's place there
+        rows_lbl = QLabel(_("Row size"))
+        rows_lbl.setObjectName("muted")
+        self.btn_rows = QPushButton()
+        self.btn_rows.setAccessibleName(_("Row size"))
+        self.btn_rows.setToolTip(_("How tall the rows in the list are"))
+        rm = DropdownMenu(self.btn_rows)
+        rm.aboutToShow.connect(lambda: self._fill_rows_menu(rm))
+        self.btn_rows.setMenu(rm)
+        self.btn_rows.setProperty("toolbarMenu", True)
+        self.btn_rows.setProperty("quiet", True)
+        self.btn_rows.setFixedHeight(CONTROL_H)
+        tb.addWidget(rows_lbl)
+        tb.addWidget(self.btn_rows)
+        self._row_size = (rows_lbl, self.btn_rows)
+        self._size_tight = False   # the window too narrow for either (_init_fit)
+        self._label_rows()
+        self._show_size_picker()
         for b in (add, self.btn_yt, self.btn_folder, more, self.btn_keys,
                   self.btn_bin, self.btn_view, self.search):
             b.setFixedHeight(CONTROL_H)
@@ -1845,6 +1814,7 @@ class MainWindow(QMainWindow):
         self.grid = PadGrid()
         self.grid.pad_w = c.pad_width
         self.grid.listed = c.pad_view == "list"
+        self.grid.row_size = c.list_rows
         self.grid._spacing()
         self.grid.reorder.connect(self.on_reorder)
         # queued: the import (and any question it asks) runs after the drop returns,
@@ -2265,6 +2235,10 @@ class MainWindow(QMainWindow):
         top.addStretch(1)
         # working: a fresh copy or off, right here (Settings → Audio has every mic)
         from soundboard.ui.audiorecovery import explanation
+        self.btn_michange = QPushButton(_("Change mic"))
+        self.btn_michange.setProperty("quiet", True)
+        self.btn_michange.setToolTip(_("Put your sounds into another mic instead"))
+        self.btn_michange.clicked.connect(self._pick_mic)
         self.btn_micredo = QPushButton(_("Reinstall"))
         self.btn_micredo.setProperty("quiet", True)
         self.btn_micredo.setToolTip(explanation("reinstall"))
@@ -2283,7 +2257,7 @@ class MainWindow(QMainWindow):
         lines.addWidget(self.mic_reason)
         self.mic_ways = Flow(gap=8)
         lines.addLayout(self.mic_ways)
-        for b in (self.btn_micredo, self.btn_micoff):   # (under the line: wraps when narrow)
+        for b in (self.btn_michange, self.btn_micredo, self.btn_micoff):   # (wraps when narrow)
             b.hide()
             self.mic_ways.addWidget(b)
         box.hide()
@@ -3207,7 +3181,7 @@ class MainWindow(QMainWindow):
         return self._cable_ends(plan["main"], plan["vm"]) if "main" in plan else None
 
     def _copy_names(self) -> list[str]:
-        """Setup -> Devices -> Also send to: the devices that get a copy of what others
+        """Setup -> Devices -> Also play on: the devices that get a copy of what others
         hear. None while sending to nobody; never the headphones (you'd hear it twice),
         and never a device that gets it already (what others hear, the cable alongside
         the mic, the stream output, or another end of one of those cables)."""
@@ -3224,12 +3198,12 @@ class MainWindow(QMainWindow):
 
     def sending_to(self) -> list[str]:
         """The devices that get what others hear already: the picked one, the cable
-        alongside the mic, and the stream output ("Also send to" can't add them again)."""
+        alongside the mic, and the stream output ("Also play on" can't add them again)."""
         return [t for t in (self._main_name(), self._tap_name(),
                             self._obs_name(self.cfg.obs_device)) if t]
 
     def set_also_send_at(self, i: int, name: str | None):
-        """Setup -> Devices -> Also send to: row `i` sends to `name` (one past the last
+        """Setup -> Devices -> Also play on: row `i` sends to `name` (one past the last
         row adds one; None removes that row)."""
         c = self.cfg
         lst = list(c.also_send)
@@ -3266,7 +3240,7 @@ class MainWindow(QMainWindow):
         return name
 
     def set_obs_device(self, name: str | None):
-        """The stream output: Setup -> Devices -> Also send to -> a row set to Clean,
+        """The stream output: Setup -> Devices -> Also play on -> a row set to Clean,
         for streaming. None switches it off."""
         self.cfg.obs_device = name
         self._show_route()            # the rows
@@ -3289,7 +3263,7 @@ class MainWindow(QMainWindow):
         self._device_job(plan, opened)
 
     def set_send_kind(self, name: str, stream: bool):
-        """Also send to: the row on `name` gets the clean stream mix (`stream`; the
+        """Also play on: the row on `name` gets the clean stream mix (`stream`; the
         one that had it before goes back to a copy of the call, in its place) or the
         same as the call."""
         c = self.cfg
@@ -3363,7 +3337,7 @@ class MainWindow(QMainWindow):
         if c.route == "off":
             self.setup_hint.setText(_("Sending to others is off: your sounds play in your "
                                       "headphones and on a device set to Clean, for streaming "
-                                      "(Also send to) only."))
+                                      "(Also play on) only."))
         elif c.route == "device" and c.main_device and c.main_device == c.mon_device:
             self.setup_hint.setText(_("<span style='color:{status}'>That's your headphones too, "
                                       "so nothing is sent (you'd hear everything twice). Pick "
@@ -3409,7 +3383,7 @@ class MainWindow(QMainWindow):
             devices = ", ".join(f"<b>{html.escape(n)}</b>" for n in down)
             self.setup_hint.setText(
                 self.setup_hint.text()
-                + _("<br><span style='color:{status}'>Can't open {devices} (under Also send to). "
+                + _("<br><span style='color:{status}'>Can't open {devices} (under Also play on). "
                     "Plugged in? It's tried again by itself.</span>",
                     status=theme.status('warn'), devices=devices))
         self.setup_hint.setVisible(bool(self.setup_hint.text()))   # (no empty gap)
@@ -3658,6 +3632,7 @@ class MainWindow(QMainWindow):
             self._show_bun = False
         effect_on = (mic_route and not mic_busy and not self.setup_show.on
                      and directmic.works(direct))
+        self.btn_michange.setVisible(effect_on)
         self.btn_micredo.setVisible(effect_on)
         self.btn_micoff.setVisible(effect_on)
         said = self._done_toast
@@ -4120,6 +4095,13 @@ class MainWindow(QMainWindow):
         self.setup_page.ensureWidgetVisible(self.cb_route)
         self.cb_route.setFocus()
         self.cb_route.showPopup()
+
+    def _pick_mic(self):
+        """Your mic -> Change mic: Devices' "My mic", opened (the effect follows the mic
+        picked there)."""
+        self.setup_page.ensureWidgetVisible(self.cb_mic)
+        self.cb_mic.setFocus()
+        self.cb_mic.showPopup()
 
     def use_cable_instead(self):
         """Straight into my mic isn't working here: send through the virtual cable (set
@@ -5318,187 +5300,17 @@ class MainWindow(QMainWindow):
         box.deleteLater()
 
     # ------------------------------------------------------------------ FFmpeg
+    # (ui/ffmpegcontrol.py: the check, getting it, and its bar)
+    @property
+    def ffmpeg(self) -> ffmpegget.Health | None:
+        """The last FFmpeg check's answer."""
+        return self.ffctl.health
+
     def check_ffmpeg(self):
-        """Is FFmpeg there and does it start? The answer of the check started behind the
-        loading screen (ffmpegget.start_check), or a new one, taken on a worker (it runs
-        ffmpeg); it comes back to _on_ffmpeg, which gets FFmpeg by itself when needed."""
-        if self._ff_checking:
-            return
-        self._ff_checking = True
-
-        # no answer is never a crash: the check failed
-        worker.run(lambda: (ffmpegget.answer(), None), self.bridge.ffmpeg, "ffmpeg-check",
-                   error=(None, None), owner=self)
-
-    def _may_get_ffmpeg(self) -> bool:
-        """Get FFmpeg without asking: unless the user said not to go online for it
-        (Offline mode, its switch, Low data mode) or not to ask about it again."""
-        return (not self._ff_auto_tried and FF_ASK_OFF not in self.cfg.tips_seen
-                and not ffmpegget.why_not() and not quality.current.low_data)
+        self.ffctl.check()
 
     def fix_ffmpeg_clicked(self, btn: QPushButton, force: bool = False):
-        """Fix it / Get FFmpeg / Reinstall (the bar or Settings): pressing it is a yes,
-        so a switched-off FFmpeg download is switched back on. Offline mode stays: it
-        says so instead."""
-        if self._ff_getting or busy.is_busy(btn):
-            return
-        if net.offline():
-            self.toast(html.escape(net.off_message(ffmpegget.FEATURE)), "warn", 8000)
-            return
-        if not net.allowed(ffmpegget.FEATURE):
-            off = [k for k in self.cfg.net_off if k != ffmpegget.FEATURE]
-            self.set_option("net_off", off)
-            net.configure_features(self.cfg.net_off, self.cfg.net_offline)
-            self.toast(_("FFmpeg downloads are switched on again (Settings → Privacy & "
-                         "security)."))
-        self.fix_ffmpeg(btn, force)
-
-    def fix_ffmpeg(self, btn: QPushButton | None = None, force: bool = False,
-                   auto: bool = False):
-        """Get FFmpeg, or repair one that won't start (``force``: reinstall a working
-        one), on a worker: winget, then the app's own download (ffmpegget.fix). The bar
-        shows how far it is, with Stop; ``btn`` shows it's busy and then whether it
-        worked; the bar and Settings show the new state."""
-        if self._ff_getting:
-            return
-        usage.used("get-ffmpeg-auto" if auto else "get-ffmpeg")
-        self._ff_getting, self._ff_percent, self._ff_error = True, -1, ""
-        self._ff_auto_now = auto
-        self._ff_auto_tried = self._ff_auto_tried or auto
-        stop = self._ff_stop_flag = threading.Event()
-        if btn is not None:
-            self._ff_waiting.append((btn, busy.hold(btn, _("Getting FFmpeg…"))))
-        seen = [-1]
-
-        def progress(done: int, total: int):
-            pct = min(99, done * 100 // total) if total else -1
-            if pct != seen[0]:
-                seen[0] = pct
-                busy.emit(self.bridge.ffmpeg_progress, pct)
-
-        def work():
-            netlog.cause(ffmpegget.FEATURE,
-                         "FFmpeg was missing or wouldn't start when the app started" if auto
-                         else "You clicked Fix it, Get FFmpeg or Reinstall (the FFmpeg bar, "
-                              "or Settings > Data & quality)")
-            err: object = ""
-            try:
-                ffmpegget.fix(force, progress, stop)
-            except ffmpegget.GetError as e:
-                err = e
-            return ffmpegget.last(), err
-
-        def failed(e):   # shown, never a stuck button
-            return None, ffmpegget.GetError(_("Couldn't get FFmpeg ({error}).",
-                                              error=errors.plain(e)))
-        worker.run(work, self.bridge.ffmpeg, "ffmpeg-get", error=failed, owner=self)
-        self._ffmpeg_news()
-
-    def _on_ffmpeg_progress(self, pct: int):
-        if self._ff_getting:
-            self._ff_percent = pct
-            self._ffmpeg_news()
-
-    def _on_ffmpeg(self, h, err):
-        """A check's answer (``err`` None) or a fix's (``err`` "" when it worked, else
-        the GetError)."""
-        if h is not None:
-            self.ffmpeg = h
-            if not err:   # a check or successful fix, never a failed/cancelled fix's stale health
-                usage.ffmpeg_state(self.cfg, h.state)
-                usage.remember(self.cfg)
-                self._save_later()
-        if err is None:
-            self._ff_checking = False
-            if h is not None and h.state != ffmpegget.OK and self._may_get_ffmpeg():
-                self.fix_ffmpeg(auto=True)
-                return
-        else:
-            self._ff_getting, self._ff_stop_flag = False, None
-            stopped = isinstance(err, ffmpegget.Stopped)
-            if err and not stopped:
-                usage.used("get-ffmpeg-auto-failed" if self._ff_auto_now
-                           else "get-ffmpeg-failed")
-                usage.ffmpeg_state(self.cfg, "get-failed")
-                usage.remember(self.cfg)
-                self._save_later()
-            for btn, release in self._ff_waiting:
-                if qt_valid(btn):
-                    release(None if stopped else _("✗ Failed") if err else _("✓ Got FFmpeg"))
-            self._ff_waiting.clear()
-            self._ff_error = "" if stopped else errors.plain(err) if err else ""
-            self._ff_done = not err
-            if stopped:
-                pass
-            elif err:
-                self.toast(html.escape(self._ff_error), "error", 8000)
-            elif h is not None and h.version:
-                self.toast(_("FFmpeg works now (version {version}).",
-                             version=html.escape(h.version)), "ok")
-            else:
-                self.toast(_("FFmpeg works now."), "ok")
-        self._ffmpeg_news()
-
-    def _ffmpeg_news(self):
-        """The bar, and Settings' FFmpeg row if it's built, show the current state."""
-        self._show_ffmpeg_bar()
-        dlg = self._settings_dlg
-        if dlg is not None and qt_valid(dlg):
-            dlg._ffmpeg_sync()
-
-    def _show_ffmpeg_bar(self):
-        """While FFmpeg downloads: how far, with Stop. When it's missing or won't start
-        and the app couldn't get it by itself: what stops working, and Fix it. Hidden by
-        ✕ until the next start, and for good by Don't ask again."""
-        h = self.ffmpeg
-        if self._ff_not_now or (not self._ff_getting and (
-                h is None or h.state == ffmpegget.OK or FF_ASK_OFF in self.cfg.tips_seen)):
-            self.ff_bar.hide()
-            return
-        if self._ff_getting:
-            text = (_("Getting FFmpeg, so M4A, AAC and video files play and videos can be "
-                      "saved… {percent}%", percent=self._ff_percent)
-                    if self._ff_percent >= 0 else
-                    _("Getting FFmpeg, so M4A, AAC and video files play and videos can be "
-                      "saved…"))
-            why = ""
-        else:
-            assert h is not None
-            if h.state == ffmpegget.MISSING:
-                text = _("FFmpeg is missing, so M4A, AAC and video files won't play and "
-                         "videos can't be saved.")
-            else:
-                text = _("FFmpeg won't start ({error}), so M4A, AAC and video files won't "
-                         "play and videos can't be saved.", error=h.why or _("no reason given"))
-            why = (self._ff_error or ffmpegget.why_not()
-                   or (_("Low data mode is on, so it wasn't downloaded by itself (about "
-                         "110 MB).") if quality.current.low_data else ""))
-        self.ff_lbl.setText("\n".join(t for t in (text, why) if t))
-        for b, on in ((self.ff_fix, not self._ff_getting), (self.ff_never, not self._ff_getting),
-                      (self.ff_stop, self._ff_getting)):
-            if not on and b.hasFocus():
-                self.ff_hide.setFocus()   # hiding a focused button jumps focus elsewhere
-            b.setVisible(on)
-        self.ff_bar.show()
-
-    def _ffmpeg_fix_clicked(self):
-        self.fix_ffmpeg_clicked(self.ff_fix)
-
-    def _ffmpeg_stop(self):
-        if self._ff_stop_flag is not None:
-            self._ff_stop_flag.set()
-            busy.flash(self.ff_stop, _("Stopping…"))
-
-    def _ffmpeg_not_now(self):
-        self._ff_not_now = True
-        self.ff_bar.hide()
-
-    def _ffmpeg_never(self):
-        self.ff_bar.hide()
-        if FF_ASK_OFF not in self.cfg.tips_seen:
-            self.cfg.tips_seen.append(FF_ASK_OFF)
-        self._save_later()
-        self.toast(_("Won't ask about FFmpeg again. Settings → Data & quality still has it."))
+        self.ffctl.fix_clicked(btn, force)
 
     # ------------------------------------------------------------------ language
     def _offer_language(self):
@@ -5823,7 +5635,7 @@ class MainWindow(QMainWindow):
         icons.set_icon(m.addAction(_("Onion Board on GitHub"), lambda: self._open_page(
             f"https://github.com/{updates.REPO}")), "folder")
         news = _("What's new")
-        icons.set_icon(m.addAction(f"{news} (v{__version__})", self.show_whats_new), "info")
+        icons.set_icon(m.addAction(f"{news} (v{__version__})", self.updctl.show_whats_new), "info")
 
     def _paint_logo(self):
         self.logo.update()   # it reads the theme colours itself
@@ -7114,18 +6926,11 @@ class MainWindow(QMainWindow):
                                _("Clear the random-sound hotkey")) if hk else None
         a_sub = menu.addAction(icons.icon("plus"), _("Add subcategory…"))
         a_rand = menu.addAction(icons.icon("play"), _("Play a random sound from it"))
-        a_all = menu.addAction(icons.icon("next"), _("Play them all, in order"))
-        a_shuf = menu.addAction(icons.icon("shuffle"), _("Play them all, shuffled"))
         a_exp = menu.addAction(icons.icon("folder"), _("Export as a sound pack"))
         cm = menu.addMenu(icons.icon("palette"), _("Colour"))
         # the same colour list as the bulk Colour menu: names, the current one ticked
         fill_colour_menu(cm, self.cfg.category_colors.get(name, ""),
                          lambda col: self.set_category_color(name, col), none=True)
-        menu.addSeparator()
-        a_prog = menu.addAction(icons.icon("apps"), _("Show this when a program is in front"))
-        a_unprog = {menu.addAction(icons.icon("offline"),
-                                  _("Stop showing this for {exe}", exe=exe)): exe
-                    for exe in catswitch.programs_for(self.cfg.category_programs, name)}
         menu.addSeparator()
         a_del = menu.addAction(icons.icon("trash", "danger_text"),
                                _("Delete category (keeps the sounds)"))
@@ -7143,16 +6948,10 @@ class MainWindow(QMainWindow):
             self.set_category_hotkey(name, "")
         elif act == a_rand:
             self.play_random(name)
-        elif act in (a_all, a_shuf):
-            self.queue_category(name, shuffled=act == a_shuf)
         elif act == a_exp:
             self.export_sounds([m for m in self.cfg.sounds if name in m.tags], name)
         elif act == a_del:
             self.delete_category(name)
-        elif act == a_prog:
-            self.pick_category_programs(name)
-        elif act in a_unprog:
-            self.remove_category_program(a_unprog[act])
 
     # ------------------------------------------------------------ program -> category
     def _update_cat_timer(self):
@@ -7177,18 +6976,6 @@ class MainWindow(QMainWindow):
                      shown=shown, exe=html.escape(sw.exe)) if sw.back
                    else _("Switched to “{shown}” ({exe} is in front)",
                           shown=shown, exe=html.escape(sw.exe)))
-
-    def pick_category_programs(self, name: str):
-        """A category's menu → Show this when a program is in front"""
-        from soundboard.ui.programpick import ProgramPicker
-        d = ProgramPicker(name, dict(self.cfg.category_programs), self)
-        picked = d.picked if d.exec() else []
-        free_dialog(d)
-        for exe in picked:
-            self.add_category_program(name, exe, quiet=True)
-        if picked:
-            self.toast(_("✓ “{name}” shows by itself when {picked} is in front",
-                         name=html.escape(name), picked=html.escape(', '.join(picked))), "ok")
 
     def add_category_program(self, name: str, exe: str, quiet: bool = False):
         exe = catswitch.exe_name(exe)
@@ -7804,7 +7591,7 @@ class MainWindow(QMainWindow):
         menu.addSeparator()
         views = QActionGroup(menu)
         for key, name, icon, tip in (
-                ("grid", _("Pads"), "sounds", _("Cards, with pictures")),
+                ("grid", _("Cards"), "sounds", _("Cards, with pictures")),
                 ("list", _("List"), "list", _("One line each: many more sounds on the screen"))):
             a = menu.addAction(name, lambda k=key: self.set_pad_view(k))
             icons.set_icon(a, icon, checked_color="accent")
@@ -7826,8 +7613,46 @@ class MainWindow(QMainWindow):
             return
         self.cfg.pad_view = view
         self._label_view()
+        self._show_size_picker()
         self._save_now()
         self.grid.set_listed(view == "list")
+
+    @staticmethod
+    def _row_names() -> dict[str, str]:
+        return {"small": _("Small"), "medium": _("Medium"), "large": _("Large")}
+
+    def _label_rows(self):
+        self.btn_rows.setText(self._row_names().get(self.cfg.list_rows, ""))
+
+    def _fill_rows_menu(self, menu: QMenu):
+        menu.clear()
+        group = QActionGroup(menu)
+        for key, name in self._row_names().items():
+            a = menu.addAction(name, lambda k=key: self.set_list_rows(k))
+            a.setCheckable(True)
+            a.setChecked(self.cfg.list_rows == key)
+            group.addAction(a)
+
+    def set_list_rows(self, size: str):
+        if size not in library.LIST_ROWS or size == self.cfg.list_rows:
+            return
+        self.cfg.list_rows = size
+        self._label_rows()
+        self._save_now()
+        self.grid.set_row_size(size)
+
+    def _show_size_picker(self):
+        """Card size for the cards, Row size for the list; neither in a narrow window."""
+        listed = self.cfg.pad_view == "list"
+        for w in self._pad_size:
+            w.setVisible(not listed and not self._size_tight)
+        for w in self._row_size:
+            w.setVisible(listed and not self._size_tight)
+        responsive.touch(*self._pad_size, *self._row_size)
+
+    def _fit_size_picker(self, tight: bool):
+        self._size_tight = tight
+        self._show_size_picker()
         self.selection.sync()
 
     def _volume_action(self, menu: QMenu, m: SoundMeta) -> QWidgetAction:
@@ -9436,32 +9261,6 @@ class MainWindow(QMainWindow):
         autostart.refresh(hidden)
 
     # ------------------------------------------------------------------ updates
-    def check_updates(self, force: bool = False, why: str = ""):
-        """Look for a newer release on a thread (see updates.py). Without `force` only
-        if the box is ticked, and at most every 6 hours. `why`: the click that asked,
-        for Network activity (none: the app's own timer)."""
-        if not force and not self.cfg.update_check:
-            return
-
-        due = force or time.time() - self.cfg.update_checked >= updates.EVERY_S
-        why = why or "Automatic update check (at most every 6 hours)"
-        netlog.cause(updates.FEATURE, why)
-        netlog.cause(watchaddon.FEATURE, f"{why}: Onion Watch add-on")
-
-        def run():
-            try:
-                rel, err = updates.check(self.cfg, force=force), ""
-            except Exception as e:  # noqa: BLE001 - offline etc.
-                rel, err = None, errors.plain(e)
-            busy.emit(self.bridge.update, rel, err, force, owner=self)
-            if not due:   # the Onion Watch add-on next, once it's installed (else nothing asked)
-                return worker.SKIP
-            offer = watchaddon.check_update()
-            return worker.SKIP if offer is None else offer
-        # (nothing waits on the add-on's answer)
-        worker.run(run, self.bridge.watch_update, "update-check", error=worker.SKIP,
-                   owner=self)
-
     def send_usage(self):
         """The anonymous daily usage count, if it's due and switched on (usage.py)."""
         usage.maybe_send(self.cfg, self.bridge.counted.emit, app_dir=library.APP_DIR)
@@ -9495,47 +9294,17 @@ class MainWindow(QMainWindow):
         if 0 <= i < len(TABS):
             usage.tab_opened(self.cfg, TAB_KEYS[i])
 
-    def _on_update(self, rel, err: str, asked: bool):
-        self._save_later()   # update_checked
-        if updates.recheck_s > 0:   # the newest is still settling: offer it once it has
-            QTimer.singleShot(round(updates.recheck_s * 1000), self, self.check_updates)
-        busy = self._downloading or self._update_file is not None
-        if rel is not None and not busy:
-            if self.release is None or self.release.version != rel.version:
-                self._update_err, self._update_fails = "", 0   # a new version: a fresh start
-            self.release = rel
-            self._show_update_state()
-            if self.tray is not None and not self.isVisible():
-                self.tray.showMessage(
-                    "Onion Board", _("Important fix: {fix}", fix=rel.urgent) if rel.urgent
-                    else _("Version {version} is out.", version=rel.version),
-                    QSystemTrayIcon.MessageIcon.Warning if rel.urgent
-                    else QSystemTrayIcon.MessageIcon.Information,
-                    8000)
-            self._show_urgent()
-        self.update_done.emit(rel, err)   # for the Settings window's "Check now"
-        if asked and rel is not None:
-            self.show_update()
-
-    def _on_watch_update(self, offer):
-        """A newer Onion Watch (check_updates): its Triggers tab offers it, and an
-        urgent one gets the banner too, on that tab only (_urgent_now)."""
-        self.triggers.offer_update(offer)
-        if offer.urgent:
-            self.watch_offer = offer
-            self._show_urgent()
-
     def _urgent_now(self) -> tuple[str, str, str] | None:
         """The urgent fix to show on the banner: (key, text, button), Onion Board's
         before Onion Watch's; None when there's none, or it was hidden."""
-        rel = self.release
+        rel = self.updctl.release
         if (rel is not None and rel.urgent
                 and f"board {rel.version}" not in self._urgent_hidden):
             # the same steps as the update card (its progress shows under the words)
-            button = (_("Cancel") if self._downloading
-                      else _("Restart to update") if self._update_file is not None
-                      and not self._update_err
-                      else _("Try again") if self._update_err
+            button = (_("Cancel") if self.updctl._downloading
+                      else _("Restart to update") if self.updctl._update_file is not None
+                      and not self.updctl._update_err
+                      else _("Try again") if self.updctl._update_err
                       else _("Update now") if updates.can_install() and rel.asset_url
                       else _("Details"))
             return (f"board {rel.version}",
@@ -9672,12 +9441,13 @@ class MainWindow(QMainWindow):
         self.urgent_btn.setText(button)
         self.urgent_btn.setVisible(bool(button))   # a warning with nothing to click
         # Onion Board's own fix: the update card's progress and words, under the reason
-        board = key.startswith("board") and (self._downloading or bool(self._update_err))
-        self.urgent_prog.setVisible(board and self._downloading)
-        self.urgent_prog.setValue(self._update_pct())
+        upd = self.updctl
+        board = key.startswith("board") and (upd._downloading or bool(upd._update_err))
+        self.urgent_prog.setVisible(board and self.updctl._downloading)
+        self.urgent_prog.setValue(self.updctl._update_pct())
         self.urgent_sub.setVisible(board)
         if board:
-            state = self._update_words()   # failed: the reason (Try again is beside it)
+            state = self.updctl._update_words()   # failed: the reason (Try again is beside it)
             self.urgent_sub.setText(state[3] if state[0] == "failed"
                                     else " · ".join(filter(None, (state[1], state[2]))))
         self.urgent_bar.show()
@@ -9699,14 +9469,15 @@ class MainWindow(QMainWindow):
             self._show_urgent()   # fixed meanwhile, or still to do
             return
         if now[0].startswith("board"):
-            if self._downloading:
-                self.cancel_update()
-            elif self._update_file is not None and not self._update_err:
-                self.install_update()
-            elif updates.can_install() and self.release is not None and self.release.asset_url:
-                self.download_update()
+            if self.updctl._downloading:
+                self.updctl.cancel_update()
+            elif self.updctl._update_file is not None and not self.updctl._update_err:
+                self.updctl.install_update()
+            elif (updates.can_install() and self.updctl.release is not None
+                  and self.updctl.release.asset_url):
+                self.updctl.download_update()
             else:
-                self.show_update()
+                self.updctl.show_update()
             return
         # Onion Watch: its tab does the updating (and shows how it's going)
         self.tabs.setCurrentWidget(self.triggers)
@@ -9715,324 +9486,6 @@ class MainWindow(QMainWindow):
             self.triggers.get()
         self.watch_offer = None
         self._show_urgent()
-
-    def show_update(self):
-        """The update pill was clicked: what's new, and what can be done about it."""
-        if self._update_file is not None:
-            self.install_update()
-            return
-        rel = self.release
-        if rel is None or self._downloading:
-            return
-        from soundboard import __version__
-        box = QMessageBox(QMessageBox.Icon.Warning if rel.urgent else QMessageBox.Icon.Information,
-                          _("Important fix available") if rel.urgent else _("Update available"),
-                          _("Onion Board {version} is out (you have {current}).",
-                            version=rel.version, current=__version__),
-                          QMessageBox.StandardButton.NoButton, self)
-        info = (_("<p><b>Important fix:</b> {fix}</p>", fix=html.escape(rel.urgent))
-                if rel.urgent else "")
-        info += html.escape(rel.notes).replace("\n", "<br>") if rel.notes else ""
-        installable = updates.can_install() and bool(rel.asset_url)
-        if installable:
-            info += _("<p>Update now downloads it in the background (about 180 MB); you "
-                      "choose when the app restarts to install it. Your sounds and "
-                      "settings stay as they are.</p>")
-        elif not updates.can_install():
-            info += _("<p>This copy runs from source: update it with <code>git pull</code>.</p>")
-        if info:
-            box.setInformativeText(f"<p>{info}</p>")
-        get = box.addButton(_("Update now") if installable else _("Open the download page"),
-                            QMessageBox.ButtonRole.AcceptRole)
-        page = (box.addButton(_("Release page"), QMessageBox.ButtonRole.HelpRole)
-                if installable else None)
-        # an urgent fix can't be skipped for good, only put off
-        skip = (None if rel.urgent
-                else box.addButton(_("Skip this version"), QMessageBox.ButtonRole.DestructiveRole))
-        box.addButton(_("Later"), QMessageBox.ButtonRole.RejectRole)
-        box.exec()
-        clicked = box.clickedButton()
-        free_dialog(box)
-        if clicked is get and installable:
-            self.download_update()
-        elif clicked is get or (page is not None and clicked is page):
-            QDesktopServices.openUrl(QUrl(rel.url))
-        elif skip is not None and clicked is skip:
-            self.set_option("update_skip", rel.version)
-            self.release = None
-            self._show_update_state()
-
-    # ---- Onion Board's own update: one state, shown on the card, the urgent bar and
-    # in Settings > Updates in the same words
-    def _update_pct(self) -> int:
-        done, total = self._update_got
-        return min(done * 100 // total, 100) if total else 0
-
-    def _update_words(self) -> tuple[str, str, str, str]:
-        """(state, title, hint, tip) for the update as it is now; state "" when
-        there's none."""
-        rel = self.release
-        if rel is None:
-            return "", "", "", ""
-        if self._downloading:
-            done, total = self._update_got
-            mb = 1024 * 1024
-            hint = (_("{done} of {total} MB", done=done // mb, total=max(1, round(total / mb)))
-                    if total else _("{done} MB", done=done // mb))
-            return ("downloading", _("Downloading {pct}%", pct=self._update_pct()), hint,
-                    _("Downloading Onion Board {version}: click to see how far it is, "
-                      "or to cancel.", version=rel.version))
-        if self._update_err:
-            return ("failed", _("Couldn't update"), _("Click to try again"),
-                    _("Updating to Onion Board {version} didn't work: {rstrip}.",
-                      version=rel.version, rstrip=self._update_err.rstrip(".")))
-        if self._update_file is not None:
-            return ("ready", _("Restart to update"), "",
-                    _("Onion Board {version} is downloaded, click to install it",
-                      version=rel.version))
-        return ("available", _("Update to {version}", version=rel.version), "",
-                _("Onion Board {version} is out, click for details", version=rel.version))
-
-    def update_status(self) -> str:
-        """The update's state in one line (Settings > Updates): the card's words."""
-        state, title, hint, tip = self._update_words()
-        if state == "failed":
-            return tip   # (with the reason)
-        return " · ".join(filter(None, (title, hint)))
-
-    def _show_update_state(self):
-        """The card (and the urgent bar, Settings, a Downloading box) say where the
-        update is."""
-        state, title, hint, tip = self._update_words()
-        if not state:
-            self.btn_update.hide()
-        else:
-            self.btn_update.set_state(state, title, hint, tip,
-                                      pct=self._update_pct() if state == "downloading" else None,
-                                      copy=state == "failed" and self._update_fails >= 2)
-            self.btn_update.show()
-        box = self._update_box
-        if box is not None and qt_valid(box):
-            box.setText(self._update_box_text())
-        self._show_urgent()
-        self.update_state.emit()
-
-    def _update_clicked(self):
-        """The update card: the next step from where it is."""
-        if self._downloading:
-            self._update_info()
-        elif self._update_err:
-            self.download_update()   # "Couldn't update, try again"
-        else:
-            self.show_update()
-
-    def _update_box_text(self) -> str:
-        rel = self.release
-        done, total = self._update_got
-        mb = 1024 * 1024
-        if total:
-            return _("Downloading Onion Board {version}: {done} of {total} MB ({pct}%).",
-                     version=rel.version if rel else "", done=done // mb,
-                     total=max(1, round(total / mb)), pct=self._update_pct())
-        return _("Downloading Onion Board {version}: {done} MB so far.",
-                 version=rel.version if rel else "", done=done // mb)
-
-    def _update_info(self):
-        """Clicked while it downloads: how far it is, and a way to stop it."""
-        if self._update_box is not None or self.release is None:
-            return   # (never a second one)
-        box = QMessageBox(QMessageBox.Icon.Information, _("Downloading the update"),
-                          self._update_box_text(), QMessageBox.StandardButton.NoButton, self)
-        box.setInformativeText(_("You can keep using Onion Board meanwhile. When it's done, "
-                                 "the button says Restart to update."))
-        stop = box.addButton(_("Cancel download"), QMessageBox.ButtonRole.DestructiveRole)
-        box.addButton(_("Keep going"), QMessageBox.ButtonRole.RejectRole)
-        self._update_box = box
-        box.exec()
-        clicked = box.clickedButton()
-        self._update_box = None
-        free_dialog(box)
-        if clicked is stop and self._downloading:
-            self.cancel_update()
-
-    def cancel_update(self):
-        """Stop the download (updates.download checks between chunks)."""
-        if self._downloading:
-            self._update_cancel = True
-
-    def _copy_update_error(self):
-        """Copy error: what went wrong, where, for the user to send to the developer."""
-        usage.used("update-copy-error")
-        QApplication.clipboard().setText(self._update_detail or self._update_err)
-        self.toast(_("Error details copied: paste them into a message to the developer."),
-                   "ok")
-
-    def _update_report(self, rel, err: str, trace: str = "", step: str = "download") -> str:
-        """Copy error's text: everything needed to find the cause, nothing private
-        beyond what the error itself says."""
-        import platform
-        from datetime import UTC, datetime
-
-        from soundboard import __version__
-        done, total = self._update_got
-        lines = [
-            f"Onion Board update failed ({step}), try {self._update_fails + 1}",
-            f"From {__version__} to {rel.version}",
-            f"Windows: {platform.platform()}  frozen: {bool(getattr(sys, 'frozen', False))}",
-            f"Time (UTC): {datetime.now(UTC):%Y-%m-%d %H:%M:%S}",
-            f"URL: {rel.asset_url}",
-            f"File: {updates.installer_path(rel)}",
-            f"Got: {done} of {total or rel.size or '?'} bytes",
-            f"Error: {err}",
-        ]
-        if trace:
-            lines += ["", trace.strip()]
-        return "\n".join(lines)
-
-    def download_update(self):
-        """Fetch the new version's installer on a thread (updates.download)."""
-        rel = self.release
-        if rel is None or self._downloading:
-            return
-        if not net.allowed(updates.FEATURE):   # switched off since it was found
-            self.toast(html.escape(net.off_message(updates.FEATURE)), "warn")
-            return
-        self._downloading = True
-        self._update_cancel = False
-        self._update_err = ""
-        self._update_got = (0, rel.size or 0)
-        netlog.cause(updates.FEATURE, f"You clicked to download Onion Board {rel.version}")
-        usage.maybe_send(self.cfg, event=usage.update_event(rel.version))
-        self._show_update_state()
-        last = [-1]
-
-        def progress(done, total):
-            pct = min(done * 100 // total, 100) if total else done // (1024 * 1024)
-            if pct != last[0]:
-                last[0] = pct
-                self.bridge.update_progress.emit(done, total)
-
-        def failed(e):   # never leave the card stuck
-            import traceback
-            self._update_detail_next = "".join(traceback.format_exception(e, limit=8))
-            return None, errors.plain(e)
-        self._update_detail_next = ""
-        worker.run(lambda: (updates.download(rel, progress,
-                                             lambda: self._shut_down or self._update_cancel),
-                            ""),
-                   self.bridge.update_ready, "update-download", error=failed, owner=self)
-
-    def _on_update_progress(self, done, total):
-        if self._downloading and qt_valid(self):
-            self._update_got = (int(done), int(total or 0))
-            self._show_update_state()
-
-    def _on_update_ready(self, path, err: str):
-        if not qt_valid(self) or self._shut_down:
-            return
-        self._downloading = False
-        box, self._update_box = self._update_box, None
-        if box is not None and qt_valid(box):
-            box.reject()   # the Downloading box: done, one way or the other
-        rel = self.release
-        if rel is None:
-            return
-        if path is None and self._update_cancel:   # Cancel: back to "Update to …"
-            self._update_cancel = False
-            usage.used("update-cancelled")
-            self._update_got = (0, 0)
-            self._show_update_state()
-            return
-        if path is None:
-            self._update_detail = self._update_report(rel, err,
-                                                      getattr(self, "_update_detail_next", ""))
-            self._update_fails += 1
-            self._update_err = errors.plain(err) or _("the download failed")
-            usage.used("update-download-failed")
-            self._show_update_state()
-            url = rel.url
-            self.tell(_("Couldn't update"),
-                      _("Onion Board {version} couldn't be downloaded: {rstrip}.",
-                        version=rel.version, rstrip=errors.plain(err).rstrip('.')), "error",
-                      action=(_("Open the download page"),
-                              lambda: QDesktopServices.openUrl(QUrl(url))))
-            return
-        self._update_file = path
-        self._update_err, self._update_fails = "", 0
-        self._show_update_state()
-        if self.tray is not None and not self.isVisible():
-            # hidden in the tray, maybe mid-game: don't pop a question, just say so
-            self.tray.showMessage("Onion Board", _("Version {version} is ready to install: "
-                                                   "open Onion Board and click Restart to "
-                                                   "update.", version=rel.version),
-                                  QSystemTrayIcon.MessageIcon.Information, 8000)
-            return
-        if QApplication.activeModalWidget() is not None:
-            return   # something else is open: the card says Restart to update
-        self.install_update()
-
-    def install_update(self):
-        """Ask, then close the app and let the downloaded installer replace it (it
-        opens the app again when it's done)."""
-        rel, path = self.release, self._update_file
-        if rel is None or path is None:
-            return
-        box = QMessageBox(QMessageBox.Icon.Question, _("Install the update"),
-                          _("Onion Board {version} is ready. Restart now to install it?",
-                            version=rel.version),
-                          QMessageBox.StandardButton.NoButton, self)
-        box.setInformativeText(_("Onion Board closes, installs the new version and opens again "
-                                 "by itself, usually within a minute. Sounds that are playing "
-                                 "stop."))
-        now = box.addButton(_("Restart now"), QMessageBox.ButtonRole.AcceptRole)
-        box.addButton(_("Later"), QMessageBox.ButtonRole.RejectRole)
-        box.exec()
-        clicked = box.clickedButton()
-        free_dialog(box)
-        if clicked is not now:
-            usage.used("update-later")
-            return
-        if not path.is_file():   # removed meanwhile: fetch it again
-            self._update_file = None
-            self.download_update()
-            return
-        self.cfg.update_pending = rel.version
-        self.cfg.save()
-        try:
-            updates.start_install(path)
-        except OSError as e:
-            log.warning("couldn't start the update installer: %s", e)
-            self.cfg.update_pending = ""
-            self._save_later()
-            import traceback
-            self._update_detail = self._update_report(rel, errors.plain(e),
-                                                      traceback.format_exc(limit=8), "install")
-            self._update_fails += 1
-            self._update_err = errors.plain(e)
-            usage.used("update-install-failed")
-            self._show_update_state()   # "Couldn't update", click to try again
-            self.tell(_("Couldn't update"),
-                      _("The installer couldn't be started ({e}). You can download it "
-                        "from the release page instead.", e=errors.plain(e)), "error",
-                      action=(_("Open the download page"),
-                              lambda: QDesktopServices.openUrl(QUrl(updates.RELEASES))))
-            return
-        exitwatch.closed_by_windows()   # the installer closes us if the quit is slow
-        self.quit_app()
-
-    def after_update(self):
-        """At start: remove downloaded installers and, the first time after an update
-        was started, say whether it worked; then What's new, once per version."""
-        pending, self.cfg.update_pending = self.cfg.update_pending, ""
-        updates.cleanup()
-        from soundboard import __version__
-        if pending:
-            self._save_later()
-            if not updates.finished(pending):
-                self._update_failed(pending)
-                return
-            log.info("updated to %s", __version__)
-        self.whats_new(updated=bool(pending))
 
     def _go_tab(self, n: int, absolute: bool = False):
         """The n-th tab on the rail (`absolute`), or the one n steps from this one."""
@@ -10046,69 +9499,6 @@ class MainWindow(QMainWindow):
             return
         cur = next((k for k, b in enumerate(shown) if b.index == self.tabs.currentIndex()), 0)
         shown[(cur + n) % len(shown)].click()
-
-    def show_whats_new(self):
-        """The header's version, clicked: the newest release's notes, any time."""
-        from soundboard.ui import whatsnew
-        if not whatsnew.NOTES:
-            return
-        dlg = whatsnew.WhatsNewDialog(self, [whatsnew.NOTES[0]])
-        dlg.exec()
-        page = dlg.page
-        free_dialog(dlg)
-        if page:
-            self.open_settings(page)
-
-    def whats_new(self, updated: bool = False):
-        """What's new in this version (ui/whatsnew.py), if they haven't seen it: once,
-        with a button to the settings it's about. Waits while the window is in the tray
-        or the setup guide is about to run. `updated`: the app updated itself."""
-        from soundboard import __version__
-        from soundboard.ui import whatsnew
-        if not self.cfg.setup_done:   # the guide comes first; this waits for next time
-            return
-        if not self.isVisible():   # started with Windows, in the tray: when it's opened
-            self._whats_new_later = updated
-            return
-        notes = whatsnew.unseen(self.cfg.whats_new_seen)
-        if updates.newer(__version__, self.cfg.whats_new_seen or "0"):
-            self.cfg.whats_new_seen = __version__
-            self._save_later()
-        if notes:
-            dlg = whatsnew.WhatsNewDialog(self, notes, updated)
-            dlg.exec()
-            page = dlg.page
-            free_dialog(dlg)
-            if page:
-                self.open_settings(page)
-            return
-        if not updated:
-            return
-        url = f"https://github.com/{updates.REPO}/releases/tag/v{__version__}"
-        self.toast(_("Onion Board is up to date: version {version}.", version=__version__),
-                   "ok", 10000,
-                   action=(_("What's new"), lambda: QDesktopServices.openUrl(QUrl(url))))
-
-    def _update_failed(self, pending: str):
-        from soundboard import __version__
-        log.warning("the update to %s didn't finish (still %s)", pending, __version__)
-        usage.used("update-didnt-finish")
-        box = QMessageBox(QMessageBox.Icon.Warning, _("The update didn't finish"),
-                          _("Onion Board {pending} wasn't installed; this is still {version}. "
-                            "You can download it from its page and run it yourself.",
-                            pending=pending, version=__version__),
-                          QMessageBox.StandardButton.NoButton, self)
-        page = box.addButton(_("Open the download page"), QMessageBox.ButtonRole.AcceptRole)
-        logb = (box.addButton(_("Show the install log"), QMessageBox.ButtonRole.HelpRole)
-                if updates.INSTALL_LOG.is_file() else None)
-        box.addButton(_("Close"), QMessageBox.ButtonRole.RejectRole)
-        box.exec()
-        clicked = box.clickedButton()
-        free_dialog(box)
-        if clicked is page:
-            QDesktopServices.openUrl(QUrl(updates.RELEASES))
-        elif logb is not None and clicked is logb:
-            QDesktopServices.openUrl(QUrl.fromLocalFile(str(updates.INSTALL_LOG)))
 
     # ------------------------------------------------------------------ test mode
     def on_mic_check(self, on):
@@ -10148,9 +9538,9 @@ class MainWindow(QMainWindow):
         note, self._pending_note = getattr(self, "_pending_note", None), None
         if note:   # held back while the window was in the tray (see __init__)
             QTimer.singleShot(400, lambda: self._tell_load_note(note))
-        later, self._whats_new_later = getattr(self, "_whats_new_later", None), None
+        later, self.updctl._whats_new_later = getattr(self.updctl, "_whats_new_later", None), None
         if later is not None:   # held back while the window was in the tray
-            QTimer.singleShot(700, lambda: self.whats_new(later))
+            QTimer.singleShot(700, lambda: self.updctl.whats_new(later))
         # an older mic part: its update is offered a moment after the window opens
         QTimer.singleShot(MIC_OFFER_MS, self, self._offer_mic_update)
 
@@ -10519,7 +9909,7 @@ class MainWindow(QMainWindow):
         # last: opened out, the rail stays open until nothing else can give (it shut
         # again at once when opened in a mid-sized window)
         f.add(90, "w", self._squeeze_rail)
-        f.add(10, "w", r.hide(*self._pad_size))
+        f.add(10, "w", self._fit_size_picker)
         f.add(18, "w", r.icon_only(self.btn_view))   # its tooltip says what it is
         # the label and the dropdown go together: a lone "Clean" said nothing (the full
         # picker is on the Setup tab)

@@ -64,7 +64,7 @@ PROGRAM_FIELDS = ("apps", "apps_paths", "apps_hidden")
 KEEP = {"version", "sounds", "categories", "category", "category_hotkeys", "screen",
         "setup_done", "use_mode", "ptt_key", "update_checked", "update_pending", "update_skip",
         "stats_id", "stats_sent", "stats_heard", "stats_started", "stats_steps", "mic_first",
-        "stats_version", "stats_pending",
+        "duck_on", "stats_version", "stats_pending",
         *DEVICE_FIELDS, *PROGRAM_FIELDS}
 RADIO_KEEP = ("favorites", "recent")
 

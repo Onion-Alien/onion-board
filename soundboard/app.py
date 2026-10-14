@@ -648,17 +648,17 @@ def main():
         # the installer's "from Soundpad" box; with the setup guide up, run_setup
         # starts it once the guide is closed
         QTimer.singleShot(500, w.import_queued)
-    QTimer.singleShot(600, w.after_update)   # "Updated to …" after an update restarted it
+    QTimer.singleShot(600, w.updctl.after_update)   # "Updated to …" after an update restarted it
     # new versions (updates.py): unless unticked, at most every 6 hours, also for an app
     # left running for days
-    QTimer.singleShot(45_000, w.check_updates)
+    QTimer.singleShot(45_000, w.updctl.check_updates)
     QTimer.singleShot(60_000, w.send_usage)   # the anonymous daily count (usage.py)
     w.tick_usage()   # how long it's open, for the daily count: from now
     open_timer = QTimer(w)
     open_timer.timeout.connect(w.tick_usage)
     open_timer.start(usage.OPEN_TICK_S * 1000)
     recheck = QTimer(w)
-    recheck.timeout.connect(w.check_updates)
+    recheck.timeout.connect(w.updctl.check_updates)
     recheck.timeout.connect(w.send_usage)
     recheck.start(6 * 3600 * 1000)
     from soundboard.hangwatch import HangWatch

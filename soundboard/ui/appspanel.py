@@ -71,7 +71,7 @@ NEW_CARDS = 1           # program cards made per go (see AppsTab._apply_listing)
 CARDS_GAP_MS = 6        # ...and the break between goes, for the audio thread
 CONNECTING = _("Connecting…")   # a card's status while its capture is starting
 # where a sent program goes (cfg.apps[exe]["to"], cfg.apps_paths[path]["to"]): the
-# choice shows once a stream output is set (Also send to → Clean, for streaming), or
+# choice shows once a stream output is set (Also play on → Clean, for streaming), or
 # while it's set to anything but both
 TO = (("both", _("Call + stream"), _("Others in the call and your stream output both get it")),
       ("call", _("Call only"), _("Only others in the call get it, not your stream output")),
@@ -1918,7 +1918,7 @@ class AppsTab(QWidget):
         self._report_active()
 
     def _stream_output(self) -> bool:
-        """A stream output is set (Also send to → Clean, for streaming)."""
+        """A stream output is set (Also play on → Clean, for streaming)."""
         return bool(self.engine.names.get("obs"))
 
     def _on_hear(self, row: AppRow, on: bool):

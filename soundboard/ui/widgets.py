@@ -518,7 +518,11 @@ MINI_PAD_MIN_W = 96   # the mini player's two-a-row pads get no smaller than thi
 
 
 SLIM_PAD_H = 30      # a pad as a one-line row: the mini player when it's too small for cards
-LIST_ROW_W = 260     # the Sounds tab's list view: rows at least this wide, as many a line as fit
+# the Sounds tab's list view, by its row size (Config.list_rows): how tall a row is,
+# and how wide at least (as many a line as fit)
+LIST_ROW_H = {"small": 26, "medium": 30, "large": 38}
+LIST_ROW_W = {"small": 220, "medium": 260, "large": 300}
+ROW_MAX_H = max(LIST_ROW_H.values())   # a pad this short or shorter is drawn as a row
 
 
 def pad_height(width: int) -> int:
@@ -895,7 +899,7 @@ class Pad(QAbstractButton):
 
     def paintEvent(self, e):
         self.describe()
-        if self.height() <= SLIM_PAD_H:
+        if self.height() <= ROW_MAX_H:
             self._paint_slim()
             return
         p = QPainter(self)
@@ -1104,7 +1108,8 @@ class Pad(QAbstractButton):
         p.setBrush(QColor(T["accent"]) if self.picked else accent)
         p.drawEllipse(dot)
         f = QFont(self.font())
-        f.setPointSizeF(8.5)
+        h = self.height()   # bigger rows (the list's row size), bigger text
+        f.setPointSizeF(8.0 if h < SLIM_PAD_H else 8.5 if h < ROW_MAX_H else 9.5)
         p.setFont(f)
         fm = p.fontMetrics()
         if self.state in ("loading", "rendering"):
@@ -1230,6 +1235,7 @@ class PadGrid(QWidget):
         self.two_up = False      # the mini player: two smaller pads a row rather than one
         self.slim = False        # a tiny mini player: one-line rows instead of cards
         self.listed = False      # the list view (Sounds tab): one-line rows in columns
+        self.row_size = "medium"   # ...and how big those rows are (LIST_ROW_H)
         self.grid = QGridLayout(self)
         self.grid.setSpacing(10)
         self.grid.setContentsMargins(4, 4, 4, 4)
@@ -1320,6 +1326,12 @@ class PadGrid(QWidget):
             self._spacing()
             self.relayout(force=True)
 
+    def set_row_size(self, size: str):
+        if size in LIST_ROW_H and size != self.row_size:
+            self.row_size = size
+            if self.listed:
+                self.relayout(force=True)
+
     def _spacing(self):
         self.grid.setSpacing(4 if self.slim else 6 if self.listed else 10)
 
@@ -1335,8 +1347,10 @@ class PadGrid(QWidget):
         # height followed the width: each row losing a pad as the window narrowed
         # jolted every row below); only pads squeezed past that (a narrow window, the
         # mini player) get shorter
-        if self.rows():
+        if self.slim:
             return SLIM_PAD_H
+        if self.listed:
+            return LIST_ROW_H[self.row_size]
         return pad_height(min(self.pad_w, round(w / PAD_SHRINK)))
 
     def fit_width(self, room: int, slim: bool | None = None) -> tuple[int, int]:
@@ -1349,7 +1363,7 @@ class PadGrid(QWidget):
             if self.two_up:
                 return 1, max(1, room)
             sp = 6
-            cols = max(1, (room + sp) // (LIST_ROW_W + sp))
+            cols = max(1, (room + sp) // (LIST_ROW_W[self.row_size] + sp))
             return cols, max(1, (room - sp * (cols - 1)) // cols)
         sp = 10
         w = max(1, min(self.pad_w, room))
