@@ -52,6 +52,7 @@ from soundboard.ui.dialogs import EditDialog, TabHelpPopup
 from soundboard.ui.iconrow import CapIcon
 from soundboard.ui import importreport
 from soundboard.ui import routewarn
+from soundboard.ui import worker
 from soundboard.ui.dropveil import DropVeil
 from soundboard.ui import toast as toastmod
 from soundboard.ui import (a11y, alsosend, appstate, busy, clipeditor, icons, responsive,
@@ -81,8 +82,8 @@ from soundboard.ui.radiopanel import RadioOff, RadioTab
 from soundboard.ui.voicepanel import VoicePanel
 from soundboard.ui.playbutton import PlayButton
 from soundboard.ui.widgets import (DropdownMenu, Meter, NameAndSeek, Pad, PadGrid, SeekSlider,
-                                   SteadyTabs, expand_dropped, fmt_pos, loudness, pad_height,
-                                   spectrum, take_out, SLIM_PAD_H)
+                                   SteadyTabs, WindowRoot, expand_dropped, fmt_pos, loudness,
+                                   pad_height, spectrum, take_out, SLIM_PAD_H)
 from soundboard.wheelguard import AppStyle, no_wheel
 from soundboard.winkeys import Hotkeys
 from soundboard import errors
@@ -231,7 +232,7 @@ class BannerButton(QPushButton):
         super().__init__(text)
         self._full, self._short = text, short
         self.setSizePolicy(QSizePolicy.Policy.Ignored, QSizePolicy.Policy.Fixed)
-        self.setToolTip(text)
+        self.setAccessibleName(text)
 
     def resizeEvent(self, e):
         super().resizeEvent(e)
@@ -243,6 +244,7 @@ class BannerButton(QPushButton):
             text = fm.elidedText(self._short, Qt.TextElideMode.ElideRight, max(0, room))
         if text != self.text():
             self.setText(text)
+            self.setToolTip("" if text == self._full else self._full)   # only when cut
 
 
 class _Moved(QObject):
@@ -317,7 +319,7 @@ _TONE_SPAN = re.compile(r"<span style='color:[^']*'>(.*)</span>", re.S)
 
 class Bridge(QObject):
     loaded = Signal(str, object, str)          # id, data|None, error
-    exported = Signal(str, int, str)           # file, sounds written, error
+    exported = Signal(str, int, str, int)      # file, sounds written, error, left out
     unpacked = Signal(object, object, str)     # backup.Imported|None, backup.Package, error
     worked = Signal(object, object, object)    # _on_worker: then, result|None, error|None
     update = Signal(object, str, bool)         # updates.Release|None, error, asked by the user
@@ -327,7 +329,7 @@ class Bridge(QObject):
     watch_update = Signal(object)              # a newer Onion Watch: watchaddon.Offer
     discord = Signal(object)                   # [discordcfg.Settings] read in the background
     mic_users = Signal(object)                 # [appaudio.App] recording the mic (rawmic)
-    counted = Signal()                         # the daily usage count was sent (usage.py)
+    counted = Signal(object)                   # a usage count went: what it clears (usage.py)
     imported = Signal(object, object, object)  # meta|None, data|None, Skipped|None
     preview = Signal(str, object, float, int)  # id, audio with unsaved effects|None, gain, gen
     ffmpeg = Signal(object, object)            # ffmpegget.Health, after a fix: "" or its error
@@ -422,6 +424,9 @@ class MainWindow(QMainWindow):
         self.setWindowTitle(self.title)
         self.setAcceptDrops(True)   # files dropped outside the pad grid: see dropEvent
         self.cfg = Config.load()
+        # sounds left on the Undo bar by a crash: into Recently deleted (before the
+        # sounds folder is scanned, or their audio joins the board again bare)
+        trash.finish_held({m.id for m in self.cfg.sounds})
         if self.cfg.netlog_keep:   # the kept network history: listed, and saved from now
             netlog.keep(library.APP_DIR / netlog.FILE_NAME)
         net.configure_from(self.cfg)   # before anything goes online
@@ -474,7 +479,7 @@ class MainWindow(QMainWindow):
         self.bridge.watch_update.connect(self._on_watch_update)
         self.bridge.discord.connect(self._on_discord)
         self.bridge.mic_users.connect(self._on_mic_users)
-        self.bridge.counted.connect(self._save_later)   # stats_sent
+        self.bridge.counted.connect(self._usage_counted)
         self.bridge.ffmpeg.connect(self._on_ffmpeg)
         self.bridge.ffmpeg_progress.connect(self._on_ffmpeg_progress)
         self._removed: list[tuple[SoundMeta, int, np.ndarray | None]] = []   # undo-able
@@ -697,9 +702,8 @@ class MainWindow(QMainWindow):
         add-on version: after that it only checks they're there."""
         from soundboard import modules
         engine = self.engine
-        threading.Thread(target=lambda: modules.precompile(modules.discover(),
-                                                           engine.any_playing),
-                         daemon=True, name="addon-precompile").start()
+        worker.run(lambda: modules.precompile(modules.discover(), engine.any_playing),
+                   name="addon-precompile")
 
     def _warm_tls(self, tries: int = 0):
         """Qt sets up its TLS (reads Windows' certificates) on the first https request,
@@ -804,8 +808,8 @@ class MainWindow(QMainWindow):
         # made too small to use (see _refit)
         self._pages = QStackedWidget()
         self.setCentralWidget(self._pages)
-        root = self._full = QWidget()
-        root.setObjectName("root")   # the theme's window gradient
+        root = self._full = WindowRoot()
+        root.setObjectName("root")   # the theme's window background (flat or the glow)
         self._pages.addWidget(root)
         self._full_row = QHBoxLayout(root)   # the tab rail (ui/sidebar.py), then the rest
         self._full_row.setContentsMargins(0, 0, 0, 0)
@@ -1318,16 +1322,16 @@ class MainWindow(QMainWindow):
         self.mini_pp = PlayButton()
         self.mini_pp.setObjectName("transport_play")
         self.mini_pp.setProperty("mini", True)
-        self.mini_pp.setToolTip(_("Play / pause"))
+        self.mini_pp.setAccessibleName(_("Play / pause"))
         self.mini_pp.clicked.connect(self.toggle_play_pause)
         self.mini_st = QPushButton()
         self.mini_st.setObjectName("transport_stop")
-        self.mini_st.setToolTip(_("Stop"))
+        self.mini_st.setAccessibleName(_("Stop"))
         self.mini_st.clicked.connect(self.stop_current)
         icons.set_icon(self.mini_st, "stop", size=16)
         self.mini_skip = QPushButton()
         self.mini_skip.setObjectName("transport_stop")
-        self.mini_skip.setToolTip(_("Skip to the next sound in Up next"))
+        self.mini_skip.setAccessibleName(_("Skip to the next sound in Up next"))
         self.mini_skip.clicked.connect(self.skip_next)
         icons.set_icon(self.mini_skip, "next", size=16)
         for b in (self.mini_pp, self.mini_st, self.mini_skip):
@@ -1893,17 +1897,17 @@ class MainWindow(QMainWindow):
         f, th = bar()
         self.btn_pp = PlayButton()
         self.btn_pp.setObjectName("transport_play")
-        self.btn_pp.setToolTip(_("Play / pause"))
+        self.btn_pp.setAccessibleName(_("Play / pause"))
         self.btn_pp.clicked.connect(self.toggle_play_pause)
         self._pp_icon = None
         self.btn_st = QPushButton()
         self.btn_st.setObjectName("transport_stop")
-        self.btn_st.setToolTip(_("Stop"))
+        self.btn_st.setAccessibleName(_("Stop"))
         self.btn_st.clicked.connect(self.stop_current)
         icons.set_icon(self.btn_st, "stop", size=16)
         self.btn_skip = QPushButton()
         self.btn_skip.setObjectName("transport_stop")   # the same quiet square as ■
-        self.btn_skip.setToolTip(_("Skip to the next sound in Up next"))
+        self.btn_skip.setAccessibleName(_("Skip to the next sound in Up next"))
         self.btn_skip.clicked.connect(self.skip_next)
         icons.set_icon(self.btn_skip, "next", size=16)
         for b in (self.btn_pp, self.btn_st, self.btn_skip):
@@ -2016,7 +2020,7 @@ class MainWindow(QMainWindow):
                     name.clicked.connect(lambda __=False, s=sid: self.select(s))
                     stop = QPushButton()
                     stop.setObjectName("chipstop")
-                    stop.setToolTip(_("Stop this sound"))
+                    stop.setAccessibleName(_("Stop this sound"))
                     icons.set_icon(stop, "stop", "danger_text", size=12)
                     stop.setFixedSize(24, 24)
                     stop.clicked.connect(lambda __=False, s=sid: self._stop_one(s))
@@ -3299,8 +3303,7 @@ class MainWindow(QMainWindow):
 
     def _prepare_all(self):
         items = list(self.audio.items())
-        threading.Thread(target=lambda: [self.engine.prepare(s, d) for s, d in items],
-                         daemon=True, name="prepare").start()
+        worker.run(lambda: [self.engine.prepare(s, d) for s, d in items], name="prepare")
 
     def on_mic_toggle(self, b):
         """Send my mic to others, or sounds only. The mic itself stays open either
@@ -3945,12 +3948,12 @@ class MainWindow(QMainWindow):
 
         def work():
             self._helper_failed = not directmic._helper_check(via)
-            if qt_valid(self):
-                try:
-                    self.helper_checked.emit()
-                except (RuntimeError, TypeError):
-                    pass
-        threading.Thread(target=work, daemon=True, name="mic-helper-check").start()
+            return ()
+
+        def failed(_e):
+            self._helper_failed = True
+            return ()
+        worker.run(work, self.helper_checked, "mic-helper-check", error=failed, owner=self)
 
     def _helper_known(self):
         self._helper_checking = False
@@ -3986,20 +3989,20 @@ class MainWindow(QMainWindow):
                 self.setup_show.start()
         self._update_flow()
         log.info("attaching the mic effect to %s%s", mic, " (by itself)" if auto else "")
-        threading.Thread(target=self._attach_mic_work, args=(mic, clean, auto),
-                         daemon=True, name="mic-attach").start()
+
+        def failed(e):
+            self._mic_fail_kind = ""
+            return mic, errors.plain(e) or type(e).__name__
+        # the admin prompt can outlast the window (closed and freed meanwhile): then
+        # there's nobody to tell (owner)
+        worker.run(self._attach_mic_work, self.mic_attached, "mic-attach", error=failed,
+                   owner=self, args=(mic, clean, auto))
 
     def _attach_mic_work(self, mic: str, clean: bool = False, auto: bool = False):
         err = directmic.install(mic, clean=clean, ask_windows=not auto) or ""
         # its reason word, kept here: the signal hands _mic_attached a plain str
         self._mic_fail_kind = directmic.fail_kind(err) if err else ""
-        # the admin prompt can outlast the window (closed and freed meanwhile): then
-        # there's nobody to tell, and emitting on the freed window raises TypeError
-        if qt_valid(self):
-            try:
-                self.mic_attached.emit(mic, err)
-            except (RuntimeError, TypeError):   # freed between the check and the emit
-                pass
+        return mic, err
 
     def _mic_attached(self, mic: str, err: str):
         self._attaching = False
@@ -4192,8 +4195,8 @@ class MainWindow(QMainWindow):
             return
         from soundboard import cableremove
         self._vb_setup_asking = True
-        threading.Thread(target=lambda: self.cable_setup_found.emit(
-            cableremove.setup_exe() is not None), daemon=True, name="cable-setup").start()
+        worker.run(lambda: cableremove.setup_exe() is not None, self.cable_setup_found,
+                   "cable-setup", error=False, owner=self)
 
     def _cable_setup_found(self, found: bool):
         self._vb_setup_asking = False
@@ -4209,8 +4212,8 @@ class MainWindow(QMainWindow):
         from soundboard import cableremove
         self._rmcable_release = busy.hold(self.btn_rmcable,
                                           _("Removing… click Yes when Windows asks"))
-        threading.Thread(target=lambda: self.cable_removed.emit(cableremove.remove() or ""),
-                         daemon=True, name="cable-remove").start()
+        worker.run(lambda: cableremove.remove() or "", self.cable_removed, "cable-remove",
+                   error=lambda e: errors.plain(e) or type(e).__name__, owner=self)
 
     def _cable_removed(self, err: str):
         if err:
@@ -4445,7 +4448,6 @@ class MainWindow(QMainWindow):
         self._setup_app, self._setup_state = app, state
         self._setup_hide.stop()
         name = html.escape(app.name)
-        self.setup_x.setToolTip(_("Hide"))
         self.setup_x.setAccessibleName(_("Hide"))
         self.setup_no.setVisible(state == "offer")
         if state == "offer":
@@ -5011,15 +5013,21 @@ class MainWindow(QMainWindow):
             self._tor_told = say[0]
             self.toast(html.escape(say[1]), say[2])
 
-    def _save_now(self):
+    def _save_now(self, then=None):
         """The debounced save: the settings are copied now and written on the saver's
-        thread (library.Saver), then _on_saved says how it went."""
+        thread (library.Saver), then _on_saved says how it went. `then(ok)` is called on
+        the UI thread once this copy (or a newer one) is written, or failed to be."""
         self._saver.cfg = self.cfg
-        self._saver.save()
+        self._saver.save(then)
 
     def _on_saved(self, ok: bool):
         """A failure (disk full, antivirus lock) is logged by the writer; here it's
         shown once so the user knows settings aren't sticking."""
+        for then, was_ok in self._saver.finished():   # _save_now(then)s now on disk (or not)
+            try:
+                then(was_ok)
+            except Exception:  # noqa: BLE001 - one mustn't stop the report
+                log.exception("after saving settings")
         if ok:
             self._save_failed_shown = False
         elif not self._save_failed_shown:
@@ -5305,14 +5313,9 @@ class MainWindow(QMainWindow):
             return
         self._ff_checking = True
 
-        def work():
-            try:
-                h = ffmpegget.answer()
-            except Exception:  # noqa: BLE001 - no answer, never a crash
-                log.exception("FFmpeg check failed")
-                h = None
-            busy.emit(self.bridge.ffmpeg, h, None)
-        threading.Thread(target=work, daemon=True, name="ffmpeg-check").start()
+        # no answer is never a crash: the check failed
+        worker.run(lambda: (ffmpegget.answer(), None), self.bridge.ffmpeg, "ffmpeg-check",
+                   error=(None, None), owner=self)
 
     def _may_get_ffmpeg(self) -> bool:
         """Get FFmpeg without asking: unless the user said not to go online for it
@@ -5370,12 +5373,12 @@ class MainWindow(QMainWindow):
                 ffmpegget.fix(force, progress, stop)
             except ffmpegget.GetError as e:
                 err = e
-            except Exception as e:  # noqa: BLE001 - shown, never a stuck button
-                log.exception("Get FFmpeg failed")
-                err = ffmpegget.GetError(_("Couldn't get FFmpeg ({error}).",
-                                           error=errors.plain(e)))
-            busy.emit(self.bridge.ffmpeg, ffmpegget.last(), err)
-        threading.Thread(target=work, daemon=True, name="ffmpeg-get").start()
+            return ffmpegget.last(), err
+
+        def failed(e):   # shown, never a stuck button
+            return None, ffmpegget.GetError(_("Couldn't get FFmpeg ({error}).",
+                                              error=errors.plain(e)))
+        worker.run(work, self.bridge.ffmpeg, "ffmpeg-get", error=failed, owner=self)
         self._ffmpeg_news()
 
     def _on_ffmpeg_progress(self, pct: int):
@@ -5760,7 +5763,7 @@ class MainWindow(QMainWindow):
     def apply_theme(self, name: str):
         # a still of the window with Bun over it while every widget restyles: no frame
         # of a half-styled window, and it fades to the new theme (ui/themecover.py)
-        with themecover.covered(self):
+        with themecover.covered(self, name):
             self._apply_theme(name)
 
     def _apply_theme(self, name: str):
@@ -6489,6 +6492,9 @@ class MainWindow(QMainWindow):
         self._preview_done = done
         self.toast(_("Rendering the preview…"), "busy", key="preview")
 
+        def answer(out):
+            return (sid, out, gain, gen) if gen == self._preview_gen else worker.SKIP
+
         def run():
             try:
                 src = load_original(m)
@@ -6501,13 +6507,10 @@ class MainWindow(QMainWindow):
                     out = library.render_cached(m.id, src, fx,
                                                 cancel=lambda: gen != self._preview_gen)
             except library.Cancelled:
-                return   # a newer preview (or the dialog closed): nothing to play
-            except Exception:  # noqa: BLE001
-                log.exception("effects preview failed")
-                out = None
-            if gen == self._preview_gen:
-                self.bridge.preview.emit(sid, out, gain, gen)
-        threading.Thread(target=run, daemon=True, name="fx-preview").start()
+                return worker.SKIP   # a newer preview (or the dialog closed): nothing to play
+            return answer(out)
+        worker.run(run, self.bridge.preview, "fx-preview", error=lambda _e: answer(None),
+                   owner=self)
         return "rendering"
 
     def drop_preview(self):
@@ -7232,8 +7235,7 @@ class MainWindow(QMainWindow):
             thumbs.prune({m.image for m in live if m.image})
             trash.prune()   # what's been in Recently deleted for too long
             log.info("loaded %d sounds in %.1fs", len(todo), time.monotonic() - t0)
-        self._load_thread = threading.Thread(target=run, daemon=True, name="load")
-        self._load_thread.start()
+        self._load_thread = worker.run(run, name="load")
 
     def on_loaded(self, sid, data, err):
         # removed while it was loading (the index can lag behind cfg.sounds: check both)
@@ -7399,6 +7401,17 @@ class MainWindow(QMainWindow):
         copy_local = self.cfg.copy_local_sounds
         local_files = set(files)   # ZIP extraction adds temporary files later
         stop = self._import_stop
+        sent = [0]   # answers so far: on_imported waits for `count` of them
+
+        def emit(meta, data, err):
+            sent[0] += 1
+            self.bridge.imported.emit(meta, data, err)
+
+        def failed(e):   # the rest come back as one problem, so the import ends
+            first = next(iter(zips), files[0] if files else "")
+            for i in range(count - sent[0]):
+                emit(None, None, importreport.classify(first, e) if i == 0 else None)
+            return worker.SKIP
 
         def run():
             with tempfile.TemporaryDirectory(prefix="onionboard-zip-") as tmp:
@@ -7406,22 +7419,22 @@ class MainWindow(QMainWindow):
                 for k, (z, names) in enumerate(zips.items()):
                     if stop.is_set():   # Stop: not unpacked, only counted down
                         for __ in names:
-                            self.bridge.imported.emit(None, None, None)
+                            emit(None, None, None)
                         continue
                     try:
                         res = backup.extract_loose(z, names, Path(tmp) / str(k))
                     except Exception as e:  # noqa: BLE001 - too big, no room, damaged
                         log.warning("can't unpack %s: %s", z, e)
                         # one message for the zip; the rest only count down
-                        self.bridge.imported.emit(None, None, importreport.classify(z, e))
+                        emit(None, None, importreport.classify(z, e))
                         for __ in names[1:]:
-                            self.bridge.imported.emit(None, None, None)
+                            emit(None, None, None)
                         continue
                     for _n, dest, err in res:
                         if dest is None:
                             sk = importreport.classify(z, err)
                             sk.file = f"{Path(z).name} → {_n}"
-                            self.bridge.imported.emit(None, None, sk)
+                            emit(None, None, sk)
                         else:
                             todo.append(str(dest))
                 import_all(todo)
@@ -7429,7 +7442,7 @@ class MainWindow(QMainWindow):
         def import_all(files):
             for i, shown in enumerate(files):
                 if stop.is_set():   # Stop: the rest only count down, the ones in stay
-                    self.bridge.imported.emit(None, None, None)
+                    emit(None, None, None)
                     continue
                 f = shown   # read through any folder link Windows won't follow
                 try:
@@ -7437,7 +7450,7 @@ class MainWindow(QMainWindow):
                     fp = fingerprint(f)
                     if fp and fp in known:
                         if shown in extras:
-                            self.bridge.imported.emit(None, None, None)   # already moved over
+                            emit(None, None, None)   # already moved over
                             continue
                         raise importreport.AlreadyAdded(known[fp])
                     x = extras.get(shown)   # from another soundboard: named as it was there
@@ -7457,11 +7470,11 @@ class MainWindow(QMainWindow):
                     self.engine.prepare(meta.id, data)
                     if Path(f).parent == library.SOUNDS_DIR and Path(meta.file) != Path(f):
                         Path(f).unlink(missing_ok=True)   # dragged into the folder: now
-                    self.bridge.imported.emit(meta, data, None)   # it's in there as ours
+                    emit(meta, data, None)   # it's in there as ours
                 except Exception as e:  # noqa: BLE001
                     log.warning("can't import %s: %s", f, e)
-                    self.bridge.imported.emit(None, None, importreport.classify(shown, e))
-        threading.Thread(target=run, daemon=True, name="import").start()
+                    emit(None, None, importreport.classify(shown, e))
+        worker.run(run, self.bridge.imported, "import", error=failed)
         busy.set_busy(self.btn_add, True)   # back in on_imported, when they're all in
         self._import_total += count
         self._import_progress()
@@ -7633,7 +7646,7 @@ class MainWindow(QMainWindow):
         self.audio[meta.id] = data
         usage.used("clip")
         usage.step(self.cfg, "added-sound")
-        threading.Thread(target=self.engine.prepare, args=(meta.id, data), daemon=True).start()
+        worker.run(lambda: self.engine.prepare(meta.id, data), name="prepare")
         self._save_now()
         self._rebuild_pads()
         self.toast(_("Added “{name}” ({duration:.1f}s) to Sounds: right-click it there "
@@ -8060,6 +8073,8 @@ class MainWindow(QMainWindow):
                 self.current = None
                 self._set_np_name(_("Pick a sound"))
                 self.np_name.setToolTip(_("Select a sound pad to use these playback controls."))
+        # written down first: a crash before the Undo bar goes still bins them next start
+        trash.hold([(m, i) for m, i, _d in self._removed])
         self._save_now()
         self._rebuild_pads()
         self._fill_categories()
@@ -8082,6 +8097,7 @@ class MainWindow(QMainWindow):
             return
         done, self._removed = self._removed, []
         self._put_back(done)
+        trash.release([m.id for m, *_rest in done])   # after the save: back on the board
         # Ctrl+Z, not its button: its card goes too (after the sounds are back, so its
         # on_close finds their pack still in use)
         toastmod.close(self, UNDO_KEY)
@@ -8100,8 +8116,8 @@ class MainWindow(QMainWindow):
             m.tags = library.merge_tags(m.tags, self.cfg.categories, self.cfg.subcategories)
             if data is not None:
                 self.audio[m.id] = data
-                threading.Thread(target=self.engine.prepare, args=(m.id, data),
-                                 daemon=True).start()
+                worker.run(lambda m=m, data=data: self.engine.prepare(m.id, data),
+                           name="prepare")
         self._save_now()
         self._rebuild_pads()
         self._fill_categories()
@@ -8136,15 +8152,13 @@ class MainWindow(QMainWindow):
             if prev is not None:
                 prev.join()   # an earlier removal's sounds go in first
             n = trash.put_sounds(done) if done else None
+            trash.release([m.id for m, _i in done])   # in the bin: crash-safe now
             for pid in packs:
                 backup.forget_pack(pid)
-            if n is not None:
-                try:
-                    self.bin_filled.emit(n)
-                except RuntimeError:   # the window is gone
-                    pass
-        self._bin_thread = threading.Thread(target=work, daemon=True, name="to-bin")
-        self._bin_thread.start()
+            return worker.SKIP if n is None else n
+        # (nothing waits on it: the bin's count shows next time)
+        self._bin_thread = worker.run(work, self.bin_filled, "to-bin", error=worker.SKIP,
+                                      owner=self)
 
     def _wait_bin(self):
         """Let removed sounds finish going into the bin (before the bin is listed,
@@ -8513,17 +8527,21 @@ class MainWindow(QMainWindow):
         def run():
             try:
                 data = load_sound(m, cancel=lambda: self._render_gen.get(m.id) != gen)
-                if self._render_gen.get(m.id) != gen:
-                    return   # edited again meanwhile: a newer render is on its way
-                self.engine.prepare(m.id, data)
-                self.bridge.loaded.emit(m.id, data, "")
             except library.Cancelled:
-                return       # (it stopped partway for that newer one)
-            except Exception as e:  # noqa: BLE001
-                log.warning("can't apply effects to %s: %s", m.name, e)
-                self.bridge.loaded.emit(m.id, None, errors.plain(e))
-            prune_cache(cache_keep(self._live_metas()))
-        threading.Thread(target=run, daemon=True, name="fx-render").start()
+                return worker.SKIP   # (it stopped partway for a newer one)
+            if self._render_gen.get(m.id) != gen:
+                return worker.SKIP   # edited again meanwhile: a newer render is on its way
+            self.engine.prepare(m.id, data)
+            prune()
+            return m.id, data, ""
+
+        def prune():
+            worker.run(lambda: prune_cache(cache_keep(self._live_metas())), name="prune")
+
+        def failed(e):
+            prune()
+            return m.id, None, errors.plain(e)
+        worker.run(run, self.bridge.loaded, "fx-render", error=failed, owner=self)
 
     # ------------------------------------------------------------------ backup
     # Export / import: see soundboard/backup.py and docs/BACKUP-FORMAT.md. The file
@@ -8582,15 +8600,14 @@ class MainWindow(QMainWindow):
         self.toast(ngettext("Exporting {n} sound…", "Exporting {n} sounds…", len(sounds)))
 
         def run():
-            try:
-                n = backup.export(path, sounds, cfg, cats)
-                self.bridge.exported.emit(path, n, "")
-            except Exception as e:  # noqa: BLE001 - disk full, no permission…
-                log.exception("export to %s failed", path)
-                self.bridge.exported.emit(path, 0, errors.plain(e))
-        threading.Thread(target=run, daemon=True, name="export").start()
+            skipped = []   # locked or vanished files: left out, the rest still go
+            n = backup.export(path, sounds, cfg, cats, skipped)
+            return path, n, "", len(skipped)
+        # disk full, no permission…: told, and _exporting goes back
+        worker.run(run, self.bridge.exported, "export",
+                   error=lambda e: (path, 0, errors.plain(e), 0), owner=self)
 
-    def _on_exported(self, path: str, n: int, err: str):
+    def _on_exported(self, path: str, n: int, err: str, skipped: int = 0):
         self._exporting = False
         if err:
             self.tell(_("Export failed"),   # in place of the "Exporting…" card
@@ -8600,7 +8617,10 @@ class MainWindow(QMainWindow):
         msg = (ngettext("Exported {n} sound to {name}.",
                         "Exported {n} sounds to {name}.",
                         n, name=html.escape(Path(path).name)))
-        self.toast(msg, "ok")
+        if skipped:
+            msg += " " + ngettext("{n} sound couldn't be read and was left out.",
+                                  "{n} sounds couldn't be read and were left out.", skipped)
+        self.toast(msg, "warn" if skipped else "ok")
 
     def show_packs(self):
         """The Free packs window (soundboard.packs): a pack it downloads is imported the
@@ -8644,24 +8664,21 @@ class MainWindow(QMainWindow):
         # finding and reading the board, and checking every sound file is there, run on
         # a thread: the board file can be tens of MB and its sounds on a network drive
         # that's gone, which takes seconds a file (the window froze, even at start-up)
+        where = [path]
+
         def run():
-            where, result = path, None
-            try:
-                if not where:
-                    try:
-                        where = str(src.find() or "")
-                    except OSError:
-                        where = ""
-                if where:
-                    entries = src.read(Path(where))
-                    result = (*otherboards.importable(entries), entries)
-            except (OSError, ValueError) as e:
-                result = e
-            except Exception as e:   # noqa: BLE001 - a bad board mustn't kill the thread
-                log.exception("reading %s's board", src.name)
-                result = e
-            self.board_read.emit(src, where, ask, result)
-        threading.Thread(target=run, daemon=True, name="import-board").start()
+            if not where[0]:
+                try:
+                    where[0] = str(src.find() or "")
+                except OSError:
+                    where[0] = ""
+            if not where[0]:
+                return src, "", ask, None
+            entries = src.read(Path(where[0]))
+            return src, where[0], ask, (*otherboards.importable(entries), entries)
+        # a board that can't be read (or a bad one) comes back as what it raised
+        worker.run(run, self.board_read, "import-board",
+                   error=lambda e: (src, where[0], ask, e), owner=self)
 
     def _board_read(self, src: otherboards.Source, path: str, ask: bool, result):
         """import_other's read is back: the question, then the import, here on the UI
@@ -8781,16 +8798,13 @@ class MainWindow(QMainWindow):
         self.toast(ngettext("Importing {n} sound…", "Importing {n} sounds…", len(pkg.sounds)))
 
         def run():
-            try:
-                if pkg.is_pack:   # kept, so it can be reset or removed in one go later
-                    backup.keep_pack(pkg)
-                res = backup.install(
-                    pkg, known, lambda i: PAD_COLORS[(start + i) % len(PAD_COLORS)], have)
-                self.bridge.unpacked.emit(res, pkg, "")
-            except Exception as e:  # noqa: BLE001
-                log.exception("import of %s failed", path)
-                self.bridge.unpacked.emit(None, pkg, errors.plain(e))
-        threading.Thread(target=run, daemon=True, name="import-pack").start()
+            if pkg.is_pack:   # kept, so it can be reset or removed in one go later
+                backup.keep_pack(pkg)
+            res = backup.install(
+                pkg, known, lambda i: PAD_COLORS[(start + i) % len(PAD_COLORS)], have)
+            return res, pkg, ""
+        worker.run(run, self.bridge.unpacked, "import-pack",
+                   error=lambda e: (None, pkg, errors.plain(e)), owner=self)
 
     def _apply_backup_settings(self, raw: dict):
         was_off = list(self.cfg.tabs_off)
@@ -9076,16 +9090,9 @@ class MainWindow(QMainWindow):
         the UI thread."""
         QApplication.setOverrideCursor(Qt.CursorShape.WaitCursor)
 
-        def run():
-            try:
-                res, err = work(), None
-            except Exception as e:  # noqa: BLE001 - said by then()
-                res, err = None, e
-            try:
-                self.bridge.worked.emit(then, res, err)
-            except RuntimeError:   # the window is gone (quitting)
-                pass
-        threading.Thread(target=run, daemon=True, name=name).start()
+        # what it raised is said by then(); the window gone (quitting): nothing
+        worker.run(lambda: (then, work(), None), self.bridge.worked, name,
+                   error=lambda e: (then, None, e), owner=self)
 
     def _on_worked(self, then, res, err):
         QApplication.restoreOverrideCursor()
@@ -9393,19 +9400,27 @@ class MainWindow(QMainWindow):
 
         def run():
             try:
-                rel = updates.check(self.cfg, force=force)
-                self.bridge.update.emit(rel, "", force)
+                rel, err = updates.check(self.cfg, force=force), ""
             except Exception as e:  # noqa: BLE001 - offline etc.
-                self.bridge.update.emit(None, errors.plain(e), force)
-            if due:   # and the Onion Watch add-on, once it's installed (else nothing asked)
-                offer = watchaddon.check_update()
-                if offer is not None:
-                    self.bridge.watch_update.emit(offer)
-        threading.Thread(target=run, daemon=True, name="update-check").start()
+                rel, err = None, errors.plain(e)
+            busy.emit(self.bridge.update, rel, err, force, owner=self)
+            if not due:   # the Onion Watch add-on next, once it's installed (else nothing asked)
+                return worker.SKIP
+            offer = watchaddon.check_update()
+            return worker.SKIP if offer is None else offer
+        # (nothing waits on the add-on's answer)
+        worker.run(run, self.bridge.watch_update, "update-check", error=worker.SKIP,
+                   owner=self)
 
     def send_usage(self):
         """The anonymous daily usage count, if it's due and switched on (usage.py)."""
         usage.maybe_send(self.cfg, self.bridge.counted.emit, app_dir=library.APP_DIR)
+
+    def _usage_counted(self, apply):
+        """A usage count went: here, on the UI thread that also adds to them, its
+        stats_* are cleared (only what it sent) and saved."""
+        apply()
+        self._save_later()
 
     def _voice_fx_changed(self, spec: dict):
         if spec.get("enabled"):
@@ -9530,16 +9545,15 @@ class MainWindow(QMainWindow):
         self._raw_looking = True
 
         def run():
-            apps = None
             try:
                 # in the endpoint effect nobody can skip it, and one copy serves every
                 # app (its stream count isn't per app): nobody to name
-                apps = [] if directmic.endpoint_wide() else \
+                return [] if directmic.endpoint_wide() else \
                     appaudio.recording_apps(mic, mine=True)
             except Exception:  # noqa: BLE001 - a check that can't run shows nothing
-                log.debug("listing who records the mic failed", exc_info=True)
-            self.bridge.mic_users.emit(apps)
-        threading.Thread(target=run, daemon=True, name="raw-mic").start()
+                log.debug("listing who records the mic failed", exc_info=True)   # (often)
+                return None
+        worker.run(run, self.bridge.mic_users, "raw-mic", error=None, owner=self)
 
     def _on_mic_users(self, apps, now: float | None = None):
         self._raw_looking = False
@@ -9848,21 +9862,15 @@ class MainWindow(QMainWindow):
                 last[0] = pct
                 self.bridge.update_progress.emit(done, total)
 
-        def run():
+        def failed(e):   # never leave the card stuck
             import traceback
-            try:
-                path = updates.download(rel, progress,
-                                        lambda: self._shut_down or self._update_cancel)
-                self.bridge.update_ready.emit(path, "")
-            except updates.UpdateError as e:
-                self._update_detail_next = traceback.format_exc(limit=8)
-                self.bridge.update_ready.emit(None, errors.plain(e))
-            except Exception as e:  # noqa: BLE001 - never leave the card stuck
-                log.exception("update download failed")
-                self._update_detail_next = traceback.format_exc(limit=8)
-                self.bridge.update_ready.emit(None, errors.plain(e))
+            self._update_detail_next = "".join(traceback.format_exception(e, limit=8))
+            return None, errors.plain(e)
         self._update_detail_next = ""
-        threading.Thread(target=run, daemon=True, name="update-download").start()
+        worker.run(lambda: (updates.download(rel, progress,
+                                             lambda: self._shut_down or self._update_cancel),
+                            ""),
+                   self.bridge.update_ready, "update-download", error=failed, owner=self)
 
     def _on_update_progress(self, done, total):
         if self._downloading and qt_valid(self):
@@ -10382,12 +10390,11 @@ class MainWindow(QMainWindow):
 
         def look():
             try:
-                found = videos.get(sid)
+                return sid, videos.get(sid)
             except Exception:  # noqa: BLE001 - never leave _video_asking stuck
-                log.debug("video lookup failed", exc_info=True)
-                found = None
-            busy.emit(self.video_found, sid, found)
-        threading.Thread(target=look, daemon=True, name="video-lookup").start()
+                log.debug("video lookup failed", exc_info=True)   # (a sleeping drive)
+                return sid, None
+        worker.run(look, self.video_found, "video-lookup", error=(sid, None))
 
     def _video_found(self, sid: str, path):
         self._video_asking = None

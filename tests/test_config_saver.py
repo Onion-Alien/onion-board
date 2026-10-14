@@ -79,6 +79,33 @@ def test_an_older_snapshot_never_overwrites_a_newer_save(app_dir):
     assert _on_disk()["theme"] == "Paper"
 
 
+def test_save_then_is_handed_back_once_its_copy_is_written(app_dir, monkeypatch):
+    """save(then): finished() gives `then` back with that write's result, only once a
+    write covers its copy, never one from an older copy that was already on its way."""
+    writing, gate = threading.Event(), threading.Event()
+    real = library._write
+    results = iter([True, False])
+
+    def slow(snap):
+        writing.set()
+        gate.wait(5)
+        real(snap)
+        return next(results)
+    monkeypatch.setattr(library, "_write", slow)
+    s = library.Saver(Config())
+    s.save()
+    assert writing.wait(5)          # the first copy is on its way to the disk
+    told = []
+    s.save(lambda ok: told.append(ok))
+    assert s.finished() == []
+    gate.set()
+    assert s.flush(10)
+    (then, ok), = s.finished()      # the second write (the one that failed) covers it
+    assert ok is False and s.finished() == []
+    then(ok)
+    assert told == [False]
+
+
 def test_a_failed_write_is_reported(app_dir, monkeypatch):
     def broken(*_a, **_k):
         raise OSError("disk full")

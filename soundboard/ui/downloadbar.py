@@ -480,8 +480,7 @@ class DownloadBar(QFrame):
     def _icon_button(self, name: str, tip: str, side: int = 28) -> QPushButton:
         b = QPushButton()
         b.setObjectName("dlicon")
-        b.setToolTip(tip)
-        b.setAccessibleName(tip)
+        b.setAccessibleName(tip)   # no tooltip: ■, ✕ and the fold arrow say it
         b.setCursor(Qt.CursorShape.PointingHandCursor)
         b.setFixedSize(side, side)
         icons.set_icon(b, name, "muted", size=18 if side >= 28 else 16)
@@ -551,12 +550,9 @@ class DownloadBar(QFrame):
         h = self._cur_lay = QHBoxLayout(cur)
         h.setContentsMargins(8, 8, 6, 8)
         h.setSpacing(12)
-        self.thumb = QLabel()
-        self.thumb.setFixedSize(THUMB_W, THUMB_H)
-        self.thumb.setAlignment(Qt.AlignmentFlag.AlignCenter)
-        h.addWidget(self.thumb, 0, Qt.AlignmentFlag.AlignVCenter)
-        # no picture of its own (an MP3, a link without art): Bun writes the download down,
-        # centred in the picture's column so he lines up with the rows' pictures under him
+        # Bun first, always: he writes the download down and shows how it went (the
+        # picture beside him stays clean); then the sound's picture, or the plain
+        # placeholder the rows use, in the column the rows' pictures line up under
         self.scribe = ScribeBunny()
         self._scribe_box = QWidget()
         self._scribe_box.setObjectName("scribebox")
@@ -566,6 +562,10 @@ class DownloadBar(QFrame):
         sb.setContentsMargins(0, 0, 0, 0)
         sb.addWidget(self.scribe, 0, Qt.AlignmentFlag.AlignCenter)
         h.addWidget(self._scribe_box, 0, Qt.AlignmentFlag.AlignVCenter)
+        self.thumb = QLabel()
+        self.thumb.setFixedSize(THUMB_W, THUMB_H)
+        self.thumb.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        h.addWidget(self.thumb, 0, Qt.AlignmentFlag.AlignVCenter)
 
         col = self._col = QVBoxLayout()
         col.setSpacing(LINE_GAP)
@@ -616,6 +616,9 @@ class DownloadBar(QFrame):
         self.lbl_status.setSizePolicy(QSizePolicy.Policy.Fixed, QSizePolicy.Policy.Fixed)
         row2.addWidget(self.lbl_status, 0, Qt.AlignmentFlag.AlignVCenter)
         row2.addStretch(1)   # past the bar's length: room, not a gap before the number
+        # as tall with the pill as without it (hidden when a pick ends): the title above
+        # mustn't hop up when one ends and down when the next starts
+        row2.addStrut(self.pill.sizeHint().height())
         col.addLayout(row2)
         h.addLayout(col, 1)
         h.setAlignment(col, Qt.AlignmentFlag.AlignVCenter)
@@ -841,9 +844,7 @@ class DownloadBar(QFrame):
             self._apply_fold()
 
     def _fold_icon(self):
-        tip = _("Show more") if self._folded() else _("Hide")
-        self.btn_min.setToolTip(tip)
-        self.btn_min.setAccessibleName(tip)
+        self.btn_min.setAccessibleName(_("Show more") if self._folded() else _("Hide"))
         icons.set_icon(self.btn_min, "fold_open" if self._folded() else "fold_up", "muted")
 
     def _running(self) -> bool:
@@ -887,20 +888,30 @@ class DownloadBar(QFrame):
         n = len(self._failed)
         self.h_failed.setText(ngettext("{n} failed", "{n} failed", n) if n else "")
         self.h_failed.setVisible(bool(n))
-        over = not self._running() and not self._queue
-        self.btn_stop_all.setVisible(bool(self._queue))
+        running = self._running()
+        over = not running and not self._queue
+        # Stop all stays up to the end of a batch (the last pick running, nothing left
+        # waiting): it still stops that one, and the bar beside it doesn't jump over
+        batch = bool(self._others_added() or self._others_failed())
+        self.btn_stop_all.setVisible(bool(self._queue) or (running and batch))
         self.btn_close.setVisible(over)
         # folded for room, it can't open: no button that does nothing
         self.btn_min.setVisible(not over and not self._mini
                                 and (self._collapsed or self._room == "open"))
-        show_bar = self._running()
+        # also between two picks (the one that ended shows its tick, the next waits): the
+        # bar staying up there is what makes the hand-over look like one job
+        show_bar = running or bool(self._queue)
         self.s_bar.setVisible(show_bar)
         self.s_text.setVisible(show_bar)
         done = len(self._others_added()) + len(self._others_failed())
-        frac = jobprogress.batch(done, self.progress_frac if show_bar else None,
-                                 len(self._queue))
+        current = (self.progress_frac if running else
+                   1.0 if show_bar and self.url and self.stage == "done" else None)
+        frac = jobprogress.batch(done, current, len(self._queue))
         self.s_text.setText(f"{frac * 100:.0f}%" if show_bar else "")
-        self.s_bar.set_progress(frac, busy=show_bar and self.stage != "downloading")
+        # as wide as "100%" from the start: 9% -> 10% mustn't nudge the bar beside it
+        self.s_text.setMinimumWidth(self.s_text.fontMetrics().horizontalAdvance("100%"))
+        self.s_text.setAlignment(Qt.AlignmentFlag.AlignRight | Qt.AlignmentFlag.AlignVCenter)
+        self.s_bar.set_progress(frac, busy=running and self.stage != "downloading")
 
     # ------------------------------------------------------------------ sizes
 
@@ -1045,15 +1056,14 @@ class DownloadBar(QFrame):
         return _placeholder(w, h, radius, dpr)
 
     def _update_thumb(self):
-        if self._pm is not None and not self._pm.isNull():
-            self.thumb.setPixmap(self._picture(self._pm, THUMB_W, THUMB_H, 8))
+        self.thumb.setPixmap(self._picture(self._pm, THUMB_W, THUMB_H, 8))
         self._apply_art()
 
     def _apply_art(self):
-        """The sound's own picture if it has one, else Bun at his scroll."""
-        has = self._pm is not None and not self._pm.isNull()
-        self.thumb.setVisible(has and not self._tight)
-        self._scribe_box.setVisible(not has and not self._tight)
+        """Bun at his scroll, then the sound's picture (the placeholder if it has none):
+        both always, except in a narrow banner."""
+        self.thumb.setVisible(not self._tight)
+        self._scribe_box.setVisible(not self._tight)
 
     # ------------------------------------------------------------------ the rest of the list
 
@@ -1112,6 +1122,7 @@ class DownloadBar(QFrame):
         rl.setContentsMargins(8, 6, 6, 6)
         rl.setSpacing(12)
         if not self._tight:   # centred under the running row's picture, titles in line
+            rl.addSpacing(THUMB_W)   # under Bun's column
             pic = QLabel()
             pic.setFixedSize(THUMB_W, ROW_THUMB[1])
             pic.setAlignment(Qt.AlignmentFlag.AlignCenter)
@@ -1200,7 +1211,7 @@ class DownloadBar(QFrame):
         # a second of tick (or red ✗ and a red glow) over the picture so it's noticed; the
         # mini player has no picture: just the glow when it failed
         spot = QRectF()
-        art = next((w for w in (self.thumb, self.scribe) if w.isVisibleTo(self)), None)
+        art = self.scribe if self.scribe.isVisibleTo(self) else None   # on Bun, not the picture
         if art is not None:
             top_left = art.mapTo(self, art.rect().topLeft())
             spot = QRectF(top_left.x(), top_left.y(), art.width(), art.height())

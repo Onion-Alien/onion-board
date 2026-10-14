@@ -787,8 +787,8 @@ class SearchResults(RoundedFrame):
         self._asked = PAGE      # hits asked for so far (Show more asks for the next PAGE)
         self._rows: list[ResultRow] = []
         self._fetching: dict[str, set[str]] = {}   # url -> {"play", "add"} downloading
-        self.net = QNetworkAccessManager(self)
-        net.apply_qt(self.net, "sounds_web")   # thumbnails: Settings > Privacy & security
+        # thumbnails, one network manager per site switch (Settings > Privacy & security)
+        self._nams: dict[str, QNetworkAccessManager] = {}
         self._done.connect(self._on_done)
         self._thumb_decoded.connect(self._on_thumb_decoded)
 
@@ -800,7 +800,6 @@ class SearchResults(RoundedFrame):
         header.setContentsMargins(0, 0, 0, 0)   # Back starts where the cards' panels do
         head = Flow(header, gap=8)
         back = self.btn_back = QPushButton(_("Back"))
-        back.setToolTip(_("Back to my sounds"))
         back.setAccessibleName(_("Back to my sounds"))
         back.setObjectName("backhome")   # the way out of the results: a plain button
         back.setCursor(Qt.CursorShape.PointingHandCursor)
@@ -1155,13 +1154,26 @@ class SearchResults(RoundedFrame):
             thumb = net.web_url(r.thumb)   # web links only
             if not quality.current.web_extras or not thumb:   # Settings > Data & quality
                 continue
+            # under the switch of the server it's on (i.ytimg.com is YouTube's), whatever
+            # site the search went to: switching YouTube off stops its pictures too
+            feature = ytdl.site_feature(thumb)
+            if not net.allowed(feature):
+                continue
             req = QNetworkRequest(QUrl(thumb))
             req.setTransferTimeout(THUMB_TIMEOUT_MS)
-            reply = self.net.get(req)
+            reply = self._nam(feature).get(req)
             reply.downloadProgress.connect(
                 lambda got, total, reply=reply: _cap_thumb(reply, got, total))
             reply.finished.connect(lambda reply=reply, row=row, g=gen: self._on_thumb(
                 reply, row, g))
+
+    def _nam(self, feature: str) -> QNetworkAccessManager:
+        """The network manager whose requests carry `feature` (a site's switch)."""
+        nam = self._nams.get(feature)
+        if nam is None:
+            nam = self._nams[feature] = QNetworkAccessManager(self)
+            net.apply_qt(nam, feature)
+        return nam
 
     def _on_thumb(self, reply, row: ResultRow, gen: int):
         """A picture came in (or failed, or was cut off): decode it on a worker, since a

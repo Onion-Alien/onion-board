@@ -335,14 +335,6 @@ def download(rel: Release, progress: Callable[[int, int], None] | None = None,
     return dest
 
 
-def _length(header) -> int:
-    """Content-Length as a number; 0 (unknown) when it's missing or isn't one."""
-    try:
-        return max(int(str(header or 0).strip()), 0)
-    except ValueError:
-        return 0
-
-
 def fetch(url: str, sha256: str, dest: Path, trusted: tuple[str, ...], max_size: int,
           what: str, size: int = 0, progress: Callable[[int, int], object] | None = None,
           cancelled: Callable[[], bool] | None = None, feature: str = FEATURE) -> Path:
@@ -369,42 +361,37 @@ def fetch(url: str, sha256: str, dest: Path, trusted: tuple[str, ...], max_size:
         return dest   # downloaded earlier, never used
     dest.parent.mkdir(parents=True, exist_ok=True)
     part = dest.with_name(dest.name + ".part")
-    h = hashlib.sha256()
-    done = 0
+
+    def check():
+        if cancelled is not None and cancelled():
+            raise UpdateError(_("cancelled"))
+        if not net.allowed(feature):   # switched off (or Offline) meanwhile
+            raise UpdateError(net.off_message(feature))
+
     try:
         with _open(url, feature) as r, open(part, "wb") as f:
             if not r.geturl().startswith("https://"):
                 raise UpdateError(_("the download was redirected off HTTPS"))
-            total = _length(r.headers.get("Content-Length")) or size or 0
-            if total > max_size:
-                raise UpdateError(too_big)
-            while chunk := r.read(CHUNK):
-                if cancelled is not None and cancelled():
-                    raise UpdateError(_("cancelled"))
-                if not net.allowed(feature):   # switched off (or Offline) meanwhile
-                    raise UpdateError(net.off_message(feature))
-                done += len(chunk)
-                if done > max_size:
-                    raise UpdateError(too_big)
-                h.update(chunk)
-                f.write(chunk)
-                if progress is not None:
-                    progress(done, total)
-        if h.hexdigest() != sha256:
-            log.warning("%s: SHA-256 %s, expected %s", dest.name, h.hexdigest(), sha256)
+            got = net.read_capped(r, f, max_size, chunk=CHUNK, total=size,
+                                  progress=progress, check=check)
+        if got != sha256:
+            log.warning("%s: SHA-256 %s, expected %s", dest.name, got, sha256)
             raise UpdateError(_("the downloaded file isn't the one GitHub lists "
                                 "(its checksum doesn't match), so it wasn't kept"))
         os.replace(part, dest)
     except UpdateError:
         part.unlink(missing_ok=True)
         raise
+    except net.TooBig:
+        part.unlink(missing_ok=True)
+        raise UpdateError(too_big) from None
     except net.ProxyError as e:   # switched off / Offline / the connection changed: its
         part.unlink(missing_ok=True)   # message already says so, in the user's words
         raise UpdateError(str(e)) from e
     except OSError as e:   # offline, disk full, connection dropped…
         part.unlink(missing_ok=True)
         raise UpdateError(_("the download failed ({error})", error=errors.plain(e))) from e
-    log.info("downloaded %s (%d bytes, SHA-256 checked)", dest.name, done)
+    log.info("downloaded %s (%d bytes, SHA-256 checked)", dest.name, dest.stat().st_size)
     return dest
 
 

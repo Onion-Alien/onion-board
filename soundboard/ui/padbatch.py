@@ -107,16 +107,10 @@ class PadSelection(QObject):
         h.setSpacing(6)
         self.lbl = QLabel()
         h.addWidget(self.lbl, 1)
-        for text, tip, fn in (
-                (_("Colour"), _("Give every picked pad the same colour"), self._color_menu),
-                (_("Volume"), _("Set every picked sound's volume"), self.ask_volume),
-                (_("Fades"), _("Set every picked sound's fade in / fade out"),
-                 self.ask_fades),
-                (_("Categories"), _("Put the picked sounds in a category, or take them out"),
-                 self._cats_menu)):
+        for text, fn in ((_("Colour"), self._color_menu), (_("Volume"), self.ask_volume),
+                         (_("Fades"), self.ask_fades), (_("Categories"), self._cats_menu)):
             b = QPushButton(text)
             b.setObjectName("small")
-            b.setToolTip(tip)
             b.clicked.connect(lambda __=False, b=b, fn=fn: fn(b))
             h.addWidget(b)
         rm = QPushButton(_("Remove"))

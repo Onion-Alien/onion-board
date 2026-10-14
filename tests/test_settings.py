@@ -12,7 +12,7 @@ from PySide6.QtWidgets import QApplication, QFrame, QLabel, QPushButton, QScroll
 
 from conftest import process_events
 from soundboard import net
-from soundboard.settings import SettingsDialog
+from soundboard.settings import SettingsDialog, ThemeCard
 from soundboard.ui import busy
 from test_mainwindow import window  # noqa: F401  (the real MainWindow fixture)
 
@@ -411,6 +411,36 @@ def test_remote_page_copies_an_ai_prompt_with_the_key_only_when_ticked(window): 
         window.apply_remote()
 
 
+def test_a_new_remote_key_says_made_only_once_it_is_saved(window, monkeypatch):  # noqa: F811
+    """New key: saved on the saver's thread, never cfg.save() on the UI thread; "made"
+    only once it's on disk. A failed save says so instead (after a restart the old key
+    would be back, and a Stream Deck set up with the new one would stop working)."""
+    from soundboard import library
+    from soundboard.ui import mainwindow
+    flashed, toasts, ui_saves = [], [], []
+    monkeypatch.setattr(busy, "flash", lambda btn, text, ms=0: flashed.append(text))
+    monkeypatch.setattr(busy, "toast", lambda w, text, kind="", *a, **k: toasts.append(kind))
+    monkeypatch.setattr(type(window.cfg), "save", lambda self: ui_saves.append(1) or True)
+    monkeypatch.setattr(mainwindow.MainWindow, "apply_remote", lambda self: "")
+    window._save_failed_shown = False
+    window.cfg.api_enabled, window.cfg.api_token = True, "the-old-key"
+    d = SettingsDialog(window, "remote")
+    try:
+        new = next(b for b in d.findChildren(QPushButton) if b.text() == "New key")
+        monkeypatch.setattr(library, "_write", lambda snap: False)   # disk full, say
+        new.click()
+        assert process_events(QApplication.instance(), lambda: "error" in toasts, 5)
+        assert flashed == [] and window.cfg.api_token != "the-old-key"
+        monkeypatch.setattr(library, "_write", lambda snap: True)
+        new.click()
+        assert process_events(QApplication.instance(), lambda: flashed, 5)
+        assert flashed == ["✓ New key made"]
+        assert ui_saves == []                # never the whole config on the UI thread
+    finally:
+        d.close()
+        window.cfg.api_enabled = False
+
+
 def test_about_shows_the_version_and_only_opens_pages(window, monkeypatch):  # noqa: F811
     from soundboard.ui.mainwindow import version_text
     opened = []
@@ -468,27 +498,34 @@ def test_every_texture_tile_is_see_through(qapp, kind):
         assert min(alphas) < 255, (kind, name)
 
 
-def test_matte_grain_replaces_a_cached_speckled_tile(qapp, tmp_path, monkeypatch):
-    """An existing installation must not keep its old texture after upgrading."""
-    import hashlib
-    from PySide6.QtGui import QImage, QColor
+def test_textured_paints_the_glow_and_the_theme_cards_preview_it(qapp, window, monkeypatch):  # noqa: F811
+    """Textured: the window gets a soft glow of the theme's accents (opaque, so scrolling
+    can copy it) and each theme card shows its own pattern. Plain: flat, no pattern."""
+    from PySide6.QtCore import QPointF, QRect
+    from PySide6.QtGui import QImage, QPainter
     from soundboard import theme
 
-    tk = theme.tokens("Dark")
-    key = ("grain", tk["panel"], tk["text_hi"], tk["accent"], tk["accent2"],
-           tk.get("texture_ink", ""), tk.get("texture_strength", ""))
-    folder = tmp_path / "onionboard-ui"
-    folder.mkdir()
-    stale = folder / f"tex-grain-{hashlib.md5(repr(key).encode()).hexdigest()[:10]}.png"
-    old = QImage(96, 96, QImage.Format.Format_ARGB32)
-    old.fill(QColor("magenta"))
-    assert old.save(str(stale))
-    monkeypatch.setattr(theme.tempfile, "gettempdir", lambda: str(tmp_path))
-    monkeypatch.setattr(theme, "_texture_urls", {})
+    def corner(textured):
+        img = QImage(400, 300, QImage.Format.Format_ARGB32)
+        p = QPainter(img)
+        theme.paint_window_bg(p, QRect(0, 0, 400, 300), QPointF(0, 0), 400, 300,
+                              tk=theme.THEMES["Dark"], textured=textured)
+        p.end()
+        c = img.pixelColor(40, 10)
+        assert c.alpha() == 255
+        return c.name()
+    assert corner(False) == theme.THEMES["Dark"]["bg"]
+    assert corner(True) != theme.THEMES["Dark"]["bg"]
+
+    def card_colours(name):
+        card = ThemeCard(name)
+        card.resize(card.sizeHint())
+        img = card.grab().toImage()
+        return {img.pixelColor(x, y).name() for x in range(18, 52) for y in range(28, 40)}
+    monkeypatch.setattr(theme, "textures_on", False)
+    assert len(card_colours("Hacker")) == 1
     monkeypatch.setattr(theme, "textures_on", True)
-    url = theme._texture_url(tk)
-    assert url != stale.as_posix()
-    assert QImage(url) == theme.texture_image("grain", tk)
+    assert len(card_colours("Hacker")) > 1   # scanlines on the pads
 
 
 def _ink_left(lbl) -> int | None:

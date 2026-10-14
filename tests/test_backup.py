@@ -386,3 +386,65 @@ def test_a_zip_of_sounds_too_big_to_import_is_refused(app_dir, tmp_path, monkeyp
     with pytest.raises(backup.BackupError, match="Import it in parts"):
         backup.extract_loose(p, backup.loose_audio(p), tmp_path / "out")
     assert not (tmp_path / "out").exists()   # refused before anything is written
+
+
+@pytest.fixture
+def locked(monkeypatch):
+    """locked(path): from now on opening `path` fails the way a file another program
+    holds open (or that was moved away mid-export) does."""
+    import builtins
+    real_open, paths = builtins.open, set()
+
+    def fake_open(file, *a, **kw):
+        if isinstance(file, (str, library.Path)) and str(file) in paths:
+            raise PermissionError(13, "The process cannot access the file", str(file))
+        return real_open(file, *a, **kw)
+    monkeypatch.setattr(builtins, "open", fake_open)
+    return lambda path: paths.add(str(path))
+
+
+def test_one_unreadable_sound_is_left_out_not_the_whole_export(board, tmp_path, locked):
+    locked(board.sounds[0].file)
+    out, skipped = tmp_path / "b.zip", []
+    assert backup.export(out, board.sounds, board, board.categories, skipped) == 1
+    assert skipped == ["Air horn"]
+    pkg = backup.read(out)
+    assert [s.entry["name"] for s in pkg.sounds] == ["Boom"]
+    assert not (tmp_path / "b.zip.part").exists()
+
+
+def test_a_sound_that_cant_be_converted_is_left_out_the_same_way(board, tmp_path):
+    odd = library.SOUNDS_DIR / "0123456789_odd.caf"
+    odd.write_bytes(b"not audio at all")
+    board.sounds.insert(0, SoundMeta(id="s9", name="Odd", file=str(odd)))
+    skipped = []
+    assert backup.export(tmp_path / "b.zip", board.sounds, None, None, skipped) == 2
+    assert skipped == ["Odd"]
+
+
+def test_an_unreadable_picture_is_left_off_and_the_sound_kept(board, tmp_path, locked):
+    locked(board.sounds[1].image)
+    out, skipped = tmp_path / "b.zip", []
+    assert backup.export(out, board.sounds, None, None, skipped) == 2
+    assert skipped == []
+    with zipfile.ZipFile(out) as z:
+        boom = json.loads(z.read("sounds/002 Boom/sound.json"))
+        assert boom["picture"] == "" and "sounds/002 Boom/picture.jpg" not in z.namelist()
+
+
+def test_a_zip_write_error_still_fails_the_export(board, tmp_path, monkeypatch):
+    def full(*a, **kw):
+        raise OSError(28, "No space left on device")
+    monkeypatch.setattr(zipfile.ZipFile, "writestr", full)
+    with pytest.raises(OSError):
+        backup.export(tmp_path / "b.zip", board.sounds)
+    assert not (tmp_path / "b.zip.part").exists()
+
+
+def test_a_pack_folder_with_an_unreadable_file_just_isnt_kept(app_dir, tmp_path, locked):
+    folder = tmp_path / "pack"
+    for name in ("a", "b"):
+        (folder / name).mkdir(parents=True)
+        _tone(folder / name / f"{name}.wav")
+    locked(folder / "b" / "b.wav")
+    assert backup.keep_pack(backup.Package(path=folder)) == ""

@@ -10,7 +10,7 @@ from soundboard.ui.radiopanel import RadioTab
 from test_radio import FakeEngine, FakeMeter
 
 
-@pytest.mark.parametrize("name", ["Hacker", "Synthwave", "Carbon", "Dark", "Light"])
+@pytest.mark.parametrize("name", ["Hacker", "Synthwave", "Carbon", "Slate", "Lilac"])
 def test_station_panel_texture_follows_appearance(qapp, app_dir, monkeypatch, name):
     previous = theme.current_name
     monkeypatch.setattr(RadioDirectory, "load_outlines", lambda self: None)
@@ -54,6 +54,9 @@ def test_map_corners_reveal_the_parent_background(
     theme.apply(qapp, name)
     root = QWidget()
     root.setObjectName("root")
+    # a colour nothing on the map uses: the window is the flat page colour now, which
+    # the map's sea shares, so only a cutout can show this
+    root.setStyleSheet("background:#ff00ff")
     root.resize(*size)
     root.show()
     before = root.grab().toImage()
