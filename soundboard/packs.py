@@ -139,6 +139,9 @@ BUILT_IN = [{
     "license": "CC0 + CC BY (credits inside)",
     "author": "Onion Board",
     "emoji": "🎃",
+    "preview": {"url": f"{updates.DOWNLOADS}halloween-pack-1/halloween-preview.zip",
+                "sha256": "8014fbf24322b467e09e4a4eaff179aa974f424750d0191393655fe27ae5a090",
+                "size": 480541},
     "categories": ["Spooky music", "Screams", "Monsters", "Jump scares", "Haunted house",
                    "Night"],
 }, {
@@ -155,6 +158,9 @@ BUILT_IN = [{
     "license": "CC0",
     "author": "Onion Board",
     "emoji": "📺",
+    "preview": {"url": f"{updates.DOWNLOADS}streamer-pack-1/streamer-preview.zip",
+                "sha256": "4baeb7fe3d9bdbd2a07db071ba89666d9b3a910118cb510325c1adef1478191c",
+                "size": 376595},
     "categories": ["Stream music", "Alerts", "Hype", "Fails", "Chat reactions", "Announcer",
                    "Transitions"],
 }]
