@@ -325,7 +325,7 @@ class PadSelection(QObject):
 
     def delete(self, *__):
         sids = [m.id for m in self.sounds()]
-        if not sids or not self.mw.ask_remove(sids):
+        if not sids or not self.mw.rmctl.ask_remove(sids):
             return
         self.picked.clear()
         self.anchor = None
@@ -339,4 +339,4 @@ class PadSelection(QObject):
         from soundboard.ui.widgets import Pad
         f = self.mw.focusWidget()   # the window's, so it works before the window is active
         if isinstance(f, Pad):
-            self.mw.ask_remove([f.meta.id])
+            self.mw.rmctl.ask_remove([f.meta.id])
