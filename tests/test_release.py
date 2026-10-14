@@ -12,6 +12,18 @@ import release  # noqa: E402
 LOG = "# Changelog\n\nNot released yet: changelog.d/\n\n## 1.0.0 - 2026-01-01\n\n- Old.\n"
 
 
+def fake_run(head="abc", main="abc", runs='[{"status":"completed","conclusion":"success"}]'):
+    """subprocess.run with git rev-parse answering head/main and gh answering runs."""
+    def run(cmd, *a, **k):
+        out = ""
+        if cmd[:2] == ["git", "rev-parse"]:
+            out = head if cmd[2] == "HEAD" else main
+        elif cmd[0] == "gh":
+            out = runs
+        return type("R", (), {"returncode": 0, "stdout": out, "stderr": ""})()
+    return run
+
+
 def test_puts_the_entries_under_the_new_version():
     out = release.date_changelog(LOG, "1.0.1", "2026-02-02", ["- B.", "- A,\n  two lines."])
     assert out == ("# Changelog\n\nNot released yet: changelog.d/\n\n"
@@ -40,8 +52,7 @@ def test_release_moves_the_fragments_into_the_changelog(monkeypatch, tmp_path):
     monkeypatch.setattr(release, "INIT", init)
     monkeypatch.setattr(release, "CHANGELOG", log)
     monkeypatch.setattr(release, "FRAGMENTS", frags)
-    monkeypatch.setattr(release.subprocess, "run", lambda *a, **k: type(
-        "R", (), {"returncode": 0, "stdout": ""})())   # no git, no i18n/docs scripts
+    monkeypatch.setattr(release.subprocess, "run", fake_run())   # no git/gh/i18n/docs
     with pytest.raises(SystemExit, match="isn't newer"):
         release.main(["1.0.0"])
     assert release.main(["1.0.1", "--dry-run"]) == 0
@@ -51,6 +62,57 @@ def test_release_moves_the_fragments_into_the_changelog(monkeypatch, tmp_path):
     assert "- A.\n\n## 1.0.0" in log.read_text(encoding="utf-8")
     assert sorted(p.name for p in frags.iterdir()) == ["README.md"]
     assert '"1.0.1"' in init.read_text(encoding="utf-8")
+
+
+OK = {"status": "completed", "conclusion": "success"}
+BAD = {"status": "completed", "conclusion": "failure"}
+GOING = {"status": "in_progress", "conclusion": ""}
+
+
+def test_ci_verdict_needs_a_passed_checks_run():
+    assert release.ci_verdict([OK]) is None
+    assert release.ci_verdict([BAD, OK]) is None   # a later run (dispatch) passed
+    assert "no 'checks' run" in release.ci_verdict([])
+    assert "still going" in release.ci_verdict([GOING])
+    assert "didn't pass (failure)" in release.ci_verdict([BAD])
+    assert "didn't pass (cancelled)" in release.ci_verdict(
+        [{"status": "completed", "conclusion": "cancelled"}])
+
+
+def _release_dir(monkeypatch, tmp_path):
+    init, log, frags = tmp_path / "__init__.py", tmp_path / "CHANGELOG.md", tmp_path / "f"
+    frags.mkdir()
+    init.write_text('__version__ = "1.0.0"\n', encoding="utf-8")
+    log.write_text(LOG, encoding="utf-8")
+    (frags / "a.md").write_text("- A.\n", encoding="utf-8")
+    for name, path in (("INIT", init), ("CHANGELOG", log), ("FRAGMENTS", frags)):
+        monkeypatch.setattr(release, name, path)
+    return log
+
+
+@pytest.mark.parametrize("kw, why", [
+    ({"runs": "[]"}, "no 'checks' run"),
+    ({"runs": '[{"status":"completed","conclusion":"failure"}]'}, "didn't pass"),
+    ({"runs": '[{"status":"queued","conclusion":""}]'}, "still going"),
+    ({"head": "abc", "main": "def"}, "isn't origin/main"),
+])
+def test_release_refuses_without_green_ci_on_origin_main(monkeypatch, tmp_path, kw, why):
+    log = _release_dir(monkeypatch, tmp_path)
+    monkeypatch.setattr(release.subprocess, "run", fake_run(**kw))
+    for args in (["1.0.1", "--dry-run"], ["1.0.1"]):
+        with pytest.raises(SystemExit, match=why):
+            release.main(args)
+    assert log.read_text(encoding="utf-8") == LOG   # nothing written
+
+
+def test_skip_ci_check_warns_but_still_needs_origin_main(monkeypatch, tmp_path, capsys):
+    _release_dir(monkeypatch, tmp_path)
+    monkeypatch.setattr(release.subprocess, "run", fake_run(runs="[]"))
+    assert release.main(["1.0.1", "--dry-run", "--skip-ci-check"]) == 0
+    assert "WARNING: --skip-ci-check" in capsys.readouterr().out
+    monkeypatch.setattr(release.subprocess, "run", fake_run(main="def"))
+    with pytest.raises(SystemExit, match="isn't origin/main"):
+        release.main(["1.0.1", "--dry-run", "--skip-ci-check"])
 
 
 def test_changelog_has_no_unreleased_section():

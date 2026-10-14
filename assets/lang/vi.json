@@ -3266,5 +3266,19 @@
   "New subcategory in {cat}": "Danh mục con mới trong {cat}",
   "Put its categories in one tab": "Gộp các danh mục của nó vào một tab",
   "Rename subcategory": "Đổi tên danh mục con",
-  "✓ “{name}” is one tab now": "✓ “{name}” giờ là một tab"
+  "✓ “{name}” is one tab now": "✓ “{name}” giờ là một tab",
+  "Attack": "Attack",
+  "Ceiling": "Trần",
+  "Chanting monk": "Nhà sư tụng kinh",
+  "De-ess": "De-esser",
+  "Release": "Release",
+  "Studio polish": "Hoàn thiện phòng thu",
+  "Tames harsh S sounds, adds warmth and keeps every peak under a ceiling. Runs last.": "Làm dịu âm S chói, thêm độ ấm và giữ mọi đỉnh dưới mức trần. Chạy sau cùng.",
+  "Warmth": "Độ ấm",
+  "quick": "nhanh",
+  "slow": "chậm",
+  "snappy": "gọn",
+  "soft": "mềm",
+  "warm": "ấm",
+  "clean": "sạch"
 }

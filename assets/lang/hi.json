@@ -3341,5 +3341,19 @@
   "New subcategory in {cat}": "{cat} में नई सब-कैटेगरी",
   "Put its categories in one tab": "इसकी कैटेगरी एक टैब में रखें",
   "Rename subcategory": "सब-कैटेगरी का नाम बदलें",
-  "✓ “{name}” is one tab now": "✓ “{name}” अब एक ही टैब है"
+  "✓ “{name}” is one tab now": "✓ “{name}” अब एक ही टैब है",
+  "Attack": "अटैक",
+  "Ceiling": "सीलिंग",
+  "Chanting monk": "मंत्र गाता भिक्षु",
+  "De-ess": "डी-एस",
+  "Release": "रिलीज़",
+  "Studio polish": "स्टूडियो पॉलिश",
+  "Tames harsh S sounds, adds warmth and keeps every peak under a ceiling. Runs last.": "तीखी S आवाज़ें नरम करता है, गर्माहट जोड़ता है और हर चोटी को सीलिंग के नीचे रखता है। सबसे आखिर में चलता है।",
+  "Warmth": "गर्माहट",
+  "quick": "तेज़",
+  "slow": "धीमा",
+  "snappy": "झटपट",
+  "soft": "नरम",
+  "warm": "गर्म",
+  "clean": "साफ़"
 }
