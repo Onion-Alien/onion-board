@@ -3416,5 +3416,19 @@
   "New subcategory in {cat}": "Nowa podkategoria w {cat}",
   "Put its categories in one tab": "Włóż jej kategorie do jednej karty",
   "Rename subcategory": "Zmień nazwę podkategorii",
-  "✓ “{name}” is one tab now": "✓ „{name}” to teraz jedna karta"
+  "✓ “{name}” is one tab now": "✓ „{name}” to teraz jedna karta",
+  "Attack": "Atak",
+  "Ceiling": "Sufit",
+  "Chanting monk": "Śpiewający mnich",
+  "De-ess": "De-esser",
+  "Release": "Zwolnienie",
+  "Studio polish": "Studyjny szlif",
+  "Tames harsh S sounds, adds warmth and keeps every peak under a ceiling. Runs last.": "Łagodzi ostre syczące S, dodaje ciepła i trzyma każdy szczyt pod sufitem. Działa na końcu.",
+  "Warmth": "Ciepło",
+  "quick": "szybko",
+  "slow": "wolno",
+  "snappy": "ostro",
+  "soft": "miękko",
+  "warm": "ciepło",
+  "clean": "czysto"
 }

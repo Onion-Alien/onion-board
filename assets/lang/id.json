@@ -3266,5 +3266,19 @@
   "New subcategory in {cat}": "Subkategori baru di {cat}",
   "Put its categories in one tab": "Taruh kategorinya dalam satu tab",
   "Rename subcategory": "Ganti nama subkategori",
-  "✓ “{name}” is one tab now": "✓ “{name}” sekarang satu tab"
+  "✓ “{name}” is one tab now": "✓ “{name}” sekarang satu tab",
+  "Attack": "Attack",
+  "Ceiling": "Batas atas",
+  "Chanting monk": "Biksu bersenandung",
+  "De-ess": "De-esser",
+  "Release": "Release",
+  "Studio polish": "Sentuhan studio",
+  "Tames harsh S sounds, adds warmth and keeps every peak under a ceiling. Runs last.": "Menjinakkan bunyi S yang tajam, menambah kehangatan dan menjaga setiap puncak di bawah batas. Berjalan terakhir.",
+  "Warmth": "Kehangatan",
+  "quick": "cepat",
+  "slow": "lambat",
+  "snappy": "tangkas",
+  "soft": "lembut",
+  "warm": "hangat",
+  "clean": "bersih"
 }

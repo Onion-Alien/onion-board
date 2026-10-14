@@ -3341,5 +3341,19 @@
   "New subcategory in {cat}": "Νέα υποκατηγορία στο {cat}",
   "Put its categories in one tab": "Βάλε τις κατηγορίες της σε μία καρτέλα",
   "Rename subcategory": "Μετονομασία υποκατηγορίας",
-  "✓ “{name}” is one tab now": "✓ Το «{name}» είναι τώρα μία καρτέλα"
+  "✓ “{name}” is one tab now": "✓ Το «{name}» είναι τώρα μία καρτέλα",
+  "Attack": "Attack",
+  "Ceiling": "Οροφή",
+  "Chanting monk": "Ψάλλων μοναχός",
+  "De-ess": "De-esser",
+  "Release": "Release",
+  "Studio polish": "Στούντιο φινίρισμα",
+  "Tames harsh S sounds, adds warmth and keeps every peak under a ceiling. Runs last.": "Μαλακώνει τα σκληρά Σ, προσθέτει ζεστασιά και κρατά κάθε κορυφή κάτω από την οροφή. Τρέχει τελευταίο.",
+  "Warmth": "Ζεστασιά",
+  "quick": "γρήγορα",
+  "slow": "αργά",
+  "snappy": "απότομα",
+  "soft": "απαλά",
+  "warm": "ζεστά",
+  "clean": "καθαρά"
 }

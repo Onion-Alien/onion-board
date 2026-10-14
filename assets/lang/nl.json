@@ -3341,5 +3341,19 @@
   "New subcategory in {cat}": "Nieuwe subcategorie in {cat}",
   "Put its categories in one tab": "Zet de categorieën in één tabblad",
   "Rename subcategory": "Subcategorie hernoemen",
-  "✓ “{name}” is one tab now": "✓ “{name}” is nu één tabblad"
+  "✓ “{name}” is one tab now": "✓ “{name}” is nu één tabblad",
+  "Attack": "Attack",
+  "Ceiling": "Plafond",
+  "Chanting monk": "Zingende monnik",
+  "De-ess": "De-esser",
+  "Release": "Release",
+  "Studio polish": "Studio-afwerking",
+  "Tames harsh S sounds, adds warmth and keeps every peak under a ceiling. Runs last.": "Temt scherpe S-klanken, voegt warmte toe en houdt elke piek onder het plafond. Draait als laatste.",
+  "Warmth": "Warmte",
+  "quick": "snel",
+  "slow": "traag",
+  "snappy": "strak",
+  "soft": "zacht",
+  "warm": "warm",
+  "clean": "schoon"
 }

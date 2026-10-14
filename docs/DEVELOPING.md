@@ -330,7 +330,14 @@ Get-Process OnionBoard -ErrorAction SilentlyContinue      # is it running?
    a change no test is about, like the changelog). main, after the merge, runs the
    whole suite, and so does running the workflow by hand on a branch. A newer push to
    the PR cancels its unfinished run.
-3. For a release: `.venv\Scripts\python scripts\release.py X.Y.Z` (bumps
+3. `release.py` (next step) refuses to start unless the checkout is exactly
+   `origin/main` (it fetches first) and main's full `checks` run passed on that
+   commit (`gh run list --workflow checks.yml --branch main --commit <sha>`): a PR
+   only runs the tests its change imports, so main's after-merge run is the first
+   time the whole suite sees the change. Still going: wait. Failed or cancelled: fix
+   main, or rerun it (`gh run rerun <id>`). `--skip-ci-check` releases anyway with a
+   loud warning: only for an urgent fix when CI itself is broken.
+   For a release: `.venv\Scripts\python scripts\release.py X.Y.Z` (bumps
    `__version__`, moves the `changelog.d/` entries into the CHANGELOG under the version, checks the
    translations, refreshes the README's release line; `--dry-run` checks only),
    build, then upload `dist\OnionBoardSetup.exe` to a GitHub Release

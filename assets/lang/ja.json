@@ -3266,5 +3266,19 @@
   "New subcategory in {cat}": "{cat} に新しいサブカテゴリ",
   "Put its categories in one tab": "カテゴリを1つのタブにまとめる",
   "Rename subcategory": "サブカテゴリの名前の変更",
-  "✓ “{name}” is one tab now": "✓「{name}」が1つのタブになりました"
+  "✓ “{name}” is one tab now": "✓「{name}」が1つのタブになりました",
+  "Attack": "アタック",
+  "Ceiling": "シーリング",
+  "Chanting monk": "詠唱する僧侶",
+  "De-ess": "ディエッサー",
+  "Release": "リリース",
+  "Studio polish": "スタジオ仕上げ",
+  "Tames harsh S sounds, adds warmth and keeps every peak under a ceiling. Runs last.": "きつい「サ行」を抑え、温かみを足し、すべてのピークをシーリング以下に保ちます。最後に動きます。",
+  "Warmth": "温かみ",
+  "quick": "速い",
+  "slow": "遅い",
+  "snappy": "キレよく",
+  "soft": "やわらか",
+  "warm": "温かい",
+  "clean": "クリーン"
 }

@@ -3266,5 +3266,19 @@
   "New subcategory in {cat}": "{cat}에 새 하위 카테고리",
   "Put its categories in one tab": "카테고리를 탭 하나로 묶기",
   "Rename subcategory": "하위 카테고리 이름 바꾸기",
-  "✓ “{name}” is one tab now": "✓ “{name}”이(가) 이제 탭 하나입니다"
+  "✓ “{name}” is one tab now": "✓ “{name}”이(가) 이제 탭 하나입니다",
+  "Attack": "어택",
+  "Ceiling": "최대 한계",
+  "Chanting monk": "염불하는 승려",
+  "De-ess": "디에서",
+  "Release": "릴리즈",
+  "Studio polish": "스튜디오 마무리",
+  "Tames harsh S sounds, adds warmth and keeps every peak under a ceiling. Runs last.": "날카로운 S 소리를 누르고, 따뜻함을 더하고, 모든 피크를 한계 아래로 유지합니다. 맨 마지막에 동작합니다.",
+  "Warmth": "따뜻함",
+  "quick": "빠르게",
+  "slow": "느리게",
+  "snappy": "날렵하게",
+  "soft": "부드럽게",
+  "warm": "따뜻하게",
+  "clean": "깨끗하게"
 }
