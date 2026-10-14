@@ -29,14 +29,14 @@ def test_off_hides_the_tab_and_on_builds_it_again(window):
     for key, cls in REAL.items():
         i = main.TAB_INDEX[key]
         assert isinstance(getattr(w, key), cls) and w.tabs.isTabVisible(i)
-        w.set_tab_on(key, False)
+        w.tabctl.set_tab_on(key, False)
         assert not isinstance(getattr(w, key), cls)
         assert not w.tabs.isTabVisible(i)
         assert key in w.cfg.tabs_off
     assert w.engine.voice_chain is None        # the voice chain went with the tab
     assert w.tabs.count() == len(main.TABS)    # every tab keeps its place
     for key, cls in REAL.items():
-        w.set_tab_on(key, True)
+        w.tabctl.set_tab_on(key, True)
         i = main.TAB_INDEX[key]
         assert isinstance(getattr(w, key), cls) and w.tabs.isTabVisible(i)
         page = w.radio_page if key == "radio" else getattr(w, key)
@@ -50,15 +50,15 @@ def test_off_hides_the_tab_and_on_builds_it_again(window):
 def test_switching_off_the_open_tab_goes_to_sounds(window):
     w = window
     w.tabs.setCurrentIndex(main.TAB_INDEX["voice"])
-    w.set_tab_on("voice", False)
+    w.tabctl.set_tab_on("voice", False)
     assert w.tabs.currentIndex() == 0 and w.cfg.tab == 0
 
 
 def test_switching_another_tab_keeps_the_open_one(window):
     w = window
     w.tabs.setCurrentIndex(main.TAB_INDEX["setup"])
-    w.set_tab_on("apps", False)
-    w.set_tab_on("apps", True)
+    w.tabctl.set_tab_on("apps", False)
+    w.tabctl.set_tab_on("apps", True)
     assert w.tabs.currentIndex() == main.TAB_INDEX["setup"]
 
 
@@ -66,7 +66,7 @@ def test_stand_ins_answer_the_window(window):
     """What the window does with every tab still works with them off."""
     w = window
     for key in taboff.KEYS:
-        w.set_tab_on(key, False)
+        w.tabctl.set_tab_on(key, False)
     w.stop_all()
     w.retheme() if hasattr(w, "retheme") else None
     w._set_voice(True)            # the voice hotkey: nothing to switch on
@@ -111,14 +111,14 @@ def test_settings_page_switches_them(window):
     assert "triggers" in window.cfg.tabs_off
     assert not window.tabs.isTabVisible(main.TAB_INDEX["triggers"])
     d.tab_boxes["triggers"].setChecked(True)
-    assert window.tab_on("triggers")
+    assert window.tabctl.tab_on("triggers")
     d.close()
     d.deleteLater()
 
 
 def test_settings_pages_build_with_every_tab_off(window):
     for key in taboff.KEYS:
-        window.set_tab_on(key, False)
+        window.tabctl.set_tab_on(key, False)
     d = SettingsDialog(window, "tabs")   # not lazy: every page, Add-ons and Audio too
     assert not any(b.isChecked() for b in d.tab_boxes.values())
     d.close()
@@ -178,7 +178,7 @@ def test_an_open_settings_window_follows_the_voice_tab(window, qapp, monkeypatch
 
 
 def test_settings_built_with_voice_off_has_the_card_once_it_is_on(window, qapp):
-    window.set_tab_on("voice", False)
+    window.tabctl.set_tab_on("voice", False)
     d = SettingsDialog(window, "tabs")
     assert d.voices_card.isHidden()
     d.tab_boxes["voice"].setChecked(True)
@@ -217,7 +217,7 @@ def test_a_long_voice_job_finishing_after_the_tab_is_off(window, qapp, monkeypat
         sp._download()
         jobs += 1
     assert process_events(qapp, lambda: len(started) >= jobs, timeout=5)
-    window.set_tab_on("voice", False)
+    window.tabctl.set_tab_on("voice", False)
     _flush_deletes(qapp)
     go.set()
     for t in started:
@@ -258,7 +258,7 @@ def test_onion_watch_download_finishing_after_the_tab_is_off(window, qapp, monke
     monkeypatch.setattr(watchaddon, "latest", slow)
     window.triggers.get()
     assert process_events(qapp, lambda: bool(started), timeout=5)
-    window.set_tab_on("triggers", False)
+    window.tabctl.set_tab_on("triggers", False)
     _flush_deletes(qapp)
     go.set()
     started[0].join(10)
@@ -271,7 +271,7 @@ def test_the_onion_watch_fix_banner_with_the_tab_off(window):
     button once raised AttributeError, reaching for the stand-in tab's offer)."""
     from types import SimpleNamespace
     w = window
-    w.set_tab_on("triggers", False)
+    w.tabctl.set_tab_on("triggers", False)
     w.watch_offer = SimpleNamespace(version="9.9.9", urgent="a fix")
     assert w.alertctl._urgent_now() is None
     w.alertctl._show_urgent()
@@ -298,7 +298,7 @@ def test_importing_settings_switches_the_tabs_live(window, qapp):
 def test_the_voice_hotkey_beeps_fail_with_the_tab_off(window, monkeypatch):
     cues = []
     monkeypatch.setattr(window, "cue", lambda kind: cues.append(kind))
-    window.set_tab_on("voice", False)
+    window.tabctl.set_tab_on("voice", False)
     window.on_hotkey("__voice__")
     window.on_hotkey("__voicehold__")
     window.on_hotkey_released("__voicehold__")
@@ -310,9 +310,9 @@ def test_apps_switched_off_right_after_it_is_built(window, qapp):
     """With remembered programs the Apps tab starts itself 1.5 s after it's made."""
     import time
     window.cfg.apps_paths = {"c:\\games\\x.exe": {"exe": "x.exe"}}
-    window.set_tab_on("apps", False)
-    window.set_tab_on("apps", True)
-    window.set_tab_on("apps", False)
+    window.tabctl.set_tab_on("apps", False)
+    window.tabctl.set_tab_on("apps", True)
+    window.tabctl.set_tab_on("apps", False)
     _flush_deletes(qapp)
     end = time.monotonic() + 2.0
     while time.monotonic() < end:
@@ -323,7 +323,7 @@ def test_apps_switched_off_right_after_it_is_built(window, qapp):
 def test_keyboard_never_lands_on_a_hidden_tab(window, qapp):
     from PySide6.QtTest import QTest
     for key in taboff.KEYS:
-        window.set_tab_on(key, False)
+        window.tabctl.set_tab_on(key, False)
     window.tabs.setCurrentIndex(0)
     for _ in range(4):
         QTest.keyClick(window.tabs, Qt.Key_Tab, Qt.ControlModifier)
@@ -372,8 +372,8 @@ def test_off_on_cycles_leave_nothing_behind(window, qapp, fake_watch):
     old_listeners = list(net._listeners)
     old_listener_ids = {id(ref) for ref in old_listeners}
     for key in taboff.KEYS:   # once round, so every count below is a settled one
-        w.set_tab_on(key, False)
-        w.set_tab_on(key, True)
+        w.tabctl.set_tab_on(key, False)
+        w.tabctl.set_tab_on(key, True)
     w.load_triggers()         # (already in: does nothing)
 
     def counts():
@@ -408,9 +408,9 @@ def test_off_on_cycles_leave_nothing_behind(window, qapp, fake_watch):
         for key in taboff.KEYS:
             if key == "triggers":
                 calls.append(w.triggers.panel.calls)
-            w.set_tab_on(key, False)
+            w.tabctl.set_tab_on(key, False)
             assert w.engine.voice_chain is (None if key == "voice" else w.voice.chain)
-            w.set_tab_on(key, True)
+            w.tabctl.set_tab_on(key, True)
             assert isinstance(getattr(w, key), REAL[key])
             if key == "triggers":   # switched back on: Onion Watch is loaded again at once
                 assert not w.triggers.pending and w.triggers.panel is not None
@@ -426,8 +426,8 @@ def test_the_onion_watch_nudge_is_hooked_once(window, monkeypatch):
     window.cfg.screen = {"on": True, "triggers": [{"id": "a", "name": "Died"}]}
     window.tabs.setCurrentIndex(0)
     for _ in range(3):
-        window.set_tab_on("triggers", False)
-        window.set_tab_on("triggers", True)
+        window.tabctl.set_tab_on("triggers", False)
+        window.tabctl.set_tab_on("triggers", True)
         assert window.triggers.needs_nudge()
     nudged = []
     monkeypatch.setattr(window.triggers, "nudged", lambda: nudged.append(1))
@@ -452,14 +452,14 @@ def test_off_from_the_start_then_on_and_off_again(qapp, app_dir, monkeypatch, fa
         steps = len(w._fit.steps)
         for _ in range(2):
             for key, cls in REAL.items():
-                w.set_tab_on(key, True)
+                w.tabctl.set_tab_on(key, True)
                 assert isinstance(getattr(w, key), cls)
                 assert w.tabs.isTabVisible(main.TAB_INDEX[key])
             assert w.engine.voice_chain is w.voice.chain
             assert not w.triggers.pending   # switched on: Onion Watch loads at once
             assert w.triggers.panel is not None
             for key in REAL:
-                w.set_tab_on(key, False)
+                w.tabctl.set_tab_on(key, False)
             assert w.engine.voice_chain is None
             assert len(w._fit.steps) == steps
         w.resize(500, 400)
@@ -482,8 +482,8 @@ def test_more_tabs_lists_the_switched_off_ones_and_adds_one(window, monkeypatch)
     steps = []
     monkeypatch.setattr(main.usage, "step", lambda cfg, name, saved=None: steps.append(name))
     assert w.btn_more_tabs.isHidden()                      # every tab on: nothing to add
-    w.set_tab_on("radio", False)
-    w.set_tab_on("triggers", False)
+    w.tabctl.set_tab_on("radio", False)
+    w.tabctl.set_tab_on("triggers", False)
     assert not w.btn_more_tabs.isHidden()
     menu = w.more_menu
     menu.aboutToShow.emit()
@@ -495,9 +495,9 @@ def test_more_tabs_lists_the_switched_off_ones_and_adds_one(window, monkeypatch)
     menu.actions()[-1].trigger()
     assert opened == ["tabs"]
     [a for a in menu.actions() if a.text().startswith("Triggers")][0].trigger()
-    assert w.tab_on("triggers") and w.tabs.currentIndex() == main.TAB_INDEX["triggers"]
+    assert w.tabctl.tab_on("triggers") and w.tabs.currentIndex() == main.TAB_INDEX["triggers"]
     assert steps == ["added-triggers-tab"]   # counted now, not with tomorrow's count
-    w.set_tab_on("radio", True)
+    w.tabctl.set_tab_on("radio", True)
     assert w.btn_more_tabs.isHidden()
 
 
@@ -506,15 +506,15 @@ def test_right_click_hides_a_tab_and_more_tabs_brings_it_back(window, monkeypatc
     shown = []
     monkeypatch.setattr(w, "toast", lambda text, kind="": shown.append(text))
     w.tabs.setCurrentIndex(main.TAB_INDEX["radio"])
-    w.hide_tab("radio")
-    assert not w.tab_on("radio") and w.tabs.currentIndex() == 0
+    w.tabctl.hide_tab("radio")
+    assert not w.tabctl.tab_on("radio") and w.tabs.currentIndex() == 0
     assert "More tabs" in shown[0]
     assert w.rail.isAncestorOf(w.btn_more_tabs)   # under the tabs on the rail
     assert not w.btn_more_tabs.isHidden()
     menu = w.more_menu
     menu.aboutToShow.emit()
     [a for a in menu.actions() if a.text().startswith("Radio")][0].trigger()
-    assert w.tab_on("radio")
+    assert w.tabctl.tab_on("radio")
 
 
 def test_more_tabs_counts_opened_added_and_closed(window, qapp, monkeypatch):
@@ -522,8 +522,8 @@ def test_more_tabs_counts_opened_added_and_closed(window, qapp, monkeypatch):
     w = window
     seen = []
     monkeypatch.setattr(usage, "used", seen.append)
-    w.set_tab_on("radio", False)
-    w.set_tab_on("voice", False)
+    w.tabctl.set_tab_on("radio", False)
+    w.tabctl.set_tab_on("voice", False)
     menu = w.more_menu
     menu.aboutToShow.emit()                  # looked, closed, added nothing
     menu.aboutToHide.emit()
@@ -535,8 +535,8 @@ def test_more_tabs_counts_opened_added_and_closed(window, qapp, monkeypatch):
     from soundboard.ui.moretabs import TabCard
     [c for c in menu.findChildren(TabCard)][0].picked.emit()
     process_events(qapp, lambda: False, timeout=0.2)   # the closed check runs, and passes
-    assert seen == ["more-tabs-opened", "more-tabs-added-radio"] and w.tab_on("radio")
-    w.hide_tab("voice")
+    assert seen == ["more-tabs-opened", "more-tabs-added-radio"] and w.tabctl.tab_on("radio")
+    w.tabctl.hide_tab("voice")
     assert seen[-1] == "tab-hidden-voice"
     assert all(k in usage.FEATURES for k in seen)
 
@@ -548,7 +548,7 @@ def test_more_tabs_menu_opens_clear_of_its_button(window, qapp):
     w = window
     w.rail.set_open(False)   # the offscreen screen is small: room for the menu beside
     w.show()
-    w.set_tab_on("radio", False)
+    w.tabctl.set_tab_on("radio", False)
     btn, menu = w.btn_more_tabs, w.more_menu
     assert isinstance(menu, moretabs.Menu)
     assert btn.menu() is None

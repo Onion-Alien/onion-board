@@ -140,7 +140,7 @@ def test_tab_explanations_are_in_each_tabs_right_click_menu(window, monkeypatch)
     monkeypatch.setattr(main.TabHelpPopup, "exec", lambda box: shown.append(box.windowTitle()))
     for page, title in ((window.apps, "Send a program's sound"),
                         (window.sounds_page, "Your sounds")):
-        menu = window.tab_menu(window.tabs.indexOf(page))
+        menu = window.tabctl.tab_menu(window.tabs.indexOf(page))
         about = menu.actions()[0]
         assert about.text() == "About this tab"
         about.trigger()

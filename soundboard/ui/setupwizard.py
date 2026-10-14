@@ -223,7 +223,7 @@ USE_TABS = {"streamer": ("apps",), "games": ("triggers",),
 def apply_use(win, use: str):
     """Switch on the tabs that fit what the app is for (Settings > Tabs can undo it)."""
     for key in USE_TABS.get(use, ()):
-        win.set_tab_on(key, True)
+        win.tabctl.set_tab_on(key, True)
 
 
 def _ok() -> str:    # status colours readable on the current theme (theme.status)

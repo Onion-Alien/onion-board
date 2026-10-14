@@ -7,7 +7,7 @@ import pytest
 from soundboard.ui import (alertcontrol, buncontrol, categorycontrol, devicecontrol,
                            editcontrol, ffmpegcontrol, importcontrol, mainwindow, miccontrol,
                            padcontrol, remoteaccess, removecontrol, routecontrol, statuscontrol,
-                           updatecontrol)
+                           tabcontrol, updatecontrol)
 from test_mainwindow import window  # noqa: F401  (the real MainWindow fixture)
 
 # (window attribute, controller class, methods that live there now)
@@ -54,6 +54,9 @@ SPLIT = [
     ("statusctl", statuscontrol.StatusControl,
      ["_update_status", "_say_audio", "_update_flow", "_place_ways", "_set_primary",
       "show_chat_guide"]),
+    ("tabctl", tabcontrol.TabControl,
+     ["tab_on", "needs_online", "tab_shown", "set_tab_on", "hide_tab", "tab_menu", "_swap_tab",
+      "_fill_more_tabs", "_add_from_more", "_go_tab", "_count_tab"]),
 ]
 
 

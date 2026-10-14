@@ -118,7 +118,7 @@ def test_escape_and_any_rail_tab_leave_settings(qapp, win):
     qapp.processEvents()
     assert not win.settings_open() and win.tabs.currentWidget() is win.setup_page
     win.open_settings()
-    win._go_tab(0, absolute=True)                            # Ctrl+1
+    win.tabctl._go_tab(0, absolute=True)                            # Ctrl+1
     qapp.processEvents()
     assert not win.settings_open()
 
@@ -126,10 +126,10 @@ def test_escape_and_any_rail_tab_leave_settings(qapp, win):
 def test_switching_the_open_tab_off_in_settings_keeps_settings_up(qapp, win):
     """Settings > Tabs switching off the tab underneath moves the tabs to the first,
     and Settings stays where it is."""
-    win.set_tab_on("voice", True)
+    win.tabctl.set_tab_on("voice", True)
     win.tabs.setCurrentWidget(win.voice)
     d = win.open_settings("tabs")
-    win.set_tab_on("voice", False)
+    win.tabctl.set_tab_on("voice", False)
     qapp.processEvents()
     assert win.settings_open() and win._settings_dlg is d
     assert win.tabs.currentIndex() == 0
@@ -227,7 +227,7 @@ def test_the_rail_keeps_up_with_the_tabs(qapp, win, monkeypatch):
             assert b.accessibleName() == tabs.tabText(i).replace("&&", "&"), (why, i)
 
     vi = tabs.indexOf(win.voice)
-    win.set_tab_on("voice", True)
+    win.tabctl.set_tab_on("voice", True)
     set_tab_live(tabs, vi, True, "● ON", "voice")
     same("start")
     try:
@@ -236,13 +236,13 @@ def test_the_rail_keeps_up_with_the_tabs(qapp, win, monkeypatch):
         win.set_live_color("#3399ff")
         same("highlight colour")
         set_tab_live(tabs, vi, False)
-        win.set_tab_on("radio", True)
+        win.tabctl.set_tab_on("radio", True)
         tabs.setCurrentIndex(main.TAB_INDEX["radio"])
-        win.set_tab_on("radio", False)
+        win.tabctl.set_tab_on("radio", False)
         same("current tab switched off")
-        win.set_tab_on("radio", True)
-        win.set_tab_on("voice", False)
-        win.set_tab_on("voice", True)
+        win.tabctl.set_tab_on("radio", True)
+        win.tabctl.set_tab_on("voice", False)
+        win.tabctl.set_tab_on("voice", True)
         same("tab swapped")
         monkeypatch.setattr(net, "offline", lambda: True)
         win._offline_follow()
@@ -267,7 +267,7 @@ def test_the_rail_keeps_up_with_the_tabs(qapp, win, monkeypatch):
         class Menu:
             def exec(self, _pos):
                 pass
-        monkeypatch.setattr(win, "tab_menu", lambda i: asked.append(i) or Menu())
+        monkeypatch.setattr(win.tabctl, "tab_menu", lambda i: asked.append(i) or Menu())
         for b in shown:
             b.customContextMenuRequested.emit(QPoint(5, 5))
         assert asked == [b.index for b in shown]

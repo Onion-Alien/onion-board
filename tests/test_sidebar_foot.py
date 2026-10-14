@@ -142,15 +142,15 @@ def test_ctrl_numbers_and_ctrl_tab_move_between_tabs(window):  # noqa: F811
     QApplication.processEvents()
     shown = [b for b in window.rail.buttons if b.isVisible()]
     assert len(shown) >= 3
-    window._go_tab(1, absolute=True)
+    window.tabctl._go_tab(1, absolute=True)
     assert shown[1].isChecked()
-    window._go_tab(1)
+    window.tabctl._go_tab(1)
     assert shown[2].isChecked()
-    window._go_tab(-1)
+    window.tabctl._go_tab(-1)
     assert shown[1].isChecked()
-    window._go_tab(-2)   # wraps round
+    window.tabctl._go_tab(-2)   # wraps round
     assert shown[-1].isChecked()
-    window._go_tab(99, absolute=True)   # no such tab: nothing happens
+    window.tabctl._go_tab(99, absolute=True)   # no such tab: nothing happens
     assert shown[-1].isChecked()
 
 

@@ -759,7 +759,7 @@ class ImportControl(Controller):
             # crashed reaching into a stand-in
             off, mw.cfg.tabs_off = mw.cfg.tabs_off, was_off
             for key in taboff.KEYS:
-                mw.set_tab_on(key, key not in off)
+                mw.tabctl.set_tab_on(key, key not in off)
             mw.set_option("tabs_off", off)   # with a newer version's keys
         if mw.voice.fx.merge_saved(raw.get(backup.SAVED_VOICES)):   # their own file
             changed.append("saved voices")
