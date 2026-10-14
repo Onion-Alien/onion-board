@@ -35,7 +35,7 @@ from soundboard import (appaudio, autostart, backup, destination, library, midi,
                         remote, otherboards, reset, soundfx, thumbs, trash, updates, videos,
                         voicesdk)
 from soundboard import (appsetup, directmic, ffmpegget, michelper, net, netlog,
-                        profiles, quality, shellicon, thumbbar, tips, tor,
+                        profiles, quality, shellicon, sourceinfo, thumbbar, tips, tor,
                         usage, watchaddon)
 from soundboard.pollthread import PollThread
 from soundboard.replay import InstantReplay
