@@ -86,6 +86,12 @@ class BoardHost:
     def sounds(self) -> list[tuple[str, str]]:
         return [(m.id, m.name) for m in self.win.cfg.sounds]
 
+    def sound_categories(self) -> list[tuple[str, list[str]]]:
+        """The board's categories in tab order, each with its sounds' ids: the
+        category list in a trigger's Play + menu."""
+        cfg = self.win.cfg
+        return [(cat, [m.id for m in cfg.sounds if cat in m.tags]) for cat in cfg.categories]
+
     def add_sound(self, path: str, done: Callable[[str | None], None]) -> None:
         """Add a file to the board (the board's own import, in the background), or
         use the pad it's already on."""

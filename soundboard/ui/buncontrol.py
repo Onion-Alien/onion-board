@@ -13,6 +13,7 @@ from PySide6.QtCore import QRect, QSize, Qt, QTimer
 from PySide6.QtWidgets import QApplication
 
 from soundboard import usage, winkeys
+from soundboard.ui.controller import Controller
 
 if TYPE_CHECKING:
     from soundboard.ui.mainwindow import MainWindow
@@ -20,11 +21,11 @@ if TYPE_CHECKING:
 FULL_FROM_BUN = QSize(1180, 720)   # Bun grown past his biggest opens the board this big
 
 
-class BunControl:
+class BunControl(Controller):
     """Bun mode for one MainWindow (``mw``)."""
 
     def __init__(self, mw: MainWindow):
-        self.mw = mw
+        super().__init__(mw)
         self.bun_mode = None   # Bun mode's floating Bun (ui/bunmode.py), once used
 
     def bun_up(self) -> bool:

@@ -30,17 +30,18 @@ from soundboard.i18n import _, ngettext
 from soundboard.library import SoundMeta
 from soundboard.settings import pretty_key
 from soundboard.ui import clipeditor, icons, responsive, sourcedialog
+from soundboard.ui.controller import Controller
 from soundboard.ui.panel import icon_label, steady_number
 
 if TYPE_CHECKING:
     from soundboard.ui.mainwindow import MainWindow
 
 
-class PadControl:
+class PadControl(Controller):
     """The pad menu and the pads' view for one MainWindow (``mw``)."""
 
     def __init__(self, mw: MainWindow):
-        self.mw = mw
+        super().__init__(mw)
 
     @staticmethod
     def _sort_names() -> dict[str, str]:

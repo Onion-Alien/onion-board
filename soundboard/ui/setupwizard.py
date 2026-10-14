@@ -1386,7 +1386,7 @@ class SetupWizard(QDialog):
             if route == "off":
                 self.cable_status.setText(_("<b style='color:{colour}'>✓ Sending nowhere.</b> "
                                             "Only you hear your sounds (and a device set to "
-                                            "Clean, for streaming under Also send to).",
+                                            "Clean, for streaming under Also play on).",
                                             colour=_ok()))
             elif self.route_ok():
                 self.cable_status.setText(_("<b style='color:{colour}'>✓ Sending to "
@@ -1658,7 +1658,7 @@ class SetupWizard(QDialog):
             self.discord_text.setText(
                 _("Your sounds play only for you: in your headphones, where OBS's <b>Desktop "
                   "Audio</b> picks them up, and on a device set to <b>Clean, for streaming</b> "
-                  "(Setup → Devices → Also send to).<br><br>Nothing to change in Discord or "
+                  "(Setup → Devices → Also play on).<br><br>Nothing to change in Discord or "
                   "your game. To send your sounds to them later, go to the Setup tab → Devices → "
                   "<b>Send my sounds to</b> → <b>My mic</b>."))
             self.btn_copy.hide()

@@ -13,11 +13,12 @@ from PySide6.QtWidgets import (QBoxLayout, QFrame, QHBoxLayout, QLabel, QPushBut
 
 from soundboard.i18n import _
 from soundboard.ui import icons
-from soundboard.ui.panel import Flow, icon_button, icon_label
+from soundboard.ui.panel import Flow, icon_label
 from soundboard.ui.widgets import Meter
 
 GAP = 16            # between the mic half and the chips, side by side
 ROW_H = 28          # every chip, label and the mic row: the bar never changes height
+STOP_H = 36         # the Stop button, bigger than the chips beside it
 
 
 class Chip(QPushButton):
@@ -73,13 +74,19 @@ class VoiceStatusBar(QFrame):
 
         mic = self._mic = QWidget()
         mic.setObjectName("voicebarpart")      # no fill of its own: the bar's shows
-        mic.setFixedHeight(ROW_H)
+        mic.setFixedHeight(STOP_H)
         mh = QHBoxLayout(mic)
         mh.setContentsMargins(0, 0, 0, 0)
         mh.setSpacing(8)
-        # Keep the stop action compact so translated mic text and the meter fit.
-        self.stop_button = icon_button("stop", _("Stop voice effects"), hover=False)
-        self.stop_button.setFixedSize(ROW_H, ROW_H)
+        # a big red Stop with its word: the one way out of every voice at once, it
+        # has to be found at a glance (a lone 28 px square was easy to miss)
+        self.stop_button = QPushButton(_("Stop"))
+        self.stop_button.setObjectName("danger")
+        self.stop_button.setAccessibleName(_("Stop voice effects"))
+        self.stop_button.setCursor(Qt.CursorShape.PointingHandCursor)
+        self.stop_button.setFixedHeight(STOP_H)
+        self.stop_button.setMinimumWidth(STOP_H * 2)
+        icons.set_icon(self.stop_button, "stop", "danger_text", size=18)
         mh.addWidget(self.stop_button)
         self.mic_icon = icon_label("mic", _("Your mic level"))
         mh.addWidget(self.mic_icon)
