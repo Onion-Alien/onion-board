@@ -14,7 +14,7 @@ from pathlib import Path
 from typing import Any, Literal, overload
 
 import numpy as np
-from PySide6.QtCore import (QEvent, QObject, QPoint, QRect, QSignalBlocker,
+from PySide6.QtCore import (QEvent, QObject, QPoint, QSignalBlocker,
                             QSize, Qt, QTimer, QUrl, Signal)
 from PySide6.QtGui import (QActionGroup, QCursor, QDesktopServices, QIcon,
                            QKeySequence, QShortcut)
@@ -34,8 +34,8 @@ from soundboard import exitwatch
 from soundboard import (appaudio, autostart, backup, destination, library, midi,
                         remote, otherboards, reset, soundfx, thumbs, trash, updates, videos,
                         voicesdk)
-from soundboard import (appsetup, directmic, discordcfg, ffmpegget, michelper, net, netlog,
-                        profiles, quality, rawmic, shellicon, sourceinfo, thumbbar, tips, tor,
+from soundboard import (appsetup, directmic, ffmpegget, michelper, net, netlog,
+                        profiles, quality, shellicon, sourceinfo, thumbbar, tips, tor,
                         usage, watchaddon)
 from soundboard.pollthread import PollThread
 from soundboard.replay import InstantReplay
@@ -51,6 +51,9 @@ from soundboard.ui import routewarn
 from soundboard.ui import worker
 from soundboard.ui.dropveil import DropVeil
 from soundboard.ui.ffmpegcontrol import FfmpegControl
+from soundboard.ui.remoteaccess import RemoteAccess
+from soundboard.ui.buncontrol import BunControl
+from soundboard.ui.alertcontrol import AlertControl
 from soundboard.ui.categorycontrol import CategoryControl
 from soundboard.ui.importcontrol import ImportControl
 from soundboard.ui.updatecontrol import UpdateControl
@@ -154,7 +157,6 @@ BODY_SIDE_TIGHT = 8    # ...and beside the rail in a narrow window
 SETTINGS_ROOM = QSize(480, 520)   # what Settings opened from the mini player grows it to
 BUN_TIP = _("Turn into Bun: a small Bun floating on top instead of this window. The "
             "button under him brings it back.")
-FULL_FROM_BUN = QSize(1180, 720)   # Bun grown past his biggest opens the board this big
 MINI_SIZE = QSize(440, 380)   # below this the window becomes the mini player...
 MINI_PAD_ROWS = 1             # ...which has the pads above it when this many rows fit
 QUEUE_CHIPS = 5          # queued sounds shown by name above the pads (then "+n more")
@@ -344,27 +346,6 @@ def _listed(name: str, names) -> bool:
     return any(" ".join(n.split()).lower() == squash for n in names)
 
 
-# the urgent bar's line for the worst thing in Discord's settings (discordcfg)
-DISCORD_URGENT = {
-    discordcfg.STUDIO: _("{name} isn't hearing your sounds: its Input Profile is Studio, "
-                         "which skips Onion Board. Set it to Custom."),
-    discordcfg.BYPASS: _("{name} isn't hearing your sounds: \"Bypass System Audio Input "
-                         "Processing\" is on, which skips Onion Board."),
-    discordcfg.VAD: _("{name}'s Advanced Voice Activity cuts most of your sounds in calls. "
-                      "Turn it off (Voice & Video → Show Advanced Voice Settings)."),
-    discordcfg.AUTO: _("{name}'s automatic input sensitivity keeps cutting your sounds out "
-                       "in calls. Turn it off (Voice & Video → Input Sensitivity)."),
-    discordcfg.ISOLATION: _("{name}'s Voice Isolation is wiping out your sounds. Set its "
-                            "Input Profile to Custom and Noise Suppression to None."),
-    discordcfg.KRISP: _("{name}'s noise suppression (Krisp) is wiping out your sounds. Set "
-                        "Noise Suppression to None."),
-    discordcfg.SUPPRESSION: _("{name}'s noise suppression is eating your sounds. Set Noise "
-                              "Suppression to None."),
-    discordcfg.ECHO: _("{name}'s echo cancellation is making your sounds dip and pump. "
-                       "Turn it off."),
-    discordcfg.AGC: _("{name}'s automatic gain control is making your sounds' volume jump. "
-                      "Turn it off."),
-}
 
 
 def _polish(w: QWidget, size=None):
@@ -406,6 +387,9 @@ class MainWindow(QMainWindow):
 
     def __init__(self):
         super().__init__()
+        self.remctl = RemoteAccess(self)
+        self.bunctl = BunControl(self)
+        self.alertctl = AlertControl(self)
         self.catctl = CategoryControl(self)
         self.impctl = ImportControl(self)
         self.updctl = UpdateControl(self)
@@ -470,8 +454,8 @@ class MainWindow(QMainWindow):
         self.bridge.update_progress.connect(self.updctl._on_update_progress)
         self.bridge.update_ready.connect(self.updctl._on_update_ready)
         self.bridge.watch_update.connect(self.updctl._on_watch_update)
-        self.bridge.discord.connect(self._on_discord)
-        self.bridge.mic_users.connect(self._on_mic_users)
+        self.bridge.discord.connect(self.alertctl._on_discord)
+        self.bridge.mic_users.connect(self.alertctl._on_mic_users)
         self.bridge.counted.connect(self._usage_counted)
         self.ffctl = FfmpegControl(self)
         self.bridge.ffmpeg.connect(self.ffctl.on_answer)
@@ -498,9 +482,7 @@ class MainWindow(QMainWindow):
         self._quitting = False            # a real quit (not "close to the tray")
         self._tray_told = False           # the "still running in the tray" note was shown
         self.tray: QSystemTrayIcon | None = None
-        self.bun_mode = None   # Bun mode's floating Bun (ui/bunmode.py), once used
         self.watch_offer: watchaddon.Offer | None = None   # an urgent Onion Watch fix
-        self._urgent_hidden: set[str] = set()   # "board 1.9.6" / "watch 0.8.2", this run
         # set up for the app you're using (appsetup): the bar's app and what it shows.
         # Before the Discord check below: on a slow start its answer (_on_discord) comes
         # in while the splash pumps events, before the end of __init__
@@ -511,23 +493,13 @@ class MainWindow(QMainWindow):
         self._setup_undo: dict | None = None    # the dest settings before a switch
         self._setup_hide = QTimer(self, singleShot=True)
         self._setup_hide.timeout.connect(self._hide_setup)
-        # Discord's own voice settings (discordcfg), read while it runs: the ones that
-        # wipe out sounds get the urgent bar
-        self.discord_found: list = []
-        self._discord_sig = None
-        self._discord_reading = False
-        self._discord_poll = PollThread("discord-settings")
         self._discord_timer = QTimer(self, interval=DISCORD_POLL_MS)
-        self._discord_timer.timeout.connect(self._discord_tick)
+        self._discord_timer.timeout.connect(self.alertctl._discord_tick)
         if sys.platform == "win32":
             self._discord_timer.start()
-            QTimer.singleShot(3000, self._discord_tick)
-        # straight into my mic: an app recording the mic in raw mode skips Onion Board
-        # and hears none of the sounds (rawmic)
-        self.raw_watch = rawmic.BypassWatch()
-        self._raw_looking = False
+            QTimer.singleShot(3000, self.alertctl._discord_tick)
         self._raw_timer = QTimer(self, interval=RAW_POLL_MS)
-        self._raw_timer.timeout.connect(self._raw_tick)
+        self._raw_timer.timeout.connect(self.alertctl._raw_tick)
         if sys.platform == "win32":
             self._raw_timer.start()
         self._preview_gen = 0            # newest effects preview (older renders are dropped)
@@ -591,8 +563,8 @@ class MainWindow(QMainWindow):
         self.register_hotkeys()
         # Stream Deck / scripts (Settings → Remote), only if turned on
         self.remote = remote.RemoteControl(lambda a, p: remote.dispatch(self, a, p), self)
-        self.apply_remote()
-        self.remote_addons = self._load_remote_addons()
+        self.remctl.apply_remote()
+        self.remctl.remote_addons = self.remctl._load_remote_addons()
         a11y.label_tree(self, force=True)   # names for the icon-only buttons
 
         self.timer = QTimer(self)
@@ -900,14 +872,14 @@ class MainWindow(QMainWindow):
         uh.addLayout(uv, 1)
         self.urgent_btn = QPushButton()
         self.urgent_btn.setObjectName("primary")
-        self.urgent_btn.clicked.connect(self._urgent_clicked)
+        self.urgent_btn.clicked.connect(self.alertctl._urgent_clicked)
         uh.addWidget(self.urgent_btn)
         hide = QPushButton()
         hide.setObjectName("urgenthide")
         hide.setAccessibleName(_("Hide"))
         hide.setToolTip(_("Hide until Onion Board starts again"))
         icons.close_button(hide, 28, "warn_text")
-        hide.clicked.connect(self._hide_urgent)
+        hide.clicked.connect(self.alertctl._hide_urgent)
         uh.addWidget(hide)
         self.urgent_bar.hide()
         rv.addWidget(self.urgent_bar)
@@ -1166,7 +1138,7 @@ class MainWindow(QMainWindow):
         self.tabs.currentChanged.connect(self._focus_sounds_page)
         # an urgent Onion Watch fix's banner shows on the Triggers tab only
         self.tabs.currentChanged.connect(
-            lambda _i: self.watch_offer is not None and self._show_urgent())
+            lambda _i: self.watch_offer is not None and self.alertctl._show_urgent())
         # a badge on a tab's icon (or, by default, a wash) in the theme's live colour while
         # its feature is live — the voice changer, a radio station, a program being
         # sent, the screen watched — so it's never left on without you noticing
@@ -1322,7 +1294,7 @@ class MainWindow(QMainWindow):
         self.mini_bun.setAccessibleName(_("Turn into Bun"))
         self.mini_bun.setIconSize(QSize(20, 20))
         self._paint_mini_bun()
-        self.mini_bun.clicked.connect(self.enter_bun_mode)
+        self.mini_bun.clicked.connect(self.bunctl.enter_bun_mode)
         connection.addWidget(self.mini_bun)
         cv.addLayout(connection)
         v.addWidget(card)
@@ -1606,7 +1578,7 @@ class MainWindow(QMainWindow):
                              "TikTok, Myinstants…). Or paste a link (YouTube, SoundCloud, "
                              "TikTok, most media sites) to see it, then play or add it")
         self.search.setToolTip(self._search_tip)
-        self.search.setClearButtonEnabled(True)
+        icons.clear_button(self.search)
         self.search.setMinimumWidth(SEARCH_MIN_W)   # until the window gets narrow (_init_fit)
         self.search.setMaximumWidth(SEARCH_MAX_W)
         # typing regrids only when the pads shown change (35 ms a key with 600 pads),
@@ -4433,9 +4405,9 @@ class MainWindow(QMainWindow):
                    ok=ok, mode=mode, name=html.escape(app.name))]
         guide = app.guide
         if guide == "discord":
-            if self.discord_problems():
+            if self.alertctl.discord_problems():
                 return lines, ""   # the urgent bar above says which, with Fix Discord
-            if self.discord_found:
+            if self.alertctl.discord_found:
                 lines.append(_("{ok} Discord's voice settings let your sounds through.",
                                ok=ok))
                 return lines, ""
@@ -4744,7 +4716,7 @@ class MainWindow(QMainWindow):
                        lambda: self.open_settings("tabs"))
         # Bun mode from the full window too (the mini player has its own Bun button)
         menu.addSeparator()
-        act = menu.addAction(self._bun_icon(), _("Turn into Bun"), self.enter_bun_mode)
+        act = menu.addAction(self._bun_icon(), _("Turn into Bun"), self.bunctl.enter_bun_mode)
         act.setToolTip(BUN_TIP)
         menu.setToolTipsVisible(True)
         return menu
@@ -5469,7 +5441,7 @@ class MainWindow(QMainWindow):
     def _settings_closed(self, dlg):
         if self._settings_dlg is dlg:
             self._settings_dlg = None
-        had_focus = _holds_focus(dlg)
+        had_focus = getattr(dlg, "had_focus", False) or _holds_focus(dlg)
         self._content.setCurrentWidget(self._tabs_area)
         self._content.removeWidget(dlg)
         self._fit_body_top()
@@ -5569,8 +5541,8 @@ class MainWindow(QMainWindow):
         self.mini_download_bar.retheme()
         self.ytresults.retheme()
         self._paint_mini_bun()
-        if self.bun_mode is not None:
-            self.bun_mode.retheme()
+        if self.bunctl.bun_mode is not None:
+            self.bunctl.bun_mode.retheme()
         pp, self._pp_icon = self._pp_icon, None
         self._set_pp_icon(pp or "play")
         self._pill_long = ""   # forces _update_flow to repaint its icon
@@ -5986,11 +5958,26 @@ class MainWindow(QMainWindow):
             self.select(LINK_ID)   # already in the player: Play / Space pause and resume it
             self.toggle_play_pause()
             return
+        pad = self._pad_for_link(r.url) if play else None
+        if pad is not None:   # it's on the board already: the pad plays, from the start
+            self.play(pad)
+            return
         kind = "play" if play else "add"
         self.linkbar.open(r.url, r.title, r.seconds)
         self.ytresults.mark(r.url, kind)   # its button greys out until the link bar's done
         if not (self.linkbar.play_once() if play else self.linkbar.add()):
             self.ytresults.mark(r.url, kind, False)
+
+    def _pad_for_link(self, url: str) -> str | None:
+        """The board's sound downloaded from this link (its audio loaded), or None."""
+        key = sourceinfo.link_key(url)
+        if not key:
+            return None
+        for m in self.cfg.sounds:
+            if (self.audio.get(m.id) is not None and isinstance(m.source, dict)
+                    and sourceinfo.link_key(m.source.get("link", "")) == key):
+                return m.id
+        return None
 
     def gain_for(self, m: SoundMeta, volume=None) -> float:
         v = m.volume if volume is None else volume
@@ -6034,6 +6021,11 @@ class MainWindow(QMainWindow):
             else:
                 self.toast(_("“{name}” is still loading…", name=html.escape(m.name)), "warn")
             return
+        if (sid != LINK_ID and LINK_ID in self.engine.playing()
+                and self._pad_for_link(self._link_url) == sid):
+            # the web song played from a search, now saved as this pad: one song, so
+            # it starts again from the top instead of a second copy playing over it
+            self._stop_sound(LINK_ID)
         self.select(sid)
         self._last_sid = sid
         if sid != LINK_ID:
@@ -7484,7 +7476,7 @@ class MainWindow(QMainWindow):
         icons.set_icon(menu.addAction(_("Open Onion Board"), self.show_from_tray), "sounds")
         icons.set_icon(menu.addAction(_("Stop all sounds"), self.stop_all), "stop")
         self._tray_bun = menu.addAction(self._bun_icon(), _("Turn into Bun"),
-                                        self.enter_bun_mode)
+                                        self.bunctl.enter_bun_mode)
         menu.addSeparator()
         # the Discord opens in the browser (feedback.py); Send feedback asks first
         from soundboard import feedback
@@ -7514,99 +7506,8 @@ class MainWindow(QMainWindow):
             self.show_from_tray()
 
     # ------------------------------------------------------------------ Bun mode
-    def bun_up(self) -> bool:
-        return self.bun_mode is not None and self.bun_mode.isVisible()
-
-    def enter_bun_mode(self):
-        """The window goes and a floating Bun takes its place (ui/bunmode.py)."""
-        from soundboard.ui.bunmode import BunMode
-        if self.bun_mode is None:
-            self.bun_mode = BunMode(self)
-            self.bun_mode.back.connect(lambda: self.leave_bun_mode(False))
-            self.bun_mode.full.connect(lambda: self.leave_bun_mode(True))
-        self.bun_mode.present(self.frameGeometry() if self.isVisible() else None)
-        if self.isVisible() and not self.isMinimized():
-            # the window as it is (the mini player or the board, maximized or not),
-            # for Back: kept in the settings, so it's the same after a restart as Bun
-            g = self.normalGeometry() if self.isMaximized() else self.geometry()
-            self.cfg.bun["from"] = [g.x(), g.y(), g.width(), g.height(),
-                                    bool(self.isMaximized())]
-        self.cfg.bun["on"] = True
-        self._save_later()
-        usage.used("bun-mode")
-        self.hide()
-        self._wake()
-
-    def leave_bun_mode(self, full: bool = False):
-        """Bun's Back button: the window back as it was. Open the full board (`full`,
-        his right-click menu): the whole board, around where he stood."""
-        b = self.bun_mode
-        if b is None or not b.isVisible():
-            return
-        spot = b.geometry().center()
-        if full:
-            room = (QApplication.screenAt(spot) or self.screen()).availableGeometry()
-            want = QSize(min(FULL_FROM_BUN.width(), room.width() - 40),
-                         min(FULL_FROM_BUN.height(), room.height() - 40))
-            if self.isMaximized() or self.isFullScreen():
-                self.showNormal()
-            self.resize(want)
-            x = min(max(spot.x() - want.width() // 2, room.left()), room.right() - want.width())
-            y = min(max(spot.y() - want.height() // 2, room.top()), room.bottom() - want.height())
-            self.move(x, y)
-            # it was the mini player: shown at once, its first frames were a blank white
-            # window while it laid the board out again; it fades in once that's done
-            self.setWindowOpacity(0.0)
-            QTimer.singleShot(150, lambda: self.setWindowOpacity(1.0))
-        else:
-            self._back_as_it_was()
-        self.show_from_tray()
-        if full:
-            self._refit()   # out of the mini player now, not after the first paints
-        if sys.platform == "win32":   # raise_/activateWindow alone left it behind the
-            winkeys.to_front(int(self.winId()))   # app in front (Bun never has focus)
-
-    def _back_as_it_was(self):
-        """The window's size and place from before Bun mode (cfg.bun["from"]), when
-        it's on a screen still. Without it, the window started as Bun showed at its
-        default size: Back looked just like Open the full board."""
-        was = self.cfg.bun.get("from")
-        if not (isinstance(was, list) and len(was) == 5):
-            return
-        x, y, w, h, maxed = was
-        rect = QRect(int(x), int(y), int(w), int(h))
-        if QApplication.screenAt(rect.center()) is None:   # that monitor's gone
-            return
-        if self.isMaximized() or self.isFullScreen():
-            self.showNormal()
-        self.setGeometry(rect)
-        if maxed:
-            self.setWindowState(self.windowState() | Qt.WindowState.WindowMaximized)
-
-    def _bun_away(self):
-        """Bun goes (the window's coming back, or the app's quitting)."""
-        b = self.bun_mode
-        if b is not None and b.isVisible():
-            b.hide()
-            self.cfg.bun["on"] = False
-            self._save_later()
-
-    def start_as_bun(self) -> bool:
-        """At start-up: quit as Bun last time, so Bun again (instead of the window)."""
-        if not (isinstance(self.cfg.bun, dict) and self.cfg.bun.get("on")
-                and self.cfg.setup_done):
-            return False
-        self.enter_bun_mode()
-        return True
-
-    def toast_seen(self, text: str, kind: str):
-        """Every toast on the window (ui/toast.py): Bun says it while he's up."""
-        b = self.bun_mode
-        if b is not None and b.isVisible():
-            b.say(text, kind)
-
     def show_from_tray(self):
-        self._bun_away()
+        self.bunctl._bun_away()
         if self.isMinimized():
             self.showNormal()
         else:
@@ -7653,112 +7554,6 @@ class MainWindow(QMainWindow):
         self._quitting = True
         exitwatch.closed_by_windows()   # ended before the quit finishes: not a crash
 
-    def apply_remote(self) -> str:
-        """Start / stop the local control API to match the settings; "" or an error."""
-        err = remote.apply(self, self.remote)
-        if err:
-            self.say(_("<span style='color:{status}'>Remote control is off: "
-                       "{err}.</span>",
-                       status=theme.status('warn'), err=html.escape(err)), "warn")
-        return err
-
-    def _load_remote_addons(self) -> list:
-        """[(ModuleInfo, add-on or None)] for every "remote" add-on (soundboard.modules),
-        e.g. Onion Pocket. One that fails is noted on its info (and the log;
-        Settings → Remote leaves it out) and never stops the app."""
-        from soundboard import modules
-        return [(info, self._start_remote_addon(info))
-                for info in modules.discover() if info.kind == "remote"]
-
-    def _start_remote_addon(self, info):
-        """The add-on's object, or None (the reason noted on `info`)."""
-        from soundboard import modules
-        from soundboard.ui.remotehost import RemoteHost
-        if info.error:
-            return None
-        try:
-            return modules.load_package(info).create(RemoteHost(self, info.id))
-        except Exception as e:  # noqa: BLE001 - a bad add-on can't stop the app
-            log.exception("remote add-on %s didn't start", info.id)
-            info.error = str(e) if isinstance(e, modules.ModuleError) \
-                else _("failed to start: {error}", error=errors.plain(e))
-            return None
-
-    def load_remote_addon(self, info):
-        """Start a remote add-on installed while the app runs (Settings → Remote's
-        *Get Onion Pocket*, or its *Update* button), in place of any copy of it. A
-        running copy is stopped first (its server lets go of the port) and its package
-        forgotten, so the new version's code loads; its settings in
-        Config.remote_addons are the board's and stay as they are. If the new one
-        doesn't start, the old one is started again and stays. The add-on's object,
-        or None."""
-        from soundboard import modules
-        old = next(((i, a) for i, a in self.remote_addons if i.id == info.id), None)
-        saved = {}
-        if old is not None and old[1] is not None:
-            try:
-                old[1].stop()
-            except Exception:  # noqa: BLE001
-                log.exception("remote add-on %s didn't stop cleanly", info.id)
-            pkg = old[0].package
-            saved = {n: m for n, m in sys.modules.items()
-                     if pkg and (n == pkg or n.startswith(pkg + "."))}
-            modules._forget(pkg)
-        addon = self._start_remote_addon(info)
-        if addon is None and saved and old is not None:   # (saved: only with an old one)
-            log.warning("remote add-on %s %s didn't start (%s): keeping %s",
-                        info.id, info.version, info.error, old[0].version)
-            if info.package:
-                modules._forget(info.package)
-            sys.modules.update(saved)
-            try:
-                restart = getattr(old[1], "apply", None)
-                if callable(restart):
-                    restart()
-            except Exception:  # noqa: BLE001
-                log.exception("remote add-on %s didn't start again", info.id)
-            return None
-        self.remote_addons = [(i, a) for i, a in self.remote_addons if i.id != info.id]
-        self.remote_addons.append((info, addon))
-        return addon
-
-    def remove_remote_addon(self, info, base=None):
-        """Uninstall a remote add-on (Settings' *Remove Onion Pocket*): the running
-        copy is stopped (its server lets go of the port), its folder in `base` (the
-        modules folder in %APPDATA%) deleted and its package forgotten. Its settings
-        in Config.remote_addons stay, for when it's got again. If the folder can't be
-        deleted, it's started again. Raises modules.ModuleError."""
-        from soundboard import modules
-        cur = next(((i, a) for i, a in self.remote_addons if i.id == info.id), None)
-        if cur is not None and cur[1] is not None:
-            try:
-                cur[1].stop()
-            except Exception:  # noqa: BLE001 - it's being removed anyway
-                log.exception("remote add-on %s didn't stop cleanly", info.id)
-        try:
-            modules.uninstall(info.id, base)
-        except modules.ModuleError:
-            if cur is not None and cur[1] is not None:
-                restart = getattr(cur[1], "apply", None)
-                try:
-                    if callable(restart):
-                        restart()
-                except Exception:  # noqa: BLE001
-                    log.exception("remote add-on %s didn't start again", info.id)
-            raise
-        if info.package:
-            modules._forget(info.package)
-        self.remote_addons = [(i, a) for i, a in self.remote_addons if i.id != info.id]
-        log.info("remote add-on %s %s was removed", info.id, info.version)
-
-    def _stop_remote_addons(self):
-        for info, addon in self.remote_addons:
-            if addon is not None:
-                try:
-                    addon.stop()
-                except Exception:  # noqa: BLE001
-                    log.exception("remote add-on %s didn't stop cleanly", info.id)
-
     def set_autostart(self, on: bool) -> bool:
         return autostart.set_enabled(on, self.cfg.autostart_hidden)
 
@@ -7766,7 +7561,7 @@ class MainWindow(QMainWindow):
         self.set_option("autostart_hidden", hidden)
         autostart.refresh(hidden)
 
-    # ------------------------------------------------------------------ updates
+    # ------------------------------------------------------------------ usage count
     def send_usage(self):
         """The anonymous daily usage count, if it's due and switched on (usage.py)."""
         usage.maybe_send(self.cfg, self.bridge.counted.emit, app_dir=library.APP_DIR)
@@ -7799,199 +7594,6 @@ class MainWindow(QMainWindow):
     def _count_tab(self, i: int):
         if 0 <= i < len(TABS):
             usage.tab_opened(self.cfg, TAB_KEYS[i])
-
-    def _urgent_now(self) -> tuple[str, str, str] | None:
-        """The urgent fix to show on the banner: (key, text, button), Onion Board's
-        before Onion Watch's; None when there's none, or it was hidden."""
-        rel = self.updctl.release
-        if (rel is not None and rel.urgent
-                and f"board {rel.version}" not in self._urgent_hidden):
-            # the same steps as the update card (its progress shows under the words)
-            button = (_("Cancel") if self.updctl._downloading
-                      else _("Restart to update") if self.updctl._update_file is not None
-                      and not self.updctl._update_err
-                      else _("Try again") if self.updctl._update_err
-                      else _("Update now") if updates.can_install() and rel.asset_url
-                      else _("Details"))
-            return (f"board {rel.version}",
-                    _("Important fix in Onion Board {version}: {fix}",
-                      version=rel.version, fix=rel.urgent), button)
-        o = self.watch_offer   # only on its Triggers tab: there it's the one in use
-        if (o is not None and f"watch {o.version}" not in self._urgent_hidden
-                and self.tabs.currentWidget() is self.triggers):
-            return (f"watch {o.version}",
-                    _("Important fix in Onion Watch {version}: {fix}",
-                      version=o.version, fix=o.urgent),
-                    _("Update Onion Watch"))
-        probs = self.discord_problems()
-        key = "discord " + ",".join(probs)
-        if probs and key not in self._urgent_hidden:
-            return key, DISCORD_URGENT[probs[0]].format(
-                name=self.discord_found[0].client), _("Fix Discord")
-        raw = self._raw_culprits()
-        key = "rawmic " + ",".join(a.exe.lower() for a in raw)
-        if raw and key not in self._urgent_hidden:
-            if len(raw) == 1:
-                text = _("{name} is using your mic without Onion Board, so it won't hear "
-                         "your sounds. Look for a \"raw\", \"bypass processing\" or "
-                         "\"studio\" option in its voice settings and turn it off.",
-                         name=raw[0].name)
-            else:
-                text = _("One of these apps is using your mic without Onion Board, so it "
-                         "won't hear your sounds: {names}. Look for a \"raw\", \"bypass "
-                         "processing\" or \"studio\" option in its voice settings and turn "
-                         "it off.", names=", ".join(a.name for a in raw))
-            return key, text, ""
-        return None
-
-    def _raw_culprits(self) -> list:
-        """The apps recording the mic in raw mode (rawmic), but not a Discord whose own
-        settings already have their line (Studio, Bypass)."""
-        raw = self.raw_watch.culprits
-        if raw and self.discord_problems():
-            from soundboard.ui.chatguide import DISCORD_EXES
-            raw = [a for a in raw if a.exe.lower() not in DISCORD_EXES]
-        return raw
-
-    def _raw_tick(self):
-        """Every RAW_POLL_MS while sending straight into the mic: who records it, on a
-        worker (Windows' session list); compared with the effect's streams after."""
-        e = self.engine
-        mic = self.cfg.mic_device
-        if (self.cfg.route != "mic" or e.direct_stream() is None or not mic
-                or self._direct_not_running()):
-            shown = bool(self.raw_watch.culprits)
-            self.raw_watch.reset()
-            if shown:
-                self._show_urgent()
-            return
-        if self._raw_looking:
-            return
-        self._raw_looking = True
-
-        def run():
-            try:
-                # in the endpoint effect nobody can skip it, and one copy serves every
-                # app (its stream count isn't per app): nobody to name
-                return [] if directmic.endpoint_wide() else \
-                    appaudio.recording_apps(mic, mine=True)
-            except Exception:  # noqa: BLE001 - a check that can't run shows nothing
-                log.debug("listing who records the mic failed", exc_info=True)   # (often)
-                return None
-        worker.run(run, self.bridge.mic_users, "raw-mic", error=None, owner=self)
-
-    def _on_mic_users(self, apps, now: float | None = None):
-        self._raw_looking = False
-        if apps is None or self.engine.direct_stream() is None:
-            return
-        before = [a.exe for a in self.raw_watch.culprits]
-        culprits = self.raw_watch.update(apps, self.engine.direct_apps(),
-                                        time.monotonic() if now is None else now)
-        if [a.exe for a in culprits] != before:
-            log.info("recording the mic without Onion Board: %s",
-                     [a.exe for a in culprits] or "nobody")
-            self._show_urgent()
-
-    def discord_problems(self) -> list[str]:
-        """What in the running Discord's own settings hurts your sounds (discordcfg),
-        worst first; [] when it's fine, not running, or couldn't be read."""
-        if not self.discord_found:
-            return []
-        from soundboard.ui.chatguide import raw_skips
-        return self.discord_found[0].problems(raw_skips(self))
-
-    def _discord_tick(self):
-        """Every DISCORD_POLL_MS: while Discord runs, re-read its settings when its
-        files changed. On a worker: the process list and the files take a few ms."""
-        if self._discord_reading:
-            return
-        self._discord_reading = True
-        last = self._discord_sig
-
-        def run():
-            found, sig = [], None
-            try:
-                from soundboard.ui.chatguide import DISCORD_EXES
-                names = {n for _p, n in appaudio._process_table().values()}
-                if names & set(DISCORD_EXES):
-                    sig = discordcfg.signature()
-                    found = None if sig == last else discordcfg.read()
-            except Exception:  # noqa: BLE001 - a check that can't run shows nothing
-                log.debug("reading Discord's settings failed", exc_info=True)
-            self.bridge.discord.emit((found, sig))
-        self._discord_poll.run(run)
-
-    def _on_discord(self, res):
-        found, sig = res
-        self._discord_reading = False
-        self._discord_sig = sig
-        if found is None:   # unchanged
-            return
-        before = self.discord_problems()
-        self.discord_found = found
-        now = self.discord_problems()
-        if now != before:
-            log.info("Discord settings: %s", now or "fine")
-            self._show_urgent()
-        app = self._setup_app
-        if self._setup_state == "done" and app is not None and app.guide == "discord":
-            self._show_setup("done", app)   # its ticks, live
-
-    def _show_urgent(self):
-        now = self._urgent_now()
-        if now is None:
-            self.urgent_bar.hide()
-            return
-        key, text, button = now
-        self.urgent_lbl.setText(text)
-        self.urgent_btn.setText(button)
-        self.urgent_btn.setVisible(bool(button))   # a warning with nothing to click
-        # Onion Board's own fix: the update card's progress and words, under the reason
-        upd = self.updctl
-        board = key.startswith("board") and (upd._downloading or bool(upd._update_err))
-        self.urgent_prog.setVisible(board and self.updctl._downloading)
-        self.urgent_prog.setValue(self.updctl._update_pct())
-        self.urgent_sub.setVisible(board)
-        if board:
-            state = self.updctl._update_words()   # failed: the reason (Try again is beside it)
-            self.urgent_sub.setText(state[3] if state[0] == "failed"
-                                    else " · ".join(filter(None, (state[1], state[2]))))
-        self.urgent_bar.show()
-        if self._setup_state == "offer":
-            self._hide_setup()   # one bar at a time: the warning beats "Set up for it?"
-
-    def _hide_urgent(self):
-        now = self._urgent_now()
-        if now is not None:
-            self._urgent_hidden.add(now[0])
-        self._show_urgent()   # the next one, if any
-
-    def _urgent_clicked(self):
-        now = self._urgent_now()
-        if now is None:
-            return
-        if now[0].startswith("discord"):
-            self.show_chat_guide("discord")
-            self._show_urgent()   # fixed meanwhile, or still to do
-            return
-        if now[0].startswith("board"):
-            if self.updctl._downloading:
-                self.updctl.cancel_update()
-            elif self.updctl._update_file is not None and not self.updctl._update_err:
-                self.updctl.install_update()
-            elif (updates.can_install() and self.updctl.release is not None
-                  and self.updctl.release.asset_url):
-                self.updctl.download_update()
-            else:
-                self.updctl.show_update()
-            return
-        # Onion Watch: its tab does the updating (and shows how it's going)
-        self.tabs.setCurrentWidget(self.triggers)
-        if (isinstance(self.triggers, TriggersTab) and self.triggers.offer is not None
-                and not self.triggers._busy):
-            self.triggers.get()
-        self.watch_offer = None
-        self._show_urgent()
 
     def _go_tab(self, n: int, absolute: bool = False):
         """The n-th tab on the rail (`absolute`), or the one n steps from this one."""
@@ -8068,7 +7670,7 @@ class MainWindow(QMainWindow):
             self._set_tick_rate()
 
     def _tick_pace(self) -> int:
-        if not self._ui_live and not self.overlay.is_open and not self.bun_up():
+        if not self._ui_live and not self.overlay.is_open and not self.bunctl.bun_up():
             return TICK_IDLE_MS
         if not self._tick_busy:   # nothing moves: 10 ticks a second instead of 30
             return TICK_QUIET_MS
@@ -8151,9 +7753,9 @@ class MainWindow(QMainWindow):
         if self._ui_live:
             self._tick_visuals(playing, now)
         self.overlay.tick(playing)
-        if self.bun_mode is not None and self.bun_mode.isVisible():
+        if self.bunctl.bun_mode is not None and self.bunctl.bun_mode.isVisible():
             bar = self.download_bar
-            self.bun_mode.tick(
+            self.bunctl.bun_mode.tick(
                 live=live, level=e.level_play, sending=e.sending, mic=self.cfg.mic_enabled,
                 paused=any(paused for sid, (_p, paused) in playing.items()
                            if sid in self._meta or sid == LINK_ID),
@@ -8649,14 +8251,14 @@ class MainWindow(QMainWindow):
             return
         self._shut_down = True
         exitwatch.quitting()   # a run that dies from here on died closing (exitwatch.py)
-        if self.bun_mode is not None:   # (cfg.bun["on"] stays: it starts as Bun next time)
-            self.bun_mode.close()
+        if self.bunctl.bun_mode is not None:   # (cfg.bun["on"] stays: it starts as Bun next time)
+            self.bunctl.bun_mode.close()
         for step in (self._finish_removals, self._wait_bin, self.timer.stop, self._voice_timer.stop,
-                     self._default_poll.stop, self._discord_poll.stop,
+                     self._default_poll.stop, self.alertctl._discord_poll.stop,
                      self._release_ptt,
                      self._remember_usage, self.cfg.save, self.overlay.shutdown,
                      self.hotkeys.stop, self.replay.stop, self.remote.stop,
-                     self._stop_remote_addons,
+                     self.remctl._stop_remote_addons,
                      self.radio.shutdown, tor.shutdown, self.apps.shutdown,
                      self.triggers.shutdown,
                      self.linkbar.shutdown, ytworker.drop_all,

@@ -607,7 +607,7 @@ class SettingsDialog(QDialog):
         self.search_box = QLineEdit()
         # (a page: "Settings" is the heading right over it)
         self.search_box.setPlaceholderText(_("Search"))
-        self.search_box.setClearButtonEnabled(True)
+        icons.clear_button(self.search_box)
         self.search_box.setAccessibleName(_("Search settings"))
         self.search_box.setFixedWidth(196)
         self._search_wait = QTimer(self, singleShot=True, interval=150)
@@ -2325,7 +2325,7 @@ class SettingsDialog(QDialog):
 
         def finish(new):
             relay.deleteLater()
-            addon = self.mw.load_remote_addon(new) if new is not None else None
+            addon = self.mw.remctl.load_remote_addon(new) if new is not None else None
             if new is not None:
                 self.mw.pocket_offer = None
             if not qt_valid(btn):
@@ -2433,7 +2433,7 @@ class SettingsDialog(QDialog):
             mw.impctl.export_board()
             if mw.impctl._exporting:   # it started (not cancelled in the save dialog)
                 busy.hold_until(exp, _("Exporting…"), mw.bridge.exported,
-                                lambda _p, _n, err: _("Didn't export") if err
+                                lambda _p, _n, err, *_rest: _("Didn't export") if err
                                 else _("✓ Exported"))
         exp.clicked.connect(export)
         imp = QPushButton(_("Import"))
@@ -3503,6 +3503,10 @@ class SettingsDialog(QDialog):
                     sig.disconnect(slot)
                 except (RuntimeError, TypeError):
                     pass
+        # hiding it hands the focus on as if Tab were pressed (a keyboard ring on the
+        # Sounds rail tab): the window takes it back, but only knows to if told here
+        fw = QApplication.focusWidget()
+        self.had_focus = fw is not None and self.isAncestorOf(fw)
         super().done(r)
 
     # ------------------------------------------------------------------ remote control
@@ -3586,17 +3590,17 @@ class SettingsDialog(QDialog):
         def set_on(b: bool):
             cfg.api_enabled = b
             mw._save_now()
-            refresh(mw.apply_remote())
+            refresh(mw.remctl.apply_remote())
 
         def set_port():
             if port.value() != cfg.api_port:
                 cfg.api_port = port.value()
                 mw._save_now()
-                refresh(mw.apply_remote())
+                refresh(mw.remctl.apply_remote())
 
         def new_key():
             cfg.api_token = remote.new_token()
-            refresh(mw.apply_remote())
+            refresh(mw.remctl.apply_remote())
             running = mw.remote.running
 
             def saved(ok: bool):   # only now is it the key after a restart too
@@ -3634,7 +3638,7 @@ class SettingsDialog(QDialog):
         error box. Without a working Onion Pocket, a card offering to get it."""
         from soundboard import pocketaddon
         out, have = [], set()
-        for info, addon in getattr(self.mw, "remote_addons", []):
+        for info, addon in getattr(getattr(self.mw, "remctl", None), "remote_addons", []):
             card = self._addon_card(info, addon)
             if card is not None:
                 if info.id == pocketaddon.MODULE_ID:
@@ -3652,7 +3656,7 @@ class SettingsDialog(QDialog):
     def _pocket_info(self):
         """The installed Onion Pocket the app knows of (running or not), or None."""
         from soundboard import pocketaddon
-        return next((i for i, _a in getattr(self.mw, "remote_addons", [])
+        return next((i for i, _a in getattr(getattr(self.mw, "remctl", None), "remote_addons", [])
                      if i.id == pocketaddon.MODULE_ID), None)
 
     def _pocket_remove_button(self, card, info):
@@ -3707,7 +3711,7 @@ class SettingsDialog(QDialog):
                 QMessageBox.StandardButton.No) != QMessageBox.StandardButton.Yes:
             return
         try:
-            self.mw.remove_remote_addon(info)
+            self.mw.remctl.remove_remote_addon(info)
         except modules.ModuleError as e:
             log.warning("Onion Pocket couldn't be removed: %s", e)
             busy.toast(self, html.escape(_("Onion Pocket wasn't removed: {error}",
@@ -3775,7 +3779,7 @@ class SettingsDialog(QDialog):
 
         def finish(new, relay):
             relay.deleteLater()
-            addon = mw.load_remote_addon(new) if new is not None else None
+            addon = mw.remctl.load_remote_addon(new) if new is not None else None
             if new is not None:
                 mw.pocket_offer = None      # installed: on disk now, whatever happens
             if not qt_valid(btn):
@@ -3851,7 +3855,7 @@ class SettingsDialog(QDialog):
         def finish(info):
             if not qt_valid(card):
                 return
-            addon = self.mw.load_remote_addon(info) if info is not None else None
+            addon = self.mw.remctl.load_remote_addon(info) if info is not None else None
             new = self._addon_card(info, addon) if addon is not None else None
             if new is not None:
                 self._pocket_remove_button(new, info)

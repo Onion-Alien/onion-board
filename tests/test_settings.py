@@ -407,7 +407,7 @@ def test_remote_page_copies_an_ai_prompt_with_the_key_only_when_ticked(window): 
     finally:
         d.close()
         window.cfg.api_enabled = False
-        window.apply_remote()
+        window.remctl.apply_remote()
 
 
 def test_a_new_remote_key_says_made_only_once_it_is_saved(window, monkeypatch):  # noqa: F811
@@ -415,12 +415,12 @@ def test_a_new_remote_key_says_made_only_once_it_is_saved(window, monkeypatch): 
     only once it's on disk. A failed save says so instead (after a restart the old key
     would be back, and a Stream Deck set up with the new one would stop working)."""
     from soundboard import library
-    from soundboard.ui import mainwindow
+    from soundboard.ui import remoteaccess
     flashed, toasts, ui_saves = [], [], []
     monkeypatch.setattr(busy, "flash", lambda btn, text, ms=0: flashed.append(text))
     monkeypatch.setattr(busy, "toast", lambda w, text, kind="", *a, **k: toasts.append(kind))
     monkeypatch.setattr(type(window.cfg), "save", lambda self: ui_saves.append(1) or True)
-    monkeypatch.setattr(mainwindow.MainWindow, "apply_remote", lambda self: "")
+    monkeypatch.setattr(remoteaccess.RemoteAccess, "apply_remote", lambda self: "")
     window._save_failed_shown = False
     window.cfg.api_enabled, window.cfg.api_token = True, "the-old-key"
     d = SettingsDialog(window, "remote")

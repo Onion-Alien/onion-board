@@ -1,10 +1,11 @@
 """MainWindow is split by feature: each group of its work is a controller in its own
 module that the window owns, not more methods on one 10,000-line class. A method moved
-out must not come back, and the window must still make each controller."""
+out must not come back, and the window must still make each controller: a QObject it
+owns, so timers and signals aimed at the controller stop with the window."""
 import pytest
 
-from soundboard.ui import (categorycontrol, ffmpegcontrol, importcontrol, mainwindow,
-                           updatecontrol)
+from soundboard.ui import (alertcontrol, buncontrol, categorycontrol, ffmpegcontrol,
+                           importcontrol, mainwindow, remoteaccess, updatecontrol)
 from test_mainwindow import window  # noqa: F401  (the real MainWindow fixture)
 
 # (window attribute, controller class, methods that live there now)
@@ -21,12 +22,20 @@ SPLIT = [
      ["_build_categories", "_fill_categories", "set_category", "new_category", "toggle_tag",
       "rename_category", "delete_category", "new_subcategory", "_cat_tick",
       "add_category_program"]),
+    ("alertctl", alertcontrol.AlertControl,
+     ["_urgent_now", "_show_urgent", "_hide_urgent", "_urgent_clicked", "discord_problems",
+      "_discord_tick", "_on_discord", "_raw_tick", "_on_mic_users"]),
+    ("bunctl", buncontrol.BunControl,
+     ["bun_up", "enter_bun_mode", "leave_bun_mode", "_bun_away", "start_as_bun", "toast_seen"]),
+    ("remctl", remoteaccess.RemoteAccess,
+     ["apply_remote", "_load_remote_addons", "load_remote_addon", "remove_remote_addon",
+      "_stop_remote_addons"]),
 ]
 
 
 @pytest.mark.parametrize("attr,cls,gone", SPLIT, ids=[s[0] for s in SPLIT])
 def test_each_feature_is_its_own_controller(window, attr, cls, gone):  # noqa: F811
     ctl = getattr(window, attr)
-    assert isinstance(ctl, cls) and ctl.mw is window
+    assert isinstance(ctl, cls) and ctl.mw is window and ctl.parent() is window
     for name in gone:
         assert not hasattr(mainwindow.MainWindow, name), name
