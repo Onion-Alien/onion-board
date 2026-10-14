@@ -347,6 +347,34 @@ def test_flat_map_names_towns_only_zoomed_in_and_only_in_view(qapp, monkeypatch)
     assert 0 < shown <= flatmap.TOWNS_IN_VIEW      # never more than a handful at once
 
 
+
+def test_flat_map_draws_only_the_town_names_that_fit(qapp, monkeypatch):
+    """Zooming past TOWN_ZOOM over Europe drew every town in view (hundreds), even the
+    ones then skipped for overlapping: 80 ms in one paint, and the sound skipped. Only
+    the names that fit are drawn, and new ones get a slice of a paint each."""
+    from soundboard.ui import flatmap
+    from soundboard.ui.flatmap import FlatMap
+    m = FlatMap()
+    m.resize(720, 400)
+    towns = [{"n": f"Town {i}", "la": 50 + (i % 20) * 0.05, "lo": 10 + (i // 20) * 0.05,
+              "k": 1000 - i} for i in range(400)]
+    m.set_towns(towns)
+    m.zoom, m.cx, m.cy = 6.0, 10.5, 50.5
+    drawn = []
+    real = m._town_pixmap
+    monkeypatch.setattr(m, "_town_pixmap", lambda n, dpr: drawn.append(n) or real(n, dpr))
+    pm = flatmap.QPixmap(720, 400)
+    monkeypatch.setattr(flatmap, "TOWN_SLICE_S", -1.0)   # no time left: all wait
+    p = flatmap.QPainter(pm)
+    assert m._paint_towns(p, 1.0) == 0 and drawn == []
+    assert m._towns_later.isActive()                   # ...for the next paint
+    monkeypatch.setattr(flatmap, "TOWN_SLICE_S", 10.0)
+    shown = m._paint_towns(p, 1.0)
+    p.end()
+    assert 0 < shown <= flatmap.TOWNS_IN_VIEW
+    assert len(drawn) == shown                         # none drawn just to be skipped
+
+
 def test_bad_coordinates_and_numbers_are_cleaned():
     s = Station.from_api(api_station(1, geo_lat=0, geo_long=0, bitrate="x", countrycode="J1"))
     assert s.lat is None and s.lon is None and s.bitrate == 0 and s.cc == ""
