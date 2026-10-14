@@ -346,6 +346,27 @@ def test_one_click_plays_a_pad(window, monkeypatch):
         Pad.single_click = False
 
 
+def test_a_double_click_plays_wherever_the_two_clicks_land(window, monkeypatch):
+    w = window
+    played = []
+    monkeypatch.setattr(w, "play", played.append)
+    pad = w.pads["s0"]
+
+    def click(x, y):
+        pos = QPointF(x, y)
+        for kind in (QMouseEvent.MouseButtonPress, QMouseEvent.MouseButtonRelease):
+            ev = QMouseEvent(kind, pos, pos, Qt.LeftButton, Qt.LeftButton, Qt.NoModifier)
+            (pad.mousePressEvent if kind == QMouseEvent.MouseButtonPress
+             else pad.mouseReleaseEvent)(ev)
+    click(4, 4)                                    # top left: selects it
+    assert played == []
+    click(pad.width() - 4, pad.height() - 4)       # then bottom right: plays it
+    assert played == ["s0"]
+    assert pad._press is None                      # and no drag starts from that press
+    click(4, 4)                                    # a third click starts over
+    assert played == ["s0"]
+
+
 def test_the_queue_shows_above_the_pads_and_can_be_trimmed(window, monkeypatch, calls):
     w = window
     w._ui_live = True

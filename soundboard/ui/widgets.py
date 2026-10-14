@@ -11,7 +11,8 @@ from PySide6.QtCore import (QEasingCurve, QEvent, QMimeData, QObject, QPoint, QP
                             QSize, Qt, QTimer, QVariantAnimation, Signal)
 from PySide6.QtGui import (QColor, QDrag, QFont, QFontMetrics, QLinearGradient, QPainter,
                            QPainterPath, QPen, QPixmap)
-from PySide6.QtWidgets import (QAbstractButton, QGridLayout, QLabel, QMainWindow, QMenu,
+from PySide6.QtWidgets import (QAbstractButton, QApplication, QGridLayout, QLabel, QMainWindow,
+                               QMenu,
                                QScrollArea,
                                QSlider, QStackedWidget, QStyle, QStyleOptionSlider,
                                QTabWidget, QToolTip,
@@ -609,6 +610,7 @@ class Pad(QAbstractButton):
         self.name_cut = False    # the name is cut short with "…" (_fit_name)
         self._play_t: float | None = None   # when it started playing (the flash on start)
         self._press = None
+        self._last_click = -1e9   # when a plain left click was let go (ms): see _second_click
         self._kbd_focus = False  # focus came from the keyboard: draw the focus ring
         self._described = None
         self._name_fit = None    # (what it was fitted to, how) - see _fit_name
@@ -830,8 +832,24 @@ class Pad(QAbstractButton):
         self._down = False
         self._fade_hover(False)
 
+    def _second_click(self, e) -> bool:
+        """A second plain left click soon after the first, anywhere on the pad. Qt only
+        counts a double-click when both land a few pixels apart, so top-left then
+        bottom-right was two single clicks (and a drag if the mouse was still moving)."""
+        return (not Pad.single_click and e.button() == Qt.MouseButton.LeftButton
+                and not e.modifiers() & (Qt.KeyboardModifier.ShiftModifier
+                                         | Qt.KeyboardModifier.ControlModifier)
+                and time.monotonic() * 1000 - self._last_click
+                <= QApplication.doubleClickInterval())
+
     def mousePressEvent(self, e):
-        if e.button() == Qt.MouseButton.LeftButton:
+        if self._second_click(e):
+            self._last_click = -1e9   # a third click starts over
+            self._press = None        # no drag, no select on release
+            self._down = True
+            self.update()
+            self.activated.emit(self.meta.id)
+        elif e.button() == Qt.MouseButton.LeftButton:
             self._press = e.position().toPoint()
             self._down = True
             self.update()
@@ -867,6 +885,9 @@ class Pad(QAbstractButton):
         if e.button() == Qt.MouseButton.LeftButton and self._press is not None:
             self._press = None
             mods = e.modifiers()
+            if not mods & (Qt.KeyboardModifier.ShiftModifier
+                           | Qt.KeyboardModifier.ControlModifier):
+                self._last_click = time.monotonic() * 1000
             if mods & Qt.KeyboardModifier.ShiftModifier:
                 self.pick.emit(self.meta.id, True)
             elif mods & Qt.KeyboardModifier.ControlModifier:
@@ -889,13 +910,10 @@ class Pad(QAbstractButton):
         e.accept()
 
     def mouseDoubleClickEvent(self, e):
-        if Pad.single_click:   # a quick second click is just another click
-            self.mousePressEvent(e)
-            return
-        if e.button() == Qt.MouseButton.LeftButton and not e.modifiers() & (
-                Qt.KeyboardModifier.ShiftModifier | Qt.KeyboardModifier.ControlModifier):
-            self._press = None
-            self.activated.emit(self.meta.id)
+        # Qt sends this in place of the second press: the same as a press (it plays when
+        # it's a second click: _second_click; a quick second click is just another click
+        # when one click plays)
+        self.mousePressEvent(e)
 
     def paintEvent(self, e):
         self.describe()
@@ -1598,7 +1616,9 @@ class PadGrid(QWidget):
         if md.hasFormat(PAD_MIME):
             sid = bytes(md.data(PAD_MIME)).decode()
             pos = e.position().toPoint()
-            self.reorder.emit(sid, self._drop_target(pos))
+            over = self.pad_at(pos)
+            if over is None or over.meta.id != sid:   # back on itself: nothing moved
+                self.reorder.emit(sid, self._drop_target(pos))
             e.acceptProposedAction()
         elif md.hasUrls():
             files = [u.toLocalFile() for u in md.urls() if u.isLocalFile()]
