@@ -3698,5 +3698,7 @@
   "Get the newest yt-dlp, the part that downloads from YouTube and other sites, then try this link again": "احصل على أحدث yt-dlp، الجزء الذي ينزّل من YouTube ومواقع أخرى، ثم جرّب هذا الرابط مرة أخرى",
   "The downloader is already the newest. The site may have changed in a way it can't handle yet: try again in a few days.": "برنامج التنزيل هو الأحدث بالفعل. ربما تغيّر الموقع بطريقة لا يستطيع التعامل معها بعد: جرّب مرة أخرى بعد بضعة أيام.",
   "Update downloader": "تحديث برنامج التنزيل",
-  "Updating the downloader…": "جارٍ تحديث برنامج التنزيل…"
+  "Updating the downloader…": "جارٍ تحديث برنامج التنزيل…",
+  "Mute the game's sounds": "كتم أصوات اللعبة",
+  "Turn the game's sounds on": "تشغيل أصوات اللعبة"
 }

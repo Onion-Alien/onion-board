@@ -3394,5 +3394,7 @@
   "Get the newest yt-dlp, the part that downloads from YouTube and other sites, then try this link again": "Letölti a legújabb yt-dlp-t, azt a részt, ami a YouTube-ról és más oldalakról tölt le, majd újra megpróbálja ezt a linket",
   "The downloader is already the newest. The site may have changed in a way it can't handle yet: try again in a few days.": "A letöltő már a legújabb. Lehet, hogy az oldal úgy változott meg, amit még nem tud kezelni: próbáld újra pár nap múlva.",
   "Update downloader": "Letöltő frissítése",
-  "Updating the downloader…": "A letöltő frissítése…"
+  "Updating the downloader…": "A letöltő frissítése…",
+  "Mute the game's sounds": "A játék hangjainak némítása",
+  "Turn the game's sounds on": "A játék hangjainak bekapcsolása"
 }

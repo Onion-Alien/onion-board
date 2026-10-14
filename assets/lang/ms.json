@@ -3318,5 +3318,7 @@
   "Get the newest yt-dlp, the part that downloads from YouTube and other sites, then try this link again": "Dapatkan yt-dlp terbaharu, bahagian yang memuat turun dari YouTube dan laman lain, kemudian cuba pautan ini lagi",
   "The downloader is already the newest. The site may have changed in a way it can't handle yet: try again in a few days.": "Pemuat turun sudah yang terbaharu. Laman itu mungkin berubah dengan cara yang belum boleh dikendalikannya: cuba lagi dalam beberapa hari.",
   "Update downloader": "Kemas kini pemuat turun",
-  "Updating the downloader…": "Mengemas kini pemuat turun…"
+  "Updating the downloader…": "Mengemas kini pemuat turun…",
+  "Mute the game's sounds": "Senyapkan bunyi permainan",
+  "Turn the game's sounds on": "Hidupkan bunyi permainan"
 }

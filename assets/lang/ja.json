@@ -3318,5 +3318,7 @@
   "Get the newest yt-dlp, the part that downloads from YouTube and other sites, then try this link again": "最新の yt-dlp（YouTube などのサイトからダウンロードする部分）を取得して、このリンクをもう一度試します",
   "The downloader is already the newest. The site may have changed in a way it can't handle yet: try again in a few days.": "ダウンローダーはすでに最新です。サイトがまだ対応できない形に変わったのかもしれません。数日後にもう一度試してください。",
   "Update downloader": "ダウンローダーを更新",
-  "Updating the downloader…": "ダウンローダーを更新中…"
+  "Updating the downloader…": "ダウンローダーを更新中…",
+  "Mute the game's sounds": "ゲームの音をミュート",
+  "Turn the game's sounds on": "ゲームの音をオンにする"
 }

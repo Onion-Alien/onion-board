@@ -3470,5 +3470,7 @@
   "Get the newest yt-dlp, the part that downloads from YouTube and other sites, then try this link again": "Скачать самый новый yt-dlp, часть, которая загружает с YouTube и других сайтов, и попробовать эту ссылку снова",
   "The downloader is already the newest. The site may have changed in a way it can't handle yet: try again in a few days.": "Загрузчик уже самый новый. Возможно, сайт изменился так, что он пока с этим не справляется: попробуйте снова через несколько дней.",
   "Update downloader": "Обновить загрузчик",
-  "Updating the downloader…": "Загрузчик обновляется…"
+  "Updating the downloader…": "Загрузчик обновляется…",
+  "Mute the game's sounds": "Выключить звуки игры",
+  "Turn the game's sounds on": "Включить звуки игры"
 }

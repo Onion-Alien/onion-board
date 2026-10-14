@@ -3394,5 +3394,7 @@
   "Get the newest yt-dlp, the part that downloads from YouTube and other sites, then try this link again": "Henter nyeste yt-dlp, delen som laster ned fra YouTube og andre sider, og prøver denne lenken igjen",
   "The downloader is already the newest. The site may have changed in a way it can't handle yet: try again in a few days.": "Nedlasteren er allerede den nyeste. Siden kan ha endret seg på en måte den ikke takler ennå: prøv igjen om noen dager.",
   "Update downloader": "Oppdater nedlasteren",
-  "Updating the downloader…": "Oppdaterer nedlasteren…"
+  "Updating the downloader…": "Oppdaterer nedlasteren…",
+  "Mute the game's sounds": "Slå av lydene i spillet",
+  "Turn the game's sounds on": "Slå på lydene i spillet"
 }

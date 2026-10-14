@@ -239,3 +239,90 @@ def test_pong_counts_opened_quit_won_and_lost(qapp, monkeypatch):
         assert usage._used == {key}
         stack2.close()
     stack.close()
+
+
+class _Engine:
+    """Records what the game plays."""
+
+    def __init__(self):
+        self.mon_stream = object()
+        self.played = []
+
+    def play(self, sid, data, gain, **kw):
+        self.played.append((sid, data, kw))
+
+
+def _game_with_sound(seed=1):
+    stack, game = _game(seed)
+    stack.engine = _Engine()
+    stack.cfg = type("Cfg", (), {"pong_sounds": True})()
+    stack.set_option = lambda attr, v: setattr(stack.cfg, attr, v)
+    game._mute_look()
+    return stack, game, stack.engine
+
+
+def test_the_game_plays_its_sounds_in_the_headphones_only(qapp, monkeypatch):
+    stack, game, eng = _game_with_sound()
+    heard = []
+    real = bunpong.pongsounds.render
+
+    def render(name, style, **kw):
+        heard.append((name, kw))
+        return real(name, style, **kw)
+
+    monkeypatch.setattr(bunpong.pongsounds, "render", render)
+    c = game.court
+    c.serve("bun")
+    for _ in range(400):
+        game.step(1 / 60)
+        if c.vx > 0:
+            break
+    c._point("bun")
+    names = [n for n, _kw in heard]
+    assert names[0] == "serve" and "bun" in names and "score_bun" in names
+    assert eng.played and all(sid == bunpong.SOUND_SID and kw["preview"] and kw["mode"] == "overlap"
+                              for sid, _d, kw in eng.played)
+    game.finish()
+    stack.close()
+
+
+def test_your_hits_climb_and_milestones_chime(qapp):
+    stack, game, eng = _game_with_sound()
+    heard = []
+    game.court.sound = lambda name, **kw: heard.append((name, kw))
+    c = game.court
+    c.serve("you")
+    for _i in range(5):
+        c._hit(0.0, -1, 0.9)
+    rallies = [kw["rally"] for n, kw in heard if n == "you"]
+    assert rallies == [0, 1, 2, 3, 4]
+    assert ("milestone", {"level": 1}) in heard
+    c._hit(1.0, -1, 0.9)   # off the very tip: a close call
+    assert heard[-1][1]["edge"] is True
+    game.finish()
+    stack.close()
+
+
+def test_the_speaker_button_mutes_and_is_kept(qapp):
+    stack, game, eng = _game_with_sound()
+    game.court.serve("bun")
+    assert eng.played
+    eng.played.clear()
+    game.mute.click()
+    assert stack.cfg.pong_sounds is False
+    assert "on" in game.mute.toolTip()
+    game.court.serve("bun")
+    assert not eng.played
+    game.mute.click()
+    assert stack.cfg.pong_sounds is True
+    game.finish()
+    stack.close()
+
+
+def test_no_headphones_open_means_no_sound(qapp):
+    stack, game, eng = _game_with_sound()
+    eng.mon_stream = None
+    game.court.serve("bun")
+    assert not eng.played
+    game.finish()
+    stack.close()

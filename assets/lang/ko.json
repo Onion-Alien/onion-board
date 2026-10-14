@@ -3318,5 +3318,7 @@
   "Get the newest yt-dlp, the part that downloads from YouTube and other sites, then try this link again": "YouTube 등 여러 사이트에서 다운로드하는 부분인 최신 yt-dlp를 받은 뒤 이 링크를 다시 시도합니다",
   "The downloader is already the newest. The site may have changed in a way it can't handle yet: try again in a few days.": "다운로더가 이미 최신이에요. 사이트가 아직 처리할 수 없는 방식으로 바뀌었을 수 있어요. 며칠 뒤에 다시 시도해 보세요.",
   "Update downloader": "다운로더 업데이트",
-  "Updating the downloader…": "다운로더 업데이트 중…"
+  "Updating the downloader…": "다운로더 업데이트 중…",
+  "Mute the game's sounds": "게임 소리 끄기",
+  "Turn the game's sounds on": "게임 소리 켜기"
 }

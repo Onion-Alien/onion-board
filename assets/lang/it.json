@@ -3394,5 +3394,7 @@
   "Get the newest yt-dlp, the part that downloads from YouTube and other sites, then try this link again": "Scarica lo yt-dlp più recente, la parte che scarica da YouTube e da altri siti, poi riprova questo link",
   "The downloader is already the newest. The site may have changed in a way it can't handle yet: try again in a few days.": "Il downloader è già il più recente. Il sito potrebbe essere cambiato in un modo che non sa ancora gestire: riprova tra qualche giorno.",
   "Update downloader": "Aggiorna downloader",
-  "Updating the downloader…": "Aggiornamento del downloader…"
+  "Updating the downloader…": "Aggiornamento del downloader…",
+  "Mute the game's sounds": "Disattiva i suoni del gioco",
+  "Turn the game's sounds on": "Attiva i suoni del gioco"
 }

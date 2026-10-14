@@ -3394,5 +3394,7 @@
   "Get the newest yt-dlp, the part that downloads from YouTube and other sites, then try this link again": "Παίρνει το νεότερο yt-dlp, το κομμάτι που κατεβάζει από το YouTube και άλλους ιστότοπους, και δοκιμάζει ξανά αυτόν τον σύνδεσμο",
   "The downloader is already the newest. The site may have changed in a way it can't handle yet: try again in a few days.": "Το πρόγραμμα λήψης είναι ήδη το νεότερο. Ο ιστότοπος ίσως άλλαξε με τρόπο που δεν μπορεί να χειριστεί ακόμα: δοκίμασε ξανά σε λίγες μέρες.",
   "Update downloader": "Ενημέρωση προγράμματος λήψης",
-  "Updating the downloader…": "Ενημέρωση του προγράμματος λήψης…"
+  "Updating the downloader…": "Ενημέρωση του προγράμματος λήψης…",
+  "Mute the game's sounds": "Σίγαση ήχων παιχνιδιού",
+  "Turn the game's sounds on": "Ενεργοποίηση ήχων παιχνιδιού"
 }

@@ -3394,5 +3394,7 @@
   "Get the newest yt-dlp, the part that downloads from YouTube and other sites, then try this link again": "सबसे नया yt-dlp लें, वह हिस्सा जो YouTube और दूसरी साइटों से डाउनलोड करता है, फिर यह लिंक दोबारा आज़माएँ",
   "The downloader is already the newest. The site may have changed in a way it can't handle yet: try again in a few days.": "डाउनलोडर पहले से सबसे नया है। साइट शायद ऐसे बदली है जिसे यह अभी संभाल नहीं पाता: कुछ दिनों में फिर कोशिश करें।",
   "Update downloader": "डाउनलोडर अपडेट करें",
-  "Updating the downloader…": "डाउनलोडर अपडेट हो रहा है…"
+  "Updating the downloader…": "डाउनलोडर अपडेट हो रहा है…",
+  "Mute the game's sounds": "गेम की आवाज़ें म्यूट करें",
+  "Turn the game's sounds on": "गेम की आवाज़ें चालू करें"
 }

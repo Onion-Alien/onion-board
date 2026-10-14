@@ -3318,5 +3318,7 @@
   "Get the newest yt-dlp, the part that downloads from YouTube and other sites, then try this link again": "Ambil yt-dlp terbaru, bagian yang mengunduh dari YouTube dan situs lain, lalu coba tautan ini lagi",
   "The downloader is already the newest. The site may have changed in a way it can't handle yet: try again in a few days.": "Pengunduh sudah yang terbaru. Situsnya mungkin berubah dengan cara yang belum bisa ditangani: coba lagi dalam beberapa hari.",
   "Update downloader": "Perbarui pengunduh",
-  "Updating the downloader…": "Memperbarui pengunduh…"
+  "Updating the downloader…": "Memperbarui pengunduh…",
+  "Mute the game's sounds": "Bisukan suara game",
+  "Turn the game's sounds on": "Nyalakan suara game"
 }

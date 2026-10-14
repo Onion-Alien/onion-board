@@ -3318,5 +3318,7 @@
   "Get the newest yt-dlp, the part that downloads from YouTube and other sites, then try this link again": "获取最新的 yt-dlp（从 YouTube 和其他网站下载的部分），然后重试这个链接",
   "The downloader is already the newest. The site may have changed in a way it can't handle yet: try again in a few days.": "下载器已经是最新的。网站可能改成了它暂时处理不了的样子：过几天再试试。",
   "Update downloader": "更新下载器",
-  "Updating the downloader…": "正在更新下载器…"
+  "Updating the downloader…": "正在更新下载器…",
+  "Mute the game's sounds": "静音游戏音效",
+  "Turn the game's sounds on": "打开游戏音效"
 }

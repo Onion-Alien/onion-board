@@ -3394,5 +3394,7 @@
   "Get the newest yt-dlp, the part that downloads from YouTube and other sites, then try this link again": "Haal de nieuwste yt-dlp op, het deel dat van YouTube en andere sites downloadt, en probeer deze link daarna opnieuw",
   "The downloader is already the newest. The site may have changed in a way it can't handle yet: try again in a few days.": "De downloader is al de nieuwste. De site is misschien veranderd op een manier die hij nog niet aankan: probeer het over een paar dagen opnieuw.",
   "Update downloader": "Downloader bijwerken",
-  "Updating the downloader…": "Downloader bijwerken…"
+  "Updating the downloader…": "Downloader bijwerken…",
+  "Mute the game's sounds": "Geluiden van het spel dempen",
+  "Turn the game's sounds on": "Geluiden van het spel aanzetten"
 }
