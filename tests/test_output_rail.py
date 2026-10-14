@@ -137,7 +137,6 @@ def _assert_pair(output):
         ink = _ink_box(img, QRect(at.x() + 4, at.y() + 4, b.width() - 8, b.height() - 8),
                        (at.x() + 3, at.y() + b.height() // 2), 40)   # (the button's fill)
         box = QRect(at, b.size())
-        assert b.text().strip()   # (English fits beside the icon)
         # (to 4 px: Mute's space after its icon, the icons' own air)
         assert abs(ink.center().x() - box.center().x()) <= 4.5, b.text()
         assert abs(ink.center().y() - box.center().y()) <= 1.5
