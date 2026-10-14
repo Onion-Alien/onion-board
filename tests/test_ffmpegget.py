@@ -335,6 +335,21 @@ def test_download_stops_at_once(monkeypatch, tmp_path):
     assert len(tried) == 1
 
 
+def test_download_switched_off_gives_up_at_once(monkeypatch, tmp_path):
+    _real(monkeypatch, "_download_once")
+    tried = []
+
+    def urlopen(req, **kw):
+        tried.append(req.full_url)
+        raise net.FeatureOff("Downloading FFmpeg is switched off.")
+    monkeypatch.setattr(ffmpegget.net, "urlopen", urlopen)
+    monkeypatch.setattr(ffmpegget, "RETRY_WAIT_S", (30.0, 30.0))   # never waited
+    with pytest.raises(ffmpegget.SwitchedOff) as e:
+        ffmpegget.download(tmp_path / "z.zip")
+    assert len(tried) == 1
+    assert "switched off" in str(e.value)
+
+
 class _Resp(io.BytesIO):
     def __init__(self, data):
         super().__init__(data)

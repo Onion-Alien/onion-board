@@ -83,6 +83,11 @@ class Stopped(GetError):
     """Stop was pressed while it downloaded."""
 
 
+class SwitchedOff(GetError):
+    """Its switch is off (or Offline mode is on): nothing was sent, and trying again
+    won't change that."""
+
+
 @dataclass(frozen=True)
 class Health:
     """What check() found: ``state`` is OK, MISSING or BROKEN; ``version`` ("7.1") when
@@ -298,7 +303,9 @@ def _download_once(url: str, to: Path, progress, stop) -> None:
                              "taking it.", mb=f"{e.listed / 1e6:.0f}")) from None
         raise GetError(_("The download kept going far past FFmpeg's size: "
                          "not taking it.")) from None
-    except net.ProxyError as e:   # FeatureOff included: switched off, nothing sent
+    except net.FeatureOff as e:   # switched off, nothing sent
+        raise SwitchedOff(errors.plain(e)) from None
+    except net.ProxyError as e:
         raise GetError(errors.plain(e)) from None
     except urllib.error.HTTPError as e:
         raise GetError(_("{host} said {error}.", host=host,
@@ -316,7 +323,8 @@ def _download_once(url: str, to: Path, progress, stop) -> None:
 def download(to: Path, progress=None, stop: threading.Event | None = None) -> None:
     """The zip into ``to``: each source in turn, a few tries each (a dropped connection,
     a busy server). Raises GetError with each source's last reason (GitHub down and the
-    builder's site missing the file are two problems, not one); Stopped at once."""
+    builder's site missing the file are two problems, not one); Stopped and SwitchedOff
+    at once."""
     why: dict[str, str] = {}
     for url in URLS:
         for n in range(TRIES):
@@ -329,7 +337,7 @@ def download(to: Path, progress=None, stop: threading.Event | None = None) -> No
             try:
                 _download_once(url, to, progress, stop)
                 return
-            except Stopped:
+            except (Stopped, SwitchedOff):
                 raise
             except GetError as e:
                 log.info("ffmpeg download from %s, try %d: %s", url, n + 1, e)
