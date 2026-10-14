@@ -14,6 +14,7 @@ import json
 import logging
 import os
 import threading
+from pathlib import Path
 
 import numpy as np
 
@@ -105,14 +106,13 @@ def save() -> None:
     with _lock:
         _timer = None
         todo = {d: dict(t) for d, t in _dirs.items()}
+    from soundboard import library   # imports engine, which imports this module
     for folder, table in todo.items():
         table = {n: v for n, v in table.items() if os.path.exists(os.path.join(folder, n))}
         out = os.path.join(folder, NAME)
-        tmp = out + ".tmp"
         try:
-            with open(tmp, "w", encoding="utf-8", newline="\n") as f:
-                json.dump({"version": VERSION, "cuts": list(destination.LOWCUTS),
-                           "files": table}, f, separators=(",", ":"))
-            os.replace(tmp, out)
+            library.atomic_write_text(
+                Path(out), json.dumps({"version": VERSION, "cuts": list(destination.LOWCUTS),
+                                       "files": table}, separators=(",", ":")))
         except OSError:
             log.debug("couldn't save %s", NAME, exc_info=True)
