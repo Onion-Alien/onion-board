@@ -49,11 +49,11 @@ def test_settings_changed_while_the_voice_list_loads_keep_the_saved_voice(speech
 
 def test_a_reload_asked_for_mid_load_runs_after_it(speech, qapp, monkeypatch):
     s = speech
-    assert process_events(qapp, lambda: not s._loading())
-    s._loading_since = time.monotonic()          # a load in flight
-    s._recheck_voices()                          # e.g. a voice server was just added
+    assert process_events(qapp, lambda: not s.installs._loading())
+    s.installs._loading_since = time.monotonic()  # a load in flight
+    s.installs._recheck_voices()                 # e.g. a voice server was just added
     calls = []
-    monkeypatch.setattr(s, "_recheck_voices", lambda: calls.append(1))
+    monkeypatch.setattr(s.installs, "_recheck_voices", lambda: calls.append(1))
     s._fill_voices(["Microsoft Zira Desktop"], "")   # the first load answers
     assert process_events(qapp, lambda: calls)
     s._fill_voices(["Microsoft Zira Desktop"], "")   # and only once

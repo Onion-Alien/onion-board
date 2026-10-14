@@ -4,7 +4,7 @@ from PySide6.QtCore import QEvent, QPointF, Qt
 from PySide6.QtGui import QMouseEvent
 
 from soundboard.appaudio import App
-from soundboard.ui import appspanel
+from soundboard.ui import appspanel, approw
 from tests.test_appspanel import tab as app_tab_fixture
 
 
@@ -84,7 +84,7 @@ def test_left_header_drag_has_threshold_and_buttons_are_not_drag_handles(tab, mo
         def exec(self, action):
             assert action == Qt.MoveAction
 
-    monkeypatch.setattr(appspanel, "QDrag", Drag)
+    monkeypatch.setattr(approw, "QDrag", Drag)
     press = QMouseEvent(QEvent.MouseButtonPress, QPointF(10, 10), QPointF(10, 10),
                         Qt.LeftButton, Qt.LeftButton, Qt.NoModifier)
     move = QMouseEvent(QEvent.MouseMove, QPointF(50, 10), QPointF(50, 10),
@@ -283,10 +283,10 @@ def test_category_headings_have_a_keyboard_way_to_their_menu(tab, qapp, monkeypa
 
     seen = []
 
-    class Shown(appspanel.QMenu):
+    class Shown(approw.QMenu):
         def exec(self, *a):
             seen.append([x.text() for x in self.actions() if x.text()])
-    monkeypatch.setattr(appspanel, "QMenu", Shown)
+    monkeypatch.setattr(approw, "QMenu", Shown)
     for heading, want in ((browsers, ["Rename category"]),
                           (tab.grid.headings["Work"], ["Rename category", "Delete category"])):
         keys = {sc.key().toString(): sc for sc in heading.findChildren(QShortcut)}
@@ -321,12 +321,12 @@ def test_built_in_category_names_show_in_the_language_and_save_in_english(qapp, 
         assert t.rows["cs2.exe"].category == "Games"          # the saved key stays English
         shown = []
 
-        class Shown(appspanel.QMenu):
+        class Shown(approw.QMenu):
             def exec(self, *a):
                 for act in self.actions():
                     if act.menu() is not None:
                         shown.extend(x.text() for x in act.menu().actions())
-        monkeypatch.setattr(appspanel, "QMenu", Shown)
+        monkeypatch.setattr(approw, "QMenu", Shown)
         t.rows["cs2.exe"]._show_card_menu(t.rows["cs2.exe"].rect().center())
         assert "Spiele" in shown and "Musik && Medien" in shown and "Games" not in shown
         asked = []

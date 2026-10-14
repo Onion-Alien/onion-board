@@ -14,8 +14,7 @@ The full list. The [README](../README.md) has the short version and how to get s
   between pads, Enter or Space plays, F2 renames, Alt+Enter opens Edit, Delete
   removes (the picked pads, or the one you're on) and Ctrl+F jumps to the search box.
   Right-click a pad for *Rename*, *Duplicate* (a second pad with its own file, for
-  its own effects or hotkey) and *Open file location*. A pad's picture is set in
-  **Edit** (from a file or a link), or by dropping or pasting a picture on it.
+  its own effects or hotkey) and *Open file location*.
 - **Record a sound with your mic, or from what's playing:** **Add** → *Record*. Record your own voice, your voice through the voice changer while
   it's on, or *What's playing*: a bit of a sound, a web search result or the radio as
   you hear it (the window stays out of the way, so you can play it while it records);
@@ -30,12 +29,6 @@ The full list. The [README](../README.md) has the short version and how to get s
   give it a random-sound hotkey. With
   *Use hotkeys per category* (Settings → Hotkeys) each category is its own set of
   keys: one key, a different sound per category.
-- **Switch category when a program is in front:** rules made in older versions
-  (a program's file name, `game.exe`, tied to a category) still work: when that
-  program comes to the front, the board and the overlay switch to its category, and
-  back when it closes. *Settings → General → Switch category by program* lists them,
-  with a *Remove* each and *Switch by itself* to turn it all off. New rules can't be
-  made any more.
 - **Remove can be undone:** *Removed “…” · Undo* stays up for 10 seconds. After that
   the sound waits in **Recently deleted** (the *Backup* menu, or the bin button that
   shows while it holds sounds) for 30 days, and *Bring back* returns it exactly as it
@@ -71,9 +64,8 @@ The full list. The [README](../README.md) has the short version and how to get s
   original file is never changed.
 - **Your mic on or off:** send your voice with the sounds, or sounds only.
 - **Where your sounds go** (Setup → Devices → *Send my sounds to*, also in
-  Settings → Audio): **straight into your mic** (the default for everyone, and
-  updating from the cable moves you here once: one click and one Windows permission
-  prompt, then Discord and games hear your sounds through the mic they already use,
+  Settings → Audio): **straight into your mic** (the default: one click and one
+  Windows permission prompt, then Discord and games hear your sounds through the mic they already use,
   with nothing to pick there; voice changer, mic volume, gate, ducking and mute all
   still work, and the Setup tab offers a one-click repair if a Windows update takes it
   off; after the first permission prompt, repairs and changes of mic don't ask again), **the virtual cable** (the backup: *Use the virtual cable instead* on the
@@ -145,8 +137,8 @@ The full list. The [README](../README.md) has the short version and how to get s
   controls change the pitch and effects of every program you send. A closed editor
   doesn't listen or keep anything. A program you removed comes back, settings and
   all, from *Forgotten programs*.
-- **Voice tab:** voice changer (29 ready voices, from Female / Male voice and Demon to
-  Autotune, Talkbox, Masked caller, Dark lord, a Dalek, a chanting monk and a choir; pitch with a natural-sound mode and a
+- **Voice tab:** voice changer (25 ready voices, from Deep, High and Male voice and
+  Demon to Autotune, Talkbox, Masked caller, Dark lord, a Dalek and a singing monk; pitch with a natural-sound mode and a
   voice-size control, autotune, mic clean-up (noise gate + hiss removal), monster growl,
   robot / talkbox, harmony, ring modulator, helmet, shout blowout, radio with walkie-talkie
   clicks, flanger, wobble (vibrato and tremolo), echo, reverb (with pre-delay and early reflections),
@@ -185,8 +177,7 @@ The full list. The [README](../README.md) has the short version and how to get s
   with the live match % next to it. *Test* plays a trigger's sound now (it shows in
   *Playing now*, and its button says *Stop* while it plays). A trigger plays once each time the picture
   appears, or rings until you stop it. Its sounds play through the board like a
-  pad; a ringing one loops in your headphones. Triggers from before the add-on
-  (Onion Board 1.4 and older) carry over as they were. When a newer Onion Watch
+  pad; a ringing one loops in your headphones. When a newer Onion Watch
   is out, the tab offers it (only while *Check for updates* is
   ticked). *Remove Onion Watch* in its *More* menu uninstalls it (after asking);
   your triggers are kept for when you get it again.
@@ -233,8 +224,8 @@ The full list. The [README](../README.md) has the short version and how to get s
   sensitivity, Advanced Voice Activity); *Fix Discord* opens the steps, each setting
   with a ✓ or what to switch. With *Straight into my mic*, an app that opens your mic
   in "raw" mode (and so skips your sounds) is named in a warning bar too.
-- **Your language:** Settings → Appearance → *Language* opens a searchable list of 32
-  languages, each in its own name (Arabic right to left). Windows set to one of them
+- **Your language:** Settings → Appearance → *Language* opens a searchable list of English
+  and 32 other languages, each in its own name (Arabic right to left). Windows set to one of them
   gets a one-time offer to switch.
 - **Tabs:** a new install starts with Sounds, Voice and Setup; the rest wait under
   **+ More tabs** and are added when clicked. Settings → Tabs switches any of Radio,
@@ -245,23 +236,26 @@ The full list. The [README](../README.md) has the short version and how to get s
   bitrate limit, *Slow or patchy connection* (waits longer before giving up), *Also
   save the video* for links, and *Show pictures and like counts* in search results.
 - **Screen readers:** buttons that only show an icon are read out by name.
-- **⚙ Settings** (with a search box above the categories: type a word and only the
-  cards with it stay)**:** 31 themes in four groups — Classic (Dark, Light, true-black
-  Midnight, High Contrast…), Colourful, Wild (Synthwave, Hacker, Amber Terminal…)
-  and Meme (Flashbang, Deep Fried, Retro 98, Comic Sans…); they switch live —
-  your own highlight colour, how live tabs show (a tint or a dot, in the highlight colour), plus hotkeys, overlay, window and audio options. A category sidebar keeps every
-  page visible: **Privacy & security** groups online permissions and Offline mode;
-  **Connection** holds Direct, proxy and Tor; **Data & quality** holds download
-  sizes, radio quality and search extras; **Updates** holds update scheduling
-  and maintenance; **Connection** also has *Keep an app log* (off stops
-  `onionboard.log` being written and deletes it); **General** holds the window (*Keep window on top*, *Play pads with
-  one click*), tips, startup, backups and *Start over* (*Reset* just the parts you
-  pick, with a restore point first; *Restore points* undoes it); **Tabs** switches
-  off the Radio, Apps, Triggers or Voice tab so it doesn't load at all;
-  **Add-ons** holds Onion Watch and Onion Pocket; **About** holds the version,
-  links, the Discord, feedback, bug reports and support. The other categories are Appearance, Audio (devices, *Also
-  send to*, the stream output and buffering: Low or Safer, with a count of drop-outs),
-  Hotkeys, Overlay and Remote. Changes apply immediately.
+- **⚙ Settings** (a search box above the categories keeps only the cards with the word
+  you type; changes apply at once):
+  - **Privacy & security:** a switch for each thing the app does online, and Offline mode.
+  - **Connection:** direct, a proxy or Tor, *Network activity*, and *Keep an app log*
+    (off stops `onionboard.log` being written and deletes it).
+  - **Data & quality:** download sizes, radio quality and search extras.
+  - **General:** the window (*Keep window on top*, *Play pads with one click*), tips,
+    starting with Windows, backups and *Start over* (*Reset* just the parts you pick,
+    with a restore point first; *Restore points* undoes it).
+  - **Tabs:** switch the Radio, Apps, Triggers or Voice tab off so it doesn't load at all.
+  - **Appearance:** 31 themes in four groups, switched live: Classic (Dark, Light,
+    true-black Midnight, High Contrast…), Colourful, Wild (Synthwave, Hacker, Amber
+    Terminal…) and Meme (Flashbang, Deep Fried, Retro 98, Comic Sans…); your own
+    highlight colour, how live tabs show (a tint or a dot), the language, the
+    interface size.
+  - **Audio:** devices, *Also play on*, the stream output and buffering (Low or Safer,
+    with a count of drop-outs).
+  - **Hotkeys**, **Overlay**, **Updates** (when to check, maintenance), **Add-ons**
+    (Onion Watch and Onion Pocket), **Remote**, and **About** (version, links, the
+    Discord, feedback, bug reports and support).
 - **MIDI pads and macro keypads:** a pad controller (Akai LPD8 / MPD, Launchpad,
   any USB MIDI keyboard) works without extra software: set a hotkey and hit a pad
   instead of pressing a key. Pads work for sounds, stop / pause, random sounds and
@@ -339,7 +333,6 @@ The virtual cable is a free audio driver that works like a pipe: Onion Board pla
 into one end, and Discord or the game uses the other end as a microphone. You hear
 the sounds in your own headphones separately.
 
-Not using the cable? Setup → Devices → **Send my sounds to** → any device by name
-sends the same mix into that output instead (Voicemeeter, a mixer, a capture card,
-OBS), *My mic* puts it in your mic, and *Nobody* keeps it to your headphones and the
-stream output.
+Setup → Devices → **Send my sounds to** picks between these, any other output by name
+(Voicemeeter, a mixer, a capture card, OBS) or *Nobody* (your headphones and the
+stream output only).

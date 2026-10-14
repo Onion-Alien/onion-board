@@ -1029,7 +1029,7 @@ def test_tab_search_shows_local_matches_then_the_directory(qapp, tab, server):
     tab._search_now()
     assert "Searching" in tab.info.text()
     assert process_events(qapp, lambda: tab._results is not None)
-    assert [s.name for s in tab.visible_stations()] == ["Rock Radio"]
+    assert [s.name for s in tab.listctl.visible_stations()] == ["Rock Radio"]
     assert "Searching" not in tab.info.text()       # the answer ends it, no 4 s wait
     tab.search.setText("pop")
     tab._search_now()
@@ -1158,22 +1158,22 @@ def test_tab_filters_by_genre_country_and_quality(tab):
     b.tags, b.country, b.bitrate = ["deep house", "chillout"], "Germany", 256
     c.tags, c.bitrate = ["Classic Rock"], 320
     assert in_genre(b, "Dance") and in_genre(b, "Chill") and not in_genre(a, "Dance")
-    tab.set_genre("Rock")
-    assert [s.uuid for s in tab.visible_stations()] == [c.uuid]
+    tab.listctl.set_genre("Rock")
+    assert [s.uuid for s in tab.listctl.visible_stations()] == [c.uuid]
     assert "1 of 5" in tab.count_label.text() and tab.btn_clear.isVisibleTo(tab)
-    tab.set_genre("")
-    tab.set_country("Germany")
-    assert [s.uuid for s in tab.visible_stations()] == [b.uuid]
+    tab.listctl.set_genre("")
+    tab.listctl.set_country("Germany")
+    assert [s.uuid for s in tab.listctl.visible_stations()] == [b.uuid]
     assert tab.cmb_country.findData("Japan") > 0      # the other countries stay pickable
-    tab.set_country("")
+    tab.listctl.set_country("")
     tab.cmb_quality.setCurrentIndex(3)                # 256 kbps +
-    tab._on_filter()
-    assert {s.uuid for s in tab.visible_stations()} == {b.uuid, c.uuid}
+    tab.listctl._on_filter()
+    assert {s.uuid for s in tab.listctl.visible_stations()} == {b.uuid, c.uuid}
     tab.cmb_sort.setCurrentIndex(5)                   # best quality first
-    assert [s.uuid for s in tab.visible_stations()] == [c.uuid, b.uuid]
-    tab.set_genre("Latin")
+    assert [s.uuid for s in tab.listctl.visible_stations()] == [c.uuid, b.uuid]
+    tab.listctl.set_genre("Latin")
     assert not tab.list.count() and "No stations match" in tab.list.empty_text()
-    tab.clear_filters()
+    tab.listctl.clear_filters()
     assert tab.list.count() == 5 and not tab.btn_clear.isVisibleTo(tab)
 
 
@@ -1182,9 +1182,9 @@ def test_tab_map_keeps_towns_per_filter_until_new_stations(tab, monkeypatch):
     real = radio.town_labels
     monkeypatch.setattr(radio, "town_labels", lambda pts: calls.append(1) or real(pts))
     tab._globe_list[0].tags = ["rock"]
-    tab.set_genre("Rock")
-    tab.set_genre("")                                 # shown before: not worked out again
-    tab.set_genre("Rock")
+    tab.listctl.set_genre("Rock")
+    tab.listctl.set_genre("")                                 # shown before: not worked out again
+    tab.listctl.set_genre("Rock")
     assert len(calls) == 1
     tab._on_globe_stations(list(tab._globe_list))     # a new list: new points and towns
     assert len(calls) == 2
@@ -1195,17 +1195,17 @@ def test_tab_filter_change_goes_through_the_stations_once(tab, monkeypatch):
     popular stations (3000 of them: ~3 ms a pass), and a country menu with the same
     counts isn't filled again."""
     passes, fills = [], []
-    real = tab._filtered
-    monkeypatch.setattr(tab, "_filtered", lambda *a, **k: passes.append(1) or real(*a, **k))
+    real = tab.listctl._filtered
+    monkeypatch.setattr(tab.listctl, "_filtered", lambda *a, **k: passes.append(1) or real(*a, **k))
     monkeypatch.setattr(tab.cmb_country, "clear", lambda: fills.append(1))
     tab._globe_list[0].tags = ["rock"]
-    tab.set_genre("Rock")
+    tab.listctl.set_genre("Rock")
     assert len(passes) == 1 and tab.list.count() == 1 and len(fills) == 1
-    tab.set_genre("")
-    tab.set_genre("Rock")                       # both chosen before: no new pass
+    tab.listctl.set_genre("")
+    tab.listctl.set_genre("Rock")                       # both chosen before: no new pass
     assert len(passes) == 1 and tab.list.count() == 1
     fills.clear()
-    tab.set_country(tab._globe_list[0].country)   # the same counts: menu kept
+    tab.listctl.set_country(tab._globe_list[0].country)   # the same counts: menu kept
     assert len(passes) == 1 and fills == [] and tab.list.count() == 1
 
 
@@ -1229,12 +1229,12 @@ def test_tab_play_stop_and_star_relabel_rows_without_rebuilding(tab, monkeypatch
 
 
 def test_station_rows_paint_without_making_fonts_each_time(tab, monkeypatch):
-    from soundboard.ui import radiopanel
+    from soundboard.ui import radiolist
     tab.list.resize(400, 300)
     tab.list.grab()
     made = []
-    real = radiopanel.QFont
-    monkeypatch.setattr(radiopanel, "QFont", lambda *a: made.append(1) or real(*a))
+    real = radiolist.QFont
+    monkeypatch.setattr(radiolist, "QFont", lambda *a: made.append(1) or real(*a))
     assert not tab.list.grab().isNull()
     assert made == []
 
@@ -1394,14 +1394,14 @@ def test_the_dice_plays_any_popular_station_whatever_the_filters(tab, monkeypatc
     played = []
     monkeypatch.setattr(tab, "play", played.append)
     popular = {s.uuid for s in tab._globe_list}
-    tab.set_genre("Rock")
+    tab.listctl.set_genre("Rock")
     tab.favorites = []
     tab.btn_favs.click()
-    assert not tab.visible_stations()
+    assert not tab.listctl.visible_stations()
     for _ in range(40):
         tab.btn_random.click()
     assert played and all(s.uuid in popular for s in played)
-    assert {s.uuid for s in played} - {s.uuid for s in tab._filtered(tab._globe_list)}
+    assert {s.uuid for s in played} - {s.uuid for s in tab.listctl._filtered(tab._globe_list)}
 
 
 def test_loads_gently_reads_what_json_loads_reads():
