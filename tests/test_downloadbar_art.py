@@ -50,3 +50,30 @@ def test_a_narrow_banner_drops_both(qapp):
     process_events(qapp, lambda: False, 0.05)
     assert not bar.scribe.isVisibleTo(bar) and not bar.thumb.isVisibleTo(bar)
     bar.close()
+
+
+def test_one_pick_hands_over_to_the_next_without_a_jump(qapp):
+    """A queue: when one ends and the next starts, Bun stays (no running off), and the
+    title, Bun, the picture and the summary bar keep their places."""
+    bar = _bar(qapp)
+    urls = ["https://example.com/1", "https://example.com/2", "https://example.com/3"]
+
+    def spots():
+        def at(w):
+            return w.mapTo(bar, w.rect().topLeft()) if w.isVisibleTo(bar) else None
+        return [at(bar.scribe), at(bar.thumb), at(bar.lbl_title).y(), at(bar.s_bar)]
+    seen = []
+    for i, url in enumerate(urls):
+        bar.set_queue([{"url": u, "title": "Next", "kind": "add"} for u in urls[i + 1:]])
+        bar.set_active(url, "A song", "add", _pic())
+        bar.set_progress(url, 0.5)
+        process_events(qapp, lambda: False, 0.05)
+        seen.append(spots())
+        bar.set_done(url, "add", True)
+        process_events(qapp, lambda: False, 0.05)
+        if i < len(urls) - 1:   # ended, the next one waiting
+            assert bar.s_bar.isVisibleTo(bar) and bar.scribe.isVisibleTo(bar)
+            assert spots()[:3] == seen[-1][:3]
+        process_events(qapp, lambda: not bar._held, 3)   # the flash, then the next
+    assert all(s == seen[0] for s in seen)
+    bar.close()

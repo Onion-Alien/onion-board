@@ -1,4 +1,4 @@
-"""Bun the scribe: the download banner's picture for a sound that has no thumbnail.
+"""Bun the scribe: the download banner's busy picture, beside the sound's own picture.
 
 He peeks over a small open scroll (a sheet between two wooden rollers) with a quill in
 his paw, and the scroll follows the download. While a link is looked up he waits with
@@ -6,9 +6,11 @@ the quill raised and a "..." over his head; while the audio comes in he writes o
 start of a well-known tune on two rows, one note at a time, left to right, so the scroll
 is as full as the download is done (a different tune each download); while it's
 converted he scribbles flat out, ears flapping, sparkles rising. When it's over the
-rollers wind in to meet side by side, he ties them with a ribbon, hops, and scoots off
-the right side in a puff of dust (or, if it failed, he droops over the scroll). The
-timer only runs while a state is animating and the widget is on screen.
+rollers wind in to meet side by side, he ties them with a ribbon and hops, then sits
+with it (or, if it failed, he droops over the scroll). He never leaves: the next
+download unrolls the same scroll open again (and a droop eases back to a smile), so
+one pick hands over to the next without a jump. The timer only runs while a state is
+animating and the widget is on screen.
 
 Everything is drawn in this widget's own pixels (SLOT_W x SLOT_H), Bun himself scaled
 down with soundboard/bunny.py's draw_bunny.
@@ -55,8 +57,8 @@ MIDDLE = 34                      # B4, the middle line: notes above it get their
 # how much room each kind of note takes along the row, and how many beats it lasts
 WIDTH = {1: 5.6, 2: 4.6, 4: 3.6, 8: 2.8, 12: 2.5, 16: 2.3}
 BEATS = {1: 4.0, 2: 2.0, 4: 1.0, 8: 0.5, 12: 1 / 3, 16: 0.25}
-HOP_S, SCOOT_S = 0.45, 0.8       # the finishing act: roll up and hop, then scoot away
-GONE_AT = HOP_S + SCOOT_S
+HOP_S = 0.45                     # the finishing act: roll up, tie it and hop
+OPEN_S = 0.35                    # the next download: the tied scroll unrolls (a droop lifts)
 FPS = 30
 
 # The openings of well-known pieces, all old enough to be free for anyone, written out
@@ -248,6 +250,7 @@ class ScribeBunny(QWidget):
         self._shown_prog = 0.0       # eased, so notes appear steadily
         self._last = time.monotonic()
         self._notes, self._bars = [], []   # reset() picks the piece
+        self._from = ""              # "done" / "failed": the ending this download opens from
         # the parts that don't move from frame to frame (Bun in a pose, the scroll with
         # what's written so far) are drawn once and reused, so a frame is a few copies
         self._layers: dict[tuple, QPixmap] = {}
@@ -261,7 +264,9 @@ class ScribeBunny(QWidget):
 
     # ------------------------------------------------------------------ state
     def reset(self):
-        """A new download: back to waiting, the scroll blank, a new tune to write."""
+        """A new download: back to waiting, the scroll blank, a new tune to write. After
+        one that ended, the tied scroll unrolls (or the droop lifts) over OPEN_S first."""
+        self._from = self.state if self.state in ("done", "failed") else ""
         self.prog = self._shown_prog = 0.0
         self._notes, self._bars = random_tune()
         self._enter("parsing")
@@ -278,8 +283,20 @@ class ScribeBunny(QWidget):
         self.prog = 1.0 if ok else self.prog
         self._enter("done" if ok else "failed")
 
-    def gone(self) -> bool:
-        return self.state == "done" and self._age() >= GONE_AT
+    def settled(self) -> bool:
+        """Nothing moves any more: he sits with the tied scroll, or droops over it."""
+        return self.state in ("done", "failed") and self._age() >= HOP_S
+
+    def _opening(self) -> float:
+        """0..1 while the last download's ending gives way to this one (1 = just begun),
+        0 once it has (or there was nothing to give way)."""
+        if not self._from or self.state in ("done", "failed"):
+            return 0.0
+        k = self._age() / OPEN_S
+        if k >= 1.0:
+            self._from = ""
+            return 0.0
+        return 1.0 - k
 
     def _enter(self, state: str):
         self.state = state
@@ -290,7 +307,7 @@ class ScribeBunny(QWidget):
         return time.monotonic() - self._t0
 
     def _run(self):
-        if self.isVisible() and not self.gone():
+        if self.isVisible() and not self.settled():
             if not self._timer.isActive():
                 self._timer.start()
         else:
@@ -309,7 +326,7 @@ class ScribeBunny(QWidget):
         now = time.monotonic()
         dt, self._last = now - self._last, now
         self._shown_prog += (self.prog - self._shown_prog) * min(1.0, dt * 6)
-        if self.gone():
+        if self.settled():
             self._timer.stop()
         if not self.window().isMinimized():   # nothing to see: skip the frame
             self.update()
@@ -342,8 +359,6 @@ class ScribeBunny(QWidget):
 
     # --------------------------------------------------------------- painting
     def paintEvent(self, _e):
-        if self.gone():
-            return
         t = time.monotonic()
         age = self._age()
         p = QPainter(self)
@@ -353,21 +368,16 @@ class ScribeBunny(QWidget):
         p.setRenderHint(QPainter.RenderHint.Antialiasing)
         p.setClipRect(self.rect())
         done = self.state == "done"
-        hop = dx = ears = 0.0
-        sad = 1.0 if self.state == "failed" else 0.0
+        hop = ears = 0.0
+        opening = self._opening()
+        sad = (1.0 if self.state == "failed" else
+               round(opening, 1) if self._from == "failed" else 0.0)   # eases back
         if self.state == "processing":
             ears = 9 * math.sin(t * 16)
-        if done:
-            if age < HOP_S:
-                hop = -7 * math.sin(math.pi * age / HOP_S)
-            else:
-                k = (age - HOP_S) / SCOOT_S
-                dx = (SLOT_W + 14) * k * k
-                ears = -14
+        if done and age < HOP_S:
+            hop = -7 * math.sin(math.pi * age / HOP_S)
         blink = 1.0 if (done and age < HOP_S) or (t % 3.2) < 0.12 else 0.0
-        p.translate(dx, hop)
-        if done and age >= HOP_S:
-            self._dust(p, (age - HOP_S) / SCOOT_S)
+        p.translate(0, hop)
         bx = (SLOT_W - W * BUN_SCALE) / 2
         ears = round(ears)
         p.drawPixmap(0, 0, self._layer(("bun", blink, ears, sad), lambda q: draw_bunny(
@@ -375,13 +385,6 @@ class ScribeBunny(QWidget):
             sad=sad)))
         self._scroll(p, t, age)
         p.end()
-
-    def _dust(self, p: QPainter, k: float):
-        """Puffs left where he took off, growing and fading."""
-        col = QColor("#d9d2e6")
-        for i in range(4):
-            col.setAlphaF(max(0.0, 0.8 - k * 0.8 - i * 0.08))
-            _oval(p, 14 - i * 9, SLOT_H - 6 - i, 6 + k * 10 + i * 2, 4 + k * 6, col)
 
     def _scroll(self, p: QPainter, t: float, age: float):
         ink = QPen(INK, 1.4)
@@ -391,7 +394,8 @@ class ScribeBunny(QWidget):
         # an open scroll: a sheet between two wooden rollers, one at the top and one at
         # the bottom. When he's done the rollers wind in to meet in the middle, side by
         # side, and he ties them with a ribbon.
-        roll = min(1.0, age / HOP_S) if done else 0.0
+        roll = (min(1.0, age / HOP_S) if done else
+                self._opening() if self._from == "done" else 0.0)   # unrolls for the next
         r = ROLLER_R + 1.0 * roll                  # a roller, with the paper wound on it
         mid = (TOP_Y + BOT_Y) / 2
         yt = TOP_Y + (mid - r - TOP_Y) * roll
@@ -433,7 +437,7 @@ class ScribeBunny(QWidget):
                 _oval(p, cx + sx * 3.4, yt - r - 1.6, 5, 3.2, ribbon, edge, sx * 25)
                 p.drawLine(QPointF(cx, yt - r), QPointF(cx + sx * 4.5, yt - r - 5))
             return
-        if done:
+        if done or self._opening():
             return
         # the quill and the paw that holds it
         if self.state == "parsing":

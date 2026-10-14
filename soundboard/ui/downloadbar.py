@@ -617,6 +617,9 @@ class DownloadBar(QFrame):
         self.lbl_status.setSizePolicy(QSizePolicy.Policy.Fixed, QSizePolicy.Policy.Fixed)
         row2.addWidget(self.lbl_status, 0, Qt.AlignmentFlag.AlignVCenter)
         row2.addStretch(1)   # past the bar's length: room, not a gap before the number
+        # as tall with the pill as without it (hidden when a pick ends): the title above
+        # mustn't hop up when one ends and down when the next starts
+        row2.addStrut(self.pill.sizeHint().height())
         col.addLayout(row2)
         h.addLayout(col, 1)
         h.setAlignment(col, Qt.AlignmentFlag.AlignVCenter)
@@ -881,20 +884,30 @@ class DownloadBar(QFrame):
         n = len(self._failed)
         self.h_failed.setText(ngettext("{n} failed", "{n} failed", n) if n else "")
         self.h_failed.setVisible(bool(n))
-        over = not self._running() and not self._queue
-        self.btn_stop_all.setVisible(bool(self._queue))
+        running = self._running()
+        over = not running and not self._queue
+        # Stop all stays up to the end of a batch (the last pick running, nothing left
+        # waiting): it still stops that one, and the bar beside it doesn't jump over
+        batch = bool(self._others_added() or self._others_failed())
+        self.btn_stop_all.setVisible(bool(self._queue) or (running and batch))
         self.btn_close.setVisible(over)
         # folded for room, it can't open: no button that does nothing
         self.btn_min.setVisible(not over and not self._mini
                                 and (self._collapsed or self._room == "open"))
-        show_bar = self._running()
+        # also between two picks (the one that ended shows its tick, the next waits): the
+        # bar staying up there is what makes the hand-over look like one job
+        show_bar = running or bool(self._queue)
         self.s_bar.setVisible(show_bar)
         self.s_text.setVisible(show_bar)
         done = len(self._others_added()) + len(self._others_failed())
-        frac = jobprogress.batch(done, self.progress_frac if show_bar else None,
-                                 len(self._queue))
+        current = (self.progress_frac if running else
+                   1.0 if show_bar and self.url and self.stage == "done" else None)
+        frac = jobprogress.batch(done, current, len(self._queue))
         self.s_text.setText(f"{frac * 100:.0f}%" if show_bar else "")
-        self.s_bar.set_progress(frac, busy=show_bar and self.stage != "downloading")
+        # as wide as "100%" from the start: 9% -> 10% mustn't nudge the bar beside it
+        self.s_text.setMinimumWidth(self.s_text.fontMetrics().horizontalAdvance("100%"))
+        self.s_text.setAlignment(Qt.AlignmentFlag.AlignRight | Qt.AlignmentFlag.AlignVCenter)
+        self.s_bar.set_progress(frac, busy=running and self.stage != "downloading")
 
     # ------------------------------------------------------------------ sizes
 
