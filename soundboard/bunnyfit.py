@@ -2,8 +2,9 @@
 fangs for Vampire, laser eyes for Deep Fried...). Drawn with QPainter on bunny.py's
 100 x 120 canvas, in four layers so each piece sits right:
 
+    behind behind everything, even his ears (a moon)
     back   behind his head (a hood, a cape collar)
-    under  on his head, under the headphones (a beanie, a headband)
+    under  on his head, under the headphones (a beanie, a frog hat)
     over   on top of everything on his head (a crown, a hat)
     face   over his face and neck (glasses, a bow tie, a scarf)
 
@@ -14,19 +15,28 @@ from __future__ import annotations
 import math
 
 from PySide6.QtCore import QPointF, QRectF, Qt
-from PySide6.QtGui import QColor, QLinearGradient, QPainter, QPainterPath, QPen, QPolygonF
+from PySide6.QtGui import (
+    QColor,
+    QLinearGradient,
+    QPainter,
+    QPainterPath,
+    QPen,
+    QPolygonF,
+    QRadialGradient,
+)
 
 from soundboard import theme
 
 # each theme's pieces; a theme that isn't listed is plain Bun (headphones only)
 OUTFITS: dict[str, tuple[str, ...]] = {
     "Light": ("bowtie",),
-    "Toxic": ("goggles",),
-    "Ocean": ("sailor",),
+    "Lilac": ("flower_crown",),
+    "Toxic": ("hazmat", "badge"),
+    "Ocean": ("captain",),
     "Cherry Blossom": ("blossom",),
-    "Carbon": ("beanie",),
+    "Carbon": ("snapback",),
     "Midnight": ("wizard",),
-    "Slate": ("scarf",),
+    "Slate": ("sweater", "turtleneck", "readers"),
     "Arctic": ("pom_beanie", "scarf"),
     "Paper": ("round_glasses", "bowtie"),
     "Vampire": ("collar", "fangs"),
@@ -35,27 +45,35 @@ OUTFITS: dict[str, tuple[str, ...]] = {
     "Sunset": ("shades", "lei"),
     "Royal": ("crown",),
     "Onion": ("onion",),
-    "Mint": ("headband",),
+    "Mint": ("mint_sprig",),
     "Synthwave": ("visor",),
     "Vaporwave": ("glasses_3d",),
-    "Blood Moon": ("horns",),
+    "Blood Moon": ("moon", "horns"),
     "Lava": ("bandana",),
-    "Amber Terminal": ("eyeshade",),
+    "Amber Terminal": ("eyeshade", "pencil"),
     "Hacker": ("hood", "strings", "shades"),
-    "Flashbang": ("aviators",),
+    "Flashbang": ("spirals", "dizzy"),
     "Barbie": ("bow", "heart_glasses"),
-    "Swamp": ("bucket",),
+    "Swamp": ("frog",),
     "Deep Fried": ("laser",),
     "Retro 98": ("pixel_shades",),
     "Comic Sans": ("party", "clown_nose"),
     "Brainrot": ("propeller",),
 }
 
-HATS = {"beanie", "pom_beanie", "wizard", "sailor", "beret", "crown", "onion", "horns",
-        "bandana", "eyeshade", "bucket", "party", "propeller", "blossom", "leaves",
-        "headband", "bow"}
+HATS = {"pom_beanie", "wizard", "captain", "beret", "crown", "onion", "horns", "bandana",
+        "eyeshade", "pencil", "frog", "snapback", "party", "propeller", "blossom", "leaves",
+        "flower_crown", "mint_sprig", "bow", "dizzy"}
 
-NECK = {"bowtie", "scarf", "lei", "strings"}   # face-layer pieces that sit round his neck
+# glasses and visors: off while he sleeps under the nightcap
+EYEWEAR = {"shades", "round_glasses", "heart_glasses", "glasses_3d",
+           "pixel_shades", "visor", "readers", "spirals"}
+# the ones you can't see his eyes through: bunny.py leaves out the lids and tears they'd
+# hide and lifts his brows clear of them
+HIDE_EYES = {"shades", "pixel_shades", "visor", "spirals"}
+
+NECK = {"bowtie", "scarf", "lei", "strings", "turtleneck", "badge"}   # face-layer pieces
+                                                                     # round his neck
 
 GOLD, GOLD_DARK =QColor("#ffcf40"), QColor("#d99a1e")
 WHITE = QColor("#ffffff")
@@ -90,13 +108,13 @@ def _poly(*pts) -> QPainterPath:
     return path
 
 
-def _star(p: QPainter, x, y, r, col: QColor):
+def _star(p: QPainter, x, y, r, col: QColor, ink: QPen | None = None):
     pts = []
     for i in range(10):
         a = -math.pi / 2 + i * math.pi / 5
         k = r if i % 2 == 0 else r * 0.45
         pts.append((x + k * math.cos(a), y + k * math.sin(a)))
-    _fill(p, _poly(*pts), col, None)
+    _fill(p, _poly(*pts), col, ink)
 
 
 def _flower(p: QPainter, x, y, r, petal: QColor, middle: QColor, ink: QPen | None = None):
@@ -112,14 +130,28 @@ def _flower(p: QPainter, x, y, r, petal: QColor, middle: QColor, ink: QPen | Non
 
 
 # ---------------------------------------------------------------- back
-def _hood(p, ink):
-    col = QColor("#23262e")
+def _hood(p, ink, col: QColor, rim: QColor | None = None):
     hood = QPainterPath()
     hood.addEllipse(QRectF(9, 28, 82, 74))
     _fill(p, hood, col, ink)
+    if rim is not None:                     # so a dark hood doesn't vanish on a dark theme
+        p.setPen(QPen(rim, 1.6))
+        p.setBrush(Qt.BrushStyle.NoBrush)
+        p.drawEllipse(QRectF(11, 30, 78, 70))
     inner = QPainterPath()
     inner.addEllipse(QRectF(14, 33, 72, 64))
     _fill(p, inner, col.darker(140), None)
+
+
+def _moon(p, ink):
+    """A big blood-red moon behind him, like a halo."""
+    grad = QRadialGradient(40, 30, 50)
+    grad.setColorAt(0, QColor("#ff8a4d"))
+    grad.setColorAt(1, QColor("#c2361f"))
+    _fill(p, _circle(50, 48, 41), QColor(255, 110, 60, 60), None)     # its glow
+    _fill(p, _circle(50, 48, 37), grad, QPen(QColor("#6e170e"), 2))
+    for x, y, r in ((27, 34, 5), (73, 28, 4), (80, 52, 5.5), (22, 58, 3.5), (58, 14, 3)):
+        _fill(p, _circle(x, y, r), QColor(140, 30, 16, 120), None)
 
 
 def _collar(p, ink):
@@ -134,7 +166,7 @@ def _collar(p, ink):
 
 
 # ---------------------------------------------------------------- under (on the head)
-def _beanie(p, ink, pom=False):
+def _pom_beanie(p, ink):
     col = _col("accent2")
     dome = QPainterPath(QPointF(20, 52))       # tall enough to show over the band
     dome.cubicTo(QPointF(18, 6), QPointF(82, 6), QPointF(80, 52))
@@ -152,29 +184,13 @@ def _beanie(p, ink, pom=False):
     cuff = QPainterPath()
     cuff.addRoundedRect(QRectF(17, 44, 66, 11), 5.5, 5.5)
     _fill(p, cuff, col.darker(112), ink)
-    if pom:
-        _fill(p, _circle(50, 14, 7), WHITE, ink)
+    _fill(p, _circle(50, 14, 7), WHITE, ink)
 
 
 def _circle(x, y, r) -> QPainterPath:
     path = QPainterPath()
     path.addEllipse(QPointF(x, y), r, r)
     return path
-
-
-def _headband(p, ink):
-    col = _col("accent2")
-    p.save()
-    p.setClipPath(_head())
-    band = QPainterPath()
-    band.addRect(QRectF(10, 43, 80, 8))
-    _fill(p, band, col, None)
-    p.setPen(QPen(WHITE, 1.6))
-    p.drawLine(QPointF(10, 47), QPointF(90, 47))
-    p.restore()
-    p.setPen(ink)
-    p.setBrush(Qt.BrushStyle.NoBrush)
-    p.drawEllipse(QRectF(16, 36, 68, 56))
 
 
 def _bandana(p, ink):
@@ -193,8 +209,11 @@ def _bandana(p, ink):
     p.setPen(QPen(col.darker(130), 2.2))
     p.setBrush(Qt.BrushStyle.NoBrush)
     p.drawPath(edge)
+    p.save()
+    p.setClipRect(QRectF(0, 0, 100, 53))     # his outline, only where the band covered it
     p.setPen(ink)
     p.drawEllipse(QRectF(16, 36, 68, 56))
+    p.restore()
     # the knot and its two tails, out on his left
     _fill(p, _circle(84, 50, 3.5), col, ink)
     _fill(p, _poly((86, 49), (96, 42), (95, 50)), col, ink)
@@ -202,21 +221,77 @@ def _bandana(p, ink):
 
 
 def _eyeshade(p, ink):
-    band = QColor("#2e2a22")
+    """An old terminal operator's amber eye shade, pushed up on his forehead."""
     p.save()
     p.setClipPath(_head())
     strap = QPainterPath()
-    strap.addRect(QRectF(10, 44, 80, 5))
-    _fill(p, strap, band, None)
+    strap.addRect(QRectF(10, 45, 80, 5))
+    _fill(p, strap, QColor("#3a2a12"), None)
     p.restore()
-    brim = QPainterPath(QPointF(19, 47))
-    brim.cubicTo(QPointF(24, 64), QPointF(76, 64), QPointF(81, 47))
-    brim.quadTo(QPointF(50, 41), QPointF(19, 47))
-    glass = QColor("#3cc46a")
-    glass.setAlpha(170)
-    _fill(p, brim, glass, QPen(band, 2))
-    p.setPen(QPen(QColor(255, 255, 255, 140), 1.4))
-    p.drawLine(QPointF(30, 50), QPointF(44, 52))
+    shade = QPainterPath(QPointF(25, 48))
+    shade.quadTo(QPointF(50, 44), QPointF(75, 48))
+    shade.lineTo(83, 31)
+    shade.quadTo(QPointF(50, 23), QPointF(17, 31))
+    shade.closeSubpath()
+    grad = QLinearGradient(0, 24, 0, 48)
+    grad.setColorAt(0, QColor(255, 150, 20, 220))   # deeper than his amber headphones
+    grad.setColorAt(1, QColor(190, 85, 0, 225))
+    _fill(p, shade, grad, QPen(QColor("#3d2200"), 2.2))
+    p.setPen(QPen(QColor(255, 255, 255, 160), 1.6, Qt.PenStyle.SolidLine,
+                  Qt.PenCapStyle.RoundCap))
+    p.drawLine(QPointF(24, 32), QPointF(30, 43))
+
+
+def _frog(p, ink):
+    """A frog hat: a green beanie with two frog eyes on top and a wide grin."""
+    col = QColor("#43a83f")
+    dome = QPainterPath(QPointF(19, 53))
+    dome.cubicTo(QPointF(17, 8), QPointF(83, 8), QPointF(81, 53))
+    dome.quadTo(QPointF(50, 43), QPointF(19, 53))
+    _fill(p, dome, col, ink)
+    p.setPen(QPen(col.darker(160), 2, Qt.PenStyle.SolidLine, Qt.PenCapStyle.RoundCap))
+    p.setBrush(Qt.BrushStyle.NoBrush)
+    grin = QPainterPath(QPointF(36, 27))
+    grin.quadTo(QPointF(50, 35), QPointF(64, 27))
+    p.drawPath(grin)
+    for x in (36, 64):
+        _fill(p, _circle(x, 19, 8.5), col, ink)
+        _fill(p, _circle(x, 18.5, 5.6), WHITE, None)
+        _fill(p, _circle(x + (1 if x < 50 else -1), 19, 3), DARK, None)
+        _fill(p, _circle(x + (1.8 if x < 50 else -0.2), 17.6, 1), WHITE, None)
+
+
+def _snapback(p, ink):
+    """A red racing cap worn backwards: the brim pokes out behind, the strap's at
+    the front, all clear of his brows."""
+    col = QColor("#e8352f")
+    p.save()
+    p.translate(13, 43)
+    p.rotate(14)
+    brim = QPainterPath()
+    brim.addEllipse(QRectF(-12, -4, 24, 8))
+    _fill(p, brim, col.darker(125), ink)
+    p.restore()
+    dome = QPainterPath(QPointF(20, 51))
+    dome.cubicTo(QPointF(18, 10), QPointF(82, 10), QPointF(80, 51))
+    dome.quadTo(QPointF(50, 41), QPointF(20, 51))
+    _fill(p, dome, col, ink)
+    p.save()
+    p.setClipPath(dome)
+    for x in (43, 53):                                   # racing stripes
+        _fill(p, _rect(x, 0, 4, 60), WHITE, None)
+    p.restore()
+    p.setPen(ink)
+    p.setBrush(Qt.BrushStyle.NoBrush)
+    p.drawPath(dome)
+    gap = QPainterPath(QPointF(41, 47.5))                # the strap's opening
+    gap.cubicTo(QPointF(41, 38), QPointF(59, 38), QPointF(59, 47.5))
+    gap.closeSubpath()
+    _fill(p, gap, QColor("#fbf7f2"), QPen(INK_COL, 1.6))
+    strap = QPainterPath()
+    strap.addRoundedRect(QRectF(42.5, 42, 15, 3.6), 1.5, 1.5)
+    _fill(p, strap, DARK, None)
+    _fill(p, _circle(50, 20, 2.6), col.darker(130), None)
 
 
 # ---------------------------------------------------------------- over (hats)
@@ -232,20 +307,6 @@ def _wizard(p, ink):
     _fill(p, brim, col.darker(115), ink)
     for x, y, r in ((50, 26, 4), (60, 12, 3), (44, 36, 2.5)):
         _star(p, x, y, r, GOLD)
-
-
-def _sailor(p, ink):
-    top = QPainterPath(QPointF(30, 40))
-    top.cubicTo(QPointF(30, 22), QPointF(70, 22), QPointF(70, 40))
-    top.closeSubpath()
-    _fill(p, top, WHITE, ink)
-    band = QPainterPath()
-    band.addRoundedRect(QRectF(29, 34, 42, 6), 2, 2)
-    _fill(p, band, QColor("#1f4fb8"), None)
-    brim = QPainterPath()
-    brim.addEllipse(QRectF(24, 38, 52, 8))
-    _fill(p, brim, WHITE, ink)
-    _fill(p, _circle(50, 25, 3), QColor("#e8432b"), None)
 
 
 def _beret(p, ink):
@@ -276,15 +337,96 @@ def _crown(p, ink):
 
 
 def _horns(p, ink):
-    col = QColor("#c4162e")
+    """Two little devil horns on top of his head, between his ears."""
+    col = QColor("#3a0b12")
     for sx in (1, -1):
         def m(x, y, sx=sx):
             return QPointF(50 + sx * (x - 50), y)
-        horn = QPainterPath(m(30, 44))
-        horn.cubicTo(m(24, 32), m(20, 24), m(14, 14))
-        horn.cubicTo(m(28, 20), m(38, 30), m(40, 41))
+        horn = QPainterPath(m(41, 39))
+        horn.cubicTo(m(40, 32), m(40, 27), m(43, 21))
+        horn.cubicTo(m(45, 27), m(47, 32), m(48.5, 38))
         horn.closeSubpath()
         _fill(p, horn, col, ink)
+
+
+def _captain(p, ink):
+    """A ship captain's hat: white top, navy band, black peak, gold anchor."""
+    navy = QColor("#1d2f5e")
+    body = _poly((30, 42), (21, 24), (79, 24), (70, 42))
+    _fill(p, body, WHITE, ink)
+    top = QPainterPath()
+    top.addEllipse(QRectF(19, 15, 62, 17))
+    _fill(p, top, WHITE, ink)
+    _fill(p, _poly((26, 34), (74, 34), (70.5, 42), (29.5, 42)), navy, ink)
+    peak = QPainterPath(QPointF(27, 41))
+    peak.quadTo(QPointF(50, 54), QPointF(73, 41))
+    peak.quadTo(QPointF(50, 45), QPointF(27, 41))
+    _fill(p, peak, DARK, ink)
+    p.setPen(QPen(GOLD, 1.4))
+    p.drawLine(QPointF(31, 40), QPointF(69, 40))
+    _fill(p, _circle(50, 29, 5), GOLD, QPen(GOLD_DARK, 1))       # the badge, an anchor
+    p.setPen(QPen(navy, 1.4, Qt.PenStyle.SolidLine, Qt.PenCapStyle.RoundCap))
+    p.setBrush(Qt.BrushStyle.NoBrush)
+    p.drawLine(QPointF(50, 26), QPointF(50, 32))
+    p.drawLine(QPointF(47.6, 27.4), QPointF(52.4, 27.4))
+    hook = QPainterPath(QPointF(47, 30))
+    hook.quadTo(QPointF(50, 33.5), QPointF(53, 30))
+    p.drawPath(hook)
+
+
+def _flower_crown(p, ink):
+    """A crown of lavender, pink and white flowers on a green vine."""
+    vine = QPainterPath(QPointF(21, 50))
+    vine.cubicTo(QPointF(22, 27), QPointF(78, 27), QPointF(79, 50))
+    p.setPen(QPen(QColor("#4e8f3e"), 2.4))
+    p.setBrush(Qt.BrushStyle.NoBrush)
+    p.drawPath(vine)
+    edge = QPen(QColor("#5b2fa3"), 0.9)
+    cols = (QColor("#c9a2ff"), QColor("#ff9ccf"), QColor("#f4ecff"))
+    for i in range(7):
+        pt = vine.pointAtPercent(i / 6)
+        _flower(p, pt.x(), pt.y(), 7 if i % 2 == 0 else 5.6, cols[i % 3], GOLD, edge)
+
+
+def _mint_sprig(p, ink):
+    """A sprig of mint tucked behind his right ear."""
+    stem, leaf, vein = QColor("#2e7d4f"), QColor("#4fd88a"), QColor("#1f8a55")
+    p.setPen(QPen(stem, 2, Qt.PenStyle.SolidLine, Qt.PenCapStyle.RoundCap))
+    p.drawLine(QPointF(29, 47), QPointF(14, 22))
+    for x, y, a, k in ((14, 22, -115, 1.4), (19, 31, -170, 1.25), (23, 38, -45, 1.2)):
+        p.save()
+        p.translate(x, y)
+        p.rotate(a)
+        shape = QPainterPath(QPointF(0, 0))
+        shape.cubicTo(QPointF(4 * k, -6 * k), QPointF(12 * k, -5 * k), QPointF(15 * k, 0))
+        shape.cubicTo(QPointF(12 * k, 5 * k), QPointF(4 * k, 6 * k), QPointF(0, 0))
+        _fill(p, shape, leaf, QPen(QColor("#145c3c"), 1.3))
+        p.setPen(QPen(vein, 1))
+        p.drawLine(QPointF(1, 0), QPointF(13 * k, 0))
+        p.restore()
+
+
+def _pencil(p, ink):
+    """A pencil tucked behind his left ear."""
+    p.save()
+    p.translate(80, 37)
+    p.rotate(-62)
+    _fill(p, _rect(-11, -2.7, 19, 5.4), QColor("#ffcc33"), QPen(INK_COL, 1.3))
+    _fill(p, _rect(8, -2.7, 2.5, 5.4), QColor("#b9bdc9"), QPen(INK_COL, 1.3))
+    eraser = QPainterPath()
+    eraser.addRoundedRect(QRectF(10.5, -2.7, 4, 5.4), 1.4, 1.4)
+    _fill(p, eraser, QColor("#ff8fae"), QPen(INK_COL, 1.3))
+    _fill(p, _poly((-11, -2.7), (-17, 0), (-11, 2.7)), QColor("#f3d3a0"),
+          QPen(INK_COL, 1.3))
+    _fill(p, _poly((-15, -0.9), (-17.3, 0), (-15, 0.9)), DARK, None)
+    p.restore()
+
+
+def _dizzy(p, ink):
+    """Stars round his head: the flashbang got him."""
+    edge = QPen(INK_COL, 1.2)
+    for x, y, r in ((50, 21, 6), (18, 33, 5), (83, 31, 5)):
+        _star(p, x, y, r, _col("accent2"), edge)
 
 
 def _blossom(p, ink):
@@ -332,25 +474,6 @@ def _onion(p, ink):
     p.setPen(QPen(QColor("#4caf50"), 2.6, Qt.PenStyle.SolidLine, Qt.PenCapStyle.RoundCap))
     p.drawLine(QPointF(50, 11), QPointF(46, 1))
     p.drawLine(QPointF(50, 11), QPointF(55, 2))
-
-
-def _bucket(p, ink):
-    col = QColor("#6b7a3a")
-    crown = QPainterPath(QPointF(32, 42))
-    crown.lineTo(35, 24)
-    crown.quadTo(QPointF(50, 18), QPointF(65, 24))
-    crown.lineTo(68, 42)
-    crown.closeSubpath()
-    _fill(p, crown, col, ink)
-    brim = QPainterPath(QPointF(20, 46))
-    brim.quadTo(QPointF(50, 34), QPointF(80, 46))
-    brim.quadTo(QPointF(50, 42), QPointF(20, 46))
-    p.setPen(QPen(INK_COL, 2.4, Qt.PenStyle.SolidLine, Qt.PenCapStyle.RoundCap,
-                  Qt.PenJoinStyle.RoundJoin))
-    p.setBrush(col.darker(115))
-    p.drawPath(brim)
-    p.setPen(QPen(col.darker(140), 1.2, Qt.PenStyle.DashLine))
-    p.drawLine(QPointF(34, 37), QPointF(66, 37))
 
 
 def _party(p, ink):
@@ -408,11 +531,6 @@ def _lenses(p, ink, fill, shape="rect", frame: QColor | None = None):
     for i, x in enumerate((39, 61)):
         if shape == "round":
             path = _circle(x, 62, 7.5)
-        elif shape == "aviator":
-            path = QPainterPath(QPointF(x - 8, 56))
-            path.lineTo(x + 8, 56)
-            path.cubicTo(QPointF(x + 9, 66), QPointF(x + 3, 70), QPointF(x, 70))
-            path.cubicTo(QPointF(x - 5, 70), QPointF(x - 9, 64), QPointF(x - 8, 56))
         elif shape == "heart":
             path = QPainterPath(QPointF(x, 70))
             path.cubicTo(QPointF(x - 13, 61), QPointF(x - 7, 50), QPointF(x, 57))
@@ -475,20 +593,6 @@ def _visor(p, ink):
     p.drawLine(QPointF(76, 61), QPointF(80, 61))
 
 
-def _goggles(p, ink):
-    strap = QColor("#2e3a2e")
-    p.setPen(QPen(strap, 4))
-    p.drawLine(QPointF(20, 60), QPointF(80, 60))
-    glass = QColor(theme.T["accent"])
-    glass.setAlpha(120)
-    for x in (39, 61):
-        _fill(p, _circle(x, 62, 9.5), QColor("#3c4a3c"), ink)
-        _fill(p, _circle(x, 62, 7), glass, None)
-        p.setPen(QPen(QColor(255, 255, 255, 170), 1.6, Qt.PenStyle.SolidLine,
-                      Qt.PenCapStyle.RoundCap))
-        p.drawLine(QPointF(x - 4, 61), QPointF(x - 1, 57.5))
-
-
 def _strings(p, ink):
     """The hood's drawstrings, hanging over his chest."""
     p.setPen(QPen(QColor("#d8dce4"), 1.8, Qt.PenStyle.SolidLine, Qt.PenCapStyle.RoundCap))
@@ -496,6 +600,80 @@ def _strings(p, ink):
         p.drawLine(QPointF(x, 90), QPointF(x + dx, 104))
         _fill(p, _rect(x + dx - 1.2, 104, 2.4, 4), QColor("#9aa0b4"), None)
         p.setPen(QPen(QColor("#d8dce4"), 1.8, Qt.PenStyle.SolidLine, Qt.PenCapStyle.RoundCap))
+
+
+def _spirals(p, ink):
+    """Blinded: spirals for eyes."""
+    for x in (39, 61):
+        _fill(p, _circle(x, 62, 6.8), WHITE, QPen(INK_COL, 1.6))
+        spin = QPainterPath(QPointF(x, 62))
+        for i in range(1, 41):
+            a = i * 0.42 * (1 if x < 50 else -1)
+            r = 5.6 * i / 40
+            spin.lineTo(x + r * math.cos(a), 62 + r * math.sin(a))
+        p.setPen(QPen(INK_COL, 1.5, Qt.PenStyle.SolidLine, Qt.PenCapStyle.RoundCap))
+        p.setBrush(Qt.BrushStyle.NoBrush)
+        p.drawPath(spin)
+
+
+def _readers(p, ink):
+    """Half-moon reading glasses, low on his nose."""
+    frame = QPen(QColor("#4a3326"), 1.8)
+    p.setPen(frame)
+    p.drawLine(QPointF(46.5, 64.5), QPointF(53.5, 64.5))
+    p.drawLine(QPointF(32.5, 64.5), QPointF(20, 61))
+    p.drawLine(QPointF(67.5, 64.5), QPointF(80, 61))
+    for x in (40, 60):
+        lens = QPainterPath(QPointF(x - 7, 64.5))
+        lens.lineTo(x + 7, 64.5)
+        lens.cubicTo(QPointF(x + 7, 72), QPointF(x - 7, 72), QPointF(x - 7, 64.5))
+        _fill(p, lens, QColor(200, 230, 255, 80), frame)
+
+
+def _sweater(p, ink):
+    """The body of a turtleneck sweater (the collar is its own piece)."""
+    col = _col("accent2")
+    body = QPainterPath()
+    body.addEllipse(QRectF(25, 82, 50, 36))
+    hem = QPainterPath()
+    hem.addRect(QRectF(0, 0, 100, 111))
+    body = body.intersected(hem).subtracted(_head())
+    _fill(p, body, col, ink)
+    p.save()
+    p.setClipPath(body)
+    p.setPen(QPen(col.darker(115), 1.4))
+    for x in range(30, 72, 5):
+        p.drawLine(QPointF(x, 106), QPointF(x, 111))
+    p.restore()
+
+
+def _turtleneck(p, ink):
+    col = _col("accent2")
+    roll = QPainterPath()
+    roll.addRoundedRect(QRectF(30, 85, 40, 11), 5.5, 5.5)
+    _fill(p, roll, col, ink)
+    p.save()
+    p.setClipPath(roll)
+    p.setPen(QPen(col.darker(118), 1.4))
+    for x in range(34, 68, 4):
+        p.drawLine(QPointF(x, 85), QPointF(x, 96))
+    p.restore()
+    p.setPen(ink)
+    p.setBrush(Qt.BrushStyle.NoBrush)
+    p.drawPath(roll)
+
+
+def _badge(p, ink):
+    """A glowing radiation badge on his chest."""
+    _fill(p, _circle(50, 101, 10.5), QColor(198, 255, 61, 90), None)
+    _fill(p, _circle(50, 101, 7.5), QColor("#ffd23f"), QPen(INK_COL, 1.4))
+    for start in (0, 120, 240):
+        blade = QPainterPath(QPointF(50, 101))
+        blade.arcTo(QRectF(44, 95, 12, 12), start, 60)
+        blade.closeSubpath()
+        _fill(p, blade, DARK, None)
+    _fill(p, _circle(50, 101, 2.2), QColor("#ffd23f"), None)
+    _fill(p, _circle(50, 101, 1.3), DARK, None)
 
 
 def _fangs(p, ink):
@@ -541,28 +719,32 @@ def _lei(p, ink):
 INK_COL = QColor("#2b2340")
 
 PIECES = {
-    "hood": ("back", _hood),
+    "moon": ("behind", _moon),
+    "hood": ("back", lambda p, ink: _hood(p, ink, QColor("#2c323e"), _col("accent"))),
+    "hazmat": ("back", lambda p, ink: _hood(p, ink, QColor("#f2c230"))),
     "collar": ("back", _collar),
-    "beanie": ("under", _beanie),
-    "pom_beanie": ("under", lambda p, ink: _beanie(p, ink, pom=True)),
-    "headband": ("under", _headband),
+    "pom_beanie": ("under", _pom_beanie),
     "bandana": ("under", _bandana),
     "eyeshade": ("under", _eyeshade),
+    "frog": ("under", _frog),
+    "snapback": ("under", _snapback),
     "wizard": ("over", _wizard),
-    "sailor": ("over", _sailor),
+    "captain": ("over", _captain),
     "beret": ("over", _beret),
     "crown": ("over", _crown),
     "horns": ("over", _horns),
     "blossom": ("over", _blossom),
     "leaves": ("over", _leaves),
+    "flower_crown": ("over", _flower_crown),
+    "mint_sprig": ("over", _mint_sprig),
+    "pencil": ("over", _pencil),
     "onion": ("over", _onion),
-    "bucket": ("over", _bucket),
     "party": ("over", _party),
     "propeller": ("over", _propeller),
     "bow": ("over", _bow),
+    "dizzy": ("over", _dizzy),
+    "sweater": ("face", _sweater),
     "shades": ("face", lambda p, ink: _lenses(p, ink, DARK)),
-    "aviators": ("face", lambda p, ink: _lenses(p, ink, QColor("#2a2d3a"), "aviator",
-                                                 GOLD_DARK)),
     "round_glasses": ("face", lambda p, ink: _lenses(p, ink, QColor(200, 230, 255, 60),
                                                       "round", QColor("#5a3a24"))),
     "heart_glasses": ("face", lambda p, ink: _lenses(p, ink, QColor(255, 79, 163, 200),
@@ -571,11 +753,14 @@ PIECES = {
         p, ink, (QColor(255, 40, 60, 170), QColor(40, 220, 255, 170)), "rect", WHITE)),
     "pixel_shades": ("face", _pixel_shades),
     "visor": ("face", _visor),
-    "goggles": ("face", _goggles),
+    "spirals": ("face", _spirals),
+    "readers": ("face", _readers),
     "laser": ("face", _laser),
     "strings": ("face", _strings),
     "fangs": ("face", _fangs),
     "clown_nose": ("face", _clown_nose),
+    "turtleneck": ("face", _turtleneck),
+    "badge": ("face", _badge),
     "bowtie": ("face", _bowtie),
     "scarf": ("face", _scarf),
     "lei": ("face", _lei),
@@ -583,16 +768,14 @@ PIECES = {
 
 
 def draw(p: QPainter, pieces: tuple[str, ...], layer: str, ink: QPen,
-         hats: bool = True, shut: bool = False, neck: bool | None = None) -> None:
+         hats: bool = True, shut: bool = False) -> None:
     """Paint the `layer` part of `pieces` (bunny.py calls this between its own layers).
-    `hats=False` leaves out anything on his head (his nightcap is on); `shut`: his eyes
-    are closed, so no laser eyes. `neck` True / False paints only the pieces round his
-    neck / only the rest (ui/owl.py places the two apart on Hoot)."""
+    `hats=False`: his nightcap is on, so nothing on his head and no glasses (he took
+    them off to sleep); `shut`: his eyes are closed, so no laser eyes."""
     for name in pieces:
         where, fn = PIECES.get(name, ("", None))
-        if (where == layer and fn and (hats or name not in HATS)
-                and not (shut and name == "laser")
-                and (neck is None or neck == (name in NECK))):
+        if (where == layer and fn and (hats or name not in HATS | EYEWEAR)
+                and not (shut and name == "laser")):
             p.save()
             fn(p, ink)
             p.restore()
