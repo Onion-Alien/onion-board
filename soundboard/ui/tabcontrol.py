@@ -108,7 +108,6 @@ class TabControl:
     def _more_tabs_hidden(self):
         """+ More tabs closed: counted when nothing was added (a pick's triggered
         signal comes after the menu hides, so this looks once that's through)."""
-        mw = self.mw
         def check():
             if not getattr(self, "_more_added", True):
                 usage.used("more-tabs-closed")
