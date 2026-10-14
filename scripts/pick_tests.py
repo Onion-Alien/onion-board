@@ -10,9 +10,12 @@ A test file runs when:
   `module.json`, "lang" for assets/lang/…)
 
 A change to what every test runs on (conftest.py, pyproject.toml, the requirements,
-the workflow, this script) runs them all. A change no test is about (the README, the
-changelog, the website) runs none. main runs the whole suite after every merge, and
-so does a manual run of the workflow.
+the workflow, this script) runs them all, and so does one to a hub (HUBS: the main
+window, the engine, the library, the settings): so much reaches those through signals
+and lazy imports no import line names that the picked tests can miss a break. A
+change no test is about (the README, the changelog, the website) runs none. main runs
+the whole suite after every merge and every night, and so does a manual run of the
+workflow.
 
 Usage: python scripts/pick_tests.py [BASE] [--local] [--matrix]   (BASE: origin/main)
 Prints the test files, one per line: `tests` alone for all of them, nothing for none.
@@ -40,6 +43,12 @@ RUN_ALL = {
     "tests/conftest.py", "pyproject.toml", "requirements.txt", "requirements-dev.txt",
     ".github/workflows/checks.yml", "scripts/pick_tests.py",
 }
+# what most of the app reaches through signals, callbacks and lazy imports: a change
+# to one runs the whole suite rather than trust the imports to find every test
+HUBS = {
+    "soundboard/ui/mainwindow.py", "soundboard/engine.py", "soundboard/library.py",
+    "soundboard/settings.py",
+}
 # too common to say which test is about it
 VAGUE_NAMES = {"__init__.py", "README.md", "LICENSE", ".gitignore", "requirements.txt"}
 
@@ -56,9 +65,10 @@ def module_name(rel: str) -> str:
 
 
 def imported_names(path: Path) -> set[str]:
-    """Every module name the file imports anywhere (inside functions too), with each
-    package above it: `from soundboard.ui import panel` gives soundboard,
-    soundboard.ui and soundboard.ui.panel."""
+    """Every module name the file imports anywhere (inside functions too, and by a
+    plain string to importlib.import_module or __import__), with each package above
+    it: `from soundboard.ui import panel` gives soundboard, soundboard.ui and
+    soundboard.ui.panel."""
     tree = ast.parse(path.read_text(encoding="utf-8"), str(path))
     own = module_name(path.relative_to(ROOT).as_posix()).split(".")
     if path.name != "__init__.py":
@@ -74,6 +84,14 @@ def imported_names(path: Path) -> set[str]:
                 base = ".".join(pkg + ([base] if base else []))
             names.add(base)
             names.update(f"{base}.{a.name}" for a in node.names)
+        elif (isinstance(node, ast.Call) and node.args
+              and isinstance(node.args[0], ast.Constant)
+              and isinstance(node.args[0].value, str)
+              and not node.args[0].value.startswith(".")
+              and (isinstance(node.func, ast.Name) and node.func.id == "__import__"
+                   or isinstance(node.func, ast.Attribute)
+                   and node.func.attr == "import_module")):
+            names.add(node.args[0].value)
     out = set()
     for name in names:
         while name:
@@ -109,7 +127,7 @@ def changed_files(base: str, local: bool = False) -> list[str]:
 
 
 def pick(changed: list[str]) -> list[str]:
-    if any(f in RUN_ALL for f in changed):
+    if any(f in RUN_ALL or f in HUBS for f in changed):
         return ["tests"]
     files = code_files()
     imports = {m: imported_names(p) for m, p in files.items()}
