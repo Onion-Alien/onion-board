@@ -7,14 +7,15 @@ import soundfile as sf
 from conftest import process_events
 from soundboard import library
 from soundboard.library import SR, Config, SoundMeta
+from soundboard.ui import importcontrol
 from soundboard.ui import mainwindow as main
 from test_mainwindow import window as main_window  # noqa: F401 - the real window, offscreen
 
 
 @pytest.fixture
 def window(main_window, monkeypatch):  # noqa: F811
-    monkeypatch.setattr(main, "LOOSE_WAIT_MS", 50)
-    main_window._loose_timer.setInterval(50)
+    monkeypatch.setattr(importcontrol, "LOOSE_WAIT_MS", 50)
+    main_window.impctl._loose_timer.setInterval(50)
     return main_window
 
 
@@ -38,26 +39,26 @@ def test_loose_sounds_are_only_files_put_there_by_hand(app_dir):
 def test_a_sound_dragged_into_the_folder_joins_the_board(window, qapp):
     dropped = library.SOUNDS_DIR / "Vine boom.wav"
     _wav(dropped)
-    window._loose_timer.start()           # what the folder watcher does on a change
+    window.impctl._loose_timer.start()           # what the folder watcher does on a change
     assert process_events(qapp, lambda: any(m.name == "Vine boom" for m in window.cfg.sounds))
     m = next(m for m in window.cfg.sounds if m.name == "Vine boom")
     assert m.id in window.pads and m.duration > 0
     assert library.Path(m.file).is_file() and not dropped.exists()   # kept once, as ours
-    assert process_events(qapp, lambda: not window._pending_imports)
-    window._take_loose()
+    assert process_events(qapp, lambda: not window.impctl._pending_imports)
+    window.impctl._take_loose()
     assert [s.name for s in window.cfg.sounds].count("Vine boom") == 1
 
 
 def test_a_file_still_copying_in_waits(window, qapp):
     dropped = library.SOUNDS_DIR / "Big.wav"
     _wav(dropped)
-    window._loose_timer.stop()
-    window._take_loose()                  # first look: noted, not taken yet
-    assert dropped in window._loose_sizes and not window._pending_imports
+    window.impctl._loose_timer.stop()
+    window.impctl._take_loose()                  # first look: noted, not taken yet
+    assert dropped in window.impctl._loose_sizes and not window.impctl._pending_imports
     _wav(dropped, 600)                    # it grew meanwhile
-    window._take_loose()
-    assert dropped in window._loose_sizes and not window._pending_imports
-    window._take_loose()                  # the same twice: done copying
+    window.impctl._take_loose()
+    assert dropped in window.impctl._loose_sizes and not window.impctl._pending_imports
+    window.impctl._take_loose()                  # the same twice: done copying
     assert process_events(qapp, lambda: any(m.name == "Big" for m in window.cfg.sounds))
 
 
