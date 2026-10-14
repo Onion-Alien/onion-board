@@ -20,8 +20,8 @@ Set up once:
 
 Then:
 
-    python scripts/steam_voice_roundtrip.py                    # raw, onion, onion+steam
-    python scripts/steam_voice_roundtrip.py --modes raw --song clip.mp3
+    python scripts/voicetests/steam_voice_roundtrip.py                    # raw, onion, onion+steam
+    python scripts/voicetests/steam_voice_roundtrip.py --modes raw --song clip.mp3
 
 It needs a steam_api64.dll. Every Steamworks game ships one; the script finds one
 in your Steam libraries, or pass --steam-api PATH. It runs as Valve's public test
@@ -50,7 +50,7 @@ import numpy as np
 import sounddevice as sd
 import soundfile as sf
 
-sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
+sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
 
 import discord_roundtrip as rt  # noqa: E402  (same folder: its signals and analysis)
 from soundboard import codecsim, destination  # noqa: E402

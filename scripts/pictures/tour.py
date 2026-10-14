@@ -2,7 +2,7 @@
 the Sounds tab playing, the Radio tab's globe spinning, a trigger catching "YOU
 DIED" and the voice changer.
 
-    .venv\\Scripts\\python scripts/tour.py --out docs\\screenshots\\tour.webp
+    .venv\\Scripts\\python scripts/pictures/tour.py --out docs\\screenshots\\tour.webp
         [--mp4 <file>]
 
 --out is an animated WebP (sharp, full colour, a fraction of a GIF's size; GitHub

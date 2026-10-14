@@ -237,14 +237,14 @@ build fails if a kept file would lose an import), `OnionBoard.exe --selftest` (t
 trimmed app loads Qt, Multimedia and the audio stack headless, no window
 or device), licence files,
 the add-ons in `modules\` copied into `dist\OnionBoard\modules\` (all but
-`ai-voices`, which has its own release), `scripts\make_bunny.py` (renders the installer artwork
+`ai-voices`, which has its own release), `scripts\pictures\make_bunny.py` (renders the installer artwork
 `installer\wizard*.bmp`, gitignored), then `ISCC` with `/DAppVersion` taken from
 `soundboard/__init__.py`. Bump `__version__` there for a release.
 
 **When to build.** Not to try a change: `scripts\run.bat` runs from source. Build for a
 release, or to check something only the built app shows: `build.ps1`, `installer\`
 (including `install-vbcable.ps1`), PyInstaller hooks, `scripts\prune_build.py`,
-`scripts\vc_runtime.py`, `scripts\make_bunny.py` or bundled data (then
+`scripts\vc_runtime.py`, `scripts\pictures\make_bunny.py` or bundled data (then
 `build.ps1 -NoInstaller` and start it once). An existing `dist\` or install is out of
 date after any change under `soundboard\`, `main.py`, `native\`, `assets\`,
 `installer\` or `modules\` (the build copies the add-ons from there); docs, tests and

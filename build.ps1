@@ -164,7 +164,7 @@ if ($NoInstaller) {
     Publish-Build
     exit 0
 }
-& $py scripts\make_bunny.py   # installer side-panel art (the mascot)
+& $py scripts\pictures\make_bunny.py   # installer side-panel art (the mascot)
 if ($LASTEXITCODE -ne 0) { throw "make_bunny.py failed" }
 $iscc = @("$env:LOCALAPPDATA\Programs\Inno Setup 6\ISCC.exe",
           "${env:ProgramFiles(x86)}\Inno Setup 6\ISCC.exe",

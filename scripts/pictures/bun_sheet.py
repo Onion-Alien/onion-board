@@ -1,10 +1,10 @@
 """Picture sheets of Bun for checking a mascot change by eye (see docs/MASCOT.md).
 
-    .venv\\Scripts\\python scripts\\bun_sheet.py outfits   # every theme's outfit
-    .venv\\Scripts\\python scripts\\bun_sheet.py poses     # outfits x every pose
-    .venv\\Scripts\\python scripts\\bun_sheet.py owls      # Hoot (Triggers tab) per theme
-    .venv\\Scripts\\python scripts\\bun_sheet.py owl       # Hoot posed, a few outfits
-    .venv\\Scripts\\python scripts\\bun_sheet.py live      # the real animated widgets,
+    .venv\\Scripts\\python scripts\\pictures\\bun_sheet.py outfits   # every theme's outfit
+    .venv\\Scripts\\python scripts\\pictures\\bun_sheet.py poses     # outfits x every pose
+    .venv\\Scripts\\python scripts\\pictures\\bun_sheet.py owls      # Hoot (Triggers tab) per theme
+    .venv\\Scripts\\python scripts\\pictures\\bun_sheet.py owl       # Hoot posed, a few outfits
+    .venv\\Scripts\\python scripts\\pictures\\bun_sheet.py live      # the real animated widgets,
                                                          # frozen at moments of each act
 
 Offscreen, no windows. Sheets go to %TEMP%\\bun-sheets (or --out DIR). `poses` and
@@ -25,7 +25,7 @@ from PySide6.QtCore import QRectF, Qt  # noqa: E402
 from PySide6.QtGui import QColor, QFont, QImage, QPainter, QPixmap  # noqa: E402
 from PySide6.QtWidgets import QApplication  # noqa: E402
 
-sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
+sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
 from soundboard import bunny, theme  # noqa: E402
 
 MIX = ["Royal", "Midnight", "Deep Fried", "Vampire", "Hacker", "Sunset", "Arctic",

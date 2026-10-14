@@ -1,7 +1,7 @@
 """Render the Triggers demo: a short clip of a made-up game where "YOU DIED" comes
 up, the Triggers tab spots it and a sad trombone plays.
 
-    .venv\\Scripts\\python scripts/promo.py --out <folder>
+    .venv\\Scripts\\python scripts/pictures/promo.py --out <folder>
         [--gif <file>.gif]
 
 Writes `onionboard-triggers-vertical.mp4` (1080 x 1920, for TikTok / Shorts /
@@ -29,7 +29,7 @@ from PySide6.QtCore import QPointF, QRectF, Qt  # noqa: E402
 from PySide6.QtGui import (QColor, QFont, QFontMetricsF, QGuiApplication, QImage,  # noqa: E402
                            QLinearGradient, QPainter, QPainterPath, QPen, QRadialGradient)
 
-ROOT = Path(__file__).resolve().parent.parent
+ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(ROOT))
 
 FPS = 30

@@ -2,7 +2,7 @@
 
 Reference for the bench profiles in `soundboard/codecsim.py` (`scripts/codec_bench.py
 --list` prints them) and what the bench found. Discord was measured in a real call
-(`scripts/discord_roundtrip.py`); the game profiles come from each stack's source
+(`scripts/voicetests/discord_roundtrip.py`); the game profiles come from each stack's source
 code or SDK docs where those are public, and are marked *estimate* where not.
 
 ## The stacks
@@ -48,20 +48,20 @@ Lethal Company's occlusion and walkie-talkie filters come from its decompiled
   *Game has no microphone setting?* steps (shown on the cable route) now set both.
   Straight into your mic there's nothing to switch: the game keeps the mic it has.
 
-- **Steam voice, measured** (`scripts/steam_voice_roundtrip.py`): Steamworks reports
+- **Steam voice, measured** (`scripts/voicetests/steam_voice_roundtrip.py`): Steamworks reports
   24 kHz as its voice rate, confirming the 12 kHz ceiling. Its capture gates the
   input on its own, even with Steam's threshold set to Off: steady tones never got
   through, and full-level speech only in bursts (1.4 s of 20 s). Sounds in Steam
   games need to be loud and voice-like; quiet intros and steady tones can vanish.
   The gating was too erratic to measure a full frequency response.
-- **Windows' capture path is clean** (`scripts/game_capture.py --resample
+- **Windows' capture path is clean** (`scripts/voicetests/game_capture.py --resample
   --ducking`): games opening the cable at 44.1 / 32 / 24 / 16 kHz or through MME
   lose at most 1.2 dB, with no more converter junk than the 48 kHz reference. A
   plain capture stream on the communications mic didn't duck the sounds going into
   the cable (a stream tagged as a call might; not tested).
 
-- **Valorant, measured in a real party** (`scripts/game_roundtrip.py` on one PC,
-  `scripts/game_listener.py` recording the second PC's Valorant). With push-to-talk
+- **Valorant, measured in a real party** (`scripts/voicetests/game_roundtrip.py` on one PC,
+  `scripts/voicetests/game_listener.py` recording the second PC's Valorant). With push-to-talk
   held: level kept within 2 dB, a steep high-pass near 80 Hz (-19..-25 dB at 70 Hz)
   with a slow tail above it (a bass-heavy song lost 5 dB at 80-100 Hz, 3 at 100-120,
   1.3 at 120-200), the full band up to 10 kHz and a few dB down above, no noise
