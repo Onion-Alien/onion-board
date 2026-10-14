@@ -199,7 +199,7 @@ class PacksDialog(QDialog):
     _listed = Signal(object, str)              # packs, why the online list wasn't read
     _progress = Signal(object, int, int)       # card, done, total
     _fetched = Signal(object, object, str)     # card, path or None, error
-    _sampled = Signal(object, object)          # card, its samples (None: couldn't)
+    _sampled = Signal(object, object)          # (pack id, preview sha), its samples
     _decoded = Signal(object, object, float, int)   # button, audio or None, gain, serial
 
     def __init__(self, add: Callable[[Path], None], parent=None, fetch_list: bool = True,
@@ -209,6 +209,8 @@ class PacksDialog(QDialog):
         self._add = add
         self._play = play
         self._busy: set[str] = set()   # pack ids downloading now
+        self._samples: dict[tuple, list] = {}   # (pack id, preview sha) -> its samples
+        self._sampling: set[tuple] = set()      # ...being fetched now
         self._closed = False
         self._playing: SampleButton | None = None
         self._serial = 0               # the newest sample pressed: an older one never plays
@@ -313,13 +315,19 @@ class PacksDialog(QDialog):
         if self._play is not None:
             for c in self.cards:
                 if c.pack.preview_url:
-                    self._fetch_samples(c)
+                    key = (c.pack.id, c.pack.preview_sha256)
+                    if key in self._samples:   # fetched for the cards this replaced
+                        c.show_samples(self._samples[key])
+                    elif key not in self._sampling:
+                        self._fetch_samples(c)
 
     # ------------------------------------------------------------------ samples
     def _fetch_samples(self, card: PackCard):
         """A pack's samples, fetched once (then kept on disk: the online list arriving
         remakes the cards, and asking again is free)."""
         p = card.pack
+        key = (p.id, p.preview_sha256)
+        self._sampling.add(key)
 
         def run():
             try:
@@ -327,12 +335,20 @@ class PacksDialog(QDialog):
             except Exception as e:  # noqa: BLE001 - offline, switched off, a bad file
                 log.info("no samples for pack %s: %s", p.id, e)
                 found = None
-            busy.emit(self._sampled, card, found)
+            busy.emit(self._sampled, key, found)
         threading.Thread(target=run, daemon=True, name="pack-samples").start()
 
-    def _on_sampled(self, card: PackCard, found):
-        if not self._closed and card in self.cards:
-            card.show_samples(found)
+    def _on_sampled(self, key, found):
+        """A pack's samples arrived: on its card now, even when the online list remade
+        the cards while they were on their way."""
+        self._sampling.discard(key)
+        if found:
+            self._samples[key] = found
+        if self._closed:
+            return
+        for c in self.cards:
+            if (c.pack.id, c.pack.preview_sha256) == key:
+                c.show_samples(found)
 
     def hear(self, b: SampleButton, on: bool):
         """A sample pressed: play it (decoded off the UI thread), or stop it."""
