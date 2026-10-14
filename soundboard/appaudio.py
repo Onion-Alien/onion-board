@@ -45,6 +45,7 @@ SR = 48000            # what the sink gets (the engine's storage rate)
 MIN_BUILD = 19041     # Windows 10 2004: process loopback works there (OBS relies on it),
                       # though Microsoft only documents it from 20348, a Server build
 GAP_S = 0.03          # no packets from the program this long: it's quiet, send silence
+MAX_GAP_S = 0.2       # most silence handed over at once (about the engine's cushion)
 
 S_OK = 0
 E_NOINTERFACE = -2147467262
@@ -1377,6 +1378,8 @@ class AppCapture:
                 # a program with nothing to play sends no packets at all: hand over
                 # the silence ourselves, or the engine's cushion for it runs dry, grows
                 # (more delay), and stays grown
+                if now - heard > MAX_GAP_S:   # stalled (sleep, a hang): don't catch up
+                    heard = now - MAX_GAP_S
                 x = np.zeros((int((now - heard) * SR), 2), np.float32)
                 heard += len(x) / SR
                 if len(x) and not self._hand_over(x):
