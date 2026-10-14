@@ -24,6 +24,31 @@ def test_a_module_runs_the_tests_that_import_it():
     assert "tests/test_dsp.py" not in picked
 
 
+def test_a_test_file_runs_itself_and_the_tests_that_import_it():
+    picked = pick_tests.pick(["tests/test_mainwindow.py"])
+    assert {"tests/test_mainwindow.py", "tests/test_audit_main.py"} <= set(picked)
+
+
+def test_a_file_the_tests_read_runs_them_by_its_name():
+    assert "tests/test_design_doc.py" in pick_tests.pick(["docs/DESIGN.md"])
+    assert "tests/test_i18n.py" in pick_tests.pick(["assets/lang/de.json"])
+    assert "tests/test_directmic.py" in pick_tests.pick(["native/directmic/obmic.cpp"])
+
+
+def test_local_adds_uncommitted_and_new_files(monkeypatch):
+    calls = []
+
+    def fake_git(*args):
+        calls.append(args)
+        return {"merge-base": ["abc"], "diff": ["soundboard/a.py", "tests/test_b.py"],
+                "ls-files": ["soundboard/new.py", "soundboard/a.py"]}[args[0]]
+
+    monkeypatch.setattr(pick_tests, "_git", fake_git)
+    assert pick_tests.changed_files("origin/main", local=True) == [
+        "soundboard/a.py", "soundboard/new.py", "tests/test_b.py"]
+    assert ("diff", "--name-only", "--no-renames", "abc") in calls
+
+
 def test_a_hub_runs_them_all():
     # signals and lazy imports reach these from everywhere: no import line says which
     # tests a change to one can break, so the whole suite runs
@@ -55,28 +80,3 @@ def test_imports_inside_functions_and_by_name_are_followed(tmp_path, monkeypatch
     assert pick_tests.pick(["soundboard/theme.py"]) == [
         "tests/test_byname.py", "tests/test_method.py"]
     assert pick_tests.pick(["soundboard/lazy.py"]) == ["tests/test_byname.py"]
-
-
-def test_a_test_file_runs_itself_and_the_tests_that_import_it():
-    picked = pick_tests.pick(["tests/test_mainwindow.py"])
-    assert {"tests/test_mainwindow.py", "tests/test_audit_main.py"} <= set(picked)
-
-
-def test_a_file_the_tests_read_runs_them_by_its_name():
-    assert "tests/test_design_doc.py" in pick_tests.pick(["docs/DESIGN.md"])
-    assert "tests/test_i18n.py" in pick_tests.pick(["assets/lang/de.json"])
-    assert "tests/test_directmic.py" in pick_tests.pick(["native/directmic/obmic.cpp"])
-
-
-def test_local_adds_uncommitted_and_new_files(monkeypatch):
-    calls = []
-
-    def fake_git(*args):
-        calls.append(args)
-        return {"merge-base": ["abc"], "diff": ["soundboard/a.py", "tests/test_b.py"],
-                "ls-files": ["soundboard/new.py", "soundboard/a.py"]}[args[0]]
-
-    monkeypatch.setattr(pick_tests, "_git", fake_git)
-    assert pick_tests.changed_files("origin/main", local=True) == [
-        "soundboard/a.py", "soundboard/new.py", "tests/test_b.py"]
-    assert ("diff", "--name-only", "--no-renames", "abc") in calls
