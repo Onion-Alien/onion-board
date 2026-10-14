@@ -37,6 +37,7 @@ def test_the_headphones_follow_windows_default_output(window, monkeypatch):
     assert window.cfg.mon_device == OUTS[0]
     windows_default(monkeypatch, "Speakers (Realtek Audio)")
     window._follow_default_output()
+    devices_done(window)   # opened on the device thread
     assert window.cfg.mon_device == OUTS[1] and window.opened[-1] == OUTS[1]
     assert window.cb_mon.currentData() == OUTS[1]
     assert "Speakers" in said(window)

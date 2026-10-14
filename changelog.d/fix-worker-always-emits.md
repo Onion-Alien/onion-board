@@ -1,0 +1,1 @@
+- A background job that fails (setting up the mic effect, removing the virtual cable, an export, an update check…) now always says so and frees its button, instead of leaving it busy until the app restarts.

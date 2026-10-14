@@ -278,17 +278,86 @@ def test_direct_relay_refuses_names_that_lead_home(monkeypatch):
         assert (F, name, "local") in net.relay_seen()
 
 
+ROUTER = "192.168.1.1"   # a home router  # sensitive-scan: allow
+
+
+def _dialling(monkeypatch) -> list[str]:
+    """socket.create_connection, recording the address each connection away from
+    127.0.0.1 would reach (a name resolved the way the real one does, through
+    socket.getaddrinfo) and refusing it, so nothing leaves this PC."""
+    real, dialled = socket.create_connection, []
+
+    def dial(address, *a, **k):
+        host, port = address
+        if host == "127.0.0.1":
+            return real(address, *a, **k)
+        dialled.extend(str(i[4][0]) for i in socket.getaddrinfo(host, port)[:1])
+        raise ConnectionRefusedError("test: not connecting")
+    monkeypatch.setattr(socket, "create_connection", dial)
+    return dialled
+
+
 def test_names_that_lead_out_arent_refused(monkeypatch):
     _resolving(monkeypatch, {"radio.example": "8.8.8.8"})
-    assert not net._name_leads_home("radio.example")
-    assert not net._name_leads_home("localhost")       # this PC by name: Direct allows it
-    assert not net._name_leads_home("fd00::1")     # an address: decided elsewhere
+    dialled = _dialling(monkeypatch)
+    net.configure(net.DIRECT)
+    out = _relay(f"CONNECT radio.example:80 HTTP/1.1\r\n"
+                 f"Proxy-Authorization: Basic {_auth()}\r\n\r\n".encode())
+    assert out.startswith(b"HTTP/1.1 502")   # tried, not refused
+    assert dialled == ["8.8.8.8"]
+    assert (F, "radio.example", "failed") in net.relay_seen()
+
+
+def test_a_name_that_answers_differently_the_second_time_stays_out(monkeypatch):
+    # DNS rebinding: a public address for the check, then the router's (TTL 0)
+    real, answers = socket.getaddrinfo, iter(["93.184.216.34", ROUTER])
+
+    def gai(host, *a, **k):
+        if host == "rebind.example":
+            ip = next(answers, ROUTER)
+            return [(socket.AF_INET, socket.SOCK_STREAM, 6, "", (ip, 0))]
+        return real(host, *a, **k)
+    monkeypatch.setattr(socket, "getaddrinfo", gai)
+    dialled = _dialling(monkeypatch)
+    net.configure(net.DIRECT)
+    _relay(f"GET http://rebind.example/admin HTTP/1.1\r\nHost: rebind.example\r\n"
+           f"Proxy-Authorization: Basic {_auth()}\r\n\r\n".encode())
+    assert ROUTER not in dialled
+    assert dialled == ["93.184.216.34"]   # the address that was checked
+
+
+def test_a_station_that_rebinds_after_the_radio_check_is_refused(monkeypatch):
+    import base64
+
+    from soundboard import radio
+    real, answers = socket.getaddrinfo, iter(["93.184.216.34", ROUTER])
+
+    def gai(host, *a, **k):
+        if host == "station.example":
+            ip = next(answers, ROUTER)
+            return [(socket.AF_INET, socket.SOCK_STREAM, 6, "", (ip, 0))]
+        return real(host, *a, **k)
+    monkeypatch.setattr(socket, "getaddrinfo", gai)
+    dialled = _dialling(monkeypatch)
+    net.configure(net.DIRECT)
+    assert not radio._name_is_local("station.example")   # the early check: public
+    # FFmpeg's stream goes through the relay, whose own lookup now says the router
+    cred = net.relay_url("radio").split("//", 1)[1].rsplit("@", 1)[0]
+    out = _relay(f"GET http://station.example/live HTTP/1.1\r\nHost: station.example\r\n"
+                 f"Proxy-Authorization: Basic {base64.b64encode(cred.encode()).decode()}"
+                 f"\r\n\r\n".encode())
+    assert out.startswith(b"HTTP/1.1 403") and b"home network" in out
+    assert dialled == []
+    assert ("radio", "station.example", "local") in net.relay_seen()
 
 
 def test_names_arent_looked_up_through_a_proxy(monkeypatch, slow):
     _site, socks = slow
     looked = []
-    monkeypatch.setattr(net, "_name_leads_home", lambda h: looked.append(h) or False)
+    real = socket.getaddrinfo
+    monkeypatch.setattr(socket, "getaddrinfo",
+                        lambda h, *a, **k: (h == "nowhere.test" and looked.append(h))
+                        or real(h, *a, **k))
     net.configure(net.PROXY, socks.url())
     _relay(f"CONNECT nowhere.test:80 HTTP/1.1\r\n"
            f"Proxy-Authorization: Basic {_auth()}\r\n\r\n".encode())

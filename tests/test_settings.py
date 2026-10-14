@@ -411,6 +411,36 @@ def test_remote_page_copies_an_ai_prompt_with_the_key_only_when_ticked(window): 
         window.apply_remote()
 
 
+def test_a_new_remote_key_says_made_only_once_it_is_saved(window, monkeypatch):  # noqa: F811
+    """New key: saved on the saver's thread, never cfg.save() on the UI thread; "made"
+    only once it's on disk. A failed save says so instead (after a restart the old key
+    would be back, and a Stream Deck set up with the new one would stop working)."""
+    from soundboard import library
+    from soundboard.ui import mainwindow
+    flashed, toasts, ui_saves = [], [], []
+    monkeypatch.setattr(busy, "flash", lambda btn, text, ms=0: flashed.append(text))
+    monkeypatch.setattr(busy, "toast", lambda w, text, kind="", *a, **k: toasts.append(kind))
+    monkeypatch.setattr(type(window.cfg), "save", lambda self: ui_saves.append(1) or True)
+    monkeypatch.setattr(mainwindow.MainWindow, "apply_remote", lambda self: "")
+    window._save_failed_shown = False
+    window.cfg.api_enabled, window.cfg.api_token = True, "the-old-key"
+    d = SettingsDialog(window, "remote")
+    try:
+        new = next(b for b in d.findChildren(QPushButton) if b.text() == "New key")
+        monkeypatch.setattr(library, "_write", lambda snap: False)   # disk full, say
+        new.click()
+        assert process_events(QApplication.instance(), lambda: "error" in toasts, 5)
+        assert flashed == [] and window.cfg.api_token != "the-old-key"
+        monkeypatch.setattr(library, "_write", lambda snap: True)
+        new.click()
+        assert process_events(QApplication.instance(), lambda: flashed, 5)
+        assert flashed == ["✓ New key made"]
+        assert ui_saves == []                # never the whole config on the UI thread
+    finally:
+        d.close()
+        window.cfg.api_enabled = False
+
+
 def test_about_shows_the_version_and_only_opens_pages(window, monkeypatch):  # noqa: F811
     from soundboard.ui.mainwindow import version_text
     opened = []
@@ -830,7 +860,7 @@ def test_heading_level_with_the_rails_name(window, qapp, theme):  # noqa: F811
 
 
 def test_live_tabs_choices_side_by_side_like_connection(window, qapp):  # noqa: F811
-    """U2: comparable short choices look alike: Live tabs' two sit in one wrapping row,
+    """Comparable short choices look alike: Live tabs' two sit in one wrapping row,
     as Connection's and Network activity's do (offscreen fonts here are too wide to
     compare positions: the pictures check that)."""
     from soundboard.ui.panel import Flow
@@ -848,7 +878,7 @@ def test_live_tabs_choices_side_by_side_like_connection(window, qapp):  # noqa: 
 
 
 def test_settings_cards_line_up(window, qapp):  # noqa: F811
-    """U6: an option's explanation sits under its box's text (General's one-click one
+    """An option's explanation sits under its box's text (General's one-click one
     sat at the card's edge); the overlay's Open overlay and Auto-hide choice are as wide
     as their words, right after what they belong to; the ducking label keeps one line."""
     from PySide6.QtWidgets import QComboBox, QPushButton

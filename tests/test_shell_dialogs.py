@@ -63,7 +63,7 @@ def test_settings_opened_again_is_the_kept_one_unless_its_config_changed(qapp, w
 
 
 def test_settings_open_as_a_page_in_place_of_the_tabs(qapp, win):
-    """Settings apply as they change, so they don't hold up the board (U4): a page in
+    """Settings apply as they change, so they don't hold up the board: a page in
     the window where the tabs show, the rail still there with its cog selected. Asked
     for again: the same page, switched to the page named."""
     win.resize(1180, 720)
