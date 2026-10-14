@@ -76,15 +76,15 @@ def test_labelled_output_switch_controls_engine_and_tracks_other_controls(window
     assert muted.red() - muted.blue() > live.red() - live.blue() + 20, (muted.name(), live.name())
 
 
-def _ink_box(img, rect, bg=None):
+def _ink_box(img, rect, bg=None, tol=90):
     """The bounding box of everything in `rect` that isn't the card's background (or
-    the colour at `bg`)."""
+    the colour at `bg`, by more than `tol`)."""
     bg = QColor(img.pixel(*(bg or (1, img.height() // 2))))
     xs, ys = [], []
     for y in range(rect.top(), rect.bottom() + 1):
         for x in range(rect.left(), rect.right() + 1):
             c = QColor(img.pixel(x, y))
-            if sum(abs(a - b) for a, b in zip(c.getRgb()[:3], bg.getRgb()[:3])) > 90:
+            if sum(abs(a - b) for a, b in zip(c.getRgb()[:3], bg.getRgb()[:3])) > tol:
                 xs.append(x)
                 ys.append(y)
     return QRect(QPoint(min(xs), min(ys)), QPoint(max(xs), max(ys)))
@@ -121,7 +121,8 @@ def test_collapsed_output_has_equal_visible_vertical_gaps(window, qapp, theme_na
 
 def _assert_pair(output):
     """Open: Mute and Stop all, the same width, the same padding round them and
-    between them, each icon in its button's middle."""
+    between them, each icon and its words ("Live", "Stop all") in its button's
+    middle."""
     from PySide6.QtWidgets import QApplication
     QApplication.processEvents()
     mute, stop = sorted((output.mute, output.stop), key=lambda b: b.mapTo(output, QPoint()).x())
@@ -134,9 +135,11 @@ def _assert_pair(output):
     for b in (mute, stop):
         at = b.mapTo(output, QPoint())
         ink = _ink_box(img, QRect(at.x() + 4, at.y() + 4, b.width() - 8, b.height() - 8),
-                       (at.x() + 3, at.y() + b.height() // 2))   # (the button's own fill)
+                       (at.x() + 3, at.y() + b.height() // 2), 40)   # (the button's fill)
         box = QRect(at, b.size())
-        assert abs(ink.center().x() - box.center().x()) <= 1.5
+        assert b.text().strip()   # (English fits beside the icon)
+        # (to 4 px: Mute's space after its icon, the icons' own air)
+        assert abs(ink.center().x() - box.center().x()) <= 4.5, b.text()
         assert abs(ink.center().y() - box.center().y()) <= 1.5
 
 
@@ -181,7 +184,8 @@ def test_output_card_icons_and_words_share_keylines(window, qapp, monkeypatch): 
     assert output.status_text.text() == "Not configured" and output.arrow.isVisible()
     output.status_text.setText("Ausgabe nicht verbunden")
     output.adjustSize()
-    qapp.processEvents()
+    for _ in range(6):   # (the strip's button sits two layouts deeper: a pass each)
+        qapp.processEvents()
     label = output.status_text
     assert label.height() >= 2 * label.fontMetrics().height() - 2   # wrapped...
     assert label.geometry().bottom() <= output.setup.contentsRect().bottom()   # ...not clipped
