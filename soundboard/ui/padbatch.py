@@ -12,8 +12,8 @@ from typing import TYPE_CHECKING
 from PySide6.QtCore import QObject, QPointF, Qt
 from PySide6.QtGui import (QActionGroup, QColor, QIcon, QKeySequence, QPainter, QPen,
                            QPixmap, QShortcut)
-from PySide6.QtWidgets import (QFrame, QHBoxLayout, QInputDialog, QLabel, QMenu, QPushButton,
-                               QWidget)
+from PySide6.QtWidgets import (QApplication, QColorDialog, QFrame, QHBoxLayout, QInputDialog,
+                               QLabel, QMenu, QPushButton, QWidget)
 
 from soundboard import library
 from soundboard.library import MAX_FADE_S, PAD_COLORS, SoundMeta
@@ -56,9 +56,10 @@ def swatch(color: str, size: int = 14) -> QIcon:
 
 
 def fill_colour_menu(menu: QMenu, current: str | None, pick, none: bool = False):
-    """The pad colours by name, the current one ticked (none for a mixed pick). With
-    `none`, a "No colour" item too (ticked when there's none). The Sounds menus share
-    it: the bulk Colour menu and a category tab's."""
+    """The pad colours by name, the current one ticked (none for a mixed pick), then
+    "Custom colour…" (a colour wheel; a custom current colour shows ticked above it).
+    With `none`, a "No colour" item too (ticked when there's none). The Sounds menus
+    share it: the bulk Colour menu and a category tab's."""
     from soundboard.ui.dialogs import COLOUR_NAMES
     group = QActionGroup(menu)
     group.setExclusive(True)
@@ -68,8 +69,22 @@ def fill_colour_menu(menu: QMenu, current: str | None, pick, none: bool = False)
         a.setCheckable(True)
         a.setChecked(c.lower() == cur)
         group.addAction(a)
+    if current and cur not in {c.lower() for c in PAD_COLORS}:
+        a = menu.addAction(swatch(current), _("Custom"), lambda: pick(current))
+        a.setCheckable(True)
+        a.setChecked(True)
+        group.addAction(a)
+    menu.addSeparator()
+
+    def wheel():
+        # runs once the menu has closed, so the dialog sits over the window
+        c = QColorDialog.getColor(QColor(current or PAD_COLORS[0]),
+                                  menu.parentWidget() or QApplication.activeWindow(),
+                                  _("Pick a colour"))
+        if c.isValid():
+            pick(c.name())
+    menu.addAction(icons.icon("palette"), _("Custom colour…"), wheel)
     if none:
-        menu.addSeparator()
         a = menu.addAction(icons.icon("palette", checked_color="accent"), _("No colour"),
                            lambda: pick(""))
         a.setCheckable(True)

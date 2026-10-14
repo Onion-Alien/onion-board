@@ -920,13 +920,14 @@ def test_the_mini_player_keeps_the_pads_while_one_row_fits(window, qapp):
 def test_the_window_shows_which_version_is_running(window, monkeypatch):
     from soundboard import __version__
     from soundboard.ui import mainwindow
-    assert window.windowTitle() == f"Onion Board {__version__} from source"
-    assert window.tagline.text() == f"v{__version__}"   # the header: no "from source"
-    assert "Onion Alien" in window.wordmark.toolTip()
+    assert window.windowTitle() == "Onion Board"   # no version in the title bar
+    # the rail: who made it and the version, no "from source"
+    assert window.tagline.text() == f"by Onion Alien · v{__version__}"
+    assert "from source" in window.wordmark.toolTip()
     window.on_mic_check(True)          # the red banner says it; the title stays the app's name
-    assert window.windowTitle() == f"Onion Board {__version__} from source"
+    assert window.windowTitle() == "Onion Board"
     window.on_mic_check(False)
-    assert window.windowTitle() == f"Onion Board {__version__} from source"
+    assert window.windowTitle() == "Onion Board"
     monkeypatch.setattr("sys.frozen", True, raising=False)
     assert mainwindow.version_text() == __version__     # the installed app: just the number
 

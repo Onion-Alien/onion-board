@@ -95,6 +95,11 @@ class PlaybackControl(Controller):
             else:
                 mw.toast(_("“{name}” is still loading…", name=html.escape(m.name)), "warn")
             return
+        if (sid != LINK_ID and LINK_ID in mw.engine.playing()
+                and mw.searchctl._pad_for_link(mw.searchctl._link_url) == sid):
+            # the web song played from a search, now saved as this pad: one song, so
+            # it starts again from the top instead of a second copy playing over it
+            self._stop_sound(LINK_ID)
         self.select(sid)
         self._last_sid = sid
         if sid != LINK_ID:

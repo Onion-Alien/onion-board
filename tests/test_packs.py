@@ -432,3 +432,45 @@ def test_two_fetches_of_one_preview_at_once_both_get_its_samples(served):
     for t in ts:
         t.join(10)
     assert len(got) == 4 and all([s.name for s in g] == ["Door", "Dragon"] for g in got)
+
+
+def test_the_online_list_keeps_the_cards_of_packs_that_didnt_change(qapp):
+    """The online list arriving (about a second after the window opens) remade every
+    card: ~250 ms of Qt work in one go, and the sound playing skipped. Unchanged packs
+    keep their cards now; only a new or changed pack gets a new one."""
+    dlg = packsdialog.PacksDialog(lambda path: None, fetch_list=False)
+    try:
+        before = list(dlg.cards)
+        dlg._show(packs.built_in(), "")
+        assert dlg.cards == before and all(a is b for a, b in zip(dlg.cards, before))
+        changed = packs.built_in()
+        changed[1].description = "Something new"
+        dlg._show(changed, "")
+        assert [c.pack for c in dlg.cards] == changed
+        assert dlg.cards[1] is not before[1]
+        assert all(dlg.cards[i] is before[i] for i in (0, 2, 3, 4))
+        assert [dlg.list.itemAt(i).widget() for i in range(len(changed))] == dlg.cards
+    finally:
+        dlg.done(0)
+
+
+def test_a_pack_card_never_shows_a_window_of_its_own(qapp):
+    """Its samples row was shown before it was put in the card: for a moment a window of
+    its own, made and pulled back in (~30 ms a card the audio threads waited on)."""
+    from PySide6.QtCore import QEvent, QObject
+
+    shown = []
+
+    class Spy(QObject):
+        def eventFilter(self, obj, ev):
+            if ev.type() == QEvent.Type.Show and obj.isWidgetType() and obj.isWindow():
+                shown.append(type(obj).__name__)
+            return False
+    spy = Spy()
+    qapp.installEventFilter(spy)
+    try:
+        cards = [packsdialog.PackCard(p) for p in packs.built_in()]
+    finally:
+        qapp.removeEventFilter(spy)
+    assert any(c.pack.preview_url for c in cards)
+    assert shown == []

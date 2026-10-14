@@ -10,7 +10,7 @@ from typing import TYPE_CHECKING
 
 from PySide6.QtCore import Qt
 
-from soundboard import library, net, ytdl
+from soundboard import library, net, sourceinfo, ytdl
 from soundboard.engine import SR
 from soundboard.i18n import _
 from soundboard.library import SoundMeta
@@ -128,11 +128,27 @@ class SearchControl(Controller):
             mw.playctl.select(LINK_ID)   # already in the player: Play / Space pause and resume it
             mw.playctl.toggle_play_pause()
             return
+        pad = self._pad_for_link(r.url) if play else None
+        if pad is not None:   # it's on the board already: the pad plays, from the start
+            mw.playctl.play(pad)
+            return
         kind = "play" if play else "add"
         mw.linkbar.open(r.url, r.title, r.seconds)
         mw.ytresults.mark(r.url, kind)   # its button greys out until the link bar's done
         if not (mw.linkbar.play_once() if play else mw.linkbar.add()):
             mw.ytresults.mark(r.url, kind, False)
+
+    def _pad_for_link(self, url: str) -> str | None:
+        """The board's sound downloaded from this link (its audio loaded), or None."""
+        mw = self.mw
+        key = sourceinfo.link_key(url)
+        if not key:
+            return None
+        for m in mw.cfg.sounds:
+            if (mw.audio.get(m.id) is not None and isinstance(m.source, dict)
+                    and sourceinfo.link_key(m.source.get("link", "")) == key):
+                return m.id
+        return None
 
     def _drop_link(self):
         """Take a stopped web song out of the player. It stayed there as the player's

@@ -1,0 +1,1 @@
+- Give Hothead a new fiery icon and add artwork for Singing monk, Dalek, Haunted radio and Underwater.
