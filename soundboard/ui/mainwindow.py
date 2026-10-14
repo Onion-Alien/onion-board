@@ -1,7 +1,6 @@
 """The main window: pads, transport, web search, the audio panel, auto push-to-talk."""
 from __future__ import annotations
 
-import copy
 import html
 import re
 import logging
@@ -24,30 +23,31 @@ from PySide6.QtWidgets import (QApplication, QBoxLayout, QCheckBox, QComboBox, Q
                                QPushButton, QScrollArea, QSizePolicy, QSlider, QStackedWidget,
                                QSystemTrayIcon, QVBoxLayout, QWidgetItem,
                                QWidget)
-from shiboken6 import isValid as qt_valid
 
-from soundboard import engine as eng
-from soundboard import bunny, theme, winkeys, ytdl, ytworker
+from soundboard import bunny, theme, winkeys, ytworker
 from soundboard.engine import SR, Engine
 from soundboard import exitwatch
-from soundboard import (appaudio, autostart, backup, destination, library, midi,
-                        remote, otherboards, reset, soundfx, thumbs, trash, videos,
-                        voicesdk)
-from soundboard import (appsetup, ffmpegget, net, netlog,
-                        profiles, quality, shellicon, sourceinfo, thumbbar, tips, tor,
+from soundboard import (appaudio, autostart, backup, destination, library, remote, otherboards,
+                        reset, thumbs, trash, videos, voicesdk)
+from soundboard import (ffmpegget, net, netlog,
+                        profiles, quality, shellicon, thumbbar, tips, tor,
                         usage, watchaddon)
 from soundboard.replay import InstantReplay
-from soundboard.library import (PAD_COLORS, PRESS_MODE, Config,
+from soundboard.library import (PAD_COLORS, Config,
                                 SoundMeta, cache_keep, fingerprint,
-                                load_original, load_sound, prune_cache, save_clip)
-from soundboard.settings import HOTKEY_ACTIONS, HotkeyDialog, pretty_key
-from soundboard.shuffle import ShuffleBag
+                                load_sound, prune_cache, save_clip)
 from soundboard.ui.crashdialog import free_dialog
-from soundboard.ui.dialogs import TabHelpPopup
 from soundboard.ui.iconrow import CapIcon
 from soundboard.ui import worker
 from soundboard.ui.dropveil import DropVeil
 from soundboard.ui.ffmpegcontrol import FfmpegControl
+from soundboard.ui.searchcontrol import SearchControl
+from soundboard.ui.playbackcontrol import PlaybackControl
+from soundboard.ui.playbackcontrol import CHIPS_GAP
+from soundboard.ui.appsetupcontrol import AppSetupControl
+from soundboard.ui.languagecontrol import LanguageControl
+from soundboard.ui.tipcontrol import TipControl
+from soundboard.ui.hotkeycontrol import HotkeyControl
 from soundboard.ui.aboutcontrol import AboutControl
 from soundboard.ui.themecontrol import ThemeControl
 from soundboard.ui.settingscontrol import SettingsControl
@@ -98,8 +98,7 @@ from soundboard.ui.widgets import (DropdownMenu, Meter, NameAndSeek, Pad, PadGri
 from soundboard.wheelguard import AppStyle, no_wheel
 from soundboard.winkeys import Hotkeys
 from soundboard import errors
-from soundboard import i18n
-from soundboard.i18n import _, ngettext
+from soundboard.i18n import _
 
 log = logging.getLogger(__name__)
 
@@ -113,17 +112,7 @@ def version_text() -> str:
     return _("{version} from source", version=__version__)
 
 
-# an effects preview of a sound longer than this renders only its first PREVIEW_S
-# (soundfx.preview_part): a 2-hour song's pitch shift took minutes to start playing
-PREVIEW_WHOLE_S = 5 * 60
-PREVIEW_S = 30
 TOAST_EXPAND = QSize(900, 640)   # a shrunk card clicked: the window grows to this
-# shown when instant replay goes on: it records whoever is talking in a call
-REPLAY_NOTE = _("Instant replay is on: your key keeps the last seconds you heard. In some "
-                "places recording a call needs everyone's OK, so only keep clips of people "
-                "who are fine with it.")
-CHIPS_GAP = 6         # between the now-playing row's chips
-CHIPS_ROW_H = 30      # the now-playing row: a chip's 24 px ■ button, its margins and border
 TICK_MS = 33         # the UI timer while the window is on screen (meters, visualisers)
 TICK_IDLE_MS = 250   # ...and while it's in the tray or minimised (push-to-talk, watchdog)
 TICK_QUIET_MS = 100  # on screen with nothing moving: no sound, radio, recording or level
@@ -132,23 +121,17 @@ PULSE_MS = 1200      # the mic-check banner's throb: bright, dimmer, bright agai
 PULSE_LOW = 0.55     # ...down to this opacity
 PULSE_FRAME_MS = 60  # ...a step this often (~16 a second still reads as a smooth pulse)
 DEFAULT_POLL_MS = 1500   # how often Windows' default output is checked
-SETUP_SWITCHED_MS = 8000   # how long "Voice chat mode for Discord. Undo" stays
-SETUP_DONE_MS = 15000      # the set-up card with nothing left to do
 DISCORD_POLL_MS = 10000  # how often Discord's voice settings are looked at (discordcfg)
 RAW_POLL_MS = 2000       # how often the apps recording the mic are counted (rawmic)
 BODY_SIDE = 14         # the gap around the window's content (beside the tab rail too)...
 BODY_SIDE_TIGHT = 8    # ...and beside the rail in a narrow window
 MINI_SIZE = QSize(440, 380)   # below this the window becomes the mini player...
 MINI_PAD_ROWS = 1             # ...which has the pads above it when this many rows fit
-QUEUE_CHIPS = 5          # queued sounds shown by name above the pads (then "+n more")
 SEARCH_WAIT_MS = 100     # typing in the search box filters the pads once it pauses this long
 LINK_WAIT_MS = 400       # a link in the search box is looked up once it stays this long
 PAD_SIZE_WAIT_MS = 50    # dragging Pad size re-lays the pads at most this often
-RANDOM = "__random__:"   # hotkey action prefix: a random sound from the category after it
 TLS_WARM_MS = 2500     # Qt's TLS is set up this long after the start (_warm_tls)
 TIP_DELAY_MS = 8000    # the first tip waits this long after the start
-TIP_RETRY_MS = 60_000  # ...and is tried again this often while it can't show
-LANG_OFFER_SEEN = "language-offer"   # in Config.tips_seen: the language bar was turned down
 FF_CHECK_MS = 1500     # the FFmpeg check's answer is taken this long after the start
 SEARCH_MIN_W = 220    # the Sounds tab's search box, until the window gets narrow
 # ...and its most: a few words go in it, so past this it's only a longer empty bar
@@ -156,7 +139,6 @@ SEARCH_MIN_W = 220    # the Sounds tab's search box, until the window gets narro
 # the drop box still follow the window: wider is useful there.
 SEARCH_MAX_W = 480
 VOICE_POLL_MS = 3000  # how often the game in front is looked at (soundboard.voicesdk)
-VOICE_POLL_IDLE_S = 15   # ...while nobody sees the hint and nothing switches by itself
 # Setup -> Devices -> Send my sounds to (Config.route, library.ROUTES): the mic, nobody,
 # or one of the output devices by name (ROUTE_DEVICE + its name: "cable" for a virtual
 # cable, "device" for anything else)
@@ -329,6 +311,12 @@ class MainWindow(QMainWindow):
 
     def __init__(self):
         super().__init__()
+        self.searchctl = SearchControl(self)
+        self.playctl = PlaybackControl(self)
+        self.appsetctl = AppSetupControl(self)
+        self.langctl = LanguageControl(self)
+        self.tipctl = TipControl(self)
+        self.hkctl = HotkeyControl(self)
         self.aboutctl = AboutControl(self)
         self.themectl = ThemeControl(self)
         self.setctl = SettingsControl(self)
@@ -377,29 +365,29 @@ class MainWindow(QMainWindow):
         self._meta: dict[str, SoundMeta] = {}   # id -> meta, rebuilt when the list changes
         self._index()
         self.hotkeys = Hotkeys()
-        self.hotkeys.fired.connect(self.on_hotkey)
-        self.hotkeys.released.connect(self.on_hotkey_released)
-        self.hotkeys.failed_changed.connect(self.on_hotkeys_failed)
-        self.hotkeys.midi.busy_changed.connect(self.on_midi_busy)
+        self.hotkeys.fired.connect(self.hkctl.on_hotkey)
+        self.hotkeys.released.connect(self.hkctl.on_hotkey_released)
+        self.hotkeys.failed_changed.connect(self.hkctl.on_hotkeys_failed)
+        self.hotkeys.midi.busy_changed.connect(self.hkctl.on_midi_busy)
         self.replay = InstantReplay(self.cfg.replay_seconds)
         # buttons in the taskbar's hover preview, like Discord's mute / deafen
         tb = thumbbar
         def counted(do):   # a taskbar button pressed (usage.py), then what it does
             return lambda: (usage.used("taskbar-buttons"), do())
         self.thumbbar = tb.ThumbBar(self, {
-            tb.LAST: counted(self.play_last),
-            tb.PAUSE: counted(self._pause_clicked),
-            tb.STOP: counted(self._stop_all_clicked),
-            tb.RANDOM: counted(self.play_random),
+            tb.LAST: counted(self.playctl.play_last),
+            tb.PAUSE: counted(self.playctl._pause_clicked),
+            tb.STOP: counted(self.playctl._stop_all_clicked),
+            tb.RANDOM: counted(self.playctl.play_random),
             tb.LIVE: counted(lambda: self.set_sending(not self.engine.sending))})
         self._radio_paused = None   # the station Pause stopped, for Play to turn back on
-        self.replay.state_changed.connect(self.on_replay_state)
+        self.replay.state_changed.connect(self.hkctl.on_replay_state)
         self.overlay = Overlay(self, self.cfg.overlay)
         self._save_failed_shown = False
         self.bridge = Bridge()
         self.bridge.loaded.connect(self.on_loaded)
         self.bridge.imported.connect(self.impctl.on_imported)
-        self.bridge.preview.connect(self._on_fx_preview)
+        self.bridge.preview.connect(self.playctl._on_fx_preview)
         self.bridge.exported.connect(self.impctl._on_exported)
         self.bridge.unpacked.connect(self.impctl._on_unpacked)
         self.bridge.worked.connect(self.impctl._on_worked)
@@ -413,29 +401,11 @@ class MainWindow(QMainWindow):
         self.ffctl = FfmpegControl(self)
         self.bridge.ffmpeg.connect(self.ffctl.on_answer)
         self.bridge.ffmpeg_progress.connect(self.ffctl.on_progress)
-        self.shuffle = ShuffleBag()       # the random-sound hotkeys
-        self._last_sid: str | None = None   # the last sound played (its replay hotkey)
-        self._queue: list[str] = []       # sounds waiting for the ones playing to finish
-        self._stopped_at = (0.0, "")       # (when, which) a ■ for one sound last stopped
-        self._cool: dict[str, float] = {}   # sid -> time.monotonic() its cooldown ends
-        self._waiting: dict[str, list[QTimer]] = {}   # sid -> its delayed starts
-        self._hotkeys_off = False         # "All hotkeys off": only that key still works
-        self._voice_was: bool | None = None   # voice changer state before a held key
         Pad.single_click = self.cfg.single_click
         self._quitting = False            # a real quit (not "close to the tray")
         self._tray_told = False           # the "still running in the tray" note was shown
         self.tray: QSystemTrayIcon | None = None
         self.watch_offer: watchaddon.Offer | None = None   # an urgent Onion Watch fix
-        # set up for the app you're using (appsetup): the bar's app and what it shows.
-        # Before the Discord check below: on a slow start its answer (_on_discord) comes
-        # in while the splash pumps events, before the end of __init__
-        self._setup_tracker = appsetup.Tracker()
-        self._setup_app: appsetup.Seen | None = None
-        self._setup_state = ""        # "offer", "done" or "" (hidden)
-        self._setup_skipped: set[str] = set()   # answered Not now, this run
-        self._setup_undo: dict | None = None    # the dest settings before a switch
-        self._setup_hide = QTimer(self, singleShot=True)
-        self._setup_hide.timeout.connect(self._hide_setup)
         self._discord_timer = QTimer(self, interval=DISCORD_POLL_MS)
         self._discord_timer.timeout.connect(self.alertctl._discord_tick)
         if sys.platform == "win32":
@@ -445,14 +415,9 @@ class MainWindow(QMainWindow):
         self._raw_timer.timeout.connect(self.alertctl._raw_tick)
         if sys.platform == "win32":
             self._raw_timer.start()
-        self._preview_gen = 0            # newest effects preview (older renders are dropped)
-        self._preview_done = None         # its done(ok) callback while it renders
         self._ptt_held: str | None = None   # PTT key we're currently holding
         self.current: str | None = None   # sound shown in the transport bar
-        self._link_meta: SoundMeta | None = None   # the link bar's Play once
-        self._link_url = ""                        # ...and the page it came from
         self.start_frac = 0.0             # where ▶ starts if it isn't playing
-        self._seeking = False
         self._tick_n = 0                  # ticks since start (the watchdog runs ~once a second)
         self._ui_live = True              # the window is on screen (see _set_tick_rate)
         self._tick_busy = True            # something moves with the tick (see _busy)
@@ -466,10 +431,6 @@ class MainWindow(QMainWindow):
         self._save_timer = QTimer(self)
         self._save_timer.setSingleShot(True)
         self._save_timer.timeout.connect(self._save_now)
-        # play counts and Ctrl+wheel volumes: saved within a few seconds, not on each press
-        # (a spammed hotkey wrote the whole config every time); closing saves the rest
-        self._count_save = QTimer(self, singleShot=True, interval=5000)
-        self._count_save.timeout.connect(self._save_now)
         # written on a background thread: a slow disk froze the window for seconds
         self._saver = library.Saver(self.cfg, done=self.config_saved.emit)
         self.config_saved.connect(self._on_saved)
@@ -497,8 +458,8 @@ class MainWindow(QMainWindow):
         self.load_triggers()   # behind the loading screen, not on the tab's first click
         splash.pump()
         self.impctl._watch_sounds_folder()
-        self._fit_overlay_key()
-        self.register_hotkeys()
+        self.hkctl._fit_overlay_key()
+        self.hkctl.register_hotkeys()
         # Stream Deck / scripts (Settings → Remote), only if turned on
         self.remote = remote.RemoteControl(lambda a, p: remote.dispatch(self, a, p), self)
         self.remctl.apply_remote()
@@ -513,7 +474,7 @@ class MainWindow(QMainWindow):
         app.applicationStateChanged.connect(self._set_tick_rate)
         app.applicationStateChanged.connect(self.micctl._app_state)
         # Space plays / pauses on the Sounds and Radio tabs, wherever the focus is
-        self._space = SpaceKey(self, self._space_action)
+        self._space = SpaceKey(self, self.playctl._space_action)
         theme.app_filter(QApplication.instance(), self._space)
         # which voice chat the game you're playing uses: a hint by Who's listening
         self.voice_suggestion: str | None = None
@@ -525,16 +486,13 @@ class MainWindow(QMainWindow):
         self._cable_watch = voicesdk.Listeners() if sys.platform == "win32" else None
         self.voice_watch = voicesdk.Watcher() if sys.platform == "win32" else None
         self._voice_timer = QTimer(self)
-        self._voice_timer.timeout.connect(self._voice_tick)
-        self._voice_at = 0.0   # when _poll_voice last ran (see _voice_tick)
+        self._voice_timer.timeout.connect(self.appsetctl._voice_tick)
         if self.voice_watch is not None:
             self._voice_timer.start(VOICE_POLL_MS)
         # a tip once things have settled; tried again now and then while the window is
         # hidden or a game is up, until one has been shown this start
-        self._tip_timer = QTimer(self, interval=TIP_RETRY_MS)
-        self._tip_timer.timeout.connect(self._maybe_tip)
-        QTimer.singleShot(TIP_DELAY_MS, self, self._start_tips)
-        self._offer_language()
+        QTimer.singleShot(TIP_DELAY_MS, self, self.tipctl._start_tips)
+        self.langctl._offer_language()
         # the check started behind the loading screen (app.py); its answer, and a
         # download if one is needed, once the window is up
         QTimer.singleShot(FF_CHECK_MS, self, self.check_ffmpeg)
@@ -673,7 +631,7 @@ class MainWindow(QMainWindow):
         sidebar.put(self.stop_btn, _("Stop all"),
                     tip=_("Stops every sound, the radio and every program, and turns "
                           "the voices off"))
-        self.stop_btn.clicked.connect(self._stop_all_clicked)
+        self.stop_btn.clicked.connect(self.playctl._stop_all_clicked)
         icons.set_icon(self.stop_btn, "stop", "danger_text", size=sidebar.ICON, gap=False)
         self.gear = QPushButton(_("Settings"))
         self.gear.setObjectName("settings")
@@ -766,7 +724,7 @@ class MainWindow(QMainWindow):
         th.addWidget(self.tip_lbl, 1)
         self.tip_btn = QPushButton(_("Show me"))
         self.tip_btn.setObjectName("small")
-        self.tip_btn.clicked.connect(self._tip_show_me)
+        self.tip_btn.clicked.connect(self.tipctl._tip_show_me)
         th.addWidget(self.tip_btn)
         hide = QPushButton()
         hide.setObjectName("urgenthide")
@@ -792,16 +750,16 @@ class MainWindow(QMainWindow):
         sh.addWidget(self.setup_lbl, 1)
         self.setup_yes = QPushButton()
         self.setup_yes.setObjectName("primary")
-        self.setup_yes.clicked.connect(self._setup_yes_clicked)
+        self.setup_yes.clicked.connect(self.appsetctl._setup_yes_clicked)
         sh.addWidget(self.setup_yes)
         self.setup_no = QPushButton(_("Not now"))
         self.setup_no.setObjectName("small")
-        self.setup_no.clicked.connect(self._setup_not_now)
+        self.setup_no.clicked.connect(self.appsetctl._setup_not_now)
         sh.addWidget(self.setup_no)
         self.setup_x = QPushButton()
         self.setup_x.setObjectName("urgenthide")
         icons.close_button(self.setup_x, 28)
-        self.setup_x.clicked.connect(self._setup_x_clicked)
+        self.setup_x.clicked.connect(self.appsetctl._setup_x_clicked)
         sh.addWidget(self.setup_x)
         self.setup_bar.hide()
         rv.addWidget(self.setup_bar)
@@ -822,12 +780,12 @@ class MainWindow(QMainWindow):
         lh.addWidget(self.lang_lbl, 1)
         self.lang_btn = QPushButton()
         self.lang_btn.setObjectName("small")
-        self.lang_btn.clicked.connect(lambda: self.switch_language(self._lang_offered))
+        self.lang_btn.clicked.connect(lambda: self.langctl.switch_language(self._lang_offered))
         lh.addWidget(self.lang_btn)
         hide = QPushButton()
         hide.setObjectName("urgenthide")
         icons.close_button(hide, 28)
-        hide.clicked.connect(self._no_language)
+        hide.clicked.connect(self.langctl._no_language)
         lh.addWidget(hide)
         self.lang_hide = hide
         self.lang_bar.hide()
@@ -1039,8 +997,8 @@ class MainWindow(QMainWindow):
         self.linkbar.failed.connect(self.download_bar.set_failed)
         self.linkbar.failed.connect(self.mini_download_bar.set_failed)
         self.linkbar.done.connect(self.mini_download_bar.set_done)
-        self.download_bar.retry_requested.connect(self._retry_download)
-        self.mini_download_bar.retry_requested.connect(self._retry_download)
+        self.download_bar.retry_requested.connect(self.searchctl._retry_download)
+        self.mini_download_bar.retry_requested.connect(self.searchctl._retry_download)
         self.download_bar.front_requested.connect(self.linkbar.move_to_front)
         self.mini_download_bar.front_requested.connect(self.linkbar.move_to_front)
         self.linkbar.queue_updated.connect(self.download_bar.set_queue)
@@ -1084,16 +1042,16 @@ class MainWindow(QMainWindow):
         self.mini_pp.setObjectName("transport_play")
         self.mini_pp.setProperty("mini", True)
         self.mini_pp.setAccessibleName(_("Play / pause"))
-        self.mini_pp.clicked.connect(self.toggle_play_pause)
+        self.mini_pp.clicked.connect(self.playctl.toggle_play_pause)
         self.mini_st = QPushButton()
         self.mini_st.setObjectName("transport_stop")
         self.mini_st.setAccessibleName(_("Stop"))
-        self.mini_st.clicked.connect(self.stop_current)
+        self.mini_st.clicked.connect(self.playctl.stop_current)
         icons.set_icon(self.mini_st, "stop", size=16)
         self.mini_skip = QPushButton()
         self.mini_skip.setObjectName("transport_stop")
         self.mini_skip.setAccessibleName(_("Skip to the next sound in Up next"))
-        self.mini_skip.clicked.connect(self.skip_next)
+        self.mini_skip.clicked.connect(self.playctl.skip_next)
         icons.set_icon(self.mini_skip, "next", size=16)
         for b in (self.mini_pp, self.mini_st, self.mini_skip):
             b.setFixedSize(34, 30)
@@ -1118,7 +1076,7 @@ class MainWindow(QMainWindow):
         self.mini_stop = QPushButton(_("All"))
         self.mini_stop.setObjectName("danger")
         self.mini_stop.setToolTip(self.stop_btn.toolTip())
-        self.mini_stop.clicked.connect(self.stop_all)
+        self.mini_stop.clicked.connect(self.playctl.stop_all)
         icons.set_icon(self.mini_stop, "stop", "danger_text", size=14)
         self.mini_air.setFixedSize(38, 30)
         self.mini_stop.setFixedHeight(30)
@@ -1132,9 +1090,9 @@ class MainWindow(QMainWindow):
         self.mini_seek.setRange(0, 1000)
         self.mini_seek.setObjectName("seek")
         self.mini_seek.setFixedHeight(24)
-        self.mini_seek.sliderPressed.connect(lambda: setattr(self, "_seeking", True))
-        self.mini_seek.sliderReleased.connect(lambda: self.do_seek(self.mini_seek))
-        self.mini_seek.valueChanged.connect(self._seek_preview)
+        self.mini_seek.sliderPressed.connect(lambda: setattr(self.playctl, "_seeking", True))
+        self.mini_seek.sliderReleased.connect(lambda: self.playctl.do_seek(self.mini_seek))
+        self.mini_seek.valueChanged.connect(self.playctl._seek_preview)
         no_wheel(self.mini_seek)
         bottom.addWidget(self.mini_seek, 1)
         self.mini_time = QLabel(self.np_time.text())
@@ -1455,11 +1413,11 @@ class MainWindow(QMainWindow):
         # and only once it pauses (_on_search_text); text set by the app filters at once
         self._search_wait = QTimer(self, singleShot=True, interval=SEARCH_WAIT_MS)
         self._search_wait.timeout.connect(
-            lambda: self.apply_filter(self.search.text(), lazy=True))
-        self._search_typed = None
-        self.search.textEdited.connect(self._on_search_edited)
-        self.search.textChanged.connect(self._on_search_text)
-        self.search.returnPressed.connect(self.on_search_enter)
+            lambda: self.searchctl.apply_filter(self.search.text(), lazy=True))
+        self._search_typed: str | None = None
+        self.search.textEdited.connect(self.searchctl._on_search_edited)
+        self.search.textChanged.connect(self.searchctl._on_search_text)
+        self.search.returnPressed.connect(self.searchctl.on_search_enter)
         icons.set_icon(self.search.addAction(QIcon(), QLineEdit.ActionPosition.LeadingPosition),
                        "search",
                        "muted")
@@ -1521,7 +1479,7 @@ class MainWindow(QMainWindow):
                                    "hotkey in Settings"))
         icons.set_icon(self.btn_keys, "keyboard", size=18)
         km = DropdownMenu(self.btn_keys)
-        km.aboutToShow.connect(lambda: self._fill_quick_hotkeys(km))
+        km.aboutToShow.connect(lambda: self.hkctl._fill_quick_hotkeys(km))
         self.btn_keys.setMenu(km)
         self.btn_keys.setProperty("toolbarMenu", True)
         km.setTitle(_("Quick hotkeys"))
@@ -1604,17 +1562,18 @@ class MainWindow(QMainWindow):
             self.engine, c, lambda: PAD_COLORS[len(self.cfg.sounds) % len(PAD_COLORS)],
             lambda: {m.fingerprint: m.name for m in self.cfg.sounds if m.fingerprint})
         self.linkbar.sound_ready.connect(self.on_downloaded)
-        self.linkbar.played.connect(self.on_link_played)
-        self.linkbar.board_busy = self._board_song_playing
-        self.linkbar.up_next_changed.connect(lambda *__: self._update_chips(self.engine.playing()))
+        self.linkbar.played.connect(self.searchctl.on_link_played)
+        self.linkbar.board_busy = self.playctl._board_song_playing
+        self.linkbar.up_next_changed.connect(
+            lambda *__: self.playctl._update_chips(self.engine.playing()))
         # a link in the search box shows as a result card (nothing downloads until Play / Add)
         self._link_wait = QTimer(self, singleShot=True, interval=LINK_WAIT_MS)
-        self._link_wait.timeout.connect(self._show_link)
-        self.linkbar.link_changed.connect(self._on_link_changed)
+        self._link_wait.timeout.connect(self.searchctl._show_link)
+        self.linkbar.link_changed.connect(self.searchctl._on_link_changed)
         left.addWidget(self.linkbar)
         self.ytresults = SearchResults()
-        self.ytresults.play.connect(lambda r: self._from_youtube(r, play=True))
-        self.ytresults.add.connect(lambda r: self._from_youtube(r, play=False))
+        self.ytresults.play.connect(lambda r: self.searchctl._from_youtube(r, play=True))
+        self.ytresults.add.connect(lambda r: self.searchctl._from_youtube(r, play=False))
         self.linkbar.done.connect(lambda url, kind, ok: self.ytresults.mark(url, kind, ok))
         self.linkbar.progress.connect(self.ytresults.progress)
         left.addWidget(self.ytresults, 1)
@@ -1645,9 +1604,9 @@ class MainWindow(QMainWindow):
         self._pads_home = (left, left.indexOf(scroll))   # the mini player borrows it
         self.ytresults.closed.connect(scroll.show)   # the results take the pads' place
         self.ytresults.closed.connect(self.catctl._cat_row.show)   # ...and the categories' row
-        self.ytresults.closed.connect(self._results_closed)
+        self.ytresults.closed.connect(self.searchctl._results_closed)
         self.ytresults.fill_site_menu(self._site_menu)
-        self.ytresults.source_changed.connect(self._on_site_picked)
+        self.ytresults.source_changed.connect(self.searchctl._on_site_picked)
         self._pads_scroll = scroll
         # ---- "3 selected · Colour · Volume · Delete": Ctrl / Shift+click picks pads
         self.selection = PadSelection(self, scroll)
@@ -1663,7 +1622,7 @@ class MainWindow(QMainWindow):
         # Ctrl+F anywhere on the page: into the search box
         find = QShortcut(QKeySequence.StandardKey.Find, page)
         find.setContext(Qt.ShortcutContext.WidgetWithChildrenShortcut)
-        find.activated.connect(self.focus_search)
+        find.activated.connect(self.searchctl.focus_search)
 
         # ---- "now playing" chips: every sound playing, so each can be stopped (■) or
         # taken into the player (name) without clicking its pad, which would restart it
@@ -1675,8 +1634,9 @@ class MainWindow(QMainWindow):
         self._chips_hl = Flow(self.playing_row, gap=CHIPS_GAP)
         self._chips: dict[str, QWidget] = {}
         self._chip_ids: tuple = ()
-        self._waiting_chips = None   # (Up next label, its chips, "+n more", how many wait)
-        _Moved(self.playing_row, self._fit_up_next)
+        # (Up next label, its chips, "+n more", how many wait)
+        self._waiting_chips: tuple | None = None
+        _Moved(self.playing_row, self.playctl._fit_up_next)
         self.playing_row.hide()
         left.addWidget(self.playing_row)
 
@@ -1685,17 +1645,17 @@ class MainWindow(QMainWindow):
         self.btn_pp = PlayButton()
         self.btn_pp.setObjectName("transport_play")
         self.btn_pp.setAccessibleName(_("Play / pause"))
-        self.btn_pp.clicked.connect(self.toggle_play_pause)
-        self._pp_icon = None
+        self.btn_pp.clicked.connect(self.playctl.toggle_play_pause)
+        self._pp_icon: str | None = None
         self.btn_st = QPushButton()
         self.btn_st.setObjectName("transport_stop")
         self.btn_st.setAccessibleName(_("Stop"))
-        self.btn_st.clicked.connect(self.stop_current)
+        self.btn_st.clicked.connect(self.playctl.stop_current)
         icons.set_icon(self.btn_st, "stop", size=16)
         self.btn_skip = QPushButton()
         self.btn_skip.setObjectName("transport_stop")   # the same quiet square as ■
         self.btn_skip.setAccessibleName(_("Skip to the next sound in Up next"))
-        self.btn_skip.clicked.connect(self.skip_next)
+        self.btn_skip.clicked.connect(self.playctl.skip_next)
         icons.set_icon(self.btn_skip, "next", size=16)
         for b in (self.btn_pp, self.btn_st, self.btn_skip):
             b.setFixedSize(CONTROL_H, CONTROL_H)
@@ -1710,9 +1670,9 @@ class MainWindow(QMainWindow):
         self.seek = SeekSlider(Qt.Orientation.Horizontal)
         self.seek.setRange(0, 1000)
         self.seek.setObjectName("seek")
-        self.seek.sliderPressed.connect(lambda: setattr(self, "_seeking", True))
-        self.seek.sliderReleased.connect(self.do_seek)
-        self.seek.valueChanged.connect(self._seek_preview)
+        self.seek.sliderPressed.connect(lambda: setattr(self.playctl, "_seeking", True))
+        self.seek.sliderReleased.connect(self.playctl.do_seek)
+        self.seek.valueChanged.connect(self.playctl._seek_preview)
         no_wheel(self.seek)
         self.np_time = QLabel("")   # blank until a sound is picked: "0:00 / 0:00" said nothing
         # room for a long sound's "75:12 / 112:40" in this font (84 px cut it, and
@@ -1744,7 +1704,7 @@ class MainWindow(QMainWindow):
         self.speed_btn = SpeedPitchButton(
             "sounds", _("Changes every sound while it plays. To save a version, "
                         "right-click a pad → Effects."))
-        self.speed_btn.changed.connect(self.on_live_speed)
+        self.speed_btn.changed.connect(self.playctl.on_live_speed)
         self.speed_btn.fx_changed.connect(lambda fx: setattr(self.engine, "sound_fx", fx))
         th.addWidget(self.speed_btn)
         sep = vsep()
@@ -1764,178 +1724,8 @@ class MainWindow(QMainWindow):
         # under the tabs, not in this page: the other tabs show it too while a sound
         # plays, so it can be paused or stopped from anywhere (_show_transport)
         self.transport = f
-        self._set_pp_icon("play")
+        self.playctl._set_pp_icon("play")
         return page
-
-    def _update_chips(self, playing):
-        """The row above the pads: every sound playing, each with its own ■, and the
-        queue, each with its own ✕. A web search / link's Play once counts too: it
-        isn't a pad, but it plays over them and needs its own ■. One rule, whatever
-        played before: a sound has a chip while it plays. (The row used to show only
-        for two or more, so stopping one of two hid the other's chip too and it looked
-        like ■ had stopped both.)"""
-        ids = tuple(s for s in self.pads if s in playing)
-        if LINK_ID in playing:
-            ids += (LINK_ID,)
-        queue = tuple(self._queue)
-        links = tuple(self.linkbar.up_next())   # web search / link Plays waiting their turn
-        if (ids, queue, links) != self._chip_ids:
-            self._chip_ids = (ids, queue, links)
-            while self._chips_hl.count():
-                item = self._chips_hl.takeAt(0)
-                w = item.widget() if item else None
-                if w:
-                    w.deleteLater()
-            self._chips = {}
-            # Now playing first, then Up next: one line, read the way the app reads
-            # (the Flow mirrors it in Arabic)
-            if ids:
-                lbl = QLabel(_("Now playing"))
-                lbl.setObjectName("muted")
-                self._chips_hl.addWidget(lbl)
-                for sid in ids:
-                    m = self.meta(sid)
-                    chip = QFrame()
-                    chip.setObjectName("chip")
-                    ch = QHBoxLayout(chip)
-                    ch.setContentsMargins(4, 2, 2, 2)
-                    ch.setSpacing(2)
-                    name = QPushButton(chip.fontMetrics().elidedText(   # && : "R&B" not "RB"
-                        m.name if m else sid, Qt.TextElideMode.ElideRight, 150).replace("&", "&&"))
-                    name.setObjectName("chipname")
-                    name.setToolTip(_("Show this sound in the player (keeps playing)"))
-                    name.clicked.connect(lambda __=False, s=sid: self.select(s))
-                    stop = QPushButton()
-                    stop.setObjectName("chipstop")
-                    stop.setAccessibleName(_("Stop this sound"))
-                    icons.set_icon(stop, "stop", "danger_text", size=12)
-                    stop.setFixedSize(24, 24)
-                    stop.clicked.connect(lambda __=False, s=sid: self._stop_one(s))
-                    ch.addWidget(name)
-                    ch.addWidget(stop)
-                    self._chips_hl.addWidget(chip)
-                    self._chips[sid] = chip
-            self._waiting_chips = None
-            if queue or links:
-                lbl = QLabel(_("Up next"))
-                lbl.setObjectName("muted")
-                self._chips_hl.addWidget(lbl)
-                # web search / link songs, then the board's queued sounds
-                waiting: list[tuple] = [(title,
-                            lambda __=False, i=i, q=links: self.linkbar.play_next(i, q),
-                            lambda __=False, i=i, q=links: self.linkbar.drop_up_next(i, q))
-                           for i, title in enumerate(links)]
-                for i, sid in enumerate(queue):
-                    m = self.meta(sid)
-                    waiting.append((m.name if m else sid,
-                                    lambda __=False, s=sid: self.select(s),
-                                    lambda __=False, i=i, q=queue: self._unqueue(i, q)))
-                chips = []
-                for text, on_click, on_x in waiting[:QUEUE_CHIPS]:
-                    chips.append(self._chip(text, _("Waits for the sounds playing to finish"),
-                                            on_click, _("Take it out of the queue"), on_x))
-                    self._chips_hl.addWidget(chips[-1])
-                more = QLabel()
-                more.setObjectName("muted")
-                self._chips_hl.addWidget(more)
-                self._waiting_chips = (lbl, chips, more, len(waiting))
-            self._fit_up_next()
-            # at least a line high, taller when the chips wrap (the Flow's height for
-            # its width); a row that shrank and grew back with every overlapping
-            # sound resized and repainted the whole board under it
-            self.playing_row.setMinimumHeight(CHIPS_ROW_H)
-            self.playing_row.setVisible(bool(ids) or bool(queue) or bool(links))
-        for sid, chip in self._chips.items():
-            sel = "true" if sid == self.current else "false"
-            if chip.property("sel") != sel:
-                chip.setProperty("sel", sel)
-                chip.style().unpolish(chip)
-                chip.style().polish(chip)
-
-    def _fit_up_next(self):
-        """Up next shares the Now playing line and never starts a line of its own: the
-        playing chips always show (every playing sound keeps its ■), then as many Up
-        next chips as fit beside them, then "+n more". If not one fits (a narrow
-        window), Up next isn't shown at all."""
-        if not self._waiting_chips:
-            return
-        lbl, chips, more, total = self._waiting_chips
-        if not all(qt_valid(w) for w in (lbl, more, *chips)):
-            return
-        gap = CHIPS_GAP
-        room = self.playing_row.width()
-        for i in range(self._chips_hl.count()):   # the Now playing label and chips
-            item = self._chips_hl.itemAt(i)
-            w = item.widget() if item is not None else None
-            if w is None:
-                continue
-            if w is lbl:
-                break
-            room -= w.sizeHint().width() + gap
-        room -= lbl.sizeHint().width() + gap
-        fm = more.fontMetrics()
-        shown = 0
-        for i, c in enumerate(chips):
-            left = total - i - 1
-            need = c.sizeHint().width() + gap
-            tail = fm.horizontalAdvance(_("+{value} more", value=left)) + gap if left else 0
-            if need + tail > room:
-                break
-            room -= need
-            shown += 1
-        lbl.setVisible(shown > 0)
-        for i, c in enumerate(chips):
-            c.setVisible(i < shown)
-        more.setText(_("+{value} more", value=total - shown))
-        more.setVisible(0 < shown < total)
-
-    def _chip(self, text: str, tip: str, on_click, x_tip: str, on_x) -> QFrame:
-        """A queued sound's chip: its name, and a ✕."""
-        chip = QFrame()
-        chip.setObjectName("chip")
-        ch = QHBoxLayout(chip)
-        ch.setContentsMargins(4, 2, 2, 2)
-        ch.setSpacing(2)
-        name = QPushButton(chip.fontMetrics().elidedText(text, Qt.TextElideMode.ElideRight, 150)
-                           .replace("&", "&&"))   # "R&B", not "RB" with a shortcut
-        name.setObjectName("chipname")
-        name.setToolTip(tip)
-        name.clicked.connect(on_click)
-        x = QPushButton()
-        x.setObjectName("chipstop")
-        x.setToolTip(x_tip)
-        icons.close_button(x, 24)
-        x.clicked.connect(on_x)
-        ch.addWidget(name)
-        ch.addWidget(x)
-        return chip
-
-    def _unqueue(self, i: int, shown: tuple[str, ...] | None = None):
-        """The ✕ on the queue's chip `i`, of the queue as its row `shown` it. A row
-        that's out of date does nothing: the chips are remade on the next tick, so a
-        double click (or a bouncy mouse) hit the same ✕ twice, and the second took out
-        the sound that had moved into that place. The row is remade at once."""
-        if shown is not None and tuple(self._queue) != shown:
-            return
-        if 0 <= i < len(self._queue):
-            del self._queue[i]
-            self._say_queue()
-            self._update_chips(self.engine.playing())
-
-    def drop_pending(self, sid: str):
-        """`sid` won't start later after all: off the queue, and not when its wait
-        before playing is over (what pressed it is gone, e.g. a deleted trigger)."""
-        self._cancel_waiting(sid)
-        if sid in self._queue:
-            self._queue = [s for s in self._queue if s != sid]
-            self._say_queue()
-
-    def _set_pp_icon(self, name: str):
-        if name != self._pp_icon:
-            self._pp_icon = name
-            for b in (self.btn_pp, getattr(self, "mini_pp", None)):
-                if b is not None:
-                    icons.set_icon(b, name, "on_accent", size=16)
 
     def _build_setup_page(self) -> WidthScroll:
         """One-time setup and the rarely-touched stuff: where the audio goes,
@@ -1970,7 +1760,7 @@ class MainWindow(QMainWindow):
         # straight into the mic: what to do if a voice app chops the sounds up sits
         # behind an ⓘ (DESIGN section 4), not as a paragraph under "Nothing to set"
         self.btn_mictips = info_button(_("Sounds chopped up?"))
-        self.btn_mictips.clicked.connect(self._show_mic_tips)
+        self.btn_mictips.clicked.connect(self.tipctl._show_mic_tips)
         self.btn_mictips.hide()
         # the heading: a mic, the title, its ⓘ, then the status pill at the end, all on
         # the title's cap height (DESIGN section 4, *Card headings*)
@@ -2415,246 +2205,6 @@ class MainWindow(QMainWindow):
             setattr(self.engine, attr, v)
         self._save_later()
 
-    def _voice_tick(self):
-        """The timer's _poll_voice: every VOICE_POLL_MS while the window is on screen
-        (the hint shows) or *Pick the mode by itself* is ticked (it switches), else only
-        every VOICE_POLL_IDLE_S: snapshotting the programs and recording sessions is
-        wasted work while nobody sees the answer."""
-        d = self.cfg.dest if isinstance(self.cfg.dest, dict) else {}
-        now = time.monotonic()
-        if (not self._ui_live and not d.get("auto")
-                and not profiles.auto_picks(profiles.current(d))
-                and not appsetup.settings(self.cfg)["apps"]   # a remembered app switches
-                and now - self._voice_at < VOICE_POLL_IDLE_S):
-            return
-        self._voice_at = now
-        self._poll_voice()
-
-    def _heard_device(self):
-        """The recording device(s) whose listeners are the voice chat: the cable's far
-        end, or with straight into my mic, the mic itself (Discord and games record it)
-        and, if there's a cable, its far end too (a voice app still set to the cable)."""
-        if self.cfg.route == "mic":
-            if self.engine.direct_stream() is None:
-                return None
-            cables = [eng.virtual_mic_for(o) for o in eng.virtual_outputs()]
-            return tuple(dict.fromkeys(d for d in (self.cfg.mic_device, *cables) if d))
-        return eng.virtual_mic_for(self.routectl._main_name())
-
-    def _poll_voice(self):
-        """Which Who's listening mode suits: the program recording the cable's far end
-        (voicesdk.Listeners), else the voice engine of the game in front. The simple
-        modes (soundboard.profiles) pick within their family from all of it; in
-        Advanced, *Pick the mode by itself* switches to the one suggested."""
-        key = self.voice_watch.poll() if self.voice_watch is not None else None
-        why = i18n.keep_english(lambda: _("The game you have open uses {engine} for voice chat",
-                                          engine=voicesdk.NAMES.get(key, key))) if key else ""
-        heard = ()
-        if self.listeners is not None:
-            heard = self.listeners.poll(self._heard_device())
-        # for the simple modes, in order: voice chat apps on the cable, the game in
-        # front, games on the cable (a per-program list would go first)
-        apps = set(voicesdk.VOICE_APPS.values())
-        def listening(name: str) -> str:
-            return i18n.keep_english(lambda: _("{name} is listening to your mic", name=name)
-                                     if self.cfg.route == "mic" else
-                                     _("{name} is listening to the virtual cable", name=name))
-        hints = [profiles.Hint(h[0], listening(h[1]),
-                               profiles.VOICE.key) for h in heard if h in apps]
-        if key:
-            hints.append(profiles.Hint(key, why, profiles.GAME.key))
-        hints += [profiles.Hint(h[0], listening(h[1]),
-                                profiles.GAME.key) for h in heard if h not in apps]
-        if heard:   # the game in front, if it's one of them; else the first
-            key, name = next((h for h in heard if h[0] == key), heard[0])
-            why = listening(name)
-        if (key != self.voice_suggestion or why != self.voice_why
-                or hints != self.voice_hints):
-            self.voice_suggestion, self.voice_why, self.voice_hints = key, why, hints
-            self._auto_dest()
-            self.voice_engine.emit(key)
-        self._app_setup(self._apps_seen())
-
-    def _apps_seen(self) -> list[appsetup.Seen]:
-        """The apps using your sounds now, ranked as _poll_voice ranks its hints: voice
-        chat apps listening, the game in front, games listening."""
-        heard = getattr(self.listeners, "apps", ())   # (a stand-in may not have them)
-        voice = [appsetup.Seen(exe, name, profiles.VOICE.key) for exe, _k, name in heard
-                 if exe in voicesdk.VOICE_APPS]
-        games = [appsetup.Seen(exe, name, profiles.GAME.key) for exe, _k, name in heard
-                 if exe not in voicesdk.VOICE_APPS]
-        w = self.voice_watch
-        path = getattr(w, "path", "")
-        if path and getattr(w, "suggestion", None):
-            base = os.path.basename(path)
-            games.insert(0, appsetup.Seen(base.lower(), os.path.splitext(base)[0],
-                                          profiles.GAME.key))
-        out: dict[str, appsetup.Seen] = {}
-        for app in voice + games:
-            out.setdefault(app.exe, app)
-        return list(out.values())
-
-    def _app_setup(self, seen, now: float | None = None):
-        """An app that just started using your sounds: switch to its remembered mode,
-        or offer to set up for it (appsetup.decide). Nothing before the setup guide is
-        done: that one picks the mode."""
-        now = time.monotonic() if now is None else now
-        new = self._setup_tracker.update(seen, now)
-        app = self._setup_app
-        if (self._setup_state == "offer" and app is not None
-                and not self._setup_tracker.here(app.exe, now)):
-            self._hide_setup()   # it closed: nothing to set up any more
-        if not new or not self.cfg.setup_done:
-            return
-        d = self.cfg.dest if isinstance(self.cfg.dest, dict) else {}
-        act = appsetup.decide(self.cfg, new, profiles.current(d).key, self._setup_skipped)
-        if act is None:
-            return
-        what, app = act
-        if what == "switch":
-            from soundboard.ui.destpanel import set_simple
-            self._setup_undo = copy.deepcopy(d)
-            set_simple(self, app.simple)
-            log.info("app setup: %s -> %s mode (remembered)", app.exe, app.simple)
-            self._hide_setup()   # (what it said was about before the switch)
-            self.toast(_("{mode} mode for <b>{name}</b>.", mode=profiles.BY_KEY[app.simple].name,
-                         name=html.escape(app.name)), "ok", SETUP_SWITCHED_MS,
-                       key="app-switch", action=(_("Undo"), self._undo_app_switch),
-                       on_close=self._forget_app_switch)
-            return
-        self._show_setup("offer", app)
-
-    def _undo_app_switch(self):
-        """Undo on "Game mode for X": the mode goes back to how it was."""
-        if self._setup_undo is not None:
-            from soundboard.ui.destpanel import _refresh_views
-            self.cfg.dest = self._setup_undo
-            self._setup_undo = None
-            self.mode_why = ""
-            destination.apply(self.cfg, self.engine)
-            self._save_later()
-            _refresh_views(self)
-
-    def _forget_app_switch(self):
-        self._setup_undo = None
-
-    def _show_setup(self, state: str, app: appsetup.Seen):
-        if state == "offer" and not self.urgent_bar.isHidden():
-            # The urgent bar (a Discord warning, a fix...) is already saying its piece:
-            # never two bars at once. The offer waits; the warning wins (_show_urgent).
-            self._setup_app, self._setup_state = None, ""
-            return
-        self._setup_app, self._setup_state = app, state
-        self._setup_hide.stop()
-        name = html.escape(app.name)
-        self.setup_x.setAccessibleName(_("Hide"))
-        self.setup_no.setVisible(state == "offer")
-        if state == "offer":
-            self.setup_lbl.setText(_("Looks like you're using <b>{name}</b>. Set up for it?",
-                                     name=name))
-            self.setup_yes.setText(_("Set up"))
-            self.setup_x.setToolTip(_("Don't ask about {name} again", name=app.name))
-            self.setup_x.setAccessibleName(self.setup_x.toolTip())
-        else:
-            lines, button = self._setup_checks(app)
-            self.setup_lbl.setText("<br>".join(lines))
-            self.setup_yes.setText(button)
-            if not button:
-                self._setup_hide.start(SETUP_DONE_MS)
-        self.setup_yes.setVisible(bool(self.setup_yes.text()))
-        self.setup_bar.show()
-
-    def _setup_checks(self, app: appsetup.Seen) -> tuple[list[str], str]:
-        """The "done" card: what was set, what the app's own settings say, and the
-        button for what's left ("" for none). Discord's problems already have the
-        urgent bar, so they aren't said twice here."""
-        ok = "<span style='color:#3fb950'>✓</span>"
-        warn = "<span style='color:#d29922'>⚠</span>"
-        mode = profiles.BY_KEY[app.simple].name
-        lines = [_("{ok} {mode} mode on for <b>{name}</b>. Next time it switches by itself.",
-                   ok=ok, mode=mode, name=html.escape(app.name))]
-        guide = app.guide
-        if guide == "discord":
-            if self.alertctl.discord_problems():
-                return lines, ""   # the urgent bar above says which, with Fix Discord
-            if self.alertctl.discord_found:
-                lines.append(_("{ok} Discord's voice settings let your sounds through.",
-                               ok=ok))
-                return lines, ""
-            return lines, _("Check Discord")
-        if guide == "meeting":
-            lines.append(_("{warn} Its noise removal can wipe out music: set it to keep "
-                           "the original sound.", warn=warn))
-            return lines, _("Show me how")
-        return lines, ""
-
-    def _setup_yes_clicked(self):
-        app, state = self._setup_app, self._setup_state
-        if app is None:
-            return
-        if state == "offer":
-            from soundboard.ui.destpanel import set_simple
-            appsetup.remember(self.cfg, app.exe, app.simple)
-            set_simple(self, app.simple)
-            log.info("app setup: %s -> %s mode (set up)", app.exe, app.simple)
-            self._show_setup("done", app)
-            self.app_setup_changed.emit()
-        elif app.guide:
-            self.statusctl.show_chat_guide(app.guide)
-            if self._setup_state == "done":
-                self._show_setup("done", app)   # the ticks, as they are now
-
-    def _setup_not_now(self):
-        if self._setup_app is not None:
-            self._setup_skipped.add(self._setup_app.exe)
-        self._hide_setup()
-
-    def _setup_x_clicked(self):
-        if self._setup_state == "offer" and self._setup_app is not None:
-            appsetup.never(self.cfg, self._setup_app.exe)
-            self._save_later()
-            self.app_setup_changed.emit()
-            self.toast(_("Won't ask about {name} again. Settings → General can change that.",
-                         name=html.escape(self._setup_app.name)))
-        self._hide_setup()
-
-    def _hide_setup(self):
-        self._setup_hide.stop()
-        self._setup_state = ""
-        self.setup_bar.hide()
-
-    def _auto_dest(self):
-        """Game and Voice chat: the shaping that suits what's seen, as soon as it's
-        seen. Advanced with *Pick the mode by itself*: the suggested mode. Nothing seen
-        keeps the mode it has."""
-        d = self.cfg.dest if isinstance(self.cfg.dest, dict) else {}
-        self.cfg.dest = d
-        p = profiles.current(d)
-        if profiles.auto_picks(p):
-            was = destination.resolve(d).key
-            key, self.mode_why = profiles.choose(p, self.voice_hints, was)
-            if key == was:
-                return
-            d["simple"], d["mode"] = p.key, key
-            mode = destination.apply(self.cfg, self.engine)
-            self._save_later()
-            log.info("who's listening: %s mode switched to %s (%s)", p.key, key,
-                     self.mode_why)
-            self.toast(_("{mode} mode: shaping for {target}. {mode_why}.",
-                         mode=p.name, target=mode.name, mode_why=self.mode_why))
-            return
-        key = self.voice_suggestion
-        if not d.get("auto") or key not in destination.BUILTIN_BY_KEY:
-            return
-        if destination.resolve(d).key == key:
-            return
-        d["mode"] = key
-        mode = destination.apply(self.cfg, self.engine)
-        self._save_later()
-        log.info("who's listening: switched to %s (%s)", key, self.voice_why)
-        self.toast(_("Who's listening: {label}. {voice_why}.",
-                     label=mode.name, voice_why=self.voice_why))
-
     def _save_later(self):
         self._save_timer.start(100)   # short: a crash loses at most this much
 
@@ -2984,235 +2534,13 @@ class MainWindow(QMainWindow):
         self._save_later()
 
     # ------------------------------------------------------------------ hotkeys
-    def _fit_overlay_key(self):
-        """The default overlay key is the one left of 1 on a US keyboard, where it types
-        a rarely used `. On most other layouts that key types a letter or everyday
-        punctuation (ö, ñ, ù, UK '@), which a bare global hotkey would take away from
-        typing everywhere: there it becomes Alt + that key. Checked once, so a key the
-        user picks later is left alone."""
-        if self.cfg.overlay_key_checked:
-            return
-        self.cfg.overlay_key_checked = True
-        if self.cfg.overlay_hotkey == "`" and winkeys.key_char(winkeys.VK["`"]) not in ("`", ""):
-            self.cfg.overlay_hotkey = "alt+`"
-            log.info("overlay hotkey moved to Alt+` for this keyboard layout")
-        self._save_later()
-
-    def register_hotkeys(self):
-        mapping = {}
-        if self._hotkeys_off and not self.cfg.hotkeys_off_hotkey:
-            # the key that turns them back on was cleared or given to something else:
-            # nothing could turn them on again until a restart, so they're on now
-            self._hotkeys_off = False
-            self.toast(_("Hotkeys are on again."), "ok", key="hotkeys")
-        if self._hotkeys_off:   # only the key that turns them back on
-            mapping[self.cfg.hotkeys_off_hotkey] = "__hotkeys__"
-            self.hotkeys.register(mapping)
-            self.replay.set_enabled(bool(self.cfg.replay_hotkey), self.cfg.replay_seconds)
-            return
-        for attr, action, _label, _desc in HOTKEY_ACTIONS:
-            combo = getattr(self.cfg, attr)
-            if combo:
-                mapping.setdefault(combo, action)
-        for m in self.cfg.sounds:
-            if m.hotkey and self._hotkey_live(m):
-                mapping.setdefault(m.hotkey, m.id)
-        for cat, combo in self.cfg.category_hotkeys.items():
-            if combo and cat in self.cfg.categories:
-                mapping.setdefault(combo, RANDOM + cat)
-        mapping.update(self.overlay.layer())   # its keys, only while it's open
-        # the game's push-to-talk key is pressed by us (auto-PTT) and by the player: as a
-        # hotkey of ours, Windows would hand those presses to us instead of the game
-        mapping.pop(self.cfg.ptt_key, None)
-        self.hotkeys.register(mapping)
-        # instant replay listens only while its hotkey is set
-        self.replay.set_enabled(bool(self.cfg.replay_hotkey), self.cfg.replay_seconds)
-
-    def _hotkey_live(self, m: SoundMeta) -> bool:
-        """Does m's hotkey work right now? Always, unless hotkeys follow the category
-        (scoped_hotkeys): then only while a category it's in is showing (All shows
-        every sound; one in no category always keeps its key)."""
-        cat = self.cfg.category
-        return not self.cfg.scoped_hotkeys or not cat or not m.tags or cat in m.tags
-
-    def set_scoped_hotkeys(self, on: bool):
-        """Settings -> Hotkeys: a set of sound hotkeys per category."""
-        self.cfg.scoped_hotkeys = on
-        if not on:   # one key, one sound again: the first sound (in board order) keeps it
-            seen = set(self._global_combos())
-            for m in self.cfg.sounds:
-                if m.hotkey and m.hotkey in seen:
-                    m.hotkey = ""
-                    if m.id in self.pads:
-                        self.pads[m.id].update()
-                elif m.hotkey:
-                    seen.add(m.hotkey)
-        self._save_now()
-        self.register_hotkeys()
-
-    def _global_combos(self) -> list[str]:
-        """Combos the app-wide actions, the push-to-talk key and category keys hold."""
-        return ([getattr(self.cfg, a) for a, *__ in HOTKEY_ACTIONS if getattr(self.cfg, a)]
-                + [c for c in (self.cfg.ptt_key, *self.cfg.category_hotkeys.values()) if c])
-
     def set_single_click(self, on: bool):
         """Settings -> General: one click on a pad plays it."""
         self.set_option("single_click", on)
         Pad.single_click = on
 
-    def on_hotkey_released(self, action: str):
-        """A hotkey or MIDI pad was let go: a hold-to-play sound stops, and an overlay
-        in hold mode opened by a MIDI pad closes (a key's release it watches itself)."""
-        m = self._meta.get(action)
-        if action == "__voicehold__":
-            if self._voice_was is not None:
-                self._set_voice(self._voice_was)
-                self._voice_was = None
-        elif m is not None and m.hold:
-            self._cancel_waiting(action)
-            self.engine.stop(action)
-        elif (action == "__overlay__" and self.overlay.s.mode == "hold"
-              and midi.is_midi(self.cfg.overlay_hotkey) and self.overlay.is_open):
-            self.overlay.close()
-
-    def on_midi_busy(self, busy: list[str]):
-        if busy:
-            self.say(_("<span style='color:{status}'>{devices} is open in another "
-                       "program (a music app?), so its pads don't work here until "
-                       "that program lets go of it.</span>",
-                       status=theme.status('warn'),
-                       devices=html.escape(", ".join(busy))), "warn")
-
-    def on_replay_state(self):
-        if self.replay.enabled and self.replay.error:
-            self.say(_("<span style='color:{status}'>Instant replay can't listen: "
-                       "{error}</span>", status=theme.status('warn'),
-                       error=html.escape(self.replay.error)), "warn")
-
-    def save_replay(self):
-        """The instant-replay hotkey: the last seconds of what you heard become a pad."""
-        data = self.replay.clip()
-        if len(data) < int(0.2 * SR):
-            self.cue("fail")
-            why = self.replay.error or ngettext(
-                "nothing has played on this PC in the last {n} second",
-                "nothing has played on this PC in the last {n} seconds", self.replay.seconds)
-            self.say(_("<span style='color:{status}'>Nothing to save: {why}.</span>",
-                       status=theme.status('warn'), why=html.escape(why)), "warn")
-            return
-        self.on_clip(data, _("Replay {time}", time=time.strftime("%H.%M.%S")))
-        self.cue("saved")
-
-    def on_hotkeys_failed(self, failed: list[str]):
-        if not failed:
-            return
-        log.warning("hotkeys that couldn't be claimed: %s", failed)
-        self.say(_("<span style='color:{status}'>Another program is already "
-                   "using {keys}, pick a different hotkey.</span>",
-                   status=theme.status('warn'),
-                   keys=html.escape(", ".join(pretty_key(c) for c in failed))), "warn")
-
-    def set_global_hotkey(self, attr: str, combo: str):
-        """Set one of the app-wide hotkeys (or ptt_key). A combo can only do one thing,
-        so it's taken off any other action or sound that had it, and a toast says what
-        lost it: a key quietly going off a pad was a surprise the next time it was
-        pressed in a game."""
-        lost = []
-        if combo:
-            for other, _action, label, _desc in HOTKEY_ACTIONS:
-                if other != attr and getattr(self.cfg, other) == combo:
-                    setattr(self.cfg, other, "")
-                    lost.append(label)
-            for m in self.cfg.sounds:
-                if m.hotkey == combo:
-                    m.hotkey = ""
-                    lost.append(f"“{m.name}”")
-                    if m.id in self.pads:
-                        self.pads[m.id].update()
-            lost += [_("a random sound from “{name}”", name=c)
-                     for c, k in self.cfg.category_hotkeys.items() if k == combo]
-            self._clear_category_hotkey(combo)
-            if attr != "ptt_key" and self.cfg.ptt_key == combo:
-                self.cfg.ptt_key = ""
-                lost.append(_("auto push-to-talk"))
-        if attr == "replay_hotkey" and combo and not self.cfg.replay_hotkey:
-            self.toast(REPLAY_NOTE)   # instant replay just went on
-        setattr(self.cfg, attr, combo)
-        self._save_now()
-        self.register_hotkeys()
-        if lost:
-            what = (_("auto push-to-talk") if attr == "ptt_key"
-                    else next((label for a, _ac, label, _d in HOTKEY_ACTIONS if a == attr), attr))
-            self.toast(_("{hotkey} is {what} now, it was the key for {lost}",
-                         hotkey=html.escape(pretty_key(combo)), what=html.escape(what),
-                         lost=html.escape(_(" and ").join(lost))), "warn")
-
     QUICK_HOTKEYS = ("stop_hotkey", "pause_hotkey", "skip_hotkey", "random_hotkey",
                      "last_hotkey", "mic_hotkey", "hotkeys_off_hotkey", "overlay_hotkey")
-
-    def _fill_quick_hotkeys(self, menu: QMenu):
-        """The Sounds tab's keyboard button: the common hotkeys with their keys (click
-        one to set it), then a way into Settings → Hotkeys for the rest."""
-        menu.clear()
-        labels = {attr: label for attr, _a, label, _d in HOTKEY_ACTIONS}
-        labels["ptt_key"] = _("Auto push-to-talk key")
-        for attr in (*self.QUICK_HOTKEYS, "ptt_key"):
-            combo = getattr(self.cfg, attr)
-            key = pretty_key(combo) or (_("Off") if attr == "ptt_key" else _("not set"))
-            icons.set_icon(menu.addAction(f"{labels[attr]}	{key}",
-                                          lambda a=attr: self._quick_set_hotkey(a)), "keyboard")
-        menu.addSeparator()
-        icons.set_icon(menu.addAction(_("All hotkeys"),
-                                      lambda: self.setctl.open_settings("hotkeys")),
-                       "settings")
-
-    def _quick_set_hotkey(self, attr: str):
-        d = HotkeyDialog(self.hotkeys, self, pads=attr != "ptt_key")
-        if d.exec() and d.result_combo:
-            self.set_global_hotkey(attr, d.result_combo)
-        else:
-            self.register_hotkeys()   # the capture paused them
-        free_dialog(d)
-
-    def _tab_info_at(self, i: int) -> tuple[str, str] | None:
-        page = self.tabs.widget(i)
-        return next((v for k, v in self.tab_info.items() if getattr(self, k, None) is page),
-                    None)
-
-    def _show_tab_info(self, i: int):
-        """A tab's right-click "About this tab": its explanation, next to the tab."""
-        info = self._tab_info_at(i)
-        if info:
-            button = next((b for b in self.rail.buttons if b.index == i), self.tabs)
-            self._show_help(TabHelpPopup(*info, owl=self.tabs.widget(i) is self.triggers,
-                                         parent=self), button)
-
-    def _show_mic_tips(self):
-        """Your mic's ⓘ: the voice app settings that stop it chopping your sounds up."""
-        box = TabHelpPopup(
-            _("Sounds chopped up?"),
-            _("If sounds get chopped up, switch off the voice app's noise suppression "
-              "(Discord: <b>Input Profile → Custom</b>, <b>Noise Suppression → None</b>, "
-              "<b>Echo Cancellation</b> off. Not Studio: it skips Onion Board)."),
-            parent=self)
-        box.body.setTextFormat(Qt.TextFormat.RichText)   # (the setting names in bold)
-        self._show_help(box, self.btn_mictips)
-
-    def _show_help(self, box: QDialog, beside: QWidget):
-        """Open a help card to the right of `beside` (a rail button), inside the
-        window: never off its left edge."""
-        lay = box.layout()
-        assert lay is not None   # the popup's own
-        lay.activate()   # wrapped text: as tall as the words need
-        box.resize(box.width(), box.heightForWidth(box.width()) if box.hasHeightForWidth()
-                   else box.sizeHint().height())
-        top_left = beside.mapToGlobal(QPoint(beside.width() + 8, 0))
-        area = self.geometry() & beside.screen().availableGeometry()
-        x = max(area.left(), min(top_left.x(), area.right() - box.width() + 1))
-        y = max(area.top(), min(top_left.y(), area.bottom() - box.height() + 1))
-        box.move(x, y)
-        box.exec()
-        box.deleteLater()
 
     # ------------------------------------------------------------------ FFmpeg
     # (ui/ffmpegcontrol.py: the check, getting it, and its bar)
@@ -3228,104 +2556,7 @@ class MainWindow(QMainWindow):
         self.ffctl.fix_clicked(btn, force)
 
     # ------------------------------------------------------------------ language
-    def _offer_language(self):
-        """Windows speaks a language the board has, and no language was ever picked:
-        a bar, in that language, offering to switch (until switched or dismissed)."""
-        code = i18n.offer()
-        if not code or self.cfg.language or LANG_OFFER_SEEN in self.cfg.tips_seen:
-            return
-        name = i18n.name_of(code)
-        self._lang_offered = code
-        text, button, hide = i18n.in_language(code, lambda: (
-            # the way there in the catalog's own words for the gear, the page and the box
-            _("Onion Board is also in {name}. You can change it any time in {where}.",
-              name=name, where=" → ".join((_("Settings"), _("Appearance"), _("Language")))),
-            _("Switch to {name}", name=name), _("No thanks")))
-        # a right-to-left line that starts with "Onion Board" still reads right to left
-        self.lang_lbl.setText("‏" + text if i18n.is_rtl(code) else text)
-        self.lang_btn.setText(button)
-        self.lang_hide.setAccessibleName(hide)
-        self.lang_hide.setToolTip(hide)
-        for w in (self.lang_lbl, self.lang_btn):   # its own direction (Arabic offered
-            w.setLayoutDirection(Qt.LayoutDirection.RightToLeft if i18n.is_rtl(code)
-                                 else Qt.LayoutDirection.LeftToRight)
-        self.lang_bar.show()
-
-    def _no_language(self):
-        self.lang_bar.hide()
-        if LANG_OFFER_SEEN not in self.cfg.tips_seen:
-            self.cfg.tips_seen.append(LANG_OFFER_SEEN)
-        self._save_later()
-
-    def switch_language(self, code: str, restart: bool = True):
-        """Show the app in language `code` from the next start (now, with `restart`:
-        text already on screen can't change language)."""
-        if not code:
-            return
-        self.cfg.language = code
-        self.lang_bar.hide()
-        self._save_later()
-        log.info("language picked: %s", code)
-        if restart and code != i18n.current():
-            self.restart_app()
-
     # ------------------------------------------------------------------ tips
-    def _start_tips(self):
-        if not self._maybe_tip():
-            self._tip_timer.start()
-
-    def _game_up(self) -> bool:
-        return self.overlay.is_open or tips.fullscreen_in_front()
-
-    def _maybe_tip(self) -> bool:
-        """Show today's tip if it's time. True when there's nothing more to try this
-        start (one shown, or none due)."""
-        tip = tips.due(self.cfg, self.tabctl.tab_on)
-        if tip is None:
-            self._tip_timer.stop()
-            return True
-        if not self.isVisible() or self.isMinimized() or self._game_up():
-            return False
-        self.show_tip(tip)
-        self._tip_timer.stop()
-        return True
-
-    def show_tip(self, tip: tips.Tip):
-        self.tip = tip
-        self.tip_lbl.setText(_("💡 Did you know? {text}", text=tip.text))
-        self.tip_bar.show()
-        if tip.key not in self.cfg.tips_seen:
-            self.cfg.tips_seen.append(tip.key)
-        self.cfg.tip_day = tips.today()
-        self._save_later()
-
-    def _tip_show_me(self):
-        tip, self.tip = self.tip, None
-        self.tip_bar.hide()
-        if tip is None:
-            return
-        kind, __, where = tip.show.partition(":")
-        if kind == "tab":
-            self.tabs.setCurrentIndex(TAB_INDEX[where])
-        elif kind == "settings":
-            self.setctl.open_settings(where)
-        elif kind == "search":
-            self.tabs.setCurrentWidget(self.sounds_page)
-            self.search.setFocus()
-        elif kind == "record" and hasattr(self, "record_dialog"):
-            self.tabs.setCurrentWidget(self.sounds_page)
-            self.record_dialog()
-        elif kind == "deleted":
-            self.rmctl.show_deleted()
-        else:
-            self.tabs.setCurrentWidget(self.sounds_page)
-
-    def set_tips_on(self, on: bool):
-        self.cfg.tips_on = bool(on)
-        if not on:
-            self.tip_bar.hide()
-        self._save_later()
-
     def _body_top(self) -> int:
         """The body's top margin: none under Settings, whose heading rises level with
         the rail's name and keeps its pages where a tab's start (SettingsDialog)."""
@@ -3344,130 +2575,7 @@ class MainWindow(QMainWindow):
                            "update_checked", "whats_new_seen", "load_note", "speech",
                            "app_setup")
 
-    def on_hotkey(self, action):
-        if action == "__hotkeys__":
-            self.toggle_hotkeys()
-            return
-        if self._hotkeys_off:   # one already on its way when they were turned off
-            return
-        if self.overlay.handle(action):
-            return
-        if action == "__stop__":
-            self.stop_all()
-        elif action == "__last__":
-            self.play_last()
-        elif action in ("__nextcat__", "__prevcat__"):
-            self.step_category(1 if action == "__nextcat__" else -1)
-        elif action in ("__volup__", "__voldown__"):
-            self.step_sound_volume(1 if action == "__volup__" else -1)
-        elif action == "__mic__":
-            self.chk_mic.setChecked(not self.chk_mic.isChecked())   # -> on_mic_toggle
-            self.cue("start" if self.cfg.mic_enabled else "stop")
-        elif action == "__voice__":
-            on = not self.voice.fx.btn_power.isChecked()
-            self._voice_was = None
-            self._set_voice(on)
-            # the Voice tab switched off: nothing went on, so no "on" beep either
-            self.cue("fail" if not self.tabctl.tab_on("voice") else "start" if on else "stop")
-        elif action == "__voicehold__":
-            if self._voice_was is None and self.tabctl.tab_on("voice"):
-                self._voice_was = self.voice.fx.btn_power.isChecked()
-            self._set_voice(True)
-        elif action == "__replay__":
-            self.save_replay()
-        elif action == "__pause__":
-            self._pause_clicked()
-        elif action == "__skip__":
-            self.skip_next()
-        elif action == "__random__":
-            self.play_random()
-        elif action.startswith(RANDOM):
-            self.play_random(action[len(RANDOM):])
-        else:
-            self.play(action)
-
-    def _set_voice(self, on: bool):
-        """The voice changer's big ON / OFF switch, from a hotkey."""
-        if not self.tabctl.tab_on("voice"):
-            if on:
-                self.toast(_("The Voice tab is switched off (Settings > Tabs)."), "warn")
-            return
-        if self.voice.fx.btn_power.isChecked() != on:
-            self.voice.fx.btn_power.setChecked(on)   # its toggled handler applies it
-
-    def toggle_hotkeys(self):
-        """All hotkeys off (they type normally again), or back on. Not saved: the app
-        always opens with them on."""
-        if not self._hotkeys_off and not self.cfg.hotkeys_off_hotkey:
-            return   # no key to turn them back on with
-        self._hotkeys_off = not self._hotkeys_off
-        if self._hotkeys_off and self._voice_was is not None:   # a held voice key
-            self._set_voice(self._voice_was)
-            self._voice_was = None
-        self.register_hotkeys()
-        self.cue("stop" if self._hotkeys_off else "start")
-        key = pretty_key(self.cfg.hotkeys_off_hotkey)
-        if self._hotkeys_off:
-            self.say(_("<span style='color:{status}'>Hotkeys are off: {key} turns them back "
-                       "on.</span>", status=theme.status('warn'), key=html.escape(key)),
-                     "warn", key="hotkeys")
-        else:
-            self.toast(_("Hotkeys are on again."), "ok", key="hotkeys")
-
-    def step_category(self, step: int):
-        """Next / previous category (with All at the front), with a beep for each
-        place along it, so you can tell where you are without looking."""
-        names = ["", *self.cfg.categories]
-        if len(names) < 2:
-            self.cue("fail")
-            return
-        i = names.index(self.cfg.category) if self.cfg.category in names else 0
-        name = names[(i + step) % len(names)]
-        self.catctl.set_category(name)
-        n = names.index(name)
-        # All: one low beep; the 1st category one high beep, the 2nd two... (up to 5)
-        self.cue((523,) if n == 0 else ((784, 0) * min(n, 5))[:-1])
-        self.toast(_("Category: {value}", value=html.escape(name or 'All')), key="category")
-
-    def step_sound_volume(self, step: int):
-        """The louder / quieter hotkeys: the sounds' volume box by 10 % a press."""
-        pct = self.vol_sound.spin.value()
-        new = min(max((round(pct / 10) + step) * 10, 0), self.vol_sound.spin.maximum())
-        self.vol_sound.spin.setValue(new)   # -> set_option("sound_vol")
-        self.cue((880, 1175) if step > 0 else (880, 659))
-        self.toast(_("Sounds: {new}%", new=new), key="volume")
-
-    def play_random(self, category: str | None = None) -> str | None:
-        """Play a random loaded sound from `category` (None = the one showing, "" = all
-        of them): each comes up once before any repeats. Returns its id."""
-        cat = self.cfg.category if category is None else category
-        if cat and cat not in self.cfg.categories:
-            return None
-        pool = [m.id for m in self.cfg.sounds
-                if (not cat or cat in m.tags) and m.id in self.audio]
-        sid = self.shuffle.next(cat, pool)
-        if sid is None:
-            self.cue("fail")
-            self.toast(_("No sounds in “{cat}” to play yet", cat=html.escape(cat)) if cat
-                       else _("No sounds to play yet"), "warn")
-            return None
-        self.play(sid)
-        return sid
-
     CUES = {"start": (660, 990), "stop": (990, 660), "saved": (880, 880, 1320), "fail": (330, 247)}
-
-    def cue(self, kind: str | tuple):
-        """A short beep in the headphones only (others never hear it), so a hotkey pressed
-        in-game is confirmed without looking at the app. `kind` is a CUES name or the
-        notes themselves (Hz; 0 = a gap)."""
-        if not self.cfg.cue_sounds or self.engine.mon_stream is None:
-            return
-        notes, n = self.CUES[kind] if isinstance(kind, str) else kind, int(0.075 * SR)
-        t = np.arange(n) / SR
-        env = np.minimum(1.0, np.minimum(t, t[::-1]) / 0.008)   # 8 ms fade in/out
-        tone = np.concatenate([np.sin(2 * np.pi * f * t) * env for f in notes]) * 0.18
-        self.engine.play("__cue__", np.stack([tone, tone], 1).astype(np.float32), 1.0,
-                         mode="restart", preview=True)
 
     def set_sending(self, on: bool):
         """The master switch, "Others hear": on (others hear your mic and whatever is
@@ -3519,60 +2627,6 @@ class MainWindow(QMainWindow):
             self.mini_air.setChecked(on)
             self.mini_air.setToolTip(self.btn_air.toolTip())
 
-    def _stop_all_clicked(self):
-        usage.used("stop-all")
-        self.stop_all()
-        # only an icon on the rail: a tick for a moment says it worked
-        icons.set_icon(self.stop_btn, "check", "live_text", size=sidebar.ICON, gap=False)
-        QTimer.singleShot(1200, self.stop_btn,   # (the button: never after it's gone)
-                          lambda: icons.set_icon(self.stop_btn, "stop", "danger_text",
-                                                 size=sidebar.ICON))
-        card = self.rail.output.stop if self.rail.output else None
-        if card is not None:   # the open card's Stop all: the same tick
-            icons.set_icon(card, "check", "live_text", gap=False)
-            QTimer.singleShot(1200, card, lambda: icons.set_icon(card, "stop", "danger_text",
-                                                                 gap=False))
-
-    def play_last(self):
-        if self._last_sid is None or self.meta(self._last_sid) is None:
-            self.cue("fail")
-        else:
-            self.play(self._last_sid)
-
-    def _pause_clicked(self):
-        """Pause everything playing (sounds and the radio), or bring it all back. A
-        station is live, so pausing it stops it and Play turns the same one back on."""
-        usage.used("pause")
-        playing = self.engine.playing()
-        radio_on = self.radio.is_active()
-        if radio_on or any(not paused for _p, paused in playing.values()):
-            if any(not paused for _p, paused in playing.values()):
-                self.engine.pause_all()   # something still plays: pauses them all
-            if radio_on:
-                self._radio_paused = getattr(getattr(self.radio, "player", None), "station", None)
-                self.radio.stop()
-        else:
-            if playing:
-                self.engine.pause_all()   # all paused: resumes them
-            station, self._radio_paused = self._radio_paused, None
-            play = getattr(self.radio, "play", None)   # (the Radio tab switched off: none)
-            if station is not None and play is not None:
-                play(station)
-        self._wake()
-
-    def stop_all(self):
-        self._radio_paused = None
-        self._queue.clear()
-        self._say_queue()
-        self.linkbar.drop_up_next()
-        for sid in list(self._waiting):
-            self._cancel_waiting(sid)
-        self.engine.stop_all()
-        self.radio.stop()
-        self.apps.stop_all()
-        self.triggers.cancel_pending()
-        self.voice.stop_all()   # the voice changer and the other voices go off too
-
     def load_triggers(self):
         """Put the Onion Watch add-on into the Triggers tab (~0.4 s on the UI thread).
         At the start it's done while the window is built, behind the loading screen (it
@@ -3618,464 +2672,12 @@ class MainWindow(QMainWindow):
 
     def meta(self, sid) -> SoundMeta | None:
         if sid == LINK_ID:
-            return self._link_meta
+            return self.searchctl._link_meta
         return self._meta.get(sid)
-
-    def on_link_played(self, title: str, data, gain: float, url: str = ""):
-        """The link bar's Play once: show it in the transport bar like a pad, so it
-        can be paused, stopped and seeked. It isn't a sound in the library."""
-        self._link_meta = SoundMeta(id=LINK_ID, name=title, file="", level_gain=gain,
-                                    duration=len(data) / SR)
-        self._link_url = url or self.linkbar.url   # its own page (another card may show)
-        self.audio[LINK_ID] = data
-        if self.current == LINK_ID:
-            self.current = None   # a new link: refresh the name
-        self.select(LINK_ID)
-
-    def _on_site_picked(self, key: str):
-        """A site picked in the search button's menu: it shows that site, and the
-        search box's words are searched there now (open results re-run themselves)."""
-        icons.set_icon(self.btn_yt, key, "accent", "accent", size=18)
-        self._drop_link()   # the last site's song, if it's over: its card goes too
-        if self.ytresults.isHidden() and self.search.text().strip():
-            self.search_youtube()
-
-    def search_youtube(self):
-        """Enter / the Search button: search the site the results header has
-        picked (ytdl.SOURCES) for the search box's text (a pasted link is the
-        link bar's instead)."""
-        self.flush_search()
-        text = self.search.text()
-        if ytdl.as_link(text):
-            self._show_link()
-            return
-        if not self.ytresults.available():
-            return
-        if not self.ytresults.search(text):
-            if not text.strip():
-                self.search.setFocus()
-                busy.flash(self.btn_yt, _("Type something first"))
-            return
-        self._pads_scroll.hide()
-        self.catctl._cat_row.hide()
-        self._results_open = True
-        self._sync_cat_bar()
-
-    def on_search_enter(self):
-        self.flush_search()   # a link pasted a moment ago: the link bar has it now
-        if ytdl.as_link(self.search.text()):
-            self._show_link()   # its card, at once: nothing downloads until Play / Add
-        else:
-            self.search_youtube()
-
-    def _on_link_changed(self, url: str):
-        """The search box's link changed: show its card once it stays (a link typed by
-        hand is a new one at every key); no link any more: its card goes."""
-        if url:
-            self._link_wait.start()
-            return
-        self._link_wait.stop()
-        if self.ytresults.link and not self.ytresults.isHidden():
-            self.ytresults.close_results()
-
-    def _show_link(self):
-        """The search box's link as a result card: looked up, not downloaded."""
-        self._link_wait.stop()
-        url = self.linkbar.url
-        if not url or self.is_mini():
-            return
-        if not ytdl.site_allowed(url):
-            # Offline mode or that site switched off: say so once per link, not nothing
-            if url != getattr(self, "_link_off_said", None):
-                self._link_off_said = url
-                self.toast(net.off_message(ytdl.site_feature(url)))
-            return
-        if not self.ytresults.show_link(url):
-            return
-        self._pads_scroll.hide()
-        self.catctl._cat_row.hide()
-        self._results_open = True
-        self._sync_cat_bar()
-
-    def _retry_download(self, item: dict):
-        """The download bar's Retry on a pick that failed: picked again, as if its
-        search card was clicked (it starts, or waits its turn)."""
-        kind = item["kind"]
-        self.linkbar.open(item["url"], item["title"], item["seconds"])
-        self.ytresults.mark(item["url"], kind)
-        if not (self.linkbar.play_once() if kind == "play" else self.linkbar.add()):
-            self.ytresults.mark(item["url"], kind, False)
-
-    def _from_youtube(self, r, play: bool):
-        if play and r.url == self._link_url and self.audio.get(LINK_ID) is not None:
-            self.select(LINK_ID)   # already in the player: Play / Space pause and resume it
-            self.toggle_play_pause()
-            return
-        pad = self._pad_for_link(r.url) if play else None
-        if pad is not None:   # it's on the board already: the pad plays, from the start
-            self.play(pad)
-            return
-        kind = "play" if play else "add"
-        self.linkbar.open(r.url, r.title, r.seconds)
-        self.ytresults.mark(r.url, kind)   # its button greys out until the link bar's done
-        if not (self.linkbar.play_once() if play else self.linkbar.add()):
-            self.ytresults.mark(r.url, kind, False)
-
-    def _pad_for_link(self, url: str) -> str | None:
-        """The board's sound downloaded from this link (its audio loaded), or None."""
-        key = sourceinfo.link_key(url)
-        if not key:
-            return None
-        for m in self.cfg.sounds:
-            if (self.audio.get(m.id) is not None and isinstance(m.source, dict)
-                    and sourceinfo.link_key(m.source.get("link", "")) == key):
-                return m.id
-        return None
 
     def gain_for(self, m: SoundMeta, volume=None) -> float:
         v = m.volume if volume is None else volume
         return v * (m.level_gain if self.cfg.level_volumes else 1.0)
-
-    def play(self, sid, now: bool = False):
-        """Play a pad's sound as its settings say (by default one at a time: a new
-        sound stops the others, PRESS_MODE): its cooldown, a Queue sound waiting
-        for the ones playing, its wait before playing. now=True skips all of that (the
-        queue and a delayed start, whose press was already checked)."""
-        m = self.meta(sid)
-        data = self.audio.get(sid)
-        if m is None:
-            return
-        if not now and data is not None:
-            t = time.monotonic()
-            if t < self._cool.get(sid, 0.0):
-                return   # in its cooldown: a spammed key does nothing
-            if m.cooldown:
-                self._cool[sid] = t + m.delay + m.cooldown
-            if m.mode == "queue" and (self._pads_playing() or self._queue):
-                self.queue_sound(sid)
-                return
-            if m.delay > 0:
-                timer = QTimer(self)
-                timer.setSingleShot(True)
-                timer.timeout.connect(lambda s=sid, tm=timer: self._waited(s, tm))
-                self._waiting.setdefault(sid, []).append(timer)
-                timer.start(int(m.delay * 1000))
-                self.select(sid)
-                return
-        if data is None:   # say why nothing happens instead of silently ignoring the press
-            p = self.pads.get(sid)
-            if p is not None and p.state == "error":
-                why = f": {html.escape(p.error)}" if p.error else ""
-                name = html.escape(m.name)
-                self.say(_("<span style='color:{status}'>Can't play “{name}”{why}. If "
-                           "the file was moved or deleted, remove the pad and add the "
-                           "sound again.</span>",
-                           status=theme.status('error'), name=name, why=why), "error")
-            else:
-                self.toast(_("“{name}” is still loading…", name=html.escape(m.name)), "warn")
-            return
-        if (sid != LINK_ID and LINK_ID in self.engine.playing()
-                and self._pad_for_link(self._link_url) == sid):
-            # the web song played from a search, now saved as this pad: one song, so
-            # it starts again from the top instead of a second copy playing over it
-            self._stop_sound(LINK_ID)
-        self.select(sid)
-        self._last_sid = sid
-        if sid != LINK_ID:
-            m.plays += 1   # Most played
-            if not self._count_save.isActive():
-                self._count_save.start()
-        v = self.engine.play(sid, data, self.gain_for(m), loop=m.loop,
-                             mode=PRESS_MODE.get(m.mode, m.mode),
-                             fade_in=m.fade_in, fade_out=m.fade_out,
-                             only=("main", "obs") if m.only_them else None)
-        self._wake()
-        if v is not None:   # a new install's first steps (usage.py; once each, if counted)
-            usage.step(self.cfg, "played-sound")
-            if self.cfg.route != "off":
-                usage.step(self.cfg, "sent-to-others")
-        if v is None and not self.engine.active_outputs():
-            self.say(_("<span style='color:{status}'>No audio device is open, pick "
-                       "one in Setup.</span>", status=theme.status('warn')), "warn")
-
-    def _waited(self, sid: str, timer: QTimer):
-        """A sound's wait before playing is over."""
-        timers = self._waiting.get(sid, [])
-        if timer in timers:
-            timers.remove(timer)
-            if not timers:
-                del self._waiting[sid]
-            self.play(sid, now=True)
-        timer.deleteLater()
-
-    def _cancel_waiting(self, sid: str):
-        for timer in self._waiting.pop(sid, []):
-            timer.stop()
-            timer.deleteLater()
-
-    def _pads_playing(self) -> bool:
-        """Is one of the board's sounds playing (not a preview, cue or the radio)?"""
-        return any(sid in self._meta and not paused
-                   for sid, (_p, paused) in self.engine.playing().items())
-
-    def _board_song_playing(self, playing=None) -> bool:
-        """Is one of the board's sounds playing or paused? A web search's Play waits
-        for it (Up next), as a pad's Play next does. A looping one (rain, a hum) is a
-        background: that would never end, so a song doesn't wait for it."""
-        playing = self.engine.playing() if playing is None else playing
-        return any(sid in self._meta and not self._meta[sid].loop for sid in playing)
-
-    def queue_sound(self, sid: str) -> bool:
-        """Play `sid` once the board's sounds playing now have finished (now, if none are:
-        True then)."""
-        if (not self._pads_playing() and not self._queue
-                and not self.linkbar.up_next() and LINK_ID not in self.engine.playing()):
-            self.play(sid, now=True)
-            return True
-        self._queue.append(sid)
-        self._say_queue()
-        return False
-
-    def queue_category(self, name: str, shuffled: bool):
-        """Play every sound in category `name`, one after another."""
-        sids = [m.id for m in self.cfg.sounds if name in m.tags and m.id in self.audio]
-        if not sids:
-            self.cue("fail")
-            self.toast(_("No sounds in “{name}” to play yet", name=html.escape(name)), "warn")
-            return
-        if shuffled:
-            self.shuffle.rng.shuffle(sids)
-        self._queue = sids
-        for sid in self.engine.playing():   # the board's sounds make way (not the radio)
-            if sid in self._meta:
-                self.engine.stop(sid)
-        self._next_in_queue()
-
-    def _next_in_queue(self):
-        while self._queue:
-            sid = self._queue.pop(0)
-            if self.meta(sid) is not None and sid in self.audio:
-                self.play(sid, now=True)
-                self._say_queue()
-                return
-
-    def _say_queue(self):
-        if self._queue:
-            m = self.meta(self._queue[0])
-            name, n = html.escape(m.name if m else "?"), len(self._queue) - 1
-            self._queue_said = (
-                _("Up next: “{name}” (+{n} more) · Stop all clears the queue", name=name, n=n)
-                if n else _("Up next: “{name}” · Stop all clears the queue", name=name))
-            self.toast(self._queue_said, key="queue")
-        elif getattr(self, "_queue_said", None):   # ran out / cleared
-            self._queue_said = None
-            self.unsay("queue")
-
-    def select(self, sid):
-        if self.current != sid:
-            if self.current in self.pads:
-                self.pads[self.current].selected = False
-                self.pads[self.current].update()
-            self.current = sid
-            self.start_frac = 0.0
-            if sid in self.pads:
-                self.pads[sid].selected = True
-                self.pads[sid].update()
-            m = self.meta(sid)
-            self._set_np_name(m.name if m else "")
-
-    def toggle_play_pause(self):
-        sid = self.current
-        if not sid:
-            return
-        st = self.engine.state(sid)
-        if st:
-            self.engine.set_paused(sid, not st[1])
-            self._wake()
-            return
-        m, data = self.meta(sid), self.audio.get(sid)
-        if m and data is not None:
-            frac = 0.0 if self.start_frac >= 0.995 else self.start_frac
-            self.engine.play(sid, data, self.gain_for(m), loop=m.loop, mode="restart", start=frac,
-                             fade_in=m.fade_in if frac == 0 else 0.0, fade_out=m.fade_out)
-            self._wake()
-
-    def _space_action(self):
-        """What Space does on the tab showing (ui/spacekey.py): play / pause the
-        player's sound on Sounds, play / stop the radio on Radio; None elsewhere."""
-        page = self.tabs.currentWidget()
-        if page is self.sounds_page:
-            return self.toggle_play_pause if self.current else None
-        if page is self.radio_page:
-            return getattr(self.radio, "toggle_play", None)
-        return None
-
-    def space_pad(self, sid: str):
-        """Space on a pad: pause or resume it while it's playing (or paused), like a
-        media player; play it when it isn't."""
-        if self.engine.state(sid):
-            self.select(sid)
-            st = self.engine.state(sid)
-            self.engine.set_paused(sid, not (st is not None and st[1]))
-            self._wake()
-        else:
-            self.play(sid)
-
-    def stop_current(self):
-        """The player's ■. A second press within a double-click of the first that
-        would stop a different sound is a double click (or a bouncy mouse): the queue's
-        next sound had already taken the player, and it went too."""
-        if self.current:
-            self._stop_one(self.current)
-        self.start_frac = 0.0
-
-    def skip_next(self):
-        """The player's ⏭ (and its hotkey): the next sound in Up next starts now. The
-        board's queue waits for every pad sound, so they all make way (as Play all
-        does); a web search's Up next waits for its song. Nothing waiting: it stops
-        the player's sound, like ■."""
-        if self._queue:
-            for sid in self.engine.playing():   # (it waits for a web search's song too)
-                if sid in self._meta or sid == LINK_ID:
-                    self.engine.stop(sid)
-            self._drop_link()
-            self._next_in_queue()
-        elif self.linkbar.up_next():
-            for sid in self.engine.playing():   # it waits for your sounds too
-                if sid == LINK_ID or (sid in self._meta and not self._meta[sid].loop):
-                    self.engine.stop(sid)
-            self.linkbar.play_next()
-        elif self.current:
-            self._stop_sound(self.current)
-            self.start_frac = 0.0
-        else:
-            self.cue("fail")
-            return
-        self._wake()
-
-    def _stop_one(self, sid: str):
-        """A ■ for one sound (the player's, or a Now playing chip's). A second press
-        within a double-click of one that stopped a different sound does nothing: the
-        player had moved to the next sound, or the chips row was remade and the next
-        sound's ■ slid in under the mouse, and a double click (or a bouncy mouse)
-        stopped that one too, so stopping one sound stopped two or all of them."""
-        now, (at, was) = time.monotonic(), self._stopped_at
-        if was and sid != was and now - at < QApplication.doubleClickInterval() / 1000:
-            return
-        self._stopped_at = (now, sid)
-        self._stop_sound(sid)
-
-    def _stop_sound(self, sid: str):
-        """Stop one sound. If it was the player's and others still play, the player
-        moves to the newest of them, so its ⏸ / ■ reach them (stopping the shown pad
-        used to leave a web search's sound playing with no way back to it)."""
-        self.engine.stop(sid)
-        if sid == LINK_ID:   # a web song isn't on the board: stopped, it leaves the player
-            self._drop_link()
-        if sid != self.current and self.current:
-            return
-        others = [s for s in self.engine.playing()
-                  if s != sid and (s in self._meta or s == LINK_ID)]
-        if others:
-            self.select(others[-1])
-
-    def _drop_link(self):
-        """Take a stopped web song out of the player. It stayed there as the player's
-        sound, and once its card was gone (another site searched) nothing took it out:
-        ■ only stopped it and its name sat in the bar for good."""
-        if LINK_ID in self.engine.playing():
-            return   # still playing or paused: the player keeps it
-        self._link_meta, self._link_url = None, ""
-        self.audio.pop(LINK_ID, None)
-        if self.current == LINK_ID:
-            self.current = None
-            self.start_frac = 0.0
-            self._set_np_name(_("Pick a sound"))
-            self.np_name.setToolTip(_("Select a sound pad to use these playback controls."))
-
-    def _seek_preview(self, v):
-        if self._seeking:
-            m = self.meta(self.current) if self.current else None
-            if m:
-                self._set_np_time(fmt_pos(v / 1000 * m.duration, m.duration))
-
-    def do_seek(self, slider=None):
-        self._seeking = False
-        if not self.current:
-            return
-        frac = (slider or self.seek).value() / 1000
-        if not self.engine.seek(self.current, frac):
-            self.start_frac = frac   # not playing: ▶ will start from here
-
-    def preview(self, sid, volume=None, fx=None, fades=None, done=None) -> str:
-        """Play a sound to your headphones only. With `fx` (the Edit dialog's unsaved
-        effects) it's rendered with those first, in the background; `fades` is the
-        dialog's unsaved (fade in, fade out). Returns "playing", "rendering" (then
-        `done(ok)` is called when it plays or fails) or "missing" (not loaded)."""
-        m = self.meta(sid)
-        data = self.audio.get(sid)
-        if not m or data is None:
-            return "missing"
-        gain = self.gain_for(m, volume)
-        fade_in, fade_out = fades if fades is not None else (m.fade_in, m.fade_out)
-        self._preview_fades: dict[str, Any] = {"fade_in": fade_in, "fade_out": fade_out}
-        if fx is None or soundfx.key(fx) == soundfx.key(m.fx):
-            self.drop_preview()   # an effects render still going mustn't play over it
-            self.engine.play(sid + ":preview", data, gain, mode="restart", preview=True,
-                             **self._preview_fades)
-            return "playing"
-        self.drop_preview()
-        gen = self._preview_gen
-        self._preview_done = done
-        self.toast(_("Rendering the preview…"), "busy", key="preview")
-
-        def answer(out):
-            return (sid, out, gain, gen) if gen == self._preview_gen else worker.SKIP
-
-        def run():
-            try:
-                src = load_original(m)
-                if len(src) > PREVIEW_WHOLE_S * SR:   # long: only what plays first
-                    part, pfx = soundfx.preview_part(src, fx, PREVIEW_S)
-                    out = soundfx.render(part, pfx)
-                else:
-                    # into the cache file for these effects: saving them afterwards
-                    # finds it rendered
-                    out = library.render_cached(m.id, src, fx,
-                                                cancel=lambda: gen != self._preview_gen)
-            except library.Cancelled:
-                return worker.SKIP   # a newer preview (or the dialog closed): nothing to play
-            return answer(out)
-        worker.run(run, self.bridge.preview, "fx-preview", error=lambda _e: answer(None),
-                   owner=self)
-        return "rendering"
-
-    def drop_preview(self):
-        """Forget an effects preview still rendering (a newer preview, or its Edit
-        dialog closed): it won't play, and the status stops saying it's rendering.
-        Its done() isn't called: the dialog it belongs to may be gone."""
-        self._preview_gen += 1
-        if self._preview_done is not None:
-            self._preview_done = None
-            self.unsay("preview")
-
-    def _on_fx_preview(self, sid, data, gain, gen=None):
-        if gen is not None and gen != self._preview_gen:
-            return   # dropped while it rendered (checked here too: the signal is queued)
-        self.unsay("preview")
-        done, self._preview_done = self._preview_done, None
-        if done is not None:
-            done(data is not None)
-        if data is None:
-            self.toast(_("Couldn't render the preview with these effects (see the log)."), "warn")
-            return
-        # its own id: it mustn't share the pad's resample cache or its preview voice
-        self.engine.play(sid + "~fx:preview", data, gain, mode="restart", preview=True,
-                         **getattr(self, "_preview_fades", {}))
-
-    def on_live_speed(self, speed: float, pitch: float, keep: bool):
-        e = self.engine
-        e.sound_speed, e.sound_pitch, e.sound_keep_pitch = speed, pitch, keep
 
     def _rebuild_pads(self):
         """Sync the pad widgets with cfg.sounds: keep the ones that still exist, create
@@ -4093,9 +2695,9 @@ class MainWindow(QMainWindow):
             p = self.pads.get(m.id)
             if p is None:
                 p = Pad(m, self.cfg.pad_width)
-                p.activated.connect(self.play)
-                p.space.connect(self.space_pad)
-                p.chosen.connect(self.select)
+                p.activated.connect(self.playctl.play)
+                p.space.connect(self.playctl.space_pad)
+                p.chosen.connect(self.playctl.select)
                 p.pick.connect(self.selection.on_pick)
                 p.step.connect(self.grid.focus_step)
                 p.menu.connect(self.padctl.pad_menu)
@@ -4107,58 +2709,8 @@ class MainWindow(QMainWindow):
             p.selected = m.id == self.current
             ordered.append(p)
         self.grid.set_pads(ordered, layout=False)   # laid out once, by the filter next
-        self.apply_filter(self.search.text())
+        self.searchctl.apply_filter(self.search.text())
         self.statusctl._update_status()
-
-    def _results_closed(self):
-        """"My sounds": all of them. The search box also filters the pads, so the web
-        search still in it left a board of only the pads matching "cat meow" (often
-        none, with nothing saying why). Something else typed in it since stays."""
-        self._results_open = False
-        self._sync_cat_bar()
-        query = " ".join(self.ytresults.query.split())
-        if query and " ".join(self.search.text().split()) == query:
-            self.search.clear()
-
-    def _on_search_edited(self, text: str):
-        # typed: Qt sends this just before textChanged (the box's clear button sends
-        # it just after; that change has filtered at once, and the next one is unequal)
-        self._search_typed = text
-
-    def _on_search_text(self, text: str):
-        typed, self._search_typed = self._search_typed == text, None
-        if typed:
-            self._search_wait.start()   # each key restarts it: filter once typing pauses
-        else:
-            self.apply_filter(text, lazy=True)
-
-    def flush_search(self):
-        """Filter the pads for the search box now, if typing left that waiting."""
-        if self._search_wait.isActive():
-            self.apply_filter(self.search.text(), lazy=True)
-
-    def apply_filter(self, text, lazy: bool = False):
-        """Show the pads that match the search box (name or category) and are in the
-        category picked above the pads. `lazy`: skip the regrid when no pad changed."""
-        self._search_wait.stop()   # this is the filter typing was waiting for
-        self.linkbar.set_text(text)
-        if getattr(self, "overlay", None) is not None:   # every sounds / category edit ends here
-            self.overlay.sounds_changed()
-        # a link filters nothing, and nor does the box in the mini player, which hides
-        # it: a web search's words left there showed a blank mini player
-        t = "" if self.linkbar.url or self.is_mini() else text.strip().lower()
-        cat, sub = self.cfg.category, self.cfg.subcategory
-        changed = False
-        for m in self.cfg.sounds:
-            p = self.pads.get(m.id)
-            if p:
-                hit = not t or t in m.name.lower() or any(t in g.lower() for g in m.tags)
-                hide = not hit or not library.in_view(m.tags, cat, sub)
-                changed = changed or bool(p.property("filtered")) != hide
-                p.setProperty("filtered", hide)
-        if changed or not lazy:
-            self.grid.relayout(force=True)
-            self.selection.sync()
 
     def _fit_toolbar(self):
         """The toolbar spans the pads: in by the grid's margin on both sides, and by the
@@ -4178,11 +2730,6 @@ class MainWindow(QMainWindow):
             sub.setContentsMargins(m.left(), 6, right, 0)
 
     # ------------------------------------------------------------------ search, rename
-    def focus_search(self):
-        """Ctrl+F: the cursor into Search sounds, with what's there selected."""
-        self.search.setFocus(Qt.FocusReason.ShortcutFocusReason)
-        self.search.selectAll()
-
     def rename_sound(self, sid: str, new: str | None = None):
         """F2 on a pad (and the pad menu's Rename): just the name, without the Edit
         window."""
@@ -4354,7 +2901,7 @@ class MainWindow(QMainWindow):
             if meta.id in self.pads:
                 self.pads[meta.id].update()
         usage.used("record")
-        self.select(meta.id)
+        self.playctl.select(meta.id)
 
         def reveal():   # once the grid has laid the new pad out
             pad = self.pads.get(meta.id)
@@ -4405,125 +2952,6 @@ class MainWindow(QMainWindow):
         if self.tabs.currentWidget() is page and (fw is None or not page.isAncestorOf(fw)):
             page.setFocus(Qt.FocusReason.OtherFocusReason)
 
-    def _hotkey_taken(self, combo: str) -> bool:
-        """Does a sound, an app-wide action, the push-to-talk key or a category's
-        random-sound key already have `combo`?"""
-        return (any(o.hotkey == combo for o in self.cfg.sounds)
-                or any(getattr(self.cfg, attr) == combo for attr, *__ in HOTKEY_ACTIONS)
-                or self.cfg.ptt_key == combo
-                or combo in self.cfg.category_hotkeys.values())
-
-    def _shares_keys(self, a: SoundMeta, b: SoundMeta) -> bool:
-        """Can a and b's hotkeys be live at the same time? With a set of hotkeys per
-        category, two sounds with no category in common can share a key."""
-        return (not self.cfg.scoped_hotkeys or not a.tags or not b.tags
-                or bool(set(a.tags) & set(b.tags)))
-
-    def _clear_dupe_hotkey(self, m) -> list[str]:
-        """A combo does one thing: m's hotkey comes off whatever else had it. Returns
-        what lost it ("“Boom”", "Stop everything"...), and says so in the status line,
-        so a key taken from another sound or action is never a silent surprise."""
-        lost = []
-        if not m.hotkey:
-            return lost
-        for o in self.cfg.sounds:
-            if (o is not m and o.hotkey and o.hotkey == m.hotkey
-                    and self._shares_keys(o, m)):
-                o.hotkey = ""
-                lost.append(f"“{o.name}”")
-                if o.id in self.pads:
-                    self.pads[o.id].update()
-        for attr, _action, label, _desc in HOTKEY_ACTIONS:
-            if m.hotkey == getattr(self.cfg, attr):
-                setattr(self.cfg, attr, "")
-                lost.append(label)
-        lost += [_("a random sound from “{name}”", name=c)
-                 for c, k in self.cfg.category_hotkeys.items() if k == m.hotkey]
-        self._clear_category_hotkey(m.hotkey)
-        if self.cfg.ptt_key == m.hotkey:   # as everywhere else a key is set
-            self.cfg.ptt_key = ""
-            lost.append(_("auto push-to-talk"))
-        if lost:
-            self.say(
-                _("<span style='color:{status}'>{hotkey} plays “{name}” now, it was the key for "
-                  "{lost}.</span>",
-                  status=theme.status('warn'), hotkey=html.escape(pretty_key(m.hotkey)),
-                  name=html.escape(m.name), lost=html.escape(_(" and ").join(lost))),
-                "warn", 8000, key="hotkey")
-        return lost
-
-    def set_sound_hotkey(self, sid: str, combo: str | None = None):
-        """The pad menu's hotkey: asks for one unless given ("" removes it)."""
-        m = self.meta(sid)
-        if m is None:
-            return
-        if combo is None:
-            d = HotkeyDialog(self.hotkeys, self)
-            combo = d.result_combo if d.exec() and d.result_combo else None
-            free_dialog(d)
-        if combo is not None and combo != m.hotkey:
-            m.hotkey = combo
-            lost = self._clear_dupe_hotkey(m)
-            self._save_now()
-            if sid in self.pads:
-                self.pads[sid].update()
-            if not lost:   # else its warning already says what the key plays now
-                self.toast(_("✓ {combo} plays “{name}”",
-                             combo=html.escape(combo), name=html.escape(m.name)) if combo
-                           else _("Hotkey removed from “{name}”", name=html.escape(m.name)),
-                           key="hotkey")
-        self.register_hotkeys()   # the capture paused them
-
-    def _clear_category_hotkey(self, combo: str, keep: str | None = None):
-        """A combo does one thing: take it off any category's random-sound hotkey."""
-        if combo:
-            for cat in [c for c, k in self.cfg.category_hotkeys.items()
-                        if k == combo and c != keep]:
-                del self.cfg.category_hotkeys[cat]
-
-    def set_category_hotkey(self, name: str, combo: str | None = None):
-        """The hotkey that plays a random sound from category `name` (asks for it
-        unless given; "" clears it)."""
-        if name not in self.cfg.categories:
-            return
-        if combo is None:
-            d = HotkeyDialog(self.hotkeys, self)
-            combo = d.result_combo if d.exec() and d.result_combo else None
-            free_dialog(d)
-            if combo is None:
-                self.register_hotkeys()   # the capture paused them
-                return
-        taken_from = []
-        if combo:
-            for attr, *__ in HOTKEY_ACTIONS:
-                if getattr(self.cfg, attr) == combo:
-                    setattr(self.cfg, attr, "")
-                    taken_from.append(_("another action"))
-            for m in self.cfg.sounds:
-                if m.hotkey == combo:
-                    taken_from.append(f"“{m.name}”")
-                    m.hotkey = ""
-                    if m.id in self.pads:
-                        self.pads[m.id].update()
-            self._clear_category_hotkey(combo, keep=name)
-            if self.cfg.ptt_key == combo:
-                self.cfg.ptt_key = ""
-            self.cfg.category_hotkeys[name] = combo
-            if taken_from:
-                msg = _("✓ {combo} plays a random “{name}” sound, it was the key for {lost}",
-                        combo=html.escape(combo), name=html.escape(name),
-                        lost=html.escape(", ".join(taken_from)))
-            else:
-                msg = _("✓ {combo} plays a random “{name}” sound",
-                        combo=html.escape(combo), name=html.escape(name))
-            self.toast(msg, "ok")
-        else:
-            self.cfg.category_hotkeys.pop(name, None)
-            self.toast(_("Random-sound hotkey for “{name}” cleared", name=html.escape(name)))
-        self._save_now()
-        self.catctl._fill_categories()
-        self.register_hotkeys()
-
     # ------------------------------------------------------------------ backup
     # ------------------------------------------------------------------ tray
     def _init_tray(self):
@@ -4535,7 +2963,7 @@ class MainWindow(QMainWindow):
         t.setToolTip(self.title)
         menu = QMenu(self)
         icons.set_icon(menu.addAction(_("Open Onion Board"), self.show_from_tray), "sounds")
-        icons.set_icon(menu.addAction(_("Stop all sounds"), self.stop_all), "stop")
+        icons.set_icon(menu.addAction(_("Stop all sounds"), self.playctl.stop_all), "stop")
         self._tray_bun = menu.addAction(self._bun_icon(), _("Turn into Bun"),
                                         self.bunctl.enter_bun_mode)
         menu.addSeparator()
@@ -4760,12 +3188,12 @@ class MainWindow(QMainWindow):
                 self.statusctl._update_flow()
             self.voice.poll()
         playing = e.playing()
-        if self._queue and LINK_ID not in playing and not any(sid in self._meta
+        if self.playctl._queue and LINK_ID not in playing and not any(sid in self._meta
                                                               for sid in playing):
-            self._next_in_queue()   # it waits for a web search's song too
+            self.playctl._next_in_queue()   # it waits for a web search's song too
             playing = e.playing()
         if (LINK_ID not in playing and self.linkbar.up_next()
-                and not self._board_song_playing(playing) and self.linkbar.play_next()):
+                and not self.playctl._board_song_playing(playing) and self.linkbar.play_next()):
             playing = e.playing()   # the web search song ended: the next one waiting
         live = any((sid in self._meta or sid == LINK_ID) and not paused   # a web search's
                    for sid, (_p, paused) in playing.items())                # Play too
@@ -4806,7 +3234,7 @@ class MainWindow(QMainWindow):
                                 or e.aux_on_air())
         want = self.cfg.ptt_key if (self.cfg.ptt_key and on_air) else None
         if want != self._ptt_held:
-            if not self._release_ptt():
+            if not self.hkctl._release_ptt():
                 return   # still held: try the key-up again next tick
             if want and winkeys.press(want):
                 self._ptt_held = want
@@ -4855,9 +3283,9 @@ class MainWindow(QMainWindow):
         self._show_transport(playing)
         if not self.ytresults.isHidden():   # the result in the player says so
             prog, paused = playing.get(LINK_ID, (None, False))
-            self.ytresults.show_now(self._link_url, "" if prog is None else
+            self.ytresults.show_now(self.searchctl._link_url, "" if prog is None else
                                     "paused" if paused else "playing")
-        self._update_chips(playing)
+        self.playctl._update_chips(playing)
         self.out_meter.set_level(self._heard_level())
         self.logo.set_level(e.level_play)   # anything playing, not your voice
         self.mic_meter.set_level(e.level_mic if e.mic_stream else 0.0)
@@ -4947,8 +3375,8 @@ class MainWindow(QMainWindow):
             return
         prog, paused = playing.get(sid, (None, False))
         live = prog is not None
-        self._set_pp_icon("pause" if live and not paused else "play")
-        if not self._seeking:
+        self.playctl._set_pp_icon("pause" if live and not paused else "play")
+        if not self.playctl._seeking:
             frac = prog if live else self.start_frac
             for slider in (self.seek, self.mini_seek):
                 slider.blockSignals(True)
@@ -5029,17 +3457,7 @@ class MainWindow(QMainWindow):
             self._video_win.setWindowIcon(self.windowIcon())
         self._video_win.show_for(sid, m.name, path)
         if self.engine.state(sid) is None:
-            self.toggle_play_pause()
-
-    def _release_ptt(self) -> bool:
-        """Let go of the PTT key we hold. False if Windows refused the key-up (an
-        admin window or a UAC prompt in front blocks it): it stays ours to release,
-        or the game's push-to-talk would stay stuck down."""
-        if self._ptt_held:
-            if not winkeys.release(self._ptt_held):
-                return False
-            self._ptt_held = None
-        return True
+            self.playctl.toggle_play_pause()
 
     # ------------------------------------------------------------------ small windows
     def _init_fit(self):
@@ -5226,7 +3644,7 @@ class MainWindow(QMainWindow):
                 home.insertWidget(index, scroll, 1)
                 scroll.setVisible(self.ytresults.isHidden())   # results take the pads' place
             self._pages.setCurrentIndex(1 if on else 0)
-            self.apply_filter(self.search.text())
+            self.searchctl.apply_filter(self.search.text())
         toastmod.relayout(self)   # cards in the window, icons in the mini player
 
     def resizeEvent(self, ev):
@@ -5291,7 +3709,7 @@ class MainWindow(QMainWindow):
             self.bunctl.bun_mode.close()
         for step in (self.rmctl._finish_removals, self.rmctl._wait_bin, self.timer.stop,
                      self._voice_timer.stop, self.devctl._default_poll.stop,
-                     self.alertctl._discord_poll.stop, self._release_ptt,
+                     self.alertctl._discord_poll.stop, self.hkctl._release_ptt,
                      self._remember_usage, self.cfg.save, self.overlay.shutdown,
                      self.hotkeys.stop, self.replay.stop, self.remote.stop,
                      self.remctl._stop_remote_addons,

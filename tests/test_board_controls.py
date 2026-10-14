@@ -40,10 +40,10 @@ def playing(monkeypatch, w, sids):
 
 def test_last_sound_hotkey_plays_it_again(window, calls):
     w = window
-    w.on_hotkey("__last__")            # nothing yet: just the fail beep
+    w.hkctl.on_hotkey("__last__")            # nothing yet: just the fail beep
     assert calls == []
-    w.play("s1")
-    w.on_hotkey("__last__")
+    w.playctl.play("s1")
+    w.hkctl.on_hotkey("__last__")
     assert [c[0] for c in calls] == ["s1", "s1"]
 
 
@@ -52,39 +52,39 @@ def test_category_keys_cycle_through_all_and_the_categories(window):
     w.catctl.new_category(name="Memes")
     w.catctl.new_category(name="Music")
     w.catctl.set_category("")
-    w.on_hotkey("__nextcat__")
+    w.hkctl.on_hotkey("__nextcat__")
     assert w.cfg.category == "Memes"
-    w.on_hotkey("__nextcat__")
-    w.on_hotkey("__nextcat__")
+    w.hkctl.on_hotkey("__nextcat__")
+    w.hkctl.on_hotkey("__nextcat__")
     assert w.cfg.category == ""        # wraps round to All
-    w.on_hotkey("__prevcat__")
+    w.hkctl.on_hotkey("__prevcat__")
     assert w.cfg.category == "Music"
 
 
 def test_volume_keys_step_the_sounds_volume_by_ten(window):
     w = window
     w.vol_sound.spin.setValue(95)
-    w.on_hotkey("__volup__")
+    w.hkctl.on_hotkey("__volup__")
     assert w.cfg.sound_vol == pytest.approx(1.1)
     w.vol_sound.spin.setValue(0)
-    w.on_hotkey("__voldown__")
+    w.hkctl.on_hotkey("__voldown__")
     assert w.cfg.sound_vol == 0.0
 
 
 def test_mic_and_voice_changer_keys(window):
     w = window
     was = w.cfg.mic_enabled
-    w.on_hotkey("__mic__")
+    w.hkctl.on_hotkey("__mic__")
     assert w.cfg.mic_enabled is (not was)
     power = w.voice.fx.btn_power
     assert not power.isChecked()
-    w.on_hotkey("__voice__")
+    w.hkctl.on_hotkey("__voice__")
     assert power.isChecked()
-    w.on_hotkey("__voice__")
+    w.hkctl.on_hotkey("__voice__")
     assert not power.isChecked()
-    w.on_hotkey("__voicehold__")      # on while held, back as it was when let go
+    w.hkctl.on_hotkey("__voicehold__")      # on while held, back as it was when let go
     assert power.isChecked()
-    w.on_hotkey_released("__voicehold__")
+    w.hkctl.on_hotkey_released("__voicehold__")
     assert not power.isChecked()
 
 
@@ -93,13 +93,13 @@ def test_all_hotkeys_off_leaves_only_its_own_key(window, monkeypatch, calls):
     registered = []
     monkeypatch.setattr(w.hotkeys, "register", lambda m: registered.append(dict(m)))
     w.meta("s0").hotkey = "f1"
-    w.set_global_hotkey("hotkeys_off_hotkey", "f12")
+    w.hkctl.set_global_hotkey("hotkeys_off_hotkey", "f12")
     assert registered[-1]["f1"] == "s0"
-    w.on_hotkey("__hotkeys__")
+    w.hkctl.on_hotkey("__hotkeys__")
     assert registered[-1] == {"f12": "__hotkeys__"}
-    w.on_hotkey("s0")                 # one already queued when they went off
+    w.hkctl.on_hotkey("s0")                 # one already queued when they went off
     assert calls == []
-    w.on_hotkey("__hotkeys__")
+    w.hkctl.on_hotkey("__hotkeys__")
     assert registered[-1]["f1"] == "s0"
 
 
@@ -108,18 +108,18 @@ def test_clearing_the_hotkeys_off_key_while_off_turns_them_back_on(window, monke
     registered = []
     monkeypatch.setattr(w.hotkeys, "register", lambda m: registered.append(dict(m)))
     w.meta("s0").hotkey = "f1"
-    w.set_global_hotkey("hotkeys_off_hotkey", "f12")
-    w.on_hotkey("__hotkeys__")
+    w.hkctl.set_global_hotkey("hotkeys_off_hotkey", "f12")
+    w.hkctl.on_hotkey("__hotkeys__")
     assert registered[-1] == {"f12": "__hotkeys__"}
-    w.set_global_hotkey("hotkeys_off_hotkey", "")   # nothing left to turn them on
-    assert not w._hotkeys_off and registered[-1]["f1"] == "s0"
-    w.set_global_hotkey("hotkeys_off_hotkey", "f12")
-    w.on_hotkey("__hotkeys__")
-    w.set_global_hotkey("pause_hotkey", "f12")      # the key went to something else
-    assert not w._hotkeys_off and registered[-1]["f1"] == "s0"
+    w.hkctl.set_global_hotkey("hotkeys_off_hotkey", "")   # nothing left to turn them on
+    assert not w.hkctl._hotkeys_off and registered[-1]["f1"] == "s0"
+    w.hkctl.set_global_hotkey("hotkeys_off_hotkey", "f12")
+    w.hkctl.on_hotkey("__hotkeys__")
+    w.hkctl.set_global_hotkey("pause_hotkey", "f12")      # the key went to something else
+    assert not w.hkctl._hotkeys_off and registered[-1]["f1"] == "s0"
     w.cfg.hotkeys_off_hotkey = ""
-    w.toggle_hotkeys()                               # no key: they don't go off
-    assert not w._hotkeys_off
+    w.hkctl.toggle_hotkeys()                               # no key: they don't go off
+    assert not w.hkctl._hotkeys_off
 
 
 def test_a_set_of_hotkeys_per_category(window, monkeypatch, calls):
@@ -130,17 +130,17 @@ def test_a_set_of_hotkeys_per_category(window, monkeypatch, calls):
     w.catctl.new_category(name="Music")
     a, b = w.meta("s0"), w.meta("s1")
     a.tags, b.tags = ["Memes"], ["Music"]
-    w.set_scoped_hotkeys(True)
+    w.hkctl.set_scoped_hotkeys(True)
     a.hotkey = "f1"
-    w._clear_dupe_hotkey(a)
+    w.hkctl._clear_dupe_hotkey(a)
     b.hotkey = "f1"
-    w._clear_dupe_hotkey(b)           # no category in common: both keep it
+    w.hkctl._clear_dupe_hotkey(b)           # no category in common: both keep it
     assert a.hotkey == b.hotkey == "f1"
     w.catctl.set_category("Memes")
     assert registered[-1]["f1"] == "s0"
     w.catctl.set_category("Music")
     assert registered[-1]["f1"] == "s1"
-    w.set_scoped_hotkeys(False)       # one key, one sound again: the first keeps it
+    w.hkctl.set_scoped_hotkeys(False)       # one key, one sound again: the first keeps it
     assert (a.hotkey, b.hotkey) == ("f1", "")
 
 
@@ -148,21 +148,21 @@ def test_queue_sound_waits_for_the_one_playing(window, monkeypatch, calls):
     w = window
     w.meta("s1").mode = "queue"
     playing(monkeypatch, w, ["s0"])
-    w.play("s1")
-    assert calls == [] and w._queue == ["s1"]
+    w.playctl.play("s1")
+    assert calls == [] and w.playctl._queue == ["s1"]
     playing(monkeypatch, w, [])
     w.tick()
     assert [c[0] for c in calls] == ["s1"] and calls[0][1]["mode"] == "restart"
-    assert w._queue == []
+    assert w.playctl._queue == []
 
 
 def test_play_next_and_stop_everything_clears_the_queue(window, monkeypatch, calls):
     w = window
     playing(monkeypatch, w, ["s0"])
-    w.queue_sound("s1")
-    assert w._queue == ["s1"]
-    w.stop_all()
-    assert w._queue == []
+    w.playctl.queue_sound("s1")
+    assert w.playctl._queue == ["s1"]
+    w.playctl.stop_all()
+    assert w.playctl._queue == []
 
 
 def test_skip_starts_the_next_queued_sound_now(window, monkeypatch, calls):
@@ -170,9 +170,9 @@ def test_skip_starts_the_next_queued_sound_now(window, monkeypatch, calls):
     stopped = []
     monkeypatch.setattr(w.engine, "stop", stopped.append)
     playing(monkeypatch, w, ["s0"])
-    w.queue_sound("s1")
+    w.playctl.queue_sound("s1")
     w.btn_skip.click()
-    assert stopped == ["s0"] and [c[0] for c in calls] == ["s1"] and w._queue == []
+    assert stopped == ["s0"] and [c[0] for c in calls] == ["s1"] and w.playctl._queue == []
 
 
 def test_a_web_search_play_waits_for_your_sound_instead_of_playing_over_it(
@@ -213,8 +213,8 @@ def test_a_web_search_play_waits_for_your_sound_instead_of_playing_over_it(
 def test_play_next_waits_for_a_web_search_song(window, monkeypatch, calls):
     w = window
     playing(monkeypatch, w, ["__link__"])
-    w.queue_sound("s1")
-    assert calls == [] and w._queue == ["s1"]
+    w.playctl.queue_sound("s1")
+    assert calls == [] and w.playctl._queue == ["s1"]
     w.tick()
     assert calls == []
     playing(monkeypatch, w, [])
@@ -229,7 +229,7 @@ def test_skip_stops_the_web_search_song_your_sound_waits_for(window, monkeypatch
     stopped = []
     monkeypatch.setattr(w.engine, "stop", stopped.append)
     playing(monkeypatch, w, ["__link__"])
-    w.queue_sound("s1")
+    w.playctl.queue_sound("s1")
     w.btn_skip.click()
     assert stopped == ["__link__"] and [c[0] for c in calls] == ["s1"]
 
@@ -239,8 +239,8 @@ def test_skip_with_nothing_waiting_just_stops_the_players_sound(window, monkeypa
     stopped = []
     monkeypatch.setattr(w.engine, "stop", stopped.append)
     playing(monkeypatch, w, ["s0"])
-    w.select("s0")
-    w.on_hotkey("__skip__")
+    w.playctl.select("s0")
+    w.hkctl.on_hotkey("__skip__")
     assert stopped == ["s0"] and calls == []
 
 
@@ -251,8 +251,8 @@ def test_play_a_whole_category_one_after_another(window, monkeypatch, calls):
         w.meta(sid).tags = ["Memes"]
     monkeypatch.setattr(w.engine, "stop", lambda sid: None)
     playing(monkeypatch, w, [])
-    w.queue_category("Memes", shuffled=False)
-    assert [c[0] for c in calls] == ["s0"] and w._queue == ["s1"]
+    w.playctl.queue_category("Memes", shuffled=False)
+    assert [c[0] for c in calls] == ["s0"] and w.playctl._queue == ["s1"]
     w.tick()
     assert [c[0] for c in calls] == ["s0", "s1"]
 
@@ -260,11 +260,11 @@ def test_play_a_whole_category_one_after_another(window, monkeypatch, calls):
 def test_cooldown_ignores_spam(window, calls):
     w = window
     w.meta("s0").cooldown = 30.0
-    w.play("s0")
-    w.play("s0")
+    w.playctl.play("s0")
+    w.playctl.play("s0")
     assert len(calls) == 1
-    w._cool.clear()
-    w.play("s0")
+    w.playctl._cool.clear()
+    w.playctl.play("s0")
     assert len(calls) == 2
 
 
@@ -272,20 +272,20 @@ def test_wait_before_playing_and_stop_cancels_it(window, calls, qapp):
     from conftest import process_events
     w = window
     w.meta("s0").delay = 0.05
-    w.play("s0")
-    assert calls == [] and "s0" in w._waiting
+    w.playctl.play("s0")
+    assert calls == [] and "s0" in w.playctl._waiting
     process_events(qapp, lambda: calls)
     assert [c[0] for c in calls] == ["s0"]
-    w.play("s0")
-    w.stop_all()
-    assert w._waiting == {}
+    w.playctl.play("s0")
+    w.playctl.stop_all()
+    assert w.playctl._waiting == {}
 
 
 def test_only_them_skips_my_headphones(window, calls):
     w = window
     w.meta("s0").only_them = True
-    w.play("s0")
-    w.play("s1")
+    w.playctl.play("s0")
+    w.playctl.play("s1")
     assert calls[0][1]["only"] == ("main", "obs") and calls[1][1]["only"] is None
 
 
@@ -309,7 +309,7 @@ def test_space_on_a_playing_pad_pauses_it_instead_of_restarting(window, monkeypa
     from PySide6.QtTest import QTest
     w = window
     played, paused = [], []
-    monkeypatch.setattr(w, "play", played.append)
+    monkeypatch.setattr(w.playctl, "play", played.append)
     state = {}
     monkeypatch.setattr(w.engine, "state", lambda sid: state.get(sid))
     monkeypatch.setattr(w.engine, "set_paused", lambda sid, p: paused.append((sid, p)))
@@ -327,7 +327,7 @@ def test_space_on_a_playing_pad_pauses_it_instead_of_restarting(window, monkeypa
 def test_one_click_plays_a_pad(window, monkeypatch):
     w = window
     played = []
-    monkeypatch.setattr(w, "play", played.append)
+    monkeypatch.setattr(w.playctl, "play", played.append)
     pad = w.pads["s0"]
 
     def click():
@@ -349,7 +349,7 @@ def test_one_click_plays_a_pad(window, monkeypatch):
 def test_a_double_click_plays_wherever_the_two_clicks_land(window, monkeypatch):
     w = window
     played = []
-    monkeypatch.setattr(w, "play", played.append)
+    monkeypatch.setattr(w.playctl, "play", played.append)
     pad = w.pads["s0"]
 
     def click(x, y):
@@ -371,39 +371,39 @@ def test_the_queue_shows_above_the_pads_and_can_be_trimmed(window, monkeypatch, 
     w = window
     w._ui_live = True
     playing(monkeypatch, w, ["s0"])
-    w.queue_sound("s1")
-    w._update_chips({"s0": (0.5, False)})
+    w.playctl.queue_sound("s1")
+    w.playctl._update_chips({"s0": (0.5, False)})
     assert not w.playing_row.isHidden()
-    w._unqueue(0)
-    w._update_chips({})
-    assert w._queue == [] and w.playing_row.isHidden()
+    w.playctl._unqueue(0)
+    w.playctl._update_chips({})
+    assert w.playctl._queue == [] and w.playing_row.isHidden()
 
 
 def test_a_double_click_on_a_queue_chips_x_takes_out_only_that_one(window, monkeypatch, calls):
     w = window
     w._ui_live = True
     playing(monkeypatch, w, ["s0"])
-    w.queue_sound("s1")
-    w.queue_sound("s0")
-    w._update_chips({"s0": (0.5, False)})
+    w.playctl.queue_sound("s1")
+    w.playctl.queue_sound("s0")
+    w.playctl._update_chips({"s0": (0.5, False)})
     first_x = [b for b in w.playing_row.findChildren(QPushButton)
                if b.toolTip() == "Take it out of the queue"][0]
     first_x.click()
     first_x.click()                   # the same ✕ again before the row is remade
-    assert w._queue == ["s0"]
+    assert w.playctl._queue == ["s0"]
 
 
 def test_a_double_click_on_stop_doesnt_stop_the_next_queued_sound(window, monkeypatch, calls):
     w = window
     stopped = []
     monkeypatch.setattr(w.engine, "stop", stopped.append)
-    w.select("s0")
-    w.stop_current()
-    w.select("s1")                    # the queue's next sound took the player
-    w.stop_current()                  # the double click's second press
+    w.playctl.select("s0")
+    w.playctl.stop_current()
+    w.playctl.select("s1")                    # the queue's next sound took the player
+    w.playctl.stop_current()                  # the double click's second press
     assert stopped == ["s0"]
-    w._stopped_at = (0.0, "s0")       # a press well after: stops it
-    w.stop_current()
+    w.playctl._stopped_at = (0.0, "s0")       # a press well after: stops it
+    w.playctl.stop_current()
     assert stopped == ["s0", "s1"]
 
 
@@ -415,15 +415,15 @@ def two_playing(w):
     for sid in ("s0", "s1"):
         w.audio[sid] = np.full((48000 * 20, 2), 0.01, np.float32)
         w.meta(sid).mode = "overlap"   # layered (the default stops the other one)
-    w.play("s0")
-    w.play("s1")
-    w._update_chips(w.engine.playing())
+    w.playctl.play("s0")
+    w.playctl.play("s1")
+    w.playctl._update_chips(w.engine.playing())
     assert list(w._chips) == ["s0", "s1"]
 
 
 def chip_stop(w, sid):
     w._chips[sid].findChildren(QPushButton)[-1].click()
-    w._update_chips(w.engine.playing())
+    w.playctl._update_chips(w.engine.playing())
 
 
 def test_stopping_one_of_two_keeps_the_others_chip(window):
@@ -434,11 +434,11 @@ def test_stopping_one_of_two_keeps_the_others_chip(window):
     chip_stop(w, "s1")
     assert list(w.engine.playing()) == ["s0"]
     assert list(w._chips) == ["s0"] and not w.playing_row.isHidden()
-    w._stopped_at = (0.0, "s1")       # well after the first press
+    w.playctl._stopped_at = (0.0, "s1")       # well after the first press
     chip_stop(w, "s0")                # the last one stops: the row goes
     assert not w.engine.playing() and w.playing_row.isHidden()
-    w.play("s1")                      # one sound on its own: its chip, same as always
-    w._update_chips(w.engine.playing())
+    w.playctl.play("s1")                      # one sound on its own: its chip, same as always
+    w.playctl._update_chips(w.engine.playing())
     assert list(w._chips) == ["s1"] and not w.playing_row.isHidden()
 
 
@@ -471,17 +471,17 @@ def test_stop_all_turns_the_voice_changer_off_but_the_say_bars_stop_doesnt(windo
 def test_the_queue_status_goes_once_the_queue_is_empty(window, monkeypatch, calls):
     w = window
     playing(monkeypatch, w, ["s0"])
-    w.queue_sound("s1")
-    w.queue_sound("s0")
+    w.playctl.queue_sound("s1")
+    w.playctl.queue_sound("s0")
     assert said(w).startswith("Up next: “Airhorn” (+1 more)")
-    w._unqueue(0)                     # the ✕ on Airhorn's chip
+    w.playctl._unqueue(0)                     # the ✕ on Airhorn's chip
     assert said(w).startswith("Up next: “Boom”")
     playing(monkeypatch, w, [])
     w.tick()                          # the last one starts: nothing is up next
-    assert w._queue == [] and not said(w).startswith("Up next")
+    assert w.playctl._queue == [] and not said(w).startswith("Up next")
     playing(monkeypatch, w, ["s0"])
-    w.queue_sound("s1")
-    w.stop_all()
+    w.playctl.queue_sound("s1")
+    w.playctl.stop_all()
     assert not said(w).startswith("Up next")
 
 
@@ -495,18 +495,18 @@ def test_a_trigger_deleted_while_its_pad_waits_or_queues_never_starts_it(window,
     host = BoardHost(w)
     w.meta("s0").delay = 0.05
     assert host.play("s0", tag="t1/s0")
-    assert "s0" in w._waiting
+    assert "s0" in w.playctl._waiting
     host.stop_tag("t1/s0")
-    assert not w._waiting
+    assert not w.playctl._waiting
     process_events(qapp, lambda: False, 0.2)
     assert calls == []
     w.meta("s1").mode = "queue"
     playing(monkeypatch, w, ["s0"])
-    w.queue_sound("s0")               # queued by hand: stays
+    w.playctl.queue_sound("s0")               # queued by hand: stays
     assert host.play("s1", tag="t2/s1")
-    assert w._queue == ["s0", "s1"]
+    assert w.playctl._queue == ["s0", "s1"]
     host.stop_tag("t2/s1")
-    assert w._queue == ["s0"]
+    assert w.playctl._queue == ["s0"]
 
 
 def menu_pick(monkeypatch, path):
@@ -532,8 +532,8 @@ def menu_pick(monkeypatch, path):
 def test_pad_menu_is_short_grouped_and_shows_the_hotkey(window, monkeypatch):
     w = window
     shown = menu_pick(monkeypatch, ["Set hotkey"])
-    from soundboard.ui import mainwindow
-    monkeypatch.setattr(mainwindow.HotkeyDialog, "exec",
+    from soundboard.settings import HotkeyDialog
+    monkeypatch.setattr(HotkeyDialog, "exec",
                         lambda self: setattr(self, "result_combo", "ctrl+alt+7") or True)
     w.padctl.pad_menu("s0", None)
     assert shown == ["Play next", "Volume", "---", "Edit", "Rename",
@@ -586,12 +586,12 @@ def test_a_key_taken_from_another_sound_or_action_says_so(window):
     w = window
     w.cfg.stop_hotkey = "ctrl+alt+s"
     w.meta("s1").hotkey = "f2"
-    w.set_sound_hotkey("s0", "f2")
+    w.hkctl.set_sound_hotkey("s0", "f2")
     assert w.meta("s1").hotkey == "" and "it was the key for “Airhorn”" in said(w)
-    w.set_sound_hotkey("s0", "ctrl+alt+s")
+    w.hkctl.set_sound_hotkey("s0", "ctrl+alt+s")
     assert w.cfg.stop_hotkey == "" and "Stop everything" in said(w)
     unsay(w)
-    w.set_sound_hotkey("s1", "f9")         # a free key: just the green card, no warning
+    w.hkctl.set_sound_hotkey("s1", "f9")         # a free key: just the green card, no warning
     [t] = toast.shown(w)
     assert t.kind == "ok" and "f9 plays" in t.text()
 
@@ -605,14 +605,14 @@ def test_a_global_hotkey_taken_off_a_sound_is_said_out_loud(window, monkeypatch)
     w = window
     w.meta("s0").hotkey = "f1"
     w.cfg.category_hotkeys["All"] = "f1"
-    w.set_global_hotkey("stop_hotkey", "f1")
+    w.hkctl.set_global_hotkey("stop_hotkey", "f1")
     assert w.meta("s0").hotkey == ""
     assert "All" not in w.cfg.category_hotkeys
     assert w.cfg.stop_hotkey == "f1"
     text, kind = toasts[-1]
     assert kind == "warn" and "Boom" in text and "Stop everything" in text and "All" in text
     toasts.clear()
-    w.set_global_hotkey("pause_hotkey", "f2")   # nothing had F2: no warning
+    w.hkctl.set_global_hotkey("pause_hotkey", "f2")   # nothing had F2: no warning
     assert not [t for t in toasts if t[1] == "warn"]
 
 
@@ -674,7 +674,7 @@ def test_transport_time_is_blank_until_a_sound_is_picked(window):
     w = window
     assert w.np_time.text() == "" and w.mini_time.text() == ""
     assert w.np_time.isHidden()   # blank: the seek line takes its room
-    w.select("s0")
+    w.playctl.select("s0")
     w._update_transport({})   # the player's timer tick
     assert w.np_time.text() and not w.np_time.isHidden()
     w.rmctl.remove_sound("s0")   # back to "Pick a sound"

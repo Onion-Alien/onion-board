@@ -70,7 +70,7 @@ class EditControl(Controller):
         mw = self.mw
         if self._editors.get(sid) is d:
             del self._editors[sid]
-        mw.drop_preview()                        # a preview still rendering
+        mw.playctl.drop_preview()                        # a preview still rendering
         mw.engine.stop(f"{sid}:preview")         # and the one playing, either kind
         mw.engine.stop(f"{sid}~fx:preview")
         # the sound as it is now: gone (removed while the window was open: nothing to
@@ -82,26 +82,26 @@ class EditControl(Controller):
             elif ok and m is not None:
                 old_key = soundfx.key(m.fx)
                 d.apply(m)
-                mw._clear_dupe_hotkey(m)
+                mw.hkctl._clear_dupe_hotkey(m)
                 mw.engine.set_gain(sid, mw.gain_for(m))
                 if soundfx.key(m.fx) != old_key:
                     self._rerender(m)
                 mw._save_now()
                 mw.pads[sid].update()
-                mw.apply_filter(mw.search.text())
+                mw.searchctl.apply_filter(mw.search.text())
         finally:
             if mw.setctl._spare_editor is None and d not in self._editors.values():
                 rehome_crash_reports(d)
                 mw.setctl._spare_editor = d
             else:   # freed once its finished signal is over (deleting it inside crashed)
                 QTimer.singleShot(0, lambda: free_dialog(d))
-        mw.register_hotkeys()
+        mw.hkctl.register_hotkeys()
 
     def _new_editor(self, m: SoundMeta, tab: str) -> EditDialog:
         mw = self.mw
-        d = EditDialog(m, mw.hotkeys, mw.preview, mw, tab=tab,
+        d = EditDialog(m, mw.hotkeys, mw.playctl.preview, mw, tab=tab,
                        others=lambda: list(mw._meta.values()))
-        d.hotkeys_changed.connect(mw.register_hotkeys)
+        d.hotkeys_changed.connect(mw.hkctl.register_hotkeys)
         d.source_forgotten.connect(mw._save_now)
         d.finished.connect(lambda ok, d=d: self._edit_done(d.meta.id, d, ok))
         return d
@@ -168,7 +168,7 @@ class EditControl(Controller):
             new.name = f"{m.name} (edit)"[:40]
         if new.hotkey == m.hotkey:
             new.hotkey = ""   # the original keeps its hotkey
-        mw._clear_dupe_hotkey(new)
+        mw.hkctl._clear_dupe_hotkey(new)
         mw.catctl._tag_new(new)   # stays in sight in the category showing
         mw.cfg.sounds.insert(mw.cfg.sounds.index(m) + 1, new)
         mw._index()

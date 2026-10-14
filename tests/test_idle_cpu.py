@@ -79,17 +79,17 @@ def test_an_unplugged_device_is_looked_for_less_often(window, monkeypatch, qapp)
 
 def test_whos_listening_poll_slows_down_while_hidden(window, monkeypatch):  # noqa: F811
     polls = []
-    monkeypatch.setattr(window, "_poll_voice", lambda: polls.append(1))
+    monkeypatch.setattr(window.appsetctl, "_poll_voice", lambda: polls.append(1))
     window.cfg.dest = {"mode": "off", "auto": False}
     window._ui_live = True
-    window._voice_tick()
-    window._voice_tick()
+    window.appsetctl._voice_tick()
+    window.appsetctl._voice_tick()
     assert len(polls) == 2
     window._ui_live = False
-    window._voice_tick()
+    window.appsetctl._voice_tick()
     assert len(polls) == 2                            # nobody sees the hint
     window.cfg.dest = {"mode": "off", "auto": True}
-    window._voice_tick()
+    window.appsetctl._voice_tick()
     assert len(polls) == 3                            # it switches by itself: keeps up
 
 
@@ -169,7 +169,7 @@ def test_the_ui_tick_slows_down_while_nothing_moves(window, monkeypatch, qapp): 
     e.level_play = e.level_main = e.level_mic = 0.0
     window.tick()
     assert window.timer.interval() == main.TICK_QUIET_MS    # 10 a second, not 30
-    window.play("s0")                                       # back to full pace at once
+    window.playctl.play("s0")                                       # back to full pace at once
     assert window.timer.interval() == main.TICK_MS
     playing["s0"] = (0.5, True)                             # paused: nothing moves
     e.level_play = e.level_main = 0.0
@@ -224,14 +224,14 @@ def test_waiting_queues_do_not_keep_paused_playback_busy(window, monkeypatch):  
     monkeypatch.setattr(window.radio, "is_active", lambda: False)
     monkeypatch.setattr(window.linkbar, "up_next", lambda: ["https://example.com/song"])
     monkeypatch.setattr(main.appstate, "active", lambda: True)
-    window._queue[:] = ["s1"]
+    window.playctl._queue[:] = ["s1"]
     window.engine.level_play = window.engine.level_main = window.engine.level_mic = 0.0
     monkeypatch.setattr(window.engine, "aux", ())
     window._ui_live = True
     window.tick()
     assert not window._tick_busy
     assert window.timer.interval() == main.TICK_QUIET_MS
-    assert window._queue == ["s1"]
+    assert window.playctl._queue == ["s1"]
 
     window._ui_live = False
     window.tick()
@@ -243,7 +243,7 @@ def test_waiting_queues_do_not_keep_paused_playback_busy(window, monkeypatch):  
     assert window.timer.interval() == main.TICK_MS
 
     advanced = []
-    monkeypatch.setattr(window, "_next_in_queue", lambda: advanced.append(True))
+    monkeypatch.setattr(window.playctl, "_next_in_queue", lambda: advanced.append(True))
     monkeypatch.setattr(window.linkbar, "play_next", lambda: False)
     playing.clear()
     window.tick()

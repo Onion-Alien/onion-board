@@ -130,9 +130,9 @@ class TabControl(Controller):
         key = TAB_KEYS[i]
         menu = QMenu(mw)
         menu.setAttribute(Qt.WidgetAttribute.WA_DeleteOnClose)
-        if mw._tab_info_at(i) is not None:
+        if mw.tipctl._tab_info_at(i) is not None:
             menu.addAction(icons.icon("info"), _("About this tab"),
-                           lambda: mw._show_tab_info(i))
+                           lambda: mw.tipctl._show_tab_info(i))
             menu.addSeparator()
         if key in taboff.KEYS:
             act = menu.addAction(icons.icon("offline"), _("Hide this tab"))

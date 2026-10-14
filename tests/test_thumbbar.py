@@ -135,6 +135,6 @@ def test_stop_all_forgets_the_paused_station(window, monkeypatch):  # noqa: F811
     _fake_sounds(window, monkeypatch, {})
     monkeypatch.setattr(window, "radio", _FakeRadio("station-a"))
     window.thumbbar.click(thumbbar.PAUSE)
-    window.stop_all()
+    window.playctl.stop_all()
     window.thumbbar.click(thumbbar.PAUSE)   # nothing left to bring back
     assert window.radio.played == []

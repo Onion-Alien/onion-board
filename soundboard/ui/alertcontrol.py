@@ -202,9 +202,9 @@ class AlertControl(Controller):
         if now != before:
             log.info("Discord settings: %s", now or "fine")
             self._show_urgent()
-        app = mw._setup_app
-        if mw._setup_state == "done" and app is not None and app.guide == "discord":
-            mw._show_setup("done", app)   # its ticks, live
+        app = mw.appsetctl._setup_app
+        if mw.appsetctl._setup_state == "done" and app is not None and app.guide == "discord":
+            mw.appsetctl._show_setup("done", app)   # its ticks, live
 
     def _show_urgent(self):
         mw = self.mw
@@ -227,8 +227,8 @@ class AlertControl(Controller):
             mw.urgent_sub.setText(state[3] if state[0] == "failed"
                                     else " · ".join(filter(None, (state[1], state[2]))))
         mw.urgent_bar.show()
-        if mw._setup_state == "offer":
-            mw._hide_setup()   # one bar at a time: the warning beats "Set up for it?"
+        if mw.appsetctl._setup_state == "offer":
+            mw.appsetctl._hide_setup()   # one bar at a time: the warning beats "Set up for it?"
 
     def _hide_urgent(self):
         now = self._urgent_now()

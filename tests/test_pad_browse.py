@@ -85,10 +85,10 @@ def test_saved_clips_know_when_they_were_added(app_dir):
 def test_playing_counts_and_most_played_sorts(window, monkeypatch):
     w = window
     monkeypatch.setattr(w.engine, "play", lambda *a, **k: object())
-    w.play("s1")
-    w.play("s1")
+    w.playctl.play("s1")
+    w.playctl.play("s1")
     assert (w.meta("s0").plays, w.meta("s1").plays) == (0, 2)
-    assert w._count_save.isActive()   # saved soon, not on each press
+    assert w.playctl._count_save.isActive()   # saved soon, not on each press
     assert [p.meta.id for p in w.grid.pads] == ["s0", "s1"]   # not re-sorted under the mouse
     w.padctl.set_pad_sort("plays")
     assert [p.meta.id for p in w.grid.pads] == ["s1", "s0"]
@@ -200,7 +200,7 @@ def test_ctrl_wheel_changes_a_pads_volume(window, monkeypatch):
     assert w.meta("s0").volume == 0.0
     wheel(pad, 60)                                   # ...and the other half
     assert w.meta("s0").volume == pytest.approx(0.05)
-    assert w._count_save.isActive()
+    assert w.playctl._count_save.isActive()
 
 
 def test_plain_wheel_still_scrolls(window):

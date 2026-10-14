@@ -214,17 +214,17 @@ def test_game_mode_picks_the_shaping_by_itself(window, monkeypatch):  # noqa: F8
             return self.key
     window.voice_watch = Watch()
     window.listeners = Heard()
-    window._poll_voice()
+    window.appsetctl._poll_voice()
     assert window.engine.dest.key == "unity" and window.cfg.dest["simple"] == "game"
     assert toasts and "Game mode" in toasts[-1] and "Unity" in toasts[-1]
     assert "The game you have open uses" in panel.now.text()
     assert panel.suggest.isHidden()
     window.voice_watch.key = None                     # the game closed: keeps it
-    window._poll_voice()
+    window.appsetctl._poll_voice()
     assert window.engine.dest.key == "unity"
     # Discord listening while in Game: suggested, never switched
     window.listeners.found = (("discord", "Discord"),)
-    window._poll_voice()
+    window.appsetctl._poll_voice()
     assert window.engine.dest.key == "unity" and not panel.suggest.isHidden()
     assert "Voice chat" in panel.suggest_text.text()
     panel.suggest_btn.click()
@@ -268,7 +268,7 @@ def test_the_game_in_front_suggests_its_voice_engine(window):  # noqa: F811
         def poll(self):
             return self.key
     window.voice_watch = Watch()
-    window._poll_voice()
+    window.appsetctl._poll_voice()
     assert window.voice_suggestion == "game" and not panel.suggest.isHidden()
     assert "Vivox" in panel.suggest_text.text()
     assert window.engine.dest.key == "discord"     # only suggested, never switched
@@ -276,12 +276,12 @@ def test_the_game_in_front_suggests_its_voice_engine(window):  # noqa: F811
     assert window.cfg.dest["mode"] == "game" and window.engine.dest.key == "game"
     assert panel.suggest.isHidden()                # already picked: nothing to suggest
     window.voice_watch.key = None                  # the game closed
-    window._poll_voice()
+    window.appsetctl._poll_voice()
     panel.combo.setCurrentIndex(panel.combo.findData("off"))
     assert panel.suggest.isHidden()
     d = SettingsDialog(window, "audio")            # a second picker hears it too
     window.voice_watch.key = "game"
-    window._poll_voice()
+    window.appsetctl._poll_voice()
     other = next(p for p in d.findChildren(DestPanel))
     assert not other.suggest.isHidden()
     d.close()
@@ -306,7 +306,7 @@ def test_the_program_listening_to_the_cable_beats_the_game_in_front(window, monk
     window.voice_watch = Watch()
     window.listeners = Heard()
     window.listeners.found = (("discord", "Discord"),)   # ...but Discord has the cable
-    window._poll_voice()
+    window.appsetctl._poll_voice()
     assert window.voice_suggestion == "discord"
     assert "Discord is listening" in panel.suggest_text.text()   # Clean: Voice chat suits
     assert "<b>Voice chat</b> mode" in panel.suggest_text.text()
@@ -315,7 +315,7 @@ def test_the_program_listening_to_the_cable_beats_the_game_in_front(window, monk
     assert "Discord is listening" in panel.suggest_text.text()
     assert "<b>Discord</b> suits it" in panel.suggest_text.text()
     window.listeners.found = (("discord", "Discord"), ("game", "Valorant"))
-    window._poll_voice()
+    window.appsetctl._poll_voice()
     assert window.voice_suggestion == "game"       # both: the game in front wins
     assert "Valorant is listening" in panel.suggest_text.text()
 
@@ -331,16 +331,16 @@ def test_switch_by_itself_follows_whoever_listens(window, monkeypatch):  # noqa:
     panel.chk_auto.setChecked(True)
     assert window.cfg.dest["auto"] is True and window.engine.dest is None
     window.listeners.found = (("discord", "Discord"),)
-    window._poll_voice()
+    window.appsetctl._poll_voice()
     assert window.cfg.dest["mode"] == "discord" and window.engine.dest.key == "discord"
     assert panel.combo.currentData() == "discord" and panel.suggest.isHidden()
     assert toasts and "Discord" in toasts[-1]
     window.listeners.found = ()                    # Discord closed: the mode stays
-    window._poll_voice()
+    window.appsetctl._poll_voice()
     assert window.engine.dest.key == "discord"
     panel.chk_auto.setChecked(False)
     window.listeners.found = (("game", "TeamSpeak"),)
-    window._poll_voice()
+    window.appsetctl._poll_voice()
     assert window.engine.dest.key == "discord"     # off: back to only suggesting
     assert not panel.suggest.isHidden()
 

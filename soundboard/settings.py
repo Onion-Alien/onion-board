@@ -37,7 +37,7 @@ from soundboard.ui.pixels import snap_to_pixels
 log = logging.getLogger(__name__)
 
 # Global hotkey actions: (config attribute, action id, label, what it does).
-# Grouped for the Settings window; the action ids go to MainWindow.on_hotkey.
+# Grouped for the Settings window; the action ids go to HotkeyControl.on_hotkey.
 HOTKEY_GROUPS = [
     (_("Sounds"), [
         ("stop_hotkey", "__stop__", _("Stop everything"),
@@ -1128,7 +1128,7 @@ class SettingsDialog(QDialog):
                     _("Onion Board shows {name} after a restart.", name=i18n.name_of(code)),
                     _("Restart now")))
                 note.setText("‏" + text if i18n.is_rtl(code) else text)   # (RLM: see
-                # MainWindow._offer_language)
+                # LanguageControl._offer_language)
                 restart.setText(button)
                 note.setLayoutDirection(Qt.LayoutDirection.RightToLeft if i18n.is_rtl(code)
                                         else Qt.LayoutDirection.LeftToRight)
@@ -1143,7 +1143,7 @@ class SettingsDialog(QDialog):
             self.lang_dialog = dlg   # (tests reach it while it's open)
             dlg.setAttribute(Qt.WidgetAttribute.WA_DeleteOnClose)
             dlg.chosen.connect(lambda code: (
-                self.mw.switch_language(code, restart=False), show()))
+                self.mw.langctl.switch_language(code, restart=False), show()))
             dlg.destroyed.connect(lambda *__: setattr(self, "lang_dialog", None))
             dlg.open_under(pick)   # a drop-down, not a window: nothing waits on it
         pick.clicked.connect(open_picker)
@@ -1283,7 +1283,7 @@ class SettingsDialog(QDialog):
                                     "play that category's sounds. Sounds in no category always "
                                     "keep their keys."))
                 scoped.setChecked(self.mw.cfg.scoped_hotkeys)
-                scoped.toggled.connect(self.mw.set_scoped_hotkeys)
+                scoped.toggled.connect(self.mw.hkctl.set_scoped_hotkeys)
                 cv.addWidget(scoped)
                 hint = QLabel(_("Sound hotkeys only work in the category showing. Switch "
                                 "categories to use the same keys for different sounds."))
@@ -1360,10 +1360,10 @@ class SettingsDialog(QDialog):
         if d.exec() and d.result_combo:
             self._set_hk(attr, d.result_combo)
         else:
-            self.mw.register_hotkeys()   # capture paused them
+            self.mw.hkctl.register_hotkeys()   # capture paused them
 
     def _set_hk(self, attr, combo):
-        self.mw.set_global_hotkey(attr, combo)
+        self.mw.hkctl.set_global_hotkey(attr, combo)
         self._refresh_hk()
 
     def _overlay(self):
@@ -1670,11 +1670,11 @@ class SettingsDialog(QDialog):
                            _("Otherwise, double-click to play. Ctrl+click selects without "
                              "playing."), self.mw.cfg.single_click, self.mw.set_single_click)
         one.setToolTip(_("Then Ctrl+click picks a pad without playing it"))
-        if hasattr(self.mw, "set_tips_on"):
+        if hasattr(getattr(self.mw, "tipctl", None), "set_tips_on"):
             self.box_tips = self._option(
                 cv, _("Show tips"),
                 _("A short “Did you know?” about a feature, at most once a day, never while a "
-                  "game is up."), self.mw.cfg.tips_on, self.mw.set_tips_on)
+                  "game is up."), self.mw.cfg.tips_on, self.mw.tipctl.set_tips_on)
         v.addWidget(card)
         v.addWidget(self._app_setup_card())
         if self.mw.cfg.category_programs:   # rules made before the category menu lost it

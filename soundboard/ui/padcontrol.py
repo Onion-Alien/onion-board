@@ -190,8 +190,8 @@ class PadControl(Controller):
         mw.engine.set_gain(sid, mw.gain_for(m))
         QToolTip.showText(QCursor.pos(), _("{name}: {pct}%", name=m.name,
                                            pct=round(m.volume * 100)), mw.pads.get(sid))
-        if not mw._count_save.isActive():
-            mw._count_save.start()
+        if not mw.playctl._count_save.isActive():
+            mw.playctl._count_save.start()
 
     def pad_menu(self, sid, pos):
         mw = self.mw
@@ -285,9 +285,9 @@ class PadControl(Controller):
             d.forgotten.connect(mw._save_now)
             d.show()
         elif act == a_stop:
-            mw._stop_sound(sid)
+            mw.playctl._stop_sound(sid)
         elif act == a_next:
-            mw.queue_sound(sid)
+            mw.playctl.queue_sound(sid)
         elif act == a_edit:
             mw.editctl.edit(sid)
         elif act == a_ren:
@@ -297,9 +297,9 @@ class PadControl(Controller):
         elif act == a_show:
             mw.editctl.show_sound_file(sid)
         elif act == a_hk:
-            mw.set_sound_hotkey(sid)
+            mw.hkctl.set_sound_hotkey(sid)
         elif act is not None and act == a_hk_clear:
-            mw.set_sound_hotkey(sid, "")
+            mw.hkctl.set_sound_hotkey(sid, "")
         elif act == a_del:
             mw.rmctl.ask_remove([sid])
 

@@ -67,7 +67,7 @@ def focused(monkeypatch, w):
 
 
 def test_space_pauses_the_player_after_a_button_was_clicked(window, player, monkeypatch):
-    window.play("s0")
+    window.playctl.play("s0")
     assert player.paused("s0") is False
     btn = toolbar_button(window)
     clicks = []
@@ -82,7 +82,7 @@ def test_space_pauses_the_player_after_a_button_was_clicked(window, player, monk
 
 def test_space_still_presses_a_button_reached_with_tab_and_types_in_text(
         window, player, monkeypatch):
-    window.play("s0")
+    window.playctl.play("s0")
     btn = toolbar_button(window)
     focused(monkeypatch, btn)
     focus(btn, Qt.TabFocusReason)
@@ -100,7 +100,7 @@ def _link(window, url="https://www.youtube.com/watch?v=abc"):
     data = np.zeros((SR * 5, 2), dtype=np.float32)
     window.linkbar.url = url
     window.engine.play(LINK_ID, data, 1.0, mode="restart")
-    window.on_link_played("What Is Love", data, 1.0)
+    window.searchctl.on_link_played("What Is Love", data, 1.0)
     r = ytdl.Result(id="abc", title="What Is Love", channel="Haddaway", seconds=5)
     row = ResultRow(r)
     row.play.connect(window.ytresults.play)
@@ -128,7 +128,7 @@ def test_the_web_result_in_the_player_says_so(window, player):
     window.tick()
     assert row.now == "playing" and row.btn_play.text() == "Pause"
     assert row.property("playing") is True and row.thumb.now == "playing"
-    window.toggle_play_pause()
+    window.playctl.toggle_play_pause()
     window.tick()
     assert row.now == "paused" and row.btn_play.text() == "Resume"
     del player.voices[LINK_ID]                    # it finished
@@ -164,11 +164,11 @@ def test_a_new_sound_stops_the_one_playing_unless_set_to_overlap(window, player,
     monkeypatch.setattr(window.engine, "play", lambda sid, *a, **k: (
         modes.__setitem__(sid, k.get("mode")), play(sid, *a, **k))[1])
     m = window.meta("s0")
-    window.play("s0")
+    window.playctl.play("s0")
     assert modes["s0"] == "solo"
     m.mode = "overlap"
-    window._cool.clear()
-    window.play("s0")
+    window.playctl._cool.clear()
+    window.playctl.play("s0")
     assert modes["s0"] == "overlap"
 
 
@@ -179,14 +179,14 @@ def test_a_web_song_saved_as_a_pad_plays_once_not_twice(window, player, monkeypa
     _link(window, "https://www.youtube.com/watch?v=abc&list=x")
     m = window.meta("s0")
     monkeypatch.setattr(m, "source", {"link": "https://youtu.be/abc"})
-    window.play("s0")
+    window.playctl.play("s0")
     assert LINK_ID not in player.voices and "s0" in player.voices
 
 
 def test_another_pad_leaves_the_web_song_playing(window, player, monkeypatch):
     _link(window)
     monkeypatch.setattr(window.meta("s0"), "source", {"link": "https://youtu.be/other"})
-    window.play("s0")
+    window.playctl.play("s0")
     assert LINK_ID in player.voices and "s0" in player.voices
 
 
@@ -196,5 +196,5 @@ def test_playing_a_search_hit_already_on_the_board_plays_its_pad(window, player,
     fetched = []
     monkeypatch.setattr(window.linkbar, "play_once", lambda: fetched.append(1) or True)
     r = ytdl.Result(id="abc", title="What Is Love", channel="Haddaway", seconds=5)
-    window._from_youtube(r, True)
+    window.searchctl._from_youtube(r, True)
     assert "s0" in player.voices and LINK_ID not in player.voices and not fetched

@@ -48,7 +48,7 @@ class ThemeControl(Controller):
         if mw.bunctl.bun_mode is not None:
             mw.bunctl.bun_mode.retheme()
         pp, mw._pp_icon = mw._pp_icon, None
-        mw._set_pp_icon(pp or "play")
+        mw.playctl._set_pp_icon(pp or "play")
         mw._pill_long = ""   # forces _update_flow to repaint its icon
         mw.statusctl._update_status()   # the hints and flow, in this theme's status colours
         mw.rail.refresh_output()   # its status icon is a copy of the pill's: redrawn

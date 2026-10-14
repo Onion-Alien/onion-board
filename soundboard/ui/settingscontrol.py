@@ -165,7 +165,7 @@ class SettingsControl(Controller):
                 QTimer.singleShot(0, lambda: free_dialog(old))
         else:   # freed once its finished signal is over (deleting it inside that crashed)
             QTimer.singleShot(0, lambda: free_dialog(dlg))
-        mw.register_hotkeys()   # in case a capture was cancelled
+        mw.hkctl.register_hotkeys()   # in case a capture was cancelled
         self._check_route_pick()
 
     def _settings_reusable(self, dlg) -> bool:

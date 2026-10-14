@@ -95,7 +95,7 @@ class RemoveControl(Controller):
         mw._save_now()
         mw._rebuild_pads()
         mw.catctl._fill_categories()
-        mw.register_hotkeys()
+        mw.hkctl.register_hotkeys()
         # "Removed X · Undo" for a while; after that they're in Recently deleted
         if len(gone) == 1:
             name = mw.fontMetrics().elidedText(gone[0].name, Qt.TextElideMode.ElideRight, 260)
@@ -129,7 +129,7 @@ class RemoveControl(Controller):
             m, index, data = entries.pop()
             if any(o.id == m.id for o in mw.cfg.sounds):
                 continue   # already back
-            if m.hotkey and mw._hotkey_taken(m.hotkey):
+            if m.hotkey and mw.hkctl._hotkey_taken(m.hotkey):
                 m.hotkey = ""   # given to something else in the meantime
             mw.cfg.sounds.insert(min(index, len(mw.cfg.sounds)), m)
             m.tags = library.merge_tags(m.tags, mw.cfg.categories, mw.cfg.subcategories)
@@ -142,7 +142,7 @@ class RemoveControl(Controller):
         mw.catctl._fill_categories()
         if any(m.id not in mw.audio for m in mw.cfg.sounds):
             mw._load_all()
-        mw.register_hotkeys()
+        mw.hkctl.register_hotkeys()
 
     def _finish_removals(self):
         """The undo window is over: the removed sounds go to Recently deleted

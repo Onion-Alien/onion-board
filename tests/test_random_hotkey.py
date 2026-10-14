@@ -42,16 +42,16 @@ def test_random_hotkeys_pick_from_the_right_category(window):
         w.audio[sid] = np.zeros((480, 2), np.float32)
     w._rebuild_pads()
     played = []
-    w.play = played.append
+    w.playctl.play = played.append
     for _ in range(6):
-        w.on_hotkey("__random__:Memes")
+        w.hkctl.on_hotkey("__random__:Memes")
     assert set(played) == {"m0", "m1"}
     played.clear()
     w.catctl.set_category("Memes")
-    w.on_hotkey("__random__")                     # the global one follows the view
+    w.hkctl.on_hotkey("__random__")                     # the global one follows the view
     assert played[0] in ("m0", "m1")
     w.catctl.set_category("")
-    assert {w.play_random() for _ in range(8)} >= {"s0", "s1"}
+    assert {w.playctl.play_random() for _ in range(8)} >= {"s0", "s1"}
 
 
 def test_category_hotkey_is_unique_and_follows_renames(window, monkeypatch):
@@ -60,13 +60,13 @@ def test_category_hotkey_is_unique_and_follows_renames(window, monkeypatch):
     monkeypatch.setattr(w.hotkeys, "register", lambda m: registered.append(dict(m)))
     w.catctl.new_category(name="Memes")
     w.meta("s0").hotkey = "ctrl+1"
-    w.set_category_hotkey("Memes", "ctrl+1")
+    w.hkctl.set_category_hotkey("Memes", "ctrl+1")
     assert w.meta("s0").hotkey == "" and w.cfg.category_hotkeys == {"Memes": "ctrl+1"}
     assert registered[-1]["ctrl+1"] == "__random__:Memes"
     w.catctl.rename_category("Memes", "Funny")
     assert w.cfg.category_hotkeys == {"Funny": "ctrl+1"}
-    w.set_global_hotkey("stop_hotkey", "ctrl+1")   # taken for something else
+    w.hkctl.set_global_hotkey("stop_hotkey", "ctrl+1")   # taken for something else
     assert w.cfg.category_hotkeys == {}
-    w.set_category_hotkey("Funny", "ctrl+2")
+    w.hkctl.set_category_hotkey("Funny", "ctrl+2")
     w.catctl.delete_category("Funny")
     assert w.cfg.category_hotkeys == {}

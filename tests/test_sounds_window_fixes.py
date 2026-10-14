@@ -14,6 +14,7 @@ from PySide6.QtWidgets import QMessageBox
 from conftest import process_events, said
 from soundboard import backup, engine, library, winkeys
 from soundboard.library import SR, Config, SoundMeta
+from soundboard.ui import hotkeycontrol
 from soundboard.ui import mainwindow as main
 from soundboard.ui.dialogs import EditDialog
 
@@ -66,18 +67,18 @@ def _pack(path, entry, wav):
 
 def test_a_renamed_category_keeps_its_random_hotkey(window):
     window.catctl.new_category("s0", name="Memes")
-    window.set_category_hotkey("Memes", "f7")
+    window.hkctl.set_category_hotkey("Memes", "f7")
     window.catctl.rename_category("Memes", "Jokes")
-    assert window._registered[-1].get("f7") == main.RANDOM + "Jokes"
+    assert window._registered[-1].get("f7") == hotkeycontrol.RANDOM + "Jokes"
     played = []
-    window.play = played.append
-    window.on_hotkey(window._registered[-1]["f7"])
+    window.playctl.play = played.append
+    window.hkctl.on_hotkey(window._registered[-1]["f7"])
     assert played == ["s0"]
 
 
 def test_a_deleted_category_lets_go_of_its_hotkey(window, monkeypatch):
     window.catctl.new_category("s0", name="Memes")
-    window.set_category_hotkey("Memes", "f7")
+    window.hkctl.set_category_hotkey("Memes", "f7")
     monkeypatch.setattr(QMessageBox, "question", lambda *a, **k: QMessageBox.Yes)
     window.catctl.delete_category("Memes")
     assert "f7" not in window._registered[-1]
@@ -120,7 +121,7 @@ def test_the_edit_dialog_does_not_nudge_the_volume(window):
     assert drifting
     for pct in drifting[:6]:
         m.volume = pct / 100
-        d = EditDialog(m, window.hotkeys, window.preview, window)
+        d = EditDialog(m, window.hotkeys, window.playctl.preview, window)
         d.apply()
         d.deleteLater()
         assert round(m.volume * 100) == pct
@@ -155,13 +156,13 @@ def test_an_imported_tag_joins_the_category_spelled_differently(window, tmp_path
 
 def test_an_imported_hotkey_does_not_take_a_categorys(window, tmp_path, qapp):
     window.catctl.new_category("s0", name="Memes")
-    window.set_category_hotkey("Memes", "f7")
+    window.hkctl.set_category_hotkey("Memes", "f7")
     wav = _tone(tmp_path / "w.wav").read_bytes()
     window.impctl.import_package(str(_pack(tmp_path / "p.zip", {"name": "x", "hotkey": "f7"}, wav)))
     process_events(qapp, lambda: len(window.cfg.sounds) == 4, 10)
     assert window.cfg.sounds[-1].hotkey == ""
     assert window.cfg.category_hotkeys == {"Memes": "f7"}
-    assert window._registered[-1]["f7"] == main.RANDOM + "Memes"
+    assert window._registered[-1]["f7"] == hotkeycontrol.RANDOM + "Memes"
 
 
 @pytest.mark.parametrize("take", [False, True])
