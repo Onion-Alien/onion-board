@@ -3,7 +3,9 @@ name: links
 # Weekly check for dead links in the README, the docs and the website (dead links
 # look abandoned to people and to search engines). A red run lists each broken link.
 # Sites that refuse bots or rate-limit them (YouTube, Reddit, X, TikTok, Discord,
-# VirusTotal) are skipped: they'd fail every week while working fine for people.
+# VirusTotal, Epic) are skipped: they'd fail every week while working fine for people.
+# So are the README's GitHub-relative links (../../releases/latest), which only
+# resolve on github.com.
 on:
   schedule:
     - cron: "47 5 * * 3"   # Wednesdays 05:47 UTC
@@ -29,5 +31,6 @@ jobs:
             --max-retries 3
             --accept 200,206,429
             --root-dir ${{ github.workspace }}/site
-            --exclude "youtube\.com|youtu\.be|reddit\.com|(^|\.)x\.com|twitter\.com|tiktok\.com|discord\.(com|gg)|virustotal\.com|localhost|127\.0\.0\.1"
+            --exclude "youtube\.com|youtu\.be|reddit\.com|(^|\.)x\.com|twitter\.com|tiktok\.com|discord\.(com|gg)|virustotal\.com|epicgames\.com|localhost|127\.0\.0\.1"
+            --exclude "^file://.*/(releases|issues)(/|$)"
             README.md CONTRIBUTING.md SECURITY.md "docs/**/*.md" "site/**/*.html"
