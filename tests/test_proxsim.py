@@ -8,7 +8,7 @@ import pytest
 from soundboard import chatsim, codecsim, proxsim, realproc
 from soundboard.codecsim import PROFILES, analyze, pink_noise
 
-sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "scripts"))
+sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "scripts" / "voicetests"))
 
 SR = 48000
 

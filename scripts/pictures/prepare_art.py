@@ -1,6 +1,6 @@
 """Turn generated pictures into the app's artwork (assets/art/<key>.png).
 
-    .venv\\Scripts\\python scripts\\prepare_art.py <folder of pictures>
+    .venv\\Scripts\\python scripts\\pictures\\prepare_art.py <folder of pictures>
 
 Each picture whose file name starts with a key from assets/art/README.md (e.g.
 "voice-chipmunk.png", "voice-chipmunk (2).jpg", "voice-demon_final.webp") is
@@ -18,7 +18,7 @@ os.environ.setdefault("QT_QPA_PLATFORM", "offscreen")
 from PySide6.QtCore import Qt  # noqa: E402
 from PySide6.QtGui import QGuiApplication, QImage  # noqa: E402
 
-ROOT = Path(__file__).resolve().parent.parent
+ROOT = Path(__file__).resolve().parents[2]
 ART = ROOT / "assets" / "art"
 SIDE = 128   # shown at 30 px at most: sharp up to 400 % screen scaling
 EXTS = {".png", ".jpg", ".jpeg", ".webp"}

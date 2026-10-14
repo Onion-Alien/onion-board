@@ -55,10 +55,13 @@ VAGUE_NAMES = {"__init__.py", "README.md", "LICENSE", ".gitignore", "requirement
 
 def module_name(rel: str) -> str:
     """soundboard/ui/panel.py → soundboard.ui.panel; tests/ and scripts/ files go by
-    their bare name, as the tests import them."""
+    their bare name, as the tests import them (scripts/voicetests/game_roundtrip.py →
+    game_roundtrip: its folder is put on sys.path)."""
     parts = list(Path(rel).with_suffix("").parts)
-    if parts[0] in ("tests", "scripts"):
+    if parts[0] == "tests":
         parts = parts[1:]
+    elif parts[0] == "scripts":
+        parts = parts[-1:]
     if parts[-1] == "__init__":
         parts = parts[:-1]
     return ".".join(parts)
