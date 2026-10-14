@@ -148,6 +148,7 @@ the launcher the shortcuts and PyInstaller use. The app is the `soundboard` pack
 | `soundboard/ui/worker.py` | `run(fn, signal, name, error=…)`: work on a thread whose answer always comes back to the UI, the error value when it raises (so no busy flag or button stays stuck), nothing when its owner is gone |
 | `soundboard/ui/toast.py` | the result cards in the window's bottom corner (`busy.toast` / `MainWindow.toast`): green / yellow / red, up to three stacked above the player, a repeat counted as ×2, an action button (Undo, See why), Copy on problems, a bar for progress |
 | `soundboard/ui/importreport.py` | what an import skipped and why, sorted into plain groups: the toast's summary line and the *See why* list you can copy |
+| `soundboard/ui/ffmpegcontrol.py` | FFmpeg in the main window (`MainWindow.ffctl`): the check at start-up, getting it by itself when it's missing or won't start, Fix it / Get FFmpeg / Reinstall, and the top bar with how far it is and Stop |
 | `soundboard/ui/dropveil.py` | the veil over the window while files are dragged in: "Drop to add 4 files" |
 | `soundboard/ui/themecover.py` | a still of the window with Bun over it while a theme switch restyles every widget, faded out after: never a half-styled frame |
 | `soundboard/ui/a11y.py` | screen-reader names for icon-only controls, taken from their tooltips as the focus moves |

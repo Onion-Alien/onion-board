@@ -2596,18 +2596,19 @@ class SettingsDialog(QDialog):
 
     def _ffmpeg_sync(self):
         """The FFmpeg row: whether it works, how far its download is, and Reinstall /
-        Get FFmpeg / Fix it. It shows the main window's state (MainWindow._ffmpeg_news
+        Get FFmpeg / Fix it. It shows the main window's state (FfmpegControl.news
         calls this), so it and the bar always agree."""
         from soundboard import ffmpegget
         button = getattr(self, "btn_ffmpeg", None)
         if button is None or not qt_valid(button):
             return
         mw = self.mw
+        ff = getattr(mw, "ffctl", None)   # ui/ffmpegcontrol.py
         h = ffmpegget.last()
         working = h is not None and h.state == ffmpegget.OK
-        getting = getattr(mw, "_ff_getting", False)
+        getting = getattr(ff, "getting", False)
         if h is None:
-            mw.check_ffmpeg()   # its answer comes back through MainWindow._ffmpeg_news
+            mw.check_ffmpeg()   # its answer comes back through FfmpegControl.news
             state, tone, label = _("Checking…"), "", _("Get FFmpeg")
             note = _("M4A, AAC and video files need FFmpeg. It's a free download of "
                      "about 100 MB.")
@@ -2626,13 +2627,13 @@ class SettingsDialog(QDialog):
             note = _("It's installed but won't start ({error}), so M4A, AAC and "
                      "video files won't play. Fix it installs it again.",
                      error=h.why or _("no reason given"))
-        pct = getattr(mw, "_ff_percent", -1)
+        pct = getattr(ff, "percent", -1)
         if getting:
             note = (_("Getting FFmpeg… {percent}%", percent=pct) if pct >= 0
                     else _("Getting FFmpeg…"))
-        elif getattr(mw, "_ff_error", ""):
-            note = mw._ff_error
-        elif getattr(mw, "_ff_done", False) and working:
+        elif ff is not None and ff.error:
+            note = ff.error
+        elif getattr(ff, "done", False) and working:
             note = _("FFmpeg is ready: M4A, AAC and video files play now.")
         elif not working and ffmpegget.why_not():
             note = "\n".join((note, ffmpegget.why_not()))
