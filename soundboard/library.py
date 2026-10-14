@@ -393,7 +393,8 @@ class Config:
     eq_gains: list[float] = field(default_factory=lambda: [0.0] * 7)
     dest: dict = field(default_factory=dict)   # who's listening (soundboard.destination)
     send_mono: bool = True    # phase-aware mono for the send device (sendfx.SmartMono)
-    duck_db: float = 0.0      # lower the sounds this much while you talk; 0 = off
+    duck_db: float = -12.0    # lower the sounds this much while you talk; 0 = off
+    duck_on: bool = False     # ducking was switched on once for older settings (from_raw)
     mic_gate: bool = False    # mute your mic while a sound plays (only the sound goes out)
     ptt_key: str = ""           # key held down while sounds play (game push-to-talk)
     always_on_top: bool = False
@@ -688,6 +689,7 @@ class Config:
         cfg = cls()
         cfg.route = "mic"
         cfg.mic_first = True
+        cfg.duck_on = True
         cfg.tabs_off = list(BASIC_TABS_OFF)   # a plain soundboard first; + More tabs adds them
         cfg.use_mode = ""   # the guide asks what it's for (and adds the tabs that fit)
         return cfg
@@ -772,6 +774,13 @@ class Config:
             if raw.get("route", "cable") == "cable":
                 raw["route"] = "mic"
             raw["mic_first"] = True
+        if not raw.get("duck_on"):
+            # once: lowering the sounds while you talk is on by default now (your voice
+            # was buried under a song). Off was the old default, so it moves to -12 dB;
+            # a depth someone picked stays, and Off picked after this stays off.
+            if not raw.get("duck_db"):
+                raw["duck_db"] = -12.0
+            raw["duck_on"] = True
         sounds = []
         blank = SoundMeta(id="", name="", file="")
         raw_sounds = raw.pop("sounds", [])
