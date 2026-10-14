@@ -3366,7 +3366,7 @@ class SettingsDialog(QDialog):
     def _updates_optin(self, on: bool):
         self.mw.set_option("update_check", on)
         if on:
-            self.mw.check_updates(why="You turned on update checks")
+            self.mw.updctl.check_updates(why="You turned on update checks")
 
     def _updates_check(self):
         if busy.is_busy(self.upd_btn) or not self.upd_btn.isEnabled():
@@ -3374,7 +3374,7 @@ class SettingsDialog(QDialog):
         self._upd_asked = True
         busy.set_busy(self.upd_btn, True)
         self.upd_label.setText(_("Checking…"))
-        self.mw.check_updates(force=True, why="You clicked Check now (Settings > Updates)")
+        self.mw.updctl.check_updates(force=True, why="You clicked Check now (Settings > Updates)")
 
     def _updates_done(self, rel, err: str):
         if not qt_valid(self.upd_label):
@@ -3395,9 +3395,9 @@ class SettingsDialog(QDialog):
     def _updates_state(self):
         if not qt_valid(self.upd_label):
             return
-        status = self.mw.update_status() if self.mw.release is not None else ""
-        if status and (self.mw._downloading or self.mw._update_err
-                       or self.mw._update_file is not None):
+        status = self.mw.updctl.update_status() if self.mw.updctl.release is not None else ""
+        if status and (self.mw.updctl._downloading or self.mw.updctl._update_err
+                       or self.mw.updctl._update_file is not None):
             self.upd_label.setText(status)
 
     def done(self, r):
