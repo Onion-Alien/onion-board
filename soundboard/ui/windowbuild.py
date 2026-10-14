@@ -39,6 +39,7 @@ from soundboard.library import PAD_COLORS
 from soundboard.ui import alsosend, busy, icons, sidebar, taboff
 from soundboard.ui.appspanel import ElidedLabel
 from soundboard.ui.buncontrol import BUN_TIP
+from soundboard.ui.controller import Controller
 from soundboard.ui.downloadbar import DownloadBar
 from soundboard.ui.dropveil import DropVeil
 from soundboard.ui.fitcontrol import BODY_SIDE, SEARCH_MIN_W
@@ -229,11 +230,11 @@ class Pulse(QObject):
         self.fx.setOpacity(self.opacity_at((time.monotonic() - self._t0) * 1000.0))
 
 
-class WindowBuilder:
+class WindowBuilder(Controller):
     """Builds the parts of one MainWindow (``mw``)."""
 
     def __init__(self, mw: MainWindow):
-        self.mw = mw
+        super().__init__(mw)
 
     # Layout: the tab rail (with Live, Stop all and the setup pill) / tabs / mixer strip.
     # Every tab is built the same way: a toolbar row on top, its content, and a
