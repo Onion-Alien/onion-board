@@ -3266,5 +3266,19 @@
   "New subcategory in {cat}": "หมวดหมู่ย่อยใหม่ใน {cat}",
   "Put its categories in one tab": "รวมหมวดหมู่ของมันไว้ในแท็บเดียว",
   "Rename subcategory": "เปลี่ยนชื่อหมวดหมู่ย่อย",
-  "✓ “{name}” is one tab now": "✓ “{name}” เป็นแท็บเดียวแล้ว"
+  "✓ “{name}” is one tab now": "✓ “{name}” เป็นแท็บเดียวแล้ว",
+  "Attack": "อะแทค",
+  "Ceiling": "เพดาน",
+  "Chanting monk": "พระสวดมนต์",
+  "De-ess": "ลดเสียง S",
+  "Release": "รีลีส",
+  "Studio polish": "ขัดเงาแบบสตูดิโอ",
+  "Tames harsh S sounds, adds warmth and keeps every peak under a ceiling. Runs last.": "ลดเสียง S ที่แหลมคม เพิ่มความอบอุ่น และกดทุกพีคให้อยู่ใต้เพดาน ทำงานเป็นตัวสุดท้าย",
+  "Warmth": "ความอบอุ่น",
+  "quick": "เร็ว",
+  "slow": "ช้า",
+  "snappy": "ฉับไว",
+  "soft": "นุ่ม",
+  "warm": "อบอุ่น",
+  "clean": "สะอาด"
 }

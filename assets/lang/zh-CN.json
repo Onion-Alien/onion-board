@@ -3266,5 +3266,19 @@
   "New subcategory in {cat}": "在 {cat} 中新建子分类",
   "Put its categories in one tab": "把它的分类放进一个标签页",
   "Rename subcategory": "重命名子分类",
-  "✓ “{name}” is one tab now": "✓ “{name}”现在是一个标签页"
+  "✓ “{name}” is one tab now": "✓ “{name}”现在是一个标签页",
+  "Attack": "起音",
+  "Ceiling": "上限",
+  "Chanting monk": "诵经僧侣",
+  "De-ess": "齿音消除",
+  "Release": "释放",
+  "Studio polish": "录音室润色",
+  "Tames harsh S sounds, adds warmth and keeps every peak under a ceiling. Runs last.": "压住刺耳的 S 音，增添温暖感，并把每个峰值压在上限之下。最后运行。",
+  "Warmth": "温暖感",
+  "quick": "快",
+  "slow": "慢",
+  "snappy": "干脆",
+  "soft": "柔和",
+  "warm": "温暖",
+  "clean": "干净"
 }

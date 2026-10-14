@@ -3416,5 +3416,19 @@
   "New subcategory in {cat}": "Subcategorie nouă în {cat}",
   "Put its categories in one tab": "Pune categoriile lui într-un singur tab",
   "Rename subcategory": "Redenumește subcategoria",
-  "✓ “{name}” is one tab now": "✓ „{name}” e acum un singur tab"
+  "✓ “{name}” is one tab now": "✓ „{name}” e acum un singur tab",
+  "Attack": "Atac",
+  "Ceiling": "Plafon",
+  "Chanting monk": "Călugăr cântând",
+  "De-ess": "De-esser",
+  "Release": "Eliberare",
+  "Studio polish": "Finisaj de studio",
+  "Tames harsh S sounds, adds warmth and keeps every peak under a ceiling. Runs last.": "Îmblânzește sunetele S ascuțite, adaugă căldură și ține fiecare vârf sub plafon. Rulează ultimul.",
+  "Warmth": "Căldură",
+  "quick": "rapid",
+  "slow": "lent",
+  "snappy": "sec",
+  "soft": "moale",
+  "warm": "cald",
+  "clean": "curat"
 }

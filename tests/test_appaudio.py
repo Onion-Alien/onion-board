@@ -309,6 +309,34 @@ def test_a_quiet_program_is_handed_over_as_silence():
     assert not any(x.any() for x in got)
 
 
+@pytest.mark.skipif(not WIN, reason="Windows events")
+def test_silence_after_a_long_stall_is_capped(monkeypatch):
+    """After a PC sleep or a long stall, the silence for the whole gap went over in one
+    block: minutes of audio in one allocation (~23 MB a minute), enough to fail."""
+    class NoPackets:
+        def call(self, i, types, *args, what=""):
+            if i == 5:                                 # GetNextPacketSize: nothing
+                args[0]._obj.value = 0
+
+    class Clock:   # the loop starts at 0 (two reads), then wakes up 10 minutes later
+        reads = iter([0.0, 0.0])
+
+        @classmethod
+        def monotonic(cls):
+            return next(cls.reads, 600.0)
+    monkeypatch.setattr(appaudio, "time", Clock)
+    monkeypatch.setattr(appaudio, "is_running", lambda pid, started=None: True)
+    got = []
+    cap = appaudio.AppCapture(os.getpid(), lambda x: (got.append(x), cap._stop.set()),
+                              name="asleep")
+    evt = appaudio._k32.CreateEventW(None, False, False, None)
+    try:
+        cap._loop(NoPackets(), appaudio._format("f32"), True, evt)
+    finally:
+        appaudio._k32.CloseHandle(evt)
+    assert len(got) == 1 and 0 < len(got[0]) <= 0.2 * SR   # the cushion, not 10 minutes
+
+
 def test_stop_without_waiting_returns_at_once_and_feeds_nothing_more(monkeypatch):
     """Windows can take seconds to open a capture, deaf to the stop flag meanwhile:
     stop(wait=False) mustn't wait for that (it froze the window), and the old thread

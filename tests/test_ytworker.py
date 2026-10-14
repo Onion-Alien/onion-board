@@ -1,4 +1,7 @@
 """soundboard.ytworker: yt-dlp in a helper process, off the audio callbacks' GIL."""
+import sys
+import threading
+import time
 from contextlib import nullcontext
 
 import pytest
@@ -23,6 +26,52 @@ def test_a_helper_answers_and_is_kept_for_the_next_call(helper):
     assert ytworker.run("ping")[0] == pid                   # an error doesn't lose it
     ytworker.drop_all()                                     # yt-dlp updated: a new one
     assert ytworker.run("ping")[0] != pid
+
+
+def _helper_command(monkeypatch, code: str) -> list:
+    """The helper runs `code` instead of the app; returns the processes started."""
+    started = []
+
+    def popen(*a, **kw):
+        started.append(real(*a, **kw))
+        return started[-1]
+    real = ytworker.subprocess.Popen
+    monkeypatch.setattr(ytworker.subprocess, "Popen", popen)
+    monkeypatch.setattr(ytworker, "_command", lambda: [sys.executable, "-c", code])
+    return started
+
+
+def _accept_threads():
+    return [t for t in threading.enumerate() if t.name == "ytdl-helper-accept"]
+
+
+def test_a_helper_that_quits_at_start_fails_at_once_and_isnt_retried(helper, monkeypatch):
+    ytworker.drop_all()
+    started = _helper_command(monkeypatch, "raise SystemExit(3)")
+    t0 = time.monotonic()
+    with pytest.raises(ytworker.Unavailable, match="code 3"):
+        ytworker.run("ping")
+    assert time.monotonic() - t0 < 5        # not START_TIMEOUT_S (30 s)
+    assert started[0].returncode == 3       # waited for
+    assert not _accept_threads()            # no accept() left blocked
+    t0 = time.monotonic()
+    with pytest.raises(ytworker.Unavailable):
+        ytworker.run("ping")                # straight to in-process: no second start
+    assert time.monotonic() - t0 < 0.5 and len(started) == 1
+    ytworker.drop_all()                     # yt-dlp updated: worth a new try
+    with pytest.raises(ytworker.Unavailable):
+        ytworker.run("ping")
+    assert len(started) == 2
+
+
+def test_a_helper_that_never_connects_is_killed_and_its_wait_ends(helper, monkeypatch):
+    ytworker.drop_all()
+    monkeypatch.setattr(ytworker, "START_TIMEOUT_S", 0.5)
+    started = _helper_command(monkeypatch, "import time; time.sleep(60)")
+    with pytest.raises(ytworker.Unavailable, match="didn't start"):
+        ytworker.run("ping")
+    assert started[0].returncode is not None
+    assert not _accept_threads()
 
 
 def test_lookups_go_to_the_helper_without_hooks_and_come_back_worded(monkeypatch):

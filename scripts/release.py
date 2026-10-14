@@ -12,6 +12,11 @@ never edit the same lines of CHANGELOG.md and conflict). It:
 4. runs `scripts/i18n_extract.py --check` (missing translations fail it) and
    `scripts/docs.py --no-shots` (the README and website release line).
 
+Before any of that it refuses unless the checkout is origin/main exactly and main's
+full "checks" run (CI on a PR only runs the tests its change imports; main runs them
+all after the merge) passed on that commit. `--skip-ci-check` skips the CI half, with
+a loud warning: only for an urgent fix when CI itself is broken.
+
 It never builds, tags, pushes or commits. After it: build, scan the installer on
 VirusTotal, then `scripts/docs.py --vt <sha256> N/N`. Scan the mic helper too
 (build\\michelper\\obmichelper\\obmichelper.exe): it is unsigned and runs as SYSTEM, and
@@ -23,6 +28,7 @@ from __future__ import annotations
 
 import argparse
 import datetime
+import json
 import re
 import subprocess
 import sys
@@ -89,11 +95,70 @@ def date_changelog(text: str, new: str, today: str, entries: list[str]) -> str:
     return text[:at] + section + text[at:]
 
 
+def git(*args: str) -> str:
+    return subprocess.run(["git", *args], cwd=ROOT, capture_output=True, text=True,
+                          timeout=60).stdout.strip()
+
+
+def head_is_origin_main() -> str:
+    """HEAD's sha, after checking it is origin/main's (fetched just now)."""
+    try:
+        git("fetch", "-q", "origin", "main")
+    except subprocess.SubprocessError:
+        print("warning: couldn't fetch origin; comparing with the last fetched main")
+    head, main = git("rev-parse", "HEAD"), git("rev-parse", "origin/main")
+    if not head or head != main:
+        raise SystemExit(f"HEAD ({head[:8] or '?'}) isn't origin/main ({main[:8] or '?'}): "
+                         "release from an up-to-date main checkout")
+    return head
+
+
+def ci_verdict(runs: list[dict]) -> str | None:
+    """None when a 'checks' run on main passed for the commit, else why not.
+    `runs` is `gh run list --json conclusion,status` for that commit."""
+    if any(r.get("conclusion") == "success" for r in runs):
+        return None
+    if not runs:
+        return "no 'checks' run on main for this commit yet"
+    if any(r.get("status") != "completed" for r in runs):
+        return "main's 'checks' run for this commit is still going: wait for it"
+    got = ", ".join(sorted({r.get("conclusion") or "?" for r in runs}))
+    return f"main's 'checks' run for this commit didn't pass ({got}): fix main first"
+
+
+def ci_runs(sha: str) -> list[dict]:
+    try:
+        out = subprocess.run(
+            ["gh", "run", "list", "--workflow", "checks.yml", "--branch", "main",
+             "--commit", sha, "--json", "conclusion,status"],
+            cwd=ROOT, capture_output=True, text=True, timeout=60)
+    except (OSError, subprocess.SubprocessError) as e:
+        raise SystemExit(f"couldn't ask GitHub about CI ({e}): is gh installed?") from None
+    if out.returncode:
+        raise SystemExit(f"gh run list failed: {out.stderr.strip()}")
+    return json.loads(out.stdout or "[]")
+
+
+def check_ci(sha: str, skip: bool) -> None:
+    if skip:
+        bar = "!" * 70
+        print(f"{bar}\nWARNING: --skip-ci-check: releasing WITHOUT main's full test run "
+              f"passing on {sha[:8]}.\nEveryone who clicks Update now gets this "
+              f"build.\n{bar}")
+        return
+    why = ci_verdict(ci_runs(sha))
+    if why:
+        raise SystemExit(f"{why} (--skip-ci-check overrides, for an urgent fix only)")
+
+
 def main(argv: list[str] | None = None) -> int:
     ap = argparse.ArgumentParser(description=__doc__.splitlines()[0])
     ap.add_argument("version")
     ap.add_argument("--dry-run", action="store_true", help="check only, change nothing")
+    ap.add_argument("--skip-ci-check", action="store_true",
+                    help="release even if main's CI didn't pass (loud warning)")
     args = ap.parse_args(argv)
+    check_ci(head_is_origin_main(), args.skip_ci_check)
 
     init, log = INIT.read_text(encoding="utf-8"), CHANGELOG.read_text(encoding="utf-8")
     old = current_version(init)

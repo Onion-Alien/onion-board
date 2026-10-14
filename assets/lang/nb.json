@@ -3341,5 +3341,19 @@
   "New subcategory in {cat}": "Ny underkategori i {cat}",
   "Put its categories in one tab": "Legg kategoriene dens i én fane",
   "Rename subcategory": "Gi underkategorien nytt navn",
-  "✓ “{name}” is one tab now": "✓ «{name}» er nå én fane"
+  "✓ “{name}” is one tab now": "✓ «{name}» er nå én fane",
+  "Attack": "Anslag",
+  "Ceiling": "Tak",
+  "Chanting monk": "Syngende munk",
+  "De-ess": "De-esser",
+  "Release": "Slipp",
+  "Studio polish": "Studiofinish",
+  "Tames harsh S sounds, adds warmth and keeps every peak under a ceiling. Runs last.": "Temmer skarpe S-lyder, gir varme og holder hver topp under taket. Kjører sist.",
+  "Warmth": "Varme",
+  "quick": "rask",
+  "slow": "sakte",
+  "snappy": "kvikk",
+  "soft": "myk",
+  "warm": "varm",
+  "clean": "ren"
 }
