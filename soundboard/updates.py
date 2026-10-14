@@ -11,7 +11,9 @@ and that installs the newer one.
 Any other release settles for SETTLE_S (30 minutes) before the app offers it: a quick
 fix that follows it replaces it, so people get one prompt instead of two. While the
 newest one settles, nothing is offered (not an older one either: the newest comes a
-few minutes later). "Check now" always offers the newest.
+few minutes later), and the app asks again once it has settled (recheck_s) instead of
+waiting for its next 6-hourly check. An urgent fix this copy missed isn't held back by
+a newer release settling. "Check now" always offers the newest.
 
 A newer version is only announced. Nothing is downloaded until the user presses
 *Update now*: then the release's OnionBoardSetup.exe is fetched from the project's own
@@ -65,6 +67,9 @@ MAX_SIZE = 400 << 20     # the installer is ~180 MB
 CHUNK = 1 << 20
 SHA_RE = re.compile(r"[0-9a-f]{64}")
 FEATURE = "app_update"   # its switch in Settings > Privacy & security (soundboard.net)
+# set by check(): the newest release is still settling, ask again in this many seconds
+# (the app's own timer only asks every EVERY_S); 0 = nothing to ask again for
+recheck_s = 0.0
 
 
 class UpdateError(Exception):
@@ -210,6 +215,14 @@ def settled(rel: Release, now: float | None = None) -> bool:
             or (time.time() if now is None else now) - rel.published >= SETTLE_S)
 
 
+def settle_left(rel: Release, now: float | None = None) -> float:
+    """Seconds until `rel` has settled (0 once it has), plus a minute's margin so the
+    next check doesn't land just before it."""
+    if settled(rel, now):
+        return 0.0
+    return rel.published + SETTLE_S - (time.time() if now is None else now) + 60.0
+
+
 def latest() -> Release | None:
     """The newest published release (drafts and pre-releases aren't 'latest')."""
     return _release(_get(API))
@@ -255,11 +268,18 @@ def check(cfg, force: bool = False) -> Release | None:
     if not force and (not cfg.update_check or not net.allowed(FEATURE)
                       or time.time() - cfg.update_checked < EVERY_S):
         return None
+    global recheck_s
+    recheck_s = 0.0
     try:
         rel = latest()
         if not force and rel is not None and newer(rel.version) and not settled(rel):
-            log.info("%s is still settling: offering it later", rel.version)
-            return None
+            # an urgent fix this copy missed isn't held back by the newer one settling
+            rel.urgent = skipped_urgent(rel)
+            if not rel.urgent:
+                recheck_s = settle_left(rel)
+                log.info("%s is still settling: asking again in %.0f s", rel.version,
+                         recheck_s)
+                return None
     except Exception as e:  # noqa: BLE001 - offline, rate-limited, GitHub down…
         log.info("update check failed: %s", e)
         if force:

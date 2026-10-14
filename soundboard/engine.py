@@ -235,6 +235,23 @@ def list_name(index: int) -> str:
         DEVICES.release()
 
 
+def close_quietly(s, what):
+    try:
+        s.close()
+    except Exception:  # noqa: BLE001
+        log.debug("closing %s raised", what, exc_info=True)
+
+
+def start_or_close(s, what):
+    """Start a freshly made stream; if that fails, close it before re-raising, or
+    every RETRY_S retry of a busy device leaks one PortAudio stream."""
+    try:
+        s.start()
+    except Exception:
+        close_quietly(s, what)
+        raise
+
+
 def find_device(kind: str, name: str | None) -> int | None:
     if not name:
         return None
@@ -682,7 +699,7 @@ class CableTap:
         self.last_cb = time.monotonic()
         self.stream = sd.OutputStream(device=idx, samplerate=self.rate, channels=CH,
                                       dtype="float32", latency=latency, callback=self._cb)
-        self.stream.start()
+        start_or_close(self.stream, f"cable tap {name}")
 
     def write(self, mix: np.ndarray):
         self.ring.write(self._rs(mix))
@@ -1171,11 +1188,7 @@ class Engine:
         s = sd.OutputStream(device=idx, samplerate=rate, channels=CH, dtype="float32",
                             latency=BUFFER.get(self.latency, "low"), callback=callback)
         self._last_cb[key] = time.monotonic()
-        try:
-            s.start()
-        except Exception:
-            self._close_quietly(s, key)   # else every RETRY_S retry leaks a stream
-            raise
+        start_or_close(s, key)
         # committed only now, so a failed open leaves the rate and the rings alone.
         # Nothing plays on or writes to this output until its *_stream attribute is
         # set, so callbacks that run before this line render silence and do no harm.
@@ -1376,12 +1389,7 @@ class Engine:
                 v.fading.discard(key)
                 v.done.discard(key)   # last: the callback may render it from here on
 
-    @staticmethod
-    def _close_quietly(s, what):
-        try:
-            s.close()
-        except Exception:  # noqa: BLE001
-            log.debug("closing %s raised", what, exc_info=True)
+    _close_quietly = staticmethod(close_quietly)
 
     def _stream_opened(self, key):
         # callback errors are counted per stream from here: the first failure on the
