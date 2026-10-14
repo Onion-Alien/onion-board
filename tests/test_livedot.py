@@ -122,9 +122,9 @@ def test_voice_panel_reports_when_it_is_changing_your_voice(panel):
     assert seen[-1] is True and panel.is_active()
     panel.fx.btn_power.setChecked(False)
     assert seen[-1] is False and not panel.is_active()
-    panel.speech._set_live_ui(True, "starting…")          # the computer voice counts too
+    panel.speech.livevoice._set_live_ui(True, "starting…")  # the computer voice counts too
     assert seen[-1] is True
-    panel.speech._set_live_ui(False, "")
+    panel.speech.livevoice._set_live_ui(False, "")
     assert seen[-1] is False
 
 

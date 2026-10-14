@@ -227,6 +227,8 @@ the launcher the shortcuts and PyInstaller use. The app is the `soundboard` pack
 | `soundboard/ui/voicepanel.py` | the Voice tab: lays out its cards and bottom bar, the add-ons list |
 | `soundboard/ui/voicefxpanel.py` | the Voice tab's voice changer card: voice tiles, effect rows and their sliders |
 | `soundboard/ui/speechpanel.py` | the Voice tab's Languages card: text-to-speech, live voice-to-speech, translation |
+| `soundboard/ui/livevoice.py` | the Languages card's live voice: Start, translating for the AI voice or voice changer, the helper's events |
+| `soundboard/ui/speechinstall.py` | the Languages card's downloads and installs: Windows voices, translation models, speech recognition |
 | `soundboard/ui/voicestatus.py` | the Voice tab's status bar: your mic level and a chip for everything changing what others hear |
 | `soundboard/voicefx/` | the voice-effect chain and the built-in effects (pitch, robot, radio, …) |
 | `soundboard/speech/` | Windows text-to-speech (`tts.py`), custom voices — local TTS servers, TTS programs, Piper packs (`customvoices.py`), the live voice-to-speech client (`live.py`, `service.py`, `protocol.py`) translation model downloads (`translation.py`), which language you speak and the speech model that hears it (`spoken.py`) and one-click Windows voice installs (`winvoices.py`) |
