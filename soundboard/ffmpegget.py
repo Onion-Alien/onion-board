@@ -24,7 +24,8 @@ net's "ffmpeg_download" switch and Offline mode decide whether the app goes onli
 it at all.
 
 To move to a newer FFmpeg: choose an essentials zip available from both URLS, and
-check that the builder's published SHA-256 and GitHub's release asset digest match.
+check that the builder's published SHA-256 and GitHub's release asset digest match
+(scripts/pinbump/ffmpeg.py does this weekly and opens the PR itself).
 Older releases may remain on GitHub after the builder removes its own copy.
 """
 from __future__ import annotations
