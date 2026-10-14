@@ -520,17 +520,39 @@ def test_new_users_are_offered_their_mic_first(mic_wizard, monkeypatch):
     w, wiz = mic_wizard
     assert w.cfg.route == "mic"
     wiz.go(wiz.base + 2)
-    assert not wiz.btn_attach.isHidden() and "straight into my mic" in wiz.btn_attach.text()
-    assert "permission once" in wiz.cable_status.text()
-    # the other ways are in their own card, not buttons under the status
+    # the step's one thing to do is Next itself; leaving without it is the quiet Skip
+    # that says what it means, and the card has no second button saying the same
+    assert "Put my sounds in my mic" in wiz.btn_next.text()
+    assert not wiz.btn_skip.isHidden() and "only I'll hear" in wiz.btn_skip.text()
+    assert wiz.btn_attach.isHidden()
+    assert "asks once" in wiz.cable_status.text()
+    # the other ways fold shut under their pill, not buttons under the status
     assert wiz.btn_cable.isHidden() and wiz.btn_other.isHidden()
+    assert not wiz.alt_fold_row.isHidden() and wiz.alt_card.isHidden()
+    wiz.alt_fold.click()
     assert not wiz.alt_card.isHidden() and not wiz.btn_alt_cable.isHidden()
     wiz.go(wiz.base + 3)   # not on the mic yet: the last page says so
     assert "isn't on your mic yet" in wiz.discord_text.text()
     monkeypatch.setattr(directmic, "status", lambda name=None: "ready")
     wiz.go(wiz.base + 3)
-    assert "nothing to pick" in wiz.discord_title.text()
+    assert "check Discord" in wiz.discord_title.text()
+    assert "nothing to pick" in wiz.discord_text.text()
+    assert "noise filter" in wiz.discord_text.text()
     assert wiz.btn_copy.isHidden() and not wiz.btn_discord.isHidden()
+
+
+def test_next_on_the_send_step_puts_the_sounds_in_the_mic(mic_wizard, monkeypatch):
+    from soundboard import usage
+    w, wiz = mic_wizard
+    calls, counted = [], []
+    monkeypatch.setattr(w.micctl, "attach_mic", lambda *a, **k: calls.append(1))
+    monkeypatch.setattr(usage, "used", counted.append)
+    wiz.go(wiz.base + 2)
+    wiz.next_clicked()
+    assert calls == [1] and wiz.stack.currentIndex() == wiz.base + 2
+    wiz.skip_clicked()   # the quiet way past: counted, and on to the last step
+    assert wiz.stack.currentIndex() == wiz.base + 3
+    assert "setup-skipped-send" in counted and wiz.btn_skip.isHidden()
 
 
 def test_a_repair_is_offered_as_one(mic_wizard, monkeypatch):
@@ -539,7 +561,7 @@ def test_a_repair_is_offered_as_one(mic_wizard, monkeypatch):
     monkeypatch.setattr(directmic, "status", lambda name=None: "wiped")
     wiz.go(wiz.base + 2)
     wiz.recheck_cable(rescan=False)
-    assert "Repair" in wiz.btn_attach.text() and "repair" in wiz.cable_status.text()
+    assert "Repair" in wiz.btn_next.text() and "repair" in wiz.cable_status.text()
 
 
 def test_cable_instead_doesnt_reinstall_a_cable_that_is_there(mic_wizard, monkeypatch):
@@ -577,13 +599,13 @@ def test_mic_attach_plays_show_in_wizard_without_blocking_buttons(mic_wizard, mo
     w, wiz = mic_wizard
     wiz.show()
     wiz.go(wiz.base + 2)
-    assert not wiz.btn_attach.isHidden()
+    assert "Put my sounds in my mic" in wiz.btn_next.text()
     assert wiz.setup_show.isHidden()
 
     monkeypatch.setattr(directmic, "install", lambda name, **k: "")
-    monkeypatch.setattr(directmic, "status", lambda name=None: "ready")
 
-    wiz.btn_attach.click()
+    wiz.btn_next.click()   # (Next sets it up while it isn't: then it's ready)
+    monkeypatch.setattr(directmic, "status", lambda name=None: "ready")
     assert wiz.setup_show.on
     assert not wiz.setup_show.isHidden()
     assert wiz.btn_attach.isHidden()
@@ -602,8 +624,10 @@ def test_mic_attach_plays_show_in_wizard_without_blocking_buttons(mic_wizard, mo
     toast = wiz.findChild(_Toast)
     assert toast is None or toast.isHidden()
 
-    assert wiz.alt_card.isHidden()   # not while Bun's show runs
+    assert wiz.alt_card.isHidden() and wiz.alt_fold_row.isHidden()   # not during the show
     wiz.setup_show._stop()
+    assert not wiz.alt_fold_row.isHidden()
+    wiz.alt_fold.click()
     assert not wiz.alt_card.isHidden()
     assert not wiz.btn_alt_cable.isHidden() and not wiz.btn_alt_other.isHidden()
     assert wiz.btn_attach.isHidden()
@@ -730,6 +754,8 @@ def test_a_fold_shut_again_puts_the_guide_back(mic_wizard, qapp, monkeypatch):
     wiz.go(wiz.base + 3)
     _settle(qapp)
     assert wiz.discord_fold.isVisible()
+    wiz.discord_fold.click()   # (it starts open: shut first)
+    _settle(qapp)
     avail = wiz.screen().availableGeometry()
     wiz.move(100, avail.bottom() - wiz.frameGeometry().height() - 5)
     _settle(qapp)
@@ -760,6 +786,8 @@ def test_other_ways_card_explains_and_works(mic_wizard, monkeypatch):
     monkeypatch.setattr(directmic, "status", lambda name=None: "ready")
     wiz.go(wiz.base + 2)
     assert wiz.status_card.tone == "ok" and "Working" in wiz.status_card.title.text()
+    assert wiz.alt_card.isHidden()   # folded under its pill
+    wiz.alt_fold.click()
     assert not wiz.alt_card.isHidden()
     texts = " ".join(lbl.text() for lbl in wiz.alt_card.findChildren(setupwizard.QLabel))
     assert "driver" in texts and "Voicemeeter" in texts
@@ -817,23 +845,27 @@ def test_status_card_says_each_state_plainly(mic_wizard, monkeypatch):
         state["s"] = s
         wiz.recheck_cable(rescan=False)
         card = wiz.status_card
-        assert card.tone == tone and card.title.text() and not card.pill.isHidden()
+        # (no "Not set up" pill repeating the title: only Working has one)
+        assert card.tone == tone and card.title.text()
+        assert card.pill.isHidden() == (s != "ready")
 
 
 def test_discord_tip_folds_away(mic_wizard, monkeypatch):
-    """On the mic, Discord needs nothing to work: its tip is shut under a heading
-    until clicked. On the cable Discord's steps are needed, so nothing folds."""
+    """On the mic, Discord needs nothing picked, but its noise filter (on by default)
+    wipes sounds out: its tip starts open under its heading, which shuts it. On the
+    cable Discord's steps are needed, so nothing folds."""
     from soundboard import directmic
     w, wiz = mic_wizard
     monkeypatch.setattr(directmic, "status", lambda name=None: "ready")
     wiz.go(wiz.base + 3)
-    assert not wiz.discord_fold.isHidden() and wiz.discord_body.isHidden()
+    assert not wiz.discord_fold.isHidden() and not wiz.discord_body.isHidden()
+    assert not wiz.btn_discord.isHidden()
     assert not wiz.discord_tip.text().startswith("<b>")   # its lead-in is the heading
     assert "Noise Suppression" in wiz.discord_tip.text()
     wiz.discord_fold.click()
-    assert not wiz.discord_body.isHidden() and not wiz.btn_discord.isHidden()
-    wiz.discord_fold.click()
     assert wiz.discord_body.isHidden()
+    wiz.discord_fold.click()
+    assert not wiz.discord_body.isHidden()
     assert wiz.discord_fold.toolTip()   # says Show / Hide
     w.routectl.set_route("cable")
     wiz.go(wiz.base + 3)
@@ -878,6 +910,7 @@ def test_cards_line_up_with_back_and_next(mic_wizard, monkeypatch, qapp):
     monkeypatch.setattr(directmic, "status", lambda name=None: "ready")
     wiz.show()
     wiz.go(wiz.base + 2)
+    wiz.alt_fold.click()   # the other ways' card, open
     qapp.processEvents()
 
     def edges(wd):

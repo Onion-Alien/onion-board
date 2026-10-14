@@ -189,7 +189,15 @@ account or anything else about you.
     Ctrl+Tab (`used/tab-keys`);
   - the first start's answer to "What's it for?" (`used/use-normal`, `use-streamer`,
     `use-games`, `use-all`, or `use-skipped` when the guide was closed there), the
-    Setup tab's *Step-by-step guide* (`used/setup-guide-opened`);
+    setup guide closed on a later step, its send step skipped, or finished with or
+    without your sounds going out (`used/setup-closed-mic`, `setup-closed-headphones`,
+    `setup-closed-send`, `setup-closed-last`, `setup-skipped-send`, `setup-finished`,
+    `setup-finished-not-sending`), the Setup tab's *Step-by-step guide*
+    (`used/setup-guide-opened`);
+  - Bun's first-run tour of the empty board shown, searched from, its Add clicked (the
+    version for Offline mode), skipped or left alone until it went (`used/tour-shown`,
+    `tour-searched`, `tour-files`, `tour-skipped`, `tour-ignored`; never what was
+    searched);
   - sounds from the web: the site (`used/dl-youtube`, `dl-tiktok`, `dl-soundcloud`,
     `dl-instagram`, `dl-x`, `dl-reddit`, `dl-twitch`, `dl-myinstants` or `dl-other`), a
     pasted link or a search pick (`used/dl-link`, `dl-search`), *Add as sound* or *Play
