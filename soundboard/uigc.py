@@ -27,6 +27,8 @@ import threading
 
 from PySide6.QtCore import QObject, QTimer
 
+from soundboard import overridepin
+
 INTERVAL_MS = 500
 
 _handed: list[tuple] = []   # (target, args, kwargs) of finished threads, until let_go
@@ -86,12 +88,14 @@ class UiCollector(QObject):
         self.thresholds = gc.get_threshold()
         gc.disable()
         hand_threads_to_ui()
+        overridepin.pin()
         self._timer = QTimer(self)
         self._timer.timeout.connect(self.check)
         self._timer.start(interval_ms)
 
     def check(self) -> int:
         let_go()
+        overridepin.pin()   # classes imported since the last tick (a tab, an add-on)
         return collect_due(self.thresholds)
 
     def stop(self):
