@@ -216,8 +216,8 @@ def test_a_mixed_drop_ends_in_one_toast_with_see_why(main_window, qapp, tmp_path
     sf.write(good, np.stack([np.sin(2 * np.pi * 700 * t)] * 2, 1) * 0.3, SR)
     bad = tmp_path / "broken.mp3"
     bad.write_bytes(b"not audio" * 50)
-    w.import_files([str(good), str(bad), str(good)])   # the 2nd one: already in
-    assert process_events(qapp, lambda: not w._pending_imports)
+    w.impctl.import_files([str(good), str(bad), str(good)])   # the 2nd one: already in
+    assert process_events(qapp, lambda: not w.impctl._pending_imports)
     t = next(x for x in toast.shown(w) if x.key == "import")
     assert t.text() == "Added 1 sound · 2 skipped" and t.kind == "warn"
     assert t.card.action.text() == "See why"
@@ -225,8 +225,8 @@ def test_a_mixed_drop_ends_in_one_toast_with_see_why(main_window, qapp, tmp_path
     d = w.findChildren(importreport.SkippedDialog)[-1]
     assert not d.isModal() and {s.group for s in d.skipped} == {"dupe", "not_sound"}
     d.close()
-    w.import_files([str(good), str(bad)])
-    assert process_events(qapp, lambda: not w._pending_imports)
+    w.impctl.import_files([str(good), str(bad)])
+    assert process_events(qapp, lambda: not w.impctl._pending_imports)
     repeated = next(x for x in toast.shown(w) if x.key == "import")
     assert repeated.text() == "That sound is already in your library · 1 skipped"
     assert repeated.kind == "warn" and repeated.card.action.text() == "See why"
@@ -241,8 +241,8 @@ def test_undo_takes_the_new_sounds_off_again(main_window, qapp, tmp_path):  # no
         sf.write(p, np.stack([np.sin(2 * np.pi * hz * t)] * 2, 1) * 0.3, SR)
         files.append(str(p))
     before = len(w.cfg.sounds)
-    w.import_files(files)
-    assert process_events(qapp, lambda: not w._pending_imports)
+    w.impctl.import_files(files)
+    assert process_events(qapp, lambda: not w.impctl._pending_imports)
     assert len(w.cfg.sounds) == before + 2
     t = next(x for x in toast.shown(w) if x.key == "import")
     assert t.kind == "ok" and t.card.action.text() == "Undo"
@@ -283,17 +283,17 @@ def test_short_sound_warning_keeps_import_actions_and_resets(main_window, qapp, 
     long = tmp_path / "long.wav"
     sf.write(short, np.zeros((SR // 10, 2)), SR)
     sf.write(long, np.zeros((SR, 2)), SR)
-    w.import_files([str(short)])
-    assert process_events(qapp, lambda: not w._pending_imports)
+    w.impctl.import_files([str(short)])
+    assert process_events(qapp, lambda: not w.impctl._pending_imports)
     cards = toast.shown(w)
     result = next(t for t in cards if t.key == "import")
     assert result.kind == "ok" and result.card.action.text() == "Undo"
     warning = next(t for t in cards if "very short" in t.text())
     assert warning.kind == "warn"
-    assert not w._imported_short
+    assert not w.impctl._imported_short
     warning.card.btn_close.click()
-    w.import_files([str(long)])
-    assert process_events(qapp, lambda: not w._pending_imports)
+    w.impctl.import_files([str(long)])
+    assert process_events(qapp, lambda: not w.impctl._pending_imports)
     assert not any("very short" in t.text() for t in toast.shown(w))
     assert next(t for t in toast.shown(w) if t.key == "import").card.action.text() == "Undo"
 
@@ -401,7 +401,7 @@ def test_a_big_import_shows_bun_and_closing_it_only_hides_it(main_window, qapp, 
     on; each sound is on the board (playable) before the import ends; the finished card
     with Undo still comes."""
     import threading
-    from soundboard.ui import mainwindow
+    from soundboard.ui import importcontrol
     w = main_window
     t = np.arange(SR // 10) / SR
     files = []
@@ -409,7 +409,7 @@ def test_a_big_import_shows_bun_and_closing_it_only_hides_it(main_window, qapp, 
         p = tmp_path / f"Big {i}.wav"
         sf.write(p, np.stack([np.sin(2 * np.pi * (300 + 90 * i) * t)] * 2, 1) * 0.3, SR)
         files.append(str(p))
-    go, real = threading.Event(), mainwindow.import_file
+    go, real = threading.Event(), importcontrol.import_file
     calls = []
 
     def slow(f, *a, **k):   # the first file goes in, the rest wait
@@ -417,27 +417,27 @@ def test_a_big_import_shows_bun_and_closing_it_only_hides_it(main_window, qapp, 
         if len(calls) > 1:
             go.wait(10)
         return real(f, *a, **k)
-    monkeypatch.setattr(mainwindow, "import_file", slow)
-    w.import_files(files)
+    monkeypatch.setattr(importcontrol, "import_file", slow)
+    w.impctl.import_files(files)
     card = next(x for x in toast.shown(w) if x.key == "import")
     assert card.kind == "busy" and card.card.progress == (0, 4)
     assert card.card.icon.pixmap() is not None and card.card.icon.width() > 30   # Bun
-    assert process_events(qapp, lambda: w._pending_imports == 3)
-    first = w._import_ids[0]
+    assert process_events(qapp, lambda: w.impctl._pending_imports == 3)
+    first = w.impctl._import_ids[0]
     assert process_events(qapp, lambda: first in w.pads)   # on the board already
     card.card.btn_close.click()
     assert process_events(qapp, lambda: not any(x.key == "import" for x in toast.shown(w)))
     go.set()
-    assert process_events(qapp, lambda: not w._pending_imports)
+    assert process_events(qapp, lambda: not w.impctl._pending_imports)
     done = next(x for x in toast.shown(w) if x.key == "import")
     assert done.kind == "ok" and done.card.action.text() == "Undo"
-    assert done.card.icon.width() == 18 and not w._import_card_shut   # next import: card again
+    assert done.card.icon.width() == 18 and not w.impctl._import_card_shut   # next: card again
 
 
 def test_stop_on_a_big_import_keeps_whats_in_and_skips_the_rest(main_window, qapp, tmp_path,  # noqa: F811
                                                                  monkeypatch):
     import threading
-    from soundboard.ui import mainwindow
+    from soundboard.ui import importcontrol
     w = main_window
     t = np.arange(SR // 10) / SR
     files = []
@@ -445,25 +445,25 @@ def test_stop_on_a_big_import_keeps_whats_in_and_skips_the_rest(main_window, qap
         p = tmp_path / f"Oops {i}.wav"
         sf.write(p, np.stack([np.sin(2 * np.pi * (300 + 70 * i) * t)] * 2, 1) * 0.3, SR)
         files.append(str(p))
-    go, real, calls = threading.Event(), mainwindow.import_file, []
+    go, real, calls = threading.Event(), importcontrol.import_file, []
 
     def slow(f, *a, **k):   # two go in, the third waits
         calls.append(f)
         if len(calls) == 3:
             go.wait(10)
         return real(f, *a, **k)
-    monkeypatch.setattr(mainwindow, "import_file", slow)
+    monkeypatch.setattr(importcontrol, "import_file", slow)
     before = len(w.cfg.sounds)
-    w.import_files(files)
-    assert process_events(qapp, lambda: w._pending_imports == 4 and len(calls) == 3)
+    w.impctl.import_files(files)
+    assert process_events(qapp, lambda: w.impctl._pending_imports == 4 and len(calls) == 3)
     card = next(x for x in toast.shown(w) if x.key == "import")
     assert card.card.action.text() == "Stop"
     card.card.action.click()
     go.set()
-    assert process_events(qapp, lambda: not w._pending_imports)
+    assert process_events(qapp, lambda: not w.impctl._pending_imports)
     assert len(calls) == 3 and len(w.cfg.sounds) == before + 3   # the one being read finished
     done = next(x for x in toast.shown(w) if x.key == "import")
-    assert done.card.action.text() == "Undo" and not w._import_stop.is_set()
+    assert done.card.action.text() == "Undo" and not w.impctl._import_stop.is_set()
     done.card.action.click()
     assert len(w.cfg.sounds) == before
 
@@ -472,20 +472,20 @@ def test_one_slow_file_keeps_its_busy_card_until_its_in(main_window, qapp, tmp_p
                                                        monkeypatch):
     """A long file can take longer to read than a notice stays up: its card waits."""
     import threading
-    from soundboard.ui import mainwindow
+    from soundboard.ui import importcontrol
     w = main_window
     p = tmp_path / "Hour.wav"
     sf.write(p, np.zeros((SR // 10, 2)), SR)
-    go, real = threading.Event(), mainwindow.import_file
-    monkeypatch.setattr(mainwindow, "import_file", lambda f, *a, **k: (go.wait(10),
+    go, real = threading.Event(), importcontrol.import_file
+    monkeypatch.setattr(importcontrol, "import_file", lambda f, *a, **k: (go.wait(10),
                                                                       real(f, *a, **k))[1])
-    w.import_files([str(p)])
+    w.impctl.import_files([str(p)])
     card = next(x for x in toast.shown(w) if x.key == "import")
     assert card.kind == "busy" and card.card.progress is None
     # a busy card's own long wait (minutes), not a notice's few seconds
     assert card._timer.remainingTime() > 60_000
     go.set()
-    assert process_events(qapp, lambda: not w._pending_imports)
+    assert process_events(qapp, lambda: not w.impctl._pending_imports)
 
 
 def test_a_long_path_wraps_but_copies_whole(qapp):

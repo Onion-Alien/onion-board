@@ -149,6 +149,7 @@ the launcher the shortcuts and PyInstaller use. The app is the `soundboard` pack
 | `soundboard/ui/toast.py` | the result cards in the window's bottom corner (`busy.toast` / `MainWindow.toast`): green / yellow / red, up to three stacked above the player, a repeat counted as ×2, an action button (Undo, See why), Copy on problems, a bar for progress |
 | `soundboard/ui/importreport.py` | what an import skipped and why, sorted into plain groups: the toast's summary line and the *See why* list you can copy |
 | `soundboard/ui/ffmpegcontrol.py` | FFmpeg in the main window (`MainWindow.ffctl`): the check at start-up, getting it by itself when it's missing or won't start, Fix it / Get FFmpeg / Reinstall, and the top bar with how far it is and Stop |
+| `soundboard/ui/importcontrol.py` | getting sounds in and out, in the main window (`MainWindow.impctl`): Add sounds / folder / link, dropped files, the sounds folder's loose files, backups and sound packs (import, export, tidy, reset, remove), other soundboards, Free packs |
 | `soundboard/ui/updatecontrol.py` | Onion Board's own updates in the main window (`MainWindow.updctl`): the check (and Onion Watch's), the update card's states, the download with Cancel, installing it, What's new |
 | `soundboard/ui/dropveil.py` | the veil over the window while files are dragged in: "Drop to add 4 files" |
 | `soundboard/ui/themecover.py` | a still of the window with Bun over it while a theme switch restyles every widget, faded out after: never a half-styled frame |

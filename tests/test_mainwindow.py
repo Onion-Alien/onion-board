@@ -1500,11 +1500,11 @@ def test_add_is_a_menu_of_every_way_in(window, monkeypatch):
     shown = []
     monkeypatch.setattr(window, "_show_link", lambda: shown.append(window.search.text()))
     QApplication.clipboard().setText("https://www.youtube.com/watch?v=abc")
-    window.add_from_link()
+    window.impctl.add_from_link()
     assert window.search.text() == "https://www.youtube.com/watch?v=abc" and shown
     window.search.clear()
     QApplication.clipboard().setText("not a link")
-    window.add_from_link()
+    window.impctl.add_from_link()
     assert window.search.text() == ""
 
 

@@ -101,7 +101,7 @@ class BoardHost:
             done(known)
             return
         self._adding.append((fp, done))
-        self.win.import_files([path])
+        self.win.impctl.import_files([path])
 
     def sounds_changed(self):
         """The board's sounds changed: hand over the ones being added that are in."""

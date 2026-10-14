@@ -647,7 +647,7 @@ def main():
     if "--resume-setup" not in sys.argv and w.cfg.setup_done:
         # the installer's "from Soundpad" box; with the setup guide up, run_setup
         # starts it once the guide is closed
-        QTimer.singleShot(500, w.import_queued)
+        QTimer.singleShot(500, w.impctl.import_queued)
     QTimer.singleShot(600, w.updctl.after_update)   # "Updated to …" after an update restarted it
     # new versions (updates.py): unless unticked, at most every 6 hours, also for an app
     # left running for days

@@ -281,12 +281,12 @@ def test_the_onion_watch_fix_banner_with_the_tab_off(window):
 def test_importing_settings_switches_the_tabs_live(window, qapp):
     """A settings backup carries tabs_off: the window follows it at once, never a
     saved list that says one thing while the window shows another."""
-    window._apply_backup_settings({"tabs_off": ["voice", "radio"]})
+    window.impctl._apply_backup_settings({"tabs_off": ["voice", "radio"]})
     assert isinstance(window.voice, taboff.VoiceOff)
     assert not isinstance(window.radio, RadioTab)
     assert not window.tabs.isTabVisible(main.TAB_INDEX["voice"])
     assert window.engine.voice_chain is None
-    window._apply_backup_settings({"tabs_off": []})
+    window.impctl._apply_backup_settings({"tabs_off": []})
     assert isinstance(window.voice, VoicePanel) and isinstance(window.radio, RadioTab)
     assert window.tabs.isTabVisible(main.TAB_INDEX["voice"])
     assert window.engine.voice_chain is window.voice.chain
