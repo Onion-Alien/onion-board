@@ -266,7 +266,7 @@ def test_update_preferences_have_one_home_and_privacy_links_to_it(window, monkey
     """Privacy grants network permission; update scheduling has one home in Updates."""
     from PySide6.QtWidgets import QCheckBox
     monkeypatch.setattr(window, "_save_later", lambda: None)
-    monkeypatch.setattr(window, "check_updates", lambda *a, **k: None)
+    monkeypatch.setattr(window.updctl, "check_updates", lambda *a, **k: None)
     d = SettingsDialog(window)
     try:
         def boxes(text):
@@ -342,7 +342,7 @@ def test_each_switch_writes_its_setting_and_applies_at_once(window, monkeypatch)
     saved in net_off and applied to soundboard.net straight away; sub-options grey out
     under a switch that's off, and Offline mode hides everything under it."""
     monkeypatch.setattr(window, "_save_later", lambda: None)
-    monkeypatch.setattr(window, "check_updates", lambda *a, **k: None)
+    monkeypatch.setattr(window.updctl, "check_updates", lambda *a, **k: None)
     d = SettingsDialog(window)
     try:
         assert set(net.FEATURES) <= set(d.net_boxes)
@@ -928,7 +928,7 @@ def test_theme_cards_and_sliders_have_a_name_a_screen_reader_can_say(window):  #
 def test_update_check_keeps_focus_and_blocks_repeat_clicks(window, qapp, monkeypatch, error):  # noqa: F811
     monkeypatch.setattr(net, "allowed", lambda key: True)
     calls = []
-    monkeypatch.setattr(window, "check_updates", lambda **kw: calls.append(kw))
+    monkeypatch.setattr(window.updctl, "check_updates", lambda **kw: calls.append(kw))
     d = _open_in_window(window, qapp, "updates")
     btn = d.upd_btn
     btn.setFocus()

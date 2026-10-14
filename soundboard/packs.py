@@ -18,6 +18,7 @@ import json
 import logging
 import re
 import shutil
+import threading
 import urllib.request
 import zipfile
 from collections.abc import Callable
@@ -249,6 +250,10 @@ class Sample:
     audio: Path
 
 
+_sample_locks: dict[str, threading.Lock] = {}
+_sample_locks_lock = threading.Lock()
+
+
 def previews_dir() -> Path:
     return library.APP_DIR / "packs" / "previews"
 
@@ -259,6 +264,13 @@ def samples(pack: Pack, cancelled: Callable[[], bool] | None = None) -> list[Sam
     updates.UpdateError (switched off, offline, a bad file). Call off the UI thread."""
     if not pack.preview_url:
         return []
+    with _sample_locks_lock:
+        lock = _sample_locks.setdefault(pack.id, threading.Lock())
+    with lock:   # two at once wrote the same .part file: a bad checksum, no samples
+        return _samples(pack, cancelled)
+
+
+def _samples(pack: Pack, cancelled: Callable[[], bool] | None) -> list[Sample]:
     d = previews_dir()
     zpath = d / f"{pack.id}.zip"
     if not zpath.is_file():   # the first time only: then it's served from here

@@ -1584,7 +1584,8 @@ class SettingsDialog(QDialog):
                   "game is up."), self.mw.cfg.tips_on, self.mw.set_tips_on)
         v.addWidget(card)
         v.addWidget(self._app_setup_card())
-        v.addWidget(self._programs_card())
+        if self.mw.cfg.category_programs:   # rules made before the category menu lost it
+            v.addWidget(self._programs_card())
         v.addWidget(self._background_card())
         v.addWidget(self._backup_card())
         v.addWidget(self._reset_card())
@@ -1676,10 +1677,7 @@ class SettingsDialog(QDialog):
 
     def _programs_card(self):
         """Switch category when a program is in front: every rule in one place."""
-        card, cv = self._card(
-            _("Switch category by program"),
-            _("Right-click a category tab → Show this when a program is in front and the board "
-              "shows that category by itself whenever the program is in front."))
+        card, cv = self._card(_("Switch category by program"))
         self.box_programs = self._option(
             cv, _("Switch by itself"),
             _("When the program closes, the board goes back to what it showed before."),
@@ -2596,18 +2594,19 @@ class SettingsDialog(QDialog):
 
     def _ffmpeg_sync(self):
         """The FFmpeg row: whether it works, how far its download is, and Reinstall /
-        Get FFmpeg / Fix it. It shows the main window's state (MainWindow._ffmpeg_news
+        Get FFmpeg / Fix it. It shows the main window's state (FfmpegControl.news
         calls this), so it and the bar always agree."""
         from soundboard import ffmpegget
         button = getattr(self, "btn_ffmpeg", None)
         if button is None or not qt_valid(button):
             return
         mw = self.mw
+        ff = getattr(mw, "ffctl", None)   # ui/ffmpegcontrol.py
         h = ffmpegget.last()
         working = h is not None and h.state == ffmpegget.OK
-        getting = getattr(mw, "_ff_getting", False)
+        getting = getattr(ff, "getting", False)
         if h is None:
-            mw.check_ffmpeg()   # its answer comes back through MainWindow._ffmpeg_news
+            mw.check_ffmpeg()   # its answer comes back through FfmpegControl.news
             state, tone, label = _("Checking…"), "", _("Get FFmpeg")
             note = _("M4A, AAC and video files need FFmpeg. It's a free download of "
                      "about 100 MB.")
@@ -2626,13 +2625,13 @@ class SettingsDialog(QDialog):
             note = _("It's installed but won't start ({error}), so M4A, AAC and "
                      "video files won't play. Fix it installs it again.",
                      error=h.why or _("no reason given"))
-        pct = getattr(mw, "_ff_percent", -1)
+        pct = getattr(ff, "percent", -1)
         if getting:
             note = (_("Getting FFmpeg… {percent}%", percent=pct) if pct >= 0
                     else _("Getting FFmpeg…"))
-        elif getattr(mw, "_ff_error", ""):
-            note = mw._ff_error
-        elif getattr(mw, "_ff_done", False) and working:
+        elif ff is not None and ff.error:
+            note = ff.error
+        elif getattr(ff, "done", False) and working:
             note = _("FFmpeg is ready: M4A, AAC and video files play now.")
         elif not working and ffmpegget.why_not():
             note = "\n".join((note, ffmpegget.why_not()))
@@ -3367,7 +3366,7 @@ class SettingsDialog(QDialog):
     def _updates_optin(self, on: bool):
         self.mw.set_option("update_check", on)
         if on:
-            self.mw.check_updates(why="You turned on update checks")
+            self.mw.updctl.check_updates(why="You turned on update checks")
 
     def _updates_check(self):
         if busy.is_busy(self.upd_btn) or not self.upd_btn.isEnabled():
@@ -3375,7 +3374,7 @@ class SettingsDialog(QDialog):
         self._upd_asked = True
         busy.set_busy(self.upd_btn, True)
         self.upd_label.setText(_("Checking…"))
-        self.mw.check_updates(force=True, why="You clicked Check now (Settings > Updates)")
+        self.mw.updctl.check_updates(force=True, why="You clicked Check now (Settings > Updates)")
 
     def _updates_done(self, rel, err: str):
         if not qt_valid(self.upd_label):
@@ -3396,9 +3395,9 @@ class SettingsDialog(QDialog):
     def _updates_state(self):
         if not qt_valid(self.upd_label):
             return
-        status = self.mw.update_status() if self.mw.release is not None else ""
-        if status and (self.mw._downloading or self.mw._update_err
-                       or self.mw._update_file is not None):
+        status = self.mw.updctl.update_status() if self.mw.updctl.release is not None else ""
+        if status and (self.mw.updctl._downloading or self.mw.updctl._update_err
+                       or self.mw.updctl._update_file is not None):
             self.upd_label.setText(status)
 
     def done(self, r):

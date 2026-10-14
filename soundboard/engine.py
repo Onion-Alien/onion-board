@@ -1094,7 +1094,7 @@ class Engine:
         self.fifo_direct = DirectFifo()
         # ...and the cable gets the same, for a voice app still set to it (CableTap)
         self.tap: CableTap | None = None
-        # Setup -> Devices -> Also send to: a copy of what others hear into each of these
+        # Setup -> Devices -> Also play on: a copy of what others hear into each of these
         # (set_copy_devices). A new tuple each change: the audio thread reads it once.
         self.copies: tuple[CableTap, ...] = ()
         self.copy_names: tuple[str, ...] = ()
@@ -1264,8 +1264,8 @@ class Engine:
 
     @_holding_devices
     def set_copy_devices(self, names):
-        """Also play what others hear into each of `names` (Setup -> Devices -> Also send
-        to: Voicemeeter, OBS, a second cable...). Ones already open stay open; one that
+        """Also play what others hear into each of `names` (Setup -> Devices -> Also play
+        on: Voicemeeter, OBS, a second cable...). Ones already open stay open; one that
         won't open is retried by check_streams."""
         names = tuple(dict.fromkeys(n for n in names if n))
         keep = {t.name: t for t in self.copies if t.name in names}
@@ -1305,7 +1305,7 @@ class Engine:
             log.warning(msg + " (trying again every %.0f s)", *args, RETRY_S)
 
     def copies_down(self) -> list[str]:
-        """The "Also send to" devices that aren't open (unplugged, or busy)."""
+        """The "Also play on" devices that aren't open (unplugged, or busy)."""
         up = {t.name for t in self.copies}
         return [n for n in self.copy_names if n not in up]
 
@@ -1315,7 +1315,7 @@ class Engine:
 
     @_holding_devices
     def _check_copies(self, now: float):
-        """The "Also send to" copies' watchdog (see check_streams)."""
+        """The "Also play on" copies' watchdog (see check_streams)."""
         for t in self.copies:
             if now - t.last_cb > STALL_S:
                 log.warning("copy to %s stalled; reopening", t.name)
@@ -2490,7 +2490,7 @@ class Engine:
         cable = self.tap
         if cable is not None and self.main_direct:
             cable.write(mix)
-        for c in self.copies:   # Also send to
+        for c in self.copies:   # Also play on
             c.write(mix)
         tap = self.main_tap
         if tap is not None:

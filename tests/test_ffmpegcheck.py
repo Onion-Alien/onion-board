@@ -1,4 +1,4 @@
-"""The FFmpeg check (MainWindow.check_ffmpeg) and its bar: FFmpeg missing or broken is
+"""The FFmpeg check (ui/ffmpegcontrol.py) and its bar: FFmpeg missing or broken is
 got by itself once the window is up, with progress and Stop; when it can't be (Offline,
 its switch, Low data mode) or it failed, the bar says what stops working, with Fix it.
 Never the real ffmpeg, winget or a download."""
@@ -9,7 +9,7 @@ import pytest
 from conftest import process_events, said
 
 from soundboard import ffmpegget, net, quality, usage
-from soundboard.ui import mainwindow
+from soundboard.ui import ffmpegcontrol, mainwindow
 from test_mainwindow import window  # noqa: F401  (the real MainWindow fixture)
 
 OK = ffmpegget.Health(ffmpegget.OK, "9.0.1", "ffmpeg.exe")
@@ -31,7 +31,7 @@ def _up(widget) -> bool:
 
 def _found(w, state, why="it stops with an error"):
     h = OK if state == ffmpegget.OK else ffmpegget.Health(state, why=why)
-    w._on_ffmpeg(h, None)
+    w.ffctl.on_answer(h, None)
     return h
 
 
@@ -75,15 +75,15 @@ def test_missing_or_broken_ffmpeg_is_got_by_itself(window, qapp, monkeypatch, st
     calls = _fix(monkeypatch, wait=go, pct=42)
     _found(window, state)
     assert calls == [False]
-    process_events(qapp, lambda: "42%" in window.ff_lbl.text())
-    assert _up(window.ff_bar) and "Getting FFmpeg" in window.ff_lbl.text()
-    assert _up(window.ff_stop) and not _up(window.ff_fix)
+    process_events(qapp, lambda: "42%" in window.ffctl.lbl.text())
+    assert _up(window.ff_bar) and "Getting FFmpeg" in window.ffctl.lbl.text()
+    assert _up(window.ffctl.stop_btn) and not _up(window.ffctl.fix_btn)
     go.set()
     process_events(qapp, lambda: not _up(window.ff_bar))
     assert not _up(window.ff_bar)
     assert "FFmpeg works now (version 9.0.1)" in said(window)
     _found(window, state)                     # broken again later this start: not again
-    assert calls == [False] and _up(window.ff_fix)
+    assert calls == [False] and _up(window.ffctl.fix_btn)
 
 
 @pytest.mark.parametrize("why", ["offline", "switch", "low-data", "dont-ask"])
@@ -96,15 +96,15 @@ def test_not_got_by_itself_when_the_user_said_no(window, monkeypatch, why):  # n
     elif why == "low-data":
         quality.change(**quality.LOW)
     else:
-        window.cfg.tips_seen.append(mainwindow.FF_ASK_OFF)
+        window.cfg.tips_seen.append(ffmpegcontrol.ASK_OFF)
     _found(window, ffmpegget.MISSING)
     assert calls == []
     if why == "dont-ask":
         assert not _up(window.ff_bar)
         return
-    assert _up(window.ff_bar) and window.ff_fix.text() == "Fix it"
+    assert _up(window.ff_bar) and window.ffctl.fix_btn.text() == "Fix it"
     words = {"offline": "Offline", "switch": "switched off", "low-data": "Low data"}[why]
-    assert words in window.ff_lbl.text()
+    assert words in window.ffctl.lbl.text()
 
 
 def test_fix_it_switches_a_switched_off_download_back_on(window, qapp, monkeypatch):  # noqa: F811
@@ -112,7 +112,7 @@ def test_fix_it_switches_a_switched_off_download_back_on(window, qapp, monkeypat
     window.cfg.net_off = ["ffmpeg_download"]
     calls = _fix(monkeypatch)
     _found(window, ffmpegget.MISSING)
-    window.ff_fix.click()
+    window.ffctl.fix_btn.click()
     assert "ffmpeg_download" not in window.cfg.net_off and net.allowed("ffmpeg_download")
     process_events(qapp, lambda: not _up(window.ff_bar))
     assert calls == [False] and "switched on again" in said(window)
@@ -122,17 +122,17 @@ def test_fix_it_offline_says_so_and_downloads_nothing(window, monkeypatch):  # n
     net.configure_features([], offline=True)
     calls = _fix(monkeypatch)
     _found(window, ffmpegget.MISSING)
-    window.ff_fix.click()
+    window.ffctl.fix_btn.click()
     assert calls == [] and "Offline" in said(window)
 
 
 def test_a_failed_fix_says_why_and_fix_it_tries_again(window, qapp, monkeypatch):  # noqa: F811
     calls = _fix(monkeypatch, err="Couldn't reach github.com (timed out).")
     _found(window, ffmpegget.BROKEN)
-    process_events(qapp, lambda: "github.com" in window.ff_lbl.text())
-    assert _up(window.ff_fix) and "github.com" in said(window)
+    process_events(qapp, lambda: "github.com" in window.ffctl.lbl.text())
+    assert _up(window.ffctl.fix_btn) and "github.com" in said(window)
     calls = _fix(monkeypatch)
-    window.ff_fix.click()
+    window.ffctl.fix_btn.click()
     process_events(qapp, lambda: not _up(window.ff_bar))
     assert calls == [False]
 
@@ -140,18 +140,18 @@ def test_a_failed_fix_says_why_and_fix_it_tries_again(window, qapp, monkeypatch)
 def test_stop(window, qapp, monkeypatch):  # noqa: F811
     _fix(monkeypatch, wait=threading.Event())
     _found(window, ffmpegget.MISSING)
-    window.ff_stop.click()
-    process_events(qapp, lambda: _up(window.ff_fix))
-    assert _up(window.ff_fix) and not _up(window.ff_stop)
-    assert "missing" in window.ff_lbl.text() and "Stopped" not in said(window)
+    window.ffctl.stop_btn.click()
+    process_events(qapp, lambda: _up(window.ffctl.fix_btn))
+    assert _up(window.ffctl.fix_btn) and not _up(window.ffctl.stop_btn)
+    assert "missing" in window.ffctl.lbl.text() and "Stopped" not in said(window)
 
 
 def test_dont_ask_again_is_remembered(window, monkeypatch):  # noqa: F811
     net.configure_features([], offline=True)   # (not got by itself)
     _found(window, ffmpegget.BROKEN)
-    window.ff_never.click()
+    window.ffctl.never_btn.click()
     assert not _up(window.ff_bar)
-    assert mainwindow.FF_ASK_OFF in window.cfg.tips_seen
+    assert ffmpegcontrol.ASK_OFF in window.cfg.tips_seen
     _found(window, ffmpegget.BROKEN)   # the next start's check
     assert not _up(window.ff_bar)
 
@@ -159,14 +159,14 @@ def test_dont_ask_again_is_remembered(window, monkeypatch):  # noqa: F811
 def test_hide_is_until_the_next_start_only(window):  # noqa: F811
     net.configure_features([], offline=True)
     _found(window, ffmpegget.BROKEN)
-    window.ff_hide.click()
+    window.ffctl.hide_btn.click()
     _found(window, ffmpegget.BROKEN)
     assert not _up(window.ff_bar)
-    assert mainwindow.FF_ASK_OFF not in window.cfg.tips_seen
+    assert ffmpegcontrol.ASK_OFF not in window.cfg.tips_seen
 
 
 def test_icon_button_has_words(window):  # noqa: F811
-    assert window.ff_hide.toolTip() and window.ff_hide.accessibleName()
+    assert window.ffctl.hide_btn.toolTip() and window.ffctl.hide_btn.accessibleName()
 
 
 
@@ -175,13 +175,13 @@ def test_failed_get_then_retry_counts_recovery(window, qapp, monkeypatch):  # no
     monkeypatch.setattr(usage, "_used", set())
     _fix(monkeypatch, err="network unavailable")
     _found(window, ffmpegget.MISSING)
-    process_events(qapp, lambda: not window._ff_getting)
+    process_events(qapp, lambda: not window.ffctl.getting)
     assert window.cfg.stats_ffmpeg_failed
     assert "get-ffmpeg-auto-failed" in window.cfg.stats_used
     assert "ffmpeg-recovered" not in window.cfg.stats_used
     _fix(monkeypatch)
-    window.ff_fix.click()
-    process_events(qapp, lambda: not window._ff_getting)
+    window.ffctl.fix_btn.click()
+    process_events(qapp, lambda: not window.ffctl.getting)
     assert not window.cfg.stats_ffmpeg_failed
     assert "ffmpeg-recovered" in window.cfg.stats_used
 
@@ -189,7 +189,7 @@ def test_failed_get_then_retry_counts_recovery(window, qapp, monkeypatch):  # no
 def test_startup_broken_then_working_check_counts_recovery(window, monkeypatch):  # noqa: F811
     monkeypatch.setattr(usage, "enabled", lambda: True)
     monkeypatch.setattr(usage, "_used", set())
-    window._ff_auto_tried = True   # test checks, without starting a download
+    window.ffctl.auto_tried = True   # test checks, without starting a download
     _found(window, ffmpegget.BROKEN)
     assert window.cfg.stats_ffmpeg_failed and "ffmpeg-broken" in window.cfg.stats_used
     _found(window, ffmpegget.OK)
@@ -202,8 +202,21 @@ def test_failed_or_stopped_fix_cannot_recover_from_stale_health(window, monkeypa
     monkeypatch.setattr(usage, "enabled", lambda: True)
     monkeypatch.setattr(usage, "_used", set())
     window.cfg.stats_ffmpeg_failed = True
-    window._on_ffmpeg(OK, err)
+    window.ffctl.on_answer(OK, err)
     assert window.cfg.stats_ffmpeg_failed
     assert "ffmpeg-recovered" not in window.cfg.stats_used
     failed = not isinstance(err, ffmpegget.Stopped)
     assert ("get-ffmpeg-failed" in window.cfg.stats_used) == failed
+
+
+def test_ffmpeg_lives_in_its_own_controller(window):  # noqa: F811
+    """The FFmpeg check, fix and bar are one FfmpegControl the window owns, not ~200
+    lines of MainWindow: the window only keeps its bar among the top bars and the two
+    calls Settings makes."""
+    assert isinstance(window.ffctl, ffmpegcontrol.FfmpegControl)
+    assert window.ff_bar is window.ffctl.bar
+    assert not [n for n in vars(window) if n.startswith("_ff_")]
+    for gone in ("_on_ffmpeg", "_ffmpeg_news", "_show_ffmpeg_bar", "fix_ffmpeg",
+                 "_may_get_ffmpeg", "_ffmpeg_never"):
+        assert not hasattr(mainwindow.MainWindow, gone), gone
+    assert window.ffmpeg is window.ffctl.health
