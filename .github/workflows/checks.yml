@@ -6,6 +6,10 @@ on:
   push:
     branches: [main]
   pull_request:
+  # Every night, the whole suite on main: a test that only passes on a rerun shows up
+  # as a trend, and the flaky-trend job fails the night a new one appears.
+  schedule:
+    - cron: "17 3 * * *"
   workflow_dispatch:
     inputs:
       linux:
@@ -56,7 +60,7 @@ jobs:
       # is only a warning: it's pushed already and can't be re-stamped, so a red main
       # would just stay red and notify everyone for nothing.
       - name: Commit times in UTC
-        if: github.event_name != 'workflow_dispatch'
+        if: github.event_name == 'push' || github.event_name == 'pull_request'
         env:
           EVENT: ${{ github.event_name }}
           PR_HEAD: ${{ github.event.pull_request.head.sha }}
@@ -227,6 +231,15 @@ jobs:
               echo "$flaky"; echo '```'; } >> "$GITHUB_STEP_SUMMARY"
             echo "$flaky" | sed 's/^/::warning::/'
           fi
+          # the test ids alone, for the nightly's flaky-trend job
+          echo "$flaky" | awk 'NF { print $2 }' > flaky.txt
+      - if: always() && github.event_name == 'schedule'
+        uses: actions/upload-artifact@v7
+        with:
+          name: flaky-${{ strategy.job-index }}
+          path: flaky.txt
+          if-no-files-found: ignore
+          retention-days: 2
       - if: failure()
         uses: actions/upload-artifact@v7
         with:
@@ -280,6 +293,56 @@ jobs:
         run: .venv\Scripts\python -m pytest --reruns 2 -rfER tests/test_directmic.py
       - name: Fuzz (60 s)
         run: .venv\Scripts\python scripts/fuzz_directmic.py 60 2
+
+  # The nightly's flaky tests (passed on a rerun) against the last nightly's: a new one
+  # fails this job, so a flake shows up the night it starts instead of hiding behind
+  # --reruns. The list it saves (flaky-all) is what the next night compares with.
+  flaky-trend:
+    needs: windows
+    if: ${{ !cancelled() && github.event_name == 'schedule' }}
+    runs-on: ubuntu-latest
+    permissions:
+      actions: read   # the last nightly's list
+    steps:
+      - uses: actions/download-artifact@v7
+        with:
+          pattern: flaky-*
+          path: shards
+      - name: The last nightly's list
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REPO: ${{ github.repository }}
+          RUN: ${{ github.run_id }}
+        run: |
+          touch before.txt
+          last=$(gh run list -R "$REPO" --workflow checks.yml --event schedule \
+            --status completed --limit 10 --json databaseId \
+            -q "[.[] | select(.databaseId != $RUN)][0].databaseId // empty")
+          if [ -n "$last" ] && gh run download "$last" -R "$REPO" -n flaky-all -D last; then
+            cp last/flaky.txt before.txt
+          else
+            echo "No list from a last nightly: tonight's is the first."
+          fi
+      - name: New flaky tests
+        run: |
+          cat shards/*/flaky.txt 2>/dev/null | sort -u > flaky.txt || true
+          sort -u before.txt > before.sorted
+          new=$(comm -13 before.sorted flaky.txt)
+          gone=$(comm -23 before.sorted flaky.txt)
+          { echo "### Flaky tests tonight: $(wc -l < flaky.txt) (last night: $(wc -l < before.sorted))"
+            if [ -n "$new" ]; then echo "New:"; echo '```'; echo "$new"; echo '```'; fi
+            if [ -n "$gone" ]; then echo "No longer flaky:"; echo '```'; echo "$gone"; echo '```'; fi
+          } >> "$GITHUB_STEP_SUMMARY"
+          if [ -n "$new" ]; then
+            echo "$new" | sed 's/^/::error::New flaky test: /'
+            exit 1
+          fi
+      - if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: flaky-all
+          path: flaky.txt
+          retention-days: 30
 
   # One check named `test` whatever the split: passed when every Windows job did, or
   # when the change needs no tests; failed when ruff, the pick or the type check did,

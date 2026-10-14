@@ -707,7 +707,7 @@ def test_admin_logs_stay_small(tmp_path, monkeypatch):
 
 
 def test_schtasks_on_the_ui_thread_is_flagged(qapp, monkeypatch, caplog):
-    """installed() / ready() run schtasks: never on the UI thread (AGENT-RULES)."""
+    """installed() / ready() run schtasks: never on the UI thread."""
     monkeypatch.setattr(mh.subprocess, "run",
                         lambda *a, **k: subprocess.CompletedProcess(a, 0, b"", b""))
     with caplog.at_level(logging.WARNING, logger=mh.__name__):

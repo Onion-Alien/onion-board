@@ -55,3 +55,36 @@ def test_local_adds_uncommitted_and_new_files(monkeypatch):
     assert pick_tests.changed_files("origin/main", local=True) == [
         "soundboard/a.py", "soundboard/new.py", "tests/test_b.py"]
     assert ("diff", "--name-only", "--no-renames", "abc") in calls
+
+
+def test_a_hub_runs_them_all():
+    # signals and lazy imports reach these from everywhere: no import line says which
+    # tests a change to one can break, so the whole suite runs
+    for f in sorted(pick_tests.HUBS):
+        assert pick_tests.pick([f]) == ["tests"], f
+    assert pick_tests.pick(["soundboard/ui/sidebar.py"]) != ["tests"]
+
+
+def test_imports_inside_functions_and_by_name_are_followed(tmp_path, monkeypatch):
+    (tmp_path / "soundboard").mkdir()
+    (tmp_path / "tests").mkdir()
+    (tmp_path / "main.py").write_text("", encoding="utf-8")
+    for name in ("__init__", "usage", "theme", "lazy", "other"):
+        (tmp_path / "soundboard" / f"{name}.py").write_text("", encoding="utf-8")
+    tests = {
+        "test_local": "def test_it():\n    from soundboard import usage\n",
+        "test_method": "class T:\n    def test_it(self):\n"
+                       "        import soundboard.theme\n",
+        "test_byname": "import importlib\n\n\ndef test_it():\n"
+                       "    importlib.import_module('soundboard.lazy')\n"
+                       "    __import__('soundboard.theme')\n",
+        "test_other": "from soundboard import other\n",
+    }
+    for name, text in tests.items():
+        (tmp_path / "tests" / f"{name}.py").write_text(text, encoding="utf-8")
+    monkeypatch.setattr(pick_tests, "ROOT", tmp_path)
+    monkeypatch.setattr(pick_tests, "TESTS", tmp_path / "tests")
+    assert pick_tests.pick(["soundboard/usage.py"]) == ["tests/test_local.py"]
+    assert pick_tests.pick(["soundboard/theme.py"]) == [
+        "tests/test_byname.py", "tests/test_method.py"]
+    assert pick_tests.pick(["soundboard/lazy.py"]) == ["tests/test_byname.py"]

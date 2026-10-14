@@ -204,3 +204,27 @@ def test_latency_and_stream_output_changes_never_wait_on_the_ui_thread(
     devices_done(w)
     assert [c[0] for c in calls].count("set_obs_device") == 2   # reopened, then picked
     assert ("set_obs_device", w._obs_name("Speakers")) in calls
+
+
+def test_default_output_switch_and_reopening_all_never_wait_on_the_ui_thread(
+        main_window, monkeypatch, qapp):  # noqa: F811
+    """Following Windows' default output and reopening every device (the setup guide
+    closing) opened their streams on the UI thread: a recovery holding the devices
+    froze the window."""
+    from conftest import devices_done
+    w = main_window
+    devices_done(w)
+    calls = []
+    for name in ("set_mic_device", "set_main_device", "set_tap_device", "set_mon_device",
+                 "set_obs_device", "set_copy_devices"):
+        monkeypatch.setattr(eng.Engine, name, recording(calls, name))
+    w.cfg.mon_follows_default = True
+    with held_elsewhere():
+        quick(w._use_default_output, "Speakers")
+        quick(w._reopen_devices)
+        assert calls == []                       # waiting their turn, off the UI thread
+        assert w.cfg.mon_device == "Speakers"    # the window shows it straight away
+    devices_done(w)
+    assert ("set_mon_device", "Speakers") in calls
+    assert [c[0] for c in calls].count("set_mon_device") == 2   # switched, then all reopened
+    assert "set_mic_device" in [c[0] for c in calls]

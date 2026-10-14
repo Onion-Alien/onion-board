@@ -172,7 +172,7 @@ FF_ASK_OFF = "ffmpeg-offer"   # in Config.tips_seen: the FFmpeg bar's Don't ask 
 SEARCH_MIN_W = 220    # the Sounds tab's search box, until the window gets narrow
 # ...and its most: a few words go in it, so past this it's only a longer empty bar
 # (456 px at 1180x720, so normal windows are unchanged). The seek bar, the levels and
-# the drop box still follow the window: wider is useful there (U11).
+# the drop box still follow the window: wider is useful there.
 SEARCH_MAX_W = 480
 VOICE_POLL_MS = 3000  # how often the game in front is looked at (soundboard.voicesdk)
 VOICE_POLL_IDLE_S = 15   # ...while nobody sees the hint and nothing switches by itself
@@ -477,7 +477,7 @@ class MainWindow(QMainWindow):
         self.bridge.ffmpeg.connect(self._on_ffmpeg)
         self.bridge.ffmpeg_progress.connect(self._on_ffmpeg_progress)
         self._removed: list[tuple[SoundMeta, int, np.ndarray | None]] = []   # undo-able
-        # windows beside the board, not over it (U4): the one Settings, and an Edit
+        # windows beside the board, not over it: the one Settings, and an Edit
         # sound for each sound being edited
         self._settings_dlg: SettingsDialog | None = None
         self._editors: dict[str, EditDialog] = {}
@@ -2728,6 +2728,16 @@ class MainWindow(QMainWindow):
         self._pick_devices()
         self._devices_opened(self._open_devices(self._device_plan()))
 
+    def _reopen_devices(self):
+        """_init_devices for a click (the setup guide closing): the boxes now, the
+        streams on the device thread (_device_job), so the window never waits on them."""
+        self._pick_devices()
+
+        def plan():   # the config as it is when its turn comes
+            devices = self._device_plan()
+            return lambda: self._open_devices(devices)
+        self._device_job(plan, lambda ends: self._devices_opened(ends or []))
+
     def _pick_devices(self):
         """_init_devices' quick part (UI thread): the devices to use, from the lists."""
         outs = [d["name"] for d in eng.list_devices("output")]
@@ -2905,12 +2915,24 @@ class MainWindow(QMainWindow):
         log.info("Windows' default output changed: headphones %r -> %r", c.mon_device, name)
         c.mon_device = name
         self._fill_combo(self.cb_mon, [d["name"] for d in eng.list_devices("output")], name)
-        self.engine.set_mon_device(name)
-        self._apply_send_outputs()
         self._save_now()
-        self._update_status()
-        self.toast(_("You hear your sounds on {name} now: it's Windows' default output.",
-                     name=html.escape(name)), "ok")
+        e = self.engine
+
+        def plan():   # the streams are opened on the device thread (_device_job)
+            mon, send = c.mon_device, self._send_plan()   # where it ended up by then
+
+            def work():
+                e.set_mon_device(mon)
+                return self._open_send(send)
+            return work
+
+        def opened(ends):
+            if ends is not None:
+                self._set_cable_bad(ends)
+            self._update_status()
+            self.toast(_("You hear your sounds on {name} now: it's Windows' default output.",
+                         name=html.escape(name)), "ok")
+        self._device_job(plan, opened)
 
     def _check_cable_format(self):
         """Note which ends of the cable in use aren't at 48 kHz (shown on the Setup tab)."""

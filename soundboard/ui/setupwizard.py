@@ -1177,7 +1177,7 @@ class SetupWizard(QDialog):
         cfg.mic_enabled = self.chk_send.isChecked()
         self.win.chk_mic.setChecked(cfg.mic_enabled)
         cfg.save()
-        self.win._init_devices()   # refresh the window's device boxes from the choices
+        self.win._reopen_devices()   # refresh the window's device boxes from the choices
         self.accept()
 
     def reject(self):
@@ -1211,7 +1211,7 @@ class SetupWizard(QDialog):
             # Step-by-step guide still opens it)
             self.win.cfg.setup_done = True
             self.win.cfg.save()
-            self.win._init_devices()
+            self.win._reopen_devices()
         super().done(r)
 
     # ------------------------------------------------------------------ actions
@@ -1271,6 +1271,23 @@ class SetupWizard(QDialog):
             self.setup_show.finish(not bool(err))
         self.recheck_cable(rescan=False)
         self._update_next()
+
+    def _open_cable(self):
+        """What others hear goes into the cable, opened on the device thread (the window
+        never waits on a slow driver); then both ends of the cable onto 48 kHz, so it
+        passes the sound through as is."""
+        win = self.win
+
+        def plan():
+            send = win._send_plan(force_main=True)
+            return lambda: win._open_send(send)
+
+        def opened(ends):
+            if ends is not None:
+                win._set_cable_bad(ends)
+            if win.cable_bad:
+                win.fix_cable_format(quiet=True)
+        win._device_job(plan, opened)
 
     def recheck_cable(self, rescan: bool = True):
         if rescan:
@@ -1387,12 +1404,8 @@ class SetupWizard(QDialog):
         elif self.cable_ok():
             if not eng.is_virtual(self.win.cfg.main_device):
                 self.win.cfg.main_device = eng.virtual_outputs()[0]
-            self.win.engine.set_main_device(self.win._main_name())
-            # both ends of the cable on 48 kHz: it then passes the sound through as is
-            self.win._check_cable_format()
+            self._open_cable()
             self.status_card.set_state("ok", _("Installed"))
-            if self.win.cable_bad:
-                self.win.fix_cable_format(quiet=True)
             resume_after_restart(False)
             if self._resumed:   # back from the restart, and it worked
                 self._resumed = False
