@@ -3339,5 +3339,13 @@
   "Try anything: a song, a meme, a game sound.": "뭐든 해 보세요: 노래, 밈, 게임 사운드.",
   "Type a song you love, then press Enter": "좋아하는 노래를 입력하고 Enter를 누르세요",
   "Your sounds are in <b style='color:{colour}'>{mic}</b> now, so there's nothing to pick in Discord or your games. One thing can still stop them: Discord's own noise filter, which is on by default.": "이제 사운드가 <b style='color:{colour}'>{mic}</b>에 들어가 있어서 Discord나 게임에서 고를 게 없어요. 막을 수 있는 건 하나뿐: 기본으로 켜져 있는 Discord 자체 소음 필터예요.",
-  "Muted / live: while muted nobody hears your sounds (your mic still goes out unless a voice changer is on or Send my mic is off)": "음소거/라이브: 음소거된 동안에는 누구도 귀하의 소리를 듣지 못합니다(보이스 체인저가 켜져 있거나 마이크 보내기가 꺼져 있지 않으면 마이크는 계속 전달됩니다)."
+  "Muted / live: while muted nobody hears your sounds (your mic still goes out unless a voice changer is on or Send my mic is off)": "음소거/라이브: 음소거된 동안에는 누구도 귀하의 소리를 듣지 못합니다(보이스 체인저가 켜져 있거나 마이크 보내기가 꺼져 있지 않으면 마이크는 계속 전달됩니다).",
+  "That MIDI pad can't be read: hit the pad again to set it.": "그 MIDI 패드를 읽을 수 없어요. 패드를 다시 쳐서 설정하세요.",
+  "A hotkey needs a key, like F1 or Ctrl+1.": "단축키에는 키가 필요해요. 예: F1, Ctrl+1",
+  "That's too long for a hotkey: one key, plus Ctrl, Alt, Shift or Windows if you like.": "단축키로는 너무 길어요. 키 하나에, 원하면 Ctrl, Alt, Shift, Windows를 더하세요.",
+  "{mod} is in that hotkey twice: use it once, like {mod}+1.": "이 단축키에 {mod}가 두 번 들어 있어요. 한 번만 쓰세요. 예: {mod}+1",
+  "“{key}” isn't a key on a keyboard, so that hotkey could never be pressed.": "“{key}”는 키보드에 있는 키가 아니라서 이 단축키는 절대 누를 수 없어요.",
+  "{mod} alone can't be a hotkey: add a key, like {mod}+1.": "{mod}만으로는 단축키가 될 수 없어요. 키를 더하세요. 예: {mod}+1",
+  "A hotkey has one key, plus Ctrl, Alt, Shift or Windows if you like: this one has {keys}.": "단축키는 키 하나에, 원하면 Ctrl, Alt, Shift, Windows를 더해요. 이건 {keys}가 있어요.",
+  "Hotkey not saved: {why}": "단축키를 저장하지 않았어요: {why}"
 }

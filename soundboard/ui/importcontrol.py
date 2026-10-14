@@ -355,7 +355,7 @@ class ImportControl(Controller):
             mw.catctl._tag_new(meta)
             meta.tags = library.merge_tags(meta.tags, mw.cfg.categories,
                                            mw.cfg.subcategories)
-            key = self._import_keys.pop(meta.id, "")
+            key = library.clean_hotkey(self._import_keys.pop(meta.id, ""), meta.name)
             if key and not mw.hkctl._hotkey_taken(key):
                 meta.hotkey = key
             mw.cfg.sounds.append(meta)

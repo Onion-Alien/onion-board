@@ -3339,5 +3339,13 @@
   "Try anything: a song, a meme, a game sound.": "Coba apa saja: lagu, meme, suara game.",
   "Type a song you love, then press Enter": "Ketik lagu yang kamu suka, lalu tekan Enter",
   "Your sounds are in <b style='color:{colour}'>{mic}</b> now, so there's nothing to pick in Discord or your games. One thing can still stop them: Discord's own noise filter, which is on by default.": "Suaramu sekarang ada di <b style='color:{colour}'>{mic}</b>, jadi tidak ada yang perlu dipilih di Discord atau game-mu. Cuma satu hal yang masih bisa menghentikannya: filter bising bawaan Discord, yang aktif secara default.",
-  "Muted / live: while muted nobody hears your sounds (your mic still goes out unless a voice changer is on or Send my mic is off)": "Dibisukan / langsung: saat dibisukan, tidak ada yang mendengar suara Anda (mikrofon Anda tetap terkirim, kecuali pengubah suara aktif atau kirim mic mati)"
+  "Muted / live: while muted nobody hears your sounds (your mic still goes out unless a voice changer is on or Send my mic is off)": "Dibisukan / langsung: saat dibisukan, tidak ada yang mendengar suara Anda (mikrofon Anda tetap terkirim, kecuali pengubah suara aktif atau kirim mic mati)",
+  "That MIDI pad can't be read: hit the pad again to set it.": "Pad MIDI itu tidak bisa dibaca: tekan pad itu lagi untuk mengaturnya.",
+  "A hotkey needs a key, like F1 or Ctrl+1.": "Hotkey butuh satu tombol, seperti F1 atau Ctrl+1.",
+  "That's too long for a hotkey: one key, plus Ctrl, Alt, Shift or Windows if you like.": "Itu terlalu panjang untuk hotkey: satu tombol, ditambah Ctrl, Alt, Shift, atau Windows jika mau.",
+  "{mod} is in that hotkey twice: use it once, like {mod}+1.": "{mod} ada dua kali di hotkey itu: pakai sekali saja, seperti {mod}+1.",
+  "“{key}” isn't a key on a keyboard, so that hotkey could never be pressed.": "“{key}” bukan tombol di keyboard, jadi hotkey itu tidak akan pernah bisa ditekan.",
+  "{mod} alone can't be a hotkey: add a key, like {mod}+1.": "{mod} saja tidak bisa jadi hotkey: tambahkan satu tombol, seperti {mod}+1.",
+  "A hotkey has one key, plus Ctrl, Alt, Shift or Windows if you like: this one has {keys}.": "Hotkey punya satu tombol, ditambah Ctrl, Alt, Shift, atau Windows jika mau: yang ini punya {keys}.",
+  "Hotkey not saved: {why}": "Hotkey tidak disimpan: {why}"
 }

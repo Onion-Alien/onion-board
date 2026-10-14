@@ -3491,5 +3491,13 @@
   "Try anything: a song, a meme, a game sound.": "Пробуй що завгодно: пісню, мем, звук із гри.",
   "Type a song you love, then press Enter": "Напиши пісню, яку любиш, і натисни Enter",
   "Your sounds are in <b style='color:{colour}'>{mic}</b> now, so there's nothing to pick in Discord or your games. One thing can still stop them: Discord's own noise filter, which is on by default.": "Тепер твої звуки в <b style='color:{colour}'>{mic}</b>, тож у Discord та іграх нічого вибирати не треба. Зупинити їх може лише одне: власний шумоподавлювач Discord, увімкнений за замовчуванням.",
-  "Muted / live: while muted nobody hears your sounds (your mic still goes out unless a voice changer is on or Send my mic is off)": "Вимкнено/наживо: коли звук вимкнено, ніхто не чує ваших звуків (мікрофон усе одно йде, якщо не ввімкнено зміну голосу і не вимкнено надсилання мікрофона)"
+  "Muted / live: while muted nobody hears your sounds (your mic still goes out unless a voice changer is on or Send my mic is off)": "Вимкнено/наживо: коли звук вимкнено, ніхто не чує ваших звуків (мікрофон усе одно йде, якщо не ввімкнено зміну голосу і не вимкнено надсилання мікрофона)",
+  "That MIDI pad can't be read: hit the pad again to set it.": "Цей MIDI-пед не читається: вдар по педу ще раз, щоб задати його.",
+  "A hotkey needs a key, like F1 or Ctrl+1.": "Гарячій клавіші потрібна клавіша, наприклад F1 або Ctrl+1.",
+  "That's too long for a hotkey: one key, plus Ctrl, Alt, Shift or Windows if you like.": "Задовго для гарячої клавіші: одна клавіша, плюс Ctrl, Alt, Shift або Windows за бажанням.",
+  "{mod} is in that hotkey twice: use it once, like {mod}+1.": "{mod} є в цій гарячій клавіші двічі: використай один раз, наприклад {mod}+1.",
+  "“{key}” isn't a key on a keyboard, so that hotkey could never be pressed.": "«{key}» — не клавіша клавіатури, тож цю гарячу клавішу ніколи не натиснути.",
+  "{mod} alone can't be a hotkey: add a key, like {mod}+1.": "Сам {mod} не може бути гарячою клавішею: додай клавішу, наприклад {mod}+1.",
+  "A hotkey has one key, plus Ctrl, Alt, Shift or Windows if you like: this one has {keys}.": "У гарячій клавіші одна клавіша, плюс Ctrl, Alt, Shift або Windows за бажанням: тут {keys}.",
+  "Hotkey not saved: {why}": "Гарячу клавішу не збережено: {why}"
 }

@@ -3415,5 +3415,13 @@
   "Try anything: a song, a meme, a game sound.": "Δοκίμασε οτιδήποτε: ένα τραγούδι, ένα meme, έναν ήχο από παιχνίδι.",
   "Type a song you love, then press Enter": "Γράψε ένα τραγούδι που αγαπάς και πάτα Enter",
   "Your sounds are in <b style='color:{colour}'>{mic}</b> now, so there's nothing to pick in Discord or your games. One thing can still stop them: Discord's own noise filter, which is on by default.": "Οι ήχοι σου είναι τώρα στο <b style='color:{colour}'>{mic}</b>, οπότε δεν έχεις τίποτα να διαλέξεις στο Discord ή στα παιχνίδια σου. Ένα πράγμα μπορεί ακόμα να τους σταματήσει: το φίλτρο θορύβου του ίδιου του Discord, που είναι ανοιχτό από προεπιλογή.",
-  "Muted / live: while muted nobody hears your sounds (your mic still goes out unless a voice changer is on or Send my mic is off)": "Σίγαση / ζωντανά: σε σίγαση κανείς δεν ακούει τους ήχους σου (το μικρόφωνό σου ακούγεται ακόμα, εκτός αν η αλλαγή φωνής είναι ανοιχτή ή η αποστολή μικροφώνου κλειστή)"
+  "Muted / live: while muted nobody hears your sounds (your mic still goes out unless a voice changer is on or Send my mic is off)": "Σίγαση / ζωντανά: σε σίγαση κανείς δεν ακούει τους ήχους σου (το μικρόφωνό σου ακούγεται ακόμα, εκτός αν η αλλαγή φωνής είναι ανοιχτή ή η αποστολή μικροφώνου κλειστή)",
+  "That MIDI pad can't be read: hit the pad again to set it.": "Δεν διαβάζεται αυτό το MIDI pad: χτύπησε ξανά το pad για να το ορίσεις.",
+  "A hotkey needs a key, like F1 or Ctrl+1.": "Μια συντόμευση χρειάζεται ένα πλήκτρο, π.χ. F1 ή Ctrl+1.",
+  "That's too long for a hotkey: one key, plus Ctrl, Alt, Shift or Windows if you like.": "Είναι πολύ μεγάλο για συντόμευση: ένα πλήκτρο, και αν θες Ctrl, Alt, Shift ή Windows.",
+  "{mod} is in that hotkey twice: use it once, like {mod}+1.": "Το {mod} υπάρχει δύο φορές σε αυτή τη συντόμευση: βάλ' το μία φορά, π.χ. {mod}+1.",
+  "“{key}” isn't a key on a keyboard, so that hotkey could never be pressed.": "Το «{key}» δεν είναι πλήκτρο πληκτρολογίου, οπότε αυτή η συντόμευση δεν θα πατιόταν ποτέ.",
+  "{mod} alone can't be a hotkey: add a key, like {mod}+1.": "Το {mod} μόνο του δεν μπορεί να είναι συντόμευση: πρόσθεσε ένα πλήκτρο, π.χ. {mod}+1.",
+  "A hotkey has one key, plus Ctrl, Alt, Shift or Windows if you like: this one has {keys}.": "Μια συντόμευση έχει ένα πλήκτρο, και αν θες Ctrl, Alt, Shift ή Windows: αυτή έχει {keys}.",
+  "Hotkey not saved: {why}": "Η συντόμευση δεν αποθηκεύτηκε: {why}"
 }

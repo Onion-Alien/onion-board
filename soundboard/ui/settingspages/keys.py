@@ -192,7 +192,11 @@ class HotkeyDialog(QDialog):
                                 "Alt or Shift, or press it again to use it anyway.</span>",
                                 warn=warn, key=key))
             return
-        self.result_combo = winkeys.combo_name(mods, vk)
+        combo, why = winkeys.check(winkeys.combo_name(mods, vk))
+        if why:   # a key Windows can't take as a hotkey: say so, keep listening
+            self.hint.setText(f"<span style='color:{theme.status('warn')}'>{why}</span>")
+            return
+        self.result_combo = combo
         self.accept()
 
 

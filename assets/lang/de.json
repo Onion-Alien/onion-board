@@ -3415,5 +3415,13 @@
   "Try anything: a song, a meme, a game sound.": "Probier alles: einen Song, ein Meme, einen Game-Sound.",
   "Type a song you love, then press Enter": "Tipp einen Song ein, den du liebst, dann drück Enter",
   "Your sounds are in <b style='color:{colour}'>{mic}</b> now, so there's nothing to pick in Discord or your games. One thing can still stop them: Discord's own noise filter, which is on by default.": "Deine Sounds sind jetzt in <b style='color:{colour}'>{mic}</b>, also musst du in Discord oder deinen Games nichts auswählen. Eins kann sie trotzdem stoppen: Discords eigener Rauschfilter, der standardmäßig an ist.",
-  "Muted / live: while muted nobody hears your sounds (your mic still goes out unless a voice changer is on or Send my mic is off)": "Stumm / live: Im Stumm-Modus hört niemand deine Sounds (dein Mikro geht weiter raus, außer der Stimmverzerrer ist an oder Mikro senden ist aus)"
+  "Muted / live: while muted nobody hears your sounds (your mic still goes out unless a voice changer is on or Send my mic is off)": "Stumm / live: Im Stumm-Modus hört niemand deine Sounds (dein Mikro geht weiter raus, außer der Stimmverzerrer ist an oder Mikro senden ist aus)",
+  "That MIDI pad can't be read: hit the pad again to set it.": "Dieses MIDI-Pad lässt sich nicht lesen: schlag das Pad noch einmal an, um es festzulegen.",
+  "A hotkey needs a key, like F1 or Ctrl+1.": "Ein Hotkey braucht eine Taste, z. B. F1 oder Ctrl+1.",
+  "That's too long for a hotkey: one key, plus Ctrl, Alt, Shift or Windows if you like.": "Das ist zu lang für einen Hotkey: eine Taste, dazu nach Wunsch Ctrl, Alt, Shift oder Windows.",
+  "{mod} is in that hotkey twice: use it once, like {mod}+1.": "{mod} kommt in diesem Hotkey zweimal vor: nimm es einmal, z. B. {mod}+1.",
+  "“{key}” isn't a key on a keyboard, so that hotkey could never be pressed.": "„{key}“ ist keine Taste auf einer Tastatur, dieser Hotkey ließe sich also nie drücken.",
+  "{mod} alone can't be a hotkey: add a key, like {mod}+1.": "{mod} allein kann kein Hotkey sein: nimm eine Taste dazu, z. B. {mod}+1.",
+  "A hotkey has one key, plus Ctrl, Alt, Shift or Windows if you like: this one has {keys}.": "Ein Hotkey hat eine Taste, dazu nach Wunsch Ctrl, Alt, Shift oder Windows: dieser hat {keys}.",
+  "Hotkey not saved: {why}": "Hotkey nicht gespeichert: {why}"
 }

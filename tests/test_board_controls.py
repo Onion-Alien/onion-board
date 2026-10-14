@@ -593,7 +593,7 @@ def test_a_key_taken_from_another_sound_or_action_says_so(window):
     unsay(w)
     w.hkctl.set_sound_hotkey("s1", "f9")         # a free key: just the green card, no warning
     [t] = toast.shown(w)
-    assert t.kind == "ok" and "f9 plays" in t.text()
+    assert t.kind == "ok" and "F9 plays" in t.text()
 
 
 def test_a_global_hotkey_taken_off_a_sound_is_said_out_loud(window, monkeypatch):

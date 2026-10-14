@@ -3339,5 +3339,13 @@
   "Try anything: a song, a meme, a game sound.": "什么都可以试：一首歌、一个梗、一个游戏音效。",
   "Type a song you love, then press Enter": "输入一首你爱的歌，然后按 Enter",
   "Your sounds are in <b style='color:{colour}'>{mic}</b> now, so there's nothing to pick in Discord or your games. One thing can still stop them: Discord's own noise filter, which is on by default.": "你的音效现在在 <b style='color:{colour}'>{mic}</b> 里了，所以 Discord 和游戏里什么都不用选。只有一样东西还可能挡住它们：Discord 自带的降噪，默认是开着的。",
-  "Muted / live: while muted nobody hears your sounds (your mic still goes out unless a voice changer is on or Send my mic is off)": "静音 / 开麦：静音时谁都听不到你的音效（除非开着变声器或关了发送麦克风，你的麦克风还是会发出去）"
+  "Muted / live: while muted nobody hears your sounds (your mic still goes out unless a voice changer is on or Send my mic is off)": "静音 / 开麦：静音时谁都听不到你的音效（除非开着变声器或关了发送麦克风，你的麦克风还是会发出去）",
+  "That MIDI pad can't be read: hit the pad again to set it.": "无法读取那个 MIDI 打击垫：再敲一次打击垫来设置。",
+  "A hotkey needs a key, like F1 or Ctrl+1.": "快捷键需要一个按键，比如 F1 或 Ctrl+1。",
+  "That's too long for a hotkey: one key, plus Ctrl, Alt, Shift or Windows if you like.": "作为快捷键太长了：一个按键，可以再加 Ctrl、Alt、Shift 或 Windows。",
+  "{mod} is in that hotkey twice: use it once, like {mod}+1.": "这个快捷键里有两个 {mod}：只用一次，比如 {mod}+1。",
+  "“{key}” isn't a key on a keyboard, so that hotkey could never be pressed.": "“{key}”不是键盘上的按键，所以这个快捷键永远按不出来。",
+  "{mod} alone can't be a hotkey: add a key, like {mod}+1.": "只有 {mod} 不能当快捷键：再加一个按键，比如 {mod}+1。",
+  "A hotkey has one key, plus Ctrl, Alt, Shift or Windows if you like: this one has {keys}.": "快捷键只有一个按键，可以再加 Ctrl、Alt、Shift 或 Windows：这个有 {keys}。",
+  "Hotkey not saved: {why}": "快捷键未保存：{why}"
 }

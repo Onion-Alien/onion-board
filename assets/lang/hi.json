@@ -3415,5 +3415,13 @@
   "Try anything: a song, a meme, a game sound.": "कुछ भी आज़माएँ: गाना, मीम, गेम साउंड।",
   "Type a song you love, then press Enter": "अपना पसंदीदा गाना लिखें, फिर Enter दबाएँ",
   "Your sounds are in <b style='color:{colour}'>{mic}</b> now, so there's nothing to pick in Discord or your games. One thing can still stop them: Discord's own noise filter, which is on by default.": "आपके साउंड अब <b style='color:{colour}'>{mic}</b> में हैं, इसलिए Discord या गेम्स में कुछ चुनना नहीं है। बस एक चीज़ अब भी उन्हें रोक सकती है: Discord का अपना नॉइज़ फ़िल्टर, जो डिफ़ॉल्ट रूप से चालू रहता है।",
-  "Muted / live: while muted nobody hears your sounds (your mic still goes out unless a voice changer is on or Send my mic is off)": "म्यूट/लाइव: म्यूट रहने पर कोई भी आपकी आवाज़ें नहीं सुनता (आपका माइक फिर भी जाता है, जब तक आवाज परिवर्तक चालू न हो या माइक भेजना बंद न हो)"
+  "Muted / live: while muted nobody hears your sounds (your mic still goes out unless a voice changer is on or Send my mic is off)": "म्यूट/लाइव: म्यूट रहने पर कोई भी आपकी आवाज़ें नहीं सुनता (आपका माइक फिर भी जाता है, जब तक आवाज परिवर्तक चालू न हो या माइक भेजना बंद न हो)",
+  "That MIDI pad can't be read: hit the pad again to set it.": "यह MIDI पैड पढ़ा नहीं जा सका: सेट करने के लिए पैड फिर से दबाएँ।",
+  "A hotkey needs a key, like F1 or Ctrl+1.": "हॉटकी में एक की चाहिए, जैसे F1 या Ctrl+1।",
+  "That's too long for a hotkey: one key, plus Ctrl, Alt, Shift or Windows if you like.": "यह हॉटकी के लिए बहुत लंबा है: एक की, और चाहें तो Ctrl, Alt, Shift या Windows।",
+  "{mod} is in that hotkey twice: use it once, like {mod}+1.": "इस हॉटकी में {mod} दो बार है: इसे एक बार लगाएँ, जैसे {mod}+1।",
+  "“{key}” isn't a key on a keyboard, so that hotkey could never be pressed.": "“{key}” कीबोर्ड की कोई की नहीं है, इसलिए यह हॉटकी कभी दबाई नहीं जा सकती।",
+  "{mod} alone can't be a hotkey: add a key, like {mod}+1.": "अकेला {mod} हॉटकी नहीं बन सकता: एक की जोड़ें, जैसे {mod}+1।",
+  "A hotkey has one key, plus Ctrl, Alt, Shift or Windows if you like: this one has {keys}.": "हॉटकी में एक की होती है, और चाहें तो Ctrl, Alt, Shift या Windows: इसमें {keys} हैं।",
+  "Hotkey not saved: {why}": "हॉटकी सेव नहीं हुई: {why}"
 }

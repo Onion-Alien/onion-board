@@ -3339,5 +3339,13 @@
   "Try anything: a song, a meme, a game sound.": "什麼都可以試：一首歌、一個梗、一個遊戲音效。",
   "Type a song you love, then press Enter": "輸入一首你愛的歌，然後按 Enter",
   "Your sounds are in <b style='color:{colour}'>{mic}</b> now, so there's nothing to pick in Discord or your games. One thing can still stop them: Discord's own noise filter, which is on by default.": "你的音效現在在 <b style='color:{colour}'>{mic}</b> 裡了，所以 Discord 和遊戲裡什麼都不用選。只有一樣東西還可能擋住它們：Discord 自己的降噪，預設是開著的。",
-  "Muted / live: while muted nobody hears your sounds (your mic still goes out unless a voice changer is on or Send my mic is off)": "靜音／傳送中：靜音時沒有人聽得到你的音效（除非開著變聲器或關了傳送麥克風，你的麥克風還是會傳出去）"
+  "Muted / live: while muted nobody hears your sounds (your mic still goes out unless a voice changer is on or Send my mic is off)": "靜音／傳送中：靜音時沒有人聽得到你的音效（除非開著變聲器或關了傳送麥克風，你的麥克風還是會傳出去）",
+  "That MIDI pad can't be read: hit the pad again to set it.": "無法讀取那個 MIDI 打擊墊：再敲一次打擊墊來設定。",
+  "A hotkey needs a key, like F1 or Ctrl+1.": "快速鍵需要一個按鍵，例如 F1 或 Ctrl+1。",
+  "That's too long for a hotkey: one key, plus Ctrl, Alt, Shift or Windows if you like.": "當快速鍵太長了：一個按鍵，可以再加 Ctrl、Alt、Shift 或 Windows。",
+  "{mod} is in that hotkey twice: use it once, like {mod}+1.": "這個快速鍵裡有兩個 {mod}：只用一次，例如 {mod}+1。",
+  "“{key}” isn't a key on a keyboard, so that hotkey could never be pressed.": "「{key}」不是鍵盤上的按鍵，所以這個快速鍵永遠按不出來。",
+  "{mod} alone can't be a hotkey: add a key, like {mod}+1.": "只有 {mod} 不能當快速鍵：再加一個按鍵，例如 {mod}+1。",
+  "A hotkey has one key, plus Ctrl, Alt, Shift or Windows if you like: this one has {keys}.": "快速鍵只有一個按鍵，可以再加 Ctrl、Alt、Shift 或 Windows：這個有 {keys}。",
+  "Hotkey not saved: {why}": "快速鍵未儲存：{why}"
 }

@@ -12,12 +12,14 @@ from __future__ import annotations
 
 import ctypes
 import ctypes.wintypes as wt
+import html
 import logging
 import threading
 
 from PySide6.QtCore import QObject, Signal
 
 from soundboard import midi
+from soundboard.i18n import _
 
 log = logging.getLogger(__name__)
 
@@ -97,6 +99,72 @@ def parse(combo: str) -> tuple[int, int] | None:
         else:
             return None
     return (mods, vk) if vk is not None else None
+
+
+MAX_COMBO = 80   # "ctrl+alt+shift+windows+play/pause media" is 39; a MIDI pad's name fits too
+MOUSE_VKS = {0x01, 0x02, 0x04, 0x05, 0x06}
+
+
+def _split(combo: str) -> list[str]:
+    """'ctrl+alt+s' -> ['ctrl', 'alt', 's'], as parse() reads it ('ctrl++' = ctrl and +)."""
+    parts = [p.strip() for p in combo.lower().replace("num +", "add").split("+")]
+    if len(parts) >= 2 and parts[-1] == "" and parts[-2] == "":
+        parts = parts[:-2] + ["+"]
+    return parts
+
+
+def check(combo: str) -> tuple[str, str]:
+    """Can `combo` ever fire? (the combo as saved, "") if so, else ("", why) with the
+    reason in plain words (HTML-escaped, for a toast). One key plus any of Ctrl, Alt,
+    Shift and Windows, each once; or a MIDI pad. Everywhere a hotkey is set goes
+    through this, so text no keyboard can send is never saved and shown as working."""
+    combo = combo if isinstance(combo, str) else ""
+    if midi.is_midi(combo):
+        if len(combo) <= MAX_COMBO and midi.parse(combo) is not None:
+            return combo, ""
+        return "", _("That MIDI pad can't be read: hit the pad again to set it.")
+    if not combo.strip():
+        return "", _("A hotkey needs a key, like F1 or Ctrl+1.")
+    if len(combo) > MAX_COMBO:
+        return "", _("That's too long for a hotkey: one key, plus Ctrl, Alt, Shift or "
+                     "Windows if you like.")
+    mods, keys = [], []
+    for p in _split(combo):
+        if not p:
+            return "", _("A hotkey needs a key, like F1 or Ctrl+1.")
+        name = MOD_ALIASES.get(p, p)
+        if name in MODS:
+            if name in mods:
+                return "", _("{mod} is in that hotkey twice: use it once, like {mod}+1.",
+                             mod=name.title())
+            mods.append(name)
+            continue
+        name = ALIASES.get(name, name)
+        vk = VK.get(name)
+        if vk is None and name.startswith("vk") and len(name) <= 4:
+            try:
+                vk = int(name[2:], 16)
+            except ValueError:
+                vk = None
+            if vk is not None and (not 0 < vk < 0xFF or vk in MODIFIER_VKS or vk in MOUSE_VKS):
+                vk = None
+        if vk is None:
+            key = p if len(p) <= 20 else p[:20] + "…"
+            return "", _("“{key}” isn't a key on a keyboard, so that hotkey could never be "
+                         "pressed.", key=html.escape(key))
+        keys.append(p)
+    if not keys:
+        return "", _("{mod} alone can't be a hotkey: add a key, like {mod}+1.",
+                     mod="+".join(m.title() for m in mods))
+    if len(keys) > 1:
+        return "", _("A hotkey has one key, plus Ctrl, Alt, Shift or Windows if you like: "
+                     "this one has {keys}.",
+                     keys=html.escape(" + ".join(k.upper() if len(k) == 1 else k.title()
+                                                 for k in keys)))
+    parsed = parse(combo)
+    if parsed is None:   # can't happen after the checks above, but never save one
+        return "", _("A hotkey needs a key, like F1 or Ctrl+1.")
+    return combo_name(*parsed), ""
 
 
 def combo_name(mods: int, vk: int) -> str:

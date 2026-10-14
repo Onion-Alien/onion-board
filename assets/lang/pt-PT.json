@@ -3415,5 +3415,13 @@
   "Try anything: a song, a meme, a game sound.": "Experimenta qualquer coisa: uma música, um meme, um som de jogo.",
   "Type a song you love, then press Enter": "Escreve uma música de que gostes muito e carrega em Enter",
   "Your sounds are in <b style='color:{colour}'>{mic}</b> now, so there's nothing to pick in Discord or your games. One thing can still stop them: Discord's own noise filter, which is on by default.": "Os teus sons estão em <b style='color:{colour}'>{mic}</b> agora, por isso não há nada a escolher no Discord nem nos teus jogos. Só uma coisa ainda os pode travar: o filtro de ruído do próprio Discord, ligado por predefinição.",
-  "Muted / live: while muted nobody hears your sounds (your mic still goes out unless a voice changer is on or Send my mic is off)": "Silenciado / em direto: enquanto silenciado ninguém ouve os teus sons (o teu microfone continua a passar, a não ser que o mudador de voz esteja ligado ou o envio do microfone desligado)"
+  "Muted / live: while muted nobody hears your sounds (your mic still goes out unless a voice changer is on or Send my mic is off)": "Silenciado / em direto: enquanto silenciado ninguém ouve os teus sons (o teu microfone continua a passar, a não ser que o mudador de voz esteja ligado ou o envio do microfone desligado)",
+  "That MIDI pad can't be read: hit the pad again to set it.": "Não é possível ler esse pad MIDI: toca no pad outra vez para o definir.",
+  "A hotkey needs a key, like F1 or Ctrl+1.": "Um atalho precisa de uma tecla, como F1 ou Ctrl+1.",
+  "That's too long for a hotkey: one key, plus Ctrl, Alt, Shift or Windows if you like.": "Isso é demasiado longo para um atalho: uma tecla, mais Ctrl, Alt, Shift ou Windows se quiseres.",
+  "{mod} is in that hotkey twice: use it once, like {mod}+1.": "{mod} aparece duas vezes nesse atalho: usa-o só uma vez, como {mod}+1.",
+  "“{key}” isn't a key on a keyboard, so that hotkey could never be pressed.": "“{key}” não é uma tecla do teclado, por isso esse atalho nunca poderia ser premido.",
+  "{mod} alone can't be a hotkey: add a key, like {mod}+1.": "{mod} sozinho não pode ser um atalho: acrescenta uma tecla, como {mod}+1.",
+  "A hotkey has one key, plus Ctrl, Alt, Shift or Windows if you like: this one has {keys}.": "Um atalho tem uma tecla, mais Ctrl, Alt, Shift ou Windows se quiseres: este tem {keys}.",
+  "Hotkey not saved: {why}": "Atalho não guardado: {why}"
 }
