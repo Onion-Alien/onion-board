@@ -146,7 +146,7 @@ class SettingsControl(Controller):
         mw = self.mw
         if self._settings_dlg is dlg:
             self._settings_dlg = None
-        had_focus = _holds_focus(dlg)
+        had_focus = getattr(dlg, "had_focus", False) or _holds_focus(dlg)
         mw._content.setCurrentWidget(mw._tabs_area)
         mw._content.removeWidget(dlg)
         mw._fit_body_top()

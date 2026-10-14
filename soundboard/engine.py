@@ -755,6 +755,14 @@ def soft_limit(x: np.ndarray, knee: float = 0.89) -> np.ndarray:
     return x
 
 
+def loud_boost(x: np.ndarray, vol: float) -> np.ndarray:
+    """Headphones over 100 %: the extra comes from rounding the peaks off (soft_limit)
+    before the SafetyLimiter, so a song gets louder. The limiter alone turned the whole
+    song down at each peak: at 300 % a mastered song came out 2.5-4.5 dB quieter than
+    with the rounding. At 100 % and below the path stays clean (in place)."""
+    return soft_limit(x) if vol > 1.0 else x
+
+
 def peak(x: np.ndarray) -> float:
     return float(np.max(np.abs(x))) if len(x) else 0.0
 
@@ -2558,7 +2566,7 @@ class Engine:
             elif not self._bus_quiet("mon", mix):
                 mix = self._dest("mon", self._eq("mon", "sounds", mix))
             mix = self._vol("mon", "out", mix, out_vol)
-            mix = self._stage("mon", SafetyLimiter).process(mix)
+            mix = self._stage("mon", SafetyLimiter).process(loud_boost(mix, out_vol))
         outdata[:] = mix
         self.level_mon = max(peak(mix), self.level_mon * 0.85)
 
@@ -2573,8 +2581,9 @@ class Engine:
         if m is not None:
             on = self.mic_enabled and not self.mic_muted
             mix += self._vol("mon", "mic", m, self.mic_vol if on else 0.0)
-        mix = self._vol("mon", "out", finite(mix), self.mon_vol if out_vol is None else out_vol)
-        mix = self._stage("mon", SafetyLimiter).process(mix)
+        v = self.mon_vol if out_vol is None else out_vol
+        mix = self._vol("mon", "out", finite(mix), v)
+        mix = self._stage("mon", SafetyLimiter).process(loud_boost(mix, v))
         outdata[:] = mix
         self.level_mon = max(peak(mix), self.level_mon * 0.85)
 
