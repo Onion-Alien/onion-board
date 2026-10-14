@@ -346,7 +346,7 @@ def test_switch_by_itself_follows_whoever_listens(window, monkeypatch):  # noqa:
 
 
 def test_mode_buttons_pick_with_arrow_keys(window, qapp):  # noqa: F811
-    """U2: the mode buttons are an exclusive group, so arrows move the pick like radio
+    """The mode buttons are an exclusive group, so arrows move the pick like radio
     buttons and apply it (DESIGN section 0: keyboard selection for button groups)."""
     from PySide6.QtCore import Qt
     from PySide6.QtTest import QTest

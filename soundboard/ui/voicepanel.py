@@ -394,15 +394,16 @@ def _enable(w, on: bool, why: str = ""):
 FX_ICONS = {"cleanup": "shield", "pitch": "mic", "growl": "wave", "robot": "keyboard",
             "compressor": "volume", "tone": "sliders", "radio": "radio", "distortion": "live",
             "shout": "speech", "helmet": "voice", "chorus": "shuffle", "echo": "history",
-            "reverb": "headphones", "polish": "star"}
+            "reverb": "headphones", "polish": "star", "harmony": "music", "ringmod": "wave",
+            "flanger": "reload", "wobble": "ear"}
 # the Voice tab's "Make it yours" window's top and the effect cards' groups;
 # an effect from an add-on goes under Add-ons
 HERO = ("pitch", "cleanup")
 HERO_TITLES = {"pitch": _("Pitch & voice")}
-GROUPS = ((_("Change the voice"), ("growl", "robot")),
+GROUPS = ((_("Change the voice"), ("harmony", "growl", "robot", "ringmod")),
           (_("Character"), ("compressor", "tone", "radio", "distortion", "shout", "helmet",
                             "polish")),
-          (_("Room"), ("chorus", "echo", "reverb")))
+          (_("Room"), ("chorus", "flanger", "wobble", "echo", "reverb")))
 ADDON_GROUP = _("Add-ons")
 # your own setting, not part of a voice: picking or saving a voice leaves it as it is
 KEEP = frozenset({"cleanup"})

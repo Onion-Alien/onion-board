@@ -41,7 +41,7 @@ Step "CODE.md modules" { & $py scripts\check_code_doc.py }
 # pyright on the changed files; only errors not in scripts/pyright_baseline.json fail
 Step "types (new errors only)" { & $py scripts\check_types.py --base $Base }
 
-# A fix comes with the test that would have caught it (docs/AGENT-RULES.md). Only a
+# A fix comes with the test that would have caught it (the PR template). Only a
 # warning: some fixes can't be tested, and the PR's "Regression test:" line says why.
 $ErrorActionPreference = "Continue"   # git's line-ending notes on stderr aren't failures
 $branch = git rev-parse --abbrev-ref HEAD

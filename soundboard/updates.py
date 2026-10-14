@@ -11,7 +11,9 @@ and that installs the newer one.
 Any other release settles for SETTLE_S (30 minutes) before the app offers it: a quick
 fix that follows it replaces it, so people get one prompt instead of two. While the
 newest one settles, nothing is offered (not an older one either: the newest comes a
-few minutes later). "Check now" always offers the newest.
+few minutes later), and the app asks again once it has settled (recheck_s) instead of
+waiting for its next 6-hourly check. An urgent fix this copy missed isn't held back by
+a newer release settling. "Check now" always offers the newest.
 
 A newer version is only announced. Nothing is downloaded until the user presses
 *Update now*: then the release's OnionBoardSetup.exe is fetched from the project's own
@@ -65,6 +67,9 @@ MAX_SIZE = 400 << 20     # the installer is ~180 MB
 CHUNK = 1 << 20
 SHA_RE = re.compile(r"[0-9a-f]{64}")
 FEATURE = "app_update"   # its switch in Settings > Privacy & security (soundboard.net)
+# set by check(): the newest release is still settling, ask again in this many seconds
+# (the app's own timer only asks every EVERY_S); 0 = nothing to ask again for
+recheck_s = 0.0
 
 
 class UpdateError(Exception):
@@ -210,6 +215,14 @@ def settled(rel: Release, now: float | None = None) -> bool:
             or (time.time() if now is None else now) - rel.published >= SETTLE_S)
 
 
+def settle_left(rel: Release, now: float | None = None) -> float:
+    """Seconds until `rel` has settled (0 once it has), plus a minute's margin so the
+    next check doesn't land just before it."""
+    if settled(rel, now):
+        return 0.0
+    return rel.published + SETTLE_S - (time.time() if now is None else now) + 60.0
+
+
 def latest() -> Release | None:
     """The newest published release (drafts and pre-releases aren't 'latest')."""
     return _release(_get(API))
@@ -255,11 +268,18 @@ def check(cfg, force: bool = False) -> Release | None:
     if not force and (not cfg.update_check or not net.allowed(FEATURE)
                       or time.time() - cfg.update_checked < EVERY_S):
         return None
+    global recheck_s
+    recheck_s = 0.0
     try:
         rel = latest()
         if not force and rel is not None and newer(rel.version) and not settled(rel):
-            log.info("%s is still settling: offering it later", rel.version)
-            return None
+            # an urgent fix this copy missed isn't held back by the newer one settling
+            rel.urgent = skipped_urgent(rel)
+            if not rel.urgent:
+                recheck_s = settle_left(rel)
+                log.info("%s is still settling: asking again in %.0f s", rel.version,
+                         recheck_s)
+                return None
     except Exception as e:  # noqa: BLE001 - offline, rate-limited, GitHub down…
         log.info("update check failed: %s", e)
         if force:
@@ -315,14 +335,6 @@ def download(rel: Release, progress: Callable[[int, int], None] | None = None,
     return dest
 
 
-def _length(header) -> int:
-    """Content-Length as a number; 0 (unknown) when it's missing or isn't one."""
-    try:
-        return max(int(str(header or 0).strip()), 0)
-    except ValueError:
-        return 0
-
-
 def fetch(url: str, sha256: str, dest: Path, trusted: tuple[str, ...], max_size: int,
           what: str, size: int = 0, progress: Callable[[int, int], object] | None = None,
           cancelled: Callable[[], bool] | None = None, feature: str = FEATURE) -> Path:
@@ -349,42 +361,37 @@ def fetch(url: str, sha256: str, dest: Path, trusted: tuple[str, ...], max_size:
         return dest   # downloaded earlier, never used
     dest.parent.mkdir(parents=True, exist_ok=True)
     part = dest.with_name(dest.name + ".part")
-    h = hashlib.sha256()
-    done = 0
+
+    def check():
+        if cancelled is not None and cancelled():
+            raise UpdateError(_("cancelled"))
+        if not net.allowed(feature):   # switched off (or Offline) meanwhile
+            raise UpdateError(net.off_message(feature))
+
     try:
         with _open(url, feature) as r, open(part, "wb") as f:
             if not r.geturl().startswith("https://"):
                 raise UpdateError(_("the download was redirected off HTTPS"))
-            total = _length(r.headers.get("Content-Length")) or size or 0
-            if total > max_size:
-                raise UpdateError(too_big)
-            while chunk := r.read(CHUNK):
-                if cancelled is not None and cancelled():
-                    raise UpdateError(_("cancelled"))
-                if not net.allowed(feature):   # switched off (or Offline) meanwhile
-                    raise UpdateError(net.off_message(feature))
-                done += len(chunk)
-                if done > max_size:
-                    raise UpdateError(too_big)
-                h.update(chunk)
-                f.write(chunk)
-                if progress is not None:
-                    progress(done, total)
-        if h.hexdigest() != sha256:
-            log.warning("%s: SHA-256 %s, expected %s", dest.name, h.hexdigest(), sha256)
+            got = net.read_capped(r, f, max_size, chunk=CHUNK, total=size,
+                                  progress=progress, check=check)
+        if got != sha256:
+            log.warning("%s: SHA-256 %s, expected %s", dest.name, got, sha256)
             raise UpdateError(_("the downloaded file isn't the one GitHub lists "
                                 "(its checksum doesn't match), so it wasn't kept"))
         os.replace(part, dest)
     except UpdateError:
         part.unlink(missing_ok=True)
         raise
+    except net.TooBig:
+        part.unlink(missing_ok=True)
+        raise UpdateError(too_big) from None
     except net.ProxyError as e:   # switched off / Offline / the connection changed: its
         part.unlink(missing_ok=True)   # message already says so, in the user's words
         raise UpdateError(str(e)) from e
     except OSError as e:   # offline, disk full, connection dropped…
         part.unlink(missing_ok=True)
         raise UpdateError(_("the download failed ({error})", error=errors.plain(e))) from e
-    log.info("downloaded %s (%d bytes, SHA-256 checked)", dest.name, done)
+    log.info("downloaded %s (%d bytes, SHA-256 checked)", dest.name, dest.stat().st_size)
     return dest
 
 

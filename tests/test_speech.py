@@ -870,6 +870,50 @@ def test_download_can_be_cancelled(tmp_path):
     assert not info.installed and not list(translation.base_dir().glob("*"))
 
 
+class _Endless:
+    """A reply that never ends (a bad mirror): counts what was read."""
+
+    def __init__(self, headers=None):
+        self.headers = headers or {}
+        self.read_bytes = 0
+
+    def read(self, n):
+        self.read_bytes += n
+        assert self.read_bytes < 50_000_000, "never cut off"
+        return b"x" * n
+
+    def __enter__(self):
+        return self
+
+    def __exit__(self, *a):
+        return False
+
+
+def test_an_endless_download_is_cut_off_at_the_cap(tmp_path, monkeypatch):
+    from soundboard import net
+    from soundboard.speech import translation
+    info = translation_info(tmp_path, "0" * 64, 100_000)    # listed 100 kB: cap 150 kB
+    reply = _Endless()
+    monkeypatch.setattr(net, "urlopen", lambda *a, **k: reply)
+    with pytest.raises(RuntimeError, match="far bigger"):
+        translation.download(info)
+    assert reply.read_bytes <= translation.max_bytes(info) + translation.CHUNK
+    assert not info.installed and not list(translation.base_dir().glob("*"))
+
+
+def test_a_listed_size_over_the_cap_is_refused_before_reading(tmp_path, monkeypatch):
+    from soundboard import net
+    from soundboard.speech import translation
+    info = translation_info(tmp_path, "0" * 64, 0)          # no size listed: 300 MB cap
+    assert translation.max_bytes(info) == translation.DEFAULT_CAP
+    reply = _Endless({"Content-Length": str(translation.DEFAULT_CAP + 1)})
+    monkeypatch.setattr(net, "urlopen", lambda *a, **k: reply)
+    with pytest.raises(RuntimeError, match="far bigger"):
+        translation.download(info)
+    assert reply.read_bytes == 0
+    assert not list(translation.base_dir().glob("*"))
+
+
 def test_live_voice_speaks_the_translation_in_the_languages_voice(tmp_path, monkeypatch):
     from soundboard import library
     monkeypatch.setattr(library, "APP_DIR", tmp_path)

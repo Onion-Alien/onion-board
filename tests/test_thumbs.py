@@ -331,6 +331,9 @@ class _Reply:
         return False
 
 
+ROUTER = "192.168.1.1"  # sensitive-scan: allow (test address)
+
+
 def fake_web(monkeypatch, pages: dict):
     """net.urlopen answering from `pages` {url: (bytes, content type)}; returns the
     list of URLs asked for (and the feature each was asked under)."""
@@ -370,7 +373,9 @@ def test_a_pages_preview_picture_is_only_fetched_from_the_web(qapp, tmp_path, mo
     # this PC, or a share on another (file:////host/share: Windows connects to it)
     pic = tmp_path / "p.png"
     pic.write_bytes(png_bytes(tmp_path))
-    for bad in (pic.as_uri(), "file:////attacker.example/share/a.png"):
+    # nor one on this PC / the home network: the page's site would reach into the LAN
+    for bad in (pic.as_uri(), "file:////attacker.example/share/a.png",
+                f"http://{ROUTER}/x.png", "http://127.0.0.1/x.png", "http://nas.lan/a.png"):
         page = f'<html><meta property="og:image" content="{bad}"></html>'.encode()
         asked = fake_web(monkeypatch, {"https://ex.com/post": (page, "text/html")})
         with pytest.raises(thumbs.LinkError, match="no picture"):
@@ -385,6 +390,33 @@ def test_fetch_goes_straight_to_a_youtube_videos_thumbnail(qapp, tmp_path, monke
                  "https://youtu.be/HEXWRTEbj1I", "youtube.com/shorts/HEXWRTEbj1I"):
         assert not thumbs.fetch(link).isNull()
     assert len(asked) == 3
+    assert {f for __, f in asked} == {"sounds_web.youtube"}   # YouTube's switch, not "other"
+
+
+def test_a_youtube_picture_link_is_refused_with_youtube_switched_off(qapp, tmp_path,
+                                                                     monkeypatch):
+    """Switching YouTube off stops its pictures too: a YouTube link, i.ytimg.com itself,
+    or a page (another site, still allowed) whose preview picture is on i.ytimg.com."""
+    from soundboard import netlog
+    png = png_bytes(tmp_path)
+    page = b'<html><meta property="og:image" content="https://i.ytimg.com/vi/x/a.jpg"></html>'
+    asked = fake_web(monkeypatch, {"https://i.ytimg.com/vi/HEXWRTEbj1I/hqdefault.jpg":
+                                   (png, "image/jpeg"),
+                                   "https://i.ytimg.com/vi/x/a.jpg": (png, "image/jpeg"),
+                                   "https://ex.com/post": (page, "text/html"),
+                                   "https://ex.com/a.png": (png, "image/png")})
+    thumbs_net.configure_features(off=["sounds_web.youtube"])
+    try:
+        for link in ("https://www.youtube.com/watch?v=HEXWRTEbj1I",
+                     "https://i.ytimg.com/vi/x/a.jpg", "https://ex.com/post"):
+            with pytest.raises(thumbs_net.FeatureOff, match="YouTube"):
+                thumbs.fetch(link)
+        assert not thumbs.fetch("https://ex.com/a.png").isNull()   # other links: still on
+    finally:
+        thumbs_net.configure_features()
+    # nothing reached YouTube: each was refused by its switch before connecting
+    assert all(f == "sounds_web.youtube" for u, f in asked if "ytimg" in u)
+    assert "picture from the link" in netlog._causes["sounds_web"]   # the activity list says why
 
 
 def test_fetch_says_why_it_couldnt(qapp, monkeypatch):

@@ -289,6 +289,28 @@ def test_a_signed_request_never_sends_the_key(qapp, loaded):
     assert api(qapp, srv, "/api/status", "add-on-key")[0] == 200   # older Pocket pages
 
 
+def test_a_signature_from_before_a_restart_is_refused(qapp, loaded):
+    """Nonces live in memory only, but the key outlives a restart: a request read off
+    the Wi-Fi before it is refused after it, though no nonce of its is remembered."""
+    import time
+    srv = loaded.server
+    before = _sig("add-on-key", "POST /api/status", ts=int(time.time()) - 10)
+    assert srv.start(0, "add-on-key", "127.0.0.1")
+    srv._nonces.clear()                      # a new launch: nothing remembered
+    status, body = call(qapp, srv, "/api/status", {"X-Sig": before}, "POST")
+    assert status == 401 and "now" in json.loads(body)
+    assert not srv.signed(before, "POST /api/status")
+    srv.succeeded("127.0.0.1")
+    assert call(qapp, srv, "/api/status", {"X-Sig": _sig("add-on-key", "POST /api/status")},
+                "POST")[0] == 200            # signed since: fine
+    # a quick restart in the same second: its nonces are still known
+    after = _sig("add-on-key", "POST /api/status")
+    assert srv.signed(after, "POST /api/status")
+    assert srv.start(0, "add-on-key", "127.0.0.1")
+    assert not srv.signed(after, "POST /api/status")
+    srv.stop()
+
+
 def test_remembered_nonces_stay_bounded(loaded, monkeypatch):
     monkeypatch.setattr(remote, "NONCES_MAX", 3)
     srv = loaded.server

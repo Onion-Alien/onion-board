@@ -784,6 +784,50 @@ class PitchShift(Effect):
 # --------------------------------------------------------------------------- growl
 
 @register
+class Harmony(Effect):
+    """Two more voices at set intervals from yours (a chord of you): two pitch
+    shifters on copies of the voice, added back under it. Your own voice waits the
+    shifters' delay in a line of its own, so the three land together; the chord
+    is a touch wider than that line (a shifter's delay moves a little with its
+    interval), which is what a choir does anyway."""
+
+    type = "harmony"
+    name = "Harmony"
+    description = "Two more voices at intervals from yours: a chord, a choir."
+    params = (Param("first", "First voice", -12, 12, 4, " st", 1, ("lower", "higher")),
+              Param("second", "Second voice", -12, 12, 7, " st", 1, ("lower", "higher")),
+              Param("level", "Volume", 0, 1, 0.7, "", 0, ("behind you", "as loud as you")))
+
+    def __init__(self, rate, values=None):
+        super().__init__(rate, values)
+        self.a = PitchShift(rate, {"semitones": self.p["first"]})
+        self.b = PitchShift(rate, {"semitones": self.p["second"]})
+        wait = PitchShift(rate, {"semitones": -12}).latency()
+        self.hist = np.zeros(max(1, int(wait * rate)), F32)    # your voice, waiting
+        self.level = None
+
+    def latency(self) -> float:
+        return len(self.hist) / self.rate
+
+    def set_values(self, values):
+        super().set_values(values)
+        self.a.set_values({"semitones": self.p["first"]})
+        self.b.set_values({"semitones": self.p["second"]})
+
+    def run(self, x, rate):
+        n = len(x)
+        if n == 0:
+            return x
+        full = np.concatenate([self.hist, x])
+        held, self.hist = full[:n], full[-len(self.hist):]
+        chord = self.a.run(x, rate) + self.b.run(x, rate)
+        level = 0.5 * self.p["level"]
+        g = _glide(level if self.level is None else self.level, level, n)
+        self.level = level
+        return (held + chord * g).astype(F32, copy=False)
+
+
+@register
 class Growl(Effect):
     """A second voice an octave below yours, the way an octave pedal makes one: a
     square wave that flips at every other cycle of your voice (so it runs at half
@@ -888,6 +932,43 @@ class Robot(Effect):
         wet = (gain * bands[self.BANDS:]).sum(0).astype(F32)
         mix = F32(self.p["mix"])
         return wet if mix >= 1 else x * (1 - mix) + wet * mix
+
+
+@register
+class RingMod(Effect):
+    """Ring modulator: the voice multiplied by a sine. Every harmonic of the voice
+    turns into a pair, one the sine's pitch above it and one below, so the voice
+    loses its own pitch and takes on a metallic, bell-like one: the Dalek at about
+    30 Hz, a robot bell higher up. The sine's phase runs on from block to block and
+    its pitch glides across a block, so neither a block edge nor a dragged slider
+    clicks."""
+
+    type = "ringmod"
+    name = "Ring modulator"
+    description = "Metallic, bell-like voice: the Dalek."
+    params = (Param("freq", "Pitch", 5, 2000, 30, " Hz", 1, ("rumble", "bell")),
+              Param("mix", "Mix", 0, 1, 1))
+
+    def __init__(self, rate, values=None):
+        super().__init__(rate, values)
+        self.phase = 0.0
+        self.f = float(self.p["freq"])
+        self.mix = None
+
+    def run(self, x, rate):
+        n = len(x)
+        if n == 0:
+            return x
+        f, f0 = float(self.p["freq"]), self.f
+        self.f = f
+        hz = np.linspace(f0, f, n + 1)[1:] if f0 != f else f
+        ph = self.phase + 2 * np.pi * np.cumsum(np.broadcast_to(hz, (n,)) / rate)
+        self.phase = float(ph[-1] % (2 * np.pi))
+        wet = x * np.sin(ph).astype(F32)
+        mix = self.p["mix"]
+        m = _glide(mix if self.mix is None else self.mix, mix, n)
+        self.mix = mix
+        return (x * (1 - m) + wet * m).astype(F32, copy=False)
 
 
 # --------------------------------------------------------------------------- dynamics
@@ -1243,6 +1324,112 @@ class Chorus(Effect):
 
 
 @register
+class Flanger(Effect):
+    """The voice mixed with a copy on a short delay (1 to 7 ms) that sweeps up and
+    down, with some of the output fed back in: the comb notches sweep through the
+    voice (a jet, a pipe, under water). The feedback needs the output's own past, so
+    the block runs in pieces no longer than the shortest delay; every piece's
+    feedback is then already in the history."""
+
+    type = "flanger"
+    name = "Flanger"
+    description = "Sweeping, jet-plane swirl, from gentle to under water."
+    params = (Param("rate", "Speed", 0.05, 5, 0.3, " Hz", 0.05),
+              Param("depth", "Depth", 0.2, 6, 3, " ms", 0.1),
+              Param("feedback", "Feedback", 0, 0.9, 0.5, "", 0, ("none", "resonant")),
+              Param("mix", "Mix", 0, 1, 0.5))
+
+    MIN_MS, MAX_MS = 1.0, 8.0
+
+    def __init__(self, rate, values=None):
+        super().__init__(rate, values)
+        self.h = int(rate * self.MAX_MS / 1000) + 2
+        self.xh = np.zeros(self.h, F32)
+        self.yh = np.zeros(self.h, F32)
+        self.phase = 0.0
+        self.depth = None
+        self.fb = None
+
+    def run(self, x, rate):
+        n = len(x)
+        if n == 0:
+            return x
+        xf = np.concatenate([self.xh, x])
+        yf = np.concatenate([self.yh, np.zeros(n, F32)])
+        ph = self.phase + 2 * np.pi * self.p["rate"] / rate * np.arange(1, n + 1)
+        self.phase = float(ph[-1] % (2 * np.pi))
+        depth = min(self.p["depth"], self.MAX_MS - self.MIN_MS - 0.1) * rate / 1000
+        d0, self.depth = (depth if self.depth is None else self.depth), depth
+        dep = np.linspace(d0, depth, n + 1)[1:] if d0 != depth else depth
+        base = self.MIN_MS * rate / 1000
+        delay = base + dep * (1 + np.sin(ph)) * 0.5          # samples, fractional
+        fb = self.p["feedback"]
+        fbs = _glide(fb if self.fb is None else self.fb, fb, n)
+        self.fb = fb
+        step = max(1, int(base))
+        i = 0
+        while i < n:
+            c = min(step, n - i)
+            pos = self.h + i + np.arange(c) - delay[i:i + c]
+            k = pos.astype(np.int64)
+            f = (pos - k).astype(F32)
+            xd = xf[k] * (1 - f) + xf[k + 1] * f
+            yd = yf[k] * (1 - f) + yf[k + 1] * f
+            g = fbs[i:i + c] if isinstance(fbs, np.ndarray) else fbs
+            yf[self.h + i:self.h + i + c] = xd + g * yd
+            i += c
+        self.xh = xf[-self.h:].copy()
+        self.yh = yf[-self.h:].copy()
+        mix = F32(self.p["mix"])
+        return x * (1 - mix) + yf[self.h:] * mix
+
+
+@register
+class Wobble(Effect):
+    """Vibrato and tremolo: the pitch wobbles (the voice read off a delay that
+    sways back and forth) and the volume wobbles, at one speed. Slow and deep is
+    drunk or seasick; fast and shallow is an old film or a nervous voice."""
+
+    type = "wobble"
+    name = "Wobble"
+    description = "Pitch and volume wobble: drunk, seasick, an old film."
+    params = (Param("rate", "Speed", 0.3, 12, 5, " Hz", 0.1),
+              Param("vibrato", "Vibrato", 0, 10, 2, " ms", 0.1, ("steady", "seasick")),
+              Param("tremolo", "Tremolo", 0, 1, 0.3, "", 0, ("steady", "flutter")))
+
+    MAX_MS = 12.0
+
+    def __init__(self, rate, values=None):
+        super().__init__(rate, values)
+        self.h = int(rate * self.MAX_MS / 1000) + 2
+        self.hist = np.zeros(self.h, F32)
+        self.phase = 0.0
+        self.depth = None
+        self.trem = None
+
+    def run(self, x, rate):
+        n = len(x)
+        if n == 0:
+            return x
+        buf = np.concatenate([self.hist, x])
+        self.hist = buf[-self.h:].copy()
+        ph = self.phase + 2 * np.pi * self.p["rate"] / rate * np.arange(1, n + 1)
+        self.phase = float(ph[-1] % (2 * np.pi))
+        depth = min(self.p["vibrato"], self.MAX_MS - 1.5) * rate / 1000
+        d0, self.depth = (depth if self.depth is None else self.depth), depth
+        dep = np.linspace(d0, depth, n + 1)[1:] if d0 != depth else depth
+        pos = self.h - 1 + np.arange(n, dtype=np.float64) - dep * (1 + np.sin(ph)) * 0.5
+        k = pos.astype(np.int64)
+        f = pos - k
+        y = buf[k] * (1 - f) + buf[k + 1] * f
+        trem = self.p["tremolo"]
+        t0, self.trem = (trem if self.trem is None else self.trem), trem
+        tr = np.linspace(t0, trem, n + 1)[1:] if t0 != trem else trem
+        gain = 1 - tr * (1 + np.sin(ph + np.pi / 2)) * 0.5
+        return (y * gain).astype(F32)
+
+
+@register
 class Echo(Effect):
     type = "echo"
     name = "Echo"
@@ -1285,19 +1472,36 @@ class Echo(Effect):
 
 @register
 class Reverb(Effect):
-    """Freeverb: eight parallel damped combs into four allpasses. The damping
-    (a lowpass inside each comb's feedback) is what keeps it from ringing like
-    a metal pipe: real rooms swallow highs faster than lows."""
+    """A room in three parts, the way real ones reach the ear.
+
+    Pre-delay holds the room back a little, so the voice stays clear in front of
+    it. Early reflections: a dozen taps off the dry voice at 4 to 60 ms (the first
+    bounces off the nearest walls), spaced unevenly with alternating signs so they
+    don't ring at one pitch. Late tail: Freeverb, eight parallel damped combs into
+    four allpasses. The damping (a lowpass inside each comb's feedback) is what
+    keeps it from ringing like a metal pipe: real rooms swallow highs faster than
+    lows. (A feedback delay network was tried in its place and measured less
+    smooth: tail flatness 0.28 against these combs' 0.34, worst echo repeat 0.21
+    against 0.15.)
+
+    A moved Pre-delay crossfades from the old taps to the new ones across the
+    block, so dragging it doesn't click."""
 
     type = "reverb"
     name = "Reverb"
     description = "Room, hall or cave."
     params = (Param("size", "Size", 0, 1, 0.5),
               Param("tone", "Brightness", 1500, 12000, 5000, " Hz", 100),
-              Param("mix", "Mix", 0, 1, 0.3))
+              Param("mix", "Mix", 0, 1, 0.3),
+              Param("predelay", "Pre-delay", 0, 100, 10, " ms", 1))
 
     COMBS = (1116, 1188, 1277, 1356, 1422, 1491, 1557, 1617)     # samples at 44.1 kHz
     ALLPASSES = (556, 441, 341, 225)
+    EARLY = ((0.0043, 0.84), (0.0215, 0.5), (0.0225, -0.4), (0.0268, 0.38),
+             (0.0270, -0.33), (0.0298, 0.32), (0.0458, 0.28), (0.0485, -0.25),
+             (0.0572, 0.22), (0.0587, -0.2), (0.0595, 0.18), (0.0612, 0.17))
+    EARLY_LEVEL = 0.35
+    PRE_MAX_S = 0.1
 
     def __init__(self, rate, values=None):
         super().__init__(rate, values)
@@ -1307,6 +1511,38 @@ class Reverb(Effect):
         self.aps: list[tuple[np.ndarray, ...]] = [
             (np.zeros(int(d * k), F32),) * 2 for d in self.ALLPASSES]
         self.hp = _Filter()
+        self.early_d = np.array([int(d * rate) for d, _ in self.EARLY])
+        self.early_g = np.array([g for _, g in self.EARLY], F32)
+        keep = int(self.PRE_MAX_S * rate) + int(self.early_d.max()) + 1
+        self.hist = np.zeros(keep, F32)                      # the dry voice, newest last
+        self.pre = int(self.p["predelay"] / 1000 * rate)
+
+    @staticmethod
+    def _tap(full: np.ndarray, d: int, n: int) -> np.ndarray:
+        """The last n samples of `full`, d samples ago."""
+        end = len(full) - d
+        return full[end - n:end]
+
+    def _room(self, x: np.ndarray, rate: int) -> tuple[np.ndarray, np.ndarray]:
+        """(the pre-delayed voice, its early reflections) for this block."""
+        n = len(x)
+        full = np.concatenate([self.hist, x])
+        self.hist = full[-len(self.hist):]
+        pre, old = int(self.p["predelay"] / 1000 * rate), self.pre
+        self.pre = pre
+        def taps(d0):
+            dry = self._tap(full, d0, n)
+            early = np.zeros(n, F32)
+            for d, gain in zip(self.early_d, self.early_g):
+                early += gain * self._tap(full, d0 + d, n)
+            return dry, early
+        dry, early = taps(pre)
+        if old != pre:      # the knob moved: glide from the old taps to the new
+            dry0, early0 = taps(old)
+            ramp = np.linspace(0, 1, n, endpoint=False, dtype=F32)
+            dry = dry0 + (dry - dry0) * ramp
+            early = early0 + (early - early0) * ramp
+        return dry, early
 
     def _comb(self, x, k, g, a):
         """v[n] = x[n] + g·lp(v[n-D]); lp is a one-pole with coefficient a."""
@@ -1338,18 +1574,22 @@ class Reverb(Effect):
         return v.sum(axis=0)
 
     def run(self, x, rate):
+        if len(x) == 0:
+            return x
         g = 0.7 + 0.28 * self.p["size"]
         a = float(np.exp(-2 * np.pi * self.p["tone"] / rate))
+        dry, early = self._room(x, rate)
         if len(x) <= min(len(h) for h in self.combs):
-            wet = self._all_combs(x, g, a)
+            wet = self._all_combs(dry, g, a)
         else:
             wet = np.zeros_like(x)
             for k in range(len(self.combs)):
-                wet += self._comb(x, k, g, a)
+                wet += self._comb(dry, k, g, a)
         wet *= F32(0.25 * np.sqrt(1 - g * g))     # same loudness at every size
         for k, (xh, yh) in enumerate(self.aps):
             wet, xh, yh = _allpass(wet, xh, yh, 0.5)
             self.aps[k] = (xh, yh)
+        wet += early * F32(self.EARLY_LEVEL)
         # the combs pile up below ~150 Hz (they all agree there): keep the mud out
         wet = self.hp.run(wet, "hp", lambda: butter(
             2, 150, btype="high", fs=rate).astype(F32))
@@ -1541,7 +1781,7 @@ PRESETS: dict[str, dict[str, dict]] = {
                           "radio": {"low": 200, "high": 5000, "drive": 6, "noise": 0.0},
                           "distortion": {"drive": 4, "tone": 4000, "level": 0.8}},
     "Anonymous":         {"pitch": {"semitones": -4, "natural": 1, "size": -4},
-                          "compressor": {"threshold": -24, "ratio": 3, "boost": 6},
+                          "compressor": {"threshold": -24, "ratio": 3, "boost": 11},
                           "chorus": {"rate": 0.2, "depth": 2, "mix": 0.2}},
     # the hidden detective talking through a TV, matched line by line to the show:
     # the voice and a copy 7 st down blended (deep and high at once, no one clear
@@ -1588,11 +1828,36 @@ PRESETS: dict[str, dict[str, dict]] = {
     # a chanting monk: every word held on a note (hard autotune), a big slow throat,
     # a slow wobble like a held chant, the top rolled off, in a temple hall
     "Chanting monk":     {"pitch": {"semitones": -2, "natural": 1, "size": 4, "tune": 1},
-                          "compressor": {"threshold": -26, "ratio": 5, "boost": 8,
+                          "compressor": {"threshold": -26, "ratio": 5, "boost": 12,
                                          "attack": 10, "release": 300},
                           "tone": {"bass": 2, "mid": 4, "presence": -2, "treble": -6},
                           "chorus": {"rate": 5.5, "depth": 2, "mix": 0.35},
                           "reverb": {"size": 0.9, "tone": 3500, "mix": 0.35}},
+    "Dalek":             {"ringmod": {"freq": 30, "mix": 1},
+                          "compressor": {"threshold": -24, "ratio": 4, "boost": 8},
+                          "radio": {"low": 250, "high": 5500, "drive": 4, "noise": 0.0},
+                          "distortion": {"drive": 12, "tone": 5000, "level": 0.32}},
+    "Whisper":           {"robot": {"freq": 100, "follow": 0, "noise": 1, "mix": 1},
+                          "compressor": {"threshold": -26, "ratio": 4, "boost": 10},
+                          "tone": {"bass": -4, "mid": 0, "presence": 2, "treble": 3}},
+    "Child":             {"pitch": {"semitones": 7, "natural": 1, "size": -5},
+                          "compressor": {"threshold": -24, "ratio": 2.5, "boost": 5},
+                          "tone": {"bass": -4, "mid": 0, "presence": 2, "treble": 1}},
+    "Underwater":        {"compressor": {"threshold": -24, "ratio": 3, "boost": 11},
+                          "tone": {"bass": 3, "mid": 0, "presence": -8, "treble": -12},
+                          "flanger": {"rate": 0.3, "depth": 3, "feedback": 0.5, "mix": 0.6},
+                          "reverb": {"size": 0.4, "tone": 1500, "mix": 0.3}},
+    "Drunk":             {"pitch": {"semitones": -1},
+                          "compressor": {"threshold": -24, "ratio": 3, "boost": 11},
+                          "wobble": {"rate": 1.5, "vibrato": 6, "tremolo": 0.1},
+                          "chorus": {"rate": 0.2, "depth": 6, "mix": 0.3}},
+    "Old film":          {"wobble": {"rate": 9, "vibrato": 0.5, "tremolo": 0.45},
+                          "compressor": {"threshold": -26, "ratio": 5, "boost": 13},
+                          "radio": {"low": 300, "high": 4000, "drive": 3, "noise": 0.02}},
+    "Choir":             {"harmony": {"first": 4, "second": 7, "level": 0.8},
+                          "compressor": {"threshold": -24, "ratio": 3, "boost": 11},
+                          "chorus": {"rate": 0.4, "depth": 5, "mix": 0.4},
+                          "reverb": {"size": 0.7, "tone": 5000, "mix": 0.35}},
     "Podcast voice":     {"compressor": {"threshold": -22, "ratio": 3, "boost": 5,
                                          "attack": 8, "release": 120},
                           "tone": {"bass": 3, "presence": 3, "treble": 1},
@@ -1605,7 +1870,9 @@ PRESET_ICONS = {"Chipmunk": "🐿️", "Deep voice": "🐻", "High voice": "🎵
                 "Dark lord": "⛑️",
                 "Hothead": "😡", "Alien": "👽", "Ghost": "👻", "Walkie-talkie": "📻",
                 "Old telephone": "☎️", "Megaphone": "📢", "Stadium announcer": "🏟️",
-                "Cave": "🦇", "Chanting monk": "🧘", "Podcast voice": "🎙️"}
+                "Cave": "🦇", "Chanting monk": "🧘", "Dalek": "🤖", "Whisper": "🤫",
+                "Child": "🧒", "Underwater": "🐠", "Drunk": "🍺", "Old film": "🎞️",
+                "Choir": "🎶", "Podcast voice": "🎙️"}
 
 
 # --------------------------------------------------------------------------- shown text
@@ -1656,6 +1923,17 @@ def shown_texts() -> dict[str, str]:
         "Reverb": _("Reverb"),
         "Room, hall or cave.": _("Room, hall or cave."),
         "Studio polish": _("Studio polish"),
+        "Harmony": _("Harmony"),
+        "Two more voices at intervals from yours: a chord, a choir.":
+            _("Two more voices at intervals from yours: a chord, a choir."),
+        "Ring modulator": _("Ring modulator"),
+        "Metallic, bell-like voice: the Dalek.": _("Metallic, bell-like voice: the Dalek."),
+        "Flanger": _("Flanger"),
+        "Sweeping, jet-plane swirl, from gentle to under water.":
+            _("Sweeping, jet-plane swirl, from gentle to under water."),
+        "Wobble": _("Wobble"),
+        "Pitch and volume wobble: drunk, seasick, an old film.":
+            _("Pitch and volume wobble: drunk, seasick, an old film."),
         "Tames harsh S sounds, adds warmth and keeps every peak under a ceiling. Runs last.":
             _("Tames harsh S sounds, adds warmth and keeps every peak under a ceiling. "
               "Runs last."),
@@ -1681,6 +1959,11 @@ def shown_texts() -> dict[str, str]:
         "De-ess": _("De-ess"),
         "Warmth": _("Warmth"),
         "Ceiling": _("Ceiling"),
+        "First voice": _("First voice"),
+        "Second voice": _("Second voice"),
+        "Feedback": _("Feedback"),
+        "Vibrato": _("Vibrato"),
+        "Tremolo": _("Tremolo"),
         "Bass": _("Bass"),
         "Mid": _("Mid"),
         "Presence": _("Presence"),
@@ -1700,6 +1983,7 @@ def shown_texts() -> dict[str, str]:
         "Repeats": _("Repeats"),
         "Size": _("Size"),
         "Brightness": _("Brightness"),
+        "Pre-delay": _("Pre-delay"),
         # the words under a slider's two ends
         "off": _("off"),
         "strong": _("strong"),
@@ -1730,6 +2014,15 @@ def shown_texts() -> dict[str, str]:
         "quick": _("quick"),
         "slow": _("slow"),
         "warm": _("warm"),
+        "behind you": _("behind you"),
+        "as loud as you": _("as loud as you"),
+        "rumble": _("rumble"),
+        "bell": _("bell"),
+        "none": _("none"),
+        "resonant": _("resonant"),
+        "steady": _("steady"),
+        "seasick": _("seasick"),
+        "flutter": _("flutter"),
         # voices (PRESETS: their English names are what settings and share codes keep)
         "Chipmunk": _("Chipmunk"),
         "Deep voice": _("Deep voice"),
@@ -1745,6 +2038,13 @@ def shown_texts() -> dict[str, str]:
         "Alien": _("Alien"),
         "Ghost": _("Ghost"),
         "Chanting monk": _("Chanting monk"),
+        "Dalek": _("Dalek"),
+        "Whisper": _("Whisper"),
+        "Child": _("Child"),
+        "Underwater": _("Underwater"),
+        "Drunk": _("Drunk"),
+        "Old film": _("Old film"),
+        "Choir": _("Choir"),
         "Walkie-talkie": _("Walkie-talkie"),
         "Old telephone": _("Old telephone"),
         "Megaphone": _("Megaphone"),
