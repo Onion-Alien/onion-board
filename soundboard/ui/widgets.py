@@ -978,7 +978,9 @@ class Pad(QAbstractButton):
             p.setPen(pen)
         elif self.picked:
             p.setPen(QPen(C["accent"], 2.4))
-        else:   # at rest (the player bar's sound too): no outline, its shade is enough
+        elif self.selected:
+            p.setPen(QPen(C["border_hi"], 1.6))
+        else:   # at rest: no outline, the card's own shade is enough
             p.setPen(Qt.PenStyle.NoPen)
         p.drawPath(path)
         if self.picked:   # a tick in the corner, so it reads as picked while playing too
@@ -1086,6 +1088,8 @@ class Pad(QAbstractButton):
                 pen.setStyle(Qt.PenStyle.DashLine)
         elif self.picked:
             pen = QPen(QColor(T["accent"]), 2)
+        elif self.selected:
+            pen = QPen(QColor(T["border_hi"]), 1.4)
         else:
             pen = Qt.PenStyle.NoPen
         p.setPen(pen)

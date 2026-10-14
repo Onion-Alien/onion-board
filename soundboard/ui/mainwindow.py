@@ -5469,7 +5469,7 @@ class MainWindow(QMainWindow):
     def _settings_closed(self, dlg):
         if self._settings_dlg is dlg:
             self._settings_dlg = None
-        had_focus = _holds_focus(dlg)
+        had_focus = getattr(dlg, "had_focus", False) or _holds_focus(dlg)
         self._content.setCurrentWidget(self._tabs_area)
         self._content.removeWidget(dlg)
         self._fit_body_top()
