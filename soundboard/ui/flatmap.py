@@ -23,7 +23,7 @@ import time
 from collections.abc import Iterator
 
 import numpy as np
-from PySide6.QtCore import QPointF, QRectF, Qt, QTimer, Signal
+from PySide6.QtCore import QPointF, QRectF, QSizeF, Qt, QTimer, Signal
 from PySide6.QtGui import (QColor, QFont, QFontMetricsF, QImage, QPainter, QPainterPath,
                            QPen, QPixmap, QTransform)
 from PySide6.QtWidgets import (QFrame, QHBoxLayout, QLabel, QPushButton, QToolTip,
@@ -53,6 +53,7 @@ FORGET_MS = 60_000   # hidden this long: let the drawn tiles go (back sooner: no
 SETTLE_MS = 120                     # zooming: the old tiles, stretched, until this idle
 TOWN_ZOOM = 2.0                     # city and town names show from this zoom in...
 TOWNS_IN_VIEW = 40                  # ...at most this many at once, only those in view
+TOWN_SLICE_S = 0.0015               # new names drawn a paint, then the rest a moment later
 SPREAD_ZOOM = 4.0                   # stations on the very same spot fan out from here...
 SPREAD_PX = 2.4                     # ...this far apart (a spiral round the spot)
 NAMES_FIRST_S = 0.35                # the country names alone, before the dots...
@@ -180,6 +181,7 @@ class FlatMap(QWidget):
         self._tlon = np.zeros(0)
         self._tlat = np.zeros(0)
         self._town_pm: dict[tuple, QPixmap] = {}   # each name drawn once, outlined
+        self._town_box: dict[tuple, QSizeF] = {}   # ...and its size, known before that
         self._points: list[dict] = []
         self._index: dict[str, int] = {}   # a station's place in _points, by uuid
         self._lon = np.zeros(0)
@@ -221,6 +223,11 @@ class FlatMap(QWidget):
         self._slice.setTimerType(Qt.TimerType.PreciseTimer)
         self._slice.setInterval(SLICE_GAP_MS)
         self._slice.timeout.connect(self._draw_slice)
+        self._towns_later = QTimer(self)  # town names left for the next paint
+        self._towns_later.setSingleShot(True)
+        self._towns_later.setTimerType(Qt.TimerType.PreciseTimer)
+        self._towns_later.setInterval(SLICE_GAP_MS)
+        self._towns_later.timeout.connect(self.update)
         self._forget = QTimer(self)       # hidden a while: let the drawn tiles go
         self._forget.setSingleShot(True)
         self._forget.setInterval(FORGET_MS)
@@ -327,6 +334,7 @@ class FlatMap(QWidget):
         self._tlat = np.array([t["la"] for t in self._towns], float)
         if len(self._town_pm) > 4 * len(self._towns) + 200:
             self._town_pm.clear()   # names the filters no longer show
+            self._town_box.clear()
         self.update()
 
     def select(self, point: dict | None, go: bool = False):
@@ -436,6 +444,7 @@ class FlatMap(QWidget):
         self._ver += 1
         self._placed.clear()
         self._town_pm.clear()
+        self._town_box.clear()
         self.update()
 
     def hideEvent(self, e):
@@ -459,6 +468,7 @@ class FlatMap(QWidget):
         self._pics = {key: pic for key, pic in self._pics.items() if key[0] == base}
         self._stable = None
         self._town_pm.clear()
+        self._town_box.clear()
 
     # ------------------------------------------------------------------ painting
     def _grow(self) -> float:
@@ -577,6 +587,24 @@ class FlatMap(QWidget):
             got = self._placed[key] = list(self._label_boxes(tr, s, whole, fm))
         return got
 
+    def _town_font(self) -> QFont:
+        font = QFont(self.font())
+        font.setPointSizeF(max(7.0, font.pointSizeF() * 0.8))
+        font.setWeight(QFont.Weight.Normal)
+        return font
+
+    def _town_size(self, name: str, dpr: float) -> QSizeF:
+        """How big _town_pixmap's picture of `name` is, without drawing it (a city
+        name that won't fit isn't drawn at all)."""
+        key = (name, dpr)
+        size = self._town_box.get(key)
+        if size is None:
+            fm = QFontMetricsF(self._town_font())
+            w, h = fm.horizontalAdvance(name) + 6, fm.height() + 2
+            size = self._town_box[key] = QSizeF(max(1, round(w * dpr)) / dpr,
+                                                max(1, round(h * dpr)) / dpr)
+        return size
+
     def _town_pixmap(self, name: str, dpr: float) -> QPixmap:
         """A city name drawn once, outlined in the land's colour so it reads over the
         dots; after that it's only copied onto the screen."""
@@ -584,12 +612,10 @@ class FlatMap(QWidget):
         pm = self._town_pm.get(key)
         if pm is None:
             t = theme.T
-            font = QFont(self.font())
-            font.setPointSizeF(max(7.0, font.pointSizeF() * 0.8))
-            font.setWeight(QFont.Weight.Normal)
+            font = self._town_font()
             fm = QFontMetricsF(font)
-            w, h = fm.horizontalAdvance(name) + 6, fm.height() + 2
-            pm = QPixmap(max(1, round(w * dpr)), max(1, round(h * dpr)))
+            size = self._town_size(name, dpr)
+            pm = QPixmap(round(size.width() * dpr), round(size.height() * dpr))
             pm.setDevicePixelRatio(dpr)
             pm.fill(Qt.GlobalColor.transparent)
             q = QPainter(pm)
@@ -609,7 +635,13 @@ class FlatMap(QWidget):
         Nothing at all until zoomed in; then only the places in view are looked at, the
         ones with the most stations first, each where it doesn't cover a country's name
         or another town's, and at most TOWNS_IN_VIEW of them: a drag costs a few
-        copied pictures. Answers how many it drew."""
+        copied pictures. Answers how many it drew.
+
+        Only the names that fit are drawn (each measured first): drawing every town
+        in view, Europe's hundreds, took 80 ms in one paint as the zoom passed
+        TOWN_ZOOM, and the sound playing skipped (Qt holds Python's lock through each
+        call, and the audio threads wait on it). New names get about TOWN_SLICE_S a
+        paint; the rest keep their place and come a moment later."""
         if not len(self._towns) or self.zoom < TOWN_ZOOM:
             return 0
         s = self._scale()
@@ -626,19 +658,27 @@ class FlatMap(QWidget):
             o = self._origin(k, s)
             taken += [b for b in (box.translated(o).adjusted(-2, -1, 2, 1)
                                   for box, _n in placed) if b.intersects(rect)]
-        drawn = 0
+        drawn, placed, later = 0, 0, False
+        end = time.perf_counter() + TOWN_SLICE_S
         for i in on:   # most stations first, like the list
-            pm = self._town_pixmap(self._towns[i]["n"], dpr)
-            size = pm.deviceIndependentSize()
+            name = self._towns[i]["n"]
+            size = self._town_size(name, dpr)
             box = QRectF(xs[i] - size.width() / 2, ys[i] - 3 - size.height(),
                          size.width(), size.height())
             if any(box.intersects(o) for o in taken):
                 continue
-            taken.append(box)
-            p.drawPixmap(box.topLeft(), pm)
-            drawn += 1
-            if drawn >= TOWNS_IN_VIEW:
+            taken.append(box)   # its place is kept even when it's drawn next time
+            placed += 1
+            pm = self._town_pm.get((name, dpr))
+            if pm is None and time.perf_counter() > end:
+                later = True
+            else:
+                p.drawPixmap(box.topLeft(), pm or self._town_pixmap(name, dpr))
+                drawn += 1
+            if placed >= TOWNS_IN_VIEW:
                 break
+        if later:
+            self._towns_later.start()
         return drawn
 
     # ------------------------------------------------------------------ the tiles
