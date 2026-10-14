@@ -12,13 +12,13 @@ Version **2.0.4** · Windows 10 / 11 · free, no account, no ads, anonymous usag
 [what's new](CHANGELOG.md)
 <!-- /release -->
 
-![Onion Board's sound pads](docs/screenshots/sounds.png?v=6a40548c)
+![Onion Board's sound pads](site/screenshots/sounds.png?v=6a40548c)
 
 | | |
 |---|---|
-| ![Voice changer and text-to-speech](docs/screenshots/voice.png?v=dc096b81) | ![Screen triggers](docs/screenshots/triggers.png?v=0534ffb7) |
+| ![Voice changer and text-to-speech](site/screenshots/voice.png?v=dc096b81) | ![Screen triggers](site/screenshots/triggers.png?v=0534ffb7) |
 | **Voice**: change your voice live, or type and a computer voice says it | **Triggers**: a sound the moment "YOU DIED" shows up in your game |
-| ![Send a program's sound](docs/screenshots/apps.png?v=59b5ca5b) | ![Setup at a glance](docs/screenshots/setup.png?v=f37c0de8) |
+| ![Send a program's sound](site/screenshots/apps.png?v=59b5ca5b) | ![Setup at a glance](site/screenshots/setup.png?v=f37c0de8) |
 | **Apps**: send one program's sound (music, a video) to your friends | **Setup**: one look tells you whether others can hear you |
 
 ## What it does

@@ -7,7 +7,8 @@ from pathlib import Path
 import pytest
 
 from conftest import own_time
-from soundboard import library, reset, resanance, soundux, trash, videos
+from soundboard import library, reset, trash, videos
+from soundboard.otherboards import resanance, soundux
 from soundboard.library import Config, SoundMeta
 
 

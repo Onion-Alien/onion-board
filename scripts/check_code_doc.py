@@ -5,7 +5,7 @@
 
 A row covers a module by its path (`soundboard/ui/busy.py`), by its folder
 (`soundboard/voicefx/`), or by its bare name after another path of the same folder in
-the row (`soundboard/soundpad.py`, `resanance.py`). `__init__.py` files aren't listed.
+the row (`soundboard/otherboards/soundpad.py`, `resanance.py`). `__init__.py` files aren't listed.
 """
 from __future__ import annotations
 

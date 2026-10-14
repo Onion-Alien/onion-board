@@ -40,29 +40,29 @@ module's `install.bat` or `pip install -r requirements.txt`).
 - Layout: [CODE.md](CODE.md) → *Code layout*. Rules: [CONTRIBUTING.md](../CONTRIBUTING.md)
   (audio callbacks, UI thread, tests).
 - Anything user-visible gets a changelog line: [changelog.d/README.md](../changelog.d/README.md).
-- The Triggers tab is the [Onion Watch](https://github.com/Onion-Alien/onion-watch)
-  add-on, a separate project. Onion Board's side is `ui/triggerstab.py` (the tab,
-  Hoot and the download), `ui/triggershost.py` (the host interface the add-on
-  talks to; `modules.TRIGGERS_API` is the version of it this app can host) and
-  `watchaddon.py` (its releases). To try an Onion Watch build before it's
-  released, or while its repo isn't reachable, build its zip
-  (`scripts\build_module.py` there) and start Onion Board with
-  `ONIONBOARD_ONION_WATCH_ZIP` set to it: *Get Onion Watch* and the update check
-  then use that file instead of GitHub. The add-on may only import what the built
-  app ships (it has no pip): the standard library, numpy, soxr, scipy.fft and
-  PySide6's QtCore / QtGui / QtWidgets. The app's own code doesn't import scipy (its
-  filters are `soundboard/dsp.py`); `build.ps1` bundles only scipy.fft, with
-  `--hidden-import`, for Onion Watch's matcher (which falls back to numpy's slower FFTs
-  without it), and scipy.ndimage, which released Onion Watch 0.5.6 imports (its
-  module.json lists it, so without it the Triggers tab refuses to load for everyone
-  still on 0.5.6). The rest of scipy (signal, stats…) isn't shipped. **Never drop a
-  part a released Onion Watch lists in its `imports`:** `RELEASED_WATCH_IMPORTS` in
-  `tests/test_triggers_module.py` fails the tests if `build.ps1` stops shipping one;
-  add each new release's list there. Removing scipy.fft from the build makes the
-  Triggers tab slower; check it still runs: `OnionBoard.exe --selftest-addon <zip>`
-  proves a build can run it (build.ps1 does that when `ONIONBOARD_ONION_WATCH_ZIP` is
-  set). Before a release, run it on the newest *released* Onion Watch zip from
-  GitHub too, not only one built from its main.
+
+### The Triggers tab (Onion Watch)
+
+The Triggers tab is the [Onion Watch](https://github.com/Onion-Alien/onion-watch)
+add-on, a separate project. Onion Board's side is `ui/triggerstab.py` (the tab, Hoot
+and the download), `ui/triggershost.py` (the host interface the add-on talks to;
+`modules.TRIGGERS_API` is the version of it this app can host) and `watchaddon.py`
+(its releases).
+
+- **Try an unreleased build:** build its zip (`scripts\build_module.py` in that repo)
+  and start Onion Board with `ONIONBOARD_ONION_WATCH_ZIP` set to it. *Get Onion Watch*
+  and the update check then use that file instead of GitHub.
+- **It can only import what the built app ships** (it has no pip): the standard
+  library, numpy, soxr, PySide6's QtCore / QtGui / QtWidgets, and of scipy only
+  `scipy.fft` and `scipy.ndimage` (why: the comment above the PyInstaller call in
+  `build.ps1`). The app itself never imports scipy; its filters are `soundboard/dsp.py`.
+- **Never drop a part a released Onion Watch lists in its `imports`**: everyone still
+  on that version would lose the tab. `RELEASED_WATCH_IMPORTS` in
+  `tests/test_triggers_module.py` fails if `build.ps1` stops shipping one; add each
+  new release's list there.
+- **Check a build runs it:** `OnionBoard.exe --selftest-addon <zip>` (`build.ps1` does
+  it when `ONIONBOARD_ONION_WATCH_ZIP` is set). Before a release, run it on the newest
+  *released* Onion Watch zip too, not only one built from its main.
 
 ## 3. Check it (headless)
 
@@ -82,20 +82,17 @@ platform and a separate single-instance name, and never touches the real
 callback at the device's pace but plays nothing, so no test is ever heard on
 the speakers or headphones (set `ONIONBOARD_TEST_REAL_AUDIO=1` to
 opt out).
-They're safe to run while someone is using the PC. The mic effect's tests
-(`tests\test_directmic.py`) run the real DLL in `testhost.exe`, never on a real mic or
-the registry; the ones that need the DLL are skipped until
-`scripts\build_directmic.py --testhost` has built it. CI's `mic-effect` job builds it
-and runs them (with a minute of fuzzing) on a PR that touches the effect.
-`scripts\check_directmic.py` checks the C++ without running it: g++ with extra
-warnings as errors, GCC's static analyzer and cppcheck (WinLibs ships it beside g++).
-`scripts\build_directmic.py --fuzz` also builds `fuzzhost.exe`, which throws hostile and
-half-written ring files at the effect (built with sanitizer traps);
-`scripts\fuzz_directmic.py [seconds] [workers]` runs it for longer than the tests do.
-`fuzzhost --lead` replays a late board block by block (no timing luck) and checks the
-effect's lead grows just enough and comes back; the real-time tests can't pin that down.
-`scripts\sim_directmic.py` drives the mic effect's admin install / uninstall against a
-fake registry, killing it at every write (run it after any change to the mic effect's install / uninstall).
+They're safe to run while someone is using the PC.
+
+**The mic effect** (`native/directmic/`, `soundboard/directmic.py`) has checks of its
+own. CI's `mic-effect` job runs the first three on a PR that touches the effect:
+
+| Command | What it checks |
+|---|---|
+| `scripts\build_directmic.py --testhost`, then `pytest tests\test_directmic.py` | the real DLL in `testhost.exe`, loaded the way Windows does; never a real mic or the registry (the DLL tests are skipped until it's built) |
+| `scripts\check_directmic.py` | the C++ without running it: g++ warnings as errors, GCC's static analyzer, cppcheck (WinLibs ships it). Run it before pushing C++ changes |
+| `scripts\build_directmic.py --fuzz`, then `scripts\fuzz_directmic.py [seconds] [workers]` | `fuzzhost.exe` (sanitizer traps on) throws hostile and half-written ring files at the effect; `fuzzhost --lead` replays a late board block by block and checks the effect's lead grows just enough and comes back |
+| `scripts\sim_directmic.py` | the admin install / uninstall against a fake registry, killed at every write (and the mic helper at every step): the mic must always end up as it started. **Run it after changing the install / uninstall or the ring layout** |
 
 **Not on Windows?** The suite also runs on Linux and macOS: `tests/offwindows.py`
 stands in for Windows' registry (every key missing) and DLLs (every call fails), so the
@@ -178,8 +175,6 @@ with no flags it only reports), `steam_voice_roundtrip.py` (Steam's own voice
 codec, one PC, one account), `discord_roundtrip.py` and `game_roundtrip.py` (a
 friend records the game on their end). The stacks, their sources and what the
 bench found: [GAME-VOICE.md](GAME-VOICE.md).
-
-**After any change to the sending path** (the mic effect, `directmic.py`, routes, send volume or the *Who's listening* modes), run the maintainer's silent voice check (`voicecheck.py`, kept outside the repo because it needs Vivox and Epic developer keys; ~3 min) and paste its table into the PR: it shows what Discord, Vivox and Epic voice do to 3 songs, and whether apps opening the mic each way still get our sounds.
 
 **Launching the real app is not headless.** It opens a window, grabs global
 hotkeys and opens audio devices: `scripts\run.bat`, `python -m soundboard`,
@@ -325,57 +320,65 @@ Get-Process OnionBoard -ErrorAction SilentlyContinue      # is it running?
 
 ## 7. Commit and release
 
+### Commit and merge
+
 1. Section 3 passes. The pre-commit hook re-runs the secrets scan.
-2. Commit, push, and open a pull request (main takes changes by PR only). Merge it
-   with `sh scripts/merge_pr.sh N` (why: CLAUDE.md, *Commit times and merging*). CI
-   (`.github/workflows/checks.yml`) runs on the PR and on main after a merge: the
-   secrets scan over the full history, gitleaks, ruff and pytest. On a PR, pytest
-   runs only the test files the change needs (`scripts/pick_tests.py`: the tests
-   that import a changed module or name a changed file; all of them when
-   `conftest.py`, `pyproject.toml`, the requirements, the workflow or a hub
-   (`ui/mainwindow.py`, `engine.py`, `library.py`, `settings.py`) change; none for
-   a change no test is about, like the changelog). main, after the merge, runs the
-   whole suite, and so does running the workflow by hand on a branch. A newer push to
-   the PR cancels its unfinished run. Every night the whole suite runs on main too,
-   and its `flaky-trend` job fails when a test needed a rerun that didn't the night
-   before (the run's summary lists the new ones and the ones no longer flaky).
-3. `release.py` (next step) refuses to start unless the checkout is exactly
-   `origin/main` (it fetches first) and main's full `checks` run passed on that
-   commit (`gh run list --workflow checks.yml --branch main --commit <sha>`): a PR
-   only runs the tests its change imports, so main's after-merge run is the first
-   time the whole suite sees the change. Still going: wait. Failed or cancelled: fix
-   main, or rerun it (`gh run rerun <id>`). `--skip-ci-check` releases anyway with a
-   loud warning: only for an urgent fix when CI itself is broken.
-   For a release: `.venv\Scripts\python scripts\release.py X.Y.Z` (bumps
-   `__version__`, moves the `changelog.d/` entries into the CHANGELOG under the version, checks the
-   translations, refreshes the README's release line; `--dry-run` checks only),
-   build, then upload `dist\OnionBoardSetup.exe` to a GitHub Release
-   with its SHA-256 (`certutil -hashfile dist\OnionBoardSetup.exe SHA256`).
-   Keep the asset named exactly `OnionBoardSetup.exe` and don't mark the release
-   as a pre-release: the README's download button links to
-   `releases/latest/download/OnionBoardSetup.exe`, and installed copies update
-   themselves from the latest release's `OnionBoardSetup.exe` (`soundboard/updates.py`
-   only installs it when GitHub lists its SHA-256, and runs it with `/RELAUNCH=1`,
-   see `installer/OnionBoard.iss`). Upload the same file a second time as
-   `OnionBoardSetup-update.exe` (`gh release upload vX.Y.Z
-   "dist\OnionBoardSetup.exe#OnionBoardSetup-update.exe"` doesn't rename it: copy it
-   to that name first): *Update now* fetches that one when a release has it, so
-   GitHub's download counts tell updates apart from new downloads. A release with a broken installer reaches
-   everyone who clicks *Update now*: install the built one over your own copy
-   before publishing.
-   **An urgent fix** (a crash, sounds cutting out, a security problem): add a line
-   `Urgent: <what it fixes, in a few plain words>` to the notes. Copies that check
-   (every 6 hours) then show a banner across the window with that reason and
-   *Update now*, and *Skip this version* isn't offered. The same line works in Onion
-   Watch's release notes. Only the newest release is read, so if a normal release
-   follows soon after, keep the line there too while the fix still matters.
-   The notes start with a one-line headline, then a download line, because GitHub
-   adds two *Source code* files that people mistake for the app:
-   `**[⬇ Download OnionBoardSetup.exe](https://github.com/Onion-Alien/onion-board/releases/download/vX.Y.Z/OnionBoardSetup.exe)**: the one file you need (Windows 10 / 11). Already have Onion Board? The *Update* button at the top of the app offers this version. (The *Source code* files are for developers.)`
-   Keep it second, not first: the app's *Update* dialog shows the start of the notes
-   (`updates.summary` skips the ⬇ line, but 1.6.4 and older don't). Those show
-   whole paragraphs up to 420 characters, so make the headline paragraph at least
-   ~220 characters: then their dialog stops before the ⬇ line instead of telling
-   someone who's already updating to go and download the file.
-   Never commit build output. Run `python scripts/check_sensitive.py --history`
-   once more before pushing the release.
+2. Commit, push and open a pull request (main takes changes by PR only). Merge it with
+   `sh scripts/merge_pr.sh N` (why: CLAUDE.md, *Commit times and merging*).
+
+CI (`.github/workflows/checks.yml`) runs the secrets scan over the full history,
+gitleaks, ruff and pytest:
+
+- **On a PR**, pytest runs only the test files the change needs
+  (`scripts/pick_tests.py`: tests that import a changed module or name a changed file;
+  all of them when `conftest.py`, `pyproject.toml`, the requirements, the workflow or a
+  hub (`ui/mainwindow.py`, `engine.py`, `library.py`, `settings.py`) changes; none for
+  a change no test is about, like the changelog). A newer push cancels the unfinished run.
+- **On main after a merge**, and when the workflow is run by hand on a branch: the
+  whole suite.
+- **Every night** the whole suite runs on main, and its `flaky-trend` job fails when a
+  test needed a rerun that didn't the night before (the run's summary lists them).
+
+### Release
+
+1. **main's full run must have passed.** `release.py` refuses to start unless the
+   checkout is exactly `origin/main` (it fetches first) and main's `checks` run passed
+   on that commit (`gh run list --workflow checks.yml --branch main --commit <sha>`): a
+   PR only runs the tests its change imports, so that run is the first time the whole
+   suite sees the change. Still going: wait. Failed or cancelled: fix main, or rerun it
+   (`gh run rerun <id>`). `--skip-ci-check` releases anyway with a loud warning: only
+   for an urgent fix when CI itself is broken.
+2. **Bump:** `.venv\Scripts\python scripts\release.py X.Y.Z` (bumps `__version__`,
+   moves the `changelog.d/` entries into the CHANGELOG under the version, checks the
+   translations, refreshes the README's release line; `--dry-run` checks only).
+3. **Build** (`build.ps1 -Clean`, section 4) and **install the built installer over
+   your own copy** first: a broken installer reaches everyone who clicks *Update now*.
+4. **Publish** a GitHub Release `vX.Y.Z`, not marked pre-release, with two assets:
+   - `OnionBoardSetup.exe`, named exactly that. The README's download button links to
+     `releases/latest/download/OnionBoardSetup.exe`, and installed copies update from
+     it (`soundboard/updates.py` installs it only when GitHub lists its SHA-256, and
+     runs it with `/RELAUNCH=1`, see `installer/OnionBoard.iss`).
+   - The same file again as `OnionBoardSetup-update.exe` (copy it to that name first:
+     `gh release upload` with `#name` doesn't rename the file). *Update now* fetches
+     this one when a release has it, so the download counts tell updates apart from
+     new downloads.
+5. Run `python scripts/check_sensitive.py --history` once more before pushing the
+   release. Never commit build output.
+
+**The release notes** start with a headline paragraph, then this download line
+(GitHub adds two *Source code* files that people mistake for the app):
+
+```
+**[⬇ Download OnionBoardSetup.exe](https://github.com/Onion-Alien/onion-board/releases/download/vX.Y.Z/OnionBoardSetup.exe)**: the one file you need (Windows 10 / 11). Already have Onion Board? The *Update* button at the top of the app offers this version. (The *Source code* files are for developers.)
+```
+
+Keep it second, and make the headline paragraph at least ~220 characters: the app's
+*Update* dialog shows the start of the notes, and copies before 1.6.5 show whole
+paragraphs up to 420 characters without skipping the ⬇ line (`updates.summary` skips
+it now), so a long headline stops them before it.
+
+**An urgent fix** (a crash, sounds cutting out, a security problem): add a line
+`Urgent: <what it fixes, in a few plain words>` to the notes. Copies that check (every
+6 hours) show a banner with that reason and *Update now*, and don't offer *Skip this
+version*. The same line works in Onion Watch's notes. Only the newest release is read,
+so keep the line in a normal release that follows soon after while the fix still matters.

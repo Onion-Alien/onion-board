@@ -1,6 +1,6 @@
 ---
 # Onion Board design system: the machine-readable part.
-# Colour values live in soundboard/theme.py (THEMES): 31 themes (not 2 or 3: every
+# Colour values live in soundboard/style/palettes.py (theme.THEMES): 31 themes (not 2 or 3: every
 # one is shipped and picked by real people) share these token NAMES, so code always
 # uses a token, never a hex value. The prose below says how; section 6 says how to check.
 name: Onion Board
@@ -130,8 +130,7 @@ Sizes (the theme gives them; don't override):
 | Bar control | height `panel.CONTROL_H` (36) inside a `panel.BAR_H` (48) bar | the Sounds toolbar, player and bottom bars only |
 
 Labels: one to three words, sentence case, a verb for actions ("Save", "Add sounds",
-"Delete"), never "OK" or "Yes"/"No". A button that starts slow work stays enabled and
-shows it with `busy.set_busy` / `busy.run_busy` (focus would jump otherwise).
+"Delete"), never "OK" or "Yes"/"No".
 
 Rows of buttons: `Flow(gap=8)` (`settings._button_row()`) or an `QHBoxLayout` with
 spacing 8, buttons at their own width, then `addStretch(1)`.
@@ -160,15 +159,18 @@ fixed gap (`HEADER_GAP`) to what's below; the parts under it share one gap
 | Removing something a person made | do it at once, then offer **Undo** (`panel.UndoBar` or `toast(..., action=(_("Undo"), fn))`), into Recently deleted | "Are you sure?" for something that can be undone |
 | Something that can't be undone (delete for good, reset everything) | a small modal dialog: the consequence in words, `[Delete for good] [Cancel]`, the verb on a `#danger` button | `QMessageBox.question` with Yes/No |
 | Explain how something works | an ⓘ icon button opening an anchored help pop-up; Esc / click outside closes | a paragraph on the card, a modal |
-| A few rare actions on a card or item | a ⋯ icon button with `widgets.DropdownMenu`; right-click gives the same `QMenu` | a row of extra buttons |
+| A card's few extra actions | quiet buttons in the card's own button row | a ⋯ menu that hides two or three options |
+| Many actions on an item in a list | right-click `QMenu`, plus a ⋯ icon button (`widgets.DropdownMenu`) with the same actions | actions only on right-click |
 | Ask a short question or a choice | a small `QDialog` (the dialog recipe below) | a chain of message boxes |
 | A long editor or tuning panel | a retained **modeless** `QDialog`: create once, `show()` + `raise_()`, changes apply live, `[Done]` closes | a modal that blocks sounds and hotkeys |
 
 **Modal or not:** modeless (`show()`) is the default, so sounds keep playing and
 hotkeys keep working. Modal (`open()` + the `finished` signal) only when the app can't
-go on without the answer. New code doesn't use `exec()` (it runs a nested event loop:
-callbacks fire after the dialog's owner is gone). Old `exec()` calls are left until
-someone reviews their lifecycle.
+go on without the answer. Keep a reference to the dialog and check its owner still
+exists in callbacks after it closes. A modeless window never steals focus back while
+the user works elsewhere. New code doesn't use `exec()` (it runs a nested event loop:
+callbacks fire after the dialog's owner is gone); old `exec()` calls stay until someone
+reviews their lifecycle.
 
 ### Dialog anatomy (every dialog looks like this)
 
@@ -284,18 +286,14 @@ Custom button tiles need the keyboard behaviour of the radio choice they replace
 | --- | --- |
 | A few extra settings for the current card | A labelled inline disclosure, immediately after that card's main controls. Keep its common controls visible. |
 | A long editor or tuning while using the app | A retained modeless `QDialog`: reuse/raise it, apply live settings immediately, close without undoing them. |
-| Short secondary actions | A more-menu beside the card heading or item. Use `DropdownMenu` for button-anchored menus and `QMenu` for context menus. Both expose the same shared actions where applicable. |
+| Short secondary actions | Quiet buttons in the card's own row. A list item with many actions: a right-click `QMenu` and a ⋯ `DropdownMenu` offering the same ones. |
 | Brief explanation | Anchored help popup; Escape/outside click closes it and focus returns to its opener. |
 | Edit an item as a transaction | Draft changes with `[Save] [Cancel]`; Cancel/Escape discards the draft. Preview must not persist edits. Modeless is preferred if the owning item can safely remain editable. |
 | A required decision or irreversible operation | A modal dialog with a specific action and Cancel. Explain the consequence; prefer Undo/recently deleted for reversible removal. |
 | General app preferences | Modeless settings, applied immediately, `[Done]` to close. No Save, Apply or Cancel implying rollback. |
 
-Use modal UI only when continuing would invalidate the task or require an answer.
-On Qt, prefer `open()` with `finished` for necessary modal tasks and `show()` for
-modeless windows; keep a reference and guard callbacks after close. Existing
-`exec()` flows need a lifecycle review before conversion. Escape follows the same
-contract as Cancel/Done. Closing a popup restores focus to its opener; a modeless
-window must not steal focus back while the user is working elsewhere.
+Modal or modeless: the *Modal or not* rule in the kit above. Escape follows the same
+contract as Cancel/Done, and closing a popup restores focus to its opener.
 
 ### Action rows and labels
 
@@ -338,9 +336,8 @@ These are the current reference points. Copy their structure before inventing a 
   a text line) may stretch. On a full-screen window only the search box is capped
   (`SEARCH_MAX_W`, 480 px); the seek bar, the meter and the drop box keep following the
   window on purpose (a longer seek bar seeks finer). Don't cap them.
-- **Dialogs**: capped at about 620 px wide, as tall as their content. Use
-  `fit.watch(self)` so they grow to fit translated text. A multi-step dialog changes
-  pages in a `QStackedWidget` and shrinks to the current page (see feedbackdialog).
+- **Dialogs**: see *Dialog anatomy* above. A multi-step dialog shrinks to the
+  current page (see feedbackdialog).
 - **Grids** use few columns of fixed-size tiles and scroll down; never spread tiles
   out to fill the width.
 - **Cards** (`QFrame#card` / `#setcard`) group related things: heading (`QLabel#section`),
@@ -348,19 +345,19 @@ These are the current reference points. Copy their structure before inventing a 
   could be one, make one: fewer sections beats more. Cards must look designed, not
   like a form: see *Cards that look designed* below.
 - Long text wraps (`setWordWrap(True)`); it never widens the layout.
-- No huge empty gaps and no sideways scroll bars, at 900x700, 720x500 and the
-  smallest window size.
+- No huge empty gaps and no sideways scroll bars at any size in section 6's *Window*
+  row.
 - Right-to-left languages mirror automatically; don't hard-code left/right positions
   in painting code without checking `layoutDirection()`.
-- The sidebar's inner edge can be dragged between its collapsed and expanded widths.
-  Release snaps to the nearer existing state; it never grows wider than the expanded
-  rail. Keep the named expand/collapse button as the keyboard alternative.
+- The sidebar's inner edge drags between three states, with nothing in between:
+  shut below halfway (one centred icon column), mid from halfway (names; what doesn't
+  fit is hidden or kept small) and full once everything fits (`sidebar._full_fit`). It
+  never grows wider than the full rail. Keep the named expand/collapse button as the
+  keyboard alternative.
 
 ## 3. Buttons
 
-- **Dialog action rows sit bottom-right, main action first within the group**:
-  stretch, then `[Send] [Cancel]` or `[Open the feedback form] [Done]`.
-  Keep contextual actions beside their content; do not right-align every UI element.
+- Dialog action rows: section 0, *Action rows and labels*.
 - **At most one filled button** (`setObjectName("primary")`) per card or dialog: the
   thing most people should press. Everything else is a plain button or a quiet one
   (`setProperty("quiet", True)`: no background until hover). The filled button is the
@@ -450,14 +447,14 @@ works, a short control plus a pop-up beats a long button or a paragraph on the p
   goes into a pop-up opened from an ⓘ icon beside the heading (or the card's hint, cut
   to one line). Warnings, the consequence of a delete and what a new user must do next
   stay visible: never hide those.
-- **Rare options in a menu or pop-up.** Settings someone changes once go behind a
-  ⋯ / ⚙ icon on the card (a `QMenu` or a small dialog), not as a row of controls
-  everyone has to read past.
+- **Rare settings in a pop-up.** A group of settings someone changes once goes behind
+  a ⚙ icon on the card (a small dialog), not as rows everyone has to read past. A card's
+  few extra *actions* stay as quiet buttons on it: never a ⋯ menu that hides two or
+  three options.
 - **Multi-step or "are you sure" flows are a dialog**, not extra buttons that appear
   in the card. One question per dialog page (see the Send feedback box).
-- **Pop-ups**: non-modal unless the app truly can't go on without an answer; close with
-  Esc and a clear Done/Cancel; as narrow as their content; open next to what opened
-  them. Tooltips are short (one line), never the only way to do something, and never
+- **Pop-ups**: close with Esc and a clear Done/Cancel; as narrow as their content;
+  open next to what opened them (modal or not: the kit). Tooltips are short (one line), never the only way to do something, and never
   hold buttons.
 
 ## 5. Cards that look designed
@@ -470,7 +467,7 @@ three of these, and none of them is plain grey boxes of text:
   background or add borders; nest an inner area in `card_hi` or `inset` (12 px corners
   outside, 8 px inside: inner corners are smaller than outer ones).
 - **A heading with an icon**: a painted icon (`ui/icons.py`) in front of the
-  `QLabel#section` heading, optional ⓘ or ⋯ icon at the end of the same line.
+  `QLabel#section` heading, an optional ⓘ at the end of the same line.
 - **Status as a pill**, not a sentence: a small rounded label in the tone colour
   ("On", "Ready", "Not set up") beside the heading, via `theme.set_tone`.
 - **Choices as tiles** when they need comparison or explanation: icon + name (+ one muted line) in a rounded
@@ -577,8 +574,6 @@ Never draw a fixed colour except a sound's own colour, the user's own highlight 
 - New features go into an existing place (a menu, a card, Settings) before they get a
   new toolbar button. The Sounds tab is the home screen: keep its toolbar as it is
   unless the task is about it.
-- Pop-ups that aren't urgent are not modal (`dlg.show()`), so sounds keep playing and
-  hotkeys keep working.
 - Every control works from the keyboard and shows a focus ring.
 - Mouse wheel never changes a dropdown or flips a tab unless it has focus
   (`wheelguard.py` does this app-wide; don't undo it).
@@ -670,12 +665,7 @@ The rules above are Onion Board's take on what the big design systems agree on n
 | Left tab rail | `soundboard/ui/sidebar.py` |
 | Wheel guard, dropdown widths | `soundboard/wheelguard.py` |
 
-## 13. Known gaps
-
-Some old screens still break these rules. Fix a gap when a task touches it; don't sweep
-them all in one go.
-
-## 14. UI workflow for agents and reviewers
+## 13. UI workflow for agents and reviewers
 
 1. **Read and inspect.** Start from the latest main in a clean checkout. Read this
    file. Inspect the
