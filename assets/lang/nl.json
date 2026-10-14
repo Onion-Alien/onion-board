@@ -3385,6 +3385,8 @@
   "The downloader is already the newest. The site may have changed in a way it can't handle yet: try again in a few days.": "De downloader is al de nieuwste. De site is misschien veranderd op een manier die hij nog niet aankan: probeer het over een paar dagen opnieuw.",
   "Update downloader": "Downloader bijwerken",
   "Updating the downloader…": "Downloader bijwerken…",
+  "Mute the game's sounds": "Geluiden van het spel dempen",
+  "Turn the game's sounds on": "Geluiden van het spel aanzetten",
   "Hear {name}": "{name} beluisteren",
   "Hear {name} (only you hear it)": "{name} beluisteren (alleen jij hoort het)",
   "Pick your headphones in Settings → Audio to hear the samples.": "Kies je koptelefoon in Instellingen → Audio om de voorbeelden te horen.",

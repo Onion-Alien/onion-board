@@ -3385,6 +3385,8 @@
   "The downloader is already the newest. The site may have changed in a way it can't handle yet: try again in a few days.": "Latausohjelma on jo uusin. Sivusto on ehkä muuttunut tavalla, jota se ei vielä osaa käsitellä: kokeile uudelleen muutaman päivän päästä.",
   "Update downloader": "Päivitä latausohjelma",
   "Updating the downloader…": "Päivitetään latausohjelmaa…",
+  "Mute the game's sounds": "Mykistä pelin äänet",
+  "Turn the game's sounds on": "Laita pelin äänet päälle",
   "Hear {name}": "Kuuntele {name}",
   "Hear {name} (only you hear it)": "Kuuntele {name} (vain sinä kuulet sen)",
   "Pick your headphones in Settings → Audio to hear the samples.": "Valitse kuulokkeesi kohdassa Asetukset → Ääni kuullaksesi näytteet.",

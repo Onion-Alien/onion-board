@@ -3309,6 +3309,8 @@
   "The downloader is already the newest. The site may have changed in a way it can't handle yet: try again in a few days.": "Pemuat turun sudah yang terbaharu. Laman itu mungkin berubah dengan cara yang belum boleh dikendalikannya: cuba lagi dalam beberapa hari.",
   "Update downloader": "Kemas kini pemuat turun",
   "Updating the downloader…": "Mengemas kini pemuat turun…",
+  "Mute the game's sounds": "Senyapkan bunyi permainan",
+  "Turn the game's sounds on": "Hidupkan bunyi permainan",
   "Hear {name}": "Dengar {name}",
   "Hear {name} (only you hear it)": "Dengar {name} (hanya anda yang dengar)",
   "Pick your headphones in Settings → Audio to hear the samples.": "Pilih fon kepala anda dalam Tetapan → Audio untuk mendengar sampel.",

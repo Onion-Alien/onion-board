@@ -3385,6 +3385,8 @@
   "The downloader is already the newest. The site may have changed in a way it can't handle yet: try again in a few days.": "Програмата за изтегляне вече е най-новата. Сайтът може да се е променил по начин, с който тя още не се справя: опитай пак след няколко дни.",
   "Update downloader": "Обнови програмата за изтегляне",
   "Updating the downloader…": "Програмата за изтегляне се обновява…",
+  "Mute the game's sounds": "Заглуши звуците на играта",
+  "Turn the game's sounds on": "Включи звуците на играта",
   "Hear {name}": "Чуй {name}",
   "Hear {name} (only you hear it)": "Чуй {name} (само ти го чуваш)",
   "Pick your headphones in Settings → Audio to hear the samples.": "Избери слушалките си в Настройки → Аудио, за да чуеш пробите.",

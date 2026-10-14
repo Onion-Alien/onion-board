@@ -3461,6 +3461,8 @@
   "The downloader is already the newest. The site may have changed in a way it can't handle yet: try again in a few days.": "Загрузчик уже самый новый. Возможно, сайт изменился так, что он пока с этим не справляется: попробуйте снова через несколько дней.",
   "Update downloader": "Обновить загрузчик",
   "Updating the downloader…": "Загрузчик обновляется…",
+  "Mute the game's sounds": "Выключить звуки игры",
+  "Turn the game's sounds on": "Включить звуки игры",
   "Hear {name}": "Послушать {name}",
   "Hear {name} (only you hear it)": "Послушать {name} (слышите только вы)",
   "Pick your headphones in Settings → Audio to hear the samples.": "Выберите наушники в Настройки → Аудио, чтобы послушать примеры.",

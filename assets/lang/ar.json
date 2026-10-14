@@ -3689,6 +3689,8 @@
   "The downloader is already the newest. The site may have changed in a way it can't handle yet: try again in a few days.": "برنامج التنزيل هو الأحدث بالفعل. ربما تغيّر الموقع بطريقة لا يستطيع التعامل معها بعد: جرّب مرة أخرى بعد بضعة أيام.",
   "Update downloader": "تحديث برنامج التنزيل",
   "Updating the downloader…": "جارٍ تحديث برنامج التنزيل…",
+  "Mute the game's sounds": "كتم أصوات اللعبة",
+  "Turn the game's sounds on": "تشغيل أصوات اللعبة",
   "Hear {name}": "استمع إلى {name}",
   "Hear {name} (only you hear it)": "استمع إلى {name} (أنت فقط تسمعه)",
   "Pick your headphones in Settings → Audio to hear the samples.": "اختر سماعاتك في الإعدادات ← صوتي لتسمع العينات.",

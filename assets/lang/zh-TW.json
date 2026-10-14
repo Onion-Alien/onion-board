@@ -3309,6 +3309,8 @@
   "The downloader is already the newest. The site may have changed in a way it can't handle yet: try again in a few days.": "下載器已經是最新的。網站可能改成它暫時處理不了的樣子：過幾天再試試。",
   "Update downloader": "更新下載器",
   "Updating the downloader…": "正在更新下載器…",
+  "Mute the game's sounds": "將遊戲音效靜音",
+  "Turn the game's sounds on": "開啟遊戲音效",
   "Hear {name}": "試聽 {name}",
   "Hear {name} (only you hear it)": "試聽 {name}（只有你聽得到）",
   "Pick your headphones in Settings → Audio to hear the samples.": "在 設定 → 音訊 裡選好耳機，就能試聽了。",

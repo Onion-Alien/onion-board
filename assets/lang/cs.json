@@ -3461,6 +3461,8 @@
   "The downloader is already the newest. The site may have changed in a way it can't handle yet: try again in a few days.": "Stahovač je už nejnovější. Web se možná změnil tak, že si s tím zatím neporadí: zkus to znovu za pár dní.",
   "Update downloader": "Aktualizovat stahovač",
   "Updating the downloader…": "Aktualizuji stahovač…",
+  "Mute the game's sounds": "Ztlumit zvuky hry",
+  "Turn the game's sounds on": "Zapnout zvuky hry",
   "Hear {name}": "Poslechnout {name}",
   "Hear {name} (only you hear it)": "Poslechnout {name} (slyšíte to jen vy)",
   "Pick your headphones in Settings → Audio to hear the samples.": "Vyberte si sluchátka v Nastavení → Zvuk, abyste slyšeli ukázky.",

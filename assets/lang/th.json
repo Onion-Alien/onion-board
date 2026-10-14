@@ -3309,6 +3309,8 @@
   "The downloader is already the newest. The site may have changed in a way it can't handle yet: try again in a few days.": "ตัวดาวน์โหลดเป็นเวอร์ชันล่าสุดแล้ว เว็บไซต์อาจเปลี่ยนไปในแบบที่ยังรับมือไม่ได้ ลองใหม่อีกครั้งในอีกไม่กี่วัน",
   "Update downloader": "อัปเดตตัวดาวน์โหลด",
   "Updating the downloader…": "กำลังอัปเดตตัวดาวน์โหลด…",
+  "Mute the game's sounds": "ปิดเสียงในเกม",
+  "Turn the game's sounds on": "เปิดเสียงในเกม",
   "Hear {name}": "ฟัง {name}",
   "Hear {name} (only you hear it)": "ฟัง {name} (มีแค่คุณที่ได้ยิน)",
   "Pick your headphones in Settings → Audio to hear the samples.": "เลือกหูฟังของคุณใน การตั้งค่า → เสียง เพื่อฟังตัวอย่าง",

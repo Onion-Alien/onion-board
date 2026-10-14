@@ -3385,6 +3385,8 @@
   "The downloader is already the newest. The site may have changed in a way it can't handle yet: try again in a few days.": "Το πρόγραμμα λήψης είναι ήδη το νεότερο. Ο ιστότοπος ίσως άλλαξε με τρόπο που δεν μπορεί να χειριστεί ακόμα: δοκίμασε ξανά σε λίγες μέρες.",
   "Update downloader": "Ενημέρωση προγράμματος λήψης",
   "Updating the downloader…": "Ενημέρωση του προγράμματος λήψης…",
+  "Mute the game's sounds": "Σίγαση ήχων παιχνιδιού",
+  "Turn the game's sounds on": "Ενεργοποίηση ήχων παιχνιδιού",
   "Hear {name}": "Άκου {name}",
   "Hear {name} (only you hear it)": "Άκου {name} (μόνο εσύ το ακούς)",
   "Pick your headphones in Settings → Audio to hear the samples.": "Διάλεξε τα ακουστικά σου στις Ρυθμίσεις → Ήχος για να ακούσεις τα δείγματα.",

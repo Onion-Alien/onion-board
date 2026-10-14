@@ -3385,6 +3385,8 @@
   "The downloader is already the newest. The site may have changed in a way it can't handle yet: try again in a few days.": "Downloaderen er allerede den nyeste. Siden har måske ændret sig på en måde, den ikke kan klare endnu: prøv igen om et par dage.",
   "Update downloader": "Opdater downloader",
   "Updating the downloader…": "Opdaterer downloaderen…",
+  "Mute the game's sounds": "Slå spillets lyde fra",
+  "Turn the game's sounds on": "Slå spillets lyde til",
   "Hear {name}": "Hør {name}",
   "Hear {name} (only you hear it)": "Hør {name} (kun du kan høre den)",
   "Pick your headphones in Settings → Audio to hear the samples.": "Vælg dine hovedtelefoner under Indstillinger → Lyd for at høre prøverne.",

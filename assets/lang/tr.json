@@ -3385,6 +3385,8 @@
   "The downloader is already the newest. The site may have changed in a way it can't handle yet: try again in a few days.": "İndirici zaten en yenisi. Site henüz başa çıkamadığı bir şekilde değişmiş olabilir: birkaç gün sonra yeniden dene.",
   "Update downloader": "İndiriciyi güncelle",
   "Updating the downloader…": "İndirici güncelleniyor…",
+  "Mute the game's sounds": "Oyunun seslerini kapat",
+  "Turn the game's sounds on": "Oyunun seslerini aç",
   "Hear {name}": "{name} dinle",
   "Hear {name} (only you hear it)": "{name} dinle (sadece sen duyarsın)",
   "Pick your headphones in Settings → Audio to hear the samples.": "Örnekleri duymak için Ayarlar → Ses bölümünden kulaklığını seç.",

@@ -3385,6 +3385,8 @@
   "The downloader is already the newest. The site may have changed in a way it can't handle yet: try again in a few days.": "O downloader já é o mais recente. O site pode ter mudado de uma forma que ainda não consegue tratar: tenta de novo daqui a uns dias.",
   "Update downloader": "Atualizar downloader",
   "Updating the downloader…": "A atualizar o downloader…",
+  "Mute the game's sounds": "Silenciar os sons do jogo",
+  "Turn the game's sounds on": "Ligar os sons do jogo",
   "Hear {name}": "Ouvir {name}",
   "Hear {name} (only you hear it)": "Ouvir {name} (só tu ouves)",
   "Pick your headphones in Settings → Audio to hear the samples.": "Escolhe os teus auscultadores em Definições → Áudio para ouvir as amostras.",

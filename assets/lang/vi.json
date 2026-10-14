@@ -3309,6 +3309,8 @@
   "The downloader is already the newest. The site may have changed in a way it can't handle yet: try again in a few days.": "Trình tải xuống đã là bản mới nhất. Trang web có thể đã thay đổi theo cách nó chưa xử lý được: hãy thử lại sau vài ngày.",
   "Update downloader": "Cập nhật trình tải xuống",
   "Updating the downloader…": "Đang cập nhật trình tải xuống…",
+  "Mute the game's sounds": "Tắt âm thanh trò chơi",
+  "Turn the game's sounds on": "Bật âm thanh trò chơi",
   "Hear {name}": "Nghe {name}",
   "Hear {name} (only you hear it)": "Nghe {name} (chỉ bạn nghe thấy)",
   "Pick your headphones in Settings → Audio to hear the samples.": "Chọn tai nghe của bạn trong Cài đặt → Âm thanh để nghe thử.",

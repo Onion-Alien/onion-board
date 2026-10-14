@@ -3309,6 +3309,8 @@
   "The downloader is already the newest. The site may have changed in a way it can't handle yet: try again in a few days.": "ダウンローダーはすでに最新です。サイトがまだ対応できない形に変わったのかもしれません。数日後にもう一度試してください。",
   "Update downloader": "ダウンローダーを更新",
   "Updating the downloader…": "ダウンローダーを更新中…",
+  "Mute the game's sounds": "ゲームの音をミュート",
+  "Turn the game's sounds on": "ゲームの音をオンにする",
   "Hear {name}": "{name} を聴く",
   "Hear {name} (only you hear it)": "{name} を聴く（聞こえるのはあなただけ）",
   "Pick your headphones in Settings → Audio to hear the samples.": "サンプルを聴くには、設定 → オーディオでヘッドホンを選んでください。",

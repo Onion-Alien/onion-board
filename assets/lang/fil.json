@@ -3385,6 +3385,8 @@
   "The downloader is already the newest. The site may have changed in a way it can't handle yet: try again in a few days.": "Pinakabago na ang downloader. Baka nagbago ang site sa paraang hindi pa nito kaya: subukan ulit pagkalipas ng ilang araw.",
   "Update downloader": "I-update ang downloader",
   "Updating the downloader…": "Ina-update ang downloader…",
+  "Mute the game's sounds": "I-mute ang mga tunog ng laro",
+  "Turn the game's sounds on": "Buksan ang mga tunog ng laro",
   "Hear {name}": "Pakinggan ang {name}",
   "Hear {name} (only you hear it)": "Pakinggan ang {name} (ikaw lang ang makakarinig)",
   "Pick your headphones in Settings → Audio to hear the samples.": "Piliin ang headphones mo sa Settings → Audio para marinig ang mga sample.",

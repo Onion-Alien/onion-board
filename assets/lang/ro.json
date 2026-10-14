@@ -3461,6 +3461,8 @@
   "The downloader is already the newest. The site may have changed in a way it can't handle yet: try again in a few days.": "Programul de descărcare e deja cel mai nou. Site-ul s-ar putea să se fi schimbat într-un fel pe care încă nu-l poate gestiona: încearcă din nou peste câteva zile.",
   "Update downloader": "Actualizează programul de descărcare",
   "Updating the downloader…": "Se actualizează programul de descărcare…",
+  "Mute the game's sounds": "Oprește sunetele jocului",
+  "Turn the game's sounds on": "Pornește sunetele jocului",
   "Hear {name}": "Ascultă {name}",
   "Hear {name} (only you hear it)": "Ascultă {name} (doar tu auzi)",
   "Pick your headphones in Settings → Audio to hear the samples.": "Alege-ți căștile în Setări → Audio ca să asculți mostrele.",
