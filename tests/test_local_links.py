@@ -104,8 +104,10 @@ def test_local_import_obeys_setting_and_zip_keeps_file(window, qapp, tmp_path, c
     other = wav(tmp_path / "zipped.wav", hz=1200)
     with zipfile.ZipFile(archive, "w") as z:
         z.write(other, "zipped.wav")
-    window.import_files([str(archive)])
-    assert process_events(qapp, lambda: not window._pending_imports)
+    before = len(window.cfg.sounds)
+    window.import_files([str(archive)])   # looked into on a worker, then imported
+    assert process_events(qapp, lambda: len(window.cfg.sounds) > before
+                          and not window._pending_imports)
     added = window.cfg.sounds[-1]
     assert library.owns(added.file) and Path(added.file).exists()
     library.unlink_cache(added.id)
