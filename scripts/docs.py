@@ -81,7 +81,9 @@ def bust_caches():
         return f"{m.group(1)}{m.group(2)}?v={h}"
     for page in PAGES:
         text = page.read_text(encoding="utf-8")
-        new = re.sub(r"(screenshots/)([\w-]+\.(?:png|webp))(?:\?v=\w+)?", tag, text)
+        # (not Onion Watch's pictures, which the home page links on its own site)
+        new = re.sub(r"(?<!onion-watch/)(screenshots/)([\w-]+\.(?:png|webp))(?:\?v=\w+)?",
+                     tag, text)
         if new != text:
             page.write_text(new, encoding="utf-8")
             print("re-linked pictures in", page.relative_to(ROOT))
