@@ -120,16 +120,17 @@ UPDATE_FEATURE = "ytdlp_update"  # ...and for updating yt-dlp from PyPI
 def site_of(target: str) -> str:
     """Which of net.SITES a search source (a key of SOURCES) or a link belongs to.
     TikTok's button searches YouTube, so it's YouTube's; a pasted TikTok link is
-    "other"."""
+    "other". A site's own picture servers count as the site (a YouTube thumbnail
+    from i.ytimg.com is YouTube's, so its switch stops it too)."""
     if target in SOURCES:
         return {"soundcloud": "soundcloud", "myinstants": "myinstants"}.get(target, "youtube")
     host = (urllib.parse.urlsplit(target).hostname or "").lower().rstrip(".")
 
     def under(*domains):
         return any(host == d or host.endswith("." + d) for d in domains)
-    if under("youtube.com", "youtu.be", "youtube-nocookie.com"):
+    if under("youtube.com", "youtu.be", "youtube-nocookie.com", "ytimg.com", "ggpht.com"):
         return "youtube"
-    if under("soundcloud.com", "snd.sc"):
+    if under("soundcloud.com", "snd.sc", "sndcdn.com"):
         return "soundcloud"
     if under("myinstants.com"):
         return "myinstants"

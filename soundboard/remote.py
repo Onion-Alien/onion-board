@@ -66,8 +66,11 @@ On the home network the key needn't travel at all: a request can instead carry
 `X-Sig: <unix time>.<nonce>.<HMAC-SHA256(key, "<time>.<nonce>.<METHOD> <path>")>`
 (base64url, no padding), where <path> is the request target as sent ("/api/play?id=…").
 Someone reading the Wi-Fi's traffic sees only signatures: each is good for one request,
-within SIG_WINDOW_S of this PC's clock, and a nonce is never taken twice. A wrong key's
-401 carries `now`, this PC's clock, so a phone whose clock is off can sign again.
+within SIG_WINDOW_S of this PC's clock and not from before the server (re)started, and a
+nonce isn't taken twice while it runs. The nonces are kept in memory only, so after a
+restart (of the app, or of the server) a signature from before it is refused by its
+time instead: one read off the Wi-Fi can't be sent again then. A wrong key's 401
+carries `now`, this PC's clock, so a phone whose clock is off can sign again.
 Onion Pocket signs from the version that sees `RemoteHost.signed_requests`; the plain
 key header still works for older ones.
 
@@ -363,6 +366,7 @@ class RemoteControl(QObject):
         self._fails: dict[str, tuple[int, float]] = {}   # peer -> (wrong keys, locked until)
         self._fails_lock = threading.Lock()
         self._nonces: dict[str, float] = {}   # lan: nonce -> forget it after (monotonic)
+        self._started = 0   # lan: the unix second it last started; older signatures refused
         self.request.connect(self._on_request, Qt.ConnectionType.QueuedConnection)
         self._network = QTimer(self)
         self._network.setInterval(int(NETWORK_CHECK_S * 1000))
@@ -380,7 +384,9 @@ class RemoteControl(QObject):
         self.token, self.port, self.error, self.host = token, int(port), "", host
         with self._fails_lock:
             self._fails.clear()
-            self._nonces.clear()
+            # nonces stay until they're stale: a quick restart still knows them. What it
+            # (or a new launch) doesn't know, a signature made before now, signed() refuses
+            self._started = int(time.time())
         if not token:
             self.error = "no token"
             return False
@@ -486,6 +492,8 @@ class RemoteControl(QObject):
         if not (ts.isascii() and ts.isdigit() and len(ts) <= 12 and _NONCE.fullmatch(nonce)):
             return False
         if abs(time.time() - int(ts)) > SIG_WINDOW_S:
+            return False
+        if int(ts) < self._started:   # made before a restart, whose nonces weren't kept
             return False
         want = base64.urlsafe_b64encode(hmac.new(
             self.token.encode(), f"{ts}.{nonce}.{request}".encode(), hashlib.sha256)
@@ -1174,7 +1182,7 @@ def apply(mw: MainWindow, ctl: RemoteControl) -> str:
         return ""
     if not cfg.api_token:
         cfg.api_token = new_token()
-        cfg.save()
+        mw._save_now()   # on the saver's thread: never the whole config on the UI thread
     if ctl.running and ctl.port == cfg.api_port and ctl.token == cfg.api_token:
         return ""
     ctl.start(cfg.api_port, cfg.api_token)
