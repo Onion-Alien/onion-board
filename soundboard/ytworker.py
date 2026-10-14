@@ -31,12 +31,14 @@ IDLE_S = 600            # a helper with nothing to do quits after this
 START_TIMEOUT_S = 30    # to start and connect back
 LOOKUP_TIMEOUT_S = 120  # a search or look-up; a download's limit is the caller's
 KEEP = 1                # helpers kept waiting
+RETRY_S = 300           # after a helper failed to start, in-process until then
 
 enabled = False
 _lock = threading.Lock()
 _idle: list[_Helper] = []
 _gen = 0                # bumped by drop_all(): helpers started before don't come back
 _warming = False
+_failed_at: float | None = None   # when a helper last failed to start
 
 
 class Unavailable(RuntimeError):
@@ -72,14 +74,31 @@ class _Helper:
                                      stdin=subprocess.DEVNULL, stdout=subprocess.DEVNULL,
                                      stderr=subprocess.DEVNULL, close_fds=True)
         got: list = []
-        t = threading.Thread(target=lambda: got.append(listener.accept()), daemon=True,
-                             name="ytdl-helper-accept")
+
+        def accept():
+            try:
+                got.append(listener.accept())
+            except (OSError, EOFError) as e:   # woken by _wake() below, or the child broke
+                log.debug("download helper's connection: %s", e)
+        t = threading.Thread(target=accept, daemon=True, name="ytdl-helper-accept")
         t.start()
-        t.join(START_TIMEOUT_S)
+        deadline = time.monotonic() + START_TIMEOUT_S
+        # A helper that already quit (a broken install, yt-dlp failing to import) is
+        # seen within a tick, not after the whole START_TIMEOUT_S.
+        while t.is_alive() and self.proc.poll() is None and time.monotonic() < deadline:
+            t.join(0.05)
+        t.join(0.2)   # it connected just before quitting: take the answer
         if not got:
+            code = self.proc.poll()
             self.proc.kill()
+            _wait(self.proc)
+            _wake(listener.address)   # accept() blocks until someone connects
+            t.join(2)
+            for c in got:
+                c.close()
             listener.close()
-            raise Unavailable("the download helper didn't start")
+            raise Unavailable("the download helper didn't start" if code is None else
+                              f"the download helper quit at start (code {code})")
         listener.close()
         self.conn = got[0]
 
@@ -93,6 +112,7 @@ class _Helper:
             pass
         if self.proc.poll() is None:
             self.proc.kill()
+        _wait(self.proc)
 
     def call(self, request: tuple, timeout: float, progress=None):
         try:
@@ -114,6 +134,37 @@ class _Helper:
             raise Unavailable(f"the download helper stopped: {e}") from e
 
 
+def _wait(proc):
+    try:
+        proc.wait(5)
+    except subprocess.TimeoutExpired:
+        log.info("the download helper (%s) is slow to quit", proc.pid)
+
+
+def _wake(address):
+    """Connects to a Listener waiting in accept() and hangs up, so accept() returns
+    (its handshake fails) and its thread ends."""
+    try:
+        Client(address).close()
+    except OSError:
+        pass
+
+
+def _start() -> _Helper:
+    """A new helper. One that can't start is not tried again for RETRY_S: the
+    callers run yt-dlp in-process straight away instead of waiting for it each time."""
+    global _failed_at
+    with _lock:
+        if _failed_at is not None and time.monotonic() - _failed_at < RETRY_S:
+            raise Unavailable("the download helper failed to start a moment ago")
+    try:
+        return _Helper()
+    except Exception:
+        with _lock:
+            _failed_at = time.monotonic()
+        raise
+
+
 def _take() -> _Helper:
     with _lock:
         while _idle:
@@ -121,7 +172,7 @@ def _take() -> _Helper:
             if h.alive():
                 return h
             h.kill()
-    return _Helper()
+    return _start()
 
 
 def _give_back(h: _Helper):
@@ -145,7 +196,7 @@ def warm():
     def start():
         global _warming
         try:
-            _give_back(_Helper())
+            _give_back(_start())
         except Exception as e:  # noqa: BLE001 - the next call starts one (or runs in-process)
             log.info("couldn't start the download helper ahead: %s", e)
         finally:
@@ -154,10 +205,12 @@ def warm():
 
 
 def drop_all():
-    """yt-dlp was updated or reset, or the app is closing: no helper keeps the old copy."""
-    global _gen
+    """yt-dlp was updated or reset, or the app is closing: no helper keeps the old copy
+    (and a new copy may start where the old one failed)."""
+    global _gen, _failed_at
     with _lock:
         _gen += 1
+        _failed_at = None
         old, _idle[:] = list(_idle), []
     for h in old:
         h.kill()
