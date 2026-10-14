@@ -211,3 +211,55 @@ def test_a_picture_that_cant_go_in_the_bin_doesnt_lose_the_sound(app_dir, monkey
     [it] = trash.items(trash.SOUND)   # listed, so it can come back
     back = trash.meta_of(trash.take(it.id))
     assert Path(back.file).exists() and Path(back.image) == Path(m.image)
+
+
+def _restart(qapp):
+    """Start the app again on the same settings (the window fixture's fakes still on)."""
+    from PySide6.QtCore import QEvent
+
+    from soundboard.ui import mainwindow as main
+    w = main.MainWindow()
+    w._load_thread.join(15)
+    ids = [m.id for m in w.cfg.sounds]
+    w.close()
+    w._load_thread.join(15)
+    w.deleteLater()
+    qapp.sendPostedEvents(None, QEvent.DeferredDelete)
+    return ids
+
+
+def test_a_crash_while_the_undo_bar_is_up_still_bins_the_removed_sound(window, qapp):  # noqa: F811
+    m = window.meta("s1")
+    m.hotkey, m.volume, m.tags = "f7", 1.5, ["Memes"]
+    window.remove_sound("s1")
+    assert window._saver.flush()   # saved without it...
+    window._removed.clear()   # ...then the app dies before the Undo bar goes
+    assert trash.items(trash.SOUND) == []
+    assert _restart(qapp) == ["s0"]
+    [it] = trash.items(trash.SOUND)   # in Recently deleted, with its pad
+    back = trash.meta_of(it)
+    assert (back.id, back.name, back.hotkey, back.volume, back.tags, it.index) == \
+        ("s1", "Airhorn", "f7", 1.5, ["Memes"], 1)
+    assert not (trash.folder() / "removing.json").exists()
+    _restart(qapp)                    # only once
+    assert len(trash.items(trash.SOUND)) == 1
+
+
+def test_undo_and_the_undo_bar_closing_leave_nothing_to_finish(window, qapp):  # noqa: F811
+    window.remove_sound("s1")
+    window.undo_remove()
+    assert not (trash.folder() / "removing.json").exists()
+    window.remove_sound("s0")
+    window._finish_removals()
+    assert not (trash.folder() / "removing.json").exists() and window._saver.flush()
+    assert _restart(qapp) == ["s1"] and len(trash.items(trash.SOUND)) == 1
+
+
+def test_finish_held_skips_sounds_still_on_the_board_or_already_binned(app_dir):
+    a, b, c = (_sound(app_dir, s) for s in ("h1", "h2", "h3"))
+    trash.hold([(a, 0), (b, 1), (c, 2)])
+    trash.put_sound(b, 1)   # it stopped while the bar's sounds were going in
+    assert trash.finish_held({"h1"}) == 1   # h1: the settings weren't saved yet
+    assert sorted(i.data["id"] for i in trash.items()) == ["h2", "h3"]
+    assert Path(a.file).exists() and (trash.folder() / "h3.wav").exists()
+    assert trash.finish_held(set()) == 0   # done: the note is gone

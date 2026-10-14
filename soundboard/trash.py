@@ -164,6 +164,61 @@ def put_sound(meta: SoundMeta, index: int) -> None:
         _destroy(item)   # audio to the Recycle Bin, as a removal used to
 
 
+def _held() -> Path:
+    return folder() / "removing.json"
+
+
+def hold(entries: list[tuple[SoundMeta, int]]) -> None:
+    """Sounds on the Undo bar: off the board but not in the bin yet. Written down
+    before the settings are saved without them, so a crash or power cut before the
+    bar goes doesn't lose their pads (finish_held() bins them on the next start)."""
+    data = [{"index": i, "data": library._with_raw(asdict(m), m)} for m, i in entries]
+    try:
+        folder().mkdir(parents=True, exist_ok=True)
+        tmp = _held().with_suffix(".tmp")
+        tmp.write_text(json.dumps({"sounds": data}, indent=1), encoding="utf-8")
+        tmp.replace(_held())
+    except OSError:
+        log.warning("couldn't write %s", _held(), exc_info=True)
+
+
+def release() -> None:
+    """The held sounds were put back (Undo) or are in the bin now."""
+    try:
+        _held().unlink(missing_ok=True)
+    except OSError:
+        log.warning("couldn't delete %s", _held(), exc_info=True)
+
+
+def finish_held(on_board: set[str]) -> int:
+    """At startup: sounds that were on the Undo bar when the app last stopped without
+    closing go into the bin now, with their pads. Ones still on the board (it stopped
+    before the settings were saved) or already in the bin are skipped. How many went in."""
+    try:
+        raw = json.loads(_held().read_text(encoding="utf-8"))
+    except FileNotFoundError:
+        return 0
+    except (OSError, ValueError):
+        log.warning("couldn't read %s", _held(), exc_info=True)
+        return 0
+    binned = {i.data.get("id") for i in load() if i.kind == SOUND}
+    n = 0
+    for e in raw.get("sounds", []) if isinstance(raw, dict) else []:
+        try:
+            m = meta_of(Item("", SOUND, "", 0, dict(e["data"])))
+            index = int(e.get("index", 0))
+        except (KeyError, TypeError, ValueError, AttributeError):
+            continue
+        if m is None or m.id in on_board or m.id in binned:
+            continue
+        put_sound(m, index)
+        n += 1
+    release()
+    if n:
+        log.info("put %d sound(s) left on the Undo bar into Recently deleted", n)
+    return n
+
+
 def put_app(exe: str, spec: dict, name: str, hidden: bool = False, path: str = "") -> Item:
     """A program was forgotten: keep what was remembered about it (`spec`, maybe
     empty), and whether it was also taken off the Apps tab's list (`hidden`). `path`:
