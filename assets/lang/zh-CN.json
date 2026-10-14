@@ -4,7 +4,6 @@
   "_meta": {
     "name": "简体中文"
   },
-  " A newer yt-dlp may fix this: Settings → Updates → Update now.": "新版 yt-dlp 也许能解决：设置 → 更新 → 立即更新。",
   " and ": "和",
   " · right-click to rename, delete or give it a random-sound hotkey · drag to reorder": " · 右键可重命名、删除或设置随机音效快捷键 · 拖动可排序",
   " · shows by itself when {progs} is in front": " · {progs} 在前台时自动显示",
@@ -3313,5 +3312,11 @@
   "steady": "平稳",
   "{n} sound couldn't be read and was left out.": [
     "有 {n} 个音效无法读取，已跳过。"
-  ]
+  ],
+  " A newer downloader may fix this.": " 更新的下载器也许能解决。",
+  "Couldn't update the downloader: {error}": "无法更新下载器：{error}",
+  "Get the newest yt-dlp, the part that downloads from YouTube and other sites, then try this link again": "获取最新的 yt-dlp（从 YouTube 和其他网站下载的部分），然后重试这个链接",
+  "The downloader is already the newest. The site may have changed in a way it can't handle yet: try again in a few days.": "下载器已经是最新的。网站可能改成了它暂时处理不了的样子：过几天再试试。",
+  "Update downloader": "更新下载器",
+  "Updating the downloader…": "正在更新下载器…"
 }

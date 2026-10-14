@@ -4,7 +4,6 @@
   "_meta": {
     "name": "Română"
   },
-  " A newer yt-dlp may fix this: Settings → Updates → Update now.": " Un yt-dlp mai nou poate rezolva asta: Setări → Actualizări → Actualizează acum.",
   " and ": " și ",
   " · right-click to rename, delete or give it a random-sound hotkey · drag to reorder": " · clic dreapta ca s-o redenumești, s-o ștergi sau să-i dai o tastă rapidă pentru sunet aleatoriu · trage ca să reordonezi",
   " · shows by itself when {progs} is in front": " · apare singură când {progs} e în față",
@@ -3465,5 +3464,11 @@
     "{n} sunet nu a putut fi citit și a fost lăsat deoparte.",
     "{n} sunete nu au putut fi citite și au fost lăsate deoparte.",
     "{n} de sunete nu au putut fi citite și au fost lăsate deoparte."
-  ]
+  ],
+  " A newer downloader may fix this.": " Un program de descărcare mai nou ar putea rezolva asta.",
+  "Couldn't update the downloader: {error}": "Programul de descărcare nu a putut fi actualizat: {error}",
+  "Get the newest yt-dlp, the part that downloads from YouTube and other sites, then try this link again": "Ia cel mai nou yt-dlp, partea care descarcă de pe YouTube și alte site-uri, apoi încearcă din nou acest link",
+  "The downloader is already the newest. The site may have changed in a way it can't handle yet: try again in a few days.": "Programul de descărcare e deja cel mai nou. Site-ul s-ar putea să se fi schimbat într-un fel pe care încă nu-l poate gestiona: încearcă din nou peste câteva zile.",
+  "Update downloader": "Actualizează programul de descărcare",
+  "Updating the downloader…": "Se actualizează programul de descărcare…"
 }

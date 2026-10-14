@@ -4,7 +4,6 @@
   "_meta": {
     "name": "Norsk"
   },
-  " A newer yt-dlp may fix this: Settings → Updates → Update now.": " En nyere yt-dlp kan fikse dette: Innstillinger → Oppdateringer → Oppdater nå.",
   " and ": " og ",
   " · right-click to rename, delete or give it a random-sound hotkey · drag to reorder": " · høyreklikk for å gi nytt navn, slette eller gi den en hurtigtast for tilfeldig lyd · dra for å endre rekkefølgen",
   " · shows by itself when {progs} is in front": " · vises av seg selv når {progs} er i forgrunnen",
@@ -3389,5 +3388,11 @@
   "{n} sound couldn't be read and was left out.": [
     "{n} lyd kunne ikke leses og ble utelatt.",
     "{n} lyder kunne ikke leses og ble utelatt."
-  ]
+  ],
+  " A newer downloader may fix this.": " En nyere nedlaster kan kanskje fikse dette.",
+  "Couldn't update the downloader: {error}": "Kunne ikke oppdatere nedlasteren: {error}",
+  "Get the newest yt-dlp, the part that downloads from YouTube and other sites, then try this link again": "Henter nyeste yt-dlp, delen som laster ned fra YouTube og andre sider, og prøver denne lenken igjen",
+  "The downloader is already the newest. The site may have changed in a way it can't handle yet: try again in a few days.": "Nedlasteren er allerede den nyeste. Siden kan ha endret seg på en måte den ikke takler ennå: prøv igjen om noen dager.",
+  "Update downloader": "Oppdater nedlasteren",
+  "Updating the downloader…": "Oppdaterer nedlasteren…"
 }

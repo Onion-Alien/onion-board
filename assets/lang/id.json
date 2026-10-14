@@ -4,7 +4,6 @@
   "_meta": {
     "name": "Bahasa Indonesia"
   },
-  " A newer yt-dlp may fix this: Settings → Updates → Update now.": " yt-dlp versi baru mungkin bisa memperbaiki ini: Pengaturan → Pembaruan → Perbarui sekarang.",
   " and ": " dan ",
   " · right-click to rename, delete or give it a random-sound hotkey · drag to reorder": " · klik kanan untuk ganti nama, hapus, atau memberi hotkey suara acak · seret untuk mengurutkan",
   " · shows by itself when {progs} is in front": " · muncul sendiri saat {progs} di depan",
@@ -3313,5 +3312,11 @@
   "steady": "stabil",
   "{n} sound couldn't be read and was left out.": [
     "{n} suara tidak bisa dibaca dan dilewati."
-  ]
+  ],
+  " A newer downloader may fix this.": " Pengunduh yang lebih baru mungkin bisa memperbaikinya.",
+  "Couldn't update the downloader: {error}": "Tidak bisa memperbarui pengunduh: {error}",
+  "Get the newest yt-dlp, the part that downloads from YouTube and other sites, then try this link again": "Ambil yt-dlp terbaru, bagian yang mengunduh dari YouTube dan situs lain, lalu coba tautan ini lagi",
+  "The downloader is already the newest. The site may have changed in a way it can't handle yet: try again in a few days.": "Pengunduh sudah yang terbaru. Situsnya mungkin berubah dengan cara yang belum bisa ditangani: coba lagi dalam beberapa hari.",
+  "Update downloader": "Perbarui pengunduh",
+  "Updating the downloader…": "Memperbarui pengunduh…"
 }
