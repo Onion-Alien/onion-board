@@ -3385,6 +3385,10 @@
   "rumble": "gümbürtü",
   "seasick": "deniz tutmuş",
   "steady": "sabit",
+  "{n} sound couldn't be read and was left out.": [
+    "{n} ses okunamadı ve dışarıda bırakıldı.",
+    "{n} ses okunamadı ve dışarıda bırakıldı."
+  ],
   " A newer downloader may fix this.": " Daha yeni bir indirici bunu düzeltebilir.",
   "Couldn't update the downloader: {error}": "İndirici güncellenemedi: {error}",
   "Get the newest yt-dlp, the part that downloads from YouTube and other sites, then try this link again": "YouTube ve diğer sitelerden indiren kısım olan en yeni yt-dlp'yi alır, sonra bu bağlantıyı yeniden dener",

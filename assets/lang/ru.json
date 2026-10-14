@@ -3460,6 +3460,11 @@
   "rumble": "гул",
   "seasick": "морская болезнь",
   "steady": "ровно",
+  "{n} sound couldn't be read and was left out.": [
+    "{n} звук не удалось прочитать, он пропущен.",
+    "{n} звука не удалось прочитать, они пропущены.",
+    "{n} звуков не удалось прочитать, они пропущены."
+  ],
   " A newer downloader may fix this.": " Более новый загрузчик может это исправить.",
   "Couldn't update the downloader: {error}": "Не удалось обновить загрузчик: {error}",
   "Get the newest yt-dlp, the part that downloads from YouTube and other sites, then try this link again": "Скачать самый новый yt-dlp, часть, которая загружает с YouTube и других сайтов, и попробовать эту ссылку снова",

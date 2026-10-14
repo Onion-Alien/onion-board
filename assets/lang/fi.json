@@ -3385,6 +3385,10 @@
   "rumble": "jyrinä",
   "seasick": "merisairas",
   "steady": "tasainen",
+  "{n} sound couldn't be read and was left out.": [
+    "{n} ääni jäi pois, koska sitä ei voitu lukea.",
+    "{n} ääntä jäi pois, koska niitä ei voitu lukea."
+  ],
   " A newer downloader may fix this.": " Uudempi latausohjelma voi korjata tämän.",
   "Couldn't update the downloader: {error}": "Latausohjelmaa ei voitu päivittää: {error}",
   "Get the newest yt-dlp, the part that downloads from YouTube and other sites, then try this link again": "Hae uusin yt-dlp, osa joka lataa YouTubesta ja muilta sivuilta, ja kokeile tätä linkkiä uudelleen",

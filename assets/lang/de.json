@@ -3385,6 +3385,10 @@
   "rumble": "Grollen",
   "seasick": "seekrank",
   "steady": "ruhig",
+  "{n} sound couldn't be read and was left out.": [
+    "{n} Sound konnte nicht gelesen werden und wurde weggelassen.",
+    "{n} Sounds konnten nicht gelesen werden und wurden weggelassen."
+  ],
   " A newer downloader may fix this.": " Ein neuerer Downloader könnte das beheben.",
   "Couldn't update the downloader: {error}": "Downloader konnte nicht aktualisiert werden: {error}",
   "Get the newest yt-dlp, the part that downloads from YouTube and other sites, then try this link again": "Holt das neueste yt-dlp, den Teil, der von YouTube und anderen Seiten herunterlädt, und versucht diesen Link dann noch mal",

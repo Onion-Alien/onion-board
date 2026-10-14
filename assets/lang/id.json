@@ -3310,6 +3310,9 @@
   "rumble": "gemuruh",
   "seasick": "mabuk laut",
   "steady": "stabil",
+  "{n} sound couldn't be read and was left out.": [
+    "{n} suara tidak bisa dibaca dan dilewati."
+  ],
   " A newer downloader may fix this.": " Pengunduh yang lebih baru mungkin bisa memperbaikinya.",
   "Couldn't update the downloader: {error}": "Tidak bisa memperbarui pengunduh: {error}",
   "Get the newest yt-dlp, the part that downloads from YouTube and other sites, then try this link again": "Ambil yt-dlp terbaru, bagian yang mengunduh dari YouTube dan situs lain, lalu coba tautan ini lagi",

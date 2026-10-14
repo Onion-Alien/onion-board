@@ -3685,6 +3685,14 @@
   "rumble": "هدير",
   "seasick": "دوار",
   "steady": "ثابت",
+  "{n} sound couldn't be read and was left out.": [
+    "تعذّرت قراءة {n} صوت فتُرك.",
+    "تعذّرت قراءة {n} صوت فتُرك.",
+    "تعذّرت قراءة {n} صوتين فتُركا.",
+    "تعذّرت قراءة {n} أصوات فتُركت.",
+    "تعذّرت قراءة {n} صوتًا فتُركت.",
+    "تعذّرت قراءة {n} صوت فتُركت."
+  ],
   " A newer downloader may fix this.": " قد يحل برنامج تنزيل أحدث هذه المشكلة.",
   "Couldn't update the downloader: {error}": "تعذّر تحديث برنامج التنزيل: {error}",
   "Get the newest yt-dlp, the part that downloads from YouTube and other sites, then try this link again": "احصل على أحدث yt-dlp، الجزء الذي ينزّل من YouTube ومواقع أخرى، ثم جرّب هذا الرابط مرة أخرى",

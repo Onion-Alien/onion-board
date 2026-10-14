@@ -3385,6 +3385,10 @@
   "rumble": "morajlás",
   "seasick": "tengeribeteg",
   "steady": "egyenletes",
+  "{n} sound couldn't be read and was left out.": [
+    "{n} hangot nem sikerült beolvasni, ezért kimaradt.",
+    "{n} hangot nem sikerült beolvasni, ezért kimaradtak."
+  ],
   " A newer downloader may fix this.": " Egy újabb letöltő talán megoldja.",
   "Couldn't update the downloader: {error}": "Nem sikerült frissíteni a letöltőt: {error}",
   "Get the newest yt-dlp, the part that downloads from YouTube and other sites, then try this link again": "Letölti a legújabb yt-dlp-t, azt a részt, ami a YouTube-ról és más oldalakról tölt le, majd újra megpróbálja ezt a linket",

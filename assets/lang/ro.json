@@ -3460,6 +3460,11 @@
   "rumble": "huruit",
   "seasick": "rău de mare",
   "steady": "stabil",
+  "{n} sound couldn't be read and was left out.": [
+    "{n} sunet nu a putut fi citit și a fost lăsat deoparte.",
+    "{n} sunete nu au putut fi citite și au fost lăsate deoparte.",
+    "{n} de sunete nu au putut fi citite și au fost lăsate deoparte."
+  ],
   " A newer downloader may fix this.": " Un program de descărcare mai nou ar putea rezolva asta.",
   "Couldn't update the downloader: {error}": "Programul de descărcare nu a putut fi actualizat: {error}",
   "Get the newest yt-dlp, the part that downloads from YouTube and other sites, then try this link again": "Ia cel mai nou yt-dlp, partea care descarcă de pe YouTube și alte site-uri, apoi încearcă din nou acest link",

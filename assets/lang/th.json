@@ -3310,6 +3310,9 @@
   "rumble": "เสียงครืน",
   "seasick": "เมาเรือ",
   "steady": "นิ่ง",
+  "{n} sound couldn't be read and was left out.": [
+    "อ่าน {n} เสียงไม่ได้ จึงข้ามไป"
+  ],
   " A newer downloader may fix this.": " ตัวดาวน์โหลดที่ใหม่กว่าอาจแก้ปัญหานี้ได้",
   "Couldn't update the downloader: {error}": "อัปเดตตัวดาวน์โหลดไม่ได้: {error}",
   "Get the newest yt-dlp, the part that downloads from YouTube and other sites, then try this link again": "รับ yt-dlp ล่าสุด ซึ่งเป็นส่วนที่ดาวน์โหลดจาก YouTube และเว็บอื่น แล้วลองลิงก์นี้อีกครั้ง",

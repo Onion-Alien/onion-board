@@ -3385,6 +3385,10 @@
   "rumble": "βουητό",
   "seasick": "ναυτία",
   "steady": "σταθερό",
+  "{n} sound couldn't be read and was left out.": [
+    "{n} ήχος δεν διαβάστηκε και παραλείφθηκε.",
+    "{n} ήχοι δεν διαβάστηκαν και παραλείφθηκαν."
+  ],
   " A newer downloader may fix this.": " Ένα νεότερο πρόγραμμα λήψης μπορεί να το διορθώσει.",
   "Couldn't update the downloader: {error}": "Δεν ήταν δυνατή η ενημέρωση του προγράμματος λήψης: {error}",
   "Get the newest yt-dlp, the part that downloads from YouTube and other sites, then try this link again": "Παίρνει το νεότερο yt-dlp, το κομμάτι που κατεβάζει από το YouTube και άλλους ιστότοπους, και δοκιμάζει ξανά αυτόν τον σύνδεσμο",

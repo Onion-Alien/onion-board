@@ -3310,6 +3310,9 @@
   "rumble": "ầm ầm",
   "seasick": "say sóng",
   "steady": "ổn định",
+  "{n} sound couldn't be read and was left out.": [
+    "Không đọc được {n} âm thanh nên đã bỏ qua."
+  ],
   " A newer downloader may fix this.": " Trình tải xuống mới hơn có thể sửa được lỗi này.",
   "Couldn't update the downloader: {error}": "Không thể cập nhật trình tải xuống: {error}",
   "Get the newest yt-dlp, the part that downloads from YouTube and other sites, then try this link again": "Lấy yt-dlp mới nhất, phần tải xuống từ YouTube và các trang khác, rồi thử lại liên kết này",

@@ -3385,6 +3385,10 @@
   "rumble": "buldring",
   "seasick": "sjøsyk",
   "steady": "stødig",
+  "{n} sound couldn't be read and was left out.": [
+    "{n} lyd kunne ikke leses og ble utelatt.",
+    "{n} lyder kunne ikke leses og ble utelatt."
+  ],
   " A newer downloader may fix this.": " En nyere nedlaster kan kanskje fikse dette.",
   "Couldn't update the downloader: {error}": "Kunne ikke oppdatere nedlasteren: {error}",
   "Get the newest yt-dlp, the part that downloads from YouTube and other sites, then try this link again": "Henter nyeste yt-dlp, delen som laster ned fra YouTube og andre sider, og prøver denne lenken igjen",

@@ -3310,6 +3310,9 @@
   "rumble": "うなり",
   "seasick": "船酔い",
   "steady": "安定",
+  "{n} sound couldn't be read and was left out.": [
+    "{n} 個のサウンドを読み込めなかったため、含めませんでした。"
+  ],
   " A newer downloader may fix this.": " 新しいダウンローダーで直るかもしれません。",
   "Couldn't update the downloader: {error}": "ダウンローダーを更新できませんでした: {error}",
   "Get the newest yt-dlp, the part that downloads from YouTube and other sites, then try this link again": "最新の yt-dlp（YouTube などのサイトからダウンロードする部分）を取得して、このリンクをもう一度試します",

@@ -3310,6 +3310,9 @@
   "rumble": "隆隆",
   "seasick": "暈船",
   "steady": "平穩",
+  "{n} sound couldn't be read and was left out.": [
+    "有 {n} 個音效無法讀取，已略過。"
+  ],
   " A newer downloader may fix this.": " 更新的下載器或許能解決。",
   "Couldn't update the downloader: {error}": "無法更新下載器：{error}",
   "Get the newest yt-dlp, the part that downloads from YouTube and other sites, then try this link again": "取得最新的 yt-dlp（從 YouTube 和其他網站下載的部分），然後重試這個連結",
