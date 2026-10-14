@@ -208,11 +208,11 @@ def test_settings_follows_the_download_and_a_fix(window, monkeypatch):  # noqa: 
     d = _data_page(window)
     d._ffmpeg_sync()
     assert "360p" in d._save_video_hint.text()
-    window._ff_getting, window._ff_percent = True, 42
-    window._ffmpeg_news()
+    window.ffctl.getting, window.ffctl.percent = True, 42
+    window.ffctl.news()
     assert "42%" in d.ff_note.text() and d.btn_ffmpeg.text() == "Getting FFmpeg…"
     h = _ff(monkeypatch, ffmpegget.OK)
-    window._ff_getting = False
-    window._on_ffmpeg(h, "")               # the fix worked
+    window.ffctl.getting = False
+    window.ffctl.on_answer(h, "")               # the fix worked
     assert d.ff_state.text() == "Working: version 9.0.1" and d.btn_ffmpeg.text() == "Reinstall"
     assert "ready" in d.ff_note.text() and "360p" not in d._save_video_hint.text()
