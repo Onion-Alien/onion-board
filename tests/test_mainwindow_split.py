@@ -9,7 +9,7 @@ from soundboard.ui import (aboutcontrol, alertcontrol, appsetupcontrol, buncontr
                            importcontrol, languagecontrol, mainwindow, miccontrol, padcontrol,
                            playbackcontrol, remoteaccess, removecontrol, routecontrol,
                            searchcontrol, settingscontrol, statuscontrol, tabcontrol, themecontrol,
-                           tickcontrol, tipcontrol, transportcontrol, updatecontrol)
+                           tickcontrol, tipcontrol, transportcontrol, updatecontrol, windowbuild)
 from test_mainwindow import window  # noqa: F401  (the real MainWindow fixture)
 
 # (window attribute, controller class, methods that live there now)
@@ -93,6 +93,8 @@ SPLIT = [
     ("fitctl", fitcontrol.FitControl,
      ["_init_fit", "_refit", "_refit_layout", "is_mini", "_set_mini", "_squeeze_rail",
       "_fit_body_top", "_fit_toolbar", "_fit_mixer", "_stack_setup"]),
+    ("builder", windowbuild.WindowBuilder,
+     ["_build_ui", "_build_mini", "_build_mixer", "_build_sounds_page", "_build_setup_page"]),
 ]
 
 

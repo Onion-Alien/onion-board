@@ -145,7 +145,7 @@ class TabControl(Controller):
                        lambda: mw.setctl.open_settings("tabs"))
         # Bun mode from the full window too (the mini player has its own Bun button)
         menu.addSeparator()
-        act = menu.addAction(mw._bun_icon(), _("Turn into Bun"), mw.bunctl.enter_bun_mode)
+        act = menu.addAction(mw.builder._bun_icon(), _("Turn into Bun"), mw.bunctl.enter_bun_mode)
         act.setToolTip(BUN_TIP)
         menu.setToolTipsVisible(True)
         return menu

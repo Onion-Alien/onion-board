@@ -7,7 +7,7 @@ from conftest import process_events
 from test_mainwindow import window  # noqa: F401 - the real window, offscreen
 
 from soundboard import appaudio, directmic
-from soundboard.ui import tickcontrol
+from soundboard.ui import tickcontrol, windowbuild
 
 
 def test_windows_default_output_is_only_asked_while_followed(window, monkeypatch, qapp):  # noqa: F811
@@ -123,13 +123,12 @@ def test_mic_check_pulse_runs_only_while_shown_in_front(window, monkeypatch, qap
 
 
 def test_mic_check_pulse_steps_about_16_times_a_second_along_the_same_curve(window):  # noqa: F811
-    from soundboard.ui import mainwindow as main
     pulse = window._pulse
     assert 1000 / pulse.timer.interval() <= 20        # the animation ran at 60
     assert pulse.opacity_at(0) == 1.0
-    assert abs(pulse.opacity_at(main.PULSE_MS / 2) - main.PULSE_LOW) < 1e-9
-    assert abs(pulse.opacity_at(main.PULSE_MS / 4) - (1 + main.PULSE_LOW) / 2) < 1e-9
-    assert pulse.opacity_at(main.PULSE_MS) == 1.0     # and round again
+    assert abs(pulse.opacity_at(windowbuild.PULSE_MS / 2) - windowbuild.PULSE_LOW) < 1e-9
+    assert abs(pulse.opacity_at(windowbuild.PULSE_MS / 4) - (1 + windowbuild.PULSE_LOW) / 2) < 1e-9
+    assert pulse.opacity_at(windowbuild.PULSE_MS) == 1.0     # and round again
 
 
 def test_ui_tick_goes_over_only_the_pads_showing_a_sound(window, monkeypatch):  # noqa: F811

@@ -1,9 +1,9 @@
 """Settings > Tabs: switching the Radio, Apps, Triggers and Voice tabs off and on
 (Config.tabs_off, ui/taboff.py). A switched-off tab is hidden and never built."""
 import pytest
-from PySide6.QtCore import QPoint, Qt
-
 from conftest import process_events
+from PySide6.QtCore import QPoint, Qt
+from test_mainwindow import window as main_window  # noqa: F401  (the real MainWindow)
 
 from soundboard import remote
 from soundboard.library import Config, clean_setting
@@ -12,9 +12,9 @@ from soundboard.ui import mainwindow as main
 from soundboard.ui import taboff
 from soundboard.ui.appspanel import AppsTab
 from soundboard.ui.radiopanel import RadioTab
+from soundboard.ui.tabcontrol import TABS
 from soundboard.ui.triggerstab import TriggersTab
 from soundboard.ui.voicepanel import VoicePanel
-from test_mainwindow import window as main_window  # noqa: F401  (the real MainWindow)
 
 REAL = {"radio": RadioTab, "apps": AppsTab, "triggers": TriggersTab, "voice": VoicePanel}
 
@@ -34,7 +34,7 @@ def test_off_hides_the_tab_and_on_builds_it_again(window):
         assert not w.tabs.isTabVisible(i)
         assert key in w.cfg.tabs_off
     assert w.engine.voice_chain is None        # the voice chain went with the tab
-    assert w.tabs.count() == len(main.TABS)    # every tab keeps its place
+    assert w.tabs.count() == len(TABS)    # every tab keeps its place
     for key, cls in REAL.items():
         w.tabctl.set_tab_on(key, True)
         i = main.TAB_INDEX[key]
@@ -42,7 +42,7 @@ def test_off_hides_the_tab_and_on_builds_it_again(window):
         page = w.radio_page if key == "radio" else getattr(w, key)
         assert w.tabs.widget(i) is page
         # no description on hover: just the name, and only while the tab is icon-only
-        assert w.tabs.tabToolTip(i) in ("", main.TABS[i][0])
+        assert w.tabs.tabToolTip(i) in ("", TABS[i][0])
     assert w.cfg.tabs_off == []
     assert w.engine.voice_chain is w.voice.chain
 
@@ -336,9 +336,10 @@ def test_keyboard_never_lands_on_a_hidden_tab(window, qapp):
 @pytest.fixture
 def fake_watch(app_dir, request):
     """A made-up Onion Watch installed where the window looks for it."""
-    from soundboard import modules
     from test_triggers_module import make_module
     from test_triggerstab import PANEL
+
+    from soundboard import modules
     name = f"fakewatch_tabs_{abs(hash(request.node.name)) % 10**8}"
     make_module(app_dir / "modules" / "onion-watch", package=name, board=PANEL)
     yield name
