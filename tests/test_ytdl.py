@@ -581,8 +581,9 @@ def test_enter_searches_youtube_and_a_result_plays_through_the_link_bar(
     monkeypatch.setattr(ytdl, "search", lambda q, count=20, source="youtube": (
         searched.append(source), hits)[1])
     monkeypatch.setattr(window.engine, "play", lambda *a, **kw: object())
+    signal = types.SimpleNamespace(connect=lambda f: None)
     window.ytresults.net.get = lambda req: types.SimpleNamespace(   # no thumbnail fetch
-        finished=types.SimpleNamespace(connect=lambda f: None))
+        finished=signal, downloadProgress=signal)
     window.search.setText("what is love")
     window.search.returnPressed.emit()                       # Enter: search YouTube
     assert process_events(qapp, lambda: window.ytresults._rows, 5)
@@ -625,9 +626,10 @@ def test_a_file_share_thumbnail_is_never_fetched(qapp, window):  # noqa: F811
     """A page's own og:image becomes the result's picture: one that isn't a web link
     is dropped, with no request at all."""
     asked = []
+    signal = types.SimpleNamespace(connect=lambda f: None)
     window.ytresults.net.get = lambda req: (asked.append(req.url().toString()),
-                                            types.SimpleNamespace(finished=types.SimpleNamespace(
-                                                connect=lambda f: None)))[1]
+                                            types.SimpleNamespace(finished=signal,
+                                                                  downloadProgress=signal))[1]
     bad = ytdl.Result("x", "Evil", "page", 3, source="generic",
                       link="https://evil.example/page", art="file://host/share/x.jpg")
     good = ytdl.Result("y", "Fine", "page", 3, source="generic",
@@ -1026,8 +1028,9 @@ def test_spammed_enter_waits_for_the_search_already_running(qapp, window,  # noq
         go.wait(5)
         return [ytdl.Result("HEXWRTEbj1I", "What Is Love", "Haddaway", 241)]
     monkeypatch.setattr(ytdl, "search", search)
+    signal = types.SimpleNamespace(connect=lambda f: None)
     window.ytresults.net.get = lambda req: types.SimpleNamespace(   # no thumbnail fetch
-        finished=types.SimpleNamespace(connect=lambda f: None))
+        finished=signal, downloadProgress=signal)
     window.search.setText("what is love")
     for _i in range(20):
         window.search.returnPressed.emit()                   # held: one search only
