@@ -190,6 +190,29 @@ def test_headphones_turn_overlapping_loud_sounds_down_instead_of_bending_them():
     assert thd_db(y, 220) < -60
 
 
+def test_headphones_over_100_percent_get_louder_not_just_limited():
+    # at 300 % the limiter alone turned a song down at every peak: it came out barely
+    # louder than at 100 %. Over 100 % the peaks are rounded off first, so it's loud.
+    from soundboard.engine import loud_boost
+    from soundboard.sendfx import SafetyLimiter
+    rng = np.random.default_rng(1)
+    song = np.clip(rng.normal(0, 0.15, (SR * 2, 2)), -1, 1).astype(np.float32)
+
+    def rms_db(vol, boost):
+        lim = SafetyLimiter(SR)
+        y = []
+        for i in range(0, len(song), BLOCK):
+            x = song[i:i + BLOCK] * np.float32(vol)
+            y.append(lim.process(loud_boost(x, vol) if boost else x))
+        y = np.concatenate(y)[SR // 2:]
+        assert np.max(np.abs(y)) <= 10 ** (-0.3 / 20) + 1e-6
+        return 20 * np.log10(np.sqrt(np.mean(y.astype(np.float64) ** 2)))
+
+    assert rms_db(3.0, True) > rms_db(3.0, False) + 2.0
+    x = song[:BLOCK].copy()
+    assert loud_boost(x, 1.0) is x and np.array_equal(x, song[:BLOCK])
+
+
 def test_loud_masters_are_stored_without_flat_tops():
     # a loud master decodes ~1 dB over full scale: clipped into the 16-bit cache, every
     # peak had a flat top (crackle). It's turned down around the peaks instead.
