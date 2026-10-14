@@ -6,7 +6,6 @@ the hand-painted widgets (pads, meters, EQ curve, logo) read the same tokens thr
 """
 from __future__ import annotations
 
-import hashlib
 import re
 import tempfile
 from contextlib import contextmanager
@@ -14,17 +13,19 @@ from pathlib import Path
 from string import Template
 
 from PySide6.QtCore import QObject, QPointF, QRectF, Qt
-from PySide6.QtGui import (QBrush, QColor, QIcon, QImage, QLinearGradient, QPainter,
-                           QPainterPath, QPen, QPixmap, QRadialGradient, QTransform)
+from PySide6.QtGui import (QColor, QIcon, QImage, QLinearGradient, QPainter,
+                           QPainterPath, QPen, QPixmap, QTransform)
 from shiboken6 import isValid as qt_valid
 
 from soundboard.i18n import _
-from soundboard.style import hooks
+from soundboard.style import hooks, palettes, textures
 # the colours and textures are in the style kit, shared with Onion Watch
-from soundboard.style.palettes import (DEFAULT, FONT, GROUPS, TEXT_ON,  # noqa: F401
+from soundboard.style.palettes import (DEFAULT, FONT, GROUPS, LIVE_NAMES,  # noqa: F401
+                                       LIVE_STYLE, TEXT_ON,
                                        THEMES, _add_live_tokens, _contrast, _mix,
                                        font_families, is_light_colour, mix, valid_colour)
-from soundboard.style.textures import TEXTURE_TILE, TEXTURES, texture_image  # noqa: F401
+from soundboard.style.textures import (AURORA, TEXTURE_TILE, TEXTURES,  # noqa: F401
+                                       texture_image)
 
 
 def group_name(group: str) -> str:
@@ -623,24 +624,10 @@ QFrame#setcard QPushButton#primary[busy="true"]:hover { background:$inset; color
 """)
 
 
-# The widgets drawn in the live colour (by objectName): a colour change restyles just
-# these (apply_live), not the whole app, which takes seconds on a full board.
-LIVE_NAMES = ("power", "onair", "pill", "live")
-LIVE_STYLE = Template("""
-QPushButton#power:checked, QPushButton#onair:checked, QPushButton#live:checked {
-    background:qlineargradient(x1:0, y1:0, x2:0, y2:1, stop:0 $live_top, stop:1 $live);
-    border:1px solid $live_hi; color:$on_live; }
-QPushButton#onair:checked { border-color:transparent; }
-QPushButton#power:checked:hover, QPushButton#onair:checked:hover,
-QPushButton#live:checked:hover { background:$live_hover; }
-QPushButton#pill[state="ok"] { color:$live_text; background:transparent; }
-""")
-
-
 def live_sheet() -> str:
-    """The live rules in the current colours, as a widget's own stylesheet (it wins
-    over the app's, so it also beats the cards' generic `:checked` rules)."""
-    return LIVE_STYLE.substitute(T)
+    """The live rules in the current colours, as a widget's own stylesheet (the style
+    kit's palettes.live_sheet)."""
+    return palettes.live_sheet(T)
 
 
 # Flat window and cards with quiet hairline borders. Textured adds each theme's tile on
@@ -760,33 +747,20 @@ def polished(name: str | None = None) -> bool:
     return (name or current_name) not in OUTLINED
 
 
-# The Textured glow: soft blobs of the theme's two accent colours behind the cards,
-# (centre x, centre y, radius) as fractions of the window, which colour, how strong.
-AURORA = (((0.12, 0.0, 0.55), "accent", 0.22), ((0.95, 1.05, 0.6), "accent2", 0.14),
-          ((0.6, 0.35, 0.45), "accent", 0.07))
 
 
 def paint_window_bg(p: QPainter, rect, origin: QPointF, width: float, height: float,
                     tk: dict[str, str] | None = None, textured: bool | None = None) -> None:
     """Paint the window background, aligned to its origin, without disk access: the flat
-    page colour, or with Textured on, the theme's soft accent glow over it. `tk`: a theme
-    other than the current one (a preview). Opaque widgets use this same background so
-    scrolling leaves no seams."""
+    page colour, or with Textured on, the theme's soft accent glow over it (the style
+    kit's textures.paint_glow). `tk`: a theme other than the current one (a preview).
+    Opaque widgets use this same background so scrolling leaves no seams."""
     tk = T if tk is None else tk
     textured = textures_on if textured is None else textured
     p.fillRect(rect, QColor(tk["bg"]))
     if not textured or (tk is T and not polished()):
         return
-    light = is_light_colour(tk["bg"])
-    side = max(width, height)
-    for (cx, cy, r), key, strength in AURORA:
-        g = QRadialGradient(QPointF(origin.x() + cx * width, origin.y() + cy * height),
-                            r * side)
-        c = QColor(tk[key])
-        c.setAlphaF(strength * (0.55 if light else 1.0))
-        g.setColorAt(0, c)
-        g.setColorAt(1, QColor(0, 0, 0, 0))
-        p.fillRect(rect, QBrush(g))
+    textures.paint_glow(p, rect, origin, width, height, tk)
 
 
 def _check_image(colour: str, size: int) -> QImage:
@@ -894,35 +868,10 @@ def _chevron_url(colour: str, size: int, up: bool, side: str = "") -> str:
     return base.as_posix()
 
 
-_texture_urls: dict[tuple, str] = {}
-
-
 def texture_style(selector: str, tk: dict[str, str] | None = None) -> str:
-    """Apply the active tiling texture to a surface, including locally styled panels."""
-    if url := _texture_url(T if tk is None else tk):
-        return f'{selector} {{ background-image:url("{url}"); background-repeat:repeat-xy; }}\n'
-    return ""
-
-
-def _texture_url(tk: dict[str, str]) -> str:
-    """The theme's texture tile as a file for the stylesheet: made once, then remembered."""
-    kind = tk.get("texture", "")
-    if not textures_on or kind not in TEXTURES:
-        return ""
-    key = (kind, tk["panel"], tk["text_hi"], tk["accent"], tk["accent2"],
-           tk.get("texture_ink", ""), tk.get("texture_strength", ""))
-    if url := _texture_urls.get(key):
-        return url
-    folder = Path(tempfile.gettempdir()) / "onionboard-ui"
-    path = folder / f"tex-{kind}-{hashlib.md5(repr(key).encode()).hexdigest()[:10]}.png"
-    try:
-        folder.mkdir(exist_ok=True)
-        if not path.exists():
-            texture_image(kind, tk).save(str(path))
-    except OSError:
-        return ""
-    _texture_urls[key] = url = path.as_posix()
-    return url
+    """Apply the active tiling texture to a surface, including locally styled panels
+    ("" with Textured off)."""
+    return textures.texture_style(selector, T if tk is None else tk) if textures_on else ""
 
 
 # Themes whose controls and cards keep an outline at rest: the others draw buttons,
