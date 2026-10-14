@@ -81,10 +81,16 @@ def detect() -> list[Engine]:
         elif exe:
             log.info("%s %s is too old for yt-dlp (needs %s)", name,
                      ".".join(map(str, v or ())) or "?", ".".join(map(str, oldest)))
-    qjs = bundled_qjs()
-    if qjs and (v := _version(str(qjs), quickjs=True)):
-        found.append(Engine(QUICKJS, str(qjs), v))
+    if qjs := bundled():
+        found.append(qjs)
     return found
+
+
+def bundled() -> Engine | None:
+    """The app's own QuickJS, if it's there and starts."""
+    qjs = bundled_qjs()
+    v = _version(str(qjs), quickjs=True) if qjs else None
+    return Engine(QUICKJS, str(qjs), v) if qjs and v else None
 
 
 def picked() -> list[Engine]:
