@@ -15,6 +15,7 @@ from soundboard import appaudio, directmic, discordcfg, rawmic, updates
 from soundboard.i18n import _
 from soundboard.pollthread import PollThread
 from soundboard.ui import worker
+from soundboard.ui.controller import Controller
 from soundboard.ui.triggerstab import TriggersTab
 
 if TYPE_CHECKING:
@@ -45,11 +46,11 @@ DISCORD_URGENT = {
 }
 
 
-class AlertControl:
+class AlertControl(Controller):
     """The urgent bar and its checks for one MainWindow (``mw``)."""
 
     def __init__(self, mw: MainWindow):
-        self.mw = mw
+        super().__init__(mw)
         self._urgent_hidden: set[str] = set()   # "board 1.9.6" / "watch 0.8.2", this run
         # Discord's own voice settings (discordcfg), read while it runs: the ones that
         # wipe out sounds get the urgent bar

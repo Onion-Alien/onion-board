@@ -18,6 +18,7 @@ from shiboken6 import isValid as qt_valid
 from soundboard import errors, ffmpegget, net, netlog, quality, usage
 from soundboard.i18n import _
 from soundboard.ui import busy, icons, worker
+from soundboard.ui.controller import Controller
 
 if TYPE_CHECKING:
     from soundboard.ui.mainwindow import MainWindow
@@ -25,11 +26,11 @@ if TYPE_CHECKING:
 ASK_OFF = "ffmpeg-offer"   # in Config.tips_seen: the FFmpeg bar's Don't ask again
 
 
-class FfmpegControl:
+class FfmpegControl(Controller):
     """The FFmpeg check, fix and bar for one MainWindow (``mw``)."""
 
     def __init__(self, mw: MainWindow):
-        self.mw = mw
+        super().__init__(mw)
         self.health: ffmpegget.Health | None = None   # the last check's answer
         self.checking = False
         self.not_now = False   # hidden until the next start
