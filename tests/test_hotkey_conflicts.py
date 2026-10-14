@@ -1,12 +1,13 @@
 """Hotkeys that would fight each other: the game's push-to-talk key, the overlay's own
 keys and the keyboard layout under the default overlay key. Headless (the real
 MainWindow on Qt's offscreen platform, no hotkeys registered)."""
+from test_mainwindow import window  # noqa: F401  (the real MainWindow fixture)
+
 from soundboard import winkeys
 from soundboard.library import Config
-from soundboard.ui import hotkeycontrol
-from soundboard.ui.dialogs import TabHelpPopup
+from soundboard.ui import hotkeycontrol, tickcontrol
 from soundboard.ui import mainwindow as main
-from test_mainwindow import window  # noqa: F401  (the real MainWindow fixture)
+from soundboard.ui.dialogs import TabHelpPopup
 
 
 def registered(window, monkeypatch):  # noqa: F811
@@ -35,14 +36,14 @@ def test_the_overlay_follows_whats_playing_with_the_window_in_the_tray(window, m
     window.hkctl.on_hotkey("__overlay__")
     seen = []
     monkeypatch.setattr(window.overlay, "tick", seen.append)
-    window.tick()
-    assert seen and window.timer.interval() == main.TICK_QUIET_MS   # nothing playing
+    window.tickctl.tick()
+    assert seen and window.timer.interval() == tickcontrol.TICK_QUIET_MS   # nothing playing
     monkeypatch.setattr(window.engine, "playing", lambda: {"s0": (0.5, False)})
-    window.tick()
-    assert window.timer.interval() == main.TICK_MS   # full pace for the overlay
+    window.tickctl.tick()
+    assert window.timer.interval() == tickcontrol.TICK_MS   # full pace for the overlay
     window.hkctl.on_hotkey("__ov:close")
-    window.tick()
-    assert window.timer.interval() == main.TICK_IDLE_MS
+    window.tickctl.tick()
+    assert window.timer.interval() == tickcontrol.TICK_IDLE_MS
 
 
 def test_a_numpad_overlay_key_still_closes_it(window, monkeypatch):  # noqa: F811
@@ -62,14 +63,14 @@ def test_the_default_overlay_key_moves_off_a_letter_on_other_layouts(qapp, app_d
     Config().save()
     w = main.MainWindow()
     try:
-        w._load_thread.join(15)
+        w.soundctl._load_thread.join(15)
         assert w.cfg.overlay_hotkey == "alt+`" and w.cfg.overlay_key_checked
         w.cfg.overlay_hotkey = "`"               # picked again on purpose: left alone
         w.hkctl._fit_overlay_key()
         assert w.cfg.overlay_hotkey == "`"
     finally:
         w.close()
-        w._load_thread.join(15)
+        w.soundctl._load_thread.join(15)
         w.deleteLater()
 
 
@@ -82,7 +83,7 @@ def test_a_blocked_ptt_key_up_is_tried_again(window, monkeypatch):  # noqa: F811
     trying, not forget it holds the key (the game's PTT would stay stuck down)."""
     ok = {"up": False}
     ups = []
-    monkeypatch.setattr(main.winkeys, "release", lambda k: ups.append(k) or ok["up"])
+    monkeypatch.setattr(winkeys, "release", lambda k: ups.append(k) or ok["up"])
     window._ptt_held = "v"
     assert window.hkctl._release_ptt() is False and window._ptt_held == "v"
     ok["up"] = True
@@ -94,6 +95,7 @@ def test_a_sound_brought_back_gives_up_a_key_an_action_took_meanwhile(window, qa
     """F9 went to Stop all while the pad was on the Undo bar / in Recently deleted:
     the pad comes back without it, rather than showing a key that never plays it."""
     from conftest import process_events
+
     from soundboard import trash
     assert process_events(qapp, lambda: all(m.id in window.audio for m in window.cfg.sounds))
     for sid, done in (("s0", window.rmctl.undo_remove), ("s1", None)):

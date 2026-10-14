@@ -20,6 +20,7 @@ class FakeWindow:
         if load_s is not None:
             self._load_thread = threading.Thread(target=time.sleep, args=(load_s,), daemon=True)
             self._load_thread.start()
+        self.soundctl = self   # the window's sounds controller: _load_thread
 
     def windowHandle(self):
         return None
@@ -31,7 +32,7 @@ class FakeWindow:
 def test_waits_until_the_sounds_are_loaded():
     app, w = FakeApp(), FakeWindow(0.2)
     sbapp.wait_for_sounds(app, w)
-    assert not w._load_thread.is_alive()
+    assert not w.soundctl._load_thread.is_alive()
     assert app.pumped >= 2   # events handled meanwhile (each pad's sound arrives)
 
 
@@ -40,7 +41,7 @@ def test_a_big_library_waits_no_longer_than_the_cap():
     t0 = time.monotonic()
     sbapp.wait_for_sounds(app, w, cap_s=0.1)
     assert time.monotonic() - t0 < 1.0
-    assert w._load_thread.is_alive()
+    assert w.soundctl._load_thread.is_alive()
 
 
 def test_no_loader_is_fine():

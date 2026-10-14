@@ -2,11 +2,11 @@
 Watch, the web search, downloads, updates…) instead of leaving it greyed out, says
 it's offline in the header, and brings it all back when it's switched off."""
 from PySide6.QtWidgets import QApplication
+from test_mainwindow import window  # noqa: F401  (the real MainWindow fixture)
 
 from soundboard import net
 from soundboard.settings import SettingsDialog
-from soundboard.ui.mainwindow import TAB_INDEX
-from test_mainwindow import window  # noqa: F401  (the real MainWindow fixture)
+from soundboard.ui.tabcontrol import TAB_INDEX
 
 
 def offline(mw, on: bool):
@@ -20,11 +20,11 @@ def test_main_window_hides_the_online_tabs_and_says_offline(window, monkeypatch)
         window.tabctl.set_tab_on(key, True)
     bar = window.tabs
     try:
-        assert window.card_lines() == [] and bar.isTabVisible(TAB_INDEX["radio"])
+        assert window.netctl.card_lines() == [] and bar.isTabVisible(TAB_INDEX["radio"])
         window.tabs.setCurrentIndex(TAB_INDEX["radio"])
         offline(window, True)
-        assert [line.words for line in window.card_lines()] == ["Offline"]   # in the card
-        assert window.rail.output._lines == window.card_lines()
+        assert [line.words for line in window.netctl.card_lines()] == ["Offline"]   # in the card
+        assert window.rail.output._lines == window.netctl.card_lines()
         assert not bar.isTabVisible(TAB_INDEX["radio"])
         assert bar.currentIndex() == 0   # was on Radio: back to the Sounds tab
         # no Onion Watch in the test profile: the Triggers tab is only its Get button
@@ -36,7 +36,7 @@ def test_main_window_hides_the_online_tabs_and_says_offline(window, monkeypatch)
         window.tabctl.set_tab_on("apps", False)
         assert window.tabctl._more_tab_keys() == ["apps"]
         offline(window, False)
-        assert window.card_lines() == [] and window.rail.output._lines == []
+        assert window.netctl.card_lines() == [] and window.rail.output._lines == []
         assert bar.isTabVisible(TAB_INDEX["radio"]) and bar.isTabVisible(TAB_INDEX["triggers"])
         assert not window.btn_yt.isHidden()
         assert "paste a link" in window.search.placeholderText()
@@ -161,7 +161,7 @@ def test_on_air_card_says_proxy_and_tor(window, monkeypatch):  # noqa: F811
                                    (tor.FAILED, "Tor failed", "warn")):
             monkeypatch.setattr(t, "state", state)
             monkeypatch.setattr(t, "progress", 40)
-            window._on_tor()
+            window.netctl._on_tor()
             assert line() == ("tor", words, tone)
         clicked = []
         monkeypatch.setattr(window.setctl, "open_settings", clicked.append)
@@ -183,7 +183,7 @@ def test_on_air_card_says_a_remote_listens(window, monkeypatch):  # noqa: F811
             QApplication.processEvents()   # (queued: it may come from another thread)
         assert [line.words for line in window.rail.output._lines] == ["Remote control on"]
         ctl.lan = True   # a phone remote's server says so instead
-        window._net_follow()
+        window.netctl._net_follow()
         assert [(line.words, line.page) for line in window.rail.output._lines] == [
             ("Phone remote on", "remote")]
     finally:

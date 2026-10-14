@@ -44,7 +44,7 @@ class ThemeControl(Controller):
         mw.download_bar.retheme()
         mw.mini_download_bar.retheme()
         mw.ytresults.retheme()
-        mw._paint_mini_bun()
+        mw.builder._paint_mini_bun()
         if mw.bunctl.bun_mode is not None:
             mw.bunctl.bun_mode.retheme()
         pp, mw._pp_icon = mw._pp_icon, None

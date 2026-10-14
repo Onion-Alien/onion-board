@@ -3,10 +3,11 @@ skipped or slowed down, and animations stop while nobody can see them."""
 import threading
 import time
 
-
 from conftest import process_events
-from soundboard import appaudio, directmic
 from test_mainwindow import window  # noqa: F401 - the real window, offscreen
+
+from soundboard import appaudio, directmic
+from soundboard.ui import tickcontrol, windowbuild
 
 
 def test_windows_default_output_is_only_asked_while_followed(window, monkeypatch, qapp):  # noqa: F811
@@ -97,11 +98,12 @@ def test_mic_check_pulse_runs_only_while_shown_in_front(window, monkeypatch, qap
     """The banner's throb draws the whole banner again on each step: not in the tray,
     minimised or behind a game (there it stands still, fully bright)."""
     from PySide6.QtCore import Qt
+
     from soundboard.ui import mainwindow as main
     monkeypatch.setattr(main.appstate, "active", lambda: True)
     window._ui_live = True
     window.on_mic_check(True)
-    window._set_tick_rate()                           # not shown (offscreen): not live
+    window.tickctl._set_tick_rate()                           # not shown (offscreen): not live
     assert not window._pulse.running()
     assert window._banner_fx.opacity() == 1.0 and not window._banner_fx.isEnabled()
     window.show()
@@ -121,13 +123,12 @@ def test_mic_check_pulse_runs_only_while_shown_in_front(window, monkeypatch, qap
 
 
 def test_mic_check_pulse_steps_about_16_times_a_second_along_the_same_curve(window):  # noqa: F811
-    from soundboard.ui import mainwindow as main
     pulse = window._pulse
     assert 1000 / pulse.timer.interval() <= 20        # the animation ran at 60
     assert pulse.opacity_at(0) == 1.0
-    assert abs(pulse.opacity_at(main.PULSE_MS / 2) - main.PULSE_LOW) < 1e-9
-    assert abs(pulse.opacity_at(main.PULSE_MS / 4) - (1 + main.PULSE_LOW) / 2) < 1e-9
-    assert pulse.opacity_at(main.PULSE_MS) == 1.0     # and round again
+    assert abs(pulse.opacity_at(windowbuild.PULSE_MS / 2) - windowbuild.PULSE_LOW) < 1e-9
+    assert abs(pulse.opacity_at(windowbuild.PULSE_MS / 4) - (1 + windowbuild.PULSE_LOW) / 2) < 1e-9
+    assert pulse.opacity_at(windowbuild.PULSE_MS) == 1.0     # and round again
 
 
 def test_ui_tick_goes_over_only_the_pads_showing_a_sound(window, monkeypatch):  # noqa: F811
@@ -143,17 +144,17 @@ def test_ui_tick_goes_over_only_the_pads_showing_a_sound(window, monkeypatch):  
     monkeypatch.setattr(window, "pads", Pads(window.pads))
     pad = window.pads["s0"]
     now = time.monotonic()
-    window._tick_visuals({}, now)
+    window.tickctl._tick_visuals({}, now)
     assert looked == []
-    window._tick_visuals({"s0": (0.25, False)}, now)
+    window.tickctl._tick_visuals({"s0": (0.25, False)}, now)
     assert pad.progress == 0.25 and looked == ["s0"]
-    window._tick_visuals({"s0": (0.5, True)}, now)    # paused: still shown
+    window.tickctl._tick_visuals({"s0": (0.5, True)}, now)    # paused: still shown
     assert pad.progress == 0.5 and pad.paused
     looked.clear()
-    window._tick_visuals({}, now)                     # it stopped
+    window.tickctl._tick_visuals({}, now)                     # it stopped
     assert looked == ["s0"] and pad.progress is None and pad.bands is None
     looked.clear()
-    window._tick_visuals({}, now)
+    window.tickctl._tick_visuals({}, now)
     assert looked == []
 
 
@@ -167,53 +168,54 @@ def test_the_ui_tick_slows_down_while_nothing_moves(window, monkeypatch, qapp): 
     monkeypatch.setattr(window, "isVisible", lambda: True)
     window._ui_live = True
     e.level_play = e.level_main = e.level_mic = 0.0
-    window.tick()
-    assert window.timer.interval() == main.TICK_QUIET_MS    # 10 a second, not 30
+    window.tickctl.tick()
+    assert window.timer.interval() == tickcontrol.TICK_QUIET_MS    # 10 a second, not 30
     window.playctl.play("s0")                                       # back to full pace at once
-    assert window.timer.interval() == main.TICK_MS
+    assert window.timer.interval() == tickcontrol.TICK_MS
     playing["s0"] = (0.5, True)                             # paused: nothing moves
     e.level_play = e.level_main = 0.0
-    window._tick_busy = False
-    window.tick()
-    assert window.timer.interval() == main.TICK_QUIET_MS
+    window.tickctl._tick_busy = False
+    window.tickctl.tick()
+    assert window.timer.interval() == tickcontrol.TICK_QUIET_MS
     playing["s0"] = (0.5, False)
-    window.tick()
-    assert window.timer.interval() == main.TICK_MS
+    window.tickctl.tick()
+    assert window.timer.interval() == tickcontrol.TICK_MS
     playing.clear()
     e.level_main = 0.5                                      # a meter still falling
-    window.tick()
-    assert window.timer.interval() == main.TICK_MS
+    window.tickctl.tick()
+    assert window.timer.interval() == tickcontrol.TICK_MS
     for _ in range(80):                                     # ...until it shows nothing
-        window.tick()
-    assert window.timer.interval() == main.TICK_QUIET_MS
+        window.tickctl.tick()
+    assert window.timer.interval() == tickcontrol.TICK_QUIET_MS
 
 
 def test_unfocused_playback_keeps_visible_meters_at_full_pace(window, monkeypatch, qapp):  # noqa: F811
     from PySide6.QtCore import Qt
+
     from soundboard.ui import mainwindow as main
 
     monkeypatch.setattr(window, "isVisible", lambda: True)
     monkeypatch.setattr(window, "isMinimized", lambda: False)
     monkeypatch.setattr(main.appstate, "active", lambda: True)
     window._ui_live = True
-    window._tick_busy = True
-    window._set_tick_rate()
-    assert window.timer.interval() == main.TICK_MS
+    window.tickctl._tick_busy = True
+    window.tickctl._set_tick_rate()
+    assert window.timer.interval() == tickcontrol.TICK_MS
 
     monkeypatch.setattr(main.appstate, "active", lambda: False)
     qapp.applicationStateChanged.emit(Qt.ApplicationInactive)
-    assert window.timer.interval() == main.TICK_MS
-    window._tick_busy = False
-    window._wake()  # playback starts while the game already has focus
-    assert window.timer.interval() == main.TICK_MS
+    assert window.timer.interval() == tickcontrol.TICK_MS
+    window.tickctl._tick_busy = False
+    window.tickctl._wake()  # playback starts while the game already has focus
+    assert window.timer.interval() == tickcontrol.TICK_MS
 
-    window._tick_busy = False
-    window._set_tick_rate()
-    assert window.timer.interval() == main.TICK_QUIET_MS
+    window.tickctl._tick_busy = False
+    window.tickctl._set_tick_rate()
+    assert window.timer.interval() == tickcontrol.TICK_QUIET_MS
     monkeypatch.setattr(window, "isMinimized", lambda: True)
-    window._tick_busy = True
-    window._set_tick_rate()
-    assert window.timer.interval() == main.TICK_IDLE_MS
+    window.tickctl._tick_busy = True
+    window.tickctl._set_tick_rate()
+    assert window.timer.interval() == tickcontrol.TICK_IDLE_MS
 
 
 def test_waiting_queues_do_not_keep_paused_playback_busy(window, monkeypatch):  # noqa: F811
@@ -228,27 +230,27 @@ def test_waiting_queues_do_not_keep_paused_playback_busy(window, monkeypatch):  
     window.engine.level_play = window.engine.level_main = window.engine.level_mic = 0.0
     monkeypatch.setattr(window.engine, "aux", ())
     window._ui_live = True
-    window.tick()
-    assert not window._tick_busy
-    assert window.timer.interval() == main.TICK_QUIET_MS
+    window.tickctl.tick()
+    assert not window.tickctl._tick_busy
+    assert window.timer.interval() == tickcontrol.TICK_QUIET_MS
     assert window.playctl._queue == ["s1"]
 
     window._ui_live = False
-    window.tick()
-    assert window.timer.interval() == main.TICK_IDLE_MS
+    window.tickctl.tick()
+    assert window.timer.interval() == tickcontrol.TICK_IDLE_MS
     playing["s0"] = (0.5, False)
     window._ui_live = True
-    window.tick()
-    assert window._tick_busy
-    assert window.timer.interval() == main.TICK_MS
+    window.tickctl.tick()
+    assert window.tickctl._tick_busy
+    assert window.timer.interval() == tickcontrol.TICK_MS
 
     advanced = []
     monkeypatch.setattr(window.playctl, "_next_in_queue", lambda: advanced.append(True))
     monkeypatch.setattr(window.linkbar, "play_next", lambda: False)
     playing.clear()
-    window.tick()
+    window.tickctl.tick()
     assert advanced == [True]
-    assert not window._tick_busy
+    assert not window.tickctl._tick_busy
 
 
 def test_what_others_hear_shows_your_voice_before_the_mic_effect(window, monkeypatch):  # noqa: F811
@@ -257,13 +259,13 @@ def test_what_others_hear_shows_your_voice_before_the_mic_effect(window, monkeyp
     monkeypatch.setattr(e, "mic_stream", object())
     e.level_main, e.level_mic = 0.0, 0.6
     window.cfg.route, e.main_direct = "mic", False   # into the mic, effect not set up:
-    window._tick_visuals({}, 0.0)                    # apps take the real mic as it is
+    window.tickctl._tick_visuals({}, 0.0)                    # apps take the real mic as it is
     assert window.out_meter.level == 0.6
     e.main_direct = True                             # in the mic: only what's sent
-    window._tick_visuals({}, 0.0)
+    window.tickctl._tick_visuals({}, 0.0)
     assert window.out_meter.level == 0.0
     window.cfg.route, e.main_direct = "cable", False
-    window._tick_visuals({}, 0.0)
+    window.tickctl._tick_visuals({}, 0.0)
     assert window.out_meter.level == 0.0
 
 

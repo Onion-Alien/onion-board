@@ -5,11 +5,12 @@ owns, so timers and signals aimed at the controller stop with the window."""
 import pytest
 
 from soundboard.ui import (aboutcontrol, alertcontrol, appsetupcontrol, buncontrol, categorycontrol,
-                           devicecontrol, editcontrol, ffmpegcontrol, hotkeycontrol, importcontrol,
-                           languagecontrol, mainwindow, miccontrol, padcontrol, playbackcontrol,
-                           remoteaccess, removecontrol, routecontrol, searchcontrol,
-                           settingscontrol, statuscontrol, tabcontrol, themecontrol, tipcontrol,
-                           updatecontrol)
+                           devicecontrol, editcontrol, ffmpegcontrol, fitcontrol, hotkeycontrol,
+                           importcontrol, languagecontrol, mainwindow, miccontrol, netcontrol,
+                           padcontrol, playbackcontrol, remoteaccess, removecontrol, routecontrol,
+                           searchcontrol, settingscontrol, soundscontrol, statuscontrol, tabcontrol,
+                           themecontrol, tickcontrol, tipcontrol, transportcontrol, updatecontrol,
+                           windowbuild)
 from test_mainwindow import window  # noqa: F401  (the real MainWindow fixture)
 
 # (window attribute, controller class, methods that live there now)
@@ -85,6 +86,22 @@ SPLIT = [
     ("searchctl", searchcontrol.SearchControl,
      ["apply_filter", "flush_search", "search_youtube", "_show_link", "_drop_link",
       "on_link_played", "focus_search"]),
+    ("tickctl", tickcontrol.TickControl,
+     ["tick", "_tick_pace", "_wake", "_busy", "_set_tick_rate", "_tick_visuals"]),
+    ("transctl", transportcontrol.TransportControl,
+     ["_show_transport", "_update_transport", "_update_playing_background", "_update_video",
+      "show_video"]),
+    ("fitctl", fitcontrol.FitControl,
+     ["_init_fit", "_refit", "_refit_layout", "is_mini", "_set_mini", "_squeeze_rail",
+      "_fit_body_top", "_fit_toolbar", "_fit_mixer", "_stack_setup"]),
+    ("builder", windowbuild.WindowBuilder,
+     ["_build_ui", "_build_mini", "_build_mixer", "_build_sounds_page", "_build_setup_page"]),
+    ("soundctl", soundscontrol.SoundsControl,
+     ["_load_all", "on_loaded", "on_clip", "record_dialog", "add_recording", "on_downloaded",
+      "on_reorder", "rename_sound"]),
+    ("netctl", netcontrol.NetControl,
+     ["_follow_switches", "_offline_follow", "_radio_follow_switch", "card_lines", "_network_line",
+      "_on_tor"]),
 ]
 
 

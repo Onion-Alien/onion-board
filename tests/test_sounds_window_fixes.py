@@ -8,11 +8,11 @@ import zipfile
 import numpy as np
 import pytest
 import soundfile as sf
+from conftest import process_events, said
 from PySide6.QtCore import QEvent
 from PySide6.QtWidgets import QMessageBox
 
-from conftest import process_events, said
-from soundboard import backup, engine, library, winkeys
+from soundboard import backup, engine, errors, library, winkeys
 from soundboard.library import SR, Config, SoundMeta
 from soundboard.ui import hotkeycontrol
 from soundboard.ui import mainwindow as main
@@ -27,8 +27,8 @@ def _tone(path, seconds=0.1):
 
 def _close(qapp, w):
     w.close()
-    if w._load_thread:
-        w._load_thread.join(15)
+    if w.soundctl._load_thread:
+        w.soundctl._load_thread.join(15)
     w.deleteLater()
     qapp.sendPostedEvents(None, QEvent.DeferredDelete)
 
@@ -50,7 +50,7 @@ def window(qapp, app_dir, quiet):
     Config(sounds=sounds).save()
     w = main.MainWindow()
     w._registered = quiet
-    w._load_thread.join(15)
+    w.soundctl._load_thread.join(15)
     process_events(qapp, lambda: all(p.state == "ready" for p in w.pads.values()), 5)
     yield w
     _close(qapp, w)
@@ -315,7 +315,7 @@ def test_a_pack_reset_reads_and_puts_back_off_the_ui_thread(window, tmp_path, qa
 def test_a_pack_gone_while_the_reset_reads_it_is_said(window, tmp_path, qapp, monkeypatch):
     door, *_rest = _import_three(window, tmp_path, qapp)
     warned = []
-    monkeypatch.setattr(main.errors, "warn", lambda parent, title, e: warned.append(title))
+    monkeypatch.setattr(errors, "warn", lambda parent, title, e: warned.append(title))
     backup.forget_pack(door.pack)
     window.impctl.reset_pack(door.pack, ask=False)
     assert process_events(qapp, lambda: warned, 10)
@@ -372,7 +372,7 @@ def test_pads_are_built_at_a_size_the_slider_can_show(qapp, app_dir, quiet, monk
     monkeypatch.setattr(main.Config, "load", classmethod(lambda cls: cfg))
     w = main.MainWindow()
     try:
-        w._load_thread.join(10)
+        w.soundctl._load_thread.join(10)
         assert 110 <= w.grid.pad_w <= 240   # (the pads stretch from it to the edge)
         assert w.cfg.pad_width == (110 if pad_width < 110 else 240)
     finally:
@@ -406,9 +406,9 @@ def test_a_backup_with_damaged_settings_still_opens(qapp, app_dir, quiet, tmp_pa
     cfg.save()
     w = main.MainWindow()
     try:
-        w._load_thread.join(10)
+        w.soundctl._load_thread.join(10)
         for _ in range(3):
-            w.tick()
+            w.tickctl.tick()
         assert w.vol_sound.value() == 10.0
     finally:
         _close(qapp, w)

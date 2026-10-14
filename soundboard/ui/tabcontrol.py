@@ -145,7 +145,7 @@ class TabControl(Controller):
                        lambda: mw.setctl.open_settings("tabs"))
         # Bun mode from the full window too (the mini player has its own Bun button)
         menu.addSeparator()
-        act = menu.addAction(mw._bun_icon(), _("Turn into Bun"), mw.bunctl.enter_bun_mode)
+        act = menu.addAction(mw.builder._bun_icon(), _("Turn into Bun"), mw.bunctl.enter_bun_mode)
         act.setToolTip(BUN_TIP)
         menu.setToolTipsVisible(True)
         return menu
@@ -184,7 +184,7 @@ class TabControl(Controller):
         if not on and mw.tabs.currentIndex() == i:
             mw.tabs.move_to(0)   # (Settings, where this is done, stays up)
         if key == "radio":
-            mw._radio_follow_switch()
+            mw.netctl._radio_follow_switch()
         else:
             self._swap_tab(key)
         mw.tabs.setTabVisible(i, self.tab_shown(key))
@@ -201,9 +201,9 @@ class TabControl(Controller):
         if key == "triggers":
             old.cancel_pending()   # sounds still waiting out a trigger's wait
         old.shutdown()   # first: a new Voice tab sets the engine's voice chain
-        steps = mw._tab_steps.pop(key, []) if hasattr(mw, "_fit") else []
+        steps = mw.fitctl._tab_steps.pop(key, []) if hasattr(mw.fitctl, "_fit") else []
         if steps:
-            mw._fit.remove(steps)
+            mw.fitctl._fit.remove(steps)
         new = mw._make_tab(key)
         setattr(mw, key, new)
         bar = mw.tabs.tabBar()
@@ -221,15 +221,15 @@ class TabControl(Controller):
         self._tab_live(key, False)
         if key == "triggers":
             mw.load_triggers()
-        if hasattr(mw, "_fit"):
+        if hasattr(mw.fitctl, "_fit"):
             if key in ("voice", "triggers"):
                 assert not isinstance(new, AppsTab)
-                mw._tab_steps[key] = new.fit_steps()
-                mw._fit.extend(mw._tab_steps[key])
+                mw.fitctl._tab_steps[key] = new.fit_steps()
+                mw.fitctl._fit.extend(mw.fitctl._tab_steps[key])
             if key == "voice":
                 assert isinstance(new, (VoicePanel, taboff.TabOff))
-                mw._stack_cols = (*mw._stack_cols[:1], *new.stack_steps())
-            mw._refit()
+                mw.fitctl._stack_cols = (*mw.fitctl._stack_cols[:1], *new.stack_steps())
+            mw.fitctl._refit()
 
     def _count_tab(self, i: int):
         mw = self.mw

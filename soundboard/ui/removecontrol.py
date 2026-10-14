@@ -141,7 +141,7 @@ class RemoveControl(Controller):
         mw._rebuild_pads()
         mw.catctl._fill_categories()
         if any(m.id not in mw.audio for m in mw.cfg.sounds):
-            mw._load_all()
+            mw.soundctl._load_all()
         mw.hkctl.register_hotkeys()
 
     def _finish_removals(self):

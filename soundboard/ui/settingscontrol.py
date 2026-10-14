@@ -88,16 +88,16 @@ class SettingsControl(Controller):
             self._route_at_open = (mw.cfg.route, mw.cfg.main_device)
             mw._content.addWidget(dlg)
         mw._content.setCurrentWidget(dlg)
-        mw._fit_body_top()
+        mw.fitctl._fit_body_top()
         self._opening_settings = True   # (_refit: not closed again for being too small)
         try:
             self._board_counts(False)
-            if mw.is_mini():
+            if mw.fitctl.is_mini():
                 self._grow_for_settings()
         finally:
             self._opening_settings = False
         mw.rail.select_foot(mw.gear)
-        mw._show_transport()
+        mw.transctl._show_transport()
         # (Escape is for it now; fresh, not the back arrow: the mini player's swap
         # handed the focus on to it, ringed)
         if fresh or not _holds_focus(dlg):
@@ -111,8 +111,8 @@ class SettingsControl(Controller):
         mw = self.mw
         policy = QSizePolicy.Policy.Preferred if on else QSizePolicy.Policy.Ignored
         mw._tabs_area.setSizePolicy(policy, policy)
-        if hasattr(mw, "_fit"):
-            mw._refit()
+        if hasattr(mw.fitctl, "_fit"):
+            mw.fitctl._refit()
 
     def _grow_for_settings(self):
         """Settings asked for from the mini player: the window grows to the smallest
@@ -121,8 +121,8 @@ class SettingsControl(Controller):
         screen = mw.screen().availableGeometry() if mw.screen() else None
         for _try in range(4):
             size = mw._pages.size()
-            need = mw._fit.fit(size).expandedTo(SETTINGS_ROOM)
-            if (not mw.is_mini() and size.width() >= need.width()
+            need = mw.fitctl._fit.fit(size).expandedTo(SETTINGS_ROOM)
+            if (not mw.fitctl.is_mini() and size.width() >= need.width()
                     and size.height() >= need.height()):
                 break
             grow = need.expandedTo(size) - size
@@ -130,7 +130,7 @@ class SettingsControl(Controller):
             if screen is not None:
                 w, h = min(w, screen.width()), min(h, screen.height())
             mw.resize(w, h)
-            mw._refit()
+            mw.fitctl._refit()
 
     def settings_open(self) -> bool:
         mw = self.mw
@@ -149,10 +149,10 @@ class SettingsControl(Controller):
         had_focus = getattr(dlg, "had_focus", False) or _holds_focus(dlg)
         mw._content.setCurrentWidget(mw._tabs_area)
         mw._content.removeWidget(dlg)
-        mw._fit_body_top()
+        mw.fitctl._fit_body_top()
         self._board_counts(True)
         mw.rail.select_foot(None)
-        mw._show_transport()
+        mw.transctl._show_transport()
         if had_focus:   # (not left on a page that's gone)
             mw._focus_sounds_page(mw.tabs.currentIndex())
             if not _holds_focus(mw._tabs_area):

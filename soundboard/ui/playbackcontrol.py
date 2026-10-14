@@ -110,7 +110,7 @@ class PlaybackControl(Controller):
                              mode=PRESS_MODE.get(m.mode, m.mode),
                              fade_in=m.fade_in, fade_out=m.fade_out,
                              only=("main", "obs") if m.only_them else None)
-        mw._wake()
+        mw.tickctl._wake()
         if v is not None:   # a new install's first steps (usage.py; once each, if counted)
             usage.step(mw.cfg, "played-sound")
             if mw.cfg.route != "off":
@@ -220,14 +220,14 @@ class PlaybackControl(Controller):
         st = mw.engine.state(sid)
         if st:
             mw.engine.set_paused(sid, not st[1])
-            mw._wake()
+            mw.tickctl._wake()
             return
         m, data = mw.meta(sid), mw.audio.get(sid)
         if m and data is not None:
             frac = 0.0 if mw.start_frac >= 0.995 else mw.start_frac
             mw.engine.play(sid, data, mw.gain_for(m), loop=m.loop, mode="restart", start=frac,
                              fade_in=m.fade_in if frac == 0 else 0.0, fade_out=m.fade_out)
-            mw._wake()
+            mw.tickctl._wake()
 
     def _space_action(self):
         """What Space does on the tab showing (ui/spacekey.py): play / pause the
@@ -248,7 +248,7 @@ class PlaybackControl(Controller):
             self.select(sid)
             st = mw.engine.state(sid)
             mw.engine.set_paused(sid, not (st is not None and st[1]))
-            mw._wake()
+            mw.tickctl._wake()
         else:
             self.play(sid)
 
@@ -284,7 +284,7 @@ class PlaybackControl(Controller):
         else:
             self.cue("fail")
             return
-        mw._wake()
+        mw.tickctl._wake()
 
     def _stop_one(self, sid: str):
         """A ■ for one sound (the player's, or a Now playing chip's). A second press
@@ -477,7 +477,7 @@ class PlaybackControl(Controller):
             play = getattr(mw.radio, "play", None)   # (the Radio tab switched off: none)
             if station is not None and play is not None:
                 play(station)
-        mw._wake()
+        mw.tickctl._wake()
 
     def stop_all(self):
         mw = self.mw

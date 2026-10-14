@@ -63,7 +63,7 @@ def _shown_setup(window, route):  # noqa: F811
     window.resize(1500, 920)
     for _ in range(6):
         QApplication.processEvents()
-        window._refit()
+        window.fitctl._refit()
 
 
 def test_setup_card_headings_line_up(window):  # noqa: F811
@@ -93,7 +93,7 @@ def test_setup_heading_ink_follows_live_font_changes(window, theme_name):  # noq
         window.themectl.apply_theme(name)
         for _ in range(8):
             QApplication.processEvents()
-            window._refit()
+            window.fitctl._refit()
         for card in window._setup_narrow:
             if not card.isVisible():
                 continue
@@ -112,7 +112,7 @@ def test_setup_card_pairs_share_top_and_bottom_with_the_eq_on_or_off(window):  #
         window.eq.chk_on.setChecked(on)
         for _ in range(6):
             QApplication.processEvents()
-            window._refit()
+            window.fitctl._refit()
         assert window.eq.body.isVisible() == on
         for a, b in window._setup_pairs:
             ga, gb = a.geometry(), b.geometry()

@@ -134,8 +134,8 @@ def test_the_video_follows_the_sound(qapp):
 
 def _close(qapp, w):
     w.close()
-    if w._load_thread:
-        w._load_thread.join(15)
+    if w.soundctl._load_thread:
+        w.soundctl._load_thread.join(15)
     w.deleteLater()
     qapp.sendPostedEvents(None, QEvent.DeferredDelete)
 
@@ -155,7 +155,7 @@ def window(qapp, app_dir, monkeypatch):
     Config(sounds=sounds).save()
     videos.link("vid", _video(app_dir / "clips" / "vid.mp4"))
     w = main.MainWindow()
-    w._load_thread.join(15)
+    w.soundctl._load_thread.join(15)
     process_events(qapp, lambda: all(p.state == "ready" for p in w.pads.values()), 5)
     yield w
     _close(qapp, w)
@@ -164,9 +164,9 @@ def window(qapp, app_dir, monkeypatch):
 def _transport(w):
     """_update_transport, once the thread looking up the sound's video is back."""
     from PySide6.QtWidgets import QApplication
-    w._update_transport({})
+    w.transctl._update_transport({})
     assert process_events(QApplication.instance(), lambda: w._video_asking is None, 3)
-    w._update_transport({})
+    w.transctl._update_transport({})
 
 
 def test_the_video_button_shows_only_for_a_video_pad(window, monkeypatch):
@@ -226,11 +226,11 @@ def test_picking_a_pad_never_reads_videos_json_on_the_ui_thread(window, monkeypa
     gate.clear()             # from here each lookup waits for the gate
     t0 = time.monotonic()
     w.playctl.select("vid")
-    w._update_transport({})
+    w.transctl._update_transport({})
     w.playctl.select("plain")        # picked again before the answer for "vid" came
-    w._update_transport({})
+    w.transctl._update_transport({})
     w.playctl.select("vid")
-    w._update_transport({})
+    w.transctl._update_transport({})
     assert time.monotonic() - t0 < 0.5
     assert w.btn_video.isHidden()
     gate.set()

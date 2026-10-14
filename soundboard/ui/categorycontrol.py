@@ -125,7 +125,7 @@ class CategoryControl(Controller):
             return
         cat = cfg.category
         if getattr(mw, "_toolbar_hold", None) is not None:
-            mw._fit_toolbar()   # its margins, before the first resize does
+            mw.fitctl._fit_toolbar()   # its margins, before the first resize does
 
         def chip(text: str, tip: str):
             b = QPushButton(text.replace("&", "&&"))
@@ -210,7 +210,7 @@ class CategoryControl(Controller):
             return
         old_tag, new_tag = library.sub_tag(cat, sub), library.sub_tag(cat, new)
         subs[subs.index(sub)] = new
-        for m in mw._live_metas():   # removed ones too, or Undo brings `old` back
+        for m in mw.soundctl._live_metas():   # removed ones too, or Undo brings `old` back
             m.tags = [new_tag if t == old_tag else t for t in m.tags]
         if mw.cfg.subcategory == sub:
             mw.cfg.subcategory = new
@@ -236,7 +236,7 @@ class CategoryControl(Controller):
         subs.remove(sub)
         if not subs:
             mw.cfg.subcategories.pop(cat, None)
-        for m in mw._live_metas():
+        for m in mw.soundctl._live_metas():
             if tag in m.tags:
                 m.tags.remove(tag)
         if mw.cfg.subcategory == sub:
@@ -453,7 +453,7 @@ class CategoryControl(Controller):
         mw.playctl.shuffle.forget(old)
         if old in mw.cfg.subcategories:
             mw.cfg.subcategories[new] = mw.cfg.subcategories.pop(old)
-        for m in mw._live_metas():   # removed ones too, or Undo brings `old` back
+        for m in mw.soundctl._live_metas():   # removed ones too, or Undo brings `old` back
             m.tags = [self._retag(t, old, new) for t in m.tags]
         if mw.cfg.category == old:
             mw.cfg.category = new
@@ -484,7 +484,7 @@ class CategoryControl(Controller):
         self._update_cat_timer()
         mw.playctl.shuffle.forget(name)
         mw.cfg.subcategories.pop(name, None)
-        for m in mw._live_metas():   # removed ones too, or Undo brings it back
+        for m in mw.soundctl._live_metas():   # removed ones too, or Undo brings it back
             m.tags = [t for t in m.tags if library.split_tag(t)[0] != name]
         if mw.cfg.category == name:
             mw.cfg.category = ""

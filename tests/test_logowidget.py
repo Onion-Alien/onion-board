@@ -56,5 +56,5 @@ def test_taskbar_and_tray_icons_stay_still_while_sound_plays(window, monkeypatch
     monkeypatch.setattr(window, "setWindowIcon", lambda ic: swaps.append(ic))
     for _ in range(5):
         window.engine.level_play = 0.9
-        window.tick()
+        window.tickctl.tick()
     assert not swaps

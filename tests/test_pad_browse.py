@@ -103,10 +103,10 @@ def test_playing_counts_and_most_played_sorts(window, monkeypatch):
 def test_dragging_while_sorted_keeps_the_own_order(window):
     w = window
     w.padctl.set_pad_sort("name")
-    w.on_reorder("s0", 0)
+    w.soundctl.on_reorder("s0", 0)
     assert [m.id for m in w.cfg.sounds] == ["s0", "s1"]
     w.padctl.set_pad_sort("custom")
-    w.on_reorder("s1", 0)
+    w.soundctl.on_reorder("s1", 0)
     assert [m.id for m in w.cfg.sounds] == ["s1", "s0"]
 
 
@@ -170,9 +170,9 @@ def test_a_newer_row_size_loads_as_medium():
 def test_list_view_survives_the_mini_player(window):
     w = window
     w.padctl.set_pad_view("list")
-    w._set_mini(True)
+    w.fitctl._set_mini(True)
     assert w.grid.fit_width(300) == (1, 300)   # one row a line in the mini player
-    w._set_mini(False)
+    w.fitctl._set_mini(False)
     assert w.grid.listed
 
 

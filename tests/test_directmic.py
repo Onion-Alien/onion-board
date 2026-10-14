@@ -3189,7 +3189,7 @@ def test_window_starts_on_the_mic_with_the_cable_copy(qapp, app_dir, monkeypatch
         w.statusctl._update_flow()
         assert "virtual cable" not in w.pill.accessibleName()
     finally:
-        w._load_thread.join(15)
+        w.soundctl._load_thread.join(15)
         w.close()
 
 
@@ -3397,7 +3397,6 @@ def test_a_failing_helper_check_backs_off(window, monkeypatch):  # noqa: F811
 
     from conftest import process_events
     from soundboard import michelper
-    from soundboard.ui import mainwindow as mw
     from soundboard.ui import miccontrol
     w = window
     _routes(w, monkeypatch, "missing")
@@ -3413,8 +3412,7 @@ def test_a_failing_helper_check_backs_off(window, monkeypatch):  # noqa: F811
         return True
     monkeypatch.setattr(michelper, "ready", ready)
     now = [1000.0]
-    for mod in (mw, miccontrol):
-        own_module(monkeypatch, mod, "time", monotonic=lambda: now[0])
+    own_module(monkeypatch, miccontrol, "time", monotonic=lambda: now[0])
     _no_threads(monkeypatch, run=True)
     app = QApplication.instance()
     for _ in range(20):

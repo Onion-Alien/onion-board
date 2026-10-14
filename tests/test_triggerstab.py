@@ -8,15 +8,16 @@ import zipfile
 
 import numpy as np
 import pytest
-
 from conftest import process_events
+from test_triggers_module import make_module, zip_of
+
 from soundboard import updates, watchaddon
 from soundboard.library import SoundMeta
 from soundboard.ui import triggershost
 from soundboard.ui.livedot import is_tab_live
+from soundboard.ui.tabcontrol import TAB_INDEX
 from soundboard.ui.triggershost import BoardHost
 from soundboard.ui.triggerstab import TriggersTab
-from test_triggers_module import make_module, zip_of
 
 PANEL = '''
 from PySide6.QtCore import Signal
@@ -131,6 +132,7 @@ def test_the_tab_itself_offers_it_no_window_pops_up(qapp, tmp_path, monkeypatch)
     """Not installed: the tab is Hoot's card (what it does, Get Onion Watch), not a
     window popping up on entering it and a lone button once that was closed."""
     from PySide6.QtWidgets import QDialog
+
     from soundboard.ui import triggerstab
     seen = []
     monkeypatch.setattr(triggerstab.usage, "used", seen.append)
@@ -195,6 +197,7 @@ def test_a_deferred_tab_loads_the_add_on_only_when_asked(qapp, tmp_path, pkg, mo
 def test_the_window_loads_onion_watch_while_it_is_built(qapp, app_dir, monkeypatch):
     """Behind the loading screen, so the tab's first click is instant."""
     from PySide6.QtCore import QEvent
+
     from soundboard import engine, winkeys
     from soundboard.library import Config
     from soundboard.ui import mainwindow as main
@@ -211,7 +214,7 @@ def test_the_window_loads_onion_watch_while_it_is_built(qapp, app_dir, monkeypat
         w.load_triggers()
         assert loads == [w.triggers]                     # once
     finally:
-        w._load_thread.join(15)
+        w.soundctl._load_thread.join(15)
         w.close()
         w.deleteLater()
         qapp.sendPostedEvents(None, QEvent.DeferredDelete)
@@ -228,14 +231,14 @@ def watch_window(qapp, app_dir, monkeypatch, pkg, screen):
     make_module(app_dir / "modules" / "onion-watch", package=pkg, board=PANEL)
     Config(screen=screen, mic_first=True).save()
     w = main.MainWindow()
-    w._load_thread.join(15)
+    w.soundctl._load_thread.join(15)
     return w
 
 
 def close_window(qapp, w):
     from PySide6.QtCore import QEvent
     w.close()
-    w._load_thread.join(15)
+    w.soundctl._load_thread.join(15)
     w.deleteLater()
     qapp.sendPostedEvents(None, QEvent.DeferredDelete)
 
@@ -246,13 +249,12 @@ def test_an_installed_onion_watch_is_in_the_tab_before_the_window_shows(
         qapp, app_dir, monkeypatch, pkg, screen):
     """Watching on or off, triggers or none: the add-on loads while the window is built
     (behind the loading screen), so the Triggers tab opens at once, already there."""
-    from soundboard.ui import mainwindow as main
     w = watch_window(qapp, app_dir, monkeypatch, pkg, screen)
     try:
         assert not w.triggers.pending and w.triggers.panel is not None
         assert w.triggers.stack.currentWidget() is w.triggers.board_page
         assert w.triggers.panel.host.screen is w.cfg.screen
-        assert not is_tab_live(w.tabs, main.TAB_INDEX["triggers"])
+        assert not is_tab_live(w.tabs, TAB_INDEX["triggers"])
         w.show()
         w.tabs.setCurrentWidget(w.triggers)
         assert w.tabs.currentWidget() is w.triggers and w.triggers.panel is not None
@@ -263,7 +265,6 @@ def test_an_installed_onion_watch_is_in_the_tab_before_the_window_shows(
 def test_the_tab_is_shown_once_behind_the_loading_screen(qapp, app_dir, monkeypatch, pkg):
     """warm_triggers: its first show (layout, the editor) done before the first click,
     quietly: the tab you were on stays, nothing saved or counted as opened."""
-    from soundboard.ui import mainwindow as main
     w = watch_window(qapp, app_dir, monkeypatch, pkg, two_triggers(on=False))
     shown = []
     try:
@@ -276,7 +277,7 @@ def test_the_tab_is_shown_once_behind_the_loading_screen(qapp, app_dir, monkeypa
         assert shown                                       # it was shown once
         assert w.tabs.currentIndex() == before and w.cfg.tab == saved_tab
         assert w.updatesEnabled()
-        assert w.tabs.currentIndex() != main.TAB_INDEX["triggers"]
+        assert w.tabs.currentIndex() != TAB_INDEX["triggers"]
     finally:
         close_window(qapp, w)
 
@@ -293,7 +294,7 @@ def test_without_onion_watch_the_tab_is_not_shown_behind_the_loading_screen(
     Config(mic_first=True).save()
     w = main.MainWindow()
     try:
-        w._load_thread.join(15)
+        w.soundctl._load_thread.join(15)
         w.show()
         qapp.processEvents()
         assert w.triggers.panel is None                    # not installed
@@ -318,7 +319,7 @@ def test_the_bar_keeps_its_words_while_it_has_room(qapp, app_dir, monkeypatch, p
         w.tabs.setCurrentWidget(w.triggers)
         qapp.processEvents()
         watch = w.triggers.panel.watch
-        assert w._fit.compact_count()        # the window squeezed parts of other tabs...
+        assert w.fitctl._fit.compact_count()        # the window squeezed parts of other tabs...
         assert watch.text() == "Start watching"   # ...and left the bar's words alone
         w.tabs.setCurrentIndex(0)
         w.resize(880, 700)                   # (while another tab shows)
@@ -786,6 +787,7 @@ def test_the_zip_names_its_own_folder(addon_zip):
 def test_addon_download_keeps_focus(qapp, tmp_path, monkeypatch):
     from PySide6.QtCore import Qt
     from PySide6.QtTest import QTest
+
     from soundboard import net
     from soundboard.ui import busy, triggerstab
     monkeypatch.setattr(net, "allowed", lambda key: True)

@@ -97,8 +97,8 @@ def test_binning_a_sound_whose_audio_is_held_still_bins_it(app_dir, map_all):
 
 def test_remove_undo_and_bin_with_mapped_sounds(window, qapp, map_all):  # noqa: F811
     window.audio.clear()
-    window._load_all()
-    window._load_thread.join(10)
+    window.soundctl._load_all()
+    window.soundctl._load_thread.join(10)
     assert process_events(qapp, lambda: all(m.id in window.audio for m in window.cfg.sounds))
     assert all(mapped.is_mapped(window.audio[m.id]) for m in window.cfg.sounds)
     window.playctl.play("s1", now=True)
@@ -111,7 +111,7 @@ def test_remove_undo_and_bin_with_mapped_sounds(window, qapp, map_all):  # noqa:
     held = window.rmctl._removed[-1][2]
     window.rmctl._finish_removals()                    # into the bin: the cache goes...
     window.rmctl._wait_bin()
-    keep = library.cache_keep(window._live_metas())
+    keep = library.cache_keep(window.soundctl._live_metas())
     del held
 
     def pruned():   # ...or, if it was refused, the next prune once it's let go

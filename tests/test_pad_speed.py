@@ -486,7 +486,7 @@ def test_dragging_a_pad_to_a_new_place_lays_the_grid_out_once(window, monkeypatc
     calls = []
     real = window.grid.relayout
     monkeypatch.setattr(window.grid, "relayout", lambda **k: (calls.append(k), real(**k)))
-    window.on_reorder("s1", 0)
+    window.soundctl.on_reorder("s1", 0)
     assert len(calls) == 1
     assert [p.meta.id for p in window.grid.pads] == ["s1", "s0"]
     at = window.grid.grid.getItemPosition

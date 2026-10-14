@@ -33,7 +33,7 @@ def test_saved_mode_is_applied_at_startup(qapp, app_dir, monkeypatch):
     Config(dest={"mode": "discord"}, mic_first=True).save()   # (on the cable)
     w = main.MainWindow()
     try:
-        w._load_thread.join(15)
+        w.soundctl._load_thread.join(15)
         assert w.engine.dest is not None and w.engine.dest.key == "discord"
     finally:
         w.close()
@@ -251,7 +251,7 @@ def test_main_window_starts_with_a_bad_custom_dest(qapp, app_dir, monkeypatch):
     Config(dest={"mode": "discord", "custom": 5}).save()
     w = main.MainWindow()
     try:
-        w._load_thread.join(15)
+        w.soundctl._load_thread.join(15)
         assert w.engine.dest is not None and w.engine.dest.key == "discord"
     finally:
         w.close()

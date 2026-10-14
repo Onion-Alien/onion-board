@@ -10,7 +10,7 @@ def test_background_stretches_whole_thumbnail_with_padding(window, size):  # noq
     w = window
     w.tabs.setCurrentWidget(w.sounds_page)
     w.cfg.playing_background = True
-    w._update_playing_background({})
+    w.transctl._update_playing_background({})
     w.resize(1180, 720)
     w.show()
     w.grid.relayout(force=True)
@@ -41,9 +41,9 @@ def test_background_board_scrolls_without_partial_rows(
     w.resize(*size)
     w.show()
     w._pad_scroll.verticalScrollBar().setValue(31)
-    w._update_playing_background(playing)
+    w.transctl._update_playing_background(playing)
     qapp.processEvents()
-    w._update_playing_background(playing)
+    w.transctl._update_playing_background(playing)
     qapp.processEvents()
     bar = w._pad_scroll.verticalScrollBar()
     assert w._pad_scroll.viewportMargins().bottom() == 0
@@ -63,21 +63,21 @@ def test_background_tracks_first_active_sound(window):  # noqa: F811
     w.meta("s0").image = "first.jpg"
     w.meta("s1").image = "second.jpg"
     playing = {"s0": (0.2, False), "s1": (0.4, True)}
-    w._update_playing_background(playing)
+    w.transctl._update_playing_background(playing)
     assert w.grid.background_image == ""
     w.cfg.playing_background = True
     w.playctl.select("s1")
-    w._update_playing_background(playing)
+    w.transctl._update_playing_background(playing)
     assert w.grid.background_image == "first.jpg"
-    w._update_playing_background({"s0": (0.2, True)})
+    w.transctl._update_playing_background({"s0": (0.2, True)})
     assert w.grid.background_image == "first.jpg"
-    w._update_playing_background({"s1": (0.4, False)})
+    w.transctl._update_playing_background({"s1": (0.4, False)})
     assert w.grid.background_image == "second.jpg"
     w.meta("s1").image = ""
-    w._update_playing_background({"s1": (0.4, False)})
+    w.transctl._update_playing_background({"s1": (0.4, False)})
     assert w.grid.background_image == ""
     w.playctl._queue = ["s0"]
-    w._update_playing_background({})
+    w.transctl._update_playing_background({})
     assert w.grid.background_image == ""
 
 

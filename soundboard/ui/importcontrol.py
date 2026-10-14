@@ -823,7 +823,7 @@ class ImportControl(Controller):
         mw._save_now()
         mw._rebuild_pads()
         mw.catctl._fill_categories()
-        mw._load_all()
+        mw.soundctl._load_all()
         mw.hkctl.register_hotkeys()
         n = len(res.sounds)
         if pkg.restored:   # Backup → My sound packs → Reset to how it came
@@ -935,13 +935,14 @@ class ImportControl(Controller):
                 QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.Cancel
                 ) != QMessageBox.StandardButton.Yes:
             return
-        mine = [m for m in mw._live_metas() if m.pack == pid]
+        mine = [m for m in mw.soundctl._live_metas() if m.pack == pid]
         library.group_pack_tags(mine, name, own)
         merge = library.merge_tags
         for m in mine:
             m.tags = merge(m.tags, mw.cfg.categories, mw.cfg.subcategories)
+        live = mw.soundctl._live_metas()
         for c in list(mw.cfg.categories):   # the old tabs, once nothing is in them
-            if c.lower() in own and not any(c in m.tags for m in mw._live_metas()) and not (
+            if c.lower() in own and not any(c in m.tags for m in live) and not (
                     mw.cfg.category_hotkeys.get(c)
                     or catswitch.programs_for(mw.cfg.category_programs, c)):
                 mw.cfg.categories.remove(c)
