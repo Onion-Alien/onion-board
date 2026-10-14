@@ -37,7 +37,6 @@ from soundboard.ui.pixels import snap_to_pixels
 
 log = logging.getLogger(__name__)
 
-CLIP_S = 15
 LIST_MAX = 300             # rows shown at once
 SEARCH_DELAY_MS = 450      # typing pause before the directory is asked
 TYPE_DELAY_MS = 80         # ...and before the list shows the matches already known
@@ -475,7 +474,7 @@ class RadioTab(QWidget):
         self.player.error.connect(self._on_error)
         self.player.now_playing.connect(self._on_now_playing)
         from soundboard.recorder import Recorder
-        self.recorder = Recorder(library.APP_DIR / "radio-recording.tmp.wav")
+        self.recorder = Recorder(library.APP_DIR / "radio-recording.tmp.wav", seconds=0)
 
         self._want_globe = globe   # a map at all (tests run without one)
         self.flat = None           # the map, made on first show
@@ -572,7 +571,7 @@ class RadioTab(QWidget):
         self.info.setObjectName("muted")
         v.addWidget(self.info)
 
-        # ---- control bar: play, random, star | live ... record, last 15 s | volume | hear
+        # ---- control bar: play, random, star | live ... record | volume | hear
         bar_, bh = bar()
         self.btn_play = QPushButton(_("Play"))
         icons.set_icon(self.btn_play, "play")
@@ -610,12 +609,6 @@ class RadioTab(QWidget):
         icons.set_icon(self.btn_rec, "record", "#ff4d4f", "#ffffff", size=14)
         self.btn_rec.toggled.connect(self._on_rec)
         bh.addWidget(self.btn_rec)
-        self.btn_last = QPushButton(_("Last {n}s", n=CLIP_S))
-        self.btn_last.setToolTip(_("Save the last {n} seconds of the radio as a sound",
-                                   n=CLIP_S))
-        icons.set_icon(self.btn_last, "history")
-        self.btn_last.clicked.connect(self.clip_last)
-        bh.addWidget(self.btn_last)
         # Live controls: the radio's pitch and effects (no speed: it's a live stream)
         self.fx_btn = SpeedPitchButton("radio")
         self.fx_btn.changed.connect(lambda _s, p, _k: setattr(self.engine, "radio_pitch", p))
@@ -634,7 +627,7 @@ class RadioTab(QWidget):
         self.meter = meter
         self.vol.changed.connect(self._on_vol)
         bh.addWidget(self.vol)
-        self._clip_group = (self.btn_rec, self.btn_last)
+        self._clip_group = (self.btn_rec,)
         self._vol_group = (sep2, vol_icon, self.vol)
         self._play_short = False
         self.chk_hear = QCheckBox(_("Hear it myself"))
@@ -1303,8 +1296,6 @@ QFrame#stations QFrame#rule { background:$border; max-height:1px; border:none; }
 
     def play(self, s: Station):
         self._title = ""
-        if self._fed_by is None or self._fed_by.uuid != s.uuid:
-            self.recorder.clear_replay()   # "Last 15s" is only ever this station
         self._fed_by = s
         self.player.play(s)
         usage.used("radio-played")
@@ -1517,7 +1508,6 @@ QFrame#stations QFrame#rule { background:$border; max-height:1px; border:none; }
                 (24, "h", r.hide(self.seg_box)),
                 (30, "w", r.hide(self.chk_hear)),
                 (36, "w", r.icon_only(self.btn_rec)),
-                (36, "w", r.icon_only(self.btn_last)),
                 (36, "w", play_icon),
                 (40, "w", r.hide(*self._vol_group)),
                 (45, "w", r.hide(self.fx_btn)),
@@ -1546,11 +1536,6 @@ QFrame#stations QFrame#rule { background:$border; max-height:1px; border:none; }
         self.btn_rec.setText(_("Record"))
         self._emit_clip(self.recorder.stop(),
                         _("Nothing was playing on the radio while you recorded."))
-
-    def clip_last(self) -> bool:
-        return self._emit_clip(self.recorder.last(),
-                               _("Nothing on the radio has played in the last {n} seconds.",
-                                 n=CLIP_S))
 
     def _emit_clip(self, data: np.ndarray, empty_msg: str) -> bool:
         data = trim_silence(data)
