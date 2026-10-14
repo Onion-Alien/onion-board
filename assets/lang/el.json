@@ -1669,7 +1669,6 @@
   "Cleared, but couldn't download a fresh copy ({error}). Try again when you're online.": "Διαγράφηκε, αλλά δεν ήταν δυνατή η λήψη νέου αντιγράφου ({error}). Δοκιμάστε ξανά όταν είστε συνδεδεμένοι.",
   "Cleared, but couldn't download a fresh copy ({error}). Using the built-in yt-dlp {version}.": "Διαγράφηκε, αλλά δεν ήταν δυνατή η λήψη νέου αντιγράφου ({error}). Χρησιμοποιώντας το ενσωματωμένο yt-dlp {version} .",
   "Click when I talk": "Κάντε κλικ όταν μιλάω",
-  "Clip editor": "Επεξεργαστής κλιπ",
   "Clip editor for {name}": "Πρόγραμμα επεξεργασίας κλιπ για {name}",
   "Clip waveform": "Κλιπ κυματομορφής",
   "Colourful": "Γραφικός",

@@ -1672,7 +1672,6 @@
   "Cleared, but couldn't download a fresh copy ({error}). Try again when you're online.": "Gewist, maar kon geen nieuw exemplaar downloaden ({error}). Probeer het opnieuw als je online bent.",
   "Cleared, but couldn't download a fresh copy ({error}). Using the built-in yt-dlp {version}.": "Gewist, maar kon geen nieuw exemplaar downloaden ({error}). Met behulp van de ingebouwde yt-dlp {version} .",
   "Click when I talk": "Klik als ik praat",
-  "Clip editor": "Clip-editor",
   "Clip editor for {name}": "Clip-editor voor {name}",
   "Clip waveform": "Golfvorm knippen",
   "Colourful": "Kleurrijk",

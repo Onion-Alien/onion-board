@@ -1844,7 +1844,6 @@
   "Cleared, but couldn't download a fresh copy ({error}). Try again when you're online.": "تم المسح، ولكن تعذر تنزيل نسخة جديدة ({error}). حاول مرة أخرى عندما تكون متصلاً بالإنترنت.",
   "Cleared, but couldn't download a fresh copy ({error}). Using the built-in yt-dlp {version}.": "تم المسح، ولكن تعذر تنزيل نسخة جديدة ({error}). باستخدام yt-dlp {version} المدمج.",
   "Click when I talk": "انقر عندما أتحدث",
-  "Clip editor": "محرر المقطع",
   "Clip editor for {name}": "محرر المقطع لـ {name}",
   "Clip waveform": "مقطع الموجي",
   "Colourful": "ملون",

@@ -1712,7 +1712,6 @@
   "Cleared, but couldn't download a fresh copy ({error}). Try again when you're online.": "S-a șters, dar nu s-a putut descărca o copie nouă ({error}). Încercați din nou când sunteți online.",
   "Cleared, but couldn't download a fresh copy ({error}). Using the built-in yt-dlp {version}.": "S-a șters, dar nu s-a putut descărca o copie nouă ({error}). Folosind {version} yt-dlp încorporat.",
   "Click when I talk": "Faceți clic când vorbesc",
-  "Clip editor": "Editor de clipuri",
   "Clip editor for {name}": "Editor de clipuri pentru {name}",
   "Clip waveform": "Clipă formă de undă",
   "Colourful": "Colorat",

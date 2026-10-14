@@ -1669,7 +1669,6 @@
   "Cleared, but couldn't download a fresh copy ({error}). Try again when you're online.": "Törölve, de nem sikerült letölteni egy új példányt ({error}). Próbálja újra, ha online lesz.",
   "Cleared, but couldn't download a fresh copy ({error}). Using the built-in yt-dlp {version}.": "Törölve, de nem sikerült letölteni egy új példányt ({error}). A beépített yt-dlp {version} használatával.",
   "Click when I talk": "Kattintson, amikor beszélek",
-  "Clip editor": "Klipszerkesztő",
   "Clip editor for {name}": "Klipszerkesztő a következőhöz: {name}",
   "Clip waveform": "Klip hullámforma",
   "Colourful": "Színes",

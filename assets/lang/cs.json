@@ -1712,7 +1712,6 @@
   "Cleared, but couldn't download a fresh copy ({error}). Try again when you're online.": "Vymazáno, ale nelze stáhnout novou kopii ({error}). Zkuste to znovu, až budete online.",
   "Cleared, but couldn't download a fresh copy ({error}). Using the built-in yt-dlp {version}.": "Vymazáno, ale nelze stáhnout novou kopii ({error}). Pomocí vestavěného yt-dlp {version} .",
   "Click when I talk": "Klikněte, když mluvím",
-  "Clip editor": "Editor klipů",
   "Clip editor for {name}": "Editor klipů pro {name}",
   "Clip waveform": "Klipová křivka",
   "Colourful": "Barvitý",

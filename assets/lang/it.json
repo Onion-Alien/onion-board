@@ -1672,7 +1672,6 @@
   "Cleared, but couldn't download a fresh copy ({error}). Try again when you're online.": "Cancellato, ma impossibile scaricare una nuova copia ({error}). Riprova quando sei online.",
   "Cleared, but couldn't download a fresh copy ({error}). Using the built-in yt-dlp {version}.": "Cancellato, ma impossibile scaricare una nuova copia ({error}). Utilizzando il file yt-dlp {version} integrato.",
   "Click when I talk": "Fai clic quando parlo",
-  "Clip editor": "Editor di clip",
   "Clip editor for {name}": "Editor di clip per {name}",
   "Clip waveform": "Taglia la forma d'onda",
   "Colourful": "Colorato",

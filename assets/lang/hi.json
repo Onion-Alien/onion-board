@@ -1672,7 +1672,6 @@
   "Cleared, but couldn't download a fresh copy ({error}). Try again when you're online.": "साफ़ कर दिया गया, लेकिन नई प्रति डाउनलोड नहीं की जा सकी ({error})। जब आप ऑनलाइन हों तो पुनः प्रयास करें.",
   "Cleared, but couldn't download a fresh copy ({error}). Using the built-in yt-dlp {version}.": "साफ़ कर दिया गया, लेकिन नई प्रति डाउनलोड नहीं की जा सकी ({error})। अंतर्निहित yt-dlp {version} उपयोग करना।",
   "Click when I talk": "जब मैं बात करूं तो क्लिक करें",
-  "Clip editor": "क्लिप संपादक",
   "Clip editor for {name}": "{name} के लिए क्लिप संपादक",
   "Clip waveform": "क्लिप तरंगरूप",
   "Colourful": "रंग बिरंगा",

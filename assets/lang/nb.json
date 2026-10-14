@@ -1669,7 +1669,6 @@
   "Cleared, but couldn't download a fresh copy ({error}). Try again when you're online.": "Fjernet, men kunne ikke laste ned en ny kopi ({error}). Prøv igjen når du er online.",
   "Cleared, but couldn't download a fresh copy ({error}). Using the built-in yt-dlp {version}.": "Fjernet, men kunne ikke laste ned en ny kopi ({error}). Bruker den innebygde yt-dlp {version} .",
   "Click when I talk": "Klikk når jeg snakker",
-  "Clip editor": "Klipp editor",
   "Clip editor for {name}": "Klippredigering for {name}",
   "Clip waveform": "Klipp bølgeform",
   "Colourful": "Fargerik",

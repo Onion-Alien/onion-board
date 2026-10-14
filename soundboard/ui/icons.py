@@ -71,6 +71,15 @@ def _wave(p, fill):
         p.drawLine(QPointF(x, 12 - h / 2), QPointF(x, 12 + h / 2))
 
 
+def _scissors(p, fill):
+    """Cutting a clip out of something."""
+    p.drawEllipse(QPointF(6, 6), 3, 3)
+    p.drawEllipse(QPointF(6, 18), 3, 3)
+    p.drawLine(QPointF(20, 4), QPointF(8.1, 15.9))
+    p.drawLine(QPointF(14.5, 14.5), QPointF(20, 20))
+    p.drawLine(QPointF(8.1, 8.1), QPointF(12, 12))
+
+
 def _music(p, fill):
     """A pair of beamed notes, matching the toolbar's round line icons."""
     path = QPainterPath(QPointF(9, 17))
@@ -778,7 +787,7 @@ SHAPES = {
     "sort": _sort, "list": _list, "rename": _rename, "tag": _tag, "search": _search,
     "sounds": _grid, "browser": _globe, "offline": _offline, "tor": _tor, "phone": _phone,
     "voice": _mask, "setup": _sliders,
-    "sliders": _sliders, "wave": _wave, "music": _music, "puzzle": _puzzle,
+    "sliders": _sliders, "wave": _wave, "scissors": _scissors, "music": _music, "puzzle": _puzzle,
     "mic": _mic, "mic_off": _mic_off, "headphones": _headphones, "volume": _volume,
     "volume_off": _volume_off, "ear": _ear,
     "play": _play, "pause": _pause, "stop": _stop, "stop_all": _stop_all, "record": _record,

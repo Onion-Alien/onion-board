@@ -1629,7 +1629,6 @@
   "Cleared, but couldn't download a fresh copy ({error}). Try again when you're online.": "ล้างแล้ว แต่ไม่สามารถดาวน์โหลดสำเนาใหม่ได้ ({error}) ลองอีกครั้งเมื่อคุณออนไลน์",
   "Cleared, but couldn't download a fresh copy ({error}). Using the built-in yt-dlp {version}.": "ล้างแล้ว แต่ไม่สามารถดาวน์โหลดสำเนาใหม่ได้ ({error}) การใช้ yt-dlp {version} ในตัว",
   "Click when I talk": "คลิกเมื่อฉันพูด",
-  "Clip editor": "โปรแกรมแก้ไขคลิป",
   "Clip editor for {name}": "โปรแกรมตัดต่อคลิปสำหรับ {name}",
   "Clip waveform": "รูปคลื่นของคลิป",
   "Colourful": "สีสัน",

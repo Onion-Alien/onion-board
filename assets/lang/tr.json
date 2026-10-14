@@ -1672,7 +1672,6 @@
   "Cleared, but couldn't download a fresh copy ({error}). Try again when you're online.": "Temizlendi ancak yeni bir kopya indirilemedi ({error}). Çevrimiçi olduğunuzda tekrar deneyin.",
   "Cleared, but couldn't download a fresh copy ({error}). Using the built-in yt-dlp {version}.": "Temizlendi ancak yeni bir kopya indirilemedi ({error}). Yerleşik yt-dlp {version} kullanma.",
   "Click when I talk": "Konuştuğumda tıkla",
-  "Clip editor": "Klip düzenleyici",
   "Clip editor for {name}": "{name} için klip düzenleyici",
   "Clip waveform": "Klip dalga formu",
   "Colourful": "Renkli",

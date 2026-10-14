@@ -1630,7 +1630,6 @@
   "Cleared, but couldn't download a fresh copy ({error}). Try again when you're online.": "Удален, но загрузить новую копию не удалось ({error}). Попробуйте еще раз, когда будете онлайн.",
   "Cleared, but couldn't download a fresh copy ({error}). Using the built-in yt-dlp {version}.": "Удален, но загрузить новую копию не удалось ({error}). Использование встроенной версии yt-dlp {version} .",
   "Click when I talk": "Нажмите, когда я говорю",
-  "Clip editor": "Редактор клипов",
   "Clip editor for {name}": "Редактор клипов для {name}",
   "Clip waveform": "Форма сигнала клипа",
   "Colourful": "Красочный",
