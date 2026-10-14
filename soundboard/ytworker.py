@@ -244,6 +244,12 @@ def _slim(info):
     if not isinstance(info, dict):
         return info
     out = {k: v for k, v in info.items() if k not in _LOOKUP_DROP and not k.startswith("__")}
+    # a flat search entry lists its picture only here (SoundCloud's card art): keep the
+    # last, the one the card reads, and drop the rest of the list
+    art = next((t["url"] for t in reversed(info.get("thumbnails") or ())
+                if isinstance(t, dict) and t.get("url")), None)
+    if art:
+        out["thumbnails"] = [{"url": art}]
     if isinstance(out.get("entries"), list) or "entries" in info:
         out["entries"] = [_slim(e) for e in (info.get("entries") or ()) if e]
     return out
