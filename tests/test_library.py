@@ -335,3 +335,20 @@ def test_a_config_locked_for_a_moment_still_saves(app_dir, monkeypatch):
     locked[0] = 99                                        # never lets go: still a failure
     c.sound_vol = 0.5
     assert not c.save()
+
+
+def test_lowering_the_sounds_while_you_talk_is_on_once_for_older_settings():
+    """Ducking is on by default: older settings (Off was the default) move to -12 dB
+    once; a depth someone picked stays, and Off chosen after that stays off."""
+    old = library.Config().to_raw()
+    old.pop("duck_on")
+    old["duck_db"] = 0.0
+    assert library.Config.from_raw(old).duck_db == -12.0
+    old.pop("duck_db")   # saved before ducking existed
+    assert library.Config.from_raw(old).duck_db == -12.0
+    old["duck_db"] = -20.0
+    assert library.Config.from_raw(old).duck_db == -20.0
+    off = library.Config.from_raw({**old, "duck_db": 0.0, "duck_on": True})
+    assert off.duck_db == 0.0
+    assert library.Config.from_raw(off.to_raw()).duck_db == 0.0
+    assert library.Config.first_start().duck_db == -12.0
