@@ -45,7 +45,7 @@ def test_help_cards_open_right_of_the_rail_inside_the_window(window, qapp, monke
 @pytest.mark.parametrize("page", ["radio_page", "triggers"])
 def test_tab_help_is_a_dismissible_mascot_popup(window, qapp, monkeypatch, page):  # noqa: F811
     from soundboard.bunny import bunny_pixmap
-    from soundboard.ui.owl import owl_image
+    from soundboard.style.owl import owl_image
 
     target = getattr(window, page)
     window.tab_info[page] = ("Tab help", "A plain explanation.")

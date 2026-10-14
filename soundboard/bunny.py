@@ -9,7 +9,8 @@ from __future__ import annotations
 from PySide6.QtCore import QPointF, QRectF, Qt
 from PySide6.QtGui import QColor, QImage, QPainter, QPainterPath, QPen, QPixmap
 
-from soundboard import bunnyfit, theme
+from soundboard import theme
+from soundboard.style import bunnyfit
 
 # drawn on a 100 x 120 canvas, scaled to the requested height
 W, H = 100.0, 120.0

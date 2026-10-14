@@ -214,7 +214,7 @@ def isolate(conf: dict):
     appaudio.endpoint_names = lambda kind: None
     appaudio.recording_apps = lambda device: []
 
-    from soundboard.ui import owl
+    from soundboard.style import owl
     owl.OwlWidget._mouse = lambda self: None   # the real cursor isn't over a hidden window
 
     from PySide6.QtWidgets import QMessageBox

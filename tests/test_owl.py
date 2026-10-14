@@ -1,10 +1,10 @@
-"""Hoot alive (ui/owl.OwlWidget, a copy of Onion Watch's): every act he does while
+"""Hoot alive (style/owl.OwlWidget, shared with Onion Watch): every act he does while
 he waits runs start to end and paints, the mouse coming near cuts an act short and
 perks him up, and a click cheers him. Offscreen, stepped by hand: no timers are waited on."""
 from PySide6.QtCore import Qt
 from PySide6.QtGui import QImage
 
-from soundboard.ui import owl
+from soundboard.style import owl
 
 
 def paint(w):
