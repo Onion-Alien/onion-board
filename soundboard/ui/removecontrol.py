@@ -20,6 +20,7 @@ from soundboard.i18n import _, ngettext
 from soundboard.library import SoundMeta
 from soundboard.ui import toast as toastmod
 from soundboard.ui import worker
+from soundboard.ui.controller import Controller
 from soundboard.ui.crashdialog import free_dialog
 
 if TYPE_CHECKING:
@@ -29,11 +30,11 @@ UNDO_S = 10          # how long "Removed … · Undo" stays up
 UNDO_KEY = "undo-sounds"   # its card (toast key)
 
 
-class RemoveControl:
+class RemoveControl(Controller):
     """Removing, Undo and the Recently deleted bin for one MainWindow (``mw``)."""
 
     def __init__(self, mw: MainWindow):
-        self.mw = mw
+        super().__init__(mw)
         self._removed: list[tuple[SoundMeta, int, np.ndarray | None]] = []   # undo-able
         self._bin_thread: threading.Thread | None = None   # the newest _finish_removals work
 

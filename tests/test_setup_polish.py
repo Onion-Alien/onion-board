@@ -108,6 +108,11 @@ def test_working_mic_card_offers_reinstall_and_remove(window, monkeypatch):  # n
     w.routectl._show_route()
     w.statusctl._update_status()
     assert not w.btn_micredo.isHidden() and not w.btn_micoff.isHidden()
+    assert not w.btn_michange.isHidden()
+    opened = []
+    monkeypatch.setattr(w.cb_mic, "showPopup", lambda: opened.append(True))
+    w.btn_michange.click()   # Change mic: Devices' My mic, opened (the effect follows it)
+    assert opened
     ran = []
     rec = audiorecovery.recovery_of(w)
     monkeypatch.setattr(rec, "start", lambda a, t=None, say_done=False:
@@ -122,3 +127,47 @@ def test_working_mic_card_offers_reinstall_and_remove(window, monkeypatch):  # n
     monkeypatch.setattr(dm, "status", lambda name=None: "missing")
     w.statusctl._update_status()
     assert w.btn_micredo.isHidden() and w.btn_micoff.isHidden()
+    assert w.btn_michange.isHidden()
+
+
+def test_mic_alt_tiles_never_clip(window, monkeypatch):  # noqa: F811
+    """Mic effect works: the "other ways" tiles sit side by side while their names and
+    buttons fit, and stack one under the other when not (at 900 px "Another device" read
+    "Another devic" with its button cut off at the card's edge)."""
+    from PySide6.QtWidgets import QLabel, QPushButton
+    w = window
+    _mic_works(w, monkeypatch)
+    w.show()
+    w.tabs.setCurrentWidget(w.setup_page)
+    w.routectl._show_route()
+    w._update_status()
+    row = w.mic_alt_tiles
+    tiles = (w.alt_cable, w.alt_device)
+
+    def fits(why):
+        for t in tiles:
+            assert row.rect().contains(t.geometry()), (why, t.geometry(), row.rect())
+            for kid in t.findChildren(QLabel) + t.findChildren(QPushButton):
+                if kid.isHidden() or kid.objectName() == "hint":   # hints wrap
+                    continue
+                at = kid.mapTo(t, kid.rect().topLeft())
+                assert at.x() >= 0 and at.x() + kid.width() <= t.width(), (why, kid)
+                assert kid.width() >= kid.minimumSizeHint().width(), (why, kid.text())
+        if not row.stacked():
+            assert tiles[0].geometry().top() == tiles[1].geometry().top(), why
+
+    for width in (1400, 1180, 1000, 900, 860, 800, 1180, 1400):
+        w.resize(width, 700)
+        pump()
+        assert not w.mic_alt.isHidden()
+        fits(width)
+    assert not row.stacked()   # roomy: side by side
+    # too narrow for both (how wide that is depends on the fonts): stacked, unclipped
+    w.mic_alt.setMaximumWidth(row._need() - 40)
+    pump()
+    assert row.stacked()
+    fits("narrow")
+    w.mic_alt.setMaximumWidth(16777215)
+    pump()
+    assert not row.stacked()
+    fits("back")

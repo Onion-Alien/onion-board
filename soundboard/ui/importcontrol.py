@@ -49,6 +49,7 @@ from soundboard.library import (
 from soundboard.settings import HOTKEY_ACTIONS, pretty_key
 from soundboard.ui import busy, importreport, taboff, worker
 from soundboard.ui import toast as toastmod
+from soundboard.ui.controller import Controller
 from soundboard.ui.crashdialog import free_dialog
 from soundboard.ui.widgets import expand_dropped
 
@@ -63,11 +64,11 @@ LOOSE_WAIT_MS = 1500   # a file dragged into the sounds folder is looked at agai
 LOOSE_EMPTY_LOOKS = 20   # an empty file that long (~30 s) waits for the folder to change
 
 
-class ImportControl:
+class ImportControl(Controller):
     """Importing, exporting and sound packs for one MainWindow (``mw``)."""
 
     def __init__(self, mw: MainWindow):
-        self.mw = mw
+        super().__init__(mw)
         self._packs_removed: set[str] = set()   # sound packs to stop keeping after Undo
         self._imported_short = False      # a sound added in this batch is under SHORT_SOUND_S
         self._pending_imports = 0

@@ -21,6 +21,7 @@ from soundboard import errors, library, soundfx, videos
 from soundboard.i18n import _
 from soundboard.library import SoundMeta, cache_keep, duplicate, load_sound, prune_cache
 from soundboard.ui import worker
+from soundboard.ui.controller import Controller
 from soundboard.ui.crashdialog import free_dialog, rehome_crash_reports
 from soundboard.ui.dialogs import EditDialog
 
@@ -28,11 +29,11 @@ if TYPE_CHECKING:
     from soundboard.ui.mainwindow import MainWindow
 
 
-class EditControl:
+class EditControl(Controller):
     """The Edit sound windows of one MainWindow (``mw``)."""
 
     def __init__(self, mw: MainWindow):
-        self.mw = mw
+        super().__init__(mw)
         self._editors: dict[str, EditDialog] = {}
         self._render_gen: dict[str, int] = {}   # sid -> newest effects render (_rerender)
 
