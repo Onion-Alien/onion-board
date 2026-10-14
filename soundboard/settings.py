@@ -9,6 +9,7 @@ import re
 import threading
 import time
 from collections.abc import Callable
+from typing import Any
 
 from PySide6.QtCore import (QObject, QPoint, QPointF, QRectF, QSignalBlocker, QSize, Qt, QTimer,
                             Signal)
@@ -31,8 +32,11 @@ from soundboard.ui import overlay as ovl
 from soundboard.wheelguard import no_wheel
 from soundboard.winkeys import Hotkeys
 from soundboard import errors, i18n, usage
-from soundboard.i18n import _, ngettext
+from soundboard.i18n import _
 from soundboard.ui.pixels import snap_to_pixels
+from soundboard.ui.settingspages import _button_row
+from soundboard.ui.settingspages.help import HelpPage
+from soundboard.ui.settingspages.audio import AudioPage
 
 log = logging.getLogger(__name__)
 
@@ -100,28 +104,6 @@ NOTE = _("Hey, thanks for actually using this. Onion Board started because every
           "me. Honestly. I'd way rather hear \"this part is cooked\" than have you quietly "
           "uninstall it.\n\nIt's free and it's staying free. Have fun with it, don't be a "
           "menace with it, and go make your friends jump in voice chat.\n\nOnionAlien")
-# Plain words, not a contract: the LICENSE file is the real terms.
-DISCLAIMER = _(
-    "Onion Board is provided as is, with no warranty: use it at your own risk (the "
-    "LICENSE file has the full terms). In plain words:"
-    "<ul style='margin-left:-24px'>"
-    "<li><b>Your sounds are on you.</b> It comes with none of its own. Only download, "
-    "play or stream things you have the right to use, and follow the rules of the sites "
-    "you get them from.</li>"
-    "<li><b>Recording people.</b> Instant replay and radio clips record what your PC "
-    "plays. Some places need everyone's OK to record a call, so ask first.</li>"
-    "<li><b>Voices.</b> Don't use the voice changer or text-to-speech to pretend to be "
-    "a real person, to scam or to harass anyone.</li>"
-    "<li><b>Games and servers.</b> Some servers and games don't allow soundboards or "
-    "voice changers. Onion Board never changes a game's files or reads its memory, but whether a "
-    "server is OK with it is their call, and your account.</li>"
-    "<li><b>Your ears.</b> Keep an eye on the volume, yours and your friends'.</li>"
-    "<li><b>Names.</b> Discord, YouTube, VB-Audio and every other product named here "
-    "belong to their owners. Onion Board isn't affiliated with or endorsed by any of "
-    "them.</li>"
-    "<li><b>Other people's code.</b> Parts of Onion Board (Qt, yt-dlp and more) "
-    "come under their own licenses; THIRD-PARTY-NOTICES.txt next to the app lists "
-    "them.</li></ul>")
 
 
 def pretty_key(combo: str) -> str:
@@ -137,13 +119,6 @@ def pretty_key(combo: str) -> str:
             return (winkeys.key_char(winkeys.VK[p]) or p).upper()
         return p.upper()
     return "+".join(part(p.strip()) for p in combo.split("+"))
-
-
-def _button_row():
-    """Buttons side by side at their own width, wrapping onto a second line only when
-    Settings is too narrow (stacked full-width buttons looked like a form)."""
-    from soundboard.ui.panel import Flow   # panel imports this module
-    return Flow(gap=8)
 
 
 class HotkeyDialog(QDialog):
@@ -534,12 +509,25 @@ class SettingsDialog(QDialog):
     PAGE_TOP = 18    # the pages start this far down: where a tab's do (its 10 + 8)
     BACK_PAD = "padding:7px 0px 7px 3px"   # (the arrow is moved by _level_icons)
 
+    # ---- set by its pages (ui/settingspages), read by the dialog, the window and tests
+    about_version: Any
+    dev_combos: Any
+    discord_btn: Any
+    feedback_box: Any
+    feedback_btn: Any
+    problem_btn: Any
+    voices_card: Any
+    voices_show: Any
+
     def __init__(self, mw, page: str = "privacy", lazy: bool = False):
         """A page in the main window, in place of the tabs (SettingsControl.open_settings),
         never a window of its own. `lazy`: build only `page` now and each other page
         the first time it's shown. Building all twelve under the app's style sheet took
         a second or two on every click of the cog; the tests build them all at once."""
         super().__init__(mw)
+        # The pages (soundboard/ui/settingspages), before anything builds one.
+        self.help = HelpPage(self)
+        self.audio = AudioPage(self)
         self.setWindowFlags(Qt.WindowType.Widget)
         self.setObjectName("settingspage")   # the window's own background
         self.mw = mw
@@ -562,13 +550,13 @@ class SettingsDialog(QDialog):
                  ("general", _("General"), "settings", self._general),
                  ("tabs", _("Tabs"), "sounds", self._tabs),
                  ("appearance", _("Appearance"), "palette", self._appearance),
-                 ("audio", _("Audio"), "volume", self._audio),
+                 ("audio", _("Audio"), "volume", self.audio._audio),
                  ("hotkeys", _("Hotkeys"), "keyboard", self._hotkeys),
                  ("overlay", _("Overlay"), "gamepad", self._overlay),
                  ("updates", _("Updates"), "reload", self._updates),
-                 ("help", _("Add-ons"), "plus", self._help),
+                 ("help", _("Add-ons"), "plus", self.help._help),
                  ("remote", _("Remote"), "cable", self._remote),
-                 ("about", _("About"), "star", self._about))
+                 ("about", _("About"), "star", self.help._about))
         self.categories = QListWidget()
         self.categories.setObjectName("settingscategories")
         self.categories.setAccessibleName(_("Settings categories"))
@@ -1516,147 +1504,6 @@ class SettingsDialog(QDialog):
         for wdg in getattr(self, "ov_toggle_only", ()):
             wdg.setEnabled(self.mw.overlay.s.mode == "toggle")   # hold mode: letting go hides
 
-    def _audio(self):
-        w, v = self._page()
-        v.addWidget(self._devices_card())
-        from soundboard.ui.audiorecovery import RecoveryCard
-        v.addWidget(RecoveryCard(self.mw))
-        card, cv = self._card(_("Your mic"),
-                              _("Normally others hear your voice and your sounds together. "
-                                "Untick this for sounds only: they hear the sounds but not your "
-                                "mic. (Same as the “Others hear it” box under My mic.)"))
-        send = QCheckBox(_("Send my mic to others"))
-        send.setChecked(self.mw.cfg.mic_enabled)
-        send.toggled.connect(self.mw.chk_mic.setChecked)   # the window applies it
-        cv.addWidget(send)
-        v.addWidget(card)
-        v.addWidget(self._voices_card())
-        card, cv = self._card(_("Who's listening"),
-                              _("Voice chat squashes your sounds: mono, no deep bass, and in "
-                                "some games nothing above 8-12 kHz. Pick where people hear you "
-                                "and they're shaped to get through it. Game and Voice chat work "
-                                "out the exact voice chat by themselves; Clean sends them "
-                                "exactly as mixed; Advanced lets you pick it yourself."))
-        from soundboard.ui.destpanel import DestPanel
-        dest = DestPanel(self.mw)
-        dest.chk_gate.setText(_("Mute mic during sounds"))
-        cv.addWidget(dest)
-        v.addWidget(card)
-        card, cv = self._card(_("Audio buffering"),
-                              _("Low keeps your voice and sounds as immediate as possible. If "
-                                "the status line reports drop-outs (crackles, stutters), Safer "
-                                "uses bigger buffers: a little more delay, far fewer drop-outs."))
-        lat = QComboBox()
-        lat.addItem(_("Low (default)"), "low")
-        lat.addItem(_("Safer: bigger buffers"), "high")
-        lat.setCurrentIndex(max(0, lat.findData(self.mw.cfg.latency)))
-        lat.currentIndexChanged.connect(lambda i: self.mw.devctl.set_latency(lat.itemData(i)))
-        no_wheel(lat)
-        cv.addWidget(lat)
-        e = self.mw.engine
-        xr = sum(e.xruns.values())
-        stat = QLabel(_("Since start: {dropouts}, {reconnects}.",
-                        dropouts=ngettext("{n} drop-out", "{n} drop-outs", xr),
-                        reconnects=ngettext("{n} device reconnect", "{n} device reconnects",
-                                            e.stalls)))
-        stat.setObjectName("hint")
-        cv.addWidget(stat)
-        v.addWidget(card)
-        v.addStretch(1)
-        return w
-
-    def _voices_card(self):
-        """Custom text-to-speech voices live on the Voice tab (behind Add voices); this
-        card is where people look for them first. Hidden while the tab is switched off
-        (Settings > Tabs), and its buttons reach the Voice tab there now: switched off
-        and on again while Settings is open, that's a new one."""
-        from soundboard.speech import customvoices
-        mw = self.mw
-        card, cv = self._card(
-            _("Custom voices (text-to-speech)"),
-            _("Your own voices for typed lines and the text-to-speech voice: a TTS server "
-              "running on your PC (Kokoro, AllTalk, any OpenAI-style one), a TTS program, or "
-              "Piper voice packs dropped into the voices folder. They join the Voice list on the "
-              "Voice tab."))
-        row = _button_row()   # one line, wrapping only when the window is narrow
-        add = QPushButton(_("Add a voice server"))
-        icons.set_icon(add, "plus")
-        add.clicked.connect(
-            lambda: mw.tabctl.tab_on("voice") and mw.voice.speech._add_voice_server())
-        row.addWidget(add)
-        folder = QPushButton(_("Open voices folder"))
-        folder.setToolTip(_("Voice packs and voice settings go here; README.txt in it says how"))
-        folder.clicked.connect(lambda: busy.open_folder(customvoices.ensure_folder, folder))
-        row.addWidget(folder)
-        show = QPushButton(_("Show on the Voice tab"))
-
-        def go():
-            if not mw.tabctl.tab_on("voice"):
-                return
-            self.accept()
-            mw.tabs.setCurrentWidget(mw.voice)
-            mw.voice.speech.show_custom_voices()
-        show.clicked.connect(go)
-        row.addWidget(show)
-        cv.addLayout(row)
-        self.voices_card, self.voices_show = card, show
-        if not mw.tabctl.tab_on("voice"):   # (never show() it here: not in its page yet, it'd
-            card.hide()              # flash up as a little window of its own)
-        return card
-
-    def _devices_card(self):
-        """Input / output pickers: the Setup tab's Devices combos, mirrored here so
-        people find them where they look first. Picking goes through the window."""
-        mw = self.mw
-        card, cv = self._card(_("Devices"),
-                              _("Your mic (input) and where you listen (output). Your sounds go "
-                                "into your mic unless you pick somewhere else to send them. "
-                                "Plugged something in? Press Re-scan."))
-        grid = QGridLayout()
-        grid.setHorizontalSpacing(10)
-        grid.setVerticalSpacing(6)
-        self.dev_combos = []
-        for r, (text, src, attr) in enumerate((
-                (_("Input: my mic"), mw.cb_mic, "mic_device"),
-                (_("Output: my headphones"), mw.cb_mon, "mon_device"),
-                (_("Send my sounds to"), mw.cb_route, "route"))):
-            cb = QComboBox()
-            cb.setMinimumWidth(120)
-            # sized for a short name, the list opens wide enough for whole ones (device
-            # names in "Send my sounds to" made the page scroll sideways)
-            cb.setSizeAdjustPolicy(QComboBox.SizeAdjustPolicy.AdjustToMinimumContentsLengthWithIcon)
-            cb.setMinimumContentsLength(16)
-            no_wheel(cb)
-            cb.activated.connect(lambda i, src=src, attr=attr: self._pick_device(src, attr, i))
-            label = QLabel(text)
-            grid.addWidget(label, r, 0)
-            grid.addWidget(cb, r, 1)
-            self.dev_combos.append((cb, src))
-        grid.setColumnStretch(2, 1)   # the room past the boxes, not the boxes' column
-        cv.addLayout(grid)
-        from soundboard.ui import alsosend   # (its panel import imports this module)
-        # once the grid is in the card: a row added before would be its own window
-        alsosend.build(mw, grid, grid.rowCount(), icons_col=False)   # kept up to date by mw
-        ref = QPushButton(_("Re-scan devices"))
-        icons.set_icon(ref, "reload")
-        ref.clicked.connect(lambda: mw.devctl.rescan_with_feedback(ref, self._sync_devices))
-        cv.addWidget(ref, 0, Qt.AlignmentFlag.AlignLeft)
-        self._sync_devices()
-        return card
-
-    def _sync_devices(self):
-        for cb, src in self.dev_combos:
-            cb.clear()
-            for i in range(src.count()):
-                cb.addItem(src.itemText(i), src.itemData(i))
-            cb.setCurrentIndex(src.currentIndex())
-            cb.view().setMinimumWidth(cb.view().sizeHintForColumn(0) + 32)   # whole names
-
-    def _pick_device(self, src, attr, i):
-        src.setCurrentIndex(i)
-        self.mw.routectl.on_device(src, attr)
-        self._sync_devices()   # "Send my sounds to" never offers the headphones
-
     def _general(self):
         w, v = self._page()
         card, cv = self._card(_("Window"))
@@ -1894,21 +1741,6 @@ class SettingsDialog(QDialog):
         from soundboard.ui.resetguide import ResetGuide, RestorePoints
         (RestorePoints if points else ResetGuide)(self.mw, self).exec()
 
-    def _help(self):
-        w, v = self._page()
-        col = QWidget()
-        col.setMaximumWidth(self.ADDONS_W)
-        cl = QVBoxLayout(col)
-        cl.setContentsMargins(0, 0, 0, 0)
-        cl.setSpacing(12)
-        cl.addWidget(self._addons_card())
-        row = QHBoxLayout()
-        row.addWidget(col, 1)
-        row.addStretch(0)
-        v.addLayout(row)
-        v.addStretch(1)
-        return w
-
     def _updates(self):
         w, v = self._page()
         v.addWidget(self._updates_card())
@@ -1925,17 +1757,6 @@ class SettingsDialog(QDialog):
         v.addStretch(1)
         return w
 
-    # ------------------------------------------------------------------ about
-    def _about(self):
-        w, v = self._page()
-        v.addWidget(self._about_card())
-        v.addWidget(self._contact_card())
-        v.addWidget(self._support_card())
-        v.addWidget(self._note_card())
-        v.addWidget(self._disclaimer_card())
-        v.addStretch(1)
-        return w
-
     def _link_button(self, text: str, url: str, icon: str = "") -> QPushButton:
         btn = QPushButton(text)
         if icon:
@@ -1945,75 +1766,11 @@ class SettingsDialog(QDialog):
             failed=_("Couldn't open your browser. The page is")))
         return btn
 
-    def _ask_feedback(self):
-        """*Send feedback*: "What would you improve?" (ui/feedbackdialog.py)."""
-        from soundboard.ui import feedbackdialog
-        self.feedback_box = feedbackdialog.ask(self.mw.cfg, self)
-
-    def _about_card(self):
-        """The version (as the title bar shows it), and where the app and its licences
-        live."""
-        from soundboard.ui.mainwindow import version_text
-        from soundboard.updates import REPO
-        card, cv = self._card("Onion Board")
-        ver = self.about_version = QLabel(_("Version {version}", version=version_text()))
-        ver.setTextInteractionFlags(Qt.TextInteractionFlag.TextSelectableByMouse)
-        cv.addWidget(ver)
-        hint = QLabel(_("Free, with no ads and no account. Made by OnionAlien. MIT license with "
-                        "the Commons Clause: use it for anything, share it for free, never sell "
-                        "it."))
-        hint.setObjectName("hint")
-        hint.setWordWrap(True)
-        cv.addWidget(hint)
-        row = _button_row()
-        row.addWidget(self._link_button(_("Website"), "https://onion-alien.github.io/onion-board/",
-                                        "browser"))
-        row.addWidget(self._link_button(_("Source code"), f"https://github.com/{REPO}"))
-        row.addWidget(self._link_button(_("Licenses"), f"https://github.com/{REPO}#license"))
-        cv.addLayout(row)
-        return card
-
-    def _contact_card(self):
-        """Ways to reach the author. All of them only open a page in the browser:
-        nothing is sent from the app (feedback.py)."""
-        from soundboard import __version__, feedback
-        from soundboard.updates import REPO
-        card, cv = self._card(_("Get in touch"),
-                              _("The Discord is where to chat, ask for help and hear about new "
-                                "versions. The feedback form needs no account. Found a security "
-                                "problem? Report it privately on GitHub, not in a public issue."))
-        row = _button_row()
-        discord = self._link_button(_("Join the Discord"), feedback.DISCORD_URL, "speech")
-        discord.setObjectName("primary")
-        row.addWidget(discord)
-        send = QPushButton(_("Send feedback"))
-        icons.set_icon(send, "edit")
-        send.clicked.connect(self._ask_feedback)
-        row.addWidget(send)
-        bug = self._link_button(_("Report a problem"), feedback.problem_url(__version__))
-        bug.setToolTip(_("For people with a GitHub account: opens a new bug report"))
-        row.addWidget(bug)
-        self.discord_btn, self.feedback_btn, self.problem_btn = discord, send, bug
-        row.addWidget(self._link_button(
-            _("Report a security issue"), f"https://github.com/{REPO}/security/advisories/new",
-            "shield"))
-        cv.addLayout(row)
-        return card
-
     def _note_card(self):
         card, cv = self._card(_("A note from me"))
         note = QLabel(NOTE)
         note.setWordWrap(True)
         cv.addWidget(note)
-        return card
-
-    def _disclaimer_card(self):
-        card, cv = self._card(_("The boring bit"))
-        text = QLabel(DISCLAIMER)
-        text.setObjectName("hint")
-        text.setWordWrap(True)
-        text.setTextFormat(Qt.TextFormat.RichText)
-        cv.addWidget(text)
         return card
 
     # ------------------------------------------------------------------ add-ons
@@ -2351,27 +2108,6 @@ class SettingsDialog(QDialog):
         relay.done.connect(finish)
         threading.Thread(target=lambda: relay.done.emit(pocketaddon.get(offer=offer)),
                          daemon=True, name="onion-pocket-addons").start()
-
-    # ------------------------------------------------------------------ support
-    def _support_card(self):
-        """A link to the GitHub page's Support section: the ways to donate live there,
-        not in the app, so they can change without a release and a copy of the app
-        with someone else's details swapped in is easy to spot."""
-        from soundboard.updates import REPO
-        card, cv = self._card(_("Support Onion Board"),
-                              _("Onion Board is free, with no ads and no account. If it made "
-                                "your games or calls more fun, you can chip in. Entirely "
-                                "optional. The button opens the project's GitHub page."))
-        btn = QPushButton(_("♥  Support Onion Board"))
-        btn.clicked.connect(lambda: busy.open_url(
-            f"https://github.com/{REPO}#support-onion-board", btn,
-            opened=_("✓ Opened in your browser, thank you!"),
-            failed=_("Couldn't open your browser. The page is")))
-        row = QHBoxLayout()
-        row.addWidget(btn)
-        row.addStretch(1)
-        cv.addLayout(row)
-        return card
 
     # ------------------------------------------------------------------ background
     def _background_card(self):
