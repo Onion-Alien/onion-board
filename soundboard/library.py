@@ -967,30 +967,36 @@ def _write(snap: tuple[int, dict, str]) -> bool:
 class Saver:
     """Saves a Config on a background thread, so a slow disk (an antivirus scan of
     the new file took 2-7 s) doesn't freeze the window. save() copies the settings
-    right away; the newest copy is the one written, and `done(ok)` is called on the
-    saver's thread after each write."""
+    right away and returns its number; the newest copy is the one written, and
+    `done(ok, n)` is called on the saver's thread after each write, `n` the number of
+    the copy written (every save() up to it is on disk when ok)."""
 
     def __init__(self, cfg: Config, done=None):
         self.cfg = cfg
         self._done = done
         self._cond = threading.Condition()
-        self._pending: tuple | None = None
+        self._pending: tuple | None = None   # (its number, the copy)
+        self._count = 0                     # save() calls so far
         self._busy = False
         self._thread: threading.Thread | None = None
 
-    def save(self):
+    def save(self) -> int:
+        with self._cond:
+            self._count += 1
+            n = self._count
         if self.cfg.read_only:   # logs it; nothing to write
             if self._done:
-                self._done(self.cfg.save())
-            return
+                self._done(self.cfg.save(), n)
+            return n
         snap = self.cfg.snapshot()
         with self._cond:
-            self._pending = snap
+            self._pending = (n, snap)
             if self._thread is None or not self._thread.is_alive():
                 self._thread = threading.Thread(target=self._run, name="config-save",
                                                 daemon=True)
                 self._thread.start()
             self._cond.notify_all()
+        return n
 
     def _run(self):
         while True:
@@ -1002,7 +1008,7 @@ class Saver:
                     if not self._cond.wait(30) and self._pending is None:
                         self._thread = None
                         return
-                snap, self._pending, self._busy = self._pending, None, True
+                (n, snap), self._pending, self._busy = self._pending, None, True
             try:
                 ok = _write(snap)
             except Exception:  # noqa: BLE001 - a save must never kill the saver
@@ -1013,7 +1019,7 @@ class Saver:
                 self._cond.notify_all()
             if self._done:
                 try:
-                    self._done(ok)
+                    self._done(ok, n)
                 except Exception:  # noqa: BLE001
                     log.exception("after saving settings")
 

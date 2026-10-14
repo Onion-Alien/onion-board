@@ -424,6 +424,22 @@ def test_probe_returns_title_and_duration_without_downloading(monkeypatch):
         ytdl.probe("https://example.com")
 
 
+def no_thumbnail_fetch(monkeypatch, window):  # noqa: F811
+    """Search results' thumbnail requests answered by nothing; returns the list of
+    (url, feature) asked for."""
+    asked = []
+
+    class Nam:
+        def __init__(self, feature):
+            self.feature = feature
+
+        def get(self, req):
+            asked.append((req.url().toString(), self.feature))
+            return types.SimpleNamespace(finished=types.SimpleNamespace(connect=lambda f: None))
+    monkeypatch.setattr(window.ytresults, "_nam", Nam)
+    return asked
+
+
 def fake_link_download(monkeypatch, tmp_path):
     """download_audio writes a 1 s tone into a fresh folder; returns the call log."""
     calls = []
@@ -581,8 +597,7 @@ def test_enter_searches_youtube_and_a_result_plays_through_the_link_bar(
     monkeypatch.setattr(ytdl, "search", lambda q, count=20, source="youtube": (
         searched.append(source), hits)[1])
     monkeypatch.setattr(window.engine, "play", lambda *a, **kw: object())
-    window.ytresults.net.get = lambda req: types.SimpleNamespace(   # no thumbnail fetch
-        finished=types.SimpleNamespace(connect=lambda f: None))
+    no_thumbnail_fetch(monkeypatch, window)
     window.search.setText("what is love")
     window.search.returnPressed.emit()                       # Enter: search YouTube
     assert process_events(qapp, lambda: window.ytresults._rows, 5)
@@ -621,20 +636,50 @@ def test_web_url_lets_only_http_links_through(url, ok):
     assert bool(net.web_url(url)) is ok
 
 
-def test_a_file_share_thumbnail_is_never_fetched(qapp, window):  # noqa: F811
+def test_a_file_share_thumbnail_is_never_fetched(qapp, window, monkeypatch):  # noqa: F811
     """A page's own og:image becomes the result's picture: one that isn't a web link
     is dropped, with no request at all."""
-    asked = []
-    window.ytresults.net.get = lambda req: (asked.append(req.url().toString()),
-                                            types.SimpleNamespace(finished=types.SimpleNamespace(
-                                                connect=lambda f: None)))[1]
+    asked = no_thumbnail_fetch(monkeypatch, window)
     bad = ytdl.Result("x", "Evil", "page", 3, source="generic",
                       link="https://evil.example/page", art="file://host/share/x.jpg")
     good = ytdl.Result("y", "Fine", "page", 3, source="generic",
                        link="https://ok.example/page", art="https://ok.example/pic.jpg")
     assert bad.thumb == ""
     window.ytresults._add_rows([bad, good], window.ytresults._gen)
-    assert asked == ["https://ok.example/pic.jpg"]
+    assert asked == [("https://ok.example/pic.jpg", "sounds_web.other")]
+
+
+def test_search_thumbnails_obey_the_switch_of_the_site_they_are_on(qapp, window,  # noqa: F811
+                                                                   monkeypatch):
+    """A thumbnail goes out under its own server's site switch: with YouTube off (and
+    other links on), i.ytimg.com isn't asked, even for a result from another site."""
+    from soundboard import net
+    asked = no_thumbnail_fetch(monkeypatch, window)
+    yt = ytdl.Result("HEXWRTEbj1I", "What Is Love", "Haddaway", 241)   # i.ytimg.com
+    page = ytdl.Result("y", "Page", "page", 3, source="generic",
+                       link="https://ok.example/page", art="https://i.ytimg.com/vi/y/a.jpg")
+    other = ytdl.Result("z", "Fine", "page", 3, source="generic",
+                        link="https://ok.example/page2", art="https://ok.example/pic.jpg")
+    window.ytresults._add_rows([yt, page, other], window.ytresults._gen)
+    assert asked == [(yt.thumb, "sounds_web.youtube"), (page.thumb, "sounds_web.youtube"),
+                     ("https://ok.example/pic.jpg", "sounds_web.other")]
+    asked.clear()
+    net.configure_features(off=["sounds_web.youtube"])
+    try:
+        window.ytresults._add_rows([yt, page, other], window.ytresults._gen)
+    finally:
+        net.configure_features()
+    assert asked == [("https://ok.example/pic.jpg", "sounds_web.other")]
+
+
+@pytest.mark.parametrize("url, site", [
+    ("https://i.ytimg.com/vi/x/mqdefault.jpg", "youtube"),
+    ("https://yt3.ggpht.com/a.jpg", "youtube"),
+    ("https://i1.sndcdn.com/artworks-x.jpg", "soundcloud"),
+    ("https://notytimg.com/a.jpg", "other"),
+])
+def test_a_sites_picture_servers_are_that_site(url, site):
+    assert ytdl.site_of(url) == site
 
 
 def test_web_results_hide_the_empty_category_bar(qapp, window,  # noqa: F811
@@ -1026,8 +1071,7 @@ def test_spammed_enter_waits_for_the_search_already_running(qapp, window,  # noq
         go.wait(5)
         return [ytdl.Result("HEXWRTEbj1I", "What Is Love", "Haddaway", 241)]
     monkeypatch.setattr(ytdl, "search", search)
-    window.ytresults.net.get = lambda req: types.SimpleNamespace(   # no thumbnail fetch
-        finished=types.SimpleNamespace(connect=lambda f: None))
+    no_thumbnail_fetch(monkeypatch, window)
     window.search.setText("what is love")
     for _i in range(20):
         window.search.returnPressed.emit()                   # held: one search only

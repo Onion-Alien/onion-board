@@ -12,6 +12,7 @@ import tempfile
 import threading
 import time
 from pathlib import Path
+from collections.abc import Callable
 from typing import Any, Literal, overload
 
 import numpy as np
@@ -325,7 +326,7 @@ class Bridge(QObject):
     watch_update = Signal(object)              # a newer Onion Watch: watchaddon.Offer
     discord = Signal(object)                   # [discordcfg.Settings] read in the background
     mic_users = Signal(object)                 # [appaudio.App] recording the mic (rawmic)
-    counted = Signal()                         # the daily usage count was sent (usage.py)
+    counted = Signal(object)                   # a usage count went: what it clears (usage.py)
     imported = Signal(object, object, object)  # meta|None, data|None, Skipped|None
     preview = Signal(str, object, float, int)  # id, audio with unsaved effects|None, gain, gen
     ffmpeg = Signal(object, object)            # ffmpegget.Health, after a fix: "" or its error
@@ -395,7 +396,7 @@ class MainWindow(QMainWindow):
     remote_changed = Signal()           # a remote control server started or stopped
     cable_setup_found = Signal(bool)    # VB-Cable's setup program is on this PC (asked on a thread)
     video_found = Signal(str, object)   # a sound's video (Path|None), looked up on a thread
-    config_saved = Signal(bool)         # the background save finished: ok
+    config_saved = Signal(bool, int)    # the background save finished: ok, the save() it wrote
     voice_engine = Signal(object)       # the voice engine of the game in front (a mode key|None)
     default_found = Signal(object)      # Windows' default output, asked on a thread (str|None)
     device_step = Signal(object)        # the device thread's next step for the UI (_off_ui)
@@ -467,7 +468,7 @@ class MainWindow(QMainWindow):
         self.bridge.watch_update.connect(self._on_watch_update)
         self.bridge.discord.connect(self._on_discord)
         self.bridge.mic_users.connect(self._on_mic_users)
-        self.bridge.counted.connect(self._save_later)   # stats_sent
+        self.bridge.counted.connect(self._usage_counted)
         self.bridge.ffmpeg.connect(self._on_ffmpeg)
         self.bridge.ffmpeg_progress.connect(self._on_ffmpeg_progress)
         self._removed: list[tuple[SoundMeta, int, np.ndarray | None]] = []   # undo-able
@@ -579,6 +580,7 @@ class MainWindow(QMainWindow):
         # written on a background thread: a slow disk froze the window for seconds
         self._saver = library.Saver(self.cfg, done=self.config_saved.emit)
         self.config_saved.connect(self._on_saved)
+        self._save_waiters: list[tuple[int, Callable[[bool], None]]] = []   # _save_now(then)
 
         self.setup_state = ""
         self._pill_long = ""              # the setup pill's whole text (its tip, its name)
@@ -4951,15 +4953,25 @@ class MainWindow(QMainWindow):
             self._tor_told = say[0]
             self.toast(html.escape(say[1]), say[2])
 
-    def _save_now(self):
+    def _save_now(self, then: Callable[[bool], None] | None = None):
         """The debounced save: the settings are copied now and written on the saver's
-        thread (library.Saver), then _on_saved says how it went."""
+        thread (library.Saver), then _on_saved says how it went. `then(ok)` is called on
+        the UI thread once this copy (or a newer one) is written, or failed to be."""
         self._saver.cfg = self.cfg
-        self._saver.save()
+        n = self._saver.save()
+        if then is not None:
+            self._save_waiters.append((n, then))
 
-    def _on_saved(self, ok: bool):
+    def _on_saved(self, ok: bool, n: int = 0):
         """A failure (disk full, antivirus lock) is logged by the writer; here it's
         shown once so the user knows settings aren't sticking."""
+        due = [w for w in self._save_waiters if w[0] <= n]
+        self._save_waiters = [w for w in self._save_waiters if w[0] > n]
+        for __, then in due:
+            try:
+                then(ok)
+            except Exception:  # noqa: BLE001 - one waiter mustn't stop the report
+                log.exception("after saving settings")
         if ok:
             self._save_failed_shown = False
         elif not self._save_failed_shown:
@@ -9160,6 +9172,12 @@ class MainWindow(QMainWindow):
     def send_usage(self):
         """The anonymous daily usage count, if it's due and switched on (usage.py)."""
         usage.maybe_send(self.cfg, self.bridge.counted.emit, app_dir=library.APP_DIR)
+
+    def _usage_counted(self, apply):
+        """A usage count went: here, on the UI thread that also adds to them, its
+        stats_* are cleared (only what it sent) and saved."""
+        apply()
+        self._save_later()
 
     def _voice_fx_changed(self, spec: dict):
         if spec.get("enabled"):

@@ -767,8 +767,8 @@ class SearchResults(RoundedFrame):
         self._asked = PAGE      # hits asked for so far (Show more asks for the next PAGE)
         self._rows: list[ResultRow] = []
         self._fetching: dict[str, set[str]] = {}   # url -> {"play", "add"} downloading
-        self.net = QNetworkAccessManager(self)
-        net.apply_qt(self.net, "sounds_web")   # thumbnails: Settings > Privacy & security
+        # thumbnails, one network manager per site switch (Settings > Privacy & security)
+        self._nams: dict[str, QNetworkAccessManager] = {}
         self._done.connect(self._on_done)
 
         v = QVBoxLayout(self)
@@ -1134,9 +1134,22 @@ class SearchResults(RoundedFrame):
             thumb = net.web_url(r.thumb)   # web links only
             if not quality.current.web_extras or not thumb:   # Settings > Data & quality
                 continue
-            reply = self.net.get(QNetworkRequest(QUrl(thumb)))
+            # under the switch of the server it's on (i.ytimg.com is YouTube's), whatever
+            # site the search went to: switching YouTube off stops its pictures too
+            feature = ytdl.site_feature(thumb)
+            if not net.allowed(feature):
+                continue
+            reply = self._nam(feature).get(QNetworkRequest(QUrl(thumb)))
             reply.finished.connect(lambda reply=reply, row=row, g=gen: self._on_thumb(
                 reply, row, g))
+
+    def _nam(self, feature: str) -> QNetworkAccessManager:
+        """The network manager whose requests carry `feature` (a site's switch)."""
+        nam = self._nams.get(feature)
+        if nam is None:
+            nam = self._nams[feature] = QNetworkAccessManager(self)
+            net.apply_qt(nam, feature)
+        return nam
 
     def _on_thumb(self, reply, row: ResultRow, gen: int):
         data = reply.readAll()
