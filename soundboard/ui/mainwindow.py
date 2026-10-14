@@ -2718,6 +2718,16 @@ class MainWindow(QMainWindow):
         self._pick_devices()
         self._devices_opened(self._open_devices(self._device_plan()))
 
+    def _reopen_devices(self):
+        """_init_devices for a click (the setup guide closing): the boxes now, the
+        streams on the device thread (_device_job), so the window never waits on them."""
+        self._pick_devices()
+
+        def plan():   # the config as it is when its turn comes
+            devices = self._device_plan()
+            return lambda: self._open_devices(devices)
+        self._device_job(plan, lambda ends: self._devices_opened(ends or []))
+
     def _pick_devices(self):
         """_init_devices' quick part (UI thread): the devices to use, from the lists."""
         outs = [d["name"] for d in eng.list_devices("output")]
@@ -2895,12 +2905,24 @@ class MainWindow(QMainWindow):
         log.info("Windows' default output changed: headphones %r -> %r", c.mon_device, name)
         c.mon_device = name
         self._fill_combo(self.cb_mon, [d["name"] for d in eng.list_devices("output")], name)
-        self.engine.set_mon_device(name)
-        self._apply_send_outputs()
         self._save_now()
-        self._update_status()
-        self.toast(_("You hear your sounds on {name} now: it's Windows' default output.",
-                     name=html.escape(name)), "ok")
+        e = self.engine
+
+        def plan():   # the streams are opened on the device thread (_device_job)
+            mon, send = c.mon_device, self._send_plan()   # where it ended up by then
+
+            def work():
+                e.set_mon_device(mon)
+                return self._open_send(send)
+            return work
+
+        def opened(ends):
+            if ends is not None:
+                self._set_cable_bad(ends)
+            self._update_status()
+            self.toast(_("You hear your sounds on {name} now: it's Windows' default output.",
+                         name=html.escape(name)), "ok")
+        self._device_job(plan, opened)
 
     def _check_cable_format(self):
         """Note which ends of the cable in use aren't at 48 kHz (shown on the Setup tab)."""
