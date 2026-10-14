@@ -225,6 +225,7 @@ the launcher the shortcuts and PyInstaller use. The app is the `soundboard` pack
 | `soundboard/ui/routewarn.py` | the question on leaving Settings when "Send my sounds to" was just set to speakers or a headset: My mic, the virtual cable (use or install), or keep it |
 | `soundboard/ui/fit.py` | dialogs grow to fit their wrapped text instead of clipping it (`fit.watch(self)` in every dialog's `__init__`) |
 | `soundboard/ui/setupwizard.py` | the first-run guide with Bun (mic, headphones, where your sounds go: straight into your mic, or the cable or another way out, then Discord) and the Steam help |
+| `soundboard/ui/firsttour.py` | Bun's first-run tour of the empty board after that guide: the search box (or offline the Add button), then the results; takes no clicks, ends when ignored or left |
 | `soundboard/ui/bunnywidget.py` | Bun animated: bobs, blinks, talks along with your mic and throws music notes |
 | `soundboard/ui/bunmode.py` | Bun mode: the mini player as a floating Bun over everything, showing what the app is doing |
 | `soundboard/ui/scribebun.py` | Bun the scribe: the download banner's picture for a sound with no thumbnail, writing a well-known piece as sheet music on a scroll as the download comes in |
