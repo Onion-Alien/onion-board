@@ -731,7 +731,6 @@
   "Onion Board sends your sounds (and your voice, if you send it) to:<p style='font-size:15pt; font-weight:800; color:{colour}'>{device}</p><b>In OBS:</b> Sources → + → <b>Audio Output Capture</b> → pick it. <b>In Voicemeeter or a mixer:</b> send that input on to wherever it should go (Discord, your stream, a recording).": "Onion Board îți trimite sunetele (și vocea, dacă o trimiți) la:<p style='font-size:15pt; font-weight:800; color:{colour}'>{device}</p><b>În OBS:</b> Sources → + → <b>Audio Output Capture</b> → alege-l. <b>În Voicemeeter sau un mixer:</b> trimite intrarea aia mai departe unde trebuie (Discord, stream-ul tău, o înregistrare).",
   "Onion Board was on your mic but needs a quick repair: <b>one click</b>, and Windows asks for permission once.": "Onion Board era în microfonul tău, dar are nevoie de o reparație rapidă: <b>un clic</b>, iar Windows cere permisiunea o dată.",
   "Onion Board {pending} wasn't installed; this is still {version}. You can download it from its page and run it yourself.": "Onion Board {pending} nu s-a instalat; asta e încă {version}. Îl poți descărca de pe pagina lui și îl poți rula singur.",
-  "Onion Board {version_text}": "Onion Board {version_text}",
   "Onion Board {version} couldn't be downloaded: {rstrip}.": "Onion Board {version} nu s-a putut descărca: {rstrip}.",
   "Onion Board {version} is downloaded, click to install it": "Onion Board {version} e descărcat, clic ca să-l instalezi",
   "Onion Board {version} is out (you have {current}).": "A apărut Onion Board {version} (tu ai {current}).",

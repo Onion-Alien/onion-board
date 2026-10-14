@@ -253,7 +253,6 @@
   "Onion Board overlay": "Onion Board 오버레이",
   "Onion Board puts your sounds into your real mic, so Discord and games need no virtual cable and nothing picked": "Onion Board가 사운드를 실제 마이크로 넣어 주니까, Discord와 게임에 가상 케이블도 따로 고를 것도 필요 없어요",
   "Onion Board {pending} wasn't installed; this is still {version}. You can download it from its page and run it yourself.": "Onion Board {pending}이(가) 설치되지 않아서 아직 {version}이에요. 릴리스 페이지에서 받아 직접 실행할 수 있어요.",
-  "Onion Board {version_text}": "Onion Board {version_text}",
   "Onion Board {version} couldn't be downloaded: {rstrip}.": "Onion Board {version}을(를) 받지 못했어요: {rstrip}.",
   "Onion Board {version} is out (you have {current}).": "Onion Board {version}이(가) 나왔어요(현재 {current}).",
   "Onion Board {version} is ready. Restart now to install it?": "Onion Board {version} 준비 완료. 지금 다시 시작해서 설치할까요?",

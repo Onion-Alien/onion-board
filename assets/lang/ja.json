@@ -253,7 +253,6 @@
   "Onion Board overlay": "Onion Board オーバーレイ",
   "Onion Board puts your sounds into your real mic, so Discord and games need no virtual cable and nothing picked": "Onion Board はサウンドを本物のマイクに入れるので、Discord やゲームに仮想ケーブルも設定も要りません",
   "Onion Board {pending} wasn't installed; this is still {version}. You can download it from its page and run it yourself.": "Onion Board {pending} はインストールされず、まだ {version} のままです。ページからダウンロードして自分で実行できます。",
-  "Onion Board {version_text}": "Onion Board {version_text}",
   "Onion Board {version} couldn't be downloaded: {rstrip}.": "Onion Board {version} をダウンロードできませんでした: {rstrip}。",
   "Onion Board {version} is out (you have {current}).": "Onion Board {version} が公開されました（現在 {current}）。",
   "Onion Board {version} is ready. Restart now to install it?": "Onion Board {version} の準備ができました。今すぐ再起動してインストールしますか？",

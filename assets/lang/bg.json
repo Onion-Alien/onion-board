@@ -667,7 +667,6 @@
   "Onion Board sends your sounds (and your voice, if you send it) to:<p style='font-size:15pt; font-weight:800; color:{colour}'>{device}</p><b>In OBS:</b> Sources → + → <b>Audio Output Capture</b> → pick it. <b>In Voicemeeter or a mixer:</b> send that input on to wherever it should go (Discord, your stream, a recording).": "Onion Board праща звуците ти (и гласа ти, ако го пращаш) към:<p style='font-size:15pt; font-weight:800; color:{colour}'>{device}</p><b>В OBS:</b> Sources → + → <b>Audio Output Capture</b> → избери го. <b>Във Voicemeeter или миксер:</b> препрати този вход натам, където трябва да отиде (Discord, стриймът ти, запис).",
   "Onion Board was on your mic but needs a quick repair: <b>one click</b>, and Windows asks for permission once.": "Onion Board беше в микрофона ти, но има нужда от бърза поправка: <b>един клик</b> и Windows ще поиска разрешение веднъж.",
   "Onion Board {pending} wasn't installed; this is still {version}. You can download it from its page and run it yourself.": "Onion Board {pending} не беше инсталиран; това е още {version}. Можеш да го изтеглиш от страницата му и да го пуснеш сам.",
-  "Onion Board {version_text}": "Onion Board {version_text}",
   "Onion Board {version} couldn't be downloaded: {rstrip}.": "Onion Board {version} не можа да се изтегли: {rstrip}.",
   "Onion Board {version} is out (you have {current}).": "Излезе Onion Board {version} (ти имаш {current}).",
   "Onion Board {version} is ready. Restart now to install it?": "Onion Board {version} е готов. Да рестартирам ли сега, за да го инсталирам?",

@@ -719,7 +719,6 @@
   "Onion Board sends your sounds (and your voice, if you send it) to:<p style='font-size:15pt; font-weight:800; color:{colour}'>{device}</p><b>In OBS:</b> Sources → + → <b>Audio Output Capture</b> → pick it. <b>In Voicemeeter or a mixer:</b> send that input on to wherever it should go (Discord, your stream, a recording).": "Onion Board lähettää äänesi (ja puheesi, jos lähetät sen) laitteeseen:<p style='font-size:15pt; font-weight:800; color:{colour}'>{device}</p><b>OBS:ssä:</b> Lähteet → + → <b>Audio Output Capture</b> → valitse se. <b>Voicemeeterissä tai mikserissä:</b> lähetä se tulo eteenpäin minne sen pitää mennä (Discord, streamisi, nauhoitus).",
   "Onion Board was on your mic but needs a quick repair: <b>one click</b>, and Windows asks for permission once.": "Onion Board oli mikissäsi, mutta tarvitsee pikakorjauksen: <b>yksi klikkaus</b>, ja Windows kysyy lupaa kerran.",
   "Onion Board {pending} wasn't installed; this is still {version}. You can download it from its page and run it yourself.": "Onion Board {pending} jäi asentamatta; tämä on yhä {version}. Voit ladata sen sen sivulta ja ajaa sen itse.",
-  "Onion Board {version_text}": "Onion Board {version_text}",
   "Onion Board {version} couldn't be downloaded: {rstrip}.": "Onion Board {version} -version lataus epäonnistui: {rstrip}.",
   "Onion Board {version} is downloaded, click to install it": "Onion Board {version} on ladattu, klikkaa asentaaksesi sen",
   "Onion Board {version} is out (you have {current}).": "Onion Board {version} on julkaistu (sinulla on {current}).",

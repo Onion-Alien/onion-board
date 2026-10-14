@@ -253,7 +253,6 @@
   "Onion Board overlay": "โอเวอร์เลย์ Onion Board",
   "Onion Board puts your sounds into your real mic, so Discord and games need no virtual cable and nothing picked": "Onion Board ใส่เสียงของคุณเข้าไมค์จริง Discord และเกมจึงไม่ต้องใช้สายเสมือนและไม่ต้องเลือกอะไร",
   "Onion Board {pending} wasn't installed; this is still {version}. You can download it from its page and run it yourself.": "Onion Board {pending} ไม่ได้ติดตั้ง ยังเป็น {version} อยู่ คุณดาวน์โหลดจากหน้าของมันแล้วรันเองได้",
-  "Onion Board {version_text}": "Onion Board {version_text}",
   "Onion Board {version} couldn't be downloaded: {rstrip}.": "ดาวน์โหลด Onion Board {version} ไม่ได้: {rstrip}",
   "Onion Board {version} is out (you have {current}).": "Onion Board {version} ออกแล้ว (คุณมี {current})",
   "Onion Board {version} is ready. Restart now to install it?": "Onion Board {version} พร้อมแล้ว รีสตาร์ทตอนนี้เพื่อติดตั้งไหม?",
