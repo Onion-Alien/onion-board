@@ -3,8 +3,8 @@ game, a call in another app) out to others (the cable, another device or the
 stream output, like your sounds), without touching what any other program plays.
 Each program is a card: its level, a **Send** switch, its own volume and *Hear it
 myself*, and **Record**, which waits for the program to make a sound, records it
-until you click again and adds it to your Sounds as a pad. Folded away at the
-bottom of each card is its *Clip editor* (soundboard.ui.clipeditor): opened, it
+until you click again and adds it to your Sounds as a pad. The scissors button
+beside Record folds out its *Clip editor* (soundboard.ui.clipeditor): opened, it
 keeps the program's last minute as a live waveform to cut bits out of; closed,
 nothing of it runs. Its Save puts the bit in *Saved clips* under the cards
 (soundboard.ui.clipshelf), and its Big view button gives one card the whole tab.
@@ -45,7 +45,7 @@ from soundboard.ui import appstate, busy, icons
 from soundboard.ui.bunnywidget import BunnyWidget
 from soundboard.ui.clipeditor import WAVE_H, ClipEditor
 from soundboard.ui.clipshelf import ClipShelf
-from soundboard.ui.panel import (CardGrid, HoverCard, UndoBar, VolumeControl, fold_button,
+from soundboard.ui.panel import (CardGrid, HoverCard, UndoBar, VolumeControl,
                                  hint_label, icon_button)
 from soundboard.ui.responsive import FitWidth
 from soundboard.ui.speedpitch import SpeedPitchButton
@@ -71,7 +71,7 @@ NEW_CARDS = 1           # program cards made per go (see AppsTab._apply_listing)
 CARDS_GAP_MS = 6        # ...and the break between goes, for the audio thread
 CONNECTING = _("Connecting…")   # a card's status while its capture is starting
 # where a sent program goes (cfg.apps[exe]["to"], cfg.apps_paths[path]["to"]): the
-# choice shows once a stream output is set (Also send to → Clean, for streaming), or
+# choice shows once a stream output is set (Also play on → Clean, for streaming), or
 # while it's set to anything but both
 TO = (("both", _("Call + stream"), _("Others in the call and your stream output both get it")),
       ("call", _("Call only"), _("Only others in the call get it, not your stream output")),
@@ -368,15 +368,13 @@ class AppGrid(CardGrid):
             if isinstance(w, AppCategoryHeading):
                 chain.append(w)
                 continue
-            inner = getattr(w, "_tab_chain", None)
-            if inner is None:   # a card's own order, read while it's still in one piece
-                inner, n = [], w.nextInFocusChain()
-                while n is not None and n is not w and w.isAncestorOf(n):
-                    if n.focusPolicy() & Qt.FocusPolicy.TabFocus:
-                        inner.append(n)
-                    n = n.nextInFocusChain()
-                w._tab_chain = inner   # pyright: ignore[reportAttributeAccessIssue]  # kept on the card
-            chain += inner
+            # a card's controls in the order they were made, read fresh: a list kept
+            # on the card held widgets Qt had since deleted (a spin box's line edit),
+            # and setTabOrder raising inside this layout pass broke PySide
+            # (overridepin.py). Not a drop-down's list: that's a window of its own.
+            chain += [c for c in w.findChildren(QWidget)
+                      if c.focusPolicy() & Qt.FocusPolicy.TabFocus
+                      and c.window() is w.window()]
         for a, b in zip(chain, chain[1:]):
             QWidget.setTabOrder(a, b)
 
@@ -636,6 +634,15 @@ class AppRow(HoverCard):
         self.btn_view.setCheckable(True)
         icons.set_icon(self.btn_view, "eye", checked_color="accent")
         buttons.addWidget(self.btn_view)
+        # the scissors: the clip editor folds out under the card (a full-size button,
+        # not a small link at the bottom)
+        self.btn_clip = icon_button("scissors", _("This program's last minute as a waveform: "
+                                                   "pick a bit out of it and keep it as a "
+                                                   "clip. It only listens while it's open."))
+        self.btn_clip.setCheckable(True)
+        icons.set_icon(self.btn_clip, "scissors", checked_color="accent")
+        self.btn_clip.toggled.connect(lambda on: self.clip_toggled.emit(self, on))
+        buttons.addWidget(self.btn_clip)
         self.cb_to = QComboBox(self)   # hidden/shown before its row is laid out: no flash
         for i, (key, label, tip) in enumerate(TO):
             self.cb_to.addItem(label, key)
@@ -664,12 +671,6 @@ class AppRow(HoverCard):
         self.view = WindowView(self)
         self.btn_view.toggled.connect(self._on_view)
         v.addWidget(self.view)
-        self.btn_clip = fold_button(_("Clip editor"))
-        self.btn_clip.setToolTip(_("This program's last minute as a waveform: pick a bit "
-                                   "out of it and keep it as a clip. It only listens while "
-                                   "it's open."))
-        self.btn_clip.toggled.connect(lambda on: self.clip_toggled.emit(self, on))
-        v.addWidget(self.btn_clip, 0, Qt.AlignmentFlag.AlignLeft)
         self._tight = 0   # how many of _TIGHTEN are applied (a narrow window)
         self._label_send()
         self.set_app(None)
@@ -914,7 +915,6 @@ class AppRow(HoverCard):
         self.btn_clip.blockSignals(True)
         self.btn_clip.setChecked(on)
         self.btn_clip.blockSignals(False)
-        icons.set_icon(self.btn_clip, "fold_open" if on else "fold", "muted", "text", size=12)
         self.btn_forget.setVisible((not self.sending or self.app is None) and not on)
 
     def set_recording(self, on: bool):
@@ -1918,7 +1918,7 @@ class AppsTab(QWidget):
         self._report_active()
 
     def _stream_output(self) -> bool:
-        """A stream output is set (Also send to → Clean, for streaming)."""
+        """A stream output is set (Also play on → Clean, for streaming)."""
         return bool(self.engine.names.get("obs"))
 
     def _on_hear(self, row: AppRow, on: bool):

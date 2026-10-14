@@ -23,7 +23,7 @@ log = logging.getLogger(__name__)
 
 FRAME_S = 0.25        # a new picture this often
 FIND_S = 2.0          # the window is looked up again this often (it may have changed)
-VIEW_H = 180          # the picture's tallest, in pixels
+VIEW_H = 320          # the picture's tallest, in pixels
 
 MESSAGES = {
     winshot.MINIMISED: _("Minimised: restore for live updates"),
@@ -39,7 +39,7 @@ class _Grabber(QObject):
     def __init__(self, parent=None):
         super().__init__(parent)
         self.pids: tuple[int, ...] = ()
-        self.limit: tuple[int, int] = (320, VIEW_H)   # the picture's largest, device pixels
+        self.limit: tuple[int, int] = (560, VIEW_H)   # the picture's largest, device pixels
         self._run = False                  # set by the UI thread: grab now
         self._stopped = False
         self._wake = threading.Event()

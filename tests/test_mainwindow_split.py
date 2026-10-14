@@ -1,6 +1,7 @@
 """MainWindow is split by feature: each group of its work is a controller in its own
 module that the window owns, not more methods on one 10,000-line class. A method moved
-out must not come back, and the window must still make each controller."""
+out must not come back, and the window must still make each controller: a QObject it
+owns, so timers and signals aimed at the controller stop with the window."""
 import pytest
 
 from soundboard.ui import (alertcontrol, buncontrol, categorycontrol, devicecontrol,
@@ -62,6 +63,6 @@ SPLIT = [
 @pytest.mark.parametrize("attr,cls,gone", SPLIT, ids=[s[0] for s in SPLIT])
 def test_each_feature_is_its_own_controller(window, attr, cls, gone):  # noqa: F811
     ctl = getattr(window, attr)
-    assert isinstance(ctl, cls) and ctl.mw is window
+    assert isinstance(ctl, cls) and ctl.mw is window and ctl.parent() is window
     for name in gone:
         assert not hasattr(mainwindow.MainWindow, name), name

@@ -10,17 +10,18 @@ import threading
 import time
 from collections.abc import Callable
 
-from PySide6.QtCore import QObject, QPoint, QRectF, QSignalBlocker, QSize, Qt, QTimer, Signal
-from PySide6.QtGui import (QBrush, QColor, QFont, QKeySequence, QPainter, QPainterPath, QPixmap,
-                           QShortcut)
+from PySide6.QtCore import (QObject, QPoint, QPointF, QRectF, QSignalBlocker, QSize, Qt, QTimer,
+                            Signal)
+from PySide6.QtGui import (QBrush, QColor, QFont, QIcon, QImage, QKeySequence, QPainter,
+                           QPainterPath, QPixmap, QShortcut)
 from PySide6.QtWidgets import (QAbstractButton, QApplication, QButtonGroup, QCheckBox,
                                QColorDialog, QComboBox,
                                QDialog, QFrame,
                                QGridLayout,
                                QHBoxLayout, QLabel, QLayout, QLineEdit, QListWidget,
                                QListWidgetItem,
-                               QPushButton, QRadioButton, QScrollArea, QSlider, QTabWidget,
-                               QVBoxLayout, QWidget)
+                               QPushButton, QRadioButton, QScrollArea, QSlider, QStyle,
+                               QStyleOptionButton, QTabWidget, QVBoxLayout, QWidget)
 
 from shiboken6 import isValid as qt_valid
 
@@ -440,6 +441,89 @@ class ThemeGrid(QWidget):
         self.updateGeometry()
 
 
+def _ink_rows(img: QImage) -> float:
+    """The middle of an image's ink between its top and bottom edge, in device px from
+    its top: a blurred end row counts by how much of a typical inked row it covers."""
+    img = img.convertToFormat(QImage.Format.Format_ARGB32_Premultiplied)
+    line, data = img.bytesPerLine(), bytes(img.constBits())
+    ink = [sum(data[y * line + 3:y * line + img.width() * 4:4]) for y in range(img.height())]
+    rows = [y for y, a in enumerate(ink) if a]
+    if not rows:
+        return img.height() / 2
+    typical = sorted(ink[y] for y in rows)[len(rows) // 2]
+    first, last = rows[0], rows[-1]
+    return (first + 1 - min(1.0, ink[first] / typical) + last + min(1.0, ink[last] / typical)) / 2
+
+
+_DRAWN: dict[tuple, tuple[QPixmap, float]] = {}   # (_draw_icon)
+
+
+def _draw_icon(p: QPainter, w: QWidget, name: str, color: str, side: int, x: float,
+               mid: float):
+    """Icon `name` drawn `side` px at `x` with its ink's middle (not its box's: an
+    icon's drawing isn't always in the middle of its picture) on `mid`, in `w`, to a
+    fraction of a screen pixel: a picture lands on whole ones, 0.4 px off at 125%."""
+    k = w.devicePixelRatioF()
+    px = max(1, round(side * k))
+    wy = w.mapTo(w.window(), QPoint(0, 0)).y()
+    plain = _DRAWN.get((name, px))
+    if plain is None:
+        pm = icons.pixmap(name, px, "#000000")
+        plain = _DRAWN[(name, px)] = (pm, _ink_rows(pm.toImage()))
+    at = (wy + mid) * k - plain[1]   # the picture's top, in screen px
+    whole = math.floor(at)
+    frac = round((at - whole) * 8) / 8
+    key = (name, px, icons.resolve(color), frac)
+    drawn = _DRAWN.get(key)
+    if drawn is None:
+        if len(_DRAWN) > 64:
+            _DRAWN.clear()
+        pm = icons.pixmap(name, px, key[2], frac)
+        pm.setDevicePixelRatio(k)
+        drawn = _DRAWN[key] = (pm, 0.0)
+    p.drawPixmap(QPointF(x, whole / k - wy), drawn[0])
+
+
+class _Mark(QWidget):
+    """The heading's cog, drawn `dy` px below its box's middle (_draw_icon): a label's
+    picture moves in whole px, 1.25 screen px at 125%."""
+
+    dy = 0.0
+
+    def __init__(self, name: str, color: str, side: int):
+        super().__init__()
+        self.name, self.color, self.side = name, color, side
+        self.setFixedWidth(side)
+
+    def sizeHint(self):
+        return QSize(self.side, self.side)
+
+    def paintEvent(self, e):
+        p = QPainter(self)
+        _draw_icon(p, self, self.name, self.color, self.side, 0,
+                   self.height() / 2 + self.dy)
+        p.end()
+
+
+class _BackArrow(QPushButton):
+    """The heading's back arrow, drawn `dy` px below the button's middle to the screen
+    pixel (as _Mark): its button, hover and focus look as any quiet one's."""
+
+    dy = 0.0
+    BACK_LEFT = 3   # (the padding's left: SettingsDialog.BACK_PAD)
+
+    def paintEvent(self, e):
+        opt = QStyleOptionButton()
+        self.initStyleOption(opt)
+        opt.icon = QIcon()
+        p = QPainter(self)
+        self.style().drawControl(QStyle.ControlElement.CE_PushButton, opt, p, self)
+        side, left = self.iconSize().height(), self.BACK_LEFT
+        _draw_icon(p, self, "back", "text" if self.isEnabled() else "muted", side,
+                   left + (self.width() - left - side) / 2, self.height() / 2 + self.dy)
+        p.end()
+
+
 class SettingsDialog(QDialog):
     """All settings in one place. `mw` is the MainWindow; changes apply immediately."""
 
@@ -448,7 +532,7 @@ class SettingsDialog(QDialog):
     NARROW_W = 640
     TITLE_COG = 18   # the heading's cog, px
     PAGE_TOP = 18    # the pages start this far down: where a tab's do (its 10 + 8)
-    BACK_PAD = "padding:{}px 0px {}px 3px"   # (top, bottom: _level_icons)
+    BACK_PAD = "padding:7px 0px 7px 3px"   # (the arrow is moved by _level_icons)
 
     def __init__(self, mw, page: str = "privacy", lazy: bool = False):
         """A page in the main window, in place of the tabs (MainWindow.open_settings),
@@ -459,6 +543,7 @@ class SettingsDialog(QDialog):
         self.setWindowFlags(Qt.WindowType.Widget)
         self.setObjectName("settingspage")   # the window's own background
         self.mw = mw
+        self._caps_cache: dict[tuple, float] = {}   # (_caps_mid)
         if hasattr(mw, "tab_switched"):
             mw.tab_switched.connect(self._tab_switched)
         self.setWindowTitle(_("Settings"))
@@ -538,7 +623,7 @@ class SettingsDialog(QDialog):
         # a page, not a window: back to the tab you were on (as Escape or a rail
         # tab does), on its own row over the search with the page's name, so the
         # search box still lines up with the categories; narrow, over the icons
-        back = self.back_btn = QPushButton()
+        back = self.back_btn = _BackArrow()
         back.setProperty("quiet", True)
         icons.set_icon(back, "back")
         back.setAccessibleName(_("Back"))
@@ -548,16 +633,14 @@ class SettingsDialog(QDialog):
         # theme's colour (decoration, not a button)
         self.page_title = QLabel(_("Settings"))
         self.page_title.setObjectName("pagetitle")
-        self.title_cog = QLabel()
-        self.title_cog.setObjectName("pagetitlecog")
-        self.title_cog.setContentsMargins(0, 0, 0, 2)   # (moved by _level_icons)
+        self.title_cog = _Mark("settings", "accent", self.TITLE_COG)
+        self.title_cog.setObjectName("pagetitlecog")   # (moved by _level_icons)
         self._title_cog()
         # Keep the arrow over the category icons, with room between its hover
         # background and the heading.
         back.setFixedWidth(26)   # (just round the arrow: the heading right after it)
-        # its icon on the icons' centre line; the same 14 px of padding: the controls'
-        # height (BACK_PAD: the arrow level with the middle of the heading's capitals)
-        back.setStyleSheet(self.BACK_PAD.format(6, 8))
+        # 14 px of padding: the controls' height
+        back.setStyleSheet(self.BACK_PAD)
         top = self._top = QHBoxLayout()
         top.setSpacing(2)   # (the heading close after the arrow)
         top.addWidget(back)
@@ -596,15 +679,32 @@ class SettingsDialog(QDialog):
         QTimer.singleShot(0, self._level_with_rail)
 
     def _caps_mid(self, label: QLabel, dy: int = 0) -> float:
-        """The middle of a one-line, vertically centred label's capitals in the window,
-        in screen pixels (what the eye lines up: not the box, not the descenders), were
-        it `dy` px lower. Qt centres the text in fractions of a pixel and the screen
-        draws its baseline on a whole one: at 125% and 175% that rounding alone put the
-        heading a pixel off the rail's name."""
-        fm, k = label.fontMetrics(), label.devicePixelRatioF()
-        top = label.mapTo(self.window(), QPoint(0, 0)).y() + dy
-        base = math.floor((top + (label.height() - fm.height()) / 2 + fm.ascent()) * k + 0.5)
-        return base - fm.capHeight() * k / 2
+        """The middle of a one-line label's capitals in the window, in screen pixels
+        (what the eye lines up: not the box, not the descenders), were it `dy` px lower.
+        Measured on an "H" drawn the way the label draws its text, on the same part of a
+        pixel: where Qt and the font's hinting put a line can't be worked out from the
+        font's numbers (Consolas and Tahoma at 125% drew theirs up to 2 px off them)."""
+        k = label.devicePixelRatioF()
+        at = (label.mapTo(self.window(), QPoint(0, 0)).y() + dy) * k
+        whole = math.floor(at)
+        rect = label.contentsRect()
+        key = (label.font().key(), rect.getRect(), int(label.alignment()), k, at - whole)
+        mid = self._caps_cache.get(key)
+        if mid is None:   # (not an alpha-only image: Windows drew its text 4 px off)
+            img = QImage(max(1, math.ceil(label.width() * k)),
+                         math.ceil(label.height() * k) + 2,
+                         QImage.Format.Format_ARGB32_Premultiplied)
+            img.setDevicePixelRatio(k)
+            img.fill(0)
+            p = QPainter(img)
+            p.translate(0, (at - whole) / k)
+            p.setFont(label.font())
+            p.setPen(Qt.GlobalColor.black)
+            p.drawText(rect, int(label.alignment()), "H")
+            p.end()
+            mid = _ink_rows(img)   # (the H's top and bottom edge)
+            self._caps_cache[key] = mid
+        return whole + mid
 
     def _level_with_rail(self):
         """The heading row moves down until the middle of "Settings"' capitals is level
@@ -640,30 +740,23 @@ class SettingsDialog(QDialog):
         self._level_icons()
 
     def _level_icons(self):
-        """The arrow and cog centred on the middle of "Settings"' capitals, wherever the
-        theme's font puts them: Consolas (Amber Terminal, Hacker) draws its capitals
-        lower in the line than Bahnschrift, and a fixed nudge left both 2 px high."""
+        """The arrow and cog centred on the middle of "Settings"' capitals as drawn,
+        wherever the theme's font puts them (_caps_mid): Consolas and Tahoma draw theirs
+        lower in the line than Bahnschrift, Comic Sans higher."""
         title = self.page_title
-        if not title.isVisible():
+        if not title.isVisible():   # (narrow: the arrow on its own, in its middle)
+            if self.back_btn.dy:
+                self.back_btn.dy = 0.0
+                self.back_btn.update()
             return
-        fm = title.fontMetrics()
-        ty = title.mapTo(self, QPoint(0, 0)).y()
-        # (the baseline on a whole pixel, as drawn: Consolas' lands on a half one)
-        base = math.floor(ty + (title.height() - fm.height()) / 2 + fm.ascent() + 0.5)
-        caps = base - fm.capHeight() / 2
+        caps = (self._caps_mid(title) / title.devicePixelRatioF()
+                - self.mapTo(self.window(), QPoint(0, 0)).y())
+        # both to the screen pixel (_BackArrow, _Mark)
         for w in (self.back_btn, self.title_cog):
-            # how far below the box's middle the drawing goes, in half pixels
-            n = round(2 * (caps - w.mapTo(self, QPoint(0, 0)).y() - w.height() / 2))
-            if w is self.back_btn:   # the same 14 px of padding, split to move the arrow
-                n = max(-14, min(14, n))
-                top = (14 + n) // 2
-                pad = self.BACK_PAD.format(top, 14 - top)
-                if w.styleSheet() != pad:
-                    w.setStyleSheet(pad)
-            else:   # the same 2 px of margin + n, the cog drawn in the middle of the rest
-                m = (max(0, n), max(0, -n))
-                if (w.contentsMargins().top(), w.contentsMargins().bottom()) != m:
-                    w.setContentsMargins(0, m[0], 0, m[1])
+            dy = caps - w.mapTo(self, QPoint(0, 0)).y() - w.height() / 2
+            if abs(dy - w.dy) > 0.01:
+                w.dy = dy
+                w.update()
 
     def _fit_width(self, width: int):
         """Narrow: the categories as an icon column (the name is the tip) and the
@@ -791,8 +884,7 @@ class SettingsDialog(QDialog):
 
     def _title_cog(self):
         """The heading's cog in this theme's accent (redrawn when the theme changes)."""
-        self.title_cog.setPixmap(icons.icon("settings", "accent").pixmap(
-            self.TITLE_COG, self.TITLE_COG))
+        self.title_cog.update()
 
     # ------------------------------------------------------------------ pages
     @staticmethod
