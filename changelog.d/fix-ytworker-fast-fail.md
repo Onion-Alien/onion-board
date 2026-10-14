@@ -1,0 +1,1 @@
+- Searches and downloads no longer wait 30 seconds each when the background download helper can't start: the app notices at once and does them itself.

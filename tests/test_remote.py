@@ -400,7 +400,7 @@ def test_voices_say_queue_and_hear(qapp, window):
     assert st == 200 and body == {"voice": True, "voice_name": "Chipmunk"}
     assert w.voice.fx.btn_power.isChecked() and d("status")[1]["voice_name"] == "Chipmunk"
     st, body = d("voice", name="chipmonk")
-    assert st == 404 and body["did_you_mean"][0] == "Chipmunk"   # (best guess first)
+    assert st == 404 and body["did_you_mean"][0] == "Chipmunk"   # the closest first
     assert d("voice", on="0")[1]["voice"] is False
 
     said, stopped = [], []
