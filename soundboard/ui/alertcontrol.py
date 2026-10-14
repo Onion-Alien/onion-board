@@ -123,7 +123,7 @@ class AlertControl:
         e = mw.engine
         mic = mw.cfg.mic_device
         if (mw.cfg.route != "mic" or e.direct_stream() is None or not mic
-                or mw._direct_not_running()):
+                or mw.micctl._direct_not_running()):
             shown = bool(self.raw_watch.culprits)
             self.raw_watch.reset()
             if shown:

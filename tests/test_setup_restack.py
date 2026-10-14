@@ -61,7 +61,7 @@ def test_setup_cards_not_squeezed_after_mic_state_flips(window, monkeypatch):  #
     monkeypatch.setattr(dm, "status", lambda name=None: "ready")
     monkeypatch.setattr(eng, "virtual_outputs", lambda: [])
     monkeypatch.setattr(type(w.engine), "effect_alive", lambda self: True)
-    monkeypatch.setattr(w, "_direct_not_running", lambda: state["dead"])
+    monkeypatch.setattr(w.micctl, "_direct_not_running", lambda: state["dead"])
     monkeypatch.setattr(w.engine, "main_stream", object())
     w.cfg.route = "mic"
     w.cfg.mic_device = "Microphone (Example Gaming Headset)"

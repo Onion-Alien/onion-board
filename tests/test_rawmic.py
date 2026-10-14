@@ -142,7 +142,7 @@ def test_the_tick_lists_on_a_worker(window, monkeypatch, qapp):
     seen = []
     monkeypatch.setattr(appaudio, "recording_apps",
                         lambda dev, mine=False: seen.append((dev, mine)) or [BOARD])
-    monkeypatch.setattr(window, "_direct_not_running", lambda: False)
+    monkeypatch.setattr(window.micctl, "_direct_not_running", lambda: False)
     monkeypatch.setattr(window.engine, "direct_apps", lambda: 1)
     window.cfg.route, window.cfg.mic_device = "mic", "Microphone (Test)"
     window.alertctl._raw_tick()

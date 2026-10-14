@@ -53,7 +53,7 @@ def test_chat_card_waits_for_a_chat_to_connect(window, monkeypatch):  # noqa: F8
     assert w.helpcard.isHidden() and not w.btn_guide.isHidden()
     monkeypatch.setattr(dm, "status", lambda name=None: "ready")
     monkeypatch.setattr(type(w.engine), "effect_alive", lambda self: True)
-    monkeypatch.setattr(w, "_direct_not_running", lambda: False)
+    monkeypatch.setattr(w.micctl, "_direct_not_running", lambda: False)
     monkeypatch.setattr(w.engine, "main_stream", _Stream())
     w.cfg.route = "mic"
     w.routectl._show_route()

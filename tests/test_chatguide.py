@@ -215,13 +215,13 @@ def test_setup_tab_offers_and_applies_the_cable_fix(wizard, monkeypatch):
         return True
     monkeypatch.setattr(cableformat, "set_rate", set_rate)
     w.cfg.main_device = "CABLE Input (VB-Audio Virtual Cable)"
-    w._check_cable_format()
-    assert w.cable_bad == [bad]
+    w.micctl._check_cable_format()
+    assert w.micctl.cable_bad == [bad]
     w._update_status()
     assert "44.1 kHz" in w.setup_hint.text()
-    assert w.fix_cable_format()
+    assert w.micctl.fix_cable_format()
     assert state["set"] == [(bad.name, 48000)]
-    assert w.cable_bad == []
+    assert w.micctl.cable_bad == []
 
 
 @pytest.mark.parametrize("rate", [44100, 96000])

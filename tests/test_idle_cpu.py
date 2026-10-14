@@ -273,7 +273,7 @@ def test_unticking_others_hear_it_warns_when_the_mic_effect_isnt_on(window, monk
     from soundboard.ui import mainwindow as main
     shown, attached = [], []
     monkeypatch.setattr(QMessageBox, "exec", lambda box: shown.append(box.text()))
-    monkeypatch.setattr(window, "attach_mic", lambda *a, **k: attached.append(1))
+    monkeypatch.setattr(window.micctl, "attach_mic", lambda *a, **k: attached.append(1))
     works = [False]
     monkeypatch.setattr(main.directmic, "works", lambda _s: works[0])
     window.cfg.route = "mic"

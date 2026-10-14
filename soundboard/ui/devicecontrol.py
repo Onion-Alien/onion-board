@@ -291,12 +291,12 @@ class DeviceControl:
             e.set_mon_device(plan["mon"])
             e.set_obs_device(plan["obs"])
             e.set_copy_devices(plan["copies"])
-        return mw._cable_ends(plan["main"], plan["vm"])
+        return mw.micctl._cable_ends(plan["main"], plan["vm"])
 
     def _devices_opened(self, ends: list):
         """_init_devices' last part (UI thread): what the cable check found, the status."""
         mw = self.mw
-        mw._set_cable_bad(ends)
+        mw.micctl._set_cable_bad(ends)
         mw._update_status()
         if "--restart-after" in sys.argv:   # started again by the app (Settings > Reset)
             self._say_back_on_mic()
@@ -434,7 +434,7 @@ class DeviceControl:
 
         def opened(ends):
             if ends is not None:
-                mw._set_cable_bad(ends)
+                mw.micctl._set_cable_bad(ends)
             mw._update_status()
             mw.toast(_("You hear your sounds on {name} now: it's Windows' default output.",
                          name=html.escape(name)), "ok")

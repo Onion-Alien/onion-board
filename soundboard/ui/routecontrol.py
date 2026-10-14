@@ -86,10 +86,10 @@ class RouteControl:
 
         def opened(ends):
             if ends is not None:
-                mw._set_cable_bad(ends)
+                mw.micctl._set_cable_bad(ends)
             if attr == "mic_device" and mw.cfg.route == "mic" \
                     and directmic.status(name) == "other":
-                mw.attach_mic()   # it follows you to the new mic
+                mw.micctl.attach_mic()   # it follows you to the new mic
             mw._update_status()
             if attr == "mic_device" and is_hands_free(name):   # after: it'd be overwritten
                 mw.say(
@@ -119,7 +119,7 @@ class RouteControl:
         # put on, and Windows may still be loading it; asking again would loop prompts.
         if route == "mic" and not attached and not directmic.works(directmic.status(c.mic_device)):
             self._show_route()   # not attached yet: the picker stays put until it is
-            mw.attach_mic()
+            mw.micctl.attach_mic()
             return
         log.info("send to others through: %s -> %s (%s)", c.route, route,
                  device or c.main_device)
@@ -135,7 +135,7 @@ class RouteControl:
         if by_hand:
             def opened(ends):
                 if ends is not None:
-                    mw._set_cable_bad(ends)
+                    mw.micctl._set_cable_bad(ends)
                 mw._update_status()
                 self._prepare_all()
 
@@ -213,7 +213,7 @@ class RouteControl:
         mw = self.mw
         ends = self._open_send(self._send_plan(force_main))
         if ends is not None:
-            mw._set_cable_bad(ends)
+            mw.micctl._set_cable_bad(ends)
 
     def _send_plan(self, force_main: bool = False) -> dict:
         """What _apply_send_outputs reopens, worked out on the UI thread (it reads the
@@ -248,7 +248,7 @@ class RouteControl:
             e.set_obs_device(plan["obs"])
         if "copies" in plan:
             e.set_copy_devices(plan["copies"])
-        return mw._cable_ends(plan["main"], plan["vm"]) if "main" in plan else None
+        return mw.micctl._cable_ends(plan["main"], plan["vm"]) if "main" in plan else None
 
     def _copy_names(self) -> list[str]:
         """Setup -> Devices -> Also send to: the devices that get a copy of what others
@@ -408,4 +408,4 @@ class RouteControl:
         free_dialog(box)
         if chosen:
             usage.used("mute-warning-setup")
-            mw.attach_mic()
+            mw.micctl.attach_mic()

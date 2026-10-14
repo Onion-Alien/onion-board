@@ -1129,7 +1129,7 @@ def test_mic_card_status_uses_painted_marks_on_one_line(window, monkeypatch):
     monkeypatch.setattr(dm, "status", lambda name=None: "ready")
     monkeypatch.setattr(eng, "virtual_outputs", lambda: [])
     monkeypatch.setattr(type(w.engine), "effect_alive", lambda self: True)
-    monkeypatch.setattr(w, "_direct_not_running", lambda: dead["on"])
+    monkeypatch.setattr(w.micctl, "_direct_not_running", lambda: dead["on"])
     monkeypatch.setattr(w.engine, "main_stream", object())
     w.cfg.route = "mic"
     w.cfg.mic_device = "Microphone (Example Gaming Headset)"

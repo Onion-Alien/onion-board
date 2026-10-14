@@ -995,7 +995,7 @@ class SetupWizard(QDialog):
         row.addWidget(self.btn_copy)
         nomic = self.btn_nomic = QPushButton(_("Game has no microphone setting?"))
         icons.set_icon(nomic, "mic")
-        nomic.clicked.connect(self.win.open_windows_mic)
+        nomic.clicked.connect(self.win.micctl.open_windows_mic)
         row.addWidget(nomic)
         row.addStretch(1)
         v.addSpacing(HEADER_GAP - 8)
@@ -1284,9 +1284,9 @@ class SetupWizard(QDialog):
 
         def opened(ends):
             if ends is not None:
-                win._set_cable_bad(ends)
-            if win.cable_bad:
-                win.fix_cable_format(quiet=True)
+                win.micctl._set_cable_bad(ends)
+            if win.micctl.cable_bad:
+                win.micctl.fix_cable_format(quiet=True)
         win.devctl._device_job(plan, opened)
 
     def recheck_cable(self, rescan: bool = True):
@@ -1507,7 +1507,7 @@ class SetupWizard(QDialog):
             self.recheck_cable(rescan=False)
             return
         self.setup_show.start()
-        self.win.attach_mic()
+        self.win.micctl.attach_mic()
         self.recheck_cable(rescan=False)
         self._update_next()   # Back / Next wait for it
 
