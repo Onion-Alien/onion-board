@@ -293,7 +293,6 @@
   "Record": "Запись",
   "Record a sound": "Записать звук",
   "Record again": "Записать заново",
-  "Record your voice, or a bit of a sound, song or the radio while it plays, and keep it as a sound.": "Запиши свой голос или кусочек звука, песни или радио, пока он играет, и сохрани как звук.",
   "Recording what's playing… play a sound, a search result or the radio now, then click Stop.": "Записываю то, что играет… включи сейчас звук, результат поиска или радио, затем нажми «Стоп».",
   "Recording… click Stop when you're done.": "Запись… нажми «Стоп», когда закончишь.",
   "Redline": "Красная зона",
@@ -3467,5 +3466,8 @@
   "<b>Let your stream hear the sounds.</b> Setup → Devices → <b>Also play on</b>: add a device set to <b>Clean, for streaming</b>, then add that device in OBS: Sources → + → <i>Audio Output Capture</i> (for a virtual cable: an <i>Audio Input Capture</i> of its Output end). Your sounds get their own volume slider in OBS. No virtual cable, or Voicemeeter / a mixer? Setup → Devices → <b>Send my sounds to</b> → that device (OBS can capture that one too) or <i>Nobody</i> (only you and your streaming device hear them).": "<b>Пусть стрим слышит звуки.</b> Подключение → Устройства → <b>Также играть на</b>: добавь устройство с <b>Чисто, для стрима</b>, затем добавь его в OBS: Источники → + → <i>Захват выходного аудиопотока</i> (для виртуального кабеля: <i>Захват входного аудиопотока</i> его конца Output). У твоих звуков в OBS будет свой ползунок громкости. Нет виртуального кабеля, или Voicemeeter / микшер? Подключение → Устройства → <b>Отправлять мои звуки в</b> → это устройство (OBS может захватить и его) или <i>Никуда</i> (звуки слышишь только ты и устройство для стрима).",
   "Plays a copy of what others hear on more devices: Voicemeeter, a device OBS captures, a second cable, speakers... Mics aren't listed here: Send my sounds to puts your sounds into your mic.": "Играет копию того, что слышат другие, ещё на устройствах: Voicemeeter, устройство, которое захватывает OBS, второй кабель, колонки... Микрофонов тут нет: «Отправлять мои звуки в» отправляет твои звуки в микрофон.",
   "Change mic": "Сменить микрофон",
-  "Put your sounds into another mic instead": "Отправлять звуки в другой микрофон"
+  "Put your sounds into another mic instead": "Отправлять звуки в другой микрофон",
+  "Record your voice, a bit of a sound, song or the radio while it plays, or both at once, and keep it as a sound.": "Запишите свой голос, кусочек звука, песни или радио, пока они играют, или и то и другое сразу, и сохраните как звук.",
+  "Recording your voice and what's playing… talk, play a sound, then click Stop.": "Записываются ваш голос и то, что играет… говорите, включите звук, затем нажмите «Стоп».",
+  "Your voice and what's playing together, as one sound. What's playing goes down while you talk, so your voice stays on top": "Ваш голос и то, что играет, вместе, одним звуком. Пока вы говорите, то, что играет, становится тише, и ваш голос слышно поверх"
 }

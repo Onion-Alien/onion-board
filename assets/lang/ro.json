@@ -887,7 +887,6 @@
   "Record": "Înregistrează",
   "Record a sound": "Înregistrează un sunet",
   "Record again": "Înregistrează din nou",
-  "Record your voice, or a bit of a sound, song or the radio while it plays, and keep it as a sound.": "Înregistrează-ți vocea, sau o bucată dintr-un sunet, o melodie sau radioul cât se redă, și păstreaz-o ca sunet.",
   "Recording what's playing… play a sound, a search result or the radio now, then click Stop.": "Se înregistrează ce se redă… redă acum un sunet, un rezultat al căutării sau radioul, apoi dă clic pe Stop.",
   "Recording {n}": "Înregistrare {n}",
   "Recording… click Stop when you're done.": "Se înregistrează… dă clic pe Stop când ai terminat.",
@@ -3467,5 +3466,8 @@
   "<b>Let your stream hear the sounds.</b> Setup → Devices → <b>Also play on</b>: add a device set to <b>Clean, for streaming</b>, then add that device in OBS: Sources → + → <i>Audio Output Capture</i> (for a virtual cable: an <i>Audio Input Capture</i> of its Output end). Your sounds get their own volume slider in OBS. No virtual cable, or Voicemeeter / a mixer? Setup → Devices → <b>Send my sounds to</b> → that device (OBS can capture that one too) or <i>Nobody</i> (only you and your streaming device hear them).": "<b>Lasă stream-ul să audă sunetele.</b> Configurare → Dispozitive → <b>Redă și pe</b>: adaugă un dispozitiv setat pe <b>Curat, pentru stream</b>, apoi adaugă acel dispozitiv în OBS: Sources → + → <i>Audio Output Capture</i> (pentru un cablu virtual: un <i>Audio Input Capture</i> al capătului său Output). Sunetele tale primesc propriul glisor de volum în OBS. N-ai cablu virtual, sau ai Voicemeeter / un mixer? Configurare → Dispozitive → <b>Trimite sunetele mele la</b> → acel dispozitiv (OBS îl poate captura și pe el) sau <i>Nimeni</i> (doar tu și dispozitivul tău de stream le auziți).",
   "Plays a copy of what others hear on more devices: Voicemeeter, a device OBS captures, a second cable, speakers... Mics aren't listed here: Send my sounds to puts your sounds into your mic.": "Redă o copie a ce aud ceilalți pe mai multe dispozitive: Voicemeeter, un dispozitiv pe care îl captează OBS, un al doilea cablu, boxe... Microfoanele nu sunt aici: „Trimite sunetele mele la” pune sunetele tale în microfon.",
   "Change mic": "Schimbă microfonul",
-  "Put your sounds into another mic instead": "Pune sunetele tale în alt microfon"
+  "Put your sounds into another mic instead": "Pune sunetele tale în alt microfon",
+  "Record your voice, a bit of a sound, song or the radio while it plays, or both at once, and keep it as a sound.": "Înregistrează-ți vocea, o bucată dintr-un sunet, o melodie sau radioul în timp ce rulează, sau pe amândouă deodată, și păstreaz-o ca sunet.",
+  "Recording your voice and what's playing… talk, play a sound, then click Stop.": "Se înregistrează vocea ta și ce se aude… vorbește, pornește un sunet, apoi apasă Oprește.",
+  "Your voice and what's playing together, as one sound. What's playing goes down while you talk, so your voice stays on top": "Vocea ta și ce se aude împreună, ca un singur sunet. Ce se aude scade cât timp vorbești, ca vocea ta să rămână deasupra"
 }

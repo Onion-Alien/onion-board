@@ -323,7 +323,6 @@
   "Record": "Запис",
   "Record a sound": "Записати звук",
   "Record again": "Записати ще раз",
-  "Record your voice, or a bit of a sound, song or the radio while it plays, and keep it as a sound.": "Запиши свій голос або шматок звуку, пісні чи радіо, поки воно грає, і збережи як звук.",
   "Recording what's playing… play a sound, a search result or the radio now, then click Stop.": "Записую те, що грає… увімкни звук, результат пошуку чи радіо, потім натисни «Стоп».",
   "Recording… click Stop when you're done.": "Записую… натисни «Стоп», коли закінчиш.",
   "Redline": "Червона зона",
@@ -3467,5 +3466,8 @@
   "<b>Let your stream hear the sounds.</b> Setup → Devices → <b>Also play on</b>: add a device set to <b>Clean, for streaming</b>, then add that device in OBS: Sources → + → <i>Audio Output Capture</i> (for a virtual cable: an <i>Audio Input Capture</i> of its Output end). Your sounds get their own volume slider in OBS. No virtual cable, or Voicemeeter / a mixer? Setup → Devices → <b>Send my sounds to</b> → that device (OBS can capture that one too) or <i>Nobody</i> (only you and your streaming device hear them).": "<b>Нехай стрим чує звуки.</b> Підключення → Пристрої → <b>Також відтворювати на</b>: додай пристрій з <b>Чисто, для стриму</b>, потім додай цей пристрій в OBS: Джерела → + → <i>Захоплення аудіовиходу</i> (для віртуального кабелю: <i>захоплення аудіовходу</i> його вихідного кінця). Ваші звуки отримують власний повзунок гучності в OBS. Немає віртуального кабелю чи Voicemeeter/мікшера? Налаштування → Пристрої → <b>Надіслати мої звуки на</b> → цей пристрій (OBS також може захопити цей пристрій) або <i>Нікому</i> (їх чуєш лише ти і твій пристрій для стриму).",
   "Plays a copy of what others hear on more devices: Voicemeeter, a device OBS captures, a second cable, speakers... Mics aren't listed here: Send my sounds to puts your sounds into your mic.": "Відтворює копію того, що чують інші, ще на пристроях: Voicemeeter, пристрій, який захоплює OBS, другий кабель, колонки... Мікрофонів тут немає: «Надсилати мої звуки в» надсилає ваші звуки в мікрофон.",
   "Change mic": "Змінити мікрофон",
-  "Put your sounds into another mic instead": "Надсилати звуки в інший мікрофон"
+  "Put your sounds into another mic instead": "Надсилати звуки в інший мікрофон",
+  "Record your voice, a bit of a sound, song or the radio while it plays, or both at once, and keep it as a sound.": "Запишіть свій голос, шматочок звуку, пісні чи радіо, поки вони грають, або все разом, і збережіть як звук.",
+  "Recording your voice and what's playing… talk, play a sound, then click Stop.": "Записуються ваш голос і те, що грає… говоріть, увімкніть звук, потім натисніть «Стоп».",
+  "Your voice and what's playing together, as one sound. What's playing goes down while you talk, so your voice stays on top": "Ваш голос і те, що грає, разом, одним звуком. Поки ви говорите, те, що грає, стає тихішим, і ваш голос чути зверху"
 }

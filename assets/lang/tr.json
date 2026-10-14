@@ -317,7 +317,6 @@
   "Record": "Kaydet",
   "Record a sound": "Ses kaydet",
   "Record again": "Tekrar kaydet",
-  "Record your voice, or a bit of a sound, song or the radio while it plays, and keep it as a sound.": "Sesini ya da çalarken bir sesin, şarkının veya radyonun bir parçasını kaydet ve ses olarak sakla.",
   "Recording what's playing… play a sound, a search result or the radio now, then click Stop.": "Çalan kaydediliyor… şimdi bir ses, bir arama sonucu ya da radyoyu çal, sonra Durdur'a tıkla.",
   "Recording… click Stop when you're done.": "Kaydediliyor… bitince Durdur'a tıkla.",
   "Redline": "Kırmızı çizgi",
@@ -3391,5 +3390,8 @@
   "<b>Let your stream hear the sounds.</b> Setup → Devices → <b>Also play on</b>: add a device set to <b>Clean, for streaming</b>, then add that device in OBS: Sources → + → <i>Audio Output Capture</i> (for a virtual cable: an <i>Audio Input Capture</i> of its Output end). Your sounds get their own volume slider in OBS. No virtual cable, or Voicemeeter / a mixer? Setup → Devices → <b>Send my sounds to</b> → that device (OBS can capture that one too) or <i>Nobody</i> (only you and your streaming device hear them).": "<b>Yayının sesleri duysun.</b> Kurulum → Cihazlar → <b>Şurada da çal:</b> <b>Temiz, yayın için</b> olarak ayarlı bir cihaz ekle, sonra o cihazı OBS'ye ekle: Kaynaklar → + → <i>Ses Çıkışı Yakalama</i> (sanal kablo için: Çıkış ucunun <i>Ses Girişi Yakalaması</i> ). OBS'de seslerinizin kendi ses düzeyi kaydırıcısı vardır. Sanal kablo veya Voicemeeter / mikser yok mu? Kurulum → Cihazlar → <b>Seslerimi şu cihaza gönder</b> → o cihaza (OBS bunu da yakalayabilir) veya <i>Hiç kimse</i> (onları sadece sen ve yayın cihazın duyar).",
   "Plays a copy of what others hear on more devices: Voicemeeter, a device OBS captures, a second cable, speakers... Mics aren't listed here: Send my sounds to puts your sounds into your mic.": "Diğerlerinin duyduğunun bir kopyasını başka cihazlarda da çalar: Voicemeeter, OBS'in yakaladığı bir cihaz, ikinci bir kablo, hoparlörler... Mikrofonlar burada yok: \"Seslerimi şuraya gönder\" seslerini mikrofonuna koyar.",
   "Change mic": "Mikrofonu değiştir",
-  "Put your sounds into another mic instead": "Seslerini başka bir mikrofona koy"
+  "Put your sounds into another mic instead": "Seslerini başka bir mikrofona koy",
+  "Record your voice, a bit of a sound, song or the radio while it plays, or both at once, and keep it as a sound.": "Sesini, çalarken bir sesin, şarkının ya da radyonun bir kısmını veya ikisini birden kaydet ve ses olarak sakla.",
+  "Recording your voice and what's playing… talk, play a sound, then click Stop.": "Sesin ve çalan kaydediliyor… konuş, bir ses çal, sonra Durdur'a tıkla.",
+  "Your voice and what's playing together, as one sound. What's playing goes down while you talk, so your voice stays on top": "Sesin ve çalan birlikte, tek bir ses olarak. Sen konuşurken çalanın sesi kısılır, böylece sesin üstte kalır"
 }

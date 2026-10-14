@@ -311,7 +311,6 @@
   "Record": "录制",
   "Record a sound": "录制音效",
   "Record again": "重新录制",
-  "Record your voice, or a bit of a sound, song or the radio while it plays, and keep it as a sound.": "录下你的声音，或在播放时录下一段音效、歌曲或电台，保存为音效。",
   "Recording what's playing… play a sound, a search result or the radio now, then click Stop.": "正在录制播放的内容… 现在播放一个音效、搜索结果或电台，然后点“停止”。",
   "Recording… click Stop when you're done.": "正在录制… 完成后点“停止”。",
   "Redline": "极限模式",
@@ -3315,5 +3314,8 @@
   "<b>Let your stream hear the sounds.</b> Setup → Devices → <b>Also play on</b>: add a device set to <b>Clean, for streaming</b>, then add that device in OBS: Sources → + → <i>Audio Output Capture</i> (for a virtual cable: an <i>Audio Input Capture</i> of its Output end). Your sounds get their own volume slider in OBS. No virtual cable, or Voicemeeter / a mixer? Setup → Devices → <b>Send my sounds to</b> → that device (OBS can capture that one too) or <i>Nobody</i> (only you and your streaming device hear them).": "<b>让直播听到音效。</b>向导 → 设备 → <b>同时播放到</b>：添加一个设为<b>干净，用于直播</b>的设备，然后在 OBS 里添加这个设备：来源 → + → <i>音频输出采集</i>（虚拟音频线的话：添加它 Output 端的 <i>音频输入采集</i>）。你的音效在 OBS 里会有独立的音量滑块。没有虚拟音频线，或用 Voicemeeter / 调音台？向导 → 设备 → <b>把我的音效发送到</b> → 那个设备（OBS 也能采集它）或 <i>不发送</i>（只有你和直播设备能听到）。",
   "Plays a copy of what others hear on more devices: Voicemeeter, a device OBS captures, a second cable, speakers... Mics aren't listed here: Send my sounds to puts your sounds into your mic.": "把别人听到的内容复制一份，在更多设备上播放：Voicemeeter、OBS 捕获的设备、第二根线、音箱……这里不列麦克风：“把我的音效发送到”会把你的音效放进麦克风。",
   "Change mic": "更换麦克风",
-  "Put your sounds into another mic instead": "把音效放进另一个麦克风"
+  "Put your sounds into another mic instead": "把音效放进另一个麦克风",
+  "Record your voice, a bit of a sound, song or the radio while it plays, or both at once, and keep it as a sound.": "录下你的声音，或正在播放的音效、歌曲或电台的一段，或两者同时录，并保存为音效。",
+  "Recording your voice and what's playing… talk, play a sound, then click Stop.": "正在录制你的声音和正在播放的内容… 说话、播放一个音效，然后点击停止。",
+  "Your voice and what's playing together, as one sound. What's playing goes down while you talk, so your voice stays on top": "你的声音和正在播放的内容合成一个音效。你说话时正在播放的内容会变小，让你的声音保持在上面"
 }

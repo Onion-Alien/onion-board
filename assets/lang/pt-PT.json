@@ -873,7 +873,6 @@
   "Record": "Gravar",
   "Record a sound": "Gravar um som",
   "Record again": "Gravar outra vez",
-  "Record your voice, or a bit of a sound, song or the radio while it plays, and keep it as a sound.": "Grava a tua voz, ou um bocado de um som, de uma música ou do rádio enquanto toca, e guarda-o como som.",
   "Recording what's playing… play a sound, a search result or the radio now, then click Stop.": "A gravar o que está a tocar… toca agora um som, um resultado da pesquisa ou o rádio e depois clica em Parar.",
   "Recording {n}": "A gravar {n}",
   "Recording… click Stop when you're done.": "A gravar… clica em Parar quando acabares.",
@@ -3391,5 +3390,8 @@
   "<b>Let your stream hear the sounds.</b> Setup → Devices → <b>Also play on</b>: add a device set to <b>Clean, for streaming</b>, then add that device in OBS: Sources → + → <i>Audio Output Capture</i> (for a virtual cable: an <i>Audio Input Capture</i> of its Output end). Your sounds get their own volume slider in OBS. No virtual cable, or Voicemeeter / a mixer? Setup → Devices → <b>Send my sounds to</b> → that device (OBS can capture that one too) or <i>Nobody</i> (only you and your streaming device hear them).": "<b>Deixa a tua stream ouvir os sons.</b> Configurar → Dispositivos → <b>Tocar também em</b>: adiciona um dispositivo em <b>Limpo, para stream</b> e depois adiciona esse dispositivo no OBS: Fontes → + → <i>Captura de saída de áudio</i> (para um cabo virtual: uma <i>Captura de entrada de áudio</i> da ponta Output). Os teus sons ficam com o seu próprio controlo de volume no OBS. Sem cabo virtual, ou com Voicemeeter / uma mesa de mistura? Configurar → Dispositivos → <b>Enviar os meus sons para</b> → esse dispositivo (o OBS também o consegue capturar) ou <i>Ninguém</i> (só tu e o teu dispositivo de stream os ouvem).",
   "Plays a copy of what others hear on more devices: Voicemeeter, a device OBS captures, a second cable, speakers... Mics aren't listed here: Send my sounds to puts your sounds into your mic.": "Toca uma cópia do que os outros ouvem em mais dispositivos: Voicemeeter, um dispositivo que o OBS capta, um segundo cabo, colunas... Os microfones não aparecem aqui: \"Enviar os meus sons para\" põe os teus sons no teu microfone.",
   "Change mic": "Mudar de microfone",
-  "Put your sounds into another mic instead": "Pôr os teus sons noutro microfone"
+  "Put your sounds into another mic instead": "Pôr os teus sons noutro microfone",
+  "Record your voice, a bit of a sound, song or the radio while it plays, or both at once, and keep it as a sound.": "Grave a sua voz, um excerto de um som, música ou da rádio enquanto toca, ou os dois ao mesmo tempo, e guarde-o como som.",
+  "Recording your voice and what's playing… talk, play a sound, then click Stop.": "A gravar a sua voz e o que está a tocar… fale, toque um som e clique em Parar.",
+  "Your voice and what's playing together, as one sound. What's playing goes down while you talk, so your voice stays on top": "A sua voz e o que está a tocar juntos, como um só som. O que está a tocar baixa enquanto fala, para a sua voz ficar por cima"
 }

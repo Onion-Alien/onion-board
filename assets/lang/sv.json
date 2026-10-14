@@ -873,7 +873,6 @@
   "Record": "Spela in",
   "Record a sound": "Spela in ett ljud",
   "Record again": "Spela in igen",
-  "Record your voice, or a bit of a sound, song or the radio while it plays, and keep it as a sound.": "Spela in din röst, eller en bit av ett ljud, en låt eller radion medan det spelas, och spara det som ett ljud.",
   "Recording what's playing… play a sound, a search result or the radio now, then click Stop.": "Spelar in det som spelas… spela ett ljud, ett sökresultat eller radion nu, och klicka sedan Stoppa.",
   "Recording {n}": "Spelar in {n}",
   "Recording… click Stop when you're done.": "Spelar in… klicka Stoppa när du är klar.",
@@ -3391,5 +3390,8 @@
   "<b>Let your stream hear the sounds.</b> Setup → Devices → <b>Also play on</b>: add a device set to <b>Clean, for streaming</b>, then add that device in OBS: Sources → + → <i>Audio Output Capture</i> (for a virtual cable: an <i>Audio Input Capture</i> of its Output end). Your sounds get their own volume slider in OBS. No virtual cable, or Voicemeeter / a mixer? Setup → Devices → <b>Send my sounds to</b> → that device (OBS can capture that one too) or <i>Nobody</i> (only you and your streaming device hear them).": "<b>Låt din stream höra ljuden.</b> Konfiguration → Enheter → <b>Spela även på</b>: lägg till en enhet inställd på <b>Rent, för streaming</b>, och lägg sedan till den enheten i OBS: Källor → + → <i>Audio Output Capture</i> (för en virtuell kabel: en <i>Audio Input Capture</i> av dess utgångsände). Dina ljud får ett eget volymreglage i OBS. Ingen virtuell kabel, eller Voicemeeter / en mixer? Konfiguration → Enheter → <b>Skicka mina ljud till</b> → den enheten (OBS kan fånga den också) eller <i>Ingen</i> (bara du och din streamingenhet hör dem).",
   "Plays a copy of what others hear on more devices: Voicemeeter, a device OBS captures, a second cable, speakers... Mics aren't listed here: Send my sounds to puts your sounds into your mic.": "Spelar en kopia av det andra hör på fler enheter: Voicemeeter, en enhet som OBS fångar, en andra kabel, högtalare... Mikrofoner finns inte här: \"Skicka mina ljud till\" lägger dina ljud i din mikrofon.",
   "Change mic": "Byt mikrofon",
-  "Put your sounds into another mic instead": "Lägg dina ljud i en annan mikrofon i stället"
+  "Put your sounds into another mic instead": "Lägg dina ljud i en annan mikrofon i stället",
+  "Record your voice, a bit of a sound, song or the radio while it plays, or both at once, and keep it as a sound.": "Spela in din röst, en bit av ett ljud, en låt eller radion medan den spelas, eller båda på en gång, och spara det som ett ljud.",
+  "Recording your voice and what's playing… talk, play a sound, then click Stop.": "Spelar in din röst och det som spelas… prata, spela upp ett ljud och klicka sedan på Stoppa.",
+  "Your voice and what's playing together, as one sound. What's playing goes down while you talk, so your voice stays on top": "Din röst och det som spelas tillsammans, som ett ljud. Det som spelas sänks medan du pratar, så att din röst hörs ovanpå"
 }

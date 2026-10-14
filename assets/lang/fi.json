@@ -873,7 +873,6 @@
   "Record": "Nauhoita",
   "Record a sound": "Nauhoita ääni",
   "Record again": "Nauhoita uudelleen",
-  "Record your voice, or a bit of a sound, song or the radio while it plays, and keep it as a sound.": "Nauhoita puheesi, tai pätkä äänestä, kappaleesta tai radiosta sen soidessa, ja säilytä se äänenä.",
   "Recording what's playing… play a sound, a search result or the radio now, then click Stop.": "Nauhoitetaan soivaa… soita nyt ääni, hakutulos tai radio, ja klikkaa sitten Pysäytä.",
   "Recording {n}": "Nauhoitus {n}",
   "Recording… click Stop when you're done.": "Nauhoitetaan… klikkaa Pysäytä, kun olet valmis.",
@@ -3391,5 +3390,8 @@
   "<b>Let your stream hear the sounds.</b> Setup → Devices → <b>Also play on</b>: add a device set to <b>Clean, for streaming</b>, then add that device in OBS: Sources → + → <i>Audio Output Capture</i> (for a virtual cable: an <i>Audio Input Capture</i> of its Output end). Your sounds get their own volume slider in OBS. No virtual cable, or Voicemeeter / a mixer? Setup → Devices → <b>Send my sounds to</b> → that device (OBS can capture that one too) or <i>Nobody</i> (only you and your streaming device hear them).": "<b>Anna streamisi kuulla äänet.</b> Käyttöönotto → Laitteet → <b>Toista myös</b>: lisää laite asetuksella <b>Puhdas, striimaukseen</b> ja lisää se laite OBS:ään: Lähteet → + → <i>Audio Output Capture</i> (virtuaalikaapelille: sen Output-pään <i>Audio Input Capture</i>). Äänesi saavat OBS:ssä oman äänenvoimakkuuden liukusäätimen. Ei virtuaalikaapelia, tai Voicemeeter / mikseri? Käyttöönotto → Laitteet → <b>Lähetä ääneni</b> → se laite (OBS voi kaapata senkin) tai <i>Ei kenellekään</i> (vain sinä ja striimauslaitteesi kuulette ne).",
   "Plays a copy of what others hear on more devices: Voicemeeter, a device OBS captures, a second cable, speakers... Mics aren't listed here: Send my sounds to puts your sounds into your mic.": "Toistaa kopion siitä, mitä muut kuulevat, useammalla laitteella: Voicemeeter, laite jonka OBS kaappaa, toinen kaapeli, kaiuttimet... Mikit eivät ole tässä: \"Lähetä ääneni\" laittaa äänesi mikkiisi.",
   "Change mic": "Vaihda mikki",
-  "Put your sounds into another mic instead": "Laita äänesi toiseen mikkiin"
+  "Put your sounds into another mic instead": "Laita äänesi toiseen mikkiin",
+  "Record your voice, a bit of a sound, song or the radio while it plays, or both at once, and keep it as a sound.": "Äänitä äänesi, pätkä äänestä, kappaleesta tai radiosta sen soidessa, tai molemmat kerralla, ja tallenna se ääneksi.",
+  "Recording your voice and what's playing… talk, play a sound, then click Stop.": "Äänitetään ääntäsi ja sitä, mikä soi… puhu, soita ääni ja napsauta sitten Pysäytä.",
+  "Your voice and what's playing together, as one sound. What's playing goes down while you talk, so your voice stays on top": "Äänesi ja se, mikä soi, yhdessä yhtenä äänenä. Se, mikä soi, hiljenee puhuessasi, joten äänesi kuuluu päällimmäisenä"
 }

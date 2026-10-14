@@ -311,7 +311,6 @@
   "Record": "録音",
   "Record a sound": "サウンドを録音",
   "Record again": "録り直す",
-  "Record your voice, or a bit of a sound, song or the radio while it plays, and keep it as a sound.": "自分の声や、再生中のサウンド・曲・ラジオの一部を録音して、サウンドとして残せます。",
   "Recording what's playing… play a sound, a search result or the radio now, then click Stop.": "再生中の音を録音中… 今サウンド、検索結果、ラジオを再生して、停止をクリックしてください。",
   "Recording… click Stop when you're done.": "録音中… 終わったら停止をクリックしてください。",
   "Redline": "レッドライン",
@@ -3315,5 +3314,8 @@
   "<b>Let your stream hear the sounds.</b> Setup → Devices → <b>Also play on</b>: add a device set to <b>Clean, for streaming</b>, then add that device in OBS: Sources → + → <i>Audio Output Capture</i> (for a virtual cable: an <i>Audio Input Capture</i> of its Output end). Your sounds get their own volume slider in OBS. No virtual cable, or Voicemeeter / a mixer? Setup → Devices → <b>Send my sounds to</b> → that device (OBS can capture that one too) or <i>Nobody</i> (only you and your streaming device hear them).": "<b>配信にサウンドを流す。</b> セットアップ → デバイス → <b>ほかの再生先</b>で<b>クリーン（配信用）</b>のデバイスを追加し、OBS でそのデバイスを追加します: ソース → + → <i>音声出力キャプチャ</i>（仮想ケーブルなら、その Output 側の<i>音声入力キャプチャ</i>）。OBS でサウンド専用の音量スライダーができます。仮想ケーブルがない、または Voicemeeter / ミキサーを使う？ セットアップ → デバイス → <b>サウンドの送信先</b> → そのデバイス（OBS はそれもキャプチャできます）か<i>なし</i>（自分と配信用デバイスだけに聞こえます）。",
   "Plays a copy of what others hear on more devices: Voicemeeter, a device OBS captures, a second cable, speakers... Mics aren't listed here: Send my sounds to puts your sounds into your mic.": "相手に聞こえる音のコピーをほかのデバイスでも再生します：Voicemeeter、OBS がキャプチャするデバイス、2 本目のケーブル、スピーカーなど。マイクはここにはありません：「サウンドの送信先」でサウンドがマイクに入ります。",
   "Change mic": "マイクを変更",
-  "Put your sounds into another mic instead": "サウンドを別のマイクに入れる"
+  "Put your sounds into another mic instead": "サウンドを別のマイクに入れる",
+  "Record your voice, a bit of a sound, song or the radio while it plays, or both at once, and keep it as a sound.": "自分の声、再生中のサウンド・曲・ラジオの一部、またはその両方を同時に録音して、サウンドとして保存します。",
+  "Recording your voice and what's playing… talk, play a sound, then click Stop.": "あなたの声と再生中の音を録音中… 話して、サウンドを再生してから「停止」をクリックしてください。",
+  "Your voice and what's playing together, as one sound. What's playing goes down while you talk, so your voice stays on top": "あなたの声と再生中の音を一緒に、1つのサウンドにします。話している間は再生中の音が下がるので、声がしっかり聞こえます"
 }

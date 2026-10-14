@@ -311,7 +311,6 @@
   "Record": "錄音",
   "Record a sound": "錄製音效",
   "Record again": "重新錄音",
-  "Record your voice, or a bit of a sound, song or the radio while it plays, and keep it as a sound.": "錄下你的聲音，或在音效、歌曲或電台播放時錄下一段，存成音效。",
   "Recording what's playing… play a sound, a search result or the radio now, then click Stop.": "正在錄製播放中的聲音… 現在播放音效、搜尋結果或電台，然後按「停止」。",
   "Recording… click Stop when you're done.": "錄音中… 完成後按「停止」。",
   "Redline": "極限",
@@ -3315,5 +3314,8 @@
   "<b>Let your stream hear the sounds.</b> Setup → Devices → <b>Also play on</b>: add a device set to <b>Clean, for streaming</b>, then add that device in OBS: Sources → + → <i>Audio Output Capture</i> (for a virtual cable: an <i>Audio Input Capture</i> of its Output end). Your sounds get their own volume slider in OBS. No virtual cable, or Voicemeeter / a mixer? Setup → Devices → <b>Send my sounds to</b> → that device (OBS can capture that one too) or <i>Nobody</i> (only you and your streaming device hear them).": "<b>讓直播聽得到音效。</b>設置 → 裝置 → <b>同時播放到</b>：加入一個設為<b>乾淨，用於直播</b>的裝置，然後在 OBS 加入那個裝置：來源 → + → <i>音訊輸出擷取</i>（如果是虛擬音源線：用它 Output 端的<i>音訊輸入擷取</i>）。你的音效在 OBS 裡會有自己的音量滑桿。沒有虛擬音源線，或用 Voicemeeter／混音器？設置 → 裝置 → <b>音效傳送到</b> → 那個裝置（OBS 也能擷取它）或<i>不傳送</i>（只有你和直播裝置聽得到）。",
   "Plays a copy of what others hear on more devices: Voicemeeter, a device OBS captures, a second cable, speakers... Mics aren't listed here: Send my sounds to puts your sounds into your mic.": "把別人聽到的內容複製一份，在更多裝置上播放：Voicemeeter、OBS 擷取的裝置、第二條線、喇叭……這裡不列麥克風：「音效傳送到」會把你的音效放進麥克風。",
   "Change mic": "更換麥克風",
-  "Put your sounds into another mic instead": "把音效放進另一個麥克風"
+  "Put your sounds into another mic instead": "把音效放進另一個麥克風",
+  "Record your voice, a bit of a sound, song or the radio while it plays, or both at once, and keep it as a sound.": "錄下你的聲音，或正在播放的音效、歌曲或電台的一段，或兩者同時錄，並儲存為音效。",
+  "Recording your voice and what's playing… talk, play a sound, then click Stop.": "正在錄製你的聲音和正在播放的內容… 說話、播放一個音效，然後按一下停止。",
+  "Your voice and what's playing together, as one sound. What's playing goes down while you talk, so your voice stays on top": "你的聲音和正在播放的內容合成一個音效。你說話時正在播放的內容會變小，讓你的聲音保持在上面"
 }

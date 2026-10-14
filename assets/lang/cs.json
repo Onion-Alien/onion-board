@@ -887,7 +887,6 @@
   "Record": "Nahrát",
   "Record a sound": "Nahrát zvuk",
   "Record again": "Nahrát znovu",
-  "Record your voice, or a bit of a sound, song or the radio while it plays, and keep it as a sound.": "Nahraj svůj hlas, nebo kousek zvuku, písničky či rádia, zatímco hraje, a nech si ho jako zvuk.",
   "Recording what's playing… play a sound, a search result or the radio now, then click Stop.": "Nahrávám, co hraje… pusť teď zvuk, výsledek hledání nebo rádio a pak klikni na Zastavit.",
   "Recording {n}": "Nahrávka {n}",
   "Recording… click Stop when you're done.": "Nahrávám… na konci klikni na Zastavit.",
@@ -3467,5 +3466,8 @@
   "<b>Let your stream hear the sounds.</b> Setup → Devices → <b>Also play on</b>: add a device set to <b>Clean, for streaming</b>, then add that device in OBS: Sources → + → <i>Audio Output Capture</i> (for a virtual cable: an <i>Audio Input Capture</i> of its Output end). Your sounds get their own volume slider in OBS. No virtual cable, or Voicemeeter / a mixer? Setup → Devices → <b>Send my sounds to</b> → that device (OBS can capture that one too) or <i>Nobody</i> (only you and your streaming device hear them).": "<b>Ať tvůj stream slyší zvuky.</b> Zapojení → Zařízení → <b>Přehrávat i na</b>: přidej zařízení nastavené na <b>Čistě, pro stream</b> a pak ho přidej do OBS: Zdroje → + → <i>Záznam zvukového výstupu</i> (pro virtuální kabel: <i>Záznam zvukového vstupu</i> z jeho konce Output). Tvoje zvuky dostanou v OBS vlastní posuvník hlasitosti. Žádný virtuální kabel, nebo Voicemeeter / mixpult? Zapojení → Zařízení → <b>Posílat moje zvuky do</b> → to zařízení (OBS umí zachytit i to) nebo <i>Nikdo</i> (slyšíš je jen ty a tvoje zařízení pro stream).",
   "Plays a copy of what others hear on more devices: Voicemeeter, a device OBS captures, a second cable, speakers... Mics aren't listed here: Send my sounds to puts your sounds into your mic.": "Přehrává kopii toho, co slyší ostatní, i na dalších zařízeních: Voicemeeter, zařízení, které zachytává OBS, druhý kabel, reproduktory... Mikrofony tu nejsou: „Posílat moje zvuky do“ dává tvoje zvuky do mikrofonu.",
   "Change mic": "Změnit mikrofon",
-  "Put your sounds into another mic instead": "Dávat zvuky do jiného mikrofonu"
+  "Put your sounds into another mic instead": "Dávat zvuky do jiného mikrofonu",
+  "Record your voice, a bit of a sound, song or the radio while it plays, or both at once, and keep it as a sound.": "Nahrajte svůj hlas, kousek zvuku, písně nebo rádia, když hraje, nebo obojí naráz, a uložte si to jako zvuk.",
+  "Recording your voice and what's playing… talk, play a sound, then click Stop.": "Nahrává se váš hlas a to, co hraje… mluvte, pusťte zvuk a pak klikněte na Zastavit.",
+  "Your voice and what's playing together, as one sound. What's playing goes down while you talk, so your voice stays on top": "Váš hlas a to, co hraje, dohromady jako jeden zvuk. Když mluvíte, to, co hraje, se ztiší, takže váš hlas zůstane navrchu"
 }
