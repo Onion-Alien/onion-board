@@ -209,7 +209,7 @@ def test_the_offer_stands_down_while_the_discord_warning_shows(window, monkeypat
     from soundboard.ui import chatguide
     monkeypatch.setattr(chatguide, "on_mic", lambda mw: True)
     window.cfg.dest = {"simple": "clean", "mode": "off"}
-    window._on_discord((_discord_warning(), ("sig",)))
+    window.alertctl._on_discord((_discord_warning(), ("sig",)))
     assert not window.urgent_bar.isHidden()
     hear(window, ("discord.exe", "discord", "Discord"))
     at(window, 0.0)
@@ -223,6 +223,6 @@ def test_the_discord_warning_takes_the_offer_down(window, monkeypatch):
     hear(window, ("discord.exe", "discord", "Discord"))
     at(window, 0.0)
     assert not window.setup_bar.isHidden()          # offered first
-    window._on_discord((_discord_warning(), ("sig",)))
+    window.alertctl._on_discord((_discord_warning(), ("sig",)))
     assert not window.urgent_bar.isHidden()
     assert window.setup_bar.isHidden()              # the warning replaces it

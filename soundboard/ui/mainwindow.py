@@ -34,8 +34,8 @@ from soundboard import exitwatch
 from soundboard import (appaudio, autostart, backup, destination, library, midi,
                         remote, otherboards, reset, soundfx, thumbs, trash, updates, videos,
                         voicesdk)
-from soundboard import (appsetup, directmic, discordcfg, ffmpegget, michelper, net, netlog,
-                        profiles, quality, rawmic, shellicon, sourceinfo, thumbbar, tips, tor,
+from soundboard import (appsetup, directmic, ffmpegget, michelper, net, netlog,
+                        profiles, quality, shellicon, sourceinfo, thumbbar, tips, tor,
                         usage, watchaddon)
 from soundboard.pollthread import PollThread
 from soundboard.replay import InstantReplay
@@ -51,6 +51,7 @@ from soundboard.ui import routewarn
 from soundboard.ui import worker
 from soundboard.ui.dropveil import DropVeil
 from soundboard.ui.ffmpegcontrol import FfmpegControl
+from soundboard.ui.alertcontrol import AlertControl
 from soundboard.ui.categorycontrol import CategoryControl
 from soundboard.ui.importcontrol import ImportControl
 from soundboard.ui.updatecontrol import UpdateControl
@@ -344,27 +345,6 @@ def _listed(name: str, names) -> bool:
     return any(" ".join(n.split()).lower() == squash for n in names)
 
 
-# the urgent bar's line for the worst thing in Discord's settings (discordcfg)
-DISCORD_URGENT = {
-    discordcfg.STUDIO: _("{name} isn't hearing your sounds: its Input Profile is Studio, "
-                         "which skips Onion Board. Set it to Custom."),
-    discordcfg.BYPASS: _("{name} isn't hearing your sounds: \"Bypass System Audio Input "
-                         "Processing\" is on, which skips Onion Board."),
-    discordcfg.VAD: _("{name}'s Advanced Voice Activity cuts most of your sounds in calls. "
-                      "Turn it off (Voice & Video → Show Advanced Voice Settings)."),
-    discordcfg.AUTO: _("{name}'s automatic input sensitivity keeps cutting your sounds out "
-                       "in calls. Turn it off (Voice & Video → Input Sensitivity)."),
-    discordcfg.ISOLATION: _("{name}'s Voice Isolation is wiping out your sounds. Set its "
-                            "Input Profile to Custom and Noise Suppression to None."),
-    discordcfg.KRISP: _("{name}'s noise suppression (Krisp) is wiping out your sounds. Set "
-                        "Noise Suppression to None."),
-    discordcfg.SUPPRESSION: _("{name}'s noise suppression is eating your sounds. Set Noise "
-                              "Suppression to None."),
-    discordcfg.ECHO: _("{name}'s echo cancellation is making your sounds dip and pump. "
-                       "Turn it off."),
-    discordcfg.AGC: _("{name}'s automatic gain control is making your sounds' volume jump. "
-                      "Turn it off."),
-}
 
 
 def _polish(w: QWidget, size=None):
@@ -406,6 +386,7 @@ class MainWindow(QMainWindow):
 
     def __init__(self):
         super().__init__()
+        self.alertctl = AlertControl(self)
         self.catctl = CategoryControl(self)
         self.impctl = ImportControl(self)
         self.updctl = UpdateControl(self)
@@ -470,8 +451,8 @@ class MainWindow(QMainWindow):
         self.bridge.update_progress.connect(self.updctl._on_update_progress)
         self.bridge.update_ready.connect(self.updctl._on_update_ready)
         self.bridge.watch_update.connect(self.updctl._on_watch_update)
-        self.bridge.discord.connect(self._on_discord)
-        self.bridge.mic_users.connect(self._on_mic_users)
+        self.bridge.discord.connect(self.alertctl._on_discord)
+        self.bridge.mic_users.connect(self.alertctl._on_mic_users)
         self.bridge.counted.connect(self._usage_counted)
         self.ffctl = FfmpegControl(self)
         self.bridge.ffmpeg.connect(self.ffctl.on_answer)
@@ -500,7 +481,6 @@ class MainWindow(QMainWindow):
         self.tray: QSystemTrayIcon | None = None
         self.bun_mode = None   # Bun mode's floating Bun (ui/bunmode.py), once used
         self.watch_offer: watchaddon.Offer | None = None   # an urgent Onion Watch fix
-        self._urgent_hidden: set[str] = set()   # "board 1.9.6" / "watch 0.8.2", this run
         # set up for the app you're using (appsetup): the bar's app and what it shows.
         # Before the Discord check below: on a slow start its answer (_on_discord) comes
         # in while the splash pumps events, before the end of __init__
@@ -511,23 +491,13 @@ class MainWindow(QMainWindow):
         self._setup_undo: dict | None = None    # the dest settings before a switch
         self._setup_hide = QTimer(self, singleShot=True)
         self._setup_hide.timeout.connect(self._hide_setup)
-        # Discord's own voice settings (discordcfg), read while it runs: the ones that
-        # wipe out sounds get the urgent bar
-        self.discord_found: list = []
-        self._discord_sig = None
-        self._discord_reading = False
-        self._discord_poll = PollThread("discord-settings")
         self._discord_timer = QTimer(self, interval=DISCORD_POLL_MS)
-        self._discord_timer.timeout.connect(self._discord_tick)
+        self._discord_timer.timeout.connect(self.alertctl._discord_tick)
         if sys.platform == "win32":
             self._discord_timer.start()
-            QTimer.singleShot(3000, self._discord_tick)
-        # straight into my mic: an app recording the mic in raw mode skips Onion Board
-        # and hears none of the sounds (rawmic)
-        self.raw_watch = rawmic.BypassWatch()
-        self._raw_looking = False
+            QTimer.singleShot(3000, self.alertctl._discord_tick)
         self._raw_timer = QTimer(self, interval=RAW_POLL_MS)
-        self._raw_timer.timeout.connect(self._raw_tick)
+        self._raw_timer.timeout.connect(self.alertctl._raw_tick)
         if sys.platform == "win32":
             self._raw_timer.start()
         self._preview_gen = 0            # newest effects preview (older renders are dropped)
@@ -900,14 +870,14 @@ class MainWindow(QMainWindow):
         uh.addLayout(uv, 1)
         self.urgent_btn = QPushButton()
         self.urgent_btn.setObjectName("primary")
-        self.urgent_btn.clicked.connect(self._urgent_clicked)
+        self.urgent_btn.clicked.connect(self.alertctl._urgent_clicked)
         uh.addWidget(self.urgent_btn)
         hide = QPushButton()
         hide.setObjectName("urgenthide")
         hide.setAccessibleName(_("Hide"))
         hide.setToolTip(_("Hide until Onion Board starts again"))
         icons.close_button(hide, 28, "warn_text")
-        hide.clicked.connect(self._hide_urgent)
+        hide.clicked.connect(self.alertctl._hide_urgent)
         uh.addWidget(hide)
         self.urgent_bar.hide()
         rv.addWidget(self.urgent_bar)
@@ -1166,7 +1136,7 @@ class MainWindow(QMainWindow):
         self.tabs.currentChanged.connect(self._focus_sounds_page)
         # an urgent Onion Watch fix's banner shows on the Triggers tab only
         self.tabs.currentChanged.connect(
-            lambda _i: self.watch_offer is not None and self._show_urgent())
+            lambda _i: self.watch_offer is not None and self.alertctl._show_urgent())
         # a badge on a tab's icon (or, by default, a wash) in the theme's live colour while
         # its feature is live — the voice changer, a radio station, a program being
         # sent, the screen watched — so it's never left on without you noticing
@@ -4433,9 +4403,9 @@ class MainWindow(QMainWindow):
                    ok=ok, mode=mode, name=html.escape(app.name))]
         guide = app.guide
         if guide == "discord":
-            if self.discord_problems():
+            if self.alertctl.discord_problems():
                 return lines, ""   # the urgent bar above says which, with Fix Discord
-            if self.discord_found:
+            if self.alertctl.discord_found:
                 lines.append(_("{ok} Discord's voice settings let your sounds through.",
                                ok=ok))
                 return lines, ""
@@ -7766,7 +7736,7 @@ class MainWindow(QMainWindow):
         self.set_option("autostart_hidden", hidden)
         autostart.refresh(hidden)
 
-    # ------------------------------------------------------------------ updates
+    # ------------------------------------------------------------------ usage count
     def send_usage(self):
         """The anonymous daily usage count, if it's due and switched on (usage.py)."""
         usage.maybe_send(self.cfg, self.bridge.counted.emit, app_dir=library.APP_DIR)
@@ -7799,199 +7769,6 @@ class MainWindow(QMainWindow):
     def _count_tab(self, i: int):
         if 0 <= i < len(TABS):
             usage.tab_opened(self.cfg, TAB_KEYS[i])
-
-    def _urgent_now(self) -> tuple[str, str, str] | None:
-        """The urgent fix to show on the banner: (key, text, button), Onion Board's
-        before Onion Watch's; None when there's none, or it was hidden."""
-        rel = self.updctl.release
-        if (rel is not None and rel.urgent
-                and f"board {rel.version}" not in self._urgent_hidden):
-            # the same steps as the update card (its progress shows under the words)
-            button = (_("Cancel") if self.updctl._downloading
-                      else _("Restart to update") if self.updctl._update_file is not None
-                      and not self.updctl._update_err
-                      else _("Try again") if self.updctl._update_err
-                      else _("Update now") if updates.can_install() and rel.asset_url
-                      else _("Details"))
-            return (f"board {rel.version}",
-                    _("Important fix in Onion Board {version}: {fix}",
-                      version=rel.version, fix=rel.urgent), button)
-        o = self.watch_offer   # only on its Triggers tab: there it's the one in use
-        if (o is not None and f"watch {o.version}" not in self._urgent_hidden
-                and self.tabs.currentWidget() is self.triggers):
-            return (f"watch {o.version}",
-                    _("Important fix in Onion Watch {version}: {fix}",
-                      version=o.version, fix=o.urgent),
-                    _("Update Onion Watch"))
-        probs = self.discord_problems()
-        key = "discord " + ",".join(probs)
-        if probs and key not in self._urgent_hidden:
-            return key, DISCORD_URGENT[probs[0]].format(
-                name=self.discord_found[0].client), _("Fix Discord")
-        raw = self._raw_culprits()
-        key = "rawmic " + ",".join(a.exe.lower() for a in raw)
-        if raw and key not in self._urgent_hidden:
-            if len(raw) == 1:
-                text = _("{name} is using your mic without Onion Board, so it won't hear "
-                         "your sounds. Look for a \"raw\", \"bypass processing\" or "
-                         "\"studio\" option in its voice settings and turn it off.",
-                         name=raw[0].name)
-            else:
-                text = _("One of these apps is using your mic without Onion Board, so it "
-                         "won't hear your sounds: {names}. Look for a \"raw\", \"bypass "
-                         "processing\" or \"studio\" option in its voice settings and turn "
-                         "it off.", names=", ".join(a.name for a in raw))
-            return key, text, ""
-        return None
-
-    def _raw_culprits(self) -> list:
-        """The apps recording the mic in raw mode (rawmic), but not a Discord whose own
-        settings already have their line (Studio, Bypass)."""
-        raw = self.raw_watch.culprits
-        if raw and self.discord_problems():
-            from soundboard.ui.chatguide import DISCORD_EXES
-            raw = [a for a in raw if a.exe.lower() not in DISCORD_EXES]
-        return raw
-
-    def _raw_tick(self):
-        """Every RAW_POLL_MS while sending straight into the mic: who records it, on a
-        worker (Windows' session list); compared with the effect's streams after."""
-        e = self.engine
-        mic = self.cfg.mic_device
-        if (self.cfg.route != "mic" or e.direct_stream() is None or not mic
-                or self._direct_not_running()):
-            shown = bool(self.raw_watch.culprits)
-            self.raw_watch.reset()
-            if shown:
-                self._show_urgent()
-            return
-        if self._raw_looking:
-            return
-        self._raw_looking = True
-
-        def run():
-            try:
-                # in the endpoint effect nobody can skip it, and one copy serves every
-                # app (its stream count isn't per app): nobody to name
-                return [] if directmic.endpoint_wide() else \
-                    appaudio.recording_apps(mic, mine=True)
-            except Exception:  # noqa: BLE001 - a check that can't run shows nothing
-                log.debug("listing who records the mic failed", exc_info=True)   # (often)
-                return None
-        worker.run(run, self.bridge.mic_users, "raw-mic", error=None, owner=self)
-
-    def _on_mic_users(self, apps, now: float | None = None):
-        self._raw_looking = False
-        if apps is None or self.engine.direct_stream() is None:
-            return
-        before = [a.exe for a in self.raw_watch.culprits]
-        culprits = self.raw_watch.update(apps, self.engine.direct_apps(),
-                                        time.monotonic() if now is None else now)
-        if [a.exe for a in culprits] != before:
-            log.info("recording the mic without Onion Board: %s",
-                     [a.exe for a in culprits] or "nobody")
-            self._show_urgent()
-
-    def discord_problems(self) -> list[str]:
-        """What in the running Discord's own settings hurts your sounds (discordcfg),
-        worst first; [] when it's fine, not running, or couldn't be read."""
-        if not self.discord_found:
-            return []
-        from soundboard.ui.chatguide import raw_skips
-        return self.discord_found[0].problems(raw_skips(self))
-
-    def _discord_tick(self):
-        """Every DISCORD_POLL_MS: while Discord runs, re-read its settings when its
-        files changed. On a worker: the process list and the files take a few ms."""
-        if self._discord_reading:
-            return
-        self._discord_reading = True
-        last = self._discord_sig
-
-        def run():
-            found, sig = [], None
-            try:
-                from soundboard.ui.chatguide import DISCORD_EXES
-                names = {n for _p, n in appaudio._process_table().values()}
-                if names & set(DISCORD_EXES):
-                    sig = discordcfg.signature()
-                    found = None if sig == last else discordcfg.read()
-            except Exception:  # noqa: BLE001 - a check that can't run shows nothing
-                log.debug("reading Discord's settings failed", exc_info=True)
-            self.bridge.discord.emit((found, sig))
-        self._discord_poll.run(run)
-
-    def _on_discord(self, res):
-        found, sig = res
-        self._discord_reading = False
-        self._discord_sig = sig
-        if found is None:   # unchanged
-            return
-        before = self.discord_problems()
-        self.discord_found = found
-        now = self.discord_problems()
-        if now != before:
-            log.info("Discord settings: %s", now or "fine")
-            self._show_urgent()
-        app = self._setup_app
-        if self._setup_state == "done" and app is not None and app.guide == "discord":
-            self._show_setup("done", app)   # its ticks, live
-
-    def _show_urgent(self):
-        now = self._urgent_now()
-        if now is None:
-            self.urgent_bar.hide()
-            return
-        key, text, button = now
-        self.urgent_lbl.setText(text)
-        self.urgent_btn.setText(button)
-        self.urgent_btn.setVisible(bool(button))   # a warning with nothing to click
-        # Onion Board's own fix: the update card's progress and words, under the reason
-        upd = self.updctl
-        board = key.startswith("board") and (upd._downloading or bool(upd._update_err))
-        self.urgent_prog.setVisible(board and self.updctl._downloading)
-        self.urgent_prog.setValue(self.updctl._update_pct())
-        self.urgent_sub.setVisible(board)
-        if board:
-            state = self.updctl._update_words()   # failed: the reason (Try again is beside it)
-            self.urgent_sub.setText(state[3] if state[0] == "failed"
-                                    else " · ".join(filter(None, (state[1], state[2]))))
-        self.urgent_bar.show()
-        if self._setup_state == "offer":
-            self._hide_setup()   # one bar at a time: the warning beats "Set up for it?"
-
-    def _hide_urgent(self):
-        now = self._urgent_now()
-        if now is not None:
-            self._urgent_hidden.add(now[0])
-        self._show_urgent()   # the next one, if any
-
-    def _urgent_clicked(self):
-        now = self._urgent_now()
-        if now is None:
-            return
-        if now[0].startswith("discord"):
-            self.show_chat_guide("discord")
-            self._show_urgent()   # fixed meanwhile, or still to do
-            return
-        if now[0].startswith("board"):
-            if self.updctl._downloading:
-                self.updctl.cancel_update()
-            elif self.updctl._update_file is not None and not self.updctl._update_err:
-                self.updctl.install_update()
-            elif (updates.can_install() and self.updctl.release is not None
-                  and self.updctl.release.asset_url):
-                self.updctl.download_update()
-            else:
-                self.updctl.show_update()
-            return
-        # Onion Watch: its tab does the updating (and shows how it's going)
-        self.tabs.setCurrentWidget(self.triggers)
-        if (isinstance(self.triggers, TriggersTab) and self.triggers.offer is not None
-                and not self.triggers._busy):
-            self.triggers.get()
-        self.watch_offer = None
-        self._show_urgent()
 
     def _go_tab(self, n: int, absolute: bool = False):
         """The n-th tab on the rail (`absolute`), or the one n steps from this one."""
@@ -8652,7 +8429,7 @@ class MainWindow(QMainWindow):
         if self.bun_mode is not None:   # (cfg.bun["on"] stays: it starts as Bun next time)
             self.bun_mode.close()
         for step in (self._finish_removals, self._wait_bin, self.timer.stop, self._voice_timer.stop,
-                     self._default_poll.stop, self._discord_poll.stop,
+                     self._default_poll.stop, self.alertctl._discord_poll.stop,
                      self._release_ptt,
                      self._remember_usage, self.cfg.save, self.overlay.shutdown,
                      self.hotkeys.stop, self.replay.stop, self.remote.stop,

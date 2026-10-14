@@ -92,7 +92,7 @@ def test_an_app_leaving_forgets_it():
 @pytest.fixture
 def window(main_window, monkeypatch):  # noqa: F811
     w = main_window
-    w.raw_watch = rawmic.BypassWatch(me=ME)
+    w.alertctl.raw_watch = rawmic.BypassWatch(me=ME)
     stream = SimpleNamespace(mic_silent_s=lambda: 0.0)   # a working mic
     monkeypatch.setattr(w.engine, "direct_stream", lambda: stream)
     return w
@@ -100,7 +100,7 @@ def window(main_window, monkeypatch):  # noqa: F811
 
 def look(window, monkeypatch, apps, streams, t):
     monkeypatch.setattr(window.engine, "direct_apps", lambda: streams)
-    window._on_mic_users(apps, now=t)
+    window.alertctl._on_mic_users(apps, now=t)
 
 
 def test_the_bar_names_the_app(window, monkeypatch):
@@ -132,8 +132,8 @@ def test_off_the_mic_route_it_clears(window, monkeypatch):
     look(window, monkeypatch, [BOARD, CHAT], 1, G)
     assert not window.urgent_bar.isHidden()
     window.cfg.route = "cable"
-    window._raw_tick()
-    assert window.urgent_bar.isHidden() and not window.raw_watch.culprits
+    window.alertctl._raw_tick()
+    assert window.urgent_bar.isHidden() and not window.alertctl.raw_watch.culprits
 
 
 def test_the_tick_lists_on_a_worker(window, monkeypatch, qapp):
@@ -145,7 +145,7 @@ def test_the_tick_lists_on_a_worker(window, monkeypatch, qapp):
     monkeypatch.setattr(window, "_direct_not_running", lambda: False)
     monkeypatch.setattr(window.engine, "direct_apps", lambda: 1)
     window.cfg.route, window.cfg.mic_device = "mic", "Microphone (Test)"
-    window._raw_tick()
-    assert process_events(qapp, lambda: not window._raw_looking)
+    window.alertctl._raw_tick()
+    assert process_events(qapp, lambda: not window.alertctl._raw_looking)
     # the board's own tick timer can fire a second look on a slow runner: same question
     assert seen and set(seen) == {("Microphone (Test)", True)}
