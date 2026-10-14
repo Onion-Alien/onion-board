@@ -36,7 +36,7 @@ def _wheel(w, notches: int):
 def test_mini_player_turns_into_bun_and_a_click_brings_it_back(window, qapp):
     _mini(window)
     window.mini_bun.click()
-    bun = window.bun_mode
+    bun = window.bunctl.bun_mode
     assert bun.isVisible() and not window.isVisible() and window.cfg.bun["on"]
     flags = bun.windowFlags()
     assert flags & Qt.WindowType.WindowDoesNotAcceptFocus   # never takes a game's keys
@@ -52,8 +52,8 @@ def test_mini_player_turns_into_bun_and_a_click_brings_it_back(window, qapp):
 
 def test_bun_resizes_freely_and_only_the_menu_opens_the_full_board(window, qapp):
     _mini(window)
-    window.enter_bun_mode()
-    bun = window.bun_mode
+    window.bunctl.enter_bun_mode()
+    bun = window.bunctl.bun_mode
     _wheel(bun, -60)
     assert bun.bun_h == bunmode.MIN_H and bun.isVisible()   # stops at tiny...
     _wheel(bun, 60)
@@ -69,8 +69,8 @@ def test_bun_resizes_freely_and_only_the_menu_opens_the_full_board(window, qapp)
 
 def test_bun_says_toasts_and_shows_errors_and_downloads(window, qapp):
     _mini(window)
-    window.enter_bun_mode()
-    bun = window.bun_mode
+    window.bunctl.enter_bun_mode()
+    bun = window.bunctl.bun_mode
     window.toast("Couldn't play <b>Airhorn</b>: the file is gone.", "error")
     assert bun.text == "Couldn't play Airhorn : the file is gone." and bun.kind == "error"
     assert bun.bun.sad == bunmode.SAD_ERROR
@@ -88,19 +88,20 @@ def test_bun_says_toasts_and_shows_errors_and_downloads(window, qapp):
 
 def test_tray_open_puts_bun_away_and_quit_as_bun_starts_as_bun(window, qapp):
     _mini(window)
-    window.enter_bun_mode()
+    window.bunctl.enter_bun_mode()
     window.show_from_tray()
-    assert not window.bun_mode.isVisible() and window.isVisible()
+    assert not window.bunctl.bun_mode.isVisible() and window.isVisible()
     window.cfg.bun["on"] = True
     window.cfg.setup_done = True
     window.hide()
-    assert window.start_as_bun() and window.bun_mode.isVisible() and not window.isVisible()
+    bun = window.bunctl
+    assert bun.start_as_bun() and bun.bun_mode.isVisible() and not window.isVisible()
 
 
 def test_bun_keeps_his_size_and_stays_on_screen(window, qapp):
     _mini(window)
-    window.enter_bun_mode()
-    bun = window.bun_mode
+    window.bunctl.enter_bun_mode()
+    bun = window.bunctl.bun_mode
     bun.set_size(180)
     bun._remember()
     bun.hide()
@@ -111,8 +112,8 @@ def test_bun_keeps_his_size_and_stays_on_screen(window, qapp):
 
 def test_hover_shows_the_buttons_and_paints_the_grip(window, qapp):
     _mini(window)
-    window.enter_bun_mode()
-    bun = window.bun_mode
+    window.bunctl.enter_bun_mode()
+    bun = window.bunctl.bun_mode
     bun.enterEvent(None)
     assert bun.icons.isVisible()
     row = bun.icons
@@ -132,8 +133,8 @@ def test_dragging_his_corner_only_resizes_him(window, qapp):
     """Grip drags, fast and erratic ones too, change his size and nothing else: his
     top-left corner stays put and the button row stays out of the way until the drop."""
     _mini(window)
-    window.enter_bun_mode()
-    bun = window.bun_mode
+    window.bunctl.enter_bun_mode()
+    bun = window.bunctl.bun_mode
     bun.set_size(120)
     bun.enterEvent(None)
     corner, h0 = bun._bun_corner(), bun.bun_h
@@ -165,7 +166,7 @@ def test_a_tabs_right_click_menu_turns_the_full_board_into_bun_and_back(window, 
     menu = window.tab_menu(0)
     act = next(a for a in menu.actions() if a.text() == "Turn into Bun")
     act.trigger()
-    bun = window.bun_mode
+    bun = window.bunctl.bun_mode
     assert bun.isVisible() and not window.isVisible()
     bun.enterEvent(None)
     bun.b_back.click()
@@ -174,8 +175,8 @@ def test_a_tabs_right_click_menu_turns_the_full_board_into_bun_and_back(window, 
 
 def test_his_resize_corner_shrinks_with_him(window, qapp):
     _mini(window)
-    window.enter_bun_mode()
-    bun = window.bun_mode
+    window.bunctl.enter_bun_mode()
+    bun = window.bunctl.bun_mode
     bun.set_size(bunmode.MIN_H)
     small = bun._grip().width()
     bun.set_size(200)
@@ -188,11 +189,11 @@ def test_back_returns_the_window_as_it_was_even_after_a_restart(window, qapp):
     _mini(window)
     window.move(120, 90)
     was = window.geometry()
-    window.enter_bun_mode()
+    window.bunctl.enter_bun_mode()
     assert window.cfg.bun["from"][:4] == [was.x(), was.y(), was.width(), was.height()]
     window.resize(1180, 720)   # what a fresh start has, the window never shown
-    window.bun_mode.back.emit()
+    window.bunctl.bun_mode.back.emit()
     assert window.isVisible() and window.is_mini() and window.geometry() == was
-    window.enter_bun_mode()
-    window.bun_mode.full.emit()   # the right-click menu: the full board
+    window.bunctl.enter_bun_mode()
+    window.bunctl.bun_mode.full.emit()   # the right-click menu: the full board
     assert not window.is_mini() and window.width() > was.width()

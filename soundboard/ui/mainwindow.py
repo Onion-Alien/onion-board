@@ -14,23 +14,23 @@ from pathlib import Path
 from typing import Any, Literal, overload
 
 import numpy as np
-from PySide6.QtCore import (QEvent, QObject, QPoint, QRect, QSignalBlocker,
-                            QSize, Qt, QTimer, QUrl, Signal)
-from PySide6.QtGui import (QActionGroup, QCursor, QDesktopServices, QIcon,
+from PySide6.QtCore import (QEvent, QObject, QPoint, QSignalBlocker,
+                            QSize, Qt, QTimer, Signal)
+from PySide6.QtGui import (QIcon,
                            QKeySequence, QShortcut)
 from PySide6.QtWidgets import (QApplication, QBoxLayout, QCheckBox, QComboBox, QDialog, QFrame,
                                QGraphicsOpacityEffect, QGridLayout, QHBoxLayout, QInputDialog,
                                QLabel, QLineEdit, QMainWindow, QMenu, QMessageBox, QProgressBar,
                                QPushButton, QScrollArea, QSizePolicy, QSlider, QStackedWidget,
-                               QSystemTrayIcon, QToolTip, QVBoxLayout, QWidgetItem,
-                               QWidget, QWidgetAction)
+                               QSystemTrayIcon, QVBoxLayout, QWidgetItem,
+                               QWidget)
 from shiboken6 import isValid as qt_valid
 
 from soundboard import engine as eng
 from soundboard import bunny, theme, winkeys, ytdl, ytworker
 from soundboard.engine import SR, Engine
 from soundboard.engine import is_virtual as is_virtual_cable
-from soundboard import exitwatch
+from soundboard import exitwatch, sourceinfo
 from soundboard import (appaudio, autostart, backup, destination, library, midi,
                         remote, otherboards, reset, soundfx, thumbs, trash, updates, videos,
                         voicesdk)
@@ -40,7 +40,7 @@ from soundboard import (appsetup, directmic, ffmpegget, michelper, net, netlog,
 from soundboard.pollthread import PollThread
 from soundboard.replay import InstantReplay
 from soundboard.library import (PAD_COLORS, PRESS_MODE, RESOURCE_DIR, Config,
-                                SoundMeta, cache_keep, duplicate, fingerprint,
+                                SoundMeta, cache_keep, fingerprint,
                                 load_original, load_sound, prune_cache, save_clip)
 from soundboard.settings import HOTKEY_ACTIONS, HotkeyDialog, SettingsDialog, pretty_key
 from soundboard.shuffle import ShuffleBag
@@ -51,13 +51,18 @@ from soundboard.ui import routewarn
 from soundboard.ui import worker
 from soundboard.ui.dropveil import DropVeil
 from soundboard.ui.ffmpegcontrol import FfmpegControl
+from soundboard.ui.editcontrol import EditControl
+from soundboard.ui.removecontrol import RemoveControl
+from soundboard.ui.padcontrol import PadControl
+from soundboard.ui.remoteaccess import RemoteAccess
+from soundboard.ui.buncontrol import BunControl
 from soundboard.ui.alertcontrol import AlertControl
 from soundboard.ui.categorycontrol import CategoryControl
 from soundboard.ui.importcontrol import ImportControl
 from soundboard.ui.updatecontrol import UpdateControl
 from soundboard.ui import toast as toastmod
-from soundboard.ui import (a11y, alsosend, appstate, busy, clipeditor, icons, responsive,
-                           sourcedialog, splash, taboff, themecover)
+from soundboard.ui import (a11y, alsosend, appstate, busy, icons, responsive,
+                           splash, taboff, themecover)
 from soundboard.ui.speedpitch import SpeedPitchButton
 from soundboard.ui.panel import (BAR_H, CONTROL_H, EqPanel, Flow, VolumeControl, bar,
                                  alt_tile, capped, card, hint_label, icon_label,
@@ -116,12 +121,10 @@ TABS = ((_("Sounds"), _("Your sound buttons: click one to play it")),
 TAB_INDEX = {key: i for i, key in enumerate(TAB_KEYS)}
 
 
-UNDO_S = 10          # how long "Removed … · Undo" stays up
 # an effects preview of a sound longer than this renders only its first PREVIEW_S
 # (soundfx.preview_part): a 2-hour song's pitch shift took minutes to start playing
 PREVIEW_WHOLE_S = 5 * 60
 PREVIEW_S = 30
-UNDO_KEY = "undo-sounds"   # its card (toast key)
 TOAST_EXPAND = QSize(900, 640)   # a shrunk card clicked: the window grows to this
 # shown when instant replay goes on: it records whoever is talking in a call
 REPLAY_NOTE = _("Instant replay is on: your key keeps the last seconds you heard. In some "
@@ -155,7 +158,6 @@ BODY_SIDE_TIGHT = 8    # ...and beside the rail in a narrow window
 SETTINGS_ROOM = QSize(480, 520)   # what Settings opened from the mini player grows it to
 BUN_TIP = _("Turn into Bun: a small Bun floating on top instead of this window. The "
             "button under him brings it back.")
-FULL_FROM_BUN = QSize(1180, 720)   # Bun grown past his biggest opens the board this big
 MINI_SIZE = QSize(440, 380)   # below this the window becomes the mini player...
 MINI_PAD_ROWS = 1             # ...which has the pads above it when this many rows fit
 QUEUE_CHIPS = 5          # queued sounds shown by name above the pads (then "+n more")
@@ -386,6 +388,11 @@ class MainWindow(QMainWindow):
 
     def __init__(self):
         super().__init__()
+        self.editctl = EditControl(self)
+        self.rmctl = RemoveControl(self)
+        self.padctl = PadControl(self)
+        self.remctl = RemoteAccess(self)
+        self.bunctl = BunControl(self)
         self.alertctl = AlertControl(self)
         self.catctl = CategoryControl(self)
         self.impctl = ImportControl(self)
@@ -457,16 +464,12 @@ class MainWindow(QMainWindow):
         self.ffctl = FfmpegControl(self)
         self.bridge.ffmpeg.connect(self.ffctl.on_answer)
         self.bridge.ffmpeg_progress.connect(self.ffctl.on_progress)
-        self._removed: list[tuple[SoundMeta, int, np.ndarray | None]] = []   # undo-able
         # windows beside the board, not over it: the one Settings, and an Edit
         # sound for each sound being edited
         self._settings_dlg: SettingsDialog | None = None
-        self._editors: dict[str, EditDialog] = {}
         self._spare_editor: EditDialog | None = None   # a closed one, reused (edit)
         self._settings_kept: SettingsDialog | None = None   # closed Settings, reused
         self._settings_kept_print = None
-        self._bin_thread: threading.Thread | None = None   # the newest _finish_removals work
-        self._render_gen: dict[str, int] = {}   # sid -> newest effects render (_rerender)
         self.shuffle = ShuffleBag()       # the random-sound hotkeys
         self._last_sid: str | None = None   # the last sound played (its replay hotkey)
         self._queue: list[str] = []       # sounds waiting for the ones playing to finish
@@ -479,7 +482,6 @@ class MainWindow(QMainWindow):
         self._quitting = False            # a real quit (not "close to the tray")
         self._tray_told = False           # the "still running in the tray" note was shown
         self.tray: QSystemTrayIcon | None = None
-        self.bun_mode = None   # Bun mode's floating Bun (ui/bunmode.py), once used
         self.watch_offer: watchaddon.Offer | None = None   # an urgent Onion Watch fix
         # set up for the app you're using (appsetup): the bar's app and what it shows.
         # Before the Discord check below: on a slow start its answer (_on_discord) comes
@@ -531,7 +533,7 @@ class MainWindow(QMainWindow):
         # written on a background thread: a slow disk froze the window for seconds
         self._saver = library.Saver(self.cfg, done=self.config_saved.emit)
         self.config_saved.connect(self._on_saved)
-        self.bin_filled.connect(self._label_bin)
+        self.bin_filled.connect(self.rmctl._label_bin)
 
         self.setup_state = ""
         self._pill_long = ""              # the setup pill's whole text (its tip, its name)
@@ -561,8 +563,8 @@ class MainWindow(QMainWindow):
         self.register_hotkeys()
         # Stream Deck / scripts (Settings → Remote), only if turned on
         self.remote = remote.RemoteControl(lambda a, p: remote.dispatch(self, a, p), self)
-        self.apply_remote()
-        self.remote_addons = self._load_remote_addons()
+        self.remctl.apply_remote()
+        self.remctl.remote_addons = self.remctl._load_remote_addons()
         a11y.label_tree(self, force=True)   # names for the icon-only buttons
 
         self.timer = QTimer(self)
@@ -1292,7 +1294,7 @@ class MainWindow(QMainWindow):
         self.mini_bun.setAccessibleName(_("Turn into Bun"))
         self.mini_bun.setIconSize(QSize(20, 20))
         self._paint_mini_bun()
-        self.mini_bun.clicked.connect(self.enter_bun_mode)
+        self.mini_bun.clicked.connect(self.bunctl.enter_bun_mode)
         connection.addWidget(self.mini_bun)
         cv.addLayout(connection)
         v.addWidget(card)
@@ -1576,7 +1578,7 @@ class MainWindow(QMainWindow):
                              "TikTok, Myinstants…). Or paste a link (YouTube, SoundCloud, "
                              "TikTok, most media sites) to see it, then play or add it")
         self.search.setToolTip(self._search_tip)
-        self.search.setClearButtonEnabled(True)
+        icons.clear_button(self.search)
         self.search.setMinimumWidth(SEARCH_MIN_W)   # until the window gets narrow (_init_fit)
         self.search.setMaximumWidth(SEARCH_MAX_W)
         # typing regrids only when the pads shown change (35 ms a key with 600 pads),
@@ -1625,7 +1627,7 @@ class MainWindow(QMainWindow):
         self._act_export_cat = mm.addAction(_("Export this category"), self.impctl.export_category)
         icons.set_icon(self._act_export_cat, "download")
         mm.addSeparator()
-        icons.set_icon(mm.addAction(_("Recently deleted sounds"), self.show_deleted), "trash")
+        icons.set_icon(mm.addAction(_("Recently deleted sounds"), self.rmctl.show_deleted), "trash")
         icons.set_icon(mm.addAction(_("Open the sounds folder"), self.impctl.open_sounds_folder),
                        "folder")   # here too, for when the window's too narrow for its button
         mm.aboutToShow.connect(lambda: (
@@ -1636,13 +1638,13 @@ class MainWindow(QMainWindow):
         self.btn_bin = QPushButton()
         self.btn_bin.setToolTip(_("Sounds you removed: bring them back, exactly as they were"))
         icons.set_icon(self.btn_bin, "trash")
-        self.btn_bin.clicked.connect(self.show_deleted)
+        self.btn_bin.clicked.connect(self.rmctl.show_deleted)
         self.btn_folder = QPushButton(_("Sounds folder"))
         self.btn_folder.setToolTip(_("Open the folder your sounds are kept in. Sound files you "
                                      "drag into it join the board by themselves."))
         icons.set_icon(self.btn_folder, "folder", size=18)
         self.btn_folder.clicked.connect(self.impctl.open_sounds_folder)
-        self._label_bin()
+        self.rmctl._label_bin()
         # the most-used app-wide hotkeys in one click; the full list is in Settings
         self.btn_keys = QPushButton()
         self.btn_keys.setToolTip(_("Quick hotkeys: set the ones people use most, or open every "
@@ -1672,10 +1674,10 @@ class MainWindow(QMainWindow):
         self.btn_view.setAccessibleName(_("Order and view"))
         vm = DropdownMenu(self.btn_view)
         vm.setToolTipsVisible(True)
-        vm.aboutToShow.connect(lambda: self._fill_view_menu(vm))
+        vm.aboutToShow.connect(lambda: self.padctl._fill_view_menu(vm))
         self.btn_view.setMenu(vm)
         self.btn_view.setProperty("toolbarMenu", True)
-        self._label_view()
+        self.padctl._label_view()
         tb.addWidget(self.btn_view)
         # Creation actions have their own surfaces; library tools stay quiet.
         for b in (self.btn_folder, more, self.btn_bin, self.btn_keys,
@@ -1705,7 +1707,7 @@ class MainWindow(QMainWindow):
         self.btn_rows.setAccessibleName(_("Row size"))
         self.btn_rows.setToolTip(_("How tall the rows in the list are"))
         rm = DropdownMenu(self.btn_rows)
-        rm.aboutToShow.connect(lambda: self._fill_rows_menu(rm))
+        rm.aboutToShow.connect(lambda: self.padctl._fill_rows_menu(rm))
         self.btn_rows.setMenu(rm)
         self.btn_rows.setProperty("toolbarMenu", True)
         self.btn_rows.setProperty("quiet", True)
@@ -1714,8 +1716,8 @@ class MainWindow(QMainWindow):
         tb.addWidget(self.btn_rows)
         self._row_size = (rows_lbl, self.btn_rows)
         self._size_tight = False   # the window too narrow for either (_init_fit)
-        self._label_rows()
-        self._show_size_picker()
+        self.padctl._label_rows()
+        self.padctl._show_size_picker()
         for b in (add, self.btn_yt, self.btn_folder, more, self.btn_keys,
                   self.btn_bin, self.btn_view, self.search):
             b.setFixedHeight(CONTROL_H)
@@ -1757,7 +1759,7 @@ class MainWindow(QMainWindow):
         # so Explorer isn't frozen until a dialog is answered
         self.grid.files_dropped.connect(self.impctl.import_files,
                                         Qt.ConnectionType.QueuedConnection)
-        self.grid.image_dropped.connect(self.set_picture, Qt.ConnectionType.QueuedConnection)
+        self.grid.image_dropped.connect(self.padctl.set_picture, Qt.ConnectionType.QueuedConnection)
         scroll = QScrollArea()
         scroll.setWidgetResizable(True)
         scroll.setWidget(self.grid)
@@ -1787,7 +1789,7 @@ class MainWindow(QMainWindow):
         page.setFocusPolicy(Qt.FocusPolicy.ClickFocus)
         paste = QShortcut(QKeySequence.StandardKey.Paste, page)
         paste.setContext(Qt.ShortcutContext.WidgetWithChildrenShortcut)
-        paste.activated.connect(self.paste_picture)
+        paste.activated.connect(self.padctl.paste_picture)
         # Ctrl+F anywhere on the page: into the search box
         find = QShortcut(QKeySequence.StandardKey.Find, page)
         find.setContext(Qt.ShortcutContext.WidgetWithChildrenShortcut)
@@ -4714,7 +4716,7 @@ class MainWindow(QMainWindow):
                        lambda: self.open_settings("tabs"))
         # Bun mode from the full window too (the mini player has its own Bun button)
         menu.addSeparator()
-        act = menu.addAction(self._bun_icon(), _("Turn into Bun"), self.enter_bun_mode)
+        act = menu.addAction(self._bun_icon(), _("Turn into Bun"), self.bunctl.enter_bun_mode)
         act.setToolTip(BUN_TIP)
         menu.setToolTipsVisible(True)
         return menu
@@ -5338,7 +5340,7 @@ class MainWindow(QMainWindow):
             self.tabs.setCurrentWidget(self.sounds_page)
             self.record_dialog()
         elif kind == "deleted":
-            self.show_deleted()
+            self.rmctl.show_deleted()
         else:
             self.tabs.setCurrentWidget(self.sounds_page)
 
@@ -5439,7 +5441,7 @@ class MainWindow(QMainWindow):
     def _settings_closed(self, dlg):
         if self._settings_dlg is dlg:
             self._settings_dlg = None
-        had_focus = _holds_focus(dlg)
+        had_focus = getattr(dlg, "had_focus", False) or _holds_focus(dlg)
         self._content.setCurrentWidget(self._tabs_area)
         self._content.removeWidget(dlg)
         self._fit_body_top()
@@ -5539,8 +5541,8 @@ class MainWindow(QMainWindow):
         self.mini_download_bar.retheme()
         self.ytresults.retheme()
         self._paint_mini_bun()
-        if self.bun_mode is not None:
-            self.bun_mode.retheme()
+        if self.bunctl.bun_mode is not None:
+            self.bunctl.bun_mode.retheme()
         pp, self._pp_icon = self._pp_icon, None
         self._set_pp_icon(pp or "play")
         self._pill_long = ""   # forces _update_flow to repaint its icon
@@ -5956,11 +5958,26 @@ class MainWindow(QMainWindow):
             self.select(LINK_ID)   # already in the player: Play / Space pause and resume it
             self.toggle_play_pause()
             return
+        pad = self._pad_for_link(r.url) if play else None
+        if pad is not None:   # it's on the board already: the pad plays, from the start
+            self.play(pad)
+            return
         kind = "play" if play else "add"
         self.linkbar.open(r.url, r.title, r.seconds)
         self.ytresults.mark(r.url, kind)   # its button greys out until the link bar's done
         if not (self.linkbar.play_once() if play else self.linkbar.add()):
             self.ytresults.mark(r.url, kind, False)
+
+    def _pad_for_link(self, url: str) -> str | None:
+        """The board's sound downloaded from this link (its audio loaded), or None."""
+        key = sourceinfo.link_key(url)
+        if not key:
+            return None
+        for m in self.cfg.sounds:
+            if (self.audio.get(m.id) is not None and isinstance(m.source, dict)
+                    and sourceinfo.link_key(m.source.get("link", "")) == key):
+                return m.id
+        return None
 
     def gain_for(self, m: SoundMeta, volume=None) -> float:
         v = m.volume if volume is None else volume
@@ -6004,6 +6021,11 @@ class MainWindow(QMainWindow):
             else:
                 self.toast(_("“{name}” is still loading…", name=html.escape(m.name)), "warn")
             return
+        if (sid != LINK_ID and LINK_ID in self.engine.playing()
+                and self._pad_for_link(self._link_url) == sid):
+            # the web song played from a search, now saved as this pad: one song, so
+            # it starts again from the top instead of a second copy playing over it
+            self._stop_sound(LINK_ID)
         self.select(sid)
         self._last_sid = sid
         if sid != LINK_ID:
@@ -6323,10 +6345,10 @@ class MainWindow(QMainWindow):
                 p.chosen.connect(self.select)
                 p.pick.connect(self.selection.on_pick)
                 p.step.connect(self.grid.focus_step)
-                p.menu.connect(self.pad_menu)
-                p.nudge.connect(self.nudge_volume)
+                p.menu.connect(self.padctl.pad_menu)
+                p.nudge.connect(self.padctl.nudge_volume)
                 p.rename.connect(self.rename_sound)
-                p.edit.connect(self.edit)
+                p.edit.connect(self.editctl.edit)
                 self.pads[m.id] = p
             p.state = "ready" if m.id in self.audio else p.state
             p.selected = m.id == self.current
@@ -6461,9 +6483,9 @@ class MainWindow(QMainWindow):
         # removed while it was loading (the index can lag behind cfg.sounds: check both)
         if (sid != LINK_ID and sid not in self._meta
                 and all(m.id != sid for m in self.cfg.sounds)):
-            for i, (m, index, _d) in enumerate(self._removed):
+            for i, (m, index, _d) in enumerate(self.rmctl._removed):
                 if m.id == sid:   # still undo-able: keep the audio with it
-                    self._removed[i] = (m, index, data)
+                    self.rmctl._removed[i] = (m, index, data)
                     return
             self.engine.forget(sid)   # gone for good: don't keep its audio around
             return
@@ -6485,7 +6507,7 @@ class MainWindow(QMainWindow):
     def _live_metas(self) -> list[SoundMeta]:
         """Every sound whose files must be kept: the library, and removed ones that
         can still be undone."""
-        return list(self.cfg.sounds) + [m for m, _i, _d in list(self._removed)]
+        return list(self.cfg.sounds) + [m for m, _i, _d in list(self.rmctl._removed)]
 
     def on_clip(self, data, name) -> SoundMeta | None:
         """A clip recorded in the Radio or Apps tab (or with the mic) becomes a normal
@@ -6611,7 +6633,7 @@ class MainWindow(QMainWindow):
         if self.cfg.pad_sort != "custom":   # the drop index is into the sorted pads
             self.toast(_("The pads are sorted {how}: pick “My order” (the ⇣ button by the "
                          "search box) to drag them into place.",
-                         how=self._sort_names()[self.cfg.pad_sort]))
+                         how=self.padctl._sort_names()[self.cfg.pad_sort]))
             return
         self.cfg.sounds.remove(m)
         self.cfg.sounds.insert(min(target, len(self.cfg.sounds)), m)
@@ -6619,267 +6641,6 @@ class MainWindow(QMainWindow):
         self._rebuild_pads()
 
     # ------------------------------------------------------------------ order and view
-    @staticmethod
-    def _sort_names() -> dict[str, str]:
-        return {"custom": _("My order"), "name": _("A–Z"), "newest": _("Newest"),
-                "plays": _("Most played")}
-
-    def _label_view(self):
-        """The order button by the search box: the order it shows, and the list icon in
-        the list view."""
-        b, c = self.btn_view, self.cfg
-        b.setText(self._sort_names().get(c.pad_sort, ""))
-        icons.set_icon(b, "list" if c.pad_view == "list" else "sort")
-        b.setToolTip(_("Sort the pads (my order, A–Z, newest, most played) and show them as "
-                       "cards or a list"))
-
-    def _fill_view_menu(self, menu: QMenu):
-        menu.clear()
-        tips = {"custom": _("As you dragged them"), "name": _("By name"),
-                "newest": _("The sounds added last first"),
-                "plays": _("The sounds you play most first (counted from now on)")}
-        group = QActionGroup(menu)
-        sort_icons = {"custom": "sort", "name": "rename", "newest": "history",
-                      "plays": "star"}
-        for key, name in self._sort_names().items():
-            a = menu.addAction(name, lambda k=key: self.set_pad_sort(k))
-            icons.set_icon(a, sort_icons[key], checked_color="accent")
-            a.setCheckable(True)
-            a.setChecked(self.cfg.pad_sort == key)
-            a.setToolTip(tips[key])
-            group.addAction(a)
-        menu.addSeparator()
-        views = QActionGroup(menu)
-        for key, name, icon, tip in (
-                ("grid", _("Cards"), "sounds", _("Cards, with pictures")),
-                ("list", _("List"), "list", _("One line each: many more sounds on the screen"))):
-            a = menu.addAction(name, lambda k=key: self.set_pad_view(k))
-            icons.set_icon(a, icon, checked_color="accent")
-            a.setCheckable(True)
-            a.setChecked(self.cfg.pad_view == key)
-            a.setToolTip(tip)
-            views.addAction(a)
-
-    def set_pad_sort(self, how: str):
-        if how not in library.PAD_SORTS or how == self.cfg.pad_sort:
-            return
-        self.cfg.pad_sort = how
-        self._label_view()
-        self._save_now()
-        self._rebuild_pads()
-
-    def set_pad_view(self, view: str):
-        if view not in library.PAD_VIEWS or view == self.cfg.pad_view:
-            return
-        self.cfg.pad_view = view
-        self._label_view()
-        self._show_size_picker()
-        self._save_now()
-        self.grid.set_listed(view == "list")
-
-    @staticmethod
-    def _row_names() -> dict[str, str]:
-        return {"small": _("Small"), "medium": _("Medium"), "large": _("Large")}
-
-    def _label_rows(self):
-        self.btn_rows.setText(self._row_names().get(self.cfg.list_rows, ""))
-
-    def _fill_rows_menu(self, menu: QMenu):
-        menu.clear()
-        group = QActionGroup(menu)
-        for key, name in self._row_names().items():
-            a = menu.addAction(name, lambda k=key: self.set_list_rows(k))
-            a.setCheckable(True)
-            a.setChecked(self.cfg.list_rows == key)
-            group.addAction(a)
-
-    def set_list_rows(self, size: str):
-        if size not in library.LIST_ROWS or size == self.cfg.list_rows:
-            return
-        self.cfg.list_rows = size
-        self._label_rows()
-        self._save_now()
-        self.grid.set_row_size(size)
-
-    def _show_size_picker(self):
-        """Card size for the cards, Row size for the list; neither in a narrow window."""
-        listed = self.cfg.pad_view == "list"
-        for w in self._pad_size:
-            w.setVisible(not listed and not self._size_tight)
-        for w in self._row_size:
-            w.setVisible(listed and not self._size_tight)
-        responsive.touch(*self._pad_size, *self._row_size)
-
-    def _fit_size_picker(self, tight: bool):
-        self._size_tight = tight
-        self._show_size_picker()
-        self.selection.sync()
-
-    def _volume_action(self, menu: QMenu, m: SoundMeta) -> QWidgetAction:
-        """A pad menu's volume slider: changes it as it's dragged (a playing sound too)."""
-        w = QWidget()
-        h = QHBoxLayout(w)
-        h.setContentsMargins(10, 4, 10, 4)
-        h.setSpacing(8)
-        h.addWidget(icon_label("volume", _("This sound's volume (Ctrl+wheel on the pad "
-                                            "changes it too)")))
-        sl = QSlider(Qt.Orientation.Horizontal)
-        sl.setRange(0, 200)
-        sl.setSingleStep(5)
-        sl.setPageStep(10)
-        sl.setValue(round(m.volume * 100))
-        sl.setFixedWidth(120)
-        sl.setAccessibleName(_("Volume"))
-        val = QLabel(f"{sl.value()}%")
-        val.setObjectName("muted")
-        steady_number(val, "200%")
-
-        def moved(v: int):
-            val.setText(f"{v}%")
-            m.volume = v / 100
-            self.engine.set_gain(m.id, self.gain_for(m))
-        sl.valueChanged.connect(moved)
-        h.addWidget(sl)
-        h.addWidget(val)
-        a = QWidgetAction(menu)
-        a.setText(_("Volume"))   # what a screen reader says for the row
-        a.setDefaultWidget(w)
-        return a
-
-    def nudge_volume(self, sid: str, steps: int):
-        """Ctrl+wheel on a pad: its volume in 5 % steps (0-200 %, as in Edit)."""
-        m = self.meta(sid)
-        if m is None:
-            return
-        m.volume = round(min(2.0, max(0.0, m.volume + 0.05 * steps)), 2)
-        self.engine.set_gain(sid, self.gain_for(m))
-        QToolTip.showText(QCursor.pos(), _("{name}: {pct}%", name=m.name,
-                                           pct=round(m.volume * 100)), self.pads.get(sid))
-        if not self._count_save.isActive():
-            self._count_save.start()
-
-    def pad_menu(self, sid, pos):
-        m = self.meta(sid)
-        if not m:
-            return
-        if sid in self.selection.picked and len(self.selection.picked) > 1:
-            self.selection.menu(pos)   # right-click on a picked pad: act on all of them
-            return
-        # short labels in three groups (play / change / share & remove); what each does
-        # in more words is its tooltip
-        menu = QMenu(self)
-        menu.setToolTipsVisible(True)
-
-        def add(icon, text, tip="", parent=menu):
-            a = parent.addAction(icons.icon(*icon) if icon else QIcon(), text)
-            a.setToolTip(tip or text)
-            return a
-        a_stop = add(("stop",), _("Stop")) if self.engine.state(sid) else None
-        a_next = add(("play",), _("Play next"), _("Plays it after the sounds playing now"))
-        vol_before = m.volume
-        menu.addAction(self._volume_action(menu, m))
-        menu.addSeparator()
-        a_edit = add(("edit",), _("Edit"), _("Name, colour, picture, volume, hotkey, "
-                                              "timing and effects"))
-        a_ren = add(("rename",), _("Rename"), _("Just the name (F2 on the pad does it too)"))
-        a_hk_clear = None
-        if m.hotkey:
-            hk = menu.addMenu(icons.icon("keyboard"), _("Hotkey: {hotkey}",
-                                                        hotkey=pretty_key(m.hotkey)))
-            hk.setToolTipsVisible(True)
-            a_hk = add(("keyboard",), _("Change"), _("Press a new key or combo for it"), hk)
-            a_hk_clear = add(("trash",), _("Remove hotkey"), "", hk)
-        else:
-            a_hk = add(("keyboard",), _("Set hotkey"), _("A key or combo that plays it, even "
-                                                          "in-game"))
-        cats = menu.addMenu(icons.icon("tag"), _("Categories"))
-        cat_acts = {}
-        for c in self.cfg.categories:
-            a = cats.addAction(icons.icon("tag", checked_color="accent"), c.replace("&", "&&"))
-            a.setCheckable(True)
-            a.setChecked(c in m.tags)
-            cat_acts[a] = c
-            for sub in self.cfg.subcategories.get(c, []):   # indented under it
-                tag = library.sub_tag(c, sub)
-                a = cats.addAction(icons.icon("tag", checked_color="accent"),
-                                   "      " + sub.replace("&", "&&"))
-                a.setCheckable(True)
-                a.setChecked(tag in m.tags)
-                cat_acts[a] = tag
-        if cat_acts:
-            cats.addSeparator()
-        a_newcat = cats.addAction(icons.icon("plus"), _("New category"))
-        cat_subs = {cats.addAction(icons.icon("plus"), _("New subcategory in {cat}", cat=c)): c
-                    for c in self.cfg.categories if c in m.tags}
-        menu.addSeparator()
-        a_dup = add(("copy",), _("Duplicate"), _("A second pad with the same sound, to give "
-                                                 "its own effects or hotkey"))
-        a_export = add(("download",), _("Export"), _("Save it as a file to share with friends"))
-        a_src_open = a_src_copy = a_src_info = None
-        if src := sourceinfo.shown(m):   # downloaded from YouTube, TikTok…
-            site = sourceinfo.site_name(src)
-            sm = menu.addMenu(icons.icon(sourceinfo.icon(src)), site)
-            sm.setToolTipsVisible(True)
-            a_src_open = add(("browser",), _("Open on {site}", site=site), src["link"], sm)
-            a_src_copy = add(("copy",), _("Copy link"), src["link"], sm)
-            a_src_info = add(("info",), _("Details"), _("Channel, upload date, length, views"),
-                             sm)
-        a_show = add(("folder",), _("Open file location"))
-        a_del = add(("trash", "danger_text"), _("Remove"), _("Goes to Recently deleted"))
-        act = menu.exec(pos)
-        menu.deleteLater()   # its actions stay valid until this returns
-        if m.volume != vol_before:
-            self._save_now()
-        if act is None:
-            return
-        if act in cat_acts:
-            self.catctl.toggle_tag(sid, cat_acts[act])
-        elif act in cat_subs:
-            self.catctl.new_subcategory(cat_subs[act], sid)
-        elif act == a_newcat:
-            self.catctl.new_category(sid)
-        elif act == a_export:
-            self.impctl.export_sounds([m], m.name)
-        elif act is not None and act == a_src_open:
-            sourcedialog.open_link(src, self)
-        elif act is not None and act == a_src_copy:
-            sourcedialog.copy_link(src, self)
-        elif act is not None and act == a_src_info:
-            d = sourcedialog.SourceDialog(m, self)
-            d.forgotten.connect(self._save_now)
-            d.show()
-        elif act == a_stop:
-            self._stop_sound(sid)
-        elif act == a_next:
-            self.queue_sound(sid)
-        elif act == a_edit:
-            self.edit(sid)
-        elif act == a_ren:
-            self.rename_sound(sid)
-        elif act == a_dup:
-            self.duplicate_sound(sid)
-        elif act == a_show:
-            self.show_sound_file(sid)
-        elif act == a_hk:
-            self.set_sound_hotkey(sid)
-        elif act is not None and act == a_hk_clear:
-            self.set_sound_hotkey(sid, "")
-        elif act == a_del:
-            self.ask_remove([sid])
-
-    def set_picture(self, sid: str, path: str):
-        """Put a picture on a pad (an image dropped on it)."""
-        m = self.meta(sid)
-        if not m:
-            return
-        if not thumbs.set_image(m, path):
-            self.tell(_("Couldn't use that picture"),
-                      _("{name} isn't a picture this app can read.", name=Path(path).name),
-                      "warn")
-            return
-        self._save_now()
-        self.pads[sid].update()
-
     def _focus_sounds_page(self, _i: int):
         """Switched to Sounds with the focus left behind on another tab (a hidden clip
         editor): the page takes it, so its Ctrl+V works straight away. Not from the tab
@@ -6891,138 +6652,6 @@ class MainWindow(QMainWindow):
         if self.tabs.currentWidget() is page and (fw is None or not page.isAncestorOf(fw)):
             page.setFocus(Qt.FocusReason.OtherFocusReason)
 
-    def paste_picture(self):
-        """Ctrl+V on the Sounds tab: a clip copied in the Apps tab's editor (or its
-        Saved clips) is added as a sound; a copied picture goes on the picked pads,
-        or else on the selected one."""
-        clip = clipeditor.pasted_clip()
-        if clip is not None:
-            self.on_clip(clip.copy(), _("Clip {time}", time=time.strftime('%H.%M.%S')))
-            return
-        sids = [m.id for m in self.selection.sounds()] or (
-            [self.current] if self.current in self.pads else [])
-        if not sids:
-            return
-        img = thumbs.from_clipboard(QApplication.clipboard().mimeData())
-        if img is None:
-            self.toast(_("Nothing to paste: copy a picture first (in a browser: "
-                         "right-click it → Copy image), then press Ctrl+V on a pad."), "warn")
-            return
-        done = [sid for sid in sids if (m := self.meta(sid)) and thumbs.set_image(m, img)]
-        if not done:
-            return
-        self._save_now()
-        for sid in done:
-            self.pads[sid].update()
-        m = self.meta(done[0])
-        assert m is not None   # done holds only sounds with a meta
-        self.toast(_("Picture pasted on “{name}”.",
-                     name=html.escape(m.name)) if len(done) == 1
-                   else ngettext("Picture pasted on {n} pad.",
-                                 "Picture pasted on {n} pads.", len(done)), "ok")
-
-    def ask_remove(self, sids: list[str]) -> bool:
-        """Remove from the menu / picked pads: ask first. They go to Recently deleted."""
-        gone = [m for m in (self.meta(s) for s in sids) if m]
-        if not gone:
-            return False
-        if len(gone) == 1:
-            ask = _("Remove “{name}”?\n\nRemoved sounds go to Recently deleted, where you "
-                    "can bring them back for {keep_days} days.",
-                    name=gone[0].name, keep_days=trash.KEEP_DAYS)
-        else:
-            ask = ngettext("Remove this {n} sound?\n\nRemoved sounds go to Recently deleted, "
-                           "where you can bring them back for {keep_days} days.",
-                           "Remove these {n} sounds?\n\nRemoved sounds go to Recently "
-                           "deleted, where you can bring them back for {keep_days} days.",
-                           len(gone), keep_days=trash.KEEP_DAYS)
-        box = QMessageBox(QMessageBox.Icon.Question, _("Remove sound") if len(gone) == 1
-                          else _("Remove sounds"), ask,
-                          QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.Cancel, self)
-        box.button(QMessageBox.StandardButton.Yes).setText(_("Remove"))
-        box.setDefaultButton(QMessageBox.StandardButton.Cancel)
-        answer = box.exec()
-        free_dialog(box)
-        if answer != QMessageBox.StandardButton.Yes:
-            return False
-        self.remove_sounds([m.id for m in gone])
-        return True
-
-    def remove_sound(self, sid: str):
-        """Take a sound off the board. Its files stay until the Undo bar goes away
-        (or the app closes); then the audio file goes to the Recycle Bin."""
-        self.remove_sounds([sid])
-
-    def remove_sounds(self, sids: list[str]):
-        """Take several sounds off the board at once; one Undo brings them all back."""
-        gone = [m for m in (self.meta(s) for s in sids) if m]
-        if not gone:
-            return
-        self._close_editors([m.id for m in gone])
-        self._finish_removals()   # only the latest removal can be undone
-        for m in gone:
-            self.engine.stop(m.id)
-            self.engine.stop(f"{m.id}:preview")
-            index = self.cfg.sounds.index(m)
-            self.cfg.sounds.remove(m)
-            self._removed.append((m, index, self.audio.pop(m.id, None)))
-            self.engine.forget(m.id)
-            if self.current == m.id:
-                self.current = None
-                self._set_np_name(_("Pick a sound"))
-                self.np_name.setToolTip(_("Select a sound pad to use these playback controls."))
-        # written down first: a crash before the Undo bar goes still bins them next start
-        trash.hold([(m, i) for m, i, _d in self._removed])
-        self._save_now()
-        self._rebuild_pads()
-        self.catctl._fill_categories()
-        self.register_hotkeys()
-        # "Removed X · Undo" for a while; after that they're in Recently deleted
-        if len(gone) == 1:
-            name = self.fontMetrics().elidedText(gone[0].name, Qt.TextElideMode.ElideRight, 260)
-            text = _("Removed “{name}”", name=name)
-        else:
-            text = _("Removed {n} sounds", n=len(gone))
-        t = self.toast(html.escape(text), "", UNDO_S * 1000, key=UNDO_KEY,
-                       action=(_("Undo"), self.undo_remove), on_close=self._finish_removals)
-        if t is not None:
-            t.card.action.setToolTip(_("Put the sound back, exactly as it was. Later: Backup "
-                                       "→ Recently deleted sounds"))
-
-    def undo_remove(self):
-        """Put the last removed sound(s) back where they were, with everything they had."""
-        if not self._removed:
-            return
-        done, self._removed = self._removed, []
-        self._put_back(done)
-        trash.release([m.id for m, *_rest in done])   # after the save: back on the board
-        # Ctrl+Z, not its button: its card goes too (after the sounds are back, so its
-        # on_close finds their pack still in use)
-        toastmod.close(self, UNDO_KEY)
-
-    def _put_back(self, entries: list[tuple[SoundMeta, int, np.ndarray | None]]):
-        """Put removed sounds back on the board: (meta, the index it had, its audio or
-        None to load it). The last one goes in first, so each lands where it was."""
-        entries = list(entries)
-        while entries:
-            m, index, data = entries.pop()
-            if any(o.id == m.id for o in self.cfg.sounds):
-                continue   # already back
-            if m.hotkey and self._hotkey_taken(m.hotkey):
-                m.hotkey = ""   # given to something else in the meantime
-            self.cfg.sounds.insert(min(index, len(self.cfg.sounds)), m)
-            m.tags = library.merge_tags(m.tags, self.cfg.categories, self.cfg.subcategories)
-            if data is not None:
-                self.audio[m.id] = data
-                worker.run(lambda m=m, data=data: self.engine.prepare(m.id, data),
-                           name="prepare")
-        self._save_now()
-        self._rebuild_pads()
-        self.catctl._fill_categories()
-        if any(m.id not in self.audio for m in self.cfg.sounds):
-            self._load_all()
-        self.register_hotkeys()
-
     def _hotkey_taken(self, combo: str) -> bool:
         """Does a sound, an app-wide action, the push-to-talk key or a category's
         random-sound key already have `combo`?"""
@@ -7030,65 +6659,6 @@ class MainWindow(QMainWindow):
                 or any(getattr(self.cfg, attr) == combo for attr, *__ in HOTKEY_ACTIONS)
                 or self.cfg.ptt_key == combo
                 or combo in self.cfg.category_hotkeys.values())
-
-    def _finish_removals(self):
-        """The undo window is over: the removed sounds go to Recently deleted
-        (soundboard.trash), where they can still be brought back for a while."""
-        # let go of their audio first: Windows won't delete a mapped cache file
-        # (soundboard.mapped) while an array still points into it
-        done, self._removed = [(m, i) for m, i, _d in self._removed], []
-        toastmod.close(self, UNDO_KEY)   # (its on_close comes back here: nothing left)
-        # not undone: the pack is no longer kept
-        packs = [p for p in self.impctl._packs_removed
-                 if not any(m.pack == p for m in self.cfg.sounds)]
-        self.impctl._packs_removed.clear()
-        if not done and not packs:
-            return
-        prev = self._bin_thread
-
-        def work():   # file moves, the bin's list (retried while locked): off the UI thread
-            if prev is not None:
-                prev.join()   # an earlier removal's sounds go in first
-            n = trash.put_sounds(done) if done else None
-            trash.release([m.id for m, _i in done])   # in the bin: crash-safe now
-            for pid in packs:
-                backup.forget_pack(pid)
-            return worker.SKIP if n is None else n
-        # (nothing waits on it: the bin's count shows next time)
-        self._bin_thread = worker.run(work, self.bin_filled, "to-bin", error=worker.SKIP,
-                                      owner=self)
-
-    def _wait_bin(self):
-        """Let removed sounds finish going into the bin (before the bin is listed,
-        and on quitting)."""
-        if self._bin_thread is not None:
-            self._bin_thread.join()
-            self._bin_thread = None
-
-    def _label_bin(self, n: int | None = None):
-        """Keep the compatibility button's count; Library holds the visible action.
-        `n`: the sounds in the bin, if known (None reads it)."""
-        if n is None:
-            n = len(trash.items(trash.SOUND))
-        self.btn_bin.setText(_("Recently deleted ({n})", n=n))
-        self.btn_bin.hide()   # Recently deleted is in the Library menu
-
-    def show_deleted(self):
-        """Library → Recently deleted sounds"""
-        from soundboard.ui.deleted import DeletedDialog
-        self._finish_removals()   # the ones on the Undo bar are listed too
-        self._wait_bin()
-        d = DeletedDialog(trash.SOUND, "sounds", self._restore_deleted, self)
-        d.exec()
-        free_dialog(d)
-        self._label_bin()
-
-    def _restore_deleted(self, item: trash.Item) -> bool:
-        m = trash.meta_of(item)
-        if m is None or not Path(m.file).exists():
-            return False
-        self._put_back([(m, item.index, None)])
-        return True
 
     def _shares_keys(self, a: SoundMeta, b: SoundMeta) -> bool:
         """Can a and b's hotkeys be live at the same time? With a set of hotkeys per
@@ -7201,64 +6771,6 @@ class MainWindow(QMainWindow):
         self.catctl._fill_categories()
         self.register_hotkeys()
 
-    def edit(self, sid, tab: str = "sound"):
-        """Edit sound beside the board, not over it: sounds, hotkeys and the other
-        pads keep working. It's still a draft: nothing changes until Save, and Cancel
-        (or Escape, or closing it) drops it. One window per sound: editing the same
-        sound again raises the open one."""
-        d = self._editors.get(sid)
-        if d is not None and qt_valid(d):
-            if tab == "effects":
-                d.tabs.setCurrentIndex(1)
-            d.showNormal() if d.isMinimized() else d.show()
-            d.raise_()
-            d.activateWindow()
-            return d
-        m = self.meta(sid)
-        if m is None:
-            return None
-        # a closed one shows this sound instead: building one took ~200 ms every time
-        d, self._spare_editor = self._spare_editor, None
-        if d is not None and qt_valid(d):
-            d.load(m, tab)
-        else:
-            d = self._new_editor(m, tab)
-        self._editors[sid] = d
-        d.show()
-        return d
-
-    def _edit_done(self, sid: str, d: EditDialog, ok: int):
-        """An Edit sound window closed: Save puts its draft on the sound (or a copy).
-        It's kept for the next sound edited (the first one closed; any more are freed)."""
-        if self._editors.get(sid) is d:
-            del self._editors[sid]
-        self.drop_preview()                        # a preview still rendering
-        self.engine.stop(f"{sid}:preview")         # and the one playing, either kind
-        self.engine.stop(f"{sid}~fx:preview")
-        # the sound as it is now: gone (removed while the window was open: nothing to
-        # save it onto), or the same sound in a new object (Undo put it back)
-        m = self.meta(sid)
-        try:
-            if ok and m is not None and d.as_copy:
-                self._save_copy(m, d)
-            elif ok and m is not None:
-                old_key = soundfx.key(m.fx)
-                d.apply(m)
-                self._clear_dupe_hotkey(m)
-                self.engine.set_gain(sid, self.gain_for(m))
-                if soundfx.key(m.fx) != old_key:
-                    self._rerender(m)
-                self._save_now()
-                self.pads[sid].update()
-                self.apply_filter(self.search.text())
-        finally:
-            if self._spare_editor is None and d not in self._editors.values():
-                rehome_crash_reports(d)
-                self._spare_editor = d
-            else:   # freed once its finished signal is over (deleting it inside crashed)
-                QTimer.singleShot(0, lambda: free_dialog(d))
-        self.register_hotkeys()
-
     def preload_dialogs(self):
         """Behind the loading screen: Settings (its first page) and an Edit sound are
         built now, so even the first click of the cog or Edit opens at once (each took
@@ -7273,7 +6785,7 @@ class MainWindow(QMainWindow):
                                    if i in dlg._unbuilt and k not in self.SETTINGS_LIVE_PAGES]
             QTimer.singleShot(1500, self._preload_next_page)
         if self._spare_editor is None and self.cfg.sounds:
-            d = self._new_editor(self.cfg.sounds[0], "sound")
+            d = self.editctl._new_editor(self.cfg.sounds[0], "sound")
             d.hide()
             _polish(d)
             self._spare_editor = d
@@ -7327,14 +6839,6 @@ class MainWindow(QMainWindow):
         _polish(dlg, self._content.size())
         QTimer.singleShot(60, self._preload_next_page)
 
-    def _new_editor(self, m: SoundMeta, tab: str) -> EditDialog:
-        d = EditDialog(m, self.hotkeys, self.preview, self, tab=tab,
-                       others=lambda: list(self._meta.values()))
-        d.hotkeys_changed.connect(self.register_hotkeys)
-        d.source_forgotten.connect(self._save_now)
-        d.finished.connect(lambda ok, d=d: self._edit_done(d.meta.id, d, ok))
-        return d
-
     def _drop_spare_dialogs(self):
         """The kept Edit sound and Settings go (a new theme: built again in it)."""
         for attr in ("_spare_editor", "_settings_kept"):
@@ -7342,104 +6846,6 @@ class MainWindow(QMainWindow):
             setattr(self, attr, None)
             if d is not None and qt_valid(d):
                 free_dialog(d)
-
-    def _close_editors(self, sids):
-        """The sounds are going: their open Edit sound windows close, unsaved (the
-        Undo bar brings the sound back as it was)."""
-        for sid in sids:
-            d = self._editors.get(sid)
-            if d is not None and qt_valid(d):
-                d.reject()
-
-    def duplicate_sound(self, sid: str) -> SoundMeta | None:
-        """The pad menu's Duplicate: a copy right after the original, with its own
-        file, so each can get its own effects, hotkey or category."""
-        m = self.meta(sid)
-        if m is None:
-            return None
-        try:
-            new = duplicate(m, _("{name} (copy)", name=m.name)[:40])
-        except OSError as e:
-            errors.warn(self, _("Couldn't copy the sound"), e)
-            return None
-        videos.copy_link(m.id, new.id)
-        self.catctl._tag_new(new)   # stays in sight in the category showing
-        self.cfg.sounds.insert(self.cfg.sounds.index(m) + 1, new)
-        self._index()
-        self._save_now()
-        self._rebuild_pads()
-        self._rerender(new)
-        self.toast(_("✓ Added “{name}”", name=html.escape(new.name)), "ok")
-        return new
-
-    def show_sound_file(self, sid: str):
-        """The pad menu's Open file location: Explorer with the file picked
-        (elsewhere, the folder it's in)."""
-        m = self.meta(sid)
-        if m is None:
-            return
-        path = Path(m.file)
-        if not path.is_file():
-            self.toast(_("The file for “{name}” isn't there any more", name=html.escape(m.name)),
-                       "warn")
-            return
-        if sys.platform == "win32":
-            subprocess.Popen(["explorer", "/select,", str(path)])
-        else:
-            QDesktopServices.openUrl(QUrl.fromLocalFile(str(path.parent)))
-
-    def _save_copy(self, m: SoundMeta, d: EditDialog):
-        """'Save a copy': the edits go onto a copy placed after the original."""
-        name = d.name.text().strip() or m.name
-        try:
-            new = duplicate(m, name if name != m.name else f"{name} (edit)")
-        except OSError as e:
-            errors.warn(self, _("Couldn't copy the sound"), e)
-            return
-        videos.copy_link(m.id, new.id)
-        d.apply(new)
-        if new.name == m.name:
-            new.name = f"{m.name} (edit)"[:40]
-        if new.hotkey == m.hotkey:
-            new.hotkey = ""   # the original keeps its hotkey
-        self._clear_dupe_hotkey(new)
-        self.catctl._tag_new(new)   # stays in sight in the category showing
-        self.cfg.sounds.insert(self.cfg.sounds.index(m) + 1, new)
-        self._index()
-        self._save_now()
-        self._rebuild_pads()
-        self._rerender(new)
-
-    def _rerender(self, m: SoundMeta):
-        """Load a sound again after its effects changed. They're rendered in the
-        background; the pad says 'applying effects…' until it's ready."""
-        self.engine.stop(m.id)
-        self.audio.pop(m.id, None)
-        self.engine.forget(m.id)
-        p = self.pads.get(m.id)
-        if p:
-            p.state = "rendering"
-            p.update()
-        gen = self._render_gen[m.id] = self._render_gen.get(m.id, 0) + 1
-
-        def run():
-            try:
-                data = load_sound(m, cancel=lambda: self._render_gen.get(m.id) != gen)
-            except library.Cancelled:
-                return worker.SKIP   # (it stopped partway for a newer one)
-            if self._render_gen.get(m.id) != gen:
-                return worker.SKIP   # edited again meanwhile: a newer render is on its way
-            self.engine.prepare(m.id, data)
-            prune()
-            return m.id, data, ""
-
-        def prune():
-            worker.run(lambda: prune_cache(cache_keep(self._live_metas())), name="prune")
-
-        def failed(e):
-            prune()
-            return m.id, None, errors.plain(e)
-        worker.run(run, self.bridge.loaded, "fx-render", error=failed, owner=self)
 
     # ------------------------------------------------------------------ backup
     # ------------------------------------------------------------------ tray
@@ -7454,7 +6860,7 @@ class MainWindow(QMainWindow):
         icons.set_icon(menu.addAction(_("Open Onion Board"), self.show_from_tray), "sounds")
         icons.set_icon(menu.addAction(_("Stop all sounds"), self.stop_all), "stop")
         self._tray_bun = menu.addAction(self._bun_icon(), _("Turn into Bun"),
-                                        self.enter_bun_mode)
+                                        self.bunctl.enter_bun_mode)
         menu.addSeparator()
         # the Discord opens in the browser (feedback.py); Send feedback asks first
         from soundboard import feedback
@@ -7484,99 +6890,8 @@ class MainWindow(QMainWindow):
             self.show_from_tray()
 
     # ------------------------------------------------------------------ Bun mode
-    def bun_up(self) -> bool:
-        return self.bun_mode is not None and self.bun_mode.isVisible()
-
-    def enter_bun_mode(self):
-        """The window goes and a floating Bun takes its place (ui/bunmode.py)."""
-        from soundboard.ui.bunmode import BunMode
-        if self.bun_mode is None:
-            self.bun_mode = BunMode(self)
-            self.bun_mode.back.connect(lambda: self.leave_bun_mode(False))
-            self.bun_mode.full.connect(lambda: self.leave_bun_mode(True))
-        self.bun_mode.present(self.frameGeometry() if self.isVisible() else None)
-        if self.isVisible() and not self.isMinimized():
-            # the window as it is (the mini player or the board, maximized or not),
-            # for Back: kept in the settings, so it's the same after a restart as Bun
-            g = self.normalGeometry() if self.isMaximized() else self.geometry()
-            self.cfg.bun["from"] = [g.x(), g.y(), g.width(), g.height(),
-                                    bool(self.isMaximized())]
-        self.cfg.bun["on"] = True
-        self._save_later()
-        usage.used("bun-mode")
-        self.hide()
-        self._wake()
-
-    def leave_bun_mode(self, full: bool = False):
-        """Bun's Back button: the window back as it was. Open the full board (`full`,
-        his right-click menu): the whole board, around where he stood."""
-        b = self.bun_mode
-        if b is None or not b.isVisible():
-            return
-        spot = b.geometry().center()
-        if full:
-            room = (QApplication.screenAt(spot) or self.screen()).availableGeometry()
-            want = QSize(min(FULL_FROM_BUN.width(), room.width() - 40),
-                         min(FULL_FROM_BUN.height(), room.height() - 40))
-            if self.isMaximized() or self.isFullScreen():
-                self.showNormal()
-            self.resize(want)
-            x = min(max(spot.x() - want.width() // 2, room.left()), room.right() - want.width())
-            y = min(max(spot.y() - want.height() // 2, room.top()), room.bottom() - want.height())
-            self.move(x, y)
-            # it was the mini player: shown at once, its first frames were a blank white
-            # window while it laid the board out again; it fades in once that's done
-            self.setWindowOpacity(0.0)
-            QTimer.singleShot(150, lambda: self.setWindowOpacity(1.0))
-        else:
-            self._back_as_it_was()
-        self.show_from_tray()
-        if full:
-            self._refit()   # out of the mini player now, not after the first paints
-        if sys.platform == "win32":   # raise_/activateWindow alone left it behind the
-            winkeys.to_front(int(self.winId()))   # app in front (Bun never has focus)
-
-    def _back_as_it_was(self):
-        """The window's size and place from before Bun mode (cfg.bun["from"]), when
-        it's on a screen still. Without it, the window started as Bun showed at its
-        default size: Back looked just like Open the full board."""
-        was = self.cfg.bun.get("from")
-        if not (isinstance(was, list) and len(was) == 5):
-            return
-        x, y, w, h, maxed = was
-        rect = QRect(int(x), int(y), int(w), int(h))
-        if QApplication.screenAt(rect.center()) is None:   # that monitor's gone
-            return
-        if self.isMaximized() or self.isFullScreen():
-            self.showNormal()
-        self.setGeometry(rect)
-        if maxed:
-            self.setWindowState(self.windowState() | Qt.WindowState.WindowMaximized)
-
-    def _bun_away(self):
-        """Bun goes (the window's coming back, or the app's quitting)."""
-        b = self.bun_mode
-        if b is not None and b.isVisible():
-            b.hide()
-            self.cfg.bun["on"] = False
-            self._save_later()
-
-    def start_as_bun(self) -> bool:
-        """At start-up: quit as Bun last time, so Bun again (instead of the window)."""
-        if not (isinstance(self.cfg.bun, dict) and self.cfg.bun.get("on")
-                and self.cfg.setup_done):
-            return False
-        self.enter_bun_mode()
-        return True
-
-    def toast_seen(self, text: str, kind: str):
-        """Every toast on the window (ui/toast.py): Bun says it while he's up."""
-        b = self.bun_mode
-        if b is not None and b.isVisible():
-            b.say(text, kind)
-
     def show_from_tray(self):
-        self._bun_away()
+        self.bunctl._bun_away()
         if self.isMinimized():
             self.showNormal()
         else:
@@ -7622,112 +6937,6 @@ class MainWindow(QMainWindow):
         open would fail with "Setup was unable to close all applications"."""
         self._quitting = True
         exitwatch.closed_by_windows()   # ended before the quit finishes: not a crash
-
-    def apply_remote(self) -> str:
-        """Start / stop the local control API to match the settings; "" or an error."""
-        err = remote.apply(self, self.remote)
-        if err:
-            self.say(_("<span style='color:{status}'>Remote control is off: "
-                       "{err}.</span>",
-                       status=theme.status('warn'), err=html.escape(err)), "warn")
-        return err
-
-    def _load_remote_addons(self) -> list:
-        """[(ModuleInfo, add-on or None)] for every "remote" add-on (soundboard.modules),
-        e.g. Onion Pocket. One that fails is noted on its info (and the log;
-        Settings → Remote leaves it out) and never stops the app."""
-        from soundboard import modules
-        return [(info, self._start_remote_addon(info))
-                for info in modules.discover() if info.kind == "remote"]
-
-    def _start_remote_addon(self, info):
-        """The add-on's object, or None (the reason noted on `info`)."""
-        from soundboard import modules
-        from soundboard.ui.remotehost import RemoteHost
-        if info.error:
-            return None
-        try:
-            return modules.load_package(info).create(RemoteHost(self, info.id))
-        except Exception as e:  # noqa: BLE001 - a bad add-on can't stop the app
-            log.exception("remote add-on %s didn't start", info.id)
-            info.error = str(e) if isinstance(e, modules.ModuleError) \
-                else _("failed to start: {error}", error=errors.plain(e))
-            return None
-
-    def load_remote_addon(self, info):
-        """Start a remote add-on installed while the app runs (Settings → Remote's
-        *Get Onion Pocket*, or its *Update* button), in place of any copy of it. A
-        running copy is stopped first (its server lets go of the port) and its package
-        forgotten, so the new version's code loads; its settings in
-        Config.remote_addons are the board's and stay as they are. If the new one
-        doesn't start, the old one is started again and stays. The add-on's object,
-        or None."""
-        from soundboard import modules
-        old = next(((i, a) for i, a in self.remote_addons if i.id == info.id), None)
-        saved = {}
-        if old is not None and old[1] is not None:
-            try:
-                old[1].stop()
-            except Exception:  # noqa: BLE001
-                log.exception("remote add-on %s didn't stop cleanly", info.id)
-            pkg = old[0].package
-            saved = {n: m for n, m in sys.modules.items()
-                     if pkg and (n == pkg or n.startswith(pkg + "."))}
-            modules._forget(pkg)
-        addon = self._start_remote_addon(info)
-        if addon is None and saved and old is not None:   # (saved: only with an old one)
-            log.warning("remote add-on %s %s didn't start (%s): keeping %s",
-                        info.id, info.version, info.error, old[0].version)
-            if info.package:
-                modules._forget(info.package)
-            sys.modules.update(saved)
-            try:
-                restart = getattr(old[1], "apply", None)
-                if callable(restart):
-                    restart()
-            except Exception:  # noqa: BLE001
-                log.exception("remote add-on %s didn't start again", info.id)
-            return None
-        self.remote_addons = [(i, a) for i, a in self.remote_addons if i.id != info.id]
-        self.remote_addons.append((info, addon))
-        return addon
-
-    def remove_remote_addon(self, info, base=None):
-        """Uninstall a remote add-on (Settings' *Remove Onion Pocket*): the running
-        copy is stopped (its server lets go of the port), its folder in `base` (the
-        modules folder in %APPDATA%) deleted and its package forgotten. Its settings
-        in Config.remote_addons stay, for when it's got again. If the folder can't be
-        deleted, it's started again. Raises modules.ModuleError."""
-        from soundboard import modules
-        cur = next(((i, a) for i, a in self.remote_addons if i.id == info.id), None)
-        if cur is not None and cur[1] is not None:
-            try:
-                cur[1].stop()
-            except Exception:  # noqa: BLE001 - it's being removed anyway
-                log.exception("remote add-on %s didn't stop cleanly", info.id)
-        try:
-            modules.uninstall(info.id, base)
-        except modules.ModuleError:
-            if cur is not None and cur[1] is not None:
-                restart = getattr(cur[1], "apply", None)
-                try:
-                    if callable(restart):
-                        restart()
-                except Exception:  # noqa: BLE001
-                    log.exception("remote add-on %s didn't start again", info.id)
-            raise
-        if info.package:
-            modules._forget(info.package)
-        self.remote_addons = [(i, a) for i, a in self.remote_addons if i.id != info.id]
-        log.info("remote add-on %s %s was removed", info.id, info.version)
-
-    def _stop_remote_addons(self):
-        for info, addon in self.remote_addons:
-            if addon is not None:
-                try:
-                    addon.stop()
-                except Exception:  # noqa: BLE001
-                    log.exception("remote add-on %s didn't stop cleanly", info.id)
 
     def set_autostart(self, on: bool) -> bool:
         return autostart.set_enabled(on, self.cfg.autostart_hidden)
@@ -7845,7 +7054,7 @@ class MainWindow(QMainWindow):
             self._set_tick_rate()
 
     def _tick_pace(self) -> int:
-        if not self._ui_live and not self.overlay.is_open and not self.bun_up():
+        if not self._ui_live and not self.overlay.is_open and not self.bunctl.bun_up():
             return TICK_IDLE_MS
         if not self._tick_busy:   # nothing moves: 10 ticks a second instead of 30
             return TICK_QUIET_MS
@@ -7928,9 +7137,9 @@ class MainWindow(QMainWindow):
         if self._ui_live:
             self._tick_visuals(playing, now)
         self.overlay.tick(playing)
-        if self.bun_mode is not None and self.bun_mode.isVisible():
+        if self.bunctl.bun_mode is not None and self.bunctl.bun_mode.isVisible():
             bar = self.download_bar
-            self.bun_mode.tick(
+            self.bunctl.bun_mode.tick(
                 live=live, level=e.level_play, sending=e.sending, mic=self.cfg.mic_enabled,
                 paused=any(paused for sid, (_p, paused) in playing.items()
                            if sid in self._meta or sid == LINK_ID),
@@ -8192,7 +7401,7 @@ class MainWindow(QMainWindow):
         # last: opened out, the rail stays open until nothing else can give (it shut
         # again at once when opened in a mid-sized window)
         f.add(90, "w", self._squeeze_rail)
-        f.add(10, "w", self._fit_size_picker)
+        f.add(10, "w", self.padctl._fit_size_picker)
         f.add(18, "w", r.icon_only(self.btn_view))   # its tooltip says what it is
         # the label and the dropdown go together: a lone "Clean" said nothing (the full
         # picker is on the Setup tab)
@@ -8426,14 +7635,14 @@ class MainWindow(QMainWindow):
             return
         self._shut_down = True
         exitwatch.quitting()   # a run that dies from here on died closing (exitwatch.py)
-        if self.bun_mode is not None:   # (cfg.bun["on"] stays: it starts as Bun next time)
-            self.bun_mode.close()
-        for step in (self._finish_removals, self._wait_bin, self.timer.stop, self._voice_timer.stop,
-                     self._default_poll.stop, self.alertctl._discord_poll.stop,
-                     self._release_ptt,
+        if self.bunctl.bun_mode is not None:   # (cfg.bun["on"] stays: it starts as Bun next time)
+            self.bunctl.bun_mode.close()
+        for step in (self.rmctl._finish_removals, self.rmctl._wait_bin, self.timer.stop,
+                     self._voice_timer.stop, self._default_poll.stop,
+                     self.alertctl._discord_poll.stop, self._release_ptt,
                      self._remember_usage, self.cfg.save, self.overlay.shutdown,
                      self.hotkeys.stop, self.replay.stop, self.remote.stop,
-                     self._stop_remote_addons,
+                     self.remctl._stop_remote_addons,
                      self.radio.shutdown, tor.shutdown, self.apps.shutdown,
                      self.triggers.shutdown,
                      self.linkbar.shutdown, ytworker.drop_all,

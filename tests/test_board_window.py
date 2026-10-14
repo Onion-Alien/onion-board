@@ -120,23 +120,23 @@ def test_remove_can_be_undone_then_goes_for_good(window, qapp):
     _loaded(window, qapp)
     m1 = window.meta("s1")
     data = window.audio["s1"]
-    window.remove_sound("s1")
+    window.rmctl.remove_sound("s1")
     assert window.meta("s1") is None and _undo_card(window)
     assert Path(m1.file).exists()                  # nothing deleted yet
-    window.undo_remove()
+    window.rmctl.undo_remove()
     assert [m.id for m in window.cfg.sounds] == ["s0", "s1"]
     assert window.audio["s1"] is data and not _undo_card(window)
-    window.remove_sound("s0")
-    window.remove_sound("s1")                      # the first removal is final now
-    assert len(window._removed) == 1 and window.cfg.sounds == []
-    window._finish_removals()
-    assert window._removed == [] and not _undo_card(window)
+    window.rmctl.remove_sound("s0")
+    window.rmctl.remove_sound("s1")                      # the first removal is final now
+    assert len(window.rmctl._removed) == 1 and window.cfg.sounds == []
+    window.rmctl._finish_removals()
+    assert window.rmctl._removed == [] and not _undo_card(window)
 
 
 def test_remove_is_finished_on_close(window):
-    window.remove_sound("s0")
+    window.rmctl.remove_sound("s0")
     window.close()
-    assert window._removed == []
+    assert window.rmctl._removed == []
 
 
 def test_export_then_import_through_the_window(window, qapp, tmp_path):
@@ -149,8 +149,8 @@ def test_export_then_import_through_the_window(window, qapp, tmp_path):
     assert process_events(qapp, lambda: "Imported" in said(window))
     assert "2 already" in said(window) and len(window.cfg.sounds) == 2
     for sid in ("s0", "s1"):
-        window.remove_sound(sid)
-    window._finish_removals()
+        window.rmctl.remove_sound(sid)
+    window.rmctl._finish_removals()
     unsay(window)
     window.impctl.import_package(str(out))
     assert process_events(qapp, lambda: "Imported" in said(window))
@@ -288,13 +288,13 @@ def test_a_sound_on_the_undo_bar_isnt_taken_back_in_as_a_loose_file(window, qapp
     t = np.arange(SR // 10) / SR   # its own sound: not a twin of Boom's
     sf.write(plain, np.stack([np.sin(2 * np.pi * 660 * t)] * 2, 1) * 0.3, SR)
     m.file, m.hotkey = str(plain), "ctrl+alt+2"
-    window.remove_sound("s1")
+    window.rmctl.remove_sound("s1")
     for _ in range(3):   # two looks at the same size = "done copying in"
         window.impctl._loose_timer.stop()
         window.impctl._take_loose()
     # an import runs on a thread: give one the time to land
     assert not process_events(qapp, lambda: len(window.cfg.sounds) > 1, timeout=3)
     assert [s.name for s in window.cfg.sounds] == ["Boom"]
-    window.undo_remove()
+    window.rmctl.undo_remove()
     assert [(s.name, s.hotkey) for s in window.cfg.sounds] == [("Boom", ""),
                                                                ("Airhorn", "ctrl+alt+2")]

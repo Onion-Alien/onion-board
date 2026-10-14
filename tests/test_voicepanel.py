@@ -1630,3 +1630,25 @@ def test_ai_voice_list_keeps_its_height_when_the_description_wraps(panel, qapp, 
     assert lines >= 2
     assert ai.lbl_about.height() >= ai.lbl_about.heightForWidth(ai.lbl_about.width())
     assert ai.cb_voice.height() >= ai.cb_voice.sizeHint().height()
+
+
+def test_stop_takes_the_picked_voice_bar_away_too(panel):
+    """Stop turns the voice changer off, and the bar under the voices that names
+    the voice goes with it: left up, it looked as if the voice were still on."""
+    p, _eng = panel
+    p.resize(1000, 900)
+    p.show()
+    p.show_tab("fx")
+    name = next(n for n in p.fx._tile if n != "Custom")
+    p.fx._tile[name].click()
+    assert p.fx.btn_power.isChecked() and p.fx.picked.isVisible()
+    p.bar.stop_button.click()
+    assert not p.fx.btn_power.isChecked()
+    assert not p.fx.picked.isVisible() and not p.fx._tile[name].isChecked()
+    p.show_tab("ai")
+    p.show_tab("fx")                    # coming back to the tab doesn't bring it back
+    assert not p.fx.picked.isVisible()
+    p.fx._tile[name].click()            # a voice picked again: it's back
+    assert p.fx.picked.isVisible()
+    p.show_tab("ai")
+    assert not p.fx.picked.isVisible()  # still only on the voice changer's tab

@@ -70,12 +70,12 @@ def test_ago():
 def test_a_removed_sound_is_in_recently_deleted_after_the_undo_bar(window, qapp):  # noqa: F811
     assert process_events(qapp, lambda: all(m.id in window.audio for m in window.cfg.sounds))
     m = window.meta("s1")
-    window.remove_sound("s1")
-    window._finish_removals()                   # the Undo bar went
-    window._wait_bin()
+    window.rmctl.remove_sound("s1")
+    window.rmctl._finish_removals()                   # the Undo bar went
+    window.rmctl._wait_bin()
     assert window.meta("s1") is None   # (a file outside the library stays put)
     [it] = trash.items(trash.SOUND)
-    dlg = DeletedDialog(trash.SOUND, "sounds", window._restore_deleted, window)
+    dlg = DeletedDialog(trash.SOUND, "sounds", window.rmctl._restore_deleted, window)
     assert dlg.list.count() == 1 and m.name in dlg.list.item(0).text()
     dlg.bring_back()
     assert [s.id for s in window.cfg.sounds] == ["s0", "s1"]    # back in its place
@@ -148,11 +148,11 @@ def test_removing_from_the_menu_asks_first_and_deleted_sounds_stay_in_library(wi
     from PySide6.QtWidgets import QMessageBox
     assert window.btn_bin.isHidden()
     monkeypatch.setattr(QMessageBox, "exec", lambda self: QMessageBox.Cancel)
-    assert not window.ask_remove(["s0"]) and window.meta("s0") is not None
+    assert not window.rmctl.ask_remove(["s0"]) and window.meta("s0") is not None
     monkeypatch.setattr(QMessageBox, "exec", lambda self: QMessageBox.Yes)
-    assert window.ask_remove(["s0"]) and window.meta("s0") is None
-    window._finish_removals()
-    window._wait_bin()
+    assert window.rmctl.ask_remove(["s0"]) and window.meta("s0") is None
+    window.rmctl._finish_removals()
+    window.rmctl._wait_bin()
     assert window.btn_bin.isHidden()
     assert len(trash.items()) == 1
     deleted = next(a for a in window.btn_more.menu().actions()
@@ -233,9 +233,9 @@ def _restart(qapp):
 def test_a_crash_while_the_undo_bar_is_up_still_bins_the_removed_sound(window, qapp):  # noqa: F811
     m = window.meta("s1")
     m.hotkey, m.volume, m.tags = "f7", 1.5, ["Memes"]
-    window.remove_sound("s1")
+    window.rmctl.remove_sound("s1")
     assert window._saver.flush()   # saved without it...
-    window._removed.clear()   # ...then the app dies before the Undo bar goes
+    window.rmctl._removed.clear()   # ...then the app dies before the Undo bar goes
     assert trash.items(trash.SOUND) == []
     assert _restart(qapp) == ["s0"]
     [it] = trash.items(trash.SOUND)   # in Recently deleted, with its pad
@@ -248,12 +248,12 @@ def test_a_crash_while_the_undo_bar_is_up_still_bins_the_removed_sound(window, q
 
 
 def test_undo_and_the_undo_bar_closing_leave_nothing_to_finish(window, qapp):  # noqa: F811
-    window.remove_sound("s1")
-    window.undo_remove()
+    window.rmctl.remove_sound("s1")
+    window.rmctl.undo_remove()
     assert not (trash.folder() / "removing.json").exists()
-    window.remove_sound("s0")
-    window._finish_removals()
-    window._wait_bin()
+    window.rmctl.remove_sound("s0")
+    window.rmctl._finish_removals()
+    window.rmctl._wait_bin()
     assert not (trash.folder() / "removing.json").exists() and window._saver.flush()
     assert _restart(qapp) == ["s1"] and len(trash.items(trash.SOUND)) == 1
 
@@ -307,8 +307,8 @@ def test_finishing_a_removal_leaves_the_disk_work_to_a_worker(window, qapp, monk
     monkeypatch.setattr(trash, "put_sounds", put_sounds)
     monkeypatch.setattr(trash, "put_sound", on_ui)
     monkeypatch.setattr(trash, "items", on_ui)   # the bin's count comes from the worker
-    window.remove_sounds(["s0", "s1"])
-    window._finish_removals()
-    window._wait_bin()
+    window.rmctl.remove_sounds(["s0", "s1"])
+    window.rmctl._finish_removals()
+    window.rmctl._wait_bin()
     assert seen and all(t is not ui for t in seen)
     assert process_events(qapp, lambda: window.btn_bin.text() == "Recently deleted (2)")

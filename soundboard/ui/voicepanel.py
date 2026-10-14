@@ -1475,8 +1475,18 @@ class VoiceFxPanel(QWidget):
                                         "(or right-click its button)"))
         self._show_delay()
 
+    def show_picked_row(self, room: bool | None = None):
+        """The bar under the cards shows only while the voice changer is on: after
+        Stop it went on naming the voice, as if it were still changing your mic.
+        `room`: whether the Voice tab has a place for it now (its own tab showing)."""
+        if room is not None:
+            self._picked_room = room
+        self.picked.setVisible(getattr(self, "_picked_room", True)
+                               and self.btn_power.isChecked())
+
     def _show_picked(self):
-        """The bar under the cards: the voice you picked (on or not), by name."""
+        """The bar under the cards: the voice that's on, by name."""
+        self.show_picked_row()
         name = self._preset
         shown = _("My own mix") if name == CUSTOM else voicefx.shown(name)
         pm = art.pixmap(art.voice_key(name), PICKED_ART) if name != CUSTOM else None
@@ -2958,7 +2968,7 @@ class VoicePanel(QWidget):
         fx_lay.removeWidget(self.fx.picked)
         outer.addWidget(self.fx.picked)
         self.fx.picked.setProperty("pinned", True)
-        self.fx.picked.setVisible(self._tab == "fx")
+        self.fx.show_picked_row(self._tab == "fx")
         outer.addWidget(self.bar)
         self.chain.configure(self.fx.spec())
         self._emit_active()
@@ -3011,7 +3021,7 @@ class VoicePanel(QWidget):
         picked.setProperty("pinned", not compact)
         picked.style().unpolish(picked)
         picked.style().polish(picked)
-        picked.setVisible(compact or self._tab == "fx")
+        self.fx.show_picked_row(compact or self._tab == "fx")
 
     def stack_steps(self):
         return []   # one card at a time: nothing to stack when narrow
@@ -3134,7 +3144,7 @@ class VoicePanel(QWidget):
         for k, f in self._cards.items():
             f.setVisible(k == key)
         if self.fx.picked.property("pinned"):   # (in its card when not: shown with it)
-            self.fx.picked.setVisible(key == "fx")
+            self.fx.show_picked_row(key == "fx")
         self._tabs[key].setChecked(True)
         self._update_heads()
         if asked and key in usage.VOICE_TABS:

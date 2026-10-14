@@ -5,7 +5,7 @@ The same path as Onion Watch (soundboard.watchaddon): nothing runs until the *Ge
 Onion Pocket* button on Settings → Remote is clicked; the zip comes only from the
 project's own github.com/…/releases/download/ link, over HTTPS, and is kept only if it
 matches the SHA-256 GitHub lists for it (updates.fetch); then it's checked and unpacked
-(modules.install_zip) and loaded (MainWindow.load_remote_addon).
+(modules.install_zip) and loaded (RemoteAccess.load_remote_addon).
 
 Once it's in, Settings → Remote asks GitHub (at most once an hour, see check_update)
 whether a newer one is out, and if so puts *Update Onion Pocket to X* on its card: the
@@ -77,7 +77,7 @@ def installed(dirs: list[Path] | None = None) -> ModuleInfo | None:
 
 def removable(info: ModuleInfo, base: Path | None = None) -> bool:
     """Whether this copy is the one installed into `base` (the modules folder in
-    %APPDATA%), which MainWindow.remove_remote_addon can take out, rather than one
+    %APPDATA%), which RemoteAccess.remove_remote_addon can take out, rather than one
     shipped with the app."""
     base = base if base is not None else modules.search_dirs()[0]
     try:

@@ -67,8 +67,8 @@ def addon_dir(tmp_path_factory):
 def loaded(window, addon_dir, monkeypatch):  # noqa: F811
     monkeypatch.setattr(modules, "discover",
                         lambda dirs=None: [modules._read(addon_dir / "test-remote")])
-    window.remote_addons = window._load_remote_addons()
-    (info, addon), = window.remote_addons
+    window.remctl.remote_addons = window.remctl._load_remote_addons()
+    (info, addon), = window.remctl.remote_addons
     assert info.id == "test-remote" and addon is not None, info.error
     yield addon
     addon.stop()
@@ -105,7 +105,7 @@ def test_it_loads_and_gets_its_card_on_settings(qapp, window, loaded):  # noqa: 
     texts = [lb.text() for lb in d.tabs.currentWidget().widget().findChildren(QLabel)]
     assert "Test add-on" in texts and "the test card" in texts
     d.close()
-    window._stop_remote_addons()
+    window.remctl._stop_remote_addons()
     assert loaded.stopped == 1
 
 
@@ -158,10 +158,10 @@ def test_a_broken_remote_add_on_never_stops_the_app(qapp, window, tmp_path,  # n
     info = _module(tmp_path, "broken", "broken_remote_addon",
                    "__version__ = '1'\ndef create(host):\n    raise RuntimeError('boom')\n")
     monkeypatch.setattr(modules, "discover", lambda dirs=None: [info])
-    loaded = window._load_remote_addons()
+    loaded = window.remctl._load_remote_addons()
     assert [(i.id, a) for i, a in loaded] == [("broken", None)]
     assert "boom" in info.error
-    window.remote_addons = loaded
+    window.remctl.remote_addons = loaded
     d = SettingsDialog(window, "remote")
     texts = " ".join(lb.text() for lb in d.tabs.currentWidget().widget().findChildren(QLabel))
     assert "Broken" not in texts and "boom" not in texts   # optional: just left out
@@ -334,17 +334,17 @@ def test_onion_pocket_can_be_removed_from_its_card_and_add_ons(qapp, window,  # 
     monkeypatch.setattr(modules, "discover", lambda dirs=None: [modules._read(info.path)])
     monkeypatch.setattr(pocketaddon, "offered", lambda: True)
     window.pocket_checked = 1e18          # no update check over the network
-    window.remote_addons = window._load_remote_addons()
-    (info, addon), = window.remote_addons
+    window.remctl.remote_addons = window.remctl._load_remote_addons()
+    (info, addon), = window.remctl.remote_addons
     window.cfg.remote_addons[info.id] = {"token": "kept"}
     d = SettingsDialog(window, "remote", lazy=False)
     assert not d.pocket_remove.isHidden() and not d.pocket_remove_addons.isHidden()
     monkeypatch.setattr(QMessageBox, "question", lambda *a, **k: QMessageBox.No)
     d.pocket_remove.click()
-    assert info.path.is_dir() and window.remote_addons    # said no: nothing happens
+    assert info.path.is_dir() and window.remctl.remote_addons    # said no: nothing happens
     monkeypatch.setattr(QMessageBox, "question", lambda *a, **k: QMessageBox.Yes)
     d.pocket_remove_addons.click()
-    assert not info.path.exists() and window.remote_addons == []
+    assert not info.path.exists() and window.remctl.remote_addons == []
     assert addon.stopped == 1 and window.cfg.remote_addons[info.id] == {"token": "kept"}
     assert d.pocket_remove_addons.isHidden()   # Add-ons: not installed
     assert d.get_pocket.isVisibleTo(d)                     # Remote offers it again
@@ -364,7 +364,7 @@ def test_add_ons_card_checks_reinstalls_and_reports(qapp, window,  # noqa: F811
     monkeypatch.setattr(modules, "discover", lambda dirs=None: [modules._read(info.path)])
     monkeypatch.setattr(net, "allowed", lambda feature: True)
     window.pocket_checked = 1e18
-    window.remote_addons = window._load_remote_addons()
+    window.remctl.remote_addons = window.remctl._load_remote_addons()
     d = SettingsDialog(window, "help")
     b = d.pocket_buttons
     assert b["get"].isHidden() and not b["check"].isHidden()
@@ -377,11 +377,11 @@ def test_add_ons_card_checks_reinstalls_and_reports(qapp, window,  # noqa: F811
                         or modules._read(info.path))
     b["reinstall"].click()
     assert process_events(qapp, lambda: got and not busy.is_busy(b["reinstall"]), timeout=3)
-    assert got == [None] and len(window.remote_addons) == 1
+    assert got == [None] and len(window.remctl.remote_addons) == 1
     opened = []
     monkeypatch.setattr(busy, "open_url", lambda url, *a, **k: opened.append(url))
     b["report"].click()
     assert "title=Onion%20Pocket%3A%20" in opened[0] and "Onion%20Pocket%201" in opened[0]
     assert "title" not in feedback.problem_url("1.0")
     d.close()
-    window._stop_remote_addons()
+    window.remctl._stop_remote_addons()

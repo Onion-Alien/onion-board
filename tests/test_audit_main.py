@@ -175,7 +175,7 @@ def test_a_newer_preview_stops_the_render_still_going(window, monkeypatch):
 
 
 def test_closing_the_edit_dialog_mid_render_clears_the_status(window, qapp):
-    d = window.edit("s0")
+    d = window.editctl.edit("s0")
     window._preview_done = lambda ok: None   # a render was going
     window.toast("Rendering the preview…", "busy", key="preview")
     d.done(0)
@@ -187,7 +187,7 @@ def test_closing_the_edit_dialog_mid_render_clears_the_status(window, qapp):
 @pytest.mark.parametrize("ok", [0, 1])
 def test_closing_the_edit_dialog_stops_the_preview(window, monkeypatch, qapp, ok):
     window.audio["s0"] = np.zeros((48000, 2), np.float32)
-    d = window.edit("s0")
+    d = window.editctl.edit("s0")
     assert window.preview("s0") == "playing"   # same effects: the plain preview
     stopped = []
     real = window.engine.stop
@@ -201,23 +201,23 @@ def test_edit_sound_sits_beside_the_board_one_per_sound(window, qapp):
     """Edit sound doesn't hold up the board any more, but it's still a draft:
     Save puts it on, Cancel drops it. Editing the same sound raises its window."""
     m = window.meta("s0")
-    d = window.edit("s0")
+    d = window.editctl.edit("s0")
     assert d.isVisible() and not d.isModal() and qapp.activeModalWidget() is None
-    assert window.edit("s0") is d                        # the same sound: the same window
-    other = window.edit("s1")
+    assert window.editctl.edit("s0") is d                        # the same sound: the same window
+    other = window.editctl.edit("s1")
     assert other is not d
     d.name.setText("Renamed")
     d.done(QDialog.Rejected)                              # Cancel: nothing changes
     qapp.processEvents()
-    assert m.name == "Boom" and "s0" not in window._editors
-    d = window.edit("s0")                                 # a new draft after closing
+    assert m.name == "Boom" and "s0" not in window.editctl._editors
+    d = window.editctl.edit("s0")                                 # a new draft after closing
     d.name.setText("Renamed")
     d.done(QDialog.Accepted)                              # Save
     qapp.processEvents()
     assert m.name == "Renamed"
     other.done(QDialog.Rejected)
     qapp.processEvents()
-    assert window._editors == {}
+    assert window.editctl._editors == {}
     # each one freed but one, kept for the next sound edited
     assert len(window.findChildren(main.EditDialog)) == 1
 
@@ -225,7 +225,7 @@ def test_edit_sound_sits_beside_the_board_one_per_sound(window, qapp):
 def test_a_kept_edit_window_shows_the_next_sound_as_a_new_one_would(window, qapp):
     """Edit sound is reused between sounds (building it took ~200 ms): nothing of the
     last sound or its unsaved draft is left in it."""
-    d = window.edit("s0")
+    d = window.editctl.edit("s0")
     d.name.setText("Draft")
     d.vol.setValue(5)
     d.loop.setChecked(True)
@@ -233,8 +233,8 @@ def test_a_kept_edit_window_shows_the_next_sound_as_a_new_one_would(window, qapp
     d.done(QDialog.Rejected)
     qapp.processEvents()
     m1 = window.meta("s1")
-    e = window.edit("s1")
-    assert e is d and e.isVisible() and window._editors == {"s1": e}
+    e = window.editctl.edit("s1")
+    assert e is d and e.isVisible() and window.editctl._editors == {"s1": e}
     assert e.meta is m1 and e.name.text() == m1.name and not e.as_copy
     assert e.vol.value() == round(m1.volume * 100) and e.loop.isChecked() == m1.loop
     assert e.tabs.currentIndex() == 0 and e.effects.fx() == (m1.fx or {})
@@ -245,19 +245,19 @@ def test_a_kept_edit_window_shows_the_next_sound_as_a_new_one_would(window, qapp
 
 
 def test_removing_a_sound_closes_its_edit_window_unsaved(window, qapp):
-    d = window.edit("s0")
+    d = window.editctl.edit("s0")
     d.name.setText("Never saved")
-    window.remove_sound("s0")
+    window.rmctl.remove_sound("s0")
     qapp.processEvents()
-    assert "s0" not in window._editors
-    window.undo_remove()                                  # back as it was
+    assert "s0" not in window.editctl._editors
+    window.rmctl.undo_remove()                                  # back as it was
     assert window.meta("s0").name == "Boom"
 
 
 def test_saving_after_undo_puts_the_draft_on_the_sound_now_there(window, qapp):
     """The sound's SoundMeta can be swapped for a new object while its window is open
     (a reload): Save goes on the one in the list now, not the stale one."""
-    d = window.edit("s0")
+    d = window.editctl.edit("s0")
     old = window.meta("s0")
     import copy
     fresh = copy.copy(old)
@@ -384,7 +384,7 @@ def test_settings_and_edit_built_behind_the_loading_screen(window, qapp):
     kept.accept()
     qapp.processEvents()
     sid = window.cfg.sounds[-1].id
-    d = window.edit(sid)
+    d = window.editctl.edit(sid)
     assert d is spare and d.meta is window.meta(sid) and d.name.text() == window.meta(sid).name
     d.reject()
     qapp.processEvents()
