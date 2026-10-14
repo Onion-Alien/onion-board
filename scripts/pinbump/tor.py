@@ -49,14 +49,13 @@ def verify(data: bytes, sig: bytes, fpr: str) -> None:
         paths = {n: Path(home, n) for n in ("key.asc", "file", "file.asc")}
         for p, b in zip(paths.values(), (key, data, sig)):
             p.write_bytes(b)
-        # forward slashes: Git for Windows' gpg takes C:\... for a relative path
-        gpg = ["gpg", "--batch", "--homedir", Path(home).as_posix()]
+        # relative paths from inside home: the gpg in Git for Windows (the Windows
+        # runner's) takes C:\... and C:/... for relative paths and looks in the wrong place
+        gpg = ["gpg", "--batch", "--homedir", "."]
         # its exit code is no use: a missing gpg-agent makes it 2 after a good import
-        subprocess.run([*gpg, "--import", paths["key.asc"].as_posix()])
-        status = subprocess.run(
-            [*gpg, "--status-fd", "1", "--verify", paths["file.asc"].as_posix(),
-             paths["file"].as_posix()],
-            text=True, stdout=subprocess.PIPE).stdout
+        subprocess.run([*gpg, "--import", "key.asc"], cwd=home)
+        status = subprocess.run([*gpg, "--status-fd", "1", "--verify", "file.asc", "file"],
+                                cwd=home, text=True, stdout=subprocess.PIPE).stdout
     # VALIDSIG <signing (sub)key> ... <primary key fingerprint>
     ok = any(line.split()[-1] == fpr for line in status.splitlines()
              if line.startswith("[GNUPG:] VALIDSIG "))
