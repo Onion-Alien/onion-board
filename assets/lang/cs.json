@@ -3430,5 +3430,10 @@
   "snappy": "ostře",
   "soft": "měkce",
   "warm": "teple",
-  "clean": "čistě"
+  "clean": "čistě",
+  "{n} sound couldn't be read and was left out.": [
+    "{n} zvuk nešel přečíst a byl vynechán.",
+    "{n} zvuky nešly přečíst a byly vynechány.",
+    "{n} zvuků nešlo přečíst a byly vynechány."
+  ]
 }

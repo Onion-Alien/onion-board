@@ -3355,5 +3355,9 @@
   "snappy": "kvikk",
   "soft": "myk",
   "warm": "varm",
-  "clean": "ren"
+  "clean": "ren",
+  "{n} sound couldn't be read and was left out.": [
+    "{n} lyd kunne ikke leses og ble utelatt.",
+    "{n} lyder kunne ikke leses og ble utelatt."
+  ]
 }

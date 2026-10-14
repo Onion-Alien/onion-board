@@ -3355,5 +3355,9 @@
   "snappy": "mabilis",
   "soft": "malambot",
   "warm": "mainit",
-  "clean": "malinis"
+  "clean": "malinis",
+  "{n} sound couldn't be read and was left out.": [
+    "Hindi nabasa ang {n} sound kaya hindi ito isinama.",
+    "Hindi nabasa ang {n} sound kaya hindi sila isinama."
+  ]
 }

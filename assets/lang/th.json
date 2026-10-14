@@ -3280,5 +3280,8 @@
   "snappy": "ฉับไว",
   "soft": "นุ่ม",
   "warm": "อบอุ่น",
-  "clean": "สะอาด"
+  "clean": "สะอาด",
+  "{n} sound couldn't be read and was left out.": [
+    "อ่าน {n} เสียงไม่ได้ จึงข้ามไป"
+  ]
 }

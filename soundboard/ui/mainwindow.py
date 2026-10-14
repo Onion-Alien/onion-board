@@ -316,7 +316,7 @@ _TONE_SPAN = re.compile(r"<span style='color:[^']*'>(.*)</span>", re.S)
 
 class Bridge(QObject):
     loaded = Signal(str, object, str)          # id, data|None, error
-    exported = Signal(str, int, str)           # file, sounds written, error
+    exported = Signal(str, int, str, int)      # file, sounds written, error, left out
     unpacked = Signal(object, object, str)     # backup.Imported|None, backup.Package, error
     update = Signal(object, str, bool)         # updates.Release|None, error, asked by the user
     update_progress = Signal(object, object)   # bytes of the new version downloaded, of
@@ -8472,15 +8472,16 @@ class MainWindow(QMainWindow):
         self.toast(ngettext("Exporting {n} sound…", "Exporting {n} sounds…", len(sounds)))
 
         def run():
+            skipped = []   # locked or vanished files: left out, the rest still go
             try:
-                n = backup.export(path, sounds, cfg, cats)
-                self.bridge.exported.emit(path, n, "")
+                n = backup.export(path, sounds, cfg, cats, skipped)
+                self.bridge.exported.emit(path, n, "", len(skipped))
             except Exception as e:  # noqa: BLE001 - disk full, no permission…
                 log.exception("export to %s failed", path)
-                self.bridge.exported.emit(path, 0, errors.plain(e))
+                self.bridge.exported.emit(path, 0, errors.plain(e), 0)
         threading.Thread(target=run, daemon=True, name="export").start()
 
-    def _on_exported(self, path: str, n: int, err: str):
+    def _on_exported(self, path: str, n: int, err: str, skipped: int = 0):
         self._exporting = False
         if err:
             self.tell(_("Export failed"),   # in place of the "Exporting…" card
@@ -8490,7 +8491,10 @@ class MainWindow(QMainWindow):
         msg = (ngettext("Exported {n} sound to {name}.",
                         "Exported {n} sounds to {name}.",
                         n, name=html.escape(Path(path).name)))
-        self.toast(msg, "ok")
+        if skipped:
+            msg += " " + ngettext("{n} sound couldn't be read and was left out.",
+                                  "{n} sounds couldn't be read and were left out.", skipped)
+        self.toast(msg, "warn" if skipped else "ok")
 
     def show_packs(self):
         """The Free packs window (soundboard.packs): a pack it downloads is imported the

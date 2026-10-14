@@ -3430,5 +3430,10 @@
   "snappy": "sec",
   "soft": "moale",
   "warm": "cald",
-  "clean": "curat"
+  "clean": "curat",
+  "{n} sound couldn't be read and was left out.": [
+    "{n} sunet nu a putut fi citit și a fost lăsat deoparte.",
+    "{n} sunete nu au putut fi citite și au fost lăsate deoparte.",
+    "{n} de sunete nu au putut fi citite și au fost lăsate deoparte."
+  ]
 }

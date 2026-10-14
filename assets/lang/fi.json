@@ -3355,5 +3355,9 @@
   "snappy": "napakka",
   "soft": "pehmeä",
   "warm": "lämmin",
-  "clean": "puhdas"
+  "clean": "puhdas",
+  "{n} sound couldn't be read and was left out.": [
+    "{n} ääni jäi pois, koska sitä ei voitu lukea.",
+    "{n} ääntä jäi pois, koska niitä ei voitu lukea."
+  ]
 }

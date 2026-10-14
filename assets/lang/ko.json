@@ -3280,5 +3280,8 @@
   "snappy": "날렵하게",
   "soft": "부드럽게",
   "warm": "따뜻하게",
-  "clean": "깨끗하게"
+  "clean": "깨끗하게",
+  "{n} sound couldn't be read and was left out.": [
+    "사운드 {n}개를 읽을 수 없어서 빼고 내보냈어요."
+  ]
 }

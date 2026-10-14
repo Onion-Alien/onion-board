@@ -3280,5 +3280,8 @@
   "snappy": "乾脆",
   "soft": "柔和",
   "warm": "溫暖",
-  "clean": "乾淨"
+  "clean": "乾淨",
+  "{n} sound couldn't be read and was left out.": [
+    "有 {n} 個音效無法讀取，已略過。"
+  ]
 }

@@ -3355,5 +3355,9 @@
   "snappy": "sert",
   "soft": "yumuşak",
   "warm": "sıcak",
-  "clean": "temiz"
+  "clean": "temiz",
+  "{n} sound couldn't be read and was left out.": [
+    "{n} ses okunamadı ve dışarıda bırakıldı.",
+    "{n} ses okunamadı ve dışarıda bırakıldı."
+  ]
 }

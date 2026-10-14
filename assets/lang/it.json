@@ -3355,5 +3355,9 @@
   "snappy": "secco",
   "soft": "morbido",
   "warm": "caldo",
-  "clean": "pulito"
+  "clean": "pulito",
+  "{n} sound couldn't be read and was left out.": [
+    "{n} suono non si è potuto leggere ed è stato escluso.",
+    "{n} suoni non si sono potuti leggere e sono stati esclusi."
+  ]
 }

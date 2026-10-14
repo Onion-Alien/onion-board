@@ -3280,5 +3280,8 @@
   "snappy": "キレよく",
   "soft": "やわらか",
   "warm": "温かい",
-  "clean": "クリーン"
+  "clean": "クリーン",
+  "{n} sound couldn't be read and was left out.": [
+    "{n} 個のサウンドを読み込めなかったため、含めませんでした。"
+  ]
 }

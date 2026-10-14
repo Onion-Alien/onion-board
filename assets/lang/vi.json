@@ -3280,5 +3280,8 @@
   "snappy": "gọn",
   "soft": "mềm",
   "warm": "ấm",
-  "clean": "sạch"
+  "clean": "sạch",
+  "{n} sound couldn't be read and was left out.": [
+    "Không đọc được {n} âm thanh nên đã bỏ qua."
+  ]
 }

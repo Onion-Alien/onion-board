@@ -3280,5 +3280,8 @@
   "snappy": "tangkas",
   "soft": "lembut",
   "warm": "hangat",
-  "clean": "bersih"
+  "clean": "bersih",
+  "{n} sound couldn't be read and was left out.": [
+    "{n} suara tidak bisa dibaca dan dilewati."
+  ]
 }

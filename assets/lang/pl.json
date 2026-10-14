@@ -3430,5 +3430,10 @@
   "snappy": "ostro",
   "soft": "miękko",
   "warm": "ciepło",
-  "clean": "czysto"
+  "clean": "czysto",
+  "{n} sound couldn't be read and was left out.": [
+    "Nie udało się odczytać {n} dźwięku, więc go pominięto.",
+    "Nie udało się odczytać {n} dźwięków, więc je pominięto.",
+    "Nie udało się odczytać {n} dźwięków, więc je pominięto."
+  ]
 }

@@ -3355,5 +3355,9 @@
   "snappy": "sec",
   "soft": "doux",
   "warm": "chaud",
-  "clean": "propre"
+  "clean": "propre",
+  "{n} sound couldn't be read and was left out.": [
+    "{n} son n'a pas pu être lu et a été laissé de côté.",
+    "{n} sons n'ont pas pu être lus et ont été laissés de côté."
+  ]
 }

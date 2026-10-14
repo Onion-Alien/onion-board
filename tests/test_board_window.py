@@ -157,6 +157,24 @@ def test_export_then_import_through_the_window(window, qapp, tmp_path):
     _loaded(window, qapp)
 
 
+
+def test_export_leaves_out_an_unreadable_sound_and_says_so(window, qapp, tmp_path,
+                                                          monkeypatch):
+    import builtins
+    real_open, locked = builtins.open, window.cfg.sounds[0].file
+
+    def fake_open(file, *a, **kw):   # held open by another program
+        if str(file) == locked:
+            raise PermissionError(13, "The process cannot access the file", locked)
+        return real_open(file, *a, **kw)
+    monkeypatch.setattr(builtins, "open", fake_open)
+    out = tmp_path / "pack.zip"
+    window._export(str(out), list(window.cfg.sounds), with_settings=False)
+    assert process_events(qapp, lambda: "Exported" in said(window))
+    assert "Exported 1 sound" in said(window)
+    assert "1 sound couldn't be read and was left out" in said(window)
+    assert len(backup.read(out).sounds) == 1
+
 def test_zip_files_go_to_the_importer(window, monkeypatch, tmp_path):
     got = []
     monkeypatch.setattr(window, "import_package", got.append)
