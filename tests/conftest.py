@@ -258,7 +258,7 @@ def devices_done(win, timeout=8.0):
     """Until the window's device changes (picks, Re-scan) ran on the device thread
     and came back to the UI thread."""
     from PySide6.QtWidgets import QApplication
-    assert process_events(QApplication.instance(), lambda: not win._dev_waiting
+    assert process_events(QApplication.instance(), lambda: not win.devctl._dev_waiting
                           and not win.engine.devices.busy, timeout)
 
 

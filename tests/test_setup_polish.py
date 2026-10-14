@@ -37,9 +37,9 @@ def test_cable_not_installed_says_it_once(window, monkeypatch):  # noqa: F811
     monkeypatch.setattr(eng, "virtual_outputs", lambda: [])
     w.cfg.route = "cable"
     w.cfg.main_device = None
-    w._show_route()
+    w.routectl._show_route()
     w._update_status()
-    assert w._main_name() is None
+    assert w.routectl._main_name() is None
     assert "Nothing picked" not in w.setup_hint.text()
     assert w.setup_hint.isHidden()   # no empty line's gap either
     assert w.setup_state == "missing"
@@ -54,7 +54,7 @@ def test_working_mic_card_is_one_line_with_tips_behind_info(window, monkeypatch)
     noise-suppression how-to is behind the card's ⓘ, not a paragraph."""
     w = window
     _mic_works(w, monkeypatch)
-    w._show_route()
+    w.routectl._show_route()
     w._update_status()
     assert w.mic_line.text() == "Your sounds go into your mic"
     assert w.step_lbl.isHidden() and w.mic_reason.isHidden()
@@ -105,7 +105,7 @@ def test_working_mic_card_offers_reinstall_and_remove(window, monkeypatch):  # n
     from soundboard.ui import audiorecovery
     w = window
     _mic_works(w, monkeypatch)
-    w._show_route()
+    w.routectl._show_route()
     w._update_status()
     assert not w.btn_micredo.isHidden() and not w.btn_micoff.isHidden()
     assert not w.btn_michange.isHidden()
@@ -139,7 +139,7 @@ def test_mic_alt_tiles_never_clip(window, monkeypatch):  # noqa: F811
     _mic_works(w, monkeypatch)
     w.show()
     w.tabs.setCurrentWidget(w.setup_page)
-    w._show_route()
+    w.routectl._show_route()
     w._update_status()
     row = w.mic_alt_tiles
     tiles = (w.alt_cable, w.alt_device)

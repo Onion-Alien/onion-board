@@ -33,10 +33,10 @@ def windows_default(monkeypatch, name):
 
 def test_the_headphones_follow_windows_default_output(window, monkeypatch):
     windows_default(monkeypatch, "Headphones (Gaming Headset)")   # spaced its own way
-    window._follow_default_output()
+    window.devctl._follow_default_output()
     assert window.cfg.mon_device == OUTS[0]
     windows_default(monkeypatch, "Speakers (Realtek Audio)")
-    window._follow_default_output()
+    window.devctl._follow_default_output()
     devices_done(window)   # opened on the device thread
     assert window.cfg.mon_device == OUTS[1] and window.opened[-1] == OUTS[1]
     assert window.cb_mon.currentData() == OUTS[1]
@@ -45,42 +45,42 @@ def test_the_headphones_follow_windows_default_output(window, monkeypatch):
 
 def test_a_device_picked_by_hand_stays(window, monkeypatch):
     windows_default(monkeypatch, "Speakers (Realtek Audio)")
-    window._follow_default_output()
+    window.devctl._follow_default_output()
     window.cb_mon.setCurrentIndex(window.cb_mon.findData(OUTS[0]))
-    window.on_device(window.cb_mon, "mon_device")      # the headset, by hand
+    window.routectl.on_device(window.cb_mon, "mon_device")      # the headset, by hand
     assert not window.cfg.mon_follows_default
     windows_default(monkeypatch, "Headphones (Gaming Headset)")
-    window._follow_default_output()
+    window.devctl._follow_default_output()
     windows_default(monkeypatch, "Speakers (Realtek Audio)")
-    window._follow_default_output()
+    window.devctl._follow_default_output()
     assert window.cfg.mon_device == OUTS[0]
     window.cb_mon.setCurrentIndex(window.cb_mon.findData(OUTS[1]))
-    window.on_device(window.cb_mon, "mon_device")      # Windows' default: follows again
+    window.routectl.on_device(window.cb_mon, "mon_device")      # Windows' default: follows again
     assert window.cfg.mon_follows_default
 
 
 def test_the_cable_as_windows_default_isnt_followed(window, monkeypatch):
     windows_default(monkeypatch, "Speakers (Realtek Audio)")
-    window._follow_default_output()
+    window.devctl._follow_default_output()
     windows_default(monkeypatch, "CABLE Input (VB-Audio Virtual Cable)")
-    window._follow_default_output()
+    window.devctl._follow_default_output()
     assert window.cfg.mon_device == OUTS[1]
 
 
 def test_the_default_when_the_app_starts(window, monkeypatch):
     window.cfg.mon_device = OUTS[0]
     window._default_out = "Speakers (Realtek Audio)"   # changed while the app was closed
-    window._init_devices()
+    window.devctl._init_devices()
     assert window.cfg.mon_device == OUTS[1]
 
 
 def test_a_listed_device_that_wont_open_gets_a_rescan_with_backoff(window, monkeypatch, qapp):
     """Plugged in after the app started, or its format changed in Windows: PortAudio's
     old list can't open it, however often the engine retries."""
-    from soundboard.ui import mainwindow
+    from soundboard.ui import devicecontrol
     from test_idle_cpu import recover
     scans = []
-    monkeypatch.setattr(window, "_refresh_off_ui",
+    monkeypatch.setattr(window.devctl, "_refresh_off_ui",
                         lambda: scans.append(1) or window.engine.devices.release())
     e = window.engine
     monkeypatch.setitem(e.names, "mic", "Microphone (USB Mic)")
@@ -95,26 +95,26 @@ def test_a_listed_device_that_wont_open_gets_a_rescan_with_backoff(window, monke
     assert len(scans) == 1
     recover(window, qapp)
     assert len(scans) == 1                             # waits before the next try
-    window._recover_at = 0.0                           # the wait is over
+    window.devctl._recover_at = 0.0                           # the wait is over
     recover(window, qapp)
     assert len(scans) == 2
-    assert window._recover_at - time.monotonic() == pytest.approx(
-        mainwindow.RECOVER_WAIT_S[1], abs=5)
+    assert window.devctl._recover_at - time.monotonic() == pytest.approx(
+        devicecontrol.RECOVER_WAIT_S[1], abs=5)
     e.errors.pop("mic")                                # it opened: the wait starts over
     recover(window, qapp)
-    assert window._recover_n == 0
+    assert window.devctl._recover_n == 0
 
 
 def test_picking_a_bluetooth_hands_free_mic_warns_about_call_quality(window, monkeypatch):
-    from soundboard.ui import mainwindow
+    from soundboard.ui import routecontrol
     monkeypatch.setattr(eng.Engine, "set_mic_device", lambda self, n: None)
-    assert mainwindow.is_hands_free("Headset (WH-1000XM4 Hands-Free AG Audio)")
-    assert not mainwindow.is_hands_free("Microphone (USB Mic)")
+    assert routecontrol.is_hands_free("Headset (WH-1000XM4 Hands-Free AG Audio)")
+    assert not routecontrol.is_hands_free("Microphone (USB Mic)")
     cb = window.cb_mic
     cb.addItem("Headset (WH-1000XM4 Hands-Free AG Audio)",
                "Headset (WH-1000XM4 Hands-Free AG Audio)")
     cb.setCurrentIndex(cb.count() - 1)
-    window.on_device(cb, "mic_device")
+    window.routectl.on_device(cb, "mic_device")
     devices_done(window)
     assert "phone-call mic" in said(window)
 
@@ -124,7 +124,7 @@ def test_a_pick_waits_its_turn_while_a_driver_is_stuck(window, monkeypatch, qapp
     doesn't freeze the window waiting for it. The picks run after it, in order."""
     from conftest import process_events
     windows_default(monkeypatch, "Speakers (Realtek Audio)")
-    window._fill_combo(window.cb_mon, OUTS, OUTS[2])
+    window.routectl._fill_combo(window.cb_mon, OUTS, OUTS[2])
     devices_done(window)
     e, stuck = window.engine, threading.Event()
     assert e.devices.claim()
@@ -132,7 +132,7 @@ def test_a_pick_waits_its_turn_while_a_driver_is_stuck(window, monkeypatch, qapp
     for name in (OUTS[1], OUTS[0]):
         window.cb_mon.setCurrentIndex(window.cb_mon.findData(name))
         t0 = time.monotonic()
-        window.on_device(window.cb_mon, "mon_device")
+        window.routectl.on_device(window.cb_mon, "mon_device")
         assert time.monotonic() - t0 < 0.5             # the window didn't wait
     process_events(qapp, lambda: False, timeout=0.3)
     assert window.opened[-2:] != [OUTS[1], OUTS[0]]    # still waiting their turn
@@ -156,21 +156,21 @@ def test_rescan_runs_on_the_device_thread(window, monkeypatch, qapp):
         return True
     monkeypatch.setattr(eng, "rescan", rescan)
     btn = QPushButton("Re-scan devices")
-    window.rescan_with_feedback(btn)
+    window.devctl.rescan_with_feedback(btn)
     assert process_events(qapp, lambda: threads, timeout=5)
     assert threads[0] is not threading.main_thread()
     assert btn.text() == "Scanning…" and busy.is_busy(btn)   # the window is free meanwhile
-    window.rescan_with_feedback(btn)                         # a double click: ignored
-    assert not window._dev_waiting
+    window.devctl.rescan_with_feedback(btn)                         # a double click: ignored
+    assert not window.devctl._dev_waiting
     stuck.set()
     devices_done(window)
     assert len(threads) == 1 and not busy.is_busy(btn)
     assert btn.text() == "✓ Found 3 devices"
     # spam clicks while it shows what it found: each re-scan reopened every device
-    window.rescan_with_feedback(btn)
-    assert not window._dev_waiting and len(threads) == 1
+    window.devctl.rescan_with_feedback(btn)
+    assert not window.devctl._dev_waiting and len(threads) == 1
     btn.setProperty("scanned_until", 0.0)   # (the result has been shown)
-    window.rescan_with_feedback(btn)
+    window.devctl.rescan_with_feedback(btn)
     assert process_events(qapp, lambda: len(threads) == 2, timeout=5)
     devices_done(window)
 
@@ -181,13 +181,13 @@ def test_a_rescan_finding_the_same_devices_keeps_the_rows(window):
     over the Devices card)."""
     devices_done(window)
     window.cfg.also_send = [OUTS[1]]
-    window._show_route()
+    window.routectl._show_route()
     rows = window.also_rows
     boxes = list(rows.boxes)
     assert boxes
     for _ in range(3):
-        window._show_route()
+        window.routectl._show_route()
     assert rows.boxes == boxes
     window.cfg.also_send = []   # a real change: made again
-    window._show_route()
+    window.routectl._show_route()
     assert rows.boxes == []

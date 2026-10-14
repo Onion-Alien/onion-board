@@ -835,7 +835,7 @@ def test_discord_tip_folds_away(mic_wizard, monkeypatch):
     wiz.discord_fold.click()
     assert wiz.discord_body.isHidden()
     assert wiz.discord_fold.toolTip()   # says Show / Hide
-    w.set_route("cable")
+    w.routectl.set_route("cable")
     wiz.go(wiz.base + 3)
     assert wiz.discord_fold.isHidden()
     assert wiz.btn_discord.isHidden() or not wiz.discord_body.isHidden()

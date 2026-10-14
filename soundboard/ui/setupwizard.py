@@ -968,12 +968,12 @@ class SetupWizard(QDialog):
             self.setup_show._stop()
         if choice == "cable":
             self._chose_cable = True   # picked here: recheck_cable leaves it on the cable
-            self.win.set_route("cable")
+            self.win.routectl.set_route("cable")
             self._show_other(False)
         elif choice == NOWHERE:
-            self.win.set_route("off")
+            self.win.routectl.set_route("off")
         else:
-            self.win.set_route("device", choice)
+            self.win.routectl.set_route("device", choice)
         self.recheck_cable(rescan=False)
 
     def _page_discord(self) -> QWidget:
@@ -1177,7 +1177,7 @@ class SetupWizard(QDialog):
         cfg.mic_enabled = self.chk_send.isChecked()
         self.win.chk_mic.setChecked(cfg.mic_enabled)
         cfg.save()
-        self.win._reopen_devices()   # refresh the window's device boxes from the choices
+        self.win.devctl._reopen_devices()   # refresh the window's device boxes from the choices
         self.accept()
 
     def reject(self):
@@ -1211,7 +1211,7 @@ class SetupWizard(QDialog):
             # Step-by-step guide still opens it)
             self.win.cfg.setup_done = True
             self.win.cfg.save()
-            self.win._reopen_devices()
+            self.win.devctl._reopen_devices()
         super().done(r)
 
     # ------------------------------------------------------------------ actions
@@ -1233,7 +1233,7 @@ class SetupWizard(QDialog):
         a slow driver), with the one in the config when its turn comes: quick clicks
         through the list open only where they ended up."""
         cfg = self.win.cfg
-        self.win._device_job(lambda: (lambda n=getattr(cfg, attr): open_it(n)))
+        self.win.devctl._device_job(lambda: (lambda n=getattr(cfg, attr): open_it(n)))
 
     def _flash_hint(self, text: str, ms: int):
         self.test_hint.setText(text)
@@ -1262,7 +1262,7 @@ class SetupWizard(QDialog):
         if route == "mic":
             return directmic.works(directmic.status(self.win.cfg.mic_device))
         if route == "device":   # picked, and it opened
-            return (self.win._main_name() is not None
+            return (self.win.routectl._main_name() is not None
                     and "main" not in self.win.engine.errors_snapshot())
         return self.cable_ok()
 
@@ -1279,19 +1279,19 @@ class SetupWizard(QDialog):
         win = self.win
 
         def plan():
-            send = win._send_plan(force_main=True)
-            return lambda: win._open_send(send)
+            send = win.routectl._send_plan(force_main=True)
+            return lambda: win.routectl._open_send(send)
 
         def opened(ends):
             if ends is not None:
                 win._set_cable_bad(ends)
             if win.cable_bad:
                 win.fix_cable_format(quiet=True)
-        win._device_job(plan, opened)
+        win.devctl._device_job(plan, opened)
 
     def recheck_cable(self, rescan: bool = True):
         if rescan:
-            self.win.refresh_devices()   # picks up a driver installed while we're open
+            self.win.devctl.refresh_devices()   # picks up a driver installed while we're open
         self.btn_restart.hide()
         busy = self._proc is not None
         self.cable_bar.setVisible(busy)
@@ -1304,7 +1304,7 @@ class SetupWizard(QDialog):
         if (route == "cable" and not busy and not self._chose_cable
                 and not self.win._attaching and not self.setup_show.on
                 and directmic.works(directmic.status(self.win.cfg.mic_device))):
-            self.win.set_route("mic")
+            self.win.routectl.set_route("mic")
             route = self.win.cfg.route
         # (straight into the mic has its own "...instead" button, below)
         self.btn_use_cable.setVisible(not busy and route not in ("cable", "mic"))
@@ -1379,7 +1379,7 @@ class SetupWizard(QDialog):
         elif route != "cable":
             if self.other_box.isHidden():
                 self._show_other(True)
-            dev = self.win._main_name()
+            dev = self.win.routectl._main_name()
             self.status_card.set_state(
                 "ok" if self.route_ok() else "warn" if dev else "",
                 _("Working") if self.route_ok() else _("Not working") if dev else "")
@@ -1503,7 +1503,7 @@ class SetupWizard(QDialog):
         self._chose_cable = False
         if self.win.cfg.route != "mic" and directmic.works(
                 directmic.status(self.win.cfg.mic_device)):
-            self.win.set_route("mic")   # already on the mic: no admin prompt, no reinstall
+            self.win.routectl.set_route("mic")   # already on the mic: no admin prompt, no reinstall
             self.recheck_cable(rescan=False)
             return
         self.setup_show.start()
@@ -1530,7 +1530,7 @@ class SetupWizard(QDialog):
         if self._proc is not None:
             return   # one install at a time
         if self.win.cfg.route == "mic":   # "Use the virtual cable instead"
-            self.win.set_route("cable")
+            self.win.routectl.set_route("cable")
         try:
             status = self._status_file()
             status.unlink(missing_ok=True)
@@ -1641,7 +1641,7 @@ class SetupWizard(QDialog):
 
     def _fill_discord_text(self):
         cfg = self.win.cfg
-        dev = self.win._main_name()
+        dev = self.win.routectl._main_name()
         name = eng.virtual_mic_for(dev)
         self._vm = name or dev or "CABLE Output"
         for b in (self.btn_steam, self.btn_game, self.btn_meeting,   # mic settings: not

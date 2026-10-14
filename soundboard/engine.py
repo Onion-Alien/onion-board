@@ -1000,7 +1000,7 @@ class Voice:
 def _holding_devices(fn):
     """Engine methods that open or close streams hold DEVICES, so two threads never
     do it at the same time. Call them on the device thread (DeviceWorker; a device
-    picked in the window goes through MainWindow._device_job), not the UI thread: a
+    picked in the window goes through DeviceControl._device_job), not the UI thread: a
     recovery stuck holding DEVICES there would freeze the window."""
     @functools.wraps(fn)
     def run(*a, **k):

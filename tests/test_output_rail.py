@@ -8,7 +8,7 @@ from test_mainwindow import window  # noqa: F401
 
 
 def test_collapsed_output_names_live_and_muted_without_hover(window, qapp, monkeypatch):  # noqa: F811
-    monkeypatch.setattr(window, "_main_name", lambda: "Selected output")
+    monkeypatch.setattr(window.routectl, "_main_name", lambda: "Selected output")
     window.resize(1180, 720)
     window.show()
     window.rail.set_open(False)
@@ -29,7 +29,7 @@ def test_collapsed_output_names_live_and_muted_without_hover(window, qapp, monke
 def test_labelled_output_switch_controls_engine_and_tracks_other_controls(window, qapp,  # noqa: F811
                                                                          monkeypatch):
     # a send device, so muting means something even on a PC (CI) with no cable
-    monkeypatch.setattr(window, "_main_name", lambda: "CABLE Input")
+    monkeypatch.setattr(window.routectl, "_main_name", lambda: "CABLE Input")
     window.resize(1180, 720)
     window.show()
     window.rail.set_open(True)
@@ -171,7 +171,7 @@ def test_output_card_icons_and_words_share_keylines(window, qapp, monkeypatch): 
     window.rail.set_open(True)
     window.cfg.route = "device"
     window.cfg.main_device = None   # nothing picked to send to
-    monkeypatch.setattr(window, "_main_name", lambda: None)
+    monkeypatch.setattr(window.routectl, "_main_name", lambda: None)
     window._update_flow()
     qapp.processEvents()
     rail, output = window.rail, window.rail.output
@@ -194,7 +194,7 @@ def test_connected_output_is_only_words_then_a_link_again(window, qapp, monkeypa
     window.rail.set_open(True)
     window.cfg.route = "device"
     window.cfg.main_device = None   # nothing picked to send to
-    monkeypatch.setattr(window, "_main_name", lambda: None)
+    monkeypatch.setattr(window.routectl, "_main_name", lambda: None)
     window._update_flow()
     qapp.processEvents()
     output = window.rail.output
@@ -202,7 +202,7 @@ def test_connected_output_is_only_words_then_a_link_again(window, qapp, monkeypa
     height = output.height()
     stream = window.engine.main_stream
     try:
-        monkeypatch.setattr(window, "_main_name", lambda: "Selected output")
+        monkeypatch.setattr(window.routectl, "_main_name", lambda: "Selected output")
         window.engine.main_stream = object()
         window._update_flow()
         qapp.processEvents()

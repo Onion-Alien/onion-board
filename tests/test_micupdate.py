@@ -133,7 +133,8 @@ def test_not_offered_when_not_needed(outdated):
 
 def test_cancel_and_failure_and_success_feedback(outdated, monkeypatch):
     w, state = outdated
-    monkeypatch.setattr(w, "set_route", lambda route, *a, **k: setattr(w.cfg, "route", route))
+    monkeypatch.setattr(w.routectl, "set_route",
+                        lambda route, *a, **k: setattr(w.cfg, "route", route))
     w._mic_updating = True
     w._mic_attached("My mic", dm.declined())   # No in Windows' prompt: a note, no error
     assert state["toasts"][-1][1] == "warn" and "cancelled" in state["toasts"][-1][0]

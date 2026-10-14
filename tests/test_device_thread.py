@@ -127,13 +127,13 @@ def test_a_listed_device_is_rescanned_off_the_ui_thread(default_window, monkeypa
     monkeypatch.setitem(e.names, "mic", "Microphone (USB Mic)")
     monkeypatch.setitem(e.errors, "mic", "device not found")
     e.mic_stream = None
-    quick(w._recover_devices)
-    quick(w._recover_devices)                       # the first is still asking Windows
+    quick(w.devctl._recover_devices)
+    quick(w.devctl._recover_devices)                       # the first is still asking Windows
     gate.set()
     process_events(qapp, lambda: scans and not e.devices.busy, timeout=5)
     assert asked == ["input"] and len(scans) == 1
     assert scans[0] is not threading.main_thread()
-    assert w._recover_n == 1
+    assert w.devctl._recover_n == 1
 
 
 def test_a_new_default_output_is_found_by_a_rescan_off_the_ui_thread(
@@ -150,7 +150,7 @@ def test_a_new_default_output_is_found_by_a_rescan_off_the_ui_thread(
 
     monkeypatch.setattr(eng, "rescan", rescan)
     w.cfg.mon_follows_default = True
-    quick(w._on_default_found, "Speakers (Realtek Audio)")
+    quick(w.devctl._on_default_found, "Speakers (Realtek Audio)")
     gate.set()
     process_events(qapp, lambda: w.cfg.mon_device == OUTS[1] and not w.engine.devices.busy,
                    timeout=5)
@@ -198,12 +198,12 @@ def test_latency_and_stream_output_changes_never_wait_on_the_ui_thread(
                  "set_obs_device", "set_copy_devices"):
         monkeypatch.setattr(eng.Engine, name, recording(calls, name))
     with held_elsewhere():
-        quick(w.set_latency, "high" if w.cfg.latency != "high" else "low")
-        quick(w.set_obs_device, "Speakers")
+        quick(w.devctl.set_latency, "high" if w.cfg.latency != "high" else "low")
+        quick(w.routectl.set_obs_device, "Speakers")
         assert calls == []                       # waiting their turn, off the UI thread
     devices_done(w)
     assert [c[0] for c in calls].count("set_obs_device") == 2   # reopened, then picked
-    assert ("set_obs_device", w._obs_name("Speakers")) in calls
+    assert ("set_obs_device", w.routectl._obs_name("Speakers")) in calls
 
 
 def test_default_output_switch_and_reopening_all_never_wait_on_the_ui_thread(
@@ -220,8 +220,8 @@ def test_default_output_switch_and_reopening_all_never_wait_on_the_ui_thread(
         monkeypatch.setattr(eng.Engine, name, recording(calls, name))
     w.cfg.mon_follows_default = True
     with held_elsewhere():
-        quick(w._use_default_output, "Speakers")
-        quick(w._reopen_devices)
+        quick(w.devctl._use_default_output, "Speakers")
+        quick(w.devctl._reopen_devices)
         assert calls == []                       # waiting their turn, off the UI thread
         assert w.cfg.mon_device == "Speakers"    # the window shows it straight away
     devices_done(w)
