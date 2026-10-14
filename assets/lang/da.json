@@ -3385,5 +3385,10 @@
   "resonant": "resonant",
   "rumble": "rumlen",
   "seasick": "søsyg",
-  "steady": "stabil"
+  "steady": "stabil",
+  "Back to the board": "Tilbage til boardet",
+  "Open the full board": "Åbn hele boardet",
+  "Turn into Bun": "Bliv til Bun",
+  "Turn into Bun: a small floating Bun instead of this window. Click him to come back.": "Bliv til Bun: en lille svævende Bun i stedet for dette vindue. Klik på ham for at komme tilbage.",
+  "Drag: move him. Scroll: bigger or smaller. Hover for the buttons.": "Træk: flyt ham. Scroll: større eller mindre. Hold musen over ham for knapperne."
 }

@@ -3385,5 +3385,10 @@
   "resonant": "umaalingawngaw",
   "rumble": "dagundong",
   "seasick": "nahihilo",
-  "steady": "matatag"
+  "steady": "matatag",
+  "Back to the board": "Bumalik sa board",
+  "Open the full board": "Buksan ang buong board",
+  "Turn into Bun": "Maging Bun",
+  "Turn into Bun: a small floating Bun instead of this window. Click him to come back.": "Maging Bun: isang maliit na lumulutang na Bun sa halip na window na ito. I-click siya para bumalik.",
+  "Drag: move him. Scroll: bigger or smaller. Hover for the buttons.": "I-drag: ilipat siya. Scroll: palakihin o paliitin. I-hover para sa mga button."
 }

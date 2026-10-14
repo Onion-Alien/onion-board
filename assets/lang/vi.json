@@ -3310,5 +3310,10 @@
   "resonant": "cộng hưởng",
   "rumble": "ầm ầm",
   "seasick": "say sóng",
-  "steady": "ổn định"
+  "steady": "ổn định",
+  "Back to the board": "Quay lại board",
+  "Open the full board": "Mở toàn bộ board",
+  "Turn into Bun": "Biến thành Bun",
+  "Turn into Bun: a small floating Bun instead of this window. Click him to come back.": "Biến thành Bun: một Bun nhỏ bay lơ lửng thay cho cửa sổ này. Nhấp vào cậu ấy để quay lại.",
+  "Drag: move him. Scroll: bigger or smaller. Hover for the buttons.": "Kéo: di chuyển cậu ấy. Cuộn: to hơn hoặc nhỏ hơn. Di chuột lên để thấy các nút."
 }

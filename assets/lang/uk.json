@@ -3460,5 +3460,10 @@
   "resonant": "резонує",
   "rumble": "гуркіт",
   "seasick": "морська хвороба",
-  "steady": "рівно"
+  "steady": "рівно",
+  "Back to the board": "Назад до борду",
+  "Open the full board": "Відкрити весь борд",
+  "Turn into Bun": "Перетворитися на Bun",
+  "Turn into Bun: a small floating Bun instead of this window. Click him to come back.": "Перетворитися на Bun: маленький Bun, що літає замість цього вікна. Натисни на нього, щоб повернутися.",
+  "Drag: move him. Scroll: bigger or smaller. Hover for the buttons.": "Перетягни: посунути. Коліщатко: більший чи менший. Наведи мишу, щоб побачити кнопки."
 }

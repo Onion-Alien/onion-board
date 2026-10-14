@@ -3460,5 +3460,10 @@
   "resonant": "rezonující",
   "rumble": "dunění",
   "seasick": "mořská nemoc",
-  "steady": "stálé"
+  "steady": "stálé",
+  "Back to the board": "Zpět na board",
+  "Open the full board": "Otevřít celý board",
+  "Turn into Bun": "Proměnit v Buna",
+  "Turn into Bun: a small floating Bun instead of this window. Click him to come back.": "Proměnit v Buna: malý plovoucí Bun místo tohohle okna. Klikni na něj a vrátíš se.",
+  "Drag: move him. Scroll: bigger or smaller. Hover for the buttons.": "Táhni: přesune ho. Kolečko: větší nebo menší. Najeď na něj pro tlačítka."
 }

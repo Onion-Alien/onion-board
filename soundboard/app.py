@@ -619,7 +619,7 @@ def main():
     if TRAY_ARG not in sys.argv:   # Bun is up: the sounds load behind it (settle)
         wait_for_sounds(app, w)
         w.preload_dialogs()   # Settings and Edit sound, built behind it too
-    if show:
+    if show and not w.start_as_bun():   # quit as Bun last time: Bun, not the window
         w.show()
         if TRAY_ARG not in sys.argv:
             first_paint(app, w)

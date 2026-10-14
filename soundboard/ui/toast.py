@@ -685,6 +685,9 @@ def show(window: QWidget | None, text: str, kind: str = "", ms: int = TOAST_MS, 
         kind = kind or "ok"
     if kind == "" and text.rstrip().endswith("…"):
         kind = "busy"
+    seen = getattr(host, "toast_seen", None)   # Bun mode says it too (MainWindow)
+    if callable(seen):
+        seen(text, kind)
     stack = _stack_for(host)
     t = stack.find(text, kind, key)
     if (t is not None and key is None and progress is None and not action and not on_close

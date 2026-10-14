@@ -3310,5 +3310,10 @@
   "resonant": "bergema",
   "rumble": "gemuruh",
   "seasick": "mabuk laut",
-  "steady": "stabil"
+  "steady": "stabil",
+  "Back to the board": "Kembali ke board",
+  "Open the full board": "Buka board penuh",
+  "Turn into Bun": "Jadi Bun",
+  "Turn into Bun: a small floating Bun instead of this window. Click him to come back.": "Jadi Bun: Bun kecil terapung menggantikan tetingkap ini. Klik dia untuk kembali.",
+  "Drag: move him. Scroll: bigger or smaller. Hover for the buttons.": "Seret: alihkan dia. Skrol: lebih besar atau lebih kecil. Halakan tetikus untuk butangnya."
 }

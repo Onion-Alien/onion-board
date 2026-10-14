@@ -3385,5 +3385,10 @@
   "resonant": "αντηχεί",
   "rumble": "βουητό",
   "seasick": "ναυτία",
-  "steady": "σταθερό"
+  "steady": "σταθερό",
+  "Back to the board": "Πίσω στο board",
+  "Open the full board": "Άνοιγμα ολόκληρου του board",
+  "Turn into Bun": "Γίνε Bun",
+  "Turn into Bun: a small floating Bun instead of this window. Click him to come back.": "Γίνε Bun: ένας μικρός Bun που αιωρείται αντί γι' αυτό το παράθυρο. Κάνε κλικ πάνω του για να γυρίσεις.",
+  "Drag: move him. Scroll: bigger or smaller. Hover for the buttons.": "Σύρε: μετακίνησέ τον. Ροδέλα: μεγαλύτερος ή μικρότερος. Πέρνα το ποντίκι από πάνω για τα κουμπιά."
 }

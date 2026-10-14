@@ -449,6 +449,28 @@ def set_click_through(hwnd: int, on: bool):
     _SetLong(h, GWL_EXSTYLE, ex | WS_EX_TRANSPARENT if on else ex & ~WS_EX_TRANSPARENT)
 
 
+def to_front(hwnd: int) -> bool:
+    """Bring the window to the front with the keyboard. Windows only lets the app the
+    user is in hand over focus, so a window coming back from Bun mode (whose own
+    window never takes focus) joins that app's input for a moment while it asks.
+    True when it's in front."""
+    h = wt.HWND(hwnd)
+    if user32.GetForegroundWindow() == hwnd:
+        return True
+    if user32.SetForegroundWindow(h):
+        return True
+    k32 = ctypes.WinDLL("kernel32")
+    other = user32.GetWindowThreadProcessId(wt.HWND(user32.GetForegroundWindow()), None)
+    mine = k32.GetCurrentThreadId()
+    joined = bool(other) and other != mine and user32.AttachThreadInput(mine, other, True)
+    try:
+        user32.BringWindowToTop(h)
+        return bool(user32.SetForegroundWindow(h))
+    finally:
+        if joined:
+            user32.AttachThreadInput(mine, other, False)
+
+
 def raise_topmost(hwnd: int):
     """Put the window back on top without activating it (games that make themselves
     topmost can otherwise end up above it)."""

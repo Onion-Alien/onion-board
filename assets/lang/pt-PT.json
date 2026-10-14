@@ -3385,5 +3385,10 @@
   "resonant": "ressonante",
   "rumble": "ronco",
   "seasick": "enjoado",
-  "steady": "firme"
+  "steady": "firme",
+  "Back to the board": "Voltar ao board",
+  "Open the full board": "Abrir o board completo",
+  "Turn into Bun": "Tornar-se Bun",
+  "Turn into Bun: a small floating Bun instead of this window. Click him to come back.": "Tornar-se Bun: um Bun pequeno a flutuar em vez desta janela. Clica nele para voltar.",
+  "Drag: move him. Scroll: bigger or smaller. Hover for the buttons.": "Arrastar: movê-lo. Roda: maior ou mais pequeno. Passa o rato por cima para os botões."
 }

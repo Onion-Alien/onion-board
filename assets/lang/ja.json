@@ -3310,5 +3310,10 @@
   "resonant": "共鳴",
   "rumble": "うなり",
   "seasick": "船酔い",
-  "steady": "安定"
+  "steady": "安定",
+  "Back to the board": "ボードに戻る",
+  "Open the full board": "ボード全体を開く",
+  "Turn into Bun": "Bun に変身",
+  "Turn into Bun: a small floating Bun instead of this window. Click him to come back.": "Bun に変身: このウィンドウの代わりに小さな Bun が浮かびます。クリックで元に戻ります。",
+  "Drag: move him. Scroll: bigger or smaller. Hover for the buttons.": "ドラッグ: 移動。スクロール: 大きく・小さく。マウスを乗せるとボタンが出ます。"
 }

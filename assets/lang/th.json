@@ -3310,5 +3310,10 @@
   "resonant": "ก้อง",
   "rumble": "เสียงครืน",
   "seasick": "เมาเรือ",
-  "steady": "นิ่ง"
+  "steady": "นิ่ง",
+  "Back to the board": "กลับไปที่บอร์ด",
+  "Open the full board": "เปิดบอร์ดเต็ม",
+  "Turn into Bun": "แปลงร่างเป็น Bun",
+  "Turn into Bun: a small floating Bun instead of this window. Click him to come back.": "แปลงร่างเป็น Bun: Bun ตัวเล็กลอยอยู่แทนหน้าต่างนี้ คลิกที่เขาเพื่อกลับมา",
+  "Drag: move him. Scroll: bigger or smaller. Hover for the buttons.": "ลาก: ย้ายเขา เลื่อนล้อ: ใหญ่ขึ้นหรือเล็กลง ชี้เมาส์ที่เขาเพื่อดูปุ่ม"
 }

@@ -3310,5 +3310,10 @@
   "resonant": "공명",
   "rumble": "우르릉",
   "seasick": "뱃멀미",
-  "steady": "안정"
+  "steady": "안정",
+  "Back to the board": "보드로 돌아가기",
+  "Open the full board": "전체 보드 열기",
+  "Turn into Bun": "Bun으로 변신",
+  "Turn into Bun: a small floating Bun instead of this window. Click him to come back.": "Bun으로 변신: 이 창 대신 작은 Bun이 떠 있어요. 클릭하면 돌아와요.",
+  "Drag: move him. Scroll: bigger or smaller. Hover for the buttons.": "드래그: 옮기기. 스크롤: 크게 또는 작게. 마우스를 올리면 버튼이 나와요."
 }

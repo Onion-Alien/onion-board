@@ -3685,5 +3685,10 @@
   "resonant": "رنّان",
   "rumble": "هدير",
   "seasick": "دوار",
-  "steady": "ثابت"
+  "steady": "ثابت",
+  "Back to the board": "العودة إلى اللوحة",
+  "Open the full board": "فتح اللوحة كاملة",
+  "Turn into Bun": "تحوّل إلى Bun",
+  "Turn into Bun: a small floating Bun instead of this window. Click him to come back.": "تحوّل إلى Bun: أرنب Bun صغير عائم بدل هذه النافذة. انقر عليه للعودة.",
+  "Drag: move him. Scroll: bigger or smaller. Hover for the buttons.": "اسحب: لتحريكه. مرّر العجلة: أكبر أو أصغر. مرّر الماوس فوقه لتظهر الأزرار."
 }

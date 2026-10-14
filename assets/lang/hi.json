@@ -3385,5 +3385,10 @@
   "resonant": "गूंजता",
   "rumble": "गड़गड़ाहट",
   "seasick": "समुद्री बीमारी",
-  "steady": "स्थिर"
+  "steady": "स्थिर",
+  "Back to the board": "बोर्ड पर वापस",
+  "Open the full board": "पूरा बोर्ड खोलें",
+  "Turn into Bun": "Bun बन जाएँ",
+  "Turn into Bun: a small floating Bun instead of this window. Click him to come back.": "Bun बन जाएँ: इस विंडो की जगह एक छोटा तैरता Bun। वापस आने के लिए उस पर क्लिक करें।",
+  "Drag: move him. Scroll: bigger or smaller. Hover for the buttons.": "खींचें: उसे हिलाएँ। स्क्रॉल: बड़ा या छोटा। बटन के लिए उस पर माउस ले जाएँ।"
 }

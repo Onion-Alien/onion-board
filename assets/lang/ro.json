@@ -3460,5 +3460,10 @@
   "resonant": "rezonant",
   "rumble": "huruit",
   "seasick": "rău de mare",
-  "steady": "stabil"
+  "steady": "stabil",
+  "Back to the board": "Înapoi la board",
+  "Open the full board": "Deschide tot board-ul",
+  "Turn into Bun": "Transformă-te în Bun",
+  "Turn into Bun: a small floating Bun instead of this window. Click him to come back.": "Transformă-te în Bun: un Bun mic plutitor în locul acestei ferestre. Dă clic pe el ca să revii.",
+  "Drag: move him. Scroll: bigger or smaller. Hover for the buttons.": "Trage: mută-l. Rotiță: mai mare sau mai mic. Ține mouse-ul pe el pentru butoane."
 }

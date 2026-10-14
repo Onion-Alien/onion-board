@@ -3460,5 +3460,10 @@
   "resonant": "резонирует",
   "rumble": "гул",
   "seasick": "морская болезнь",
-  "steady": "ровно"
+  "steady": "ровно",
+  "Back to the board": "Назад к борду",
+  "Open the full board": "Открыть весь борд",
+  "Turn into Bun": "Превратиться в Bun",
+  "Turn into Bun: a small floating Bun instead of this window. Click him to come back.": "Превратиться в Bun: маленький парящий Bun вместо этого окна. Нажми на него, чтобы вернуться.",
+  "Drag: move him. Scroll: bigger or smaller. Hover for the buttons.": "Перетащить: подвинуть. Колесо: больше или меньше. Наведи мышь, чтобы увидеть кнопки."
 }

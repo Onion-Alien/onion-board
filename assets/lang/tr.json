@@ -3385,5 +3385,10 @@
   "resonant": "tınlayan",
   "rumble": "gümbürtü",
   "seasick": "deniz tutmuş",
-  "steady": "sabit"
+  "steady": "sabit",
+  "Back to the board": "Board'a dön",
+  "Open the full board": "Tüm board'u aç",
+  "Turn into Bun": "Bun'a dönüş",
+  "Turn into Bun: a small floating Bun instead of this window. Click him to come back.": "Bun'a dönüş: bu pencere yerine küçük, havada süzülen bir Bun. Geri dönmek için ona tıkla.",
+  "Drag: move him. Scroll: bigger or smaller. Hover for the buttons.": "Sürükle: onu taşı. Kaydır: büyüt veya küçült. Düğmeler için üzerine gel."
 }

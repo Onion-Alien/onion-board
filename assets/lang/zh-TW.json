@@ -3310,5 +3310,10 @@
   "resonant": "共鳴",
   "rumble": "隆隆",
   "seasick": "暈船",
-  "steady": "平穩"
+  "steady": "平穩",
+  "Back to the board": "返回音效板",
+  "Open the full board": "開啟完整音效板",
+  "Turn into Bun": "變成 Bun",
+  "Turn into Bun: a small floating Bun instead of this window. Click him to come back.": "變成 Bun：一隻小小的 Bun 浮在畫面上，取代這個視窗。點他就能回來。",
+  "Drag: move him. Scroll: bigger or smaller. Hover for the buttons.": "拖曳：移動他。滾輪：變大或變小。滑鼠移上去會出現按鈕。"
 }
