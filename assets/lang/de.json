@@ -3385,5 +3385,9 @@
   "resonant": "resonant",
   "rumble": "Grollen",
   "seasick": "seekrank",
-  "steady": "ruhig"
+  "steady": "ruhig",
+  "{n} sound couldn't be read and was left out.": [
+    "{n} Sound konnte nicht gelesen werden und wurde weggelassen.",
+    "{n} Sounds konnten nicht gelesen werden und wurden weggelassen."
+  ]
 }

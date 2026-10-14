@@ -3310,5 +3310,8 @@
   "resonant": "공명",
   "rumble": "우르릉",
   "seasick": "뱃멀미",
-  "steady": "안정"
+  "steady": "안정",
+  "{n} sound couldn't be read and was left out.": [
+    "사운드 {n}개를 읽을 수 없어서 빼고 내보냈어요."
+  ]
 }

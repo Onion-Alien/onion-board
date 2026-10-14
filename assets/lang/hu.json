@@ -3385,5 +3385,9 @@
   "resonant": "zengő",
   "rumble": "morajlás",
   "seasick": "tengeribeteg",
-  "steady": "egyenletes"
+  "steady": "egyenletes",
+  "{n} sound couldn't be read and was left out.": [
+    "{n} hangot nem sikerült beolvasni, ezért kimaradt.",
+    "{n} hangot nem sikerült beolvasni, ezért kimaradtak."
+  ]
 }

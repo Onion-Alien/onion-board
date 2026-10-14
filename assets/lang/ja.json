@@ -3310,5 +3310,8 @@
   "resonant": "共鳴",
   "rumble": "うなり",
   "seasick": "船酔い",
-  "steady": "安定"
+  "steady": "安定",
+  "{n} sound couldn't be read and was left out.": [
+    "{n} 個のサウンドを読み込めなかったため、含めませんでした。"
+  ]
 }

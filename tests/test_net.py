@@ -563,3 +563,57 @@ def test_a_closed_port_is_never_handed_to_a_later_server():
     finally:
         for s in servers:
             s.close()
+
+
+# ------------------------------------------------------------- capped downloads
+
+class _Reply:
+    def __init__(self, body: bytes, length=None):
+        import io
+        self._f = io.BytesIO(body)
+        self.headers = {} if length is None else {"Content-Length": length}
+
+    def read(self, n):
+        return self._f.read(n)
+
+
+def test_read_capped_copies_hashes_and_reports_progress():
+    import hashlib
+    import io
+    out, seen = io.BytesIO(), []
+    got = net.read_capped(_Reply(b"abc" * 10, "30"), out, 30, chunk=7,
+                          progress=lambda d, t: seen.append((d, t)))
+    assert out.getvalue() == b"abc" * 10
+    assert got == hashlib.sha256(b"abc" * 10).hexdigest()
+    assert seen[-1] == (30, 30)
+
+
+@pytest.mark.parametrize("length", [None, "nonsense", "5"])
+def test_read_capped_stops_once_the_bytes_pass_the_cap(length):
+    import io
+    out = io.BytesIO()
+    with pytest.raises(net.TooBig) as e:
+        net.read_capped(_Reply(b"x" * 100, length), out, 30, chunk=8)
+    assert e.value.listed == 0 and len(out.getvalue()) <= 30
+
+
+def test_read_capped_refuses_a_listed_size_over_the_cap_before_reading():
+    import io
+    reply = _Reply(b"x" * 100, "100")
+    with pytest.raises(net.TooBig) as e:
+        net.read_capped(reply, io.BytesIO(), 30)
+    assert e.value.listed == 100 and reply.read(1) == b"x"
+
+
+def test_read_capped_check_can_stop_it():
+    import io
+
+    class Stop(Exception):
+        pass
+
+    def check():
+        raise Stop
+    out = io.BytesIO()
+    with pytest.raises(Stop):
+        net.read_capped(_Reply(b"x" * 10), out, 30, check=check)
+    assert out.getvalue() == b""

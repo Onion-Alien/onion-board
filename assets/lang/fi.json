@@ -3385,5 +3385,9 @@
   "resonant": "resonoiva",
   "rumble": "jyrinä",
   "seasick": "merisairas",
-  "steady": "tasainen"
+  "steady": "tasainen",
+  "{n} sound couldn't be read and was left out.": [
+    "{n} ääni jäi pois, koska sitä ei voitu lukea.",
+    "{n} ääntä jäi pois, koska niitä ei voitu lukea."
+  ]
 }

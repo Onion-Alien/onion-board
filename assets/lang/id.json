@@ -3310,5 +3310,8 @@
   "resonant": "beresonansi",
   "rumble": "gemuruh",
   "seasick": "mabuk laut",
-  "steady": "stabil"
+  "steady": "stabil",
+  "{n} sound couldn't be read and was left out.": [
+    "{n} suara tidak bisa dibaca dan dilewati."
+  ]
 }

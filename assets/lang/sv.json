@@ -3385,5 +3385,9 @@
   "resonant": "resonant",
   "rumble": "muller",
   "seasick": "sjösjuk",
-  "steady": "stadig"
+  "steady": "stadig",
+  "{n} sound couldn't be read and was left out.": [
+    "{n} ljud kunde inte läsas och lämnades utanför.",
+    "{n} ljud kunde inte läsas och lämnades utanför."
+  ]
 }

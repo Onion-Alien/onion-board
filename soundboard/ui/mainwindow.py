@@ -317,7 +317,7 @@ _TONE_SPAN = re.compile(r"<span style='color:[^']*'>(.*)</span>", re.S)
 
 class Bridge(QObject):
     loaded = Signal(str, object, str)          # id, data|None, error
-    exported = Signal(str, int, str)           # file, sounds written, error
+    exported = Signal(str, int, str, int)      # file, sounds written, error, left out
     unpacked = Signal(object, object, str)     # backup.Imported|None, backup.Package, error
     worked = Signal(object, object, object)    # _on_worker: then, result|None, error|None
     update = Signal(object, str, bool)         # updates.Release|None, error, asked by the user
@@ -327,7 +327,7 @@ class Bridge(QObject):
     watch_update = Signal(object)              # a newer Onion Watch: watchaddon.Offer
     discord = Signal(object)                   # [discordcfg.Settings] read in the background
     mic_users = Signal(object)                 # [appaudio.App] recording the mic (rawmic)
-    counted = Signal()                         # the daily usage count was sent (usage.py)
+    counted = Signal(object)                   # a usage count went: what it clears (usage.py)
     imported = Signal(object, object, object)  # meta|None, data|None, Skipped|None
     preview = Signal(str, object, float, int)  # id, audio with unsaved effects|None, gain, gen
     ffmpeg = Signal(object, object)            # ffmpegget.Health, after a fix: "" or its error
@@ -477,7 +477,7 @@ class MainWindow(QMainWindow):
         self.bridge.watch_update.connect(self._on_watch_update)
         self.bridge.discord.connect(self._on_discord)
         self.bridge.mic_users.connect(self._on_mic_users)
-        self.bridge.counted.connect(self._save_later)   # stats_sent
+        self.bridge.counted.connect(self._usage_counted)
         self.bridge.ffmpeg.connect(self._on_ffmpeg)
         self.bridge.ffmpeg_progress.connect(self._on_ffmpeg_progress)
         self._removed: list[tuple[SoundMeta, int, np.ndarray | None]] = []   # undo-able
@@ -4998,15 +4998,21 @@ class MainWindow(QMainWindow):
             self._tor_told = say[0]
             self.toast(html.escape(say[1]), say[2])
 
-    def _save_now(self):
+    def _save_now(self, then=None):
         """The debounced save: the settings are copied now and written on the saver's
-        thread (library.Saver), then _on_saved says how it went."""
+        thread (library.Saver), then _on_saved says how it went. `then(ok)` is called on
+        the UI thread once this copy (or a newer one) is written, or failed to be."""
         self._saver.cfg = self.cfg
-        self._saver.save()
+        self._saver.save(then)
 
     def _on_saved(self, ok: bool):
         """A failure (disk full, antivirus lock) is logged by the writer; here it's
         shown once so the user knows settings aren't sticking."""
+        for then, was_ok in self._saver.finished():   # _save_now(then)s now on disk (or not)
+            try:
+                then(was_ok)
+            except Exception:  # noqa: BLE001 - one mustn't stop the report
+                log.exception("after saving settings")
         if ok:
             self._save_failed_shown = False
         elif not self._save_failed_shown:
@@ -8575,12 +8581,15 @@ class MainWindow(QMainWindow):
         self._exporting = True
         self.toast(ngettext("Exporting {n} sound…", "Exporting {n} sounds…", len(sounds)))
 
+        def run():
+            skipped = []   # locked or vanished files: left out, the rest still go
+            n = backup.export(path, sounds, cfg, cats, skipped)
+            return path, n, "", len(skipped)
         # disk full, no permission…: told, and _exporting goes back
-        worker.run(lambda: (path, backup.export(path, sounds, cfg, cats), ""),
-                   self.bridge.exported, "export",
-                   error=lambda e: (path, 0, errors.plain(e)), owner=self)
+        worker.run(run, self.bridge.exported, "export",
+                   error=lambda e: (path, 0, errors.plain(e), 0), owner=self)
 
-    def _on_exported(self, path: str, n: int, err: str):
+    def _on_exported(self, path: str, n: int, err: str, skipped: int = 0):
         self._exporting = False
         if err:
             self.tell(_("Export failed"),   # in place of the "Exporting…" card
@@ -8590,7 +8599,10 @@ class MainWindow(QMainWindow):
         msg = (ngettext("Exported {n} sound to {name}.",
                         "Exported {n} sounds to {name}.",
                         n, name=html.escape(Path(path).name)))
-        self.toast(msg, "ok")
+        if skipped:
+            msg += " " + ngettext("{n} sound couldn't be read and was left out.",
+                                  "{n} sounds couldn't be read and were left out.", skipped)
+        self.toast(msg, "warn" if skipped else "ok")
 
     def show_packs(self):
         """The Free packs window (soundboard.packs): a pack it downloads is imported the
@@ -9317,6 +9329,12 @@ class MainWindow(QMainWindow):
     def send_usage(self):
         """The anonymous daily usage count, if it's due and switched on (usage.py)."""
         usage.maybe_send(self.cfg, self.bridge.counted.emit, app_dir=library.APP_DIR)
+
+    def _usage_counted(self, apply):
+        """A usage count went: here, on the UI thread that also adds to them, its
+        stats_* are cleared (only what it sent) and saved."""
+        apply()
+        self._save_later()
 
     def _voice_fx_changed(self, spec: dict):
         if spec.get("enabled"):

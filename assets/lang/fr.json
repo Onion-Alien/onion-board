@@ -3385,5 +3385,9 @@
   "resonant": "résonant",
   "rumble": "grondement",
   "seasick": "mal de mer",
-  "steady": "stable"
+  "steady": "stable",
+  "{n} sound couldn't be read and was left out.": [
+    "{n} son n'a pas pu être lu et a été laissé de côté.",
+    "{n} sons n'ont pas pu être lus et ont été laissés de côté."
+  ]
 }

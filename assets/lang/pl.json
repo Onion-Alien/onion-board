@@ -3460,5 +3460,10 @@
   "resonant": "rezonujące",
   "rumble": "dudnienie",
   "seasick": "choroba morska",
-  "steady": "stabilnie"
+  "steady": "stabilnie",
+  "{n} sound couldn't be read and was left out.": [
+    "Nie udało się odczytać {n} dźwięku, więc go pominięto.",
+    "Nie udało się odczytać {n} dźwięków, więc je pominięto.",
+    "Nie udało się odczytać {n} dźwięków, więc je pominięto."
+  ]
 }

@@ -3385,5 +3385,9 @@
   "resonant": "resonant",
   "rumble": "buldring",
   "seasick": "sjøsyk",
-  "steady": "stødig"
+  "steady": "stødig",
+  "{n} sound couldn't be read and was left out.": [
+    "{n} lyd kunne ikke leses og ble utelatt.",
+    "{n} lyder kunne ikke leses og ble utelatt."
+  ]
 }

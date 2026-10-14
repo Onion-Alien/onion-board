@@ -3385,5 +3385,9 @@
   "resonant": "resonerend",
   "rumble": "gerommel",
   "seasick": "zeeziek",
-  "steady": "stabiel"
+  "steady": "stabiel",
+  "{n} sound couldn't be read and was left out.": [
+    "{n} geluid kon niet worden gelezen en is weggelaten.",
+    "{n} geluiden konden niet worden gelezen en zijn weggelaten."
+  ]
 }

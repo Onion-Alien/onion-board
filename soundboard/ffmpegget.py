@@ -29,7 +29,6 @@ Older releases may remain on GitHub after the builder removes its own copy.
 """
 from __future__ import annotations
 
-import hashlib
 import logging
 import os
 import shutil
@@ -279,37 +278,26 @@ def _with_winget() -> Health:
 
 # --------------------------------------------------------------------------- own copy
 
-def _length(header) -> int:
-    try:
-        return max(int(str(header or 0).strip()), 0)
-    except ValueError:
-        return 0
-
-
 def _download_once(url: str, to: Path, progress, stop) -> None:
     """``url`` into the file ``to``, checked against SHA256. Raises GetError."""
     host = urllib.parse.urlsplit(url).hostname
     req = urllib.request.Request(url, headers={"User-Agent": "OnionBoard"})
-    h = hashlib.sha256()
-    got = 0
+
+    def check():
+        if stop is not None and stop.is_set():
+            raise Stopped(_("Stopped."))
+
     try:
         with net.urlopen(req, timeout=DOWNLOAD_TIMEOUT_S, feature=FEATURE) as r, \
                 open(to, "wb") as f:
-            total = _length(r.headers.get("Content-Length"))
-            if total > MAX_BYTES:
-                raise GetError(_("The download is {mb} MB, far bigger than FFmpeg: not "
-                                 "taking it.", mb=f"{total / 1e6:.0f}"))
-            while chunk := r.read(CHUNK):
-                if stop is not None and stop.is_set():
-                    raise Stopped(_("Stopped."))
-                h.update(chunk)
-                f.write(chunk)
-                got += len(chunk)
-                if got > MAX_BYTES:
-                    raise GetError(_("The download kept going far past FFmpeg's size: "
-                                     "not taking it."))
-                if progress:
-                    progress(got, total)
+            got = net.read_capped(r, f, MAX_BYTES, chunk=CHUNK, progress=progress,
+                                  check=check)
+    except net.TooBig as e:
+        if e.listed:
+            raise GetError(_("The download is {mb} MB, far bigger than FFmpeg: not "
+                             "taking it.", mb=f"{e.listed / 1e6:.0f}")) from None
+        raise GetError(_("The download kept going far past FFmpeg's size: "
+                         "not taking it.")) from None
     except net.ProxyError as e:   # FeatureOff included: switched off, nothing sent
         raise GetError(errors.plain(e)) from None
     except urllib.error.HTTPError as e:
@@ -318,9 +306,8 @@ def _download_once(url: str, to: Path, progress, stop) -> None:
     except (urllib.error.URLError, OSError) as e:
         why = getattr(e, "reason", None) or e
         raise GetError(_("Couldn't reach {host} ({error}).", host=host, error=why)) from None
-    if h.hexdigest() != SHA256:
-        log.warning("ffmpeg download from %s: SHA-256 %s, expected %s", host,
-                    h.hexdigest(), SHA256)
+    if got != SHA256:
+        log.warning("ffmpeg download from %s: SHA-256 %s, expected %s", host, got, SHA256)
         raise GetError(_("The download isn't the FFmpeg it should be (its checksum doesn't "
                          "match), so it wasn't used. It was cut short, or something "
                          "between you and the site changed it."))
