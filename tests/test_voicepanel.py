@@ -202,7 +202,7 @@ def test_speak_in_offers_the_languages_and_downloads_only_on_request(panel, monk
     s = p.speech
     codes = [s.cb_lang.itemData(i) for i in range(s.cb_lang.count())]
     assert codes[0] == "" and {"zh", "es", "fr", "de", "ru", "ja", "pt-BR", "zh-TW"} <= set(codes)
-    assert len(codes) == 34
+    assert len(codes) == 36
     assert s.tr_box.isHidden()                          # English: nothing to download
     assert not translation.base_dir().exists()          # and nothing was fetched
     got = []
@@ -1087,6 +1087,64 @@ def test_speak_in_switch_starts_off_for_a_saved_language(qapp, monkeypatch):
         assert sp.translating() is None
         args = sp._live_args()                        # the computer voice speaks English
         assert "--translate" not in args
+    finally:
+        p.shutdown()
+        p.deleteLater()
+
+
+def test_speaking_another_language_goes_through_english(panel, monkeypatch):
+    """The translations go from English: a Spanish speaker's line is heard straight
+    into English first (Whisper's translate task), by a model that hears Spanish."""
+    from soundboard import i18n
+    p, _ = panel
+    sp = p.speech
+    _chinese_downloaded(sp)
+    sp.cb_lang.setCurrentIndex(sp.cb_lang.findData("zh"))
+    args = sp._live_args()                            # English: as before
+    assert args[:4] == ["--model", "base.en", "--language", "en"]
+    assert "--task" not in args and "--translate" in args
+    monkeypatch.setattr(i18n, "current", lambda: "es")
+    args = sp._live_args()                            # the app in Spanish: Spanish in
+    assert args[:4] == ["--model", "small", "--language", "es"]
+    assert args[args.index("--task") + 1] == "translate" and "--translate" in args
+    monkeypatch.setattr(i18n, "current", lambda: "zh-CN")
+    args = sp._live_args()                            # said in Chinese: just spoken
+    assert "--task" not in args and "--translate" not in args
+    sp.ed_lang.setText("en")                          # English typed in on purpose
+    sp.ed_lang.editingFinished.emit()
+    assert sp.s["spoken"] == "en" and sp._live_args()[3] == "en"
+
+
+def test_speech_model_download_shows_a_bar_until_its_ready(panel):
+    p, _ = panel
+    sp = p.speech
+    assert sp.dl_bar.isHidden() and sp.bg_bar.isHidden()
+    sp._on_event({"type": "download", "done": 121_450_000, "total": 485_800_000})
+    assert not sp.dl_bar.isHidden() and sp.dl_bar.value() == 250
+    assert "121 of 485 MB" in sp.lbl_state.text()
+    sp._on_event({"type": "status", "text": "loading translation…"})   # downloaded
+    assert sp.dl_bar.isHidden()
+    sp._on_event({"type": "download", "done": 5, "total": 0})        # no size: empty bar
+    assert not sp.dl_bar.isHidden() and sp.dl_bar.value() == 0
+    sp._set_live_ui(False, "stopped")                                  # stopped by hand
+    assert sp.dl_bar.isHidden()
+    sp.bg_for = "ai"                                                   # for another voice
+    sp._on_event({"type": "download", "done": 50_000_000, "total": 100_000_000})
+    assert not sp.bg_bar.isHidden() and sp.dl_bar.isHidden()
+    assert "50 of 100 MB" in sp.lbl_bg.text()
+    sp._on_event({"type": "ready"})
+    assert sp.bg_bar.isHidden()
+
+
+def test_languages_tab_hides_when_speech_recognition_cant_hear_the_app(qapp, monkeypatch):
+    from soundboard import i18n
+    monkeypatch.setattr(tts.SapiTTS, "warm_up", lambda self: ["Microsoft Zira Desktop"])
+    monkeypatch.setattr(i18n, "current", lambda: "tlh")
+    from soundboard.ui.voicepanel import VoicePanel
+    p = VoicePanel(FakeEngine(), {"enabled": False, "effects": {}}, {"tab": "speak"})
+    try:
+        assert not p._tabs["speak"].isVisibleTo(p) and p.current_tab() == "fx"
+        assert p._tabs["fx"].isVisibleTo(p) and p._tabs["addons"].isVisibleTo(p)
     finally:
         p.shutdown()
         p.deleteLater()
