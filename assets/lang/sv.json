@@ -638,7 +638,6 @@
   "No audio device is open, pick one in Setup.": "Ingen ljudenhet är öppen, välj en under Konfiguration.",
   "No audio device is open. Pick one in Setup → Devices.": "Ingen ljudenhet är öppen. Välj en under Konfiguration → Enheter.",
   "No cable found yet": "Ingen kabel hittad än",
-  "No custom modes yet. Fill in the form to make one, or click Add / Copy built-in.": "Inga anpassade lägen än. Fyll i formuläret för att skapa ett, eller klicka Lägg till / Kopiera inbyggt.",
   "No cut (full band)": "Ingen klippning (hela bandet)",
   "No mic is picked. Pick one in Setup → Devices.": "Ingen mikrofon är vald. Välj en under Konfiguration → Enheter.",
   "No open programs found. Use Browse for a program.": "Inga öppna program hittades. Använd Bläddra efter ett program.",
@@ -3389,5 +3388,11 @@
   "Hear {name}": "Lyssna på {name}",
   "Hear {name} (only you hear it)": "Lyssna på {name} (bara du hör det)",
   "Pick your headphones in Settings → Audio to hear the samples.": "Välj dina hörlurar under Inställningar → Ljud för att höra smakproven.",
-  "Ready-made boards, free to use anywhere: in games, streams and videos. Press a sound to hear it first (only you hear it). Add a pack and its sounds land on your board, each category as its own tab.": "Färdiga brädor, gratis att använda var som helst: i spel, streams och videor. Tryck på ett ljud för att höra det först (bara du hör det). Lägg till ett och dess ljud landar på din bräda, varje kategori som sin egen flik."
+  "Ready-made boards, free to use anywhere: in games, streams and videos. Press a sound to hear it first (only you hear it). Add a pack and its sounds land on your board, each category as its own tab.": "Färdiga brädor, gratis att använda var som helst: i spel, streams och videor. Tryck på ett ljud för att höra det först (bara du hör det). Lägg till ett och dess ljud landar på din bräda, varje kategori som sin egen flik.",
+  "Hide the report": "Dölj rapporten",
+  "Network activity log": "Logg över nätverksaktivitet",
+  "No custom modes yet. Fill in the form to make one.": "Inga egna lägen än. Fyll i formuläret för att göra ett.",
+  "Show the report": "Visa rapporten",
+  "This run only. It isn't saved.": "Bara den här körningen. Sparas inte.",
+  "Your own sound modes, for a voice chat the built-in ones don't cover.": "Dina egna ljudlägen, för en röstchatt som de inbyggda inte täcker."
 }

@@ -290,17 +290,17 @@ class WhatsNewDialog(QDialog):
         buttons.addStretch(1)
         close = QPushButton(_("Close"))
         close.clicked.connect(self.reject)
-        buttons.addWidget(close)
         page = next((n for n in notes if n.page), None)
         if page is not None:
             go = QPushButton(page.page_label)
             go.setObjectName("primary")
             go.setDefault(True)
             go.clicked.connect(lambda: self._open(page.page))
-            buttons.addWidget(go)
+            buttons.addWidget(go)   # the main button first
             self.settings_btn = go
         else:
             close.setDefault(True)
+        buttons.addWidget(close)
         lay.addLayout(buttons)
 
     def showEvent(self, ev):

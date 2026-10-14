@@ -992,7 +992,6 @@
   "Nine tiles a page, in the same order as your pads. Drag pads in the Sounds tab to rearrange them.": "Nove quadros por página, na mesma ordem dos seus botões, arraste os botões na aba Sons para reorganizar.",
   "No audio device is open, pick one in Setup.": "Nenhum dispositivo de áudio aberto, escolha um em Configurar.",
   "No cable found yet": "Nenhum cabo encontrado ainda",
-  "No custom modes yet. Fill in the form to make one, or click Add / Copy built-in.": "Ainda não há modos personalizados. Preencha o formulário para criar um, ou clique em Adicionar / Copiar embutido.",
   "No cut (full band)": "Sem corte (banda completa)",
   "No mic is picked. Pick one in Setup → Devices.": "Nenhum microfone escolhido. Escolha um em Configurar → Dispositivos.",
   "No programs set yet.": "Nenhum programa definido ainda.",
@@ -3389,5 +3388,11 @@
   "Hear {name}": "Ouvir {name}",
   "Hear {name} (only you hear it)": "Ouvir {name} (só você ouve)",
   "Pick your headphones in Settings → Audio to hear the samples.": "Escolha seus fones em Configurações → Áudio para ouvir as amostras.",
-  "Ready-made boards, free to use anywhere: in games, streams and videos. Press a sound to hear it first (only you hear it). Add a pack and its sounds land on your board, each category as its own tab.": "Tabuleiros prontos, gratuitos para usar em qualquer lugar: em jogos, streams e vídeos. Clique em um som para ouvir antes (só você ouve). Adicione um e seus sons chegarão ao seu quadro, cada categoria como sua própria guia."
+  "Ready-made boards, free to use anywhere: in games, streams and videos. Press a sound to hear it first (only you hear it). Add a pack and its sounds land on your board, each category as its own tab.": "Tabuleiros prontos, gratuitos para usar em qualquer lugar: em jogos, streams e vídeos. Clique em um som para ouvir antes (só você ouve). Adicione um e seus sons chegarão ao seu quadro, cada categoria como sua própria guia.",
+  "Hide the report": "Ocultar o relatório",
+  "Network activity log": "Registro de atividade de rede",
+  "No custom modes yet. Fill in the form to make one.": "Ainda não há modos personalizados. Preencha o formulário para criar um.",
+  "Show the report": "Mostrar o relatório",
+  "This run only. It isn't saved.": "Só desta sessão. Não é salvo.",
+  "Your own sound modes, for a voice chat the built-in ones don't cover.": "Seus próprios modos de som, para um chat de voz que os embutidos não cobrem."
 }

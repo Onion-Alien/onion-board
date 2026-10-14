@@ -993,7 +993,6 @@
   "Nine tiles a page, in the same order as your pads. Drag pads in the Sounds tab to rearrange them.": "Pedlerinizle aynı sırada bir sayfayı dokuz döşeme; yeniden düzenlemek için Sesler sekmesinde pedleri sürükleyin.",
   "No audio device is open, pick one in Setup.": "Hiçbir ses cihazı açık değil; Kurulum'da bir tane seçin.",
   "No cable found yet": "Henüz kablo bulunamadı",
-  "No custom modes yet. Fill in the form to make one, or click Add / Copy built-in.": "Henüz özel mod yok. Bir tane oluşturmak için formu doldurun veya Yerleşik Ekle / Kopyala seçeneğine tıklayın.",
   "No cut (full band)": "Kesim yok (tam bant)",
   "No mic is picked. Pick one in Setup → Devices.": "Hiçbir mikrofon seçilmedi. Kurulum → Cihazlar'dan birini seçin.",
   "No programs set yet.": "Henüz program belirlenmedi.",
@@ -3389,5 +3388,11 @@
   "Hear {name}": "{name} dinle",
   "Hear {name} (only you hear it)": "{name} dinle (sadece sen duyarsın)",
   "Pick your headphones in Settings → Audio to hear the samples.": "Örnekleri duymak için Ayarlar → Ses bölümünden kulaklığını seç.",
-  "Ready-made boards, free to use anywhere: in games, streams and videos. Press a sound to hear it first (only you hear it). Add a pack and its sounds land on your board, each category as its own tab.": "Her yerde ücretsiz kullanılabilen hazır panolar: oyunlarda, yayınlarda ve videolarda. Önce dinlemek için bir sese basın (sadece siz duyarsınız). Bir tane ekleyin ve sesleri panonuza gelsin; her kategori kendi sekmesidir."
+  "Ready-made boards, free to use anywhere: in games, streams and videos. Press a sound to hear it first (only you hear it). Add a pack and its sounds land on your board, each category as its own tab.": "Her yerde ücretsiz kullanılabilen hazır panolar: oyunlarda, yayınlarda ve videolarda. Önce dinlemek için bir sese basın (sadece siz duyarsınız). Bir tane ekleyin ve sesleri panonuza gelsin; her kategori kendi sekmesidir.",
+  "Hide the report": "Raporu gizle",
+  "Network activity log": "Ağ etkinliği günlüğü",
+  "No custom modes yet. Fill in the form to make one.": "Henüz özel mod yok. Bir tane yapmak için formu doldur.",
+  "Show the report": "Raporu göster",
+  "This run only. It isn't saved.": "Yalnızca bu çalıştırma. Kaydedilmez.",
+  "Your own sound modes, for a voice chat the built-in ones don't cover.": "Yerleşik modların karşılamadığı bir sesli sohbet için kendi ses modların."
 }

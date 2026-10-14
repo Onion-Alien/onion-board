@@ -993,7 +993,6 @@
   "Nine tiles a page, in the same order as your pads. Drag pads in the Sounds tab to rearrange them.": "Nove riquadri per pagina, nello stesso ordine dei pad: trascina i pad nella scheda Suoni per riorganizzarli.",
   "No audio device is open, pick one in Setup.": "Nessun dispositivo audio è aperto: scegline uno in Configurazione.",
   "No cable found yet": "Nessun cavo ancora trovato",
-  "No custom modes yet. Fill in the form to make one, or click Add / Copy built-in.": "Nessuna modalità personalizzata ancora. Compila il modulo per crearne uno oppure fai clic su Aggiungi/Copia integrato.",
   "No cut (full band)": "Nessun taglio (banda intera)",
   "No mic is picked. Pick one in Setup → Devices.": "Nessun microfono selezionato. Scegline uno in Configurazione → Dispositivi.",
   "No programs set yet.": "Nessun programma ancora impostato.",
@@ -3389,5 +3388,11 @@
   "Hear {name}": "Ascolta {name}",
   "Hear {name} (only you hear it)": "Ascolta {name} (lo senti solo tu)",
   "Pick your headphones in Settings → Audio to hear the samples.": "Scegli le tue cuffie in Impostazioni → Audio per ascoltare i campioni.",
-  "Ready-made boards, free to use anywhere: in games, streams and videos. Press a sound to hear it first (only you hear it). Add a pack and its sounds land on your board, each category as its own tab.": "Schede già pronte, utilizzabili gratuitamente ovunque: nei giochi, negli streaming e nei video. Premi un suono per ascoltarlo prima (lo senti solo tu). Aggiungine uno e i suoi suoni arriveranno sulla tua scheda, ogni categoria come una propria scheda."
+  "Ready-made boards, free to use anywhere: in games, streams and videos. Press a sound to hear it first (only you hear it). Add a pack and its sounds land on your board, each category as its own tab.": "Schede già pronte, utilizzabili gratuitamente ovunque: nei giochi, negli streaming e nei video. Premi un suono per ascoltarlo prima (lo senti solo tu). Aggiungine uno e i suoi suoni arriveranno sulla tua scheda, ogni categoria come una propria scheda.",
+  "Hide the report": "Nascondi il rapporto",
+  "Network activity log": "Registro delle attività di rete",
+  "No custom modes yet. Fill in the form to make one.": "Ancora nessuna modalità personalizzata. Compila il modulo per crearne una.",
+  "Show the report": "Mostra il rapporto",
+  "This run only. It isn't saved.": "Solo questa sessione. Non viene salvato.",
+  "Your own sound modes, for a voice chat the built-in ones don't cover.": "Le tue modalità audio, per una chat vocale che quelle integrate non coprono."
 }

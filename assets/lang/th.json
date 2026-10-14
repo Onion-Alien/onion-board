@@ -972,7 +972,6 @@
   "Nine tiles a page, in the same order as your pads. Drag pads in the Sounds tab to rearrange them.": "เก้าแผ่นต่อหน้า ในลำดับเดียวกับแผ่นของคุณ ให้ลากแผ่นในแถบเสียงเพื่อจัดเรียงแผ่นใหม่",
   "No audio device is open, pick one in Setup.": "ไม่มีอุปกรณ์เสียงเปิดอยู่, เลือกหนึ่งอุปกรณ์ในการตั้งค่า",
   "No cable found yet": "ยังไม่พบสายเคเบิล",
-  "No custom modes yet. Fill in the form to make one, or click Add / Copy built-in.": "ยังไม่มีโหมดที่กำหนดเอง กรอกแบบฟอร์มเพื่อสร้างหรือคลิกเพิ่ม / คัดลอกในตัว.",
   "No cut (full band)": "ไม่ตัด (เต็มวง)",
   "No mic is picked. Pick one in Setup → Devices.": "ไม่มีการเลือกไมค์ เลือกหนึ่งรายการในการตั้งค่า → อุปกรณ์",
   "No programs set yet.": "ยังไม่มีการตั้งค่าโปรแกรม",
@@ -3313,5 +3312,11 @@
   "Hear {name}": "ฟัง {name}",
   "Hear {name} (only you hear it)": "ฟัง {name} (มีแค่คุณที่ได้ยิน)",
   "Pick your headphones in Settings → Audio to hear the samples.": "เลือกหูฟังของคุณใน การตั้งค่า → เสียง เพื่อฟังตัวอย่าง",
-  "Ready-made boards, free to use anywhere: in games, streams and videos. Press a sound to hear it first (only you hear it). Add a pack and its sounds land on your board, each category as its own tab.": "บอร์ดสำเร็จรูป ใช้งานฟรีได้ทุกที่: ในเกม สตรีม และวิดีโอ กดเสียงเพื่อฟังก่อน (มีแค่คุณที่ได้ยิน) เพิ่มหนึ่งรายการและเสียงของมันลงบนกระดานของคุณ โดยแต่ละหมวดหมู่จะมีแท็บของตัวเอง"
+  "Ready-made boards, free to use anywhere: in games, streams and videos. Press a sound to hear it first (only you hear it). Add a pack and its sounds land on your board, each category as its own tab.": "บอร์ดสำเร็จรูป ใช้งานฟรีได้ทุกที่: ในเกม สตรีม และวิดีโอ กดเสียงเพื่อฟังก่อน (มีแค่คุณที่ได้ยิน) เพิ่มหนึ่งรายการและเสียงของมันลงบนกระดานของคุณ โดยแต่ละหมวดหมู่จะมีแท็บของตัวเอง",
+  "Hide the report": "ซ่อนรายงาน",
+  "Network activity log": "บันทึกกิจกรรมเครือข่าย",
+  "No custom modes yet. Fill in the form to make one.": "ยังไม่มีโหมดที่กำหนดเอง กรอกแบบฟอร์มเพื่อสร้างหนึ่งโหมด",
+  "Show the report": "แสดงรายงาน",
+  "This run only. It isn't saved.": "เฉพาะการเปิดครั้งนี้ ไม่ได้บันทึกไว้",
+  "Your own sound modes, for a voice chat the built-in ones don't cover.": "โหมดเสียงของคุณเอง สำหรับแชทเสียงที่โหมดในตัวไม่ครอบคลุม"
 }

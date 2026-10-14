@@ -7,12 +7,12 @@ import threading
 
 from PySide6.QtCore import QFileInfo, QObject, QSize, Qt, Signal, Slot
 from PySide6.QtWidgets import (QAbstractItemView, QApplication, QDialog, QFileDialog,
-                               QFileIconProvider, QHBoxLayout, QListWidget, QListWidgetItem,
+                               QFileIconProvider, QHBoxLayout, QListWidgetItem,
                                QPushButton, QVBoxLayout)
 
 from soundboard import catswitch
 from soundboard.ui import fit, icons
-from soundboard.ui.panel import hint_label
+from soundboard.ui.panel import EmptyList, hint_label
 from soundboard.i18n import _
 
 
@@ -50,7 +50,7 @@ class ProgramPicker(QDialog):
             _("When one of these programs comes to the front, the board shows “{category}” by "
               "itself. When it closes, the board goes back to what it showed before.",
               category=category)))
-        self.list = QListWidget()
+        self.list = EmptyList(_("Looking for open programs…"), "apps")
         self.list.setSelectionMode(QAbstractItemView.SelectionMode.ExtendedSelection)
         self.list.setIconSize(QSize(20, 20))
         self.list.setMinimumSize(380, 260)
@@ -73,9 +73,6 @@ class ProgramPicker(QDialog):
         row.addWidget(cancel)
         lay.addLayout(row)
         self._icons = QFileIconProvider()
-        self._wait = QListWidgetItem(_("Looking for open programs…"))
-        self._wait.setFlags(Qt.ItemFlag.NoItemFlags)
-        self.list.addItem(self._wait)
         carrier, me, lister = _carrier(), id(self), self._lister
         carrier.listed.connect(self._on_listed)
         # the thread never touches the picker: it may be closed and freed meanwhile
@@ -92,10 +89,7 @@ class ProgramPicker(QDialog):
         self.list.clear()
         for exe, path, title in programs:
             self._add(exe, path, title)
-        if not self.list.count():
-            li = QListWidgetItem(_("No open programs found. Use Browse for a program."))
-            li.setFlags(Qt.ItemFlag.NoItemFlags)
-            self.list.addItem(li)
+        self.list.set_empty(_("No open programs found. Use Browse for a program."))
         self._update()
 
     def _add(self, exe: str, path: str, title: str = "") -> QListWidgetItem:
@@ -129,8 +123,6 @@ class ProgramPicker(QDialog):
             if self.list.item(i).data(Qt.ItemDataRole.UserRole) == exe:
                 self.list.setCurrentRow(i)
                 return
-        if self.list.count() == 1 and not self.list.item(0).data(Qt.ItemDataRole.UserRole):
-            self.list.clear()   # the "Looking…" / "none found" line
         self.list.setCurrentItem(self._add(exe, path))
 
     def _chosen(self) -> list[str]:

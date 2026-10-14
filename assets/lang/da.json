@@ -638,7 +638,6 @@
   "No audio device is open, pick one in Setup.": "Ingen lydenhed er åben, vælg en under Opsætning.",
   "No audio device is open. Pick one in Setup → Devices.": "Ingen lydenhed er åben. Vælg en under Opsætning → Enheder.",
   "No cable found yet": "Intet kabel fundet endnu",
-  "No custom modes yet. Fill in the form to make one, or click Add / Copy built-in.": "Ingen egne tilstande endnu. Udfyld formularen for at lave en, eller klik på Tilføj / Kopiér indbygget.",
   "No cut (full band)": "Intet klip (fuldt bånd)",
   "No mic is picked. Pick one in Setup → Devices.": "Ingen mikrofon er valgt. Vælg en under Opsætning → Enheder.",
   "No open programs found. Use Browse for a program.": "Ingen åbne programmer fundet. Brug Find et program.",
@@ -3389,5 +3388,11 @@
   "Hear {name}": "Hør {name}",
   "Hear {name} (only you hear it)": "Hør {name} (kun du kan høre den)",
   "Pick your headphones in Settings → Audio to hear the samples.": "Vælg dine hovedtelefoner under Indstillinger → Lyd for at høre prøverne.",
-  "Ready-made boards, free to use anywhere: in games, streams and videos. Press a sound to hear it first (only you hear it). Add a pack and its sounds land on your board, each category as its own tab.": "Færdiglavede boards, gratis at bruge overalt: i spil, streams og videoer. Tryk på en lyd for at høre den først (kun du kan høre den). Tilføj en, og dens lyde lander på dit board, hver kategori som sin egen fane."
+  "Ready-made boards, free to use anywhere: in games, streams and videos. Press a sound to hear it first (only you hear it). Add a pack and its sounds land on your board, each category as its own tab.": "Færdiglavede boards, gratis at bruge overalt: i spil, streams og videoer. Tryk på en lyd for at høre den først (kun du kan høre den). Tilføj en, og dens lyde lander på dit board, hver kategori som sin egen fane.",
+  "Hide the report": "Skjul rapporten",
+  "Network activity log": "Log over netværksaktivitet",
+  "No custom modes yet. Fill in the form to make one.": "Ingen egne tilstande endnu. Udfyld formularen for at lave en.",
+  "Show the report": "Vis rapporten",
+  "This run only. It isn't saved.": "Kun denne kørsel. Den gemmes ikke.",
+  "Your own sound modes, for a voice chat the built-in ones don't cover.": "Dine egne lydtilstande til en stemmechat, som de indbyggede ikke dækker."
 }

@@ -370,7 +370,11 @@ class AiVoiceEditor(QDialog):
         self._sampled.connect(lambda b, d, e: self.previewer.done(b, d, e, self._say))
         recipe = (voice or {}).get("recipe") or {}
         lay = QVBoxLayout(self)
+        lay.setContentsMargins(18, 18, 18, 18)
         lay.setSpacing(10)
+        title = QLabel(self.windowTitle())
+        title.setObjectName("helptitle")   # the dialog Title role (DESIGN.md)
+        lay.addWidget(title)
         lay.addWidget(hint_label(_("Start from a voice, mix a bit of another one in, then "
                                    "set how deep and how high it is. Press Hear it to try "
                                    "it.")))
@@ -383,6 +387,10 @@ class AiVoiceEditor(QDialog):
         self.ed_emoji = QLineEdit((voice or {}).get("emoji", "") or "🎙️")
         self.ed_emoji.setMaxLength(4)
         self.ed_emoji.setFixedWidth(52)
+        self.ed_emoji.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        big = self.ed_emoji.font()
+        big.setPointSizeF(big.pointSizeF() * 1.3)
+        self.ed_emoji.setFont(big)
         self.ed_emoji.setToolTip(_("An emoji for it (Windows key + . opens the emoji list)"))
         nrow.addWidget(self.ed_emoji)
         self.ed_name = QLineEdit((voice or {}).get("name", ""))
@@ -505,6 +513,10 @@ class AiVoiceEditor(QDialog):
                                  _("brighter {amount}", amount=f"{abs(f):g}"))
         self.lbl_pitch.setText(avl.pitch_word(self.sl_pitch.value()))
         self.status.setText("")
+
+    def showEvent(self, ev):
+        super().showEvent(ev)
+        self.ed_name.setFocus()   # the name first, not the small emoji box before it
 
     def result_voice(self) -> dict:
         base, other = self._base(), self._other()

@@ -15,7 +15,7 @@ from PySide6.QtWidgets import (QDialog, QHBoxLayout, QLabel, QPlainTextEdit, QPu
                                QVBoxLayout)
 import shiboken6
 
-from soundboard.ui import fit
+from soundboard.ui import fit, quietbox
 from soundboard.ui.panel import icon_button
 from soundboard.updates import REPO
 from soundboard.i18n import _
@@ -39,22 +39,32 @@ class CrashDialog(QDialog):
         self.rep, self.log_path = rep, log_path
         self.setWindowTitle(_("Onion Board hit a problem"))
         self.setAttribute(Qt.WidgetAttribute.WA_DeleteOnClose)
-        self.setMinimumSize(560, 420)
+        self.setMinimumWidth(520)
+        self.setMaximumWidth(620)
         v = QVBoxLayout(self)
+        v.setContentsMargins(18, 18, 18, 18)
+        v.setSpacing(12)
 
+        top = QHBoxLayout()
+        top.setSpacing(14)
+        mark = QLabel()
+        mark.setPixmap(quietbox.badge("alert", "error_text", self.devicePixelRatioF()))
+        top.addWidget(mark, 0, Qt.AlignmentFlag.AlignTop)
+        words = QVBoxLayout()
+        words.setSpacing(4)
         head = QLabel(_("Sorry, something went wrong.") if not rep.fatal
                       else _("Sorry, Onion Board couldn't start."))
-        f = head.font()
-        f.setPointSizeF(f.pointSizeF() * 1.3)
-        f.setBold(True)
-        head.setFont(f)
-        v.addWidget(head)
-
+        head.setObjectName("helptitle")   # the dialog Title role (DESIGN.md)
+        head.setWordWrap(True)
+        words.addWidget(head)
         what = QLabel(rep.title)
+        what.setObjectName("hint")
         what.setTextFormat(Qt.TextFormat.PlainText)   # exception text, not markup
         what.setWordWrap(True)
         what.setTextInteractionFlags(Qt.TextInteractionFlag.TextSelectableByMouse)
-        v.addWidget(what)
+        words.addWidget(what)
+        top.addLayout(words, 1)
+        v.addLayout(top)
 
         keep = (_("The app will close.") if rep.fatal else
                 _("The app is still running, but if something looks wrong, restart it."))
@@ -66,39 +76,54 @@ class CrashDialog(QDialog):
         ask.setWordWrap(True)
         v.addWidget(ask)
 
+        # the report itself: there to read, folded away so the box isn't mostly a big
+        # grey panel of code
         self.details = QPlainTextEdit(rep.text)
         self.details.setReadOnly(True)
         self.details.setLineWrapMode(QPlainTextEdit.LineWrapMode.NoWrap)
         mono = QFont("Consolas")
         mono.setStyleHint(QFont.StyleHint.Monospace)
         self.details.setFont(mono)
+        self.details.setMinimumHeight(200)
+        self.details.hide()
         v.addWidget(self.details, 1)
 
         self.status = QLabel("")
         self.status.setObjectName("hint")
+        self.status.setWordWrap(True)
         v.addWidget(self.status)
 
         row = QHBoxLayout()
-        self.copy_btn = QPushButton(_("Copy report"))
-        self.copy_btn.clicked.connect(self.copy)
-        self.github_btn = QPushButton(_("Report on GitHub"))
-        self.github_btn.setObjectName("primary")
-        self.github_btn.setDefault(True)
-        self.github_btn.setToolTip(_("Copies the report and opens a new issue in your browser"))
-        self.github_btn.clicked.connect(self.open_issue)
+        self.show_btn = QPushButton(_("Show the report"))
+        self.show_btn.setProperty("quiet", True)
+        self.show_btn.setCheckable(True)
+        self.show_btn.toggled.connect(self._show_details)
         self.folder_btn = icon_button("folder", _("Open folder"))
         # The name says what it does; the tooltip also says what's in there.
         self.folder_btn.setToolTip(_("Open folder") + "\n"
                                    + _("The saved report and the app's log"))
         self.folder_btn.clicked.connect(self.open_folder)
         self.folder_btn.setEnabled(self._folder() is not None)
+        self.github_btn = QPushButton(_("Report on GitHub"))
+        self.github_btn.setObjectName("primary")
+        self.github_btn.setDefault(True)
+        self.github_btn.setToolTip(_("Copies the report and opens a new issue in your browser"))
+        self.github_btn.clicked.connect(self.open_issue)
+        self.copy_btn = QPushButton(_("Copy report"))
+        self.copy_btn.clicked.connect(self.copy)
         close = QPushButton(_("Quit") if rep.fatal else _("Close"))
         close.clicked.connect(self.accept)
-        for b in (self.copy_btn, self.github_btn, self.folder_btn):
-            row.addWidget(b)
+        row.addWidget(self.show_btn)
+        row.addWidget(self.folder_btn)
         row.addStretch(1)
-        row.addWidget(close)
+        for b in (self.github_btn, self.copy_btn, close):   # the main button first
+            row.addWidget(b)
         v.addLayout(row)
+
+    def _show_details(self, on: bool):
+        self.details.setVisible(on)
+        self.show_btn.setText(_("Hide the report") if on else _("Show the report"))
+        self.adjustSize()
 
     def report_text(self) -> str:
         text = self.rep.text

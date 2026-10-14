@@ -993,7 +993,6 @@
   "Nine tiles a page, in the same order as your pads. Drag pads in the Sounds tab to rearrange them.": "Negen tegels per pagina, in dezelfde volgorde als uw pads: sleep de pads op het tabblad Geluiden om ze opnieuw te rangschikken.",
   "No audio device is open, pick one in Setup.": "Er is geen audioapparaat geopend. Kies er een in Configuratie.",
   "No cable found yet": "Nog geen kabel gevonden",
-  "No custom modes yet. Fill in the form to make one, or click Add / Copy built-in.": "Nog geen aangepaste modi. Vul het formulier in om er een te maken, of klik op Toevoegen / Kopiëren ingebouwd.",
   "No cut (full band)": "Geen snit (volledige band)",
   "No mic is picked. Pick one in Setup → Devices.": "Er is geen microfoon gekozen. Kies er een in Instellingen → Apparaten.",
   "No programs set yet.": "Er zijn nog geen programma's ingesteld.",
@@ -3389,5 +3388,11 @@
   "Hear {name}": "{name} beluisteren",
   "Hear {name} (only you hear it)": "{name} beluisteren (alleen jij hoort het)",
   "Pick your headphones in Settings → Audio to hear the samples.": "Kies je koptelefoon in Instellingen → Audio om de voorbeelden te horen.",
-  "Ready-made boards, free to use anywhere: in games, streams and videos. Press a sound to hear it first (only you hear it). Add a pack and its sounds land on your board, each category as its own tab.": "Kant-en-klare borden, overal gratis te gebruiken: in games, streams en video's. Klik op een geluid om het eerst te horen (alleen jij hoort het). Voeg er één toe en de geluiden ervan verschijnen op je bord, elke categorie als een eigen tabblad."
+  "Ready-made boards, free to use anywhere: in games, streams and videos. Press a sound to hear it first (only you hear it). Add a pack and its sounds land on your board, each category as its own tab.": "Kant-en-klare borden, overal gratis te gebruiken: in games, streams en video's. Klik op een geluid om het eerst te horen (alleen jij hoort het). Voeg er één toe en de geluiden ervan verschijnen op je bord, elke categorie als een eigen tabblad.",
+  "Hide the report": "Rapport verbergen",
+  "Network activity log": "Netwerkactiviteitlogboek",
+  "No custom modes yet. Fill in the form to make one.": "Nog geen aangepaste modi. Vul het formulier in om er een te maken.",
+  "Show the report": "Rapport tonen",
+  "This run only. It isn't saved.": "Alleen deze sessie. Wordt niet opgeslagen.",
+  "Your own sound modes, for a voice chat the built-in ones don't cover.": "Je eigen geluidsmodi, voor een voicechat die de ingebouwde niet dekken."
 }

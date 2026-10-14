@@ -971,7 +971,6 @@
   "Nine tiles a page, in the same order as your pads. Drag pads in the Sounds tab to rearrange them.": "每頁九格，順序和你的按鈕一樣，在「音效」分頁拖曳按鈕來重新排列。",
   "No audio device is open, pick one in Setup.": "沒有開啟任何音訊裝置，請在「設置」裡選一個。",
   "No cable found yet": "還沒找到音源線",
-  "No custom modes yet. Fill in the form to make one, or click Add / Copy built-in.": "還沒有自訂模式。填寫表單來建立一個，或按「新增」／「複製內建」。",
   "No cut (full band)": "不切（全頻段）",
   "No mic is picked. Pick one in Setup → Devices.": "沒有選擇麥克風。請在 設置 → 裝置 選一個。",
   "No programs set yet.": "還沒有設定任何程式。",
@@ -3313,5 +3312,11 @@
   "Hear {name}": "試聽 {name}",
   "Hear {name} (only you hear it)": "試聽 {name}（只有你聽得到）",
   "Pick your headphones in Settings → Audio to hear the samples.": "在 設定 → 音訊 裡選好耳機，就能試聽了。",
-  "Ready-made boards, free to use anywhere: in games, streams and videos. Press a sound to hear it first (only you hear it). Add a pack and its sounds land on your board, each category as its own tab.": "現成的圖板，可在任何地方免費使用：在遊戲、直播和影片中。點一個聲音先試聽（只有你聽得到）。加上一個，它的聲音就會出現在你的板上，每個類別都有自己的選項卡。"
+  "Ready-made boards, free to use anywhere: in games, streams and videos. Press a sound to hear it first (only you hear it). Add a pack and its sounds land on your board, each category as its own tab.": "現成的圖板，可在任何地方免費使用：在遊戲、直播和影片中。點一個聲音先試聽（只有你聽得到）。加上一個，它的聲音就會出現在你的板上，每個類別都有自己的選項卡。",
+  "Hide the report": "隱藏報告",
+  "Network activity log": "網路活動記錄",
+  "No custom modes yet. Fill in the form to make one.": "還沒有自訂模式。填寫表單來新增一個。",
+  "Show the report": "顯示報告",
+  "This run only. It isn't saved.": "僅限這次執行。不會儲存。",
+  "Your own sound modes, for a voice chat the built-in ones don't cover.": "你自己的聲音模式，用於內建模式不適合的語音聊天。"
 }

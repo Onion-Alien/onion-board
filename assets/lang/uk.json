@@ -1014,7 +1014,6 @@
   "Nine tiles a page, in the same order as your pads. Drag pads in the Sounds tab to rearrange them.": "Дев’ять плиток на сторінці в тому ж порядку, що й ваші панелі: перетягніть панелі на вкладці «Звуки», щоб змінити їх порядок.",
   "No audio device is open, pick one in Setup.": "Жоден аудіопристрій не відкрито: виберіть один у налаштуваннях.",
   "No cable found yet": "Кабель ще не знайдено",
-  "No custom modes yet. Fill in the form to make one, or click Add / Copy built-in.": "Спеціальних режимів ще немає. Заповніть форму, щоб створити його, або натисніть Додати / Копіювати вбудований.",
   "No cut (full band)": "Без розрізу (повна смуга)",
   "No mic is picked. Pick one in Setup → Devices.": "Мікрофон не вибрано. Виберіть один у меню Налаштування → Пристрої.",
   "No programs set yet.": "Програм ще не встановлено.",
@@ -3465,5 +3464,11 @@
   "Hear {name}": "Послухати {name}",
   "Hear {name} (only you hear it)": "Послухати {name} (чуєте лише ви)",
   "Pick your headphones in Settings → Audio to hear the samples.": "Виберіть навушники в Налаштування → Аудіо, щоб послухати зразки.",
-  "Ready-made boards, free to use anywhere: in games, streams and videos. Press a sound to hear it first (only you hear it). Add a pack and its sounds land on your board, each category as its own tab.": "Готові дошки, які можна безкоштовно використовувати будь-де: в іграх, потоках і відео. Натисніть звук, щоб спершу послухати його (чуєте лише ви). Додайте один, і його звуки потраплять на вашу дошку, кожна категорія як окрема вкладка."
+  "Ready-made boards, free to use anywhere: in games, streams and videos. Press a sound to hear it first (only you hear it). Add a pack and its sounds land on your board, each category as its own tab.": "Готові дошки, які можна безкоштовно використовувати будь-де: в іграх, потоках і відео. Натисніть звук, щоб спершу послухати його (чуєте лише ви). Додайте один, і його звуки потраплять на вашу дошку, кожна категорія як окрема вкладка.",
+  "Hide the report": "Сховати звіт",
+  "Network activity log": "Журнал мережевої активності",
+  "No custom modes yet. Fill in the form to make one.": "Власних режимів ще немає. Заповни форму, щоб створити режим.",
+  "Show the report": "Показати звіт",
+  "This run only. It isn't saved.": "Лише цей запуск. Не зберігається.",
+  "Your own sound modes, for a voice chat the built-in ones don't cover.": "Власні звукові режими для голосового чату, якого не покривають вбудовані."
 }

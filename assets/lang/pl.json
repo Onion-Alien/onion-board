@@ -1014,7 +1014,6 @@
   "Nine tiles a page, in the same order as your pads. Drag pads in the Sounds tab to rearrange them.": "Dziewięć kafelków na stronie, w tej samej kolejności, co klocki, przeciągnij podkładki na karcie Dźwięki, aby zmienić ich rozmieszczenie.",
   "No audio device is open, pick one in Setup.": "Żadne urządzenie audio nie jest otwarte, wybierz je w konfiguracji.",
   "No cable found yet": "Nie znaleziono jeszcze kabla",
-  "No custom modes yet. Fill in the form to make one, or click Add / Copy built-in.": "Nie ma jeszcze żadnych trybów niestandardowych. Wypełnij formularz, aby go utworzyć, lub kliknij opcję Dodaj/Kopiuj wbudowany.",
   "No cut (full band)": "Bez cięcia (pełne pasmo)",
   "No mic is picked. Pick one in Setup → Devices.": "Nie wybrano żadnego mikrofonu. Wybierz jedno w Ustawieniach → Urządzenia.",
   "No programs set yet.": "Nie ustawiono jeszcze żadnych programów.",
@@ -3465,5 +3464,11 @@
   "Hear {name}": "Posłuchaj: {name}",
   "Hear {name} (only you hear it)": "Posłuchaj: {name} (słyszysz to tylko ty)",
   "Pick your headphones in Settings → Audio to hear the samples.": "Wybierz słuchawki w Ustawienia → Audio, żeby usłyszeć próbki.",
-  "Ready-made boards, free to use anywhere: in games, streams and videos. Press a sound to hear it first (only you hear it). Add a pack and its sounds land on your board, each category as its own tab.": "Gotowe tablice, z których możesz korzystać bezpłatnie w dowolnym miejscu: w grach, transmisjach strumieniowych i filmach. Kliknij dźwięk, żeby najpierw go posłuchać (słyszysz go tylko ty). Dodaj jeden, a jego dźwięki wylądują na Twojej tablicy, każda kategoria jako osobna zakładka."
+  "Ready-made boards, free to use anywhere: in games, streams and videos. Press a sound to hear it first (only you hear it). Add a pack and its sounds land on your board, each category as its own tab.": "Gotowe tablice, z których możesz korzystać bezpłatnie w dowolnym miejscu: w grach, transmisjach strumieniowych i filmach. Kliknij dźwięk, żeby najpierw go posłuchać (słyszysz go tylko ty). Dodaj jeden, a jego dźwięki wylądują na Twojej tablicy, każda kategoria jako osobna zakładka.",
+  "Hide the report": "Ukryj raport",
+  "Network activity log": "Dziennik aktywności sieciowej",
+  "No custom modes yet. Fill in the form to make one.": "Brak jeszcze własnych trybów. Wypełnij formularz, aby utworzyć jeden.",
+  "Show the report": "Pokaż raport",
+  "This run only. It isn't saved.": "Tylko ten przebieg. Nie jest zapisywany.",
+  "Your own sound modes, for a voice chat the built-in ones don't cover.": "Twoje własne tryby dźwięku, do czatu głosowego, którego nie obejmują wbudowane."
 }
