@@ -22,7 +22,7 @@ from soundboard.ui import icons
 
 Step = tuple[int, str, Callable[[bool], object]]   # (priority, "w" / "h", apply(compact))
 
-MIN_SIZE = QSize(260, 120)   # the mini player (see MainWindow._refit)
+MIN_SIZE = QSize(260, 120)   # the mini player (see FitControl._refit)
 
 
 @contextmanager

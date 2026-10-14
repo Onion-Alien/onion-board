@@ -302,7 +302,7 @@ class BunMode(QWidget):
     # ------------------------------------------------------------------ status
     def tick(self, *, live: bool, paused: bool, level: float, sending: bool, mic: bool,
              downloading: bool, failed: int):
-        """The app's state, from MainWindow.tick (a few times a second or more)."""
+        """The app's state, from TickControl.tick (a few times a second or more)."""
         b = self.bun
         b.set_level(level if live else 0.0)
         b.naps = not (live or downloading)

@@ -120,7 +120,7 @@ def test_built_bar_keeps_its_words_with_triggers_coming_and_going(
                 qapp.processEvents()
             return all(b.text() for b in words)
 
-        assert w._fit.compact_count() and shown()      # no triggers
+        assert w.fitctl._fit.compact_count() and shown()      # no triggers
         panel.btn_new.click()                          # one, blank
         assert len(panel.triggers) == 1 and shown()
         w.tabs.setCurrentIndex(0)

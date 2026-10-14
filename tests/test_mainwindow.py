@@ -131,7 +131,7 @@ def test_mic_check_pulse_runs_only_while_on(window):
 
 def test_tick_runs_without_devices(window):
     for _ in range(31):        # crosses the once-a-second watchdog branch
-        window.tick()
+        window.tickctl.tick()
 
 
 def wheel(widget):
@@ -287,16 +287,16 @@ def test_window_shrinks_and_still_fits(window, size, qapp):
     window.show()                            # offscreen: nothing appears
     window.tabs.setCurrentWidget(window.sounds_page)
     window.resize(*size)
-    window._refit()
-    assert not window.is_mini()
+    window.fitctl._refit()
+    assert not window.fitctl.is_mini()
     need = window._full.minimumSizeHint()
     assert need.width() <= size[0] and need.height() <= size[1]
     assert window.grid.isVisibleTo(window) and window.btn_pp.isVisibleTo(window)
-    small = window._fit.compact_count()
+    small = window.fitctl._fit.compact_count()
     assert small > 0
     window.resize(1800, 1000)                # and it comes back (tests have no real
-    window._refit()                          # fonts, so text is wider than in the app)
-    assert window._fit.compact_count() < small
+    window.fitctl._refit()                          # fonts, so text is wider than in the app)
+    assert window.fitctl._fit.compact_count() < small
     assert window.mixer.isVisibleTo(window) and window.np_name.isVisibleTo(window)
 
 
@@ -310,19 +310,19 @@ def test_long_download_list_folds_before_the_mini_player(window, qapp):
     bar = window.download_bar
     links = [f"https://www.youtube.com/watch?v={c}" for c in "abcd"]
     window.resize(1400, 1000)
-    window._refit()
+    window.fitctl._refit()
     bar.set_active(links[0], "One", "add", None, "Someone", 90)
     bar.set_queue([{"url": u, "title": "x", "kind": "add", "seconds": 60} for u in links[1:]])
     QTest.qWait(50)   # the bar asks for a refit once it's laid out
     assert bar._room == "open" and bar.scroll_area.isVisibleTo(bar)
     window.resize(800, 600)
-    window._refit()
-    assert not window.is_mini() and bar.isVisibleTo(window)
+    window.fitctl._refit()
+    assert not window.fitctl.is_mini() and bar.isVisibleTo(window)
     assert bar._room in ("row", "line")
     need = window._full.minimumSizeHint()
     assert need.height() <= 600
     window.resize(1400, 1000)
-    window._refit()
+    window.fitctl._refit()
     assert bar._room == "open" and bar.scroll_area.isVisibleTo(bar)
     bar._clear_and_hide()
 
@@ -335,25 +335,25 @@ def test_tiny_window_becomes_mini_player_and_back(window, qapp):
     window.tabs.setCurrentWidget(window.sounds_page)
     window.playctl.select("s1")
     window.resize(260, 120)
-    window._refit()
-    assert window.is_mini()
+    window.fitctl._refit()
+    assert window.fitctl.is_mini()
     assert window.mini_pp.isVisibleTo(window) and window.mini_air.isVisibleTo(window)
     assert window.mini_name.text() == "Airhorn"
     assert not window.grid.isVisibleTo(window)    # no room for pads
     window.resize(540, 180)                        # short: one-line rows, not cards
-    window._refit()
-    assert window.is_mini() and window.grid.isVisibleTo(window) and window.grid.slim
+    window.fitctl._refit()
+    assert window.fitctl.is_mini() and window.grid.isVisibleTo(window) and window.grid.slim
     assert window.pads["s0"].height() <= 30
     window.resize(360, 700)                        # tall and narrow: the pads come along
-    window._refit()
-    assert window.is_mini() and window.grid.isVisibleTo(window) and not window.grid.slim
+    window.fitctl._refit()
+    assert window.fitctl.is_mini() and window.grid.isVisibleTo(window) and not window.grid.slim
     window.mini_air.setChecked(False)              # one switch, both buttons
     assert not window.btn_air.isChecked() and window.engine.sending is False
     window.btn_air.setChecked(True)
     assert window.mini_air.isChecked()
     window.resize(1100, 760)
-    window._refit()
-    assert not window.is_mini()
+    window.fitctl._refit()
+    assert not window.fitctl.is_mini()
     assert window._pads_scroll.parentWidget().parentWidget() is window.sounds_page.parentWidget() \
         or window.grid.isVisibleTo(window)
     assert window._pads_home[0].indexOf(window._pads_scroll) == window._pads_home[1]
@@ -364,14 +364,14 @@ def test_refit_leaves_widgets_alone_when_nothing_crosses_an_edge(window, qapp):
     doesn't show and hide half the window on every mouse move (it flashed)."""
     window.show()
     window.resize(950, 700)
-    window._refit()
+    window.fitctl._refit()
     flips = []
-    orig = [s[2] for s in window._fit.steps]
-    window._fit.steps = [(p, a, (lambda c, f=f, i=i: (flips.append((i, c)), f(c))))
-                         for i, ((p, a, _), f) in enumerate(zip(window._fit.steps, orig))]
+    orig = [s[2] for s in window.fitctl._fit.steps]
+    window.fitctl._fit.steps = [(p, a, (lambda c, f=f, i=i: (flips.append((i, c)), f(c))))
+                         for i, ((p, a, _), f) in enumerate(zip(window.fitctl._fit.steps, orig))]
     for w in range(950, 930, -2):                  # small moves, no edge crossed
         window.resize(w, 700)
-        window._refit()
+        window.fitctl._refit()
     # New controls may move an edge into this interval. Each step may tighten once;
     # repeatedly undoing/reapplying it is the flashing this test guards against.
     assert len(flips) == len({i for i, _ in flips})
@@ -386,21 +386,21 @@ def test_maximizing_doesnt_grow_what_the_window_needs(window, qapp):
     window.show()
     window.tabs.setCurrentWidget(window.sounds_page)
     window.resize(1180, 720)
-    window._refit()
+    window.fitctl._refit()
     page = window.tabs.widget([t for t, _ in main.TABS].index("Radio"))
     assert page.isAncestorOf(window.radio)
     small = page.minimumSizeHint().height()
     for _ in range(2):
         window.resize(1920, 1040)                  # maximize...
-        window._refit()
+        window.fitctl._refit()
         qapp.processEvents()
         assert not window.radio.genre_box.isHidden()   # (its tab isn't the one showing)
         assert page.minimumSizeHint().height() < small + 120
         assert window._full.minimumSizeHint().height() <= 720
         window.resize(1180, 720)                   # ...and restore
-        window._refit()
+        window.fitctl._refit()
         qapp.processEvents()
-        assert not window.is_mini() and window.tabs.isVisibleTo(window)
+        assert not window.fitctl.is_mini() and window.tabs.isVisibleTo(window)
 
 
 def test_flow_asks_for_its_lines_at_its_width_not_one_chip_a_line(qapp):
@@ -529,7 +529,7 @@ def test_the_tabs_are_a_rail_down_the_left(window, qapp):
     and the onion (saved); a narrow window shuts it again."""
     window.show()
     window.resize(1200, 760)
-    window._refit()
+    window.fitctl._refit()
     rail = window.rail
     assert window.tabs.tabBar().isHidden()   # the rail shows the tabs, not the bar
     assert rail.is_open() and window.cfg.sidebar_open   # open by default: names, not just icons
@@ -563,22 +563,22 @@ def test_sounds_tab_lights_up_while_a_sound_plays(window, monkeypatch):
     tabs, i = window.tabs, window.tabs.indexOf(window.sounds_page)
     playing = {}
     monkeypatch.setattr(window.engine, "playing", lambda: dict(playing))
-    window.tick()
+    window.tickctl.tick()
     assert not is_tab_live(tabs, i)
     playing["s0"] = (0.3, False)
-    window.tick()
+    window.tickctl.tick()
     assert is_tab_live(tabs, i) and tabs.tabToolTip(i).startswith("● ON")
     playing["s0"] = (0.3, True)                  # paused: not live
-    window.tick()
+    window.tickctl.tick()
     assert not is_tab_live(tabs, i)
     playing.clear()
     playing["__test__"] = (0.1, False)           # the mic test's playback isn't a sound
-    window.tick()
+    window.tickctl.tick()
     assert not is_tab_live(tabs, i) and not tabs.tabToolTip(i).startswith("●")
     from soundboard.ui.linkbar import PLAY_ID   # a web search's Play lights it too
     playing.clear()
     playing[PLAY_ID] = (0.1, False)
-    window.tick()
+    window.tickctl.tick()
     assert is_tab_live(tabs, i)
 
 
@@ -594,14 +594,14 @@ def test_player_bar_follows_to_other_tabs_while_a_sound_plays(window, monkeypatc
     window.tabs.setCurrentWidget(window.setup_page)
     assert bar.isHidden()                            # nothing playing: out of the way
     playing["s0"] = (0.3, False)
-    window._show_transport(window.engine.playing())
+    window.transctl._show_transport(window.engine.playing())
     assert not bar.isHidden()
     playing["s0"] = (0.3, True)                      # paused: still there to resume
-    window._show_transport(window.engine.playing())
+    window.transctl._show_transport(window.engine.playing())
     assert not bar.isHidden()
     playing.clear()
     playing["__test__"] = (0.1, False)               # the mic test's playback isn't a sound
-    window._show_transport(window.engine.playing())
+    window.transctl._show_transport(window.engine.playing())
     assert bar.isHidden()
     window.tabs.setCurrentWidget(window.sounds_page)
     assert not bar.isHidden()
@@ -691,21 +691,21 @@ def test_pads_fit_the_width_with_no_sideways_scrolling(window, qapp):
     window.show()
     window.set_pad_width(240)
     window.resize(1000, 700)
-    window._refit()
+    window.fitctl._refit()
     near_240_to_the_edge(window)
     window.resize(270, 600)
-    window._refit()
+    window.fitctl._refit()
     qapp.processEvents()
     scroll = window._pads_scroll
-    assert window.is_mini() and scroll.isVisibleTo(window)
+    assert window.fitctl.is_mini() and scroll.isVisibleTo(window)
     assert scroll.horizontalScrollBar().maximum() == 0
     assert window.grid.width() <= scroll.viewport().width()
     a, b = window.pads["s0"], window.pads["s1"]
     assert a.geometry().right() <= scroll.viewport().width()
     assert a.y() == b.y() and a.width() < 240          # two a row
     window.resize(1000, 700)
-    window._refit()
-    assert not window.is_mini()
+    window.fitctl._refit()
+    assert not window.fitctl.is_mini()
     near_240_to_the_edge(window)
 
 
@@ -737,8 +737,8 @@ def test_setup_stacks_long_controls_without_sideways_scrolling(window, qapp):
         window.resize(width, 700)
         for _ in range(6):
             qapp.processEvents()
-            window._refit()
-        assert not window.is_mini()
+            window.fitctl._refit()
+        assert not window.fitctl.is_mini()
         assert window.setup_page.horizontalScrollBar().maximum() == 0
         assert window._setup_stacked == (width == 900)
 
@@ -751,12 +751,12 @@ def test_an_empty_board_shrinks_with_the_window(window, qapp):
     window._rebuild_pads()
     window.show()
     window.resize(1400, 800)
-    window._refit()
+    window.fitctl._refit()
     window.resize(265, 520)
-    window._refit()
+    window.fitctl._refit()
     qapp.processEvents()
     scroll = window._pads_scroll
-    assert window.is_mini() and window.grid.empty.isVisibleTo(window)
+    assert window.fitctl.is_mini() and window.grid.empty.isVisibleTo(window)
     assert window.grid.width() <= scroll.viewport().width()
     assert window.grid.empty.geometry().right() <= scroll.viewport().width()
 
@@ -767,30 +767,30 @@ def test_the_whole_window_comes_back_after_the_mini_player(window, qapp):
     window.show()
     window.tabs.setCurrentWidget(window.sounds_page)
     window.resize(1000, 700)
-    window._refit()
+    window.fitctl._refit()
     for size in ((300, 600), (430, 600), (520, 600)):
         window.resize(*size)
-        window._refit()
-    assert not window.is_mini()
+        window.fitctl._refit()
+    assert not window.fitctl.is_mini()
 
 
 @pytest.mark.windows   # Segoe UI's text widths
 def test_every_tab_stays_the_whole_window_down_to_the_mini_size(window, qapp):
     """The icon-only tabs' padding alone needed ~480 px, so a window the rest fits
     (480 px is a 600 px window at 125 %) turned into the mini player."""
-    from soundboard.ui.mainwindow import MINI_SIZE
+    from soundboard.ui.fitcontrol import MINI_SIZE
 
     window.show()
     window.resize(1000, 700)
-    window._refit()
+    window.fitctl._refit()
     for page in (window.sounds_page, window.radio_page, window.apps, window.voice,
                  window.setup_page):
         window.tabs.setCurrentWidget(page)
         window.resize(MINI_SIZE.width() + 10, 700)
-        window._refit()
-        assert not window.is_mini(), type(page).__name__
+        window.fitctl._refit()
+        assert not window.fitctl.is_mini(), type(page).__name__
         window.resize(1000, 700)
-        window._refit()
+        window.fitctl._refit()
 
 
 def test_the_mini_player_shows_the_pads_whatever_is_in_the_search_box(window, qapp):
@@ -802,7 +802,7 @@ def test_the_mini_player_shows_the_pads_whatever_is_in_the_search_box(window, qa
     window.show()
     window.tabs.setCurrentWidget(window.apps)
     window.resize(1000, 700)
-    window._refit()
+    window.fitctl._refit()
     window.search.setText("idiot test")             # matches none of the sounds
     assert not any(p.isVisibleTo(window) for p in window.grid.pads)
     window.tabs.setCurrentWidget(window.sounds_page)
@@ -811,13 +811,13 @@ def test_the_mini_player_shows_the_pads_whatever_is_in_the_search_box(window, qa
     assert window.grid.empty_text.text() == PadGrid.NO_MATCH
     window.tabs.setCurrentWidget(window.apps)
     window.resize(360, 700)
-    window._refit()
-    assert window.is_mini()
+    window.fitctl._refit()
+    assert window.fitctl.is_mini()
     assert all(p.isVisibleTo(window) for p in window.grid.pads)
     assert not window.grid.empty.isVisibleTo(window)
     window.resize(1000, 700)
-    window._refit()
-    assert not window.is_mini()
+    window.fitctl._refit()
+    assert not window.fitctl.is_mini()
     assert window.search.text() == "idiot test"     # still filtering the whole window
     assert not any(p.property("filtered") is False and p.isVisibleTo(window)
                    for p in window.grid.pads)
@@ -848,12 +848,12 @@ def test_restoring_a_large_window_keeps_search_results(window, qapp, theme_name)
             qapp.processEvents()
             # the offscreen screen is 800 x 800: be as big as a real maximized window
             window.resize(1920, 1040)
-            window._refit()
+            window.fitctl._refit()
             qapp.processEvents()
-            assert not window.is_mini()
+            assert not window.fitctl.is_mini()
             window.showNormal()
             qapp.processEvents()
-            assert not window.is_mini()
+            assert not window.fitctl.is_mini()
             assert window.ytresults.isVisibleTo(window)
             assert window.tabs.isVisibleTo(window)
     finally:
@@ -896,9 +896,9 @@ def test_a_whole_row_of_pads_before_the_mixer(window, qapp):
     window.show()
     window.tabs.setCurrentWidget(window.sounds_page)
     window.resize(700, 400)
-    window._refit()
+    window.fitctl._refit()
     qapp.processEvents()
-    if not window.is_mini():
+    if not window.fitctl.is_mini():
         assert window._pads_scroll.height() >= window.pads["s0"].height()
 
 
@@ -909,10 +909,11 @@ def test_the_mini_player_keeps_the_pads_while_one_row_fits(window, qapp):
     window.tabs.setCurrentWidget(window.sounds_page)
     window.set_pad_width(240)
     window.resize(1100, 330)
-    window._refit()
+    window.fitctl._refit()
     size = window._pages.size()
-    assert window.is_mini()
-    assert window._mini_row(size) <= window._mini_pad_room(size) < 2 * window._mini_row(size)
+    assert window.fitctl.is_mini()
+    fit = window.fitctl
+    assert fit._mini_row(size) <= fit._mini_pad_room(size) < 2 * fit._mini_row(size)
     assert window.grid.isVisibleTo(window)
 
 
@@ -1028,15 +1029,15 @@ def test_the_mic_banner_and_a_row_of_playing_sounds_dont_force_the_mini_player(w
     window.show()
     window.tabs.setCurrentWidget(window.sounds_page)
     window.resize(800, 600)
-    window._refit()
-    assert not window.is_mini()
+    window.fitctl._refit()
+    assert not window.fitctl.is_mini()
     window.mic_banner.show()
     ids = list(window.pads)
     window.playctl._queue[:] = ids * 3
     window.playctl._update_chips(set(ids))
-    window._refit()
+    window.fitctl._refit()
     assert window.playing_row.isVisibleTo(window)
-    assert not window.is_mini()
+    assert not window.fitctl.is_mini()
     assert window.mic_banner.width() <= 800 and window.mic_banner.text()
     # every playing sound keeps its chip (to stop it): the row wraps instead
     assert set(window._chips) == set(ids)
@@ -1174,14 +1175,14 @@ def test_audit_normal_navigation_returns_from_mini(window, qapp, size):
     window.show()
     window.resize(360, 320)
     qapp.processEvents()
-    assert window.is_mini()
+    assert window.fitctl.is_mini()
     window.resize(*size)
     for _ in range(3):
         qapp.processEvents()
     for i in range(window.tabs.count()):
         window.tabs.setCurrentIndex(i)
-        window._refit()
-        assert not window.is_mini()
+        window.fitctl._refit()
+        assert not window.fitctl.is_mini()
         assert window.rail.isVisibleTo(window)
 
 
@@ -1199,7 +1200,7 @@ def test_audit_mini_mic_controls_share_the_mixer_state(window, qapp):
     assert window.cfg.mic_enabled and window.mini_mic.isChecked()
     window.mini_connection.click()
     qapp.processEvents()
-    assert not window.is_mini() and window.tabs.currentWidget() is window.setup_page
+    assert not window.fitctl.is_mini() and window.tabs.currentWidget() is window.setup_page
 
 
 def test_audit_expanded_sidebar_labels_status(window, qapp):
@@ -1221,7 +1222,7 @@ def test_audit_setup_cards_fit_the_first_screen_open(window, qapp):
     window.tabs.setCurrentWidget(window.setup_page)
     for _ in range(5):
         qapp.processEvents()
-        window._refit()
+        window.fitctl._refit()
     view = window.setup_page.viewport()
     for card in (*window._setup_top, window.dev_card, window.eq_card):
         top = card.mapTo(view, QPoint()).y()
@@ -1245,8 +1246,8 @@ def test_setup_columns_side_by_side_and_stack_when_narrow(window, qapp):
         window.resize(width, height)
         for _ in range(5):
             qapp.processEvents()
-            window._refit()
-        assert not window.is_mini()
+            window.fitctl._refit()
+        assert not window.fitctl.is_mini()
         assert window.setup_page.horizontalScrollBar().maximum() == 0
         shown = [w for w in (mic, *cards) if not w.isHidden()]
         if not window._setup_stacked:
@@ -1269,7 +1270,7 @@ def test_setup_columns_side_by_side_and_stack_when_narrow(window, qapp):
     window.resize(800, 600)
     for _ in range(5):
         qapp.processEvents()
-        window._refit()
+        window.fitctl._refit()
     assert window._setup_stacked
 
 
@@ -1395,7 +1396,7 @@ def test_medium_footer_uses_the_width_without_empty_control_gaps(window, qapp):
         window.resize(*size)
         for _ in range(5):
             qapp.processEvents()
-    assert not window.is_mini()
+    assert not window.fitctl.is_mini()
     assert window.mixer.height() < 100
     assert window.btn_check.isVisibleTo(window)
     last = window._deck_tabs[2]   # the headphones' icon, after what others hear
@@ -1425,7 +1426,7 @@ def test_narrow_levels_strip_shows_one_group_and_icons_for_the_others(window, qa
     for width in (900, 640):   # (narrower is the mini player with the tests' wider font)
         window.resize(width, 800)
         qapp.processEvents()
-        assert not window.is_mini() and window.mixer.isVisibleTo(window)
+        assert not window.fitctl.is_mini() and window.mixer.isVisibleTo(window)
         assert window._mixer_one
         assert [d.isVisibleTo(window) for d in decks] == [False, True, False]
         assert [t.isVisibleTo(window) for t in window._deck_tabs] == [True, False, True]
@@ -1460,7 +1461,7 @@ def test_others_hear_it_keeps_its_words_in_the_tightest_levels_strip(window, qap
         qapp.processEvents()
         window._focus_deck(0)
         qapp.processEvents()
-        if window.is_mini() or not window.chk_mic.isVisibleTo(window):
+        if window.fitctl.is_mini() or not window.chk_mic.isVisibleTo(window):
             continue
         assert window.chk_mic.text() == "Others hear it"
         br = window.chk_mic.mapTo(window.mixer, window.chk_mic.rect().bottomRight())
@@ -1517,8 +1518,8 @@ def test_a_link_pasted_in_offline_mode_says_why_nothing_happens(window, monkeypa
     monkeypatch.setattr(window, "toast", lambda text, *a, **k: said.append(text))
     window.show()                            # offscreen: nothing appears
     window.resize(800, 600)
-    window._refit()
-    assert not window.is_mini()
+    window.fitctl._refit()
+    assert not window.fitctl.is_mini()
     net.configure_features(offline=True)
     try:
         window.search.setText("https://www.youtube.com/watch?v=abc")
@@ -1535,7 +1536,7 @@ def test_resize_transactions_finish_before_painting(window, qapp, monkeypatch, p
     window.show()
     window.tabs.setCurrentWidget(getattr(window, page))
     qapp.processEvents()
-    original = window._fit.fit
+    original = window.fitctl._fit.fit
     calls = []
 
     def fit(size):
@@ -1545,12 +1546,12 @@ def test_resize_transactions_finish_before_painting(window, qapp, monkeypatch, p
         calls.append(size)
         return result
 
-    monkeypatch.setattr(window._fit, "fit", fit)
+    monkeypatch.setattr(window.fitctl._fit, "fit", fit)
     for width, height in ((440, 600), (360, 220), (800, 600), (450, 390),
                           (1180, 720), (800, 320), (1700, 1000)):
         window.resize(width, height)
         qapp.processEvents()
         assert window.updatesEnabled()
     assert calls
-    assert not window.is_mini()
+    assert not window.fitctl.is_mini()
     assert window.tabs.currentWidget() is getattr(window, page)

@@ -47,7 +47,7 @@ def test_playback_updates_fill_with_signals_blocked(qapp):
 def test_transport_playback_updates_both_players(window):  # noqa: F811
     window.current = "s0"
     for frac in (0, 0.4, 0.7, 0):
-        window._update_transport({"s0": (frac, False)})
+        window.transctl._update_transport({"s0": (frac, False)})
         for slider in (window.seek, window.mini_seek):
             assert slider.value() == int(frac * 1000)
             assert slider.property("atstart") is (frac == 0)

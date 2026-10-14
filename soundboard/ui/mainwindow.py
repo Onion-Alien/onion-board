@@ -17,18 +17,17 @@ from PySide6.QtCore import (QEvent, QObject, QPoint, QSignalBlocker,
                             QSize, Qt, QTimer, Signal)
 from PySide6.QtGui import (QIcon,
                            QKeySequence, QShortcut)
-from PySide6.QtWidgets import (QApplication, QBoxLayout, QCheckBox, QComboBox, QDialog, QFrame,
+from PySide6.QtWidgets import (QApplication, QCheckBox, QComboBox, QDialog, QFrame,
                                QGraphicsOpacityEffect, QGridLayout, QHBoxLayout, QInputDialog,
                                QLabel, QLineEdit, QMainWindow, QMenu, QMessageBox, QProgressBar,
                                QPushButton, QScrollArea, QSizePolicy, QSlider, QStackedWidget,
-                               QSystemTrayIcon, QVBoxLayout, QWidgetItem,
-                               QWidget)
+                               QSystemTrayIcon, QVBoxLayout, QWidget)
 
-from soundboard import bunny, theme, winkeys, ytworker
+from soundboard import bunny, theme, ytworker
 from soundboard.engine import SR, Engine
 from soundboard import exitwatch
 from soundboard import (appaudio, autostart, backup, destination, library, remote, otherboards,
-                        reset, thumbs, trash, videos, voicesdk)
+                        reset, thumbs, trash, voicesdk)
 from soundboard import (ffmpegget, net, netlog,
                         profiles, quality, shellicon, thumbbar, tips, tor,
                         usage, watchaddon)
@@ -41,6 +40,11 @@ from soundboard.ui.iconrow import CapIcon
 from soundboard.ui import worker
 from soundboard.ui.dropveil import DropVeil
 from soundboard.ui.ffmpegcontrol import FfmpegControl
+from soundboard.ui.fitcontrol import FitControl
+from soundboard.ui.fitcontrol import BODY_SIDE, SEARCH_MIN_W
+from soundboard.ui.transportcontrol import TransportControl
+from soundboard.ui.tickcontrol import TickControl
+from soundboard.ui.tickcontrol import TICK_MS
 from soundboard.ui.searchcontrol import SearchControl
 from soundboard.ui.playbackcontrol import PlaybackControl
 from soundboard.ui.playbackcontrol import CHIPS_GAP
@@ -76,7 +80,6 @@ from soundboard.ui.panel import (BAR_H, CONTROL_H, EqPanel, Flow, VolumeControl,
 from soundboard.ui.downloadbar import DownloadBar
 from soundboard.ui.linkbar import PLAY_ID as LINK_ID
 from soundboard.ui.linkbar import LinkBar
-from soundboard.ui.livedot import set_tab_live
 from soundboard.ui.livedot import set_tint as set_live_tint
 from soundboard.ui.logowidget import LogoWidget, glow_icon
 from soundboard.ui import sidebar
@@ -93,8 +96,7 @@ from soundboard.ui.radiopanel import RadioOff, RadioTab
 from soundboard.ui.voicepanel import VoicePanel
 from soundboard.ui.playbutton import PlayButton
 from soundboard.ui.widgets import (DropdownMenu, Meter, NameAndSeek, Pad, PadGrid, SeekSlider,
-                                   SteadyTabs, WindowRoot, expand_dropped, fmt_pos, loudness,
-                                   pad_height, spectrum, take_out, SLIM_PAD_H)
+                                   SteadyTabs, WindowRoot, expand_dropped)
 from soundboard.wheelguard import AppStyle, no_wheel
 from soundboard.winkeys import Hotkeys
 from soundboard import errors
@@ -113,27 +115,18 @@ def version_text() -> str:
 
 
 TOAST_EXPAND = QSize(900, 640)   # a shrunk card clicked: the window grows to this
-TICK_MS = 33         # the UI timer while the window is on screen (meters, visualisers)
-TICK_IDLE_MS = 250   # ...and while it's in the tray or minimised (push-to-talk, watchdog)
-TICK_QUIET_MS = 100  # on screen with nothing moving: no sound, radio, recording or level
-LEVEL_QUIET = 0.003  # a level below this (-50 dB) shows as nothing on the meters
 PULSE_MS = 1200      # the mic-check banner's throb: bright, dimmer, bright again
 PULSE_LOW = 0.55     # ...down to this opacity
 PULSE_FRAME_MS = 60  # ...a step this often (~16 a second still reads as a smooth pulse)
 DEFAULT_POLL_MS = 1500   # how often Windows' default output is checked
 DISCORD_POLL_MS = 10000  # how often Discord's voice settings are looked at (discordcfg)
 RAW_POLL_MS = 2000       # how often the apps recording the mic are counted (rawmic)
-BODY_SIDE = 14         # the gap around the window's content (beside the tab rail too)...
-BODY_SIDE_TIGHT = 8    # ...and beside the rail in a narrow window
-MINI_SIZE = QSize(440, 380)   # below this the window becomes the mini player...
-MINI_PAD_ROWS = 1             # ...which has the pads above it when this many rows fit
 SEARCH_WAIT_MS = 100     # typing in the search box filters the pads once it pauses this long
 LINK_WAIT_MS = 400       # a link in the search box is looked up once it stays this long
 PAD_SIZE_WAIT_MS = 50    # dragging Pad size re-lays the pads at most this often
 TLS_WARM_MS = 2500     # Qt's TLS is set up this long after the start (_warm_tls)
 TIP_DELAY_MS = 8000    # the first tip waits this long after the start
 FF_CHECK_MS = 1500     # the FFmpeg check's answer is taken this long after the start
-SEARCH_MIN_W = 220    # the Sounds tab's search box, until the window gets narrow
 # ...and its most: a few words go in it, so past this it's only a longer empty bar
 # (456 px at 1180x720, so normal windows are unchanged). The seek bar, the levels and
 # the drop box still follow the window: wider is useful there.
@@ -311,6 +304,9 @@ class MainWindow(QMainWindow):
 
     def __init__(self):
         super().__init__()
+        self.fitctl = FitControl(self)
+        self.transctl = TransportControl(self)
+        self.tickctl = TickControl(self)
         self.searchctl = SearchControl(self)
         self.playctl = PlaybackControl(self)
         self.appsetctl = AppSetupControl(self)
@@ -418,13 +414,7 @@ class MainWindow(QMainWindow):
         self._ptt_held: str | None = None   # PTT key we're currently holding
         self.current: str | None = None   # sound shown in the transport bar
         self.start_frac = 0.0             # where ▶ starts if it isn't playing
-        self._tick_n = 0                  # ticks since start (the watchdog runs ~once a second)
         self._ui_live = True              # the window is on screen (see _set_tick_rate)
-        self._tick_busy = True            # something moves with the tick (see _busy)
-        self._pads_lit: set[str] = set()  # pads showing a sound (see _tick_visuals)
-        self._sounds_live = False         # the Sounds tab's live dot is shown
-        self._talk_until = 0.0            # "hearing you" indicator holds until this time
-        self._talk_shown: bool | None = None
         self._load_thread: threading.Thread | None = None
         self._loading: set[str] = set()   # sids a load thread is decoding right now
         self.engine.latency = self.cfg.latency if self.cfg.latency in ("low", "high") else "low"
@@ -467,11 +457,11 @@ class MainWindow(QMainWindow):
         a11y.label_tree(self, force=True)   # names for the icon-only buttons
 
         self.timer = QTimer(self)
-        self.timer.timeout.connect(self.tick)
+        self.timer.timeout.connect(self.tickctl.tick)
         self.timer.start(TICK_MS)
         app = QApplication.instance()
         assert isinstance(app, QApplication)   # made before the window
-        app.applicationStateChanged.connect(self._set_tick_rate)
+        app.applicationStateChanged.connect(self.tickctl._set_tick_rate)
         app.applicationStateChanged.connect(self.micctl._app_state)
         # Space plays / pauses on the Sounds and Radio tabs, wherever the focus is
         self._space = SpaceKey(self, self.playctl._space_action)
@@ -505,7 +495,7 @@ class MainWindow(QMainWindow):
         self.device_step.connect(lambda step: step())
         if sys.platform == "win32":
             self._default_timer.start(DEFAULT_POLL_MS)
-        self._init_fit()
+        self.fitctl._init_fit()
         self.resize(1180, 720)
         if self.cfg.always_on_top:
             self.setWindowFlag(Qt.WindowType.WindowStaysOnTopHint, True)
@@ -812,9 +802,9 @@ class MainWindow(QMainWindow):
         self.download_bar = DownloadBar(self)
         self._dl_lay.addWidget(self.download_bar)
         tv.addWidget(dl_box)
-        self.download_bar.shown_changed.connect(self._dl_bar_gap)
-        self.download_bar.shown_changed.connect(lambda _on: self._refit_dl_bar())
-        self.download_bar.room_changed.connect(self._refit_dl_bar)
+        self.download_bar.shown_changed.connect(self.fitctl._dl_bar_gap)
+        self.download_bar.shown_changed.connect(lambda _on: self.fitctl._refit_dl_bar())
+        self.download_bar.room_changed.connect(self.fitctl._refit_dl_bar)
 
         # ---- tabs
         self.tab_info: dict[str, tuple[str, str]] = {}   # page attr -> (title, text) for ⓘ
@@ -878,7 +868,7 @@ class MainWindow(QMainWindow):
         self.rail = sidebar.SideRail(
             self.tabs, self.logo, self.wordmark, self.tagline,
             [self.btn_more_tabs], self.cfg.sidebar_open, [self.gear, self.btn_about],
-            self._rail_opened,
+            self.fitctl._rail_opened,
             # Live and Stop all never move; the pills (what needs attention) sit above
             # them and only show when needed (at the rail's foot, as icons)
             [self.btn_air, self.stop_btn],
@@ -959,7 +949,7 @@ class MainWindow(QMainWindow):
         self.tabs.setCurrentIndex(tab if self.tabs.isTabVisible(tab) else 0)
         self.tabctl._focus_open_tab()
         self.tabs.currentChanged.connect(lambda i: self.set_option("tab", i))
-        self.tabs.currentChanged.connect(lambda _i: self._fit_dl_bar())
+        self.tabs.currentChanged.connect(lambda _i: self.fitctl._fit_dl_bar())
         self.tabs.currentChanged.connect(self.tabctl._count_tab)   # names only (usage.py)
         self.tabctl._count_tab(self.tabs.currentIndex())
         self.tabs.currentChanged.connect(lambda _i: self.statusctl._update_status())
@@ -979,10 +969,10 @@ class MainWindow(QMainWindow):
 
         # the Sounds tab's player; right under the page, where it sat inside it
         rv.addWidget(self.transport)
-        self.tabs.currentChanged.connect(lambda _i: self._show_transport())
-        self._show_transport()
+        self.tabs.currentChanged.connect(lambda _i: self.transctl._show_transport())
+        self.transctl._show_transport()
         self._fit_tab = self.tabs.currentWidget()
-        self.tabs.currentChanged.connect(self._fit_setup_tab)
+        self.tabs.currentChanged.connect(self.fitctl._fit_setup_tab)
 
         # ---- mixer strip: the things that apply whatever tab you're on
         rv.addWidget(self._build_mixer())
@@ -1143,7 +1133,7 @@ class MainWindow(QMainWindow):
     def _mini_setup(self):
         self.resize(max(800, self.width()), max(600, self.height()))
         self.tabs.setCurrentWidget(self.setup_page)
-        self._refit()
+        self.fitctl._refit()
 
     def _sync_mini_mic(self):
         if not hasattr(self, "mini_mic"):
@@ -1290,84 +1280,13 @@ class MainWindow(QMainWindow):
             box.changed.connect(lambda v, key=key: self.set_option(key, v))
         return f
 
-    def _fit_mixer(self, tight: bool):
-        """The levels strip's responsive step. Only when the strip itself is too wide
-        (not for whatever else is): one group whole, the other two as icons; still too
-        wide, the % boxes go (the sliders still say it). "Others hear it" keeps its
-        words: an empty box beside a mic icon said nothing, and it's the switch a warning
-        sends you to."""
-        stages = (lambda: self._mixer_one_at_a_time(True),
-                  lambda: (self.vol_mic.spin.hide(), self.vol_mon.spin.hide()))
-        self._mixer_one_at_a_time(False)
-        self.vol_mic.spin.show()
-        self.vol_mon.spin.show()
-        self._touch_mixer()
-        self._mixer_tight = tight
-        if not tight:
-            return
-        side = self._body_lay.contentsMargins()
-        room = self._pages.width() - self.rail.minimumWidth() - side.left() - side.right()
-        for stage in stages:
-            if self.mixer.minimumSizeHint().width() <= room:
-                break
-            stage()
-            self._touch_mixer()
-
-    def _touch_mixer(self):
-        responsive.touch(*self._deck_tabs, self.chk_mic, self.vol_mic.spin,
-                         self.vol_mon.spin, self.out_meter)
-
-    def _mixer_one_at_a_time(self, on: bool):
-        """Too narrow for the three groups: show one whole, the others as icons."""
-        self._mixer_one = on
-        for i, (deck, tab, title) in enumerate(zip(
-                (g[-1] for g in self._decks), self._deck_tabs, self._deck_titles)):
-            whole = not on or i == self._mixer_focus
-            deck.setVisible(whole)
-            tab.setVisible(not whole)
-            title.setVisible(not on)   # the icon beside it (and its tooltip) says which
-            # the shown group takes the room (what others hear, with all three)
-            self._mixer_layout.setStretchFactor(deck, int(i == (self._mixer_focus if on else 1)))
-
     def _focus_deck(self, i: int):
         """An icon in the narrow levels strip clicked: its group is the one shown."""
         self._mixer_focus = i
         if self._deck_tabs[i].hasFocus():   # it just hid: keep the keyboard in the strip
             self._deck_tabs[i - 1 if i else 1].setFocus()
-        self._fit.reset()   # the groups aren't the same width: fit again
-        self._refit()
-
-    def _fit_dl_bar(self):
-        """A page whose cards stop short of the edges (Setup: room for its scroll bar,
-        and centred past the width cap on a wide window) names that column `dl_column`:
-        the download bar then takes the cards' own left and right edges."""
-        col = getattr(self.tabs.currentWidget(), "dl_column", None)
-        left = right = 0
-        if col is not None and col.isVisible():
-            x = col.mapTo(self._tabs_box, QPoint(0, 0)).x()
-            left, right = max(0, x), max(0, self._tabs_box.width() - x - col.width())
-        m = self._dl_lay.contentsMargins()
-        if (m.left(), m.right()) != (left, right):
-            self._dl_lay.setContentsMargins(left, 0, right, 0)
-
-    def _refit_dl_bar(self):
-        """The download bar came, went or needs another height (rows added, opened):
-        fit the window again for it, once the change is laid out."""
-        if getattr(self, "_dl_refit_due", False) or not hasattr(self, "_dl_steps"):
-            return
-        self._dl_refit_due = True
-
-        def run():
-            self._dl_refit_due = False
-            self._fit.retry(self._dl_steps)   # open again if it fits now
-            self._refit()
-        QTimer.singleShot(0, self, run)   # with the window: not after it's gone
-
-    def _dl_bar_gap(self, shown: bool):
-        """Under the download bar: its own 8 px (so a page's scroll bar doesn't touch it)
-        and none from the Sounds page, whose first row then sits 8 px down like the rest."""
-        self._tabs_lay.setSpacing(8 if shown else 0)
-        self._sounds_lay.setContentsMargins(0, 0 if shown else 8, 0, 0)
+        self.fitctl._fit.reset()   # the groups aren't the same width: fit again
+        self.fitctl._refit()
 
     def _build_sounds_page(self) -> QWidget:
         c = self.cfg
@@ -1592,15 +1511,15 @@ class MainWindow(QMainWindow):
         scroll = QScrollArea()
         scroll.setWidgetResizable(True)
         scroll.setWidget(self.grid)
-        scroll.verticalScrollBar().valueChanged.connect(self._scroll_background_board)
+        scroll.verticalScrollBar().valueChanged.connect(self.transctl._scroll_background_board)
         self._pad_scroll = scroll
         scroll.setFrameShape(QFrame.Shape.NoFrame)
         # the pads fit the width
         scroll.setHorizontalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
         left.addWidget(scroll, 1)
-        scroll.verticalScrollBar().rangeChanged.connect(lambda *_r: self._fit_toolbar())
-        self.grid.laid_out.connect(self._fit_toolbar)
-        self._fit_toolbar()
+        scroll.verticalScrollBar().rangeChanged.connect(lambda *_r: self.fitctl._fit_toolbar())
+        self.grid.laid_out.connect(self.fitctl._fit_toolbar)
+        self.fitctl._fit_toolbar()
         self._pads_home = (left, left.indexOf(scroll))   # the mini player borrows it
         self.ytresults.closed.connect(scroll.show)   # the results take the pads' place
         self.ytresults.closed.connect(self.catctl._cat_row.show)   # ...and the categories' row
@@ -1693,13 +1612,13 @@ class MainWindow(QMainWindow):
         self.btn_video.setToolTip(_("Watch this sound's video while it plays. The sound still "
                                     "goes out as normal; the video is only for you."))
         icons.set_icon(self.btn_video, "video", size=16)
-        self.btn_video.clicked.connect(self.show_video)
+        self.btn_video.clicked.connect(self.transctl.show_video)
         self.btn_video.hide()
         self._video_for: tuple[str | None, Path | None] = ("", None)   # (sid, its video)
         self._video_asking: str | None = None   # the sound whose video a thread looks up
-        self.video_found.connect(self._video_found)
+        self.video_found.connect(self.transctl._video_found)
         self.board_read.connect(self.impctl._board_read)
-        self._video_win = None   # ui/videowindow.VideoWindow, made on first use
+        self._video_win: Any = None   # ui/videowindow.VideoWindow, made on first use
         th.addWidget(self.btn_video)
         self.speed_btn = SpeedPitchButton(
             "sounds", _("Changes every sound while it plays. To save a version, "
@@ -1732,12 +1651,12 @@ class MainWindow(QMainWindow):
         devices, the recorded test, EQ, levelling."""
         c = self.cfg
         page = WidthScroll(lambda: self._pages.width() - SHUT_W - 2 * BODY_SIDE,
-                           lambda: self._setup_one_col())
+                           lambda: self.fitctl._setup_one_col())
         page.setWidgetResizable(True)
         page.setFrameShape(QFrame.Shape.NoFrame)
         body = QWidget()
         page.dl_column = body   # the download bar lines up with these cards
-        _Moved(body, self._fit_dl_bar)
+        _Moved(body, self.fitctl._fit_dl_bar)
         inner = capped(body, margins=(0, 12, 12, 12))   # not a 900 px wide card at full screen; the
         # cards' left edge lines up with the download bar and the other tabs
         sections = QVBoxLayout(body)
@@ -2104,8 +2023,8 @@ class MainWindow(QMainWindow):
         self._setup_pairs = (self._setup_top, (devcard, eqcard))
         self._setup_wide = ((howcard, devcard, helpcard), (destcard, eqcard))
         self._setup_narrow = (howcard, destcard, devcard, helpcard, eqcard)
-        self._setup_stacked = None
-        self._stack_setup(False)
+        self._setup_stacked: bool | None = None
+        self.fitctl._stack_setup(False)
         self.on_eq(*self.eq.state())   # push the saved EQ into the engine
         destination.apply(self.cfg, self.engine)   # ...and the destination mode (Who's listening)
         from soundboard.ui.destpanel import apply_send
@@ -2119,51 +2038,6 @@ class MainWindow(QMainWindow):
         icons.set_icon(guide, "check")
         guide.clicked.connect(lambda: (usage.used("setup-guide-opened"), self.run_setup()))
         return guide
-
-    def _stack_setup(self, compact: bool):
-        """Setup's cards in two columns, or in one column in setup order."""
-        if compact == self._setup_stacked:
-            return
-        self._setup_stacked = compact
-        grid = self._setup_cols
-        for col in self._setup_lr:
-            while col.count():
-                take_out(col)   # the cards stay on the page, only their places change
-        paired = [w for pair in self._setup_pairs for w in pair]
-        for w in paired:
-            grid.removeWidget(w)
-        if not compact:
-            for r, pair in enumerate(self._setup_pairs):
-                for c, w in enumerate(pair):
-                    grid.addWidget(w, r, c)
-        grid.setColumnStretch(1, 0 if compact else 1)   # (stacked: column 1 is empty)
-        grid.setColumnStretch(0, 1)
-        lcol, rcol = self._setup_lr
-        for w in self._setup_narrow if compact else ():
-            lcol.addWidget(w)
-        if not compact:   # the rest under the pairs, in their own column
-            for col, cards in zip(self._setup_lr, self._setup_wide):
-                for w in cards:
-                    if w not in paired:
-                        col.addWidget(w)
-        for col in self._setup_lr:
-            col.addStretch(1)
-
-    def _setup_one_col(self) -> int:
-        """The width Setup needs in one column: its widest card, and the page's margins."""
-        widest = max(QWidgetItem(w).minimumSize().width() for w in self._setup_narrow)
-        inner = self.setup_page.widget()
-        lay = inner.layout() if inner is not None else None
-        if lay is None:   # (built in _build_setup_page: always there)
-            return widest
-        m = lay.contentsMargins()
-        return widest + m.left() + m.right()
-
-    def _setup_need(self) -> int:
-        """The width Setup's two columns need side by side, measured the same way
-        whether they're stacked or not (stacked, the right column is empty)."""
-        return sum(max(QWidgetItem(w).minimumSize().width() for w in cards)
-                   for cards in self._setup_wide) + self._setup_cols.spacing()
 
     def on_eq(self, gains, enabled, target, preset):
         c = self.cfg
@@ -2200,7 +2074,7 @@ class MainWindow(QMainWindow):
         window and dialogs use."""
         setattr(self.cfg, attr, v)
         if attr in ("playing_background", "playing_background_opacity"):
-            self._update_playing_background(self.engine.playing())
+            self.transctl._update_playing_background(self.engine.playing())
         if hasattr(self.engine, attr):
             setattr(self.engine, attr, v)
         self._save_later()
@@ -2239,7 +2113,7 @@ class MainWindow(QMainWindow):
         """How the corner cards show (ui/toast.py): as cards in the window; as icons on
         top of the mini player's pads; not at all in the mini player with no pads (a
         remote: errors wait for the window to grow)."""
-        if not self.is_mini():
+        if not self.fitctl.is_mini():
             return "cards"
         return "icons" if self._pads_scroll.isVisible() else "hidden"
 
@@ -2318,33 +2192,6 @@ class MainWindow(QMainWindow):
         v.active_changed.connect(lambda on, k=key: self.tabctl._tab_live(k, on))
         return v
 
-    def _squeeze_rail(self, tight: bool):
-        """A narrow window: the rail shut (opened out, it shuts again) and the gap
-        beside it narrower, so the pages keep their room before the mini player."""
-        self.rail.squeeze(tight)
-        side = (BODY_SIDE_TIGHT if tight else BODY_SIDE, BODY_SIDE)
-        if self.isRightToLeft():   # mirrored (Arabic): the rail is on the right
-            side = side[::-1]
-        self._body_lay.setContentsMargins(side[0], self._body_top(), side[1], 10)
-        if getattr(self, "_mixer_tight", False):   # its room changed: measure it again
-            self._fit_mixer(True)
-
-    def _fit_setup_tab(self, _i: int):
-        """Into or out of Setup: its width counts only while it shows (WidthScroll),
-        so what gives way is worked out again."""
-        was, self._fit_tab = self._fit_tab, self.tabs.currentWidget()
-        if hasattr(self, "_fit") and self.setup_page in (was, self._fit_tab):
-            self._fit.reset()
-            self._refit()
-
-    def _rail_opened(self, on: bool):
-        """The rail opened out or shut: save it, and fit the window to its new width
-        (shut, what had given way for it comes back)."""
-        self.set_option("sidebar_open", on)
-        if hasattr(self, "_fit"):
-            self._fit.reset()
-            self._refit()
-
     def _follow_switches(self):
         """Settings > Privacy & security changed: the parts of the window that go
         online follow their switches."""
@@ -2352,8 +2199,8 @@ class MainWindow(QMainWindow):
         self.statusctl._update_flow()   # the cable's install button (_cable_follow_switch)
         self._search_follow_switch()
         self._offline_follow()
-        if hasattr(self, "_fit"):   # buttons came or went: what fits is measured again
-            self._refit()
+        if hasattr(self.fitctl, "_fit"):   # buttons came or went: what fits is measured again
+            self.fitctl._refit()
 
     def _offline_follow(self):
         """Offline mode: Offline in the On Air card, and the tabs that only work online
@@ -2397,15 +2244,15 @@ class MainWindow(QMainWindow):
             return
         old, playing = self.radio, self.radio.is_active()
         old.shutdown()
-        if hasattr(self, "_fit"):   # undone while the old tab's widgets still exist
-            self._fit.remove(self._radio_steps)
+        if hasattr(self.fitctl, "_fit"):   # undone while the old tab's widgets still exist
+            self.fitctl._fit.remove(self._radio_steps)
         self.radio = self._make_radio()
         self.radio_page.removeWidget(old)
         old.deleteLater()
-        if hasattr(self, "_fit"):
+        if hasattr(self.fitctl, "_fit"):
             self._radio_steps = self.radio.fit_steps()
-            self._fit.extend(self._radio_steps)
-            self._refit()
+            self.fitctl._fit.extend(self._radio_steps)
+            self.fitctl._refit()
         self.tabctl._radio_live(False)
         if playing:
             self.toast(html.escape(_("Radio was switched off, so the station stopped.")))
@@ -2557,15 +2404,6 @@ class MainWindow(QMainWindow):
 
     # ------------------------------------------------------------------ language
     # ------------------------------------------------------------------ tips
-    def _body_top(self) -> int:
-        """The body's top margin: none under Settings, whose heading rises level with
-        the rail's name and keeps its pages where a tab's start (SettingsDialog)."""
-        return 0 if self.setctl.settings_open() else 10
-
-    def _fit_body_top(self):
-        m = self._body_lay.contentsMargins()
-        self._body_lay.setContentsMargins(m.left(), self._body_top(), m.right(), m.bottom())
-
     # Settings pages showing state from outside the config (downloads, add-ons, Tor,
     # updates, the remote's add-ons): a kept Settings with one of them built is rebuilt
     SETTINGS_LIVE_PAGES = ("data", "connection", "help", "updates", "remote", "about")
@@ -2711,23 +2549,6 @@ class MainWindow(QMainWindow):
         self.grid.set_pads(ordered, layout=False)   # laid out once, by the filter next
         self.searchctl.apply_filter(self.search.text())
         self.statusctl._update_status()
-
-    def _fit_toolbar(self):
-        """The toolbar spans the pads: in by the grid's margin on both sides, and by the
-        scroll bar too while it shows (and the odd pixels a row can't split). The
-        category tabs start on the same line as the toolbar and the first card."""
-        m = self.grid.grid.contentsMargins()
-        sb = self._pad_scroll.verticalScrollBar()
-        right = (m.right() + self.grid.slack()
-                 + (sb.sizeHint().width() if sb.maximum() > 0 else 0))
-        hold = self._toolbar_hold.layout()
-        row = self.catctl._cat_row.layout()
-        if hold is None or row is None:
-            return
-        hold.setContentsMargins(m.left(), 0, right, 0)
-        row.setContentsMargins(m.left(), 0, 0, 0)
-        if sub := self.catctl._sub_row.layout():
-            sub.setContentsMargins(m.left(), 6, right, 0)
 
     # ------------------------------------------------------------------ search, rename
     def rename_sound(self, sid: str, new: str | None = None):
@@ -3105,7 +2926,7 @@ class MainWindow(QMainWindow):
             # (again here: start-up can still switch the tab after __init__, to Setup)
             self._start_focus_set = True
             self.tabctl._focus_open_tab()
-        self._set_tick_rate()
+        self.tickctl._set_tick_rate()
         note, self._pending_note = getattr(self, "_pending_note", None), None
         if note:   # held back while the window was in the tray (see __init__)
             QTimer.singleShot(400, lambda: self._tell_load_note(note))
@@ -3125,405 +2946,14 @@ class MainWindow(QMainWindow):
 
     def hideEvent(self, ev):
         super().hideEvent(ev)
-        self._set_tick_rate()
+        self.tickctl._set_tick_rate()
 
     def changeEvent(self, ev):
         super().changeEvent(ev)
         if ev.type() == QEvent.Type.WindowStateChange:
-            self._set_tick_rate()
-
-    def _tick_pace(self) -> int:
-        if not self._ui_live and not self.overlay.is_open and not self.bunctl.bun_up():
-            return TICK_IDLE_MS
-        if not self._tick_busy:   # nothing moves: 10 ticks a second instead of 30
-            return TICK_QUIET_MS
-        # Visible and busy: meters stay smooth even when a game has focus.
-        return TICK_MS
-
-    def _wake(self):
-        """A sound started or resumed: full pace now, not after a quiet tick (auto
-        push-to-talk presses its key from the tick)."""
-        if not self._tick_busy:
-            self._tick_busy = True
-            pace = self._tick_pace()
-            if self.timer.interval() != pace and not self._shut_down:
-                self.timer.start(pace)
-
-    def _busy(self, playing) -> bool:
-        """Something on screen moves with the tick: a sound playing (not paused), the
-        radio, a meter or the mic level still showing."""
-        e = self.engine
-        return (any(not paused for _p, paused in playing.values())
-                or self.radio.is_active() or bool(e.aux)
-                or max(e.level_play, e.level_main,
-                       e.level_mic if e.mic_stream is not None else 0.0) > LEVEL_QUIET)
-
-    def _set_tick_rate(self, *__):
-        live = self.isVisible() and not self.isMinimized()
-        was, self._ui_live = self._ui_live, live
-        # the mic-check banner pulses only while it can be seen, in front
-        self._pulse.set_live(live and appstate.active())
-        pace = self._tick_pace()
-        if (live == was and self.timer.interval() == pace) or getattr(self, "_shut_down", False):
-            return
-        self.timer.start(pace)
-        if not live:   # a level frozen mid-flight would show as stuck on the next show
-            self.out_meter.set_level(0.0)
-            self.mic_meter.set_level(0.0)
-            if not self.isVisible():   # to the tray: the pads' pictures are made again
-                thumbs.trim()          # from their small files when it's back
-
-    def tick(self):
-        if self._shut_down:   # a tick already queued when the window shut down
-            return
-        e = self.engine
-        now = time.monotonic()
-        self._tick_n += 1
-        if self._tick_n % max(1, 1000 // self.timer.interval()) == 0:   # about once a second
-            if self.cfg.route == "mic":
-                self.micctl._follow_mic_effect()
-            if e.check_streams() or sum(e.xruns.values()) != self.statusctl._xruns_shown:
-                self.statusctl._update_status()
-            elif self.cfg.route == "mic" and self.micctl._direct_health() != self._direct_shown:
-                self.statusctl._update_flow()
-            self.voice.poll()
-        playing = e.playing()
-        if self.playctl._queue and LINK_ID not in playing and not any(sid in self._meta
-                                                              for sid in playing):
-            self.playctl._next_in_queue()   # it waits for a web search's song too
-            playing = e.playing()
-        if (LINK_ID not in playing and self.linkbar.up_next()
-                and not self.playctl._board_song_playing(playing) and self.linkbar.play_next()):
-            playing = e.playing()   # the web search song ended: the next one waiting
-        live = any((sid in self._meta or sid == LINK_ID) and not paused   # a web search's
-                   for sid, (_p, paused) in playing.items())                # Play too
-        if live != self._sounds_live:   # the Sounds tab glows while a sound plays
-            self._sounds_live = live
-            set_tab_live(self.tabs, self.tabs.indexOf(self.sounds_page), live,
-                         _("● ON: a sound is playing"), "sounds")
-        # the taskbar preview's Pause button turns into Play while all of it is paused
-        # (a station Pause stopped counts as paused, until anything plays again)
-        if live or self.radio.is_active():
-            self._radio_paused = None
-        self.thumbbar.set_paused(not live and not self.radio.is_active() and (
-            self._radio_paused is not None or any(
-                paused for sid, (_p, paused) in playing.items()
-                if sid in self._meta or sid == LINK_ID)))
-        self._tick_busy = self._busy(playing)
-        pace = self._tick_pace()
-        if self.timer.interval() != pace:
-            self.timer.start(pace)
-        if self._ui_live:
-            self._tick_visuals(playing, now)
-        self.overlay.tick(playing)
-        if self.bunctl.bun_mode is not None and self.bunctl.bun_mode.isVisible():
-            bar = self.download_bar
-            self.bunctl.bun_mode.tick(
-                live=live, level=e.level_play, sending=e.sending, mic=self.cfg.mic_enabled,
-                paused=any(paused for sid, (_p, paused) in playing.items()
-                           if sid in self._meta or sid == LINK_ID),
-                downloading=bar.running(), failed=bar.failed_count())
-        e.level_play *= 0.9
-        e.level_main *= 0.9
-        e.level_mic *= 0.9
-
-        # auto push-to-talk: hold the game's PTT key only while a sound (or live
-        # radio / a program) goes out. _ptt_held remembers exactly which key we pressed, so it's
-        # always released even if the setting changes mid-sound.
-        on_air = e.sending and (e.any_playing() or e.radio_on_air()
-                                or e.aux_on_air())
-        want = self.cfg.ptt_key if (self.cfg.ptt_key and on_air) else None
-        if want != self._ptt_held:
-            if not self.hkctl._release_ptt():
-                return   # still held: try the key-up again next tick
-            if want and winkeys.press(want):
-                self._ptt_held = want
-
-    def _heard_level(self) -> float:
-        """The "What others hear" meter. Sending into the mic but not in it yet (no mic
-        effect): voice apps still take the real mic as it is, so others hear your voice
-        even with nothing sent; the meter showed nothing while you talked."""
-        e = self.engine
-        if self.cfg.route == "mic" and not e.main_direct and e.mic_stream is not None:
-            return max(e.level_main, e.level_mic)
-        return e.level_main
-
-    def _tick_visuals(self, playing, now: float):
-        """The part of tick() that only matters while the window is on screen."""
-        e = self.engine
-        self._update_playing_background(playing)
-        on_board = self.tabs.currentWidget() is self.sounds_page   # no visualiser off-screen
-        shown = self.isVisible()
-        # only the pads playing now and the ones still showing a sound (cleared on the
-        # tick after it stops): going over all of them, 30 times a second, cost more
-        # than the rest of the tick on a big board with nothing playing
-        pads, lit = self.pads, set()
-        for sid in self._pads_lit.union(playing):
-            p = pads.get(sid)
-            if p is None:   # not a pad (a preview, the test recording) or gone
-                continue
-            prog, paused = playing.get(sid, (None, False))
-            if prog is not None and not paused and on_board and not p.isHidden():
-                # scrolled out of view: skip the FFT (the next tick after it scrolls
-                # back in catches up)
-                if not (shown and p.visibleRegion().isEmpty()):
-                    data = self.audio.get(sid)
-                    p.set_levels(spectrum(data, prog, p.n_bands))
-                    p.set_meter(loudness(data, prog, self.gain_for(p.meta)))
-            elif prog is None and p.bands is not None:
-                p.set_levels(None)
-                p.set_meter(None)
-            if prog != p.progress or paused != p.paused:
-                p.progress, p.paused = prog, paused
-                p.update()
-            if p.progress is not None or p.bands is not None:
-                lit.add(sid)
-        self._pads_lit = lit
-        self._update_transport(playing)
-        self._show_transport(playing)
-        if not self.ytresults.isHidden():   # the result in the player says so
-            prog, paused = playing.get(LINK_ID, (None, False))
-            self.ytresults.show_now(self.searchctl._link_url, "" if prog is None else
-                                    "paused" if paused else "playing")
-        self.playctl._update_chips(playing)
-        self.out_meter.set_level(self._heard_level())
-        self.logo.set_level(e.level_play)   # anything playing, not your voice
-        self.mic_meter.set_level(e.level_mic if e.mic_stream else 0.0)
-        if self.card_meter.isVisible():
-            self.card_meter.set_level(e.level_mic if e.mic_stream else 0.0)
-        talking = e.mic_stream is not None and e.level_mic > 0.05
-        if talking:
-            self._talk_until = now + 0.8
-        talking = now < self._talk_until
-        if talking != self._talk_shown:
-            self._talk_shown = talking
-            self.statusctl._update_flow(talking)
-
-    def _show_transport(self, playing=None):
-        """The player bar: always on the Sounds tab; on the others only while a sound
-        plays or is paused, so it can be stopped without going back to the pads (and
-        doesn't take the room the rest of the time)."""
-        if self.tabs.currentWidget() is self.sounds_page and not self.setctl.settings_open():
-            want = True
-        else:
-            if playing is None:
-                playing = self.engine.playing()
-            want = any(sid in self._meta or sid == LINK_ID for sid in playing)
-        if self.transport.isHidden() == want:
-            self.transport.setVisible(want)
-
-    def _scroll_background_board(self, value):
-        if not self.grid.background_image:
-            return
-        step = getattr(self, "_background_row_step", 0)
-        bar = self._pad_scroll.verticalScrollBar()
-        if step:
-            snapped = min(round(value / step), bar.maximum() // step) * step
-            if snapped != value:
-                bar.setValue(snapped)
-        self.grid.update()
-
-    def _update_playing_background(self, playing):
-        on = self.cfg.playing_background
-        fitted_height, step = 0, 0
-        if on and self.grid.pads and self.grid._shape is not None:
-            margins = self.grid.grid.contentsMargins()
-            height = self.grid.natural_pad_h(self.grid._shape[1])
-            spacing = self.grid.grid.spacing()
-            step = height + spacing
-            room = self._pad_scroll.height() - margins.top() - margins.bottom()
-            if room >= height:
-                rows = max(1, (room + spacing) // step)
-                fitted_height = (room - spacing * (rows - 1)) // rows
-                step = fitted_height + spacing
-        if fitted_height != self.grid.background_pad_height:
-            self.grid.background_pad_height = fitted_height
-            self.grid.relayout(force=True)
-        self._background_row_step = step
-        gap = (on, step)
-        if getattr(self, "_background_gap", None) != gap:
-            self._background_gap = gap
-            bar = self._pad_scroll.verticalScrollBar()
-            if not hasattr(self, "_background_scroll_step"):
-                self._background_scroll_step = bar.singleStep()
-            # The gap belongs outside the viewport, so the backdrop contains
-            # every card rather than cutting inside their edges.
-            rtl = self.layoutDirection() == Qt.LayoutDirection.RightToLeft
-            self._pad_scroll.setViewportMargins(12 if on and rtl else 0, 0,
-                                               12 if on and not rtl else 0, 0)
-            bar.setSingleStep(step or self._background_scroll_step)
-        image = ""
-        if on:
-            # The first active sound owns the backdrop, including while paused.
-            # Waiting sounds and a merely selected pad never claim it.
-            sid = next((sid for sid in playing if sid in self._meta), None)
-            m = self.meta(sid) if sid else None
-            image = m.image if m else ""
-        self.grid.set_background(image, self.cfg.playing_background_opacity)
-        if image and step and self._pad_scroll.verticalScrollBar().value() % step:
-            self._scroll_background_board(self._pad_scroll.verticalScrollBar().value())
-
-    def _update_transport(self, playing):
-        sid = self.current
-        m = self.meta(sid) if sid else None
-        self._update_video(sid, m, playing)
-        enabled = m is not None
-        for w in (self.btn_pp, self.btn_st, self.seek, self.mini_pp, self.mini_st,
-                  self.mini_seek):
-            w.setEnabled(enabled)
-        if not m:
-            return
-        prog, paused = playing.get(sid, (None, False))
-        live = prog is not None
-        self.playctl._set_pp_icon("pause" if live and not paused else "play")
-        if not self.playctl._seeking:
-            frac = prog if live else self.start_frac
-            for slider in (self.seek, self.mini_seek):
-                slider.blockSignals(True)
-                slider.setValue(int(frac * 1000))
-                slider.blockSignals(False)
-            self._set_np_time(fmt_pos(frac * m.duration, m.duration))
-
-    def _video_of(self, sid: str | None) -> Path | None:
-        """The current sound's video, looked up once per selection, on a thread (it
-        reads videos.json and checks the video is there, maybe on a sleeping drive):
-        None until it's known."""
-        if self._video_for[0] != sid:
-            self._video_for = (sid, None)
-            if sid:
-                self._ask_video(sid)
-        return self._video_for[1]
-
-    def _ask_video(self, sid: str):
-        if self._video_asking is not None:   # one at a time: its answer asks for the next
-            return
-        self._video_asking = sid
-
-        def look():
-            try:
-                return sid, videos.get(sid)
-            except Exception:  # noqa: BLE001 - never leave _video_asking stuck
-                log.debug("video lookup failed", exc_info=True)   # (a sleeping drive)
-                return sid, None
-        worker.run(look, self.video_found, "video-lookup", error=(sid, None))
-
-    def _video_found(self, sid: str, path):
-        self._video_asking = None
-        now = self._video_for[0]
-        if now != sid:             # another sound was picked meanwhile
-            if now:
-                self._ask_video(now)
-            return
-        self._video_for = (sid, path)
-        if self.btn_video.isHidden() == (path is not None):
-            self.btn_video.setVisible(path is not None)
-
-    def _update_video(self, sid, m, playing):
-        path = self._video_of(sid) if m else None
-        if self.btn_video.isHidden() == (path is not None):
-            self.btn_video.setVisible(path is not None)
-        w = self._video_win
-        if w is None or not w.isVisible():
-            return
-        if path is not None and w.sid != sid:   # a newly picked video pad takes it over
-            w.show_for(sid, m.name, path)
-        shown = self.meta(w.sid)
-        data = self.audio.get(w.sid)
-        if shown is None or data is None:
-            w.follow(None, 0.0)
-            return
-        w.follow(playing.get(w.sid), len(data) / SR, self.engine.sound_speed)
-
-    def show_video(self):
-        """The player's Video button: open the current sound's video (and play the
-        sound if it isn't playing)."""
-        sid = self.current
-        m = self.meta(sid) if sid else None
-        path = videos.get(sid) if m and sid else None
-        self._video_for = (sid, path)
-        if path is None or sid is None or m is None:   # (a path: there's a sound)
-            self.btn_video.hide()
-            self.toast(_("This sound's video isn't there any more"), "warn")
-            return
-        if self._video_win is None:
-            try:   # imported here: a build missing QtMultimediaWidgets must still start
-                from soundboard.ui.videowindow import VideoWindow
-            except ImportError:
-                log.exception("can't show videos")
-                self.btn_video.hide()
-                self.toast(_("Videos can't be shown in this copy of Onion Board"), "warn")
-                return
-            self._video_win = VideoWindow(self)
-            self._video_win.setWindowIcon(self.windowIcon())
-        self._video_win.show_for(sid, m.name, path)
-        if self.engine.state(sid) is None:
-            self.playctl.toggle_play_pause()
+            self.tickctl._set_tick_rate()
 
     # ------------------------------------------------------------------ small windows
-    def _init_fit(self):
-        """What gives way when the window gets small (see ui/responsive.py). Lower
-        numbers go first; width and height are handled separately."""
-        r = responsive
-        f = self._fit = r.Fitter(self._full)
-        self._results_open = False      # web results are taking the pads' place
-        self._cat_bar_compact = False   # the fitter's last say on the category bar
-        # last: opened out, the rail stays open until nothing else can give (it shut
-        # again at once when opened in a mid-sized window)
-        f.add(90, "w", self._squeeze_rail)
-        f.add(10, "w", self.padctl._fit_size_picker)
-        f.add(18, "w", r.icon_only(self.btn_view))   # its tooltip says what it is
-        # the label and the dropdown go together: a lone "Clean" said nothing (the full
-        # picker is on the Setup tab)
-        # the ear button shrinks to its icon first: the level bar is the live part
-        f.add(12, "w", r.icon_only(self.btn_check))
-        f.add(14, "w", self._show_np_time)   # also hidden while it's blank
-        f.add(45, "w", r.hide(self.speed_btn))
-        f.add(30, "w", r.hide(self.chk_monitor))
-        # the levels strip never drops a group: one is shown whole and the other two
-        # become icons that bring theirs up (_fit_mixer)
-        f.add(52, "w", self._fit_mixer)
-        f.add(40, "w", r.hide(*self._transport_vol))
-        f.add(50, "w", r.hide(self.np_name))
-        f.add(60, "w", r.icon_only(self.btn_add))
-        # the search box keeps room to type in until the buttons beside it have shrunk
-        f.add(62, "w", lambda tight: (self.search.setMinimumWidth(0 if tight else SEARCH_MIN_W),
-                                      r.touch(self.search)))
-        # very narrow: the search button (and its site menu) goes; Enter still searches
-        # the site picked last
-        f.add(63, "w", lambda tight: (
-            self.btn_yt.setVisible(not tight and self.ytresults.available()),
-            r.touch(self.btn_yt)))
-        f.add(64, "w", r.icon_only(self.btn_more))
-        self._radio_steps = self.radio.fit_steps()   # swapped with the tab (Privacy)
-        f.extend(self._radio_steps)
-        self._tab_steps = {k: getattr(self, k).fit_steps() for k in ("voice", "triggers")}
-        for steps in self._tab_steps.values():
-            f.extend(steps)
-        # height: the whole mixer strip
-        f.add(5, "h", self.rail.compact)   # the rail's buttons closer together, first
-        f.add(40, "h", lambda tight: r.hide(self.mixer)(
-            tight and (self.height() < 520 or self.width() < 760)))
-        f.add(50, "h", self._cat_bar_step)   # the overlay's category key still works
-        # the download list folds to its running row, then to its summary line, before
-        # the mixer goes (a long queue at 800x600 isn't a reason for the mini player)
-        self._dl_steps = self.download_bar.fit_steps()
-        f.extend(self._dl_steps)
-        self._stack_cols = (self._stack_setup,
-                            *self.voice.stack_steps())
-        self.setMinimumSize(responsive.MIN_SIZE)
-
-    def _cat_bar_step(self, compact: bool):
-        """The fitter's say on the category bar: it hides it when the window is short."""
-        self._cat_bar_compact = compact
-        self._sync_cat_bar()
-
-    def _sync_cat_bar(self):
-        """The category bar is hidden when the window is short (the fitter) or when web
-        results take the pads' place: leaving its empty row in the layout kept a gap
-        between the toolbar and the results' buttons."""
-        self.cat_bar.setVisible(not self._cat_bar_compact and not self._results_open)
-        responsive.touch(self.cat_bar)
-
     def _show_pill(self):
         """The setup pill: only while something needs fixing."""
         self.pill.setVisible(not self._pill_good)
@@ -3531,128 +2961,12 @@ class MainWindow(QMainWindow):
         if hasattr(self, "rail"):
             self.rail.refresh_output()
 
-    def _refit(self):
-        if getattr(self, "_refitting", False):
-            return
-        self._refitting = True
-        try:
-            with responsive.hold_updates(self):
-                self._refit_layout()
-        finally:
-            self._refitting = False
-
-    def _refit_layout(self):
-        size = self._pages.size()
-        mini = size.width() < MINI_SIZE.width() or size.height() < MINI_SIZE.height()
-        if not mini:
-            # measured with the whole window in place: while the mini player shows, the
-            # hidden page's sizes go stale and it stayed the mini player at sizes the
-            # whole window fits (nothing is painted before this returns)
-            self._set_mini(False)
-            self.rail.compact(self.rail._compact)
-            self._mixer_layout.setDirection(QBoxLayout.Direction.LeftToRight)
-            self._mixer_layout.setSpacing(14)
-            for group in self._decks[1:]:
-                group[0].setMaximumHeight(16777215)
-            responsive.touch(self._pads_scroll)
-            # room for a whole row of pads comes before the mixer, the status line and
-            # the rest: without it they kept their room and the pads got a slit
-            self._pads_scroll.setMinimumHeight(self.grid.row_height())
-            narrow = self.width() < 860   # two cards side by side get cramped below this
-            # Translated controls can need more room than the fixed breakpoint.
-            # Measure both Setup columns even while they are stacked, so growing
-            # the window brings them back only when neither will be clipped.
-            body = self.setup_page.widget()
-            lay = body.layout() if body is not None else None
-            holder = self._setup_cols.parentWidget()
-            assert lay is not None and holder is not None   # built in _build_setup_page
-            margins = lay.contentsMargins()
-            room = self.setup_page.viewport().width() - margins.left() - margins.right()
-            available = min(room, holder.maximumWidth())
-            self._stack_cols[0](narrow or self._setup_need() > available)
-            for apply in self._stack_cols[1:]:
-                apply(narrow)
-            need = self._fit.fit(size)   # even the smallest layout won't fit
-            if need.width() > size.width() or need.height() > size.height():
-                # A restored mixer needs one width pass before considering a wrap.
-                need = self._fit.fit(size)
-            if (self.width() >= 760 and need.width() > size.width()
-                    and self.mixer.minimumSizeHint().width() + self.rail.width() > size.width()):
-                # Wrap only when the visible groups need it, e.g. with larger fonts.
-                self._mixer_layout.setDirection(QBoxLayout.Direction.TopToBottom)
-                self._mixer_layout.setSpacing(4)
-                for group in self._decks[1:]:
-                    group[0].setMaximumHeight(0)
-                self.mixer.setMinimumSize(0, 0)
-                self._mixer_layout.activate()
-                responsive.touch(self.mixer)
-                need = self._fit.fit(size)
-            mini = need.width() > size.width() or need.height() > size.height()
-            if mini and not self.is_mini():
-                log.info("mini player at %dx%d: the window needs %dx%d (tab %s)",
-                         size.width(), size.height(), need.width(), need.height(),
-                         type(self.tabs.currentWidget()).__name__)
-        opening = getattr(self.setctl, "_opening_settings", False)
-        if mini and self.setctl.settings_open() and not opening:
-            # made too small for Settings: they close (as Done does), the mini player shows
-            self.setctl.close_settings()
-            # close_settings requests a refit, which the outer transaction guards.
-            # Finish it here with Settings removed, before painting resumes.
-            self._refit_layout()
-            return
-        self._set_mini(mini)
-        if mini:   # the pads too: cards with room for a couple of rows of them, else
-            # one-line rows, so they can still be seen and played however small it gets
-            room = self._mini_pad_room(size)
-            self.grid.set_slim(room < MINI_PAD_ROWS * self._mini_row(size))
-            m = self.grid.grid.contentsMargins()
-            show = room >= SLIM_PAD_H + m.top() + m.bottom()
-            if self._pads_scroll.isHidden() == show:
-                self._pads_scroll.setVisible(show)
-                toastmod.relayout(self)   # icons on the pads, or none without them
-
-    def _mini_pad_room(self, size: QSize) -> int:
-        """The height above the mini player's card."""
-        m = self._mini_v.contentsMargins()
-        return (size.height() - m.top() - m.bottom() - self._mini_v.spacing()
-                - self._mini_card.sizeHint().height())
-
-    def _mini_row(self, size: QSize) -> int:
-        """How tall a row of pads is in the mini player at this size."""
-        m, g = self._mini_v.contentsMargins(), self.grid.grid.contentsMargins()
-        bar = self._pads_scroll.verticalScrollBar().sizeHint().width()
-        room = size.width() - m.left() - m.right() - g.left() - g.right() - bar
-        return pad_height(self.grid.fit_width(room, slim=False)[1]) + 10
-
-    def is_mini(self) -> bool:
-        return self._pages.currentIndex() == 1
-
-    def _set_mini(self, on: bool):
-        """Swap the whole window for the mini player (or back). The pads move with it."""
-        if on == self.is_mini():
-            return
-        scroll = self._pads_scroll
-        with responsive.hold_updates(self):
-            self.grid.set_two_up(on)
-            if not on:
-                self.grid.set_slim(False)
-            if on:
-                scroll.setMinimumHeight(0)
-                self._mini_v.insertWidget(0, scroll, 1)
-            else:
-                home, index = self._pads_home
-                home.insertWidget(index, scroll, 1)
-                scroll.setVisible(self.ytresults.isHidden())   # results take the pads' place
-            self._pages.setCurrentIndex(1 if on else 0)
-            self.searchctl.apply_filter(self.search.text())
-        toastmod.relayout(self)   # cards in the window, icons in the mini player
-
     def resizeEvent(self, ev):
         super().resizeEvent(ev)
-        if hasattr(self, "_fit"):
+        if hasattr(self.fitctl, "_fit"):
             # right away, before the frame is painted: a queued refit let each frame
             # paint twice, before and after, which made parts of the window flash
-            self._refit()
+            self.fitctl._refit()
 
     # Files dropped anywhere else on the window (the toolbar, another tab, the edge of
     # the pad area) are added just like ones dropped on the pads.

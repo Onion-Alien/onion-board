@@ -638,7 +638,7 @@ def test_link_play_once_shows_in_the_transport_bar(qapp, window, monkeypatch,  #
     assert process_events(qapp, lambda: window.current == "__link__", 5)
     assert window.np_name.text() == "A Tone"
     assert window.meta("__link__").duration == 1.0
-    window._update_transport({"__link__": (0.5, False)})
+    window.transctl._update_transport({"__link__": (0.5, False)})
     assert window.btn_pp.isEnabled() and window.seek.value() == 500
     paused = []
     monkeypatch.setattr(window.engine, "state", lambda sid: (0.5, False))

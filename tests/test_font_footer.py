@@ -57,7 +57,7 @@ def test_footer_icon_capitals_stay_level(window, name):  # noqa: F811
     window.themectl.apply_theme(name)
     for _ in range(8):
         QApplication.processEvents()
-        window._refit()
+        window.fitctl._refit()
     marks = [w for w in window.mixer.findChildren(QLabel) if not w.pixmap().isNull()]
     assert len(marks) == 3
     for mark in marks:

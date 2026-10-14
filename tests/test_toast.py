@@ -375,7 +375,7 @@ def test_the_mini_player_shows_icons_on_top_or_none(main_window, qapp):  # noqa:
     w.show()
     w.resize(300, 260)
     qapp.processEvents()
-    assert w.is_mini() and w._pads_scroll.isVisible()
+    assert w.fitctl.is_mini() and w._pads_scroll.isVisible()
     ok = busy.toast(w, "Saved a clip", "ok")
     err = busy.toast(w, "That station isn't working", "error")
     s = toast._stack_for(w)
@@ -391,7 +391,7 @@ def test_the_mini_player_shows_icons_on_top_or_none(main_window, qapp):  # noqa:
     qapp.processEvents()
     [d for d in s.dots if d.isVisible()][0].click()          # the window grows
     qapp.processEvents()
-    assert not w.is_mini() and s.mode == "cards"
+    assert not w.fitctl.is_mini() and s.mode == "cards"
     assert err.isVisible() and toast.shown(w) == [ok, err]   # nothing was closed
 
 

@@ -266,14 +266,14 @@ def test_image_dropped_on_a_pad_becomes_its_picture(qapp, window, tmp_path):  # 
 def test_playing_pad_gets_visualizer_levels(qapp, window, monkeypatch):  # noqa: F811
     assert process_events(qapp, lambda: "s0" in window.audio, 5)
     monkeypatch.setattr(window.engine, "playing", lambda: {"s0": (0.2, False)})
-    window.tick()
+    window.tickctl.tick()
     pad = window.pads["s0"]
     assert pad.bands is None and pad.progress == 0.2   # another tab showing: no spectrum
     window.tabs.setCurrentWidget(window.sounds_page)
-    window.tick()
+    window.tickctl.tick()
     assert pad.bands is not None and pad.bands.max() > 0.3 and pad.progress == 0.2
     monkeypatch.setattr(window.engine, "playing", lambda: {})
-    window.tick()
+    window.tickctl.tick()
     assert pad.bands is None and pad.progress is None
 
 

@@ -125,7 +125,7 @@ class CategoryControl(Controller):
             return
         cat = cfg.category
         if getattr(mw, "_toolbar_hold", None) is not None:
-            mw._fit_toolbar()   # its margins, before the first resize does
+            mw.fitctl._fit_toolbar()   # its margins, before the first resize does
 
         def chip(text: str, tip: str):
             b = QPushButton(text.replace("&", "&&"))

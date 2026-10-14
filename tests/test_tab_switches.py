@@ -72,7 +72,7 @@ def test_stand_ins_answer_the_window(window):
     w.hkctl._set_voice(True)            # the voice hotkey: nothing to switch on
     assert not w.voice.fx.btn_power.isChecked()
     w.resize(500, 400)
-    w._refit()
+    w.fitctl._refit()
     assert remote.dispatch(w, "voice", {"on": "1"}) == (409, remote.VOICE_OFF)
     assert remote.dispatch(w, "radio", {}) == (409, remote.RADIO_OFF)
 
@@ -394,8 +394,8 @@ def test_off_on_cycles_leave_nothing_behind(window, qapp, fake_watch):
         alive = sum(ref() is not None for ref in net._listeners
                     if id(ref) not in old_listener_ids)
         objs = [o for o in gc.get_objects() if id(o) not in already_ids]
-        return {"net listeners": alive, "fit steps": len(w._fit.steps),
-                "stack": len(w._stack_cols), "tabs": w.tabs.count(),
+        return {"net listeners": alive, "fit steps": len(w.fitctl._fit.steps),
+                "stack": len(w.fitctl._stack_cols), "tabs": w.tabs.count(),
                 "radio pages": w.radio_page.count(),
                 "watch panels": sum(type(x).__name__ == "Panel"
                                     for x in QApplication.allWidgets()),
@@ -449,7 +449,7 @@ def test_off_from_the_start_then_on_and_off_again(qapp, app_dir, monkeypatch, fa
     try:
         w._load_thread.join(15)
         w.load_triggers()
-        steps = len(w._fit.steps)
+        steps = len(w.fitctl._fit.steps)
         for _ in range(2):
             for key, cls in REAL.items():
                 w.tabctl.set_tab_on(key, True)
@@ -461,9 +461,9 @@ def test_off_from_the_start_then_on_and_off_again(qapp, app_dir, monkeypatch, fa
             for key in REAL:
                 w.tabctl.set_tab_on(key, False)
             assert w.engine.voice_chain is None
-            assert len(w._fit.steps) == steps
+            assert len(w.fitctl._fit.steps) == steps
         w.resize(500, 400)
-        w._refit()
+        w.fitctl._refit()
     finally:
         w.close()
         w._load_thread.join(15)

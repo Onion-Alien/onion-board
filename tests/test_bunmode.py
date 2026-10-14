@@ -4,7 +4,7 @@ from PySide6.QtCore import QEvent, QPoint, QPointF, Qt
 from PySide6.QtGui import QMouseEvent, QWheelEvent
 
 from soundboard.ui import bunmode
-from soundboard.ui.mainwindow import MINI_SIZE
+from soundboard.ui.fitcontrol import MINI_SIZE
 from test_mainwindow import window as main_window  # noqa: F401  (the real MainWindow)
 
 
@@ -16,8 +16,8 @@ def window(main_window):  # noqa: F811
 def _mini(window):
     window.show()
     window.resize(300, 200)
-    window._refit()
-    assert window.is_mini() and window.mini_bun.isVisibleTo(window)
+    window.fitctl._refit()
+    assert window.fitctl.is_mini() and window.mini_bun.isVisibleTo(window)
 
 
 def _click(w, pos: QPoint, button=Qt.MouseButton.LeftButton):
@@ -46,7 +46,7 @@ def test_mini_player_turns_into_bun_and_a_click_brings_it_back(window, qapp):
     assert bun.isVisible() and not window.isVisible()
     bun.enterEvent(None)
     bun.b_back.click()                      # the button switches back
-    assert not bun.isVisible() and window.isVisible() and window.is_mini()
+    assert not bun.isVisible() and window.isVisible() and window.fitctl.is_mini()
     assert not window.cfg.bun["on"]
 
 
@@ -63,7 +63,7 @@ def test_bun_resizes_freely_and_only_the_menu_opens_the_full_board(window, qapp)
     _wheel(bun, 5)
     assert bun.isVisible() and not window.isVisible()       # never a trapdoor
     bun.full.emit()                                         # right-click: full board
-    assert not bun.isVisible() and window.isVisible() and not window.is_mini()
+    assert not bun.isVisible() and window.isVisible() and not window.fitctl.is_mini()
     assert window.width() >= MINI_SIZE.width() and window.cfg.bun["size"] == bun.max_h()
 
 
@@ -161,8 +161,8 @@ def test_dragging_his_corner_only_resizes_him(window, qapp):
 def test_a_tabs_right_click_menu_turns_the_full_board_into_bun_and_back(window, qapp):
     window.show()
     window.resize(1180, 720)
-    window._refit()
-    assert not window.is_mini()
+    window.fitctl._refit()
+    assert not window.fitctl.is_mini()
     menu = window.tabctl.tab_menu(0)
     act = next(a for a in menu.actions() if a.text() == "Turn into Bun")
     act.trigger()
@@ -170,7 +170,7 @@ def test_a_tabs_right_click_menu_turns_the_full_board_into_bun_and_back(window, 
     assert bun.isVisible() and not window.isVisible()
     bun.enterEvent(None)
     bun.b_back.click()
-    assert window.isVisible() and not window.is_mini() and window.width() == 1180
+    assert window.isVisible() and not window.fitctl.is_mini() and window.width() == 1180
 
 
 def test_his_resize_corner_shrinks_with_him(window, qapp):
@@ -193,7 +193,7 @@ def test_back_returns_the_window_as_it_was_even_after_a_restart(window, qapp):
     assert window.cfg.bun["from"][:4] == [was.x(), was.y(), was.width(), was.height()]
     window.resize(1180, 720)   # what a fresh start has, the window never shown
     window.bunctl.bun_mode.back.emit()
-    assert window.isVisible() and window.is_mini() and window.geometry() == was
+    assert window.isVisible() and window.fitctl.is_mini() and window.geometry() == was
     window.bunctl.enter_bun_mode()
     window.bunctl.bun_mode.full.emit()   # the right-click menu: the full board
-    assert not window.is_mini() and window.width() > was.width()
+    assert not window.fitctl.is_mini() and window.width() > was.width()
