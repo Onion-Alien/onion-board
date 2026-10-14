@@ -760,6 +760,44 @@ def test_feed_looks_again_just_in_time(ring_file):
         s.close()
 
 
+def test_stream_renders_whole_blocks_ahead_while_the_effect_reads(ring_file):
+    """The effect runs but sends no clean mic (it reads on its own clock): the ring stays
+    a block ahead, rendered a whole block (10 ms) at a time, about 100 engine calls a
+    second. In small steps every 2 ms it was 400, four times the CPU, and the window
+    froze waiting for the audio thread."""
+    calls, ahead = [], []
+    s = dm.DirectMicStream(lambda out, frames, t, status: (calls.append(frames),
+                                                           out.fill(0))[1], ring_file)
+    w = dm.RingWriter(ring_file)
+    stop = threading.Event()
+
+    def effect():   # alive, reading LEAD_S (20 ms) behind the board
+        t0, start = time.perf_counter(), w.write_pos - int(dm.LEAD_S * dm.RATE)
+        while not stop.is_set():
+            slot = w.slots[0]
+            slot["owner"], slot["tick"] = 2, dm._tick()
+            slot["read_pos"] = start + int((time.perf_counter() - t0) * dm.RATE)
+            ahead.append(w.write_pos - int(slot["read_pos"]))
+            time.sleep(0.01)
+    t = threading.Thread(target=effect, daemon=True)
+    try:
+        s.start()
+        time.sleep(0.1)
+        t.start()
+        time.sleep(0.2)
+        calls.clear()
+        ahead.clear()
+        time.sleep(1.0)
+    finally:
+        stop.set()
+        t.join()
+        w.close()
+        s.close()
+    assert set(calls) == {dm.BLOCK}, set(calls)
+    assert 50 <= len(calls) <= 150, len(calls)
+    assert min(ahead) >= 0, min(ahead)   # never behind the effect
+
+
 def test_two_blocks_at_once_still_wait_for_only_one(ring_file):
     """After a hiccup two blocks of mic can come at once: the thread still looks again a
     block later, not two (that would make the board late with the next one)."""
