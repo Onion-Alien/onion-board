@@ -39,23 +39,20 @@
     '<button class="next" aria-label="Next picture">›</button>';
   document.body.appendChild(dlg);
   var stage = dlg.querySelector(".stage"), big = dlg.querySelector("img"),
-      cap = dlg.querySelector(".cap"), at = 0;
-  if (pics.length < 2) {
-    dlg.querySelector(".prev").hidden = dlg.querySelector(".next").hidden = true;
-  }
+      cap = dlg.querySelector(".cap"), at = 0, group = pics;
 
   function caption(img) {
     var fig = img.closest("figure"), fc = fig && fig.querySelector("figcaption");
     return fc ? fc.textContent : img.alt;
   }
   function show(i) {
-    at = (i + pics.length) % pics.length;
-    var img = pics[at];
+    at = (i + group.length) % group.length;
+    var img = group[at];
     big.classList.remove("full");
     stage.classList.remove("scroll");
     big.src = img.currentSrc || img.src;
     big.alt = img.alt;
-    cap.textContent = caption(img) + (pics.length > 1 ? "  ·  " + (at + 1) + " / " + pics.length : "");
+    cap.textContent = caption(img) + (group.length > 1 ? "  ·  " + (at + 1) + " / " + group.length : "");
   }
   function close() { dlg.close(); }
 
@@ -65,7 +62,11 @@
     img.setAttribute("role", "button");
     img.title = "Click to enlarge";
     function open() {
-      show(i);
+      // Step only through the pictures you can see (the home page hides the other app's tab).
+      group = pics.filter(function (p) { return p.offsetParent !== null; });
+      if (group.indexOf(img) < 0) group = [img];
+      dlg.querySelector(".prev").hidden = dlg.querySelector(".next").hidden = group.length < 2;
+      show(group.indexOf(img));
       dlg.showModal();
       if (window.goatcounter && goatcounter.count) {
         goatcounter.count({ path: "zoom-" + (img.getAttribute("src") || "").split("?")[0].split("/").pop(),

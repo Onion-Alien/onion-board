@@ -1,6 +1,6 @@
 """Render the README screenshots into docs/screenshots/.
 
-    .venv\\Scripts\\python scripts/screenshots.py [--theme "Retro 98"]
+    .venv\\Scripts\\python scripts/screenshots.py [--theme "Dark"] [--plain]
 
 scripts/docs.py runs this along with the README / site version line.
 
@@ -43,7 +43,7 @@ from soundboard import appaudio, autostart, engine, library, winkeys  # noqa: E4
 
 winkeys.key_char = conftest.us_key_char   # hotkeys drawn as on a US keyboard
 
-THEME = "Retro 98"   # the README and site pictures all use this theme
+THEME = "Dark"   # the README and site pictures all use this theme, Textured (--plain for Plain)
 OUTS = ["CABLE Input (VB-Audio Virtual Cable)", "Headphones (USB Audio Device)",
         "Speakers (Realtek(R) Audio)"]
 INS = ["CABLE Output (VB-Audio Virtual Cable)", "Microphone (USB Audio Device)"]
@@ -136,7 +136,7 @@ def install_onion_watch() -> bool:
     return True
 
 
-def demo_config(tmp: Path, theme: str):
+def demo_config(tmp: Path, theme: str, texture: bool):
     rng = np.random.default_rng(1)
     sounds = []
     for i, (name, key, tag) in enumerate(SOUNDS):
@@ -148,7 +148,8 @@ def demo_config(tmp: Path, theme: str):
                                         color=library.PAD_COLORS[i % len(library.PAD_COLORS)],
                                         tags=[tag], image=pad_picture(tmp, name)))
     library.Config(sounds=sounds, categories=["Memes", "Reactions", "Music"],
-                   setup_done=True, theme=theme, screen={"triggers": demo_triggers(tmp)},
+                   setup_done=True, theme=theme, theme_texture=texture,
+                   screen={"triggers": demo_triggers(tmp)},
                    route="mic", mic_first=True).save()
 
 
@@ -224,6 +225,7 @@ def demo_triggers(tmp: Path) -> list[dict]:
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--theme", default=THEME)
+    ap.add_argument("--plain", action="store_true", help="Plain instead of Textured")
     ap.add_argument("--out", type=Path, default=ROOT / "docs" / "screenshots")
     args = ap.parse_args()
     args.out.mkdir(parents=True, exist_ok=True)
@@ -232,7 +234,7 @@ def main():
     app.setStyle("Fusion")
     tmp = Path(tempfile.mkdtemp())
     fake_machine(tmp)
-    demo_config(tmp, args.theme)
+    demo_config(tmp, args.theme, not args.plain)
     watch = install_onion_watch()
 
     def spin(seconds=0.8):
