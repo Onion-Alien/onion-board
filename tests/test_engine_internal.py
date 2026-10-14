@@ -39,7 +39,7 @@ def peak_hz(x):
 # ---------------------------------------------------------------- live speed / pitch
 
 def test_the_apps_own_voices_are_fixed():
-    for sid in ("__test__", "__cue__", "__setup__", "abc:preview", "abc~fx:preview"):
+    for sid in ("__test__", "__cue__", "__setup__", "__pong__", "abc:preview", "abc~fx:preview"):
         assert is_fixed(sid)
     for sid in ("abc", "tts", "preview", "abc:previewx"):
         assert not is_fixed(sid)

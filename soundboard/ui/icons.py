@@ -120,6 +120,17 @@ def _volume(p, fill):
     p.drawArc(QRectF(11, 4.5, 10, 15), -60 * 16, 120 * 16)
 
 
+def _volume_off(p, fill):
+    """The speaker with a cross where its sound waves were: muted."""
+    path = QPainterPath(QPointF(3, 9.5))
+    for pt in ((7, 9.5), (12, 5), (12, 19), (7, 14.5), (3, 14.5)):
+        path.lineTo(*pt)
+    path.closeSubpath()
+    p.drawPath(path)
+    p.drawLine(QPointF(15.5, 9), QPointF(21, 15))
+    p.drawLine(QPointF(21, 9), QPointF(15.5, 15))
+
+
 def _play(p, fill):
     path = QPainterPath()
     path.moveTo(8.2, 5.8)
@@ -364,6 +375,18 @@ def _info(p, fill):
     dot.addEllipse(QPointF(12, 7.5), 1.1, 1.1)
     fill(dot)
     p.drawLine(QPointF(12, 11), QPointF(12, 16.5))
+
+
+def _question(p, fill):
+    """A question (yes / no boxes): a circle with a question mark, like _info's."""
+    p.drawEllipse(QRectF(3, 3, 18, 18))
+    hook = QPainterPath(QPointF(9.4, 9.6))
+    hook.cubicTo(9.4, 6.4, 14.8, 6.4, 14.8, 9.6)
+    hook.cubicTo(14.8, 11.6, 12, 11.8, 12, 14)
+    p.drawPath(hook)
+    dot = QPainterPath()
+    dot.addEllipse(QPointF(12, 16.8), 1.1, 1.1)
+    fill(dot)
 
 
 def _more(p, fill):
@@ -756,7 +779,8 @@ SHAPES = {
     "sounds": _grid, "browser": _globe, "offline": _offline, "tor": _tor, "phone": _phone,
     "voice": _mask, "setup": _sliders,
     "sliders": _sliders, "wave": _wave, "music": _music, "puzzle": _puzzle,
-    "mic": _mic, "mic_off": _mic_off, "headphones": _headphones, "volume": _volume, "ear": _ear,
+    "mic": _mic, "mic_off": _mic_off, "headphones": _headphones, "volume": _volume,
+    "volume_off": _volume_off, "ear": _ear,
     "play": _play, "pause": _pause, "stop": _stop, "stop_all": _stop_all, "record": _record,
     "plus": _plus, "close": _close,
     "download": _download,
@@ -770,7 +794,8 @@ SHAPES = {
     "speech": _speech, "cable": _cable, "check": _check, "warn": _warn,
     "folder": _folder,
     "link": _link,
-    "shield": _shield, "info": _info, "alert": _alert, "more": _more, "onion": _onion,
+    "shield": _shield, "info": _info, "question": _question, "alert": _alert, "more": _more,
+    "onion": _onion,
     "next": _next, "edit": _edit, "trash": _trash, "keyboard": _keyboard,
     "palette": _palette, "gamepad": _gamepad, "image": _image, "video": _video, "radio": _radio,
     "apps": _apps, "triggers": _eye, "eye": _eye,

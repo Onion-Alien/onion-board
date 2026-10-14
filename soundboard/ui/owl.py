@@ -55,21 +55,37 @@ def _mix(a: float, b: float, k: float) -> float:
     return a + (b - a) * k
 
 
+# where Bun's pieces go on Hoot, as (dx, dy, scale) from Bun's canvas: his head sits 12
+# higher than Bun's; his eyes are 28 apart (Bun's 22) and 9 higher; he has no neck, so
+# a bow tie or scarf goes just under his beak
+HEAD = (0, -12, 1.0)
+EYES_AT = (50 - 50 * 1.3, 53 - 62 * 1.3, 1.3)
+NECK_AT = (0, -14, 1.0)
+# pieces that need their own place: the frog's eyes and the mint would poke out of the
+# top of his picture (moved a little lower). Tall hats stay full size on purpose: an
+# oversized hat on him is the look.
+OWN_PLACE = {"frog": (0, -10, 1.0), "mint_sprig": (2, -1, 1.0)}
+# pieces that don't fit an owl: a hoodie's drawstrings read as a second face on his
+# belly, and a turtleneck's ribbed roll as teeth under his beak
+NOT_ON_OWL = {"strings", "sweater", "turtleneck"}
+
+
 def _fit(p: QPainter, fit, layer: str, ink: QPen, shut: bool = False):
     """Hoot wears Bun's theme outfit (soundboard/bunnyfit.py, drawn for Bun's canvas):
-    each part is moved onto Hoot's shape. His head sits 12 higher than Bun's, his eyes
-    are 28 apart (Bun's 22) and 9 higher, and he has no neck, so a bow tie or scarf goes
-    just under his beak."""
-    if not fit:
-        return
-    places = {"back": [(None, (0, -12, 1.0))], "under": [(None, (0, -12, 1.0))],
-              "over": [(None, (0, -12, 1.0))],
-              "face": [(False, (50 - 50 * 1.3, 53 - 62 * 1.3, 1.3)), (True, (0, -14, 1.0))]}
-    for neck, (dx, dy, k) in places[layer]:
+    each piece is moved onto Hoot's shape (HEAD, EYES_AT, NECK_AT, OWN_PLACE)."""
+    for name in fit:
+        if name in NOT_ON_OWL:
+            continue
+        if name in OWN_PLACE:
+            dx, dy, k = OWN_PLACE[name]
+        elif layer == "face":
+            dx, dy, k = NECK_AT if name in bunnyfit.NECK else EYES_AT
+        else:
+            dx, dy, k = HEAD
         p.save()
         p.translate(dx, dy)
         p.scale(k, k)
-        bunnyfit.draw(p, fit, layer, ink, shut=shut, neck=neck)
+        bunnyfit.draw(p, (name,), layer, ink, shut=shut)
         p.restore()
 
 
@@ -100,6 +116,7 @@ def draw_owl(p: QPainter, rect: QRectF, look: float = 0.0, feather=None, dark=No
     ink.setJoinStyle(Qt.PenJoinStyle.RoundJoin)
     ink.setCapStyle(Qt.PenCapStyle.RoundCap)
 
+    _fit(p, fit, "behind", ink)
     _fit(p, fit, "back", ink)
     # ear tufts, turned about their base
     for sx in (-1, 1):

@@ -15,8 +15,8 @@ from pathlib import Path
 from typing import Any, Literal, overload
 
 import numpy as np
-from PySide6.QtCore import (QEvent, QFileSystemWatcher, QObject, QPoint, QSignalBlocker, QSize,
-                            Qt, QTimer, QUrl, QVariantAnimation, Signal)
+from PySide6.QtCore import (QEvent, QFileSystemWatcher, QObject, QPoint, QRect, QSignalBlocker,
+                            QSize, Qt, QTimer, QUrl, QVariantAnimation, Signal)
 from PySide6.QtGui import (QActionGroup, QColor, QCursor, QDesktopServices, QIcon,
                            QKeySequence, QPainter, QPixmap, QShortcut)
 from PySide6.QtWidgets import (QApplication, QBoxLayout, QCheckBox, QComboBox, QDialog, QFileDialog,
@@ -156,6 +156,9 @@ LOOSE_EMPTY_LOOKS = 20   # an empty file that long (~30 s) waits for the folder 
 BODY_SIDE = 14         # the gap around the window's content (beside the tab rail too)...
 BODY_SIDE_TIGHT = 8    # ...and beside the rail in a narrow window
 SETTINGS_ROOM = QSize(480, 520)   # what Settings opened from the mini player grows it to
+BUN_TIP = _("Turn into Bun: a small Bun floating on top instead of this window. The "
+            "button under him brings it back.")
+FULL_FROM_BUN = QSize(1180, 720)   # Bun grown past his biggest opens the board this big
 MINI_SIZE = QSize(440, 380)   # below this the window becomes the mini player...
 MINI_PAD_ROWS = 1             # ...which has the pads above it when this many rows fit
 QUEUE_CHIPS = 5          # queued sounds shown by name above the pads (then "+n more")
@@ -506,6 +509,7 @@ class MainWindow(QMainWindow):
         self._quitting = False            # a real quit (not "close to the tray")
         self._tray_told = False           # the "still running in the tray" note was shown
         self.tray: QSystemTrayIcon | None = None
+        self.bun_mode = None   # Bun mode's floating Bun (ui/bunmode.py), once used
         self.release: updates.Release | None = None   # a newer version, once found
         self._update_file: Path | None = None   # its downloaded, checked installer
         self._downloading = False
@@ -1396,11 +1400,29 @@ class MainWindow(QMainWindow):
         self.mini_mic.clicked.connect(lambda: usage.used("mini-mic-mute"))   # clicks only
         self.mini_mic.clicked.connect(self._warn_mute_does_nothing)
         connection.addWidget(self.mini_mic)
+        self.mini_bun = QPushButton()
+        self.mini_bun.setFixedSize(34, 28)
+        self.mini_bun.setToolTip(BUN_TIP)
+        self.mini_bun.setAccessibleName(_("Turn into Bun"))
+        self.mini_bun.setIconSize(QSize(20, 20))
+        self._paint_mini_bun()
+        self.mini_bun.clicked.connect(self.enter_bun_mode)
+        connection.addWidget(self.mini_bun)
         cv.addLayout(connection)
         v.addWidget(card)
         self._sync_mini_mic()
         icons.set_icon(self.mini_pp, "play", "on_accent", size=16)
         return page
+
+    def _paint_mini_bun(self):
+        """The mini player's Bun button: him in this theme's outfit."""
+        self.mini_bun.setIcon(self._bun_icon())
+        if getattr(self, "_tray_bun", None) is not None:   # (the tray's menu: theme changes)
+            self._tray_bun.setIcon(self._bun_icon())
+
+    def _bun_icon(self) -> QIcon:
+        """Bun in this theme's outfit, drawn at the exact size shown."""
+        return icons.sharp_icon(lambda px, _mode, _state: bunny.bunny_pixmap(px))
 
     def _mini_setup(self):
         self.resize(max(800, self.width()), max(600, self.height()))
@@ -4771,6 +4793,11 @@ class MainWindow(QMainWindow):
         menu.addSeparator()
         menu.addAction(icons.icon("settings"), _("Choose tabs in Settings"),
                        lambda: self.open_settings("tabs"))
+        # Bun mode from the full window too (the mini player has its own Bun button)
+        menu.addSeparator()
+        act = menu.addAction(self._bun_icon(), _("Turn into Bun"), self.enter_bun_mode)
+        act.setToolTip(BUN_TIP)
+        menu.setToolTipsVisible(True)
         return menu
 
     def hide_tab(self, key: str):
@@ -5762,6 +5789,9 @@ class MainWindow(QMainWindow):
         self.download_bar.retheme()
         self.mini_download_bar.retheme()
         self.ytresults.retheme()
+        self._paint_mini_bun()
+        if self.bun_mode is not None:
+            self.bun_mode.retheme()
         pp, self._pp_icon = self._pp_icon, None
         self._set_pp_icon(pp or "play")
         self._pill_long = ""   # forces _update_flow to repaint its icon
@@ -9122,6 +9152,8 @@ class MainWindow(QMainWindow):
         menu = QMenu(self)
         icons.set_icon(menu.addAction(_("Open Onion Board"), self.show_from_tray), "sounds")
         icons.set_icon(menu.addAction(_("Stop all sounds"), self.stop_all), "stop")
+        self._tray_bun = menu.addAction(self._bun_icon(), _("Turn into Bun"),
+                                        self.enter_bun_mode)
         menu.addSeparator()
         # the Discord opens in the browser (feedback.py); Send feedback asks first
         from soundboard import feedback
@@ -9150,7 +9182,100 @@ class MainWindow(QMainWindow):
                       QSystemTrayIcon.ActivationReason.DoubleClick):
             self.show_from_tray()
 
+    # ------------------------------------------------------------------ Bun mode
+    def bun_up(self) -> bool:
+        return self.bun_mode is not None and self.bun_mode.isVisible()
+
+    def enter_bun_mode(self):
+        """The window goes and a floating Bun takes its place (ui/bunmode.py)."""
+        from soundboard.ui.bunmode import BunMode
+        if self.bun_mode is None:
+            self.bun_mode = BunMode(self)
+            self.bun_mode.back.connect(lambda: self.leave_bun_mode(False))
+            self.bun_mode.full.connect(lambda: self.leave_bun_mode(True))
+        self.bun_mode.present(self.frameGeometry() if self.isVisible() else None)
+        if self.isVisible() and not self.isMinimized():
+            # the window as it is (the mini player or the board, maximized or not),
+            # for Back: kept in the settings, so it's the same after a restart as Bun
+            g = self.normalGeometry() if self.isMaximized() else self.geometry()
+            self.cfg.bun["from"] = [g.x(), g.y(), g.width(), g.height(),
+                                    bool(self.isMaximized())]
+        self.cfg.bun["on"] = True
+        self._save_later()
+        usage.used("bun-mode")
+        self.hide()
+        self._wake()
+
+    def leave_bun_mode(self, full: bool = False):
+        """Bun's Back button: the window back as it was. Open the full board (`full`,
+        his right-click menu): the whole board, around where he stood."""
+        b = self.bun_mode
+        if b is None or not b.isVisible():
+            return
+        spot = b.geometry().center()
+        if full:
+            room = (QApplication.screenAt(spot) or self.screen()).availableGeometry()
+            want = QSize(min(FULL_FROM_BUN.width(), room.width() - 40),
+                         min(FULL_FROM_BUN.height(), room.height() - 40))
+            if self.isMaximized() or self.isFullScreen():
+                self.showNormal()
+            self.resize(want)
+            x = min(max(spot.x() - want.width() // 2, room.left()), room.right() - want.width())
+            y = min(max(spot.y() - want.height() // 2, room.top()), room.bottom() - want.height())
+            self.move(x, y)
+            # it was the mini player: shown at once, its first frames were a blank white
+            # window while it laid the board out again; it fades in once that's done
+            self.setWindowOpacity(0.0)
+            QTimer.singleShot(150, lambda: self.setWindowOpacity(1.0))
+        else:
+            self._back_as_it_was()
+        self.show_from_tray()
+        if full:
+            self._refit()   # out of the mini player now, not after the first paints
+        if sys.platform == "win32":   # raise_/activateWindow alone left it behind the
+            winkeys.to_front(int(self.winId()))   # app in front (Bun never has focus)
+
+    def _back_as_it_was(self):
+        """The window's size and place from before Bun mode (cfg.bun["from"]), when
+        it's on a screen still. Without it, the window started as Bun showed at its
+        default size: Back looked just like Open the full board."""
+        was = self.cfg.bun.get("from")
+        if not (isinstance(was, list) and len(was) == 5):
+            return
+        x, y, w, h, maxed = was
+        rect = QRect(int(x), int(y), int(w), int(h))
+        if QApplication.screenAt(rect.center()) is None:   # that monitor's gone
+            return
+        if self.isMaximized() or self.isFullScreen():
+            self.showNormal()
+        self.setGeometry(rect)
+        if maxed:
+            self.setWindowState(self.windowState() | Qt.WindowState.WindowMaximized)
+
+    def _bun_away(self):
+        """Bun goes (the window's coming back, or the app's quitting)."""
+        b = self.bun_mode
+        if b is not None and b.isVisible():
+            b.hide()
+            self.cfg.bun["on"] = False
+            self._save_later()
+
+    def start_as_bun(self) -> bool:
+        """At start-up: quit as Bun last time, so Bun again (instead of the window)."""
+        if not (isinstance(self.cfg.bun, dict) and self.cfg.bun.get("on")
+                and self.cfg.setup_done):
+            return False
+        self.enter_bun_mode()
+        return True
+
+    def toast_seen(self, text: str, kind: str):
+        """Every toast on the window (ui/toast.py): Bun says it while he's up."""
+        b = self.bun_mode
+        if b is not None and b.isVisible():
+            b.say(text, kind)
+
     def show_from_tray(self):
+        self._bun_away()
         if self.isMinimized():
             self.showNormal()
         else:
@@ -10047,7 +10172,7 @@ class MainWindow(QMainWindow):
             self._set_tick_rate()
 
     def _tick_pace(self) -> int:
-        if not self._ui_live and not self.overlay.is_open:
+        if not self._ui_live and not self.overlay.is_open and not self.bun_up():
             return TICK_IDLE_MS
         if not self._tick_busy:   # nothing moves: 10 ticks a second instead of 30
             return TICK_QUIET_MS
@@ -10130,6 +10255,13 @@ class MainWindow(QMainWindow):
         if self._ui_live:
             self._tick_visuals(playing, now)
         self.overlay.tick(playing)
+        if self.bun_mode is not None and self.bun_mode.isVisible():
+            bar = self.download_bar
+            self.bun_mode.tick(
+                live=live, level=e.level_play, sending=e.sending, mic=self.cfg.mic_enabled,
+                paused=any(paused for sid, (_p, paused) in playing.items()
+                           if sid in self._meta or sid == LINK_ID),
+                downloading=bar.running(), failed=bar.failed_count())
         e.level_play *= 0.9
         e.level_main *= 0.9
         e.level_mic *= 0.9
@@ -10621,6 +10753,8 @@ class MainWindow(QMainWindow):
             return
         self._shut_down = True
         exitwatch.quitting()   # a run that dies from here on died closing (exitwatch.py)
+        if self.bun_mode is not None:   # (cfg.bun["on"] stays: it starts as Bun next time)
+            self.bun_mode.close()
         for step in (self._finish_removals, self._wait_bin, self.timer.stop, self._voice_timer.stop,
                      self._default_poll.stop, self._discord_poll.stop,
                      self._release_ptt,

@@ -158,8 +158,9 @@ FEATURES = ("add-files", "youtube", "record", "clip", "clip-editor", "import-boa
             "apps-category-deleted", "apps-own-categories", "apps-window-view",
             # Settings' search box used, and a search that found nothing
             "settings-search", "settings-search-nothing",
-            # the mini player's mic mute switch; the setup guide opened from Setup
-            "mini-mic-mute", "setup-guide-opened",
+            # the mini player's mic mute switch; the setup guide opened from Setup; the
+            # mini player turned into Bun (ui/bunmode.py)
+            "mini-mic-mute", "setup-guide-opened", "bun-mode",
             # the side rail: Ctrl+1-9 / Ctrl+Tab, the version clicked for What's new,
             # kept shut (features_now)
             "tab-keys", "whats-new", "rail-shut",

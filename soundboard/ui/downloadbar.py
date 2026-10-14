@@ -850,6 +850,13 @@ class DownloadBar(QFrame):
     def _running(self) -> bool:
         return bool(self.url) and self.stage != "done"
 
+    def running(self) -> bool:
+        """A download is under way (Bun mode builds while it is)."""
+        return self._running()
+
+    def failed_count(self) -> int:
+        return len(self._failed)
+
     def _head_text(self) -> tuple[str, str, str]:
         """(words, icon, icon colour) for the summary line."""
         busy = (1 if self._running() else 0) + len(self._queue)
