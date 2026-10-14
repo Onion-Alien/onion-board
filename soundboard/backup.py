@@ -132,9 +132,10 @@ def export(dest: str | Path, sounds: list[SoundMeta], cfg: Config | None = None,
     return len(folders)
 
 
-class _Unreadable(Exception):
+class _Unreadable(OSError):
     """A sound's own file can't be read: that sound is left out of the export. (An
-    error writing the zip itself is not this one, and fails the export.)"""
+    error writing the zip itself is not this one, and fails the export.) An OSError,
+    so callers of _add_file that catch those (keep_pack) still do."""
 
 
 def _add_sound(z: zipfile.ZipFile, m: SoundMeta, folder: str) -> dict:

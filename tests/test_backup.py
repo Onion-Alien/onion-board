@@ -439,3 +439,12 @@ def test_a_zip_write_error_still_fails_the_export(board, tmp_path, monkeypatch):
     with pytest.raises(OSError):
         backup.export(tmp_path / "b.zip", board.sounds)
     assert not (tmp_path / "b.zip.part").exists()
+
+
+def test_a_pack_folder_with_an_unreadable_file_just_isnt_kept(app_dir, tmp_path, locked):
+    folder = tmp_path / "pack"
+    for name in ("a", "b"):
+        (folder / name).mkdir(parents=True)
+        _tone(folder / name / f"{name}.wav")
+    locked(folder / "b" / "b.wav")
+    assert backup.keep_pack(backup.Package(path=folder)) == ""
