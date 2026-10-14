@@ -873,7 +873,6 @@
   "Record": "I-record",
   "Record a sound": "Mag-record ng sound",
   "Record again": "I-record ulit",
-  "Record your voice, or a bit of a sound, song or the radio while it plays, and keep it as a sound.": "I-record ang boses mo, o bahagi ng sound, kanta o radio habang nagpe-play, at itago ito bilang sound.",
   "Recording what's playing… play a sound, a search result or the radio now, then click Stop.": "Nire-record ang nagpe-play… mag-play ng sound, search result o radio ngayon, tapos i-click ang Itigil.",
   "Recording {n}": "Recording {n}",
   "Recording… click Stop when you're done.": "Nagre-record… i-click ang Itigil kapag tapos ka na.",
@@ -3388,5 +3387,8 @@
   "Plays a copy of what others hear on more devices: Voicemeeter, a device OBS captures, a second cable, speakers... Mics aren't listed here: Send my sounds to puts your sounds into your mic.": "Pinapatugtog ang kopya ng naririnig ng iba sa iba pang device: Voicemeeter, device na kinukuha ng OBS, pangalawang cable, speakers... Wala rito ang mga mic: ang \"Ipadala ang mga sound ko sa\" ang naglalagay ng mga sound mo sa mic mo.",
   "Change mic": "Palitan ang mic",
   "Put your sounds into another mic instead": "Ilagay ang mga sound mo sa ibang mic",
+  "Record your voice, a bit of a sound, song or the radio while it plays, or both at once, and keep it as a sound.": "I-record ang boses mo, isang bahagi ng tunog, kanta o radyo habang tumutugtog, o pareho nang sabay, at itago ito bilang tunog.",
+  "Recording your voice and what's playing… talk, play a sound, then click Stop.": "Nire-record ang boses mo at ang tumutugtog… magsalita, magpatugtog ng tunog, saka i-click ang Itigil.",
+  "Your voice and what's playing together, as one sound. What's playing goes down while you talk, so your voice stays on top": "Ang boses mo at ang tumutugtog nang magkasama, bilang isang tunog. Humihina ang tumutugtog habang nagsasalita ka, kaya nananatiling nasa ibabaw ang boses mo",
   "The Radio tab plays stations from around the world, and can record them as pads.": "Nagpe-play ang Radio tab ng mga station mula sa buong mundo, at kayang i-record ang mga ito bilang pad."
 }

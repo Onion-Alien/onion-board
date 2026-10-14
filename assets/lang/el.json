@@ -873,7 +873,6 @@
   "Record": "Ηχογράφηση",
   "Record a sound": "Ηχογράφηση ήχου",
   "Record again": "Ηχογράφηση ξανά",
-  "Record your voice, or a bit of a sound, song or the radio while it plays, and keep it as a sound.": "Ηχογράφησε τη φωνή σου, ή ένα κομμάτι από ήχο, τραγούδι ή το ραδιόφωνο όσο παίζει, και κράτα το ως ήχο.",
   "Recording what's playing… play a sound, a search result or the radio now, then click Stop.": "Ηχογραφώ ό,τι παίζει… παίξε τώρα έναν ήχο, ένα αποτέλεσμα αναζήτησης ή το ραδιόφωνο, μετά κάνε κλικ στο Στοπ.",
   "Recording {n}": "Ηχογράφηση {n}",
   "Recording… click Stop when you're done.": "Ηχογράφηση… κάνε κλικ στο Στοπ όταν τελειώσεις.",
@@ -3388,5 +3387,8 @@
   "Plays a copy of what others hear on more devices: Voicemeeter, a device OBS captures, a second cable, speakers... Mics aren't listed here: Send my sounds to puts your sounds into your mic.": "Παίζει ένα αντίγραφο αυτού που ακούνε οι άλλοι σε περισσότερες συσκευές: Voicemeeter, μια συσκευή που καταγράφει το OBS, ένα δεύτερο καλώδιο, ηχεία... Τα μικρόφωνα δεν είναι εδώ: το «Στείλε τους ήχους μου σε» βάζει τους ήχους σου στο μικρόφωνό σου.",
   "Change mic": "Άλλαξε μικρόφωνο",
   "Put your sounds into another mic instead": "Βάλε τους ήχους σου σε άλλο μικρόφωνο",
+  "Record your voice, a bit of a sound, song or the radio while it plays, or both at once, and keep it as a sound.": "Ηχογραφήστε τη φωνή σας, ένα κομμάτι ήχου, τραγουδιού ή του ραδιοφώνου όσο παίζει, ή και τα δύο μαζί, και κρατήστε το ως ήχο.",
+  "Recording your voice and what's playing… talk, play a sound, then click Stop.": "Ηχογραφείται η φωνή σας και ό,τι παίζει… μιλήστε, παίξτε έναν ήχο και πατήστε Διακοπή.",
+  "Your voice and what's playing together, as one sound. What's playing goes down while you talk, so your voice stays on top": "Η φωνή σας και ό,τι παίζει μαζί, ως ένας ήχος. Ό,τι παίζει χαμηλώνει όταν μιλάτε, ώστε η φωνή σας να ακούγεται από πάνω",
   "The Radio tab plays stations from around the world, and can record them as pads.": "Η καρτέλα Ραδιόφωνο παίζει σταθμούς από όλο τον κόσμο, και μπορεί να τους ηχογραφήσει ως κουμπιά."
 }

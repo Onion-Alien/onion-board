@@ -317,7 +317,6 @@
   "Record": "Aufnehmen",
   "Record a sound": "Sound aufnehmen",
   "Record again": "Nochmal aufnehmen",
-  "Record your voice, or a bit of a sound, song or the radio while it plays, and keep it as a sound.": "Nimm deine Stimme auf, oder ein Stück eines Sounds, Songs oder des Radios, während es spielt, und behalte es als Sound.",
   "Recording what's playing… play a sound, a search result or the radio now, then click Stop.": "Nehme auf, was spielt… spiel jetzt einen Sound, ein Suchergebnis oder das Radio ab und klick dann auf Stopp.",
   "Recording… click Stop when you're done.": "Nehme auf… klick auf Stopp, wenn du fertig bist.",
   "Redline": "Grenzbereich",
@@ -3388,5 +3387,8 @@
   "Plays a copy of what others hear on more devices: Voicemeeter, a device OBS captures, a second cable, speakers... Mics aren't listed here: Send my sounds to puts your sounds into your mic.": "Spielt eine Kopie dessen, was die anderen hören, auf weiteren Geräten ab: Voicemeeter, ein Gerät, das OBS aufnimmt, ein zweites Kabel, Lautsprecher... Mikros stehen hier nicht: „Meine Sounds senden an“ bringt deine Sounds in dein Mikro.",
   "Change mic": "Mikro wechseln",
   "Put your sounds into another mic instead": "Deine Sounds stattdessen in ein anderes Mikro geben",
+  "Record your voice, a bit of a sound, song or the radio while it plays, or both at once, and keep it as a sound.": "Nimm deine Stimme auf, ein Stück eines Sounds, Songs oder des Radios, während es läuft, oder beides gleichzeitig, und behalte es als Sound.",
+  "Recording your voice and what's playing… talk, play a sound, then click Stop.": "Deine Stimme und was gerade läuft werden aufgenommen… sprich, spiel einen Sound ab und klick dann auf Stopp.",
+  "Your voice and what's playing together, as one sound. What's playing goes down while you talk, so your voice stays on top": "Deine Stimme und was gerade läuft zusammen als ein Sound. Was läuft, wird leiser, während du sprichst, damit deine Stimme obenauf bleibt",
   "The Radio tab plays stations from around the world, and can record them as pads.": "Der Radio-Tab spielt Sender aus aller Welt und kann sie als Pads aufnehmen."
 }

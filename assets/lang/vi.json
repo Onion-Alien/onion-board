@@ -311,7 +311,6 @@
   "Record": "Ghi",
   "Record a sound": "Ghi âm thanh",
   "Record again": "Ghi lại",
-  "Record your voice, or a bit of a sound, song or the radio while it plays, and keep it as a sound.": "Ghi giọng bạn, hoặc một đoạn âm thanh, bài hát hay radio khi nó đang phát, rồi giữ thành âm thanh.",
   "Recording what's playing… play a sound, a search result or the radio now, then click Stop.": "Đang ghi những gì đang phát… phát một âm thanh, kết quả tìm kiếm hoặc radio ngay, rồi bấm Dừng.",
   "Recording… click Stop when you're done.": "Đang ghi… bấm Dừng khi xong.",
   "Redline": "Vượt ngưỡng",
@@ -3312,5 +3311,8 @@
   "Plays a copy of what others hear on more devices: Voicemeeter, a device OBS captures, a second cable, speakers... Mics aren't listed here: Send my sounds to puts your sounds into your mic.": "Phát một bản sao của những gì người khác nghe trên thêm thiết bị: Voicemeeter, thiết bị OBS thu, cáp thứ hai, loa... Micrô không có ở đây: \"Gửi âm thanh của tôi tới\" đưa âm thanh của bạn vào micrô.",
   "Change mic": "Đổi micrô",
   "Put your sounds into another mic instead": "Đưa âm thanh của bạn vào micrô khác",
+  "Record your voice, a bit of a sound, song or the radio while it plays, or both at once, and keep it as a sound.": "Ghi âm giọng của bạn, một đoạn âm thanh, bài hát hoặc radio khi đang phát, hoặc cả hai cùng lúc, rồi giữ lại làm âm thanh.",
+  "Recording your voice and what's playing… talk, play a sound, then click Stop.": "Đang ghi giọng của bạn và thứ đang phát… hãy nói, phát một âm thanh, rồi bấm Dừng.",
+  "Your voice and what's playing together, as one sound. What's playing goes down while you talk, so your voice stays on top": "Giọng của bạn và thứ đang phát cùng nhau, thành một âm thanh. Thứ đang phát nhỏ lại khi bạn nói, nên giọng bạn luôn nổi bên trên",
   "The Radio tab plays stations from around the world, and can record them as pads.": "Thẻ Radio phát các đài khắp thế giới, và có thể ghi âm chúng thành nút."
 }

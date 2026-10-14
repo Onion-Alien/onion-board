@@ -12,6 +12,7 @@ import soundfile as sf
 from soundboard.engine import SR, resample
 from soundboard import library
 from soundboard.library import MAX_SECONDS
+from soundboard.sendfx import Ducker
 
 log = logging.getLogger(__name__)
 
@@ -213,6 +214,7 @@ class MicTake:
     (Engine.start_mic_take) moved onto a 16-bit WAV on disk by pump() on the UI thread
     as it comes, so a long one doesn't sit in RAM; at the mic's own rate, capped at
     MAX_SECONDS. stop() gives it back as (n, 2) float32 at SR."""
+    both = False   # (BothTake: your voice and what's playing)
 
     def __init__(self, engine, processed: bool = False, spool_path=None,
                  playing: bool = False):
@@ -325,3 +327,68 @@ class MicTake:
             self._spool = None
             self._unlink()
         self._mem = None
+
+
+BOTH_DUCK_DB = -12.0   # what's playing goes down this much under your voice (ducking off)
+BOTH_BLOCK = 1024
+
+
+class BothTake:
+    """Record a sound with your voice and what's playing at once: a MicTake of each,
+    spooled side by side, mixed at stop() with what's playing lowered while you talk
+    (sendfx.Ducker, at the depth set for voice chat), so your voice isn't buried."""
+    playing = False
+    both = True
+
+    def __init__(self, engine, processed: bool = False, spool_dir=None):
+        d = spool_dir or library.APP_DIR
+        self.engine = engine
+        self.voice = MicTake(engine, processed, spool_path=d / "mictake.tmp.wav")
+        self.sound = MicTake(engine, spool_path=d / "playtake.tmp.wav", playing=True)
+
+    @property
+    def seconds(self) -> float:
+        return max(self.voice.seconds, self.sound.seconds)
+
+    @property
+    def full(self) -> bool:
+        return self.voice.full or self.sound.full
+
+    @property
+    def rate_changed(self) -> bool:
+        return self.voice.rate_changed or self.sound.rate_changed
+
+    def pump(self) -> int:
+        """Frames the mic sent since the last call (the mic always sends: what's playing
+        may be silence, or nothing at all with no sound on)."""
+        self.sound.pump()
+        return self.voice.pump()
+
+    def stop(self) -> np.ndarray:
+        voice, sound = self.voice.stop(), self.sound.stop()
+        return mix_voice(voice, sound, getattr(self.engine, "duck_db", 0.0) or BOTH_DUCK_DB)
+
+    def cancel(self):
+        self.voice.cancel()
+        self.sound.cancel()
+
+
+def mix_voice(voice: np.ndarray, sound: np.ndarray, depth_db: float) -> np.ndarray:
+    """Your voice over what's playing ((n, 2) float32 at SR each): the sound lowered by
+    `depth_db` while you talk (the engine's own Ducker, so it sounds like a call), the
+    two added, and pulled back under full scale."""
+    n = max(len(voice), len(sound))
+    out = np.zeros((n, 2), np.float32)
+    out[:len(sound)] = sound
+    if len(voice):
+        duck = Ducker(SR)
+        for a in range(0, len(voice), BOTH_BLOCK):
+            v = voice[a:a + BOTH_BLOCK]
+            g = duck.process(v, len(v), min(0.0, depth_db))
+            if isinstance(g, np.ndarray):   # (1.0: nothing to lower)
+                out[a:a + len(v)] *= g
+        out[:len(voice)] += voice
+    peak = float(np.max(np.abs(out))) if n else 0.0
+    if peak > 0.99:
+        out *= np.float32(0.99 / peak)
+    return out

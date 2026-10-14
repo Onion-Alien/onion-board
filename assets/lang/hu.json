@@ -873,7 +873,6 @@
   "Record": "Felvétel",
   "Record a sound": "Hang felvétele",
   "Record again": "Újra felvétel",
-  "Record your voice, or a bit of a sound, song or the radio while it plays, and keep it as a sound.": "Vedd fel a beszédhangodat, vagy egy darabot egy hangból, dalból vagy a rádióból, amíg szól, és tartsd meg hangként.",
   "Recording what's playing… play a sound, a search result or the radio now, then click Stop.": "A szóló hang felvétele… játssz le most egy hangot, egy keresési találatot vagy a rádiót, aztán kattints a Stop gombra.",
   "Recording {n}": "Felvétel {n}",
   "Recording… click Stop when you're done.": "Felvétel… kattints a Stop gombra, ha végeztél.",
@@ -3388,5 +3387,8 @@
   "Plays a copy of what others hear on more devices: Voicemeeter, a device OBS captures, a second cable, speakers... Mics aren't listed here: Send my sounds to puts your sounds into your mic.": "Annak másolatát, amit a többiek hallanak, további eszközökön is lejátssza: Voicemeeter, egy eszköz, amit az OBS rögzít, egy második kábel, hangszórók... Mikrofonok itt nincsenek: a „Hangjaim küldése ide” teszi a hangjaidat a mikrofonodba.",
   "Change mic": "Mikrofon cseréje",
   "Put your sounds into another mic instead": "A hangjaid inkább egy másik mikrofonba menjenek",
+  "Record your voice, a bit of a sound, song or the radio while it plays, or both at once, and keep it as a sound.": "Vedd fel a hangodat, egy hang, dal vagy a rádió egy részét, amíg szól, vagy mindkettőt egyszerre, és tartsd meg hangként.",
+  "Recording your voice and what's playing… talk, play a sound, then click Stop.": "A hangod és ami szól, felvétel alatt… beszélj, játssz le egy hangot, majd kattints a Leállításra.",
+  "Your voice and what's playing together, as one sound. What's playing goes down while you talk, so your voice stays on top": "A hangod és ami szól, együtt, egy hangként. Ami szól, halkabb lesz, amíg beszélsz, így a hangod felül marad",
   "The Radio tab plays stations from around the world, and can record them as pads.": "A Rádió lap a világ minden tájáról játszik állomásokat, és gombként fel is veheti őket."
 }

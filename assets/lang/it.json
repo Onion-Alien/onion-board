@@ -317,7 +317,6 @@
   "Record": "Registra",
   "Record a sound": "Registra un suono",
   "Record again": "Registra di nuovo",
-  "Record your voice, or a bit of a sound, song or the radio while it plays, and keep it as a sound.": "Registra la tua voce, o un pezzo di un suono, di una canzone o della radio mentre suona, e tienilo come suono.",
   "Recording what's playing… play a sound, a search result or the radio now, then click Stop.": "Registro ciò che suona… fai partire ora un suono, un risultato di ricerca o la radio, poi clicca Stop.",
   "Recording… click Stop when you're done.": "Registrazione… clicca Stop quando hai finito.",
   "Redline": "Al limite",
@@ -3388,5 +3387,8 @@
   "Plays a copy of what others hear on more devices: Voicemeeter, a device OBS captures, a second cable, speakers... Mics aren't listed here: Send my sounds to puts your sounds into your mic.": "Riproduce una copia di ciò che sentono gli altri su altri dispositivi: Voicemeeter, un dispositivo che OBS cattura, un secondo cavo, casse... I microfoni non sono qui: «Invia i miei suoni a» mette i tuoi suoni nel tuo microfono.",
   "Change mic": "Cambia microfono",
   "Put your sounds into another mic instead": "Metti i tuoi suoni in un altro microfono",
+  "Record your voice, a bit of a sound, song or the radio while it plays, or both at once, and keep it as a sound.": "Registra la tua voce, un pezzo di un suono, di una canzone o della radio mentre suona, o entrambi insieme, e tienilo come suono.",
+  "Recording your voice and what's playing… talk, play a sound, then click Stop.": "Registrazione della tua voce e di ciò che sta suonando… parla, riproduci un suono, poi fai clic su Interrompi.",
+  "Your voice and what's playing together, as one sound. What's playing goes down while you talk, so your voice stays on top": "La tua voce e ciò che sta suonando insieme, come un unico suono. Ciò che suona si abbassa mentre parli, così la tua voce resta sopra",
   "The Radio tab plays stations from around the world, and can record them as pads.": "La scheda Radio suona stazioni da tutto il mondo, e può registrarle come pad."
 }

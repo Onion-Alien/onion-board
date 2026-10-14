@@ -293,7 +293,6 @@
   "Record": "Запись",
   "Record a sound": "Записать звук",
   "Record again": "Записать заново",
-  "Record your voice, or a bit of a sound, song or the radio while it plays, and keep it as a sound.": "Запиши свой голос или кусочек звука, песни или радио, пока он играет, и сохрани как звук.",
   "Recording what's playing… play a sound, a search result or the radio now, then click Stop.": "Записываю то, что играет… включи сейчас звук, результат поиска или радио, затем нажми «Стоп».",
   "Recording… click Stop when you're done.": "Запись… нажми «Стоп», когда закончишь.",
   "Redline": "Красная зона",
@@ -3464,5 +3463,8 @@
   "Plays a copy of what others hear on more devices: Voicemeeter, a device OBS captures, a second cable, speakers... Mics aren't listed here: Send my sounds to puts your sounds into your mic.": "Играет копию того, что слышат другие, ещё на устройствах: Voicemeeter, устройство, которое захватывает OBS, второй кабель, колонки... Микрофонов тут нет: «Отправлять мои звуки в» отправляет твои звуки в микрофон.",
   "Change mic": "Сменить микрофон",
   "Put your sounds into another mic instead": "Отправлять звуки в другой микрофон",
+  "Record your voice, a bit of a sound, song or the radio while it plays, or both at once, and keep it as a sound.": "Запишите свой голос, кусочек звука, песни или радио, пока они играют, или и то и другое сразу, и сохраните как звук.",
+  "Recording your voice and what's playing… talk, play a sound, then click Stop.": "Записываются ваш голос и то, что играет… говорите, включите звук, затем нажмите «Стоп».",
+  "Your voice and what's playing together, as one sound. What's playing goes down while you talk, so your voice stays on top": "Ваш голос и то, что играет, вместе, одним звуком. Пока вы говорите, то, что играет, становится тише, и ваш голос слышно поверх",
   "The Radio tab plays stations from around the world, and can record them as pads.": "Вкладка «Радио» играет станции со всего мира и может записывать их как кнопки."
 }

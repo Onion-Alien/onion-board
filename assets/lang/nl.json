@@ -317,7 +317,6 @@
   "Record": "Opnemen",
   "Record a sound": "Een geluid opnemen",
   "Record again": "Opnieuw opnemen",
-  "Record your voice, or a bit of a sound, song or the radio while it plays, and keep it as a sound.": "Neem je stem op, of een stukje van een geluid, nummer of de radio terwijl het speelt, en bewaar het als geluid.",
   "Recording what's playing… play a sound, a search result or the radio now, then click Stop.": "Neemt op wat er speelt… speel nu een geluid, een zoekresultaat of de radio af en klik dan op Stop.",
   "Recording… click Stop when you're done.": "Opnemen… klik op Stop als je klaar bent.",
   "Redline": "Redline",
@@ -3388,5 +3387,8 @@
   "Plays a copy of what others hear on more devices: Voicemeeter, a device OBS captures, a second cable, speakers... Mics aren't listed here: Send my sounds to puts your sounds into your mic.": "Speelt een kopie van wat anderen horen af op meer apparaten: Voicemeeter, een apparaat dat OBS opneemt, een tweede kabel, speakers... Microfoons staan hier niet: 'Stuur mijn geluiden naar' stopt je geluiden in je microfoon.",
   "Change mic": "Andere microfoon",
   "Put your sounds into another mic instead": "Stop je geluiden in een andere microfoon",
+  "Record your voice, a bit of a sound, song or the radio while it plays, or both at once, and keep it as a sound.": "Neem je stem op, een stukje van een geluid, nummer of de radio terwijl het speelt, of allebei tegelijk, en bewaar het als geluid.",
+  "Recording your voice and what's playing… talk, play a sound, then click Stop.": "Je stem en wat er speelt worden opgenomen… praat, speel een geluid af en klik dan op Stoppen.",
+  "Your voice and what's playing together, as one sound. What's playing goes down while you talk, so your voice stays on top": "Je stem en wat er speelt samen, als één geluid. Wat er speelt gaat zachter terwijl je praat, zodat je stem bovenop blijft",
   "The Radio tab plays stations from around the world, and can record them as pads.": "Het tabblad Radio speelt zenders van over de hele wereld en kan ze als pads opnemen."
 }

@@ -317,7 +317,6 @@
   "Record": "रिकॉर्ड",
   "Record a sound": "साउंड रिकॉर्ड करें",
   "Record again": "फिर से रिकॉर्ड करें",
-  "Record your voice, or a bit of a sound, song or the radio while it plays, and keep it as a sound.": "अपनी आवाज़ रिकॉर्ड करें, या चलते हुए किसी साउंड, गाने या रेडियो का हिस्सा, और उसे साउंड के रूप में रखें।",
   "Recording what's playing… play a sound, a search result or the radio now, then click Stop.": "जो चल रहा है वह रिकॉर्ड हो रहा है… अभी कोई साउंड, सर्च नतीजा या रेडियो चलाएँ, फिर रोकें पर क्लिक करें।",
   "Recording… click Stop when you're done.": "रिकॉर्डिंग… हो जाने पर रोकें पर क्लिक करें।",
   "Redline": "रेडलाइन",
@@ -3388,5 +3387,8 @@
   "Plays a copy of what others hear on more devices: Voicemeeter, a device OBS captures, a second cable, speakers... Mics aren't listed here: Send my sounds to puts your sounds into your mic.": "दूसरे जो सुनते हैं उसकी एक कॉपी और डिवाइसों पर चलाता है: Voicemeeter, OBS जिस डिवाइस को कैप्चर करता है, दूसरी केबल, स्पीकर... माइक यहाँ नहीं हैं: \"मेरे साउंड यहाँ भेजें\" आपके साउंड आपके माइक में डालता है।",
   "Change mic": "माइक बदलें",
   "Put your sounds into another mic instead": "अपने साउंड किसी दूसरे माइक में डालें",
+  "Record your voice, a bit of a sound, song or the radio while it plays, or both at once, and keep it as a sound.": "अपनी आवाज़, या चलते समय किसी साउंड, गाने या रेडियो का हिस्सा, या दोनों एक साथ रिकॉर्ड करें, और उसे साउंड के रूप में रखें।",
+  "Recording your voice and what's playing… talk, play a sound, then click Stop.": "आपकी आवाज़ और जो चल रहा है, रिकॉर्ड हो रहा है… बोलें, कोई साउंड चलाएँ, फिर रोकें पर क्लिक करें।",
+  "Your voice and what's playing together, as one sound. What's playing goes down while you talk, so your voice stays on top": "आपकी आवाज़ और जो चल रहा है, एक साथ एक साउंड के रूप में। आपके बोलते समय जो चल रहा है वह धीमा हो जाता है, ताकि आपकी आवाज़ ऊपर रहे",
   "The Radio tab plays stations from around the world, and can record them as pads.": "रेडियो टैब दुनिया भर के स्टेशन चलाता है, और उन्हें पैड के रूप में रिकॉर्ड कर सकता है।"
 }

@@ -317,7 +317,6 @@
   "Record": "Gravar",
   "Record a sound": "Gravar um som",
   "Record again": "Gravar de novo",
-  "Record your voice, or a bit of a sound, song or the radio while it plays, and keep it as a sound.": "Grave sua voz, ou um trecho de um som, música ou da rádio enquanto toca, e guarde como som.",
   "Recording what's playing… play a sound, a search result or the radio now, then click Stop.": "Gravando o que está tocando… toque um som, um resultado da busca ou a rádio agora, depois clique em Parar.",
   "Recording… click Stop when you're done.": "Gravando… clique em Parar quando terminar.",
   "Redline": "Zona vermelha",
@@ -3388,5 +3387,8 @@
   "Plays a copy of what others hear on more devices: Voicemeeter, a device OBS captures, a second cable, speakers... Mics aren't listed here: Send my sounds to puts your sounds into your mic.": "Toca uma cópia do que os outros ouvem em mais dispositivos: Voicemeeter, um dispositivo que o OBS captura, um segundo cabo, alto-falantes... Microfones não aparecem aqui: \"Enviar meus sons para\" coloca seus sons no seu microfone.",
   "Change mic": "Trocar microfone",
   "Put your sounds into another mic instead": "Colocar seus sons em outro microfone",
+  "Record your voice, a bit of a sound, song or the radio while it plays, or both at once, and keep it as a sound.": "Grave sua voz, um trecho de um som, música ou do rádio enquanto toca, ou os dois ao mesmo tempo, e guarde como um som.",
+  "Recording your voice and what's playing… talk, play a sound, then click Stop.": "Gravando sua voz e o que está tocando… fale, toque um som e clique em Parar.",
+  "Your voice and what's playing together, as one sound. What's playing goes down while you talk, so your voice stays on top": "Sua voz e o que está tocando juntos, como um só som. O que está tocando abaixa enquanto você fala, para sua voz ficar por cima",
   "The Radio tab plays stations from around the world, and can record them as pads.": "A aba Rádio toca estações do mundo todo, e pode gravá-las como botões."
 }

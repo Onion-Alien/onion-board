@@ -859,7 +859,6 @@
   "Record": "Rakam",
   "Record a sound": "Rakam bunyi",
   "Record again": "Rakam semula",
-  "Record your voice, or a bit of a sound, song or the radio while it plays, and keep it as a sound.": "Rakam suara anda, atau sedikit bunyi, lagu atau radio semasa ia dimainkan, dan simpan sebagai bunyi.",
   "Recording what's playing… play a sound, a search result or the radio now, then click Stop.": "Merakam apa yang sedang dimainkan… mainkan bunyi, hasil carian atau radio sekarang, kemudian klik Henti.",
   "Recording {n}": "Rakaman {n}",
   "Recording… click Stop when you're done.": "Merakam… klik Henti apabila selesai.",
@@ -3312,5 +3311,8 @@
   "Plays a copy of what others hear on more devices: Voicemeeter, a device OBS captures, a second cable, speakers... Mics aren't listed here: Send my sounds to puts your sounds into your mic.": "Memainkan salinan apa yang orang lain dengar pada lebih banyak peranti: Voicemeeter, peranti yang dirakam OBS, kabel kedua, pembesar suara... Mikrofon tiada di sini: \"Hantar bunyi saya ke\" memasukkan bunyi anda ke mikrofon anda.",
   "Change mic": "Tukar mikrofon",
   "Put your sounds into another mic instead": "Masukkan bunyi anda ke mikrofon lain",
+  "Record your voice, a bit of a sound, song or the radio while it plays, or both at once, and keep it as a sound.": "Rakam suara anda, sebahagian bunyi, lagu atau radio semasa ia dimainkan, atau kedua-duanya sekali gus, dan simpan sebagai bunyi.",
+  "Recording your voice and what's playing… talk, play a sound, then click Stop.": "Merakam suara anda dan apa yang dimainkan… bercakap, mainkan bunyi, kemudian klik Berhenti.",
+  "Your voice and what's playing together, as one sound. What's playing goes down while you talk, so your voice stays on top": "Suara anda dan apa yang dimainkan bersama, sebagai satu bunyi. Apa yang dimainkan menjadi perlahan semasa anda bercakap, jadi suara anda kekal di atas",
   "The Radio tab plays stations from around the world, and can record them as pads.": "Tab Radio memainkan stesen dari seluruh dunia, dan boleh merakamnya sebagai pad."
 }

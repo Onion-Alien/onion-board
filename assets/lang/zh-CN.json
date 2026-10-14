@@ -311,7 +311,6 @@
   "Record": "录制",
   "Record a sound": "录制音效",
   "Record again": "重新录制",
-  "Record your voice, or a bit of a sound, song or the radio while it plays, and keep it as a sound.": "录下你的声音，或在播放时录下一段音效、歌曲或电台，保存为音效。",
   "Recording what's playing… play a sound, a search result or the radio now, then click Stop.": "正在录制播放的内容… 现在播放一个音效、搜索结果或电台，然后点“停止”。",
   "Recording… click Stop when you're done.": "正在录制… 完成后点“停止”。",
   "Redline": "极限模式",
@@ -3312,5 +3311,8 @@
   "Plays a copy of what others hear on more devices: Voicemeeter, a device OBS captures, a second cable, speakers... Mics aren't listed here: Send my sounds to puts your sounds into your mic.": "把别人听到的内容复制一份，在更多设备上播放：Voicemeeter、OBS 捕获的设备、第二根线、音箱……这里不列麦克风：“把我的音效发送到”会把你的音效放进麦克风。",
   "Change mic": "更换麦克风",
   "Put your sounds into another mic instead": "把音效放进另一个麦克风",
+  "Record your voice, a bit of a sound, song or the radio while it plays, or both at once, and keep it as a sound.": "录下你的声音，或正在播放的音效、歌曲或电台的一段，或两者同时录，并保存为音效。",
+  "Recording your voice and what's playing… talk, play a sound, then click Stop.": "正在录制你的声音和正在播放的内容… 说话、播放一个音效，然后点击停止。",
+  "Your voice and what's playing together, as one sound. What's playing goes down while you talk, so your voice stays on top": "你的声音和正在播放的内容合成一个音效。你说话时正在播放的内容会变小，让你的声音保持在上面",
   "The Radio tab plays stations from around the world, and can record them as pads.": "“电台”标签页播放世界各地的电台，还能把它们录成按钮。"
 }

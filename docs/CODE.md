@@ -188,6 +188,7 @@ the launcher the shortcuts and PyInstaller use. The app is the `soundboard` pack
 | `soundboard/hangwatch.py` | notes down a frozen window: if the UI thread stops answering for 5 s, its stack goes into the log and a report beside the crash reports, with every thread's CPU use over 0.5 s (`cpu_times`) and, once it answers again, how long it lasted (`applog.note_freeze_end`; nothing shown or sent) |
 | `soundboard/pollthread.py` | one thread kept for a timer's repeated look-up (Windows' default output, Discord's settings), so the UI never waits in Thread.start for a new one each time |
 | `soundboard/threadnames.py` | each Python thread's name given to Windows too (SetThreadDescription), so profilers and crash dumps tell the threads apart |
+| `soundboard/overridepin.py` | Keeps every Python override of a Qt method alive: in PySide 6.11 one exception inside a Qt callback can free another class's override, and the next call runs freed memory |
 | `soundboard/uigc.py` | Python's garbage collection on the UI thread only: a collection on another thread could free a Qt object with a running timer there and crash the app |
 | `soundboard/ui/icons.py` | the line icons, drawn in code and recoloured with the theme |
 | `soundboard/ui/art.py` | optional pictures from `assets/art` (voice tiles, the computer voice, its languages); emoji / painted icons when missing |

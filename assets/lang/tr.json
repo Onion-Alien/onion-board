@@ -317,7 +317,6 @@
   "Record": "Kaydet",
   "Record a sound": "Ses kaydet",
   "Record again": "Tekrar kaydet",
-  "Record your voice, or a bit of a sound, song or the radio while it plays, and keep it as a sound.": "Sesini ya da çalarken bir sesin, şarkının veya radyonun bir parçasını kaydet ve ses olarak sakla.",
   "Recording what's playing… play a sound, a search result or the radio now, then click Stop.": "Çalan kaydediliyor… şimdi bir ses, bir arama sonucu ya da radyoyu çal, sonra Durdur'a tıkla.",
   "Recording… click Stop when you're done.": "Kaydediliyor… bitince Durdur'a tıkla.",
   "Redline": "Kırmızı çizgi",
@@ -3388,5 +3387,8 @@
   "Plays a copy of what others hear on more devices: Voicemeeter, a device OBS captures, a second cable, speakers... Mics aren't listed here: Send my sounds to puts your sounds into your mic.": "Diğerlerinin duyduğunun bir kopyasını başka cihazlarda da çalar: Voicemeeter, OBS'in yakaladığı bir cihaz, ikinci bir kablo, hoparlörler... Mikrofonlar burada yok: \"Seslerimi şuraya gönder\" seslerini mikrofonuna koyar.",
   "Change mic": "Mikrofonu değiştir",
   "Put your sounds into another mic instead": "Seslerini başka bir mikrofona koy",
+  "Record your voice, a bit of a sound, song or the radio while it plays, or both at once, and keep it as a sound.": "Sesini, çalarken bir sesin, şarkının ya da radyonun bir kısmını veya ikisini birden kaydet ve ses olarak sakla.",
+  "Recording your voice and what's playing… talk, play a sound, then click Stop.": "Sesin ve çalan kaydediliyor… konuş, bir ses çal, sonra Durdur'a tıkla.",
+  "Your voice and what's playing together, as one sound. What's playing goes down while you talk, so your voice stays on top": "Sesin ve çalan birlikte, tek bir ses olarak. Sen konuşurken çalanın sesi kısılır, böylece sesin üstte kalır",
   "The Radio tab plays stations from around the world, and can record them as pads.": "Radyo sekmesi dünyanın her yerinden istasyonlar çalar ve onları pad olarak kaydedebilir."
 }

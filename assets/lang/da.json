@@ -873,7 +873,6 @@
   "Record": "Optag",
   "Record a sound": "Optag en lyd",
   "Record again": "Optag igen",
-  "Record your voice, or a bit of a sound, song or the radio while it plays, and keep it as a sound.": "Optag din stemme, eller et stykke af en lyd, en sang eller radioen, mens den spiller, og gem det som en lyd.",
   "Recording what's playing… play a sound, a search result or the radio now, then click Stop.": "Optager det, der spiller… afspil en lyd, et søgeresultat eller radioen nu, og klik så på Stop.",
   "Recording {n}": "Optager {n}",
   "Recording… click Stop when you're done.": "Optager… klik på Stop, når du er færdig.",
@@ -3388,5 +3387,8 @@
   "Plays a copy of what others hear on more devices: Voicemeeter, a device OBS captures, a second cable, speakers... Mics aren't listed here: Send my sounds to puts your sounds into your mic.": "Afspiller en kopi af det, andre hører, på flere enheder: Voicemeeter, en enhed OBS optager, et ekstra kabel, højttalere... Mikrofoner står ikke her: \"Send mine lyde til\" sender dine lyde ind i din mikrofon.",
   "Change mic": "Skift mikrofon",
   "Put your sounds into another mic instead": "Send dine lyde ind i en anden mikrofon i stedet",
+  "Record your voice, a bit of a sound, song or the radio while it plays, or both at once, and keep it as a sound.": "Optag din stemme, et stykke af en lyd, en sang eller radioen mens den spiller, eller begge dele på én gang, og gem det som en lyd.",
+  "Recording your voice and what's playing… talk, play a sound, then click Stop.": "Optager din stemme og det, der spiller… tal, afspil en lyd, og klik så på Stop.",
+  "Your voice and what's playing together, as one sound. What's playing goes down while you talk, so your voice stays on top": "Din stemme og det, der spiller, sammen som én lyd. Det, der spiller, skrues ned, mens du taler, så din stemme er øverst",
   "The Radio tab plays stations from around the world, and can record them as pads.": "Fanen Radio spiller stationer fra hele verden og kan optage dem som pads."
 }

@@ -323,7 +323,6 @@
   "Record": "Nagraj",
   "Record a sound": "Nagraj dźwięk",
   "Record again": "Nagraj ponownie",
-  "Record your voice, or a bit of a sound, song or the radio while it plays, and keep it as a sound.": "Nagraj swój głos albo kawałek dźwięku, piosenki czy radia, gdy gra, i zachowaj go jako dźwięk.",
   "Recording what's playing… play a sound, a search result or the radio now, then click Stop.": "Nagrywanie tego, co gra… zagraj teraz dźwięk, wynik wyszukiwania albo radio, potem kliknij Stop.",
   "Recording… click Stop when you're done.": "Nagrywanie… kliknij Stop, gdy skończysz.",
   "Redline": "Redline",
@@ -3464,5 +3463,8 @@
   "Plays a copy of what others hear on more devices: Voicemeeter, a device OBS captures, a second cable, speakers... Mics aren't listed here: Send my sounds to puts your sounds into your mic.": "Odtwarza kopię tego, co słyszą inni, na kolejnych urządzeniach: Voicemeeter, urządzenie przechwytywane przez OBS, drugi kabel, głośniki... Mikrofonów tu nie ma: „Wysyłaj moje dźwięki do” wkłada twoje dźwięki do mikrofonu.",
   "Change mic": "Zmień mikrofon",
   "Put your sounds into another mic instead": "Wkładaj dźwięki do innego mikrofonu",
+  "Record your voice, a bit of a sound, song or the radio while it plays, or both at once, and keep it as a sound.": "Nagraj swój głos, fragment dźwięku, piosenki lub radia, gdy gra, albo oba naraz, i zachowaj to jako dźwięk.",
+  "Recording your voice and what's playing… talk, play a sound, then click Stop.": "Nagrywanie twojego głosu i tego, co gra… mów, odtwórz dźwięk, a potem kliknij Zatrzymaj.",
+  "Your voice and what's playing together, as one sound. What's playing goes down while you talk, so your voice stays on top": "Twój głos i to, co gra, razem jako jeden dźwięk. To, co gra, cichnie, gdy mówisz, więc twój głos pozostaje na wierzchu",
   "The Radio tab plays stations from around the world, and can record them as pads.": "Karta Radio gra stacje z całego świata i może je nagrywać jako pady."
 }

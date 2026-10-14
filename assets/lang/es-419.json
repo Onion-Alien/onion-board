@@ -873,7 +873,6 @@
   "Record": "Grabar",
   "Record a sound": "Grabar un sonido",
   "Record again": "Grabar otra vez",
-  "Record your voice, or a bit of a sound, song or the radio while it plays, and keep it as a sound.": "Graba tu voz, o un pedazo de un sonido, una canción o la radio mientras suena, y guárdalo como sonido.",
   "Recording what's playing… play a sound, a search result or the radio now, then click Stop.": "Grabando lo que suena… reproduce ahora un sonido, un resultado de búsqueda o la radio, y luego haz clic en Detener.",
   "Recording {n}": "Grabación {n}",
   "Recording… click Stop when you're done.": "Grabando… haz clic en Detener cuando termines.",
@@ -3388,5 +3387,8 @@
   "Plays a copy of what others hear on more devices: Voicemeeter, a device OBS captures, a second cable, speakers... Mics aren't listed here: Send my sounds to puts your sounds into your mic.": "Reproduce una copia de lo que oyen los demás en más dispositivos: Voicemeeter, un dispositivo que capta OBS, un segundo cable, bocinas... Los micrófonos no aparecen aquí: «Enviar mis sonidos a» pone tus sonidos en tu micrófono.",
   "Change mic": "Cambiar micrófono",
   "Put your sounds into another mic instead": "Poner tus sonidos en otro micrófono",
+  "Record your voice, a bit of a sound, song or the radio while it plays, or both at once, and keep it as a sound.": "Graba tu voz, un fragmento de un sonido, una canción o la radio mientras suena, o ambos a la vez, y guárdalo como sonido.",
+  "Recording your voice and what's playing… talk, play a sound, then click Stop.": "Grabando tu voz y lo que está sonando… habla, reproduce un sonido y luego haz clic en Detener.",
+  "Your voice and what's playing together, as one sound. What's playing goes down while you talk, so your voice stays on top": "Tu voz y lo que está sonando juntos, como un solo sonido. Lo que suena baja mientras hablas, así tu voz queda por encima",
   "The Radio tab plays stations from around the world, and can record them as pads.": "La pestaña Radio reproduce emisoras de todo el mundo y puede grabarlas como pads."
 }

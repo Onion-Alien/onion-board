@@ -311,7 +311,6 @@
   "Record": "録音",
   "Record a sound": "サウンドを録音",
   "Record again": "録り直す",
-  "Record your voice, or a bit of a sound, song or the radio while it plays, and keep it as a sound.": "自分の声や、再生中のサウンド・曲・ラジオの一部を録音して、サウンドとして残せます。",
   "Recording what's playing… play a sound, a search result or the radio now, then click Stop.": "再生中の音を録音中… 今サウンド、検索結果、ラジオを再生して、停止をクリックしてください。",
   "Recording… click Stop when you're done.": "録音中… 終わったら停止をクリックしてください。",
   "Redline": "レッドライン",
@@ -3312,5 +3311,8 @@
   "Plays a copy of what others hear on more devices: Voicemeeter, a device OBS captures, a second cable, speakers... Mics aren't listed here: Send my sounds to puts your sounds into your mic.": "相手に聞こえる音のコピーをほかのデバイスでも再生します：Voicemeeter、OBS がキャプチャするデバイス、2 本目のケーブル、スピーカーなど。マイクはここにはありません：「サウンドの送信先」でサウンドがマイクに入ります。",
   "Change mic": "マイクを変更",
   "Put your sounds into another mic instead": "サウンドを別のマイクに入れる",
+  "Record your voice, a bit of a sound, song or the radio while it plays, or both at once, and keep it as a sound.": "自分の声、再生中のサウンド・曲・ラジオの一部、またはその両方を同時に録音して、サウンドとして保存します。",
+  "Recording your voice and what's playing… talk, play a sound, then click Stop.": "あなたの声と再生中の音を録音中… 話して、サウンドを再生してから「停止」をクリックしてください。",
+  "Your voice and what's playing together, as one sound. What's playing goes down while you talk, so your voice stays on top": "あなたの声と再生中の音を一緒に、1つのサウンドにします。話している間は再生中の音が下がるので、声がしっかり聞こえます",
   "The Radio tab plays stations from around the world, and can record them as pads.": "ラジオタブでは世界中の局を再生でき、パッドとして録音できます。"
 }
