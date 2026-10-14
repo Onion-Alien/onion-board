@@ -217,7 +217,7 @@ def test_setup_tab_offers_and_applies_the_cable_fix(wizard, monkeypatch):
     w.cfg.main_device = "CABLE Input (VB-Audio Virtual Cable)"
     w.micctl._check_cable_format()
     assert w.micctl.cable_bad == [bad]
-    w._update_status()
+    w.statusctl._update_status()
     assert "44.1 kHz" in w.setup_hint.text()
     assert w.micctl.fix_cable_format()
     assert state["set"] == [(bad.name, 48000)]

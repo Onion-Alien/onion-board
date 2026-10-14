@@ -172,7 +172,7 @@ def test_output_card_icons_and_words_share_keylines(window, qapp, monkeypatch): 
     window.cfg.route = "device"
     window.cfg.main_device = None   # nothing picked to send to
     monkeypatch.setattr(window.routectl, "_main_name", lambda: None)
-    window._update_flow()
+    window.statusctl._update_flow()
     qapp.processEvents()
     rail, output = window.rail, window.rail.output
     _assert_keylines(output)
@@ -195,7 +195,7 @@ def test_connected_output_is_only_words_then_a_link_again(window, qapp, monkeypa
     window.cfg.route = "device"
     window.cfg.main_device = None   # nothing picked to send to
     monkeypatch.setattr(window.routectl, "_main_name", lambda: None)
-    window._update_flow()
+    window.statusctl._update_flow()
     qapp.processEvents()
     output = window.rail.output
     assert output.status_text.text() == "Not configured"
@@ -204,7 +204,7 @@ def test_connected_output_is_only_words_then_a_link_again(window, qapp, monkeypa
     try:
         monkeypatch.setattr(window.routectl, "_main_name", lambda: "Selected output")
         window.engine.main_stream = object()
-        window._update_flow()
+        window.statusctl._update_flow()
         qapp.processEvents()
         assert output.status_text.text() == "Connected"
         # the same line, no chevron, no hover, no click, out of the Tab order (no taller:
@@ -221,7 +221,7 @@ def test_connected_output_is_only_words_then_a_link_again(window, qapp, monkeypa
         assert window.pill.isHidden() and not window.rail.toggle.property("dot")
         assert output.dot.isVisible() and output.dot.ok   # green: working
         window.engine.main_stream = None
-        window._update_flow()
+        window.statusctl._update_flow()
         qapp.processEvents()
         # shut: the dot is on the On Air icon (the arrow has none), and the icon is
         # the way to Setup
@@ -299,7 +299,7 @@ def test_picked_but_failing_says_not_working(window, qapp, monkeypatch):  # noqa
     stream = window.engine.main_stream
     try:
         window.engine.main_stream = None
-        window._update_flow()
+        window.statusctl._update_flow()
         qapp.processEvents()
         output = window.rail.output
         assert output.status_text.text() == "Not working" and output.arrow.isVisible()
@@ -315,7 +315,7 @@ def test_full_card_only_when_every_line_fits(window, qapp):  # noqa: F811
     window.resize(1180, 720)
     window.show()
     window.cfg.route, window.cfg.main_device = "device", None
-    window._update_flow()
+    window.statusctl._update_flow()
     window.set_sending(False)
     rail = window.rail
     rail.set_open(True)

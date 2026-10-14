@@ -35,7 +35,7 @@ def test_studio_on_the_mic_gets_the_urgent_bar(window, monkeypatch):
     assert "Studio" in window.urgent_lbl.text() and "Custom" in window.urgent_lbl.text()
     assert window.urgent_btn.text() == "Fix Discord"
     guides = []
-    monkeypatch.setattr(window, "show_chat_guide", guides.append)
+    monkeypatch.setattr(window.statusctl, "show_chat_guide", guides.append)
     window.urgent_btn.click()
     assert guides == ["discord"]
     window.alertctl._on_discord((found(), ("sig2",)))          # fixed in Discord

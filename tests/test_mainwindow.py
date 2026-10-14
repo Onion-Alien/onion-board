@@ -725,7 +725,7 @@ def test_setup_stacks_long_controls_without_sideways_scrolling(window, qapp):
 
     window.rail.set_open(False)   # the widths below assume the shut rail
     window.cfg.route = "mic"
-    window._update_flow()
+    window.statusctl._update_flow()
     window.btn_install.setText("Meine Sounds direkt in mein Mikro legen für Discord und Spiele")
     window.btn_install.setMinimumWidth(650)  # a long translated action
     window.btn_install.show()
@@ -1107,8 +1107,8 @@ def test_setup_not_done_yet_is_one_orange_step_not_red_crosses(window, monkeypat
     monkeypatch.setattr(eng, "virtual_outputs", lambda: [])
     w = window
     w.cfg.route = "cable"
-    w._update_flow()
-    assert w.setup_state == "missing"
+    w.statusctl._update_flow()
+    assert w.statusctl.setup_state == "missing"
     text = w.flow_mic.text() + w.flow_out.text()
     from soundboard.ui import icons
     dpr = w.flow_out.devicePixelRatioF()
@@ -1137,7 +1137,7 @@ def test_mic_card_status_uses_painted_marks_on_one_line(window, monkeypatch):
     w.resize(1180, 720)
     w.show()
     w.tabs.setCurrentWidget(w.setup_page)
-    w._update_flow()
+    w.statusctl._update_flow()
     for _ in range(6):
         QApplication.processEvents()
     out = w.flow_out
@@ -1146,7 +1146,7 @@ def test_mic_card_status_uses_painted_marks_on_one_line(window, monkeypatch):
     assert icons.inline("cross", theme.status("error"), dpr=dpr) in out.text()
     assert out.height() < 2 * out.fontMetrics().lineSpacing()   # one line
     dead["on"] = False
-    w._update_flow()
+    w.statusctl._update_flow()
     assert icons.inline("check", theme.status("ok"), dpr=dpr) in out.text()
 
 

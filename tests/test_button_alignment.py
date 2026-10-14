@@ -41,12 +41,12 @@ class _Capture:
 def test_setup_ways_share_one_height_and_check_again_stays_with_them(window, monkeypatch):  # noqa: F811
     w = window
     w.cfg.route = "cable"   # no cable: the mic first (filled), then the cable's ways
-    monkeypatch.setattr(w, "virtual_mic", None)
+    monkeypatch.setattr(w.statusctl, "virtual_mic", None)
     monkeypatch.setattr(eng, "virtual_outputs", lambda: [])
     w.resize(1400, 900)
     w.show()
     w.tabs.setCurrentIndex(TAB_INDEX["setup"])
-    w._update_flow()
+    w.statusctl._update_flow()
     pump()
     ways = (w.btn_attach, w.btn_install, w.btn_guide, w.btn_rescan)
     assert all(b.isVisible() for b in ways)

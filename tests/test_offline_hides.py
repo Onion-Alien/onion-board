@@ -58,18 +58,18 @@ def test_offline_start_hides_them_from_the_first_paint(window):  # noqa: F811
 
 def test_cable_install_button_goes_but_the_mic_setup_stays(window):  # noqa: F811
     window.cfg.route = "cable"
-    window._update_flow()
+    window.statusctl._update_flow()
     shown_online = not window.btn_install.isHidden()
     offline(window, True)
     try:
         assert window.btn_install.isHidden()   # it downloads VB-Cable
         window.cfg.route = "mic"
-        window._update_flow()
+        window.statusctl._update_flow()
         assert window.btn_install.isEnabled()   # setting up the mic goes nowhere online
     finally:
         window.cfg.route = "cable"
         offline(window, False)
-    window._update_flow()
+    window.statusctl._update_flow()
     assert (not window.btn_install.isHidden()) == shown_online
 
 
