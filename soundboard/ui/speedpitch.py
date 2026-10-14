@@ -21,7 +21,7 @@ from PySide6.QtWidgets import (QApplication, QCheckBox, QDialog, QFrame, QGridLa
 from soundboard import livefx, theme, voicefx
 from soundboard.ui import fit, icons
 from soundboard.ui.panel import hint_label, reset_button, section_label
-from soundboard.ui.voicepanel import ParamSlider
+from soundboard.ui.voicefxpanel import ParamSlider
 from soundboard.i18n import _
 from soundboard.ui.pixels import snap_to_pixels
 
