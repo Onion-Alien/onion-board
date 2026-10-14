@@ -189,7 +189,7 @@ class StreamerGuide(QDialog):
     def turn_on(self):
         self.mw.cfg.api_enabled = True
         self.mw.cfg.save()
-        self.mw.apply_remote()
+        self.mw.remctl.apply_remote()
         self.refresh()
 
     def _copy(self, btn, action: str, query: str):
