@@ -155,3 +155,44 @@ def test_dragging_his_corner_only_resizes_him(window, qapp):
     mouse(QEvent.Type.MouseButtonRelease, bun.mapFromGlobal(g0 + QPoint(-60, -60)),
           Qt.MouseButton.NoButton)
     assert bun.icons.isVisible() and bun.isVisible() and not window.isVisible()
+
+
+def test_a_tabs_right_click_menu_turns_the_full_board_into_bun_and_back(window, qapp):
+    window.show()
+    window.resize(1180, 720)
+    window._refit()
+    assert not window.is_mini()
+    menu = window.tab_menu(0)
+    act = next(a for a in menu.actions() if a.text() == "Turn into Bun")
+    act.trigger()
+    bun = window.bun_mode
+    assert bun.isVisible() and not window.isVisible()
+    bun.enterEvent(None)
+    bun.b_back.click()
+    assert window.isVisible() and not window.is_mini() and window.width() == 1180
+
+
+def test_his_resize_corner_shrinks_with_him(window, qapp):
+    _mini(window)
+    window.enter_bun_mode()
+    bun = window.bun_mode
+    bun.set_size(bunmode.MIN_H)
+    small = bun._grip().width()
+    bun.set_size(200)
+    assert small < bun._grip().width() and small <= bunmode.GRIP_MIN + 4
+
+
+def test_back_returns_the_window_as_it_was_even_after_a_restart(window, qapp):
+    """Back gives the window its size and place from before Bun, also when the app
+    started as Bun (the window never shown); only the menu opens the full board."""
+    _mini(window)
+    window.move(120, 90)
+    was = window.geometry()
+    window.enter_bun_mode()
+    assert window.cfg.bun["from"][:4] == [was.x(), was.y(), was.width(), was.height()]
+    window.resize(1180, 720)   # what a fresh start has, the window never shown
+    window.bun_mode.back.emit()
+    assert window.isVisible() and window.is_mini() and window.geometry() == was
+    window.enter_bun_mode()
+    window.bun_mode.full.emit()   # the right-click menu: the full board
+    assert not window.is_mini() and window.width() > was.width()

@@ -52,7 +52,8 @@ ICONS_H = 48          # the row of buttons under him (room kept, shown on hover)
 SNAP = 4
 BUTTON = 32
 ICON = 16
-GRIP = 16             # the resize corner
+GRIP = 16             # the resize corner, at full size; it shrinks with him...
+GRIP_MIN = 7          # ...down to this (a 16 px corner beside a tiny Bun looked huge)
 MARGIN = 24           # from the screen's edge, where he first lands
 RESIZE_REST_MS = 350   # the wheel stopped this long: the buttons come back
 HIDE_ICONS_MS = 450   # the mouse left: the buttons go after this
@@ -238,7 +239,8 @@ class BunMode(QWidget):
 
     def _grip(self) -> QRect:
         r = self._bun_rect()
-        return QRect(r.right() - GRIP // 2, r.bottom() - GRIP, GRIP + 4, GRIP + 4)
+        g = max(GRIP_MIN, min(GRIP, round(self.bun_h * 0.13)))
+        return QRect(r.right() - g // 2, r.bottom() - g, g + 4, g + 4)
 
     # ------------------------------------------------------------------ show
     def present(self, near: QRect | None = None):
@@ -450,7 +452,7 @@ class BunMode(QWidget):
 
     def _paint_grip(self, p: QPainter):
         r = QRectF(self._grip())
-        pen = QPen(QColor(theme.T["text_hi"]), 1.6)
+        pen = QPen(QColor(theme.T["text_hi"]), 1.6 if r.width() >= 14 else 1.2)
         pen.setCapStyle(Qt.PenCapStyle.RoundCap)
         p.setPen(pen)
         for k in (0.35, 0.65, 0.95):

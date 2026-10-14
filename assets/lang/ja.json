@@ -3314,5 +3314,5 @@
   "Drag: move him. Scroll: bigger or smaller. Hover for the buttons.": "ドラッグ: 移動。スクロール: 大きく・小さく。マウスを乗せるとボタンが出ます。",
   "Open the full board": "ボード全体を開く",
   "Turn into Bun": "Bun に変身",
-  "Turn into Bun: a small floating Bun instead of this window. Click him to come back.": "Bun に変身: このウィンドウの代わりに小さな Bun が浮かびます。クリックで元に戻ります。"
+  "Turn into Bun: a small Bun floating on top instead of this window. The button under him brings it back.": "Bun に変身: このウィンドウの代わりに小さな Bun が最前面に浮かびます。下のボタンで元に戻ります。"
 }
