@@ -1162,6 +1162,9 @@ class SearchResults(RoundedFrame):
             req = QNetworkRequest(QUrl(thumb))
             req.setTransferTimeout(THUMB_TIMEOUT_MS)
             reply = self._nam(feature).get(req)
+            # Qt's network thread reads on while the UI thread is busy: without a buffer
+            # limit a never-ending picture piles up long before _cap_thumb gets to run
+            reply.setReadBufferSize(THUMB_MAX_BYTES + 1_000_000)
             reply.downloadProgress.connect(
                 lambda got, total, reply=reply: _cap_thumb(reply, got, total))
             reply.finished.connect(lambda reply=reply, row=row, g=gen: self._on_thumb(
