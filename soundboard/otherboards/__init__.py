@@ -48,7 +48,7 @@ def importable(entries: list[Entry]) -> tuple[list[Entry], list[Entry]]:
 
 
 def sources() -> list[Source]:
-    from soundboard import expboard, resanance, soundpad, soundux
+    from soundboard.otherboards import expboard, resanance, soundpad, soundux
     return [soundpad.SOURCE, resanance.SOURCE, soundux.SOURCE, expboard.SOURCE]
 
 

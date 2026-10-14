@@ -6,13 +6,13 @@
     .venv\\Scripts\\python scripts\\docs.py --no-shots         # only the text
 
 The version comes from soundboard/__init__.py; the VirusTotal scan is remembered in
-docs/release.json, so it only needs passing once per release. The line is rewritten
-between the <!-- release --> markers in README.md and docs/index.html, and the
+site/release.json, so it only needs passing once per release. The line is rewritten
+between the <!-- release --> markers in README.md and site/index.html, and the
 sitemap's dates are set to today. Every screenshot link gets ?v=<hash of the picture>,
 so nobody is shown an old cached copy after the pictures change.
 
 Screenshots are screenshots.py (offscreen, made-up data, the Dark theme, Textured). The
-Onion Watch pictures in docs/screenshots/watch/ come from Onion Watch's own screenshots.py
+Onion Watch pictures in site/screenshots/watch/ come from Onion Watch's own screenshots.py
 (`python scripts/screenshots.py <dir>` there, Dark like these; its game is the same scene as
 this site's Watch demo): copy main, window-picker, cut-picture, health-bar and categories
 in, then run this with --no-shots to re-link them. Set
@@ -31,8 +31,8 @@ import time
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
-RELEASE = ROOT / "docs" / "release.json"
-SHOTS = ROOT / "docs" / "screenshots"
+RELEASE = ROOT / "site" / "release.json"
+SHOTS = ROOT / "site" / "screenshots"
 REPO = "https://github.com/Onion-Alien/onion-board"
 
 
@@ -70,8 +70,8 @@ def stamp(path: Path, block: str):
     print("stamped", path.relative_to(ROOT))
 
 
-PAGES = [ROOT / "README.md", ROOT / "docs" / "index.html",
-         *sorted((ROOT / "docs").glob("*/index.html"))]   # the guide pages
+PAGES = [ROOT / "README.md", ROOT / "site" / "index.html",
+         *sorted((ROOT / "site").glob("*/index.html"))]   # the guide pages
 
 
 def bust_caches():
@@ -97,7 +97,7 @@ def main():
     ap.add_argument("--vt", nargs=2, metavar=("SHA256", "CLEAN/TOTAL"),
                     help="the release installer's VirusTotal scan, e.g. --vt 4267e4cf... 68/68")
     ap.add_argument("--no-shots", action="store_true", help="skip the screenshots")
-    ap.add_argument("--tour", action="store_true", help="also re-record docs/screenshots/tour.webp")
+    ap.add_argument("--tour", action="store_true", help="also re-record site/screenshots/tour.webp")
     args = ap.parse_args()
 
     r = json.loads(RELEASE.read_text(encoding="utf-8"))
@@ -110,8 +110,8 @@ def main():
     RELEASE.write_text(json.dumps(r, indent=2) + "\n", encoding="utf-8")
 
     stamp(ROOT / "README.md", readme_block(r))
-    stamp(ROOT / "docs" / "index.html", site_block(r))
-    sitemap = ROOT / "docs" / "sitemap.xml"
+    stamp(ROOT / "site" / "index.html", site_block(r))
+    sitemap = ROOT / "site" / "sitemap.xml"
     # UTC, like the commit times and the CHANGELOG: a local date can give away the timezone
     today = datetime.datetime.now(datetime.UTC).date().isoformat()
     sitemap.write_text(re.sub(r"<lastmod>[^<]*</lastmod>", f"<lastmod>{today}</lastmod>",
