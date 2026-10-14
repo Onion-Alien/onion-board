@@ -4,7 +4,6 @@
   "_meta": {
     "name": "हिन्दी"
   },
-  " A newer yt-dlp may fix this: Settings → Updates → Update now.": " नया yt-dlp इसे ठीक कर सकता है: सेटिंग्स → अपडेट → अभी अपडेट करें।",
   " and ": " और ",
   " · right-click to rename, delete or give it a random-sound hotkey · drag to reorder": " · नाम बदलने, डिलीट करने या रैंडम-साउंड हॉटकी देने के लिए राइट-क्लिक करें · क्रम बदलने के लिए खींचें",
   " · shows by itself when {progs} is in front": " · {progs} सामने होने पर अपने आप दिखती है",
@@ -3389,5 +3388,11 @@
   "{n} sound couldn't be read and was left out.": [
     "{n} साउंड पढ़ा नहीं जा सका और छोड़ दिया गया।",
     "{n} साउंड पढ़े नहीं जा सके और छोड़ दिए गए।"
-  ]
+  ],
+  " A newer downloader may fix this.": " नया डाउनलोडर शायद इसे ठीक कर दे।",
+  "Couldn't update the downloader: {error}": "डाउनलोडर अपडेट नहीं हो सका: {error}",
+  "Get the newest yt-dlp, the part that downloads from YouTube and other sites, then try this link again": "सबसे नया yt-dlp लें, वह हिस्सा जो YouTube और दूसरी साइटों से डाउनलोड करता है, फिर यह लिंक दोबारा आज़माएँ",
+  "The downloader is already the newest. The site may have changed in a way it can't handle yet: try again in a few days.": "डाउनलोडर पहले से सबसे नया है। साइट शायद ऐसे बदली है जिसे यह अभी संभाल नहीं पाता: कुछ दिनों में फिर कोशिश करें।",
+  "Update downloader": "डाउनलोडर अपडेट करें",
+  "Updating the downloader…": "डाउनलोडर अपडेट हो रहा है…"
 }

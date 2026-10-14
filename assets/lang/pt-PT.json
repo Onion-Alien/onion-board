@@ -4,7 +4,6 @@
   "_meta": {
     "name": "Português (Portugal)"
   },
-  " A newer yt-dlp may fix this: Settings → Updates → Update now.": " Uma versão mais recente do yt-dlp pode resolver isto: Definições → Atualizações → Atualizar agora.",
   " and ": " e ",
   " · right-click to rename, delete or give it a random-sound hotkey · drag to reorder": " · clica com o botão direito para mudar o nome, eliminar ou dar-lhe um atalho de som aleatório · arrasta para reordenar",
   " · shows by itself when {progs} is in front": " · aparece sozinha quando {progs} está à frente",
@@ -3389,5 +3388,11 @@
   "{n} sound couldn't be read and was left out.": [
     "{n} som não pôde ser lido e ficou de fora.",
     "{n} sons não puderam ser lidos e ficaram de fora."
-  ]
+  ],
+  " A newer downloader may fix this.": " Um downloader mais recente pode resolver isto.",
+  "Couldn't update the downloader: {error}": "Não foi possível atualizar o downloader: {error}",
+  "Get the newest yt-dlp, the part that downloads from YouTube and other sites, then try this link again": "Obtém o yt-dlp mais recente, a parte que transfere do YouTube e de outros sites, e tenta esta ligação de novo",
+  "The downloader is already the newest. The site may have changed in a way it can't handle yet: try again in a few days.": "O downloader já é o mais recente. O site pode ter mudado de uma forma que ainda não consegue tratar: tenta de novo daqui a uns dias.",
+  "Update downloader": "Atualizar downloader",
+  "Updating the downloader…": "A atualizar o downloader…"
 }

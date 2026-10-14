@@ -188,12 +188,17 @@ def test_a_failed_download_leaves_no_temp_folder(monkeypatch, tmp_path):
 def pypi(app_dir, monkeypatch):
     """A fake PyPI: `releases[version]` makes a wheel whose yt_dlp says that version.
     Nothing touches the network; the import hook is removed afterwards."""
-    state = {"latest": "2099.1.1", "fetched": [], "corrupt": False}
+    # requires: version -> requires_python, listed as PyPI's "releases" when set;
+    # broken: versions whose yt_dlp doesn't import (like one written for a newer Python)
+    state = {"latest": "2099.1.1", "fetched": [], "corrupt": False, "requires": {},
+             "broken": set()}
 
     def wheel(pkg, version):
         buf = io.BytesIO()
         with zipfile.ZipFile(buf, "w") as z:
-            z.writestr(f"{pkg}/__init__.py", f"__version__ = {version!r}\nFAKE = True\n")
+            body = ("def broken(:\n" if pkg == "yt_dlp" and version in state["broken"] else
+                    f"__version__ = {version!r}\nFAKE = True\n")
+            z.writestr(f"{pkg}/__init__.py", body)
             z.writestr(f"{pkg}/sub.py", "X = 1\n")
             z.writestr(f"{pkg}-{version}.dist-info/METADATA", "Name: x\n")
         return buf.getvalue()
@@ -203,15 +208,24 @@ def pypi(app_dir, monkeypatch):
         url = f"{ytdl.WHEEL_HOST}{name}-{version}-py3-none-any.whl"
         state[url] = data
         digest = "0" * 64 if state["corrupt"] else hashlib.sha256(data).hexdigest()
+        file = {"packagetype": "bdist_wheel", "url": url, "digests": {"sha256": digest},
+                "filename": url.rsplit("/", 1)[1],
+                "requires_python": state["requires"].get(version)}
         return {"info": {"name": name, "version": version, "requires_dist": list(requires)},
-                "urls": [{"packagetype": "bdist_wheel", "url": url, "digests": {"sha256": digest},
-                          "filename": url.rsplit("/", 1)[1]}]}
+                "urls": [file]}
+
+    ejs = ['yt-dlp-ejs==0.9.0; extra == "default"']
 
     def get(url, limit):
         state["fetched"].append(url)
         if url == ytdl.PYPI.format("yt-dlp"):
-            return json.dumps(release("yt-dlp", state["latest"],
-                                      ['yt-dlp-ejs==0.9.0; extra == "default"'])).encode()
+            meta = release("yt-dlp", state["latest"], ejs)
+            if state["requires"]:
+                meta["releases"] = {v: release("yt-dlp", v, ejs)["urls"]
+                                    for v in state["requires"]}
+            return json.dumps(meta).encode()
+        if url.startswith("https://pypi.org/pypi/yt-dlp/"):   # one version's page
+            return json.dumps(release("yt-dlp", url.split("/")[-2], ejs)).encode()
         if url.endswith("/yt-dlp-ejs/0.9.0/json"):
             return json.dumps(release("yt-dlp-ejs", "0.9.0")).encode()
         return state[url]
@@ -357,6 +371,89 @@ def test_a_failed_download_updates_and_retries_once(pypi, monkeypatch, tmp_path)
     with pytest.raises(ytdl.FetchError):
         ytdl.download_audio("https://youtu.be/x")
     assert calls == ["2099.1.1"]
+
+
+@pytest.mark.parametrize("spec, ok", [
+    (None, True), ("", True), (">=3.10", True), (">=3.12", True), (">=3.13", False),
+    (">=3.10,<4", True), ("<3.12", False), ("!=3.12.*", False), ("==3.12.*", True),
+    ("~=3.11", True), ("~=3.12.5", False), (">=3.9, !=3.11.*", True), ("junk", False)])
+def test_requires_python_is_read_for_this_python(spec, ok):
+    assert ytdl._py_ok(spec, (3, 12, 4)) is ok
+
+
+def test_update_skips_a_release_that_needs_a_newer_python(pypi):
+    """yt-dlp drops old Pythons now and then: the app (frozen on its Python) keeps
+    getting the newest release that still runs on it, never one that can't import."""
+    pypi["requires"] = {"2099.1.1": ">=3.99", "2098.5.5": ">=3.10", "2097.1.1": ">=3.10",
+                        "2099.2.2.123.dev0": ">=3.10"}   # a nightly: never taken
+    assert ytdl.update() == "Updated yt-dlp to 2098.5.5."
+    assert ytdl.active_version() == ("2098.5.5", True)
+
+    pypi["requires"] = {"2099.1.1": ">=3.99"}            # nothing runs here
+    assert "up to date" in ytdl.update(force=True)
+    assert ytdl.active_version() == ("2098.5.5", True)  # the copy in use stays
+
+
+def test_a_downloaded_copy_that_doesnt_import_falls_back_and_is_never_fetched_again(pypi):
+    pypi["broken"].add("2099.1.1")
+    assert ytdl.update() == "Updated yt-dlp to 2099.1.1."
+    with ytdl._ydl() as yt_dlp:               # the built-in one, not an error
+        assert not getattr(yt_dlp, "FAKE", False)
+    assert ytdl.active_version() == ("2026.8.19", False)
+    assert not ytdl._pkg_dir().exists() and not list(ytdl.root().glob("bad-*"))
+    assert ytdl._state()["bad"] == ["2099.1.1"]
+    pypi["requires"] = {"2099.1.1": ">=3.10"}  # still PyPI's newest: skipped now
+    assert "up to date" in ytdl.update()
+    assert ytdl.active_version() == ("2026.8.19", False)
+
+
+def test_link_bar_offers_to_update_the_downloader_and_tries_again(qapp, monkeypatch):
+    from soundboard.ui.linkbar import LinkBar
+    calls, version = [], ["2026.8.19"]
+
+    def fake_download(url, progress=None, auto_update=True):
+        calls.append(auto_update)
+        raise ytdl.FetchError("ERROR: [youtube] abc: Signature extraction failed")
+    monkeypatch.setattr(ytdl, "download_audio", fake_download)
+    monkeypatch.setattr(ytdl, "active_version", lambda: (version[0], True))
+
+    def update():
+        version[0] = "2099.1.1"
+        return "Updated yt-dlp to 2099.1.1."
+    monkeypatch.setattr(ytdl, "update", update)
+    bar = LinkBar(engine=None, cfg=Config(), color_for=lambda: "#fff", known_for=dict)
+    bar.set_text("https://www.youtube.com/watch?v=abc")
+    bar.add()
+    assert process_events(qapp, lambda: not bar._busy and calls)
+    assert calls == [False] and bar.btn_update.isVisibleTo(bar)   # auto-update is opt-in
+    assert "A newer downloader may fix this." in bar.info.text()
+    bar.btn_update.click()                                         # updates, then retries
+    assert process_events(qapp, lambda: len(calls) == 2 and not bar._busy)
+    assert bar.btn_update.isVisibleTo(bar)                         # failed again: offered again
+    bar.btn_update.click()                                         # nothing newer this time
+    assert process_events(qapp, lambda: "already the newest" in bar.info.text())
+    assert len(calls) == 2 and not bar.btn_update.isVisibleTo(bar)
+
+
+def test_link_bar_doesnt_offer_an_update_when_its_switched_off_or_a_site_refused(
+        qapp, monkeypatch):
+    from soundboard import net
+    from soundboard.ui.linkbar import LinkBar
+    errors = [ytdl.FetchError("ERROR: Sign in to confirm you're not a bot")]
+    monkeypatch.setattr(ytdl, "download_audio", lambda url, progress=None, auto_update=True:
+                        (_ for _ in ()).throw(errors[0]))
+    bar = LinkBar(engine=None, cfg=Config(), color_for=lambda: "#fff", known_for=dict)
+    bar.set_text("https://www.youtube.com/watch?v=abc")
+    bar.add()
+    assert process_events(qapp, lambda: not bar._busy and bar.info.text())
+    assert not bar.btn_update.isVisibleTo(bar)     # a bot check: about the address
+    errors[0] = ytdl.FetchError("ERROR: Signature extraction failed")
+    real = net.allowed
+    monkeypatch.setattr(net, "allowed", lambda f: f != ytdl.UPDATE_FEATURE and real(f))
+    bar.set_text("https://www.youtube.com/watch?v=xyz")
+    bar.add()
+    assert process_events(qapp, lambda: not bar._busy and bar.info.text())
+    assert not bar.btn_update.isVisibleTo(bar)     # updating is switched off
 
 
 def test_a_refused_download_does_not_update(pypi, monkeypatch):

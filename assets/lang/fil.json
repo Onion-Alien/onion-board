@@ -4,7 +4,6 @@
   "_meta": {
     "name": "Filipino"
   },
-  " A newer yt-dlp may fix this: Settings → Updates → Update now.": " Baka maayos ito ng mas bagong yt-dlp: Settings → Mga update → Update now.",
   " and ": " at ",
   " · right-click to rename, delete or give it a random-sound hotkey · drag to reorder": " · i-right-click para i-rename, burahin o bigyan ng random-sound hotkey · i-drag para ayusin ang order",
   " · shows by itself when {progs} is in front": " · kusang lumalabas kapag nasa harap ang {progs}",
@@ -3389,5 +3388,11 @@
   "{n} sound couldn't be read and was left out.": [
     "Hindi nabasa ang {n} sound kaya hindi ito isinama.",
     "Hindi nabasa ang {n} sound kaya hindi sila isinama."
-  ]
+  ],
+  " A newer downloader may fix this.": " Baka maayos ito ng mas bagong downloader.",
+  "Couldn't update the downloader: {error}": "Hindi ma-update ang downloader: {error}",
+  "Get the newest yt-dlp, the part that downloads from YouTube and other sites, then try this link again": "Kunin ang pinakabagong yt-dlp, ang bahaging nagda-download mula sa YouTube at iba pang site, tapos subukan ulit ang link na ito",
+  "The downloader is already the newest. The site may have changed in a way it can't handle yet: try again in a few days.": "Pinakabago na ang downloader. Baka nagbago ang site sa paraang hindi pa nito kaya: subukan ulit pagkalipas ng ilang araw.",
+  "Update downloader": "I-update ang downloader",
+  "Updating the downloader…": "Ina-update ang downloader…"
 }

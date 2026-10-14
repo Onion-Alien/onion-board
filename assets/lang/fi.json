@@ -4,7 +4,6 @@
   "_meta": {
     "name": "Suomi"
   },
-  " A newer yt-dlp may fix this: Settings → Updates → Update now.": " Uudempi yt-dlp voi korjata tämän: Asetukset → Päivitykset → Päivitä nyt.",
   " and ": " ja ",
   " · right-click to rename, delete or give it a random-sound hotkey · drag to reorder": " · klikkaa oikealla nimetäksesi, poistaaksesi tai antaaksesi satunnaisäänen pikanäppäimen · vedä järjestääksesi",
   " · shows by itself when {progs} is in front": " · näkyy itsestään, kun {progs} on edessä",
@@ -3389,5 +3388,11 @@
   "{n} sound couldn't be read and was left out.": [
     "{n} ääni jäi pois, koska sitä ei voitu lukea.",
     "{n} ääntä jäi pois, koska niitä ei voitu lukea."
-  ]
+  ],
+  " A newer downloader may fix this.": " Uudempi latausohjelma voi korjata tämän.",
+  "Couldn't update the downloader: {error}": "Latausohjelmaa ei voitu päivittää: {error}",
+  "Get the newest yt-dlp, the part that downloads from YouTube and other sites, then try this link again": "Hae uusin yt-dlp, osa joka lataa YouTubesta ja muilta sivuilta, ja kokeile tätä linkkiä uudelleen",
+  "The downloader is already the newest. The site may have changed in a way it can't handle yet: try again in a few days.": "Latausohjelma on jo uusin. Sivusto on ehkä muuttunut tavalla, jota se ei vielä osaa käsitellä: kokeile uudelleen muutaman päivän päästä.",
+  "Update downloader": "Päivitä latausohjelma",
+  "Updating the downloader…": "Päivitetään latausohjelmaa…"
 }

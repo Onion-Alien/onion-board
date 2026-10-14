@@ -4,7 +4,6 @@
   "_meta": {
     "name": "Українська"
   },
-  " A newer yt-dlp may fix this: Settings → Updates → Update now.": " Новіша версія yt-dlp може це виправити: Налаштування → Оновлення → Оновити зараз.",
   " and ": " і ",
   " · right-click to rename, delete or give it a random-sound hotkey · drag to reorder": " · правий клік: перейменувати, видалити або дати гарячу клавішу випадкового звуку · перетягни, щоб змінити порядок",
   " · shows by itself when {progs} is in front": " · з'являється сама, коли {progs} на передньому плані",
@@ -3465,5 +3464,11 @@
     "{n} звук не вдалося прочитати, його пропущено.",
     "{n} звуки не вдалося прочитати, їх пропущено.",
     "{n} звуків не вдалося прочитати, їх пропущено."
-  ]
+  ],
+  " A newer downloader may fix this.": " Новіший завантажувач може це виправити.",
+  "Couldn't update the downloader: {error}": "Не вдалося оновити завантажувач: {error}",
+  "Get the newest yt-dlp, the part that downloads from YouTube and other sites, then try this link again": "Отримати найновіший yt-dlp, частину, що завантажує з YouTube та інших сайтів, і спробувати це посилання знову",
+  "The downloader is already the newest. The site may have changed in a way it can't handle yet: try again in a few days.": "Завантажувач уже найновіший. Можливо, сайт змінився так, що він поки з цим не справляється: спробуйте знову за кілька днів.",
+  "Update downloader": "Оновити завантажувач",
+  "Updating the downloader…": "Завантажувач оновлюється…"
 }
