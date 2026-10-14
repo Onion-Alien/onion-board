@@ -221,7 +221,7 @@ def test_the_window_adds_a_recording_as_a_selected_pad(window, monkeypatch):  # 
     e.names["mic"], e.mic_stream = "Test mic", object()
     try:
         d = RecordDialog(e, lambda: False, lambda: [m.name for m in window.cfg.sounds],
-                         window.add_recording, lambda: None, window)
+                         window.soundctl.add_recording, lambda: None, window)
         n = len(window.cfg.sounds)
         record(d, e)
         assert window.cfg.to_raw() == before   # a take changes no setting
@@ -246,7 +246,7 @@ def test_a_recording_of_a_playing_pad_gets_its_picture(window, tmp_path):  # noq
     e = out_engine("main")
     saved = []
     d = RecordDialog(e, lambda: False, lambda: [],
-                     lambda *a: saved.append(a) or window.add_recording(*a), lambda: None,
+                     lambda *a: saved.append(a) or window.soundctl.add_recording(*a), lambda: None,
                      playing_name=lambda: "Airhorn", playing_picture=lambda: src.image)
     d.opt_play.setChecked(True)
     assert d.start()
@@ -273,9 +273,9 @@ def test_the_main_window_names_the_playing_pads_picture(window, monkeypatch):  #
     assert thumbs.set_image(window.meta("s0"), img)
     window.current = "s0"
     monkeypatch.setattr(window.engine, "state", lambda sid: (0.1, False))
-    assert window._playing_picture() == window.meta("s0").image
+    assert window.soundctl._playing_picture() == window.meta("s0").image
     monkeypatch.setattr(window.engine, "state", lambda sid: None)   # stopped: nothing
-    assert window._playing_picture() == ""
+    assert window.soundctl._playing_picture() == ""
 
 
 def test_cancel_adds_nothing(window, monkeypatch):  # noqa: F811
@@ -283,7 +283,7 @@ def test_cancel_adds_nothing(window, monkeypatch):  # noqa: F811
     e.names["mic"], e.mic_stream = "Test mic", object()
     try:
         n = len(window.cfg.sounds)
-        d = RecordDialog(e, lambda: False, lambda: [], window.add_recording, lambda: None,
+        d = RecordDialog(e, lambda: False, lambda: [], window.soundctl.add_recording, lambda: None,
                          window)
         record(d, e)
         monkeypatch.setattr(QMessageBox, "question", lambda *a, **k: QMessageBox.Yes)
@@ -378,13 +378,13 @@ def test_whats_playing_needs_an_open_device(app_dir):
 
 
 def test_the_record_window_leaves_the_board_usable(window):  # noqa: F811
-    window.record_dialog()
-    d = window._record_dlg
+    window.soundctl.record_dialog()
+    d = window.soundctl._record_dlg
     assert d is not None and d.isVisible() and not d.isModal()
-    window.record_dialog()                     # a second click brings the same one up
-    assert window._record_dlg is d
+    window.soundctl.record_dialog()                     # a second click brings the same one up
+    assert window.soundctl._record_dlg is d
     d.reject()
-    assert window._record_dlg is None
+    assert window.soundctl._record_dlg is None
 
 
 # ------------------------------------------------------------------ both at once

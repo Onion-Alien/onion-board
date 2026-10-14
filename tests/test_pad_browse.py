@@ -103,10 +103,10 @@ def test_playing_counts_and_most_played_sorts(window, monkeypatch):
 def test_dragging_while_sorted_keeps_the_own_order(window):
     w = window
     w.padctl.set_pad_sort("name")
-    w.on_reorder("s0", 0)
+    w.soundctl.on_reorder("s0", 0)
     assert [m.id for m in w.cfg.sounds] == ["s0", "s1"]
     w.padctl.set_pad_sort("custom")
-    w.on_reorder("s1", 0)
+    w.soundctl.on_reorder("s1", 0)
     assert [m.id for m in w.cfg.sounds] == ["s1", "s0"]
 
 

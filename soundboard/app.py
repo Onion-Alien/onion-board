@@ -451,13 +451,13 @@ PAINT_WAIT_S = 0.5   # ...and for Windows to put the window on screen for its fi
 
 
 def wait_for_sounds(app, w, cap_s: float = LOAD_WAIT_S):
-    """The sounds (MainWindow._load_all's thread) finish loading behind the loading
+    """The sounds (SoundsControl._load_all's thread) finish loading behind the loading
     screen: ~0.4 s for 50 sounds that otherwise ran right after the window showed,
     sharing Python with the first paint and the first clicks. Events are handled
     meanwhile, so each pad gets its sound as it loads. A big library shows the window
     after `cap_s` and loads the rest as before."""
     import time
-    loader = getattr(w, "_load_thread", None)
+    loader = getattr(w.soundctl, "_load_thread", None)
     end = time.monotonic() + cap_s
     while loader is not None and loader.is_alive() and time.monotonic() < end:
         app.processEvents()

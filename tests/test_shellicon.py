@@ -185,11 +185,11 @@ def win(qapp, app_dir, monkeypatch):
     monkeypatch.setattr(winkeys.Hotkeys, "register", lambda self, m: None)
     monkeypatch.setattr(setupwizard, "resume_after_restart", lambda on: None)
     w = main.MainWindow()
-    w._load_thread.join(15)
+    w.soundctl._load_thread.join(15)
     yield w
     w._quitting = True
     w.close()
-    w._load_thread.join(15)
+    w.soundctl._load_thread.join(15)
     w.deleteLater()
     qapp.sendPostedEvents(None, QEvent.DeferredDelete)
 

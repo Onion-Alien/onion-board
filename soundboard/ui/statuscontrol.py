@@ -387,7 +387,7 @@ class StatusControl(Controller):
         mw.rmcable_note.hide()   # (its tooltip says it)
         if route == "mic":
             mw._direct_shown = mw.micctl._direct_health()
-        mw._cable_follow_switch()
+        mw.netctl._cable_follow_switch()
         mw.btn_rescan.setVisible(state == "missing" and route != "mic")
         mw.btn_attach.setVisible(route == "cable" and not mw._attaching)
         if route == "mic":

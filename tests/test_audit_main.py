@@ -67,10 +67,10 @@ def test_fitter_steps_can_be_removed(qapp):
 def test_radio_switched_off_and_on_swaps_its_fit_steps(window, qapp):
     first = window._radio_steps
     net.configure_features(off=["radio"])
-    window._radio_follow_switch()
+    window.netctl._radio_follow_switch()
     qapp.sendPostedEvents(None, QEvent.DeferredDelete)   # the old Radio tab is gone
     net.configure_features()
-    window._radio_follow_switch()
+    window.netctl._radio_follow_switch()
     qapp.sendPostedEvents(None, QEvent.DeferredDelete)
     ids = {id(s[2]) for s in window.fitctl._fit.steps}
     assert window._radio_steps and all(id(s[2]) in ids for s in window._radio_steps)
