@@ -18,6 +18,10 @@ Set-Location $root
 $py = Join-Path $root ".venv\Scripts\python.exe"
 if (-not (Test-Path $py)) { throw "No .venv: see docs/DEVELOPING.md section 1" }
 $env:QT_QPA_PLATFORM = "offscreen"
+# translation catalogs merge by key (scripts/merge_json.py, .gitattributes): set it once per clone
+if (-not (git config --get merge.langjson.driver)) {
+    git config merge.langjson.driver "python scripts/merge_json.py %O %A %B"
+}
 $total = [Diagnostics.Stopwatch]::StartNew()
 
 # how long each step and the whole run took, so it's clear what's slow

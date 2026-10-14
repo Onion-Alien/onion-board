@@ -348,3 +348,31 @@ def test_built_in_category_names_show_in_the_language_and_save_in_english(qapp, 
         t.shutdown()
     finally:
         i18n.set_language("en")
+
+
+def test_tab_order_reads_each_cards_controls_fresh(tab, qapp, monkeypatch):
+    """Each card's controls are read fresh for the Tab order. A list kept on the card
+    held one Qt had deleted: setTabOrder raised inside the layout pass, and that broke
+    PySide badly enough to crash closing the clip editor's big view (overridepin.py)."""
+    import shiboken6
+    from PySide6.QtWidgets import QPushButton
+    apps = [App(1, "firefox.exe"), App(2, "spotify.exe")]
+    monkeypatch.setattr(appspanel.appaudio, "list_apps", lambda **_: apps)
+    tab.resize(1000, 900)
+    tab.show()
+    tab._on_apps(apps)
+    qapp.processEvents()
+    row = tab.rows["firefox.exe"]
+    browsers = tab.grid.headings["Browsers"]
+
+    def resync():
+        tab.grid._tab_key = []   # as when the shown order changes
+        tab.grid._place(tab.grid.geometry(), move=True)
+
+    gone = QPushButton("gone", row)
+    resync()
+    assert gone in _focus_chain(browsers)
+    shiboken6.delete(gone)
+    resync()                    # no "already deleted" from setTabOrder
+    stops = [w for w in _focus_chain(browsers) if w.focusPolicy() & Qt.TabFocus]
+    assert row.isAncestorOf(stops[0]) and row.vol.slider in stops
