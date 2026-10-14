@@ -2,6 +2,7 @@
 seam, no pop at a hard start, no steps when a volume moves. Each test measures the
 problem it guards against (on synthesised audio), so a regression shows as a number."""
 import numpy as np
+import pytest
 
 from soundboard.engine import SR, Engine
 
@@ -225,6 +226,42 @@ def test_sounds_at_1000_percent_go_out_louder_than_at_300():
         y = np.concatenate([lim.process(loud_boost(song[i:i + BLOCK] * np.float32(vol),
                                                    vol, LOUD_SEND))
                             for i in range(0, len(song), BLOCK)])[SR // 2:]
+        assert np.max(np.abs(y)) <= LOUD_SEND + 1e-6
+        return 20 * np.log10(np.sqrt(np.mean(y.astype(np.float64) ** 2)))
+
+    assert rms_db(10.0) > rms_db(3.0) + 3.0 > rms_db(1.0) + 3.0
+
+
+@pytest.mark.parametrize("path", ["cable", "mic", "check", "stream"])
+def test_sounds_over_100_percent_go_out_louder_on_every_send_path(path):
+    # the peaks were rounded before the voice chat shaping (mono, destination), whose
+    # filters built them back up: on the cable, the mic and Hear what they hear the
+    # limiter turned 1000 % down to 300 % again (only the stream output got louder)
+    from soundboard.engine import LOUD_SEND
+    rng = np.random.default_rng(4)
+    song = np.clip(rng.normal(0, 0.15, (SR * 2, 2)), -1, 1).astype(np.float32)
+
+    def rms_db(vol):
+        e = Engine()
+        if path == "stream":
+            e.obs_stream, e.obs_vol = object(), 1.0
+            run, only = e._obs, "obs"
+        elif path == "check":
+            e.main_stream, e.mon_stream, e.mon_vol = object(), object(), 1.0
+            e.monitor_sounds = e.mic_check = True
+            run, only = e._mon, ("main", "mon")
+        else:
+            e.main_stream, e.main_direct = object(), path == "mic"
+            run, only = e._main, "main"
+        e.sound_vol = vol
+        e._glides.clear()
+        e.play("a", song, 1.0, mode="overlap", only=only)
+        out = np.zeros((BLOCK, 2), np.float32)
+        y = []
+        for _ in range(len(song) // BLOCK - 2):
+            run(out, BLOCK)
+            y.append(out[:, 0].copy())
+        y = np.concatenate(y)[SR // 2:]
         assert np.max(np.abs(y)) <= LOUD_SEND + 1e-6
         return 20 * np.log10(np.sqrt(np.mean(y.astype(np.float64) ** 2)))
 
