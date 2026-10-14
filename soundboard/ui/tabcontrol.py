@@ -184,7 +184,7 @@ class TabControl(Controller):
         if not on and mw.tabs.currentIndex() == i:
             mw.tabs.move_to(0)   # (Settings, where this is done, stays up)
         if key == "radio":
-            mw._radio_follow_switch()
+            mw.netctl._radio_follow_switch()
         else:
             self._swap_tab(key)
         mw.tabs.setTabVisible(i, self.tab_shown(key))

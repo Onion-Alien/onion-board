@@ -291,7 +291,7 @@ class PadControl(Controller):
         elif act == a_edit:
             mw.editctl.edit(sid)
         elif act == a_ren:
-            mw.rename_sound(sid)
+            mw.soundctl.rename_sound(sid)
         elif act == a_dup:
             mw.editctl.duplicate_sound(sid)
         elif act == a_show:
@@ -324,7 +324,7 @@ class PadControl(Controller):
         mw = self.mw
         clip = clipeditor.pasted_clip()
         if clip is not None:
-            mw.on_clip(clip.copy(), _("Clip {time}", time=time.strftime('%H.%M.%S')))
+            mw.soundctl.on_clip(clip.copy(), _("Clip {time}", time=time.strftime('%H.%M.%S')))
             return
         sids = [m.id for m in mw.selection.sounds()] or (
             [mw.current] if mw.current in mw.pads else [])

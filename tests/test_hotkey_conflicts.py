@@ -63,14 +63,14 @@ def test_the_default_overlay_key_moves_off_a_letter_on_other_layouts(qapp, app_d
     Config().save()
     w = main.MainWindow()
     try:
-        w._load_thread.join(15)
+        w.soundctl._load_thread.join(15)
         assert w.cfg.overlay_hotkey == "alt+`" and w.cfg.overlay_key_checked
         w.cfg.overlay_hotkey = "`"               # picked again on purpose: left alone
         w.hkctl._fit_overlay_key()
         assert w.cfg.overlay_hotkey == "`"
     finally:
         w.close()
-        w._load_thread.join(15)
+        w.soundctl._load_thread.join(15)
         w.deleteLater()
 
 

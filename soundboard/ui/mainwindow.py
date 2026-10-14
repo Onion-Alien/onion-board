@@ -1,37 +1,35 @@
 """The main window: pads, transport, web search, the audio panel, auto push-to-talk."""
 from __future__ import annotations
 
-import html
 import re
 import logging
 import os
 import subprocess
 import sys
-import threading
-import time
 from pathlib import Path
 from typing import TYPE_CHECKING, Any, Literal, overload
 
 import numpy as np
 from PySide6.QtCore import (QEvent, QObject, QPoint, QSignalBlocker,
                             QSize, Qt, QTimer, Signal)
-from PySide6.QtWidgets import (QApplication, QDialog, QInputDialog,
-                               QMainWindow, QMenu, QMessageBox, QPushButton, QSystemTrayIcon)
+from PySide6.QtWidgets import (QApplication, QDialog, QMainWindow, QMenu, QMessageBox, QPushButton,
+                               QSystemTrayIcon)
 
 from soundboard import theme, ytworker
 from soundboard.engine import SR, Engine
 from soundboard import exitwatch
-from soundboard import (appaudio, autostart, library, remote, reset, thumbs, trash, voicesdk)
+from soundboard import (appaudio, autostart, library, remote, reset, trash, voicesdk)
 from soundboard import (ffmpegget, net, netlog,
                         profiles, quality, shellicon, thumbbar, tor,
                         usage, watchaddon)
 from soundboard.replay import InstantReplay
-from soundboard.library import (PAD_COLORS, Config,
-                                SoundMeta, cache_keep, fingerprint,
-                                load_sound, prune_cache, save_clip)
+from soundboard.library import (Config,
+                                SoundMeta)
 from soundboard.ui.crashdialog import free_dialog
 from soundboard.ui import worker
 from soundboard.ui.ffmpegcontrol import FfmpegControl
+from soundboard.ui.netcontrol import NetControl
+from soundboard.ui.soundscontrol import SoundsControl
 from soundboard.ui.windowbuild import WindowBuilder, version_text
 from soundboard.ui.fitcontrol import FitControl
 from soundboard.ui.transportcontrol import TransportControl
@@ -46,7 +44,7 @@ from soundboard.ui.hotkeycontrol import HotkeyControl
 from soundboard.ui.aboutcontrol import AboutControl
 from soundboard.ui.themecontrol import ThemeControl
 from soundboard.ui.settingscontrol import SettingsControl
-from soundboard.ui.tabcontrol import TAB_INDEX, TabControl
+from soundboard.ui.tabcontrol import TabControl
 from soundboard.ui.statuscontrol import StatusControl
 from soundboard.ui.miccontrol import MIC_OFFER_MS, MicControl
 from soundboard.ui.routecontrol import RouteControl
@@ -75,7 +73,6 @@ from soundboard.ui.radiopanel import RadioOff, RadioTab
 from soundboard.ui.voicepanel import VoicePanel
 from soundboard.ui.widgets import (Meter, Pad, expand_dropped)
 from soundboard.winkeys import Hotkeys
-from soundboard import errors
 from soundboard.i18n import _
 
 log = logging.getLogger(__name__)
@@ -140,80 +137,19 @@ class Bridge(QObject):
 class MainWindow(QMainWindow):
     # ---- the window's parts: made once by WindowBuilder (ui/windowbuild.py), used by
     # the window and its controllers
+    about_menu: DropdownMenu
     _act_export_cat: Any
     _add_menu: DropdownMenu
-    _attach_release: Any
-    _attaching: bool
-    _banner_fx: QGraphicsOpacityEffect
-    _body_lay: Any
-    _cable_gone: bool
-    _chip_ids: tuple
-    _chips: dict[str, QWidget]
-    _chips_hl: Flow
-    _content: QStackedWidget
-    _deck_rows: list[QHBoxLayout]
-    _deck_tabs: list[QPushButton]
-    _deck_titles: list[QWidget]
-    _decks: list[tuple[QWidget, ...]]
-    _dl_lay: QHBoxLayout
-    _done_toast: str | None
-    _fit_tab: Any
-    _full: WindowRoot
-    _full_row: QHBoxLayout
-    _install_icon: tuple | None
-    _lang_offered: Any
-    _link_wait: QTimer
-    _mic_icon: tuple[str, str] | None
-    _mini_card: QFrame
-    _mini_v: QVBoxLayout
-    _mixer_layout: QHBoxLayout
-    _mixer_one: bool
-    _mixer_tight: bool
-    _name_seek: NameAndSeek
-    _packs_menu: Any
-    _pad_scroll: Any
-    _pad_size: Any
-    _pad_size_wait: QTimer
-    _pads_home: Any
-    _pads_scroll: Any
-    _pages: QStackedWidget
-    _pp_icon: str | None
-    _pulse: Pulse
-    _row_size: Any
-    _search_tip: Any
-    _search_typed: str | None
-    _search_wait: QTimer
-    _settle_until: Any
-    _setup_cols: QGridLayout
-    _setup_lr: Any
-    _setup_narrow: Any
-    _setup_pairs: Any
-    _setup_stacked: bool | None
-    _setup_top: Any
-    _setup_wide: Any
-    _site_menu: DropdownMenu
-    _size_tight: bool
-    _sounds_lay: Any
-    _tabs_area: QWidget
-    _tabs_box: QWidget
-    _tabs_lay: Any
-    _toolbar_hold: QWidget
-    _transport_vol: Any
-    _vb_setup: bool | None
-    _vb_setup_asking: bool
-    _video_asking: str | None
-    _video_for: tuple[str | None, Path | None]
-    _video_win: Any
-    _waiting_chips: tuple | None
-    _ways: Any
-    _ways_in: bool | None
-    about_menu: DropdownMenu
     also_rows: Any
     also_views: Any
     alt_cable: Any
     alt_cable_words: Any
     alt_device: Any
     apps: Any
+    _attach_release: Any
+    _attaching: bool
+    _banner_fx: QGraphicsOpacityEffect
+    _body_lay: Any
     btn_about: QPushButton
     btn_add: QPushButton
     btn_air: QPushButton
@@ -248,40 +184,58 @@ class MainWindow(QMainWindow):
     btn_video: QPushButton
     btn_view: QPushButton
     btn_yt: QPushButton
+    _cable_gone: bool
     card_meter: Meter
     cat_bar: Any
     cb_main: Any
     cb_mic: Any
     cb_mon: Any
     cb_route: QComboBox
+    _chip_ids: tuple
+    _chips: dict[str, QWidget]
+    _chips_hl: Flow
     chk_level: QCheckBox
     chk_mic: QCheckBox
     chk_monitor: QCheckBox
+    _content: QStackedWidget
+    _deck_rows: list[QHBoxLayout]
+    _deck_tabs: list[QPushButton]
+    _deck_titles: list[QWidget]
+    _decks: list[tuple[QWidget, ...]]
     dest_panel: DestPanel
     dev_card: Any
+    _dl_lay: QHBoxLayout
+    _done_toast: str | None
     download_bar: DownloadBar
     drop_veil: DropVeil
     eq: EqPanel
     eq_card: Any
     ff_bar: Any
+    _fit_tab: Any
     flow_mic: QLabel
     flow_out: QLabel
     flow_snd: QLabel
+    _full: WindowRoot
+    _full_row: QHBoxLayout
     gear: QPushButton
     grid: PadGrid
     helpcard: Any
     how_title: Any
     hp_lbl: Any
+    _install_icon: tuple | None
     lang_bar: QFrame
     lang_btn: QPushButton
     lang_hide: Any
     lang_lbl: QLabel
+    _lang_offered: Any
+    _link_wait: QTimer
     linkbar: LinkBar
     logo: LogoWidget
     mic_alt: QWidget
     mic_alt_tiles: TileRow
     mic_banner: BannerButton
     mic_flow: QFrame
+    _mic_icon: tuple[str, str] | None
     mic_lbl: Any
     mic_line: QLabel
     mic_meter: Any
@@ -296,6 +250,7 @@ class MainWindow(QMainWindow):
     mic_ways: Flow
     mini_air: QPushButton
     mini_bun: QPushButton
+    _mini_card: QFrame
     mini_connection: QPushButton
     mini_download_bar: DownloadBar
     mini_mic: QPushButton
@@ -306,29 +261,60 @@ class MainWindow(QMainWindow):
     mini_st: QPushButton
     mini_stop: QPushButton
     mini_time: QLabel
+    _mini_v: QVBoxLayout
     mixer: Any
+    _mixer_layout: QHBoxLayout
+    _mixer_one: bool
+    _mixer_tight: bool
     mode_btn: ModeButton
     more_menu: moretabs.Menu
+    _name_seek: NameAndSeek
     np_name: QLabel
     np_time: QLabel
     out_meter: Meter
+    _packs_menu: Any
+    _pad_scroll: Any
+    _pad_size: Any
+    _pad_size_wait: QTimer
+    _pads_home: Any
+    _pads_scroll: Any
+    _pages: QStackedWidget
     pill: QPushButton
     playing_row: QWidget
+    _pp_icon: str | None
+    _pulse: Pulse
+    radio: RadioTab | RadioOff
     radio_page: QStackedWidget
+    _radio_steps: list
     rail: sidebar.SideRail
     rmcable_note: Any
+    _row_size: Any
     search: QLineEdit
+    _search_tip: Any
+    _search_typed: str | None
+    _search_wait: QTimer
     seek: SeekSlider
     selection: PadSelection
+    _settle_until: Any
     setup_bar: QFrame
+    _setup_cols: QGridLayout
     setup_connection: QLabel
     setup_hint: Any
     setup_lbl: QLabel
+    _setup_lr: Any
+    _setup_narrow: Any
     setup_no: QPushButton
     setup_page: Any
+    _setup_pairs: Any
     setup_show: SetupShow
+    _setup_stacked: bool | None
+    _setup_top: Any
+    _setup_wide: Any
     setup_x: QPushButton
     setup_yes: QPushButton
+    _site_menu: DropdownMenu
+    _size_tight: bool
+    _sounds_lay: Any
     sounds_page: Any
     sounds_toolbar: QFrame
     speed_btn: SpeedPitchButton
@@ -336,22 +322,35 @@ class MainWindow(QMainWindow):
     stop_btn: QPushButton
     tab_info: dict[str, tuple[str, str]]
     tabs: SideTabs
+    _tabs_area: QWidget
+    _tabs_box: QWidget
+    _tabs_lay: Any
     tagline: sidebar.ClickLabel
     tip: tips.Tip | None
     tip_bar: QFrame
     tip_btn: QPushButton
     tip_lbl: QLabel
+    _toolbar_hold: QWidget
     transport: Any
+    _transport_vol: Any
     triggers: Any
     urgent_bar: QFrame
     urgent_btn: QPushButton
     urgent_lbl: QLabel
     urgent_prog: QProgressBar
     urgent_sub: QLabel
+    _vb_setup: bool | None
+    _vb_setup_asking: bool
+    _video_asking: str | None
+    _video_for: tuple[str | None, Path | None]
+    _video_win: Any
     voice: Any
     vol_mic: VolumeControl
     vol_mon: VolumeControl
     vol_sound: VolumeControl
+    _waiting_chips: tuple | None
+    _ways: Any
+    _ways_in: bool | None
     wordmark: QLabel
     ytresults: SearchResults
 
@@ -380,6 +379,8 @@ class MainWindow(QMainWindow):
 
     def __init__(self):
         super().__init__()
+        self.netctl = NetControl(self)
+        self.soundctl = SoundsControl(self)
         self.builder = WindowBuilder(self)
         self.fitctl = FitControl(self)
         self.transctl = TransportControl(self)
@@ -423,8 +424,7 @@ class MainWindow(QMainWindow):
         net.configure_from(self.cfg)   # before anything goes online
         quality.load(self.cfg.data)    # ...and how much it fetches when it does
         tor.configure_from(self.cfg)   # Connection = Tor: starts when something goes online
-        self._tor_told = ""             # what the last Tor toast said (one per change)
-        tor.qt_status().changed.connect(self._on_tor)
+        tor.qt_status().changed.connect(self.netctl._on_tor)
         app = QApplication.instance()
         # before the UI is built, so everything polishes in-theme
         if isinstance(app, QApplication):
@@ -458,7 +458,7 @@ class MainWindow(QMainWindow):
         self.overlay = Overlay(self, self.cfg.overlay)
         self._save_failed_shown = False
         self.bridge = Bridge()
-        self.bridge.loaded.connect(self.on_loaded)
+        self.bridge.loaded.connect(self.soundctl.on_loaded)
         self.bridge.imported.connect(self.impctl.on_imported)
         self.bridge.preview.connect(self.playctl._on_fx_preview)
         self.bridge.exported.connect(self.impctl._on_exported)
@@ -492,8 +492,6 @@ class MainWindow(QMainWindow):
         self.current: str | None = None   # sound shown in the transport bar
         self.start_frac = 0.0             # where ▶ starts if it isn't playing
         self._ui_live = True              # the window is on screen (see _set_tick_rate)
-        self._load_thread: threading.Thread | None = None
-        self._loading: set[str] = set()   # sids a load thread is decoding right now
         self.engine.latency = self.cfg.latency if self.cfg.latency in ("low", "high") else "low"
         self._save_timer = QTimer(self)
         self._save_timer.setSingleShot(True)
@@ -520,7 +518,7 @@ class MainWindow(QMainWindow):
         library.tidy_files(self.cfg)   # files from before library folders move in
         self._rebuild_pads()
         splash.pump()
-        self._load_all()
+        self.soundctl._load_all()
         splash.pump()
         self.load_triggers()   # behind the loading screen, not on the tab's first click
         splash.pump()
@@ -788,7 +786,7 @@ class MainWindow(QMainWindow):
         same panel stands in, hidden, while the tab is switched off in Settings > Tabs.)"""
         if net.allowed("radio") and self.tabctl.tab_on("radio"):
             r = RadioTab(self.engine, self.cfg, self._save_later, Meter)
-            r.clip_ready.connect(self.on_clip)
+            r.clip_ready.connect(self.soundctl.on_clip)
         else:
             r = RadioOff()
             r.open_settings.connect(lambda: self.setctl.open_settings("privacy"))
@@ -822,14 +820,14 @@ class MainWindow(QMainWindow):
             v = VoicePanel(self.engine, self.cfg.voice_fx, self.cfg.speech)
             v.fx_changed.connect(self._voice_fx_changed)
             v.speech_changed.connect(lambda s: self.set_option("speech", s))
-            v.clip_ready.connect(self.on_clip)
+            v.clip_ready.connect(self.soundctl.on_clip)
             v.fx.set_tip_enabled(not self.cfg.voice_discord_tip_shown)
             v.fx.chat_help.connect(lambda: self.statusctl.show_chat_guide("discord"))
             v.fx.tip_dismissed.connect(
                 lambda: self.set_option("voice_discord_tip_shown", True))
         elif key == "apps":
             v = AppsTab(self.engine, self.cfg, self._save_later, Meter)
-            v.clip_ready.connect(self.on_clip)
+            v.clip_ready.connect(self.soundctl.on_clip)
             self.tab_info["apps"] = v.info
         else:
             # the Onion Watch add-on, or Hoot and its download button until it's
@@ -837,156 +835,6 @@ class MainWindow(QMainWindow):
             v = TriggersTab(BoardHost(self), defer=True)
         v.active_changed.connect(lambda on, k=key: self.tabctl._tab_live(k, on))
         return v
-
-    def _follow_switches(self):
-        """Settings > Privacy & security changed: the parts of the window that go
-        online follow their switches."""
-        self._radio_follow_switch()
-        self.statusctl._update_flow()   # the cable's install button (_cable_follow_switch)
-        self._search_follow_switch()
-        self._offline_follow()
-        if hasattr(self.fitctl, "_fit"):   # buttons came or went: what fits is measured again
-            self.fitctl._refit()
-
-    def _offline_follow(self):
-        """Offline mode: Offline in the On Air card, and the tabs that only work online
-        (needs_online) out of the tab bar and + More tabs; back when it's off."""
-        self._net_follow()
-        for key in ("radio", "triggers"):
-            i = TAB_INDEX[key]
-            shown = self.tabctl.tab_shown(key)
-            if not shown and self.tabs.currentIndex() == i:
-                self.tabs.move_to(0)   # (Settings, where this is done, stays up)
-            self.tabs.setTabVisible(i, shown)
-        self.tabctl._update_more_tabs()
-
-    def _search_follow_switch(self):
-        """Finding sounds online switched off: no Search button, and the search box
-        only filters your own sounds (and says so)."""
-        online = self.ytresults.available()
-        self.btn_yt.setVisible(online)
-        self.search.setPlaceholderText(_("Search sounds or paste a link") if online else
-                                       _("Search your sounds"))
-        self.search.setToolTip(self._search_tip if online else _("Type to filter your sounds"))
-
-    def _cable_follow_switch(self):
-        """The cable's install button downloads it (from vb-audio.com): gone in Offline
-        mode, greyed with its switch off. On the mic route the same button sets up the
-        mic, which goes nowhere online."""
-        if busy.is_busy(self.btn_install):
-            return
-        cable = self.cfg.route != "mic"
-        allowed = not cable or net.allowed("setup_downloads")
-        if cable and net.offline():
-            self.btn_install.hide()
-        self.btn_install.setEnabled(allowed)
-        self.btn_install.setToolTip("" if allowed else net.off_message("setup_downloads"))
-
-    def _radio_follow_switch(self):
-        """Radio switched off: the tab becomes the "off" panel (a playing station
-        stops); switched back on, the tab is built again."""
-        on = net.allowed("radio") and self.tabctl.tab_on("radio")
-        if on == isinstance(self.radio, RadioTab):
-            return
-        old, playing = self.radio, self.radio.is_active()
-        old.shutdown()
-        if hasattr(self.fitctl, "_fit"):   # undone while the old tab's widgets still exist
-            self.fitctl._fit.remove(self._radio_steps)
-        self.radio = self._make_radio()
-        self.radio_page.removeWidget(old)
-        old.deleteLater()
-        if hasattr(self.fitctl, "_fit"):
-            self._radio_steps = self.radio.fit_steps()
-            self.fitctl._fit.extend(self._radio_steps)
-            self.fitctl._refit()
-        self.tabctl._radio_live(False)
-        if playing:
-            self.toast(html.escape(_("Radio was switched off, so the station stopped.")))
-
-    def card_lines(self) -> list[sidebar.Line]:
-        """What the On Air card says under its status (OutputBlock.set_lines): how the
-        app goes online, and a remote control listening."""
-        return [line for line in (self._network_line(), self._remote_line()) if line]
-
-    def _network_line(self) -> sidebar.Line | None:
-        """Offline mode, a proxy or Tor (and how far Tor got), or None when direct."""
-        if net.offline():
-            return sidebar.Line("offline", _("Offline"), "",
-                                _("Offline mode is on: nothing goes online, and what needs "
-                                  "the internet is hidden. Click to change it."), "privacy")
-        mode = net.mode()
-        click = _("Click to change it.")
-        if mode == net.TOR:
-            t = tor.manager()
-            tip = "\n".join((t.status_text(), click))
-            if t.state == tor.READY:
-                return sidebar.Line("tor", _("Through Tor"), "ok", tip, "privacy")
-            if t.state == tor.STARTING:
-                return sidebar.Line("tor", _("Tor {percent}%", percent=t.progress), "", tip,
-                                    "privacy")
-            if t.state == tor.FAILED:
-                return sidebar.Line("tor", _("Tor failed"), "warn", tip, "privacy")
-            return sidebar.Line("tor", _("Tor"), "", tip, "privacy")
-        if mode == net.PROXY:
-            p = net.proxy()
-            if p is None:
-                return sidebar.Line("shield", _("Proxy not working"), "warn",
-                                    "\n".join((net.describe(), click)), "privacy")
-            return sidebar.Line("shield", _("Through proxy"), "ok",
-                                "\n".join((_("Everything goes through your proxy "
-                                             "({address}).", address=p.where), click)),
-                                "privacy")
-        return None
-
-    def _remote_line(self) -> sidebar.Line | None:
-        """A phone remote (a remote add-on such as Onion Pocket) listening on the home
-        network, or else the control API listening on this PC; None when neither."""
-        servers = remote.listening()
-        click = _("Click to change it.")
-        phone = [s for s in servers if s.lan]
-        if phone:
-            return sidebar.Line("phone", _("Phone remote on"), "ok",
-                                "\n".join((_("Phones on your home network can control the "
-                                             "board ({address}).",
-                                             address=f"{phone[0].host}:{phone[0].port}"),
-                                            click)), "remote")
-        if servers:
-            return sidebar.Line("phone", _("Remote control on"), "",
-                                "\n".join((_("Stream Deck buttons and scripts on this PC "
-                                             "can control the board (port {port}).",
-                                             port=servers[0].port), click)), "remote")
-        return None
-
-    def _remote_watch(self):
-        self.remote_changed.emit()   # (maybe from the thread that stopped it)
-
-    def _net_follow(self):
-        output = getattr(getattr(self, "rail", None), "output", None)
-        if output is not None:
-            output.set_lines(self.card_lines())
-            self.rail.refresh_output()   # (the card's widest line can change its scale)
-
-    def _on_tor(self):
-        """Something is waiting for Tor: say so (once), and when it's ready or failed."""
-        self._net_follow()
-        t = tor.manager()
-        if t.state == tor.STARTING and t.waiting:
-            say = ("starting", _("Connecting to Tor… what you asked for goes once it's "
-                                  "connected (Settings → Privacy & security shows how far "
-                                  "it is)."), "")
-        elif t.state == tor.READY and self._tor_told == "starting":
-            say = ("ready", _("✓ Connected to Tor."), "ok")
-        elif t.state == tor.FAILED and self._tor_told in ("starting", "") and t.waiting:
-            say = ("failed", _("Couldn't connect to Tor: {error}. Nothing was sent "
-                               "without it.", error=t.message), "error")
-        elif t.state == tor.OFF:
-            self._tor_told = ""
-            return
-        else:
-            return
-        if say[0] != self._tor_told:
-            self._tor_told = say[0]
-            self.toast(html.escape(say[1]), say[2])
 
     def _save_now(self, then=None):
         """The debounced save: the settings are copied now and written on the saver's
@@ -1186,7 +1034,7 @@ class MainWindow(QMainWindow):
                 p.step.connect(self.grid.focus_step)
                 p.menu.connect(self.padctl.pad_menu)
                 p.nudge.connect(self.padctl.nudge_volume)
-                p.rename.connect(self.rename_sound)
+                p.rename.connect(self.soundctl.rename_sound)
                 p.edit.connect(self.editctl.edit)
                 self.pads[m.id] = p
             p.state = "ready" if m.id in self.audio else p.state
@@ -1197,216 +1045,7 @@ class MainWindow(QMainWindow):
         self.statusctl._update_status()
 
     # ------------------------------------------------------------------ search, rename
-    def rename_sound(self, sid: str, new: str | None = None):
-        """F2 on a pad (and the pad menu's Rename): just the name, without the Edit
-        window."""
-        m = self.meta(sid)
-        if m is None:
-            return
-        if new is None:
-            new, ok = QInputDialog.getText(self, _("Rename sound"), _("New name:"), text=m.name)
-            new = new if ok else ""
-        new = new.strip()
-        if not new or new == m.name:
-            return
-        m.name = new
-        if sid in self.pads:
-            self.pads[sid].update()
-        if self.current == sid:
-            self._set_np_name(new)
-        self._save_now()
-        self.toast(_("✓ Renamed to “{new}”", new=html.escape(new)), "ok")
-
     # ------------------------------------------------------------------ loading sounds
-    def _load_all(self):
-        # one still being loaded by an earlier call (a pack import or Undo during a slow
-        # first load) isn't decoded again: two writers of one cache file garble it
-        todo = [m for m in self.cfg.sounds if m.id not in self.audio and m.id not in self._loading]
-        self._loading.update(m.id for m in todo)
-        prev = self._load_thread
-
-        def run():
-            t0 = time.monotonic()
-            for m in todo:
-                try:
-                    data = load_sound(m)   # from the cache after the first run
-                    self.engine.prepare(m.id, data)
-                    self.bridge.loaded.emit(m.id, data, "")
-                except Exception as e:  # noqa: BLE001
-                    log.warning("can't load %s: %s", m.file, e)
-                    self.bridge.loaded.emit(m.id, None, errors.plain(e))
-                finally:
-                    self._loading.discard(m.id)
-            if prev is not None:   # done only once the sounds it skipped are, too
-                prev.join()
-            live = self._live_metas()   # as of now, not of the start
-            prune_cache(cache_keep(live))
-            thumbs.prune({m.image for m in live if m.image})
-            trash.prune()   # what's been in Recently deleted for too long
-            log.info("loaded %d sounds in %.1fs", len(todo), time.monotonic() - t0)
-        self._load_thread = worker.run(run, name="load")
-
-    def on_loaded(self, sid, data, err):
-        # removed while it was loading (the index can lag behind cfg.sounds: check both)
-        if (sid != LINK_ID and sid not in self._meta
-                and all(m.id != sid for m in self.cfg.sounds)):
-            for i, (m, index, _d) in enumerate(self.rmctl._removed):
-                if m.id == sid:   # still undo-able: keep the audio with it
-                    self.rmctl._removed[i] = (m, index, data)
-                    return
-            self.engine.forget(sid)   # gone for good: don't keep its audio around
-            return
-        p = self.pads.get(sid)
-        if data is not None:
-            self.audio[sid] = data
-            m = self.meta(sid)
-            if m and abs(m.duration - len(data) / SR) > 0.005:   # effects change the length
-                m.duration = len(data) / SR
-                self._save_later()
-            if m and not m.fingerprint:   # sounds imported before fingerprints existed
-                m.fingerprint = fingerprint(m.file)
-                self._save_later()
-        if p:
-            p.state = "ready" if data is not None else "error"
-            p.error = err
-            p.update()
-
-    def _live_metas(self) -> list[SoundMeta]:
-        """Every sound whose files must be kept: the library, and removed ones that
-        can still be undone."""
-        return list(self.cfg.sounds) + [m for m, _i, _d in list(self.rmctl._removed)]
-
-    def on_clip(self, data, name) -> SoundMeta | None:
-        """A clip recorded in the Radio or Apps tab (or with the mic) becomes a normal
-        sound pad."""
-        try:
-            meta, data = save_clip(data, name, PAD_COLORS[len(self.cfg.sounds) % len(PAD_COLORS)])
-        except Exception as e:  # noqa: BLE001
-            log.exception("can't save clip")
-            src = self.sender()
-            if src is not None and hasattr(src, "clip_error"):
-                src.clip_error = errors.plain(e)   # pyright: ignore[reportAttributeAccessIssue]  # the tab says so on its row (hasattr)
-            else:
-                errors.warn(self, _("Couldn't save clip"), e)
-            return None
-        self.catctl._tag_new(meta)
-        self.cfg.sounds.append(meta)
-        self._index()
-        self.audio[meta.id] = data
-        usage.used("clip")
-        usage.step(self.cfg, "added-sound")
-        worker.run(lambda: self.engine.prepare(meta.id, data), name="prepare")
-        self._save_now()
-        self._rebuild_pads()
-        self.toast(_("Added “{name}” ({duration:.1f}s) to Sounds: right-click it there "
-                     "to rename or set a hotkey.",
-                     name=html.escape(meta.name), duration=meta.duration), "ok")
-        return meta
-
-    def record_dialog(self):
-        """Sounds tab → Record: record a sound with the mic, or a bit of what's playing.
-        The window doesn't block the board: pads, web results, the radio and Space
-        still work while it's open (to play what's being recorded)."""
-        from soundboard.ui.recordmic import RecordDialog
-        d = getattr(self, "_record_dlg", None)
-        if d is not None:   # already open: bring it forward
-            d.raise_()
-            d.activateWindow()
-            return
-        voice = getattr(self, "voice", None)
-
-        def voice_on() -> bool:
-            on = getattr(voice, "is_active", None)
-            return bool(on()) if on is not None else False
-
-        def open_devices():
-            self.tabs.setCurrentWidget(self.setup_page)
-
-        d = RecordDialog(self.engine, voice_on, lambda: [m.name for m in self.cfg.sounds],
-                         self.add_recording, open_devices, self,
-                         playing_name=self._playing_name,
-                         playing_picture=self._playing_picture)
-        self._record_dlg = d
-
-        def closed(_r):
-            self._record_dlg = None
-            # after its own signal returns; tied to `d`, so nothing runs if the window
-            # (and the dialog with it) is gone first
-            QTimer.singleShot(0, d, lambda: free_dialog(d))
-        d.finished.connect(closed)
-        d.setModal(False)
-        d.show()
-
-    def _playing_name(self) -> str:
-        """What's playing now, for naming a recording of it: the player's sound (a pad
-        or a web result) or the radio station; "" for nothing."""
-        sid = self.current
-        st = self.engine.state(sid) if sid else None
-        if st is not None and not st[1]:
-            m = self.meta(sid)
-            if m is not None:
-                return m.name
-        station = getattr(getattr(self.radio, "player", None), "station", None)
-        return station.name if station is not None else ""
-
-    def _playing_picture(self) -> str:
-        """The picture of the pad playing now ("" for none, or not a pad), for a
-        recording of it."""
-        sid = self.current
-        st = self.engine.state(sid) if sid else None
-        m = self.meta(sid) if st is not None and not st[1] else None
-        return m.image if m is not None and m.image and Path(m.image).is_file() else ""
-
-    def add_recording(self, data, name, picture: str = "") -> bool:
-        """A mic recording becomes a pad: selected, scrolled to, and a toast says so.
-        `picture`: the picture of the pad it was recorded from (copied onto it)."""
-        meta = self.on_clip(data, name)
-        if meta is None:
-            return False
-        if picture and thumbs.set_image(meta, picture):
-            self._save_now()
-            if meta.id in self.pads:
-                self.pads[meta.id].update()
-        usage.used("record")
-        self.playctl.select(meta.id)
-
-        def reveal():   # once the grid has laid the new pad out
-            pad = self.pads.get(meta.id)
-            if pad is not None:
-                self._pads_scroll.ensureWidgetVisible(pad)
-        QTimer.singleShot(0, self._pads_scroll, reveal)   # not after the window's gone
-        self.toast(_("✓ Added “{name}”", name=html.escape(meta.name)), "ok")
-        return True
-
-    def on_downloaded(self, meta, data):
-        """"Add as sound" (link bar / web search) finished: already decoded, stored and
-        prepared."""
-        self.catctl._tag_new(meta)
-        self.cfg.sounds.append(meta)
-        self._index()
-        self.audio[meta.id] = data
-        usage.used("youtube")
-        usage.step(self.cfg, "added-sound")
-        self._save_now()
-        self._rebuild_pads()
-        self.toast(_("Added “{name}” ({duration:.1f}s) to Sounds: right-click it there "
-                     "to rename or set a hotkey.",
-                     name=html.escape(meta.name), duration=meta.duration), "ok")
-
-    def on_reorder(self, sid, target):
-        m = self.meta(sid)
-        if not m:
-            return
-        if self.cfg.pad_sort != "custom":   # the drop index is into the sorted pads
-            self.toast(_("The pads are sorted {how}: pick “My order” (the ⇣ button by the "
-                         "search box) to drag them into place.",
-                         how=self.padctl._sort_names()[self.cfg.pad_sort]))
-            return
-        self.cfg.sounds.remove(m)
-        self.cfg.sounds.insert(min(target, len(self.cfg.sounds)), m)
-        self._save_now()
-        self._rebuild_pads()
-
     # ------------------------------------------------------------------ order and view
     def _focus_sounds_page(self, _i: int):
         """Switched to Sounds with the focus left behind on another tab (a hidden clip

@@ -3151,7 +3151,7 @@ def test_window_starts_on_the_mic_with_the_cable_copy(qapp, app_dir, monkeypatch
         w.statusctl._update_flow()
         assert "virtual cable" not in w.pill.accessibleName()
     finally:
-        w._load_thread.join(15)
+        w.soundctl._load_thread.join(15)
         w.close()
 
 

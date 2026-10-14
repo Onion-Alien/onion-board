@@ -37,13 +37,13 @@ def window(qapp, app_dir, monkeypatch):
     w = main.MainWindow()
     # the loader thread writes the cache and prunes orphans: it must finish while the
     # temp paths are still patched in, never after the fixture is torn down
-    w._load_thread.join(15)
-    assert not w._load_thread.is_alive()
+    w.soundctl._load_thread.join(15)
+    assert not w.soundctl._load_thread.is_alive()
     w.load_triggers()   # now, not on its timer in the middle of a test
     yield w
     w.close()
-    w._load_thread.join(15)   # a test may have started another load (e.g. Undo) just now
-    assert not w._load_thread.is_alive()
+    w.soundctl._load_thread.join(15)   # a test may have started another load (e.g. Undo) just now
+    assert not w.soundctl._load_thread.is_alive()
     # a closed top-level window isn't freed by Qt; left alive, every later test's
     # theme / stylesheet change restyles all of them and the suite crawls
     from PySide6.QtCore import QEvent
@@ -86,7 +86,7 @@ def test_triggers_timer_during_start_up(qapp, app_dir, monkeypatch):
         assert calls and not errors
         assert not w.triggers.pending   # loaded while the window was built
     finally:
-        w._load_thread.join(15)
+        w.soundctl._load_thread.join(15)
         w.close()
         from PySide6.QtCore import QEvent
         w.deleteLater()
@@ -113,7 +113,7 @@ def test_rebuild_keeps_existing_pad_widgets(window):
 
 def test_reorder_moves_without_recreating(window):
     old = dict(window.pads)
-    window.on_reorder("s1", 0)
+    window.soundctl.on_reorder("s1", 0)
     assert [m.id for m in window.cfg.sounds] == ["s1", "s0"]
     assert window.pads["s1"] is old["s1"]
     assert [p.meta.id for p in window.grid.pads] == ["s1", "s0"]

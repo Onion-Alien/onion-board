@@ -12,7 +12,7 @@ from soundboard.ui import mainwindow as main
 from soundboard.ui import taboff
 from soundboard.ui.appspanel import AppsTab
 from soundboard.ui.radiopanel import RadioTab
-from soundboard.ui.tabcontrol import TABS
+from soundboard.ui.tabcontrol import TAB_INDEX, TABS
 from soundboard.ui.triggerstab import TriggersTab
 from soundboard.ui.voicepanel import VoicePanel
 
@@ -27,7 +27,7 @@ def window(main_window):  # noqa: F811
 def test_off_hides_the_tab_and_on_builds_it_again(window):
     w = window
     for key, cls in REAL.items():
-        i = main.TAB_INDEX[key]
+        i = TAB_INDEX[key]
         assert isinstance(getattr(w, key), cls) and w.tabs.isTabVisible(i)
         w.tabctl.set_tab_on(key, False)
         assert not isinstance(getattr(w, key), cls)
@@ -37,7 +37,7 @@ def test_off_hides_the_tab_and_on_builds_it_again(window):
     assert w.tabs.count() == len(TABS)    # every tab keeps its place
     for key, cls in REAL.items():
         w.tabctl.set_tab_on(key, True)
-        i = main.TAB_INDEX[key]
+        i = TAB_INDEX[key]
         assert isinstance(getattr(w, key), cls) and w.tabs.isTabVisible(i)
         page = w.radio_page if key == "radio" else getattr(w, key)
         assert w.tabs.widget(i) is page
@@ -49,17 +49,17 @@ def test_off_hides_the_tab_and_on_builds_it_again(window):
 
 def test_switching_off_the_open_tab_goes_to_sounds(window):
     w = window
-    w.tabs.setCurrentIndex(main.TAB_INDEX["voice"])
+    w.tabs.setCurrentIndex(TAB_INDEX["voice"])
     w.tabctl.set_tab_on("voice", False)
     assert w.tabs.currentIndex() == 0 and w.cfg.tab == 0
 
 
 def test_switching_another_tab_keeps_the_open_one(window):
     w = window
-    w.tabs.setCurrentIndex(main.TAB_INDEX["setup"])
+    w.tabs.setCurrentIndex(TAB_INDEX["setup"])
     w.tabctl.set_tab_on("apps", False)
     w.tabctl.set_tab_on("apps", True)
-    assert w.tabs.currentIndex() == main.TAB_INDEX["setup"]
+    assert w.tabs.currentIndex() == TAB_INDEX["setup"]
 
 
 def test_stand_ins_answer_the_window(window):
@@ -85,12 +85,12 @@ def test_a_switched_off_tab_is_never_built(qapp, app_dir, monkeypatch):
     for name in ("set_main_device", "set_mon_device", "set_mic_device"):
         monkeypatch.setattr(engine.Engine, name, lambda self, n: None)
     monkeypatch.setattr(winkeys.Hotkeys, "register", lambda self, m: None)
-    Config(tabs_off=list(taboff.KEYS), tab=main.TAB_INDEX["voice"], mic_first=True).save()
+    Config(tabs_off=list(taboff.KEYS), tab=TAB_INDEX["voice"], mic_first=True).save()
     for cls in REAL.values():
         monkeypatch.setattr(cls, "__init__", lambda *a, **k: pytest.fail("built"))
     w = main.MainWindow()
     try:
-        w._load_thread.join(15)
+        w.soundctl._load_thread.join(15)
         w.load_triggers()
         assert w.cfg.tabs_off == list(taboff.KEYS)
         assert w.tabs.isTabVisible(w.tabs.currentIndex())   # not the saved, hidden one
@@ -99,7 +99,7 @@ def test_a_switched_off_tab_is_never_built(qapp, app_dir, monkeypatch):
         assert w.engine.voice_chain is None
     finally:
         w.close()
-        w._load_thread.join(15)
+        w.soundctl._load_thread.join(15)
         w.deleteLater()
         qapp.sendPostedEvents(None, QEvent.DeferredDelete)
 
@@ -109,7 +109,7 @@ def test_settings_page_switches_them(window):
     assert set(d.tab_boxes) == set(taboff.KEYS)
     d.tab_boxes["triggers"].setChecked(False)
     assert "triggers" in window.cfg.tabs_off
-    assert not window.tabs.isTabVisible(main.TAB_INDEX["triggers"])
+    assert not window.tabs.isTabVisible(TAB_INDEX["triggers"])
     d.tab_boxes["triggers"].setChecked(True)
     assert window.tabctl.tab_on("triggers")
     d.close()
@@ -284,11 +284,11 @@ def test_importing_settings_switches_the_tabs_live(window, qapp):
     window.impctl._apply_backup_settings({"tabs_off": ["voice", "radio"]})
     assert isinstance(window.voice, taboff.VoiceOff)
     assert not isinstance(window.radio, RadioTab)
-    assert not window.tabs.isTabVisible(main.TAB_INDEX["voice"])
+    assert not window.tabs.isTabVisible(TAB_INDEX["voice"])
     assert window.engine.voice_chain is None
     window.impctl._apply_backup_settings({"tabs_off": []})
     assert isinstance(window.voice, VoicePanel) and isinstance(window.radio, RadioTab)
-    assert window.tabs.isTabVisible(main.TAB_INDEX["voice"])
+    assert window.tabs.isTabVisible(TAB_INDEX["voice"])
     assert window.engine.voice_chain is window.voice.chain
     d = SettingsDialog(window, "tabs")   # every page builds with what's there now
     d.close()
@@ -328,7 +328,7 @@ def test_keyboard_never_lands_on_a_hidden_tab(window, qapp):
     for _ in range(4):
         QTest.keyClick(window.tabs, Qt.Key_Tab, Qt.ControlModifier)
         assert window.tabs.isTabVisible(window.tabs.currentIndex())
-    window.tabs.setCurrentIndex(main.TAB_INDEX["setup"])
+    window.tabs.setCurrentIndex(TAB_INDEX["setup"])
     QTest.keyClick(window.tabs.tabBar(), Qt.Key_Left)
     assert window.tabs.isTabVisible(window.tabs.currentIndex())
 
@@ -432,9 +432,9 @@ def test_the_onion_watch_nudge_is_hooked_once(window, monkeypatch):
         assert window.triggers.needs_nudge()
     nudged = []
     monkeypatch.setattr(window.triggers, "nudged", lambda: nudged.append(1))
-    window.tabs.setCurrentIndex(main.TAB_INDEX["triggers"])
+    window.tabs.setCurrentIndex(TAB_INDEX["triggers"])
     window.tabs.setCurrentIndex(0)
-    window.tabs.setCurrentIndex(main.TAB_INDEX["triggers"])
+    window.tabs.setCurrentIndex(TAB_INDEX["triggers"])
     assert nudged == [1]
 
 
@@ -448,14 +448,14 @@ def test_off_from_the_start_then_on_and_off_again(qapp, app_dir, monkeypatch, fa
     Config(tabs_off=list(taboff.KEYS), mic_first=True).save()
     w = main.MainWindow()
     try:
-        w._load_thread.join(15)
+        w.soundctl._load_thread.join(15)
         w.load_triggers()
         steps = len(w.fitctl._fit.steps)
         for _ in range(2):
             for key, cls in REAL.items():
                 w.tabctl.set_tab_on(key, True)
                 assert isinstance(getattr(w, key), cls)
-                assert w.tabs.isTabVisible(main.TAB_INDEX[key])
+                assert w.tabs.isTabVisible(TAB_INDEX[key])
             assert w.engine.voice_chain is w.voice.chain
             assert not w.triggers.pending   # switched on: Onion Watch loads at once
             assert w.triggers.panel is not None
@@ -467,7 +467,7 @@ def test_off_from_the_start_then_on_and_off_again(qapp, app_dir, monkeypatch, fa
         w.fitctl._refit()
     finally:
         w.close()
-        w._load_thread.join(15)
+        w.soundctl._load_thread.join(15)
         w.deleteLater()
         qapp.sendPostedEvents(None, QEvent.DeferredDelete)
 
@@ -496,7 +496,7 @@ def test_more_tabs_lists_the_switched_off_ones_and_adds_one(window, monkeypatch)
     menu.actions()[-1].trigger()
     assert opened == ["tabs"]
     [a for a in menu.actions() if a.text().startswith("Triggers")][0].trigger()
-    assert w.tabctl.tab_on("triggers") and w.tabs.currentIndex() == main.TAB_INDEX["triggers"]
+    assert w.tabctl.tab_on("triggers") and w.tabs.currentIndex() == TAB_INDEX["triggers"]
     assert steps == ["added-triggers-tab"]   # counted now, not with tomorrow's count
     w.tabctl.set_tab_on("radio", True)
     assert w.btn_more_tabs.isHidden()
@@ -506,7 +506,7 @@ def test_right_click_hides_a_tab_and_more_tabs_brings_it_back(window, monkeypatc
     w = window
     shown = []
     monkeypatch.setattr(w, "toast", lambda text, kind="": shown.append(text))
-    w.tabs.setCurrentIndex(main.TAB_INDEX["radio"])
+    w.tabs.setCurrentIndex(TAB_INDEX["radio"])
     w.tabctl.hide_tab("radio")
     assert not w.tabctl.tab_on("radio") and w.tabs.currentIndex() == 0
     assert "More tabs" in shown[0]

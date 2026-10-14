@@ -5,9 +5,10 @@ from PySide6.QtCore import QEvent, QPoint, Qt
 from PySide6.QtTest import QTest
 
 from soundboard import engine, settings, theme, winkeys
-from soundboard.ui import mainwindow as main
 from soundboard.ui import fitcontrol, settingscontrol, setupwizard
+from soundboard.ui import mainwindow as main
 from soundboard.ui.livedot import set_tab_live
+from soundboard.ui.tabcontrol import TAB_INDEX
 
 
 @pytest.fixture
@@ -17,11 +18,11 @@ def win(qapp, app_dir, monkeypatch):
     monkeypatch.setattr(winkeys.Hotkeys, "register", lambda self, m: None)
     monkeypatch.setattr(setupwizard, "resume_after_restart", lambda on: None)
     w = main.MainWindow()
-    w._load_thread.join(15)
+    w.soundctl._load_thread.join(15)
     yield w
     w._quitting = True
     w.close()
-    w._load_thread.join(15)
+    w.soundctl._load_thread.join(15)
     w.deleteLater()
     qapp.sendPostedEvents(None, QEvent.DeferredDelete)
 
@@ -215,6 +216,7 @@ def test_the_rail_keeps_up_with_the_tabs(qapp, win, monkeypatch):
     """Everything that changed a tab on the old top bar shows on the rail: a theme or
     highlight colour change, a tab switched off / on / swapped, offline mode, Ctrl+Tab."""
     from PySide6.QtTest import QTest
+
     from soundboard import net
     tabs, rail = win.tabs, win.rail
     win.show()
@@ -238,7 +240,7 @@ def test_the_rail_keeps_up_with_the_tabs(qapp, win, monkeypatch):
         same("highlight colour")
         set_tab_live(tabs, vi, False)
         win.tabctl.set_tab_on("radio", True)
-        tabs.setCurrentIndex(main.TAB_INDEX["radio"])
+        tabs.setCurrentIndex(TAB_INDEX["radio"])
         win.tabctl.set_tab_on("radio", False)
         same("current tab switched off")
         win.tabctl.set_tab_on("radio", True)
@@ -246,10 +248,10 @@ def test_the_rail_keeps_up_with_the_tabs(qapp, win, monkeypatch):
         win.tabctl.set_tab_on("voice", True)
         same("tab swapped")
         monkeypatch.setattr(net, "offline", lambda: True)
-        win._offline_follow()
+        win.netctl._offline_follow()
         same("offline")
         monkeypatch.setattr(net, "offline", lambda: False)
-        win._offline_follow()
+        win.netctl._offline_follow()
         tabs.setCurrentIndex(0)
         QTest.keyClick(tabs, Qt.Key_Tab, Qt.ControlModifier)
         assert tabs.currentIndex() != 0

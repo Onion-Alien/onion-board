@@ -6,10 +6,11 @@ import pytest
 
 from soundboard.ui import (aboutcontrol, alertcontrol, appsetupcontrol, buncontrol, categorycontrol,
                            devicecontrol, editcontrol, ffmpegcontrol, fitcontrol, hotkeycontrol,
-                           importcontrol, languagecontrol, mainwindow, miccontrol, padcontrol,
-                           playbackcontrol, remoteaccess, removecontrol, routecontrol,
-                           searchcontrol, settingscontrol, statuscontrol, tabcontrol, themecontrol,
-                           tickcontrol, tipcontrol, transportcontrol, updatecontrol, windowbuild)
+                           importcontrol, languagecontrol, mainwindow, miccontrol, netcontrol,
+                           padcontrol, playbackcontrol, remoteaccess, removecontrol, routecontrol,
+                           searchcontrol, settingscontrol, soundscontrol, statuscontrol, tabcontrol,
+                           themecontrol, tickcontrol, tipcontrol, transportcontrol, updatecontrol,
+                           windowbuild)
 from test_mainwindow import window  # noqa: F401  (the real MainWindow fixture)
 
 # (window attribute, controller class, methods that live there now)
@@ -95,6 +96,12 @@ SPLIT = [
       "_fit_body_top", "_fit_toolbar", "_fit_mixer", "_stack_setup"]),
     ("builder", windowbuild.WindowBuilder,
      ["_build_ui", "_build_mini", "_build_mixer", "_build_sounds_page", "_build_setup_page"]),
+    ("soundctl", soundscontrol.SoundsControl,
+     ["_load_all", "on_loaded", "on_clip", "record_dialog", "add_recording", "on_downloaded",
+      "on_reorder", "rename_sound"]),
+    ("netctl", netcontrol.NetControl,
+     ["_follow_switches", "_offline_follow", "_radio_follow_switch", "card_lines", "_network_line",
+      "_on_tor"]),
 ]
 
 

@@ -563,9 +563,9 @@ class WindowBuilder:
         if mw.rail.output is not None:
             mw.rail.output.lineClicked.connect(mw.setctl.open_settings)
             mw.rail.output.lineClicked.connect(lambda _p: usage.used("on-air-line"))
-        mw.remote_changed.connect(mw._net_follow, Qt.ConnectionType.QueuedConnection)
-        remote.on_change(mw._remote_watch)
-        mw._net_follow()
+        mw.remote_changed.connect(mw.netctl._net_follow, Qt.ConnectionType.QueuedConnection)
+        remote.on_change(mw.netctl._remote_watch)
+        mw.netctl._net_follow()
         # Ctrl+1... jump to the tabs in the rail's order, Ctrl+Tab / Ctrl+Shift+Tab step
         # through them (the tab widget does that only while it has the focus)
         for n in range(1, 10):
@@ -648,8 +648,8 @@ class WindowBuilder:
         for key in ("voice", "triggers", "apps"):
             mw.tabctl._tab_live(key, getattr(mw, key).is_active())
         mw.tabctl._radio_live(mw.radio.is_active())
-        mw._search_follow_switch()
-        net.on_change(mw._follow_switches)
+        mw.netctl._search_follow_switch()
+        net.on_change(mw.netctl._follow_switches)
 
         # the Sounds tab's player; right under the page, where it sat inside it
         rv.addWidget(mw.transport)
@@ -931,7 +931,7 @@ class WindowBuilder:
         am = mw._add_menu = DropdownMenu(add)
         icons.set_icon(am.addAction(_("Sound files"), mw.impctl.add_dialog), "music")
         icons.set_icon(am.addAction(_("A whole folder"), mw.impctl.add_folder_dialog), "folder")
-        icons.set_icon(am.addAction(_("Record"), mw.record_dialog), "mic")
+        icons.set_icon(am.addAction(_("Record"), mw.soundctl.record_dialog), "mic")
         icons.set_icon(am.addAction(_("From a link"), mw.impctl.add_from_link), "link")
         icons.set_icon(am.addAction(_("Free sound packs"), mw.impctl.show_packs), "download")
         add.setMenu(am)
@@ -1100,7 +1100,7 @@ class WindowBuilder:
         mw.linkbar = LinkBar(
             mw.engine, c, lambda: PAD_COLORS[len(mw.cfg.sounds) % len(PAD_COLORS)],
             lambda: {m.fingerprint: m.name for m in mw.cfg.sounds if m.fingerprint})
-        mw.linkbar.sound_ready.connect(mw.on_downloaded)
+        mw.linkbar.sound_ready.connect(mw.soundctl.on_downloaded)
         mw.linkbar.played.connect(mw.searchctl.on_link_played)
         mw.linkbar.board_busy = mw.playctl._board_song_playing
         mw.linkbar.up_next_changed.connect(
@@ -1122,7 +1122,7 @@ class WindowBuilder:
         mw.grid.listed = c.pad_view == "list"
         mw.grid.row_size = c.list_rows
         mw.grid._spacing()
-        mw.grid.reorder.connect(mw.on_reorder)
+        mw.grid.reorder.connect(mw.soundctl.on_reorder)
         # queued: the import (and any question it asks) runs after the drop returns,
         # so Explorer isn't frozen until a dialog is answered
         mw.grid.files_dropped.connect(mw.impctl.import_files,

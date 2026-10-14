@@ -45,10 +45,10 @@ def win(qapp, app_dir, opened):
     Config(mon_device=PHONES, mon_follows_default=False, setup_done=True,
            mic_first=True).save()   # (on the cable)
     w = main.MainWindow()
-    w._load_thread.join(15)
+    w.soundctl._load_thread.join(15)
     yield w
     w.close()
-    w._load_thread.join(15)
+    w.soundctl._load_thread.join(15)
     from PySide6.QtCore import QEvent
     w.deleteLater()
     qapp.sendPostedEvents(None, QEvent.DeferredDelete)
