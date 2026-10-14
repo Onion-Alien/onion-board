@@ -264,9 +264,10 @@ class WindowBuilder(Controller):
         mw.wordmark = QLabel("Onion Board")
         mw.wordmark.setObjectName("wordmark")
         from soundboard import __version__
-        # on the rail: the name over a quiet "v1.9.28" (the title bar says "from source");
-        # who made it is a tip on all three
-        mw.tagline = sidebar.ClickLabel(f"v{__version__}")
+        # on the rail: the name over a quiet "by Onion Alien · v1.9.28" (the title bar
+        # is just the name; "from source" is in the tips)
+        mw.tagline = sidebar.ClickLabel(
+            f"{_('by {name}', name='Onion Alien')} · v{__version__}")
         mw.tagline.setObjectName("tagline")
         about = _("an app by Onion Alien · v{version_text}", version_text=version_text())
         for w in (mw.logo, mw.wordmark):

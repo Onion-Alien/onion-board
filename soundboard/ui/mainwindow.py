@@ -30,7 +30,7 @@ from soundboard.ui import worker
 from soundboard.ui.ffmpegcontrol import FfmpegControl
 from soundboard.ui.netcontrol import NetControl
 from soundboard.ui.soundscontrol import SoundsControl
-from soundboard.ui.windowbuild import WindowBuilder, version_text
+from soundboard.ui.windowbuild import WindowBuilder, version_text  # noqa: F401  (settings imports it here)
 from soundboard.ui.fitcontrol import FitControl
 from soundboard.ui.transportcontrol import TransportControl
 from soundboard.ui.tickcontrol import TickControl
@@ -412,7 +412,7 @@ class MainWindow(QMainWindow):
         # pumps events while the window is built, so its timers can run
         # before the end of __init__
         self._shut_down = False
-        self.title = _("Onion Board {version_text}", version_text=version_text())
+        self.title = "Onion Board"   # the version is on the rail, under the name
         self.setWindowTitle(self.title)
         self.setAcceptDrops(True)   # files dropped outside the pad grid: see dropEvent
         self.cfg = Config.load()
