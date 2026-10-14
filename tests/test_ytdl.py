@@ -581,8 +581,9 @@ def test_enter_searches_youtube_and_a_result_plays_through_the_link_bar(
     monkeypatch.setattr(ytdl, "search", lambda q, count=20, source="youtube": (
         searched.append(source), hits)[1])
     monkeypatch.setattr(window.engine, "play", lambda *a, **kw: object())
+    signal = types.SimpleNamespace(connect=lambda f: None)
     window.ytresults.net.get = lambda req: types.SimpleNamespace(   # no thumbnail fetch
-        finished=types.SimpleNamespace(connect=lambda f: None))
+        finished=signal, downloadProgress=signal)
     window.search.setText("what is love")
     window.search.returnPressed.emit()                       # Enter: search YouTube
     assert process_events(qapp, lambda: window.ytresults._rows, 5)
@@ -1027,8 +1028,9 @@ def test_spammed_enter_waits_for_the_search_already_running(qapp, window,  # noq
         go.wait(5)
         return [ytdl.Result("HEXWRTEbj1I", "What Is Love", "Haddaway", 241)]
     monkeypatch.setattr(ytdl, "search", search)
+    signal = types.SimpleNamespace(connect=lambda f: None)
     window.ytresults.net.get = lambda req: types.SimpleNamespace(   # no thumbnail fetch
-        finished=types.SimpleNamespace(connect=lambda f: None))
+        finished=signal, downloadProgress=signal)
     window.search.setText("what is love")
     for _i in range(20):
         window.search.returnPressed.emit()                   # held: one search only
