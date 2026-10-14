@@ -696,9 +696,21 @@ def test_search_theme_and_colour_terms_shows_every_theme(window, qapp, query):  
 
 @pytest.mark.parametrize("query, tab", [("opacity", "Background"), ("interface size", "Size"),
                                         ("textured", "Theme style"), ("synthwave", "Themes")])
-def test_search_shows_the_look_tab_with_the_words(window, qapp, query, tab):  # noqa: F811
-    d = SettingsDialog(window, "general", lazy=True)
+@pytest.mark.parametrize("clicked_first", [False, True])
+def test_search_shows_the_look_tab_with_the_words(window, qapp, query, tab,  # noqa: F811
+                                                  clicked_first):
+    """Also after every look tab was clicked once (ending on Background): the search
+    still moves the box to the tab with the words, typed into the box as a person does."""
+    d = SettingsDialog(window, "appearance" if clicked_first else "general", lazy=True)
     try:
+        if clicked_first:
+            d.show()
+            for b in d.look_tabs:
+                b.click()
+                qapp.processEvents()
+            d.search_box.setText("opacity")
+            d._apply_search(d.search_box.text())
+            d.search_box.setText(query)
         d._apply_search(query)
         assert d._page_keys[d.tabs.currentIndex()] == "appearance"
         shown = d.look_shown
