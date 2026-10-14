@@ -617,7 +617,7 @@ def _no_windows_speech(request, monkeypatch):
 # still handing it something, it crashed the test worker a few tests later (access
 # violation / abort, about 1 run in 100). (module, class, method that stops it)
 _STOP_AFTER_TEST = (("soundboard.radio", "RadioPlayer", "shutdown"),
-                    ("soundboard.ui.appspanel", "_Lister", "stop"))
+                    ("soundboard.ui.approw", "_Lister", "stop"))
 
 
 @pytest.fixture(autouse=True)

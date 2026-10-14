@@ -1,8 +1,8 @@
 # Translating Onion Board
 
-People pick the language in **Settings → Appearance → Language**: a window of tiles
-(`ui/langpick.py`), a drop-down with each language in its own name and a search on top; the card's title
-is in Windows' language too. It's saved as config.json's
+People pick the language in **Settings → Appearance → Language**: a drop-down
+(`ui/langpick.py`) with each language in its own name and a search on top; the card's
+title is in Windows' language too. It's saved as config.json's
 `language` and takes effect after a restart. The board doesn't follow Windows by itself
 yet (`i18n.FOLLOW_WINDOWS`, for 2.0): until a language is picked, a bar in Windows'
 language offers to switch, once, if a catalog for it is shipped.
@@ -43,12 +43,11 @@ ngettext("{n} sound", "{n} sounds", n)
 
 - The key is the English exactly as in the code. An empty or missing translation shows
   the English.
-- Plural entries are a list of forms in the order of the language's rule
-  (`soundboard/i18n.py` → `PLURALS`; how many: `FORMS`): English, German, Spanish,
-  Italian, Dutch, Turkish: one, other; French, Portuguese (Brazil), Hindi: 0–1, other;
-  Russian, Ukrainian: one (1, 21…), few (2–4, 22–24…), many; Polish: one (1), few
-  (2–4, 22–24…), many; Arabic: zero, one, two, few (3–10), many (11–99), other;
-  Chinese, Japanese, Korean, Indonesian, Vietnamese, Thai: one form for every number.
+- Plural entries are a list of forms in the order of the language's rule:
+  `soundboard/i18n.py`'s `PLURALS` (each rule with a comment saying which numbers take
+  which form) and `FORMS` (how many forms). Most languages have two (one, other);
+  Russian, Ukrainian, Polish, Czech and Romanian three, Arabic six, and Chinese,
+  Japanese, Korean, Indonesian, Malay, Vietnamese and Thai one for every number.
 - Keep the app's tone: short, plain, friendly words. Keep `{placeholders}`, `<b>…</b>`
   and `&amp;` as they are.
 
@@ -66,7 +65,8 @@ Onion Watch too, so the two keep the same languages.
 
 ## The languages and what's special about them
 
-The same languages as Onion Watch (the Triggers tab), with the same words for shared things: English, Deutsch, Español, Français, Italiano, Nederlands, Polski, Português (Brasil), Türkçe, Bahasa Indonesia, Tiếng Việt, Русский, Українська, العربية, हिन्दी, ไทย, 简体中文, 繁體中文, 日本語 and 한국어.
+English (the code itself) and 32 translations, one catalog each in `assets/lang/`. Onion
+Watch (the Triggers tab) has the same ones, with the same words for shared things.
 
 - **Chinese** goes by region: Windows' `zh-HK`, `zh-MO`, `zh-TW` and `zh-Hant…` get
   Traditional (`zh-TW`), the rest (`zh-CN`, `zh-SG`, `zh-Hans…`) Simplified (`zh-CN`).

@@ -209,12 +209,12 @@ def test_a_long_voice_job_finishing_after_the_tab_is_off(window, qapp, monkeypat
     jobs = 1
     ai._get()
     if sp.module is not None:
-        sp._install()
+        sp.installs._install()
         jobs += 1
     lang = next((m for m in window.voice.modules if m.kind == "translation"), None)
     if lang is not None:
         monkeypatch.setattr(type(sp), "_lang", lambda self: lang)
-        sp._download()
+        sp.installs._download()
         jobs += 1
     assert process_events(qapp, lambda: len(started) >= jobs, timeout=5)
     window.tabctl.set_tab_on("voice", False)

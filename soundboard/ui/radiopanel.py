@@ -1,7 +1,8 @@
 """The Radio tab: internet radio from all over the world, picked on a world map or
 by searching, played through the engine so it can go out to others like your
 sounds do (Send). The directory and player are in radio.py; the map, painted by
-Qt itself, is ui/flatmap.py.
+Qt itself, is ui/flatmap.py; the station list and its filters are
+ui/radiolist.py (RadioTab.listctl).
 
 Nothing touches the network until the tab is first opened.
 """
@@ -11,16 +12,12 @@ import html
 import logging
 import random
 import time
-import zlib
-from string import Template
 
 import numpy as np
-from PySide6.QtCore import QEvent, QRect, QRectF, QSize, Qt, QTimer, Signal
-from PySide6.QtGui import QColor, QFont, QFontMetrics, QPainter, QPainterPath
-from PySide6.QtWidgets import (QButtonGroup, QCheckBox, QComboBox, QFrame, QHBoxLayout,
-                               QLabel, QLineEdit, QListWidget, QListWidgetItem,
-                               QPushButton, QSizePolicy, QSplitter, QStyle,
-                               QStyledItemDelegate, QStyleOptionComboBox, QVBoxLayout,
+from PySide6.QtCore import QEvent, QRectF, Qt, QTimer, Signal
+from PySide6.QtGui import QColor, QFont, QPainter
+from PySide6.QtWidgets import (QButtonGroup, QCheckBox, QComboBox, QHBoxLayout, QLabel,
+                               QLineEdit, QPushButton, QSizePolicy, QSplitter, QVBoxLayout,
                                QWidget)
 
 from soundboard import library, radio, theme, usage
@@ -29,55 +26,21 @@ from soundboard.engine import SR
 from soundboard.library import MAX_SECONDS, trim_silence
 from soundboard.radio import RadioDirectory, RadioPlayer, Station
 from soundboard.ui import appstate, busy, icons
-from soundboard.ui.panel import Flow as _Flow
 from soundboard.ui.panel import EmptyList, RoundedFrame, VolumeControl, bar, icon_label, vsep
+# the station list and its filters live in radiolist.py; their names stay importable here
+from soundboard.ui.radiolist import (GENRE_LABELS, GENRES, LIST_MAX,  # noqa: F401
+                                     MAP_CACHE, QUALITIES, ROW_H, SORTS, StationList,
+                                     _FilterRow, _StationDelegate, in_genre)
 from soundboard.ui.speedpitch import SpeedPitchButton
-from soundboard.ui.widgets import paint_now_playing, take_out
+from soundboard.ui.widgets import paint_now_playing
 from soundboard.ui.pixels import snap_to_pixels
 
 log = logging.getLogger(__name__)
 
-LIST_MAX = 300             # rows shown at once
 SEARCH_DELAY_MS = 450      # typing pause before the directory is asked
 TYPE_DELAY_MS = 80         # ...and before the list shows the matches already known
 FAV_MAX = 200
 RECENT_MAX = 30
-ROW_H = 54
-MAP_CACHE = 8              # filter combinations whose map points and towns are kept
-
-# genre chips: a station is in a genre when one of its tags contains one of the words
-GENRES: tuple[tuple[str, tuple[str, ...]], ...] = (
-    ("Pop", ("pop", "top 40", "top40", "hits", "charts")),
-    ("Rock", ("rock", "metal", "alternative", "indie", "punk", "grunge")),
-    ("Dance", ("dance", "house", "edm", "club", "techno", "trance", "electro", "dnb",
-               "drum and bass")),
-    ("Hip-hop", ("hip hop", "hip-hop", "hiphop", "rap", "r&b", "rnb", "urban")),
-    ("Jazz & Soul", ("jazz", "blues", "soul", "funk", "swing")),
-    ("Classical", ("classical", "orchestra", "opera", "baroque", "symphon")),
-    ("Chill", ("chill", "lounge", "ambient", "relax", "easy listening", "downtempo", "lofi",
-               "lo-fi")),
-    ("Oldies", ("oldies", "60s", "70s", "80s", "90s", "retro", "classic hits")),
-    ("Country & Folk", ("country", "folk", "bluegrass", "americana")),
-    ("Latin", ("latin", "reggaeton", "salsa", "bachata", "cumbia", "tropical")),
-    ("Reggae", ("reggae", "dancehall", "ska", "dub")),
-    ("News & Talk", ("news", "talk", "sport", "information", "public radio", "politics")),
-)
-_GENRE_WORDS: dict[str, tuple[str, ...]] = dict(GENRES)
-GENRE_LABELS = {"Pop": _("Pop"), "Rock": _("Rock"), "Dance": _("Dance"),
-                "Hip-hop": _("Hip-hop"), "Jazz & Soul": _("Jazz & Soul"),
-                "Classical": _("Classical"), "Chill": _("Chill"), "Oldies": _("Oldies"),
-                "Country & Folk": _("Country & Folk"), "Latin": _("Latin"),
-                "Reggae": _("Reggae"), "News & Talk": _("News & Talk")}
-
-# (label, key) — None keeps the list's own order (most listened / starred / most recent)
-SORTS = ((_("Default order"), None),
-         (_("Most listened"), lambda s: -s.clicks),
-         (_("Trending"), lambda s: -s.trend),
-         (_("Most voted"), lambda s: -s.votes),
-         (_("Name A–Z"), lambda s: s.name.lower()),
-         (_("Best quality"), lambda s: -s.bitrate))
-QUALITIES = ((_("Any quality"), 0), (_("{kbps} kbps +", kbps=128), 128),
-             (_("{kbps} kbps +", kbps=192), 192), (_("{kbps} kbps +", kbps=256), 256))
 
 
 def _steady_text(btn: QPushButton, text: str, *others: str):
@@ -97,280 +60,6 @@ def _steady_text(btn: QPushButton, text: str, *others: str):
     btn.blockSignals(blocked)
     btn.setText(text)
     btn.setMinimumWidth(widest if text else 0)
-
-
-def in_genre(s: Station, genre: str) -> bool:
-    words = _GENRE_WORDS.get(genre)
-    if not words:
-        return True
-    hay = s.genre_hay
-    return any(w in hay for w in words)
-
-
-def _country(s: Station) -> str:
-    return s.country or s.cc
-
-
-class _StationDelegate(QStyledItemDelegate):
-    """Paints a station row: a country badge (play button on hover), the name over its
-    country and genres, a bitrate pill and a star. Clicking the badge plays or stops
-    the station; clicking the star adds or removes it from Favorites."""
-
-    def __init__(self, tab: RadioTab):
-        super().__init__(tab.list)
-        self.tab = tab
-        self._skip_release = False   # the second release of a double-click on badge/star
-        self._fonts: dict[str, tuple] = {}     # list font (QFont.key()): its fonts below
-        self._badges: dict[str, QColor] = {}   # a country's badge colour
-
-    def _fonts_for(self, base: QFont) -> tuple:
-        """(badge, pill, name, subtitle) fonts and the last three's metrics: made once
-        per list font (the playing row's is bold), not for every row painted."""
-        key = base.key()
-        got = self._fonts.get(key)
-        if got is None:
-            def font(size: float, bold: bool | None) -> QFont:
-                f = QFont(base)
-                f.setPointSizeF(size)
-                if bold is not None:
-                    f.setBold(bold)
-                return f
-            badge, pill, name, sub = (font(8.5, True), font(7.5, True), font(10, True),
-                                      font(8.5, None))
-            if len(self._fonts) > 8:
-                self._fonts.clear()
-            got = self._fonts[key] = (badge, pill, name, sub, QFontMetrics(pill),
-                                      QFontMetrics(name), QFontMetrics(sub))
-        return got
-
-    def _badge(self, key: str) -> QColor:
-        c = self._badges.get(key)
-        if c is None:
-            if len(self._badges) > 2000:
-                self._badges.clear()
-            c = self._badges[key] = QColor.fromHsl(zlib.crc32(key.encode("utf-8")) % 360,
-                                                   95, 88)
-        return c
-
-    def sizeHint(self, opt, idx):
-        return QSize(1, ROW_H if idx.data(Qt.ItemDataRole.UserRole) else 96)   # as wide as the list
-
-    @staticmethod
-    def _rects(r: QRect):
-        card = r.adjusted(4, 2, -6, -2)
-        cy = card.center().y()
-        avatar = QRect(card.left() + 8, cy - 18, 36, 36)
-        star = QRect(card.right() - 30, cy - 12, 24, 24)
-        return card, avatar, star
-
-    def paint(self, p: QPainter, opt, idx):
-        t = theme.T
-        p.save()
-        p.setRenderHint(QPainter.RenderHint.Antialiasing)
-        uuid = idx.data(Qt.ItemDataRole.UserRole)
-        s = self.tab._stations.get(uuid) if uuid else None
-        if s is None:
-            p.setPen(QColor(t["muted"]))
-            p.drawText(opt.rect.adjusted(20, 8, -20, -8), Qt.AlignmentFlag.AlignCenter
-                       | Qt.TextFlag.TextWordWrap,
-                       idx.data(Qt.ItemDataRole.DisplayRole) or "")
-            p.restore()
-            return
-        on = self.tab.player.station
-        playing = on is not None and on.uuid == uuid
-        fav = uuid in self.tab._fav_ids
-        hover = bool(opt.state & QStyle.StateFlag.State_MouseOver)
-        sel = bool(opt.state & QStyle.StateFlag.State_Selected)
-        card, avatar, star = self._rects(opt.rect)
-        cardf = QRectF(card)
-        badge_f, pill_f, name_f, sub_f, pill_fm, name_fm, sub_fm = self._fonts_for(opt.font)
-
-        # row background
-        accent = QColor(t["accent"])
-        if sel:
-            bg = QColor(accent)
-            bg.setAlpha(56)
-            p.setPen(QColor(accent.red(), accent.green(), accent.blue(), 150))
-            p.setBrush(bg)
-            p.drawRoundedRect(cardf.adjusted(0.5, 0.5, -0.5, -0.5), 9, 9)
-        elif playing or hover:
-            bg = QColor(accent) if playing else QColor(t["card_hi"])
-            if playing:
-                bg.setAlpha(30)
-            p.setPen(Qt.PenStyle.NoPen)
-            p.setBrush(bg)
-            p.drawRoundedRect(cardf, 9, 9)
-        if playing:
-            p.setPen(Qt.PenStyle.NoPen)
-            p.setBrush(accent)
-            p.drawRoundedRect(QRectF(card.left(), card.top() + 10, 3, card.height() - 20), 1.5, 1.5)
-
-        # country badge / play button
-        path = QPainterPath()
-        path.addRoundedRect(QRectF(avatar), 10, 10)
-        if playing or hover:
-            p.fillPath(path, accent)
-            p.setPen(Qt.PenStyle.NoPen)
-            p.setBrush(QColor(t["on_accent"]))
-            c = QRectF(avatar).center()
-            if playing:          # a little equalizer, bouncing (still while tuning in)
-                paint_now_playing(p, QRectF(c.x() - 9, c.y() - 9, 18, 18),
-                                  QColor(t["on_accent"]), n=3,
-                                  paused=self.tab.player.status == "connecting")
-            else:                # ▶
-                tri = QPainterPath()
-                tri.moveTo(c.x() - 5, c.y() - 8)
-                tri.lineTo(c.x() + 8, c.y())
-                tri.lineTo(c.x() - 5, c.y() + 8)
-                tri.closeSubpath()
-                p.fillPath(tri, QColor(t["on_accent"]))
-        else:
-            p.fillPath(path, self._badge(s.cc or _country(s) or s.name))
-            p.setFont(badge_f)
-            p.setPen(QColor("#ffffff"))
-            p.drawText(avatar, Qt.AlignmentFlag.AlignCenter, s.cc or (s.name[:1].upper() or "?"))
-
-        # star
-        if fav:
-            icons.icon("star_filled", "accent").paint(p, star.adjusted(3, 3, -3, -3))
-        elif hover or sel:
-            icons.icon("star", "muted").paint(p, star.adjusted(3, 3, -3, -3))
-
-        # bitrate pill
-        right = star.left() - 6
-        pill_txt = f"{s.bitrate}k" if s.bitrate else (s.codec or "")[:5].upper()
-        if pill_txt:
-            w = pill_fm.horizontalAdvance(pill_txt) + 12
-            pill = QRectF(right - w, card.center().y() - 9, w, 18)
-            p.setPen(Qt.PenStyle.NoPen)
-            p.setBrush(QColor(t["badge"]))
-            p.drawRoundedRect(pill, 9, 9)
-            p.setFont(pill_f)
-            p.setPen(QColor(t["live_text"] if s.bitrate >= 256 else t["badge_text"]))
-            p.drawText(pill, Qt.AlignmentFlag.AlignCenter, pill_txt)
-            right = int(pill.left()) - 8
-
-        # name over country · genres
-        left = avatar.right() + 11
-        width = max(10, right - left)
-        p.setFont(name_f)
-        p.setPen(QColor(t["accent_hi"] if playing else t["text_hi"]))
-        name = name_fm.elidedText(s.name, Qt.TextElideMode.ElideRight, width)
-        p.drawText(QRect(left, card.top() + 7, width, 21), Qt.AlignmentFlag.AlignLeft
-                   | Qt.AlignmentFlag.AlignVCenter, name)
-        p.setFont(sub_f)
-        p.setPen(QColor(t["muted"]))
-        sub = " · ".join(b for b in (_country(s), ", ".join(s.tags[:3])) if b)
-        sub = sub_fm.elidedText(sub, Qt.TextElideMode.ElideRight, width)
-        p.drawText(QRect(left, card.top() + 27, width, 18), Qt.AlignmentFlag.AlignLeft
-                   | Qt.AlignmentFlag.AlignVCenter, sub)
-        p.restore()
-
-    def editorEvent(self, ev, model, opt, idx):
-        if (ev.type() in (QEvent.Type.MouseButtonRelease, QEvent.Type.MouseButtonDblClick)
-                and ev.button() == Qt.MouseButton.LeftButton
-                and idx.data(Qt.ItemDataRole.UserRole)):
-            uuid = idx.data(Qt.ItemDataRole.UserRole)
-            _card, avatar, star = self._rects(opt.rect)
-            pos = ev.position().toPoint()
-            on_button = star.adjusted(-4, -4, 4, 4).contains(pos) or avatar.contains(pos)
-            if ev.type() == QEvent.Type.MouseButtonDblClick:
-                # the first click already played / starred it: swallow the double-click
-                # (no "activated" play on top) and the release after it (no undo)
-                if on_button:
-                    self._skip_release = True
-                    return True
-                return super().editorEvent(ev, model, opt, idx)
-            if self._skip_release:
-                self._skip_release = False
-                if on_button:
-                    return True
-            # after this event: both rebuild the list this row belongs to
-            if star.adjusted(-4, -4, 4, 4).contains(pos):
-                QTimer.singleShot(0, lambda: self.tab._toggle_fav(uuid))
-                return True
-            if avatar.contains(pos):
-                QTimer.singleShot(0, lambda: self.tab._play_or_stop(uuid))
-                return True
-            if ev.type() == QEvent.Type.MouseButtonRelease and opt.rect.contains(pos):
-                QTimer.singleShot(0, lambda: self.tab.play_uuid(uuid))   # a click plays it
-        return super().editorEvent(ev, model, opt, idx)
-
-
-class _FilterRow(QWidget):
-    """The country / quality / sort boxes: side by side while their words fit, else
-    country on a row of its own above the other two, else one box a row. Squeezed
-    into one row they read "All coun", "Any qua" in a narrow window."""
-
-    GAP = 6
-
-    def __init__(self, combos: list[QComboBox]):
-        super().__init__()
-        self.combos = combos
-        for c in combos:
-            c.setProperty("snug", False)   # sized here, by what their words need
-        self.rows = 0
-        v = QVBoxLayout(self)
-        v.setContentsMargins(0, 0, 0, 0)
-        v.setSpacing(self.GAP)
-        self._lines = []
-        for _combo in combos:
-            h = QHBoxLayout()
-            h.setSpacing(self.GAP)
-            v.addLayout(h)
-            self._lines.append(h)
-        self._arrange(1)
-        for c in combos:   # a longer choice picked may need another row
-            c.currentIndexChanged.connect(lambda _i: self._arrange(self.rows_for(self.width())))
-
-    @staticmethod
-    def needs(c: QComboBox) -> int:
-        """The width that shows the box's longest choice in full, arrow included (for
-        a long list, like every country, the first choice and the one showing)."""
-        fm = c.fontMetrics()
-        texts = ([c.itemText(i) for i in range(c.count())] if c.count() <= 10
-                 else [c.itemText(0), c.currentText()])
-        text = max((fm.horizontalAdvance(t) for t in texts), default=0)
-        opt = QStyleOptionComboBox()
-        c.initStyleOption(opt)
-        full = c.style().sizeFromContents(QStyle.ContentsType.CT_ComboBox, opt,
-                                          QSize(text, fm.height()), c)
-        return max(c.minimumSizeHint().width(), full.width())
-
-    def fits(self, idx: list[int], width: int) -> bool:
-        """Whether these boxes side by side in `width` each get their words' room
-        (_arrange shares a row out in proportion to what each box needs)."""
-        return sum(self.needs(self.combos[i]) for i in idx) + self.GAP * (len(idx) - 1) <= width
-
-    def rows_for(self, width: int) -> int:
-        every = list(range(len(self.combos)))
-        if self.fits(every, width):
-            return 1
-        if self.fits(every[1:], width):
-            return 2
-        return len(every)
-
-    def _arrange(self, rows: int):
-        if rows != self.rows:
-            self.rows = rows
-            for h in self._lines:
-                while h.count():
-                    take_out(h)
-            for i, c in enumerate(self.combos):
-                line = 0 if rows == 1 else (min(i, 1) if rows == 2 else i)
-                self._lines[line].addWidget(c)
-            for h in self._lines:
-                h.addStretch(1)   # boxes as wide as their words, the rest left empty
-            self.updateGeometry()
-        for c in self.combos:   # a box's share of its row: what its words need
-            for h in self._lines:
-                if h.indexOf(c) >= 0:
-                    h.setStretch(h.indexOf(c), self.needs(c))
-            c.setMaximumWidth(self.needs(c))   # and no wider: the row's rest stays empty
-
-    def resizeEvent(self, e):
-        super().resizeEvent(e)
-        self._arrange(self.rows_for(self.width()))
 
 
 class NowPlaying(QWidget):
@@ -455,11 +144,30 @@ class NowPlaying(QWidget):
 class RadioTab(QWidget):
     clip_ready = Signal(object, str)   # audio, suggested name (like AppsTab's)
     active_changed = Signal(bool)      # a station started / stopped (for the tab's live dot)
+    # made by the station list (radiolist.StationList._make_station_panel)
+    station_panel: RoundedFrame
+    seg_box: QWidget
+    btn_popular: QPushButton
+    btn_favs: QPushButton
+    btn_recent: QPushButton
+    _mode: QButtonGroup
+    genre_box: QWidget
+    _genres: QButtonGroup
+    _genre_btns: dict[str, QPushButton]
+    filter_box: QWidget
+    cmb_country: QComboBox
+    cmb_quality: QComboBox
+    cmb_sort: QComboBox
+    filter_row: _FilterRow
+    count_label: QLabel
+    btn_clear: QPushButton
+    list: EmptyList
 
     def __init__(self, engine, cfg, save_cb, meter_cls, directory: RadioDirectory | None = None,
                  globe: bool = True):
         super().__init__()
         self.engine, self.cfg, self._save = engine, cfg, save_cb
+        self.listctl = StationList(self)   # the station list and its filters
         if not isinstance(cfg.radio, dict):
             cfg.radio = {}
         self.dir = directory or RadioDirectory(parent=self)
@@ -521,7 +229,7 @@ class RadioTab(QWidget):
         self._type_timer = QTimer(self)   # the list follows typing after a short pause
         self._type_timer.setSingleShot(True)
         self._type_timer.setInterval(TYPE_DELAY_MS)
-        self._type_timer.timeout.connect(self._show_list)
+        self._type_timer.timeout.connect(self.listctl._show_list)
 
         v = QVBoxLayout(self)
         v.setContentsMargins(0, 8, 0, 0)
@@ -558,7 +266,7 @@ class RadioTab(QWidget):
         self.globe_layout = QVBoxLayout(self.globe_box)
         self.globe_layout.setContentsMargins(0, 0, 0, 0)
         self.split.addWidget(self.globe_box)
-        self.split.addWidget(self._make_station_panel())
+        self.split.addWidget(self.listctl._make_station_panel())
         self.split.setStretchFactor(0, 3)
         self.split.setStretchFactor(1, 2)
         if not globe:
@@ -651,239 +359,6 @@ class RadioTab(QWidget):
         self._refresh_info()
         self._update_buttons()
 
-    # ------------------------------------------------------------------ station panel
-    _PANEL_STYLE = Template("""
-QFrame#stations { background:$panel; border-radius:12px; }
-QFrame#stations QWidget { background:transparent; }
-QFrame#stations QComboBox QAbstractItemView, QFrame#stations QComboBoxPrivateContainer,
-QFrame#stations QMenu { background:$card; }
-QFrame#stations QListWidget { border:none; outline:0; }
-QFrame#stations QPushButton#seg { border:none; border-radius:7px; padding:5px 10px;
-    min-height:18px; background:transparent; color:$muted; font-weight:600; }
-QFrame#stations QPushButton#seg:hover { color:$text_hi; background:$card_hi; }
-QFrame#stations QPushButton#seg:checked { background:$accent; color:$on_accent; }
-QFrame#stations QWidget#segbox { background:$segbox; border-radius:9px; }
-QFrame#stations QPushButton#genre { border-radius:6px; padding:3px 10px; font-size:8.5pt;
-    background:$btn; border:1px solid transparent; color:$text; }
-QFrame#stations QPushButton#genre:hover { background:$btn_hover; }
-QFrame#stations QPushButton#genre:checked { background:$accent; border-color:$accent;
-    color:$on_accent; }
-QFrame#stations QComboBox { background:$card_ctl; padding:4px 8px; font-size:9pt; }
-QFrame#stations QLabel#count { color:$muted; font-size:8.5pt; }
-QFrame#stations QPushButton#clear { border:none; background:transparent; color:$accent_hi;
-    font-size:8.5pt; padding:0 2px; }
-QFrame#stations QPushButton#clear:hover { text-decoration:underline; }
-QFrame#stations QFrame#rule { background:$border; max-height:1px; border:none; }
-""")
-
-    def _make_station_panel(self) -> QFrame:
-        self.station_panel = panel = RoundedFrame()
-        panel.setObjectName("stations")
-        panel.setMinimumWidth(220)
-        v = QVBoxLayout(panel)
-        v.setContentsMargins(10, 8, 6, 4)
-        v.setSpacing(8)
-
-        # Popular | Favorites | Recent
-        seg = QWidget()
-        seg.setObjectName("segbox")
-        sh = QHBoxLayout(seg)
-        sh.setContentsMargins(3, 3, 3, 3)
-        sh.setSpacing(2)
-        self.btn_popular = QPushButton(_("Popular"))
-        self.btn_favs = QPushButton(_("Favorites"))
-        icons.set_icon(self.btn_favs, "star", "muted")
-        self.btn_recent = QPushButton(_("Recent"))
-        self._mode = QButtonGroup(self)
-        for b in (self.btn_popular, self.btn_favs, self.btn_recent):
-            b.setObjectName("seg")
-            b.setAccessibleName(b.text())    # kept when the fitter drops the words
-            b.setCheckable(True)
-            b.setCursor(Qt.CursorShape.PointingHandCursor)
-            self._mode.addButton(b)
-            sh.addWidget(b)
-        self.btn_popular.setChecked(True)
-        self._mode.buttonClicked.connect(lambda _b: self._show_list())
-        self.seg_box = seg
-        # as wide as its words
-        seg.setSizePolicy(QSizePolicy.Policy.Maximum, QSizePolicy.Policy.Fixed)
-        v.addWidget(seg)
-
-        # genre chips
-        self.genre_box = QWidget()
-        self.genre_box.setSizePolicy(QSizePolicy.Policy.Preferred, QSizePolicy.Policy.Minimum)
-        flow = _Flow(self.genre_box, gap=5)
-        self._genres = QButtonGroup(self)
-        self._genre_btns: dict[str, QPushButton] = {}
-        for g in ("", *(name for name, _words in GENRES)):
-            b = QPushButton((GENRE_LABELS.get(g, g) if g else _("All")).replace("&", "&&"))
-            b.setObjectName("genre")
-            b.setCheckable(True)
-            b.setCursor(Qt.CursorShape.PointingHandCursor)
-            b.setChecked(not g)
-            b.clicked.connect(lambda _c=False, g=g: self.set_genre(g))
-            self._genres.addButton(b)
-            self._genre_btns[g] = b
-            flow.addWidget(b)
-        v.addWidget(self.genre_box)
-
-        # country | quality | sort, then "312 of 3,000 stations"  ·  Clear filters
-        self.filter_box = QWidget()
-        fv = QVBoxLayout(self.filter_box)
-        fv.setContentsMargins(0, 0, 0, 0)
-        fv.setSpacing(8)
-        self.cmb_country = QComboBox()
-        self.cmb_country.setSizeAdjustPolicy(QComboBox.SizeAdjustPolicy.AdjustToMinimumContentsLengthWithIcon)
-        self.cmb_country.setMinimumContentsLength(8)
-        self.cmb_country.addItem(_("All countries"), "")
-        self.cmb_country.setAccessibleName(_("Country"))
-        self.cmb_country.activated.connect(
-            lambda _i: self.set_country(self.cmb_country.currentData() or ""))
-        self.cmb_quality = QComboBox()
-        self.cmb_quality.setToolTip(_("Only stations streaming at least this bitrate"))
-        self.cmb_quality.setAccessibleName(_("Quality"))
-        for label, kbps in QUALITIES:
-            self.cmb_quality.addItem(label, kbps)
-        self.cmb_quality.activated.connect(lambda _i: self._on_filter())
-        self.cmb_sort = QComboBox()
-        self.cmb_sort.setAccessibleName(_("Sort by"))
-        for label, _key in SORTS:
-            self.cmb_sort.addItem(label)
-        self.cmb_sort.activated.connect(lambda _i: self._show_list())
-        self.filter_row = _FilterRow([self.cmb_country, self.cmb_quality, self.cmb_sort])
-        fv.addWidget(self.filter_row)
-        row = QHBoxLayout()
-        row.setContentsMargins(2, 0, 4, 0)
-        self.count_label = QLabel()
-        self.count_label.setObjectName("count")
-        row.addWidget(self.count_label, 1)
-        self.btn_clear = QPushButton(_("Clear filters"))
-        self.btn_clear.setObjectName("clear")
-        self.btn_clear.setCursor(Qt.CursorShape.PointingHandCursor)
-        self.btn_clear.clicked.connect(self.clear_filters)
-        self.btn_clear.hide()
-        row.addWidget(self.btn_clear)
-        fv.addLayout(row)
-        v.addWidget(self.filter_box)
-        rule = QFrame()
-        rule.setObjectName("rule")
-        rule.setFixedHeight(1)
-        v.addWidget(rule)
-
-        self.list = EmptyList(icon="radio")   # says why it's empty, centred (_show_list)
-        self.list.setAccessibleName(_("Stations"))
-        self.list.setMinimumSize(160, 48)
-        self.list.setUniformItemSizes(True)
-        self.list.setWordWrap(False)
-        self.list.setMouseTracking(True)
-        self.list.setVerticalScrollMode(QListWidget.ScrollMode.ScrollPerPixel)
-        self.list.setHorizontalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
-        self.list.setItemDelegate(_StationDelegate(self))
-        self.list.itemActivated.connect(self._on_activated)          # double-click / Enter
-        self.list.currentItemChanged.connect(self._on_current)
-        v.addWidget(self.list, 1)
-        self._style_panel()
-        return panel
-
-    def _style_panel(self):
-        self.station_panel.setStyleSheet(self._PANEL_STYLE.substitute(theme.T)
-                                        + theme.texture_style("QFrame#stations"))
-
-    # -- filters
-    def set_genre(self, genre: str):
-        self._genre = genre if genre in _GENRE_WORDS else ""
-        self._genre_btns[self._genre].setChecked(True)
-        self._on_filter()
-
-    def set_country(self, country: str):
-        self._country = country
-        self._on_filter()
-
-    def _min_kbps(self) -> int:
-        return int(self.cmb_quality.currentData() or 0)
-
-    def filters_on(self) -> bool:
-        return bool(self._genre or self._country or self._min_kbps())
-
-    def clear_filters(self):
-        self._genre, self._country = "", ""
-        self._genre_btns[""].setChecked(True)
-        self.cmb_quality.setCurrentIndex(0)
-        self._on_filter()
-
-    def _on_filter(self):
-        self._show_list()
-        self._push_globe()
-
-    def _filtered(self, stations: list[Station], country: bool = True) -> list[Station]:
-        kbps = self._min_kbps()
-        words = _GENRE_WORDS.get(self._genre)
-        place = self._country if country else ""
-        if not (words or place or kbps):
-            return list(stations)
-        return [s for s in stations
-                if (not words or any(w in s.genre_hay for w in words))
-                and (not place or _country(s) == place)
-                and (not kbps or s.bitrate >= kbps)]
-
-    def _popular_filtered(self, country: bool = True) -> list[Station]:
-        """_filtered(self._globe_list): the genre and quality pass is done once per
-        filter choice and kept (read it, don't change it); the country is picked out of
-        that (cheap)."""
-        if self._popular_of is not self._globe_list:   # a new list: nothing kept is true
-            self._popular_of = self._globe_list
-            self._popular_cache.clear()
-        key = (self._genre, self._min_kbps())
-        got = self._popular_cache.pop(key, None)
-        if got is None:
-            got = self._filtered(self._globe_list, country=False)
-        self._popular_cache[key] = got
-        while len(self._popular_cache) > MAP_CACHE:
-            self._popular_cache.pop(next(iter(self._popular_cache)))
-        if country and self._country:
-            return [s for s in got if _country(s) == self._country]
-        return got
-
-    def _popular_showing(self) -> bool:
-        return not (self._query or self.btn_favs.isChecked() or self.btn_recent.isChecked())
-
-    def _source(self) -> list[Station]:
-        """The list before filters: search results, favourites, recent or popular."""
-        if self._query:
-            local = self._local_matches()
-            if self._results is None:
-                return local
-            ids = {s.uuid for s in self._results}
-            return sorted(self._results + [s for s in local if s.uuid not in ids],
-                          key=lambda s: -s.clicks)
-        if self.btn_favs.isChecked():
-            return list(self.favorites)
-        if self.btn_recent.isChecked():
-            return list(self.recent)
-        return list(self._globe_list)
-
-    def _fill_countries(self, source: list[Station], filtered: bool = False):
-        """The country menu: how many of `source` each country has with the other
-        filters on (`filtered`: they already are)."""
-        counts: dict[str, int] = {}
-        for s in source if filtered else self._filtered(source, country=False):
-            c = _country(s)
-            if c:
-                counts[c] = counts.get(c, 0) + 1
-        if self._country and self._country not in counts:
-            counts[self._country] = 0          # keep the chosen one listed
-        rows = tuple(sorted(counts.items(), key=lambda kv: (-kv[1], kv[0].lower())))
-        cmb = self.cmb_country
-        cmb.blockSignals(True)
-        if rows != self._countries_shown:   # the same counts: the menu is already right
-            self._countries_shown = rows
-            cmb.clear()
-            cmb.addItem(_("All countries"), "")
-            for c, n in rows:
-                cmb.addItem(f"{c}  ({n:,})", c)
-        cmb.setCurrentIndex(max(0, cmb.findData(self._country)))
-        cmb.blockSignals(False)
-
     # ------------------------------------------------------------------ first open
     def showEvent(self, e):
         super().showEvent(e)
@@ -934,7 +409,7 @@ QFrame#stations QFrame#rule { background:$border; max-height:1px; border:none; }
         self.dir.load_outlines()
         if self._globe_error:
             self.flat.show_message(self._globe_error)   # sad Bun on the map says why
-            self._show_list()                           # ... so the list needn't
+            self.listctl._show_list()                   # ... so the list needn't
             self._refresh_info()
         self._push_globe(force=True)
         self._select_on_globe(fly=False)
@@ -951,7 +426,7 @@ QFrame#stations QFrame#rule { background:$border; max-height:1px; border:none; }
     def _push_globe(self, force: bool = False):
         """Pin the popular stations on the map — only those the filters let through — and
         name the cities and towns they're in."""
-        shown = self._popular_filtered()
+        shown = self.listctl._popular_filtered()
         ids = [s.uuid for s in shown]
         if force or ids != self._globe_shown:
             self._globe_shown = ids
@@ -976,7 +451,7 @@ QFrame#stations QFrame#rule { background:$border; max-height:1px; border:none; }
         s = self._stations.get(uuid)
         if s is not None:
             self.play(s)
-            self._highlight(s.uuid)
+            self.listctl._highlight(s.uuid)
 
     # ------------------------------------------------------------------ station lists
     def _remember(self, stations: list[Station]):
@@ -1001,7 +476,7 @@ QFrame#stations QFrame#rule { background:$border; max-height:1px; border:none; }
         if self._globe_list:
             self._refresh_info(_("Refreshing the station list…"))
         if not self._globe_list:
-            self._show_list()
+            self.listctl._show_list()
             self._refresh_info()
 
     def _on_globe_stations(self, stations: list):
@@ -1010,7 +485,7 @@ QFrame#stations QFrame#rule { background:$border; max-height:1px; border:none; }
         self._map_cache.clear()    # new station data: new points and towns
         self._remember(stations)
         self._push_globe(force=True)
-        self._show_list()
+        self.listctl._show_list()
         if self._reloading:
             self._reloading = False
             busy.set_busy(self.btn_refresh, False)
@@ -1035,11 +510,11 @@ QFrame#stations QFrame#rule { background:$border; max-height:1px; border:none; }
             usage.used("radio-list-down")
             self._map("show_message", self._globe_error)
             self._flash_until = 0.0
-            self._show_list()
+            self.listctl._show_list()
             self._refresh_info()
         elif self._query:
             self._results, self._search_failed = [], True
-            self._show_list()
+            self.listctl._show_list()
             self._say((msg or radio.directory_unreachable()) + " "
                       + _("Press Enter to search again."), "error")
 
@@ -1049,7 +524,7 @@ QFrame#stations QFrame#rule { background:$border; max-height:1px; border:none; }
             self._search_timer.stop()
             self.dir.search("")    # drops any search still on its way
             self._results, self._search_failed = None, False
-            self._show_list()
+            self.listctl._show_list()
             self._flash_until = 0.0    # no "Searching…" left over from the cleared words
             self._refresh_info()
             return
@@ -1061,7 +536,7 @@ QFrame#stations QFrame#rule { background:$border; max-height:1px; border:none; }
     def flush_typing(self):
         """Show the list for what's typed now, not after the typing pause."""
         if self._type_timer.isActive():
-            self._show_list()
+            self.listctl._show_list()
 
     def _search_now(self):
         self._search_timer.stop()
@@ -1070,7 +545,7 @@ QFrame#stations QFrame#rule { background:$border; max-height:1px; border:none; }
             self.start()
             if self._search_failed:   # trying again: back to "Searching…"
                 self._results, self._search_failed = None, False
-                self._show_list()
+                self.listctl._show_list()
             self.dir.search(self._query)
             self._refresh_info(_("Searching…"))
 
@@ -1079,7 +554,7 @@ QFrame#stations QFrame#rule { background:$border; max-height:1px; border:none; }
             return
         self._remember(stations)
         self._results = [self._stations[s.uuid] for s in stations]
-        self._show_list()
+        self.listctl._show_list()
         self._flash_until = 0.0        # the results are in: "Searching…" is over
         self._refresh_info()
 
@@ -1144,113 +619,6 @@ QFrame#stations QFrame#rule { background:$border; max-height:1px; border:none; }
         if query == self._phone_query:
             self._phone_query = ""            # the same words again: ask again later
 
-    def visible_stations(self, source: list[Station] | None = None) -> list[Station]:
-        return self._sorted(self._filtered(self._source() if source is None else source))
-
-    def _sorted(self, stations: list[Station]) -> list[Station]:
-        key = SORTS[max(0, self.cmb_sort.currentIndex())][1]
-        return sorted(stations, key=key) if key else stations
-
-    def _show_list(self):
-        self._type_timer.stop()    # whatever was typed is in this one
-        source = self._source()    # once: a search goes through every known station
-        others = (self._popular_filtered(country=False) if self._popular_showing()
-                  else self._filtered(source, country=False))
-        self._fill_countries(others, filtered=True)
-        every = self._sorted([s for s in others if _country(s) == self._country]
-                             if self._country else others)
-        stations = every[:LIST_MAX]
-        n, total = len(every), len(source)
-        if n != total:
-            count = ngettext("{n} of {total} station", "{n} of {total} stations", total,
-                             n=f"{n:,}", total=f"{total:,}")
-        elif n > LIST_MAX:
-            count = ngettext("{n} station (top {shown} shown)", "{n} stations (top {shown} shown)",
-                             n, n=f"{n:,}", shown=LIST_MAX)
-        else:
-            count = ngettext("{n} station", "{n} stations", n, n=f"{n:,}")
-        self.count_label.setText(count)
-        self.btn_clear.setVisible(self.filters_on())
-        cur = self.list.currentItem()
-        keep = cur.data(Qt.ItemDataRole.UserRole) if cur is not None else None
-        playing = self.player.station.uuid if self.player.station else None
-        self._rows_playing = playing
-        fav = self._fav_ids
-        self.list.blockSignals(True)
-        self.list.clear()
-        for s in stations:
-            it = QListWidgetItem(self._row_text(s, playing, fav))
-            it.setData(Qt.ItemDataRole.UserRole, s.uuid)
-            # station data is community-edited: escape it, or Qt renders it as HTML
-            it.setToolTip(f"<p>{html.escape(s.name)}"
-                          + (f"<br>{html.escape(s.homepage)}" if s.homepage else "") + "</p>")
-            if s.uuid == playing:
-                f = it.font()
-                f.setBold(True)
-                it.setFont(f)
-            self.list.addItem(it)
-            if s.uuid == keep:
-                self.list.setCurrentItem(it)
-        self.list.blockSignals(False)
-        if not stations:
-            if self._query:
-                empty = (_("Searching…") if self._results is None else
-                         _("Search failed: press Enter to try again.") if self._search_failed
-                         else _("No stations found."))
-            elif source and self.filters_on():
-                empty = _("No stations match these filters.\nTry another genre or country.")
-            elif self.btn_favs.isChecked():
-                empty = _("No favorites yet.\nHover a station and click its ☆ to keep it "
-                          "here.")
-            elif self.btn_recent.isChecked():
-                empty = _("Nothing played yet.\nStations you listen to show up here.")
-            else:
-                empty = self._no_stations_text()
-            self.list.set_empty(empty)
-        self._update_buttons()
-
-    @staticmethod
-    def _row_text(s: Station, playing: str | None, fav: set[str]) -> str:
-        """A row's text (the delegate paints its own; this is for screen readers)."""
-        star = "★ " if s.uuid in fav else ""
-        return f"{'▶ ' if s.uuid == playing else ''}{star}{s.name}\n{s.subtitle()}"
-
-    def _restate_rows(self, *changed: str, rebuild: bool = False):
-        """Playing, stopping or starring a station changes how its row looks, not which
-        rows there are (unless `rebuild`: Favorites or Recent showing): the rows of the
-        station that was playing, the one playing now and `changed` are relabelled and
-        the list repainted, instead of the whole list being made again."""
-        if rebuild:
-            self._show_list()
-            return
-        playing = self.player.station.uuid if self.player.station else None
-        fav = self._fav_ids
-        todo = {self._rows_playing, playing, *changed} - {None}
-        self._rows_playing = playing
-        for i in range(self.list.count() if todo else 0):
-            it = self.list.item(i)
-            uuid = it.data(Qt.ItemDataRole.UserRole)
-            s = self._stations.get(uuid) if uuid in todo else None
-            if s is None:
-                continue
-            text = self._row_text(s, playing, fav)
-            if it.text() != text:
-                it.setText(text)
-            if it.font().bold() != (s.uuid == playing):
-                f = it.font()
-                f.setBold(s.uuid == playing)
-                it.setFont(f)
-        self.list.viewport().update()
-        self._update_buttons()
-
-    def _highlight(self, uuid: str):
-        for i in range(self.list.count()):
-            it = self.list.item(i)
-            if it.data(Qt.ItemDataRole.UserRole) == uuid:
-                self.list.setCurrentItem(it)
-                self.list.scrollToItem(it)
-                return
-
     def selected(self) -> Station | None:
         it = self.list.currentItem()
         return self._stations.get(it.data(Qt.ItemDataRole.UserRole)) if it is not None else None
@@ -1277,7 +645,7 @@ QFrame#stations QFrame#rule { background:$border; max-height:1px; border:none; }
     def _show_playing(self):
         """The now-playing strip was clicked: the station's row in the list."""
         if self.player.station is not None:
-            self._highlight(self.player.station.uuid)
+            self.listctl._highlight(self.player.station.uuid)
             self._select_on_globe(fly=True)
 
     # ------------------------------------------------------------------ playing
@@ -1303,7 +671,7 @@ QFrame#stations QFrame#rule { background:$border; max-height:1px; border:none; }
         self.cfg.radio["recent"] = [r.to_saved() for r in self.recent]
         self._save()
         self._select_on_globe(fly=True)
-        self._restate_rows(rebuild=self.btn_recent.isChecked() and not self._query)
+        self.listctl._restate_rows(rebuild=self.btn_recent.isChecked() and not self._query)
         self._refresh_info()
         self._report_active()
 
@@ -1333,7 +701,7 @@ QFrame#stations QFrame#rule { background:$border; max-height:1px; border:none; }
         if self.player.station is not None:
             self.player.stop()
             self._select_on_globe(fly=False)
-            self._restate_rows()
+            self.listctl._restate_rows()
         self._report_active()
 
     def toggle_play(self):
@@ -1359,7 +727,7 @@ QFrame#stations QFrame#rule { background:$border; max-height:1px; border:none; }
 
     def _on_error(self, msg: str):
         usage.used("radio-failed")
-        self._restate_rows()
+        self.listctl._restate_rows()
         # the player's own plain words (radio.station_off_air, a switch's reason)
         self._say(msg or radio.station_off_air(), "error")
         self._select_on_globe(fly=False)
@@ -1463,7 +831,7 @@ QFrame#stations QFrame#rule { background:$border; max-height:1px; border:none; }
         self.cfg.radio["favorites"] = [f.to_saved() for f in self.favorites]
         self._save()
         # searching lists favourites first, so their order there changes too
-        self._restate_rows(s.uuid, rebuild=self.btn_favs.isChecked() or bool(self._query))
+        self.listctl._restate_rows(s.uuid, rebuild=self.btn_favs.isChecked() or bool(self._query))
 
     # ------------------------------------------------------------------ controls
     def _on_live(self, on: bool):
@@ -1575,7 +943,7 @@ QFrame#stations QFrame#rule { background:$border; max-height:1px; border:none; }
             self._refresh_info()
 
     def retheme(self):
-        self._style_panel()
+        self.listctl._style_panel()
         self._globe_theme()
 
     def _globe_theme(self):

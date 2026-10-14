@@ -86,7 +86,7 @@ def test_global_voice_stop_turns_off_replacements_and_translation(panel, monkeyp
     p, eng = panel
     calls = []
     # Set the switches without starting real helpers, then restore their signals.
-    for button in (p.speech.b_live, p.ai.b_start, p.speech.sw_lang):
+    for button in (p.speech.livevoice.b_live, p.ai.b_start, p.speech.sw_lang):
         button.blockSignals(True)
         button.setChecked(True)
         button.blockSignals(False)
@@ -96,7 +96,7 @@ def test_global_voice_stop_turns_off_replacements_and_translation(panel, monkeyp
     monkeypatch.setattr(p.controller, "stop_live", lambda: calls.append("speech"))
     monkeypatch.setattr(p.controller, "stop_speaking", lambda: calls.append("typed"))
     p.stop_all()
-    assert not p.speech.b_live.isChecked()
+    assert not p.speech.livevoice.b_live.isChecked()
     assert not p.ai.is_on()
     assert not p.speech.sw_lang.isChecked()
     assert "typed" in calls
@@ -166,7 +166,7 @@ def test_live_voice_needs_the_addon_set_up(panel):
     # the repo's live-voice module has no .venv in a test checkout -> install hint
     m = p.speech.module
     if m is None or not m.installed:
-        assert p.speech.lang_box.isHidden() and not p.speech.missing.isHidden()
+        assert p.speech.lang_box.isHidden() and not p.speech.installs.missing.isHidden()
 
 
 def test_everything_spoken_lands_in_the_log(panel, monkeypatch):
@@ -175,8 +175,8 @@ def test_everything_spoken_lands_in_the_log(panel, monkeypatch):
     monkeypatch.setattr(s.ctl, "say", lambda text: None)
     s.ed.setText("typed line")
     s._say()
-    s._on_event({"type": "final", "text": "heard line"})
-    s._on_event({"type": "final", "text": ""})
+    s.livevoice._on_event({"type": "final", "text": "heard line"})
+    s.livevoice._on_event({"type": "final", "text": ""})
     lines = s.said_log.toPlainText().splitlines()
     assert len(lines) == 2
     assert lines[0].endswith("typed line") and lines[1].endswith("heard line")
@@ -184,7 +184,8 @@ def test_everything_spoken_lands_in_the_log(panel, monkeypatch):
 
 def test_changer_starts_off_even_if_it_was_left_on(qapp, monkeypatch):
     monkeypatch.setattr(tts.SapiTTS, "warm_up", lambda self: [])
-    from soundboard.ui.voicepanel import POWER_TEXT, VoicePanel
+    from soundboard.ui.voicefxpanel import POWER_TEXT
+    from soundboard.ui.voicepanel import VoicePanel
     p = VoicePanel(FakeEngine(), {"enabled": True, "preset": "Old telephone", "effects": {}}, {})
     try:
         assert not p.fx.btn_power.isChecked() and not p.chain.enabled
@@ -209,13 +210,13 @@ def test_speak_in_offers_the_languages_and_downloads_only_on_request(panel, monk
     s.changed.connect(got.append)
     s.cb_lang.setCurrentIndex(s.cb_lang.findData("de"))
     assert got[-1]["translate"] == "de"
-    assert not s.tr_box.isHidden() and not s.b_dl.isHidden()
-    assert s.b_dl.text() == "Download German" and "151 MB" in s.lbl_tr.text()
+    assert not s.tr_box.isHidden() and not s.installs.b_dl.isHidden()
+    assert s.installs.b_dl.text() == "Download German" and "151 MB" in s.lbl_tr.text()
     started = []
     monkeypatch.setattr(s.ctl, "start_live", lambda m, args=(): started.append(args))
     if s.module is not None:
-        s._toggle_live(True)                            # not downloaded: refuses to start
-        assert started == [] and "Download German first" in s.lbl_state.text()
+        s.livevoice._toggle_live(True)                  # not downloaded: refuses to start
+        assert started == [] and "Download German first" in s.livevoice.lbl_state.text()
 
 
 def test_downloaded_language_needs_a_windows_voice_and_uses_it(panel, monkeypatch):
@@ -232,24 +233,24 @@ def test_downloaded_language_needs_a_windows_voice_and_uses_it(panel, monkeypatc
     tts.voices, tts.voice_langs = ["Microsoft Zira Desktop"], {"Microsoft Zira Desktop": "en-US"}
     s._fill_langs()
     assert s.cb_lang.currentText() == "German"
-    assert s.b_dl.isHidden() and not s.b_voices.isHidden()
+    assert s.installs.b_dl.isHidden() and not s.installs.b_voices.isHidden()
     assert "no German voice" in s.lbl_tr.text()
     tts.voices.append("Microsoft Katja")
     tts.voice_langs["Microsoft Katja"] = "de-DE"
     s._refresh_translation()
-    assert s.b_voices.isHidden() and "Katja says it in German" in s.lbl_tr.text()
+    assert s.installs.b_voices.isHidden() and "Katja says it in German" in s.lbl_tr.text()
     started = []
     monkeypatch.setattr(s.ctl, "start_live", lambda mod, args=(): started.append(args))
     s.module = s.module or object()
-    s._toggle_live(True)
+    s.livevoice._toggle_live(True)
     args = started[0]
     assert args[args.index("--translate") + 1] == str(d)
     assert s.ctl.live_voice == "Microsoft Katja"
-    s._on_event({"type": "final", "text": "Hallo", "original": "Hello"})
+    s.livevoice._on_event({"type": "final", "text": "Hallo", "original": "Hello"})
     assert s.said_log.toPlainText().endswith("Hallo   (you said: Hello)")
     from PySide6.QtWidgets import QApplication, QMessageBox
     monkeypatch.setattr(QMessageBox, "question", lambda *a, **k: QMessageBox.Yes)
-    s._remove_download()                         # asks, then "Deleting…" on the button
+    s.installs._remove_download()                         # asks, then "Deleting…" on the button
     process_events(QApplication.instance(), lambda: not d.exists())
     assert "(download" in s.cb_lang.currentText()
 
@@ -260,7 +261,7 @@ def test_voice_installed_in_windows_settings_is_found_on_return(panel, qapp, mon
     from soundboard.speech import translation
     p, _ = panel
     s = p.speech
-    assert process_events(qapp, lambda: not s._loading())    # the first voice load
+    assert process_events(qapp, lambda: not s.installs._loading())  # the first voice load
     s.cb_lang.setCurrentIndex(s.cb_lang.findData("zh"))
     d = translation.model_dir(s._lang())
     (d / "model").mkdir(parents=True)
@@ -269,13 +270,13 @@ def test_voice_installed_in_windows_settings_is_found_on_return(panel, qapp, mon
     tts_ = s.ctl.tts
     tts_.voices, tts_.voice_langs = ["Microsoft Zira Desktop"], {"Microsoft Zira Desktop": "en-US"}
     s._fill_langs()
-    assert not s.b_voices.isHidden() and not s.b_voices_check.isHidden()
+    assert not s.installs.b_voices.isHidden() and not s.installs.b_voices_check.isHidden()
     assert "Add-ons" not in s.lbl_tr.text()
-    s._app_state(Qt.ApplicationActive)          # not sent to settings: no rescan
+    s.installs._app_state(Qt.ApplicationActive)  # not sent to settings: no rescan
     opened = []
     monkeypatch.setattr(QDesktopServices, "openUrl", lambda url: opened.append(url) or True)
-    s.b_voices.click()
-    assert opened and s._voice_wait
+    s.installs.b_voices.click()
+    assert opened and s.installs._voice_wait
 
     def installed(self):
         self.voices = ["Microsoft Zira Desktop", "Microsoft Huihui Desktop"]
@@ -283,15 +284,16 @@ def test_voice_installed_in_windows_settings_is_found_on_return(panel, qapp, mon
                             "Microsoft Huihui Desktop": "zh-CN"}
         return self.voices
     monkeypatch.setattr(tts.SapiTTS, "refresh", installed)
-    s._app_state(Qt.ApplicationActive)          # back from settings: looks again by itself
+    s.installs._app_state(Qt.ApplicationActive)  # back from settings: looks again by itself
     assert process_events(qapp, lambda: "Huihui says it in Chinese" in s.lbl_tr.text())
-    assert s.b_voices.isHidden() and s.b_voices_check.isHidden() and not s._voice_wait
-    assert s.b_voice_install.isHidden()
+    assert s.installs.b_voices.isHidden() and s.installs.b_voices_check.isHidden()
+    assert not s.installs._voice_wait
+    assert s.installs.b_voice_install.isHidden()
 
 
 def _chinese_without_a_voice(s, qapp):
     from soundboard.speech import translation
-    assert process_events(qapp, lambda: not s._loading())
+    assert process_events(qapp, lambda: not s.installs._loading())
     s.cb_lang.setCurrentIndex(s.cb_lang.findData("zh"))
     d = translation.model_dir(s._lang())
     (d / "model").mkdir(parents=True)
@@ -316,21 +318,22 @@ def test_one_click_voice_install_then_its_picked_up(panel, qapp, monkeypatch):
     p, _ = panel
     s = p.speech
     _chinese_without_a_voice(s, qapp)
-    assert not s.b_voice_install.isHidden() and "Chinese voice" in s.b_voice_install.text()
-    assert s._voice_timer.isActive()               # watching for it to turn up
+    assert not s.installs.b_voice_install.isHidden()
+    assert "Chinese voice" in s.installs.b_voice_install.text()
+    assert s.installs._voice_timer.isActive()      # watching for it to turn up
     go = threading.Event()
     asked = []
     monkeypatch.setattr(winvoices, "install", lambda lang: (asked.append(lang), go.wait(5),
                                                             "ok")[-1])
     _huihui_arrives(monkeypatch)
-    s.b_voice_install.click()
+    s.installs.b_voice_install.click()
     from soundboard.ui import busy
-    assert busy.is_busy(s.b_voice_install) and "Installing" in s.lbl_tr.text()
-    s.b_voice_install.click()                      # a second click does nothing
+    assert busy.is_busy(s.installs.b_voice_install) and "Installing" in s.lbl_tr.text()
+    s.installs.b_voice_install.click()             # a second click does nothing
     go.set()
     assert process_events(qapp, lambda: "Huihui says it in Chinese" in s.lbl_tr.text())
     assert asked == ["zh"]
-    assert s.b_voice_install.isHidden() and not s._voice_timer.isActive()
+    assert s.installs.b_voice_install.isHidden() and not s.installs._voice_timer.isActive()
 
 
 def test_voice_install_cancelled_or_failed_says_so(panel, qapp, monkeypatch):
@@ -342,16 +345,16 @@ def test_voice_install_cancelled_or_failed_says_so(panel, qapp, monkeypatch):
     def cancel(lang):
         raise winvoices.Cancelled()
     monkeypatch.setattr(winvoices, "install", cancel)
-    s.b_voice_install.click()
+    s.installs.b_voice_install.click()
     assert process_events(qapp, lambda: "permission prompt was closed" in s.lbl_tr.text())
-    assert s.b_voice_install.isEnabled() and not s.b_voices.isHidden()
+    assert s.installs.b_voice_install.isEnabled() and not s.installs.b_voices.isHidden()
 
     def fail(lang):
         raise RuntimeError("0x800f0954")
     monkeypatch.setattr(winvoices, "install", fail)
-    s.b_voice_install.click()
+    s.installs.b_voice_install.click()
     assert process_events(qapp, lambda: "0x800f0954" in s.lbl_tr.text())
-    assert s.b_voice_install.isEnabled()
+    assert s.installs.b_voice_install.isEnabled()
 
 
 def test_new_voice_is_used_mid_talk_without_a_restart(panel, qapp, monkeypatch):
@@ -362,19 +365,19 @@ def test_new_voice_is_used_mid_talk_without_a_restart(panel, qapp, monkeypatch):
     monkeypatch.setattr(s.ctl, "start_live", lambda mod, args=(): None)
     monkeypatch.setattr(type(s.ctl), "live", property(lambda self: True))
     s.module = s.module or object()
-    s._toggle_live(True)
+    s.livevoice._toggle_live(True)
     assert s.ctl.live_voice is None                # nothing speaks Chinese yet
     old = frozenset({"MSTTS_V110_enUS_ZiraM"})
     s._voice_fp = old
     monkeypatch.setattr(winvoices, "fingerprint", lambda: old)
-    s._poll_voices()                               # nothing changed: no reload
-    assert not s._loading()
+    s.installs._poll_voices()                      # nothing changed: no reload
+    assert not s.installs._loading()
     _huihui_arrives(monkeypatch)
     monkeypatch.setattr(winvoices, "fingerprint",
                         lambda: old | {"MSTTS_V110_zhCN_HuihuiM"})
-    s._poll_voices()
+    s.installs._poll_voices()
     assert process_events(qapp, lambda: s.ctl.live_voice == "Microsoft Huihui")
-    assert "Huihui speaks" in s.lbl_state.text()
+    assert "Huihui speaks" in s.livevoice.lbl_state.text()
 
 
 def test_update_shows_progress_and_blocks_a_second_install(panel, qapp, monkeypatch):
@@ -394,15 +397,15 @@ def test_update_shows_progress_and_blocks_a_second_install(panel, qapp, monkeypa
     monkeypatch.setattr(mods, "install", boom)
     reported = []
     monkeypatch.setattr(applog, "report", lambda **k: reported.append(k))
-    s._install()
+    s.installs._install()
     from soundboard.ui import busy
-    assert busy.is_busy(s.b_update) and busy.is_busy(s.b_install)
-    s._install()                                   # a double-click: still one pip
-    assert process_events(qapp, lambda: not busy.is_busy(s.b_update))
+    assert busy.is_busy(s.installs.b_update) and busy.is_busy(s.installs.b_install)
+    s.installs._install()                          # a double-click: still one pip
+    assert process_events(qapp, lambda: not busy.is_busy(s.installs.b_update))
     from soundboard.ui import toast
     [t] = [t for t in toast.shown(s) if "disk full" in t.words()]
     assert len(started) == 1 and t.kind == "error" and "again" in t.words()
-    assert s.b_update.text() == "Update speech recognition"
+    assert s.installs.b_update.text() == "Update speech recognition"
     assert reported == []   # a full disk is said on the card, not shown as a crash
 
 
@@ -410,20 +413,20 @@ def test_no_update_button_without_the_addon(panel):
     p, _ = panel
     s = p.speech
     s.module = None
-    s._refresh_module()
-    assert s.b_update.isHidden()
-    s._install()                                   # nothing to install: no thread, no crash
-    assert not s._installing
+    s.installs._refresh_module()
+    assert s.installs.b_update.isHidden()
+    s.installs._install()                          # nothing to install: no thread, no crash
+    assert not s.installs._installing
 
 
 def test_a_live_voice_that_cant_load_turns_the_button_back_off(panel):
     p, _ = panel
     s = p.speech
-    s._set_live_ui(True, "starting…")
-    s._on_event({"type": "error", "text": "no model"})
-    s._on_event({"type": "stopped", "text": "no model"})
-    assert not s.b_live.isChecked() and "no model" in s.lbl_state.text()
-    assert s.b_update.isEnabled()
+    s.livevoice._set_live_ui(True, "starting…")
+    s.livevoice._on_event({"type": "error", "text": "no model"})
+    s.livevoice._on_event({"type": "stopped", "text": "no model"})
+    assert not s.livevoice.b_live.isChecked() and "no model" in s.livevoice.lbl_state.text()
+    assert s.installs.b_update.isEnabled()
 
 
 @pytest.mark.parametrize("fx, speech", [
@@ -472,7 +475,7 @@ def test_a_saved_voice_that_was_uninstalled_falls_back_to_the_default(qapp, monk
 @pytest.mark.parametrize("q", [voicefx.Param("k", "K", 1, 1, 1),
                                voicefx.Param("k", "K", 0, 1, 0, "", 2)])
 def test_a_slider_with_no_room_to_move_doesnt_divide_by_zero(qapp, q):
-    from soundboard.ui.voicepanel import ParamSlider
+    from soundboard.ui.voicefxpanel import ParamSlider
     s = ParamSlider(q, q.default)
     s.set_value(float("nan"))
     assert s.steps >= 1 and s.value() == q.lo
@@ -577,7 +580,7 @@ def test_voice_tiles_reflow_in_a_narrow_window(qapp, monkeypatch):
     monkeypatch.setattr(tts.SapiTTS, "warm_up", lambda self: [])
     from PySide6.QtWidgets import QWidget
 
-    from soundboard.ui.voicepanel import MAX_COLS, VoiceFxPanel
+    from soundboard.ui.voicefxpanel import MAX_COLS, VoiceFxPanel
     holder = QWidget()                 # inside the tab, it gets the width there is
     fx = VoiceFxPanel({})
     fx.setParent(holder)
@@ -985,7 +988,7 @@ def test_a_slider_step_lays_nothing_out_and_its_value_always_fits(panel, qapp):
 
 
 def test_every_value_a_slider_shows_fits_its_label(panel):
-    from soundboard.ui.voicepanel import param_text
+    from soundboard.ui.voicefxpanel import param_text
     p, _ = panel
     p.show()
     for row in p.fx.rows.values():
@@ -1017,22 +1020,22 @@ def test_the_voice_thats_on_speaks_the_language_picked(panel, monkeypatch):
     p, _ = panel
     sp = p.speech
     asked = []
-    monkeypatch.setattr(sp, "translate_for", asked.append)
+    monkeypatch.setattr(sp.livevoice, "translate_for", asked.append)
     p._sync_translate()
     assert asked[-1] == "" and sp.ctl.dub is None             # English: nothing to do
     de = SimpleNamespace(language="de", language_name="German")
     monkeypatch.setattr(sp, "translating", lambda: de)
     p._sync_translate()
-    assert asked[-1] == "" and "Turn on the AI voice" in sp.lbl_bg.text()
+    assert asked[-1] == "" and "Turn on the AI voice" in sp.livevoice.lbl_bg.text()
     p.fx.pick("Robot")
     assert asked[-1] == "fx" and sp.ctl.fx_always and sp.ctl.dub is None
     assert "German, a few seconds late" in p._states["fx"].text()
     monkeypatch.setattr(p.ai, "is_on", lambda: True)
     p._sync_translate()
     assert asked[-1] == "ai" and sp.ctl.dub is p.ai_controller and p.ai_controller.dub_on
-    sp.b_live.blockSignals(True)
-    sp.b_live.setChecked(True)
-    sp.b_live.blockSignals(False)
+    sp.livevoice.b_live.blockSignals(True)
+    sp.livevoice.b_live.setChecked(True)
+    sp.livevoice.b_live.blockSignals(False)
     p._sync_translate()
     assert asked[-1] == "" and sp.ctl.dub is None and not p.ai_controller.dub_on
 
@@ -1055,7 +1058,7 @@ def test_speak_in_has_its_own_switch_a_voice_never_turns_it_back_on(panel, monke
     sp = p.speech
     _chinese_downloaded(sp)
     asked = []
-    monkeypatch.setattr(sp, "translate_for", asked.append)
+    monkeypatch.setattr(sp.livevoice, "translate_for", asked.append)
     assert not sp.sw_lang.isChecked()                 # off by default
     saved = []
     sp.changed.connect(saved.append)
@@ -1064,7 +1067,7 @@ def test_speak_in_has_its_own_switch_a_voice_never_turns_it_back_on(panel, monke
     assert saved[-1]["translate_on"] and saved[-1]["translate"] == "zh"
     sp.sw_lang.setChecked(False)                      # off: the language stays picked
     assert sp.cb_lang.currentData() == "zh" and sp.translating() is None
-    assert not saved[-1]["translate_on"] and sp.lbl_bg.isHidden()
+    assert not saved[-1]["translate_on"] and sp.livevoice.lbl_bg.isHidden()
     p.fx.pick("Robot")                                # a voice from another card
     assert asked[-1] == "" and not sp.ctl.fx_always
     assert "Chinese" not in p._states["fx"].text()
@@ -1085,7 +1088,7 @@ def test_speak_in_switch_starts_off_for_a_saved_language(qapp, monkeypatch):
         assert sp.cb_lang.currentData() == "zh" and not sp.sw_lang.isChecked()
         _chinese_downloaded(sp)
         assert sp.translating() is None
-        args = sp._live_args()                        # the computer voice speaks English
+        args = sp.livevoice._live_args()              # the computer voice speaks English
         assert "--translate" not in args
     finally:
         p.shutdown()
@@ -1100,40 +1103,40 @@ def test_speaking_another_language_goes_through_english(panel, monkeypatch):
     sp = p.speech
     _chinese_downloaded(sp)
     sp.cb_lang.setCurrentIndex(sp.cb_lang.findData("zh"))
-    args = sp._live_args()                            # English: as before
+    args = sp.livevoice._live_args()                  # English: as before
     assert args[:4] == ["--model", "base.en", "--language", "en"]
     assert "--task" not in args and "--translate" in args
     monkeypatch.setattr(i18n, "current", lambda: "es")
-    args = sp._live_args()                            # the app in Spanish: Spanish in
+    args = sp.livevoice._live_args()                  # the app in Spanish: Spanish in
     assert args[:4] == ["--model", "small", "--language", "es"]
     assert args[args.index("--task") + 1] == "translate" and "--translate" in args
     monkeypatch.setattr(i18n, "current", lambda: "zh-CN")
-    args = sp._live_args()                            # said in Chinese: just spoken
+    args = sp.livevoice._live_args()                  # said in Chinese: just spoken
     assert "--task" not in args and "--translate" not in args
     sp.ed_lang.setText("en")                          # English typed in on purpose
     sp.ed_lang.editingFinished.emit()
-    assert sp.s["spoken"] == "en" and sp._live_args()[3] == "en"
+    assert sp.s["spoken"] == "en" and sp.livevoice._live_args()[3] == "en"
 
 
 def test_speech_model_download_shows_a_bar_until_its_ready(panel):
     p, _ = panel
     sp = p.speech
-    assert sp.dl_bar.isHidden() and sp.bg_bar.isHidden()
-    sp._on_event({"type": "download", "done": 121_450_000, "total": 485_800_000})
-    assert not sp.dl_bar.isHidden() and sp.dl_bar.value() == 250
-    assert "121 of 485 MB" in sp.lbl_state.text()
-    sp._on_event({"type": "status", "text": "loading translation…"})   # downloaded
-    assert sp.dl_bar.isHidden()
-    sp._on_event({"type": "download", "done": 5, "total": 0})        # no size: empty bar
-    assert not sp.dl_bar.isHidden() and sp.dl_bar.value() == 0
-    sp._set_live_ui(False, "stopped")                                  # stopped by hand
-    assert sp.dl_bar.isHidden()
-    sp.bg_for = "ai"                                                   # for another voice
-    sp._on_event({"type": "download", "done": 50_000_000, "total": 100_000_000})
-    assert not sp.bg_bar.isHidden() and sp.dl_bar.isHidden()
-    assert "50 of 100 MB" in sp.lbl_bg.text()
-    sp._on_event({"type": "ready"})
-    assert sp.bg_bar.isHidden()
+    assert sp.livevoice.dl_bar.isHidden() and sp.livevoice.bg_bar.isHidden()
+    sp.livevoice._on_event({"type": "download", "done": 121_450_000, "total": 485_800_000})
+    assert not sp.livevoice.dl_bar.isHidden() and sp.livevoice.dl_bar.value() == 250
+    assert "121 of 485 MB" in sp.livevoice.lbl_state.text()
+    sp.livevoice._on_event({"type": "status", "text": "loading translation…"})  # downloaded
+    assert sp.livevoice.dl_bar.isHidden()
+    sp.livevoice._on_event({"type": "download", "done": 5, "total": 0})  # no size: empty bar
+    assert not sp.livevoice.dl_bar.isHidden() and sp.livevoice.dl_bar.value() == 0
+    sp.livevoice._set_live_ui(False, "stopped")                        # stopped by hand
+    assert sp.livevoice.dl_bar.isHidden()
+    sp.livevoice.bg_for = "ai"                                         # for another voice
+    sp.livevoice._on_event({"type": "download", "done": 50_000_000, "total": 100_000_000})
+    assert not sp.livevoice.bg_bar.isHidden() and sp.livevoice.dl_bar.isHidden()
+    assert "50 of 100 MB" in sp.livevoice.lbl_bg.text()
+    sp.livevoice._on_event({"type": "ready"})
+    assert sp.livevoice.bg_bar.isHidden()
 
 
 def test_languages_tab_hides_when_speech_recognition_cant_hear_the_app(qapp, monkeypatch):
@@ -1446,11 +1449,11 @@ def test_status_bar_says_what_others_hear_and_opens_its_card(panel):
     assert p.bar.texts() == ["Voice effects off: mic unchanged"]
     # a chip opens its tab
     assert p.current_tab() != "speak"
-    p.speech.b_live.setChecked(True)
+    p.speech.livevoice.b_live.setChecked(True)
     assert "Computer voice" in p.bar.texts()
     p.bar.chips["speak"].click()
     assert p.current_tab() == "speak" and p.speech.isVisibleTo(p)
-    p.speech.b_live.setChecked(False)
+    p.speech.livevoice.b_live.setChecked(False)
     # the mic: its level, or that none is open
     p.bar.set_level(None)
     assert not p.bar.lbl_mic.isHidden() and p.bar.lbl_mic.text() == "No mic open"
@@ -1530,7 +1533,7 @@ def test_say_bar_has_no_volume_of_its_own(qapp, monkeypatch):
 def test_voice_reload_and_install_keep_focus(panel, qapp, monkeypatch):
     from PySide6.QtCore import Qt
     from PySide6.QtTest import QTest
-    from soundboard.ui import busy, voicepanel
+    from soundboard.ui import busy, speechinstall
     p, _ = panel
     s = p.speech
     _chinese_without_a_voice(s, qapp)
@@ -1541,10 +1544,10 @@ def test_voice_reload_and_install_keep_focus(panel, qapp, monkeypatch):
     class Thread:
         def __init__(self, target, **kw): self.target = target
         def start(self): workers.append(self.target)
-    monkeypatch.setattr(voicepanel, "threading", type("Threads", (), {"Thread": Thread}))
+    monkeypatch.setattr(speechinstall, "threading", type("Threads", (), {"Thread": Thread}))
     for btn, finish in (
-            (s.b_voices_check, lambda: s._fill_voices(["Microsoft Zira Desktop"], "")),
-            (s.b_voice_install, lambda: s._on_voice_installed("", "offline"))):
+            (s.installs.b_voices_check, lambda: s._fill_voices(["Microsoft Zira Desktop"], "")),
+            (s.installs.b_voice_install, lambda: s.installs._on_voice_installed("", "offline"))):
         btn.setFocus()
         QTest.mouseClick(btn, Qt.LeftButton)
         assert btn.isEnabled() and busy.is_busy(btn) and p.focusWidget() is btn
@@ -1559,35 +1562,35 @@ def test_voice_reload_and_install_keep_focus(panel, qapp, monkeypatch):
 def test_speech_install_and_cancel_keep_focus(panel, qapp, monkeypatch):
     from PySide6.QtCore import Qt
     from PySide6.QtTest import QTest
-    from soundboard.ui import busy, voicepanel
+    from soundboard.ui import busy, speechinstall
     p, _ = panel
     s = p.speech
-    assert process_events(qapp, lambda: not s._loading())
+    assert process_events(qapp, lambda: not s.installs._loading())
     p.show_tab("speak")
     p.show()
     s.opts.show()
-    s.b_update.show()
+    s.installs.b_update.show()
     qapp.processEvents()
     workers = []
     class Thread:
         def __init__(self, target, **kw): self.target = target
         def start(self): workers.append(self.target)
-    monkeypatch.setattr(voicepanel, "threading", type("Threads", (), {"Thread": Thread}))
-    s.b_update.setFocus()
-    QTest.mouseClick(s.b_update, Qt.LeftButton)
-    assert busy.is_busy(s.b_update) and p.focusWidget() is s.b_update
-    QTest.mouseClick(s.b_update, Qt.LeftButton)
+    monkeypatch.setattr(speechinstall, "threading", type("Threads", (), {"Thread": Thread}))
+    s.installs.b_update.setFocus()
+    QTest.mouseClick(s.installs.b_update, Qt.LeftButton)
+    assert busy.is_busy(s.installs.b_update) and p.focusWidget() is s.installs.b_update
+    QTest.mouseClick(s.installs.b_update, Qt.LeftButton)
     assert len(workers) == 1
-    s._on_install_done(False, "offline")
-    assert not busy.is_busy(s.b_update) and p.focusWidget() is s.b_update
+    s.installs._on_install_done(False, "offline")
+    assert not busy.is_busy(s.installs.b_update) and p.focusWidget() is s.installs.b_update
     _chinese_without_a_voice(s, qapp)
-    s._dl_busy = s._lang()
+    s.installs._dl_busy = s._lang()
     s._refresh_translation()
-    s.b_dl_cancel.setFocus()
-    QTest.mouseClick(s.b_dl_cancel, Qt.LeftButton)
-    assert busy.is_busy(s.b_dl_cancel) and p.focusWidget() is s.b_dl_cancel
-    s._on_dl_done("cancelled")
-    assert not busy.is_busy(s.b_dl_cancel)
+    s.installs.b_dl_cancel.setFocus()
+    QTest.mouseClick(s.installs.b_dl_cancel, Qt.LeftButton)
+    assert busy.is_busy(s.installs.b_dl_cancel) and p.focusWidget() is s.installs.b_dl_cancel
+    s.installs._on_dl_done("cancelled")
+    assert not busy.is_busy(s.installs.b_dl_cancel)
 
 
 def test_translation_download_keeps_focus(panel, qapp, monkeypatch):
@@ -1595,15 +1598,15 @@ def test_translation_download_keeps_focus(panel, qapp, monkeypatch):
     from PySide6.QtTest import QTest
     from soundboard import net
     from soundboard.speech import translation
-    from soundboard.ui import busy, voicepanel
+    from soundboard.ui import busy, speechinstall
     monkeypatch.setattr(net, "allowed", lambda key: True)
     monkeypatch.setattr(net, "offline", lambda: False)
     p, _ = panel
     s = p.speech
-    assert process_events(qapp, lambda: not s._loading())
+    assert process_events(qapp, lambda: not s.installs._loading())
     monkeypatch.setattr(translation, "is_downloaded", lambda info: False)
-    installed = voicepanel.mods.ModuleInfo.installed.fget
-    monkeypatch.setattr(voicepanel.mods.ModuleInfo, "installed", property(
+    installed = speechinstall.mods.ModuleInfo.installed.fget
+    monkeypatch.setattr(speechinstall.mods.ModuleInfo, "installed", property(
         lambda info: True if info.id == "live-voice" else installed(info)))
     s._fill_langs()
     s.cb_lang.setCurrentIndex(s.cb_lang.findData("zh"))
@@ -1614,14 +1617,15 @@ def test_translation_download_keeps_focus(panel, qapp, monkeypatch):
     class Thread:
         def __init__(self, target, **kw): self.target = target
         def start(self): workers.append(self.target)
-    monkeypatch.setattr(voicepanel, "threading", type("Threads", (), {"Thread": Thread}))
-    s.b_dl.setFocus()
-    QTest.mouseClick(s.b_dl, Qt.LeftButton)
-    assert s.b_dl.isVisible() and busy.is_busy(s.b_dl) and p.focusWidget() is s.b_dl
-    QTest.mouseClick(s.b_dl, Qt.LeftButton)
+    monkeypatch.setattr(speechinstall, "threading", type("Threads", (), {"Thread": Thread}))
+    s.installs.b_dl.setFocus()
+    QTest.mouseClick(s.installs.b_dl, Qt.LeftButton)
+    b_dl = s.installs.b_dl
+    assert b_dl.isVisible() and busy.is_busy(b_dl) and p.focusWidget() is b_dl
+    QTest.mouseClick(s.installs.b_dl, Qt.LeftButton)
     assert len(workers) == 1
-    s._on_dl_done("offline")
-    assert not busy.is_busy(s.b_dl) and p.focusWidget() is s.b_dl
+    s.installs._on_dl_done("offline")
+    assert not busy.is_busy(s.installs.b_dl) and p.focusWidget() is s.installs.b_dl
 
 
 @pytest.mark.parametrize("width", [900, 1600])
