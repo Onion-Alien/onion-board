@@ -70,8 +70,8 @@ class SearchControl(Controller):
             return
         mw._pads_scroll.hide()
         mw.catctl._cat_row.hide()
-        mw._results_open = True
-        mw._sync_cat_bar()
+        mw.fitctl._results_open = True
+        mw.fitctl._sync_cat_bar()
 
     def on_search_enter(self):
         mw = self.mw
@@ -97,7 +97,7 @@ class SearchControl(Controller):
         mw = self.mw
         mw._link_wait.stop()
         url = mw.linkbar.url
-        if not url or mw.is_mini():
+        if not url or mw.fitctl.is_mini():
             return
         if not ytdl.site_allowed(url):
             # Offline mode or that site switched off: say so once per link, not nothing
@@ -109,8 +109,8 @@ class SearchControl(Controller):
             return
         mw._pads_scroll.hide()
         mw.catctl._cat_row.hide()
-        mw._results_open = True
-        mw._sync_cat_bar()
+        mw.fitctl._results_open = True
+        mw.fitctl._sync_cat_bar()
 
     def _retry_download(self, item: dict):
         """The download bar's Retry on a pick that failed: picked again, as if its
@@ -154,8 +154,8 @@ class SearchControl(Controller):
         search still in it left a board of only the pads matching "cat meow" (often
         none, with nothing saying why). Something else typed in it since stays."""
         mw = self.mw
-        mw._results_open = False
-        mw._sync_cat_bar()
+        mw.fitctl._results_open = False
+        mw.fitctl._sync_cat_bar()
         query = " ".join(mw.ytresults.query.split())
         if query and " ".join(mw.search.text().split()) == query:
             mw.search.clear()
@@ -190,7 +190,7 @@ class SearchControl(Controller):
             mw.overlay.sounds_changed()
         # a link filters nothing, and nor does the box in the mini player, which hides
         # it: a web search's words left there showed a blank mini player
-        t = "" if mw.linkbar.url or mw.is_mini() else text.strip().lower()
+        t = "" if mw.linkbar.url or mw.fitctl.is_mini() else text.strip().lower()
         cat, sub = mw.cfg.category, mw.cfg.subcategory
         changed = False
         for m in mw.cfg.sounds:

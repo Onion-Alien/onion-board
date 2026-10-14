@@ -6,7 +6,7 @@ from PySide6.QtTest import QTest
 
 from soundboard import engine, settings, theme, winkeys
 from soundboard.ui import mainwindow as main
-from soundboard.ui import settingscontrol, setupwizard
+from soundboard.ui import fitcontrol, settingscontrol, setupwizard
 from soundboard.ui.livedot import set_tab_live
 
 
@@ -170,10 +170,11 @@ def test_too_small_closes_settings_and_the_mini_player_grows_for_them(qapp, win)
     qapp.processEvents()
     win.resize(320, 300)
     qapp.processEvents()
-    assert not win.setctl.settings_open() and win.is_mini() and win.setctl._settings_dlg is None
+    assert not win.setctl.settings_open() and win.fitctl.is_mini()
+    assert win.setctl._settings_dlg is None
     d = win.setctl.open_settings("audio")
     qapp.processEvents()
-    assert win.setctl.settings_open() and not win.is_mini() and d.isVisible()
+    assert win.setctl.settings_open() and not win.fitctl.is_mini() and d.isVisible()
     size = win._pages.size()
     assert size.width() >= settingscontrol.SETTINGS_ROOM.width() - 1
     assert size.height() >= min(settingscontrol.SETTINGS_ROOM.height(),
@@ -301,10 +302,10 @@ def test_the_rail_mirrors_right_to_left(qapp, win, green):
         assert rail.property("rtl") is True
         assert rail.mapTo(win, QPoint(0, 0)).x() + rail.width() == win.width()
         assert bar_at() == ([rail.width() - 1] if green else [])
-        win._squeeze_rail(True)
+        win.fitctl._squeeze_rail(True)
         m = win._body_lay.contentsMargins()
-        assert (m.left(), m.right()) == (main.BODY_SIDE, main.BODY_SIDE_TIGHT)
-        win._squeeze_rail(False)
+        assert (m.left(), m.right()) == (fitcontrol.BODY_SIDE, fitcontrol.BODY_SIDE_TIGHT)
+        win.fitctl._squeeze_rail(False)
     finally:
         qapp.setLayoutDirection(Qt.LeftToRight)
         set_tab_live(win.tabs, vi, False)

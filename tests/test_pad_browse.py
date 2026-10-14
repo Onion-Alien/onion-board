@@ -170,9 +170,9 @@ def test_a_newer_row_size_loads_as_medium():
 def test_list_view_survives_the_mini_player(window):
     w = window
     w.padctl.set_pad_view("list")
-    w._set_mini(True)
+    w.fitctl._set_mini(True)
     assert w.grid.fit_width(300) == (1, 300)   # one row a line in the mini player
-    w._set_mini(False)
+    w.fitctl._set_mini(False)
     assert w.grid.listed
 
 

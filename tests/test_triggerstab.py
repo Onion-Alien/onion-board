@@ -318,7 +318,7 @@ def test_the_bar_keeps_its_words_while_it_has_room(qapp, app_dir, monkeypatch, p
         w.tabs.setCurrentWidget(w.triggers)
         qapp.processEvents()
         watch = w.triggers.panel.watch
-        assert w._fit.compact_count()        # the window squeezed parts of other tabs...
+        assert w.fitctl._fit.compact_count()        # the window squeezed parts of other tabs...
         assert watch.text() == "Start watching"   # ...and left the bar's words alone
         w.tabs.setCurrentIndex(0)
         w.resize(880, 700)                   # (while another tab shows)

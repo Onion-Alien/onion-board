@@ -17,12 +17,11 @@ from PySide6.QtCore import (QEvent, QObject, QPoint, QSignalBlocker,
                             QSize, Qt, QTimer, Signal)
 from PySide6.QtGui import (QIcon,
                            QKeySequence, QShortcut)
-from PySide6.QtWidgets import (QApplication, QBoxLayout, QCheckBox, QComboBox, QDialog, QFrame,
+from PySide6.QtWidgets import (QApplication, QCheckBox, QComboBox, QDialog, QFrame,
                                QGraphicsOpacityEffect, QGridLayout, QHBoxLayout, QInputDialog,
                                QLabel, QLineEdit, QMainWindow, QMenu, QMessageBox, QProgressBar,
                                QPushButton, QScrollArea, QSizePolicy, QSlider, QStackedWidget,
-                               QSystemTrayIcon, QVBoxLayout, QWidgetItem,
-                               QWidget)
+                               QSystemTrayIcon, QVBoxLayout, QWidget)
 
 from soundboard import bunny, theme, ytworker
 from soundboard.engine import SR, Engine
@@ -41,6 +40,8 @@ from soundboard.ui.iconrow import CapIcon
 from soundboard.ui import worker
 from soundboard.ui.dropveil import DropVeil
 from soundboard.ui.ffmpegcontrol import FfmpegControl
+from soundboard.ui.fitcontrol import FitControl
+from soundboard.ui.fitcontrol import BODY_SIDE, SEARCH_MIN_W
 from soundboard.ui.transportcontrol import TransportControl
 from soundboard.ui.tickcontrol import TickControl
 from soundboard.ui.tickcontrol import TICK_MS
@@ -95,8 +96,7 @@ from soundboard.ui.radiopanel import RadioOff, RadioTab
 from soundboard.ui.voicepanel import VoicePanel
 from soundboard.ui.playbutton import PlayButton
 from soundboard.ui.widgets import (DropdownMenu, Meter, NameAndSeek, Pad, PadGrid, SeekSlider,
-                                   SteadyTabs, WindowRoot, expand_dropped, pad_height, take_out,
-                                   SLIM_PAD_H)
+                                   SteadyTabs, WindowRoot, expand_dropped)
 from soundboard.wheelguard import AppStyle, no_wheel
 from soundboard.winkeys import Hotkeys
 from soundboard import errors
@@ -121,17 +121,12 @@ PULSE_FRAME_MS = 60  # ...a step this often (~16 a second still reads as a smoot
 DEFAULT_POLL_MS = 1500   # how often Windows' default output is checked
 DISCORD_POLL_MS = 10000  # how often Discord's voice settings are looked at (discordcfg)
 RAW_POLL_MS = 2000       # how often the apps recording the mic are counted (rawmic)
-BODY_SIDE = 14         # the gap around the window's content (beside the tab rail too)...
-BODY_SIDE_TIGHT = 8    # ...and beside the rail in a narrow window
-MINI_SIZE = QSize(440, 380)   # below this the window becomes the mini player...
-MINI_PAD_ROWS = 1             # ...which has the pads above it when this many rows fit
 SEARCH_WAIT_MS = 100     # typing in the search box filters the pads once it pauses this long
 LINK_WAIT_MS = 400       # a link in the search box is looked up once it stays this long
 PAD_SIZE_WAIT_MS = 50    # dragging Pad size re-lays the pads at most this often
 TLS_WARM_MS = 2500     # Qt's TLS is set up this long after the start (_warm_tls)
 TIP_DELAY_MS = 8000    # the first tip waits this long after the start
 FF_CHECK_MS = 1500     # the FFmpeg check's answer is taken this long after the start
-SEARCH_MIN_W = 220    # the Sounds tab's search box, until the window gets narrow
 # ...and its most: a few words go in it, so past this it's only a longer empty bar
 # (456 px at 1180x720, so normal windows are unchanged). The seek bar, the levels and
 # the drop box still follow the window: wider is useful there.
@@ -309,6 +304,7 @@ class MainWindow(QMainWindow):
 
     def __init__(self):
         super().__init__()
+        self.fitctl = FitControl(self)
         self.transctl = TransportControl(self)
         self.tickctl = TickControl(self)
         self.searchctl = SearchControl(self)
@@ -499,7 +495,7 @@ class MainWindow(QMainWindow):
         self.device_step.connect(lambda step: step())
         if sys.platform == "win32":
             self._default_timer.start(DEFAULT_POLL_MS)
-        self._init_fit()
+        self.fitctl._init_fit()
         self.resize(1180, 720)
         if self.cfg.always_on_top:
             self.setWindowFlag(Qt.WindowType.WindowStaysOnTopHint, True)
@@ -805,9 +801,9 @@ class MainWindow(QMainWindow):
         self.download_bar = DownloadBar(self)
         self._dl_lay.addWidget(self.download_bar)
         tv.addWidget(dl_box)
-        self.download_bar.shown_changed.connect(self._dl_bar_gap)
-        self.download_bar.shown_changed.connect(lambda _on: self._refit_dl_bar())
-        self.download_bar.room_changed.connect(self._refit_dl_bar)
+        self.download_bar.shown_changed.connect(self.fitctl._dl_bar_gap)
+        self.download_bar.shown_changed.connect(lambda _on: self.fitctl._refit_dl_bar())
+        self.download_bar.room_changed.connect(self.fitctl._refit_dl_bar)
 
         # ---- tabs
         self.tab_info: dict[str, tuple[str, str]] = {}   # page attr -> (title, text) for ⓘ
@@ -871,7 +867,7 @@ class MainWindow(QMainWindow):
         self.rail = sidebar.SideRail(
             self.tabs, self.logo, self.wordmark, self.tagline,
             [self.btn_more_tabs], self.cfg.sidebar_open, [self.gear, self.btn_about],
-            self._rail_opened,
+            self.fitctl._rail_opened,
             # Live and Stop all never move; the pills (what needs attention) sit above
             # them and only show when needed (at the rail's foot, as icons)
             [self.btn_air, self.stop_btn],
@@ -952,7 +948,7 @@ class MainWindow(QMainWindow):
         self.tabs.setCurrentIndex(tab if self.tabs.isTabVisible(tab) else 0)
         self.tabctl._focus_open_tab()
         self.tabs.currentChanged.connect(lambda i: self.set_option("tab", i))
-        self.tabs.currentChanged.connect(lambda _i: self._fit_dl_bar())
+        self.tabs.currentChanged.connect(lambda _i: self.fitctl._fit_dl_bar())
         self.tabs.currentChanged.connect(self.tabctl._count_tab)   # names only (usage.py)
         self.tabctl._count_tab(self.tabs.currentIndex())
         self.tabs.currentChanged.connect(lambda _i: self.statusctl._update_status())
@@ -975,7 +971,7 @@ class MainWindow(QMainWindow):
         self.tabs.currentChanged.connect(lambda _i: self.transctl._show_transport())
         self.transctl._show_transport()
         self._fit_tab = self.tabs.currentWidget()
-        self.tabs.currentChanged.connect(self._fit_setup_tab)
+        self.tabs.currentChanged.connect(self.fitctl._fit_setup_tab)
 
         # ---- mixer strip: the things that apply whatever tab you're on
         rv.addWidget(self._build_mixer())
@@ -1136,7 +1132,7 @@ class MainWindow(QMainWindow):
     def _mini_setup(self):
         self.resize(max(800, self.width()), max(600, self.height()))
         self.tabs.setCurrentWidget(self.setup_page)
-        self._refit()
+        self.fitctl._refit()
 
     def _sync_mini_mic(self):
         if not hasattr(self, "mini_mic"):
@@ -1283,84 +1279,13 @@ class MainWindow(QMainWindow):
             box.changed.connect(lambda v, key=key: self.set_option(key, v))
         return f
 
-    def _fit_mixer(self, tight: bool):
-        """The levels strip's responsive step. Only when the strip itself is too wide
-        (not for whatever else is): one group whole, the other two as icons; still too
-        wide, the % boxes go (the sliders still say it). "Others hear it" keeps its
-        words: an empty box beside a mic icon said nothing, and it's the switch a warning
-        sends you to."""
-        stages = (lambda: self._mixer_one_at_a_time(True),
-                  lambda: (self.vol_mic.spin.hide(), self.vol_mon.spin.hide()))
-        self._mixer_one_at_a_time(False)
-        self.vol_mic.spin.show()
-        self.vol_mon.spin.show()
-        self._touch_mixer()
-        self._mixer_tight = tight
-        if not tight:
-            return
-        side = self._body_lay.contentsMargins()
-        room = self._pages.width() - self.rail.minimumWidth() - side.left() - side.right()
-        for stage in stages:
-            if self.mixer.minimumSizeHint().width() <= room:
-                break
-            stage()
-            self._touch_mixer()
-
-    def _touch_mixer(self):
-        responsive.touch(*self._deck_tabs, self.chk_mic, self.vol_mic.spin,
-                         self.vol_mon.spin, self.out_meter)
-
-    def _mixer_one_at_a_time(self, on: bool):
-        """Too narrow for the three groups: show one whole, the others as icons."""
-        self._mixer_one = on
-        for i, (deck, tab, title) in enumerate(zip(
-                (g[-1] for g in self._decks), self._deck_tabs, self._deck_titles)):
-            whole = not on or i == self._mixer_focus
-            deck.setVisible(whole)
-            tab.setVisible(not whole)
-            title.setVisible(not on)   # the icon beside it (and its tooltip) says which
-            # the shown group takes the room (what others hear, with all three)
-            self._mixer_layout.setStretchFactor(deck, int(i == (self._mixer_focus if on else 1)))
-
     def _focus_deck(self, i: int):
         """An icon in the narrow levels strip clicked: its group is the one shown."""
         self._mixer_focus = i
         if self._deck_tabs[i].hasFocus():   # it just hid: keep the keyboard in the strip
             self._deck_tabs[i - 1 if i else 1].setFocus()
-        self._fit.reset()   # the groups aren't the same width: fit again
-        self._refit()
-
-    def _fit_dl_bar(self):
-        """A page whose cards stop short of the edges (Setup: room for its scroll bar,
-        and centred past the width cap on a wide window) names that column `dl_column`:
-        the download bar then takes the cards' own left and right edges."""
-        col = getattr(self.tabs.currentWidget(), "dl_column", None)
-        left = right = 0
-        if col is not None and col.isVisible():
-            x = col.mapTo(self._tabs_box, QPoint(0, 0)).x()
-            left, right = max(0, x), max(0, self._tabs_box.width() - x - col.width())
-        m = self._dl_lay.contentsMargins()
-        if (m.left(), m.right()) != (left, right):
-            self._dl_lay.setContentsMargins(left, 0, right, 0)
-
-    def _refit_dl_bar(self):
-        """The download bar came, went or needs another height (rows added, opened):
-        fit the window again for it, once the change is laid out."""
-        if getattr(self, "_dl_refit_due", False) or not hasattr(self, "_dl_steps"):
-            return
-        self._dl_refit_due = True
-
-        def run():
-            self._dl_refit_due = False
-            self._fit.retry(self._dl_steps)   # open again if it fits now
-            self._refit()
-        QTimer.singleShot(0, self, run)   # with the window: not after it's gone
-
-    def _dl_bar_gap(self, shown: bool):
-        """Under the download bar: its own 8 px (so a page's scroll bar doesn't touch it)
-        and none from the Sounds page, whose first row then sits 8 px down like the rest."""
-        self._tabs_lay.setSpacing(8 if shown else 0)
-        self._sounds_lay.setContentsMargins(0, 0 if shown else 8, 0, 0)
+        self.fitctl._fit.reset()   # the groups aren't the same width: fit again
+        self.fitctl._refit()
 
     def _build_sounds_page(self) -> QWidget:
         c = self.cfg
@@ -1591,9 +1516,9 @@ class MainWindow(QMainWindow):
         # the pads fit the width
         scroll.setHorizontalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
         left.addWidget(scroll, 1)
-        scroll.verticalScrollBar().rangeChanged.connect(lambda *_r: self._fit_toolbar())
-        self.grid.laid_out.connect(self._fit_toolbar)
-        self._fit_toolbar()
+        scroll.verticalScrollBar().rangeChanged.connect(lambda *_r: self.fitctl._fit_toolbar())
+        self.grid.laid_out.connect(self.fitctl._fit_toolbar)
+        self.fitctl._fit_toolbar()
         self._pads_home = (left, left.indexOf(scroll))   # the mini player borrows it
         self.ytresults.closed.connect(scroll.show)   # the results take the pads' place
         self.ytresults.closed.connect(self.catctl._cat_row.show)   # ...and the categories' row
@@ -1725,12 +1650,12 @@ class MainWindow(QMainWindow):
         devices, the recorded test, EQ, levelling."""
         c = self.cfg
         page = WidthScroll(lambda: self._pages.width() - SHUT_W - 2 * BODY_SIDE,
-                           lambda: self._setup_one_col())
+                           lambda: self.fitctl._setup_one_col())
         page.setWidgetResizable(True)
         page.setFrameShape(QFrame.Shape.NoFrame)
         body = QWidget()
         page.dl_column = body   # the download bar lines up with these cards
-        _Moved(body, self._fit_dl_bar)
+        _Moved(body, self.fitctl._fit_dl_bar)
         inner = capped(body, margins=(0, 12, 12, 12))   # not a 900 px wide card at full screen; the
         # cards' left edge lines up with the download bar and the other tabs
         sections = QVBoxLayout(body)
@@ -2097,8 +2022,8 @@ class MainWindow(QMainWindow):
         self._setup_pairs = (self._setup_top, (devcard, eqcard))
         self._setup_wide = ((howcard, devcard, helpcard), (destcard, eqcard))
         self._setup_narrow = (howcard, destcard, devcard, helpcard, eqcard)
-        self._setup_stacked = None
-        self._stack_setup(False)
+        self._setup_stacked: bool | None = None
+        self.fitctl._stack_setup(False)
         self.on_eq(*self.eq.state())   # push the saved EQ into the engine
         destination.apply(self.cfg, self.engine)   # ...and the destination mode (Who's listening)
         from soundboard.ui.destpanel import apply_send
@@ -2112,51 +2037,6 @@ class MainWindow(QMainWindow):
         icons.set_icon(guide, "check")
         guide.clicked.connect(lambda: (usage.used("setup-guide-opened"), self.run_setup()))
         return guide
-
-    def _stack_setup(self, compact: bool):
-        """Setup's cards in two columns, or in one column in setup order."""
-        if compact == self._setup_stacked:
-            return
-        self._setup_stacked = compact
-        grid = self._setup_cols
-        for col in self._setup_lr:
-            while col.count():
-                take_out(col)   # the cards stay on the page, only their places change
-        paired = [w for pair in self._setup_pairs for w in pair]
-        for w in paired:
-            grid.removeWidget(w)
-        if not compact:
-            for r, pair in enumerate(self._setup_pairs):
-                for c, w in enumerate(pair):
-                    grid.addWidget(w, r, c)
-        grid.setColumnStretch(1, 0 if compact else 1)   # (stacked: column 1 is empty)
-        grid.setColumnStretch(0, 1)
-        lcol, rcol = self._setup_lr
-        for w in self._setup_narrow if compact else ():
-            lcol.addWidget(w)
-        if not compact:   # the rest under the pairs, in their own column
-            for col, cards in zip(self._setup_lr, self._setup_wide):
-                for w in cards:
-                    if w not in paired:
-                        col.addWidget(w)
-        for col in self._setup_lr:
-            col.addStretch(1)
-
-    def _setup_one_col(self) -> int:
-        """The width Setup needs in one column: its widest card, and the page's margins."""
-        widest = max(QWidgetItem(w).minimumSize().width() for w in self._setup_narrow)
-        inner = self.setup_page.widget()
-        lay = inner.layout() if inner is not None else None
-        if lay is None:   # (built in _build_setup_page: always there)
-            return widest
-        m = lay.contentsMargins()
-        return widest + m.left() + m.right()
-
-    def _setup_need(self) -> int:
-        """The width Setup's two columns need side by side, measured the same way
-        whether they're stacked or not (stacked, the right column is empty)."""
-        return sum(max(QWidgetItem(w).minimumSize().width() for w in cards)
-                   for cards in self._setup_wide) + self._setup_cols.spacing()
 
     def on_eq(self, gains, enabled, target, preset):
         c = self.cfg
@@ -2232,7 +2112,7 @@ class MainWindow(QMainWindow):
         """How the corner cards show (ui/toast.py): as cards in the window; as icons on
         top of the mini player's pads; not at all in the mini player with no pads (a
         remote: errors wait for the window to grow)."""
-        if not self.is_mini():
+        if not self.fitctl.is_mini():
             return "cards"
         return "icons" if self._pads_scroll.isVisible() else "hidden"
 
@@ -2311,33 +2191,6 @@ class MainWindow(QMainWindow):
         v.active_changed.connect(lambda on, k=key: self.tabctl._tab_live(k, on))
         return v
 
-    def _squeeze_rail(self, tight: bool):
-        """A narrow window: the rail shut (opened out, it shuts again) and the gap
-        beside it narrower, so the pages keep their room before the mini player."""
-        self.rail.squeeze(tight)
-        side = (BODY_SIDE_TIGHT if tight else BODY_SIDE, BODY_SIDE)
-        if self.isRightToLeft():   # mirrored (Arabic): the rail is on the right
-            side = side[::-1]
-        self._body_lay.setContentsMargins(side[0], self._body_top(), side[1], 10)
-        if getattr(self, "_mixer_tight", False):   # its room changed: measure it again
-            self._fit_mixer(True)
-
-    def _fit_setup_tab(self, _i: int):
-        """Into or out of Setup: its width counts only while it shows (WidthScroll),
-        so what gives way is worked out again."""
-        was, self._fit_tab = self._fit_tab, self.tabs.currentWidget()
-        if hasattr(self, "_fit") and self.setup_page in (was, self._fit_tab):
-            self._fit.reset()
-            self._refit()
-
-    def _rail_opened(self, on: bool):
-        """The rail opened out or shut: save it, and fit the window to its new width
-        (shut, what had given way for it comes back)."""
-        self.set_option("sidebar_open", on)
-        if hasattr(self, "_fit"):
-            self._fit.reset()
-            self._refit()
-
     def _follow_switches(self):
         """Settings > Privacy & security changed: the parts of the window that go
         online follow their switches."""
@@ -2345,8 +2198,8 @@ class MainWindow(QMainWindow):
         self.statusctl._update_flow()   # the cable's install button (_cable_follow_switch)
         self._search_follow_switch()
         self._offline_follow()
-        if hasattr(self, "_fit"):   # buttons came or went: what fits is measured again
-            self._refit()
+        if hasattr(self.fitctl, "_fit"):   # buttons came or went: what fits is measured again
+            self.fitctl._refit()
 
     def _offline_follow(self):
         """Offline mode: Offline in the On Air card, and the tabs that only work online
@@ -2390,15 +2243,15 @@ class MainWindow(QMainWindow):
             return
         old, playing = self.radio, self.radio.is_active()
         old.shutdown()
-        if hasattr(self, "_fit"):   # undone while the old tab's widgets still exist
-            self._fit.remove(self._radio_steps)
+        if hasattr(self.fitctl, "_fit"):   # undone while the old tab's widgets still exist
+            self.fitctl._fit.remove(self._radio_steps)
         self.radio = self._make_radio()
         self.radio_page.removeWidget(old)
         old.deleteLater()
-        if hasattr(self, "_fit"):
+        if hasattr(self.fitctl, "_fit"):
             self._radio_steps = self.radio.fit_steps()
-            self._fit.extend(self._radio_steps)
-            self._refit()
+            self.fitctl._fit.extend(self._radio_steps)
+            self.fitctl._refit()
         self.tabctl._radio_live(False)
         if playing:
             self.toast(html.escape(_("Radio was switched off, so the station stopped.")))
@@ -2550,15 +2403,6 @@ class MainWindow(QMainWindow):
 
     # ------------------------------------------------------------------ language
     # ------------------------------------------------------------------ tips
-    def _body_top(self) -> int:
-        """The body's top margin: none under Settings, whose heading rises level with
-        the rail's name and keeps its pages where a tab's start (SettingsDialog)."""
-        return 0 if self.setctl.settings_open() else 10
-
-    def _fit_body_top(self):
-        m = self._body_lay.contentsMargins()
-        self._body_lay.setContentsMargins(m.left(), self._body_top(), m.right(), m.bottom())
-
     # Settings pages showing state from outside the config (downloads, add-ons, Tor,
     # updates, the remote's add-ons): a kept Settings with one of them built is rebuilt
     SETTINGS_LIVE_PAGES = ("data", "connection", "help", "updates", "remote", "about")
@@ -2704,23 +2548,6 @@ class MainWindow(QMainWindow):
         self.grid.set_pads(ordered, layout=False)   # laid out once, by the filter next
         self.searchctl.apply_filter(self.search.text())
         self.statusctl._update_status()
-
-    def _fit_toolbar(self):
-        """The toolbar spans the pads: in by the grid's margin on both sides, and by the
-        scroll bar too while it shows (and the odd pixels a row can't split). The
-        category tabs start on the same line as the toolbar and the first card."""
-        m = self.grid.grid.contentsMargins()
-        sb = self._pad_scroll.verticalScrollBar()
-        right = (m.right() + self.grid.slack()
-                 + (sb.sizeHint().width() if sb.maximum() > 0 else 0))
-        hold = self._toolbar_hold.layout()
-        row = self.catctl._cat_row.layout()
-        if hold is None or row is None:
-            return
-        hold.setContentsMargins(m.left(), 0, right, 0)
-        row.setContentsMargins(m.left(), 0, 0, 0)
-        if sub := self.catctl._sub_row.layout():
-            sub.setContentsMargins(m.left(), 6, right, 0)
 
     # ------------------------------------------------------------------ search, rename
     def rename_sound(self, sid: str, new: str | None = None):
@@ -3126,70 +2953,6 @@ class MainWindow(QMainWindow):
             self.tickctl._set_tick_rate()
 
     # ------------------------------------------------------------------ small windows
-    def _init_fit(self):
-        """What gives way when the window gets small (see ui/responsive.py). Lower
-        numbers go first; width and height are handled separately."""
-        r = responsive
-        f = self._fit = r.Fitter(self._full)
-        self._results_open = False      # web results are taking the pads' place
-        self._cat_bar_compact = False   # the fitter's last say on the category bar
-        # last: opened out, the rail stays open until nothing else can give (it shut
-        # again at once when opened in a mid-sized window)
-        f.add(90, "w", self._squeeze_rail)
-        f.add(10, "w", self.padctl._fit_size_picker)
-        f.add(18, "w", r.icon_only(self.btn_view))   # its tooltip says what it is
-        # the label and the dropdown go together: a lone "Clean" said nothing (the full
-        # picker is on the Setup tab)
-        # the ear button shrinks to its icon first: the level bar is the live part
-        f.add(12, "w", r.icon_only(self.btn_check))
-        f.add(14, "w", self._show_np_time)   # also hidden while it's blank
-        f.add(45, "w", r.hide(self.speed_btn))
-        f.add(30, "w", r.hide(self.chk_monitor))
-        # the levels strip never drops a group: one is shown whole and the other two
-        # become icons that bring theirs up (_fit_mixer)
-        f.add(52, "w", self._fit_mixer)
-        f.add(40, "w", r.hide(*self._transport_vol))
-        f.add(50, "w", r.hide(self.np_name))
-        f.add(60, "w", r.icon_only(self.btn_add))
-        # the search box keeps room to type in until the buttons beside it have shrunk
-        f.add(62, "w", lambda tight: (self.search.setMinimumWidth(0 if tight else SEARCH_MIN_W),
-                                      r.touch(self.search)))
-        # very narrow: the search button (and its site menu) goes; Enter still searches
-        # the site picked last
-        f.add(63, "w", lambda tight: (
-            self.btn_yt.setVisible(not tight and self.ytresults.available()),
-            r.touch(self.btn_yt)))
-        f.add(64, "w", r.icon_only(self.btn_more))
-        self._radio_steps = self.radio.fit_steps()   # swapped with the tab (Privacy)
-        f.extend(self._radio_steps)
-        self._tab_steps = {k: getattr(self, k).fit_steps() for k in ("voice", "triggers")}
-        for steps in self._tab_steps.values():
-            f.extend(steps)
-        # height: the whole mixer strip
-        f.add(5, "h", self.rail.compact)   # the rail's buttons closer together, first
-        f.add(40, "h", lambda tight: r.hide(self.mixer)(
-            tight and (self.height() < 520 or self.width() < 760)))
-        f.add(50, "h", self._cat_bar_step)   # the overlay's category key still works
-        # the download list folds to its running row, then to its summary line, before
-        # the mixer goes (a long queue at 800x600 isn't a reason for the mini player)
-        self._dl_steps = self.download_bar.fit_steps()
-        f.extend(self._dl_steps)
-        self._stack_cols = (self._stack_setup,
-                            *self.voice.stack_steps())
-        self.setMinimumSize(responsive.MIN_SIZE)
-
-    def _cat_bar_step(self, compact: bool):
-        """The fitter's say on the category bar: it hides it when the window is short."""
-        self._cat_bar_compact = compact
-        self._sync_cat_bar()
-
-    def _sync_cat_bar(self):
-        """The category bar is hidden when the window is short (the fitter) or when web
-        results take the pads' place: leaving its empty row in the layout kept a gap
-        between the toolbar and the results' buttons."""
-        self.cat_bar.setVisible(not self._cat_bar_compact and not self._results_open)
-        responsive.touch(self.cat_bar)
-
     def _show_pill(self):
         """The setup pill: only while something needs fixing."""
         self.pill.setVisible(not self._pill_good)
@@ -3197,128 +2960,12 @@ class MainWindow(QMainWindow):
         if hasattr(self, "rail"):
             self.rail.refresh_output()
 
-    def _refit(self):
-        if getattr(self, "_refitting", False):
-            return
-        self._refitting = True
-        try:
-            with responsive.hold_updates(self):
-                self._refit_layout()
-        finally:
-            self._refitting = False
-
-    def _refit_layout(self):
-        size = self._pages.size()
-        mini = size.width() < MINI_SIZE.width() or size.height() < MINI_SIZE.height()
-        if not mini:
-            # measured with the whole window in place: while the mini player shows, the
-            # hidden page's sizes go stale and it stayed the mini player at sizes the
-            # whole window fits (nothing is painted before this returns)
-            self._set_mini(False)
-            self.rail.compact(self.rail._compact)
-            self._mixer_layout.setDirection(QBoxLayout.Direction.LeftToRight)
-            self._mixer_layout.setSpacing(14)
-            for group in self._decks[1:]:
-                group[0].setMaximumHeight(16777215)
-            responsive.touch(self._pads_scroll)
-            # room for a whole row of pads comes before the mixer, the status line and
-            # the rest: without it they kept their room and the pads got a slit
-            self._pads_scroll.setMinimumHeight(self.grid.row_height())
-            narrow = self.width() < 860   # two cards side by side get cramped below this
-            # Translated controls can need more room than the fixed breakpoint.
-            # Measure both Setup columns even while they are stacked, so growing
-            # the window brings them back only when neither will be clipped.
-            body = self.setup_page.widget()
-            lay = body.layout() if body is not None else None
-            holder = self._setup_cols.parentWidget()
-            assert lay is not None and holder is not None   # built in _build_setup_page
-            margins = lay.contentsMargins()
-            room = self.setup_page.viewport().width() - margins.left() - margins.right()
-            available = min(room, holder.maximumWidth())
-            self._stack_cols[0](narrow or self._setup_need() > available)
-            for apply in self._stack_cols[1:]:
-                apply(narrow)
-            need = self._fit.fit(size)   # even the smallest layout won't fit
-            if need.width() > size.width() or need.height() > size.height():
-                # A restored mixer needs one width pass before considering a wrap.
-                need = self._fit.fit(size)
-            if (self.width() >= 760 and need.width() > size.width()
-                    and self.mixer.minimumSizeHint().width() + self.rail.width() > size.width()):
-                # Wrap only when the visible groups need it, e.g. with larger fonts.
-                self._mixer_layout.setDirection(QBoxLayout.Direction.TopToBottom)
-                self._mixer_layout.setSpacing(4)
-                for group in self._decks[1:]:
-                    group[0].setMaximumHeight(0)
-                self.mixer.setMinimumSize(0, 0)
-                self._mixer_layout.activate()
-                responsive.touch(self.mixer)
-                need = self._fit.fit(size)
-            mini = need.width() > size.width() or need.height() > size.height()
-            if mini and not self.is_mini():
-                log.info("mini player at %dx%d: the window needs %dx%d (tab %s)",
-                         size.width(), size.height(), need.width(), need.height(),
-                         type(self.tabs.currentWidget()).__name__)
-        opening = getattr(self.setctl, "_opening_settings", False)
-        if mini and self.setctl.settings_open() and not opening:
-            # made too small for Settings: they close (as Done does), the mini player shows
-            self.setctl.close_settings()
-            # close_settings requests a refit, which the outer transaction guards.
-            # Finish it here with Settings removed, before painting resumes.
-            self._refit_layout()
-            return
-        self._set_mini(mini)
-        if mini:   # the pads too: cards with room for a couple of rows of them, else
-            # one-line rows, so they can still be seen and played however small it gets
-            room = self._mini_pad_room(size)
-            self.grid.set_slim(room < MINI_PAD_ROWS * self._mini_row(size))
-            m = self.grid.grid.contentsMargins()
-            show = room >= SLIM_PAD_H + m.top() + m.bottom()
-            if self._pads_scroll.isHidden() == show:
-                self._pads_scroll.setVisible(show)
-                toastmod.relayout(self)   # icons on the pads, or none without them
-
-    def _mini_pad_room(self, size: QSize) -> int:
-        """The height above the mini player's card."""
-        m = self._mini_v.contentsMargins()
-        return (size.height() - m.top() - m.bottom() - self._mini_v.spacing()
-                - self._mini_card.sizeHint().height())
-
-    def _mini_row(self, size: QSize) -> int:
-        """How tall a row of pads is in the mini player at this size."""
-        m, g = self._mini_v.contentsMargins(), self.grid.grid.contentsMargins()
-        bar = self._pads_scroll.verticalScrollBar().sizeHint().width()
-        room = size.width() - m.left() - m.right() - g.left() - g.right() - bar
-        return pad_height(self.grid.fit_width(room, slim=False)[1]) + 10
-
-    def is_mini(self) -> bool:
-        return self._pages.currentIndex() == 1
-
-    def _set_mini(self, on: bool):
-        """Swap the whole window for the mini player (or back). The pads move with it."""
-        if on == self.is_mini():
-            return
-        scroll = self._pads_scroll
-        with responsive.hold_updates(self):
-            self.grid.set_two_up(on)
-            if not on:
-                self.grid.set_slim(False)
-            if on:
-                scroll.setMinimumHeight(0)
-                self._mini_v.insertWidget(0, scroll, 1)
-            else:
-                home, index = self._pads_home
-                home.insertWidget(index, scroll, 1)
-                scroll.setVisible(self.ytresults.isHidden())   # results take the pads' place
-            self._pages.setCurrentIndex(1 if on else 0)
-            self.searchctl.apply_filter(self.search.text())
-        toastmod.relayout(self)   # cards in the window, icons in the mini player
-
     def resizeEvent(self, ev):
         super().resizeEvent(ev)
-        if hasattr(self, "_fit"):
+        if hasattr(self.fitctl, "_fit"):
             # right away, before the frame is painted: a queued refit let each frame
             # paint twice, before and after, which made parts of the window flash
-            self._refit()
+            self.fitctl._refit()
 
     # Files dropped anywhere else on the window (the toolbar, another tab, the edge of
     # the pad area) are added just like ones dropped on the pads.

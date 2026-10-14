@@ -82,7 +82,7 @@ class BunControl(Controller):
             self._back_as_it_was()
         mw.show_from_tray()
         if full:
-            mw._refit()   # out of the mini player now, not after the first paints
+            mw.fitctl._refit()   # out of the mini player now, not after the first paints
         if sys.platform == "win32":   # raise_/activateWindow alone left it behind the
             winkeys.to_front(int(mw.winId()))   # app in front (Bun never has focus)
 
