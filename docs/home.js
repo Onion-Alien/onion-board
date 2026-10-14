@@ -75,7 +75,7 @@
     did("tab-" + name);
     apply(name);
     if (scrollUp) window.scrollTo(0, 0);
-    var p = $(".panel.on");     // fade the new page in and drop its mascot in (CSS)
+    var p = $(".panel.on");     // drop its mascot in (CSS)
     p.classList.remove("enter"); void p.offsetWidth; p.classList.add("enter");
   }
   tabs.forEach(function (t, i) {
@@ -96,7 +96,9 @@
     else if (location.hash === "#board") select("board", true);
   });
   panels.forEach(function (p) {
-    p.addEventListener("animationend", function (e) { if (e.target === p) p.classList.remove("enter"); });
+    p.addEventListener("animationend", function (e) {
+      if (e.target.classList.contains("mascot")) p.classList.remove("enter");
+    });
   });
   new Image().src = brandImg.getAttribute("data-watch-src");   // no blank logo on the first switch
   window.addEventListener("resize", placePill);

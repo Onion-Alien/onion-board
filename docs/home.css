@@ -443,8 +443,8 @@ footer .pals svg:hover { transform: translateY(-6px) rotate(-6deg); }
 .js .rv { opacity: 0; transform: translateY(26px); transition: opacity .7s ease, transform .7s cubic-bezier(.2,.8,.2,1); }
 .js .rv.in { opacity: 1; transform: none; }
 
-/* the tab swap: the new page fades in and its mascot drops in */
-.panel.enter { animation: fadeIn .3s ease both; }
+/* the tab swap: the colours blend over (:root) and the new mascot drops in. The page
+   itself doesn't fade: fading it from nothing flashed the screen dark. */
 .panel.enter .mascot { animation: dropIn .55s cubic-bezier(.3,1.5,.5,1) both; }
 @keyframes fadeIn { from { opacity: 0; } }
 @keyframes dropIn { from { transform: translateY(-70px) scale(.6) rotate(8deg); opacity: 0; } }
