@@ -4,7 +4,7 @@ from test_mainwindow import window  # noqa: F401
 
 
 def test_backup_export_button_takes_the_finished_signal(window, monkeypatch):  # noqa: F811
-    d = window.open_settings("general")
+    d = window.setctl.open_settings("general")
     exp = next(b for b in d.findChildren(QPushButton) if b.text() == "Export everything")
 
     def export_board():

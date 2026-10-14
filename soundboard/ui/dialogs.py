@@ -24,7 +24,7 @@ from soundboard.ui import busy, fit, icons, sourcedialog, toast
 from soundboard.ui.panel import (EqPanel, hint_label, icon_button, reset_button,
                                  section_label, steady_number)
 from soundboard.ui.trim import TrimPanel
-from soundboard.ui.voicepanel import EffectRow, ParamSlider
+from soundboard.ui.voicefxpanel import EffectRow, ParamSlider
 from soundboard.wheelguard import no_wheel
 from soundboard.winkeys import Hotkeys
 from soundboard.i18n import _

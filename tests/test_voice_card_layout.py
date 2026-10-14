@@ -121,19 +121,20 @@ def test_computer_action_precedes_description_and_choices(qapp, monkeypatch, tmp
     try:
         speech.setParent(None)
         speech.title.show()
-        speech.start_box.show()
+        speech.livevoice.start_box.show()
         speech.setFixedWidth(width)
-        speech.lbl_state.setText("Starting: the computer voice is getting ready to speak "
-                                 "your words in the selected language.")
+        live = speech.livevoice
+        live.lbl_state.setText("Starting: the computer voice is getting ready to speak "
+                               "your words in the selected language.")
         speech.show()
         qapp.processEvents()
-        assert at(speech.start_box, speech).bottom() < at(speech.lbl_intro, speech).top()
+        assert at(live.start_box, speech).bottom() < at(speech.lbl_intro, speech).top()
         assert at(speech.lbl_intro, speech).bottom() < at(speech.cb_voice, speech).top()
-        assert speech.b_live.geometry().left() == 0
-        assert speech.b_live.geometry().right() < speech.lbl_state.geometry().left()
-        assert speech.start_box.rect().contains(speech.lbl_state.geometry())
-        assert speech.start_box.rect().contains(speech.b_live.geometry())
-        assert speech.lbl_state.wordWrap()
+        assert live.b_live.geometry().left() == 0
+        assert live.b_live.geometry().right() < live.lbl_state.geometry().left()
+        assert live.start_box.rect().contains(live.lbl_state.geometry())
+        assert live.start_box.rect().contains(live.b_live.geometry())
+        assert live.lbl_state.wordWrap()
         speech.grab().save(str(tmp_path / f"computer-voice-{name}-{width}.png"))
     finally:
         speech.close()

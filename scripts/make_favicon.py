@@ -1,4 +1,4 @@
-"""Render the website's tab icons (Bun the mascot, from soundboard/bunny.py) into docs/.
+"""Render the website's tab icons (Bun the mascot, from soundboard/bunny.py) into site/.
 
     .venv\\Scripts\\python scripts\\make_favicon.py
 """
@@ -14,7 +14,7 @@ from PySide6.QtGui import QColor, QGuiApplication, QImage, QPainter
 
 ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(ROOT))   # run from scripts\: make `soundboard` importable
-OUT = ROOT / "docs"
+OUT = ROOT / "site"
 
 ICO_SIZES = (16, 32, 48)
 HEAD = 0.80   # top share of Bun that's ears + head + headphones: tiny icons skip the body
@@ -57,7 +57,7 @@ def main():
     head(192).save(str(OUT / "favicon.png"))
     # phones put the home-screen icon on a tile, so give it the site's background
     head(180, QColor("#0f1016")).save(str(OUT / "apple-touch-icon.png"))
-    print("wrote docs/favicon.ico, favicon.png, apple-touch-icon.png")
+    print("wrote site/favicon.ico, favicon.png, apple-touch-icon.png")
 
 
 if __name__ == "__main__":

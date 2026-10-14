@@ -1,4 +1,4 @@
-"""Render the README screenshots into docs/screenshots/.
+"""Render the README screenshots into site/screenshots/.
 
     .venv\\Scripts\\python scripts/screenshots.py [--theme "Dark"] [--plain]
 
@@ -226,7 +226,7 @@ def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--theme", default=THEME)
     ap.add_argument("--plain", action="store_true", help="Plain instead of Textured")
-    ap.add_argument("--out", type=Path, default=ROOT / "docs" / "screenshots")
+    ap.add_argument("--out", type=Path, default=ROOT / "site" / "screenshots")
     args = ap.parse_args()
     args.out.mkdir(parents=True, exist_ok=True)
 
