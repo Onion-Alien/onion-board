@@ -193,7 +193,7 @@ class EffectsPanel(QWidget):
         return trim
 
     def set_sound(self, meta: SoundMeta):
-        """Show another sound (Edit sound reused, MainWindow.edit): its trim and fx."""
+        """Show another sound (Edit sound reused, EditControl.edit): its trim and fx."""
         old = self.trim
         self.trim = self._new_trim(meta, self._v.indexOf(old))
         self._v.removeWidget(old)
@@ -589,7 +589,7 @@ class EditDialog(QDialog):
         self.btn_source.clicked.connect(details)
 
     def load(self, meta: SoundMeta, tab: str = "sound"):
-        """Show another sound, as a new window would: MainWindow.edit reuses a closed
+        """Show another sound, as a new window would: EditControl.edit reuses a closed
         one (building one took ~200 ms each time)."""
         for child in self.findChildren(QDialog):   # its Details / hotkey boxes
             child.close()
