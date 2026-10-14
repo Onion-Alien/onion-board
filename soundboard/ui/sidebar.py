@@ -293,11 +293,12 @@ class OutputBlock(QFrame):
                           # looked out of place); past that, the small card instead
     ROW_PAD = 4           # the status line's hover fill past its icon
     ROW_GAP = 6           # title row to the status line's fill
-    ROW_H = 28            # the status line's height, fill and all
+    ROW_H = 34            # the status line's height, fill and all: Mute's and Stop all's
     CHEVRON = 12          # the status line's chevron: lighter than the icons
     STOP = 28             # Stop all after the switch, open: a normal icon button
     PAIR_H = 34           # open: Mute and Stop all, two halves of one row...
     PAIR_GAP = 8          # ...this far apart
+    PAIR_ICON = 18        # their icons
     INK_DOWN = 1          # the switch's and Stop all's ink this far under their box's
                           # centre: on the title's cap-height centre (measured)
 
@@ -429,7 +430,12 @@ class OutputBlock(QFrame):
         strip.setContentsMargins(0, 0, 0, 0)
         strip.setSpacing(0)
         strip.addWidget(self.setup, 1)
-        outer.addWidget(self.strip)
+        # its own rounded button inside the card, padded like Mute and Stop all over it
+        self.strip_row = QWidget()
+        self.strip_row.setObjectName("railpairrow")
+        self.strip_lay = QHBoxLayout(self.strip_row)
+        self.strip_lay.addWidget(self.strip, 1)
+        outer.addWidget(self.strip_row)
         # the network lines (set_lines), made as they're needed
         self._lines: list[Line] = []
         self.net: list[_NetLine] = []
@@ -554,13 +560,16 @@ class OutputBlock(QFrame):
         def px(n: float) -> int:
             return max(1, round(n * scale))
         text_x = round(self.ICON_X - px(self.GLYPH) / 2) + px(self.GLYPH) + px(self.GAP)
+        # the status line: in its own button, the card's padding round it and its own
+        # inside it
+        status_x = 2 * px(self.PAD) + px(self.GLYPH) + px(self.GAP)
         status = self._metrics(scale).horizontalAdvance(self.status_text.text())
         network = max((self._metrics(scale).horizontalAdvance(line.words)
                        for line in self._lines), default=0)
         halves = 2 if self.stop is not None else 1
         return max(2 * px(self.PAD) + halves * px(self.PAIR_H) + (halves - 1) * px(self.PAIR_GAP),
-                   text_x + status + 1 + px(self.GAP - 2) + px(self.CHEVRON) + px(self.PAD)
-                   + px(self.PAD),
+                   status_x + status + 1 + px(self.GAP - 2) + px(self.CHEVRON)
+                   + 2 * px(self.PAD),
                    text_x + network + 1 + 2 * px(self.PAD))
 
     def scale_for(self, width: int) -> float:
@@ -602,7 +611,9 @@ class OutputBlock(QFrame):
             b.setFixedSize(half, px(self.PAIR_H))
         self._mute_look(self.power.isChecked())
         if self.stop is not None:
-            icons.set_icon(self.stop, "stop", "danger_text", gap=False, size=px(18))
+            icons.set_icon(self.stop, "stop", "danger_text", gap=False,
+                           size=px(self.PAIR_ICON))
+        self._words()
         self.pair.setVisible(expanded)
         self.box.setContentsMargins(*(pad, 0, pad, 0) if expanded else (0, 4, 0, 0))
         self.top.setContentsMargins(0, 0, 0, 0)
@@ -693,6 +704,25 @@ class OutputBlock(QFrame):
     def names() -> tuple[str, str]:
         return _("Live"), _("Muted")
 
+    def _words(self):
+        """Mute's and Stop all's words beside their icons ("Live" / "Muted", "Stop
+        all"): what each does, without a hover. A word too long for its half (a
+        long translation) leaves that button its icon alone, as the tip says it. Mute
+        keeps its words only if both of them fit: never "Live" with a bare muted icon."""
+        on = self.power.isChecked()
+        # (a plain space after the waves; none after the stop square, whose ink has
+        # more air round it: the same gap to the eye)
+        stop = self.rail_stop.property("railtext") if self.rail_stop is not None else ""
+        for b, words, lead in ((self.mute, self.names(), " "), (self.stop, (stop,), "")):
+            if b is None:
+                continue
+            # (Qt's 4 px after the icon, the border and a little air each side)
+            room = b.width() - self._px(self.PAIR_ICON) - self._px(10)
+            fits = all(w and b.fontMetrics().horizontalAdvance(lead + w) <= room
+                       for w in words)
+            word = words[0 if on or len(words) == 1 else 1]
+            b.setText(lead + word if fits else "")
+
     def _mute_look(self, on: bool):
         """Mute: the live waves while others hear you, struck through on red while
         they don't."""
@@ -702,7 +732,8 @@ class OutputBlock(QFrame):
         self.mute.style().polish(self.mute)
         tone = "accent" if on else "danger_text"
         icons.set_icon(self.mute, "live" if on else "live_off", tone, tone, gap=False,
-                       size=self._px(18))
+                       size=self._px(self.PAIR_ICON))
+        self._words()
 
     def _name(self, on: bool):
         """"Live" while others hear you, "Muted" while they don't."""
@@ -735,6 +766,7 @@ class OutputBlock(QFrame):
         small = not self.property("expanded")
         # all good: no strip, the switch says it
         self.strip.setVisible(not small and not good)
+        self.strip_row.setVisible(not small and not good)
         if self.stop is not None and self.rail_stop is not None:
             self.stop.setToolTip(self.rail_stop.toolTip())
             self.stop.setAccessibleName(self.rail_stop.property("railtext") or "")
@@ -760,6 +792,9 @@ class OutputBlock(QFrame):
         # over its words as under them
         pad = self._px(self.PAD)
         self.pair_lay.setContentsMargins(pad, pad, pad, 0 if self._lines else pad)
+        self.strip_lay.setContentsMargins(pad, pad if self._lines else 0, pad, pad)
+        if self.stop is not None and self.rail_stop is not None:
+            self._words()
         self._pin_all()
 
 
