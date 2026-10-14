@@ -111,6 +111,34 @@ def test_files_go_back_if_the_settings_cant_be_saved(app_dir, monkeypatch):
     assert [m.file for m in cfg.sounds] == before and all(Path(f).is_file() for f in before)
 
 
+def test_the_moves_list_stays_until_the_settings_are_on_the_disk(app_dir, monkeypatch):
+    """Deleted after a save that never reached the disk, a power cut would leave the
+    sounds naming files that moved, with nothing to move them back."""
+    cfg = _old_board(app_dir)
+    before = [m.file for m in cfg.sounds]
+    real_fsync, real_replace = library.os.fsync, library.os.replace
+
+    def fsync(fd):   # the moves list's own fsync is fine; the settings' fails
+        if list(app_dir.glob("config.json.*.tmp")):
+            raise OSError(5, "I/O error")
+        real_fsync(fd)
+
+    def stuck(a, b):   # a file open in another program won't go back
+        if "Air horn" in str(a):
+            raise PermissionError(32, "in use")
+        return real_replace(a, b)
+
+    with monkeypatch.context() as mp:
+        mp.setattr(library.os, "fsync", fsync)
+        mp.setattr(library.os, "replace", stuck)
+        assert library.tidy_files(cfg) == 0
+    assert (app_dir / "tidy-moves.txt").exists()   # the next start puts it back
+    assert [m.file for m in Config.load().sounds] == before
+    assert library._undo_tidy(Config.load()) == 1
+    assert all(Path(f).is_file() for f in before)
+    assert not (app_dir / "tidy-moves.txt").exists()
+
+
 def test_locked_settings_or_a_busy_file_leave_things_as_they_are(app_dir, monkeypatch):
     cfg = _old_board(app_dir)
     cfg.read_only = True

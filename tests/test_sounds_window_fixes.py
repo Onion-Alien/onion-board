@@ -259,8 +259,65 @@ def test_a_reset_asks_before_taking_a_key_given_to_another_sound(window, tmp_pat
     monkeypatch.setattr(window, "_take_pack_hotkeys",
                         lambda clashes, name: asked.append(name) or False)
     window.reset_pack(door.pack, ask=False)
+    assert process_events(qapp, lambda: asked, 10)
     assert asked == ["Dungeon pack"]
     assert window.meta("s0").hotkey == "f1" and door.hotkey == ""
+
+
+def _held(monkeypatch, name):
+    """backup.<name> made to wait for go.set(), noting the thread it ran on."""
+    import threading
+    go, ran, real = threading.Event(), [], getattr(backup, name)
+
+    def slow(*a, **k):
+        ran.append(threading.current_thread())
+        assert go.wait(10)
+        return real(*a, **k)
+    monkeypatch.setattr(backup, name, slow)
+    return go, ran
+
+
+def test_a_backup_is_read_off_the_ui_thread(window, tmp_path, qapp, monkeypatch):
+    import threading
+    go, ran = _held(monkeypatch, "read")
+    window.import_package(str(_three_pack(tmp_path)))   # returns while it's still read
+    assert process_events(qapp, lambda: ran, 5)
+    assert ran[0] is not threading.main_thread() and len(window.cfg.sounds) == 3
+    go.set()
+    assert process_events(qapp, lambda: len(window.cfg.sounds) == 6, 10)
+
+
+def test_a_zip_is_looked_into_off_the_ui_thread(window, tmp_path, qapp, monkeypatch):
+    import threading
+    go, ran = _held(monkeypatch, "loose_audio")
+    window.import_files([str(_three_pack(tmp_path))])
+    assert process_events(qapp, lambda: ran, 5)
+    assert ran[0] is not threading.main_thread() and len(window.cfg.sounds) == 3
+    go.set()
+    assert process_events(qapp, lambda: len(window.cfg.sounds) == 6, 10)
+
+
+def test_a_pack_reset_reads_and_puts_back_off_the_ui_thread(window, tmp_path, qapp,
+                                                            monkeypatch):
+    import threading
+    door, *_rest = _import_three(window, tmp_path, qapp)
+    door.name = "My door"
+    go, ran = _held(monkeypatch, "reset_sounds")
+    window.reset_pack(door.pack, ask=False)
+    assert process_events(qapp, lambda: ran, 5)
+    assert ran[0] is not threading.main_thread() and door.name == "My door"
+    go.set()
+    assert process_events(qapp, lambda: door.name == "Door", 10)
+
+
+def test_a_pack_gone_while_the_reset_reads_it_is_said(window, tmp_path, qapp, monkeypatch):
+    door, *_rest = _import_three(window, tmp_path, qapp)
+    warned = []
+    monkeypatch.setattr(main.errors, "warn", lambda parent, title, e: warned.append(title))
+    backup.forget_pack(door.pack)
+    window.reset_pack(door.pack, ask=False)
+    assert process_events(qapp, lambda: warned, 10)
+    assert warned == ["Can't reset the sound pack"]
 
 
 def test_a_sound_pack_is_removed_in_one_go_and_undone(window, tmp_path, qapp):
@@ -271,9 +328,11 @@ def test_a_sound_pack_is_removed_in_one_go_and_undone(window, tmp_path, qapp):
     window.undo_remove()
     assert len(window.cfg.sounds) == 6
     window._finish_removals()
+    window._wait_bin()
     assert pid in backup.packs()   # undone: still kept
     window.remove_pack(pid, ask=False)
     window._finish_removals()
+    window._wait_bin()
     assert backup.packs() == {}
 
 
