@@ -385,4 +385,17 @@ def test_edit_dialog_colour_swatches_are_named_and_exclusive(qapp):
     assert ":focus" in d.swatches[0][0].styleSheet()     # keyboard focus is drawn
     d.apply()
     assert m.color == PAD_COLORS[4]
+    # any other colour comes from the colour wheel button after the swatches
+    from PySide6.QtGui import QColor
+    from PySide6.QtWidgets import QColorDialog
+    orig = QColorDialog.getColor
+    QColorDialog.getColor = staticmethod(lambda *a: QColor("#123456"))
+    try:
+        d.custom_swatch.click()
+    finally:
+        QColorDialog.getColor = orig
+    assert d.color == "#123456" and d.swatch_group.checkedButton() is d.custom_swatch
+    assert "#123456" in d.custom_swatch.styleSheet()
+    d.apply()
+    assert m.color == "#123456"
     d.deleteLater()
