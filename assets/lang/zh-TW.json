@@ -3280,5 +3280,6 @@
   "soft": "柔和",
   "warm": "溫暖",
   "clean": "乾淨",
-  "This program's last minute as a waveform: pick a bit out of it and keep it as a clip. It only listens while it's open.": "這個程式最近一分鐘的波形：從中選一段，保存為剪輯。只在打開時才會收聽。"
+  "This program's last minute as a waveform: pick a bit out of it and keep it as a clip. It only listens while it's open.": "這個程式最近一分鐘的波形：從中選一段，保存為剪輯。只在打開時才會收聽。",
+  "Pre-delay": "預延遲"
 }

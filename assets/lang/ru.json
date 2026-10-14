@@ -3430,5 +3430,6 @@
   "soft": "мягко",
   "warm": "тепло",
   "clean": "чисто",
-  "This program's last minute as a waveform: pick a bit out of it and keep it as a clip. It only listens while it's open.": "Последняя минута этой программы в виде волны: выберите кусочек и сохраните его как клип. Слушает, только пока открыт."
+  "This program's last minute as a waveform: pick a bit out of it and keep it as a clip. It only listens while it's open.": "Последняя минута этой программы в виде волны: выберите кусочек и сохраните его как клип. Слушает, только пока открыт.",
+  "Pre-delay": "Предзадержка"
 }

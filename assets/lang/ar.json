@@ -3655,5 +3655,6 @@
   "soft": "ناعم",
   "warm": "دافئ",
   "clean": "نظيف",
-  "This program's last minute as a waveform: pick a bit out of it and keep it as a clip. It only listens while it's open.": "آخر دقيقة من هذا البرنامج كشكل موجي: اختر جزءًا منها واحتفظ به كمقطع. لا يستمع إلا وهو مفتوح."
+  "This program's last minute as a waveform: pick a bit out of it and keep it as a clip. It only listens while it's open.": "آخر دقيقة من هذا البرنامج كشكل موجي: اختر جزءًا منها واحتفظ به كمقطع. لا يستمع إلا وهو مفتوح.",
+  "Pre-delay": "تأخير مسبق"
 }

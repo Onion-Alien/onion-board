@@ -3355,5 +3355,6 @@
   "soft": "pehmeä",
   "warm": "lämmin",
   "clean": "puhdas",
-  "This program's last minute as a waveform: pick a bit out of it and keep it as a clip. It only listens while it's open.": "Ohjelman viimeinen minuutti aaltomuotona: valitse siitä pätkä ja tallenna se leikkeeksi. Se kuuntelee vain, kun se on auki."
+  "This program's last minute as a waveform: pick a bit out of it and keep it as a clip. It only listens while it's open.": "Ohjelman viimeinen minuutti aaltomuotona: valitse siitä pätkä ja tallenna se leikkeeksi. Se kuuntelee vain, kun se on auki.",
+  "Pre-delay": "Esiviive"
 }
