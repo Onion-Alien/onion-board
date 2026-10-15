@@ -1,6 +1,7 @@
 """Apps recording the mic without Onion Board (soundboard.rawmic): the count check, and
 its line on the real MainWindow's urgent bar (offscreen). Windows isn't asked: the
 session list and the effect's stream count are fed in."""
+import threading
 from types import SimpleNamespace
 
 import pytest
@@ -149,3 +150,22 @@ def test_the_tick_lists_on_a_worker(window, monkeypatch, qapp):
     assert process_events(qapp, lambda: not window.alertctl._raw_looking)
     # the board's own tick timer can fire a second look on a slow runner: same question
     assert seen and set(seen) == {("Microphone (Test)", True)}
+
+
+def test_the_tick_keeps_one_thread(window, monkeypatch, qapp):
+    # a new thread every 2 s kept the window waiting in Thread.start (2.2.0's freeze
+    # at worker.py:45 < alertcontrol.py:146): every look runs on the same kept thread
+    from conftest import process_events
+    from soundboard import appaudio
+    threads = []
+    monkeypatch.setattr(appaudio, "recording_apps",
+                        lambda dev, mine=False: threads.append(threading.current_thread())
+                        or [BOARD])
+    monkeypatch.setattr(window.micctl, "_direct_not_running", lambda: False)
+    monkeypatch.setattr(window.engine, "direct_apps", lambda: 1)
+    window.cfg.route, window.cfg.mic_device = "mic", "Microphone (Test)"
+    for _ in range(3):
+        window.alertctl._raw_tick()
+        assert process_events(qapp, lambda: not window.alertctl._raw_looking)
+    assert len(threads) >= 3 and len(set(threads)) == 1
+    assert threading.main_thread() not in threads

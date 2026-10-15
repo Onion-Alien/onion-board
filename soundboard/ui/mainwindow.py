@@ -1328,7 +1328,8 @@ class MainWindow(QMainWindow):
             self.bunctl.bun_mode.close()
         for step in (self.rmctl._finish_removals, self.rmctl._wait_bin, self.timer.stop,
                      self._voice_timer.stop, self.devctl._default_poll.stop,
-                     self.alertctl._discord_poll.stop, self.hkctl._release_ptt,
+                     self.alertctl._discord_poll.stop, self.alertctl._raw_poll.stop,
+                     self.hkctl._release_ptt,
                      self._remember_usage, self.cfg.save, self.overlay.shutdown,
                      self.hotkeys.stop, self.replay.stop, self.remote.stop,
                      self.remctl._stop_remote_addons,

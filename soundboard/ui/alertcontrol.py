@@ -14,7 +14,7 @@ from typing import TYPE_CHECKING
 from soundboard import appaudio, directmic, discordcfg, rawmic, updates
 from soundboard.i18n import _
 from soundboard.pollthread import PollThread
-from soundboard.ui import worker
+from soundboard.ui import busy
 from soundboard.ui.controller import Controller
 from soundboard.ui.triggerstab import TriggersTab
 
@@ -62,6 +62,7 @@ class AlertControl(Controller):
         # and hears none of the sounds (rawmic)
         self.raw_watch = rawmic.BypassWatch()
         self._raw_looking = False
+        self._raw_poll = PollThread("raw-mic")
 
     def _urgent_now(self) -> tuple[str, str, str] | None:
         """The urgent fix to show on the banner: (key, text, button), Onion Board's
@@ -143,7 +144,10 @@ class AlertControl(Controller):
             except Exception:  # noqa: BLE001 - a check that can't run shows nothing
                 log.debug("listing who records the mic failed", exc_info=True)   # (often)
                 return None
-        worker.run(run, mw.bridge.mic_users, "raw-mic", error=None, owner=mw)
+
+        def look():
+            busy.emit(mw.bridge.mic_users, run())
+        self._raw_poll.run(look)
 
     def _on_mic_users(self, apps, now: float | None = None):
         mw = self.mw
