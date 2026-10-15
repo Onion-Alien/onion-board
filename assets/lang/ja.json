@@ -3347,5 +3347,7 @@
   "“{key}” isn't a key on a keyboard, so that hotkey could never be pressed.": "「{key}」はキーボードのキーではないため、このホットキーは押せません。",
   "{mod} alone can't be a hotkey: add a key, like {mod}+1.": "{mod}だけではホットキーになりません。キーを追加してください（例: {mod}+1）。",
   "A hotkey has one key, plus Ctrl, Alt, Shift or Windows if you like: this one has {keys}.": "ホットキーのキーは1つで、必要ならCtrl、Alt、Shift、Windowsを付けます。これには{keys}があります。",
-  "Hotkey not saved: {why}": "ホットキーを保存しませんでした: {why}"
+  "Hotkey not saved: {why}": "ホットキーを保存しませんでした: {why}",
+  "Hide advanced": "詳細を隠す",
+  "Show advanced": "詳細を表示"
 }

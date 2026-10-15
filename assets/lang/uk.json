@@ -3499,5 +3499,7 @@
   "“{key}” isn't a key on a keyboard, so that hotkey could never be pressed.": "«{key}» — не клавіша клавіатури, тож цю гарячу клавішу ніколи не натиснути.",
   "{mod} alone can't be a hotkey: add a key, like {mod}+1.": "Сам {mod} не може бути гарячою клавішею: додай клавішу, наприклад {mod}+1.",
   "A hotkey has one key, plus Ctrl, Alt, Shift or Windows if you like: this one has {keys}.": "У гарячій клавіші одна клавіша, плюс Ctrl, Alt, Shift або Windows за бажанням: тут {keys}.",
-  "Hotkey not saved: {why}": "Гарячу клавішу не збережено: {why}"
+  "Hotkey not saved: {why}": "Гарячу клавішу не збережено: {why}",
+  "Hide advanced": "Сховати розширені",
+  "Show advanced": "Показати розширені"
 }

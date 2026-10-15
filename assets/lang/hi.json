@@ -3423,5 +3423,7 @@
   "“{key}” isn't a key on a keyboard, so that hotkey could never be pressed.": "“{key}” कीबोर्ड की कोई की नहीं है, इसलिए यह हॉटकी कभी दबाई नहीं जा सकती।",
   "{mod} alone can't be a hotkey: add a key, like {mod}+1.": "अकेला {mod} हॉटकी नहीं बन सकता: एक की जोड़ें, जैसे {mod}+1।",
   "A hotkey has one key, plus Ctrl, Alt, Shift or Windows if you like: this one has {keys}.": "हॉटकी में एक की होती है, और चाहें तो Ctrl, Alt, Shift या Windows: इसमें {keys} हैं।",
-  "Hotkey not saved: {why}": "हॉटकी सेव नहीं हुई: {why}"
+  "Hotkey not saved: {why}": "हॉटकी सेव नहीं हुई: {why}",
+  "Hide advanced": "उन्नत छुपाएँ",
+  "Show advanced": "उन्नत दिखाएँ"
 }

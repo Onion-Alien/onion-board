@@ -575,6 +575,7 @@ class PrivacyPage(Page):
             return
         for i, key in enumerate(keys):
             cats.item(i).setHidden(offline and key in self.dlg.OFFLINE_PAGES)
+        self.dlg._fold()   # (the advanced rows stay folded away)
         if cats.item(self.dlg.tabs.currentIndex()).isHidden():
             self.dlg.tabs.setCurrentIndex(keys.index("privacy"))
         search = getattr(self.dlg, "search_box", None)

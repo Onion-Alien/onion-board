@@ -909,7 +909,7 @@ class MainWindow(QMainWindow):
     # Voice tab's speech) or that it keeps up to date itself (app_setup_changed)
     SETTINGS_PRINT_SKIP = ("sounds", "tab", "category", "tip_day", "tips_seen",
                            "update_checked", "whats_new_seen", "load_note", "speech",
-                           "app_setup")
+                           "app_setup", "settings_advanced")
 
     CUES = {"start": (660, 990), "stop": (990, 660), "saved": (880, 880, 1320), "fail": (330, 247)}
 

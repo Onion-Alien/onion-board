@@ -3727,5 +3727,7 @@
   "“{key}” isn't a key on a keyboard, so that hotkey could never be pressed.": "“{key}” ليس مفتاحًا على لوحة المفاتيح، لذا لا يمكن الضغط على هذا الاختصار أبدًا.",
   "{mod} alone can't be a hotkey: add a key, like {mod}+1.": "لا يمكن أن يكون {mod} وحده اختصارًا: أضف مفتاحًا، مثل {mod}+1.",
   "A hotkey has one key, plus Ctrl, Alt, Shift or Windows if you like: this one has {keys}.": "للاختصار مفتاح واحد، مع Ctrl أو Alt أو Shift أو Windows إن شئت: هذا فيه {keys}.",
-  "Hotkey not saved: {why}": "لم يُحفظ الاختصار: {why}"
+  "Hotkey not saved: {why}": "لم يُحفظ الاختصار: {why}",
+  "Hide advanced": "إخفاء الإعدادات المتقدمة",
+  "Show advanced": "عرض الإعدادات المتقدمة"
 }

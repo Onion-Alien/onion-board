@@ -152,7 +152,7 @@ def test_the_settings_page_fits_every_width(qapp, win, width):
     narrow = d.width() < d.NARROW_W
     item = d.categories.item(0)
     assert (item.text() == "") == narrow
-    assert item.toolTip() == ("Privacy & security" if narrow else "")
+    assert item.toolTip() == ("Audio" if narrow else "")
     assert d.categories.width() == (48 if narrow else 196)
     page = d.tabs.currentWidget()
     from PySide6.QtGui import QFontDatabase
