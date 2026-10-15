@@ -40,6 +40,8 @@
   };
   var tabs = $$(".switch [role=tab]"), pill = $(".switch .pill"), panels = $$(".panel");
   var brandImg = $(".brand img"), brandName = $("[data-name]"), miniDl = $(".mini-dl");
+  var favicons = $$("link[rel=icon]");
+  favicons.forEach(function (l) { l.setAttribute("data-board-href", l.getAttribute("href")); });
 
   function current() { return root.dataset.product === "watch" ? "watch" : "board"; }
   function placePill() {
@@ -65,6 +67,9 @@
     miniDl.href = NAV_DL[name][0];
     miniDl.setAttribute("data-goatcounter-click", NAV_DL[name][1]);
     document.title = TITLES[name];
+    favicons.forEach(function (l) {       // the browser tab shows Bun or Hoot too
+      l.href = name === "watch" ? brandImg.getAttribute("data-watch-src") : l.getAttribute("data-board-href");
+    });
     placePill();
     onScroll();
     if (name === "watch") watchShown(); else bunShown();
@@ -130,7 +135,23 @@
   var ac = null, bus = null, an = null, master = null, noise = null, levels = null;
   var muted = load("onion-site-muted") === "1";
   var muteBtn = $("#mute");
+  // A headset that sleeps, wakes or gets unplugged leaves the old context playing into
+  // nothing (or stuck, its clock frozen) until a reload: start a fresh one instead.
+  var stale = false, lastClock = -1, lastSeen = 0;
+  if (navigator.mediaDevices && navigator.mediaDevices.addEventListener)
+    navigator.mediaDevices.addEventListener("devicechange", function () { stale = true; });
+  function broken() {
+    if (stale || ac.state === "closed" || ac.state === "interrupted") return true;
+    var now = performance.now(), frozen = ac.state === "running" && ac.currentTime === lastClock && now - lastSeen > 400;
+    if (ac.currentTime !== lastClock) { lastClock = ac.currentTime; lastSeen = now; }
+    return frozen;
+  }
   function audio() {
+    if (ac && broken()) {
+      try { ac.close(); } catch (e) { /* already closed */ }
+      ac = null; an = null; roomIR = null; clips = {};
+      stale = false; lastClock = -1;
+    }
     if (!ac) {
       var C = window.AudioContext || window.webkitAudioContext;
       if (!C) return null;
