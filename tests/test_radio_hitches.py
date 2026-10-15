@@ -8,7 +8,7 @@ from pathlib import Path
 import numpy as np
 import pytest
 
-from conftest import real_pc_timing
+from conftest import process_events, real_pc_timing
 from soundboard import radio
 from soundboard.ui import flatmap
 from soundboard.ui.flatmap import LAND_PART, FlatMap
@@ -17,6 +17,15 @@ from soundboard.ui.flatmap import LAND_PART, FlatMap
 def outlines():
     raw = (radio.ASSET_DIR / radio.COUNTRIES).read_bytes()
     return radio.outline_rings(raw), radio.outline_labels(raw)
+
+
+def landed(m):
+    """The rest of set_land's parts now (it makes them a step at a time)."""
+    m._land_steps.stop()
+    while m._rings:
+        m._land_step()
+    assert m._land_set
+    return m
 
 
 @pytest.mark.parametrize("dpr", [1.0, 1.25, 1.5, 1.75, 2.0])
@@ -110,6 +119,7 @@ def world_map(rings, labels, zoom=2.0):
     m = FlatMap()
     m.resize(1200, 700)
     m.set_land(rings, labels)
+    landed(m)
     m.set_loading(False)   # no stations: Bun would wait on it (and move between grabs)
     m.zoom = zoom
     return m
@@ -119,10 +129,36 @@ def test_the_land_is_drawn_in_small_parts(qapp):
     rings, _ = outlines()
     m = FlatMap()
     m.set_land(rings)
+    landed(m)
     sizes = [sum(p.elementAt(i).isMoveTo() for i in range(p.elementCount()))
              for p in m._land]
     assert sum(sizes) == len(rings) and len(m._land) > 10   # every outline, in parts
     assert max(p.elementCount() for p in m._land) <= max(LAND_PART, *map(len, rings)) + 1
+
+
+def test_the_land_is_made_a_part_at_a_time(qapp):
+    """All ~30 parts of the outlines made in one go were 10-40 ms of back-to-back Qt
+    calls as the Radio tab first opened, and a sound playing came up to 33 ms late (a
+    skip): the audio threads wait on the UI thread. One part a step now, with a rest
+    between, and the land shows once all of them are made."""
+    rings, _ = outlines()
+    m = FlatMap()
+    m.set_land(rings)
+    assert len(m._land_new) == 1 and not m._land_set and not m._land   # one at once
+    steps = []
+    real = m._land_step
+
+    def step():
+        before = len(m._land_new)
+        real()
+        steps.append(len(m._land_new) - before)
+    m._land_steps.timeout.disconnect()
+    m._land_steps.timeout.connect(step)
+    assert process_events(qapp, lambda: m._land_set, 5)
+    assert steps and max(steps) == 1 and len(m._land) == len(steps) + 1 > 10
+    assert m._land_steps.interval() == flatmap.STEP_GAP_MS
+    m.set_land([[(0, 0), (10, 0), (10, 10)]])   # a small one: done at once
+    assert m._land_set and len(m._land) == 1
 
 
 def test_the_map_looks_the_same_drawn_in_parts(qapp, monkeypatch):
@@ -377,6 +413,7 @@ def test_the_country_names_show_before_the_dots(qapp):
     m.set_points([{"id": f"s{i}", "la": 0.0, "lo": float(i), "k": i} for i in range(50)])
     assert m.revealing() and m._reveal_t0 is None   # no dots till the land is in
     m.set_land(rings, labels)
+    assert process_events(qapp, lambda: m._land_set, 5)   # (made a part a step)
     assert m._reveal_t0 > time.monotonic() + flatmap.NAMES_FIRST_S / 2
     end = time.monotonic() + 2
     while m._names_pic is None and time.monotonic() < end:   # (drawn a slice a paint)
