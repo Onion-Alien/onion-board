@@ -218,3 +218,10 @@ def test_settings_follows_the_download_and_a_fix(window, monkeypatch):  # noqa: 
     window.ffctl.on_answer(h, "")               # the fix worked
     assert d.ff_state.text() == "Working: version 9.0.1" and d.btn_ffmpeg.text() == "Reinstall"
     assert "ready" in d.ff_note.text() and "360p" not in d._save_video_hint.text()
+
+
+def test_updates_shows_ffmpeg_working_when_opened_first(window, monkeypatch):  # noqa: F811
+    from soundboard import ffmpegget
+    _ff(monkeypatch, ffmpegget.OK)
+    d = _data_page(window)   # straight to Updates: Data & quality never built
+    assert d.ff_state.text() == "Working: version 9.0.1" and d.btn_ffmpeg.text() == "Reinstall"
