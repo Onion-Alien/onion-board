@@ -135,6 +135,42 @@ def test_nested_update_hold_commits_geometry_before_resuming(qapp):
     root.deleteLater()
 
 
+class _Tall(QWidget):
+    """A page whose height follows its width, counting how often it's asked."""
+
+    def __init__(self, per_px: float):
+        super().__init__()
+        self.per_px, self.asked = per_px, 0
+
+    def hasHeightForWidth(self):
+        return True
+
+    def heightForWidth(self, w):
+        self.asked += 1
+        return int(w * self.per_px)
+
+
+def test_only_the_page_on_show_says_how_tall_it_is(qapp):
+    """Dragging the window's edge: Qt's stacks and tab widget ask every page how tall
+    it is at the new width, and the hidden tabs' wrapped text was laid out again on
+    every step (~10 frames a second on the Radio, Triggers and Voice tabs)."""
+    from soundboard.ui.panel import ShownStack
+    from soundboard.ui.sidebar import SideTabs
+    for make, add, show in ((ShownStack, ShownStack.addWidget, ShownStack.setCurrentWidget),
+                            (SideTabs, lambda t, p: t.addTab(p, ""), SideTabs.setCurrentWidget)):
+        holder = make()
+        shown, hidden = _Tall(0.5), _Tall(2.0)
+        add(holder, shown)
+        add(holder, hidden)
+        show(holder, shown)
+        shown.asked = hidden.asked = 0   # (Qt asks while they're added)
+        h = holder.heightForWidth(400)
+        assert hidden.asked == 0 and shown.asked == 1
+        assert 200 <= h < 800   # the shown page's height (and a tab widget's own frame)
+        show(holder, hidden)
+        assert holder.heightForWidth(400) > 2 * h   # the other page, once it shows
+
+
 def two_rows() -> tuple[QWidget, QPushButton, list[QPushButton]]:
     """A wide row (the part that decides the width) over a row of small buttons."""
     root = QWidget()

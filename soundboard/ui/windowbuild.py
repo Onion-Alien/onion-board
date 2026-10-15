@@ -28,7 +28,6 @@ from PySide6.QtWidgets import (
     QScrollArea,
     QSizePolicy,
     QSlider,
-    QStackedWidget,
     QVBoxLayout,
     QWidget,
 )
@@ -53,6 +52,7 @@ from soundboard.ui.panel import (
     CONTROL_H,
     EqPanel,
     Flow,
+    ShownStack,
     TileRow,
     VolumeControl,
     alt_tile,
@@ -243,7 +243,7 @@ class WindowBuilder(Controller):
         # page 0 the whole window, page 1 the mini player it turns into when it's
         # made too small to use (see _refit)
         mw = self.mw
-        mw._pages = QStackedWidget()
+        mw._pages = ShownStack()
         mw.setCentralWidget(mw._pages)
         root = mw._full = WindowRoot()
         root.setObjectName("root")   # the theme's window background (flat or the glow)
@@ -511,13 +511,13 @@ class WindowBuilder(Controller):
             rv.removeWidget(strip)
             av.addWidget(strip)
         av.addWidget(tabs_box, 1)
-        mw._content = QStackedWidget()
+        mw._content = ShownStack()
         mw._content.addWidget(area)
         rv.addWidget(mw._content, 1)
         mw.sounds_page = self._build_sounds_page()
         mw.tabs.addTab(mw.sounds_page, "")
         # the Radio tab, or the panel saying it's switched off (Settings > Privacy)
-        mw.radio_page = QStackedWidget()
+        mw.radio_page = ShownStack()
         mw.radio = mw._make_radio()
         mw.tabs.addTab(mw.radio_page, "")
         # the rest are made by _make_tab: each one or, switched off in Settings > Tabs,

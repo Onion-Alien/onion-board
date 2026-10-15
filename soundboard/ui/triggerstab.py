@@ -27,13 +27,13 @@ import threading
 
 from PySide6.QtCore import QEvent, Qt, QTimer, Signal
 from PySide6.QtWidgets import (QBoxLayout, QHBoxLayout, QLabel, QMessageBox, QProgressBar,
-                               QPushButton, QStackedWidget, QVBoxLayout, QWidget)
+                               QPushButton, QVBoxLayout, QWidget)
 
 from soundboard import modules, net, netlog, theme, updates, usage, watchaddon
 from soundboard.i18n import _, ngettext
 from soundboard.ui import art, busy, icons
 from soundboard.style.owl import OwlWidget
-from soundboard.ui.panel import Flow, HoverCard, hint_label
+from soundboard.ui.panel import Flow, HoverCard, ShownStack, hint_label
 from soundboard.ui.widgets import LoadingBar
 from soundboard import errors
 
@@ -104,7 +104,7 @@ class TriggersTab(QWidget):
 
         v = QVBoxLayout(self)
         v.setContentsMargins(0, 0, 0, 0)
-        self.stack = QStackedWidget()
+        self.stack = ShownStack()
         v.addWidget(self.stack)
         self._build_get_page()
         self.board_page = QWidget()

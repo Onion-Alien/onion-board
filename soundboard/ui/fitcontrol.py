@@ -146,15 +146,19 @@ class FitControl(Controller):
             narrow = mw.width() < 860   # two cards side by side get cramped below this
             # Translated controls can need more room than the fixed breakpoint.
             # Measure both Setup columns even while they are stacked, so growing
-            # the window brings them back only when neither will be clipped.
-            body = mw.setup_page.widget()
-            lay = body.layout() if body is not None else None
-            holder = mw._setup_cols.parentWidget()
-            assert lay is not None and holder is not None   # built in _build_setup_page
-            margins = lay.contentsMargins()
-            room = mw.setup_page.viewport().width() - margins.left() - margins.right()
-            available = min(room, holder.maximumWidth())
-            self._stack_cols[0](narrow or self._setup_need() > available)
+            # the window brings them back only when neither will be clipped. Only
+            # while Setup shows (or before its first fit): measuring its cards took
+            # ~1 ms of every resize step on the other tabs, and switching to it
+            # fits it again (_fit_setup_tab).
+            if mw._setup_stacked is None or mw.tabs.currentWidget() is mw.setup_page:
+                body = mw.setup_page.widget()
+                lay = body.layout() if body is not None else None
+                holder = mw._setup_cols.parentWidget()
+                assert lay is not None and holder is not None   # built in _build_setup_page
+                margins = lay.contentsMargins()
+                room = mw.setup_page.viewport().width() - margins.left() - margins.right()
+                available = min(room, holder.maximumWidth())
+                self._stack_cols[0](narrow or self._setup_need() > available)
             for apply in self._stack_cols[1:]:
                 apply(narrow)
             need = self._fit.fit(size)   # even the smallest layout won't fit
