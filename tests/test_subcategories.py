@@ -136,3 +136,23 @@ def test_deleting_a_category_takes_its_subcategories_with_it(window, monkeypatch
     w.catctl.delete_category("Memes")
     assert w.cfg.subcategories == {} and w.meta("s0").tags == []
     assert isinstance(w.meta("s0"), SoundMeta)
+
+
+def test_the_window_starts_on_a_category_with_subcategories(qapp, app_dir, monkeypatch):
+    """The category bar is built before the pads: starting on a tab with chips once tried
+    to line the toolbar up with a grid that wasn't there yet (2.1.0 start-up crash)."""
+    from soundboard import engine, winkeys
+    from soundboard.ui import mainwindow as main
+    for name in ("set_main_device", "set_mon_device", "set_mic_device"):
+        monkeypatch.setattr(engine.Engine, name, lambda self, n, _k=name: None)
+    monkeypatch.setattr(winkeys.Hotkeys, "register", lambda self, m: None)
+    Config.from_raw({"categories": ["Memes"], "category": "Memes",
+                     "subcategories": {"Memes": ["Vine"]}, "sounds": []}).save()
+    w = main.MainWindow()
+    try:
+        w.soundctl._load_thread.join(15)
+        assert w.catctl._sub_flow.count() > 0   # the chips are there
+    finally:
+        w.close()
+        w.soundctl._load_thread.join(15)
+        w.deleteLater()
