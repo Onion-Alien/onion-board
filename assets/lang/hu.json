@@ -3190,7 +3190,6 @@
   "Equalizer and volume": "Hangszínszabályzó és hangerő",
   "Live: click to mute": "Élő: kattints a némításhoz",
   "Muted: click to go live": "Némítva: kattints, hogy újra élő legyél",
-  "No sound": "Nincs hang",
   "Before update": "Frissítés előtt",
   "One is saved every time you reset something or update the app (the last {max_points} are kept). Restoring puts back your settings, hotkeys and sounds as they were. Sounds you've added since are kept.": "Minden alaphelyzetbe állításkor és az app minden frissítésekor készül egy (az utolsó {max_points} marad meg). A helyreállítás visszateszi a beállításaidat, gyorsbillentyűidet és hangjaidat, ahogy voltak. Az azóta hozzáadott hangok megmaradnak.",
   "Stops every sound, the radio and every program, and turns the voices off": "Minden hangot, a rádiót és minden programot leállít, és kikapcsolja a hangokat",
@@ -3424,10 +3423,7 @@
   "YouTube downloads still work, but with fewer formats.": "A YouTube-letöltések így is mennek, csak kevesebb formátummal.",
   "Is your headset on?": "Be van kapcsolva a headseted?",
   "Is your headset plugged in?": "Be van dugva a headseted?",
-  "No sound from your mic. Is your headset on?": "Nem jön hang a mikrofonodból. Be van kapcsolva a headseted?",
   "Unplugged": "Nincs csatlakoztatva",
-  "Windows can't find <b>{mic}</b> right now. Plug it in, or switch it on if it's wireless. This goes away by itself.": "A Windows most nem találja ezt: <b>{mic}</b>. Dugd be, vagy kapcsold be, ha vezeték nélküli. Ez magától eltűnik.",
-  "Your headset is off or its mic is muted. Turn it on or unmute it. Still nothing? Click <b>Repair</b>.": "A headseted ki van kapcsolva, vagy le van némítva a mikrofonja. Kapcsold be, vagy oldd fel a némítást. Még mindig semmi? Kattints a <b>Javítás</b> gombra.",
   "The download was cut off before the end. Try again.": "A letöltés a vége előtt megszakadt. Próbáld újra.",
   "You can change the proxy in Settings > Connection.": "A proxyt a Beállítások > Kapcsolat részben módosíthatod.",
   "the pack's file is damaged, so it wasn't kept": "a csomag fájlja sérült, ezért nem lett megtartva",
@@ -3449,5 +3445,7 @@
   "Add “{name}” to Favorites": "„{name}” hozzáadása a Kedvencekhez",
   "No favorites yet. Click the star in a voice's corner to keep it here.": "Még nincsenek kedvencek. Kattints a csillagra egy hang sarkában, és itt marad.",
   "Remove “{name}” from Favorites": "„{name}” eltávolítása a Kedvencekből",
-  "No voices of your own yet: press Make your own voice below.": "Még nincs saját hangod: nyomd meg lent a „Hozd ki a saját hangod” gombot."
+  "No voices of your own yet: press Make your own voice below.": "Még nincs saját hangod: nyomd meg lent a „Hozd ki a saját hangod” gombot.",
+  "Windows can't find <b>{mic}</b> right now. Plug it in, or switch it on if it's wireless. No mic at all? Use the <b>virtual cable</b> below: it works without one.": "A Windows most nem találja ezt: <b>{mic}</b>. Dugd be, vagy kapcsold be, ha vezeték nélküli. Egyáltalán nincs mikrofonod? Használd a lenti <b>virtuális kábelt</b>: mikrofon nélkül is működik.",
+  "Your mic sends no sound right now (switched off, muted or no mic plugged in), so others hear only your sounds. Want them to hear you too? Turn it on or unmute it.": "A mikrofonod most nem küld hangot (ki van kapcsolva, le van némítva, vagy nincs bedugva mikrofon), így mások csak a hangjaidat hallják. Szeretnéd, hogy téged is halljanak? Kapcsold be, vagy oldd fel a némítást."
 }

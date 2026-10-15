@@ -3190,7 +3190,6 @@
   "Equalizer and volume": "तुल्यकारक और वॉल्यूम",
   "Live: click to mute": "लाइव: म्यूट करने के लिए क्लिक करें",
   "Muted: click to go live": "म्यूट: लाइव होने के लिए क्लिक करें",
-  "No sound": "आवाज़ नहीं",
   "Before update": "अपडेट से पहले",
   "One is saved every time you reset something or update the app (the last {max_points} are kept). Restoring puts back your settings, hotkeys and sounds as they were. Sounds you've added since are kept.": "हर बार जब आप कुछ रीसेट करते हैं या ऐप अपडेट करते हैं तो एक सहेजा जाता है (अंतिम {max_points} रखे जाते हैं)। पुनर्स्थापित करने से आपकी सेटिंग्स, हॉटकीज़ और ध्वनियाँ वैसी ही वापस आ जाती हैं जैसी वे थीं। आपके द्वारा जोड़ी गई ध्वनियाँ रखी गई हैं।",
   "Stops every sound, the radio and every program, and turns the voices off": "हर साउंड, रेडियो और हर प्रोग्राम रोक देता है, और आवाज़ें बंद कर देता है",
@@ -3424,10 +3423,7 @@
   "YouTube downloads still work, but with fewer formats.": "YouTube डाउनलोड अब भी चलते हैं, पर कम फ़ॉर्मेट के साथ।",
   "Is your headset on?": "क्या आपका हेडसेट चालू है?",
   "Is your headset plugged in?": "क्या आपका हेडसेट लगा है?",
-  "No sound from your mic. Is your headset on?": "आपके माइक से कोई आवाज़ नहीं। क्या आपका हेडसेट चालू है?",
   "Unplugged": "प्लग नहीं है",
-  "Windows can't find <b>{mic}</b> right now. Plug it in, or switch it on if it's wireless. This goes away by itself.": "Windows को अभी <b>{mic}</b> नहीं मिल रहा। उसे लगाएँ, या वायरलेस हो तो चालू करें। यह अपने आप हट जाएगा।",
-  "Your headset is off or its mic is muted. Turn it on or unmute it. Still nothing? Click <b>Repair</b>.": "आपका हेडसेट बंद है या उसका माइक म्यूट है। उसे चालू करें या अनम्यूट करें। फिर भी कुछ नहीं? <b>ठीक करें</b> पर क्लिक करें।",
   "The download was cut off before the end. Try again.": "डाउनलोड पूरा होने से पहले ही कट गया। फिर से कोशिश करें।",
   "You can change the proxy in Settings > Connection.": "आप प्रॉक्सी को सेटिंग्स > कनेक्शन में बदल सकते हैं।",
   "the pack's file is damaged, so it wasn't kept": "पैक की फ़ाइल खराब है, इसलिए उसे नहीं रखा गया",
@@ -3449,5 +3445,7 @@
   "Add “{name}” to Favorites": "“{name}” को पसंदीदा में जोड़ें",
   "No favorites yet. Click the star in a voice's corner to keep it here.": "अभी कोई पसंदीदा नहीं। किसी आवाज़ के कोने वाले तारे पर क्लिक करें, वह यहाँ रहेगी।",
   "Remove “{name}” from Favorites": "“{name}” को पसंदीदा से हटाएँ",
-  "No voices of your own yet: press Make your own voice below.": "अभी आपकी अपनी कोई आवाज़ नहीं: नीचे “अपनी आवाज खुद बनाओ” दबाएँ।"
+  "No voices of your own yet: press Make your own voice below.": "अभी आपकी अपनी कोई आवाज़ नहीं: नीचे “अपनी आवाज खुद बनाओ” दबाएँ।",
+  "Windows can't find <b>{mic}</b> right now. Plug it in, or switch it on if it's wireless. No mic at all? Use the <b>virtual cable</b> below: it works without one.": "Windows को अभी <b>{mic}</b> नहीं मिल रहा। उसे लगाएँ, या वायरलेस हो तो चालू करें। माइक है ही नहीं? नीचे दी गई <b>वर्चुअल केबल</b> इस्तेमाल करें: यह बिना माइक के भी चलती है।",
+  "Your mic sends no sound right now (switched off, muted or no mic plugged in), so others hear only your sounds. Want them to hear you too? Turn it on or unmute it.": "आपका माइक अभी कोई आवाज़ नहीं भेज रहा (बंद है, म्यूट है या कोई माइक लगा नहीं है), इसलिए दूसरों को सिर्फ़ आपकी साउंड सुनाई देती हैं। चाहते हैं कि वे आपको भी सुनें? उसे चालू करें या अनम्यूट करें।"
 }

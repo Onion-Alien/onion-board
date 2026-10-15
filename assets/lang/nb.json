@@ -3190,7 +3190,6 @@
   "Equalizer and volume": "Equalizer og volum",
   "Live: click to mute": "Live: klikk for å dempe",
   "Muted: click to go live": "Dempet: klikk for å gå live",
-  "No sound": "Ingen lyd",
   "Before update": "Før oppdatering",
   "One is saved every time you reset something or update the app (the last {max_points} are kept). Restoring puts back your settings, hotkeys and sounds as they were. Sounds you've added since are kept.": "Et lagres hver gang du tilbakestiller noe eller oppdaterer appen (de siste {max_points} beholdes). Gjenoppretting setter tilbake innstillingene, hurtigtastene og lydene dine slik de var. Lyder du har lagt til siden, beholdes.",
   "Stops every sound, the radio and every program, and turns the voices off": "Stopper alle lyder, radioen og alle programmer og slår av stemmene",
@@ -3424,10 +3423,7 @@
   "YouTube downloads still work, but with fewer formats.": "YouTube-nedlastinger virker fortsatt, men med færre formater.",
   "Is your headset on?": "Er headsettet på?",
   "Is your headset plugged in?": "Er headsettet koblet til?",
-  "No sound from your mic. Is your headset on?": "Ingen lyd fra mikrofonen din. Er headsettet på?",
   "Unplugged": "Ikke tilkoblet",
-  "Windows can't find <b>{mic}</b> right now. Plug it in, or switch it on if it's wireless. This goes away by itself.": "Windows finner ikke <b>{mic}</b> akkurat nå. Koble det til, eller slå det på hvis det er trådløst. Dette forsvinner av seg selv.",
-  "Your headset is off or its mic is muted. Turn it on or unmute it. Still nothing? Click <b>Repair</b>.": "Headsettet er slått av, eller mikrofonen er dempet. Slå det på, eller slå på lyden. Fortsatt ingenting? Klikk <b>Reparer</b>.",
   "The download was cut off before the end. Try again.": "Nedlastingen ble avbrutt før slutten. Prøv igjen.",
   "You can change the proxy in Settings > Connection.": "Du kan endre proxyen i Innstillinger > Tilkobling.",
   "the pack's file is damaged, so it wasn't kept": "pakkens fil er skadet, så den ble ikke beholdt",
@@ -3449,5 +3445,7 @@
   "Add “{name}” to Favorites": "Legg «{name}» til i Favoritter",
   "No favorites yet. Click the star in a voice's corner to keep it here.": "Ingen favoritter ennå. Klikk stjernen i hjørnet av en stemme for å ha den her.",
   "Remove “{name}” from Favorites": "Fjern «{name}» fra Favoritter",
-  "No voices of your own yet: press Make your own voice below.": "Ingen egne stemmer ennå: trykk på «Lag din egen stemme» nedenfor."
+  "No voices of your own yet: press Make your own voice below.": "Ingen egne stemmer ennå: trykk på «Lag din egen stemme» nedenfor.",
+  "Windows can't find <b>{mic}</b> right now. Plug it in, or switch it on if it's wireless. No mic at all? Use the <b>virtual cable</b> below: it works without one.": "Windows finner ikke <b>{mic}</b> akkurat nå. Koble det til, eller slå det på hvis det er trådløst. Ingen mikrofon i det hele tatt? Bruk den <b>virtuelle kabelen</b> nedenfor: den virker uten.",
+  "Your mic sends no sound right now (switched off, muted or no mic plugged in), so others hear only your sounds. Want them to hear you too? Turn it on or unmute it.": "Mikrofonen din sender ingen lyd akkurat nå (av, dempet eller ingen mikrofon koblet til), så andre hører bare lydene dine. Vil du at de skal høre deg også? Slå den på eller slå av dempingen."
 }

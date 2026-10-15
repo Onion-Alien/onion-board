@@ -3190,7 +3190,6 @@
   "Equalizer and volume": "Ekolayzer ve ses seviyesi",
   "Live: click to mute": "Canlı: sessize almak için tıkla",
   "Muted: click to go live": "Sessiz: canlıya geçmek için tıkla",
-  "No sound": "Ses yok",
   "Before update": "Güncellemeden önce",
   "One is saved every time you reset something or update the app (the last {max_points} are kept). Restoring puts back your settings, hotkeys and sounds as they were. Sounds you've added since are kept.": "Bir şeyi her sıfırladığınızda veya uygulamayı her güncellediğinizde bir tanesi kaydedilir (son {max_points} saklanır). Geri yükleme, ayarlarınızı, kısayol tuşlarınızı ve seslerinizi olduğu gibi geri yükler. O zamandan beri eklediğiniz sesler tutulur.",
   "Stops every sound, the radio and every program, and turns the voices off": "Her sesi, radyoyu ve her programı durdurur ve sesleri kapatır",
@@ -3424,10 +3423,7 @@
   "YouTube downloads still work, but with fewer formats.": "YouTube indirmeleri yine çalışır ama daha az biçimle.",
   "Is your headset on?": "Kulaklığın açık mı?",
   "Is your headset plugged in?": "Kulaklığın takılı mı?",
-  "No sound from your mic. Is your headset on?": "Mikrofonundan ses gelmiyor. Kulaklığın açık mı?",
   "Unplugged": "Takılı değil",
-  "Windows can't find <b>{mic}</b> right now. Plug it in, or switch it on if it's wireless. This goes away by itself.": "Windows şu an <b>{mic}</b> cihazını bulamıyor. Tak ya da kablosuzsa aç. Bu kendiliğinden kaybolur.",
-  "Your headset is off or its mic is muted. Turn it on or unmute it. Still nothing? Click <b>Repair</b>.": "Kulaklığın kapalı ya da mikrofonu sessizde. Kulaklığı aç ya da mikrofonun sesini aç. Hâlâ bir şey yok mu? <b>Onar</b>'a tıkla.",
   "The download was cut off before the end. Try again.": "İndirme bitmeden kesildi. Tekrar deneyin.",
   "You can change the proxy in Settings > Connection.": "Proxy'yi Ayarlar > Bağlantı bölümünden değiştirebilirsiniz.",
   "the pack's file is damaged, so it wasn't kept": "paketin dosyası bozuk, bu yüzden saklanmadı",
@@ -3449,5 +3445,7 @@
   "Add “{name}” to Favorites": "“{name}” sesini Favorilere ekle",
   "No favorites yet. Click the star in a voice's corner to keep it here.": "Henüz favori yok. Bir sesin köşesindeki yıldıza tıkla, burada dursun.",
   "Remove “{name}” from Favorites": "“{name}” sesini Favorilerden çıkar",
-  "No voices of your own yet: press Make your own voice below.": "Henüz kendi sesin yok: aşağıdaki “Kendi sesini yap” düğmesine bas."
+  "No voices of your own yet: press Make your own voice below.": "Henüz kendi sesin yok: aşağıdaki “Kendi sesini yap” düğmesine bas.",
+  "Windows can't find <b>{mic}</b> right now. Plug it in, or switch it on if it's wireless. No mic at all? Use the <b>virtual cable</b> below: it works without one.": "Windows şu an <b>{mic}</b> cihazını bulamıyor. Tak ya da kablosuzsa aç. Hiç mikrofonun yok mu? Aşağıdaki <b>sanal kabloyu</b> kullan: mikrofonsuz da çalışır.",
+  "Your mic sends no sound right now (switched off, muted or no mic plugged in), so others hear only your sounds. Want them to hear you too? Turn it on or unmute it.": "Mikrofonun şu an hiç ses göndermiyor (kapalı, sessizde ya da takılı mikrofon yok), bu yüzden diğerleri yalnızca seslerini duyuyor. Seni de duysunlar mı? Aç ya da sesini aç."
 }

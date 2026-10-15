@@ -3117,7 +3117,6 @@
   "Equalizer and volume": "Penyama dan kelantangan",
   "Live: click to mute": "Langsung: klik untuk bisukan",
   "Muted: click to go live": "Dibisukan: klik untuk langsung semula",
-  "No sound": "Tiada bunyi",
   "Before update": "Sebelum kemas kini",
   "One is saved every time you reset something or update the app (the last {max_points} are kept). Restoring puts back your settings, hotkeys and sounds as they were. Sounds you've added since are kept.": "Satu disimpan setiap kali anda menetapkan semula sesuatu atau mengemas kini apl ({max_points} terakhir dikekalkan). Memulihkan mengembalikan tetapan, hotkey dan bunyi anda seperti dahulu. Bunyi yang anda tambah sejak itu dikekalkan.",
   "Stops every sound, the radio and every program, and turns the voices off": "Menghentikan setiap bunyi, radio dan setiap program, dan mematikan suara",
@@ -3348,10 +3347,7 @@
   "YouTube downloads still work, but with fewer formats.": "Muat turun YouTube masih berfungsi, tetapi dengan kurang format.",
   "Is your headset on?": "Adakah set kepala anda dihidupkan?",
   "Is your headset plugged in?": "Adakah set kepala anda dipasang?",
-  "No sound from your mic. Is your headset on?": "Tiada bunyi daripada mikrofon anda. Adakah set kepala anda dihidupkan?",
   "Unplugged": "Tidak disambung",
-  "Windows can't find <b>{mic}</b> right now. Plug it in, or switch it on if it's wireless. This goes away by itself.": "Windows tidak menjumpai <b>{mic}</b> sekarang. Pasangkannya, atau hidupkannya jika ia tanpa wayar. Ini hilang dengan sendirinya.",
-  "Your headset is off or its mic is muted. Turn it on or unmute it. Still nothing? Click <b>Repair</b>.": "Set kepala anda dimatikan atau mikrofonnya diredamkan. Hidupkannya atau nyahredamkannya. Masih tiada? Klik <b>Baiki</b>.",
   "The download was cut off before the end. Try again.": "Muat turun terputus sebelum selesai. Cuba lagi.",
   "You can change the proxy in Settings > Connection.": "Anda boleh menukar proksi dalam Tetapan > Sambungan.",
   "the pack's file is damaged, so it wasn't kept": "fail pek rosak, jadi ia tidak disimpan",
@@ -3373,5 +3369,7 @@
   "Add “{name}” to Favorites": "Tambah “{name}” ke Kegemaran",
   "No favorites yet. Click the star in a voice's corner to keep it here.": "Belum ada kegemaran. Klik bintang di penjuru suara untuk menyimpannya di sini.",
   "Remove “{name}” from Favorites": "Buang “{name}” dari Kegemaran",
-  "No voices of your own yet: press Make your own voice below.": "Belum ada suara sendiri: tekan “Buat suara sendiri” di bawah."
+  "No voices of your own yet: press Make your own voice below.": "Belum ada suara sendiri: tekan “Buat suara sendiri” di bawah.",
+  "Windows can't find <b>{mic}</b> right now. Plug it in, or switch it on if it's wireless. No mic at all? Use the <b>virtual cable</b> below: it works without one.": "Windows tidak menjumpai <b>{mic}</b> sekarang. Pasangkannya, atau hidupkannya jika ia tanpa wayar. Tiada mikrofon langsung? Gunakan <b>kabel maya</b> di bawah: ia berfungsi tanpa mikrofon.",
+  "Your mic sends no sound right now (switched off, muted or no mic plugged in), so others hear only your sounds. Want them to hear you too? Turn it on or unmute it.": "Mikrofon anda tidak menghantar bunyi sekarang (dimatikan, diredamkan atau tiada mikrofon dipasang), jadi orang lain hanya mendengar bunyi anda. Mahu mereka dengar anda juga? Hidupkannya atau nyahredamkannya."
 }

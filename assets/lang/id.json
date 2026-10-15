@@ -3117,7 +3117,6 @@
   "Equalizer and volume": "Equaliser dan volume",
   "Live: click to mute": "Live: klik untuk membisukan",
   "Muted: click to go live": "Dibisukan: klik untuk live lagi",
-  "No sound": "Tidak ada suara",
   "Before update": "Sebelum pembaruan",
   "One is saved every time you reset something or update the app (the last {max_points} are kept). Restoring puts back your settings, hotkeys and sounds as they were. Sounds you've added since are kept.": "Satu disimpan setiap kali Anda menyetel ulang sesuatu atau memperbarui aplikasi ({max_points} terakhir disimpan). Memulihkan akan mengembalikan pengaturan, tombol pintas, dan suara Anda seperti semula. Suara yang Anda tambahkan sejak itu disimpan.",
   "Stops every sound, the radio and every program, and turns the voices off": "Menghentikan semua suara, radio, dan semua program, lalu mematikan suara-suara pengubah",
@@ -3348,10 +3347,7 @@
   "YouTube downloads still work, but with fewer formats.": "Unduhan YouTube tetap jalan, tapi dengan format lebih sedikit.",
   "Is your headset on?": "Apakah headset-mu menyala?",
   "Is your headset plugged in?": "Apakah headset-mu tersambung?",
-  "No sound from your mic. Is your headset on?": "Tidak ada suara dari mic-mu. Apakah headset-mu menyala?",
   "Unplugged": "Tidak tersambung",
-  "Windows can't find <b>{mic}</b> right now. Plug it in, or switch it on if it's wireless. This goes away by itself.": "Windows tidak menemukan <b>{mic}</b> sekarang. Sambungkan, atau nyalakan kalau nirkabel. Ini hilang sendiri.",
-  "Your headset is off or its mic is muted. Turn it on or unmute it. Still nothing? Click <b>Repair</b>.": "Headset-mu mati atau mic-nya di-mute. Nyalakan atau aktifkan lagi mic-nya. Masih tidak ada? Klik <b>Perbaiki</b>.",
   "The download was cut off before the end. Try again.": "Unduhan terputus sebelum selesai. Coba lagi.",
   "You can change the proxy in Settings > Connection.": "Kamu bisa mengganti proxy di Pengaturan > Koneksi.",
   "the pack's file is damaged, so it wasn't kept": "file paket rusak, jadi tidak disimpan",
@@ -3373,5 +3369,7 @@
   "Add “{name}” to Favorites": "Tambahkan “{name}” ke Favorit",
   "No favorites yet. Click the star in a voice's corner to keep it here.": "Belum ada favorit. Klik bintang di pojok suara untuk menyimpannya di sini.",
   "Remove “{name}” from Favorites": "Hapus “{name}” dari Favorit",
-  "No voices of your own yet: press Make your own voice below.": "Belum ada suaramu sendiri: tekan “Ciptakan suaramu sendiri” di bawah."
+  "No voices of your own yet: press Make your own voice below.": "Belum ada suaramu sendiri: tekan “Ciptakan suaramu sendiri” di bawah.",
+  "Windows can't find <b>{mic}</b> right now. Plug it in, or switch it on if it's wireless. No mic at all? Use the <b>virtual cable</b> below: it works without one.": "Windows tidak menemukan <b>{mic}</b> sekarang. Sambungkan, atau nyalakan kalau nirkabel. Tidak punya mik sama sekali? Pakai <b>kabel virtual</b> di bawah: bisa tanpa mik.",
+  "Your mic sends no sound right now (switched off, muted or no mic plugged in), so others hear only your sounds. Want them to hear you too? Turn it on or unmute it.": "Mik kamu tidak mengirim suara sekarang (mati, dibisukan, atau tidak ada mik yang terpasang), jadi orang lain hanya mendengar suara-suaramu. Mau mereka juga mendengarmu? Nyalakan atau aktifkan suaranya."
 }

@@ -3263,7 +3263,6 @@
   "Equalizer and volume": "Эквалайзер и громкость",
   "Live: click to mute": "В эфире: нажмите, чтобы выключить звук",
   "Muted: click to go live": "Без звука: нажмите, чтобы выйти в эфир",
-  "No sound": "Нет звука",
   "Before update": "До обновления",
   "One is saved every time you reset something or update the app (the last {max_points} are kept). Restoring puts back your settings, hotkeys and sounds as they were. Sounds you've added since are kept.": "Она сохраняется при каждом сбросе и каждом обновлении приложения (хранятся последние {max_points}). Восстановление возвращает настройки, горячие клавиши и звуки как были. Звуки, добавленные после, остаются.",
   "Stops every sound, the radio and every program, and turns the voices off": "Останавливает все звуки, радио и все программы и выключает голоса",
@@ -3500,10 +3499,7 @@
   "YouTube downloads still work, but with fewer formats.": "Загрузки с YouTube всё равно работают, но форматов меньше.",
   "Is your headset on?": "Гарнитура включена?",
   "Is your headset plugged in?": "Гарнитура подключена?",
-  "No sound from your mic. Is your headset on?": "С микрофона нет звука. Гарнитура включена?",
   "Unplugged": "Отключён",
-  "Windows can't find <b>{mic}</b> right now. Plug it in, or switch it on if it's wireless. This goes away by itself.": "Windows сейчас не видит <b>{mic}</b>. Подключи его или включи, если он беспроводной. Это пропадёт само.",
-  "Your headset is off or its mic is muted. Turn it on or unmute it. Still nothing? Click <b>Repair</b>.": "Гарнитура выключена или её микрофон отключён. Включи её или микрофон. Всё ещё ничего? Нажми <b>Починить</b>.",
   "The download was cut off before the end. Try again.": "Загрузка оборвалась, не дойдя до конца. Попробуйте ещё раз.",
   "You can change the proxy in Settings > Connection.": "Прокси можно изменить в разделе «Настройки» > «Подключение».",
   "the pack's file is damaged, so it wasn't kept": "файл пакета повреждён, поэтому он не сохранён",
@@ -3525,5 +3521,7 @@
   "Add “{name}” to Favorites": "Добавить «{name}» в Избранное",
   "No favorites yet. Click the star in a voice's corner to keep it here.": "В избранном пока пусто. Нажми звёздочку в углу голоса, чтобы он был здесь.",
   "Remove “{name}” from Favorites": "Убрать «{name}» из Избранного",
-  "No voices of your own yet: press Make your own voice below.": "Своих голосов пока нет: нажми «Сделайте свой собственный голос» ниже."
+  "No voices of your own yet: press Make your own voice below.": "Своих голосов пока нет: нажми «Сделайте свой собственный голос» ниже.",
+  "Windows can't find <b>{mic}</b> right now. Plug it in, or switch it on if it's wireless. No mic at all? Use the <b>virtual cable</b> below: it works without one.": "Windows сейчас не видит <b>{mic}</b>. Подключи его или включи, если он беспроводной. Микрофона нет совсем? Используй <b>виртуальный кабель</b> ниже: он работает и без микрофона.",
+  "Your mic sends no sound right now (switched off, muted or no mic plugged in), so others hear only your sounds. Want them to hear you too? Turn it on or unmute it.": "Твой микрофон сейчас не передаёт звук (выключен, заглушён или не подключён), поэтому другие слышат только твои звуки. Хочешь, чтобы слышали и тебя? Включи его или сними заглушку."
 }

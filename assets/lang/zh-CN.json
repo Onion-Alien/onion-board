@@ -3117,7 +3117,6 @@
   "Equalizer and volume": "均衡器和音量",
   "Live: click to mute": "直播中：点击静音",
   "Muted: click to go live": "已静音：点击恢复直播",
-  "No sound": "没有声音",
   "Before update": "更新前",
   "One is saved every time you reset something or update the app (the last {max_points} are kept). Restoring puts back your settings, hotkeys and sounds as they were. Sounds you've added since are kept.": "每次重置东西或更新应用时都会保存一个（保留最近 {max_points} 个）。还原会把你的设置、快捷键和音效恢复原样。之后添加的音效会保留。",
   "Stops every sound, the radio and every program, and turns the voices off": "停止所有音效、电台和所有程序，并关闭变声",
@@ -3348,10 +3347,7 @@
   "YouTube downloads still work, but with fewer formats.": "YouTube 下载仍然可用，但格式会少一些。",
   "Is your headset on?": "耳机开着吗？",
   "Is your headset plugged in?": "耳机插好了吗？",
-  "No sound from your mic. Is your headset on?": "麦克风没有声音。耳机开着吗？",
   "Unplugged": "未连接",
-  "Windows can't find <b>{mic}</b> right now. Plug it in, or switch it on if it's wireless. This goes away by itself.": "Windows 现在找不到 <b>{mic}</b>。请插上，如果是无线的就打开它。这条提示会自己消失。",
-  "Your headset is off or its mic is muted. Turn it on or unmute it. Still nothing? Click <b>Repair</b>.": "耳机关着，或者麦克风静音了。请打开耳机或取消静音。还是没声音？点 <b>修复</b>。",
   "The download was cut off before the end. Try again.": "下载在完成前中断了。请重试。",
   "You can change the proxy in Settings > Connection.": "你可以在“设置”>“连接”中更改代理。",
   "the pack's file is damaged, so it wasn't kept": "包文件已损坏，因此未保留",
@@ -3373,5 +3369,7 @@
   "Add “{name}” to Favorites": "把“{name}”加入收藏夹",
   "No favorites yet. Click the star in a voice's corner to keep it here.": "还没有收藏。点声音卡角上的星星，它就会出现在这里。",
   "Remove “{name}” from Favorites": "把“{name}”移出收藏夹",
-  "No voices of your own yet: press Make your own voice below.": "还没有你自己的声音：按下方的“发出自己的声音”。"
+  "No voices of your own yet: press Make your own voice below.": "还没有你自己的声音：按下方的“发出自己的声音”。",
+  "Windows can't find <b>{mic}</b> right now. Plug it in, or switch it on if it's wireless. No mic at all? Use the <b>virtual cable</b> below: it works without one.": "Windows 现在找不到 <b>{mic}</b>。请插上，如果是无线的就打开它。根本没有麦克风？用下面的<b>虚拟音频线</b>：没有麦克风也能用。",
+  "Your mic sends no sound right now (switched off, muted or no mic plugged in), so others hear only your sounds. Want them to hear you too? Turn it on or unmute it.": "你的麦克风现在没有发出任何声音（已关闭、已静音或没插麦克风），所以别人只听得到你的音效。想让他们也听到你？打开它或取消静音。"
 }

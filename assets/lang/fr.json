@@ -3190,7 +3190,6 @@
   "Equalizer and volume": "Égaliseur et volume",
   "Live: click to mute": "En direct : cliquez pour couper le son",
   "Muted: click to go live": "Muet : cliquez pour repasser en direct",
-  "No sound": "Pas de son",
   "Before update": "Avant la mise à jour",
   "One is saved every time you reset something or update the app (the last {max_points} are kept). Restoring puts back your settings, hotkeys and sounds as they were. Sounds you've added since are kept.": "Un est enregistré chaque fois que tu réinitialises quelque chose ou mets l'app à jour (les {max_points} derniers sont gardés). Restaurer remet tes paramètres, raccourcis et sons comme ils étaient. Les sons ajoutés depuis sont gardés.",
   "Stops every sound, the radio and every program, and turns the voices off": "Arrête chaque son, la radio et chaque programme, et coupe les voix",
@@ -3424,10 +3423,7 @@
   "YouTube downloads still work, but with fewer formats.": "Les téléchargements YouTube marchent toujours, mais avec moins de formats.",
   "Is your headset on?": "Ton casque est-il allumé ?",
   "Is your headset plugged in?": "Ton casque est-il branché ?",
-  "No sound from your mic. Is your headset on?": "Aucun son de ton micro. Ton casque est-il allumé ?",
   "Unplugged": "Débranché",
-  "Windows can't find <b>{mic}</b> right now. Plug it in, or switch it on if it's wireless. This goes away by itself.": "Windows ne trouve pas <b>{mic}</b> pour l'instant. Branche-le, ou allume-le s'il est sans fil. Ce message part tout seul.",
-  "Your headset is off or its mic is muted. Turn it on or unmute it. Still nothing? Click <b>Repair</b>.": "Ton casque est éteint ou son micro est coupé. Allume-le ou réactive le micro. Toujours rien ? Clique sur <b>Réparer</b>.",
   "The download was cut off before the end. Try again.": "Le téléchargement a été interrompu avant la fin. Réessayez.",
   "You can change the proxy in Settings > Connection.": "Vous pouvez changer le proxy dans Paramètres > Connexion.",
   "the pack's file is damaged, so it wasn't kept": "le fichier du pack est endommagé, il n'a donc pas été gardé",
@@ -3449,5 +3445,7 @@
   "Add “{name}” to Favorites": "Ajouter « {name} » aux Favoris",
   "No favorites yet. Click the star in a voice's corner to keep it here.": "Pas encore de favoris. Clique sur l'étoile dans le coin d'une voix pour la garder ici.",
   "Remove “{name}” from Favorites": "Retirer « {name} » des Favoris",
-  "No voices of your own yet: press Make your own voice below.": "Pas encore de voix à toi : appuie sur « Faites votre propre voix » en dessous."
+  "No voices of your own yet: press Make your own voice below.": "Pas encore de voix à toi : appuie sur « Faites votre propre voix » en dessous.",
+  "Windows can't find <b>{mic}</b> right now. Plug it in, or switch it on if it's wireless. No mic at all? Use the <b>virtual cable</b> below: it works without one.": "Windows ne trouve pas <b>{mic}</b> pour l'instant. Branche-le, ou allume-le s'il est sans fil. Pas de micro du tout ? Utilise le <b>câble virtuel</b> ci-dessous : il marche sans micro.",
+  "Your mic sends no sound right now (switched off, muted or no mic plugged in), so others hear only your sounds. Want them to hear you too? Turn it on or unmute it.": "Ton micro n'envoie aucun son pour l'instant (éteint, coupé ou aucun micro branché), donc les autres n'entendent que tes sons. Tu veux qu'ils t'entendent aussi ? Allume-le ou réactive-le."
 }

@@ -3190,7 +3190,6 @@
   "Equalizer and volume": "Taajuuskorjain ja äänenvoimakkuus",
   "Live: click to mute": "Live: mykistä napsauttamalla",
   "Muted: click to go live": "Mykistetty: palaa liveen napsauttamalla",
-  "No sound": "Ei ääntä",
   "Before update": "Ennen päivitystä",
   "One is saved every time you reset something or update the app (the last {max_points} are kept). Restoring puts back your settings, hotkeys and sounds as they were. Sounds you've added since are kept.": "Sellainen tallennetaan aina, kun nollaat jotain tai päivität sovelluksen (viimeiset {max_points} säilytetään). Palautus laittaa asetuksesi, pikanäppäimesi ja äänesi takaisin ennalleen. Sen jälkeen lisäämäsi äänet säilyvät.",
   "Stops every sound, the radio and every program, and turns the voices off": "Pysäyttää kaikki äänet, radion ja kaikki ohjelmat ja sammuttaa äänimuuntimet",
@@ -3424,10 +3423,7 @@
   "YouTube downloads still work, but with fewer formats.": "YouTube-lataukset toimivat yhä, mutta vähemmillä muodoilla.",
   "Is your headset on?": "Ovatko kuulokkeesi päällä?",
   "Is your headset plugged in?": "Ovatko kuulokkeesi kiinni?",
-  "No sound from your mic. Is your headset on?": "Mikistäsi ei tule ääntä. Ovatko kuulokkeesi päällä?",
   "Unplugged": "Irrotettu",
-  "Windows can't find <b>{mic}</b> right now. Plug it in, or switch it on if it's wireless. This goes away by itself.": "Windows ei löydä laitetta <b>{mic}</b> juuri nyt. Kytke se kiinni, tai laita se päälle, jos se on langaton. Tämä katoaa itsestään.",
-  "Your headset is off or its mic is muted. Turn it on or unmute it. Still nothing? Click <b>Repair</b>.": "Kuulokkeesi ovat pois päältä tai niiden mikki on mykistetty. Laita ne päälle tai poista mykistys. Vieläkään ei mitään? Klikkaa <b>Korjaa</b>.",
   "The download was cut off before the end. Try again.": "Lataus katkesi ennen loppua. Yritä uudelleen.",
   "You can change the proxy in Settings > Connection.": "Voit vaihtaa välityspalvelimen kohdassa Asetukset > Yhteys.",
   "the pack's file is damaged, so it wasn't kept": "paketin tiedosto on vioittunut, joten sitä ei säilytetty",
@@ -3449,5 +3445,7 @@
   "Add “{name}” to Favorites": "Lisää ”{name}” Suosikkeihin",
   "No favorites yet. Click the star in a voice's corner to keep it here.": "Ei vielä suosikkeja. Klikkaa tähteä äänen kulmassa, niin se pysyy täällä.",
   "Remove “{name}” from Favorites": "Poista ”{name}” Suosikeista",
-  "No voices of your own yet: press Make your own voice below.": "Ei vielä omia ääniä: paina alta ”Tee oma äänesi”."
+  "No voices of your own yet: press Make your own voice below.": "Ei vielä omia ääniä: paina alta ”Tee oma äänesi”.",
+  "Windows can't find <b>{mic}</b> right now. Plug it in, or switch it on if it's wireless. No mic at all? Use the <b>virtual cable</b> below: it works without one.": "Windows ei löydä laitetta <b>{mic}</b> juuri nyt. Kytke se kiinni, tai laita se päälle, jos se on langaton. Eikö mikkiä ole ollenkaan? Käytä alla olevaa <b>virtuaalikaapelia</b>: se toimii ilman mikkiä.",
+  "Your mic sends no sound right now (switched off, muted or no mic plugged in), so others hear only your sounds. Want them to hear you too? Turn it on or unmute it.": "Mikkisi ei lähetä ääntä juuri nyt (pois päältä, mykistetty tai mikkiä ei ole kytketty), joten muut kuulevat vain äänesi. Haluatko, että sinutkin kuullaan? Laita se päälle tai poista mykistys."
 }

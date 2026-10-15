@@ -3190,7 +3190,6 @@
   "Equalizer and volume": "Equalizador e volume",
   "Live: click to mute": "Ao vivo: clique para silenciar",
   "Muted: click to go live": "Silenciado: clique para entrar ao vivo",
-  "No sound": "Sem som",
   "Before update": "Antes de atualizar",
   "One is saved every time you reset something or update the app (the last {max_points} are kept). Restoring puts back your settings, hotkeys and sounds as they were. Sounds you've added since are kept.": "Um é salvo toda vez que você redefine algo ou atualiza o app (os últimos {max_points} ficam guardados). Restaurar devolve suas configurações, atalhos e sons como estavam. Sons que você adicionou depois são mantidos.",
   "Stops every sound, the radio and every program, and turns the voices off": "Para todos os sons, a rádio e todos os programas, e desliga as vozes",
@@ -3424,10 +3423,7 @@
   "YouTube downloads still work, but with fewer formats.": "Os downloads do YouTube ainda funcionam, mas com menos formatos.",
   "Is your headset on?": "Seu headset está ligado?",
   "Is your headset plugged in?": "Seu headset está conectado?",
-  "No sound from your mic. Is your headset on?": "Nenhum som do seu microfone. Seu headset está ligado?",
   "Unplugged": "Desconectado",
-  "Windows can't find <b>{mic}</b> right now. Plug it in, or switch it on if it's wireless. This goes away by itself.": "O Windows não encontra <b>{mic}</b> agora. Conecte, ou ligue se for sem fio. Isso some sozinho.",
-  "Your headset is off or its mic is muted. Turn it on or unmute it. Still nothing? Click <b>Repair</b>.": "Seu headset está desligado ou com o microfone no mudo. Ligue-o ou tire do mudo. Ainda nada? Clique em <b>Consertar</b>.",
   "The download was cut off before the end. Try again.": "O download foi interrompido antes do fim. Tente de novo.",
   "You can change the proxy in Settings > Connection.": "Você pode trocar o proxy em Configurações > Conexão.",
   "the pack's file is damaged, so it wasn't kept": "o arquivo do pacote está danificado, então não foi mantido",
@@ -3449,5 +3445,7 @@
   "Add “{name}” to Favorites": "Adicionar “{name}” aos Favoritos",
   "No favorites yet. Click the star in a voice's corner to keep it here.": "Nenhum favorito ainda. Clique na estrela no canto de uma voz para guardá-la aqui.",
   "Remove “{name}” from Favorites": "Tirar “{name}” dos Favoritos",
-  "No voices of your own yet: press Make your own voice below.": "Você ainda não tem vozes próprias: clique em “Faça sua própria voz” abaixo."
+  "No voices of your own yet: press Make your own voice below.": "Você ainda não tem vozes próprias: clique em “Faça sua própria voz” abaixo.",
+  "Windows can't find <b>{mic}</b> right now. Plug it in, or switch it on if it's wireless. No mic at all? Use the <b>virtual cable</b> below: it works without one.": "O Windows não encontra <b>{mic}</b> agora. Conecte, ou ligue se for sem fio. Não tem microfone nenhum? Use o <b>cabo virtual</b> abaixo: ele funciona sem microfone.",
+  "Your mic sends no sound right now (switched off, muted or no mic plugged in), so others hear only your sounds. Want them to hear you too? Turn it on or unmute it.": "Seu microfone não está mandando som agora (desligado, mudo ou nenhum microfone conectado), então os outros ouvem só os seus sons. Quer que ouçam você também? Ligue ou tire do mudo."
 }

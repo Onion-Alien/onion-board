@@ -3117,7 +3117,6 @@
   "Equalizer and volume": "Bộ chỉnh hóa và âm lượng",
   "Live: click to mute": "Trực tiếp: bấm để tắt tiếng",
   "Muted: click to go live": "Đã tắt tiếng: bấm để phát trực tiếp",
-  "No sound": "Không có tiếng",
   "Before update": "Trước khi cập nhật",
   "One is saved every time you reset something or update the app (the last {max_points} are kept). Restoring puts back your settings, hotkeys and sounds as they were. Sounds you've added since are kept.": "Một điểm sẽ được lưu mỗi khi bạn đặt lại thứ gì đó hoặc cập nhật ứng dụng ({max_points} cuối cùng được giữ lại). Việc khôi phục sẽ đưa các cài đặt, phím nóng và âm thanh của bạn trở lại như cũ. Âm thanh bạn đã thêm vào sẽ được giữ lại.",
   "Stops every sound, the radio and every program, and turns the voices off": "Dừng mọi âm thanh, radio và mọi chương trình, rồi tắt các giọng",
@@ -3348,10 +3347,7 @@
   "YouTube downloads still work, but with fewer formats.": "Tải từ YouTube vẫn được, nhưng ít định dạng hơn.",
   "Is your headset on?": "Tai nghe của bạn đã bật chưa?",
   "Is your headset plugged in?": "Tai nghe của bạn đã cắm chưa?",
-  "No sound from your mic. Is your headset on?": "Không có tiếng từ mic của bạn. Tai nghe của bạn đã bật chưa?",
   "Unplugged": "Chưa cắm",
-  "Windows can't find <b>{mic}</b> right now. Plug it in, or switch it on if it's wireless. This goes away by itself.": "Windows hiện không tìm thấy <b>{mic}</b>. Hãy cắm vào, hoặc bật lên nếu là loại không dây. Thông báo này tự biến mất.",
-  "Your headset is off or its mic is muted. Turn it on or unmute it. Still nothing? Click <b>Repair</b>.": "Tai nghe của bạn đang tắt hoặc mic đang tắt tiếng. Hãy bật tai nghe hoặc bật lại tiếng mic. Vẫn không có gì? Bấm <b>Sửa</b>.",
   "The download was cut off before the end. Try again.": "Tải xuống bị ngắt trước khi xong. Hãy thử lại.",
   "You can change the proxy in Settings > Connection.": "Bạn có thể đổi proxy trong Cài đặt > Kết nối.",
   "the pack's file is damaged, so it wasn't kept": "tệp của gói bị hỏng nên không được giữ lại",
@@ -3373,5 +3369,7 @@
   "Add “{name}” to Favorites": "Thêm “{name}” vào Yêu thích",
   "No favorites yet. Click the star in a voice's corner to keep it here.": "Chưa có giọng yêu thích. Bấm ngôi sao ở góc một giọng để giữ nó ở đây.",
   "Remove “{name}” from Favorites": "Bỏ “{name}” khỏi Yêu thích",
-  "No voices of your own yet: press Make your own voice below.": "Chưa có giọng của riêng bạn: bấm “Tạo giọng nói của riêng bạn” bên dưới."
+  "No voices of your own yet: press Make your own voice below.": "Chưa có giọng của riêng bạn: bấm “Tạo giọng nói của riêng bạn” bên dưới.",
+  "Windows can't find <b>{mic}</b> right now. Plug it in, or switch it on if it's wireless. No mic at all? Use the <b>virtual cable</b> below: it works without one.": "Windows hiện không tìm thấy <b>{mic}</b>. Hãy cắm vào, hoặc bật lên nếu là loại không dây. Không có mic nào cả? Dùng <b>cáp ảo</b> bên dưới: nó chạy được mà không cần mic.",
+  "Your mic sends no sound right now (switched off, muted or no mic plugged in), so others hear only your sounds. Want them to hear you too? Turn it on or unmute it.": "Mic của bạn hiện không gửi âm thanh (đang tắt, đang tắt tiếng hoặc chưa cắm mic), nên người khác chỉ nghe thấy âm thanh của bạn. Muốn họ nghe cả giọng bạn? Bật mic lên hoặc bỏ tắt tiếng."
 }

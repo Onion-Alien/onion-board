@@ -3190,7 +3190,6 @@
   "Equalizer and volume": "Equalizer at volume",
   "Live: click to mute": "Live: i-click para i-mute",
   "Muted: click to go live": "Naka-mute: i-click para mag-live",
-  "No sound": "Walang tunog",
   "Before update": "Bago mag-update",
   "One is saved every time you reset something or update the app (the last {max_points} are kept). Restoring puts back your settings, hotkeys and sounds as they were. Sounds you've added since are kept.": "May isang sine-save tuwing may nire-reset ka o ina-update mo ang app (itinatago ang huling {max_points}). Ibinabalik ng pag-restore ang settings, hotkeys at sounds mo gaya ng dati. Hindi gagalawin ang mga sound na idinagdag mo mula noon.",
   "Stops every sound, the radio and every program, and turns the voices off": "Itinitigil ang bawat sound, ang radio at bawat program, at pinapatay ang mga boses",
@@ -3424,10 +3423,7 @@
   "YouTube downloads still work, but with fewer formats.": "Gumagana pa rin ang mga YouTube download, pero mas kaunti ang format.",
   "Is your headset on?": "Naka-on ba ang headset mo?",
   "Is your headset plugged in?": "Nakasaksak ba ang headset mo?",
-  "No sound from your mic. Is your headset on?": "Walang tunog mula sa mic mo. Naka-on ba ang headset mo?",
   "Unplugged": "Hindi nakasaksak",
-  "Windows can't find <b>{mic}</b> right now. Plug it in, or switch it on if it's wireless. This goes away by itself.": "Hindi mahanap ng Windows ang <b>{mic}</b> ngayon. Isaksak ito, o i-on kung wireless ito. Kusa itong mawawala.",
-  "Your headset is off or its mic is muted. Turn it on or unmute it. Still nothing? Click <b>Repair</b>.": "Naka-off ang headset mo o naka-mute ang mic nito. I-on ito o i-unmute. Wala pa rin? I-click ang <b>I-repair</b>.",
   "The download was cut off before the end. Try again.": "Naputol ang download bago matapos. Subukan ulit.",
   "You can change the proxy in Settings > Connection.": "Mapapalitan mo ang proxy sa Mga Setting > Koneksyon.",
   "the pack's file is damaged, so it wasn't kept": "sira ang file ng pack, kaya hindi ito itinago",
@@ -3449,5 +3445,7 @@
   "Add “{name}” to Favorites": "Idagdag ang “{name}” sa Mga paborito",
   "No favorites yet. Click the star in a voice's corner to keep it here.": "Wala pang paborito. I-click ang bituin sa sulok ng isang boses para itago ito rito.",
   "Remove “{name}” from Favorites": "Alisin ang “{name}” sa Mga paborito",
-  "No voices of your own yet: press Make your own voice below.": "Wala ka pang sariling boses: pindutin ang “Gumawa ng sarili mong boses” sa ibaba."
+  "No voices of your own yet: press Make your own voice below.": "Wala ka pang sariling boses: pindutin ang “Gumawa ng sarili mong boses” sa ibaba.",
+  "Windows can't find <b>{mic}</b> right now. Plug it in, or switch it on if it's wireless. No mic at all? Use the <b>virtual cable</b> below: it works without one.": "Hindi mahanap ng Windows ang <b>{mic}</b> ngayon. Isaksak ito, o i-on kung wireless ito. Walang mic talaga? Gamitin ang <b>virtual cable</b> sa ibaba: gumagana ito kahit walang mic.",
+  "Your mic sends no sound right now (switched off, muted or no mic plugged in), so others hear only your sounds. Want them to hear you too? Turn it on or unmute it.": "Walang tunog na pinapadala ang mic mo ngayon (naka-off, naka-mute o walang mic na nakasaksak), kaya mga sound mo lang ang naririnig ng iba. Gusto mong marinig ka rin nila? I-on ito o i-unmute."
 }

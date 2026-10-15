@@ -3190,7 +3190,6 @@
   "Equalizer and volume": "Еквалайзер и сила на звука",
   "Live: click to mute": "На живо: щракнете за заглушаване",
   "Muted: click to go live": "Заглушено: щракнете, за да сте на живо",
-  "No sound": "Няма звук",
   "Before update": "Преди обновяването",
   "One is saved every time you reset something or update the app (the last {max_points} are kept). Restoring puts back your settings, hotkeys and sounds as they were. Sounds you've added since are kept.": "Запазва се по една всеки път, когато нулираш нещо или обновиш приложението (пазят се последните {max_points}). Възстановяването връща настройките, бързите клавиши и звуците ти, както са били. Звуците, които си добавил оттогава, се пазят.",
   "Stops every sound, the radio and every program, and turns the voices off": "Спира всеки звук, радиото и всяка програма и изключва гласовете",
@@ -3424,10 +3423,7 @@
   "YouTube downloads still work, but with fewer formats.": "Изтеглянията от YouTube пак работят, но с по-малко формати.",
   "Is your headset on?": "Слушалките пуснати ли са?",
   "Is your headset plugged in?": "Слушалките включени ли са?",
-  "No sound from your mic. Is your headset on?": "Няма звук от микрофона ти. Слушалките пуснати ли са?",
   "Unplugged": "Изключен",
-  "Windows can't find <b>{mic}</b> right now. Plug it in, or switch it on if it's wireless. This goes away by itself.": "Windows не намира <b>{mic}</b> в момента. Включи го в компютъра или го пусни, ако е безжичен. Това изчезва само.",
-  "Your headset is off or its mic is muted. Turn it on or unmute it. Still nothing? Click <b>Repair</b>.": "Слушалките са изключени или микрофонът им е заглушен. Пусни ги или махни заглушаването. Пак нищо? Кликни <b>Поправи</b>.",
   "The download was cut off before the end. Try again.": "Изтеглянето прекъсна преди края. Опитайте отново.",
   "You can change the proxy in Settings > Connection.": "Можете да смените проксито в Настройки > Връзка.",
   "the pack's file is damaged, so it wasn't kept": "файлът на пакета е повреден, затова не е запазен",
@@ -3449,5 +3445,7 @@
   "Add “{name}” to Favorites": "Добави „{name}“ в Любими",
   "No favorites yet. Click the star in a voice's corner to keep it here.": "Още няма любими. Натисни звездата в ъгъла на глас, за да го държиш тук.",
   "Remove “{name}” from Favorites": "Махни „{name}“ от Любими",
-  "No voices of your own yet: press Make your own voice below.": "Още нямаш свои гласове: натисни „Направете своя собствен глас“ отдолу."
+  "No voices of your own yet: press Make your own voice below.": "Още нямаш свои гласове: натисни „Направете своя собствен глас“ отдолу.",
+  "Windows can't find <b>{mic}</b> right now. Plug it in, or switch it on if it's wireless. No mic at all? Use the <b>virtual cable</b> below: it works without one.": "Windows не намира <b>{mic}</b> в момента. Включи го в компютъра или го пусни, ако е безжичен. Нямаш микрофон изобщо? Ползвай <b>виртуалния кабел</b> по-долу: работи и без микрофон.",
+  "Your mic sends no sound right now (switched off, muted or no mic plugged in), so others hear only your sounds. Want them to hear you too? Turn it on or unmute it.": "Микрофонът ти не праща звук в момента (изключен, заглушен или не е включен микрофон), затова другите чуват само звуците ти. Искаш да чуват и теб? Включи го или махни заглушаването."
 }

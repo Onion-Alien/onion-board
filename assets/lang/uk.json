@@ -3263,7 +3263,6 @@
   "Equalizer and volume": "Еквалайзер і гучність",
   "Live: click to mute": "В ефірі: натисніть, щоб вимкнути звук",
   "Muted: click to go live": "Без звуку: натисніть, щоб вийти в ефір",
-  "No sound": "Немає звуку",
   "Before update": "Перед оновленням",
   "One is saved every time you reset something or update the app (the last {max_points} are kept). Restoring puts back your settings, hotkeys and sounds as they were. Sounds you've added since are kept.": "Один зберігається щоразу, коли ви щось скидаєте або оновлюєте застосунок (останні {max_points} зберігаються). Відновлення повертає ваші налаштування, гарячі клавіші та звуки, як вони були. Звуки, які ви додали після того, зберігаються.",
   "Stops every sound, the radio and every program, and turns the voices off": "Зупиняє всі звуки, радіо й усі програми та вимикає голоси",
@@ -3500,10 +3499,7 @@
   "YouTube downloads still work, but with fewer formats.": "Завантаження з YouTube все одно працюють, але форматів менше.",
   "Is your headset on?": "Гарнітуру увімкнено?",
   "Is your headset plugged in?": "Гарнітуру під'єднано?",
-  "No sound from your mic. Is your headset on?": "З мікрофона немає звуку. Гарнітуру увімкнено?",
   "Unplugged": "Від'єднано",
-  "Windows can't find <b>{mic}</b> right now. Plug it in, or switch it on if it's wireless. This goes away by itself.": "Windows зараз не бачить <b>{mic}</b>. Під'єднай його або увімкни, якщо він бездротовий. Це зникне само.",
-  "Your headset is off or its mic is muted. Turn it on or unmute it. Still nothing? Click <b>Repair</b>.": "Гарнітуру вимкнено, або її мікрофон вимкнено. Увімкни її або мікрофон. Досі нічого? Натисни <b>Полагодити</b>.",
   "The download was cut off before the end. Try again.": "Завантаження обірвалося до кінця. Спробуйте ще раз.",
   "You can change the proxy in Settings > Connection.": "Проксі можна змінити в меню «Налаштування» > «З’єднання».",
   "the pack's file is damaged, so it wasn't kept": "файл пакета пошкоджено, тому його не збережено",
@@ -3525,5 +3521,7 @@
   "Add “{name}” to Favorites": "Додати «{name}» до Вибраного",
   "No favorites yet. Click the star in a voice's corner to keep it here.": "У вибраному поки порожньо. Натисни зірочку в куті голосу, щоб він був тут.",
   "Remove “{name}” from Favorites": "Прибрати «{name}» з Вибраного",
-  "No voices of your own yet: press Make your own voice below.": "Власних голосів поки немає: натисни «Зробіть свій власний голос» нижче."
+  "No voices of your own yet: press Make your own voice below.": "Власних голосів поки немає: натисни «Зробіть свій власний голос» нижче.",
+  "Windows can't find <b>{mic}</b> right now. Plug it in, or switch it on if it's wireless. No mic at all? Use the <b>virtual cable</b> below: it works without one.": "Windows зараз не бачить <b>{mic}</b>. Під'єднай його або увімкни, якщо він бездротовий. Мікрофона немає взагалі? Скористайся <b>віртуальним кабелем</b> нижче: він працює і без мікрофона.",
+  "Your mic sends no sound right now (switched off, muted or no mic plugged in), so others hear only your sounds. Want them to hear you too? Turn it on or unmute it.": "Твій мікрофон зараз не передає звуку (вимкнений, заглушений або не під'єднаний), тож інші чують лише твої звуки. Хочеш, щоб чули й тебе? Увімкни його або зніми заглушення."
 }

@@ -3190,7 +3190,6 @@
   "Equalizer and volume": "Equalizer und Lautstärke",
   "Live: click to mute": "Live: Klicken zum Stummschalten",
   "Muted: click to go live": "Stumm: Klicken, um live zu gehen",
-  "No sound": "Kein Ton",
   "Before update": "Vor dem Update",
   "One is saved every time you reset something or update the app (the last {max_points} are kept). Restoring puts back your settings, hotkeys and sounds as they were. Sounds you've added since are kept.": "Bei jedem Zurücksetzen und jedem Update der App wird einer gespeichert (die letzten {max_points} bleiben erhalten). Wiederherstellen bringt deine Einstellungen, Hotkeys und Sounds zurück, wie sie waren. Sounds, die du seitdem hinzugefügt hast, bleiben.",
   "Stops every sound, the radio and every program, and turns the voices off": "Stoppt jeden Sound, das Radio und jedes Programm und schaltet die Stimmen aus",
@@ -3424,10 +3423,7 @@
   "YouTube downloads still work, but with fewer formats.": "YouTube-Downloads gehen trotzdem, aber mit weniger Formaten.",
   "Is your headset on?": "Ist dein Headset an?",
   "Is your headset plugged in?": "Ist dein Headset eingesteckt?",
-  "No sound from your mic. Is your headset on?": "Kein Ton von deinem Mikro. Ist dein Headset an?",
   "Unplugged": "Nicht angeschlossen",
-  "Windows can't find <b>{mic}</b> right now. Plug it in, or switch it on if it's wireless. This goes away by itself.": "Windows findet <b>{mic}</b> gerade nicht. Steck es ein, oder schalte es ein, wenn es kabellos ist. Das geht von selbst weg.",
-  "Your headset is off or its mic is muted. Turn it on or unmute it. Still nothing? Click <b>Repair</b>.": "Dein Headset ist aus oder sein Mikro stummgeschaltet. Schalte es ein oder heb die Stummschaltung auf. Immer noch nichts? Klick <b>Reparieren</b>.",
   "The download was cut off before the end. Try again.": "Der Download wurde vor dem Ende abgebrochen. Versuche es noch einmal.",
   "You can change the proxy in Settings > Connection.": "Den Proxy kannst du unter Einstellungen > Verbindung ändern.",
   "the pack's file is damaged, so it wasn't kept": "die Datei des Pakets ist beschädigt, daher wurde sie nicht aufbewahrt",
@@ -3449,5 +3445,7 @@
   "Add “{name}” to Favorites": "„{name}“ zu Favoriten hinzufügen",
   "No favorites yet. Click the star in a voice's corner to keep it here.": "Noch keine Favoriten. Klick auf den Stern in der Ecke einer Stimme, um sie hier zu behalten.",
   "Remove “{name}” from Favorites": "„{name}“ aus Favoriten entfernen",
-  "No voices of your own yet: press Make your own voice below.": "Noch keine eigenen Stimmen: Drück unten auf „Machen Sie Ihre eigene Stimme“."
+  "No voices of your own yet: press Make your own voice below.": "Noch keine eigenen Stimmen: Drück unten auf „Machen Sie Ihre eigene Stimme“.",
+  "Windows can't find <b>{mic}</b> right now. Plug it in, or switch it on if it's wireless. No mic at all? Use the <b>virtual cable</b> below: it works without one.": "Windows findet <b>{mic}</b> gerade nicht. Steck es ein, oder schalte es ein, wenn es kabellos ist. Gar kein Mikro? Nimm das <b>virtuelle Kabel</b> unten: Es geht auch ohne.",
+  "Your mic sends no sound right now (switched off, muted or no mic plugged in), so others hear only your sounds. Want them to hear you too? Turn it on or unmute it.": "Dein Mikro sendet gerade keinen Ton (aus, stummgeschaltet oder kein Mikro eingesteckt), deshalb hören andere nur deine Sounds. Sie sollen dich auch hören? Schalte es ein oder heb die Stummschaltung auf."
 }

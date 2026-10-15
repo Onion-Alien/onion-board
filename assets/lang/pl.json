@@ -3263,7 +3263,6 @@
   "Equalizer and volume": "Korektor i głośność",
   "Live: click to mute": "Na żywo: kliknij, aby wyciszyć",
   "Muted: click to go live": "Wyciszono: kliknij, aby wrócić na żywo",
-  "No sound": "Brak dźwięku",
   "Before update": "Przed aktualizacją",
   "One is saved every time you reset something or update the app (the last {max_points} are kept). Restoring puts back your settings, hotkeys and sounds as they were. Sounds you've added since are kept.": "Jeden jest zapisywany za każdym razem, gdy coś resetujesz lub aktualizujesz aplikację (ostatnie {max_points} zostają zachowane). Przywracanie przywraca ustawienia, klawisze skrótów i dźwięki do stanu poprzedniego. Dźwięki dodane od tego czasu zostaną zachowane.",
   "Stops every sound, the radio and every program, and turns the voices off": "Zatrzymuje wszystkie dźwięki, radio i każdy program oraz wyłącza głosy",
@@ -3500,10 +3499,7 @@
   "YouTube downloads still work, but with fewer formats.": "Pobieranie z YouTube nadal działa, ale z mniejszą liczbą formatów.",
   "Is your headset on?": "Czy słuchawki są włączone?",
   "Is your headset plugged in?": "Czy słuchawki są podłączone?",
-  "No sound from your mic. Is your headset on?": "Brak dźwięku z mikrofonu. Czy słuchawki są włączone?",
   "Unplugged": "Odłączony",
-  "Windows can't find <b>{mic}</b> right now. Plug it in, or switch it on if it's wireless. This goes away by itself.": "Windows nie widzi teraz urządzenia <b>{mic}</b>. Podłącz je albo włącz, jeśli jest bezprzewodowe. To zniknie samo.",
-  "Your headset is off or its mic is muted. Turn it on or unmute it. Still nothing? Click <b>Repair</b>.": "Słuchawki są wyłączone albo ich mikrofon jest wyciszony. Włącz je albo wyłącz wyciszenie. Dalej nic? Kliknij <b>Napraw</b>.",
   "The download was cut off before the end. Try again.": "Pobieranie zostało przerwane przed końcem. Spróbuj ponownie.",
   "You can change the proxy in Settings > Connection.": "Proxy możesz zmienić w Ustawieniach > Połączenie.",
   "the pack's file is damaged, so it wasn't kept": "plik pakietu jest uszkodzony, więc nie został zachowany",
@@ -3525,5 +3521,7 @@
   "Add “{name}” to Favorites": "Dodaj „{name}” do Ulubionych",
   "No favorites yet. Click the star in a voice's corner to keep it here.": "Brak ulubionych. Kliknij gwiazdkę w rogu głosu, żeby był tutaj.",
   "Remove “{name}” from Favorites": "Usuń „{name}” z Ulubionych",
-  "No voices of your own yet: press Make your own voice below.": "Nie masz jeszcze własnych głosów: naciśnij „Stwórz własny głos” poniżej."
+  "No voices of your own yet: press Make your own voice below.": "Nie masz jeszcze własnych głosów: naciśnij „Stwórz własny głos” poniżej.",
+  "Windows can't find <b>{mic}</b> right now. Plug it in, or switch it on if it's wireless. No mic at all? Use the <b>virtual cable</b> below: it works without one.": "Windows nie widzi teraz urządzenia <b>{mic}</b>. Podłącz je albo włącz, jeśli jest bezprzewodowe. Nie masz w ogóle mikrofonu? Użyj <b>wirtualnego kabla</b> poniżej: działa bez niego.",
+  "Your mic sends no sound right now (switched off, muted or no mic plugged in), so others hear only your sounds. Want them to hear you too? Turn it on or unmute it.": "Twój mikrofon nie wysyła teraz dźwięku (wyłączony, wyciszony albo nie podłączono mikrofonu), więc inni słyszą tylko twoje dźwięki. Chcesz, żeby słyszeli też ciebie? Włącz go albo wyłącz wyciszenie."
 }
