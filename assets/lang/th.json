@@ -3362,7 +3362,10 @@
   "Unplugged": "ไม่ได้เสียบ",
   "Windows can't find <b>{mic}</b> right now. Plug it in, or switch it on if it's wireless. This goes away by itself.": "ตอนนี้ Windows หา <b>{mic}</b> ไม่เจอ เสียบมัน หรือเปิดมันถ้าเป็นแบบไร้สาย ข้อความนี้จะหายไปเอง",
   "Your headset is off or its mic is muted. Turn it on or unmute it. Still nothing? Click <b>Repair</b>.": "หูฟังปิดอยู่ หรือไมค์ของหูฟังปิดเสียงอยู่ เปิดหูฟังหรือเปิดเสียงไมค์ ยังไม่มีเสียงอีกหรือ คลิก <b>ซ่อม</b>",
+  "Heads up: while Onion Board is open, {key} plays your hotkey instead of doing its usual job in other apps.": "โปรดทราบ: ขณะที่ Onion Board เปิดอยู่ {key} จะเล่นปุ่มลัดของคุณแทนการทำงานปกติในแอปอื่น",
+  "Windows keeps {key} for itself and never passes it to an app, so that hotkey could never play: pick another key.": "Windows เก็บ {key} ไว้ใช้เองและไม่ส่งต่อให้แอปใดเลย ปุ่มลัดนี้จึงไม่มีวันเล่นเสียง: เลือกปุ่มอื่น",
+  "{key} is your Stop everything key, so it stays on that. Pick another key, or give Stop everything a new one in Settings → Hotkeys first.": "{key} เป็นปุ่ม หยุดทุกอย่าง ของคุณ จึงยังคงอยู่ที่เดิม เลือกปุ่มอื่น หรือตั้งปุ่มใหม่ให้ หยุดทุกอย่าง ก่อนใน การตั้งค่า → ปุ่มลัด",
+  "the pack's file is damaged, so it wasn't kept": "ไฟล์ของแพ็คเสียหาย จึงไม่ได้เก็บไว้",
   "The download was cut off before the end. Try again.": "การดาวน์โหลดถูกตัดก่อนเสร็จ ลองอีกครั้ง",
-  "You can change the proxy in Settings > Connection.": "คุณเปลี่ยนพร็อกซีได้ในการตั้งค่า > การเชื่อมต่อ",
-  "the pack's file is damaged, so it wasn't kept": "ไฟล์ของแพ็คเสียหาย จึงไม่ได้เก็บไว้"
+  "You can change the proxy in Settings > Connection.": "คุณเปลี่ยนพร็อกซีได้ในการตั้งค่า > การเชื่อมต่อ"
 }

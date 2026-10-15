@@ -3438,7 +3438,10 @@
   "Unplugged": "Ikke tilsluttet",
   "Windows can't find <b>{mic}</b> right now. Plug it in, or switch it on if it's wireless. This goes away by itself.": "Windows kan ikke finde <b>{mic}</b> lige nu. Sæt det i, eller tænd det, hvis det er trådløst. Det her forsvinder af sig selv.",
   "Your headset is off or its mic is muted. Turn it on or unmute it. Still nothing? Click <b>Repair</b>.": "Dit headset er slukket, eller dets mikrofon er slået fra. Tænd det, eller slå mikrofonen til. Stadig intet? Klik <b>Reparér</b>.",
+  "Heads up: while Onion Board is open, {key} plays your hotkey instead of doing its usual job in other apps.": "Bemærk: mens Onion Board er åben, spiller {key} din genvejstast i stedet for at gøre sit sædvanlige arbejde i andre apps.",
+  "Windows keeps {key} for itself and never passes it to an app, so that hotkey could never play: pick another key.": "Windows beholder {key} selv og giver den aldrig videre til en app, så den genvejstast ville aldrig spille: vælg en anden tast.",
+  "{key} is your Stop everything key, so it stays on that. Pick another key, or give Stop everything a new one in Settings → Hotkeys first.": "{key} er din tast til Stop alt, så den bliver der. Vælg en anden tast, eller giv først Stop alt en ny under Indstillinger → Genvejstaster.",
+  "the pack's file is damaged, so it wasn't kept": "pakkens fil er beskadiget, så den blev ikke gemt",
   "The download was cut off before the end. Try again.": "Downloadet blev afbrudt før slutningen. Prøv igen.",
-  "You can change the proxy in Settings > Connection.": "Du kan ændre proxyen i Indstillinger > Forbindelse.",
-  "the pack's file is damaged, so it wasn't kept": "pakkens fil er beskadiget, så den blev ikke gemt"
+  "You can change the proxy in Settings > Connection.": "Du kan ændre proxyen i Indstillinger > Forbindelse."
 }

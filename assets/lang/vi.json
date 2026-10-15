@@ -3362,7 +3362,10 @@
   "Unplugged": "Chưa cắm",
   "Windows can't find <b>{mic}</b> right now. Plug it in, or switch it on if it's wireless. This goes away by itself.": "Windows hiện không tìm thấy <b>{mic}</b>. Hãy cắm vào, hoặc bật lên nếu là loại không dây. Thông báo này tự biến mất.",
   "Your headset is off or its mic is muted. Turn it on or unmute it. Still nothing? Click <b>Repair</b>.": "Tai nghe của bạn đang tắt hoặc mic đang tắt tiếng. Hãy bật tai nghe hoặc bật lại tiếng mic. Vẫn không có gì? Bấm <b>Sửa</b>.",
+  "Heads up: while Onion Board is open, {key} plays your hotkey instead of doing its usual job in other apps.": "Lưu ý: khi Onion Board đang mở, {key} sẽ phát phím tắt của bạn thay vì làm việc thường lệ trong các ứng dụng khác.",
+  "Windows keeps {key} for itself and never passes it to an app, so that hotkey could never play: pick another key.": "Windows giữ {key} cho riêng mình và không bao giờ chuyển cho ứng dụng nào, nên phím tắt đó sẽ không bao giờ phát: hãy chọn phím khác.",
+  "{key} is your Stop everything key, so it stays on that. Pick another key, or give Stop everything a new one in Settings → Hotkeys first.": "{key} là phím Dừng mọi thứ của bạn, nên nó vẫn giữ ở đó. Hãy chọn phím khác, hoặc đặt phím mới cho Dừng mọi thứ trước trong Cài đặt → Phím tắt.",
+  "the pack's file is damaged, so it wasn't kept": "tệp của gói bị hỏng nên không được giữ lại",
   "The download was cut off before the end. Try again.": "Tải xuống bị ngắt trước khi xong. Hãy thử lại.",
-  "You can change the proxy in Settings > Connection.": "Bạn có thể đổi proxy trong Cài đặt > Kết nối.",
-  "the pack's file is damaged, so it wasn't kept": "tệp của gói bị hỏng nên không được giữ lại"
+  "You can change the proxy in Settings > Connection.": "Bạn có thể đổi proxy trong Cài đặt > Kết nối."
 }
