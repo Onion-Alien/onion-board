@@ -62,7 +62,7 @@ class DeviceControl(Controller):
         for the button that asked ("✓ Found 7 devices", "No cable yet", …).
         Runs on the UI thread: the app's own recoveries use _refresh_off_ui."""
         mw = self.mw
-        mw.engine.shutdown()
+        mw.engine.close_streams()
         rescanned = eng.rescan()
         mw._vb_setup = None     # installed or removed since: look again
         self._init_devices()
@@ -107,7 +107,7 @@ class DeviceControl(Controller):
             if then is not None:
                 then(msg)
 
-        self._off_ui(lambda: (e.shutdown(), eng.rescan())[1], scanned)
+        self._off_ui(lambda: (e.close_streams(), eng.rescan())[1], scanned)
 
     def _when_devices_free(self, start):
         """start() on the UI thread once it holds the device thread's claim: a
