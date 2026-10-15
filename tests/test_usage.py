@@ -1081,3 +1081,29 @@ def test_ffmpeg_recovery_doesnt_track_while_the_count_is_off(sent, monkeypatch, 
     usage.ffmpeg_state(cfg, "ok")
     usage.remember(cfg)
     assert not cfg.stats_ffmpeg_failed and not cfg.stats_used
+
+
+def test_packs_settings_pages_and_ytdlp_buttons_count_by_fixed_names():
+    """Free packs by their built-in id (a newer one is "other"), Settings' pages by
+    their key, yt-dlp's buttons by their job: every name is in FEATURES."""
+    from soundboard import packs, ytdl
+    from soundboard.ui.settingspages import connection
+    ids = {p.id for p in packs.built_in()}
+    assert ids and ids <= set(usage.PACKS)
+    assert {usage.pack_tag(i) for i in ids} == ids
+    assert usage.pack_tag("someone-elses-pack") == "other"
+    assert {f"pack-added-{k}" for k in usage.PACKS} <= set(usage.FEATURES)
+    for job in (ytdl.update, ytdl.reset, ytdl.force_newest):
+        assert connection.YTDLP_COUNTS[job.__name__] in usage.FEATURES
+    assert {f"settings-page-{k}" for k in usage.SETTINGS_PAGES} <= set(usage.FEATURES)
+
+
+def test_settings_pages_match_the_dialog():
+    """A page added to Settings needs its name in SETTINGS_PAGES, or it's never counted."""
+    import re
+    from pathlib import Path
+    src = (Path(usage.__file__).parent / "settings.py").read_text(encoding="utf-8")
+    start = src.index("        pages = ((")
+    block = src[start:src.index("        self.categories = QListWidget()", start)]
+    keys = set(re.findall(r'\("([a-z]+)", _\(', block))
+    assert keys == set(usage.SETTINGS_PAGES)

@@ -8,11 +8,15 @@ from PySide6.QtWidgets import (QCheckBox, QComboBox, QHBoxLayout, QLabel, QPushB
                                QWidget)
 from shiboken6 import isValid as qt_valid
 
-from soundboard import errors, theme, ytdl
+from soundboard import errors, theme, usage, ytdl
 from soundboard.i18n import _
 from soundboard.ui import busy
 from soundboard.ui.settingspages import Page
 from soundboard.wheelguard import no_wheel
+
+# the yt-dlp buttons' jobs (ytdl.update, reset, force_newest) as the count's names
+YTDLP_COUNTS = {"update": "ytdlp-update", "reset": "ytdlp-reinstall",
+                "force_newest": "ytdlp-force"}
 
 
 class _Relay(QObject):
@@ -467,6 +471,7 @@ class ConnectionPage(Page):
                      if button else "You asked to update the downloader")
         for b in buttons:
             busy.set_busy(b, True)
+        usage.used(YTDLP_COUNTS.get(getattr(job, "__name__", ""), "ytdlp-update"))
         self._ytdlp_say(_("Working…"))
         relay = _Relay(self.mw)   # outlives this window if it's closed meanwhile
 
@@ -485,6 +490,7 @@ class ConnectionPage(Page):
             try:
                 msg = job()
             except Exception as e:  # noqa: BLE001 - offline, PyPI down…
+                usage.used("ytdlp-failed")   # the name only, never the error
                 msg = _("Couldn't update: {error}.", error=errors.plain(e))
             relay.done.emit(msg)
         threading.Thread(target=run, daemon=True, name="ytdlp-settings").start()

@@ -262,10 +262,14 @@ class SettingsDialog(QDialog, Built):
         Offline mode's Privacy page) opens the advanced rows too."""
         if i > self._adv_row and not self._advanced:
             self._set_advanced(True)
+        if 0 <= i < len(self._page_keys):
+            usage.used(f"settings-page-{self._page_keys[i]}")   # the page's name only
         self.categories.setCurrentRow(i)
 
     def _set_advanced(self, on: bool):
         self._advanced = on
+        if on:
+            usage.used("settings-advanced")
         if getattr(self.mw.cfg, "settings_advanced", None) != on:
             self.mw.set_option("settings_advanced", on)
         if not on and self.tabs.currentIndex() > self._adv_row:

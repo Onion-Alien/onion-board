@@ -15,7 +15,7 @@ from PySide6.QtGui import (QActionGroup, QColor, QIcon, QKeySequence, QPainter, 
 from PySide6.QtWidgets import (QApplication, QColorDialog, QFrame, QHBoxLayout, QInputDialog,
                                QLabel, QMenu, QPushButton, QWidget)
 
-from soundboard import library
+from soundboard import library, usage
 from soundboard.library import MAX_FADE_S, PAD_COLORS, SoundMeta
 from soundboard.ui import icons
 from soundboard.ui.widgets import DropdownMenu
@@ -82,6 +82,7 @@ def fill_colour_menu(menu: QMenu, current: str | None, pick, none: bool = False)
                                   menu.parentWidget() or QApplication.activeWindow(),
                                   _("Pick a colour"))
         if c.isValid():
+            usage.used("custom-colour")
             pick(c.name())
     menu.addAction(icons.icon("palette"), _("Custom colour…"), wheel)
     if none:

@@ -179,6 +179,7 @@ class MicControl(Controller):
             look = ("warn", "reload", _("Starting…"), _("Setting up…"), step, None)
         elif directmic.unplugged(mw.cfg.mic_device):
             # Windows still knows it, it's just not there: nothing to repair or set up
+            usage.used("mic-unplugged")   # the card said so (never which mic)
             look = ("warn", "mic", _("Is your headset plugged in?"), _("Unplugged"), _(
                 "Windows can't find <b>{mic}</b> right now. Plug it in, or switch it on if "
                 "it's wireless. No mic at all? Use the <b>virtual cable</b> below: it works "
@@ -220,6 +221,7 @@ class MicControl(Controller):
             # dongle stays plugged in), the mic's own mute or its boom mic pulled out.
             # The effect still sends the sounds on that silence, so nothing is broken:
             # others hear just the sounds (a mic stuck after an audio restart: Reinstall)
+            usage.used("mic-silent")
             look = ("ok", "check", _("Your sounds go into your mic"), _("Connected"), _(
                 "Your mic sends no sound right now (switched off, muted or no mic plugged "
                 "in), so others hear only your sounds. Want them to hear you too? Turn it "
@@ -384,6 +386,7 @@ class MicControl(Controller):
                              "update it from the Setup tab."), "warn")
             elif err == directmic.mic_silent():
                 # it's on the mic, but the mic came back from the audio restart dead
+                usage.used("mic-silent-after-setup")
                 mw.tell(_("Is your headset on?"), err, "warn")
             else:
                 # the route stays on the mic: until it's set up, the cable carries the

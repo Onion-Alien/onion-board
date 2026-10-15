@@ -21,7 +21,7 @@ from PySide6.QtWidgets import (QButtonGroup, QCheckBox, QComboBox, QDialog, QFra
                                QGridLayout, QHBoxLayout, QLabel, QMenu, QPushButton,
                                QSlider, QVBoxLayout, QWidget)
 
-from soundboard import aiaddon, applog, errors, net, updates
+from soundboard import aiaddon, applog, errors, net, updates, usage
 from soundboard import modules as mods
 from soundboard.i18n import _, ngettext
 from soundboard.speech import aivoice
@@ -200,7 +200,8 @@ class AiVoicePanel(QWidget):
             b.setCursor(Qt.CursorShape.PointingHandCursor)
             if key == FAVS:
                 icons.set_icon(b, "star_filled", "accent")
-            b.clicked.connect(lambda __=False, k=key: self.show_group(k))
+            b.clicked.connect(lambda __=False, k=key: (usage.used("ai-voice-group"),
+                                                     self.show_group(k)))
             self._cat_group.addButton(b)
             self._cat_btns[key] = b
             cflow.addWidget(b)
@@ -260,8 +261,8 @@ class AiVoicePanel(QWidget):
         btns = QWidget()
         bflow = Flow(btns, gap=6)
         self.b_hear = hear_button()
-        self.b_hear.clicked.connect(lambda: self.previewer.hear(
-            self.b_hear, self._voice(), self._sampled, self._say))
+        self.b_hear.clicked.connect(lambda: (usage.used("ai-voice-hear"), self.previewer.hear(
+            self.b_hear, self._voice(), self._sampled, self._say)))
         bflow.addWidget(self.b_hear)
         self.b_make = QPushButton(_("Make your own voice"))
         icons.set_icon(self.b_make, "plus")
@@ -604,6 +605,7 @@ class AiVoicePanel(QWidget):
         if on == (vid in self._favs):
             return
         if on:
+            usage.used("ai-voice-favorite")   # the name only (usage.py)
             self._favs.append(vid)
         else:
             self._favs.remove(vid)
@@ -687,6 +689,7 @@ class AiVoicePanel(QWidget):
         if d.exec() == QDialog.DialogCode.Accepted and self.store.put(d.result_voice()) is not None:
             self._resync()
             if vid is None:
+                usage.used("ai-voice-made")
                 self.pick(d.result_voice()["id"])
 
     def delete(self, vid: str):
@@ -759,6 +762,7 @@ class AiVoicePanel(QWidget):
             if not self._start_helper():
                 return
             self._voice_name = self._voice().get("name", "")
+            usage.used("ai-voice")   # switched on (never which voice)
             self._set_ui(True, self._starting_text())
         elif not on and self.ctl.running:
             self.ctl.stop()

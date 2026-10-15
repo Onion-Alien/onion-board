@@ -549,10 +549,15 @@ class ImportControl(Controller):
         way dropping its zip on the window is."""
         mw = self.mw
         from soundboard.ui.packsdialog import PacksDialog
-        dlg = PacksDialog(lambda path: self.import_files([str(path)]), mw,
-                          play=self._pack_sample)
+        usage.used("packs-opened")
+        dlg = PacksDialog(self._pack_got, mw, play=self._pack_sample)
         dlg.exec()
         free_dialog(dlg)
+
+    def _pack_got(self, path):
+        """A free pack downloaded (packs/<its id>.zip): imported like a dropped zip."""
+        usage.used(f"pack-added-{usage.pack_tag(Path(path).stem)}")
+        self.import_files([str(path)])
 
     def _pack_sample(self, data, gain: float) -> bool:
         """Free packs' samples: to your headphones only (None stops it). False: no
@@ -561,6 +566,7 @@ class ImportControl(Controller):
         if data is None:
             mw.engine.stop(PACK_SAMPLE)
             return True
+        usage.used("pack-heard")
         return mw.engine.play(PACK_SAMPLE, data, gain, mode="restart",
                                 preview=True) is not None
 

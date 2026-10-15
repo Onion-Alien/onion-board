@@ -255,6 +255,25 @@ account or anything else about you.
     preview's buttons (`used/pause`, `stop-all`, `taskbar-buttons`), the pop-up saying
     unticking *Others hear it* can't mute your mic yet and its *Set it up*
     (`used/mute-warning-shown`, `mute-warning-setup`);
+  - voices: the voice changer's groups, a voice starred, *Make it yours*, *Randomize*,
+    *Save as a voice* and a share code copied or imported (`used/voice-group`,
+    `voice-favorite`, `voice-tweak`, `voice-random`, `voice-saved`, `voice-code-shared`,
+    `voice-code-imported`), and AI voices switched on, a group picked, a voice starred,
+    *Hear it* and one of your own made (`used/ai-voice`, `ai-voice-group`,
+    `ai-voice-favorite`, `ai-voice-hear`, `ai-voice-made`): never which voice, its name
+    or its code;
+  - *Free packs* opened, a sample heard and which built-in pack was added
+    (`used/packs-opened`, `pack-heard`, `pack-added-streamer`, `-esports`, `-podcast`,
+    `-halloween`, `-gm-starter`, or `-other` for a newer one); a colour from the colour
+    wheel (`used/custom-colour`: never the colour); Settings' *Show advanced* and which
+    of its pages were looked at (`used/settings-advanced`, `settings-page-audio`,
+    `settings-page-privacy`…); yt-dlp's *Update now*, *Reinstall*, *Force update* and
+    one failing (`used/ytdlp-update`, `ytdlp-reinstall`, `ytdlp-force`, `ytdlp-failed`:
+    never the error); the mic card asking whether your headset is plugged in or on
+    (`used/mic-unplugged`, `mic-silent`, `mic-silent-after-setup`: never the mic's
+    name); a sound played at 0% Sounds volume and its *Set to 100%*
+    (`used/sound-vol-0`, `sound-vol-0-fixed`); a hotkey that was refused
+    (`used/hotkey-refused`: never which key);
   - and every day they're set: *Remember where it came from* off, own Apps categories,
     the side menu kept shut, a proxy, Tor or Offline mode, the playing sound's picture
     behind the board, the mic helper set up, and any sound set to play other than one at

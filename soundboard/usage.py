@@ -131,6 +131,12 @@ MIC_FAILS = ("unanswered", "no-start", "stuck", "silent", "no-helper", "no-mic",
 PRESS_MODES = ("overlap", "toggle", "solo", "queue")
 # the add-ons with install steps (their module.json id); any other is "other"
 ADDONS = ("ai-voices", "live-voice", "other")
+# the free sound packs (soundboard.packs BUILT_IN ids); any other is "other"
+PACKS = ("streamer", "esports", "podcast", "halloween", "gm-starter", "other")
+# Settings' pages (settings.SettingsDialog's page keys, without Show advanced)
+SETTINGS_PAGES = ("audio", "appearance", "hotkeys", "tabs", "general", "about",
+                  "overlay", "privacy", "connection", "data", "updates", "help",
+                  "remote")
 # what else is counted, only ever these names (see the docstring)
 FEATURES = ("add-files", "youtube", "record", "clip", "clip-editor", "import-board",
             "voice-changer", "text-to-speech", "hotkeys", "phone-remote", "also-send",
@@ -232,7 +238,29 @@ FEATURES = ("add-files", "youtube", "record", "clip", "clip-editor", "import-boa
             "restore-point-update", "restore-point-used",
             # unticking Others hear it while the mic effect isn't on: the pop-up saying it
             # can't mute yet, and its Set it up
-            "mute-warning-shown", "mute-warning-setup")
+            "mute-warning-shown", "mute-warning-setup",
+            # the voice changer: a group or Favorites picked, a voice starred, Make it
+            # yours opened, Randomize, Save as a voice, a share code copied or imported
+            "voice-group", "voice-favorite", "voice-tweak", "voice-random", "voice-saved",
+            "voice-code-shared", "voice-code-imported",
+            # AI voices: switched on, a group picked, a voice starred, Hear it, one of
+            # your own made (never which voice)
+            "ai-voice", "ai-voice-group", "ai-voice-favorite", "ai-voice-hear",
+            "ai-voice-made",
+            # Free packs: the window opened, a sample heard, a pack added (PACKS)
+            "packs-opened", "pack-heard", *(f"pack-added-{k}" for k in PACKS),
+            # a custom colour from the colour wheel (a pad or a group of them)
+            "custom-colour",
+            # Settings: Show advanced opened, which pages were looked at (SETTINGS_PAGES)
+            "settings-advanced", *(f"settings-page-{k}" for k in SETTINGS_PAGES),
+            # yt-dlp's Update now, Reinstall, Force update, and one failing
+            "ytdlp-update", "ytdlp-reinstall", "ytdlp-force", "ytdlp-failed",
+            # the mic card saying the headset is unplugged, or the mic sends silence
+            # (also right after a set-up)
+            "mic-unplugged", "mic-silent", "mic-silent-after-setup",
+            # a sound played at 0% Sounds volume (the warning), its Set to 100%; a
+            # hotkey no keyboard can press or Windows keeps (Win+L) refused
+            "sound-vol-0", "sound-vol-0-fixed", "hotkey-refused")
 STEPS = ("added-sound", "played-sound", "sent-to-others",
          # a tab a new user starts without (+ More tabs, Settings > Tabs)
          "added-radio-tab", "added-apps-tab", "added-triggers-tab")
@@ -543,6 +571,12 @@ def features_now(cfg) -> list[str]:
     if cfg.route == "mic" and michelper.known():   # its last check's answer, no new one
         out.append("mic-helper")
     return out
+
+
+def pack_tag(pack_id: str) -> str:
+    """A free pack's id as a count's word: one of PACKS, else "other" (a pack from
+    the online list that's newer than this version)."""
+    return pack_id if pack_id in PACKS else "other"
 
 
 def theme_tag(name: str) -> str:

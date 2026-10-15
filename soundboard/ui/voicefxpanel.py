@@ -19,7 +19,7 @@ from PySide6.QtWidgets import (QButtonGroup, QCheckBox, QDialog, QFrame, QGridLa
                                QVBoxLayout, QWidget)
 from shiboken6 import isValid as qt_valid
 
-from soundboard import savedvoices, theme, voicefx
+from soundboard import savedvoices, theme, usage, voicefx
 from soundboard.ui import art, busy, icons
 from soundboard.ui.widgets import take_out
 from soundboard.ui.panel import (Flow, UndoBar, hint_label, reset_button, section_label,
@@ -734,7 +734,8 @@ class VoiceFxPanel(QWidget):
             b.setCursor(Qt.CursorShape.PointingHandCursor)
             if key == FAVS:
                 icons.set_icon(b, "star_filled", "accent")
-            b.clicked.connect(lambda __=False, k=key: self.show_group(k))
+            b.clicked.connect(lambda __=False, k=key: (usage.used("voice-group"),
+                                                     self.show_group(k)))
             self._cat_group.addButton(b)
             self._cat_btns[key] = b
             cflow.addWidget(b)
@@ -794,7 +795,7 @@ class VoiceFxPanel(QWidget):
         icons.set_icon(self.btn_tweak, "sliders")
         self.btn_tweak.setToolTip(_("Pitch, Randomize, every effect, and your saved voices: "
                                     "build your own voice in a window beside the app"))
-        self.btn_tweak.clicked.connect(self.open_tweak)
+        self.btn_tweak.clicked.connect(lambda: (usage.used("voice-tweak"), self.open_tweak()))
         ph.addWidget(self.btn_tweak)
         ph.addStretch(1)
         v.addWidget(self.picked)
@@ -839,7 +840,7 @@ class VoiceFxPanel(QWidget):
         self.btn_random.setIconSize(QSize(16, 16))
         self.btn_random.setToolTip(_("A random silly mix of effects, as “My own mix”: what "
                                      "it changed lights up below. Click again for another."))
-        self.btn_random.clicked.connect(lambda: self.randomize())
+        self.btn_random.clicked.connect(lambda: (usage.used("voice-random"), self.randomize()))
         srow.addWidget(self.btn_random)
         self.btn_save = QPushButton(_("Save as a voice"))
         icons.set_icon(self.btn_save, "plus")
@@ -1165,6 +1166,7 @@ class VoiceFxPanel(QWidget):
         if on == (name in self._favs):
             return
         if on:
+            usage.used("voice-favorite")   # the name only (usage.py)
             self._favs.append(name)
         else:
             self._favs.remove(name)
@@ -1216,6 +1218,7 @@ class VoiceFxPanel(QWidget):
         if self._mine():
             self._custom = effects   # "My own mix" stays what it was too
         name = self.store.put(name, effects)
+        usage.used("voice-saved")   # the name only (usage.py), never the voice's
         self._preset, self._own, self._based_on = name, False, name
         self._fill_saved()
         self._emit()
@@ -1247,6 +1250,7 @@ class VoiceFxPanel(QWidget):
             return ""
         code = savedvoices.share_code(name, effects)
         QGuiApplication.clipboard().setText(code)
+        usage.used("voice-code-shared")
         if self.dlg.isVisible() and name == self._preset:
             busy.flash(self.btn_share, _("✓ Copied"))
         else:
@@ -1287,6 +1291,7 @@ class VoiceFxPanel(QWidget):
         if QMessageBox.question(self._parent(), title, ask) != QMessageBox.StandardButton.Yes:
             return ""
         name = self.store.put(name, effects)
+        usage.used("voice-code-imported")
         self._fill_saved()
         self.pick(name)
         if self.dlg.isVisible():

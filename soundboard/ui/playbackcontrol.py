@@ -130,9 +130,11 @@ class PlaybackControl(Controller):
                 or mw.cfg.route == "off"):
             return
         self._zero_vol_said = True
+        usage.used("sound-vol-0")
         mw.toast(_("Your Sounds volume is at 0%, so nobody else hears your sounds."), "warn",
                  8000, key="sound-vol-0",
-                 action=(_("Set to 100%"), lambda: mw.vol_sound.spin.setValue(100)))
+                 action=(_("Set to 100%"), lambda: (usage.used("sound-vol-0-fixed"),
+                                                     mw.vol_sound.spin.setValue(100))))
 
     def sound_volume_changed(self, v: float):
         if v > 0:
