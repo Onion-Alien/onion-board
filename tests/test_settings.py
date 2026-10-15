@@ -634,6 +634,38 @@ def test_a_board_reopened_shows_the_picked_language_on_the_button(window):  # no
     d.close()
 
 
+def test_show_advanced_clicks_keep_the_page_row_highlighted(window, qapp):  # noqa: F811
+    """Clicking Show advanced over and over switches it each time, and the page's own
+    row keeps its highlight: the switch row never becomes the current one, not even
+    between the press and the release. The search box has no right-click menu."""
+    from PySide6.QtCore import QPointF
+    from PySide6.QtGui import QMouseEvent
+
+    d = SettingsDialog(window, "about")
+    try:
+        d.resize(900, 700)
+        d.show()
+        qapp.processEvents()
+        about = d._page_keys.index("about")
+        rows = []
+        d.categories.currentRowChanged.connect(rows.append)
+        vp = d.categories.viewport()
+        pos = QPointF(d.categories.visualItemRect(d.categories.item(d._adv_row)).center())
+        was = d._advanced
+        for i in range(4):
+            for kind in (QEvent.Type.MouseButtonPress, QEvent.Type.MouseButtonRelease):
+                QApplication.sendEvent(vp, QMouseEvent(
+                    kind, pos, vp.mapToGlobal(pos), Qt.MouseButton.LeftButton,
+                    Qt.MouseButton.LeftButton if kind == QEvent.Type.MouseButtonPress
+                    else Qt.MouseButton.NoButton, Qt.KeyboardModifier.NoModifier))
+                assert d.categories.currentRow() == about
+            assert d._advanced == (was if i % 2 else not was)
+        assert rows == []
+        assert d.search_box.contextMenuPolicy() == Qt.ContextMenuPolicy.NoContextMenu
+    finally:
+        d.close()
+
+
 def _rows_back(d) -> bool:
     """Every row shown again after a search, but the advanced ones while folded."""
     return all(d.categories.item(i).isHidden() == (i > d._adv_row and not d._advanced)

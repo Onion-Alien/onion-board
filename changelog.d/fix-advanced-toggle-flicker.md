@@ -1,0 +1,1 @@
+- Settings: clicking Show advanced / Hide advanced fast no longer makes the page you're on lose and regain its highlight, and the Settings search box no longer opens a right-click menu (Ctrl+C / Ctrl+V still work).
