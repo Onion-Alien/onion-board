@@ -12,6 +12,7 @@ import copy
 import html
 import logging
 import os
+import re
 import tempfile
 import threading
 import time
@@ -63,6 +64,13 @@ PACK_SAMPLE = "__pack_sample"   # Free packs' "hear it first" voice (headphones 
 LOOSE_WAIT_MS = 1500   # a file dragged into the sounds folder is looked at again (ms)
 LOOSE_EMPTY_LOOKS = 20   # an empty file that long (~30 s) waits for the folder to change
 
+
+
+def pack_tab_name(name: str) -> str:
+    """A pack's tab: its name without a trailing "pack" ("Streamer pack" → "Streamer",
+    "GM starter pack" → "GM starter"), first letter capital."""
+    tab = re.sub(r"(?i)[\s_-]*\bpack\s*$", "", name.strip()).strip() or name.strip()
+    return tab[:1].upper() + tab[1:]
 
 class ImportControl(Controller):
     """Importing, exporting and sound packs for one MainWindow (``mw``)."""
@@ -837,17 +845,23 @@ class ImportControl(Controller):
             return
         self._settle_hotkeys(res.sounds + pkg.restored, self._pack_name(pkg))
         from soundboard.library import merge_tags
+        cats = pkg.categories
         if pkg.is_pack and len({library.split_tag(t)[0].lower() for ps in pkg.sounds
                                 for t in clean_tags(ps.entry.get("tags"))}) > 1:
             # one tab for the pack, its categories inside it as subcategories
-            library.group_pack_tags(res.sounds + pkg.restored, self._pack_name(pkg))
+            tab = self._pack_tab(pkg)
+            if library.group_pack_tags(res.sounds + pkg.restored, tab):
+                # its list of categories too, or each one comes back as an empty tab
+                cats = [tab] + [library.sub_tag(tab, c) for c in cats
+                                if not library.split_tag(c)[1]
+                                and c.lower() != tab.lower()]
         order = [ps.folder for ps in pkg.sounds]
         for m in pkg.restored + res.sounds:
             # "memes" goes into the "Memes" already here (and a new one gets a tab)
             m.tags = merge_tags(m.tags, mw.cfg.categories, mw.cfg.subcategories)
         for m in res.sounds:
             mw.cfg.sounds.insert(self._pack_spot(m, order), m)
-        merge_tags(pkg.categories, mw.cfg.categories,   # a full backup's empty ones too
+        merge_tags(cats, mw.cfg.categories,   # a full backup's empty ones too
                    mw.cfg.subcategories)
         for m in pkg.restored:
             mw.engine.set_gain(m.id, mw.gain_for(m))
@@ -902,6 +916,11 @@ class ImportControl(Controller):
 
     def _pack_name(self, pkg) -> str:
         return backup.packs().get(pkg.pack_id) or Path(pkg.path).name
+
+    def _pack_tab(self, pkg) -> str:
+        """The one tab a pack goes into: its name without "pack" ("Streamer pack" →
+        "Streamer")."""
+        return pack_tab_name(self._pack_name(pkg))
 
     def _pack_spot(self, m: SoundMeta, order: list[str]) -> int:
         """Where a sound coming back into its pack goes: after the pack's sound before it
@@ -967,7 +986,7 @@ class ImportControl(Controller):
                 ) != QMessageBox.StandardButton.Yes:
             return
         mine = [m for m in mw.soundctl._live_metas() if m.pack == pid]
-        library.group_pack_tags(mine, name, own)
+        library.group_pack_tags(mine, pack_tab_name(name), own)
         merge = library.merge_tags
         for m in mine:
             m.tags = merge(m.tags, mw.cfg.categories, mw.cfg.subcategories)
