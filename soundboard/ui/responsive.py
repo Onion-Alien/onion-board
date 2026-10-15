@@ -131,6 +131,11 @@ class Fitter:
         # the last need() (good until a step is applied or undone)
         self._layouts: list[QLayout] | None = None
         self._known: QSize | None = None
+        # the window's edge is being dragged (FitControl.live): need() trusts the sizes
+        # Qt has cached, a step's touch() having dropped those it changed. Walking and
+        # invalidating every layout made Qt measure the whole window again on each
+        # mouse move; a fit with live off, on release, measures it all fresh
+        self.live = False
 
     def add(self, priority: int, axis: str, apply: Callable[[bool], object]):
         self.reset()
@@ -175,9 +180,10 @@ class Fitter:
         step changed something."""
         if self._known is not None:
             return QSize(self._known)
-        for lay in (self._layouts if self._layouts is not None
-                    else self.root.findChildren(QLayout)):
-            lay.invalidate()
+        if not self.live:
+            for lay in (self._layouts if self._layouts is not None
+                        else self.root.findChildren(QLayout)):
+                lay.invalidate()
         need = self.root.minimumSizeHint()
         if self._layouts is not None:
             self._known = QSize(need)
@@ -215,7 +221,8 @@ class Fitter:
         # found once for the whole fit, not on each need(): with a few hundred pads the
         # search through every widget took longer than the measuring (a step only
         # shows, hides or retitles things, so the layouts stay the same meanwhile)
-        self._layouts, self._known = self.root.findChildren(QLayout), None
+        self._layouts = [] if self.live else self.root.findChildren(QLayout)
+        self._known = None
         with hold_updates(self.root):
             new: list[int] = []   # applied by this fit
             for axis in ("h", "w"):   # hiding the mixer (height) narrows the window too

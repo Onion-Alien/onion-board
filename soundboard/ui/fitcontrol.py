@@ -101,6 +101,17 @@ class FitControl(Controller):
                             *mw.voice.stack_steps())
         mw.setMinimumSize(responsive.MIN_SIZE)
 
+    def live(self, dragging: bool):
+        """The window's edge is being dragged (MainWindow.nativeEvent): each step fits
+        with the sizes Qt has cached, and letting go fits once more measuring it all
+        fresh, as every step did before (~3-10 ms a step, most on Setup and Voice)."""
+        fit = getattr(self, "_fit", None)
+        if fit is None or fit.live == dragging:
+            return
+        fit.live = dragging
+        if not dragging:
+            self._refit()
+
     def _cat_bar_step(self, compact: bool):
         """The fitter's say on the category bar: it hides it when the window is short."""
         self._cat_bar_compact = compact
@@ -165,6 +176,16 @@ class FitControl(Controller):
             if need.width() > size.width() or need.height() > size.height():
                 # A restored mixer needs one width pass before considering a wrap.
                 need = self._fit.fit(size)
+            if self._fit.live and (need.width() > size.width()
+                                   or need.height() > size.height()):
+                # dragging, measured with the sizes Qt cached: measured fresh before
+                # giving up on the whole window (a stale size sent it into the mini
+                # player at a size it fits)
+                self._fit.live = False
+                try:
+                    need = self._fit.fit(size)
+                finally:
+                    self._fit.live = True
             if (mw.width() >= 760 and need.width() > size.width()
                     and mw.mixer.minimumSizeHint().width() + mw.rail.width() > size.width()):
                 # Wrap only when the visible groups need it, e.g. with larger fonts.
