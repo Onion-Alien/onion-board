@@ -3462,5 +3462,10 @@
   "Onion Board {version} is out: downloading it now. The app restarts by itself to install it when it's done.": "Onion Board {version} çıktı: şimdi indiriliyor. Bitince uygulama yüklemek için kendiliğinden yeniden başlar.",
   "Tell me when a new version is out.": "Yeni sürüm çıkınca bana haber ver.",
   "This is Onion Board {version}. With the box ticked it asks GitHub whether a newer version is out each time it starts and every hour after, and tells you (with a banner if it's an important fix). Every update is checked against the file GitHub lists. Your sounds and settings are kept.": "Bu Onion Board {version}. Kutu işaretliyken her açılışta ve sonra her saat GitHub'a daha yeni bir sürüm olup olmadığını sorar ve sana haber verir (önemli bir düzeltmeyse bir şeritle). Her güncelleme GitHub'ın listelediği dosyayla karşılaştırılır. Seslerin ve ayarların korunur.",
-  "When Onion Board starts and a new version is out, it downloads it and restarts to install it, unless a sound is playing.": "Onion Board açıldığında yeni bir sürüm çıkmışsa onu indirir ve yüklemek için yeniden başlar; bir ses çalıyorsa bunu yapmaz."
+  "When Onion Board starts and a new version is out, it downloads it and restarts to install it, unless a sound is playing.": "Onion Board açıldığında yeni bir sürüm çıkmışsa onu indirir ve yüklemek için yeniden başlar; bir ses çalıyorsa bunu yapmaz.",
+  "Checking for updates…": "Güncellemeler aranıyor…",
+  "Installing Onion Board {version}…": "Onion Board {version} yükleniyor…",
+  "Updated to {version}": "{version} sürümüne güncellendi",
+  "Updating to {version}…": "{version} sürümüne güncelleniyor…",
+  "Updating to {version}… {pct}%": "{version} sürümüne güncelleniyor… %{pct}"
 }

@@ -3386,5 +3386,10 @@
   "Onion Board {version} is out: downloading it now. The app restarts by itself to install it when it's done.": "Onion Board {version} 已發布：正在下載。完成後應用程式會自動重新啟動來安裝。",
   "Tell me when a new version is out.": "有新版本時告訴我。",
   "This is Onion Board {version}. With the box ticked it asks GitHub whether a newer version is out each time it starts and every hour after, and tells you (with a banner if it's an important fix). Every update is checked against the file GitHub lists. Your sounds and settings are kept.": "這是 Onion Board {version}。勾選後，它會在每次啟動時以及之後每小時向 GitHub 查詢是否有新版本，並告訴你（如果是重要修正會顯示橫幅）。每個更新都會與 GitHub 列出的檔案核對。你的音效和設定都會保留。",
-  "When Onion Board starts and a new version is out, it downloads it and restarts to install it, unless a sound is playing.": "Onion Board 啟動時如果有新版本，會下載並重新啟動來安裝，正在播放音效時除外。"
+  "When Onion Board starts and a new version is out, it downloads it and restarts to install it, unless a sound is playing.": "Onion Board 啟動時如果有新版本，會下載並重新啟動來安裝，正在播放音效時除外。",
+  "Checking for updates…": "正在檢查更新…",
+  "Installing Onion Board {version}…": "正在安裝 Onion Board {version}…",
+  "Updated to {version}": "已更新到 {version}",
+  "Updating to {version}…": "正在更新到 {version}…",
+  "Updating to {version}… {pct}%": "正在更新到 {version}… {pct}%"
 }

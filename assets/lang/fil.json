@@ -3462,5 +3462,10 @@
   "Onion Board {version} is out: downloading it now. The app restarts by itself to install it when it's done.": "Labas na ang Onion Board {version}: dina-download na ngayon. Kusang magre-restart ang app para i-install ito kapag tapos na.",
   "Tell me when a new version is out.": "Sabihan ako kapag may bagong bersyon.",
   "This is Onion Board {version}. With the box ticked it asks GitHub whether a newer version is out each time it starts and every hour after, and tells you (with a banner if it's an important fix). Every update is checked against the file GitHub lists. Your sounds and settings are kept.": "Ito ang Onion Board {version}. Kapag naka-check ang box, tinatanong nito sa GitHub kung may mas bagong bersyon tuwing nagbubukas ito at bawat oras pagkatapos, at sinasabihan ka (may banner kung mahalagang ayos ito). Bawat update ay sinusuri laban sa file na nakalista sa GitHub. Nananatili ang mga sound at setting mo.",
-  "When Onion Board starts and a new version is out, it downloads it and restarts to install it, unless a sound is playing.": "Kapag nagbukas ang Onion Board at may bagong bersyon, dina-download nito iyon at nagre-restart para i-install, maliban kung may tumutugtog na sound."
+  "When Onion Board starts and a new version is out, it downloads it and restarts to install it, unless a sound is playing.": "Kapag nagbukas ang Onion Board at may bagong bersyon, dina-download nito iyon at nagre-restart para i-install, maliban kung may tumutugtog na sound.",
+  "Checking for updates…": "Naghahanap ng update…",
+  "Installing Onion Board {version}…": "Ini-install ang Onion Board {version}…",
+  "Updated to {version}": "Na-update na sa {version}",
+  "Updating to {version}…": "Nag-a-update sa {version}…",
+  "Updating to {version}… {pct}%": "Nag-a-update sa {version}… {pct}%"
 }

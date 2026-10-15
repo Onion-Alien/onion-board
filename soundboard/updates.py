@@ -16,8 +16,10 @@ waiting for its next hourly check. An urgent fix this copy missed isn't held bac
 a newer release settling. "Check now" always offers the newest.
 
 Found as the app starts (and *Install updates by themselves* is ticked, the default),
-a newer version installs itself: downloaded, then the app restarts into it, unless a
-sound is playing or the window is in the tray (then it waits for *Restart to update*).
+a newer version installs itself: behind the loading screen, which shows the download's
+percentage, before the window opens (UpdateControl.update_at_start); if that check
+was too slow, in the window a few seconds later, unless a sound is playing or the
+window is in the tray (then it waits for *Restart to update*).
 Found later, it's only announced, and nothing is downloaded until the user presses
 *Update now*. Either way the release's OnionBoardSetup.exe is fetched from the
 project's own GitHub release, checked against the SHA-256 GitHub lists for it, and run

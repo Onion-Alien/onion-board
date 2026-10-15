@@ -3386,5 +3386,10 @@
   "Onion Board {version} is out: downloading it now. The app restarts by itself to install it when it's done.": "Onion Board {version} ออกแล้ว: กำลังดาวน์โหลด เมื่อเสร็จแอปจะรีสตาร์ทเองเพื่อติดตั้ง",
   "Tell me when a new version is out.": "บอกฉันเมื่อมีเวอร์ชันใหม่",
   "This is Onion Board {version}. With the box ticked it asks GitHub whether a newer version is out each time it starts and every hour after, and tells you (with a banner if it's an important fix). Every update is checked against the file GitHub lists. Your sounds and settings are kept.": "นี่คือ Onion Board {version} เมื่อติ๊กช่องนี้ แอปจะถาม GitHub ว่ามีเวอร์ชันใหม่กว่าหรือไม่ทุกครั้งที่เปิดและทุกชั่วโมงหลังจากนั้น แล้วบอกคุณ (พร้อมแบนเนอร์ถ้าเป็นการแก้ไขสำคัญ) ทุกอัปเดตจะถูกตรวจกับไฟล์ที่ GitHub ระบุไว้ เสียงและการตั้งค่าของคุณจะยังอยู่ครบ",
-  "When Onion Board starts and a new version is out, it downloads it and restarts to install it, unless a sound is playing.": "เมื่อ Onion Board เปิดขึ้นและมีเวอร์ชันใหม่ แอปจะดาวน์โหลดแล้วรีสตาร์ทเพื่อติดตั้ง เว้นแต่มีเสียงกำลังเล่นอยู่"
+  "When Onion Board starts and a new version is out, it downloads it and restarts to install it, unless a sound is playing.": "เมื่อ Onion Board เปิดขึ้นและมีเวอร์ชันใหม่ แอปจะดาวน์โหลดแล้วรีสตาร์ทเพื่อติดตั้ง เว้นแต่มีเสียงกำลังเล่นอยู่",
+  "Checking for updates…": "กำลังตรวจหาอัปเดต…",
+  "Installing Onion Board {version}…": "กำลังติดตั้ง Onion Board {version}…",
+  "Updated to {version}": "อัปเดตเป็น {version} แล้ว",
+  "Updating to {version}…": "กำลังอัปเดตเป็น {version}…",
+  "Updating to {version}… {pct}%": "กำลังอัปเดตเป็น {version}… {pct}%"
 }

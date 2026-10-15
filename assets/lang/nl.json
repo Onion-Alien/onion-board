@@ -3462,5 +3462,10 @@
   "Onion Board {version} is out: downloading it now. The app restarts by itself to install it when it's done.": "Onion Board {version} is uit: wordt nu gedownload. De app start vanzelf opnieuw om hem te installeren zodra hij klaar is.",
   "Tell me when a new version is out.": "Laat me weten wanneer er een nieuwe versie is.",
   "This is Onion Board {version}. With the box ticked it asks GitHub whether a newer version is out each time it starts and every hour after, and tells you (with a banner if it's an important fix). Every update is checked against the file GitHub lists. Your sounds and settings are kept.": "Dit is Onion Board {version}. Met het vinkje vraagt het GitHub bij elke start en daarna elk uur of er een nieuwere versie is, en laat het je weten (met een balk als het een belangrijke fix is). Elke update wordt gecontroleerd tegen het bestand dat GitHub vermeldt. Je geluiden en instellingen blijven behouden.",
-  "When Onion Board starts and a new version is out, it downloads it and restarts to install it, unless a sound is playing.": "Als Onion Board start en er een nieuwe versie is, downloadt het die en start het opnieuw om hem te installeren, tenzij er een geluid speelt."
+  "When Onion Board starts and a new version is out, it downloads it and restarts to install it, unless a sound is playing.": "Als Onion Board start en er een nieuwe versie is, downloadt het die en start het opnieuw om hem te installeren, tenzij er een geluid speelt.",
+  "Checking for updates…": "Zoeken naar updates…",
+  "Installing Onion Board {version}…": "Onion Board {version} installeren…",
+  "Updated to {version}": "Bijgewerkt naar {version}",
+  "Updating to {version}…": "Bijwerken naar {version}…",
+  "Updating to {version}… {pct}%": "Bijwerken naar {version}… {pct}%"
 }

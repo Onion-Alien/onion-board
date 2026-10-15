@@ -3386,5 +3386,10 @@
   "Onion Board {version} is out: downloading it now. The app restarts by itself to install it when it's done.": "Onion Board {version} sudah keluar: sedang dimuat turun. Aplikasi akan mula semula sendiri untuk memasangnya apabila selesai.",
   "Tell me when a new version is out.": "Beritahu saya apabila ada versi baharu.",
   "This is Onion Board {version}. With the box ticked it asks GitHub whether a newer version is out each time it starts and every hour after, and tells you (with a banner if it's an important fix). Every update is checked against the file GitHub lists. Your sounds and settings are kept.": "Ini Onion Board {version}. Dengan kotak ditanda, ia bertanya kepada GitHub sama ada versi lebih baharu sudah keluar setiap kali ia dibuka dan setiap jam selepas itu, dan memberitahu anda (dengan sepanduk jika ia pembaikan penting). Setiap kemas kini disemak dengan fail yang disenaraikan oleh GitHub. Bunyi dan tetapan anda kekal.",
-  "When Onion Board starts and a new version is out, it downloads it and restarts to install it, unless a sound is playing.": "Apabila Onion Board dibuka dan ada versi baharu, ia memuat turunnya dan mula semula untuk memasangnya, kecuali ada bunyi sedang dimainkan."
+  "When Onion Board starts and a new version is out, it downloads it and restarts to install it, unless a sound is playing.": "Apabila Onion Board dibuka dan ada versi baharu, ia memuat turunnya dan mula semula untuk memasangnya, kecuali ada bunyi sedang dimainkan.",
+  "Checking for updates…": "Mencari kemas kini…",
+  "Installing Onion Board {version}…": "Memasang Onion Board {version}…",
+  "Updated to {version}": "Dikemas kini ke {version}",
+  "Updating to {version}…": "Mengemas kini ke {version}…",
+  "Updating to {version}… {pct}%": "Mengemas kini ke {version}… {pct}%"
 }

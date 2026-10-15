@@ -3538,5 +3538,10 @@
   "Onion Board {version} is out: downloading it now. The app restarts by itself to install it when it's done.": "Вийшов Onion Board {version}: зараз завантажується. Коли завершить, застосунок сам перезапуститься й установить його.",
   "Tell me when a new version is out.": "Повідомляти, коли вийде нова версія.",
   "This is Onion Board {version}. With the box ticked it asks GitHub whether a newer version is out each time it starts and every hour after, and tells you (with a banner if it's an important fix). Every update is checked against the file GitHub lists. Your sounds and settings are kept.": "Це Onion Board {version}. З позначкою він питає GitHub, чи вийшла новіша версія, під час кожного запуску, а потім щогодини, і повідомляє тобі (з банером, якщо це важливе виправлення). Кожне оновлення звіряється з файлом, указаним на GitHub. Твої звуки й налаштування зберігаються.",
-  "When Onion Board starts and a new version is out, it downloads it and restarts to install it, unless a sound is playing.": "Коли Onion Board запускається і вийшла нова версія, він завантажує її та перезапускається, щоб установити, якщо тільки не грає звук."
+  "When Onion Board starts and a new version is out, it downloads it and restarts to install it, unless a sound is playing.": "Коли Onion Board запускається і вийшла нова версія, він завантажує її та перезапускається, щоб установити, якщо тільки не грає звук.",
+  "Checking for updates…": "Перевірка оновлень…",
+  "Installing Onion Board {version}…": "Встановлення Onion Board {version}…",
+  "Updated to {version}": "Оновлено до {version}",
+  "Updating to {version}…": "Оновлення до {version}…",
+  "Updating to {version}… {pct}%": "Оновлення до {version}… {pct}%"
 }

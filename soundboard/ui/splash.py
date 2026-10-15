@@ -49,11 +49,23 @@ _splash: Splash | NativeSplash | None = None
 _last = 0.0
 _surfaces: dict[tuple, QImage] = {}   # only the dots need drawing on each frame
 _animate = True
+# what it says under the name ("" = Starting…) and a bar 0..1 instead of the dots
+# (None = the dots): set_status, read by every frame (also on the native thread)
+_status = ""
+_progress: float | None = None
+
+
+def set_status(text: str = "", progress: float | None = None):
+    """Say what start-up is doing (the update as it starts: UpdateControl.update_at_start),
+    with a bar when `progress` (0..1) is given; set_status() goes back to Starting…."""
+    global _status, _progress
+    _status, _progress = text, progress
+    pump()
 
 
 def _surface(w: float, h: float, scale: float) -> QImage:
     """Cache the stationary panel at the monitor's resolution, including its text."""
-    status = _("Starting…")
+    status = _status or _("Starting…")
     family = theme.T.get("font", theme.FONT)
     key = (w, h, scale, tuple(theme.T.items()), family, status)
     img = _surfaces.get(key)
@@ -93,6 +105,15 @@ def paint_frame(p: QPainter, t: float, w: float, h: float, scale: float = 1.0):
     p.setPen(Qt.PenStyle.NoPen)
     accent = QColor(theme.T["accent"])
     resting = QColor(theme.T["muted"])
+    progress = _progress
+    if progress is not None:   # a bar where the dots were
+        bar = QRectF(40, h - 38, w - 80, 6)
+        p.setBrush(QColor(theme.T.get("border", theme.T["muted"])))
+        p.drawRoundedRect(bar, 3, 3)
+        p.setBrush(accent)
+        p.drawRoundedRect(QRectF(bar.x(), bar.y(), bar.width() * min(max(progress, 0.0), 1.0),
+                                 bar.height()), 3, 3)
+        return
     for i in range(3):
         # A raised cosine confined to one step gives a clear 1 -> 2 -> 3 chase,
         # with a smooth handoff and the first dot highlighted from the first frame.
@@ -301,8 +322,11 @@ def show() -> Splash | NativeSplash:
     """Put the splash up, centred on the screen the mouse is on."""
     global _splash, _animate
     _animate = _animations_enabled()
+    set_status()
     try:
-        theme.set_current(json.loads(CONFIG.read_text(encoding="utf-8-sig")).get("theme", ""))
+        cfg = json.loads(CONFIG.read_text(encoding="utf-8-sig"))
+        theme.set_current(cfg.get("theme", ""))
+        _updated(str(cfg.get("update_pending") or ""))
     except Exception:  # noqa: BLE001 - first launch, or unreadable: the default theme
         pass
     if QGuiApplication.platformName() == "windows":
@@ -320,6 +344,13 @@ def show() -> Splash | NativeSplash:
     QApplication.processEvents(QEventLoop.ProcessEventsFlag.ExcludeUserInputEvents)
     sys.meta_path.insert(0, _PumpOnImport)
     return _splash
+
+
+def _updated(pending: str):
+    """The first start after an update: "Updated to X" instead of Starting…."""
+    from soundboard import __version__
+    if pending and pending == __version__:
+        set_status(_("Updated to {version}", version=__version__))
 
 
 def pump():

@@ -3386,5 +3386,10 @@
   "Onion Board {version} is out: downloading it now. The app restarts by itself to install it when it's done.": "Onion Board {version}が出ました: 今ダウンロードしています。終わったらアプリが自動で再起動してインストールします。",
   "Tell me when a new version is out.": "新しいバージョンが出たら知らせる。",
   "This is Onion Board {version}. With the box ticked it asks GitHub whether a newer version is out each time it starts and every hour after, and tells you (with a banner if it's an important fix). Every update is checked against the file GitHub lists. Your sounds and settings are kept.": "これはOnion Board {version}です。チェックを入れると、起動するたびとその後1時間ごとに新しいバージョンが出ていないかGitHubに確認し、お知らせします(重要な修正ならバナーで)。どのアップデートもGitHubに載っているファイルと照合します。サウンドと設定はそのまま残ります。",
-  "When Onion Board starts and a new version is out, it downloads it and restarts to install it, unless a sound is playing.": "Onion Boardの起動時に新しいバージョンが出ていれば、ダウンロードして再起動しインストールします。サウンド再生中は除きます。"
+  "When Onion Board starts and a new version is out, it downloads it and restarts to install it, unless a sound is playing.": "Onion Boardの起動時に新しいバージョンが出ていれば、ダウンロードして再起動しインストールします。サウンド再生中は除きます。",
+  "Checking for updates…": "アップデートを確認中…",
+  "Installing Onion Board {version}…": "Onion Board {version}をインストール中…",
+  "Updated to {version}": "{version}に更新しました",
+  "Updating to {version}…": "{version}に更新中…",
+  "Updating to {version}… {pct}%": "{version}に更新中… {pct}%"
 }

@@ -3386,5 +3386,10 @@
   "Onion Board {version} is out: downloading it now. The app restarts by itself to install it when it's done.": "Onion Board {version}이(가) 나왔습니다: 지금 내려받는 중입니다. 다 되면 앱이 스스로 다시 시작해 설치합니다.",
   "Tell me when a new version is out.": "새 버전이 나오면 알려 주기.",
   "This is Onion Board {version}. With the box ticked it asks GitHub whether a newer version is out each time it starts and every hour after, and tells you (with a banner if it's an important fix). Every update is checked against the file GitHub lists. Your sounds and settings are kept.": "Onion Board {version}입니다. 체크하면 시작할 때마다, 그리고 그 뒤 1시간마다 GitHub에 새 버전이 있는지 묻고 알려 줍니다(중요한 수정이면 배너로). 모든 업데이트는 GitHub에 올라온 파일과 대조해 확인합니다. 사운드와 설정은 그대로 유지됩니다.",
-  "When Onion Board starts and a new version is out, it downloads it and restarts to install it, unless a sound is playing.": "Onion Board가 시작될 때 새 버전이 나와 있으면 내려받고 다시 시작해 설치합니다. 사운드가 재생 중이면 하지 않습니다."
+  "When Onion Board starts and a new version is out, it downloads it and restarts to install it, unless a sound is playing.": "Onion Board가 시작될 때 새 버전이 나와 있으면 내려받고 다시 시작해 설치합니다. 사운드가 재생 중이면 하지 않습니다.",
+  "Checking for updates…": "업데이트 확인 중…",
+  "Installing Onion Board {version}…": "Onion Board {version} 설치 중…",
+  "Updated to {version}": "{version}(으)로 업데이트됨",
+  "Updating to {version}…": "{version}(으)로 업데이트 중…",
+  "Updating to {version}… {pct}%": "{version}(으)로 업데이트 중… {pct}%"
 }

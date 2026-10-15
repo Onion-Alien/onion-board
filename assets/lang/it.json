@@ -3462,5 +3462,10 @@
   "Onion Board {version} is out: downloading it now. The app restarts by itself to install it when it's done.": "È uscito Onion Board {version}: download in corso. L'app si riavvia da sola per installarlo quando ha finito.",
   "Tell me when a new version is out.": "Avvisami quando esce una nuova versione.",
   "This is Onion Board {version}. With the box ticked it asks GitHub whether a newer version is out each time it starts and every hour after, and tells you (with a banner if it's an important fix). Every update is checked against the file GitHub lists. Your sounds and settings are kept.": "Questo è Onion Board {version}. Con la casella spuntata chiede a GitHub se è uscita una versione più nuova a ogni avvio e poi ogni ora, e ti avvisa (con un banner se è una correzione importante). Ogni aggiornamento viene confrontato con il file elencato da GitHub. I tuoi suoni e le impostazioni restano.",
-  "When Onion Board starts and a new version is out, it downloads it and restarts to install it, unless a sound is playing.": "Quando Onion Board si avvia ed è uscita una nuova versione, la scarica e si riavvia per installarla, a meno che non stia suonando un suono."
+  "When Onion Board starts and a new version is out, it downloads it and restarts to install it, unless a sound is playing.": "Quando Onion Board si avvia ed è uscita una nuova versione, la scarica e si riavvia per installarla, a meno che non stia suonando un suono.",
+  "Checking for updates…": "Cerco aggiornamenti…",
+  "Installing Onion Board {version}…": "Installo Onion Board {version}…",
+  "Updated to {version}": "Aggiornato a {version}",
+  "Updating to {version}…": "Aggiorno a {version}…",
+  "Updating to {version}… {pct}%": "Aggiorno a {version}… {pct}%"
 }

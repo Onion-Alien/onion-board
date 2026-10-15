@@ -3462,5 +3462,10 @@
   "Onion Board {version} is out: downloading it now. The app restarts by itself to install it when it's done.": "Onion Board {version} излезе: изтегля се сега. Приложението се рестартира само, за да го инсталира, когато свърши.",
   "Tell me when a new version is out.": "Кажи ми, когато излезе нова версия.",
   "This is Onion Board {version}. With the box ticked it asks GitHub whether a newer version is out each time it starts and every hour after, and tells you (with a banner if it's an important fix). Every update is checked against the file GitHub lists. Your sounds and settings are kept.": "Това е Onion Board {version}. С отметката той пита GitHub дали има по-нова версия при всяко стартиране и после на всеки час и ти казва (с банер, ако е важна поправка). Всяко обновление се проверява спрямо файла, който GitHub показва. Звуците и настройките ти се запазват.",
-  "When Onion Board starts and a new version is out, it downloads it and restarts to install it, unless a sound is playing.": "Когато Onion Board се стартира и има нова версия, той я изтегля и се рестартира, за да я инсталира, освен ако не свири звук."
+  "When Onion Board starts and a new version is out, it downloads it and restarts to install it, unless a sound is playing.": "Когато Onion Board се стартира и има нова версия, той я изтегля и се рестартира, за да я инсталира, освен ако не свири звук.",
+  "Checking for updates…": "Проверка за обновления…",
+  "Installing Onion Board {version}…": "Инсталиране на Onion Board {version}…",
+  "Updated to {version}": "Обновено до {version}",
+  "Updating to {version}…": "Обновяване до {version}…",
+  "Updating to {version}… {pct}%": "Обновяване до {version}… {pct}%"
 }

@@ -3386,5 +3386,10 @@
   "Onion Board {version} is out: downloading it now. The app restarts by itself to install it when it's done.": "Onion Board {version} đã ra: đang tải về. Ứng dụng sẽ tự khởi động lại để cài khi tải xong.",
   "Tell me when a new version is out.": "Báo cho tôi khi có phiên bản mới.",
   "This is Onion Board {version}. With the box ticked it asks GitHub whether a newer version is out each time it starts and every hour after, and tells you (with a banner if it's an important fix). Every update is checked against the file GitHub lists. Your sounds and settings are kept.": "Đây là Onion Board {version}. Khi đánh dấu ô này, ứng dụng hỏi GitHub xem có phiên bản mới hơn không mỗi lần khởi động và sau đó mỗi giờ, rồi báo cho bạn (kèm biểu ngữ nếu là bản sửa quan trọng). Mỗi bản cập nhật đều được đối chiếu với tệp GitHub liệt kê. Âm thanh và cài đặt của bạn được giữ nguyên.",
-  "When Onion Board starts and a new version is out, it downloads it and restarts to install it, unless a sound is playing.": "Khi Onion Board khởi động và có phiên bản mới, nó sẽ tải về rồi khởi động lại để cài, trừ khi đang phát âm thanh."
+  "When Onion Board starts and a new version is out, it downloads it and restarts to install it, unless a sound is playing.": "Khi Onion Board khởi động và có phiên bản mới, nó sẽ tải về rồi khởi động lại để cài, trừ khi đang phát âm thanh.",
+  "Checking for updates…": "Đang kiểm tra bản cập nhật…",
+  "Installing Onion Board {version}…": "Đang cài Onion Board {version}…",
+  "Updated to {version}": "Đã cập nhật lên {version}",
+  "Updating to {version}…": "Đang cập nhật lên {version}…",
+  "Updating to {version}… {pct}%": "Đang cập nhật lên {version}… {pct}%"
 }

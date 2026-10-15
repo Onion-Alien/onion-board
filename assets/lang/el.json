@@ -3462,5 +3462,10 @@
   "Onion Board {version} is out: downloading it now. The app restarts by itself to install it when it's done.": "Βγήκε το Onion Board {version}: κατεβαίνει τώρα. Η εφαρμογή επανεκκινεί μόνη της για να το εγκαταστήσει όταν τελειώσει.",
   "Tell me when a new version is out.": "Πες μου όταν βγει νέα έκδοση.",
   "This is Onion Board {version}. With the box ticked it asks GitHub whether a newer version is out each time it starts and every hour after, and tells you (with a banner if it's an important fix). Every update is checked against the file GitHub lists. Your sounds and settings are kept.": "Αυτό είναι το Onion Board {version}. Με το κουτάκι τσεκαρισμένο ρωτά το GitHub αν υπάρχει νεότερη έκδοση κάθε φορά που ξεκινά και μετά κάθε ώρα, και σου λέει (με μπάνερ αν είναι σημαντική διόρθωση). Κάθε ενημέρωση ελέγχεται με το αρχείο που δείχνει το GitHub. Οι ήχοι και οι ρυθμίσεις σου μένουν ως έχουν.",
-  "When Onion Board starts and a new version is out, it downloads it and restarts to install it, unless a sound is playing.": "Όταν ξεκινά το Onion Board και υπάρχει νέα έκδοση, την κατεβάζει και επανεκκινεί για να την εγκαταστήσει, εκτός αν παίζει κάποιος ήχος."
+  "When Onion Board starts and a new version is out, it downloads it and restarts to install it, unless a sound is playing.": "Όταν ξεκινά το Onion Board και υπάρχει νέα έκδοση, την κατεβάζει και επανεκκινεί για να την εγκαταστήσει, εκτός αν παίζει κάποιος ήχος.",
+  "Checking for updates…": "Έλεγχος για ενημερώσεις…",
+  "Installing Onion Board {version}…": "Εγκατάσταση Onion Board {version}…",
+  "Updated to {version}": "Ενημερώθηκε σε {version}",
+  "Updating to {version}…": "Ενημέρωση σε {version}…",
+  "Updating to {version}… {pct}%": "Ενημέρωση σε {version}… {pct}%"
 }

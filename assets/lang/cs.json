@@ -3538,5 +3538,10 @@
   "Onion Board {version} is out: downloading it now. The app restarts by itself to install it when it's done.": "Onion Board {version} je venku: teď se stahuje. Až bude hotovo, aplikace se sama restartuje a nainstaluje ji.",
   "Tell me when a new version is out.": "Řekni mi, když vyjde nová verze.",
   "This is Onion Board {version}. With the box ticked it asks GitHub whether a newer version is out each time it starts and every hour after, and tells you (with a banner if it's an important fix). Every update is checked against the file GitHub lists. Your sounds and settings are kept.": "Tohle je Onion Board {version}. Se zaškrtnutím se při každém spuštění a pak každou hodinu ptá GitHubu, jestli je venku novější verze, a dá ti vědět (s pruhem, pokud jde o důležitou opravu). Každá aktualizace se kontroluje podle souboru, který GitHub uvádí. Tvoje zvuky a nastavení zůstanou.",
-  "When Onion Board starts and a new version is out, it downloads it and restarts to install it, unless a sound is playing.": "Když se Onion Board spustí a je venku nová verze, stáhne ji a restartuje se, aby ji nainstaloval, pokud zrovna nehraje zvuk."
+  "When Onion Board starts and a new version is out, it downloads it and restarts to install it, unless a sound is playing.": "Když se Onion Board spustí a je venku nová verze, stáhne ji a restartuje se, aby ji nainstaloval, pokud zrovna nehraje zvuk.",
+  "Checking for updates…": "Hledám aktualizace…",
+  "Installing Onion Board {version}…": "Instaluji Onion Board {version}…",
+  "Updated to {version}": "Aktualizováno na {version}",
+  "Updating to {version}…": "Aktualizuji na {version}…",
+  "Updating to {version}… {pct}%": "Aktualizuji na {version}… {pct}%"
 }

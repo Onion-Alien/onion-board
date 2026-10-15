@@ -3462,5 +3462,10 @@
   "Onion Board {version} is out: downloading it now. The app restarts by itself to install it when it's done.": "Onion Board {version} on julkaistu: ladataan nyt. Sovellus käynnistyy itsestään uudelleen ja asentaa sen, kun lataus on valmis.",
   "Tell me when a new version is out.": "Kerro, kun uusi versio julkaistaan.",
   "This is Onion Board {version}. With the box ticked it asks GitHub whether a newer version is out each time it starts and every hour after, and tells you (with a banner if it's an important fix). Every update is checked against the file GitHub lists. Your sounds and settings are kept.": "Tämä on Onion Board {version}. Kun ruutu on valittuna, se kysyy GitHubista uudempaa versiota joka käynnistyksellä ja sen jälkeen tunnin välein, ja kertoo sinulle (bannerilla, jos kyse on tärkeästä korjauksesta). Jokainen päivitys tarkistetaan GitHubin listaamaa tiedostoa vasten. Äänesi ja asetuksesi säilyvät.",
-  "When Onion Board starts and a new version is out, it downloads it and restarts to install it, unless a sound is playing.": "Kun Onion Board käynnistyy ja uusi versio on saatavilla, se lataa sen ja käynnistyy uudelleen asentaakseen sen, ellei jokin ääni ole soimassa."
+  "When Onion Board starts and a new version is out, it downloads it and restarts to install it, unless a sound is playing.": "Kun Onion Board käynnistyy ja uusi versio on saatavilla, se lataa sen ja käynnistyy uudelleen asentaakseen sen, ellei jokin ääni ole soimassa.",
+  "Checking for updates…": "Etsitään päivityksiä…",
+  "Installing Onion Board {version}…": "Asennetaan Onion Board {version}…",
+  "Updated to {version}": "Päivitetty versioon {version}",
+  "Updating to {version}…": "Päivitetään versioon {version}…",
+  "Updating to {version}… {pct}%": "Päivitetään versioon {version}… {pct}%"
 }

@@ -3462,5 +3462,10 @@
   "Onion Board {version} is out: downloading it now. The app restarts by itself to install it when it's done.": "Onion Board {version} आ गया है: अभी डाउनलोड हो रहा है। पूरा होने पर ऐप उसे इंस्टॉल करने के लिए अपने आप रीस्टार्ट होगा।",
   "Tell me when a new version is out.": "नया वर्ज़न आने पर मुझे बताएं।",
   "This is Onion Board {version}. With the box ticked it asks GitHub whether a newer version is out each time it starts and every hour after, and tells you (with a banner if it's an important fix). Every update is checked against the file GitHub lists. Your sounds and settings are kept.": "यह Onion Board {version} है। बॉक्स पर टिक होने पर यह हर बार शुरू होने पर और फिर हर घंटे GitHub से पूछता है कि कोई नया वर्ज़न आया है या नहीं, और आपको बताता है (ज़रूरी फ़िक्स हो तो बैनर के साथ)। हर अपडेट को GitHub पर दी गई फ़ाइल से जाँचा जाता है। आपके साउंड और सेटिंग्स बने रहते हैं।",
-  "When Onion Board starts and a new version is out, it downloads it and restarts to install it, unless a sound is playing.": "जब Onion Board शुरू होता है और नया वर्ज़न आया हो, तो वह उसे डाउनलोड करता है और इंस्टॉल करने के लिए रीस्टार्ट होता है, जब तक कोई साउंड न चल रहा हो।"
+  "When Onion Board starts and a new version is out, it downloads it and restarts to install it, unless a sound is playing.": "जब Onion Board शुरू होता है और नया वर्ज़न आया हो, तो वह उसे डाउनलोड करता है और इंस्टॉल करने के लिए रीस्टार्ट होता है, जब तक कोई साउंड न चल रहा हो।",
+  "Checking for updates…": "अपडेट देखे जा रहे हैं…",
+  "Installing Onion Board {version}…": "Onion Board {version} इंस्टॉल हो रहा है…",
+  "Updated to {version}": "{version} पर अपडेट हो गया",
+  "Updating to {version}…": "{version} पर अपडेट हो रहा है…",
+  "Updating to {version}… {pct}%": "{version} पर अपडेट हो रहा है… {pct}%"
 }

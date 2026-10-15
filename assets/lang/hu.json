@@ -3462,5 +3462,10 @@
   "Onion Board {version} is out: downloading it now. The app restarts by itself to install it when it's done.": "Megjelent az Onion Board {version}: most töltődik le. Ha kész, az app magától újraindul, hogy telepítse.",
   "Tell me when a new version is out.": "Szólj, ha új verzió jelenik meg.",
   "This is Onion Board {version}. With the box ticked it asks GitHub whether a newer version is out each time it starts and every hour after, and tells you (with a banner if it's an important fix). Every update is checked against the file GitHub lists. Your sounds and settings are kept.": "Ez az Onion Board {version}. Bejelölve minden indításkor, majd óránként megkérdezi a GitHubot, van-e újabb verzió, és szól neked (sávval, ha fontos javításról van szó). Minden frissítést ellenőriz a GitHub által listázott fájllal. A hangjaid és beállításaid megmaradnak.",
-  "When Onion Board starts and a new version is out, it downloads it and restarts to install it, unless a sound is playing.": "Amikor az Onion Board elindul és új verzió jelent meg, letölti és újraindul, hogy telepítse, kivéve ha épp szól egy hang."
+  "When Onion Board starts and a new version is out, it downloads it and restarts to install it, unless a sound is playing.": "Amikor az Onion Board elindul és új verzió jelent meg, letölti és újraindul, hogy telepítse, kivéve ha épp szól egy hang.",
+  "Checking for updates…": "Frissítések keresése…",
+  "Installing Onion Board {version}…": "Onion Board {version} telepítése…",
+  "Updated to {version}": "Frissítve erre: {version}",
+  "Updating to {version}…": "Frissítés erre: {version}…",
+  "Updating to {version}… {pct}%": "Frissítés erre: {version}… {pct}%"
 }

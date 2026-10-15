@@ -3538,5 +3538,10 @@
   "Onion Board {version} is out: downloading it now. The app restarts by itself to install it when it's done.": "A apărut Onion Board {version}: se descarcă acum. Aplicația repornește singură ca s-o instaleze când termină.",
   "Tell me when a new version is out.": "Spune-mi când apare o versiune nouă.",
   "This is Onion Board {version}. With the box ticked it asks GitHub whether a newer version is out each time it starts and every hour after, and tells you (with a banner if it's an important fix). Every update is checked against the file GitHub lists. Your sounds and settings are kept.": "Acesta este Onion Board {version}. Cu bifa pusă, întreabă GitHub dacă a apărut o versiune mai nouă la fiecare pornire și apoi în fiecare oră și îți spune (cu un banner dacă e o reparație importantă). Fiecare actualizare e verificată cu fișierul listat de GitHub. Sunetele și setările tale rămân.",
-  "When Onion Board starts and a new version is out, it downloads it and restarts to install it, unless a sound is playing.": "Când Onion Board pornește și a apărut o versiune nouă, o descarcă și repornește ca s-o instaleze, doar dacă nu se aude un sunet."
+  "When Onion Board starts and a new version is out, it downloads it and restarts to install it, unless a sound is playing.": "Când Onion Board pornește și a apărut o versiune nouă, o descarcă și repornește ca s-o instaleze, doar dacă nu se aude un sunet.",
+  "Checking for updates…": "Caut actualizări…",
+  "Installing Onion Board {version}…": "Se instalează Onion Board {version}…",
+  "Updated to {version}": "Actualizat la {version}",
+  "Updating to {version}…": "Se actualizează la {version}…",
+  "Updating to {version}… {pct}%": "Se actualizează la {version}… {pct}%"
 }
