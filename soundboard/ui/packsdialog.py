@@ -264,6 +264,9 @@ class PacksDialog(QDialog):
         self.list.setSpacing(12)
         self.scroll_area.setWidget(self.body)
         self.scroll_area.setMinimumSize(440, 260)
+        # Keep the cards off the scroll bar; with no bar they line up with the share card.
+        self.scroll_area.verticalScrollBar().rangeChanged.connect(
+            lambda _lo, hi: self.list.setContentsMargins(0, 0, 10 if hi > 0 else 0, 0))
         lay.addWidget(self.scroll_area, 1)
         share = QFrame()
         share.setObjectName("card")
