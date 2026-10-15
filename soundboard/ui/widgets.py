@@ -1355,7 +1355,7 @@ class PadGrid(QWidget):
         ev.setContentsMargins(0, 24, 0, 4)
         ev.setSpacing(12)
         self.bun = BunnyWidget(
-            height=96, pad=16, sad=0.9,
+            height=130, pad=16, sad=0.9,
             lines=(_("add a sound?"), _("pleeease?"), _("it's so quiet…"),
                    _("drop one on me!"), _("just one sound?"), _("I'm bored…")),
             hope_lines=(_("yes! drop it!"), _("ooh, for me?!")),

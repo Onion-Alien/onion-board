@@ -118,7 +118,7 @@ class SearchingView(QWidget):
     there's too little, then the bar, leaving just the line."""
 
     MASCOTS = ("bunny", "owl")
-    BIG, SMALL = 104, 44       # mascot heights, px
+    BIG, SMALL = 130, 44       # mascot heights, px
     GAP = 12
 
     def __init__(self, parent=None):
