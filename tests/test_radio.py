@@ -1094,13 +1094,17 @@ def test_the_map_is_the_only_view_and_the_3d_globe_setting_moves_to_it(
     t.shutdown()
 
 
-def test_the_decoder_preloads_when_the_tab_first_opens_not_at_start_up(
+def test_the_decoder_preloads_once_the_stations_are_up_not_at_start_up(
         qapp, app_dir, server, monkeypatch):
     """Loading Qt's FFmpeg DLLs on a thread stops a hitch as the first station starts,
-    but costs ~22 MB: only once the radio is used."""
+    but costs ~22 MB: only once the radio is used. And not while the tab first fills:
+    Windows holds up every DLL load while one loads, and the map's first draw waited
+    out the decoder's on a cold disk (a 14 s freeze)."""
+    from soundboard.ui import radiopanel
     from soundboard.ui.radiopanel import RadioTab
     calls = []
     monkeypatch.setattr(radio, "preload_decoder", lambda: calls.append(1))
+    monkeypatch.setattr(radiopanel, "PRELOAD_MS", 50)
     d = RadioDirectory(app_dir / "radio", bases=(server.base,))
     cfg = Config()
     t = RadioTab(FakeEngine(), cfg, lambda: None, FakeMeter, directory=d, globe=False)
@@ -1108,8 +1112,10 @@ def test_the_decoder_preloads_when_the_tab_first_opens_not_at_start_up(
     assert calls == []                            # built (at every start-up): nothing yet
     t.start()
     t.start()                                     # the tab shown again
-    assert calls == [1]
+    assert calls == []                            # the stations first
     assert process_events(qapp, lambda: t._globe_list, timeout=20)
+    assert calls == []
+    assert process_events(qapp, lambda: calls, timeout=5)
     t.shutdown()
 
 
