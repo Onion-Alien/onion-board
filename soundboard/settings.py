@@ -351,6 +351,11 @@ class SettingsDialog(QDialog, Built):
             finally:
                 self._searching = False
         first = named = None
+        # whole words (at a word's start): the page that says them most, unless the one
+        # you're on says them too ("tor" is inside "history" and "monitor" on General:
+        # it goes to Connection, not the first page with the letters)
+        starts = [re.compile(r"\b" + re.escape(w)) for w in words]
+        best, best_n, cur_n = None, 0, 0
         for i in range(self.tabs.count()):
             if i == self._adv_row:
                 continue   # (_fold)
@@ -362,11 +367,12 @@ class SettingsDialog(QDialog, Built):
                 self.categories.item(i).setHidden(False)
                 continue
             page = self._tab_page(i)
-            hits = 0
+            hits = whole = 0
             for card in page.findChildren(QFrame, "setcard"):
                 if card.property("offline_hid"):   # (_offline_hide) as if it weren't there
                     continue
-                match = not words or all(w in title or w in self._words_of(card) for w in words)
+                said = self._words_of(card) if words else ""
+                match = all(w in title or w in said for w in words)
                 if not match and not card.isHidden():
                     card.hide()
                     card.setProperty("search_hid", True)
@@ -376,7 +382,13 @@ class SettingsDialog(QDialog, Built):
                 if match and words and card is getattr(self, "look_box", None):
                     self._look_pick(words)   # (the look box: show the tab with the words)
                 hits += match
+                if match and words:
+                    whole += min(len(r.findall(f"{title} {said}")) for r in starts)
             self.categories.item(i).setHidden(bool(words) and not hits)
+            if whole > best_n:
+                best, best_n = i, whole
+            if i == self.tabs.currentIndex():
+                cur_n = whole
             if hits and first is None:
                 first = i
             # "hotkey" goes to the Hotkeys page, not the first page that mentions one
@@ -392,6 +404,8 @@ class SettingsDialog(QDialog, Built):
         on_hidden = self.categories.item(self.tabs.currentIndex()).isHidden()
         if named is not None:
             self.tabs.setCurrentIndex(named)
+        elif best is not None and not cur_n:
+            self.tabs.setCurrentIndex(best)
         elif words and first is not None and on_hidden:
             self.tabs.setCurrentIndex(first)
 

@@ -105,3 +105,18 @@ def test_every_tab_stop_on_the_main_pages_has_a_name(window):
         assert not [w for w in stops if isinstance(w, QAbstractScrollArea)]
     assert window.catctl.cat_tabs.accessibleName() == "Categories"
     assert window._pad_scroll.accessibleName() == "Your sounds"
+
+
+def test_the_sounds_page_and_the_hear_switch_have_names(window, qapp):
+    """The Sounds page takes the focus when switched to (its Ctrl+V), and a narrow
+    window blanks the Hear what they hear switch's words: both still have a name."""
+    assert window.sounds_page.accessibleName() == "Sounds"
+    b = window.btn_check
+    b.setText("")   # what a narrow window does
+    assert b.accessibleName() == "Hear what they hear"
+    b.setChecked(True)
+    qapp.processEvents()
+    assert b.accessibleName() == "Stop hearing it"
+    b.setChecked(False)
+    qapp.processEvents()
+    assert b.accessibleName() == "Hear what they hear"

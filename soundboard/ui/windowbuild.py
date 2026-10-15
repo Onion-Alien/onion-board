@@ -886,6 +886,8 @@ class WindowBuilder(Controller):
         row.addWidget(mw.out_meter, 1)
         mw.btn_check = QPushButton(_("Hear what they hear"))
         mw.btn_check.setObjectName("miccheck")
+        # its name by hand: a narrow window blanks the words (on_mic_check keeps it)
+        mw.btn_check.setAccessibleName(_("Hear what they hear"))
         mw.btn_check.setCheckable(True)
         mw.btn_check.setToolTip(_("Plays your mic into your headphones on top of the sounds, "
                                     "exactly what others hear. A red banner shows while it's on."))
@@ -1159,6 +1161,7 @@ class WindowBuilder(Controller):
         # pad (or the picked ones)
         # a click on the page's bare parts lands here
         page.setFocusPolicy(Qt.FocusPolicy.ClickFocus)
+        page.setAccessibleName(_("Sounds"))   # (a screen reader says it when it has the focus)
         paste = QShortcut(QKeySequence.StandardKey.Paste, page)
         paste.setContext(Qt.ShortcutContext.WidgetWithChildrenShortcut)
         paste.activated.connect(mw.padctl.paste_picture)
