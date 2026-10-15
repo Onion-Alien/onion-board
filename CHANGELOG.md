@@ -2,6 +2,17 @@
 
 Changes not released yet are in [changelog.d/](changelog.d/), one file per change.
 
+## 2.2.1 — 2026-10-15
+
+- Adding a free sound pack puts it in one tab named after it ("Streamer") with its
+  categories inside, instead of also making an empty tab for each of its categories.
+- Opening the Radio tab for the first time no longer freezes the whole window for several
+  seconds on a slow or busy disk.
+- FFmpeg got by the installer no longer shows as *FFmpeg won't start (some of its files are gone)* the first time the app opens, and the app no longer downloads a second copy of it: on PCs where winget can't make its usual shortcut to FFmpeg, the app now finds it in winget's own folder.
+- Importing the same soundboard yourself while the installer's import of it is still
+  running no longer adds every sound twice, or asks "Keep your imported sounds?" after
+  you already said yes.
+
 ## 2.2.0 — 2026-10-15
 
 - Stop all now silences the sound effects too: the echo and reverb no longer keep

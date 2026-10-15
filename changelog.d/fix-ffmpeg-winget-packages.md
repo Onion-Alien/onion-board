@@ -1,1 +1,0 @@
-- FFmpeg got by the installer no longer shows as *FFmpeg won't start (some of its files are gone)* the first time the app opens, and the app no longer downloads a second copy of it: on PCs where winget can't make its usual shortcut to FFmpeg, the app now finds it in winget's own folder.
