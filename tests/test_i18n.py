@@ -93,6 +93,17 @@ def test_own_name_found_below_other_keys_and_in_a_minified_file(langs):
     assert dict(i18n.available())["ru"] == "Русский"
 
 
+def test_available_reads_each_catalog_once(langs, monkeypatch):
+    first = i18n.available()
+    opened = []
+    real = i18n._own_name
+    monkeypatch.setattr(i18n, "_own_name", lambda f: opened.append(f) or real(f))
+    assert i18n.available() == first and opened == []
+    (langs / "fr.json").write_text(json.dumps({"_meta": {"name": "Français"}}),
+                                   encoding="utf-8")
+    assert ("fr", "Français") in i18n.available() and [f.stem for f in opened] == ["fr"]
+
+
 def test_resolve_follows_windows_and_matches_regions(langs, monkeypatch):
     monkeypatch.setattr(i18n, "windows_language", lambda: "de-AT")
     assert i18n.resolve(i18n.WINDOWS) == "de"
