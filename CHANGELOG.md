@@ -2,6 +2,38 @@
 
 Changes not released yet are in [changelog.d/](changelog.d/), one file per change.
 
+## 2.2.0 — 2026-10-15
+
+- Stop all now silences the sound effects too: the echo and reverb no longer keep
+  ringing for a second or two after it. A short fade keeps it click-free.
+- Stopping the radio is instant: the last fraction of a second it had queued no longer
+  plays on after you press Stop.
+- Settings: clicking Show advanced / Hide advanced fast no longer makes the page you're on lose and regain its highlight, and the Settings search box no longer opens a right-click menu (Ctrl+C / Ctrl+V still work).
+- Voice changer and AI voices: hovering a voice's star shows a circle around it on every card, not just the picked one.
+- Clicking a button, dragging a slider or picking from a drop-down no longer leaves a focus ring on it: the ring shows while you hold it (or while its menu is open) and goes when you let go. Switching tabs no longer rings the new page's first button (the info button beside Your mic).
+- The Apps tab's empty page now matches the Sounds tab's: the same text size under Bun, and Bun sits in the middle from the start.
+- Pressing Re-scan devices while a sound plays no longer stops it: the sound carries on from where it was once the devices are back.
+- Updates install themselves when you open Onion Board: the loading screen checks for a new version, shows *Updating to X… 42%* with a bar while it downloads, installs it, and the new version opens saying *Updated to X*. If there's nothing new, or you're offline, the app just opens. Untick *Install updates by themselves* in Settings → Updates to be asked instead.
+- Bun and Hoot are bigger on the pages where they wait in the middle: Apps with nothing playing, an empty Sounds tab and while a search loads.
+- Opening the *Radio* tab for the first time while a sound plays no longer cuts the
+  sound out for a moment: the map's country outlines are made a part at a time, with
+  a rest between, instead of all at once.
+- Dragging the window's edge is smoother: while it's held, the window only re-measures
+  what changed, and measures everything once you let go (up to 44 % less work a step,
+  most on the Setup and Voice tabs).
+- Count me in now also counts the newest features (voice groups and Favorites, AI voices,
+  Free packs, the colour wheel, Show advanced, yt-dlp's buttons, the headset and 0% volume
+  warnings), each as a name only. SECURITY.md lists every one.
+- Opening *Free sound packs* while a sound plays no longer cuts the sound out for a
+  moment: the window fills in a pack (or a sample's tile) at a time, with a rest
+  between, instead of building everything at once.
+- The app does less work on every event it handles, so dragging the window's edge is a
+  little smoother (5-9 % less work a step on most tabs).
+- AI voices: clicking a voice turns the AI voice on with it, like the voice changer's voices. No more picking a voice and then pressing Start.
+- Settings → Updates → yt-dlp has a *Force update* button: when YouTube or another
+  site stops working and no approved yt-dlp fixes it yet, it installs the newest
+  yt-dlp right away, after a warning that the app's makers haven't approved it yet.
+
 ## 2.1.0 — 2026-10-15
 
 - New installs get a short first-run tour: right after the setup guide, on the empty
