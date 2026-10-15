@@ -3200,7 +3200,6 @@
   "Equalizer and volume": "Equalizer en volume",
   "Live: click to mute": "Live: klik om te dempen",
   "Muted: click to go live": "Gedempt: klik om live te gaan",
-  "No sound": "Geen geluid",
   "Before update": "Vóór de update",
   "One is saved every time you reset something or update the app (the last {max_points} are kept). Restoring puts back your settings, hotkeys and sounds as they were. Sounds you've added since are kept.": "Elke keer dat u iets reset of de app bijwerkt, wordt er één opgeslagen (de laatste {max_points} blijven behouden). Bij het herstellen worden uw instellingen, sneltoetsen en geluiden teruggezet zoals ze waren. Geluiden die u sindsdien heeft toegevoegd, blijven behouden.",
   "Stops every sound, the radio and every program, and turns the voices off": "Stopt alle geluiden, de radio en alle programma's en zet de stemmen uit",
@@ -3434,10 +3433,7 @@
   "YouTube downloads still work, but with fewer formats.": "YouTube-downloads werken nog steeds, maar met minder formaten.",
   "Is your headset on?": "Staat je headset aan?",
   "Is your headset plugged in?": "Zit je headset erin?",
-  "No sound from your mic. Is your headset on?": "Geen geluid van je mic. Staat je headset aan?",
   "Unplugged": "Niet aangesloten",
-  "Windows can't find <b>{mic}</b> right now. Plug it in, or switch it on if it's wireless. This goes away by itself.": "Windows kan <b>{mic}</b> nu niet vinden. Sluit hem aan, of zet hem aan als hij draadloos is. Dit gaat vanzelf weg.",
-  "Your headset is off or its mic is muted. Turn it on or unmute it. Still nothing? Click <b>Repair</b>.": "Je headset staat uit of de mic is gedempt. Zet hem aan of zet dempen uit. Nog steeds niets? Klik op <b>Repareren</b>.",
   "The download was cut off before the end. Try again.": "De download werd voor het einde afgebroken. Probeer het opnieuw.",
   "You can change the proxy in Settings > Connection.": "Je kunt de proxy wijzigen in Instellingen > Verbinding.",
   "the pack's file is damaged, so it wasn't kept": "het bestand van het pakket is beschadigd, dus het is niet bewaard",
@@ -3458,5 +3454,7 @@
   "Scary": "Eng",
   "Add “{name}” to Favorites": "“{name}” toevoegen aan Favorieten",
   "No favorites yet. Click the star in a voice's corner to keep it here.": "Nog geen favorieten. Klik op de ster in de hoek van een stem om hem hier te bewaren.",
-  "Remove “{name}” from Favorites": "“{name}” uit Favorieten halen"
+  "Remove “{name}” from Favorites": "“{name}” uit Favorieten halen",
+  "Windows can't find <b>{mic}</b> right now. Plug it in, or switch it on if it's wireless. No mic at all? Use the <b>virtual cable</b> below: it works without one.": "Windows kan <b>{mic}</b> nu niet vinden. Sluit hem aan, of zet hem aan als hij draadloos is. Helemaal geen microfoon? Gebruik de <b>virtuele kabel</b> hieronder: die werkt zonder.",
+  "Your mic sends no sound right now (switched off, muted or no mic plugged in), so others hear only your sounds. Want them to hear you too? Turn it on or unmute it.": "Je microfoon stuurt nu geen geluid (uit, gedempt of geen microfoon aangesloten), dus anderen horen alleen je geluiden. Wil je dat ze jou ook horen? Zet hem aan of zet het dempen uit."
 }

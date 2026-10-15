@@ -3200,7 +3200,6 @@
   "Equalizer and volume": "Equalizer och volym",
   "Live: click to mute": "Live: klicka för att stänga av ljudet",
   "Muted: click to go live": "Ljud av: klicka för att gå live",
-  "No sound": "Inget ljud",
   "Before update": "Före uppdatering",
   "One is saved every time you reset something or update the app (the last {max_points} are kept). Restoring puts back your settings, hotkeys and sounds as they were. Sounds you've added since are kept.": "En sparas varje gång du återställer något eller uppdaterar appen (de senaste {max_points} behålls). Att återställa lägger tillbaka dina inställningar, snabbtangenter och ljud som de var. Ljud du lagt till sedan dess behålls.",
   "Stops every sound, the radio and every program, and turns the voices off": "Stoppar alla ljud, radion och alla program och stänger av rösterna",
@@ -3434,10 +3433,7 @@
   "YouTube downloads still work, but with fewer formats.": "YouTube-nedladdningar fungerar ändå, men med färre format.",
   "Is your headset on?": "Är ditt headset på?",
   "Is your headset plugged in?": "Är ditt headset anslutet?",
-  "No sound from your mic. Is your headset on?": "Inget ljud från din mikrofon. Är ditt headset på?",
   "Unplugged": "Ej ansluten",
-  "Windows can't find <b>{mic}</b> right now. Plug it in, or switch it on if it's wireless. This goes away by itself.": "Windows hittar inte <b>{mic}</b> just nu. Anslut det, eller slå på det om det är trådlöst. Det här försvinner av sig självt.",
-  "Your headset is off or its mic is muted. Turn it on or unmute it. Still nothing? Click <b>Repair</b>.": "Ditt headset är avstängt eller dess mikrofon avstängd. Slå på det eller mikrofonen. Fortfarande inget? Klicka <b>Reparera</b>.",
   "The download was cut off before the end. Try again.": "Nedladdningen avbröts innan den var klar. Försök igen.",
   "You can change the proxy in Settings > Connection.": "Du kan ändra proxyn i Inställningar > Anslutning.",
   "the pack's file is damaged, so it wasn't kept": "paketets fil är skadad, så den sparades inte",
@@ -3458,5 +3454,7 @@
   "Scary": "Läskiga",
   "Add “{name}” to Favorites": "Lägg till ”{name}” i Favoriter",
   "No favorites yet. Click the star in a voice's corner to keep it here.": "Inga favoriter än. Klicka på stjärnan i hörnet av en röst för att ha den här.",
-  "Remove “{name}” from Favorites": "Ta bort ”{name}” från Favoriter"
+  "Remove “{name}” from Favorites": "Ta bort ”{name}” från Favoriter",
+  "Windows can't find <b>{mic}</b> right now. Plug it in, or switch it on if it's wireless. No mic at all? Use the <b>virtual cable</b> below: it works without one.": "Windows hittar inte <b>{mic}</b> just nu. Anslut det, eller slå på det om det är trådlöst. Ingen mikrofon alls? Använd den <b>virtuella kabeln</b> nedan: den fungerar utan.",
+  "Your mic sends no sound right now (switched off, muted or no mic plugged in), so others hear only your sounds. Want them to hear you too? Turn it on or unmute it.": "Din mikrofon skickar inget ljud just nu (avstängd, ljudlös eller ingen mikrofon ansluten), så andra hör bara dina ljud. Vill du att de hör dig också? Slå på den eller stäng av ljudlöst."
 }

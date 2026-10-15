@@ -3127,7 +3127,6 @@
   "Equalizer and volume": "อีควอไลเซอร์และความดัง",
   "Live: click to mute": "สด: คลิกเพื่อปิดเสียง",
   "Muted: click to go live": "ปิดเสียงอยู่: คลิกเพื่อกลับมาสด",
-  "No sound": "ไม่มีเสียง",
   "Before update": "ก่อนอัปเดต",
   "One is saved every time you reset something or update the app (the last {max_points} are kept). Restoring puts back your settings, hotkeys and sounds as they were. Sounds you've added since are kept.": "หนึ่งรายการจะถูกบันทึกไว้ทุกครั้งที่คุณรีเซ็ตบางสิ่งหรืออัปเดตแอป (คะแนนสูงสุด {max_points} สุดท้ายจะถูกเก็บไว้) การคืนค่าจะทำให้การตั้งค่า ปุ่มลัด และเสียงของคุณกลับมาเหมือนเดิม เสียงที่คุณเพิ่มตั้งแต่นั้นจะถูกเก็บไว้",
   "Stops every sound, the radio and every program, and turns the voices off": "หยุดทุกเสียง วิทยุ และทุกโปรแกรม แล้วปิดเสียงพากย์",
@@ -3358,10 +3357,7 @@
   "YouTube downloads still work, but with fewer formats.": "การดาวน์โหลดจาก YouTube ยังใช้ได้ แต่ได้รูปแบบน้อยลง",
   "Is your headset on?": "หูฟังเปิดอยู่หรือเปล่า",
   "Is your headset plugged in?": "เสียบหูฟังอยู่หรือเปล่า",
-  "No sound from your mic. Is your headset on?": "ไม่มีเสียงจากไมค์ของคุณ หูฟังเปิดอยู่หรือเปล่า",
   "Unplugged": "ไม่ได้เสียบ",
-  "Windows can't find <b>{mic}</b> right now. Plug it in, or switch it on if it's wireless. This goes away by itself.": "ตอนนี้ Windows หา <b>{mic}</b> ไม่เจอ เสียบมัน หรือเปิดมันถ้าเป็นแบบไร้สาย ข้อความนี้จะหายไปเอง",
-  "Your headset is off or its mic is muted. Turn it on or unmute it. Still nothing? Click <b>Repair</b>.": "หูฟังปิดอยู่ หรือไมค์ของหูฟังปิดเสียงอยู่ เปิดหูฟังหรือเปิดเสียงไมค์ ยังไม่มีเสียงอีกหรือ คลิก <b>ซ่อม</b>",
   "The download was cut off before the end. Try again.": "การดาวน์โหลดถูกตัดก่อนเสร็จ ลองอีกครั้ง",
   "You can change the proxy in Settings > Connection.": "คุณเปลี่ยนพร็อกซีได้ในการตั้งค่า > การเชื่อมต่อ",
   "the pack's file is damaged, so it wasn't kept": "ไฟล์ของแพ็คเสียหาย จึงไม่ได้เก็บไว้",
@@ -3382,5 +3378,7 @@
   "Scary": "น่ากลัว",
   "Add “{name}” to Favorites": "เพิ่ม “{name}” ในรายการโปรด",
   "No favorites yet. Click the star in a voice's corner to keep it here.": "ยังไม่มีรายการโปรด คลิกดาวที่มุมของเสียงเพื่อเก็บไว้ที่นี่",
-  "Remove “{name}” from Favorites": "เอา “{name}” ออกจากรายการโปรด"
+  "Remove “{name}” from Favorites": "เอา “{name}” ออกจากรายการโปรด",
+  "Windows can't find <b>{mic}</b> right now. Plug it in, or switch it on if it's wireless. No mic at all? Use the <b>virtual cable</b> below: it works without one.": "ตอนนี้ Windows หา <b>{mic}</b> ไม่เจอ เสียบมัน หรือเปิดมันถ้าเป็นแบบไร้สาย ไม่มีไมค์เลยเหรอ? ใช้ <b>สายเสมือน</b> ด้านล่าง: ใช้ได้แม้ไม่มีไมค์",
+  "Your mic sends no sound right now (switched off, muted or no mic plugged in), so others hear only your sounds. Want them to hear you too? Turn it on or unmute it.": "ตอนนี้ไมค์ของคุณไม่ส่งเสียงเลย (ปิดอยู่ ปิดเสียงอยู่ หรือไม่ได้เสียบไมค์) คนอื่นจึงได้ยินแค่เสียงเอฟเฟกต์ของคุณ อยากให้เขาได้ยินคุณด้วยไหม? เปิดไมค์หรือเลิกปิดเสียง"
 }
