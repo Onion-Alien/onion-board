@@ -37,6 +37,10 @@ CHIPS_GAP = 6         # between the now-playing row's chips
 CHIPS_ROW_H = 30      # the now-playing row: a chip's 24 px ■ button, its margins and border
 
 
+def _nothing():
+    """Space with nothing to play (PlaybackControl._space_action)."""
+
+
 class PlaybackControl(Controller):
     """Playing sounds for one MainWindow (``mw``)."""
 
@@ -253,11 +257,13 @@ class PlaybackControl(Controller):
 
     def _space_action(self):
         """What Space does on the tab showing (ui/spacekey.py): play / pause the
-        player's sound on Sounds, play / stop the radio on Radio; None elsewhere."""
+        player's sound on Sounds, play / stop the radio on Radio; None elsewhere.
+        Nothing to play on Sounds: nothing, not a press of the button clicked last
+        (the mini player's Bun button turned the window back into Bun)."""
         mw = self.mw
         page = mw.tabs.currentWidget()
         if page is mw.sounds_page:
-            return self.toggle_play_pause if mw.current else None
+            return self.toggle_play_pause if mw.current else _nothing
         if page is mw.radio_page:
             return getattr(mw.radio, "toggle_play", None)
         return None
