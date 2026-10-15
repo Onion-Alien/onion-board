@@ -3437,5 +3437,7 @@
   "No sound from your mic. Is your headset on?": "आपके माइक से कोई आवाज़ नहीं। क्या आपका हेडसेट चालू है?",
   "Unplugged": "प्लग नहीं है",
   "Windows can't find <b>{mic}</b> right now. Plug it in, or switch it on if it's wireless. This goes away by itself.": "Windows को अभी <b>{mic}</b> नहीं मिल रहा। उसे लगाएँ, या वायरलेस हो तो चालू करें। यह अपने आप हट जाएगा।",
-  "Your headset is off or its mic is muted. Turn it on or unmute it. Still nothing? Click <b>Repair</b>.": "आपका हेडसेट बंद है या उसका माइक म्यूट है। उसे चालू करें या अनम्यूट करें। फिर भी कुछ नहीं? <b>ठीक करें</b> पर क्लिक करें।"
+  "Your headset is off or its mic is muted. Turn it on or unmute it. Still nothing? Click <b>Repair</b>.": "आपका हेडसेट बंद है या उसका माइक म्यूट है। उसे चालू करें या अनम्यूट करें। फिर भी कुछ नहीं? <b>ठीक करें</b> पर क्लिक करें।",
+  "The download was cut off before the end. Try again.": "डाउनलोड पूरा होने से पहले ही कट गया। फिर से कोशिश करें।",
+  "You can change the proxy in Settings > Connection.": "आप प्रॉक्सी को सेटिंग्स > कनेक्शन में बदल सकते हैं।"
 }

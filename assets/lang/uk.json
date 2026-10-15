@@ -3513,5 +3513,7 @@
   "No sound from your mic. Is your headset on?": "З мікрофона немає звуку. Гарнітуру увімкнено?",
   "Unplugged": "Від'єднано",
   "Windows can't find <b>{mic}</b> right now. Plug it in, or switch it on if it's wireless. This goes away by itself.": "Windows зараз не бачить <b>{mic}</b>. Під'єднай його або увімкни, якщо він бездротовий. Це зникне само.",
-  "Your headset is off or its mic is muted. Turn it on or unmute it. Still nothing? Click <b>Repair</b>.": "Гарнітуру вимкнено, або її мікрофон вимкнено. Увімкни її або мікрофон. Досі нічого? Натисни <b>Полагодити</b>."
+  "Your headset is off or its mic is muted. Turn it on or unmute it. Still nothing? Click <b>Repair</b>.": "Гарнітуру вимкнено, або її мікрофон вимкнено. Увімкни її або мікрофон. Досі нічого? Натисни <b>Полагодити</b>.",
+  "The download was cut off before the end. Try again.": "Завантаження обірвалося до кінця. Спробуйте ще раз.",
+  "You can change the proxy in Settings > Connection.": "Проксі можна змінити в меню «Налаштування» > «З’єднання»."
 }

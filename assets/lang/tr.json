@@ -3437,5 +3437,7 @@
   "No sound from your mic. Is your headset on?": "Mikrofonundan ses gelmiyor. Kulaklığın açık mı?",
   "Unplugged": "Takılı değil",
   "Windows can't find <b>{mic}</b> right now. Plug it in, or switch it on if it's wireless. This goes away by itself.": "Windows şu an <b>{mic}</b> cihazını bulamıyor. Tak ya da kablosuzsa aç. Bu kendiliğinden kaybolur.",
-  "Your headset is off or its mic is muted. Turn it on or unmute it. Still nothing? Click <b>Repair</b>.": "Kulaklığın kapalı ya da mikrofonu sessizde. Kulaklığı aç ya da mikrofonun sesini aç. Hâlâ bir şey yok mu? <b>Onar</b>'a tıkla."
+  "Your headset is off or its mic is muted. Turn it on or unmute it. Still nothing? Click <b>Repair</b>.": "Kulaklığın kapalı ya da mikrofonu sessizde. Kulaklığı aç ya da mikrofonun sesini aç. Hâlâ bir şey yok mu? <b>Onar</b>'a tıkla.",
+  "The download was cut off before the end. Try again.": "İndirme bitmeden kesildi. Tekrar deneyin.",
+  "You can change the proxy in Settings > Connection.": "Proxy'yi Ayarlar > Bağlantı bölümünden değiştirebilirsiniz."
 }

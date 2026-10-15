@@ -341,3 +341,22 @@ def test_add_with_save_video_says_why_no_video_was_kept(qapp, monkeypatch, tmp_p
     text = bar.info.text()
     assert "No video was saved" in text
     assert ("needs FFmpeg" in text) == (ffmpeg is None), text
+
+
+def test_the_switched_off_line_follows_the_switches(qapp):
+    """Offline mode's line stayed up after Offline mode was switched off and only the
+    sounds switch was: the line is redone whenever a switch changes."""
+    from soundboard import net
+    try:
+        net.configure_features(offline=True)
+        bar, __ = _bar()
+        assert "Offline mode" in bar.info.text() and bar._shown
+        net.configure_features(off=["sounds_web"])
+        qapp.processEvents()
+        assert "Offline mode" not in bar.info.text()
+        assert bar.info.text() and bar._shown          # says it's switched off instead
+        net.configure_features()
+        qapp.processEvents()
+        assert bar.info.text() == "" and not bar._shown
+    finally:
+        net.configure_features()

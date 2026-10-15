@@ -3437,5 +3437,7 @@
   "No sound from your mic. Is your headset on?": "Ingen lyd fra mikrofonen din. Er headsettet på?",
   "Unplugged": "Ikke tilkoblet",
   "Windows can't find <b>{mic}</b> right now. Plug it in, or switch it on if it's wireless. This goes away by itself.": "Windows finner ikke <b>{mic}</b> akkurat nå. Koble det til, eller slå det på hvis det er trådløst. Dette forsvinner av seg selv.",
-  "Your headset is off or its mic is muted. Turn it on or unmute it. Still nothing? Click <b>Repair</b>.": "Headsettet er slått av, eller mikrofonen er dempet. Slå det på, eller slå på lyden. Fortsatt ingenting? Klikk <b>Reparer</b>."
+  "Your headset is off or its mic is muted. Turn it on or unmute it. Still nothing? Click <b>Repair</b>.": "Headsettet er slått av, eller mikrofonen er dempet. Slå det på, eller slå på lyden. Fortsatt ingenting? Klikk <b>Reparer</b>.",
+  "The download was cut off before the end. Try again.": "Nedlastingen ble avbrutt før slutten. Prøv igjen.",
+  "You can change the proxy in Settings > Connection.": "Du kan endre proxyen i Innstillinger > Tilkobling."
 }

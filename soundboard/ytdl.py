@@ -112,6 +112,7 @@ class FetchError(DownloadError):
 
     problem: errors.Problem | None = None   # set by _readable
     raw: str = ""
+    proxy = False   # the proxy / Tor failed, not yt-dlp (set by _readable)
 
 
 class SwitchedOff(DownloadError):
@@ -940,12 +941,23 @@ def _readable(e: Exception) -> FetchError:
     p = errors.describe(e, downloader=True)
     text = p.text
     # through a proxy / Tor, "check your internet" was wrong when it's the proxy that
-    # didn't answer: say what net.py saw ("Couldn't reach the proxy at ...")
-    if text == _("Couldn't reach the site. Check your internet connection.") \
-            and net.mode() != net.DIRECT:
-        text = net.last_failure(time.monotonic() - 60) or text
+    # didn't answer: say what net.py saw ("Couldn't reach the proxy at ..."). yt-dlp
+    # goes through the app's relay, which answers 502 when the proxy didn't, so "the
+    # site is having trouble" was just as wrong
+    if net.mode() != net.DIRECT and text in (
+            _("Couldn't reach the site. Check your internet connection."),
+            _("The site is having trouble right now. Try again later."),
+            _("The connection timed out. Check your internet and try again.")):
+        failure = net.last_failure(time.monotonic() - 60)
+        # (an address that isn't usable already says where it is)
+        if failure and net.mode() == net.PROXY and net.proxy() is not None:
+            failure += " " + _("You can change the proxy in Settings > Connection.")
+        text = failure or text
     out = FetchError(text)
-    out.problem, out.raw = p, str(e)
+    # the words shown are the problem's (errors.describe reads .problem back)
+    out.problem = p if text == p.text else errors.Problem(text, p.detail)
+    out.raw = str(e)
+    out.proxy = text != p.text   # the proxy / Tor's fault: no newer yt-dlp fixes that
     return out
 
 

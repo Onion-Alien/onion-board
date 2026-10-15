@@ -3361,5 +3361,7 @@
   "No sound from your mic. Is your headset on?": "ไม่มีเสียงจากไมค์ของคุณ หูฟังเปิดอยู่หรือเปล่า",
   "Unplugged": "ไม่ได้เสียบ",
   "Windows can't find <b>{mic}</b> right now. Plug it in, or switch it on if it's wireless. This goes away by itself.": "ตอนนี้ Windows หา <b>{mic}</b> ไม่เจอ เสียบมัน หรือเปิดมันถ้าเป็นแบบไร้สาย ข้อความนี้จะหายไปเอง",
-  "Your headset is off or its mic is muted. Turn it on or unmute it. Still nothing? Click <b>Repair</b>.": "หูฟังปิดอยู่ หรือไมค์ของหูฟังปิดเสียงอยู่ เปิดหูฟังหรือเปิดเสียงไมค์ ยังไม่มีเสียงอีกหรือ คลิก <b>ซ่อม</b>"
+  "Your headset is off or its mic is muted. Turn it on or unmute it. Still nothing? Click <b>Repair</b>.": "หูฟังปิดอยู่ หรือไมค์ของหูฟังปิดเสียงอยู่ เปิดหูฟังหรือเปิดเสียงไมค์ ยังไม่มีเสียงอีกหรือ คลิก <b>ซ่อม</b>",
+  "The download was cut off before the end. Try again.": "การดาวน์โหลดถูกตัดก่อนเสร็จ ลองอีกครั้ง",
+  "You can change the proxy in Settings > Connection.": "คุณเปลี่ยนพร็อกซีได้ในการตั้งค่า > การเชื่อมต่อ"
 }

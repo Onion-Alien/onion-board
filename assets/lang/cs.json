@@ -3513,5 +3513,7 @@
   "No sound from your mic. Is your headset on?": "Z mikrofonu nejde žádný zvuk. Jsou sluchátka zapnutá?",
   "Unplugged": "Odpojený",
   "Windows can't find <b>{mic}</b> right now. Plug it in, or switch it on if it's wireless. This goes away by itself.": "Windows teď nenacházejí <b>{mic}</b>. Připoj je, nebo je zapni, jestli jsou bezdrátová. Tohle zmizí samo.",
-  "Your headset is off or its mic is muted. Turn it on or unmute it. Still nothing? Click <b>Repair</b>.": "Sluchátka jsou vypnutá nebo mají ztlumený mikrofon. Zapni je nebo zruš ztlumení. Pořád nic? Klikni na <b>Opravit</b>."
+  "Your headset is off or its mic is muted. Turn it on or unmute it. Still nothing? Click <b>Repair</b>.": "Sluchátka jsou vypnutá nebo mají ztlumený mikrofon. Zapni je nebo zruš ztlumení. Pořád nic? Klikni na <b>Opravit</b>.",
+  "The download was cut off before the end. Try again.": "Stahování se přerušilo před koncem. Zkuste to znovu.",
+  "You can change the proxy in Settings > Connection.": "Proxy můžete změnit v Nastavení > Připojení."
 }

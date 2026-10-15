@@ -3361,5 +3361,7 @@
   "No sound from your mic. Is your headset on?": "麦克风没有声音。耳机开着吗？",
   "Unplugged": "未连接",
   "Windows can't find <b>{mic}</b> right now. Plug it in, or switch it on if it's wireless. This goes away by itself.": "Windows 现在找不到 <b>{mic}</b>。请插上，如果是无线的就打开它。这条提示会自己消失。",
-  "Your headset is off or its mic is muted. Turn it on or unmute it. Still nothing? Click <b>Repair</b>.": "耳机关着，或者麦克风静音了。请打开耳机或取消静音。还是没声音？点 <b>修复</b>。"
+  "Your headset is off or its mic is muted. Turn it on or unmute it. Still nothing? Click <b>Repair</b>.": "耳机关着，或者麦克风静音了。请打开耳机或取消静音。还是没声音？点 <b>修复</b>。",
+  "The download was cut off before the end. Try again.": "下载在完成前中断了。请重试。",
+  "You can change the proxy in Settings > Connection.": "你可以在“设置”>“连接”中更改代理。"
 }

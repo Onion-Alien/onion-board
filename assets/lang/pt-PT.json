@@ -3437,5 +3437,7 @@
   "No sound from your mic. Is your headset on?": "Nenhum som do teu microfone. Os teus auscultadores estão ligados?",
   "Unplugged": "Desligado",
   "Windows can't find <b>{mic}</b> right now. Plug it in, or switch it on if it's wireless. This goes away by itself.": "O Windows não encontra <b>{mic}</b> agora. Liga-o ao PC, ou liga-o se for sem fios. Isto desaparece sozinho.",
-  "Your headset is off or its mic is muted. Turn it on or unmute it. Still nothing? Click <b>Repair</b>.": "Os teus auscultadores estão desligados ou com o microfone silenciado. Liga-os ou tira o silêncio. Continua sem nada? Clica em <b>Reparar</b>."
+  "Your headset is off or its mic is muted. Turn it on or unmute it. Still nothing? Click <b>Repair</b>.": "Os teus auscultadores estão desligados ou com o microfone silenciado. Liga-os ou tira o silêncio. Continua sem nada? Clica em <b>Reparar</b>.",
+  "The download was cut off before the end. Try again.": "A transferência foi interrompida antes do fim. Tente novamente.",
+  "You can change the proxy in Settings > Connection.": "Pode mudar o proxy em Definições > Ligação."
 }

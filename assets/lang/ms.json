@@ -3361,5 +3361,7 @@
   "No sound from your mic. Is your headset on?": "Tiada bunyi daripada mikrofon anda. Adakah set kepala anda dihidupkan?",
   "Unplugged": "Tidak disambung",
   "Windows can't find <b>{mic}</b> right now. Plug it in, or switch it on if it's wireless. This goes away by itself.": "Windows tidak menjumpai <b>{mic}</b> sekarang. Pasangkannya, atau hidupkannya jika ia tanpa wayar. Ini hilang dengan sendirinya.",
-  "Your headset is off or its mic is muted. Turn it on or unmute it. Still nothing? Click <b>Repair</b>.": "Set kepala anda dimatikan atau mikrofonnya diredamkan. Hidupkannya atau nyahredamkannya. Masih tiada? Klik <b>Baiki</b>."
+  "Your headset is off or its mic is muted. Turn it on or unmute it. Still nothing? Click <b>Repair</b>.": "Set kepala anda dimatikan atau mikrofonnya diredamkan. Hidupkannya atau nyahredamkannya. Masih tiada? Klik <b>Baiki</b>.",
+  "The download was cut off before the end. Try again.": "Muat turun terputus sebelum selesai. Cuba lagi.",
+  "You can change the proxy in Settings > Connection.": "Anda boleh menukar proksi dalam Tetapan > Sambungan."
 }

@@ -3437,5 +3437,7 @@
   "No sound from your mic. Is your headset on?": "Няма звук от микрофона ти. Слушалките пуснати ли са?",
   "Unplugged": "Изключен",
   "Windows can't find <b>{mic}</b> right now. Plug it in, or switch it on if it's wireless. This goes away by itself.": "Windows не намира <b>{mic}</b> в момента. Включи го в компютъра или го пусни, ако е безжичен. Това изчезва само.",
-  "Your headset is off or its mic is muted. Turn it on or unmute it. Still nothing? Click <b>Repair</b>.": "Слушалките са изключени или микрофонът им е заглушен. Пусни ги или махни заглушаването. Пак нищо? Кликни <b>Поправи</b>."
+  "Your headset is off or its mic is muted. Turn it on or unmute it. Still nothing? Click <b>Repair</b>.": "Слушалките са изключени или микрофонът им е заглушен. Пусни ги или махни заглушаването. Пак нищо? Кликни <b>Поправи</b>.",
+  "The download was cut off before the end. Try again.": "Изтеглянето прекъсна преди края. Опитайте отново.",
+  "You can change the proxy in Settings > Connection.": "Можете да смените проксито в Настройки > Връзка."
 }
