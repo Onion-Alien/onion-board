@@ -1,1 +1,1 @@
-- Clicking a button, dragging a slider or picking from a drop-down no longer leaves a focus ring on it, and switching tabs no longer rings the new page's first button (the info button beside Your mic). The ring now only shows when you move with the Tab key.
+- Clicking a button, dragging a slider or picking from a drop-down no longer leaves a focus ring on it: the ring shows while you hold it (or while its menu is open) and goes when you let go. Switching tabs no longer rings the new page's first button (the info button beside Your mic).

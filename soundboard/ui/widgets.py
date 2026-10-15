@@ -295,9 +295,10 @@ class CrispSlider(QSlider):
         p.drawEllipse(circle)
         hovered = opt.activeSubControls == QStyle.SubControl.SC_SliderHandle
         if self.isEnabled() and (self.hasFocus() or hovered or self.isSliderDown()):
-            width = 2 if self.hasFocus() else 1
+            ring = self.hasFocus() or self.isSliderDown()   # Tab, or held by the mouse
+            width = 2 if ring else 1
             p.setBrush(Qt.BrushStyle.NoBrush)
-            p.setPen(QPen(QColor(theme.T["accent" if self.hasFocus() else "border_hi"]), width))
+            p.setPen(QPen(QColor(theme.T["accent" if ring else "border_hi"]), width))
             p.drawEllipse(circle.adjusted(width / 2, width / 2, -width / 2, -width / 2))
 
 
