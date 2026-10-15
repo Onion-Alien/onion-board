@@ -75,11 +75,16 @@ class ImportControl(Controller):
         self._imported_ok = 0
         # boards the installer's ticked box brought over: asked once they're in
         self._ask_keep: list[str] = []
+        self._said_yes: set[str] = set()   # boards they chose to import here themselves
         self._exporting = False
         self._import_errors: list[importreport.Skipped] = []
         self._import_total = 0      # this batch, for the toast's "3 of 12"
         self._import_card_shut = False   # its card closed with ✕: the import goes on
         self._import_stop = threading.Event()   # its Stop: the files not started are skipped
+        # the sounds in, or on their way in, by fingerprint: shared by every import
+        # running at once, so the same board imported twice together isn't added twice
+        self._known: dict[str, str] = {}
+        self._known_lock = threading.Lock()
         self._import_ids: list[str] = []   # added in this batch: Undo takes them off
         # sound id -> the hotkey it had in another soundboard (Import from Soundpad),
         # given to it once it's in if nothing here has that key
@@ -223,9 +228,11 @@ class ImportControl(Controller):
         count = len(files) + sum(len(n) for n in zips.values())
         if not count:
             return
+        if not self._pending_imports:   # nothing else running: start from the library
+            self._known = {m.fingerprint: m.name for m in mw.cfg.sounds if m.fingerprint}
         self._pending_imports += count
         start = len(mw.cfg.sounds)
-        known = {m.fingerprint: m.name for m in mw.cfg.sounds if m.fingerprint}
+        known, lock = self._known, self._known_lock
         copy_local = mw.cfg.copy_local_sounds
         local_files = set(files)   # ZIP extraction adds temporary files later
         stop = self._import_stop
@@ -276,11 +283,15 @@ class ImportControl(Controller):
                 try:
                     f = str(winpath.usable(shown))
                     fp = fingerprint(f)
-                    if fp and fp in known:
+                    with lock:   # taken here, before it's read in: the other import skips it
+                        had = known.get(fp) if fp else None
+                        if fp and had is None:
+                            known[fp] = Path(shown).stem
+                    if had is not None:
                         if shown in extras:
                             emit(None, None, None)   # already moved over
                             continue
-                        raise importreport.AlreadyAdded(known[fp])
+                        raise importreport.AlreadyAdded(had)
                     x = extras.get(shown)   # from another soundboard: named as it was there
                     meta, data = import_file(f, PAD_COLORS[(start + i) % len(PAD_COLORS)],
                                              name=x.name if x is not None else "",
@@ -591,7 +602,8 @@ class ImportControl(Controller):
         note.unlink(missing_ok=True)
         for key in dict.fromkeys(keys):
             if (src := otherboards.by_key(key)) is not None:
-                self._ask_keep.append(src.name)
+                if src.name not in self._said_yes:   # already imported it themselves
+                    self._ask_keep.append(src.name)
                 self.import_other(src, ask=False)
 
     def import_other(self, src: otherboards.Source, path: str = "", ask: bool = True):
@@ -691,6 +703,11 @@ class ImportControl(Controller):
                                     QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No
                                     ) != QMessageBox.StandardButton.Yes:
                 return
+            # their own yes: no "keep them?" at the end for this board, even when the
+            # installer's import of it is still running (it asked minutes later)
+            self._said_yes.add(src.name)
+            if src.name in self._ask_keep:
+                self._ask_keep.remove(src.name)
         self.import_files([e.path for e in ok], {e.path: e for e in ok})
 
     def import_package(self, path: str):
