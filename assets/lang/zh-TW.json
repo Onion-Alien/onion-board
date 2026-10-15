@@ -3397,5 +3397,7 @@
   "On: phones on this Wi-Fi can play your pads.": "已開啟：這個 Wi-Fi 上的手機可以播放你的按鍵。",
   "Onion Pocket": "Onion Pocket",
   "Onion Pocket's settings didn't open: they're on Settings → Remote.": "Onion Pocket 的設定沒能開啟：它們在 設定 → 遠端。",
-  "Pair a phone and settings": "配對手機和設定"
+  "Pair a phone and settings": "配對手機和設定",
+  "<br><span style='color:{status}'>Can't open {devices} (My headphones). Plugged in? It's tried again by itself.</span>": "<br><span style='color:{status}'>無法開啟 {devices}（「我的耳機」）。有插上嗎？程式會自動再試。</span>",
+  "<br><span style='color:{status}'>Can't open {devices} (My mic). Plugged in? It's tried again by itself.</span>": "<br><span style='color:{status}'>無法開啟 {devices}（「我的麥克風」）。有插上嗎？程式會自動再試。</span>"
 }

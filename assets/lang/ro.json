@@ -3549,5 +3549,7 @@
   "On: phones on this Wi-Fi can play your pads.": "Pornit: telefoanele de pe acest Wi-Fi pot reda butoanele tale.",
   "Onion Pocket": "Onion Pocket",
   "Onion Pocket's settings didn't open: they're on Settings → Remote.": "Setările Onion Pocket nu s-au deschis: sunt în Setări → Telecomandă.",
-  "Pair a phone and settings": "Asociază un telefon și setări"
+  "Pair a phone and settings": "Asociază un telefon și setări",
+  "<br><span style='color:{status}'>Can't open {devices} (My headphones). Plugged in? It's tried again by itself.</span>": "<br><span style='color:{status}'>Nu se poate deschide {devices} (Căștile mele). E conectat? Se reîncearcă singur.</span>",
+  "<br><span style='color:{status}'>Can't open {devices} (My mic). Plugged in? It's tried again by itself.</span>": "<br><span style='color:{status}'>Nu se poate deschide {devices} (Microfonul meu). E conectat? Se reîncearcă singur.</span>"
 }

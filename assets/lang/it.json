@@ -3473,5 +3473,7 @@
   "On: phones on this Wi-Fi can play your pads.": "Acceso: i telefoni su questo Wi-Fi possono suonare i tuoi pad.",
   "Onion Pocket": "Onion Pocket",
   "Onion Pocket's settings didn't open: they're on Settings → Remote.": "Le impostazioni di Onion Pocket non si sono aperte: sono in Impostazioni → Remoto.",
-  "Pair a phone and settings": "Abbina un telefono e impostazioni"
+  "Pair a phone and settings": "Abbina un telefono e impostazioni",
+  "<br><span style='color:{status}'>Can't open {devices} (My headphones). Plugged in? It's tried again by itself.</span>": "<br><span style='color:{status}'>Impossibile aprire {devices} (Le mie cuffie). È collegato? Riprova da solo.</span>",
+  "<br><span style='color:{status}'>Can't open {devices} (My mic). Plugged in? It's tried again by itself.</span>": "<br><span style='color:{status}'>Impossibile aprire {devices} (Il mio microfono). È collegato? Riprova da solo.</span>"
 }

@@ -3549,5 +3549,7 @@
   "On: phones on this Wi-Fi can play your pads.": "Zapnuto: telefony na této Wi-Fi můžou pouštět tvoje pady.",
   "Onion Pocket": "Onion Pocket",
   "Onion Pocket's settings didn't open: they're on Settings → Remote.": "Nastavení Onion Pocket se neotevřelo: najdeš ho v Nastavení → Dálkové ovládání.",
-  "Pair a phone and settings": "Spárovat telefon a nastavení"
+  "Pair a phone and settings": "Spárovat telefon a nastavení",
+  "<br><span style='color:{status}'>Can't open {devices} (My headphones). Plugged in? It's tried again by itself.</span>": "<br><span style='color:{status}'>{devices} nejde otevřít (Moje sluchátka). Je připojené? Zkouší se to znovu samo.</span>",
+  "<br><span style='color:{status}'>Can't open {devices} (My mic). Plugged in? It's tried again by itself.</span>": "<br><span style='color:{status}'>{devices} nejde otevřít (Můj mikrofon). Je připojené? Zkouší se to znovu samo.</span>"
 }
