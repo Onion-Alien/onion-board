@@ -80,7 +80,7 @@ def try_ytdlp_update(sites, mode, monkeypatch):
     with pytest.raises(ytdl.SwitchedOff, match="yt-dlp"):
         ytdl.reset()
     with pytest.raises(net.FeatureOff, match="yt-dlp"):
-        ytdl._get(url(sites, mode, "pypi", "/pypi/yt-dlp/json"), 1000)
+        ytdl._get(url(sites, mode, "pypi", "/pins/yt-dlp.json"), 1000)
     ytdl.auto_update(True)            # the daily check skips itself, silently
 
 

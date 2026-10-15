@@ -9,23 +9,28 @@ MP3 on the way: the library stores it losslessly as a FLAC of what was decoded.
 yt-dlp is imported lazily: it's a big package and only needed on click.
 
 Keeping it working: YouTube changes often and yt-dlp follows within days, but the
-built app can't pip-install. So a newer yt-dlp is fetched from PyPI (the wheels of
-yt-dlp and its pinned yt-dlp-ejs, checked against PyPI's SHA-256) and unpacked into
-%APPDATA%\\OnionBoard\\yt-dlp\\current; an import hook (_Finder) makes that copy win
-over the bundled one. That only happens when the user asks (Settings → Updates:
-Update now / Reinstall), or, if they opted in (off by default: it's code the app runs),
-once a day and when a download fails. "Reinstall" deletes the copy and its cache and fetches
-a fresh one. A copy older than the bundled yt-dlp (the app itself was updated) is
-dropped at startup.
+built app can't pip-install. So a newer yt-dlp is fetched from PyPI and unpacked into
+%APPDATA%\\OnionBoard\\yt-dlp\\current, but only a version the project approved:
+pins/yt-dlp.json on the repo's main branch (APPROVED_URL) lists them, each with the
+SHA-256 of its yt-dlp and yt-dlp-ejs wheels. A weekly job adds new releases to it once
+their PyPI attestations check out (scripts/pinbump/ytdlp.py), and merging its PR
+approves one. The app also waits until a version has been on PyPI for MIN_AGE_S, so a
+bad release gets caught and pulled first. The wheels are checked against the list's
+hashes, not PyPI's. An import hook (_Finder) makes that copy win over the bundled one.
+That only happens when the user asks (Settings → Updates: Update now / Reinstall), or,
+if they opted in (off by default: it's code the app runs), once a day and when a
+download fails. "Reinstall" deletes the copy and its cache and fetches a fresh one.
+A copy older than the bundled yt-dlp (the app itself was updated) is dropped at startup.
 
 An update never leaves downloads worse off than the built-in copy: it takes the
-newest release whose wheel says it runs on this app's Python (one that needs a newer
-Python is skipped, not installed), and a downloaded copy that fails to import is
-dropped on first use, remembered as bad (never fetched again) and the built-in one
-used instead.
+newest approved release (never one older than the built-in copy) whose wheel says it
+runs on this app's Python (one that needs a newer Python is skipped, not installed),
+and a downloaded copy that fails to import is dropped on first use, remembered as bad
+(never fetched again) and the built-in one used instead.
 """
 from __future__ import annotations
 
+import calendar
 import contextlib
 import hashlib
 import html
@@ -47,7 +52,7 @@ from collections.abc import Callable
 from dataclasses import dataclass
 from pathlib import Path
 
-from soundboard import jsengine, library, net, quality, sourceinfo, ytworker
+from soundboard import jsengine, library, net, quality, sourceinfo, updates, ytworker
 from soundboard.library import MAX_SECONDS
 from soundboard import errors
 from soundboard.i18n import _
@@ -60,7 +65,9 @@ PROGRESS_EVERY_S = 0.1          # download progress to the UI: at most 10 a seco
 VIDEO_MAX_BYTES = 1024 * 1024 * 1024   # ...and with the video kept (Settings > Data)
 VIDEO_EXTS = {".mp4", ".webm", ".mkv", ".mov"}
 PACKAGES = ("yt_dlp", "yt_dlp_ejs")
-PYPI = "https://pypi.org/pypi/{}/json"
+APPROVED_URL = f"https://raw.githubusercontent.com/{updates.REPO}/main/pins/yt-dlp.json"
+APPROVED_MAX = 1 << 20            # the list is a few KB
+MIN_AGE_S = 3 * 24 * 3600         # an approved version waits this long after its release
 WHEEL_HOST = "https://files.pythonhosted.org/"
 CHECK_EVERY = 24 * 3600          # automatic update check
 RETRY_CHECK_AFTER = 3600         # a failed download checks again if the last check is older
@@ -121,7 +128,7 @@ class SwitchedOff(DownloadError):
 
 
 FEATURE = "sounds_web"           # soundboard.net's switch for all of this
-UPDATE_FEATURE = "ytdlp_update"  # ...and for updating yt-dlp from PyPI
+UPDATE_FEATURE = "ytdlp_update"  # ...and for updating yt-dlp (the list + PyPI)
 
 
 def site_of(target: str) -> str:
@@ -381,71 +388,85 @@ def _py_ok(spec: str | None, have: tuple[int, ...] = tuple(sys.version_info[:3])
     return True
 
 
-def _fits(f: dict) -> bool:
-    """A file of a PyPI release this app can use: the pure-Python wheel, not yanked,
-    for this Python."""
-    return (f.get("packagetype") == "bdist_wheel"
-            and str(f.get("filename", "")).endswith("-py3-none-any.whl")
-            and not f.get("yanked") and _py_ok(f.get("requires_python")))
+@dataclass
+class Approved:
+    """One version from the approved list, with its wheels (yt-dlp's first)."""
+    version: str
+    uploaded: float          # when it went up on PyPI (a timestamp)
+    wheels: list[dict]       # {"filename", "url", "sha256", "requires_python", ...}
 
 
-def _pick(meta: dict) -> str:
-    """The newest final yt-dlp release (no nightlies) this app can run that hasn't
-    failed here before: PyPI's latest, unless it needs a newer Python. "" if none."""
+def _approved_entry(e) -> Approved | None:
+    """One of the list's versions, or None when it's one the app mustn't take: not a
+    final release, a wheel that isn't a pure-Python one on PyPI's file host, a hash that
+    isn't a SHA-256."""
+    try:
+        version = str(e["version"])
+        uploaded = calendar.timegm(time.strptime(str(e["uploaded"])[:19],
+                                                 "%Y-%m-%dT%H:%M:%S"))   # UTC
+        wheels = list(e["wheels"])
+        ok = (re.fullmatch(r"\d+(\.\d+)+", version) and wheels
+              and wheels[0].get("name") == "yt-dlp"
+              and all(str(w["url"]).startswith(WHEEL_HOST)
+                      and str(w["filename"]).endswith("-py3-none-any.whl")
+                      and str(w["url"]).endswith("/" + str(w["filename"]))
+                      and re.fullmatch(r"[0-9a-f]{64}", str(w["sha256"])) for w in wheels))
+    except (KeyError, TypeError, ValueError, AttributeError, OverflowError):
+        return None
+    return Approved(version, uploaded, wheels) if ok else None
+
+
+def approved() -> list[Approved]:
+    """The versions the project approved (APPROVED_URL) that the app may take. Raises
+    DownloadError when the list can't be read; net.FeatureOff when updating yt-dlp is
+    switched off or the app is in Offline mode."""
+    raw = _get(APPROVED_URL, APPROVED_MAX)
+    try:
+        versions = json.loads(raw)["versions"]
+        if not isinstance(versions, list):
+            raise TypeError(versions)
+    except (ValueError, KeyError, TypeError) as e:
+        raise DownloadError(_("The list of approved yt-dlp versions couldn't be read")) from e
+    return [a for e in versions if (a := _approved_entry(e))]
+
+
+def _pick(versions: list[Approved], now: float | None = None) -> Approved | None:
+    """The newest approved version this app can run: out for MIN_AGE_S, every wheel
+    for this Python, never failed here before. None if there's none."""
     bad = set(_state().get("bad") or ())
-    latest = str(meta["info"]["version"])
-    releases = meta.get("releases") or {latest: meta.get("urls") or []}
-    best = ""
-    for v, files in releases.items():
-        if (re.fullmatch(r"\d+(\.\d+)*", v) and v not in bad
-                and any(_fits(f) for f in files or ()) and vtuple(v) > vtuple(best)):
-            best = v
-    return best
+    cutoff = (time.time() if now is None else now) - MIN_AGE_S
+    fits = [a for a in versions
+            if a.version not in bad and a.uploaded <= cutoff
+            and all(_py_ok(w.get("requires_python")) for w in a.wheels)]
+    return max(fits, key=lambda a: vtuple(a.version), default=None)
 
 
-def _wheel(meta: dict) -> bytes:
-    """The pure-Python wheel from a PyPI JSON release, verified by its SHA-256."""
-    for f in meta.get("urls", ()):
-        if _fits(f):
-            if not f["url"].startswith(WHEEL_HOST):
-                raise DownloadError(_("unexpected download location for {file}",
-                                      file=f["filename"]))
-            data = _get(f["url"], WHEEL_MAX)
-            if hashlib.sha256(data).hexdigest() != f["digests"]["sha256"]:
-                raise DownloadError(_("{file} failed its checksum", file=f["filename"]))
-            return data
-    raise DownloadError(_("no wheel for {package}",
-                          package=meta.get("info", {}).get("name")))
+def _wheel(w: dict) -> bytes:
+    """One listed wheel, checked against the list's SHA-256."""
+    data = _get(w["url"], WHEEL_MAX)
+    if hashlib.sha256(data).hexdigest() != w["sha256"]:
+        raise DownloadError(_("{file} failed its checksum", file=w["filename"]))
+    return data
 
 
 def update(force: bool = False) -> str:
-    """Fetch the latest yt-dlp if it's newer than what's in use (or always, with
-    force). Returns a short message for the user; raises DownloadError on failure
-    (SwitchedOff when updating it is switched off in Settings > Privacy & security)."""
+    """Fetch the newest approved yt-dlp if it's newer than what's in use (or always,
+    with force, unless it's older than the built-in one). Returns a short message for
+    the user; raises DownloadError on failure (SwitchedOff when updating it is switched
+    off in Settings > Privacy & security, or in Offline mode)."""
     if not net.allowed(UPDATE_FEATURE):
         raise SwitchedOff(net.off_message(UPDATE_FEATURE))
-    try:
-        meta = json.loads(_get(PYPI.format("yt-dlp"), 5 * 1024 * 1024))
-        newest = str(meta["info"]["version"])
-        latest = _pick(meta)
-        if latest and latest != newest:   # the newest needs a newer Python, or failed here
-            log.info("yt-dlp %s can't run here: taking %s", newest, latest)
-            meta = json.loads(_get(f"https://pypi.org/pypi/yt-dlp/{latest}/json",
-                                   5 * 1024 * 1024))
-    except (ValueError, KeyError, TypeError, AttributeError) as e:
-        raise DownloadError(_("PyPI sent an answer that couldn't be read")) from e
+    pick = _pick(approved())
+    latest = pick.version if pick else ""
     current, __ = active_version()
     _save_state(checked=time.time())
-    if not latest:
-        log.info("no yt-dlp release on PyPI runs on this Python: keeping %s", current)
-    if not latest or (not force and current and vtuple(latest) <= vtuple(current)):
+    if not pick:
+        log.info("no approved yt-dlp is out long enough and runs here: keeping %s", current)
+    bundled = bundled_version()
+    if (not pick or (bundled and vtuple(latest) < vtuple(bundled))
+            or (not force and current and vtuple(latest) <= vtuple(current))):
         return _("yt-dlp {version} is up to date.", version=current)
-    wheels = [_wheel(meta)]
-    pin = next((m.group(1) for r in meta["info"].get("requires_dist") or ()
-                if (m := re.match(r"yt-dlp-ejs\s*==\s*([\w.]+)", r))), None)
-    if pin:
-        wheels.append(_wheel(json.loads(_get(f"https://pypi.org/pypi/yt-dlp-ejs/{pin}/json",
-                                             5 * 1024 * 1024))))
+    wheels = [_wheel(w) for w in pick.wheels]
     root().mkdir(parents=True, exist_ok=True)
     new = Path(tempfile.mkdtemp(prefix="new-", dir=root()))
     try:
@@ -485,7 +506,9 @@ def reset() -> str:
         shutil.rmtree(root(), ignore_errors=True)
         _purge()
     try:
-        update(force=True)
+        msg = update(force=True)
+        if not override_version():   # nothing approved is newer than the built-in one
+            return msg
         return _("Reinstalled yt-dlp {version}.", version=override_version())
     except Exception as e:  # noqa: BLE001
         log.warning("yt-dlp reinstall failed: %s", e)

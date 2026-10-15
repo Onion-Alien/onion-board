@@ -13,6 +13,10 @@ updates:
     directory: /modules/live-voice
     schedule:
       interval: monthly
+  - package-ecosystem: pip
+    directory: /scripts/pinbump    # the pin bumpers' attestation checker
+    schedule:
+      interval: monthly
   - package-ecosystem: github-actions
     directory: /
     schedule:

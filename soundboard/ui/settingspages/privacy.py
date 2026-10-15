@@ -400,9 +400,10 @@ class PrivacyPage(Page):
         # "yt-dlp" and "Tor": names, the same in every language
         __, col, d.ytdlp_state, d.ytdlp_note = self._helper_row(cv, "yt-dlp", "link")
         auto = self._option(col, _("Update automatically"),
-                            _("Once a day and after a failed download, gets the newest "
-                              "yt-dlp from PyPI. Off by default: a new version is code the "
-                              "app's makers haven't checked yet."),
+                            _("Once a day and after a failed download, gets a newer "
+                              "yt-dlp from PyPI, but only a version the app's makers "
+                              "approved that has been out for at least 3 days. Off by "
+                              "default."),
                             self.mw.cfg.ytdlp_auto_optin,
                             lambda b: self.mw.set_option("ytdlp_auto_optin", b))
         d.ytdlp_auto_box = auto

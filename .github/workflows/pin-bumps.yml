@@ -8,6 +8,9 @@ name: pin-bumps
 # It skips a bump that's already waiting. One failing checker doesn't stop the others.
 # FFmpeg's builder drops old builds, so when its pin is already the newest the ffmpeg job
 # checks both its sites still serve the pinned zip: a red one there means bump by hand.
+# yt-dlp is different: its job adds the newest release to pins/yt-dlp.json, the list the
+# app's Update now reads from main (merging the PR approves it), after checking its PyPI
+# attestations (scripts/pinbump/ytdlp.py).
 on:
   schedule:
     - cron: "37 6 * * 1"   # Mondays 06:37 UTC
@@ -20,6 +23,7 @@ on:
       - soundboard/ffmpegget.py
       - soundboard/pyget.py
       - scripts/fetch_qjs.py
+      - pins/yt-dlp.json
 
 permissions:
   contents: read
@@ -35,12 +39,14 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        checker: [tor, ffmpeg, qjs, python]
+        checker: [tor, ffmpeg, qjs, python, ytdlp]
     steps:
       - uses: actions/checkout@v6
       - uses: actions/setup-python@v7
         with:
           python-version: "3.13"
+      - if: matrix.checker == 'ytdlp'   # checks PyPI attestations (sigstore)
+        run: python -m pip install -r scripts/pinbump/requirements.txt
       # On a PR touching the bumpers: check, verify and smoke-test only, change nothing.
       # Git Bash puts Git for Windows' gpg on PATH (tor.py checks a signature with it).
       - env:

@@ -621,9 +621,10 @@ class SettingsDialog(QDialog, Built):
                         "searches your own sounds."),
         "sound_packs": _("Free sound packs (Sounds tab → Backup) reads the list of packs "
                          "from GitHub, and downloads one from there when you press Add."),
-        "ytdlp_update": _("Fetches a newer yt-dlp from PyPI when you press Update now or "
-                          "Reinstall (Updates > Helper programs), or by itself if "
-                          "you ticked Update automatically there."),
+        "ytdlp_update": _("Reads the list of yt-dlp versions the app's makers approved "
+                          "(from GitHub), and fetches a newer one from PyPI when you press "
+                          "Update now or Reinstall (Updates > Helper programs), or by "
+                          "itself if you ticked Update automatically there."),
         "radio": _("The station directory (Radio Browser) and the stations you play. Off: "
                    "the Radio tab contacts nobody."),
         "app_update": _("Asks GitHub for the latest release, and downloads its installer "

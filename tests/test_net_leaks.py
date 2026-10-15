@@ -6,11 +6,13 @@ fake SOCKS5 proxy (tests/fakeproxy.py) knows, so a request that skipped the prox
 couldn't find them. Python-side connections and DNS lookups that leave 127.0.0.1 fail
 the test outright (fakeproxy.no_leaks); Qt and FFmpeg connect from C++, so for them the
 proof is the proxy's log plus the fact that the .test name worked at all."""
+import hashlib
 import http.server
 import io
 import json
 import threading
 import types
+import zipfile
 
 import numpy as np
 import pytest
@@ -146,8 +148,24 @@ def test_add_on_release_check(sites, socks, guard, monkeypatch, app_dir):
 
 def test_ytdlp_updater_and_myinstants(sites, socks, guard, monkeypatch, app_dir):
     from soundboard import ytdl
-    sites.routes["/pypi/yt-dlp/json"] = (b'{"info": {"version": "1"}}', "application/json")
-    assert ytdl._get(sites.url("pypi", "/pypi/yt-dlp/json"), 1000).startswith(b"{")
+    # Update now, for real through the proxy / Tor: the approved list, then its wheels
+    buf = io.BytesIO()
+    with zipfile.ZipFile(buf, "w") as z:
+        z.writestr("yt_dlp/__init__.py", "__version__ = '2099.1.1'\n")
+    whl = buf.getvalue()
+    monkeypatch.setattr(ytdl, "WHEEL_HOST", sites.url("pypi", "/packages/"))
+    monkeypatch.setattr(ytdl, "APPROVED_URL", sites.url("api.github", "/pins/yt-dlp.json"))
+    monkeypatch.setattr(ytdl, "bundled_version", lambda: "2026.8.19")
+    monkeypatch.setattr(ytdl, "_purge", lambda: None)
+    sites.routes["/packages/yt_dlp-2099.1.1-py3-none-any.whl"] = (whl, "application/zip")
+    sites.routes["/pins/yt-dlp.json"] = (json.dumps({"versions": [{
+        "version": "2099.1.1", "uploaded": "2020-01-01T00:00:00Z",
+        "wheels": [{"name": "yt-dlp", "filename": "yt_dlp-2099.1.1-py3-none-any.whl",
+                    "url": sites.url("pypi", "/packages/yt_dlp-2099.1.1-py3-none-any.whl"),
+                    "sha256": hashlib.sha256(whl).hexdigest()}]}]}).encode(),
+        "application/json")
+    assert ytdl.update() == "Updated yt-dlp to 2099.1.1."
+    assert socks.hosts_asked() == {"api.github.test", "pypi.test"}
     page = ("<button onclick=\"play('/media/sounds/bruh.mp3', 'x')\"></button>"
             '<a href="/en/instant/bruh/" class="instant-link link-secondary">Bruh</a>')
     sites.routes["/en/search/"] = (page.encode(), "text/html")
@@ -157,7 +175,7 @@ def test_ytdlp_updater_and_myinstants(sites, socks, guard, monkeypatch, app_dir)
     assert [h.title for h in hits] == ["Bruh"]
     path, _title = ytdl.download_audio(hits[0].url)
     assert path.read_bytes().startswith(b"ID3")
-    assert socks.hosts_asked() == {"pypi.test", "myinstants.test"}
+    assert socks.hosts_asked() == {"api.github.test", "pypi.test", "myinstants.test"}
 
 
 def test_translation_model_download(sites, socks, guard, monkeypatch, app_dir):
