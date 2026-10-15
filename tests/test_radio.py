@@ -937,6 +937,47 @@ def test_player_reopens_a_dropped_stream_retries_times_and_never_twice_at_once(
     assert errors and p.station is None and p.status == "error"
 
 
+def test_a_station_that_plays_a_moment_and_drops_each_time_is_given_up_on(
+        qapp, monkeypatch):
+    """Each reopen got a few seconds of audio, which counted as a working station
+    again: it was reopened for ever, no message, the tab still saying it played."""
+    p = RadioPlayer()
+    scheduled = later(monkeypatch)
+    opens, errors = [], []
+    p.error.connect(errors.append)
+    p._open = lambda: (opens.append(1), setattr(p, "_got_audio", False))
+    p.station = Station(uuid="u", name="S", url="http://x")
+    p._gen = 1
+    for _ in range(radio.RETRIES + 2):
+        if p.station is None:
+            break
+        p._on_first_audio(1)                     # a moment of sound...
+        p._retry("the station stopped sending")  # ...then it drops again
+        if scheduled:
+            scheduled.pop()()
+    assert len(opens) == radio.RETRIES
+    assert errors and p.station is None and p.status == "error"
+
+
+def test_a_station_back_for_a_while_gets_its_reopens_again(qapp, monkeypatch):
+    p = RadioPlayer()
+    scheduled = later(monkeypatch)
+    clock = [1000.0]
+    monkeypatch.setattr(radio.time, "monotonic", lambda: clock[0])
+    p._open = lambda: setattr(p, "_got_audio", False)
+    p.station, p._gen = Station(uuid="u", name="S", url="http://x"), 1
+    p._on_first_audio(1)
+    p._retry("the station stopped sending")
+    scheduled.pop()()
+    p._on_first_audio(1)
+    assert p._retries == 1
+    for _ in range(int(radio.STEADY_S) + 2):     # it plays on, the watchdog ticking
+        clock[0] += 1
+        p._last_audio = clock[0]
+        p._check()
+    assert p._retries == 0 and p.station is not None
+
+
 def test_a_reopen_scheduled_before_stop_does_nothing(qapp, monkeypatch):
     p = RadioPlayer()
     scheduled = later(monkeypatch)

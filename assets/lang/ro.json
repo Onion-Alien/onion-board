@@ -3513,5 +3513,6 @@
   "No sound from your mic. Is your headset on?": "Niciun sunet de la microfon. Căștile sunt pornite?",
   "Unplugged": "Deconectat",
   "Windows can't find <b>{mic}</b> right now. Plug it in, or switch it on if it's wireless. This goes away by itself.": "Windows nu găsește <b>{mic}</b> acum. Conectează-le sau pornește-le, dacă sunt wireless. Asta dispare singur.",
-  "Your headset is off or its mic is muted. Turn it on or unmute it. Still nothing? Click <b>Repair</b>.": "Căștile sunt oprite sau au microfonul pe mut. Pornește-le sau scoate-l de pe mut. Tot nimic? Dă clic pe <b>Repară</b>."
+  "Your headset is off or its mic is muted. Turn it on or unmute it. Still nothing? Click <b>Repair</b>.": "Căștile sunt oprite sau au microfonul pe mut. Pornește-le sau scoate-l de pe mut. Tot nimic? Dă clic pe <b>Repară</b>.",
+  "the pack's file is damaged, so it wasn't kept": "fișierul pachetului este deteriorat, așa că nu a fost păstrat"
 }

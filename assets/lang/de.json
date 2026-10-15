@@ -3437,5 +3437,6 @@
   "No sound from your mic. Is your headset on?": "Kein Ton von deinem Mikro. Ist dein Headset an?",
   "Unplugged": "Nicht angeschlossen",
   "Windows can't find <b>{mic}</b> right now. Plug it in, or switch it on if it's wireless. This goes away by itself.": "Windows findet <b>{mic}</b> gerade nicht. Steck es ein, oder schalte es ein, wenn es kabellos ist. Das geht von selbst weg.",
-  "Your headset is off or its mic is muted. Turn it on or unmute it. Still nothing? Click <b>Repair</b>.": "Dein Headset ist aus oder sein Mikro stummgeschaltet. Schalte es ein oder heb die Stummschaltung auf. Immer noch nichts? Klick <b>Reparieren</b>."
+  "Your headset is off or its mic is muted. Turn it on or unmute it. Still nothing? Click <b>Repair</b>.": "Dein Headset ist aus oder sein Mikro stummgeschaltet. Schalte es ein oder heb die Stummschaltung auf. Immer noch nichts? Klick <b>Reparieren</b>.",
+  "the pack's file is damaged, so it wasn't kept": "die Datei des Pakets ist beschädigt, daher wurde sie nicht aufbewahrt"
 }
