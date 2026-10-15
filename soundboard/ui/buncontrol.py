@@ -53,8 +53,17 @@ class BunControl(Controller):
         mw.cfg.bun["on"] = True
         mw._save_later()
         usage.used("bun-mode")
+        if mw.focusWidget() is getattr(mw, "mini_bun", None):
+            mw.mini_bun.clearFocus()   # back from Bun, the keys don't go to it
         mw.hide()
         mw.tickctl._wake()
+
+    def tray_bun(self):
+        """The tray menu's Bun item: Bun when he isn't up, the window back when he is."""
+        if self.bun_up():
+            self.leave_bun_mode(False)
+        else:
+            self.enter_bun_mode()
 
     def leave_bun_mode(self, full: bool = False):
         """Bun's Back button: the window back as it was. Open the full board (`full`,

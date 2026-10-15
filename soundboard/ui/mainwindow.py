@@ -1079,7 +1079,8 @@ class MainWindow(QMainWindow):
         icons.set_icon(menu.addAction(_("Open Onion Board"), self.show_from_tray), "sounds")
         icons.set_icon(menu.addAction(_("Stop all sounds"), self.playctl.stop_all), "stop")
         self._tray_bun = menu.addAction(self.builder._bun_icon(), _("Turn into Bun"),
-                                        self.bunctl.enter_bun_mode)
+                                        self.bunctl.tray_bun)
+        menu.aboutToShow.connect(self._name_tray_bun)
         menu.addSeparator()
         # the Discord opens in the browser (feedback.py); Send feedback asks first
         from soundboard import feedback
@@ -1093,6 +1094,11 @@ class MainWindow(QMainWindow):
         t.messageClicked.connect(self.show_from_tray)
         t.show()
         QApplication.setQuitOnLastWindowClosed(False)
+
+    def _name_tray_bun(self):
+        """The tray's Bun item says what it does now: Bun up, it brings the window back."""
+        self._tray_bun.setText(_("Back to the board") if self.bunctl.bun_up()
+                               else _("Turn into Bun"))
 
     def _on_tray(self, reason):
         if reason in (QSystemTrayIcon.ActivationReason.Trigger,

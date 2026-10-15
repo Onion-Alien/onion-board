@@ -197,3 +197,29 @@ def test_back_returns_the_window_as_it_was_even_after_a_restart(window, qapp):
     window.bunctl.enter_bun_mode()
     window.bunctl.bun_mode.full.emit()   # the right-click menu: the full board
     assert not window.fitctl.is_mini() and window.width() > was.width()
+
+
+def test_tray_item_brings_the_window_back_while_bun_is_up(window, qapp):
+    from PySide6.QtTest import QTest
+    _mini(window)
+    window.activateWindow()
+    window.mini_bun.setFocus(Qt.FocusReason.MouseFocusReason)   # as a click leaves it
+    window.mini_bun.click()
+    assert window.bunctl.bun_up()
+    assert window.focusWidget() is not window.mini_bun
+    if getattr(window, "_tray_bun", None) is not None:   # (no tray on some desktops)
+        window._name_tray_bun()
+        assert window._tray_bun.text() == "Back to the board"
+    window.bunctl.tray_bun()                             # the tray item, Bun up
+    assert not window.bunctl.bun_up() and window.isVisible()
+    if getattr(window, "_tray_bun", None) is not None:
+        window._name_tray_bun()
+        assert window._tray_bun.text() == "Turn into Bun"
+    window.tabs.setCurrentWidget(window.sounds_page)   # the mini player's pads
+    window.current = None                                # nothing loaded to play
+    window.mini_bun.setFocus(Qt.FocusReason.MouseFocusReason)
+    QTest.keyClick(window.mini_bun, Qt.Key.Key_Space)    # Space: not a press of Bun's
+    assert not window.bunctl.bun_up() and window.isVisible()
+    window.bunctl.tray_bun()                             # Bun not up: turns into him
+    assert window.bunctl.bun_up()
+    window.bunctl.leave_bun_mode()
