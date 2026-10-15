@@ -499,14 +499,10 @@ def test_a_click_leaves_no_focus_ring(qapp, win):
     page.show()
     qapp.processEvents()
     QTest.mouseClick(btn, Qt.MouseButton.LeftButton)
+    assert not btn.hasFocus()   # never ringed, not even for a moment
     QTest.mouseClick(slider, Qt.MouseButton.LeftButton, pos=slider.rect().center())
-    combo.setFocus(Qt.FocusReason.PopupFocusReason)   # (its list just closed)
-    for w in (btn, slider, combo):
-        if w is not combo:
-            w.setFocus(Qt.FocusReason.MouseFocusReason)
-        qapp.processEvents()
-        assert not w.hasFocus(), w
+    assert not slider.hasFocus()
+    assert combo.focusPolicy() == Qt.FocusPolicy.TabFocus
     slider.setFocus(Qt.FocusReason.TabFocusReason)   # Tab: ringed, as it should be
-    qapp.processEvents()
     assert slider.hasFocus()
     page.deleteLater()

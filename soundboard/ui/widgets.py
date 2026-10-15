@@ -12,7 +12,7 @@ from PySide6.QtCore import (QEasingCurve, QEvent, QMimeData, QObject, QPoint, QP
 from PySide6.QtGui import (QColor, QDrag, QFont, QFontMetrics, QLinearGradient, QPainter,
                            QPainterPath, QPen, QPixmap)
 from PySide6.QtWidgets import (QAbstractButton, QAbstractSlider, QApplication, QComboBox,
-                               QDialog, QGridLayout, QLabel, QMainWindow, QMenu, QTabBar,
+                               QGridLayout, QLabel, QMainWindow, QMenu, QTabBar,
                                QScrollArea,
                                QSlider, QStackedWidget, QStyle, QStyleOptionSlider,
                                QTabWidget, QToolTip,
@@ -220,10 +220,6 @@ class EqCurve(QWidget):
             p.drawText(plate, Qt.AlignmentFlag.AlignCenter, off)
 
 
-CLICK_FOCUS = (Qt.FocusReason.MouseFocusReason, Qt.FocusReason.PopupFocusReason,
-               Qt.FocusReason.ActiveWindowFocusReason)
-
-
 def _clicked_kind(w) -> bool:
     """A control a click works (a button, a drop-down, a slider, a tab): no text to type."""
     if isinstance(w, QComboBox):
@@ -232,28 +228,20 @@ def _clicked_kind(w) -> bool:
 
 
 class ClickFocusFilter(QObject):
-    """The focus ring is for the keyboard: a click, a drag or a closed drop-down left
-    the control it touched ringed until something else was clicked. Those controls
-    hand the focus on to their page (or dialog) as soon as they get it from the mouse,
-    a closed pop-up or the window coming back; Tab still rings them."""
-    EVENTS = (QEvent.Type.FocusIn,)   # all it reads (theme.app_filter)
+    """The focus ring is for the keyboard: a click, a drag or a pick from a drop-down
+    left the control it touched ringed until something else was clicked. Those
+    controls take the focus from the Tab key only, so a click never rings them (and
+    never moves the focus off whatever had it)."""
+    EVENTS = (QEvent.Type.Polish,)   # all it reads (theme.app_filter)
 
     def eventFilter(self, obj, event):   # noqa: N802 - Qt API
-        if (event.type() == QEvent.Type.FocusIn and event.reason() in CLICK_FOCUS
-                and _clicked_kind(obj)):
-            QTimer.singleShot(0, lambda w=obj: self._hand_on(w))
+        if event.type() == QEvent.Type.Polish and _clicked_kind(obj):
+            policy = obj.focusPolicy()
+            if policy in (Qt.FocusPolicy.StrongFocus, Qt.FocusPolicy.WheelFocus):
+                obj.setFocusPolicy(Qt.FocusPolicy.TabFocus)
+            elif policy == Qt.FocusPolicy.ClickFocus:
+                obj.setFocusPolicy(Qt.FocusPolicy.NoFocus)
         return False
-
-    @staticmethod
-    def _hand_on(w):
-        if not qt_valid(w) or not w.hasFocus():
-            return
-        home = w.parentWidget()
-        while home is not None and not (isinstance(home, QDialog) or home.isWindow()
-                                        or isinstance(home.parentWidget(), QStackedWidget)):
-            home = home.parentWidget()
-        if home is not None:
-            home.setFocus(Qt.FocusReason.OtherFocusReason)
 
 
 def install_click_focus(app: QApplication) -> None:
