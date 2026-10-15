@@ -59,7 +59,7 @@ from soundboard.ui.categorycontrol import CategoryControl
 from soundboard.ui.importcontrol import ImportControl
 from soundboard.ui.updatecontrol import UpdateControl
 from soundboard.ui import toast as toastmod
-from soundboard.ui import (a11y, appstate, busy, icons, responsive,
+from soundboard.ui import (a11y, appstate, busy, icons, livesize, responsive,
                            splash, taboff)
 from soundboard.ui.linkbar import PLAY_ID as LINK_ID
 from soundboard.ui.logowidget import glow_icon
@@ -1233,6 +1233,8 @@ class MainWindow(QMainWindow):
         tb = getattr(self, "thumbbar", None)
         if tb is not None and tb.native_event(message):
             return True, 0
+        if drag := livesize.drag_edge(message):   # the edge held / let go
+            self.fitctl.live(drag > 0)
         return super().nativeEvent(event_type, message)
 
     def hideEvent(self, ev):
