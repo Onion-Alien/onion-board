@@ -301,6 +301,9 @@ class NameAndSeek(QWidget):
         # slider gets too short to aim at or the name is cut: the name as it is now (up
         # to max_name). Not announced on a new name (no relayout per pad press): the
         # fitter measures it fresh on the next resize
+        # (asked while the window closes too: nothing here may raise, overridepin.py)
+        if not (qt_valid(self.name) and qt_valid(self.seek)):
+            return QSize(self.SEEK_MIN, 0)
         name = 0 if self.name.isHidden() else self.GAP + min(
             self.max_name, self.name.fontMetrics().horizontalAdvance(self.name.text()) + 4)
         return QSize(self.SEEK_MIN + name, self.sizeHint().height())

@@ -10,7 +10,7 @@ import logging
 from pathlib import Path
 from typing import TYPE_CHECKING
 
-from PySide6.QtCore import Qt
+from PySide6.QtCore import Qt, QTimer
 
 from soundboard import videos
 from soundboard.engine import SR
@@ -31,12 +31,14 @@ class TransportControl(Controller):
 
     def __init__(self, mw: MainWindow):
         super().__init__(mw)
+        self._refit_due = False   # a refit for the player bar is on its way
 
     def _show_transport(self, playing=None):
         """The player bar: always on the Sounds tab; on the others only while a sound
         plays or is paused, so it can be stopped without going back to the pads (and
         doesn't take the room the rest of the time)."""
         mw = self.mw
+        from_tick = playing is not None
         if mw.tabs.currentWidget() is mw.sounds_page and not mw.setctl.settings_open():
             want = True
         else:
@@ -46,9 +48,18 @@ class TransportControl(Controller):
         if mw.transport.isHidden() == want:
             mw.transport.setVisible(want)
             # fitted again with the bar: on another tab the window gave its room back,
-            # and coming to Sounds the bar's name was cut off ("Sound wählen" in 0 px)
+            # and coming to Sounds the bar's name was cut off ("Sound wählen" in 0 px).
+            # From the play tick: just after it, not inside it
             if want and hasattr(mw.fitctl, "_fit"):
-                mw.fitctl._refit()
+                if not from_tick:
+                    mw.fitctl._refit()
+                elif not self._refit_due:
+                    self._refit_due = True
+
+                    def refit():
+                        self._refit_due = False
+                        mw.fitctl._refit()
+                    QTimer.singleShot(0, mw, refit)   # with the window: not after it's gone
 
     def _scroll_background_board(self, value):
         mw = self.mw

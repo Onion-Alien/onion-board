@@ -28,6 +28,7 @@ BODY_SIDE_TIGHT = 8    # ...and beside the rail in a narrow window
 MINI_SIZE = QSize(440, 380)   # below this the window becomes the mini player...
 MINI_PAD_ROWS = 1             # ...which has the pads above it when this many rows fit
 SEARCH_MIN_W = 220    # the Sounds tab's search box, until the window gets narrow
+SEARCH_TIGHT_W = 130  # ...then this, until it gets very narrow
 
 
 class FitControl(Controller):
@@ -62,9 +63,20 @@ class FitControl(Controller):
         f.add(40, "w", r.hide(*mw._transport_vol))
         f.add(50, "w", r.hide(mw.np_name))
         f.add(60, "w", r.icon_only(mw.btn_add))
-        # the search box keeps room to type in until the buttons beside it have shrunk
-        f.add(62, "w", lambda tight: (mw.search.setMinimumWidth(0 if tight else SEARCH_MIN_W),
-                                      r.touch(mw.search)))
+        # the search box keeps room to type in until the buttons beside it have shrunk,
+        # then some room ("Search..." was all that was left once their words came back
+        # beside a box allowed down to nothing), and only at the very narrowest none
+        search_tight = {62: False, 65: False}
+
+        def search_room(step: int):
+            def apply(tight: bool):
+                search_tight[step] = tight
+                mw.search.setMinimumWidth(0 if search_tight[65] else SEARCH_TIGHT_W
+                                          if search_tight[62] else SEARCH_MIN_W)
+                r.touch(mw.search)
+            return apply
+        f.add(62, "w", search_room(62))
+        f.add(65, "w", search_room(65))
         # very narrow: the search button (and its site menu) goes; Enter still searches
         # the site picked last
         f.add(63, "w", lambda tight: (
