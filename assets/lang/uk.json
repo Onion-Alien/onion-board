@@ -3551,5 +3551,7 @@
   "Onion Pocket's settings didn't open: they're on Settings → Remote.": "Налаштування Onion Pocket не відкрилися: вони в розділі Налаштування → Дистанційний.",
   "Pair a phone and settings": "Підключити телефон і налаштування",
   "<br><span style='color:{status}'>Can't open {devices} (My headphones). Plugged in? It's tried again by itself.</span>": "<br><span style='color:{status}'>Не вдається відкрити {devices} («Мої навушники»). Підключено? Спроба повториться сама.</span>",
-  "<br><span style='color:{status}'>Can't open {devices} (My mic). Plugged in? It's tried again by itself.</span>": "<br><span style='color:{status}'>Не вдається відкрити {devices} («Мій мікрофон»). Підключено? Спроба повториться сама.</span>"
+  "<br><span style='color:{status}'>Can't open {devices} (My mic). Plugged in? It's tried again by itself.</span>": "<br><span style='color:{status}'>Не вдається відкрити {devices} («Мій мікрофон»). Підключено? Спроба повториться сама.</span>",
+  "Two mics have names like that one. Pick yours again (Setup tab → Devices).": "Два мікрофони мають схожі назви. Вибери свій знову (вкладка «Підключення» → Пристрої).",
+  "Windows doesn't know that mic any more. Pick your mic again (Setup tab → Devices).": "Windows більше не знає цей мікрофон. Вибери мікрофон знову (вкладка «Підключення» → Пристрої)."
 }

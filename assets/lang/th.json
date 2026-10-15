@@ -3399,5 +3399,7 @@
   "Onion Pocket's settings didn't open: they're on Settings → Remote.": "การตั้งค่า Onion Pocket ไม่เปิด: อยู่ใน การตั้งค่า → ระยะไกล",
   "Pair a phone and settings": "จับคู่โทรศัพท์และการตั้งค่า",
   "<br><span style='color:{status}'>Can't open {devices} (My headphones). Plugged in? It's tried again by itself.</span>": "<br><span style='color:{status}'>เปิด {devices} ไม่ได้ (หูฟังของฉัน) เสียบอยู่ไหม? ระบบจะลองใหม่เอง</span>",
-  "<br><span style='color:{status}'>Can't open {devices} (My mic). Plugged in? It's tried again by itself.</span>": "<br><span style='color:{status}'>เปิด {devices} ไม่ได้ (ไมค์ของฉัน) เสียบอยู่ไหม? ระบบจะลองใหม่เอง</span>"
+  "<br><span style='color:{status}'>Can't open {devices} (My mic). Plugged in? It's tried again by itself.</span>": "<br><span style='color:{status}'>เปิด {devices} ไม่ได้ (ไมค์ของฉัน) เสียบอยู่ไหม? ระบบจะลองใหม่เอง</span>",
+  "Two mics have names like that one. Pick yours again (Setup tab → Devices).": "มีไมค์สองตัวที่ชื่อคล้ายกัน เลือกไมค์ของคุณใหม่อีกครั้ง (แท็บ เซ็ตอัป → อุปกรณ์)",
+  "Windows doesn't know that mic any more. Pick your mic again (Setup tab → Devices).": "Windows ไม่รู้จักไมค์นั้นแล้ว เลือกไมค์ใหม่อีกครั้ง (แท็บ เซ็ตอัป → อุปกรณ์)"
 }

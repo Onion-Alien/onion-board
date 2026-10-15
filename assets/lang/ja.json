@@ -3399,5 +3399,7 @@
   "Onion Pocket's settings didn't open: they're on Settings → Remote.": "Onion Pocket の設定を開けませんでした: 設定 → リモート にあります。",
   "Pair a phone and settings": "スマホの接続と設定",
   "<br><span style='color:{status}'>Can't open {devices} (My headphones). Plugged in? It's tried again by itself.</span>": "<br><span style='color:{status}'>{devices}（「私のヘッドフォン」）を開けません。接続されていますか？ 自動で再試行します。</span>",
-  "<br><span style='color:{status}'>Can't open {devices} (My mic). Plugged in? It's tried again by itself.</span>": "<br><span style='color:{status}'>{devices}（「私のマイク」）を開けません。接続されていますか？ 自動で再試行します。</span>"
+  "<br><span style='color:{status}'>Can't open {devices} (My mic). Plugged in? It's tried again by itself.</span>": "<br><span style='color:{status}'>{devices}（「私のマイク」）を開けません。接続されていますか？ 自動で再試行します。</span>",
+  "Two mics have names like that one. Pick yours again (Setup tab → Devices).": "似た名前のマイクが 2 つあります。自分のマイクを選び直してください（セットアップタブ → デバイス）。",
+  "Windows doesn't know that mic any more. Pick your mic again (Setup tab → Devices).": "Windows がそのマイクを認識しなくなりました。マイクを選び直してください（セットアップタブ → デバイス）。"
 }

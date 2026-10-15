@@ -3475,5 +3475,7 @@
   "Onion Pocket's settings didn't open: they're on Settings → Remote.": "Hindi nabuksan ang settings ng Onion Pocket: nasa Settings → Remote ang mga ito.",
   "Pair a phone and settings": "Mag-pair ng phone at settings",
   "<br><span style='color:{status}'>Can't open {devices} (My headphones). Plugged in? It's tried again by itself.</span>": "<br><span style='color:{status}'>Hindi mabuksan ang {devices} (Headphones ko). Nakasaksak ba? Kusa itong susubukan ulit.</span>",
-  "<br><span style='color:{status}'>Can't open {devices} (My mic). Plugged in? It's tried again by itself.</span>": "<br><span style='color:{status}'>Hindi mabuksan ang {devices} (Mic ko). Nakasaksak ba? Kusa itong susubukan ulit.</span>"
+  "<br><span style='color:{status}'>Can't open {devices} (My mic). Plugged in? It's tried again by itself.</span>": "<br><span style='color:{status}'>Hindi mabuksan ang {devices} (Mic ko). Nakasaksak ba? Kusa itong susubukan ulit.</span>",
+  "Two mics have names like that one. Pick yours again (Setup tab → Devices).": "Magkahawig ang pangalan ng dalawang mic. Piliin ulit ang sa iyo (Setup tab → Mga device).",
+  "Windows doesn't know that mic any more. Pick your mic again (Setup tab → Devices).": "Hindi na kilala ng Windows ang mic na iyon. Piliin ulit ang mic mo (Setup tab → Mga device)."
 }

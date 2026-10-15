@@ -3399,5 +3399,7 @@
   "Onion Pocket's settings didn't open: they're on Settings → Remote.": "Onion Pocket 설정이 열리지 않았어요: 설정 → 원격에 있어요.",
   "Pair a phone and settings": "휴대폰 연결 및 설정",
   "<br><span style='color:{status}'>Can't open {devices} (My headphones). Plugged in? It's tried again by itself.</span>": "<br><span style='color:{status}'>{devices}을(를) 열 수 없어요(내 헤드폰). 연결되어 있나요? 자동으로 다시 시도해요.</span>",
-  "<br><span style='color:{status}'>Can't open {devices} (My mic). Plugged in? It's tried again by itself.</span>": "<br><span style='color:{status}'>{devices}을(를) 열 수 없어요(내 마이크). 연결되어 있나요? 자동으로 다시 시도해요.</span>"
+  "<br><span style='color:{status}'>Can't open {devices} (My mic). Plugged in? It's tried again by itself.</span>": "<br><span style='color:{status}'>{devices}을(를) 열 수 없어요(내 마이크). 연결되어 있나요? 자동으로 다시 시도해요.</span>",
+  "Two mics have names like that one. Pick yours again (Setup tab → Devices).": "이름이 비슷한 마이크가 두 개 있습니다. 내 마이크를 다시 고르세요(셋업 탭 → 장치).",
+  "Windows doesn't know that mic any more. Pick your mic again (Setup tab → Devices).": "Windows가 더 이상 그 마이크를 알지 못합니다. 마이크를 다시 고르세요(셋업 탭 → 장치)."
 }

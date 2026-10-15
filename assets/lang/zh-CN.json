@@ -3399,5 +3399,7 @@
   "Onion Pocket's settings didn't open: they're on Settings → Remote.": "Onion Pocket 的设置没能打开：它们在 设置 → 远程。",
   "Pair a phone and settings": "配对手机和设置",
   "<br><span style='color:{status}'>Can't open {devices} (My headphones). Plugged in? It's tried again by itself.</span>": "<br><span style='color:{status}'>无法打开 {devices}（“我的耳机”）。插好了吗？它会自动重试。</span>",
-  "<br><span style='color:{status}'>Can't open {devices} (My mic). Plugged in? It's tried again by itself.</span>": "<br><span style='color:{status}'>无法打开 {devices}（“我的麦克风”）。插好了吗？它会自动重试。</span>"
+  "<br><span style='color:{status}'>Can't open {devices} (My mic). Plugged in? It's tried again by itself.</span>": "<br><span style='color:{status}'>无法打开 {devices}（“我的麦克风”）。插好了吗？它会自动重试。</span>",
+  "Two mics have names like that one. Pick yours again (Setup tab → Devices).": "有两个麦克风的名字很像。请重新选择你的麦克风（向导标签页 → 设备）。",
+  "Windows doesn't know that mic any more. Pick your mic again (Setup tab → Devices).": "Windows 已经不认识这个麦克风了。请重新选择你的麦克风（向导标签页 → 设备）。"
 }

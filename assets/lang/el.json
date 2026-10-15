@@ -3475,5 +3475,7 @@
   "Onion Pocket's settings didn't open: they're on Settings → Remote.": "Οι ρυθμίσεις του Onion Pocket δεν άνοιξαν: είναι στο Ρυθμίσεις → Απομακρυσμένο.",
   "Pair a phone and settings": "Σύνδεση κινητού και ρυθμίσεις",
   "<br><span style='color:{status}'>Can't open {devices} (My headphones). Plugged in? It's tried again by itself.</span>": "<br><span style='color:{status}'>Δεν ανοίγει: {devices} (Τα ακουστικά μου). Είναι συνδεδεμένο; Ξαναδοκιμάζεται μόνο του.</span>",
-  "<br><span style='color:{status}'>Can't open {devices} (My mic). Plugged in? It's tried again by itself.</span>": "<br><span style='color:{status}'>Δεν ανοίγει: {devices} (Το μικρόφωνό μου). Είναι συνδεδεμένο; Ξαναδοκιμάζεται μόνο του.</span>"
+  "<br><span style='color:{status}'>Can't open {devices} (My mic). Plugged in? It's tried again by itself.</span>": "<br><span style='color:{status}'>Δεν ανοίγει: {devices} (Το μικρόφωνό μου). Είναι συνδεδεμένο; Ξαναδοκιμάζεται μόνο του.</span>",
+  "Two mics have names like that one. Pick yours again (Setup tab → Devices).": "Δύο μικρόφωνα έχουν παρόμοια ονόματα. Διάλεξε ξανά το δικό σου (καρτέλα Διαμόρφωση → Συσκευές).",
+  "Windows doesn't know that mic any more. Pick your mic again (Setup tab → Devices).": "Τα Windows δεν γνωρίζουν πια αυτό το μικρόφωνο. Διάλεξε ξανά το μικρόφωνό σου (καρτέλα Διαμόρφωση → Συσκευές)."
 }

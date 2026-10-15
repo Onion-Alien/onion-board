@@ -3475,5 +3475,7 @@
   "Onion Pocket's settings didn't open: they're on Settings → Remote.": "Onion Pockets indstillinger åbnede ikke: de er under Indstillinger → Fjernbetjening.",
   "Pair a phone and settings": "Par en telefon og indstillinger",
   "<br><span style='color:{status}'>Can't open {devices} (My headphones). Plugged in? It's tried again by itself.</span>": "<br><span style='color:{status}'>Kan ikke åbne {devices} (Mine hovedtelefoner). Er den sat i? Den prøves igen af sig selv.</span>",
-  "<br><span style='color:{status}'>Can't open {devices} (My mic). Plugged in? It's tried again by itself.</span>": "<br><span style='color:{status}'>Kan ikke åbne {devices} (Min mikrofon). Er den sat i? Den prøves igen af sig selv.</span>"
+  "<br><span style='color:{status}'>Can't open {devices} (My mic). Plugged in? It's tried again by itself.</span>": "<br><span style='color:{status}'>Kan ikke åbne {devices} (Min mikrofon). Er den sat i? Den prøves igen af sig selv.</span>",
+  "Two mics have names like that one. Pick yours again (Setup tab → Devices).": "To mikrofoner har navne, der ligner hinanden. Vælg din igen (fanen Opsætning → Enheder).",
+  "Windows doesn't know that mic any more. Pick your mic again (Setup tab → Devices).": "Windows kender ikke den mikrofon længere. Vælg din mikrofon igen (fanen Opsætning → Enheder)."
 }

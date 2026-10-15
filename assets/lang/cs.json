@@ -3551,5 +3551,7 @@
   "Onion Pocket's settings didn't open: they're on Settings → Remote.": "Nastavení Onion Pocket se neotevřelo: najdeš ho v Nastavení → Dálkové ovládání.",
   "Pair a phone and settings": "Spárovat telefon a nastavení",
   "<br><span style='color:{status}'>Can't open {devices} (My headphones). Plugged in? It's tried again by itself.</span>": "<br><span style='color:{status}'>{devices} nejde otevřít (Moje sluchátka). Je připojené? Zkouší se to znovu samo.</span>",
-  "<br><span style='color:{status}'>Can't open {devices} (My mic). Plugged in? It's tried again by itself.</span>": "<br><span style='color:{status}'>{devices} nejde otevřít (Můj mikrofon). Je připojené? Zkouší se to znovu samo.</span>"
+  "<br><span style='color:{status}'>Can't open {devices} (My mic). Plugged in? It's tried again by itself.</span>": "<br><span style='color:{status}'>{devices} nejde otevřít (Můj mikrofon). Je připojené? Zkouší se to znovu samo.</span>",
+  "Two mics have names like that one. Pick yours again (Setup tab → Devices).": "Dva mikrofony mají podobný název. Vyber ten svůj znovu (karta Zapojení → Zařízení).",
+  "Windows doesn't know that mic any more. Pick your mic again (Setup tab → Devices).": "Windows tento mikrofon už nezná. Vyber mikrofon znovu (karta Zapojení → Zařízení)."
 }

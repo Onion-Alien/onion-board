@@ -3399,5 +3399,7 @@
   "Onion Pocket's settings didn't open: they're on Settings → Remote.": "Cài đặt Onion Pocket không mở được: chúng ở Cài đặt → Xa.",
   "Pair a phone and settings": "Ghép điện thoại và cài đặt",
   "<br><span style='color:{status}'>Can't open {devices} (My headphones). Plugged in? It's tried again by itself.</span>": "<br><span style='color:{status}'>Không mở được {devices} (Tai nghe của tôi). Đã cắm chưa? Ứng dụng sẽ tự thử lại.</span>",
-  "<br><span style='color:{status}'>Can't open {devices} (My mic). Plugged in? It's tried again by itself.</span>": "<br><span style='color:{status}'>Không mở được {devices} (Micrô của tôi). Đã cắm chưa? Ứng dụng sẽ tự thử lại.</span>"
+  "<br><span style='color:{status}'>Can't open {devices} (My mic). Plugged in? It's tried again by itself.</span>": "<br><span style='color:{status}'>Không mở được {devices} (Micrô của tôi). Đã cắm chưa? Ứng dụng sẽ tự thử lại.</span>",
+  "Two mics have names like that one. Pick yours again (Setup tab → Devices).": "Có hai mic tên giống nhau. Hãy chọn lại mic của bạn (thẻ Thiết lập → Thiết bị).",
+  "Windows doesn't know that mic any more. Pick your mic again (Setup tab → Devices).": "Windows không còn nhận ra mic đó. Hãy chọn lại mic (thẻ Thiết lập → Thiết bị)."
 }

@@ -3475,5 +3475,7 @@
   "Onion Pocket's settings didn't open: they're on Settings → Remote.": "Onion Pocketin asetukset eivät auenneet: ne ovat kohdassa Asetukset → Etäohjaus.",
   "Pair a phone and settings": "Yhdistä puhelin ja asetukset",
   "<br><span style='color:{status}'>Can't open {devices} (My headphones). Plugged in? It's tried again by itself.</span>": "<br><span style='color:{status}'>Laitetta {devices} ei saada auki (Kuulokkeeni). Onko se kytketty? Sitä yritetään itsestään uudelleen.</span>",
-  "<br><span style='color:{status}'>Can't open {devices} (My mic). Plugged in? It's tried again by itself.</span>": "<br><span style='color:{status}'>Laitetta {devices} ei saada auki (Oma mikki). Onko se kytketty? Sitä yritetään itsestään uudelleen.</span>"
+  "<br><span style='color:{status}'>Can't open {devices} (My mic). Plugged in? It's tried again by itself.</span>": "<br><span style='color:{status}'>Laitetta {devices} ei saada auki (Oma mikki). Onko se kytketty? Sitä yritetään itsestään uudelleen.</span>",
+  "Two mics have names like that one. Pick yours again (Setup tab → Devices).": "Kahdella mikillä on samankaltaiset nimet. Valitse omasi uudelleen (Käyttöönotto-välilehti → Laitteet).",
+  "Windows doesn't know that mic any more. Pick your mic again (Setup tab → Devices).": "Windows ei enää tunne tätä mikkiä. Valitse mikkisi uudelleen (Käyttöönotto-välilehti → Laitteet)."
 }

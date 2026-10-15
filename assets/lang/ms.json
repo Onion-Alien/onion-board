@@ -3399,5 +3399,7 @@
   "Onion Pocket's settings didn't open: they're on Settings → Remote.": "Tetapan Onion Pocket tidak terbuka: ia ada di Tetapan → Kawalan jauh.",
   "Pair a phone and settings": "Pasangkan telefon dan tetapan",
   "<br><span style='color:{status}'>Can't open {devices} (My headphones). Plugged in? It's tried again by itself.</span>": "<br><span style='color:{status}'>Tidak dapat membuka {devices} (Fon kepala saya). Sudah dipasang? Ia dicuba semula sendiri.</span>",
-  "<br><span style='color:{status}'>Can't open {devices} (My mic). Plugged in? It's tried again by itself.</span>": "<br><span style='color:{status}'>Tidak dapat membuka {devices} (Mikrofon saya). Sudah dipasang? Ia dicuba semula sendiri.</span>"
+  "<br><span style='color:{status}'>Can't open {devices} (My mic). Plugged in? It's tried again by itself.</span>": "<br><span style='color:{status}'>Tidak dapat membuka {devices} (Mikrofon saya). Sudah dipasang? Ia dicuba semula sendiri.</span>",
+  "Two mics have names like that one. Pick yours again (Setup tab → Devices).": "Dua mikrofon mempunyai nama yang serupa. Pilih mikrofon anda sekali lagi (tab Persediaan → Peranti).",
+  "Windows doesn't know that mic any more. Pick your mic again (Setup tab → Devices).": "Windows tidak lagi mengenali mikrofon itu. Pilih mikrofon anda sekali lagi (tab Persediaan → Peranti)."
 }

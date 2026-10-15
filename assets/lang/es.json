@@ -3475,5 +3475,7 @@
   "Onion Pocket's settings didn't open: they're on Settings → Remote.": "Los ajustes de Onion Pocket no se abrieron: están en Ajustes → Remoto.",
   "Pair a phone and settings": "Vincular un móvil y ajustes",
   "<br><span style='color:{status}'>Can't open {devices} (My headphones). Plugged in? It's tried again by itself.</span>": "<br><span style='color:{status}'>No se puede abrir {devices} (Mis auriculares). ¿Está conectado? Se vuelve a intentar solo.</span>",
-  "<br><span style='color:{status}'>Can't open {devices} (My mic). Plugged in? It's tried again by itself.</span>": "<br><span style='color:{status}'>No se puede abrir {devices} (Mi micro). ¿Está conectado? Se vuelve a intentar solo.</span>"
+  "<br><span style='color:{status}'>Can't open {devices} (My mic). Plugged in? It's tried again by itself.</span>": "<br><span style='color:{status}'>No se puede abrir {devices} (Mi micro). ¿Está conectado? Se vuelve a intentar solo.</span>",
+  "Two mics have names like that one. Pick yours again (Setup tab → Devices).": "Hay dos micros con nombres parecidos. Vuelve a elegir el tuyo (pestaña Configuración → Dispositivos).",
+  "Windows doesn't know that mic any more. Pick your mic again (Setup tab → Devices).": "Windows ya no reconoce ese micro. Vuelve a elegir tu micro (pestaña Configuración → Dispositivos)."
 }
