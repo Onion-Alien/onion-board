@@ -213,7 +213,10 @@ The full list. The [README](../README.md) has the short version and how to get s
   YouTube's m4a/webm audio needs FFmpeg, like a dropped m4a file does. Settings →
   Updates → *Helper programs* lists FFmpeg, yt-dlp, the JavaScript engine and Tor,
   with *Update now* and *Reinstall* for when downloads start failing, and an
-  opt-in box to update yt-dlp from PyPI automatically (off by default). FFmpeg and
+  opt-in box to update yt-dlp automatically (off by default). A yt-dlp update only
+  installs a version this project approved (`pins/yt-dlp.json`, checked against
+  yt-dlp's signed PyPI release and added by a reviewed pull request) once it has been
+  out for 3 days, and never one older than the built-in copy. FFmpeg and
   Tor copies the app downloaded follow the app: an app update that names a newer
   version fetches it (checked against its SHA-256) at the next start.
 - **"Did you know?" tips:** after the setup guide, a short tip about one feature at

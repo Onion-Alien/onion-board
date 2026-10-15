@@ -1,0 +1,2 @@
+# What scripts/pinbump/ytdlp.py needs besides the standard library (pin-bumps.yml).
+pypi-attestations==0.0.30

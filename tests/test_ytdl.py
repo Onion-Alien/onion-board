@@ -18,7 +18,7 @@ import pytest
 import soundfile as sf
 
 from conftest import process_events
-from soundboard import ytdl
+from soundboard import net, ytdl
 from soundboard.engine import SR
 from soundboard.library import Config
 
@@ -185,13 +185,15 @@ def test_a_failed_download_leaves_no_temp_folder(monkeypatch, tmp_path):
 # ---------------------------------------------------------------- keeping yt-dlp current
 
 @pytest.fixture
-def pypi(app_dir, monkeypatch):
-    """A fake PyPI: `releases[version]` makes a wheel whose yt_dlp says that version.
-    Nothing touches the network; the import hook is removed afterwards."""
-    # requires: version -> requires_python, listed as PyPI's "releases" when set;
-    # broken: versions whose yt_dlp doesn't import (like one written for a newer Python)
+def listed(app_dir, monkeypatch):
+    """A fake approved list (ytdl.APPROVED_URL) and PyPI file host: `latest` is listed,
+    out for `age` days, with a wheel whose yt_dlp says that version. Nothing touches the
+    network; the import hook is removed afterwards."""
+    # requires: version -> requires_python, listed instead of `latest` when set;
+    # broken: versions whose yt_dlp doesn't import (like one written for a newer Python);
+    # ages: version -> days on PyPI, for the ones that differ from `age`
     state = {"latest": "2099.1.1", "fetched": [], "corrupt": False, "requires": {},
-             "broken": set()}
+             "broken": set(), "age": 10, "ages": {}}
 
     def wheel(pkg, version):
         buf = io.BytesIO()
@@ -203,31 +205,28 @@ def pypi(app_dir, monkeypatch):
             z.writestr(f"{pkg}-{version}.dist-info/METADATA", "Name: x\n")
         return buf.getvalue()
 
-    def release(name, version, requires=()):
+    def file(name, version, requires=None):
         data = wheel(name.replace("-", "_"), version)
-        url = f"{ytdl.WHEEL_HOST}{name}-{version}-py3-none-any.whl"
+        filename = f"{name.replace('-', '_')}-{version}-py3-none-any.whl"
+        url = f"{ytdl.WHEEL_HOST}packages/ab/cd/{filename}"
         state[url] = data
         digest = "0" * 64 if state["corrupt"] else hashlib.sha256(data).hexdigest()
-        file = {"packagetype": "bdist_wheel", "url": url, "digests": {"sha256": digest},
-                "filename": url.rsplit("/", 1)[1],
-                "requires_python": state["requires"].get(version)}
-        return {"info": {"name": name, "version": version, "requires_dist": list(requires)},
-                "urls": [file]}
+        return {"name": name, "version": version, "filename": filename, "url": url,
+                "sha256": digest, "requires_python": requires or ""}
 
-    ejs = ['yt-dlp-ejs==0.9.0; extra == "default"']
+    def entry(version, requires=None):
+        days = state["ages"].get(version, state["age"])
+        uploaded = time.strftime("%Y-%m-%dT%H:%M:%S.123456Z",
+                                 time.gmtime(time.time() - days * 86400))
+        return {"version": version, "uploaded": uploaded,
+                "wheels": [file("yt-dlp", version, requires), file("yt-dlp-ejs", "0.9.0")]}
 
     def get(url, limit):
         state["fetched"].append(url)
-        if url == ytdl.PYPI.format("yt-dlp"):
-            meta = release("yt-dlp", state["latest"], ejs)
-            if state["requires"]:
-                meta["releases"] = {v: release("yt-dlp", v, ejs)["urls"]
-                                    for v in state["requires"]}
-            return json.dumps(meta).encode()
-        if url.startswith("https://pypi.org/pypi/yt-dlp/"):   # one version's page
-            return json.dumps(release("yt-dlp", url.split("/")[-2], ejs)).encode()
-        if url.endswith("/yt-dlp-ejs/0.9.0/json"):
-            return json.dumps(release("yt-dlp-ejs", "0.9.0")).encode()
+        if url == ytdl.APPROVED_URL:
+            versions = state["requires"] or {state["latest"]: None}
+            return json.dumps({"versions": [entry(v, r) for v, r in versions.items()]}
+                              ).encode()
         return state[url]
 
     monkeypatch.setattr(ytdl, "_get", get)
@@ -242,7 +241,7 @@ def pypi(app_dir, monkeypatch):
     sys.modules.update(saved)
 
 
-def test_update_installs_a_newer_copy_that_imports_win(pypi):
+def test_update_installs_a_newer_copy_that_imports_win(listed):
     assert ytdl.update() == "Updated yt-dlp to 2099.1.1."
     assert ytdl.active_version() == ("2099.1.1", True)
     ytdl.install()
@@ -255,23 +254,23 @@ def test_update_installs_a_newer_copy_that_imports_win(pypi):
     assert not list(ytdl.root().glob("new-*")) and not list(ytdl.root().glob("old-*"))
 
 
-def test_update_skips_when_up_to_date(pypi):
-    pypi["latest"] = "2026.08.19"
+def test_update_skips_when_up_to_date(listed):
+    listed["latest"] = "2026.08.19"
     assert "up to date" in ytdl.update()
-    assert pypi["fetched"] == [ytdl.PYPI.format("yt-dlp")]   # no wheel downloaded
+    assert listed["fetched"] == [ytdl.APPROVED_URL]           # no wheel downloaded
     assert not ytdl.due()                                    # but it counts as a check
 
 
-def test_update_rejects_a_bad_checksum(pypi):
-    pypi["corrupt"] = True
+def test_update_rejects_a_bad_checksum(listed):
+    listed["corrupt"] = True
     with pytest.raises(ytdl.DownloadError, match="checksum"):
         ytdl.update()
     assert ytdl.active_version() == ("2026.8.19", False)
 
 
-def test_a_swap_that_fails_halfway_keeps_the_copy_in_use(pypi, monkeypatch):
+def test_a_swap_that_fails_halfway_keeps_the_copy_in_use(listed, monkeypatch):
     ytdl.update()
-    pypi["latest"] = "2099.2.2"
+    listed["latest"] = "2099.2.2"
     real = Path.rename
 
     def rename(self, target):
@@ -287,7 +286,7 @@ def test_a_swap_that_fails_halfway_keeps_the_copy_in_use(pypi, monkeypatch):
     assert not list(ytdl.root().glob("old-*")) and not list(ytdl.root().glob("new-*"))
 
 
-def test_leftovers_of_a_cut_short_update_are_tidied_at_startup(pypi):
+def test_leftovers_of_a_cut_short_update_are_tidied_at_startup(listed):
     ytdl.update()
     ytdl._pkg_dir().rename(ytdl.root() / "old-1")   # stopped between the two renames
     (ytdl.root() / "new-abc" / "yt_dlp").mkdir(parents=True)
@@ -299,7 +298,7 @@ def test_leftovers_of_a_cut_short_update_are_tidied_at_startup(pypi):
     assert not list(ytdl.root().glob("old-*")) and not list(ytdl.root().glob("new-*"))
 
 
-def test_tidying_leaves_an_update_in_progress_alone(pypi):
+def test_tidying_leaves_an_update_in_progress_alone(listed):
     """A download helper starting up (ytworker: a new process, so ytdl.install() runs
     _tidy again) while the app is unpacking or swapping in a new yt-dlp: its fresh
     new-* folder, and the copy just moved aside before the new one is in place, are
@@ -313,18 +312,18 @@ def test_tidying_leaves_an_update_in_progress_alone(pypi):
     assert not ytdl._pkg_dir().exists()             # the swap's own rename comes next
 
 
-def test_reset_clears_and_reinstalls(pypi):
+def test_reset_clears_and_reinstalls(listed):
     ytdl.update()
     junk = ytdl.cache_dir() / "youtube-sigfuncs" / "x.json"
     junk.parent.mkdir(parents=True)
     junk.write_text("{}")
-    pypi["latest"] = "2099.2.2"
+    listed["latest"] = "2099.2.2"
     assert "2099.2.2" in ytdl.reset()
     assert not junk.exists()
     assert ytdl.active_version() == ("2099.2.2", True)
 
 
-def test_reset_offline_falls_back_to_the_built_in_copy(pypi, monkeypatch):
+def test_reset_offline_falls_back_to_the_built_in_copy(listed, monkeypatch):
     ytdl.update()
 
     def offline(url, limit):
@@ -334,27 +333,27 @@ def test_reset_offline_falls_back_to_the_built_in_copy(pypi, monkeypatch):
     assert "built-in yt-dlp 2026.8.19" in msg and not ytdl.root().exists()
 
 
-def test_a_copy_older_than_the_bundled_one_is_dropped(pypi):
-    pypi["latest"] = "2099.1.1"
+def test_a_copy_older_than_the_bundled_one_is_dropped(listed):
+    listed["latest"] = "2099.1.1"
     ytdl.update()
     ytdl._save_state(version="2020.1.1")   # the app has since shipped a newer yt-dlp
     ytdl.install()
     assert ytdl.active_version() == ("2026.8.19", False)
 
 
-def test_auto_update_only_when_enabled_and_due(pypi):
+def test_auto_update_only_when_enabled_and_due(listed):
     ytdl.auto_update(False)
-    assert pypi["fetched"] == []
+    assert listed["fetched"] == []
     ytdl.auto_update(True)
     assert ytdl.override_version() == "2099.1.1"
-    pypi["fetched"].clear()
+    listed["fetched"].clear()
     ytdl.auto_update(True)                     # checked a moment ago
-    assert pypi["fetched"] == []
+    assert listed["fetched"] == []
     ytdl._save_state(checked=time.time() - ytdl.CHECK_EVERY - 1)
     assert ytdl.due()
 
 
-def test_a_failed_download_updates_and_retries_once(pypi, monkeypatch, tmp_path):
+def test_a_failed_download_updates_and_retries_once(listed, monkeypatch, tmp_path):
     calls = []
 
     def dl(url, dest, progress, *_feature):
@@ -381,28 +380,122 @@ def test_requires_python_is_read_for_this_python(spec, ok):
     assert ytdl._py_ok(spec, (3, 12, 4)) is ok
 
 
-def test_update_skips_a_release_that_needs_a_newer_python(pypi):
+def test_update_skips_a_release_that_needs_a_newer_python(listed):
     """yt-dlp drops old Pythons now and then: the app (frozen on its Python) keeps
     getting the newest release that still runs on it, never one that can't import."""
-    pypi["requires"] = {"2099.1.1": ">=3.99", "2098.5.5": ">=3.10", "2097.1.1": ">=3.10",
+    listed["requires"] = {"2099.1.1": ">=3.99", "2098.5.5": ">=3.10", "2097.1.1": ">=3.10",
                         "2099.2.2.123.dev0": ">=3.10"}   # a nightly: never taken
     assert ytdl.update() == "Updated yt-dlp to 2098.5.5."
     assert ytdl.active_version() == ("2098.5.5", True)
 
-    pypi["requires"] = {"2099.1.1": ">=3.99"}            # nothing runs here
+    listed["requires"] = {"2099.1.1": ">=3.99"}            # nothing runs here
     assert "up to date" in ytdl.update(force=True)
     assert ytdl.active_version() == ("2098.5.5", True)  # the copy in use stays
 
 
-def test_a_downloaded_copy_that_doesnt_import_falls_back_and_is_never_fetched_again(pypi):
-    pypi["broken"].add("2099.1.1")
+def test_update_only_asks_the_list_and_takes_its_wheels_from_pypi(listed):
+    ytdl.update()
+    assert listed["fetched"][0] == ytdl.APPROVED_URL
+    assert ytdl.APPROVED_URL.startswith("https://raw.githubusercontent.com/")
+    assert ytdl.APPROVED_URL.endswith("/main/pins/yt-dlp.json")
+    assert [u.rsplit("/", 1)[1] for u in listed["fetched"][1:]] == [
+        "yt_dlp-2099.1.1-py3-none-any.whl", "yt_dlp_ejs-0.9.0-py3-none-any.whl"]
+    assert all(u.startswith(ytdl.WHEEL_HOST) for u in listed["fetched"][1:])
+
+
+def test_an_approved_version_waits_until_its_3_days_old(listed):
+    """A hacked release is usually caught and pulled within days: a version that went
+    up on PyPI less than 3 days ago isn't installed yet, an older approved one is."""
+    listed["requires"] = {"2099.2.2": None, "2099.1.1": None}
+    listed["ages"] = {"2099.2.2": 2.5}
+    assert ytdl.update() == "Updated yt-dlp to 2099.1.1."
+    listed["ages"] = {"2099.2.2": 3.1}
+    assert ytdl.update() == "Updated yt-dlp to 2099.2.2."
+
+    listed["requires"] = {}
+    listed["latest"], listed["age"] = "2099.3.3", 0.5    # the only one listed is too new
+    listed["fetched"].clear()
+    assert "up to date" in ytdl.update(force=True)
+    assert listed["fetched"] == [ytdl.APPROVED_URL]       # nothing downloaded
+    assert ytdl.active_version() == ("2099.2.2", True)
+
+
+def test_update_never_installs_one_older_than_the_built_in_copy(listed):
+    """The list can lag behind an app release that ships a newer yt-dlp."""
+    listed["latest"] = "2026.1.1"
+    assert ytdl.update(force=True) == "yt-dlp 2026.8.19 is up to date."
+    assert "up to date" in ytdl.reset()
+    assert ytdl.active_version() == ("2026.8.19", False)
+    assert not any(u.endswith(".whl") for u in listed["fetched"])
+
+
+@pytest.mark.parametrize("change", [
+    lambda e: e["wheels"][0].update(url="https://evil.example/" + e["wheels"][0]["filename"]),
+    lambda e: e["wheels"][1].update(url=ytdl.WHEEL_HOST + "x/other-1.0-py3-none-any.whl"),
+    lambda e: e["wheels"][0].update(sha256="nope"),
+    lambda e: e["wheels"][0].update(filename="yt_dlp-2099.1.1.tar.gz"),
+    lambda e: e.update(version="2099.1.1.dev0"),
+    lambda e: e.update(uploaded="yesterday"),
+    lambda e: e.update(wheels=[]),
+    lambda e: e.pop("wheels"),
+])
+def test_a_listed_version_that_isnt_a_checked_pypi_wheel_is_never_taken(listed, monkeypatch,
+                                                                        change):
+    get = ytdl._get
+
+    def edited(url, limit):
+        data = get(url, limit)
+        if url == ytdl.APPROVED_URL:
+            raw = json.loads(data)
+            change(raw["versions"][0])
+            data = json.dumps(raw).encode()
+        return data
+    monkeypatch.setattr(ytdl, "_get", edited)
+    assert "up to date" in ytdl.update()
+    assert ytdl.active_version() == ("2026.8.19", False)
+    assert listed["fetched"] == [ytdl.APPROVED_URL]
+
+
+def test_a_wheel_that_doesnt_match_the_lists_hash_is_refused(listed, monkeypatch):
+    """The hash comes from the approved list, not PyPI: different bytes at the listed
+    address (PyPI or the connection tampered with) are never unpacked."""
+    url = f"{ytdl.WHEEL_HOST}packages/ab/cd/yt_dlp_ejs-0.9.0-py3-none-any.whl"
+    real = ytdl._get
+
+    def swapped(u, limit):
+        data = real(u, limit)
+        return b"PK" + data[2:-1] if u == url else data
+    monkeypatch.setattr(ytdl, "_get", swapped)
+    with pytest.raises(ytdl.DownloadError, match="yt_dlp_ejs-0.9.0.*checksum"):
+        ytdl.update()
+    assert ytdl.active_version() == ("2026.8.19", False)
+    assert not ytdl._pkg_dir().exists() and not list(ytdl.root().glob("new-*"))
+
+
+@pytest.mark.parametrize("off, offline", [(["ytdlp_update"], False), ([], True)])
+def test_switched_off_or_offline_nothing_is_asked(listed, off, offline):
+    net.configure_features(off, offline=offline)
+    try:
+        with pytest.raises(ytdl.SwitchedOff):
+            ytdl.update()
+        with pytest.raises(ytdl.SwitchedOff):
+            ytdl.reset()
+        ytdl.auto_update(True)                    # the daily check skips itself
+    finally:
+        net.configure_features()
+    assert listed["fetched"] == []
+    assert ytdl.active_version() == ("2026.8.19", False)
+
+
+def test_a_downloaded_copy_that_doesnt_import_falls_back_and_is_never_fetched_again(listed):
+    listed["broken"].add("2099.1.1")
     assert ytdl.update() == "Updated yt-dlp to 2099.1.1."
     with ytdl._ydl() as yt_dlp:               # the built-in one, not an error
         assert not getattr(yt_dlp, "FAKE", False)
     assert ytdl.active_version() == ("2026.8.19", False)
     assert not ytdl._pkg_dir().exists() and not list(ytdl.root().glob("bad-*"))
     assert ytdl._state()["bad"] == ["2099.1.1"]
-    pypi["requires"] = {"2099.1.1": ">=3.10"}  # still PyPI's newest: skipped now
+    listed["requires"] = {"2099.1.1": ">=3.10"}  # still the newest listed: skipped now
     assert "up to date" in ytdl.update()
     assert ytdl.active_version() == ("2026.8.19", False)
 
@@ -456,13 +549,13 @@ def test_link_bar_doesnt_offer_an_update_when_its_switched_off_or_a_site_refused
     assert not bar.btn_update.isVisibleTo(bar)     # updating is switched off
 
 
-def test_a_refused_download_does_not_update(pypi, monkeypatch):
+def test_a_refused_download_does_not_update(listed, monkeypatch):
     def dl(url, dest, progress, *_feature):
         raise ytdl.DownloadError("That's a playlist")
     monkeypatch.setattr(ytdl, "_download", dl)
     with pytest.raises(ytdl.DownloadError):
         ytdl.download_audio("https://youtu.be/x")
-    assert pypi["fetched"] == []
+    assert listed["fetched"] == []
 
 
 # ---------------------------------------------------------------- Settings → Updates
@@ -985,10 +1078,11 @@ def test_yt_dlp_is_shared_and_an_update_waits_for_its_users():
     assert order == ["search", "slow done", "swapped"]
 
 
-@pytest.mark.parametrize("answer", [b"<html>down for maintenance</html>", b'{"x": 1}', b"[]"])
-def test_update_says_so_when_pypi_answers_junk(monkeypatch, answer):
+@pytest.mark.parametrize("answer", [b"<html>down for maintenance</html>", b'{"x": 1}', b"[]",
+                                    b'{"versions": {"2099.1.1": 1}}'])
+def test_update_says_so_when_the_list_is_junk(monkeypatch, answer):
     monkeypatch.setattr(ytdl, "_get", lambda url, limit: answer)
-    with pytest.raises(ytdl.DownloadError, match="PyPI"):
+    with pytest.raises(ytdl.DownloadError, match="list of approved yt-dlp versions"):
         ytdl.update()
 
 
