@@ -13,7 +13,7 @@ from __future__ import annotations
 import time
 
 from PySide6.QtCore import QEvent, QObject, QPointF, Qt, QTimer
-from PySide6.QtGui import QHoverEvent, QMouseEvent, QPalette
+from PySide6.QtGui import QCursor, QHelpEvent, QHoverEvent, QMouseEvent, QPalette
 from PySide6.QtWidgets import (QAbstractButton, QAbstractScrollArea, QAbstractSlider,
                                QAbstractSpinBox, QApplication, QCheckBox, QComboBox, QFormLayout,
                                QGridLayout, QLayout, QMenu, QProxyStyle, QPushButton,
@@ -47,6 +47,10 @@ class AppStyle(QProxyStyle):
       while a menu is open never leaves its opener highlighted.
     - tick boxes take keyboard focus from Tab, so mouse clicks do not leave a
       focus ring behind. Keyboard users can still reach and toggle them.
+    - a button's, pad's, dropdown's or tab's tooltip waits until the mouse has been
+      on it TIP_DELAY seconds (_hold_tip), every time. Qt's own wait is 0.7 s, and
+      for 2 s after one tooltip every other shows at once, so sweeping across the
+      pads or the toolbar popped one up under the mouse at each step.
     """
 
     COMBO_CAP = 360
@@ -72,12 +76,54 @@ class AppStyle(QProxyStyle):
 
 
 
+TIP_DELAY = 1.0   # seconds on a control before its tooltip shows
+_TIP_EVENTS = (QEvent.Type.Enter, QEvent.Type.Leave, QEvent.Type.ToolTip,
+               QEvent.Type.MouseButtonPress, QEvent.Type.Wheel)
+
+
+def _hold_tip(obj, ev) -> bool:
+    """Hold a tooltip back until the mouse has rested on `obj` for TIP_DELAY,
+    then show it where the mouse is. True = the event was held (eaten).
+
+    Called from the filters already on buttons, dropdowns and tab strips (no new
+    per-event filter). A click, a wheel turn or leaving starts the wait over.
+    """
+    t = ev.type()
+    if t != QEvent.Type.ToolTip:
+        obj.setProperty("tipFrom", None if t == QEvent.Type.Leave else time.monotonic())
+        obj.setProperty("tipPending", None)
+        return False
+    start = obj.property("tipFrom")
+    if start is None:   # hovered before it was polished: count from now
+        start = time.monotonic()
+        obj.setProperty("tipFrom", start)
+    wait = TIP_DELAY - (time.monotonic() - start)
+    if wait <= 0:
+        return False
+    if obj.property("tipPending") != start:
+        obj.setProperty("tipPending", start)
+
+        def show():
+            if obj.property("tipPending") != start or not obj.underMouse():
+                return
+            obj.setProperty("tipPending", None)
+            g = QCursor.pos()
+            QApplication.sendEvent(obj, QHelpEvent(QEvent.Type.ToolTip, obj.mapFromGlobal(g), g))
+
+        QTimer.singleShot(int(wait * 1000) + 1, obj, show)
+    return True
+
+
 class _AppFilter(QObject):
-    """AppStyle's wheel and slider changes, on each dropdown, tab strip and slider."""
+    """AppStyle's wheel and slider changes, on each dropdown, tab strip and slider,
+    plus the tooltip wait on tab strips and sliders (dropdowns get it from
+    _PopupClickGuard)."""
     WHEEL, PRESS = QEvent.Type.Wheel, QEvent.Type.MouseButtonPress
 
     def eventFilter(self, obj, ev):
         t = ev.type()
+        if t in _TIP_EVENTS and not isinstance(obj, QComboBox) and _hold_tip(obj, ev):
+            return True
         if t == self.WHEEL and isinstance(obj, (QComboBox, QTabBar)):
             ev.ignore()   # passed on to the parent, so the page scrolls instead
             return True
@@ -172,7 +218,9 @@ def _submenu_edge() -> _SubmenuEdge:
 
 
 class _PopupClickGuard(QObject):
-    """Require a short pause before reopening a dismissed dropdown with the mouse.
+    """On every button and dropdown: the tooltip wait (_hold_tip), and:
+
+    Require a short pause before reopening a dismissed dropdown with the mouse.
 
     Qt can replay the outside click that dismissed a popup onto its opener. That
     must not immediately reopen it. Repeated presses extend the pause, so a burst
@@ -183,6 +231,8 @@ class _PopupClickGuard(QObject):
 
     def eventFilter(self, obj, ev):
         kind = ev.type()
+        if kind in _TIP_EVENTS and _hold_tip(obj, ev):   # the tooltip wait, see AppStyle
+            return True
         if kind in (QEvent.Type.MouseButtonPress, QEvent.Type.MouseButtonDblClick) \
                 and ev.button() == Qt.MouseButton.LeftButton:
             closed = obj.property("popupClosedAt")

@@ -209,8 +209,9 @@ def pytest_xdist_auto_num_workers(config):
 def qapp():
     from PySide6.QtWidgets import QApplication
     app = QApplication.instance() or QApplication([])
-    from soundboard.wheelguard import AppStyle
-    app.setStyle(AppStyle("Fusion"))   # as the app sets it (app.main)
+    from soundboard import wheelguard
+    app.setStyle(wheelguard.AppStyle("Fusion"))   # as the app sets it (app.main)
+    wheelguard.TIP_DELAY = 0   # tests ask for tooltips at once; test_tooltip_wait checks it
     if not app.styleSheet():   # the app's theme and font, as the window applies them:
         from soundboard import theme   # without it a worker's first tests measured
         from soundboard.library import Config   # text in Qt's plain font, and the
