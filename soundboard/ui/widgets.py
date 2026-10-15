@@ -103,6 +103,9 @@ class Meter(QWidget):
         self._hot = False
         self._drawn = None        # (bar width in px, colour) as last painted
         self._col = "#13ce66"
+        # the loudest the level can get: full bar and the red zone sit under it (the
+        # send limiter holds what others hear at sendfx.CEILING_DB, under 0 dB)
+        self.top_db = 0.0
         self.setFixedHeight(8)
         self.setAccessibleName(_("Level meter"))
 
@@ -116,7 +119,7 @@ class Meter(QWidget):
         self.update()
 
     def _bar(self) -> tuple[float, str]:
-        db = 20 * np.log10(max(self.level, 1e-5))
+        db = 20 * np.log10(max(self.level, 1e-5)) - self.top_db
         frac = float(np.clip((db + 50) / 50, 0, 1))
         # Hysteresis keeps levels near the thresholds from flashing between colours.
         if self._col == "#ff4d4f":
