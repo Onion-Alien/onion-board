@@ -3128,8 +3128,6 @@
   "Live: click to mute": "直播中：點一下即可靜音",
   "Muted: click to go live": "已靜音：點一下即可恢復直播",
   "No sound": "沒有聲音",
-  "Your mic sends no sound": "你的麥克風沒有聲音",
-  "Your mic sends no sound: see the Setup tab.": "你的麥克風沒有聲音：請查看設定分頁。",
   "Before update": "更新之前",
   "One is saved every time you reset something or update the app (the last {max_points} are kept). Restoring puts back your settings, hotkeys and sounds as they were. Sounds you've added since are kept.": "每次重設東西或更新應用程式時都會儲存一個（保留最近 {max_points} 個）。還原會把你的設定、快速鍵和音效恢復成當時的樣子。之後加入的音效會保留。",
   "Stops every sound, the radio and every program, and turns the voices off": "停止所有音效、電台和所有程式，並關閉變聲",
@@ -3176,8 +3174,6 @@
   "Show this program's window": "顯示這個程式的視窗",
   "This program doesn't share its picture": "這個程式不分享它的畫面",
   "Window of {name}": "{name} 的視窗",
-  "Discord and games hear nothing from your mic. Is your headset switched off, or its mic muted? Turn it on or unmute it. If not, click <b>Repair</b>, then <b>Yes</b> when Windows asks.": "Discord 和遊戲聽不到你麥克風的任何聲音。耳機是不是關著，或者麥克風靜音了？請打開耳機或取消靜音。如果沒有，按 <b>修復</b>，然後在 Windows 詢問時按 <b>是</b>。",
-  "Discord and games hear nothing from your mic. Is your headset switched off, or its mic muted? Turn it on or unmute it. If not, click <b>Repair</b>: your sound drops out for a few seconds.": "Discord 和遊戲聽不到你麥克風的任何聲音。耳機是不是關著，或者麥克風靜音了？請打開耳機或取消靜音。如果沒有，按 <b>修復</b>：聲音會中斷幾秒。",
   "Your mic sends no sound. Is your headset switched off, or its mic muted? Turn it on or unmute it. Still nothing? Restart your PC, then try again.": "你的麥克風沒有聲音。耳機是不是關著，或者麥克風靜音了？請打開耳機或取消靜音。還是沒有聲音？請重新啟動電腦，然後再試一次。",
   "Minimised: last picture": "已最小化：最後一幀",
   "Minimised: restore for live updates": "已最小化：還原視窗以即時更新",
@@ -3359,5 +3355,12 @@
   "Used when Connection is set to Tor. It's up to date.": "連線設為 Tor 時使用。已是最新版本。",
   "Working: {engine}": "正常運作：{engine}",
   "Working: {engine} {version} (faster)": "正常運作：{engine} {version}（更快）",
-  "YouTube downloads still work, but with fewer formats.": "YouTube 下載仍然可用，但格式會少一些。"
+  "YouTube downloads still work, but with fewer formats.": "YouTube 下載仍然可用，但格式會少一些。",
+  "Is your headset on?": "耳機開著嗎？",
+  "Is your headset plugged in?": "耳機插好了嗎？",
+  "No sound at all comes from your mic. A headset that's switched off, or whose mic is muted, does that. Turn it on or unmute it: this goes away by itself. Still nothing? Click <b>Repair</b>, then <b>Yes</b> when Windows asks.": "你的麥克風完全沒有聲音。耳機關著，或者麥克風靜音了，就會這樣。請打開耳機或取消靜音：這則提示會自己消失。還是沒聲音？按 <b>修復</b>，然後在 Windows 詢問時按 <b>是</b>。",
+  "No sound at all comes from your mic. A headset that's switched off, or whose mic is muted, does that. Turn it on or unmute it: this goes away by itself. Still nothing? Click <b>Repair</b>: your sound drops out for a few seconds.": "你的麥克風完全沒有聲音。耳機關著，或者麥克風靜音了，就會這樣。請打開耳機或取消靜音：這則提示會自己消失。還是沒聲音？按 <b>修復</b>：聲音會中斷幾秒。",
+  "No sound from your mic. Is your headset on?": "麥克風沒有聲音。耳機開著嗎？",
+  "Unplugged": "未連接",
+  "Windows can't find <b>{mic}</b> right now. Plug it in, or switch it on if it's wireless. This goes away by itself.": "Windows 現在找不到 <b>{mic}</b>。請插上，如果是無線的就打開它。這則提示會自己消失。"
 }

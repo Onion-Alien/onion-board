@@ -3201,8 +3201,6 @@
   "Live: click to mute": "Live: klik for at slå lyden fra",
   "Muted: click to go live": "Lyd fra: klik for at gå live",
   "No sound": "Ingen lyd",
-  "Your mic sends no sound": "Din mikrofon sender ingen lyd",
-  "Your mic sends no sound: see the Setup tab.": "Din mikrofon sender ingen lyd: se fanen Opsætning.",
   "Before update": "Før opdatering",
   "One is saved every time you reset something or update the app (the last {max_points} are kept). Restoring puts back your settings, hotkeys and sounds as they were. Sounds you've added since are kept.": "Der gemmes et, hver gang du nulstiller noget eller opdaterer appen (de sidste {max_points} beholdes). Gendannelse sætter dine indstillinger, genvejstaster og lyde tilbage, som de var. Lyde, du har tilføjet siden, beholdes.",
   "Stops every sound, the radio and every program, and turns the voices off": "Stopper alle lyde, radioen og alle programmer og slår stemmerne fra",
@@ -3250,8 +3248,6 @@
   "Show this program's window": "Vis dette programs vindue",
   "This program doesn't share its picture": "Dette program deler ikke sit billede",
   "Window of {name}": "Vindue for {name}",
-  "Discord and games hear nothing from your mic. Is your headset switched off, or its mic muted? Turn it on or unmute it. If not, click <b>Repair</b>, then <b>Yes</b> when Windows asks.": "Discord og spil hører intet fra din mikrofon. Er dit headset slukket, eller er dets mikrofon slået fra? Tænd det, eller slå mikrofonen til. Hvis ikke, klik <b>Reparér</b> og derefter <b>Ja</b>, når Windows spørger.",
-  "Discord and games hear nothing from your mic. Is your headset switched off, or its mic muted? Turn it on or unmute it. If not, click <b>Repair</b>: your sound drops out for a few seconds.": "Discord og spil hører intet fra din mikrofon. Er dit headset slukket, eller er dets mikrofon slået fra? Tænd det, eller slå mikrofonen til. Hvis ikke, klik <b>Reparér</b>: lyden forsvinder i et par sekunder.",
   "Your mic sends no sound. Is your headset switched off, or its mic muted? Turn it on or unmute it. Still nothing? Restart your PC, then try again.": "Din mikrofon sender ingen lyd. Er dit headset slukket, eller er dets mikrofon slået fra? Tænd det, eller slå mikrofonen til. Stadig intet? Genstart din pc, og prøv igen.",
   "Minimised: last picture": "Minimeret: sidste billede",
   "Minimised: restore for live updates": "Minimeret: gendan for løbende opdateringer",
@@ -3435,5 +3431,12 @@
   "Used when Connection is set to Tor. It's up to date.": "Bruges, når forbindelsen er sat til Tor. Den er opdateret.",
   "Working: {engine}": "Virker: {engine}",
   "Working: {engine} {version} (faster)": "Virker: {engine} {version} (hurtigere)",
-  "YouTube downloads still work, but with fewer formats.": "YouTube-downloads virker stadig, men med færre formater."
+  "YouTube downloads still work, but with fewer formats.": "YouTube-downloads virker stadig, men med færre formater.",
+  "Is your headset on?": "Er dit headset tændt?",
+  "Is your headset plugged in?": "Er dit headset sat i?",
+  "No sound at all comes from your mic. A headset that's switched off, or whose mic is muted, does that. Turn it on or unmute it: this goes away by itself. Still nothing? Click <b>Repair</b>, then <b>Yes</b> when Windows asks.": "Der kommer slet ingen lyd fra din mikrofon. Det gør et headset, der er slukket eller har mikrofonen slået fra. Tænd det, eller slå mikrofonen til: det her forsvinder af sig selv. Stadig intet? Klik <b>Reparér</b> og derefter <b>Ja</b>, når Windows spørger.",
+  "No sound at all comes from your mic. A headset that's switched off, or whose mic is muted, does that. Turn it on or unmute it: this goes away by itself. Still nothing? Click <b>Repair</b>: your sound drops out for a few seconds.": "Der kommer slet ingen lyd fra din mikrofon. Det gør et headset, der er slukket eller har mikrofonen slået fra. Tænd det, eller slå mikrofonen til: det her forsvinder af sig selv. Stadig intet? Klik <b>Reparér</b>: din lyd falder ud i et par sekunder.",
+  "No sound from your mic. Is your headset on?": "Ingen lyd fra din mikrofon. Er dit headset tændt?",
+  "Unplugged": "Ikke tilsluttet",
+  "Windows can't find <b>{mic}</b> right now. Plug it in, or switch it on if it's wireless. This goes away by itself.": "Windows kan ikke finde <b>{mic}</b> lige nu. Sæt det i, eller tænd det, hvis det er trådløst. Det her forsvinder af sig selv."
 }

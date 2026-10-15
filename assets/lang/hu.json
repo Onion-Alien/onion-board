@@ -3201,8 +3201,6 @@
   "Live: click to mute": "Élő: kattints a némításhoz",
   "Muted: click to go live": "Némítva: kattints, hogy újra élő legyél",
   "No sound": "Nincs hang",
-  "Your mic sends no sound": "A mikrofonod nem küld hangot",
-  "Your mic sends no sound: see the Setup tab.": "A mikrofonod nem küld hangot: nézd meg a Beállítás fület.",
   "Before update": "Frissítés előtt",
   "One is saved every time you reset something or update the app (the last {max_points} are kept). Restoring puts back your settings, hotkeys and sounds as they were. Sounds you've added since are kept.": "Minden alaphelyzetbe állításkor és az app minden frissítésekor készül egy (az utolsó {max_points} marad meg). A helyreállítás visszateszi a beállításaidat, gyorsbillentyűidet és hangjaidat, ahogy voltak. Az azóta hozzáadott hangok megmaradnak.",
   "Stops every sound, the radio and every program, and turns the voices off": "Minden hangot, a rádiót és minden programot leállít, és kikapcsolja a hangokat",
@@ -3250,8 +3248,6 @@
   "Show this program's window": "A program ablakának megjelenítése",
   "This program doesn't share its picture": "Ez a program nem osztja meg a képét",
   "Window of {name}": "{name} ablaka",
-  "Discord and games hear nothing from your mic. Is your headset switched off, or its mic muted? Turn it on or unmute it. If not, click <b>Repair</b>, then <b>Yes</b> when Windows asks.": "A Discord és a játékok semmit sem hallanak a mikrofonodból. Ki van kapcsolva a headseted, vagy le van némítva a mikrofonja? Kapcsold be, vagy oldd fel a némítást. Ha nem, kattints a <b>Javítás</b> gombra, majd az <b>Igen</b> gombra, amikor a Windows kérdez.",
-  "Discord and games hear nothing from your mic. Is your headset switched off, or its mic muted? Turn it on or unmute it. If not, click <b>Repair</b>: your sound drops out for a few seconds.": "A Discord és a játékok semmit sem hallanak a mikrofonodból. Ki van kapcsolva a headseted, vagy le van némítva a mikrofonja? Kapcsold be, vagy oldd fel a némítást. Ha nem, kattints a <b>Javítás</b> gombra: a hang pár másodpercre kimarad.",
   "Your mic sends no sound. Is your headset switched off, or its mic muted? Turn it on or unmute it. Still nothing? Restart your PC, then try again.": "A mikrofonod nem küld hangot. Ki van kapcsolva a headseted, vagy le van némítva a mikrofonja? Kapcsold be, vagy oldd fel a némítást. Még mindig semmi? Indítsd újra a géped, aztán próbáld újra.",
   "Minimised: last picture": "Kis méretű: utolsó kép",
   "Minimised: restore for live updates": "Kis méretű: állítsd vissza az élő képhez",
@@ -3435,5 +3431,12 @@
   "Used when Connection is set to Tor. It's up to date.": "Akkor használja, ha a kapcsolat Tor-ra van állítva. Naprakész.",
   "Working: {engine}": "Működik: {engine}",
   "Working: {engine} {version} (faster)": "Működik: {engine} {version} (gyorsabb)",
-  "YouTube downloads still work, but with fewer formats.": "A YouTube-letöltések így is mennek, csak kevesebb formátummal."
+  "YouTube downloads still work, but with fewer formats.": "A YouTube-letöltések így is mennek, csak kevesebb formátummal.",
+  "Is your headset on?": "Be van kapcsolva a headseted?",
+  "Is your headset plugged in?": "Be van dugva a headseted?",
+  "No sound at all comes from your mic. A headset that's switched off, or whose mic is muted, does that. Turn it on or unmute it: this goes away by itself. Still nothing? Click <b>Repair</b>, then <b>Yes</b> when Windows asks.": "Semmi hang nem jön a mikrofonodból. Ezt csinálja a kikapcsolt headset, vagy amelyiknek le van némítva a mikrofonja. Kapcsold be, vagy oldd fel a némítást: ez magától eltűnik. Még mindig semmi? Kattints a <b>Javítás</b> gombra, majd az <b>Igen</b> gombra, amikor a Windows kérdez.",
+  "No sound at all comes from your mic. A headset that's switched off, or whose mic is muted, does that. Turn it on or unmute it: this goes away by itself. Still nothing? Click <b>Repair</b>: your sound drops out for a few seconds.": "Semmi hang nem jön a mikrofonodból. Ezt csinálja a kikapcsolt headset, vagy amelyiknek le van némítva a mikrofonja. Kapcsold be, vagy oldd fel a némítást: ez magától eltűnik. Még mindig semmi? Kattints a <b>Javítás</b> gombra: a hangod pár másodpercre kimarad.",
+  "No sound from your mic. Is your headset on?": "Nem jön hang a mikrofonodból. Be van kapcsolva a headseted?",
+  "Unplugged": "Nincs csatlakoztatva",
+  "Windows can't find <b>{mic}</b> right now. Plug it in, or switch it on if it's wireless. This goes away by itself.": "A Windows most nem találja ezt: <b>{mic}</b>. Dugd be, vagy kapcsold be, ha vezeték nélküli. Ez magától eltűnik."
 }

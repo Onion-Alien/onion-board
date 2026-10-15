@@ -3274,8 +3274,6 @@
   "Live: click to mute": "Live: clic pentru a dezactiva sunetul",
   "Muted: click to go live": "Fără sunet: clic pentru a reveni live",
   "No sound": "Fără sunet",
-  "Your mic sends no sound": "Microfonul tău nu trimite niciun sunet",
-  "Your mic sends no sound: see the Setup tab.": "Microfonul tău nu trimite niciun sunet: vezi fila Configurare.",
   "Before update": "Înainte de actualizare",
   "One is saved every time you reset something or update the app (the last {max_points} are kept). Restoring puts back your settings, hotkeys and sounds as they were. Sounds you've added since are kept.": "Se salvează unul de fiecare dată când resetezi ceva sau actualizezi aplicația (se păstrează ultimele {max_points}). Restaurarea îți pune la loc setările, tastele rapide și sunetele cum erau. Sunetele adăugate între timp sunt păstrate.",
   "Stops every sound, the radio and every program, and turns the voices off": "Oprește toate sunetele, radioul și toate programele și oprește vocile",
@@ -3324,8 +3322,6 @@
   "Show this program's window": "Arată fereastra acestui program",
   "This program doesn't share its picture": "Acest program nu își partajează imaginea",
   "Window of {name}": "Fereastra {name}",
-  "Discord and games hear nothing from your mic. Is your headset switched off, or its mic muted? Turn it on or unmute it. If not, click <b>Repair</b>, then <b>Yes</b> when Windows asks.": "Discord și jocurile nu aud nimic de la microfonul tău. Căștile sunt oprite sau au microfonul pe mut? Pornește-le sau scoate-l de pe mut. Dacă nu, dă clic pe <b>Repară</b>, apoi pe <b>Da</b> când întreabă Windows.",
-  "Discord and games hear nothing from your mic. Is your headset switched off, or its mic muted? Turn it on or unmute it. If not, click <b>Repair</b>: your sound drops out for a few seconds.": "Discord și jocurile nu aud nimic de la microfonul tău. Căștile sunt oprite sau au microfonul pe mut? Pornește-le sau scoate-l de pe mut. Dacă nu, dă clic pe <b>Repară</b>: sunetul se oprește câteva secunde.",
   "Your mic sends no sound. Is your headset switched off, or its mic muted? Turn it on or unmute it. Still nothing? Restart your PC, then try again.": "Microfonul tău nu trimite niciun sunet. Căștile sunt oprite sau au microfonul pe mut? Pornește-le sau scoate-l de pe mut. Tot nimic? Repornește PC-ul, apoi încearcă din nou.",
   "Minimised: last picture": "Minimizată: ultima imagine",
   "Minimised: restore for live updates": "Minimizată: restaurează pentru actualizări în timp real",
@@ -3511,5 +3507,12 @@
   "Used when Connection is set to Tor. It's up to date.": "Folosit când conexiunea e setată pe Tor. E la zi.",
   "Working: {engine}": "Merge: {engine}",
   "Working: {engine} {version} (faster)": "Merge: {engine} {version} (mai rapid)",
-  "YouTube downloads still work, but with fewer formats.": "Descărcările de pe YouTube merg în continuare, dar cu mai puține formate."
+  "YouTube downloads still work, but with fewer formats.": "Descărcările de pe YouTube merg în continuare, dar cu mai puține formate.",
+  "Is your headset on?": "Căștile sunt pornite?",
+  "Is your headset plugged in?": "Căștile sunt conectate?",
+  "No sound at all comes from your mic. A headset that's switched off, or whose mic is muted, does that. Turn it on or unmute it: this goes away by itself. Still nothing? Click <b>Repair</b>, then <b>Yes</b> when Windows asks.": "Nu vine niciun sunet de la microfonul tău. Așa fac căștile oprite sau cu microfonul pe mut. Pornește-le sau scoate-l de pe mut: asta dispare singur. Tot nimic? Dă clic pe <b>Repară</b>, apoi pe <b>Da</b> când întreabă Windows.",
+  "No sound at all comes from your mic. A headset that's switched off, or whose mic is muted, does that. Turn it on or unmute it: this goes away by itself. Still nothing? Click <b>Repair</b>: your sound drops out for a few seconds.": "Nu vine niciun sunet de la microfonul tău. Așa fac căștile oprite sau cu microfonul pe mut. Pornește-le sau scoate-l de pe mut: asta dispare singur. Tot nimic? Dă clic pe <b>Repară</b>: sunetul tău se întrerupe câteva secunde.",
+  "No sound from your mic. Is your headset on?": "Niciun sunet de la microfon. Căștile sunt pornite?",
+  "Unplugged": "Deconectat",
+  "Windows can't find <b>{mic}</b> right now. Plug it in, or switch it on if it's wireless. This goes away by itself.": "Windows nu găsește <b>{mic}</b> acum. Conectează-le sau pornește-le, dacă sunt wireless. Asta dispare singur."
 }

@@ -3201,8 +3201,6 @@
   "Live: click to mute": "На живо: щракнете за заглушаване",
   "Muted: click to go live": "Заглушено: щракнете, за да сте на живо",
   "No sound": "Няма звук",
-  "Your mic sends no sound": "Микрофонът ти не праща звук",
-  "Your mic sends no sound: see the Setup tab.": "Микрофонът ти не праща звук: виж раздела Настройка.",
   "Before update": "Преди обновяването",
   "One is saved every time you reset something or update the app (the last {max_points} are kept). Restoring puts back your settings, hotkeys and sounds as they were. Sounds you've added since are kept.": "Запазва се по една всеки път, когато нулираш нещо или обновиш приложението (пазят се последните {max_points}). Възстановяването връща настройките, бързите клавиши и звуците ти, както са били. Звуците, които си добавил оттогава, се пазят.",
   "Stops every sound, the radio and every program, and turns the voices off": "Спира всеки звук, радиото и всяка програма и изключва гласовете",
@@ -3250,8 +3248,6 @@
   "Show this program's window": "Покажи прозореца на тази програма",
   "This program doesn't share its picture": "Тази програма не споделя картината си",
   "Window of {name}": "Прозорец на {name}",
-  "Discord and games hear nothing from your mic. Is your headset switched off, or its mic muted? Turn it on or unmute it. If not, click <b>Repair</b>, then <b>Yes</b> when Windows asks.": "Discord и игрите не чуват нищо от микрофона ти. Слушалките изключени ли са, или микрофонът им е заглушен? Включи ги или махни заглушаването. Ако не е, кликни <b>Поправи</b>, после <b>Да</b>, когато Windows попита.",
-  "Discord and games hear nothing from your mic. Is your headset switched off, or its mic muted? Turn it on or unmute it. If not, click <b>Repair</b>: your sound drops out for a few seconds.": "Discord и игрите не чуват нищо от микрофона ти. Слушалките изключени ли са, или микрофонът им е заглушен? Включи ги или махни заглушаването. Ако не е, кликни <b>Поправи</b>: звукът ще изчезне за няколко секунди.",
   "Your mic sends no sound. Is your headset switched off, or its mic muted? Turn it on or unmute it. Still nothing? Restart your PC, then try again.": "Микрофонът ти не праща звук. Слушалките изключени ли са, или микрофонът им е заглушен? Включи ги или махни заглушаването. Пак нищо? Рестартирай компютъра и опитай пак.",
   "Minimised: last picture": "Минимизиран: последна снимка",
   "Minimised: restore for live updates": "Минимизиран: възстановете за обновяване на живо",
@@ -3435,5 +3431,12 @@
   "Used when Connection is set to Tor. It's up to date.": "Ползва се, когато връзката е настроена на Tor. Обновен е.",
   "Working: {engine}": "Работи: {engine}",
   "Working: {engine} {version} (faster)": "Работи: {engine} {version} (по-бързо)",
-  "YouTube downloads still work, but with fewer formats.": "Изтеглянията от YouTube пак работят, но с по-малко формати."
+  "YouTube downloads still work, but with fewer formats.": "Изтеглянията от YouTube пак работят, но с по-малко формати.",
+  "Is your headset on?": "Слушалките пуснати ли са?",
+  "Is your headset plugged in?": "Слушалките включени ли са?",
+  "No sound at all comes from your mic. A headset that's switched off, or whose mic is muted, does that. Turn it on or unmute it: this goes away by itself. Still nothing? Click <b>Repair</b>, then <b>Yes</b> when Windows asks.": "От микрофона ти не идва никакъв звук. Така става, когато слушалките са изключени или микрофонът им е заглушен. Пусни ги или махни заглушаването: това изчезва само. Пак нищо? Кликни <b>Поправи</b>, после <b>Да</b>, когато Windows попита.",
+  "No sound at all comes from your mic. A headset that's switched off, or whose mic is muted, does that. Turn it on or unmute it: this goes away by itself. Still nothing? Click <b>Repair</b>: your sound drops out for a few seconds.": "От микрофона ти не идва никакъв звук. Така става, когато слушалките са изключени или микрофонът им е заглушен. Пусни ги или махни заглушаването: това изчезва само. Пак нищо? Кликни <b>Поправи</b>: звукът ти прекъсва за няколко секунди.",
+  "No sound from your mic. Is your headset on?": "Няма звук от микрофона ти. Слушалките пуснати ли са?",
+  "Unplugged": "Изключен",
+  "Windows can't find <b>{mic}</b> right now. Plug it in, or switch it on if it's wireless. This goes away by itself.": "Windows не намира <b>{mic}</b> в момента. Включи го в компютъра или го пусни, ако е безжичен. Това изчезва само."
 }

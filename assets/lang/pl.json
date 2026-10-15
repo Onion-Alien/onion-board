@@ -3274,8 +3274,6 @@
   "Live: click to mute": "Na żywo: kliknij, aby wyciszyć",
   "Muted: click to go live": "Wyciszono: kliknij, aby wrócić na żywo",
   "No sound": "Brak dźwięku",
-  "Your mic sends no sound": "Twój mikrofon nie wysyła dźwięku",
-  "Your mic sends no sound: see the Setup tab.": "Twój mikrofon nie wysyła dźwięku: zajrzyj na kartę Ustawienia.",
   "Before update": "Przed aktualizacją",
   "One is saved every time you reset something or update the app (the last {max_points} are kept). Restoring puts back your settings, hotkeys and sounds as they were. Sounds you've added since are kept.": "Jeden jest zapisywany za każdym razem, gdy coś resetujesz lub aktualizujesz aplikację (ostatnie {max_points} zostają zachowane). Przywracanie przywraca ustawienia, klawisze skrótów i dźwięki do stanu poprzedniego. Dźwięki dodane od tego czasu zostaną zachowane.",
   "Stops every sound, the radio and every program, and turns the voices off": "Zatrzymuje wszystkie dźwięki, radio i każdy program oraz wyłącza głosy",
@@ -3324,8 +3322,6 @@
   "Show this program's window": "Pokaż okno tego programu",
   "This program doesn't share its picture": "Ten program nie udostępnia swojego obrazu",
   "Window of {name}": "Okno {name}",
-  "Discord and games hear nothing from your mic. Is your headset switched off, or its mic muted? Turn it on or unmute it. If not, click <b>Repair</b>, then <b>Yes</b> when Windows asks.": "Discord i gry nic nie słyszą z twojego mikrofonu. Czy słuchawki są wyłączone albo ich mikrofon wyciszony? Włącz je albo wyłącz wyciszenie. Jeśli nie, kliknij <b>Napraw</b>, a potem <b>Tak</b>, gdy Windows zapyta.",
-  "Discord and games hear nothing from your mic. Is your headset switched off, or its mic muted? Turn it on or unmute it. If not, click <b>Repair</b>: your sound drops out for a few seconds.": "Discord i gry nic nie słyszą z twojego mikrofonu. Czy słuchawki są wyłączone albo ich mikrofon wyciszony? Włącz je albo wyłącz wyciszenie. Jeśli nie, kliknij <b>Napraw</b>: dźwięk zniknie na kilka sekund.",
   "Your mic sends no sound. Is your headset switched off, or its mic muted? Turn it on or unmute it. Still nothing? Restart your PC, then try again.": "Twój mikrofon nie wysyła dźwięku. Czy słuchawki są wyłączone albo ich mikrofon wyciszony? Włącz je albo wyłącz wyciszenie. Nadal nic? Uruchom ponownie komputer i spróbuj jeszcze raz.",
   "Minimised: last picture": "Zminimalizowane: ostatni obraz",
   "Minimised: restore for live updates": "Zminimalizowane: przywróć, aby oglądać na żywo",
@@ -3511,5 +3507,12 @@
   "Used when Connection is set to Tor. It's up to date.": "Używany, gdy połączenie jest ustawione na Tor. Jest aktualny.",
   "Working: {engine}": "Działa: {engine}",
   "Working: {engine} {version} (faster)": "Działa: {engine} {version} (szybciej)",
-  "YouTube downloads still work, but with fewer formats.": "Pobieranie z YouTube nadal działa, ale z mniejszą liczbą formatów."
+  "YouTube downloads still work, but with fewer formats.": "Pobieranie z YouTube nadal działa, ale z mniejszą liczbą formatów.",
+  "Is your headset on?": "Czy słuchawki są włączone?",
+  "Is your headset plugged in?": "Czy słuchawki są podłączone?",
+  "No sound at all comes from your mic. A headset that's switched off, or whose mic is muted, does that. Turn it on or unmute it: this goes away by itself. Still nothing? Click <b>Repair</b>, then <b>Yes</b> when Windows asks.": "Z twojego mikrofonu nie płynie żaden dźwięk. Tak działają słuchawki wyłączone albo z wyciszonym mikrofonem. Włącz je albo wyłącz wyciszenie: to zniknie samo. Dalej nic? Kliknij <b>Napraw</b>, a potem <b>Tak</b>, gdy Windows zapyta.",
+  "No sound at all comes from your mic. A headset that's switched off, or whose mic is muted, does that. Turn it on or unmute it: this goes away by itself. Still nothing? Click <b>Repair</b>: your sound drops out for a few seconds.": "Z twojego mikrofonu nie płynie żaden dźwięk. Tak działają słuchawki wyłączone albo z wyciszonym mikrofonem. Włącz je albo wyłącz wyciszenie: to zniknie samo. Dalej nic? Kliknij <b>Napraw</b>: dźwięk zniknie na kilka sekund.",
+  "No sound from your mic. Is your headset on?": "Brak dźwięku z mikrofonu. Czy słuchawki są włączone?",
+  "Unplugged": "Odłączony",
+  "Windows can't find <b>{mic}</b> right now. Plug it in, or switch it on if it's wireless. This goes away by itself.": "Windows nie widzi teraz urządzenia <b>{mic}</b>. Podłącz je albo włącz, jeśli jest bezprzewodowe. To zniknie samo."
 }

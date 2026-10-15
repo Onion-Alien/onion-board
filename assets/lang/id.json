@@ -3128,8 +3128,6 @@
   "Live: click to mute": "Live: klik untuk membisukan",
   "Muted: click to go live": "Dibisukan: klik untuk live lagi",
   "No sound": "Tidak ada suara",
-  "Your mic sends no sound": "Mic-mu tidak mengirim suara",
-  "Your mic sends no sound: see the Setup tab.": "Mic-mu tidak mengirim suara: lihat tab Setup.",
   "Before update": "Sebelum pembaruan",
   "One is saved every time you reset something or update the app (the last {max_points} are kept). Restoring puts back your settings, hotkeys and sounds as they were. Sounds you've added since are kept.": "Satu disimpan setiap kali Anda menyetel ulang sesuatu atau memperbarui aplikasi ({max_points} terakhir disimpan). Memulihkan akan mengembalikan pengaturan, tombol pintas, dan suara Anda seperti semula. Suara yang Anda tambahkan sejak itu disimpan.",
   "Stops every sound, the radio and every program, and turns the voices off": "Menghentikan semua suara, radio, dan semua program, lalu mematikan suara-suara pengubah",
@@ -3176,8 +3174,6 @@
   "Show this program's window": "Tampilkan jendela program ini",
   "This program doesn't share its picture": "Program ini tidak membagikan gambarnya",
   "Window of {name}": "Jendela {name}",
-  "Discord and games hear nothing from your mic. Is your headset switched off, or its mic muted? Turn it on or unmute it. If not, click <b>Repair</b>, then <b>Yes</b> when Windows asks.": "Discord dan game tidak mendengar apa pun dari mic-mu. Apakah headset-mu mati, atau mic-nya di-mute? Nyalakan atau aktifkan lagi mic-nya. Kalau tidak, klik <b>Perbaiki</b>, lalu <b>Ya</b> saat Windows bertanya.",
-  "Discord and games hear nothing from your mic. Is your headset switched off, or its mic muted? Turn it on or unmute it. If not, click <b>Repair</b>: your sound drops out for a few seconds.": "Discord dan game tidak mendengar apa pun dari mic-mu. Apakah headset-mu mati, atau mic-nya di-mute? Nyalakan atau aktifkan lagi mic-nya. Kalau tidak, klik <b>Perbaiki</b>: suaramu hilang beberapa detik.",
   "Your mic sends no sound. Is your headset switched off, or its mic muted? Turn it on or unmute it. Still nothing? Restart your PC, then try again.": "Mic-mu tidak mengirim suara. Apakah headset-mu mati, atau mic-nya di-mute? Nyalakan atau aktifkan lagi mic-nya. Masih tidak ada? Restart PC-mu, lalu coba lagi.",
   "Minimised: last picture": "Diminimalkan: gambar terakhir",
   "Minimised: restore for live updates": "Diminimalkan: pulihkan untuk pembaruan langsung",
@@ -3359,5 +3355,12 @@
   "Used when Connection is set to Tor. It's up to date.": "Dipakai saat koneksi diatur ke Tor. Sudah versi terbaru.",
   "Working: {engine}": "Berfungsi: {engine}",
   "Working: {engine} {version} (faster)": "Berfungsi: {engine} {version} (lebih cepat)",
-  "YouTube downloads still work, but with fewer formats.": "Unduhan YouTube tetap jalan, tapi dengan format lebih sedikit."
+  "YouTube downloads still work, but with fewer formats.": "Unduhan YouTube tetap jalan, tapi dengan format lebih sedikit.",
+  "Is your headset on?": "Apakah headset-mu menyala?",
+  "Is your headset plugged in?": "Apakah headset-mu tersambung?",
+  "No sound at all comes from your mic. A headset that's switched off, or whose mic is muted, does that. Turn it on or unmute it: this goes away by itself. Still nothing? Click <b>Repair</b>, then <b>Yes</b> when Windows asks.": "Tidak ada suara sama sekali dari mic-mu. Begitulah headset yang mati, atau yang mic-nya di-mute. Nyalakan atau aktifkan lagi mic-nya: ini hilang sendiri. Masih tidak ada? Klik <b>Perbaiki</b>, lalu <b>Ya</b> saat Windows bertanya.",
+  "No sound at all comes from your mic. A headset that's switched off, or whose mic is muted, does that. Turn it on or unmute it: this goes away by itself. Still nothing? Click <b>Repair</b>: your sound drops out for a few seconds.": "Tidak ada suara sama sekali dari mic-mu. Begitulah headset yang mati, atau yang mic-nya di-mute. Nyalakan atau aktifkan lagi mic-nya: ini hilang sendiri. Masih tidak ada? Klik <b>Perbaiki</b>: suaramu hilang beberapa detik.",
+  "No sound from your mic. Is your headset on?": "Tidak ada suara dari mic-mu. Apakah headset-mu menyala?",
+  "Unplugged": "Tidak tersambung",
+  "Windows can't find <b>{mic}</b> right now. Plug it in, or switch it on if it's wireless. This goes away by itself.": "Windows tidak menemukan <b>{mic}</b> sekarang. Sambungkan, atau nyalakan kalau nirkabel. Ini hilang sendiri."
 }

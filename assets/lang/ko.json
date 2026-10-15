@@ -3128,8 +3128,6 @@
   "Live: click to mute": "라이브: 클릭하면 음소거",
   "Muted: click to go live": "음소거됨: 클릭하면 라이브",
   "No sound": "소리 없음",
-  "Your mic sends no sound": "마이크에서 소리가 나가지 않습니다",
-  "Your mic sends no sound: see the Setup tab.": "마이크에서 소리가 나가지 않습니다: 설정 탭을 확인하세요.",
   "Before update": "업데이트 전",
   "One is saved every time you reset something or update the app (the last {max_points} are kept). Restoring puts back your settings, hotkeys and sounds as they were. Sounds you've added since are kept.": "무언가를 재설정하거나 앱을 업데이트할 때마다 하나가 저장됩니다(마지막 {max_points} 개는 유지됩니다). 복원하면 설정, 단축키 및 사운드가 원래대로 돌아갑니다. 이후 추가한 사운드는 유지됩니다.",
   "Stops every sound, the radio and every program, and turns the voices off": "모든 사운드, 라디오, 모든 프로그램을 멈추고 음성을 끕니다",
@@ -3176,8 +3174,6 @@
   "Show this program's window": "이 프로그램의 창 보기",
   "This program doesn't share its picture": "이 프로그램은 화면을 공유하지 않아요",
   "Window of {name}": "{name} 창",
-  "Discord and games hear nothing from your mic. Is your headset switched off, or its mic muted? Turn it on or unmute it. If not, click <b>Repair</b>, then <b>Yes</b> when Windows asks.": "Discord와 게임에 마이크 소리가 전혀 들리지 않습니다. 헤드셋이 꺼져 있거나 마이크가 음소거되어 있나요? 켜거나 음소거를 해제하세요. 아니라면 <b>복구</b>를 클릭한 다음 Windows가 물으면 <b>예</b>를 클릭하세요.",
-  "Discord and games hear nothing from your mic. Is your headset switched off, or its mic muted? Turn it on or unmute it. If not, click <b>Repair</b>: your sound drops out for a few seconds.": "Discord와 게임에 마이크 소리가 전혀 들리지 않습니다. 헤드셋이 꺼져 있거나 마이크가 음소거되어 있나요? 켜거나 음소거를 해제하세요. 아니라면 <b>복구</b>를 클릭하세요: 몇 초 동안 소리가 끊깁니다.",
   "Your mic sends no sound. Is your headset switched off, or its mic muted? Turn it on or unmute it. Still nothing? Restart your PC, then try again.": "마이크에서 소리가 나가지 않습니다. 헤드셋이 꺼져 있거나 마이크가 음소거되어 있나요? 켜거나 음소거를 해제하세요. 그래도 안 되면 PC를 다시 시작한 다음 다시 시도하세요.",
   "Minimised: last picture": "최소화됨: 마지막 화면",
   "Minimised: restore for live updates": "최소화됨: 실시간으로 보려면 창을 복원하세요",
@@ -3359,5 +3355,12 @@
   "Used when Connection is set to Tor. It's up to date.": "연결이 Tor로 설정되었을 때 사용돼요. 최신 버전이에요.",
   "Working: {engine}": "작동 중: {engine}",
   "Working: {engine} {version} (faster)": "작동 중: {engine} {version} (더 빠름)",
-  "YouTube downloads still work, but with fewer formats.": "YouTube 다운로드는 여전히 되지만 형식이 더 적어요."
+  "YouTube downloads still work, but with fewer formats.": "YouTube 다운로드는 여전히 되지만 형식이 더 적어요.",
+  "Is your headset on?": "헤드셋이 켜져 있나요?",
+  "Is your headset plugged in?": "헤드셋이 연결되어 있나요?",
+  "No sound at all comes from your mic. A headset that's switched off, or whose mic is muted, does that. Turn it on or unmute it: this goes away by itself. Still nothing? Click <b>Repair</b>, then <b>Yes</b> when Windows asks.": "마이크에서 아무 소리도 나오지 않습니다. 꺼져 있거나 마이크가 음소거된 헤드셋이 이렇습니다. 켜거나 음소거를 해제하세요. 이 표시는 저절로 사라집니다. 그래도 안 되나요? <b>복구</b>를 클릭한 다음 Windows가 물으면 <b>예</b>를 클릭하세요.",
+  "No sound at all comes from your mic. A headset that's switched off, or whose mic is muted, does that. Turn it on or unmute it: this goes away by itself. Still nothing? Click <b>Repair</b>: your sound drops out for a few seconds.": "마이크에서 아무 소리도 나오지 않습니다. 꺼져 있거나 마이크가 음소거된 헤드셋이 이렇습니다. 켜거나 음소거를 해제하세요. 이 표시는 저절로 사라집니다. 그래도 안 되나요? <b>복구</b>를 클릭하세요. 몇 초 동안 소리가 끊깁니다.",
+  "No sound from your mic. Is your headset on?": "마이크에서 소리가 나지 않습니다. 헤드셋이 켜져 있나요?",
+  "Unplugged": "연결 안 됨",
+  "Windows can't find <b>{mic}</b> right now. Plug it in, or switch it on if it's wireless. This goes away by itself.": "지금 Windows가 <b>{mic}</b>을(를) 찾지 못합니다. 연결하거나, 무선이라면 켜세요. 이 표시는 저절로 사라집니다."
 }

@@ -3201,8 +3201,6 @@
   "Live: click to mute": "Live: mykistä napsauttamalla",
   "Muted: click to go live": "Mykistetty: palaa liveen napsauttamalla",
   "No sound": "Ei ääntä",
-  "Your mic sends no sound": "Mikkisi ei lähetä ääntä",
-  "Your mic sends no sound: see the Setup tab.": "Mikkisi ei lähetä ääntä: katso Asetukset-välilehti.",
   "Before update": "Ennen päivitystä",
   "One is saved every time you reset something or update the app (the last {max_points} are kept). Restoring puts back your settings, hotkeys and sounds as they were. Sounds you've added since are kept.": "Sellainen tallennetaan aina, kun nollaat jotain tai päivität sovelluksen (viimeiset {max_points} säilytetään). Palautus laittaa asetuksesi, pikanäppäimesi ja äänesi takaisin ennalleen. Sen jälkeen lisäämäsi äänet säilyvät.",
   "Stops every sound, the radio and every program, and turns the voices off": "Pysäyttää kaikki äänet, radion ja kaikki ohjelmat ja sammuttaa äänimuuntimet",
@@ -3250,8 +3248,6 @@
   "Show this program's window": "Näytä tämän ohjelman ikkuna",
   "This program doesn't share its picture": "Tämä ohjelma ei jaa kuvaansa",
   "Window of {name}": "Ohjelman {name} ikkuna",
-  "Discord and games hear nothing from your mic. Is your headset switched off, or its mic muted? Turn it on or unmute it. If not, click <b>Repair</b>, then <b>Yes</b> when Windows asks.": "Discord ja pelit eivät kuule mikistäsi mitään. Ovatko kuulokkeesi pois päältä tai niiden mikki mykistetty? Laita ne päälle tai poista mykistys. Jos ei, klikkaa <b>Korjaa</b> ja sitten <b>Kyllä</b>, kun Windows kysyy.",
-  "Discord and games hear nothing from your mic. Is your headset switched off, or its mic muted? Turn it on or unmute it. If not, click <b>Repair</b>: your sound drops out for a few seconds.": "Discord ja pelit eivät kuule mikistäsi mitään. Ovatko kuulokkeesi pois päältä tai niiden mikki mykistetty? Laita ne päälle tai poista mykistys. Jos ei, klikkaa <b>Korjaa</b>: ääni katkeaa muutamaksi sekunniksi.",
   "Your mic sends no sound. Is your headset switched off, or its mic muted? Turn it on or unmute it. Still nothing? Restart your PC, then try again.": "Mikkisi ei lähetä ääntä. Ovatko kuulokkeesi pois päältä tai niiden mikki mykistetty? Laita ne päälle tai poista mykistys. Vieläkään ei mitään? Käynnistä tietokone uudelleen ja yritä sitten uudestaan.",
   "Minimised: last picture": "Pienennetty: viimeisin kuva",
   "Minimised: restore for live updates": "Pienennetty: palauta ikkuna live-kuvaa varten",
@@ -3435,5 +3431,12 @@
   "Used when Connection is set to Tor. It's up to date.": "Käytetään, kun yhteydeksi on valittu Tor. Se on ajan tasalla.",
   "Working: {engine}": "Toimii: {engine}",
   "Working: {engine} {version} (faster)": "Toimii: {engine} {version} (nopeampi)",
-  "YouTube downloads still work, but with fewer formats.": "YouTube-lataukset toimivat yhä, mutta vähemmillä muodoilla."
+  "YouTube downloads still work, but with fewer formats.": "YouTube-lataukset toimivat yhä, mutta vähemmillä muodoilla.",
+  "Is your headset on?": "Ovatko kuulokkeesi päällä?",
+  "Is your headset plugged in?": "Ovatko kuulokkeesi kiinni?",
+  "No sound at all comes from your mic. A headset that's switched off, or whose mic is muted, does that. Turn it on or unmute it: this goes away by itself. Still nothing? Click <b>Repair</b>, then <b>Yes</b> when Windows asks.": "Mikistäsi ei tule mitään ääntä. Niin käy, kun kuulokkeet ovat pois päältä tai niiden mikki on mykistetty. Laita ne päälle tai poista mykistys: tämä katoaa itsestään. Vieläkään ei mitään? Klikkaa <b>Korjaa</b> ja sitten <b>Kyllä</b>, kun Windows kysyy.",
+  "No sound at all comes from your mic. A headset that's switched off, or whose mic is muted, does that. Turn it on or unmute it: this goes away by itself. Still nothing? Click <b>Repair</b>: your sound drops out for a few seconds.": "Mikistäsi ei tule mitään ääntä. Niin käy, kun kuulokkeet ovat pois päältä tai niiden mikki on mykistetty. Laita ne päälle tai poista mykistys: tämä katoaa itsestään. Vieläkään ei mitään? Klikkaa <b>Korjaa</b>: äänesi katkeaa muutamaksi sekunniksi.",
+  "No sound from your mic. Is your headset on?": "Mikistäsi ei tule ääntä. Ovatko kuulokkeesi päällä?",
+  "Unplugged": "Irrotettu",
+  "Windows can't find <b>{mic}</b> right now. Plug it in, or switch it on if it's wireless. This goes away by itself.": "Windows ei löydä laitetta <b>{mic}</b> juuri nyt. Kytke se kiinni, tai laita se päälle, jos se on langaton. Tämä katoaa itsestään."
 }

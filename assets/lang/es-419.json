@@ -3201,8 +3201,6 @@
   "Live: click to mute": "En vivo: haz clic para silenciar",
   "Muted: click to go live": "Silenciado: haz clic para salir en vivo",
   "No sound": "Sin sonido",
-  "Your mic sends no sound": "Tu micrófono no envía sonido",
-  "Your mic sends no sound: see the Setup tab.": "Tu micrófono no envía sonido: ve a la pestaña Configuración.",
   "Before update": "Antes de actualizar",
   "One is saved every time you reset something or update the app (the last {max_points} are kept). Restoring puts back your settings, hotkeys and sounds as they were. Sounds you've added since are kept.": "Se guarda uno cada vez que restableces algo o actualizas la app (se conservan los últimos {max_points}). Restaurar devuelve tu configuración, tus atajos y tus sonidos a como estaban. Los sonidos que agregaste después se conservan.",
   "Stops every sound, the radio and every program, and turns the voices off": "Detiene todos los sonidos, la radio y todos los programas, y apaga las voces",
@@ -3250,8 +3248,6 @@
   "Show this program's window": "Mostrar la ventana de este programa",
   "This program doesn't share its picture": "Este programa no comparte su imagen",
   "Window of {name}": "Ventana de {name}",
-  "Discord and games hear nothing from your mic. Is your headset switched off, or its mic muted? Turn it on or unmute it. If not, click <b>Repair</b>, then <b>Yes</b> when Windows asks.": "Discord y los juegos no oyen nada de tu micrófono. ¿Tus audífonos están apagados o su micrófono silenciado? Enciéndelos o quita el silencio. Si no, haz clic en <b>Reparar</b> y luego en <b>Sí</b> cuando Windows pregunte.",
-  "Discord and games hear nothing from your mic. Is your headset switched off, or its mic muted? Turn it on or unmute it. If not, click <b>Repair</b>: your sound drops out for a few seconds.": "Discord y los juegos no oyen nada de tu micrófono. ¿Tus audífonos están apagados o su micrófono silenciado? Enciéndelos o quita el silencio. Si no, haz clic en <b>Reparar</b>: el sonido se corta unos segundos.",
   "Your mic sends no sound. Is your headset switched off, or its mic muted? Turn it on or unmute it. Still nothing? Restart your PC, then try again.": "Tu micrófono no envía sonido. ¿Tus audífonos están apagados o su micrófono silenciado? Enciéndelos o quita el silencio. ¿Sigue sin funcionar? Reinicia tu PC y vuelve a intentarlo.",
   "Minimised: last picture": "Minimizada: última imagen",
   "Minimised: restore for live updates": "Minimizada: restaura para ver cambios en vivo",
@@ -3435,5 +3431,12 @@
   "Used when Connection is set to Tor. It's up to date.": "Se usa cuando la conexión está en Tor. Está actualizado.",
   "Working: {engine}": "Funciona: {engine}",
   "Working: {engine} {version} (faster)": "Funciona: {engine} {version} (más rápido)",
-  "YouTube downloads still work, but with fewer formats.": "Las descargas de YouTube siguen funcionando, pero con menos formatos."
+  "YouTube downloads still work, but with fewer formats.": "Las descargas de YouTube siguen funcionando, pero con menos formatos.",
+  "Is your headset on?": "¿Tus audífonos están encendidos?",
+  "Is your headset plugged in?": "¿Tus audífonos están conectados?",
+  "No sound at all comes from your mic. A headset that's switched off, or whose mic is muted, does that. Turn it on or unmute it: this goes away by itself. Still nothing? Click <b>Repair</b>, then <b>Yes</b> when Windows asks.": "No sale nada de sonido de tu micrófono. Eso pasa con unos audífonos apagados o con el micrófono silenciado. Enciéndelos o quita el silencio: esto desaparece solo. ¿Sigue sin nada? Haz clic en <b>Reparar</b> y luego en <b>Sí</b> cuando Windows pregunte.",
+  "No sound at all comes from your mic. A headset that's switched off, or whose mic is muted, does that. Turn it on or unmute it: this goes away by itself. Still nothing? Click <b>Repair</b>: your sound drops out for a few seconds.": "No sale nada de sonido de tu micrófono. Eso pasa con unos audífonos apagados o con el micrófono silenciado. Enciéndelos o quita el silencio: esto desaparece solo. ¿Sigue sin nada? Haz clic en <b>Reparar</b>: tu sonido se corta unos segundos.",
+  "No sound from your mic. Is your headset on?": "No sale sonido de tu micrófono. ¿Tus audífonos están encendidos?",
+  "Unplugged": "Desconectado",
+  "Windows can't find <b>{mic}</b> right now. Plug it in, or switch it on if it's wireless. This goes away by itself.": "Windows no encuentra <b>{mic}</b> ahora. Conéctalo, o enciéndelo si es inalámbrico. Esto desaparece solo."
 }

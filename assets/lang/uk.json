@@ -3274,8 +3274,6 @@
   "Live: click to mute": "В ефірі: натисніть, щоб вимкнути звук",
   "Muted: click to go live": "Без звуку: натисніть, щоб вийти в ефір",
   "No sound": "Немає звуку",
-  "Your mic sends no sound": "Мікрофон не передає звук",
-  "Your mic sends no sound: see the Setup tab.": "Мікрофон не передає звук: глянь вкладку «Налаштування».",
   "Before update": "Перед оновленням",
   "One is saved every time you reset something or update the app (the last {max_points} are kept). Restoring puts back your settings, hotkeys and sounds as they were. Sounds you've added since are kept.": "Один зберігається щоразу, коли ви щось скидаєте або оновлюєте застосунок (останні {max_points} зберігаються). Відновлення повертає ваші налаштування, гарячі клавіші та звуки, як вони були. Звуки, які ви додали після того, зберігаються.",
   "Stops every sound, the radio and every program, and turns the voices off": "Зупиняє всі звуки, радіо й усі програми та вимикає голоси",
@@ -3324,8 +3322,6 @@
   "Show this program's window": "Показати вікно цієї програми",
   "This program doesn't share its picture": "Ця програма не ділиться своїм зображенням",
   "Window of {name}": "Вікно {name}",
-  "Discord and games hear nothing from your mic. Is your headset switched off, or its mic muted? Turn it on or unmute it. If not, click <b>Repair</b>, then <b>Yes</b> when Windows asks.": "Discord та ігри нічого не чують з твого мікрофона. Гарнітуру вимкнено, або її мікрофон вимкнено? Увімкни її або мікрофон. Якщо ні, натисни <b>Полагодити</b>, потім <b>Так</b>, коли Windows запитає.",
-  "Discord and games hear nothing from your mic. Is your headset switched off, or its mic muted? Turn it on or unmute it. If not, click <b>Repair</b>: your sound drops out for a few seconds.": "Discord та ігри нічого не чують з твого мікрофона. Гарнітуру вимкнено, або її мікрофон вимкнено? Увімкни її або мікрофон. Якщо ні, натисни <b>Полагодити</b>: звук зникне на кілька секунд.",
   "Your mic sends no sound. Is your headset switched off, or its mic muted? Turn it on or unmute it. Still nothing? Restart your PC, then try again.": "Мікрофон не передає звук. Гарнітуру вимкнено, або її мікрофон вимкнено? Увімкни її або мікрофон. Досі нічого? Перезавантаж ПК і спробуй ще раз.",
   "Minimised: last picture": "Згорнуто: останній кадр",
   "Minimised: restore for live updates": "Згорнуто: відновіть вікно для оновлень наживо",
@@ -3511,5 +3507,12 @@
   "Used when Connection is set to Tor. It's up to date.": "Використовується, коли в підключенні вибрано Tor. Він оновлений.",
   "Working: {engine}": "Працює: {engine}",
   "Working: {engine} {version} (faster)": "Працює: {engine} {version} (швидше)",
-  "YouTube downloads still work, but with fewer formats.": "Завантаження з YouTube все одно працюють, але форматів менше."
+  "YouTube downloads still work, but with fewer formats.": "Завантаження з YouTube все одно працюють, але форматів менше.",
+  "Is your headset on?": "Гарнітуру увімкнено?",
+  "Is your headset plugged in?": "Гарнітуру під'єднано?",
+  "No sound at all comes from your mic. A headset that's switched off, or whose mic is muted, does that. Turn it on or unmute it: this goes away by itself. Still nothing? Click <b>Repair</b>, then <b>Yes</b> when Windows asks.": "З твого мікрофона не йде жодного звуку. Так буває, коли гарнітуру вимкнено або її мікрофон вимкнено. Увімкни її або мікрофон: це зникне само. Досі нічого? Натисни <b>Полагодити</b>, потім <b>Так</b>, коли Windows запитає.",
+  "No sound at all comes from your mic. A headset that's switched off, or whose mic is muted, does that. Turn it on or unmute it: this goes away by itself. Still nothing? Click <b>Repair</b>: your sound drops out for a few seconds.": "З твого мікрофона не йде жодного звуку. Так буває, коли гарнітуру вимкнено або її мікрофон вимкнено. Увімкни її або мікрофон: це зникне само. Досі нічого? Натисни <b>Полагодити</b>: звук зникне на кілька секунд.",
+  "No sound from your mic. Is your headset on?": "З мікрофона немає звуку. Гарнітуру увімкнено?",
+  "Unplugged": "Від'єднано",
+  "Windows can't find <b>{mic}</b> right now. Plug it in, or switch it on if it's wireless. This goes away by itself.": "Windows зараз не бачить <b>{mic}</b>. Під'єднай його або увімкни, якщо він бездротовий. Це зникне само."
 }

@@ -3201,8 +3201,6 @@
   "Live: click to mute": "Ζωντανά: κάντε κλικ για σίγαση",
   "Muted: click to go live": "Σε σίγαση: κάντε κλικ για ζωντανά",
   "No sound": "Χωρίς ήχο",
-  "Your mic sends no sound": "Το μικρόφωνό σου δεν στέλνει ήχο",
-  "Your mic sends no sound: see the Setup tab.": "Το μικρόφωνό σου δεν στέλνει ήχο: δες την καρτέλα Ρύθμιση.",
   "Before update": "Πριν την ενημέρωση",
   "One is saved every time you reset something or update the app (the last {max_points} are kept). Restoring puts back your settings, hotkeys and sounds as they were. Sounds you've added since are kept.": "Αποθηκεύεται ένα κάθε φορά που επαναφέρεις κάτι ή ενημερώνεις την εφαρμογή (κρατιούνται τα τελευταία {max_points}). Η ανάκτηση επαναφέρει τις ρυθμίσεις, τις συντομεύσεις και τους ήχους σου όπως ήταν. Οι ήχοι που πρόσθεσες από τότε μένουν.",
   "Stops every sound, the radio and every program, and turns the voices off": "Σταματάει κάθε ήχο, το ραδιόφωνο και κάθε πρόγραμμα και κλείνει τις φωνές",
@@ -3250,8 +3248,6 @@
   "Show this program's window": "Εμφάνιση του παραθύρου αυτού του προγράμματος",
   "This program doesn't share its picture": "Αυτό το πρόγραμμα δεν μοιράζεται την εικόνα του",
   "Window of {name}": "Παράθυρο του {name}",
-  "Discord and games hear nothing from your mic. Is your headset switched off, or its mic muted? Turn it on or unmute it. If not, click <b>Repair</b>, then <b>Yes</b> when Windows asks.": "Το Discord και τα παιχνίδια δεν ακούν τίποτα από το μικρόφωνό σου. Είναι τα ακουστικά σου κλειστά ή το μικρόφωνό τους σε σίγαση; Άνοιξέ τα ή βγάλε τη σίγαση. Αν όχι, κάνε κλικ στο <b>Επισκευή</b> και μετά στο <b>Ναι</b> όταν ρωτήσουν τα Windows.",
-  "Discord and games hear nothing from your mic. Is your headset switched off, or its mic muted? Turn it on or unmute it. If not, click <b>Repair</b>: your sound drops out for a few seconds.": "Το Discord και τα παιχνίδια δεν ακούν τίποτα από το μικρόφωνό σου. Είναι τα ακουστικά σου κλειστά ή το μικρόφωνό τους σε σίγαση; Άνοιξέ τα ή βγάλε τη σίγαση. Αν όχι, κάνε κλικ στο <b>Επισκευή</b>: ο ήχος σου κόβεται για λίγα δευτερόλεπτα.",
   "Your mic sends no sound. Is your headset switched off, or its mic muted? Turn it on or unmute it. Still nothing? Restart your PC, then try again.": "Το μικρόφωνό σου δεν στέλνει ήχο. Είναι τα ακουστικά σου κλειστά ή το μικρόφωνό τους σε σίγαση; Άνοιξέ τα ή βγάλε τη σίγαση. Ακόμα τίποτα; Κάνε επανεκκίνηση στον υπολογιστή και δοκίμασε ξανά.",
   "Minimised: last picture": "Ελαχιστοποιημένο: τελευταία εικόνα",
   "Minimised: restore for live updates": "Ελαχιστοποιημένο: επαναφέρετε για ζωντανή εικόνα",
@@ -3435,5 +3431,12 @@
   "Used when Connection is set to Tor. It's up to date.": "Χρησιμοποιείται όταν η σύνδεση είναι ρυθμισμένη σε Tor. Είναι ενημερωμένο.",
   "Working: {engine}": "Δουλεύει: {engine}",
   "Working: {engine} {version} (faster)": "Δουλεύει: {engine} {version} (πιο γρήγορο)",
-  "YouTube downloads still work, but with fewer formats.": "Οι λήψεις από YouTube δουλεύουν ακόμα, αλλά με λιγότερες μορφές."
+  "YouTube downloads still work, but with fewer formats.": "Οι λήψεις από YouTube δουλεύουν ακόμα, αλλά με λιγότερες μορφές.",
+  "Is your headset on?": "Είναι ανοιχτά τα ακουστικά σου;",
+  "Is your headset plugged in?": "Είναι συνδεδεμένα τα ακουστικά σου;",
+  "No sound at all comes from your mic. A headset that's switched off, or whose mic is muted, does that. Turn it on or unmute it: this goes away by itself. Still nothing? Click <b>Repair</b>, then <b>Yes</b> when Windows asks.": "Δεν βγαίνει κανένας ήχος από το μικρόφωνό σου. Αυτό κάνουν ακουστικά που είναι κλειστά ή έχουν το μικρόφωνο σε σίγαση. Άνοιξέ τα ή βγάλε τη σίγαση: αυτό φεύγει μόνο του. Ακόμα τίποτα; Κάνε κλικ στο <b>Επισκευή</b> και μετά στο <b>Ναι</b> όταν ρωτήσουν τα Windows.",
+  "No sound at all comes from your mic. A headset that's switched off, or whose mic is muted, does that. Turn it on or unmute it: this goes away by itself. Still nothing? Click <b>Repair</b>: your sound drops out for a few seconds.": "Δεν βγαίνει κανένας ήχος από το μικρόφωνό σου. Αυτό κάνουν ακουστικά που είναι κλειστά ή έχουν το μικρόφωνο σε σίγαση. Άνοιξέ τα ή βγάλε τη σίγαση: αυτό φεύγει μόνο του. Ακόμα τίποτα; Κάνε κλικ στο <b>Επισκευή</b>: ο ήχος σου κόβεται για λίγα δευτερόλεπτα.",
+  "No sound from your mic. Is your headset on?": "Κανένας ήχος από το μικρόφωνό σου. Είναι ανοιχτά τα ακουστικά σου;",
+  "Unplugged": "Αποσυνδεδεμένο",
+  "Windows can't find <b>{mic}</b> right now. Plug it in, or switch it on if it's wireless. This goes away by itself.": "Τα Windows δεν βρίσκουν το <b>{mic}</b> αυτή τη στιγμή. Σύνδεσέ το ή άνοιξέ το αν είναι ασύρματο. Αυτό φεύγει μόνο του."
 }

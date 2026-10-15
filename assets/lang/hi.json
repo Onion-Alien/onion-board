@@ -3201,8 +3201,6 @@
   "Live: click to mute": "लाइव: म्यूट करने के लिए क्लिक करें",
   "Muted: click to go live": "म्यूट: लाइव होने के लिए क्लिक करें",
   "No sound": "आवाज़ नहीं",
-  "Your mic sends no sound": "आपका माइक कोई आवाज़ नहीं भेज रहा",
-  "Your mic sends no sound: see the Setup tab.": "आपका माइक कोई आवाज़ नहीं भेज रहा: सेटअप टैब देखें।",
   "Before update": "अपडेट से पहले",
   "One is saved every time you reset something or update the app (the last {max_points} are kept). Restoring puts back your settings, hotkeys and sounds as they were. Sounds you've added since are kept.": "हर बार जब आप कुछ रीसेट करते हैं या ऐप अपडेट करते हैं तो एक सहेजा जाता है (अंतिम {max_points} रखे जाते हैं)। पुनर्स्थापित करने से आपकी सेटिंग्स, हॉटकीज़ और ध्वनियाँ वैसी ही वापस आ जाती हैं जैसी वे थीं। आपके द्वारा जोड़ी गई ध्वनियाँ रखी गई हैं।",
   "Stops every sound, the radio and every program, and turns the voices off": "हर साउंड, रेडियो और हर प्रोग्राम रोक देता है, और आवाज़ें बंद कर देता है",
@@ -3250,8 +3248,6 @@
   "Show this program's window": "इस प्रोग्राम की विंडो दिखाएं",
   "This program doesn't share its picture": "यह प्रोग्राम अपनी तस्वीर साझा नहीं करता",
   "Window of {name}": "{name} की विंडो",
-  "Discord and games hear nothing from your mic. Is your headset switched off, or its mic muted? Turn it on or unmute it. If not, click <b>Repair</b>, then <b>Yes</b> when Windows asks.": "Discord और गेम आपके माइक से कुछ नहीं सुन रहे। क्या आपका हेडसेट बंद है, या उसका माइक म्यूट है? उसे चालू करें या अनम्यूट करें। अगर नहीं, तो <b>ठीक करें</b> पर क्लिक करें, फिर Windows पूछे तो <b>हाँ</b> पर।",
-  "Discord and games hear nothing from your mic. Is your headset switched off, or its mic muted? Turn it on or unmute it. If not, click <b>Repair</b>: your sound drops out for a few seconds.": "Discord और गेम आपके माइक से कुछ नहीं सुन रहे। क्या आपका हेडसेट बंद है, या उसका माइक म्यूट है? उसे चालू करें या अनम्यूट करें। अगर नहीं, तो <b>ठीक करें</b> पर क्लिक करें: आपकी आवाज़ कुछ सेकंड के लिए बंद हो जाएगी।",
   "Your mic sends no sound. Is your headset switched off, or its mic muted? Turn it on or unmute it. Still nothing? Restart your PC, then try again.": "आपका माइक कोई आवाज़ नहीं भेज रहा। क्या आपका हेडसेट बंद है, या उसका माइक म्यूट है? उसे चालू करें या अनम्यूट करें। अब भी कुछ नहीं? अपना PC रीस्टार्ट करें, फिर दोबारा कोशिश करें।",
   "Minimised: last picture": "छोटी की गई: आखिरी तस्वीर",
   "Minimised: restore for live updates": "छोटी की गई: लाइव अपडेट के लिए विंडो बहाल करें",
@@ -3435,5 +3431,12 @@
   "Used when Connection is set to Tor. It's up to date.": "जब कनेक्शन Tor पर हो तब इस्तेमाल होता है। यह अप टू डेट है।",
   "Working: {engine}": "काम कर रहा है: {engine}",
   "Working: {engine} {version} (faster)": "काम कर रहा है: {engine} {version} (तेज़)",
-  "YouTube downloads still work, but with fewer formats.": "YouTube डाउनलोड अब भी चलते हैं, पर कम फ़ॉर्मेट के साथ।"
+  "YouTube downloads still work, but with fewer formats.": "YouTube डाउनलोड अब भी चलते हैं, पर कम फ़ॉर्मेट के साथ।",
+  "Is your headset on?": "क्या आपका हेडसेट चालू है?",
+  "Is your headset plugged in?": "क्या आपका हेडसेट लगा है?",
+  "No sound at all comes from your mic. A headset that's switched off, or whose mic is muted, does that. Turn it on or unmute it: this goes away by itself. Still nothing? Click <b>Repair</b>, then <b>Yes</b> when Windows asks.": "आपके माइक से कोई भी आवाज़ नहीं आ रही। बंद हेडसेट, या जिसका माइक म्यूट हो, ऐसा ही करता है। उसे चालू करें या अनम्यूट करें: यह अपने आप हट जाएगा। फिर भी कुछ नहीं? <b>ठीक करें</b> पर क्लिक करें, फिर Windows पूछे तो <b>हाँ</b> पर।",
+  "No sound at all comes from your mic. A headset that's switched off, or whose mic is muted, does that. Turn it on or unmute it: this goes away by itself. Still nothing? Click <b>Repair</b>: your sound drops out for a few seconds.": "आपके माइक से कोई भी आवाज़ नहीं आ रही। बंद हेडसेट, या जिसका माइक म्यूट हो, ऐसा ही करता है। उसे चालू करें या अनम्यूट करें: यह अपने आप हट जाएगा। फिर भी कुछ नहीं? <b>ठीक करें</b> पर क्लिक करें: आपकी आवाज़ कुछ सेकंड के लिए रुकती है।",
+  "No sound from your mic. Is your headset on?": "आपके माइक से कोई आवाज़ नहीं। क्या आपका हेडसेट चालू है?",
+  "Unplugged": "प्लग नहीं है",
+  "Windows can't find <b>{mic}</b> right now. Plug it in, or switch it on if it's wireless. This goes away by itself.": "Windows को अभी <b>{mic}</b> नहीं मिल रहा। उसे लगाएँ, या वायरलेस हो तो चालू करें। यह अपने आप हट जाएगा।"
 }
