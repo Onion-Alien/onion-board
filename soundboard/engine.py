@@ -652,13 +652,14 @@ class Engine(EngineTakes, EngineDevices, SoundCache):
 
     def pause_all(self, on: bool | None = None) -> bool:
         """Pause everything playing, or resume if everything is already paused.
-        on=True / False pauses / resumes everything instead of flipping."""
+        on=True / False pauses / resumes everything instead of flipping. Returns whether
+        anything is paused now: with nothing playing, nothing is."""
         with self.lock:
             live = [v for v in self.voices if not v.stopping and not v.finished and not v.preview]
             resume = (bool(live) and all(v.paused for v in live)) if on is None else not on
             for v in live:
                 v.paused = not resume
-            return not resume
+            return bool(live) and not resume
 
     def set_gain(self, sid: str, gain: float):
         with self.lock:

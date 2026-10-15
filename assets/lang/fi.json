@@ -3437,5 +3437,8 @@
   "No sound from your mic. Is your headset on?": "Mikistäsi ei tule ääntä. Ovatko kuulokkeesi päällä?",
   "Unplugged": "Irrotettu",
   "Windows can't find <b>{mic}</b> right now. Plug it in, or switch it on if it's wireless. This goes away by itself.": "Windows ei löydä laitetta <b>{mic}</b> juuri nyt. Kytke se kiinni, tai laita se päälle, jos se on langaton. Tämä katoaa itsestään.",
-  "Your headset is off or its mic is muted. Turn it on or unmute it. Still nothing? Click <b>Repair</b>.": "Kuulokkeesi ovat pois päältä tai niiden mikki on mykistetty. Laita ne päälle tai poista mykistys. Vieläkään ei mitään? Klikkaa <b>Korjaa</b>."
+  "Your headset is off or its mic is muted. Turn it on or unmute it. Still nothing? Click <b>Repair</b>.": "Kuulokkeesi ovat pois päältä tai niiden mikki on mykistetty. Laita ne päälle tai poista mykistys. Vieläkään ei mitään? Klikkaa <b>Korjaa</b>.",
+  "Heads up: while Onion Board is open, {key} plays your hotkey instead of doing its usual job in other apps.": "Huomio: kun Onion Board on auki, {key} käynnistää pikanäppäimesi eikä tee tavallista tehtäväänsä muissa sovelluksissa.",
+  "Windows keeps {key} for itself and never passes it to an app, so that hotkey could never play: pick another key.": "Windows pitää {key} itsellään eikä anna sitä koskaan sovellukselle, joten tämä pikanäppäin ei soisi koskaan: valitse toinen näppäin.",
+  "{key} is your Stop everything key, so it stays on that. Pick another key, or give Stop everything a new one in Settings → Hotkeys first.": "{key} on Pysäytä kaikki -näppäimesi, joten se pysyy siinä. Valitse toinen näppäin tai anna ensin Pysäytä kaikki -toiminnolle uusi kohdassa Asetukset → Pikanäppäimet."
 }

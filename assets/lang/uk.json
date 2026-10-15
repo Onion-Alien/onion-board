@@ -3513,5 +3513,8 @@
   "No sound from your mic. Is your headset on?": "З мікрофона немає звуку. Гарнітуру увімкнено?",
   "Unplugged": "Від'єднано",
   "Windows can't find <b>{mic}</b> right now. Plug it in, or switch it on if it's wireless. This goes away by itself.": "Windows зараз не бачить <b>{mic}</b>. Під'єднай його або увімкни, якщо він бездротовий. Це зникне само.",
-  "Your headset is off or its mic is muted. Turn it on or unmute it. Still nothing? Click <b>Repair</b>.": "Гарнітуру вимкнено, або її мікрофон вимкнено. Увімкни її або мікрофон. Досі нічого? Натисни <b>Полагодити</b>."
+  "Your headset is off or its mic is muted. Turn it on or unmute it. Still nothing? Click <b>Repair</b>.": "Гарнітуру вимкнено, або її мікрофон вимкнено. Увімкни її або мікрофон. Досі нічого? Натисни <b>Полагодити</b>.",
+  "Heads up: while Onion Board is open, {key} plays your hotkey instead of doing its usual job in other apps.": "Увага: поки Onion Board відкритий, {key} запускає твою гарячу клавішу замість своєї звичної роботи в інших застосунках.",
+  "Windows keeps {key} for itself and never passes it to an app, so that hotkey could never play: pick another key.": "Windows залишає {key} собі й ніколи не передає застосункам, тож ця гаряча клавіша ніколи не спрацює: вибери іншу клавішу.",
+  "{key} is your Stop everything key, so it stays on that. Pick another key, or give Stop everything a new one in Settings → Hotkeys first.": "{key} — твоя клавіша «Зупини все», тому вона лишається за нею. Вибери іншу клавішу або спершу дай «Зупини все» нову в Налаштування → Гарячі клавіші."
 }

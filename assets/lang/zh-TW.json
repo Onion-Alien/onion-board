@@ -3361,5 +3361,8 @@
   "No sound from your mic. Is your headset on?": "麥克風沒有聲音。耳機開著嗎？",
   "Unplugged": "未連接",
   "Windows can't find <b>{mic}</b> right now. Plug it in, or switch it on if it's wireless. This goes away by itself.": "Windows 現在找不到 <b>{mic}</b>。請插上，如果是無線的就打開它。這則提示會自己消失。",
-  "Your headset is off or its mic is muted. Turn it on or unmute it. Still nothing? Click <b>Repair</b>.": "耳機關著，或者麥克風靜音了。請打開耳機或取消靜音。還是沒聲音？按 <b>修復</b>。"
+  "Your headset is off or its mic is muted. Turn it on or unmute it. Still nothing? Click <b>Repair</b>.": "耳機關著，或者麥克風靜音了。請打開耳機或取消靜音。還是沒聲音？按 <b>修復</b>。",
+  "Heads up: while Onion Board is open, {key} plays your hotkey instead of doing its usual job in other apps.": "注意：Onion Board 開著的時候，{key} 會播放你的快速鍵，而不會在其他應用程式裡做它平常的事。",
+  "Windows keeps {key} for itself and never passes it to an app, so that hotkey could never play: pick another key.": "{key} 被 Windows 自己保留，永遠不會交給任何應用程式，所以這個快速鍵永遠不會播放：請換一個鍵。",
+  "{key} is your Stop everything key, so it stays on that. Pick another key, or give Stop everything a new one in Settings → Hotkeys first.": "{key} 是你的「停止所有東西」鍵，所以它會保持不變。請換一個鍵，或先在 設定 → 快速鍵 裡給「停止所有東西」設一個新鍵。"
 }

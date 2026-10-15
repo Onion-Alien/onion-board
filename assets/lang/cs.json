@@ -3513,5 +3513,8 @@
   "No sound from your mic. Is your headset on?": "Z mikrofonu nejde žádný zvuk. Jsou sluchátka zapnutá?",
   "Unplugged": "Odpojený",
   "Windows can't find <b>{mic}</b> right now. Plug it in, or switch it on if it's wireless. This goes away by itself.": "Windows teď nenacházejí <b>{mic}</b>. Připoj je, nebo je zapni, jestli jsou bezdrátová. Tohle zmizí samo.",
-  "Your headset is off or its mic is muted. Turn it on or unmute it. Still nothing? Click <b>Repair</b>.": "Sluchátka jsou vypnutá nebo mají ztlumený mikrofon. Zapni je nebo zruš ztlumení. Pořád nic? Klikni na <b>Opravit</b>."
+  "Your headset is off or its mic is muted. Turn it on or unmute it. Still nothing? Click <b>Repair</b>.": "Sluchátka jsou vypnutá nebo mají ztlumený mikrofon. Zapni je nebo zruš ztlumení. Pořád nic? Klikni na <b>Opravit</b>.",
+  "Heads up: while Onion Board is open, {key} plays your hotkey instead of doing its usual job in other apps.": "Pozor: dokud je Onion Board otevřený, {key} spouští tvou zkratku místo toho, co obvykle dělá v jiných aplikacích.",
+  "Windows keeps {key} for itself and never passes it to an app, so that hotkey could never play: pick another key.": "Windows si {key} nechává pro sebe a nikdy ji nepředá aplikaci, takže by ta zkratka nikdy nehrála: vyber jinou klávesu.",
+  "{key} is your Stop everything key, so it stays on that. Pick another key, or give Stop everything a new one in Settings → Hotkeys first.": "{key} je tvoje klávesa pro Zastavit všechno, takže zůstává u ní. Vyber jinou klávesu, nebo nejdřív dej Zastavit všechno novou v Nastavení → Zkratky."
 }

@@ -3437,5 +3437,8 @@
   "No sound from your mic. Is your headset on?": "Ingen lyd fra mikrofonen din. Er headsettet på?",
   "Unplugged": "Ikke tilkoblet",
   "Windows can't find <b>{mic}</b> right now. Plug it in, or switch it on if it's wireless. This goes away by itself.": "Windows finner ikke <b>{mic}</b> akkurat nå. Koble det til, eller slå det på hvis det er trådløst. Dette forsvinner av seg selv.",
-  "Your headset is off or its mic is muted. Turn it on or unmute it. Still nothing? Click <b>Repair</b>.": "Headsettet er slått av, eller mikrofonen er dempet. Slå det på, eller slå på lyden. Fortsatt ingenting? Klikk <b>Reparer</b>."
+  "Your headset is off or its mic is muted. Turn it on or unmute it. Still nothing? Click <b>Repair</b>.": "Headsettet er slått av, eller mikrofonen er dempet. Slå det på, eller slå på lyden. Fortsatt ingenting? Klikk <b>Reparer</b>.",
+  "Heads up: while Onion Board is open, {key} plays your hotkey instead of doing its usual job in other apps.": "Obs: mens Onion Board er åpen, spiller {key} hurtigtasten din i stedet for å gjøre den vanlige jobben sin i andre apper.",
+  "Windows keeps {key} for itself and never passes it to an app, so that hotkey could never play: pick another key.": "Windows holder {key} for seg selv og gir den aldri videre til en app, så den hurtigtasten ville aldri spille: velg en annen tast.",
+  "{key} is your Stop everything key, so it stays on that. Pick another key, or give Stop everything a new one in Settings → Hotkeys first.": "{key} er tasten din for Stopp alt, så den blir der. Velg en annen tast, eller gi først Stopp alt en ny i Innstillinger → Hurtigtaster."
 }

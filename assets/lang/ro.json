@@ -3513,5 +3513,8 @@
   "No sound from your mic. Is your headset on?": "Niciun sunet de la microfon. Căștile sunt pornite?",
   "Unplugged": "Deconectat",
   "Windows can't find <b>{mic}</b> right now. Plug it in, or switch it on if it's wireless. This goes away by itself.": "Windows nu găsește <b>{mic}</b> acum. Conectează-le sau pornește-le, dacă sunt wireless. Asta dispare singur.",
-  "Your headset is off or its mic is muted. Turn it on or unmute it. Still nothing? Click <b>Repair</b>.": "Căștile sunt oprite sau au microfonul pe mut. Pornește-le sau scoate-l de pe mut. Tot nimic? Dă clic pe <b>Repară</b>."
+  "Your headset is off or its mic is muted. Turn it on or unmute it. Still nothing? Click <b>Repair</b>.": "Căștile sunt oprite sau au microfonul pe mut. Pornește-le sau scoate-l de pe mut. Tot nimic? Dă clic pe <b>Repară</b>.",
+  "Heads up: while Onion Board is open, {key} plays your hotkey instead of doing its usual job in other apps.": "Atenție: cât timp Onion Board e deschis, {key} pornește tasta ta rapidă în loc să-și facă treaba obișnuită în celelalte aplicații.",
+  "Windows keeps {key} for itself and never passes it to an app, so that hotkey could never play: pick another key.": "Windows păstrează {key} pentru el și nu o dă niciodată unei aplicații, așa că tasta rapidă n-ar suna niciodată: alege altă tastă.",
+  "{key} is your Stop everything key, so it stays on that. Pick another key, or give Stop everything a new one in Settings → Hotkeys first.": "{key} e tasta ta pentru Oprește tot, așa că rămâne acolo. Alege altă tastă sau dă-i întâi lui Oprește tot una nouă în Setări → Taste rapide."
 }

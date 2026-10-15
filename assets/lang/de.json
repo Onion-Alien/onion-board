@@ -3437,5 +3437,8 @@
   "No sound from your mic. Is your headset on?": "Kein Ton von deinem Mikro. Ist dein Headset an?",
   "Unplugged": "Nicht angeschlossen",
   "Windows can't find <b>{mic}</b> right now. Plug it in, or switch it on if it's wireless. This goes away by itself.": "Windows findet <b>{mic}</b> gerade nicht. Steck es ein, oder schalte es ein, wenn es kabellos ist. Das geht von selbst weg.",
-  "Your headset is off or its mic is muted. Turn it on or unmute it. Still nothing? Click <b>Repair</b>.": "Dein Headset ist aus oder sein Mikro stummgeschaltet. Schalte es ein oder heb die Stummschaltung auf. Immer noch nichts? Klick <b>Reparieren</b>."
+  "Your headset is off or its mic is muted. Turn it on or unmute it. Still nothing? Click <b>Repair</b>.": "Dein Headset ist aus oder sein Mikro stummgeschaltet. Schalte es ein oder heb die Stummschaltung auf. Immer noch nichts? Klick <b>Reparieren</b>.",
+  "Heads up: while Onion Board is open, {key} plays your hotkey instead of doing its usual job in other apps.": "Achtung: Solange Onion Board offen ist, löst {key} deinen Hotkey aus, statt in anderen Apps das Übliche zu tun.",
+  "Windows keeps {key} for itself and never passes it to an app, so that hotkey could never play: pick another key.": "Windows behält {key} für sich und gibt die Taste nie an eine App weiter, dieser Hotkey könnte also nie abspielen: Nimm eine andere Taste.",
+  "{key} is your Stop everything key, so it stays on that. Pick another key, or give Stop everything a new one in Settings → Hotkeys first.": "{key} ist deine Taste für Alles stoppen, deshalb bleibt sie dort. Nimm eine andere Taste oder gib Alles stoppen zuerst unter Einstellungen → Hotkeys eine neue."
 }

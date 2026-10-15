@@ -3437,5 +3437,8 @@
   "No sound from your mic. Is your headset on?": "Mikrofonundan ses gelmiyor. Kulaklığın açık mı?",
   "Unplugged": "Takılı değil",
   "Windows can't find <b>{mic}</b> right now. Plug it in, or switch it on if it's wireless. This goes away by itself.": "Windows şu an <b>{mic}</b> cihazını bulamıyor. Tak ya da kablosuzsa aç. Bu kendiliğinden kaybolur.",
-  "Your headset is off or its mic is muted. Turn it on or unmute it. Still nothing? Click <b>Repair</b>.": "Kulaklığın kapalı ya da mikrofonu sessizde. Kulaklığı aç ya da mikrofonun sesini aç. Hâlâ bir şey yok mu? <b>Onar</b>'a tıkla."
+  "Your headset is off or its mic is muted. Turn it on or unmute it. Still nothing? Click <b>Repair</b>.": "Kulaklığın kapalı ya da mikrofonu sessizde. Kulaklığı aç ya da mikrofonun sesini aç. Hâlâ bir şey yok mu? <b>Onar</b>'a tıkla.",
+  "Heads up: while Onion Board is open, {key} plays your hotkey instead of doing its usual job in other apps.": "Dikkat: Onion Board açıkken {key}, diğer uygulamalardaki olağan işini yapmak yerine kısayolunu çalar.",
+  "Windows keeps {key} for itself and never passes it to an app, so that hotkey could never play: pick another key.": "Windows {key} tuşunu kendine ayırır ve hiçbir uygulamaya iletmez, bu yüzden bu kısayol asla çalmaz: başka bir tuş seç.",
+  "{key} is your Stop everything key, so it stays on that. Pick another key, or give Stop everything a new one in Settings → Hotkeys first.": "{key} senin Herşeyi durdur tuşun, o yüzden orada kalıyor. Başka bir tuş seç ya da önce Ayarlar → Kısayol tuşları'ndan Herşeyi durdur'a yeni bir tuş ver."
 }

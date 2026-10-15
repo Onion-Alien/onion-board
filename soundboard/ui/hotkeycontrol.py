@@ -189,6 +189,26 @@ class HotkeyControl(Controller):
             return None
         return good
 
+    def keeps_stop_key(self, combo: str) -> bool:
+        """True (and a toast saying why) if `combo` is the Stop everything key: it stays
+        on that. Handing it to a sound or another action left no key to stop every sound
+        at once."""
+        mw = self.mw
+        if not combo or combo != mw.cfg.stop_hotkey:
+            return False
+        mw.toast(_("{key} is your Stop everything key, so it stays on that. Pick another key, "
+                   "or give Stop everything a new one in Settings → Hotkeys first.",
+                   key=html.escape(pretty_key(combo))), "warn", key="hotkey")
+        return True
+
+    def everyday_note(self, combo: str):
+        """Ctrl+C, Alt+Tab and the like work as hotkeys, but then they stop doing their
+        own job in every other app while the board runs: say so."""
+        if combo and winkeys.everyday(combo):
+            self.mw.toast(_("Heads up: while Onion Board is open, {key} plays your hotkey "
+                            "instead of doing its usual job in other apps.",
+                            key=html.escape(pretty_key(combo))), "warn", key="hotkey-everyday")
+
     def set_global_hotkey(self, attr: str, combo: str):
         """Set one of the app-wide hotkeys (or ptt_key). A combo can only do one thing,
         so it's taken off any other action or sound that had it, and a toast says what
@@ -200,6 +220,9 @@ class HotkeyControl(Controller):
             self.register_hotkeys()   # the capture paused them
             return
         combo = good
+        if attr != "stop_hotkey" and self.keeps_stop_key(combo):
+            self.register_hotkeys()
+            return
         lost = []
         if combo:
             for other, _action, label, _desc in HOTKEY_ACTIONS:
@@ -229,6 +252,7 @@ class HotkeyControl(Controller):
             mw.toast(_("{hotkey} is {what} now, it was the key for {lost}",
                          hotkey=html.escape(pretty_key(combo)), what=html.escape(what),
                          lost=html.escape(_(" and ").join(lost))), "warn")
+        self.everyday_note(combo)
 
     def _fill_quick_hotkeys(self, menu: QMenu):
         """The Sounds tab's keyboard button: the common hotkeys with their keys (click
@@ -416,6 +440,8 @@ class HotkeyControl(Controller):
             free_dialog(d)
         if combo is not None:
             combo = self._valid_hotkey(combo)
+        if combo and self.keeps_stop_key(combo):
+            combo = None
         if combo is not None and combo != m.hotkey:
             m.hotkey = combo
             lost = self._clear_dupe_hotkey(m)
@@ -428,6 +454,7 @@ class HotkeyControl(Controller):
                              name=html.escape(m.name)) if combo
                            else _("Hotkey removed from “{name}”", name=html.escape(m.name)),
                            key="hotkey")
+            self.everyday_note(combo)
         self.register_hotkeys()   # the capture paused them
 
     def _clear_category_hotkey(self, combo: str, keep: str | None = None):
@@ -452,7 +479,7 @@ class HotkeyControl(Controller):
                 self.register_hotkeys()   # the capture paused them
                 return
         combo = self._valid_hotkey(combo)
-        if combo is None:
+        if combo is None or self.keeps_stop_key(combo):
             self.register_hotkeys()
             return
         taken_from = []
@@ -479,6 +506,7 @@ class HotkeyControl(Controller):
                 msg = _("✓ {combo} plays a random “{name}” sound",
                         combo=html.escape(pretty_key(combo)), name=html.escape(name))
             mw.toast(msg, "ok")
+            self.everyday_note(combo)
         else:
             mw.cfg.category_hotkeys.pop(name, None)
             mw.toast(_("Random-sound hotkey for “{name}” cleared", name=html.escape(name)))

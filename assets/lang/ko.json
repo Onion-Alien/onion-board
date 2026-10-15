@@ -3361,5 +3361,8 @@
   "No sound from your mic. Is your headset on?": "마이크에서 소리가 나지 않습니다. 헤드셋이 켜져 있나요?",
   "Unplugged": "연결 안 됨",
   "Windows can't find <b>{mic}</b> right now. Plug it in, or switch it on if it's wireless. This goes away by itself.": "지금 Windows가 <b>{mic}</b>을(를) 찾지 못합니다. 연결하거나, 무선이라면 켜세요. 이 표시는 저절로 사라집니다.",
-  "Your headset is off or its mic is muted. Turn it on or unmute it. Still nothing? Click <b>Repair</b>.": "헤드셋이 꺼져 있거나 마이크가 음소거되어 있습니다. 켜거나 음소거를 해제하세요. 그래도 안 되나요? <b>복구</b>를 클릭하세요."
+  "Your headset is off or its mic is muted. Turn it on or unmute it. Still nothing? Click <b>Repair</b>.": "헤드셋이 꺼져 있거나 마이크가 음소거되어 있습니다. 켜거나 음소거를 해제하세요. 그래도 안 되나요? <b>복구</b>를 클릭하세요.",
+  "Heads up: while Onion Board is open, {key} plays your hotkey instead of doing its usual job in other apps.": "참고: Onion Board가 열려 있는 동안 {key}는 다른 앱에서 원래 하던 일 대신 단축키를 재생해요.",
+  "Windows keeps {key} for itself and never passes it to an app, so that hotkey could never play: pick another key.": "{key}는 Windows가 직접 쓰는 키라 앱에 전달되지 않아요. 그래서 이 단축키는 절대 재생되지 않아요: 다른 키를 고르세요.",
+  "{key} is your Stop everything key, so it stays on that. Pick another key, or give Stop everything a new one in Settings → Hotkeys first.": "{key}는 '모든 것을 멈춰라' 키라서 그대로 둬요. 다른 키를 고르거나, 먼저 설정 → 단축키에서 '모든 것을 멈춰라'에 새 키를 지정하세요."
 }

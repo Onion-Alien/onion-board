@@ -3437,5 +3437,8 @@
   "No sound from your mic. Is your headset on?": "Geen geluid van je mic. Staat je headset aan?",
   "Unplugged": "Niet aangesloten",
   "Windows can't find <b>{mic}</b> right now. Plug it in, or switch it on if it's wireless. This goes away by itself.": "Windows kan <b>{mic}</b> nu niet vinden. Sluit hem aan, of zet hem aan als hij draadloos is. Dit gaat vanzelf weg.",
-  "Your headset is off or its mic is muted. Turn it on or unmute it. Still nothing? Click <b>Repair</b>.": "Je headset staat uit of de mic is gedempt. Zet hem aan of zet dempen uit. Nog steeds niets? Klik op <b>Repareren</b>."
+  "Your headset is off or its mic is muted. Turn it on or unmute it. Still nothing? Click <b>Repair</b>.": "Je headset staat uit of de mic is gedempt. Zet hem aan of zet dempen uit. Nog steeds niets? Klik op <b>Repareren</b>.",
+  "Heads up: while Onion Board is open, {key} plays your hotkey instead of doing its usual job in other apps.": "Let op: zolang Onion Board open is, speelt {key} je sneltoets af in plaats van zijn gewone werk te doen in andere apps.",
+  "Windows keeps {key} for itself and never passes it to an app, so that hotkey could never play: pick another key.": "Windows houdt {key} voor zichzelf en geeft hem nooit door aan een app, dus die sneltoets zou nooit spelen: kies een andere toets.",
+  "{key} is your Stop everything key, so it stays on that. Pick another key, or give Stop everything a new one in Settings → Hotkeys first.": "{key} is je toets voor Stop met alles, dus die blijft daar. Kies een andere toets, of geef Stop met alles eerst een nieuwe bij Instellingen → Sneltoetsen."
 }

@@ -127,6 +127,13 @@ def test_loop_wraps_and_pause_holds_position():
     assert np.all(out == 0) and v.pos["main"] == p
 
 
+def test_pause_all_with_nothing_playing_says_nothing_is_paused():
+    e = engine_with("main")
+    assert e.pause_all() is False and e.pause_all(True) is False
+    e.play("a", tone(), 1.0)
+    assert e.pause_all() is True and e.pause_all() is False
+
+
 def test_seek_and_state():
     e = engine_with("main")
     v = e.play("a", tone(1.0), 1.0)
