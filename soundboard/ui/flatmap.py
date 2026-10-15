@@ -51,6 +51,7 @@ SLICE_S = 0.0015
 SLICE_GAP_MS = 4
 FORGET_MS = 60_000   # hidden this long: let the drawn tiles go (back sooner: no redraw)
 SETTLE_MS = 120                     # zooming: the old tiles, stretched, until this idle
+LABEL_GROW_MAX = 2.2                # country names grow up to this much zoomed in
 TOWN_ZOOM = 2.0                     # city and town names show from this zoom in...
 TOWNS_IN_VIEW = 40                  # ...at most this many at once, only those in view
 TOWN_SLICE_S = 0.0015               # new names drawn a paint, then the rest a moment later
@@ -526,7 +527,7 @@ class FlatMap(QWidget):
                     if k % 200 == 0:
                         yield
             # country names last, outlined in the land's colour, so the dots don't hide them
-            font, colour = self._label_style()
+            font, colour = self._label_style(s)
             fm = QFontMetricsF(font)
             halo = QPen(_mix(t["bg"], t["text"], 0.14), 3)
             halo.setJoinStyle(Qt.PenJoinStyle.RoundJoin)
@@ -543,9 +544,13 @@ class FlatMap(QWidget):
         finally:
             p.restore()
 
-    def _label_style(self) -> tuple[QFont, QColor]:
+    def _label_style(self, s: float) -> tuple[QFont, QColor]:
+        """The country names' font at scale `s`: they grow as the map zooms in, so a
+        country's name stays well above its cities' (the same size, it read as one)."""
         font = QFont(self.font())
-        font.setPointSizeF(max(7.0, font.pointSizeF() * 0.85))
+        zoom = s / max(1e-9, self._scale() / self.zoom)
+        grow = min(LABEL_GROW_MAX, max(1.0, 1 + 0.4 * math.log2(max(zoom, 1.0) / 1.5)))
+        font.setPointSizeF(max(7.0, font.pointSizeF() * 0.85) * grow)
         font.setWeight(QFont.Weight.DemiBold)
         return font, QColor(theme.T["text_hi"])
 
@@ -588,7 +593,7 @@ class FlatMap(QWidget):
             tr.translate(180 * s, LAT_TOP * s)
             tr.scale(s, s)
             whole = QRectF(0, 0, 360 * s, (LAT_TOP - LAT_BOTTOM) * s)
-            fm = QFontMetricsF(self._label_style()[0])
+            fm = QFontMetricsF(self._label_style(s)[0])
             got = self._placed[key] = list(self._label_boxes(tr, s, whole, fm))
         return got
 
@@ -971,7 +976,7 @@ class FlatMap(QWidget):
         try:
             q.setRenderHint(QPainter.RenderHint.Antialiasing)
             t = theme.T
-            font, colour = self._label_style()
+            font, colour = self._label_style(s)
             fm = QFontMetricsF(font)
             halo = QPen(_mix(t["bg"], t["text"], 0.14), 3)
             halo.setJoinStyle(Qt.PenJoinStyle.RoundJoin)
