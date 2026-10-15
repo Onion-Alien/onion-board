@@ -688,6 +688,39 @@ def test_a_day_old_station_list_shows_at_once_and_is_refreshed_behind_it(
     assert len(got) == 1 and not fails                          # no error over a list
 
 
+LET_GO_IN_REPLY = r"""
+import os, sys
+sys.path.insert(0, os.getcwd())
+from PySide6.QtCore import QCoreApplication, QTimer
+from soundboard.radio import RadioDirectory
+
+app = QCoreApplication([])
+d = RadioDirectory(sys.argv[1], bases=(sys.argv[2],))
+d.failed.connect(lambda *_: QTimer.singleShot(1000, app.quit))
+d.search("rock")
+del d   # held now only by what its replies' answers need
+app.exec()
+print("ok")
+"""
+
+
+def test_a_directory_let_go_of_before_its_replies_are_freed_is_freed_once(tmp_path):
+    """A finished reply is freed later (deleteLater), and freeing it lets go of what
+    its answer needed: the directory. When that was the last hold on it (a directory
+    nothing else kept), the directory went right there, mid-way through freeing the
+    reply, and took the reply with it a second time: Qt aborted ("pure virtual function
+    call"), every few hundred runs of the test above in CI. In a child process: the
+    abort takes the whole process."""
+    import os
+    import subprocess
+    import sys
+    env = dict(os.environ, QT_QPA_PLATFORM="offscreen")
+    r = subprocess.run([sys.executable, "-c", LET_GO_IN_REPLY, str(tmp_path), dead_base()], env=env,
+                       capture_output=True, text=True, timeout=60,
+                       cwd=os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+    assert r.returncode == 0 and r.stdout.strip() == "ok", (r.returncode, r.stderr[-2000:])
+
+
 def test_a_directory_let_go_while_its_thread_ends_is_freed_on_the_ui_thread(
         qapp, tmp_path, monkeypatch):
     """The worker thread holds the directory; under load it could end after the
