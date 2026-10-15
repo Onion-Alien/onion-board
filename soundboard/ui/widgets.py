@@ -11,8 +11,8 @@ from PySide6.QtCore import (QEasingCurve, QEvent, QMimeData, QObject, QPoint, QP
                             QSize, Qt, QTimer, QVariantAnimation, Signal)
 from PySide6.QtGui import (QColor, QDrag, QFont, QFontMetrics, QLinearGradient, QPainter,
                            QPainterPath, QPen, QPixmap)
-from PySide6.QtWidgets import (QAbstractButton, QApplication, QGridLayout, QLabel, QMainWindow,
-                               QMenu,
+from PySide6.QtWidgets import (QAbstractButton, QAbstractSlider, QApplication, QComboBox,
+                               QDialog, QGridLayout, QLabel, QMainWindow, QMenu, QTabBar,
                                QScrollArea,
                                QSlider, QStackedWidget, QStyle, QStyleOptionSlider,
                                QTabWidget, QToolTip,
@@ -218,6 +218,49 @@ class EqCurve(QWidget):
             p.drawRoundedRect(plate, plate.height() / 2, plate.height() / 2)
             p.setPen(QColor(theme.T["muted"]))
             p.drawText(plate, Qt.AlignmentFlag.AlignCenter, off)
+
+
+CLICK_FOCUS = (Qt.FocusReason.MouseFocusReason, Qt.FocusReason.PopupFocusReason,
+               Qt.FocusReason.ActiveWindowFocusReason)
+
+
+def _clicked_kind(w) -> bool:
+    """A control a click works (a button, a drop-down, a slider, a tab): no text to type."""
+    if isinstance(w, QComboBox):
+        return not w.isEditable()
+    return isinstance(w, (QAbstractButton, QAbstractSlider, QTabBar))
+
+
+class ClickFocusFilter(QObject):
+    """The focus ring is for the keyboard: a click, a drag or a closed drop-down left
+    the control it touched ringed until something else was clicked. Those controls
+    hand the focus on to their page (or dialog) as soon as they get it from the mouse,
+    a closed pop-up or the window coming back; Tab still rings them."""
+    EVENTS = (QEvent.Type.FocusIn,)   # all it reads (theme.app_filter)
+
+    def eventFilter(self, obj, event):   # noqa: N802 - Qt API
+        if (event.type() == QEvent.Type.FocusIn and event.reason() in CLICK_FOCUS
+                and _clicked_kind(obj)):
+            QTimer.singleShot(0, lambda w=obj: self._hand_on(w))
+        return False
+
+    @staticmethod
+    def _hand_on(w):
+        if not qt_valid(w) or not w.hasFocus():
+            return
+        home = w.parentWidget()
+        while home is not None and not (isinstance(home, QDialog) or home.isWindow()
+                                        or isinstance(home.parentWidget(), QStackedWidget)):
+            home = home.parentWidget()
+        if home is not None:
+            home.setFocus(Qt.FocusReason.OtherFocusReason)
+
+
+def install_click_focus(app: QApplication) -> None:
+    """ClickFocusFilter on every widget the app shows from now on."""
+    f = ClickFocusFilter(app)
+    app._click_focus_filter = f   # pyright: ignore[reportAttributeAccessIssue]  # kept alive with the app
+    theme.app_filter(app, f)
 
 
 class CrispSlider(QSlider):

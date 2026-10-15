@@ -1,1 +1,1 @@
-﻿- Switching tabs or opening Settings no longer puts a focus ring on the first button of the new page (the ⓘ beside Your mic).
+- Clicking a button, dragging a slider or picking from a drop-down no longer leaves a focus ring on it, and switching tabs no longer rings the new page's first button (the info button beside Your mic). The ring now only shows when you move with the Tab key.

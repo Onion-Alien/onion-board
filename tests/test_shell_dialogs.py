@@ -479,3 +479,34 @@ def test_switching_pages_hands_no_button_the_focus(qapp, win):
     win.tabs.setCurrentWidget(win.setup_page)
     qapp.processEvents()
     assert win.focusWidget() is win.setup_page
+
+
+def test_a_click_leaves_no_focus_ring(qapp, win):
+    """A click on a button, a drag of a slider or a pick from a drop-down left that
+    control ringed until something else was clicked. The ring is for the Tab key."""
+    from PySide6.QtWidgets import QComboBox, QPushButton, QSlider, QVBoxLayout, QWidget
+
+    from soundboard.ui.widgets import install_click_focus
+    install_click_focus(qapp)
+    page = QWidget(win)
+    lay = QVBoxLayout(page)
+    btn, slider, combo = QPushButton("Go"), QSlider(Qt.Orientation.Horizontal), QComboBox()
+    combo.addItems(["a", "b"])
+    for w in (btn, slider, combo):
+        lay.addWidget(w)
+    page.resize(300, 200)
+    win.show()
+    page.show()
+    qapp.processEvents()
+    QTest.mouseClick(btn, Qt.MouseButton.LeftButton)
+    QTest.mouseClick(slider, Qt.MouseButton.LeftButton, pos=slider.rect().center())
+    combo.setFocus(Qt.FocusReason.PopupFocusReason)   # (its list just closed)
+    for w in (btn, slider, combo):
+        if w is not combo:
+            w.setFocus(Qt.FocusReason.MouseFocusReason)
+        qapp.processEvents()
+        assert not w.hasFocus(), w
+    slider.setFocus(Qt.FocusReason.TabFocusReason)   # Tab: ringed, as it should be
+    qapp.processEvents()
+    assert slider.hasFocus()
+    page.deleteLater()
