@@ -3445,5 +3445,9 @@
   "Your Sounds volume is at 0%, so nobody else hears your sounds.": "Sesler düzeyin %0'da, bu yüzden seslerini senden başka kimse duymuyor.",
   "Heads up: while Onion Board is open, {key} plays your hotkey instead of doing its usual job in other apps.": "Dikkat: Onion Board açıkken {key}, diğer uygulamalardaki olağan işini yapmak yerine kısayolunu çalar.",
   "Windows keeps {key} for itself and never passes it to an app, so that hotkey could never play: pick another key.": "Windows {key} tuşunu kendine ayırır ve hiçbir uygulamaya iletmez, bu yüzden bu kısayol asla çalmaz: başka bir tuş seç.",
-  "{key} is your Stop everything key, so it stays on that. Pick another key, or give Stop everything a new one in Settings → Hotkeys first.": "{key} senin Herşeyi durdur tuşun, o yüzden orada kalıyor. Başka bir tuş seç ya da önce Ayarlar → Kısayol tuşları'ndan Herşeyi durdur'a yeni bir tuş ver."
+  "{key} is your Stop everything key, so it stays on that. Pick another key, or give Stop everything a new one in Settings → Hotkeys first.": "{key} senin Herşeyi durdur tuşun, o yüzden orada kalıyor. Başka bir tuş seç ya da önce Ayarlar → Kısayol tuşları'ndan Herşeyi durdur'a yeni bir tuş ver.",
+  "Names can be up to {n} characters, so it's “{name}”.": "Adlar en fazla {n} karakter olabilir, bu yüzden “{name}” oldu.",
+  "They go in a category called “{name}”.": "“{name}” adlı bir kategoriye girerler.",
+  "Type a name first.": "Önce bir ad yazın.",
+  "✓ Renamed to “{new}”. Another sound has that name too.": "✓ “{new}” olarak yeniden adlandırıldı. Başka bir sesin de adı bu."
 }

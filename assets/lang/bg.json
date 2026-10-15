@@ -3445,5 +3445,9 @@
   "Your Sounds volume is at 0%, so nobody else hears your sounds.": "Силата на „Звуци“ е на 0%, затова никой друг не чува звуците ти.",
   "Heads up: while Onion Board is open, {key} plays your hotkey instead of doing its usual job in other apps.": "Внимание: докато Onion Board е отворен, {key} пуска твоя бърз клавиш, вместо да върши обичайната си работа в другите приложения.",
   "Windows keeps {key} for itself and never passes it to an app, so that hotkey could never play: pick another key.": "Windows пази {key} за себе си и никога не го дава на приложение, така че този бърз клавиш никога няма да свири: избери друг клавиш.",
-  "{key} is your Stop everything key, so it stays on that. Pick another key, or give Stop everything a new one in Settings → Hotkeys first.": "{key} е клавишът ти за „Спри всичко“, затова остава за него. Избери друг клавиш или първо дай нов на „Спри всичко“ в Настройки → Бързи клавиши."
+  "{key} is your Stop everything key, so it stays on that. Pick another key, or give Stop everything a new one in Settings → Hotkeys first.": "{key} е клавишът ти за „Спри всичко“, затова остава за него. Избери друг клавиш или първо дай нов на „Спри всичко“ в Настройки → Бързи клавиши.",
+  "Names can be up to {n} characters, so it's “{name}”.": "Имената може да са до {n} знака, затова е „{name}“.",
+  "They go in a category called “{name}”.": "Отиват в категория с име „{name}“.",
+  "Type a name first.": "Първо въведете име.",
+  "✓ Renamed to “{new}”. Another sound has that name too.": "✓ Преименувано на „{new}“. Има и друг звук с това име."
 }

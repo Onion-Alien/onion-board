@@ -175,9 +175,12 @@ class CategoryControl(Controller):
         if name is None:
             name, ok = QInputDialog.getText(mw, _("New subcategory"),
                                             _("Name (a group inside {cat}):", cat=cat))
-            name = name if ok else ""
-        name = str(library.plain_name(name or ""))
+            name = name if ok else None
+        name, cut = self._typed_name(name)
         if not name:
+            return ""
+        if name.lower() == cat.lower():   # "Memes › Memes" said nothing new
+            mw.toast(_("There's already a “{new}”.", new=html.escape(cat)), "warn")
             return ""
         subs: list[str] = mw.cfg.subcategories.setdefault(cat, [])
         name = {x.lower(): x for x in subs}.get(name.lower(), name)
@@ -191,6 +194,8 @@ class CategoryControl(Controller):
             if mw.cfg.category != cat:
                 self.set_category(cat)
             self.set_subcategory(name)
+        if cut:
+            self._say_cut(name)
         return name
 
     def rename_subcategory(self, sub: str, new: str | None = None):
@@ -202,11 +207,11 @@ class CategoryControl(Controller):
         if new is None:
             new, ok = QInputDialog.getText(mw, _("Rename subcategory"), _("New name:"),
                                            text=sub)
-            new = new if ok else ""
-        new = library.plain_name(new)
+            new = new if ok else None
+        new, cut = self._typed_name(new)
         if not new or new == sub:
             return
-        if new.lower() in {x.lower() for x in subs if x != sub}:
+        if new.lower() in {x.lower() for x in subs if x != sub} | {cat.lower()}:
             mw.toast(_("There's already a “{new}”.", new=html.escape(new)), "warn")
             return
         old_tag, new_tag = library.sub_tag(cat, sub), library.sub_tag(cat, new)
@@ -217,7 +222,7 @@ class CategoryControl(Controller):
             mw.cfg.subcategory = new
         mw._save_now()
         self._fill_subcategories()
-        mw.toast(_("✓ Renamed to “{new}”", new=html.escape(new)), "ok")
+        self._say_renamed(new, cut)
 
     def delete_subcategory(self, sub: str):
         """Delete a subcategory. Its sounds stay in the category."""
@@ -363,8 +368,8 @@ class CategoryControl(Controller):
         if name is None:
             name, ok = QInputDialog.getText(mw, _("New category"),
                                             _("Name (e.g. Memes, Music, Game 1):"))
-            name = name if ok else ""
-        name = library.plain_name(name)
+            name = name if ok else None
+        name, cut = self._typed_name(name)
         if name.lower() == ALL.lower():   # would look like the built-in tab
             mw.toast(_("“{all}” is the built-in tab, pick another name", all=ALL), "warn")
             return ""
@@ -383,7 +388,31 @@ class CategoryControl(Controller):
         if not sid:
             self.set_category(name)
         mw.searchctl.apply_filter(mw.search.text())
+        if cut:
+            self._say_cut(name)
         return name
+
+    def _typed_name(self, typed: str | None) -> tuple[str, bool]:
+        """A name typed in a New / Rename box (None: the box was cancelled), cleaned
+        by `library.plain_name`, and whether it had to be cut short. A box left empty,
+        or with only spaces in it, says so rather than doing nothing."""
+        if typed is None:
+            return "", False
+        name = library.plain_name(typed)
+        if not name:
+            self.mw.toast(_("Type a name first."), "warn")
+            return "", False
+        return name, len(library.one_line(typed)) > len(name)
+
+    def _say_cut(self, name: str):
+        self.mw.toast(_("Names can be up to {n} characters, so it's “{name}”.",
+                        n=library.CATEGORY_MAX, name=html.escape(name)), "warn")
+
+    def _say_renamed(self, new: str, cut: bool):
+        if cut:
+            self._say_cut(new)
+        else:
+            self.mw.toast(_("✓ Renamed to “{new}”", new=html.escape(new)), "ok")
 
     @staticmethod
     def _retag(tag: str, old: str, new: str) -> str:
@@ -429,8 +458,8 @@ class CategoryControl(Controller):
         mw = self.mw
         if new is None:
             new, ok = QInputDialog.getText(mw, _("Rename category"), _("New name:"), text=old)
-            new = new if ok else ""
-        new = library.plain_name(new)
+            new = new if ok else None
+        new, cut = self._typed_name(new)
         if new.lower() == ALL.lower():
             mw.toast(_("“{all}” is the built-in tab, pick another name", all=ALL), "warn")
             return
@@ -461,7 +490,7 @@ class CategoryControl(Controller):
         mw._save_now()
         self._fill_categories()
         mw.hkctl.register_hotkeys()   # its random-sound hotkey now plays `new`
-        mw.toast(_("✓ Renamed to “{new}”", new=html.escape(new)), "ok")
+        self._say_renamed(new, cut)
 
     def delete_category(self, name: str):
         """Delete a category. Its sounds stay (in All and their other categories)."""

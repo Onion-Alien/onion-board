@@ -3369,5 +3369,9 @@
   "Your Sounds volume is at 0%, so nobody else hears your sounds.": "サウンドの音量が0%なので、あなたのサウンドは他の人に聞こえていません。",
   "Heads up: while Onion Board is open, {key} plays your hotkey instead of doing its usual job in other apps.": "ご注意: Onion Board を開いている間、{key} はほかのアプリでいつもの動作をせず、あなたのホットキーを鳴らします。",
   "Windows keeps {key} for itself and never passes it to an app, so that hotkey could never play: pick another key.": "{key} は Windows 自身が使うキーで、アプリには渡されないため、このホットキーは鳴りません。別のキーを選んでください。",
-  "{key} is your Stop everything key, so it stays on that. Pick another key, or give Stop everything a new one in Settings → Hotkeys first.": "{key} は「すべてをやめてください」のキーなので、そのままにします。別のキーを選ぶか、先に 設定 → ホットキー で「すべてをやめてください」に新しいキーを設定してください。"
+  "{key} is your Stop everything key, so it stays on that. Pick another key, or give Stop everything a new one in Settings → Hotkeys first.": "{key} は「すべてをやめてください」のキーなので、そのままにします。別のキーを選ぶか、先に 設定 → ホットキー で「すべてをやめてください」に新しいキーを設定してください。",
+  "Names can be up to {n} characters, so it's “{name}”.": "名前は{n}文字までなので、「{name}」になりました。",
+  "They go in a category called “{name}”.": "「{name}」というカテゴリに入ります。",
+  "Type a name first.": "まず名前を入力してください。",
+  "✓ Renamed to “{new}”. Another sound has that name too.": "✓ 「{new}」に名前を変更しました。同じ名前のサウンドがほかにもあります。"
 }

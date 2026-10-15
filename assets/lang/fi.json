@@ -3445,5 +3445,9 @@
   "Your Sounds volume is at 0%, so nobody else hears your sounds.": "Äänet-voimakkuus on 0 %, joten kukaan muu ei kuule ääniäsi.",
   "Heads up: while Onion Board is open, {key} plays your hotkey instead of doing its usual job in other apps.": "Huomio: kun Onion Board on auki, {key} käynnistää pikanäppäimesi eikä tee tavallista tehtäväänsä muissa sovelluksissa.",
   "Windows keeps {key} for itself and never passes it to an app, so that hotkey could never play: pick another key.": "Windows pitää {key} itsellään eikä anna sitä koskaan sovellukselle, joten tämä pikanäppäin ei soisi koskaan: valitse toinen näppäin.",
-  "{key} is your Stop everything key, so it stays on that. Pick another key, or give Stop everything a new one in Settings → Hotkeys first.": "{key} on Pysäytä kaikki -näppäimesi, joten se pysyy siinä. Valitse toinen näppäin tai anna ensin Pysäytä kaikki -toiminnolle uusi kohdassa Asetukset → Pikanäppäimet."
+  "{key} is your Stop everything key, so it stays on that. Pick another key, or give Stop everything a new one in Settings → Hotkeys first.": "{key} on Pysäytä kaikki -näppäimesi, joten se pysyy siinä. Valitse toinen näppäin tai anna ensin Pysäytä kaikki -toiminnolle uusi kohdassa Asetukset → Pikanäppäimet.",
+  "Names can be up to {n} characters, so it's “{name}”.": "Nimessä voi olla enintään {n} merkkiä, joten se on “{name}”.",
+  "They go in a category called “{name}”.": "Ne menevät luokkaan nimeltä “{name}”.",
+  "Type a name first.": "Kirjoita ensin nimi.",
+  "✓ Renamed to “{new}”. Another sound has that name too.": "✓ Uudelleennimetty \"{new}\". Toisellakin äänellä on sama nimi."
 }

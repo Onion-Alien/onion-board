@@ -3445,5 +3445,9 @@
   "Your Sounds volume is at 0%, so nobody else hears your sounds.": "Din Lyde-lydstyrke er på 0 %, så ingen andre hører dine lyde.",
   "Heads up: while Onion Board is open, {key} plays your hotkey instead of doing its usual job in other apps.": "Bemærk: mens Onion Board er åben, spiller {key} din genvejstast i stedet for at gøre sit sædvanlige arbejde i andre apps.",
   "Windows keeps {key} for itself and never passes it to an app, so that hotkey could never play: pick another key.": "Windows beholder {key} selv og giver den aldrig videre til en app, så den genvejstast ville aldrig spille: vælg en anden tast.",
-  "{key} is your Stop everything key, so it stays on that. Pick another key, or give Stop everything a new one in Settings → Hotkeys first.": "{key} er din tast til Stop alt, så den bliver der. Vælg en anden tast, eller giv først Stop alt en ny under Indstillinger → Genvejstaster."
+  "{key} is your Stop everything key, so it stays on that. Pick another key, or give Stop everything a new one in Settings → Hotkeys first.": "{key} er din tast til Stop alt, så den bliver der. Vælg en anden tast, eller giv først Stop alt en ny under Indstillinger → Genvejstaster.",
+  "Names can be up to {n} characters, so it's “{name}”.": "Navne kan være op til {n} tegn, så det er “{name}”.",
+  "They go in a category called “{name}”.": "De kommer i en kategori, der hedder “{name}”.",
+  "Type a name first.": "Skriv først et navn.",
+  "✓ Renamed to “{new}”. Another sound has that name too.": "✓ Omdøbt til “{new}”. En anden lyd hedder også det."
 }

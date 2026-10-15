@@ -3445,5 +3445,9 @@
   "Your Sounds volume is at 0%, so nobody else hears your sounds.": "Il volume dei Suoni è allo 0%, quindi nessun altro sente i tuoi suoni.",
   "Heads up: while Onion Board is open, {key} plays your hotkey instead of doing its usual job in other apps.": "Attenzione: finché Onion Board è aperto, {key} avvia la tua scorciatoia invece di fare il suo solito lavoro nelle altre app.",
   "Windows keeps {key} for itself and never passes it to an app, so that hotkey could never play: pick another key.": "Windows tiene {key} per sé e non la passa mai a un'app, quindi quella scorciatoia non potrebbe mai suonare: scegli un altro tasto.",
-  "{key} is your Stop everything key, so it stays on that. Pick another key, or give Stop everything a new one in Settings → Hotkeys first.": "{key} è il tuo tasto per Ferma tutto, quindi resta lì. Scegli un altro tasto, oppure prima dai un tasto nuovo a Ferma tutto in Impostazioni → Scorciatoie."
+  "{key} is your Stop everything key, so it stays on that. Pick another key, or give Stop everything a new one in Settings → Hotkeys first.": "{key} è il tuo tasto per Ferma tutto, quindi resta lì. Scegli un altro tasto, oppure prima dai un tasto nuovo a Ferma tutto in Impostazioni → Scorciatoie.",
+  "Names can be up to {n} characters, so it's “{name}”.": "I nomi possono avere fino a {n} caratteri, quindi è “{name}”.",
+  "They go in a category called “{name}”.": "Finiscono in una categoria chiamata “{name}”.",
+  "Type a name first.": "Prima scrivi un nome.",
+  "✓ Renamed to “{new}”. Another sound has that name too.": "✓ Rinominato in “{new}”. Anche un altro suono ha questo nome."
 }

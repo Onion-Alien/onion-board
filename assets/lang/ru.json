@@ -3521,5 +3521,9 @@
   "Your Sounds volume is at 0%, so nobody else hears your sounds.": "Громкость «Звуков» на 0%, поэтому твои звуки больше никто не слышит.",
   "Heads up: while Onion Board is open, {key} plays your hotkey instead of doing its usual job in other apps.": "Внимание: пока Onion Board открыт, {key} запускает твою горячую клавишу вместо своей обычной работы в других приложениях.",
   "Windows keeps {key} for itself and never passes it to an app, so that hotkey could never play: pick another key.": "Windows оставляет {key} себе и никогда не передаёт приложениям, так что эта горячая клавиша никогда не сработает: выбери другую клавишу.",
-  "{key} is your Stop everything key, so it stays on that. Pick another key, or give Stop everything a new one in Settings → Hotkeys first.": "{key} — твоя клавиша «Остановить всё», поэтому она остаётся за ней. Выбери другую клавишу или сначала дай «Остановить всё» новую в Настройки → Горячие клавиши."
+  "{key} is your Stop everything key, so it stays on that. Pick another key, or give Stop everything a new one in Settings → Hotkeys first.": "{key} — твоя клавиша «Остановить всё», поэтому она остаётся за ней. Выбери другую клавишу или сначала дай «Остановить всё» новую в Настройки → Горячие клавиши.",
+  "Names can be up to {n} characters, so it's “{name}”.": "В названии может быть до {n} символов, поэтому получилось «{name}».",
+  "They go in a category called “{name}”.": "Они попадут в категорию «{name}».",
+  "Type a name first.": "Сначала введите название.",
+  "✓ Renamed to “{new}”. Another sound has that name too.": "✓ Переименовано в «{new}». Другой звук тоже так называется."
 }

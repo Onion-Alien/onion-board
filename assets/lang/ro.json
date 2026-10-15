@@ -3521,5 +3521,9 @@
   "Your Sounds volume is at 0%, so nobody else hears your sounds.": "Volumul Sunetelor e la 0%, așa că nimeni altcineva nu-ți aude sunetele.",
   "Heads up: while Onion Board is open, {key} plays your hotkey instead of doing its usual job in other apps.": "Atenție: cât timp Onion Board e deschis, {key} pornește tasta ta rapidă în loc să-și facă treaba obișnuită în celelalte aplicații.",
   "Windows keeps {key} for itself and never passes it to an app, so that hotkey could never play: pick another key.": "Windows păstrează {key} pentru el și nu o dă niciodată unei aplicații, așa că tasta rapidă n-ar suna niciodată: alege altă tastă.",
-  "{key} is your Stop everything key, so it stays on that. Pick another key, or give Stop everything a new one in Settings → Hotkeys first.": "{key} e tasta ta pentru Oprește tot, așa că rămâne acolo. Alege altă tastă sau dă-i întâi lui Oprește tot una nouă în Setări → Taste rapide."
+  "{key} is your Stop everything key, so it stays on that. Pick another key, or give Stop everything a new one in Settings → Hotkeys first.": "{key} e tasta ta pentru Oprește tot, așa că rămâne acolo. Alege altă tastă sau dă-i întâi lui Oprește tot una nouă în Setări → Taste rapide.",
+  "Names can be up to {n} characters, so it's “{name}”.": "Numele pot avea cel mult {n} caractere, așa că e „{name}”.",
+  "They go in a category called “{name}”.": "Ajung într-o categorie numită „{name}”.",
+  "Type a name first.": "Scrie mai întâi un nume.",
+  "✓ Renamed to “{new}”. Another sound has that name too.": "✓ Redenumit în „{new}”. Și alt sunet are numele ăsta."
 }

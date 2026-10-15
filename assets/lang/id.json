@@ -3369,5 +3369,9 @@
   "Your Sounds volume is at 0%, so nobody else hears your sounds.": "Volume Suara kamu di 0%, jadi tidak ada orang lain yang mendengar suaramu.",
   "Heads up: while Onion Board is open, {key} plays your hotkey instead of doing its usual job in other apps.": "Perhatian: selama Onion Board terbuka, {key} menjalankan hotkey-mu alih-alih melakukan tugas biasanya di aplikasi lain.",
   "Windows keeps {key} for itself and never passes it to an app, so that hotkey could never play: pick another key.": "Windows menyimpan {key} untuk dirinya sendiri dan tidak pernah meneruskannya ke aplikasi, jadi hotkey itu tidak akan pernah memutar suara: pilih tombol lain.",
-  "{key} is your Stop everything key, so it stays on that. Pick another key, or give Stop everything a new one in Settings → Hotkeys first.": "{key} adalah tombol Hentikan semuanya milikmu, jadi tetap di situ. Pilih tombol lain, atau beri Hentikan semuanya tombol baru dulu di Pengaturan → Hotkey."
+  "{key} is your Stop everything key, so it stays on that. Pick another key, or give Stop everything a new one in Settings → Hotkeys first.": "{key} adalah tombol Hentikan semuanya milikmu, jadi tetap di situ. Pilih tombol lain, atau beri Hentikan semuanya tombol baru dulu di Pengaturan → Hotkey.",
+  "Names can be up to {n} characters, so it's “{name}”.": "Nama bisa sampai {n} karakter, jadi namanya “{name}”.",
+  "They go in a category called “{name}”.": "Semuanya masuk ke kategori bernama “{name}”.",
+  "Type a name first.": "Ketik nama dulu.",
+  "✓ Renamed to “{new}”. Another sound has that name too.": "✓ Nama diganti jadi “{new}”. Ada suara lain dengan nama yang sama."
 }

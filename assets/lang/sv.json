@@ -3445,5 +3445,9 @@
   "Your Sounds volume is at 0%, so nobody else hears your sounds.": "Din Ljud-volym står på 0 %, så ingen annan hör dina ljud.",
   "Heads up: while Onion Board is open, {key} plays your hotkey instead of doing its usual job in other apps.": "Obs: medan Onion Board är öppen spelar {key} din snabbtangent i stället för att göra sitt vanliga jobb i andra appar.",
   "Windows keeps {key} for itself and never passes it to an app, so that hotkey could never play: pick another key.": "Windows behåller {key} för sig själv och skickar den aldrig vidare till en app, så snabbtangenten skulle aldrig spela: välj en annan tangent.",
-  "{key} is your Stop everything key, so it stays on that. Pick another key, or give Stop everything a new one in Settings → Hotkeys first.": "{key} är din tangent för Stoppa allt, så den stannar där. Välj en annan tangent, eller ge först Stoppa allt en ny under Inställningar → Snabbtangenter."
+  "{key} is your Stop everything key, so it stays on that. Pick another key, or give Stop everything a new one in Settings → Hotkeys first.": "{key} är din tangent för Stoppa allt, så den stannar där. Välj en annan tangent, eller ge först Stoppa allt en ny under Inställningar → Snabbtangenter.",
+  "Names can be up to {n} characters, so it's “{name}”.": "Namn kan ha upp till {n} tecken, så det blir ”{name}”.",
+  "They go in a category called “{name}”.": "De hamnar i en kategori som heter ”{name}”.",
+  "Type a name first.": "Skriv ett namn först.",
+  "✓ Renamed to “{new}”. Another sound has that name too.": "✓ Bytte namn till ”{new}”. Ett annat ljud heter också så."
 }

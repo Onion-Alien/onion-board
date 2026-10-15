@@ -3445,5 +3445,9 @@
   "Your Sounds volume is at 0%, so nobody else hears your sounds.": "Nasa 0% ang volume ng Sounds mo, kaya walang ibang nakakarinig ng sounds mo.",
   "Heads up: while Onion Board is open, {key} plays your hotkey instead of doing its usual job in other apps.": "Paalala: habang bukas ang Onion Board, pinapatugtog ng {key} ang hotkey mo sa halip na gawin ang karaniwang trabaho nito sa ibang app.",
   "Windows keeps {key} for itself and never passes it to an app, so that hotkey could never play: pick another key.": "Itinatabi ng Windows ang {key} para sa sarili nito at hindi ito ibinibigay sa anumang app, kaya hindi kailanman tutugtog ang hotkey na iyan: pumili ng ibang key.",
-  "{key} is your Stop everything key, so it stays on that. Pick another key, or give Stop everything a new one in Settings → Hotkeys first.": "Ang {key} ang key mo para sa Itigil lahat, kaya doon ito mananatili. Pumili ng ibang key, o bigyan muna ng bago ang Itigil lahat sa Settings → Mga hotkey."
+  "{key} is your Stop everything key, so it stays on that. Pick another key, or give Stop everything a new one in Settings → Hotkeys first.": "Ang {key} ang key mo para sa Itigil lahat, kaya doon ito mananatili. Pumili ng ibang key, o bigyan muna ng bago ang Itigil lahat sa Settings → Mga hotkey.",
+  "Names can be up to {n} characters, so it's “{name}”.": "Hanggang {n} character lang ang pangalan, kaya “{name}” ito.",
+  "They go in a category called “{name}”.": "Mapupunta sila sa category na “{name}”.",
+  "Type a name first.": "Mag-type muna ng pangalan.",
+  "✓ Renamed to “{new}”. Another sound has that name too.": "✓ Na-rename sa “{new}”. May isa pang sound na ganito rin ang pangalan."
 }

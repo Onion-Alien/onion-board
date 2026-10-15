@@ -3369,5 +3369,9 @@
   "Your Sounds volume is at 0%, so nobody else hears your sounds.": "ระดับเสียงของเสียงอยู่ที่ 0% จึงไม่มีใครได้ยินเสียงของคุณ",
   "Heads up: while Onion Board is open, {key} plays your hotkey instead of doing its usual job in other apps.": "โปรดทราบ: ขณะที่ Onion Board เปิดอยู่ {key} จะเล่นปุ่มลัดของคุณแทนการทำงานปกติในแอปอื่น",
   "Windows keeps {key} for itself and never passes it to an app, so that hotkey could never play: pick another key.": "Windows เก็บ {key} ไว้ใช้เองและไม่ส่งต่อให้แอปใดเลย ปุ่มลัดนี้จึงไม่มีวันเล่นเสียง: เลือกปุ่มอื่น",
-  "{key} is your Stop everything key, so it stays on that. Pick another key, or give Stop everything a new one in Settings → Hotkeys first.": "{key} เป็นปุ่ม หยุดทุกอย่าง ของคุณ จึงยังคงอยู่ที่เดิม เลือกปุ่มอื่น หรือตั้งปุ่มใหม่ให้ หยุดทุกอย่าง ก่อนใน การตั้งค่า → ปุ่มลัด"
+  "{key} is your Stop everything key, so it stays on that. Pick another key, or give Stop everything a new one in Settings → Hotkeys first.": "{key} เป็นปุ่ม หยุดทุกอย่าง ของคุณ จึงยังคงอยู่ที่เดิม เลือกปุ่มอื่น หรือตั้งปุ่มใหม่ให้ หยุดทุกอย่าง ก่อนใน การตั้งค่า → ปุ่มลัด",
+  "Names can be up to {n} characters, so it's “{name}”.": "ชื่อยาวได้ไม่เกิน {n} ตัวอักษร จึงเป็น “{name}”",
+  "They go in a category called “{name}”.": "จะอยู่ในหมวดหมู่ชื่อ “{name}”",
+  "Type a name first.": "พิมพ์ชื่อก่อน",
+  "✓ Renamed to “{new}”. Another sound has that name too.": "✓ เปลี่ยนชื่อเป็น “{new}” แล้ว มีเสียงอื่นที่ชื่อนี้ด้วย"
 }

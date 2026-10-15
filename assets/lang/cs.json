@@ -3521,5 +3521,9 @@
   "Your Sounds volume is at 0%, so nobody else hears your sounds.": "Hlasitost Zvuků je na 0 %, takže tvoje zvuky nikdo jiný neslyší.",
   "Heads up: while Onion Board is open, {key} plays your hotkey instead of doing its usual job in other apps.": "Pozor: dokud je Onion Board otevřený, {key} spouští tvou zkratku místo toho, co obvykle dělá v jiných aplikacích.",
   "Windows keeps {key} for itself and never passes it to an app, so that hotkey could never play: pick another key.": "Windows si {key} nechává pro sebe a nikdy ji nepředá aplikaci, takže by ta zkratka nikdy nehrála: vyber jinou klávesu.",
-  "{key} is your Stop everything key, so it stays on that. Pick another key, or give Stop everything a new one in Settings → Hotkeys first.": "{key} je tvoje klávesa pro Zastavit všechno, takže zůstává u ní. Vyber jinou klávesu, nebo nejdřív dej Zastavit všechno novou v Nastavení → Zkratky."
+  "{key} is your Stop everything key, so it stays on that. Pick another key, or give Stop everything a new one in Settings → Hotkeys first.": "{key} je tvoje klávesa pro Zastavit všechno, takže zůstává u ní. Vyber jinou klávesu, nebo nejdřív dej Zastavit všechno novou v Nastavení → Zkratky.",
+  "Names can be up to {n} characters, so it's “{name}”.": "Názvy mohou mít nejvýš {n} znaků, takže je to „{name}“.",
+  "They go in a category called “{name}”.": "Přijdou do kategorie „{name}“.",
+  "Type a name first.": "Nejdřív napište název.",
+  "✓ Renamed to “{new}”. Another sound has that name too.": "✓ Přejmenováno na „{new}“. Stejně se jmenuje i jiný zvuk."
 }

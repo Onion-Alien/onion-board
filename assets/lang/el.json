@@ -3445,5 +3445,9 @@
   "Your Sounds volume is at 0%, so nobody else hears your sounds.": "Η ένταση των Ήχων είναι στο 0%, οπότε κανείς άλλος δεν ακούει τους ήχους σου.",
   "Heads up: while Onion Board is open, {key} plays your hotkey instead of doing its usual job in other apps.": "Προσοχή: όσο το Onion Board είναι ανοιχτό, το {key} παίζει τη συντόμευσή σου αντί να κάνει τη συνηθισμένη του δουλειά στις άλλες εφαρμογές.",
   "Windows keeps {key} for itself and never passes it to an app, so that hotkey could never play: pick another key.": "Τα Windows κρατούν το {key} για τον εαυτό τους και δεν το δίνουν ποτέ σε εφαρμογή, οπότε αυτή η συντόμευση δεν θα έπαιζε ποτέ: διάλεξε άλλο πλήκτρο.",
-  "{key} is your Stop everything key, so it stays on that. Pick another key, or give Stop everything a new one in Settings → Hotkeys first.": "Το {key} είναι το πλήκτρο σου για το Σταμάτα τα πάντα, οπότε μένει εκεί. Διάλεξε άλλο πλήκτρο ή δώσε πρώτα νέο στο Σταμάτα τα πάντα στις Ρυθμίσεις → Συντομεύσεις."
+  "{key} is your Stop everything key, so it stays on that. Pick another key, or give Stop everything a new one in Settings → Hotkeys first.": "Το {key} είναι το πλήκτρο σου για το Σταμάτα τα πάντα, οπότε μένει εκεί. Διάλεξε άλλο πλήκτρο ή δώσε πρώτα νέο στο Σταμάτα τα πάντα στις Ρυθμίσεις → Συντομεύσεις.",
+  "Names can be up to {n} characters, so it's “{name}”.": "Τα ονόματα έχουν έως {n} χαρακτήρες, οπότε είναι «{name}».",
+  "They go in a category called “{name}”.": "Μπαίνουν σε κατηγορία με όνομα «{name}».",
+  "Type a name first.": "Γράψτε πρώτα ένα όνομα.",
+  "✓ Renamed to “{new}”. Another sound has that name too.": "✓ Μετονομάστηκε σε \"{new}\". Και άλλος ήχος έχει αυτό το όνομα."
 }

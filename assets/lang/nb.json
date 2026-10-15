@@ -3445,5 +3445,9 @@
   "Your Sounds volume is at 0%, so nobody else hears your sounds.": "Lyder-volumet ditt står på 0 %, så ingen andre hører lydene dine.",
   "Heads up: while Onion Board is open, {key} plays your hotkey instead of doing its usual job in other apps.": "Obs: mens Onion Board er åpen, spiller {key} hurtigtasten din i stedet for å gjøre den vanlige jobben sin i andre apper.",
   "Windows keeps {key} for itself and never passes it to an app, so that hotkey could never play: pick another key.": "Windows holder {key} for seg selv og gir den aldri videre til en app, så den hurtigtasten ville aldri spille: velg en annen tast.",
-  "{key} is your Stop everything key, so it stays on that. Pick another key, or give Stop everything a new one in Settings → Hotkeys first.": "{key} er tasten din for Stopp alt, så den blir der. Velg en annen tast, eller gi først Stopp alt en ny i Innstillinger → Hurtigtaster."
+  "{key} is your Stop everything key, so it stays on that. Pick another key, or give Stop everything a new one in Settings → Hotkeys first.": "{key} er tasten din for Stopp alt, så den blir der. Velg en annen tast, eller gi først Stopp alt en ny i Innstillinger → Hurtigtaster.",
+  "Names can be up to {n} characters, so it's “{name}”.": "Navn kan ha opptil {n} tegn, så det blir «{name}».",
+  "They go in a category called “{name}”.": "De havner i en kategori som heter «{name}».",
+  "Type a name first.": "Skriv inn et navn først.",
+  "✓ Renamed to “{new}”. Another sound has that name too.": "✓ Nytt navn: «{new}». En annen lyd heter også det."
 }

@@ -3749,5 +3749,9 @@
   "Your Sounds volume is at 0%, so nobody else hears your sounds.": "مستوى صوت «الأصوات» عند 0%، لذا لا يسمع أحد غيرك أصواتك.",
   "Heads up: while Onion Board is open, {key} plays your hotkey instead of doing its usual job in other apps.": "انتبه: ما دام Onion Board مفتوحًا، يشغّل {key} اختصارك بدل عمله المعتاد في التطبيقات الأخرى.",
   "Windows keeps {key} for itself and never passes it to an app, so that hotkey could never play: pick another key.": "يحتفظ Windows بـ {key} لنفسه ولا يمرره لأي تطبيق، فلن يعمل هذا الاختصار أبدًا: اختر مفتاحًا آخر.",
-  "{key} is your Stop everything key, so it stays on that. Pick another key, or give Stop everything a new one in Settings → Hotkeys first.": "{key} هو مفتاح «أوقف كل شيء»، فيبقى له. اختر مفتاحًا آخر، أو أعطِ «أوقف كل شيء» مفتاحًا جديدًا في الإعدادات → الاختصارات أولًا."
+  "{key} is your Stop everything key, so it stays on that. Pick another key, or give Stop everything a new one in Settings → Hotkeys first.": "{key} هو مفتاح «أوقف كل شيء»، فيبقى له. اختر مفتاحًا آخر، أو أعطِ «أوقف كل شيء» مفتاحًا جديدًا في الإعدادات → الاختصارات أولًا.",
+  "Names can be up to {n} characters, so it's “{name}”.": "يمكن أن يصل الاسم إلى {n} حرفًا، لذا أصبح “{name}”.",
+  "They go in a category called “{name}”.": "ستوضع في فئة باسم “{name}”.",
+  "Type a name first.": "اكتب اسمًا أولًا.",
+  "✓ Renamed to “{new}”. Another sound has that name too.": "✓ أُعيدت التسمية إلى “{new}”. يوجد صوت آخر بهذا الاسم أيضًا."
 }

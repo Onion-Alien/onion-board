@@ -3369,5 +3369,9 @@
   "Your Sounds volume is at 0%, so nobody else hears your sounds.": "你的音效音量為 0%，所以其他人聽不到你的音效。",
   "Heads up: while Onion Board is open, {key} plays your hotkey instead of doing its usual job in other apps.": "注意：Onion Board 開著的時候，{key} 會播放你的快速鍵，而不會在其他應用程式裡做它平常的事。",
   "Windows keeps {key} for itself and never passes it to an app, so that hotkey could never play: pick another key.": "{key} 被 Windows 自己保留，永遠不會交給任何應用程式，所以這個快速鍵永遠不會播放：請換一個鍵。",
-  "{key} is your Stop everything key, so it stays on that. Pick another key, or give Stop everything a new one in Settings → Hotkeys first.": "{key} 是你的「停止所有東西」鍵，所以它會保持不變。請換一個鍵，或先在 設定 → 快速鍵 裡給「停止所有東西」設一個新鍵。"
+  "{key} is your Stop everything key, so it stays on that. Pick another key, or give Stop everything a new one in Settings → Hotkeys first.": "{key} 是你的「停止所有東西」鍵，所以它會保持不變。請換一個鍵，或先在 設定 → 快速鍵 裡給「停止所有東西」設一個新鍵。",
+  "Names can be up to {n} characters, so it's “{name}”.": "名稱最多 {n} 個字元，所以是「{name}」。",
+  "They go in a category called “{name}”.": "它們會放進名為「{name}」的分類。",
+  "Type a name first.": "請先輸入名稱。",
+  "✓ Renamed to “{new}”. Another sound has that name too.": "✓ 已重新命名為「{new}」。另一個音效也叫這個名字。"
 }

@@ -3445,5 +3445,9 @@
   "Your Sounds volume is at 0%, so nobody else hears your sounds.": "Je Geluiden-volume staat op 0%, dus niemand anders hoort je geluiden.",
   "Heads up: while Onion Board is open, {key} plays your hotkey instead of doing its usual job in other apps.": "Let op: zolang Onion Board open is, speelt {key} je sneltoets af in plaats van zijn gewone werk te doen in andere apps.",
   "Windows keeps {key} for itself and never passes it to an app, so that hotkey could never play: pick another key.": "Windows houdt {key} voor zichzelf en geeft hem nooit door aan een app, dus die sneltoets zou nooit spelen: kies een andere toets.",
-  "{key} is your Stop everything key, so it stays on that. Pick another key, or give Stop everything a new one in Settings → Hotkeys first.": "{key} is je toets voor Stop met alles, dus die blijft daar. Kies een andere toets, of geef Stop met alles eerst een nieuwe bij Instellingen → Sneltoetsen."
+  "{key} is your Stop everything key, so it stays on that. Pick another key, or give Stop everything a new one in Settings → Hotkeys first.": "{key} is je toets voor Stop met alles, dus die blijft daar. Kies een andere toets, of geef Stop met alles eerst een nieuwe bij Instellingen → Sneltoetsen.",
+  "Names can be up to {n} characters, so it's “{name}”.": "Namen mogen tot {n} tekens zijn, dus het wordt “{name}”.",
+  "They go in a category called “{name}”.": "Ze komen in een categorie met de naam “{name}”.",
+  "Type a name first.": "Typ eerst een naam.",
+  "✓ Renamed to “{new}”. Another sound has that name too.": "✓ Hernoemd naar “{new}”. Een ander geluid heet ook zo."
 }

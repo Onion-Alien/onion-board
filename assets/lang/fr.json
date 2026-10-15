@@ -2897,7 +2897,7 @@
   "From a file (you can also drop a picture on the pad)": "Depuis un fichier (tu peux aussi déposer une image sur le pad)",
   "Right-click any pad → Edit → Effects for bass boost, nightcore, slowed + reverb, trim and more. The original file is never changed.": "Clic droit sur n'importe quel pad → Modifier → Effets pour le boost de basses, nightcore, slowed + reverb, la coupe et plus. Le fichier d'origine n'est jamais modifié.",
   "Delete info": "Supprimer les infos",
-  "Delete where “{name}” came from?\n\nIts link, channel and other details and their text file are deleted. The sound stays.": "Supprimer la provenance de « {name} » ?\n\nSon lien, sa chaîne et les autres détails, ainsi que leur fichier texte, sont supprimés. Le son reste.",
+  "Delete where “{name}” came from?\n\nIts link, channel and other details and their text file are deleted. The sound stays.": "Supprimer la provenance de « {name} » ?\n\nSon lien, sa chaîne et les autres détails, ainsi que leur fichier texte, sont supprimés. Le son reste.",
   "Keeps each download's link, channel, upload date, length and views (from the download itself, nothing extra is fetched), in a text file next to the sound too. Right-click the sound to open or copy the link. Off: new downloads keep none of it and the menu hides it; what's already saved stays.": "Garde le lien, la chaîne, la date de mise en ligne, la durée et les vues de chaque téléchargement (tirés du téléchargement lui-même, rien d'autre n'est récupéré), aussi dans un fichier texte à côté du son. Clic droit sur le son pour ouvrir ou copier le lien. Désactivé : les nouveaux téléchargements n'en gardent rien et le menu le masque ; ce qui est déjà enregistré reste.",
   "Remember where it came from": "Se souvenir de la provenance",
   "Set up output": "Configurer la sortie",
@@ -2981,12 +2981,12 @@
   "Your sounds and settings are kept.": "Tes sons et tes paramètres sont conservés.",
   "{error}": "{error}",
   "Update mic effect": "Mettre à jour l’effet micro",
-  "Added the voice “{name}”": "Voix « {name} » ajoutée",
+  "Added the voice “{name}”": "Voix « {name} » ajoutée",
   "Added {n} clip to your Sounds": [
     "{n} extrait ajouté à vos sons",
     "{n} extraits ajoutés à vos sons"
   ],
-  "Copied “{name}”: Ctrl+V pastes it in an editor or on the Sounds tab": "« {name} » copié : Ctrl+V le colle dans un éditeur ou dans l'onglet Sons",
+  "Copied “{name}”: Ctrl+V pastes it in an editor or on the Sounds tab": "« {name} » copié : Ctrl+V le colle dans un éditeur ou dans l'onglet Sons",
   "Keep": "Garder",
   "Keep your imported sounds?": "Garder les sons importés ?",
   "We brought over <b>{n}</b> sound from your other soundboards. Keep it?": [
@@ -3271,16 +3271,16 @@
   "Delete subcategory": "Supprimer la sous-catégorie",
   "Delete subcategory (keeps the sounds)": "Supprimer la sous-catégorie (garde les sons)",
   "Delete the “{name}” subcategory? Its {n} sound stay in {cat}.": [
-    "Supprimer la sous-catégorie « {name} » ? Ses sons ({n}) restent dans {cat}.",
-    "Supprimer la sous-catégorie « {name} » ? Ses sons ({n}) restent dans {cat}."
+    "Supprimer la sous-catégorie « {name} » ? Ses sons ({n}) restent dans {cat}.",
+    "Supprimer la sous-catégorie « {name} » ? Ses sons ({n}) restent dans {cat}."
   ],
-  "Make one “{name}” tab, with {n} of its categories inside it as subcategories instead of tabs of their own?\n\nNo sound is removed or changed.": "Faire un seul onglet « {name} », avec {n} de ses catégories dedans comme sous-catégories au lieu d'onglets séparés ?\n\nAucun son n'est retiré ni modifié.",
+  "Make one “{name}” tab, with {n} of its categories inside it as subcategories instead of tabs of their own?\n\nNo sound is removed or changed.": "Faire un seul onglet « {name} », avec {n} de ses catégories dedans comme sous-catégories au lieu d'onglets séparés ?\n\nAucun son n'est retiré ni modifié.",
   "Name (a group inside {cat}):": "Nom (un groupe dans {cat}) :",
   "New subcategory": "Nouvelle sous-catégorie",
   "New subcategory in {cat}": "Nouvelle sous-catégorie dans {cat}",
   "Put its categories in one tab": "Mettre ses catégories dans un seul onglet",
   "Rename subcategory": "Renommer la sous-catégorie",
-  "✓ “{name}” is one tab now": "✓ « {name} » est maintenant un seul onglet",
+  "✓ “{name}” is one tab now": "✓ « {name} » est maintenant un seul onglet",
   "Attack": "Attaque",
   "Ceiling": "Plafond",
   "De-ess": "Dé-esseur",
@@ -3445,5 +3445,9 @@
   "Your Sounds volume is at 0%, so nobody else hears your sounds.": "Ton volume des Sons est à 0 %, donc personne d’autre n’entend tes sons.",
   "Heads up: while Onion Board is open, {key} plays your hotkey instead of doing its usual job in other apps.": "Attention : tant qu'Onion Board est ouvert, {key} lance ton raccourci au lieu de faire son travail habituel dans les autres applis.",
   "Windows keeps {key} for itself and never passes it to an app, so that hotkey could never play: pick another key.": "Windows garde {key} pour lui et ne la transmet jamais à une appli, donc ce raccourci ne pourrait jamais jouer : choisis une autre touche.",
-  "{key} is your Stop everything key, so it stays on that. Pick another key, or give Stop everything a new one in Settings → Hotkeys first.": "{key} est ta touche Tout arrêter, elle y reste donc. Choisis une autre touche, ou donne d'abord une nouvelle touche à Tout arrêter dans Paramètres → Raccourcis."
+  "{key} is your Stop everything key, so it stays on that. Pick another key, or give Stop everything a new one in Settings → Hotkeys first.": "{key} est ta touche Tout arrêter, elle y reste donc. Choisis une autre touche, ou donne d'abord une nouvelle touche à Tout arrêter dans Paramètres → Raccourcis.",
+  "Names can be up to {n} characters, so it's “{name}”.": "Les noms font au plus {n} caractères, donc c'est « {name} ».",
+  "They go in a category called “{name}”.": "Ils vont dans une catégorie appelée « {name} ».",
+  "Type a name first.": "Tapez d'abord un nom.",
+  "✓ Renamed to “{new}”. Another sound has that name too.": "✓ Renommé en « {new} ». Un autre son porte aussi ce nom."
 }

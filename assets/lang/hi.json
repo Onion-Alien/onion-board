@@ -3445,5 +3445,9 @@
   "Your Sounds volume is at 0%, so nobody else hears your sounds.": "आपका साउंड वॉल्यूम 0% पर है, इसलिए आपके साउंड कोई और नहीं सुन रहा।",
   "Heads up: while Onion Board is open, {key} plays your hotkey instead of doing its usual job in other apps.": "ध्यान दें: जब तक Onion Board खुला है, {key} दूसरे ऐप्स में अपना सामान्य काम करने के बजाय आपकी हॉटकी चलाएगी।",
   "Windows keeps {key} for itself and never passes it to an app, so that hotkey could never play: pick another key.": "Windows {key} को अपने पास रखता है और किसी ऐप को कभी नहीं देता, इसलिए यह हॉटकी कभी नहीं बजेगी: कोई दूसरी की चुनें।",
-  "{key} is your Stop everything key, so it stays on that. Pick another key, or give Stop everything a new one in Settings → Hotkeys first.": "{key} आपकी सब कुछ बंद करो की है, इसलिए यह उसी पर रहेगी। कोई दूसरी की चुनें, या पहले सेटिंग्स → हॉटकी में सब कुछ बंद करो को नई की दें।"
+  "{key} is your Stop everything key, so it stays on that. Pick another key, or give Stop everything a new one in Settings → Hotkeys first.": "{key} आपकी सब कुछ बंद करो की है, इसलिए यह उसी पर रहेगी। कोई दूसरी की चुनें, या पहले सेटिंग्स → हॉटकी में सब कुछ बंद करो को नई की दें।",
+  "Names can be up to {n} characters, so it's “{name}”.": "नाम में ज़्यादा से ज़्यादा {n} अक्षर हो सकते हैं, इसलिए यह “{name}” है।",
+  "They go in a category called “{name}”.": "ये “{name}” नाम की कैटेगरी में जाएँगे।",
+  "Type a name first.": "पहले एक नाम लिखें।",
+  "✓ Renamed to “{new}”. Another sound has that name too.": "✓ नाम बदलकर “{new}” किया। एक और साउंड का भी यही नाम है।"
 }

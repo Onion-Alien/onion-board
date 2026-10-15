@@ -3445,5 +3445,9 @@
   "Your Sounds volume is at 0%, so nobody else hears your sounds.": "Deine Sounds-Lautstärke steht auf 0 %, also hört niemand sonst deine Sounds.",
   "Heads up: while Onion Board is open, {key} plays your hotkey instead of doing its usual job in other apps.": "Achtung: Solange Onion Board offen ist, löst {key} deinen Hotkey aus, statt in anderen Apps das Übliche zu tun.",
   "Windows keeps {key} for itself and never passes it to an app, so that hotkey could never play: pick another key.": "Windows behält {key} für sich und gibt die Taste nie an eine App weiter, dieser Hotkey könnte also nie abspielen: Nimm eine andere Taste.",
-  "{key} is your Stop everything key, so it stays on that. Pick another key, or give Stop everything a new one in Settings → Hotkeys first.": "{key} ist deine Taste für Alles stoppen, deshalb bleibt sie dort. Nimm eine andere Taste oder gib Alles stoppen zuerst unter Einstellungen → Hotkeys eine neue."
+  "{key} is your Stop everything key, so it stays on that. Pick another key, or give Stop everything a new one in Settings → Hotkeys first.": "{key} ist deine Taste für Alles stoppen, deshalb bleibt sie dort. Nimm eine andere Taste oder gib Alles stoppen zuerst unter Einstellungen → Hotkeys eine neue.",
+  "Names can be up to {n} characters, so it's “{name}”.": "Namen können bis zu {n} Zeichen haben, daher „{name}“.",
+  "They go in a category called “{name}”.": "Sie kommen in eine Kategorie namens „{name}“.",
+  "Type a name first.": "Gib zuerst einen Namen ein.",
+  "✓ Renamed to “{new}”. Another sound has that name too.": "✓ Umbenannt in „{new}“. Ein anderer Sound heißt auch so."
 }
