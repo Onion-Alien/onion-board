@@ -20,6 +20,7 @@ from PySide6.QtWidgets import (QApplication, QDialog, QHBoxLayout, QLabel, QPush
                                QVBoxLayout)
 
 from soundboard import chatcheck, directmic, discordcfg, theme
+from soundboard.pollthread import PollThread
 from soundboard.ui import busy, fit, icons
 from soundboard.ui.bunnywidget import BunnyWidget
 from soundboard.ui.crashdialog import free_dialog
@@ -27,6 +28,9 @@ from soundboard import errors
 from soundboard.i18n import _
 
 log = logging.getLogger(__name__)
+# Discord's settings, re-read every 2 s while the guide shows: one kept thread for every
+# guide (a new thread each time made the window wait in Thread.start, pollthread.py)
+_READ_POLL = PollThread("discord-guide-read")
 
 DISCORD_EXES = ("discord.exe", "discordptb.exe", "discordcanary.exe", "discorddevelopment.exe")
 DISCORD_VOICE_URL = "discord://-/settings/voice"
@@ -458,8 +462,8 @@ class DiscordGuide(QDialog):
         if self._reading:
             return
         self._reading = True
-        threading.Thread(target=self._read_worker, args=(self._sig,), daemon=True,
-                         name="discord-guide-read").start()
+        last = self._sig
+        _READ_POLL.run(lambda: self._read_worker(last))
 
     def _read_worker(self, last):
         try:

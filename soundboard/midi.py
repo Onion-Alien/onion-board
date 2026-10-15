@@ -24,6 +24,8 @@ import threading
 
 from PySide6.QtCore import QObject, QTimer, Signal
 
+from soundboard.pollthread import PollThread
+
 log = logging.getLogger(__name__)
 
 PREFIX = "midi:"
@@ -194,6 +196,7 @@ class MidiIn(QObject):
         self._held: dict[int, set[str]] = {}               # key -> pads down right now
         self._next_key = 1
         self._lock = threading.Lock()
+        self._scan_poll = PollThread("midi-scan")
         self._timer = QTimer(self)
         self._timer.setInterval(POLL_MS)
         self._timer.timeout.connect(self.sync)
@@ -235,7 +238,7 @@ class MidiIn(QObject):
         """Open what's needed and connected, close the rest; retry busy ones later."""
         if self._async and (self._capturing or self._wanted) and not self._scanning:
             self._scanning = True
-            threading.Thread(target=self._scan_thread, daemon=True, name="midi-scan").start()
+            self._scan_poll.run(self._scan_thread)
         self._apply()
 
     def _scan_thread(self):

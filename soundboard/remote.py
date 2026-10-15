@@ -104,6 +104,7 @@ from urllib.parse import parse_qs, urlsplit
 from PySide6.QtCore import QObject, Qt, QTimer, Signal
 
 from soundboard import errors, netcategory
+from soundboard.pollthread import PollThread
 from soundboard.i18n import _
 
 if TYPE_CHECKING:
@@ -367,6 +368,7 @@ class RemoteControl(QObject):
         self._server: _Server | None = None
         self._fails: dict[str, tuple[int, float]] = {}   # peer -> (wrong keys, locked until)
         self._fails_lock = threading.Lock()
+        self._net_poll = PollThread("remote-network-check")
         self._nonces: dict[str, float] = {}   # lan: nonce -> forget it after (monotonic)
         self._started = 0   # lan: the unix second it last started; older signatures refused
         self.request.connect(self._on_request, Qt.ConnectionType.QueuedConnection)
@@ -436,7 +438,7 @@ class RemoteControl(QObject):
                 self._net_answer.emit(server, public)
             except RuntimeError:   # the window (and this) went away meanwhile
                 pass
-        threading.Thread(target=ask, daemon=True, name="remote-network-check").start()
+        self._net_poll.run(ask)
 
     def _network_checked(self, server, public: bool):
         """lan: the network turned Public (or the PC moved to a Public one keeping its

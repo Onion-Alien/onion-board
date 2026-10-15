@@ -20,12 +20,16 @@ from PySide6.QtWidgets import (QApplication, QDialog, QFrame, QHBoxLayout, QLabe
 from shiboken6 import isValid as qt_valid
 
 from soundboard import directmic, errors, michelper, theme, usage
+from soundboard.pollthread import PollThread
 from soundboard.i18n import _
 from soundboard.ui import busy, fit, icons
 from soundboard.ui.panel import Flow
 from soundboard.ui.setupshow import SetupShow
 
 log = logging.getLogger(__name__)
+# the status look every 5 s while the page shows: one kept thread for every copy of the
+# page (a new thread each time made the window wait in Thread.start, pollthread.py)
+_STATUS_POLL = PollThread("recovery-status")
 INSTALLS = ("install", "repair", "update", "reinstall")   # these leave the effect on
 
 
@@ -397,7 +401,7 @@ class RecoveryCard(QFrame):
             # the app's mic first, then the list: one rebuild of the rows, not two
             busy.emit(self.checked, state, mic or "")
             busy.emit(self.listed, found, mic or "")
-        threading.Thread(target=work, daemon=True, name="recovery-status").start()
+        _STATUS_POLL.run(work)
 
     def shown(self):
         """The mics the card lists: Windows' list, or, when it lists none, the app's
