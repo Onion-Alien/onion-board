@@ -3515,5 +3515,6 @@
   "Windows can't find <b>{mic}</b> right now. Plug it in, or switch it on if it's wireless. This goes away by itself.": "Windows nie widzi teraz urządzenia <b>{mic}</b>. Podłącz je albo włącz, jeśli jest bezprzewodowe. To zniknie samo.",
   "Your headset is off or its mic is muted. Turn it on or unmute it. Still nothing? Click <b>Repair</b>.": "Słuchawki są wyłączone albo ich mikrofon jest wyciszony. Włącz je albo wyłącz wyciszenie. Dalej nic? Kliknij <b>Napraw</b>.",
   "The download was cut off before the end. Try again.": "Pobieranie zostało przerwane przed końcem. Spróbuj ponownie.",
-  "You can change the proxy in Settings > Connection.": "Proxy możesz zmienić w Ustawieniach > Połączenie."
+  "You can change the proxy in Settings > Connection.": "Proxy możesz zmienić w Ustawieniach > Połączenie.",
+  "the pack's file is damaged, so it wasn't kept": "plik pakietu jest uszkodzony, więc nie został zachowany"
 }

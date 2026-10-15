@@ -3439,5 +3439,6 @@
   "Windows can't find <b>{mic}</b> right now. Plug it in, or switch it on if it's wireless. This goes away by itself.": "Windows ei löydä laitetta <b>{mic}</b> juuri nyt. Kytke se kiinni, tai laita se päälle, jos se on langaton. Tämä katoaa itsestään.",
   "Your headset is off or its mic is muted. Turn it on or unmute it. Still nothing? Click <b>Repair</b>.": "Kuulokkeesi ovat pois päältä tai niiden mikki on mykistetty. Laita ne päälle tai poista mykistys. Vieläkään ei mitään? Klikkaa <b>Korjaa</b>.",
   "The download was cut off before the end. Try again.": "Lataus katkesi ennen loppua. Yritä uudelleen.",
-  "You can change the proxy in Settings > Connection.": "Voit vaihtaa välityspalvelimen kohdassa Asetukset > Yhteys."
+  "You can change the proxy in Settings > Connection.": "Voit vaihtaa välityspalvelimen kohdassa Asetukset > Yhteys.",
+  "the pack's file is damaged, so it wasn't kept": "paketin tiedosto on vioittunut, joten sitä ei säilytetty"
 }

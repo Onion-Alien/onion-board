@@ -3363,5 +3363,6 @@
   "Windows can't find <b>{mic}</b> right now. Plug it in, or switch it on if it's wireless. This goes away by itself.": "Windows 現在找不到 <b>{mic}</b>。請插上，如果是無線的就打開它。這則提示會自己消失。",
   "Your headset is off or its mic is muted. Turn it on or unmute it. Still nothing? Click <b>Repair</b>.": "耳機關著，或者麥克風靜音了。請打開耳機或取消靜音。還是沒聲音？按 <b>修復</b>。",
   "The download was cut off before the end. Try again.": "下載在完成前中斷了。請再試一次。",
-  "You can change the proxy in Settings > Connection.": "你可以在「設定」>「連線」中變更代理。"
+  "You can change the proxy in Settings > Connection.": "你可以在「設定」>「連線」中變更代理。",
+  "the pack's file is damaged, so it wasn't kept": "包檔案已損毀，因此未保留"
 }

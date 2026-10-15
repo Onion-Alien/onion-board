@@ -3439,5 +3439,6 @@
   "Windows can't find <b>{mic}</b> right now. Plug it in, or switch it on if it's wireless. This goes away by itself.": "Τα Windows δεν βρίσκουν το <b>{mic}</b> αυτή τη στιγμή. Σύνδεσέ το ή άνοιξέ το αν είναι ασύρματο. Αυτό φεύγει μόνο του.",
   "Your headset is off or its mic is muted. Turn it on or unmute it. Still nothing? Click <b>Repair</b>.": "Τα ακουστικά σου είναι κλειστά ή το μικρόφωνό τους σε σίγαση. Άνοιξέ τα ή βγάλε τη σίγαση. Ακόμα τίποτα; Κάνε κλικ στο <b>Επισκευή</b>.",
   "The download was cut off before the end. Try again.": "Η λήψη διακόπηκε πριν τελειώσει. Δοκιμάστε ξανά.",
-  "You can change the proxy in Settings > Connection.": "Μπορείτε να αλλάξετε τον διακομιστή μεσολάβησης στις Ρυθμίσεις > Σύνδεση."
+  "You can change the proxy in Settings > Connection.": "Μπορείτε να αλλάξετε τον διακομιστή μεσολάβησης στις Ρυθμίσεις > Σύνδεση.",
+  "the pack's file is damaged, so it wasn't kept": "το αρχείο του πακέτου είναι κατεστραμμένο, οπότε δεν κρατήθηκε"
 }
