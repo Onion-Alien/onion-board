@@ -13,7 +13,8 @@ from PySide6.QtGui import QColor, QFont, QPainter, QPainterPath, QRegion
 from shiboken6 import isValid as qt_valid
 from PySide6.QtWidgets import (QBoxLayout, QCheckBox, QComboBox, QFrame, QGridLayout,
                                QHBoxLayout, QLabel, QLayout, QListWidget, QPushButton,
-                               QSizePolicy, QSlider, QSpinBox, QStyle, QVBoxLayout, QWidget)
+                               QSizePolicy, QSlider, QSpinBox, QStackedWidget, QStyle,
+                               QVBoxLayout, QWidget)
 
 from soundboard import theme
 from soundboard.eq import BAND_LABELS as EQ_LABELS
@@ -86,6 +87,21 @@ def bar(margins=(10, 5, 12, 6)) -> tuple[QFrame, QHBoxLayout]:
     h.setContentsMargins(*margins)
     h.setSpacing(10)
     return f, h
+
+
+class ShownStack(QStackedWidget):
+    """A QStackedWidget whose height at a width is its page on show's. Qt's asks every
+    page, and the hidden ones' wrapped text was laid out again at each new width: on
+    every step of a window resize, for the window's pages, the Settings page and the
+    tabs. Its smallest size still counts every page, as Qt's does."""
+
+    def heightForWidth(self, w: int) -> int:
+        page, lay = self.currentWidget(), self.layout()
+        if page is None or lay is None or not page.hasHeightForWidth():
+            return super().heightForWidth(w)
+        m, lm = self.contentsMargins(), lay.contentsMargins()
+        h = page.heightForWidth(w - m.left() - m.right() - lm.left() - lm.right())
+        return h + m.top() + m.bottom() + lm.top() + lm.bottom() if h >= 0 else h
 
 
 class Flow(QLayout):

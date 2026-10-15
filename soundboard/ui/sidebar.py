@@ -17,8 +17,8 @@ from dataclasses import dataclass
 from PySide6.QtCore import QEvent, QObject, QRectF, QSize, Qt, QTimer, Signal
 from PySide6.QtGui import QColor, QFont, QFontMetrics, QMouseEvent, QPainter, QPen
 from PySide6.QtWidgets import (QApplication, QBoxLayout, QFrame, QHBoxLayout, QLabel, QPushButton,
-                               QSizePolicy, QSpacerItem, QTabWidget, QToolButton,
-                               QVBoxLayout, QWidget)
+                               QSizePolicy, QSpacerItem, QStyle, QStyleOptionTabWidgetFrame,
+                               QTabWidget, QToolButton, QVBoxLayout, QWidget)
 
 from soundboard import theme
 from soundboard.i18n import _
@@ -74,6 +74,26 @@ class SideTabs(QTabWidget):
         if obj is self._bar and e.type() == QEvent.Type.Show:
             self._bar.hide()   # QTabWidget shows it again when it lays itself out
         return False
+
+    def heightForWidth(self, w: int) -> int:
+        """Qt's sum (the page, the bar and the frame), for the page showing only. Qt
+        asks every page, and on the Radio, Triggers and Voice tabs (the ones whose height
+        follows their width) every resize step laid out the text of all of them again,
+        the hidden tabs' too: ~10 frames a second while dragging the window's edge. The
+        tabs that aren't showing still count in the window's smallest size."""
+        page = self.currentWidget()
+        if page is None or not page.hasHeightForWidth():
+            return super().heightForWidth(w)
+        opt = QStyleOptionTabWidgetFrame()
+        self.initStyleOption(opt)
+        opt.state = QStyle.StateFlag.State_None
+        pad = self.style().sizeFromContents(QStyle.ContentsType.CT_TabWidget, opt,
+                                            QSize(0, 0), self)
+        corners = [c.sizeHint().height() for c in (self.cornerWidget(Qt.Corner.TopLeftCorner),
+                                                    self.cornerWidget(Qt.Corner.TopRightCorner))
+                   if c is not None]
+        bar = max([self._bar.sizeHint().height(), *corners])   # (North, as here)
+        return page.heightForWidth(w - pad.width()) + bar + pad.height()
 
     def setCurrentIndex(self, i):
         super().setCurrentIndex(i)
