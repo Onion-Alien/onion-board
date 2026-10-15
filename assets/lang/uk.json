@@ -1251,7 +1251,6 @@
   "Take it out of the queue": "Зняти з черги",
   "Takes the add-on out of Onion Board: phones can't play your pads any more. Paired phones are kept for when you get it again.": "Вилучає надбудову з Onion Board: телефони більше не можуть грати на ваших планшетах. Спарені телефони зберігаються, коли ви їх знову отримаєте.",
   "Teal": "Чирок",
-  "Tell me when a new version is out. Nothing is downloaded until I press Update now.": "Скажи мені, коли вийде нова версія. Нічого не завантажується, доки я не натисну Оновити зараз.",
   "Testing…": "Тестування…",
   "That restore point is gone.": "Ця точка відновлення зникла.",
   "That's it. Add sounds by dragging files onto the window, then click one to play it. You can open this guide again any time from the <b>Setup</b> tab (<b>Step-by-step guide</b>).": "Ось і все. Додайте звуки, перетягнувши файли у вікно, а потім натисніть один, щоб відтворити його. Ви можете будь-коли знову відкрити цей посібник на вкладці <b>«Налаштування»</b> ( <b>Покроковий посібник</b> ).",
@@ -1279,7 +1278,6 @@
   "They're copied into Onion Board; {name} keeps its own. Ones already here are skipped, and a hotkey something here already uses is left off.": "Вони скопійовані в Onion Board; {name} зберігає своє. Ті, які вже тут, пропускаються, а гаряча клавіша, яку тут уже використовує, не працює.",
   "This desktop has no system tray, so closing the window quits.": "Цей робочий стіл не має системного лотка, тому закриття вікна припиняє роботу.",
   "This is Onion Board {version}. With the box ticked it asks GitHub every few hours whether a newer version is out and tells you (with a banner if it's an important fix). This copy runs from source, so it only tells you: update it with git pull.": "Це цибулева дошка {version} . Якщо прапорець позначено, він кожні кілька годин запитує GitHub, чи вийшла новіша версія, і повідомляє вас (з банером, якщо це важливе виправлення). Ця копія запускається з джерела, тому вона лише повідомляє вам: оновіть її за допомогою git pull.",
-  "This is Onion Board {version}. With the box ticked it asks GitHub every few hours whether a newer version is out and tells you (with a banner if it's an important fix). Update now downloads it and checks it's the file GitHub lists; you pick when the app restarts to install it. Your sounds and settings are kept.": "Це цибулева дошка {version} . Якщо прапорець позначено, він кожні кілька годин запитує GitHub, чи вийшла новіша версія, і повідомляє вас (з банером, якщо це важливе виправлення). Оновлення тепер завантажує його та перевіряє, що це файл зі списку GitHub; ви вибираєте, коли програма перезавантажується, щоб її встановити. Ваші звуки та налаштування зберігаються.",
   "Through a proxy": "Через проксі",
   "Through a proxy or Tor, everything the app fetches (searches, downloads, radio, updates) goes through it, and site names are looked up there, not on this PC. If it can't be reached, nothing is fetched: the app never quietly goes direct. This PC's own addresses (127.0.0.1) stay direct.": "Через проксі-сервер або Tor все, що отримує програма (пошук, завантаження, радіо, оновлення), проходить через нього, і назви сайтів шукаються там, а не на цьому ПК. Якщо його неможливо отримати, нічого не буде отримано: програма ніколи не переходить тихо безпосередньо. Власні адреси цього ПК (127.0.0.1) залишаються прямими.",
   "TikTok sounds": "Звуки TikTok",
@@ -3535,5 +3533,10 @@
   "PyPI sent an answer that couldn't be read": "PyPI надіслав відповідь, яку не вдалося прочитати",
   "Use it only when YouTube or another site stopped working and Update now doesn't fix it. Reinstall goes back to an approved version.": "Використовуй це лише тоді, коли YouTube чи інший сайт перестав працювати, а Оновити зараз не допомагає. Перевстановити поверне схвалену версію.",
   "Warning: this gets the newest yt-dlp from PyPI right away. Onion Board hasn't approved it yet, so nobody has checked it's safe. It may fix downloads that stopped working.": "Увага: це одразу завантажує найновіший yt-dlp з PyPI. Onion Board його ще не схвалив, тож ніхто не перевірив, чи він безпечний. Він може полагодити завантаження, які перестали працювати.",
-  "no wheel for {package}": "немає колеса для {package}"
+  "no wheel for {package}": "немає колеса для {package}",
+  "Install updates by themselves": "Встановлювати оновлення самостійно",
+  "Onion Board {version} is out: downloading it now. The app restarts by itself to install it when it's done.": "Вийшов Onion Board {version}: зараз завантажується. Коли завершить, застосунок сам перезапуститься й установить його.",
+  "Tell me when a new version is out.": "Повідомляти, коли вийде нова версія.",
+  "This is Onion Board {version}. With the box ticked it asks GitHub whether a newer version is out each time it starts and every hour after, and tells you (with a banner if it's an important fix). Every update is checked against the file GitHub lists. Your sounds and settings are kept.": "Це Onion Board {version}. З позначкою він питає GitHub, чи вийшла новіша версія, під час кожного запуску, а потім щогодини, і повідомляє тобі (з банером, якщо це важливе виправлення). Кожне оновлення звіряється з файлом, указаним на GitHub. Твої звуки й налаштування зберігаються.",
+  "When Onion Board starts and a new version is out, it downloads it and restarts to install it, unless a sound is playing.": "Коли Onion Board запускається і вийшла нова версія, він завантажує її та перезапускається, щоб установити, якщо тільки не грає звук."
 }

@@ -674,9 +674,10 @@ def main():
         # starts it once the guide is closed
         QTimer.singleShot(500, w.impctl.import_queued)
     QTimer.singleShot(600, w.updctl.after_update)   # "Updated to …" after an update restarted it
-    # new versions (updates.py): unless unticked, at most every hour (updates.EVERY_S),
-    # also for an app left running for days
-    QTimer.singleShot(45_000, w.updctl.check_updates)
+    # new versions (updates.py): unless unticked, as it starts (what that finds installs
+    # itself) and then at most every hour (updates.EVERY_S), also for an app left
+    # running for days
+    QTimer.singleShot(8_000, lambda: w.updctl.check_updates(launch=True))
     QTimer.singleShot(60_000, w.send_usage)   # the anonymous daily count (usage.py)
     w.tick_usage()   # how long it's open, for the daily count: from now
     open_timer = QTimer(w)

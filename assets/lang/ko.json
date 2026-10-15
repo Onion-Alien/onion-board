@@ -1205,7 +1205,6 @@
   "Take it out of the queue": "대기열에서 꺼내세요",
   "Takes the add-on out of Onion Board: phones can't play your pads any more. Paired phones are kept for when you get it again.": "Onion Board에서 추가 기능을 제거합니다. 휴대폰에서는 더 이상 패드를 재생할 수 없습니다. 페어링된 휴대폰은 다시 구입했을 때를 대비해 보관됩니다.",
   "Teal": "물오리",
-  "Tell me when a new version is out. Nothing is downloaded until I press Update now.": "새 버전이 나오면 알려주세요. 지금 업데이트를 누를 때까지 아무것도 다운로드되지 않습니다.",
   "Testing…": "테스트 중…",
   "That restore point is gone.": "해당 복원 지점이 사라졌습니다.",
   "That's it. Add sounds by dragging files onto the window, then click one to play it. You can open this guide again any time from the <b>Setup</b> tab (<b>Step-by-step guide</b>).": "그게 다야. 파일을 창으로 드래그하여 사운드를 추가한 다음 하나를 클릭하여 재생하세요. 언제든지 <b>설정</b> 탭에서 이 가이드를 다시 열 수 있습니다( <b>단계별 가이드</b> ).",
@@ -1233,7 +1232,6 @@
   "They're copied into Onion Board; {name} keeps its own. Ones already here are skipped, and a hotkey something here already uses is left off.": "Onion Board에 복사됩니다. {name} 은(는) 자체적으로 유지합니다. 여기에 이미 있는 단축키는 건너뛰고, 여기서 이미 사용하고 있는 단축키는 생략합니다.",
   "This desktop has no system tray, so closing the window quits.": "이 바탕 화면에는 시스템 트레이가 없으므로 창 닫기가 종료됩니다.",
   "This is Onion Board {version}. With the box ticked it asks GitHub every few hours whether a newer version is out and tells you (with a banner if it's an important fix). This copy runs from source, so it only tells you: update it with git pull.": "어니언보드 {version} 입니다. 확인란을 선택하면 몇 시간마다 GitHub에 최신 버전이 있는지 묻고 알려줍니다(중요한 수정 사항인 경우 배너와 함께). 이 복사본은 소스에서 실행되므로 git pull로 업데이트하라는 내용만 알려줍니다.",
-  "This is Onion Board {version}. With the box ticked it asks GitHub every few hours whether a newer version is out and tells you (with a banner if it's an important fix). Update now downloads it and checks it's the file GitHub lists; you pick when the app restarts to install it. Your sounds and settings are kept.": "어니언보드 {version} 입니다. 확인란을 선택하면 몇 시간마다 GitHub에 최신 버전이 있는지 묻고 알려줍니다(중요한 수정 사항인 경우 배너와 함께). 이제 업데이트가 이를 다운로드하고 GitHub 목록에 있는 파일인지 확인합니다. 앱이 다시 시작되는 시점을 선택하여 설치하세요. 소리와 설정은 유지됩니다.",
   "Through a proxy": "프록시를 통해",
   "Through a proxy or Tor, everything the app fetches (searches, downloads, radio, updates) goes through it, and site names are looked up there, not on this PC. If it can't be reached, nothing is fetched: the app never quietly goes direct. This PC's own addresses (127.0.0.1) stay direct.": "프록시나 Tor를 통해 앱이 가져오는 모든 것(검색, 다운로드, 라디오, 업데이트)이 이를 통과하며 사이트 이름은 이 PC가 아닌 그곳에서 조회됩니다. 도달할 수 없는 경우 아무것도 가져오지 않습니다. 앱은 조용히 직접 이동하지 않습니다. 이 PC의 자체 주소(127.0.0.1)는 그대로 유지됩니다.",
   "TikTok sounds": "틱톡 소리",
@@ -3383,5 +3381,10 @@
   "PyPI sent an answer that couldn't be read": "PyPI가 읽을 수 없는 답변을 보냈습니다",
   "Use it only when YouTube or another site stopped working and Update now doesn't fix it. Reinstall goes back to an approved version.": "YouTube나 다른 사이트가 안 되고 지금 업데이트로도 안 고쳐질 때만 쓰세요. 재설치를 누르면 승인된 버전으로 돌아가요.",
   "Warning: this gets the newest yt-dlp from PyPI right away. Onion Board hasn't approved it yet, so nobody has checked it's safe. It may fix downloads that stopped working.": "경고: PyPI에서 최신 yt-dlp를 바로 받아요. Onion Board가 아직 승인하지 않아서 안전한지 아무도 확인하지 않았어요. 멈춘 다운로드가 다시 될 수도 있어요.",
-  "no wheel for {package}": "{package} 에 바퀴가 없습니다"
+  "no wheel for {package}": "{package} 에 바퀴가 없습니다",
+  "Install updates by themselves": "업데이트 자동 설치",
+  "Onion Board {version} is out: downloading it now. The app restarts by itself to install it when it's done.": "Onion Board {version}이(가) 나왔습니다: 지금 내려받는 중입니다. 다 되면 앱이 스스로 다시 시작해 설치합니다.",
+  "Tell me when a new version is out.": "새 버전이 나오면 알려 주기.",
+  "This is Onion Board {version}. With the box ticked it asks GitHub whether a newer version is out each time it starts and every hour after, and tells you (with a banner if it's an important fix). Every update is checked against the file GitHub lists. Your sounds and settings are kept.": "Onion Board {version}입니다. 체크하면 시작할 때마다, 그리고 그 뒤 1시간마다 GitHub에 새 버전이 있는지 묻고 알려 줍니다(중요한 수정이면 배너로). 모든 업데이트는 GitHub에 올라온 파일과 대조해 확인합니다. 사운드와 설정은 그대로 유지됩니다.",
+  "When Onion Board starts and a new version is out, it downloads it and restarts to install it, unless a sound is playing.": "Onion Board가 시작될 때 새 버전이 나와 있으면 내려받고 다시 시작해 설치합니다. 사운드가 재생 중이면 하지 않습니다."
 }

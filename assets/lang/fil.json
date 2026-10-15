@@ -1084,7 +1084,6 @@
   "Tap to open, tap again to close": "I-tap para buksan, i-tap ulit para isara",
   "Tape mode: speed changes the pitch too (nightcore / slowed)": "Tape mode: binabago rin ng bilis ang pitch (nightcore / slowed)",
   "Teal": "Teal",
-  "Tell me when a new version is out. Nothing is downloaded until I press Update now.": "Sabihan ako kapag may bagong version. Walang dina-download hanggang pindutin ko ang Update now.",
   "Test": "Subukan",
   "Testing…": "Sinusubukan…",
   "That restore point is gone.": "Wala na ang restore point na 'yan.",
@@ -1131,7 +1130,6 @@
   "They're copied into Onion Board; {name} keeps its own. Ones already here are skipped, and a hotkey something here already uses is left off.": "Kinokopya sila sa Onion Board; itinatago ng {name} ang sarili nito. Nilalaktawan ang mga nandito na, at hindi isinasama ang hotkey na gamit na ng iba dito.",
   "This desktop has no system tray, so closing the window quits.": "Walang system tray ang desktop na ito, kaya mag-quit ito kapag isinara ang window.",
   "This is Onion Board {version}. With the box ticked it asks GitHub every few hours whether a newer version is out and tells you (with a banner if it's an important fix). This copy runs from source, so it only tells you: update it with git pull.": "Ito ang Onion Board {version}. Kapag naka-tick ang box, tinatanong nito ang GitHub kada ilang oras kung may bagong version at sinasabihan ka (may banner kung importanteng fix). Tumatakbo ang kopyang ito mula sa source, kaya sinasabihan ka lang nito: i-update gamit ang git pull.",
-  "This is Onion Board {version}. With the box ticked it asks GitHub every few hours whether a newer version is out and tells you (with a banner if it's an important fix). Update now downloads it and checks it's the file GitHub lists; you pick when the app restarts to install it. Your sounds and settings are kept.": "Ito ang Onion Board {version}. Kapag naka-tick ang box, tinatanong nito ang GitHub kada ilang oras kung may bagong version at sinasabihan ka (may banner kung importanteng fix). Dina-download ito ng Update now at sinusuri kung ito ang file na nakalista sa GitHub; ikaw ang pipili kung kailan magre-restart ang app para i-install ito. Nananatili ang mga sound at settings mo.",
   "This sound's video isn't there any more": "Wala na ang video ng sound na ito",
   "This version's page on GitHub, in your browser": "Ang page ng version na ito sa GitHub, sa browser mo",
   "This video can't be shown ({value}). The sound plays as normal.": "Hindi maipakita ang video na ito ({value}). Normal na magpe-play ang sound.",
@@ -3459,5 +3457,10 @@
   "PyPI sent an answer that couldn't be read": "Nagpadala ang PyPI ng sagot na hindi mabasa",
   "Use it only when YouTube or another site stopped working and Update now doesn't fix it. Reinstall goes back to an approved version.": "Gamitin lang ito kapag huminto ang YouTube o ibang site at hindi naayos ng Update now. Ibinabalik ng I-reinstall ang isang aprubadong bersyon.",
   "Warning: this gets the newest yt-dlp from PyPI right away. Onion Board hasn't approved it yet, so nobody has checked it's safe. It may fix downloads that stopped working.": "Babala: kinukuha nito agad ang pinakabagong yt-dlp mula sa PyPI. Hindi pa ito inaaprubahan ng Onion Board, kaya walang nakasuri kung ligtas ito. Baka maayos nito ang mga download na huminto sa paggana.",
-  "no wheel for {package}": "walang gulong para sa {package}"
+  "no wheel for {package}": "walang gulong para sa {package}",
+  "Install updates by themselves": "Kusang i-install ang mga update",
+  "Onion Board {version} is out: downloading it now. The app restarts by itself to install it when it's done.": "Labas na ang Onion Board {version}: dina-download na ngayon. Kusang magre-restart ang app para i-install ito kapag tapos na.",
+  "Tell me when a new version is out.": "Sabihan ako kapag may bagong bersyon.",
+  "This is Onion Board {version}. With the box ticked it asks GitHub whether a newer version is out each time it starts and every hour after, and tells you (with a banner if it's an important fix). Every update is checked against the file GitHub lists. Your sounds and settings are kept.": "Ito ang Onion Board {version}. Kapag naka-check ang box, tinatanong nito sa GitHub kung may mas bagong bersyon tuwing nagbubukas ito at bawat oras pagkatapos, at sinasabihan ka (may banner kung mahalagang ayos ito). Bawat update ay sinusuri laban sa file na nakalista sa GitHub. Nananatili ang mga sound at setting mo.",
+  "When Onion Board starts and a new version is out, it downloads it and restarts to install it, unless a sound is playing.": "Kapag nagbukas ang Onion Board at may bagong bersyon, dina-download nito iyon at nagre-restart para i-install, maliban kung may tumutugtog na sound."
 }

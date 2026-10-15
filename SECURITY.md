@@ -226,9 +226,9 @@ account or anything else about you.
     name; Settings' *Audio recovery* (`used/recovery-repair`, `recovery-remove`… and
     `recovery-failed`);
   - Onion Board's own update cancelled, failing to download or to start, its *Copy
-    error*, *Later*, one that didn't finish (`used/update-cancelled`,
-    `update-download-failed`, `update-install-failed`, `update-copy-error`,
-    `update-later`, `update-didnt-finish`), the version clicked for What's new
+    error*, *Later*, one that didn't finish, one installing itself as the app started
+    (`used/update-cancelled`, `update-download-failed`, `update-install-failed`,
+    `update-copy-error`, `update-later`, `update-didnt-finish`, `update-auto`), the version clicked for What's new
     (`used/whats-new`), a restore point saved before an update and one put back
     (`used/restore-point-update`, `restore-point-used`);
   - add-ons: one set up, failing to, repaired, a Python got for it or that failing

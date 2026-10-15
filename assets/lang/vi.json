@@ -1205,7 +1205,6 @@
   "Take it out of the queue": "Đưa nó ra khỏi hàng đợi",
   "Takes the add-on out of Onion Board: phones can't play your pads any more. Paired phones are kept for when you get it again.": "Loại bỏ tiện ích bổ sung khỏi Onion Board: điện thoại không thể phát miếng đệm của bạn nữa. Điện thoại đã ghép nối sẽ được giữ lại khi bạn lấy lại.",
   "Teal": "màu xanh mòng két",
-  "Tell me when a new version is out. Nothing is downloaded until I press Update now.": "Hãy cho tôi biết khi nào có phiên bản mới. Không có gì được tải xuống cho đến khi tôi nhấn Cập nhật ngay.",
   "Testing…": "Đang thử nghiệm…",
   "That restore point is gone.": "Điểm khôi phục đó đã biến mất.",
   "That's it. Add sounds by dragging files onto the window, then click one to play it. You can open this guide again any time from the <b>Setup</b> tab (<b>Step-by-step guide</b>).": "Thế thôi. Thêm âm thanh bằng cách kéo tệp vào cửa sổ, sau đó nhấp vào một tệp để phát. Bạn có thể mở lại hướng dẫn này bất kỳ lúc nào từ tab <b>Thiết lập</b> ( <b>Hướng dẫn từng bước</b> ).",
@@ -1233,7 +1232,6 @@
   "They're copied into Onion Board; {name} keeps its own. Ones already here are skipped, and a hotkey something here already uses is left off.": "Chúng được sao chép vào Onion Board; {name} giữ quyền riêng của mình. Những cái đã có ở đây sẽ bị bỏ qua và một phím nóng nào đó đã sử dụng ở đây sẽ bị bỏ đi.",
   "This desktop has no system tray, so closing the window quits.": "Máy tính để bàn này không có khay hệ thống nên việc đóng cửa sổ sẽ dừng lại.",
   "This is Onion Board {version}. With the box ticked it asks GitHub every few hours whether a newer version is out and tells you (with a banner if it's an important fix). This copy runs from source, so it only tells you: update it with git pull.": "Đây là Onion Board {version} . Với hộp được đánh dấu, cứ sau vài giờ, nó sẽ hỏi GitHub xem có phiên bản mới hơn không và cho bạn biết (kèm biểu ngữ nếu đó là một bản sửa lỗi quan trọng). Bản sao này chạy từ nguồn nên nó chỉ cho bạn biết: cập nhật nó bằng git pull.",
-  "This is Onion Board {version}. With the box ticked it asks GitHub every few hours whether a newer version is out and tells you (with a banner if it's an important fix). Update now downloads it and checks it's the file GitHub lists; you pick when the app restarts to install it. Your sounds and settings are kept.": "Đây là Onion Board {version} . Với hộp được đánh dấu, cứ sau vài giờ, nó sẽ hỏi GitHub xem có phiên bản mới hơn không và cho bạn biết (kèm biểu ngữ nếu đó là một bản sửa lỗi quan trọng). Cập nhật ngay bây giờ sẽ tải xuống và kiểm tra xem đó có phải là tệp danh sách GitHub hay không; bạn chọn thời điểm ứng dụng khởi động lại để cài đặt nó. Âm thanh và cài đặt của bạn được lưu giữ.",
   "Through a proxy": "Thông qua một proxy",
   "Through a proxy or Tor, everything the app fetches (searches, downloads, radio, updates) goes through it, and site names are looked up there, not on this PC. If it can't be reached, nothing is fetched: the app never quietly goes direct. This PC's own addresses (127.0.0.1) stay direct.": "Thông qua proxy hoặc Tor, mọi thứ mà ứng dụng tìm nạp (tìm kiếm, tải xuống, radio, cập nhật) đều đi qua nó và tên trang web được tra cứu ở đó chứ không phải trên PC này. Nếu không thể truy cập được thì sẽ không có gì được tìm nạp: ứng dụng không bao giờ hoạt động trực tiếp một cách lặng lẽ. Địa chỉ riêng của PC này (127.0.0.1) luôn được giữ nguyên.",
   "TikTok sounds": "Âm thanh TikTok",
@@ -3383,5 +3381,10 @@
   "PyPI sent an answer that couldn't be read": "PyPI đã gửi câu trả lời không thể đọc được",
   "Use it only when YouTube or another site stopped working and Update now doesn't fix it. Reinstall goes back to an approved version.": "Chỉ dùng khi YouTube hoặc trang khác ngừng hoạt động và Cập nhật ngay không sửa được. Cài đặt lại sẽ quay về một phiên bản đã duyệt.",
   "Warning: this gets the newest yt-dlp from PyPI right away. Onion Board hasn't approved it yet, so nobody has checked it's safe. It may fix downloads that stopped working.": "Cảnh báo: thao tác này tải ngay yt-dlp mới nhất từ PyPI. Onion Board chưa duyệt bản này nên chưa ai kiểm tra nó có an toàn không. Nó có thể sửa việc tải xuống đã ngừng hoạt động.",
-  "no wheel for {package}": "không có bánh xe cho {package}"
+  "no wheel for {package}": "không có bánh xe cho {package}",
+  "Install updates by themselves": "Tự cài bản cập nhật",
+  "Onion Board {version} is out: downloading it now. The app restarts by itself to install it when it's done.": "Onion Board {version} đã ra: đang tải về. Ứng dụng sẽ tự khởi động lại để cài khi tải xong.",
+  "Tell me when a new version is out.": "Báo cho tôi khi có phiên bản mới.",
+  "This is Onion Board {version}. With the box ticked it asks GitHub whether a newer version is out each time it starts and every hour after, and tells you (with a banner if it's an important fix). Every update is checked against the file GitHub lists. Your sounds and settings are kept.": "Đây là Onion Board {version}. Khi đánh dấu ô này, ứng dụng hỏi GitHub xem có phiên bản mới hơn không mỗi lần khởi động và sau đó mỗi giờ, rồi báo cho bạn (kèm biểu ngữ nếu là bản sửa quan trọng). Mỗi bản cập nhật đều được đối chiếu với tệp GitHub liệt kê. Âm thanh và cài đặt của bạn được giữ nguyên.",
+  "When Onion Board starts and a new version is out, it downloads it and restarts to install it, unless a sound is playing.": "Khi Onion Board khởi động và có phiên bản mới, nó sẽ tải về rồi khởi động lại để cài, trừ khi đang phát âm thanh."
 }

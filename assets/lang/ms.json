@@ -1068,7 +1068,6 @@
   "Tap to open, tap again to close": "Ketik untuk buka, ketik lagi untuk tutup",
   "Tape mode: speed changes the pitch too (nightcore / slowed)": "Mod pita: kelajuan mengubah pic juga (nightcore / slowed)",
   "Teal": "Biru kehijauan",
-  "Tell me when a new version is out. Nothing is downloaded until I press Update now.": "Beritahu saya apabila versi baharu keluar. Tiada apa dimuat turun sehingga saya tekan Kemas kini sekarang.",
   "Test": "Uji",
   "Testing…": "Menguji…",
   "That restore point is gone.": "Titik pemulihan itu sudah tiada.",
@@ -1115,7 +1114,6 @@
   "They're copied into Onion Board; {name} keeps its own. Ones already here are skipped, and a hotkey something here already uses is left off.": "Ia disalin ke dalam Onion Board; {name} mengekalkan miliknya sendiri. Yang sudah ada di sini dilangkau, dan hotkey yang sudah digunakan di sini tidak ditetapkan.",
   "This desktop has no system tray, so closing the window quits.": "Desktop ini tiada dulang sistem, jadi menutup tetingkap akan keluar.",
   "This is Onion Board {version}. With the box ticked it asks GitHub every few hours whether a newer version is out and tells you (with a banner if it's an important fix). This copy runs from source, so it only tells you: update it with git pull.": "Ini Onion Board {version}. Dengan kotak ditanda, ia bertanya GitHub setiap beberapa jam sama ada versi baharu sudah keluar dan memberitahu anda (dengan sepanduk jika ia pembaikan penting). Salinan ini berjalan dari kod sumber, jadi ia hanya memberitahu anda: kemas kininya dengan git pull.",
-  "This is Onion Board {version}. With the box ticked it asks GitHub every few hours whether a newer version is out and tells you (with a banner if it's an important fix). Update now downloads it and checks it's the file GitHub lists; you pick when the app restarts to install it. Your sounds and settings are kept.": "Ini Onion Board {version}. Dengan kotak ditanda, ia bertanya GitHub setiap beberapa jam sama ada versi baharu sudah keluar dan memberitahu anda (dengan sepanduk jika ia pembaikan penting). Kemas kini sekarang memuat turunnya dan menyemak ia fail yang disenaraikan GitHub; anda pilih bila aplikasi dimulakan semula untuk memasangnya. Bunyi dan tetapan anda dikekalkan.",
   "This sound's video isn't there any more": "Video bunyi ini sudah tiada",
   "This version's page on GitHub, in your browser": "Halaman versi ini di GitHub, dalam pelayar anda",
   "This video can't be shown ({value}). The sound plays as normal.": "Video ini tidak boleh ditunjukkan ({value}). Bunyi dimainkan seperti biasa.",
@@ -3383,5 +3381,10 @@
   "PyPI sent an answer that couldn't be read": "PyPI menghantar jawapan yang tidak boleh dibaca",
   "Use it only when YouTube or another site stopped working and Update now doesn't fix it. Reinstall goes back to an approved version.": "Gunakannya hanya apabila YouTube atau laman lain berhenti berfungsi dan Kemas kini sekarang tidak membaikinya. Pasang semula kembali ke versi yang diluluskan.",
   "Warning: this gets the newest yt-dlp from PyPI right away. Onion Board hasn't approved it yet, so nobody has checked it's safe. It may fix downloads that stopped working.": "Amaran: ini terus mengambil yt-dlp terbaharu dari PyPI. Onion Board belum meluluskannya, jadi tiada siapa yang menyemak sama ada ia selamat. Ia mungkin membaiki muat turun yang berhenti berfungsi.",
-  "no wheel for {package}": "tiada roda untuk {package}"
+  "no wheel for {package}": "tiada roda untuk {package}",
+  "Install updates by themselves": "Pasang kemas kini sendiri",
+  "Onion Board {version} is out: downloading it now. The app restarts by itself to install it when it's done.": "Onion Board {version} sudah keluar: sedang dimuat turun. Aplikasi akan mula semula sendiri untuk memasangnya apabila selesai.",
+  "Tell me when a new version is out.": "Beritahu saya apabila ada versi baharu.",
+  "This is Onion Board {version}. With the box ticked it asks GitHub whether a newer version is out each time it starts and every hour after, and tells you (with a banner if it's an important fix). Every update is checked against the file GitHub lists. Your sounds and settings are kept.": "Ini Onion Board {version}. Dengan kotak ditanda, ia bertanya kepada GitHub sama ada versi lebih baharu sudah keluar setiap kali ia dibuka dan setiap jam selepas itu, dan memberitahu anda (dengan sepanduk jika ia pembaikan penting). Setiap kemas kini disemak dengan fail yang disenaraikan oleh GitHub. Bunyi dan tetapan anda kekal.",
+  "When Onion Board starts and a new version is out, it downloads it and restarts to install it, unless a sound is playing.": "Apabila Onion Board dibuka dan ada versi baharu, ia memuat turunnya dan mula semula untuk memasangnya, kecuali ada bunyi sedang dimainkan."
 }

@@ -1320,7 +1320,6 @@
   "Take it out of the queue": "أخرجه من قائمة الانتظار",
   "Takes the add-on out of Onion Board: phones can't play your pads any more. Paired phones are kept for when you get it again.": "إزالة الوظيفة الإضافية من Onion Board: لم تعد الهواتف قادرة على تشغيل منصاتك بعد الآن. يتم الاحتفاظ بالهواتف المقترنة عندما تحصل عليها مرة أخرى.",
   "Teal": "البط البري",
-  "Tell me when a new version is out. Nothing is downloaded until I press Update now.": "أخبرني عندما يخرج الإصدار الجديد. لا يتم تنزيل أي شيء حتى أضغط على التحديث الآن.",
   "Testing…": "اختبار…",
   "That restore point is gone.": "لقد اختفت نقطة الاستعادة هذه.",
   "That's it. Add sounds by dragging files onto the window, then click one to play it. You can open this guide again any time from the <b>Setup</b> tab (<b>Step-by-step guide</b>).": "هذا كل شيء. أضف أصواتًا عن طريق سحب الملفات إلى النافذة، ثم انقر فوق أحد الأصوات لتشغيلها. يمكنك فتح هذا الدليل مرة أخرى في أي وقت من علامة التبويب <b>\"الإعداد\"</b> ( <b>دليل خطوة بخطوة</b> ).",
@@ -1348,7 +1347,6 @@
   "They're copied into Onion Board; {name} keeps its own. Ones already here are skipped, and a hotkey something here already uses is left off.": "لقد تم نسخها إلى Onion Board؛ {name} يحتفظ بنفسه. يتم تخطي المفاتيح الموجودة هنا بالفعل، ويتم إيقاف مفتاح التشغيل السريع الذي يستخدمه هنا بالفعل.",
   "This desktop has no system tray, so closing the window quits.": "لا يحتوي سطح المكتب هذا على علبة نظام، لذا يتم إنهاء إغلاق النافذة.",
   "This is Onion Board {version}. With the box ticked it asks GitHub every few hours whether a newer version is out and tells you (with a banner if it's an important fix). This copy runs from source, so it only tells you: update it with git pull.": "هذا هو Onion Board {version} . مع تحديد المربع، يسأل GitHub كل بضع ساعات ما إذا كان قد تم إصدار إصدار أحدث ويخبرك (مع لافتة إذا كان هذا إصلاحًا مهمًا). تعمل هذه النسخة من المصدر، لذا فهي تخبرك فقط: قم بتحديثها باستخدام git pull.",
-  "This is Onion Board {version}. With the box ticked it asks GitHub every few hours whether a newer version is out and tells you (with a banner if it's an important fix). Update now downloads it and checks it's the file GitHub lists; you pick when the app restarts to install it. Your sounds and settings are kept.": "هذا هو Onion Board {version} . مع تحديد المربع، يسأل GitHub كل بضع ساعات ما إذا كان قد تم إصدار إصدار أحدث ويخبرك (مع لافتة إذا كان هذا إصلاحًا مهمًا). يقوم التحديث الآن بتنزيله والتحقق من أنه الملف الذي يسرده GitHub؛ تختار عند إعادة تشغيل التطبيق لتثبيته. يتم الاحتفاظ بالأصوات والإعدادات الخاصة بك.",
   "Through a proxy": "من خلال وكيل",
   "Through a proxy or Tor, everything the app fetches (searches, downloads, radio, updates) goes through it, and site names are looked up there, not on this PC. If it can't be reached, nothing is fetched: the app never quietly goes direct. This PC's own addresses (127.0.0.1) stay direct.": "من خلال وكيل أو Tor، كل ما يجلبه التطبيق (عمليات البحث والتنزيلات والراديو والتحديثات) يمر عبره، ويتم البحث عن أسماء المواقع هناك، وليس على هذا الكمبيوتر. إذا تعذر الوصول إليه، فلن يتم جلب أي شيء: لا يتم تشغيل التطبيق بشكل مباشر بهدوء. تظل العناوين الخاصة بهذا الكمبيوتر الشخصي (127.0.0.1) مباشرة.",
   "TikTok sounds": "أصوات تيك توك",
@@ -3763,5 +3761,10 @@
   "PyPI sent an answer that couldn't be read": "أرسل PyPI إجابة لا يمكن قراءتها",
   "Use it only when YouTube or another site stopped working and Update now doesn't fix it. Reinstall goes back to an approved version.": "استخدمه فقط عندما يتوقف YouTube أو موقع آخر عن العمل ولا يصلحه حدّث الآن. أعد التثبيت يرجعك إلى نسخة موافق عليها.",
   "Warning: this gets the newest yt-dlp from PyPI right away. Onion Board hasn't approved it yet, so nobody has checked it's safe. It may fix downloads that stopped working.": "تحذير: هذا يجلب أحدث yt-dlp من PyPI فورًا. لم يوافق عليه Onion Board بعد، لذا لم يتحقق أحد من أنه آمن. قد يصلح التنزيلات التي توقفت عن العمل.",
-  "no wheel for {package}": "لا توجد عجلة لـ {package}"
+  "no wheel for {package}": "لا توجد عجلة لـ {package}",
+  "Install updates by themselves": "تثبيت التحديثات تلقائيًا",
+  "Onion Board {version} is out: downloading it now. The app restarts by itself to install it when it's done.": "صدر Onion Board {version}: يجري تنزيله الآن. يعيد التطبيق التشغيل بنفسه لتثبيته عند الانتهاء.",
+  "Tell me when a new version is out.": "أخبرني عندما تصدر نسخة جديدة.",
+  "This is Onion Board {version}. With the box ticked it asks GitHub whether a newer version is out each time it starts and every hour after, and tells you (with a banner if it's an important fix). Every update is checked against the file GitHub lists. Your sounds and settings are kept.": "هذا Onion Board {version}. مع تحديد المربع يسأل GitHub في كل مرة يبدأ فيها ثم كل ساعة إن كانت هناك نسخة أحدث، ويخبرك (مع شريط تنبيه إن كان إصلاحًا مهمًا). يُفحص كل تحديث مقابل الملف الذي يدرجه GitHub. تبقى أصواتك وإعداداتك كما هي.",
+  "When Onion Board starts and a new version is out, it downloads it and restarts to install it, unless a sound is playing.": "عندما يبدأ Onion Board وتتوفر نسخة جديدة، ينزّلها ويعيد التشغيل لتثبيتها، إلا إذا كان صوت قيد التشغيل."
 }

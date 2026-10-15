@@ -1,0 +1,1 @@
+- Updates install themselves: each time Onion Board starts it checks for a new version straight away, and if there is one it downloads it and restarts into it (not while a sound is playing or the window is in the tray). Untick *Install updates by themselves* in Settings → Updates to be asked instead.

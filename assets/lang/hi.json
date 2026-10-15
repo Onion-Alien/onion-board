@@ -1228,7 +1228,6 @@
   "Take it out of the queue": "इसे कतार से बाहर निकालो",
   "Takes the add-on out of Onion Board: phones can't play your pads any more. Paired phones are kept for when you get it again.": "अनियन बोर्ड से ऐड-ऑन हटाता है: फ़ोन अब आपके पैड नहीं चला सकते। युग्मित फ़ोन तब तक रखे जाते हैं जब तक आप इसे दोबारा प्राप्त न कर लें।",
   "Teal": "टील",
-  "Tell me when a new version is out. Nothing is downloaded until I press Update now.": "मुझे बताएं कि नया संस्करण कब आएगा। जब तक मैं अपडेट नाउ नहीं दबाता, कुछ भी डाउनलोड नहीं होता।",
   "Testing…": "परीक्षण...",
   "That restore point is gone.": "वह पुनर्स्थापना बिंदु चला गया है.",
   "That's it. Add sounds by dragging files onto the window, then click one to play it. You can open this guide again any time from the <b>Setup</b> tab (<b>Step-by-step guide</b>).": "इतना ही। फ़ाइलों को विंडो पर खींचकर ध्वनियाँ जोड़ें, फिर उसे चलाने के लिए किसी एक पर क्लिक करें। आप <b>सेटअप</b> टैब ( <b>चरण-दर-चरण मार्गदर्शिका</b> ) से किसी भी समय इस गाइड को दोबारा खोल सकते हैं।",
@@ -1256,7 +1255,6 @@
   "They're copied into Onion Board; {name} keeps its own. Ones already here are skipped, and a hotkey something here already uses is left off.": "उन्हें प्याज बोर्ड में कॉपी किया गया है; {name} अपना रखता है। यहां पहले से मौजूद हॉटकी को छोड़ दिया जाता है, और यहां पहले से ही उपयोग की जाने वाली हॉटकी को छोड़ दिया जाता है।",
   "This desktop has no system tray, so closing the window quits.": "इस डेस्कटॉप में कोई सिस्टम ट्रे नहीं है, इसलिए विंडो बंद करना बंद हो जाता है।",
   "This is Onion Board {version}. With the box ticked it asks GitHub every few hours whether a newer version is out and tells you (with a banner if it's an important fix). This copy runs from source, so it only tells you: update it with git pull.": "यह प्याज बोर्ड {version} है। बॉक्स पर टिक लगाने पर यह हर कुछ घंटों में GitHub से पूछता है कि क्या कोई नया संस्करण आ गया है और आपको बताता है (एक बैनर के साथ यदि यह एक महत्वपूर्ण सुधार है)। यह प्रतिलिपि स्रोत से चलती है, इसलिए यह आपको केवल यह बताती है: इसे गिट पुल के साथ अपडेट करें।",
-  "This is Onion Board {version}. With the box ticked it asks GitHub every few hours whether a newer version is out and tells you (with a banner if it's an important fix). Update now downloads it and checks it's the file GitHub lists; you pick when the app restarts to install it. Your sounds and settings are kept.": "यह प्याज बोर्ड {version} है। बॉक्स पर टिक लगाने पर यह हर कुछ घंटों में GitHub से पूछता है कि क्या कोई नया संस्करण आ गया है और आपको बताता है (एक बैनर के साथ यदि यह एक महत्वपूर्ण सुधार है)। अद्यतन अब इसे डाउनलोड करता है और जांचता है कि यह फ़ाइल GitHub सूची है; आप इसे इंस्टॉल करने के लिए ऐप के पुनरारंभ होने का समय चुनें। आपकी ध्वनियाँ और सेटिंग्स रखी जाती हैं।",
   "Through a proxy": "एक प्रॉक्सी के माध्यम से",
   "Through a proxy or Tor, everything the app fetches (searches, downloads, radio, updates) goes through it, and site names are looked up there, not on this PC. If it can't be reached, nothing is fetched: the app never quietly goes direct. This PC's own addresses (127.0.0.1) stay direct.": "प्रॉक्सी या टोर के माध्यम से, ऐप जो कुछ भी प्राप्त करता है (खोज, डाउनलोड, रेडियो, अपडेट) इसके माध्यम से जाता है, और साइट के नाम वहां देखे जाते हैं, इस पीसी पर नहीं। यदि उस तक नहीं पहुंचा जा सकता है, तो कुछ भी प्राप्त नहीं होता है: ऐप कभी भी चुपचाप सीधे नहीं जाता है। इस पीसी के अपने पते (127.0.0.1) प्रत्यक्ष रहते हैं।",
   "TikTok sounds": "टिकटोक लगता है",
@@ -3459,5 +3457,10 @@
   "PyPI sent an answer that couldn't be read": "पीईपीआई ने एक उत्तर भेजा जिसे पढ़ा नहीं जा सका",
   "Use it only when YouTube or another site stopped working and Update now doesn't fix it. Reinstall goes back to an approved version.": "इसे सिर्फ़ तब इस्तेमाल करें जब YouTube या कोई और साइट काम करना बंद कर दे और अभी अपडेट करें से ठीक न हो। पुनर्स्थापित मंज़ूर किए गए वर्ज़न पर वापस ले जाता है।",
   "Warning: this gets the newest yt-dlp from PyPI right away. Onion Board hasn't approved it yet, so nobody has checked it's safe. It may fix downloads that stopped working.": "चेतावनी: यह PyPI से सबसे नया yt-dlp तुरंत लाता है। Onion Board ने इसे अभी मंज़ूर नहीं किया है, इसलिए किसी ने नहीं जाँचा कि यह सुरक्षित है। इससे बंद हो चुके डाउनलोड ठीक हो सकते हैं।",
-  "no wheel for {package}": "{package} के लिए कोई पहिया नहीं"
+  "no wheel for {package}": "{package} के लिए कोई पहिया नहीं",
+  "Install updates by themselves": "अपडेट अपने आप इंस्टॉल करें",
+  "Onion Board {version} is out: downloading it now. The app restarts by itself to install it when it's done.": "Onion Board {version} आ गया है: अभी डाउनलोड हो रहा है। पूरा होने पर ऐप उसे इंस्टॉल करने के लिए अपने आप रीस्टार्ट होगा।",
+  "Tell me when a new version is out.": "नया वर्ज़न आने पर मुझे बताएं।",
+  "This is Onion Board {version}. With the box ticked it asks GitHub whether a newer version is out each time it starts and every hour after, and tells you (with a banner if it's an important fix). Every update is checked against the file GitHub lists. Your sounds and settings are kept.": "यह Onion Board {version} है। बॉक्स पर टिक होने पर यह हर बार शुरू होने पर और फिर हर घंटे GitHub से पूछता है कि कोई नया वर्ज़न आया है या नहीं, और आपको बताता है (ज़रूरी फ़िक्स हो तो बैनर के साथ)। हर अपडेट को GitHub पर दी गई फ़ाइल से जाँचा जाता है। आपके साउंड और सेटिंग्स बने रहते हैं।",
+  "When Onion Board starts and a new version is out, it downloads it and restarts to install it, unless a sound is playing.": "जब Onion Board शुरू होता है और नया वर्ज़न आया हो, तो वह उसे डाउनलोड करता है और इंस्टॉल करने के लिए रीस्टार्ट होता है, जब तक कोई साउंड न चल रहा हो।"
 }

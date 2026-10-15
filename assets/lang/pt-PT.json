@@ -1084,7 +1084,6 @@
   "Tap to open, tap again to close": "Toca para abrir, toca outra vez para fechar",
   "Tape mode: speed changes the pitch too (nightcore / slowed)": "Modo cassete: a velocidade também muda o tom (nightcore / slowed)",
   "Teal": "Azul-petróleo",
-  "Tell me when a new version is out. Nothing is downloaded until I press Update now.": "Avisa-me quando sair uma versão nova. Nada é transferido até eu carregar em Atualizar agora.",
   "Test": "Testar",
   "Testing…": "A testar…",
   "That restore point is gone.": "Esse ponto de restauro já não existe.",
@@ -1131,7 +1130,6 @@
   "They're copied into Onion Board; {name} keeps its own. Ones already here are skipped, and a hotkey something here already uses is left off.": "São copiados para o Onion Board; o {name} mantém os seus. Os que já estão cá são ignorados, e um atalho que algo aqui já usa fica de fora.",
   "This desktop has no system tray, so closing the window quits.": "Este ambiente de trabalho não tem área de notificação, por isso fechar a janela sai da app.",
   "This is Onion Board {version}. With the box ticked it asks GitHub every few hours whether a newer version is out and tells you (with a banner if it's an important fix). This copy runs from source, so it only tells you: update it with git pull.": "Esta é o Onion Board {version}. Com a caixa marcada, pergunta ao GitHub de poucas em poucas horas se saiu uma versão mais recente e avisa-te (com uma faixa se for uma correção importante). Esta cópia corre a partir do código-fonte, por isso só te avisa: atualiza-a com git pull.",
-  "This is Onion Board {version}. With the box ticked it asks GitHub every few hours whether a newer version is out and tells you (with a banner if it's an important fix). Update now downloads it and checks it's the file GitHub lists; you pick when the app restarts to install it. Your sounds and settings are kept.": "Esta é o Onion Board {version}. Com a caixa marcada, pergunta ao GitHub de poucas em poucas horas se saiu uma versão mais recente e avisa-te (com uma faixa se for uma correção importante). Atualizar agora transfere-a e verifica se é o ficheiro que o GitHub indica; tu escolhes quando a app reinicia para a instalar. Os teus sons e definições são mantidos.",
   "This sound's video isn't there any more": "O vídeo deste som já não está lá",
   "This version's page on GitHub, in your browser": "A página desta versão no GitHub, no teu browser",
   "This video can't be shown ({value}). The sound plays as normal.": "Este vídeo não pode ser mostrado ({value}). O som toca normalmente.",
@@ -3459,5 +3457,10 @@
   "PyPI sent an answer that couldn't be read": "O PyPI enviou uma resposta que não pôde ser lida",
   "Use it only when YouTube or another site stopped working and Update now doesn't fix it. Reinstall goes back to an approved version.": "Usa só quando o YouTube ou outro site deixou de funcionar e Atualizar agora não resolve. Reinstalar volta a uma versão aprovada.",
   "Warning: this gets the newest yt-dlp from PyPI right away. Onion Board hasn't approved it yet, so nobody has checked it's safe. It may fix downloads that stopped working.": "Atenção: isto vai buscar já o yt-dlp mais recente ao PyPI. O Onion Board ainda não o aprovou, por isso ninguém verificou se é seguro. Pode resolver transferências que deixaram de funcionar.",
-  "no wheel for {package}": "sem roda para {package}"
+  "no wheel for {package}": "sem roda para {package}",
+  "Install updates by themselves": "Instalar atualizações sozinho",
+  "Onion Board {version} is out: downloading it now. The app restarts by itself to install it when it's done.": "Saiu o Onion Board {version}: a transferir agora. A app reinicia sozinha para o instalar quando terminar.",
+  "Tell me when a new version is out.": "Avisa-me quando sair uma versão nova.",
+  "This is Onion Board {version}. With the box ticked it asks GitHub whether a newer version is out each time it starts and every hour after, and tells you (with a banner if it's an important fix). Every update is checked against the file GitHub lists. Your sounds and settings are kept.": "Este é o Onion Board {version}. Com a caixa marcada, pergunta ao GitHub se há uma versão mais recente sempre que abre e depois de hora a hora, e avisa-te (com uma faixa se for uma correção importante). Cada atualização é verificada com o ficheiro listado no GitHub. Os teus sons e definições mantêm-se.",
+  "When Onion Board starts and a new version is out, it downloads it and restarts to install it, unless a sound is playing.": "Quando o Onion Board abre e há uma versão nova, transfere-a e reinicia para a instalar, a não ser que esteja a tocar um som."
 }

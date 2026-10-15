@@ -1204,7 +1204,6 @@
   "Take it out of the queue": "從佇列移除",
   "Takes the add-on out of Onion Board: phones can't play your pads any more. Paired phones are kept for when you get it again.": "從 Onion Board 移除這個附加元件：手機將無法再播放你的按鈕。配對的手機會保留，等你再次取得時使用。",
   "Teal": "藍綠色",
-  "Tell me when a new version is out. Nothing is downloaded until I press Update now.": "有新版本時通知我。在我按「立即更新」之前不會下載任何東西。",
   "Testing…": "測試中…",
   "That restore point is gone.": "那個還原點已經不在了。",
   "That's it. Add sounds by dragging files onto the window, then click one to play it. You can open this guide again any time from the <b>Setup</b> tab (<b>Step-by-step guide</b>).": "就這樣。把檔案拖到視窗上來加入音效，然後點一下就能播放。你隨時可以從<b>設置</b>分頁（<b>逐步教學</b>）再次開啟這份教學。",
@@ -1232,7 +1231,6 @@
   "They're copied into Onion Board; {name} keeps its own. Ones already here are skipped, and a hotkey something here already uses is left off.": "它們會被複製到 Onion Board；{name} 會保留它自己的那份。已經有的會略過，這裡已經被使用的快速鍵也不會設定。",
   "This desktop has no system tray, so closing the window quits.": "這個桌面沒有系統匣，所以關閉視窗就會結束程式。",
   "This is Onion Board {version}. With the box ticked it asks GitHub every few hours whether a newer version is out and tells you (with a banner if it's an important fix). This copy runs from source, so it only tells you: update it with git pull.": "這是 Onion Board {version}。勾選這個方塊後，它每隔幾小時會向 GitHub 查詢是否有新版本並通知你（如果是重要修正，會顯示橫幅）。這份是從原始碼執行的，所以只會通知你：請用 git pull 更新。",
-  "This is Onion Board {version}. With the box ticked it asks GitHub every few hours whether a newer version is out and tells you (with a banner if it's an important fix). Update now downloads it and checks it's the file GitHub lists; you pick when the app restarts to install it. Your sounds and settings are kept.": "這是 Onion Board {version}。勾選這個方塊後，它每隔幾小時會向 GitHub 查詢是否有新版本並通知你（如果是重要修正，會顯示橫幅）。「立即更新」會下載它並確認是 GitHub 上列出的檔案；由你決定程式何時重新啟動來安裝。你的音效和設定都會保留。",
   "Through a proxy": "透過代理伺服器",
   "Through a proxy or Tor, everything the app fetches (searches, downloads, radio, updates) goes through it, and site names are looked up there, not on this PC. If it can't be reached, nothing is fetched: the app never quietly goes direct. This PC's own addresses (127.0.0.1) stay direct.": "透過代理伺服器或 Tor 時，程式抓取的所有東西（搜尋、下載、電台、更新）都會經過它，網站名稱也會在那裡查詢，而不是在這台電腦上。如果連不上，就什麼都不會抓取：程式絕不會偷偷改成直接連線。這台電腦自己的位址（127.0.0.1）會保持直接連線。",
   "TikTok sounds": "TikTok 音效",
@@ -3383,5 +3381,10 @@
   "PyPI sent an answer that couldn't be read": "PyPI 發送了無法讀取的答案",
   "Use it only when YouTube or another site stopped working and Update now doesn't fix it. Reinstall goes back to an approved version.": "只在 YouTube 或其他網站失效、且立即更新也修不好時使用。重新安裝會回到已核准的版本。",
   "Warning: this gets the newest yt-dlp from PyPI right away. Onion Board hasn't approved it yet, so nobody has checked it's safe. It may fix downloads that stopped working.": "警告：這會立即從 PyPI 取得最新的 yt-dlp。Onion Board 還沒核准它，所以沒人檢查過它是否安全。它可能修好已經失效的下載。",
-  "no wheel for {package}": "{package}沒有輪子"
+  "no wheel for {package}": "{package}沒有輪子",
+  "Install updates by themselves": "自動安裝更新",
+  "Onion Board {version} is out: downloading it now. The app restarts by itself to install it when it's done.": "Onion Board {version} 已發布：正在下載。完成後應用程式會自動重新啟動來安裝。",
+  "Tell me when a new version is out.": "有新版本時告訴我。",
+  "This is Onion Board {version}. With the box ticked it asks GitHub whether a newer version is out each time it starts and every hour after, and tells you (with a banner if it's an important fix). Every update is checked against the file GitHub lists. Your sounds and settings are kept.": "這是 Onion Board {version}。勾選後，它會在每次啟動時以及之後每小時向 GitHub 查詢是否有新版本，並告訴你（如果是重要修正會顯示橫幅）。每個更新都會與 GitHub 列出的檔案核對。你的音效和設定都會保留。",
+  "When Onion Board starts and a new version is out, it downloads it and restarts to install it, unless a sound is playing.": "Onion Board 啟動時如果有新版本，會下載並重新啟動來安裝，正在播放音效時除外。"
 }

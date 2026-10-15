@@ -1100,7 +1100,6 @@
   "Tap to open, tap again to close": "Ťukni pro otevření, znovu pro zavření",
   "Tape mode: speed changes the pitch too (nightcore / slowed)": "Režim kazety: rychlost mění i výšku (nightcore / slowed)",
   "Teal": "Tyrkysová",
-  "Tell me when a new version is out. Nothing is downloaded until I press Update now.": "Dej mi vědět, když vyjde nová verze. Nic se nestáhne, dokud nestisknu Aktualizovat teď.",
   "Test": "Test",
   "Testing…": "Testuji…",
   "That restore point is gone.": "Ten bod obnovení už neexistuje.",
@@ -1147,7 +1146,6 @@
   "They're copied into Onion Board; {name} keeps its own. Ones already here are skipped, and a hotkey something here already uses is left off.": "Zkopírují se do Onion Board; {name} si nechá svoje. Ty, které už tu jsou, se přeskočí, a zkratka, kterou tu už něco používá, se vynechá.",
   "This desktop has no system tray, so closing the window quits.": "Tohle prostředí nemá oznamovací oblast, takže zavření okna aplikaci ukončí.",
   "This is Onion Board {version}. With the box ticked it asks GitHub every few hours whether a newer version is out and tells you (with a banner if it's an important fix). This copy runs from source, so it only tells you: update it with git pull.": "Tohle je Onion Board {version}. Se zaškrtnutým políčkem se každých pár hodin zeptá GitHubu, jestli nevyšla novější verze, a řekne ti to (s bannerem, pokud jde o důležitou opravu). Tahle kopie běží ze zdrojového kódu, takže ti to jen řekne: aktualizuj ji přes git pull.",
-  "This is Onion Board {version}. With the box ticked it asks GitHub every few hours whether a newer version is out and tells you (with a banner if it's an important fix). Update now downloads it and checks it's the file GitHub lists; you pick when the app restarts to install it. Your sounds and settings are kept.": "Tohle je Onion Board {version}. Se zaškrtnutým políčkem se každých pár hodin zeptá GitHubu, jestli nevyšla novější verze, a řekne ti to (s bannerem, pokud jde o důležitou opravu). Aktualizovat teď ji stáhne a ověří, že je to soubor, který uvádí GitHub; kdy se aplikace restartuje a nainstaluje ji, vybíráš ty. Tvoje zvuky a nastavení zůstanou.",
   "This sound's video isn't there any more": "Video tohoto zvuku už tu není",
   "This version's page on GitHub, in your browser": "Stránka této verze na GitHubu, v prohlížeči",
   "This video can't be shown ({value}). The sound plays as normal.": "Toto video nejde zobrazit ({value}). Zvuk hraje normálně.",
@@ -3535,5 +3533,10 @@
   "PyPI sent an answer that couldn't be read": "PyPI odeslal odpověď, kterou nelze přečíst",
   "Use it only when YouTube or another site stopped working and Update now doesn't fix it. Reinstall goes back to an approved version.": "Použij to jen tehdy, když YouTube nebo jiný web přestal fungovat a Aktualizovat teď nepomůže. Přeinstalovat vrátí schválenou verzi.",
   "Warning: this gets the newest yt-dlp from PyPI right away. Onion Board hasn't approved it yet, so nobody has checked it's safe. It may fix downloads that stopped working.": "Pozor: tímhle se hned stáhne nejnovější yt-dlp z PyPI. Onion Board ho ještě neschválil, takže nikdo nezkontroloval, jestli je bezpečný. Může opravit stahování, které přestalo fungovat.",
-  "no wheel for {package}": "žádné kolo pro {package}"
+  "no wheel for {package}": "žádné kolo pro {package}",
+  "Install updates by themselves": "Instalovat aktualizace samy",
+  "Onion Board {version} is out: downloading it now. The app restarts by itself to install it when it's done.": "Onion Board {version} je venku: teď se stahuje. Až bude hotovo, aplikace se sama restartuje a nainstaluje ji.",
+  "Tell me when a new version is out.": "Řekni mi, když vyjde nová verze.",
+  "This is Onion Board {version}. With the box ticked it asks GitHub whether a newer version is out each time it starts and every hour after, and tells you (with a banner if it's an important fix). Every update is checked against the file GitHub lists. Your sounds and settings are kept.": "Tohle je Onion Board {version}. Se zaškrtnutím se při každém spuštění a pak každou hodinu ptá GitHubu, jestli je venku novější verze, a dá ti vědět (s pruhem, pokud jde o důležitou opravu). Každá aktualizace se kontroluje podle souboru, který GitHub uvádí. Tvoje zvuky a nastavení zůstanou.",
+  "When Onion Board starts and a new version is out, it downloads it and restarts to install it, unless a sound is playing.": "Když se Onion Board spustí a je venku nová verze, stáhne ji a restartuje se, aby ji nainstaloval, pokud zrovna nehraje zvuk."
 }

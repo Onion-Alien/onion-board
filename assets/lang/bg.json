@@ -1010,7 +1010,6 @@
   "Tap to open, tap again to close": "Докосни, за да отвориш, докосни пак, за да затвориш",
   "Tape mode: speed changes the pitch too (nightcore / slowed)": "Режим касета: скоростта променя и тона (nightcore / slowed)",
   "Teal": "Синьозелено",
-  "Tell me when a new version is out. Nothing is downloaded until I press Update now.": "Кажи ми, когато излезе нова версия. Нищо не се изтегля, докато не натисна Обнови сега.",
   "Test": "Тествай",
   "Testing…": "Тествам…",
   "That restore point is gone.": "Тази точка за възстановяване вече я няма.",
@@ -1057,7 +1056,6 @@
   "They're copied into Onion Board; {name} keeps its own. Ones already here are skipped, and a hotkey something here already uses is left off.": "Копират се в Onion Board; {name} си запазва своите. Тези, които вече са тук, се пропускат, а бърз клавиш, който нещо тук вече ползва, се оставя празен.",
   "This desktop has no system tray, so closing the window quits.": "Този работен плот няма системен трей, затова затварянето на прозореца излиза от приложението.",
   "This is Onion Board {version}. With the box ticked it asks GitHub every few hours whether a newer version is out and tells you (with a banner if it's an important fix). This copy runs from source, so it only tells you: update it with git pull.": "Това е Onion Board {version}. С отметнато поле пита GitHub на всеки няколко часа дали има по-нова версия и ти казва (с лента, ако е важна поправка). Това копие върви от изходния код, затова само ти казва: обнови го с git pull.",
-  "This is Onion Board {version}. With the box ticked it asks GitHub every few hours whether a newer version is out and tells you (with a banner if it's an important fix). Update now downloads it and checks it's the file GitHub lists; you pick when the app restarts to install it. Your sounds and settings are kept.": "Това е Onion Board {version}. С отметнато поле пита GitHub на всеки няколко часа дали има по-нова версия и ти казва (с лента, ако е важна поправка). Обнови сега я изтегля и проверява, че е файлът, който GitHub посочва; ти избираш кога приложението да се рестартира, за да я инсталира. Звуците и настройките ти се пазят.",
   "This sound's video isn't there any more": "Видеото на този звук вече го няма",
   "This version's page on GitHub, in your browser": "Страницата на тази версия в GitHub, в браузъра ти",
   "This video can't be shown ({value}). The sound plays as normal.": "Това видео не може да се покаже ({value}). Звукът звучи нормално.",
@@ -3459,5 +3457,10 @@
   "PyPI sent an answer that couldn't be read": "PyPI изпрати отговор, който не можа да бъде прочетен",
   "Use it only when YouTube or another site stopped working and Update now doesn't fix it. Reinstall goes back to an approved version.": "Използвай го само когато YouTube или друг сайт е спрял да работи и Обнови сега не помага. Преинсталирай връща към одобрена версия.",
   "Warning: this gets the newest yt-dlp from PyPI right away. Onion Board hasn't approved it yet, so nobody has checked it's safe. It may fix downloads that stopped working.": "Внимание: това изтегля най-новия yt-dlp от PyPI веднага. Onion Board още не го е одобрил, така че никой не е проверил дали е безопасен. Може да оправи изтеглянията, които са спрели да работят.",
-  "no wheel for {package}": "няма колело за {package}"
+  "no wheel for {package}": "няма колело за {package}",
+  "Install updates by themselves": "Инсталирай обновленията сами",
+  "Onion Board {version} is out: downloading it now. The app restarts by itself to install it when it's done.": "Onion Board {version} излезе: изтегля се сега. Приложението се рестартира само, за да го инсталира, когато свърши.",
+  "Tell me when a new version is out.": "Кажи ми, когато излезе нова версия.",
+  "This is Onion Board {version}. With the box ticked it asks GitHub whether a newer version is out each time it starts and every hour after, and tells you (with a banner if it's an important fix). Every update is checked against the file GitHub lists. Your sounds and settings are kept.": "Това е Onion Board {version}. С отметката той пита GitHub дали има по-нова версия при всяко стартиране и после на всеки час и ти казва (с банер, ако е важна поправка). Всяко обновление се проверява спрямо файла, който GitHub показва. Звуците и настройките ти се запазват.",
+  "When Onion Board starts and a new version is out, it downloads it and restarts to install it, unless a sound is playing.": "Когато Onion Board се стартира и има нова версия, той я изтегля и се рестартира, за да я инсталира, освен ако не свири звук."
 }

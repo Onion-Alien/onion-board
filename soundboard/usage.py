@@ -209,9 +209,10 @@ FEATURES = ("add-files", "youtube", "record", "clip", "clip-editor", "import-boa
             "mic-effect-no-load",
             "mic-effect-taken-off", "mic-helper",
             # Onion Board's own update: the download cancelled or failed, the installer
-            # wouldn't start, Copy error, Later at "Restart now", one that didn't finish
+            # wouldn't start, Copy error, Later at "Restart now", one that didn't finish,
+            # one installing itself as the app started
             "update-cancelled", "update-download-failed", "update-install-failed",
-            "update-copy-error", "update-later", "update-didnt-finish",
+            "update-copy-error", "update-later", "update-didnt-finish", "update-auto",
             # On Air switched off / on by a click, a line of the On Air card clicked; a
             # proxy, Tor or Offline mode set (features_now)
             "on-air-off", "on-air-on", "on-air-line", "net-proxy", "net-tor", "net-offline",

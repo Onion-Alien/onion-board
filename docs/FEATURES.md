@@ -305,10 +305,12 @@ The full list. The [README](../README.md) has the short version and how to get s
   the overlay keep working; right-click the tray icon for *Open Onion Board*, *Stop
   all sounds* or *Quit*). Optionally
   **starts when you sign in**, straight to the tray (Settings → General).
-- **Updates itself:** every few hours it checks GitHub for a new version (untick it in
-  Settings → Updates). *Update now* downloads it, checks it's the file GitHub lists,
-  and on *Restart now* installs it and reopens the app, keeping your sounds and
-  settings. Nothing is downloaded until you click. An **important fix** (a release
+- **Updates itself:** each time it starts, and every hour after, it checks GitHub for
+  a new version (untick it in Settings → Updates). One found as it starts installs
+  itself: downloaded, checked against the file GitHub lists, then the app restarts
+  into it, keeping your sounds and settings (not while a sound plays or the window is
+  in the tray; untick *Install updates by themselves* to always be asked). Found
+  later, *Update now* downloads it and *Restart now* installs it. An **important fix** (a release
   whose notes have an `Urgent: …` line, for Onion Board or Onion Watch) shows as a
   banner across the window with the reason and an *Update now* button; it can be
   hidden until the next start, but not skipped for good.
