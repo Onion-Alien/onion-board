@@ -455,3 +455,27 @@ def test_a_live_theme_switch_leaves_no_old_text_colours(qapp, win):
     finally:
         win.themectl.apply_theme("Dark")
 
+
+
+def test_switching_pages_hands_no_button_the_focus(qapp, win):
+    """Going to Settings (or another tab) with the focus on the page left: Qt gave it to
+    the new page's first button, the ⓘ beside "Your mic", ringed though no key was
+    pressed. The page (or Settings' list) takes it instead."""
+    win.resize(1180, 720)
+    win.show()
+    win.tabs.setCurrentWidget(win.sounds_page)
+    win.search.setFocus(Qt.FocusReason.MouseFocusReason)
+    for _ in range(2):   # the one made ahead (what the cog opens), then opened again
+        win.setctl._prebuild_settings()
+        win.setctl.warm_settings()
+        win.search.setFocus(Qt.FocusReason.MouseFocusReason)
+        d = win.setctl.open_settings("audio")
+        qapp.processEvents()
+        assert win.focusWidget() is d.categories
+        d.done(0)
+        qapp.processEvents()
+        assert win.focusWidget() in (win.sounds_page, win.tabs.currentWidget())
+    win.search.setFocus(Qt.FocusReason.MouseFocusReason)
+    win.tabs.setCurrentWidget(win.setup_page)
+    qapp.processEvents()
+    assert win.focusWidget() is win.setup_page

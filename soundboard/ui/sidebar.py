@@ -23,6 +23,7 @@ from PySide6.QtWidgets import (QApplication, QBoxLayout, QFrame, QHBoxLayout, QL
 from soundboard import theme
 from soundboard.i18n import _
 from soundboard.ui import icons
+from soundboard.ui.panel import keep_focus_off
 from soundboard.ui.pixels import snap_to_pixels
 
 ICON = 20          # a tab's icon on the rail
@@ -96,17 +97,20 @@ class SideTabs(QTabWidget):
         return page.heightForWidth(w - pad.width()) + bar + pad.height()
 
     def setCurrentIndex(self, i):
-        super().setCurrentIndex(i)
+        with keep_focus_off(self):
+            super().setCurrentIndex(i)
         self.picked.emit()
 
     def setCurrentWidget(self, w):
-        super().setCurrentWidget(w)
+        with keep_focus_off(self):
+            super().setCurrentWidget(w)
         self.picked.emit()
 
     def move_to(self, i):
         """Another tab without `picked`: the app moving off a tab that's going away
         (switched off in Settings, which stays open), not someone asking for one."""
-        super().setCurrentIndex(i)
+        with keep_focus_off(self):
+            super().setCurrentIndex(i)
 
     # what changes a tab's look, all through here
     def setTabText(self, i, text):

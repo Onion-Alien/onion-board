@@ -1,0 +1,1 @@
+﻿- Switching tabs or opening Settings no longer puts a focus ring on the first button of the new page (the ⓘ beside Your mic).
