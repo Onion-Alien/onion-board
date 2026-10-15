@@ -201,6 +201,7 @@ class Fitter:
         # shows, hides or retitles things, so the layouts stay the same meanwhile)
         self._layouts, self._known = self.root.findChildren(QLayout), None
         with hold_updates(self.root):
+            new: list[int] = []   # applied by this fit
             for axis in ("h", "w"):   # hiding the mixer (height) narrows the window too
                 for i, (_, ax, _fn) in enumerate(self.steps):
                     if ax != axis or i in self._at:
@@ -209,6 +210,7 @@ class Fitter:
                         break
                     self._apply(i, True)
                     self._at[i] = (dim["w"], dim["h"], False)
+                    new.append(i)
             # still over (a diagonal drag): the other axis' steps can help too (hiding
             # the mixer narrows the window), so try them before anyone calls it too small
             for i in range(len(self.steps)):
@@ -217,6 +219,17 @@ class Fitter:
                 if i not in self._at:
                     self._apply(i, True)
                     self._at[i] = (dim["w"], dim["h"], True)
+                    new.append(i)
+            # give back what didn't help: steps go in order until one fits, and the
+            # ones before it may not have narrowed the widest part at all (at 1100 px
+            # the levels strip was it, and the speed button, the radio's volume and
+            # Say's Stop went first for nothing, staying hidden until the window grew)
+            for i in reversed(new[:-1]):
+                self._apply(i, False)
+                if self._over(size, "w") or self._over(size, "h"):
+                    self._apply(i, True)
+                else:
+                    del self._at[i]
             for axis in ("w", "h"):   # grown: bring back what fits again, last-hidden first
                 for i in sorted((i for i in self._at if self.steps[i][1] == axis),
                                 reverse=True):
@@ -225,12 +238,18 @@ class Fitter:
                     if cross:   # hidden for the other axis: that one growing counts too
                         grown = grown or (dim["h"] > h if axis == "w" else dim["w"] > w)
                     if not grown:
-                        break   # no bigger than when it had to go
+                        continue   # no bigger than when it had to go
                     self._apply(i, False)
                     if self._over(size, "w") or self._over(size, "h"):
+                        # still too big: try it again once the window is as big as it
+                        # needs, not on every pixel of a drag. The others go on: one in
+                        # another row may fit (stopping here kept the radio's volume
+                        # hidden after 800 -> 1180 px, behind the levels strip)
+                        need = self.need()
                         self._apply(i, True)
-                        self._at[i] = (dim["w"], dim["h"], cross)
-                        break
+                        self._at[i] = (max(dim["w"], need.width() - 1),
+                                       max(dim["h"], need.height() - 1), cross)
+                        continue
                     del self._at[i]
         try:
             return self.need()
