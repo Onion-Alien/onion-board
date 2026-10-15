@@ -3554,5 +3554,11 @@
   "<br><span style='color:{status}'>Can't open {devices} (My mic). Plugged in? It's tried again by itself.</span>": "<br><span style='color:{status}'>{devices} nejde otevřít (Můj mikrofon). Je připojené? Zkouší se to znovu samo.</span>",
   "On, waiting for Windows to allow it: answer its prompt.": "Zapnuto, čeká se, až to Windows povolí: odpověz na jeho dotaz.",
   "Two mics have names like that one. Pick yours again (Setup tab → Devices).": "Dva mikrofony mají podobný název. Vyber ten svůj znovu (karta Zapojení → Zařízení).",
-  "Windows doesn't know that mic any more. Pick your mic again (Setup tab → Devices).": "Windows tento mikrofon už nezná. Vyber mikrofon znovu (karta Zapojení → Zařízení)."
+  "Windows doesn't know that mic any more. Pick your mic again (Setup tab → Devices).": "Windows tento mikrofon už nezná. Vyber mikrofon znovu (karta Zapojení → Zařízení).",
+  "Search radio stations, genres, countries or cities…": "Vyhledejte rozhlasové stanice, žánry, země nebo města...",
+  "{n} popular station: search, or click a station to play it.": [
+    "{n} oblíbená stanice: vyhledejte, nebo kliknutím na stanici ji přehrajete.",
+    "{n} oblíbené stanice: vyhledejte, nebo kliknutím na stanici ji přehrajete.",
+    "{n} oblíbených stanic: vyhledejte, nebo kliknutím na stanici ji přehrajete."
+  ]
 }

@@ -3402,5 +3402,9 @@
   "<br><span style='color:{status}'>Can't open {devices} (My mic). Plugged in? It's tried again by itself.</span>": "<br><span style='color:{status}'>Không mở được {devices} (Micrô của tôi). Đã cắm chưa? Ứng dụng sẽ tự thử lại.</span>",
   "On, waiting for Windows to allow it: answer its prompt.": "Bật, đang chờ Windows cho phép: hãy trả lời hộp thoại của nó.",
   "Two mics have names like that one. Pick yours again (Setup tab → Devices).": "Có hai mic tên giống nhau. Hãy chọn lại mic của bạn (thẻ Thiết lập → Thiết bị).",
-  "Windows doesn't know that mic any more. Pick your mic again (Setup tab → Devices).": "Windows không còn nhận ra mic đó. Hãy chọn lại mic (thẻ Thiết lập → Thiết bị)."
+  "Windows doesn't know that mic any more. Pick your mic again (Setup tab → Devices).": "Windows không còn nhận ra mic đó. Hãy chọn lại mic (thẻ Thiết lập → Thiết bị).",
+  "Search radio stations, genres, countries or cities…": "Tìm kiếm đài phát thanh, thể loại, quốc gia hoặc thành phố…",
+  "{n} popular station: search, or click a station to play it.": [
+    "{n} đài phổ biến: tìm kiếm, hoặc bấm vào một đài để phát."
+  ]
 }

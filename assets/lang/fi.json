@@ -3478,5 +3478,10 @@
   "<br><span style='color:{status}'>Can't open {devices} (My mic). Plugged in? It's tried again by itself.</span>": "<br><span style='color:{status}'>Laitetta {devices} ei saada auki (Oma mikki). Onko se kytketty? Sitä yritetään itsestään uudelleen.</span>",
   "On, waiting for Windows to allow it: answer its prompt.": "Päällä, odottaa Windowsin lupaa: vastaa sen kysymykseen.",
   "Two mics have names like that one. Pick yours again (Setup tab → Devices).": "Kahdella mikillä on samankaltaiset nimet. Valitse omasi uudelleen (Käyttöönotto-välilehti → Laitteet).",
-  "Windows doesn't know that mic any more. Pick your mic again (Setup tab → Devices).": "Windows ei enää tunne tätä mikkiä. Valitse mikkisi uudelleen (Käyttöönotto-välilehti → Laitteet)."
+  "Windows doesn't know that mic any more. Pick your mic again (Setup tab → Devices).": "Windows ei enää tunne tätä mikkiä. Valitse mikkisi uudelleen (Käyttöönotto-välilehti → Laitteet).",
+  "Search radio stations, genres, countries or cities…": "Hae radioasemia, genrejä, maita tai kaupunkeja…",
+  "{n} popular station: search, or click a station to play it.": [
+    "{n} suosittu asema: hae tai napsauta asemaa toistaaksesi sen.",
+    "{n} suosittua asemaa: hae tai napsauta asemaa toistaaksesi sen."
+  ]
 }

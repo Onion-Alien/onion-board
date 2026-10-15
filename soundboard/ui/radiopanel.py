@@ -240,8 +240,6 @@ class RadioTab(QWidget):
         top = QHBoxLayout()
         top.setSpacing(8)
         self.search = QLineEdit()
-        self.search.setPlaceholderText(_("Search radio stations, genres, countries or "
-                                         "cities…  (or click a dot on the map)"))
         icons.clear_button(self.search)
         self.search.textChanged.connect(self._on_text)
         self.search.returnPressed.connect(self._search_now)
@@ -272,6 +270,7 @@ class RadioTab(QWidget):
         self.split.setStretchFactor(1, 2)
         if not globe:
             self.globe_box.hide()
+        self._search_hint()
         v.addWidget(self.split, 1)
 
         self.info = QLabel()
@@ -803,11 +802,18 @@ class RadioTab(QWidget):
         st, state = self.player.station, self.player.status
         if st is None:
             n = len(self._globe_list)
-            text = (ngettext("{n} popular station: click a dot on the map, or search. "
-                             "Click a station to play it.",
-                             "{n} popular stations: click a dot on the map, or search. "
-                             "Click a station to play it.", n, n=f"{n:,}") if n else
-                    self._no_stations_text())
+            if not n:
+                text = self._no_stations_text()
+            elif self.globe_box.isHidden():   # narrow: no map to click
+                text = ngettext("{n} popular station: search, or click a station to "
+                                "play it.",
+                                "{n} popular stations: search, or click a station to "
+                                "play it.", n, n=f"{n:,}")
+            else:
+                text = ngettext("{n} popular station: click a dot on the map, or search. "
+                                "Click a station to play it.",
+                                "{n} popular stations: click a dot on the map, or search. "
+                                "Click a station to play it.", n, n=f"{n:,}")
             if not n and self._globe_error:
                 red = theme.status("error")
                 text = (f"<span style='color:{red}'>" + html.escape(
@@ -865,6 +871,13 @@ class RadioTab(QWidget):
                                  _("Send the radio out to others, the way your sounds go "
                                    "(Setup tab). Off: only you hear it."))
 
+    def _search_hint(self):
+        """The search box's hint, pointing at the map only while it's showing."""
+        self.search.setPlaceholderText(
+            _("Search radio stations, genres, countries or cities…") if self.globe_box.isHidden()
+            else _("Search radio stations, genres, countries or "
+                   "cities…  (or click a dot on the map)"))
+
     def fit_steps(self):
         """What the main window may hide here when it gets small (ui/responsive.py)."""
         from soundboard.ui import responsive as r
@@ -875,6 +888,13 @@ class RadioTab(QWidget):
             # or it sits off-centre in a wider pill between Popular and Recent
             icons.set_icon(self.btn_favs, "star", "muted")
             r.touch(self.btn_favs)
+
+        hide_map = r.hide(self.globe_box)
+
+        def no_map(compact):
+            hide_map(compact)
+            self._search_hint()    # the hints stop pointing at a map that isn't there
+            self._refresh_info()
 
         def play_icon(compact):
             self._play_short = compact
@@ -889,7 +909,7 @@ class RadioTab(QWidget):
                 (36, "w", play_icon),
                 (40, "w", r.hide(*self._vol_group)),
                 (45, "w", r.hide(self.fx_btn)),
-                (46, "w", r.hide(self.globe_box)),      # narrow: just the list
+                (46, "w", no_map),                      # narrow: just the list
                 (50, "w", r.hide(*self._clip_group, self.btn_fav, self.btn_refresh)),
                 (54, "w", r.hide(self.now)),
                 (20, "h", r.hide(self.info))]

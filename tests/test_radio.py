@@ -1704,3 +1704,22 @@ def test_stopping_the_tab_silences_what_the_engine_had_buffered(qapp, tab, serve
         eng._mon(out, 480)
         peaks.append(float(np.abs(out).max()))
     assert max(peaks[2:]) < 1e-4, peaks
+
+
+def test_a_narrow_window_hides_the_map_and_stops_pointing_at_it(tab):
+    """Narrow, the map gives way to the station list, but the search box and the line
+    under the list still said "click a dot on the map"."""
+    assert "map" not in tab.search.placeholderText()   # this tab is made without a map
+    n = len(tab._globe_list)
+    tab._flash_until = 0
+    step = next(fn for _cost, axis, fn in tab.fit_steps()
+                if axis == "w" and fn.__name__ == "no_map")
+    step(False)                                          # wide: the map shows
+    assert "map" in tab.search.placeholderText() and "map" in tab.info.text()
+    step(True)
+    assert tab.globe_box.isHidden()
+    assert "map" not in tab.search.placeholderText()
+    assert "map" not in tab.info.text() and f"{n} popular stations" in tab.info.text()
+    step(False)
+    assert not tab.globe_box.isHidden()
+    assert "map" in tab.search.placeholderText() and "map" in tab.info.text()
