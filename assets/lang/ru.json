@@ -3513,5 +3513,6 @@
   "No sound from your mic. Is your headset on?": "С микрофона нет звука. Гарнитура включена?",
   "Unplugged": "Отключён",
   "Windows can't find <b>{mic}</b> right now. Plug it in, or switch it on if it's wireless. This goes away by itself.": "Windows сейчас не видит <b>{mic}</b>. Подключи его или включи, если он беспроводной. Это пропадёт само.",
-  "Your headset is off or its mic is muted. Turn it on or unmute it. Still nothing? Click <b>Repair</b>.": "Гарнитура выключена или её микрофон отключён. Включи её или микрофон. Всё ещё ничего? Нажми <b>Починить</b>."
+  "Your headset is off or its mic is muted. Turn it on or unmute it. Still nothing? Click <b>Repair</b>.": "Гарнитура выключена или её микрофон отключён. Включи её или микрофон. Всё ещё ничего? Нажми <b>Починить</b>.",
+  "the pack's file is damaged, so it wasn't kept": "файл пакета повреждён, поэтому он не сохранён"
 }

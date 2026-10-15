@@ -3513,5 +3513,6 @@
   "No sound from your mic. Is your headset on?": "З мікрофона немає звуку. Гарнітуру увімкнено?",
   "Unplugged": "Від'єднано",
   "Windows can't find <b>{mic}</b> right now. Plug it in, or switch it on if it's wireless. This goes away by itself.": "Windows зараз не бачить <b>{mic}</b>. Під'єднай його або увімкни, якщо він бездротовий. Це зникне само.",
-  "Your headset is off or its mic is muted. Turn it on or unmute it. Still nothing? Click <b>Repair</b>.": "Гарнітуру вимкнено, або її мікрофон вимкнено. Увімкни її або мікрофон. Досі нічого? Натисни <b>Полагодити</b>."
+  "Your headset is off or its mic is muted. Turn it on or unmute it. Still nothing? Click <b>Repair</b>.": "Гарнітуру вимкнено, або її мікрофон вимкнено. Увімкни її або мікрофон. Досі нічого? Натисни <b>Полагодити</b>.",
+  "the pack's file is damaged, so it wasn't kept": "файл пакета пошкоджено, тому його не збережено"
 }

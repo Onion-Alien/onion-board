@@ -3361,5 +3361,6 @@
   "No sound from your mic. Is your headset on?": "マイクの音が出ていません。ヘッドセットの電源は入っていますか？",
   "Unplugged": "未接続",
   "Windows can't find <b>{mic}</b> right now. Plug it in, or switch it on if it's wireless. This goes away by itself.": "今は Windows が <b>{mic}</b> を見つけられません。接続するか、ワイヤレスなら電源を入れてください。この表示は自動で消えます。",
-  "Your headset is off or its mic is muted. Turn it on or unmute it. Still nothing? Click <b>Repair</b>.": "ヘッドセットの電源が切れているか、マイクがミュートになっています。電源を入れるかミュートを解除してください。それでも音が出ない場合は<b>修復</b>をクリックしてください。"
+  "Your headset is off or its mic is muted. Turn it on or unmute it. Still nothing? Click <b>Repair</b>.": "ヘッドセットの電源が切れているか、マイクがミュートになっています。電源を入れるかミュートを解除してください。それでも音が出ない場合は<b>修復</b>をクリックしてください。",
+  "the pack's file is damaged, so it wasn't kept": "パックのファイルが壊れているため、保存されませんでした"
 }

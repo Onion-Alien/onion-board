@@ -3361,5 +3361,6 @@
   "No sound from your mic. Is your headset on?": "Không có tiếng từ mic của bạn. Tai nghe của bạn đã bật chưa?",
   "Unplugged": "Chưa cắm",
   "Windows can't find <b>{mic}</b> right now. Plug it in, or switch it on if it's wireless. This goes away by itself.": "Windows hiện không tìm thấy <b>{mic}</b>. Hãy cắm vào, hoặc bật lên nếu là loại không dây. Thông báo này tự biến mất.",
-  "Your headset is off or its mic is muted. Turn it on or unmute it. Still nothing? Click <b>Repair</b>.": "Tai nghe của bạn đang tắt hoặc mic đang tắt tiếng. Hãy bật tai nghe hoặc bật lại tiếng mic. Vẫn không có gì? Bấm <b>Sửa</b>."
+  "Your headset is off or its mic is muted. Turn it on or unmute it. Still nothing? Click <b>Repair</b>.": "Tai nghe của bạn đang tắt hoặc mic đang tắt tiếng. Hãy bật tai nghe hoặc bật lại tiếng mic. Vẫn không có gì? Bấm <b>Sửa</b>.",
+  "the pack's file is damaged, so it wasn't kept": "tệp của gói bị hỏng nên không được giữ lại"
 }

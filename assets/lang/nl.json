@@ -3437,5 +3437,6 @@
   "No sound from your mic. Is your headset on?": "Geen geluid van je mic. Staat je headset aan?",
   "Unplugged": "Niet aangesloten",
   "Windows can't find <b>{mic}</b> right now. Plug it in, or switch it on if it's wireless. This goes away by itself.": "Windows kan <b>{mic}</b> nu niet vinden. Sluit hem aan, of zet hem aan als hij draadloos is. Dit gaat vanzelf weg.",
-  "Your headset is off or its mic is muted. Turn it on or unmute it. Still nothing? Click <b>Repair</b>.": "Je headset staat uit of de mic is gedempt. Zet hem aan of zet dempen uit. Nog steeds niets? Klik op <b>Repareren</b>."
+  "Your headset is off or its mic is muted. Turn it on or unmute it. Still nothing? Click <b>Repair</b>.": "Je headset staat uit of de mic is gedempt. Zet hem aan of zet dempen uit. Nog steeds niets? Klik op <b>Repareren</b>.",
+  "the pack's file is damaged, so it wasn't kept": "het bestand van het pakket is beschadigd, dus het is niet bewaard"
 }
