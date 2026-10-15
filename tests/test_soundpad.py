@@ -220,6 +220,32 @@ def test_an_import_from_the_menu_is_not_asked_again(
 
 
 @pytest.mark.windows   # Windows paths
+@pytest.mark.parametrize("first", ["installer", "menu"])
+def test_no_keep_box_when_they_imported_it_themselves(
+        main_window, qapp, tmp_path, monkeypatch, first):  # noqa: F811
+    """The installer's import is running (or still waiting) and they import the same
+    board from the menu too: they already said yes here, so no "keep them?" box."""
+    w = main_window
+    monkeypatch.setenv("APPDATA", str(tmp_path))
+    _board(tmp_path)
+    note = library.APP_DIR / otherboards.QUEUED_NAME
+    note.parent.mkdir(parents=True, exist_ok=True)
+    note.write_text("soundpad", encoding="utf-8")
+    monkeypatch.setattr(QMessageBox, "question", lambda *a: QMessageBox.Yes)
+    monkeypatch.setattr(QMessageBox, "exec", lambda box: pytest.fail("asked to keep"))
+    if first == "menu":
+        w.impctl.import_other(soundpad.SOURCE)
+        assert process_events(qapp, lambda: not w.impctl._pending_imports
+                              and len(w.cfg.sounds) == 5)
+        w.impctl.import_queued()
+    else:
+        w.impctl.import_queued()
+        w.impctl.import_other(soundpad.SOURCE)
+    assert process_events(qapp, lambda: not note.exists() and not w.impctl._pending_imports
+                          and not w.impctl._ask_keep and len(w.cfg.sounds) == 5)
+
+
+@pytest.mark.windows   # Windows paths
 def test_the_installers_box_waits_for_the_setup_guide_and_says_where_from(
         main_window, qapp, tmp_path, monkeypatch):  # noqa: F811
     """The first start opens the setup guide: the import only starts once it's closed
