@@ -3434,9 +3434,8 @@
   "YouTube downloads still work, but with fewer formats.": "YouTube-nedladdningar fungerar ändå, men med färre format.",
   "Is your headset on?": "Är ditt headset på?",
   "Is your headset plugged in?": "Är ditt headset anslutet?",
-  "No sound at all comes from your mic. A headset that's switched off, or whose mic is muted, does that. Turn it on or unmute it: this goes away by itself. Still nothing? Click <b>Repair</b>, then <b>Yes</b> when Windows asks.": "Det kommer inget ljud alls från din mikrofon. Så gör ett headset som är avstängt, eller vars mikrofon är avstängd. Slå på det eller mikrofonen: det här försvinner av sig självt. Fortfarande inget? Klicka <b>Reparera</b> och sedan <b>Ja</b> när Windows frågar.",
-  "No sound at all comes from your mic. A headset that's switched off, or whose mic is muted, does that. Turn it on or unmute it: this goes away by itself. Still nothing? Click <b>Repair</b>: your sound drops out for a few seconds.": "Det kommer inget ljud alls från din mikrofon. Så gör ett headset som är avstängt, eller vars mikrofon är avstängd. Slå på det eller mikrofonen: det här försvinner av sig självt. Fortfarande inget? Klicka <b>Reparera</b>: ditt ljud försvinner några sekunder.",
   "No sound from your mic. Is your headset on?": "Inget ljud från din mikrofon. Är ditt headset på?",
   "Unplugged": "Ej ansluten",
-  "Windows can't find <b>{mic}</b> right now. Plug it in, or switch it on if it's wireless. This goes away by itself.": "Windows hittar inte <b>{mic}</b> just nu. Anslut det, eller slå på det om det är trådlöst. Det här försvinner av sig självt."
+  "Windows can't find <b>{mic}</b> right now. Plug it in, or switch it on if it's wireless. This goes away by itself.": "Windows hittar inte <b>{mic}</b> just nu. Anslut det, eller slå på det om det är trådlöst. Det här försvinner av sig självt.",
+  "Your headset is off or its mic is muted. Turn it on or unmute it. Still nothing? Click <b>Repair</b>.": "Ditt headset är avstängt eller dess mikrofon avstängd. Slå på det eller mikrofonen. Fortfarande inget? Klicka <b>Reparera</b>."
 }

@@ -223,15 +223,8 @@ class MicControl(Controller):
                 self._silent_said = True
                 mw.toast(_("No sound from your mic. Is your headset on?"), "warn")
             look = ("warn", "mic", _("Is your headset on?"), _("No sound"), needed(
-                _("No sound at all comes from your mic. A headset that's switched off, or "
-                  "whose mic is muted, does that. Turn it on or unmute it: this goes away "
-                  "by itself. Still nothing? Click <b>Repair</b>, then <b>Yes</b> when "
-                  "Windows asks.")
-                if ask else
-                _("No sound at all comes from your mic. A headset that's switched off, or "
-                  "whose mic is muted, does that. Turn it on or unmute it: this goes away "
-                  "by itself. Still nothing? Click <b>Repair</b>: your sound drops out for "
-                  "a few seconds.")),
+                _("Your headset is off or its mic is muted. Turn it on or unmute it. Still "
+                  "nothing? Click <b>Repair</b>.")),
                 _("Repair (one click)"))
         elif state == "ok":
             look = ("ok", "check", _("Your sounds go into your mic"), _("Connected"), "", None)

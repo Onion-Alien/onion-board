@@ -3307,7 +3307,7 @@ def test_a_mic_sending_only_silence_offers_the_repair(window, monkeypatch):  # n
     w.statusctl._update_flow()
     assert w.mic_line.text() == "Is your headset on?"
     assert "Repair" in w.btn_install.text() and not w.btn_install.isHidden()
-    assert "switched off" in w.mic_reason.text() and "mute" in w.mic_reason.text()
+    assert "headset is off" in w.mic_reason.text() and "muted" in w.mic_reason.text()
     assert [t for t, k in said if "No sound" in t]
     w.statusctl._update_flow()
     silent[0] = 0.0

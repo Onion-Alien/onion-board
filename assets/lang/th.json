@@ -3358,9 +3358,8 @@
   "YouTube downloads still work, but with fewer formats.": "การดาวน์โหลดจาก YouTube ยังใช้ได้ แต่ได้รูปแบบน้อยลง",
   "Is your headset on?": "หูฟังเปิดอยู่หรือเปล่า",
   "Is your headset plugged in?": "เสียบหูฟังอยู่หรือเปล่า",
-  "No sound at all comes from your mic. A headset that's switched off, or whose mic is muted, does that. Turn it on or unmute it: this goes away by itself. Still nothing? Click <b>Repair</b>, then <b>Yes</b> when Windows asks.": "ไม่มีเสียงออกจากไมค์ของคุณเลย หูฟังที่ปิดอยู่ หรือไมค์ปิดเสียงอยู่ จะเป็นแบบนี้ เปิดหูฟังหรือเปิดเสียงไมค์ ข้อความนี้จะหายไปเอง ยังไม่มีเสียงอีกหรือ คลิก <b>ซ่อม</b> แล้วคลิก <b>ใช่</b> เมื่อ Windows ถาม",
-  "No sound at all comes from your mic. A headset that's switched off, or whose mic is muted, does that. Turn it on or unmute it: this goes away by itself. Still nothing? Click <b>Repair</b>: your sound drops out for a few seconds.": "ไม่มีเสียงออกจากไมค์ของคุณเลย หูฟังที่ปิดอยู่ หรือไมค์ปิดเสียงอยู่ จะเป็นแบบนี้ เปิดหูฟังหรือเปิดเสียงไมค์ ข้อความนี้จะหายไปเอง ยังไม่มีเสียงอีกหรือ คลิก <b>ซ่อม</b> เสียงของคุณจะหายไปสองสามวินาที",
   "No sound from your mic. Is your headset on?": "ไม่มีเสียงจากไมค์ของคุณ หูฟังเปิดอยู่หรือเปล่า",
   "Unplugged": "ไม่ได้เสียบ",
-  "Windows can't find <b>{mic}</b> right now. Plug it in, or switch it on if it's wireless. This goes away by itself.": "ตอนนี้ Windows หา <b>{mic}</b> ไม่เจอ เสียบมัน หรือเปิดมันถ้าเป็นแบบไร้สาย ข้อความนี้จะหายไปเอง"
+  "Windows can't find <b>{mic}</b> right now. Plug it in, or switch it on if it's wireless. This goes away by itself.": "ตอนนี้ Windows หา <b>{mic}</b> ไม่เจอ เสียบมัน หรือเปิดมันถ้าเป็นแบบไร้สาย ข้อความนี้จะหายไปเอง",
+  "Your headset is off or its mic is muted. Turn it on or unmute it. Still nothing? Click <b>Repair</b>.": "หูฟังปิดอยู่ หรือไมค์ของหูฟังปิดเสียงอยู่ เปิดหูฟังหรือเปิดเสียงไมค์ ยังไม่มีเสียงอีกหรือ คลิก <b>ซ่อม</b>"
 }
