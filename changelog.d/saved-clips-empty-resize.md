@@ -1,2 +1,0 @@
-- Hide empty saved clips and their resize grip while keeping Undo available and restoring the saved height when clips return.
-- Disable the clip editor's Edit button when none of its menu actions are available.

@@ -1,1 +1,0 @@
-- Settings search now finds themes by name; searching for themes or colours shows every theme group.

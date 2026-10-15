@@ -1,1 +1,0 @@
-- Hothead now has a crunchy megaphone sound during normal speech, with extra blowout when shouting. Autotune tracks quieter microphones and blends in a tuned robotic voice so its effect is audible even on notes that are already in tune.

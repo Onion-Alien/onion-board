@@ -1,1 +1,0 @@
-- Keep audio meters smooth while playing with the window visible behind a game or another app.

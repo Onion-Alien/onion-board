@@ -1,1 +1,0 @@
-- "Get Tor" now downloads Tor 15.0.25 (was 15.0.24), the current Tor Expert Bundle.

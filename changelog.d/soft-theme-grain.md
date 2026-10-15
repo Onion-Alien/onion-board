@@ -1,1 +1,0 @@
-- Give textured Dark, Light and Lilac themes a soft brushed satin finish instead of speckled grain.

@@ -1,1 +1,0 @@
-- Fixed a thin background gap between flat map world copies at fractional display scales.
