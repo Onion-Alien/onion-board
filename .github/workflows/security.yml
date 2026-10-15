@@ -1,0 +1,51 @@
+name: security
+
+# Weekly scans that Dependabot doesn't do: CodeQL reads our own Python and workflows
+# for unsafe patterns (results under Security > Code scanning), and pip-audit checks
+# every pinned package against the public advisory database (a red run names the
+# package and the fixed version). Weekly, not on every PR, to keep PR checks fast.
+on:
+  schedule:
+    - cron: "17 5 * * 2"   # Tuesdays 05:17 UTC
+  workflow_dispatch:
+  pull_request:
+    paths: [".github/workflows/security.yml"]
+
+permissions:
+  contents: read
+
+jobs:
+  codeql:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    permissions:
+      security-events: write   # upload the results
+    strategy:
+      fail-fast: false
+      matrix:
+        language: [python, actions]
+    steps:
+      - uses: actions/checkout@v6
+      - uses: github/codeql-action/init@v4
+        with:
+          languages: ${{ matrix.language }}
+          build-mode: none
+      - uses: github/codeql-action/analyze@v4
+        with:
+          category: /language:${{ matrix.language }}
+
+  pip-audit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-python@v7
+        with:
+          python-version: "3.13"
+      # --no-deps --disable-pip: look up the pinned versions as written, without
+      # installing them (several are Windows-only, and this runs on Linux).
+      - run: |
+          python -m pip install -q pip-audit==2.9.0
+          files="-r requirements.txt -r requirements-dev.txt"
+          [ -f modules/live-voice/requirements.txt ] && files="$files -r modules/live-voice/requirements.txt"
+          pip-audit --no-deps --disable-pip --progress-spinner off $files

@@ -1,0 +1,160 @@
+name: release
+
+# Builds a release on GitHub's Windows machine instead of the release PC: push the tag
+# (git tag vX.Y.Z <main's sha> && git push origin vX.Y.Z) after scripts/release.py's
+# bump is merged, and this builds the installer from that tag (build.ps1 -Clean),
+# scans it and the mic helper on VirusTotal when the VT_API_KEY secret is set, and
+# makes a DRAFT release with both assets (OnionBoardSetup.exe and the same file as
+# OnionBoardSetup-update.exe, docs/DEVELOPING.md "Release"), the SHA-256 and the scan
+# line. Nobody gets it until the draft is published by hand, after the headline is
+# written and the draft's installer is installed over a real copy.
+# A tag whose release already exists (made by hand) is left alone. On a PR that
+# changes this file it builds and checks only: no release, no scan.
+on:
+  push:
+    tags: ["v*"]
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: "Tag to build (vX.Y.Z, must exist)"
+        required: true
+  pull_request:
+    paths: [".github/workflows/release.yml"]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: release-${{ github.event.inputs.tag || github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: windows-latest
+    timeout-minutes: 60
+    permissions:
+      contents: write   # the draft release
+    env:
+      GH_TOKEN: ${{ github.token }}
+      TAG: ${{ github.event.inputs.tag || (github.event_name == 'push' && github.ref_name) || '' }}
+      HAS_VT: ${{ secrets.VT_API_KEY != '' }}
+    steps:
+      - name: Already released?
+        id: gate
+        shell: bash
+        run: |
+          if [ -n "$TAG" ] && gh release view "$TAG" -R "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
+            echo "A release for $TAG already exists: nothing to do."
+            echo "skip=1" >> "$GITHUB_OUTPUT"
+          fi
+      - if: steps.gate.outputs.skip != '1'
+        uses: actions/checkout@v6
+        with:
+          ref: ${{ env.TAG || github.sha }}
+      - if: steps.gate.outputs.skip != '1'
+        uses: actions/setup-python@v7
+        with:
+          python-version: "3.13"
+      - name: Version matches the tag
+        if: steps.gate.outputs.skip != '1' && env.TAG != ''
+        shell: bash
+        run: |
+          v=$(sed -nE 's/^__version__ = "([^"]+)".*/\1/p' soundboard/__init__.py)
+          if [ "v$v" != "$TAG" ]; then
+            echo "::error::soundboard/__init__.py says $v but the tag is $TAG"; exit 1
+          fi
+      - name: Tools (venv, Inno Setup, MinGW-w64 g++ for the mic effect and bootloader)
+        if: steps.gate.outputs.skip != '1'
+        shell: pwsh
+        run: |
+          python -m venv .venv
+          .venv\Scripts\python -m pip install --disable-pip-version-check -q -r requirements-dev.txt
+          if ($LASTEXITCODE -ne 0) { throw "pip install failed" }
+          if (-not (Test-Path "${env:ProgramFiles(x86)}\Inno Setup 6\ISCC.exe")) {
+            choco install innosetup -y --no-progress
+          }
+          if (-not (Get-Command g++ -ErrorAction SilentlyContinue)) {
+            choco install mingw -y --no-progress
+            "C:\ProgramData\mingw64\mingw64\bin" | Out-File -Append -Encoding utf8 $env:GITHUB_PATH
+          }
+      - name: Build (build.ps1 -Clean)
+        if: steps.gate.outputs.skip != '1'
+        shell: pwsh
+        run: |
+          ./build.ps1 -Clean
+          if (-not (Test-Path dist\OnionBoardSetup.exe)) { throw "no dist\OnionBoardSetup.exe" }
+          Copy-Item dist\OnionBoardSetup.exe dist\OnionBoardSetup-update.exe
+          $sha = (Get-FileHash dist\OnionBoardSetup.exe -Algorithm SHA256).Hash.ToLower()
+          "SHA=$sha" | Out-File -Append -Encoding utf8 $env:GITHUB_ENV
+          $mb = [math]::Round((Get-Item dist\OnionBoardSetup.exe).Length / 1MB)
+          "Built OnionBoardSetup.exe: $mb MB, SHA-256 $sha" | Out-File -Append -Encoding utf8 $env:GITHUB_STEP_SUMMARY
+      # Upload, then wait for the full report: a fresh upload often has engines that
+      # haven't answered yet, so poll until the analysis says completed (max 20 min).
+      - name: VirusTotal scan
+        id: vt
+        if: steps.gate.outputs.skip != '1' && env.TAG != '' && env.HAS_VT == 'true'
+        env:
+          VT_API_KEY: ${{ secrets.VT_API_KEY }}
+        shell: bash
+        run: |
+          scan() {
+            up=$(curl -sf -H "x-apikey: $VT_API_KEY" https://www.virustotal.com/api/v3/files/upload_url \
+                 | python -c "import json,sys; print(json.load(sys.stdin)['data'])") || return 1
+            id=$(curl -sf -H "x-apikey: $VT_API_KEY" -F "file=@$1" "$up" \
+                 | python -c "import json,sys; print(json.load(sys.stdin)['data']['id'])") || return 1
+            for i in $(seq 1 40); do
+              sleep 30
+              r=$(curl -sf -H "x-apikey: $VT_API_KEY" "https://www.virustotal.com/api/v3/analyses/$id") || continue
+              line=$(python -c "
+          import json,sys
+          a=json.loads(sys.argv[1])['data']['attributes']
+          if a['status']!='completed': sys.exit(1)
+          s=a['stats']; bad=s['malicious']+s['suspicious']; tot=bad+s['undetected']+s.get('harmless',0)
+          print(f'{tot-bad} {tot}')" "$r") && { echo "$line"; return 0; }
+            done
+            return 1
+          }
+          if res=$(scan dist/OnionBoardSetup.exe); then
+            set -- $res
+            echo "clean=$1" >> "$GITHUB_OUTPUT"; echo "total=$2" >> "$GITHUB_OUTPUT"
+            echo "VirusTotal (installer): $1 of $2 clean" >> "$GITHUB_STEP_SUMMARY"
+            [ "$1" = "$2" ] || echo "::warning::VirusTotal flags the installer: only $1 of $2 clean"
+          else
+            echo "::warning::VirusTotal scan of the installer didn't finish; scan it by hand"
+          fi
+          helper=build/michelper/obmichelper/obmichelper.exe
+          if [ -f "$helper" ] && res=$(scan "$helper"); then
+            set -- $res
+            echo "VirusTotal (mic helper): $1 of $2 clean" >> "$GITHUB_STEP_SUMMARY"
+            [ "$1" = "$2" ] || echo "::warning::VirusTotal flags the mic helper: only $1 of $2 clean"
+          fi
+      - name: Draft release
+        if: steps.gate.outputs.skip != '1' && env.TAG != ''
+        shell: bash
+        env:
+          CLEAN: ${{ steps.vt.outputs.clean }}
+          TOTAL: ${{ steps.vt.outputs.total }}
+        run: |
+          v="${TAG#v}"
+          # this version's CHANGELOG section, without its heading
+          section=$(awk -v v="$v" '$0 ~ "^## "v" " {on=1; next} /^## / {if (on) exit} on' CHANGELOG.md)
+          if [ -n "$CLEAN" ]; then
+            vt="Virus scan: [VirusTotal scan](https://www.virustotal.com/gui/file/$SHA) ($CLEAN of $TOTAL engines clean)"
+          else
+            vt="Virus scan: [VirusTotal scan](https://www.virustotal.com/gui/file/$SHA) (TODO: scan and add the count)"
+          fi
+          cat > notes.md <<EOF
+          **TODO headline: one plain paragraph of at least ~220 characters on what this release brings (docs/DEVELOPING.md "Release").**
+
+          **[⬇ Download OnionBoardSetup.exe](https://github.com/$GITHUB_REPOSITORY/releases/download/$TAG/OnionBoardSetup.exe)**: the one file you need (Windows 10 / 11). Already have Onion Board? The *Update* button at the top of the app offers this version. (The *Source code* files are for developers.)
+
+          $section
+
+          The whole list is in the [changelog](https://github.com/$GITHUB_REPOSITORY/blob/main/CHANGELOG.md).
+
+          SHA-256 (OnionBoardSetup.exe): \`$SHA\`
+          $vt
+          EOF
+          gh release create "$TAG" dist/OnionBoardSetup.exe dist/OnionBoardSetup-update.exe \
+            --draft --verify-tag --title "Onion Board $v" --notes-file notes.md
+          echo "Draft release made: write the headline, install it over a real copy, then publish." >> "$GITHUB_STEP_SUMMARY"
