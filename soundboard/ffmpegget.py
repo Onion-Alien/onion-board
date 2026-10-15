@@ -52,8 +52,10 @@ log = logging.getLogger(__name__)
 PACKAGE = "Gyan.FFmpeg.Essentials"   # the package the installer ticks (installer/OnionBoard.iss)
 FEATURE = "ffmpeg_download"          # net's switch for this download
 TIMEOUT_S = 900.0                    # winget fetches about 100 MB; a stuck one is cut here
-CHECK_TIMEOUT_S = 8.0                # `ffmpeg -version` answers in well under a second;
-                                     # a cold disk and a virus scan get a few more
+CHECK_TIMEOUT_S = 60.0               # `ffmpeg -version` answers in well under a second,
+                                     # but the first run of a just-installed copy (a
+                                     # 100 MB exe) waits for the virus scan, on a PC
+                                     # still busy with the app's own first start
 
 # the app's own copy (step 2): a release available on both GitHub and the builder's site
 VERSION = "9.0.2"
@@ -92,11 +94,13 @@ class SwitchedOff(GetError):
 @dataclass(frozen=True)
 class Health:
     """What check() found: ``state`` is OK, MISSING or BROKEN; ``version`` ("7.1") when
-    it runs; ``why`` (for the user) when it's broken."""
+    it runs; ``why`` (for the user) when it's broken; ``slow`` when it only didn't
+    answer in time (it may yet work: not proof it's broken)."""
     state: str
     version: str = ""
     path: str = ""
     why: str = ""
+    slow: bool = False
 
 
 _last: Health | None = None   # check()'s latest answer, for the UI thread to show
@@ -195,7 +199,7 @@ def _check() -> Health:
         p = _run_version(exe)
     except subprocess.TimeoutExpired:
         return Health(BROKEN, path=exe, why=_("it didn't answer in {seconds} seconds",
-                                              seconds=int(CHECK_TIMEOUT_S)))
+                                              seconds=int(CHECK_TIMEOUT_S)), slow=True)
     except OSError as e:   # not a program, the wrong kind for this PC, a dead link
         log.info("FFmpeg won't start: %s", e)
         return Health(BROKEN, path=exe, why=_("Windows won't start it"))

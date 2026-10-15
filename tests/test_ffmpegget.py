@@ -149,6 +149,14 @@ def test_check_says_broken_when_it_wont_start(monkeypatch, how):
         _version_says(monkeypatch, rc=-1073741515, out=b"")
     h = ffmpegget._check()
     assert h.state == ffmpegget.BROKEN and h.path == "ffmpeg.exe" and h.why
+    assert h.slow == (how == "timeout")   # only too slow to answer: not proof it's broken
+
+
+def test_check_waits_out_a_first_run_behind_a_virus_scan():
+    """A new install's first ffmpeg.exe run (100 MB) waits for the virus scan, on a PC
+    busy with the app's own first start: 8 s could call a fine copy broken and fetch
+    another ~100 MB one."""
+    assert ffmpegget.CHECK_TIMEOUT_S >= 60
 
 
 def test_the_check_behind_the_loading_screen_is_the_answer(monkeypatch):

@@ -511,7 +511,10 @@ def used(key: str) -> None:
 def ffmpeg_state(cfg, state: str) -> None:
     """Remember a broken copy or failed get until a later check verifies it works.
     The marker survives daily sends and restarts; missing on a new install is normal,
-    and an unknown check or a cancelled get cannot prove recovery. Only fixed feature
+    and an unknown check or a cancelled get cannot prove recovery. A check that only
+    timed out ("slow") is neither: on a new install's first start the virus scan of the
+    new ffmpeg.exe can outlast it, and it works a moment later. If the get it starts
+    then fails, get-failed still counts. Only fixed feature
     names are counted, never a path or error message.
     On purpose, only this count's own switch (and Offline / Tor) stop it, not FFmpeg's
     download switch: the check that finds a broken copy is local, so with that switch off
@@ -520,6 +523,8 @@ def ffmpeg_state(cfg, state: str) -> None:
     """
     if not enabled() or not net.allowed(FEATURE) or net.mode() == net.TOR:
         cfg.stats_ffmpeg_failed = False
+        return
+    if state == "slow":
         return
     if state in ("broken", "get-failed"):
         cfg.stats_ffmpeg_failed = True
