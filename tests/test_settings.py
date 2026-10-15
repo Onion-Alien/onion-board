@@ -86,7 +86,7 @@ def test_each_page_opens_by_name_and_holds_its_cards(window):  # noqa: F811
              "general": ("Window", "Running in the background", "Backup"),
              "help": ("Add-ons",),
              "about": ("Onion Board", "Get in touch", "Support Onion Board"),
-             "updates": ("App updates", "Downloader (yt-dlp)"),
+             "updates": ("App updates", "Helper programs"),
              "remote": ("Remote control (Stream Deck, scripts)", "Set it up the easy way")}
     for page, titles in where.items():
         d = SettingsDialog(window, page)
@@ -1033,7 +1033,7 @@ def test_downloader_actions_keep_focus_and_block_overlap(window, qapp, monkeypat
     qapp.processEvents()
     assert jobs == [1] and d.focusWidget() is btn
     assert all(not busy.is_busy(b) for b in d.ytdlp_btns)
-    assert ("Couldn't update" if error else "Done.") in d.ytdlp_label.text()
+    assert ("Couldn't update" if error else "Done.") in d.ytdlp_note.text()
     QTest.keyClick(btn, Qt.Key_Space)
     assert len(workers) == 1
     workers.pop()()
@@ -1130,7 +1130,7 @@ def test_downloads_card_shows_each_helper_program(window, qapp, monkeypatch, tmp
     monkeypatch.setattr(jsengine, "picked", engines)
     monkeypatch.setattr(tor, "available", lambda: False)
     monkeypatch.setattr(net, "allowed", lambda key: True)
-    d = _open_in_window(window, qapp, "data")
+    d = _open_in_window(window, qapp, "updates")
     try:
         assert process_events(qapp, lambda: "Checking…" not in (d.ytdlp_state.text(),
                                                                  d.js_state.text()))
@@ -1138,15 +1138,16 @@ def test_downloads_card_shows_each_helper_program(window, qapp, monkeypatch, tmp
         assert d.ytdlp_state.text() == "Working: version 2026.9.1"
         assert d.js_state.text() == "Working: Deno 2.4 (faster)"
         assert d.tor_row.isHidden()          # no Tor here: no row for it
-        assert not d.ytdlp_row_btn.isHidden() and d.ytdlp_row_btn.isEnabled()
+        upd = d.ytdlp_btns[0]
+        assert not upd.isHidden() and upd.isEnabled()
 
-        # Update now: the Downloader card's job, and both pages say how it went
+        # Update now: yt-dlp's row says how it went
         monkeypatch.setattr(ytdl, "update", lambda: "Updated yt-dlp to 2099.1.1.")
-        d.ytdlp_row_btn.click()
-        assert busy.is_busy(d.ytdlp_row_btn) and d.ytdlp_row_btn.isEnabled()
+        upd.click()
+        assert busy.is_busy(upd) and upd.isEnabled()
         monkeypatch.setattr(ytdl, "active_version", lambda: ("2099.1.1", True))
         assert process_events(qapp, lambda: d.ytdlp_state.text() == "Working: version 2099.1.1")
-        assert not busy.is_busy(d.ytdlp_row_btn)
+        assert not busy.is_busy(upd)
         assert d.ytdlp_note.text() == "Updated yt-dlp to 2099.1.1."
 
         # Tor found, an older copy: its row shows and offers the Connection page's download
@@ -1168,7 +1169,7 @@ def test_downloads_card_shows_each_helper_program(window, qapp, monkeypatch, tmp
         # Offline mode: what would go online is hidden; the versions stay
         net.configure_features(offline=True)
         d.privacy._offline_sync()
-        assert d.ytdlp_row_btn.isHidden() and d.tor_row_btn.isHidden()
+        assert all(b.isHidden() for b in d.ytdlp_btns) and d.tor_row_btn.isHidden()
         assert not d.tor_row.isHidden()
     finally:
         net.configure_features()

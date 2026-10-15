@@ -163,7 +163,8 @@ def _ff(monkeypatch, state, why=""):
 
 
 def _data_page(window):  # noqa: F811
-    window.setctl.open_settings("data")   # Settings is a page in the window
+    """Settings > Updates, where FFmpeg's row is."""
+    window.setctl.open_settings("updates")   # Settings is a page in the window
     return window.setctl._settings_dlg
 
 
@@ -205,7 +206,8 @@ def test_settings_checks_ffmpeg_when_nobody_has_yet(window, qapp):  # noqa: F811
 def test_settings_follows_the_download_and_a_fix(window, monkeypatch):  # noqa: F811
     from soundboard import ffmpegget
     _ff(monkeypatch, ffmpegget.MISSING)
-    d = _data_page(window)
+    window.setctl.open_settings("data")   # its video hint follows FFmpeg too
+    d = _data_page(window)                # FFmpeg's row: Updates > Helper programs
     d.privacy._ffmpeg_sync()
     assert "360p" in d._save_video_hint.text()
     window.ffctl.getting, window.ffctl.percent = True, 42

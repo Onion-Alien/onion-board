@@ -172,7 +172,8 @@ def modules_prune():
 
 
 def start_ytdlp_check(cfg):
-    """The daily "is there a newer yt-dlp?" check, off the UI thread (see ytdl.py)."""
+    """The daily "is there a newer yt-dlp?" check, off the UI thread (see ytdl.py), and
+    the app's own FFmpeg and Tor brought to the versions this release names."""
     import threading
 
     from soundboard import netlog, ytdl
@@ -180,6 +181,29 @@ def start_ytdlp_check(cfg):
                                       "(yt-dlp), after start-up")
     threading.Thread(target=ytdl.auto_update, args=(cfg.ytdlp_auto_optin,), daemon=True,
                      name="ytdlp-update").start()
+    threading.Thread(target=helpers_follow_app, daemon=True, name="helpers-update").start()
+
+
+def helpers_follow_app():
+    """FFmpeg and Tor update with the app: a copy the app downloaded for an older
+    version of itself is replaced by the one this version names (pinned and checked
+    against its SHA-256, so it's as safe as the app update itself). Tor waits while
+    Connection is set to Tor (it's carrying the app's traffic); Update Tor does it."""
+    from soundboard import ffmpegget, net, netlog, tor, torget
+    try:
+        netlog.cause(ffmpegget.FEATURE, "FFmpeg follows the app update (its own copy)")
+        h = ffmpegget.update_own()
+        if h is not None:
+            log.info("FFmpeg after following the app: %s %s", h.state, h.version)
+    except Exception as e:  # noqa: BLE001 - offline etc.: try again next start
+        log.info("couldn't update the app's FFmpeg: %s", e)
+    try:
+        if (torget.outdated() and net.allowed(torget.FEATURE)
+                and net.mode() != net.TOR):
+            netlog.cause(torget.FEATURE, "Tor follows the app update")
+            torget.get(before_unpack=tor.shutdown)
+    except Exception as e:  # noqa: BLE001 - offline etc.: try again next start
+        log.info("couldn't update Tor: %s", e)
 
 
 def selftest() -> int:

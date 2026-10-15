@@ -129,11 +129,9 @@ class Built:
     _tor_msg: Any
     _ytdlp_msg: Any
     ytdlp_note: Any
-    ytdlp_row_btn: Any
     _ytdlp_row_say: Any
     ytdlp_state: Any
     ytdlp_btns: Any
-    ytdlp_label: Any
 
 
 class Page(QObject):

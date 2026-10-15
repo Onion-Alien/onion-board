@@ -405,6 +405,30 @@ def _own_copy(progress, stop) -> Health:
     return check()
 
 
+def is_own(path: str) -> bool:
+    """`path` is the app's own copy (own_dir), not winget's or one on PATH."""
+    try:
+        return Path(path).resolve().parent == own_dir().resolve()
+    except OSError:
+        return False
+
+
+def update_own() -> Health | None:
+    """The app's own copy follows the app: one older than VERSION (the app was updated)
+    is replaced by this release's, checked against SHA256 like any download. A copy
+    from winget or elsewhere is left alone. None: nothing to do. Raises GetError.
+    Never on the UI thread."""
+    if why_not():
+        return None
+    with _fixing:
+        h = check()
+        if h.state != OK or not is_own(h.path) or h.version == VERSION:
+            return None
+        log.info("the app's FFmpeg is %s, this version of the app uses %s: updating",
+                 h.version, VERSION)
+        return _own_copy(None, None)
+
+
 # --------------------------------------------------------------------------- fix
 
 def fix(force: bool = False, progress: Callable[[int, int], None] | None = None,

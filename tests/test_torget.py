@@ -241,3 +241,26 @@ def test_gone_from_both_says_so(monkeypatch, app_dir):
     monkeypatch.setattr(tor, "bundle_dirs", lambda: [torget.bin_dir()])
     with pytest.raises(torget.GetError, match="archive.torproject.org said 404"):
         torget.get()
+
+
+def test_a_tor_from_an_older_app_follows_the_app_update(served, app_dir, monkeypatch):
+    """At start-up an older downloaded Tor is replaced by the one this release names,
+    but never while Connection is set to Tor (it's carrying the traffic), and nothing
+    is fetched for someone who never got Tor."""
+    from soundboard import app, ffmpegget
+    monkeypatch.setattr(ffmpegget, "update_own", lambda: None)
+    assert not torget.outdated()
+    app.helpers_follow_app()
+    assert served.calls == []                     # no Tor here: nothing fetched
+    old = torget.bin_dir()
+    old.mkdir(parents=True)
+    (old / "tor.exe").write_bytes(b"old")
+    (old / "VERSION").write_text("14.0 0000\n")
+    assert torget.outdated()
+    monkeypatch.setattr(net, "mode", lambda: net.TOR)
+    app.helpers_follow_app()
+    assert served.calls == [] and torget.outdated()
+    monkeypatch.setattr(net, "mode", lambda: net.DIRECT)
+    monkeypatch.setattr(tor, "shutdown", lambda: None)
+    app.helpers_follow_app()
+    assert len(served.calls) == 1 and torget.installed() and not torget.outdated()

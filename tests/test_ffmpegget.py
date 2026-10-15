@@ -390,3 +390,30 @@ def test_unpack_says_what_is_missing(tmp_path):
     with pytest.raises(ffmpegget.GetError, match="ffmpeg.exe"):
         ffmpegget.unpack(z, tmp_path / "bin")
     assert not (tmp_path / "bin").exists()
+
+
+# --------------------------------------------------------------------------- follow the app
+
+def test_the_apps_own_copy_follows_the_app(monkeypatch, tmp_path):
+    """An app update naming a newer FFmpeg replaces the app's own older copy; a copy
+    from winget (or one already at VERSION) is left alone."""
+    monkeypatch.setattr(library, "APP_DIR", tmp_path)
+    own = str(ffmpegget.own_dir() / "ffmpeg.exe")
+    got = []
+
+    def own_copy(progress, stop):
+        got.append(1)
+        return ffmpegget.Health(ffmpegget.OK, ffmpegget.VERSION, own)
+    monkeypatch.setattr(ffmpegget, "_own_copy", own_copy)
+    for path, version, fetched in ((own, "9.0.1", True), (own, ffmpegget.VERSION, False),
+                                   (str(tmp_path / "WinGet" / "ffmpeg.exe"), "8.1.1", False)):
+        got.clear()
+        monkeypatch.setattr(ffmpegget, "check",
+                            lambda p=path, v=version: ffmpegget.Health(ffmpegget.OK, v, p))
+        h = ffmpegget.update_own()
+        assert bool(got) is fetched and (h is not None) is fetched
+    monkeypatch.setattr(ffmpegget, "check",
+                        lambda: ffmpegget.Health(ffmpegget.OK, "9.0.1", own))
+    got.clear()
+    net.configure_features(["ffmpeg_download"], offline=False)   # switched off: never
+    assert ffmpegget.update_own() is None and not got
