@@ -5,8 +5,8 @@ import logging
 import threading
 
 from PySide6.QtCore import QObject, QTimer, Qt, Signal
-from PySide6.QtWidgets import (QCheckBox, QComboBox, QFrame, QGridLayout, QLabel,
-                               QPushButton, QVBoxLayout, QWidget)
+from PySide6.QtWidgets import (QCheckBox, QComboBox, QDialog, QFrame, QGridLayout,
+                               QHBoxLayout, QLabel, QPushButton, QVBoxLayout, QWidget)
 from shiboken6 import isValid as qt_valid
 
 from soundboard.i18n import _
@@ -422,6 +422,16 @@ class PrivacyPage(Page):
                               d.connection._ytdlp_run(getattr(ytdl, j), t))
             row.addWidget(b)
             d.ytdlp_btns.append(b)
+        # for when downloads broke and nothing approved fixes them yet: PyPI's newest
+        force = QPushButton(_("Force update"))
+        icons.set_icon(force, "alert")
+        force.setProperty("quiet", True)
+        force.setProperty("tip", _("Install the newest yt-dlp now, even one the app's makers "
+                                   "haven't approved yet"))
+        force.clicked.connect(self._ytdlp_force_ask)
+        row.addWidget(force)
+        d.ytdlp_btns.append(force)
+        d.ytdlp_force_btn = force
         col.addLayout(row)
         d._ytdlp_row_say = self._ytdlp_row_say
 
@@ -440,6 +450,56 @@ class PrivacyPage(Page):
         self._helpers_offline()
         d.connection._net_sync()   # a download that's switched off: greyed, with why
         self._helpers_refresh()
+
+    def _ytdlp_force_ask(self):
+        """Force update's warning: the newest yt-dlp isn't approved yet. Install anyway
+        runs ytdl.force_newest like Update now runs ytdl.update."""
+        from soundboard import ytdl
+        from soundboard.ui import fit
+        d = self.dlg
+        if any(busy.is_busy(b) for b in d.connection._ytdlp_buttons()):
+            return
+        box = QDialog(d)
+        box.setWindowTitle(_("Install an unapproved yt-dlp?"))
+        box.setMaximumWidth(620)
+        v = QVBoxLayout(box)
+        v.setContentsMargins(18, 18, 18, 18)
+        v.setSpacing(12)
+        title = QLabel(_("Install an unapproved yt-dlp?"))
+        title.setObjectName("helptitle")
+        v.addWidget(title)
+        for text, name in (
+                (_("Warning: this gets the newest yt-dlp from PyPI right away. Onion Board "
+                   "hasn't approved it yet, so nobody has checked it's safe. It may fix "
+                   "downloads that stopped working."), ""),
+                (_("Use it only when YouTube or another site stopped working and Update now "
+                   "doesn't fix it. Reinstall goes back to an approved version."), "hint")):
+            label = QLabel(text)
+            label.setWordWrap(True)
+            if name:
+                label.setObjectName(name)
+            v.addWidget(label)
+        row = QHBoxLayout()
+        row.setSpacing(8)
+        row.addStretch(1)
+        go = QPushButton(_("Install anyway"))
+        go.setObjectName("danger")
+        go.setDefault(True)
+        cancel = QPushButton(_("Cancel"))
+        cancel.clicked.connect(box.reject)
+
+        def install():
+            box.accept()
+            if qt_valid(d):
+                d.connection._ytdlp_run(ytdl.force_newest, "Force update")
+        go.clicked.connect(install)
+        row.addWidget(go)
+        row.addWidget(cancel)
+        v.addLayout(row)
+        fit.watch(box)
+        box.finished.connect(box.deleteLater)
+        d.ytdlp_force_box = box
+        box.open()
 
     def _helpers_refresh(self):
         """Look up what's in use on workers (reading files, starting each engine with

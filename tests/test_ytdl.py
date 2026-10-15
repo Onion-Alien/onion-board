@@ -21,6 +21,7 @@ from conftest import process_events
 from soundboard import net, ytdl
 from soundboard.engine import SR
 from soundboard.library import Config
+from PySide6.QtWidgets import QLabel, QPushButton
 
 
 @pytest.mark.parametrize("url, ok", [
@@ -192,8 +193,9 @@ def listed(app_dir, monkeypatch):
     # requires: version -> requires_python, listed instead of `latest` when set;
     # broken: versions whose yt_dlp doesn't import (like one written for a newer Python);
     # ages: version -> days on PyPI, for the ones that differ from `age`
+    # pypi: version -> requires_python, what PyPI itself has (for Force update)
     state = {"latest": "2099.1.1", "fetched": [], "corrupt": False, "requires": {},
-             "broken": set(), "age": 10, "ages": {}}
+             "broken": set(), "age": 10, "ages": {}, "pypi": {}}
 
     def wheel(pkg, version):
         buf = io.BytesIO()
@@ -227,7 +229,24 @@ def listed(app_dir, monkeypatch):
             versions = state["requires"] or {state["latest"]: None}
             return json.dumps({"versions": [entry(v, r) for v, r in versions.items()]}
                               ).encode()
+        if url.startswith(ytdl.PYPI):   # PyPI's JSON: <name>/json or <name>/<version>/json
+            parts = url.removeprefix(ytdl.PYPI).split("/")
+            if parts[0] == "yt-dlp-ejs":
+                return json.dumps(pypi_release("yt-dlp-ejs", parts[1])).encode()
+            if len(parts) == 3:
+                return json.dumps(pypi_release("yt-dlp", parts[1])).encode()
+            return json.dumps({"info": {"name": "yt-dlp", "version": "x"}, "releases": {
+                v: pypi_release("yt-dlp", v)["urls"] for v in state["pypi"]}}).encode()
         return state[url]
+
+    def pypi_release(name, version):
+        f = file(name, version, state["pypi"].get(version))
+        return {"info": {"name": name, "version": version,
+                         "requires_dist": ['yt-dlp-ejs==0.9.0; extra == "default"']
+                         if name == "yt-dlp" else []},
+                "urls": [{"packagetype": "bdist_wheel", "filename": f["filename"],
+                          "url": f["url"], "digests": {"sha256": f["sha256"]},
+                          "requires_python": f["requires_python"]}]}
 
     monkeypatch.setattr(ytdl, "_get", get)
     monkeypatch.setattr(ytdl, "bundled_version", lambda: "2026.8.19")
@@ -487,6 +506,56 @@ def test_switched_off_or_offline_nothing_is_asked(listed, off, offline):
     assert ytdl.active_version() == ("2026.8.19", False)
 
 
+def test_force_update_takes_pypis_newest_right_away(listed):
+    """Downloads broke and nothing approved fixes them yet (the fix is a day old):
+    Force update installs PyPI's newest that runs here, without the list or the wait."""
+    listed["latest"], listed["age"] = "2099.2.2", 0.5     # approved, too new for Update now
+    listed["pypi"] = {"2099.1.1": None, "2099.2.2": None, "2099.3.3.123.dev0": None,
+                      "2099.9.9": ">=3.99"}               # a nightly, one for a newer Python
+    assert "up to date" in ytdl.update()
+    listed["fetched"].clear()
+    assert ytdl.force_newest() == "Updated yt-dlp to 2099.2.2."
+    assert ytdl.active_version() == ("2099.2.2", True)
+    assert (ytdl._pkg_dir() / "yt_dlp_ejs" / "__init__.py").is_file()   # its pinned partner
+    assert ytdl.APPROVED_URL not in listed["fetched"]
+    assert all(u.startswith((ytdl.PYPI, ytdl.WHEEL_HOST)) for u in listed["fetched"])
+    assert "up to date" in ytdl.force_newest()           # already the newest
+
+
+def test_force_update_never_goes_below_the_copy_in_use(listed):
+    listed["pypi"] = {"2026.1.1": None}
+    assert ytdl.force_newest() == "yt-dlp 2026.8.19 is up to date."
+    assert ytdl.active_version() == ("2026.8.19", False)
+    assert not any(u.endswith(".whl") for u in listed["fetched"])
+
+
+def test_force_update_checks_pypis_hash(listed):
+    listed["pypi"] = {"2099.2.2": None}
+    listed["corrupt"] = True
+    with pytest.raises(ytdl.DownloadError, match="checksum"):
+        ytdl.force_newest()
+    assert ytdl.active_version() == ("2026.8.19", False)
+
+
+@pytest.mark.parametrize("answer", [b"<html>down</html>", b"[]", b'{"releases": {}}'])
+def test_force_update_says_so_when_pypi_answers_junk(monkeypatch, answer):
+    monkeypatch.setattr(ytdl, "_get", lambda url, limit: answer)
+    with pytest.raises(ytdl.DownloadError, match="PyPI"):
+        ytdl.force_newest()
+
+
+@pytest.mark.parametrize("off, offline", [(["ytdlp_update"], False), ([], True)])
+def test_force_update_switched_off_or_offline_asks_nobody(listed, off, offline):
+    listed["pypi"] = {"2099.2.2": None}
+    net.configure_features(off, offline=offline)
+    try:
+        with pytest.raises(ytdl.SwitchedOff):
+            ytdl.force_newest()
+    finally:
+        net.configure_features()
+    assert listed["fetched"] == []
+
+
 def test_a_downloaded_copy_that_doesnt_import_falls_back_and_is_never_fetched_again(listed):
     listed["broken"].add("2099.1.1")
     assert ytdl.update() == "Updated yt-dlp to 2099.1.1."
@@ -570,7 +639,7 @@ def test_settings_ytdlp_row(qapp, window, monkeypatch):  # noqa: F811
     monkeypatch.setattr(ytdl, "active_version", lambda: ("2026.8.19", False))
     monkeypatch.setattr(ytdl, "update", lambda: "Updated yt-dlp to 2099.1.1.")
     d = SettingsDialog(window, "updates")
-    assert [b.text() for b in d.ytdlp_btns] == ["Update now", "Reinstall"]
+    assert [b.text() for b in d.ytdlp_btns] == ["Update now", "Reinstall", "Force update"]
     assert not d.ytdlp_auto_box.isChecked()               # opt-in
     d.ytdlp_btns[0].click()                               # Update now
     assert busy.is_busy(d.ytdlp_btns[0]) and d.ytdlp_btns[0].isEnabled()
@@ -578,6 +647,34 @@ def test_settings_ytdlp_row(qapp, window, monkeypatch):  # noqa: F811
     assert process_events(qapp, lambda: not busy.is_busy(d.ytdlp_btns[0]), 5)
     assert process_events(qapp, lambda: d.ytdlp_state.text() == "Working: version 2099.1.1", 5)
     assert d.ytdlp_note.text() == "Updated yt-dlp to 2099.1.1."
+    d.close()
+
+
+def test_force_update_warns_first(qapp, window, monkeypatch):  # noqa: F811
+    """Force update installs nothing until the warning's Install anyway; Cancel does
+    nothing at all."""
+    from soundboard.settings import SettingsDialog
+    from soundboard.ui import busy
+    calls = []
+    monkeypatch.setattr(ytdl, "active_version", lambda: ("2026.8.19", False))
+    monkeypatch.setattr(ytdl, "force_newest",
+                        lambda: calls.append(1) or "Updated yt-dlp to 2099.2.2.")
+    d = SettingsDialog(window, "updates")
+    d.ytdlp_force_btn.click()
+    box = d.ytdlp_force_box
+    assert box.isVisible() and "approved" in box.findChildren(QLabel)[1].text()
+    [cancel] = [b for b in box.findChildren(QPushButton) if b.text() == "Cancel"]
+    cancel.click()
+    qapp.processEvents()
+    assert calls == [] and not busy.is_busy(d.ytdlp_force_btn)
+
+    d.ytdlp_force_btn.click()
+    [go] = [b for b in d.ytdlp_force_box.findChildren(QPushButton)
+            if b.text() == "Install anyway"]
+    assert go.objectName() == "danger"
+    go.click()
+    assert process_events(qapp, lambda: calls and not busy.is_busy(d.ytdlp_force_btn), 5)
+    assert process_events(qapp, lambda: d.ytdlp_note.text() == "Updated yt-dlp to 2099.2.2.", 5)
     d.close()
 
 

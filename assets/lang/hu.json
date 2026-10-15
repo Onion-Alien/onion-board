@@ -3451,5 +3451,13 @@
   "{voice}, the computer voice. It's on: just talk.": "{voice}, a gépi hang. Be van kapcsolva: csak beszélj.",
   "Once a day and after a failed download, gets a newer yt-dlp from PyPI, but only a version the app's makers approved that has been out for at least 3 days. Off by default.": "Naponta egyszer és sikertelen letöltés után letölt egy újabb yt-dlp-t a PyPI-ról, de csak olyan verziót, amit az alkalmazás készítői jóváhagytak, és ami legalább 3 napja megjelent. Alapból ki van kapcsolva.",
   "Reads the list of yt-dlp versions the app's makers approved (from GitHub), and fetches a newer one from PyPI when you press Update now or Reinstall (Updates > Helper programs), or by itself if you ticked Update automatically there.": "Beolvassa az alkalmazás készítői által jóváhagyott yt-dlp-verziók listáját (a GitHubról), és újabbat tölt le a PyPI-ról, amikor megnyomod a Frissítés most vagy a Újratelepítés gombot (Frissítések > Segédprogramok), vagy magától, ha ott bepipáltad az Automatikus frissítést.",
-  "The list of approved yt-dlp versions couldn't be read": "A jóváhagyott yt-dlp-verziók listáját nem sikerült beolvasni"
+  "The list of approved yt-dlp versions couldn't be read": "A jóváhagyott yt-dlp-verziók listáját nem sikerült beolvasni",
+  "Force update": "Frissítés kényszerítése",
+  "Install an unapproved yt-dlp?": "Telepíted a jóvá nem hagyott yt-dlp-t?",
+  "Install anyway": "Telepítés mégis",
+  "Install the newest yt-dlp now, even one the app's makers haven't approved yet": "Most telepíti a legújabb yt-dlp-t, akkor is, ha az alkalmazás készítői még nem hagyták jóvá",
+  "PyPI sent an answer that couldn't be read": "A PyPI nem olvasható választ küldött",
+  "Use it only when YouTube or another site stopped working and Update now doesn't fix it. Reinstall goes back to an approved version.": "Csak akkor használd, ha a YouTube vagy egy másik oldal leállt, és a Frissítés most nem segít. Az Újratelepítés visszavált egy jóváhagyott verzióra.",
+  "Warning: this gets the newest yt-dlp from PyPI right away. Onion Board hasn't approved it yet, so nobody has checked it's safe. It may fix downloads that stopped working.": "Figyelem: ez azonnal letölti a legújabb yt-dlp-t a PyPI-ról. Az Onion Board még nem hagyta jóvá, így senki nem ellenőrizte, hogy biztonságos-e. Megjavíthatja a leállt letöltéseket.",
+  "no wheel for {package}": "nincs kerék a következőhöz: {package}"
 }

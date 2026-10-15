@@ -16,7 +16,10 @@ SHA-256 of its yt-dlp and yt-dlp-ejs wheels. A weekly job adds new releases to i
 their PyPI attestations check out (scripts/pinbump/ytdlp.py), and merging its PR
 approves one. The app also waits until a version has been on PyPI for MIN_AGE_S, so a
 bad release gets caught and pulled first. The wheels are checked against the list's
-hashes, not PyPI's. An import hook (_Finder) makes that copy win over the bundled one.
+hashes, not PyPI's. When downloads broke and nothing approved fixes them yet, Force
+update (force_newest) takes PyPI's newest right away, after a warning in Settings,
+checked only against PyPI's SHA-256. An import hook (_Finder) makes the copy win over
+the bundled one.
 That only happens when the user asks (Settings → Updates: Update now / Reinstall), or,
 if they opted in (off by default: it's code the app runs), once a day and when a
 download fails. "Reinstall" deletes the copy and its cache and fetches a fresh one.
@@ -68,6 +71,8 @@ PACKAGES = ("yt_dlp", "yt_dlp_ejs")
 APPROVED_URL = f"https://raw.githubusercontent.com/{updates.REPO}/main/pins/yt-dlp.json"
 APPROVED_MAX = 1 << 20            # the list is a few KB
 MIN_AGE_S = 3 * 24 * 3600         # an approved version waits this long after its release
+PYPI = "https://pypi.org/pypi/"   # Force update only: PyPI's newest, not yet approved
+PYPI_MAX = 5 * 1024 * 1024
 WHEEL_HOST = "https://files.pythonhosted.org/"
 CHECK_EVERY = 24 * 3600          # automatic update check
 RETRY_CHECK_AFTER = 3600         # a failed download checks again if the last check is older
@@ -466,7 +471,11 @@ def update(force: bool = False) -> str:
     if (not pick or (bundled and vtuple(latest) < vtuple(bundled))
             or (not force and current and vtuple(latest) <= vtuple(current))):
         return _("yt-dlp {version} is up to date.", version=current)
-    wheels = [_wheel(w) for w in pick.wheels]
+    return _install(latest, [_wheel(w) for w in pick.wheels])
+
+
+def _install(latest: str, wheels: list[bytes]) -> str:
+    """Unpack checked wheels into a new copy and swap it in for the one in use."""
     root().mkdir(parents=True, exist_ok=True)
     new = Path(tempfile.mkdtemp(prefix="new-", dir=root()))
     try:
@@ -493,6 +502,66 @@ def update(force: bool = False) -> str:
         shutil.rmtree(new, ignore_errors=True)
     log.info("yt-dlp updated to %s", latest)
     return _("Updated yt-dlp to {version}.", version=latest)
+
+
+# ---- Force update: PyPI's newest, not yet approved (the user asked, after a warning)
+
+def _pypi_file(files) -> dict | None:
+    """A PyPI release's pure-Python wheel this app can use: not yanked, on PyPI's file
+    host, for this Python."""
+    for f in files or ():
+        if (f.get("packagetype") == "bdist_wheel"
+                and str(f.get("filename", "")).endswith("-py3-none-any.whl")
+                and str(f.get("url", "")).startswith(WHEEL_HOST)
+                and not f.get("yanked") and _py_ok(f.get("requires_python"))):
+            return f
+    return None
+
+
+def _pypi_json(name: str, version: str = "") -> dict:
+    path = f"{name}/{version}/json" if version else f"{name}/json"
+    try:
+        meta = json.loads(_get(PYPI + path, PYPI_MAX))
+        meta["info"]["version"]   # noqa: B018 - it's there, or the answer is junk
+        return meta
+    except (ValueError, KeyError, TypeError) as e:
+        raise DownloadError(_("PyPI sent an answer that couldn't be read")) from e
+
+
+def _pypi_wheel(name: str, version: str) -> bytes:
+    """One release's wheel, checked against the SHA-256 PyPI lists for it."""
+    f = _pypi_file(_pypi_json(name, version).get("urls"))
+    if f is None:
+        raise DownloadError(_("no wheel for {package}", package=name))
+    return _wheel({"url": f["url"], "filename": f["filename"],
+                   "sha256": f["digests"]["sha256"]})
+
+
+def force_newest() -> str:
+    """Settings > Updates: Force update, for when downloads broke and no approved
+    version fixes them yet. Installs PyPI's newest final yt-dlp that runs here (and
+    its pinned yt-dlp-ejs) right away: not on the approved list, not 3 days old,
+    checked only against PyPI's own SHA-256. Never older than the built-in copy or
+    one that failed here; one already in use is left as it is."""
+    if not net.allowed(UPDATE_FEATURE):
+        raise SwitchedOff(net.off_message(UPDATE_FEATURE))
+    bad = set(_state().get("bad") or ())
+    releases = _pypi_json("yt-dlp").get("releases") or {}
+    latest = max((v for v, files in releases.items()
+                  if re.fullmatch(r"\d+(\.\d+)+", v) and v not in bad and _pypi_file(files)),
+                 key=vtuple, default="")
+    current, __ = active_version()
+    _save_state(checked=time.time())
+    if not latest or (current and vtuple(latest) <= vtuple(current)):
+        return _("yt-dlp {version} is up to date.", version=current)
+    meta = _pypi_json("yt-dlp", latest)
+    pin = next((m.group(1) for r in meta["info"].get("requires_dist") or ()
+                if (m := re.match(r"yt-dlp-ejs\s*==\s*([\w.]+)", r))), None)
+    wheels = [_pypi_wheel("yt-dlp", latest)]
+    if pin:
+        wheels.append(_pypi_wheel("yt-dlp-ejs", pin))
+    log.warning("force-installing yt-dlp %s from PyPI: not on the approved list", latest)
+    return _install(latest, wheels)
 
 
 def reset() -> str:

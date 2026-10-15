@@ -3451,5 +3451,13 @@
   "{voice}, the computer voice. It's on: just talk.": "{voice}, la voz de computadora. Está activada: solo habla.",
   "Once a day and after a failed download, gets a newer yt-dlp from PyPI, but only a version the app's makers approved that has been out for at least 3 days. Off by default.": "Una vez al día y después de una descarga fallida, descarga un yt-dlp más nuevo de PyPI, pero solo una versión que los creadores de la app aprobaron y que salió hace al menos 3 días. Desactivado por defecto.",
   "Reads the list of yt-dlp versions the app's makers approved (from GitHub), and fetches a newer one from PyPI when you press Update now or Reinstall (Updates > Helper programs), or by itself if you ticked Update automatically there.": "Lee la lista de versiones de yt-dlp que aprobaron los creadores de la app (desde GitHub) y descarga una más nueva de PyPI cuando presionas Actualizar ahora o Reinstalar (Actualizaciones > Programas auxiliares), o solo si marcaste Actualizar automáticamente ahí.",
-  "The list of approved yt-dlp versions couldn't be read": "No se pudo leer la lista de versiones aprobadas de yt-dlp"
+  "The list of approved yt-dlp versions couldn't be read": "No se pudo leer la lista de versiones aprobadas de yt-dlp",
+  "Force update": "Forzar actualización",
+  "Install an unapproved yt-dlp?": "¿Instalar un yt-dlp sin aprobar?",
+  "Install anyway": "Instalar igual",
+  "Install the newest yt-dlp now, even one the app's makers haven't approved yet": "Instala el yt-dlp más nuevo ahora, aunque los creadores de la app todavía no lo hayan aprobado",
+  "PyPI sent an answer that couldn't be read": "PyPI envió una respuesta que no se pudo leer.",
+  "Use it only when YouTube or another site stopped working and Update now doesn't fix it. Reinstall goes back to an approved version.": "Úsalo solo cuando YouTube u otro sitio dejó de funcionar y Actualizar ahora no lo arregla. Reinstalar vuelve a una versión aprobada.",
+  "Warning: this gets the newest yt-dlp from PyPI right away. Onion Board hasn't approved it yet, so nobody has checked it's safe. It may fix downloads that stopped working.": "Atención: esto descarga el yt-dlp más nuevo de PyPI al instante. Onion Board todavía no lo aprobó, así que nadie revisó que sea seguro. Puede arreglar descargas que dejaron de funcionar.",
+  "no wheel for {package}": "sin rueda para {package}"
 }
