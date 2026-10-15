@@ -3551,5 +3551,6 @@
   "Onion Pocket's settings didn't open: they're on Settings → Remote.": "Настройки Onion Pocket не открылись: они в разделе Настройки → Пульт.",
   "Pair a phone and settings": "Подключить телефон и настройки",
   "<br><span style='color:{status}'>Can't open {devices} (My headphones). Plugged in? It's tried again by itself.</span>": "<br><span style='color:{status}'>Не удаётся открыть {devices} («Мои наушники»). Подключено? Попытка повторится сама.</span>",
-  "<br><span style='color:{status}'>Can't open {devices} (My mic). Plugged in? It's tried again by itself.</span>": "<br><span style='color:{status}'>Не удаётся открыть {devices} («Мой микрофон»). Подключено? Попытка повторится сама.</span>"
+  "<br><span style='color:{status}'>Can't open {devices} (My mic). Plugged in? It's tried again by itself.</span>": "<br><span style='color:{status}'>Не удаётся открыть {devices} («Мой микрофон»). Подключено? Попытка повторится сама.</span>",
+  "On, waiting for Windows to allow it: answer its prompt.": "Включено, ждёт разрешения Windows: ответьте на его запрос."
 }

@@ -3551,5 +3551,6 @@
   "Onion Pocket's settings didn't open: they're on Settings → Remote.": "Nastavení Onion Pocket se neotevřelo: najdeš ho v Nastavení → Dálkové ovládání.",
   "Pair a phone and settings": "Spárovat telefon a nastavení",
   "<br><span style='color:{status}'>Can't open {devices} (My headphones). Plugged in? It's tried again by itself.</span>": "<br><span style='color:{status}'>{devices} nejde otevřít (Moje sluchátka). Je připojené? Zkouší se to znovu samo.</span>",
-  "<br><span style='color:{status}'>Can't open {devices} (My mic). Plugged in? It's tried again by itself.</span>": "<br><span style='color:{status}'>{devices} nejde otevřít (Můj mikrofon). Je připojené? Zkouší se to znovu samo.</span>"
+  "<br><span style='color:{status}'>Can't open {devices} (My mic). Plugged in? It's tried again by itself.</span>": "<br><span style='color:{status}'>{devices} nejde otevřít (Můj mikrofon). Je připojené? Zkouší se to znovu samo.</span>",
+  "On, waiting for Windows to allow it: answer its prompt.": "Zapnuto, čeká se, až to Windows povolí: odpověz na jeho dotaz."
 }

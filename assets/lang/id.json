@@ -3399,5 +3399,6 @@
   "Onion Pocket's settings didn't open: they're on Settings → Remote.": "Pengaturan Onion Pocket tidak terbuka: ada di Pengaturan → Terpencil.",
   "Pair a phone and settings": "Sambungkan ponsel dan pengaturan",
   "<br><span style='color:{status}'>Can't open {devices} (My headphones). Plugged in? It's tried again by itself.</span>": "<br><span style='color:{status}'>Tidak bisa membuka {devices} (Headphone saya). Sudah dicolok? Akan dicoba lagi otomatis.</span>",
-  "<br><span style='color:{status}'>Can't open {devices} (My mic). Plugged in? It's tried again by itself.</span>": "<br><span style='color:{status}'>Tidak bisa membuka {devices} (Mikrofon saya). Sudah dicolok? Akan dicoba lagi otomatis.</span>"
+  "<br><span style='color:{status}'>Can't open {devices} (My mic). Plugged in? It's tried again by itself.</span>": "<br><span style='color:{status}'>Tidak bisa membuka {devices} (Mikrofon saya). Sudah dicolok? Akan dicoba lagi otomatis.</span>",
+  "On, waiting for Windows to allow it: answer its prompt.": "Nyala, menunggu Windows mengizinkannya: jawab pertanyaannya."
 }

@@ -3475,5 +3475,6 @@
   "Onion Pocket's settings didn't open: they're on Settings → Remote.": "Les réglages d'Onion Pocket ne se sont pas ouverts : ils sont dans Paramètres → Télécommande.",
   "Pair a phone and settings": "Associer un téléphone et réglages",
   "<br><span style='color:{status}'>Can't open {devices} (My headphones). Plugged in? It's tried again by itself.</span>": "<br><span style='color:{status}'>Impossible d'ouvrir {devices} (Mon casque). C'est branché ? Ça réessaie tout seul.</span>",
-  "<br><span style='color:{status}'>Can't open {devices} (My mic). Plugged in? It's tried again by itself.</span>": "<br><span style='color:{status}'>Impossible d'ouvrir {devices} (Mon micro). C'est branché ? Ça réessaie tout seul.</span>"
+  "<br><span style='color:{status}'>Can't open {devices} (My mic). Plugged in? It's tried again by itself.</span>": "<br><span style='color:{status}'>Impossible d'ouvrir {devices} (Mon micro). C'est branché ? Ça réessaie tout seul.</span>",
+  "On, waiting for Windows to allow it: answer its prompt.": "Activé, en attente de l'accord de Windows : réponds à sa demande."
 }

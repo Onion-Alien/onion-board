@@ -3399,5 +3399,6 @@
   "Onion Pocket's settings didn't open: they're on Settings → Remote.": "การตั้งค่า Onion Pocket ไม่เปิด: อยู่ใน การตั้งค่า → ระยะไกล",
   "Pair a phone and settings": "จับคู่โทรศัพท์และการตั้งค่า",
   "<br><span style='color:{status}'>Can't open {devices} (My headphones). Plugged in? It's tried again by itself.</span>": "<br><span style='color:{status}'>เปิด {devices} ไม่ได้ (หูฟังของฉัน) เสียบอยู่ไหม? ระบบจะลองใหม่เอง</span>",
-  "<br><span style='color:{status}'>Can't open {devices} (My mic). Plugged in? It's tried again by itself.</span>": "<br><span style='color:{status}'>เปิด {devices} ไม่ได้ (ไมค์ของฉัน) เสียบอยู่ไหม? ระบบจะลองใหม่เอง</span>"
+  "<br><span style='color:{status}'>Can't open {devices} (My mic). Plugged in? It's tried again by itself.</span>": "<br><span style='color:{status}'>เปิด {devices} ไม่ได้ (ไมค์ของฉัน) เสียบอยู่ไหม? ระบบจะลองใหม่เอง</span>",
+  "On, waiting for Windows to allow it: answer its prompt.": "เปิด กำลังรอให้ Windows อนุญาต: ตอบหน้าต่างที่ถามอยู่"
 }

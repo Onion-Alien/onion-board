@@ -3475,5 +3475,6 @@
   "Onion Pocket's settings didn't open: they're on Settings → Remote.": "Innstillingene for Onion Pocket åpnet seg ikke: de ligger under Innstillinger → Fjernstyring.",
   "Pair a phone and settings": "Koble til en telefon og innstillinger",
   "<br><span style='color:{status}'>Can't open {devices} (My headphones). Plugged in? It's tried again by itself.</span>": "<br><span style='color:{status}'>Får ikke åpnet {devices} (Hodetelefonene mine). Koblet til? Det prøves igjen av seg selv.</span>",
-  "<br><span style='color:{status}'>Can't open {devices} (My mic). Plugged in? It's tried again by itself.</span>": "<br><span style='color:{status}'>Får ikke åpnet {devices} (Mikrofonen min). Koblet til? Det prøves igjen av seg selv.</span>"
+  "<br><span style='color:{status}'>Can't open {devices} (My mic). Plugged in? It's tried again by itself.</span>": "<br><span style='color:{status}'>Får ikke åpnet {devices} (Mikrofonen min). Koblet til? Det prøves igjen av seg selv.</span>",
+  "On, waiting for Windows to allow it: answer its prompt.": "På, venter på at Windows skal tillate det: svar på spørsmålet."
 }

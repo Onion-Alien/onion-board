@@ -10,7 +10,7 @@ from __future__ import annotations
 import logging
 from typing import TYPE_CHECKING
 
-from PySide6.QtCore import QEvent, QObject
+from PySide6.QtCore import QEvent, QObject, QTimer
 from PySide6.QtWidgets import QVBoxLayout, QWidget
 
 from soundboard.i18n import _
@@ -68,6 +68,11 @@ class PocketCard(QObject):
             text = _("Off: phones can't reach Onion Board. Open it below to turn it on.")
         elif server is not None and getattr(server, "running", False):
             text = _("On: phones on this Wi-Fi can play your pads.")
+        elif getattr(a, "asking", None) is not None:
+            # it starts once Windows' firewall prompt is answered: until then that's no
+            # "couldn't start". Looked at again until the answer's in.
+            text = _("On, waiting for Windows to allow it: answer its prompt.")
+            QTimer.singleShot(500, self, self.say_state)
         else:
             text = _("On, but it couldn't start. Open it below to see why.")
         self.state.setText(text)
