@@ -11,7 +11,7 @@ from shiboken6 import isValid as qt_valid
 from soundboard import errors, theme, ytdl
 from soundboard.i18n import _
 from soundboard.ui import busy
-from soundboard.ui.settingspages import Page, _button_row
+from soundboard.ui.settingspages import Page
 from soundboard.wheelguard import no_wheel
 
 
@@ -365,7 +365,7 @@ class ConnectionPage(Page):
     def _updates(self):
         w, v = self._page()
         v.addWidget(self._updates_card())
-        v.addWidget(self._downloader_card())
+        v.addWidget(self.dlg.privacy._tools_card())
         v.addStretch(1)
         return w
 
@@ -445,70 +445,19 @@ class ConnectionPage(Page):
             self.dlg.upd_label.setText(status)
 
     # ------------------------------------------------------------------ yt-dlp
-    def _downloader_card(self):
-        card, cv = self._card(_("Downloader (yt-dlp)"),
-                              _("Searching YouTube / SoundCloud and adding a pasted link use "
-                                "yt-dlp. YouTube changes often, so it needs updating now and "
-                                "then. Nothing is downloaded unless you click Update now / "
-                                "Reset, or tick the box below. If downloads keep failing even "
-                                "after updating, Reset deletes it and its cache and installs a "
-                                "fresh copy."), icon="download")
-        auto = self._option(cv, _("Update automatically"),
-                            _("Check PyPI once a day and after a failed download. Off by "
-                              "default: an update is code the app runs."),
-                            self.mw.cfg.ytdlp_auto_optin,
-                            lambda b: self.mw.set_option("ytdlp_auto_optin", b))
-        auto.setToolTip(_("Off by default: an update is code the app runs. It's checked against "
-                          "PyPI's SHA-256 before it's used."))
-        self.dlg.ytdlp_auto_box = auto
-        row = _button_row()
-        self.dlg.ytdlp_label = QLabel()
-        self.dlg.ytdlp_label.setObjectName("hint")
-        self.dlg.ytdlp_label.setWordWrap(True)
-        cv.addWidget(self.dlg.ytdlp_label)
-        self.dlg.ytdlp_btns = []
-        # (label, the English one for the network log, job, tooltip)
-        for text, logged, job, tip in (
-                (_("Update now"), "Update now", ytdl.update,
-                 _("Check for a newer yt-dlp and install it")),
-                (_("Reset downloader"), "Reset downloader", ytdl.reset,
-                 _("Delete the downloaded yt-dlp and its cache, then install a fresh copy"))):
-            b = QPushButton(text)
-            b.setToolTip(tip)
-            b.setProperty("tip", tip)
-            b.clicked.connect(lambda __=False, j=job, t=logged: self._ytdlp_run(j, t))
-            row.addWidget(b)
-            self.dlg.ytdlp_btns.append(b)
-        cv.addLayout(row)
-        self._ytdlp_show()
-        self._net_sync()
-        return card
-
-    def _ytdlp_show(self, msg: str = ""):
-        v, downloaded = ytdl.active_version()
-        now = (_("yt-dlp isn't installed.") if not v else
-               _("In use: yt-dlp {version} (updated copy).", version=v) if downloaded else
-               _("In use: yt-dlp {version} (built in).", version=v))
-        self.dlg.ytdlp_label.setText(f"{msg} {now}".strip())
-
     def _ytdlp_buttons(self) -> list[QPushButton]:
-        """Every button that updates yt-dlp: Update now and Reset here, and Update now
-        on Data & quality (whichever of those pages has been built)."""
-        found = [*getattr(self.dlg, "ytdlp_btns", ()), getattr(self.dlg, "ytdlp_row_btn", None)]
-        return [b for b in found if b is not None and qt_valid(b)]
+        """Update now and Reinstall (Updates > Helper programs), once built."""
+        return [b for b in getattr(self.dlg, "ytdlp_btns", ()) if qt_valid(b)]
 
     def _ytdlp_say(self, msg: str):
-        """How the update is going, on both pages."""
-        label = getattr(self.dlg, "ytdlp_label", None)
-        if label is not None and qt_valid(label):
-            label.setText(msg)
+        """How the update is going, on yt-dlp's row."""
         say = getattr(self.dlg, "_ytdlp_row_say", None)
         if say is not None:
             say(msg)
 
     def _ytdlp_run(self, job, button: str = "", where: str = "Settings > Updates"):
-        """Update now / Reset downloader: `job` (ytdl.update or ytdl.reset) on a worker,
-        every yt-dlp button busy meanwhile. Data & quality's Update now comes here too."""
+        """Update now / Reinstall: `job` (ytdl.update or ytdl.reset) on a worker,
+        both yt-dlp buttons busy meanwhile."""
         buttons = self._ytdlp_buttons()
         if any(busy.is_busy(b) or not b.isEnabled() for b in buttons):
             return
@@ -525,9 +474,6 @@ class ConnectionPage(Page):
             for b in self._ytdlp_buttons():
                 busy.set_busy(b, False)
             self._net_sync()
-            label = getattr(self.dlg, "ytdlp_label", None)
-            if label is not None and qt_valid(label):
-                self._ytdlp_show(msg)
             say = getattr(self.dlg, "_ytdlp_row_say", None)
             if say is not None:
                 say(msg, done=True)

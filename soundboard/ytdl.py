@@ -13,8 +13,8 @@ built app can't pip-install. So a newer yt-dlp is fetched from PyPI (the wheels 
 yt-dlp and its pinned yt-dlp-ejs, checked against PyPI's SHA-256) and unpacked into
 %APPDATA%\\OnionBoard\\yt-dlp\\current; an import hook (_Finder) makes that copy win
 over the bundled one. That only happens when the user asks (Settings → Updates:
-Update now / Reset), or, if they opted in (off by default: it's code the app runs),
-once a day and when a download fails. "Reset" deletes the copy and its cache and fetches
+Update now / Reinstall), or, if they opted in (off by default: it's code the app runs),
+once a day and when a download fails. "Reinstall" deletes the copy and its cache and fetches
 a fresh one. A copy older than the bundled yt-dlp (the app itself was updated) is
 dropped at startup.
 
@@ -799,7 +799,8 @@ def _ydl():
                 return
         if retry or not override_version():
             raise FetchError(_("The downloader (yt-dlp) isn't installed, "
-                               "Settings → Updates → Reset downloader.")) from failed
+                               "Settings → Updates → Helper programs → yt-dlp → "
+                               "Reinstall.")) from failed
         _drop_broken(failed)
 
 
@@ -987,7 +988,7 @@ def _opts(dest: Path | None = None, progress=None, thumbnail: bool = False,
         "no_warnings": True,
         "noprogress": True,
         "max_filesize": MAX_BYTES,
-        "cachedir": str(cache_dir()),  # ours, so Reset can clear it
+        "cachedir": str(cache_dir()),  # ours, so Reinstall can clear it
         "js_runtimes": jsengine.runtimes(),   # YouTube's player challenge; works without
         "progress_hooks": [hook],
         "logger": log,
