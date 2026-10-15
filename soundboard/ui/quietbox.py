@@ -112,6 +112,8 @@ def tidy_input(dlg: QInputDialog) -> None:
 
 
 class _Filter(QObject):
+    EVENTS = (QEvent.Type.Polish, QEvent.Type.Show)   # all it reads (theme.app_filter)
+
     def eventFilter(self, obj, event):   # noqa: N802 - Qt API
         # Polish comes before the box is sized; Show (before its showEvent, which
         # plays the sound and sizes the box) catches an icon or text set after that
