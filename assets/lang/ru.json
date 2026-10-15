@@ -3543,5 +3543,11 @@
   "Installing Onion Board {version}…": "Установка Onion Board {version}…",
   "Updated to {version}": "Обновлено до {version}",
   "Updating to {version}…": "Обновление до {version}…",
-  "Updating to {version}… {pct}%": "Обновление до {version}… {pct}%"
+  "Updating to {version}… {pct}%": "Обновление до {version}… {pct}%",
+  "Off: phones can't reach Onion Board. Open it below to turn it on.": "Выключено: телефоны не могут достучаться до Onion Board. Откройте ниже, чтобы включить.",
+  "On, but it couldn't start. Open it below to see why.": "Включено, но не запустилось. Откройте ниже, чтобы увидеть почему.",
+  "On: phones on this Wi-Fi can play your pads.": "Включено: телефоны в этой сети Wi-Fi могут запускать ваши кнопки.",
+  "Onion Pocket": "Onion Pocket",
+  "Onion Pocket's settings didn't open: they're on Settings → Remote.": "Настройки Onion Pocket не открылись: они в разделе Настройки → Пульт.",
+  "Pair a phone and settings": "Подключить телефон и настройки"
 }

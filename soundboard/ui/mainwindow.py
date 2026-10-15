@@ -304,6 +304,7 @@ class MainWindow(QMainWindow):
     setup_hint: Any
     setup_lbl: QLabel
     _setup_lr: Any
+    _setup_cards: Any
     _setup_narrow: Any
     setup_no: QPushButton
     setup_page: Any
@@ -357,6 +358,7 @@ class MainWindow(QMainWindow):
     ytresults: SearchResults
 
     # ---- kept by Settings → Remote across openings (ui/settingspages/addons.py)
+    pocket_card: Any
     pocket_checked: float
     pocket_offer: Any
 
@@ -535,6 +537,7 @@ class MainWindow(QMainWindow):
         self.remote = remote.RemoteControl(lambda a, p: remote.dispatch(self, a, p), self)
         self.remctl.apply_remote()
         self.remctl.remote_addons = self.remctl._load_remote_addons()
+        self.pocket_card.refresh()   # its own card on Setup, if it's installed
         a11y.label_tree(self, force=True)   # names for the icon-only buttons
 
         self.timer = QTimer(self)

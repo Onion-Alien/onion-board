@@ -3543,5 +3543,11 @@
   "Installing Onion Board {version}…": "Se instalează Onion Board {version}…",
   "Updated to {version}": "Actualizat la {version}",
   "Updating to {version}…": "Se actualizează la {version}…",
-  "Updating to {version}… {pct}%": "Se actualizează la {version}… {pct}%"
+  "Updating to {version}… {pct}%": "Se actualizează la {version}… {pct}%",
+  "Off: phones can't reach Onion Board. Open it below to turn it on.": "Oprit: telefoanele nu pot ajunge la Onion Board. Deschide mai jos ca să-l pornești.",
+  "On, but it couldn't start. Open it below to see why.": "Pornit, dar nu a putut porni. Deschide mai jos ca să vezi de ce.",
+  "On: phones on this Wi-Fi can play your pads.": "Pornit: telefoanele de pe acest Wi-Fi pot reda butoanele tale.",
+  "Onion Pocket": "Onion Pocket",
+  "Onion Pocket's settings didn't open: they're on Settings → Remote.": "Setările Onion Pocket nu s-au deschis: sunt în Setări → Telecomandă.",
+  "Pair a phone and settings": "Asociază un telefon și setări"
 }

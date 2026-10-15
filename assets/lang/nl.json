@@ -3467,5 +3467,11 @@
   "Installing Onion Board {version}…": "Onion Board {version} installeren…",
   "Updated to {version}": "Bijgewerkt naar {version}",
   "Updating to {version}…": "Bijwerken naar {version}…",
-  "Updating to {version}… {pct}%": "Bijwerken naar {version}… {pct}%"
+  "Updating to {version}… {pct}%": "Bijwerken naar {version}… {pct}%",
+  "Off: phones can't reach Onion Board. Open it below to turn it on.": "Uit: telefoons kunnen Onion Board niet bereiken. Klap hieronder open om het aan te zetten.",
+  "On, but it couldn't start. Open it below to see why.": "Aan, maar het kon niet starten. Klap hieronder open om te zien waarom.",
+  "On: phones on this Wi-Fi can play your pads.": "Aan: telefoons op deze wifi kunnen je pads afspelen.",
+  "Onion Pocket": "Onion Pocket",
+  "Onion Pocket's settings didn't open: they're on Settings → Remote.": "De instellingen van Onion Pocket gingen niet open: ze staan onder Instellingen → Op afstand.",
+  "Pair a phone and settings": "Telefoon koppelen en instellingen"
 }

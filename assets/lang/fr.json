@@ -3467,5 +3467,11 @@
   "Installing Onion Board {version}…": "Installation d'Onion Board {version}…",
   "Updated to {version}": "Mis à jour vers {version}",
   "Updating to {version}…": "Mise à jour vers {version}…",
-  "Updating to {version}… {pct}%": "Mise à jour vers {version}… {pct}%"
+  "Updating to {version}… {pct}%": "Mise à jour vers {version}… {pct}%",
+  "Off: phones can't reach Onion Board. Open it below to turn it on.": "Désactivé : les téléphones ne peuvent pas joindre Onion Board. Ouvre-le ci-dessous pour l'activer.",
+  "On, but it couldn't start. Open it below to see why.": "Activé, mais il n'a pas pu démarrer. Ouvre-le ci-dessous pour voir pourquoi.",
+  "On: phones on this Wi-Fi can play your pads.": "Activé : les téléphones sur ce Wi-Fi peuvent jouer tes pads.",
+  "Onion Pocket": "Onion Pocket",
+  "Onion Pocket's settings didn't open: they're on Settings → Remote.": "Les réglages d'Onion Pocket ne se sont pas ouverts : ils sont dans Paramètres → Télécommande.",
+  "Pair a phone and settings": "Associer un téléphone et réglages"
 }

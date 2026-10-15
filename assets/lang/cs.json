@@ -3543,5 +3543,11 @@
   "Installing Onion Board {version}…": "Instaluji Onion Board {version}…",
   "Updated to {version}": "Aktualizováno na {version}",
   "Updating to {version}…": "Aktualizuji na {version}…",
-  "Updating to {version}… {pct}%": "Aktualizuji na {version}… {pct}%"
+  "Updating to {version}… {pct}%": "Aktualizuji na {version}… {pct}%",
+  "Off: phones can't reach Onion Board. Open it below to turn it on.": "Vypnuto: telefony se k Onion Board nedostanou. Otevři to níže a zapni.",
+  "On, but it couldn't start. Open it below to see why.": "Zapnuto, ale nepovedlo se spustit. Otevři to níže a uvidíš proč.",
+  "On: phones on this Wi-Fi can play your pads.": "Zapnuto: telefony na této Wi-Fi můžou pouštět tvoje pady.",
+  "Onion Pocket": "Onion Pocket",
+  "Onion Pocket's settings didn't open: they're on Settings → Remote.": "Nastavení Onion Pocket se neotevřelo: najdeš ho v Nastavení → Dálkové ovládání.",
+  "Pair a phone and settings": "Spárovat telefon a nastavení"
 }

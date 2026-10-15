@@ -3391,5 +3391,11 @@
   "Installing Onion Board {version}…": "Memasang Onion Board {version}…",
   "Updated to {version}": "Dikemas kini ke {version}",
   "Updating to {version}…": "Mengemas kini ke {version}…",
-  "Updating to {version}… {pct}%": "Mengemas kini ke {version}… {pct}%"
+  "Updating to {version}… {pct}%": "Mengemas kini ke {version}… {pct}%",
+  "Off: phones can't reach Onion Board. Open it below to turn it on.": "Mati: telefon tidak dapat mencapai Onion Board. Buka di bawah untuk menghidupkannya.",
+  "On, but it couldn't start. Open it below to see why.": "Hidup, tetapi ia gagal bermula. Buka di bawah untuk lihat sebabnya.",
+  "On: phones on this Wi-Fi can play your pads.": "Hidup: telefon di Wi-Fi ini boleh memainkan pad anda.",
+  "Onion Pocket": "Onion Pocket",
+  "Onion Pocket's settings didn't open: they're on Settings → Remote.": "Tetapan Onion Pocket tidak terbuka: ia ada di Tetapan → Kawalan jauh.",
+  "Pair a phone and settings": "Pasangkan telefon dan tetapan"
 }

@@ -1665,6 +1665,11 @@ class WindowBuilder(Controller):
         mw._setup_pairs = (mw._setup_top, (devcard, eqcard))
         mw._setup_wide = ((howcard, devcard, helpcard), (destcard, eqcard))
         mw._setup_narrow = (howcard, destcard, devcard, helpcard, eqcard)
+        # Onion Pocket, once it's installed: a card on the left, in Connect your chat's
+        # place (that moves to the right, under the EQ). fitctl._place_pocket
+        from soundboard.ui.pocketcard import PocketCard
+        mw.pocket_card = PocketCard(mw)
+        mw._setup_cards = (howcard, devcard, helpcard, destcard, eqcard)
         mw._setup_stacked = None
         mw.fitctl._stack_setup(False)
         mw.on_eq(*mw.eq.state())   # push the saved EQ into the engine

@@ -3771,5 +3771,11 @@
   "Installing Onion Board {version}…": "جارٍ تثبيت Onion Board {version}…",
   "Updated to {version}": "تم التحديث إلى {version}",
   "Updating to {version}…": "جارٍ التحديث إلى {version}…",
-  "Updating to {version}… {pct}%": "جارٍ التحديث إلى {version}… {pct}%"
+  "Updating to {version}… {pct}%": "جارٍ التحديث إلى {version}… {pct}%",
+  "Off: phones can't reach Onion Board. Open it below to turn it on.": "متوقف: لا تستطيع الهواتف الوصول إلى Onion Board. افتحه بالأسفل لتشغيله.",
+  "On, but it couldn't start. Open it below to see why.": "يعمل، لكنه لم يبدأ. افتحه بالأسفل لترى السبب.",
+  "On: phones on this Wi-Fi can play your pads.": "يعمل: الهواتف على شبكة الواي فاي هذه تستطيع تشغيل أزرارك.",
+  "Onion Pocket": "Onion Pocket",
+  "Onion Pocket's settings didn't open: they're on Settings → Remote.": "لم تُفتح إعدادات Onion Pocket: تجدها في الإعدادات ← بعيد.",
+  "Pair a phone and settings": "ربط هاتف والإعدادات"
 }

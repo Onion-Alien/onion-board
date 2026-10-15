@@ -3391,5 +3391,11 @@
   "Installing Onion Board {version}…": "Onion Board {version}をインストール中…",
   "Updated to {version}": "{version}に更新しました",
   "Updating to {version}…": "{version}に更新中…",
-  "Updating to {version}… {pct}%": "{version}に更新中… {pct}%"
+  "Updating to {version}… {pct}%": "{version}に更新中… {pct}%",
+  "Off: phones can't reach Onion Board. Open it below to turn it on.": "オフ: スマホから Onion Board に届きません。下を開いてオンにしてください。",
+  "On, but it couldn't start. Open it below to see why.": "オンですが、起動できませんでした。下を開いて理由を確認してください。",
+  "On: phones on this Wi-Fi can play your pads.": "オン: この Wi-Fi のスマホからパッドを鳴らせます。",
+  "Onion Pocket": "Onion Pocket",
+  "Onion Pocket's settings didn't open: they're on Settings → Remote.": "Onion Pocket の設定を開けませんでした: 設定 → リモート にあります。",
+  "Pair a phone and settings": "スマホの接続と設定"
 }

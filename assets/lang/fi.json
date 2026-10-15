@@ -3467,5 +3467,11 @@
   "Installing Onion Board {version}…": "Asennetaan Onion Board {version}…",
   "Updated to {version}": "Päivitetty versioon {version}",
   "Updating to {version}…": "Päivitetään versioon {version}…",
-  "Updating to {version}… {pct}%": "Päivitetään versioon {version}… {pct}%"
+  "Updating to {version}… {pct}%": "Päivitetään versioon {version}… {pct}%",
+  "Off: phones can't reach Onion Board. Open it below to turn it on.": "Pois: puhelimet eivät tavoita Onion Boardia. Avaa alta ja laita päälle.",
+  "On, but it couldn't start. Open it below to see why.": "Päällä, mutta se ei käynnistynyt. Avaa alta ja katso miksi.",
+  "On: phones on this Wi-Fi can play your pads.": "Päällä: tämän Wi-Fin puhelimet voivat soittaa nappejasi.",
+  "Onion Pocket": "Onion Pocket",
+  "Onion Pocket's settings didn't open: they're on Settings → Remote.": "Onion Pocketin asetukset eivät auenneet: ne ovat kohdassa Asetukset → Etäohjaus.",
+  "Pair a phone and settings": "Yhdistä puhelin ja asetukset"
 }

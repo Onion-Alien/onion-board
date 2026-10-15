@@ -3543,5 +3543,11 @@
   "Installing Onion Board {version}…": "Встановлення Onion Board {version}…",
   "Updated to {version}": "Оновлено до {version}",
   "Updating to {version}…": "Оновлення до {version}…",
-  "Updating to {version}… {pct}%": "Оновлення до {version}… {pct}%"
+  "Updating to {version}… {pct}%": "Оновлення до {version}… {pct}%",
+  "Off: phones can't reach Onion Board. Open it below to turn it on.": "Вимкнено: телефони не можуть дістатися до Onion Board. Розгорніть нижче, щоб увімкнути.",
+  "On, but it couldn't start. Open it below to see why.": "Увімкнено, але не вдалося запустити. Розгорніть нижче, щоб побачити чому.",
+  "On: phones on this Wi-Fi can play your pads.": "Увімкнено: телефони в цій мережі Wi-Fi можуть запускати ваші кнопки.",
+  "Onion Pocket": "Onion Pocket",
+  "Onion Pocket's settings didn't open: they're on Settings → Remote.": "Налаштування Onion Pocket не відкрилися: вони в розділі Налаштування → Дистанційний.",
+  "Pair a phone and settings": "Підключити телефон і налаштування"
 }

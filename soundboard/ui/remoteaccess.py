@@ -98,6 +98,7 @@ class RemoteAccess(Controller):
             return None
         self.remote_addons = [(i, a) for i, a in self.remote_addons if i.id != info.id]
         self.remote_addons.append((info, addon))
+        self._pocket_card()
         return addon
 
     def remove_remote_addon(self, info, base=None):
@@ -128,6 +129,13 @@ class RemoteAccess(Controller):
             modules._forget(info.package)
         self.remote_addons = [(i, a) for i, a in self.remote_addons if i.id != info.id]
         log.info("remote add-on %s %s was removed", info.id, info.version)
+        self._pocket_card()
+
+    def _pocket_card(self):
+        """Onion Pocket's card on Setup: shown or gone with the add-on."""
+        pc = getattr(self.mw, "pocket_card", None)
+        if pc is not None:
+            pc.refresh()
 
     def _stop_remote_addons(self):
         for info, addon in self.remote_addons:

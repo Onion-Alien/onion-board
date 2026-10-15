@@ -3391,5 +3391,11 @@
   "Installing Onion Board {version}…": "Đang cài Onion Board {version}…",
   "Updated to {version}": "Đã cập nhật lên {version}",
   "Updating to {version}…": "Đang cập nhật lên {version}…",
-  "Updating to {version}… {pct}%": "Đang cập nhật lên {version}… {pct}%"
+  "Updating to {version}… {pct}%": "Đang cập nhật lên {version}… {pct}%",
+  "Off: phones can't reach Onion Board. Open it below to turn it on.": "Tắt: điện thoại không kết nối được tới Onion Board. Mở bên dưới để bật.",
+  "On, but it couldn't start. Open it below to see why.": "Bật, nhưng không khởi động được. Mở bên dưới để xem lý do.",
+  "On: phones on this Wi-Fi can play your pads.": "Bật: điện thoại trong Wi-Fi này có thể phát pad của bạn.",
+  "Onion Pocket": "Onion Pocket",
+  "Onion Pocket's settings didn't open: they're on Settings → Remote.": "Cài đặt Onion Pocket không mở được: chúng ở Cài đặt → Xa.",
+  "Pair a phone and settings": "Ghép điện thoại và cài đặt"
 }

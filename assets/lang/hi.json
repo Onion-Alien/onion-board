@@ -3467,5 +3467,11 @@
   "Installing Onion Board {version}…": "Onion Board {version} इंस्टॉल हो रहा है…",
   "Updated to {version}": "{version} पर अपडेट हो गया",
   "Updating to {version}…": "{version} पर अपडेट हो रहा है…",
-  "Updating to {version}… {pct}%": "{version} पर अपडेट हो रहा है… {pct}%"
+  "Updating to {version}… {pct}%": "{version} पर अपडेट हो रहा है… {pct}%",
+  "Off: phones can't reach Onion Board. Open it below to turn it on.": "बंद: फ़ोन Onion Board तक नहीं पहुँच सकते। चालू करने के लिए नीचे खोलें।",
+  "On, but it couldn't start. Open it below to see why.": "चालू, पर शुरू नहीं हो सका। वजह देखने के लिए नीचे खोलें।",
+  "On: phones on this Wi-Fi can play your pads.": "चालू: इस Wi-Fi पर फ़ोन आपके पैड चला सकते हैं।",
+  "Onion Pocket": "Onion Pocket",
+  "Onion Pocket's settings didn't open: they're on Settings → Remote.": "Onion Pocket की सेटिंग्स नहीं खुलीं: वे सेटिंग्स → दूर में हैं।",
+  "Pair a phone and settings": "फ़ोन जोड़ें और सेटिंग्स"
 }
