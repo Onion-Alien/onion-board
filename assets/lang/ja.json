@@ -3349,5 +3349,15 @@
   "A hotkey has one key, plus Ctrl, Alt, Shift or Windows if you like: this one has {keys}.": "ホットキーのキーは1つで、必要ならCtrl、Alt、Shift、Windowsを付けます。これには{keys}があります。",
   "Hotkey not saved: {why}": "ホットキーを保存しませんでした: {why}",
   "Hide advanced": "詳細を隠す",
-  "Show advanced": "詳細を表示"
+  "Show advanced": "詳細を表示",
+  "Gets the sounds from YouTube, SoundCloud and other links. Sites change often, so it needs updating now and then.": "YouTube や SoundCloud などのリンクからサウンドを取得します。サイトはよく変わるので、ときどき更新が必要です。",
+  "Installed: version {version}": "インストール済み: バージョン {version}",
+  "JavaScript engine": "JavaScript エンジン",
+  "Lets YouTube downloads get every format. It comes with the app and only runs on this PC.": "YouTube のダウンロードですべての形式を取得できます。アプリに付属し、この PC 上でのみ動きます。",
+  "Lets YouTube downloads get every format. {engine} is on this PC and faster than the app's own, so it's used first.": "YouTube のダウンロードですべての形式を取得できます。{engine} がこの PC にあり、アプリ付属のものより速いので、先に使われます。",
+  "Not found": "見つかりません",
+  "Used when Connection is set to Tor. It's up to date.": "接続が Tor のときに使われます。最新です。",
+  "Working: {engine}": "動作中: {engine}",
+  "Working: {engine} {version} (faster)": "動作中: {engine} {version} (高速)",
+  "YouTube downloads still work, but with fewer formats.": "YouTube のダウンロードはできますが、形式が少なくなります。"
 }

@@ -3349,5 +3349,15 @@
   "A hotkey has one key, plus Ctrl, Alt, Shift or Windows if you like: this one has {keys}.": "Phím nóng có một phím, thêm Ctrl, Alt, Shift hoặc Windows nếu muốn: phím này có {keys}.",
   "Hotkey not saved: {why}": "Chưa lưu phím nóng: {why}",
   "Hide advanced": "Ẩn nâng cao",
-  "Show advanced": "Hiện nâng cao"
+  "Show advanced": "Hiện nâng cao",
+  "Gets the sounds from YouTube, SoundCloud and other links. Sites change often, so it needs updating now and then.": "Lấy âm thanh từ YouTube, SoundCloud và các liên kết khác. Các trang thay đổi thường xuyên nên thỉnh thoảng cần cập nhật.",
+  "Installed: version {version}": "Đã cài: phiên bản {version}",
+  "JavaScript engine": "Bộ máy JavaScript",
+  "Lets YouTube downloads get every format. It comes with the app and only runs on this PC.": "Giúp các bản tải từ YouTube có mọi định dạng. Đi kèm ứng dụng và chỉ chạy trên máy này.",
+  "Lets YouTube downloads get every format. {engine} is on this PC and faster than the app's own, so it's used first.": "Giúp các bản tải từ YouTube có mọi định dạng. {engine} có trên máy này và nhanh hơn bộ của ứng dụng nên được dùng trước.",
+  "Not found": "Không tìm thấy",
+  "Used when Connection is set to Tor. It's up to date.": "Dùng khi kết nối được đặt thành Tor. Đã là bản mới nhất.",
+  "Working: {engine}": "Đang hoạt động: {engine}",
+  "Working: {engine} {version} (faster)": "Đang hoạt động: {engine} {version} (nhanh hơn)",
+  "YouTube downloads still work, but with fewer formats.": "Tải từ YouTube vẫn được, nhưng ít định dạng hơn."
 }

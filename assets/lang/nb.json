@@ -3425,5 +3425,15 @@
   "A hotkey has one key, plus Ctrl, Alt, Shift or Windows if you like: this one has {keys}.": "En hurtigtast har én tast, pluss Ctrl, Alt, Shift eller Windows om du vil: denne har {keys}.",
   "Hotkey not saved: {why}": "Hurtigtasten ble ikke lagret: {why}",
   "Hide advanced": "Skjul avansert",
-  "Show advanced": "Vis avansert"
+  "Show advanced": "Vis avansert",
+  "Gets the sounds from YouTube, SoundCloud and other links. Sites change often, so it needs updating now and then.": "Henter lydene fra YouTube, SoundCloud og andre lenker. Nettsteder endrer seg ofte, så den må oppdateres innimellom.",
+  "Installed: version {version}": "Installert: versjon {version}",
+  "JavaScript engine": "JavaScript-motor",
+  "Lets YouTube downloads get every format. It comes with the app and only runs on this PC.": "Gir YouTube-nedlastinger alle formater. Den følger med appen og kjører bare på denne PC-en.",
+  "Lets YouTube downloads get every format. {engine} is on this PC and faster than the app's own, so it's used first.": "Gir YouTube-nedlastinger alle formater. {engine} er på denne PC-en og raskere enn appens egen, så den brukes først.",
+  "Not found": "Ikke funnet",
+  "Used when Connection is set to Tor. It's up to date.": "Brukes når tilkoblingen er satt til Tor. Den er oppdatert.",
+  "Working: {engine}": "Virker: {engine}",
+  "Working: {engine} {version} (faster)": "Virker: {engine} {version} (raskere)",
+  "YouTube downloads still work, but with fewer formats.": "YouTube-nedlastinger virker fortsatt, men med færre formater."
 }

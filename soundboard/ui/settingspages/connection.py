@@ -41,7 +41,6 @@ class ConnectionPage(Page):
         reached makes requests fail, never go direct."""
         from PySide6.QtWidgets import QButtonGroup, QLineEdit, QRadioButton
 
-        import logging
 
         from soundboard import net, tor, torget
         cfg = self.mw.cfg
@@ -234,43 +233,18 @@ class ConnectionPage(Page):
         newnym.clicked.connect(run_newnym)
 
         def run_get():
-            release = busy.hold(get, _("Downloading…"))
-            relay = _ProgressRelay(self.mw)   # outlives this window if it's closed meanwhile
-
-            def progress(done, total):
+            def progress(text):
                 if qt_valid(get_note):
-                    get_note.setText(
-                        _("Downloading Tor… {done:.1f} of {total:.1f} MB",
-                          done=done / 1e6, total=total / 1e6) if total else
-                        _("Downloading Tor… {done:.1f} MB", done=done / 1e6))
+                    get_note.setText(text)
 
             def finish(err):
-                relay.deleteLater()
-                release(_("✗ Failed") if err else _("✓ Got Tor"))
                 if qt_valid(get_note):
                     show_get(err or _("Tor {version} is ready: pick Tor above to use it.",
                                       version=torget.VERSION))
                     show()
                     self._net_sync()
+            self._tor_get(get, progress, finish, "Settings > Connection")
 
-            def work():
-                from soundboard import netlog
-                netlog.cause(torget.FEATURE, "You clicked to download Tor (Settings > "
-                                             "Connection)")
-                try:
-                    # a running Tor may have carried the download: stopped before its
-                    # files are swapped, the next connection starts the new one
-                    torget.get(relay.progress.emit, before_unpack=tor.shutdown)
-                    relay.done.emit("")
-                except torget.GetError as e:
-                    relay.done.emit(errors.plain(e))
-                except Exception as e:  # noqa: BLE001 - shown, never a stuck button
-                    logging.getLogger(__name__).exception("Get Tor failed")
-                    relay.done.emit(_("Couldn't get Tor ({error}).", error=errors.plain(e)))
-
-            relay.progress.connect(progress)
-            relay.done.connect(finish)
-            threading.Thread(target=work, daemon=True, name="tor-get").start()
         get.clicked.connect(run_get)
 
         def run_test():
@@ -303,11 +277,58 @@ class ConnectionPage(Page):
         self.dlg.net_tor, self.dlg.net_hide, self.dlg.net_bridge = use_tor, hide, kind
         self.dlg.net_tor_state, self.dlg.net_newnym = tor_state, newnym
         self.dlg.net_get, self.dlg.net_get_note = get, get_note
+
+        def tor_got():   # Tor got from Data & quality: Get Tor here says so too
+            if qt_valid(get_note):
+                show_get()
+        self.dlg._net_show_get = tor_got
         self.dlg.net_note = note
         show_get()
         show()
         self._net_sync()   # Get Tor switched off: greyed, with the reason
         return card
+
+    def _tor_get(self, button: QPushButton, progress, done, where: str):
+        """Download Tor (soundboard.torget) on a worker, `button` busy meanwhile: Get Tor
+        here and Update Tor on Data & quality. `progress(text)` gets how far it is,
+        `done(error)` an empty error when it worked; both on the UI thread."""
+        import logging
+
+        from soundboard import tor, torget
+        release = busy.hold(button, _("Downloading…"))
+        relay = _ProgressRelay(self.mw)   # outlives this window if it's closed meanwhile
+
+        def moved(got, total):
+            progress(_("Downloading Tor… {done:.1f} of {total:.1f} MB",
+                       done=got / 1e6, total=total / 1e6) if total else
+                     _("Downloading Tor… {done:.1f} MB", done=got / 1e6))
+
+        def finish(err):
+            relay.deleteLater()
+            release(_("✗ Failed") if err else _("✓ Got Tor"))
+            for refresh in ("_net_show_get", "_helpers_refresh"):   # both pages follow,
+                fn = getattr(self.dlg, refresh, None)
+                if fn is not None:
+                    fn()
+            done(err)   # then the clicked one says how it went
+
+        def work():
+            from soundboard import netlog
+            netlog.cause(torget.FEATURE, f"You clicked to download Tor ({where})")
+            try:
+                # a running Tor may have carried the download: stopped before its
+                # files are swapped, the next connection starts the new one
+                torget.get(relay.progress.emit, before_unpack=tor.shutdown)
+                relay.done.emit("")
+            except torget.GetError as e:
+                relay.done.emit(errors.plain(e))
+            except Exception as e:  # noqa: BLE001 - shown, never a stuck button
+                logging.getLogger(__name__).exception("Get Tor failed")
+                relay.done.emit(_("Couldn't get Tor ({error}).", error=errors.plain(e)))
+
+        relay.progress.connect(moved)
+        relay.done.connect(finish)
+        threading.Thread(target=work, daemon=True, name="tor-get").start()
 
     def _activity_card(self):
         """Network activity: every connection the app has made (soundboard.netlog)."""
@@ -470,24 +491,46 @@ class ConnectionPage(Page):
                _("In use: yt-dlp {version} (built in).", version=v))
         self.dlg.ytdlp_label.setText(f"{msg} {now}".strip())
 
-    def _ytdlp_run(self, job, button: str = ""):
-        if any(busy.is_busy(b) or not b.isEnabled() for b in self.dlg.ytdlp_btns):
+    def _ytdlp_buttons(self) -> list[QPushButton]:
+        """Every button that updates yt-dlp: Update now and Reset here, and Update now
+        on Data & quality (whichever of those pages has been built)."""
+        found = [*getattr(self.dlg, "ytdlp_btns", ()), getattr(self.dlg, "ytdlp_row_btn", None)]
+        return [b for b in found if b is not None and qt_valid(b)]
+
+    def _ytdlp_say(self, msg: str):
+        """How the update is going, on both pages."""
+        label = getattr(self.dlg, "ytdlp_label", None)
+        if label is not None and qt_valid(label):
+            label.setText(msg)
+        say = getattr(self.dlg, "_ytdlp_row_say", None)
+        if say is not None:
+            say(msg)
+
+    def _ytdlp_run(self, job, button: str = "", where: str = "Settings > Updates"):
+        """Update now / Reset downloader: `job` (ytdl.update or ytdl.reset) on a worker,
+        every yt-dlp button busy meanwhile. Data & quality's Update now comes here too."""
+        buttons = self._ytdlp_buttons()
+        if any(busy.is_busy(b) or not b.isEnabled() for b in buttons):
             return
         from soundboard import netlog
-        netlog.cause(ytdl.UPDATE_FEATURE, f"You clicked {button} (Settings > Updates)"
+        netlog.cause(ytdl.UPDATE_FEATURE, f"You clicked {button} ({where})"
                      if button else "You asked to update the downloader")
-        for b in self.dlg.ytdlp_btns:
+        for b in buttons:
             busy.set_busy(b, True)
-        self.dlg.ytdlp_label.setText(_("Working…"))
+        self._ytdlp_say(_("Working…"))
         relay = _Relay(self.mw)   # outlives this window if it's closed meanwhile
 
         def finish(msg):
             relay.deleteLater()
-            if qt_valid(self.dlg.ytdlp_label):
-                for b in self.dlg.ytdlp_btns:
-                    busy.set_busy(b, False)
-                self._net_sync()
+            for b in self._ytdlp_buttons():
+                busy.set_busy(b, False)
+            self._net_sync()
+            label = getattr(self.dlg, "ytdlp_label", None)
+            if label is not None and qt_valid(label):
                 self._ytdlp_show(msg)
+            say = getattr(self.dlg, "_ytdlp_row_say", None)
+            if say is not None:
+                say(msg, done=True)
 
         relay.done.connect(finish)
 
@@ -516,14 +559,14 @@ class ConnectionPage(Page):
             if w is not None and qt_valid(w):
                 w.setEnabled(all(net.allowed(k) for k in keys))
                 w.setToolTip("" if w.isEnabled() else net.off_message(keys[0]))
-        for b in getattr(self.dlg, "ytdlp_btns", ()):
-            if qt_valid(b):
-                b.setEnabled(net.allowed("ytdlp_update"))
-                b.setToolTip(b.property("tip") if b.isEnabled()
-                             else net.off_message("ytdlp_update"))
-        b = getattr(self.dlg, "net_get", None)
-        if b is not None and qt_valid(b) and not busy.is_busy(b):
-            b.setEnabled(net.allowed(torget.FEATURE))
+        for b in self._ytdlp_buttons():
+            b.setEnabled(net.allowed("ytdlp_update"))
             b.setToolTip(b.property("tip") if b.isEnabled()
-                         else net.off_message(torget.FEATURE))
+                         else net.off_message("ytdlp_update"))
+        for attr in ("net_get", "tor_row_btn"):   # Get Tor here, Update Tor on Data & quality
+            b = getattr(self.dlg, attr, None)
+            if b is not None and qt_valid(b) and not busy.is_busy(b):
+                b.setEnabled(net.allowed(torget.FEATURE))
+                b.setToolTip(b.property("tip") if b.isEnabled()
+                             else net.off_message(torget.FEATURE))
         self.dlg.privacy._offline_sync()

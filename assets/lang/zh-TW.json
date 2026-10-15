@@ -3349,5 +3349,15 @@
   "A hotkey has one key, plus Ctrl, Alt, Shift or Windows if you like: this one has {keys}.": "快速鍵只有一個按鍵，可以再加 Ctrl、Alt、Shift 或 Windows：這個有 {keys}。",
   "Hotkey not saved: {why}": "快速鍵未儲存：{why}",
   "Hide advanced": "隱藏進階",
-  "Show advanced": "顯示進階"
+  "Show advanced": "顯示進階",
+  "Gets the sounds from YouTube, SoundCloud and other links. Sites change often, so it needs updating now and then.": "從 YouTube、SoundCloud 和其他連結取得聲音。網站常常變動，所以需要偶爾更新一下。",
+  "Installed: version {version}": "已安裝：版本 {version}",
+  "JavaScript engine": "JavaScript 引擎",
+  "Lets YouTube downloads get every format. It comes with the app and only runs on this PC.": "讓 YouTube 下載能取得所有格式。它隨應用程式附帶，只在這台電腦上執行。",
+  "Lets YouTube downloads get every format. {engine} is on this PC and faster than the app's own, so it's used first.": "讓 YouTube 下載能取得所有格式。這台電腦上有 {engine}，比應用程式內建的更快，所以優先使用它。",
+  "Not found": "找不到",
+  "Used when Connection is set to Tor. It's up to date.": "連線設為 Tor 時使用。已是最新版本。",
+  "Working: {engine}": "正常運作：{engine}",
+  "Working: {engine} {version} (faster)": "正常運作：{engine} {version}（更快）",
+  "YouTube downloads still work, but with fewer formats.": "YouTube 下載仍然可用，但格式會少一些。"
 }

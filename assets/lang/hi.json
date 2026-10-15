@@ -3425,5 +3425,15 @@
   "A hotkey has one key, plus Ctrl, Alt, Shift or Windows if you like: this one has {keys}.": "हॉटकी में एक की होती है, और चाहें तो Ctrl, Alt, Shift या Windows: इसमें {keys} हैं।",
   "Hotkey not saved: {why}": "हॉटकी सेव नहीं हुई: {why}",
   "Hide advanced": "उन्नत छुपाएँ",
-  "Show advanced": "उन्नत दिखाएँ"
+  "Show advanced": "उन्नत दिखाएँ",
+  "Gets the sounds from YouTube, SoundCloud and other links. Sites change often, so it needs updating now and then.": "YouTube, SoundCloud और दूसरे लिंक से आवाज़ें लाता है। साइटें अक्सर बदलती हैं, इसलिए इसे कभी-कभी अपडेट करना पड़ता है।",
+  "Installed: version {version}": "इंस्टॉल है: वर्ज़न {version}",
+  "JavaScript engine": "JavaScript इंजन",
+  "Lets YouTube downloads get every format. It comes with the app and only runs on this PC.": "इससे YouTube डाउनलोड को हर फ़ॉर्मेट मिलता है। यह ऐप के साथ आता है और सिर्फ़ इसी PC पर चलता है।",
+  "Lets YouTube downloads get every format. {engine} is on this PC and faster than the app's own, so it's used first.": "इससे YouTube डाउनलोड को हर फ़ॉर्मेट मिलता है। {engine} इस PC पर है और ऐप वाले से तेज़ है, इसलिए पहले वही इस्तेमाल होता है।",
+  "Not found": "नहीं मिला",
+  "Used when Connection is set to Tor. It's up to date.": "जब कनेक्शन Tor पर हो तब इस्तेमाल होता है। यह अप टू डेट है।",
+  "Working: {engine}": "काम कर रहा है: {engine}",
+  "Working: {engine} {version} (faster)": "काम कर रहा है: {engine} {version} (तेज़)",
+  "YouTube downloads still work, but with fewer formats.": "YouTube डाउनलोड अब भी चलते हैं, पर कम फ़ॉर्मेट के साथ।"
 }

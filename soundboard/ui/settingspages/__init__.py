@@ -118,6 +118,20 @@ class Built:
     watch_buttons: Any
     _watch_refresh: Any
     ytdlp_auto_box: Any
+    _helpers_refresh: Any
+    js_note: Any
+    js_state: Any
+    _net_show_get: Any
+    tor_note: Any
+    tor_row: Any
+    tor_row_btn: Any
+    tor_state: Any
+    _tor_msg: Any
+    _ytdlp_msg: Any
+    ytdlp_note: Any
+    ytdlp_row_btn: Any
+    _ytdlp_row_say: Any
+    ytdlp_state: Any
     ytdlp_btns: Any
     ytdlp_label: Any
 

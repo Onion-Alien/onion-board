@@ -3501,5 +3501,15 @@
   "A hotkey has one key, plus Ctrl, Alt, Shift or Windows if you like: this one has {keys}.": "Zkratka má jednu klávesu, k tomu případně Ctrl, Alt, Shift nebo Windows: tahle má {keys}.",
   "Hotkey not saved: {why}": "Zkratka nebyla uložena: {why}",
   "Hide advanced": "Skrýt pokročilé",
-  "Show advanced": "Zobrazit pokročilé"
+  "Show advanced": "Zobrazit pokročilé",
+  "Gets the sounds from YouTube, SoundCloud and other links. Sites change often, so it needs updating now and then.": "Stahuje zvuky z YouTube, SoundCloudu a dalších odkazů. Weby se často mění, takže je občas potřeba ho aktualizovat.",
+  "Installed: version {version}": "Nainstalováno: verze {version}",
+  "JavaScript engine": "JavaScriptový engine",
+  "Lets YouTube downloads get every format. It comes with the app and only runs on this PC.": "Umožní stahování z YouTube ve všech formátech. Je součástí aplikace a běží jen na tomto PC.",
+  "Lets YouTube downloads get every format. {engine} is on this PC and faster than the app's own, so it's used first.": "Umožní stahování z YouTube ve všech formátech. {engine} je na tomto PC a je rychlejší než ten v aplikaci, proto se použije jako první.",
+  "Not found": "Nenalezeno",
+  "Used when Connection is set to Tor. It's up to date.": "Používá se, když je připojení nastavené na Tor. Je aktuální.",
+  "Working: {engine}": "Funguje: {engine}",
+  "Working: {engine} {version} (faster)": "Funguje: {engine} {version} (rychlejší)",
+  "YouTube downloads still work, but with fewer formats.": "Stahování z YouTube pořád funguje, ale s méně formáty."
 }

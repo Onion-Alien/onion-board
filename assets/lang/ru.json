@@ -3501,5 +3501,15 @@
   "A hotkey has one key, plus Ctrl, Alt, Shift or Windows if you like: this one has {keys}.": "В горячей клавише одна клавиша, плюс Ctrl, Alt, Shift или Windows по желанию: здесь {keys}.",
   "Hotkey not saved: {why}": "Горячая клавиша не сохранена: {why}",
   "Hide advanced": "Скрыть дополнительные",
-  "Show advanced": "Показать дополнительные"
+  "Show advanced": "Показать дополнительные",
+  "Gets the sounds from YouTube, SoundCloud and other links. Sites change often, so it needs updating now and then.": "Берёт звуки с YouTube, SoundCloud и по другим ссылкам. Сайты часто меняются, поэтому его нужно время от времени обновлять.",
+  "Installed: version {version}": "Установлен: версия {version}",
+  "JavaScript engine": "Движок JavaScript",
+  "Lets YouTube downloads get every format. It comes with the app and only runs on this PC.": "Даёт загрузкам с YouTube все форматы. Идёт вместе с приложением и работает только на этом ПК.",
+  "Lets YouTube downloads get every format. {engine} is on this PC and faster than the app's own, so it's used first.": "Даёт загрузкам с YouTube все форматы. {engine} есть на этом ПК и работает быстрее встроенного, поэтому используется первым.",
+  "Not found": "Не найден",
+  "Used when Connection is set to Tor. It's up to date.": "Используется, когда в подключении выбран Tor. Он обновлён.",
+  "Working: {engine}": "Работает: {engine}",
+  "Working: {engine} {version} (faster)": "Работает: {engine} {version} (быстрее)",
+  "YouTube downloads still work, but with fewer formats.": "Загрузки с YouTube всё равно работают, но форматов меньше."
 }

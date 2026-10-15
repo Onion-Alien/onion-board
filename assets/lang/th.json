@@ -3349,5 +3349,15 @@
   "A hotkey has one key, plus Ctrl, Alt, Shift or Windows if you like: this one has {keys}.": "ปุ่มลัดมีปุ่มเดียว และจะเพิ่ม Ctrl, Alt, Shift หรือ Windows ก็ได้ แต่อันนี้มี {keys}",
   "Hotkey not saved: {why}": "ไม่ได้บันทึกปุ่มลัด: {why}",
   "Hide advanced": "ซ่อนขั้นสูง",
-  "Show advanced": "แสดงขั้นสูง"
+  "Show advanced": "แสดงขั้นสูง",
+  "Gets the sounds from YouTube, SoundCloud and other links. Sites change often, so it needs updating now and then.": "ดึงเสียงจาก YouTube, SoundCloud และลิงก์อื่นๆ เว็บไซต์เปลี่ยนบ่อย จึงต้องอัปเดตเป็นครั้งคราว",
+  "Installed: version {version}": "ติดตั้งแล้ว: เวอร์ชัน {version}",
+  "JavaScript engine": "เอนจิน JavaScript",
+  "Lets YouTube downloads get every format. It comes with the app and only runs on this PC.": "ทำให้การดาวน์โหลดจาก YouTube ได้ทุกรูปแบบ มาพร้อมกับแอปและทำงานบนพีซีเครื่องนี้เท่านั้น",
+  "Lets YouTube downloads get every format. {engine} is on this PC and faster than the app's own, so it's used first.": "ทำให้การดาวน์โหลดจาก YouTube ได้ทุกรูปแบบ {engine} อยู่บนพีซีเครื่องนี้และเร็วกว่าของแอป จึงถูกใช้ก่อน",
+  "Not found": "ไม่พบ",
+  "Used when Connection is set to Tor. It's up to date.": "ใช้เมื่อตั้งการเชื่อมต่อเป็น Tor เป็นเวอร์ชันล่าสุดแล้ว",
+  "Working: {engine}": "ใช้งานได้: {engine}",
+  "Working: {engine} {version} (faster)": "ใช้งานได้: {engine} {version} (เร็วกว่า)",
+  "YouTube downloads still work, but with fewer formats.": "การดาวน์โหลดจาก YouTube ยังใช้ได้ แต่ได้รูปแบบน้อยลง"
 }

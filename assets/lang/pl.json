@@ -3501,5 +3501,15 @@
   "A hotkey has one key, plus Ctrl, Alt, Shift or Windows if you like: this one has {keys}.": "Skrót ma jeden klawisz, do tego, jeśli chcesz, Ctrl, Alt, Shift lub Windows: ten ma {keys}.",
   "Hotkey not saved: {why}": "Nie zapisano skrótu: {why}",
   "Hide advanced": "Ukryj zaawansowane",
-  "Show advanced": "Pokaż zaawansowane"
+  "Show advanced": "Pokaż zaawansowane",
+  "Gets the sounds from YouTube, SoundCloud and other links. Sites change often, so it needs updating now and then.": "Pobiera dźwięki z YouTube, SoundCloud i innych linków. Strony często się zmieniają, więc od czasu do czasu trzeba go zaktualizować.",
+  "Installed: version {version}": "Zainstalowano: wersja {version}",
+  "JavaScript engine": "Silnik JavaScript",
+  "Lets YouTube downloads get every format. It comes with the app and only runs on this PC.": "Pozwala pobieraniu z YouTube dostać każdy format. Jest dołączony do aplikacji i działa tylko na tym komputerze.",
+  "Lets YouTube downloads get every format. {engine} is on this PC and faster than the app's own, so it's used first.": "Pozwala pobieraniu z YouTube dostać każdy format. {engine} jest na tym komputerze i jest szybszy niż silnik aplikacji, więc jest używany najpierw.",
+  "Not found": "Nie znaleziono",
+  "Used when Connection is set to Tor. It's up to date.": "Używany, gdy połączenie jest ustawione na Tor. Jest aktualny.",
+  "Working: {engine}": "Działa: {engine}",
+  "Working: {engine} {version} (faster)": "Działa: {engine} {version} (szybciej)",
+  "YouTube downloads still work, but with fewer formats.": "Pobieranie z YouTube nadal działa, ale z mniejszą liczbą formatów."
 }

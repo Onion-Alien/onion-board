@@ -1,9 +1,10 @@
 """Settings → Privacy and Data: what goes online, Offline mode, what's kept."""
 from __future__ import annotations
 
+import logging
 import threading
 
-from PySide6.QtCore import QTimer, Qt
+from PySide6.QtCore import QObject, QTimer, Qt, Signal
 from PySide6.QtWidgets import (QCheckBox, QComboBox, QFrame, QGridLayout, QLabel,
                                QPushButton, QVBoxLayout, QWidget)
 from shiboken6 import isValid as qt_valid
@@ -12,6 +13,16 @@ from soundboard.i18n import _
 from soundboard.ui import busy, icons
 from soundboard.ui.settingspages import Page, _button_row
 from soundboard.wheelguard import no_wheel
+
+log = logging.getLogger(__name__)
+
+# jsengine's names for the engines, as people know them
+ENGINE_NAMES = {"deno": "Deno", "node": "Node", "bun": "Bun", "quickjs": "QuickJS"}
+
+
+class _Found(QObject):
+    """Carries what a worker found out about the helper programs to the UI thread."""
+    found = Signal(object)
 
 
 class PrivacyPage(Page):
@@ -167,6 +178,7 @@ class PrivacyPage(Page):
         ff_col.setSpacing(6)
         self.dlg.ff_state = QLabel()
         self.dlg.ff_state.setObjectName("pill")       # works / missing / won't start
+        self.dlg.ff_state.setProperty("keepline", True)
         # "FFmpeg": a name, the same in every language; the pill right after it
         head, _name, _marks = heading_row("FFmpeg", "video", beside=(self.dlg.ff_state,))
         ff_col.addLayout(head)
@@ -180,6 +192,7 @@ class PrivacyPage(Page):
         ff_col.addWidget(self.dlg.btn_ffmpeg, 0, Qt.AlignmentFlag.AlignLeft)   # buttons sit left
         cv.addWidget(ff_box)
         self.dlg.btn_ffmpeg.clicked.connect(self._get_ffmpeg)
+        self._helper_rows(cv)
         v.addWidget(card)
 
         card, cv = self._card(_("Radio"),
@@ -302,11 +315,7 @@ class PrivacyPage(Page):
             note = _("FFmpeg is ready: M4A, AAC and video files play now.")
         elif not working and ffmpegget.why_not():
             note = "\n".join((note, ffmpegget.why_not()))
-        self.dlg.ff_state.setText(state)
-        for prop in ("on", "slow"):   # the pill's own colours: on = works, slow = a problem
-            self.dlg.ff_state.setProperty(prop, "true" if tone == prop else "false")
-        self.dlg.ff_state.style().unpolish(self.dlg.ff_state)
-        self.dlg.ff_state.style().polish(self.dlg.ff_state)
+        self._pill(self.dlg.ff_state, state, tone)
         self.dlg.ff_note.setText(note)
         if not busy.is_busy(button):
             button.setText(_("Getting FFmpeg…") if getting else label)
@@ -321,6 +330,197 @@ class PrivacyPage(Page):
                        "sound). Videos use a lot more data: about 5 to 25 MB a minute. "
                        "Without ffmpeg installed only lower-quality videos can be saved "
                        "(usually 360p)."))
+
+    @staticmethod
+    def _pill(pill: QLabel, text: str, tone: str = ""):
+        """A status pill's words and colours: on = works, slow = a problem."""
+        pill.setText(text)
+        for prop in ("on", "slow"):
+            pill.setProperty(prop, "true" if tone == prop else "false")
+        pill.style().unpolish(pill)
+        pill.style().polish(pill)
+
+    # ---- the other helper programs, under FFmpeg and built like it
+    def _helper_row(self, cv, name: str, icon: str):
+        """A helper program's row: its icon, name and a status pill, one hint line, then
+        (added by the caller) a button on the left. Returns (row, its column, pill, hint)."""
+        from soundboard.ui.panel import heading_row
+        box = QWidget()
+        col = QVBoxLayout(box)
+        col.setContentsMargins(0, 0, 0, 0)
+        col.setSpacing(6)
+        pill = QLabel(_("Checking…"))
+        pill.setObjectName("pill")
+        pill.setProperty("keepline", True)   # one line, whatever its words turn out to be
+        head, _name, _marks = heading_row(name, icon, beside=(pill,))
+        col.addLayout(head)
+        note = QLabel()
+        note.setObjectName("hint")
+        note.setWordWrap(True)
+        col.addWidget(note)
+        cv.addWidget(box)
+        return box, col, pill, note
+
+    def _helper_rows(self, cv):
+        """yt-dlp, the JavaScript engine and Tor (only once it's here). Their versions
+        are looked up on workers (_helpers_refresh); the buttons are the Updates and
+        Connection pages' own (ConnectionPage._ytdlp_run, _tor_get)."""
+        from soundboard import torget
+        d = self.dlg
+        d._ytdlp_msg = d._tor_msg = ""
+        left = Qt.AlignmentFlag.AlignLeft   # buttons sit left
+        # "yt-dlp" and "Tor": names, the same in every language
+        __, col, d.ytdlp_state, d.ytdlp_note = self._helper_row(cv, "yt-dlp", "link")
+        d.ytdlp_row_btn = QPushButton(_("Update now"))
+        icons.set_icon(d.ytdlp_row_btn, "reload")
+        d.ytdlp_row_btn.setProperty("tip", _("Check for a newer yt-dlp and install it"))
+        d.ytdlp_row_btn.clicked.connect(self._ytdlp_update)
+        col.addWidget(d.ytdlp_row_btn, 0, left)
+        d._ytdlp_row_say = self._ytdlp_row_say
+
+        __, __, d.js_state, d.js_note = self._helper_row(cv, _("JavaScript engine"), "puzzle")
+
+        d.tor_row, col, d.tor_state, d.tor_note = self._helper_row(cv, "Tor", "tor")
+        d.tor_row.hide()   # until Tor turns out to be here
+        d.tor_row_btn = QPushButton(_("Update Tor"))
+        icons.set_icon(d.tor_row_btn, "download")
+        d.tor_row_btn.setProperty("tip", _("Download Tor {version} from the Tor Project "
+                                           "(dist.torproject.org), the way the Connection "
+                                           "setting says", version=torget.VERSION))
+        d.tor_row_btn.clicked.connect(self._tor_update)
+        col.addWidget(d.tor_row_btn, 0, left)
+        d._helpers_refresh = self._helpers_refresh
+        self._helpers_offline()
+        d.connection._net_sync()   # a download that's switched off: greyed, with why
+        self._helpers_refresh()
+
+    def _helpers_refresh(self):
+        """Look up what's in use on workers (reading files, starting each engine with
+        --version); _helpers_show puts the answers on the rows."""
+        self._off_ui(self._files_now, "helpers-files")
+        self._off_ui(self._engine_now, "helpers-js")   # slower the first time: on its own
+
+    def _off_ui(self, job, name: str):
+        relay = _Found(self.mw)   # outlives this window if it's closed meanwhile
+
+        def got(found):
+            relay.deleteLater()
+            self._helpers_show(found)
+        relay.found.connect(got)
+
+        def run():
+            try:
+                found = job()
+            except Exception:  # noqa: BLE001 - the row says Checking…, never a crash
+                log.exception("couldn't look up a helper program")
+                found = {}
+            relay.found.emit(found)
+        threading.Thread(target=run, daemon=True, name=name).start()
+
+    @staticmethod
+    def _files_now() -> dict:
+        """yt-dlp's version, and Tor's: (version, a newer one is ready), None if it isn't
+        here. Worker thread."""
+        from soundboard import tor, torget, ytdl
+        found: dict = {"ytdlp": ytdl.active_version(), "tor": None}
+        if tor.available():
+            where = tor.bundle_dir()
+            try:
+                version = (where / torget.STAMP).read_text("ascii").split()[0]
+            except (OSError, IndexError):
+                version = ""   # (from source: scripts/fetch_tor.py's copy may not say)
+            found["tor"] = (version, where == torget.bin_dir() and not torget.installed())
+        return found
+
+    @staticmethod
+    def _engine_now() -> dict:
+        """The JavaScript engine yt-dlp gets, or None. Worker thread."""
+        from soundboard import jsengine
+        engines = jsengine.picked()
+        return {"js": engines[0] if engines else None}
+
+    def _helpers_show(self, found: dict):
+        from soundboard import jsengine, torget
+        d = self.dlg
+        if not qt_valid(d.ytdlp_state):
+            return   # Settings was closed meanwhile
+        if "ytdlp" in found:
+            version, __ = found["ytdlp"]
+            if version:
+                self._pill(d.ytdlp_state, _("Working: version {version}", version=version), "on")
+            else:
+                self._pill(d.ytdlp_state, _("Missing"), "slow")
+            if not busy.is_busy(d.ytdlp_row_btn):
+                d.ytdlp_note.setText(d._ytdlp_msg or _(
+                    "Gets the sounds from YouTube, SoundCloud and other links. Sites change "
+                    "often, so it needs updating now and then."))
+        if "js" in found:
+            engine = found["js"]
+            if engine is None:
+                self._pill(d.js_state, _("Not found"), "slow")
+                d.js_note.setText(_("YouTube downloads still work, but with fewer formats."))
+            elif engine.name == jsengine.QUICKJS:
+                self._pill(d.js_state, _("Working: {engine}", engine="QuickJS"), "on")
+                d.js_note.setText(_("Lets YouTube downloads get every format. It comes with "
+                                    "the app and only runs on this PC."))
+            else:
+                name = ENGINE_NAMES.get(engine.name, engine.name)
+                self._pill(d.js_state, _("Working: {engine} {version} (faster)", engine=name,
+                                         version=".".join(map(str, engine.version[:2]))), "on")
+                d.js_note.setText(_("Lets YouTube downloads get every format. {engine} is on "
+                                    "this PC and faster than the app's own, so it's used "
+                                    "first.", engine=name))
+        if "tor" in found:
+            got = found["tor"]
+            d.tor_row.setVisible(got is not None)
+            if got is not None:
+                version, outdated = got
+                self._pill(d.tor_state,
+                           _("Installed: version {version}", version=version) if version
+                           else _("Installed"), "slow" if outdated else "on")
+                if not busy.is_busy(d.tor_row_btn):
+                    d.tor_row_btn.setText(_("Update Tor") if outdated else _("Reinstall"))
+                    d.tor_note.setText(d._tor_msg or (
+                        _("A newer Tor ({version}) is ready to download.",
+                          version=torget.VERSION) if outdated else
+                        _("Used when Connection is set to Tor. It's up to date.")))
+
+    def _helpers_offline(self):
+        """Offline mode: the buttons that would go online are hidden."""
+        from soundboard import net
+        for attr in ("ytdlp_row_btn", "tor_row_btn"):
+            b = getattr(self.dlg, attr, None)
+            if b is not None and qt_valid(b):
+                b.setVisible(not net.offline())
+
+    def _ytdlp_update(self):
+        """Update now: the Updates page's Downloader card does it (_ytdlp_run)."""
+        from soundboard import ytdl
+        self.dlg.connection._ytdlp_run(ytdl.update, "Update now", "Settings > Data & quality")
+
+    def _ytdlp_row_say(self, msg: str, done: bool = False):
+        """How Update now is going, on this row too; when it's done, the new version."""
+        if not qt_valid(self.dlg.ytdlp_note):
+            return
+        self.dlg.ytdlp_note.setText(msg)
+        if done:
+            self.dlg._ytdlp_msg = msg
+            self._helpers_refresh()
+
+    def _tor_update(self):
+        """Update Tor / Reinstall: the Connection page's Get Tor does it (_tor_get)."""
+        d = self.dlg
+        d._tor_msg = ""
+
+        def progress(text):
+            if qt_valid(d.tor_note):
+                d.tor_note.setText(text)
+
+        def done(err):
+            d._tor_msg = err   # (it worked: _tor_get has already looked again)
+            if err and qt_valid(d.tor_note):
+                d.tor_note.setText(err)
+        d.connection._tor_get(d.tor_row_btn, progress, done, "Settings > Data & quality")
 
     def _get_ffmpeg(self):
         """Get FFmpeg, fix it or reinstall it (MainWindow.fix_ffmpeg_clicked: on a worker,
@@ -550,6 +750,7 @@ class PrivacyPage(Page):
         """Offline mode on or off: its pages, cards and tab boxes follow."""
         from soundboard import net
         offline = net.offline()
+        self._helpers_offline()
         for card, online_only in list(getattr(self.dlg, "_offline_cards", {}).items()):
             if qt_valid(card):
                 self._offline_hide(card, self._offline_says(online_only))

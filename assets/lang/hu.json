@@ -3425,5 +3425,15 @@
   "A hotkey has one key, plus Ctrl, Alt, Shift or Windows if you like: this one has {keys}.": "Egy gyorsbillentyűben egy billentyű van, plusz ha akarod Ctrl, Alt, Shift vagy Windows: ebben {keys} van.",
   "Hotkey not saved: {why}": "A gyorsbillentyű nincs mentve: {why}",
   "Hide advanced": "Haladó elrejtése",
-  "Show advanced": "Haladó mutatása"
+  "Show advanced": "Haladó mutatása",
+  "Gets the sounds from YouTube, SoundCloud and other links. Sites change often, so it needs updating now and then.": "A hangokat hozza a YouTube-ról, a SoundCloudról és más linkekről. Az oldalak gyakran változnak, ezért néha frissíteni kell.",
+  "Installed: version {version}": "Telepítve: {version} verzió",
+  "JavaScript engine": "JavaScript-motor",
+  "Lets YouTube downloads get every format. It comes with the app and only runs on this PC.": "Így a YouTube-letöltések minden formátumot megkapnak. Az alkalmazással együtt jön, és csak ezen a gépen fut.",
+  "Lets YouTube downloads get every format. {engine} is on this PC and faster than the app's own, so it's used first.": "Így a YouTube-letöltések minden formátumot megkapnak. A(z) {engine} ezen a gépen van, és gyorsabb az alkalmazás sajátjánál, ezért azt használja először.",
+  "Not found": "Nem található",
+  "Used when Connection is set to Tor. It's up to date.": "Akkor használja, ha a kapcsolat Tor-ra van állítva. Naprakész.",
+  "Working: {engine}": "Működik: {engine}",
+  "Working: {engine} {version} (faster)": "Működik: {engine} {version} (gyorsabb)",
+  "YouTube downloads still work, but with fewer formats.": "A YouTube-letöltések így is mennek, csak kevesebb formátummal."
 }

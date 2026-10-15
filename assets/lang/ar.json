@@ -3729,5 +3729,15 @@
   "A hotkey has one key, plus Ctrl, Alt, Shift or Windows if you like: this one has {keys}.": "للاختصار مفتاح واحد، مع Ctrl أو Alt أو Shift أو Windows إن شئت: هذا فيه {keys}.",
   "Hotkey not saved: {why}": "لم يُحفظ الاختصار: {why}",
   "Hide advanced": "إخفاء الإعدادات المتقدمة",
-  "Show advanced": "عرض الإعدادات المتقدمة"
+  "Show advanced": "عرض الإعدادات المتقدمة",
+  "Gets the sounds from YouTube, SoundCloud and other links. Sites change often, so it needs updating now and then.": "يجلب الأصوات من YouTube وSoundCloud وروابط أخرى. المواقع تتغير كثيرًا، لذا يحتاج إلى تحديث من حين لآخر.",
+  "Installed: version {version}": "مثبّت: الإصدار {version}",
+  "JavaScript engine": "محرك JavaScript",
+  "Lets YouTube downloads get every format. It comes with the app and only runs on this PC.": "يتيح لتنزيلات YouTube الحصول على كل الصيغ. يأتي مع التطبيق ويعمل على هذا الكمبيوتر فقط.",
+  "Lets YouTube downloads get every format. {engine} is on this PC and faster than the app's own, so it's used first.": "يتيح لتنزيلات YouTube الحصول على كل الصيغ. {engine} موجود على هذا الكمبيوتر وأسرع من محرك التطبيق، لذا يُستخدم أولًا.",
+  "Not found": "غير موجود",
+  "Used when Connection is set to Tor. It's up to date.": "يُستخدم عندما يكون الاتصال مضبوطًا على Tor. إنه محدّث.",
+  "Working: {engine}": "يعمل: {engine}",
+  "Working: {engine} {version} (faster)": "يعمل: {engine} {version} (أسرع)",
+  "YouTube downloads still work, but with fewer formats.": "تنزيلات YouTube ما زالت تعمل، لكن بصيغ أقل."
 }

@@ -3349,5 +3349,15 @@
   "A hotkey has one key, plus Ctrl, Alt, Shift or Windows if you like: this one has {keys}.": "Hotkey punya satu tombol, ditambah Ctrl, Alt, Shift, atau Windows jika mau: yang ini punya {keys}.",
   "Hotkey not saved: {why}": "Hotkey tidak disimpan: {why}",
   "Hide advanced": "Sembunyikan lanjutan",
-  "Show advanced": "Tampilkan lanjutan"
+  "Show advanced": "Tampilkan lanjutan",
+  "Gets the sounds from YouTube, SoundCloud and other links. Sites change often, so it needs updating now and then.": "Mengambil suara dari YouTube, SoundCloud, dan link lain. Situs sering berubah, jadi perlu diperbarui sesekali.",
+  "Installed: version {version}": "Terpasang: versi {version}",
+  "JavaScript engine": "Mesin JavaScript",
+  "Lets YouTube downloads get every format. It comes with the app and only runs on this PC.": "Membuat unduhan YouTube mendapat semua format. Disertakan dengan aplikasi dan hanya berjalan di PC ini.",
+  "Lets YouTube downloads get every format. {engine} is on this PC and faster than the app's own, so it's used first.": "Membuat unduhan YouTube mendapat semua format. {engine} ada di PC ini dan lebih cepat dari milik aplikasi, jadi dipakai lebih dulu.",
+  "Not found": "Tidak ditemukan",
+  "Used when Connection is set to Tor. It's up to date.": "Dipakai saat koneksi diatur ke Tor. Sudah versi terbaru.",
+  "Working: {engine}": "Berfungsi: {engine}",
+  "Working: {engine} {version} (faster)": "Berfungsi: {engine} {version} (lebih cepat)",
+  "YouTube downloads still work, but with fewer formats.": "Unduhan YouTube tetap jalan, tapi dengan format lebih sedikit."
 }
