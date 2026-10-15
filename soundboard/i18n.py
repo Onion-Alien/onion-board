@@ -198,9 +198,19 @@ def _own_name(f: Path) -> str:
     return meta.get("name", f.stem) if isinstance(meta, dict) else f.stem
 
 
+_names: dict[Path, str] = {}   # catalog -> its own name: read once per run
+
+
 def available() -> list[tuple[str, str]]:
-    """(code, the language's own name) for every catalog shipped, English first."""
-    return [(ENGLISH, "English"), *((f.stem, _own_name(f)) for f in _files())]
+    """(code, the language's own name) for every catalog shipped, English first.
+    Each name is read once: opening 32 catalogs on every Settings visit stalled the
+    window on a slow disk or a busy virus scanner."""
+    out = [(ENGLISH, "English")]
+    for f in _files():
+        if f not in _names:
+            _names[f] = _own_name(f)
+        out.append((f.stem, _names[f]))
+    return out
 
 
 def windows_language() -> str:
