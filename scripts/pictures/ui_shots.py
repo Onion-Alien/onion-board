@@ -66,8 +66,8 @@ def test_zz_ui_shots(window, qapp):
             page = target.partition(":")[2] or "privacy"
             # Settings is a page in the window (never a window of its own): shoot the
             # window with it open, then go back to the tabs
-            w.open_settings(page)
-            widget, close = w, w._settings_dlg
+            w.setctl.open_settings(page)
+            widget, close = w, w.setctl._settings_dlg
         else:
             widget, close = eval(target, {{"w": w}}), None
         process_events(qapp, lambda: False, timeout=0.3)
