@@ -41,6 +41,7 @@ SEARCH_DELAY_MS = 450      # typing pause before the directory is asked
 TYPE_DELAY_MS = 80         # ...and before the list shows the matches already known
 FAV_MAX = 200
 RECENT_MAX = 30
+PRELOAD_MS = 2000          # after the station list is up: the decoder loads (preload_decoder)
 
 
 def _steady_text(btn: QPushButton, text: str, *others: str):
@@ -353,6 +354,12 @@ class RadioTab(QWidget):
         self._search_timer = QTimer(self)
         self._search_timer.setSingleShot(True)
         self._search_timer.timeout.connect(self._search_now)
+        # the stream decoder's DLLs load on a thread once the stations are up (or the
+        # directory failed), not alongside them: see _on_globe_stations
+        self._preload_timer = QTimer(self)
+        self._preload_timer.setSingleShot(True)
+        self._preload_timer.setInterval(PRELOAD_MS)
+        self._preload_timer.timeout.connect(radio.preload_decoder)
         self.timer = QTimer(self)
         self.timer.timeout.connect(self._tick)   # runs while shown, or while recording
         appstate.slow_in_background(self, self.timer, 50)   # behind a game: 4 a second
@@ -384,9 +391,6 @@ class RadioTab(QWidget):
         if self._started:
             return
         self._started = True
-        # the stream decoder's DLLs load on a thread now, before a station is picked:
-        # not at every start-up (+22 MB for someone who never opens the radio)
-        radio.preload_decoder()
         if self._want_globe:
             w = max(self.split.width(), 800)
             self.split.setSizes([w * 3 // 5, w * 2 // 5])
@@ -480,6 +484,12 @@ class RadioTab(QWidget):
             self._refresh_info()
 
     def _on_globe_stations(self, stations: list):
+        # the stream decoder's DLLs, loaded on a thread before a station is picked (not
+        # at every start-up: +22 MB for someone who never opens the radio). Not while
+        # the tab first fills: Windows holds up every DLL load while one loads, and the
+        # map's first draw waited out the decoder's, a freeze. A while after the last
+        # list (the first few, then all of them).
+        self._preload_timer.start()
         self._globe_error = ""
         self._globe_list = stations
         self._map_cache.clear()    # new station data: new points and towns
@@ -501,6 +511,7 @@ class RadioTab(QWidget):
 
     def _on_failed(self, kind: str, msg: str):
         if kind == "globe":
+            self._preload_timer.start()   # (a saved station may still play)
             self._reloading = False
             busy.set_busy(self.btn_refresh, False)
             # plain words from radio (directory_down / _unreachable / a switch's reason);

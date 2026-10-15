@@ -325,7 +325,9 @@ class FlatMap(QWidget):
             # the map fills up: the most listened first, the rest in a shuffled wave
             n = len(pts)
             rank = (n - 1 - np.arange(n)) / max(1, n)
-            jitter = np.random.default_rng(7).random(n) * 0.25
+            # a fixed scatter, not np.random: its first use loads numpy's random DLLs,
+            # and a DLL load here waited out the decoder's (radio.preload_decoder)
+            jitter = (np.arange(n) * 0.6180339887 % 1.0) * 0.25
             self._delay = (REVEAL_S - POP_S) * np.clip(rank * 0.8 + jitter, 0, 1)
             if self._land_set:
                 self._start_reveal()

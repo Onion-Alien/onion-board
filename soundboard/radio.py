@@ -899,7 +899,17 @@ def preload_decoder():
     def load():
         import ctypes
         try:
-            for f in _decoder_files():
+            files = _decoder_files()
+            # read through first: Windows holds its loader lock for the whole of a DLL
+            # load, so a cold disk (and the virus scan) under it held up every thread
+            # that loaded a DLL or started a thread meanwhile, the window included: a
+            # 14 s freeze as the Radio tab first opened. Read beforehand, they're in
+            # memory and already scanned, and each load takes milliseconds.
+            for f in files:
+                with open(f, "rb") as fh:
+                    while fh.read(1 << 20):
+                        pass
+            for f in files:
                 ctypes.WinDLL(str(f))   # (ctypes lets go of the lock while it loads)
         except OSError as e:   # Qt finds them itself later, as before
             log.debug("radio: preloading the decoder failed: %s", e)
