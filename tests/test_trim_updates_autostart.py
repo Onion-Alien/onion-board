@@ -90,8 +90,8 @@ def test_check_on_by_default_and_every_6_hours(monkeypatch):
     cfg.update_checked, cfg.update_skip = 0, "99.0.0"
     assert updates.check(cfg) is None                            # skipped version
     cfg.update_checked -= updates.EVERY_S - 60
-    assert updates.check(cfg) is None and len(calls) == 3        # not 6 hours yet
-    assert updates.EVERY_S == 6 * 3600
+    assert updates.check(cfg) is None and len(calls) == 3        # not an hour yet
+    assert updates.EVERY_S == 3600
 
 
 def test_an_urgent_fix_shows_even_when_skipped(monkeypatch):
@@ -124,7 +124,7 @@ def test_a_settling_release_is_asked_for_again_once_it_has_settled(monkeypatch):
     monkeypatch.setattr(updates, "_get", lambda url, *_f: answers[url])
     cfg = Config()
     assert updates.check(cfg) is None and cfg.update_checked == 0   # not counted as asked
-    # out 15 of its 30 minutes: asked again in ~15 (and a minute), not in 6 hours
+    # out 15 of its 30 minutes: asked again in ~15 (and a minute), not in an hour
     assert 15 * 60 < updates.recheck_s < 17 * 60
     answers[updates.API] = _gh("v99.0.2", 0.6)
     assert updates.check(cfg).version == "99.0.2" and updates.recheck_s == 0

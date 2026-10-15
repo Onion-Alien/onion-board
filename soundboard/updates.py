@@ -1,5 +1,5 @@
 """Is there a newer Onion Board, and installing it. The app asks the project's latest
-GitHub release every 6 hours (Settings → Updates; on unless unticked), plus a "Check
+GitHub release every hour (Settings → Updates; on unless unticked), plus a "Check
 now" button.
 
 A release whose notes have a line starting "Urgent:" ("Urgent: fixes sounds cutting
@@ -12,7 +12,7 @@ Any other release settles for SETTLE_S (30 minutes) before the app offers it: a 
 fix that follows it replaces it, so people get one prompt instead of two. While the
 newest one settles, nothing is offered (not an older one either: the newest comes a
 few minutes later), and the app asks again once it has settled (recheck_s) instead of
-waiting for its next 6-hourly check. An urgent fix this copy missed isn't held back by
+waiting for its next hourly check. An urgent fix this copy missed isn't held back by
 a newer release settling. "Check now" always offers the newest.
 
 A newer version is only announced. Nothing is downloaded until the user presses
@@ -60,7 +60,7 @@ DOWNLOADS = f"https://github.com/{REPO}/releases/download/"
 OLD_DOWNLOADS = "https://github.com/Onion-Alien/onionboard/releases/download/"
 UPDATES_DIR = APP_DIR / "updates"
 INSTALL_LOG = UPDATES_DIR / "install.log"
-EVERY_S = 6 * 3600       # so an urgent fix reaches people the same day
+EVERY_S = 3600           # so a new version (or an urgent fix) reaches people within the hour
 SETTLE_S = 30 * 60       # how long any other release is out before it's offered
 LIMIT = 1 << 20          # the API's answer is a few KB
 MAX_SIZE = 400 << 20     # the installer is ~180 MB

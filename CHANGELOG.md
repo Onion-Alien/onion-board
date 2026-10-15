@@ -8,6 +8,8 @@ Changes not released yet are in [changelog.d/](changelog.d/), one file per chang
   board, Bun points at the search box (type a song, press Enter), then at the first
   result to add it, or at *Add sounds* for your own files when you're offline. Any
   click goes through to what's under it, and it ends for good once you go elsewhere.
+- The app looks for a new version every hour instead of every 6, so updates reach you
+  sooner (Settings → Updates still turns it off).
 - yt-dlp updates (Settings → Updates → *Update now* / *Reinstall*, and the opt-in
   *Update automatically*) now only install a version the app's makers approved,
   checked against yt-dlp's signed release, once it has been out for 3 days, instead
