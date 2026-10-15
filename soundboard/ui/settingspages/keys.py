@@ -71,6 +71,9 @@ HOTKEY_GROUPS = [
 
 
 HOTKEY_ACTIONS = [a for __, group in HOTKEY_GROUPS for a in group]
+# each group's card heading icon, in HOTKEY_GROUPS' order
+HOTKEY_GROUP_ICONS = ("sounds", "tag", "voice", "live_off", "history", "gamepad")
+assert len(HOTKEY_GROUP_ICONS) == len(HOTKEY_GROUPS)
 
 
 def pretty_key(combo: str) -> str:
@@ -205,8 +208,8 @@ class KeysPage(Page):
 
     def _hotkeys(self):
         w, v = self._page()
-        for group, actions in HOTKEY_GROUPS:
-            card, cv = self._card(group)
+        for (group, actions), icon in zip(HOTKEY_GROUPS, HOTKEY_GROUP_ICONS):
+            card, cv = self._card(group, icon=icon)
             for attr, _action, label, desc in actions:
                 self._hk_row(cv, attr, label, desc)
             # the Categories group: its keys and the per-category sets go together
@@ -228,7 +231,8 @@ class KeysPage(Page):
         card, cv = self._card(_("Auto push-to-talk (optional)"),
                               _("Only if you use push-to-talk in a game or Discord: set your "
                                 "push-to-talk key and the app holds it for you while a sound, "
-                                "live radio or a program plays. Leave it Off for open mic."))
+                                "live radio or a program plays. Leave it Off for open mic."),
+                              icon="mic")
         self._hk_row(cv, "ptt_key", _("Hold this key"), "")
         v.addWidget(card)
         card, cv = self._card(_("Hotkey sounds"),
@@ -236,7 +240,8 @@ class KeysPage(Page):
                                 "hotkey does something you can't see in a game: switches "
                                 "category (one beep per place along, a low one for All), turns "
                                 "your mic, the voice changer or the hotkeys on (rising) or off "
-                                "(falling), changes the volume, or records or saves a clip."))
+                                "(falling), changes the volume, or records or saves a clip."),
+                              icon="volume")
         cue = QCheckBox(_("Play hotkey beeps"))
         cue.setChecked(self.mw.cfg.cue_sounds)
         cue.toggled.connect(lambda b: self.mw.set_option("cue_sounds", b))
@@ -307,7 +312,7 @@ class KeysPage(Page):
         card, cv = self._card(_("Open it"),
                               _("Press the hotkey in a game and your sounds appear on top of it. "
                                 "The game keeps your keyboard and mouse, and the overlay's keys "
-                                "go back to the game the moment it closes."))
+                                "go back to the game the moment it closes."), icon="keyboard")
         self._hk_row(cv, "overlay_hotkey", _("Overlay hotkey"), "")
         test = QPushButton(_("Open overlay"))
         test.setToolTip(_("Opens it now, the same as the hotkey: pick a sound with its keys or a "
@@ -323,7 +328,7 @@ class KeysPage(Page):
 
         card, cv = self._card(_("Pick sounds"),
                               _("Nine tiles a page, in the same order as your pads. Drag pads "
-                                "in the Sounds tab to rearrange them."))
+                                "in the Sounds tab to rearrange them."), icon="sounds")
         cv.addWidget(self._ov_combo("keys", ovl.KEY_CHOICES, s.keys))
         after = QCheckBox(_("Hide after picking a sound"))
         after.setChecked(s.close_after_play)
@@ -344,7 +349,7 @@ class KeysPage(Page):
                               _("Or just drag it: grab any empty part of the overlay (its title, "
                                 "its edges) and drop it anywhere, on any monitor. It opens there "
                                 "from then on. Show preview only shows how it looks: open the "
-                                "overlay with its hotkey to try it or move it."))
+                                "overlay with its hotkey to try it or move it."), icon="eye")
         grid = QGridLayout()
         grid.setHorizontalSpacing(12)
         grid.addWidget(QLabel(_("Monitor")), 0, 0)

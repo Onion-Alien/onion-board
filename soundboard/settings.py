@@ -450,15 +450,29 @@ class SettingsDialog(QDialog, Built):
         return page
 
     @staticmethod
-    def _card(title: str, hint: str = ""):
+    def _card(title: str, hint: str = "", icon: str = ""):
+        """A Settings card: `icon` in front of the title (panel.heading_row, centred on
+        its cap height), the hint under it."""
         card = QFrame()
         card.setObjectName("setcard")
         v = QVBoxLayout(card)
         v.setContentsMargins(14, 12, 14, 14)
         v.setSpacing(8)
-        t = QLabel(title)
-        t.setObjectName("section")
-        v.addWidget(t)
+        if icon:
+            from soundboard.ui.panel import heading_row
+            row, t, _marks = heading_row(title, icon)
+            # the title takes the room the row has, so it only wraps when it doesn't
+            # fit (sharing it with the row's stretch, it wrapped at half the width)
+            row.setStretch(row.count() - 1, 0)
+            row.setStretch(1, 1)
+            # one widget, so a page can hide the whole heading (the look box's tabs)
+            head = QWidget()
+            head.setLayout(row)
+            v.addWidget(head)
+        else:
+            t = QLabel(title)
+            t.setObjectName("section")
+            v.addWidget(t)
         if hint:
             h = QLabel(hint)
             h.setObjectName("hint")
@@ -489,7 +503,8 @@ class SettingsDialog(QDialog, Built):
             _("Tabs"),
             _("Switch off the tabs you don't use. A switched-off tab is gone from the window and "
               "doesn't load at all, so nothing of it runs in the background. Switch it back on "
-              "any time, here or with + More tabs after the tabs. Right-click a tab to hide it."))
+              "any time, here or with + More tabs after the tabs. Right-click a tab to hide it."),
+            icon="sounds")
         from soundboard.ui.tabcontrol import TAB_KEYS, TABS
         self.tab_boxes: dict[str, QCheckBox] = {}
         for key, (text, _tip) in zip(TAB_KEYS, TABS):
@@ -508,7 +523,7 @@ class SettingsDialog(QDialog, Built):
         cv.addWidget(self.tabs_offline_note)
         v.addWidget(card)
         self.privacy._offline_sync()
-        card, cv = self._card(_("Saved clips"))
+        card, cv = self._card(_("Saved clips"), icon="scissors")
         self.keep_clips = self._option(
             cv, _("Keep forever"),
             _("Otherwise, clips are removed after 7 days without previewing, sending, copying, "
@@ -542,7 +557,7 @@ class SettingsDialog(QDialog, Built):
         return btn
 
     def _note_card(self):
-        card, cv = self._card(_("A note from me"))
+        card, cv = self._card(_("A note from me"), icon="edit")
         note = QLabel(NOTE)
         note.setWordWrap(True)
         cv.addWidget(note)
