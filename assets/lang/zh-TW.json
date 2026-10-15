@@ -3361,5 +3361,9 @@
   "No sound from your mic. Is your headset on?": "麥克風沒有聲音。耳機開著嗎？",
   "Unplugged": "未連接",
   "Windows can't find <b>{mic}</b> right now. Plug it in, or switch it on if it's wireless. This goes away by itself.": "Windows 現在找不到 <b>{mic}</b>。請插上，如果是無線的就打開它。這則提示會自己消失。",
-  "Your headset is off or its mic is muted. Turn it on or unmute it. Still nothing? Click <b>Repair</b>.": "耳機關著，或者麥克風靜音了。請打開耳機或取消靜音。還是沒聲音？按 <b>修復</b>。"
+  "Your headset is off or its mic is muted. Turn it on or unmute it. Still nothing? Click <b>Repair</b>.": "耳機關著，或者麥克風靜音了。請打開耳機或取消靜音。還是沒聲音？按 <b>修復</b>。",
+  "Names can be up to {n} characters, so it's “{name}”.": "名稱最多 {n} 個字元，所以是「{name}」。",
+  "They go in a category called “{name}”.": "它們會放進名為「{name}」的分類。",
+  "Type a name first.": "請先輸入名稱。",
+  "✓ Renamed to “{new}”. Another sound has that name too.": "✓ 已重新命名為「{new}」。另一個音效也叫這個名字。"
 }

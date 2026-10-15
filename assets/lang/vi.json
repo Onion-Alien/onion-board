@@ -3361,5 +3361,9 @@
   "No sound from your mic. Is your headset on?": "Không có tiếng từ mic của bạn. Tai nghe của bạn đã bật chưa?",
   "Unplugged": "Chưa cắm",
   "Windows can't find <b>{mic}</b> right now. Plug it in, or switch it on if it's wireless. This goes away by itself.": "Windows hiện không tìm thấy <b>{mic}</b>. Hãy cắm vào, hoặc bật lên nếu là loại không dây. Thông báo này tự biến mất.",
-  "Your headset is off or its mic is muted. Turn it on or unmute it. Still nothing? Click <b>Repair</b>.": "Tai nghe của bạn đang tắt hoặc mic đang tắt tiếng. Hãy bật tai nghe hoặc bật lại tiếng mic. Vẫn không có gì? Bấm <b>Sửa</b>."
+  "Your headset is off or its mic is muted. Turn it on or unmute it. Still nothing? Click <b>Repair</b>.": "Tai nghe của bạn đang tắt hoặc mic đang tắt tiếng. Hãy bật tai nghe hoặc bật lại tiếng mic. Vẫn không có gì? Bấm <b>Sửa</b>.",
+  "Names can be up to {n} characters, so it's “{name}”.": "Tên dài tối đa {n} ký tự, nên tên là “{name}”.",
+  "They go in a category called “{name}”.": "Chúng vào một danh mục tên “{name}”.",
+  "Type a name first.": "Hãy nhập tên trước.",
+  "✓ Renamed to “{new}”. Another sound has that name too.": "✓ Đã đổi tên thành “{new}”. Một âm thanh khác cũng có tên này."
 }

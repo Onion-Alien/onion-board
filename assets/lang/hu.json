@@ -3437,5 +3437,9 @@
   "No sound from your mic. Is your headset on?": "Nem jön hang a mikrofonodból. Be van kapcsolva a headseted?",
   "Unplugged": "Nincs csatlakoztatva",
   "Windows can't find <b>{mic}</b> right now. Plug it in, or switch it on if it's wireless. This goes away by itself.": "A Windows most nem találja ezt: <b>{mic}</b>. Dugd be, vagy kapcsold be, ha vezeték nélküli. Ez magától eltűnik.",
-  "Your headset is off or its mic is muted. Turn it on or unmute it. Still nothing? Click <b>Repair</b>.": "A headseted ki van kapcsolva, vagy le van némítva a mikrofonja. Kapcsold be, vagy oldd fel a némítást. Még mindig semmi? Kattints a <b>Javítás</b> gombra."
+  "Your headset is off or its mic is muted. Turn it on or unmute it. Still nothing? Click <b>Repair</b>.": "A headseted ki van kapcsolva, vagy le van némítva a mikrofonja. Kapcsold be, vagy oldd fel a némítást. Még mindig semmi? Kattints a <b>Javítás</b> gombra.",
+  "Names can be up to {n} characters, so it's “{name}”.": "A név legfeljebb {n} karakter lehet, így „{name}” lett.",
+  "They go in a category called “{name}”.": "Egy „{name}” nevű kategóriába kerülnek.",
+  "Type a name first.": "Előbb írj be egy nevet.",
+  "✓ Renamed to “{new}”. Another sound has that name too.": "✓ átnevezve erre: „{new}”. Egy másik hang neve is ez."
 }

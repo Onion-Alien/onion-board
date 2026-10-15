@@ -3437,5 +3437,9 @@
   "No sound from your mic. Is your headset on?": "आपके माइक से कोई आवाज़ नहीं। क्या आपका हेडसेट चालू है?",
   "Unplugged": "प्लग नहीं है",
   "Windows can't find <b>{mic}</b> right now. Plug it in, or switch it on if it's wireless. This goes away by itself.": "Windows को अभी <b>{mic}</b> नहीं मिल रहा। उसे लगाएँ, या वायरलेस हो तो चालू करें। यह अपने आप हट जाएगा।",
-  "Your headset is off or its mic is muted. Turn it on or unmute it. Still nothing? Click <b>Repair</b>.": "आपका हेडसेट बंद है या उसका माइक म्यूट है। उसे चालू करें या अनम्यूट करें। फिर भी कुछ नहीं? <b>ठीक करें</b> पर क्लिक करें।"
+  "Your headset is off or its mic is muted. Turn it on or unmute it. Still nothing? Click <b>Repair</b>.": "आपका हेडसेट बंद है या उसका माइक म्यूट है। उसे चालू करें या अनम्यूट करें। फिर भी कुछ नहीं? <b>ठीक करें</b> पर क्लिक करें।",
+  "Names can be up to {n} characters, so it's “{name}”.": "नाम में ज़्यादा से ज़्यादा {n} अक्षर हो सकते हैं, इसलिए यह “{name}” है।",
+  "They go in a category called “{name}”.": "ये “{name}” नाम की कैटेगरी में जाएँगे।",
+  "Type a name first.": "पहले एक नाम लिखें।",
+  "✓ Renamed to “{new}”. Another sound has that name too.": "✓ नाम बदलकर “{new}” किया। एक और साउंड का भी यही नाम है।"
 }

@@ -3361,5 +3361,9 @@
   "No sound from your mic. Is your headset on?": "마이크에서 소리가 나지 않습니다. 헤드셋이 켜져 있나요?",
   "Unplugged": "연결 안 됨",
   "Windows can't find <b>{mic}</b> right now. Plug it in, or switch it on if it's wireless. This goes away by itself.": "지금 Windows가 <b>{mic}</b>을(를) 찾지 못합니다. 연결하거나, 무선이라면 켜세요. 이 표시는 저절로 사라집니다.",
-  "Your headset is off or its mic is muted. Turn it on or unmute it. Still nothing? Click <b>Repair</b>.": "헤드셋이 꺼져 있거나 마이크가 음소거되어 있습니다. 켜거나 음소거를 해제하세요. 그래도 안 되나요? <b>복구</b>를 클릭하세요."
+  "Your headset is off or its mic is muted. Turn it on or unmute it. Still nothing? Click <b>Repair</b>.": "헤드셋이 꺼져 있거나 마이크가 음소거되어 있습니다. 켜거나 음소거를 해제하세요. 그래도 안 되나요? <b>복구</b>를 클릭하세요.",
+  "Names can be up to {n} characters, so it's “{name}”.": "이름은 최대 {n}자라서 “{name}”(으)로 했어요.",
+  "They go in a category called “{name}”.": "“{name}” 카테고리에 들어가요.",
+  "Type a name first.": "먼저 이름을 입력하세요.",
+  "✓ Renamed to “{new}”. Another sound has that name too.": "✓ “{new}”(으)로 이름 변경함. 같은 이름의 다른 사운드도 있어요."
 }

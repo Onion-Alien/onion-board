@@ -3513,5 +3513,9 @@
   "No sound from your mic. Is your headset on?": "З мікрофона немає звуку. Гарнітуру увімкнено?",
   "Unplugged": "Від'єднано",
   "Windows can't find <b>{mic}</b> right now. Plug it in, or switch it on if it's wireless. This goes away by itself.": "Windows зараз не бачить <b>{mic}</b>. Під'єднай його або увімкни, якщо він бездротовий. Це зникне само.",
-  "Your headset is off or its mic is muted. Turn it on or unmute it. Still nothing? Click <b>Repair</b>.": "Гарнітуру вимкнено, або її мікрофон вимкнено. Увімкни її або мікрофон. Досі нічого? Натисни <b>Полагодити</b>."
+  "Your headset is off or its mic is muted. Turn it on or unmute it. Still nothing? Click <b>Repair</b>.": "Гарнітуру вимкнено, або її мікрофон вимкнено. Увімкни її або мікрофон. Досі нічого? Натисни <b>Полагодити</b>.",
+  "Names can be up to {n} characters, so it's “{name}”.": "Назва може мати до {n} символів, тому вийшло «{name}».",
+  "They go in a category called “{name}”.": "Вони потраплять у категорію «{name}».",
+  "Type a name first.": "Спершу введіть назву.",
+  "✓ Renamed to “{new}”. Another sound has that name too.": "✓ Перейменовано на «{new}». Інший звук теж так називається."
 }

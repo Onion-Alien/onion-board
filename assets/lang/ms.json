@@ -3361,5 +3361,9 @@
   "No sound from your mic. Is your headset on?": "Tiada bunyi daripada mikrofon anda. Adakah set kepala anda dihidupkan?",
   "Unplugged": "Tidak disambung",
   "Windows can't find <b>{mic}</b> right now. Plug it in, or switch it on if it's wireless. This goes away by itself.": "Windows tidak menjumpai <b>{mic}</b> sekarang. Pasangkannya, atau hidupkannya jika ia tanpa wayar. Ini hilang dengan sendirinya.",
-  "Your headset is off or its mic is muted. Turn it on or unmute it. Still nothing? Click <b>Repair</b>.": "Set kepala anda dimatikan atau mikrofonnya diredamkan. Hidupkannya atau nyahredamkannya. Masih tiada? Klik <b>Baiki</b>."
+  "Your headset is off or its mic is muted. Turn it on or unmute it. Still nothing? Click <b>Repair</b>.": "Set kepala anda dimatikan atau mikrofonnya diredamkan. Hidupkannya atau nyahredamkannya. Masih tiada? Klik <b>Baiki</b>.",
+  "Names can be up to {n} characters, so it's “{name}”.": "Nama boleh sampai {n} aksara, jadi namanya “{name}”.",
+  "They go in a category called “{name}”.": "Semuanya masuk ke kategori bernama “{name}”.",
+  "Type a name first.": "Taip nama dahulu.",
+  "✓ Renamed to “{new}”. Another sound has that name too.": "✓ Dinamakan semula kepada “{new}”. Ada bunyi lain dengan nama yang sama."
 }

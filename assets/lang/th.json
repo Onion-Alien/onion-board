@@ -3361,5 +3361,9 @@
   "No sound from your mic. Is your headset on?": "ไม่มีเสียงจากไมค์ของคุณ หูฟังเปิดอยู่หรือเปล่า",
   "Unplugged": "ไม่ได้เสียบ",
   "Windows can't find <b>{mic}</b> right now. Plug it in, or switch it on if it's wireless. This goes away by itself.": "ตอนนี้ Windows หา <b>{mic}</b> ไม่เจอ เสียบมัน หรือเปิดมันถ้าเป็นแบบไร้สาย ข้อความนี้จะหายไปเอง",
-  "Your headset is off or its mic is muted. Turn it on or unmute it. Still nothing? Click <b>Repair</b>.": "หูฟังปิดอยู่ หรือไมค์ของหูฟังปิดเสียงอยู่ เปิดหูฟังหรือเปิดเสียงไมค์ ยังไม่มีเสียงอีกหรือ คลิก <b>ซ่อม</b>"
+  "Your headset is off or its mic is muted. Turn it on or unmute it. Still nothing? Click <b>Repair</b>.": "หูฟังปิดอยู่ หรือไมค์ของหูฟังปิดเสียงอยู่ เปิดหูฟังหรือเปิดเสียงไมค์ ยังไม่มีเสียงอีกหรือ คลิก <b>ซ่อม</b>",
+  "Names can be up to {n} characters, so it's “{name}”.": "ชื่อยาวได้ไม่เกิน {n} ตัวอักษร จึงเป็น “{name}”",
+  "They go in a category called “{name}”.": "จะอยู่ในหมวดหมู่ชื่อ “{name}”",
+  "Type a name first.": "พิมพ์ชื่อก่อน",
+  "✓ Renamed to “{new}”. Another sound has that name too.": "✓ เปลี่ยนชื่อเป็น “{new}” แล้ว มีเสียงอื่นที่ชื่อนี้ด้วย"
 }

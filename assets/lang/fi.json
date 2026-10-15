@@ -3437,5 +3437,9 @@
   "No sound from your mic. Is your headset on?": "Mikistäsi ei tule ääntä. Ovatko kuulokkeesi päällä?",
   "Unplugged": "Irrotettu",
   "Windows can't find <b>{mic}</b> right now. Plug it in, or switch it on if it's wireless. This goes away by itself.": "Windows ei löydä laitetta <b>{mic}</b> juuri nyt. Kytke se kiinni, tai laita se päälle, jos se on langaton. Tämä katoaa itsestään.",
-  "Your headset is off or its mic is muted. Turn it on or unmute it. Still nothing? Click <b>Repair</b>.": "Kuulokkeesi ovat pois päältä tai niiden mikki on mykistetty. Laita ne päälle tai poista mykistys. Vieläkään ei mitään? Klikkaa <b>Korjaa</b>."
+  "Your headset is off or its mic is muted. Turn it on or unmute it. Still nothing? Click <b>Repair</b>.": "Kuulokkeesi ovat pois päältä tai niiden mikki on mykistetty. Laita ne päälle tai poista mykistys. Vieläkään ei mitään? Klikkaa <b>Korjaa</b>.",
+  "Names can be up to {n} characters, so it's “{name}”.": "Nimessä voi olla enintään {n} merkkiä, joten se on “{name}”.",
+  "They go in a category called “{name}”.": "Ne menevät luokkaan nimeltä “{name}”.",
+  "Type a name first.": "Kirjoita ensin nimi.",
+  "✓ Renamed to “{new}”. Another sound has that name too.": "✓ Uudelleennimetty \"{new}\". Toisellakin äänellä on sama nimi."
 }

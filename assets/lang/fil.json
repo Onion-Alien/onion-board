@@ -3437,5 +3437,9 @@
   "No sound from your mic. Is your headset on?": "Walang tunog mula sa mic mo. Naka-on ba ang headset mo?",
   "Unplugged": "Hindi nakasaksak",
   "Windows can't find <b>{mic}</b> right now. Plug it in, or switch it on if it's wireless. This goes away by itself.": "Hindi mahanap ng Windows ang <b>{mic}</b> ngayon. Isaksak ito, o i-on kung wireless ito. Kusa itong mawawala.",
-  "Your headset is off or its mic is muted. Turn it on or unmute it. Still nothing? Click <b>Repair</b>.": "Naka-off ang headset mo o naka-mute ang mic nito. I-on ito o i-unmute. Wala pa rin? I-click ang <b>I-repair</b>."
+  "Your headset is off or its mic is muted. Turn it on or unmute it. Still nothing? Click <b>Repair</b>.": "Naka-off ang headset mo o naka-mute ang mic nito. I-on ito o i-unmute. Wala pa rin? I-click ang <b>I-repair</b>.",
+  "Names can be up to {n} characters, so it's “{name}”.": "Hanggang {n} character lang ang pangalan, kaya “{name}” ito.",
+  "They go in a category called “{name}”.": "Mapupunta sila sa category na “{name}”.",
+  "Type a name first.": "Mag-type muna ng pangalan.",
+  "✓ Renamed to “{new}”. Another sound has that name too.": "✓ Na-rename sa “{new}”. May isa pang sound na ganito rin ang pangalan."
 }

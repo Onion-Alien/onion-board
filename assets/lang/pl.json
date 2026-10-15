@@ -3513,5 +3513,9 @@
   "No sound from your mic. Is your headset on?": "Brak dźwięku z mikrofonu. Czy słuchawki są włączone?",
   "Unplugged": "Odłączony",
   "Windows can't find <b>{mic}</b> right now. Plug it in, or switch it on if it's wireless. This goes away by itself.": "Windows nie widzi teraz urządzenia <b>{mic}</b>. Podłącz je albo włącz, jeśli jest bezprzewodowe. To zniknie samo.",
-  "Your headset is off or its mic is muted. Turn it on or unmute it. Still nothing? Click <b>Repair</b>.": "Słuchawki są wyłączone albo ich mikrofon jest wyciszony. Włącz je albo wyłącz wyciszenie. Dalej nic? Kliknij <b>Napraw</b>."
+  "Your headset is off or its mic is muted. Turn it on or unmute it. Still nothing? Click <b>Repair</b>.": "Słuchawki są wyłączone albo ich mikrofon jest wyciszony. Włącz je albo wyłącz wyciszenie. Dalej nic? Kliknij <b>Napraw</b>.",
+  "Names can be up to {n} characters, so it's “{name}”.": "Nazwa może mieć do {n} znaków, więc jest „{name}”.",
+  "They go in a category called “{name}”.": "Trafią do kategorii o nazwie „{name}”.",
+  "Type a name first.": "Najpierw wpisz nazwę.",
+  "✓ Renamed to “{new}”. Another sound has that name too.": "✓ Zmieniono nazwę na „{new}”. Inny dźwięk też ma tę nazwę."
 }

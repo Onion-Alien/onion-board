@@ -3361,5 +3361,9 @@
   "No sound from your mic. Is your headset on?": "麦克风没有声音。耳机开着吗？",
   "Unplugged": "未连接",
   "Windows can't find <b>{mic}</b> right now. Plug it in, or switch it on if it's wireless. This goes away by itself.": "Windows 现在找不到 <b>{mic}</b>。请插上，如果是无线的就打开它。这条提示会自己消失。",
-  "Your headset is off or its mic is muted. Turn it on or unmute it. Still nothing? Click <b>Repair</b>.": "耳机关着，或者麦克风静音了。请打开耳机或取消静音。还是没声音？点 <b>修复</b>。"
+  "Your headset is off or its mic is muted. Turn it on or unmute it. Still nothing? Click <b>Repair</b>.": "耳机关着，或者麦克风静音了。请打开耳机或取消静音。还是没声音？点 <b>修复</b>。",
+  "Names can be up to {n} characters, so it's “{name}”.": "名称最多 {n} 个字符，所以是“{name}”。",
+  "They go in a category called “{name}”.": "它们会放进名为“{name}”的分类。",
+  "Type a name first.": "请先输入名称。",
+  "✓ Renamed to “{new}”. Another sound has that name too.": "✓ 已重命名为“{new}”。另一个声音也叫这个名字。"
 }

@@ -3437,5 +3437,9 @@
   "No sound from your mic. Is your headset on?": "Inget ljud från din mikrofon. Är ditt headset på?",
   "Unplugged": "Ej ansluten",
   "Windows can't find <b>{mic}</b> right now. Plug it in, or switch it on if it's wireless. This goes away by itself.": "Windows hittar inte <b>{mic}</b> just nu. Anslut det, eller slå på det om det är trådlöst. Det här försvinner av sig självt.",
-  "Your headset is off or its mic is muted. Turn it on or unmute it. Still nothing? Click <b>Repair</b>.": "Ditt headset är avstängt eller dess mikrofon avstängd. Slå på det eller mikrofonen. Fortfarande inget? Klicka <b>Reparera</b>."
+  "Your headset is off or its mic is muted. Turn it on or unmute it. Still nothing? Click <b>Repair</b>.": "Ditt headset är avstängt eller dess mikrofon avstängd. Slå på det eller mikrofonen. Fortfarande inget? Klicka <b>Reparera</b>.",
+  "Names can be up to {n} characters, so it's “{name}”.": "Namn kan ha upp till {n} tecken, så det blir ”{name}”.",
+  "They go in a category called “{name}”.": "De hamnar i en kategori som heter ”{name}”.",
+  "Type a name first.": "Skriv ett namn först.",
+  "✓ Renamed to “{new}”. Another sound has that name too.": "✓ Bytte namn till ”{new}”. Ett annat ljud heter också så."
 }

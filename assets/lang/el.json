@@ -3437,5 +3437,9 @@
   "No sound from your mic. Is your headset on?": "Κανένας ήχος από το μικρόφωνό σου. Είναι ανοιχτά τα ακουστικά σου;",
   "Unplugged": "Αποσυνδεδεμένο",
   "Windows can't find <b>{mic}</b> right now. Plug it in, or switch it on if it's wireless. This goes away by itself.": "Τα Windows δεν βρίσκουν το <b>{mic}</b> αυτή τη στιγμή. Σύνδεσέ το ή άνοιξέ το αν είναι ασύρματο. Αυτό φεύγει μόνο του.",
-  "Your headset is off or its mic is muted. Turn it on or unmute it. Still nothing? Click <b>Repair</b>.": "Τα ακουστικά σου είναι κλειστά ή το μικρόφωνό τους σε σίγαση. Άνοιξέ τα ή βγάλε τη σίγαση. Ακόμα τίποτα; Κάνε κλικ στο <b>Επισκευή</b>."
+  "Your headset is off or its mic is muted. Turn it on or unmute it. Still nothing? Click <b>Repair</b>.": "Τα ακουστικά σου είναι κλειστά ή το μικρόφωνό τους σε σίγαση. Άνοιξέ τα ή βγάλε τη σίγαση. Ακόμα τίποτα; Κάνε κλικ στο <b>Επισκευή</b>.",
+  "Names can be up to {n} characters, so it's “{name}”.": "Τα ονόματα έχουν έως {n} χαρακτήρες, οπότε είναι «{name}».",
+  "They go in a category called “{name}”.": "Μπαίνουν σε κατηγορία με όνομα «{name}».",
+  "Type a name first.": "Γράψτε πρώτα ένα όνομα.",
+  "✓ Renamed to “{new}”. Another sound has that name too.": "✓ Μετονομάστηκε σε \"{new}\". Και άλλος ήχος έχει αυτό το όνομα."
 }

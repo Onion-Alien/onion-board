@@ -3437,5 +3437,9 @@
   "No sound from your mic. Is your headset on?": "No sale sonido de tu micro. ¿Tus cascos están encendidos?",
   "Unplugged": "Desconectado",
   "Windows can't find <b>{mic}</b> right now. Plug it in, or switch it on if it's wireless. This goes away by itself.": "Windows no encuentra <b>{mic}</b> ahora. Conéctalo, o enciéndelo si es inalámbrico. Esto desaparece solo.",
-  "Your headset is off or its mic is muted. Turn it on or unmute it. Still nothing? Click <b>Repair</b>.": "Tus cascos están apagados o su micro silenciado. Enciéndelos o quita el silencio. ¿Sigue sin nada? Haz clic en <b>Reparar</b>."
+  "Your headset is off or its mic is muted. Turn it on or unmute it. Still nothing? Click <b>Repair</b>.": "Tus cascos están apagados o su micro silenciado. Enciéndelos o quita el silencio. ¿Sigue sin nada? Haz clic en <b>Reparar</b>.",
+  "Names can be up to {n} characters, so it's “{name}”.": "Los nombres pueden tener hasta {n} caracteres, así que queda “{name}”.",
+  "They go in a category called “{name}”.": "Van a una categoría llamada “{name}”.",
+  "Type a name first.": "Primero escribe un nombre.",
+  "✓ Renamed to “{new}”. Another sound has that name too.": "✓ Nombre cambiado a “{new}”. Otro sonido también tiene ese nombre."
 }
