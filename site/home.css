@@ -204,7 +204,18 @@ h1 em, h2 em { font-style: normal; background: linear-gradient(100deg, var(--a1)
 .bun-g .cap { transform: translateY(-14px); transition: opacity .3s, transform .4s cubic-bezier(.3,1.6,.5,1); }
 #bun.asleep .cap { opacity: 1; transform: none; }
 #bun.asleep .whole { animation-duration: 6s; }
-.bun-g .band-c { stroke: #7c5cff; } .bun-g .cup { fill: #7c5cff; } .bun-g .cup-hi { fill: #b2a2ff; }
+.bun-g .band-c { stroke: var(--a1); } .bun-g .cup { fill: var(--a1); }
+.bun-g .cup-hi { fill: color-mix(in srgb, var(--a1) 55%, #fff); }
+/* Their theme outfits, like in the apps: home.js names the picked look on <html>. The
+   nightcap replaces hats and glasses while Bun naps. */
+.fit { display: none; }
+html[data-look="blood-moon"] .fit.blood-moon, html[data-look="synthwave"] .fit.synthwave,
+html[data-look="hacker"] .fit.hacker, html[data-look="ocean"] .fit.ocean,
+html[data-look="light"] .fit.light { display: inline; }
+.fit .rim { stroke: var(--a1); } .fit .tie { fill: var(--a2); }
+.fit .knot { fill: color-mix(in srgb, var(--a2) 83%, #000); }
+.fit.hat, .fit.eyewear { transition: opacity .3s; }
+#bun.asleep .fit.hat, #bun.asleep .fit.eyewear { opacity: 0; }
 .bun-g .mic { transform-box: view-box; transform-origin: 79px 98px; transition: transform .2s; }
 #bun.talking .mic { transform: rotate(-14deg) translate(-3px, -2px); }
 

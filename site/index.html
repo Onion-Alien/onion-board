@@ -64,6 +64,9 @@
     <clipPath id="capclip"><path d="M24 49C24 30 40 19 56 20C74 21 88 31 91 47C85 40 80 38 76 47Q50 40 24 49Z"/></clipPath>
     <clipPath id="eyeL"><circle cx="36" cy="53" r="11"/></clipPath>
     <clipPath id="eyeR"><circle cx="64" cy="53" r="11"/></clipPath>
+    <!-- the theme outfits' colours (the pieces themselves are in Bun and Hoot below) -->
+    <radialGradient id="fit-moon" gradientUnits="userSpaceOnUse" cx="40" cy="30" r="50"><stop offset="0" stop-color="#ff8a4d"/><stop offset="1" stop-color="#c2361f"/></radialGradient>
+    <linearGradient id="fit-visor" gradientUnits="userSpaceOnUse" x1="26" y1="0" x2="74" y2="0"><stop offset="0" stop-color="#ff2fb4"/><stop offset="1" stop-color="#2fe6ff"/></linearGradient>
     <filter id="soft" x="-50%" y="-50%" width="200%" height="200%"><feGaussianBlur stdDeviation="3"/></filter>
     <!-- Still copies for the small pictures (tabs, footer, cross-links): a <use> of the live
          Bun or Hoot is rebuilt every time they move, and flickers. -->
@@ -208,6 +211,8 @@
           <svg id="bun" viewBox="-6 -10 112 140" aria-hidden="true">
             <ellipse class="shadow" cx="50" cy="122" rx="30" ry="4.5"/>
             <g class="whole bun-g" id="bun-art" stroke="#2b2340" stroke-width="2.4" stroke-linejoin="round" stroke-linecap="round">
+              <!-- his theme outfit (the apps' bunnyfit.py): behind him -->
+              <g class="fit blood-moon"><circle cx="50" cy="48" r="41" fill="rgba(255,110,60,.24)" stroke="none"/><circle cx="50" cy="48" r="37" fill="url(#fit-moon)" stroke="#6e170e" stroke-width="2"/><g fill="rgba(140,30,16,.47)" stroke="none"><circle cx="27" cy="34" r="5"/><circle cx="73" cy="28" r="4"/><circle cx="80" cy="52" r="5.5"/><circle cx="22" cy="58" r="3.5"/><circle cx="58" cy="14" r="3"/></g></g>
               <g class="ear l"><ellipse cx="36" cy="26" rx="9.5" ry="25" fill="#fbf7f2" transform="rotate(-10 36 26)"/>
                 <ellipse cx="36" cy="28" rx="4.5" ry="18" fill="#ffb3c7" stroke="none" transform="rotate(-10 36 28)"/></g>
               <g class="ear r"><ellipse cx="66" cy="28" rx="9.5" ry="24" fill="#fbf7f2" transform="rotate(18 66 28)"/>
@@ -216,6 +221,7 @@
               <ellipse cx="50" cy="104" rx="15" ry="11" fill="#ece3da" stroke="none"/>
               <ellipse cx="37" cy="116" rx="8" ry="4" fill="#fbf7f2"/>
               <ellipse cx="63" cy="116" rx="8" ry="4" fill="#fbf7f2"/>
+              <g class="fit hacker"><ellipse cx="50" cy="65" rx="41" ry="37" fill="#2c323e"/><ellipse class="rim" cx="50" cy="65" rx="39" ry="35" fill="none" stroke-width="1.6"/><ellipse cx="50" cy="65" rx="36" ry="32" fill="#1f242c" stroke="none"/></g>
               <ellipse cx="50" cy="64" rx="34" ry="28" fill="#fbf7f2"/>
               <path class="phones-band" d="M17 64C15 26 85 26 83 64" fill="none" stroke-width="8.5"/>
               <path class="band-c" d="M17 64C15 26 85 26 83 64" fill="none" stroke-width="5"/>
@@ -223,6 +229,9 @@
               <rect class="cup-hi" x="12.5" y="57" width="3" height="10" rx="1.5" stroke="none"/>
               <rect class="cup" x="80" y="54" width="11" height="22" rx="5"/>
               <rect class="cup-hi" x="82.5" y="57" width="3" height="10" rx="1.5" stroke="none"/>
+              <!-- hats, over his headphones -->
+              <g class="fit hat blood-moon" fill="#3a0b12"><path d="M41 39C40 32 40 27 43 21C45 27 47 32 48.5 38Z"/><path d="M59 39C60 32 60 27 57 21C55 27 53 32 51.5 38Z"/></g>
+              <g class="fit hat ocean"><path d="M30 42L21 24H79L70 42Z" fill="#fff"/><ellipse cx="50" cy="23.5" rx="31" ry="8.5" fill="#fff"/><path d="M26 34H74L70.5 42H29.5Z" fill="#1d2f5e"/><path d="M27 41Q50 54 73 41Q50 45 27 41Z" fill="#1c1a26"/><path d="M31 40H69" stroke="#ffcf40" stroke-width="1.4"/><circle cx="50" cy="29" r="5" fill="#ffcf40" stroke="#d99a1e" stroke-width="1"/><path d="M50 26V32M47.6 27.4H52.4M47 30Q50 33.5 53 30" fill="none" stroke="#1d2f5e" stroke-width="1.4"/></g>
               <g class="cap">
                 <path d="M24 49C24 30 40 19 56 20C74 21 88 31 91 47C85 40 80 38 76 47Q50 40 24 49Z" fill="#7c5cff"/>
                 <g clip-path="url(#capclip)" stroke="#a996ff" stroke-width="5"><path d="M24 50L40 14M40 50L56 14M56 50L72 14M72 50L88 14"/></g>
@@ -247,6 +256,11 @@
               <path class="frown" d="M45 78.5Q50 74.5 55 78.5" fill="none" stroke-width="1.8"/>
               <g class="talk"><ellipse class="mo" cx="50" cy="80" rx="4.5" ry="4" fill="#5a2238" stroke-width="1.6"/>
                 <ellipse class="tongue" cx="50" cy="82.5" rx="2.25" ry="1.6" fill="#ff8fae" stroke="none"/></g>
+              <!-- on his face and neck -->
+              <g class="fit eyewear hacker" stroke="#1c1a26" stroke-width="2"><path d="M46 60H54M31 59L20 60M69 59L80 60"/><rect x="30.5" y="55.5" width="17" height="12" rx="4" fill="#1c1a26"/><rect x="52.5" y="55.5" width="17" height="12" rx="4" fill="#1c1a26"/><path d="M34 63L38 58M56 63L60 58" stroke="rgba(255,255,255,.59)" stroke-width="1.6"/></g>
+              <g class="fit eyewear synthwave" stroke="#1c1a26" stroke-width="2"><rect x="24" y="55" width="52" height="13" rx="6.5" fill="url(#fit-visor)"/><path d="M30 59H70" stroke="rgba(255,255,255,.67)" stroke-width="1.5"/><path d="M24 61H20M76 61H80"/></g>
+              <g class="fit hacker"><path d="M42 90L41 104M58 90L59 104" stroke="#d8dce4" stroke-width="1.8"/><g fill="#9aa0b4" stroke="none"><rect x="39.8" y="104" width="2.4" height="4"/><rect x="57.8" y="104" width="2.4" height="4"/></g></g>
+              <g class="fit light"><path class="tie" d="M50 93L39 87V99Z"/><path class="tie" d="M50 93L61 87V99Z"/><rect class="knot" x="46.5" y="89.5" width="7" height="7" rx="2"/></g>
               <g class="mic"><rect x="76" y="88" width="7" height="20" rx="3" fill="#3a3452"/>
                 <circle cx="79.5" cy="84" r="7.5" fill="#9aa0b4"/>
                 <path d="M74 81H85M73.5 84H85.5M74 87H85" stroke="#6d7288" stroke-width="1"/>
@@ -415,6 +429,8 @@
           <svg id="hoot" viewBox="-6 -10 112 140" aria-hidden="true">
             <ellipse class="shadow" cx="50" cy="121" rx="28" ry="4.5"/>
             <g class="whole hoot-g" id="hoot-art"><g class="body-turn" stroke="#2b2340" stroke-width="2.4" stroke-linejoin="round" stroke-linecap="round">
+              <!-- his theme outfit: Bun's pieces moved onto him (the apps' owl.py) -->
+              <g transform="translate(0 -12)"><g class="fit blood-moon"><circle cx="50" cy="48" r="41" fill="rgba(255,110,60,.24)" stroke="none"/><circle cx="50" cy="48" r="37" fill="url(#fit-moon)" stroke="#6e170e" stroke-width="2"/><g fill="rgba(140,30,16,.47)" stroke="none"><circle cx="27" cy="34" r="5"/><circle cx="73" cy="28" r="4"/><circle cx="80" cy="52" r="5.5"/><circle cx="22" cy="58" r="3.5"/><circle cx="58" cy="14" r="3"/></g></g><g class="fit hacker"><ellipse cx="50" cy="65" rx="41" ry="37" fill="#2c323e"/><ellipse class="rim" cx="50" cy="65" rx="39" ry="35" fill="none" stroke-width="1.6"/><ellipse cx="50" cy="65" rx="36" ry="32" fill="#1f242c" stroke="none"/></g></g>
               <path class="tuft l" d="M34 34Q20 22 16 10Q14 30 16 44Z" fill="#2f9c8c"/>
               <path class="tuft r" d="M66 34Q80 22 84 10Q86 30 84 44Z" fill="#2f9c8c"/>
               <rect x="16" y="24" width="68" height="88" rx="34" ry="36" fill="#4fc3b0"/>
@@ -438,6 +454,9 @@
               <circle cx="36" cy="53" r="12" fill="none"/><circle cx="64" cy="53" r="12" fill="none"/>
               <g stroke="none" fill="rgba(255,128,160,.43)"><ellipse cx="25" cy="68" rx="5" ry="3"/><ellipse cx="75" cy="68" rx="5" ry="3"/></g>
               <path d="M45.5 62L54.5 62Q52 70 50 72Q48 70 45.5 62Z" fill="#ffb347" stroke-width="1.8"/>
+              <g transform="translate(0 -12)"><g class="fit hat blood-moon" fill="#3a0b12"><path d="M41 39C40 32 40 27 43 21C45 27 47 32 48.5 38Z"/><path d="M59 39C60 32 60 27 57 21C55 27 53 32 51.5 38Z"/></g><g class="fit hat ocean"><path d="M30 42L21 24H79L70 42Z" fill="#fff"/><ellipse cx="50" cy="23.5" rx="31" ry="8.5" fill="#fff"/><path d="M26 34H74L70.5 42H29.5Z" fill="#1d2f5e"/><path d="M27 41Q50 54 73 41Q50 45 27 41Z" fill="#1c1a26"/><path d="M31 40H69" stroke="#ffcf40" stroke-width="1.4"/><circle cx="50" cy="29" r="5" fill="#ffcf40" stroke="#d99a1e" stroke-width="1"/><path d="M50 26V32M47.6 27.4H52.4M47 30Q50 33.5 53 30" fill="none" stroke="#1d2f5e" stroke-width="1.4"/></g></g>
+              <g transform="translate(-15 -27.6) scale(1.3)"><g class="fit eyewear hacker" stroke="#1c1a26" stroke-width="2"><path d="M46 60H54M31 59L20 60M69 59L80 60"/><rect x="30.5" y="55.5" width="17" height="12" rx="4" fill="#1c1a26"/><rect x="52.5" y="55.5" width="17" height="12" rx="4" fill="#1c1a26"/><path d="M34 63L38 58M56 63L60 58" stroke="rgba(255,255,255,.59)" stroke-width="1.6"/></g><g class="fit eyewear synthwave" stroke="#1c1a26" stroke-width="2"><rect x="24" y="55" width="52" height="13" rx="6.5" fill="url(#fit-visor)"/><path d="M30 59H70" stroke="rgba(255,255,255,.67)" stroke-width="1.5"/><path d="M24 61H20M76 61H80"/></g></g>
+              <g transform="translate(0 -14)"><g class="fit light"><path class="tie" d="M50 93L39 87V99Z"/><path class="tie" d="M50 93L61 87V99Z"/><rect class="knot" x="46.5" y="89.5" width="7" height="7" rx="2"/></g></g>
             </g></g>
           </svg>
         </button>
