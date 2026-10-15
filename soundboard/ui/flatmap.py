@@ -20,6 +20,7 @@ from __future__ import annotations
 import html
 import math
 import time
+from collections import deque
 from collections.abc import Iterator
 
 import numpy as np
@@ -37,6 +38,10 @@ LAT_TOP, LAT_BOTTOM = 84.0, -58.0   # the inhabited world: no polar wastes
 ZOOM_MAX = 250.0                    # about street level: a city's stations come apart
 HIT_PX = 7.0                        # how near the pointer a dot counts as under it
 LAND_PART = 400                     # outline points per drawn part (set_land)
+# The parts are made one a step with this long a rest between (set_land). All ~30 in
+# one go were 10-40 ms of back-to-back Qt calls on opening the Radio tab, and the audio
+# threads wait on them: a sound playing came up to 33 ms late, a skip.
+STEP_GAP_MS = 4
 FILL_PX = 1_000_000                 # device pixels per filled band (_fill)
 # The world in tiles: a drag copies the ones in view (well under 1 ms) instead of
 # drawing the map again, which took 10-20 ms a frame zoomed in and made it lag.
@@ -208,6 +213,12 @@ class FlatMap(QWidget):
         self._reveal_t0: float | None = None     # when the first stations pop in (REVEAL_S)
         self._reveal_wait = False                # ...stations came before the land did
         self._land_set = False
+        self._rings: deque[list] = deque()          # outlines still to make parts of
+        self._land_new: list[QPainterPath] = []     # ...and the parts made so far
+        self._land_steps = QTimer(self)             # makes the next part (_land_step)
+        self._land_steps.setSingleShot(True)
+        self._land_steps.setTimerType(Qt.TimerType.PreciseTimer)
+        self._land_steps.timeout.connect(self._land_step)
         self._names_pic: tuple | None = None     # (view, picture): the names over the pop-in
         self._names_build: tuple | None = None   # (view, picture, its steps): being drawn
         self._dots_pic: tuple | None = None      # (view, picture, which are on it): the
@@ -262,19 +273,30 @@ class FlatMap(QWidget):
         # in parts of a few hundred points: Qt holds Python's lock while it draws a
         # path, and the whole world in one took 10-30 ms, long enough to hold up the
         # audio threads (a sound skipped each time the map was redrawn at a new zoom).
-        # A part takes about 1 ms, and all of them less than the one did.
-        self._land = []
-        path, n = None, 0
-        for ring in rings:
-            if path is None or n + len(ring) > LAND_PART:
-                path, n = QPainterPath(), 0
-                path.setFillRule(Qt.FillRule.WindingFill)
-                self._land.append(path)
+        # A part takes about 1 ms, and all of them less than the one did. They're made
+        # one a step too (STEP_GAP_MS), and shown once they're all made.
+        self._rings = deque(rings)
+        self._land_new = []
+        self._land_steps.stop()
+        self._land_step()   # the first at once: a small map (or none) is done here
+
+    def _land_step(self):
+        """The next part of the land (set_land); the last one puts them all on the map."""
+        path, n = QPainterPath(), 0
+        path.setFillRule(Qt.FillRule.WindingFill)
+        while self._rings and (n == 0 or n + len(self._rings[0]) <= LAND_PART):
+            ring = self._rings.popleft()
             path.moveTo(ring[0][0], -ring[0][1])
             for x, y in ring[1:]:
                 path.lineTo(x, -y)
             path.closeSubpath()
             n += len(ring)
+        if n:
+            self._land_new.append(path)
+        if self._rings:
+            self._land_steps.start(STEP_GAP_MS)
+            return
+        self._land = self._land_new
         self._land_box = [part.boundingRect() for part in self._land]
         self._land_ver += 1
         self._land_set = True
