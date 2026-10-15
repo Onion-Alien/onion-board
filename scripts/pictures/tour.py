@@ -147,13 +147,13 @@ def main():
     screenshots.fake_machine(tmp)
     for name, fn in real.items():               # outputs: silent streams, not stubs
         setattr(engine.Engine, name, fn)
-    screenshots.demo_config(tmp, args.theme)
+    screenshots.demo_config(tmp, args.theme, True)
     if not screenshots.install_onion_watch():   # the Triggers tab is the Onion Watch add-on
         raise SystemExit("set ONIONBOARD_ONION_WATCH_ZIP to an OnionWatch-module.zip first")
 
     from soundboard.ui import mainwindow
     w = mainwindow.MainWindow()
-    w._load_thread.join(15)
+    w.soundctl._load_thread.join(15)
     w.setWindowFlags(Qt.Tool | Qt.FramelessWindowHint | Qt.WindowDoesNotAcceptFocus)
     w.setAttribute(Qt.WA_ShowWithoutActivating)
     w.resize(1180, 720)
@@ -172,7 +172,7 @@ def main():
     def sounds(t):
         for at, sid in list(plays.items()):
             if t >= at:
-                w.play(sid)
+                w.playctl.play(sid)
                 plays.pop(at)
     rec.record(5.0, "Press a pad or a hotkey: Discord and your game hear it", sounds)
 

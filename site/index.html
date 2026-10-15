@@ -43,6 +43,14 @@
   document.documentElement.classList.add("js");
   // Open on the app the link asks for (#watch), before anything paints.
   if (/^#watch/.test(location.hash)) document.documentElement.dataset.product = "watch";
+  // The look they picked last time (home.js keeps it): its colours before anything paints.
+  try {
+    var look = JSON.parse(localStorage.getItem("onion-site-look") || "null");
+    if (look && look.vars && look.vars.indexOf("--tex:") >= 0) document.documentElement.classList.add("textured");
+    if (look && look.vars) look.vars.split(";").forEach(function (kv) {
+      kv = kv.split(":"); document.documentElement.style.setProperty(kv[0], kv[1]);
+    });
+  } catch (e) { /* private window or an old value: the default look */ }
 </script>
 <script data-goatcounter="https://onionalien.goatcounter.com/count"
         async src="https://gc.zgo.at/count.js"></script>
@@ -148,6 +156,21 @@
         <svg viewBox="-6 -10 112 140" aria-hidden="true"><use href="#hoot-icon"/></svg>Onion Watch</button>
     </div>
     <div class="tools">
+      <div class="looks">
+        <button class="icon-btn" id="look" type="button" aria-expanded="false" aria-controls="look-menu"
+                aria-label="Change the look" title="Change the look"><i aria-hidden="true"></i></button>
+        <div class="look-menu" id="look-menu" hidden>
+          <b>See the apps in</b>
+<!-- themes -->
+        <button type="button" aria-pressed="false" data-theme="dark"><i style="--s1:#7859f7;--s2:#ff4d8d;--s0:#0f0f11"></i>Dark</button>
+        <button type="button" aria-pressed="false" data-theme="blood-moon" data-v="f2ae4b76" data-vars="--bg:#120a0b;--bg2:#1b0f11;--a1:#d91f35;--a2:#ff8a3d;--link:#ec8a95;--tex:url(screenshots/themes/blood-moon/texture.png?v=57459227);--tex-size:96px"><i style="--s1:#d91f35;--s2:#ff8a3d;--s0:#120a0b"></i>Blood Moon</button>
+        <button type="button" aria-pressed="false" data-theme="synthwave" data-v="3ab935af" data-vars="--bg:#1a0b2e;--bg2:#240f3d;--a1:#e5155a;--a2:#36f9f6;--link:#f396b5;--tex:url(screenshots/themes/synthwave/texture.png?v=138a85ea);--tex-size:24px"><i style="--s1:#e5155a;--s2:#36f9f6;--s0:#1a0b2e"></i>Synthwave</button>
+        <button type="button" aria-pressed="false" data-theme="hacker" data-v="49e8a310" data-vars="--bg:#020a04;--bg2:#051208;--a1:#00ff41;--a2:#00c8ff;--link:#00ff41;--tex:url(screenshots/themes/hacker/texture.png?v=f45e773e);--tex-size:3px"><i style="--s1:#00ff41;--s2:#00c8ff;--s0:#020a04"></i>Hacker</button>
+        <button type="button" aria-pressed="false" data-theme="ocean" data-v="b9c8c6f1" data-vars="--bg:#0c131d;--bg2:#111a27;--a1:#1fb6ff;--a2:#7c5cff;--link:#2ab9ff;--tex:url(screenshots/themes/ocean/texture.png?v=6560a60b);--tex-size:32px"><i style="--s1:#1fb6ff;--s2:#7c5cff;--s0:#0c131d"></i>Ocean</button>
+        <button type="button" aria-pressed="false" data-theme="light" data-v="7d90e8b3" data-vars="--bg:#110f20;--bg2:#181627;--a1:#6a4cff;--a2:#ff3d7f;--link:#9e8bff"><i style="--s1:#6a4cff;--s2:#ff3d7f;--s0:#f4f4f6"></i>Light</button>
+<!-- /themes -->
+        </div>
+      </div>
       <button class="icon-btn" id="mute" type="button" aria-pressed="false" aria-label="Sound on: click to mute the page" title="Sound on">🔊</button>
       <a class="dl mini-dl" data-dl href="https://github.com/Onion-Alien/onion-board/releases/latest/download/OnionBoardSetup.exe" data-goatcounter-click="download-home-nav">Download</a>
     </div>

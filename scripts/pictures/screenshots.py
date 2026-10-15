@@ -254,16 +254,16 @@ def main():
     mainwindow.version_text = lambda: __version__   # as the installed app shows it
 
     w = mainwindow.MainWindow()
-    w._load_thread.join(15)
+    w.soundctl._load_thread.join(15)
     w.resize(1180, 720)
     w.show()
-    w._update_status()
+    w.statusctl._update_status()
     spin(1.5)
     # wide enough that nothing folds away (the tagline with the version, the buttons'
     # words): the top row grows as features are added, and 1180 stopped being enough.
     # At least 1400, so the Voice tab's voice grid fits without a half-cut last row
-    w._fit.reset()
-    need = max(w._fit.need().width(), 1400)
+    w.fitctl._fit.reset()
+    need = max(w.fitctl._fit.need().width(), 1400)
     if need > w.width():
         w.resize(need, round(need * 720 / 1180))
         spin(1.5)
@@ -290,7 +290,7 @@ def main():
         print("triggers not captured: set ONIONBOARD_ONION_WATCH_ZIP to an OnionWatch-module.zip")
     w.tabs.setCurrentWidget(w.sounds_page)
 
-    d = w.open_settings("hotkeys")   # a page in the window, not a window of its own
+    d = w.setctl.open_settings("hotkeys")   # a page in the window, not a window of its own
     spin()
     save(w, "settings-hotkeys")
     d.accept()
