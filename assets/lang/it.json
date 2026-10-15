@@ -3475,5 +3475,6 @@
   "Onion Pocket's settings didn't open: they're on Settings → Remote.": "Le impostazioni di Onion Pocket non si sono aperte: sono in Impostazioni → Remoto.",
   "Pair a phone and settings": "Abbina un telefono e impostazioni",
   "<br><span style='color:{status}'>Can't open {devices} (My headphones). Plugged in? It's tried again by itself.</span>": "<br><span style='color:{status}'>Impossibile aprire {devices} (Le mie cuffie). È collegato? Riprova da solo.</span>",
-  "<br><span style='color:{status}'>Can't open {devices} (My mic). Plugged in? It's tried again by itself.</span>": "<br><span style='color:{status}'>Impossibile aprire {devices} (Il mio microfono). È collegato? Riprova da solo.</span>"
+  "<br><span style='color:{status}'>Can't open {devices} (My mic). Plugged in? It's tried again by itself.</span>": "<br><span style='color:{status}'>Impossibile aprire {devices} (Il mio microfono). È collegato? Riprova da solo.</span>",
+  "On, waiting for Windows to allow it: answer its prompt.": "Acceso, in attesa che Windows lo consenta: rispondi alla sua richiesta."
 }

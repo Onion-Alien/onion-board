@@ -3475,5 +3475,6 @@
   "Onion Pocket's settings didn't open: they're on Settings → Remote.": "Hindi nabuksan ang settings ng Onion Pocket: nasa Settings → Remote ang mga ito.",
   "Pair a phone and settings": "Mag-pair ng phone at settings",
   "<br><span style='color:{status}'>Can't open {devices} (My headphones). Plugged in? It's tried again by itself.</span>": "<br><span style='color:{status}'>Hindi mabuksan ang {devices} (Headphones ko). Nakasaksak ba? Kusa itong susubukan ulit.</span>",
-  "<br><span style='color:{status}'>Can't open {devices} (My mic). Plugged in? It's tried again by itself.</span>": "<br><span style='color:{status}'>Hindi mabuksan ang {devices} (Mic ko). Nakasaksak ba? Kusa itong susubukan ulit.</span>"
+  "<br><span style='color:{status}'>Can't open {devices} (My mic). Plugged in? It's tried again by itself.</span>": "<br><span style='color:{status}'>Hindi mabuksan ang {devices} (Mic ko). Nakasaksak ba? Kusa itong susubukan ulit.</span>",
+  "On, waiting for Windows to allow it: answer its prompt.": "On, hinihintay na payagan ito ng Windows: sagutin ang tanong nito."
 }

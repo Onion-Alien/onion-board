@@ -3475,5 +3475,6 @@
   "Onion Pocket's settings didn't open: they're on Settings → Remote.": "Az Onion Pocket beállításai nem nyíltak meg: itt vannak: Beállítások → Távirányítás.",
   "Pair a phone and settings": "Telefon párosítása és beállítások",
   "<br><span style='color:{status}'>Can't open {devices} (My headphones). Plugged in? It's tried again by itself.</span>": "<br><span style='color:{status}'>Nem nyitható meg: {devices} (Fejhallgatóm). Be van dugva? Magától újrapróbálja.</span>",
-  "<br><span style='color:{status}'>Can't open {devices} (My mic). Plugged in? It's tried again by itself.</span>": "<br><span style='color:{status}'>Nem nyitható meg: {devices} (Saját mikrofon). Be van dugva? Magától újrapróbálja.</span>"
+  "<br><span style='color:{status}'>Can't open {devices} (My mic). Plugged in? It's tried again by itself.</span>": "<br><span style='color:{status}'>Nem nyitható meg: {devices} (Saját mikrofon). Be van dugva? Magától újrapróbálja.</span>",
+  "On, waiting for Windows to allow it: answer its prompt.": "Be, a Windows engedélyére vár: válaszolj a kérdésére."
 }

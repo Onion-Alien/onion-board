@@ -3475,5 +3475,6 @@
   "Onion Pocket's settings didn't open: they're on Settings → Remote.": "Die Einstellungen von Onion Pocket gingen nicht auf: Sie sind unter Einstellungen → Fernsteuerung.",
   "Pair a phone and settings": "Handy koppeln und Einstellungen",
   "<br><span style='color:{status}'>Can't open {devices} (My headphones). Plugged in? It's tried again by itself.</span>": "<br><span style='color:{status}'>{devices} lässt sich nicht öffnen („Meine Kopfhörer“). Angeschlossen? Es wird von selbst erneut versucht.</span>",
-  "<br><span style='color:{status}'>Can't open {devices} (My mic). Plugged in? It's tried again by itself.</span>": "<br><span style='color:{status}'>{devices} lässt sich nicht öffnen („Mein Mikro“). Angeschlossen? Es wird von selbst erneut versucht.</span>"
+  "<br><span style='color:{status}'>Can't open {devices} (My mic). Plugged in? It's tried again by itself.</span>": "<br><span style='color:{status}'>{devices} lässt sich nicht öffnen („Mein Mikro“). Angeschlossen? Es wird von selbst erneut versucht.</span>",
+  "On, waiting for Windows to allow it: answer its prompt.": "An, wartet darauf, dass Windows es erlaubt: beantworte seine Abfrage."
 }

@@ -74,3 +74,17 @@ def test_pocket_card_in_one_column(window):  # noqa: F811
     assert right.indexOf(window.helpcard) < 0
     _install(window, None)
     assert left.indexOf(window.pocket_card.frame) < 0
+
+
+def test_waiting_on_windows_prompt_isnt_couldnt_start(window, qapp):  # noqa: F811
+    """Turned on, the add-on waits for Windows' firewall prompt before it starts its
+    server: the shut card said "couldn't start" all that time. It says it's waiting,
+    then what came of it once the prompt's answered."""
+    from conftest import process_events
+    addon = FakePocket()
+    addon.enabled, addon.asking = True, object()   # the prompt's up
+    _install(window, addon)
+    assert window.pocket_card.state.text() == ("On, waiting for Windows to allow it: "
+                                               "answer its prompt.")
+    addon.asking, addon.server.running = None, True   # answered: it started
+    assert process_events(qapp, lambda: window.pocket_card.state.text().startswith("On: "))

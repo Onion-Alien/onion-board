@@ -3399,5 +3399,6 @@
   "Onion Pocket's settings didn't open: they're on Settings → Remote.": "Onion Pocket 설정이 열리지 않았어요: 설정 → 원격에 있어요.",
   "Pair a phone and settings": "휴대폰 연결 및 설정",
   "<br><span style='color:{status}'>Can't open {devices} (My headphones). Plugged in? It's tried again by itself.</span>": "<br><span style='color:{status}'>{devices}을(를) 열 수 없어요(내 헤드폰). 연결되어 있나요? 자동으로 다시 시도해요.</span>",
-  "<br><span style='color:{status}'>Can't open {devices} (My mic). Plugged in? It's tried again by itself.</span>": "<br><span style='color:{status}'>{devices}을(를) 열 수 없어요(내 마이크). 연결되어 있나요? 자동으로 다시 시도해요.</span>"
+  "<br><span style='color:{status}'>Can't open {devices} (My mic). Plugged in? It's tried again by itself.</span>": "<br><span style='color:{status}'>{devices}을(를) 열 수 없어요(내 마이크). 연결되어 있나요? 자동으로 다시 시도해요.</span>",
+  "On, waiting for Windows to allow it: answer its prompt.": "켜짐, Windows의 허용을 기다리는 중: 확인 창에 답해 주세요."
 }

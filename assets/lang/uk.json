@@ -3551,5 +3551,6 @@
   "Onion Pocket's settings didn't open: they're on Settings → Remote.": "Налаштування Onion Pocket не відкрилися: вони в розділі Налаштування → Дистанційний.",
   "Pair a phone and settings": "Підключити телефон і налаштування",
   "<br><span style='color:{status}'>Can't open {devices} (My headphones). Plugged in? It's tried again by itself.</span>": "<br><span style='color:{status}'>Не вдається відкрити {devices} («Мої навушники»). Підключено? Спроба повториться сама.</span>",
-  "<br><span style='color:{status}'>Can't open {devices} (My mic). Plugged in? It's tried again by itself.</span>": "<br><span style='color:{status}'>Не вдається відкрити {devices} («Мій мікрофон»). Підключено? Спроба повториться сама.</span>"
+  "<br><span style='color:{status}'>Can't open {devices} (My mic). Plugged in? It's tried again by itself.</span>": "<br><span style='color:{status}'>Не вдається відкрити {devices} («Мій мікрофон»). Підключено? Спроба повториться сама.</span>",
+  "On, waiting for Windows to allow it: answer its prompt.": "Увімкнено, чекає дозволу Windows: дайте відповідь на його запит."
 }
