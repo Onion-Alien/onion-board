@@ -625,6 +625,11 @@ class RadioDirectory(QObject):
         reply.setParent(self)   # this directory going (its tab switched off) aborts it
 
         def finished():
+            # freed later, and freeing it lets go of this function, which holds the
+            # directory: when that was the last hold, the directory went mid-way through
+            # and freed the reply a second time (Qt aborted). So it's the network
+            # manager's to free now, not the directory's.
+            reply.setParent(_the_nam())
             reply.deleteLater()
             if reply.error() != QNetworkReply.NetworkError.NoError:
                 status = reply.attribute(QNetworkRequest.Attribute.HttpStatusCodeAttribute)
