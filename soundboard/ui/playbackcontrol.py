@@ -23,7 +23,7 @@ from soundboard.shuffle import ShuffleBag
 from soundboard.ui import icons, sidebar, worker
 from soundboard.ui.controller import Controller
 from soundboard.ui.linkbar import PLAY_ID as LINK_ID
-from soundboard.ui.widgets import fmt_pos
+from soundboard.ui.widgets import fmt_pos, widget_at
 
 if TYPE_CHECKING:
     from soundboard.ui.mainwindow import MainWindow
@@ -613,8 +613,7 @@ class PlaybackControl(Controller):
         gap = CHIPS_GAP
         room = mw.playing_row.width()
         for i in range(mw._chips_hl.count()):   # the Now playing label and chips
-            item = mw._chips_hl.itemAt(i)
-            w = item.widget() if item is not None else None
+            w = widget_at(mw._chips_hl, i)
             if w is None:
                 continue
             if w is lbl:

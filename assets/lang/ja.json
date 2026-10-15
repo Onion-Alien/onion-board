@@ -3366,5 +3366,8 @@
   "You can change the proxy in Settings > Connection.": "プロキシは [設定] > [接続] で変更できます。",
   "the pack's file is damaged, so it wasn't kept": "パックのファイルが壊れているため、保存されませんでした",
   "Set to 100%": "100%にする",
-  "Your Sounds volume is at 0%, so nobody else hears your sounds.": "サウンドの音量が0%なので、あなたのサウンドは他の人に聞こえていません。"
+  "Your Sounds volume is at 0%, so nobody else hears your sounds.": "サウンドの音量が0%なので、あなたのサウンドは他の人に聞こえていません。",
+  "Heads up: while Onion Board is open, {key} plays your hotkey instead of doing its usual job in other apps.": "ご注意: Onion Board を開いている間、{key} はほかのアプリでいつもの動作をせず、あなたのホットキーを鳴らします。",
+  "Windows keeps {key} for itself and never passes it to an app, so that hotkey could never play: pick another key.": "{key} は Windows 自身が使うキーで、アプリには渡されないため、このホットキーは鳴りません。別のキーを選んでください。",
+  "{key} is your Stop everything key, so it stays on that. Pick another key, or give Stop everything a new one in Settings → Hotkeys first.": "{key} は「すべてをやめてください」のキーなので、そのままにします。別のキーを選ぶか、先に 設定 → ホットキー で「すべてをやめてください」に新しいキーを設定してください。"
 }

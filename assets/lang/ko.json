@@ -3366,5 +3366,8 @@
   "You can change the proxy in Settings > Connection.": "프록시는 설정 > 연결에서 바꿀 수 있습니다.",
   "the pack's file is damaged, so it wasn't kept": "팩 파일이 손상되어 보관하지 않았습니다",
   "Set to 100%": "100%로 설정",
-  "Your Sounds volume is at 0%, so nobody else hears your sounds.": "사운드 볼륨이 0%라서 다른 사람에게 사운드가 들리지 않아요."
+  "Your Sounds volume is at 0%, so nobody else hears your sounds.": "사운드 볼륨이 0%라서 다른 사람에게 사운드가 들리지 않아요.",
+  "Heads up: while Onion Board is open, {key} plays your hotkey instead of doing its usual job in other apps.": "참고: Onion Board가 열려 있는 동안 {key}는 다른 앱에서 원래 하던 일 대신 단축키를 재생해요.",
+  "Windows keeps {key} for itself and never passes it to an app, so that hotkey could never play: pick another key.": "{key}는 Windows가 직접 쓰는 키라 앱에 전달되지 않아요. 그래서 이 단축키는 절대 재생되지 않아요: 다른 키를 고르세요.",
+  "{key} is your Stop everything key, so it stays on that. Pick another key, or give Stop everything a new one in Settings → Hotkeys first.": "{key}는 '모든 것을 멈춰라' 키라서 그대로 둬요. 다른 키를 고르거나, 먼저 설정 → 단축키에서 '모든 것을 멈춰라'에 새 키를 지정하세요."
 }

@@ -3366,5 +3366,8 @@
   "You can change the proxy in Settings > Connection.": "你可以在「設定」>「連線」中變更代理。",
   "the pack's file is damaged, so it wasn't kept": "包檔案已損毀，因此未保留",
   "Set to 100%": "設為 100%",
-  "Your Sounds volume is at 0%, so nobody else hears your sounds.": "你的音效音量為 0%，所以其他人聽不到你的音效。"
+  "Your Sounds volume is at 0%, so nobody else hears your sounds.": "你的音效音量為 0%，所以其他人聽不到你的音效。",
+  "Heads up: while Onion Board is open, {key} plays your hotkey instead of doing its usual job in other apps.": "注意：Onion Board 開著的時候，{key} 會播放你的快速鍵，而不會在其他應用程式裡做它平常的事。",
+  "Windows keeps {key} for itself and never passes it to an app, so that hotkey could never play: pick another key.": "{key} 被 Windows 自己保留，永遠不會交給任何應用程式，所以這個快速鍵永遠不會播放：請換一個鍵。",
+  "{key} is your Stop everything key, so it stays on that. Pick another key, or give Stop everything a new one in Settings → Hotkeys first.": "{key} 是你的「停止所有東西」鍵，所以它會保持不變。請換一個鍵，或先在 設定 → 快速鍵 裡給「停止所有東西」設一個新鍵。"
 }

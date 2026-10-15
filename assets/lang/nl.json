@@ -3442,5 +3442,8 @@
   "You can change the proxy in Settings > Connection.": "Je kunt de proxy wijzigen in Instellingen > Verbinding.",
   "the pack's file is damaged, so it wasn't kept": "het bestand van het pakket is beschadigd, dus het is niet bewaard",
   "Set to 100%": "Zet op 100%",
-  "Your Sounds volume is at 0%, so nobody else hears your sounds.": "Je Geluiden-volume staat op 0%, dus niemand anders hoort je geluiden."
+  "Your Sounds volume is at 0%, so nobody else hears your sounds.": "Je Geluiden-volume staat op 0%, dus niemand anders hoort je geluiden.",
+  "Heads up: while Onion Board is open, {key} plays your hotkey instead of doing its usual job in other apps.": "Let op: zolang Onion Board open is, speelt {key} je sneltoets af in plaats van zijn gewone werk te doen in andere apps.",
+  "Windows keeps {key} for itself and never passes it to an app, so that hotkey could never play: pick another key.": "Windows houdt {key} voor zichzelf en geeft hem nooit door aan een app, dus die sneltoets zou nooit spelen: kies een andere toets.",
+  "{key} is your Stop everything key, so it stays on that. Pick another key, or give Stop everything a new one in Settings → Hotkeys first.": "{key} is je toets voor Stop met alles, dus die blijft daar. Kies een andere toets, of geef Stop met alles eerst een nieuwe bij Instellingen → Sneltoetsen."
 }

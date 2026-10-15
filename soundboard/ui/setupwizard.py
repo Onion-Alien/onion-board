@@ -1325,7 +1325,8 @@ class SetupWizard(QDialog):
         self.test_hint.setText(text)
         self._hint_serial = getattr(self, "_hint_serial", 0) + 1
         serial = self._hint_serial
-        QTimer.singleShot(ms, lambda: serial == self._hint_serial
+        # self as the receiver: the guide may be closed before it fires
+        QTimer.singleShot(ms, self, lambda: serial == self._hint_serial
                           and self.test_hint.setText(f"<b>{_test_title()}</b>"))
 
     def test_sound(self):

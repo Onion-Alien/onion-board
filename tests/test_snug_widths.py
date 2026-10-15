@@ -111,3 +111,62 @@ def test_settings_device_boxes_line_up(window):  # noqa: F811
         assert len({cb.width() for cb, _src in d.dev_combos}) == 1
     finally:
         window.setctl.close_settings()
+
+
+def test_finding_column_mates_leaves_no_stale_layout_items(qapp):
+    """Lining a column up must not leave Python wrappers for the layout's items: when
+    Qt later frees an item, its wrapper stayed listed at that address, and a menu made
+    there reached the style's polish() as a QWidgetItem (a crash report)."""
+    import gc
+
+    from PySide6.QtWidgets import QFormLayout, QLabel, QLayoutItem
+
+    def items():   # (by id: other tests' leftovers come and go meanwhile)
+        gc.collect()
+        return {id(o) for o in gc.get_objects() if isinstance(o, QLayoutItem)}
+
+    box = QWidget()
+    outer = QVBoxLayout(box)
+    grid, form = QGridLayout(), QFormLayout()
+    outer.addLayout(grid)
+    outer.addLayout(form)
+    before = items()
+    for r in range(3):
+        grid.addWidget(QLabel("a name"), r, 0)
+        cb = QComboBox()
+        cb.addItem("Off" * (r + 1))
+        grid.addWidget(cb, r, 1)
+        f = QComboBox()
+        f.addItem("On" * (r + 1))
+        form.addRow(f"row {r}", f)
+    box.show()
+    QApplication.processEvents()
+    try:
+        assert not items() - before
+        assert len({cb.width() for cb in box.findChildren(QComboBox)
+                    if grid.indexOf(cb) >= 0}) == 1   # still lined up
+    finally:
+        box.close()
+
+
+def test_a_freed_layout_item_never_reaches_polish(qapp):
+    """widget_at() reads a layout's widget without leaving the item's wrapper behind,
+    and the style shrugs off a stale item instead of raising out of Qt's call."""
+    import shiboken6
+    from PySide6.QtCore import QObject
+    from PySide6.QtWidgets import QLabel, QWidgetItem
+
+    from soundboard.ui.widgets import widget_at
+
+    box = QWidget()
+    row = QHBoxLayout(box)
+    labels = [QLabel(str(i)) for i in range(3)]
+    for lbl in labels:
+        row.addWidget(lbl)
+    addr = shiboken6.getCppPointer(row.itemAt(1))[0]   # (the old way, to find it)
+    assert widget_at(row, 1) is labels[1]
+    assert widget_at(row, 7) is None
+    labels[1].deleteLater()                            # Qt frees its item itself
+    QApplication.sendPostedEvents(None, QEvent.DeferredDelete)
+    assert not isinstance(shiboken6.wrapInstance(addr, QObject), QWidgetItem)
+    AppStyle().polish(QWidgetItem(QLabel()))           # must not raise

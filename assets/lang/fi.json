@@ -3442,5 +3442,8 @@
   "You can change the proxy in Settings > Connection.": "Voit vaihtaa välityspalvelimen kohdassa Asetukset > Yhteys.",
   "the pack's file is damaged, so it wasn't kept": "paketin tiedosto on vioittunut, joten sitä ei säilytetty",
   "Set to 100%": "Aseta 100 %:iin",
-  "Your Sounds volume is at 0%, so nobody else hears your sounds.": "Äänet-voimakkuus on 0 %, joten kukaan muu ei kuule ääniäsi."
+  "Your Sounds volume is at 0%, so nobody else hears your sounds.": "Äänet-voimakkuus on 0 %, joten kukaan muu ei kuule ääniäsi.",
+  "Heads up: while Onion Board is open, {key} plays your hotkey instead of doing its usual job in other apps.": "Huomio: kun Onion Board on auki, {key} käynnistää pikanäppäimesi eikä tee tavallista tehtäväänsä muissa sovelluksissa.",
+  "Windows keeps {key} for itself and never passes it to an app, so that hotkey could never play: pick another key.": "Windows pitää {key} itsellään eikä anna sitä koskaan sovellukselle, joten tämä pikanäppäin ei soisi koskaan: valitse toinen näppäin.",
+  "{key} is your Stop everything key, so it stays on that. Pick another key, or give Stop everything a new one in Settings → Hotkeys first.": "{key} on Pysäytä kaikki -näppäimesi, joten se pysyy siinä. Valitse toinen näppäin tai anna ensin Pysäytä kaikki -toiminnolle uusi kohdassa Asetukset → Pikanäppäimet."
 }

@@ -668,19 +668,21 @@ class PrivacyPage(Page):
             t = threading.Thread(target=usage.opt_out, args=("settings",), daemon=True,
                                  name="usage-opt-out")
             t.start()
-            self._opt_out_wait(t)
+            self._opt_out_wait(t, cfg, self.dlg)
             return
         net.configure_features(cfg.net_off, cfg.net_offline)   # applies at once
         self.dlg.connection._net_sync()
 
-    def _opt_out_wait(self, t):
+    def _opt_out_wait(self, t, cfg, dlg):
+        """The switch takes hold even when Settings closed meanwhile; only the page
+        that's still open shows it."""
         from soundboard import net
         if t.is_alive():
-            QTimer.singleShot(100, lambda: self._opt_out_wait(t))
+            QTimer.singleShot(100, lambda: self._opt_out_wait(t, cfg, dlg))
             return
-        cfg = self.mw.cfg
         net.configure_features(cfg.net_off, cfg.net_offline)
-        self.dlg.connection._net_sync()
+        if qt_valid(dlg):
+            dlg.connection._net_sync()
 
     def _set_offline(self, on: bool):
         from soundboard import net

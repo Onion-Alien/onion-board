@@ -14,7 +14,7 @@ from PySide6.QtWidgets import (QBoxLayout, QFrame, QHBoxLayout, QLabel, QPushBut
 from soundboard.i18n import _
 from soundboard.ui import icons
 from soundboard.ui.panel import Flow, icon_label
-from soundboard.ui.widgets import Meter
+from soundboard.ui.widgets import Meter, widget_at
 
 GAP = 16            # between the mic half and the chips, side by side
 ROW_H = 28          # every chip, label and the mic row: the bar never changes height
@@ -152,8 +152,7 @@ class VoiceStatusBar(QFrame):
 
     def _row_widgets(self) -> list:
         row = self._chips_row
-        items = (row.itemAt(i) for i in range(row.count()))
-        return [it.widget() for it in items if it is not None]
+        return [w for i in range(row.count()) if (w := widget_at(row, i)) is not None]
 
     # ---- the mic
     def set_level(self, level: float | None):

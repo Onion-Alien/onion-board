@@ -80,8 +80,13 @@ class EditControl(Controller):
             if ok and m is not None and d.as_copy:
                 self._save_copy(m, d)
             elif ok and m is not None:
-                old_key = soundfx.key(m.fx)
+                old_key, old_hotkey = soundfx.key(m.fx), m.hotkey
                 d.apply(m)
+                if m.hotkey != old_hotkey:
+                    if mw.hkctl.keeps_stop_key(m.hotkey):
+                        m.hotkey = old_hotkey
+                    else:
+                        mw.hkctl.everyday_note(m.hotkey)
                 mw.hkctl._clear_dupe_hotkey(m)
                 mw.engine.set_gain(sid, mw.gain_for(m))
                 if soundfx.key(m.fx) != old_key:
@@ -168,6 +173,8 @@ class EditControl(Controller):
             new.name = f"{m.name} (edit)"[:40]
         if new.hotkey == m.hotkey:
             new.hotkey = ""   # the original keeps its hotkey
+        if mw.hkctl.keeps_stop_key(new.hotkey):
+            new.hotkey = ""
         mw.hkctl._clear_dupe_hotkey(new)
         mw.catctl._tag_new(new)   # stays in sight in the category showing
         mw.cfg.sounds.insert(mw.cfg.sounds.index(m) + 1, new)

@@ -3442,5 +3442,8 @@
   "You can change the proxy in Settings > Connection.": "A proxyt a Beállítások > Kapcsolat részben módosíthatod.",
   "the pack's file is damaged, so it wasn't kept": "a csomag fájlja sérült, ezért nem lett megtartva",
   "Set to 100%": "Legyen 100%",
-  "Your Sounds volume is at 0%, so nobody else hears your sounds.": "A Hangok hangereje 0%-on áll, így rajtad kívül senki sem hallja a hangjaidat."
+  "Your Sounds volume is at 0%, so nobody else hears your sounds.": "A Hangok hangereje 0%-on áll, így rajtad kívül senki sem hallja a hangjaidat.",
+  "Heads up: while Onion Board is open, {key} plays your hotkey instead of doing its usual job in other apps.": "Figyelem: amíg az Onion Board nyitva van, a(z) {key} a gyorsbillentyűdet indítja, és nem a szokásos dolgát végzi a többi alkalmazásban.",
+  "Windows keeps {key} for itself and never passes it to an app, so that hotkey could never play: pick another key.": "A Windows a(z) {key} billentyűt magának tartja, és sosem adja át egy alkalmazásnak, így ez a gyorsbillentyű sosem szólalna meg: válassz másik billentyűt.",
+  "{key} is your Stop everything key, so it stays on that. Pick another key, or give Stop everything a new one in Settings → Hotkeys first.": "A(z) {key} a Minden leállítása billentyűd, ezért ott marad. Válassz másik billentyűt, vagy előbb adj újat a Minden leállításának itt: Beállítások → Gyorsbillentyűk."
 }

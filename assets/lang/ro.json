@@ -3518,5 +3518,8 @@
   "You can change the proxy in Settings > Connection.": "Poți schimba proxy-ul din Setări > Conexiune.",
   "the pack's file is damaged, so it wasn't kept": "fișierul pachetului este deteriorat, așa că nu a fost păstrat",
   "Set to 100%": "Pune la 100%",
-  "Your Sounds volume is at 0%, so nobody else hears your sounds.": "Volumul Sunetelor e la 0%, așa că nimeni altcineva nu-ți aude sunetele."
+  "Your Sounds volume is at 0%, so nobody else hears your sounds.": "Volumul Sunetelor e la 0%, așa că nimeni altcineva nu-ți aude sunetele.",
+  "Heads up: while Onion Board is open, {key} plays your hotkey instead of doing its usual job in other apps.": "Atenție: cât timp Onion Board e deschis, {key} pornește tasta ta rapidă în loc să-și facă treaba obișnuită în celelalte aplicații.",
+  "Windows keeps {key} for itself and never passes it to an app, so that hotkey could never play: pick another key.": "Windows păstrează {key} pentru el și nu o dă niciodată unei aplicații, așa că tasta rapidă n-ar suna niciodată: alege altă tastă.",
+  "{key} is your Stop everything key, so it stays on that. Pick another key, or give Stop everything a new one in Settings → Hotkeys first.": "{key} e tasta ta pentru Oprește tot, așa că rămâne acolo. Alege altă tastă sau dă-i întâi lui Oprește tot una nouă în Setări → Taste rapide."
 }

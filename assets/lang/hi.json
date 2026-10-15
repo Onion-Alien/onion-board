@@ -3442,5 +3442,8 @@
   "You can change the proxy in Settings > Connection.": "आप प्रॉक्सी को सेटिंग्स > कनेक्शन में बदल सकते हैं।",
   "the pack's file is damaged, so it wasn't kept": "पैक की फ़ाइल खराब है, इसलिए उसे नहीं रखा गया",
   "Set to 100%": "100% करें",
-  "Your Sounds volume is at 0%, so nobody else hears your sounds.": "आपका साउंड वॉल्यूम 0% पर है, इसलिए आपके साउंड कोई और नहीं सुन रहा।"
+  "Your Sounds volume is at 0%, so nobody else hears your sounds.": "आपका साउंड वॉल्यूम 0% पर है, इसलिए आपके साउंड कोई और नहीं सुन रहा।",
+  "Heads up: while Onion Board is open, {key} plays your hotkey instead of doing its usual job in other apps.": "ध्यान दें: जब तक Onion Board खुला है, {key} दूसरे ऐप्स में अपना सामान्य काम करने के बजाय आपकी हॉटकी चलाएगी।",
+  "Windows keeps {key} for itself and never passes it to an app, so that hotkey could never play: pick another key.": "Windows {key} को अपने पास रखता है और किसी ऐप को कभी नहीं देता, इसलिए यह हॉटकी कभी नहीं बजेगी: कोई दूसरी की चुनें।",
+  "{key} is your Stop everything key, so it stays on that. Pick another key, or give Stop everything a new one in Settings → Hotkeys first.": "{key} आपकी सब कुछ बंद करो की है, इसलिए यह उसी पर रहेगी। कोई दूसरी की चुनें, या पहले सेटिंग्स → हॉटकी में सब कुछ बंद करो को नई की दें।"
 }
