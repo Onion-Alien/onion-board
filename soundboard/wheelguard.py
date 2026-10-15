@@ -13,7 +13,7 @@ from __future__ import annotations
 import time
 
 from PySide6.QtCore import QEvent, QObject, QPointF, Qt, QTimer
-from PySide6.QtGui import QHoverEvent, QMouseEvent
+from PySide6.QtGui import QHoverEvent, QMouseEvent, QPalette
 from PySide6.QtWidgets import (QAbstractButton, QAbstractScrollArea, QAbstractSlider,
                                QAbstractSpinBox, QApplication, QCheckBox, QComboBox, QFormLayout,
                                QGridLayout, QLayout, QMenu, QProxyStyle, QPushButton,
@@ -52,6 +52,10 @@ class AppStyle(QProxyStyle):
     COMBO_CAP = 360
 
     def polish(self, arg):
+        if not isinstance(arg, (QWidget, QApplication, QPalette)):
+            # a dead layout item's wrapper still listed at the new widget's address
+            # (ui/widgets.py widget_at): Qt's own call must never raise from here
+            return
         super().polish(arg)
         if isinstance(arg, (QComboBox, QTabBar, QSlider)):
             arg.installEventFilter(_app_filter())   # once: Qt doesn't add it twice
@@ -244,30 +248,29 @@ def _own_width(cb: QComboBox, cap: int) -> int:
 def _column_mates(cb: QComboBox) -> list[QComboBox]:
     """The snug dropdowns stacked in cb's grid / form column, cb included: they share
     the widest one's width (Settings -> Devices' three boxes were 300, 358 and 358 px,
-    each fitting its own device name). Just cb when it isn't in one."""
+    each fitting its own device name). Just cb when it isn't in one.
+
+    Found by indexOf / getItemPosition only, never itemAt(): an item's Python wrapper
+    outlives the item when Qt deletes it, and a widget made later at its address
+    reached polish() as that stale item."""
     parent = cb.parentWidget()
     top = parent.layout() if parent is not None else None
-    todo: list[QLayout] = [top] if top is not None else []
-    while todo:
-        lay = todo.pop()
+    if parent is None or top is None:
+        return [cb]
+    for lay in [top, *top.findChildren(QLayout)]:
         i = lay.indexOf(cb)
-        if i >= 0:
-            if isinstance(lay, QGridLayout):
-                col = lay.getItemPosition(i)[1]  # pyright: ignore[reportIndexIssue]  (a tuple)
-                cells = [lay.itemAtPosition(r, col) for r in range(lay.rowCount())]
-            elif isinstance(lay, QFormLayout):
-                role = lay.getItemPosition(i)[1]  # pyright: ignore[reportIndexIssue]  (a tuple)
-                cells = [lay.itemAt(r, role) for r in range(lay.rowCount())]
-            else:
-                return [cb]
-            mates = [c.widget() for c in cells if c is not None]
-            return [w for w in mates if isinstance(w, QComboBox)
-                    and w.property("snug") is True and not w.isHidden()] or [cb]
-        for j in range(lay.count()):
-            item = lay.itemAt(j)
-            sub = item.layout() if item is not None else None
-            if sub is not None:
-                todo.append(sub)
+        if i < 0:
+            continue
+        if not isinstance(lay, (QGridLayout, QFormLayout)):
+            return [cb]
+        # grid: (row, column, ...); form: (row, role)
+        col = lay.getItemPosition(i)[1]  # pyright: ignore[reportIndexIssue]  (a tuple)
+        mates = []
+        for w in parent.findChildren(QComboBox):
+            j = lay.indexOf(w)
+            if j >= 0 and lay.getItemPosition(j)[1] == col:  # pyright: ignore[reportIndexIssue]
+                mates.append(w)
+        return [w for w in mates if w.property("snug") is True and not w.isHidden()] or [cb]
     return [cb]
 
 
