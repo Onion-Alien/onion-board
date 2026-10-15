@@ -57,6 +57,10 @@ class TickControl(Controller):
             pace = self._tick_pace()
             if mw.timer.interval() != pace and not mw._shut_down:
                 mw.timer.start(pace)
+        # the PTT key goes down with the sound, not on the next tick: minimised, that's up
+        # to TICK_IDLE_MS later, and a game that only sends while it's held cut the start
+        if not mw._shut_down:
+            self._sync_ptt()
 
     def _busy(self, playing) -> bool:
         """Something on screen moves with the tick: a sound playing (not paused), the
@@ -139,9 +143,14 @@ class TickControl(Controller):
         e.level_main *= 0.9
         e.level_mic *= 0.9
 
-        # auto push-to-talk: hold the game's PTT key only while a sound (or live
-        # radio / a program) goes out. _ptt_held remembers exactly which key we pressed, so it's
-        # always released even if the setting changes mid-sound.
+        self._sync_ptt()
+
+    def _sync_ptt(self):
+        """Auto push-to-talk: hold the game's PTT key only while a sound (or live
+        radio / a program) goes out. _ptt_held remembers exactly which key we pressed, so it's
+        always released even if the setting changes mid-sound."""
+        mw = self.mw
+        e = mw.engine
         on_air = e.sending and (e.any_playing() or e.radio_on_air()
                                 or e.aux_on_air())
         want = mw.cfg.ptt_key if (mw.cfg.ptt_key and on_air) else None

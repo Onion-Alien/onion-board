@@ -149,3 +149,25 @@ def test_tab_explanations_are_in_each_tabs_right_click_menu(window, monkeypatch)
         assert about.text() == "About this tab"
         about.trigger()
         assert shown[-1] == title
+
+
+def test_auto_ptt_goes_down_with_the_sound_not_on_the_next_tick(window, qapp, monkeypatch):  # noqa: F811
+    """Minimised, the tick runs every TICK_IDLE_MS: pressing the game's PTT key there
+    let the start of every sound out before the key was held (a game that only sends
+    while it's held cut it). The key goes down as the sound starts."""
+    from conftest import process_events
+    assert process_events(qapp, lambda: "s0" in window.audio)
+    keys = []
+    monkeypatch.setattr(winkeys, "press", lambda k: keys.append(("press", k)) or True)
+    monkeypatch.setattr(winkeys, "release", lambda k: keys.append(("release", k)) or True)
+    window.timer.stop()                 # no tick from here: only the play itself
+    window.cfg.ptt_key = "v"
+    window.engine.sending = True
+
+    class _Out:   # an open "send to others" output, so the sound really starts
+        def stop(self):
+            pass
+        close = stop
+    monkeypatch.setattr(window.engine, "main_stream", _Out())
+    window.playctl.play("s0")
+    assert keys == [("press", "v")] and window._ptt_held == "v"
