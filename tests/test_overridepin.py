@@ -28,8 +28,10 @@ def test_an_override_raising_cannot_free_another_widgets_method(qapp):
     lay.addWidget(Fresh())
     try:
         box.show()   # Raises.showEvent raises, then Fresh is resized for the first time
-    except RuntimeError as e:
-        assert "an override's bug" in str(e)
+    except (RuntimeError, SystemError) as e:
+        # the app-wide event filter (theme) can be the next Python call while the bug's
+        # exception waits: it then comes out as its SystemError instead
+        assert "an override's bug" in str(e) or "exception set" in str(e)
     box.hide()
     # PySide took one (2026-10-14, 6.11.2): unpinned, that was the class's last one
     assert sys.getrefcount(method) > overridepin.PIN
