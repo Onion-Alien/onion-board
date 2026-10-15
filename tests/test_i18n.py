@@ -74,6 +74,25 @@ def test_available_lists_each_catalog_by_its_own_name(langs):
                                 ("pt-BR", "Português (Brasil)"), ("ru", "Русский")]
 
 
+def test_own_names_come_from_the_head_of_each_shipped_catalog(monkeypatch):
+    """The language list reads a few KB of each catalog, not all ~300 KB of 32 of them
+    (that was 86 ms of opening Settings > Appearance), even with keys above _meta."""
+    def whole(path):
+        raise AssertionError(f"read all of {path.name} for its name")
+    monkeypatch.setattr(i18n, "_read", whole)
+    got = dict(i18n.available())
+    assert len(got) > 10 and got["de"] == "Deutsch"
+    assert all(name and name != code for code, name in got.items())
+
+
+def test_own_name_found_below_other_keys_and_in_a_minified_file(langs):
+    (langs / "de.json").write_text(
+        '{\n  "Themes": "Themen",\n  "_meta": {\n    "name": "Deutsch"\n  }\n}', encoding="utf-8")
+    (langs / "ru.json").write_text('{"_meta":{"name":"Русский"},"a":"b"}', encoding="utf-8")
+    assert dict(i18n.available())["de"] == "Deutsch"
+    assert dict(i18n.available())["ru"] == "Русский"
+
+
 def test_resolve_follows_windows_and_matches_regions(langs, monkeypatch):
     monkeypatch.setattr(i18n, "windows_language", lambda: "de-AT")
     assert i18n.resolve(i18n.WINDOWS) == "de"
