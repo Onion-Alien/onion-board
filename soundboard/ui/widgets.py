@@ -301,6 +301,50 @@ class SeekSlider(CrispSlider):
         super().mousePressEvent(e)
 
 
+class EdgeMatch(QObject):
+    """Lines up the right ends of two bars in different rows (the player's seek
+    slider and the "What others hear" meter): the one that reaches further gives up
+    the difference through its ``set_pad`` callable, so the two end in one line. Only
+    while both show, left to right, and the difference is small (a narrow window
+    lays the rows out differently: a big gap there looked worse)."""
+
+    MAX = 24
+
+    def __init__(self, a: QWidget, pad_a, b: QWidget, pad_b):
+        super().__init__(a)
+        self._bars = ((a, pad_a), (b, pad_b))
+        self._pads = [0, 0]
+        self._queued = False
+        for w in (a, b):
+            w.installEventFilter(self)
+
+    def eventFilter(self, obj, event):
+        if event.type() in (QEvent.Type.Resize, QEvent.Type.Move, QEvent.Type.Show,
+                            QEvent.Type.Hide) and not self._queued:
+            self._queued = True   # after the layouts have placed both
+            QTimer.singleShot(0, self, self.match)
+        return False
+
+    def match(self):
+        self._queued = False
+        bars = [w for w, _ in self._bars]
+        if not all(qt_valid(w) for w in bars):
+            return
+        pads = [0, 0]
+        win = bars[0].window()
+        if (all(w.isVisible() and w.isLeftToRight() and w.window() is win for w in bars)):
+            # where each would end with no pad
+            ends = [w.mapTo(win, QPoint(w.width(), 0)).x() + p
+                    for w, p in zip(bars, self._pads)]
+            give = [e - min(ends) for e in ends]
+            if max(give) <= self.MAX:
+                pads = give
+        for i, (_w, set_pad) in enumerate(self._bars):
+            if pads[i] != self._pads[i]:
+                self._pads[i] = pads[i]
+                set_pad(pads[i])
+
+
 class NameAndSeek(QWidget):
     """The player's sound name with its seek slider right after it: the name is only
     as wide as its text (up to ``max_name``) and the slider takes the rest. Placed by
@@ -313,6 +357,7 @@ class NameAndSeek(QWidget):
     def __init__(self, name: QLabel, seek: QWidget, max_name: int, parent=None):
         super().__init__(parent)
         self.name, self.seek, self.max_name = name, seek, max_name
+        self.pad_right = 0   # room left after the slider (EdgeMatch)
         name.setParent(self)
         seek.setParent(self)
         name.installEventFilter(self)
@@ -341,7 +386,12 @@ class NameAndSeek(QWidget):
         self.name.setGeometry(0, 0, w, h)
         sh = self.seek.sizeHint().height()
         x = w + self.GAP if not self.name.isHidden() else 0
-        self.seek.setGeometry(x, (h - sh) // 2, max(0, self.width() - x), sh)
+        self.seek.setGeometry(x, (h - sh) // 2,
+                              max(0, self.width() - self.pad_right - x), sh)
+
+    def set_pad_right(self, px: int):
+        self.pad_right = px
+        self.relayout()
 
     def eventFilter(self, obj, event):
         if obj is self.name and event.type() in (QEvent.Type.Show, QEvent.Type.Hide):

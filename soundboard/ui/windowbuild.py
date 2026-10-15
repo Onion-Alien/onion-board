@@ -28,6 +28,7 @@ from PySide6.QtWidgets import (
     QScrollArea,
     QSizePolicy,
     QSlider,
+    QSpacerItem,
     QVBoxLayout,
     QWidget,
 )
@@ -73,6 +74,7 @@ from soundboard.ui.speedpitch import SpeedPitchButton
 from soundboard.ui.tabcontrol import TAB_INDEX, TAB_KEYS, TABS
 from soundboard.ui.widgets import (
     DropdownMenu,
+    EdgeMatch,
     Meter,
     NameAndSeek,
     PadGrid,
@@ -884,6 +886,16 @@ class WindowBuilder(Controller):
         mw.out_meter.setMinimumWidth(60)
         mw.out_meter.setToolTip(_("Level of what others receive (Discord, the game, OBS…)"))
         row.addWidget(mw.out_meter, 1)
+        # its right end in line with the seek slider's above (EdgeMatch)
+        meter_pad = QSpacerItem(0, 0, QSizePolicy.Policy.Fixed, QSizePolicy.Policy.Minimum)
+        row.addItem(meter_pad)
+
+        def set_meter_pad(px: int, row=row):
+            meter_pad.changeSize(px, 0, QSizePolicy.Policy.Fixed, QSizePolicy.Policy.Minimum)
+            row.invalidate()
+
+        mw._bar_edges = EdgeMatch(mw.seek, mw._name_seek.set_pad_right,
+                                  mw.out_meter, set_meter_pad)
         mw.btn_check = QPushButton(_("Hear what they hear"))
         mw.btn_check.setObjectName("miccheck")
         # its name by hand: a narrow window blanks the words (on_mic_check keeps it)
