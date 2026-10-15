@@ -343,6 +343,18 @@ class _FilterRow(QWidget):
         self._arrange(self.rows_for(self.width()))
 
 
+class _StationPanel(RoundedFrame):
+    """The station list's card: at least MIN_W wide, and never less than its rows
+    need. A plain setMinimumWidth(220) overrode what the tabs and filters need, so the
+    window kept the map beside a list squashed to "Favorit" and "Classic…" (the
+    map is meant to give way first: RadioTab.fit_steps)."""
+    MIN_W = 220
+
+    def minimumSizeHint(self):
+        hint = super().minimumSizeHint()
+        return QSize(max(hint.width(), self.MIN_W), hint.height())
+
+
 class StationList(QObject):
     """The station list and its filters for one RadioTab (``tab``)."""
 
@@ -376,9 +388,8 @@ QFrame#stations QFrame#rule { background:$border; max-height:1px; border:none; }
 """)
 
     def _make_station_panel(self) -> QFrame:
-        self.tab.station_panel = panel = RoundedFrame()
+        self.tab.station_panel = panel = _StationPanel()
         panel.setObjectName("stations")
-        panel.setMinimumWidth(220)
         v = QVBoxLayout(panel)
         v.setContentsMargins(10, 8, 6, 4)
         v.setSpacing(8)

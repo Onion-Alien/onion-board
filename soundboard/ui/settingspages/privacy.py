@@ -115,8 +115,8 @@ class PrivacyPage(Page):
               "Videos use a lot more data: about 5 to 25 MB a minute. Without ffmpeg "
               "installed only lower-quality videos can be saved (usually 360p)."),
             q.save_video, lambda b: self._data_set(save_video=b))
-        item = cv.itemAt(cv.count() - 1)   # _option's hint: its words follow FFmpeg
-        hint_lbl = item.widget() if item is not None else None
+        from soundboard.ui.widgets import widget_at   # (it imports this module)
+        hint_lbl = widget_at(cv, cv.count() - 1)   # _option's hint: its words follow FFmpeg
         assert isinstance(hint_lbl, QLabel)
         self.dlg._save_video_hint = hint_lbl
         self.dlg._has_ff = has_ff

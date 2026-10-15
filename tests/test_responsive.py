@@ -133,3 +133,94 @@ def test_nested_update_hold_commits_geometry_before_resuming(qapp):
     assert root.updatesEnabled()
     assert pill.isHidden()
     root.deleteLater()
+
+
+def two_rows() -> tuple[QWidget, QPushButton, list[QPushButton]]:
+    """A wide row (the part that decides the width) over a row of small buttons."""
+    root = QWidget()
+    v = QVBoxLayout(root)
+    wide = QPushButton("wide")
+    wide.setMinimumWidth(600)
+    v.addWidget(wide)
+    row = QHBoxLayout()
+    v.addLayout(row)
+    small = []
+    for name in ("a", "b"):
+        b = QPushButton(name)
+        b.setMinimumWidth(100)
+        row.addWidget(b)
+        small.append(b)
+    return root, wide, small
+
+
+def test_steps_that_did_not_help_come_back(qapp):
+    """Steps go lowest first until it fits: the ones before the step that fixed it may
+    not have narrowed the widest part at all. At 1100 px the levels strip was it, and
+    15 controls (the speed button, the radio's volume, Say's Stop) were hidden for
+    nothing until the window grew past the size they went at."""
+    root, wide, small = two_rows()
+    f = responsive.Fitter(root)
+    f.add(10, "w", responsive.hide(small[0]))
+    f.add(20, "w", responsive.hide(small[1]))
+    f.add(50, "w", responsive.hide(wide))
+    root.show()
+    qapp.processEvents()
+    f.fit(QSize(400, 400))
+    assert wide.isHidden()
+    assert not small[0].isHidden() and not small[1].isHidden(), "hid what didn't help"
+    assert f.compact_count() == 1
+    root.deleteLater()
+
+
+def test_growing_brings_back_whatever_fits(qapp):
+    """Growing, the last-hidden step not fitting yet mustn't keep the earlier ones in
+    another row hidden (the radio's volume stayed hidden from 800 back to 1180 px)."""
+    root, wide, small = two_rows()
+    f = responsive.Fitter(root)
+    f.add(10, "w", responsive.hide(small[0]))
+    f.add(20, "w", responsive.hide(small[1]))
+    f.add(50, "w", responsive.hide(wide))
+    root.show()
+    qapp.processEvents()
+    f.fit(QSize(20, 400))                  # too small for anything: all three go
+    assert wide.isHidden() and small[0].isHidden() and small[1].isHidden()
+    f.fit(QSize(400, 400))
+    assert wide.isHidden()                 # still doesn't fit
+    assert not small[0].isHidden() and not small[1].isHidden()
+    f.fit(QSize(800, 400))
+    assert not wide.isHidden()
+    assert f.compact_count() == 0
+    root.deleteLater()
+
+
+def test_growing_keeps_the_more_important_step_shown(qapp):
+    """Growing, a later (more important) step comes back first, hiding earlier ones
+    to make room if it has to: giving the room to them instead kept the levels strip
+    in its one-group form at 1700 px."""
+    root = QWidget()
+    row = QHBoxLayout(root)
+    row.setContentsMargins(0, 0, 0, 0)
+    row.setSpacing(0)
+    big = QPushButton("big")
+    big.setMinimumWidth(300)
+    row.addWidget(big)
+    small = []
+    for name in ("a", "b"):
+        b = QPushButton(name)
+        b.setMinimumWidth(100)
+        row.addWidget(b)
+        small.append(b)
+    f = responsive.Fitter(root)
+    f.add(10, "w", responsive.hide(small[0]))
+    f.add(20, "w", responsive.hide(small[1]))
+    f.add(50, "w", responsive.hide(big))
+    root.show()
+    qapp.processEvents()
+    f.fit(QSize(250, 400))                 # big goes; a and b fit beside nothing
+    assert big.isHidden() and not small[0].isHidden() and not small[1].isHidden()
+    f.fit(QSize(450, 400))                 # big and one of them
+    assert not big.isHidden(), "the room went to the less important ones"
+    assert small[0].isHidden() and not small[1].isHidden()
+    f.fit(QSize(900, 400))
+    assert f.compact_count() == 0 and not small[0].isHidden()
+    root.deleteLater()

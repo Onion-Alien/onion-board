@@ -191,11 +191,14 @@ class AppearancePage(Page):
         bv.addLayout(row)
         group = QButtonGroup(box)
         tabs = []
+        from soundboard.ui.widgets import widget_at   # (it imports this module)
         for i, (name, card) in enumerate(pages):
             card.setObjectName("lookpage")   # not a card of its own: flat inside the box
             lay = card.layout()
             lay.setContentsMargins(0, 0, 0, 0)
-            lay.itemAt(0).widget().hide()   # its title: the tab says it (search still reads it)
+            title = widget_at(lay, 0)
+            assert title is not None
+            title.hide()   # its title: the tab says it (search still reads it)
             b = QPushButton(name)
             b.setObjectName("voicetab")    # the same tabs as the voice changer's
             b.setCheckable(True)

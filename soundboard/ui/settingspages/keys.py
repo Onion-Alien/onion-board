@@ -340,9 +340,10 @@ class KeysPage(Page):
         row.addWidget(self._ov_combo("autohide", ovl.AUTOHIDE, s.autohide))
         row.addStretch(1)   # the choice right after its label, not at the card's far edge
         cv.addLayout(row)
-        item = row.itemAt(1)
-        assert item is not None
-        self.dlg.ov_toggle_only = (after, item.widget())
+        from soundboard.ui.widgets import widget_at   # (it imports this module)
+        toggle_only = widget_at(row, 1)
+        assert toggle_only is not None
+        self.dlg.ov_toggle_only = (after, toggle_only)
         v.addWidget(card)
 
         card, cv = self._card(_("Where and how it looks"),

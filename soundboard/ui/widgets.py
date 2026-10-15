@@ -308,6 +308,7 @@ class NameAndSeek(QWidget):
     every pad press, and a hint change would lay out the whole page again."""
 
     GAP = 10
+    SEEK_MIN = 120   # the slider, at the least
 
     def __init__(self, name: QLabel, seek: QWidget, max_name: int, parent=None):
         super().__init__(parent)
@@ -320,14 +321,23 @@ class NameAndSeek(QWidget):
         return QSize(self.max_name + 120, max(self.name.height(), self.seek.sizeHint().height()))
 
     def minimumSizeHint(self):
-        return QSize(160, self.sizeHint().height())
+        # honest, so the window's fitter hides other things (or the name) before the
+        # slider gets too short to aim at or the name is cut: the name as it is now (up
+        # to max_name). Not announced on a new name (no relayout per pad press): the
+        # fitter measures it fresh on the next resize
+        # (asked while the window closes too: nothing here may raise, overridepin.py)
+        if not (qt_valid(self.name) and qt_valid(self.seek)):
+            return QSize(self.SEEK_MIN, 0)
+        name = 0 if self.name.isHidden() else self.GAP + min(
+            self.max_name, self.name.fontMetrics().horizontalAdvance(self.name.text()) + 4)
+        return QSize(self.SEEK_MIN + name, self.sizeHint().height())
 
     def relayout(self):
         h = self.height()
         fm = self.name.fontMetrics()
         w = 0 if self.name.isHidden() else min(
             self.max_name, fm.horizontalAdvance(self.name.text()) + 4,
-            max(0, self.width() - 60 - self.GAP))
+            max(0, self.width() - self.SEEK_MIN - self.GAP))
         self.name.setGeometry(0, 0, w, h)
         sh = self.seek.sizeHint().height()
         x = w + self.GAP if not self.name.isHidden() else 0
@@ -335,6 +345,7 @@ class NameAndSeek(QWidget):
 
     def eventFilter(self, obj, event):
         if obj is self.name and event.type() in (QEvent.Type.Show, QEvent.Type.Hide):
+            self.updateGeometry()   # the minimum has room for the name or not
             self.relayout()
         return super().eventFilter(obj, event)
 
