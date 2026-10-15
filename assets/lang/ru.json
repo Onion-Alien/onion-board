@@ -3525,5 +3525,14 @@
   "Names can be up to {n} characters, so it's “{name}”.": "В названии может быть до {n} символов, поэтому получилось «{name}».",
   "They go in a category called “{name}”.": "Они попадут в категорию «{name}».",
   "Type a name first.": "Сначала введите название.",
-  "✓ Renamed to “{new}”. Another sound has that name too.": "✓ Переименовано в «{new}». Другой звук тоже так называется."
+  "✓ Renamed to “{new}”. Another sound has that name too.": "✓ Переименовано в «{new}». Другой звук тоже так называется.",
+  "Disguise": "Маскировка",
+  "Funny": "Смешные",
+  "Mine": "Мои",
+  "Radio & places": "Рация и места",
+  "Robots & sci-fi": "Роботы и фантастика",
+  "Scary": "Страшные",
+  "Add “{name}” to Favorites": "Добавить «{name}» в Избранное",
+  "No favorites yet. Click the star in a voice's corner to keep it here.": "В избранном пока пусто. Нажми звёздочку в углу голоса, чтобы он был здесь.",
+  "Remove “{name}” from Favorites": "Убрать «{name}» из Избранного"
 }

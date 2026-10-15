@@ -460,6 +460,11 @@ QFrame#card QToolButton#voicetile:checked { background:$accent; color:$on_accent
 QFrame#card QToolButton#voicetile:focus { border-color:$accent; }
 QFrame#card QToolButton#voicetile:checked:focus { border-color:$text_hi; }
 QFrame#card QFrame#picked { background:$inset; border-radius:10px; }
+QFrame#card QPushButton#voicecat { border-radius:12px; padding:4px 12px; min-height:16px; font-size:8.5pt; background:$btn; border:1px solid transparent; color:$text; }
+QFrame#card QPushButton#voicecat:hover:!checked { background:$btn_hover; }
+QFrame#card QPushButton#voicecat:checked { background:$accent; border-color:$accent_hi; color:$on_accent; font-weight:600; }
+QFrame#card QToolButton#voicestar { background:transparent; border:none; border-radius:11px; padding:0; }
+QFrame#card QToolButton#voicestar:hover { background:$btn_hover; }
 QFrame#card QFrame#voicebox { background:$inset; border:1px solid $border; border-radius:8px; }
 QFrame#picked[pinned="true"] { background:$panel; border-radius:12px; }
 QFrame#picked QLabel#pickedname { color:$text_hi; font-size:11pt; font-weight:700; }
@@ -880,7 +885,7 @@ OUTLINED = {"High Contrast"}
 OUTLINE_STYLE = Template("""
 QPushButton, QPushButton#danger, QLineEdit, QComboBox, QAbstractSpinBox,
 QFrame#chip, QFrame#card QFrame#chip, QFrame#fxcard, QLabel#pill, QPushButton#vchip,
-QFrame#card QToolButton#voicetile { border:1px solid $border; }
+QFrame#card QToolButton#voicetile, QFrame#card QPushButton#voicecat { border:1px solid $border; }
 QFrame#card, QFrame#setcard, QFrame#voicebar, QFrame#picked { border:1px solid $border; }
 """)
 

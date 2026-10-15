@@ -3373,5 +3373,14 @@
   "Names can be up to {n} characters, so it's “{name}”.": "이름은 최대 {n}자라서 “{name}”(으)로 했어요.",
   "They go in a category called “{name}”.": "“{name}” 카테고리에 들어가요.",
   "Type a name first.": "먼저 이름을 입력하세요.",
-  "✓ Renamed to “{new}”. Another sound has that name too.": "✓ “{new}”(으)로 이름 변경함. 같은 이름의 다른 사운드도 있어요."
+  "✓ Renamed to “{new}”. Another sound has that name too.": "✓ “{new}”(으)로 이름 변경함. 같은 이름의 다른 사운드도 있어요.",
+  "Disguise": "변장",
+  "Funny": "웃긴",
+  "Mine": "내 목소리",
+  "Radio & places": "무전 & 장소",
+  "Robots & sci-fi": "로봇 & SF",
+  "Scary": "무서운",
+  "Add “{name}” to Favorites": "“{name}” 즐겨찾기에 추가",
+  "No favorites yet. Click the star in a voice's corner to keep it here.": "아직 즐겨찾기가 없어요. 목소리 모서리의 별을 클릭하면 여기에 모여요.",
+  "Remove “{name}” from Favorites": "“{name}” 즐겨찾기에서 빼기"
 }

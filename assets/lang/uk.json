@@ -3525,5 +3525,14 @@
   "Names can be up to {n} characters, so it's “{name}”.": "Назва може мати до {n} символів, тому вийшло «{name}».",
   "They go in a category called “{name}”.": "Вони потраплять у категорію «{name}».",
   "Type a name first.": "Спершу введіть назву.",
-  "✓ Renamed to “{new}”. Another sound has that name too.": "✓ Перейменовано на «{new}». Інший звук теж так називається."
+  "✓ Renamed to “{new}”. Another sound has that name too.": "✓ Перейменовано на «{new}». Інший звук теж так називається.",
+  "Disguise": "Маскування",
+  "Funny": "Смішні",
+  "Mine": "Мої",
+  "Radio & places": "Рація й місця",
+  "Robots & sci-fi": "Роботи й фантастика",
+  "Scary": "Страшні",
+  "Add “{name}” to Favorites": "Додати «{name}» до Вибраного",
+  "No favorites yet. Click the star in a voice's corner to keep it here.": "У вибраному поки порожньо. Натисни зірочку в куті голосу, щоб він був тут.",
+  "Remove “{name}” from Favorites": "Прибрати «{name}» з Вибраного"
 }

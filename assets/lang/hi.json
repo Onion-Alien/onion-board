@@ -3449,5 +3449,14 @@
   "Names can be up to {n} characters, so it's “{name}”.": "नाम में ज़्यादा से ज़्यादा {n} अक्षर हो सकते हैं, इसलिए यह “{name}” है।",
   "They go in a category called “{name}”.": "ये “{name}” नाम की कैटेगरी में जाएँगे।",
   "Type a name first.": "पहले एक नाम लिखें।",
-  "✓ Renamed to “{new}”. Another sound has that name too.": "✓ नाम बदलकर “{new}” किया। एक और साउंड का भी यही नाम है।"
+  "✓ Renamed to “{new}”. Another sound has that name too.": "✓ नाम बदलकर “{new}” किया। एक और साउंड का भी यही नाम है।",
+  "Disguise": "भेस",
+  "Funny": "मज़ेदार",
+  "Mine": "मेरी",
+  "Radio & places": "रेडियो और जगहें",
+  "Robots & sci-fi": "रोबोट और साइ-फ़ाई",
+  "Scary": "डरावनी",
+  "Add “{name}” to Favorites": "“{name}” को पसंदीदा में जोड़ें",
+  "No favorites yet. Click the star in a voice's corner to keep it here.": "अभी कोई पसंदीदा नहीं। किसी आवाज़ के कोने वाले तारे पर क्लिक करें, वह यहाँ रहेगी।",
+  "Remove “{name}” from Favorites": "“{name}” को पसंदीदा से हटाएँ"
 }

@@ -3449,5 +3449,14 @@
   "Names can be up to {n} characters, so it's “{name}”.": "Navne kan være op til {n} tegn, så det er “{name}”.",
   "They go in a category called “{name}”.": "De kommer i en kategori, der hedder “{name}”.",
   "Type a name first.": "Skriv først et navn.",
-  "✓ Renamed to “{new}”. Another sound has that name too.": "✓ Omdøbt til “{new}”. En anden lyd hedder også det."
+  "✓ Renamed to “{new}”. Another sound has that name too.": "✓ Omdøbt til “{new}”. En anden lyd hedder også det.",
+  "Disguise": "Forklædning",
+  "Funny": "Sjove",
+  "Mine": "Mine",
+  "Radio & places": "Radio & steder",
+  "Robots & sci-fi": "Robotter & sci-fi",
+  "Scary": "Uhyggelige",
+  "Add “{name}” to Favorites": "Føj “{name}” til Favoritter",
+  "No favorites yet. Click the star in a voice's corner to keep it here.": "Ingen favoritter endnu. Klik på stjernen i hjørnet af en stemme for at have den her.",
+  "Remove “{name}” from Favorites": "Fjern “{name}” fra Favoritter"
 }

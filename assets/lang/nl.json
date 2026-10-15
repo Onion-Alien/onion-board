@@ -3449,5 +3449,14 @@
   "Names can be up to {n} characters, so it's “{name}”.": "Namen mogen tot {n} tekens zijn, dus het wordt “{name}”.",
   "They go in a category called “{name}”.": "Ze komen in een categorie met de naam “{name}”.",
   "Type a name first.": "Typ eerst een naam.",
-  "✓ Renamed to “{new}”. Another sound has that name too.": "✓ Hernoemd naar “{new}”. Een ander geluid heet ook zo."
+  "✓ Renamed to “{new}”. Another sound has that name too.": "✓ Hernoemd naar “{new}”. Een ander geluid heet ook zo.",
+  "Disguise": "Vermomming",
+  "Funny": "Grappig",
+  "Mine": "Van mij",
+  "Radio & places": "Radio & plekken",
+  "Robots & sci-fi": "Robots & sci-fi",
+  "Scary": "Eng",
+  "Add “{name}” to Favorites": "“{name}” toevoegen aan Favorieten",
+  "No favorites yet. Click the star in a voice's corner to keep it here.": "Nog geen favorieten. Klik op de ster in de hoek van een stem om hem hier te bewaren.",
+  "Remove “{name}” from Favorites": "“{name}” uit Favorieten halen"
 }

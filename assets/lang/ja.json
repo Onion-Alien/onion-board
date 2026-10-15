@@ -3373,5 +3373,14 @@
   "Names can be up to {n} characters, so it's “{name}”.": "名前は{n}文字までなので、「{name}」になりました。",
   "They go in a category called “{name}”.": "「{name}」というカテゴリに入ります。",
   "Type a name first.": "まず名前を入力してください。",
-  "✓ Renamed to “{new}”. Another sound has that name too.": "✓ 「{new}」に名前を変更しました。同じ名前のサウンドがほかにもあります。"
+  "✓ Renamed to “{new}”. Another sound has that name too.": "✓ 「{new}」に名前を変更しました。同じ名前のサウンドがほかにもあります。",
+  "Disguise": "変装",
+  "Funny": "おもしろ",
+  "Mine": "マイボイス",
+  "Radio & places": "無線＆場所",
+  "Robots & sci-fi": "ロボット＆SF",
+  "Scary": "こわい",
+  "Add “{name}” to Favorites": "「{name}」をお気に入りに追加",
+  "No favorites yet. Click the star in a voice's corner to keep it here.": "お気に入りはまだありません。ボイスの角の星をクリックするとここに入ります。",
+  "Remove “{name}” from Favorites": "「{name}」をお気に入りから外す"
 }

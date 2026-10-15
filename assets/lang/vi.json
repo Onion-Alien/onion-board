@@ -3373,5 +3373,14 @@
   "Names can be up to {n} characters, so it's “{name}”.": "Tên dài tối đa {n} ký tự, nên tên là “{name}”.",
   "They go in a category called “{name}”.": "Chúng vào một danh mục tên “{name}”.",
   "Type a name first.": "Hãy nhập tên trước.",
-  "✓ Renamed to “{new}”. Another sound has that name too.": "✓ Đã đổi tên thành “{new}”. Một âm thanh khác cũng có tên này."
+  "✓ Renamed to “{new}”. Another sound has that name too.": "✓ Đã đổi tên thành “{new}”. Một âm thanh khác cũng có tên này.",
+  "Disguise": "Cải trang",
+  "Funny": "Hài hước",
+  "Mine": "Của tôi",
+  "Radio & places": "Bộ đàm & địa điểm",
+  "Robots & sci-fi": "Robot & khoa học viễn tưởng",
+  "Scary": "Đáng sợ",
+  "Add “{name}” to Favorites": "Thêm “{name}” vào Yêu thích",
+  "No favorites yet. Click the star in a voice's corner to keep it here.": "Chưa có giọng yêu thích. Bấm ngôi sao ở góc một giọng để giữ nó ở đây.",
+  "Remove “{name}” from Favorites": "Bỏ “{name}” khỏi Yêu thích"
 }

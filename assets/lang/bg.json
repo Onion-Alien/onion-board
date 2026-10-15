@@ -3449,5 +3449,14 @@
   "Names can be up to {n} characters, so it's “{name}”.": "Имената може да са до {n} знака, затова е „{name}“.",
   "They go in a category called “{name}”.": "Отиват в категория с име „{name}“.",
   "Type a name first.": "Първо въведете име.",
-  "✓ Renamed to “{new}”. Another sound has that name too.": "✓ Преименувано на „{new}“. Има и друг звук с това име."
+  "✓ Renamed to “{new}”. Another sound has that name too.": "✓ Преименувано на „{new}“. Има и друг звук с това име.",
+  "Disguise": "Маскировка",
+  "Funny": "Смешни",
+  "Mine": "Мои",
+  "Radio & places": "Радио и места",
+  "Robots & sci-fi": "Роботи и фантастика",
+  "Scary": "Страшни",
+  "Add “{name}” to Favorites": "Добави „{name}“ в Любими",
+  "No favorites yet. Click the star in a voice's corner to keep it here.": "Още няма любими. Натисни звездата в ъгъла на глас, за да го държиш тук.",
+  "Remove “{name}” from Favorites": "Махни „{name}“ от Любими"
 }

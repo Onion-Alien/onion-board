@@ -3449,5 +3449,14 @@
   "Names can be up to {n} characters, so it's “{name}”.": "Namn kan ha upp till {n} tecken, så det blir ”{name}”.",
   "They go in a category called “{name}”.": "De hamnar i en kategori som heter ”{name}”.",
   "Type a name first.": "Skriv ett namn först.",
-  "✓ Renamed to “{new}”. Another sound has that name too.": "✓ Bytte namn till ”{new}”. Ett annat ljud heter också så."
+  "✓ Renamed to “{new}”. Another sound has that name too.": "✓ Bytte namn till ”{new}”. Ett annat ljud heter också så.",
+  "Disguise": "Förklädnad",
+  "Funny": "Roliga",
+  "Mine": "Mina",
+  "Radio & places": "Radio & platser",
+  "Robots & sci-fi": "Robotar & sci-fi",
+  "Scary": "Läskiga",
+  "Add “{name}” to Favorites": "Lägg till ”{name}” i Favoriter",
+  "No favorites yet. Click the star in a voice's corner to keep it here.": "Inga favoriter än. Klicka på stjärnan i hörnet av en röst för att ha den här.",
+  "Remove “{name}” from Favorites": "Ta bort ”{name}” från Favoriter"
 }

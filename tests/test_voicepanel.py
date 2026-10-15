@@ -1692,3 +1692,32 @@ def test_stop_takes_the_picked_voice_bar_away_too(panel):
     assert p.fx.picked.isVisible()
     p.show_tab("ai")
     assert not p.fx.picked.isVisible()  # still only on the voice changer's tab
+
+
+def test_voice_groups_and_favorites(qapp, monkeypatch):
+    """Every voice sits under one group; a starred voice shows under Favorites (in the
+    order starred), is saved with the settings and comes back starred."""
+    monkeypatch.setattr(tts.SapiTTS, "warm_up", lambda self: [])
+    from soundboard import voicefx
+    from soundboard.ui.voicefxpanel import (CUSTOM, FAVS, MINE, VOICE_GROUPS,
+                                            VoiceFxPanel, voice_group)
+    grouped = [n for _k, _t, names in VOICE_GROUPS for n in names]
+    assert sorted(grouped) == sorted(voicefx.PRESETS)   # each preset once, none left out
+    assert voice_group(CUSTOM) == MINE
+    fx = VoiceFxPanel({})
+    shown = lambda: {n for n, b in fx._tile.items() if not b.isHidden()}  # noqa: E731
+    assert shown() == set(fx._tile)
+    fx._cat_btns["scary"].click()
+    assert shown() == set(dict(((k, n) for k, _t, n in VOICE_GROUPS))["scary"])
+    fx._cat_btns[FAVS].click()
+    assert shown() == set() and not fx.no_favs.isHidden()
+    fx._tile["Robot"].star.click()
+    fx._tile["Demon"].star.click()
+    assert shown() == {"Robot", "Demon"} and fx.no_favs.isHidden()
+    assert fx.spec()["favorites"] == ["Robot", "Demon"]
+    again = VoiceFxPanel(voicefx.clean_spec(fx.spec()))
+    assert again.favorites == ["Robot", "Demon"]
+    assert again._tile["Robot"].star.isChecked()
+    fx._tile["Robot"].star.click()                      # unstarred: it leaves Favorites
+    assert shown() == {"Demon"} and fx.favorites == ["Demon"]
+    assert voicefx.clean_spec({"favorites": ["A", 3, "A", ""]})["favorites"] == ["A"]

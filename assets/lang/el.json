@@ -3449,5 +3449,14 @@
   "Names can be up to {n} characters, so it's “{name}”.": "Τα ονόματα έχουν έως {n} χαρακτήρες, οπότε είναι «{name}».",
   "They go in a category called “{name}”.": "Μπαίνουν σε κατηγορία με όνομα «{name}».",
   "Type a name first.": "Γράψτε πρώτα ένα όνομα.",
-  "✓ Renamed to “{new}”. Another sound has that name too.": "✓ Μετονομάστηκε σε \"{new}\". Και άλλος ήχος έχει αυτό το όνομα."
+  "✓ Renamed to “{new}”. Another sound has that name too.": "✓ Μετονομάστηκε σε \"{new}\". Και άλλος ήχος έχει αυτό το όνομα.",
+  "Disguise": "Μεταμφίεση",
+  "Funny": "Αστείες",
+  "Mine": "Δικές μου",
+  "Radio & places": "Ραδιόφωνο & μέρη",
+  "Robots & sci-fi": "Ρομπότ & επιστ. φαντασία",
+  "Scary": "Τρομακτικές",
+  "Add “{name}” to Favorites": "Προσθήκη του «{name}» στα Αγαπημένα",
+  "No favorites yet. Click the star in a voice's corner to keep it here.": "Δεν υπάρχουν αγαπημένα ακόμα. Πάτα το αστέρι στη γωνία μιας φωνής για να μείνει εδώ.",
+  "Remove “{name}” from Favorites": "Αφαίρεση του «{name}» από τα Αγαπημένα"
 }

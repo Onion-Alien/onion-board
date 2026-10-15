@@ -3525,5 +3525,14 @@
   "Names can be up to {n} characters, so it's “{name}”.": "Názvy mohou mít nejvýš {n} znaků, takže je to „{name}“.",
   "They go in a category called “{name}”.": "Přijdou do kategorie „{name}“.",
   "Type a name first.": "Nejdřív napište název.",
-  "✓ Renamed to “{new}”. Another sound has that name too.": "✓ Přejmenováno na „{new}“. Stejně se jmenuje i jiný zvuk."
+  "✓ Renamed to “{new}”. Another sound has that name too.": "✓ Přejmenováno na „{new}“. Stejně se jmenuje i jiný zvuk.",
+  "Disguise": "Převlek",
+  "Funny": "Vtipné",
+  "Mine": "Moje",
+  "Radio & places": "Rádio a místa",
+  "Robots & sci-fi": "Roboti a sci-fi",
+  "Scary": "Strašidelné",
+  "Add “{name}” to Favorites": "Přidat „{name}“ do Oblíbených",
+  "No favorites yet. Click the star in a voice's corner to keep it here.": "Zatím žádné oblíbené. Klikni na hvězdičku v rohu hlasu a bude tady.",
+  "Remove “{name}” from Favorites": "Odebrat „{name}“ z Oblíbených"
 }

@@ -3373,5 +3373,14 @@
   "Names can be up to {n} characters, so it's “{name}”.": "ชื่อยาวได้ไม่เกิน {n} ตัวอักษร จึงเป็น “{name}”",
   "They go in a category called “{name}”.": "จะอยู่ในหมวดหมู่ชื่อ “{name}”",
   "Type a name first.": "พิมพ์ชื่อก่อน",
-  "✓ Renamed to “{new}”. Another sound has that name too.": "✓ เปลี่ยนชื่อเป็น “{new}” แล้ว มีเสียงอื่นที่ชื่อนี้ด้วย"
+  "✓ Renamed to “{new}”. Another sound has that name too.": "✓ เปลี่ยนชื่อเป็น “{new}” แล้ว มีเสียงอื่นที่ชื่อนี้ด้วย",
+  "Disguise": "ปลอมตัว",
+  "Funny": "ตลก",
+  "Mine": "ของฉัน",
+  "Radio & places": "วิทยุและสถานที่",
+  "Robots & sci-fi": "หุ่นยนต์และไซไฟ",
+  "Scary": "น่ากลัว",
+  "Add “{name}” to Favorites": "เพิ่ม “{name}” ในรายการโปรด",
+  "No favorites yet. Click the star in a voice's corner to keep it here.": "ยังไม่มีรายการโปรด คลิกดาวที่มุมของเสียงเพื่อเก็บไว้ที่นี่",
+  "Remove “{name}” from Favorites": "เอา “{name}” ออกจากรายการโปรด"
 }
