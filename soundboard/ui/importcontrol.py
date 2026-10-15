@@ -731,12 +731,14 @@ class ImportControl(Controller):
             return
         # only what's on the board: a sound removed a moment ago (still undo-able) must
         # come back from its backup, or deleting all then restoring leaves nothing
-        # by name too: a removed pad that shared its audio with one still here
-        # ("Save as new sound") comes back rather than being "already in your library"
-        known: dict[str, set[str]] = {}
+        # a backup goes by name too: a removed pad that shared its audio with one still
+        # here ("Save as new sound") comes back rather than being "already in your
+        # library". A pack's sound is skipped whenever its audio is here, whatever its name
+        names: dict[str, set[str]] = {}
         for m in mw.cfg.sounds:
             if m.fingerprint:
-                known.setdefault(m.fingerprint, set()).add(m.name.lower())
+                names.setdefault(m.fingerprint, set()).add(m.name.lower())
+        known = set(names) if pkg.is_pack else names
         have = {(m.pack, m.pack_item) for m in mw.cfg.sounds if m.pack}
         start = len(mw.cfg.sounds)
         mw.toast(ngettext("Importing {n} sound…", "Importing {n} sounds…", len(pkg.sounds)))
