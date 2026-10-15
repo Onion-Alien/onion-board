@@ -6,6 +6,7 @@ from __future__ import annotations
 import html
 import logging
 import threading
+from collections import deque
 from collections.abc import Callable
 from pathlib import Path
 
@@ -28,6 +29,11 @@ log = logging.getLogger(__name__)
 PIC = 32          # px: a sample's picture on its button
 SAMPLE_COLS = 3   # sample buttons a row
 WIDTH = 620       # the window: DESIGN's widest dialog
+# The window is filled a piece at a time (a pack's card, one sample's tile) with this
+# long a rest between pieces. Built in one go it was ~80 ms of back-to-back Qt work,
+# and the audio threads wait on the UI thread through all of it: with a few sounds
+# playing, blocks came 10 ms late, a skip.
+STEP_GAP_MS = 4
 # plays a sample to your headphones only at a gain (None stops it); False when it
 # couldn't (no headphones set)
 Play = Callable[[np.ndarray | None, float], bool]
@@ -177,12 +183,17 @@ class PackCard(QFrame):
 
     def show_samples(self, found: list[packs.Sample] | None):
         """Its samples arrived (none: they couldn't be fetched, so the row goes)."""
+        for i in range(len(self.samples) if found else 1):
+            self.show_sample(found, i)
+
+    def show_sample(self, found: list[packs.Sample] | None, i: int):
+        """show_samples for its i-th button alone (the window fills them one at a time)."""
         if not found:
             self.listen.hide()
             return
-        for i, b in enumerate(self.samples):
-            b.set_sample(found[i] if i < len(found) else None)
-            b.setVisible(i < len(found))
+        b = self.samples[i]
+        b.set_sample(found[i] if i < len(found) else None)
+        b.setVisible(i < len(found))
 
     def _hear(self, b: SampleButton, on: bool):
         dialog = self.window()
@@ -220,6 +231,13 @@ class PacksDialog(QDialog):
         self._ends = QTimer(self)      # un-lights a sample once it has played out
         self._ends.setSingleShot(True)
         self._ends.timeout.connect(self._stop)
+        # the packs shown, in order: a card, or a pack whose card isn't made yet (_step)
+        self._slots: list[PackCard | packs.Pack] = []
+        self._fills: deque[tuple[PackCard, list | None, int]] = deque()   # tiles to fill
+        self._stepper = QTimer(self)
+        self._stepper.setSingleShot(True)
+        self._stepper.setTimerType(Qt.TimerType.PreciseTimer)
+        self._stepper.timeout.connect(self._step)
         self.setWindowTitle(_("Free sound packs"))
         lay = QVBoxLayout(self)
         lay.setContentsMargins(18, 18, 18, 18)
@@ -264,7 +282,6 @@ class PacksDialog(QDialog):
         box = QDialogButtonBox(QDialogButtonBox.StandardButton.Close)
         box.rejected.connect(self.reject)
         lay.addWidget(box)
-        self.cards: list[PackCard] = []
         self._listed.connect(self._show)
         self._progress.connect(self._on_progress)
         self._fetched.connect(self._on_fetched)
@@ -303,41 +320,78 @@ class PacksDialog(QDialog):
                 "this version knows.", error=err)), "warn")
         if found is None or self._busy:   # don't pull a card out from under a download
             return
-        if found == [c.pack for c in self.cards]:
+        if found == [s.pack if isinstance(s, PackCard) else s for s in self._slots]:
             return   # the online list is the one shown (it usually is): nothing to redo
         # Keep the cards of packs that didn't change and make only the new ones: making
         # all of them again in the open window took about 250 ms of Qt work at once,
         # and the sound playing skipped (the audio threads wait on the UI thread).
         old = {c.pack.id: c for c in self.cards}
-        cards, new = [], []
+        slots: list[PackCard | packs.Pack] = []
         for p in found:
             c = old.get(p.id)
             if c is not None and c.pack == p:
                 del old[p.id]
+                slots.append(c)
             else:
-                c = PackCard(p)
-                if self._play is None:
-                    c.listen.hide()
-                new.append(c)
-            cards.append(c)
+                slots.append(p)   # its card is made by _step
         if self._playing_card() in old.values():   # its card goes: stop its sample
             self._stop()
         while self.list.count():
             take_out(self.list)
         for c in old.values():   # packs no longer on offer (or changed)
             c.deleteLater()
-        self.cards = cards
+        self._slots = slots
         for c in self.cards:
             self.list.addWidget(c)
         self.list.addStretch(1)
-        if self._play is not None:
-            for c in new:
-                if c.pack.preview_url:
-                    key = (c.pack.id, c.pack.preview_sha256)
-                    if key in self._samples:   # fetched for the cards this replaced
-                        c.show_samples(self._samples[key])
-                    elif key not in self._sampling:
-                        self._fetch_samples(c)
+        self._make_next()   # the first new card at once: the window never opens empty
+        self._stepper.start(STEP_GAP_MS)
+
+    @property
+    def cards(self) -> list[PackCard]:
+        """The packs' cards made so far, in order."""
+        return [s for s in self._slots if isinstance(s, PackCard)]
+
+    def _step(self):
+        """One piece of filling the window: the next pack's card, else one sample's
+        tile; then a rest (STEP_GAP_MS) for the audio threads before the next one."""
+        if self._closed:
+            return
+        if not self._make_next():
+            while self._fills:
+                card, found, i = self._fills.popleft()
+                if card in self.cards:   # not remade meanwhile (the new one gets them)
+                    card.show_sample(found, i)
+                    break
+        if self._fills or any(not isinstance(s, PackCard) for s in self._slots):
+            self._stepper.start(STEP_GAP_MS)
+
+    def _make_next(self) -> bool:
+        """Make the first pack's card still to be made, in its place; False: none left."""
+        i = next((i for i, s in enumerate(self._slots) if not isinstance(s, PackCard)), -1)
+        if i < 0:
+            return False
+        p = self._slots[i]
+        assert isinstance(p, packs.Pack)
+        c = PackCard(p)
+        if self._play is None:
+            c.listen.hide()
+        self.list.insertWidget(sum(isinstance(s, PackCard) for s in self._slots[:i]), c)
+        self._slots[i] = c
+        if self._play is not None and p.preview_url:
+            key = (p.id, p.preview_sha256)
+            if key in self._samples:   # fetched for the card this replaced
+                self._fill(c, self._samples[key])
+            elif key not in self._sampling:
+                self._fetch_samples(c)
+        return True
+
+    def _fill(self, card: PackCard, found: list | None):
+        """Its samples onto `card`, a tile a step (_step)."""
+        for i in range(len(card.samples) if found else 1):
+            self._fills.append((card, found, i))
+        if not self._stepper.isActive():
+            self._stepper.start(STEP_GAP_MS)
 
     def _playing_card(self) -> PackCard | None:
         """The card whose sample is playing, if one is."""
@@ -371,7 +425,7 @@ class PacksDialog(QDialog):
             return
         for c in self.cards:
             if (c.pack.id, c.pack.preview_sha256) == key:
-                c.show_samples(found)
+                self._fill(c, found)
 
     def hear(self, b: SampleButton, on: bool):
         """A sample pressed: play it (decoded off the UI thread), or stop it."""
@@ -468,5 +522,6 @@ class PacksDialog(QDialog):
 
     def done(self, r: int):
         self._stop()
+        self._stepper.stop()
         self._closed = True   # a download still going stops at its next chunk
         super().done(r)
