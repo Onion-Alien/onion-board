@@ -1,1 +1,0 @@
-- An urgent fix still shows its update banner when a normal release came out after it: the banner now installs the newest version.

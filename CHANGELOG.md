@@ -2,6 +2,371 @@
 
 Changes not released yet are in [changelog.d/](changelog.d/), one file per change.
 
+## 2.1.0 — 2026-10-15
+
+- New installs get a short first-run tour: right after the setup guide, on the empty
+  board, Bun points at the search box (type a song, press Enter), then at the first
+  result to add it, or at *Add sounds* for your own files when you're offline. Any
+  click goes through to what's under it, and it ends for good once you go elsewhere.
+- The app looks for a new version every hour instead of every 6, so updates reach you
+  sooner (Settings → Updates still turns it off).
+- yt-dlp updates (Settings → Updates → *Update now* / *Reinstall*, and the opt-in
+  *Update automatically*) now only install a version the app's makers approved,
+  checked against yt-dlp's signed release, once it has been out for 3 days, instead
+  of whatever is newest on PyPI.
+- Speak another language is simpler: pick the language first (Don't translate is the
+  first choice, no separate switch), then Said by names the voice others will hear, then
+  one button that says what it does (Start speaking Chinese). Computer voice, speed and
+  deleting a language moved under More options.
+- Voice tab cards no longer get squeezed when the window is narrow (controls shorter than
+  they should be, text cut off).
+- Settings → Updates now has one *Helper programs* card listing FFmpeg, yt-dlp, the
+  JavaScript engine and Tor, each saying how it updates. yt-dlp's *Reset downloader*
+  is now called *Reinstall*, like FFmpeg's, and its *Update automatically* box (still
+  off by default) sits on its row. Data & quality no longer repeats these.
+- FFmpeg and Tor copies the app downloaded now follow app updates: when an update names
+  a newer version, the app fetches it (checked against its SHA-256) at the next start.
+  Tor waits while Connection is set to Tor.
+- AI voices look like the Voice changer now: a picture card per voice under Men, Women,
+  In between & fun and Mine, with the same row of buttons to show one group and a star
+  for Favorites. The All voices window is gone: Hear it, Make your own voice and
+  changing or deleting your own voices sit under the cards.
+- The Voice changer's voices are sorted into groups (Funny, Scary, Robots & sci-fi,
+  Disguise, Radio & places, Mine), with a row of buttons to show just one group.
+- Star a voice in its corner to add it to Favorites, its own button above the voices.
+- Settings search lands on the page that really uses the word: "tor" opens Connection,
+  not the first page with those letters inside another word.
+- Screen readers now name the Sounds page and the Hear what they hear switch, also
+  when a narrow window hides the switch's words.
+- At 1100 px and other in-between window sizes, controls no longer go missing for no
+  reason: the speed and effects button, the radio's volume, Record and map, and the Say
+  bar's Stop were hidden when only the levels strip at the bottom needed less room, and
+  stayed hidden until the window was made much wider.
+- Playing a sound with the Sounds volume at 0% now says that nobody else hears it, with a
+  button to set it back to 100% (you still heard it yourself, so it looked like it worked).
+- Import a code with nothing pasted now says "There's no code there." instead of quietly
+  doing nothing.
+- Closing the quick setup guide right after "Play a test sound" no longer shows an
+  error report.
+- Fixed a rare error report when a right-click menu opened after sounds were removed
+  from the board.
+- Category, subcategory and sound names now say why when they can't be used as typed:
+  an empty box (or only spaces) asks for a name, a name that's too long says how long
+  it can be, and a subcategory can't take its own category's name. Tabs and line breaks
+  in a typed name become spaces. Renaming a sound to a name another sound has says so.
+- Restoring a backup brings back a removed sound that shared its audio with a sound still
+  on the board, instead of calling it "already in your library".
+- Importing from another soundboard says which category the sounds go in.
+- A pasted link through a proxy that doesn't answer now says the proxy couldn't be reached
+  and where to change it, instead of "The site is having trouble right now".
+- A download cut off part-way says so in plain words instead of the downloader's own text.
+- After Offline mode or a site's switch changes in Settings > Privacy & security, the line
+  under a pasted link says the new state instead of the old one.
+- Win+L and Ctrl+Alt+Del can't be saved as hotkeys any more: Windows keeps them for itself,
+  so they never played. Keys other apps use (Ctrl+C, Ctrl+V, Alt+Tab, Alt+F4...) still work,
+  with a heads-up that they stop doing their usual job while Onion Board is open.
+- A sound, category or other action can't take the Stop everything key any more, so there's
+  always a key that stops every sound.
+- The remote API's /api/pause on an idle board now answers "not paused" instead of "paused".
+- A radio station that plays a few seconds and drops again and again is now given up on
+  with a message, instead of being reopened for ever while the tab still says it plays.
+- A free pack whose download is a damaged zip is no longer kept: the window says so, and
+  the pack's button stays *Add to my board* instead of *Add again*.
+- Pressing a free pack's *Add to my board* with Offline mode on now answers with a message.
+- After a device re-scan (the Re-scan button, or plugging in new headphones), a headset
+  pulled out was never noticed: no warning, and it didn't come back by itself when plugged
+  in again. It's watched again after every re-scan.
+- Setup tab: a headset that's switched off or unplugged no longer looks broken. A mic
+  that sends nothing at all now asks "Is your headset on?", and a picked mic that's
+  unplugged asks "Is your headset plugged in?" with no Repair or set-up button. Both go
+  away by themselves once it's back.
+- The green tick and red cross on the Setup tab's mic card now sit level with their words in every theme's font, with a little space either side (they hung low in the default font).
+- Settings > Data & quality: under FFmpeg, the other helper programs now have a row each
+  too: yt-dlp (its version, with Update now), the JavaScript engine YouTube downloads use
+  (QuickJS from the app, or a faster Deno, Node or Bun if it's on the PC) and, once it's
+  here, Tor (its version, with Update Tor).
+- Every card in Settings has an icon by its heading now, like Audio recovery (the theme
+  groups and FFmpeg too), and a heading that fits stays on one line instead of wrapping
+  half-way across the card.
+- Settings opens on Audio and lists the everyday pages first (Audio, Appearance, Hotkeys,
+  Tabs, General, About). The rest (Overlay, Privacy, Connection, Data, Updates, Add-ons,
+  Remote) sit behind a Show advanced switch, which remembers being open and opens by
+  itself when a link goes to one of them.
+- A hotkey has to be one a keyboard (or a MIDI pad) can really press: text like "Ctrl"
+  alone, a key that doesn't exist or the same modifier twice isn't saved any more, and a
+  message says why (it used to be saved and shown as working). A bad one in older
+  settings or a backup is dropped when it loads.
+- A message that changes in place (like a hotkey's) now grows to show all its words
+  instead of being cut off.
+- Settings opens at once again after you looked at About, Updates, Help or another page
+  that shows live info: a fresh copy is now made ahead while the app is idle, instead of
+  building Settings again on the next click.
+- Muted while your mic is still sent: the sidebar now says "Only your mic" instead of
+  "Muted", since others still hear your plain voice. The streamer guide and the remote
+  control help say the same.
+- "Get Tor" now downloads Tor 15.0.25 (was 15.0.24), the current Tor Expert Bundle.
+- A search picture that never ends now stops at its size limit even while the window is
+  busy, instead of piling up in memory first.
+- Small blank windows no longer flash up for a moment when the app starts: a few labels
+  and buttons were shown before they were put in place.
+- Settings > Appearance is shorter: the language stays on top and themes, highlight colour, theme style, interface size, live tabs and the playing-sound background are now tabs in one box, and settings search jumps to the right tab.
+- Sounds added from your PC are copied into the library by default, so they keep working if the original is moved or deleted (switch it off in Data & quality to link instead).
+- Sounds no longer skip now and then while the app tidies up its memory: the tidy-up
+  now runs in small, quick steps, and the big one waits until nothing is playing.
+- The taskbar, shortcut and exe icon now fill their whole square like other apps' icons, so it no longer looks smaller and slightly low next to them.
+- The open sidebar's Live and Stop all buttons now say what they do ("Live" / "Muted", "Stop all") beside their icons, and "Not configured" is its own rounded button inside the card instead of a strip along its bottom edge.
+- Fix: with the mic effect on, the board's audio no longer runs four times as often as
+  it needs to while the effect hasn't sent your mic yet: it mixed sounds 400 times a
+  second instead of 100, and on a slower PC the window stopped answering for a few
+  seconds at a time.
+- Give Hothead a new fiery icon and add artwork for Singing monk, Dalek, Haunted radio and Underwater.
+- Double-clicking a pad plays it wherever the two clicks land on it, and a quick second click no longer starts a drag or shows the "pads are sorted" note.
+- Languages: speak in your own language, not just English. The live voice listens in the app's language (or the one you type under More options), turns it into English with its speech recognition, then into the language you picked; speaking the picked language itself just says it. Anyone not speaking English gets the accurate recognition model by default.
+- New translation add-ons: Ukrainian and Filipino.
+- Languages: a progress bar while the speech model downloads the first time.
+- Opening *Free sound packs* while a sound plays no longer makes the sound skip: the
+  window no longer rebuilds its pack cards when the online list arrives, and each card
+  is built in about 2 ms instead of 30.
+- Zooming the radio map no longer makes a playing sound skip: it draws only the town
+  names that fit (it drew every town in view, hundreds over Europe, in one go).
+- A song played from a search and then added to your sounds is one song now: playing
+  its pad starts it again from the top instead of a second copy playing over the first,
+  and Play on a search result already on your board plays its pad.
+- No more stray outlined square where the two scroll bars meet on a narrow Setup page.
+- After Stop on the Voice tab, the bar under the voices that names the picked voice goes away too, instead of looking as if the voice were still on.
+- Developers: `scripts/merge_pr.sh` merges again by itself when another merge lands at the same
+  moment.
+- Developers: the translation files now merge by text, so two changes that both add
+  texts no longer conflict.
+- Setup: the "other ways to send your sounds" tiles under Your mic stack one under the
+  other when the window is narrow, instead of cutting off "Another device" and its button.
+- Voice changer: a new **Singing monk** voice and effect. A monk sings what you say: every
+  syllable becomes one of his sung notes, following the ups and downs of your voice on a
+  five-note scale around his own low note. His voice is measured off the Delay Lama synth,
+  vowel by vowel. *Follow my tune* and *Words* (how much of your consonants still comes
+  through) are on its card.
+- The Voice tab's **Stop** is a big red button with its word now, instead of a small square.
+- Settings: the back arrow and cog beside the "Settings" heading line up with the word in every theme, also in the ones with their own font (Hacker, Amber Terminal, Retro 98, Comic Sans), where they sat up to 2 px low.
+- Setup → Devices: *Also send to* is now *Also play on*, and its tip says mics aren't
+  listed there (it read like "send into another mic").
+- Your mic card: a **Change mic** button next to Reinstall and Remove opens the mic list;
+  your sounds follow the mic you pick.
+- Fixed a crash in the Apps tab when closing a card's Clip editor (most often from its
+  big view): one small error while laying the cards out could break a card for good.
+- Triggers: the + after Play can show your sounds by category, so you find the one you
+  want faster (with an Onion Watch that has the new sound menu).
+- Record a sound: a new **Both** choice records your voice and what's playing at once,
+  as one sound. What's playing goes down while you talk, so your voice stays on top.
+- The list view has its own Row size (Small, Medium or Large) where the slider sits. "Pad size" is now "Card size", and it only shows with the cards it sizes.
+- Your voice no longer gets buried under your sounds: while you talk, your sounds now go
+  down to half (Setup → Who's listening, "While I talk, lower my sounds"). It's switched
+  on for everyone who had it off; pick Off there to turn it back off.
+- A category's right-click menu is shorter: *Play them all* (in order / shuffled) and
+  *Show this when a program is in front* are gone. Program rules you already made still
+  work, and Settings → General still lists them to remove.
+- Free sound packs: every pack's sounds to try now show up the first time you open the
+  window. Some packs (often Halloween and GM) used to stay empty until you reopened it.
+- The Radio tab no longer has a *Last 15s* button: use *Record* to save the radio as a sound.
+- Apps tab: the Clip editor opens from a scissors button beside the eye on each card, a
+  full-size button instead of the small link at the bottom. The eye's window picture is
+  bigger too (up to 320 px tall).
+- A web address whose name leads to your own PC or home network (a link, or a redirect
+  to one) is now refused for pictures, packs, previews and updates too, the same way
+  downloads already refused it.
+- Hoot's speech bubble in the Triggers tab now breaks a long translation onto two lines
+  instead of saying nothing.
+- Bun's animations are livelier. When a cable install fails, his hammer snaps and his
+  ears droop with a sigh. He dives into a dust cloud for his tools instead of getting cut
+  off at the edge, and builds a little speaker as he hammers. Robo-Bun's gadget is easy to
+  see, with sparks and glowing ears. A click gets a proper happy hop, music notes show up
+  on dark themes, and now and then he yawns, looks round or taps his foot.
+- Bun has new outfits in ten themes: a flower crown (Lilac), a frog hat (Swamp), a
+  backwards racing cap (Carbon), an amber eye shade and a pencil (Amber Terminal), a red
+  moon and little horns (Blood Moon), a hazmat hood and radiation badge (Toxic), a
+  turtleneck and reading glasses (Slate), a mint sprig (Mint), a captain's hat (Ocean)
+  and dizzy spiral eyes (Flashbang). Hacker's hood no longer vanishes on its dark
+  background.
+- Bun takes his glasses off when he naps, and his smug brows and tears no longer show
+  through sunglasses. Hoot the owl's bands and hood strings fit him properly.
+- Bun mode: the mini player has a new Bun button that turns the window into a small Bun
+  floating over your screen. He sings along while a sound plays, builds while a download
+  runs, and says notices and errors in a bubble. Hover for play, stop, Live and mic;
+  scroll to resize him. Click him to get the mini player back, or grow him past his
+  biggest for the full board. Your hotkeys keep working the whole time.
+- *Free sound packs* lists the everyday packs first (Streamer, Esports, Podcast), then
+  Halloween, then the GM starter pack.
+- Pong with Bun has sounds now: crisp hits that climb a note with every hit of a rally,
+  a chime every 5 hits, a little ting for a hit off the tip of your paddle, and cheers
+  or a sad trombone at the end. Each theme has its own style of sound. They play in your
+  headphones only, and the speaker button beside Close mutes them.
+- Changing theme: Bun and the dimmed picture in the middle of the window now already
+  show the theme you're switching to (its colours, headphones and outfit), not the one
+  you're leaving.
+- YouTube downloads keep all their formats on PCs without Deno or Node: the app now ships
+  a small JavaScript engine (QuickJS) for yt-dlp to solve YouTube's player challenge, and
+  uses Deno, Node or Bun instead when one is installed.
+- Two new free sound packs in *Free sound packs*: a Halloween pack (49 sounds: screams,
+  evil laughs, monsters, jump scares, a haunted house and spooky music) and a streamer pack
+  (57 sounds: stream music, follower and sub alerts, hype, fails and chat reactions).
+- Yes/no and warning boxes use the app's own icons in your theme's colours instead of
+  Windows' old ? and ! pictures, with the question as a bold heading and more room.
+  Boxes that ask for a name are wider, with OK as the main button.
+- Recently deleted, the program picker and Custom destination modes show a proper
+  empty state in the middle of the list, not a grey line in its corner. Custom
+  destination modes is laid out as a card with a heading; the long explanation is
+  behind its ⓘ.
+- The crash box is shorter: a heading with an icon, and the report itself folded
+  away behind Show the report.
+- Restore points, Reset and What's new put their main button first, like every
+  other box. The chat and streamer guides start their steps right under the intro.
+- The download banner always shows Bun on the left, writing the download down, with the
+  sound's picture beside him. In a queue he stays: he ties up the scroll, then unrolls it
+  for the next one, and the banner no longer jumps between picks (the title, the overall
+  bar and Stop all keep their places).
+- A link that fails to download because the downloader (yt-dlp) is out of date now shows
+  an *Update downloader* button: one click gets the newest and tries the link again.
+- Updating the downloader never breaks it any more: it skips a yt-dlp that needs a newer
+  Python than the app has, and a downloaded copy that won't start is dropped for the
+  built-in one (and never fetched again).
+- Windows switching your default output, the setup guide's cable step and closing the
+  setup guide no longer freeze the window while a stuck device is being recovered.
+- Voice changer: four new effects, **Harmony** (two more voices at intervals from yours),
+  **Ring modulator** (the Dalek), **Flanger** (jet-plane swirl to under water) and
+  **Wobble** (vibrato and tremolo), and three new voices built on them and the rest:
+  Dalek, Haunted radio and Underwater.
+- Dark and Light themes are now neutral grey: a near-black window with charcoal cards
+  and hairline borders, and an off-white window with pure white cards. The blue tint and
+  the faint satin texture are gone.
+- Textured (Settings → Appearance) now also gives every theme a soft glow of its two
+  accent colours behind the cards, and the theme cards in Settings preview each theme's
+  pattern and glow. Plain is a flat window with flat cards.
+- Slate, Forest and Lilac got new patterns (pinstripes, crosshatch, frost): the old
+  brushed-metal and satin ones were too faint to see.
+- Voice changer: Reverb is a real room now: a Pre-delay slider keeps your voice clear in
+  front of it, and early reflections (the first bounces off the nearest walls) arrive
+  before the tail. Saved voices keep their tail: Size, Brightness and Mix mean what
+  they did.
+- About 150 tooltips that only repeated what the button already shows are gone: the
+  play, stop and skip buttons, close and back arrows, the voice tiles, every effect's
+  switch, fold arrow and Reset, the hotkey clear buttons, the EQ bands and the mascots.
+  Screen readers still hear each one's name.
+- Free sound packs: the window is bigger, and every pack shows six of its sounds with
+  their pictures. Click one to hear it before adding the pack (only you hear it, in your
+  headphones).
+- Bringing your sounds over from Soundpad, Resanance, Soundux or EXP Soundboard (from the
+  menu, a drop, or the installer's box at start-up) no longer freezes the window while the
+  board is read and its sound files checked, even ones on a network drive that's offline.
+- A sound added or brought back while the board was still loading could be loaded twice at once
+  and saved garbled, so it played wrong every time after. Each load now has its own file.
+- Free sound packs are stored once, not twice: an added pack's download becomes the
+  kept copy (about 60 MB back for the three built-in packs), and copies an older version
+  doubled up are cleaned up on start. Removing a pack now leaves nothing behind.
+- Switching YouTube off in Privacy & security now also stops YouTube pictures: a sound's picture from a YouTube link and the thumbnails in web search results go under the switch of the site they come from, not under *Other pasted links*.
+- Network activity says why a sound's picture from a link went online.
+- Onion Pocket: a request read off the Wi-Fi can no longer be sent again after Onion Board or its phone server restarts.
+- The anonymous usage count no longer loses a tab opened or a sound downloaded while a count is being sent.
+- Settings → Remote: turning it on, a new port and *New key* are saved in the background, and *New key made* shows only once the key is really saved (a failed save says so instead).
+- Importing from Resanance: a damaged or crafted board file with documents nested very
+  deep is skipped as unreadable instead of crashing the app.
+- Export: a sound whose file can't be read (another program has it open, or it was
+  moved mid-export) is left out instead of failing the whole backup, and the app says
+  how many were left out.
+- Straight into my mic: one bad block of your mic no longer stops your mic going in for
+  good. It's skipped, the error shows like any other audio error, and the rest goes on.
+- The stream output does no work while nothing plays, like your send device and
+  headphones already did.
+- The voice changer no longer ends up running at your mic's old sample rate (the wrong
+  pitch) when you change an effect just as the mic changes rate.
+- Search result pictures now give up after 15 seconds of no data and stop at 5 MB, and
+  are decoded in the background, so a huge or endless picture can't eat memory or freeze
+  the window.
+- A translation model download now stops at about one and a half times the model's size
+  (300 MB if no size is listed), so a broken or bad mirror can't fill your disk. Every
+  download (FFmpeg, Tor, Python, updates, translation) now shares one capped, checked copy.
+- With a direct connection, a site or radio station whose name answers with a public
+  address first and your router's address a moment later can no longer reach your home
+  network: the name is looked up once, checked, and the connection goes to the address
+  that was checked.
+- A background job that fails (setting up the mic effect, removing the virtual cable, an export, an update check…) now always says so and frees its button, instead of leaving it busy until the app restarts.
+- A sound removed just before the app crashed or the PC lost power is no longer lost:
+  on the next start it's in Recently deleted, with its name, hotkey and effects.
+- Changing the audio buffering, the stream output (Also send to) or a device in the
+  setup guide no longer freezes the window while a stuck device is being recovered.
+- Importing a backup or sound pack, dropping a zip, and *Reset to how it came* no longer
+  freeze the window while a big archive (or one on OneDrive) is read.
+- Network activity's Totals window and its "Keep a history" switch no longer freeze the
+  app while a big saved history is read: the file is read and written in the background.
+- A website can no longer make Onion Board reach into your PC or home network: a
+  redirect, or a link's preview picture, pointing at 127.0.0.1, 192.168.x or a .lan
+  name is refused (custom voice servers on your own network still work).
+- Settings, the bin, saved voices and restore points are now flushed to the disk before
+  they replace the old file, so a power cut can no longer leave them empty.
+- Removing many sounds (a whole sound pack) no longer freezes the window when the Undo bar goes: they go into Recently deleted in the background, with one save of its list.
+- Searches and downloads no longer wait 30 seconds each when the background download helper can't start: the app notices at once and does them itself.
+- Straight into the mic: once the mic effect stopped sending its clean mic, mic check, voice effects and recordings could play your voice at the wrong pitch until the mic was reopened. The mic goes back to its own rate now.
+- Voice changer: the Distortion effect runs at four times the rate, so a hard crunch is
+  harmonics of your voice instead of aliasing fizz; the Compressor reads your level every
+  millisecond and has Attack and Release sliders with a soft knee; a new **Studio polish**
+  effect (de-esser, warmth, lookahead limiter) runs last; *Podcast voice* uses it.
+- The checks on Windows' default output and on Discord's settings each keep one thread
+  of their own instead of starting a new one every few seconds, which could hold up the
+  window (*Not Responding*) while Windows started it.
+- An AI voices download that fails (offline, the connection dropped) no longer saves a
+  crash report: the tab says what happened.
+- Categories can now have subcategories. Right-click a category tab and pick "Add
+  subcategory…" (or click "+ Subcategory" under the tabs): small chips under the tabs
+  show just that group, and "All" shows everything in the category. Sounds can be in
+  several subcategories, and pads, the pad menu and the bulk Categories menu know about
+  them. Older settings load as they were.
+- Free sound packs now arrive as one tab named after the pack, with their categories
+  (Tavern, Combat…) as subcategories inside it, instead of adding a tab for each. Packs
+  you already added keep their tabs; Backup → My sound packs → "Put its categories in
+  one tab" tidies one up.
+- A new version that was still in its first 30 minutes is now offered once they're up,
+  instead of at the next check up to 6 hours later. An urgent fix you missed is no
+  longer held back while a newer version settles.
+- The clip editor's waveform keeps a steady scale: Louder and Quieter visibly change it,
+  near-silence stays small, and it no longer jumps as a loud bit scrolls past.
+- Trim zooms to what's left instead of leaving it as a sliver at the left edge.
+- The Clip editor button's tip says what it opens.
+- The PC going to sleep with Onion Board open no longer counts as the app freezing (the
+  freeze check now counts only time the PC is awake), so *Count me in*'s freeze numbers
+  show real freezes. A freeze that held up the whole app, not only the window, now says
+  so, to tell the two causes apart.
+- Fix a rare crash while the app closed or rebuilt its tabs (the hidden tab bar's last
+  events).
+- Find saved clips by name, app or creation date, and group them automatically by app and day.
+- Replace the 200-clip limit with cleanup after seven days without use. Settings > Tabs offers Keep forever; automatic cleanup supports Undo.
+- Fill large clip lists in small batches so the interface remains responsive.
+- Fold saved clips down to one header and reopen them with their search and list height preserved.
+- Apps recordings go to Saved clips first. The editor says Save to clips, and the result offers Show clips; Add to Sounds creates a sound when wanted.
+- Give textured Dark, Light and Lilac themes a soft brushed satin finish instead of speckled grain.
+- Keep the taskbar right-click menu icon in the theme colours when starting through a source launcher.
+- Sharpen playback and volume slider knobs by drawing pixel-aligned circles without soft transparent borders.
+- Hide empty saved clips and their resize grip while keeping Undo available and restoring the saved height when clips return.
+- Disable the clip editor's Edit button when none of its menu actions are available.
+- Fixed the anti-meridian hairline in the settled flat map by aligning adjacent world tiles to a shared pixel boundary.
+- Show Live or Muted above the compact sidebar's output switch, with a crossed-out broadcast icon while muted.
+- Search provider icons now follow the current theme accent, including after changing themes.
+- Radio's stations panel now follows the active theme's texture and the Plain/Textured appearance setting.
+- Use the active theme accent for application tiles without an executable icon.
+- Settings search now finds themes by name; searching for themes or colours shows every theme group.
+- Fixed a thin background gap between flat map world copies at fractional display scales.
+- Feedback follow-ups resize immediately when their checkbox changes, without a delayed snap.
+- Live tabs default to a small icon dot, listed first in Settings. Theme's colour comes before More colours.
+- The Voice status bar uses a compact stop button so translated mic status text fits in narrow windows.
+- Keep audio meters smooth while playing with the window visible behind a game or another app.
+- Stop level meters flashing between colours when audio hovers around a warning threshold.
+- Give the Apps clip editor a larger waveform and full-size controls, preview and trim actions, and a roomier edit menu. Saving returns to live audio automatically, while Undo can restore the previous selection.
+- Keep saved clips directly below the app cards, with larger rows and visible preview, rename, delete and Add to Sounds actions. Move optional duplicate headphone monitoring into the program menu.
+- Resize the saved clips list by dragging its grip, keep the chosen height for next time, or double-click the grip to fit the clips again.
+- Let the UI timer slow down while playback is paused with sounds waiting in Up next.
+- Keep compact-window layout changes together while resizing, and move the playing-tab marker with its tab.
+- Hothead now has a crunchy megaphone sound during normal speech, with extra blowout when shouting. Autotune tracks quieter microphones and blends in a tuned robotic voice so its effect is audible even on notes that are already in tune.
+- Apps window views keep their last picture when the source is minimised, label it clearly, and offer Restore for live updates without switching focus. Open views also refresh while another app has focus.
+- New versions are offered 30 minutes after they come out instead of a day, and while the newest is that fresh no older version is offered.
+- An urgent fix still shows its update banner when a normal release came out after it: the banner now installs the newest version.
+
 ## 2.0.4 — 2026-10-13
 
 - Fix an error report that could pop up when a menu opened over the board (right-clicking a sound, for one).

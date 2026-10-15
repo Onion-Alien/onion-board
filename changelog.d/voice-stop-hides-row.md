@@ -1,1 +1,0 @@
-- After Stop on the Voice tab, the bar under the voices that names the picked voice goes away too, instead of looking as if the voice were still on.

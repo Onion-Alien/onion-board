@@ -49,14 +49,14 @@ class UpdateControl(Controller):
 
     def check_updates(self, force: bool = False, why: str = ""):
         """Look for a newer release on a thread (see updates.py). Without `force` only
-        if the box is ticked, and at most every 6 hours. `why`: the click that asked,
+        if the box is ticked, and at most every hour. `why`: the click that asked,
         for Network activity (none: the app's own timer)."""
         mw = self.mw
         if not force and not mw.cfg.update_check:
             return
 
         due = force or time.time() - mw.cfg.update_checked >= updates.EVERY_S
-        why = why or "Automatic update check (at most every 6 hours)"
+        why = why or "Automatic update check (at most every hour)"
         netlog.cause(updates.FEATURE, why)
         netlog.cause(watchaddon.FEATURE, f"{why}: Onion Watch add-on")
 

@@ -1,1 +1,0 @@
-- The list view has its own Row size (Small, Medium or Large) where the slider sits. "Pad size" is now "Card size", and it only shows with the cards it sizes.

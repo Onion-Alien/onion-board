@@ -1,3 +1,0 @@
-- Feedback follow-ups resize immediately when their checkbox changes, without a delayed snap.
-- Live tabs default to a small icon dot, listed first in Settings. Theme's colour comes before More colours.
-- The Voice status bar uses a compact stop button so translated mic status text fits in narrow windows.

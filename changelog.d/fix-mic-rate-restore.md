@@ -1,1 +1,0 @@
-- Straight into the mic: once the mic effect stopped sending its clean mic, mic check, voice effects and recordings could play your voice at the wrong pitch until the mic was reopened. The mic goes back to its own rate now.

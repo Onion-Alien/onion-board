@@ -3,7 +3,7 @@
         xmlns:image="http://www.google.com/schemas/sitemap-image/1.1">
   <url>
     <loc>https://onion-alien.github.io/onion-board/</loc>
-    <lastmod>2026-10-13</lastmod>
+    <lastmod>2026-10-15</lastmod>
     <image:image><image:loc>https://onion-alien.github.io/onion-board/screenshots/apps.png</image:loc></image:image>
     <image:image><image:loc>https://onion-alien.github.io/onion-board/screenshots/setup.png</image:loc></image:image>
     <image:image><image:loc>https://onion-alien.github.io/onion-board/screenshots/sounds.png</image:loc></image:image>
@@ -12,46 +12,46 @@
   </url>
   <url>
     <loc>https://onion-alien.github.io/onion-board/discord-soundboard/</loc>
-    <lastmod>2026-10-13</lastmod>
+    <lastmod>2026-10-15</lastmod>
     <image:image><image:loc>https://onion-alien.github.io/onion-board/screenshots/sounds.png</image:loc></image:image>
   </url>
   <url>
     <loc>https://onion-alien.github.io/onion-board/free-soundpad-alternative/</loc>
-    <lastmod>2026-10-13</lastmod>
+    <lastmod>2026-10-15</lastmod>
     <image:image><image:loc>https://onion-alien.github.io/onion-board/screenshots/triggers.png</image:loc></image:image>
   </url>
   <url>
     <loc>https://onion-alien.github.io/onion-board/soundboard-without-virtual-cable/</loc>
-    <lastmod>2026-10-13</lastmod>
+    <lastmod>2026-10-15</lastmod>
     <image:image><image:loc>https://onion-alien.github.io/onion-board/screenshots/setup.png</image:loc></image:image>
   </url>
   <url>
     <loc>https://onion-alien.github.io/onion-board/voicemod-alternative/</loc>
-    <lastmod>2026-10-13</lastmod>
+    <lastmod>2026-10-15</lastmod>
     <image:image><image:loc>https://onion-alien.github.io/onion-board/screenshots/voice.png</image:loc></image:image>
   </url>
   <url>
     <loc>https://onion-alien.github.io/onion-board/resanance-alternative/</loc>
-    <lastmod>2026-10-13</lastmod>
+    <lastmod>2026-10-15</lastmod>
     <image:image><image:loc>https://onion-alien.github.io/onion-board/screenshots/sounds.png</image:loc></image:image>
   </url>
   <url>
     <loc>https://onion-alien.github.io/onion-board/exp-soundboard-alternative/</loc>
-    <lastmod>2026-10-13</lastmod>
+    <lastmod>2026-10-15</lastmod>
     <image:image><image:loc>https://onion-alien.github.io/onion-board/screenshots/sounds.png</image:loc></image:image>
   </url>
   <url>
     <loc>https://onion-alien.github.io/onion-board/play-sounds-through-mic/</loc>
-    <lastmod>2026-10-13</lastmod>
+    <lastmod>2026-10-15</lastmod>
     <image:image><image:loc>https://onion-alien.github.io/onion-board/screenshots/setup.png</image:loc></image:image>
   </url>
   <url>
     <loc>https://onion-alien.github.io/onion-board/discord-text-to-speech-voice-chat/</loc>
-    <lastmod>2026-10-13</lastmod>
+    <lastmod>2026-10-15</lastmod>
     <image:image><image:loc>https://onion-alien.github.io/onion-board/screenshots/voice.png</image:loc></image:image>
   </url>
   <url>
     <loc>https://onion-alien.github.io/onion-board/zoom-google-meet-soundboard/</loc>
-    <lastmod>2026-10-13</lastmod>
+    <lastmod>2026-10-15</lastmod>
   </url>
 </urlset>

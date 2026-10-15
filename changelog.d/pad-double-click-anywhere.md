@@ -1,1 +1,0 @@
-- Double-clicking a pad plays it wherever the two clicks land on it, and a quick second click no longer starts a drag or shows the "pads are sorted" note.

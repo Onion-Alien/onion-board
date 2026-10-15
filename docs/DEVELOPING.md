@@ -391,6 +391,6 @@ it now), so a long headline stops them before it.
 
 **An urgent fix** (a crash, sounds cutting out, a security problem): add a line
 `Urgent: <what it fixes, in a few plain words>` to the notes. Copies that check (every
-6 hours) show a banner with that reason and *Update now*, and don't offer *Skip this
+hour) show a banner with that reason and *Update now*, and don't offer *Skip this
 version*. The same line works in Onion Watch's notes. Only the newest release is read,
 so keep the line in a normal release that follows soon after while the fix still matters.

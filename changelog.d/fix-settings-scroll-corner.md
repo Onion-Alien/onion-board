@@ -1,1 +1,0 @@
-- No more stray outlined square where the two scroll bars meet on a narrow Setup page.

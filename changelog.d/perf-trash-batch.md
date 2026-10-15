@@ -1,1 +1,0 @@
-- Removing many sounds (a whole sound pack) no longer freezes the window when the Undo bar goes: they go into Recently deleted in the background, with one save of its list.

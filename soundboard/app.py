@@ -617,7 +617,7 @@ def main():
     # Windows logging off / shutting down while the window is hidden in the tray never
     # calls closeEvent: still let go of push-to-talk and save the settings
     app.aboutToQuit.connect(w.shutdown)
-    from soundboard import usage
+    from soundboard import updates, usage
     unclean = usage.mark_running(APP_DIR)   # the last run ended without closing itself?
     usage.started(w.cfg)   # this launch, and updated/<from>-to-<to> after an update
     failed_ver, failed_pid = bootmark.previous()   # a start that never got this far
@@ -674,16 +674,18 @@ def main():
         # starts it once the guide is closed
         QTimer.singleShot(500, w.impctl.import_queued)
     QTimer.singleShot(600, w.updctl.after_update)   # "Updated to …" after an update restarted it
-    # new versions (updates.py): unless unticked, at most every 6 hours, also for an app
-    # left running for days
+    # new versions (updates.py): unless unticked, at most every hour (updates.EVERY_S),
+    # also for an app left running for days
     QTimer.singleShot(45_000, w.updctl.check_updates)
     QTimer.singleShot(60_000, w.send_usage)   # the anonymous daily count (usage.py)
     w.tick_usage()   # how long it's open, for the daily count: from now
     open_timer = QTimer(w)
     open_timer.timeout.connect(w.tick_usage)
     open_timer.start(usage.OPEN_TICK_S * 1000)
+    update_timer = QTimer(w)
+    update_timer.timeout.connect(w.updctl.check_updates)
+    update_timer.start(updates.EVERY_S * 1000)
     recheck = QTimer(w)
-    recheck.timeout.connect(w.updctl.check_updates)
     recheck.timeout.connect(w.send_usage)
     recheck.start(6 * 3600 * 1000)
     from soundboard.hangwatch import HangWatch
