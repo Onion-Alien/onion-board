@@ -304,7 +304,7 @@ jobs:
     permissions:
       actions: read   # the last nightly's list
     steps:
-      - uses: actions/download-artifact@v7
+      - uses: actions/download-artifact@v8
         with:
           pattern: flaky-*
           path: shards
