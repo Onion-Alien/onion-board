@@ -1,0 +1,1 @@
+- The onion inside the taskbar, shortcut and exe icon is drawn bigger, so it fills its tile like other apps' icons do.

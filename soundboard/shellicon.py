@@ -53,7 +53,7 @@ def ico_bytes(c1: str, c2: str, sizes=ICO_SIZES) -> bytes:
         buf = QBuffer()
         buf.open(QIODevice.OpenModeFlag.WriteOnly)
         # a str format: the stubs say bytes, which PySide6 refuses at run time
-        theme.logo_pixmap(sz, c1, c2, theme.ICON_INSET).toImage().save(buf, "PNG")   # pyright: ignore[reportCallIssue, reportArgumentType]
+        theme.logo_pixmap(sz, c1, c2, theme.ICON_INSET, theme.ICON_GLYPH).toImage().save(buf, "PNG")   # pyright: ignore[reportCallIssue, reportArgumentType]
         pngs.append(buf.data().data())
         buf.close()
     head = struct.pack("<HHH", 0, 1, len(pngs))   # reserved, type 1 = icon, count

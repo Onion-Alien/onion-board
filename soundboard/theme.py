@@ -1045,7 +1045,7 @@ def apply_live(app, colour: str) -> str:
 
 # --------------------------------------------------------------------------- logo
 
-def paint_logo(p: QPainter, rect: QRectF, c1: str, c2: str, inset: float = 0.04):
+def paint_logo(p: QPainter, rect: QRectF, c1: str, c2: str, inset: float = 0.04, glyph: float = 1.0):
     """The Onion Board mark: a gradient squircle holding an onion whose layers
     are drawn as sound-wave arcs — onion + soundboard in one shape."""
     s = rect.width()
@@ -1070,6 +1070,10 @@ def paint_logo(p: QPainter, rect: QRectF, c1: str, c2: str, inset: float = 0.04)
     lum = sum((0.299 * q.red() + 0.587 * q.green() + 0.114 * q.blue()) / 2 for q in (a, b))
     fg = QColor("#0b1a10") if lum > 165 else QColor("white")
     cx = x0 + s * 0.5
+    if glyph != 1.0:   # grow the onion about its own centre (it spans 0.10-0.87 of the tile)
+        p.translate(cx, y0 + s * 0.485)
+        p.scale(glyph, glyph)
+        p.translate(-cx, -(y0 + s * 0.485))
 
     def pt(dx, dy):   # offsets in units of s, from the top-centre of the icon
         return QPointF(cx + dx * s, y0 + dy * s)
@@ -1116,16 +1120,18 @@ BRAND = ("#7c5cff", "#ff4d8d")   # the app icon keeps its own colours in every t
 
 
 # Icons Windows draws (taskbar, exe, shortcuts) fill their square edge to edge, like other apps'
-# do; with the in-app 4% margin the tile looked smaller and a touch low beside them.
+# do; with the in-app 4% margin the tile looked smaller and a touch low beside them. Their onion
+# is drawn bigger too, so it fills the tile like other apps' marks fill theirs.
 ICON_INSET = 0.01
+ICON_GLYPH = 1.15
 
 
 def logo_pixmap(size: int, c1: str | None = None, c2: str | None = None,
-                inset: float = 0.04) -> QPixmap:
+                inset: float = 0.04, glyph: float = 1.0) -> QPixmap:
     pm = QPixmap(size, size)
     pm.fill(Qt.GlobalColor.transparent)
     p = QPainter(pm)
-    paint_logo(p, QRectF(0, 0, size, size), c1 or BRAND[0], c2 or BRAND[1], inset)
+    paint_logo(p, QRectF(0, 0, size, size), c1 or BRAND[0], c2 or BRAND[1], inset, glyph)
     p.end()
     return pm
 
@@ -1133,7 +1139,7 @@ def logo_pixmap(size: int, c1: str | None = None, c2: str | None = None,
 def app_icon(c1: str | None = None, c2: str | None = None) -> QIcon:
     icon = QIcon()
     for sz in (16, 24, 32, 48, 64, 128, 256):
-        icon.addPixmap(logo_pixmap(sz, c1, c2, ICON_INSET))
+        icon.addPixmap(logo_pixmap(sz, c1, c2, ICON_INSET, ICON_GLYPH))
     return icon
 
 
@@ -1141,6 +1147,6 @@ def logo_image(size: int) -> QImage:
     img = QImage(size, size, QImage.Format.Format_ARGB32)
     img.fill(Qt.GlobalColor.transparent)
     p = QPainter(img)
-    paint_logo(p, QRectF(0, 0, size, size), *BRAND, inset=ICON_INSET)
+    paint_logo(p, QRectF(0, 0, size, size), *BRAND, inset=ICON_INSET, glyph=ICON_GLYPH)
     p.end()
     return img
