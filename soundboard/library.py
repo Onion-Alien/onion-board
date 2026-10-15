@@ -1167,6 +1167,8 @@ def clean_wait(v, kind: str = "delay") -> float:
 
 
 SUB_SEP = " / "   # "Cat / Sub": the tag a sound in a subcategory carries (besides "Cat")
+CATEGORY_MAX = 30   # characters in a category's (and a subcategory's) name
+SOUND_NAME_MAX = 40   # ...and in a sound's
 
 
 def split_tag(tag: str) -> tuple[str, str]:
@@ -1180,9 +1182,14 @@ def sub_tag(cat: str, sub: str) -> str:
 
 
 def plain_name(name: str) -> str:
-    """A name typed for a category or subcategory: one that can't be mistaken for a
-    "Cat / Sub" tag."""
-    return (clean_tags([name.replace(SUB_SEP, " - ")]) or [""])[0]
+    """A name typed for a category or subcategory: on one line (tabs and line breaks
+    are spaces), and one that can't be mistaken for a "Cat / Sub" tag."""
+    return (clean_tags([one_line(name).replace(SUB_SEP, " - ")]) or [""])[0]
+
+
+def one_line(name: str) -> str:
+    """`name` with each run of spaces, tabs and line breaks as one space, trimmed."""
+    return " ".join(str(name or "").split())
 
 
 def clean_tags(tags) -> list[str]:
@@ -1193,7 +1200,7 @@ def clean_tags(tags) -> list[str]:
         if not isinstance(t, str):
             continue
         cat, sub = split_tag(t.strip())
-        cat, sub = cat.strip()[:30].strip(), sub.strip()[:30].strip()
+        cat, sub = cat.strip()[:CATEGORY_MAX].strip(), sub.strip()[:CATEGORY_MAX].strip()
         t = sub_tag(cat, sub) if cat and sub else cat
         if t and t.lower() not in seen:
             seen.add(t.lower())

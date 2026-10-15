@@ -31,6 +31,7 @@ from PySide6.QtWidgets import (QFrame, QHBoxLayout, QInputDialog, QLabel, QLayou
 from soundboard import appaudio, library, theme, trash, usage
 from soundboard.i18n import _
 from soundboard.ui import a11y, appstate, icons
+from soundboard.ui.widgets import widget_at
 from soundboard.ui.appcapture import METER_MS, AppCapture
 # the cards and their helpers live in approw.py; their names stay importable from here
 from soundboard.ui.approw import (APP_CATEGORIES, APP_DRAG_MIME,  # noqa: F401
@@ -315,8 +316,7 @@ class AppsTab(QWidget):
         """The cards in the grid, in its order."""
         rows = []
         for i in range(self.grid.count()):
-            item = self.grid.itemAt(i)
-            w = item.widget() if item else None
+            w = widget_at(self.grid, i)
             assert isinstance(w, AppRow)   # the grid holds only cards (headings sit beside it)
             rows.append(w)
         return rows

@@ -588,8 +588,9 @@ def test_a_key_taken_from_another_sound_or_action_says_so(window):
     w.meta("s1").hotkey = "f2"
     w.hkctl.set_sound_hotkey("s0", "f2")
     assert w.meta("s1").hotkey == "" and "it was the key for “Airhorn”" in said(w)
-    w.hkctl.set_sound_hotkey("s0", "ctrl+alt+s")
-    assert w.cfg.stop_hotkey == "" and "Stop everything" in said(w)
+    w.hkctl.set_sound_hotkey("s0", "ctrl+alt+s")   # the Stop everything key stays on that
+    assert w.cfg.stop_hotkey == "ctrl+alt+s" and w.meta("s0").hotkey == "f2"
+    assert "Stop everything key" in said(w)
     unsay(w)
     w.hkctl.set_sound_hotkey("s1", "f9")         # a free key: just the green card, no warning
     [t] = toast.shown(w)

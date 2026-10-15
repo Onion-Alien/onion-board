@@ -1248,6 +1248,21 @@ def test_importing_junk_says_why_and_adds_nothing(panel, monkeypatch):
     assert p.fx.import_code(code) == "Robot (shared)"
 
 
+def test_import_with_an_empty_box_says_so_and_cancel_says_nothing(panel, monkeypatch):
+    import html
+
+    from soundboard.ui import busy
+    p, _ = panel
+    said = []
+    monkeypatch.setattr(busy, "toast", lambda *a, **k: said.append(a[1]))
+    _ask(monkeypatch, "  ", None)
+    p.fx.btn_import.click()             # OK with nothing pasted: it says why
+    assert [html.unescape(s) for s in said] == ["There's no code there."]
+    assert not p.fx.store.voices
+    p.fx.btn_import.click()             # Cancel: nothing to say
+    assert len(said) == 1
+
+
 def test_copy_from_a_tile_with_the_window_closed_says_so(panel, monkeypatch):
     p, _ = panel
     _ask(monkeypatch, "Mine", "Other")
@@ -1630,16 +1645,13 @@ def test_translation_download_keeps_focus(panel, qapp, monkeypatch):
 
 @pytest.mark.parametrize("width", [900, 1600])
 def test_ai_voice_list_keeps_its_height_when_the_description_wraps(panel, qapp, width):
-    """The voice box is narrower than the card: its height must be worked out at its own
-    width, or a two-line description is counted as one and squashes the voice list."""
+    """The picked voice's description wraps under its name: its height must be worked out
+    at its own width, or a two-line one is counted as one and squashes the voice cards."""
     p, _eng = panel
     ai = p.ai
     about = "A light, high, young-sounding voice, good for cheerful characters. " * 3
     ai.voices = [{"id": "pixie", "name": "Pixie", "about": about}]
-    ai.cb_voice.blockSignals(True)
-    ai.cb_voice.clear()
-    ai.cb_voice.addItem("Pixie", "pixie")
-    ai.cb_voice.blockSignals(False)
+    ai._fill_tiles()
     ai.ready_box.setVisible(True)
     ai.missing.setVisible(False)
     p.resize(width, 700)
@@ -1650,11 +1662,11 @@ def test_ai_voice_list_keeps_its_height_when_the_description_wraps(panel, qapp, 
     ai._show_about()
     lb = ai.lbl_about
     process_events(qapp, lambda: lb.height() >= lb.heightForWidth(lb.width())
-                   and ai.cb_voice.height() >= ai.cb_voice.sizeHint().height(), 1.0)
+                   and ai._tile["pixie"].height() >= ai._tile["pixie"].sizeHint().height(), 1.0)
     lines = ai.lbl_about.heightForWidth(ai.lbl_about.width()) // ai.lbl_about.fontMetrics().height()
     assert lines >= 2
     assert ai.lbl_about.height() >= ai.lbl_about.heightForWidth(ai.lbl_about.width())
-    assert ai.cb_voice.height() >= ai.cb_voice.sizeHint().height()
+    assert ai._tile["pixie"].height() >= ai._tile["pixie"].sizeHint().height()
 
 
 def test_stop_takes_the_picked_voice_bar_away_too(panel):
@@ -1677,3 +1689,32 @@ def test_stop_takes_the_picked_voice_bar_away_too(panel):
     assert p.fx.picked.isVisible()
     p.show_tab("ai")
     assert not p.fx.picked.isVisible()  # still only on the voice changer's tab
+
+
+def test_voice_groups_and_favorites(qapp, monkeypatch):
+    """Every voice sits under one group; a starred voice shows under Favorites (in the
+    order starred), is saved with the settings and comes back starred."""
+    monkeypatch.setattr(tts.SapiTTS, "warm_up", lambda self: [])
+    from soundboard import voicefx
+    from soundboard.ui.voicefxpanel import (CUSTOM, FAVS, MINE, VOICE_GROUPS,
+                                            VoiceFxPanel, voice_group)
+    grouped = [n for _k, _t, names in VOICE_GROUPS for n in names]
+    assert sorted(grouped) == sorted(voicefx.PRESETS)   # each preset once, none left out
+    assert voice_group(CUSTOM) == MINE
+    fx = VoiceFxPanel({})
+    shown = lambda: {n for n, b in fx._tile.items() if not b.isHidden()}  # noqa: E731
+    assert shown() == set(fx._tile)
+    fx._cat_btns["scary"].click()
+    assert shown() == set(dict(((k, n) for k, _t, n in VOICE_GROUPS))["scary"])
+    fx._cat_btns[FAVS].click()
+    assert shown() == set() and not fx.no_favs.isHidden()
+    fx._tile["Robot"].star.click()
+    fx._tile["Demon"].star.click()
+    assert shown() == {"Robot", "Demon"} and fx.no_favs.isHidden()
+    assert fx.spec()["favorites"] == ["Robot", "Demon"]
+    again = VoiceFxPanel(voicefx.clean_spec(fx.spec()))
+    assert again.favorites == ["Robot", "Demon"]
+    assert again._tile["Robot"].star.isChecked()
+    fx._tile["Robot"].star.click()                      # unstarred: it leaves Favorites
+    assert shown() == {"Demon"} and fx.favorites == ["Demon"]
+    assert voicefx.clean_spec({"favorites": ["A", 3, "A", ""]})["favorites"] == ["A"]

@@ -822,6 +822,10 @@ def test_search_lands_on_the_named_page_and_says_when_nothing_matches(window, qa
             assert d.tabs.currentIndex() == i, name
         d._apply_search("hotkey")   # General mentions hotkeys too, but comes first
         assert d.categories.item(d.tabs.currentIndex()).text() == "Hotkeys"
+        # "tor" is inside "history" and "monitor" on General: the card called Tor
+        d.tabs.setCurrentIndex(d._page_keys.index("general"))
+        d._apply_search("tor")
+        assert d._page_keys[d.tabs.currentIndex()] == "connection"
         d._apply_search("zzqq nothing")
         assert d.no_match.isVisibleTo(d) and not d.tabs.isVisibleTo(d)
         assert "zzqq nothing" in d.no_match.text()

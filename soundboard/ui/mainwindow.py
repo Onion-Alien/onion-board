@@ -1188,6 +1188,7 @@ class MainWindow(QMainWindow):
         self.engine.mic_check = on
         text = _("Stop hearing it") if on else _("Hear what they hear")
         self.btn_check.setProperty("full_text", text)   # what a compact window restores
+        self.btn_check.setAccessibleName(text)
         if self.btn_check.text():   # blank while the window is too narrow for words
             self.btn_check.setText(text)
         self.mic_banner.setVisible(on)

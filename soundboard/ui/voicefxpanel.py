@@ -553,6 +553,33 @@ VOICE_ICONS = {"Walkie-talkie": "radio", "Old telephone": "speech",
                "Alien": "voice", CUSTOM: "sliders"}
 
 
+# the voice cards in groups, each voice in one ("All" shows them under these headings;
+# a chip shows one group). Your own mix and saved voices are "Mine"; a voice not
+# listed here (a new preset) lands in Funny until it's given a group.
+VOICE_GROUPS = (
+    ("funny", _("Funny"), ("Chipmunk", "High voice", "Hothead", "Singing monk",
+                           "Underwater")),
+    ("scary", _("Scary"), ("Demon", "Dark lord", "Ghost", "Masked caller",
+                           "Haunted radio")),
+    ("scifi", _("Robots & sci-fi"), ("Robot", "Dalek", "Alien", "Talkbox", "Autotune")),
+    ("disguise", _("Disguise"), ("Deep voice", "Male voice", "Anonymous",
+                                 "Secret detective")),
+    ("places", _("Radio & places"), ("Walkie-talkie", "Old telephone", "Megaphone",
+                                     "Stadium announcer", "Cave", "Podcast voice")),
+)
+MINE = "mine"
+FAVS = "favs"
+ALL = ""
+STAR = 22   # px: the favorite star in a voice card's corner
+
+
+def voice_group(name: str) -> str:
+    """The group a voice card goes under."""
+    if name == CUSTOM or name not in voicefx.PRESETS:
+        return MINE
+    return next((k for k, _t, names in VOICE_GROUPS if name in names), VOICE_GROUPS[0][0])
+
+
 class VoiceTile(QToolButton):
     """A voice card: picture over name. A name too long for the card ends in "…" (a
     saved voice's can be 32 characters), the whole name in its tip; an "&" in it
@@ -569,7 +596,27 @@ class VoiceTile(QToolButton):
         self.setAccessibleName(title)
         self._tip = ""          # its own tip; a cut-short name shows the whole name
         self._cut = False
+        # a favorite? the star in its top-right corner (always shown: never on hover only)
+        self.star = QToolButton(self)
+        self.star.setObjectName("voicestar")
+        self.star.setCheckable(True)
+        self.star.setFixedSize(STAR, STAR)
+        self.star.setCursor(Qt.CursorShape.PointingHandCursor)
+        self.star.setFocusPolicy(Qt.FocusPolicy.TabFocus)
+        self.star.toggled.connect(self._show_star)
+        self.toggled.connect(self._show_star)   # on the picked (accent) card: white
+        self._show_star()
         self._fit_name(TILE_MIN_W)
+
+    def _show_star(self, *_a):
+        on, picked = self.star.isChecked(), self.isChecked()
+        icons.set_icon(self.star, "star_filled" if on else "star",
+                       "on_accent" if picked else "muted",
+                       "on_accent" if picked else "accent", size=16)
+        tip = (_("Remove “{name}” from Favorites", name=self.title) if on
+               else _("Add “{name}” to Favorites", name=self.title))
+        self.star.setToolTip(tip)
+        self.star.setAccessibleName(tip)
 
     def setToolTip(self, tip: str):
         self._tip = tip
@@ -585,6 +632,7 @@ class VoiceTile(QToolButton):
     def resizeEvent(self, e):
         super().resizeEvent(e)
         self._fit_name(self.width())
+        self.star.move(self.width() - STAR - 4, 4)
 
 
 class VoiceFxPanel(QWidget):
@@ -669,14 +717,47 @@ class VoiceFxPanel(QWidget):
         self._tip_enabled = True
         v.addWidget(self.tip)
 
+        # ---- which voices show: All (under group headings), your favorites, one group
+        favs = spec.get("favorites")
+        self._favs: list[str] = list(favs) if isinstance(favs, list) else []
+        self._group = ALL
+        self.cats = QWidget()
+        cflow = Flow(self.cats, gap=6)
+        self._cat_group = QButtonGroup(self)
+        self._cat_btns: dict[str, QPushButton] = {}
+        for key, text in ((ALL, _("All")), (FAVS, _("Favorites")),
+                          *((k, t) for k, t, _n in VOICE_GROUPS), (MINE, _("Mine"))):
+            b = QPushButton(text.replace("&", "&&"))
+            b.setObjectName("voicecat")
+            b.setAccessibleName(text)
+            b.setCheckable(True)
+            b.setCursor(Qt.CursorShape.PointingHandCursor)
+            if key == FAVS:
+                icons.set_icon(b, "star_filled", "accent")
+            b.clicked.connect(lambda __=False, k=key: self.show_group(k))
+            self._cat_group.addButton(b)
+            self._cat_btns[key] = b
+            cflow.addWidget(b)
+        self._cat_btns[ALL].setChecked(True)
+        v.addWidget(self.cats)
+        self._heads: dict[str, QLabel] = {}
+        for key, text in (*((k, t) for k, t, _n in VOICE_GROUPS), (MINE, _("Mine"))):
+            lbl = QLabel(text)
+            lbl.setObjectName("fxgroup")
+            lbl.hide()
+            self._heads[key] = lbl
+        self.no_favs = hint_label(_("No favorites yet. Click the star in a voice's corner "
+                                    "to keep it here."))
+        self.no_favs.hide()
+
         # ---- pick a voice: picture cards, as many a row as the width holds
         grid = self._tile_grid = QGridLayout()
         grid.setSpacing(TILE_GAP)
         self._tile_cols = self.COLS
         self.tiles = QButtonGroup(self)
         self.tiles.setExclusive(True)
-        self._tile: dict[str, QToolButton] = {}
-        self._saved_tiles: list[QToolButton] = []
+        self._tile: dict[str, VoiceTile] = {}
+        self._saved_tiles: list[VoiceTile] = []
         for name in list(voicefx.PRESETS) + [CUSTOM]:
             title = _("My own mix") if name == CUSTOM else voicefx.shown(name)
             pic = art.icon(art.voice_key(name)) or (art.mystery_icon() if name != CUSTOM
@@ -687,6 +768,7 @@ class VoiceFxPanel(QWidget):
         for c in range(self.COLS):
             grid.setColumnStretch(c, 1)
         v.addLayout(grid)
+        v.addWidget(self.no_favs)
         self.undo_bar = UndoBar(_("Bring the voice back, as it was"))
         v.addWidget(self.undo_bar)
 
@@ -993,7 +1075,7 @@ class VoiceFxPanel(QWidget):
         return super().eventFilter(obj, e)
 
     # ------------------------------------------------------------------ saved voices
-    def _make_tile(self, name: str, title: str, pic, line_icon: str) -> QToolButton:
+    def _make_tile(self, name: str, title: str, pic, line_icon: str) -> VoiceTile:
         """A checkable voice card: its picture (ui/art.py), else a line icon, with the
         name under it."""
         b = VoiceTile(title)
@@ -1005,6 +1087,8 @@ class VoiceFxPanel(QWidget):
         b.setIconSize(QSize(TILE_ART, TILE_ART))   # a line icon: as tall as a picture
         b.setCursor(Qt.CursorShape.PointingHandCursor)
         b.clicked.connect(lambda __=False, n=name: self.pick(n))
+        b.star.setChecked(name in self._favs)
+        b.star.toggled.connect(lambda on, n=name: self.set_favorite(n, on))
         self.tiles.addButton(b)
         self._tile[name] = b
         return b
@@ -1031,15 +1115,65 @@ class VoiceFxPanel(QWidget):
         self._refresh()
 
     def _place_tiles(self):
+        """The cards the picked chip shows: All under a heading per group, else one
+        group (or your favorites, in the order you starred them) without headings."""
         g, cols = self._tile_grid, self._tile_cols
-        order = [self._tile[n] for n in list(voicefx.PRESETS) + [CUSTOM]] \
-            + self._saved_tiles
-        for b in order:
-            g.removeWidget(b)
-        for i, b in enumerate(order):
-            g.addWidget(b, i // cols, i % cols)
+        names = list(voicefx.PRESETS) + [CUSTOM] + [n for n in self.store.voices
+                                                    if n in self._tile]
+        for w in (*self._tile.values(), *self._heads.values()):
+            g.removeWidget(w)
+        rows: list[tuple[str, list[str]]]
+        if self._group == ALL:
+            rows = [(k, [n for n in names if voice_group(n) == k])
+                    for k in (*(k for k, _t, _n in VOICE_GROUPS), MINE)]
+        elif self._group == FAVS:
+            rows = [("", [n for n in self._favs if n in self._tile])]
+        else:
+            rows = [("", [n for n in names if voice_group(n) == self._group])]
+        shown: set[str] = set()
+        r = 0
+        for head, group in rows:
+            if not group:
+                continue
+            if head:
+                g.addWidget(self._heads[head], r, 0, 1, cols)
+                r += 1
+            for i, n in enumerate(group):
+                g.addWidget(self._tile[n], r + i // cols, i % cols)
+            r += (len(group) + cols - 1) // cols
+            shown.update(group)
+        for k, lbl in self._heads.items():
+            lbl.setVisible(self._group == ALL and any(voice_group(n) == k for n in shown))
+        for n, b in self._tile.items():
+            b.setVisible(n in shown)
+        self.no_favs.setVisible(self._group == FAVS and not shown)
         for c in range(MAX_COLS):
             g.setColumnStretch(c, 1 if c < cols else 0)
+
+    def show_group(self, key: str):
+        """Show one chip's voices (ALL, FAVS, MINE or a VOICE_GROUPS key)."""
+        self._group = key
+        self._cat_btns[key].setChecked(True)
+        self._place_tiles()
+
+    @property
+    def favorites(self) -> list[str]:
+        return list(self._favs)
+
+    def set_favorite(self, name: str, on: bool):
+        """Star or unstar a voice: Favorites lists them in the order you starred them."""
+        if on == (name in self._favs):
+            return
+        if on:
+            self._favs.append(name)
+        else:
+            self._favs.remove(name)
+        b = self._tile.get(name)
+        if b is not None and b.star.isChecked() != on:
+            b.star.setChecked(on)   # (toggled comes back here and finds nothing to do)
+        if self._group == FAVS:
+            self._place_tiles()
+        self._emit()
 
     def _ask_name(self, title: str, text: str, keep: str = "") -> str:
         """A name for a saved voice, or "" if cancelled. Built-in voices' names are
@@ -1132,7 +1266,7 @@ class VoiceFxPanel(QWidget):
             text, ok = QInputDialog.getText(self._parent(), title,
                                             _("Paste the code someone sent you:"),
                                             QLineEdit.EchoMode.Normal, "")
-            if not ok or not text.strip():
+            if not ok:   # OK on an empty box gets read_code's "There's no code there."
                 return ""
         try:
             name, effects, notes = savedvoices.read_code(text)
@@ -1184,6 +1318,7 @@ class VoiceFxPanel(QWidget):
             self._preset = new
         if self._based_on == old:
             self._based_on = new
+        self._favs = [new if n == old else n for n in self._favs]
         self._fill_saved()
         self._emit()
 
@@ -1389,6 +1524,7 @@ class VoiceFxPanel(QWidget):
         return {"enabled": self.btn_power.isChecked(), "preset": self._preset,
                 "effects": effects,
                 "custom": effects if self._mine() else self._custom,
+                **({"favorites": list(self._favs)} if self._favs else {}),
                 **({"panel_size": [self._dlg_size.width(), self._dlg_size.height()]}
                    if self._dlg_size else {})}
 

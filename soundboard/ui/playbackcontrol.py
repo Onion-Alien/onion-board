@@ -23,7 +23,7 @@ from soundboard.shuffle import ShuffleBag
 from soundboard.ui import icons, sidebar, worker
 from soundboard.ui.controller import Controller
 from soundboard.ui.linkbar import PLAY_ID as LINK_ID
-from soundboard.ui.widgets import fmt_pos
+from soundboard.ui.widgets import fmt_pos, widget_at
 
 if TYPE_CHECKING:
     from soundboard.ui.mainwindow import MainWindow
@@ -55,6 +55,7 @@ class PlaybackControl(Controller):
         self._preview_gen = 0            # newest effects preview (older renders are dropped)
         self._preview_done = None         # its done(ok) callback while it renders
         self._seeking = False
+        self._zero_vol_said = False   # the "Sounds volume is at 0%" toast, once per time
 
     def play(self, sid, now: bool = False):
         """Play a pad's sound as its settings say (by default one at a time: a new
@@ -118,6 +119,25 @@ class PlaybackControl(Controller):
         if v is None and not mw.engine.active_outputs():
             mw.say(_("<span style='color:{status}'>No audio device is open, pick "
                        "one in Setup.</span>", status=theme.status('warn')), "warn")
+        self._say_zero_volume(v is not None)
+
+    def _say_zero_volume(self, played: bool):
+        """A sound started with the Sounds volume at 0%: it still plays in your own
+        headphones, so it seems to work while nobody else hears it. Said once, until
+        the volume goes up again (sound_volume_changed)."""
+        mw = self.mw
+        if (not played or mw.cfg.sound_vol > 0 or self._zero_vol_said
+                or mw.cfg.route == "off"):
+            return
+        self._zero_vol_said = True
+        mw.toast(_("Your Sounds volume is at 0%, so nobody else hears your sounds."), "warn",
+                 8000, key="sound-vol-0",
+                 action=(_("Set to 100%"), lambda: mw.vol_sound.spin.setValue(100)))
+
+    def sound_volume_changed(self, v: float):
+        if v > 0:
+            self._zero_vol_said = False   # back at 0 later: say it again
+            self.mw.unsay("sound-vol-0")
 
     def _waited(self, sid: str, timer: QTimer):
         """A sound's wait before playing is over."""
@@ -593,8 +613,7 @@ class PlaybackControl(Controller):
         gap = CHIPS_GAP
         room = mw.playing_row.width()
         for i in range(mw._chips_hl.count()):   # the Now playing label and chips
-            item = mw._chips_hl.itemAt(i)
-            w = item.widget() if item is not None else None
+            w = widget_at(mw._chips_hl, i)
             if w is None:
                 continue
             if w is lbl:

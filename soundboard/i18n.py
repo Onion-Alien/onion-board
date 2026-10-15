@@ -180,15 +180,16 @@ def codes() -> list[str]:
     return [ENGLISH, *(f.stem for f in _files())]
 
 
-_META_NAME = re.compile(r'^\{\s*"_meta"\s*:\s*\{\s*"name"\s*:\s*("(?:[^"\\]|\\.)*")')
+_META_NAME = re.compile(r'"_meta"\s*:\s*\{\s*"name"\s*:\s*("(?:[^"\\]|\\.)*")')
+META_HEAD = 4096   # _meta sits near the top, not always first (new keys can land above it)
 
 
 def _own_name(f: Path) -> str:
-    """Catalog `f`'s `_meta.name`, from its first lines when it's at the top (a whole
+    """Catalog `f`'s `_meta.name`, from its first lines when it's near the top (a whole
     catalog is ~300 KB: reading all of them took 0.1 s), else from the whole file."""
     try:
         with f.open(encoding="utf-8") as fh:
-            m = _META_NAME.match(fh.read(512))
+            m = _META_NAME.search(fh.read(META_HEAD))
         if m:
             return json.loads(m.group(1)) or f.stem
     except (OSError, ValueError):

@@ -47,7 +47,6 @@ class MicControl(Controller):
     _helper_failed = False  # the last check raised: the next waits HELPER_RETRY_S
     _helper_check_at = 0.0  # when the last check started (time.monotonic())
     _mic_offered = False    # shown this start (it comes back next start until updated)
-    _silent_said = False    # the "your mic sends no sound" toast came this run
     _following_effect = False
 
     def __init__(self, mw: MainWindow):
@@ -182,7 +181,8 @@ class MicControl(Controller):
             # Windows still knows it, it's just not there: nothing to repair or set up
             look = ("warn", "mic", _("Is your headset plugged in?"), _("Unplugged"), _(
                 "Windows can't find <b>{mic}</b> right now. Plug it in, or switch it on if "
-                "it's wireless. This goes away by itself.", mic=html.escape(name)), None)
+                "it's wireless. No mic at all? Use the <b>virtual cable</b> below: it works "
+                "without one.", mic=html.escape(name)), None)
         elif directmic.needs_repair(direct):
             known = michelper.known()
             if known and self._autofix_tried and not self._autofix_err:
@@ -216,16 +216,14 @@ class MicControl(Controller):
                         _("One click puts your sounds straight into your mic, so Discord and "
                           "games hear them.")), _("Put my sounds straight into my mic"))
         elif state == "ok" and self._mic_sends_nothing():
-            # the mic itself sends exact zeros: nearly always a wireless headset switched
-            # off (its dongle stays plugged in) or the mic's own mute, now and then a mic
-            # stuck after an audio restart: Repair restarts the audio and listens again
-            if not self._silent_said:
-                self._silent_said = True
-                mw.toast(_("No sound from your mic. Is your headset on?"), "warn")
-            look = ("warn", "mic", _("Is your headset on?"), _("No sound"), needed(
-                _("Your headset is off or its mic is muted. Turn it on or unmute it. Still "
-                  "nothing? Click <b>Repair</b>.")),
-                _("Repair (one click)"))
+            # the mic itself sends exact zeros: a wireless headset switched off (its
+            # dongle stays plugged in), the mic's own mute or its boom mic pulled out.
+            # The effect still sends the sounds on that silence, so nothing is broken:
+            # others hear just the sounds (a mic stuck after an audio restart: Reinstall)
+            look = ("ok", "check", _("Your sounds go into your mic"), _("Connected"), _(
+                "Your mic sends no sound right now (switched off, muted or no mic plugged "
+                "in), so others hear only your sounds. Want them to hear you too? Turn it "
+                "on or unmute it."), None)
         elif state == "ok":
             look = ("ok", "check", _("Your sounds go into your mic"), _("Connected"), "", None)
         else:   # set up, but Windows isn't running it or it won't open: the step says why

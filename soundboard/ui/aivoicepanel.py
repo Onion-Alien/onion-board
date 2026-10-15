@@ -2,8 +2,10 @@
 
 The add-on (modules/ai-voices) does the converting in its own process; this card
 installs it, starts and stops it (soundboard.speech.aivoice) and shows how it's
-doing. Settings are a plain dict (`changed`) the Voice tab keeps in the speech
-settings under "ai".
+doing. The voices are picture cards under chips, like the voice changer's: All (a
+heading per kind), Favorites, Men, Women, In between & fun, Mine. Under them the
+picked voice, with Hear it and Make your own voice (ui/aivoicebrowser.py). Settings
+are a plain dict (`changed`) the Voice tab keeps in the speech settings under "ai".
 """
 from __future__ import annotations
 
@@ -13,18 +15,23 @@ import logging
 import re
 import threading
 
-from PySide6.QtCore import Qt, Signal
-from PySide6.QtWidgets import (QCheckBox, QComboBox, QFrame, QGridLayout, QHBoxLayout, QLabel,
-                               QPushButton, QSizePolicy, QSlider, QVBoxLayout, QWidget)
+from PySide6.QtCore import QPoint, QSize, Qt, Signal
+from PySide6.QtGui import QFont, QIcon, QPainter, QPixmap
+from PySide6.QtWidgets import (QButtonGroup, QCheckBox, QComboBox, QDialog, QFrame,
+                               QGridLayout, QHBoxLayout, QLabel, QMenu, QPushButton,
+                               QSlider, QVBoxLayout, QWidget)
 
 from soundboard import aiaddon, applog, errors, net, updates
 from soundboard import modules as mods
-from soundboard.i18n import _
+from soundboard.i18n import _, ngettext
 from soundboard.speech import aivoice
 from soundboard.speech import aivoicelist as avl
 from soundboard.ui import busy, icons
+from soundboard.ui.aivoicebrowser import AiVoiceEditor, Previewer, hear_button
 from soundboard.ui.bunnywidget import BunnyWidget
-from soundboard.ui.panel import fold_button, hint_label, section_label
+from soundboard.ui.panel import Flow, UndoBar, fold_button, hint_label, section_label
+from soundboard.ui.voicefxpanel import (MAX_COLS, PICKED_ART, TILE_ART, TILE_GAP,
+                                        TILE_MIN_W, VoiceTile)
 from soundboard.ui.widgets import LoadingBar
 from soundboard.wheelguard import no_wheel
 
@@ -36,6 +43,30 @@ BACKUP_LABELS = [(_("A built-in voice (still hides yours)"), "voice"),
 # what others hear once the AI voice has stopped, by backup key ("Others now hear …")
 BACKUP_HEARD = {"voice": _("a built-in voice (still hides yours)"),
                 "mic": _("your real voice"), "mute": _("silence")}
+
+# the chips over the voice cards: All shows a heading per kind (avl.who), your own last
+ALL, FAVS, MINE = "", "favs", "mine"
+KINDS = (("men", _("Men")), ("women", _("Women")), ("other", _("In between & fun")),
+         (MINE, _("Mine")))
+
+
+def voice_kind(voice: dict) -> str:
+    """The heading a voice card goes under: yours under Mine, else who it sounds like."""
+    return MINE if avl.is_mine(voice) else avl.who(voice)
+
+
+def emoji_icon(emoji: str, size: int = TILE_ART) -> QIcon:
+    """A voice's emoji as a card picture (the AI voices have emoji, not drawings)."""
+    pm = QPixmap(size * 2, size * 2)   # drawn at 2x: sharp on a high-DPI screen too
+    pm.setDevicePixelRatio(2.0)
+    pm.fill(Qt.GlobalColor.transparent)
+    p = QPainter(pm)
+    f = QFont("Segoe UI Emoji")
+    f.setPixelSize(int(size * 0.8))
+    p.setFont(f)
+    p.drawText(0, 0, size, size, Qt.AlignmentFlag.AlignCenter, emoji or "🎙️")
+    p.end()
+    return QIcon(pm)
 
 
 def read_voices(module: mods.ModuleInfo | None,
@@ -82,22 +113,7 @@ def install_step(line: str) -> str | None:
     return None
 
 
-BOX_MAX_W = 560   # px: the voice and pitch box at its widest
-
-
-class _CappedGrid(QGridLayout):
-    """The layout of a frame with a maximum width, working out its height at that width.
-    The layout around asks for the height at the whole row's width (it goes straight
-    to the frame's layout, ignoring the frame's maximum), so a wrapped line inside (the
-    voice's description) counted as one line and the voice list was squashed to make
-    room. Call the frame's updateGeometry() when that text changes."""
-
-    def heightForWidth(self, w: int) -> int:
-        box = self.parentWidget()
-        if box is not None:
-            m = box.contentsMargins()
-            w = min(w, box.maximumWidth() - m.left() - m.right())
-        return super().heightForWidth(w)
+BOX_MAX_W = 560   # px: the pitch box at its widest
 
 
 class AiVoicePanel(QWidget):
@@ -108,6 +124,7 @@ class AiVoicePanel(QWidget):
     _install_line = Signal(str)     # a raw line of the install's output
     _install_note = Signal(str)     # our own words for the card, shown as they are
     _install_done = Signal(bool, str)
+    _sampled = Signal(object, object, str)   # a Hear it sample is made (Previewer)
 
     def __init__(self, controller: aivoice.AiVoiceController, settings: dict | None,
                  module_list: list[mods.ModuleInfo], engine=None):
@@ -129,6 +146,10 @@ class AiVoicePanel(QWidget):
         self._status = "off"
         self.module: mods.ModuleInfo | None = None
         self.voices: list[dict] = []
+        self.previewer = Previewer(
+            self, lambda: self.module if self.module is not None and self.module.installed
+            else None, self._play_sample if engine is not None else None)
+        self._sampled.connect(lambda b, d, e: self.previewer.done(b, d, e, self._say))
 
         v = QVBoxLayout(self)
         v.setContentsMargins(0, 0, 0, 0)
@@ -144,7 +165,7 @@ class AiVoicePanel(QWidget):
         self.ready_box = QWidget()
         rv = QVBoxLayout(self.ready_box)
         rv.setContentsMargins(0, 0, 0, 0)
-        rv.setSpacing(16)
+        rv.setSpacing(12)
         action = QHBoxLayout()
         action.setSpacing(14)
         self.b_start = QPushButton(_("Start AI voice"))
@@ -162,35 +183,129 @@ class AiVoicePanel(QWidget):
         action.addWidget(self.lbl_state, 1)
         rv.addLayout(action)
         rv.addWidget(self.intro)
-        grid = _CappedGrid()
+
+        # ---- which voices show: All (a heading per kind), your favorites, one kind
+        favs = self.s.pop("favorites", None)   # kept here, added back by _emit
+        self._favs: list[str] = list(favs) if isinstance(favs, list) else []
+        self._group = ALL
+        self.cats = QWidget()
+        cflow = Flow(self.cats, gap=6)
+        self._cat_group = QButtonGroup(self)
+        self._cat_btns: dict[str, QPushButton] = {}
+        for key, text in ((ALL, _("All")), (FAVS, _("Favorites")), *KINDS):
+            b = QPushButton(text.replace("&", "&&"))
+            b.setObjectName("voicecat")
+            b.setAccessibleName(text)
+            b.setCheckable(True)
+            b.setCursor(Qt.CursorShape.PointingHandCursor)
+            if key == FAVS:
+                icons.set_icon(b, "star_filled", "accent")
+            b.clicked.connect(lambda __=False, k=key: self.show_group(k))
+            self._cat_group.addButton(b)
+            self._cat_btns[key] = b
+            cflow.addWidget(b)
+        self._cat_btns[ALL].setChecked(True)
+        rv.addWidget(self.cats)
+        self._heads: dict[str, QLabel] = {}
+        for key, text in KINDS:
+            lbl = QLabel(text)
+            lbl.setObjectName("fxgroup")
+            lbl.hide()
+            self._heads[key] = lbl
+        self.no_favs = hint_label(_("No favorites yet. Click the star in a voice's corner "
+                                    "to keep it here."))
+        self.no_favs.hide()
+        self.no_mine = hint_label(_("No voices of your own yet: press Make your own voice "
+                                    "below."))
+        self.no_mine.hide()
+
+        # ---- pick a voice: a card each, as many a row as the width holds
+        self._tile_grid = QGridLayout()
+        self._tile_grid.setSpacing(TILE_GAP)
+        self._tile_cols = 3
+        self.tiles = QButtonGroup(self)
+        self.tiles.setExclusive(True)
+        self._tile: dict[str, VoiceTile] = {}
+        rv.addLayout(self._tile_grid)
+        rv.addWidget(self.no_favs)
+        rv.addWidget(self.no_mine)
+        self.undo_bar = UndoBar(_("Bring the voice back"))
+        rv.addWidget(self.undo_bar)
+
+        # ---- the voice you picked: what it is; under that Hear it, Make your own voice
+        # (and change or delete it, one of yours), on a line of their own
+        self.picked = QFrame()
+        self.picked.setObjectName("picked")
+        pv = QVBoxLayout(self.picked)
+        pv.setContentsMargins(12, 8, 12, 10)
+        pv.setSpacing(8)
+        ph = QHBoxLayout()
+        ph.setSpacing(10)
+        pv.addLayout(ph)
+        self.picked_pic = QLabel()
+        self.picked_pic.setFixedSize(PICKED_ART, PICKED_ART)
+        ph.addWidget(self.picked_pic, 0, Qt.AlignmentFlag.AlignTop)
+        words = QVBoxLayout()
+        words.setSpacing(2)
+        self.picked_name = QLabel()
+        self.picked_name.setObjectName("pickedname")
+        self.picked_name.setTextFormat(Qt.TextFormat.PlainText)
+        self.picked_name.setMinimumWidth(40)   # a long name gives way in a narrow window
+        words.addWidget(self.picked_name)
+        self.lbl_about = hint_label("")
+        self.lbl_about.setTextFormat(Qt.TextFormat.PlainText)
+        self.lbl_about.setMinimumWidth(40)
+        words.addWidget(self.lbl_about)
+        ph.addLayout(words, 1)
+        btns = QWidget()
+        bflow = Flow(btns, gap=6)
+        self.b_hear = hear_button()
+        self.b_hear.clicked.connect(lambda: self.previewer.hear(
+            self.b_hear, self._voice(), self._sampled, self._say))
+        bflow.addWidget(self.b_hear)
+        self.b_make = QPushButton(_("Make your own voice"))
+        icons.set_icon(self.b_make, "plus")
+        self.b_make.clicked.connect(lambda: self.edit(None))
+        bflow.addWidget(self.b_make)
+        self.b_edit = QPushButton()
+        icons.set_icon(self.b_edit, "edit")
+        self.b_edit.setToolTip(_("Change this voice"))
+        self.b_edit.setAccessibleName(_("Change this voice"))
+        self.b_edit.clicked.connect(lambda: self.edit(self.s["voice"]))
+        bflow.addWidget(self.b_edit)
+        self.b_delete = QPushButton()
+        icons.set_icon(self.b_delete, "trash", "danger_text")
+        self.b_delete.setToolTip(_("Delete this voice (you can bring it back)"))
+        self.b_delete.setAccessibleName(_("Delete this voice (you can bring it back)"))
+        self.b_delete.clicked.connect(lambda: self.delete(self.s["voice"]))
+        bflow.addWidget(self.b_delete)
+        self.b_bin = QPushButton("")
+        self.b_bin.setObjectName("fold")
+        icons.set_icon(self.b_bin, "trash", "muted", "text", size=12)
+        self.b_bin.clicked.connect(self.show_deleted)
+        bflow.addWidget(self.b_bin)
+        brow = QHBoxLayout()
+        brow.addSpacing(PICKED_ART + 10)   # under the name, not the picture
+        brow.addWidget(btns, 1)
+        pv.addLayout(brow)
+        rv.addWidget(self.picked)
+        self.lbl_sample = QLabel("")
+        self.lbl_sample.setObjectName("muted")
+        self.lbl_sample.setWordWrap(True)
+        self.lbl_sample.hide()
+        rv.addWidget(self.lbl_sample)
+
+        # ---- how high: in its own inner area under the picked voice
+        grid = QGridLayout()
         grid.setHorizontalSpacing(12)
         grid.setVerticalSpacing(10)
-        grid.addWidget(section_label(_("Voice")), 0, 0, 1, 2)
-        vrow = QHBoxLayout()
-        vrow.setSpacing(10)
-        self.cb_voice = QComboBox()
-        self.cb_voice.setMinimumWidth(0)
-        self.cb_voice.setSizeAdjustPolicy(QComboBox.SizeAdjustPolicy.AdjustToMinimumContentsLengthWithIcon)
-        self.cb_voice.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Fixed)
-        vrow.addWidget(self.cb_voice, 1)
-        self.b_all = QPushButton(_("All voices"))
-        icons.set_icon(self.b_all, "sounds")
-        self.b_all.setToolTip(_("Every voice with what it sounds like, a sample to hear, "
-                              "and making your own"))
-        self.b_all.clicked.connect(self.open_browser)
-        # the list takes the room, not the button
-        self.b_all.setSizePolicy(QSizePolicy.Policy.Fixed, QSizePolicy.Policy.Fixed)
-        vrow.addWidget(self.b_all)
-        grid.addLayout(vrow, 1, 0, 1, 2)
-        self.lbl_about = hint_label("")
-        grid.addWidget(self.lbl_about, 2, 0, 1, 2)
-        grid.addWidget(section_label(_("Pitch")), 3, 0)
+        grid.addWidget(section_label(_("Pitch")), 0, 0)
         prow = QHBoxLayout()
         self.chk_auto = QCheckBox(_("Match the voice"))
         self.chk_auto.setToolTip(_("Moves your pitch to where this voice naturally sits, "
                                  "whoever is talking. Off: your own pitch."))
         self.chk_auto.setChecked(self.s["auto_pitch"])
-        grid.addWidget(self.chk_auto, 3, 1, Qt.AlignmentFlag.AlignRight)
+        grid.addWidget(self.chk_auto, 0, 1, Qt.AlignmentFlag.AlignRight)
         self.sl_pitch = QSlider(Qt.Orientation.Horizontal)
         self.sl_pitch.setRange(-24, 24)            # half semitones
         self.sl_pitch.setValue(int(round(self.s["pitch"] * 2)))
@@ -201,12 +316,11 @@ class AiVoicePanel(QWidget):
         self.lbl_pitch.setMinimumWidth(38)
         self.lbl_pitch.setAlignment(Qt.AlignmentFlag.AlignRight | Qt.AlignmentFlag.AlignVCenter)
         prow.addWidget(self.lbl_pitch)
-        grid.addLayout(prow, 4, 0, 1, 2)
+        grid.addLayout(prow, 1, 0, 1, 2)
         grid.setColumnStretch(1, 1)
-        # the voice and its pitch, together in one inner area under Start
         box = self.voicebox = QFrame()
         box.setObjectName("voicebox")
-        box.setMaximumWidth(BOX_MAX_W)   # a list and a slider, not bars across the card
+        box.setMaximumWidth(BOX_MAX_W)   # a slider, not a bar across the card
         grid.setContentsMargins(14, 4, 14, 14)
         box.setLayout(grid)
         rv.addWidget(box)
@@ -304,9 +418,8 @@ class AiVoicePanel(QWidget):
         v.addWidget(self.opts)
         self.opts.hide()
         self.btn_opts.toggled.connect(self.opts.setVisible)
-        no_wheel(self.cb_voice, self.sl_pitch, self.cb_backup)
+        no_wheel(self.sl_pitch, self.cb_backup)
 
-        self.cb_voice.currentIndexChanged.connect(self._voice_picked)
         self.chk_auto.toggled.connect(self._auto_toggled)
         self.sl_pitch.valueChanged.connect(self._pitch_moved)
         self.sl_pitch.sliderReleased.connect(self._pitch_released)
@@ -320,14 +433,7 @@ class AiVoicePanel(QWidget):
         self.module = next((m for m in module_list
                             if m.id == aivoice.MODULE_ID and not m.error), None)
         self.voices = read_voices(self.module) if voices is None else voices
-        self.cb_voice.blockSignals(True)
-        self.cb_voice.clear()
-        for vo in self.voices:
-            self.cb_voice.addItem(f"{vo.get('emoji', '')} {vo['name']}".strip(), vo["id"])
-        i = self.cb_voice.findData(self.s["voice"])
-        self.cb_voice.setCurrentIndex(max(0, i))
-        self.cb_voice.blockSignals(False)
-        self._show_about()
+        self._fill_tiles()
         self.lbl_credits.setText(self.module.credits if self.module else "")
         self._refresh()
 
@@ -370,63 +476,234 @@ class AiVoicePanel(QWidget):
             fix = m is not None and m.broken
             self.b_install.setText(_("Repair") if fix else _("Install AI voices"))
             icons.set_icon(self.b_install, "reload" if fix else "plus")
+        can_make = self.can_make()
+        self.b_make.setEnabled(can_make)
+        self.b_make.setToolTip(
+            _("Blend two voices and set how deep and how high it is") if can_make else
+            _("Only for AI voices installed with the Get AI voices button"))
 
     # ------------------------------------------------------------ settings
     def _emit(self):
-        self.changed.emit(dict(self.s))
+        self.changed.emit({**self.s, **({"favorites": list(self._favs)} if self._favs
+                                        else {})})
+
+    def current_voice(self) -> str:
+        """The picked voice's id: the saved one if the add-on has it, else its first."""
+        ids = [vo["id"] for vo in self.voices]
+        return self.s["voice"] if self.s["voice"] in ids else (ids[0] if ids else "")
 
     def _voice(self) -> dict:
-        vid = self.cb_voice.currentData() or ""
+        vid = self.current_voice()
         return next((vo for vo in self.voices if vo["id"] == vid), {})
 
     def _show_about(self):
+        """The bar under the cards: the picked voice, who it sounds like and about it."""
         vo = self._voice()
         tags = avl.tag_line(vo) if vo else ""
         text = str(vo.get("about") or vo.get("description") or "")
+        self.picked_name.setText(str(vo.get("name", "")))
+        self.picked_pic.setPixmap(emoji_icon(str(vo.get("emoji") or ""), PICKED_ART)
+                                  .pixmap(PICKED_ART, PICKED_ART))
         self.lbl_about.setText(f"{tags}. {text}" if tags and text else tags or text)
-        # its height for its width changed: the layouts around keep the old one until told
-        self.voicebox.updateGeometry()
+        mine = avl.is_mine(vo)
+        self.b_edit.setVisible(mine and self.can_make())
+        self.b_delete.setVisible(mine)
+        self.b_hear.setVisible(self.previewer.available())
+        n = len(self.store.deleted)
+        self.b_bin.setText(_("Recently deleted ({n})", n=n))
+        self.b_bin.setVisible(n > 0)
+        self.tiles.setExclusive(False)
+        for vid, b in self._tile.items():
+            b.setChecked(vid == vo.get("id"))
+        self.tiles.setExclusive(True)
 
-    # ------------------------------------------------------------ all voices
-    def _resync(self) -> list[dict]:
-        """Your own voices changed: write them into the add-on and list them again."""
-        self.voices = read_voices(self.module, self.store.voices)
-        old = self.s["voice"]
-        self.cb_voice.blockSignals(True)
-        self.cb_voice.clear()
+    def _say(self, text: str):
+        self.lbl_sample.setText(text)
+        self.lbl_sample.setVisible(bool(text))
+
+    # ------------------------------------------------------------ the voice cards
+    def _fill_tiles(self):
+        """(Re)make a card for each voice the add-on has."""
+        for b in self._tile.values():
+            self.tiles.removeButton(b)
+            self._tile_grid.removeWidget(b)
+            b.hide()   # until it's gone it would paint over the regrown grid
+            b.deleteLater()
+        self._tile = {}
         for vo in self.voices:
-            self.cb_voice.addItem(f"{vo.get('emoji', '')} {vo['name']}".strip(), vo["id"])
-        self.cb_voice.setCurrentIndex(max(0, self.cb_voice.findData(old)))
-        self.cb_voice.blockSignals(False)
-        if (self.cb_voice.currentData() or "") != old:    # it was deleted
-            self._voice_picked()
+            vid = vo["id"]
+            b = VoiceTile(vo["name"])
+            b.setIcon(emoji_icon(str(vo.get("emoji") or "")))
+            b.setIconSize(QSize(TILE_ART, TILE_ART))
+            b.setCursor(Qt.CursorShape.PointingHandCursor)
+            tags = avl.tag_line(vo)
+            about = str(vo.get("about") or vo.get("description") or "")
+            b.setToolTip(f"{tags}. {about}" if tags and about else tags or about)
+            b.clicked.connect(lambda __=False, i=vid: self.pick(i))
+            b.star.setChecked(vid in self._favs)
+            b.star.toggled.connect(lambda on, i=vid: self.set_favorite(i, on))
+            if avl.is_mine(vo):
+                b.setContextMenuPolicy(Qt.ContextMenuPolicy.CustomContextMenu)
+                b.customContextMenuRequested.connect(
+                    lambda pos, i=vid, w=b: self._mine_menu(i, w.mapToGlobal(pos)))
+            self.tiles.addButton(b)
+            self._tile[vid] = b
+        self._place_tiles()
         self._show_about()
-        return self.voices
+
+    def _place_tiles(self):
+        """The cards the picked chip shows: All under a heading per kind (lowest voice
+        first), else one kind (or your favorites, in the order you starred them)."""
+        g, cols = self._tile_grid, self._tile_cols
+        for w in (*self._tile.values(), *self._heads.values()):
+            g.removeWidget(w)
+        by_id = {vo["id"]: vo for vo in self.voices if vo["id"] in self._tile}
+        low_first = sorted(by_id.values(), key=lambda vo: vo.get("pitch_hz", 0))
+        rows: list[tuple[str, list[str]]]
+        if self._group == ALL:
+            rows = [(k, [vo["id"] for vo in low_first if voice_kind(vo) == k])
+                    for k, _t in KINDS]
+        elif self._group == FAVS:
+            rows = [("", [i for i in self._favs if i in by_id])]
+        else:
+            rows = [("", [vo["id"] for vo in low_first if voice_kind(vo) == self._group])]
+        shown: set[str] = set()
+        r = 0
+        for head, group in rows:
+            if not group:
+                continue
+            if head:
+                g.addWidget(self._heads[head], r, 0, 1, cols)
+                r += 1
+            for i, vid in enumerate(group):
+                g.addWidget(self._tile[vid], r + i // cols, i % cols)
+            r += (len(group) + cols - 1) // cols
+            shown.update(group)
+        for k, lbl in self._heads.items():
+            lbl.setVisible(self._group == ALL and any(voice_kind(by_id[i]) == k
+                                                      for i in shown))
+        for vid, b in self._tile.items():
+            b.setVisible(vid in shown)
+        self.no_favs.setVisible(self._group == FAVS and not shown)
+        self.no_mine.setVisible(self._group == MINE and not shown)
+        for c in range(MAX_COLS):
+            g.setColumnStretch(c, 1 if c < cols else 0)
+
+    def show_group(self, key: str):
+        """Show one chip's voices (ALL, FAVS, MINE or an avl.WHO key)."""
+        self._group = key
+        self._cat_btns[key].setChecked(True)
+        self._place_tiles()
+
+    @property
+    def favorites(self) -> list[str]:
+        return list(self._favs)
+
+    def set_favorite(self, vid: str, on: bool):
+        """Star or unstar a voice: Favorites lists them in the order you starred them."""
+        if on == (vid in self._favs):
+            return
+        if on:
+            self._favs.append(vid)
+        else:
+            self._favs.remove(vid)
+        b = self._tile.get(vid)
+        if b is not None and b.star.isChecked() != on:
+            b.star.setChecked(on)   # (toggled comes back here and finds nothing to do)
+        if self._group == FAVS:
+            self._place_tiles()
+        self._emit()
+
+    def resizeEvent(self, e):
+        super().resizeEvent(e)
+        # only a new width: fewer cards a row makes it taller, and refitting on that
+        # can flip it back and forth
+        if e.size().width() != e.oldSize().width():
+            self._fit_width(self.width())
+
+    def _fit_width(self, width: int):
+        """As many voice cards a row as the width holds, at least one."""
+        cols = max(1, min(MAX_COLS, (width + TILE_GAP) // (TILE_MIN_W + TILE_GAP)))
+        if cols != self._tile_cols:
+            self._tile_cols = cols
+            self._place_tiles()
+
+    def pick(self, vid: str):
+        """Use this voice (a card was clicked): the next Start, or now if it's on."""
+        if vid not in self._tile:
+            return
+        self.s["voice"] = vid
+        self._show_about()
+        if self.ctl.running:
+            self.ctl.set_voice(vid, self.s["pitch"])
+            self._voice_name = self._voice().get("name", "")
+            self.lbl_state.setText(_("● switching to {voice}…", voice=self._voice_name))
+        self._emit()
+
+    # ------------------------------------------------------------ your own voices
+    def can_make(self) -> bool:
+        """Your own voices are written into the add-on: only the one you downloaded."""
+        return self.module is not None and aiaddon.removable(self.module)
+
+    def _resync(self):
+        """Your own voices changed: write them into the add-on and list them again."""
+        old = self.s["voice"]
+        self.voices = read_voices(self.module, self.store.voices)
+        self._favs = [i for i in self._favs if any(vo["id"] == i for vo in self.voices)]
+        self._fill_tiles()
+        if self.current_voice() != old:     # it was deleted: the first one instead
+            self.pick(self.current_voice())
+        self._emit()
 
     def _play_sample(self, data):
         assert self.engine is not None   # only offered with one
         self.engine.play("__ai_voice_sample", data, 1.0, preview=True)
 
-    def open_browser(self):
-        from soundboard.ui.aivoicebrowser import AiVoiceBrowser, Previewer
-        ready = self.module is not None and self.module.installed
-        prev = Previewer(self, lambda: self.module if ready else None,
-                         self._play_sample if self.engine is not None else None)
-        can_make = self.module is not None and aiaddon.removable(self.module)
-        d = AiVoiceBrowser(self.voices, self.cb_voice.currentData() or "", self.store, prev,
-                           can_make, self, refresh=self._resync)
-        d.picked.connect(lambda vid: self.cb_voice.setCurrentIndex(
-            max(0, self.cb_voice.findData(vid))))
-        d.exec()
+    def _mine_menu(self, vid: str, pos: QPoint):
+        m = QMenu(self)
+        if self.can_make():
+            m.addAction(_("Change this voice"), lambda: self.edit(vid))
+        m.addAction(_("Delete"), lambda: self.delete(vid))
+        m.exec(pos)
 
-    def _voice_picked(self, *__):
-        self.s["voice"] = self.cb_voice.currentData() or ""
-        self._show_about()
-        if self.ctl.running:
-            self.ctl.set_voice(self.s["voice"], self.s["pitch"])
-            self._voice_name = self._voice().get("name", "")
-            self.lbl_state.setText(_("● switching to {voice}…", voice=self._voice_name))
-        self._emit()
+    def edit(self, vid: str | None):
+        """Make one of your own voices (None) or change one."""
+        if not self.can_make():
+            return
+        if vid is None and self.store.full():
+            busy.toast(self, html.escape(ngettext(
+                "⚠ You have {n} voice of your own already: delete it to make another.",
+                "⚠ You have {n} voices of your own already: delete one to make another.",
+                avl.MAX_VOICES).removeprefix("⚠ ")), "warn")
+            return
+        built = [vo for vo in self.voices if not avl.is_mine(vo)]
+        d = AiVoiceEditor(built, self.store.get(vid) if vid else None, self.previewer, self)
+        if d.exec() == QDialog.DialogCode.Accepted and self.store.put(d.result_voice()) is not None:
+            self._resync()
+            if vid is None:
+                self.pick(d.result_voice()["id"])
+
+    def delete(self, vid: str):
+        item = self.store.remove(vid)
+        if item is None:
+            return
+        self._resync()
+        self.undo_bar.show_for(_("Deleted “{name}”", name=item.name),
+                               lambda: self._undo(item.id))
+
+    def _undo(self, item_id: str):
+        it = self.store.take(item_id)
+        if it is not None and self.store.restore(it) is not None:
+            self._resync()
+
+    def show_deleted(self):
+        from soundboard.ui.deleted import DeletedDialog
+        self.undo_bar.finish()
+
+        def back(item) -> bool:
+            return self.store.restore(item) is not None
+        DeletedDialog(avl.KIND, "voices", back, self, source=self.store).exec()
+        self._resync()
 
     def _auto_toggled(self, on: bool):
         self.s["auto_pitch"] = on
@@ -486,7 +763,7 @@ class AiVoicePanel(QWidget):
         module = self.module
         assert module is not None   # both callers checked
         try:
-            self.ctl.start(module, self.s["voice"] or self.cb_voice.currentData() or "",
+            self.ctl.start(module, self.current_voice(),
                            self.s["auto_pitch"], self.s["pitch"])
         except RuntimeError as e:
             self._set_ui(False, f"⚠ {errors.plain(e)}")
@@ -500,7 +777,7 @@ class AiVoicePanel(QWidget):
 
     def voice_title(self) -> str:
         """The running voice's name (the status bar's chip)."""
-        return self._voice_name or self._voice().get("name", "") or self.cb_voice.currentText()
+        return self._voice_name or self._voice().get("name", "")
 
     def backup_heard(self) -> str:
         return BACKUP_HEARD.get(self.cb_backup.currentData() or "voice", BACKUP_HEARD["voice"])

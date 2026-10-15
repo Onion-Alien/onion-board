@@ -16,7 +16,7 @@ from typing import TYPE_CHECKING
 from PySide6.QtCore import QTimer
 from PySide6.QtWidgets import QInputDialog
 
-from soundboard import errors, thumbs, trash, usage
+from soundboard import errors, library, thumbs, trash, usage
 from soundboard.engine import SR
 from soundboard.i18n import _
 from soundboard.library import (
@@ -255,9 +255,14 @@ class SoundsControl(Controller):
             return
         if new is None:
             new, ok = QInputDialog.getText(mw, _("Rename sound"), _("New name:"), text=m.name)
-            new = new if ok else ""
-        new = new.strip()
-        if not new or new == m.name:
+            if not ok:
+                return
+        typed = library.one_line(new)
+        new = typed[:library.SOUND_NAME_MAX].strip()
+        if not new:   # an empty box (or only spaces) did nothing and said nothing
+            mw.toast(_("Type a name first."), "warn")
+            return
+        if new == m.name:
             return
         m.name = new
         if sid in mw.pads:
@@ -265,4 +270,12 @@ class SoundsControl(Controller):
         if mw.current == sid:
             mw._set_np_name(new)
         mw._save_now()
-        mw.toast(_("✓ Renamed to “{new}”", new=html.escape(new)), "ok")
+        if len(typed) > len(new):
+            mw.toast(_("Names can be up to {n} characters, so it's “{name}”.",
+                       n=library.SOUND_NAME_MAX, name=html.escape(new)), "warn")
+        elif any(o is not m and o.name.lower() == new.lower() for o in mw.cfg.sounds):
+            # allowed (two takes of one clip), but two pads called the same are easy to mix up
+            mw.toast(_("✓ Renamed to “{new}”. Another sound has that name too.",
+                       new=html.escape(new)), "ok")
+        else:
+            mw.toast(_("✓ Renamed to “{new}”", new=html.escape(new)), "ok")

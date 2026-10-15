@@ -29,6 +29,7 @@ import time
 import uuid
 import zipfile
 import zlib
+from collections.abc import Mapping
 from collections.abc import Set as AbstractSet
 from dataclasses import dataclass, field, fields
 from pathlib import Path, PurePosixPath
@@ -498,14 +499,20 @@ class Imported:
     failed: list[str] = field(default_factory=list)    # "name: why"
 
 
-def install(pkg: Package, known_fingerprints: set[str], color_for=None,
+def install(pkg: Package, known_fingerprints: AbstractSet[str] | Mapping[str, AbstractSet[str]],
+            color_for=None,
             on_board: AbstractSet[tuple[str, str]] = frozenset()) -> Imported:
     """Copy the package's sounds into the library, as new sounds with ids of their own.
     Sounds whose fingerprint is already in the library are skipped (importing the same
     backup twice adds nothing); copies inside the package are all kept, since "Save as
     new sound" makes pads that share their audio. So are ones `on_board` has as
-    (pack id, pack folder). The audio is decoded later, by the normal loader."""
+    (pack id, pack folder). `known_fingerprints` may map each fingerprint to the names
+    (lower case) of the sounds here with it: then only a sound with one of those names
+    is skipped, and a removed pad that shared its audio with one still here comes back.
+    The audio is decoded later, by the normal loader."""
     out = Imported()
+    names: Mapping[str, AbstractSet[str]] = (
+        known_fingerprints if isinstance(known_fingerprints, Mapping) else {})
     known = set(known_fingerprints)
     src = _Source(pkg.path)
     try:
@@ -516,7 +523,8 @@ def install(pkg: Package, known_fingerprints: set[str], color_for=None,
             if (pkg.pack_id, ps.folder) in on_board:
                 out.skipped.append(name)
                 continue
-            if isinstance(fp, str) and fp and fp in known:
+            if isinstance(fp, str) and fp and fp in known and (
+                    fp not in names or name.lower() in names[fp]):
                 out.skipped.append(name)
                 continue
             try:

@@ -97,9 +97,9 @@ def test_ai_action_precedes_choices_and_status_wraps(qapp, monkeypatch, tmp_path
         panel.show()
         qapp.processEvents()
         box = panel.ready_box
-        assert at(panel.b_start, box).bottom() < at(panel.cb_voice, box).top()
+        assert at(panel.b_start, box).bottom() < at(panel._tile["bear"], box).top()
         assert box.rect().contains(at(panel.lbl_state, box))
-        assert box.rect().contains(at(panel.cb_voice, box))
+        assert box.rect().contains(at(panel._tile["bear"], box))
         panel._set_ui(False, "Ready")
         assert not panel.b_start.isChecked()
         assert panel.lbl_state.text() == "Ready"

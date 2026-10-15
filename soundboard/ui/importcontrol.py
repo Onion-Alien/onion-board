@@ -672,7 +672,8 @@ class ImportControl(Controller):
             lines = [found,
                      _("They're copied into Onion Board; {name} keeps its own. Ones "
                        "already here are skipped, and a hotkey something here already "
-                       "uses is left off.", name=src.name)]
+                       "uses is left off.", name=src.name),
+                     _("They go in a category called “{name}”.", name=html.escape(src.name))]
             if bad:
                 lines.append(ngettext(
                     "{n} more can't be brought over (the file was moved or deleted, or isn't "
@@ -730,7 +731,14 @@ class ImportControl(Controller):
             return
         # only what's on the board: a sound removed a moment ago (still undo-able) must
         # come back from its backup, or deleting all then restoring leaves nothing
-        known = {m.fingerprint for m in mw.cfg.sounds if m.fingerprint}
+        # a backup goes by name too: a removed pad that shared its audio with one still
+        # here ("Save as new sound") comes back rather than being "already in your
+        # library". A pack's sound is skipped whenever its audio is here, whatever its name
+        names: dict[str, set[str]] = {}
+        for m in mw.cfg.sounds:
+            if m.fingerprint:
+                names.setdefault(m.fingerprint, set()).add(m.name.lower())
+        known = set(names) if pkg.is_pack else names
         have = {(m.pack, m.pack_item) for m in mw.cfg.sounds if m.pack}
         start = len(mw.cfg.sounds)
         mw.toast(ngettext("Importing {n} sound…", "Importing {n} sounds…", len(pkg.sounds)))
