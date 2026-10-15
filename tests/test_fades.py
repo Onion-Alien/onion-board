@@ -85,3 +85,63 @@ def test_pause_during_fade_in_then_resume_finishes_the_fade():
     e.set_paused("a", False)
     y = run(e, 15)
     assert np.allclose(y[-480:], 0.5)
+
+
+def _db(y):
+    return 20 * np.log10(max(float(np.abs(y).max()), 1e-6))
+
+
+def tone(seconds, hz=660.0, level=0.5):
+    t = np.arange(int(seconds * SR)) / SR
+    x = (np.sin(2 * np.pi * hz * t) * level).astype(np.float32)
+    return np.column_stack([x, x])
+
+
+def test_stop_all_cuts_the_live_echo_tail_too():
+    # Stop all is the panic button: the sounds bus' echo and reverb hold what they
+    # already had and kept repeating it for a second or two after it
+    e = engine_with("main")
+    e.sound_fx = {"echo": 0.6, "reverb": 0.2}
+    e.play("a", tone(0.3), 1.0)
+    run(e, 35)                                   # the click and its first repeats
+    e.stop_all()
+    fade = run(e, 3)                             # a short fade, no click
+    assert np.all(np.abs(np.diff(fade)) < 0.05)
+    assert _db(run(e, 50)) < -90                 # then silence, not the echo
+    e.sound_fx = {"echo": 0.6}                   # the knobs stay on for the next sound
+    e.play("b", tone(0.1), 1.0)
+    assert _db(run(e, 60)[16000:]) > -30         # ...which echoes as before
+
+
+def test_stop_all_leaves_a_sound_started_right_after_it_alone():
+    e = engine_with("main")
+    e.sound_fx = {"muffle": 0.3}
+    e.play("a", dc(), 1.0)
+    run(e, 5)
+    e.stop_all()
+    e.play("b", dc(), 1.0)
+    y = run(e, 10)
+    assert y[-1] > 0.3
+
+
+def test_the_radio_stopping_drops_what_was_still_buffered():
+    # stopping the radio left 0.1-0.3 s of it queued in the engine to play out
+    e = engine_with("mon")
+    e.feed_radio(tone(0.4, level=0.25))
+    run_mon = lambda k: run_out(e, "_mon", k)   # noqa: E731
+    run_mon(5)
+    e.stop_radio()
+    fade = run_mon(2)
+    assert np.all(np.abs(np.diff(fade)) < 0.05)
+    assert _db(run_mon(20)) < -90
+    e.feed_radio(tone(0.4, level=0.25))          # the next station plays again
+    assert _db(run_mon(20)) > -20
+
+
+def run_out(e, render, blocks, n=480):
+    out = np.zeros((n, 2), np.float32)
+    got = []
+    for _ in range(blocks):
+        getattr(e, render)(out, n)
+        got.append(out[:, 0].copy())
+    return np.concatenate(got)

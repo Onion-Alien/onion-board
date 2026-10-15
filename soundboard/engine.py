@@ -310,6 +310,7 @@ class Engine(EngineTakes, EngineDevices, SoundCache):
         self.sound_fx: dict = {}      # live effects on every sound (livefx), {} = none
         self._spitch: dict[str, LivePitch] = {}
         self._sfx: dict = {}          # out or (out, bus) -> livefx.LiveFx
+        self._fx_gen: dict[str, int] = {}   # bus -> flushes asked for (stop_all, stop_radio)
         # the same live pitch / effects on the radio and on the Apps tab's programs
         # (one setting for all of them): no speed, they're live streams
         self.radio_pitch = 0.0
@@ -617,11 +618,24 @@ class Engine(EngineTakes, EngineDevices, SoundCache):
                     v.stopping = True
 
     def stop_all(self):
-        """Stop everything now: the panic button skips the sounds' own fade-outs."""
+        """Stop everything now: the panic button skips the sounds' own fade-outs, and
+        the live echo / reverb tails fade out at once too (livefx FADE)."""
         with self.lock:
             for v in self.voices:
                 v.fade_out = 0.0
                 v.stopping = True
+            self._flush_fx("sounds")
+
+    def stop_radio(self):
+        """The radio stopped: what's still queued for it fades out over a few ms
+        instead of playing on, and so do its live effects' tails."""
+        for ring in (self.ring_rmain, self.ring_rmon, self.ring_robs):
+            ring.fade_out()
+        self._flush_fx("radio")
+
+    def _flush_fx(self, bus: str):
+        # a count the audio thread compares (_fx): it alone touches the LiveFx
+        self._fx_gen[bus] = self._fx_gen.get(bus, 0) + 1
 
     def _current(self, sid: str) -> Voice | None:
         cur = [v for v in self.voices if v.sid == sid and not v.stopping and not v.finished]
@@ -869,10 +883,15 @@ class Engine(EngineTakes, EngineDevices, SoundCache):
             fx = self.sound_fx
         key = out if key is None else key
         f = self._sfx.get(key)
+        gen = self._fx_gen.get("sounds" if key == out else key[1], 0)
         if f is None or f.rate != self.rates[out]:
             if not fx:
                 return x
             f = self._sfx[key] = livefx.LiveFx(self.rates[out])
+            f.gen = gen
+        if f.gen != gen:
+            f.gen = gen
+            f.flush()
         y = f.process(x, fx)
         if not fx and f.idle:
             self._sfx.pop(key, None)

@@ -288,6 +288,7 @@ class Ring:
             self.max_fill = int(rate * self.max_s)      # beyond this, skip ahead (latency)
             self.max_prefill = max(self.prefill, int(rate * self.grow_to_s))
             self.fade = max(1, int(rate * self.FADE_S))
+            self._stop_left = 0   # frames left of a fade_out()
             self._fade_in = True
             self.r = self.w = self.count = 0
             self.primed = False
@@ -363,10 +364,23 @@ class Ring:
 
     def clear(self):
         with self.lock:
-            self.r = self.w = self.count = 0
-            self.primed = False
-            self._fade_in = True
-            self._est_reset()
+            self._clear()
+
+    def _clear(self):
+        self.r = self.w = self.count = 0
+        self.primed = False
+        self._fade_in = True
+        self._stop_left = 0
+        self._est_reset()
+
+    def fade_out(self):
+        """The source stopped: the next reads play what's queued for `fade` more
+        frames, fading to silence, and drop the rest (no hard edge, no play-out)."""
+        with self.lock:
+            if self.count and self.primed:
+                self._stop_left = self.fade
+            else:
+                self._clear()
 
     def write(self, x: np.ndarray):
         with self.lock:
@@ -397,6 +411,17 @@ class Ring:
 
     def read(self, n: int) -> np.ndarray | None:
         with self.lock:
+            if self._stop_left:
+                k = min(n, self.count, self._stop_left)
+                out = np.zeros((n, CH), np.float32)
+                g = (self._stop_left - np.arange(1, k + 1)) / np.float32(self.fade)
+                out[:k] = self._peek(k) * g.astype(np.float32)[:, None]
+                self.r = (self.r + k) % self.cap
+                self.count -= k
+                self._stop_left -= k
+                if k < n or not self._stop_left:
+                    self._clear()
+                return out
             if not self.primed:
                 if self.count < self.prefill + n:
                     return None
