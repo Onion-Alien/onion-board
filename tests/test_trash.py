@@ -49,6 +49,23 @@ def test_old_entries_go_for_good(app_dir):
     assert trash.items() == [] and not (trash.folder() / "old.wav").exists()
 
 
+def test_forgetting_a_program_leaves_old_sounds_for_later(app_dir, monkeypatch):
+    # it's asked on the UI thread: sending old audio to the Recycle Bin there froze
+    # the window. The next start lets go of them
+    trash.put_sound(_sound(app_dir, "old"), 0)
+    items = trash.load()
+    items[0].when = time.time() - (trash.KEEP_DAYS + 1) * 86400
+    trash._save(items)
+    gone = []
+    with monkeypatch.context() as m:
+        m.setattr(trash, "_destroy", gone.append)
+        trash.put_app("game.exe", {"vol": 0.5}, "Game")
+    assert gone == [] and len(trash.items()) == 2
+    trash.prune()
+    assert [i.kind for i in trash.items()] == [trash.APP]
+    assert not (trash.folder() / "old.wav").exists()
+
+
 def test_forget_deletes_the_files(app_dir):
     trash.put_sound(_sound(app_dir, "f1"), 0)
     trash.forget(trash.items()[0].id)

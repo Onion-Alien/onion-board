@@ -270,13 +270,17 @@ def put_app(exe: str, spec: dict, name: str, hidden: bool = False, path: str = "
     if path:
         data["path"] = path
     item = Item(uuid.uuid4().hex[:12], APP, name or exe, time.time(), data)
-    _add(item)
+    # asked on the UI thread: letting go of old sounds sends their audio to the
+    # Recycle Bin, which can take Windows many seconds. The next sound put in the
+    # bin (on a worker) or the next start does it instead
+    _add(item, prune=False)
     return item
 
 
-def _add(*new: Item) -> list[Item] | None:
+def _add(*new: Item, prune: bool = True) -> list[Item] | None:
     """List `new` in the bin (one read, one save): the bin as saved, or None if its
-    list is locked: the rest of the bin is kept, unchanged."""
+    list is locked: the rest of the bin is kept, unchanged. `prune`: also let go of
+    what's been in it too long (disk work)."""
     with _lock:
         all_, ok = _read(tries=10)
         if not ok:
@@ -284,7 +288,7 @@ def _add(*new: Item) -> list[Item] | None:
                         ", ".join(i.name for i in new))
             return None
         all_.extend(new)
-        kept = _prune(all_)
+        kept = _prune(all_) if prune else all_
         _save(kept)
         return kept
 
