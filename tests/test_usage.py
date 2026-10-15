@@ -1058,6 +1058,19 @@ def test_ffmpeg_failure_survives_a_send_and_restart_until_verified_recovery(sent
     assert not cfg.stats_used
 
 
+def test_ffmpeg_check_that_only_timed_out_is_neither_broken_nor_recovered(sent):
+    cfg = Config()
+    usage.ffmpeg_state(cfg, "slow")
+    usage.ffmpeg_state(cfg, "ok")
+    usage.remember(cfg)
+    assert not cfg.stats_ffmpeg_failed and not cfg.stats_used
+    cfg = Config(stats_ffmpeg_failed=True)   # broken before: still waiting for proof
+    usage.ffmpeg_state(cfg, "slow")
+    assert cfg.stats_ffmpeg_failed
+    usage.ffmpeg_state(cfg, "get-failed")    # the get it started failed: that counts
+    assert cfg.stats_ffmpeg_failed
+
+
 def test_ffmpeg_first_install_and_healthy_reinstall_arent_recoveries(sent):
     cfg = Config()
     usage.ffmpeg_state(cfg, "missing")

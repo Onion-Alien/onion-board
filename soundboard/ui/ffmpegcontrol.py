@@ -169,7 +169,7 @@ class FfmpegControl(Controller):
         if h is not None:
             self.health = h
             if not err:   # a check or successful fix, never a failed/cancelled fix's stale health
-                usage.ffmpeg_state(mw.cfg, h.state)
+                usage.ffmpeg_state(mw.cfg, "slow" if h.slow else h.state)
                 usage.remember(mw.cfg)
                 mw._save_later()
         if err is None:

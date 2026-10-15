@@ -197,6 +197,19 @@ def test_startup_broken_then_working_check_counts_recovery(window, monkeypatch):
     assert "ffmpeg-recovered" in window.cfg.stats_used
 
 
+def test_startup_check_that_timed_out_isnt_counted_broken(window, monkeypatch):  # noqa: F811
+    """A check that only didn't answer in time (a new install's first run behind a virus
+    scan) still gets FFmpeg by itself, but isn't counted as broken."""
+    monkeypatch.setattr(usage, "enabled", lambda: True)
+    monkeypatch.setattr(usage, "_used", set())
+    window.ffctl.auto_tried = True   # test checks, without starting a download
+    window.ffctl.on_answer(ffmpegget.Health(ffmpegget.BROKEN, path="ffmpeg.exe",
+                                            why="it didn't answer", slow=True), None)
+    assert not window.cfg.stats_ffmpeg_failed and "ffmpeg-broken" not in window.cfg.stats_used
+    _found(window, ffmpegget.OK)
+    assert "ffmpeg-recovered" not in window.cfg.stats_used
+
+
 @pytest.mark.parametrize("err", [ffmpegget.Stopped("Stopped."), ffmpegget.GetError("failed")])
 def test_failed_or_stopped_fix_cannot_recover_from_stale_health(window, monkeypatch, err):  # noqa: F811
     monkeypatch.setattr(usage, "enabled", lambda: True)
