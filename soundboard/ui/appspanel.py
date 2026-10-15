@@ -145,7 +145,7 @@ class AppsTab(QWidget):
         self.empty = QWidget()
         ev = QVBoxLayout(self.empty)
         ev.setContentsMargins(0, 12, 0, 0)
-        ev.setSpacing(4)
+        ev.setSpacing(12)
         ev.addStretch(1)
         self.bun = BunnyWidget(height=130, pad=18, sad=0.6,
                                lines=(_("play something?"), _("so quiet…"),
@@ -154,13 +154,15 @@ class AppsTab(QWidget):
         ev.addWidget(self.bun, 0, Qt.AlignmentFlag.AlignHCenter)
         self.empty_text = hint_label(_("Nothing is playing sound right now. Start some music, "
                                        "a video or a call and it'll show up here."))
+        self.empty_text.setObjectName("empty")   # the Sounds tab's empty line
+        self.empty_text.setStyleSheet("padding:8px 12px; background:transparent;")
         self.empty_text.setAlignment(Qt.AlignmentFlag.AlignCenter)
         ev.addWidget(self.empty_text)
         ev.addStretch(1)
         self.list_layout.addWidget(self.empty, 1)
         self._tools_for_rows()
         self.list_layout.addLayout(self.grid)
-        self.list_layout.addStretch(1)
+        self.list_layout.addStretch(0)   # no cards yet: the empty page gets the room
         self.scroll_area.setWidget(self.list)
         v.addWidget(self.scroll_area, 1)
         self.big: AppRow | None = None   # the card in the big view (the rest are hidden)
