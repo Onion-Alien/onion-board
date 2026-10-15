@@ -3449,5 +3449,14 @@
   "Names can be up to {n} characters, so it's “{name}”.": "Nimessä voi olla enintään {n} merkkiä, joten se on “{name}”.",
   "They go in a category called “{name}”.": "Ne menevät luokkaan nimeltä “{name}”.",
   "Type a name first.": "Kirjoita ensin nimi.",
-  "✓ Renamed to “{new}”. Another sound has that name too.": "✓ Uudelleennimetty \"{new}\". Toisellakin äänellä on sama nimi."
+  "✓ Renamed to “{new}”. Another sound has that name too.": "✓ Uudelleennimetty \"{new}\". Toisellakin äänellä on sama nimi.",
+  "Disguise": "Naamioituminen",
+  "Funny": "Hauskat",
+  "Mine": "Omat",
+  "Radio & places": "Radio & paikat",
+  "Robots & sci-fi": "Robotit & scifi",
+  "Scary": "Pelottavat",
+  "Add “{name}” to Favorites": "Lisää ”{name}” Suosikkeihin",
+  "No favorites yet. Click the star in a voice's corner to keep it here.": "Ei vielä suosikkeja. Klikkaa tähteä äänen kulmassa, niin se pysyy täällä.",
+  "Remove “{name}” from Favorites": "Poista ”{name}” Suosikeista"
 }

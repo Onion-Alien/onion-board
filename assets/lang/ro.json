@@ -3525,5 +3525,14 @@
   "Names can be up to {n} characters, so it's “{name}”.": "Numele pot avea cel mult {n} caractere, așa că e „{name}”.",
   "They go in a category called “{name}”.": "Ajung într-o categorie numită „{name}”.",
   "Type a name first.": "Scrie mai întâi un nume.",
-  "✓ Renamed to “{new}”. Another sound has that name too.": "✓ Redenumit în „{new}”. Și alt sunet are numele ăsta."
+  "✓ Renamed to “{new}”. Another sound has that name too.": "✓ Redenumit în „{new}”. Și alt sunet are numele ăsta.",
+  "Disguise": "Deghizare",
+  "Funny": "Amuzante",
+  "Mine": "Ale mele",
+  "Radio & places": "Radio și locuri",
+  "Robots & sci-fi": "Roboți și SF",
+  "Scary": "Înfricoșătoare",
+  "Add “{name}” to Favorites": "Adaugă „{name}” la Favorite",
+  "No favorites yet. Click the star in a voice's corner to keep it here.": "Încă nu ai favorite. Dă clic pe steaua din colțul unei voci ca s-o ții aici.",
+  "Remove “{name}” from Favorites": "Scoate „{name}” din Favorite"
 }

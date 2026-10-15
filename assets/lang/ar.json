@@ -3753,5 +3753,14 @@
   "Names can be up to {n} characters, so it's “{name}”.": "يمكن أن يصل الاسم إلى {n} حرفًا، لذا أصبح “{name}”.",
   "They go in a category called “{name}”.": "ستوضع في فئة باسم “{name}”.",
   "Type a name first.": "اكتب اسمًا أولًا.",
-  "✓ Renamed to “{new}”. Another sound has that name too.": "✓ أُعيدت التسمية إلى “{new}”. يوجد صوت آخر بهذا الاسم أيضًا."
+  "✓ Renamed to “{new}”. Another sound has that name too.": "✓ أُعيدت التسمية إلى “{new}”. يوجد صوت آخر بهذا الاسم أيضًا.",
+  "Disguise": "تنكّر",
+  "Funny": "مضحك",
+  "Mine": "أصواتي",
+  "Radio & places": "راديو وأماكن",
+  "Robots & sci-fi": "روبوتات وخيال علمي",
+  "Scary": "مخيف",
+  "Add “{name}” to Favorites": "أضف «{name}» إلى المفضلة",
+  "No favorites yet. Click the star in a voice's corner to keep it here.": "لا توجد مفضلة بعد. انقر النجمة في زاوية الصوت لتبقيه هنا.",
+  "Remove “{name}” from Favorites": "أزل «{name}» من المفضلة"
 }

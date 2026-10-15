@@ -3373,5 +3373,14 @@
   "Names can be up to {n} characters, so it's “{name}”.": "名稱最多 {n} 個字元，所以是「{name}」。",
   "They go in a category called “{name}”.": "它們會放進名為「{name}」的分類。",
   "Type a name first.": "請先輸入名稱。",
-  "✓ Renamed to “{new}”. Another sound has that name too.": "✓ 已重新命名為「{new}」。另一個音效也叫這個名字。"
+  "✓ Renamed to “{new}”. Another sound has that name too.": "✓ 已重新命名為「{new}」。另一個音效也叫這個名字。",
+  "Disguise": "偽裝",
+  "Funny": "搞笑",
+  "Mine": "我的",
+  "Radio & places": "電台與場景",
+  "Robots & sci-fi": "機器人與科幻",
+  "Scary": "恐怖",
+  "Add “{name}” to Favorites": "把「{name}」加入收藏夾",
+  "No favorites yet. Click the star in a voice's corner to keep it here.": "還沒有收藏。點聲音卡角落的星星，它就會出現在這裡。",
+  "Remove “{name}” from Favorites": "把「{name}」移出收藏夾"
 }

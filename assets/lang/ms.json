@@ -3373,5 +3373,14 @@
   "Names can be up to {n} characters, so it's “{name}”.": "Nama boleh sampai {n} aksara, jadi namanya “{name}”.",
   "They go in a category called “{name}”.": "Semuanya masuk ke kategori bernama “{name}”.",
   "Type a name first.": "Taip nama dahulu.",
-  "✓ Renamed to “{new}”. Another sound has that name too.": "✓ Dinamakan semula kepada “{new}”. Ada bunyi lain dengan nama yang sama."
+  "✓ Renamed to “{new}”. Another sound has that name too.": "✓ Dinamakan semula kepada “{new}”. Ada bunyi lain dengan nama yang sama.",
+  "Disguise": "Penyamaran",
+  "Funny": "Lucu",
+  "Mine": "Saya punya",
+  "Radio & places": "Radio & tempat",
+  "Robots & sci-fi": "Robot & sci-fi",
+  "Scary": "Seram",
+  "Add “{name}” to Favorites": "Tambah “{name}” ke Kegemaran",
+  "No favorites yet. Click the star in a voice's corner to keep it here.": "Belum ada kegemaran. Klik bintang di penjuru suara untuk menyimpannya di sini.",
+  "Remove “{name}” from Favorites": "Buang “{name}” dari Kegemaran"
 }

@@ -3449,5 +3449,14 @@
   "Names can be up to {n} characters, so it's “{name}”.": "Hanggang {n} character lang ang pangalan, kaya “{name}” ito.",
   "They go in a category called “{name}”.": "Mapupunta sila sa category na “{name}”.",
   "Type a name first.": "Mag-type muna ng pangalan.",
-  "✓ Renamed to “{new}”. Another sound has that name too.": "✓ Na-rename sa “{new}”. May isa pang sound na ganito rin ang pangalan."
+  "✓ Renamed to “{new}”. Another sound has that name too.": "✓ Na-rename sa “{new}”. May isa pang sound na ganito rin ang pangalan.",
+  "Disguise": "Pagbabalatkayo",
+  "Funny": "Nakakatawa",
+  "Mine": "Akin",
+  "Radio & places": "Radyo at mga lugar",
+  "Robots & sci-fi": "Robot at sci-fi",
+  "Scary": "Nakakatakot",
+  "Add “{name}” to Favorites": "Idagdag ang “{name}” sa Mga paborito",
+  "No favorites yet. Click the star in a voice's corner to keep it here.": "Wala pang paborito. I-click ang bituin sa sulok ng isang boses para itago ito rito.",
+  "Remove “{name}” from Favorites": "Alisin ang “{name}” sa Mga paborito"
 }

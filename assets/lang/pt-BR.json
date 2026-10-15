@@ -3449,5 +3449,14 @@
   "Names can be up to {n} characters, so it's “{name}”.": "Os nomes podem ter até {n} caracteres, então ficou “{name}”.",
   "They go in a category called “{name}”.": "Eles vão para uma categoria chamada “{name}”.",
   "Type a name first.": "Digite um nome primeiro.",
-  "✓ Renamed to “{new}”. Another sound has that name too.": "✓ Renomeado para “{new}”. Outro som também tem esse nome."
+  "✓ Renamed to “{new}”. Another sound has that name too.": "✓ Renomeado para “{new}”. Outro som também tem esse nome.",
+  "Disguise": "Disfarce",
+  "Funny": "Engraçadas",
+  "Mine": "Minhas",
+  "Radio & places": "Rádio e lugares",
+  "Robots & sci-fi": "Robôs e ficção científica",
+  "Scary": "Assustadoras",
+  "Add “{name}” to Favorites": "Adicionar “{name}” aos Favoritos",
+  "No favorites yet. Click the star in a voice's corner to keep it here.": "Nenhum favorito ainda. Clique na estrela no canto de uma voz para guardá-la aqui.",
+  "Remove “{name}” from Favorites": "Tirar “{name}” dos Favoritos"
 }
