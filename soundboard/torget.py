@@ -93,6 +93,11 @@ def installed(dest: Path | None = None) -> bool:
     return ok and all((dest / rel).is_file() for rel in KEEP.values())
 
 
+def outdated() -> bool:
+    """A Tor downloaded by an older version of the app is here (not this release's)."""
+    return (bin_dir() / STAMP).is_file() and not installed()
+
+
 def download(progress: Callable[[int, int], None] | None = None) -> bytes:
     """The tarball, checked against SHA256: from dist.torproject.org, or from the
     archive once dist no longer has this version. `progress(done, total)` is called as

@@ -208,6 +208,9 @@ class FlatMap(QWidget):
         self._reveal_wait = False                # ...stations came before the land did
         self._land_set = False
         self._names_pic: tuple | None = None     # (view, picture): the names over the pop-in
+        self._names_build: tuple | None = None   # (view, picture, its steps): being drawn
+        self._dots_pic: tuple | None = None      # (view, picture, which are on it): the
+                                                 # dots done popping in, drawn once
         self._delay = np.zeros(0)                # ...and each one's turn to pop in
         self._reveal = QTimer(self)
         self._reveal.setInterval(16)
@@ -323,6 +326,8 @@ class FlatMap(QWidget):
         if self._reveal_t0 is None or time.monotonic() - self._reveal_t0 >= REVEAL_S:
             self._reveal_t0 = None
             self._names_pic = None
+            self._drop_names()
+            self._dots_pic = None
             self._reveal.stop()
         self.update()
 
@@ -914,37 +919,56 @@ class FlatMap(QWidget):
 
     def _paint_reveal(self, p: QPainter):
         """The first stations popping in, drawn live over the map (the tiles with
-        them on wait till all are in): just the ones in view, each its turn."""
+        them on wait till all are in): just the ones in view, each its turn. A dot
+        done growing is drawn once, into a picture kept for the view, so a frame
+        draws only the ones still growing: drawing all ~3000 every frame was 4-7 ms
+        of back-to-back draw calls each 16 ms, the most right as the last ones came
+        in, and the sound playing skipped (the audio threads wait on each call)."""
         if self._reveal_t0 is None:   # waiting on the land: no dots yet
             return
         t = time.monotonic() - self._reveal_t0
-        size = _pop((t - self._delay) / POP_S) if len(self._delay) == len(self._r) else 1.0
+        n = len(self._r)
+        if len(self._delay) == n:
+            x = (t - self._delay) / POP_S
+            size, done = _pop(x), x >= 1.0
+        else:
+            size, done = np.ones(n), np.ones(n, bool)
         xs, ys = self._screen()
-        on = np.flatnonzero((size > 0.05) & (xs > -8) & (xs < self.width() + 8)
-                            & (ys > -8) & (ys < self.height() + 8))
+        seen = (xs > -8) & (xs < self.width() + 8) & (ys > -8) & (ys < self.height() + 8)
         accent = QColor(theme.T["accent"])
         accent.setAlphaF(0.85)
-        p.setPen(Qt.PenStyle.NoPen)
-        p.setBrush(accent)
-        r = self._r * self._grow() * size
-        for i in on.tolist():
-            p.drawEllipse(QPointF(xs[i], ys[i]), r[i], r[i])
-
-    def _paint_names(self, p: QPainter):
-        """The country names over the pop-in (the stand-in under it is just land), so
-        they're there before the dots: drawn once for the view, then copied."""
-        if not self._labels:
-            return
+        r = self._r * self._grow()
         dpr = self.devicePixelRatioF()
-        s = self._scale()
-        view = (round(s, 6), self.cx, self.cy, self.width(), self.height(), dpr,
-                self._ver)
-        if self._names_pic is None or self._names_pic[0] != view:
-            pic = QPixmap(max(1, round(self.width() * dpr)),
-                          max(1, round(self.height() * dpr)))
+        view = (round(self._scale(), 6), self.cx, self.cy, self.width(), self.height(),
+                dpr, self._ver, n)
+        if self._dots_pic is None or self._dots_pic[0] != view:
+            pic = QImage(max(1, round(self.width() * dpr)), max(1, round(self.height() * dpr)),
+                         QImage.Format.Format_ARGB32_Premultiplied)
             pic.setDevicePixelRatio(dpr)
             pic.fill(Qt.GlobalColor.transparent)
+            self._dots_pic = (view, pic, np.zeros(n, bool))
+        _view, pic, drawn = self._dots_pic
+        new = np.flatnonzero(done & seen & ~drawn)
+        if len(new):
             q = QPainter(pic)
+            q.setRenderHint(QPainter.RenderHint.Antialiasing)
+            q.setPen(Qt.PenStyle.NoPen)
+            q.setBrush(accent)
+            for i in new.tolist():
+                q.drawEllipse(QPointF(xs[i], ys[i]), r[i], r[i])
+            q.end()
+            drawn[new] = True
+        p.drawImage(0, 0, pic)
+        p.setPen(Qt.PenStyle.NoPen)
+        p.setBrush(accent)
+        r = r * size
+        for i in np.flatnonzero((size > 0.05) & ~done & seen).tolist():
+            p.drawEllipse(QPointF(xs[i], ys[i]), r[i], r[i])
+
+    def _names_steps(self, pic: QPixmap, s: float):
+        """The steps that draw the country names in view onto `pic`, a name a step."""
+        q = QPainter(pic)
+        try:
             q.setRenderHint(QPainter.RenderHint.Antialiasing)
             t = theme.T
             font, colour = self._label_style()
@@ -953,6 +977,7 @@ class FlatMap(QWidget):
             halo.setJoinStyle(Qt.PenJoinStyle.RoundJoin)
             rect = QRectF(self.rect())
             placed = self._place_labels(s)
+            yield
             for k in self._copies():
                 corner = self._origin(k, s)
                 for box, name in placed:
@@ -963,8 +988,44 @@ class FlatMap(QWidget):
                     path.addText(box.left(), box.top() + fm.ascent(), font, name)
                     q.strokePath(path, halo)
                     q.fillPath(path, colour)
+                    yield
+        finally:
             q.end()
-            self._names_pic = (view, pic)
+
+    def _drop_names(self):
+        if self._names_build is not None:
+            self._names_build[2].close()   # ends its painter
+            self._names_build = None
+
+    def _paint_names(self, p: QPainter):
+        """The country names over the pop-in (the stand-in under it is just land), so
+        they're there before the dots: drawn once for the view, then copied. Drawn a
+        slice a paint (all at once was ~25 ms, a skip in the sound playing), shown
+        when they're all there."""
+        if not self._labels:
+            return
+        dpr = self.devicePixelRatioF()
+        s = self._scale()
+        view = (round(s, 6), self.cx, self.cy, self.width(), self.height(), dpr,
+                self._ver)
+        if self._names_pic is None or self._names_pic[0] != view:
+            if self._names_build is None or self._names_build[0] != view:
+                self._drop_names()
+                pic = QPixmap(max(1, round(self.width() * dpr)),
+                              max(1, round(self.height() * dpr)))
+                pic.setDevicePixelRatio(dpr)
+                pic.fill(Qt.GlobalColor.transparent)
+                self._names_build = (view, pic, self._names_steps(pic, s))
+            _view, pic, steps = self._names_build
+            end = time.perf_counter() + SLICE_S
+            while time.perf_counter() < end:
+                if next(steps, steps) is steps:   # that was its last step
+                    self._names_build = None
+                    self._names_pic = (view, pic)
+                    break
+            else:
+                self._towns_later.start()   # the rest in a moment
+                return
         p.drawPixmap(0, 0, self._names_pic[1])
 
     def paintEvent(self, _e):

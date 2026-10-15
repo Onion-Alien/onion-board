@@ -10,6 +10,7 @@ import time
 from typing import TYPE_CHECKING
 
 from soundboard import thumbs, winkeys
+from soundboard.sendfx import CEILING_DB
 from soundboard.i18n import _
 from soundboard.ui import appstate
 from soundboard.ui.controller import Controller
@@ -199,6 +200,8 @@ class TickControl(Controller):
             mw.ytresults.show_now(mw.searchctl._link_url, "" if prog is None else
                                     "paused" if paused else "playing")
         mw.playctl._update_chips(playing)
+        # held at the limiter's ceiling, it never reached the red zone
+        mw.out_meter.top_db = CEILING_DB if e.limiter_on else 0.0
         mw.out_meter.set_level(self._heard_level())
         mw.logo.set_level(e.level_play)   # anything playing, not your voice
         mw.mic_meter.set_level(e.level_mic if e.mic_stream else 0.0)

@@ -378,7 +378,10 @@ def test_the_country_names_show_before_the_dots(qapp):
     assert m.revealing() and m._reveal_t0 is None   # no dots till the land is in
     m.set_land(rings, labels)
     assert m._reveal_t0 > time.monotonic() + flatmap.NAMES_FIRST_S / 2
-    m.grab()
+    end = time.monotonic() + 2
+    while m._names_pic is None and time.monotonic() < end:   # (drawn a slice a paint)
+        m.grab()
+        qapp.processEvents()
     assert m._names_pic is not None                 # the names are on the map...
     t = time.monotonic() - m._reveal_t0
     assert (flatmap._pop((t - m._delay) / flatmap.POP_S) < 0.05).all()   # ...no dots yet
@@ -387,6 +390,37 @@ def test_the_country_names_show_before_the_dots(qapp):
         qapp.processEvents()
         time.sleep(0.005)
     assert not m.revealing() and m._names_pic is None
+    m.close()
+
+
+def test_the_dots_done_popping_in_are_drawn_once(qapp):
+    """Every frame of the pop-in drew all ~3000 dots again (4-7 ms of draw calls each
+    16 ms, the most as the last ones came in) and the sound playing skipped. A dot
+    done growing goes into a picture kept for the view, drawn once."""
+    from soundboard.ui import flatmap
+    m = FlatMap()
+    m.resize(600, 400)
+    m.show()
+    m.set_land([], [])
+    m.set_points([{"id": f"s{i}", "la": (i % 50) - 25.0, "lo": i * 1.1 - 165, "k": i}
+                  for i in range(300)])
+    m._delay[:] = 0                                # all in, still revealing
+    m._reveal_t0 = time.monotonic() - flatmap.POP_S - 0.1
+    m.grab()
+    view, pic, drawn = m._dots_pic
+    xs, ys = m._screen()
+    seen = (xs > -8) & (xs < m.width() + 8) & (ys > -8) & (ys < m.height() + 8)
+    assert drawn.sum() == seen.sum() > 100
+    m.grab()
+    assert m._dots_pic[1] is pic                  # the same picture, nothing drawn again
+    m.zoom = 2.0                                  # a new view: a new picture
+    m.grab()
+    assert m._dots_pic[0] != view
+    end = time.monotonic() + 2
+    while m.revealing() and time.monotonic() < end:
+        qapp.processEvents()
+        time.sleep(0.005)
+    assert m._dots_pic is None                    # let go once they're all in
     m.close()
 
 

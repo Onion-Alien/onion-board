@@ -1031,6 +1031,18 @@ def test_tab_lists_popular_stations_and_starts_off_air(tab):
     assert tab.engine.radio_vol == pytest.approx(0.5)
 
 
+def test_the_station_list_never_says_it_needs_less_than_its_tabs(tab):
+    """A plain setMinimumWidth(220) overrode what the Popular / Favorites / Recent row
+    needs, so the window kept the map beside a list squashed to "Favorit" (the map
+    is meant to give way first)."""
+    panel = tab.station_panel
+    lay = panel.layout()
+    lay.invalidate()
+    assert panel.minimumSizeHint().width() >= lay.minimumSize().width()
+    assert panel.minimumSizeHint().width() >= 220
+    assert panel.minimumWidth() == 0   # an explicit one would win over the hint
+
+
 def test_every_radio_control_has_a_name_a_screen_reader_can_say(tab):
     """Play/Stop, the country and sort boxes, the station list and the Popular /
     Favorites / Recent buttons were silent, worst when a small window shows them as

@@ -44,7 +44,8 @@ def test_a_height_step_hidden_for_width_comes_back_when_wider(qapp):
     f.add(20, "h", responsive.hide(b))
     root.show()
     f.fit(QSize(400, 400))
-    assert b.isHidden() and f.compact_count() == 2
+    # (a fits once b is hidden: it's given back)
+    assert b.isHidden() and not a.isHidden() and f.compact_count() == 1
     f.fit(QSize(1000, 400))   # the same height, wide again: both fit
     assert not b.isHidden() and not a.isHidden() and f.compact_count() == 0
     root.close()

@@ -45,7 +45,7 @@ class PrivacyPage(Page):
         from PySide6.QtWidgets import QFileDialog, QSizePolicy
 
         from soundboard import library, quality
-        from soundboard.ui.panel import heading_row, icon_button
+        from soundboard.ui.panel import icon_button
         q = quality.current
         w, v = self._page()
         self.dlg._data_widgets = {}
@@ -115,8 +115,8 @@ class PrivacyPage(Page):
               "Videos use a lot more data: about 5 to 25 MB a minute. Without ffmpeg "
               "installed only lower-quality videos can be saved (usually 360p)."),
             q.save_video, lambda b: self._data_set(save_video=b))
-        item = cv.itemAt(cv.count() - 1)   # _option's hint: its words follow FFmpeg
-        hint_lbl = item.widget() if item is not None else None
+        from soundboard.ui.widgets import widget_at   # (it imports this module)
+        hint_lbl = widget_at(cv, cv.count() - 1)   # _option's hint: its words follow FFmpeg
         assert isinstance(hint_lbl, QLabel)
         self.dlg._save_video_hint = hint_lbl
         self.dlg._has_ff = has_ff
@@ -169,30 +169,6 @@ class PrivacyPage(Page):
               "none of it and the menu hides it; what's already saved stays."),
             q.keep_source, lambda b: self._data_set(keep_source=b))
 
-        # FFmpeg: M4A, AAC and video files need it. The installer offers it once; someone
-        # who skipped it had no way to add it later, so the app can get it itself now.
-        # Always shown: whether it works (MainWindow.check_ffmpeg), and a way to fix it.
-        ff_box = QWidget()
-        ff_col = QVBoxLayout(ff_box)
-        ff_col.setContentsMargins(0, 0, 0, 0)
-        ff_col.setSpacing(6)
-        self.dlg.ff_state = QLabel()
-        self.dlg.ff_state.setObjectName("pill")       # works / missing / won't start
-        self.dlg.ff_state.setProperty("keepline", True)
-        # "FFmpeg": a name, the same in every language; the pill right after it
-        head, _name, _marks = heading_row("FFmpeg", "video", beside=(self.dlg.ff_state,))
-        ff_col.addLayout(head)
-        self.dlg.ff_note = QLabel()
-        self.dlg.ff_note.setObjectName("hint")
-        self.dlg.ff_note.setWordWrap(True)
-        ff_col.addWidget(self.dlg.ff_note)
-        self.dlg.btn_ffmpeg = QPushButton(_("Get FFmpeg"))
-        icons.set_icon(self.dlg.btn_ffmpeg, "download")
-        self.dlg.ff_box = ff_box
-        ff_col.addWidget(self.dlg.btn_ffmpeg, 0, Qt.AlignmentFlag.AlignLeft)   # buttons sit left
-        cv.addWidget(ff_box)
-        self.dlg.btn_ffmpeg.clicked.connect(self._get_ffmpeg)
-        self._helper_rows(cv)
         v.addWidget(card)
 
         card, cv = self._card(_("Radio"),
@@ -272,11 +248,49 @@ class PrivacyPage(Page):
         finally:
             self.dlg._data_syncing = False
 
+    # ------------------------------------------------------------------ helper programs
+    def _tools_card(self):
+        """Settings > Updates: the programs the app downloads and plays sounds with
+        (FFmpeg, yt-dlp, the JavaScript engine, Tor), each with how it is, how it
+        updates and its button."""
+        from soundboard.ui.panel import heading_row
+        card, cv = self._card(_("Helper programs"),
+                              _("The programs the app uses to download and play sounds. "
+                                "They update with the app, to the exact versions it was "
+                                "tested with. Only yt-dlp can update sooner, if you let it."),
+                              icon="download")
+        # FFmpeg: M4A, AAC and video files need it. The installer offers it once; someone
+        # who skipped it had no way to add it later, so the app can get it itself now.
+        # Always shown: whether it works (MainWindow.check_ffmpeg), and a way to fix it.
+        ff_box = QWidget()
+        ff_col = QVBoxLayout(ff_box)
+        ff_col.setContentsMargins(0, 0, 0, 0)
+        ff_col.setSpacing(6)
+        self.dlg.ff_state = QLabel()
+        self.dlg.ff_state.setObjectName("pill")       # works / missing / won't start
+        self.dlg.ff_state.setProperty("keepline", True)
+        # "FFmpeg": a name, the same in every language; the pill right after it
+        head, _name, _marks = heading_row("FFmpeg", "video", beside=(self.dlg.ff_state,))
+        ff_col.addLayout(head)
+        self.dlg.ff_note = QLabel()
+        self.dlg.ff_note.setObjectName("hint")
+        self.dlg.ff_note.setWordWrap(True)
+        ff_col.addWidget(self.dlg.ff_note)
+        self.dlg.btn_ffmpeg = QPushButton(_("Get FFmpeg"))
+        icons.set_icon(self.dlg.btn_ffmpeg, "download")
+        self.dlg.ff_box = ff_box
+        ff_col.addWidget(self.dlg.btn_ffmpeg, 0, Qt.AlignmentFlag.AlignLeft)   # buttons sit left
+        cv.addWidget(ff_box)
+        self.dlg.btn_ffmpeg.clicked.connect(self._get_ffmpeg)
+        self._helper_rows(cv)
+        return card
+
     def _ffmpeg_sync(self):
         """The FFmpeg row: whether it works, how far its download is, and Reinstall /
         Get FFmpeg / Fix it. It shows the main window's state (FfmpegControl.news
         calls this), so it and the bar always agree."""
         from soundboard import ffmpegget
+        self._video_hint_sync()
         button = getattr(self.dlg, "btn_ffmpeg", None)
         if button is None or not qt_valid(button):
             return
@@ -296,6 +310,11 @@ class PrivacyPage(Page):
             tone, label = "on", _("Reinstall")
             note = _("M4A, AAC and video files play, and videos can be saved. If "
                      "they stop working, reinstall it.")
+            if not ffmpegget.is_own(h.path):
+                note = " ".join((note, _("It came from winget or another program: that "
+                                         "updates it, not the app.")))
+            else:
+                note = " ".join((note, _("It updates with the app.")))
         elif h.state == ffmpegget.MISSING:
             state, tone, label = _("Missing"), "slow", _("Get FFmpeg")
             note = _("M4A, AAC and video files need FFmpeg. It's a free download of "
@@ -321,9 +340,18 @@ class PrivacyPage(Page):
             button.setText(_("Getting FFmpeg…") if getting else label)
             button.setToolTip(_("Download FFmpeg (about 110 MB) so M4A, AAC and video "
                                 "files play and videos can be saved"))
-        if h is not None and working != self.dlg._has_ff:   # the video hint's words follow
+
+    def _video_hint_sync(self):
+        """Data & quality's "Also save the video" hint says what FFmpeg changes."""
+        from soundboard import ffmpegget
+        hint = getattr(self.dlg, "_save_video_hint", None)
+        h = ffmpegget.last()
+        if hint is None or not qt_valid(hint) or h is None:
+            return
+        working = h.state == ffmpegget.OK
+        if working != self.dlg._has_ff:
             self.dlg._has_ff = working
-            self.dlg._save_video_hint.setText(
+            hint.setText(
                 _("Add as sound keeps a copy of the video too (the pad is still just its "
                   "sound). Videos use a lot more data: about 5 to 25 MB a minute.") if working
                 else _("Add as sound keeps a copy of the video too (the pad is still just its "
@@ -363,19 +391,37 @@ class PrivacyPage(Page):
 
     def _helper_rows(self, cv):
         """yt-dlp, the JavaScript engine and Tor (only once it's here). Their versions
-        are looked up on workers (_helpers_refresh); the buttons are the Updates and
-        Connection pages' own (ConnectionPage._ytdlp_run, _tor_get)."""
-        from soundboard import torget
+        are looked up on workers (_helpers_refresh); the buttons run the Connection
+        page's jobs (ConnectionPage._ytdlp_run, _tor_get)."""
+        from soundboard import torget, ytdl
         d = self.dlg
         d._ytdlp_msg = d._tor_msg = ""
         left = Qt.AlignmentFlag.AlignLeft   # buttons sit left
         # "yt-dlp" and "Tor": names, the same in every language
         __, col, d.ytdlp_state, d.ytdlp_note = self._helper_row(cv, "yt-dlp", "link")
-        d.ytdlp_row_btn = QPushButton(_("Update now"))
-        icons.set_icon(d.ytdlp_row_btn, "reload")
-        d.ytdlp_row_btn.setProperty("tip", _("Check for a newer yt-dlp and install it"))
-        d.ytdlp_row_btn.clicked.connect(self._ytdlp_update)
-        col.addWidget(d.ytdlp_row_btn, 0, left)
+        auto = self._option(col, _("Update automatically"),
+                            _("Once a day and after a failed download, gets the newest "
+                              "yt-dlp from PyPI. Off by default: a new version is code the "
+                              "app's makers haven't checked yet."),
+                            self.mw.cfg.ytdlp_auto_optin,
+                            lambda b: self.mw.set_option("ytdlp_auto_optin", b))
+        d.ytdlp_auto_box = auto
+        row = _button_row()
+        d.ytdlp_btns = []
+        # (label, its icon, the English one for the network log, ytdl's job, tooltip)
+        for text, icon, logged, job, tip in (
+                (_("Update now"), "reload", "Update now", "update",
+                 _("Check for a newer yt-dlp and install it")),
+                (_("Reinstall"), "download", "Reinstall", "reset",
+                 _("Delete the downloaded yt-dlp and its cache, then install a fresh copy"))):
+            b = QPushButton(text)
+            icons.set_icon(b, icon)
+            b.setProperty("tip", tip)
+            b.clicked.connect(lambda __=False, j=job, t=logged:
+                              d.connection._ytdlp_run(getattr(ytdl, j), t))
+            row.addWidget(b)
+            d.ytdlp_btns.append(b)
+        col.addLayout(row)
         d._ytdlp_row_say = self._ytdlp_row_say
 
         __, __, d.js_state, d.js_note = self._helper_row(cv, _("JavaScript engine"), "puzzle")
@@ -440,17 +486,18 @@ class PrivacyPage(Page):
         return {"js": engines[0] if engines else None}
 
     def _helpers_show(self, found: dict):
-        from soundboard import jsengine, torget
+        from soundboard import jsengine, net, torget
         d = self.dlg
-        if not qt_valid(d.ytdlp_state):
-            return   # Settings was closed meanwhile
+        state = getattr(d, "ytdlp_state", None)
+        if state is None or not qt_valid(state):
+            return   # Settings was closed meanwhile, or the rows aren't built
         if "ytdlp" in found:
             version, __ = found["ytdlp"]
             if version:
                 self._pill(d.ytdlp_state, _("Working: version {version}", version=version), "on")
             else:
                 self._pill(d.ytdlp_state, _("Missing"), "slow")
-            if not busy.is_busy(d.ytdlp_row_btn):
+            if not any(busy.is_busy(b) for b in d.ytdlp_btns):
                 d.ytdlp_note.setText(d._ytdlp_msg or _(
                     "Gets the sounds from YouTube, SoundCloud and other links. Sites change "
                     "often, so it needs updating now and then."))
@@ -462,14 +509,15 @@ class PrivacyPage(Page):
             elif engine.name == jsengine.QUICKJS:
                 self._pill(d.js_state, _("Working: {engine}", engine="QuickJS"), "on")
                 d.js_note.setText(_("Lets YouTube downloads get every format. It comes with "
-                                    "the app and only runs on this PC."))
+                                    "the app, updates with it and only runs on this PC."))
             else:
                 name = ENGINE_NAMES.get(engine.name, engine.name)
                 self._pill(d.js_state, _("Working: {engine} {version} (faster)", engine=name,
                                          version=".".join(map(str, engine.version[:2]))), "on")
                 d.js_note.setText(_("Lets YouTube downloads get every format. {engine} is on "
                                     "this PC and faster than the app's own, so it's used "
-                                    "first.", engine=name))
+                                    "first. You update {engine} yourself; the app leaves it "
+                                    "alone.", engine=name))
         if "tor" in found:
             got = found["tor"]
             d.tor_row.setVisible(got is not None)
@@ -481,22 +529,23 @@ class PrivacyPage(Page):
                 if not busy.is_busy(d.tor_row_btn):
                     d.tor_row_btn.setText(_("Update Tor") if outdated else _("Reinstall"))
                     d.tor_note.setText(d._tor_msg or (
-                        _("A newer Tor ({version}) is ready to download.",
-                          version=torget.VERSION) if outdated else
-                        _("Used when Connection is set to Tor. It's up to date.")))
+                        (_("A newer Tor ({version}) came with this app update. Tor is in "
+                           "use (Connection is set to Tor), so press Update Tor when it "
+                           "suits you.",
+                           version=torget.VERSION) if net.mode() == net.TOR else
+                         _("A newer Tor ({version}) came with this app update. The app "
+                           "gets it by itself next start, or press Update Tor.",
+                           version=torget.VERSION)) if outdated else
+                        _("Used when Connection is set to Tor. It's up to date, and updates with "
+                          "the app.")))
 
     def _helpers_offline(self):
         """Offline mode: the buttons that would go online are hidden."""
         from soundboard import net
-        for attr in ("ytdlp_row_btn", "tor_row_btn"):
-            b = getattr(self.dlg, attr, None)
+        tor = getattr(self.dlg, "tor_row_btn", None)
+        for b in (*getattr(self.dlg, "ytdlp_btns", ()), tor):
             if b is not None and qt_valid(b):
                 b.setVisible(not net.offline())
-
-    def _ytdlp_update(self):
-        """Update now: the Updates page's Downloader card does it (_ytdlp_run)."""
-        from soundboard import ytdl
-        self.dlg.connection._ytdlp_run(ytdl.update, "Update now", "Settings > Data & quality")
 
     def _ytdlp_row_say(self, msg: str, done: bool = False):
         """How Update now is going, on this row too; when it's done, the new version."""

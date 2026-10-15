@@ -470,19 +470,21 @@ def test_a_refused_download_does_not_update(pypi, monkeypatch):
 from test_mainwindow import window  # noqa: E402,F401  (the real MainWindow fixture)
 
 
-def test_settings_downloader_card(qapp, window, monkeypatch):  # noqa: F811
+def test_settings_ytdlp_row(qapp, window, monkeypatch):  # noqa: F811
+    """Updates > Helper programs: yt-dlp's Update now says how it went on its row."""
     from soundboard.settings import SettingsDialog
     from soundboard.ui import busy
     monkeypatch.setattr(ytdl, "active_version", lambda: ("2026.8.19", False))
     monkeypatch.setattr(ytdl, "update", lambda: "Updated yt-dlp to 2099.1.1.")
     d = SettingsDialog(window, "updates")
-    assert "2026.8.19 (built in)" in d.ytdlp_label.text()
+    assert [b.text() for b in d.ytdlp_btns] == ["Update now", "Reinstall"]
+    assert not d.ytdlp_auto_box.isChecked()               # opt-in
     d.ytdlp_btns[0].click()                               # Update now
     assert busy.is_busy(d.ytdlp_btns[0]) and d.ytdlp_btns[0].isEnabled()
     monkeypatch.setattr(ytdl, "active_version", lambda: ("2099.1.1", True))
     assert process_events(qapp, lambda: not busy.is_busy(d.ytdlp_btns[0]), 5)
-    assert d.ytdlp_label.text() == ("Updated yt-dlp to 2099.1.1. "
-                                    "In use: yt-dlp 2099.1.1 (updated copy).")
+    assert process_events(qapp, lambda: d.ytdlp_state.text() == "Working: version 2099.1.1", 5)
+    assert d.ytdlp_note.text() == "Updated yt-dlp to 2099.1.1."
     d.close()
 
 

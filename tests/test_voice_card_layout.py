@@ -97,9 +97,9 @@ def test_ai_action_precedes_choices_and_status_wraps(qapp, monkeypatch, tmp_path
         panel.show()
         qapp.processEvents()
         box = panel.ready_box
-        assert at(panel.b_start, box).bottom() < at(panel.cb_voice, box).top()
+        assert at(panel.b_start, box).bottom() < at(panel._tile["bear"], box).top()
         assert box.rect().contains(at(panel.lbl_state, box))
-        assert box.rect().contains(at(panel.cb_voice, box))
+        assert box.rect().contains(at(panel._tile["bear"], box))
         panel._set_ui(False, "Ready")
         assert not panel.b_start.isChecked()
         assert panel.lbl_state.text() == "Ready"
@@ -111,7 +111,7 @@ def test_ai_action_precedes_choices_and_status_wraps(qapp, monkeypatch, tmp_path
 
 @pytest.mark.parametrize("name", ["Dark", "Light"])
 @pytest.mark.parametrize("width", [340, 580])
-def test_computer_action_precedes_description_and_choices(qapp, monkeypatch, tmp_path,
+def test_languages_card_reads_language_then_who_then_start(qapp, monkeypatch, tmp_path,
                                                         name, width):
     monkeypatch.setattr(tts.SapiTTS, "warm_up", lambda self: [])
     old = theme.current_name
@@ -128,8 +128,9 @@ def test_computer_action_precedes_description_and_choices(qapp, monkeypatch, tmp
                                "your words in the selected language.")
         speech.show()
         qapp.processEvents()
-        assert at(live.start_box, speech).bottom() < at(speech.lbl_intro, speech).top()
-        assert at(speech.lbl_intro, speech).bottom() < at(speech.cb_voice, speech).top()
+        # in the order you use it: the words, the language box, then Start
+        assert at(speech.lbl_intro, speech).bottom() < at(speech.settings_box, speech).top()
+        assert at(speech.settings_box, speech).bottom() < at(live.start_box, speech).top()
         assert live.b_live.geometry().left() == 0
         assert live.b_live.geometry().right() < live.lbl_state.geometry().left()
         assert live.start_box.rect().contains(live.lbl_state.geometry())
