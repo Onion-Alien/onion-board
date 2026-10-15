@@ -3516,5 +3516,7 @@
   "Your headset is off or its mic is muted. Turn it on or unmute it. Still nothing? Click <b>Repair</b>.": "Słuchawki są wyłączone albo ich mikrofon jest wyciszony. Włącz je albo wyłącz wyciszenie. Dalej nic? Kliknij <b>Napraw</b>.",
   "The download was cut off before the end. Try again.": "Pobieranie zostało przerwane przed końcem. Spróbuj ponownie.",
   "You can change the proxy in Settings > Connection.": "Proxy możesz zmienić w Ustawieniach > Połączenie.",
-  "the pack's file is damaged, so it wasn't kept": "plik pakietu jest uszkodzony, więc nie został zachowany"
+  "the pack's file is damaged, so it wasn't kept": "plik pakietu jest uszkodzony, więc nie został zachowany",
+  "Set to 100%": "Ustaw na 100%",
+  "Your Sounds volume is at 0%, so nobody else hears your sounds.": "Głośność Dźwięków jest na 0%, więc nikt inny nie słyszy twoich dźwięków."
 }

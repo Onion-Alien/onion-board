@@ -3440,5 +3440,7 @@
   "Your headset is off or its mic is muted. Turn it on or unmute it. Still nothing? Click <b>Repair</b>.": "A headseted ki van kapcsolva, vagy le van némítva a mikrofonja. Kapcsold be, vagy oldd fel a némítást. Még mindig semmi? Kattints a <b>Javítás</b> gombra.",
   "The download was cut off before the end. Try again.": "A letöltés a vége előtt megszakadt. Próbáld újra.",
   "You can change the proxy in Settings > Connection.": "A proxyt a Beállítások > Kapcsolat részben módosíthatod.",
-  "the pack's file is damaged, so it wasn't kept": "a csomag fájlja sérült, ezért nem lett megtartva"
+  "the pack's file is damaged, so it wasn't kept": "a csomag fájlja sérült, ezért nem lett megtartva",
+  "Set to 100%": "Legyen 100%",
+  "Your Sounds volume is at 0%, so nobody else hears your sounds.": "A Hangok hangereje 0%-on áll, így rajtad kívül senki sem hallja a hangjaidat."
 }

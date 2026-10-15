@@ -3440,5 +3440,7 @@
   "Your headset is off or its mic is muted. Turn it on or unmute it. Still nothing? Click <b>Repair</b>.": "Dit headset er slukket, eller dets mikrofon er slået fra. Tænd det, eller slå mikrofonen til. Stadig intet? Klik <b>Reparér</b>.",
   "The download was cut off before the end. Try again.": "Downloadet blev afbrudt før slutningen. Prøv igen.",
   "You can change the proxy in Settings > Connection.": "Du kan ændre proxyen i Indstillinger > Forbindelse.",
-  "the pack's file is damaged, so it wasn't kept": "pakkens fil er beskadiget, så den blev ikke gemt"
+  "the pack's file is damaged, so it wasn't kept": "pakkens fil er beskadiget, så den blev ikke gemt",
+  "Set to 100%": "Sæt til 100 %",
+  "Your Sounds volume is at 0%, so nobody else hears your sounds.": "Din Lyde-lydstyrke er på 0 %, så ingen andre hører dine lyde."
 }

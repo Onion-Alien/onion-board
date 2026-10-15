@@ -3364,5 +3364,7 @@
   "Your headset is off or its mic is muted. Turn it on or unmute it. Still nothing? Click <b>Repair</b>.": "Headset-mu mati atau mic-nya di-mute. Nyalakan atau aktifkan lagi mic-nya. Masih tidak ada? Klik <b>Perbaiki</b>.",
   "The download was cut off before the end. Try again.": "Unduhan terputus sebelum selesai. Coba lagi.",
   "You can change the proxy in Settings > Connection.": "Kamu bisa mengganti proxy di Pengaturan > Koneksi.",
-  "the pack's file is damaged, so it wasn't kept": "file paket rusak, jadi tidak disimpan"
+  "the pack's file is damaged, so it wasn't kept": "file paket rusak, jadi tidak disimpan",
+  "Set to 100%": "Atur ke 100%",
+  "Your Sounds volume is at 0%, so nobody else hears your sounds.": "Volume Suara kamu di 0%, jadi tidak ada orang lain yang mendengar suaramu."
 }

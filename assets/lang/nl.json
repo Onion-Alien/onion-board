@@ -3440,5 +3440,7 @@
   "Your headset is off or its mic is muted. Turn it on or unmute it. Still nothing? Click <b>Repair</b>.": "Je headset staat uit of de mic is gedempt. Zet hem aan of zet dempen uit. Nog steeds niets? Klik op <b>Repareren</b>.",
   "The download was cut off before the end. Try again.": "De download werd voor het einde afgebroken. Probeer het opnieuw.",
   "You can change the proxy in Settings > Connection.": "Je kunt de proxy wijzigen in Instellingen > Verbinding.",
-  "the pack's file is damaged, so it wasn't kept": "het bestand van het pakket is beschadigd, dus het is niet bewaard"
+  "the pack's file is damaged, so it wasn't kept": "het bestand van het pakket is beschadigd, dus het is niet bewaard",
+  "Set to 100%": "Zet op 100%",
+  "Your Sounds volume is at 0%, so nobody else hears your sounds.": "Je Geluiden-volume staat op 0%, dus niemand anders hoort je geluiden."
 }

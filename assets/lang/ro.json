@@ -3516,5 +3516,7 @@
   "Your headset is off or its mic is muted. Turn it on or unmute it. Still nothing? Click <b>Repair</b>.": "Căștile sunt oprite sau au microfonul pe mut. Pornește-le sau scoate-l de pe mut. Tot nimic? Dă clic pe <b>Repară</b>.",
   "The download was cut off before the end. Try again.": "Descărcarea s-a întrerupt înainte de final. Încearcă din nou.",
   "You can change the proxy in Settings > Connection.": "Poți schimba proxy-ul din Setări > Conexiune.",
-  "the pack's file is damaged, so it wasn't kept": "fișierul pachetului este deteriorat, așa că nu a fost păstrat"
+  "the pack's file is damaged, so it wasn't kept": "fișierul pachetului este deteriorat, așa că nu a fost păstrat",
+  "Set to 100%": "Pune la 100%",
+  "Your Sounds volume is at 0%, so nobody else hears your sounds.": "Volumul Sunetelor e la 0%, așa că nimeni altcineva nu-ți aude sunetele."
 }

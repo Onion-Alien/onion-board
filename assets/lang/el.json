@@ -3440,5 +3440,7 @@
   "Your headset is off or its mic is muted. Turn it on or unmute it. Still nothing? Click <b>Repair</b>.": "Τα ακουστικά σου είναι κλειστά ή το μικρόφωνό τους σε σίγαση. Άνοιξέ τα ή βγάλε τη σίγαση. Ακόμα τίποτα; Κάνε κλικ στο <b>Επισκευή</b>.",
   "The download was cut off before the end. Try again.": "Η λήψη διακόπηκε πριν τελειώσει. Δοκιμάστε ξανά.",
   "You can change the proxy in Settings > Connection.": "Μπορείτε να αλλάξετε τον διακομιστή μεσολάβησης στις Ρυθμίσεις > Σύνδεση.",
-  "the pack's file is damaged, so it wasn't kept": "το αρχείο του πακέτου είναι κατεστραμμένο, οπότε δεν κρατήθηκε"
+  "the pack's file is damaged, so it wasn't kept": "το αρχείο του πακέτου είναι κατεστραμμένο, οπότε δεν κρατήθηκε",
+  "Set to 100%": "Βάλε 100%",
+  "Your Sounds volume is at 0%, so nobody else hears your sounds.": "Η ένταση των Ήχων είναι στο 0%, οπότε κανείς άλλος δεν ακούει τους ήχους σου."
 }

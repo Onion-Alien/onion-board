@@ -3440,5 +3440,7 @@
   "Your headset is off or its mic is muted. Turn it on or unmute it. Still nothing? Click <b>Repair</b>.": "Naka-off ang headset mo o naka-mute ang mic nito. I-on ito o i-unmute. Wala pa rin? I-click ang <b>I-repair</b>.",
   "The download was cut off before the end. Try again.": "Naputol ang download bago matapos. Subukan ulit.",
   "You can change the proxy in Settings > Connection.": "Mapapalitan mo ang proxy sa Mga Setting > Koneksyon.",
-  "the pack's file is damaged, so it wasn't kept": "sira ang file ng pack, kaya hindi ito itinago"
+  "the pack's file is damaged, so it wasn't kept": "sira ang file ng pack, kaya hindi ito itinago",
+  "Set to 100%": "Gawing 100%",
+  "Your Sounds volume is at 0%, so nobody else hears your sounds.": "Nasa 0% ang volume ng Sounds mo, kaya walang ibang nakakarinig ng sounds mo."
 }

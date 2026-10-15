@@ -198,3 +198,41 @@ def test_playing_a_search_hit_already_on_the_board_plays_its_pad(window, player,
     r = ytdl.Result(id="abc", title="What Is Love", channel="Haddaway", seconds=5)
     window.searchctl._from_youtube(r, True)
     assert "s0" in player.voices and LINK_ID not in player.voices and not fetched
+
+
+def test_a_sound_played_at_zero_sounds_volume_says_nobody_else_hears_it(
+        window, player, monkeypatch):
+    """At 0% Sounds volume a pad still plays in your own headphones, so it looked like it
+    worked while nobody else heard it: one toast says so, with a button to set it back."""
+    said = []
+    monkeypatch.setattr(window, "toast", lambda text, kind="", ms=0, **kw: said.append(
+        (text, kw.get("action"))))
+    window.cfg.route = "cable"
+    window.vol_sound.spin.setValue(0)
+    assert window.cfg.sound_vol == 0
+    window.playctl.play("s0")
+    hint = [(t, a) for t, a in said if "0%" in t]
+    assert len(hint) == 1
+    window.playctl._cool.clear()
+    window.playctl.play("s0")
+    assert len([t for t, _ in said if "0%" in t]) == 1   # once, not on every press
+    hint[0][1][1]()   # its button
+    assert window.cfg.sound_vol == 1.0
+    window.vol_sound.spin.setValue(0)   # down again, nothing played in between
+    window.playctl._cool.clear()
+    window.playctl.play("s0")
+    assert len([t for t, _ in said if "0%" in t]) == 2   # up and down again: said again
+
+
+def test_no_zero_volume_hint_at_a_normal_volume_or_when_not_sending(
+        window, player, monkeypatch):
+    said = []
+    monkeypatch.setattr(window, "toast", lambda text, kind="", ms=0, **kw: said.append(text))
+    window.cfg.route = "cable"
+    window.vol_sound.spin.setValue(100)
+    window.playctl.play("s0")
+    window.cfg.route = "off"   # not sending at all: the volume isn't why
+    window.vol_sound.spin.setValue(0)
+    window.playctl._cool.clear()
+    window.playctl.play("s0")
+    assert not [t for t in said if "0%" in t]

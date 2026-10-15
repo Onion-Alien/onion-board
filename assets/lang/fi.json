@@ -3440,5 +3440,7 @@
   "Your headset is off or its mic is muted. Turn it on or unmute it. Still nothing? Click <b>Repair</b>.": "Kuulokkeesi ovat pois päältä tai niiden mikki on mykistetty. Laita ne päälle tai poista mykistys. Vieläkään ei mitään? Klikkaa <b>Korjaa</b>.",
   "The download was cut off before the end. Try again.": "Lataus katkesi ennen loppua. Yritä uudelleen.",
   "You can change the proxy in Settings > Connection.": "Voit vaihtaa välityspalvelimen kohdassa Asetukset > Yhteys.",
-  "the pack's file is damaged, so it wasn't kept": "paketin tiedosto on vioittunut, joten sitä ei säilytetty"
+  "the pack's file is damaged, so it wasn't kept": "paketin tiedosto on vioittunut, joten sitä ei säilytetty",
+  "Set to 100%": "Aseta 100 %:iin",
+  "Your Sounds volume is at 0%, so nobody else hears your sounds.": "Äänet-voimakkuus on 0 %, joten kukaan muu ei kuule ääniäsi."
 }

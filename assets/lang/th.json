@@ -3364,5 +3364,7 @@
   "Your headset is off or its mic is muted. Turn it on or unmute it. Still nothing? Click <b>Repair</b>.": "หูฟังปิดอยู่ หรือไมค์ของหูฟังปิดเสียงอยู่ เปิดหูฟังหรือเปิดเสียงไมค์ ยังไม่มีเสียงอีกหรือ คลิก <b>ซ่อม</b>",
   "The download was cut off before the end. Try again.": "การดาวน์โหลดถูกตัดก่อนเสร็จ ลองอีกครั้ง",
   "You can change the proxy in Settings > Connection.": "คุณเปลี่ยนพร็อกซีได้ในการตั้งค่า > การเชื่อมต่อ",
-  "the pack's file is damaged, so it wasn't kept": "ไฟล์ของแพ็คเสียหาย จึงไม่ได้เก็บไว้"
+  "the pack's file is damaged, so it wasn't kept": "ไฟล์ของแพ็คเสียหาย จึงไม่ได้เก็บไว้",
+  "Set to 100%": "ตั้งเป็น 100%",
+  "Your Sounds volume is at 0%, so nobody else hears your sounds.": "ระดับเสียงของเสียงอยู่ที่ 0% จึงไม่มีใครได้ยินเสียงของคุณ"
 }

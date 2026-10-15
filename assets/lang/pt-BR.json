@@ -3440,5 +3440,7 @@
   "Your headset is off or its mic is muted. Turn it on or unmute it. Still nothing? Click <b>Repair</b>.": "Seu headset está desligado ou com o microfone no mudo. Ligue-o ou tire do mudo. Ainda nada? Clique em <b>Consertar</b>.",
   "The download was cut off before the end. Try again.": "O download foi interrompido antes do fim. Tente de novo.",
   "You can change the proxy in Settings > Connection.": "Você pode trocar o proxy em Configurações > Conexão.",
-  "the pack's file is damaged, so it wasn't kept": "o arquivo do pacote está danificado, então não foi mantido"
+  "the pack's file is damaged, so it wasn't kept": "o arquivo do pacote está danificado, então não foi mantido",
+  "Set to 100%": "Pôr em 100%",
+  "Your Sounds volume is at 0%, so nobody else hears your sounds.": "Seu volume de Sons está em 0%, então ninguém mais ouve seus sons."
 }

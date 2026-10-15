@@ -3440,5 +3440,7 @@
   "Your headset is off or its mic is muted. Turn it on or unmute it. Still nothing? Click <b>Repair</b>.": "Kulaklığın kapalı ya da mikrofonu sessizde. Kulaklığı aç ya da mikrofonun sesini aç. Hâlâ bir şey yok mu? <b>Onar</b>'a tıkla.",
   "The download was cut off before the end. Try again.": "İndirme bitmeden kesildi. Tekrar deneyin.",
   "You can change the proxy in Settings > Connection.": "Proxy'yi Ayarlar > Bağlantı bölümünden değiştirebilirsiniz.",
-  "the pack's file is damaged, so it wasn't kept": "paketin dosyası bozuk, bu yüzden saklanmadı"
+  "the pack's file is damaged, so it wasn't kept": "paketin dosyası bozuk, bu yüzden saklanmadı",
+  "Set to 100%": "%100 yap",
+  "Your Sounds volume is at 0%, so nobody else hears your sounds.": "Sesler düzeyin %0'da, bu yüzden seslerini senden başka kimse duymuyor."
 }

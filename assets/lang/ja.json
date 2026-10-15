@@ -3364,5 +3364,7 @@
   "Your headset is off or its mic is muted. Turn it on or unmute it. Still nothing? Click <b>Repair</b>.": "ヘッドセットの電源が切れているか、マイクがミュートになっています。電源を入れるかミュートを解除してください。それでも音が出ない場合は<b>修復</b>をクリックしてください。",
   "The download was cut off before the end. Try again.": "ダウンロードが途中で切れました。もう一度試してください。",
   "You can change the proxy in Settings > Connection.": "プロキシは [設定] > [接続] で変更できます。",
-  "the pack's file is damaged, so it wasn't kept": "パックのファイルが壊れているため、保存されませんでした"
+  "the pack's file is damaged, so it wasn't kept": "パックのファイルが壊れているため、保存されませんでした",
+  "Set to 100%": "100%にする",
+  "Your Sounds volume is at 0%, so nobody else hears your sounds.": "サウンドの音量が0%なので、あなたのサウンドは他の人に聞こえていません。"
 }

@@ -3516,5 +3516,7 @@
   "Your headset is off or its mic is muted. Turn it on or unmute it. Still nothing? Click <b>Repair</b>.": "Sluchátka jsou vypnutá nebo mají ztlumený mikrofon. Zapni je nebo zruš ztlumení. Pořád nic? Klikni na <b>Opravit</b>.",
   "The download was cut off before the end. Try again.": "Stahování se přerušilo před koncem. Zkuste to znovu.",
   "You can change the proxy in Settings > Connection.": "Proxy můžete změnit v Nastavení > Připojení.",
-  "the pack's file is damaged, so it wasn't kept": "soubor balíčku je poškozený, proto nebyl ponechán"
+  "the pack's file is damaged, so it wasn't kept": "soubor balíčku je poškozený, proto nebyl ponechán",
+  "Set to 100%": "Nastavit na 100 %",
+  "Your Sounds volume is at 0%, so nobody else hears your sounds.": "Hlasitost Zvuků je na 0 %, takže tvoje zvuky nikdo jiný neslyší."
 }

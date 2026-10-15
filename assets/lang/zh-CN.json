@@ -3364,5 +3364,7 @@
   "Your headset is off or its mic is muted. Turn it on or unmute it. Still nothing? Click <b>Repair</b>.": "耳机关着，或者麦克风静音了。请打开耳机或取消静音。还是没声音？点 <b>修复</b>。",
   "The download was cut off before the end. Try again.": "下载在完成前中断了。请重试。",
   "You can change the proxy in Settings > Connection.": "你可以在“设置”>“连接”中更改代理。",
-  "the pack's file is damaged, so it wasn't kept": "包文件已损坏，因此未保留"
+  "the pack's file is damaged, so it wasn't kept": "包文件已损坏，因此未保留",
+  "Set to 100%": "设为 100%",
+  "Your Sounds volume is at 0%, so nobody else hears your sounds.": "你的音效音量为 0%，所以其他人听不到你的音效。"
 }

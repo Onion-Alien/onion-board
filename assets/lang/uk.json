@@ -3516,5 +3516,7 @@
   "Your headset is off or its mic is muted. Turn it on or unmute it. Still nothing? Click <b>Repair</b>.": "Гарнітуру вимкнено, або її мікрофон вимкнено. Увімкни її або мікрофон. Досі нічого? Натисни <b>Полагодити</b>.",
   "The download was cut off before the end. Try again.": "Завантаження обірвалося до кінця. Спробуйте ще раз.",
   "You can change the proxy in Settings > Connection.": "Проксі можна змінити в меню «Налаштування» > «З’єднання».",
-  "the pack's file is damaged, so it wasn't kept": "файл пакета пошкоджено, тому його не збережено"
+  "the pack's file is damaged, so it wasn't kept": "файл пакета пошкоджено, тому його не збережено",
+  "Set to 100%": "Поставити 100%",
+  "Your Sounds volume is at 0%, so nobody else hears your sounds.": "Гучність «Звуків» на 0%, тому твої звуки більше ніхто не чує."
 }
