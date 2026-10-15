@@ -176,6 +176,24 @@ def test_library_uses_the_apps_own_copy_first(monkeypatch, tmp_path):
     assert library._ffmpeg() == str(own)
 
 
+def test_library_finds_wingets_copy_without_a_link(monkeypatch, tmp_path):
+    """winget without the right to make links puts the package's bin folder on PATH
+    instead of WinGet\\Links: an app started before that (by the installer) must still
+    find it, not call it broken."""
+    monkeypatch.setattr(library, "APP_DIR", tmp_path / "app")
+    monkeypatch.setattr(library.shutil, "which", lambda name: None)
+    monkeypatch.setenv("LOCALAPPDATA", str(tmp_path))
+    monkeypatch.delenv("ProgramFiles", raising=False)
+    pkg = (tmp_path / "Microsoft" / "WinGet" / "Packages"
+           / (ffmpegget.PACKAGE + "_Microsoft.Winget.Source_8wekyb3d8bbwe"))
+    pkg.mkdir(parents=True)
+    assert library._ffmpeg() is None         # half there: check() says broken
+    exe = pkg / "ffmpeg-9.0.1-essentials_build" / "bin" / "ffmpeg.exe"
+    exe.parent.mkdir(parents=True)
+    exe.write_bytes(b"MZ")
+    assert library._ffmpeg() == str(exe)
+
+
 def test_why_not(monkeypatch):
     assert ffmpegget.why_not() == ""
     net.configure_features(["ffmpeg_download"], offline=False)
