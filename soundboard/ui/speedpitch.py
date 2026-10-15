@@ -22,6 +22,7 @@ from soundboard import livefx, theme, voicefx
 from soundboard.ui import fit, icons
 from soundboard.ui.panel import hint_label, reset_button, section_label
 from soundboard.ui.voicefxpanel import ParamSlider
+from soundboard.ui.widgets import widget_at
 from soundboard.i18n import _
 from soundboard.ui.pixels import snap_to_pixels
 
@@ -334,8 +335,7 @@ class SpeedPitchButton(QPushButton):
         assert h is not None   # name, slider, value
         h.setContentsMargins(0, 0, 0, 0)
         h.setSpacing(GAP)
-        name = h.itemAt(0)
-        name_label = name.widget() if name else None
+        name_label = widget_at(h, 0)
         assert name_label is not None
         name_label.setFixedWidth(name_w)
         s.val.setObjectName("")
