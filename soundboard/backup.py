@@ -710,7 +710,8 @@ def keep_pack(pkg: Package) -> str:
             else:
                 src.replace(dest)
             pkg.path = dest
-            info.write_text(json.dumps({"name": src.stem[:60], "free": src.stem}), "utf-8")
+            info.write_text(json.dumps({"name": _free_pack_name(src.stem),
+                                        "free": src.stem}), "utf-8")
             pkg.pack_id = pid
             return pid
         if not dest.is_file():
@@ -733,6 +734,13 @@ def keep_pack(pkg: Package) -> str:
         return ""
     pkg.pack_id = pid
     return pid
+
+
+def _free_pack_name(free_id: str) -> str:
+    """A free pack's name as the list of packs has it ("Streamer pack"), not its
+    file's ("streamer")."""
+    from soundboard import packs as free   # it imports this module
+    return next((p.name for p in free.built_in() if p.id == free_id), free_id)[:60]
 
 
 def kept_free_pack(free_id: str) -> Path | None:
@@ -786,9 +794,12 @@ def packs() -> dict[str, str]:
         if not (j.with_suffix(".zip")).is_file():
             continue
         try:
-            name = json.loads(j.read_text("utf-8")).get("name")
+            meta = json.loads(j.read_text("utf-8"))
+            name, free_id = meta.get("name"), meta.get("free")
         except (OSError, ValueError, AttributeError):
-            name = None
+            name = free_id = None
+        if isinstance(free_id, str) and free_id and name == free_id[:60]:
+            name = _free_pack_name(free_id)   # kept by an older version under its file name
         out[j.stem] = name if isinstance(name, str) and name else j.stem
     return dict(sorted(out.items(), key=lambda kv: kv[1].lower()))
 

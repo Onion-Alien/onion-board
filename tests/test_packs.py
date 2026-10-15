@@ -26,8 +26,10 @@ class Response(io.BytesIO):
         return "https://objects.githubusercontent.com/x"
 
 
-def make_pack(names=("Door", "Dragon")) -> bytes:
-    """A pack zip the way Export this category writes one (backup format)."""
+def make_pack(names=("Door", "Dragon"), tags=None) -> bytes:
+    """A pack zip the way Export this category writes one (backup format); `tags`, one
+    category per sound (default: all "Horror")."""
+    tags = tags or ["Horror"] * len(names)
     buf = io.BytesIO()
     with zipfile.ZipFile(buf, "w") as z:
         sounds = []
@@ -35,10 +37,11 @@ def make_pack(names=("Door", "Dragon")) -> bytes:
             folder = f"sounds/{i:03d} {n}"
             z.writestr(f"{folder}/sound.wav", wav_bytes())
             z.writestr(f"{folder}/sound.json", json.dumps({"name": n, "audio": "sound.wav",
-                                                           "tags": ["Horror"]}))
+                                                           "tags": [tags[i]]}))
             sounds.append(folder)
         z.writestr("onionboard.json", json.dumps({
-            "format": "onionboard-board", "format_version": 1, "categories": ["Horror"],
+            "format": "onionboard-board", "format_version": 1,
+            "categories": list(dict.fromkeys(tags)),
             "sounds": sounds}))
     return buf.getvalue()
 
@@ -234,6 +237,24 @@ def test_a_downloaded_pack_lands_on_the_board(window, qapp, served):
     assert all("Horror" in m.tags for m in added) and "Horror" in window.cfg.categories
     # kept once: the download became the kept pack, not a second copy beside it
     assert [z.name for z in backup.packs_dir().glob("*.zip")] == [f"{added[0].pack}.zip"]
+
+
+
+def test_a_pack_with_categories_is_one_tab_named_after_it(window, qapp, served):
+    """The Streamer pack once landed in a "streamer" tab plus an empty tab for each of
+    its categories: its category list was added as tabs after its sounds were grouped."""
+    data = make_pack(("Hype", "Bonk"), tags=["Alerts", "Fails"])
+    p, = packs.parse([entry(data, id="streamer", name="Streamer pack")])
+    served.files[p.url] = data
+    tabs = list(window.cfg.categories)
+    before = len(window.cfg.sounds)
+    window.impctl.import_files([str(packs.download(p))])
+    assert process_events(qapp, lambda: len(window.cfg.sounds) == before + 2, 10)
+    assert window.cfg.categories == tabs + ["Streamer"]
+    assert window.cfg.subcategories["Streamer"] == ["Alerts", "Fails"]
+    assert [m.tags for m in window.cfg.sounds[before:]] == [
+        ["Streamer", "Streamer / Alerts"], ["Streamer", "Streamer / Fails"]]
+    assert list(backup.packs().values()) == ["Streamer pack"]
 
 
 def _install(p: packs.Pack) -> str:
