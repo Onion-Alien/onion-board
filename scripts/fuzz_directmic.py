@@ -11,6 +11,7 @@ temporary folder.
 """
 from __future__ import annotations
 
+import re
 import subprocess
 import sys
 import tempfile
@@ -21,6 +22,27 @@ BUILD = ROOT / "build" / "directmic"
 HOST = BUILD / "fuzzhost.exe"
 DLL = BUILD / "obmic_fuzz.dll"
 BELOW_NORMAL = 0x00004000
+
+
+def stalled(out: str, work: Path) -> bool:
+    """A HANG whose case runs clean when replayed (3 times, watchdog still on) was the
+    machine pausing, not the effect: a CI runner once froze both workers for ~0.9 s
+    and the case replayed in a fraction of a millisecond."""
+    m = re.search(r"^HANG: .*case seed (\d+)", out, re.M)
+    if not m:
+        return False
+    work.mkdir(parents=True, exist_ok=True)
+    for _ in range(3):
+        try:
+            code = subprocess.run([str(HOST), str(DLL), str(work), "--replay", m.group(1)],
+                                  capture_output=True, text=True, timeout=60).returncode
+        except subprocess.TimeoutExpired:
+            code = -1
+        if code != 0:
+            print(f"  the replay of case {m.group(1)} hangs too: a real hang")
+            return False
+    print(f"  case {m.group(1)} replays clean 3 times: the machine stalled, not counted")
+    return True
 
 
 def main(argv: list[str]) -> int:
@@ -56,6 +78,8 @@ def main(argv: list[str]) -> int:
             print(f"worker {n} (seed {seed + n}): exit {p.returncode}")
             for ln in last[-6:]:
                 print("  " + ln)
+            if p.returncode == 4 and stalled(out, Path(tmp) / f"r{n}"):
+                continue
             bad += p.returncode != 0
     return 1 if bad else 0
 
