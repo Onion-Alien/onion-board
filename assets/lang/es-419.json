@@ -3467,5 +3467,11 @@
   "Installing Onion Board {version}…": "Instalando Onion Board {version}…",
   "Updated to {version}": "Actualizado a {version}",
   "Updating to {version}…": "Actualizando a {version}…",
-  "Updating to {version}… {pct}%": "Actualizando a {version}… {pct}%"
+  "Updating to {version}… {pct}%": "Actualizando a {version}… {pct}%",
+  "Off: phones can't reach Onion Board. Open it below to turn it on.": "Apagado: los celulares no pueden llegar a Onion Board. Ábrelo abajo para encenderlo.",
+  "On, but it couldn't start. Open it below to see why.": "Encendido, pero no pudo arrancar. Ábrelo abajo para ver por qué.",
+  "On: phones on this Wi-Fi can play your pads.": "Encendido: los celulares en este Wi-Fi pueden reproducir tus pads.",
+  "Onion Pocket": "Onion Pocket",
+  "Onion Pocket's settings didn't open: they're on Settings → Remote.": "Los ajustes de Onion Pocket no se abrieron: están en Configuración → Remoto.",
+  "Pair a phone and settings": "Vincular un celular y ajustes"
 }

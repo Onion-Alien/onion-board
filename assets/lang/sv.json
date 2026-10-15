@@ -3467,5 +3467,11 @@
   "Installing Onion Board {version}…": "Installerar Onion Board {version}…",
   "Updated to {version}": "Uppdaterad till {version}",
   "Updating to {version}…": "Uppdaterar till {version}…",
-  "Updating to {version}… {pct}%": "Uppdaterar till {version}… {pct}%"
+  "Updating to {version}… {pct}%": "Uppdaterar till {version}… {pct}%",
+  "Off: phones can't reach Onion Board. Open it below to turn it on.": "Av: telefoner når inte Onion Board. Öppna den nedan för att slå på den.",
+  "On, but it couldn't start. Open it below to see why.": "På, men den kunde inte starta. Öppna den nedan för att se varför.",
+  "On: phones on this Wi-Fi can play your pads.": "På: telefoner på det här wifi-nätet kan spela dina rutor.",
+  "Onion Pocket": "Onion Pocket",
+  "Onion Pocket's settings didn't open: they're on Settings → Remote.": "Inställningarna för Onion Pocket öppnades inte: de finns under Inställningar → Fjärrstyrning.",
+  "Pair a phone and settings": "Koppla en telefon och inställningar"
 }

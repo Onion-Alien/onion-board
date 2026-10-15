@@ -3467,5 +3467,11 @@
   "Installing Onion Board {version}…": "Εγκατάσταση Onion Board {version}…",
   "Updated to {version}": "Ενημερώθηκε σε {version}",
   "Updating to {version}…": "Ενημέρωση σε {version}…",
-  "Updating to {version}… {pct}%": "Ενημέρωση σε {version}… {pct}%"
+  "Updating to {version}… {pct}%": "Ενημέρωση σε {version}… {pct}%",
+  "Off: phones can't reach Onion Board. Open it below to turn it on.": "Κλειστό: τα κινητά δεν φτάνουν το Onion Board. Άνοιξέ το παρακάτω για να το ενεργοποιήσεις.",
+  "On, but it couldn't start. Open it below to see why.": "Ανοιχτό, αλλά δεν μπόρεσε να ξεκινήσει. Άνοιξέ το παρακάτω για να δεις γιατί.",
+  "On: phones on this Wi-Fi can play your pads.": "Ανοιχτό: τα κινητά σε αυτό το Wi-Fi μπορούν να παίζουν τα κουμπιά σου.",
+  "Onion Pocket": "Onion Pocket",
+  "Onion Pocket's settings didn't open: they're on Settings → Remote.": "Οι ρυθμίσεις του Onion Pocket δεν άνοιξαν: είναι στο Ρυθμίσεις → Απομακρυσμένο.",
+  "Pair a phone and settings": "Σύνδεση κινητού και ρυθμίσεις"
 }

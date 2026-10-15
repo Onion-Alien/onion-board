@@ -433,6 +433,25 @@ class FitControl(Controller):
         for col in mw._setup_lr:
             col.addStretch(1)
 
+    def _place_pocket(self, have: bool):
+        """Setup's cards with Onion Pocket's (`have`: it's installed) or without it.
+        With it, it's on the left in Connect your chat's place, and Connect your chat
+        goes to the right, under the EQ (the room there was empty); without it, the
+        cards are where they always were."""
+        mw = self.mw
+        pocket = mw.pocket_card.frame
+        how, dev, chat, dest, eq = mw._setup_cards
+        if have:
+            mw._setup_wide = ((how, dev, pocket), (dest, eq, chat))
+            mw._setup_narrow = (how, dest, dev, chat, pocket, eq)
+        else:
+            mw._setup_wide = ((how, dev, chat), (dest, eq))
+            mw._setup_narrow = (how, dest, dev, chat, eq)
+        was = mw._setup_stacked
+        mw._setup_stacked = None   # (so it's placed again)
+        self._stack_setup(bool(was))
+        pocket.setVisible(have)   # (after: in a layout, so never a window of its own)
+
     def _setup_one_col(self) -> int:
         """The width Setup needs in one column: its widest card, and the page's margins."""
         mw = self.mw

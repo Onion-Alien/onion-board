@@ -3467,5 +3467,11 @@
   "Installing Onion Board {version}…": "Ini-install ang Onion Board {version}…",
   "Updated to {version}": "Na-update na sa {version}",
   "Updating to {version}…": "Nag-a-update sa {version}…",
-  "Updating to {version}… {pct}%": "Nag-a-update sa {version}… {pct}%"
+  "Updating to {version}… {pct}%": "Nag-a-update sa {version}… {pct}%",
+  "Off: phones can't reach Onion Board. Open it below to turn it on.": "Off: hindi maabot ng mga phone ang Onion Board. Buksan ito sa ibaba para i-on.",
+  "On, but it couldn't start. Open it below to see why.": "On, pero hindi ito nakapagsimula. Buksan ito sa ibaba para makita kung bakit.",
+  "On: phones on this Wi-Fi can play your pads.": "On: kayang patugtugin ng mga phone sa Wi-Fi na ito ang mga pad mo.",
+  "Onion Pocket": "Onion Pocket",
+  "Onion Pocket's settings didn't open: they're on Settings → Remote.": "Hindi nabuksan ang settings ng Onion Pocket: nasa Settings → Remote ang mga ito.",
+  "Pair a phone and settings": "Mag-pair ng phone at settings"
 }

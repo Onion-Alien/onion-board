@@ -3391,5 +3391,11 @@
   "Installing Onion Board {version}…": "Onion Board {version} 설치 중…",
   "Updated to {version}": "{version}(으)로 업데이트됨",
   "Updating to {version}…": "{version}(으)로 업데이트 중…",
-  "Updating to {version}… {pct}%": "{version}(으)로 업데이트 중… {pct}%"
+  "Updating to {version}… {pct}%": "{version}(으)로 업데이트 중… {pct}%",
+  "Off: phones can't reach Onion Board. Open it below to turn it on.": "꺼짐: 휴대폰이 Onion Board에 연결할 수 없어요. 아래에서 열어 켜세요.",
+  "On, but it couldn't start. Open it below to see why.": "켜졌지만 시작하지 못했어요. 아래에서 열어 이유를 확인하세요.",
+  "On: phones on this Wi-Fi can play your pads.": "켜짐: 이 Wi-Fi의 휴대폰에서 패드를 재생할 수 있어요.",
+  "Onion Pocket": "Onion Pocket",
+  "Onion Pocket's settings didn't open: they're on Settings → Remote.": "Onion Pocket 설정이 열리지 않았어요: 설정 → 원격에 있어요.",
+  "Pair a phone and settings": "휴대폰 연결 및 설정"
 }

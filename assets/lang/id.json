@@ -3391,5 +3391,11 @@
   "Installing Onion Board {version}…": "Memasang Onion Board {version}…",
   "Updated to {version}": "Diperbarui ke {version}",
   "Updating to {version}…": "Memperbarui ke {version}…",
-  "Updating to {version}… {pct}%": "Memperbarui ke {version}… {pct}%"
+  "Updating to {version}… {pct}%": "Memperbarui ke {version}… {pct}%",
+  "Off: phones can't reach Onion Board. Open it below to turn it on.": "Mati: ponsel tidak bisa menjangkau Onion Board. Buka di bawah untuk menyalakannya.",
+  "On, but it couldn't start. Open it below to see why.": "Nyala, tapi gagal dimulai. Buka di bawah untuk melihat sebabnya.",
+  "On: phones on this Wi-Fi can play your pads.": "Nyala: ponsel di Wi-Fi ini bisa memutar pad kamu.",
+  "Onion Pocket": "Onion Pocket",
+  "Onion Pocket's settings didn't open: they're on Settings → Remote.": "Pengaturan Onion Pocket tidak terbuka: ada di Pengaturan → Terpencil.",
+  "Pair a phone and settings": "Sambungkan ponsel dan pengaturan"
 }

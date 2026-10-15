@@ -3391,5 +3391,11 @@
   "Installing Onion Board {version}…": "正在安装 Onion Board {version}…",
   "Updated to {version}": "已更新到 {version}",
   "Updating to {version}…": "正在更新到 {version}…",
-  "Updating to {version}… {pct}%": "正在更新到 {version}… {pct}%"
+  "Updating to {version}… {pct}%": "正在更新到 {version}… {pct}%",
+  "Off: phones can't reach Onion Board. Open it below to turn it on.": "已关闭：手机连不上 Onion Board。在下面展开即可打开。",
+  "On, but it couldn't start. Open it below to see why.": "已开启，但没能启动。在下面展开查看原因。",
+  "On: phones on this Wi-Fi can play your pads.": "已开启：这个 Wi-Fi 上的手机可以播放你的按键。",
+  "Onion Pocket": "Onion Pocket",
+  "Onion Pocket's settings didn't open: they're on Settings → Remote.": "Onion Pocket 的设置没能打开：它们在 设置 → 远程。",
+  "Pair a phone and settings": "配对手机和设置"
 }
