@@ -178,6 +178,7 @@ class PrivacyPage(Page):
         ff_col.setSpacing(6)
         self.dlg.ff_state = QLabel()
         self.dlg.ff_state.setObjectName("pill")       # works / missing / won't start
+        self.dlg.ff_state.setProperty("keepline", True)
         # "FFmpeg": a name, the same in every language; the pill right after it
         head, _name, _marks = heading_row("FFmpeg", "video", beside=(self.dlg.ff_state,))
         ff_col.addLayout(head)
@@ -350,6 +351,7 @@ class PrivacyPage(Page):
         col.setSpacing(6)
         pill = QLabel(_("Checking…"))
         pill.setObjectName("pill")
+        pill.setProperty("keepline", True)   # one line, whatever its words turn out to be
         head, _name, _marks = heading_row(name, icon, beside=(pill,))
         col.addLayout(head)
         note = QLabel()
