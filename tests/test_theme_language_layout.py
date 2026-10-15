@@ -1,4 +1,6 @@
 """Translated labels fit the complete screen when each built-in theme is applied."""
+import re
+
 import pytest
 from PySide6.QtCore import Qt
 from PySide6.QtWidgets import QApplication, QLabel
@@ -19,6 +21,20 @@ def language(qapp, request):
     qapp.setLayoutDirection(direction)
 
 
+# What a theme changes besides colour: its stylesheet with every colour, gradient and
+# picture taken out. Themes that only recolour lay out the same, so one of each kind
+# is enough (5 instead of 32: checking them all took a test shard past CI's limit).
+_COLOUR = re.compile(r"#[0-9a-fA-F]{3,8}\b|rgba?\([^)]*\)|url\([^)]*\)"
+                     r"|q(?:linear|radial)gradient\([^)]*\)|\b(?:transparent|black|white)\b")
+
+
+def layout_themes() -> list[str]:
+    seen: dict[str, str] = {}
+    for name in theme.THEMES:
+        seen.setdefault(_COLOUR.sub("C", theme.stylesheet(name)), name)
+    return list(seen.values())
+
+
 @pytest.fixture
 def translated_window(language, main_window):  # noqa: F811
     return main_window
@@ -27,7 +43,7 @@ def translated_window(language, main_window):  # noqa: F811
 def test_translated_labels_fit_across_themes(translated_window):
     w = translated_window
     w.show()
-    for name in theme.THEMES:
+    for name in layout_themes():
         w.themectl.apply_theme(name)
         for width, height in ((800, 600), (440, 600)):
             w.resize(width, height)

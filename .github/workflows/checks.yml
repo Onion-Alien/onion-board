@@ -281,8 +281,19 @@ jobs:
           if (-not (Test-Path $gxx)) { $gxx = (Get-Command g++ -ErrorAction Stop).Source }
           & $gxx --version | Select-Object -First 1
           "MINGW_GXX=$gxx" >> $env:GITHUB_ENV
+      # straight from cppcheck's GitHub release: Chocolatey's feed times out now and
+      # then, and the copy beside the image's g++ can't find its own std.cfg
       - name: cppcheck
-        run: choco install cppcheck -y --no-progress
+        shell: pwsh
+        run: |
+          $v = '2.19.0'
+          $msi = "$env:RUNNER_TEMP\cppcheck.msi"
+          gh release download $v -R danmar/cppcheck -p "cppcheck-$v-x64-Setup.msi" -O $msi --clobber
+          Start-Process msiexec -ArgumentList '/i', $msi, '/qn', '/norestart' -Wait -NoNewWindow
+          & 'C:\Program Files\Cppcheck\cppcheck.exe' --version
+          if ($LASTEXITCODE) { exit 1 }
+        env:
+          GH_TOKEN: ${{ github.token }}
       - name: Check the C++
         run: .venv\Scripts\python scripts/check_directmic.py --need-cppcheck
       - name: Build
