@@ -111,7 +111,8 @@ if TYPE_CHECKING:
     from soundboard.ui.setupshow import SetupShow
     from soundboard.ui.sidebar import SideTabs
     from soundboard.ui.speedpitch import SpeedPitchButton
-    from soundboard.ui.widgets import DropdownMenu, NameAndSeek, PadGrid, SeekSlider, WindowRoot
+    from soundboard.ui.widgets import (DropdownMenu, EdgeMatch, NameAndSeek, PadGrid, SeekSlider,
+                                       WindowRoot)
     from soundboard.ui.windowbuild import BannerButton, Pulse
     from soundboard.ui.ytsearch import SearchResults
 
@@ -269,6 +270,7 @@ class MainWindow(QMainWindow):
     mode_btn: ModeButton
     more_menu: moretabs.Menu
     _name_seek: NameAndSeek
+    _bar_edges: EdgeMatch   # seek slider and "What others hear" meter end in line
     np_name: QLabel
     np_time: QLabel
     out_meter: Meter
