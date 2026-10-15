@@ -755,6 +755,7 @@
     VARS.forEach(function (k) { root.style.removeProperty(k); });
     vars.split(";").forEach(function (kv) { if (kv) { kv = kv.split(":"); root.style.setProperty(kv[0], kv[1]); } });
     root.classList.toggle("textured", vars.indexOf("--tex:") >= 0);
+    root.dataset.look = name;      // Bun and Hoot wear its outfit (home.css .fit)
     looks.forEach(function (b) { b.setAttribute("aria-pressed", b === btn ? "true" : "false"); });
     lookBtn.title = "Change the look: " + btn.textContent;
     lookBtn.setAttribute("aria-label", lookBtn.title);
