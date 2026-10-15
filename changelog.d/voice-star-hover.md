@@ -1,0 +1,1 @@
+- Voice changer and AI voices: hovering a voice's star shows a circle around it on every card, not just the picked one.

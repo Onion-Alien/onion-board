@@ -464,7 +464,8 @@ QFrame#card QPushButton#voicecat { border-radius:12px; padding:4px 12px; min-hei
 QFrame#card QPushButton#voicecat:hover:!checked { background:$btn_hover; }
 QFrame#card QPushButton#voicecat:checked { background:$accent; border-color:$accent_hi; color:$on_accent; font-weight:600; }
 QFrame#card QToolButton#voicestar { background:transparent; border:none; border-radius:11px; padding:0; }
-QFrame#card QToolButton#voicestar:hover { background:$btn_hover; }
+QFrame#card QToolButton#voicestar:hover { background:$card; border:1px solid $border_hi; }
+QFrame#card QToolButton#voicestar[picked="true"]:hover { background:$btn_hover; border:none; }
 QFrame#card QFrame#voicebox { background:$inset; border:1px solid $border; border-radius:8px; }
 QFrame#picked[pinned="true"] { background:$panel; border-radius:12px; }
 QFrame#picked QLabel#pickedname { color:$text_hi; font-size:11pt; font-weight:700; }

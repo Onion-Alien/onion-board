@@ -610,6 +610,11 @@ class VoiceTile(QToolButton):
 
     def _show_star(self, *_a):
         on, picked = self.star.isChecked(), self.isChecked()
+        # its hover circle: the hovered card itself is btn_hover, so a lighter one there
+        if self.star.property("picked") != picked:
+            self.star.setProperty("picked", picked)
+            self.star.style().unpolish(self.star)
+            self.star.style().polish(self.star)
         icons.set_icon(self.star, "star_filled" if on else "star",
                        "on_accent" if picked else "muted",
                        "on_accent" if picked else "accent", size=16)
