@@ -3478,5 +3478,10 @@
   "<br><span style='color:{status}'>Can't open {devices} (My mic). Plugged in? It's tried again by itself.</span>": "<br><span style='color:{status}'>Nem nyitható meg: {devices} (Saját mikrofon). Be van dugva? Magától újrapróbálja.</span>",
   "On, waiting for Windows to allow it: answer its prompt.": "Be, a Windows engedélyére vár: válaszolj a kérdésére.",
   "Two mics have names like that one. Pick yours again (Setup tab → Devices).": "Két mikrofonnak hasonló a neve. Válaszd ki újra a sajátodat (Beüzemelés lap → Eszközök).",
-  "Windows doesn't know that mic any more. Pick your mic again (Setup tab → Devices).": "A Windows már nem ismeri ezt a mikrofont. Válaszd ki újra a mikrofonodat (Beüzemelés lap → Eszközök)."
+  "Windows doesn't know that mic any more. Pick your mic again (Setup tab → Devices).": "A Windows már nem ismeri ezt a mikrofont. Válaszd ki újra a mikrofonodat (Beüzemelés lap → Eszközök).",
+  "Search radio stations, genres, countries or cities…": "Rádióállomások, műfajok, országok vagy városok keresése…",
+  "{n} popular station: search, or click a station to play it.": [
+    "{n} népszerű állomás: keressen, vagy kattintson egy állomásra a lejátszáshoz.",
+    "{n} népszerű állomás: keressen, vagy kattintson egy állomásra a lejátszáshoz."
+  ]
 }

@@ -3554,5 +3554,11 @@
   "<br><span style='color:{status}'>Can't open {devices} (My mic). Plugged in? It's tried again by itself.</span>": "<br><span style='color:{status}'>Nie można otworzyć {devices} („Mój mikrofon”). Podłączone? Kolejna próba nastąpi sama.</span>",
   "On, waiting for Windows to allow it: answer its prompt.": "Włączone, czeka na zgodę Windows: odpowiedz na jego pytanie.",
   "Two mics have names like that one. Pick yours again (Setup tab → Devices).": "Dwa mikrofony mają podobne nazwy. Wybierz swój ponownie (karta Konfiguracja → Urządzenia).",
-  "Windows doesn't know that mic any more. Pick your mic again (Setup tab → Devices).": "Windows nie zna już tego mikrofonu. Wybierz mikrofon ponownie (karta Konfiguracja → Urządzenia)."
+  "Windows doesn't know that mic any more. Pick your mic again (Setup tab → Devices).": "Windows nie zna już tego mikrofonu. Wybierz mikrofon ponownie (karta Konfiguracja → Urządzenia).",
+  "Search radio stations, genres, countries or cities…": "Wyszukaj stacje radiowe, gatunki, kraje lub miasta…",
+  "{n} popular station: search, or click a station to play it.": [
+    "{n} popularna stacja: wyszukaj lub kliknij stację, aby ją odtworzyć.",
+    "{n} popularne stacje: wyszukaj lub kliknij stację, aby ją odtworzyć.",
+    "{n} popularnych stacji: wyszukaj lub kliknij stację, aby ją odtworzyć."
+  ]
 }

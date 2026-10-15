@@ -3402,5 +3402,9 @@
   "<br><span style='color:{status}'>Can't open {devices} (My mic). Plugged in? It's tried again by itself.</span>": "<br><span style='color:{status}'>{devices}（「私のマイク」）を開けません。接続されていますか？ 自動で再試行します。</span>",
   "On, waiting for Windows to allow it: answer its prompt.": "オン、Windows の許可待ち: 表示された確認に答えてください。",
   "Two mics have names like that one. Pick yours again (Setup tab → Devices).": "似た名前のマイクが 2 つあります。自分のマイクを選び直してください（セットアップタブ → デバイス）。",
-  "Windows doesn't know that mic any more. Pick your mic again (Setup tab → Devices).": "Windows がそのマイクを認識しなくなりました。マイクを選び直してください（セットアップタブ → デバイス）。"
+  "Windows doesn't know that mic any more. Pick your mic again (Setup tab → Devices).": "Windows がそのマイクを認識しなくなりました。マイクを選び直してください（セットアップタブ → デバイス）。",
+  "Search radio stations, genres, countries or cities…": "ラジオ局、ジャンル、国、都市を検索...",
+  "{n} popular station: search, or click a station to play it.": [
+    "{n}個の人気局：検索するか、局をクリックして再生します。"
+  ]
 }

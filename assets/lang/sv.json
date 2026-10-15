@@ -3478,5 +3478,10 @@
   "<br><span style='color:{status}'>Can't open {devices} (My mic). Plugged in? It's tried again by itself.</span>": "<br><span style='color:{status}'>Kan inte öppna {devices} (Min mikrofon). Inkopplad? Den provas igen av sig själv.</span>",
   "On, waiting for Windows to allow it: answer its prompt.": "På, väntar på att Windows ska tillåta det: svara på frågan.",
   "Two mics have names like that one. Pick yours again (Setup tab → Devices).": "Två mikrofoner har namn som liknar varandra. Välj din igen (fliken Konfiguration → Enheter).",
-  "Windows doesn't know that mic any more. Pick your mic again (Setup tab → Devices).": "Windows känner inte längre igen den mikrofonen. Välj din mikrofon igen (fliken Konfiguration → Enheter)."
+  "Windows doesn't know that mic any more. Pick your mic again (Setup tab → Devices).": "Windows känner inte längre igen den mikrofonen. Välj din mikrofon igen (fliken Konfiguration → Enheter).",
+  "Search radio stations, genres, countries or cities…": "Sök efter radiostationer, genrer, länder eller städer...",
+  "{n} popular station: search, or click a station to play it.": [
+    "{n} populär station: sök, eller klicka på en station för att spela upp den.",
+    "{n} populära stationer: sök, eller klicka på en station för att spela upp den."
+  ]
 }

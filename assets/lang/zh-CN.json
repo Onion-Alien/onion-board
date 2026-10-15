@@ -3402,5 +3402,9 @@
   "<br><span style='color:{status}'>Can't open {devices} (My mic). Plugged in? It's tried again by itself.</span>": "<br><span style='color:{status}'>无法打开 {devices}（“我的麦克风”）。插好了吗？它会自动重试。</span>",
   "On, waiting for Windows to allow it: answer its prompt.": "已开启，正在等 Windows 允许：请回应它的提示。",
   "Two mics have names like that one. Pick yours again (Setup tab → Devices).": "有两个麦克风的名字很像。请重新选择你的麦克风（向导标签页 → 设备）。",
-  "Windows doesn't know that mic any more. Pick your mic again (Setup tab → Devices).": "Windows 已经不认识这个麦克风了。请重新选择你的麦克风（向导标签页 → 设备）。"
+  "Windows doesn't know that mic any more. Pick your mic again (Setup tab → Devices).": "Windows 已经不认识这个麦克风了。请重新选择你的麦克风（向导标签页 → 设备）。",
+  "Search radio stations, genres, countries or cities…": "搜索广播电台、流派、国家或城市……",
+  "{n} popular station: search, or click a station to play it.": [
+    "{n}个热门电台：进行搜索，或单击一个电台即可播放。"
+  ]
 }

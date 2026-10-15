@@ -3478,5 +3478,10 @@
   "<br><span style='color:{status}'>Can't open {devices} (My mic). Plugged in? It's tried again by itself.</span>": "<br><span style='color:{status}'>Δεν ανοίγει: {devices} (Το μικρόφωνό μου). Είναι συνδεδεμένο; Ξαναδοκιμάζεται μόνο του.</span>",
   "On, waiting for Windows to allow it: answer its prompt.": "Ανοιχτό, περιμένει να το επιτρέψουν τα Windows: απάντησε στο μήνυμά τους.",
   "Two mics have names like that one. Pick yours again (Setup tab → Devices).": "Δύο μικρόφωνα έχουν παρόμοια ονόματα. Διάλεξε ξανά το δικό σου (καρτέλα Διαμόρφωση → Συσκευές).",
-  "Windows doesn't know that mic any more. Pick your mic again (Setup tab → Devices).": "Τα Windows δεν γνωρίζουν πια αυτό το μικρόφωνο. Διάλεξε ξανά το μικρόφωνό σου (καρτέλα Διαμόρφωση → Συσκευές)."
+  "Windows doesn't know that mic any more. Pick your mic again (Setup tab → Devices).": "Τα Windows δεν γνωρίζουν πια αυτό το μικρόφωνο. Διάλεξε ξανά το μικρόφωνό σου (καρτέλα Διαμόρφωση → Συσκευές).",
+  "Search radio stations, genres, countries or cities…": "Αναζητήστε ραδιοφωνικούς σταθμούς, είδη, χώρες ή πόλεις…",
+  "{n} popular station: search, or click a station to play it.": [
+    "{n} δημοφιλής σταθμός: κάντε αναζήτηση ή κάντε κλικ σε έναν σταθμό για να τον παίξετε.",
+    "{n} δημοφιλείς σταθμοί: κάντε αναζήτηση ή κάντε κλικ σε έναν σταθμό για να τον παίξετε."
+  ]
 }

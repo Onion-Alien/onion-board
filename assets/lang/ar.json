@@ -3782,5 +3782,14 @@
   "<br><span style='color:{status}'>Can't open {devices} (My mic). Plugged in? It's tried again by itself.</span>": "<br><span style='color:{status}'>تعذّر فتح {devices} (الميكروفون الخاص بي). هل هو موصول؟ ستتم المحاولة مجددًا تلقائيًا.</span>",
   "On, waiting for Windows to allow it: answer its prompt.": "يعمل، بانتظار أن يسمح به Windows: أجب على رسالته.",
   "Two mics have names like that one. Pick yours again (Setup tab → Devices).": "يوجد ميكروفونان باسمين متشابهين. اختر ميكروفونك مرة أخرى (تبويب التهيئة → الأجهزة).",
-  "Windows doesn't know that mic any more. Pick your mic again (Setup tab → Devices).": "لم يعد Windows يعرف هذا الميكروفون. اختر الميكروفون مرة أخرى (تبويب التهيئة → الأجهزة)."
+  "Windows doesn't know that mic any more. Pick your mic again (Setup tab → Devices).": "لم يعد Windows يعرف هذا الميكروفون. اختر الميكروفون مرة أخرى (تبويب التهيئة → الأجهزة).",
+  "Search radio stations, genres, countries or cities…": "ابحث عن محطات الراديو أو الأنواع أو البلدان أو المدن...",
+  "{n} popular station: search, or click a station to play it.": [
+    "{n} محطة شعبية: ابحث، أو انقر على محطة لتشغيلها.",
+    "{n} محطات شعبية: ابحث، أو انقر على محطة لتشغيلها.",
+    "{n} محطات شعبية: ابحث، أو انقر على محطة لتشغيلها.",
+    "{n} محطات شعبية: ابحث، أو انقر على محطة لتشغيلها.",
+    "{n} محطات شعبية: ابحث، أو انقر على محطة لتشغيلها.",
+    "{n} محطات شعبية: ابحث، أو انقر على محطة لتشغيلها."
+  ]
 }

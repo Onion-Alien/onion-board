@@ -3402,5 +3402,9 @@
   "<br><span style='color:{status}'>Can't open {devices} (My mic). Plugged in? It's tried again by itself.</span>": "<br><span style='color:{status}'>เปิด {devices} ไม่ได้ (ไมค์ของฉัน) เสียบอยู่ไหม? ระบบจะลองใหม่เอง</span>",
   "On, waiting for Windows to allow it: answer its prompt.": "เปิด กำลังรอให้ Windows อนุญาต: ตอบหน้าต่างที่ถามอยู่",
   "Two mics have names like that one. Pick yours again (Setup tab → Devices).": "มีไมค์สองตัวที่ชื่อคล้ายกัน เลือกไมค์ของคุณใหม่อีกครั้ง (แท็บ เซ็ตอัป → อุปกรณ์)",
-  "Windows doesn't know that mic any more. Pick your mic again (Setup tab → Devices).": "Windows ไม่รู้จักไมค์นั้นแล้ว เลือกไมค์ใหม่อีกครั้ง (แท็บ เซ็ตอัป → อุปกรณ์)"
+  "Windows doesn't know that mic any more. Pick your mic again (Setup tab → Devices).": "Windows ไม่รู้จักไมค์นั้นแล้ว เลือกไมค์ใหม่อีกครั้ง (แท็บ เซ็ตอัป → อุปกรณ์)",
+  "Search radio stations, genres, countries or cities…": "ค้นหาสถานีวิทยุ ประเภท ประเทศ หรือเมือง...",
+  "{n} popular station: search, or click a station to play it.": [
+    "{n} สถานียอดนิยม: ค้นหา หรือคลิกสถานีเพื่อเล่น"
+  ]
 }

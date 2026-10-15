@@ -3478,5 +3478,10 @@
   "<br><span style='color:{status}'>Can't open {devices} (My mic). Plugged in? It's tried again by itself.</span>": "<br><span style='color:{status}'>{devices} नहीं खुल रहा (मेरा माइक)। प्लग इन है? यह अपने आप फिर से कोशिश करेगा।</span>",
   "On, waiting for Windows to allow it: answer its prompt.": "चालू, Windows की अनुमति का इंतज़ार: उसके संदेश का जवाब दें।",
   "Two mics have names like that one. Pick yours again (Setup tab → Devices).": "दो माइक के नाम मिलते-जुलते हैं। अपना माइक फिर से चुनें (सेटअप टैब → डिवाइस)।",
-  "Windows doesn't know that mic any more. Pick your mic again (Setup tab → Devices).": "विंडोज़ अब उस माइक को नहीं पहचानता। अपना माइक फिर से चुनें (सेटअप टैब → डिवाइस)।"
+  "Windows doesn't know that mic any more. Pick your mic again (Setup tab → Devices).": "विंडोज़ अब उस माइक को नहीं पहचानता। अपना माइक फिर से चुनें (सेटअप टैब → डिवाइस)।",
+  "Search radio stations, genres, countries or cities…": "रेडियो स्टेशन, शैलियाँ, देश या शहर खोजें...",
+  "{n} popular station: search, or click a station to play it.": [
+    "{n} लोकप्रिय स्टेशन - खोजें, या चलाने के लिए किसी स्टेशन पर क्लिक करें।",
+    "{n} लोकप्रिय स्टेशन - खोजें, या चलाने के लिए किसी स्टेशन पर क्लिक करें।"
+  ]
 }

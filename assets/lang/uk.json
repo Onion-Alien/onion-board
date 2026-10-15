@@ -3554,5 +3554,11 @@
   "<br><span style='color:{status}'>Can't open {devices} (My mic). Plugged in? It's tried again by itself.</span>": "<br><span style='color:{status}'>Не вдається відкрити {devices} («Мій мікрофон»). Підключено? Спроба повториться сама.</span>",
   "On, waiting for Windows to allow it: answer its prompt.": "Увімкнено, чекає дозволу Windows: дайте відповідь на його запит.",
   "Two mics have names like that one. Pick yours again (Setup tab → Devices).": "Два мікрофони мають схожі назви. Вибери свій знову (вкладка «Підключення» → Пристрої).",
-  "Windows doesn't know that mic any more. Pick your mic again (Setup tab → Devices).": "Windows більше не знає цей мікрофон. Вибери мікрофон знову (вкладка «Підключення» → Пристрої)."
+  "Windows doesn't know that mic any more. Pick your mic again (Setup tab → Devices).": "Windows більше не знає цей мікрофон. Вибери мікрофон знову (вкладка «Підключення» → Пристрої).",
+  "Search radio stations, genres, countries or cities…": "Шукайте радіостанції, жанри, країни чи міста…",
+  "{n} popular station: search, or click a station to play it.": [
+    "{n} популярна станція: здійсніть пошук або натисніть станцію, щоб її увімкнути.",
+    "{n} популярні станції: здійсніть пошук або натисніть станцію, щоб її увімкнути.",
+    "{n} популярних станцій: здійсніть пошук або натисніть станцію, щоб її увімкнути."
+  ]
 }

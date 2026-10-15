@@ -3402,5 +3402,9 @@
   "<br><span style='color:{status}'>Can't open {devices} (My mic). Plugged in? It's tried again by itself.</span>": "<br><span style='color:{status}'>Tidak dapat membuka {devices} (Mikrofon saya). Sudah dipasang? Ia dicuba semula sendiri.</span>",
   "On, waiting for Windows to allow it: answer its prompt.": "Hidup, menunggu Windows membenarkannya: jawab gesaannya.",
   "Two mics have names like that one. Pick yours again (Setup tab → Devices).": "Dua mikrofon mempunyai nama yang serupa. Pilih mikrofon anda sekali lagi (tab Persediaan → Peranti).",
-  "Windows doesn't know that mic any more. Pick your mic again (Setup tab → Devices).": "Windows tidak lagi mengenali mikrofon itu. Pilih mikrofon anda sekali lagi (tab Persediaan → Peranti)."
+  "Windows doesn't know that mic any more. Pick your mic again (Setup tab → Devices).": "Windows tidak lagi mengenali mikrofon itu. Pilih mikrofon anda sekali lagi (tab Persediaan → Peranti).",
+  "Search radio stations, genres, countries or cities…": "Cari stesen radio, genre, negara atau bandar…",
+  "{n} popular station: search, or click a station to play it.": [
+    "{n} stesen popular: cari, atau klik stesen untuk memainkannya."
+  ]
 }
