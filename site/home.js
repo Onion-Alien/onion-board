@@ -733,6 +733,59 @@
     deepest[tab] = Math.max(deepest[tab] || 0, p);
   }, { passive: true });
 
+  // ------------------------------------------------------------------ the look
+  // The apps' own themes: each swaps every screenshot for the same one in that theme
+  // (screenshots/themes/<theme>/, made by scripts/pictures/site_themes.py) and tints the
+  // page to match. The default pictures stay the plain .png ones search engines index.
+  var lookBtn = $("#look"), lookMenu = $("#look-menu");
+  var looks = $$("#look-menu button");
+  var SHOT = /screenshots\/(watch\/)?(sounds|voice|triggers|apps|setup|main|window-picker|cut-picture|health-bar|categories)\.png/;
+  var shots = $$("img").filter(function (img) {
+    var m = SHOT.exec(img.getAttribute("src") || "");
+    if (m) { img.dataset.base = img.getAttribute("src"); img.dataset.pic = (m[1] || "") + m[2]; }
+    return !!m;
+  });
+  var VARS = ["--bg", "--bg2", "--a1", "--a2", "--link", "--tex", "--tex-size"];
+  function lookMenuOpen(open) {
+    lookMenu.hidden = !open;
+    lookBtn.setAttribute("aria-expanded", open ? "true" : "false");
+  }
+  function setLook(btn, quiet) {
+    var name = btn.dataset.theme, v = btn.dataset.v, vars = btn.dataset.vars || "";
+    VARS.forEach(function (k) { root.style.removeProperty(k); });
+    vars.split(";").forEach(function (kv) { if (kv) { kv = kv.split(":"); root.style.setProperty(kv[0], kv[1]); } });
+    root.classList.toggle("textured", vars.indexOf("--tex:") >= 0);
+    looks.forEach(function (b) { b.setAttribute("aria-pressed", b === btn ? "true" : "false"); });
+    lookBtn.title = "Change the look: " + btn.textContent;
+    lookBtn.setAttribute("aria-label", lookBtn.title);
+    shots.forEach(function (img) {
+      var src = v ? "screenshots/themes/" + name + "/" + img.dataset.pic + ".webp?v=" + v : img.dataset.base;
+      img.dataset.want = src;     // the newest pick wins, however the downloads finish
+      if (img.getAttribute("src") === src) return;
+      var next = new Image();     // swap once it's loaded, so the old one shows until then
+      next.onload = function () { if (img.dataset.want === src) img.src = src; };
+      next.onerror = function () { if (img.dataset.want === src) img.src = img.dataset.base; };
+      next.src = src;
+    });
+    save("onion-site-look", v ? JSON.stringify({ name: name, vars: vars }) : "");
+    if (!quiet) did("look-" + name);
+  }
+  if (lookBtn && looks.length) {
+    var saved = null;
+    try { saved = JSON.parse(load("onion-site-look") || "null"); } catch (e) { /* an old value */ }
+    setLook(looks.filter(function (b) { return saved && b.dataset.theme === saved.name; })[0] || looks[0], true);
+    lookBtn.addEventListener("click", function () { lookMenuOpen(lookMenu.hidden); });
+    looks.forEach(function (b) {
+      b.addEventListener("click", function () { setLook(b); lookMenuOpen(false); lookBtn.focus(); });
+    });
+    document.addEventListener("click", function (e) {
+      if (!lookMenu.hidden && !e.target.closest(".looks")) lookMenuOpen(false);
+    });
+    document.addEventListener("keydown", function (e) {
+      if (e.key === "Escape" && !lookMenu.hidden) { lookMenuOpen(false); lookBtn.focus(); }
+    });
+  }
+
   apply(location.hash === "#watch" ? "watch" : "board");
   did("open-" + current());       // which tab they landed on
 })();

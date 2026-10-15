@@ -183,6 +183,7 @@ def test_dialog_keeps_the_built_in_list_when_offline(qapp, served):
     net.configure_features(offline=True)
     dlg = packsdialog.PacksDialog(lambda p: None)
     try:
+        assert process_events(qapp, lambda: len(dlg.cards) == 5, 5)
         assert [c.pack.id for c in dlg.cards] == ["streamer", "esports", "podcast",
                                                 "halloween", "gm-starter"]
         assert dlg.note.isVisibleTo(dlg) and dlg.note.text()
@@ -371,7 +372,8 @@ def test_the_window_plays_a_sample_to_the_headphones_and_stops_it(qapp, served):
     try:
         dlg._show(packs.parse([p]), "")
         card = dlg.cards[0]
-        assert process_events(qapp, lambda: card.samples[0].sample is not None, 5)
+        assert process_events(
+            qapp, lambda: card.samples[0].sample is not None and not dlg._fills, 5)
         assert [b.isVisibleTo(dlg) for b in card.samples].count(True) == 2
         assert card.samples[0].isEnabled() and card.samples[1].text() == "Dragon"
         card.samples[0].click()
@@ -395,7 +397,8 @@ def test_no_headphones_says_where_to_set_them(qapp, served):
     try:
         dlg._show(packs.parse([p]), "")
         card = dlg.cards[0]
-        assert process_events(qapp, lambda: card.samples[0].sample is not None, 5)
+        assert process_events(
+            qapp, lambda: card.samples[0].sample is not None and not dlg._fills, 5)
         card.samples[0].click()
         assert process_events(qapp, lambda: dlg.note.isVisibleTo(dlg), 5)
         assert "headphones" in dlg.note.text() and not card.samples[0].isChecked()
@@ -437,7 +440,8 @@ def test_samples_still_land_when_the_online_list_remakes_the_cards(qapp, served,
         dlg._show(packs.parse([p]), "")   # the online list, while it's still fetching
         gate.set()
         card = dlg.cards[0]
-        assert process_events(qapp, lambda: card.samples[0].sample is not None, 5)
+        assert process_events(
+            qapp, lambda: card.samples[0].sample is not None and not dlg._fills, 5)
         assert card.listen.isVisibleTo(dlg) and fetched.count("horror") == 1
         dlg._show(packs.parse([p]), "")   # once more: shown at once, not fetched again
         assert dlg.cards[0].samples[0].sample is not None and fetched.count("horror") == 1
@@ -464,12 +468,14 @@ def test_the_online_list_keeps_the_cards_of_packs_that_didnt_change(qapp):
     keep their cards now; only a new or changed pack gets a new one."""
     dlg = packsdialog.PacksDialog(lambda path: None, fetch_list=False)
     try:
+        assert process_events(qapp, lambda: len(dlg.cards) == 5, 5)
         before = list(dlg.cards)
         dlg._show(packs.built_in(), "")
         assert dlg.cards == before and all(a is b for a, b in zip(dlg.cards, before))
         changed = packs.built_in()
         changed[1].description = "Something new"
         dlg._show(changed, "")
+        assert process_events(qapp, lambda: len(dlg.cards) == 5, 5)
         assert [c.pack for c in dlg.cards] == changed
         assert dlg.cards[1] is not before[1]
         assert all(dlg.cards[i] is before[i] for i in (0, 2, 3, 4))
@@ -498,3 +504,38 @@ def test_a_pack_card_never_shows_a_window_of_its_own(qapp):
         qapp.removeEventFilter(spy)
     assert any(c.pack.preview_url for c in cards)
     assert shown == []
+
+
+def test_the_window_is_filled_a_piece_at_a_time(qapp, served):
+    """Built in one go (every card, then every sample's tile) it was ~80 ms of Qt work
+    back to back, and the sound playing came 10 ms late (a skip): the audio threads
+    wait on the UI thread. One card at once, then a card or a tile a step, with a rest
+    between for the audio."""
+    preview = make_preview(("Door", "Dragon"))
+    served.files[with_preview(b"x", preview)["preview"]["url"]] = preview
+    shown = [with_preview(make_pack(), preview, id=f"p{i}", name=f"Pack {i}")
+             for i in range(3)]
+    dlg = packsdialog.PacksDialog(lambda path: None, fetch_list=False,
+                                  play=lambda d, g: True)
+    try:
+        dlg._show(packs.parse(shown), "")
+        assert len(dlg.cards) == 1   # the rest wait their turn: the window isn't empty
+        steps = []
+        real = dlg._step
+
+        def step():
+            before = (len(dlg.cards), sum(b.sample is not None
+                                          for c in dlg.cards for b in c.samples))
+            real()
+            after = (len(dlg.cards), sum(b.sample is not None
+                                         for c in dlg.cards for b in c.samples))
+            steps.append((after[0] - before[0]) + (after[1] - before[1]))
+        dlg._stepper.timeout.disconnect()
+        dlg._stepper.timeout.connect(step)
+        assert process_events(qapp, lambda: len(dlg.cards) == 3 and all(
+            c.samples[1].sample is not None for c in dlg.cards), 5)
+        assert [c.pack.id for c in dlg.cards] == ["p0", "p1", "p2"]
+        assert [dlg.list.itemAt(i).widget() for i in range(3)] == dlg.cards
+        assert steps and max(steps) == 1   # one card or one tile a step, never more
+    finally:
+        dlg.done(0)

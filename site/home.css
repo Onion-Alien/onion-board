@@ -39,7 +39,9 @@ h1 ::selection, h2 ::selection, h1::selection, h2::selection { background: rgba(
 .stage, .switch, .ctas, .icon-btn, .mini-dl, .dl, .small-btn { -webkit-user-select: none; user-select: none; }
 
 /* ---------- background: aurora, grid, grain ---------- */
-.bg { position: fixed; inset: 0; z-index: -1; pointer-events: none; overflow: hidden; }
+.bg { position: fixed; inset: 0; z-index: -1; pointer-events: none; overflow: hidden;
+      background: var(--tex, none) 0 0 / var(--tex-size, auto) repeat; }   /* a picked theme's texture */
+html.textured .bg::before { display: none; }   /* its own pattern stands in for the grid */
 .bg i { position: absolute; border-radius: 50%; filter: blur(110px); }
 .bg i:nth-child(1) { width: 70vmax; height: 70vmax; top: -38vmax; left: -22vmax; background: var(--a1); opacity: .22;
                      animation: drift 28s ease-in-out infinite alternate; }
@@ -60,7 +62,7 @@ h1 ::selection, h2 ::selection, h1::selection, h2::selection { background: rgba(
 /* ---------- top bar ---------- */
 .top { position: sticky; top: 0; z-index: 20; padding: 12px 0; transition: padding .25s, background .25s, border-color .25s;
        border-bottom: 1px solid transparent; }
-.top.stuck { padding: 8px 0; background: rgba(11, 11, 18, .72); border-color: var(--edge);
+.top.stuck { padding: 8px 0; background: color-mix(in srgb, var(--bg) 72%, transparent); border-color: var(--edge);
              backdrop-filter: blur(18px) saturate(1.5); -webkit-backdrop-filter: blur(18px) saturate(1.5); }
 .top .wrap { display: flex; align-items: center; gap: 12px; }
 .brand { display: flex; align-items: center; gap: 9px; color: var(--text); text-decoration: none;
@@ -89,6 +91,28 @@ html:not(.js) .switch { display: none; }
                 padding: 9px 16px; font-size: 14.5px; }
 .top.past .mini-dl { opacity: 1; transform: none; pointer-events: auto; }
 html:not(.js) .icon-btn { display: none; }
+/* the look switcher: the apps' own themes, pictures and page colours together */
+.looks { position: relative; }
+html:not(.js) .looks { display: none; }
+#look i { width: 18px; height: 18px; border-radius: 50%;
+          background: conic-gradient(from 200deg, var(--a1), var(--a2), var(--a1));
+          box-shadow: 0 0 0 2px rgba(255,255,255,.18); transition: transform .35s cubic-bezier(.3,1.6,.5,1); }
+#look:hover i, #look[aria-expanded="true"] i { transform: rotate(-30deg) scale(1.08); }
+.look-menu { position: absolute; top: calc(100% + 10px); right: 0; z-index: 30; display: grid; gap: 2px;
+             width: 210px; padding: 8px; border-radius: 16px; border: 1px solid var(--edge2);
+             background: color-mix(in srgb, var(--bg) 90%, transparent); box-shadow: 0 18px 50px rgba(0,0,0,.5);
+             backdrop-filter: blur(18px) saturate(1.4); -webkit-backdrop-filter: blur(18px) saturate(1.4); }
+.look-menu[hidden] { display: none; }
+.look-menu b { padding: 4px 10px 6px; color: var(--dim); font: 600 13px/1.3 var(--body); }
+.look-menu button { display: flex; align-items: center; gap: 11px; width: 100%; padding: 8px 10px; border: 0;
+                    border-radius: 10px; background: none; color: var(--muted); cursor: pointer; text-align: left;
+                    font: 600 15px/1.2 var(--display); }
+.look-menu button:hover, .look-menu button:focus-visible { background: rgba(255,255,255,.07); color: var(--text); outline: none; }
+.look-menu button[aria-pressed="true"] { color: var(--text); }
+.look-menu button[aria-pressed="true"]::after { content: "✓"; margin-left: auto; color: var(--a1); font-weight: 800; }
+.look-menu button i { flex: none; width: 22px; height: 22px; border-radius: 50%;
+                      background: linear-gradient(135deg, var(--s1) 0 50%, var(--s2) 50%);
+                      box-shadow: 0 0 0 3px var(--s0), 0 0 0 4px rgba(255,255,255,.2); }
 
 /* ---------- buttons ---------- */
 .dl { position: relative; overflow: hidden; display: inline-flex; align-items: center; gap: 10px;
@@ -208,7 +232,7 @@ h1 em, h2 em { font-style: normal; background: linear-gradient(100deg, var(--a1)
 
 /* ---------- the try-it soundboard ---------- */
 .tryit { position: relative; z-index: 1; width: min(440px, 100%); padding: 14px; border-radius: var(--r);
-         background: rgba(18, 18, 28, .66); border: 1px solid var(--edge); box-shadow: 0 24px 60px rgba(0,0,0,.4);
+         background: color-mix(in srgb, var(--bg2) 66%, transparent); border: 1px solid var(--edge); box-shadow: 0 24px 60px rgba(0,0,0,.4);
          backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px); }
 .tryit-head { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin: 0 2px 10px;
               font-size: 13.5px; color: var(--muted); }
