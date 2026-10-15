@@ -928,7 +928,30 @@ def stylesheet(name: str | None = None) -> str:
         css += POLISH_STYLE.substitute(polish_tokens(tk, is_light(name)))
     css += texture_style("QFrame#card, QFrame#setcard, QFrame#fxcard, QFrame#transport, "
                          "QDialog#transport, QFrame#deck", tk)
-    return css
+    return css + held_rings(css)
+
+
+_FOCUS_RULE = re.compile(r"([^{}]*:focus[^{}]*)\{([^{}]*)\}")
+_HELD = (("QPushButton", ":pressed"), ("QToolButton", ":pressed"), ("QComboBox", ":on"),
+         ("QSlider", ":pressed"), ("QCheckBox", ":pressed"), ("QRadioButton", ":pressed"))
+
+
+def held_rings(css: str) -> str:
+    """Click controls take the focus from the Tab key only (widgets.ClickFocusFilter),
+    so their :focus ring is the keyboard's. A mouse gets the same ring while it holds
+    the control down (a drop-down or a button's menu: while it's open), gone as it
+    lets go: every :focus rule again as :pressed (:on for a drop-down)."""
+    out = []
+    for m in _FOCUS_RULE.finditer(css):
+        sels = []
+        for sel in m.group(1).split(","):
+            sel = sel.strip()
+            kind = next((h for k, h in _HELD if k in sel), None)
+            if kind and ":focus" in sel:
+                sels.append(sel.replace(":focus", kind))
+        if sels:
+            out.append(", ".join(sels) + " {" + m.group(2) + "}")
+    return "\n" + "\n".join(out) + "\n" if out else ""
 
 
 # Text colours code writes straight into a label's rich text or a widget's own stylesheet

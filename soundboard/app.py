@@ -576,6 +576,8 @@ def main():
     i18n.translate_qt_buttons(app)   # OK, Cancel, Yes… in Qt's own dialogs
     from soundboard.ui import quietbox
     quietbox.install(app)   # no Windows ding from tips and warnings
+    from soundboard.ui.widgets import install_click_focus
+    install_click_focus(app)   # a click leaves no focus ring: that's for the keyboard
     from soundboard.ui import weblinks
     weblinks.install()   # links open the browser without the relay's proxy settings
     applog.ui_ready()

@@ -7,13 +7,14 @@ from __future__ import annotations
 import html
 
 import math
+from contextlib import contextmanager
 
 from PySide6.QtCore import QEvent, QObject, QPoint, QRect, QRectF, QSize, Qt, QTimer, Signal
 from PySide6.QtGui import QColor, QFont, QPainter, QPainterPath, QRegion
 from shiboken6 import isValid as qt_valid
-from PySide6.QtWidgets import (QBoxLayout, QCheckBox, QComboBox, QFrame, QGridLayout,
+from PySide6.QtWidgets import (QApplication, QBoxLayout, QCheckBox, QComboBox, QFrame, QGridLayout,
                                QHBoxLayout, QLabel, QLayout, QListWidget, QPushButton,
-                               QSizePolicy, QSlider, QSpinBox, QStackedWidget, QStyle,
+                               QSizePolicy, QSlider, QSpinBox, QStackedWidget, QStyle, QTabWidget,
                                QVBoxLayout, QWidget)
 
 from soundboard import theme
@@ -89,6 +90,21 @@ def bar(margins=(10, 5, 12, 6)) -> tuple[QFrame, QHBoxLayout]:
     return f, h
 
 
+@contextmanager
+def keep_focus_off(stack: QTabWidget | QStackedWidget):
+    """Switching `stack`'s page with the focus on the page going away: Qt hands it to the
+    first button on the new page (an ⓘ, a combo), ringed as if tabbed to though nobody
+    pressed a key. The new page itself takes it instead, as a click on the rail leaves
+    it: no ring, and Tab still starts at its first control."""
+    old = stack.currentWidget()
+    fw = QApplication.focusWidget()
+    moving = old is not None and fw is not None and (fw is old or old.isAncestorOf(fw))
+    yield
+    page = stack.currentWidget()
+    if moving and page is not None and page is not old:
+        page.setFocus(Qt.FocusReason.OtherFocusReason)
+
+
 class ShownStack(QStackedWidget):
     """A QStackedWidget whose height at a width is its page on show's. Qt's asks every
     page, and the hidden ones' wrapped text was laid out again at each new width: on
@@ -102,6 +118,14 @@ class ShownStack(QStackedWidget):
         m, lm = self.contentsMargins(), lay.contentsMargins()
         h = page.heightForWidth(w - m.left() - m.right() - lm.left() - lm.right())
         return h + m.top() + m.bottom() + lm.top() + lm.bottom() if h >= 0 else h
+
+    def setCurrentIndex(self, i: int):
+        with keep_focus_off(self):
+            super().setCurrentIndex(i)
+
+    def setCurrentWidget(self, w: QWidget):
+        with keep_focus_off(self):
+            super().setCurrentWidget(w)
 
 
 class Flow(QLayout):

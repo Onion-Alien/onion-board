@@ -455,3 +455,54 @@ def test_a_live_theme_switch_leaves_no_old_text_colours(qapp, win):
     finally:
         win.themectl.apply_theme("Dark")
 
+
+
+def test_switching_pages_hands_no_button_the_focus(qapp, win):
+    """Going to Settings (or another tab) with the focus on the page left: Qt gave it to
+    the new page's first button, the ⓘ beside "Your mic", ringed though no key was
+    pressed. The page (or Settings' list) takes it instead."""
+    win.resize(1180, 720)
+    win.show()
+    win.tabs.setCurrentWidget(win.sounds_page)
+    win.search.setFocus(Qt.FocusReason.MouseFocusReason)
+    for _ in range(2):   # the one made ahead (what the cog opens), then opened again
+        win.setctl._prebuild_settings()
+        win.setctl.warm_settings()
+        win.search.setFocus(Qt.FocusReason.MouseFocusReason)
+        d = win.setctl.open_settings("audio")
+        qapp.processEvents()
+        assert win.focusWidget() is d.categories
+        d.done(0)
+        qapp.processEvents()
+        assert win.focusWidget() in (win.sounds_page, win.tabs.currentWidget())
+    win.search.setFocus(Qt.FocusReason.MouseFocusReason)
+    win.tabs.setCurrentWidget(win.setup_page)
+    qapp.processEvents()
+    assert win.focusWidget() is win.setup_page
+
+
+def test_a_click_leaves_no_focus_ring(qapp, win):
+    """A click on a button, a drag of a slider or a pick from a drop-down left that
+    control ringed until something else was clicked. The ring is for the Tab key."""
+    from PySide6.QtWidgets import QComboBox, QPushButton, QSlider, QVBoxLayout, QWidget
+
+    from soundboard.ui.widgets import install_click_focus
+    install_click_focus(qapp)
+    page = QWidget(win)
+    lay = QVBoxLayout(page)
+    btn, slider, combo = QPushButton("Go"), QSlider(Qt.Orientation.Horizontal), QComboBox()
+    combo.addItems(["a", "b"])
+    for w in (btn, slider, combo):
+        lay.addWidget(w)
+    page.resize(300, 200)
+    win.show()
+    page.show()
+    qapp.processEvents()
+    QTest.mouseClick(btn, Qt.MouseButton.LeftButton)
+    assert not btn.hasFocus()   # never ringed, not even for a moment
+    QTest.mouseClick(slider, Qt.MouseButton.LeftButton, pos=slider.rect().center())
+    assert not slider.hasFocus()
+    assert combo.focusPolicy() == Qt.FocusPolicy.TabFocus
+    slider.setFocus(Qt.FocusReason.TabFocusReason)   # Tab: ringed, as it should be
+    assert slider.hasFocus()
+    page.deleteLater()

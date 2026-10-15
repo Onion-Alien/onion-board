@@ -11,8 +11,8 @@ from PySide6.QtCore import (QEasingCurve, QEvent, QMimeData, QObject, QPoint, QP
                             QSize, Qt, QTimer, QVariantAnimation, Signal)
 from PySide6.QtGui import (QColor, QDrag, QFont, QFontMetrics, QLinearGradient, QPainter,
                            QPainterPath, QPen, QPixmap)
-from PySide6.QtWidgets import (QAbstractButton, QApplication, QGridLayout, QLabel, QMainWindow,
-                               QMenu,
+from PySide6.QtWidgets import (QAbstractButton, QAbstractSlider, QApplication, QComboBox,
+                               QGridLayout, QLabel, QMainWindow, QMenu, QTabBar,
                                QScrollArea,
                                QSlider, QStackedWidget, QStyle, QStyleOptionSlider,
                                QTabWidget, QToolTip,
@@ -220,6 +220,37 @@ class EqCurve(QWidget):
             p.drawText(plate, Qt.AlignmentFlag.AlignCenter, off)
 
 
+def _clicked_kind(w) -> bool:
+    """A control a click works (a button, a drop-down, a slider, a tab): no text to type."""
+    if isinstance(w, QComboBox):
+        return not w.isEditable()
+    return isinstance(w, (QAbstractButton, QAbstractSlider, QTabBar))
+
+
+class ClickFocusFilter(QObject):
+    """The focus ring is for the keyboard: a click, a drag or a pick from a drop-down
+    left the control it touched ringed until something else was clicked. Those
+    controls take the focus from the Tab key only, so a click never rings them (and
+    never moves the focus off whatever had it)."""
+    EVENTS = (QEvent.Type.Polish,)   # all it reads (theme.app_filter)
+
+    def eventFilter(self, obj, event):   # noqa: N802 - Qt API
+        if event.type() == QEvent.Type.Polish and _clicked_kind(obj):
+            policy = obj.focusPolicy()
+            if policy in (Qt.FocusPolicy.StrongFocus, Qt.FocusPolicy.WheelFocus):
+                obj.setFocusPolicy(Qt.FocusPolicy.TabFocus)
+            elif policy == Qt.FocusPolicy.ClickFocus:
+                obj.setFocusPolicy(Qt.FocusPolicy.NoFocus)
+        return False
+
+
+def install_click_focus(app: QApplication) -> None:
+    """ClickFocusFilter on every widget the app shows from now on."""
+    f = ClickFocusFilter(app)
+    app._click_focus_filter = f   # pyright: ignore[reportAttributeAccessIssue]  # kept alive with the app
+    theme.app_filter(app, f)
+
+
 class CrispSlider(QSlider):
     """Themed horizontal slider with a circle aligned to physical pixels."""
 
@@ -264,9 +295,10 @@ class CrispSlider(QSlider):
         p.drawEllipse(circle)
         hovered = opt.activeSubControls == QStyle.SubControl.SC_SliderHandle
         if self.isEnabled() and (self.hasFocus() or hovered or self.isSliderDown()):
-            width = 2 if self.hasFocus() else 1
+            ring = self.hasFocus() or self.isSliderDown()   # Tab, or held by the mouse
+            width = 2 if ring else 1
             p.setBrush(Qt.BrushStyle.NoBrush)
-            p.setPen(QPen(QColor(theme.T["accent" if self.hasFocus() else "border_hi"]), width))
+            p.setPen(QPen(QColor(theme.T["accent" if ring else "border_hi"]), width))
             p.drawEllipse(circle.adjusted(width / 2, width / 2, -width / 2, -width / 2))
 
 
