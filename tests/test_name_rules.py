@@ -65,6 +65,27 @@ def test_a_subcategory_cant_have_its_categorys_name(window):
     assert window.said == ["There's already a “Memes”."]
 
 
+def test_a_new_category_with_a_taken_name_says_so_and_goes_there(window):
+    """The + box given a name that's already a tab: nothing new showed and nothing was
+    said. It goes to that tab and says it's there already (any case); from a pad's
+    menu the sound just joins it."""
+    window.catctl.new_category(name="Memes 🎮")
+    window.catctl.new_category(name="Music")
+    window.said.clear()
+    assert window.catctl.new_category(name="memes 🎮") == "Memes 🎮"
+    assert window.cfg.categories == ["Memes 🎮", "Music"]
+    assert window.cfg.category == "Memes 🎮"
+    assert window.said == ["There's already a “Memes 🎮”."]
+    window.said.clear()
+    assert window.catctl.new_category("s0", name="Music") == "Music"
+    assert "Music" in window.meta("s0").tags and window.said == []
+    window.catctl.new_subcategory("Music", name="Lofi")
+    window.said.clear()
+    assert window.catctl.new_subcategory("Music", name="LOFI") == "Lofi"
+    assert window.cfg.subcategories == {"Music": ["Lofi"]}
+    assert window.said == ["There's already a “Lofi”."]
+
+
 def test_sound_rename_rules(window):
     rename = window.soundctl.rename_sound
     rename("s0", "N" * 60)

@@ -184,7 +184,10 @@ class CategoryControl(Controller):
             return ""
         subs: list[str] = mw.cfg.subcategories.setdefault(cat, [])
         name = {x.lower(): x for x in subs}.get(name.lower(), name)
-        if name not in subs:
+        if name in subs:
+            if not sid:   # as new_category: it goes there, and says so
+                mw.toast(_("There's already a “{new}”.", new=html.escape(name)), "warn")
+        else:
             subs.append(name)
         if sid and mw.meta(sid):
             self.toggle_tag(sid, library.sub_tag(cat, name), on=True)
@@ -376,7 +379,10 @@ class CategoryControl(Controller):
         if not name:
             return ""
         name = {c.lower(): c for c in mw.cfg.categories}.get(name.lower(), name)
-        if name not in mw.cfg.categories:
+        if name in mw.cfg.categories:
+            if not sid:   # the + box: it goes to that tab, and says why nothing new showed
+                mw.toast(_("There's already a “{new}”.", new=html.escape(name)), "warn")
+        else:
             mw.cfg.categories.append(name)
         m = mw.meta(sid) if sid else None
         if m and name not in m.tags:
