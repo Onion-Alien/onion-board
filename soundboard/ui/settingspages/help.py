@@ -68,7 +68,7 @@ class HelpPage(Page):
         live."""
         from soundboard.ui.mainwindow import version_text
         from soundboard.updates import REPO
-        card, cv = self._card("Onion Board")
+        card, cv = self._card("Onion Board", icon="onion")
         ver = self.dlg.about_version = QLabel(_("Version {version}", version=version_text()))
         ver.setTextInteractionFlags(Qt.TextInteractionFlag.TextSelectableByMouse)
         cv.addWidget(ver)
@@ -94,7 +94,8 @@ class HelpPage(Page):
         card, cv = self._card(_("Get in touch"),
                               _("The Discord is where to chat, ask for help and hear about new "
                                 "versions. The feedback form needs no account. Found a security "
-                                "problem? Report it privately on GitHub, not in a public issue."))
+                                "problem? Report it privately on GitHub, not in a public issue."),
+                              icon="speech")
         row = _button_row()
         discord = self._link_button(_("Join the Discord"), feedback.DISCORD_URL, "speech")
         discord.setObjectName("primary")
@@ -114,7 +115,7 @@ class HelpPage(Page):
         return card
 
     def _disclaimer_card(self):
-        card, cv = self._card(_("The boring bit"))
+        card, cv = self._card(_("The boring bit"), icon="info")
         text = QLabel(DISCLAIMER)
         text.setObjectName("hint")
         text.setWordWrap(True)
@@ -131,7 +132,8 @@ class HelpPage(Page):
         card, cv = self._card(_("Support Onion Board"),
                               _("Onion Board is free, with no ads and no account. If it made "
                                 "your games or calls more fun, you can chip in. Entirely "
-                                "optional. The button opens the project's GitHub page."))
+                                "optional. The button opens the project's GitHub page."),
+                              icon="like")
         btn = QPushButton(_("♥  Support Onion Board"))
         btn.clicked.connect(lambda: busy.open_url(
             f"https://github.com/{REPO}#support-onion-board", btn,

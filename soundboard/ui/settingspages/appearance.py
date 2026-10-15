@@ -145,12 +145,15 @@ class AppearancePage(Page):
         v.addWidget(self._language_card())
         hints = {"Classic": _("Changes the whole app instantly."),
                  "Meme": _("For when you want your soundboard to be a bit.")}
-        themes, tv = self._card(_("Themes"))
+        themes, tv = self._card(_("Themes"), icon="palette")
         tv.setSpacing(6)
+        from soundboard.ui.panel import heading_row
+        group_icons = {"Classic": "star", "Colourful": "palette", "Wild": "shuffle",
+                       "Meme": "like"}
         for group, names in theme.GROUPS:
-            head = QLabel(theme.group_name(group))
-            head.setObjectName("section")
-            tv.addWidget(head)
+            head, _title, _marks = heading_row(theme.group_name(group),
+                                               group_icons.get(group, ""))
+            tv.addLayout(head)
             if group in hints:
                 h = QLabel(hints[group])
                 h.setObjectName("hint")
@@ -224,7 +227,7 @@ class AppearancePage(Page):
         card, cv = self._card(_("Live tabs"),
                               _("A tab whose feature is on right now (a sound playing, the voice "
                                 "changer, the radio…) is marked, so nothing is left on without "
-                                "you noticing."))
+                                "you noticing."), icon="live")
         # side by side like Connection's and Network activity's choices (DESIGN section 0:
         # comparable short choices look alike); they wrap when Settings is narrow
         row = _button_row()
@@ -247,7 +250,8 @@ class AppearancePage(Page):
         """Textured or Plain: each theme's own pattern on its panels, or flat panels."""
         card, cv = self._card(_("Theme style"),
                               _("Textured gives each theme its own pattern on the panels: "
-                                "scanlines, carbon fibre, waves and more. Plain keeps them flat."))
+                                "scanlines, carbon fibre, waves and more. Plain keeps them flat."),
+                              icon="image")
         row = _button_row()
         textured = QRadioButton(_("Textured"))
         plain = QRadioButton(_("Plain"))
@@ -269,7 +273,7 @@ class AppearancePage(Page):
         from soundboard.library import UI_SCALES
         card, cv = self._card(_("Interface size"),
                               _("Makes everything in Onion Board bigger or smaller: text, "
-                                "buttons and pads."))
+                                "buttons and pads."), icon="expand")
         now = round(float(os.environ.get("QT_SCALE_FACTOR") or 1) * 100)
         combo = QComboBox()
         combo.setAccessibleName(_("Interface size"))
@@ -307,7 +311,7 @@ class AppearancePage(Page):
 
     def _playing_background_card(self) -> QFrame:
         card, cv = self._card(_("Playing sound background"),
-                              _("Show the playing sound's thumbnail behind the cards"))
+                              _("Show the playing sound's thumbnail behind the cards"), icon="wave")
         enabled = QCheckBox(_("On"))
         enabled.setAccessibleName(_("Playing sound background"))
         enabled.setChecked(self.mw.cfg.playing_background)
@@ -342,7 +346,7 @@ class AppearancePage(Page):
         if other:
             word = i18n.in_language(other, lambda: _("Language"))
             title = title if word == title else f"{title} · {word}"
-        card, cv = self._card(title)
+        card, cv = self._card(title, icon="browser")
         from soundboard.ui.langpick import LangButton
         pick = LangButton()
         pick.setAccessibleName(_("Language"))
@@ -404,7 +408,7 @@ class AppearancePage(Page):
         card, cv = self._card(_("Highlight colour"),
                               _("What's switched on (the voice changer, Live, a live tab) is "
                                 "shown in the theme's colour. Slide to pick your own; it stays "
-                                "when you change theme."))
+                                "when you change theme."), icon="edit")
         row = QHBoxLayout()
         row.setSpacing(10)
         swatch = QPushButton(_("On"))   # a switched-on button, as it will look

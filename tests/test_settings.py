@@ -464,7 +464,7 @@ def test_live_tabs_is_a_tab_of_the_look_box_tint_or_dot(window, qapp):  # noqa: 
     d = SettingsDialog(window, "appearance")
     assert d.live_green.isChecked() == window.cfg.live_tab_green
     card = d.live_green.parentWidget()
-    assert card.findChild(QLabel).text() == "Live tabs"
+    assert card.findChild(QLabel, "section").text() == "Live tabs"
     # one of the look box's tabs, the box right under the language
     names = [b.text() for b in d.look_tabs]
     assert names[0] == "Themes" and "Live tabs" in names
@@ -609,7 +609,7 @@ def test_language_comes_first_on_appearance_and_opens_the_picker(window, monkeyp
     card = btn.parentWidget()
     assert card.parentWidget().layout().itemAt(0).widget() is card    # first on the page
     # the title in Windows' language too: found by someone who can't read English
-    assert card.findChild(QLabel).text() == "Language · Sprache"
+    assert card.findChild(QLabel, "section").text() == "Language · Sprache"
     assert btn.text().startswith("English") and not d.lang_restart.isVisibleTo(d)
     btn.click()                                  # a drop-down: nothing waits on it
     dlg = d.lang_dialog
@@ -1074,3 +1074,33 @@ def test_basics_first_and_show_advanced(window, qapp):  # noqa: F811
         assert cats.currentRow() == d.tabs.currentIndex()
     finally:
         d.close()
+
+
+def test_every_card_heading_has_its_icon_on_one_line(window, qapp):  # noqa: F811
+    """Every Settings card's heading has an icon in front (like Audio recovery's), and
+    a heading that fits stays on one line: sharing its row with a stretch, "Custom
+    voices (text-to-speech)" wrapped at half the card's width."""
+    window.resize(1180, 820)
+    window.show()
+    d = window.setctl.open_settings("audio")   # a page in the window, as the cog opens it
+    try:
+        for i, key in enumerate(d._page_keys):
+            if key == d.ADVANCED:
+                continue
+            d.show_page(key)
+            for _ in range(3):
+                qapp.processEvents()
+            for card in d.tabs.widget(i).widget().findChildren(QFrame, "setcard"):
+                title = next((lb for lb in card.findChildren(QLabel, "section")), None)
+                assert title is not None
+                # (Audio recovery paints its own: any picture beside the title)
+                marks = [lb for lb in card.findChildren(QLabel)
+                         if not lb.pixmap().isNull() and lb.y() <= title.y() + title.height()]
+                assert marks, (key, title.text())
+                if title.isVisible():
+                    one = title.fontMetrics().horizontalAdvance(title.text())
+                    room = card.width() - 28 - 26   # the card's margins, the icon and gap
+                    if one < room:   # it fits: one line, as wide as its words
+                        assert title.width() >= one, (key, title.text())
+    finally:
+        d.accept()

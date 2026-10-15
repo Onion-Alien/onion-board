@@ -4,7 +4,7 @@ from __future__ import annotations
 import threading
 
 from PySide6.QtCore import QTimer, Qt
-from PySide6.QtWidgets import (QCheckBox, QComboBox, QFrame, QGridLayout, QHBoxLayout, QLabel,
+from PySide6.QtWidgets import (QCheckBox, QComboBox, QFrame, QGridLayout, QLabel,
                                QPushButton, QVBoxLayout, QWidget)
 from shiboken6 import isValid as qt_valid
 
@@ -34,12 +34,12 @@ class PrivacyPage(Page):
         from PySide6.QtWidgets import QFileDialog, QSizePolicy
 
         from soundboard import library, quality
-        from soundboard.ui.panel import icon_button, section_label
+        from soundboard.ui.panel import heading_row, icon_button
         q = quality.current
         w, v = self._page()
         self.dlg._data_widgets = {}
 
-        card, cv = self._card(_("Local sounds"))
+        card, cv = self._card(_("Local sounds"), icon="folder")
         self.dlg.copy_local_sounds = self._option(
             cv, _("Copy into library"),
             _("Off: link to the original file. Turn on to keep sounds if the original is "
@@ -53,7 +53,7 @@ class PrivacyPage(Page):
                               _("For a phone hotspot, capped plan or slow internet: smaller "
                                 "downloads, lower-bitrate radio, more patience with stations "
                                 "that cut out, and no pictures in web search results. Or pick "
-                                "each one below."))
+                                "each one below."), icon="leaf")
         self.dlg.data_low = QCheckBox(_("Use less data"))
         self.dlg.data_low.toggled.connect(
             lambda b: self._data_set(**(quality.LOW if b else quality.NORMAL)))
@@ -63,7 +63,8 @@ class PrivacyPage(Page):
         card, cv = self._card(_("Downloads"),
                               _("Sounds added from YouTube, SoundCloud and other links. Smaller "
                                 "files are about a third of the size (around 0.5 MB a minute "
-                                "instead of 1.5 MB) and still sound fine on a pad."))
+                                "instead of 1.5 MB) and still sound fine on a pad."),
+                              icon="download")
         save_hint = _("Downloads and recordings are saved as this in your Sounds folder. "
                       "MP3 opens anywhere; FLAC is about 7 times bigger and loses nothing. "
                       "Files you add from your PC stay as they are.")
@@ -164,15 +165,10 @@ class PrivacyPage(Page):
         ff_col = QVBoxLayout(ff_box)
         ff_col.setContentsMargins(0, 0, 0, 0)
         ff_col.setSpacing(6)
-        head = QHBoxLayout()
-        head.setSpacing(8)
-        name = section_label("FFmpeg")   # a name: the same in every language
-        name.setProperty("head", True)   # no gap above: it shares its line with the pill
-        head.addWidget(name)
         self.dlg.ff_state = QLabel()
         self.dlg.ff_state.setObjectName("pill")       # works / missing / won't start
-        head.addWidget(self.dlg.ff_state)
-        head.addStretch(1)
+        # "FFmpeg": a name, the same in every language; the pill right after it
+        head, _name, _marks = heading_row("FFmpeg", "video", beside=(self.dlg.ff_state,))
         ff_col.addLayout(head)
         self.dlg.ff_note = QLabel()
         self.dlg.ff_note.setObjectName("hint")
@@ -190,7 +186,7 @@ class PrivacyPage(Page):
                               _("Lower bitrates use less data: 128 kbps is about 58 MB an hour, "
                                 "64 kbps about 29 MB and 32 kbps about 14 MB. With a limit, the "
                                 "map and search only show stations at or under it (and ones that "
-                                "don't say)."))
+                                "don't say)."), icon="radio")
         grid = QGridLayout()
         grid.setHorizontalSpacing(12)
         grid.addWidget(QLabel(_("Stations")), 0, 0)
@@ -211,7 +207,7 @@ class PrivacyPage(Page):
             q.patient, lambda b: self._data_set(patient=b))
         v.addWidget(card)
 
-        card, cv = self._card(_("Sounds from the web"))
+        card, cv = self._card(_("Sounds from the web"), icon="search")
         self.dlg._data_widgets["web_extras"] = self._option(
             cv, _("Show pictures"),
             _("Search results load each video's thumbnail. Off: just the titles, a lot less data "
@@ -362,7 +358,7 @@ class PrivacyPage(Page):
             _("Onion Board has no account or ads. The only thing it sends us is the anonymous "
               "usage count below, if it's on. These are the only things that go online. Switch "
               "off what you don't want: off means it makes no connection at all, whatever the "
-              "Connection setting."))
+              "Connection setting."), icon="offline")
         self.dlg.offline_box = self._option(
             cv, _("Offline mode"),
             _("Nothing goes online at all, and everything that needs the internet is hidden "
@@ -383,11 +379,12 @@ class PrivacyPage(Page):
         self.dlg.net_boxes = {}
         self.dlg._net_subs = {}
         groups = (
-            (_("Sounds and radio"), ("sounds_web", "sound_packs", "radio")),
-            (_("Voices"), ("voices", "voice_servers")),
-            (_("Updates and add-ons"), ("app_update", "ytdlp_update", "addons")),
-            (_("Setup downloads"), ("setup_downloads", "tor_download", "ffmpeg_download")),
-            (_("Usage count"), ("usage_stats",)),
+            (_("Sounds and radio"), "music", ("sounds_web", "sound_packs", "radio")),
+            (_("Voices"), "voice", ("voices", "voice_servers")),
+            (_("Updates and add-ons"), "reload", ("app_update", "ytdlp_update", "addons")),
+            (_("Setup downloads"), "download",
+             ("setup_downloads", "tor_download", "ffmpeg_download")),
+            (_("Usage count"), "eye", ("usage_stats",)),
         )
         labels = {"sounds_web": _("Online sounds"), "sound_packs": _("Free sound packs"),
                   "app_update": _("App updates"),
@@ -398,8 +395,8 @@ class PrivacyPage(Page):
                   "tor_download": _("Tor download"),
                   "ffmpeg_download": _("FFmpeg download"),
                   "usage_stats": _("Count me in")}
-        for title, keys in groups:
-            section, sv = self._card(title)
+        for title, icon, keys in groups:
+            section, sv = self._card(title, icon=icon)
             for key in keys:
                 self.dlg.net_boxes[key] = self._option(
                     sv, labels.get(key) or net.feature_name(key), self.dlg.NET_HINTS[key],
@@ -501,7 +498,7 @@ class PrivacyPage(Page):
               "straight from that station, and a download you press fetches that one file. Those "
               "sites see your IP address like they would in a browser, unless you use a proxy or "
               "Tor (Connection page). The radio maps ship with the app: opening them contacts "
-              "nobody."))
+              "nobody."), icon="info")
         remote = QLabel()
         remote.setWordWrap(True)
         on = self.mw.cfg.api_enabled

@@ -16,7 +16,7 @@ class GeneralPage(Page):
 
     def _general(self):
         w, v = self._page()
-        card, cv = self._card(_("Window"))
+        card, cv = self._card(_("Window"), icon="panel_open")
         top = QCheckBox(_("Keep window on top"))
         top.setChecked(self.mw.cfg.always_on_top)
         top.toggled.connect(self.mw.on_top_toggle)
@@ -49,7 +49,7 @@ class GeneralPage(Page):
             _("Set up for the app you're using"),
             _("When a voice chat app or a game starts listening to you, a small bar offers "
               "to set the board up for it. Apps you set up switch the mode by themselves "
-              "next time."))
+              "next time."), icon="setup")
         self.dlg.box_app_setup = self._option(
             cv, _("Offer to set up for new apps"),
             _("Off: nothing asks. Apps already set up still switch."),
@@ -127,7 +127,7 @@ class GeneralPage(Page):
 
     def _programs_card(self):
         """Switch category when a program is in front: every rule in one place."""
-        card, cv = self._card(_("Switch category by program"))
+        card, cv = self._card(_("Switch category by program"), icon="apps")
         self.dlg.box_programs = self._option(
             cv, _("Switch by itself"),
             _("When the program closes, the board goes back to what it showed before."),
@@ -176,7 +176,7 @@ class GeneralPage(Page):
                               _("Something's not right? Reset just the parts you pick: settings, "
                                 "hotkeys, sounds, Recently deleted, Apps tab programs or audio "
                                 "devices. A restore point is saved first, so it can always be "
-                                "undone."))
+                                "undone."), icon="history")
         row = QHBoxLayout()
         rst = QPushButton(_("Reset"))
         icons.set_icon(rst, "reload")
@@ -199,7 +199,7 @@ class GeneralPage(Page):
                               _("Export puts every sound (with its picture, effects, hotkey and "
                                 "categories) and your settings into one .zip: keep it safe, or "
                                 "import it on another PC. Importing a friend's sound pack adds "
-                                "its sounds; ones you already have are skipped."))
+                                "its sounds; ones you already have are skipped."), icon="archive")
         row = QHBoxLayout()
         exp = QPushButton(_("Export everything"))
         icons.set_icon(exp, "folder")
@@ -225,7 +225,7 @@ class GeneralPage(Page):
         card, cv = self._card(_("Running in the background"),
                               _("A soundboard is most useful left running: your hotkeys and the "
                                 "overlay work while the window is closed. The tray icon (by the "
-                                "clock) opens it again; right-click it to quit."))
+                                "clock) opens it again; right-click it to quit."), icon="play")
         tray = QCheckBox(_("Close to tray"))
         tray.setChecked(mw.cfg.tray)
         tray.toggled.connect(lambda b: mw.set_option("tray", b))

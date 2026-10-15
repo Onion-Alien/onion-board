@@ -50,7 +50,7 @@ class ConnectionPage(Page):
             _("Through a proxy or Tor, everything the app fetches (searches, downloads, radio, "
               "updates) goes through it, and site names are looked up there, not on this PC. If "
               "it can't be reached, nothing is fetched: the app never quietly goes direct. This "
-              "PC's own addresses (127.0.0.1) stay direct."))
+              "PC's own addresses (127.0.0.1) stay direct."), icon="tor")
         direct = QRadioButton(_("Direct"))
         direct.setToolTip(_("Connect straight to each site"))
         via = QRadioButton(_("Through a proxy"))
@@ -312,7 +312,7 @@ class ConnectionPage(Page):
     def _activity_card(self):
         """Network activity: every connection the app has made (soundboard.netlog)."""
         from soundboard.ui.netactivity import NetActivity
-        card, cv = self._card(_("Network activity"))
+        card, cv = self._card(_("Network activity"), icon="list")
         self.dlg.net_activity = NetActivity(card)
         cv.addWidget(self.dlg.net_activity)
         self.dlg.netlog_keep_box = self._option(
@@ -361,7 +361,7 @@ class ConnectionPage(Page):
                   "few hours whether a newer version is out and tells you (with a banner if "
                   "it's an important fix). This copy runs from source, so it only tells you: "
                   "update it with git pull.", version=__version__))
-        card, cv = self._card(_("App updates"), hint)
+        card, cv = self._card(_("App updates"), hint, icon="reload")
         chk = self._option(cv, _("Check for updates"),
                            _("Tell me when a new version is out. Nothing is downloaded until I "
                              "press Update now."), self.mw.cfg.update_check,
@@ -431,7 +431,7 @@ class ConnectionPage(Page):
                                 "then. Nothing is downloaded unless you click Update now / "
                                 "Reset, or tick the box below. If downloads keep failing even "
                                 "after updating, Reset deletes it and its cache and installs a "
-                                "fresh copy."))
+                                "fresh copy."), icon="download")
         auto = self._option(cv, _("Update automatically"),
                             _("Check PyPI once a day and after a failed download. Off by "
                               "default: an update is code the app runs."),

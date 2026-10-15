@@ -91,7 +91,7 @@ class AddonsPage(Page):
         up from one add-on to the next, folding to two columns in a narrow window."""
         card, cv = self._card(_("Add-ons"),
                               _("Free add-ons from GitHub. Removing or reinstalling one keeps "
-                                "your triggers and paired phones."))
+                                "your triggers and paired phones."), icon="puzzle")
         grid = _AddonGrid(len(self.dlg.ADDON_COLUMNS))
         cv.addWidget(grid)      # in the card first: a button shown without a parent
         self._watch_block(grid)  # is a window of its own
@@ -427,7 +427,7 @@ class AddonsPage(Page):
                               _("Lets programs on this PC play your sounds: a Stream Deck (its "
                                 "API-request or website buttons, Bitfocus Companion, Touch "
                                 "Portal), AutoHotkey or a script. Only this PC can connect, and "
-                                "only with the key below, treat it like a password."))
+                                "only with the key below, treat it like a password."), icon="cable")
         on = QCheckBox(_("Enable remote control"))
         on.setChecked(cfg.api_enabled)
         cv.addWidget(on)
@@ -750,7 +750,7 @@ class AddonsPage(Page):
         card, cv = self._card(_("Onion Pocket: your pads on your phone"),
                               _("Scan a code with your phone's camera and tap a pad on the phone "
                                 "to play it here. iPhone or Android, in the browser: nothing to "
-                                "install on the phone. A free add-on from GitHub."))
+                                "install on the phone. A free add-on from GitHub."), icon="phone")
         get = QPushButton(_("Get Onion Pocket"))
         row = _button_row()
         row.addWidget(get)
@@ -790,7 +790,8 @@ class AddonsPage(Page):
                                 "Stream Deck keys, channel points and chat commands, step by "
                                 "step. Or copy a ready-made message for ChatGPT, Claude or any "
                                 "AI chat: it explains Onion Board's links and lists your sounds, "
-                                "so the AI can set up whatever tools you use with you."))
+                                "so the AI can set up whatever tools you use with you."),
+                              icon="link")
         # side by side, wrapping (not widening the window) when Settings is narrow
         btns = _button_row()
         guide = QPushButton(_("Streamer guide"))

@@ -21,7 +21,8 @@ class AudioPage(Page):
         card, cv = self._card(_("Your mic"),
                               _("Normally others hear your voice and your sounds together. "
                                 "Untick this for sounds only: they hear the sounds but not your "
-                                "mic. (Same as the “Others hear it” box under My mic.)"))
+                                "mic. (Same as the “Others hear it” box under My mic.)"),
+                              icon="mic")
         send = QCheckBox(_("Send my mic to others"))
         send.setChecked(self.mw.cfg.mic_enabled)
         send.toggled.connect(self.mw.chk_mic.setChecked)   # the window applies it
@@ -33,7 +34,8 @@ class AudioPage(Page):
                                 "some games nothing above 8-12 kHz. Pick where people hear you "
                                 "and they're shaped to get through it. Game and Voice chat work "
                                 "out the exact voice chat by themselves; Clean sends them "
-                                "exactly as mixed; Advanced lets you pick it yourself."))
+                                "exactly as mixed; Advanced lets you pick it yourself."),
+                              icon="ear")
         from soundboard.ui.destpanel import DestPanel
         dest = DestPanel(self.mw)
         dest.chk_gate.setText(_("Mute mic during sounds"))
@@ -42,7 +44,8 @@ class AudioPage(Page):
         card, cv = self._card(_("Audio buffering"),
                               _("Low keeps your voice and sounds as immediate as possible. If "
                                 "the status line reports drop-outs (crackles, stutters), Safer "
-                                "uses bigger buffers: a little more delay, far fewer drop-outs."))
+                                "uses bigger buffers: a little more delay, far fewer drop-outs."),
+                              icon="sliders")
         lat = QComboBox()
         lat.addItem(_("Low (default)"), "low")
         lat.addItem(_("Safer: bigger buffers"), "high")
@@ -74,7 +77,7 @@ class AudioPage(Page):
             _("Your own voices for typed lines and the text-to-speech voice: a TTS server "
               "running on your PC (Kokoro, AllTalk, any OpenAI-style one), a TTS program, or "
               "Piper voice packs dropped into the voices folder. They join the Voice list on the "
-              "Voice tab."))
+              "Voice tab."), icon="speech")
         row = _button_row()   # one line, wrapping only when the window is narrow
         add = QPushButton(_("Add a voice server"))
         icons.set_icon(add, "plus")
@@ -108,7 +111,7 @@ class AudioPage(Page):
         card, cv = self._card(_("Devices"),
                               _("Your mic (input) and where you listen (output). Your sounds go "
                                 "into your mic unless you pick somewhere else to send them. "
-                                "Plugged something in? Press Re-scan."))
+                                "Plugged something in? Press Re-scan."), icon="headphones")
         grid = QGridLayout()
         grid.setHorizontalSpacing(10)
         grid.setVerticalSpacing(6)
