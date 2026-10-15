@@ -13,8 +13,8 @@ import weakref
 import shiboken6
 
 from PySide6.QtCore import QBuffer, QByteArray, QPointF, QRectF, QSize, Qt
-from PySide6.QtGui import (QColor, QIcon, QIconEngine, QPainter, QPainterPath, QPen, QPixmap,
-                           QTransform)
+from PySide6.QtGui import (QColor, QFont, QFontMetricsF, QIcon, QIconEngine, QImage, QPainter,
+                           QPainterPath, QPen, QPixmap, QTextDocument, QTransform)
 
 from soundboard import theme
 
@@ -1067,22 +1067,83 @@ def _mark(name: str, px: int, color: str) -> QPixmap:
     return pm
 
 
-def inline(name: str, color: str, size: int = 16, dpr: float = 1.0) -> str:
+_INLINE_GAP = 3   # clear space either side of an inline mark, so it isn't on the words
+_lift: dict[tuple, int] = {}
+
+
+def _inked_rows(img: QImage, x0: int, x1: int) -> list[int]:
+    """The rows of `img` with something drawn between columns x0 and x1."""
+    return [y for y in range(img.height())
+            if any(img.pixelColor(x, y).alpha() > 128 for x in range(x0, x1))]
+
+
+def _mark_lift(font: QFont, size: int) -> int:
+    """How many pixels of empty space under a `size` px inline mark put its middle level
+    with the middle of `font`'s capitals. Rich text's "vertical-align: middle" centres
+    an image on the font's own box, which sits lower in some fonts than others
+    (Bahnschrift, the default, dropped the tick 4 px under its words), so it's measured:
+    "H" and the mark laid out together, once per font."""
+    key = (font.key(), size)
+    if key in _lift:
+        return _lift[key]
+    cap = QFontMetricsF(font).horizontalAdvance("H")
+    best, best_off = 0, None
+    for pad in range(size):
+        pm = QPixmap(size, size + pad)
+        pm.fill(Qt.GlobalColor.transparent)
+        p = QPainter(pm)
+        p.fillRect(0, 0, size, size, QColor("black"))
+        p.end()
+        doc = QTextDocument()
+        doc.setDefaultFont(font)
+        doc.setDocumentMargin(0)
+        doc.addResource(QTextDocument.ResourceType.ImageResource, "mark:", pm)
+        doc.setHtml(f"H&nbsp;<img src='mark:' width='{size}' height='{size + pad}' "
+                    "style='vertical-align: middle'>")
+        img = QImage(doc.size().toSize(), QImage.Format.Format_ARGB32)
+        img.fill(Qt.GlobalColor.transparent)
+        p = QPainter(img)
+        doc.drawContents(p)
+        p.end()
+        split = math.ceil(cap)
+        h, m = _inked_rows(img, 0, split), _inked_rows(img, split + 1, img.width())
+        if not h or not m:
+            break
+        off = abs((m[0] + m[-1]) - (h[0] + h[-1]))
+        if best_off is None or off < best_off:
+            best, best_off = pad, off
+        elif off > best_off:   # past the best: it only gets worse from here
+            break
+    _lift[key] = best
+    return best
+
+
+def inline(name: str, color: str, size: int = 16, dpr: float = 1.0,
+           font: QFont | None = None) -> str:
     """A status mark ("check" or "cross") inside rich text, as an <img>.
     Drawn at exactly the screen pixels it fills (`size` x the label's
     devicePixelRatioF): rich text scales an image without smoothing, so one drawn
     bigger and shrunk came out jagged. `color` is a real colour (theme.status(...)),
-    so a redraw after a theme change picks up the new one."""
+    so a redraw after a theme change picks up the new one. `font`: the label's, so
+    the mark sits level with its words (see _mark_lift) with a little space each side."""
+    lift = _mark_lift(font, size) if font is not None else 0
+    gap = _INLINE_GAP if font is not None else 0
     px = max(1, round(size * dpr))
-    key = (name, color, px)
+    key = (name, color, px, lift, gap)
     if key not in _inline:
+        w, h = size + 2 * gap, size + lift
+        pm = QPixmap(round(w * dpr), round(h * dpr))
+        pm.fill(Qt.GlobalColor.transparent)
+        p = QPainter(pm)
+        p.drawPixmap(round(gap * dpr), 0, _mark(name, px, color))
+        p.end()
         data = QByteArray()
         buf = QBuffer(data)
         buf.open(QBuffer.OpenModeFlag.WriteOnly)
-        _mark(name, px, color).save(buf, "PNG")
+        pm.save(buf, "PNG")
         src = bytes(data.toBase64().data()).decode()
-        _inline[key] = (f"<img src='data:image/png;base64,{src}' width='{px / dpr:g}' "
-                        f"height='{px / dpr:g}' style='vertical-align: middle'>")
+        _inline[key] = (f"<img src='data:image/png;base64,{src}' width='{w:g}' "
+                        f"height='{h:g}' style='vertical-align: middle'>")
     return _inline[key]
 
 

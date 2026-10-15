@@ -1167,11 +1167,11 @@ def test_mic_card_status_uses_painted_marks_on_one_line(window, monkeypatch):
     out = w.flow_out
     assert "✗" not in out.text() and "✓" not in w.flow_mic.text() + out.text()
     dpr = out.devicePixelRatioF()
-    assert icons.inline("cross", theme.status("error"), dpr=dpr) in out.text()
+    assert icons.inline("cross", theme.status("error"), dpr=dpr, font=out.font()) in out.text()
     assert out.height() < 2 * out.fontMetrics().lineSpacing()   # one line
     dead["on"] = False
     w.statusctl._update_flow()
-    assert icons.inline("check", theme.status("ok"), dpr=dpr) in out.text()
+    assert icons.inline("check", theme.status("ok"), dpr=dpr, font=out.font()) in out.text()
 
 
 def test_sounds_toolbar_dropdown_menus_open_with_gap(window, qapp):

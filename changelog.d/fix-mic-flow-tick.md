@@ -1,0 +1,1 @@
+- The green tick and red cross on the Setup tab's mic card now sit level with their words in every theme's font, with a little space either side (they hung low in the default font).
