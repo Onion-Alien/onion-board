@@ -1645,16 +1645,13 @@ def test_translation_download_keeps_focus(panel, qapp, monkeypatch):
 
 @pytest.mark.parametrize("width", [900, 1600])
 def test_ai_voice_list_keeps_its_height_when_the_description_wraps(panel, qapp, width):
-    """The voice box is narrower than the card: its height must be worked out at its own
-    width, or a two-line description is counted as one and squashes the voice list."""
+    """The picked voice's description wraps under its name: its height must be worked out
+    at its own width, or a two-line one is counted as one and squashes the voice cards."""
     p, _eng = panel
     ai = p.ai
     about = "A light, high, young-sounding voice, good for cheerful characters. " * 3
     ai.voices = [{"id": "pixie", "name": "Pixie", "about": about}]
-    ai.cb_voice.blockSignals(True)
-    ai.cb_voice.clear()
-    ai.cb_voice.addItem("Pixie", "pixie")
-    ai.cb_voice.blockSignals(False)
+    ai._fill_tiles()
     ai.ready_box.setVisible(True)
     ai.missing.setVisible(False)
     p.resize(width, 700)
@@ -1665,11 +1662,11 @@ def test_ai_voice_list_keeps_its_height_when_the_description_wraps(panel, qapp, 
     ai._show_about()
     lb = ai.lbl_about
     process_events(qapp, lambda: lb.height() >= lb.heightForWidth(lb.width())
-                   and ai.cb_voice.height() >= ai.cb_voice.sizeHint().height(), 1.0)
+                   and ai._tile["pixie"].height() >= ai._tile["pixie"].sizeHint().height(), 1.0)
     lines = ai.lbl_about.heightForWidth(ai.lbl_about.width()) // ai.lbl_about.fontMetrics().height()
     assert lines >= 2
     assert ai.lbl_about.height() >= ai.lbl_about.heightForWidth(ai.lbl_about.width())
-    assert ai.cb_voice.height() >= ai.cb_voice.sizeHint().height()
+    assert ai._tile["pixie"].height() >= ai._tile["pixie"].sizeHint().height()
 
 
 def test_stop_takes_the_picked_voice_bar_away_too(panel):

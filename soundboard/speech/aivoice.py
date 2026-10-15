@@ -66,6 +66,11 @@ def clean_settings(raw) -> dict:
         out["pitch"] = round(min(max(float(p), -12.0), 12.0) * 2) / 2
     if raw.get("backup") in BACKUPS:
         out["backup"] = raw["backup"]
+    favs = raw.get("favorites")   # starred voices' ids, in the order starred
+    if isinstance(favs, list):
+        kept = list(dict.fromkeys(f for f in favs if isinstance(f, str) and f))
+        if kept:
+            out["favorites"] = kept[:100]
     return out
 
 
