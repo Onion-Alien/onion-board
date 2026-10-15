@@ -1261,6 +1261,7 @@ class WindowBuilder(Controller):
         mw.vol_sound = VolumeControl(c.sound_vol, tip=_("How loud your sounds are, type up to "
                                                           "1000% in the box"))
         mw.vol_sound.changed.connect(lambda v: mw.set_option("sound_vol", v))
+        mw.vol_sound.changed.connect(lambda v: mw.playctl.sound_volume_changed(v))
         th.addWidget(mw.vol_sound)
         mw.chk_monitor = QCheckBox(_("Hear it myself"))
         mw.chk_monitor.setChecked(c.monitor_sounds)

@@ -3438,10 +3438,12 @@
   "Unplugged": "प्लग नहीं है",
   "Windows can't find <b>{mic}</b> right now. Plug it in, or switch it on if it's wireless. This goes away by itself.": "Windows को अभी <b>{mic}</b> नहीं मिल रहा। उसे लगाएँ, या वायरलेस हो तो चालू करें। यह अपने आप हट जाएगा।",
   "Your headset is off or its mic is muted. Turn it on or unmute it. Still nothing? Click <b>Repair</b>.": "आपका हेडसेट बंद है या उसका माइक म्यूट है। उसे चालू करें या अनम्यूट करें। फिर भी कुछ नहीं? <b>ठीक करें</b> पर क्लिक करें।",
+  "The download was cut off before the end. Try again.": "डाउनलोड पूरा होने से पहले ही कट गया। फिर से कोशिश करें।",
+  "You can change the proxy in Settings > Connection.": "आप प्रॉक्सी को सेटिंग्स > कनेक्शन में बदल सकते हैं।",
+  "the pack's file is damaged, so it wasn't kept": "पैक की फ़ाइल खराब है, इसलिए उसे नहीं रखा गया",
+  "Set to 100%": "100% करें",
+  "Your Sounds volume is at 0%, so nobody else hears your sounds.": "आपका साउंड वॉल्यूम 0% पर है, इसलिए आपके साउंड कोई और नहीं सुन रहा।",
   "Heads up: while Onion Board is open, {key} plays your hotkey instead of doing its usual job in other apps.": "ध्यान दें: जब तक Onion Board खुला है, {key} दूसरे ऐप्स में अपना सामान्य काम करने के बजाय आपकी हॉटकी चलाएगी।",
   "Windows keeps {key} for itself and never passes it to an app, so that hotkey could never play: pick another key.": "Windows {key} को अपने पास रखता है और किसी ऐप को कभी नहीं देता, इसलिए यह हॉटकी कभी नहीं बजेगी: कोई दूसरी की चुनें।",
-  "{key} is your Stop everything key, so it stays on that. Pick another key, or give Stop everything a new one in Settings → Hotkeys first.": "{key} आपकी सब कुछ बंद करो की है, इसलिए यह उसी पर रहेगी। कोई दूसरी की चुनें, या पहले सेटिंग्स → हॉटकी में सब कुछ बंद करो को नई की दें।",
-  "the pack's file is damaged, so it wasn't kept": "पैक की फ़ाइल खराब है, इसलिए उसे नहीं रखा गया",
-  "The download was cut off before the end. Try again.": "डाउनलोड पूरा होने से पहले ही कट गया। फिर से कोशिश करें।",
-  "You can change the proxy in Settings > Connection.": "आप प्रॉक्सी को सेटिंग्स > कनेक्शन में बदल सकते हैं।"
+  "{key} is your Stop everything key, so it stays on that. Pick another key, or give Stop everything a new one in Settings → Hotkeys first.": "{key} आपकी सब कुछ बंद करो की है, इसलिए यह उसी पर रहेगी। कोई दूसरी की चुनें, या पहले सेटिंग्स → हॉटकी में सब कुछ बंद करो को नई की दें।"
 }

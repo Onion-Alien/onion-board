@@ -3438,10 +3438,12 @@
   "Unplugged": "Débranché",
   "Windows can't find <b>{mic}</b> right now. Plug it in, or switch it on if it's wireless. This goes away by itself.": "Windows ne trouve pas <b>{mic}</b> pour l'instant. Branche-le, ou allume-le s'il est sans fil. Ce message part tout seul.",
   "Your headset is off or its mic is muted. Turn it on or unmute it. Still nothing? Click <b>Repair</b>.": "Ton casque est éteint ou son micro est coupé. Allume-le ou réactive le micro. Toujours rien ? Clique sur <b>Réparer</b>.",
+  "The download was cut off before the end. Try again.": "Le téléchargement a été interrompu avant la fin. Réessayez.",
+  "You can change the proxy in Settings > Connection.": "Vous pouvez changer le proxy dans Paramètres > Connexion.",
+  "the pack's file is damaged, so it wasn't kept": "le fichier du pack est endommagé, il n'a donc pas été gardé",
+  "Set to 100%": "Mettre à 100 %",
+  "Your Sounds volume is at 0%, so nobody else hears your sounds.": "Ton volume des Sons est à 0 %, donc personne d’autre n’entend tes sons.",
   "Heads up: while Onion Board is open, {key} plays your hotkey instead of doing its usual job in other apps.": "Attention : tant qu'Onion Board est ouvert, {key} lance ton raccourci au lieu de faire son travail habituel dans les autres applis.",
   "Windows keeps {key} for itself and never passes it to an app, so that hotkey could never play: pick another key.": "Windows garde {key} pour lui et ne la transmet jamais à une appli, donc ce raccourci ne pourrait jamais jouer : choisis une autre touche.",
-  "{key} is your Stop everything key, so it stays on that. Pick another key, or give Stop everything a new one in Settings → Hotkeys first.": "{key} est ta touche Tout arrêter, elle y reste donc. Choisis une autre touche, ou donne d'abord une nouvelle touche à Tout arrêter dans Paramètres → Raccourcis.",
-  "the pack's file is damaged, so it wasn't kept": "le fichier du pack est endommagé, il n'a donc pas été gardé",
-  "The download was cut off before the end. Try again.": "Le téléchargement a été interrompu avant la fin. Réessayez.",
-  "You can change the proxy in Settings > Connection.": "Vous pouvez changer le proxy dans Paramètres > Connexion."
+  "{key} is your Stop everything key, so it stays on that. Pick another key, or give Stop everything a new one in Settings → Hotkeys first.": "{key} est ta touche Tout arrêter, elle y reste donc. Choisis une autre touche, ou donne d'abord une nouvelle touche à Tout arrêter dans Paramètres → Raccourcis."
 }

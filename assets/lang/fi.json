@@ -3438,10 +3438,12 @@
   "Unplugged": "Irrotettu",
   "Windows can't find <b>{mic}</b> right now. Plug it in, or switch it on if it's wireless. This goes away by itself.": "Windows ei löydä laitetta <b>{mic}</b> juuri nyt. Kytke se kiinni, tai laita se päälle, jos se on langaton. Tämä katoaa itsestään.",
   "Your headset is off or its mic is muted. Turn it on or unmute it. Still nothing? Click <b>Repair</b>.": "Kuulokkeesi ovat pois päältä tai niiden mikki on mykistetty. Laita ne päälle tai poista mykistys. Vieläkään ei mitään? Klikkaa <b>Korjaa</b>.",
+  "The download was cut off before the end. Try again.": "Lataus katkesi ennen loppua. Yritä uudelleen.",
+  "You can change the proxy in Settings > Connection.": "Voit vaihtaa välityspalvelimen kohdassa Asetukset > Yhteys.",
+  "the pack's file is damaged, so it wasn't kept": "paketin tiedosto on vioittunut, joten sitä ei säilytetty",
+  "Set to 100%": "Aseta 100 %:iin",
+  "Your Sounds volume is at 0%, so nobody else hears your sounds.": "Äänet-voimakkuus on 0 %, joten kukaan muu ei kuule ääniäsi.",
   "Heads up: while Onion Board is open, {key} plays your hotkey instead of doing its usual job in other apps.": "Huomio: kun Onion Board on auki, {key} käynnistää pikanäppäimesi eikä tee tavallista tehtäväänsä muissa sovelluksissa.",
   "Windows keeps {key} for itself and never passes it to an app, so that hotkey could never play: pick another key.": "Windows pitää {key} itsellään eikä anna sitä koskaan sovellukselle, joten tämä pikanäppäin ei soisi koskaan: valitse toinen näppäin.",
-  "{key} is your Stop everything key, so it stays on that. Pick another key, or give Stop everything a new one in Settings → Hotkeys first.": "{key} on Pysäytä kaikki -näppäimesi, joten se pysyy siinä. Valitse toinen näppäin tai anna ensin Pysäytä kaikki -toiminnolle uusi kohdassa Asetukset → Pikanäppäimet.",
-  "the pack's file is damaged, so it wasn't kept": "paketin tiedosto on vioittunut, joten sitä ei säilytetty",
-  "The download was cut off before the end. Try again.": "Lataus katkesi ennen loppua. Yritä uudelleen.",
-  "You can change the proxy in Settings > Connection.": "Voit vaihtaa välityspalvelimen kohdassa Asetukset > Yhteys."
+  "{key} is your Stop everything key, so it stays on that. Pick another key, or give Stop everything a new one in Settings → Hotkeys first.": "{key} on Pysäytä kaikki -näppäimesi, joten se pysyy siinä. Valitse toinen näppäin tai anna ensin Pysäytä kaikki -toiminnolle uusi kohdassa Asetukset → Pikanäppäimet."
 }

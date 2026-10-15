@@ -3438,10 +3438,12 @@
   "Unplugged": "Takılı değil",
   "Windows can't find <b>{mic}</b> right now. Plug it in, or switch it on if it's wireless. This goes away by itself.": "Windows şu an <b>{mic}</b> cihazını bulamıyor. Tak ya da kablosuzsa aç. Bu kendiliğinden kaybolur.",
   "Your headset is off or its mic is muted. Turn it on or unmute it. Still nothing? Click <b>Repair</b>.": "Kulaklığın kapalı ya da mikrofonu sessizde. Kulaklığı aç ya da mikrofonun sesini aç. Hâlâ bir şey yok mu? <b>Onar</b>'a tıkla.",
+  "The download was cut off before the end. Try again.": "İndirme bitmeden kesildi. Tekrar deneyin.",
+  "You can change the proxy in Settings > Connection.": "Proxy'yi Ayarlar > Bağlantı bölümünden değiştirebilirsiniz.",
+  "the pack's file is damaged, so it wasn't kept": "paketin dosyası bozuk, bu yüzden saklanmadı",
+  "Set to 100%": "%100 yap",
+  "Your Sounds volume is at 0%, so nobody else hears your sounds.": "Sesler düzeyin %0'da, bu yüzden seslerini senden başka kimse duymuyor.",
   "Heads up: while Onion Board is open, {key} plays your hotkey instead of doing its usual job in other apps.": "Dikkat: Onion Board açıkken {key}, diğer uygulamalardaki olağan işini yapmak yerine kısayolunu çalar.",
   "Windows keeps {key} for itself and never passes it to an app, so that hotkey could never play: pick another key.": "Windows {key} tuşunu kendine ayırır ve hiçbir uygulamaya iletmez, bu yüzden bu kısayol asla çalmaz: başka bir tuş seç.",
-  "{key} is your Stop everything key, so it stays on that. Pick another key, or give Stop everything a new one in Settings → Hotkeys first.": "{key} senin Herşeyi durdur tuşun, o yüzden orada kalıyor. Başka bir tuş seç ya da önce Ayarlar → Kısayol tuşları'ndan Herşeyi durdur'a yeni bir tuş ver.",
-  "the pack's file is damaged, so it wasn't kept": "paketin dosyası bozuk, bu yüzden saklanmadı",
-  "The download was cut off before the end. Try again.": "İndirme bitmeden kesildi. Tekrar deneyin.",
-  "You can change the proxy in Settings > Connection.": "Proxy'yi Ayarlar > Bağlantı bölümünden değiştirebilirsiniz."
+  "{key} is your Stop everything key, so it stays on that. Pick another key, or give Stop everything a new one in Settings → Hotkeys first.": "{key} senin Herşeyi durdur tuşun, o yüzden orada kalıyor. Başka bir tuş seç ya da önce Ayarlar → Kısayol tuşları'ndan Herşeyi durdur'a yeni bir tuş ver."
 }

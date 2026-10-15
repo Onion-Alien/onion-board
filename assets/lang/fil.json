@@ -3438,10 +3438,12 @@
   "Unplugged": "Hindi nakasaksak",
   "Windows can't find <b>{mic}</b> right now. Plug it in, or switch it on if it's wireless. This goes away by itself.": "Hindi mahanap ng Windows ang <b>{mic}</b> ngayon. Isaksak ito, o i-on kung wireless ito. Kusa itong mawawala.",
   "Your headset is off or its mic is muted. Turn it on or unmute it. Still nothing? Click <b>Repair</b>.": "Naka-off ang headset mo o naka-mute ang mic nito. I-on ito o i-unmute. Wala pa rin? I-click ang <b>I-repair</b>.",
+  "The download was cut off before the end. Try again.": "Naputol ang download bago matapos. Subukan ulit.",
+  "You can change the proxy in Settings > Connection.": "Mapapalitan mo ang proxy sa Mga Setting > Koneksyon.",
+  "the pack's file is damaged, so it wasn't kept": "sira ang file ng pack, kaya hindi ito itinago",
+  "Set to 100%": "Gawing 100%",
+  "Your Sounds volume is at 0%, so nobody else hears your sounds.": "Nasa 0% ang volume ng Sounds mo, kaya walang ibang nakakarinig ng sounds mo.",
   "Heads up: while Onion Board is open, {key} plays your hotkey instead of doing its usual job in other apps.": "Paalala: habang bukas ang Onion Board, pinapatugtog ng {key} ang hotkey mo sa halip na gawin ang karaniwang trabaho nito sa ibang app.",
   "Windows keeps {key} for itself and never passes it to an app, so that hotkey could never play: pick another key.": "Itinatabi ng Windows ang {key} para sa sarili nito at hindi ito ibinibigay sa anumang app, kaya hindi kailanman tutugtog ang hotkey na iyan: pumili ng ibang key.",
-  "{key} is your Stop everything key, so it stays on that. Pick another key, or give Stop everything a new one in Settings → Hotkeys first.": "Ang {key} ang key mo para sa Itigil lahat, kaya doon ito mananatili. Pumili ng ibang key, o bigyan muna ng bago ang Itigil lahat sa Settings → Mga hotkey.",
-  "the pack's file is damaged, so it wasn't kept": "sira ang file ng pack, kaya hindi ito itinago",
-  "The download was cut off before the end. Try again.": "Naputol ang download bago matapos. Subukan ulit.",
-  "You can change the proxy in Settings > Connection.": "Mapapalitan mo ang proxy sa Mga Setting > Koneksyon."
+  "{key} is your Stop everything key, so it stays on that. Pick another key, or give Stop everything a new one in Settings → Hotkeys first.": "Ang {key} ang key mo para sa Itigil lahat, kaya doon ito mananatili. Pumili ng ibang key, o bigyan muna ng bago ang Itigil lahat sa Settings → Mga hotkey."
 }

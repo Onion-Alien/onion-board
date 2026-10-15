@@ -3438,10 +3438,12 @@
   "Unplugged": "Ej ansluten",
   "Windows can't find <b>{mic}</b> right now. Plug it in, or switch it on if it's wireless. This goes away by itself.": "Windows hittar inte <b>{mic}</b> just nu. Anslut det, eller slå på det om det är trådlöst. Det här försvinner av sig självt.",
   "Your headset is off or its mic is muted. Turn it on or unmute it. Still nothing? Click <b>Repair</b>.": "Ditt headset är avstängt eller dess mikrofon avstängd. Slå på det eller mikrofonen. Fortfarande inget? Klicka <b>Reparera</b>.",
+  "The download was cut off before the end. Try again.": "Nedladdningen avbröts innan den var klar. Försök igen.",
+  "You can change the proxy in Settings > Connection.": "Du kan ändra proxyn i Inställningar > Anslutning.",
+  "the pack's file is damaged, so it wasn't kept": "paketets fil är skadad, så den sparades inte",
+  "Set to 100%": "Sätt till 100 %",
+  "Your Sounds volume is at 0%, so nobody else hears your sounds.": "Din Ljud-volym står på 0 %, så ingen annan hör dina ljud.",
   "Heads up: while Onion Board is open, {key} plays your hotkey instead of doing its usual job in other apps.": "Obs: medan Onion Board är öppen spelar {key} din snabbtangent i stället för att göra sitt vanliga jobb i andra appar.",
   "Windows keeps {key} for itself and never passes it to an app, so that hotkey could never play: pick another key.": "Windows behåller {key} för sig själv och skickar den aldrig vidare till en app, så snabbtangenten skulle aldrig spela: välj en annan tangent.",
-  "{key} is your Stop everything key, so it stays on that. Pick another key, or give Stop everything a new one in Settings → Hotkeys first.": "{key} är din tangent för Stoppa allt, så den stannar där. Välj en annan tangent, eller ge först Stoppa allt en ny under Inställningar → Snabbtangenter.",
-  "the pack's file is damaged, so it wasn't kept": "paketets fil är skadad, så den sparades inte",
-  "The download was cut off before the end. Try again.": "Nedladdningen avbröts innan den var klar. Försök igen.",
-  "You can change the proxy in Settings > Connection.": "Du kan ändra proxyn i Inställningar > Anslutning."
+  "{key} is your Stop everything key, so it stays on that. Pick another key, or give Stop everything a new one in Settings → Hotkeys first.": "{key} är din tangent för Stoppa allt, så den stannar där. Välj en annan tangent, eller ge först Stoppa allt en ny under Inställningar → Snabbtangenter."
 }
