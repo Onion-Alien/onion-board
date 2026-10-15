@@ -2881,7 +2881,7 @@ def test_redraws_never_look_for_the_cable_setup_on_the_ui_thread(window, monkeyp
     for _ in range(5):
         w.statusctl._update_flow()
     assert len(asked) == 1                   # asked once, not on every redraw
-    monkeypatch.setattr(w.engine, "shutdown", lambda: None)
+    monkeypatch.setattr(w.engine, "close_streams", lambda: None)
     monkeypatch.setattr(w.devctl, "_init_devices", lambda: None)
     monkeypatch.setattr(w.routectl, "_prepare_all", lambda: None)
     w.devctl.refresh_devices()                      # devices re-scanned: looked up again

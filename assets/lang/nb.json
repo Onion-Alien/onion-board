@@ -3442,5 +3442,7 @@
   "They go in a category called “{name}”.": "De havner i en kategori som heter «{name}».",
   "Type a name first.": "Skriv inn et navn først.",
   "✓ Renamed to “{new}”. Another sound has that name too.": "✓ Nytt navn: «{new}». En annen lyd heter også det.",
-  "the pack's file is damaged, so it wasn't kept": "pakkens fil er skadet, så den ble ikke beholdt"
+  "the pack's file is damaged, so it wasn't kept": "pakkens fil er skadet, så den ble ikke beholdt",
+  "The download was cut off before the end. Try again.": "Nedlastingen ble avbrutt før slutten. Prøv igjen.",
+  "You can change the proxy in Settings > Connection.": "Du kan endre proxyen i Innstillinger > Tilkobling."
 }

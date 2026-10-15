@@ -3442,5 +3442,7 @@
   "They go in a category called “{name}”.": "ये “{name}” नाम की कैटेगरी में जाएँगे।",
   "Type a name first.": "पहले एक नाम लिखें।",
   "✓ Renamed to “{new}”. Another sound has that name too.": "✓ नाम बदलकर “{new}” किया। एक और साउंड का भी यही नाम है।",
-  "the pack's file is damaged, so it wasn't kept": "पैक की फ़ाइल खराब है, इसलिए उसे नहीं रखा गया"
+  "the pack's file is damaged, so it wasn't kept": "पैक की फ़ाइल खराब है, इसलिए उसे नहीं रखा गया",
+  "The download was cut off before the end. Try again.": "डाउनलोड पूरा होने से पहले ही कट गया। फिर से कोशिश करें।",
+  "You can change the proxy in Settings > Connection.": "आप प्रॉक्सी को सेटिंग्स > कनेक्शन में बदल सकते हैं।"
 }

@@ -3518,5 +3518,7 @@
   "They go in a category called “{name}”.": "Они попадут в категорию «{name}».",
   "Type a name first.": "Сначала введите название.",
   "✓ Renamed to “{new}”. Another sound has that name too.": "✓ Переименовано в «{new}». Другой звук тоже так называется.",
-  "the pack's file is damaged, so it wasn't kept": "файл пакета повреждён, поэтому он не сохранён"
+  "the pack's file is damaged, so it wasn't kept": "файл пакета повреждён, поэтому он не сохранён",
+  "The download was cut off before the end. Try again.": "Загрузка оборвалась, не дойдя до конца. Попробуйте ещё раз.",
+  "You can change the proxy in Settings > Connection.": "Прокси можно изменить в разделе «Настройки» > «Подключение»."
 }

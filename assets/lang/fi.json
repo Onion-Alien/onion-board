@@ -3442,5 +3442,7 @@
   "They go in a category called “{name}”.": "Ne menevät luokkaan nimeltä “{name}”.",
   "Type a name first.": "Kirjoita ensin nimi.",
   "✓ Renamed to “{new}”. Another sound has that name too.": "✓ Uudelleennimetty \"{new}\". Toisellakin äänellä on sama nimi.",
-  "the pack's file is damaged, so it wasn't kept": "paketin tiedosto on vioittunut, joten sitä ei säilytetty"
+  "the pack's file is damaged, so it wasn't kept": "paketin tiedosto on vioittunut, joten sitä ei säilytetty",
+  "The download was cut off before the end. Try again.": "Lataus katkesi ennen loppua. Yritä uudelleen.",
+  "You can change the proxy in Settings > Connection.": "Voit vaihtaa välityspalvelimen kohdassa Asetukset > Yhteys."
 }

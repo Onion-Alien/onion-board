@@ -3518,5 +3518,7 @@
   "They go in a category called “{name}”.": "Trafią do kategorii o nazwie „{name}”.",
   "Type a name first.": "Najpierw wpisz nazwę.",
   "✓ Renamed to “{new}”. Another sound has that name too.": "✓ Zmieniono nazwę na „{new}”. Inny dźwięk też ma tę nazwę.",
-  "the pack's file is damaged, so it wasn't kept": "plik pakietu jest uszkodzony, więc nie został zachowany"
+  "the pack's file is damaged, so it wasn't kept": "plik pakietu jest uszkodzony, więc nie został zachowany",
+  "The download was cut off before the end. Try again.": "Pobieranie zostało przerwane przed końcem. Spróbuj ponownie.",
+  "You can change the proxy in Settings > Connection.": "Proxy możesz zmienić w Ustawieniach > Połączenie."
 }

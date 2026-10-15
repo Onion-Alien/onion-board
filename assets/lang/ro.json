@@ -3518,5 +3518,7 @@
   "They go in a category called “{name}”.": "Ajung într-o categorie numită „{name}”.",
   "Type a name first.": "Scrie mai întâi un nume.",
   "✓ Renamed to “{new}”. Another sound has that name too.": "✓ Redenumit în „{new}”. Și alt sunet are numele ăsta.",
-  "the pack's file is damaged, so it wasn't kept": "fișierul pachetului este deteriorat, așa că nu a fost păstrat"
+  "the pack's file is damaged, so it wasn't kept": "fișierul pachetului este deteriorat, așa că nu a fost păstrat",
+  "The download was cut off before the end. Try again.": "Descărcarea s-a întrerupt înainte de final. Încearcă din nou.",
+  "You can change the proxy in Settings > Connection.": "Poți schimba proxy-ul din Setări > Conexiune."
 }

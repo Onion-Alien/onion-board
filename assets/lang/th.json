@@ -3366,5 +3366,7 @@
   "They go in a category called “{name}”.": "จะอยู่ในหมวดหมู่ชื่อ “{name}”",
   "Type a name first.": "พิมพ์ชื่อก่อน",
   "✓ Renamed to “{new}”. Another sound has that name too.": "✓ เปลี่ยนชื่อเป็น “{new}” แล้ว มีเสียงอื่นที่ชื่อนี้ด้วย",
-  "the pack's file is damaged, so it wasn't kept": "ไฟล์ของแพ็คเสียหาย จึงไม่ได้เก็บไว้"
+  "the pack's file is damaged, so it wasn't kept": "ไฟล์ของแพ็คเสียหาย จึงไม่ได้เก็บไว้",
+  "The download was cut off before the end. Try again.": "การดาวน์โหลดถูกตัดก่อนเสร็จ ลองอีกครั้ง",
+  "You can change the proxy in Settings > Connection.": "คุณเปลี่ยนพร็อกซีได้ในการตั้งค่า > การเชื่อมต่อ"
 }

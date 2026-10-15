@@ -3442,5 +3442,7 @@
   "They go in a category called “{name}”.": "Egy „{name}” nevű kategóriába kerülnek.",
   "Type a name first.": "Előbb írj be egy nevet.",
   "✓ Renamed to “{new}”. Another sound has that name too.": "✓ átnevezve erre: „{new}”. Egy másik hang neve is ez.",
-  "the pack's file is damaged, so it wasn't kept": "a csomag fájlja sérült, ezért nem lett megtartva"
+  "the pack's file is damaged, so it wasn't kept": "a csomag fájlja sérült, ezért nem lett megtartva",
+  "The download was cut off before the end. Try again.": "A letöltés a vége előtt megszakadt. Próbáld újra.",
+  "You can change the proxy in Settings > Connection.": "A proxyt a Beállítások > Kapcsolat részben módosíthatod."
 }

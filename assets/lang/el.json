@@ -3442,5 +3442,7 @@
   "They go in a category called “{name}”.": "Μπαίνουν σε κατηγορία με όνομα «{name}».",
   "Type a name first.": "Γράψτε πρώτα ένα όνομα.",
   "✓ Renamed to “{new}”. Another sound has that name too.": "✓ Μετονομάστηκε σε \"{new}\". Και άλλος ήχος έχει αυτό το όνομα.",
-  "the pack's file is damaged, so it wasn't kept": "το αρχείο του πακέτου είναι κατεστραμμένο, οπότε δεν κρατήθηκε"
+  "the pack's file is damaged, so it wasn't kept": "το αρχείο του πακέτου είναι κατεστραμμένο, οπότε δεν κρατήθηκε",
+  "The download was cut off before the end. Try again.": "Η λήψη διακόπηκε πριν τελειώσει. Δοκιμάστε ξανά.",
+  "You can change the proxy in Settings > Connection.": "Μπορείτε να αλλάξετε τον διακομιστή μεσολάβησης στις Ρυθμίσεις > Σύνδεση."
 }

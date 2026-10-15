@@ -3518,5 +3518,7 @@
   "They go in a category called “{name}”.": "Přijdou do kategorie „{name}“.",
   "Type a name first.": "Nejdřív napište název.",
   "✓ Renamed to “{new}”. Another sound has that name too.": "✓ Přejmenováno na „{new}“. Stejně se jmenuje i jiný zvuk.",
-  "the pack's file is damaged, so it wasn't kept": "soubor balíčku je poškozený, proto nebyl ponechán"
+  "the pack's file is damaged, so it wasn't kept": "soubor balíčku je poškozený, proto nebyl ponechán",
+  "The download was cut off before the end. Try again.": "Stahování se přerušilo před koncem. Zkuste to znovu.",
+  "You can change the proxy in Settings > Connection.": "Proxy můžete změnit v Nastavení > Připojení."
 }

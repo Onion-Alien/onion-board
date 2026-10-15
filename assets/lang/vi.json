@@ -3366,5 +3366,7 @@
   "They go in a category called “{name}”.": "Chúng vào một danh mục tên “{name}”.",
   "Type a name first.": "Hãy nhập tên trước.",
   "✓ Renamed to “{new}”. Another sound has that name too.": "✓ Đã đổi tên thành “{new}”. Một âm thanh khác cũng có tên này.",
-  "the pack's file is damaged, so it wasn't kept": "tệp của gói bị hỏng nên không được giữ lại"
+  "the pack's file is damaged, so it wasn't kept": "tệp của gói bị hỏng nên không được giữ lại",
+  "The download was cut off before the end. Try again.": "Tải xuống bị ngắt trước khi xong. Hãy thử lại.",
+  "You can change the proxy in Settings > Connection.": "Bạn có thể đổi proxy trong Cài đặt > Kết nối."
 }

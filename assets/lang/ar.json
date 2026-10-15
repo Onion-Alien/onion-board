@@ -3746,5 +3746,7 @@
   "They go in a category called “{name}”.": "ستوضع في فئة باسم “{name}”.",
   "Type a name first.": "اكتب اسمًا أولًا.",
   "✓ Renamed to “{new}”. Another sound has that name too.": "✓ أُعيدت التسمية إلى “{new}”. يوجد صوت آخر بهذا الاسم أيضًا.",
-  "the pack's file is damaged, so it wasn't kept": "ملف الحزمة تالف، لذا لم يتم الاحتفاظ به"
+  "the pack's file is damaged, so it wasn't kept": "ملف الحزمة تالف، لذا لم يتم الاحتفاظ به",
+  "The download was cut off before the end. Try again.": "انقطع التنزيل قبل اكتماله. حاول مرة أخرى.",
+  "You can change the proxy in Settings > Connection.": "يمكنك تغيير الوكيل في الإعدادات > الاتصال."
 }

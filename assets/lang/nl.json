@@ -3442,5 +3442,7 @@
   "They go in a category called “{name}”.": "Ze komen in een categorie met de naam “{name}”.",
   "Type a name first.": "Typ eerst een naam.",
   "✓ Renamed to “{new}”. Another sound has that name too.": "✓ Hernoemd naar “{new}”. Een ander geluid heet ook zo.",
-  "the pack's file is damaged, so it wasn't kept": "het bestand van het pakket is beschadigd, dus het is niet bewaard"
+  "the pack's file is damaged, so it wasn't kept": "het bestand van het pakket is beschadigd, dus het is niet bewaard",
+  "The download was cut off before the end. Try again.": "De download werd voor het einde afgebroken. Probeer het opnieuw.",
+  "You can change the proxy in Settings > Connection.": "Je kunt de proxy wijzigen in Instellingen > Verbinding."
 }

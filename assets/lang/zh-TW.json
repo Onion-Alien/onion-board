@@ -3366,5 +3366,7 @@
   "They go in a category called “{name}”.": "它們會放進名為「{name}」的分類。",
   "Type a name first.": "請先輸入名稱。",
   "✓ Renamed to “{new}”. Another sound has that name too.": "✓ 已重新命名為「{new}」。另一個音效也叫這個名字。",
-  "the pack's file is damaged, so it wasn't kept": "包檔案已損毀，因此未保留"
+  "the pack's file is damaged, so it wasn't kept": "包檔案已損毀，因此未保留",
+  "The download was cut off before the end. Try again.": "下載在完成前中斷了。請再試一次。",
+  "You can change the proxy in Settings > Connection.": "你可以在「設定」>「連線」中變更代理。"
 }

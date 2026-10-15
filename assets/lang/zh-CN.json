@@ -3366,5 +3366,7 @@
   "They go in a category called “{name}”.": "它们会放进名为“{name}”的分类。",
   "Type a name first.": "请先输入名称。",
   "✓ Renamed to “{new}”. Another sound has that name too.": "✓ 已重命名为“{new}”。另一个声音也叫这个名字。",
-  "the pack's file is damaged, so it wasn't kept": "包文件已损坏，因此未保留"
+  "the pack's file is damaged, so it wasn't kept": "包文件已损坏，因此未保留",
+  "The download was cut off before the end. Try again.": "下载在完成前中断了。请重试。",
+  "You can change the proxy in Settings > Connection.": "你可以在“设置”>“连接”中更改代理。"
 }

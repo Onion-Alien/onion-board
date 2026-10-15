@@ -3518,5 +3518,7 @@
   "They go in a category called “{name}”.": "Вони потраплять у категорію «{name}».",
   "Type a name first.": "Спершу введіть назву.",
   "✓ Renamed to “{new}”. Another sound has that name too.": "✓ Перейменовано на «{new}». Інший звук теж так називається.",
-  "the pack's file is damaged, so it wasn't kept": "файл пакета пошкоджено, тому його не збережено"
+  "the pack's file is damaged, so it wasn't kept": "файл пакета пошкоджено, тому його не збережено",
+  "The download was cut off before the end. Try again.": "Завантаження обірвалося до кінця. Спробуйте ще раз.",
+  "You can change the proxy in Settings > Connection.": "Проксі можна змінити в меню «Налаштування» > «З’єднання»."
 }

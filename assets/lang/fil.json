@@ -3442,5 +3442,7 @@
   "They go in a category called “{name}”.": "Mapupunta sila sa category na “{name}”.",
   "Type a name first.": "Mag-type muna ng pangalan.",
   "✓ Renamed to “{new}”. Another sound has that name too.": "✓ Na-rename sa “{new}”. May isa pang sound na ganito rin ang pangalan.",
-  "the pack's file is damaged, so it wasn't kept": "sira ang file ng pack, kaya hindi ito itinago"
+  "the pack's file is damaged, so it wasn't kept": "sira ang file ng pack, kaya hindi ito itinago",
+  "The download was cut off before the end. Try again.": "Naputol ang download bago matapos. Subukan ulit.",
+  "You can change the proxy in Settings > Connection.": "Mapapalitan mo ang proxy sa Mga Setting > Koneksyon."
 }

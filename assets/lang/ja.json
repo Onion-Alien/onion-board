@@ -3366,5 +3366,7 @@
   "They go in a category called “{name}”.": "「{name}」というカテゴリに入ります。",
   "Type a name first.": "まず名前を入力してください。",
   "✓ Renamed to “{new}”. Another sound has that name too.": "✓ 「{new}」に名前を変更しました。同じ名前のサウンドがほかにもあります。",
-  "the pack's file is damaged, so it wasn't kept": "パックのファイルが壊れているため、保存されませんでした"
+  "the pack's file is damaged, so it wasn't kept": "パックのファイルが壊れているため、保存されませんでした",
+  "The download was cut off before the end. Try again.": "ダウンロードが途中で切れました。もう一度試してください。",
+  "You can change the proxy in Settings > Connection.": "プロキシは [設定] > [接続] で変更できます。"
 }

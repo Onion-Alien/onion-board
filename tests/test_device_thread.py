@@ -79,6 +79,36 @@ def test_a_stalled_stream_is_reopened_off_the_ui_thread(monkeypatch, gate):
     assert e.stalls == 1 and len(opened) == 2 and e.mon_stream is opened[-1]
 
 
+def test_a_device_pulled_out_after_a_rescan_is_still_noticed(monkeypatch, gate):
+    opened = []
+    hanging_driver(monkeypatch, gate, opened)
+    gate.set()
+    e = Engine()
+    e.set_mon_device("Headphones")
+    e.close_streams()                               # a re-scan closes them all...
+    e.set_mon_device("Headphones")                  # ...and opens them again
+    e._last_cb["mon"] = time.monotonic() - 10       # then the headset is pulled out
+    e.check_streams()
+    assert e.devices.wait(5)
+    assert e.check_streams() == ["mon"]             # noticed: the status says so
+    assert e.stalls == 1 and len(opened) == 3
+    e.shutdown()                                    # quitting: never reopened again
+    e._last_try["mon"] = 0.0
+    assert e.check_streams() == [] and not e.devices.busy
+
+
+def test_the_app_s_rescans_keep_the_device_watchdog_on(default_window, monkeypatch,  # noqa: F811
+                                                       qapp):
+    w = default_window
+    monkeypatch.setattr(eng, "rescan", lambda: True)
+    w.devctl.refresh_devices()                      # the Re-scan button
+    assert not w.engine._shut
+    done = []
+    w.devctl._when_devices_free(lambda: w.devctl._refresh_off_ui(done.append))   # its own
+    process_events(qapp, lambda: done and not w.engine.devices.busy, timeout=5)
+    assert done and not w.engine._shut
+
+
 def test_a_missing_device_is_retried_off_the_ui_thread(monkeypatch, gate):
     opened = []
     hanging_driver(monkeypatch, gate, opened)

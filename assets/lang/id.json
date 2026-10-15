@@ -3366,5 +3366,7 @@
   "They go in a category called “{name}”.": "Semuanya masuk ke kategori bernama “{name}”.",
   "Type a name first.": "Ketik nama dulu.",
   "✓ Renamed to “{new}”. Another sound has that name too.": "✓ Nama diganti jadi “{new}”. Ada suara lain dengan nama yang sama.",
-  "the pack's file is damaged, so it wasn't kept": "file paket rusak, jadi tidak disimpan"
+  "the pack's file is damaged, so it wasn't kept": "file paket rusak, jadi tidak disimpan",
+  "The download was cut off before the end. Try again.": "Unduhan terputus sebelum selesai. Coba lagi.",
+  "You can change the proxy in Settings > Connection.": "Kamu bisa mengganti proxy di Pengaturan > Koneksi."
 }
