@@ -3274,8 +3274,6 @@
   "Live: click to mute": "Živě: kliknutím ztlumíte",
   "Muted: click to go live": "Ztlumeno: kliknutím přejdete živě",
   "No sound": "Bez zvuku",
-  "Your mic sends no sound": "Tvůj mikrofon neposílá žádný zvuk",
-  "Your mic sends no sound: see the Setup tab.": "Tvůj mikrofon neposílá žádný zvuk: podívej se na kartu Nastavení.",
   "Before update": "Před aktualizací",
   "One is saved every time you reset something or update the app (the last {max_points} are kept). Restoring puts back your settings, hotkeys and sounds as they were. Sounds you've added since are kept.": "Ukládá se pokaždé, když něco resetuješ nebo aktualizuješ aplikaci (posledních {max_points} se uchovává). Obnovení vrátí tvoje nastavení, zkratky a zvuky, jak byly. Zvuky přidané od té doby zůstanou.",
   "Stops every sound, the radio and every program, and turns the voices off": "Zastaví všechny zvuky, rádio a všechny programy a vypne hlasy",
@@ -3324,8 +3322,6 @@
   "Show this program's window": "Zobrazit okno tohoto programu",
   "This program doesn't share its picture": "Tento program nesdílí svůj obraz",
   "Window of {name}": "Okno {name}",
-  "Discord and games hear nothing from your mic. Is your headset switched off, or its mic muted? Turn it on or unmute it. If not, click <b>Repair</b>, then <b>Yes</b> when Windows asks.": "Discord a hry z tvého mikrofonu nic neslyší. Nejsou sluchátka vypnutá, nebo jejich mikrofon ztlumený? Zapni je nebo zruš ztlumení. Jestli ne, klikni na <b>Opravit</b> a pak na <b>Ano</b>, až se Windows zeptají.",
-  "Discord and games hear nothing from your mic. Is your headset switched off, or its mic muted? Turn it on or unmute it. If not, click <b>Repair</b>: your sound drops out for a few seconds.": "Discord a hry z tvého mikrofonu nic neslyší. Nejsou sluchátka vypnutá, nebo jejich mikrofon ztlumený? Zapni je nebo zruš ztlumení. Jestli ne, klikni na <b>Opravit</b>: zvuk na pár sekund vypadne.",
   "Your mic sends no sound. Is your headset switched off, or its mic muted? Turn it on or unmute it. Still nothing? Restart your PC, then try again.": "Tvůj mikrofon neposílá žádný zvuk. Nejsou sluchátka vypnutá, nebo jejich mikrofon ztlumený? Zapni je nebo zruš ztlumení. Pořád nic? Restartuj počítač a zkus to znovu.",
   "Minimised: last picture": "Minimalizováno: poslední snímek",
   "Minimised: restore for live updates": "Minimalizováno: obnovte okno pro živý náhled",
@@ -3511,5 +3507,11 @@
   "Used when Connection is set to Tor. It's up to date.": "Používá se, když je připojení nastavené na Tor. Je aktuální.",
   "Working: {engine}": "Funguje: {engine}",
   "Working: {engine} {version} (faster)": "Funguje: {engine} {version} (rychlejší)",
-  "YouTube downloads still work, but with fewer formats.": "Stahování z YouTube pořád funguje, ale s méně formáty."
+  "YouTube downloads still work, but with fewer formats.": "Stahování z YouTube pořád funguje, ale s méně formáty.",
+  "Is your headset on?": "Jsou sluchátka zapnutá?",
+  "Is your headset plugged in?": "Jsou sluchátka připojená?",
+  "No sound from your mic. Is your headset on?": "Z mikrofonu nejde žádný zvuk. Jsou sluchátka zapnutá?",
+  "Unplugged": "Odpojený",
+  "Windows can't find <b>{mic}</b> right now. Plug it in, or switch it on if it's wireless. This goes away by itself.": "Windows teď nenacházejí <b>{mic}</b>. Připoj je, nebo je zapni, jestli jsou bezdrátová. Tohle zmizí samo.",
+  "Your headset is off or its mic is muted. Turn it on or unmute it. Still nothing? Click <b>Repair</b>.": "Sluchátka jsou vypnutá nebo mají ztlumený mikrofon. Zapni je nebo zruš ztlumení. Pořád nic? Klikni na <b>Opravit</b>."
 }

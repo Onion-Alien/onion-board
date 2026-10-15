@@ -2758,7 +2758,8 @@ def test_a_mic_left_silent_by_the_set_up_never_cheers(window, monkeypatch):  # n
     w.micctl._mic_attached("My mic", dm.mic_silent())
     w.statusctl._update_flow()
     assert w.setup_show._result is False
-    assert told and told[0][0] == "Your mic sends no sound" and "Restart your PC" in told[0][1]
+    assert told and told[0][0] == "Is your headset on?" and "Restart your PC" in told[0][1]
+    assert told[0][2] == "warn"   # most likely switched off: not an error
     assert not [k for _t, k in said if k == "ok"]
 
 
@@ -3304,17 +3305,66 @@ def test_a_mic_sending_only_silence_offers_the_repair(window, monkeypatch):  # n
     silent[0] = w.MIC_SILENT_S + 1
     assert w.micctl._direct_health() != w._direct_shown   # the once-a-second check redraws it
     w.statusctl._update_flow()
-    assert w.mic_line.text() == "Your mic sends no sound"
+    assert w.mic_line.text() == "Is your headset on?"
     assert "Repair" in w.btn_install.text() and not w.btn_install.isHidden()
-    assert "mute" in w.mic_reason.text()
-    assert [t for t, k in said if "no sound" in t]
+    assert "headset is off" in w.mic_reason.text() and "muted" in w.mic_reason.text()
+    assert [t for t, k in said if "No sound" in t]
     w.statusctl._update_flow()
     silent[0] = 0.0
     w.statusctl._update_flow()
     assert w.mic_line.text() == "Your sounds go into your mic"
     silent[0] = w.MIC_SILENT_S + 1
     w.statusctl._update_flow()
-    assert len([t for t, k in said if "no sound" in t]) == 1   # the toast: once a run
+    assert len([t for t, k in said if "No sound" in t]) == 1   # the toast: once a run
+
+
+@pytest.mark.parametrize("state", ["ready", "other", "missing"])
+def test_an_unplugged_mic_asks_to_plug_it_in(window, monkeypatch, state):  # noqa: F811
+    """The picked mic is unplugged (or its headset switched off, so Windows lists it as
+    unplugged): the card asks whether it's plugged in, with no Repair or set-up button
+    (neither can work without it), and goes back by itself once it's there."""
+    w = window
+    _routes(w, monkeypatch, state)
+    w.cfg.mic_device = "My mic"
+    monkeypatch.setattr(w.engine, "main_stream", object())
+    monkeypatch.setattr(w.micctl, "_direct_not_running", lambda: False)
+    monkeypatch.setattr(type(w.engine), "effect_alive", lambda self: True)
+    out = [True]
+    monkeypatch.setattr(dm, "unplugged", lambda name: out[0] and name == "My mic")
+    w.statusctl._update_flow()
+    assert w.mic_line.text() == "Is your headset plugged in?"
+    assert w.mic_pill.text() == "Unplugged"
+    assert "My mic" in w.mic_reason.text() and "Repair" not in w.mic_reason.text()
+    assert w.btn_install.isHidden()
+    out[0] = False
+    assert w.micctl._direct_health() != w._direct_shown   # the once-a-second check redraws it
+    w.statusctl._update_flow()
+    assert w.mic_line.text() != "Is your headset plugged in?"
+
+
+def test_unplugged_follows_the_last_status_check(monkeypatch):
+    """status() notes whether the mic it was asked about is one Windows knows but has
+    unplugged (or not present: a wireless headset switched off); a mic Windows has
+    switched off by hand, or one it doesn't know at all, isn't "unplugged"."""
+    mics = [{"guid": "{a}", "name": "Headset Mic (G733)", "active": False, "out": True},
+            {"guid": "{b}", "name": "Line In (Realtek)", "active": False, "out": False},
+            {"guid": "{c}", "name": "Webcam Mic (USB)", "active": True, "out": False}]
+    monkeypatch.setattr(dm, "capture_endpoints", lambda: mics)
+    monkeypatch.setattr(dm, "installed_on", lambda: ["{a}"])
+    dm.forget_status()
+    assert dm.status("Headset Mic (G733)") == "other" and dm.unplugged("Headset Mic (G733)")
+    assert dm.status("Line In (Realtek)") == "other" and not dm.unplugged("Line In (Realtek)")
+    assert dm.status("Nothing (gone)") == "other" and not dm.unplugged("Nothing (gone)")
+    assert not dm.unplugged("Webcam Mic (USB)") and not dm.unplugged(None)
+    mics[0] = {**mics[0], "active": True, "out": False}   # plugged back in
+    dm.forget_status()
+    dm.status("Headset Mic (G733)")
+    assert not dm.unplugged("Headset Mic (G733)")
+    monkeypatch.setattr(dm, "installed_on", lambda: [])   # nothing set up yet: still told
+    mics[0] = {**mics[0], "active": False, "out": True}
+    dm.forget_status()
+    assert dm.status("Headset Mic (G733)") == "missing" and dm.unplugged("Headset Mic (G733)")
+    dm.forget_status()
 
 
 def test_the_fix_never_asks_windows_by_itself(monkeypatch):

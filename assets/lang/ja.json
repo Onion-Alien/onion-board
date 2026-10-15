@@ -3128,8 +3128,6 @@
   "Live: click to mute": "ライブ: クリックでミュート",
   "Muted: click to go live": "ミュート中: クリックでライブに戻る",
   "No sound": "音なし",
-  "Your mic sends no sound": "マイクから音が出ていません",
-  "Your mic sends no sound: see the Setup tab.": "マイクから音が出ていません: セットアップ タブを確認してください。",
   "Before update": "更新前",
   "One is saved every time you reset something or update the app (the last {max_points} are kept). Restoring puts back your settings, hotkeys and sounds as they were. Sounds you've added since are kept.": "何かをリセットしたりアプリを更新したりするたびに 1 つ保存されます (最後の{max_points}が保持されます)。復元すると、設定、ホットキー、サウンドが元の状態に戻ります。それ以降に追加したサウンドは保持されます。",
   "Stops every sound, the radio and every program, and turns the voices off": "すべてのサウンド、ラジオ、プログラムを停止し、ボイスをオフにします",
@@ -3176,8 +3174,6 @@
   "Show this program's window": "このプログラムのウィンドウを表示",
   "This program doesn't share its picture": "このプログラムは画面を共有しません",
   "Window of {name}": "{name} のウィンドウ",
-  "Discord and games hear nothing from your mic. Is your headset switched off, or its mic muted? Turn it on or unmute it. If not, click <b>Repair</b>, then <b>Yes</b> when Windows asks.": "Discord やゲームにマイクの音が何も届いていません。ヘッドセットの電源が切れているか、マイクがミュートになっていませんか？電源を入れるか、ミュートを解除してください。そうでなければ<b>修復</b>をクリックし、Windows の確認で<b>はい</b>をクリックしてください。",
-  "Discord and games hear nothing from your mic. Is your headset switched off, or its mic muted? Turn it on or unmute it. If not, click <b>Repair</b>: your sound drops out for a few seconds.": "Discord やゲームにマイクの音が何も届いていません。ヘッドセットの電源が切れているか、マイクがミュートになっていませんか？電源を入れるか、ミュートを解除してください。そうでなければ<b>修復</b>をクリックしてください: 数秒間音が途切れます。",
   "Your mic sends no sound. Is your headset switched off, or its mic muted? Turn it on or unmute it. Still nothing? Restart your PC, then try again.": "マイクから音が出ていません。ヘッドセットの電源が切れているか、マイクがミュートになっていませんか？電源を入れるか、ミュートを解除してください。それでも出ない場合は、PC を再起動してから、もう一度お試しください。",
   "Minimised: last picture": "最小化中：最後の画像",
   "Minimised: restore for live updates": "最小化中：元に戻すと映像が更新されます",
@@ -3359,5 +3355,11 @@
   "Used when Connection is set to Tor. It's up to date.": "接続が Tor のときに使われます。最新です。",
   "Working: {engine}": "動作中: {engine}",
   "Working: {engine} {version} (faster)": "動作中: {engine} {version} (高速)",
-  "YouTube downloads still work, but with fewer formats.": "YouTube のダウンロードはできますが、形式が少なくなります。"
+  "YouTube downloads still work, but with fewer formats.": "YouTube のダウンロードはできますが、形式が少なくなります。",
+  "Is your headset on?": "ヘッドセットの電源は入っていますか？",
+  "Is your headset plugged in?": "ヘッドセットは接続されていますか？",
+  "No sound from your mic. Is your headset on?": "マイクの音が出ていません。ヘッドセットの電源は入っていますか？",
+  "Unplugged": "未接続",
+  "Windows can't find <b>{mic}</b> right now. Plug it in, or switch it on if it's wireless. This goes away by itself.": "今は Windows が <b>{mic}</b> を見つけられません。接続するか、ワイヤレスなら電源を入れてください。この表示は自動で消えます。",
+  "Your headset is off or its mic is muted. Turn it on or unmute it. Still nothing? Click <b>Repair</b>.": "ヘッドセットの電源が切れているか、マイクがミュートになっています。電源を入れるかミュートを解除してください。それでも音が出ない場合は<b>修復</b>をクリックしてください。"
 }

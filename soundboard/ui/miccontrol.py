@@ -178,6 +178,11 @@ class MicControl(Controller):
             look = ("warn", "reload", _("Setting up…"), _("Setting up…"), step, None)
         elif state == "missing" and settling:
             look = ("warn", "reload", _("Starting…"), _("Setting up…"), step, None)
+        elif directmic.unplugged(mw.cfg.mic_device):
+            # Windows still knows it, it's just not there: nothing to repair or set up
+            look = ("warn", "mic", _("Is your headset plugged in?"), _("Unplugged"), _(
+                "Windows can't find <b>{mic}</b> right now. Plug it in, or switch it on if "
+                "it's wireless. This goes away by itself.", mic=html.escape(name)), None)
         elif directmic.needs_repair(direct):
             known = michelper.known()
             if known and self._autofix_tried and not self._autofix_err:
@@ -211,19 +216,15 @@ class MicControl(Controller):
                         _("One click puts your sounds straight into your mic, so Discord and "
                           "games hear them.")), _("Put my sounds straight into my mic"))
         elif state == "ok" and self._mic_sends_nothing():
-            # the mic itself sends nothing (stuck after an audio restart, or its own mute):
-            # Repair restarts the audio and listens to it again
+            # the mic itself sends exact zeros: nearly always a wireless headset switched
+            # off (its dongle stays plugged in) or the mic's own mute, now and then a mic
+            # stuck after an audio restart: Repair restarts the audio and listens again
             if not self._silent_said:
                 self._silent_said = True
-                mw.toast(_("Your mic sends no sound: see the Setup tab."), "warn")
-            look = ("warn", "warn", _("Your mic sends no sound"), _("No sound"), needed(
-                _("Discord and games hear nothing from your mic. Is your headset switched "
-                  "off, or its mic muted? Turn it on or unmute it. If not, click "
-                  "<b>Repair</b>, then <b>Yes</b> when Windows asks.")
-                if ask else
-                _("Discord and games hear nothing from your mic. Is your headset switched "
-                  "off, or its mic muted? Turn it on or unmute it. If not, click "
-                  "<b>Repair</b>: your sound drops out for a few seconds.")),
+                mw.toast(_("No sound from your mic. Is your headset on?"), "warn")
+            look = ("warn", "mic", _("Is your headset on?"), _("No sound"), needed(
+                _("Your headset is off or its mic is muted. Turn it on or unmute it. Still "
+                  "nothing? Click <b>Repair</b>.")),
                 _("Repair (one click)"))
         elif state == "ok":
             look = ("ok", "check", _("Your sounds go into your mic"), _("Connected"), "", None)
@@ -385,7 +386,7 @@ class MicControl(Controller):
                              "update it from the Setup tab."), "warn")
             elif err == directmic.mic_silent():
                 # it's on the mic, but the mic came back from the audio restart dead
-                mw.tell(_("Your mic sends no sound"), err, "error")
+                mw.tell(_("Is your headset on?"), err, "warn")
             else:
                 # the route stays on the mic: until it's set up, the cable carries the
                 # sounds meanwhile (_main_name), and the one-click stays on offer
@@ -493,7 +494,7 @@ class MicControl(Controller):
         h = (directmic.status(mw.cfg.mic_device), e.main_stream is not None,
              self._direct_not_running(), bool(e.direct_apps()),
              time.monotonic() < mw._settle_until and e.effect_alive(),   # "starting…" ends
-             self._mic_sends_nothing())
+             self._mic_sends_nothing(), directmic.unplugged(mw.cfg.mic_device))
         return h
 
     def _mic_sends_nothing(self) -> bool:

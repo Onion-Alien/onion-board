@@ -149,6 +149,7 @@ MODES_KEY = "{d3993a3f-99c2-4402-b5ec-a92a0367664b},%d"     # PKEY_*_ProcessingM
 MODE_DEFAULT = "{C18E2F7E-933D-4965-B7D1-1EEF228D2AF3}"     # AUDIO_SIGNALPROCESSINGMODE_DEFAULT
 NAME_DESC = "{a45c254e-df1c-4efd-8020-67d146a850e0},2"       # "Microphone"
 NAME_IFACE = "{b3f8fa53-0004-438e-9003-51a46e139bfc},6"      # "Realtek Audio"
+UNPLUGGED_STATES = (4, 8)   # DEVICE_STATE_NOTPRESENT, _UNPLUGGED (2 is switched off by hand)
 _GUID = re.compile(r"\{[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-"
                    r"[0-9a-fA-F]{12}\}")
 _CREATE_NO_WINDOW = 0x08000000
@@ -737,7 +738,8 @@ def _pid_alive(pid: int) -> bool:
 # ---------------------------------------------------------------------- the mics
 
 def capture_endpoints() -> list[dict]:
-    """Every recording device Windows knows: {"guid", "name", "active"}."""
+    """Every recording device Windows knows: {"guid", "name", "active", "out": unplugged
+    (or its USB or Bluetooth headset switched off)}."""
     found = []
     try:
         root = winreg.OpenKey(winreg.HKEY_LOCAL_MACHINE, CAPTURE_KEY)
@@ -760,7 +762,8 @@ def capture_endpoints() -> list[dict]:
             except OSError:
                 continue
             name = f"{desc} ({iface})" if iface else desc
-            found.append({"guid": guid.lower(), "name": name, "active": state == 1})
+            found.append({"guid": guid.lower(), "name": name, "active": state == 1,
+                          "out": state in UNPLUGGED_STATES})
     return found
 
 
@@ -810,12 +813,14 @@ _status_cache: dict = {}
 _status_gen = [0]          # forget_status() bumps it: a refresh started before is dropped
 _status_busy: set = set()  # mic names being re-checked on a thread
 _status_lock = threading.Lock()
+_unplugged: dict = {}   # mic name -> unplugged at the last status() check
 STATUS_S = 2.0
 
 
 def forget_status():
     with _status_lock:
         _status_cache.clear()
+        _unplugged.clear()
         _status_gen[0] += 1
 
 
@@ -878,11 +883,22 @@ def works(state: str) -> bool:
     return state in ("ready", "outdated")
 
 
+def unplugged(mic_name: str | None) -> bool:
+    """Windows knows the mic called `mic_name`, but it's unplugged right now (or its
+    headset is switched off), as the last status() for it found: no I/O."""
+    return bool(mic_name) and _unplugged.get(mic_name, False)
+
+
 def _status(mic_name: str | None) -> str:
     on = installed_on()
+    if mic_name is None:
+        return _state(on[0], on) if on else "missing"
+    guid = endpoint_for(mic_name)
+    _unplugged[mic_name] = guid is None and _match(
+        mic_name, [e for e in capture_endpoints() if e.get("out")]) is not None
     if not on:
         return "missing"
-    return _state(endpoint_for(mic_name) if mic_name is not None else on[0], on)
+    return _state(guid, on)
 
 
 def _state(guid: str | None, on: list[str]) -> str:

@@ -3201,8 +3201,6 @@
   "Live: click to mute": "In diretta: clic per disattivare l'audio",
   "Muted: click to go live": "Muto: clic per tornare in diretta",
   "No sound": "Nessun suono",
-  "Your mic sends no sound": "Il tuo microfono non invia nessun suono",
-  "Your mic sends no sound: see the Setup tab.": "Il tuo microfono non invia nessun suono: guarda la scheda Configurazione.",
   "Before update": "Prima dell'aggiornamento",
   "One is saved every time you reset something or update the app (the last {max_points} are kept). Restoring puts back your settings, hotkeys and sounds as they were. Sounds you've added since are kept.": "Ne viene salvato uno ogni volta che reimposti qualcosa o aggiorni l'app (vengono mantenuti gli ultimi {max_points}). Il ripristino ripristina le impostazioni, i tasti di scelta rapida e i suoni com'erano. I suoni che hai aggiunto da allora vengono mantenuti.",
   "Stops every sound, the radio and every program, and turns the voices off": "Ferma ogni suono, la radio e ogni programma, e spegne le voci",
@@ -3250,8 +3248,6 @@
   "Show this program's window": "Mostra la finestra di questo programma",
   "This program doesn't share its picture": "Questo programma non condivide la sua immagine",
   "Window of {name}": "Finestra di {name}",
-  "Discord and games hear nothing from your mic. Is your headset switched off, or its mic muted? Turn it on or unmute it. If not, click <b>Repair</b>, then <b>Yes</b> when Windows asks.": "Discord e i giochi non sentono niente dal tuo microfono. Le cuffie sono spente o il loro microfono è disattivato? Accendile o riattiva il microfono. Altrimenti fai clic su <b>Ripara</b>, poi su <b>Sì</b> quando Windows lo chiede.",
-  "Discord and games hear nothing from your mic. Is your headset switched off, or its mic muted? Turn it on or unmute it. If not, click <b>Repair</b>: your sound drops out for a few seconds.": "Discord e i giochi non sentono niente dal tuo microfono. Le cuffie sono spente o il loro microfono è disattivato? Accendile o riattiva il microfono. Altrimenti fai clic su <b>Ripara</b>: l'audio si interrompe per qualche secondo.",
   "Your mic sends no sound. Is your headset switched off, or its mic muted? Turn it on or unmute it. Still nothing? Restart your PC, then try again.": "Il tuo microfono non invia nessun suono. Le cuffie sono spente o il loro microfono è disattivato? Accendile o riattiva il microfono. Ancora niente? Riavvia il PC e riprova.",
   "Minimised: last picture": "Ridotta a icona: ultima immagine",
   "Minimised: restore for live updates": "Ridotta a icona: ripristina per gli aggiornamenti in tempo reale",
@@ -3435,5 +3431,11 @@
   "Used when Connection is set to Tor. It's up to date.": "Usato quando la connessione è impostata su Tor. È aggiornato.",
   "Working: {engine}": "Funziona: {engine}",
   "Working: {engine} {version} (faster)": "Funziona: {engine} {version} (più veloce)",
-  "YouTube downloads still work, but with fewer formats.": "I download da YouTube funzionano comunque, ma con meno formati."
+  "YouTube downloads still work, but with fewer formats.": "I download da YouTube funzionano comunque, ma con meno formati.",
+  "Is your headset on?": "Le cuffie sono accese?",
+  "Is your headset plugged in?": "Le cuffie sono collegate?",
+  "No sound from your mic. Is your headset on?": "Nessun suono dal tuo microfono. Le cuffie sono accese?",
+  "Unplugged": "Scollegato",
+  "Windows can't find <b>{mic}</b> right now. Plug it in, or switch it on if it's wireless. This goes away by itself.": "Windows non trova <b>{mic}</b> in questo momento. Collegale, o accendile se sono wireless. Questo sparisce da solo.",
+  "Your headset is off or its mic is muted. Turn it on or unmute it. Still nothing? Click <b>Repair</b>.": "Le cuffie sono spente o il loro microfono è disattivato. Accendile o riattiva il microfono. Ancora niente? Fai clic su <b>Ripara</b>."
 }

@@ -3201,8 +3201,6 @@
   "Live: click to mute": "Live: klik om te dempen",
   "Muted: click to go live": "Gedempt: klik om live te gaan",
   "No sound": "Geen geluid",
-  "Your mic sends no sound": "Je mic stuurt geen geluid",
-  "Your mic sends no sound: see the Setup tab.": "Je mic stuurt geen geluid: kijk op het tabblad Instellen.",
   "Before update": "Vóór de update",
   "One is saved every time you reset something or update the app (the last {max_points} are kept). Restoring puts back your settings, hotkeys and sounds as they were. Sounds you've added since are kept.": "Elke keer dat u iets reset of de app bijwerkt, wordt er één opgeslagen (de laatste {max_points} blijven behouden). Bij het herstellen worden uw instellingen, sneltoetsen en geluiden teruggezet zoals ze waren. Geluiden die u sindsdien heeft toegevoegd, blijven behouden.",
   "Stops every sound, the radio and every program, and turns the voices off": "Stopt alle geluiden, de radio en alle programma's en zet de stemmen uit",
@@ -3250,8 +3248,6 @@
   "Show this program's window": "Venster van dit programma tonen",
   "This program doesn't share its picture": "Dit programma deelt zijn beeld niet",
   "Window of {name}": "Venster van {name}",
-  "Discord and games hear nothing from your mic. Is your headset switched off, or its mic muted? Turn it on or unmute it. If not, click <b>Repair</b>, then <b>Yes</b> when Windows asks.": "Discord en games horen niets van je mic. Staat je headset uit, of is de mic gedempt? Zet hem aan of zet dempen uit. Zo niet, klik op <b>Repareren</b> en dan op <b>Ja</b> als Windows het vraagt.",
-  "Discord and games hear nothing from your mic. Is your headset switched off, or its mic muted? Turn it on or unmute it. If not, click <b>Repair</b>: your sound drops out for a few seconds.": "Discord en games horen niets van je mic. Staat je headset uit, of is de mic gedempt? Zet hem aan of zet dempen uit. Zo niet, klik op <b>Repareren</b>: je geluid valt een paar seconden weg.",
   "Your mic sends no sound. Is your headset switched off, or its mic muted? Turn it on or unmute it. Still nothing? Restart your PC, then try again.": "Je mic stuurt geen geluid. Staat je headset uit, of is de mic gedempt? Zet hem aan of zet dempen uit. Nog steeds niets? Start je pc opnieuw op en probeer het nog eens.",
   "Minimised: last picture": "Geminimaliseerd: laatste beeld",
   "Minimised: restore for live updates": "Geminimaliseerd: herstel voor livebeelden",
@@ -3435,5 +3431,11 @@
   "Used when Connection is set to Tor. It's up to date.": "Gebruikt als de verbinding op Tor staat. Hij is bijgewerkt.",
   "Working: {engine}": "Werkt: {engine}",
   "Working: {engine} {version} (faster)": "Werkt: {engine} {version} (sneller)",
-  "YouTube downloads still work, but with fewer formats.": "YouTube-downloads werken nog steeds, maar met minder formaten."
+  "YouTube downloads still work, but with fewer formats.": "YouTube-downloads werken nog steeds, maar met minder formaten.",
+  "Is your headset on?": "Staat je headset aan?",
+  "Is your headset plugged in?": "Zit je headset erin?",
+  "No sound from your mic. Is your headset on?": "Geen geluid van je mic. Staat je headset aan?",
+  "Unplugged": "Niet aangesloten",
+  "Windows can't find <b>{mic}</b> right now. Plug it in, or switch it on if it's wireless. This goes away by itself.": "Windows kan <b>{mic}</b> nu niet vinden. Sluit hem aan, of zet hem aan als hij draadloos is. Dit gaat vanzelf weg.",
+  "Your headset is off or its mic is muted. Turn it on or unmute it. Still nothing? Click <b>Repair</b>.": "Je headset staat uit of de mic is gedempt. Zet hem aan of zet dempen uit. Nog steeds niets? Klik op <b>Repareren</b>."
 }

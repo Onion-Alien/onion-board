@@ -3201,8 +3201,6 @@
   "Live: click to mute": "Live: i-click para i-mute",
   "Muted: click to go live": "Naka-mute: i-click para mag-live",
   "No sound": "Walang tunog",
-  "Your mic sends no sound": "Walang tunog na pinapadala ang mic mo",
-  "Your mic sends no sound: see the Setup tab.": "Walang tunog na pinapadala ang mic mo: tingnan ang Setup tab.",
   "Before update": "Bago mag-update",
   "One is saved every time you reset something or update the app (the last {max_points} are kept). Restoring puts back your settings, hotkeys and sounds as they were. Sounds you've added since are kept.": "May isang sine-save tuwing may nire-reset ka o ina-update mo ang app (itinatago ang huling {max_points}). Ibinabalik ng pag-restore ang settings, hotkeys at sounds mo gaya ng dati. Hindi gagalawin ang mga sound na idinagdag mo mula noon.",
   "Stops every sound, the radio and every program, and turns the voices off": "Itinitigil ang bawat sound, ang radio at bawat program, at pinapatay ang mga boses",
@@ -3250,8 +3248,6 @@
   "Show this program's window": "Ipakita ang window ng program na ito",
   "This program doesn't share its picture": "Hindi ibinabahagi ng program na ito ang larawan nito",
   "Window of {name}": "Window ng {name}",
-  "Discord and games hear nothing from your mic. Is your headset switched off, or its mic muted? Turn it on or unmute it. If not, click <b>Repair</b>, then <b>Yes</b> when Windows asks.": "Walang naririnig ang Discord at mga laro mula sa mic mo. Naka-off ba ang headset mo, o naka-mute ang mic nito? I-on ito o i-unmute. Kung hindi, i-click ang <b>I-repair</b>, tapos <b>Yes</b> kapag nagtanong ang Windows.",
-  "Discord and games hear nothing from your mic. Is your headset switched off, or its mic muted? Turn it on or unmute it. If not, click <b>Repair</b>: your sound drops out for a few seconds.": "Walang naririnig ang Discord at mga laro mula sa mic mo. Naka-off ba ang headset mo, o naka-mute ang mic nito? I-on ito o i-unmute. Kung hindi, i-click ang <b>I-repair</b>: mawawala ang tunog mo nang ilang segundo.",
   "Your mic sends no sound. Is your headset switched off, or its mic muted? Turn it on or unmute it. Still nothing? Restart your PC, then try again.": "Walang tunog na pinapadala ang mic mo. Naka-off ba ang headset mo, o naka-mute ang mic nito? I-on ito o i-unmute. Wala pa rin? I-restart ang PC mo, tapos subukan ulit.",
   "Minimised: last picture": "Naka-minimize: huling larawan",
   "Minimised: restore for live updates": "Naka-minimize: i-restore para sa live na larawan",
@@ -3435,5 +3431,11 @@
   "Used when Connection is set to Tor. It's up to date.": "Ginagamit kapag Tor ang Connection. Updated na ito.",
   "Working: {engine}": "Gumagana: {engine}",
   "Working: {engine} {version} (faster)": "Gumagana: {engine} {version} (mas mabilis)",
-  "YouTube downloads still work, but with fewer formats.": "Gumagana pa rin ang mga YouTube download, pero mas kaunti ang format."
+  "YouTube downloads still work, but with fewer formats.": "Gumagana pa rin ang mga YouTube download, pero mas kaunti ang format.",
+  "Is your headset on?": "Naka-on ba ang headset mo?",
+  "Is your headset plugged in?": "Nakasaksak ba ang headset mo?",
+  "No sound from your mic. Is your headset on?": "Walang tunog mula sa mic mo. Naka-on ba ang headset mo?",
+  "Unplugged": "Hindi nakasaksak",
+  "Windows can't find <b>{mic}</b> right now. Plug it in, or switch it on if it's wireless. This goes away by itself.": "Hindi mahanap ng Windows ang <b>{mic}</b> ngayon. Isaksak ito, o i-on kung wireless ito. Kusa itong mawawala.",
+  "Your headset is off or its mic is muted. Turn it on or unmute it. Still nothing? Click <b>Repair</b>.": "Naka-off ang headset mo o naka-mute ang mic nito. I-on ito o i-unmute. Wala pa rin? I-click ang <b>I-repair</b>."
 }

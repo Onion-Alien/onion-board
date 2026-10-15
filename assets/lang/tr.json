@@ -3201,8 +3201,6 @@
   "Live: click to mute": "Canlı: sessize almak için tıkla",
   "Muted: click to go live": "Sessiz: canlıya geçmek için tıkla",
   "No sound": "Ses yok",
-  "Your mic sends no sound": "Mikrofonun ses göndermiyor",
-  "Your mic sends no sound: see the Setup tab.": "Mikrofonun ses göndermiyor: Kurulum sekmesine bak.",
   "Before update": "Güncellemeden önce",
   "One is saved every time you reset something or update the app (the last {max_points} are kept). Restoring puts back your settings, hotkeys and sounds as they were. Sounds you've added since are kept.": "Bir şeyi her sıfırladığınızda veya uygulamayı her güncellediğinizde bir tanesi kaydedilir (son {max_points} saklanır). Geri yükleme, ayarlarınızı, kısayol tuşlarınızı ve seslerinizi olduğu gibi geri yükler. O zamandan beri eklediğiniz sesler tutulur.",
   "Stops every sound, the radio and every program, and turns the voices off": "Her sesi, radyoyu ve her programı durdurur ve sesleri kapatır",
@@ -3250,8 +3248,6 @@
   "Show this program's window": "Bu programın penceresini göster",
   "This program doesn't share its picture": "Bu program görüntüsünü paylaşmıyor",
   "Window of {name}": "{name} penceresi",
-  "Discord and games hear nothing from your mic. Is your headset switched off, or its mic muted? Turn it on or unmute it. If not, click <b>Repair</b>, then <b>Yes</b> when Windows asks.": "Discord ve oyunlar mikrofonundan hiçbir şey duymuyor. Kulaklığın kapalı mı, ya da mikrofonu sessizde mi? Kulaklığı aç ya da mikrofonun sesini aç. Değilse <b>Onar</b>'a, sonra Windows sorunca <b>Evet</b>'e tıkla.",
-  "Discord and games hear nothing from your mic. Is your headset switched off, or its mic muted? Turn it on or unmute it. If not, click <b>Repair</b>: your sound drops out for a few seconds.": "Discord ve oyunlar mikrofonundan hiçbir şey duymuyor. Kulaklığın kapalı mı, ya da mikrofonu sessizde mi? Kulaklığı aç ya da mikrofonun sesini aç. Değilse <b>Onar</b>'a tıkla: sesin birkaç saniye kesilir.",
   "Your mic sends no sound. Is your headset switched off, or its mic muted? Turn it on or unmute it. Still nothing? Restart your PC, then try again.": "Mikrofonun ses göndermiyor. Kulaklığın kapalı mı, ya da mikrofonu sessizde mi? Kulaklığı aç ya da mikrofonun sesini aç. Hâlâ bir şey yok mu? Bilgisayarını yeniden başlat, sonra tekrar dene.",
   "Minimised: last picture": "Simge durumunda: son görüntü",
   "Minimised: restore for live updates": "Simge durumunda: canlı güncellemeler için geri yükle",
@@ -3435,5 +3431,11 @@
   "Used when Connection is set to Tor. It's up to date.": "Bağlantı Tor olarak ayarlandığında kullanılır. Güncel.",
   "Working: {engine}": "Çalışıyor: {engine}",
   "Working: {engine} {version} (faster)": "Çalışıyor: {engine} {version} (daha hızlı)",
-  "YouTube downloads still work, but with fewer formats.": "YouTube indirmeleri yine çalışır ama daha az biçimle."
+  "YouTube downloads still work, but with fewer formats.": "YouTube indirmeleri yine çalışır ama daha az biçimle.",
+  "Is your headset on?": "Kulaklığın açık mı?",
+  "Is your headset plugged in?": "Kulaklığın takılı mı?",
+  "No sound from your mic. Is your headset on?": "Mikrofonundan ses gelmiyor. Kulaklığın açık mı?",
+  "Unplugged": "Takılı değil",
+  "Windows can't find <b>{mic}</b> right now. Plug it in, or switch it on if it's wireless. This goes away by itself.": "Windows şu an <b>{mic}</b> cihazını bulamıyor. Tak ya da kablosuzsa aç. Bu kendiliğinden kaybolur.",
+  "Your headset is off or its mic is muted. Turn it on or unmute it. Still nothing? Click <b>Repair</b>.": "Kulaklığın kapalı ya da mikrofonu sessizde. Kulaklığı aç ya da mikrofonun sesini aç. Hâlâ bir şey yok mu? <b>Onar</b>'a tıkla."
 }

@@ -3128,8 +3128,6 @@
   "Live: click to mute": "สด: คลิกเพื่อปิดเสียง",
   "Muted: click to go live": "ปิดเสียงอยู่: คลิกเพื่อกลับมาสด",
   "No sound": "ไม่มีเสียง",
-  "Your mic sends no sound": "ไมค์ของคุณไม่ส่งเสียงออกมา",
-  "Your mic sends no sound: see the Setup tab.": "ไมค์ของคุณไม่ส่งเสียงออกมา: ดูที่แท็บตั้งค่า",
   "Before update": "ก่อนอัปเดต",
   "One is saved every time you reset something or update the app (the last {max_points} are kept). Restoring puts back your settings, hotkeys and sounds as they were. Sounds you've added since are kept.": "หนึ่งรายการจะถูกบันทึกไว้ทุกครั้งที่คุณรีเซ็ตบางสิ่งหรืออัปเดตแอป (คะแนนสูงสุด {max_points} สุดท้ายจะถูกเก็บไว้) การคืนค่าจะทำให้การตั้งค่า ปุ่มลัด และเสียงของคุณกลับมาเหมือนเดิม เสียงที่คุณเพิ่มตั้งแต่นั้นจะถูกเก็บไว้",
   "Stops every sound, the radio and every program, and turns the voices off": "หยุดทุกเสียง วิทยุ และทุกโปรแกรม แล้วปิดเสียงพากย์",
@@ -3176,8 +3174,6 @@
   "Show this program's window": "แสดงหน้าต่างของโปรแกรมนี้",
   "This program doesn't share its picture": "โปรแกรมนี้ไม่แชร์ภาพของมัน",
   "Window of {name}": "หน้าต่างของ {name}",
-  "Discord and games hear nothing from your mic. Is your headset switched off, or its mic muted? Turn it on or unmute it. If not, click <b>Repair</b>, then <b>Yes</b> when Windows asks.": "Discord และเกมไม่ได้ยินอะไรจากไมค์ของคุณเลย หูฟังปิดอยู่ หรือไมค์ของหูฟังปิดเสียงอยู่หรือเปล่า เปิดหูฟังหรือเปิดเสียงไมค์ ถ้าไม่ได้ปิด ให้คลิก <b>ซ่อม</b> แล้วคลิก <b>ใช่</b> เมื่อ Windows ถาม",
-  "Discord and games hear nothing from your mic. Is your headset switched off, or its mic muted? Turn it on or unmute it. If not, click <b>Repair</b>: your sound drops out for a few seconds.": "Discord และเกมไม่ได้ยินอะไรจากไมค์ของคุณเลย หูฟังปิดอยู่ หรือไมค์ของหูฟังปิดเสียงอยู่หรือเปล่า เปิดหูฟังหรือเปิดเสียงไมค์ ถ้าไม่ได้ปิด ให้คลิก <b>ซ่อม</b>: เสียงจะหายไปสองสามวินาที",
   "Your mic sends no sound. Is your headset switched off, or its mic muted? Turn it on or unmute it. Still nothing? Restart your PC, then try again.": "ไมค์ของคุณไม่ส่งเสียงออกมา หูฟังปิดอยู่ หรือไมค์ของหูฟังปิดเสียงอยู่หรือเปล่า เปิดหูฟังหรือเปิดเสียงไมค์ ยังไม่มีเสียงอีก? ให้รีสตาร์ท PC แล้วลองอีกครั้ง",
   "Minimised: last picture": "ย่อหน้าต่างอยู่: ภาพล่าสุด",
   "Minimised: restore for live updates": "ย่อหน้าต่างอยู่: คืนค่าหน้าต่างเพื่อดูภาพสด",
@@ -3359,5 +3355,11 @@
   "Used when Connection is set to Tor. It's up to date.": "ใช้เมื่อตั้งการเชื่อมต่อเป็น Tor เป็นเวอร์ชันล่าสุดแล้ว",
   "Working: {engine}": "ใช้งานได้: {engine}",
   "Working: {engine} {version} (faster)": "ใช้งานได้: {engine} {version} (เร็วกว่า)",
-  "YouTube downloads still work, but with fewer formats.": "การดาวน์โหลดจาก YouTube ยังใช้ได้ แต่ได้รูปแบบน้อยลง"
+  "YouTube downloads still work, but with fewer formats.": "การดาวน์โหลดจาก YouTube ยังใช้ได้ แต่ได้รูปแบบน้อยลง",
+  "Is your headset on?": "หูฟังเปิดอยู่หรือเปล่า",
+  "Is your headset plugged in?": "เสียบหูฟังอยู่หรือเปล่า",
+  "No sound from your mic. Is your headset on?": "ไม่มีเสียงจากไมค์ของคุณ หูฟังเปิดอยู่หรือเปล่า",
+  "Unplugged": "ไม่ได้เสียบ",
+  "Windows can't find <b>{mic}</b> right now. Plug it in, or switch it on if it's wireless. This goes away by itself.": "ตอนนี้ Windows หา <b>{mic}</b> ไม่เจอ เสียบมัน หรือเปิดมันถ้าเป็นแบบไร้สาย ข้อความนี้จะหายไปเอง",
+  "Your headset is off or its mic is muted. Turn it on or unmute it. Still nothing? Click <b>Repair</b>.": "หูฟังปิดอยู่ หรือไมค์ของหูฟังปิดเสียงอยู่ เปิดหูฟังหรือเปิดเสียงไมค์ ยังไม่มีเสียงอีกหรือ คลิก <b>ซ่อม</b>"
 }
