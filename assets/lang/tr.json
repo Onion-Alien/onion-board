@@ -3473,5 +3473,7 @@
   "On: phones on this Wi-Fi can play your pads.": "Açık: bu Wi-Fi'daki telefonlar pad'lerini çalabilir.",
   "Onion Pocket": "Onion Pocket",
   "Onion Pocket's settings didn't open: they're on Settings → Remote.": "Onion Pocket ayarları açılmadı: Ayarlar → Uzak içinde.",
-  "Pair a phone and settings": "Telefon eşle ve ayarlar"
+  "Pair a phone and settings": "Telefon eşle ve ayarlar",
+  "<br><span style='color:{status}'>Can't open {devices} (My headphones). Plugged in? It's tried again by itself.</span>": "<br><span style='color:{status}'>{devices} açılamıyor (Kulaklıklarım). Takılı mı? Kendiliğinden tekrar denenir.</span>",
+  "<br><span style='color:{status}'>Can't open {devices} (My mic). Plugged in? It's tried again by itself.</span>": "<br><span style='color:{status}'>{devices} açılamıyor (Mikrofonum). Takılı mı? Kendiliğinden tekrar denenir.</span>"
 }

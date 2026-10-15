@@ -3397,5 +3397,7 @@
   "On: phones on this Wi-Fi can play your pads.": "Hidup: telefon di Wi-Fi ini boleh memainkan pad anda.",
   "Onion Pocket": "Onion Pocket",
   "Onion Pocket's settings didn't open: they're on Settings → Remote.": "Tetapan Onion Pocket tidak terbuka: ia ada di Tetapan → Kawalan jauh.",
-  "Pair a phone and settings": "Pasangkan telefon dan tetapan"
+  "Pair a phone and settings": "Pasangkan telefon dan tetapan",
+  "<br><span style='color:{status}'>Can't open {devices} (My headphones). Plugged in? It's tried again by itself.</span>": "<br><span style='color:{status}'>Tidak dapat membuka {devices} (Fon kepala saya). Sudah dipasang? Ia dicuba semula sendiri.</span>",
+  "<br><span style='color:{status}'>Can't open {devices} (My mic). Plugged in? It's tried again by itself.</span>": "<br><span style='color:{status}'>Tidak dapat membuka {devices} (Mikrofon saya). Sudah dipasang? Ia dicuba semula sendiri.</span>"
 }

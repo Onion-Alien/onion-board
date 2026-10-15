@@ -3397,5 +3397,7 @@
   "On: phones on this Wi-Fi can play your pads.": "Bật: điện thoại trong Wi-Fi này có thể phát pad của bạn.",
   "Onion Pocket": "Onion Pocket",
   "Onion Pocket's settings didn't open: they're on Settings → Remote.": "Cài đặt Onion Pocket không mở được: chúng ở Cài đặt → Xa.",
-  "Pair a phone and settings": "Ghép điện thoại và cài đặt"
+  "Pair a phone and settings": "Ghép điện thoại và cài đặt",
+  "<br><span style='color:{status}'>Can't open {devices} (My headphones). Plugged in? It's tried again by itself.</span>": "<br><span style='color:{status}'>Không mở được {devices} (Tai nghe của tôi). Đã cắm chưa? Ứng dụng sẽ tự thử lại.</span>",
+  "<br><span style='color:{status}'>Can't open {devices} (My mic). Plugged in? It's tried again by itself.</span>": "<br><span style='color:{status}'>Không mở được {devices} (Micrô của tôi). Đã cắm chưa? Ứng dụng sẽ tự thử lại.</span>"
 }

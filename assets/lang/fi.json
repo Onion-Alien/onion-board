@@ -3473,5 +3473,7 @@
   "On: phones on this Wi-Fi can play your pads.": "Päällä: tämän Wi-Fin puhelimet voivat soittaa nappejasi.",
   "Onion Pocket": "Onion Pocket",
   "Onion Pocket's settings didn't open: they're on Settings → Remote.": "Onion Pocketin asetukset eivät auenneet: ne ovat kohdassa Asetukset → Etäohjaus.",
-  "Pair a phone and settings": "Yhdistä puhelin ja asetukset"
+  "Pair a phone and settings": "Yhdistä puhelin ja asetukset",
+  "<br><span style='color:{status}'>Can't open {devices} (My headphones). Plugged in? It's tried again by itself.</span>": "<br><span style='color:{status}'>Laitetta {devices} ei saada auki (Kuulokkeeni). Onko se kytketty? Sitä yritetään itsestään uudelleen.</span>",
+  "<br><span style='color:{status}'>Can't open {devices} (My mic). Plugged in? It's tried again by itself.</span>": "<br><span style='color:{status}'>Laitetta {devices} ei saada auki (Oma mikki). Onko se kytketty? Sitä yritetään itsestään uudelleen.</span>"
 }

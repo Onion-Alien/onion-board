@@ -3473,5 +3473,7 @@
   "On: phones on this Wi-Fi can play your pads.": "Aan: telefoons op deze wifi kunnen je pads afspelen.",
   "Onion Pocket": "Onion Pocket",
   "Onion Pocket's settings didn't open: they're on Settings → Remote.": "De instellingen van Onion Pocket gingen niet open: ze staan onder Instellingen → Op afstand.",
-  "Pair a phone and settings": "Telefoon koppelen en instellingen"
+  "Pair a phone and settings": "Telefoon koppelen en instellingen",
+  "<br><span style='color:{status}'>Can't open {devices} (My headphones). Plugged in? It's tried again by itself.</span>": "<br><span style='color:{status}'>Kan {devices} niet openen (Mijn koptelefoon). Aangesloten? Het wordt vanzelf opnieuw geprobeerd.</span>",
+  "<br><span style='color:{status}'>Can't open {devices} (My mic). Plugged in? It's tried again by itself.</span>": "<br><span style='color:{status}'>Kan {devices} niet openen (Mijn microfoon). Aangesloten? Het wordt vanzelf opnieuw geprobeerd.</span>"
 }

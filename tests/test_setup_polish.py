@@ -171,3 +171,28 @@ def test_mic_alt_tiles_never_clip(window, monkeypatch):  # noqa: F811
     pump()
     assert not row.stacked()
     fits("back")
+
+
+def test_unplugged_headphones_and_mic_stay_said_under_devices(window, monkeypatch):  # noqa: F811
+    """The headphones or mic picked under Devices won't open (unplugged): the toast about
+    it fades, so the Devices card says so until it's back, and stops once it is."""
+    w = window
+    e = w.engine
+    w._attaching, w._settle_until = False, 0.0
+    monkeypatch.setitem(e.names, "mon", "Headphones (Example Headset)")
+    monkeypatch.setitem(e.names, "mic", "Headset Microphone (Example Headset)")
+    monkeypatch.setattr(e, "mon_stream", None)
+    monkeypatch.setattr(e, "mic_stream", None)
+    monkeypatch.setitem(e.errors, "mon", "Device unavailable")
+    monkeypatch.setitem(e.errors, "mic", "Device unavailable")
+    w.statusctl._update_status()
+    hint = w.setup_hint.text()
+    assert "Can't open <b>Headphones (Example Headset)</b> (My headphones)" in hint
+    assert "Can't open <b>Headset Microphone (Example Headset)</b> (My mic)" in hint
+    assert not w.setup_hint.isHidden()
+    # back: the lines go
+    monkeypatch.setattr(e, "mon_stream", _Stream())
+    e.errors.pop("mon")
+    w.statusctl._update_status()
+    hint = w.setup_hint.text()
+    assert "My headphones" not in hint and "(My mic)" in hint

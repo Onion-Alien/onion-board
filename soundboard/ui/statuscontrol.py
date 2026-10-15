@@ -89,6 +89,30 @@ class StatusControl(Controller):
                 + _("<br><span style='color:{status}'>Can't open {devices} (under Also play on). "
                     "Plugged in? It's tried again by itself.</span>",
                     status=theme.status('warn'), devices=devices))
+        # the headphones or mic picked here won't open (unplugged): the toast about it
+        # fades, so say it where the device is picked until it's back
+        if not (mw._attaching or time.monotonic() < mw._settle_until):
+            errs_now = e.errors_snapshot()
+
+            def gone(key):
+                name = e.names.get(key)
+                if name and key in errs_now and getattr(e, f"{key}_stream", None) is None:
+                    return f"<b>{html.escape(name)}</b>"
+                return None
+            if dev := gone("mon"):
+                mw.setup_hint.setText(
+                    mw.setup_hint.text()
+                    + _("<br><span style='color:{status}'>Can't open {devices} (My headphones). "
+                        "Plugged in? It's tried again by itself.</span>",
+                        status=theme.status('warn'), devices=dev))
+            if dev := gone("mic"):
+                mw.setup_hint.setText(
+                    mw.setup_hint.text()
+                    + _("<br><span style='color:{status}'>Can't open {devices} (My mic). "
+                        "Plugged in? It's tried again by itself.</span>",
+                        status=theme.status('warn'), devices=dev))
+        if mw.setup_hint.text().startswith("<br>"):   # only the lines above: no blank first line
+            mw.setup_hint.setText(mw.setup_hint.text()[4:])
         mw.setup_hint.setVisible(bool(mw.setup_hint.text()))   # (no empty gap)
         mw.set_sending(mw.btn_air.isChecked())   # its label follows the route
         self._update_flow()

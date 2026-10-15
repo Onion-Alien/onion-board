@@ -3549,5 +3549,7 @@
   "On: phones on this Wi-Fi can play your pads.": "Включено: телефоны в этой сети Wi-Fi могут запускать ваши кнопки.",
   "Onion Pocket": "Onion Pocket",
   "Onion Pocket's settings didn't open: they're on Settings → Remote.": "Настройки Onion Pocket не открылись: они в разделе Настройки → Пульт.",
-  "Pair a phone and settings": "Подключить телефон и настройки"
+  "Pair a phone and settings": "Подключить телефон и настройки",
+  "<br><span style='color:{status}'>Can't open {devices} (My headphones). Plugged in? It's tried again by itself.</span>": "<br><span style='color:{status}'>Не удаётся открыть {devices} («Мои наушники»). Подключено? Попытка повторится сама.</span>",
+  "<br><span style='color:{status}'>Can't open {devices} (My mic). Plugged in? It's tried again by itself.</span>": "<br><span style='color:{status}'>Не удаётся открыть {devices} («Мой микрофон»). Подключено? Попытка повторится сама.</span>"
 }
