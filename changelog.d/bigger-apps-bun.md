@@ -1,0 +1,1 @@
+- Bun and Hoot are bigger on the pages where they wait in the middle: Apps with nothing playing, an empty Sounds tab and while a search loads.

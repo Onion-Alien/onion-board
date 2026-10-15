@@ -147,7 +147,7 @@ class AppsTab(QWidget):
         ev.setContentsMargins(0, 12, 0, 0)
         ev.setSpacing(4)
         ev.addStretch(1)
-        self.bun = BunnyWidget(height=72, pad=18, sad=0.6,
+        self.bun = BunnyWidget(height=130, pad=18, sad=0.6,
                                lines=(_("play something?"), _("so quiet…"),
                                       _("music, please?")),
                                joy_lines=(_("hehe!"), _("yay!")), pong=True, naps=True)
