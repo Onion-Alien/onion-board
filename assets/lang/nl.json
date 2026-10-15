@@ -1228,7 +1228,6 @@
   "Take it out of the queue": "Haal het uit de wachtrij",
   "Takes the add-on out of Onion Board: phones can't play your pads any more. Paired phones are kept for when you get it again.": "Haalt de add-on uit Onion Board: telefoons kunnen je pads niet meer afspelen. Gekoppelde telefoons worden bewaard voor het geval u deze weer krijgt.",
   "Teal": "Wintertaling",
-  "Tell me when a new version is out. Nothing is downloaded until I press Update now.": "Vertel me wanneer er een nieuwe versie uitkomt. Er wordt niets gedownload totdat ik op Nu bijwerken druk.",
   "Testing…": "Testen…",
   "That restore point is gone.": "Dat herstelpunt is verdwenen.",
   "That's it. Add sounds by dragging files onto the window, then click one to play it. You can open this guide again any time from the <b>Setup</b> tab (<b>Step-by-step guide</b>).": "Dat is het. Voeg geluiden toe door bestanden naar het venster te slepen en klik er vervolgens op om deze af te spelen. U kunt deze handleiding op elk gewenst moment opnieuw openen via het tabblad <b>Installatie</b> ( <b>Stapsgewijze handleiding</b> ).",
@@ -1256,7 +1255,6 @@
   "They're copied into Onion Board; {name} keeps its own. Ones already here are skipped, and a hotkey something here already uses is left off.": "Ze worden gekopieerd naar Onion Board; {name} behoudt zijn eigen naam. Degene die hier al staan, worden overgeslagen en een sneltoets die hier al wordt gebruikt, wordt weggelaten.",
   "This desktop has no system tray, so closing the window quits.": "Deze desktop heeft geen systeemvak, dus het sluiten van het venster wordt afgesloten.",
   "This is Onion Board {version}. With the box ticked it asks GitHub every few hours whether a newer version is out and tells you (with a banner if it's an important fix). This copy runs from source, so it only tells you: update it with git pull.": "Dit is Onion Board {version} . Als het vakje is aangevinkt, wordt GitHub elke paar uur gevraagd of er een nieuwere versie beschikbaar is en wordt het je verteld (met een banner als het een belangrijke oplossing is). Deze kopie draait vanaf de broncode, dus het vertelt je alleen: update het met git pull.",
-  "This is Onion Board {version}. With the box ticked it asks GitHub every few hours whether a newer version is out and tells you (with a banner if it's an important fix). Update now downloads it and checks it's the file GitHub lists; you pick when the app restarts to install it. Your sounds and settings are kept.": "Dit is Onion Board {version} . Als het vakje is aangevinkt, wordt GitHub elke paar uur gevraagd of er een nieuwere versie beschikbaar is en wordt het je verteld (met een banner als het een belangrijke oplossing is). Update downloadt het nu en controleert of dit het bestand is dat GitHub vermeldt; u kiest wanneer de app opnieuw wordt opgestart om deze te installeren. Je geluiden en instellingen blijven behouden.",
   "Through a proxy": "Via een proxy",
   "Through a proxy or Tor, everything the app fetches (searches, downloads, radio, updates) goes through it, and site names are looked up there, not on this PC. If it can't be reached, nothing is fetched: the app never quietly goes direct. This PC's own addresses (127.0.0.1) stay direct.": "Via een proxy of Tor gaat alles wat de app ophaalt (zoekopdrachten, downloads, radio, updates) er doorheen en worden sitenamen daar opgezocht, niet op deze pc. Als deze niet bereikbaar is, wordt er niets opgehaald: de app gaat nooit stilletjes direct. De eigen adressen van deze pc (127.0.0.1) blijven direct.",
   "TikTok sounds": "TikTok-geluiden",
@@ -3459,5 +3457,15 @@
   "PyPI sent an answer that couldn't be read": "PyPI stuurde een antwoord dat niet kon worden gelezen",
   "Use it only when YouTube or another site stopped working and Update now doesn't fix it. Reinstall goes back to an approved version.": "Gebruik dit alleen als YouTube of een andere site niet meer werkt en Nu updaten het niet oplost. Opnieuw installeren gaat terug naar een goedgekeurde versie.",
   "Warning: this gets the newest yt-dlp from PyPI right away. Onion Board hasn't approved it yet, so nobody has checked it's safe. It may fix downloads that stopped working.": "Let op: dit haalt meteen de nieuwste yt-dlp op van PyPI. Onion Board heeft hem nog niet goedgekeurd, dus niemand heeft gecontroleerd of hij veilig is. Hij kan downloads repareren die niet meer werken.",
-  "no wheel for {package}": "geen wiel voor {package}"
+  "no wheel for {package}": "geen wiel voor {package}",
+  "Install updates by themselves": "Updates zelf installeren",
+  "Onion Board {version} is out: downloading it now. The app restarts by itself to install it when it's done.": "Onion Board {version} is uit: wordt nu gedownload. De app start vanzelf opnieuw om hem te installeren zodra hij klaar is.",
+  "Tell me when a new version is out.": "Laat me weten wanneer er een nieuwe versie is.",
+  "This is Onion Board {version}. With the box ticked it asks GitHub whether a newer version is out each time it starts and every hour after, and tells you (with a banner if it's an important fix). Every update is checked against the file GitHub lists. Your sounds and settings are kept.": "Dit is Onion Board {version}. Met het vinkje vraagt het GitHub bij elke start en daarna elk uur of er een nieuwere versie is, en laat het je weten (met een balk als het een belangrijke fix is). Elke update wordt gecontroleerd tegen het bestand dat GitHub vermeldt. Je geluiden en instellingen blijven behouden.",
+  "When Onion Board starts and a new version is out, it downloads it and restarts to install it, unless a sound is playing.": "Als Onion Board start en er een nieuwe versie is, downloadt het die en start het opnieuw om hem te installeren, tenzij er een geluid speelt.",
+  "Checking for updates…": "Zoeken naar updates…",
+  "Installing Onion Board {version}…": "Onion Board {version} installeren…",
+  "Updated to {version}": "Bijgewerkt naar {version}",
+  "Updating to {version}…": "Bijwerken naar {version}…",
+  "Updating to {version}… {pct}%": "Bijwerken naar {version}… {pct}%"
 }

@@ -1228,7 +1228,6 @@
   "Take it out of the queue": "Sıradan çıkar",
   "Takes the add-on out of Onion Board: phones can't play your pads any more. Paired phones are kept for when you get it again.": "Onion Board'un eklentisini kaldırır: telefonlar artık pedlerinizi çalamaz. Eşleştirilen telefonlar, tekrar alacağınız zaman kullanılmak üzere saklanır.",
   "Teal": "turkuaz",
-  "Tell me when a new version is out. Nothing is downloaded until I press Update now.": "Yeni bir sürüm çıktığında bana haber ver. Şimdi Güncelle'ye basana kadar hiçbir şey indirilmiyor.",
   "Testing…": "Test…",
   "That restore point is gone.": "Bu geri yükleme noktası gitti.",
   "That's it. Add sounds by dragging files onto the window, then click one to play it. You can open this guide again any time from the <b>Setup</b> tab (<b>Step-by-step guide</b>).": "İşte bu. Dosyaları pencereye sürükleyerek sesler ekleyin, ardından oynatmak için birine tıklayın. Bu kılavuzu istediğiniz zaman <b>Kurulum</b> sekmesinden ( <b>Adım adım kılavuz</b> ) tekrar açabilirsiniz.",
@@ -1256,7 +1255,6 @@
   "They're copied into Onion Board; {name} keeps its own. Ones already here are skipped, and a hotkey something here already uses is left off.": "Onion Board'a kopyalanırlar; {name} kendine ait. Zaten burada olanlar atlanır ve burada zaten kullanılan bir kısayol tuşu devre dışı bırakılır.",
   "This desktop has no system tray, so closing the window quits.": "Bu masaüstünde sistem tepsisi bulunmadığından pencere kapatıldığında işlem sonlandırılır.",
   "This is Onion Board {version}. With the box ticked it asks GitHub every few hours whether a newer version is out and tells you (with a banner if it's an important fix). This copy runs from source, so it only tells you: update it with git pull.": "Bu Soğan Kurulu {version} . Kutu işaretlendiğinde GitHub'a birkaç saatte bir daha yeni bir sürümün çıkıp çıkmadığını sorar ve size bildirir (önemli bir düzeltme ise bir banner ile). Bu kopya kaynaktan çalışır, dolayısıyla size yalnızca şunları söyler: onu git pull ile güncelleyin.",
-  "This is Onion Board {version}. With the box ticked it asks GitHub every few hours whether a newer version is out and tells you (with a banner if it's an important fix). Update now downloads it and checks it's the file GitHub lists; you pick when the app restarts to install it. Your sounds and settings are kept.": "Bu Soğan Kurulu {version} . Kutu işaretlendiğinde GitHub'a birkaç saatte bir daha yeni bir sürümün çıkıp çıkmadığını sorar ve size bildirir (önemli bir düzeltme ise bir banner ile). Güncelleme şimdi dosyayı indiriyor ve GitHub'un listelediği dosya olup olmadığını kontrol ediyor; Uygulamayı yüklemek için uygulamanın ne zaman yeniden başlayacağını seçersiniz. Sesleriniz ve ayarlarınız korunur.",
   "Through a proxy": "Bir vekil aracılığıyla",
   "Through a proxy or Tor, everything the app fetches (searches, downloads, radio, updates) goes through it, and site names are looked up there, not on this PC. If it can't be reached, nothing is fetched: the app never quietly goes direct. This PC's own addresses (127.0.0.1) stay direct.": "Bir proxy veya Tor aracılığıyla, uygulamanın getirdiği her şey (aramalar, indirmeler, radyo, güncellemeler) üzerinden geçer ve site adları bu bilgisayarda değil, orada aranır. Ulaşılamıyorsa hiçbir şey getirilmez: uygulama asla sessizce doğrudan gitmez. Bu bilgisayarın kendi adresleri (127.0.0.1) doğrudan kalır.",
   "TikTok sounds": "TikTok sesleri",
@@ -3459,5 +3457,15 @@
   "PyPI sent an answer that couldn't be read": "PyPI okunamayan bir yanıt gönderdi",
   "Use it only when YouTube or another site stopped working and Update now doesn't fix it. Reinstall goes back to an approved version.": "Bunu sadece YouTube ya da başka bir site çalışmayı bıraktığında ve Şimdi güncelle düzeltmediğinde kullan. Yeniden yükle onaylı bir sürüme geri döner.",
   "Warning: this gets the newest yt-dlp from PyPI right away. Onion Board hasn't approved it yet, so nobody has checked it's safe. It may fix downloads that stopped working.": "Uyarı: bu, en yeni yt-dlp'yi PyPI'dan hemen indirir. Onion Board onu henüz onaylamadı, yani kimse güvenli olup olmadığını kontrol etmedi. Çalışmayı bırakan indirmeleri düzeltebilir.",
-  "no wheel for {package}": "{package} için tekerlek yok"
+  "no wheel for {package}": "{package} için tekerlek yok",
+  "Install updates by themselves": "Güncellemeleri kendisi yüklesin",
+  "Onion Board {version} is out: downloading it now. The app restarts by itself to install it when it's done.": "Onion Board {version} çıktı: şimdi indiriliyor. Bitince uygulama yüklemek için kendiliğinden yeniden başlar.",
+  "Tell me when a new version is out.": "Yeni sürüm çıkınca bana haber ver.",
+  "This is Onion Board {version}. With the box ticked it asks GitHub whether a newer version is out each time it starts and every hour after, and tells you (with a banner if it's an important fix). Every update is checked against the file GitHub lists. Your sounds and settings are kept.": "Bu Onion Board {version}. Kutu işaretliyken her açılışta ve sonra her saat GitHub'a daha yeni bir sürüm olup olmadığını sorar ve sana haber verir (önemli bir düzeltmeyse bir şeritle). Her güncelleme GitHub'ın listelediği dosyayla karşılaştırılır. Seslerin ve ayarların korunur.",
+  "When Onion Board starts and a new version is out, it downloads it and restarts to install it, unless a sound is playing.": "Onion Board açıldığında yeni bir sürüm çıkmışsa onu indirir ve yüklemek için yeniden başlar; bir ses çalıyorsa bunu yapmaz.",
+  "Checking for updates…": "Güncellemeler aranıyor…",
+  "Installing Onion Board {version}…": "Onion Board {version} yükleniyor…",
+  "Updated to {version}": "{version} sürümüne güncellendi",
+  "Updating to {version}…": "{version} sürümüne güncelleniyor…",
+  "Updating to {version}… {pct}%": "{version} sürümüne güncelleniyor… %{pct}"
 }

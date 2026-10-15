@@ -68,6 +68,138 @@ def test_update_now_downloads_then_restarts_into_the_installer(window, boxes, qa
     assert window.cfg.update_pending == "99.0.0"
 
 
+def _launch_check(window, qapp, monkeypatch, rel):
+    """The check as the app starts (check_updates(launch=True)) finding `rel`."""
+    from soundboard import watchaddon
+    monkeypatch.setattr(updates, "check", lambda cfg, force=False, launch=False: rel)
+    monkeypatch.setattr(watchaddon, "check_update", lambda: None)
+    window.updctl.check_updates(launch=True)
+    assert process_events(qapp, lambda: window.updctl.release is not None)
+
+
+@pytest.fixture
+def installer(window, monkeypatch, tmp_path):
+    """A faked download and installer: `installer.started` lists the installers run,
+    `installer.got` the downloads."""
+    setup = tmp_path / "OnionBoardSetup-99.0.0.exe"
+    setup.write_bytes(b"MZ")
+
+    class Fake:
+        started: list = []
+        got: list = []
+    f = Fake()
+    f.started, f.got = [], []
+    f.setup = setup
+    monkeypatch.setattr(updates, "can_install", lambda: True)
+    monkeypatch.setattr(updates, "download", lambda rel, p, c: f.got.append(rel) or setup)
+    monkeypatch.setattr(updates, "start_install", f.started.append)
+    monkeypatch.setattr(window, "quit_app", lambda: None)
+    window.show()
+    return f
+
+
+def test_found_as_the_app_starts_it_installs_itself(window, boxes, qapp, monkeypatch,
+                                                   installer):
+    _launch_check(window, qapp, monkeypatch, _rel())
+    assert process_events(qapp, lambda: installer.started)
+    assert boxes.shown == []                     # no question: it just restarts into it
+    assert "downloading it now" in toast.shown(window)[-1].text()
+    assert window.cfg.update_pending == "99.0.0" and window.cfg.update_auto_tried == "99.0.0"
+
+
+def test_a_version_that_already_tried_waits_for_a_click(window, boxes, qapp, monkeypatch,
+                                                       installer):
+    window.cfg.update_auto_tried = "99.0.0"      # it didn't work last time: no loop
+    _launch_check(window, qapp, monkeypatch, _rel())
+    process_events(qapp, lambda: False, timeout=0.3)
+    assert installer.got == [] and installer.started == []
+    assert window.btn_update.accessibleName() == "Update to 99.0.0"
+
+
+def test_unticked_or_found_later_it_only_offers(window, boxes, qapp, monkeypatch, installer):
+    window.cfg.update_auto = False
+    _launch_check(window, qapp, monkeypatch, _rel())
+    window.cfg.update_auto = True
+    window.updctl.release = None
+    window.updctl._on_update(_rel(), "", False)  # the hourly check: the card only
+    process_events(qapp, lambda: False, timeout=0.3)
+    assert installer.got == [] and installer.started == []
+
+
+def test_found_behind_the_loading_screen_it_installs_before_the_window(
+        window, boxes, qapp, monkeypatch, installer):
+    from soundboard.ui import splash
+    said = []
+    monkeypatch.setattr(splash, "set_status", lambda text="", progress=None:
+                        said.append((text, progress)))
+    monkeypatch.setattr(updates, "check", lambda cfg, force=False, launch=False: _rel())
+
+    def download(rel, progress, cancelled):
+        progress(5, 10)
+        return installer.setup
+    monkeypatch.setattr(updates, "download", download)
+    assert window.updctl.update_at_start() is True
+    assert installer.started == [installer.setup] and boxes.shown == []
+    assert said[0] == ("Checking for updates…", None)
+    assert ("Updating to 99.0.0… 50%", 0.5) in said
+    assert said[-1] == ("Installing Onion Board 99.0.0…", 1.0)
+    assert window.cfg.update_pending == "99.0.0" and window.cfg.update_auto_tried == "99.0.0"
+
+
+def test_nothing_new_or_slow_the_app_opens_as_usual(window, qapp, monkeypatch, installer):
+    import threading
+    from soundboard.ui import splash, updatecontrol
+    said = []
+    monkeypatch.setattr(splash, "set_status", lambda text="", progress=None:
+                        said.append(text))
+    monkeypatch.setattr(updates, "check", lambda cfg, force=False, launch=False: None)
+    assert window.updctl.update_at_start() is False and said[-1] == ""
+    assert window.updctl.start_checked   # (the check after the window is up skips)
+    hold = threading.Event()
+    monkeypatch.setattr(updates, "check", lambda cfg, force=False, launch=False: hold.wait(5))
+    monkeypatch.setattr(updatecontrol, "START_CHECK_S", 0.2)
+    window.updctl.start_checked = False
+    assert window.updctl.update_at_start() is False and not window.updctl.start_checked
+    hold.set()
+    assert installer.started == []
+
+
+def test_a_failed_download_at_start_opens_the_app_with_the_card(window, qapp, monkeypatch,
+                                                                installer):
+    monkeypatch.setattr(updates, "check", lambda cfg, force=False, launch=False: _rel())
+
+    def fail(rel, progress, cancelled):
+        raise updates.UpdateError("nope")
+    monkeypatch.setattr(updates, "download", fail)
+    assert window.updctl.update_at_start() is False
+    assert process_events(qapp, lambda: window.updctl.release is not None)
+    assert installer.started == [] and window.btn_update.isVisible()
+
+
+def test_unticked_nothing_is_asked_at_start(window, monkeypatch, installer):
+    asked = []
+    monkeypatch.setattr(updates, "check", lambda *a, **k: asked.append(1))
+    window.cfg.update_auto = False
+    assert window.updctl.update_at_start() is False and asked == []
+
+
+def test_the_loading_screen_says_updated_after_an_update():
+    from soundboard.ui import splash
+    splash._updated(__version__)
+    assert splash._status == f"Updated to {__version__}"
+    splash.set_status()
+    splash._updated("0.0.1")   # (an update that didn't land: Starting…)
+    assert splash._status == ""
+
+
+def test_a_sound_playing_asks_first(window, boxes, qapp, monkeypatch, installer):
+    monkeypatch.setattr(window.engine, "playing", lambda: {"x": (0.5, False)})
+    boxes.answers = {"Install the update": "Later"}
+    _launch_check(window, qapp, monkeypatch, _rel())
+    assert process_events(qapp, lambda: boxes.shown)
+    assert boxes.shown[0][0] == "Install the update" and installer.started == []
+
+
 def test_later_keeps_the_download_for_the_pill(window, boxes, qapp, monkeypatch, tmp_path):
     setup = tmp_path / "OnionBoardSetup-99.0.0.exe"
     setup.write_bytes(b"MZ")

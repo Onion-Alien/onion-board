@@ -30,6 +30,9 @@ if TYPE_CHECKING:
 
 log = logging.getLogger(__name__)
 
+START_CHECK_S = 4.0   # how long the loading screen waits for GitHub's answer
+STALL_S = 30.0        # ...and for a download that stopped moving
+
 
 class UpdateControl(Controller):
     """The update check, card, download and install for one MainWindow (``mw``)."""
@@ -46,23 +49,32 @@ class UpdateControl(Controller):
         self._update_fails = 0        # failed tries in a row: from 2, Copy error
         self._update_box: QMessageBox | None = None   # "Downloading…" open over it
         self._whats_new_later: bool | None = None   # What's new waits for the window
+        # the check as the app starts is on: a newer version it finds installs itself
+        # (until that check is answered, or the settling one it asks for afterwards)
+        self._auto = False
+        self.start_checked = False   # update_at_start had GitHub's answer
+        self._auto_install = False   # this download was started by itself: install it too
 
-    def check_updates(self, force: bool = False, why: str = ""):
+    def check_updates(self, force: bool = False, why: str = "", launch: bool = False):
         """Look for a newer release on a thread (see updates.py). Without `force` only
         if the box is ticked, and at most every hour. `why`: the click that asked,
-        for Network activity (none: the app's own timer)."""
+        for Network activity (none: the app's own timer). `launch`: the check as the
+        app starts, whatever the hour; what it finds installs itself (_can_auto)."""
         mw = self.mw
         if not force and not mw.cfg.update_check:
             return
 
-        due = force or time.time() - mw.cfg.update_checked >= updates.EVERY_S
+        due = force or launch or time.time() - mw.cfg.update_checked >= updates.EVERY_S
+        if launch:
+            self._auto = True
+            why = why or "Update check as the app starts"
         why = why or "Automatic update check (at most every hour)"
         netlog.cause(updates.FEATURE, why)
         netlog.cause(watchaddon.FEATURE, f"{why}: Onion Watch add-on")
 
         def run():
             try:
-                rel, err = updates.check(mw.cfg, force=force), ""
+                rel, err = updates.check(mw.cfg, force=force, launch=launch), ""
             except Exception as e:  # noqa: BLE001 - offline etc.
                 rel, err = None, errors.plain(e)
             busy.emit(mw.bridge.update, rel, err, force, owner=mw)
@@ -77,8 +89,11 @@ class UpdateControl(Controller):
     def _on_update(self, rel, err: str, asked: bool):
         mw = self.mw
         mw._save_later()   # update_checked
+        auto = self._auto and not asked
         if updates.recheck_s > 0:   # the newest is still settling: offer it once it has
             QTimer.singleShot(round(updates.recheck_s * 1000), mw, self.check_updates)
+        else:   # (the start's check isn't over until then)
+            self._auto = False
         busy = self._downloading or self._update_file is not None
         if rel is not None and not busy:
             if self.release is None or self.release.version != rel.version:
@@ -93,9 +108,116 @@ class UpdateControl(Controller):
                     else QSystemTrayIcon.MessageIcon.Information,
                     8000)
             mw.alertctl._show_urgent()
+            if auto and self._can_auto(rel):
+                self._auto = False
+                self.download_update(auto=True)
         mw.update_done.emit(rel, err)   # for the Settings window's "Check now"
         if asked and rel is not None:
             self.show_update()
+
+    def update_at_start(self) -> bool:
+        """As the app starts, behind the loading screen (splash): is a newer version
+        out? Then download it there, the percentage under Bun, and start its installer.
+        True when the installer was started: the app closes instead of opening, and the
+        installer opens the new version ("Updated to X" on its loading screen). Waits
+        START_CHECK_S at most for GitHub's answer, and gives up on a download that
+        stops moving for STALL_S; anything else (nothing new, offline, unticked, from
+        source) opens the app as usual, and the check's answer goes to _on_update."""
+        mw = self.mw
+        cfg = mw.cfg
+        if not (cfg.update_check and cfg.update_auto and updates.can_install()
+                and net.allowed(updates.FEATURE)):
+            return False
+        from soundboard.ui import splash
+        netlog.cause(updates.FEATURE, "Update check as the app starts")
+        splash.set_status(_("Checking for updates…"))
+        got: dict = {}
+
+        def check():
+            try:
+                got["rel"] = updates.check(cfg, launch=True)
+            except Exception as e:  # noqa: BLE001 - offline etc.: open as usual
+                got["err"] = errors.plain(e)
+        end = time.monotonic() + START_CHECK_S
+        if not self._wait(check, lambda: time.monotonic() > end, "update-start-check"):
+            splash.set_status()
+            return False   # GitHub is slow: the check after the window is up asks again
+        self.start_checked = True
+        rel = got.get("rel")
+        if rel is None or not self._can_auto(rel):
+            splash.set_status()
+            # nothing new, or one to offer on the card; one still settling is asked
+            # for again (_on_update) and installs itself in the window then
+            self._auto = rel is None
+            QTimer.singleShot(0, mw, lambda: self._on_update(rel, "", False))
+            return False
+        usage.maybe_send(cfg, event=usage.update_event(rel.version))
+        netlog.cause(updates.FEATURE,
+                     f"Installing Onion Board {rel.version} by itself (found as the app started)")
+        text = _("Updating to {version}…", version=rel.version)
+        splash.set_status(text, 0.0)
+        moved = [time.monotonic()]
+
+        def progress(done, total):
+            moved[0] = time.monotonic()
+            if total:
+                splash.set_status(_("Updating to {version}… {pct}%", version=rel.version,
+                                    pct=min(done * 100 // total, 100)), done / total)
+
+        def fetch():
+            try:
+                got["path"] = updates.download(
+                    rel, progress, lambda: time.monotonic() - moved[0] > STALL_S)
+            except Exception as e:  # noqa: BLE001 - open as usual, offered on the card
+                log.info("the update at start didn't download: %s", e)
+        self._wait(fetch, lambda: False, "update-start-download")
+        path = got.get("path")
+        if path is None:
+            splash.set_status()
+            QTimer.singleShot(0, mw, lambda: self._on_update(rel, "", False))
+            return False
+        splash.set_status(_("Installing Onion Board {version}…", version=rel.version), 1.0)
+        self.release, self._update_file = rel, path
+        cfg.update_auto_tried = rel.version   # once: a failed one waits for a click
+        usage.used("update-auto")
+        cfg.update_pending = rel.version
+        cfg.save()
+        try:
+            updates.start_install(path)
+        except OSError as e:
+            log.warning("couldn't start the update installer: %s", e)
+            cfg.update_pending = ""
+            cfg.save()
+            splash.set_status()
+            QTimer.singleShot(0, mw, lambda: self._on_update(rel, "", False))
+            return False
+        log.info("installing %s as the app starts", rel.version)
+        exitwatch.closed_by_windows()   # the installer closes us if the quit is slow
+        return True
+
+    @staticmethod
+    def _wait(fn, give_up, name: str) -> bool:
+        """Run `fn` on a thread, keeping the loading screen moving, until it's done
+        (True) or `give_up()` (False; the thread is left to finish on its own)."""
+        import threading
+
+        from soundboard.ui import splash
+        t = threading.Thread(target=fn, daemon=True, name=name)
+        t.start()
+        while t.is_alive():
+            if give_up():
+                return False
+            splash.pump()
+            t.join(0.03)
+        return True
+
+    def _can_auto(self, rel) -> bool:
+        """Install `rel` by itself: ticked in Settings > Updates, an installed copy (not
+        from source), and not a version that already tried (and so didn't work)."""
+        cfg = self.mw.cfg
+        return (cfg.update_auto and cfg.update_check and updates.can_install()
+                and bool(rel.asset_url) and rel.version != cfg.update_auto_tried
+                and net.allowed(updates.FEATURE))
 
     def _on_watch_update(self, offer):
         """A newer Onion Watch (check_updates): its Triggers tab offers it, and an
@@ -283,8 +405,9 @@ class UpdateControl(Controller):
             lines += ["", trace.strip()]
         return "\n".join(lines)
 
-    def download_update(self):
-        """Fetch the new version's installer on a thread (updates.download)."""
+    def download_update(self, auto: bool = False):
+        """Fetch the new version's installer on a thread (updates.download). `auto`:
+        found as the app started, it installs itself once it's here (_on_update_ready)."""
         mw = self.mw
         rel = self.release
         if rel is None or self._downloading:
@@ -292,11 +415,18 @@ class UpdateControl(Controller):
         if not net.allowed(updates.FEATURE):   # switched off since it was found
             mw.toast(html.escape(net.off_message(updates.FEATURE)), "warn")
             return
+        self._auto_install = auto
+        if auto:
+            mw.toast(_("Onion Board {version} is out: downloading it now. The app restarts "
+                       "by itself to install it when it's done.", version=rel.version),
+                     "ok", 8000)
         self._downloading = True
         self._update_cancel = False
         self._update_err = ""
         self._update_got = (0, rel.size or 0)
-        netlog.cause(updates.FEATURE, f"You clicked to download Onion Board {rel.version}")
+        netlog.cause(updates.FEATURE,
+                     f"Installing Onion Board {rel.version} by itself (found as the app started)"
+                     if auto else f"You clicked to download Onion Board {rel.version}")
         usage.maybe_send(mw.cfg, event=usage.update_event(rel.version))
         self._show_update_state()
         last = [-1]
@@ -328,6 +458,7 @@ class UpdateControl(Controller):
         if not qt_valid(mw) or mw._shut_down:
             return
         self._downloading = False
+        auto, self._auto_install = self._auto_install, False
         box, self._update_box = self._update_box, None
         if box is not None and qt_valid(box):
             box.reject()   # the Downloading box: done, one way or the other
@@ -366,14 +497,22 @@ class UpdateControl(Controller):
             return
         if QApplication.activeModalWidget() is not None:
             return   # something else is open: the card says Restart to update
-        self.install_update()
+        # installing itself: not over a sound that's playing (then it asks, as always)
+        self.install_update(ask=not (auto and not mw.engine.playing()))
 
-    def install_update(self):
-        """Ask, then close the app and let the downloaded installer replace it (it
-        opens the app again when it's done)."""
+    def install_update(self, ask: bool = True):
+        """Ask (unless not `ask`: installing by itself, _on_update_ready), then close
+        the app and let the downloaded installer replace it (it opens the app again
+        when it's done)."""
         mw = self.mw
         rel, path = self.release, self._update_file
         if rel is None or path is None:
+            return
+        if not ask:
+            log.info("installing %s by itself", rel.version)
+            mw.cfg.update_auto_tried = rel.version   # once: a failed one waits for a click
+            usage.used("update-auto")
+            self._start_install(rel, path)
             return
         box = QMessageBox(QMessageBox.Icon.Question, _("Install the update"),
                           _("Onion Board {version} is ready. Restart now to install it?",
@@ -390,6 +529,10 @@ class UpdateControl(Controller):
         if clicked is not now:
             usage.used("update-later")
             return
+        self._start_install(rel, path)
+
+    def _start_install(self, rel, path: Path):
+        mw = self.mw
         if not path.is_file():   # removed meanwhile: fetch it again
             self._update_file = None
             self.download_update()

@@ -489,6 +489,9 @@ class Config:
     update_checked: float = 0.0       # time.time() of the last check
     update_skip: str = ""             # a version the user said to skip
     update_pending: str = ""          # the version an update is installing (see updates.py)
+    # a new version found as the app starts installs itself (UpdateControl, "auto")
+    update_auto: bool = True
+    update_auto_tried: str = ""       # ...once per version: a failed one isn't retried
     # the newest version whose What's new (ui/whatsnew.py) was shown; a first start has
     # nothing to catch up on, a config without it is from an older version
     whats_new_seen: str = __version__

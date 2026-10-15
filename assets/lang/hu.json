@@ -1084,7 +1084,6 @@
   "Tap to open, tap again to close": "Koppints a megnyitáshoz, újra a bezáráshoz",
   "Tape mode: speed changes the pitch too (nightcore / slowed)": "Kazetta mód: a sebesség a hangmagasságot is változtatja (nightcore / slowed)",
   "Teal": "Kékeszöld",
-  "Tell me when a new version is out. Nothing is downloaded until I press Update now.": "Szólj, ha új verzió jelenik meg. Semmi nem töltődik le, amíg meg nem nyomom a Frissítés most gombot.",
   "Test": "Teszt",
   "Testing…": "Tesztelés…",
   "That restore point is gone.": "Az a visszaállítási pont már nincs meg.",
@@ -1131,7 +1130,6 @@
   "They're copied into Onion Board; {name} keeps its own. Ones already here are skipped, and a hotkey something here already uses is left off.": "Átmásolódnak az Onion Boardba; a(z) {name} megtartja a sajátjait. A már itt lévőket kihagyja, és egy itt már használt gyorsbillentyű kimarad.",
   "This desktop has no system tray, so closing the window quits.": "Ezen az asztalon nincs tálca, így az ablak bezárása kilép.",
   "This is Onion Board {version}. With the box ticked it asks GitHub every few hours whether a newer version is out and tells you (with a banner if it's an important fix). This copy runs from source, so it only tells you: update it with git pull.": "Ez az Onion Board {version}. Bepipálva néhány óránként megkérdezi a GitHubot, megjelent-e újabb verzió, és szól (sávval, ha fontos javítás). Ez a példány forrásból fut, ezért csak szól: frissítsd git pull-lal.",
-  "This is Onion Board {version}. With the box ticked it asks GitHub every few hours whether a newer version is out and tells you (with a banner if it's an important fix). Update now downloads it and checks it's the file GitHub lists; you pick when the app restarts to install it. Your sounds and settings are kept.": "Ez az Onion Board {version}. Bepipálva néhány óránként megkérdezi a GitHubot, megjelent-e újabb verzió, és szól (sávval, ha fontos javítás). A Frissítés most letölti, és ellenőrzi, hogy az a fájl, amit a GitHub listáz; te döntöd el, mikor indul újra az app a telepítéshez. A hangjaid és beállításaid megmaradnak.",
   "This sound's video isn't there any more": "Ennek a hangnak a videója már nincs meg",
   "This version's page on GitHub, in your browser": "Ennek a verziónak az oldala a GitHubon, a böngésződben",
   "This video can't be shown ({value}). The sound plays as normal.": "Ez a videó nem jeleníthető meg ({value}). A hang a szokásos módon szól.",
@@ -3459,5 +3457,15 @@
   "PyPI sent an answer that couldn't be read": "A PyPI nem olvasható választ küldött",
   "Use it only when YouTube or another site stopped working and Update now doesn't fix it. Reinstall goes back to an approved version.": "Csak akkor használd, ha a YouTube vagy egy másik oldal leállt, és a Frissítés most nem segít. Az Újratelepítés visszavált egy jóváhagyott verzióra.",
   "Warning: this gets the newest yt-dlp from PyPI right away. Onion Board hasn't approved it yet, so nobody has checked it's safe. It may fix downloads that stopped working.": "Figyelem: ez azonnal letölti a legújabb yt-dlp-t a PyPI-ról. Az Onion Board még nem hagyta jóvá, így senki nem ellenőrizte, hogy biztonságos-e. Megjavíthatja a leállt letöltéseket.",
-  "no wheel for {package}": "nincs kerék a következőhöz: {package}"
+  "no wheel for {package}": "nincs kerék a következőhöz: {package}",
+  "Install updates by themselves": "Frissítések telepítése maguktól",
+  "Onion Board {version} is out: downloading it now. The app restarts by itself to install it when it's done.": "Megjelent az Onion Board {version}: most töltődik le. Ha kész, az app magától újraindul, hogy telepítse.",
+  "Tell me when a new version is out.": "Szólj, ha új verzió jelenik meg.",
+  "This is Onion Board {version}. With the box ticked it asks GitHub whether a newer version is out each time it starts and every hour after, and tells you (with a banner if it's an important fix). Every update is checked against the file GitHub lists. Your sounds and settings are kept.": "Ez az Onion Board {version}. Bejelölve minden indításkor, majd óránként megkérdezi a GitHubot, van-e újabb verzió, és szól neked (sávval, ha fontos javításról van szó). Minden frissítést ellenőriz a GitHub által listázott fájllal. A hangjaid és beállításaid megmaradnak.",
+  "When Onion Board starts and a new version is out, it downloads it and restarts to install it, unless a sound is playing.": "Amikor az Onion Board elindul és új verzió jelent meg, letölti és újraindul, hogy telepítse, kivéve ha épp szól egy hang.",
+  "Checking for updates…": "Frissítések keresése…",
+  "Installing Onion Board {version}…": "Onion Board {version} telepítése…",
+  "Updated to {version}": "Frissítve erre: {version}",
+  "Updating to {version}…": "Frissítés erre: {version}…",
+  "Updating to {version}… {pct}%": "Frissítés erre: {version}… {pct}%"
 }

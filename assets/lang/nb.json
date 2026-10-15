@@ -1084,7 +1084,6 @@
   "Tap to open, tap again to close": "Trykk for å åpne, trykk igjen for å lukke",
   "Tape mode: speed changes the pitch too (nightcore / slowed)": "Kassettmodus: hastigheten endrer tonehøyden også (nightcore / slowed)",
   "Teal": "Blågrønn",
-  "Tell me when a new version is out. Nothing is downloaded until I press Update now.": "Si fra når en ny versjon er ute. Ingenting lastes ned før jeg trykker Oppdater nå.",
   "Test": "Test",
   "Testing…": "Tester…",
   "That restore point is gone.": "Det gjenopprettingspunktet finnes ikke lenger.",
@@ -1131,7 +1130,6 @@
   "They're copied into Onion Board; {name} keeps its own. Ones already here are skipped, and a hotkey something here already uses is left off.": "De kopieres inn i Onion Board; {name} beholder sine egne. De som allerede er her, hoppes over, og en hurtigtast som noe her allerede bruker, utelates.",
   "This desktop has no system tray, so closing the window quits.": "Dette skrivebordet har ikke noe systemstatusfelt, så å lukke vinduet avslutter.",
   "This is Onion Board {version}. With the box ticked it asks GitHub every few hours whether a newer version is out and tells you (with a banner if it's an important fix). This copy runs from source, so it only tells you: update it with git pull.": "Dette er Onion Board {version}. Med haken på spør den GitHub med noen timers mellomrom om en nyere versjon er ute, og sier fra (med et banner hvis det er en viktig fiks). Denne kopien kjører fra kildekoden, så den sier bare fra: oppdater den med git pull.",
-  "This is Onion Board {version}. With the box ticked it asks GitHub every few hours whether a newer version is out and tells you (with a banner if it's an important fix). Update now downloads it and checks it's the file GitHub lists; you pick when the app restarts to install it. Your sounds and settings are kept.": "Dette er Onion Board {version}. Med haken på spør den GitHub med noen timers mellomrom om en nyere versjon er ute, og sier fra (med et banner hvis det er en viktig fiks). Oppdater nå laster den ned og sjekker at det er filen GitHub oppgir; du velger når appen starter på nytt for å installere den. Lydene og innstillingene dine beholdes.",
   "This sound's video isn't there any more": "Videoen til denne lyden finnes ikke lenger",
   "This version's page on GitHub, in your browser": "Siden for denne versjonen på GitHub, i nettleseren din",
   "This video can't be shown ({value}). The sound plays as normal.": "Denne videoen kan ikke vises ({value}). Lyden spilles som vanlig.",
@@ -3459,5 +3457,15 @@
   "PyPI sent an answer that couldn't be read": "PyPI sendte et svar som ikke kunne leses",
   "Use it only when YouTube or another site stopped working and Update now doesn't fix it. Reinstall goes back to an approved version.": "Bruk det bare når YouTube eller en annen side har sluttet å virke og Oppdater nå ikke hjelper. Installer på nytt går tilbake til en godkjent versjon.",
   "Warning: this gets the newest yt-dlp from PyPI right away. Onion Board hasn't approved it yet, so nobody has checked it's safe. It may fix downloads that stopped working.": "Advarsel: dette henter den nyeste yt-dlp fra PyPI med en gang. Onion Board har ikke godkjent den ennå, så ingen har sjekket at den er trygg. Den kan fikse nedlastinger som har sluttet å virke.",
-  "no wheel for {package}": "ikke noe hjul for {package}"
+  "no wheel for {package}": "ikke noe hjul for {package}",
+  "Install updates by themselves": "Installer oppdateringer av seg selv",
+  "Onion Board {version} is out: downloading it now. The app restarts by itself to install it when it's done.": "Onion Board {version} er ute: lastes ned nå. Appen starter på nytt av seg selv for å installere den når den er ferdig.",
+  "Tell me when a new version is out.": "Si fra når en ny versjon er ute.",
+  "This is Onion Board {version}. With the box ticked it asks GitHub whether a newer version is out each time it starts and every hour after, and tells you (with a banner if it's an important fix). Every update is checked against the file GitHub lists. Your sounds and settings are kept.": "Dette er Onion Board {version}. Med haken spør den GitHub om en nyere versjon er ute hver gang den starter og deretter hver time, og sier fra (med et banner hvis det er en viktig retting). Hver oppdatering sjekkes mot filen GitHub viser. Lydene og innstillingene dine beholdes.",
+  "When Onion Board starts and a new version is out, it downloads it and restarts to install it, unless a sound is playing.": "Når Onion Board starter og en ny versjon er ute, laster den den ned og starter på nytt for å installere den, med mindre en lyd spilles.",
+  "Checking for updates…": "Ser etter oppdateringer…",
+  "Installing Onion Board {version}…": "Installerer Onion Board {version}…",
+  "Updated to {version}": "Oppdatert til {version}",
+  "Updating to {version}…": "Oppdaterer til {version}…",
+  "Updating to {version}… {pct}%": "Oppdaterer til {version}… {pct}%"
 }

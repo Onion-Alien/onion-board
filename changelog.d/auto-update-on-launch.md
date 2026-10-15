@@ -1,0 +1,1 @@
+- Updates install themselves when you open Onion Board: the loading screen checks for a new version, shows *Updating to X… 42%* with a bar while it downloads, installs it, and the new version opens saying *Updated to X*. If there's nothing new, or you're offline, the app just opens. Untick *Install updates by themselves* in Settings → Updates to be asked instead.

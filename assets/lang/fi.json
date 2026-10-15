@@ -1084,7 +1084,6 @@
   "Tap to open, tap again to close": "Napauta avataksesi, napauta uudelleen sulkeaksesi",
   "Tape mode: speed changes the pitch too (nightcore / slowed)": "Nauhatila: nopeus muuttaa myös sävelkorkeutta (nightcore / slowed)",
   "Teal": "Sinivihreä",
-  "Tell me when a new version is out. Nothing is downloaded until I press Update now.": "Kerro, kun uusi versio on julkaistu. Mitään ei ladata ennen kuin painan Päivitä nyt.",
   "Test": "Testaa",
   "Testing…": "Testataan…",
   "That restore point is gone.": "Sitä palautuspistettä ei enää ole.",
@@ -1131,7 +1130,6 @@
   "They're copied into Onion Board; {name} keeps its own. Ones already here are skipped, and a hotkey something here already uses is left off.": "Ne kopioidaan Onion Boardiin; {name} pitää omansa. Jo täällä olevat ohitetaan, ja pikanäppäin, jota jokin täällä jo käyttää, jätetään pois.",
   "This desktop has no system tray, so closing the window quits.": "Tällä työpöydällä ei ole ilmoitusaluetta, joten ikkunan sulkeminen lopettaa sovelluksen.",
   "This is Onion Board {version}. With the box ticked it asks GitHub every few hours whether a newer version is out and tells you (with a banner if it's an important fix). This copy runs from source, so it only tells you: update it with git pull.": "Tämä on Onion Board {version}. Kun ruutu on ruksattu, se kysyy GitHubilta muutaman tunnin välein, onko uudempi versio julkaistu, ja kertoo sinulle (palkilla, jos kyse on tärkeästä korjauksesta). Tämä kopio ajetaan lähdekoodista, joten se vain kertoo: päivitä se komennolla git pull.",
-  "This is Onion Board {version}. With the box ticked it asks GitHub every few hours whether a newer version is out and tells you (with a banner if it's an important fix). Update now downloads it and checks it's the file GitHub lists; you pick when the app restarts to install it. Your sounds and settings are kept.": "Tämä on Onion Board {version}. Kun ruutu on ruksattu, se kysyy GitHubilta muutaman tunnin välein, onko uudempi versio julkaistu, ja kertoo sinulle (palkilla, jos kyse on tärkeästä korjauksesta). Päivitä nyt lataa sen ja tarkistaa, että se on GitHubin listaama tiedosto; sinä valitset, milloin sovellus käynnistyy uudelleen asentaakseen sen. Äänesi ja asetuksesi säilyvät.",
   "This sound's video isn't there any more": "Tämän äänen videota ei enää ole",
   "This version's page on GitHub, in your browser": "Tämän version sivu GitHubissa, selaimessasi",
   "This video can't be shown ({value}). The sound plays as normal.": "Tätä videota ei voi näyttää ({value}). Ääni soi normaalisti.",
@@ -3459,5 +3457,15 @@
   "PyPI sent an answer that couldn't be read": "PyPI lähetti vastauksen, jota ei voitu lukea",
   "Use it only when YouTube or another site stopped working and Update now doesn't fix it. Reinstall goes back to an approved version.": "Käytä tätä vain, kun YouTube tai muu sivusto lakkasi toimimasta eikä Päivitä nyt auta. Asenna uudelleen palaa hyväksyttyyn versioon.",
   "Warning: this gets the newest yt-dlp from PyPI right away. Onion Board hasn't approved it yet, so nobody has checked it's safe. It may fix downloads that stopped working.": "Varoitus: tämä hakee uusimman yt-dlp:n PyPI:stä heti. Onion Board ei ole vielä hyväksynyt sitä, joten kukaan ei ole tarkistanut, että se on turvallinen. Se voi korjata lataukset, jotka lakkasivat toimimasta.",
-  "no wheel for {package}": "ei pyörää {package} lle"
+  "no wheel for {package}": "ei pyörää {package} lle",
+  "Install updates by themselves": "Asenna päivitykset itsestään",
+  "Onion Board {version} is out: downloading it now. The app restarts by itself to install it when it's done.": "Onion Board {version} on julkaistu: ladataan nyt. Sovellus käynnistyy itsestään uudelleen ja asentaa sen, kun lataus on valmis.",
+  "Tell me when a new version is out.": "Kerro, kun uusi versio julkaistaan.",
+  "This is Onion Board {version}. With the box ticked it asks GitHub whether a newer version is out each time it starts and every hour after, and tells you (with a banner if it's an important fix). Every update is checked against the file GitHub lists. Your sounds and settings are kept.": "Tämä on Onion Board {version}. Kun ruutu on valittuna, se kysyy GitHubista uudempaa versiota joka käynnistyksellä ja sen jälkeen tunnin välein, ja kertoo sinulle (bannerilla, jos kyse on tärkeästä korjauksesta). Jokainen päivitys tarkistetaan GitHubin listaamaa tiedostoa vasten. Äänesi ja asetuksesi säilyvät.",
+  "When Onion Board starts and a new version is out, it downloads it and restarts to install it, unless a sound is playing.": "Kun Onion Board käynnistyy ja uusi versio on saatavilla, se lataa sen ja käynnistyy uudelleen asentaakseen sen, ellei jokin ääni ole soimassa.",
+  "Checking for updates…": "Etsitään päivityksiä…",
+  "Installing Onion Board {version}…": "Asennetaan Onion Board {version}…",
+  "Updated to {version}": "Päivitetty versioon {version}",
+  "Updating to {version}…": "Päivitetään versioon {version}…",
+  "Updating to {version}… {pct}%": "Päivitetään versioon {version}… {pct}%"
 }

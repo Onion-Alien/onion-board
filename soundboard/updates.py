@@ -15,11 +15,16 @@ few minutes later), and the app asks again once it has settled (recheck_s) inste
 waiting for its next hourly check. An urgent fix this copy missed isn't held back by
 a newer release settling. "Check now" always offers the newest.
 
-A newer version is only announced. Nothing is downloaded until the user presses
-*Update now*: then the release's OnionBoardSetup.exe is fetched from the project's own
-GitHub release, checked against the SHA-256 GitHub lists for it, and run silently over
-the installed copy once they press *Restart to update* (the app closes, the installer
-opens it again). A copy running from source is never updated: it only says what's new.
+Found as the app starts (and *Install updates by themselves* is ticked, the default),
+a newer version installs itself: behind the loading screen, which shows the download's
+percentage, before the window opens (UpdateControl.update_at_start); if that check
+was too slow, in the window a few seconds later, unless a sound is playing or the
+window is in the tray (then it waits for *Restart to update*).
+Found later, it's only announced, and nothing is downloaded until the user presses
+*Update now*. Either way the release's OnionBoardSetup.exe is fetched from the
+project's own GitHub release, checked against the SHA-256 GitHub lists for it, and run
+silently over the installed copy (the app closes, the installer opens it again). A
+copy running from source is never updated: it only says what's new.
 The requests carry no data about the user beyond what any HTTPS request does (see
 SECURITY.md)."""
 from __future__ import annotations
@@ -258,15 +263,16 @@ def skipped_urgent(rel: Release) -> str:
     return ""
 
 
-def check(cfg, force: bool = False) -> Release | None:
+def check(cfg, force: bool = False, launch: bool = False) -> Release | None:
     """A newer release than this one, or None. Without `force` it only asks if the
-    box is ticked, at most every EVERY_S, and stays quiet about a version they
+    box is ticked, at most every EVERY_S (`launch`: the check as the app starts,
+    which always asks), and stays quiet about a version they
     skipped (unless it's an urgent fix), or about one still settling (SETTLE_S).
     Network errors are logged and read as 'nothing new'. Switched off in Settings >
     Privacy & security, the daily check skips itself silently (a forced one raises
     net.FeatureOff). Call off the UI thread."""
     if not force and (not cfg.update_check or not net.allowed(FEATURE)
-                      or time.time() - cfg.update_checked < EVERY_S):
+                      or (not launch and time.time() - cfg.update_checked < EVERY_S)):
         return None
     global recheck_s
     recheck_s = 0.0

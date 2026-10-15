@@ -92,6 +92,9 @@ def test_check_on_by_default_and_every_6_hours(monkeypatch):
     cfg.update_checked -= updates.EVERY_S - 60
     assert updates.check(cfg) is None and len(calls) == 3        # not an hour yet
     assert updates.EVERY_S == 3600
+    cfg.update_skip = ""
+    assert updates.check(cfg, launch=True).version == "99.0.0"   # as the app starts: always
+    assert len(calls) == 4
 
 
 def test_an_urgent_fix_shows_even_when_skipped(monkeypatch):

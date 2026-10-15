@@ -1205,7 +1205,6 @@
   "Take it out of the queue": "เอามันออกจากคิว",
   "Takes the add-on out of Onion Board: phones can't play your pads any more. Paired phones are kept for when you get it again.": "นำส่วนเสริมออกจาก Onion Board: โทรศัพท์ไม่สามารถเล่นแผ่นอิเล็กโทรดของคุณได้อีกต่อไป โทรศัพท์ที่จับคู่จะถูกเก็บไว้เมื่อคุณได้รับอีกครั้ง",
   "Teal": "นกเป็ดน้ำ",
-  "Tell me when a new version is out. Nothing is downloaded until I press Update now.": "บอกฉันเมื่อมีเวอร์ชันใหม่ออก ไม่มีการดาวน์โหลดใด ๆ จนกว่าฉันจะกดอัปเดตทันที",
   "Testing…": "กำลังทดสอบ...",
   "That restore point is gone.": "จุดคืนค่านั้นหายไป",
   "That's it. Add sounds by dragging files onto the window, then click one to play it. You can open this guide again any time from the <b>Setup</b> tab (<b>Step-by-step guide</b>).": "แค่นั้นแหละ. เพิ่มเสียงโดยการลากไฟล์ไปไว้บนหน้าต่าง จากนั้นคลิกไฟล์เสียงเพื่อเล่น คุณสามารถเปิดคู่มือนี้อีกครั้งได้ทุกเมื่อจากแท็บ <b>การตั้งค่า</b> ( <b>คำแนะนำทีละขั้นตอน</b> )",
@@ -1233,7 +1232,6 @@
   "They're copied into Onion Board; {name} keeps its own. Ones already here are skipped, and a hotkey something here already uses is left off.": "พวกมันถูกคัดลอกไปยัง Onion Board; {name} ยังคงเป็นของตัวเอง อันที่อยู่ที่นี่จะถูกข้ามไป และปุ่มลัดบางอย่างที่นี่ใช้อยู่แล้วจะถูกละไว้",
   "This desktop has no system tray, so closing the window quits.": "เดสก์ท็อปเครื่องนี้ไม่มีถาดระบบ ดังนั้นการปิดหน้าต่างจึงปิดไป",
   "This is Onion Board {version}. With the box ticked it asks GitHub every few hours whether a newer version is out and tells you (with a banner if it's an important fix). This copy runs from source, so it only tells you: update it with git pull.": "นี่คือกระดานหัวหอม {version} เมื่อทำเครื่องหมายที่ช่อง ระบบจะถาม GitHub ทุก ๆ สองสามชั่วโมงว่ามีเวอร์ชันใหม่ออกหรือไม่ และจะแจ้งให้คุณทราบ (พร้อมแบนเนอร์หากเป็นการแก้ไขที่สำคัญ) สำเนานี้ทำงานจากแหล่งที่มา ดังนั้นจึงเพียงแจ้งคุณว่า: อัปเดตด้วย git pull",
-  "This is Onion Board {version}. With the box ticked it asks GitHub every few hours whether a newer version is out and tells you (with a banner if it's an important fix). Update now downloads it and checks it's the file GitHub lists; you pick when the app restarts to install it. Your sounds and settings are kept.": "นี่คือกระดานหัวหอม {version} เมื่อทำเครื่องหมายที่ช่อง ระบบจะถาม GitHub ทุก ๆ สองสามชั่วโมงว่ามีเวอร์ชันใหม่ออกหรือไม่ และจะแจ้งให้คุณทราบ (พร้อมแบนเนอร์หากเป็นการแก้ไขที่สำคัญ) อัปเดตตอนนี้จะดาวน์โหลดและตรวจสอบว่าเป็นรายการไฟล์ GitHub คุณเลือกเมื่อแอปรีสตาร์ทเพื่อติดตั้ง เสียงและการตั้งค่าของคุณจะถูกเก็บไว้",
   "Through a proxy": "ผ่านทางตัวแทน",
   "Through a proxy or Tor, everything the app fetches (searches, downloads, radio, updates) goes through it, and site names are looked up there, not on this PC. If it can't be reached, nothing is fetched: the app never quietly goes direct. This PC's own addresses (127.0.0.1) stay direct.": "ผ่านพร็อกซีหรือ Tor ทุกสิ่งที่แอปดึงมา (การค้นหา ดาวน์โหลด วิทยุ อัปเดต) จะต้องผ่านมัน และชื่อไซต์จะถูกค้นหาที่นั่น ไม่ใช่บนพีซีเครื่องนี้ หากไม่สามารถเข้าถึงได้ จะไม่มีการดึงข้อมูลใดๆ แอปจะไม่ส่งตรงไปอย่างเงียบๆ ที่อยู่ของพีซีเครื่องนี้ (127.0.0.1) จะยังคงอยู่โดยตรง",
   "TikTok sounds": "เสียงติ๊กต๊อก",
@@ -3383,5 +3381,15 @@
   "PyPI sent an answer that couldn't be read": "PyPI ส่งคำตอบที่ไม่สามารถอ่านได้",
   "Use it only when YouTube or another site stopped working and Update now doesn't fix it. Reinstall goes back to an approved version.": "ใช้เฉพาะตอนที่ YouTube หรือเว็บอื่นใช้ไม่ได้ และ อัปเดตเลย แก้ไม่หาย ติดตั้งใหม่ จะกลับไปใช้เวอร์ชันที่อนุมัติแล้ว",
   "Warning: this gets the newest yt-dlp from PyPI right away. Onion Board hasn't approved it yet, so nobody has checked it's safe. It may fix downloads that stopped working.": "คำเตือน: จะดาวน์โหลด yt-dlp ล่าสุดจาก PyPI ทันที Onion Board ยังไม่ได้อนุมัติ จึงยังไม่มีใครตรวจว่าปลอดภัย อาจช่วยแก้การดาวน์โหลดที่ใช้ไม่ได้",
-  "no wheel for {package}": "ไม่มีล้อสำหรับ {package}"
+  "no wheel for {package}": "ไม่มีล้อสำหรับ {package}",
+  "Install updates by themselves": "ติดตั้งอัปเดตเอง",
+  "Onion Board {version} is out: downloading it now. The app restarts by itself to install it when it's done.": "Onion Board {version} ออกแล้ว: กำลังดาวน์โหลด เมื่อเสร็จแอปจะรีสตาร์ทเองเพื่อติดตั้ง",
+  "Tell me when a new version is out.": "บอกฉันเมื่อมีเวอร์ชันใหม่",
+  "This is Onion Board {version}. With the box ticked it asks GitHub whether a newer version is out each time it starts and every hour after, and tells you (with a banner if it's an important fix). Every update is checked against the file GitHub lists. Your sounds and settings are kept.": "นี่คือ Onion Board {version} เมื่อติ๊กช่องนี้ แอปจะถาม GitHub ว่ามีเวอร์ชันใหม่กว่าหรือไม่ทุกครั้งที่เปิดและทุกชั่วโมงหลังจากนั้น แล้วบอกคุณ (พร้อมแบนเนอร์ถ้าเป็นการแก้ไขสำคัญ) ทุกอัปเดตจะถูกตรวจกับไฟล์ที่ GitHub ระบุไว้ เสียงและการตั้งค่าของคุณจะยังอยู่ครบ",
+  "When Onion Board starts and a new version is out, it downloads it and restarts to install it, unless a sound is playing.": "เมื่อ Onion Board เปิดขึ้นและมีเวอร์ชันใหม่ แอปจะดาวน์โหลดแล้วรีสตาร์ทเพื่อติดตั้ง เว้นแต่มีเสียงกำลังเล่นอยู่",
+  "Checking for updates…": "กำลังตรวจหาอัปเดต…",
+  "Installing Onion Board {version}…": "กำลังติดตั้ง Onion Board {version}…",
+  "Updated to {version}": "อัปเดตเป็น {version} แล้ว",
+  "Updating to {version}…": "กำลังอัปเดตเป็น {version}…",
+  "Updating to {version}… {pct}%": "กำลังอัปเดตเป็น {version}… {pct}%"
 }

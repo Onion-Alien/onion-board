@@ -1205,7 +1205,6 @@
   "Take it out of the queue": "列から外してください",
   "Takes the add-on out of Onion Board: phones can't play your pads any more. Paired phones are kept for when you get it again.": "Onion Board からアドオンを削除します。電話ではパッドを再生できなくなります。ペアリングされた携帯電話は、再度入手したときのために保持されます。",
   "Teal": "ティール",
-  "Tell me when a new version is out. Nothing is downloaded until I press Update now.": "新しいバージョンが出たら教えてください。 「今すぐ更新」を押すまでは何もダウンロードされません。",
   "Testing…": "テスト中…",
   "That restore point is gone.": "その復元ポイントがなくなってしまいました。",
   "That's it. Add sounds by dragging files onto the window, then click one to play it. You can open this guide again any time from the <b>Setup</b> tab (<b>Step-by-step guide</b>).": "それでおしまい。ファイルをウィンドウにドラッグしてサウンドを追加し、いずれかをクリックして再生します。このガイドは、 <b>[セットアップ]</b>タブからいつでも再度開くことができます (<b>ステップバイステップ ガイド</b>)。",
@@ -1233,7 +1232,6 @@
   "They're copied into Onion Board; {name} keeps its own. Ones already here are skipped, and a hotkey something here already uses is left off.": "それらは Onion Board にコピーされます。 {name}は独自のものを保持します。すでにここにあるホットキーはスキップされ、ここですでに使用されているホットキーはオフのままになります。",
   "This desktop has no system tray, so closing the window quits.": "このデスクトップにはシステム トレイがないため、ウィンドウを閉じると終了します。",
   "This is Onion Board {version}. With the box ticked it asks GitHub every few hours whether a newer version is out and tells you (with a banner if it's an important fix). This copy runs from source, so it only tells you: update it with git pull.": "これは Onion Board {version}です。チェックボックスをオンにすると、新しいバージョンがリリースされているかどうかを数時間ごとに GitHub に問い合わせて、(重要な修正の場合はバナーを表示して) 通知します。このコピーはソースから実行されるため、「git pull で更新する」ということだけが通知されます。",
-  "This is Onion Board {version}. With the box ticked it asks GitHub every few hours whether a newer version is out and tells you (with a banner if it's an important fix). Update now downloads it and checks it's the file GitHub lists; you pick when the app restarts to install it. Your sounds and settings are kept.": "これは Onion Board {version}です。チェックボックスをオンにすると、新しいバージョンがリリースされているかどうかを数時間ごとに GitHub に問い合わせて、(重要な修正の場合はバナーを表示して) 通知します。 Update はそれをダウンロードし、それが GitHub のリストにあるファイルであることを確認します。アプリをいつ再起動してインストールするかを選択します。サウンドと設定は保持されます。",
   "Through a proxy": "プロキシ経由",
   "Through a proxy or Tor, everything the app fetches (searches, downloads, radio, updates) goes through it, and site names are looked up there, not on this PC. If it can't be reached, nothing is fetched: the app never quietly goes direct. This PC's own addresses (127.0.0.1) stay direct.": "プロキシまたは Tor を介して、アプリが取得するもの (検索、ダウンロード、ラジオ、アップデート) はすべてプロキシまたは Tor を経由し、サイト名はこの PC ではなくそこで検索されます。アクセスできない場合は何も取得されません。アプリは静かにダイレクトに移行することはありません。この PC 自体のアドレス (127.0.0.1) はそのまま残ります。",
   "TikTok sounds": "TikTokサウンド",
@@ -3383,5 +3381,15 @@
   "PyPI sent an answer that couldn't be read": "PyPI が読み取れない回答を送信しました",
   "Use it only when YouTube or another site stopped working and Update now doesn't fix it. Reinstall goes back to an approved version.": "YouTubeなどのサイトが動かなくなり、今すぐ更新でも直らないときだけ使ってください。再インストールで承認済みのバージョンに戻せます。",
   "Warning: this gets the newest yt-dlp from PyPI right away. Onion Board hasn't approved it yet, so nobody has checked it's safe. It may fix downloads that stopped working.": "警告：PyPIから最新のyt-dlpをすぐに取得します。Onion Boardはまだ承認していないので、安全かどうか誰も確認していません。動かなくなったダウンロードが直るかもしれません。",
-  "no wheel for {package}": "{package}のホイールがありません"
+  "no wheel for {package}": "{package}のホイールがありません",
+  "Install updates by themselves": "アップデートを自動でインストール",
+  "Onion Board {version} is out: downloading it now. The app restarts by itself to install it when it's done.": "Onion Board {version}が出ました: 今ダウンロードしています。終わったらアプリが自動で再起動してインストールします。",
+  "Tell me when a new version is out.": "新しいバージョンが出たら知らせる。",
+  "This is Onion Board {version}. With the box ticked it asks GitHub whether a newer version is out each time it starts and every hour after, and tells you (with a banner if it's an important fix). Every update is checked against the file GitHub lists. Your sounds and settings are kept.": "これはOnion Board {version}です。チェックを入れると、起動するたびとその後1時間ごとに新しいバージョンが出ていないかGitHubに確認し、お知らせします(重要な修正ならバナーで)。どのアップデートもGitHubに載っているファイルと照合します。サウンドと設定はそのまま残ります。",
+  "When Onion Board starts and a new version is out, it downloads it and restarts to install it, unless a sound is playing.": "Onion Boardの起動時に新しいバージョンが出ていれば、ダウンロードして再起動しインストールします。サウンド再生中は除きます。",
+  "Checking for updates…": "アップデートを確認中…",
+  "Installing Onion Board {version}…": "Onion Board {version}をインストール中…",
+  "Updated to {version}": "{version}に更新しました",
+  "Updating to {version}…": "{version}に更新中…",
+  "Updating to {version}… {pct}%": "{version}に更新中… {pct}%"
 }

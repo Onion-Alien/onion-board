@@ -1100,7 +1100,6 @@
   "Tap to open, tap again to close": "Apasă ca să deschizi, apasă din nou ca să închizi",
   "Tape mode: speed changes the pitch too (nightcore / slowed)": "Mod casetă: viteza schimbă și tonul (nightcore / slowed)",
   "Teal": "Turcoaz",
-  "Tell me when a new version is out. Nothing is downloaded until I press Update now.": "Spune-mi când apare o versiune nouă. Nu se descarcă nimic până nu apăs Actualizează acum.",
   "Test": "Testează",
   "Testing…": "Se testează…",
   "That restore point is gone.": "Punctul ăla de restaurare nu mai există.",
@@ -1147,7 +1146,6 @@
   "They're copied into Onion Board; {name} keeps its own. Ones already here are skipped, and a hotkey something here already uses is left off.": "Sunt copiate în Onion Board; {name} le păstrează pe ale lui. Cele care sunt deja aici sunt sărite, iar o tastă rapidă pe care o folosește deja ceva de aici e lăsată deoparte.",
   "This desktop has no system tray, so closing the window quits.": "Desktopul ăsta n-are tray de sistem, deci închiderea ferestrei închide aplicația.",
   "This is Onion Board {version}. With the box ticked it asks GitHub every few hours whether a newer version is out and tells you (with a banner if it's an important fix). This copy runs from source, so it only tells you: update it with git pull.": "Asta e Onion Board {version}. Cu căsuța bifată întreabă GitHub la câteva ore dacă a apărut o versiune mai nouă și îți spune (cu un banner dacă e o reparație importantă). Copia asta rulează din sursă, deci doar îți spune: actualizeaz-o cu git pull.",
-  "This is Onion Board {version}. With the box ticked it asks GitHub every few hours whether a newer version is out and tells you (with a banner if it's an important fix). Update now downloads it and checks it's the file GitHub lists; you pick when the app restarts to install it. Your sounds and settings are kept.": "Asta e Onion Board {version}. Cu căsuța bifată întreabă GitHub la câteva ore dacă a apărut o versiune mai nouă și îți spune (cu un banner dacă e o reparație importantă). Actualizează acum o descarcă și verifică dacă e fișierul listat pe GitHub; tu alegi când repornește aplicația ca s-o instaleze. Sunetele și setările tale sunt păstrate.",
   "This sound's video isn't there any more": "Videoclipul sunetului ăstuia nu mai există",
   "This version's page on GitHub, in your browser": "Pagina versiunii ăsteia pe GitHub, în browser",
   "This video can't be shown ({value}). The sound plays as normal.": "Videoclipul ăsta nu poate fi afișat ({value}). Sunetul se redă normal.",
@@ -3535,5 +3533,15 @@
   "PyPI sent an answer that couldn't be read": "PyPI a trimis un răspuns care nu a putut fi citit",
   "Use it only when YouTube or another site stopped working and Update now doesn't fix it. Reinstall goes back to an approved version.": "Folosește-l doar când YouTube sau alt site nu mai merge și Actualizează acum nu rezolvă. Reinstalează revine la o versiune aprobată.",
   "Warning: this gets the newest yt-dlp from PyPI right away. Onion Board hasn't approved it yet, so nobody has checked it's safe. It may fix downloads that stopped working.": "Atenție: asta ia imediat cel mai nou yt-dlp de pe PyPI. Onion Board nu l-a aprobat încă, deci nimeni n-a verificat dacă e sigur. Poate repara descărcările care nu mai merg.",
-  "no wheel for {package}": "nicio roată pentru {package}"
+  "no wheel for {package}": "nicio roată pentru {package}",
+  "Install updates by themselves": "Instalează actualizările singure",
+  "Onion Board {version} is out: downloading it now. The app restarts by itself to install it when it's done.": "A apărut Onion Board {version}: se descarcă acum. Aplicația repornește singură ca s-o instaleze când termină.",
+  "Tell me when a new version is out.": "Spune-mi când apare o versiune nouă.",
+  "This is Onion Board {version}. With the box ticked it asks GitHub whether a newer version is out each time it starts and every hour after, and tells you (with a banner if it's an important fix). Every update is checked against the file GitHub lists. Your sounds and settings are kept.": "Acesta este Onion Board {version}. Cu bifa pusă, întreabă GitHub dacă a apărut o versiune mai nouă la fiecare pornire și apoi în fiecare oră și îți spune (cu un banner dacă e o reparație importantă). Fiecare actualizare e verificată cu fișierul listat de GitHub. Sunetele și setările tale rămân.",
+  "When Onion Board starts and a new version is out, it downloads it and restarts to install it, unless a sound is playing.": "Când Onion Board pornește și a apărut o versiune nouă, o descarcă și repornește ca s-o instaleze, doar dacă nu se aude un sunet.",
+  "Checking for updates…": "Caut actualizări…",
+  "Installing Onion Board {version}…": "Se instalează Onion Board {version}…",
+  "Updated to {version}": "Actualizat la {version}",
+  "Updating to {version}…": "Se actualizează la {version}…",
+  "Updating to {version}… {pct}%": "Se actualizează la {version}… {pct}%"
 }

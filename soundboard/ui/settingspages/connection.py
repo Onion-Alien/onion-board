@@ -376,11 +376,11 @@ class ConnectionPage(Page):
     # ------------------------------------------------------------------ app updates
     def _updates_card(self):
         from soundboard import __version__, updates
-        hint = (_("This is Onion Board {version}. With the box ticked it asks GitHub every "
-                  "few hours whether a newer version is out and tells you (with a banner if "
-                  "it's an important fix). Update now downloads it and checks it's the file "
-                  "GitHub lists; you pick when the app restarts to install it. Your sounds "
-                  "and settings are kept.", version=__version__)
+        hint = (_("This is Onion Board {version}. With the box ticked it asks GitHub whether "
+                  "a newer version is out each time it starts and every hour after, and tells "
+                  "you (with a banner if it's an important fix). Every update is checked "
+                  "against the file GitHub lists. Your sounds and settings are kept.",
+                  version=__version__)
                 if updates.can_install() else
                 _("This is Onion Board {version}. With the box ticked it asks GitHub every "
                   "few hours whether a newer version is out and tells you (with a banner if "
@@ -388,10 +388,17 @@ class ConnectionPage(Page):
                   "update it with git pull.", version=__version__))
         card, cv = self._card(_("App updates"), hint, icon="reload")
         chk = self._option(cv, _("Check for updates"),
-                           _("Tell me when a new version is out. Nothing is downloaded until I "
-                             "press Update now."), self.mw.cfg.update_check,
+                           _("Tell me when a new version is out."), self.mw.cfg.update_check,
                            self._updates_optin)
         self.dlg.upd_chk = chk
+        if updates.can_install():   # (from source: git pull)
+            auto = self._option(cv, _("Install updates by themselves"),
+                                _("When Onion Board starts and a new version is out, it "
+                                  "downloads it and restarts to install it, unless a sound is "
+                                  "playing."), self.mw.cfg.update_auto,
+                                lambda on: self.mw.set_option("update_auto", on))
+            self.dlg.upd_auto = auto   # greyed with the check off (_net_sync)
+            chk.toggled.connect(lambda _on: self._net_sync())
         row = QHBoxLayout()
         self.dlg.upd_label = QLabel()
         self.dlg.upd_label.setObjectName("hint")
@@ -512,6 +519,9 @@ class ConnectionPage(Page):
             if w is not None and qt_valid(w):
                 w.setEnabled(all(net.allowed(k) for k in keys))
                 w.setToolTip("" if w.isEnabled() else net.off_message(keys[0]))
+        auto = getattr(self.dlg, "upd_auto", None)   # nothing to install without the check
+        if auto is not None and qt_valid(auto):
+            auto.setEnabled(net.allowed("app_update") and self.mw.cfg.update_check)
         for b in self._ytdlp_buttons():
             b.setEnabled(net.allowed("ytdlp_update"))
             b.setToolTip(b.property("tip") if b.isEnabled()

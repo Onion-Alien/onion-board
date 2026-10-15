@@ -1084,7 +1084,6 @@
   "Tap to open, tap again to close": "Πάτα για άνοιγμα, πάτα ξανά για κλείσιμο",
   "Tape mode: speed changes the pitch too (nightcore / slowed)": "Λειτουργία κασέτας: η ταχύτητα αλλάζει και τον τόνο (nightcore / slowed)",
   "Teal": "Πετρόλ",
-  "Tell me when a new version is out. Nothing is downloaded until I press Update now.": "Πες μου όταν βγαίνει νέα έκδοση. Δεν κατεβαίνει τίποτα μέχρι να πατήσω Ενημέρωση τώρα.",
   "Test": "Δοκιμή",
   "Testing…": "Δοκιμή…",
   "That restore point is gone.": "Αυτό το σημείο επαναφοράς δεν υπάρχει πια.",
@@ -1131,7 +1130,6 @@
   "They're copied into Onion Board; {name} keeps its own. Ones already here are skipped, and a hotkey something here already uses is left off.": "Αντιγράφονται στο Onion Board· το {name} κρατάει τους δικούς του. Όσοι υπάρχουν ήδη εδώ παραλείπονται, και μια συντόμευση που ήδη χρησιμοποιείται εδώ μένει απ' έξω.",
   "This desktop has no system tray, so closing the window quits.": "Αυτή η επιφάνεια εργασίας δεν έχει system tray, οπότε το κλείσιμο του παραθύρου τερματίζει την εφαρμογή.",
   "This is Onion Board {version}. With the box ticked it asks GitHub every few hours whether a newer version is out and tells you (with a banner if it's an important fix). This copy runs from source, so it only tells you: update it with git pull.": "Αυτό είναι το Onion Board {version}. Με τσεκαρισμένο το κουτάκι ρωτάει το GitHub κάθε λίγες ώρες αν βγήκε νεότερη έκδοση και σου το λέει (με μπάνερ αν είναι σημαντική διόρθωση). Αυτό το αντίγραφο τρέχει από τον πηγαίο κώδικα, οπότε μόνο σου το λέει: ενημέρωσέ το με git pull.",
-  "This is Onion Board {version}. With the box ticked it asks GitHub every few hours whether a newer version is out and tells you (with a banner if it's an important fix). Update now downloads it and checks it's the file GitHub lists; you pick when the app restarts to install it. Your sounds and settings are kept.": "Αυτό είναι το Onion Board {version}. Με τσεκαρισμένο το κουτάκι ρωτάει το GitHub κάθε λίγες ώρες αν βγήκε νεότερη έκδοση και σου το λέει (με μπάνερ αν είναι σημαντική διόρθωση). Το Ενημέρωση τώρα την κατεβάζει και ελέγχει ότι είναι το αρχείο που δείχνει το GitHub· εσύ διαλέγεις πότε θα γίνει επανεκκίνηση για την εγκατάσταση. Οι ήχοι και οι ρυθμίσεις σου μένουν.",
   "This sound's video isn't there any more": "Το βίντεο αυτού του ήχου δεν υπάρχει πια",
   "This version's page on GitHub, in your browser": "Η σελίδα αυτής της έκδοσης στο GitHub, στον browser σου",
   "This video can't be shown ({value}). The sound plays as normal.": "Αυτό το βίντεο δεν μπορεί να εμφανιστεί ({value}). Ο ήχος παίζει κανονικά.",
@@ -3459,5 +3457,15 @@
   "PyPI sent an answer that couldn't be read": "Το PyPI έστειλε μια απάντηση που δεν μπορούσε να διαβαστεί",
   "Use it only when YouTube or another site stopped working and Update now doesn't fix it. Reinstall goes back to an approved version.": "Χρησιμοποίησέ το μόνο όταν το YouTube ή άλλη σελίδα σταμάτησε να δουλεύει και η Ενημέρωση τώρα δεν βοηθά. Η Επανεγκατάσταση γυρίζει σε εγκεκριμένη έκδοση.",
   "Warning: this gets the newest yt-dlp from PyPI right away. Onion Board hasn't approved it yet, so nobody has checked it's safe. It may fix downloads that stopped working.": "Προσοχή: αυτό κατεβάζει αμέσως το νεότερο yt-dlp από το PyPI. Το Onion Board δεν το έχει εγκρίνει ακόμα, οπότε κανείς δεν έχει ελέγξει αν είναι ασφαλές. Μπορεί να φτιάξει λήψεις που σταμάτησαν να δουλεύουν.",
-  "no wheel for {package}": "χωρίς τροχό για {package}"
+  "no wheel for {package}": "χωρίς τροχό για {package}",
+  "Install updates by themselves": "Αυτόματη εγκατάσταση ενημερώσεων",
+  "Onion Board {version} is out: downloading it now. The app restarts by itself to install it when it's done.": "Βγήκε το Onion Board {version}: κατεβαίνει τώρα. Η εφαρμογή επανεκκινεί μόνη της για να το εγκαταστήσει όταν τελειώσει.",
+  "Tell me when a new version is out.": "Πες μου όταν βγει νέα έκδοση.",
+  "This is Onion Board {version}. With the box ticked it asks GitHub whether a newer version is out each time it starts and every hour after, and tells you (with a banner if it's an important fix). Every update is checked against the file GitHub lists. Your sounds and settings are kept.": "Αυτό είναι το Onion Board {version}. Με το κουτάκι τσεκαρισμένο ρωτά το GitHub αν υπάρχει νεότερη έκδοση κάθε φορά που ξεκινά και μετά κάθε ώρα, και σου λέει (με μπάνερ αν είναι σημαντική διόρθωση). Κάθε ενημέρωση ελέγχεται με το αρχείο που δείχνει το GitHub. Οι ήχοι και οι ρυθμίσεις σου μένουν ως έχουν.",
+  "When Onion Board starts and a new version is out, it downloads it and restarts to install it, unless a sound is playing.": "Όταν ξεκινά το Onion Board και υπάρχει νέα έκδοση, την κατεβάζει και επανεκκινεί για να την εγκαταστήσει, εκτός αν παίζει κάποιος ήχος.",
+  "Checking for updates…": "Έλεγχος για ενημερώσεις…",
+  "Installing Onion Board {version}…": "Εγκατάσταση Onion Board {version}…",
+  "Updated to {version}": "Ενημερώθηκε σε {version}",
+  "Updating to {version}…": "Ενημέρωση σε {version}…",
+  "Updating to {version}… {pct}%": "Ενημέρωση σε {version}… {pct}%"
 }

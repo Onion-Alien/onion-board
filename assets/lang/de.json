@@ -1227,7 +1227,6 @@
   "Take it out of the queue": "Aus der Warteschlange nehmen",
   "Takes the add-on out of Onion Board: phones can't play your pads any more. Paired phones are kept for when you get it again.": "Nimmt das Add-on aus Onion Board: Handys können deine Pads nicht mehr abspielen. Gekoppelte Handys bleiben gespeichert, falls du es wieder holst.",
   "Teal": "Türkis",
-  "Tell me when a new version is out. Nothing is downloaded until I press Update now.": "Sag mir, wenn eine neue Version da ist. Nichts wird heruntergeladen, bis ich „Jetzt aktualisieren“ drücke.",
   "Testing…": "Wird getestet…",
   "That restore point is gone.": "Dieser Wiederherstellungspunkt ist weg.",
   "That's it. Add sounds by dragging files onto the window, then click one to play it. You can open this guide again any time from the <b>Setup</b> tab (<b>Step-by-step guide</b>).": "Das war's. Füg Sounds hinzu, indem du Dateien aufs Fenster ziehst, und klick dann auf einen, um ihn abzuspielen. Du kannst diese Anleitung jederzeit im <b>Setup</b>-Tab wieder öffnen (<b>Schritt-für-Schritt-Anleitung</b>).",
@@ -1255,7 +1254,6 @@
   "They're copied into Onion Board; {name} keeps its own. Ones already here are skipped, and a hotkey something here already uses is left off.": "Sie werden in Onion Board kopiert; {name} behält seine eigenen. Welche, die schon hier sind, werden übersprungen, und ein Hotkey, den hier schon etwas nutzt, wird weggelassen.",
   "This desktop has no system tray, so closing the window quits.": "Dieser Desktop hat keinen Infobereich, also beendet das Schließen des Fensters die App.",
   "This is Onion Board {version}. With the box ticked it asks GitHub every few hours whether a newer version is out and tells you (with a banner if it's an important fix). This copy runs from source, so it only tells you: update it with git pull.": "Das ist Onion Board {version}. Mit dem Haken fragt es alle paar Stunden bei GitHub nach, ob eine neuere Version da ist, und sagt dir Bescheid (mit einem Banner, wenn es eine wichtige Korrektur ist). Diese Kopie läuft aus dem Quellcode, also sagt es nur Bescheid: Aktualisier sie mit git pull.",
-  "This is Onion Board {version}. With the box ticked it asks GitHub every few hours whether a newer version is out and tells you (with a banner if it's an important fix). Update now downloads it and checks it's the file GitHub lists; you pick when the app restarts to install it. Your sounds and settings are kept.": "Das ist Onion Board {version}. Mit dem Haken fragt es alle paar Stunden bei GitHub nach, ob eine neuere Version da ist, und sagt dir Bescheid (mit einem Banner, wenn es eine wichtige Korrektur ist). „Jetzt aktualisieren“ lädt sie herunter und prüft, ob es die Datei ist, die GitHub auflistet; du wählst, wann die App zum Installieren neu startet. Deine Sounds und Einstellungen bleiben erhalten.",
   "Through a proxy": "Über einen Proxy",
   "Through a proxy or Tor, everything the app fetches (searches, downloads, radio, updates) goes through it, and site names are looked up there, not on this PC. If it can't be reached, nothing is fetched: the app never quietly goes direct. This PC's own addresses (127.0.0.1) stay direct.": "Über einen Proxy oder Tor geht alles, was die App holt (Suchen, Downloads, Radio, Updates), darüber, und Seitennamen werden dort aufgelöst, nicht auf diesem PC. Wenn er nicht erreichbar ist, wird nichts geholt: Die App geht nie heimlich direkt. Die eigenen Adressen dieses PCs (127.0.0.1) bleiben direkt.",
   "TikTok sounds": "TikTok-Sounds",
@@ -3459,5 +3457,15 @@
   "PyPI sent an answer that couldn't be read": "PyPI hat eine Antwort gesendet, die nicht gelesen werden konnte",
   "Use it only when YouTube or another site stopped working and Update now doesn't fix it. Reinstall goes back to an approved version.": "Nimm das nur, wenn YouTube oder eine andere Seite nicht mehr geht und Jetzt aktualisieren nicht hilft. Neu installieren geht zurück zu einer freigegebenen Version.",
   "Warning: this gets the newest yt-dlp from PyPI right away. Onion Board hasn't approved it yet, so nobody has checked it's safe. It may fix downloads that stopped working.": "Achtung: Das holt sofort das neueste yt-dlp von PyPI. Onion Board hat es noch nicht freigegeben, also hat niemand geprüft, ob es sicher ist. Es kann Downloads reparieren, die nicht mehr gehen.",
-  "no wheel for {package}": "kein Rad für {package}"
+  "no wheel for {package}": "kein Rad für {package}",
+  "Install updates by themselves": "Updates selbst installieren",
+  "Onion Board {version} is out: downloading it now. The app restarts by itself to install it when it's done.": "Onion Board {version} ist da: wird jetzt heruntergeladen. Die App startet von selbst neu, um sie zu installieren, sobald sie fertig ist.",
+  "Tell me when a new version is out.": "Sag mir, wenn eine neue Version da ist.",
+  "This is Onion Board {version}. With the box ticked it asks GitHub whether a newer version is out each time it starts and every hour after, and tells you (with a banner if it's an important fix). Every update is checked against the file GitHub lists. Your sounds and settings are kept.": "Das ist Onion Board {version}. Mit dem Haken fragt es bei jedem Start und danach jede Stunde bei GitHub nach, ob eine neuere Version da ist, und sagt dir Bescheid (mit einem Banner, wenn es eine wichtige Korrektur ist). Jedes Update wird mit der Datei abgeglichen, die GitHub auflistet. Deine Sounds und Einstellungen bleiben erhalten.",
+  "When Onion Board starts and a new version is out, it downloads it and restarts to install it, unless a sound is playing.": "Wenn Onion Board startet und eine neue Version da ist, lädt es sie herunter und startet neu, um sie zu installieren, außer gerade läuft ein Sound.",
+  "Checking for updates…": "Suche nach Updates…",
+  "Installing Onion Board {version}…": "Onion Board {version} wird installiert…",
+  "Updated to {version}": "Aktualisiert auf {version}",
+  "Updating to {version}…": "Update auf {version}…",
+  "Updating to {version}… {pct}%": "Update auf {version}… {pct}%"
 }

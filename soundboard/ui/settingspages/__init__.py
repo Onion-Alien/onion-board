@@ -110,6 +110,7 @@ class Built:
     ui_scale_note: Any
     ui_scale_restart: Any
     _upd_asked: Any
+    upd_auto: Any
     upd_btn: Any
     upd_chk: Any
     upd_label: Any

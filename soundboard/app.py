@@ -644,9 +644,16 @@ def main():
     import time
     exitwatch.start(APP_DIR, lambda: time.monotonic() - getattr(  # for the next start
         getattr(app, "hangwatch", None), "beat", time.monotonic()))
+    # a newer version: downloaded and installed behind the loading screen, and the
+    # installer opens the new one (not started with Windows into the tray: no splash)
+    updating = TRAY_ARG not in sys.argv and w.updctl.update_at_start()
     show = (not (TRAY_ARG in sys.argv and w.can_hide())   # started with Windows: tray only
             or server.show_requested)    # ...unless launched again since
-    if TRAY_ARG not in sys.argv:   # Bun is up: the sounds load behind it (settle)
+    if updating:
+        show = False
+        from PySide6.QtCore import QTimer
+        QTimer.singleShot(0, lambda: (w.quit_app(), app.quit()))   # (never shown)
+    if TRAY_ARG not in sys.argv and not updating:   # Bun is up: the sounds load behind it
         wait_for_sounds(app, w)
         w.setctl.preload_dialogs()   # Settings and Edit sound, built behind it too
     if show and not w.bunctl.start_as_bun():   # quit as Bun last time: Bun, not the window
@@ -674,9 +681,12 @@ def main():
         # starts it once the guide is closed
         QTimer.singleShot(500, w.impctl.import_queued)
     QTimer.singleShot(600, w.updctl.after_update)   # "Updated to …" after an update restarted it
-    # new versions (updates.py): unless unticked, at most every hour (updates.EVERY_S),
-    # also for an app left running for days
-    QTimer.singleShot(45_000, w.updctl.check_updates)
+    # new versions (updates.py): unless unticked, as it starts (what that finds installs
+    # itself) and then at most every hour (updates.EVERY_S), also for an app left
+    # running for days
+    # (already asked behind the loading screen: its answer went to the card)
+    QTimer.singleShot(8_000, lambda: w.updctl.start_checked
+                      or w.updctl.check_updates(launch=True))
     QTimer.singleShot(60_000, w.send_usage)   # the anonymous daily count (usage.py)
     w.tick_usage()   # how long it's open, for the daily count: from now
     open_timer = QTimer(w)
