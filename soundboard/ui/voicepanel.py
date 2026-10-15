@@ -213,7 +213,10 @@ class VoicePanel(QWidget):
         self._card_box = QVBoxLayout()
         self._card_box.setContentsMargins(0, 0, 0, 0)
         pv.addLayout(self._card_box)
-        pv.addStretch(1)                 # spare height goes under the card
+        # spare height goes under the card: each card is held at the top of its box
+        # (_section), at its height for the width. Not pv.addStretch(): with a stretch
+        # under it the card got its one-line height instead, so a card with wrapped text
+        # was squeezed (controls shorter than they can be, text cut off) when narrow
         # "folded": Make it yours' folded effect cards ("fx.<type>"); "tab": the tab open
         saved_folds = speech.get("folded") if isinstance(speech, dict) else None
         self._folded = ({k for k in saved_folds if isinstance(k, str)}
@@ -363,7 +366,7 @@ class VoicePanel(QWidget):
         self.ai.stop()
         self.speech.livevoice.b_live.setChecked(False)
         self.fx.btn_power.setChecked(False)   # its toggled handler applies it
-        self.speech.sw_lang.setChecked(False)
+        self.speech.stop_translating()
 
     def is_active(self) -> bool:
         """Something here is changing what others hear from your mic."""
@@ -397,12 +400,16 @@ class VoicePanel(QWidget):
         if who and not lv.bg_for:
             lv._bg_note("")               # "turn on a voice": one is on now
         lv.translate_for(who)
-        if m is not None and not fg and not who and not lv._bg_warning:
-            lv._bg_note(_("Turn on the AI voice or the voice changer below, or press Start "
-                          "for the computer voice, to speak {language}.",
-                          language=langnames.of(m)))
-        elif m is None and not lv.bg_for and not lv._bg_warning:
-            lv._bg_note("")               # switched off: no "turn on a voice" hint
+        if not lv.bg_for and not lv._bg_warning:
+            lv._bg_note("")               # Said by says who speaks (or that Start does)
+        fx = self.fx.preset
+        if self.ai.is_on():
+            on = ("ai", self.ai.voice_title())
+        elif self.fx.btn_power.isChecked():
+            on = ("fx", _("My own mix") if fx == CUSTOM else voicefx.shown(fx))
+        else:
+            on = ("", "")
+        sp.said_by(*on)
 
     # ---- cards that fold away
     def _section(self, key: str, panel: QWidget, title: QLabel,
@@ -442,7 +449,7 @@ class VoicePanel(QWidget):
         self._tabs[key] = b
         self._cards[key] = f
         self._states[key] = state
-        self._card_box.addWidget(f)
+        self._card_box.addWidget(f, 0, Qt.AlignmentFlag.AlignTop)
         f.hide()
         return f
 

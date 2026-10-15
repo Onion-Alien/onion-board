@@ -13,7 +13,7 @@ import html
 import threading
 import time
 
-from PySide6.QtCore import QEvent, QObject, QSize, Qt, QTimer, Signal
+from PySide6.QtCore import QSize, Qt, QTimer, Signal
 from PySide6.QtGui import QGuiApplication
 from PySide6.QtWidgets import (QCheckBox, QComboBox, QDialog, QDialogButtonBox,
                                QFormLayout, QFrame, QGridLayout, QHBoxLayout, QLabel,
@@ -28,7 +28,6 @@ from soundboard.ui import busy, fit, icons
 from soundboard.ui.panel import bar, fold_button, hint_label, icon_label, section_label
 from soundboard.ui.livevoice import MODELS, LiveVoice
 from soundboard.ui.speechinstall import SpeechInstalls
-from soundboard.ui.voicefxpanel import Switch
 from soundboard.wheelguard import no_wheel
 from soundboard import errors
 from soundboard.i18n import _, ngettext
@@ -45,28 +44,6 @@ def translations(module_list: list[mods.ModuleInfo]) -> list[mods.ModuleInfo]:
     """The languages the live voice can speak in (translation add-ons), A to Z."""
     return sorted((m for m in module_list if m.kind == "translation" and not m.error),
                   key=langnames.sort_key)
-
-
-class _SameWidth(QObject):
-    """Keeps the list `follower` as wide as `source` (two lists in different rows),
-    or wider when its picked item wouldn't fit (a narrow window)."""
-
-    def __init__(self, source: QWidget, follower: QComboBox):
-        super().__init__(source)
-        self._source, self._follower = source, follower
-        source.installEventFilter(self)
-        follower.currentIndexChanged.connect(lambda _i: self.fit())
-
-    def fit(self):
-        f = self._follower
-        need = f.fontMetrics().horizontalAdvance(f.currentText()) + 56   # padding + arrow
-        if self._source.width() > 0:
-            f.setFixedWidth(max(self._source.width(), need))
-
-    def eventFilter(self, obj, e):
-        if e.type() == QEvent.Type.Resize:
-            self.fit()
-        return False
 
 
 class SpeechPanel(QWidget):
@@ -111,13 +88,11 @@ class SpeechPanel(QWidget):
         v.setSpacing(12)
 
         # ---- live voice to speech
+        # in the order you use it: the language, who says it, then Start
         self.title = section_label(_("Speak another language"))
         v.addWidget(self.title)
-        v.addWidget(live.start_box)   # Start and its state: shown with live_box
-        self.lbl_intro = hint_label(_(
-            "Talk in your language and others hear another one. Turn on the switch below: the AI "
-            "voice or the voice changer says it when one of them is on; otherwise press "
-            "Start and a computer voice does."))
+        self.lbl_intro = hint_label(_("Talk in your language and others hear another one. "
+                                      "Pick it under Speak in."))
         v.addWidget(self.lbl_intro)
         # Speak in belongs to every voice on the tab (VoicePanel._sync_translate).
         # your language in, the chosen one out (through English: spoken.py).
@@ -126,23 +101,22 @@ class SpeechPanel(QWidget):
         lv.setContentsMargins(0, 0, 0, 0)
         lv.setSpacing(8)
         trow = QHBoxLayout()
-        # its own on/off: turning on a voice elsewhere never starts translating
-        self.sw_lang = Switch(_("Translate what you say into this language. Off: every "
-                                "voice says it as you do, and the language stays picked."))
-        self.sw_lang.setAccessibleName(_("Speak in"))
-        self.sw_lang.setChecked(bool(self.s["translate_on"]))
-        trow.addWidget(self.sw_lang)
+        # a language here is on; Don't translate (the list's first) is off. Turning on
+        # a voice elsewhere never changes it
         self.lbl_lang = QLabel(_("Speak in"))
         trow.addWidget(self.lbl_lang)
         self.cb_lang = QComboBox()
+        self.cb_lang.setAccessibleName(_("Speak in"))
         self.cb_lang.setToolTip(_("Say it in your language; whichever voice is on says it in this "
                                   "language. Each language is a one-time download."))
-        # as wide as the voice list below (_SameWidth), not a bar across the card:
-        # its list opens as wide as the box
-        trow.setSpacing(12)                             # the voice grid's spacing
-        trow.addWidget(self.cb_lang)
+        self.cb_lang.setMinimumWidth(120)   # a list, not a bar across the card: it
+        self.cb_lang.setMaximumWidth(380)   # opens as wide as its names need
+        trow.setSpacing(12)
+        trow.addWidget(self.cb_lang, 1)
         trow.addStretch(1)
         lv.addLayout(trow)
+        self._said_row = QHBoxLayout()   # Said by: filled below, once the voice list is
+        lv.addLayout(self._said_row)
         self.lbl_delay = hint_label("")
         theme.set_tone(self.lbl_delay, "warn")
         self.lbl_delay.hide()
@@ -157,7 +131,23 @@ class SpeechPanel(QWidget):
         tv.addWidget(self.lbl_tr)
         tv.addLayout(inst.tr_row)
         lv.addWidget(self.tr_box)
-        # the voice's settings, together in one inner area: Speak in, the voice, speed
+        # who says it: the AI voice or the voice changer when one is on, else the
+        # computer voice (VoicePanel tells it which: said_by)
+        srow = QHBoxLayout()
+        srow.setSpacing(12)
+        self.lbl_said_by = QLabel(_("Said by"))
+        srow.addWidget(self.lbl_said_by, 0, Qt.AlignmentFlag.AlignTop)
+        self.lbl_who = QLabel("")
+        self.lbl_who.setWordWrap(True)
+        self.lbl_who.setMinimumWidth(0)
+        self.lbl_who.setTextFormat(Qt.TextFormat.PlainText)
+        srow.addWidget(self.lbl_who, 1)
+        heads = max(self.lbl_said_by.sizeHint().width(), self.lbl_lang.sizeHint().width())
+        self.lbl_said_by.setMinimumWidth(heads)
+        self.lbl_lang.setMinimumWidth(heads)
+        self._said_row.addLayout(srow)
+        self._who = ""   # "ai:name" / "fx:name" / "": who's on elsewhere (said_by)
+        # the language and who says it, together in one inner area; Start under it
         self.settings_box = QFrame()
         self.settings_box.setObjectName("voicebox")
         sbl = QVBoxLayout(self.settings_box)
@@ -165,6 +155,7 @@ class SpeechPanel(QWidget):
         sbl.setSpacing(14)
         sbl.addWidget(self.lang_box)
         v.addWidget(self.settings_box)
+        v.addWidget(live.start_box)   # Start and its state: shown once it's installed
 
         # ---- the voice (shared by live and typed speech): set before you press Start
         grid = QGridLayout()
@@ -172,9 +163,6 @@ class SpeechPanel(QWidget):
         grid.setVerticalSpacing(14)
         lbl_voice = QLabel(_("Computer voice"))
         grid.addWidget(lbl_voice, 0, 0)
-        # Speak in's box starts where the voice list does
-        self.lbl_lang.setMinimumWidth(max(self.lbl_lang.sizeHint().width(),
-                                          lbl_voice.sizeHint().width()))
         self.cb_voice = QComboBox()
         self.cb_voice.setToolTip(_("Speaks for you when no AI voice or voice changer is on, "
                                    "and says lines you type"))
@@ -198,12 +186,11 @@ class SpeechPanel(QWidget):
         self.sl_rate.setValue(int(self.s["rate"]))
         grid.addWidget(self.sl_rate, 1, 1)
         for w in (self.cb_voice, self.sl_rate):   # a list and a slider, not bars across
-            w.setMinimumWidth(160)                # the whole card at full screen (and
+            w.setMinimumWidth(100)                # the whole card at full screen (and
             w.setMaximumWidth(380)                # Add voices fits a narrow window)
-        _SameWidth(self.cb_voice, self.cb_lang)
         grid.setColumnStretch(1, 1)
         grid.setColumnStretch(3, 2)
-        sbl.addLayout(grid)
+        voice_grid = grid   # under More options: Said by names the voice
 
         # everything the voice was asked to say, live or typed, newest at the bottom
         lrow = QHBoxLayout()
@@ -244,7 +231,8 @@ class SpeechPanel(QWidget):
         self.opts = QWidget()
         ov = QVBoxLayout(self.opts)
         ov.setContentsMargins(0, 0, 0, 0)
-        grid = QGridLayout()
+        ov.setSpacing(10)
+        grid = voice_grid
         grid.addWidget(QLabel(_("Recognition")), 2, 0)
         self.cb_model = QComboBox()
         for label, key in MODELS:
@@ -257,7 +245,8 @@ class SpeechPanel(QWidget):
         self.ed_lang.setToolTip(_("Language you speak (two-letter code). Empty: the app's "
                                   "language. 'auto' guesses."))
         grid.addWidget(self.ed_lang, 3, 1)
-        grid.setColumnStretch(1, 1)
+        for w in (self.cb_model, self.ed_lang):
+            w.setMaximumWidth(380)
         ov.addLayout(grid)
         no_wheel(self.cb_lang, self.cb_voice, self.sl_rate, self.cb_model)
         self.chk_mute = QCheckBox(_("Mute my real mic while the computer voice is on"))
@@ -269,7 +258,13 @@ class SpeechPanel(QWidget):
                                  "gets the same effect (a chipmunk robot voice, say)."))
         self.chk_fx.setChecked(self.s["voice_fx"])
         ov.addWidget(self.chk_fx)
-        ov.addWidget(inst.b_update, 0, Qt.AlignmentFlag.AlignLeft)
+        urow = QHBoxLayout()
+        urow.setSpacing(8)
+        urow.addWidget(inst.b_update)
+        inst.tr_row.removeWidget(inst.b_dl_remove)   # rarely wanted: not by Speak in
+        urow.addWidget(inst.b_dl_remove)
+        urow.addStretch(1)
+        ov.addLayout(urow)
         v.addWidget(self.opts)
         self.opts.hide()
         # the log after the options: More options sits with the controls it adds to
@@ -339,8 +334,6 @@ class SpeechPanel(QWidget):
         self.ed_lang.editingFinished.connect(self._settings_edited)
         self._fill_langs()
         self.cb_lang.currentIndexChanged.connect(self._lang_picked)
-        self.sw_lang.toggled.connect(self._lang_switched)
-        self.sw_lang.clicked.connect(lambda on: on and usage.used("translate-on"))
         inst._refresh_module()
 
         app = QGuiApplication.instance()
@@ -557,8 +550,10 @@ class SpeechPanel(QWidget):
                       spoken=self.ed_lang.text().strip().lower(),
                       mute_real_voice=self.chk_mute.isChecked(),
                       voice_fx=self.chk_fx.isChecked(),
-                      translate=self.cb_lang.currentData() or "",
-                      translate_on=self.sw_lang.isChecked())
+                      # Don't translate keeps the last language (older versions show
+                      # it picked, switched off)
+                      translate=self.cb_lang.currentData() or self.s["translate"],
+                      translate_on=bool(self.cb_lang.currentData()))
         self.ctl.speaker.rate = self.s["rate"]
         self.ctl.set_mute_real_voice(self.s["mute_real_voice"])
         if self.ctl.live and not self.livevoice.bg_for:
@@ -584,7 +579,7 @@ class SpeechPanel(QWidget):
     def _fill_langs(self):
         self.cb_lang.blockSignals(True)
         self.cb_lang.clear()
-        self.cb_lang.addItem(_("As you say it"), "")
+        self.cb_lang.addItem(_("Don't translate"), "")
         for m in self.langs:
             name = langnames.of(m)
             self.cb_lang.addItem(name if m.installed
@@ -595,33 +590,59 @@ class SpeechPanel(QWidget):
         # the open list shows every name whole, even past the box's own width
         view = self.cb_lang.view()
         view.setMinimumWidth(view.sizeHintForColumn(0) + 40)    # + padding, scroll bar
-        self.cb_lang.setCurrentIndex(max(0, self.cb_lang.findData(self.s["translate"])))
+        self.cb_lang.setCurrentIndex(max(0, self.cb_lang.findData(self.s["translate"]))
+                                     if self.s["translate_on"] else 0)
         self.cb_lang.blockSignals(False)
         self.lang_box.setVisible(self.module is not None and self.module.installed
                                  and bool(self.langs))
         self._refresh_translation()
 
     def _lang_picked(self, *_):
-        # picking a language means speaking it; As you say it is off
-        self.sw_lang.blockSignals(True)
-        self.sw_lang.setChecked(bool(self.cb_lang.currentData()))
-        self.sw_lang.blockSignals(False)
-        self._lang_switched()
-
-    def _lang_switched(self, *_):
-        if self.sw_lang.isChecked() and not self.cb_lang.currentData():
-            self.sw_lang.blockSignals(True)
-            self.sw_lang.setChecked(False)    # no language yet: pick one first
-            self.sw_lang.blockSignals(False)
-            self.cb_lang.showPopup()
-            return
+        """A language picked means speaking it; Don't translate is off."""
+        if self.cb_lang.currentData():
+            usage.used("translate-on")
         self._settings_edited()
         self._refresh_translation()
         self.lang_changed.emit()
 
+    def stop_translating(self):
+        """Back to Don't translate (Stop all)."""
+        self.cb_lang.setCurrentIndex(0)
+
     def _lang_on(self) -> mods.ModuleInfo | None:
-        """The language picked under Speak in while its switch is on."""
-        return self._lang() if self.sw_lang.isChecked() else None
+        """The language picked under Speak in (None: Don't translate)."""
+        return self._lang()
+
+    def said_by(self, who: str, name: str = ""):
+        """Who's on elsewhere on the tab: "ai" (the AI voice `name`), "fx" (the voice
+        changer's voice `name`) or "" (nobody: the computer voice). From VoicePanel."""
+        self._who = f"{who}:{name}" if who else ""
+        self._show_who()
+
+    def _show_who(self):
+        """Said by: who others will hear, and Start's words to match."""
+        who, _c, name = self._who.partition(":")
+        m = self._lang_on()
+        lang = langnames.of(m) if m is not None else ""
+        voice = self._voice_for(m) if m is not None and self.ctl.tts.voices else ""
+        computer = (customvoices.label(voice or self.cb_voice.currentData() or "")
+                    or self.cb_voice.currentText())
+        if m is not None and self.ctl.tts.voices and not voice:
+            text = _("A {language} computer voice, once it's on this PC (below).",
+                     language=lang)
+        elif who == "ai" and m is not None:
+            text = _("Your AI voice, {voice}. It's on: just talk.", voice=name)
+        elif who == "fx" and m is not None:
+            text = _("{voice} with your {effect} voice changer. It's on: just talk.",
+                     voice=computer, effect=name)
+        elif self.livevoice.b_live.isChecked():
+            text = _("{voice}, the computer voice. It's on: just talk.", voice=computer)
+        else:
+            text = _("{voice}, the computer voice, once you press Start.", voice=computer)
+        self.lbl_who.setText(text)
+        # its height for its width changed: the layouts around keep the old one until told
+        self.settings_box.updateGeometry()
+        self.livevoice.show_button(lang, bool(who) and m is not None)
 
     def translating(self) -> mods.ModuleInfo | None:
         """The language picked under Speak in, switched on, downloaded and ready."""
@@ -637,6 +658,7 @@ class SpeechPanel(QWidget):
         # when the same action is still available in the resulting state.
         focused = self.focusWidget()
         self._refresh_translation_state()
+        self._show_who()
         if (focused is not None and focused in self.installs.tr_buttons()
                 and focused.isVisible()):
             focused.setFocus(Qt.FocusReason.OtherFocusReason)
@@ -685,17 +707,15 @@ class SpeechPanel(QWidget):
             i.b_dl.setToolTip(net.off_message("voices") if not net.allowed("voices") else
                               _("Stop the voice to download this") if live else "")
             return
+        i.b_dl_remove.setText(_("Delete the {language} download", language=name))
         i.b_dl_remove.setVisible(not live)
         if not self.ctl.tts.voices:        # still loading, or no speech at all
-            self.lbl_tr.setText(_("Say it in your language; the voice says it in {language}.",
-                                  language=name))
+            self.lbl_tr.setText(_("Translation is quick but not perfect with slang."))
             return
         voice = self._voice_for(m)
         if voice:
-            short = customvoices.label(voice)
-            self.lbl_tr.setText(_("Say it in your language; {voice} says it in {language}. "
-                                  "Translation is quick but not perfect with slang.",
-                                  voice=short, language=name))
+            # (Said by names the voice)
+            self.lbl_tr.setText(_("Translation is quick but not perfect with slang."))
         else:
             i._watch_voices(True)
             for b in (i.b_voice_install, i.b_voices, i.b_voices_check):

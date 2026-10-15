@@ -181,9 +181,8 @@ class LiveVoice(QObject):
         self.b_live.blockSignals(True)
         self.b_live.setChecked(on)
         self.b_live.blockSignals(False)
-        self.b_live.setText(_("Stop the computer voice") if on else _("Start the computer voice"))
         p.live_changed.emit(on)
-        for w in (p.cb_model, p.ed_lang, p.cb_lang, p.sw_lang):
+        for w in (p.cb_model, p.ed_lang, p.cb_lang):
             _enable(w, not on, _("Stop the computer voice to change this"))
         _enable(p.installs.b_update, not on,
                 _("Stop the computer voice to change this") if on
@@ -192,6 +191,30 @@ class LiveVoice(QObject):
         if not on:
             self.dl_bar.hide()
         p._refresh_translation()
+
+    def show_button(self, language: str, other_on: bool):
+        """Start's words follow Speak in: the language it speaks, or the computer voice
+        taking over from the AI voice or the voice changer (`other_on`)."""
+        if self.b_live.isChecked():
+            text = (_("Stop speaking {language}", language=language) if language
+                    else _("Stop the computer voice"))
+        elif other_on:
+            text = _("Use the computer voice instead")
+        else:
+            text = (_("Start speaking {language}", language=language) if language
+                    else _("Start the computer voice"))
+        self.b_live.setText(text)
+        self.b_live.setAccessibleName(text)
+        # taking over from a voice that's on is a side choice, not the next step
+        main = "" if other_on and not self.b_live.isChecked() else "primary"
+        if self.b_live.objectName() != main:
+            self.b_live.setObjectName(main)
+            icons.set_icon(self.b_live, "mic", "on_accent" if main else "text",
+                           "on_accent" if main else "text")
+            self.b_live.style().unpolish(self.b_live)
+            self.b_live.style().polish(self.b_live)
+        if not self.b_live.isChecked() and self.lbl_state.text() in ("", IDLE_HINT):
+            self.lbl_state.setText("" if other_on else IDLE_HINT)
 
     def _download_note(self, ev: dict) -> str:
         """A "download" event: its bar filled, the words that go with it."""
