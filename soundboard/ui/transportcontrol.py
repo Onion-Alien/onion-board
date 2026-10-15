@@ -45,6 +45,10 @@ class TransportControl(Controller):
             want = any(sid in mw._meta or sid == LINK_ID for sid in playing)
         if mw.transport.isHidden() == want:
             mw.transport.setVisible(want)
+            # fitted again with the bar: on another tab the window gave its room back,
+            # and coming to Sounds the bar's name was cut off ("Sound wählen" in 0 px)
+            if want and hasattr(mw.fitctl, "_fit"):
+                mw.fitctl._refit()
 
     def _scroll_background_board(self, value):
         mw = self.mw
