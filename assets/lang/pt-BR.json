@@ -3440,5 +3440,6 @@
   "Your headset is off or its mic is muted. Turn it on or unmute it. Still nothing? Click <b>Repair</b>.": "Seu headset está desligado ou com o microfone no mudo. Ligue-o ou tire do mudo. Ainda nada? Clique em <b>Consertar</b>.",
   "Heads up: while Onion Board is open, {key} plays your hotkey instead of doing its usual job in other apps.": "Atenção: enquanto o Onion Board estiver aberto, {key} toca o seu atalho em vez de fazer o trabalho de sempre nos outros apps.",
   "Windows keeps {key} for itself and never passes it to an app, so that hotkey could never play: pick another key.": "O Windows guarda {key} para si e nunca passa para um app, então esse atalho nunca tocaria: escolha outra tecla.",
-  "{key} is your Stop everything key, so it stays on that. Pick another key, or give Stop everything a new one in Settings → Hotkeys first.": "{key} é a sua tecla de Parar tudo, então ela fica lá. Escolha outra tecla ou dê antes uma nova para Parar tudo em Configurações → Atalhos."
+  "{key} is your Stop everything key, so it stays on that. Pick another key, or give Stop everything a new one in Settings → Hotkeys first.": "{key} é a sua tecla de Parar tudo, então ela fica lá. Escolha outra tecla ou dê antes uma nova para Parar tudo em Configurações → Atalhos.",
+  "the pack's file is damaged, so it wasn't kept": "o arquivo do pacote está danificado, então não foi mantido"
 }

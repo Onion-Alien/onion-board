@@ -3364,5 +3364,6 @@
   "Your headset is off or its mic is muted. Turn it on or unmute it. Still nothing? Click <b>Repair</b>.": "Tai nghe của bạn đang tắt hoặc mic đang tắt tiếng. Hãy bật tai nghe hoặc bật lại tiếng mic. Vẫn không có gì? Bấm <b>Sửa</b>.",
   "Heads up: while Onion Board is open, {key} plays your hotkey instead of doing its usual job in other apps.": "Lưu ý: khi Onion Board đang mở, {key} sẽ phát phím tắt của bạn thay vì làm việc thường lệ trong các ứng dụng khác.",
   "Windows keeps {key} for itself and never passes it to an app, so that hotkey could never play: pick another key.": "Windows giữ {key} cho riêng mình và không bao giờ chuyển cho ứng dụng nào, nên phím tắt đó sẽ không bao giờ phát: hãy chọn phím khác.",
-  "{key} is your Stop everything key, so it stays on that. Pick another key, or give Stop everything a new one in Settings → Hotkeys first.": "{key} là phím Dừng mọi thứ của bạn, nên nó vẫn giữ ở đó. Hãy chọn phím khác, hoặc đặt phím mới cho Dừng mọi thứ trước trong Cài đặt → Phím tắt."
+  "{key} is your Stop everything key, so it stays on that. Pick another key, or give Stop everything a new one in Settings → Hotkeys first.": "{key} là phím Dừng mọi thứ của bạn, nên nó vẫn giữ ở đó. Hãy chọn phím khác, hoặc đặt phím mới cho Dừng mọi thứ trước trong Cài đặt → Phím tắt.",
+  "the pack's file is damaged, so it wasn't kept": "tệp của gói bị hỏng nên không được giữ lại"
 }

@@ -3440,5 +3440,6 @@
   "Your headset is off or its mic is muted. Turn it on or unmute it. Still nothing? Click <b>Repair</b>.": "Слушалките са изключени или микрофонът им е заглушен. Пусни ги или махни заглушаването. Пак нищо? Кликни <b>Поправи</b>.",
   "Heads up: while Onion Board is open, {key} plays your hotkey instead of doing its usual job in other apps.": "Внимание: докато Onion Board е отворен, {key} пуска твоя бърз клавиш, вместо да върши обичайната си работа в другите приложения.",
   "Windows keeps {key} for itself and never passes it to an app, so that hotkey could never play: pick another key.": "Windows пази {key} за себе си и никога не го дава на приложение, така че този бърз клавиш никога няма да свири: избери друг клавиш.",
-  "{key} is your Stop everything key, so it stays on that. Pick another key, or give Stop everything a new one in Settings → Hotkeys first.": "{key} е клавишът ти за „Спри всичко“, затова остава за него. Избери друг клавиш или първо дай нов на „Спри всичко“ в Настройки → Бързи клавиши."
+  "{key} is your Stop everything key, so it stays on that. Pick another key, or give Stop everything a new one in Settings → Hotkeys first.": "{key} е клавишът ти за „Спри всичко“, затова остава за него. Избери друг клавиш или първо дай нов на „Спри всичко“ в Настройки → Бързи клавиши.",
+  "the pack's file is damaged, so it wasn't kept": "файлът на пакета е повреден, затова не е запазен"
 }

@@ -69,6 +69,10 @@ FEATURE = "radio"           # its switch in Settings > Privacy & security (sound
 RETRIES = 3                # a dropped stream is reopened this many times in a row
 CONNECT_S = 20.0           # a station that sends no audio this long after opening is dead
 STALL_S = 8.0              # ...and one that goes quiet this long while playing is reopened
+# A reopen only counts as having worked once the station plays this long without
+# dropping: one that sends a few seconds and dies each time is given up on, not
+# reopened forever while the tab still says it's playing
+STEADY_S = 30.0
 # Over Tor a stream's circuit can break (a relay in it goes away, or Tor restarts) and a
 # new one takes longer to open: more reopens, more time, and no giving up while Tor
 # itself is still connecting (its own wait fails the stream if it never does)
@@ -927,7 +931,7 @@ class RadioPlayer(QObject):
         self._gen = 0                # bumped by play/stop so a stale reopen does nothing
         self._first_sent = -1        # the generation _first_audio was last sent for
         self._state = "stopped"
-        self._opened = self._last_audio = 0.0
+        self._opened = self._last_audio = self._steady_from = 0.0
         # FFmpeg can sit on a station that never answers (or stops sending) for
         # minutes, so the player keeps its own watch
         self._watch = QTimer(self)
@@ -1115,9 +1119,8 @@ class RadioPlayer(QObject):
     def _on_first_audio(self, gen: int):
         if gen != self._gen or self.station is None or self._got_audio:
             return
-        self._last_audio = time.monotonic()
+        self._last_audio = self._steady_from = time.monotonic()
         self._got_audio = True
-        self._retries = 0
         self._reconnecting = False
         self._set_state("playing")
 
@@ -1136,6 +1139,8 @@ class RadioPlayer(QObject):
             self._retry("the station didn't answer")
         elif self._got_audio and now - self._last_audio > STALL_S * _patience():
             self._retry("the station stopped sending")
+        elif self._got_audio and self._retries and now - self._steady_from > STEADY_S:
+            self._retries = 0   # it's back for good: a later drop gets its reopens again
 
     def _on_error(self, _err, msg: str):
         if self.station is None:

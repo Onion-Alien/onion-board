@@ -423,7 +423,10 @@ class PacksDialog(QDialog):
         if p.id in self._busy:
             return
         if not net.allowed(packs.FEATURE) and not p.downloaded():
-            self._say(net.off_message(packs.FEATURE))
+            why = net.off_message(packs.FEATURE)
+            self._say(why)
+            # the note above may already say it: the press itself gets an answer too
+            busy.toast(self, html.escape(why), "error")
             return
         self._busy.add(p.id)
         busy.set_busy(card.btn, True)

@@ -3744,5 +3744,6 @@
   "Your headset is off or its mic is muted. Turn it on or unmute it. Still nothing? Click <b>Repair</b>.": "السماعة مطفأة أو ميكروفونها مكتوم. شغّلها أو ألغِ الكتم. ما زال لا شيء؟ انقر <b>إصلاح</b>.",
   "Heads up: while Onion Board is open, {key} plays your hotkey instead of doing its usual job in other apps.": "انتبه: ما دام Onion Board مفتوحًا، يشغّل {key} اختصارك بدل عمله المعتاد في التطبيقات الأخرى.",
   "Windows keeps {key} for itself and never passes it to an app, so that hotkey could never play: pick another key.": "يحتفظ Windows بـ {key} لنفسه ولا يمرره لأي تطبيق، فلن يعمل هذا الاختصار أبدًا: اختر مفتاحًا آخر.",
-  "{key} is your Stop everything key, so it stays on that. Pick another key, or give Stop everything a new one in Settings → Hotkeys first.": "{key} هو مفتاح «أوقف كل شيء»، فيبقى له. اختر مفتاحًا آخر، أو أعطِ «أوقف كل شيء» مفتاحًا جديدًا في الإعدادات → الاختصارات أولًا."
+  "{key} is your Stop everything key, so it stays on that. Pick another key, or give Stop everything a new one in Settings → Hotkeys first.": "{key} هو مفتاح «أوقف كل شيء»، فيبقى له. اختر مفتاحًا آخر، أو أعطِ «أوقف كل شيء» مفتاحًا جديدًا في الإعدادات → الاختصارات أولًا.",
+  "the pack's file is damaged, so it wasn't kept": "ملف الحزمة تالف، لذا لم يتم الاحتفاظ به"
 }
