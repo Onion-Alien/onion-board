@@ -156,9 +156,9 @@ def test_the_engine_is_quiet_only_with_nothing_playing():
     e = Engine.__new__(Engine)                 # just the state quiet() reads
     e.voices, e.aux, e._radio_heard = (), (), 0.0
     assert e.quiet()
-    e.voices = (SimpleNamespace(finished=False),)
+    e.voices = (SimpleNamespace(silent=False),)
     assert not e.quiet()
-    e.voices = (SimpleNamespace(finished=True),)
+    e.voices = (SimpleNamespace(silent=True),)
     assert e.quiet()
     e._radio_heard = time.monotonic()
     assert not e.quiet()

@@ -9,6 +9,7 @@ import pytest
 from soundboard import engine as eng
 from soundboard import soundcache
 from soundboard.engine import SR, Engine, is_xrun
+from soundboard.engineparts import CUT_KEEP_S
 
 
 class FakeStream:
@@ -267,7 +268,8 @@ def test_close_marks_voices_done_on_that_output():
     e._close("mon_stream")
     assert "mon" in v.done and not v.finished
     e._close("main_stream")
-    assert v.finished
+    assert v.silent and not v.finished           # waits for a reopen (a rescan)
+    assert not e.any_playing() and e.quiet()     # but holds no push-to-talk meanwhile
 
 
 def test_sounds_only_keeps_the_mic_out_of_the_cable():
@@ -520,7 +522,8 @@ def test_a_device_rescan_keeps_sounds_playing_where_they_were(monkeypatch):
     at = v.pos["main"]
     assert done.finished
     e.shutdown()                                 # the rescan: everything closed
-    assert v.finished
+    assert not v.finished and "a" in e.playing()   # the UI's poll mustn't drop it
+    assert v in e.voices
     fake_devices(monkeypatch, rate=SR)
     e.set_main_device("cable")
     assert "main" not in v.done and v.pos["main"] == at
@@ -533,6 +536,27 @@ def test_a_device_rescan_keeps_sounds_playing_where_they_were(monkeypatch):
     fake_devices(monkeypatch, rate=44100)        # back at another rate: its data is
     e.set_main_device("cable")                   # useless, so it stays done
     assert "main" in v.done
+    e.set_mon_device("headphones")
+    assert v.finished                            # nowhere left to resume it
+
+
+def test_a_cut_sound_whose_device_never_comes_back_ends(monkeypatch):
+    e = engine_with("main")
+    v = e.play("a", tone(2.0), 1.0)
+    e._render("main", 480)
+    e.shutdown()
+    assert not v.finished
+    v.cut_at -= CUT_KEEP_S + 1               # the device stayed away
+    assert v.finished and "a" not in e.playing()
+
+
+def test_a_sound_stopped_while_cut_ends_at_once():
+    e = engine_with("main")
+    v = e.play("a", tone(2.0), 1.0)
+    e._render("main", 480)
+    e.shutdown()
+    e.stop("a")
+    assert v.finished and "a" not in e.playing()
 
 
 def test_reopened_output_at_another_rate_leaves_sounds_done(monkeypatch):

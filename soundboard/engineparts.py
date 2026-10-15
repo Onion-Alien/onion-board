@@ -30,6 +30,9 @@ CH = 2
 I16_SCALE = np.float32(1 / 32767.0)   # int16 sound data -> float
 STALL_S = 1.5   # a stream whose callback hasn't run for this long is dead: reopen it
 RETRY_S = 5.0   # how often to retry a device that failed to open
+# a sound cut off by its outputs closing (a rescan, a stalled device) waits this long
+# for one to reopen before it counts as finished (a slow driver can take seconds)
+CUT_KEEP_S = 30.0
 # What each Audio buffering choice asks PortAudio for. Windows' shared mode never goes
 # below its own 10 ms period, so 'low' and PortAudio's 'high' (10 ms) both came out as
 # 22 ms with ~10 ms to spare per block; asking for a number buys real room.
@@ -752,6 +755,7 @@ class Voice:
     # outs whose stream closed under it mid-play (a rescan, a stalled device): done
     # there for now, but a reopen at the same rate resumes it from its own position
     cut: set = field(default_factory=set)
+    cut_at: float = 0.0        # when an output was last cut (see CUT_KEEP_S)
     # out -> the gain its last block ended at (_render glides from there to a new one)
     gnow: dict = field(default_factory=dict)
 
@@ -770,8 +774,16 @@ class Voice:
         return destination.makeup(self.cut_share.get(lowcut, 0.0))
 
     @property
-    def finished(self) -> bool:
+    def silent(self) -> bool:
+        """No output plays it now (a cut one may still resume: see finished)."""
         return self.done >= self.outs
+
+    @property
+    def finished(self) -> bool:
+        # cut off everywhere by a rescan isn't finished: the UI's poll would drop it
+        # before the outputs reopen, and nothing would be left to resume
+        return self.silent and (
+            not self.cut or self.stopping or time.monotonic() - self.cut_at > CUT_KEEP_S)
 
     def seek(self, frac: float):
         """Ask for a new position (applied by the audio callback: see seek_to)."""

@@ -682,14 +682,14 @@ class Engine(EngineTakes, EngineDevices, SoundCache):
         """True while a sound is going out to others (drives auto push-to-talk)."""
         with self.lock:
             # a stopped sound still fading out is still being heard
-            return any(not v.finished and not v.preview and not v.paused
+            return any(not v.silent and not v.preview and not v.paused
                        and not (v.stopping and not any(v.gate.values()))
                        for v in self.voices)
 
     def quiet(self) -> bool:
         """Nothing is playing: no sound or sample, no captured program, no radio heard
         in the last second (when uigc's deep sweep can pause the UI thread unheard)."""
-        return (not any(not v.finished for v in self.voices) and not self.aux
+        return (not any(not v.silent for v in self.voices) and not self.aux
                 and time.monotonic() - self._radio_heard > 1.0)
 
     # ----------------------------------------------------------------- callbacks
@@ -1388,7 +1388,7 @@ class Engine(EngineTakes, EngineDevices, SoundCache):
         if not self.mic_gate and g0 >= 1.0:
             return m
         playing = self.mic_gate and any(
-            out in v.data and not v.preview and not v.paused and not v.finished
+            out in v.data and not v.preview and not v.paused and not v.silent
             for v in self.voices)
         target = 0.0 if playing else 1.0
         step = len(m) / (self.GATE_S * max(self.rates.get(out, SR), 1))

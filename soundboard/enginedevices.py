@@ -252,8 +252,10 @@ class EngineDevices:
         they were cut. Data made for another rate is useless, so those stay done."""
         with self.lock:
             for v in self.voices:
-                if (key not in v.done or v.stopping or not len(v.data.get(key, ()))
-                        or v.rates.get(key) != rate):
+                if key not in v.done or v.stopping or not len(v.data.get(key, ())):
+                    continue
+                if v.rates.get(key) != rate:
+                    v.cut.discard(key)   # can't resume here: let it finish
                     continue
                 other = next((o for o in v.data if o != key and o not in v.done
                               and len(v.data[o])), None)
@@ -500,6 +502,7 @@ class EngineDevices:
                 for v in self.voices:
                     if out in v.data and out not in v.done:
                         v.cut.add(out)
+                        v.cut_at = time.monotonic()
                     v.done.add(out)
         if s is not None:
             try:
