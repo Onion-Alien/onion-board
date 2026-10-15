@@ -15,7 +15,7 @@ from typing import TYPE_CHECKING
 
 from PySide6.QtWidgets import QMenu
 
-from soundboard import midi, theme, winkeys
+from soundboard import midi, theme, usage, winkeys
 from soundboard.engine import SR
 from soundboard.i18n import _, ngettext
 from soundboard.library import SoundMeta
@@ -185,6 +185,7 @@ class HotkeyControl(Controller):
         good, why = winkeys.check(combo)
         if why:
             log.info("refused hotkey %r: %s", combo[:80], why)
+            usage.used("hotkey-refused")   # never which key
             self.mw.toast(_("Hotkey not saved: {why}", why=why), "warn", key="hotkey")
             return None
         return good

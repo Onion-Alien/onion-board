@@ -763,6 +763,8 @@ class EditDialog(QDialog):
     def _pick_custom(self):
         c = QColorDialog.getColor(QColor(self.color or PAD_COLORS[0]), self,
                                   _("Pick a colour"))
+        if c.isValid():
+            usage.used("custom-colour")
         self._set_color(c.name() if c.isValid() else self.color)
 
     def _set_color(self, c):
