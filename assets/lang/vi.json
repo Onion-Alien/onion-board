@@ -3365,5 +3365,6 @@
   "Names can be up to {n} characters, so it's “{name}”.": "Tên dài tối đa {n} ký tự, nên tên là “{name}”.",
   "They go in a category called “{name}”.": "Chúng vào một danh mục tên “{name}”.",
   "Type a name first.": "Hãy nhập tên trước.",
-  "✓ Renamed to “{new}”. Another sound has that name too.": "✓ Đã đổi tên thành “{new}”. Một âm thanh khác cũng có tên này."
+  "✓ Renamed to “{new}”. Another sound has that name too.": "✓ Đã đổi tên thành “{new}”. Một âm thanh khác cũng có tên này.",
+  "the pack's file is damaged, so it wasn't kept": "tệp của gói bị hỏng nên không được giữ lại"
 }

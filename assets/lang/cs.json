@@ -3517,5 +3517,6 @@
   "Names can be up to {n} characters, so it's “{name}”.": "Názvy mohou mít nejvýš {n} znaků, takže je to „{name}“.",
   "They go in a category called “{name}”.": "Přijdou do kategorie „{name}“.",
   "Type a name first.": "Nejdřív napište název.",
-  "✓ Renamed to “{new}”. Another sound has that name too.": "✓ Přejmenováno na „{new}“. Stejně se jmenuje i jiný zvuk."
+  "✓ Renamed to “{new}”. Another sound has that name too.": "✓ Přejmenováno na „{new}“. Stejně se jmenuje i jiný zvuk.",
+  "the pack's file is damaged, so it wasn't kept": "soubor balíčku je poškozený, proto nebyl ponechán"
 }

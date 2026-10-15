@@ -3441,5 +3441,6 @@
   "Names can be up to {n} characters, so it's “{name}”.": "नाम में ज़्यादा से ज़्यादा {n} अक्षर हो सकते हैं, इसलिए यह “{name}” है।",
   "They go in a category called “{name}”.": "ये “{name}” नाम की कैटेगरी में जाएँगे।",
   "Type a name first.": "पहले एक नाम लिखें।",
-  "✓ Renamed to “{new}”. Another sound has that name too.": "✓ नाम बदलकर “{new}” किया। एक और साउंड का भी यही नाम है।"
+  "✓ Renamed to “{new}”. Another sound has that name too.": "✓ नाम बदलकर “{new}” किया। एक और साउंड का भी यही नाम है।",
+  "the pack's file is damaged, so it wasn't kept": "पैक की फ़ाइल खराब है, इसलिए उसे नहीं रखा गया"
 }

@@ -3441,5 +3441,6 @@
   "Names can be up to {n} characters, so it's “{name}”.": "Nimessä voi olla enintään {n} merkkiä, joten se on “{name}”.",
   "They go in a category called “{name}”.": "Ne menevät luokkaan nimeltä “{name}”.",
   "Type a name first.": "Kirjoita ensin nimi.",
-  "✓ Renamed to “{new}”. Another sound has that name too.": "✓ Uudelleennimetty \"{new}\". Toisellakin äänellä on sama nimi."
+  "✓ Renamed to “{new}”. Another sound has that name too.": "✓ Uudelleennimetty \"{new}\". Toisellakin äänellä on sama nimi.",
+  "the pack's file is damaged, so it wasn't kept": "paketin tiedosto on vioittunut, joten sitä ei säilytetty"
 }

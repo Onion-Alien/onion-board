@@ -3441,5 +3441,6 @@
   "Names can be up to {n} characters, so it's “{name}”.": "A név legfeljebb {n} karakter lehet, így „{name}” lett.",
   "They go in a category called “{name}”.": "Egy „{name}” nevű kategóriába kerülnek.",
   "Type a name first.": "Előbb írj be egy nevet.",
-  "✓ Renamed to “{new}”. Another sound has that name too.": "✓ átnevezve erre: „{new}”. Egy másik hang neve is ez."
+  "✓ Renamed to “{new}”. Another sound has that name too.": "✓ átnevezve erre: „{new}”. Egy másik hang neve is ez.",
+  "the pack's file is damaged, so it wasn't kept": "a csomag fájlja sérült, ezért nem lett megtartva"
 }

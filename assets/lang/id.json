@@ -3365,5 +3365,6 @@
   "Names can be up to {n} characters, so it's “{name}”.": "Nama bisa sampai {n} karakter, jadi namanya “{name}”.",
   "They go in a category called “{name}”.": "Semuanya masuk ke kategori bernama “{name}”.",
   "Type a name first.": "Ketik nama dulu.",
-  "✓ Renamed to “{new}”. Another sound has that name too.": "✓ Nama diganti jadi “{new}”. Ada suara lain dengan nama yang sama."
+  "✓ Renamed to “{new}”. Another sound has that name too.": "✓ Nama diganti jadi “{new}”. Ada suara lain dengan nama yang sama.",
+  "the pack's file is damaged, so it wasn't kept": "file paket rusak, jadi tidak disimpan"
 }

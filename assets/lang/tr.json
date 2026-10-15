@@ -3441,5 +3441,6 @@
   "Names can be up to {n} characters, so it's “{name}”.": "Adlar en fazla {n} karakter olabilir, bu yüzden “{name}” oldu.",
   "They go in a category called “{name}”.": "“{name}” adlı bir kategoriye girerler.",
   "Type a name first.": "Önce bir ad yazın.",
-  "✓ Renamed to “{new}”. Another sound has that name too.": "✓ “{new}” olarak yeniden adlandırıldı. Başka bir sesin de adı bu."
+  "✓ Renamed to “{new}”. Another sound has that name too.": "✓ “{new}” olarak yeniden adlandırıldı. Başka bir sesin de adı bu.",
+  "the pack's file is damaged, so it wasn't kept": "paketin dosyası bozuk, bu yüzden saklanmadı"
 }

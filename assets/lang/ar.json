@@ -3745,5 +3745,6 @@
   "Names can be up to {n} characters, so it's “{name}”.": "يمكن أن يصل الاسم إلى {n} حرفًا، لذا أصبح “{name}”.",
   "They go in a category called “{name}”.": "ستوضع في فئة باسم “{name}”.",
   "Type a name first.": "اكتب اسمًا أولًا.",
-  "✓ Renamed to “{new}”. Another sound has that name too.": "✓ أُعيدت التسمية إلى “{new}”. يوجد صوت آخر بهذا الاسم أيضًا."
+  "✓ Renamed to “{new}”. Another sound has that name too.": "✓ أُعيدت التسمية إلى “{new}”. يوجد صوت آخر بهذا الاسم أيضًا.",
+  "the pack's file is damaged, so it wasn't kept": "ملف الحزمة تالف، لذا لم يتم الاحتفاظ به"
 }

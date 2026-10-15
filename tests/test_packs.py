@@ -125,6 +125,30 @@ def test_download_checks_the_sha256_and_keeps_nothing_wrong(served):
     assert p.path.read_bytes() == data
 
 
+def test_a_damaged_pack_zip_with_a_matching_checksum_isnt_kept(served):
+    """A broken upload whose checksum the list matched was kept: its import failed,
+    and the card then said "Add again" though nothing was added."""
+    bad = b"PK" + bytes(900)
+    p, = packs.parse([entry(bad)])
+    served.files[p.url] = bad
+    with pytest.raises(updates.UpdateError, match="damaged"):
+        packs.download(p)
+    assert not p.downloaded() and not p.path.exists()
+
+
+def test_add_with_offline_mode_on_answers_the_press(qapp, served, monkeypatch):
+    toasts = []
+    monkeypatch.setattr(packsdialog.busy, "toast", lambda _w, text, *a, **k: toasts.append(text))
+    net.configure_features(offline=True)
+    dlg = packsdialog.PacksDialog(lambda p: None)
+    try:
+        dlg.add(dlg.cards[0])
+        assert toasts and "Offline mode" in toasts[0]
+        assert dlg.cards[0].btn.text() == "Add to my board" and served.calls == []
+    finally:
+        dlg.done(0)
+
+
 def test_switched_off_nothing_is_fetched(served):
     data = make_pack()
     p, = packs.parse([entry(data)])

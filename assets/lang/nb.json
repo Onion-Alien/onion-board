@@ -3441,5 +3441,6 @@
   "Names can be up to {n} characters, so it's “{name}”.": "Navn kan ha opptil {n} tegn, så det blir «{name}».",
   "They go in a category called “{name}”.": "De havner i en kategori som heter «{name}».",
   "Type a name first.": "Skriv inn et navn først.",
-  "✓ Renamed to “{new}”. Another sound has that name too.": "✓ Nytt navn: «{new}». En annen lyd heter også det."
+  "✓ Renamed to “{new}”. Another sound has that name too.": "✓ Nytt navn: «{new}». En annen lyd heter også det.",
+  "the pack's file is damaged, so it wasn't kept": "pakkens fil er skadet, så den ble ikke beholdt"
 }

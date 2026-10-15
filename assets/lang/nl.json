@@ -3441,5 +3441,6 @@
   "Names can be up to {n} characters, so it's “{name}”.": "Namen mogen tot {n} tekens zijn, dus het wordt “{name}”.",
   "They go in a category called “{name}”.": "Ze komen in een categorie met de naam “{name}”.",
   "Type a name first.": "Typ eerst een naam.",
-  "✓ Renamed to “{new}”. Another sound has that name too.": "✓ Hernoemd naar “{new}”. Een ander geluid heet ook zo."
+  "✓ Renamed to “{new}”. Another sound has that name too.": "✓ Hernoemd naar “{new}”. Een ander geluid heet ook zo.",
+  "the pack's file is damaged, so it wasn't kept": "het bestand van het pakket is beschadigd, dus het is niet bewaard"
 }

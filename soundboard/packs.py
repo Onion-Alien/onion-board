@@ -26,6 +26,7 @@ from dataclasses import dataclass, field
 from pathlib import Path
 
 from soundboard import backup, library, net, netlog, updates
+from soundboard.i18n import _
 
 log = logging.getLogger(__name__)
 
@@ -237,8 +238,18 @@ def download(pack: Pack, progress: Callable[[int, int], object] | None = None,
     if kept is not None and updates._sha256(kept) == pack.sha256:
         return kept   # added before and still kept: the same file, not fetched again
     netlog.cause(FEATURE, f"You pressed Add on the {netlog.quoted(pack.name)} pack")
-    return updates.fetch(pack.url, pack.sha256, pack.path, (updates.DOWNLOADS,), MAX_SIZE,
+    path = updates.fetch(pack.url, pack.sha256, pack.path, (updates.DOWNLOADS,), MAX_SIZE,
                          "pack", pack.size, progress, cancelled, feature=FEATURE)
+    try:   # its checksum matched a broken upload: kept, it would read "Add again"
+        with zipfile.ZipFile(path) as z:
+            bad = z.testzip()
+    except (OSError, zipfile.BadZipFile, EOFError) as e:
+        bad = str(e) or "unreadable"
+    if bad is not None:
+        log.warning("pack %s: the downloaded zip is damaged (%s)", pack.id, bad)
+        path.unlink(missing_ok=True)
+        raise updates.UpdateError(_("the pack's file is damaged, so it wasn't kept"))
+    return path
 
 
 @dataclass

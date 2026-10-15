@@ -3517,5 +3517,6 @@
   "Names can be up to {n} characters, so it's “{name}”.": "Назва може мати до {n} символів, тому вийшло «{name}».",
   "They go in a category called “{name}”.": "Вони потраплять у категорію «{name}».",
   "Type a name first.": "Спершу введіть назву.",
-  "✓ Renamed to “{new}”. Another sound has that name too.": "✓ Перейменовано на «{new}». Інший звук теж так називається."
+  "✓ Renamed to “{new}”. Another sound has that name too.": "✓ Перейменовано на «{new}». Інший звук теж так називається.",
+  "the pack's file is damaged, so it wasn't kept": "файл пакета пошкоджено, тому його не збережено"
 }

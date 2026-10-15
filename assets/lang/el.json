@@ -3441,5 +3441,6 @@
   "Names can be up to {n} characters, so it's “{name}”.": "Τα ονόματα έχουν έως {n} χαρακτήρες, οπότε είναι «{name}».",
   "They go in a category called “{name}”.": "Μπαίνουν σε κατηγορία με όνομα «{name}».",
   "Type a name first.": "Γράψτε πρώτα ένα όνομα.",
-  "✓ Renamed to “{new}”. Another sound has that name too.": "✓ Μετονομάστηκε σε \"{new}\". Και άλλος ήχος έχει αυτό το όνομα."
+  "✓ Renamed to “{new}”. Another sound has that name too.": "✓ Μετονομάστηκε σε \"{new}\". Και άλλος ήχος έχει αυτό το όνομα.",
+  "the pack's file is damaged, so it wasn't kept": "το αρχείο του πακέτου είναι κατεστραμμένο, οπότε δεν κρατήθηκε"
 }

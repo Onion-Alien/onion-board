@@ -3517,5 +3517,6 @@
   "Names can be up to {n} characters, so it's “{name}”.": "В названии может быть до {n} символов, поэтому получилось «{name}».",
   "They go in a category called “{name}”.": "Они попадут в категорию «{name}».",
   "Type a name first.": "Сначала введите название.",
-  "✓ Renamed to “{new}”. Another sound has that name too.": "✓ Переименовано в «{new}». Другой звук тоже так называется."
+  "✓ Renamed to “{new}”. Another sound has that name too.": "✓ Переименовано в «{new}». Другой звук тоже так называется.",
+  "the pack's file is damaged, so it wasn't kept": "файл пакета повреждён, поэтому он не сохранён"
 }

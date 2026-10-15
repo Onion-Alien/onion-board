@@ -3365,5 +3365,6 @@
   "Names can be up to {n} characters, so it's “{name}”.": "이름은 최대 {n}자라서 “{name}”(으)로 했어요.",
   "They go in a category called “{name}”.": "“{name}” 카테고리에 들어가요.",
   "Type a name first.": "먼저 이름을 입력하세요.",
-  "✓ Renamed to “{new}”. Another sound has that name too.": "✓ “{new}”(으)로 이름 변경함. 같은 이름의 다른 사운드도 있어요."
+  "✓ Renamed to “{new}”. Another sound has that name too.": "✓ “{new}”(으)로 이름 변경함. 같은 이름의 다른 사운드도 있어요.",
+  "the pack's file is damaged, so it wasn't kept": "팩 파일이 손상되어 보관하지 않았습니다"
 }

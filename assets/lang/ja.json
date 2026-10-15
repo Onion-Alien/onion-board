@@ -3365,5 +3365,6 @@
   "Names can be up to {n} characters, so it's “{name}”.": "名前は{n}文字までなので、「{name}」になりました。",
   "They go in a category called “{name}”.": "「{name}」というカテゴリに入ります。",
   "Type a name first.": "まず名前を入力してください。",
-  "✓ Renamed to “{new}”. Another sound has that name too.": "✓ 「{new}」に名前を変更しました。同じ名前のサウンドがほかにもあります。"
+  "✓ Renamed to “{new}”. Another sound has that name too.": "✓ 「{new}」に名前を変更しました。同じ名前のサウンドがほかにもあります。",
+  "the pack's file is damaged, so it wasn't kept": "パックのファイルが壊れているため、保存されませんでした"
 }

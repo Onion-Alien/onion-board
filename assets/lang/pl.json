@@ -3517,5 +3517,6 @@
   "Names can be up to {n} characters, so it's “{name}”.": "Nazwa może mieć do {n} znaków, więc jest „{name}”.",
   "They go in a category called “{name}”.": "Trafią do kategorii o nazwie „{name}”.",
   "Type a name first.": "Najpierw wpisz nazwę.",
-  "✓ Renamed to “{new}”. Another sound has that name too.": "✓ Zmieniono nazwę na „{new}”. Inny dźwięk też ma tę nazwę."
+  "✓ Renamed to “{new}”. Another sound has that name too.": "✓ Zmieniono nazwę na „{new}”. Inny dźwięk też ma tę nazwę.",
+  "the pack's file is damaged, so it wasn't kept": "plik pakietu jest uszkodzony, więc nie został zachowany"
 }

@@ -3441,5 +3441,6 @@
   "Names can be up to {n} characters, so it's “{name}”.": "Имената може да са до {n} знака, затова е „{name}“.",
   "They go in a category called “{name}”.": "Отиват в категория с име „{name}“.",
   "Type a name first.": "Първо въведете име.",
-  "✓ Renamed to “{new}”. Another sound has that name too.": "✓ Преименувано на „{new}“. Има и друг звук с това име."
+  "✓ Renamed to “{new}”. Another sound has that name too.": "✓ Преименувано на „{new}“. Има и друг звук с това име.",
+  "the pack's file is damaged, so it wasn't kept": "файлът на пакета е повреден, затова не е запазен"
 }
