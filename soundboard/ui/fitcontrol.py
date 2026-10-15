@@ -307,6 +307,8 @@ class FitControl(Controller):
         scroll bar too while it shows (and the odd pixels a row can't split). The
         category tabs start on the same line as the toolbar and the first card."""
         mw = self.mw
+        if getattr(mw, "grid", None) is None or getattr(mw, "_pad_scroll", None) is None:
+            return   # the category bar is built before the pads; they fit it once they exist
         m = mw.grid.grid.contentsMargins()
         sb = mw._pad_scroll.verticalScrollBar()
         right = (m.right() + mw.grid.slack()
