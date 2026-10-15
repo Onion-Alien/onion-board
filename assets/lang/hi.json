@@ -3476,5 +3476,7 @@
   "Pair a phone and settings": "फ़ोन जोड़ें और सेटिंग्स",
   "<br><span style='color:{status}'>Can't open {devices} (My headphones). Plugged in? It's tried again by itself.</span>": "<br><span style='color:{status}'>{devices} नहीं खुल रहा (मेरे हेडफोन)। प्लग इन है? यह अपने आप फिर से कोशिश करेगा।</span>",
   "<br><span style='color:{status}'>Can't open {devices} (My mic). Plugged in? It's tried again by itself.</span>": "<br><span style='color:{status}'>{devices} नहीं खुल रहा (मेरा माइक)। प्लग इन है? यह अपने आप फिर से कोशिश करेगा।</span>",
-  "On, waiting for Windows to allow it: answer its prompt.": "चालू, Windows की अनुमति का इंतज़ार: उसके संदेश का जवाब दें।"
+  "On, waiting for Windows to allow it: answer its prompt.": "चालू, Windows की अनुमति का इंतज़ार: उसके संदेश का जवाब दें।",
+  "Two mics have names like that one. Pick yours again (Setup tab → Devices).": "दो माइक के नाम मिलते-जुलते हैं। अपना माइक फिर से चुनें (सेटअप टैब → डिवाइस)।",
+  "Windows doesn't know that mic any more. Pick your mic again (Setup tab → Devices).": "विंडोज़ अब उस माइक को नहीं पहचानता। अपना माइक फिर से चुनें (सेटअप टैब → डिवाइस)।"
 }

@@ -770,16 +770,39 @@ def capture_endpoints() -> list[dict]:
 def endpoint_for(name: str | None) -> str | None:
     """The endpoint GUID of the active recording device called `name` (as PortAudio
     lists it: its name may be cut short, so a prefix match counts)."""
+    return mic_lookup(name)[0]
+
+
+def mic_lookup(name: str | None) -> tuple[str | None, str]:
+    """(endpoint GUID, "") of the active mic called `name`, else (None, why): "off"
+    Windows knows it but it's unplugged or switched off, "unsure" two active mics start
+    like that name (a cut-short one) and either could be it, "gone" Windows doesn't
+    know it at all (an old mic, or renamed: "Microphone (2- USB Audio)" in another port).
+    The why is counted (FAIL_KINDS no-mic-<why>), never the name."""
     if not name:
-        return None
-    return _match(name, [e for e in capture_endpoints() if e["active"]])
+        return None, "gone"
+    endpoints = capture_endpoints()
+    active = [e for e in endpoints if e["active"]]
+    guid = _match(name, active)
+    if guid is not None:
+        return guid, ""
+    if len(_near(name, active)) > 1:
+        return None, "unsure"
+    others = [e for e in endpoints if not e["active"]]
+    if any(e["name"] == name for e in others) or _near(name, others):
+        return None, "off"
+    return None, "gone"
+
+
+def _near(name: str, mics: list[dict]) -> list[dict]:
+    return [e for e in mics if e["name"].startswith(name) or name.startswith(e["name"])]
 
 
 def _match(name: str, active: list[dict]) -> str | None:
     for e in active:
         if e["name"] == name:
             return e["guid"]
-    near = [e for e in active if e["name"].startswith(name) or name.startswith(e["name"])]
+    near = _near(name, active)
     # one mic only: two that start the same (a cut-short name) could be the wrong one
     return near[0]["guid"] if len(near) == 1 else None
 
@@ -2278,6 +2301,16 @@ def no_mic() -> str:
     return _("That mic isn't plugged in (or Windows doesn't list it).")
 
 
+def mic_gone() -> str:
+    """What install returns when Windows doesn't know the picked mic at all."""
+    return _("Windows doesn't know that mic any more. Pick your mic again (Setup tab → Devices).")
+
+
+def mic_unsure() -> str:
+    """What install returns when two mics start like the picked mic's name."""
+    return _("Two mics have names like that one. Pick yours again (Setup tab → Devices).")
+
+
 def no_effect() -> str:
     """What install returns when this copy has no mic effect DLL bundled."""
     return _("This copy of Onion Board has no mic effect in it.")
@@ -2291,8 +2324,11 @@ def no_effect() -> str:
 # file missing or empty, 4 another copy at it, 5 its data folder couldn't be secured,
 # 6 Windows' audio wouldn't stop. Never the message, the mic or a path.
 FAIL_CODES = (1, 2, 3, 4, 5, 6)
+# no such mic, and why (mic_lookup): unplugged or off, two that look alike, unknown.
+# Plain "no-mic" is a set-up given no mic at all (and what 2.2 and older counted).
+NO_MIC_KINDS = ("no-mic-off", "no-mic-unsure", "no-mic-gone")
 FAIL_KINDS = ("unanswered", "no-start", "stuck", "silent", "no-helper", "no-mic",
-              "no-effect", *(f"code-{c}" for c in FAIL_CODES), "code-other")
+              *NO_MIC_KINDS, "no-effect", *(f"code-{c}" for c in FAIL_CODES), "code-other")
 _UNFINISHED_KIND = {NO_ANSWER: "unanswered", NOT_STARTED: "no-start", UNFINISHED: "stuck"}
 
 
@@ -2318,7 +2354,12 @@ def install(mic_name: str | None, *, clean: bool = False,
     """Put the effect on the mic called `mic_name` (Windows asks for admin, unless the
     mic helper does it, or `ask_windows` is False). None when done, else what went
     wrong, in plain words."""
-    return install_on(endpoint_for(mic_name), clean=clean, ask_windows=ask_windows)
+    guid = endpoint_for(mic_name)
+    if guid is None:
+        why = mic_lookup(mic_name)[1] or "gone"
+        text = {"off": no_mic, "unsure": mic_unsure}.get(why, mic_gone)()
+        return Failure(text, f"no-mic-{why}")
+    return install_on(guid, clean=clean, ask_windows=ask_windows)
 
 
 def install_on(guid: str | None, *, clean: bool = False,

@@ -3476,5 +3476,7 @@
   "Pair a phone and settings": "Telefon eşle ve ayarlar",
   "<br><span style='color:{status}'>Can't open {devices} (My headphones). Plugged in? It's tried again by itself.</span>": "<br><span style='color:{status}'>{devices} açılamıyor (Kulaklıklarım). Takılı mı? Kendiliğinden tekrar denenir.</span>",
   "<br><span style='color:{status}'>Can't open {devices} (My mic). Plugged in? It's tried again by itself.</span>": "<br><span style='color:{status}'>{devices} açılamıyor (Mikrofonum). Takılı mı? Kendiliğinden tekrar denenir.</span>",
-  "On, waiting for Windows to allow it: answer its prompt.": "Açık, Windows'un izin vermesi bekleniyor: sorusunu yanıtla."
+  "On, waiting for Windows to allow it: answer its prompt.": "Açık, Windows'un izin vermesi bekleniyor: sorusunu yanıtla.",
+  "Two mics have names like that one. Pick yours again (Setup tab → Devices).": "İki mikrofonun adı birbirine benziyor. Kendi mikrofonunu yeniden seç (Kurulum sekmesi → Cihazlar).",
+  "Windows doesn't know that mic any more. Pick your mic again (Setup tab → Devices).": "Windows bu mikrofonu artık tanımıyor. Mikrofonunu yeniden seç (Kurulum sekmesi → Cihazlar)."
 }

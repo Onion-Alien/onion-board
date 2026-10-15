@@ -3552,5 +3552,7 @@
   "Pair a phone and settings": "Asociază un telefon și setări",
   "<br><span style='color:{status}'>Can't open {devices} (My headphones). Plugged in? It's tried again by itself.</span>": "<br><span style='color:{status}'>Nu se poate deschide {devices} (Căștile mele). E conectat? Se reîncearcă singur.</span>",
   "<br><span style='color:{status}'>Can't open {devices} (My mic). Plugged in? It's tried again by itself.</span>": "<br><span style='color:{status}'>Nu se poate deschide {devices} (Microfonul meu). E conectat? Se reîncearcă singur.</span>",
-  "On, waiting for Windows to allow it: answer its prompt.": "Pornit, așteaptă ca Windows să-l permită: răspunde la întrebarea lui."
+  "On, waiting for Windows to allow it: answer its prompt.": "Pornit, așteaptă ca Windows să-l permită: răspunde la întrebarea lui.",
+  "Two mics have names like that one. Pick yours again (Setup tab → Devices).": "Două microfoane au nume asemănătoare. Alege-l din nou pe al tău (fila Configurare → Dispozitive).",
+  "Windows doesn't know that mic any more. Pick your mic again (Setup tab → Devices).": "Windows nu mai recunoaște acest microfon. Alege din nou microfonul (fila Configurare → Dispozitive)."
 }

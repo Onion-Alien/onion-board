@@ -3476,5 +3476,7 @@
   "Pair a phone and settings": "Vincular un celular y ajustes",
   "<br><span style='color:{status}'>Can't open {devices} (My headphones). Plugged in? It's tried again by itself.</span>": "<br><span style='color:{status}'>No se puede abrir {devices} (Mis audífonos). ¿Está conectado? Se vuelve a intentar solo.</span>",
   "<br><span style='color:{status}'>Can't open {devices} (My mic). Plugged in? It's tried again by itself.</span>": "<br><span style='color:{status}'>No se puede abrir {devices} (Mi micrófono). ¿Está conectado? Se vuelve a intentar solo.</span>",
-  "On, waiting for Windows to allow it: answer its prompt.": "Encendido, esperando a que Windows lo permita: responde su aviso."
+  "On, waiting for Windows to allow it: answer its prompt.": "Encendido, esperando a que Windows lo permita: responde su aviso.",
+  "Two mics have names like that one. Pick yours again (Setup tab → Devices).": "Hay dos micrófonos con nombres parecidos. Vuelve a elegir el tuyo (pestaña Configurar → Dispositivos).",
+  "Windows doesn't know that mic any more. Pick your mic again (Setup tab → Devices).": "Windows ya no reconoce ese micrófono. Vuelve a elegir tu micrófono (pestaña Configurar → Dispositivos)."
 }

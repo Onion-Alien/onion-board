@@ -3637,3 +3637,25 @@ def test_effect_lifecycle_audit(tmp_path, case):
     r = subprocess.run([str(FUZZ_HOST), str(FUZZ_DLL), str(tmp_path), "--audit", case],
                        capture_output=True, text=True, timeout=30)
     assert r.returncode == 0, r.stdout + r.stderr
+
+
+@pytest.mark.parametrize("picked,why", [
+    ("Microphone (USB Audio Device)", "off"),        # Windows knows it: unplugged / off
+    ("Microphone (USB Audio", "unsure"),             # two active mics start like that
+    ("Microphone (2- Old Webcam)", "gone"),          # Windows doesn't know it
+    ("", "gone")])
+def test_no_such_mic_says_why_as_a_fixed_word(monkeypatch, picked, why):
+    mics = [{"guid": "{a}", "name": "Microphone (USB Audio Device)", "active": False},
+            {"guid": "{b}", "name": "Microphone (USB Audio Device 2)", "active": True},
+            {"guid": "{c}", "name": "Microphone (USB Audio Device 3)", "active": True}]
+    monkeypatch.setattr(dm, "capture_endpoints", lambda: mics)
+    monkeypatch.setattr(dm, "_elevated", lambda *a, **k: pytest.fail("no mic: no step"))
+    err = dm.install(picked)
+    assert dm.fail_kind(err) == f"no-mic-{why}" and f"no-mic-{why}" in dm.FAIL_KINDS
+    assert why not in err and (not picked or picked not in err)   # counted, never shown
+    assert err == {"off": dm.no_mic(), "unsure": dm.mic_unsure()}.get(why, dm.mic_gone())
+
+
+def test_every_fail_word_is_counted():
+    from soundboard import usage
+    assert set(dm.FAIL_KINDS) == set(usage.MIC_FAILS)

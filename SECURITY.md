@@ -221,7 +221,9 @@ account or anything else about you.
     `mic-effect-fix-failed`, `mic-effect-no-load`, `mic-effect-taken-off`), and why a
     set-up or fix failed as one word (`mic-effect-failed-<why>` /
     `mic-effect-fix-failed-<why>`: `unanswered` (the admin prompt left open),
-    `no-start`, `stuck`, `silent`, `no-helper`, `no-mic`, `no-effect`, the admin step's
+    `no-start`, `stuck`, `silent`, `no-helper`, `no-mic`, `no-mic-off` (unplugged or
+    switched off), `no-mic-unsure` (two mics with names alike), `no-mic-gone` (not known
+    to Windows), `no-effect`, the admin step's
     exit code as `code-1` to `code-6`, or `code-other`): never the message or the mic's
     name; Settings' *Audio recovery* (`used/recovery-repair`, `recovery-remove`… and
     `recovery-failed`);

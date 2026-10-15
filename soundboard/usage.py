@@ -123,10 +123,11 @@ VOICE_TABS = ("fx", "ai", "speak", "addons")
 RECOVERY = ("install", "repair", "update", "reinstall", "cleanup", "remove")
 # why a mic effect set-up failed, a click's or the repair-by-itself's (directmic.FAIL_KINDS:
 # the admin prompt unanswered, the step not starting or stopping half-way, a silent mic,
-# the helper not answering, no mic, no effect, the admin step's exit code 1-6 or another)
+# the helper not answering, no mic (and why: unplugged or off, two alike, unknown to
+# Windows), no effect, the admin step's exit code 1-6 or another)
 MIC_FAILS = ("unanswered", "no-start", "stuck", "silent", "no-helper", "no-mic",
-             "no-effect", "code-1", "code-2", "code-3", "code-4", "code-5", "code-6",
-             "code-other")
+             "no-mic-off", "no-mic-unsure", "no-mic-gone", "no-effect", "code-1", "code-2",
+             "code-3", "code-4", "code-5", "code-6", "code-other")
 # a pad's "On press" modes other than the default (library.MODES, without "restart")
 PRESS_MODES = ("overlap", "toggle", "solo", "queue")
 # the add-ons with install steps (their module.json id); any other is "other"

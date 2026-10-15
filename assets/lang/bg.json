@@ -3476,5 +3476,7 @@
   "Pair a phone and settings": "Свържи телефон и настройки",
   "<br><span style='color:{status}'>Can't open {devices} (My headphones). Plugged in? It's tried again by itself.</span>": "<br><span style='color:{status}'>Не мога да отворя {devices} (Моите слушалки). Включено ли е? Опитва се пак само.</span>",
   "<br><span style='color:{status}'>Can't open {devices} (My mic). Plugged in? It's tried again by itself.</span>": "<br><span style='color:{status}'>Не мога да отворя {devices} (Моят микрофон). Включено ли е? Опитва се пак само.</span>",
-  "On, waiting for Windows to allow it: answer its prompt.": "Включено, чака Windows да го разреши: отговори на прозореца му."
+  "On, waiting for Windows to allow it: answer its prompt.": "Включено, чака Windows да го разреши: отговори на прозореца му.",
+  "Two mics have names like that one. Pick yours again (Setup tab → Devices).": "Два микрофона имат подобни имена. Избери своя отново (раздел Свързване → Устройства).",
+  "Windows doesn't know that mic any more. Pick your mic again (Setup tab → Devices).": "Windows вече не познава този микрофон. Избери микрофона си отново (раздел Свързване → Устройства)."
 }

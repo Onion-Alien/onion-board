@@ -3400,5 +3400,7 @@
   "Pair a phone and settings": "配對手機和設定",
   "<br><span style='color:{status}'>Can't open {devices} (My headphones). Plugged in? It's tried again by itself.</span>": "<br><span style='color:{status}'>無法開啟 {devices}（「我的耳機」）。有插上嗎？程式會自動再試。</span>",
   "<br><span style='color:{status}'>Can't open {devices} (My mic). Plugged in? It's tried again by itself.</span>": "<br><span style='color:{status}'>無法開啟 {devices}（「我的麥克風」）。有插上嗎？程式會自動再試。</span>",
-  "On, waiting for Windows to allow it: answer its prompt.": "已開啟，正在等 Windows 允許：請回應它的提示。"
+  "On, waiting for Windows to allow it: answer its prompt.": "已開啟，正在等 Windows 允許：請回應它的提示。",
+  "Two mics have names like that one. Pick yours again (Setup tab → Devices).": "有兩個麥克風的名稱很像。請重新選擇你的麥克風（設置分頁 → 裝置）。",
+  "Windows doesn't know that mic any more. Pick your mic again (Setup tab → Devices).": "Windows 已經不認得這個麥克風了。請重新選擇你的麥克風（設置分頁 → 裝置）。"
 }
