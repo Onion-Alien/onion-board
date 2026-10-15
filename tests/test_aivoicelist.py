@@ -9,7 +9,6 @@ import pytest
 from soundboard import modules
 from soundboard.speech import aipreview
 from soundboard.speech import aivoicelist as avl
-from tests.conftest import process_events
 
 ROOT = Path(__file__).resolve().parent.parent
 ADDON = ROOT / "modules" / "ai-voices"
@@ -171,7 +170,7 @@ def test_render_without_the_addons_python_says_so(tmp_path):
         aipreview.render(info, avl.BUILT_IN[0], np.zeros(10, np.float32))
 
 
-# ---------------------------------------------------------------- the window
+# ---------------------------------------------------------------- the card
 
 class FakePreviewer:
     def __init__(self):
@@ -186,36 +185,6 @@ class FakePreviewer:
 
     def done(self, *a):
         pass
-
-
-def test_all_voices_window_lists_every_voice_with_its_words(qapp, app_dir):
-    from soundboard.ui.aivoicebrowser import AiVoiceBrowser
-    store = avl.Store()
-    store.put(mine("Robo"))
-    voices = avl.BUILT_IN + store.voices
-    prev = FakePreviewer()
-    d = AiVoiceBrowser(voices, "pixie", store, prev, True)
-    picked = []
-    d.picked.connect(picked.append)
-    try:
-        assert len(d.cards) == len(voices)
-        bear = d.card("bear")
-        assert bear.tags.text() == "Man · Very deep" and "deep" in bear.about.text()
-        assert not d.card("pixie").b_use.isEnabled()
-        bear.b_hear.click()
-        assert prev.heard == ["bear"]
-        bear.b_use.click()
-        assert picked == ["bear"] and not bear.b_use.isEnabled()
-        assert d.card("pixie").b_use.isEnabled()
-        robo = d.cards[-1]
-        assert robo.b_edit is not None and bear.b_edit is None
-        robo.b_delete.click()
-        assert store.voices == [] and d.undo_bar.active()
-        assert d.b_bin.text() == "Recently deleted (1)"
-        d.undo_bar.undo()
-        assert [v["name"] for v in store.voices] == ["Robo"]
-    finally:
-        d.deleteLater()
 
 
 def test_make_your_own_voice_from_two_others(qapp, app_dir):
@@ -243,9 +212,10 @@ def test_make_your_own_voice_from_two_others(qapp, app_dir):
         d.deleteLater()
 
 
-def test_card_shows_who_the_voice_is_and_opens_the_window(qapp, app_dir, monkeypatch):
+def ready_panel(app_dir, monkeypatch, settings=None):
+    """The AI voices card with the add-on installed (yours: you can make voices)."""
+    from soundboard import aiaddon
     from soundboard.speech.aivoice import AiVoiceController
-    from soundboard.ui import aivoicebrowser
     from soundboard.ui.aivoicepanel import AiVoicePanel
     from soundboard.voicefx import VoiceChain
     folder = addon_copy(app_dir, all_speakers())
@@ -253,21 +223,88 @@ def test_card_shows_who_the_voice_is_and_opens_the_window(qapp, app_dir, monkeyp
     (folder / ".venv" / "Scripts" / "python.exe").write_bytes(b"")
     for f in ("stream.onnx", "speaker.onnx"):
         (folder / "model" / f).write_bytes(b"x")
+    monkeypatch.setattr(aiaddon, "removable", lambda m, base=None: True)
     (info,) = modules.discover([app_dir])
-    p = AiVoicePanel(AiVoiceController(VoiceChain(), lambda e: None), {"voice": "titan"},
+    p = AiVoicePanel(AiVoiceController(VoiceChain(), lambda e: None), settings or {},
                      [info])
-    opened = []
-    monkeypatch.setattr(aivoicebrowser.AiVoiceBrowser, "exec",
-                        lambda self: opened.append(self) or 0)
+    p.previewer = FakePreviewer()
+    return p
+
+
+def test_card_shows_every_voice_as_a_card_under_its_kind(qapp, app_dir, monkeypatch):
+    p = ready_panel(app_dir, monkeypatch, {"voice": "titan"})
+    shown = lambda: [vid for vid, b in p._tile.items() if not b.isHidden()]  # noqa: E731
     try:
-        assert p.cb_voice.count() == len(avl.BUILT_IN)
+        assert sorted(p._tile) == sorted(v["id"] for v in avl.BUILT_IN)
+        assert p._tile["titan"].isChecked() and p.picked_name.text() == "Titan"
         assert p.lbl_about.text().startswith("Monster · Rumbling. Deeper than")
-        p.b_all.click()
-        process_events(qapp, lambda: bool(opened))
-        assert len(opened[0].cards) == len(avl.BUILT_IN)
+        assert p._tile["bear"].toolTip().startswith("Man · Very deep. ")
+        assert p.b_edit.isHidden() and p.b_delete.isHidden()     # not one of yours
+        p._cat_btns["women"].click()
+        g = p._tile_grid
+        order = sorted(shown(), key=lambda vid: (g.getItemPosition(g.indexOf(p._tile[vid]))))
+        assert order == ["ivy", "sage", "nova", "pixie"]          # lowest first
+        p._cat_btns["mine"].click()
+        assert shown() == [] and not p.no_mine.isHidden()
+        saved = []
+        p.changed.connect(saved.append)
+        p._cat_btns[""].click()
+        p._tile["bear"].click()                                   # picks it for Start
+        assert saved[-1]["voice"] == "bear" and p.current_voice() == "bear"
+        assert p.picked_name.text() == "Bear" and not p._tile["titan"].isChecked()
+        p.b_hear.click()
+        assert p.previewer.heard == ["bear"]
     finally:
-        for d in opened:
-            d.deleteLater()
+        p.shutdown()
+        p.deleteLater()
+
+
+def test_card_favorites_are_kept_in_the_order_starred(qapp, app_dir, monkeypatch):
+    from soundboard.speech import aivoice
+    p = ready_panel(app_dir, monkeypatch)
+    shown = lambda: {vid for vid, b in p._tile.items() if not b.isHidden()}  # noqa: E731
+    saved = []
+    p.changed.connect(saved.append)
+    try:
+        p._cat_btns["favs"].click()
+        assert shown() == set() and not p.no_favs.isHidden()
+        p._tile["nova"].star.click()
+        p._tile["bear"].star.click()
+        assert shown() == {"nova", "bear"} and p.no_favs.isHidden()
+        assert saved[-1]["favorites"] == ["nova", "bear"]
+        assert aivoice.clean_settings(saved[-1])["favorites"] == ["nova", "bear"]
+        p._tile["nova"].star.click()
+        assert shown() == {"bear"} and saved[-1]["favorites"] == ["bear"]
+        assert aivoice.clean_settings({"favorites": ["a", 3, "a", ""]})["favorites"] == ["a"]
+        (app_dir / "again").mkdir()
+        again = ready_panel(app_dir / "again", monkeypatch, saved[-1])
+        assert again.favorites == ["bear"] and again._tile["bear"].star.isChecked()
+        again.shutdown()
+        again.deleteLater()
+    finally:
+        p.shutdown()
+        p.deleteLater()
+
+
+def test_card_makes_changes_and_deletes_your_own_voices(qapp, app_dir, monkeypatch):
+    from soundboard.ui import aivoicebrowser
+    p = ready_panel(app_dir, monkeypatch, {"voice": "nova"})
+    made = mine("Robo", tags=["Man"], pitch_hz=100)
+    monkeypatch.setattr(aivoicebrowser.AiVoiceEditor, "exec", lambda self: 1)
+    monkeypatch.setattr(aivoicebrowser.AiVoiceEditor, "result_voice", lambda self: made)
+    try:
+        p.b_make.click()                                # made, and picked
+        assert made["id"] in p._tile and p.current_voice() == made["id"]
+        assert not p.b_edit.isHidden() and not p.b_delete.isHidden()
+        p._cat_btns["mine"].click()
+        assert [vid for vid, b in p._tile.items() if not b.isHidden()] == [made["id"]]
+        p.b_delete.click()                              # gone: back to the first voice
+        assert made["id"] not in p._tile and avl.Store().voices == []
+        assert p.current_voice() == p.voices[0]["id"] and p.undo_bar.active()
+        assert p.b_bin.text() == "Recently deleted (1)" and not p.b_bin.isHidden()
+        p.undo_bar.undo()
+        assert made["id"] in p._tile and [v["name"] for v in avl.Store().voices] == ["Robo"]
+    finally:
         p.shutdown()
         p.deleteLater()
 
@@ -281,26 +318,3 @@ def test_voices_sort_into_who_and_how_high():
     assert avl.pitch_band({"pitch_hz": "junk"}) == "low"
 
 
-def test_all_voices_window_filters_by_who_and_pitch(qapp, app_dir):
-    from soundboard.ui.aivoicebrowser import AiVoiceBrowser
-    store = avl.Store()
-    store.put(mine("Robo", tags=["Man"], pitch_hz=100))
-    d = AiVoiceBrowser(avl.BUILT_IN + store.voices, "nova", store, FakePreviewer(), True,
-                       refresh=lambda: avl.BUILT_IN + store.voices)
-    try:
-        assert len(d.cards) == len(avl.BUILT_IN) + 1
-        assert d.cards[-1].voice["name"] == "Robo"             # your own: last, on its own
-        assert d.who_buttons["men"].text().endswith(" 6")      # Robo counts as a man too
-        d.who_buttons["women"].click()
-        assert [c.voice["id"] for c in d.cards] == ["ivy", "sage", "nova", "pixie"]  # low first
-        d.band_buttons["high"].click()
-        assert [c.voice["id"] for c in d.cards] == ["nova", "pixie"]
-        d.who_buttons["men"].click()
-        assert d.cards == []                                    # no high men: says so
-        d.who_buttons["mine"].click()
-        d.band_buttons["any"].click()
-        assert [c.voice["name"] for c in d.cards] == ["Robo"]
-        d.cards[0].b_delete.click()                             # the last of your own
-        assert d.who_buttons["mine"].isHidden() and len(d.cards) == len(avl.BUILT_IN)
-    finally:
-        d.deleteLater()
