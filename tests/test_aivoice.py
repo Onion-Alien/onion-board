@@ -355,10 +355,11 @@ def test_card_lists_the_voices_once_installed(qapp, tmp_path):
     p.changed.connect(saved.append)
     try:
         assert not p.ready_box.isHidden() and p.b_get.isHidden()
-        assert p.cb_voice.count() >= 3 and p.cb_voice.currentData() == "pixie"
-        p.cb_voice.setCurrentIndex(0)
+        assert len(p._tile) >= 3 and p._tile["pixie"].isChecked()
+        first = p.voices[0]["id"]
+        p._tile[first].click()
         process_events(qapp, lambda: bool(saved))
-        assert saved[-1]["voice"] == p.cb_voice.itemData(0)
+        assert saved[-1]["voice"] == first
     finally:
         p.shutdown()
         p.deleteLater()

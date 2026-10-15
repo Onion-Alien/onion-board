@@ -1,27 +1,24 @@
-"""The AI voices card's "All voices" window and the "Make your own voice" editor.
+"""The AI voices card's Hear it samples and its "Make your own voice" editor.
 
-Every voice as a card: who it sounds like, how high it sits, a few lines about it,
-Hear it (a short sample in your headphones, soundboard.speech.aipreview) and Use.
-Your own voices (soundboard.speech.aivoicelist.Store) are blends of the others:
-edit, delete (Undo, then Recently deleted), or make another.
+Hear it plays a short sample in your headphones (soundboard.speech.aipreview). Your
+own voices (soundboard.speech.aivoicelist.Store) are blends of the others; the card
+(ui/aivoicepanel.py) lists them with the rest, to change, delete or make another.
 """
 from __future__ import annotations
 
-import html
 import threading
 from collections.abc import Callable
 
 from PySide6.QtCore import Qt, Signal
-from PySide6.QtWidgets import (QButtonGroup, QComboBox, QDialog, QDialogButtonBox, QFrame,
-                               QGridLayout, QHBoxLayout, QLabel, QLineEdit, QPushButton,
-                               QScrollArea, QSlider, QVBoxLayout, QWidget)
+from PySide6.QtWidgets import (QComboBox, QDialog, QDialogButtonBox, QGridLayout, QHBoxLayout,
+                               QLabel, QLineEdit, QPushButton, QSlider, QVBoxLayout, QWidget)
 
 from soundboard import errors
-from soundboard.i18n import _, ngettext
+from soundboard.i18n import _
 from soundboard.speech import aipreview
 from soundboard.speech import aivoicelist as avl
 from soundboard.ui import busy, fit, icons
-from soundboard.ui.panel import Flow, UndoBar, hint_label, section_label, steady_number
+from soundboard.ui.panel import hint_label, steady_number
 from soundboard.wheelguard import no_wheel
 
 HEAR, MAKING = _("Hear it"), _("Making a sample…")
@@ -72,286 +69,12 @@ class Previewer:
             on_error(_("⚠ Couldn't play a sample: {error}", error=err))
 
 
-def _hear_button() -> QPushButton:
+def hear_button() -> QPushButton:
     b = QPushButton(HEAR)
     icons.set_icon(b, "headphones")
     b.setToolTip(_("A short sample in this voice, in your headphones only (nobody else "
                    "hears it). The first one takes a few seconds."))
     return b
-
-
-class VoiceCard(QFrame):
-    def __init__(self, voice: dict, current: bool, can_hear: bool):
-        super().__init__()
-        self.voice = voice
-        self.setObjectName("card")
-        v = QVBoxLayout(self)
-        v.setContentsMargins(14, 12, 14, 12)
-        v.setSpacing(6)
-        top = QHBoxLayout()
-        top.setSpacing(10)
-        emoji = QLabel(voice.get("emoji") or "🎙️")
-        emoji.setStyleSheet("font-size: 22pt; background: transparent;")
-        top.addWidget(emoji, 0, Qt.AlignmentFlag.AlignTop)
-        names = QVBoxLayout()
-        names.setSpacing(0)
-        self.name = QLabel(voice["name"])
-        self.name.setTextFormat(Qt.TextFormat.PlainText)
-        self.name.setStyleSheet("font-weight: 600; font-size: 11pt; background: transparent;")
-        names.addWidget(self.name)
-        self.tags = QLabel(avl.tag_line(voice))
-        self.tags.setObjectName("muted")
-        self.tags.setTextFormat(Qt.TextFormat.PlainText)
-        names.addWidget(self.tags)
-        top.addLayout(names, 1)
-        v.addLayout(top)
-        self.about = hint_label(voice.get("about") or voice.get("description") or "")
-        self.about.setTextFormat(Qt.TextFormat.PlainText)
-        v.addWidget(self.about, 1)
-        row = QHBoxLayout()
-        row.setSpacing(6)
-        self.b_use = QPushButton(_("In use") if current else _("Use this voice"))
-        self.b_use.setEnabled(not current)
-        if not current:
-            self.b_use.setObjectName("primary")
-        row.addWidget(self.b_use)
-        self.b_hear = _hear_button()
-        self.b_hear.setVisible(can_hear)
-        row.addWidget(self.b_hear)
-        row.addStretch(1)
-        self.b_edit = self.b_delete = None
-        if avl.is_mine(voice):
-            self.b_edit = QPushButton()
-            icons.set_icon(self.b_edit, "edit")
-            self.b_edit.setToolTip(_("Change this voice"))
-            row.addWidget(self.b_edit)
-            self.b_delete = QPushButton()
-            icons.set_icon(self.b_delete, "trash", "danger_text")
-            self.b_delete.setToolTip(_("Delete this voice (you can bring it back)"))
-            row.addWidget(self.b_delete)
-        v.addLayout(row)
-
-
-class AiVoiceBrowser(QDialog):
-    """`voices`: what the add-on has now (built-in and yours). Emits `picked(id)` for
-    Use, `edited()` when your own voices changed (the card re-syncs the add-on)."""
-    picked = Signal(str)
-    edited = Signal()
-    _sampled = Signal(object, object, str)
-
-    def __init__(self, voices: list[dict], current: str, store: avl.Store,
-                 previewer: Previewer, can_make: bool, parent=None,
-                 refresh: Callable[[], list[dict]] | None = None):
-        super().__init__(parent)
-        fit.watch(self)
-        self.setWindowTitle(_("AI voices"))
-        self.voices, self.current, self.store = voices, current, store
-        self.previewer, self.can_make = previewer, can_make
-        self.refresh_voices = refresh
-        self._sampled.connect(lambda b, d, e: self.previewer.done(b, d, e, self._say))
-        lay = QVBoxLayout(self)
-        lay.setSpacing(10)
-        lay.addWidget(hint_label(_(
-            "Every voice, who it sounds like and how high it sits. Hear it plays a short "
-            "sample in your headphones only. Make your own by blending them.")))
-        # filters: who it sounds like, and how high
-        self._who, self._band = "all", "any"
-        self.who_names = {"men": _("Men"), "women": _("Women"),
-                          "other": _("In between & fun"), "mine": _("Your own")}
-        self.who_buttons: dict[str, QPushButton] = {}
-        self.band_buttons: dict[str, QPushButton] = {}
-        lay.addLayout(self._chips(
-            _("Who"), [("all", _("All"))] + [(k, self.who_names[k]) for k in (*avl.WHO, "mine")],
-            self.who_buttons, self._pick_who))
-        lay.addLayout(self._chips(
-            _("Pitch"), [("any", _("Any")), ("low", _("Low")), ("mid", _("Middle")),
-                         ("high", _("High"))],
-            self.band_buttons, self._pick_band))
-        self.status = QLabel("")
-        self.status.setObjectName("muted")
-        self.status.setWordWrap(True)
-        self.status.hide()
-        lay.addWidget(self.status)
-        self.scroll_area = QScrollArea()
-        self.scroll_area.setWidgetResizable(True)
-        self.scroll_area.setFrameShape(QFrame.Shape.NoFrame)
-        self.scroll_area.setMinimumSize(680, 420)
-        lay.addWidget(self.scroll_area, 1)
-        self.undo_bar = UndoBar(_("Bring the voice back"))
-        lay.addWidget(self.undo_bar)
-        row = QHBoxLayout()
-        self.b_make = QPushButton(_("Make your own voice"))
-        icons.set_icon(self.b_make, "plus")
-        self.b_make.setEnabled(can_make)
-        self.b_make.setToolTip(
-            _("Blend two voices and set how deep and how high it is") if can_make else
-            _("Only for AI voices installed with the Get AI voices button"))
-        self.b_make.clicked.connect(lambda: self.edit(None))
-        row.addWidget(self.b_make)
-        self.b_bin = QPushButton("")
-        self.b_bin.setObjectName("fold")
-        icons.set_icon(self.b_bin, "trash", "muted", "text", size=12)
-        self.b_bin.clicked.connect(self.show_deleted)
-        row.addWidget(self.b_bin)
-        row.addStretch(1)
-        box = QDialogButtonBox(QDialogButtonBox.StandardButton.Close)
-        box.rejected.connect(self.reject)
-        row.addWidget(box)
-        lay.addLayout(row)
-        self.fill()
-
-    def _say(self, text: str):
-        self.status.setText(text)
-        self.status.setVisible(bool(text))
-
-    def _chips(self, label: str, items, buttons: dict, pick) -> QHBoxLayout:
-        """A row of filter chips, the first one picked."""
-        row = QHBoxLayout()
-        row.setSpacing(10)
-        head = QLabel(label)
-        head.setObjectName("muted")
-        head.setMinimumWidth(40)
-        row.addWidget(head, 0, Qt.AlignmentFlag.AlignVCenter)
-        flow = Flow(gap=6)
-        group = QButtonGroup(self)
-        for key, text in items:
-            b = QPushButton(text.replace("&", "&&"))   # a plain &, not a shortcut key
-            b.setObjectName("small")
-            b.setCheckable(True)
-            b.setChecked(key == items[0][0])
-            b.setProperty("label", text.replace("&", "&&"))
-            b.clicked.connect(lambda __=False, key=key: pick(key))
-            group.addButton(b)
-            buttons[key] = b
-            flow.addWidget(b)
-        row.addLayout(flow, 1)
-        return row
-
-    def _pick_who(self, key: str):
-        self._who = key
-        self.fill()
-
-    def _pick_band(self, key: str):
-        self._band = key
-        self.fill()
-
-    def _shown(self, vo: dict) -> bool:
-        w, b = self._who, self._band
-        return ((w == "all" or (avl.is_mine(vo) if w == "mine" else avl.who(vo) == w))
-                and (b == "any" or avl.pitch_band(vo) == b))
-
-    def _sections(self) -> list[tuple[str, list[dict]]]:
-        """The voices to show, lowest first: under a heading per kind when showing
-        everyone (your own last), else one list."""
-        shown = sorted((v for v in self.voices if self._shown(v)),
-                       key=lambda v: v.get("pitch_hz", 0))
-        if self._who != "all":
-            return [("", shown)] if shown else []
-        out = [(self.who_names[k], [v for v in shown if not avl.is_mine(v) and avl.who(v) == k])
-               for k in avl.WHO]
-        out.append((self.who_names["mine"], [v for v in shown if avl.is_mine(v)]))
-        return [(t, vs) for t, vs in out if vs]
-
-    def _count_chips(self):
-        mine = any(avl.is_mine(v) for v in self.voices)
-        self.who_buttons["mine"].setVisible(mine)
-        if self._who == "mine" and not mine:      # deleted the last one
-            self._who = "all"
-            self.who_buttons["all"].setChecked(True)
-        for key, b in self.who_buttons.items():   # how many each one has
-            n = sum(1 for v in self.voices if key == "all" or (
-                avl.is_mine(v) if key == "mine" else avl.who(v) == key))
-            b.setText(f"{b.property('label')}  {n}")
-
-    def fill(self):
-        self.cards: list[VoiceCard] = []
-        self._count_chips()
-        body = QWidget()
-        grid = QGridLayout(body)
-        grid.setContentsMargins(0, 0, 6, 0)
-        grid.setSpacing(10)
-        can_hear = self.previewer.available()
-        r = 0
-        sections = self._sections()
-        for title, voices in sections:
-            if title:
-                grid.addWidget(section_label(title), r, 0, 1, 2)
-                r += 1
-            for i, vo in enumerate(voices):
-                c = VoiceCard(vo, vo["id"] == self.current, can_hear)
-                c.b_use.clicked.connect(lambda __=False, vid=vo["id"]: self.use(vid))
-                c.b_hear.clicked.connect(lambda __=False, c=c: self.previewer.hear(
-                    c.b_hear, c.voice, self._sampled, self._say))
-                if c.b_edit is not None and c.b_delete is not None:   # (made together)
-                    c.b_edit.clicked.connect(lambda __=False, vid=vo["id"]: self.edit(vid))
-                    c.b_delete.clicked.connect(lambda __=False, vid=vo["id"]: self.delete(vid))
-                grid.addWidget(c, r + i // 2, i % 2)
-                self.cards.append(c)
-            r += (len(voices) + 1) // 2
-        if not sections:
-            grid.addWidget(hint_label(_("No voices like that. Try another pitch.")), r, 0, 1, 2)
-            r += 1
-        grid.setColumnStretch(0, 1)
-        grid.setColumnStretch(1, 1)
-        grid.setRowStretch(r, 1)
-        self.scroll_area.setWidget(body)
-        n = len(self.store.deleted)
-        self.b_bin.setText(_("Recently deleted ({n})", n=n))
-        self.b_bin.setVisible(n > 0)
-
-    def card(self, vid: str) -> VoiceCard | None:
-        return next((c for c in self.cards if c.voice["id"] == vid), None)
-
-    def use(self, vid: str):
-        self.current = vid
-        self.picked.emit(vid)
-        for c in self.cards:
-            on = c.voice["id"] == vid
-            c.b_use.setText(_("In use") if on else _("Use this voice"))
-            c.b_use.setEnabled(not on)
-
-    def _changed(self):
-        self.edited.emit()
-        if self.refresh_voices is not None:
-            self.voices = self.refresh_voices()
-        self.fill()
-
-    # ------------------------------------------------------------ your own voices
-    def edit(self, vid: str | None):
-        if vid is None and self.store.full():
-            busy.toast(self, html.escape(ngettext(
-                "⚠ You have {n} voice of your own already: delete it to make another.",
-                "⚠ You have {n} voices of your own already: delete one to make another.",
-                avl.MAX_VOICES).removeprefix("⚠ ")), "warn")
-            return
-        built = [v for v in self.voices if not avl.is_mine(v)]
-        d = AiVoiceEditor(built, self.store.get(vid) if vid else None, self.previewer, self)
-        if d.exec() == QDialog.DialogCode.Accepted and self.store.put(d.result_voice()) is not None:
-            self._changed()
-            if vid is None:
-                self.use(d.result_voice()["id"])
-
-    def delete(self, vid: str):
-        item = self.store.remove(vid)
-        if item is None:
-            return
-        self._changed()
-        self.undo_bar.show_for(_("Deleted “{name}”", name=item.name),
-                               lambda: self._undo(item.id))
-
-    def _undo(self, item_id: str):
-        it = self.store.take(item_id)
-        if it is not None and self.store.restore(it) is not None:
-            self._changed()
-
-    def show_deleted(self):
-        from soundboard.ui.deleted import DeletedDialog
-        self.undo_bar.finish()
-
-        def back(item) -> bool:
-            return self.store.restore(item) is not None
-        DeletedDialog(avl.KIND, "voices", back, self, source=self.store).exec()
-        self._changed()
 
 
 class AiVoiceEditor(QDialog):
@@ -457,7 +180,7 @@ class AiVoiceEditor(QDialog):
         g.setColumnStretch(1, 1)
         lay.addLayout(g)
         hrow = QHBoxLayout()
-        self.b_hear = _hear_button()
+        self.b_hear = hear_button()
         self.b_hear.setVisible(previewer.available())
         self.b_hear.clicked.connect(lambda: self.previewer.hear(
             self.b_hear, self.result_voice(), self._sampled, self._say))

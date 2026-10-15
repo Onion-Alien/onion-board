@@ -3286,11 +3286,12 @@ def test_windows_taking_it_off_is_fixed_by_itself(window, monkeypatch):  # noqa:
     assert "Your sounds go into your mic" in w.mic_line.text()
 
 
-def test_a_mic_sending_only_silence_offers_the_repair(window, monkeypatch):  # noqa: F811
+def test_a_mic_sending_only_silence_still_sends_the_sounds(window, monkeypatch):  # noqa: F811
     """Set up and working, but the mic itself has sent nothing but exact zeros for a
-    while (Discord and Windows' own mic test hear nothing): the card says so with its
-    Repair (which restarts the audio and listens again), once a toast too. Gone at the
-    first real sound: a headset's own mute does the same, and talking ends it."""
+    while (switched off, muted, or a headset with its boom mic pulled out): the effect
+    still sends the sounds on that silence, so the card stays green and says others
+    hear only the sounds, with no Repair button and no warning toast. Back to the plain
+    card at the first real sound."""
     w = window
     _routes(w, monkeypatch, "ready")
     w.cfg.mic_device = "My mic"
@@ -3302,20 +3303,18 @@ def test_a_mic_sending_only_silence_offers_the_repair(window, monkeypatch):  # n
     said = _said(w, monkeypatch)
     w.statusctl._update_flow()
     assert w.mic_line.text() == "Your sounds go into your mic"
+    assert w.mic_reason.isHidden()
     silent[0] = w.MIC_SILENT_S + 1
     assert w.micctl._direct_health() != w._direct_shown   # the once-a-second check redraws it
     w.statusctl._update_flow()
-    assert w.mic_line.text() == "Is your headset on?"
-    assert "Repair" in w.btn_install.text() and not w.btn_install.isHidden()
-    assert "headset is off" in w.mic_reason.text() and "muted" in w.mic_reason.text()
-    assert [t for t, k in said if "No sound" in t]
-    w.statusctl._update_flow()
+    assert w.mic_line.text() == "Your sounds go into your mic"
+    assert w.mic_pill.text() == "Connected"
+    assert w.btn_install.isHidden()
+    assert not w.mic_reason.isHidden() and "only your sounds" in w.mic_reason.text()
+    assert not [t for t, k in said if k == "warn"]
     silent[0] = 0.0
     w.statusctl._update_flow()
-    assert w.mic_line.text() == "Your sounds go into your mic"
-    silent[0] = w.MIC_SILENT_S + 1
-    w.statusctl._update_flow()
-    assert len([t for t, k in said if "No sound" in t]) == 1   # the toast: once a run
+    assert w.mic_reason.isHidden()
 
 
 @pytest.mark.parametrize("state", ["ready", "other", "missing"])

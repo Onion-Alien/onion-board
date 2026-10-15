@@ -48,3 +48,14 @@ def test_meter_colours_are_independent(qapp):
     second.set_level(10 ** (-10 / 20))
     assert first._bar()[1] == RED
     assert second._bar()[1] == GREEN
+
+
+def test_meter_tops_out_at_its_ceiling(qapp):
+    """What others hear is held at the send limiter's ceiling: that's full and red."""
+    from soundboard.sendfx import CEILING_DB
+    meter = Meter()
+    meter.top_db = CEILING_DB
+    meter.set_level(10 ** (CEILING_DB / 20))
+    assert meter._bar() == (pytest.approx(1.0), RED)
+    meter.set_level(10 ** ((CEILING_DB - 9) / 20))
+    assert meter._bar()[1] == YELLOW
