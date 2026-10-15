@@ -719,7 +719,9 @@ class RadioTab(QWidget):
         self.engine.feed_radio(x)
         self.recorder.push(x)
 
-    def _on_state(self, _st: str):
+    def _on_state(self, st: str):
+        if st == "stopped":        # what the engine still had queued doesn't play out
+            self.engine.stop_radio()
         self._flash_until = 0.0    # what's playing matters more than an older notice
         self._refresh_info()
         self._update_buttons()

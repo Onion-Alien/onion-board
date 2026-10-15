@@ -95,6 +95,8 @@ class LiveFx:
         self._fx: dict[str, tuple] = {}      # key -> one effect per channel
         self._last: dict[str, float] = {}    # key -> its last amount (for the fade-out)
         self._gone: dict[str, int] = {}      # key -> samples into its fade-out
+        self._flush: int | None = None       # samples into a flush() fade, or None
+        self.gen = 0                         # the engine's flush count it last saw
 
     @property
     def idle(self) -> bool:
@@ -151,9 +153,28 @@ class LiveFx:
         return self._run(self._pair("reverb", Reverb, {
             "size": 0.5 + 0.35 * a, "tone": 6000, "mix": a}), y)
 
+    def flush(self):
+        """Stop all: the echo and reverb tails fade out over FADE samples, then every
+        effect starts again from silence. Knobs stay where they are. Audio thread."""
+        if self._fx:
+            self._flush = 0
+
     def process(self, x: np.ndarray, fx: dict) -> np.ndarray:
         g = {q.key: float(fx.get(q.key, 0.0)) for q in PARAMS}
-        y = self.shelf.process(x, (g["bass"], g["treble"], g["muffle"]))
-        y = self._knob("crunch", g["crunch"], y, self._crunch)
+        dry = self.shelf.process(x, (g["bass"], g["treble"], g["muffle"]))
+        y = self._knob("crunch", g["crunch"], dry, self._crunch)
         y = self._knob("echo", g["echo"], y, self._echo)
-        return self._knob("reverb", g["reverb"], y, self._reverb)
+        y = self._knob("reverb", g["reverb"], y, self._reverb)
+        if self._flush is None:
+            return y
+        pos, n = self._flush, len(y)
+        ramp = np.clip(1 - (pos + np.arange(1, n + 1, dtype=F32)) / F32(FADE), 0, 1)
+        y = (dry + (y - dry) * ramp[:, None]).astype(F32, copy=False)
+        if pos + n >= FADE:
+            self._fx.clear()
+            self._last.clear()
+            self._gone.clear()
+            self._flush = None
+        else:
+            self._flush = pos + n
+        return y

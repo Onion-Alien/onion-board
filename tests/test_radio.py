@@ -1005,6 +1005,9 @@ class FakeEngine:
     def feed_radio(self, x):
         self.chunks.append(x)
 
+    def stop_radio(self):
+        pass
+
 
 class FakeMeter(QWidget):
     def set_level(self, _level):
@@ -1676,3 +1679,22 @@ def test_search_spammed_with_the_same_words_asks_once(qapp, server, tmp_path):
     assert sum("name=rock" in h for h in server.hits) == 1
     d.search("rock")                # answered: asked again
     assert process_events(qapp, lambda: len(res) == 2)
+
+
+def test_stopping_the_tab_silences_what_the_engine_had_buffered(qapp, tab, server):
+    eng = Engine()
+    eng.mon_stream = FakeStream()
+    tab.engine = eng
+    s = tab._stations["uuid-0"]
+    s.url = server.base + "/stream.wav"
+    tab.play(s)
+    assert process_events(qapp, lambda: eng.ring_rmon.count > SR // 5, timeout=15)
+    out = np.zeros((480, 2), np.float32)
+    eng._mon(out, 480)
+    assert np.abs(out).max() > 0.05                 # playing
+    tab.stop()
+    peaks = []
+    for _ in range(12):                              # 10 ms to fade, then 0.1 s
+        eng._mon(out, 480)
+        peaks.append(float(np.abs(out).max()))
+    assert max(peaks[2:]) < 1e-4, peaks
