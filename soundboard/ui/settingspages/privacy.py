@@ -282,6 +282,7 @@ class PrivacyPage(Page):
         ff_col.addWidget(self.dlg.btn_ffmpeg, 0, Qt.AlignmentFlag.AlignLeft)   # buttons sit left
         cv.addWidget(ff_box)
         self.dlg.btn_ffmpeg.clicked.connect(self._get_ffmpeg)
+        self._ffmpeg_sync()   # filled now: Updates can open before Data & quality is built
         self._helper_rows(cv)
         return card
 
