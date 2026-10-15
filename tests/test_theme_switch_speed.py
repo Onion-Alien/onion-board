@@ -82,6 +82,39 @@ def test_app_wide_filters_sit_out_the_restyle(settings, main_window):  # noqa: F
     assert seen   # installed again
 
 
+def test_an_app_filter_hears_only_the_events_it_lists(qapp):
+    """The app's own filters share one: Qt called into Python once an event for each of
+    them (~300 events on every step of a window resize, each through all three). One
+    lists the types it reads (EVENTS) and gets just those; one whose owner closed is
+    dropped, as Qt drops its own."""
+    from PySide6.QtCore import Qt
+    from PySide6.QtGui import QKeyEvent
+    from PySide6.QtWidgets import QWidget
+
+    def key():
+        return QKeyEvent(QEvent.Type.KeyPress, Qt.Key.Key_A, Qt.KeyboardModifier.NoModifier)
+    owner = QWidget()
+    seen = []
+
+    class Keys(QObject):
+        EVENTS = (QEvent.Type.KeyPress,)
+
+        def eventFilter(self, obj, ev):
+            seen.append(ev.type())
+            return False
+
+    keys = Keys(owner)
+    theme.app_filter(qapp, keys)
+    target = QWidget()
+    QApplication.sendEvent(target, QEvent(QEvent.Type.User))
+    QApplication.sendEvent(target, key())
+    assert seen == [QEvent.Type.KeyPress]
+    owner.deleteLater()
+    QApplication.sendPostedEvents(None, QEvent.Type.DeferredDelete)
+    QApplication.sendEvent(target, key())   # no call on the gone one
+    assert seen == [QEvent.Type.KeyPress]
+
+
 def test_the_drag_veil_sits_out_the_restyle_too(settings, main_window):  # noqa: F811
     """The drop veil watched every event app-wide outside app_filter(): 49,000 Python
     calls in each switch on a full board, each one waiting on the audio threads."""

@@ -40,6 +40,7 @@ class SpaceKey(QObject):
     """Installed on the application. `action()` gives what Space does right now (a
     callable, or None to leave Space alone: another tab, a dialog in front);
     `window` is the main window, so other windows keep their Space."""
+    EVENTS = (QEvent.Type.FocusIn, QEvent.Type.KeyPress)   # all it reads (theme.app_filter)
 
     def __init__(self, window: QWidget, action: Callable[[], Callable[[], None] | None]):
         super().__init__(window)

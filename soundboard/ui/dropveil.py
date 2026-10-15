@@ -33,6 +33,9 @@ def label_for(paths: list[str]) -> str | None:
 
 
 class DropVeil(QWidget):
+    EVENTS = (QEvent.Type.DragEnter, QEvent.Type.DragMove, QEvent.Type.DragLeave,
+              QEvent.Type.Drop)   # all its eventFilter reads (theme.app_filter)
+
     def __init__(self, window: QWidget):
         super().__init__(window)
         self.setAttribute(Qt.WidgetAttribute.WA_TransparentForMouseEvents)
