@@ -1132,7 +1132,7 @@ class VoiceFxPanel(QWidget):
             text, ok = QInputDialog.getText(self._parent(), title,
                                             _("Paste the code someone sent you:"),
                                             QLineEdit.EchoMode.Normal, "")
-            if not ok or not text.strip():
+            if not ok:   # OK on an empty box gets read_code's "There's no code there."
                 return ""
         try:
             name, effects, notes = savedvoices.read_code(text)
