@@ -3200,7 +3200,6 @@
   "Equalizer and volume": "Equalizador e volume",
   "Live: click to mute": "Em direto: clique para silenciar",
   "Muted: click to go live": "Silenciado: clique para voltar ao direto",
-  "No sound": "Sem som",
   "Before update": "Antes de atualizar",
   "One is saved every time you reset something or update the app (the last {max_points} are kept). Restoring puts back your settings, hotkeys and sounds as they were. Sounds you've added since are kept.": "É guardado um sempre que repões alguma coisa ou atualizas a app (os últimos {max_points} são mantidos). Restaurar repõe as tuas definições, atalhos e sons como estavam. Os sons que adicionaste desde então são mantidos.",
   "Stops every sound, the radio and every program, and turns the voices off": "Para todos os sons, o rádio e todos os programas, e desliga as vozes",
@@ -3434,10 +3433,7 @@
   "YouTube downloads still work, but with fewer formats.": "As transferências do YouTube continuam a funcionar, mas com menos formatos.",
   "Is your headset on?": "Os teus auscultadores estão ligados?",
   "Is your headset plugged in?": "Os teus auscultadores estão ligados ao PC?",
-  "No sound from your mic. Is your headset on?": "Nenhum som do teu microfone. Os teus auscultadores estão ligados?",
   "Unplugged": "Desligado",
-  "Windows can't find <b>{mic}</b> right now. Plug it in, or switch it on if it's wireless. This goes away by itself.": "O Windows não encontra <b>{mic}</b> agora. Liga-o ao PC, ou liga-o se for sem fios. Isto desaparece sozinho.",
-  "Your headset is off or its mic is muted. Turn it on or unmute it. Still nothing? Click <b>Repair</b>.": "Os teus auscultadores estão desligados ou com o microfone silenciado. Liga-os ou tira o silêncio. Continua sem nada? Clica em <b>Reparar</b>.",
   "The download was cut off before the end. Try again.": "A transferência foi interrompida antes do fim. Tente novamente.",
   "You can change the proxy in Settings > Connection.": "Pode mudar o proxy em Definições > Ligação.",
   "the pack's file is damaged, so it wasn't kept": "o ficheiro do pacote está danificado, por isso não foi guardado",
@@ -3458,5 +3454,7 @@
   "Scary": "Assustadoras",
   "Add “{name}” to Favorites": "Adicionar “{name}” aos Favoritos",
   "No favorites yet. Click the star in a voice's corner to keep it here.": "Ainda não há favoritos. Clica na estrela no canto de uma voz para a guardar aqui.",
-  "Remove “{name}” from Favorites": "Tirar “{name}” dos Favoritos"
+  "Remove “{name}” from Favorites": "Tirar “{name}” dos Favoritos",
+  "Windows can't find <b>{mic}</b> right now. Plug it in, or switch it on if it's wireless. No mic at all? Use the <b>virtual cable</b> below: it works without one.": "O Windows não encontra <b>{mic}</b> agora. Liga-o ao PC, ou liga-o se for sem fios. Não tens microfone nenhum? Usa o <b>cabo virtual</b> abaixo: funciona sem microfone.",
+  "Your mic sends no sound right now (switched off, muted or no mic plugged in), so others hear only your sounds. Want them to hear you too? Turn it on or unmute it.": "O teu microfone não está a enviar som agora (desligado, sem som ou nenhum microfone ligado), por isso os outros só ouvem os teus sons. Queres que te ouçam também? Liga-o ou tira-o do silêncio."
 }

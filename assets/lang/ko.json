@@ -3127,7 +3127,6 @@
   "Equalizer and volume": "평형 장치와 볼륨",
   "Live: click to mute": "라이브: 클릭하면 음소거",
   "Muted: click to go live": "음소거됨: 클릭하면 라이브",
-  "No sound": "소리 없음",
   "Before update": "업데이트 전",
   "One is saved every time you reset something or update the app (the last {max_points} are kept). Restoring puts back your settings, hotkeys and sounds as they were. Sounds you've added since are kept.": "무언가를 재설정하거나 앱을 업데이트할 때마다 하나가 저장됩니다(마지막 {max_points} 개는 유지됩니다). 복원하면 설정, 단축키 및 사운드가 원래대로 돌아갑니다. 이후 추가한 사운드는 유지됩니다.",
   "Stops every sound, the radio and every program, and turns the voices off": "모든 사운드, 라디오, 모든 프로그램을 멈추고 음성을 끕니다",
@@ -3358,10 +3357,7 @@
   "YouTube downloads still work, but with fewer formats.": "YouTube 다운로드는 여전히 되지만 형식이 더 적어요.",
   "Is your headset on?": "헤드셋이 켜져 있나요?",
   "Is your headset plugged in?": "헤드셋이 연결되어 있나요?",
-  "No sound from your mic. Is your headset on?": "마이크에서 소리가 나지 않습니다. 헤드셋이 켜져 있나요?",
   "Unplugged": "연결 안 됨",
-  "Windows can't find <b>{mic}</b> right now. Plug it in, or switch it on if it's wireless. This goes away by itself.": "지금 Windows가 <b>{mic}</b>을(를) 찾지 못합니다. 연결하거나, 무선이라면 켜세요. 이 표시는 저절로 사라집니다.",
-  "Your headset is off or its mic is muted. Turn it on or unmute it. Still nothing? Click <b>Repair</b>.": "헤드셋이 꺼져 있거나 마이크가 음소거되어 있습니다. 켜거나 음소거를 해제하세요. 그래도 안 되나요? <b>복구</b>를 클릭하세요.",
   "The download was cut off before the end. Try again.": "다운로드가 끝나기 전에 끊겼습니다. 다시 시도하세요.",
   "You can change the proxy in Settings > Connection.": "프록시는 설정 > 연결에서 바꿀 수 있습니다.",
   "the pack's file is damaged, so it wasn't kept": "팩 파일이 손상되어 보관하지 않았습니다",
@@ -3382,5 +3378,7 @@
   "Scary": "무서운",
   "Add “{name}” to Favorites": "“{name}” 즐겨찾기에 추가",
   "No favorites yet. Click the star in a voice's corner to keep it here.": "아직 즐겨찾기가 없어요. 목소리 모서리의 별을 클릭하면 여기에 모여요.",
-  "Remove “{name}” from Favorites": "“{name}” 즐겨찾기에서 빼기"
+  "Remove “{name}” from Favorites": "“{name}” 즐겨찾기에서 빼기",
+  "Windows can't find <b>{mic}</b> right now. Plug it in, or switch it on if it's wireless. No mic at all? Use the <b>virtual cable</b> below: it works without one.": "지금 Windows가 <b>{mic}</b>을(를) 찾지 못합니다. 연결하거나, 무선이라면 켜세요. 마이크가 아예 없나요? 아래의 <b>가상 케이블</b>을 쓰세요. 마이크 없이도 됩니다.",
+  "Your mic sends no sound right now (switched off, muted or no mic plugged in), so others hear only your sounds. Want them to hear you too? Turn it on or unmute it.": "지금 마이크에서 소리가 오지 않습니다(꺼짐, 음소거 또는 마이크 연결 안 됨). 그래서 다른 사람들에게는 사운드만 들립니다. 내 목소리도 들리게 하려면 마이크를 켜거나 음소거를 해제하세요."
 }

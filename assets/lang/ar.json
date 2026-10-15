@@ -3492,7 +3492,6 @@
   "Equalizer and volume": "المعادل ومستوى الصوت",
   "Live: click to mute": "مباشر: انقر لكتم الصوت",
   "Muted: click to go live": "مكتوم: انقر للعودة مباشرًا",
-  "No sound": "لا صوت",
   "Before update": "قبل التحديث",
   "One is saved every time you reset something or update the app (the last {max_points} are kept). Restoring puts back your settings, hotkeys and sounds as they were. Sounds you've added since are kept.": "يتم حفظ واحدة في كل مرة تقوم فيها بإعادة تعيين شيء ما أو تحديث التطبيق (يتم الاحتفاظ بآخر {max_points}). تؤدي عملية الاستعادة إلى إعادة الإعدادات ومفاتيح التشغيل السريع والأصوات كما كانت. يتم الاحتفاظ بالأصوات التي أضفتها منذ ذلك الحين.",
   "Stops every sound, the radio and every program, and turns the voices off": "يوقف كل صوت والراديو وكل برنامج، ويطفئ الأصوات",
@@ -3738,10 +3737,7 @@
   "YouTube downloads still work, but with fewer formats.": "تنزيلات YouTube ما زالت تعمل، لكن بصيغ أقل.",
   "Is your headset on?": "هل السماعة مشغّلة؟",
   "Is your headset plugged in?": "هل السماعة موصولة؟",
-  "No sound from your mic. Is your headset on?": "لا صوت من الميكروفون. هل السماعة مشغّلة؟",
   "Unplugged": "غير موصول",
-  "Windows can't find <b>{mic}</b> right now. Plug it in, or switch it on if it's wireless. This goes away by itself.": "لا يجد Windows <b>{mic}</b> الآن. صِلها، أو شغّلها إن كانت لاسلكية. سيختفي هذا من تلقاء نفسه.",
-  "Your headset is off or its mic is muted. Turn it on or unmute it. Still nothing? Click <b>Repair</b>.": "السماعة مطفأة أو ميكروفونها مكتوم. شغّلها أو ألغِ الكتم. ما زال لا شيء؟ انقر <b>إصلاح</b>.",
   "The download was cut off before the end. Try again.": "انقطع التنزيل قبل اكتماله. حاول مرة أخرى.",
   "You can change the proxy in Settings > Connection.": "يمكنك تغيير الوكيل في الإعدادات > الاتصال.",
   "the pack's file is damaged, so it wasn't kept": "ملف الحزمة تالف، لذا لم يتم الاحتفاظ به",
@@ -3762,5 +3758,7 @@
   "Scary": "مخيف",
   "Add “{name}” to Favorites": "أضف «{name}» إلى المفضلة",
   "No favorites yet. Click the star in a voice's corner to keep it here.": "لا توجد مفضلة بعد. انقر النجمة في زاوية الصوت لتبقيه هنا.",
-  "Remove “{name}” from Favorites": "أزل «{name}» من المفضلة"
+  "Remove “{name}” from Favorites": "أزل «{name}» من المفضلة",
+  "Windows can't find <b>{mic}</b> right now. Plug it in, or switch it on if it's wireless. No mic at all? Use the <b>virtual cable</b> below: it works without one.": "لا يجد Windows <b>{mic}</b> الآن. صِلها، أو شغّلها إن كانت لاسلكية. لا يوجد ميكروفون أصلًا؟ استخدم <b>الكابل الافتراضي</b> بالأسفل: يعمل بدون ميكروفون.",
+  "Your mic sends no sound right now (switched off, muted or no mic plugged in), so others hear only your sounds. Want them to hear you too? Turn it on or unmute it.": "ميكروفونك لا يرسل أي صوت الآن (مطفأ، أو مكتوم، أو لا يوجد ميكروفون موصول)، لذا يسمع الآخرون أصواتك فقط. تريدهم أن يسمعوك أيضًا؟ شغّله أو ألغِ كتمه."
 }

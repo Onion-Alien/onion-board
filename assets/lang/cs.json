@@ -3273,7 +3273,6 @@
   "Equalizer and volume": "Ekvalizér a hlasitost",
   "Live: click to mute": "Živě: kliknutím ztlumíte",
   "Muted: click to go live": "Ztlumeno: kliknutím přejdete živě",
-  "No sound": "Bez zvuku",
   "Before update": "Před aktualizací",
   "One is saved every time you reset something or update the app (the last {max_points} are kept). Restoring puts back your settings, hotkeys and sounds as they were. Sounds you've added since are kept.": "Ukládá se pokaždé, když něco resetuješ nebo aktualizuješ aplikaci (posledních {max_points} se uchovává). Obnovení vrátí tvoje nastavení, zkratky a zvuky, jak byly. Zvuky přidané od té doby zůstanou.",
   "Stops every sound, the radio and every program, and turns the voices off": "Zastaví všechny zvuky, rádio a všechny programy a vypne hlasy",
@@ -3510,10 +3509,7 @@
   "YouTube downloads still work, but with fewer formats.": "Stahování z YouTube pořád funguje, ale s méně formáty.",
   "Is your headset on?": "Jsou sluchátka zapnutá?",
   "Is your headset plugged in?": "Jsou sluchátka připojená?",
-  "No sound from your mic. Is your headset on?": "Z mikrofonu nejde žádný zvuk. Jsou sluchátka zapnutá?",
   "Unplugged": "Odpojený",
-  "Windows can't find <b>{mic}</b> right now. Plug it in, or switch it on if it's wireless. This goes away by itself.": "Windows teď nenacházejí <b>{mic}</b>. Připoj je, nebo je zapni, jestli jsou bezdrátová. Tohle zmizí samo.",
-  "Your headset is off or its mic is muted. Turn it on or unmute it. Still nothing? Click <b>Repair</b>.": "Sluchátka jsou vypnutá nebo mají ztlumený mikrofon. Zapni je nebo zruš ztlumení. Pořád nic? Klikni na <b>Opravit</b>.",
   "The download was cut off before the end. Try again.": "Stahování se přerušilo před koncem. Zkuste to znovu.",
   "You can change the proxy in Settings > Connection.": "Proxy můžete změnit v Nastavení > Připojení.",
   "the pack's file is damaged, so it wasn't kept": "soubor balíčku je poškozený, proto nebyl ponechán",
@@ -3534,5 +3530,7 @@
   "Scary": "Strašidelné",
   "Add “{name}” to Favorites": "Přidat „{name}“ do Oblíbených",
   "No favorites yet. Click the star in a voice's corner to keep it here.": "Zatím žádné oblíbené. Klikni na hvězdičku v rohu hlasu a bude tady.",
-  "Remove “{name}” from Favorites": "Odebrat „{name}“ z Oblíbených"
+  "Remove “{name}” from Favorites": "Odebrat „{name}“ z Oblíbených",
+  "Windows can't find <b>{mic}</b> right now. Plug it in, or switch it on if it's wireless. No mic at all? Use the <b>virtual cable</b> below: it works without one.": "Windows teď nenacházejí <b>{mic}</b>. Připoj je, nebo je zapni, jestli jsou bezdrátová. Nemáš mikrofon vůbec? Použij <b>virtuální kabel</b> níže: funguje i bez něj.",
+  "Your mic sends no sound right now (switched off, muted or no mic plugged in), so others hear only your sounds. Want them to hear you too? Turn it on or unmute it.": "Tvůj mikrofon teď neposílá žádný zvuk (vypnutý, ztlumený nebo žádný mikrofon nepřipojený), takže ostatní slyší jen tvoje zvuky. Chceš, aby slyšeli i tebe? Zapni ho nebo zruš ztlumení."
 }

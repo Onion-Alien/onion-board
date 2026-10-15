@@ -3200,7 +3200,6 @@
   "Equalizer and volume": "Equalizzatore e volume",
   "Live: click to mute": "In diretta: clic per disattivare l'audio",
   "Muted: click to go live": "Muto: clic per tornare in diretta",
-  "No sound": "Nessun suono",
   "Before update": "Prima dell'aggiornamento",
   "One is saved every time you reset something or update the app (the last {max_points} are kept). Restoring puts back your settings, hotkeys and sounds as they were. Sounds you've added since are kept.": "Ne viene salvato uno ogni volta che reimposti qualcosa o aggiorni l'app (vengono mantenuti gli ultimi {max_points}). Il ripristino ripristina le impostazioni, i tasti di scelta rapida e i suoni com'erano. I suoni che hai aggiunto da allora vengono mantenuti.",
   "Stops every sound, the radio and every program, and turns the voices off": "Ferma ogni suono, la radio e ogni programma, e spegne le voci",
@@ -3434,10 +3433,7 @@
   "YouTube downloads still work, but with fewer formats.": "I download da YouTube funzionano comunque, ma con meno formati.",
   "Is your headset on?": "Le cuffie sono accese?",
   "Is your headset plugged in?": "Le cuffie sono collegate?",
-  "No sound from your mic. Is your headset on?": "Nessun suono dal tuo microfono. Le cuffie sono accese?",
   "Unplugged": "Scollegato",
-  "Windows can't find <b>{mic}</b> right now. Plug it in, or switch it on if it's wireless. This goes away by itself.": "Windows non trova <b>{mic}</b> in questo momento. Collegale, o accendile se sono wireless. Questo sparisce da solo.",
-  "Your headset is off or its mic is muted. Turn it on or unmute it. Still nothing? Click <b>Repair</b>.": "Le cuffie sono spente o il loro microfono è disattivato. Accendile o riattiva il microfono. Ancora niente? Fai clic su <b>Ripara</b>.",
   "The download was cut off before the end. Try again.": "Il download si è interrotto prima della fine. Riprova.",
   "You can change the proxy in Settings > Connection.": "Puoi cambiare il proxy in Impostazioni > Connessione.",
   "the pack's file is damaged, so it wasn't kept": "il file del pacchetto è danneggiato, quindi non è stato tenuto",
@@ -3458,5 +3454,7 @@
   "Scary": "Spaventose",
   "Add “{name}” to Favorites": "Aggiungi “{name}” ai Preferiti",
   "No favorites yet. Click the star in a voice's corner to keep it here.": "Ancora nessun preferito. Clicca la stella nell'angolo di una voce per tenerla qui.",
-  "Remove “{name}” from Favorites": "Togli “{name}” dai Preferiti"
+  "Remove “{name}” from Favorites": "Togli “{name}” dai Preferiti",
+  "Windows can't find <b>{mic}</b> right now. Plug it in, or switch it on if it's wireless. No mic at all? Use the <b>virtual cable</b> below: it works without one.": "Windows non trova <b>{mic}</b> in questo momento. Collegale, o accendile se sono wireless. Non hai proprio un microfono? Usa il <b>cavo virtuale</b> qui sotto: funziona anche senza.",
+  "Your mic sends no sound right now (switched off, muted or no mic plugged in), so others hear only your sounds. Want them to hear you too? Turn it on or unmute it.": "Il tuo microfono ora non manda nessun suono (spento, disattivato o nessun microfono collegato), quindi gli altri sentono solo i tuoi suoni. Vuoi che sentano anche te? Accendilo o riattivalo."
 }

@@ -3273,7 +3273,6 @@
   "Equalizer and volume": "Egalizator și volum",
   "Live: click to mute": "Live: clic pentru a dezactiva sunetul",
   "Muted: click to go live": "Fără sunet: clic pentru a reveni live",
-  "No sound": "Fără sunet",
   "Before update": "Înainte de actualizare",
   "One is saved every time you reset something or update the app (the last {max_points} are kept). Restoring puts back your settings, hotkeys and sounds as they were. Sounds you've added since are kept.": "Se salvează unul de fiecare dată când resetezi ceva sau actualizezi aplicația (se păstrează ultimele {max_points}). Restaurarea îți pune la loc setările, tastele rapide și sunetele cum erau. Sunetele adăugate între timp sunt păstrate.",
   "Stops every sound, the radio and every program, and turns the voices off": "Oprește toate sunetele, radioul și toate programele și oprește vocile",
@@ -3510,10 +3509,7 @@
   "YouTube downloads still work, but with fewer formats.": "Descărcările de pe YouTube merg în continuare, dar cu mai puține formate.",
   "Is your headset on?": "Căștile sunt pornite?",
   "Is your headset plugged in?": "Căștile sunt conectate?",
-  "No sound from your mic. Is your headset on?": "Niciun sunet de la microfon. Căștile sunt pornite?",
   "Unplugged": "Deconectat",
-  "Windows can't find <b>{mic}</b> right now. Plug it in, or switch it on if it's wireless. This goes away by itself.": "Windows nu găsește <b>{mic}</b> acum. Conectează-le sau pornește-le, dacă sunt wireless. Asta dispare singur.",
-  "Your headset is off or its mic is muted. Turn it on or unmute it. Still nothing? Click <b>Repair</b>.": "Căștile sunt oprite sau au microfonul pe mut. Pornește-le sau scoate-l de pe mut. Tot nimic? Dă clic pe <b>Repară</b>.",
   "The download was cut off before the end. Try again.": "Descărcarea s-a întrerupt înainte de final. Încearcă din nou.",
   "You can change the proxy in Settings > Connection.": "Poți schimba proxy-ul din Setări > Conexiune.",
   "the pack's file is damaged, so it wasn't kept": "fișierul pachetului este deteriorat, așa că nu a fost păstrat",
@@ -3534,5 +3530,7 @@
   "Scary": "Înfricoșătoare",
   "Add “{name}” to Favorites": "Adaugă „{name}” la Favorite",
   "No favorites yet. Click the star in a voice's corner to keep it here.": "Încă nu ai favorite. Dă clic pe steaua din colțul unei voci ca s-o ții aici.",
-  "Remove “{name}” from Favorites": "Scoate „{name}” din Favorite"
+  "Remove “{name}” from Favorites": "Scoate „{name}” din Favorite",
+  "Windows can't find <b>{mic}</b> right now. Plug it in, or switch it on if it's wireless. No mic at all? Use the <b>virtual cable</b> below: it works without one.": "Windows nu găsește <b>{mic}</b> acum. Conectează-le sau pornește-le, dacă sunt wireless. N-ai deloc microfon? Folosește <b>cablul virtual</b> de mai jos: merge și fără.",
+  "Your mic sends no sound right now (switched off, muted or no mic plugged in), so others hear only your sounds. Want them to hear you too? Turn it on or unmute it.": "Microfonul tău nu trimite niciun sunet acum (oprit, pe mut sau niciun microfon conectat), așa că ceilalți aud doar sunetele tale. Vrei să te audă și pe tine? Pornește-l sau scoate-l de pe mut."
 }
