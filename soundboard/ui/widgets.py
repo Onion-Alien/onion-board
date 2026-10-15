@@ -291,38 +291,45 @@ class NameAndSeek(QWidget):
         self.name, self.seek, self.max_name = name, seek, max_name
         name.setParent(self)
         seek.setParent(self)
+        # both hints are kept in plain ints, set by relayout(): Qt asks for them on
+        # every layout pass and while the window closes, when the name or slider may be
+        # gone already, and an exception in here can free another override
+        # (overridepin.py)
+        self._min_w = self.SEEK_MIN
+        self._h = max(name.sizeHint().height(), seek.sizeHint().height())
         name.installEventFilter(self)
 
     def sizeHint(self):
-        return QSize(self.max_name + 120, max(self.name.height(), self.seek.sizeHint().height()))
+        return QSize(self.max_name + 120, self._h)
 
     def minimumSizeHint(self):
         # honest, so the window's fitter hides other things (or the name) before the
-        # slider gets too short to aim at or the name is cut: the name as it is now (up
-        # to max_name). Not announced on a new name (no relayout per pad press): the
-        # fitter measures it fresh on the next resize
-        # (asked while the window closes too: nothing here may raise, overridepin.py)
-        if not (qt_valid(self.name) and qt_valid(self.seek)):
-            return QSize(self.SEEK_MIN, 0)
-        name = 0 if self.name.isHidden() else self.GAP + min(
-            self.max_name, self.name.fontMetrics().horizontalAdvance(self.name.text()) + 4)
-        return QSize(self.SEEK_MIN + name, self.sizeHint().height())
+        # slider gets too short to aim at or the name is cut: the slider plus the name
+        # as it was at the last relayout (up to max_name)
+        return QSize(self._min_w, self._h)
 
     def relayout(self):
         h = self.height()
         fm = self.name.fontMetrics()
-        w = 0 if self.name.isHidden() else min(
-            self.max_name, fm.horizontalAdvance(self.name.text()) + 4,
-            max(0, self.width() - self.SEEK_MIN - self.GAP))
-        self.name.setGeometry(0, 0, w, h)
+        need = min(self.max_name, fm.horizontalAdvance(self.name.text()) + 4)
+        # not announced on a new name (no page relayout per pad press): the fitter
+        # reads it on the next resize
+        self._min_w = self.SEEK_MIN + (0 if self.name.isHidden() else self.GAP + need)
         sh = self.seek.sizeHint().height()
+        hint_h = max(self.name.sizeHint().height(), sh)
+        if hint_h != self._h:   # a new font: the bar's height changes, never per name
+            self._h = hint_h
+            self.updateGeometry()
+        w = 0 if self.name.isHidden() else min(
+            need, max(0, self.width() - self.SEEK_MIN - self.GAP))
+        self.name.setGeometry(0, 0, w, h)
         x = w + self.GAP if not self.name.isHidden() else 0
         self.seek.setGeometry(x, (h - sh) // 2, max(0, self.width() - x), sh)
 
     def eventFilter(self, obj, event):
         if obj is self.name and event.type() in (QEvent.Type.Show, QEvent.Type.Hide):
-            self.updateGeometry()   # the minimum has room for the name or not
             self.relayout()
+            self.updateGeometry()   # the minimum has room for the name or not
         return super().eventFilter(obj, event)
 
     def resizeEvent(self, e):
