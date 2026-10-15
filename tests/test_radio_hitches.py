@@ -338,11 +338,18 @@ def test_a_new_zoom_shows_all_at_once_never_tile_by_tile(qapp):
     m.show()
 
     def done():
-        m.grab()                               # (offscreen, repaint() may not paint)
-        end = time.monotonic() + 5
-        while m.busy() and time.monotonic() < end:
+        # a paint lines up the tiles and the one after it finds them all drawn; on a
+        # slow runner the queue can be empty between the two, so wait on the result
+        end = time.monotonic() + 10
+        while time.monotonic() < end:
+            m.grab()                           # (offscreen, repaint() may not paint)
+            while m.busy() and time.monotonic() < end:
+                qapp.processEvents()
+                time.sleep(0.0005)
+            if m._stable is not None and m._stable[0] == m._level():
+                break
             qapp.processEvents()
-            time.sleep(0.0005)
+            time.sleep(0.01)
         m.grab()
         assert m._stable is not None and m._stable[0] == m._level()
 
