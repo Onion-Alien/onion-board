@@ -3451,5 +3451,13 @@
   "{voice}, the computer voice. It's on: just talk.": "{voice}, компютърният глас. Включен е: просто говори.",
   "Once a day and after a failed download, gets a newer yt-dlp from PyPI, but only a version the app's makers approved that has been out for at least 3 days. Off by default.": "Веднъж на ден и след неуспешно изтегляне изтегля по-нов yt-dlp от PyPI, но само версия, която създателите на приложението са одобрили и която е излязла преди поне 3 дни. Изключено по подразбиране.",
   "Reads the list of yt-dlp versions the app's makers approved (from GitHub), and fetches a newer one from PyPI when you press Update now or Reinstall (Updates > Helper programs), or by itself if you ticked Update automatically there.": "Чете списъка с версии на yt-dlp, одобрени от създателите на приложението (от GitHub), и изтегля по-нова от PyPI, когато натиснеш Обнови сега или Преинсталирай (Обновления > Помощни програми), или сам, ако си отметнал там Обновявай автоматично.",
-  "The list of approved yt-dlp versions couldn't be read": "Списъкът с одобрени версии на yt-dlp не можа да бъде прочетен"
+  "The list of approved yt-dlp versions couldn't be read": "Списъкът с одобрени версии на yt-dlp не можа да бъде прочетен",
+  "Force update": "Принудително обновяване",
+  "Install an unapproved yt-dlp?": "Да се инсталира ли неодобрен yt-dlp?",
+  "Install anyway": "Инсталирай въпреки това",
+  "Install the newest yt-dlp now, even one the app's makers haven't approved yet": "Инсталирай най-новия yt-dlp сега, дори такъв, който създателите на приложението още не са одобрили",
+  "PyPI sent an answer that couldn't be read": "PyPI изпрати отговор, който не можа да бъде прочетен",
+  "Use it only when YouTube or another site stopped working and Update now doesn't fix it. Reinstall goes back to an approved version.": "Използвай го само когато YouTube или друг сайт е спрял да работи и Обнови сега не помага. Преинсталирай връща към одобрена версия.",
+  "Warning: this gets the newest yt-dlp from PyPI right away. Onion Board hasn't approved it yet, so nobody has checked it's safe. It may fix downloads that stopped working.": "Внимание: това изтегля най-новия yt-dlp от PyPI веднага. Onion Board още не го е одобрил, така че никой не е проверил дали е безопасен. Може да оправи изтеглянията, които са спрели да работят.",
+  "no wheel for {package}": "няма колело за {package}"
 }

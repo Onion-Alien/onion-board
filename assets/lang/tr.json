@@ -3451,5 +3451,13 @@
   "{voice}, the computer voice. It's on: just talk.": "{voice}, bilgisayar sesi. Açık: sadece konuş.",
   "Once a day and after a failed download, gets a newer yt-dlp from PyPI, but only a version the app's makers approved that has been out for at least 3 days. Off by default.": "Günde bir kez ve başarısız bir indirmeden sonra PyPI'dan daha yeni bir yt-dlp indirir, ama yalnızca uygulamanın yapımcılarının onayladığı ve en az 3 gündür yayında olan bir sürümü. Varsayılan olarak kapalı.",
   "Reads the list of yt-dlp versions the app's makers approved (from GitHub), and fetches a newer one from PyPI when you press Update now or Reinstall (Updates > Helper programs), or by itself if you ticked Update automatically there.": "Uygulamanın yapımcılarının onayladığı yt-dlp sürümlerinin listesini (GitHub'dan) okur ve Şimdi güncelle'ye veya Yeniden yükle'ye bastığında (Güncellemeler > Yardımcı programlar) ya da orada Otomatik olarak güncelle'yi işaretlediysen kendiliğinden PyPI'dan daha yeni bir sürüm indirir.",
-  "The list of approved yt-dlp versions couldn't be read": "Onaylı yt-dlp sürümlerinin listesi okunamadı"
+  "The list of approved yt-dlp versions couldn't be read": "Onaylı yt-dlp sürümlerinin listesi okunamadı",
+  "Force update": "Zorla güncelle",
+  "Install an unapproved yt-dlp?": "Onaylanmamış bir yt-dlp yüklensin mi?",
+  "Install anyway": "Yine de yükle",
+  "Install the newest yt-dlp now, even one the app's makers haven't approved yet": "Uygulamanın yapımcıları henüz onaylamamış olsa bile en yeni yt-dlp'yi şimdi yükler",
+  "PyPI sent an answer that couldn't be read": "PyPI okunamayan bir yanıt gönderdi",
+  "Use it only when YouTube or another site stopped working and Update now doesn't fix it. Reinstall goes back to an approved version.": "Bunu sadece YouTube ya da başka bir site çalışmayı bıraktığında ve Şimdi güncelle düzeltmediğinde kullan. Yeniden yükle onaylı bir sürüme geri döner.",
+  "Warning: this gets the newest yt-dlp from PyPI right away. Onion Board hasn't approved it yet, so nobody has checked it's safe. It may fix downloads that stopped working.": "Uyarı: bu, en yeni yt-dlp'yi PyPI'dan hemen indirir. Onion Board onu henüz onaylamadı, yani kimse güvenli olup olmadığını kontrol etmedi. Çalışmayı bırakan indirmeleri düzeltebilir.",
+  "no wheel for {package}": "{package} için tekerlek yok"
 }

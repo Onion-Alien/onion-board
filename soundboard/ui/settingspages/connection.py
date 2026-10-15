@@ -446,7 +446,8 @@ class ConnectionPage(Page):
 
     # ------------------------------------------------------------------ yt-dlp
     def _ytdlp_buttons(self) -> list[QPushButton]:
-        """Update now and Reinstall (Updates > Helper programs), once built."""
+        """Update now, Reinstall and Force update (Updates > Helper programs), once
+        built."""
         return [b for b in getattr(self.dlg, "ytdlp_btns", ()) if qt_valid(b)]
 
     def _ytdlp_say(self, msg: str):
@@ -456,8 +457,8 @@ class ConnectionPage(Page):
             say(msg)
 
     def _ytdlp_run(self, job, button: str = "", where: str = "Settings > Updates"):
-        """Update now / Reinstall: `job` (ytdl.update or ytdl.reset) on a worker,
-        both yt-dlp buttons busy meanwhile."""
+        """Update now / Reinstall / Force update: `job` (ytdl.update, ytdl.reset or
+        ytdl.force_newest) on a worker, all the yt-dlp buttons busy meanwhile."""
         buttons = self._ytdlp_buttons()
         if any(busy.is_busy(b) or not b.isEnabled() for b in buttons):
             return

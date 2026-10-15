@@ -216,7 +216,9 @@ The full list. The [README](../README.md) has the short version and how to get s
   opt-in box to update yt-dlp automatically (off by default). A yt-dlp update only
   installs a version this project approved (`pins/yt-dlp.json`, checked against
   yt-dlp's signed PyPI release and added by a reviewed pull request) once it has been
-  out for 3 days, and never one older than the built-in copy. FFmpeg and
+  out for 3 days, and never one older than the built-in copy. When a site breaks and
+  no approved version fixes it yet, *Force update* installs PyPI's newest yt-dlp right
+  away, after a warning that it isn't approved yet. FFmpeg and
   Tor copies the app downloaded follow the app: an app update that names a newer
   version fetches it (checked against its SHA-256) at the next start.
 - **"Did you know?" tips:** after the setup guide, a short tip about one feature at

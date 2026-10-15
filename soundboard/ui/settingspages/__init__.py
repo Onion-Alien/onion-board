@@ -132,6 +132,8 @@ class Built:
     _ytdlp_row_say: Any
     ytdlp_state: Any
     ytdlp_btns: Any
+    ytdlp_force_btn: Any
+    ytdlp_force_box: Any
 
 
 class Page(QObject):
