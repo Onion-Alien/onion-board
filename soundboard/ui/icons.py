@@ -779,7 +779,26 @@ def _myinstants(p, fill):
     fill(button)
 
 
+def _bun(p, fill):
+    """Bun mode: a bunny's head, one ear up and one flopped over (an outline like the
+    rest, not the cartoon Bun himself)."""
+    shape = QPainterPath()
+    shape.addEllipse(QRectF(5, 10, 14, 11.5))
+    ear = QPainterPath()
+    ear.addEllipse(QRectF(-2, -5.5, 4, 11))
+    shape = shape.united(QTransform().translate(9.4, 7).rotate(-8).map(ear))
+    flop = QPainterPath()
+    flop.addEllipse(QRectF(-2, -5, 4, 10))
+    shape = shape.united(QTransform().translate(17.2, 8.2).rotate(62).map(flop))
+    p.drawPath(shape.simplified())
+    for x in (9.6, 14.4):
+        eye = QPainterPath()
+        eye.addEllipse(QPointF(x, 15.4), 1.1, 1.1)
+        fill(eye)
+
+
 SHAPES = {
+    "bun": _bun,
     "youtube": _youtube, "ytmusic": _ytmusic, "soundcloud": _soundcloud,
     "tiktok": _tiktok, "myinstants": _myinstants,
     "shuffle": _shuffle, "star": _star,

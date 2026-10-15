@@ -33,7 +33,7 @@ from PySide6.QtWidgets import (
     QWidget,
 )
 
-from soundboard import backup, bunny, destination, net, otherboards, remote, usage
+from soundboard import backup, destination, net, otherboards, remote, usage
 from soundboard.i18n import _
 from soundboard.library import PAD_COLORS
 from soundboard.ui import a11y, alsosend, busy, icons, sidebar, taboff
@@ -1658,15 +1658,16 @@ class WindowBuilder(Controller):
         return page
 
     def _paint_mini_bun(self):
-        """The mini player's Bun button: him in this theme's outfit."""
+        """The mini player's Bun button, in this theme's colours."""
         mw = self.mw
         mw.mini_bun.setIcon(self._bun_icon())
         if getattr(mw, "_tray_bun", None) is not None:   # (the tray's menu: theme changes)
             mw._tray_bun.setIcon(self._bun_icon())
 
     def _bun_icon(self) -> QIcon:
-        """Bun in this theme's outfit, drawn at the exact size shown."""
-        return icons.sharp_icon(lambda px, _mode, _state: bunny.bunny_pixmap(px))
+        """A line-drawn bunny like the other icons (the cartoon Bun looked out of place
+        among them)."""
+        return icons.icon("bun")
 
     def _guide_button(self) -> QPushButton:
         mw = self.mw
