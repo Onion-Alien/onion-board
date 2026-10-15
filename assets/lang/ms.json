@@ -3365,5 +3365,7 @@
   "Heads up: while Onion Board is open, {key} plays your hotkey instead of doing its usual job in other apps.": "Perhatian: selagi Onion Board dibuka, {key} memainkan hotkey anda dan bukan membuat kerja biasanya dalam apl lain.",
   "Windows keeps {key} for itself and never passes it to an app, so that hotkey could never play: pick another key.": "Windows menyimpan {key} untuk dirinya sendiri dan tidak pernah menghantarnya ke apl, jadi hotkey itu tidak akan pernah berbunyi: pilih kekunci lain.",
   "{key} is your Stop everything key, so it stays on that. Pick another key, or give Stop everything a new one in Settings → Hotkeys first.": "{key} ialah kekunci Hentikan semua anda, jadi ia kekal di situ. Pilih kekunci lain, atau beri Hentikan semua kekunci baharu dahulu di Tetapan → Hotkey.",
-  "the pack's file is damaged, so it wasn't kept": "fail pek rosak, jadi ia tidak disimpan"
+  "the pack's file is damaged, so it wasn't kept": "fail pek rosak, jadi ia tidak disimpan",
+  "The download was cut off before the end. Try again.": "Muat turun terputus sebelum selesai. Cuba lagi.",
+  "You can change the proxy in Settings > Connection.": "Anda boleh menukar proksi dalam Tetapan > Sambungan."
 }

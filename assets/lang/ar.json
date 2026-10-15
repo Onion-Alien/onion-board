@@ -3745,5 +3745,7 @@
   "Heads up: while Onion Board is open, {key} plays your hotkey instead of doing its usual job in other apps.": "انتبه: ما دام Onion Board مفتوحًا، يشغّل {key} اختصارك بدل عمله المعتاد في التطبيقات الأخرى.",
   "Windows keeps {key} for itself and never passes it to an app, so that hotkey could never play: pick another key.": "يحتفظ Windows بـ {key} لنفسه ولا يمرره لأي تطبيق، فلن يعمل هذا الاختصار أبدًا: اختر مفتاحًا آخر.",
   "{key} is your Stop everything key, so it stays on that. Pick another key, or give Stop everything a new one in Settings → Hotkeys first.": "{key} هو مفتاح «أوقف كل شيء»، فيبقى له. اختر مفتاحًا آخر، أو أعطِ «أوقف كل شيء» مفتاحًا جديدًا في الإعدادات → الاختصارات أولًا.",
-  "the pack's file is damaged, so it wasn't kept": "ملف الحزمة تالف، لذا لم يتم الاحتفاظ به"
+  "the pack's file is damaged, so it wasn't kept": "ملف الحزمة تالف، لذا لم يتم الاحتفاظ به",
+  "The download was cut off before the end. Try again.": "انقطع التنزيل قبل اكتماله. حاول مرة أخرى.",
+  "You can change the proxy in Settings > Connection.": "يمكنك تغيير الوكيل في الإعدادات > الاتصال."
 }

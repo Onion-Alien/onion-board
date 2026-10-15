@@ -3517,5 +3517,7 @@
   "Heads up: while Onion Board is open, {key} plays your hotkey instead of doing its usual job in other apps.": "Внимание: пока Onion Board открыт, {key} запускает твою горячую клавишу вместо своей обычной работы в других приложениях.",
   "Windows keeps {key} for itself and never passes it to an app, so that hotkey could never play: pick another key.": "Windows оставляет {key} себе и никогда не передаёт приложениям, так что эта горячая клавиша никогда не сработает: выбери другую клавишу.",
   "{key} is your Stop everything key, so it stays on that. Pick another key, or give Stop everything a new one in Settings → Hotkeys first.": "{key} — твоя клавиша «Остановить всё», поэтому она остаётся за ней. Выбери другую клавишу или сначала дай «Остановить всё» новую в Настройки → Горячие клавиши.",
-  "the pack's file is damaged, so it wasn't kept": "файл пакета повреждён, поэтому он не сохранён"
+  "the pack's file is damaged, so it wasn't kept": "файл пакета повреждён, поэтому он не сохранён",
+  "The download was cut off before the end. Try again.": "Загрузка оборвалась, не дойдя до конца. Попробуйте ещё раз.",
+  "You can change the proxy in Settings > Connection.": "Прокси можно изменить в разделе «Настройки» > «Подключение»."
 }

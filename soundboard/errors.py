@@ -116,6 +116,8 @@ def _downloader() -> list[tuple[str, str]]:
         (r"http error 403|forbidden", _("The site refused the download (403).")),
         (r"http error 5\d\d", _("The site is having trouble right now. Try again later.")),
         (r"timed? ?out", _("The connection timed out. Check your internet and try again.")),
+        (r"downloaded \d+ bytes, expected \d+ bytes|incomplete ?read",
+         _("The download was cut off before the end. Try again.")),
         (r"getaddrinfo|name resolution|unable to download webpage|connection (?:refused|reset|"
          r"aborted)|network is unreachable|no route to host|urlopen error",
          _("Couldn't reach the site. Check your internet connection.")),

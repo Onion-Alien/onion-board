@@ -1184,3 +1184,31 @@ def test_spammed_enter_waits_for_the_search_already_running(qapp, window,  # noq
     window.search.setText("rick astley")                     # new words: searched at once
     window.search.returnPressed.emit()
     assert process_events(qapp, lambda: calls[-1] == "rick astley", 5)
+
+
+def test_a_dead_proxy_behind_the_relay_is_named_not_the_site(monkeypatch, tmp_path):
+    """yt-dlp goes through the app's relay, which answers 502 when the proxy didn't:
+    a dead proxy said "The site is having trouble right now"."""
+    fake_yt_dlp(monkeypatch, {}, fail="ERROR: [generic] x: Unable to download webpage: "
+                                      "HTTP Error 502: Bad Gateway")
+    monkeypatch.setattr(ytdl.net, "mode", lambda: ytdl.net.PROXY)
+    monkeypatch.setattr(ytdl.net, "proxy", lambda: ytdl.net.parse("socks5h://127.0.0.1:9"))
+    monkeypatch.setattr(ytdl.net, "last_failure",
+                        lambda since=0.0: "Couldn't reach the proxy at 127.0.0.1:9.")
+    with pytest.raises(ytdl.DownloadError) as e:
+        ytdl.download_audio("https://example.com/a.mp3", tmp_path, auto_update=False)
+    assert "proxy at 127.0.0.1:9" in str(e.value)
+    assert "Settings > Connection" in str(e.value)       # and where to change it
+    assert ytdl.errors.describe(e.value).text == str(e.value)   # what the panels show
+    assert e.value.proxy
+    monkeypatch.setattr(ytdl.net, "mode", lambda: ytdl.net.DIRECT)   # direct: the site's
+    with pytest.raises(ytdl.DownloadError) as e:
+        ytdl.download_audio("https://example.com/a.mp3", tmp_path, auto_update=False)
+    assert "having trouble" in str(e.value)
+
+
+def test_a_download_cut_off_is_said_in_plain_words():
+    p = ytdl.errors.describe(Exception("ERROR: Got error: Downloaded 32336 bytes, expected "
+                                       "97009 bytes"), downloader=True)
+    assert p.text == "The download was cut off before the end. Try again."
+    assert not p.reportable

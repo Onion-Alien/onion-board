@@ -21,7 +21,7 @@ from collections.abc import Callable
 from typing import Any
 from pathlib import Path
 
-from PySide6.QtCore import Qt, Signal
+from PySide6.QtCore import Qt, QTimer, Signal
 from PySide6.QtWidgets import QFrame, QHBoxLayout, QLabel, QPushButton
 
 from soundboard import library, net, netlog, quality, sourceinfo, theme, thumbs, usage, videos, ytdl
@@ -94,6 +94,8 @@ class LinkBar(QFrame):
         self._dups: set[str] = set()     # urls refused as already in the library
         self._msg.connect(self._on_msg)
         self._shown = False           # the line says something wrong (_say)
+        self._off_said = False        # ...and it's net.off_message: redone on a switch
+        net.on_change(self._net_changed)
 
         self.setObjectName("card")
         h = QHBoxLayout(self)
@@ -147,11 +149,26 @@ class LinkBar(QFrame):
         if url:
             self._via[url] = "link"
         self._drop_download()
-        self._say("")
-        if url and not ytdl.site_allowed(url):   # switched off in Settings > Privacy
-            self._say(html.escape(net.off_message(ytdl.site_feature(url))),
-                      theme.status("warn"))
+        self._say_if_off()
         self.link_changed.emit(url)
+
+    def _say_if_off(self):
+        """The line says why the link can't go online (switched off in Settings >
+        Privacy, or Offline mode), or nothing."""
+        self._say("")
+        if self.url and not ytdl.site_allowed(self.url):
+            self._say(html.escape(net.off_message(ytdl.site_feature(self.url))),
+                      theme.status("warn"))
+            self._off_said = True
+
+    def _net_changed(self):
+        """A switch or Offline mode changed (any thread): the line said the old one's
+        words, now redone ("Offline mode" stayed up after it was switched off)."""
+        QTimer.singleShot(0, self, self._recheck_off)
+
+    def _recheck_off(self):
+        if self._off_said or (self.url and not ytdl.site_allowed(self.url)):
+            self._say_if_off()
 
     def open(self, url: str, title: str, secs: float = 0.0):
         """A video picked from the YouTube search: already looked up, so no probe."""
@@ -177,6 +194,7 @@ class LinkBar(QFrame):
         """The bar's line. Only a problem shows it (the card shows the rest: busy,
         playing, added); the text is kept either way."""
         self.info.setText(f"<span style='color:{color}'>{text}</span>" if color else text)
+        self._off_said = False
         self._shown = bool(text) and color in (theme.status("error"), theme.status("warn"))
         self._buttons()
 
@@ -532,6 +550,7 @@ class LinkBar(QFrame):
             # a bot check or rate limit is about the user's address, not yt-dlp; with
             # auto-update on, download_audio() already tried a newer one
             fixable = (isinstance(e, ytdl.FetchError) and not auto_update
+                       and not getattr(e, "proxy", False)
                        and net.allowed(ytdl.UPDATE_FEATURE)
                        and not ytdl.blocked_by_site(f"{e} {getattr(e, 'raw', '')}"))
             hint = _(" A newer downloader may fix this.") if fixable else ""
