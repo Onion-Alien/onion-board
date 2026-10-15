@@ -520,7 +520,10 @@ def test_directory_loads_the_globe_caches_it_and_fails_over(qapp, server, tmp_pa
     d.load_globe()
     assert process_events(qapp, lambda: got)
     assert [s.uuid for s in got[0]] == [f"uuid-{i}" for i in range(5)]   # located ones only
-    assert (tmp_path / "stations.json").exists()
+    # the first few can come in before the whole list (only that one is saved), and
+    # either can reach the live mirror last: both asked, and the list saved
+    assert process_events(qapp, lambda: len(server.hits) == 2
+                          and (tmp_path / "stations.json").exists())
     n = len(server.hits)
     d2 = RadioDirectory(tmp_path, bases=(server.base,))
     got2 = []
