@@ -191,3 +191,36 @@ def test_growing_brings_back_whatever_fits(qapp):
     assert not wide.isHidden()
     assert f.compact_count() == 0
     root.deleteLater()
+
+
+def test_growing_keeps_the_more_important_step_shown(qapp):
+    """Growing, a later (more important) step comes back first, hiding earlier ones
+    to make room if it has to: giving the room to them instead kept the levels strip
+    in its one-group form at 1700 px."""
+    root = QWidget()
+    row = QHBoxLayout(root)
+    row.setContentsMargins(0, 0, 0, 0)
+    row.setSpacing(0)
+    big = QPushButton("big")
+    big.setMinimumWidth(300)
+    row.addWidget(big)
+    small = []
+    for name in ("a", "b"):
+        b = QPushButton(name)
+        b.setMinimumWidth(100)
+        row.addWidget(b)
+        small.append(b)
+    f = responsive.Fitter(root)
+    f.add(10, "w", responsive.hide(small[0]))
+    f.add(20, "w", responsive.hide(small[1]))
+    f.add(50, "w", responsive.hide(big))
+    root.show()
+    qapp.processEvents()
+    f.fit(QSize(250, 400))                 # big goes; a and b fit beside nothing
+    assert big.isHidden() and not small[0].isHidden() and not small[1].isHidden()
+    f.fit(QSize(450, 400))                 # big and one of them
+    assert not big.isHidden(), "the room went to the less important ones"
+    assert small[0].isHidden() and not small[1].isHidden()
+    f.fit(QSize(900, 400))
+    assert f.compact_count() == 0 and not small[0].isHidden()
+    root.deleteLater()

@@ -192,6 +192,22 @@ class Fitter:
         self.steps[i][2](on)
         self._known = None   # measure again
 
+    def _fits(self, size: QSize) -> bool:
+        return not (self._over(size, "w") or self._over(size, "h"))
+
+    def _give_back(self, new: list[int], size: QSize):
+        """Undo the steps in `new` (applied in that order, until it fit) that weren't
+        needed after all, last first. Steps go in order until one fits, and the ones
+        before it may not have narrowed the widest part: at 1100 px the levels strip
+        was it, and the speed button, the radio's volume and Say's Stop went first for
+        nothing, staying hidden until the window grew past 1100."""
+        for i in reversed(new[:-1]):
+            self._apply(i, False)
+            if self._fits(size):
+                del self._at[i]
+            else:
+                self._apply(i, True)
+
     def fit(self, size: QSize) -> QSize:
         """Apply as few steps as it takes for the content to fit `size`. Returns
         need() for what it left."""
@@ -214,25 +230,18 @@ class Fitter:
             # still over (a diagonal drag): the other axis' steps can help too (hiding
             # the mixer narrows the window), so try them before anyone calls it too small
             for i in range(len(self.steps)):
-                if not (self._over(size, "w") or self._over(size, "h")):
+                if self._fits(size):
                     break
                 if i not in self._at:
                     self._apply(i, True)
                     self._at[i] = (dim["w"], dim["h"], True)
                     new.append(i)
-            # give back what didn't help: steps go in order until one fits, and the
-            # ones before it may not have narrowed the widest part at all (at 1100 px
-            # the levels strip was it, and the speed button, the radio's volume and
-            # Say's Stop went first for nothing, staying hidden until the window grew)
-            for i in reversed(new[:-1]):
-                self._apply(i, False)
-                if self._over(size, "w") or self._over(size, "h"):
-                    self._apply(i, True)
-                else:
-                    del self._at[i]
+            self._give_back(new, size)
             for axis in ("w", "h"):   # grown: bring back what fits again, last-hidden first
                 for i in sorted((i for i in self._at if self.steps[i][1] == axis),
                                 reverse=True):
+                    if i not in self._at:
+                        continue   # given back meanwhile
                     w, h, cross = self._at[i]
                     grown = dim[axis] > (w if axis == "w" else h)
                     if cross:   # hidden for the other axis: that one growing counts too
@@ -240,17 +249,32 @@ class Fitter:
                     if not grown:
                         continue   # no bigger than when it had to go
                     self._apply(i, False)
-                    if self._over(size, "w") or self._over(size, "h"):
-                        # still too big: try it again once the window is as big as it
-                        # needs, not on every pixel of a drag. The others go on: one in
-                        # another row may fit (stopping here kept the radio's volume
-                        # hidden after 800 -> 1180 px, behind the levels strip)
-                        need = self.need()
-                        self._apply(i, True)
-                        self._at[i] = (max(dim["w"], need.width() - 1),
-                                       max(dim["h"], need.height() - 1), cross)
+                    if self._fits(size):
+                        del self._at[i]
                         continue
-                    del self._at[i]
+                    # still too big: the steps that go before it make room first
+                    room = []
+                    for j in range(i):
+                        if self._fits(size):
+                            break
+                        if j not in self._at and self.steps[j][1] == axis:
+                            self._apply(j, True)
+                            self._at[j] = (dim["w"], dim["h"], False)
+                            room.append(j)
+                    if self._fits(size):
+                        del self._at[i]
+                        self._give_back(room, size)
+                        continue
+                    # no room yet: try it again once the window is as big as it needs
+                    # with them out of the way, not on every pixel of a drag. The others
+                    # go on: one in another row may fit
+                    need = self.need()
+                    for j in reversed(room):
+                        self._apply(j, False)
+                        del self._at[j]
+                    self._apply(i, True)
+                    self._at[i] = (max(dim["w"], need.width() - 1),
+                                   max(dim["h"], need.height() - 1), cross)
         try:
             return self.need()
         finally:
