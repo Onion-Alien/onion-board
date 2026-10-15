@@ -3349,5 +3349,15 @@
   "A hotkey has one key, plus Ctrl, Alt, Shift or Windows if you like: this one has {keys}.": "단축키는 키 하나에, 원하면 Ctrl, Alt, Shift, Windows를 더해요. 이건 {keys}가 있어요.",
   "Hotkey not saved: {why}": "단축키를 저장하지 않았어요: {why}",
   "Hide advanced": "고급 숨기기",
-  "Show advanced": "고급 보기"
+  "Show advanced": "고급 보기",
+  "Gets the sounds from YouTube, SoundCloud and other links. Sites change often, so it needs updating now and then.": "YouTube, SoundCloud 등 링크에서 사운드를 가져옵니다. 사이트가 자주 바뀌어서 가끔 업데이트가 필요해요.",
+  "Installed: version {version}": "설치됨: 버전 {version}",
+  "JavaScript engine": "JavaScript 엔진",
+  "Lets YouTube downloads get every format. It comes with the app and only runs on this PC.": "YouTube 다운로드에서 모든 형식을 받을 수 있게 해요. 앱에 포함되어 있고 이 PC에서만 실행돼요.",
+  "Lets YouTube downloads get every format. {engine} is on this PC and faster than the app's own, so it's used first.": "YouTube 다운로드에서 모든 형식을 받을 수 있게 해요. 이 PC에 {engine}이(가) 있고 앱 기본 엔진보다 빨라서 먼저 사용해요.",
+  "Not found": "찾을 수 없음",
+  "Used when Connection is set to Tor. It's up to date.": "연결이 Tor로 설정되었을 때 사용돼요. 최신 버전이에요.",
+  "Working: {engine}": "작동 중: {engine}",
+  "Working: {engine} {version} (faster)": "작동 중: {engine} {version} (더 빠름)",
+  "YouTube downloads still work, but with fewer formats.": "YouTube 다운로드는 여전히 되지만 형식이 더 적어요."
 }

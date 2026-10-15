@@ -3425,5 +3425,15 @@
   "A hotkey has one key, plus Ctrl, Alt, Shift or Windows if you like: this one has {keys}.": "Bir kısayol tuşunda bir tuş olur, istersen artı Ctrl, Alt, Shift veya Windows: bunda {keys} var.",
   "Hotkey not saved: {why}": "Kısayol tuşu kaydedilmedi: {why}",
   "Hide advanced": "Gelişmişi gizle",
-  "Show advanced": "Gelişmişi göster"
+  "Show advanced": "Gelişmişi göster",
+  "Gets the sounds from YouTube, SoundCloud and other links. Sites change often, so it needs updating now and then.": "Sesleri YouTube, SoundCloud ve diğer bağlantılardan alır. Siteler sık değiştiği için arada bir güncellenmesi gerekir.",
+  "Installed: version {version}": "Kurulu: sürüm {version}",
+  "JavaScript engine": "JavaScript motoru",
+  "Lets YouTube downloads get every format. It comes with the app and only runs on this PC.": "YouTube indirmelerinin her biçimi almasını sağlar. Uygulamayla gelir ve yalnızca bu bilgisayarda çalışır.",
+  "Lets YouTube downloads get every format. {engine} is on this PC and faster than the app's own, so it's used first.": "YouTube indirmelerinin her biçimi almasını sağlar. {engine} bu bilgisayarda var ve uygulamanınkinden hızlı, bu yüzden önce o kullanılır.",
+  "Not found": "Bulunamadı",
+  "Used when Connection is set to Tor. It's up to date.": "Bağlantı Tor olarak ayarlandığında kullanılır. Güncel.",
+  "Working: {engine}": "Çalışıyor: {engine}",
+  "Working: {engine} {version} (faster)": "Çalışıyor: {engine} {version} (daha hızlı)",
+  "YouTube downloads still work, but with fewer formats.": "YouTube indirmeleri yine çalışır ama daha az biçimle."
 }

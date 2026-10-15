@@ -3425,5 +3425,15 @@
   "A hotkey has one key, plus Ctrl, Alt, Shift or Windows if you like: this one has {keys}.": "Μια συντόμευση έχει ένα πλήκτρο, και αν θες Ctrl, Alt, Shift ή Windows: αυτή έχει {keys}.",
   "Hotkey not saved: {why}": "Η συντόμευση δεν αποθηκεύτηκε: {why}",
   "Hide advanced": "Απόκρυψη για προχωρημένους",
-  "Show advanced": "Εμφάνιση για προχωρημένους"
+  "Show advanced": "Εμφάνιση για προχωρημένους",
+  "Gets the sounds from YouTube, SoundCloud and other links. Sites change often, so it needs updating now and then.": "Παίρνει τους ήχους από YouTube, SoundCloud και άλλους συνδέσμους. Οι ιστότοποι αλλάζουν συχνά, οπότε θέλει ενημέρωση πού και πού.",
+  "Installed: version {version}": "Εγκατεστημένο: έκδοση {version}",
+  "JavaScript engine": "Μηχανή JavaScript",
+  "Lets YouTube downloads get every format. It comes with the app and only runs on this PC.": "Επιτρέπει στις λήψεις από YouTube να παίρνουν κάθε μορφή. Έρχεται με την εφαρμογή και τρέχει μόνο σε αυτόν τον υπολογιστή.",
+  "Lets YouTube downloads get every format. {engine} is on this PC and faster than the app's own, so it's used first.": "Επιτρέπει στις λήψεις από YouTube να παίρνουν κάθε μορφή. Το {engine} είναι σε αυτόν τον υπολογιστή και πιο γρήγορο από της εφαρμογής, οπότε χρησιμοποιείται πρώτο.",
+  "Not found": "Δεν βρέθηκε",
+  "Used when Connection is set to Tor. It's up to date.": "Χρησιμοποιείται όταν η σύνδεση είναι ρυθμισμένη σε Tor. Είναι ενημερωμένο.",
+  "Working: {engine}": "Δουλεύει: {engine}",
+  "Working: {engine} {version} (faster)": "Δουλεύει: {engine} {version} (πιο γρήγορο)",
+  "YouTube downloads still work, but with fewer formats.": "Οι λήψεις από YouTube δουλεύουν ακόμα, αλλά με λιγότερες μορφές."
 }

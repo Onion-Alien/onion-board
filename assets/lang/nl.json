@@ -3425,5 +3425,15 @@
   "A hotkey has one key, plus Ctrl, Alt, Shift or Windows if you like: this one has {keys}.": "Een sneltoets heeft één toets, plus Ctrl, Alt, Shift of Windows als je wilt: deze heeft {keys}.",
   "Hotkey not saved: {why}": "Sneltoets niet opgeslagen: {why}",
   "Hide advanced": "Geavanceerd verbergen",
-  "Show advanced": "Geavanceerd tonen"
+  "Show advanced": "Geavanceerd tonen",
+  "Gets the sounds from YouTube, SoundCloud and other links. Sites change often, so it needs updating now and then.": "Haalt de geluiden van YouTube, SoundCloud en andere links. Sites veranderen vaak, dus hij moet af en toe worden bijgewerkt.",
+  "Installed: version {version}": "Geïnstalleerd: versie {version}",
+  "JavaScript engine": "JavaScript-engine",
+  "Lets YouTube downloads get every format. It comes with the app and only runs on this PC.": "Zorgt dat YouTube-downloads elk formaat krijgen. Hij zit bij de app en draait alleen op deze pc.",
+  "Lets YouTube downloads get every format. {engine} is on this PC and faster than the app's own, so it's used first.": "Zorgt dat YouTube-downloads elk formaat krijgen. {engine} staat op deze pc en is sneller dan die van de app, dus die wordt eerst gebruikt.",
+  "Not found": "Niet gevonden",
+  "Used when Connection is set to Tor. It's up to date.": "Gebruikt als de verbinding op Tor staat. Hij is bijgewerkt.",
+  "Working: {engine}": "Werkt: {engine}",
+  "Working: {engine} {version} (faster)": "Werkt: {engine} {version} (sneller)",
+  "YouTube downloads still work, but with fewer formats.": "YouTube-downloads werken nog steeds, maar met minder formaten."
 }

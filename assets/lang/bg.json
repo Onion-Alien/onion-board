@@ -3425,5 +3425,15 @@
   "A hotkey has one key, plus Ctrl, Alt, Shift or Windows if you like: this one has {keys}.": "Бързият клавиш има един клавиш, плюс Ctrl, Alt, Shift или Windows, ако искаш: този има {keys}.",
   "Hotkey not saved: {why}": "Бързият клавиш не е запазен: {why}",
   "Hide advanced": "Скрий разширените",
-  "Show advanced": "Покажи разширените"
+  "Show advanced": "Покажи разширените",
+  "Gets the sounds from YouTube, SoundCloud and other links. Sites change often, so it needs updating now and then.": "Взима звуците от YouTube, SoundCloud и други връзки. Сайтовете често се променят, затова от време на време трябва да се обновява.",
+  "Installed: version {version}": "Инсталиран: версия {version}",
+  "JavaScript engine": "JavaScript енджин",
+  "Lets YouTube downloads get every format. It comes with the app and only runs on this PC.": "Позволява на изтеглянията от YouTube да получат всеки формат. Идва с приложението и работи само на този компютър.",
+  "Lets YouTube downloads get every format. {engine} is on this PC and faster than the app's own, so it's used first.": "Позволява на изтеглянията от YouTube да получат всеки формат. {engine} е на този компютър и е по-бърз от този на приложението, затова се ползва първи.",
+  "Not found": "Не е намерен",
+  "Used when Connection is set to Tor. It's up to date.": "Ползва се, когато връзката е настроена на Tor. Обновен е.",
+  "Working: {engine}": "Работи: {engine}",
+  "Working: {engine} {version} (faster)": "Работи: {engine} {version} (по-бързо)",
+  "YouTube downloads still work, but with fewer formats.": "Изтеглянията от YouTube пак работят, но с по-малко формати."
 }

@@ -1104,3 +1104,68 @@ def test_every_card_heading_has_its_icon_on_one_line(window, qapp):  # noqa: F81
                         assert title.width() >= one, (key, title.text())
     finally:
         d.accept()
+
+
+def test_downloads_card_shows_each_helper_program(window, qapp, monkeypatch, tmp_path):  # noqa: F811
+    """yt-dlp, the JavaScript engine and Tor (only once it's here) each get a row like
+    FFmpeg's: a version pill and a hint, looked up off the UI thread, and Update now /
+    Update Tor doing what the Updates and Connection pages do. Offline mode hides those."""
+    import threading
+
+    from soundboard import jsengine, tor, torget, ytdl
+    off_ui = []
+
+    def version():
+        off_ui.append(threading.current_thread() is not threading.main_thread())
+        return ("2026.9.1", False)
+
+    def engines():
+        off_ui.append(threading.current_thread() is not threading.main_thread())
+        return [jsengine.Engine("deno", "deno.exe", (2, 4, 1))]
+    monkeypatch.setattr(ytdl, "active_version", version)
+    monkeypatch.setattr(jsengine, "picked", engines)
+    monkeypatch.setattr(tor, "available", lambda: False)
+    monkeypatch.setattr(net, "allowed", lambda key: True)
+    d = _open_in_window(window, qapp, "data")
+    try:
+        assert process_events(qapp, lambda: "Checking…" not in (d.ytdlp_state.text(),
+                                                                 d.js_state.text()))
+        assert off_ui and all(off_ui)
+        assert d.ytdlp_state.text() == "Working: version 2026.9.1"
+        assert d.js_state.text() == "Working: Deno 2.4 (faster)"
+        assert d.tor_row.isHidden()          # no Tor here: no row for it
+        assert not d.ytdlp_row_btn.isHidden() and d.ytdlp_row_btn.isEnabled()
+
+        # Update now: the Downloader card's job, and both pages say how it went
+        monkeypatch.setattr(ytdl, "update", lambda: "Updated yt-dlp to 2099.1.1.")
+        d.ytdlp_row_btn.click()
+        assert busy.is_busy(d.ytdlp_row_btn) and d.ytdlp_row_btn.isEnabled()
+        monkeypatch.setattr(ytdl, "active_version", lambda: ("2099.1.1", True))
+        assert process_events(qapp, lambda: d.ytdlp_state.text() == "Working: version 2099.1.1")
+        assert not busy.is_busy(d.ytdlp_row_btn)
+        assert d.ytdlp_note.text() == "Updated yt-dlp to 2099.1.1."
+
+        # Tor found, an older copy: its row shows and offers the Connection page's download
+        bin_dir = tmp_path / "tor" / "bin"
+        bin_dir.mkdir(parents=True)
+        (bin_dir / torget.STAMP).write_text("15.0.1 old", "ascii")
+        monkeypatch.setattr(torget, "bin_dir", lambda: bin_dir)
+        monkeypatch.setattr(tor, "available", lambda: True)
+        monkeypatch.setattr(tor, "bundle_dir", lambda: bin_dir)
+        d._helpers_refresh()
+        assert process_events(qapp, lambda: not d.tor_row.isHidden())
+        assert d.tor_state.text() == "Installed: version 15.0.1"
+        assert d.tor_row_btn.text() == "Update Tor" and "newer Tor" in d.tor_note.text()
+        got = []
+        monkeypatch.setattr(torget, "get", lambda progress, before_unpack=None: got.append(1))
+        d.tor_row_btn.click()
+        assert process_events(qapp, lambda: got and not busy.is_busy(d.tor_row_btn))
+
+        # Offline mode: what would go online is hidden; the versions stay
+        net.configure_features(offline=True)
+        d.privacy._offline_sync()
+        assert d.ytdlp_row_btn.isHidden() and d.tor_row_btn.isHidden()
+        assert not d.tor_row.isHidden()
+    finally:
+        net.configure_features()
+        d.accept()

@@ -3501,5 +3501,15 @@
   "A hotkey has one key, plus Ctrl, Alt, Shift or Windows if you like: this one has {keys}.": "У гарячій клавіші одна клавіша, плюс Ctrl, Alt, Shift або Windows за бажанням: тут {keys}.",
   "Hotkey not saved: {why}": "Гарячу клавішу не збережено: {why}",
   "Hide advanced": "Сховати розширені",
-  "Show advanced": "Показати розширені"
+  "Show advanced": "Показати розширені",
+  "Gets the sounds from YouTube, SoundCloud and other links. Sites change often, so it needs updating now and then.": "Бере звуки з YouTube, SoundCloud та за іншими посиланнями. Сайти часто змінюються, тож його час від часу треба оновлювати.",
+  "Installed: version {version}": "Встановлено: версія {version}",
+  "JavaScript engine": "Рушій JavaScript",
+  "Lets YouTube downloads get every format. It comes with the app and only runs on this PC.": "Дає завантаженням з YouTube усі формати. Іде разом із застосунком і працює лише на цьому ПК.",
+  "Lets YouTube downloads get every format. {engine} is on this PC and faster than the app's own, so it's used first.": "Дає завантаженням з YouTube усі формати. {engine} є на цьому ПК і швидший за вбудований, тому використовується першим.",
+  "Not found": "Не знайдено",
+  "Used when Connection is set to Tor. It's up to date.": "Використовується, коли в підключенні вибрано Tor. Він оновлений.",
+  "Working: {engine}": "Працює: {engine}",
+  "Working: {engine} {version} (faster)": "Працює: {engine} {version} (швидше)",
+  "YouTube downloads still work, but with fewer formats.": "Завантаження з YouTube все одно працюють, але форматів менше."
 }

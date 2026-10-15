@@ -3425,5 +3425,15 @@
   "A hotkey has one key, plus Ctrl, Alt, Shift or Windows if you like: this one has {keys}.": "En genvejstast har én tast, plus Ctrl, Alt, Shift eller Windows hvis du vil: denne har {keys}.",
   "Hotkey not saved: {why}": "Genvejstasten blev ikke gemt: {why}",
   "Hide advanced": "Skjul avanceret",
-  "Show advanced": "Vis avanceret"
+  "Show advanced": "Vis avanceret",
+  "Gets the sounds from YouTube, SoundCloud and other links. Sites change often, so it needs updating now and then.": "Henter lydene fra YouTube, SoundCloud og andre links. Sider ændrer sig tit, så den skal opdateres en gang imellem.",
+  "Installed: version {version}": "Installeret: version {version}",
+  "JavaScript engine": "JavaScript-motor",
+  "Lets YouTube downloads get every format. It comes with the app and only runs on this PC.": "Giver YouTube-downloads alle formater. Den følger med appen og kører kun på denne pc.",
+  "Lets YouTube downloads get every format. {engine} is on this PC and faster than the app's own, so it's used first.": "Giver YouTube-downloads alle formater. {engine} er på denne pc og hurtigere end appens egen, så den bruges først.",
+  "Not found": "Ikke fundet",
+  "Used when Connection is set to Tor. It's up to date.": "Bruges, når forbindelsen er sat til Tor. Den er opdateret.",
+  "Working: {engine}": "Virker: {engine}",
+  "Working: {engine} {version} (faster)": "Virker: {engine} {version} (hurtigere)",
+  "YouTube downloads still work, but with fewer formats.": "YouTube-downloads virker stadig, men med færre formater."
 }
