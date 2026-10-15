@@ -290,11 +290,14 @@ class StatusControl(Controller):
             mic = _("Your mic  <b style='color:{colour}'>after the setup below</b>",
                     colour=warn)
         # the app's own painted tick and cross, not the font's ✓ / ✗ (a brushy x)
+        # level with the words in the theme's font, whatever its shape
         dpr = mw.flow_out.devicePixelRatioF() or 1.0
+        mw.flow_out.ensurePolished()
+        font = mw.flow_out.font()
 
         def marks(text: str) -> str:
-            return (text.replace("✗", icons.inline("cross", bad, dpr=dpr))
-                    .replace("✓", icons.inline("check", ok, dpr=dpr)))
+            return (text.replace("✗", icons.inline("cross", bad, dpr=dpr, font=font))
+                    .replace("✓", icons.inline("check", ok, dpr=dpr, font=font)))
         mw.flow_mic.setText(marks(mic))
         mw.flow_out.setText(marks(out))
         mic_route = route == "mic"
