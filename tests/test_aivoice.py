@@ -338,7 +338,7 @@ def test_card_offers_the_download_when_the_addon_isnt_there(qapp):
         p.deleteLater()
 
 
-def test_card_lists_the_voices_once_installed(qapp, tmp_path):
+def test_card_lists_the_voices_once_installed(qapp, tmp_path, monkeypatch):
     from soundboard.ui.aivoicepanel import AiVoicePanel
     folder = tmp_path / "ai-voices"
     folder.mkdir()
@@ -350,16 +350,34 @@ def test_card_lists_the_voices_once_installed(qapp, tmp_path):
     for f in ("stream.onnx", "speaker.onnx", "voices.npz"):
         (folder / "model" / f).write_bytes(b"x")
     (info,) = modules.discover([tmp_path])
-    saved = []
-    p = AiVoicePanel(AiVoiceController(VoiceChain(), lambda e: None), {"voice": "pixie"}, [info])
+    saved, starts, switches = [], [], []
+    ctl = AiVoiceController(VoiceChain(), lambda e: None)
+
+    def fake_start(module, voice, auto_pitch=True, pitch=0.0, args=()):
+        starts.append(voice)
+        ctl.host = object()          # running
+    monkeypatch.setattr(ctl, "start", fake_start)
+    monkeypatch.setattr(ctl, "stop", lambda: setattr(ctl, "host", None))
+    monkeypatch.setattr(ctl, "set_voice", lambda vid, pitch: switches.append(vid))
+    p = AiVoicePanel(ctl, {"voice": "pixie"}, [info])
     p.changed.connect(saved.append)
     try:
         assert not p.ready_box.isHidden() and p.b_get.isHidden()
         assert len(p._tile) >= 3 and p._tile["pixie"].isChecked()
-        first = p.voices[0]["id"]
+        assert not p.is_on()
+        first, second = p.voices[0]["id"], p.voices[1]["id"]
+        # clicking a card turns the AI voice on with that voice, like the voice changer
         p._tile[first].click()
         process_events(qapp, lambda: bool(saved))
         assert saved[-1]["voice"] == first
+        assert p.is_on() and starts == [first] and p.b_start.text() == "Stop AI voice"
+        # while it's on, another card switches voice without starting it again
+        p._tile[second].click()
+        assert starts == [first] and switches == [second] and p.is_on()
+        # and a card clicked after Stop starts it again
+        p.b_start.setChecked(False)
+        p._tile[first].click()
+        assert starts == [first, first] and p.is_on()
     finally:
         p.shutdown()
         p.deleteLater()

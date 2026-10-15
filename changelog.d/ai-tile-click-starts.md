@@ -1,0 +1,1 @@
+- AI voices: clicking a voice turns the AI voice on with it, like the voice changer's voices. No more picking a voice and then pressing Start.

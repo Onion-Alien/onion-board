@@ -539,7 +539,7 @@ class AiVoicePanel(QWidget):
             tags = avl.tag_line(vo)
             about = str(vo.get("about") or vo.get("description") or "")
             b.setToolTip(f"{tags}. {about}" if tags and about else tags or about)
-            b.clicked.connect(lambda __=False, i=vid: self.pick(i))
+            b.clicked.connect(lambda __=False, i=vid: self.use(i))
             b.star.setChecked(vid in self._favs)
             b.star.toggled.connect(lambda on, i=vid: self.set_favorite(i, on))
             if avl.is_mine(vo):
@@ -628,8 +628,14 @@ class AiVoicePanel(QWidget):
             self._tile_cols = cols
             self._place_tiles()
 
+    def use(self, vid: str):
+        """A card was clicked: that voice, on now (like the voice changer's cards)."""
+        self.pick(vid)
+        if vid in self._tile and not self.is_on():
+            self.b_start.setChecked(True)      # _toggle starts it with this voice
+
     def pick(self, vid: str):
-        """Use this voice (a card was clicked): the next Start, or now if it's on."""
+        """Make this the voice: the next Start, or now if it's on."""
         if vid not in self._tile:
             return
         self.s["voice"] = vid

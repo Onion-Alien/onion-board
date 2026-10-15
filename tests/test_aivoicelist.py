@@ -246,11 +246,14 @@ def test_card_shows_every_voice_as_a_card_under_its_kind(qapp, app_dir, monkeypa
         assert order == ["ivy", "sage", "nova", "pixie"]          # lowest first
         p._cat_btns["mine"].click()
         assert shown() == [] and not p.no_mine.isHidden()
-        saved = []
+        saved, starts = [], []
         p.changed.connect(saved.append)
+        monkeypatch.setattr(p.ctl, "start", lambda m, voice, *a: starts.append(voice))
+        monkeypatch.setattr(p.ctl, "stop", lambda: None)
         p._cat_btns[""].click()
-        p._tile["bear"].click()                                   # picks it for Start
+        p._tile["bear"].click()                                   # picks it and starts it
         assert saved[-1]["voice"] == "bear" and p.current_voice() == "bear"
+        assert starts == ["bear"] and p.is_on()
         assert p.picked_name.text() == "Bear" and not p._tile["titan"].isChecked()
         p.b_hear.click()
         assert p.previewer.heard == ["bear"]
