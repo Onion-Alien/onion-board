@@ -3444,5 +3444,8 @@
   "✓ Renamed to “{new}”. Another sound has that name too.": "✓ Nytt navn: «{new}». En annen lyd heter også det.",
   "the pack's file is damaged, so it wasn't kept": "pakkens fil er skadet, så den ble ikke beholdt",
   "The download was cut off before the end. Try again.": "Nedlastingen ble avbrutt før slutten. Prøv igjen.",
-  "You can change the proxy in Settings > Connection.": "Du kan endre proxyen i Innstillinger > Tilkobling."
+  "You can change the proxy in Settings > Connection.": "Du kan endre proxyen i Innstillinger > Tilkobling.",
+  "Heads up: while Onion Board is open, {key} plays your hotkey instead of doing its usual job in other apps.": "Obs: mens Onion Board er åpen, spiller {key} hurtigtasten din i stedet for å gjøre den vanlige jobben sin i andre apper.",
+  "Windows keeps {key} for itself and never passes it to an app, so that hotkey could never play: pick another key.": "Windows holder {key} for seg selv og gir den aldri videre til en app, så den hurtigtasten ville aldri spille: velg en annen tast.",
+  "{key} is your Stop everything key, so it stays on that. Pick another key, or give Stop everything a new one in Settings → Hotkeys first.": "{key} er tasten din for Stopp alt, så den blir der. Velg en annen tast, eller gi først Stopp alt en ny i Innstillinger → Hurtigtaster."
 }

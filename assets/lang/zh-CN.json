@@ -3368,5 +3368,8 @@
   "✓ Renamed to “{new}”. Another sound has that name too.": "✓ 已重命名为“{new}”。另一个声音也叫这个名字。",
   "the pack's file is damaged, so it wasn't kept": "包文件已损坏，因此未保留",
   "The download was cut off before the end. Try again.": "下载在完成前中断了。请重试。",
-  "You can change the proxy in Settings > Connection.": "你可以在“设置”>“连接”中更改代理。"
+  "You can change the proxy in Settings > Connection.": "你可以在“设置”>“连接”中更改代理。",
+  "Heads up: while Onion Board is open, {key} plays your hotkey instead of doing its usual job in other apps.": "注意：Onion Board 打开期间，{key} 会播放你的快捷键，而不会在其他应用里做它平常的事。",
+  "Windows keeps {key} for itself and never passes it to an app, so that hotkey could never play: pick another key.": "{key} 被 Windows 自己占用，永远不会交给任何应用，所以这个快捷键永远不会播放：请换一个键。",
+  "{key} is your Stop everything key, so it stays on that. Pick another key, or give Stop everything a new one in Settings → Hotkeys first.": "{key} 是你的“全部停止”键，所以它保持不变。请换一个键，或者先在 设置 → 快捷键 里给“全部停止”设一个新键。"
 }

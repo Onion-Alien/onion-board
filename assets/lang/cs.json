@@ -3520,5 +3520,8 @@
   "✓ Renamed to “{new}”. Another sound has that name too.": "✓ Přejmenováno na „{new}“. Stejně se jmenuje i jiný zvuk.",
   "the pack's file is damaged, so it wasn't kept": "soubor balíčku je poškozený, proto nebyl ponechán",
   "The download was cut off before the end. Try again.": "Stahování se přerušilo před koncem. Zkuste to znovu.",
-  "You can change the proxy in Settings > Connection.": "Proxy můžete změnit v Nastavení > Připojení."
+  "You can change the proxy in Settings > Connection.": "Proxy můžete změnit v Nastavení > Připojení.",
+  "Heads up: while Onion Board is open, {key} plays your hotkey instead of doing its usual job in other apps.": "Pozor: dokud je Onion Board otevřený, {key} spouští tvou zkratku místo toho, co obvykle dělá v jiných aplikacích.",
+  "Windows keeps {key} for itself and never passes it to an app, so that hotkey could never play: pick another key.": "Windows si {key} nechává pro sebe a nikdy ji nepředá aplikaci, takže by ta zkratka nikdy nehrála: vyber jinou klávesu.",
+  "{key} is your Stop everything key, so it stays on that. Pick another key, or give Stop everything a new one in Settings → Hotkeys first.": "{key} je tvoje klávesa pro Zastavit všechno, takže zůstává u ní. Vyber jinou klávesu, nebo nejdřív dej Zastavit všechno novou v Nastavení → Zkratky."
 }

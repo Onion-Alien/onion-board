@@ -164,7 +164,36 @@ def check(combo: str) -> tuple[str, str]:
     parsed = parse(combo)
     if parsed is None:   # can't happen after the checks above, but never save one
         return "", _("A hotkey needs a key, like F1 or Ctrl+1.")
+    if windows_only(*parsed):
+        return "", _("Windows keeps {key} for itself and never passes it to an app, so "
+                     "that hotkey could never play: pick another key.",
+                     key=html.escape(_title(combo_name(*parsed))))
     return combo_name(*parsed), ""
+
+
+def windows_only(mods: int, vk: int) -> bool:
+    """Win+L (lock) and Ctrl+Alt+Del (the security screen): Windows acts on them itself
+    and no app ever gets them, whatever RegisterHotKey says."""
+    if vk == 0x4C and mods == MOD_WIN:
+        return True
+    return vk == 0x2E and bool(mods & MOD_CONTROL) and bool(mods & MOD_ALT)
+
+
+# keys every app already uses: they fire as our hotkey, but then they stop doing their own
+# job (copy, paste, switching windows...) in every other app while the board runs
+EVERYDAY = {(MOD_CONTROL, 0x43), (MOD_CONTROL, 0x56), (MOD_CONTROL, 0x58),
+            (MOD_CONTROL, 0x5A), (MOD_CONTROL, 0x59), (MOD_CONTROL, 0x41), (MOD_CONTROL, 0x53),
+            (MOD_ALT, 0x09), (MOD_ALT, 0x73), (MOD_WIN, 0x44)}
+
+
+def everyday(combo: str) -> bool:
+    """Is `combo` a key other apps already use (Ctrl+C, Alt+Tab, Win+D...)?"""
+    return not midi.is_midi(combo) and parse(combo) in EVERYDAY
+
+
+def _title(name: str) -> str:
+    """'ctrl+alt+delete' -> 'Ctrl+Alt+Delete' (settings.pretty_key, without its import)."""
+    return "+".join(p.upper() if len(p) == 1 else p.title() for p in _split(name))
 
 
 def combo_name(mods: int, vk: int) -> str:

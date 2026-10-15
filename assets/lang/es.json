@@ -3444,5 +3444,8 @@
   "✓ Renamed to “{new}”. Another sound has that name too.": "✓ Nombre cambiado a “{new}”. Otro sonido también tiene ese nombre.",
   "the pack's file is damaged, so it wasn't kept": "el archivo del paquete está dañado, así que no se ha guardado",
   "The download was cut off before the end. Try again.": "La descarga se cortó antes de terminar. Inténtalo de nuevo.",
-  "You can change the proxy in Settings > Connection.": "Puedes cambiar el proxy en Configuración > Conexión."
+  "You can change the proxy in Settings > Connection.": "Puedes cambiar el proxy en Configuración > Conexión.",
+  "Heads up: while Onion Board is open, {key} plays your hotkey instead of doing its usual job in other apps.": "Ojo: mientras Onion Board esté abierto, {key} activa tu atajo en vez de hacer lo de siempre en las otras apps.",
+  "Windows keeps {key} for itself and never passes it to an app, so that hotkey could never play: pick another key.": "Windows se reserva {key} y nunca se la pasa a una app, así que ese atajo nunca podría sonar: elige otra tecla.",
+  "{key} is your Stop everything key, so it stays on that. Pick another key, or give Stop everything a new one in Settings → Hotkeys first.": "{key} es tu tecla de Parar todo, así que se queda ahí. Elige otra tecla o dale antes una nueva a Parar todo en Ajustes → Atajos."
 }

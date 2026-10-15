@@ -507,7 +507,7 @@ class TriggersTab(QWidget):
             # before it starts (the bar would otherwise sit at its last frame)
             self.btn_cancel.hide()
             self._on_step("Starting…")
-            QTimer.singleShot(30, lambda: self._finish(info, error, update))
+            QTimer.singleShot(30, self, lambda: self._finish(info, error, update))
             return
         self._finish(info, error, update)
 

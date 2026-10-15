@@ -1248,6 +1248,21 @@ def test_importing_junk_says_why_and_adds_nothing(panel, monkeypatch):
     assert p.fx.import_code(code) == "Robot (shared)"
 
 
+def test_import_with_an_empty_box_says_so_and_cancel_says_nothing(panel, monkeypatch):
+    import html
+
+    from soundboard.ui import busy
+    p, _ = panel
+    said = []
+    monkeypatch.setattr(busy, "toast", lambda *a, **k: said.append(a[1]))
+    _ask(monkeypatch, "  ", None)
+    p.fx.btn_import.click()             # OK with nothing pasted: it says why
+    assert [html.unescape(s) for s in said] == ["There's no code there."]
+    assert not p.fx.store.voices
+    p.fx.btn_import.click()             # Cancel: nothing to say
+    assert len(said) == 1
+
+
 def test_copy_from_a_tile_with_the_window_closed_says_so(panel, monkeypatch):
     p, _ = panel
     _ask(monkeypatch, "Mine", "Other")

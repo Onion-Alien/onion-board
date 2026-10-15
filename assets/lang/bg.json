@@ -3444,5 +3444,8 @@
   "✓ Renamed to “{new}”. Another sound has that name too.": "✓ Преименувано на „{new}“. Има и друг звук с това име.",
   "the pack's file is damaged, so it wasn't kept": "файлът на пакета е повреден, затова не е запазен",
   "The download was cut off before the end. Try again.": "Изтеглянето прекъсна преди края. Опитайте отново.",
-  "You can change the proxy in Settings > Connection.": "Можете да смените проксито в Настройки > Връзка."
+  "You can change the proxy in Settings > Connection.": "Можете да смените проксито в Настройки > Връзка.",
+  "Heads up: while Onion Board is open, {key} plays your hotkey instead of doing its usual job in other apps.": "Внимание: докато Onion Board е отворен, {key} пуска твоя бърз клавиш, вместо да върши обичайната си работа в другите приложения.",
+  "Windows keeps {key} for itself and never passes it to an app, so that hotkey could never play: pick another key.": "Windows пази {key} за себе си и никога не го дава на приложение, така че този бърз клавиш никога няма да свири: избери друг клавиш.",
+  "{key} is your Stop everything key, so it stays on that. Pick another key, or give Stop everything a new one in Settings → Hotkeys first.": "{key} е клавишът ти за „Спри всичко“, затова остава за него. Избери друг клавиш или първо дай нов на „Спри всичко“ в Настройки → Бързи клавиши."
 }

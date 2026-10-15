@@ -3444,5 +3444,8 @@
   "✓ Renamed to “{new}”. Another sound has that name too.": "✓ Umbenannt in „{new}“. Ein anderer Sound heißt auch so.",
   "the pack's file is damaged, so it wasn't kept": "die Datei des Pakets ist beschädigt, daher wurde sie nicht aufbewahrt",
   "The download was cut off before the end. Try again.": "Der Download wurde vor dem Ende abgebrochen. Versuche es noch einmal.",
-  "You can change the proxy in Settings > Connection.": "Den Proxy kannst du unter Einstellungen > Verbindung ändern."
+  "You can change the proxy in Settings > Connection.": "Den Proxy kannst du unter Einstellungen > Verbindung ändern.",
+  "Heads up: while Onion Board is open, {key} plays your hotkey instead of doing its usual job in other apps.": "Achtung: Solange Onion Board offen ist, löst {key} deinen Hotkey aus, statt in anderen Apps das Übliche zu tun.",
+  "Windows keeps {key} for itself and never passes it to an app, so that hotkey could never play: pick another key.": "Windows behält {key} für sich und gibt die Taste nie an eine App weiter, dieser Hotkey könnte also nie abspielen: Nimm eine andere Taste.",
+  "{key} is your Stop everything key, so it stays on that. Pick another key, or give Stop everything a new one in Settings → Hotkeys first.": "{key} ist deine Taste für Alles stoppen, deshalb bleibt sie dort. Nimm eine andere Taste oder gib Alles stoppen zuerst unter Einstellungen → Hotkeys eine neue."
 }

@@ -3444,5 +3444,8 @@
   "✓ Renamed to “{new}”. Another sound has that name too.": "✓ Na-rename sa “{new}”. May isa pang sound na ganito rin ang pangalan.",
   "the pack's file is damaged, so it wasn't kept": "sira ang file ng pack, kaya hindi ito itinago",
   "The download was cut off before the end. Try again.": "Naputol ang download bago matapos. Subukan ulit.",
-  "You can change the proxy in Settings > Connection.": "Mapapalitan mo ang proxy sa Mga Setting > Koneksyon."
+  "You can change the proxy in Settings > Connection.": "Mapapalitan mo ang proxy sa Mga Setting > Koneksyon.",
+  "Heads up: while Onion Board is open, {key} plays your hotkey instead of doing its usual job in other apps.": "Paalala: habang bukas ang Onion Board, pinapatugtog ng {key} ang hotkey mo sa halip na gawin ang karaniwang trabaho nito sa ibang app.",
+  "Windows keeps {key} for itself and never passes it to an app, so that hotkey could never play: pick another key.": "Itinatabi ng Windows ang {key} para sa sarili nito at hindi ito ibinibigay sa anumang app, kaya hindi kailanman tutugtog ang hotkey na iyan: pumili ng ibang key.",
+  "{key} is your Stop everything key, so it stays on that. Pick another key, or give Stop everything a new one in Settings → Hotkeys first.": "Ang {key} ang key mo para sa Itigil lahat, kaya doon ito mananatili. Pumili ng ibang key, o bigyan muna ng bago ang Itigil lahat sa Settings → Mga hotkey."
 }

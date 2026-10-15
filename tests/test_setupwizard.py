@@ -1144,3 +1144,17 @@ def test_the_cable_page_and_closing_never_wait_on_the_ui_thread(wizard, devices,
     devices_done(w)
     assert engine.is_virtual(devices["picked"]["set_main_device"])
     assert "set_mic_device" in devices["picked"]   # every device reopened on close
+
+
+def test_closing_the_guide_while_a_hint_flashes(wizard, qapp):
+    """"Play a test sound" puts "Playing… hear it?" up for 1.5 s; closing the guide
+    in that time crashed when the timer put the title back on the freed label."""
+    from PySide6.QtCore import QEvent
+    from PySide6.QtTest import QTest
+    w, wiz = wizard
+    other = setupwizard.SetupWizard(w)
+    other._flash_hint("Playing… hear it?", 50)
+    other.done(0)
+    other.deleteLater()
+    qapp.sendPostedEvents(None, QEvent.DeferredDelete)
+    QTest.qWait(150)   # past the flash: nothing left to touch the label

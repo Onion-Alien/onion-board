@@ -3520,5 +3520,8 @@
   "✓ Renamed to “{new}”. Another sound has that name too.": "✓ Redenumit în „{new}”. Și alt sunet are numele ăsta.",
   "the pack's file is damaged, so it wasn't kept": "fișierul pachetului este deteriorat, așa că nu a fost păstrat",
   "The download was cut off before the end. Try again.": "Descărcarea s-a întrerupt înainte de final. Încearcă din nou.",
-  "You can change the proxy in Settings > Connection.": "Poți schimba proxy-ul din Setări > Conexiune."
+  "You can change the proxy in Settings > Connection.": "Poți schimba proxy-ul din Setări > Conexiune.",
+  "Heads up: while Onion Board is open, {key} plays your hotkey instead of doing its usual job in other apps.": "Atenție: cât timp Onion Board e deschis, {key} pornește tasta ta rapidă în loc să-și facă treaba obișnuită în celelalte aplicații.",
+  "Windows keeps {key} for itself and never passes it to an app, so that hotkey could never play: pick another key.": "Windows păstrează {key} pentru el și nu o dă niciodată unei aplicații, așa că tasta rapidă n-ar suna niciodată: alege altă tastă.",
+  "{key} is your Stop everything key, so it stays on that. Pick another key, or give Stop everything a new one in Settings → Hotkeys first.": "{key} e tasta ta pentru Oprește tot, așa că rămâne acolo. Alege altă tastă sau dă-i întâi lui Oprește tot una nouă în Setări → Taste rapide."
 }
