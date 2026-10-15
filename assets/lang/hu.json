@@ -3438,5 +3438,7 @@
   "Unplugged": "Nincs csatlakoztatva",
   "Windows can't find <b>{mic}</b> right now. Plug it in, or switch it on if it's wireless. This goes away by itself.": "A Windows most nem találja ezt: <b>{mic}</b>. Dugd be, vagy kapcsold be, ha vezeték nélküli. Ez magától eltűnik.",
   "Your headset is off or its mic is muted. Turn it on or unmute it. Still nothing? Click <b>Repair</b>.": "A headseted ki van kapcsolva, vagy le van némítva a mikrofonja. Kapcsold be, vagy oldd fel a némítást. Még mindig semmi? Kattints a <b>Javítás</b> gombra.",
+  "The download was cut off before the end. Try again.": "A letöltés a vége előtt megszakadt. Próbáld újra.",
+  "You can change the proxy in Settings > Connection.": "A proxyt a Beállítások > Kapcsolat részben módosíthatod.",
   "the pack's file is damaged, so it wasn't kept": "a csomag fájlja sérült, ezért nem lett megtartva"
 }

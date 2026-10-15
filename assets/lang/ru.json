@@ -3514,5 +3514,7 @@
   "Unplugged": "Отключён",
   "Windows can't find <b>{mic}</b> right now. Plug it in, or switch it on if it's wireless. This goes away by itself.": "Windows сейчас не видит <b>{mic}</b>. Подключи его или включи, если он беспроводной. Это пропадёт само.",
   "Your headset is off or its mic is muted. Turn it on or unmute it. Still nothing? Click <b>Repair</b>.": "Гарнитура выключена или её микрофон отключён. Включи её или микрофон. Всё ещё ничего? Нажми <b>Починить</b>.",
+  "The download was cut off before the end. Try again.": "Загрузка оборвалась, не дойдя до конца. Попробуйте ещё раз.",
+  "You can change the proxy in Settings > Connection.": "Прокси можно изменить в разделе «Настройки» > «Подключение».",
   "the pack's file is damaged, so it wasn't kept": "файл пакета повреждён, поэтому он не сохранён"
 }

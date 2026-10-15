@@ -3438,5 +3438,7 @@
   "Unplugged": "Ej ansluten",
   "Windows can't find <b>{mic}</b> right now. Plug it in, or switch it on if it's wireless. This goes away by itself.": "Windows hittar inte <b>{mic}</b> just nu. Anslut det, eller slå på det om det är trådlöst. Det här försvinner av sig självt.",
   "Your headset is off or its mic is muted. Turn it on or unmute it. Still nothing? Click <b>Repair</b>.": "Ditt headset är avstängt eller dess mikrofon avstängd. Slå på det eller mikrofonen. Fortfarande inget? Klicka <b>Reparera</b>.",
+  "The download was cut off before the end. Try again.": "Nedladdningen avbröts innan den var klar. Försök igen.",
+  "You can change the proxy in Settings > Connection.": "Du kan ändra proxyn i Inställningar > Anslutning.",
   "the pack's file is damaged, so it wasn't kept": "paketets fil är skadad, så den sparades inte"
 }
