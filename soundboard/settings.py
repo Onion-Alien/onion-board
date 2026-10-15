@@ -7,7 +7,7 @@ import logging
 import re
 from collections.abc import Callable
 
-from PySide6.QtCore import QElapsedTimer, QObject, QSignalBlocker, QSize, Qt, QTimer, Signal
+from PySide6.QtCore import QElapsedTimer, QEvent, QObject, QSignalBlocker, QSize, Qt, QTimer, Signal
 from PySide6.QtGui import QColor, QKeySequence, QPainter, QPen, QShortcut
 from PySide6.QtWidgets import (QAbstractButton, QApplication, QCheckBox, QComboBox, QDialog, QFrame,
                                QHBoxLayout, QLabel, QLineEdit, QListWidget, QListWidgetItem,
@@ -165,6 +165,10 @@ class SettingsDialog(QDialog, Built):
         self.categories.currentRowChanged.connect(self._row_picked)
         self.categories.itemClicked.connect(self._row_clicked)
         self.categories.itemActivated.connect(self._row_clicked)   # (Enter)
+        # a mouse press on the Show advanced row would make it the current row until the
+        # release, so the page's own row lost its highlight and got it back on every
+        # click: the press does the switch here instead, and the list never sees it
+        self.categories.viewport().installEventFilter(self)
         self._adv_clicked = QElapsedTimer()
         self.tabs.currentChanged.connect(self._build_page)
         self.tabs.currentChanged.connect(self._page_shown)
@@ -180,6 +184,8 @@ class SettingsDialog(QDialog, Built):
         icons.clear_button(self.search_box)
         self.search_box.setAccessibleName(_("Search settings"))
         self.search_box.setFixedWidth(196)
+        # no right-click menu over a few words: Ctrl+C / Ctrl+V still copy and paste
+        self.search_box.setContextMenuPolicy(Qt.ContextMenuPolicy.NoContextMenu)
         self._search_wait = QTimer(self, singleShot=True, interval=150)
         self._search_wait.timeout.connect(lambda: self._apply_search(self.search_box.text()))
         self.search_box.textChanged.connect(lambda _t: self._search_wait.start())
@@ -256,6 +262,18 @@ class SettingsDialog(QDialog, Built):
             return
         self._adv_clicked.start()
         self._set_advanced(not self._advanced)
+
+    def eventFilter(self, obj, e):
+        cats = getattr(self, "categories", None)
+        if (cats is not None and obj is cats.viewport()
+                and e.type() in (QEvent.Type.MouseButtonPress, QEvent.Type.MouseButtonDblClick,
+                                 QEvent.Type.MouseButtonRelease)
+                and cats.indexAt(e.position().toPoint()).row() == self._adv_row):
+            # (a double click's second press comes as a DblClick: the same click)
+            if e.type() == QEvent.Type.MouseButtonPress and e.button() == Qt.MouseButton.LeftButton:
+                self._set_advanced(not self._advanced)
+            return True
+        return super().eventFilter(obj, e)
 
     def _page_shown(self, i: int):
         """The list follows the page; an advanced page opened from elsewhere (a link,
