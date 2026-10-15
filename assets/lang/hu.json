@@ -3423,5 +3423,7 @@
   "“{key}” isn't a key on a keyboard, so that hotkey could never be pressed.": "A(z) „{key}” nem billentyű a billentyűzeten, így ezt a gyorsbillentyűt sosem lehetne lenyomni.",
   "{mod} alone can't be a hotkey: add a key, like {mod}+1.": "A(z) {mod} egyedül nem lehet gyorsbillentyű: adj hozzá egy billentyűt, például {mod}+1.",
   "A hotkey has one key, plus Ctrl, Alt, Shift or Windows if you like: this one has {keys}.": "Egy gyorsbillentyűben egy billentyű van, plusz ha akarod Ctrl, Alt, Shift vagy Windows: ebben {keys} van.",
-  "Hotkey not saved: {why}": "A gyorsbillentyű nincs mentve: {why}"
+  "Hotkey not saved: {why}": "A gyorsbillentyű nincs mentve: {why}",
+  "Hide advanced": "Haladó elrejtése",
+  "Show advanced": "Haladó mutatása"
 }

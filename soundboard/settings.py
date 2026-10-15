@@ -7,15 +7,16 @@ import logging
 import re
 from collections.abc import Callable
 
-from PySide6.QtCore import QObject, QSignalBlocker, QSize, Qt, QTimer, Signal
-from PySide6.QtGui import QKeySequence, QShortcut
+from PySide6.QtCore import QElapsedTimer, QObject, QSignalBlocker, QSize, Qt, QTimer, Signal
+from PySide6.QtGui import QColor, QKeySequence, QPainter, QPen, QShortcut
 from PySide6.QtWidgets import (QAbstractButton, QApplication, QCheckBox, QComboBox, QDialog, QFrame,
                                QHBoxLayout, QLabel, QLineEdit, QListWidget, QListWidgetItem,
-                               QPushButton, QScrollArea, QTabWidget, QVBoxLayout, QWidget)
+                               QPushButton, QScrollArea, QStyledItemDelegate, QTabWidget,
+                               QVBoxLayout, QWidget)
 
 
 from soundboard.ui import busy, icons
-from soundboard import usage
+from soundboard import theme, usage
 from soundboard.i18n import _
 from soundboard.ui.settingspages import Built, _button_row as _button_row
 from soundboard.ui.settingspages.help import HelpPage
@@ -43,6 +44,28 @@ NOTE = _("Hey, thanks for actually using this. Onion Board started because every
           "menace with it, and go make your friends jump in voice chat.\n\nOnionAlien")
 
 
+class _AdvancedRow(QStyledItemDelegate):
+    """The Show advanced row: a clear gap over it with a thin line across, so the
+    everyday pages above read as their own group. Only the row under the gap
+    highlights."""
+    GAP = 28
+
+    def sizeHint(self, option, index):
+        size = super().sizeHint(option, index)
+        size.setHeight(size.height() + self.GAP)
+        return size
+
+    def paint(self, painter: QPainter, option, index):
+        line = QColor(theme.tokens().get("border", "#444"))
+        y = option.rect.top() + self.GAP // 2
+        painter.save()
+        painter.setPen(QPen(line, 1))
+        painter.drawLine(option.rect.left() + 8, y, option.rect.right() - 8, y)
+        painter.restore()
+        option.rect.setTop(option.rect.top() + self.GAP)
+        super().paint(painter, option, index)
+
+
 class SettingsDialog(QDialog, Built):
     """All settings in one place. `mw` is the MainWindow; changes apply immediately."""
 
@@ -53,7 +76,11 @@ class SettingsDialog(QDialog, Built):
     PAGE_TOP = 18    # the pages start this far down: where a tab's do (its 10 + 8)
     BACK_PAD = "padding:7px 0px 7px 3px"   # (the arrow is moved by _level_icons)
 
-    def __init__(self, mw, page: str = "privacy", lazy: bool = False):
+    # the row between the everyday pages and the rest: Show advanced / Hide advanced.
+    # It has an empty page of its own, so a row is still its page's tab index.
+    ADVANCED = "advanced"
+
+    def __init__(self, mw, page: str = "audio", lazy: bool = False):
         """A page in the main window, in place of the tabs (SettingsControl.open_settings),
         never a window of its own. `lazy`: build only `page` now and each other page
         the first time it's shown. Building all twelve under the app's style sheet took
@@ -85,19 +112,21 @@ class SettingsDialog(QDialog, Built):
         self.tabs = QTabWidget()
         self.tabs.setDocumentMode(True)
         self.hk_buttons: dict[str, list[QPushButton]] = {}
-        pages = (("privacy", _("Privacy && security"), "shield", self.privacy._privacy),
+        # what most people change first; the rest waits behind Show advanced
+        pages = (("audio", _("Audio"), "volume", self.audio._audio),
+                 ("appearance", _("Appearance"), "palette", self.appearance._appearance),
+                 ("hotkeys", _("Hotkeys"), "keyboard", self.keys._hotkeys),
+                 ("tabs", _("Tabs"), "sounds", self._tabs),
+                 ("general", _("General"), "settings", self.general._general),
+                 ("about", _("About"), "star", self.help._about),
+                 (self.ADVANCED, _("Show advanced"), "sliders", None),
+                 ("overlay", _("Overlay"), "gamepad", self.keys._overlay),
+                 ("privacy", _("Privacy && security"), "shield", self.privacy._privacy),
                  ("connection", _("Connection"), "radio", self.connection._connection),
                  ("data", _("Data && quality"), "wave", self.privacy._data),
-                 ("general", _("General"), "settings", self.general._general),
-                 ("tabs", _("Tabs"), "sounds", self._tabs),
-                 ("appearance", _("Appearance"), "palette", self.appearance._appearance),
-                 ("audio", _("Audio"), "volume", self.audio._audio),
-                 ("hotkeys", _("Hotkeys"), "keyboard", self.keys._hotkeys),
-                 ("overlay", _("Overlay"), "gamepad", self.keys._overlay),
                  ("updates", _("Updates"), "reload", self.connection._updates),
                  ("help", _("Add-ons"), "plus", self.help._help),
-                 ("remote", _("Remote"), "cable", self.addons._remote),
-                 ("about", _("About"), "star", self.help._about))
+                 ("remote", _("Remote"), "cable", self.addons._remote))
         self.categories = QListWidget()
         self.categories.setObjectName("settingscategories")
         self.categories.setAccessibleName(_("Settings categories"))
@@ -106,7 +135,9 @@ class SettingsDialog(QDialog, Built):
         self._unbuilt: dict[int, Callable[[], QWidget]] = {}   # tab index -> its page's builder
         for i, (key, title, icon, build) in enumerate(pages):
             sa = self._scroll()
-            if lazy and key != page:
+            if build is None:   # (the Show advanced row: nothing to show)
+                self._fill(sa, QWidget())
+            elif lazy and key != page:
                 self._unbuilt[i] = build
             else:
                 self._fill(sa, build())
@@ -125,10 +156,20 @@ class SettingsDialog(QDialog, Built):
         self.tabs.tabBar().setFocusPolicy(Qt.FocusPolicy.NoFocus)
         self.tabs.setFocusPolicy(Qt.FocusPolicy.NoFocus)
         self.tabs.setFocusProxy(None)   # pyright: ignore[reportArgumentType]  # None clears it
-        self.categories.currentRowChanged.connect(self.tabs.setCurrentIndex)
-        self.tabs.currentChanged.connect(self._build_page)
-        self.tabs.currentChanged.connect(self.categories.setCurrentRow)
         self._page_keys = [p[0] for p in pages]
+        self._adv_row = self._page_keys.index(self.ADVANCED)
+        adv = self.categories.item(self._adv_row)
+        adv.setFlags(Qt.ItemFlag.ItemIsEnabled)   # a switch, never the page you're on
+        self._adv_delegate = _AdvancedRow(self.categories)
+        self.categories.setItemDelegateForRow(self._adv_row, self._adv_delegate)
+        self.categories.currentRowChanged.connect(self._row_picked)
+        self.categories.itemClicked.connect(self._row_clicked)
+        self.categories.itemActivated.connect(self._row_clicked)   # (Enter)
+        self._adv_clicked = QElapsedTimer()
+        self.tabs.currentChanged.connect(self._build_page)
+        self.tabs.currentChanged.connect(self._page_shown)
+        self._advanced = bool(getattr(mw.cfg, "settings_advanced", False))
+        self._fold()
         self.show_page(page)
         self.privacy._offline_sync()
         # a search box over the categories: 13 pages are a lot to look through for one
@@ -198,6 +239,61 @@ class SettingsDialog(QDialog, Built):
         lay.addLayout(content, 1)
         self._narrow = False
 
+    # ------------------------------------------------------------------ advanced
+    def _row_picked(self, row: int):
+        """A row became the current one: its page (the Show advanced row has none)."""
+        if row >= 0 and row != self._adv_row:
+            self.tabs.setCurrentIndex(row)
+
+    def _row_clicked(self, item):
+        """The Show advanced row clicked (or Enter on it). A double click's second
+        click (and its activation) is the same click, not a second switch."""
+        if self.categories.row(item) != self._adv_row:
+            return
+        clicked = self._adv_clicked
+        if clicked.isValid() and clicked.elapsed() < QApplication.doubleClickInterval():
+            self.categories.setCurrentRow(self.tabs.currentIndex())
+            return
+        self._adv_clicked.start()
+        self._set_advanced(not self._advanced)
+
+    def _page_shown(self, i: int):
+        """The list follows the page; an advanced page opened from elsewhere (a link,
+        Offline mode's Privacy page) opens the advanced rows too."""
+        if i > self._adv_row and not self._advanced:
+            self._set_advanced(True)
+        self.categories.setCurrentRow(i)
+
+    def _set_advanced(self, on: bool):
+        self._advanced = on
+        if getattr(self.mw.cfg, "settings_advanced", None) != on:
+            self.mw.set_option("settings_advanced", on)
+        if not on and self.tabs.currentIndex() > self._adv_row:
+            self.tabs.setCurrentIndex(0)   # (its row is about to go)
+        self._fold()
+        self.categories.setCurrentRow(self.tabs.currentIndex())
+
+    def _fold(self, searching: bool | None = None):
+        """The advanced rows hidden or shown, and the switch's words to match. A search
+        shows every page it finds, and hides the switch. `searching`: whether words
+        are being searched for (None: whether the box has any)."""
+        item = self.categories.item(self._adv_row)
+        title = (_("Hide advanced") + "  ▾") if self._advanced else (_("Show advanced") + "  ▸")
+        item.setData(Qt.ItemDataRole.UserRole + 1, title)
+        narrow = getattr(self, "_narrow", False)
+        item.setText("" if narrow else title)
+        item.setToolTip(title if narrow else "")
+        if searching is None:
+            box = getattr(self, "search_box", None)
+            searching = box is not None and bool(box.text().split())
+        item.setHidden(searching)
+        if searching:
+            return
+        offline = self._offline_pages()
+        for i in range(self._adv_row + 1, self.categories.count()):
+            self.categories.item(i).setHidden(
+                not self._advanced or self._page_keys[i] in offline)
+
     def resizeEvent(self, e):
         super().resizeEvent(e)
         self.heading._fit_width(self.width())
@@ -218,9 +314,9 @@ class SettingsDialog(QDialog, Built):
         keys = self._page_keys
         if page in self._offline_pages():
             page = "privacy"
-        i = keys.index(page) if page in keys else 0
-        self.categories.setCurrentRow(i)
+        i = keys.index(page) if page in keys and page != self.ADVANCED else 0
         self.tabs.setCurrentIndex(i)
+        self._page_shown(i)
         self._build_page(self.tabs.currentIndex())
 
     # ------------------------------------------------------------------ search
@@ -256,6 +352,8 @@ class SettingsDialog(QDialog, Built):
                 self._searching = False
         first = named = None
         for i in range(self.tabs.count()):
+            if i == self._adv_row:
+                continue   # (_fold)
             title = self.categories.item(i).data(Qt.ItemDataRole.UserRole + 1).lower()
             if self._page_keys[i] in self._offline_pages():   # hidden in Offline mode
                 self.categories.item(i).setHidden(True)
@@ -290,6 +388,7 @@ class SettingsDialog(QDialog, Built):
         self.no_match.setText(_("No settings match “{text}”", text=text.strip()))
         self.no_match.setVisible(nothing)
         self.tabs.setVisible(not nothing)
+        self._fold(bool(words))
         on_hidden = self.categories.item(self.tabs.currentIndex()).isHidden()
         if named is not None:
             self.tabs.setCurrentIndex(named)

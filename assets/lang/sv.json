@@ -3423,5 +3423,7 @@
   "“{key}” isn't a key on a keyboard, so that hotkey could never be pressed.": "”{key}” är ingen tangent på ett tangentbord, så den snabbtangenten kan aldrig tryckas.",
   "{mod} alone can't be a hotkey: add a key, like {mod}+1.": "{mod} ensam kan inte vara en snabbtangent: lägg till en tangent, till exempel {mod}+1.",
   "A hotkey has one key, plus Ctrl, Alt, Shift or Windows if you like: this one has {keys}.": "En snabbtangent har en tangent, plus Ctrl, Alt, Shift eller Windows om du vill: den här har {keys}.",
-  "Hotkey not saved: {why}": "Snabbtangenten sparades inte: {why}"
+  "Hotkey not saved: {why}": "Snabbtangenten sparades inte: {why}",
+  "Hide advanced": "Dölj avancerat",
+  "Show advanced": "Visa avancerat"
 }

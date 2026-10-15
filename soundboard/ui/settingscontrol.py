@@ -76,13 +76,13 @@ class SettingsControl(Controller):
             # nothing it shows changed since it closed: the same one, as it was left
             if dlg is not None and qt_valid(dlg) \
                     and self._settings_print() == self._settings_kept_print:
-                dlg.show_page(page or "privacy")
+                dlg.show_page(page or "audio")
                 if getattr(dlg, "dev_combos", None):
                     dlg.audio._sync_devices()
             else:
                 if dlg is not None and qt_valid(dlg):
                     free_dialog(dlg)
-                dlg = SettingsDialog(mw, page or "privacy", lazy=True)
+                dlg = SettingsDialog(mw, page or "audio", lazy=True)
                 dlg.finished.connect(lambda _r, d=dlg: self._settings_closed(d))
             self._settings_dlg = dlg
             # (what "Send my sounds to" was: a new pick is checked on the way out)
@@ -246,7 +246,7 @@ class SettingsControl(Controller):
         if (self._settings_dlg is not None or self._settings_kept is not None
                 or getattr(mw, "_quitting", False) or not qt_valid(mw)):
             return
-        dlg = SettingsDialog(mw, "privacy", lazy=True)
+        dlg = SettingsDialog(mw, "audio", lazy=True)
         dlg.hide()
         dlg.finished.connect(lambda _r, d=dlg: self._settings_closed(d))
         _polish(dlg, mw._content.size())

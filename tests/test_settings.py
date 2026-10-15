@@ -124,7 +124,8 @@ def test_the_cog_builds_only_the_page_it_opens_and_the_rest_when_shown(window): 
         d = SettingsDialog(window, "audio", lazy=True)
     assert shown == []
     built = [i for i in range(d.tabs.count()) if d.tabs.widget(i).widget() is not None]
-    assert built == [d._page_keys.index("audio")]
+    # (the Show advanced row's page is an empty one, made with the list)
+    assert built == [d._page_keys.index("audio"), d._page_keys.index(d.ADVANCED)]
     d.categories.setCurrentRow(d._page_keys.index("updates"))
     page = d.tabs.currentWidget().widget()
     assert page is not None and "App updates" in {lb.text() for lb in page.findChildren(QLabel)}
@@ -238,9 +239,9 @@ def test_onion_watch_can_be_removed_from_settings(window, monkeypatch):  # noqa:
 def test_connection_choice_applies_at_once_and_fails_closed(window, qapp, monkeypatch):  # noqa: F811
     from soundboard import net
     monkeypatch.setattr(window, "_save_later", lambda: None)
-    d = SettingsDialog(window)
+    d = SettingsDialog(window, "privacy")
     try:
-        assert d.tabs.currentIndex() == 0 and d._page_keys[0] == "privacy"
+        assert d._page_keys[d.tabs.currentIndex()] == "privacy"
         assert d.net_direct.isChecked() and not d.net_addr.isEnabled()
         d.net_via.setChecked(True)                 # no address yet: nothing goes online
         assert window.cfg.net_mode == "proxy" and net.active() and net.proxy() is None
@@ -299,13 +300,16 @@ def test_all_settings_pages_fit_their_window(window, qapp):  # noqa: F811
         for width, height in ((720, 600), (860, 700), (1020, 760)):
             d.resize(width, height)
             for key in d._page_keys:
+                if key == d.ADVANCED:   # (a switch, not a page)
+                    continue
                 d.categories.setCurrentRow(d._page_keys.index(key))
                 for _ in range(3):
                     qapp.processEvents()
                 sa = d.tabs.currentWidget()
                 assert sa.widget().minimumSizeHint().width() <= sa.viewport().width(), key
                 assert d.tabs.currentIndex() == d.categories.currentRow()
-        assert "&&" in d.tabs.tabText(0)        # "&" alone would underline the next letter
+        # "&" alone would underline the next letter
+        assert "&&" in d.tabs.tabText(d._page_keys.index("privacy"))
     finally:
         d.close()
 
@@ -630,6 +634,12 @@ def test_a_board_reopened_shows_the_picked_language_on_the_button(window):  # no
     d.close()
 
 
+def _rows_back(d) -> bool:
+    """Every row shown again after a search, but the advanced ones while folded."""
+    return all(d.categories.item(i).isHidden() == (i > d._adv_row and not d._advanced)
+               for i in range(d.categories.count()))
+
+
 def test_search_hides_cards_and_pages_without_the_word(window, qapp):  # noqa: F811
     """Typing in the search box keeps only the cards with the word, hides the pages
     with none left, lands on the first page with one, and clearing brings it all back."""
@@ -648,7 +658,7 @@ def test_search_hides_cards_and_pages_without_the_word(window, qapp):  # noqa: F
         assert all("tray" in d._words_of(c) for c in visible)
         d._apply_search("")
         assert all(not c.isHidden() for c in cards)
-        assert all(not d.categories.item(i).isHidden() for i in range(d.categories.count()))
+        assert _rows_back(d)
         d._apply_search("no such words here")
         assert all(d.categories.item(i).isHidden() for i in range(d.categories.count()))
     finally:
@@ -670,7 +680,7 @@ def test_search_finds_painted_theme_names(window, qapp, name):  # noqa: F811
                        for tile in card.findChildren(ThemeCard))
                    for card in cards)
         d._apply_search("")
-        assert all(not d.categories.item(i).isHidden() for i in range(d.categories.count()))
+        assert _rows_back(d)
     finally:
         d.close()
 
@@ -804,6 +814,8 @@ def test_search_lands_on_the_named_page_and_says_when_nothing_matches(window, qa
     d.show()
     try:
         for i in range(d.categories.count()):   # a page's own name opens that page
+            if i == d._adv_row:   # (a switch, not a page)
+                continue
             name = d.categories.item(i).text()
             d.tabs.setCurrentIndex((i + 5) % d.tabs.count())
             d._apply_search(name)
@@ -815,7 +827,7 @@ def test_search_lands_on_the_named_page_and_says_when_nothing_matches(window, qa
         assert "zzqq nothing" in d.no_match.text()
         d._apply_search("")
         assert d.tabs.isVisibleTo(d) and not d.no_match.isVisibleTo(d)
-        assert not any(d.categories.item(r).isHidden() for r in range(d.categories.count()))
+        assert _rows_back(d)
     finally:
         d.close()
 
@@ -828,7 +840,7 @@ def test_search_of_only_spaces_before_the_pages_are_built(window, qapp, text):  
     try:
         assert d._unbuilt
         d._apply_search(text)
-        assert not any(d.categories.item(r).isHidden() for r in range(d.categories.count()))
+        assert _rows_back(d)
         for word in ("Größe", "日本語", "مرحبا", "😀"):   # any language: no crash
             d._apply_search(word)
         d._apply_search(text)
@@ -1034,3 +1046,31 @@ def test_search_words_skip_widgets_kept_as_a_name(qapp):
     words = SettingsDialog._words_of(card)
     assert "midnight" in words and "speaker" in words
     assert "pyside" not in words and "object at" not in words
+
+
+def test_basics_first_and_show_advanced(window, qapp):  # noqa: F811
+    """The everyday pages come first; the rest wait behind Show advanced, which opens
+    by itself for a link to one of them and is remembered."""
+    window.cfg.settings_advanced = False
+    d = SettingsDialog(window, lazy=True)
+    try:
+        keys, cats, adv = d._page_keys, d.categories, d._adv_row
+        assert keys[0] == "audio" and keys.index("privacy") > adv
+        assert all(cats.item(i).isHidden() for i in range(adv + 1, cats.count()))
+        assert not cats.item(adv).isHidden() and cats.item(d.tabs.currentIndex()).text() == "Audio"
+        assert not cats.item(adv).flags() & Qt.ItemFlag.ItemIsSelectable
+        d._row_clicked(cats.item(adv))
+        assert d._advanced and window.cfg.settings_advanced
+        assert not any(cats.item(i).isHidden() for i in range(cats.count()))
+        assert keys[d.tabs.currentIndex()] == "audio"   # the page stays
+        d._row_clicked(cats.item(adv))   # a double click's second click: still open
+        assert d._advanced
+        d.show_page("privacy")
+        d._adv_clicked.invalidate()
+        d._row_clicked(cats.item(adv))   # folding away the page you're on: back to Audio
+        assert not d._advanced and keys[d.tabs.currentIndex()] == "audio"
+        d.show_page("updates")   # a link to an advanced page opens them
+        assert d._advanced and keys[d.tabs.currentIndex()] == "updates"
+        assert cats.currentRow() == d.tabs.currentIndex()
+    finally:
+        d.close()

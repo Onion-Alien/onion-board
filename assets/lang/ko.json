@@ -3347,5 +3347,7 @@
   "“{key}” isn't a key on a keyboard, so that hotkey could never be pressed.": "“{key}”는 키보드에 있는 키가 아니라서 이 단축키는 절대 누를 수 없어요.",
   "{mod} alone can't be a hotkey: add a key, like {mod}+1.": "{mod}만으로는 단축키가 될 수 없어요. 키를 더하세요. 예: {mod}+1",
   "A hotkey has one key, plus Ctrl, Alt, Shift or Windows if you like: this one has {keys}.": "단축키는 키 하나에, 원하면 Ctrl, Alt, Shift, Windows를 더해요. 이건 {keys}가 있어요.",
-  "Hotkey not saved: {why}": "단축키를 저장하지 않았어요: {why}"
+  "Hotkey not saved: {why}": "단축키를 저장하지 않았어요: {why}",
+  "Hide advanced": "고급 숨기기",
+  "Show advanced": "고급 보기"
 }

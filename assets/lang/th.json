@@ -3347,5 +3347,7 @@
   "“{key}” isn't a key on a keyboard, so that hotkey could never be pressed.": "“{key}” ไม่ใช่ปุ่มบนคีย์บอร์ด จึงไม่มีทางกดปุ่มลัดนี้ได้",
   "{mod} alone can't be a hotkey: add a key, like {mod}+1.": "{mod} อย่างเดียวเป็นปุ่มลัดไม่ได้ เพิ่มอีกหนึ่งปุ่ม เช่น {mod}+1",
   "A hotkey has one key, plus Ctrl, Alt, Shift or Windows if you like: this one has {keys}.": "ปุ่มลัดมีปุ่มเดียว และจะเพิ่ม Ctrl, Alt, Shift หรือ Windows ก็ได้ แต่อันนี้มี {keys}",
-  "Hotkey not saved: {why}": "ไม่ได้บันทึกปุ่มลัด: {why}"
+  "Hotkey not saved: {why}": "ไม่ได้บันทึกปุ่มลัด: {why}",
+  "Hide advanced": "ซ่อนขั้นสูง",
+  "Show advanced": "แสดงขั้นสูง"
 }
