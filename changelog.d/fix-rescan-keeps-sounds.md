@@ -1,1 +1,0 @@
-- Pressing Re-scan devices while a sound plays no longer stops it: the sound carries on from where it was once the devices are back.

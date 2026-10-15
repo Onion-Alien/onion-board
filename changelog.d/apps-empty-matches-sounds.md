@@ -1,1 +1,0 @@
-- The Apps tab's empty page now matches the Sounds tab's: the same text size under Bun, and Bun sits in the middle from the start.
