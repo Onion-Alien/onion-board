@@ -324,7 +324,7 @@ html:not(.js) .gamewin { display: none; }
 .marquee { position: relative; overflow: hidden; padding: 18px 0; border-block: 1px solid var(--edge);
            mask-image: linear-gradient(90deg, transparent, #000 10%, #000 90%, transparent);
            -webkit-mask-image: linear-gradient(90deg, transparent, #000 10%, #000 90%, transparent); }
-.marquee div { display: flex; gap: 48px; width: max-content; animation: marquee 38s linear infinite; }
+.marquee div { display: flex; gap: 48px; width: max-content; animation: marquee 38s linear infinite; will-change: transform; }
 .marquee span { color: var(--muted); font: 650 17px/1 var(--display); white-space: nowrap; letter-spacing: -.005em; }
 .marquee span::before { content: "✦"; margin-right: 48px; color: var(--a1); }
 @keyframes marquee { to { transform: translateX(-50%); } }
@@ -505,8 +505,14 @@ footer .pals svg:hover { transform: translateY(-6px) rotate(-6deg); }
 @media (prefers-reduced-motion: reduce) {
   html { scroll-behavior: auto; }
   .bg i, .marquee div { animation: none !important; }
-  .marquee div { flex-wrap: wrap; justify-content: center; width: auto; row-gap: 10px; }
-  .marquee span:nth-child(n + 11) { display: none; }
+  /* Still strip: one copy of the words in centred rows, no edge fade (a faded strip
+     that doesn't move looks cut off, and the mask flickered on fast scrolls). */
+  .marquee { mask-image: none; -webkit-mask-image: none; }
+  .marquee div { flex-wrap: wrap; justify-content: center; width: auto;
+                 padding: 0 16px; gap: 12px 28px; will-change: auto; }
+  .marquee span::before { margin-right: 28px; }
+  .marquee span:first-child::before { content: none; }
+  .marquee span.d { display: none; }
   .js .rv { opacity: 1; transform: none; transition: none; }
   .showcase .frame { animation: none !important; }
   .panel.enter .mascot { animation-name: fadeIn; }
