@@ -509,9 +509,16 @@ class EngineDevices:
                 log.debug("closing %s raised", attr, exc_info=True)
 
     def shutdown(self, wait_s: float = 5.0):
-        """Close every stream. Waits up to `wait_s` for the device thread's work
-        (quitting mustn't hang on a driver that never answers)."""
+        """Quitting: close every stream, and the watchdog never reopens one again. Waits
+        up to `wait_s` for the device thread's work (quitting mustn't hang on a driver
+        that never answers)."""
         self._shut = True
+        self.close_streams(wait_s)
+
+    def close_streams(self, wait_s: float = 5.0):
+        """Close every stream, for a re-scan that opens them again: unlike shutdown(),
+        the watchdog keeps watching them (a re-scan used to switch it off for good, so
+        a device pulled out after one was never noticed or brought back)."""
         held = DEVICES.acquire(timeout=wait_s)
         if not held:
             log.warning("the device thread is stuck; closing the streams anyway")
