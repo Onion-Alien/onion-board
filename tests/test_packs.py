@@ -539,3 +539,19 @@ def test_the_window_is_filled_a_piece_at_a_time(qapp, served):
         assert steps and max(steps) == 1   # one card or one tile a step, never more
     finally:
         dlg.done(0)
+
+
+def test_the_pack_cards_keep_clear_of_the_scroll_bar(qapp):
+    dlg = packsdialog.PacksDialog(lambda p: None, fetch_list=False)
+    try:
+        dlg.resize(780, 500)
+        dlg.show()
+        dlg._show(packs.built_in(), "")
+        bar = dlg.scroll_area.verticalScrollBar()
+        assert process_events(qapp, lambda: bar.maximum() > 0, 5)
+        assert dlg.list.contentsMargins().right() == 10
+        dlg.resize(780, 4000)   # everything fits: no bar, cards line up with the share card
+        assert process_events(qapp, lambda: bar.maximum() == 0, 5)
+        assert dlg.list.contentsMargins().right() == 0
+    finally:
+        dlg.close()
