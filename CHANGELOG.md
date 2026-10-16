@@ -2,6 +2,49 @@
 
 Changes not released yet are in [changelog.d/](changelog.d/), one file per change.
 
+## 2.3.0 — 2026-10-16
+
+- Pong with Bun opens again in the installed app: it stopped with a missing-module error.
+- Renaming a category or subcategory to a name that's cut back to the one it already has
+  now says names can be up to 30 characters, instead of doing nothing.
+- New Chat tab: one anonymous, text-only room for everyone using Onion Board. It is off until
+  you add it (+ More tabs, or Settings > Tabs) and shows its rules the first time you open it.
+  You get a made-up name like Cute Onion or Red Car, new every time you open the app, links
+  are blocked, and you can mute a name or report a message (enough reports mute someone for an hour). It has its own switch in
+  Settings > Privacy & security.
+- New Store tab: free CC0 sounds anyone can use. Hear one first, add it to your Sounds in
+  one click, and give it a thumbs up or down so the best ones come first. Share your own
+  there too, as a file or as a link to a video (only the link is shared: right-click a
+  sound you downloaded and pick *Share to the store*). Shared sounds show up once they've
+  been checked, and you can report one that breaks the rules. The store has its own
+  switch in Settings > Privacy & security, and you can hide the tab like the others.
+- **Trending on Myinstants**: the Search button's menu now has a line that shows the meme
+  sounds people play most on Myinstants right now (the ones for your country). Play one
+  once or add it as a pad, like any search result; no words to type.
+- A new install's board no longer stays empty: if you skip the first-run tour (or leave it)
+  without adding anything, 25 short starter sounds (air horn, vine boom, bruh, rimshot…)
+  are added for you, in a tab of their own called Starter. They come with the app (under
+  1 MB, no download), and you can delete or rename them like any sound. Add a song during
+  the tour and they aren't added.
+- Every voice on the Voice tab can have its own hotkey: right-click its card and pick
+  *Set a hotkey…*. The key turns the voice changer on with that voice, so you can swap
+  between voices in a call without opening the app.
+- The tray icon has a *Voice changer* menu: turn it on or off, or pick one of your
+  starred and saved voices.
+- Closing Onion Board now puts Discord's noise suppression, echo cancellation and
+  automatic volume back the way you talk, so your plain voice sounds right without
+  the board. If Discord is still open, a notification says so and it's done the
+  moment Discord closes. "Put Discord back for talking on close" switches it off.
+- New free pack in *Free sound packs*: the General sound pack, 483 sounds in 20 categories
+  (memes, comedy, game show, crowds, animals, video game, combat, sci-fi, magic, horror,
+  nature and more). All CC0.
+- Bun moves more smoothly and feels more alive: twice the frame rate, ears that trail
+  behind his hops and wobble as they settle, a squash on every landing, and quicker,
+  more natural blinks (now and then a double blink).
+- Your voice now stays at one volume while you talk, loud or quiet, so friends don't
+  have to keep turning you up and down with voice chat's own automatic volume off.
+  Settings has a "Keep my voice at one volume" box to switch it off.
+
 ## 2.2.2 — 2026-10-16
 
 - AI voices: a voice card only lights up while the AI voice is on, like the Voice changer
