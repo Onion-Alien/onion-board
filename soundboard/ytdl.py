@@ -1057,8 +1057,11 @@ def _readable(e: Exception) -> FetchError:
 def _opts(dest: Path | None = None, progress=None, thumbnail: bool = False,
           feature: str = FEATURE, direct: bool = False, video: bool = False) -> dict:
     last = [-1.0]
+    stalled = ytworker.stall_guard()
 
     def hook(d):
+        if d.get("status") == "downloading":
+            stalled(d.get("downloaded_bytes") or 0)
         if progress and d.get("status") == "downloading":
             total = d.get("total_bytes") or d.get("total_bytes_estimate") or 0
             if total:
@@ -1143,6 +1146,8 @@ def _run(yt_dlp, url: str, dest: Path, progress, feature: str = FEATURE,
             path = Path(ydl.prepare_filename(info))
     except DownloadError:
         raise
+    except ytworker.Stalled as e:
+        raise FetchError(_("The download stopped moving. Try again.")) from e
     except Exception as e:  # noqa: BLE001 - yt-dlp raises many kinds; show its message
         if _went_nowhere(url, str(e)):
             raise FetchError(_("That video isn't available any more.")) from e
@@ -1159,6 +1164,8 @@ def _run_helper(url: str, opts: dict, progress) -> tuple[dict, Path] | None:
         info, name = ytworker.run("download", url, _sendable(opts), MAX_SECONDS,
                                   timeout=DOWNLOAD_QUIET_S, progress=progress)
     except ytworker.RemoteError as e:
+        if e.kind.endswith(".Stalled"):
+            raise FetchError(_("The download stopped moving. Try again.")) from None
         if _went_nowhere(url, str(e)):
             raise FetchError(_("That video isn't available any more.")) from None
         raise _readable(_remote(e)) from None

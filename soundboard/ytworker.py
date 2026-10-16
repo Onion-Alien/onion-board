@@ -32,6 +32,7 @@ START_TIMEOUT_S = 30    # to start and connect back
 LOOKUP_TIMEOUT_S = 120  # a search or look-up; a download's limit is the caller's
 KEEP = 1                # helpers kept waiting
 RETRY_S = 300           # after a helper failed to start, in-process until then
+STALL_S = 60            # a download whose bytes don't grow for this long is stuck
 
 enabled = False
 _lock = threading.Lock()
@@ -43,6 +44,26 @@ _failed_at: float | None = None   # when a helper last failed to start
 
 class Unavailable(RuntimeError):
     """The helper couldn't start or died: the caller runs it in-process instead."""
+
+
+class Stalled(Exception):
+    """A download that stopped growing while yt-dlp kept calling back: a server that
+    cuts every piece off makes yt-dlp ask for the same bytes again and again, forever."""
+
+
+def stall_guard(clock=None):
+    """For a progress hook: `check(downloaded_bytes)` raises Stalled once the count
+    hasn't grown for STALL_S, however often yt-dlp says it's still downloading."""
+    clock = clock or (lambda: time.monotonic())
+    best, grew = [-1], [clock()]
+
+    def check(done: int) -> None:
+        now = clock()
+        if done > best[0]:
+            best[0], grew[0] = done, now
+        elif now - grew[0] >= STALL_S:
+            raise Stalled(f"no new data for {STALL_S} s")
+    return check
 
 
 class RemoteError(Exception):
@@ -115,13 +136,18 @@ class _Helper:
         _wait(self.proc)
 
     def call(self, request: tuple, timeout: float, progress=None):
+        wait = timeout
         try:
             self.conn.send(request)
             while True:
-                if not self.conn.poll(timeout):
+                if not self.conn.poll(wait):
                     self.kill()
-                    raise TimeoutError(f"no answer from the download helper in {timeout:.0f} s")
+                    raise TimeoutError(f"no answer from the download helper in {wait:.0f} s")
                 kind, value = self.conn.recv()
+                if kind in ("progress", "alive"):
+                    # bytes are coming in: from now on a silence of STALL_S is stuck (a
+                    # server that cuts every piece off leaves yt-dlp asking again, silently)
+                    wait = min(timeout, STALL_S)
                 if kind == "progress":
                     if progress:
                         progress(value)
@@ -129,6 +155,8 @@ class _Helper:
                 if kind == "alive":   # downloading, size unknown: not stuck
                     continue
                 return kind, value
+        except TimeoutError:   # an OSError too, but stuck isn't "no helper": not here again
+            raise
         except (EOFError, OSError, BrokenPipeError) as e:
             self.kill()
             raise Unavailable(f"the download helper stopped: {e}") from e
@@ -344,10 +372,12 @@ def _download(conn, yt_dlp, url: str, opts: dict, max_seconds: float):
     (or, when the site gives no size, that it's still going: at least once a second):
     the app takes a download that says nothing for DOWNLOAD_QUIET_S as stuck."""
     last = [0.0]
+    stalled = stall_guard()
 
     def hook(d):
         if d.get("status") != "downloading":
             return
+        stalled(d.get("downloaded_bytes") or 0)
         total = d.get("total_bytes") or d.get("total_bytes_estimate") or 0
         now = time.monotonic()
         if not total:
