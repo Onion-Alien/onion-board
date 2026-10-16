@@ -25,7 +25,7 @@ NAME = "starting.txt"
 # main.py leaves no breadcrumb for them, since one would look like a start that failed.
 # Kept here, not in app.py, because main.py reads it before the heavy imports.
 ONE_OFF = ("--selftest", "--get-tor", "--install-addon", "--set-offline", "--keep-netlog",
-           "--usage-count", "--uninstall-count", "--selftest-addon")
+           "--usage-count", "--uninstall-count", "--selftest-addon", "--discord-restore")
 _VERSION_RE = re.compile(r"[0-9][0-9A-Za-z.\-]{0,20}")
 
 

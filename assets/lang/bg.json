@@ -3496,5 +3496,9 @@
   "Turn on": "Включи",
   "the voice “{name}”": "гласът „{name}“",
   "✓ {combo} picks the voice “{name}”": "✓ {combo} избира гласа „{name}“",
-  "✓ {combo} picks the voice “{name}”, it was the key for {lost}": "✓ {combo} избира гласа „{name}“, беше клавишът за {lost}"
+  "✓ {combo} picks the voice “{name}”, it was the key for {lost}": "✓ {combo} избира гласа „{name}“, беше клавишът за {lost}",
+  "Discord is still set up for sounds": "Discord още е настроен за звуци",
+  "Discord's noise suppression, echo cancellation and automatic volume go back on the way you had them, so your plain voice sounds right without Onion Board. If Discord is still open, it's done the moment you close it.": "Потискането на шум, премахването на ехо и автоматичната сила в Discord се връщат както си ги имал, така че обикновеният ти глас звучи добре без Onion Board. Ако Discord още е отворен, става в момента, в който го затвориш.",
+  "Onion Board turns its voice clean-up back on as soon as you close Discord. To talk clearly right now, click here and turn on Noise Suppression, Echo Cancellation and Automatic Gain Control.": "Onion Board включва отново изчистването на гласа веднага щом затвориш Discord. За да говориш ясно още сега, щракни тук и включи Noise Suppression, Echo Cancellation и Automatic Gain Control.",
+  "Put Discord back for talking on close": "Върни Discord за говорене при затваряне"
 }

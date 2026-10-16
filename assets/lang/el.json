@@ -3496,5 +3496,9 @@
   "Turn on": "Ενεργοποίηση",
   "the voice “{name}”": "η φωνή «{name}»",
   "✓ {combo} picks the voice “{name}”": "✓ Το {combo} επιλέγει τη φωνή «{name}»",
-  "✓ {combo} picks the voice “{name}”, it was the key for {lost}": "✓ Το {combo} επιλέγει τη φωνή «{name}», ήταν η συντόμευση για {lost}"
+  "✓ {combo} picks the voice “{name}”, it was the key for {lost}": "✓ Το {combo} επιλέγει τη φωνή «{name}», ήταν η συντόμευση για {lost}",
+  "Discord is still set up for sounds": "Το Discord είναι ακόμα ρυθμισμένο για ήχους",
+  "Discord's noise suppression, echo cancellation and automatic volume go back on the way you had them, so your plain voice sounds right without Onion Board. If Discord is still open, it's done the moment you close it.": "Η καταστολή θορύβου, η ακύρωση ηχούς και η αυτόματη ένταση του Discord επιστρέφουν όπως τις είχες, ώστε η απλή φωνή σου να ακούγεται σωστά χωρίς το Onion Board. Αν το Discord είναι ακόμα ανοιχτό, γίνεται μόλις το κλείσεις.",
+  "Onion Board turns its voice clean-up back on as soon as you close Discord. To talk clearly right now, click here and turn on Noise Suppression, Echo Cancellation and Automatic Gain Control.": "Το Onion Board ξανανάβει τον καθαρισμό φωνής μόλις κλείσεις το Discord. Για να μιλάς καθαρά τώρα, κάνε κλικ εδώ και άναψε την καταστολή θορύβου, την ακύρωση ηχούς και τον αυτόματο έλεγχο απολαβής.",
+  "Put Discord back for talking on close": "Επαναφορά του Discord για ομιλία στο κλείσιμο"
 }

@@ -3496,5 +3496,9 @@
   "Turn on": "Aanzetten",
   "the voice “{name}”": "de stem “{name}”",
   "✓ {combo} picks the voice “{name}”": "✓ {combo} kiest de stem “{name}”",
-  "✓ {combo} picks the voice “{name}”, it was the key for {lost}": "✓ {combo} kiest de stem “{name}”, dat was de sneltoets voor {lost}"
+  "✓ {combo} picks the voice “{name}”, it was the key for {lost}": "✓ {combo} kiest de stem “{name}”, dat was de sneltoets voor {lost}",
+  "Discord is still set up for sounds": "Discord staat nog ingesteld op geluiden",
+  "Discord's noise suppression, echo cancellation and automatic volume go back on the way you had them, so your plain voice sounds right without Onion Board. If Discord is still open, it's done the moment you close it.": "Ruisonderdrukking, echo-onderdrukking en automatisch volume in Discord gaan terug zoals je ze had, zodat je gewone stem goed klinkt zonder Onion Board. Is Discord nog open, dan gebeurt het zodra je hem sluit.",
+  "Onion Board turns its voice clean-up back on as soon as you close Discord. To talk clearly right now, click here and turn on Noise Suppression, Echo Cancellation and Automatic Gain Control.": "Onion Board zet de stemopschoning weer aan zodra je Discord sluit. Om nu meteen duidelijk te praten: klik hier en zet ruisonderdrukking, echo-onderdrukking en automatische versterkingsregeling aan.",
+  "Put Discord back for talking on close": "Discord bij sluiten terugzetten voor praten"
 }

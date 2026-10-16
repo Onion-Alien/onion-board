@@ -3419,5 +3419,9 @@
   "Turn on": "เปิด",
   "the voice “{name}”": "เสียง “{name}”",
   "✓ {combo} picks the voice “{name}”": "✓ {combo} เลือกเสียง “{name}”",
-  "✓ {combo} picks the voice “{name}”, it was the key for {lost}": "✓ {combo} เลือกเสียง “{name}” ก่อนหน้านี้เป็นปุ่มลัดของ {lost}"
+  "✓ {combo} picks the voice “{name}”, it was the key for {lost}": "✓ {combo} เลือกเสียง “{name}” ก่อนหน้านี้เป็นปุ่มลัดของ {lost}",
+  "Discord is still set up for sounds": "Discord ยังตั้งค่าไว้สำหรับเสียงเอฟเฟกต์",
+  "Discord's noise suppression, echo cancellation and automatic volume go back on the way you had them, so your plain voice sounds right without Onion Board. If Discord is still open, it's done the moment you close it.": "การลดเสียงรบกวน การตัดเสียงสะท้อน และระดับเสียงอัตโนมัติของ Discord จะกลับมาเหมือนที่คุณเคยตั้งไว้ เสียงพูดปกติของคุณจึงฟังดูดีแม้ไม่มี Onion Board ถ้า Discord ยังเปิดอยู่ จะทำทันทีที่คุณปิดมัน",
+  "Onion Board turns its voice clean-up back on as soon as you close Discord. To talk clearly right now, click here and turn on Noise Suppression, Echo Cancellation and Automatic Gain Control.": "Onion Board จะเปิดการทำความสะอาดเสียงพูดกลับมาทันทีที่คุณปิด Discord ถ้าอยากพูดให้ชัดตอนนี้เลย คลิกที่นี่แล้วเปิด Noise Suppression, Echo Cancellation และ Automatic Gain Control",
+  "Put Discord back for talking on close": "คืนค่า Discord สำหรับการพูดเมื่อปิด"
 }

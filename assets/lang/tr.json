@@ -3496,5 +3496,9 @@
   "Turn on": "Aç",
   "the voice “{name}”": "“{name}” sesi",
   "✓ {combo} picks the voice “{name}”": "✓ {combo} “{name}” sesini seçer",
-  "✓ {combo} picks the voice “{name}”, it was the key for {lost}": "✓ {combo} “{name}” sesini seçer, önceden {lost} kısayoluydu"
+  "✓ {combo} picks the voice “{name}”, it was the key for {lost}": "✓ {combo} “{name}” sesini seçer, önceden {lost} kısayoluydu",
+  "Discord is still set up for sounds": "Discord hâlâ sesler için ayarlı",
+  "Discord's noise suppression, echo cancellation and automatic volume go back on the way you had them, so your plain voice sounds right without Onion Board. If Discord is still open, it's done the moment you close it.": "Discord'un gürültü bastırma, yankı engelleme ve otomatik ses ayarı eskisi gibi geri gelir; böylece sade sesin Onion Board olmadan da düzgün duyulur. Discord hâlâ açıksa, kapattığın anda yapılır.",
+  "Onion Board turns its voice clean-up back on as soon as you close Discord. To talk clearly right now, click here and turn on Noise Suppression, Echo Cancellation and Automatic Gain Control.": "Onion Board, Discord'u kapattığın anda ses temizliğini yeniden açar. Şu an net konuşmak için buraya tıkla ve Gürültü Bastırma, Yankı Engelleme ve Otomatik Kazanç Kontrolü'nü aç.",
+  "Put Discord back for talking on close": "Kapanınca Discord'u konuşmaya geri al"
 }

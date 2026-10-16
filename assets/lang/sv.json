@@ -3496,5 +3496,9 @@
   "Turn on": "Slå på",
   "the voice “{name}”": "rösten “{name}”",
   "✓ {combo} picks the voice “{name}”": "✓ {combo} väljer rösten “{name}”",
-  "✓ {combo} picks the voice “{name}”, it was the key for {lost}": "✓ {combo} väljer rösten “{name}”, det var kortkommandot för {lost}"
+  "✓ {combo} picks the voice “{name}”, it was the key for {lost}": "✓ {combo} väljer rösten “{name}”, det var kortkommandot för {lost}",
+  "Discord is still set up for sounds": "Discord är fortfarande inställt för ljud",
+  "Discord's noise suppression, echo cancellation and automatic volume go back on the way you had them, so your plain voice sounds right without Onion Board. If Discord is still open, it's done the moment you close it.": "Discords brusreducering, ekoeliminering och automatiska volym kommer tillbaka som du hade dem, så att din vanliga röst låter rätt utan Onion Board. Är Discord fortfarande öppen sker det så fort du stänger den.",
+  "Onion Board turns its voice clean-up back on as soon as you close Discord. To talk clearly right now, click here and turn on Noise Suppression, Echo Cancellation and Automatic Gain Control.": "Onion Board slår på röstrensningen igen så fort du stänger Discord. För att prata tydligt redan nu: klicka här och slå på brusreducering, ekoeliminering och automatisk förstärkningskontroll.",
+  "Put Discord back for talking on close": "Ställ tillbaka Discord för prat vid stängning"
 }

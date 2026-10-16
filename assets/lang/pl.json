@@ -3573,5 +3573,9 @@
   "Turn on": "Włącz",
   "the voice “{name}”": "głos „{name}”",
   "✓ {combo} picks the voice “{name}”": "✓ {combo} wybiera głos „{name}”",
-  "✓ {combo} picks the voice “{name}”, it was the key for {lost}": "✓ {combo} wybiera głos „{name}”, to był skrót do: {lost}"
+  "✓ {combo} picks the voice “{name}”, it was the key for {lost}": "✓ {combo} wybiera głos „{name}”, to był skrót do: {lost}",
+  "Discord is still set up for sounds": "Discord jest wciąż ustawiony pod dźwięki",
+  "Discord's noise suppression, echo cancellation and automatic volume go back on the way you had them, so your plain voice sounds right without Onion Board. If Discord is still open, it's done the moment you close it.": "Tłumienie szumów, usuwanie echa i automatyczna głośność w Discordzie wracają do twoich ustawień, więc twój zwykły głos brzmi dobrze bez Onion Board. Jeśli Discord jest jeszcze otwarty, stanie się to, gdy go zamkniesz.",
+  "Onion Board turns its voice clean-up back on as soon as you close Discord. To talk clearly right now, click here and turn on Noise Suppression, Echo Cancellation and Automatic Gain Control.": "Onion Board włączy z powrotem czyszczenie głosu, gdy tylko zamkniesz Discorda. Żeby mówić wyraźnie już teraz, kliknij tutaj i włącz tłumienie szumów, usuwanie echa i automatyczną regulację wzmocnienia.",
+  "Put Discord back for talking on close": "Przywróć Discord do rozmów przy zamknięciu"
 }

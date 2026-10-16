@@ -3496,5 +3496,9 @@
   "Turn on": "Bekapcsolás",
   "the voice “{name}”": "a(z) „{name}” hang",
   "✓ {combo} picks the voice “{name}”": "✓ {combo} a(z) „{name}” hangot választja",
-  "✓ {combo} picks the voice “{name}”, it was the key for {lost}": "✓ {combo} a(z) „{name}” hangot választja, korábban ez volt a gyorsbillentyűje: {lost}"
+  "✓ {combo} picks the voice “{name}”, it was the key for {lost}": "✓ {combo} a(z) „{name}” hangot választja, korábban ez volt a gyorsbillentyűje: {lost}",
+  "Discord is still set up for sounds": "A Discord még hangokra van beállítva",
+  "Discord's noise suppression, echo cancellation and automatic volume go back on the way you had them, so your plain voice sounds right without Onion Board. If Discord is still open, it's done the moment you close it.": "A Discord zajszűrése, visszhangszűrése és automatikus hangereje visszaáll, ahogy volt, így a sima hangod jól szól Onion Board nélkül is. Ha a Discord még nyitva van, akkor abban a pillanatban történik, amikor bezárod.",
+  "Onion Board turns its voice clean-up back on as soon as you close Discord. To talk clearly right now, click here and turn on Noise Suppression, Echo Cancellation and Automatic Gain Control.": "Az Onion Board visszakapcsolja a hangtisztítást, amint bezárod a Discordot. Hogy most rögtön tisztán beszélj, kattints ide, és kapcsold be a zajszűrést, a visszhangszűrést és az automatikus erősítésszabályzást.",
+  "Put Discord back for talking on close": "Bezáráskor a Discord vissza beszédre"
 }

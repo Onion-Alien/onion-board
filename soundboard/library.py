@@ -420,6 +420,8 @@ class Config:
     duck_db: float = -12.0    # lower the sounds this much while you talk; 0 = off
     duck_on: bool = False     # ducking was switched on once for older settings (from_raw)
     mic_gate: bool = False    # mute your mic while a sound plays (only the sound goes out)
+    discord_restore: bool = True   # put Discord back for talking on quit (discordtalk)
+    discord_talk: dict = field(default_factory=dict)   # Discord folder -> how you talk there
     voice_level: bool = True  # keep your voice at one volume (sendfx.VoiceLeveler)
     ptt_key: str = ""           # key held down while sounds play (game push-to-talk)
     always_on_top: bool = False

@@ -3573,5 +3573,9 @@
   "Turn on": "Pornește",
   "the voice “{name}”": "vocea „{name}”",
   "✓ {combo} picks the voice “{name}”": "✓ {combo} alege vocea „{name}”",
-  "✓ {combo} picks the voice “{name}”, it was the key for {lost}": "✓ {combo} alege vocea „{name}”, era scurtătura pentru {lost}"
+  "✓ {combo} picks the voice “{name}”, it was the key for {lost}": "✓ {combo} alege vocea „{name}”, era scurtătura pentru {lost}",
+  "Discord is still set up for sounds": "Discord e încă setat pentru sunete",
+  "Discord's noise suppression, echo cancellation and automatic volume go back on the way you had them, so your plain voice sounds right without Onion Board. If Discord is still open, it's done the moment you close it.": "Suprimarea zgomotului, anularea ecoului și volumul automat din Discord revin cum le aveai, ca vocea ta simplă să sune bine fără Onion Board. Dacă Discord e încă deschis, se face imediat ce îl închizi.",
+  "Onion Board turns its voice clean-up back on as soon as you close Discord. To talk clearly right now, click here and turn on Noise Suppression, Echo Cancellation and Automatic Gain Control.": "Onion Board pornește din nou curățarea vocii imediat ce închizi Discord. Ca să vorbești clar chiar acum, dă clic aici și pornește Suprimarea zgomotului, Anularea ecoului și Controlul automat al amplificării.",
+  "Put Discord back for talking on close": "Readu Discord pe vorbit la închidere"
 }
