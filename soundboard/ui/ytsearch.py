@@ -811,6 +811,7 @@ class SearchResults(RoundedFrame):
         # what the cards are when no search words say it: "Trending on Myinstants"
         self.heading = QLabel()
         self.heading.setObjectName("section")
+        self.heading.setProperty("head", True)   # no space above: in line with Back
         self.heading.hide()
         head.addWidget(self.heading)
         self.site_actions: dict[str, QAction] = {}
