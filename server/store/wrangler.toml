@@ -5,11 +5,11 @@ compatibility_date = "2025-09-01"
 [[d1_databases]]
 binding = "DB"
 database_name = "onion-board-store"
-database_id = "00000000-0000-0000-0000-000000000000"   # filled in by `wrangler d1 create`
+database_id = "db1ea851-8ee1-414c-8674-8be70a5b7f0c"
 
 # the sounds' files (Workers KV: free, no payment card on the account)
 [[kv_namespaces]]
 binding = "FILES"
-id = "00000000000000000000000000000000"   # filled in by `wrangler kv namespace create`
+id = "30ae4ae2184e43b5833d37116a390286"
 
 # Secrets (never in this file): `npx wrangler secret put ADMIN_TOKEN` and `... SALT`
