@@ -47,6 +47,21 @@ def test_a_long_category_name_is_cut_and_says_so(window):
     assert window.said == ["✓ Renamed to “Short”"]
 
 
+def test_a_rename_cut_back_to_the_same_name_says_why(window):
+    """One letter added to a full-length name is cut off again: nothing changes, and
+    it used to say nothing either."""
+    full = window.catctl.new_category(name="L" * library.CATEGORY_MAX)
+    window.said.clear()
+    window.catctl.rename_category(full, full + "X")
+    assert window.cfg.categories == [full]
+    assert window.said == [f"Names can be up to 30 characters, so it's “{full}”."]
+    sub = window.catctl.new_subcategory(full, name="S" * library.CATEGORY_MAX)
+    window.said.clear()
+    window.catctl.rename_subcategory(sub, sub + "X")
+    assert window.cfg.subcategories == {full: [sub]}
+    assert window.said == [f"Names can be up to 30 characters, so it's “{sub}”."]
+
+
 def test_tabs_and_line_breaks_in_a_category_name_are_spaces(window):
     assert window.catctl.new_category(name="a\tb\nc") == "a b c"
     window.catctl.rename_category("a b c", "   ")
