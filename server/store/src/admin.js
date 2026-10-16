@@ -12,6 +12,7 @@ export const ADMIN_PAGE = `<!doctype html>
     :root { --bg:#f4f4f8; --panel:#fff; --hi:#ececf3; --text:#1d1d26; --muted:#5d5d6e; }
   }
   * { box-sizing: border-box; }
+  [hidden] { display: none !important; }   /* .bar's display: flex mustn't show a hidden bar */
   body { margin:0; background:var(--bg); color:var(--text);
          font:15px/1.4 "Segoe UI", system-ui, sans-serif; }
   main { max-width:760px; margin:0 auto; padding:16px; }
@@ -63,26 +64,34 @@ async function load() {
   if (r.status === 401) { $("msg").textContent = "Wrong token."; show(false); return; }
   show(true);
   const { sounds } = await r.json();
-  $("msg").textContent = sounds.length ? sounds.length + " sounds" : "Nothing here.";
+  $("msg").textContent = !sounds.length ? "Nothing here."
+    : sounds.length === 1 ? "1 sound" : sounds.length + " sounds";
   const list = $("list");
   list.replaceChildren();
   for (const s of sounds) {
     const row = el("div", { class: "row" });
     const info = el("div", { class: "name" }, s.name);
     info.append(el("div", { class: "muted" },
-      (s.author || "Community") + " · " + s.ext + " · " + Math.round(s.size / 1024) + " KB · 👍 " +
+      (s.author || "Community") + " · " + (s.link ? "link" : s.ext + " · " + Math.round(s.size / 1024) + " KB") + " · 👍 " +
       s.up + " 👎 " + s.down + (s.tags.length ? " · " + s.tags.join(", ") : "")));
-    if (s.reports) info.append(el("div", { class: "warn" }, "Reported " + s.reports + "×: " + s.why));
+    if (s.reports) {   // each reason once: "Reported 3×: copyright, broken"
+      const why = [...new Set(s.why.split(",").filter(Boolean))].join(", ");
+      info.append(el("div", { class: "warn" }, "Reported " + s.reports + "×: " + why));
+    }
     if (s.link) {   // a shared link: open it to check it (nothing is kept but the link)
       info.append(el("div", { class: "muted" }, s.link));
       const open = el("a", { href: s.link, target: "_blank", rel: "noopener noreferrer" }, "Open link");
       row.append(info, open);
+    } else if (s.status === "rejected") {   // its file was deleted: nothing to play
+      row.append(info, el("span", { class: "muted" }, "File deleted"));
     } else {
       const play = el("button", {}, "▶ Play");
       play.onclick = () => listen(s.id, play);
       row.append(info, play);
     }
-    if (s.status !== "live") row.append(act(s.id, "approve", "Approve", "ok"));
+    // (a rejected upload's file is gone: only a rejected link can be approved again)
+    if (s.status !== "live" && (s.status !== "rejected" || s.link))
+      row.append(act(s.id, "approve", "Approve", "ok"));
     if (s.status !== "rejected") row.append(act(s.id, "reject", "Reject", "bad"));
     list.append(row);
   }

@@ -16,7 +16,7 @@ from soundboard import savedvoices
 # Sounds and Setup always stay. (Store is last in TAB_KEYS, so older
 # configs' saved tab numbers still point at the same tabs, but the rail shows it
 # before Setup: windowbuild)
-KEYS = ("radio", "apps", "triggers", "voice", "store")
+KEYS = ("radio", "apps", "triggers", "voice", "store", "chat")
 
 
 class TabOff(QWidget):

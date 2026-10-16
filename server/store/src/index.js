@@ -6,6 +6,9 @@
 // (X-Onion-Install); it's kept only as a salted hash, so one install gets one vote per
 // sound. Addresses are kept the same way, only to stop one address flooding the store.
 import { ADMIN_PAGE } from "./admin.js";
+import { chatRoute } from "./chat.js";
+
+export { ChatRoom } from "./chat.js";   // the Durable Object wrangler.toml names
 
 const MAX_BYTES = 4 << 20;          // the biggest sound accepted (4 MB)
 const PAGE = 50;                     // sounds per list page
@@ -59,6 +62,7 @@ async function route(req, env) {
     return new Response(ADMIN_PAGE, { headers: { "content-type": "text/html; charset=utf-8",
       "content-security-policy": "default-src 'self'; style-src 'unsafe-inline'; " +
         "script-src 'unsafe-inline'; media-src 'self' blob:", "cache-control": "no-store" } });
+  if (p === "/v1/chat" || /^\/v1\/chat\/\d+\/report$/.test(p)) return chatRoute(req, env);
   if (p === "/v1/sounds" && m === "GET") return list(url, req, env);
   if (p === "/v1/sounds" && m === "POST") return upload(req, env);
   if (p === "/v1/links" && m === "POST") return shareLink(req, env);
@@ -70,6 +74,7 @@ async function route(req, env) {
     return report(req, env, g[1]);
   if (p.startsWith("/v1/admin/")) {
     await admin(req, env);
+    if (p === "/v1/admin/chat" || p.startsWith("/v1/admin/chat/")) return chatRoute(req, env);
     if (p === "/v1/admin/queue" && m === "GET") return queue(url, env);
     if (p === "/v1/admin/import" && m === "POST") return upload(req, env, true);
     if ((g = p.match(/^\/v1\/admin\/sounds\/([0-9a-f]{12})\/file$/)) && m === "GET")
@@ -351,9 +356,11 @@ async function queue(url, env) {
 
 async function review(req, env, id) {
   const { action, name } = await body(req);
-  const row = await env.DB.prepare("SELECT ext FROM sounds WHERE id = ?").bind(id).first();
+  const row = await env.DB.prepare("SELECT ext, status FROM sounds WHERE id = ?").bind(id).first();
   if (!row) fail("not found", 404);
   if (action === "approve") {
+    // a rejected upload's file is deleted: it can't go live again (a link has no file)
+    if (row.status === "rejected" && row.ext !== "link") fail("file gone", 409);
     // approved again after reports: the old reports are dealt with
     await env.DB.prepare("DELETE FROM reports WHERE sound = ?").bind(id).run();
     await env.DB.prepare("UPDATE sounds SET status = 'live', reports = 0, reviewed = ? WHERE id = ?")

@@ -109,10 +109,11 @@ def test_upload_sends_the_agreement(fake, tmp_path):
 
 
 def test_rail_shows_store_before_setup():
-    assert TAB_KEYS[-1] == "store"   # older configs' saved tab numbers still fit
-    assert rail_order([]) == ["sounds", "radio", "apps", "triggers", "voice", "store", "setup"]
+    assert TAB_KEYS[-2:] == ("store", "chat")   # older configs' saved tab numbers still fit
+    assert rail_order([]) == ["sounds", "radio", "apps", "triggers", "voice", "store", "chat",
+                              "setup"]
     dragged = ["voice", "sounds", "setup", "radio", "apps", "triggers"]
-    assert rail_order(dragged) == ["voice", "sounds", "store", "setup", "radio", "apps",
+    assert rail_order(dragged) == ["voice", "sounds", "store", "chat", "setup", "radio", "apps",
                                    "triggers"]
     assert rail_order([*dragged, "store", "gone"])[-1] == "store"   # dragged last: kept
 
@@ -203,7 +204,7 @@ def test_store_tab_in_the_window(window, qapp, tmp_path):
     i = TAB_INDEX["store"]
     assert isinstance(window.store, storetab.StoreTab) and window.tabs.isTabVisible(i)
     order = [b.index for b in window.rail.buttons]
-    assert order.index(i) == order.index(TAB_INDEX["setup"]) - 1
+    assert order.index(i) == order.index(TAB_INDEX["setup"]) - 2   # Chat sits between
     window.tabctl.set_tab_on("store", False)
     assert not isinstance(window.store, storetab.StoreTab)
     window.tabctl.set_tab_on("store", True)
@@ -274,3 +275,66 @@ def test_share_window_on_a_link(qapp, fake):
     assert _wait(qapp, lambda: d.sent)
     assert fake.calls[-1][1] == "/v1/links"
     d.close()
+
+
+def test_trending_on_myinstants_in_the_order_menu(qapp, fake, monkeypatch):
+    from soundboard import ytdl
+    hits = [ytdl.Result(f"s{i}.mp3", f"Bruh {i}" if i % 2 else f"Horn {i}", "Myinstants",
+                        0, "myinstants", f"https://www.myinstants.com/media/sounds/s{i}.mp3")
+            for i in range(storetab.TREND_PAGE + 2)]
+    asked = []
+    monkeypatch.setattr(ytdl, "trending", lambda count=20, direct=False, start=1: (
+        asked.append((count, direct, start)), hits[start - 1:count])[1])
+    links = []
+    t = storetab.StoreTab(Config(), [].append, lambda d, g: True, lambda: None,
+                          link=lambda url, name, kind: links.append((url, name, kind)))
+    t.show()
+    assert _wait(qapp, lambda: len(t._rows) == 2)
+    t.sort_actions[storetab.TRENDING].trigger()
+    assert t.btn_sort.text() == "Trending"
+    assert _wait(qapp, lambda: len(t._rows) == storetab.TREND_PAGE)
+    r = t._rows[0]
+    assert r.meta.full == "Trending on Myinstants"
+    # not the store's: no votes or reports, played and added from Myinstants
+    assert not r.btn_up.isVisibleTo(r) and not r.btn_report.isVisibleTo(r)
+    r.btn_play.click()
+    r.btn_add.click()
+    url = "https://www.myinstants.com/media/sounds/s0.mp3"
+    assert links == [(url, "Horn 0", "play"), (url, "Horn 0", "add")]
+    assert t.btn_more.isVisibleTo(t)
+    t.more()
+    assert _wait(qapp, lambda: len(t._rows) == storetab.TREND_PAGE + 2)
+    assert asked[-1] == (2 * storetab.TREND_PAGE, False, storetab.TREND_PAGE + 1)
+    t.search.setText("bruh")   # the words filter what's trending
+    t.reload()
+    assert _wait(qapp, lambda: len(t._rows) == storetab.TREND_PAGE // 2)
+    assert all("Bruh" in r.sound.name for r in t._rows)
+    calls = len(fake.calls)
+    t.set_sort("top")          # back to the store's own
+    t.search.setText("")
+    t.reload()
+    assert _wait(qapp, lambda: len(t._rows) == 2 and len(fake.calls) > calls)
+    t.shutdown()
+
+
+def test_trending_failures_and_switched_off(qapp, fake, monkeypatch):
+    from soundboard import ytdl
+
+    def blocked(count=20, direct=False, start=1):
+        if direct:
+            return []
+        raise ytdl.TorBlocked("Myinstants turned Tor away")
+    monkeypatch.setattr(ytdl, "trending", blocked)
+    t = _tab(qapp, [], [])
+    t.set_sort(storetab.TRENDING)
+    assert _wait(qapp, lambda: t.msg_btn.text() == "Try this one without Tor")
+    assert "turned Tor away" in t.msg_text.text()
+    t.msg_btn.click()   # only that click goes without Tor
+    assert _wait(qapp, lambda: "Nothing is trending" in t.msg_title.text())
+    real = net.allowed
+    monkeypatch.setattr(net, "allowed", lambda f: f != ytdl.site_feature("myinstants")
+                        and real(f))
+    monkeypatch.setattr(ytdl, "trending", lambda **kw: pytest.fail("asked while off"))
+    t.reload()
+    assert t.msg_btn.text() == "Privacy && security settings"
+    t.shutdown()

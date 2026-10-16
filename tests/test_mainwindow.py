@@ -302,7 +302,8 @@ def test_sounds_only_toggle_leaves_the_mic_open(window, monkeypatch):
     assert window.engine.mic_enabled is True
 
 
-@pytest.mark.parametrize("size", [(480, 420), (800, 600)])
+# (480 x 450: every tab on, including Chat, takes one more button on the rail than 420 holds)
+@pytest.mark.parametrize("size", [(480, 450), (800, 600)])
 def test_window_shrinks_and_still_fits(window, size, qapp):
     """The less important controls give way and what's left fits (every tab counts:
     the tab widget's minimum is the largest page's)."""
