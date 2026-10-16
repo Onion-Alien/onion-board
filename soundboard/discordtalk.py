@@ -521,7 +521,7 @@ def cli(_rest: list[str]) -> int:
     tray = None
     try:
         from soundboard.theme import app_icon
-        tray = QSystemTrayIcon(app_icon())
+        tray = QSystemTrayIcon(app_icon(), parent=qapp)   # not a widget: no window
         tray.setToolTip("Onion Board")
         tray.messageClicked.connect(lambda: os.startfile(VOICE_URL))  # noqa: S606
         tray.show()
