@@ -259,8 +259,11 @@ class PlaybackControl(Controller):
         """What Space does on the tab showing (ui/spacekey.py): play / pause the
         player's sound on Sounds, play / stop the radio on Radio; None elsewhere.
         Nothing to play on Sounds: nothing, not a press of the button clicked last
-        (the mini player's Bun button turned the window back into Bun)."""
+        (the mini player's Bun button turned the window back into Bun). Settings open
+        over a tab: None, so Space ticks the box you clicked there, as anywhere."""
         mw = self.mw
+        if mw.setctl.settings_open():
+            return None
         page = mw.tabs.currentWidget()
         if page is mw.sounds_page:
             return self.toggle_play_pause if mw.current else _nothing
