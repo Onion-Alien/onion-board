@@ -65,24 +65,20 @@ class ConnectionPage(Page):
         for b in (direct, via, use_tor):
             group.addButton(b)
             row.addWidget(b)
-        row.addStretch(1)
-        cv.addLayout(row)
-
-        # ---- Get Tor: the app doesn't ship it (soundboard.torget)
-        get_box = QWidget()
-        row = QHBoxLayout(get_box)
-        row.setContentsMargins(0, 0, 0, 0)
-        get_note = QLabel()
-        get_note.setObjectName("hint")
-        get_note.setWordWrap(True)
-        row.addWidget(get_note, 1)
+        # ---- Get Tor: the app doesn't ship it (soundboard.torget). Right after the
+        # Tor choice it greys out, with its note on the line below
         get = QPushButton(_("Get Tor"))
         get.setProperty("tip", _("Download Tor {version} from the Tor Project "
                                  "(dist.torproject.org), the way the Connection setting says",
                                  version=torget.VERSION))
         get.setToolTip(get.property("tip"))
         row.addWidget(get)
-        cv.addWidget(get_box)
+        row.addStretch(1)
+        cv.addLayout(row)
+        get_note = QLabel()
+        get_note.setObjectName("hint")
+        get_note.setWordWrap(True)
+        cv.addWidget(get_note)
 
         def show_get(msg: str = ""):
             have = tor.available()
@@ -94,7 +90,9 @@ class ConnectionPage(Page):
                 if have else tor.not_installed())
             if not busy.is_busy(get):
                 get.setText(_("Update Tor") if outdated else _("Get Tor"))
-            get_box.setVisible(bool(msg) or busy.is_busy(get) or not have or outdated)
+            wanted = bool(msg) or busy.is_busy(get) or not have or outdated
+            get.setVisible(wanted)
+            get_note.setVisible(wanted)
             get_note.setText(msg or (
                 _("A newer Tor ({version}) is ready to download.", version=torget.VERSION)
                 if outdated else
