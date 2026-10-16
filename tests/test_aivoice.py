@@ -363,7 +363,8 @@ def test_card_lists_the_voices_once_installed(qapp, tmp_path, monkeypatch):
     p.changed.connect(saved.append)
     try:
         assert not p.ready_box.isHidden() and p.b_get.isHidden()
-        assert len(p._tile) >= 3 and p._tile["pixie"].isChecked()
+        # off: no card lit up, even the saved one
+        assert len(p._tile) >= 3 and not any(b.isChecked() for b in p._tile.values())
         assert not p.is_on()
         first, second = p.voices[0]["id"], p.voices[1]["id"]
         # clicking a card turns the AI voice on with that voice, like the voice changer

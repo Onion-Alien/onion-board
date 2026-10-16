@@ -513,9 +513,15 @@ class AiVoicePanel(QWidget):
         n = len(self.store.deleted)
         self.b_bin.setText(_("Recently deleted ({n})", n=n))
         self.b_bin.setVisible(n > 0)
+        self._mark_tile()
+
+    def _mark_tile(self):
+        """Light up the picked voice's card only while the AI voice is on (like the
+        voice changer's cards): off, no card looks switched on."""
+        vid = self.current_voice() if self.is_on() else None
         self.tiles.setExclusive(False)
-        for vid, b in self._tile.items():
-            b.setChecked(vid == vo.get("id"))
+        for i, b in self._tile.items():
+            b.setChecked(i == vid)
         self.tiles.setExclusive(True)
 
     def _say(self, text: str):
@@ -767,6 +773,7 @@ class AiVoicePanel(QWidget):
         elif not on and self.ctl.running:
             self.ctl.stop()
             self._set_ui(False, IDLE)
+        self._mark_tile()   # (also when it had already stopped by itself)
 
     def _start_helper(self) -> bool:
         self._connected = False      # the helper said hello (it can still fail to load)
@@ -809,6 +816,7 @@ class AiVoicePanel(QWidget):
         self.b_start.setChecked(on)
         self.b_start.blockSignals(False)
         self.b_start.setText(_("Stop AI voice") if on else _("Start AI voice"))
+        self._mark_tile()
         self.b_update.setEnabled(not on)
         self.lbl_state.setText(state)
         self.live_changed.emit(on)
