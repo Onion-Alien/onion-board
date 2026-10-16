@@ -3485,5 +3485,16 @@
     "{n} népszerű állomás: keressen, vagy kattintson egy állomásra a lejátszáshoz."
   ],
   "Evens out your voice, loud or quiet, so friends don't have to keep turning you up and down. Your voice chat's own automatic volume can then stay off: it cuts up your sounds.": "Kiegyenlíti a hangodat, akár hangos, akár halk, így a barátaidnak nem kell folyton fel-le tekerniük. A hangcsevegő saját automatikus hangereje így kikapcsolva maradhat: az szétszabdalja a hangjaidat.",
-  "Keep my voice at one volume": "A hangom maradjon egy hangerőn"
+  "Keep my voice at one volume": "A hangom maradjon egy hangerőn",
+  "Clear hotkey": "Gyorsbillentyű törlése",
+  "Hotkey for the voice “{name}” cleared": "A(z) „{name}” hang gyorsbillentyűje törölve",
+  "Hotkey: {key}…": "Gyorsbillentyű: {key}…",
+  "Set a hotkey…": "Gyorsbillentyű beállítása…",
+  "Star voices on the Voice tab to list them here": "Jelölj meg hangokat csillaggal a Hang fülön, és itt megjelennek",
+  "The Voice tab is switched off": "A Hang fül ki van kapcsolva",
+  "Turn off": "Kikapcsolás",
+  "Turn on": "Bekapcsolás",
+  "the voice “{name}”": "a(z) „{name}” hang",
+  "✓ {combo} picks the voice “{name}”": "✓ {combo} a(z) „{name}” hangot választja",
+  "✓ {combo} picks the voice “{name}”, it was the key for {lost}": "✓ {combo} a(z) „{name}” hangot választja, korábban ez volt a gyorsbillentyűje: {lost}"
 }

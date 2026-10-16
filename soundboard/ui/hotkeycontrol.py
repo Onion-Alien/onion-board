@@ -30,6 +30,7 @@ if TYPE_CHECKING:
 log = logging.getLogger(__name__)
 
 RANDOM = "__random__:"   # hotkey action prefix: a random sound from the category after it
+PICK_VOICE = "__pickvoice__:"   # ...: the voice (Voice tab) named after it
 # shown when instant replay goes on: it records whoever is talking in a call
 REPLAY_NOTE = _("Instant replay is on: your key keeps the last seconds you heard. In some "
                 "places recording a call needs everyone's OK, so only keep clips of people "
@@ -82,6 +83,13 @@ class HotkeyControl(Controller):
         for cat, combo in mw.cfg.category_hotkeys.items():
             if combo and cat in mw.cfg.categories:
                 mapping.setdefault(combo, RANDOM + cat)
+        fx = self._voice_fx()
+        if fx is not None:
+            fx.keys = dict(mw.cfg.voice_hotkeys)   # for the voice cards' menus
+            known = fx.voice_names()
+            for name, combo in mw.cfg.voice_hotkeys.items():
+                if combo and name in known:
+                    mapping.setdefault(combo, PICK_VOICE + name)
         mapping.update(mw.overlay.layer())   # its keys, only while it's open
         # the game's push-to-talk key is pressed by us (auto-PTT) and by the player: as a
         # hotkey of ours, Windows would hand those presses to us instead of the game
@@ -118,7 +126,8 @@ class HotkeyControl(Controller):
         """Combos the app-wide actions, the push-to-talk key and category keys hold."""
         mw = self.mw
         return ([getattr(mw.cfg, a) for a, *__ in HOTKEY_ACTIONS if getattr(mw.cfg, a)]
-                + [c for c in (mw.cfg.ptt_key, *mw.cfg.category_hotkeys.values()) if c])
+                + [c for c in (mw.cfg.ptt_key, *mw.cfg.category_hotkeys.values(),
+                               *mw.cfg.voice_hotkeys.values()) if c])
 
     def on_hotkey_released(self, action: str):
         """A hotkey or MIDI pad was let go: a hold-to-play sound stops, and an overlay
@@ -239,6 +248,9 @@ class HotkeyControl(Controller):
             lost += [_("a random sound from “{name}”", name=c)
                      for c, k in mw.cfg.category_hotkeys.items() if k == combo]
             self._clear_category_hotkey(combo)
+            lost += [_("the voice “{name}”", name=n)
+                     for n, k in mw.cfg.voice_hotkeys.items() if k == combo]
+            self._clear_voice_hotkey(combo)
             if attr != "ptt_key" and mw.cfg.ptt_key == combo:
                 mw.cfg.ptt_key = ""
                 lost.append(_("auto push-to-talk"))
@@ -321,8 +333,31 @@ class HotkeyControl(Controller):
             mw.playctl.play_random()
         elif action.startswith(RANDOM):
             mw.playctl.play_random(action[len(RANDOM):])
+        elif action.startswith(PICK_VOICE):
+            self.pick_voice(action[len(PICK_VOICE):])
         else:
             mw.playctl.play(action)
+
+    def _voice_fx(self):
+        """The Voice tab's voice grid, or None while the tab is switched off."""
+        mw = self.mw
+        voice = getattr(mw, "voice", None)
+        return voice.fx if voice is not None and mw.tabctl.tab_on("voice") else None
+
+    def pick_voice(self, name: str):
+        """A voice's own hotkey (or the tray): turns the voice changer on with it."""
+        mw = self.mw
+        fx = self._voice_fx()
+        if fx is None:
+            mw.playctl.cue("fail")
+            mw.toast(_("The Voice tab is switched off (Settings > Tabs)."), "warn")
+            return
+        if name not in fx.voice_names():   # deleted since the key was set
+            mw.playctl.cue("fail")
+            return
+        self._voice_was = None
+        fx.pick(name)
+        mw.playctl.cue("start")
 
     def _set_voice(self, on: bool):
         """The voice changer's big ON / OFF switch, from a hotkey."""
@@ -386,7 +421,8 @@ class HotkeyControl(Controller):
         return (any(o.hotkey == combo for o in mw.cfg.sounds)
                 or any(getattr(mw.cfg, attr) == combo for attr, *__ in HOTKEY_ACTIONS)
                 or mw.cfg.ptt_key == combo
-                or combo in mw.cfg.category_hotkeys.values())
+                or combo in mw.cfg.category_hotkeys.values()
+                or combo in mw.cfg.voice_hotkeys.values())
 
     def _shares_keys(self, a: SoundMeta, b: SoundMeta) -> bool:
         """Can a and b's hotkeys be live at the same time? With a set of hotkeys per
@@ -417,6 +453,9 @@ class HotkeyControl(Controller):
         lost += [_("a random sound from “{name}”", name=c)
                  for c, k in mw.cfg.category_hotkeys.items() if k == m.hotkey]
         self._clear_category_hotkey(m.hotkey)
+        lost += [_("the voice “{name}”", name=n)
+                 for n, k in mw.cfg.voice_hotkeys.items() if k == m.hotkey]
+        self._clear_voice_hotkey(m.hotkey)
         if mw.cfg.ptt_key == m.hotkey:   # as everywhere else a key is set
             mw.cfg.ptt_key = ""
             lost.append(_("auto push-to-talk"))
@@ -466,6 +505,74 @@ class HotkeyControl(Controller):
                         if k == combo and c != keep]:
                 del mw.cfg.category_hotkeys[cat]
 
+    def _clear_voice_hotkey(self, combo: str, keep: str | None = None):
+        """A combo does one thing: take it off any voice's hotkey."""
+        mw = self.mw
+        if combo:
+            for v in [n for n, k in mw.cfg.voice_hotkeys.items() if k == combo and n != keep]:
+                del mw.cfg.voice_hotkeys[v]
+
+    def voice_renamed(self, old: str, new: str):
+        """A saved voice got a new name: its key goes with it."""
+        mw = self.mw
+        if old in mw.cfg.voice_hotkeys:
+            mw.cfg.voice_hotkeys[new] = mw.cfg.voice_hotkeys.pop(old)
+            mw._save_now()
+            self.register_hotkeys()
+
+    def set_voice_hotkey(self, name: str, combo: str | None = None):
+        """The hotkey that picks voice `name` and turns the voice changer on (asks for
+        it unless given; "" clears it)."""
+        mw = self.mw
+        fx = self._voice_fx()
+        if fx is None or name not in fx.voice_names():
+            return
+        if combo is None:
+            d = HotkeyDialog(mw.hotkeys, mw)
+            combo = d.result_combo if d.exec() and d.result_combo else None
+            free_dialog(d)
+            if combo is None:
+                self.register_hotkeys()   # the capture paused them
+                return
+        combo = self._valid_hotkey(combo)
+        if combo is None or self.keeps_stop_key(combo):
+            self.register_hotkeys()
+            return
+        if combo:
+            taken_from = []
+            for attr, _action, label, _desc in HOTKEY_ACTIONS:
+                if getattr(mw.cfg, attr) == combo:
+                    setattr(mw.cfg, attr, "")
+                    taken_from.append(label)
+            for m in mw.cfg.sounds:
+                if m.hotkey == combo:
+                    m.hotkey = ""
+                    taken_from.append(f"“{m.name}”")
+                    if m.id in mw.pads:
+                        mw.pads[m.id].update()
+            taken_from += [_("a random sound from “{name}”", name=c)
+                           for c, k in mw.cfg.category_hotkeys.items() if k == combo]
+            self._clear_category_hotkey(combo)
+            taken_from += [_("the voice “{name}”", name=n)
+                           for n, k in mw.cfg.voice_hotkeys.items() if k == combo and n != name]
+            self._clear_voice_hotkey(combo, keep=name)
+            if mw.cfg.ptt_key == combo:
+                mw.cfg.ptt_key = ""
+                taken_from.append(_("auto push-to-talk"))
+            mw.cfg.voice_hotkeys[name] = combo
+            msg = (_("✓ {combo} picks the voice “{name}”, it was the key for {lost}",
+                     combo=html.escape(pretty_key(combo)), name=html.escape(name),
+                     lost=html.escape(", ".join(taken_from))) if taken_from
+                   else _("✓ {combo} picks the voice “{name}”",
+                          combo=html.escape(pretty_key(combo)), name=html.escape(name)))
+            mw.toast(msg, "ok")
+            self.everyday_note(combo)
+        else:
+            mw.cfg.voice_hotkeys.pop(name, None)
+            mw.toast(_("Hotkey for the voice “{name}” cleared", name=html.escape(name)))
+        mw._save_now()
+        self.register_hotkeys()
+
     def set_category_hotkey(self, name: str, combo: str | None = None):
         """The hotkey that plays a random sound from category `name` (asks for it
         unless given; "" clears it)."""
@@ -496,6 +603,9 @@ class HotkeyControl(Controller):
                     if m.id in mw.pads:
                         mw.pads[m.id].update()
             self._clear_category_hotkey(combo, keep=name)
+            taken_from += [_("the voice “{name}”", name=n)
+                           for n, k in mw.cfg.voice_hotkeys.items() if k == combo]
+            self._clear_voice_hotkey(combo)
             if mw.cfg.ptt_key == combo:
                 mw.cfg.ptt_key = ""
             mw.cfg.category_hotkeys[name] = combo

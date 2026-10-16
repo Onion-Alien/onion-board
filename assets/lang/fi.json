@@ -3485,5 +3485,16 @@
     "{n} suosittua asemaa: hae tai napsauta asemaa toistaaksesi sen."
   ],
   "Evens out your voice, loud or quiet, so friends don't have to keep turning you up and down. Your voice chat's own automatic volume can then stay off: it cuts up your sounds.": "Tasoittaa äänesi, kovan tai hiljaisen, ettei kavereiden tarvitse jatkuvasti säätää sinua kovemmalle ja hiljemmalle. Puhechatin oma automaattinen äänenvoimakkuus voi silloin olla pois päältä: se pätkii äänesi.",
-  "Keep my voice at one volume": "Pidä ääneni samalla voimakkuudella"
+  "Keep my voice at one volume": "Pidä ääneni samalla voimakkuudella",
+  "Clear hotkey": "Poista pikanäppäin",
+  "Hotkey for the voice “{name}” cleared": "Äänen “{name}” pikanäppäin poistettu",
+  "Hotkey: {key}…": "Pikanäppäin: {key}…",
+  "Set a hotkey…": "Aseta pikanäppäin…",
+  "Star voices on the Voice tab to list them here": "Merkitse ääniä tähdellä Ääni-välilehdellä, niin ne näkyvät tässä",
+  "The Voice tab is switched off": "Ääni-välilehti on pois päältä",
+  "Turn off": "Sammuta",
+  "Turn on": "Käynnistä",
+  "the voice “{name}”": "ääni “{name}”",
+  "✓ {combo} picks the voice “{name}”": "✓ {combo} valitsee äänen “{name}”",
+  "✓ {combo} picks the voice “{name}”, it was the key for {lost}": "✓ {combo} valitsee äänen “{name}”, se oli kohteen {lost} pikanäppäin"
 }

@@ -3408,5 +3408,16 @@
     "{n} đài phổ biến: tìm kiếm, hoặc bấm vào một đài để phát."
   ],
   "Evens out your voice, loud or quiet, so friends don't have to keep turning you up and down. Your voice chat's own automatic volume can then stay off: it cuts up your sounds.": "Cân bằng giọng bạn, to hay nhỏ, để bạn bè không phải liên tục chỉnh to nhỏ bạn. Âm lượng tự động của voice chat có thể để tắt: nó làm âm thanh của bạn bị ngắt quãng.",
-  "Keep my voice at one volume": "Giữ giọng tôi ở một mức âm lượng"
+  "Keep my voice at one volume": "Giữ giọng tôi ở một mức âm lượng",
+  "Clear hotkey": "Xóa phím tắt",
+  "Hotkey for the voice “{name}” cleared": "Đã xóa phím tắt của giọng “{name}”",
+  "Hotkey: {key}…": "Phím tắt: {key}…",
+  "Set a hotkey…": "Đặt phím tắt…",
+  "Star voices on the Voice tab to list them here": "Gắn sao cho giọng ở tab Giọng nói để hiện ở đây",
+  "The Voice tab is switched off": "Tab Giọng nói đang tắt",
+  "Turn off": "Tắt",
+  "Turn on": "Bật",
+  "the voice “{name}”": "giọng “{name}”",
+  "✓ {combo} picks the voice “{name}”": "✓ {combo} chọn giọng “{name}”",
+  "✓ {combo} picks the voice “{name}”, it was the key for {lost}": "✓ {combo} chọn giọng “{name}”, trước đây là phím tắt của {lost}"
 }

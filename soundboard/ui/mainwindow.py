@@ -832,6 +832,10 @@ class MainWindow(QMainWindow):
             v.clip_ready.connect(self.soundctl.on_clip)
             v.fx.set_tip_enabled(not self.cfg.voice_discord_tip_shown)
             v.fx.chat_help.connect(lambda: self.statusctl.show_chat_guide("discord"))
+            v.fx.hotkey_asked.connect(self.hkctl.set_voice_hotkey)
+            v.fx.hotkey_cleared.connect(lambda n: self.hkctl.set_voice_hotkey(n, ""))
+            v.fx.renamed.connect(self.hkctl.voice_renamed)
+            v.fx.keys = dict(self.cfg.voice_hotkeys)
             v.fx.tip_dismissed.connect(
                 lambda: self.set_option("voice_discord_tip_shown", True))
         elif key == "apps":
@@ -1084,6 +1088,9 @@ class MainWindow(QMainWindow):
         self._tray_bun = menu.addAction(self.builder._bun_icon(), _("Turn into Bun"),
                                         self.bunctl.tray_bun)
         menu.aboutToShow.connect(self._name_tray_bun)
+        self._tray_voices = menu.addMenu(_("Voice changer"))
+        icons.set_icon(self._tray_voices.menuAction(), "wave")
+        self._tray_voices.aboutToShow.connect(self._fill_tray_voices)
         menu.addSeparator()
         # the Discord opens in the browser (feedback.py); Send feedback asks first
         from soundboard import feedback
@@ -1097,6 +1104,30 @@ class MainWindow(QMainWindow):
         t.messageClicked.connect(self.show_from_tray)
         t.show()
         QApplication.setQuitOnLastWindowClosed(False)
+
+    def _fill_tray_voices(self):
+        """The tray's Voice changer menu: on / off, then your favorite and saved voices
+        (the one in use ticked). Made each time it opens, so it's never out of date."""
+        m = self._tray_voices
+        m.clear()
+        fx = self.hkctl._voice_fx()
+        if fx is None:
+            m.addAction(_("The Voice tab is switched off")).setEnabled(False)
+            return
+        on = fx.btn_power.isChecked()
+        m.addAction(_("Turn off") if on else _("Turn on"),
+                    lambda: self.hkctl._set_voice(not on))
+        names = [n for n in fx.favorites if n in fx.voice_names()]
+        names += [n for n in fx.saved_names() if n not in names]
+        if not names:
+            m.addSeparator()
+            m.addAction(_("Star voices on the Voice tab to list them here")).setEnabled(False)
+            return
+        m.addSeparator()
+        for n in names:
+            a = m.addAction(fx.title_of(n), lambda n=n: self.hkctl.pick_voice(n))
+            a.setCheckable(True)
+            a.setChecked(on and fx.preset == n)
 
     def _name_tray_bun(self):
         """The tray's Bun item says what it does now: Bun up, it brings the window back."""

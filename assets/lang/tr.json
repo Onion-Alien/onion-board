@@ -3485,5 +3485,16 @@
     "{n} popüler istasyon: arayın veya çalmak için bir istasyona tıklayın."
   ],
   "Evens out your voice, loud or quiet, so friends don't have to keep turning you up and down. Your voice chat's own automatic volume can then stay off: it cuts up your sounds.": "Sesini, yüksek ya da alçak, dengeler; böylece arkadaşların seni sürekli açıp kısmak zorunda kalmaz. Sesli sohbetin kendi otomatik ses ayarı kapalı kalabilir: seslerini kesip biçiyor.",
-  "Keep my voice at one volume": "Sesimi tek seviyede tut"
+  "Keep my voice at one volume": "Sesimi tek seviyede tut",
+  "Clear hotkey": "Kısayolu temizle",
+  "Hotkey for the voice “{name}” cleared": "“{name}” sesinin kısayolu temizlendi",
+  "Hotkey: {key}…": "Kısayol: {key}…",
+  "Set a hotkey…": "Kısayol ayarla…",
+  "Star voices on the Voice tab to list them here": "Ses sekmesinde seslere yıldız ver, burada görünsünler",
+  "The Voice tab is switched off": "Ses sekmesi kapalı",
+  "Turn off": "Kapat",
+  "Turn on": "Aç",
+  "the voice “{name}”": "“{name}” sesi",
+  "✓ {combo} picks the voice “{name}”": "✓ {combo} “{name}” sesini seçer",
+  "✓ {combo} picks the voice “{name}”, it was the key for {lost}": "✓ {combo} “{name}” sesini seçer, önceden {lost} kısayoluydu"
 }

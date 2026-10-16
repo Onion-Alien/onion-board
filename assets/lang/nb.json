@@ -3485,5 +3485,16 @@
     "{n} populære stasjoner: søk, eller klikk på en stasjon for å spille den."
   ],
   "Evens out your voice, loud or quiet, so friends don't have to keep turning you up and down. Your voice chat's own automatic volume can then stay off: it cuts up your sounds.": "Jevner ut stemmen din, høy eller lav, så vennene dine slipper å skru deg opp og ned hele tiden. Talechattens eget automatiske volum kan da være av: det hakker opp lydene dine.",
-  "Keep my voice at one volume": "Hold stemmen min på ett volum"
+  "Keep my voice at one volume": "Hold stemmen min på ett volum",
+  "Clear hotkey": "Fjern hurtigtast",
+  "Hotkey for the voice “{name}” cleared": "Hurtigtasten for stemmen «{name}» er fjernet",
+  "Hotkey: {key}…": "Hurtigtast: {key}…",
+  "Set a hotkey…": "Sett en hurtigtast…",
+  "Star voices on the Voice tab to list them here": "Gi stemmer en stjerne i fanen Stemme, så vises de her",
+  "The Voice tab is switched off": "Fanen Stemme er slått av",
+  "Turn off": "Slå av",
+  "Turn on": "Slå på",
+  "the voice “{name}”": "stemmen «{name}»",
+  "✓ {combo} picks the voice “{name}”": "✓ {combo} velger stemmen «{name}»",
+  "✓ {combo} picks the voice “{name}”, it was the key for {lost}": "✓ {combo} velger stemmen «{name}», den var hurtigtasten til {lost}"
 }

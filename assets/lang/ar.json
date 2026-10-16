@@ -3793,5 +3793,16 @@
     "{n} محطات شعبية: ابحث، أو انقر على محطة لتشغيلها."
   ],
   "Evens out your voice, loud or quiet, so friends don't have to keep turning you up and down. Your voice chat's own automatic volume can then stay off: it cuts up your sounds.": "يوازن صوتك، عاليًا كان أو منخفضًا، حتى لا يضطر أصدقاؤك لرفعك وخفضك كل مرة. وبعدها يمكن ترك الصوت التلقائي في دردشتك الصوتية مطفأً: فهو يقطّع أصواتك.",
-  "Keep my voice at one volume": "أبقِ صوتي بمستوى واحد"
+  "Keep my voice at one volume": "أبقِ صوتي بمستوى واحد",
+  "Clear hotkey": "مسح الاختصار",
+  "Hotkey for the voice “{name}” cleared": "تم مسح اختصار الصوت “{name}”",
+  "Hotkey: {key}…": "الاختصار: {key}…",
+  "Set a hotkey…": "تعيين اختصار…",
+  "Star voices on the Voice tab to list them here": "ضع نجمة على الأصوات في تبويب الصوت لتظهر هنا",
+  "The Voice tab is switched off": "تبويب الصوت متوقف",
+  "Turn off": "إيقاف",
+  "Turn on": "تشغيل",
+  "the voice “{name}”": "الصوت “{name}”",
+  "✓ {combo} picks the voice “{name}”": "✓ {combo} يختار الصوت “{name}”",
+  "✓ {combo} picks the voice “{name}”, it was the key for {lost}": "✓ {combo} يختار الصوت “{name}”، وكان مفتاح {lost}"
 }

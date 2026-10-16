@@ -3485,5 +3485,16 @@
     "{n} लोकप्रिय स्टेशन - खोजें, या चलाने के लिए किसी स्टेशन पर क्लिक करें।"
   ],
   "Evens out your voice, loud or quiet, so friends don't have to keep turning you up and down. Your voice chat's own automatic volume can then stay off: it cuts up your sounds.": "आपकी आवाज़ को बराबर करता है, तेज़ हो या धीमी, ताकि दोस्तों को बार-बार आपको तेज़ और धीमा न करना पड़े। फिर आपके वॉइस चैट का अपना ऑटोमैटिक वॉल्यूम बंद रह सकता है: वह आपकी साउंड्स को काट देता है।",
-  "Keep my voice at one volume": "मेरी आवाज़ एक ही वॉल्यूम पर रखें"
+  "Keep my voice at one volume": "मेरी आवाज़ एक ही वॉल्यूम पर रखें",
+  "Clear hotkey": "हॉटकी हटाएँ",
+  "Hotkey for the voice “{name}” cleared": "आवाज़ “{name}” की हॉटकी हटा दी गई",
+  "Hotkey: {key}…": "हॉटकी: {key}…",
+  "Set a hotkey…": "हॉटकी सेट करें…",
+  "Star voices on the Voice tab to list them here": "आवाज़ टैब में आवाज़ों पर स्टार लगाएँ, वे यहाँ दिखेंगी",
+  "The Voice tab is switched off": "आवाज़ टैब बंद है",
+  "Turn off": "बंद करें",
+  "Turn on": "चालू करें",
+  "the voice “{name}”": "आवाज़ “{name}”",
+  "✓ {combo} picks the voice “{name}”": "✓ {combo} आवाज़ “{name}” चुनता है",
+  "✓ {combo} picks the voice “{name}”, it was the key for {lost}": "✓ {combo} आवाज़ “{name}” चुनता है, यह {lost} की हॉटकी थी"
 }

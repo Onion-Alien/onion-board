@@ -3485,5 +3485,16 @@
     "{n} beliebte Sender: suche oder klicke auf einen Sender, um ihn abzuspielen."
   ],
   "Evens out your voice, loud or quiet, so friends don't have to keep turning you up and down. Your voice chat's own automatic volume can then stay off: it cuts up your sounds.": "Gleicht deine Stimme aus, laut oder leise, damit Freunde dich nicht ständig lauter und leiser drehen müssen. Die automatische Lautstärke deines Voice-Chats kann dann aus bleiben: Sie zerhackt deine Sounds.",
-  "Keep my voice at one volume": "Meine Stimme gleich laut halten"
+  "Keep my voice at one volume": "Meine Stimme gleich laut halten",
+  "Clear hotkey": "Hotkey entfernen",
+  "Hotkey for the voice “{name}” cleared": "Hotkey für die Stimme „{name}“ entfernt",
+  "Hotkey: {key}…": "Hotkey: {key}…",
+  "Set a hotkey…": "Hotkey festlegen…",
+  "Star voices on the Voice tab to list them here": "Markiere Stimmen im Tab Stimme mit einem Stern, dann erscheinen sie hier",
+  "The Voice tab is switched off": "Der Tab Stimme ist ausgeschaltet",
+  "Turn off": "Ausschalten",
+  "Turn on": "Einschalten",
+  "the voice “{name}”": "die Stimme „{name}“",
+  "✓ {combo} picks the voice “{name}”": "✓ {combo} wählt die Stimme „{name}“",
+  "✓ {combo} picks the voice “{name}”, it was the key for {lost}": "✓ {combo} wählt die Stimme „{name}“, es war der Hotkey für {lost}"
 }

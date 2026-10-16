@@ -222,7 +222,7 @@ def clean_setting(k: str, v):
     range of its control. None if it's unusable, so the default applies instead."""
     if k.endswith("_hotkey") or k == "ptt_key":
         return clean_hotkey(v, k)
-    if k == "category_hotkeys":   # {category: its random-sound key}
+    if k in ("category_hotkeys", "voice_hotkeys"):   # {category / voice: its key}
         return {c: key for c, key in v.items()
                 if isinstance(c, str) and isinstance(key, str)
                 and clean_hotkey(key, f"category {c!r}")}
@@ -514,6 +514,7 @@ class Config:
     scoped_hotkeys: bool = False
     single_click: bool = False        # one click on a pad plays it (not a double-click)
     category_hotkeys: dict = field(default_factory=dict)   # category -> its random-sound key
+    voice_hotkeys: dict = field(default_factory=dict)      # voice name -> the key that picks it
     # Switch category when a program is in front (soundboard.catswitch): {"game.exe":
     # category}, set by the user from a category's menu; and the switch for all of it
     category_programs: dict = field(default_factory=dict)

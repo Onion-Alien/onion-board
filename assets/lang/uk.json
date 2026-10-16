@@ -3562,5 +3562,16 @@
     "{n} популярних станцій: здійсніть пошук або натисніть станцію, щоб її увімкнути."
   ],
   "Evens out your voice, loud or quiet, so friends don't have to keep turning you up and down. Your voice chat's own automatic volume can then stay off: it cuts up your sounds.": "Вирівнює твій голос, гучний чи тихий, щоб друзям не доводилося постійно робити тебе гучніше й тихіше. Автогучність самого голосового чату тоді може лишатися вимкненою: вона рве твої звуки.",
-  "Keep my voice at one volume": "Тримати мій голос на одній гучності"
+  "Keep my voice at one volume": "Тримати мій голос на одній гучності",
+  "Clear hotkey": "Прибрати гарячу клавішу",
+  "Hotkey for the voice “{name}” cleared": "Гарячу клавішу голосу «{name}» прибрано",
+  "Hotkey: {key}…": "Гаряча клавіша: {key}…",
+  "Set a hotkey…": "Призначити гарячу клавішу…",
+  "Star voices on the Voice tab to list them here": "Познач голоси зірочкою на вкладці «Голос», і вони з’являться тут",
+  "The Voice tab is switched off": "Вкладка «Голос» вимкнена",
+  "Turn off": "Вимкнути",
+  "Turn on": "Увімкнути",
+  "the voice “{name}”": "голос «{name}»",
+  "✓ {combo} picks the voice “{name}”": "✓ {combo} вибирає голос «{name}»",
+  "✓ {combo} picks the voice “{name}”, it was the key for {lost}": "✓ {combo} вибирає голос «{name}», раніше це була клавіша для {lost}"
 }

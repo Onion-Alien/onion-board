@@ -61,7 +61,8 @@ DEVICE_FIELDS = ("main_device", "mon_device", "mic_device", "obs_device", "also_
 PROGRAM_FIELDS = ("apps", "apps_paths", "apps_hidden")
 # what "Settings" leaves alone: the other parts, what the user made (sounds,
 # categories, triggers, radio favourites) and the app's own bookkeeping
-KEEP = {"version", "sounds", "categories", "category", "category_hotkeys", "screen",
+KEEP = {"version", "sounds", "categories", "category", "category_hotkeys", "voice_hotkeys",
+        "screen",
         "setup_done", "use_mode", "ptt_key", "update_checked", "update_pending", "update_skip",
         "update_auto_tried",
         "stats_id", "stats_sent", "stats_heard", "stats_started", "stats_steps", "mic_first",
@@ -206,7 +207,7 @@ def reset(parts: list[str]) -> str:
         fresh = Config()
         for name in hotkey_fields():
             setattr(cfg, name, getattr(fresh, name))
-        cfg.category_hotkeys, cfg.ptt_key = {}, ""
+        cfg.category_hotkeys, cfg.voice_hotkeys, cfg.ptt_key = {}, {}, ""
         cfg.overlay_key_checked = False
     if SOUND_KEYS in parts:
         for m in cfg.sounds:
