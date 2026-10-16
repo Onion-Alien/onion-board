@@ -1142,6 +1142,29 @@ def test_every_card_heading_has_its_icon_on_one_line(window, qapp):  # noqa: F81
         d.accept()
 
 
+def test_helper_lookup_finishing_after_window_closed(qapp):
+    """The helper rows' lookup runs on a worker; when the main window is gone before
+    it answers (the app closing), its answer is dropped, not a "Signal source has
+    been deleted" crash on the worker."""
+    import threading
+    from types import SimpleNamespace
+
+    import shiboken6
+
+    from soundboard.ui.settingspages.privacy import PrivacyPage
+    mw = QObject()
+    shown, go = [], threading.Event()
+    page = SimpleNamespace(mw=mw, _helpers_show=shown.append)
+    PrivacyPage._off_ui(page, lambda: go.wait(5) and {"ytdlp": ("1", False)},
+                        "test-helper-lookup")
+    worker = next(t for t in threading.enumerate() if t.name == "test-helper-lookup")
+    shiboken6.delete(mw)   # takes the relay with it
+    go.set()
+    worker.join(5)
+    process_events(qapp, lambda: False, timeout=0.3)
+    assert shown == []
+
+
 def test_downloads_card_shows_each_helper_program(window, qapp, monkeypatch, tmp_path):  # noqa: F811
     """yt-dlp, the JavaScript engine and Tor (only once it's here) each get a row like
     FFmpeg's: a version pill and a hint, looked up off the UI thread, and Update now /
