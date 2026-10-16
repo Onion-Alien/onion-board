@@ -151,6 +151,67 @@ def test_a_download_of_unknown_size_still_says_it_is_moving(monkeypatch):
     assert 9 <= len(conn.sent) <= 10          # 10 s of downloading, once a second
 
 
+class _CutYdl(_FakeYdl):
+    """A server that cuts every piece off: yt-dlp keeps asking for the same bytes and
+    says it's downloading, 90% done, without ever getting further."""
+
+    def process_ie_result(self, info, download):
+        for _ in range(1000):
+            self.clock[0] += 0.2
+            self.hook({"status": "downloading", "downloaded_bytes": 900,
+                       "total_bytes": 1000})
+        return info
+
+
+def test_a_download_that_stops_growing_fails_instead_of_hanging(monkeypatch):
+    """Progress messages kept the app's quiet timer happy while nothing arrived: the
+    card sat on "Adding... 90%" for good. Bytes that don't grow for STALL_S end it."""
+    from tests.conftest import own_time
+    clock = [0.0]
+    own_time(monkeypatch, ytworker, monotonic=lambda: clock[0])
+    fake = type("yt_dlp", (), {"YoutubeDL": lambda self, opts: _CutYdl(opts, clock)})()
+    with pytest.raises(ytworker.Stalled):
+        ytworker._download(_Conn(), fake, "https://ex.com/v", {}, 600)
+    assert ytworker.STALL_S <= clock[0] < ytworker.STALL_S + 1
+
+
+class _QuietConn:
+    """The helper's pipe: a few progress messages, then nothing at all (yt-dlp asking a
+    server that cuts every piece off for the same bytes again, without a word)."""
+
+    def __init__(self, said):
+        self.said, self.waits = list(said), []
+
+    def send(self, msg):
+        pass
+
+    def poll(self, wait):
+        self.waits.append(wait)
+        return bool(self.said)
+
+    def recv(self):
+        return self.said.pop(0)
+
+
+def test_a_download_that_goes_quiet_after_starting_is_stuck_sooner():
+    h = object.__new__(ytworker._Helper)
+    h.conn, killed = _QuietConn([("progress", 0.5), ("progress", 0.9)]), []
+    h.kill = lambda: killed.append(True)
+    with pytest.raises(TimeoutError):
+        h.call(("download",), 300)
+    assert h.conn.waits[0] == 300                    # before any data: the long wait
+    assert h.conn.waits[-1] == ytworker.STALL_S       # once it was moving: the short one
+    assert killed
+
+
+def test_a_stalled_helper_download_says_it_stopped_moving(monkeypatch):
+    def run(*a, **kw):
+        raise ytworker.RemoteError("soundboard.ytworker.Stalled", "no new data for 60 s")
+    monkeypatch.setattr(ytworker, "run", run)
+    with pytest.raises(ytdl.FetchError, match="stopped moving"):
+        ytdl._run_helper("https://www.youtube.com/watch?v=x", {}, None)
+
+
 class _SearchYdl:
     """yt-dlp's YouTube search: reads YouTube's settings, then asks the API. `fail`
     makes the API turn down settings marked old."""
