@@ -3500,5 +3500,6 @@
   "Discord is still set up for sounds": "Discord on yhä säädetty ääniä varten",
   "Discord's noise suppression, echo cancellation and automatic volume go back on the way you had them, so your plain voice sounds right without Onion Board. If Discord is still open, it's done the moment you close it.": "Discordin kohinanvaimennus, kaiunpoisto ja automaattinen äänenvoimakkuus palaavat sellaisiksi kuin ne olivat, joten pelkkä äänesi kuulostaa oikealta ilman Onion Boardia. Jos Discord on vielä auki, se tehdään heti kun suljet sen.",
   "Onion Board turns its voice clean-up back on as soon as you close Discord. To talk clearly right now, click here and turn on Noise Suppression, Echo Cancellation and Automatic Gain Control.": "Onion Board laittaa äänen siistimisen takaisin päälle heti, kun suljet Discordin. Puhuaksesi selkeästi heti nyt: napsauta tästä ja laita kohinanvaimennus, kaiunpoisto ja automaattinen vahvistuksen säätö päälle.",
-  "Put Discord back for talking on close": "Palauta Discord puhetta varten suljettaessa"
+  "Put Discord back for talking on close": "Palauta Discord puhetta varten suljettaessa",
+  "Starter": "Aloitus"
 }

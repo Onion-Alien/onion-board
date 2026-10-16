@@ -3,6 +3,7 @@ offscreen: once only, never in the way (every click goes on to what was under it
 gone when they go elsewhere or leave it alone, and the Add button instead of the
 search box in Offline mode."""
 import time
+from pathlib import Path
 
 import pytest
 from conftest import process_events
@@ -11,7 +12,7 @@ from PySide6.QtGui import QKeyEvent
 from PySide6.QtTest import QTest
 from PySide6.QtWidgets import QApplication, QDialog
 
-from soundboard import __version__, engine, net, usage, winkeys
+from soundboard import __version__, engine, net, starter, usage, winkeys
 from soundboard.library import Config
 from soundboard.ui import firsttour
 from soundboard.ui import mainwindow as main
@@ -26,7 +27,15 @@ def counted(monkeypatch):
 
 
 @pytest.fixture
-def window(qapp, app_dir, monkeypatch, counted):
+def added(monkeypatch):
+    """The windows the starter sounds were handed to (not really imported)."""
+    seen = []
+    monkeypatch.setattr(starter, "add_to", lambda win: seen.append(win) or True)
+    return seen
+
+
+@pytest.fixture
+def window(qapp, app_dir, monkeypatch, counted, added):
     for name in ("set_main_device", "set_mon_device", "set_mic_device"):
         monkeypatch.setattr(engine.Engine, name, lambda self, n, _k=name: None)
     monkeypatch.setattr(winkeys.Hotkeys, "register", lambda self, m: None)
@@ -148,3 +157,47 @@ def test_the_guide_hands_over_to_the_tour(window, qapp, monkeypatch, counted):
     assert window.tabs.currentWidget() is window.sounds_page
     assert process_events(qapp, lambda: firsttour._current is not None, 3)
     wiz.deleteLater()
+
+
+# ---- the starter sounds: added by themselves when the tour ends on a bare board -------
+
+def test_skipping_the_tour_adds_the_starter_sounds(window, added):
+    tour = firsttour.start(window)
+    tour.end(skipped=True)
+    assert added == [window]
+
+
+def test_leaving_it_alone_or_for_another_tab_adds_them_too(window, qapp, added):
+    firsttour.start(window)
+    window.tabs.setCurrentWidget(window.setup_page)
+    assert process_events(qapp, lambda: firsttour._current is None, 2)
+    assert added == [window]
+
+
+def test_searching_then_picking_a_song_adds_none(window, added):
+    tour = firsttour.start(window)
+    tour._go("results")   # they searched: what they pick is their own first sound
+    tour.end()
+    assert added == []
+
+
+def test_a_board_with_sounds_gets_none(window, added):
+    from soundboard.library import SoundMeta
+    tour = firsttour.start(window)
+    window.cfg.sounds = [SoundMeta(id="a", name="A", file="a.wav")]
+    tour.end()
+    assert added == []
+
+
+def test_the_starter_sounds_ship_small_and_come_once(window, monkeypatch, added):
+    monkeypatch.undo()   # the real starter.add_to, not the stub
+    found = starter.files()
+    assert len(found) == 25
+    assert sum(Path(f).stat().st_size for f in found) < 1_000_000   # about 0.8 MB
+    got = []
+    monkeypatch.setattr(window.impctl, "import_files",
+                        lambda files, extras=None: got.append((files, extras)))
+    assert starter.add_to(window) and got[0][0] == found
+    assert {e.tags[0] for e in got[0][1].values()} == {"Starter"}   # a tab of their own
+    assert starter.KEY in window.cfg.tips_seen
+    assert not starter.add_to(window) and len(got) == 1   # once only

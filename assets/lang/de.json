@@ -3500,5 +3500,6 @@
   "Discord is still set up for sounds": "Discord ist noch für Sounds eingestellt",
   "Discord's noise suppression, echo cancellation and automatic volume go back on the way you had them, so your plain voice sounds right without Onion Board. If Discord is still open, it's done the moment you close it.": "Rauschunterdrückung, Echounterdrückung und automatische Lautstärke in Discord kommen zurück, wie du sie hattest, damit deine normale Stimme ohne Onion Board gut klingt. Ist Discord noch offen, passiert es, sobald du es schließt.",
   "Onion Board turns its voice clean-up back on as soon as you close Discord. To talk clearly right now, click here and turn on Noise Suppression, Echo Cancellation and Automatic Gain Control.": "Onion Board schaltet die Sprachbereinigung wieder ein, sobald du Discord schließt. Um jetzt sofort klar zu reden: hier klicken und Rauschunterdrückung, Echounterdrückung und automatische Verstärkungsregelung einschalten.",
-  "Put Discord back for talking on close": "Discord beim Schließen aufs Reden zurückstellen"
+  "Put Discord back for talking on close": "Discord beim Schließen aufs Reden zurückstellen",
+  "Starter": "Start"
 }

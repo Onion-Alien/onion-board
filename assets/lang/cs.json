@@ -3577,5 +3577,6 @@
   "Discord is still set up for sounds": "Discord je pořád nastavený na zvuky",
   "Discord's noise suppression, echo cancellation and automatic volume go back on the way you had them, so your plain voice sounds right without Onion Board. If Discord is still open, it's done the moment you close it.": "Potlačení šumu, rušení ozvěny a automatická hlasitost v Discordu se vrátí, jak jsi je měl, takže tvůj obyčejný hlas zní dobře i bez Onion Board. Když je Discord ještě otevřený, stane se to ve chvíli, kdy ho zavřeš.",
   "Onion Board turns its voice clean-up back on as soon as you close Discord. To talk clearly right now, click here and turn on Noise Suppression, Echo Cancellation and Automatic Gain Control.": "Onion Board zapne čištění hlasu zpátky, jakmile zavřeš Discord. Abys mluvil čistě hned teď, klikni sem a zapni potlačení šumu, rušení ozvěny a automatické řízení zisku.",
-  "Put Discord back for talking on close": "Při zavření vrátit Discord na mluvení"
+  "Put Discord back for talking on close": "Při zavření vrátit Discord na mluvení",
+  "Starter": "Startovní"
 }

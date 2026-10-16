@@ -3500,5 +3500,6 @@
   "Discord is still set up for sounds": "Discord अभी भी साउंड्स के लिए सेट है",
   "Discord's noise suppression, echo cancellation and automatic volume go back on the way you had them, so your plain voice sounds right without Onion Board. If Discord is still open, it's done the moment you close it.": "Discord का नॉइज़ सप्रेशन, इको कैंसलेशन और ऑटोमैटिक वॉल्यूम वैसे ही वापस चालू हो जाते हैं जैसे आपके पास थे, ताकि Onion Board के बिना आपकी सादी आवाज़ ठीक सुनाई दे। अगर Discord अभी खुला है, तो उसे बंद करते ही यह हो जाता है।",
   "Onion Board turns its voice clean-up back on as soon as you close Discord. To talk clearly right now, click here and turn on Noise Suppression, Echo Cancellation and Automatic Gain Control.": "जैसे ही आप Discord बंद करेंगे, Onion Board आवाज़ की सफ़ाई फिर से चालू कर देगा। अभी साफ़ बात करने के लिए, यहाँ क्लिक करें और Noise Suppression, Echo Cancellation और Automatic Gain Control चालू करें।",
-  "Put Discord back for talking on close": "बंद करने पर Discord को बात करने के लिए वापस करें"
+  "Put Discord back for talking on close": "बंद करने पर Discord को बात करने के लिए वापस करें",
+  "Starter": "शुरुआती"
 }

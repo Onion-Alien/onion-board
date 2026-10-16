@@ -72,3 +72,6 @@ BUG-REPORT*.md
 
 # Tor Expert Bundle, unpacked by scripts/fetch_tor.py (never committed)
 vendor/
+
+# the starter sounds that ship in the app (soundboard/starter.py)
+!assets/starter/*.ogg

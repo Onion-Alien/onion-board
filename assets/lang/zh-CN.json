@@ -3423,5 +3423,6 @@
   "Discord is still set up for sounds": "Discord 仍是为音效设置的",
   "Discord's noise suppression, echo cancellation and automatic volume go back on the way you had them, so your plain voice sounds right without Onion Board. If Discord is still open, it's done the moment you close it.": "Discord 的噪音抑制、回声消除和自动音量会恢复成你原来的样子，这样不用 Onion Board 时你的声音也正常。如果 Discord 还开着，会在你关闭它的那一刻恢复。",
   "Onion Board turns its voice clean-up back on as soon as you close Discord. To talk clearly right now, click here and turn on Noise Suppression, Echo Cancellation and Automatic Gain Control.": "你一关闭 Discord，Onion Board 就会重新打开语音清理。想现在就说话清楚，点这里，打开噪音抑制、回声消除和自动增益控制。",
-  "Put Discord back for talking on close": "关闭时把 Discord 恢复成聊天设置"
+  "Put Discord back for talking on close": "关闭时把 Discord 恢复成聊天设置",
+  "Starter": "入门"
 }

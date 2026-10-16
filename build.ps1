@@ -81,6 +81,7 @@ try {
     --add-data "assets\onionboard.ico;." `
     --add-data "assets\art;art" `
     --add-data "assets\radio;radio" `
+    --add-data "assets\starter;starter" `
     --add-data "assets\lang;lang" `
     --add-binary "build\directmic\obmic.dll;directmic" `
     --add-data "build\michelper\obmichelper;michelper" `
