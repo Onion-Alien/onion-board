@@ -3408,5 +3408,16 @@
     "{n}個熱門電台：進行搜尋，或點擊一個電台即可播放。"
   ],
   "Evens out your voice, loud or quiet, so friends don't have to keep turning you up and down. Your voice chat's own automatic volume can then stay off: it cuts up your sounds.": "把你的聲音調勻，不管大聲還是小聲，朋友就不用一直把你調大調小。語音聊天內建的自動音量可以保持關閉：它會把你的音效切得斷斷續續。",
-  "Keep my voice at one volume": "讓我的聲音保持同一音量"
+  "Keep my voice at one volume": "讓我的聲音保持同一音量",
+  "Clear hotkey": "清除快速鍵",
+  "Hotkey for the voice “{name}” cleared": "已清除聲音「{name}」的快速鍵",
+  "Hotkey: {key}…": "快速鍵：{key}…",
+  "Set a hotkey…": "設定快速鍵…",
+  "Star voices on the Voice tab to list them here": "在「聲音」分頁替聲音加星號，就會顯示在這裡",
+  "The Voice tab is switched off": "「聲音」分頁已關閉",
+  "Turn off": "關閉",
+  "Turn on": "開啟",
+  "the voice “{name}”": "聲音「{name}」",
+  "✓ {combo} picks the voice “{name}”": "✓ {combo} 選擇聲音「{name}」",
+  "✓ {combo} picks the voice “{name}”, it was the key for {lost}": "✓ {combo} 選擇聲音「{name}」，它原本是{lost}的快速鍵"
 }

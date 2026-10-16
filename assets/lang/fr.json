@@ -3485,5 +3485,16 @@
     "{n} stations populaires : recherchez, ou cliquez sur une station pour la diffuser."
   ],
   "Evens out your voice, loud or quiet, so friends don't have to keep turning you up and down. Your voice chat's own automatic volume can then stay off: it cuts up your sounds.": "Égalise ta voix, forte ou faible, pour que tes amis n'aient pas à te monter et te baisser sans arrêt. Le volume automatique de ton chat vocal peut alors rester coupé : il hache tes sons.",
-  "Keep my voice at one volume": "Garder ma voix au même volume"
+  "Keep my voice at one volume": "Garder ma voix au même volume",
+  "Clear hotkey": "Effacer le raccourci",
+  "Hotkey for the voice “{name}” cleared": "Raccourci de la voix « {name} » effacé",
+  "Hotkey: {key}…": "Raccourci : {key}…",
+  "Set a hotkey…": "Définir un raccourci…",
+  "Star voices on the Voice tab to list them here": "Mets des étoiles aux voix dans l’onglet Voix pour les voir ici",
+  "The Voice tab is switched off": "L’onglet Voix est désactivé",
+  "Turn off": "Éteindre",
+  "Turn on": "Allumer",
+  "the voice “{name}”": "la voix « {name} »",
+  "✓ {combo} picks the voice “{name}”": "✓ {combo} choisit la voix « {name} »",
+  "✓ {combo} picks the voice “{name}”, it was the key for {lost}": "✓ {combo} choisit la voix « {name} », c’était le raccourci de {lost}"
 }

@@ -3562,5 +3562,16 @@
     "{n} popularnych stacji: wyszukaj lub kliknij stację, aby ją odtworzyć."
   ],
   "Evens out your voice, loud or quiet, so friends don't have to keep turning you up and down. Your voice chat's own automatic volume can then stay off: it cuts up your sounds.": "Wyrównuje twój głos, głośny czy cichy, żeby znajomi nie musieli ciągle cię podgłaśniać i ściszać. Automatyczna głośność czatu głosowego może wtedy zostać wyłączona: tnie twoje dźwięki.",
-  "Keep my voice at one volume": "Trzymaj mój głos na jednej głośności"
+  "Keep my voice at one volume": "Trzymaj mój głos na jednej głośności",
+  "Clear hotkey": "Usuń skrót",
+  "Hotkey for the voice “{name}” cleared": "Usunięto skrót głosu „{name}”",
+  "Hotkey: {key}…": "Skrót: {key}…",
+  "Set a hotkey…": "Ustaw skrót…",
+  "Star voices on the Voice tab to list them here": "Oznacz głosy gwiazdką na karcie Głos, a pojawią się tutaj",
+  "The Voice tab is switched off": "Karta Głos jest wyłączona",
+  "Turn off": "Wyłącz",
+  "Turn on": "Włącz",
+  "the voice “{name}”": "głos „{name}”",
+  "✓ {combo} picks the voice “{name}”": "✓ {combo} wybiera głos „{name}”",
+  "✓ {combo} picks the voice “{name}”, it was the key for {lost}": "✓ {combo} wybiera głos „{name}”, to był skrót do: {lost}"
 }

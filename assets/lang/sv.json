@@ -3485,5 +3485,16 @@
     "{n} populära stationer: sök, eller klicka på en station för att spela upp den."
   ],
   "Evens out your voice, loud or quiet, so friends don't have to keep turning you up and down. Your voice chat's own automatic volume can then stay off: it cuts up your sounds.": "Jämnar ut din röst, hög eller låg, så att kompisarna slipper skruva upp och ner dig hela tiden. Röstchattens egen automatiska volym kan då vara av: den hackar sönder dina ljud.",
-  "Keep my voice at one volume": "Håll min röst på en volym"
+  "Keep my voice at one volume": "Håll min röst på en volym",
+  "Clear hotkey": "Ta bort kortkommando",
+  "Hotkey for the voice “{name}” cleared": "Kortkommandot för rösten “{name}” är borttaget",
+  "Hotkey: {key}…": "Kortkommando: {key}…",
+  "Set a hotkey…": "Ange ett kortkommando…",
+  "Star voices on the Voice tab to list them here": "Stjärnmärk röster på fliken Röst så visas de här",
+  "The Voice tab is switched off": "Fliken Röst är avstängd",
+  "Turn off": "Stäng av",
+  "Turn on": "Slå på",
+  "the voice “{name}”": "rösten “{name}”",
+  "✓ {combo} picks the voice “{name}”": "✓ {combo} väljer rösten “{name}”",
+  "✓ {combo} picks the voice “{name}”, it was the key for {lost}": "✓ {combo} väljer rösten “{name}”, det var kortkommandot för {lost}"
 }

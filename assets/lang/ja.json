@@ -3408,5 +3408,16 @@
     "{n}個の人気局：検索するか、局をクリックして再生します。"
   ],
   "Evens out your voice, loud or quiet, so friends don't have to keep turning you up and down. Your voice chat's own automatic volume can then stay off: it cuts up your sounds.": "大きい声も小さい声もそろえるので、フレンドが何度も音量を上げ下げしなくて済みます。ボイスチャット側の自動音量はオフのままでOK:サウンドが途切れる原因になります。",
-  "Keep my voice at one volume": "声の音量を一定に保つ"
+  "Keep my voice at one volume": "声の音量を一定に保つ",
+  "Clear hotkey": "ホットキーを消す",
+  "Hotkey for the voice “{name}” cleared": "ボイス「{name}」のホットキーを消しました",
+  "Hotkey: {key}…": "ホットキー：{key}…",
+  "Set a hotkey…": "ホットキーを設定…",
+  "Star voices on the Voice tab to list them here": "ボイスタブでボイスにスターを付けると、ここに表示されます",
+  "The Voice tab is switched off": "ボイスタブはオフです",
+  "Turn off": "オフにする",
+  "Turn on": "オンにする",
+  "the voice “{name}”": "ボイス「{name}」",
+  "✓ {combo} picks the voice “{name}”": "✓ {combo} でボイス「{name}」を選びます",
+  "✓ {combo} picks the voice “{name}”, it was the key for {lost}": "✓ {combo} でボイス「{name}」を選びます（以前は{lost}のキーでした）"
 }

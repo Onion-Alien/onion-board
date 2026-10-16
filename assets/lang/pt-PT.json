@@ -3485,5 +3485,16 @@
     "{n} estações populares: pesquise ou clique numa estação para reproduzi-la."
   ],
   "Evens out your voice, loud or quiet, so friends don't have to keep turning you up and down. Your voice chat's own automatic volume can then stay off: it cuts up your sounds.": "Nivela a tua voz, alta ou baixa, para os amigos não terem de te estar sempre a aumentar e a baixar. O volume automático do teu chat de voz pode ficar desligado: corta os teus sons.",
-  "Keep my voice at one volume": "Manter a minha voz num só volume"
+  "Keep my voice at one volume": "Manter a minha voz num só volume",
+  "Clear hotkey": "Limpar atalho",
+  "Hotkey for the voice “{name}” cleared": "Atalho da voz “{name}” removido",
+  "Hotkey: {key}…": "Atalho: {key}…",
+  "Set a hotkey…": "Definir um atalho…",
+  "Star voices on the Voice tab to list them here": "Marca vozes com uma estrela no separador Voz para as ver aqui",
+  "The Voice tab is switched off": "O separador Voz está desligado",
+  "Turn off": "Desligar",
+  "Turn on": "Ligar",
+  "the voice “{name}”": "a voz “{name}”",
+  "✓ {combo} picks the voice “{name}”": "✓ {combo} escolhe a voz “{name}”",
+  "✓ {combo} picks the voice “{name}”, it was the key for {lost}": "✓ {combo} escolhe a voz “{name}”, era o atalho de {lost}"
 }

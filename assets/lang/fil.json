@@ -3485,5 +3485,16 @@
     "{n} mga sikat na istasyon: maghanap, o mag-click sa isang istasyon para i-play ito."
   ],
   "Evens out your voice, loud or quiet, so friends don't have to keep turning you up and down. Your voice chat's own automatic volume can then stay off: it cuts up your sounds.": "Pinapantay ang boses mo, malakas man o mahina, para hindi ka na paulit-ulit na lakasan at hinaan ng mga kaibigan mo. Puwede nang patayin ang sariling awtomatikong volume ng voice chat mo: pinuputol-putol nito ang mga sound mo.",
-  "Keep my voice at one volume": "Panatilihin sa iisang lakas ang boses ko"
+  "Keep my voice at one volume": "Panatilihin sa iisang lakas ang boses ko",
+  "Clear hotkey": "Alisin ang hotkey",
+  "Hotkey for the voice “{name}” cleared": "Naalis na ang hotkey ng boses na “{name}”",
+  "Hotkey: {key}…": "Hotkey: {key}…",
+  "Set a hotkey…": "Magtakda ng hotkey…",
+  "Star voices on the Voice tab to list them here": "Bigyan ng star ang mga boses sa tab na Boses para lumabas dito",
+  "The Voice tab is switched off": "Naka-off ang tab na Boses",
+  "Turn off": "I-off",
+  "Turn on": "I-on",
+  "the voice “{name}”": "ang boses na “{name}”",
+  "✓ {combo} picks the voice “{name}”": "✓ Pinipili ng {combo} ang boses na “{name}”",
+  "✓ {combo} picks the voice “{name}”, it was the key for {lost}": "✓ Pinipili ng {combo} ang boses na “{name}”, dati itong key para sa {lost}"
 }

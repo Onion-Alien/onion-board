@@ -651,6 +651,9 @@ class VoiceFxPanel(QWidget):
     chat_help = Signal()
     tip_dismissed = Signal()
     folds_changed = Signal(list)   # the effect types whose cards are folded away
+    hotkey_asked = Signal(str)     # right-click a voice -> Set hotkey: its name ("" key: clear)
+    hotkey_cleared = Signal(str)
+    renamed = Signal(str, str)     # a saved voice's old and new name
 
     COLS = 3
 
@@ -763,6 +766,7 @@ class VoiceFxPanel(QWidget):
         self.tiles = QButtonGroup(self)
         self.tiles.setExclusive(True)
         self._tile: dict[str, VoiceTile] = {}
+        self.keys: dict[str, str] = {}   # voice name -> its hotkey (the window fills it in)
         self._saved_tiles: list[VoiceTile] = []
         for name in list(voicefx.PRESETS) + [CUSTOM]:
             title = _("My own mix") if name == CUSTOM else voicefx.shown(name)
@@ -1093,6 +1097,10 @@ class VoiceFxPanel(QWidget):
         b.setIconSize(QSize(TILE_ART, TILE_ART))   # a line icon: as tall as a picture
         b.setCursor(Qt.CursorShape.PointingHandCursor)
         b.clicked.connect(lambda __=False, n=name: self.pick(n))
+        if name != CUSTOM:
+            b.setContextMenuPolicy(Qt.ContextMenuPolicy.CustomContextMenu)
+            b.customContextMenuRequested.connect(
+                lambda pos, n=name, w=b: self._tile_menu(n, w.mapToGlobal(pos)))
         b.star.setChecked(name in self._favs)
         b.star.toggled.connect(lambda on, n=name: self.set_favorite(n, on))
         self.tiles.addButton(b)
@@ -1112,9 +1120,6 @@ class VoiceFxPanel(QWidget):
             b = self._make_tile(name, name, art.icon(art.voice_key(CUSTOM)), "sliders")
             b.setToolTip(_("Your saved voice “{name}”. Click to turn the voice changer on "
                            "with it; right-click to rename or delete it.", name=name))
-            b.setContextMenuPolicy(Qt.ContextMenuPolicy.CustomContextMenu)
-            b.customContextMenuRequested.connect(
-                lambda pos, n=name, w=b: self._saved_menu(n, w.mapToGlobal(pos)))
             self._saved_tiles.append(b)
         self._place_tiles()
         self.btn_bin.setVisible(bool(self.store.deleted))
@@ -1229,12 +1234,35 @@ class VoiceFxPanel(QWidget):
         self._emit()
         busy.flash(self.btn_save, _("✓ Saved"))
 
-    def _saved_menu(self, name: str, at):
+    def voice_names(self) -> set[str]:
+        """The voices a hotkey can pick: the ready ones and your saved ones."""
+        return {n for n in self._tile if n != CUSTOM}
+
+    def saved_names(self) -> list[str]:
+        return list(self.store.voices)
+
+    def title_of(self, name: str) -> str:
+        """What a voice's card calls it."""
+        return voicefx.shown(name) if name in voicefx.PRESETS else name
+
+    def _tile_menu(self, name: str, at):
+        """A voice card's right-click menu: its hotkey, and for a saved voice rename,
+        share and delete."""
+        from soundboard.settings import pretty_key
         m = QMenu(self)
-        m.addAction(icons.icon("edit"), _("Rename"), lambda: self.rename_voice(name))
-        m.addAction(icons.icon("copy"), _("Copy share code"), lambda: self.copy_code(name))
-        m.addAction(icons.icon("trash", "danger_text"), _("Delete"),
-                    lambda: self.delete_voice(name))
+        key = self.keys.get(name, "")
+        m.addAction(icons.icon("keyboard"),
+                    _("Hotkey: {key}…", key=pretty_key(key)) if key else _("Set a hotkey…"),
+                    lambda: self.hotkey_asked.emit(name))
+        if key:
+            m.addAction(icons.icon("close"), _("Clear hotkey"),
+                        lambda: self.hotkey_cleared.emit(name))
+        if name in self.store.voices:
+            m.addSeparator()
+            m.addAction(icons.icon("edit"), _("Rename"), lambda: self.rename_voice(name))
+            m.addAction(icons.icon("copy"), _("Copy share code"), lambda: self.copy_code(name))
+            m.addAction(icons.icon("trash", "danger_text"), _("Delete"),
+                        lambda: self.delete_voice(name))
         m.exec(at)
 
     @staticmethod
@@ -1330,6 +1358,7 @@ class VoiceFxPanel(QWidget):
             self._based_on = new
         self._favs = [new if n == old else n for n in self._favs]
         self._fill_saved()
+        self.renamed.emit(old, new)
         self._emit()
 
     def delete_voice(self, name: str):
