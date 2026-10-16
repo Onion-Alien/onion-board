@@ -3408,5 +3408,10 @@
     "{n} stasiun populer: cari, atau klik stasiun untuk memutarnya."
   ],
   "Evens out your voice, loud or quiet, so friends don't have to keep turning you up and down. Your voice chat's own automatic volume can then stay off: it cuts up your sounds.": "Meratakan suaramu, keras atau pelan, supaya teman tidak perlu terus mengeraskan dan mengecilkanmu. Volume otomatis bawaan voice chat-mu bisa tetap mati: itu memotong-motong suaramu.",
-  "Keep my voice at one volume": "Jaga suaraku di satu volume"
+  "Keep my voice at one volume": "Jaga suaraku di satu volume",
+  "<span style='color:{red}'>Couldn't load what's trending on Myinstants: {err}</span>": "<span style='color:{red}'>Tidak bisa memuat yang trending di Myinstants: {err}</span>",
+  "Loading what's trending on Myinstants…": "Memuat yang sedang trending di Myinstants…",
+  "Nothing is trending on Myinstants right now.": "Tidak ada yang trending di Myinstants saat ini.",
+  "The meme sounds people play most on Myinstants right now": "Suara meme yang paling banyak diputar di Myinstants saat ini",
+  "Trending on Myinstants": "Trending di Myinstants"
 }

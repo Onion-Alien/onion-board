@@ -3408,5 +3408,10 @@
     "{n} đài phổ biến: tìm kiếm, hoặc bấm vào một đài để phát."
   ],
   "Evens out your voice, loud or quiet, so friends don't have to keep turning you up and down. Your voice chat's own automatic volume can then stay off: it cuts up your sounds.": "Cân bằng giọng bạn, to hay nhỏ, để bạn bè không phải liên tục chỉnh to nhỏ bạn. Âm lượng tự động của voice chat có thể để tắt: nó làm âm thanh của bạn bị ngắt quãng.",
-  "Keep my voice at one volume": "Giữ giọng tôi ở một mức âm lượng"
+  "Keep my voice at one volume": "Giữ giọng tôi ở một mức âm lượng",
+  "<span style='color:{red}'>Couldn't load what's trending on Myinstants: {err}</span>": "<span style='color:{red}'>Không tải được mục thịnh hành trên Myinstants: {err}</span>",
+  "Loading what's trending on Myinstants…": "Đang tải mục thịnh hành trên Myinstants…",
+  "Nothing is trending on Myinstants right now.": "Hiện chưa có gì thịnh hành trên Myinstants.",
+  "The meme sounds people play most on Myinstants right now": "Những âm thanh meme được mọi người phát nhiều nhất trên Myinstants lúc này",
+  "Trending on Myinstants": "Thịnh hành trên Myinstants"
 }

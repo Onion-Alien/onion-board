@@ -3485,5 +3485,10 @@
     "{n} popüler istasyon: arayın veya çalmak için bir istasyona tıklayın."
   ],
   "Evens out your voice, loud or quiet, so friends don't have to keep turning you up and down. Your voice chat's own automatic volume can then stay off: it cuts up your sounds.": "Sesini, yüksek ya da alçak, dengeler; böylece arkadaşların seni sürekli açıp kısmak zorunda kalmaz. Sesli sohbetin kendi otomatik ses ayarı kapalı kalabilir: seslerini kesip biçiyor.",
-  "Keep my voice at one volume": "Sesimi tek seviyede tut"
+  "Keep my voice at one volume": "Sesimi tek seviyede tut",
+  "<span style='color:{red}'>Couldn't load what's trending on Myinstants: {err}</span>": "<span style='color:{red}'>Myinstants'ta trend olanlar yüklenemedi: {err}</span>",
+  "Loading what's trending on Myinstants…": "Myinstants'ta trend olanlar yükleniyor…",
+  "Nothing is trending on Myinstants right now.": "Şu anda Myinstants'ta trend olan bir şey yok.",
+  "The meme sounds people play most on Myinstants right now": "Şu anda Myinstants'ta en çok çalınan mim sesleri",
+  "Trending on Myinstants": "Myinstants'ta trend olanlar"
 }

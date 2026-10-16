@@ -3485,5 +3485,10 @@
     "{n} suosittua asemaa: hae tai napsauta asemaa toistaaksesi sen."
   ],
   "Evens out your voice, loud or quiet, so friends don't have to keep turning you up and down. Your voice chat's own automatic volume can then stay off: it cuts up your sounds.": "Tasoittaa äänesi, kovan tai hiljaisen, ettei kavereiden tarvitse jatkuvasti säätää sinua kovemmalle ja hiljemmalle. Puhechatin oma automaattinen äänenvoimakkuus voi silloin olla pois päältä: se pätkii äänesi.",
-  "Keep my voice at one volume": "Pidä ääneni samalla voimakkuudella"
+  "Keep my voice at one volume": "Pidä ääneni samalla voimakkuudella",
+  "<span style='color:{red}'>Couldn't load what's trending on Myinstants: {err}</span>": "<span style='color:{red}'>Myinstantsin suosittuja ei voitu ladata: {err}</span>",
+  "Loading what's trending on Myinstants…": "Ladataan Myinstantsin suosittuja…",
+  "Nothing is trending on Myinstants right now.": "Myinstantsissa ei ole juuri nyt mitään suosittua.",
+  "The meme sounds people play most on Myinstants right now": "Meemiäänet, joita Myinstantsissa soitetaan juuri nyt eniten",
+  "Trending on Myinstants": "Suosittua Myinstantsissa"
 }

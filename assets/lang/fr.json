@@ -3485,5 +3485,10 @@
     "{n} stations populaires : recherchez, ou cliquez sur une station pour la diffuser."
   ],
   "Evens out your voice, loud or quiet, so friends don't have to keep turning you up and down. Your voice chat's own automatic volume can then stay off: it cuts up your sounds.": "Égalise ta voix, forte ou faible, pour que tes amis n'aient pas à te monter et te baisser sans arrêt. Le volume automatique de ton chat vocal peut alors rester coupé : il hache tes sons.",
-  "Keep my voice at one volume": "Garder ma voix au même volume"
+  "Keep my voice at one volume": "Garder ma voix au même volume",
+  "<span style='color:{red}'>Couldn't load what's trending on Myinstants: {err}</span>": "<span style='color:{red}'>Impossible de charger les tendances de Myinstants : {err}</span>",
+  "Loading what's trending on Myinstants…": "Chargement des tendances de Myinstants…",
+  "Nothing is trending on Myinstants right now.": "Rien n'est en tendance sur Myinstants en ce moment.",
+  "The meme sounds people play most on Myinstants right now": "Les sons de mèmes les plus joués sur Myinstants en ce moment",
+  "Trending on Myinstants": "Tendances sur Myinstants"
 }

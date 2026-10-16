@@ -3485,5 +3485,10 @@
     "{n} népszerű állomás: keressen, vagy kattintson egy állomásra a lejátszáshoz."
   ],
   "Evens out your voice, loud or quiet, so friends don't have to keep turning you up and down. Your voice chat's own automatic volume can then stay off: it cuts up your sounds.": "Kiegyenlíti a hangodat, akár hangos, akár halk, így a barátaidnak nem kell folyton fel-le tekerniük. A hangcsevegő saját automatikus hangereje így kikapcsolva maradhat: az szétszabdalja a hangjaidat.",
-  "Keep my voice at one volume": "A hangom maradjon egy hangerőn"
+  "Keep my voice at one volume": "A hangom maradjon egy hangerőn",
+  "<span style='color:{red}'>Couldn't load what's trending on Myinstants: {err}</span>": "<span style='color:{red}'>Nem sikerült betölteni a Myinstants népszerű hangjait: {err}</span>",
+  "Loading what's trending on Myinstants…": "A Myinstants népszerű hangjainak betöltése…",
+  "Nothing is trending on Myinstants right now.": "Most semmi sem népszerű a Myinstantson.",
+  "The meme sounds people play most on Myinstants right now": "A mémhangok, amelyeket most a legtöbben játszanak le a Myinstantson",
+  "Trending on Myinstants": "Népszerű a Myinstantson"
 }

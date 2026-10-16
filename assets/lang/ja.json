@@ -3408,5 +3408,10 @@
     "{n}個の人気局：検索するか、局をクリックして再生します。"
   ],
   "Evens out your voice, loud or quiet, so friends don't have to keep turning you up and down. Your voice chat's own automatic volume can then stay off: it cuts up your sounds.": "大きい声も小さい声もそろえるので、フレンドが何度も音量を上げ下げしなくて済みます。ボイスチャット側の自動音量はオフのままでOK:サウンドが途切れる原因になります。",
-  "Keep my voice at one volume": "声の音量を一定に保つ"
+  "Keep my voice at one volume": "声の音量を一定に保つ",
+  "<span style='color:{red}'>Couldn't load what's trending on Myinstants: {err}</span>": "<span style='color:{red}'>Myinstantsのトレンドを読み込めませんでした: {err}</span>",
+  "Loading what's trending on Myinstants…": "Myinstantsのトレンドを読み込み中…",
+  "Nothing is trending on Myinstants right now.": "いまMyinstantsでトレンドのものはありません。",
+  "The meme sounds people play most on Myinstants right now": "いまMyinstantsでいちばん再生されているミーム音",
+  "Trending on Myinstants": "Myinstantsのトレンド"
 }

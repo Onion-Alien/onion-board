@@ -3562,5 +3562,10 @@
     "{n} popularnych stacji: wyszukaj lub kliknij stację, aby ją odtworzyć."
   ],
   "Evens out your voice, loud or quiet, so friends don't have to keep turning you up and down. Your voice chat's own automatic volume can then stay off: it cuts up your sounds.": "Wyrównuje twój głos, głośny czy cichy, żeby znajomi nie musieli ciągle cię podgłaśniać i ściszać. Automatyczna głośność czatu głosowego może wtedy zostać wyłączona: tnie twoje dźwięki.",
-  "Keep my voice at one volume": "Trzymaj mój głos na jednej głośności"
+  "Keep my voice at one volume": "Trzymaj mój głos na jednej głośności",
+  "<span style='color:{red}'>Couldn't load what's trending on Myinstants: {err}</span>": "<span style='color:{red}'>Nie udało się wczytać, co jest na czasie w Myinstants: {err}</span>",
+  "Loading what's trending on Myinstants…": "Wczytuję, co jest na czasie w Myinstants…",
+  "Nothing is trending on Myinstants right now.": "W Myinstants nic nie jest teraz na czasie.",
+  "The meme sounds people play most on Myinstants right now": "Memiczne dźwięki, które ludzie najczęściej odtwarzają teraz w Myinstants",
+  "Trending on Myinstants": "Na czasie w Myinstants"
 }

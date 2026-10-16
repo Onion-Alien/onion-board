@@ -3562,5 +3562,10 @@
     "{n} oblíbených stanic: vyhledejte, nebo kliknutím na stanici ji přehrajete."
   ],
   "Evens out your voice, loud or quiet, so friends don't have to keep turning you up and down. Your voice chat's own automatic volume can then stay off: it cuts up your sounds.": "Vyrovná tvůj hlas, hlasitý i tichý, aby tě kamarádi nemuseli pořád zesilovat a ztišovat. Automatická hlasitost hlasového chatu pak může zůstat vypnutá: rozsekává tvoje zvuky.",
-  "Keep my voice at one volume": "Držet můj hlas na jedné hlasitosti"
+  "Keep my voice at one volume": "Držet můj hlas na jedné hlasitosti",
+  "<span style='color:{red}'>Couldn't load what's trending on Myinstants: {err}</span>": "<span style='color:{red}'>Trendy na Myinstants se nepodařilo načíst: {err}</span>",
+  "Loading what's trending on Myinstants…": "Načítám trendy na Myinstants…",
+  "Nothing is trending on Myinstants right now.": "Na Myinstants teď nic netrenduje.",
+  "The meme sounds people play most on Myinstants right now": "Meme zvuky, které si lidé na Myinstants teď pouštějí nejvíc",
+  "Trending on Myinstants": "Trendy na Myinstants"
 }

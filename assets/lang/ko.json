@@ -3408,5 +3408,10 @@
     "{n} 인기 방송국: 검색하거나 방송국을 클릭해 재생하세요."
   ],
   "Evens out your voice, loud or quiet, so friends don't have to keep turning you up and down. Your voice chat's own automatic volume can then stay off: it cuts up your sounds.": "크든 작든 목소리를 고르게 맞춰서, 친구들이 계속 볼륨을 올렸다 내렸다 할 필요가 없어요. 음성 채팅 자체의 자동 볼륨은 꺼 둬도 돼요: 사운드를 끊기게 하거든요.",
-  "Keep my voice at one volume": "내 목소리를 같은 볼륨으로 유지"
+  "Keep my voice at one volume": "내 목소리를 같은 볼륨으로 유지",
+  "<span style='color:{red}'>Couldn't load what's trending on Myinstants: {err}</span>": "<span style='color:{red}'>Myinstants 인기 급상승을 불러오지 못했어요: {err}</span>",
+  "Loading what's trending on Myinstants…": "Myinstants 인기 급상승 불러오는 중…",
+  "Nothing is trending on Myinstants right now.": "지금 Myinstants에 인기 급상승 중인 게 없어요.",
+  "The meme sounds people play most on Myinstants right now": "지금 Myinstants에서 가장 많이 재생되는 밈 사운드",
+  "Trending on Myinstants": "Myinstants 인기 급상승"
 }

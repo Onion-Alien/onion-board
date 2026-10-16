@@ -3485,5 +3485,10 @@
     "{n} δημοφιλείς σταθμοί: κάντε αναζήτηση ή κάντε κλικ σε έναν σταθμό για να τον παίξετε."
   ],
   "Evens out your voice, loud or quiet, so friends don't have to keep turning you up and down. Your voice chat's own automatic volume can then stay off: it cuts up your sounds.": "Εξισώνει τη φωνή σου, δυνατή ή σιγανή, ώστε οι φίλοι σου να μη χρειάζεται να σε δυναμώνουν και να σε χαμηλώνουν συνέχεια. Η αυτόματη ένταση του φωνητικού chat μπορεί τότε να μείνει κλειστή: κόβει τους ήχους σου.",
-  "Keep my voice at one volume": "Κράτα τη φωνή μου σε μία ένταση"
+  "Keep my voice at one volume": "Κράτα τη φωνή μου σε μία ένταση",
+  "<span style='color:{red}'>Couldn't load what's trending on Myinstants: {err}</span>": "<span style='color:{red}'>Δεν φορτώθηκαν τα δημοφιλή του Myinstants: {err}</span>",
+  "Loading what's trending on Myinstants…": "Φόρτωση των δημοφιλών στο Myinstants…",
+  "Nothing is trending on Myinstants right now.": "Τίποτα δεν είναι δημοφιλές στο Myinstants αυτή τη στιγμή.",
+  "The meme sounds people play most on Myinstants right now": "Οι ήχοι meme που παίζουν περισσότερο στο Myinstants αυτή τη στιγμή",
+  "Trending on Myinstants": "Δημοφιλή στο Myinstants"
 }

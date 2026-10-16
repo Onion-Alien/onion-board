@@ -3485,5 +3485,10 @@
     "{n} beliebte Sender: suche oder klicke auf einen Sender, um ihn abzuspielen."
   ],
   "Evens out your voice, loud or quiet, so friends don't have to keep turning you up and down. Your voice chat's own automatic volume can then stay off: it cuts up your sounds.": "Gleicht deine Stimme aus, laut oder leise, damit Freunde dich nicht ständig lauter und leiser drehen müssen. Die automatische Lautstärke deines Voice-Chats kann dann aus bleiben: Sie zerhackt deine Sounds.",
-  "Keep my voice at one volume": "Meine Stimme gleich laut halten"
+  "Keep my voice at one volume": "Meine Stimme gleich laut halten",
+  "<span style='color:{red}'>Couldn't load what's trending on Myinstants: {err}</span>": "<span style='color:{red}'>Konnte nicht laden, was auf Myinstants angesagt ist: {err}</span>",
+  "Loading what's trending on Myinstants…": "Lade, was auf Myinstants angesagt ist…",
+  "Nothing is trending on Myinstants right now.": "Auf Myinstants ist gerade nichts angesagt.",
+  "The meme sounds people play most on Myinstants right now": "Die Meme-Sounds, die gerade am meisten auf Myinstants abgespielt werden",
+  "Trending on Myinstants": "Angesagt auf Myinstants"
 }

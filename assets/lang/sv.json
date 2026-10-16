@@ -3485,5 +3485,10 @@
     "{n} populära stationer: sök, eller klicka på en station för att spela upp den."
   ],
   "Evens out your voice, loud or quiet, so friends don't have to keep turning you up and down. Your voice chat's own automatic volume can then stay off: it cuts up your sounds.": "Jämnar ut din röst, hög eller låg, så att kompisarna slipper skruva upp och ner dig hela tiden. Röstchattens egen automatiska volym kan då vara av: den hackar sönder dina ljud.",
-  "Keep my voice at one volume": "Håll min röst på en volym"
+  "Keep my voice at one volume": "Håll min röst på en volym",
+  "<span style='color:{red}'>Couldn't load what's trending on Myinstants: {err}</span>": "<span style='color:{red}'>Kunde inte hämta det populära på Myinstants: {err}</span>",
+  "Loading what's trending on Myinstants…": "Hämtar det populära på Myinstants…",
+  "Nothing is trending on Myinstants right now.": "Inget är populärt på Myinstants just nu.",
+  "The meme sounds people play most on Myinstants right now": "Memeljuden som spelas mest på Myinstants just nu",
+  "Trending on Myinstants": "Populärt på Myinstants"
 }

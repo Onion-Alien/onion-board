@@ -3408,5 +3408,10 @@
     "{n}个热门电台：进行搜索，或单击一个电台即可播放。"
   ],
   "Evens out your voice, loud or quiet, so friends don't have to keep turning you up and down. Your voice chat's own automatic volume can then stay off: it cuts up your sounds.": "把你的声音调匀，不管大声还是小声，朋友就不用一直把你调大调小。语音聊天自带的自动音量可以保持关闭：它会把你的音效切得断断续续。",
-  "Keep my voice at one volume": "让我的声音保持同一音量"
+  "Keep my voice at one volume": "让我的声音保持同一音量",
+  "<span style='color:{red}'>Couldn't load what's trending on Myinstants: {err}</span>": "<span style='color:{red}'>无法加载 Myinstants 热门：{err}</span>",
+  "Loading what's trending on Myinstants…": "正在加载 Myinstants 热门…",
+  "Nothing is trending on Myinstants right now.": "Myinstants 上现在没有热门内容。",
+  "The meme sounds people play most on Myinstants right now": "此刻 Myinstants 上播放最多的梗音效",
+  "Trending on Myinstants": "Myinstants 热门"
 }

@@ -3793,5 +3793,10 @@
     "{n} محطات شعبية: ابحث، أو انقر على محطة لتشغيلها."
   ],
   "Evens out your voice, loud or quiet, so friends don't have to keep turning you up and down. Your voice chat's own automatic volume can then stay off: it cuts up your sounds.": "يوازن صوتك، عاليًا كان أو منخفضًا، حتى لا يضطر أصدقاؤك لرفعك وخفضك كل مرة. وبعدها يمكن ترك الصوت التلقائي في دردشتك الصوتية مطفأً: فهو يقطّع أصواتك.",
-  "Keep my voice at one volume": "أبقِ صوتي بمستوى واحد"
+  "Keep my voice at one volume": "أبقِ صوتي بمستوى واحد",
+  "<span style='color:{red}'>Couldn't load what's trending on Myinstants: {err}</span>": "<span style='color:{red}'>تعذّر تحميل الرائج على Myinstants: {err}</span>",
+  "Loading what's trending on Myinstants…": "جارٍ تحميل الرائج على Myinstants…",
+  "Nothing is trending on Myinstants right now.": "لا يوجد شيء رائج على Myinstants الآن.",
+  "The meme sounds people play most on Myinstants right now": "أصوات الميمز الأكثر تشغيلًا على Myinstants الآن",
+  "Trending on Myinstants": "الرائج على Myinstants"
 }

@@ -3485,5 +3485,10 @@
     "{n} популярни станции: потърсете или щракнете върху станция, за да я пуснете."
   ],
   "Evens out your voice, loud or quiet, so friends don't have to keep turning you up and down. Your voice chat's own automatic volume can then stay off: it cuts up your sounds.": "Изравнява гласа ти, силен или тих, за да не те усилват и намаляват приятелите постоянно. Автоматичната сила на гласовия чат тогава може да остане изключена: тя накъсва звуците ти.",
-  "Keep my voice at one volume": "Гласът ми на една сила"
+  "Keep my voice at one volume": "Гласът ми на една сила",
+  "<span style='color:{red}'>Couldn't load what's trending on Myinstants: {err}</span>": "<span style='color:{red}'>Популярното в Myinstants не се зареди: {err}</span>",
+  "Loading what's trending on Myinstants…": "Зареждане на популярното в Myinstants…",
+  "Nothing is trending on Myinstants right now.": "В момента няма нищо популярно в Myinstants.",
+  "The meme sounds people play most on Myinstants right now": "Мийм звуците, които хората пускат най-често в Myinstants в момента",
+  "Trending on Myinstants": "Популярно в Myinstants"
 }
