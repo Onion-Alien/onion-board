@@ -88,3 +88,32 @@ def test_waiting_on_windows_prompt_isnt_couldnt_start(window, qapp):  # noqa: F8
                                                "answer its prompt.")
     addon.asking, addon.server.running = None, True   # answered: it started
     assert process_events(qapp, lambda: window.pocket_card.state.text().startswith("On: "))
+
+
+def test_opening_the_fold_draws_only_the_settled_page(window, qapp):  # noqa: F811
+    """Opening the fold laid Setup out twice, first in the page's old height: the cards
+    above were squashed (Devices jumped up) and drawn so for a moment. The window draws
+    again only once every card is where it ends up."""
+    from conftest import process_events
+    from PySide6.QtCore import QEvent, QObject
+    _install(window, FakePocket())
+    window.resize(1500, 900)
+    window.show()
+    window.tabs.setCurrentWidget(window.setup_page)
+    process_events(qapp, lambda: False, 0.3)
+    drawn = []
+
+    class Watch(QObject):
+        def eventFilter(self, o, e):
+            if e.type() in (QEvent.Type.Move, QEvent.Type.Resize):
+                drawn.append(window.updatesEnabled())
+            return False
+    watch = Watch()
+    for w in (*window._setup_cards, window.pocket_card.frame):
+        w.installEventFilter(watch)
+    window.pocket_card.fold.click()
+    assert not window.updatesEnabled()
+    assert process_events(qapp, window.updatesEnabled)
+    assert drawn and not any(drawn)   # every move made while the window wasn't drawing
+    window.pocket_card.fold.click()
+    assert process_events(qapp, window.updatesEnabled)
