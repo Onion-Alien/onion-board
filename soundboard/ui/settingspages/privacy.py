@@ -515,6 +515,7 @@ class PrivacyPage(Page):
             relay.deleteLater()
             self._helpers_show(found)
         relay.found.connect(got)
+        signal = relay.found   # (taken here: the worker can't touch a deleted relay)
 
         def run():
             try:
@@ -522,7 +523,7 @@ class PrivacyPage(Page):
             except Exception:  # noqa: BLE001 - the row says Checking…, never a crash
                 log.exception("couldn't look up a helper program")
                 found = {}
-            relay.found.emit(found)
+            busy.emit(signal, found, owner=relay)   # not if the window went meanwhile
         threading.Thread(target=run, daemon=True, name=name).start()
 
     @staticmethod
