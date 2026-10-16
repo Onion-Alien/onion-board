@@ -27,6 +27,11 @@ def win(qapp, app_dir, monkeypatch):
     qapp.sendPostedEvents(None, QEvent.DeferredDelete)
 
 
+def _rail_button(win, page):
+    """The rail button for `page` (the rail's order isn't the tabs': Store is before Setup)."""
+    return next(b for b in win.rail.buttons if b.index == win.tabs.indexOf(page))
+
+
 def test_closed_settings_and_setup_dialogs_are_freed(qapp, win, monkeypatch):
     """Parented to the window and never freed, every closed copy stayed alive and
     each theme change restyled all of them."""
@@ -91,7 +96,7 @@ def test_settings_open_as_a_page_in_place_of_the_tabs(qapp, win):
     assert not win.setctl.settings_open() and win.setctl._settings_dlg is None
     assert win._tabs_area.isVisible() and win.tabs.currentWidget() is win.radio_page
     assert not win.gear.isChecked()
-    assert win.rail.buttons[win.tabs.indexOf(win.radio_page)].isChecked()
+    assert _rail_button(win, win.radio_page).isChecked()
     assert win.findChildren(settings.SettingsDialog) == []
     again = win.setctl.open_settings()                              # a new one after closing
     assert again.isVisible()
@@ -108,13 +113,13 @@ def test_escape_and_any_rail_tab_leave_settings(qapp, win):
     QTest.keyClick(win.focusWidget(), Qt.Key_Escape)         # Escape = Done
     qapp.processEvents()
     assert not win.setctl.settings_open() and win.tabs.currentWidget() is win.sounds_page
-    sounds = win.rail.buttons[win.tabs.indexOf(win.sounds_page)]
+    sounds = _rail_button(win, win.sounds_page)
     win.setctl.open_settings()
     sounds.click()                                           # the tab you were on
     qapp.processEvents()
     assert not win.setctl.settings_open() and sounds.isChecked() and not win.gear.isChecked()
     win.setctl.open_settings()
-    setup = win.rail.buttons[win.tabs.indexOf(win.setup_page)]
+    setup = _rail_button(win, win.setup_page)
     setup.click()                                            # another tab: that one
     qapp.processEvents()
     assert not win.setctl.settings_open() and win.tabs.currentWidget() is win.setup_page
@@ -208,7 +213,7 @@ def test_live_tab_warning_shows_on_the_rail(qapp, win):
     set_tab_live(win.tabs, vi, False)
     assert not b.accessibleDescription().startswith("●")
     win.rail.set_open(False)
-    setup = win.rail.buttons[win.tabs.indexOf(win.setup_page)]
+    setup = _rail_button(win, win.setup_page)
     assert not setup.accessibleDescription().startswith("●")
 
 

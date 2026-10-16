@@ -1,0 +1,275 @@
+"""The sound store (the Store tab): free sounds anyone can add to their board, voted up
+or down, and shared by the people who made them.
+
+Everything lives on the project's own small server (server/store in this repository:
+a Cloudflare Worker, its files in R2 and its list in D1). Every sound is CC0: whoever
+uploads one agrees it's theirs and gives it away, and nothing shows in the store until
+it has been checked. The app sends a random id it made itself (Config.store_id), so one
+install gets one vote per sound; the server only keeps a salted hash of it. Nothing
+else about the user is sent, and the store has its own switch in Settings > Privacy &
+security (FEATURE)."""
+from __future__ import annotations
+
+import json
+import logging
+import secrets
+import urllib.error
+import urllib.parse
+import urllib.request
+import uuid
+from dataclasses import dataclass, field
+from pathlib import Path
+
+from soundboard import library, net, netlog
+from soundboard.i18n import _
+
+log = logging.getLogger(__name__)
+
+FEATURE = "sound_store"   # its switch in Settings > Privacy & security (soundboard.net)
+BASE = "https://onion-board-store.onion-alien.workers.dev"
+AGREEMENT = "own-cc0-v1"    # the upload agreement's version (the server checks it)
+LINK_AGREEMENT = "link-v1"  # sharing a link: only the link is kept
+MAX_BYTES = 4 << 20         # the biggest sound the store takes
+EXTS = (".mp3", ".ogg", ".wav", ".flac")   # what it takes (checked from the bytes there)
+LIST_LIMIT = 1 << 20        # a page of the list is a few KB
+REASONS = ("copyright", "offensive", "broken", "other")
+ID_LEN = 12
+
+
+class StoreError(Exception):
+    """What went wrong, in words for the user."""
+
+
+@dataclass
+class Sound:
+    id: str
+    name: str
+    ext: str
+    size: int = 0
+    up: int = 0
+    down: int = 0
+    author: str = ""   # "" = shared by someone using the app
+    created: int = 0
+    mine: int = 0      # this install's vote: 1, -1 or 0
+    tags: list[str] = field(default_factory=list)
+    link: str = ""     # a shared link (ext "link"): no file, the site's own download
+
+    @property
+    def is_link(self) -> bool:
+        return self.ext == "link"
+
+    @property
+    def score(self) -> int:
+        return self.up - self.down
+
+    @property
+    def path(self) -> Path:
+        """Where it's kept once fetched: the app folder's "store", in a folder of its
+        own under its name (added to the board, the name comes from the file's)."""
+        return library.APP_DIR / "store" / self.id / f"{library.file_stem(self.name)}.{self.ext}"
+
+
+def install_id(cfg) -> str:
+    """This install's random store id, made the first time it's needed."""
+    if not getattr(cfg, "store_id", ""):
+        cfg.store_id = str(uuid.UUID(bytes=secrets.token_bytes(16), version=4))
+    return cfg.store_id
+
+
+def parse(raw) -> tuple[list[Sound], bool]:
+    """The sounds in a page of the list (anything odd is left out) and whether there
+    are more."""
+    out = []
+    items = raw.get("sounds") if isinstance(raw, dict) else None
+    for d in items if isinstance(items, list) else []:
+        try:
+            s = Sound(id=str(d["id"]), name=str(d["name"]).strip()[:60], ext=str(d["ext"]),
+                      size=int(d.get("size") or 0), up=max(0, int(d.get("up") or 0)),
+                      down=max(0, int(d.get("down") or 0)),
+                      author=str(d.get("author") or "").strip()[:60],
+                      created=int(d.get("created") or 0), mine=int(d.get("mine") or 0),
+                      tags=[str(t)[:24] for t in d.get("tags") or [] if isinstance(t, str)][:8],
+                      link=str(d.get("link") or "")[:500])
+        except (KeyError, TypeError, ValueError):
+            continue
+        if (len(s.id) != ID_LEN or not all(c in "0123456789abcdef" for c in s.id)
+                or not (f".{s.ext}" in EXTS or (s.is_link and link_ok(s.link)))
+                or not s.name or s.mine not in (-1, 0, 1)):
+            continue
+        out.append(s)
+    return out, bool(isinstance(raw, dict) and raw.get("more"))
+
+
+def link_ok(url: str) -> bool:
+    """A link the store keeps: https, on one of the video and sound sites the app knows
+    (sourceinfo), never any other web address."""
+    from soundboard import sourceinfo
+    found = sourceinfo.site_of(url)
+    return url.startswith("https://") and found is not None and found[0] != "web"
+
+
+def _request(method: str, path: str, install: str = "", body: bytes | None = None,
+             ctype: str = "", limit: int = LIST_LIMIT, timeout: float = 15) -> bytes:
+    """One call to the store; its answer. Raises StoreError (or net.ProxyError when the
+    store is switched off or Offline). Call off the UI thread."""
+    headers = {"User-Agent": "OnionBoard (sound store)"}
+    if install:
+        headers["X-Onion-Install"] = install
+    if ctype:
+        headers["Content-Type"] = ctype
+    req = urllib.request.Request(BASE + path, data=body, headers=headers, method=method)
+    try:
+        with net.urlopen(req, timeout=timeout, feature=FEATURE) as r:
+            data = r.read(limit + 1)
+    except urllib.error.HTTPError as e:
+        try:
+            err = json.loads(e.read(4096) or b"{}").get("error", "")
+        except (ValueError, AttributeError):
+            err = ""
+        raise StoreError(_why(e.code, err)) from None
+    except net.ProxyError:
+        raise
+    except OSError as e:
+        log.info("store %s %s failed: %s", method, path, e)
+        raise StoreError(_("Couldn't reach the sound store. Check your internet and try "
+                           "again.")) from None
+    if len(data) > limit:
+        raise StoreError(_("The sound store sent more than it should, so it was left."))
+    return data
+
+
+def _why(code: int, err: str) -> str:
+    if err == "duplicate":
+        return _("That sound is already in the store.")
+    if err == "slow down" or code == 429:
+        return _("That's a lot for one day. Try again tomorrow.")
+    if err == "too big" or code == 413:
+        return _("That file is too big: the store takes sounds up to 4 MB.")
+    if err == "not audio" or code == 415:
+        return _("That file isn't a sound the store takes (MP3, OGG, WAV or FLAC).")
+    if err == "bad link":
+        return _("The store takes links to YouTube, TikTok, SoundCloud and other video "
+                 "and sound sites.")
+    if err == "queue full" or code == 503:
+        return _("Lots of sounds are waiting to be checked. Try again in a day or two.")
+    if code == 404:
+        return _("That sound isn't in the store any more.")
+    return _("The sound store had a problem. Try again in a bit.")
+
+
+def browse(install: str, sort: str = "top", query: str = "", offset: int = 0
+           ) -> tuple[list[Sound], bool]:
+    """A page of the store: the best first ("top") or the newest ("new"), only those
+    matching `query` when it isn't empty. Call off the UI thread."""
+    netlog.cause(FEATURE, "You opened the Store tab: reading the list of sounds")
+    q = urllib.parse.urlencode({"sort": "new" if sort == "new" else "top",
+                                **({"q": query[:60]} if query.strip() else {}),
+                                **({"offset": offset} if offset else {})})
+    data = _request("GET", f"/v1/sounds?{q}", install)
+    try:
+        return parse(json.loads(data.decode("utf-8")))
+    except ValueError:
+        raise StoreError(_("The sound store had a problem. Try again in a bit.")) from None
+
+
+def fetch(sound: Sound) -> Path:
+    """The sound's file, fetched once into the app folder's "store". Call off the UI
+    thread."""
+    p = sound.path
+    if p.is_file() and p.stat().st_size:
+        return p
+    netlog.cause(FEATURE, f"You played or added {netlog.quoted(sound.name)} from the store")
+    data = _request("GET", f"/v1/sounds/{sound.id}/file", limit=MAX_BYTES, timeout=30)
+    if not data:
+        raise StoreError(_("The sound store had a problem. Try again in a bit."))
+    p.parent.mkdir(parents=True, exist_ok=True)
+    part = p.with_name(p.name + ".part")
+    part.write_bytes(data)
+    part.replace(p)
+    return p
+
+
+def vote(install: str, sound_id: str, value: int) -> tuple[int, int, int]:
+    """Thumbs up (1), down (-1) or neither (0); the sound's new (up, down, mine)."""
+    netlog.cause(FEATURE, "You voted on a sound in the store")
+    data = _request("POST", f"/v1/sounds/{sound_id}/vote", install,
+                    json.dumps({"value": value}).encode(), "application/json")
+    try:
+        d = json.loads(data.decode("utf-8"))
+        return int(d["up"]), int(d["down"]), int(d["mine"])
+    except (ValueError, KeyError, TypeError):
+        raise StoreError(_("The sound store had a problem. Try again in a bit.")) from None
+
+
+def report(install: str, sound_id: str, reason: str) -> None:
+    """Tell the store a sound breaks the rules (REASONS)."""
+    netlog.cause(FEATURE, "You reported a sound in the store")
+    _request("POST", f"/v1/sounds/{sound_id}/report", install,
+             json.dumps({"reason": reason if reason in REASONS else "other"}).encode(),
+             "application/json")
+
+
+def check_file(path: str) -> str:
+    """Why `path` can't be uploaded, or "" when it can."""
+    p = Path(path)
+    if p.suffix.lower() not in EXTS:
+        return _("The store takes MP3, OGG, WAV or FLAC files.")
+    try:
+        size = p.stat().st_size
+    except OSError:
+        return _("That file can't be opened.")
+    if not size:
+        return _("That file is empty.")
+    if size > MAX_BYTES:
+        return _("That file is too big: the store takes sounds up to 4 MB.")
+    return ""
+
+
+def _form(fields: dict[str, str], file_name: str, data: bytes) -> tuple[bytes, str]:
+    """A multipart form with `fields` and the file; (body, content type)."""
+    b = secrets.token_hex(16)
+    out = []
+    for k, v in fields.items():
+        out.append(f'--{b}\r\nContent-Disposition: form-data; name="{k}"\r\n\r\n'
+                   .encode() + v.encode("utf-8") + b"\r\n")
+    safe = "".join(c for c in file_name if c.isalnum() or c in "._-")[:60] or "sound"
+    out.append(f'--{b}\r\nContent-Disposition: form-data; name="file"; filename="{safe}"\r\n'
+               "Content-Type: application/octet-stream\r\n\r\n".encode() + data + b"\r\n")
+    out.append(f"--{b}--\r\n".encode())
+    return b"".join(out), f"multipart/form-data; boundary={b}"
+
+
+def upload(install: str, path: str, name: str, tags: str = "") -> str:
+    """Share a sound: it waits to be checked before it shows. Its id. Raises
+    StoreError. Call off the UI thread."""
+    if why := check_file(path):
+        raise StoreError(why)
+    netlog.cause(FEATURE, f"You shared {netlog.quoted(name)} with the store")
+    try:
+        data = Path(path).read_bytes()
+    except OSError:
+        raise StoreError(_("That file can't be opened.")) from None
+    body, ctype = _form({"name": name.strip()[:60], "tags": tags.strip()[:200],
+                         "agree": AGREEMENT}, Path(path).name, data)
+    out = _request("POST", "/v1/sounds", install, body, ctype, timeout=60)
+    try:
+        return str(json.loads(out.decode("utf-8"))["id"])
+    except (ValueError, KeyError, TypeError):
+        raise StoreError(_("The sound store had a problem. Try again in a bit.")) from None
+
+
+def share_link(install: str, link: str, name: str, tags: str = "") -> str:
+    """Share a link (a YouTube video…): only the link is kept, and it waits to be
+    checked. Whoever adds it downloads it from the site. Its id. Raises StoreError."""
+    link = link.strip()
+    if not link_ok(link):
+        raise StoreError(_("The store takes links to YouTube, TikTok, SoundCloud and other "
+                           "video and sound sites."))
+    netlog.cause(FEATURE, f"You shared a link to {netlog.quoted(name)} with the store")
+    body = json.dumps({"link": link[:500], "name": name.strip()[:60], "tags": tags.strip()[:200],
+                       "agree": LINK_AGREEMENT}).encode()
+    out = _request("POST", "/v1/links", install, body, "application/json")
+    try:
+        return str(json.loads(out.decode("utf-8"))["id"])
+    except (ValueError, KeyError, TypeError):
+        raise StoreError(_("The sound store had a problem. Try again in a bit.")) from None

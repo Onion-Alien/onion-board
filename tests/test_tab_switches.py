@@ -1,4 +1,4 @@
-"""Settings > Tabs: switching the Radio, Apps, Triggers and Voice tabs off and on
+"""Settings > Tabs: switching the Radio, Apps, Triggers, Voice and Store tabs off and on
 (Config.tabs_off, ui/taboff.py). A switched-off tab is hidden and never built."""
 import pytest
 from conftest import process_events
@@ -12,11 +12,13 @@ from soundboard.ui import mainwindow as main
 from soundboard.ui import taboff
 from soundboard.ui.appspanel import AppsTab
 from soundboard.ui.radiopanel import RadioTab
+from soundboard.ui.storetab import StoreTab
 from soundboard.ui.tabcontrol import TAB_INDEX, TABS
 from soundboard.ui.triggerstab import TriggersTab
 from soundboard.ui.voicepanel import VoicePanel
 
-REAL = {"radio": RadioTab, "apps": AppsTab, "triggers": TriggersTab, "voice": VoicePanel}
+REAL = {"radio": RadioTab, "apps": AppsTab, "triggers": TriggersTab, "voice": VoicePanel,
+        "store": StoreTab}
 
 
 @pytest.fixture
@@ -95,7 +97,7 @@ def test_a_switched_off_tab_is_never_built(qapp, app_dir, monkeypatch):
         assert w.cfg.tabs_off == list(taboff.KEYS)
         assert w.tabs.isTabVisible(w.tabs.currentIndex())   # not the saved, hidden one
         assert [w.tabs.isTabVisible(i) for i in range(w.tabs.count())] == [
-            True, False, False, False, False, True]
+            True, False, False, False, False, True, False]
         assert w.engine.voice_chain is None
     finally:
         w.close()

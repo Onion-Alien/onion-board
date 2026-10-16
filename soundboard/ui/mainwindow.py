@@ -70,6 +70,7 @@ from soundboard.ui.appspanel import AppsTab
 from soundboard.ui.triggershost import BoardHost
 from soundboard.ui.triggerstab import TriggersTab
 from soundboard.ui.radiopanel import RadioOff, RadioTab
+from soundboard.ui.storetab import PREVIEW as STORE_PREVIEW, StoreTab
 from soundboard.ui.voicepanel import VoicePanel
 from soundboard.ui.widgets import (Meter, Pad, expand_dropped)
 from soundboard.winkeys import Hotkeys
@@ -348,6 +349,7 @@ class MainWindow(QMainWindow):
     _video_for: tuple[str | None, Path | None]
     _video_win: Any
     voice: Any
+    store: Any   # the Store tab (StoreTab), or its stand-in while switched off
     vol_mic: VolumeControl
     vol_mon: VolumeControl
     vol_sound: VolumeControl
@@ -811,11 +813,13 @@ class MainWindow(QMainWindow):
     @overload
     def _make_tab(self, key: Literal["triggers"]) -> TriggersTab | taboff.TabOff: ...
     @overload
-    def _make_tab(self, key: str) -> (VoicePanel | AppsTab | TriggersTab
+    def _make_tab(self, key: Literal["store"]) -> StoreTab | taboff.TabOff: ...
+    @overload
+    def _make_tab(self, key: str) -> (VoicePanel | AppsTab | TriggersTab | StoreTab
                                       | taboff.TabOff): ...
 
     def _make_tab(self, key: str):
-        """The Apps, Triggers or Voice tab, wired to the window; or, switched off in
+        """The Apps, Triggers, Voice or Store tab, wired to the window; or, switched off in
         Settings > Tabs, its stand-in (nothing of the tab is made or loaded)."""
         if not self.tabctl.tab_on(key):
             self.tab_info.pop(key, None)
@@ -838,12 +842,35 @@ class MainWindow(QMainWindow):
             v = AppsTab(self.engine, self.cfg, self._save_later, Meter)
             v.clip_ready.connect(self.soundctl.on_clip)
             self.tab_info["apps"] = v.info
+        elif key == "store":
+            v = StoreTab(self.cfg, lambda path: self.impctl.import_files([path]),
+                         self._store_sample, lambda: self.setctl.open_settings("privacy"),
+                         self._save_later, self._store_link)
+            return v
         else:
             # the Onion Watch add-on, or Hoot and its download button until it's
             # installed; loaded by load_triggers
             v = TriggersTab(BoardHost(self), defer=True)
         v.active_changed.connect(lambda on, k=key: self.tabctl._tab_live(k, on))
         return v
+
+    def _store_link(self, url: str, name: str, kind: str):
+        """A shared link in the Store tab: played once or added, downloaded from its
+        site the way a pasted link is (the download bar shows how far it is)."""
+        self.linkbar.open(url, name)
+        if kind == "play":
+            self.linkbar.play_once()
+        else:
+            self.linkbar.add()
+
+    def _store_sample(self, data, gain: float) -> bool:
+        """The Store tab's "hear it first": to your headphones only (None stops it).
+        False: no headphones to play it on."""
+        if data is None:
+            self.engine.stop(STORE_PREVIEW)
+            return True
+        return self.engine.play(STORE_PREVIEW, data, gain, mode="restart",
+                                preview=True) is not None
 
     def _save_now(self, then=None):
         """The debounced save: the settings are copied now and written on the saver's
@@ -1344,7 +1371,7 @@ class MainWindow(QMainWindow):
                      self.remctl._stop_remote_addons,
                      self._finish_count_at_quit,   # sent meanwhile; before Tor stops
                      self.radio.shutdown, tor.shutdown, self.apps.shutdown,
-                     self.triggers.shutdown,
+                     self.triggers.shutdown, self.store.shutdown,
                      self.linkbar.shutdown, ytworker.drop_all,
                      self.voice.shutdown, self.engine.shutdown, shellicon.detach,
                      self.thumbbar.close,

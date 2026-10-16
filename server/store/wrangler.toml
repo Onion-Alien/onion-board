@@ -1,0 +1,15 @@
+name = "onion-board-store"
+main = "src/index.js"
+compatibility_date = "2025-09-01"
+
+[[d1_databases]]
+binding = "DB"
+database_name = "onion-board-store"
+database_id = "00000000-0000-0000-0000-000000000000"   # filled in by `wrangler d1 create`
+
+# the sounds' files (Workers KV: free, no payment card on the account)
+[[kv_namespaces]]
+binding = "FILES"
+id = "00000000000000000000000000000000"   # filled in by `wrangler kv namespace create`
+
+# Secrets (never in this file): `npx wrangler secret put ADMIN_TOKEN` and `... SALT`
