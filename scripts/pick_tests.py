@@ -23,8 +23,8 @@ Prints the test files, one per line: `tests` alone for all of them, nothing for 
 ruff and the other quick checks; with -Tests these tests too.
 
 --matrix prints CI's test jobs as JSON instead (BASE "all": the whole suite): the
-picked files split into SHARDS jobs of about the same length by test_times.json (each
-file's seconds in a full run), or one job when they're quick, or none.
+picked files split into jobs of about the same length by test_times.json (each
+file's seconds in a full run): one per JOB_S of tests, SHARDS at most, or none.
 
 --refresh-times DIR rewrites test_times.json from the JUnit reports in DIR (every test
 job keeps one: `gh run download <run> -p "times-*" -D DIR`, a run of the whole suite).
@@ -33,6 +33,7 @@ from __future__ import annotations
 
 import ast
 import json
+import math
 import subprocess
 import sys
 from pathlib import Path
@@ -192,26 +193,27 @@ def pick(changed: list[str]) -> list[str]:
 
 
 TIMES = Path(__file__).with_name("test_times.json")
-SHARDS = 4             # jobs a long run is split into (on Windows and on Linux)
-SPLIT_FROM_S = 240     # seconds of tests (summed over workers) worth a second job:
-                       # each job spends ~35 s starting (checkout, venv cache, Python)
+SHARDS = 6             # the most jobs a run is split into (on Windows and on Linux):
+                       # the whole suite, ~5600 s over 4 workers, ~4 min each
+JOB_S = 600            # seconds of tests (summed over workers) worth another job, about
+                       # 2.5 min on its 4 workers: each job spends ~35 s starting
+                       # (checkout, venv cache, Python), so a small run gets few
 
 
 def all_tests() -> list[str]:
     return sorted(p.relative_to(ROOT).as_posix() for p in TESTS.glob("test_*.py"))
 
 
-def shards(files: list[str], n: int = SHARDS) -> list[list[str]]:
+def shards(files: list[str], most: int = SHARDS) -> list[list[str]]:
     """`files` in jobs of about the same length (longest first, each into the job with
-    the least so far). One job when they're quick; a file not timed yet counts as an
-    average one."""
+    the least so far): one job per JOB_S of tests, `most` at most. A file not timed yet
+    counts as an average one."""
     times = json.loads(TIMES.read_text(encoding="utf-8"))
     avg = sum(times.values()) / max(len(times), 1)
     cost = {f: max(times.get(f, avg), 0.5) for f in files}
     if not files:
         return []
-    if sum(cost.values()) < SPLIT_FROM_S:
-        return [sorted(files)]
+    n = max(1, min(most, math.ceil(sum(cost.values()) / JOB_S)))
     jobs: list[tuple[float, list[str]]] = [(0.0, []) for _ in range(n)]
     for f in sorted(files, key=lambda f: -cost[f]):
         i = min(range(n), key=lambda i: jobs[i][0])
