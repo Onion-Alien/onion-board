@@ -195,7 +195,9 @@ def test_the_starter_sounds_ship_small_and_come_once(window, monkeypatch, added)
     assert len(found) == 25
     assert sum(Path(f).stat().st_size for f in found) < 1_000_000   # about 0.8 MB
     got = []
-    monkeypatch.setattr(window.impctl, "import_files", got.append)
-    assert starter.add_to(window) and got == [found]
+    monkeypatch.setattr(window.impctl, "import_files",
+                        lambda files, extras=None: got.append((files, extras)))
+    assert starter.add_to(window) and got[0][0] == found
+    assert {e.tags[0] for e in got[0][1].values()} == {"Starter"}   # a tab of their own
     assert starter.KEY in window.cfg.tips_seen
     assert not starter.add_to(window) and len(got) == 1   # once only

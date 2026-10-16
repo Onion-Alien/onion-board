@@ -2,8 +2,9 @@
 0.7 MB) and are added to a new install's board when Bun's first-run tour ends with the
 board still empty (ui/firsttour.py). No download, no button, once only.
 
-They're ordinary sounds on the board, imported like dropped files: rename, delete or
-recolour them like any other. Deleting them all doesn't bring them back (the flag below
+They go in a tab of their own, "Starter", so they never sit among the sounds someone adds
+later. They're ordinary sounds, imported like dropped files: rename, delete or recolour
+them like any other. Deleting them all doesn't bring them back (the flag below
 stays in Config.tips_seen)."""
 from __future__ import annotations
 
@@ -12,6 +13,8 @@ import sys
 from pathlib import Path
 
 from soundboard import usage
+from soundboard.i18n import _
+from soundboard.otherboards import Entry
 
 log = logging.getLogger(__name__)
 
@@ -41,8 +44,10 @@ def add_to(win) -> bool:
     cfg.tips_seen = [*cfg.tips_seen, KEY]
     win._save_later()
     usage.used("starter-sounds")
+    tab = _("Starter")
+    entries = {f: Entry(f, Path(f).stem, tags=[tab]) for f in found}
     try:
-        win.impctl.import_files(found)
+        win.impctl.import_files(found, entries)
     except RuntimeError:   # the window went meanwhile
         log.info("starter sounds: the window was closing")
         return False
