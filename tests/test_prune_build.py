@@ -102,3 +102,25 @@ def test_every_qt_module_the_app_imports_is_kept():
     for f in (ROOT / "soundboard").rglob("*.py"):
         used |= set(re.findall(r"PySide6\.(Qt\w+)", f.read_text(encoding="utf-8")))
     assert used - pb.KEEP_MODULES == set()
+
+
+def test_the_app_never_imports_a_module_the_build_leaves_out():
+    """build.ps1 leaves parts of scipy out of the built app (`--exclude-module`): an
+    app module importing one works from source and fails with ModuleNotFoundError in
+    the built app (Pong's sounds did, with scipy.signal). soundboard.dsp has the filters."""
+    import ast
+    import re
+    from pathlib import Path
+    root = Path(__file__).resolve().parent.parent
+    excluded = set(re.findall(r"--exclude-module\s+(\S+)",
+                              (root / "build.ps1").read_text(encoding="utf-8")))
+    assert "scipy.signal" in excluded
+    bad = []
+    for path in (root / "soundboard").rglob("*.py"):
+        for node in ast.walk(ast.parse(path.read_text(encoding="utf-8"))):
+            names = ([a.name for a in node.names] if isinstance(node, ast.Import)
+                     else [node.module or ""] if isinstance(node, ast.ImportFrom) else [])
+            for name in names:
+                if any(name == x or name.startswith(x + ".") for x in excluded):
+                    bad.append(f"{path.relative_to(root)}:{node.lineno} {name}")
+    assert not bad, bad

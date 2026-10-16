@@ -212,6 +212,8 @@ class CategoryControl(Controller):
                                            text=sub)
             new = new if ok else None
         new, cut = self._typed_name(new)
+        if new == sub and cut:   # cut short to the name it has: say why nothing changed
+            self._say_cut(new)
         if not new or new == sub:
             return
         if new.lower() in {x.lower() for x in subs if x != sub} | {cat.lower()}:
@@ -469,6 +471,8 @@ class CategoryControl(Controller):
         if new.lower() == ALL.lower():
             mw.toast(_("“{all}” is the built-in tab, pick another name", all=ALL), "warn")
             return
+        if new == old and cut:   # cut short to the name it has: say why nothing changed
+            self._say_cut(new)
         if not new or new == old or old not in mw.cfg.categories:
             return
         if new.lower() in {c.lower() for c in mw.cfg.categories if c != old}:

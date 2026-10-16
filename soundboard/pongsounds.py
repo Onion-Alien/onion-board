@@ -17,8 +17,8 @@ import random
 from functools import lru_cache
 
 import numpy as np
-from scipy.signal import butter, sosfilt
 
+from soundboard.dsp import butter, sosfilt   # not scipy.signal: the built app leaves it out
 from soundboard.engine import SR
 
 # each theme's sound style; a theme that isn't listed gets "soft"
@@ -69,7 +69,7 @@ def _sos(kind: str, lo: float, hi: float = 0.0):
     """A 2nd-order Butterworth filter's sections (made once each: designing one costs
     more than running it on a sound this short)."""
     edge = (lo, min(hi, SR * 0.45)) if kind == "band" else min(lo, SR * 0.45)
-    return butter(2, edge, kind, fs=SR, output="sos")
+    return butter(2, edge, kind, fs=SR)
 
 
 def _env(n: int, attack: float, gain: float) -> np.ndarray:
