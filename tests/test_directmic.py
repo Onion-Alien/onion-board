@@ -2671,6 +2671,31 @@ def test_a_slow_status_check_never_holds_up_the_window(monkeypatch):
     assert dm.status("My mic") == "wiped"
 
 
+def test_status_re_checks_keep_one_thread(monkeypatch):
+    """A 2.2.1 freeze: every re-check started a new thread, and the window waited in
+    Thread.start until Windows had it running. They share one kept thread now."""
+    import threading
+    import time
+    started = []
+    real_start = threading.Thread.start
+
+    def counting_start(self, *a, **kw):
+        if self.name == "mic-effect-status":
+            started.append(self.name)
+        return real_start(self, *a, **kw)
+    monkeypatch.setattr(threading.Thread, "start", counting_start)
+    monkeypatch.setattr(dm, "_status", lambda name: "ready")
+    dm.forget_status()
+    dm.status("My mic")
+    monkeypatch.setattr(dm, "STATUS_S", 0.0)
+    for _ in range(3):
+        dm.status("My mic")                # stale: a re-check on the thread
+        end = time.monotonic() + 5
+        while dm._status_busy and time.monotonic() < end:
+            time.sleep(0.01)
+    assert len(started) <= 1
+
+
 def test_a_status_check_from_before_forget_status_is_dropped(monkeypatch):
     import threading
     import time
