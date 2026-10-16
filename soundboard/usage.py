@@ -25,8 +25,10 @@ there the next time, with the native stacks or Windows' own error for it when ei
 there). Past MAX_PROBLEMS in one send, one `problems-dropped/<bucket>` says roughly
 how many more. On the first start of a new version, `updated/<from>-to-<to>` (so an
 update that never finished shows up as an *Update now* without one). One-off events
-wait in config.json until a send takes them. And `uninstall/<version>` when the
-uninstaller removes it.
+wait in config.json until a send takes them; at a real quit, what waits (those, and
+the tabs and features used since the last daily count) is sent then, so the last
+day before someone stops using the app isn't lost (at_quit). And
+`uninstall/<version>` when the uninstaller removes it.
 With the daily one, a rough picture of how it's used, each as a bucket or a name from a
 fixed list: how long ago it was installed (`age/days-2-7`), where sounds go
 (`route/mic`), how many sounds the board has and how many were played since the last
@@ -956,20 +958,9 @@ def maybe_send(cfg, on_sent=None, event: str = "", app_dir: Path | None = None) 
     now = time.time()
     settle(cfg, now)
     remember(cfg)
-    extra, taken, newest = [], [], 0.0
     if not cfg.stats_problems_seen:   # first run with this: older reports aren't news
         cfg.stats_problems_seen = now
-    if not event:
-        extra = list(cfg.stats_pending)   # remember() just made it a clean list
-        taken = extra[:]
-        skipped = [0]
-        if app_dir is not None:
-            found, newest = problems(app_dir, cfg.stats_problems_seen, skipped)
-            extra += found
-        dropped = skipped[-1] + max(0, len(extra) - MAX_PROBLEMS)
-        extra = extra[:MAX_PROBLEMS]
-        if dropped:   # a bug in a loop: one count saying roughly how many more
-            extra.append(f"problems-dropped/{bucket(dropped)}")
+    extra, taken, newest = ([], [], 0.0) if event else _waiting(cfg, now, app_dir)
     open_tick(cfg)
     payload = hits(cfg, now, event, extra)
     if not payload:
@@ -994,17 +985,90 @@ def maybe_send(cfg, on_sent=None, event: str = "", app_dir: Path | None = None) 
             cfg.stats_open_s = max(0.0, (cfg.stats_open_s or 0) - opened)   # since then
             cfg.stats_launches = max(0, (cfg.stats_launches or 0) - launches)
             cfg.stats_downloads = max(0, (cfg.stats_downloads or 0) - downloads)
-        left = [e for e in cfg.stats_pending if isinstance(e, str)]
-        for e in taken:   # each one sent, once: any kept meanwhile stay
-            if e in left:
-                left.remove(e)
-        cfg.stats_pending = left
+        cfg.stats_pending = _without(cfg.stats_pending, taken)
         cfg.stats_problems_seen = max(cfg.stats_problems_seen, newest)
 
     def run():   # the network only: never touches cfg
         if send(payload) and not event:
             (on_sent or (lambda f: f()))(apply)
     threading.Thread(target=run, daemon=True, name="usage-count").start()
+
+
+def _waiting(cfg, now: float, app_dir: Path | None) -> tuple[list[str], list[str], float]:
+    """The one-off and problem events waiting for a send: (the events, the ones taken
+    from cfg.stats_pending, the newest report's time). Call after remember()."""
+    if not cfg.stats_problems_seen:   # first run with this: older reports aren't news
+        cfg.stats_problems_seen = now
+    extra = list(cfg.stats_pending)   # remember() just made it a clean list
+    taken = extra[:]
+    skipped, newest = [0], 0.0
+    if app_dir is not None:
+        found, newest = problems(app_dir, cfg.stats_problems_seen, skipped)
+        extra += found
+    dropped = skipped[-1] + max(0, len(extra) - MAX_PROBLEMS)
+    extra = extra[:MAX_PROBLEMS]
+    if dropped:   # a bug in a loop: one count saying roughly how many more
+        extra.append(f"problems-dropped/{bucket(dropped)}")
+    return extra, taken, newest
+
+
+def _without(have, sent) -> list[str]:
+    """`have` with each of `sent` taken out once: any added meanwhile stay."""
+    left = [e for e in (have if isinstance(have, list) else []) if isinstance(e, str)]
+    for e in sent:
+        if e in left:
+            left.remove(e)
+    return left
+
+
+QUIT_WAIT_S = 2.0   # the longest a quit waits for at_quit's send (it runs while the rest closes)
+
+
+def at_quit(cfg, app_dir: Path | None = None):
+    """At a real quit: what's waiting for the next count, sent now, so the last day
+    someone used the app isn't lost when they never start it again (or closed it
+    within a minute of starting). Only the events the next count would carry anyway:
+    the features used (`used/`, not features_now, which the daily count adds), the tabs
+    opened (`tab/`) and the one-off and problem events waiting. Never the daily count
+    itself or its buckets, and nothing when nothing waits.
+
+    Starts the send on a thread and returns finish(), or None when nothing goes. Call
+    finish() later in the quit, on the thread that owns cfg: it waits what's left of
+    QUIT_WAIT_S and returns True when the counter took them, after clearing exactly
+    those from cfg (save it after). If it didn't (offline, too slow), they stay for
+    the next count."""
+    if not enabled() or not net.allowed(FEATURE):
+        return None
+    now = time.time()
+    settle(cfg, now)
+    remember(cfg)
+    have = cfg.stats_used if isinstance(cfg.stats_used, list) else []
+    feats = [k for k in FEATURES if k in have]
+    tabs = [t for t in TABS if t in (cfg.stats_tabs if isinstance(cfg.stats_tabs, list)
+                                     else [])]
+    extra, taken, newest = _waiting(cfg, now, app_dir)
+    events = [*(f"used/{k}" for k in feats), *(f"tab/{t}" for t in tabs), *extra]
+    if not events:
+        return None
+    sid = install_id(cfg)
+    payload = [_event(e, sid) for e in events]
+    netlog.cause(FEATURE, "Anonymous usage count (at quit)")
+    done: list[bool] = []
+    end = time.monotonic() + QUIT_WAIT_S
+    t = threading.Thread(target=lambda: done.append(send(payload, timeout=QUIT_WAIT_S)),
+                         daemon=True, name="usage-count")
+    t.start()
+
+    def finish() -> bool:
+        t.join(max(0.0, end - time.monotonic()))
+        if not (done and done[0]):
+            return False
+        cfg.stats_used = [k for k in cfg.stats_used if k not in feats]
+        cfg.stats_tabs = [k for k in cfg.stats_tabs if k not in tabs]
+        cfg.stats_pending = _without(cfg.stats_pending, taken)
+        cfg.stats_problems_seen = max(cfg.stats_problems_seen, newest)
+        return True
+    return finish
 
 
 def step(cfg, name: str, on_sent=None) -> None:

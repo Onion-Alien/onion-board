@@ -12,6 +12,7 @@ import pytest
 
 from soundboard import __version__, app, applog, library, net, reset, usage
 from soundboard.library import Config
+from test_mainwindow import window  # noqa: F401 - the real window, offscreen
 
 
 @pytest.fixture
@@ -49,6 +50,9 @@ class _Inline:
 
     def start(self):
         self.target()
+
+    def join(self, timeout=None):
+        pass
 
 
 ABOUT = ("age/", "route/", "sounds/", "played/", "open/", "lang/", "used/", "os/",
@@ -841,6 +845,84 @@ def test_features_used_survive_a_quit(app_dir):
     usage.remember(cfg)
     cfg.save()
     assert Config.load().stats_used == ["youtube"]
+
+
+# ---- at a quit: what waits for the next count goes then ------------------------------
+
+def test_a_quit_sends_what_waits_for_the_next_count(sent, app_dir):
+    """Someone who never starts it again: their last day's features, tabs and
+    one-off events still arrive. Never the daily count or its buckets."""
+    cfg = Config(stats_sent=1e18, stats_problems_seen=1.0, stats_tabs=["radio"],
+                 stats_pending=["updated/2.0.0-to-2.0.1"])
+    usage.used("youtube")
+    usage.note("warned/2.0.1/KeyError")
+    finish = usage.at_quit(cfg, app_dir=app_dir)
+    assert finish() is True
+    hits = json.loads(sent[0][0].data.decode("utf-8"))["hits"]
+    assert [h["path"] for h in hits] == ["used/youtube", "tab/radio",
+                                         "updated/2.0.0-to-2.0.1", "warned/2.0.1/KeyError"]
+    assert all(h["event"] and h["ref"] == usage.user_tag(cfg.stats_id) for h in hits)
+    assert sent[0][1] == "usage_stats"
+    assert cfg.stats_used == [] and cfg.stats_tabs == [] and cfg.stats_pending == []
+    assert cfg.stats_sent == 1e18                  # the daily count is still its own
+
+
+def test_a_quit_with_nothing_waiting_sends_nothing(sent, app_dir):
+    cfg = Config(stats_sent=1e18, stats_problems_seen=1.0, route="mic")
+    assert usage.at_quit(cfg, app_dir=app_dir) is None
+    assert sent == []
+
+
+@pytest.mark.parametrize("why", ["off", "source"])
+def test_a_quit_follows_the_switch(sent, app_dir, monkeypatch, why):
+    cfg = Config(stats_sent=1e18, stats_tabs=["radio"])
+    if why == "off":
+        net.configure_features(off=["usage_stats"])
+    else:
+        monkeypatch.setattr(sys, "frozen", False, raising=False)
+    assert usage.at_quit(cfg, app_dir=app_dir) is None
+    assert sent == [] and cfg.stats_tabs == ["radio"]
+
+
+def test_a_quit_that_cant_send_keeps_it_all_for_the_next_count(sent, app_dir, monkeypatch):
+    monkeypatch.setattr(usage, "send", lambda *a, **k: False)
+    cfg = Config(stats_sent=1e18, stats_problems_seen=1.0, stats_tabs=["radio"],
+                 stats_used=["youtube"], stats_pending=["unclean-exit/2.0.0"])
+    assert usage.at_quit(cfg, app_dir=app_dir)() is False
+    assert cfg.stats_tabs == ["radio"] and cfg.stats_used == ["youtube"]
+    assert cfg.stats_pending == ["unclean-exit/2.0.0"]
+
+
+def test_a_slow_quit_send_is_waited_for_only_briefly(sent, app_dir, monkeypatch):
+    import threading
+    import time
+    gate = threading.Event()
+    monkeypatch.setattr(usage, "threading", threading)
+    monkeypatch.setattr(usage, "QUIT_WAIT_S", 0.2)
+    monkeypatch.setattr(usage, "send", lambda *a, **k: gate.wait(5))
+    cfg = Config(stats_sent=1e18, stats_tabs=["radio"])
+    t0 = time.monotonic()
+    assert usage.at_quit(cfg, app_dir=app_dir)() is False
+    assert time.monotonic() - t0 < 2
+    assert cfg.stats_tabs == ["radio"]
+    gate.set()
+
+
+def test_closing_the_window_sends_what_waits_and_saves(window, sent):  # noqa: F811
+    window.cfg.stats_sent = 1e18
+    window.cfg.stats_tabs = ["radio"]
+    window.shutdown()
+    assert [p for r, _ in sent for p in _paths(r)] == ["tab/radio"]
+    assert Config.load().stats_tabs == []
+
+
+def test_what_comes_in_during_a_quit_send_stays(sent, app_dir):
+    cfg = Config(stats_sent=1e18, stats_problems_seen=1.0, stats_pending=["a/1"])
+    finish = usage.at_quit(cfg, app_dir=app_dir)
+    cfg.stats_pending = [*cfg.stats_pending, "b/1"]
+    cfg.stats_tabs = ["apps"]
+    assert finish() is True
+    assert cfg.stats_pending == ["b/1"] and cfg.stats_tabs == ["apps"]
 
 
 

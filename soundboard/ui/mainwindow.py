@@ -1187,6 +1187,14 @@ class MainWindow(QMainWindow):
         usage.open_tick(self.cfg)
         usage.remember(self.cfg)
 
+    def _count_at_quit(self):   # what waits for the next count goes now (usage.at_quit)
+        self._quit_count = usage.at_quit(self.cfg, app_dir=library.APP_DIR)
+
+    def _finish_count_at_quit(self):   # waits at most usage.QUIT_WAIT_S, all told
+        finish, self._quit_count = getattr(self, "_quit_count", None), None
+        if finish is not None and finish():
+            self.cfg.save()
+
     def tick_usage(self):   # every usage.OPEN_TICK_S: how long the app has been open
         usage.open_tick(self.cfg)
 
@@ -1330,9 +1338,11 @@ class MainWindow(QMainWindow):
                      self._voice_timer.stop, self.devctl._default_poll.stop,
                      self.alertctl._discord_poll.stop, self.alertctl._raw_poll.stop,
                      self.hkctl._release_ptt,
-                     self._remember_usage, self.cfg.save, self.overlay.shutdown,
+                     self._remember_usage, self._count_at_quit, self.cfg.save,
+                     self.overlay.shutdown,
                      self.hotkeys.stop, self.replay.stop, self.remote.stop,
                      self.remctl._stop_remote_addons,
+                     self._finish_count_at_quit,   # sent meanwhile; before Tor stops
                      self.radio.shutdown, tor.shutdown, self.apps.shutdown,
                      self.triggers.shutdown,
                      self.linkbar.shutdown, ytworker.drop_all,
