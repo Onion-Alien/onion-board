@@ -80,7 +80,8 @@ def served(monkeypatch, app_dir):
 def test_the_built_in_list_has_our_packs_from_our_own_releases():
     built = packs.built_in()
     assert [(p.id, p.sounds) for p in built] == [("streamer", 57), ("esports", 51),
-                                                 ("podcast", 51), ("halloween", 49),
+                                                 ("general", 483), ("podcast", 51),
+                                                 ("halloween", 49),
                                                  ("gm-starter", 67)]
     for p in built:
         assert p.url.startswith(updates.DOWNLOADS) and len(p.sha256) == 64
@@ -186,9 +187,9 @@ def test_dialog_keeps_the_built_in_list_when_offline(qapp, served):
     net.configure_features(offline=True)
     dlg = packsdialog.PacksDialog(lambda p: None)
     try:
-        assert process_events(qapp, lambda: len(dlg.cards) == 5, 5)
-        assert [c.pack.id for c in dlg.cards] == ["streamer", "esports", "podcast",
-                                                "halloween", "gm-starter"]
+        assert process_events(qapp, lambda: len(dlg.cards) == 6, 5)
+        assert [c.pack.id for c in dlg.cards] == ["streamer", "esports", "general",
+                                                "podcast", "halloween", "gm-starter"]
         assert dlg.note.isVisibleTo(dlg) and dlg.note.text()
         assert served.calls == []
     finally:
@@ -489,17 +490,17 @@ def test_the_online_list_keeps_the_cards_of_packs_that_didnt_change(qapp):
     keep their cards now; only a new or changed pack gets a new one."""
     dlg = packsdialog.PacksDialog(lambda path: None, fetch_list=False)
     try:
-        assert process_events(qapp, lambda: len(dlg.cards) == 5, 5)
+        assert process_events(qapp, lambda: len(dlg.cards) == 6, 5)
         before = list(dlg.cards)
         dlg._show(packs.built_in(), "")
         assert dlg.cards == before and all(a is b for a, b in zip(dlg.cards, before))
         changed = packs.built_in()
         changed[1].description = "Something new"
         dlg._show(changed, "")
-        assert process_events(qapp, lambda: len(dlg.cards) == 5, 5)
+        assert process_events(qapp, lambda: len(dlg.cards) == 6, 5)
         assert [c.pack for c in dlg.cards] == changed
         assert dlg.cards[1] is not before[1]
-        assert all(dlg.cards[i] is before[i] for i in (0, 2, 3, 4))
+        assert all(dlg.cards[i] is before[i] for i in (0, 2, 3, 4, 5))
         assert [dlg.list.itemAt(i).widget() for i in range(len(changed))] == dlg.cards
     finally:
         dlg.done(0)

@@ -135,7 +135,7 @@ PRESS_MODES = ("overlap", "toggle", "solo", "queue")
 # the add-ons with install steps (their module.json id); any other is "other"
 ADDONS = ("ai-voices", "live-voice", "other")
 # the free sound packs (soundboard.packs BUILT_IN ids); any other is "other"
-PACKS = ("streamer", "esports", "podcast", "halloween", "gm-starter", "other")
+PACKS = ("streamer", "esports", "general", "podcast", "halloween", "gm-starter", "other")
 # Settings' pages (settings.SettingsDialog's page keys, without Show advanced)
 SETTINGS_PAGES = ("audio", "appearance", "hotkeys", "tabs", "general", "about",
                   "overlay", "privacy", "connection", "data", "updates", "help",
