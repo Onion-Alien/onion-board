@@ -356,9 +356,11 @@ async function queue(url, env) {
 
 async function review(req, env, id) {
   const { action, name } = await body(req);
-  const row = await env.DB.prepare("SELECT ext FROM sounds WHERE id = ?").bind(id).first();
+  const row = await env.DB.prepare("SELECT ext, status FROM sounds WHERE id = ?").bind(id).first();
   if (!row) fail("not found", 404);
   if (action === "approve") {
+    // a rejected upload's file is deleted: it can't go live again (a link has no file)
+    if (row.status === "rejected" && row.ext !== "link") fail("file gone", 409);
     // approved again after reports: the old reports are dealt with
     await env.DB.prepare("DELETE FROM reports WHERE sound = ?").bind(id).run();
     await env.DB.prepare("UPDATE sounds SET status = 'live', reports = 0, reviewed = ? WHERE id = ?")
