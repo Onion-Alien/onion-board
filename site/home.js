@@ -1,5 +1,5 @@
-// The home page's moving parts: the Board / Watch tabs, the try-it pads (made here with
-// the Web Audio API; Hoot's hoot is a real owl, sounds/hoot.mp3), Bun and Hoot, the Watch demo,
+// The home page's moving parts: the Board / Watch tabs, the try-it pads (real CC0 recordings
+// in sounds/, see CREDITS.txt; made-up Web Audio stand-ins play until they load), Bun and Hoot, the Watch demo,
 // and the small stuff (reveal on scroll, counters, the copy button).
 (function () {
   "use strict";
@@ -149,7 +149,7 @@
   function audio() {
     if (ac && broken()) {
       try { ac.close(); } catch (e) { /* already closed */ }
-      ac = null; an = null; roomIR = null; clips = {};
+      ac = null; an = null; roomIR = null;
       stale = false; lastClock = -1;
     }
     if (!ac) {
@@ -166,7 +166,6 @@
       noise = ac.createBuffer(1, ac.sampleRate * 2, ac.sampleRate);
       var d = noise.getChannelData(0);
       for (var i = 0; i < d.length; i++) d[i] = Math.random() * 2 - 1;
-      loadClip("hoot", "sounds/hoot.mp3");
     }
     if (ac.state === "suspended") ac.resume();
     return ac;
@@ -187,14 +186,24 @@
     if (!muted) { audio(); play("coin"); }
   });
 
-  // Recorded clips, fetched once the page may play sound.
+  // Recorded clips, fetched and decoded soon after the page loads, so even the first press
+  // plays the real one. An offline context decodes without asking to play (no autoplay
+  // block), and its buffers work in any context, so a rebuilt one keeps them.
   var clips = {};
-  function loadClip(name, url) {
-    fetch(url).then(function (r) { return r.arrayBuffer(); })
-      .then(function (b) { return new Promise(function (ok, no) { ac.decodeAudioData(b, ok, no); }); })
-      .then(function (buf) { clips[name] = buf; })
-      .catch(function () { /* offline or blocked: the made-up one plays instead */ });
+  var PADS = ["horn", "boom", "buzzer", "rimshot", "laser", "trombone", "clap", "coin", "drop"];
+  function loadClips() {
+    var O = window.OfflineAudioContext || window.webkitOfflineAudioContext;
+    if (!O) return;
+    var dec = new O(1, 1, 44100);
+    PADS.concat("hoot").forEach(function (name) {
+      fetch("sounds/" + name + ".mp3").then(function (r) { return r.arrayBuffer(); })
+        .then(function (b) { return new Promise(function (ok, no) { dec.decodeAudioData(b, ok, no); }); })
+        .then(function (buf) { clips[name] = buf; })
+        .catch(function () { /* offline or blocked: the made-up one plays instead */ });
+    });
   }
+  if (document.readyState === "complete") setTimeout(loadClips, 300);
+  else addEventListener("load", function () { setTimeout(loadClips, 300); });
   function clip(name, t, vol) {
     var buf = clips[name];
     if (!buf) return 0;
@@ -384,7 +393,8 @@
   var talkUntil = 0, looping = false;
   function play(name) {
     if (!audio() || !SFX[name]) return 0;
-    var d = SFX[name](ac.currentTime + 0.01);
+    var t = ac.currentTime + 0.01;
+    var d = (PADS.indexOf(name) >= 0 && clip(name, t, 0.7)) || SFX[name](t);
     talkUntil = Math.max(talkUntil, performance.now() + d * 1000 + 80);
     if (!looping) { looping = true; requestAnimationFrame(levelLoop); }
     return d;
