@@ -310,8 +310,12 @@ jobs:
       - name: Tests (the real effect in the test host)
         env:
           QT_QPA_PLATFORM: offscreen
-        # -n 4: one file runs in one process by default (conftest), ~5 min for this one
-        run: .venv\Scripts\python -m pytest -n 4 --durations=20 --reruns 2 -rfER tests/test_directmic.py
+        # -n 4: one file runs in one process by default (conftest), ~5 min for this one.
+        # The ones in the test host run alone after: side by side they miss real time.
+        run: |
+          .venv\Scripts\python -m pytest -n 4 -m "not host" --durations=10 --reruns 2 -rfER tests/test_directmic.py
+          if ($LASTEXITCODE) { exit 1 }
+          .venv\Scripts\python -m pytest -n 0 -m host --durations=10 --reruns 2 -rfER tests/test_directmic.py
       - name: Fuzz (60 s)
         run: .venv\Scripts\python scripts/fuzz_directmic.py 60 2
 

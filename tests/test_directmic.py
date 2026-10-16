@@ -1074,8 +1074,14 @@ def test_late_pump_sends_all_the_voice(ring_file):
 
 # ---------------------------------------------------------------------- the real effect
 
-needs_host = pytest.mark.skipif(not (HOST.is_file() and DLL.is_file()),
+_have_host = pytest.mark.skipif(not (HOST.is_file() and DLL.is_file()),
                                 reason="run scripts/build_directmic.py --testhost")
+
+
+def needs_host(test):
+    """Skipped without the test host; marked `host`: run with other tests side by side,
+    the effect can miss its moment (CI runs these alone)."""
+    return pytest.mark.host(_have_host(test))
 
 
 def realtime(test):
