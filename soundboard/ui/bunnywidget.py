@@ -35,8 +35,12 @@ wakes him, grumpy, for WOKEN_S seconds; then he nods off again.
 
 The widget is bigger than Bun himself so there's room around him for the notes,
 which also gives him even breathing room in a layout. The timer only runs while
-he's on screen, always at the same 30 fps (a slower idle pace made the bob judder
-next to the smooth blinks and ear flicks).
+he's on screen, always at the same 60 fps (a slower idle pace made the bob judder
+next to the smooth blinks and ear flicks); Bun mode drops to 30 behind a game.
+
+Over the pose sits a springy layer (`_spring`, `springy`): his ears trail behind his
+hops and wobble as they settle, a fast move stretches him and a landing squashes him,
+then he jiggles back into shape.
 """
 from __future__ import annotations
 
@@ -104,8 +108,19 @@ def loudness(level: float) -> float:
     if level <= TALK:
         return 0.0
     return min(1.0, math.log(level / TALK) / math.log(LOUD / TALK))
-FPS = 30
+FPS = 60
 FAST_MS = 1000 // FPS
+BACK_MS = 33       # Bun mode's pace while a game is in front (he keeps going there)
+# a blink shuts fast, stays shut a moment and opens more slowly, like a real one;
+# now and then it's a double blink
+BLINK_SHUT, BLINK_HOLD, BLINK_OPEN = 0.05, 0.035, 0.13
+DOUBLE_BLINK = 0.2
+# the springy layer over the pose (paintEvent): stiffness (1/s²) and damping (1/s)
+EAR_SPRING = (420.0, 13.0)     # ears trail his moves and wobble as they settle
+SQUASH_SPRING = (300.0, 15.0)  # his body jiggles back after a squash or stretch
+STRETCH = 0.05     # how tall and thin a fast move makes him, per Bun-height a second
+SQUASH = 0.6       # how hard a change of direction (a landing) squashes him
+EAR_DRAG = 9.0     # how far his ears trail behind, degrees per Bun-height a second
 BUBBLE = QColor("#fffaf0")
 BEG = 2.8          # how long a begging line stays up, seconds
 # the Pong Easter egg: this many clicks inside ANNOY_WINDOW seconds and he fetches
@@ -115,6 +130,40 @@ TAUNT = 1.5        # how long he taps the bat before the game opens, seconds
 NAP_HOURS = (2, 3, 4)   # local hours (2:00 to 4:59) he's asleep, with naps=True
 WOKEN_S = 30.0     # how long a click keeps him awake
 ZZZ_EVERY = 1.1    # seconds between Zs
+
+
+def blink_amount(b: float) -> float:
+    """How shut his eyes are (0..1) `b` seconds into a blink."""
+    if b < 0:
+        return 0.0
+    if b < BLINK_SHUT:   # speeding up as the lids come down
+        k = b / BLINK_SHUT
+        return k * k
+    b -= BLINK_SHUT
+    if b < BLINK_HOLD:
+        return 1.0
+    b -= BLINK_HOLD
+    if b < BLINK_OPEN:   # easing open
+        k = b / BLINK_OPEN
+        return 1 - k * k * (3 - 2 * k)
+    return 0.0
+
+
+class _Spring:
+    """A damped spring chasing a target: the lag, overshoot and wobble that make a
+    move look alive instead of on rails."""
+    __slots__ = ("x", "v")
+
+    def __init__(self, x: float = 0.0):
+        self.x, self.v = x, 0.0
+
+    def step(self, target: float, dt: float, k: float, d: float) -> float:
+        n = max(1, math.ceil(dt / 0.008))   # small steps: steady at any frame rate
+        h = dt / n
+        for _i in range(n):
+            self.v += (k * (target - self.x) - d * self.v) * h
+            self.x += self.v * h
+        return self.x
 
 
 def local_hour() -> int:
@@ -272,12 +321,18 @@ class BunnyWidget(QWidget):
         self._act_t = -1.0         # seconds into build(), or -1 when not building
         self._blows = 0            # hammer blows landed so far
         self._timer = QTimer(self)
+        self._timer.setTimerType(Qt.TimerType.PreciseTimer)   # (even frames at 60 fps)
         self._timer.setInterval(FAST_MS)
         self._timer.timeout.connect(self._step)
         if pong:
             self.challenge.connect(self._open_game)
-        if not in_background:
+        if in_background:
+            appstate.slow_in_background(self, self._timer, FAST_MS, BACK_MS)
+        else:
             appstate.pause_in_background(self, self._resume, self._timer.stop)
+        self._ears_s = _Spring()        # the springy layer (_spring): ears,
+        self._squash_s = _Spring()      # ... squash and stretch,
+        self._dy_last, self._vy = 0.0, 0.0   # ... and how fast he's moving up or down
         self.junk: list[_Junk] = []     # tossed out of the dust cloud, the hammer's head
         self.sparks: list[_Spark] = []
         self._junk_debt = 0.0
@@ -486,7 +541,8 @@ class BunnyWidget(QWidget):
 
     def _resume(self):
         self._last = time.monotonic()
-        self._timer.start(FAST_MS)
+        self._timer.start(appstate.interval(FAST_MS, BACK_MS) if self.in_background
+                          else FAST_MS)
 
     def hideEvent(self, ev):
         self._timer.stop()
@@ -655,11 +711,12 @@ class BunnyWidget(QWidget):
             n.y += n.vy * dt
             n.vx *= 1 - dt * 0.6
         self.notes = [n for n in self.notes if n.age < n.life]
-        self._level *= 0.9
+        self._level *= 0.9 ** (dt * 30)   # (the same fall-off at any frame rate)
         # blink / ear flick schedules
         if now >= self._next_blink:
             self._blink_at = now
-            self._next_blink = now + self._rng.uniform(2.2, 5.5)
+            double = self._rng.random() < DOUBLE_BLINK
+            self._next_blink = now + (0.27 if double else self._rng.uniform(2.2, 5.5))
         if now >= self._next_flick:
             self._flick_at = now
             self._next_flick = now + self._rng.uniform(4, 9)
@@ -695,7 +752,37 @@ class BunnyWidget(QWidget):
             self._say(self.lines, BEG)
             self._next_beg = now + BEG + self._rng.uniform(3, 6)
         self._step_fidget(now)
+        self._spring(now, dt)
         self.update()
+
+    def _spring(self, now: float, dt: float):
+        """Moves the springy layer on a frame: his ears trail behind his hops and
+        wobble as they settle, a fast move stretches him and a change of direction (a
+        landing, a take-off) squashes him, then he jiggles back into shape."""
+        pose = self.pose(now)
+        if dt <= 0:
+            return
+        acted = self.act_phase() in ("dash", "cloud", "back") or self._pop_t >= 0
+        vy = 0.0 if acted else (pose["dy"] - self._dy_last) / dt / self.bun_h
+        self._dy_last = pose["dy"]
+        dv = max(-4.0, min(4.0, vy - self._vy))   # (a jump cut can't fling him)
+        self._vy = vy
+        if not pose["shown"] or acted:   # the act squashes him by hand
+            self._squash_s.x = self._squash_s.v = 0.0
+        else:
+            self._squash_s.v += SQUASH * dv * 10   # landing (dv < 0): squash
+            self._squash_s.step(min(0.08, abs(vy) * STRETCH), dt, *SQUASH_SPRING)
+            self._squash_s.x = max(-0.2, min(0.15, self._squash_s.x))
+        self._ears_s.step(pose["ears"] - vy * EAR_DRAG, dt, *EAR_SPRING)
+
+    def springy(self, pose: dict) -> dict:
+        """`pose` with the springy layer on top (what paintEvent draws)."""
+        s = self._squash_s.x
+        if s > 0:   # stretched tall: never past the top of his box (his ears got cut)
+            room = self._bun_rect().top() + pose["dy"] - 1
+            s = min(s, max(0.0, room / (self.bun_h * pose["sy"])))
+        return {**pose, "ears": self._ears_s.x, "sy": pose["sy"] * (1 + s),
+                "sx": pose["sx"] * (1 - 0.6 * s)}
 
     def _step_beats(self, now: float, dt: float):
         """The failure beat, the finished speaker, popping out, and what's flying."""
@@ -769,9 +856,7 @@ class BunnyWidget(QWidget):
         """Blink / mouth / ears / vertical offset for the current moment."""
         now = time.monotonic() if now is None else now
         t = now - self._t0
-        blink = 0.0
-        if self._blink_at >= 0 and (b := now - self._blink_at) < 0.16:
-            blink = 1 - abs(b - 0.08) / 0.08
+        blink = blink_amount(now - self._blink_at) if self._blink_at >= 0 else 0.0
         ears = 3 * math.sin(t * 1.3)
         if self._flick_at >= 0 and (f := now - self._flick_at) < 0.5:
             ears += 14 * math.sin(f / 0.5 * math.pi) * math.cos(f * 30) * (1 - f / 0.5)
@@ -909,7 +994,7 @@ class BunnyWidget(QWidget):
         snap_to_pixels(p)
         p.setRenderHint(QPainter.RenderHint.Antialiasing)
         now = time.monotonic()
-        pose = self.pose(now)
+        pose = self.springy(self.pose(now))
         r = self._bun_rect()
         # soft shadow on the "floor", shrinking as he rises
         lift = max(0.0, -pose["dy"])
