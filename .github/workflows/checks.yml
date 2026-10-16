@@ -116,7 +116,7 @@ jobs:
             base=all
           fi
           tests=$(python scripts/pick_tests.py "$base" | tr '\n' ' ')
-          # the test jobs: a long run split in four (about the same length each)
+          # the test jobs: a long run split in up to six (about the same length each)
           matrix=$(python scripts/pick_tests.py "$base" --matrix)
           echo "tests=$tests" >> "$GITHUB_OUTPUT"
           echo "matrix=$matrix" >> "$GITHUB_OUTPUT"
@@ -170,11 +170,11 @@ jobs:
       - run: .venv\Scripts\python scripts/check_types.py --all
 
   # The Windows tests, as the pick job split them: a long run (main, or a PR that needs
-  # most of the suite) in four jobs side by side, about a quarter of the wait.
+  # most of the suite) in up to six jobs side by side (pick_tests.py, SHARDS).
   windows:
     needs: pick
     if: ${{ needs.pick.result == 'success' && needs.pick.outputs.matrix != '[]' }}
-    name: test-windows   # GitHub adds the shard: "test-windows (1/4)"
+    name: test-windows   # GitHub adds the shard: "test-windows (1/6)"
     strategy:
       fail-fast: false   # each job's failures are listed in full
       matrix:
@@ -408,7 +408,7 @@ jobs:
   test-linux:
     needs: pick
     if: ${{ inputs.linux && needs.pick.result == 'success' && needs.pick.outputs.matrix != '[]' }}
-    name: test-linux   # GitHub adds the shard: "test-linux (1/4)"
+    name: test-linux   # GitHub adds the shard: "test-linux (1/6)"
     strategy:
       fail-fast: false
       matrix:
