@@ -1,5 +1,6 @@
 """The rail's foot: alerts above the on-air controls, Settings with the open / shut
 arrow beside it."""
+import pytest
 from PySide6.QtWidgets import QApplication, QBoxLayout, QLabel, QPushButton, QWidget
 
 from test_mainwindow import window  # noqa: F401
@@ -165,6 +166,7 @@ def test_the_header_version_opens_whats_new_and_stop_all_has_its_own_icon(window
     assert "stop_all" in icons.SHAPES and icons.SHAPES["stop_all"] is not icons.SHAPES["stop"]
 
 
+@pytest.mark.fonts   # loads Segoe UI (conftest runs it last)
 def test_an_open_tab_has_room_between_its_icon_and_its_name(qapp):
     """Qt leaves ~4 px there, which looked cramped: the rail adds to it (ICON_PAD)."""
     import os

@@ -9,6 +9,9 @@ from PySide6.QtGui import QFontDatabase
 from PySide6.QtWidgets import QApplication, QLabel
 from test_mainwindow import window  # noqa: F401
 
+pytestmark = pytest.mark.fonts   # (conftest runs these last)
+
+
 @pytest.fixture(autouse=True)
 def pixel_fonts(qapp):
     """Load real glyphs for these pixel checks without changing other tests' fonts."""
