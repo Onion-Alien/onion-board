@@ -71,7 +71,7 @@ from soundboard.ui.playbutton import PlayButton
 from soundboard.ui.setupshow import SetupShow
 from soundboard.ui.sidebar import SHUT_W, SideTabs
 from soundboard.ui.speedpitch import SpeedPitchButton
-from soundboard.ui.tabcontrol import TAB_INDEX, TAB_KEYS, TABS
+from soundboard.ui.tabcontrol import TAB_INDEX, TAB_KEYS, TABS, rail_order
 from soundboard.ui.widgets import (
     DropdownMenu,
     EdgeMatch,
@@ -532,6 +532,8 @@ class WindowBuilder(Controller):
         mw.tabs.addTab(mw.voice, "")
         mw.setup_page = self._build_setup_page()
         mw.tabs.addTab(mw.setup_page, "")
+        mw.store = mw._make_tab("store")
+        mw.tabs.addTab(mw.store, "")
         for i, (text, _tip) in enumerate(TABS):   # no hover tip: the name says it
             mw.tabs.setTabText(i, text)
             icons.set_tab_icon(mw.tabs, i, TAB_KEYS[i])
@@ -561,7 +563,7 @@ class WindowBuilder(Controller):
             # Live and Stop all never move; the pills (what needs attention) sit above
             # them and only show when needed (at the rail's foot, as icons)
             [mw.btn_air, mw.stop_btn],
-            order=[TAB_INDEX[k] for k in mw.cfg.sidebar_order if k in TAB_INDEX],
+            order=[TAB_INDEX[k] for k in rail_order(mw.cfg.sidebar_order)],
             alerts=[mw.pill], update=mw.btn_update)
         # Proxy, Tor or Offline mode, a phone remote listening: lines in the On Air card
         # (_net_follow), each one click to its Settings page

@@ -251,7 +251,7 @@ class PadControl(Controller):
         a_dup = add(("copy",), _("Duplicate"), _("A second pad with the same sound, to give "
                                                  "its own effects or hotkey"))
         a_export = add(("download",), _("Export"), _("Save it as a file to share with friends"))
-        a_src_open = a_src_copy = a_src_info = None
+        a_src_open = a_src_copy = a_src_info = a_src_share = None
         if src := sourceinfo.shown(m):   # downloaded from YouTube, TikTok…
             site = sourceinfo.site_name(src)
             sm = menu.addMenu(icons.icon(sourceinfo.icon(src)), site)
@@ -260,6 +260,12 @@ class PadControl(Controller):
             a_src_copy = add(("copy",), _("Copy link"), src["link"], sm)
             a_src_info = add(("info",), _("Details"), _("Channel, upload date, length, views"),
                              sm)
+            # the Store tab can take its link (only the link: whoever adds it downloads it)
+            from soundboard import store
+            from soundboard.ui.storetab import StoreTab
+            if isinstance(mw.store, StoreTab) and store.link_ok(src["link"]):
+                a_src_share = add(("store",), _("Share to the store"),
+                                  _("Share this link in the Store tab"), sm)
         a_show = add(("folder",), _("Open file location"))
         a_del = add(("trash", "danger_text"), _("Remove"), _("Goes to Recently deleted"))
         act = menu.exec(pos)
@@ -280,6 +286,8 @@ class PadControl(Controller):
             sourcedialog.open_link(src, mw)
         elif act is not None and act == a_src_copy:
             sourcedialog.copy_link(src, mw)
+        elif act is not None and act == a_src_share:
+            mw.store.share(src["link"], m.name)
         elif act is not None and act == a_src_info:
             d = sourcedialog.SourceDialog(m, mw)
             d.forgotten.connect(mw._save_now)

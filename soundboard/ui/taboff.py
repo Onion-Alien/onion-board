@@ -13,8 +13,10 @@ from PySide6.QtWidgets import QPushButton, QWidget
 from soundboard import savedvoices
 
 # the tabs that can be switched off, by key (the main window's attribute for each);
-# Sounds and Setup always stay
-KEYS = ("radio", "apps", "triggers", "voice")
+# Sounds and Setup always stay. (Store is last in TAB_KEYS, so older
+# configs' saved tab numbers still point at the same tabs, but the rail shows it
+# before Setup: windowbuild)
+KEYS = ("radio", "apps", "triggers", "voice", "store")
 
 
 class TabOff(QWidget):

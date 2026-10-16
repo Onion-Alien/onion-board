@@ -679,6 +679,45 @@ def _like(p, fill):
     p.drawPath(path)
 
 
+def _dislike(p, fill):
+    """The thumbs-up turned upside down."""
+    p.save()
+    p.translate(0, 24)
+    p.scale(1, -1)
+    _like(p, fill)
+    p.restore()
+
+
+def _upload(p, fill):
+    """An arrow up out of an open tray."""
+    p.drawLine(QPointF(12, 15), QPointF(12, 4))
+    p.drawPolyline([QPointF(7.5, 8.5), QPointF(12, 4), QPointF(16.5, 8.5)])
+    p.drawPolyline([QPointF(4, 15), QPointF(4, 20), QPointF(20, 20), QPointF(20, 15)])
+
+
+def _flag(p, fill):
+    """A flag on a pole: report something."""
+    p.drawLine(QPointF(5, 21), QPointF(5, 3.5))
+    path = QPainterPath(QPointF(5, 4))
+    for pt in ((10, 2.5), (14, 5.5), (19, 4), (19, 13), (14, 14.5), (10, 11.5), (5, 13)):
+        path.lineTo(*pt)
+    p.drawPath(path)
+
+
+def _store(p, fill):
+    """A shop front: an awning over a door."""
+    p.drawPolyline([QPointF(4, 11), QPointF(4, 20.5), QPointF(20, 20.5), QPointF(20, 11)])
+    path = QPainterPath(QPointF(3, 9))
+    path.lineTo(5, 3.5)
+    path.lineTo(19, 3.5)
+    path.lineTo(21, 9)
+    path.closeSubpath()
+    p.drawPath(path)
+    for x in (8.3, 12, 15.7):
+        p.drawLine(QPointF(x, 3.5), QPointF(x - 0.6 if x < 12 else x + 0.6 if x > 12 else x, 9))
+    p.drawRect(QRectF(9.5, 14, 5, 6.5))
+
+
 def _sort(p, fill):
     """Lines getting shorter, an arrow pointing down beside them."""
     for y, w in ((6, 10), (12, 7), (18, 4)):
@@ -803,6 +842,8 @@ SHAPES = {
     "tiktok": _tiktok, "myinstants": _myinstants,
     "shuffle": _shuffle, "star": _star,
     "star_filled": lambda p, fill: _star(p, fill, True), "like": _like, "copy": _copy,
+    "dislike": _dislike,
+    "upload": _upload, "flag": _flag, "store": _store,
     "sort": _sort, "list": _list, "rename": _rename, "tag": _tag, "search": _search,
     "sounds": _grid, "browser": _globe, "offline": _offline, "tor": _tor, "phone": _phone,
     "voice": _mask, "setup": _sliders,

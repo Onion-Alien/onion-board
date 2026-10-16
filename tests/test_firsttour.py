@@ -26,6 +26,9 @@ def counted(monkeypatch):
     return seen
 
 
+REAL_ADD_TO = starter.add_to   # (the fixture below stubs it)
+
+
 @pytest.fixture
 def added(monkeypatch):
     """The windows the starter sounds were handed to (not really imported)."""
@@ -190,7 +193,8 @@ def test_a_board_with_sounds_gets_none(window, added):
 
 
 def test_the_starter_sounds_ship_small_and_come_once(window, monkeypatch, added):
-    monkeypatch.undo()   # the real starter.add_to, not the stub
+    # the real starter.add_to, not the stub (undo() would drop the window's stubs too)
+    monkeypatch.setattr(starter, "add_to", REAL_ADD_TO)
     found = starter.files()
     assert len(found) == 25
     assert sum(Path(f).stat().st_size for f in found) < 1_000_000   # about 0.8 MB

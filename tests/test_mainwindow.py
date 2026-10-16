@@ -569,7 +569,7 @@ def test_the_tabs_are_a_rail_down_the_left(window, qapp):
     assert b.text().strip() == "Radio" and b.toolTip() == ""
     assert not window.wordmark.isHidden() and not window.tagline.isHidden()
     rail.buttons[5].click()
-    assert window.tabs.currentIndex() == 5 and rail.buttons[5].isChecked()
+    assert window.tabs.currentIndex() == rail.buttons[5].index and rail.buttons[5].isChecked()
     window.tabs.setTabVisible(2, False)
     assert rail.buttons[2].isHidden()
     window.tabs.setTabVisible(2, True)

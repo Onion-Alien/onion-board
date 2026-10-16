@@ -440,10 +440,14 @@ class Config:
     app_clips_keep_forever: bool = False   # otherwise expire after seven inactive days
     sidebar_open: bool = True   # the tab rail opened out to show the tabs' names
     sidebar_order: list[str] = field(default_factory=list)   # stable tab keys, visual order
-    tab: int = 0     # 0 = sounds, 1 = radio, 2 = apps, 3 = triggers, 4 = voice, 5 = setup
+    # 0 = sounds, 1 = radio, 2 = apps, 3 = triggers, 4 = voice, 5 = setup, 6 = store
+    tab: int = 0
     # Settings > Tabs: the tabs switched off ("radio", "apps", "triggers", "voice"), gone
     # from the window and never built (a new user starts with BASIC_TABS_OFF)
     tabs_off: list[str] = field(default_factory=list)
+    # the Store tab's random id for this install (soundboard.store: one vote per sound);
+    # "" until the store is first used
+    store_id: str = ""
     # fetch newer yt-dlp versions from PyPI by itself: opt-in, since that's code the app
     # runs (named *_optin so configs saved while it defaulted to on start off again)
     ytdlp_auto_optin: bool = False
