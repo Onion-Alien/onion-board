@@ -53,7 +53,8 @@ jobs:
       - name: Personal data and secrets (repo rules)
         env:
           RANGE: ${{ steps.range.outputs.range }}
-        run: python scripts/check_sensitive.py --history "$RANGE"
+        # "=": a nightly run's range is --all, which on its own reads as an option
+        run: python scripts/check_sensitive.py --history="$RANGE"
       # A commit's time zone says where its author is: new commits must be in UTC
       # (CLAUDE.md, "Commit times"). A PR: its commits not on main yet, and it fails.
       # main: what the push added (a merge made with GitHub's button or `gh pr merge`)

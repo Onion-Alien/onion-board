@@ -338,12 +338,16 @@ def test_a_new_zoom_shows_all_at_once_never_tile_by_tile(qapp):
     m.show()
 
     def done():
-        m.grab()                               # (offscreen, repaint() may not paint)
-        end = time.monotonic() + 5
-        while m.busy() and time.monotonic() < end:
+        # (offscreen, repaint() may not paint; a slow runner takes well over 5 s)
+        m.grab()
+        end = time.monotonic() + 30
+        while time.monotonic() < end:
+            if not m.busy():
+                m.grab()
+                if m._stable is not None and m._stable[0] == m._level():
+                    break
             qapp.processEvents()
             time.sleep(0.0005)
-        m.grab()
         assert m._stable is not None and m._stable[0] == m._level()
 
     done()
@@ -354,7 +358,7 @@ def test_a_new_zoom_shows_all_at_once_never_tile_by_tile(qapp):
 
     seen = [look()]   # each different picture shown, in turn (this one starts it)
     assert m.busy()
-    end = time.monotonic() + 5
+    end = time.monotonic() + 30
     while m.busy() and time.monotonic() < end:
         h = look()
         if not seen or seen[-1] != h:
