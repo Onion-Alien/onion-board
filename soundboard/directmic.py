@@ -786,21 +786,50 @@ def mic_lookup(name: str | None) -> tuple[str | None, str]:
     guid = _match(name, active)
     if guid is not None:
         return guid, ""
+    # the engine finds a saved name more loosely (engine.find_device): the mic it opened
+    # (and the meter shows working) is the one meant. Uninstall feedback: "it said it
+    # couldn't find my mic, but it was showing it picked up my mic sound just fine"
+    opened = _engine_name(name)
+    if opened and opened != name:
+        exact = [e for e in active if _squash(e["name"]) == _squash(opened)]
+        if len(exact) == 1:
+            return exact[0]["guid"], ""
     if len(_near(name, active)) > 1:
         return None, "unsure"
     others = [e for e in endpoints if not e["active"]]
-    if any(e["name"] == name for e in others) or _near(name, others):
+    if _near(name, others):
         return None, "off"
     return None, "gone"
 
 
+def _engine_name(name: str) -> str | None:
+    """The name of the recording device the engine opens for the saved `name`."""
+    try:
+        from soundboard import engine
+        idx = engine.find_device("input", name)
+        return None if idx is None else engine.list_name(idx)
+    except Exception:  # noqa: BLE001 - no audio devices to ask: the registry's answer stands
+        log.debug("engine name lookup failed", exc_info=True)
+        return None
+
+
+def _squash(name: str) -> str:
+    """A name with Windows' odd spacing and case ironed out (as engine.find_device)."""
+    return " ".join(name.split()).lower()
+
+
 def _near(name: str, mics: list[dict]) -> list[dict]:
-    return [e for e in mics if e["name"].startswith(name) or name.startswith(e["name"])]
+    n = _squash(name)
+    return [e for e in mics if _squash(e["name"]).startswith(n)
+            or n.startswith(_squash(e["name"]))]
 
 
 def _match(name: str, active: list[dict]) -> str | None:
     for e in active:
         if e["name"] == name:
+            return e["guid"]
+    for e in active:
+        if _squash(e["name"]) == _squash(name):
             return e["guid"]
     near = _near(name, active)
     # one mic only: two that start the same (a cut-short name) could be the wrong one

@@ -2175,6 +2175,33 @@ def test_a_cut_short_name_two_mics_share_picks_neither(monkeypatch):
     assert dm.endpoint_for("Headset Microphone (USB") == "{c}"
 
 
+def test_a_name_spaced_or_cased_differently_still_finds_the_mic(monkeypatch):
+    mics = [{"guid": "{a}", "name": "Microphone  (USB Audio)", "active": True}]
+    monkeypatch.setattr(dm, "capture_endpoints", lambda: mics)
+    monkeypatch.setattr(dm, "_engine_name", lambda name: None)
+    assert dm.mic_lookup("microphone (usb audio)") == ("{a}", "")
+
+
+def test_the_mic_the_engine_opened_is_the_one_set_up(monkeypatch):
+    # the meter showed the mic working while the set-up said it wasn't plugged in:
+    # the engine had opened it under a looser match than the set-up's
+    mics = [{"guid": "{a}", "name": "Microphone (2- USB Audio)", "active": True},
+            {"guid": "{b}", "name": "Line In (Realtek Audio)", "active": True}]
+    monkeypatch.setattr(dm, "capture_endpoints", lambda: mics)
+    monkeypatch.setattr(dm, "_engine_name", lambda name: "Microphone (2- USB Audio)")
+    assert dm.mic_lookup("USB Audio") == ("{a}", "")
+    monkeypatch.setattr(dm, "_engine_name", lambda name: None)   # nothing opened: as before
+    assert dm.mic_lookup("USB Audio") == (None, "gone")
+
+
+def test_a_mic_the_engine_cant_place_on_one_endpoint_isnt_guessed(monkeypatch):
+    mics = [{"guid": "{a}", "name": "Microphone (USB Audio)", "active": True},
+            {"guid": "{b}", "name": "Microphone (USB  Audio)", "active": True}]
+    monkeypatch.setattr(dm, "capture_endpoints", lambda: mics)
+    monkeypatch.setattr(dm, "_engine_name", lambda name: "Microphone (USB Audio)")
+    assert dm.mic_lookup("USB")[0] is None
+
+
 # ---------------------------------------------------------------------- the data folder
 # The admin step writes into %ProgramData%, where anyone signed in can make folders:
 # it must never be steered through a link someone planted there.
