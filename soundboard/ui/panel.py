@@ -628,6 +628,7 @@ def fold_button(text: str, body: QWidget | None = None) -> QPushButton:
     b = QPushButton(text)
     b.setObjectName("fold")
     b.setCheckable(True)
+    b.toggled.connect(lambda _on: paint_once_settled(b))   # first: before anything grows
     icons.set_icon(b, "fold", "muted", "text", size=12)
     b.toggled.connect(lambda on: icons.set_icon(b, "fold_open" if on else "fold", "muted",
                                                 "text", size=12))
@@ -635,6 +636,25 @@ def fold_button(text: str, body: QWidget | None = None) -> QPushButton:
         body.hide()
         b.toggled.connect(body.setVisible)
     return b
+
+
+def paint_once_settled(w: QWidget):
+    """Draw `w`'s window again only once the change just made has been laid out. A fold
+    opening in a scrolling page is laid out twice: first in the page's old height (the
+    cards above squashed, Devices jumping ~150 px up), then in its new one. Each pass was
+    drawn, so the cards flashed out of place for a moment."""
+    top = w.window()
+    if not top.updatesEnabled():   # already waiting
+        return
+    top.setUpdatesEnabled(False)
+
+    def done():
+        # the new parts get their style (and so their size), then the card → column →
+        # page → scroll area are laid out again, one level per pass
+        for _pass in range(6):
+            QApplication.sendPostedEvents()
+        top.setUpdatesEnabled(True)
+    QTimer.singleShot(0, top, done)   # after the other toggled slots fill it
 
 
 def reset_button(tip: str, *, hover: bool = True) -> QPushButton:

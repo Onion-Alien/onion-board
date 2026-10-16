@@ -78,7 +78,7 @@ def test_the_tick_reads_on_a_worker(window, monkeypatch, qapp):
     window.alertctl._discord_tick()
     assert process_events(qapp, lambda: window.alertctl.discord_found)
     assert window.alertctl.discord_problems() == [dc.STUDIO]
-    # the window's own poll timer may start another read meanwhile: wait it out
+    # (the start-up tick, 3 s after the window, can land meanwhile on a slow runner)
     assert process_events(qapp, lambda: not window.alertctl._discord_reading)
 
 
