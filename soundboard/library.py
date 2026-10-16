@@ -1337,6 +1337,15 @@ MIGRATIONS = {1: _migrate_1_to_2, 2: _migrate_2_to_3, 3: _migrate_3_to_4}
 
 # --------------------------------------------------------------------------- decoding
 
+def _is_file(p: Path) -> bool:
+    """Path.is_file, but False when Windows can't look at it: a WinGet link it can't
+    follow raised OSError out of the FFmpeg check (2.2.0)."""
+    try:
+        return p.is_file()
+    except OSError:
+        return False
+
+
 def _ffmpeg() -> str | None:
     """The app's own FFmpeg (ffmpegget downloads it there when winget can't fix one),
     else ffmpeg on PATH, or where winget links it (the installer's M4A/video option uses
@@ -1345,7 +1354,7 @@ def _ffmpeg() -> str | None:
     the package's bin folder on the user's PATH instead, so that folder is looked in too
     (the app the installer opens would otherwise call a fine FFmpeg broken)."""
     own = APP_DIR / "ffmpeg" / "bin" / "ffmpeg.exe"
-    if os.name == "nt" and own.is_file():
+    if os.name == "nt" and _is_file(own):
         return str(own)
     found = shutil.which("ffmpeg")
     if found:
@@ -1356,11 +1365,11 @@ def _ffmpeg() -> str | None:
         if not base:
             continue
         link = Path(base) / sub / "Links" / "ffmpeg.exe"
-        if link.is_file():
+        if _is_file(link):
             return str(link)
         try:   # Packages\Gyan.FFmpeg.Essentials_<source>\ffmpeg-<version>-essentials_build\bin
             for exe in (Path(base) / sub / "Packages").glob("Gyan.FFmpeg*/*/bin/ffmpeg.exe"):
-                if exe.is_file():
+                if _is_file(exe):
                     return str(exe)
         except OSError:
             pass

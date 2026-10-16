@@ -80,6 +80,7 @@ else:
         np = None         # it only runs the admin part, which never needs it
 
 from soundboard.i18n import _
+from soundboard.pollthread import PollThread
 
 log = logging.getLogger(__name__)
 
@@ -864,6 +865,9 @@ def installed_on() -> list[str]:
 _status_cache: dict = {}
 _status_gen = [0]          # forget_status() bumps it: a refresh started before is dropped
 _status_busy: set = set()  # mic names being re-checked on a thread
+# One thread kept for the re-checks: starting a new one each time made the window wait
+# in Thread.start until Windows had it running (a 2.2.1 freeze)
+_status_poll = PollThread("mic-effect-status")
 _status_lock = threading.Lock()
 _unplugged: dict = {}   # mic name -> unplugged at the last status() check
 STATUS_S = 2.0
@@ -898,8 +902,8 @@ def status(mic_name: str | None = None) -> str:
         if hit:
             if mic_name not in _status_busy:
                 _status_busy.add(mic_name)
-                threading.Thread(target=_refresh_status, args=(mic_name, _status_gen[0]),
-                                 daemon=True, name="mic-effect-status").start()
+                gen = _status_gen[0]
+                _status_poll.run(lambda: _refresh_status(mic_name, gen))
             return hit[1]
         gen = _status_gen[0]
     result = _status(mic_name)

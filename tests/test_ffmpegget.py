@@ -202,6 +202,23 @@ def test_library_finds_wingets_copy_without_a_link(monkeypatch, tmp_path):
     assert library._ffmpeg() == str(exe)
 
 
+def test_library_skips_a_winget_link_windows_cant_look_at(monkeypatch, tmp_path):
+    """2.2.0: is_file() on a WinGet link Windows couldn't follow raised OSError out of
+    the FFmpeg check; it counts as not there."""
+    monkeypatch.setattr(library, "APP_DIR", tmp_path / "app")
+    monkeypatch.setattr(library.shutil, "which", lambda name: None)
+    monkeypatch.setenv("LOCALAPPDATA", str(tmp_path))
+    monkeypatch.delenv("ProgramFiles", raising=False)
+    real = library.Path.is_file
+
+    def is_file(self):
+        if self.name == "ffmpeg.exe" and self.parent.name == "Links":
+            raise OSError(22, "The file cannot be accessed by the system")
+        return real(self)
+    monkeypatch.setattr(library.Path, "is_file", is_file)
+    assert library._ffmpeg() is None
+
+
 def test_why_not(monkeypatch):
     assert ffmpegget.why_not() == ""
     net.configure_features(["ffmpeg_download"], offline=False)
