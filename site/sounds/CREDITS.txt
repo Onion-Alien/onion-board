@@ -1,3 +1,33 @@
-hoot.mp3: "owl.wav" by Anthousai, CC0 (public domain).
+All sounds here are CC0 (public domain): free to use, no credit needed. Credited anyway.
+Each was trimmed, faded and evened out in loudness.
+
+hoot.mp3: "owl.wav" by Anthousai, CC0.
 https://freesound.org/people/Anthousai/sounds/398734/
 Trimmed to two hoots and cleaned of background hiss.
+
+horn.mp3 (Air horn): "Airhorn" by jacksonacademyashmore, CC0.
+https://freesound.org/people/jacksonacademyashmore/sounds/414208/
+
+boom.mp3 (Vine boom): "Big Boom" by unfa, CC0.
+https://freesound.org/people/unfa/sounds/189779/
+
+buzzer.mp3 (Wrong buzzer): "Wrong Answer" by -Andreas, CC0.
+https://freesound.org/people/-Andreas/sounds/648462/
+
+rimshot.mp3 (Ba dum tss): "Ba-dum tss" by SoundMaker25, CC0.
+https://freesound.org/people/SoundMaker25/sounds/534937/
+
+laser.mp3 (Laser): "laser6" from "Digital Audio" by Kenney, CC0.
+https://kenney.nl/assets/digital-audio
+
+trombone.mp3 (Sad trombone): "wah wah sad trombone.wav" by kirbydx, CC0.
+https://freesound.org/people/kirbydx/sounds/175409/
+
+clap.mp3 (Applause): "Large crowd applause.wav" by Bansemer, CC0.
+https://freesound.org/people/Bansemer/sounds/160493/
+
+coin.mp3 (Coin): "coin.wav" by rigor789, CC0.
+https://freesound.org/people/rigor789/sounds/341979/
+
+drop.mp3 (Bass drop): "Wicked Bass Drop" by ani_music, CC0.
+https://freesound.org/people/ani_music/sounds/165320/
