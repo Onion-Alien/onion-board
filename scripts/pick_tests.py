@@ -26,8 +26,10 @@ ruff and the other quick checks; with -Tests these tests too.
 picked files split into jobs of about the same length by test_times.json (each
 file's seconds in a full run): one per JOB_S of tests, SHARDS at most, or none.
 
---refresh-times DIR rewrites test_times.json from the JUnit reports in DIR (every test
-job keeps one: `gh run download <run> -p "times-*" -D DIR`, a run of the whole suite).
+--refresh-times DIR [DIR...] rewrites test_times.json from the JUnit reports in each DIR
+(every test job keeps one: `gh run download <run> -p "times-*" -D DIR`, one DIR a run of
+the whole suite). With a few runs each file gets its average: one file took 418 s in one
+run and 164 s in the next, so one run's times split the jobs unevenly.
 """
 from __future__ import annotations
 
@@ -248,14 +250,17 @@ def main(argv: list[str]) -> int:
     flags = {a for a in argv[1:] if a.startswith("--")}
     args = [a for a in argv[1:] if not a.startswith("--")]
     if "--refresh-times" in flags:
-        reports = sorted(Path(args[0]).rglob("*.xml")) if args else []
-        if not reports:
-            print("usage: pick_tests.py --refresh-times DIR (DIR: the runs' JUnit reports)")
+        runs = [refresh_times(r) for a in args if (r := sorted(Path(a).rglob("*.xml")))]
+        if not runs:
+            print("usage: pick_tests.py --refresh-times DIR [DIR...] (DIR: a run's JUnit "
+                  "reports)")
             return 2
-        times = refresh_times(reports)
+        files = sorted(set().union(*runs))
+        times = {f: round(sum(run[f] for run in runs if f in run)
+                          / sum(f in run for run in runs), 1) for f in files}
         TIMES.write_text(json.dumps(times, indent=0) + "\n", encoding="utf-8")
-        print(f"{len(times)} files, {sum(times.values()):.0f} s in all, from "
-              f"{len(reports)} report(s)")
+        print(f"{len(times)} files, {sum(times.values()):.0f} s in all, the average of "
+              f"{len(runs)} run(s)")
         return 0
     base = args[0] if args else "origin/main"
     picked = ["tests"] if base == "all" else pick(changed_files(base, "--local" in flags))
