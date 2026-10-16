@@ -3501,5 +3501,10 @@
   "Discord's noise suppression, echo cancellation and automatic volume go back on the way you had them, so your plain voice sounds right without Onion Board. If Discord is still open, it's done the moment you close it.": "A Discord zajszűrése, visszhangszűrése és automatikus hangereje visszaáll, ahogy volt, így a sima hangod jól szól Onion Board nélkül is. Ha a Discord még nyitva van, akkor abban a pillanatban történik, amikor bezárod.",
   "Onion Board turns its voice clean-up back on as soon as you close Discord. To talk clearly right now, click here and turn on Noise Suppression, Echo Cancellation and Automatic Gain Control.": "Az Onion Board visszakapcsolja a hangtisztítást, amint bezárod a Discordot. Hogy most rögtön tisztán beszélj, kattints ide, és kapcsold be a zajszűrést, a visszhangszűrést és az automatikus erősítésszabályzást.",
   "Put Discord back for talking on close": "Bezáráskor a Discord vissza beszédre",
-  "Starter": "Kezdő"
+  "Starter": "Kezdő",
+  "<span style='color:{red}'>Couldn't load what's trending on Myinstants: {err}</span>": "<span style='color:{red}'>Nem sikerült betölteni a Myinstants népszerű hangjait: {err}</span>",
+  "Loading what's trending on Myinstants…": "A Myinstants népszerű hangjainak betöltése…",
+  "Nothing is trending on Myinstants right now.": "Most semmi sem népszerű a Myinstantson.",
+  "The meme sounds people play most on Myinstants right now": "A mémhangok, amelyeket most a legtöbben játszanak le a Myinstantson",
+  "Trending on Myinstants": "Népszerű a Myinstantson"
 }

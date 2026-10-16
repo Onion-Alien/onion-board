@@ -725,6 +725,8 @@ SOURCES = {"youtube": ("YouTube", "ytsearch"),
            "myinstants": ("Myinstants", "myinstants")}
 TIKTOK_SUFFIX = " tiktok sound"
 MYINSTANTS = "https://www.myinstants.com"
+# redirects to the trending page of the visitor's country (/en/trending/us/…)
+TRENDING = MYINSTANTS + "/en/trending/"
 BROWSER_HEADERS = {   # Myinstants' Cloudflare turns away urllib's default User-Agent
     "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 "
                   "(KHTML, like Gecko) Chrome/140.0 Safari/537.36",
@@ -801,9 +803,27 @@ def search(query: str, count: int = 20, source: str = "youtube",
     return out[:count]
 
 
+def trending(count: int = 20, direct: bool = False, start: int = 1) -> list[Result]:
+    """What's trending on Myinstants right now (the search button's *Trending on
+    Myinstants*): hits `start` to `count` of its trending page, the one for the
+    visitor's country (the site picks it from the address it sees, so a Tor exit's in
+    Tor mode). Raises like search."""
+    _gate("myinstants")
+    url = TRENDING
+    if direct:
+        return _myinstants_page(url, count, direct=True)[start - 1:]
+    return _over_tor(lambda: _myinstants_page(url, count), MYINSTANTS)[start - 1:]
+
+
 def _myinstants(query: str, count: int, direct: bool = False) -> list[Result]:
     """Myinstants' search page, read for its sound buttons (title + MP3 path)."""
-    url = f"{MYINSTANTS}/en/search/?name={urllib.parse.quote_plus(query)}"
+    return _myinstants_page(f"{MYINSTANTS}/en/search/?name={urllib.parse.quote_plus(query)}",
+                            count, direct)
+
+
+def _myinstants_page(url: str, count: int, direct: bool = False) -> list[Result]:
+    """A Myinstants page of sound buttons (search or trending), read for each one's
+    title and MP3 path."""
     try:
         req = urllib.request.Request(url, headers=BROWSER_HEADERS)
         with net.urlopen(req, timeout=20, feature=f"{FEATURE}.myinstants",

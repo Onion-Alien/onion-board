@@ -3501,5 +3501,10 @@
   "Discord's noise suppression, echo cancellation and automatic volume go back on the way you had them, so your plain voice sounds right without Onion Board. If Discord is still open, it's done the moment you close it.": "Rauschunterdrückung, Echounterdrückung und automatische Lautstärke in Discord kommen zurück, wie du sie hattest, damit deine normale Stimme ohne Onion Board gut klingt. Ist Discord noch offen, passiert es, sobald du es schließt.",
   "Onion Board turns its voice clean-up back on as soon as you close Discord. To talk clearly right now, click here and turn on Noise Suppression, Echo Cancellation and Automatic Gain Control.": "Onion Board schaltet die Sprachbereinigung wieder ein, sobald du Discord schließt. Um jetzt sofort klar zu reden: hier klicken und Rauschunterdrückung, Echounterdrückung und automatische Verstärkungsregelung einschalten.",
   "Put Discord back for talking on close": "Discord beim Schließen aufs Reden zurückstellen",
-  "Starter": "Start"
+  "Starter": "Start",
+  "<span style='color:{red}'>Couldn't load what's trending on Myinstants: {err}</span>": "<span style='color:{red}'>Konnte nicht laden, was auf Myinstants angesagt ist: {err}</span>",
+  "Loading what's trending on Myinstants…": "Lade, was auf Myinstants angesagt ist…",
+  "Nothing is trending on Myinstants right now.": "Auf Myinstants ist gerade nichts angesagt.",
+  "The meme sounds people play most on Myinstants right now": "Die Meme-Sounds, die gerade am meisten auf Myinstants abgespielt werden",
+  "Trending on Myinstants": "Angesagt auf Myinstants"
 }

@@ -180,9 +180,10 @@ FEATURES = ("add-files", "youtube", "record", "clip", "clip-editor", "import-boa
             # the side rail: Ctrl+1-9 / Ctrl+Tab, the version clicked for What's new,
             # kept shut (features_now)
             "tab-keys", "whats-new", "rail-shut",
-            # Show more under web search results; a pad's Edit: Effects tab, a picture
-            # from a file or a link
-            "search-show-more", "pad-effects", "pad-picture-file", "pad-picture-link",
+            # Show more under web search results, Trending on Myinstants opened; a pad's
+            # Edit: Effects tab, a picture from a file or a link
+            "search-show-more", "search-trending", "pad-effects", "pad-picture-file",
+            "pad-picture-link",
             # the Triggers tab (the Onion Watch add-on) says which of its features were
             # used or are set up (triggershost.BoardHost.count): onionwatch/usage.py's
             # FEATURES, keep in step

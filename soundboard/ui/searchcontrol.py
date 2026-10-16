@@ -73,6 +73,17 @@ class SearchControl(Controller):
         mw.fitctl._results_open = True
         mw.fitctl._sync_cat_bar()
 
+    def show_trending(self):
+        """The search button's *Trending on Myinstants*: its trending sounds take the
+        pads' place, like a search's results."""
+        mw = self.mw
+        if mw.fitctl.is_mini() or not mw.ytresults.show_trending():
+            return
+        mw._pads_scroll.hide()
+        mw.catctl._cat_row.hide()
+        mw.fitctl._results_open = True
+        mw.fitctl._sync_cat_bar()
+
     def on_search_enter(self):
         mw = self.mw
         self.flush_search()   # a link pasted a moment ago: the link bar has it now

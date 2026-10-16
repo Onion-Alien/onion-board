@@ -3501,5 +3501,10 @@
   "Discord's noise suppression, echo cancellation and automatic volume go back on the way you had them, so your plain voice sounds right without Onion Board. If Discord is still open, it's done the moment you close it.": "Ruisonderdrukking, echo-onderdrukking en automatisch volume in Discord gaan terug zoals je ze had, zodat je gewone stem goed klinkt zonder Onion Board. Is Discord nog open, dan gebeurt het zodra je hem sluit.",
   "Onion Board turns its voice clean-up back on as soon as you close Discord. To talk clearly right now, click here and turn on Noise Suppression, Echo Cancellation and Automatic Gain Control.": "Onion Board zet de stemopschoning weer aan zodra je Discord sluit. Om nu meteen duidelijk te praten: klik hier en zet ruisonderdrukking, echo-onderdrukking en automatische versterkingsregeling aan.",
   "Put Discord back for talking on close": "Discord bij sluiten terugzetten voor praten",
-  "Starter": "Start"
+  "Starter": "Start",
+  "<span style='color:{red}'>Couldn't load what's trending on Myinstants: {err}</span>": "<span style='color:{red}'>Kon niet laden wat er trending is op Myinstants: {err}</span>",
+  "Loading what's trending on Myinstants…": "Laden wat er trending is op Myinstants…",
+  "Nothing is trending on Myinstants right now.": "Er is nu niets trending op Myinstants.",
+  "The meme sounds people play most on Myinstants right now": "De meme-geluiden die mensen nu het meest afspelen op Myinstants",
+  "Trending on Myinstants": "Trending op Myinstants"
 }

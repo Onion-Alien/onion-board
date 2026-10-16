@@ -3501,5 +3501,10 @@
   "Discord's noise suppression, echo cancellation and automatic volume go back on the way you had them, so your plain voice sounds right without Onion Board. If Discord is still open, it's done the moment you close it.": "Η καταστολή θορύβου, η ακύρωση ηχούς και η αυτόματη ένταση του Discord επιστρέφουν όπως τις είχες, ώστε η απλή φωνή σου να ακούγεται σωστά χωρίς το Onion Board. Αν το Discord είναι ακόμα ανοιχτό, γίνεται μόλις το κλείσεις.",
   "Onion Board turns its voice clean-up back on as soon as you close Discord. To talk clearly right now, click here and turn on Noise Suppression, Echo Cancellation and Automatic Gain Control.": "Το Onion Board ξανανάβει τον καθαρισμό φωνής μόλις κλείσεις το Discord. Για να μιλάς καθαρά τώρα, κάνε κλικ εδώ και άναψε την καταστολή θορύβου, την ακύρωση ηχούς και τον αυτόματο έλεγχο απολαβής.",
   "Put Discord back for talking on close": "Επαναφορά του Discord για ομιλία στο κλείσιμο",
-  "Starter": "Εκκίνηση"
+  "Starter": "Εκκίνηση",
+  "<span style='color:{red}'>Couldn't load what's trending on Myinstants: {err}</span>": "<span style='color:{red}'>Δεν φορτώθηκαν τα δημοφιλή του Myinstants: {err}</span>",
+  "Loading what's trending on Myinstants…": "Φόρτωση των δημοφιλών στο Myinstants…",
+  "Nothing is trending on Myinstants right now.": "Τίποτα δεν είναι δημοφιλές στο Myinstants αυτή τη στιγμή.",
+  "The meme sounds people play most on Myinstants right now": "Οι ήχοι meme που παίζουν περισσότερο στο Myinstants αυτή τη στιγμή",
+  "Trending on Myinstants": "Δημοφιλή στο Myinstants"
 }

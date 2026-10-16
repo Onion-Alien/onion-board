@@ -3501,5 +3501,10 @@
   "Discord's noise suppression, echo cancellation and automatic volume go back on the way you had them, so your plain voice sounds right without Onion Board. If Discord is still open, it's done the moment you close it.": "Babalik ang noise suppression, echo cancellation at awtomatikong volume ng Discord gaya ng dati mo, para tama ang tunog ng boses mo kahit walang Onion Board. Kung bukas pa ang Discord, gagawin ito pagkasara mo rito.",
   "Onion Board turns its voice clean-up back on as soon as you close Discord. To talk clearly right now, click here and turn on Noise Suppression, Echo Cancellation and Automatic Gain Control.": "Bubuksan ulit ng Onion Board ang paglilinis ng boses pagkasara mo ng Discord. Para malinaw kang magsalita ngayon, i-click dito at buksan ang Noise Suppression, Echo Cancellation at Automatic Gain Control.",
   "Put Discord back for talking on close": "Ibalik ang Discord para sa pag-uusap pagsara",
-  "Starter": "Panimula"
+  "Starter": "Panimula",
+  "<span style='color:{red}'>Couldn't load what's trending on Myinstants: {err}</span>": "<span style='color:{red}'>Hindi ma-load ang trending sa Myinstants: {err}</span>",
+  "Loading what's trending on Myinstants…": "Nilo-load ang trending sa Myinstants…",
+  "Nothing is trending on Myinstants right now.": "Walang trending sa Myinstants ngayon.",
+  "The meme sounds people play most on Myinstants right now": "Ang mga meme sound na pinakamaraming pinapatugtog sa Myinstants ngayon",
+  "Trending on Myinstants": "Trending sa Myinstants"
 }

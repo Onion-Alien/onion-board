@@ -3424,5 +3424,10 @@
   "Discord's noise suppression, echo cancellation and automatic volume go back on the way you had them, so your plain voice sounds right without Onion Board. If Discord is still open, it's done the moment you close it.": "Discord 的噪音抑制、回声消除和自动音量会恢复成你原来的样子，这样不用 Onion Board 时你的声音也正常。如果 Discord 还开着，会在你关闭它的那一刻恢复。",
   "Onion Board turns its voice clean-up back on as soon as you close Discord. To talk clearly right now, click here and turn on Noise Suppression, Echo Cancellation and Automatic Gain Control.": "你一关闭 Discord，Onion Board 就会重新打开语音清理。想现在就说话清楚，点这里，打开噪音抑制、回声消除和自动增益控制。",
   "Put Discord back for talking on close": "关闭时把 Discord 恢复成聊天设置",
-  "Starter": "入门"
+  "Starter": "入门",
+  "<span style='color:{red}'>Couldn't load what's trending on Myinstants: {err}</span>": "<span style='color:{red}'>无法加载 Myinstants 热门：{err}</span>",
+  "Loading what's trending on Myinstants…": "正在加载 Myinstants 热门…",
+  "Nothing is trending on Myinstants right now.": "Myinstants 上现在没有热门内容。",
+  "The meme sounds people play most on Myinstants right now": "此刻 Myinstants 上播放最多的梗音效",
+  "Trending on Myinstants": "Myinstants 热门"
 }
