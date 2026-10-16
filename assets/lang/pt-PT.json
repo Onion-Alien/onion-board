@@ -3483,5 +3483,7 @@
   "{n} popular station: search, or click a station to play it.": [
     "{n} estação popular: pesquise ou clique numa estação para reproduzi-la.",
     "{n} estações populares: pesquise ou clique numa estação para reproduzi-la."
-  ]
+  ],
+  "Evens out your voice, loud or quiet, so friends don't have to keep turning you up and down. Your voice chat's own automatic volume can then stay off: it cuts up your sounds.": "Nivela a tua voz, alta ou baixa, para os amigos não terem de te estar sempre a aumentar e a baixar. O volume automático do teu chat de voz pode ficar desligado: corta os teus sons.",
+  "Keep my voice at one volume": "Manter a minha voz num só volume"
 }

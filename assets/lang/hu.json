@@ -3483,5 +3483,7 @@
   "{n} popular station: search, or click a station to play it.": [
     "{n} népszerű állomás: keressen, vagy kattintson egy állomásra a lejátszáshoz.",
     "{n} népszerű állomás: keressen, vagy kattintson egy állomásra a lejátszáshoz."
-  ]
+  ],
+  "Evens out your voice, loud or quiet, so friends don't have to keep turning you up and down. Your voice chat's own automatic volume can then stay off: it cuts up your sounds.": "Kiegyenlíti a hangodat, akár hangos, akár halk, így a barátaidnak nem kell folyton fel-le tekerniük. A hangcsevegő saját automatikus hangereje így kikapcsolva maradhat: az szétszabdalja a hangjaidat.",
+  "Keep my voice at one volume": "A hangom maradjon egy hangerőn"
 }
