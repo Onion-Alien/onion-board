@@ -269,7 +269,7 @@ account or anything else about you.
     `ai-voice-favorite`, `ai-voice-hear`, `ai-voice-made`): never which voice, its name
     or its code;
   - *Free packs* opened, a sample heard and which built-in pack was added
-    (`used/packs-opened`, `pack-heard`, `pack-added-streamer`, `-esports`, `-podcast`,
+    (`used/packs-opened`, `pack-heard`, `pack-added-streamer`, `-esports`, `-general`, `-podcast`,
     `-halloween`, `-gm-starter`, or `-other` for a newer one); a colour from the colour
     wheel (`used/custom-colour`: never the colour); Settings' *Show advanced* and which
     of its pages were looked at (`used/settings-advanced`, `settings-page-audio`,
