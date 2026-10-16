@@ -109,10 +109,11 @@ def test_upload_sends_the_agreement(fake, tmp_path):
 
 
 def test_rail_shows_store_before_setup():
-    assert TAB_KEYS[-1] == "store"   # older configs' saved tab numbers still fit
-    assert rail_order([]) == ["sounds", "radio", "apps", "triggers", "voice", "store", "setup"]
+    assert TAB_KEYS[-2:] == ("store", "chat")   # older configs' saved tab numbers still fit
+    assert rail_order([]) == ["sounds", "radio", "apps", "triggers", "voice", "store", "chat",
+                              "setup"]
     dragged = ["voice", "sounds", "setup", "radio", "apps", "triggers"]
-    assert rail_order(dragged) == ["voice", "sounds", "store", "setup", "radio", "apps",
+    assert rail_order(dragged) == ["voice", "sounds", "store", "chat", "setup", "radio", "apps",
                                    "triggers"]
     assert rail_order([*dragged, "store", "gone"])[-1] == "store"   # dragged last: kept
 
@@ -203,7 +204,7 @@ def test_store_tab_in_the_window(window, qapp, tmp_path):
     i = TAB_INDEX["store"]
     assert isinstance(window.store, storetab.StoreTab) and window.tabs.isTabVisible(i)
     order = [b.index for b in window.rail.buttons]
-    assert order.index(i) == order.index(TAB_INDEX["setup"]) - 1
+    assert order.index(i) == order.index(TAB_INDEX["setup"]) - 2   # Chat sits between
     window.tabctl.set_tab_on("store", False)
     assert not isinstance(window.store, storetab.StoreTab)
     window.tabctl.set_tab_on("store", True)

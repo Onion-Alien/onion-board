@@ -99,7 +99,7 @@ HEARD_ALIASES = {"yt": "youtube", "you tube": "youtube", "youtube.com": "youtube
 HEARD_MAX = 24   # characters of a typed answer, after tidying
 TIMEOUT_S = 15
 # the tabs whose use is counted (tabcontrol.TAB_KEYS); anything else is never sent
-TABS = ("sounds", "radio", "apps", "triggers", "voice", "setup", "store")
+TABS = ("sounds", "radio", "apps", "triggers", "voice", "setup", "store", "chat")
 RUNNING = "running.txt"     # in the app folder while the app runs (mark_running)
 MAX_PROBLEMS = 10           # problem events per send: a bug in a loop isn't 1000 hits
 VERSION_RE = r"[0-9][0-9A-Za-z.\-]{0,20}"
@@ -146,10 +146,14 @@ FEATURES = ("add-files", "youtube", "record", "clip", "clip-editor", "import-boa
             # + More tabs: opened it, added a tab from it, or closed it adding none; and
             # a tab hidden from its right-click menu
             "more-tabs-opened", "more-tabs-closed",
-            *(f"more-tabs-added-{k}" for k in ("radio", "apps", "triggers", "voice", "store")),
-            *(f"tab-hidden-{k}" for k in ("radio", "apps", "triggers", "voice", "store")),
+            *(f"more-tabs-added-{k}" for k in ("radio", "apps", "triggers", "voice", "store",
+                                               "chat")),
+            *(f"tab-hidden-{k}" for k in ("radio", "apps", "triggers", "voice", "store",
+                                          "chat")),
             # the Store tab: a sound heard, added to the board, voted on, or shared
             "store-heard", "store-added", "store-voted", "store-shared",
+            # the Chat tab: the rules accepted, a first message said
+            "chat-joined", "chat-said",
             # the first start's "What's it for?" answer (setupwizard.uses keys), or
             # the guide closed on that page
             *(f"use-{k}" for k in ("normal", "streamer", "games", "all", "skipped")),

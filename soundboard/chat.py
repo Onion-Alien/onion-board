@@ -58,7 +58,8 @@ def parse(raw) -> tuple[list[Message], int, bool]:
     if not isinstance(raw, dict):
         return [], 0, False
     out = []
-    for d in raw.get("messages") if isinstance(raw.get("messages"), list) else []:
+    items = raw.get("messages")
+    for d in items if isinstance(items, list) else []:
         try:
             m = Message(id=int(d["id"]), t=int(d.get("t") or 0), user=str(d.get("u") or "")[:16],
                         name=str(d["name"]).strip()[:40], text=str(d["text"]).strip()[:MAX_LEN])
