@@ -88,3 +88,16 @@ def test_imports_inside_functions_and_by_name_are_followed(tmp_path, monkeypatch
     assert pick_tests.pick(["soundboard/theme.py"]) == [
         "tests/test_byname.py", "tests/test_method.py"]
     assert pick_tests.pick(["soundboard/lazy.py"]) == ["tests/test_byname.py"]
+
+
+def test_times_come_from_the_runs_junit_reports(tmp_path):
+    (tmp_path / "times-0").mkdir()
+    (tmp_path / "times-0" / "junit.xml").write_text(
+        '<testsuites><testsuite>'
+        '<testcase classname="tests.test_a" name="test_x" time="1.25"/>'
+        '<testcase classname="tests.test_a.TestIt" name="test_y" time="0.5"/>'
+        '<testcase classname="tests.test_b" name="test_z[1]" time="2"/>'
+        '</testsuite></testsuites>', encoding="utf-8")
+    reports = sorted(tmp_path.rglob("*.xml"))
+    assert pick_tests.refresh_times(reports) == {"tests/test_a.py": 1.8,
+                                                 "tests/test_b.py": 2.0}
