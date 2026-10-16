@@ -13,8 +13,8 @@ import weakref
 import shiboken6
 
 from PySide6.QtCore import QBuffer, QByteArray, QPointF, QRectF, QSize, Qt
-from PySide6.QtGui import (QColor, QFont, QFontMetricsF, QIcon, QIconEngine, QImage, QPainter,
-                           QPainterPath, QPen, QPixmap, QTextDocument, QTransform)
+from PySide6.QtGui import (QColor, QFont, QFontInfo, QFontMetricsF, QIcon, QIconEngine, QImage,
+                           QPainter, QPainterPath, QPen, QPixmap, QTextDocument, QTransform)
 
 from soundboard import theme
 
@@ -1142,11 +1142,14 @@ def _mark_lift(font: QFont, size: int) -> int:
     with the middle of `font`'s capitals. Rich text's "vertical-align: middle" centres
     an image on the font's own box, which sits lower in some fonts than others
     (Bahnschrift, the default, dropped the tick 4 px under its words), so it's measured:
-    "H" and the mark laid out together, once per font."""
-    key = (font.key(), size)
+    "H" and the mark laid out together, once per font. The key holds the font Qt
+    really draws with and its measures, not only the name asked for: a name can stand
+    for another font later (one added or removed while the app runs, a fallback)."""
+    fm = QFontMetricsF(font)
+    key = (font.key(), QFontInfo(font).family(), fm.ascent(), fm.descent(), size)
     if key in _lift:
         return _lift[key]
-    cap = QFontMetricsF(font).horizontalAdvance("H")
+    cap = fm.horizontalAdvance("H")
     best, best_off = 0, None
     for pad in range(size):
         pm = QPixmap(size, size + pad)
