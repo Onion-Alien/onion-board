@@ -259,12 +259,19 @@ jobs:
 
   # The mic effect (native/directmic/, the C++ Windows' audio engine runs): the test
   # jobs skip its end-to-end tests, which need the effect and its test hosts built.
-  # Here they're built with the runner's MinGW, checked (scripts/check_directmic.py:
-  # warnings as errors, GCC's analyzer, cppcheck), run (tests/test_directmic.py), and
-  # fuzzed for a minute. Only when the pick job says the change touches it.
+  # Here they're built with the runner's MinGW, in two jobs side by side: "tests" runs
+  # them (the `host` tests of tests/test_directmic.py; the test jobs run the rest of
+  # it), "checks" checks the C++ (scripts/check_directmic.py: warnings as errors, GCC's
+  # analyzer, cppcheck) and fuzzes it for a minute. Only when the pick job says the
+  # change touches it.
   mic-effect:
     needs: pick
     if: ${{ needs.pick.result == 'success' && needs.pick.outputs.mic == 'true' }}
+    name: mic-effect   # GitHub adds the part: "mic-effect (tests)"
+    strategy:
+      fail-fast: false
+      matrix:
+        part: [tests, checks]
     runs-on: windows-latest
     timeout-minutes: 20
     steps:
@@ -293,6 +300,7 @@ jobs:
       # straight from cppcheck's GitHub release: Chocolatey's feed times out now and
       # then, and the copy beside the image's g++ can't find its own std.cfg
       - name: cppcheck
+        if: matrix.part == 'checks'
         shell: pwsh
         run: |
           $v = '2.19.0'
@@ -304,19 +312,18 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
       - name: Check the C++
+        if: matrix.part == 'checks'
         run: .venv\Scripts\python scripts/check_directmic.py --need-cppcheck
       - name: Build
-        run: .venv\Scripts\python scripts/build_directmic.py --testhost --fuzz
+        run: .venv\Scripts\python scripts/build_directmic.py ${{ matrix.part == 'tests' && '--testhost --fuzz' || '--fuzz' }}
+      # one at a time (-n 0): side by side, the effect in its host misses real time
       - name: Tests (the real effect in the test host)
+        if: matrix.part == 'tests'
         env:
           QT_QPA_PLATFORM: offscreen
-        # -n 4: one file runs in one process by default (conftest), ~5 min for this one.
-        # The ones in the test host run alone after: side by side they miss real time.
-        run: |
-          .venv\Scripts\python -m pytest -n 4 -m "not host" --durations=10 --reruns 2 -rfER tests/test_directmic.py
-          if ($LASTEXITCODE) { exit 1 }
-          .venv\Scripts\python -m pytest -n 0 -m host --durations=10 --reruns 2 -rfER tests/test_directmic.py
+        run: .venv\Scripts\python -m pytest -n 0 -m host --durations=10 --reruns 2 -rfER tests/test_directmic.py
       - name: Fuzz (60 s)
+        if: matrix.part == 'checks'
         run: .venv\Scripts\python scripts/fuzz_directmic.py 60 2
 
   # The nightly's flaky tests (passed on a rerun) against the last nightly's: a new one

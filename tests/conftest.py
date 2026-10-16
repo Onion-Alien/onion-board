@@ -180,8 +180,9 @@ def pytest_configure(config):
                             "DLLs or processes); skipped on Linux and macOS")
     config.addinivalue_line("markers", "fonts: loads Windows' own fonts into Qt, which "
                             "changes every later test's text in that process: run last")
-    config.addinivalue_line("markers", "host: runs the real mic effect in its test host, "
-                            "in real time (CI's mic-effect job runs these one at a time)")
+    config.addinivalue_line("markers", "host: runs the real mic effect in its test or fuzz "
+                            "host (CI's mic-effect job builds them and runs these, one at a "
+                            "time: side by side they miss real time)")
 
 
 def pytest_collection_modifyitems(config, items):

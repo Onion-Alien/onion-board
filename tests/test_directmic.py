@@ -1751,8 +1751,13 @@ def test_a_header_gone_bad_puts_the_mic_back_until_it_is_right(ring_file):
 
 FUZZ_HOST = BUILD / "fuzzhost.exe"
 FUZZ_DLL = BUILD / "obmic_fuzz.dll"
-needs_fuzz = pytest.mark.skipif(not (FUZZ_HOST.is_file() and FUZZ_DLL.is_file()),
+_have_fuzz = pytest.mark.skipif(not (FUZZ_HOST.is_file() and FUZZ_DLL.is_file()),
                                 reason="run scripts/build_directmic.py --fuzz")
+
+
+def needs_fuzz(test):
+    """Skipped without the fuzz host; marked `host` (CI's mic-effect job runs these)."""
+    return pytest.mark.host(_have_fuzz(test))
 
 
 @needs_fuzz
