@@ -1,7 +1,11 @@
 """The tick and cross inside status text sit level with the words, in every theme's
 font, with a little space either side (Bahnschrift dropped them 4 px low)."""
+import os
+from pathlib import Path
+
+import pytest
 from PySide6.QtCore import Qt
-from PySide6.QtGui import QFont, QFontMetricsF, QImage, QPainter, QTextDocument
+from PySide6.QtGui import QFont, QFontDatabase, QFontMetricsF, QImage, QPainter, QTextDocument
 
 from soundboard.style.palettes import font_families
 from soundboard.ui import icons
@@ -34,3 +38,21 @@ def test_mark_is_level_with_the_words(qapp):
         cols = [x for x in range(split, img.width())
                 if any(img.pixelColor(x, y).alpha() > 128 for y in mark)]
         assert cols[0] - split >= icons._INLINE_GAP - 1, family   # not on the "H"
+
+
+def test_mark_is_measured_again_when_a_font_name_changes_font(qapp):
+    """A name can stand for another font later (one added while the app runs, then
+    removed): the tick is measured for the font really drawn, not the name's old one."""
+    path = Path(os.environ.get("WINDIR", "C:/Windows")) / "Fonts" / "comic.ttf"
+    if not path.is_file():
+        pytest.skip("no Comic Sans on this PC")
+    icons._lift.clear()   # measured fresh, as in a test run that met this font first
+    icons._inline.clear()
+    font_id = QFontDatabase.addApplicationFont(str(path))
+    try:
+        font = QFont("Comic Sans MS")
+        font.setPointSizeF(10)
+        icons.inline("check", "#13ce66", font=font)   # measured while it's there
+    finally:
+        QFontDatabase.removeApplicationFont(font_id)
+    test_mark_is_level_with_the_words(qapp)
