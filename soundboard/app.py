@@ -521,6 +521,11 @@ def _selftest_addon_cmd(rest: list[str]) -> int:
 # Its keys must be bootmark.ONE_OFF (main.py skips the breadcrumb for those):
 # tests/test_bootmark.py checks both, so add a new one-off command here, never as its
 # own `if` in main().
+def _discord_restore_cmd(rest):
+    from soundboard import discordtalk
+    return discordtalk.cli(rest)
+
+
 ONE_OFF_COMMANDS = {
     "--selftest": lambda rest: selftest(),
     "--get-tor": lambda rest: get_tor(),
@@ -530,6 +535,7 @@ ONE_OFF_COMMANDS = {
     "--usage-count": _usage_count_cmd,
     "--uninstall-count": lambda rest: uninstall_count(),
     "--selftest-addon": _selftest_addon_cmd,
+    "--discord-restore": _discord_restore_cmd,
 }
 
 

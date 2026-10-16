@@ -3485,5 +3485,9 @@
     "{n} populære stasjoner: søk, eller klikk på en stasjon for å spille den."
   ],
   "Evens out your voice, loud or quiet, so friends don't have to keep turning you up and down. Your voice chat's own automatic volume can then stay off: it cuts up your sounds.": "Jevner ut stemmen din, høy eller lav, så vennene dine slipper å skru deg opp og ned hele tiden. Talechattens eget automatiske volum kan da være av: det hakker opp lydene dine.",
-  "Keep my voice at one volume": "Hold stemmen min på ett volum"
+  "Keep my voice at one volume": "Hold stemmen min på ett volum",
+  "Discord is still set up for sounds": "Discord er fortsatt satt opp for lyder",
+  "Discord's noise suppression, echo cancellation and automatic volume go back on the way you had them, so your plain voice sounds right without Onion Board. If Discord is still open, it's done the moment you close it.": "Støydemping, ekkofjerning og automatisk volum i Discord kommer tilbake slik du hadde dem, så den vanlige stemmen din høres riktig ut uten Onion Board. Er Discord fortsatt åpen, skjer det idet du lukker den.",
+  "Onion Board turns its voice clean-up back on as soon as you close Discord. To talk clearly right now, click here and turn on Noise Suppression, Echo Cancellation and Automatic Gain Control.": "Onion Board slår stemmeopprydningen på igjen så snart du lukker Discord. For å snakke tydelig akkurat nå: klikk her og slå på støydemping, ekkofjerning og automatisk forsterkning.",
+  "Put Discord back for talking on close": "Sett Discord tilbake til prat ved lukking"
 }

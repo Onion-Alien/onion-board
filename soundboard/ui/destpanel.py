@@ -323,6 +323,12 @@ class DestPanel(QWidget):
         self.chk_gate.setToolTip(_("Others hear only the sound, clean, and your mic comes back "
                                    "the moment it ends. Handy with a noisy room or keyboard."))
         v.addWidget(self.chk_gate)
+        self.chk_discord = QCheckBox(_("Put Discord back for talking on close"))
+        self.chk_discord.setToolTip(
+            _("Discord's noise suppression, echo cancellation and automatic volume go back "
+              "on the way you had them, so your plain voice sounds right without Onion "
+              "Board. If Discord is still open, it's done the moment you close it."))
+        v.addWidget(self.chk_discord)
         self.refresh()
         self.group.buttonClicked.connect(self._simple_clicked)
         self.combo.currentIndexChanged.connect(self._picked)
@@ -331,6 +337,7 @@ class DestPanel(QWidget):
         self.chk_level.toggled.connect(self._send_changed)
         self.cb_duck.currentIndexChanged.connect(self._send_changed)
         self.chk_gate.toggled.connect(self._send_changed)
+        self.chk_discord.toggled.connect(self._send_changed)
 
     def _cfg(self) -> dict:
         return _dest_cfg(self.mw)
@@ -347,15 +354,18 @@ class DestPanel(QWidget):
         self.combo.setCurrentIndex(max(0, self.combo.findData(current)))
         self.combo.blockSignals(False)
         c = self.mw.cfg
-        for w in (self.chk_mono, self.chk_level, self.cb_duck, self.chk_gate, self.chk_auto):
+        for w in (self.chk_mono, self.chk_level, self.cb_duck, self.chk_gate, self.chk_discord,
+                  self.chk_auto):
             w.blockSignals(True)
         self.chk_auto.setChecked(bool(cfg.get("auto")))
         self.chk_gate.setChecked(bool(c.mic_gate))
         self.chk_mono.setChecked(bool(c.send_mono))
         self.chk_level.setChecked(bool(c.voice_level))
+        self.chk_discord.setChecked(bool(c.discord_restore))
         i = min(range(len(DUCK_LABELS)), key=lambda k: abs(DUCK_LABELS[k][1] - c.duck_db))
         self.cb_duck.setCurrentIndex(i)
-        for w in (self.chk_mono, self.chk_level, self.cb_duck, self.chk_gate, self.chk_auto):
+        for w in (self.chk_mono, self.chk_level, self.cb_duck, self.chk_gate, self.chk_discord,
+                  self.chk_auto):
             w.blockSignals(False)
         self._show()
 
@@ -454,6 +464,7 @@ class DestPanel(QWidget):
         c.duck_db = float(self.cb_duck.currentData())
         c.mic_gate = self.chk_gate.isChecked()
         c.voice_level = self.chk_level.isChecked()
+        c.discord_restore = self.chk_discord.isChecked()
         apply_send(c, self.mw.engine)
         self.mw._save_later()
 

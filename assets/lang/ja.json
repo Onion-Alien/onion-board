@@ -3408,5 +3408,9 @@
     "{n}個の人気局：検索するか、局をクリックして再生します。"
   ],
   "Evens out your voice, loud or quiet, so friends don't have to keep turning you up and down. Your voice chat's own automatic volume can then stay off: it cuts up your sounds.": "大きい声も小さい声もそろえるので、フレンドが何度も音量を上げ下げしなくて済みます。ボイスチャット側の自動音量はオフのままでOK:サウンドが途切れる原因になります。",
-  "Keep my voice at one volume": "声の音量を一定に保つ"
+  "Keep my voice at one volume": "声の音量を一定に保つ",
+  "Discord is still set up for sounds": "Discordがまだサウンド用の設定です",
+  "Discord's noise suppression, echo cancellation and automatic volume go back on the way you had them, so your plain voice sounds right without Onion Board. If Discord is still open, it's done the moment you close it.": "Discordのノイズ抑制・エコー除去・自動音量を元の設定に戻すので、Onion Boardなしでも普段の声がきちんと聞こえます。Discordを開いたままなら、閉じた時点で戻します。",
+  "Onion Board turns its voice clean-up back on as soon as you close Discord. To talk clearly right now, click here and turn on Noise Suppression, Echo Cancellation and Automatic Gain Control.": "Discordを閉じるとすぐ、Onion Boardが音声のクリーンアップを元に戻します。今すぐはっきり話すには、ここをクリックしてノイズ抑制・エコー除去・自動ゲイン調整をオンにしてください。",
+  "Put Discord back for talking on close": "閉じたらDiscordを通話用に戻す"
 }

@@ -3485,5 +3485,9 @@
     "{n} suosittua asemaa: hae tai napsauta asemaa toistaaksesi sen."
   ],
   "Evens out your voice, loud or quiet, so friends don't have to keep turning you up and down. Your voice chat's own automatic volume can then stay off: it cuts up your sounds.": "Tasoittaa äänesi, kovan tai hiljaisen, ettei kavereiden tarvitse jatkuvasti säätää sinua kovemmalle ja hiljemmalle. Puhechatin oma automaattinen äänenvoimakkuus voi silloin olla pois päältä: se pätkii äänesi.",
-  "Keep my voice at one volume": "Pidä ääneni samalla voimakkuudella"
+  "Keep my voice at one volume": "Pidä ääneni samalla voimakkuudella",
+  "Discord is still set up for sounds": "Discord on yhä säädetty ääniä varten",
+  "Discord's noise suppression, echo cancellation and automatic volume go back on the way you had them, so your plain voice sounds right without Onion Board. If Discord is still open, it's done the moment you close it.": "Discordin kohinanvaimennus, kaiunpoisto ja automaattinen äänenvoimakkuus palaavat sellaisiksi kuin ne olivat, joten pelkkä äänesi kuulostaa oikealta ilman Onion Boardia. Jos Discord on vielä auki, se tehdään heti kun suljet sen.",
+  "Onion Board turns its voice clean-up back on as soon as you close Discord. To talk clearly right now, click here and turn on Noise Suppression, Echo Cancellation and Automatic Gain Control.": "Onion Board laittaa äänen siistimisen takaisin päälle heti, kun suljet Discordin. Puhuaksesi selkeästi heti nyt: napsauta tästä ja laita kohinanvaimennus, kaiunpoisto ja automaattinen vahvistuksen säätö päälle.",
+  "Put Discord back for talking on close": "Palauta Discord puhetta varten suljettaessa"
 }

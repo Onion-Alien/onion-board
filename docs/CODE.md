@@ -348,6 +348,7 @@ the launcher the shortcuts and PyInstaller use. The app is the `soundboard` pack
 | `soundboard/proxsim.py` | development tool: proximity chat on the listener's side (distance fade, walls, walkie-talkies and radios) from each game's published or decompiled defaults |
 | `soundboard/chatcheck.py` | the Discord check: a test sound, and how to tell from Discord's Mic Test playback whether its noise suppression, gate or gain control is changing your sounds |
 | `soundboard/discordcfg.py` | Discord's own voice settings, read from its files (its LevelDB web storage, read only): which ones are wiping out sounds |
+| `soundboard/discordtalk.py` | puts Discord's voice clean-up back the way you talk when the board closes: one record appended to its LevelDB log, only while Discord is closed (else the `--discord-restore` helper waits for it to close), after a backup |
 | `soundboard/ui/chatguide.py` | the Discord and game voice-chat guides (the settings that keep sounds clean) and the check that runs from them |
 | `soundboard/ui/streamguide.py` | the streamer guide for remote control (Stream Deck keys, channel points, chat commands, with the links to copy) and the prompt that lets an AI assistant set it up |
 | `soundboard/sendfx.py` | the send stage before what others hear (your mic, the cable or another device): phase-aware mono downmix, lookahead peak limiter, ducking under your voice, levelling your voice |

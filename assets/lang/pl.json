@@ -3562,5 +3562,9 @@
     "{n} popularnych stacji: wyszukaj lub kliknij stację, aby ją odtworzyć."
   ],
   "Evens out your voice, loud or quiet, so friends don't have to keep turning you up and down. Your voice chat's own automatic volume can then stay off: it cuts up your sounds.": "Wyrównuje twój głos, głośny czy cichy, żeby znajomi nie musieli ciągle cię podgłaśniać i ściszać. Automatyczna głośność czatu głosowego może wtedy zostać wyłączona: tnie twoje dźwięki.",
-  "Keep my voice at one volume": "Trzymaj mój głos na jednej głośności"
+  "Keep my voice at one volume": "Trzymaj mój głos na jednej głośności",
+  "Discord is still set up for sounds": "Discord jest wciąż ustawiony pod dźwięki",
+  "Discord's noise suppression, echo cancellation and automatic volume go back on the way you had them, so your plain voice sounds right without Onion Board. If Discord is still open, it's done the moment you close it.": "Tłumienie szumów, usuwanie echa i automatyczna głośność w Discordzie wracają do twoich ustawień, więc twój zwykły głos brzmi dobrze bez Onion Board. Jeśli Discord jest jeszcze otwarty, stanie się to, gdy go zamkniesz.",
+  "Onion Board turns its voice clean-up back on as soon as you close Discord. To talk clearly right now, click here and turn on Noise Suppression, Echo Cancellation and Automatic Gain Control.": "Onion Board włączy z powrotem czyszczenie głosu, gdy tylko zamkniesz Discorda. Żeby mówić wyraźnie już teraz, kliknij tutaj i włącz tłumienie szumów, usuwanie echa i automatyczną regulację wzmocnienia.",
+  "Put Discord back for talking on close": "Przywróć Discord do rozmów przy zamknięciu"
 }

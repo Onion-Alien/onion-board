@@ -3793,5 +3793,9 @@
     "{n} محطات شعبية: ابحث، أو انقر على محطة لتشغيلها."
   ],
   "Evens out your voice, loud or quiet, so friends don't have to keep turning you up and down. Your voice chat's own automatic volume can then stay off: it cuts up your sounds.": "يوازن صوتك، عاليًا كان أو منخفضًا، حتى لا يضطر أصدقاؤك لرفعك وخفضك كل مرة. وبعدها يمكن ترك الصوت التلقائي في دردشتك الصوتية مطفأً: فهو يقطّع أصواتك.",
-  "Keep my voice at one volume": "أبقِ صوتي بمستوى واحد"
+  "Keep my voice at one volume": "أبقِ صوتي بمستوى واحد",
+  "Discord is still set up for sounds": "ديسكورد ما زال مضبوطًا للأصوات",
+  "Discord's noise suppression, echo cancellation and automatic volume go back on the way you had them, so your plain voice sounds right without Onion Board. If Discord is still open, it's done the moment you close it.": "تعود ميزات ديسكورد لكتم الضوضاء وإلغاء الصدى والصوت التلقائي كما كانت عندك، فيبدو صوتك العادي سليمًا بدون Onion Board. وإذا كان ديسكورد ما زال مفتوحًا، يتم ذلك لحظة إغلاقه.",
+  "Onion Board turns its voice clean-up back on as soon as you close Discord. To talk clearly right now, click here and turn on Noise Suppression, Echo Cancellation and Automatic Gain Control.": "يعيد Onion Board تشغيل تنظيف الصوت فور إغلاقك ديسكورد. لتتكلم بوضوح الآن، انقر هنا وشغّل كتم الضوضاء وإلغاء الصدى والتحكم التلقائي في الكسب.",
+  "Put Discord back for talking on close": "أعد ديسكورد للكلام عند الإغلاق"
 }

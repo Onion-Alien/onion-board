@@ -3408,5 +3408,9 @@
     "{n} đài phổ biến: tìm kiếm, hoặc bấm vào một đài để phát."
   ],
   "Evens out your voice, loud or quiet, so friends don't have to keep turning you up and down. Your voice chat's own automatic volume can then stay off: it cuts up your sounds.": "Cân bằng giọng bạn, to hay nhỏ, để bạn bè không phải liên tục chỉnh to nhỏ bạn. Âm lượng tự động của voice chat có thể để tắt: nó làm âm thanh của bạn bị ngắt quãng.",
-  "Keep my voice at one volume": "Giữ giọng tôi ở một mức âm lượng"
+  "Keep my voice at one volume": "Giữ giọng tôi ở một mức âm lượng",
+  "Discord is still set up for sounds": "Discord vẫn đang đặt cho âm thanh",
+  "Discord's noise suppression, echo cancellation and automatic volume go back on the way you had them, so your plain voice sounds right without Onion Board. If Discord is still open, it's done the moment you close it.": "Lọc tiếng ồn, khử tiếng vọng và âm lượng tự động của Discord sẽ trở lại như bạn từng đặt, để giọng nói thường của bạn nghe ổn mà không cần Onion Board. Nếu Discord vẫn đang mở, việc này diễn ra ngay khi bạn đóng nó.",
+  "Onion Board turns its voice clean-up back on as soon as you close Discord. To talk clearly right now, click here and turn on Noise Suppression, Echo Cancellation and Automatic Gain Control.": "Onion Board bật lại phần làm sạch giọng nói ngay khi bạn đóng Discord. Để nói rõ ngay bây giờ, bấm vào đây và bật Noise Suppression, Echo Cancellation và Automatic Gain Control.",
+  "Put Discord back for talking on close": "Đưa Discord về chế độ nói chuyện khi đóng"
 }
