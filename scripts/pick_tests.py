@@ -24,8 +24,10 @@ ruff and the other quick checks; with -Tests these tests too.
 
 --matrix prints CI's test jobs as JSON instead (BASE "all": the whole suite): the
 picked files split into SHARDS jobs of about the same length by test_times.json (each
-file's seconds in a full run), or one job when they're quick, or none. Refresh it now
-and then from a full run's `--durations=0 --durations-min=0` (refresh_times()).
+file's seconds in a full run), or one job when they're quick, or none.
+
+--refresh-times DIR rewrites test_times.json from the JUnit reports in DIR (every test
+job keeps one: `gh run download <run> -p "times-*" -D DIR`, a run of the whole suite).
 """
 from __future__ import annotations
 
@@ -224,21 +226,35 @@ def matrix(picked: list[str]) -> list[dict]:
             for i, fs in enumerate(jobs, 1)]
 
 
-def refresh_times(durations_log: str) -> dict[str, float]:
-    """Each test file's seconds (setup + call + teardown) from a pytest
-    `--durations=0 --durations-min=0` output."""
-    import re
+def refresh_times(reports: list[Path]) -> dict[str, float]:
+    """Each test file's seconds (setup + call + teardown, all its tests) from the
+    JUnit reports of a full run (pytest --junitxml, one per test job)."""
+    import xml.etree.ElementTree as ET
     out: dict[str, float] = {}
-    for line in durations_log.splitlines():
-        m = re.match(r"([\d.]+)s (?:call|setup|teardown)\s+(tests/\S+?\.py)::", line)
-        if m:
-            out[m[2]] = round(out.get(m[2], 0.0) + float(m[1]), 1)
-    return dict(sorted(out.items()))
+    for report in reports:
+        for case in ET.parse(report).iter("testcase"):
+            # classname "tests.test_x" or "tests.test_x.TestClass"
+            parts = case.get("classname", "").split(".")
+            if len(parts) < 2 or not parts[1].startswith("test_"):
+                continue
+            f = f"{parts[0]}/{parts[1]}.py"
+            out[f] = out.get(f, 0.0) + float(case.get("time") or 0)
+    return {f: round(t, 1) for f, t in sorted(out.items())}
 
 
 def main(argv: list[str]) -> int:
     flags = {a for a in argv[1:] if a.startswith("--")}
     args = [a for a in argv[1:] if not a.startswith("--")]
+    if "--refresh-times" in flags:
+        reports = sorted(Path(args[0]).rglob("*.xml")) if args else []
+        if not reports:
+            print("usage: pick_tests.py --refresh-times DIR (DIR: the runs' JUnit reports)")
+            return 2
+        times = refresh_times(reports)
+        TIMES.write_text(json.dumps(times, indent=0) + "\n", encoding="utf-8")
+        print(f"{len(times)} files, {sum(times.values()):.0f} s in all, from "
+              f"{len(reports)} report(s)")
+        return 0
     base = args[0] if args else "origin/main"
     picked = ["tests"] if base == "all" else pick(changed_files(base, "--local" in flags))
     if "--matrix" in flags:

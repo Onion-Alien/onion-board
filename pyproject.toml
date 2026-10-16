@@ -83,7 +83,9 @@ venv = ".venv"
 # ---------------------------------------------------------------- pytest
 [tool.pytest.ini_options]
 testpaths = ["tests"]
-addopts = "-q -rfE -n auto"   # -rfE: failures and errors listed at the end; -n: see conftest
+addopts = "-q -rfE -n auto --dist worksteal"   # -rfE: failures and errors listed at the end; -n: see conftest
+# --dist worksteal: a worker that runs out of tests takes some from a busy one, so the
+# few 20-60 s tests don't leave one worker running alone at the end of a run
 # A test still running after 2 minutes is hung (the slowest take ~10 s, ~50 s on a PC
 # busy with something else): every thread's stack is printed and its worker stopped,
 # so the run goes on and says where it hung, instead of sitting there until CI's

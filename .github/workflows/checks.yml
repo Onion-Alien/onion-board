@@ -214,11 +214,12 @@ jobs:
       # --reruns 2: a failed test gets two more tries, a crashed worker's test too
       # (pytest-rerunfailures), so a flake doesn't hold up a merge; a real break fails
       # all three. The tests that needed a rerun are listed on the run's summary page.
-      # TESTS: this job's share of the files the pick job chose.
+      # TESTS: this job's share of the files the pick job chose. junit.xml: each test's
+      # time, kept to split the next runs evenly (pick_tests.py --refresh-times).
       - shell: bash
         run: |
           set -o pipefail
-          .venv/Scripts/python -m pytest --durations=20 --reruns 2 -rfER $TESTS | tee pytest.log
+          .venv/Scripts/python -m pytest --durations=20 --reruns 2 -rfER --junitxml=junit.xml $TESTS | tee pytest.log
         env:
           QT_QPA_PLATFORM: offscreen
           TESTS: ${{ fromJSON(needs.pick.outputs.shard_tests)[matrix.shard] }}
@@ -234,6 +235,13 @@ jobs:
           fi
           # the test ids alone, for the nightly's flaky-trend job
           echo "$flaky" | awk 'NF { print $2 }' > flaky.txt
+      - if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: times-${{ strategy.job-index }}
+          path: junit.xml
+          if-no-files-found: ignore
+          retention-days: 14
       - if: always() && github.event_name == 'schedule'
         uses: actions/upload-artifact@v7
         with:
@@ -302,7 +310,8 @@ jobs:
       - name: Tests (the real effect in the test host)
         env:
           QT_QPA_PLATFORM: offscreen
-        run: .venv\Scripts\python -m pytest --reruns 2 -rfER tests/test_directmic.py
+        # -n 4: one file runs in one process by default (conftest), ~5 min for this one
+        run: .venv\Scripts\python -m pytest -n 4 --durations=20 --reruns 2 -rfER tests/test_directmic.py
       - name: Fuzz (60 s)
         run: .venv\Scripts\python scripts/fuzz_directmic.py 60 2
 
