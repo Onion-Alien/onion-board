@@ -4,6 +4,7 @@ import numpy as np
 import pytest
 from PySide6.QtCore import QEvent, Qt
 from PySide6.QtGui import QFocusEvent, QKeyEvent
+from PySide6.QtTest import QTest
 from PySide6.QtWidgets import QApplication, QPushButton
 
 from soundboard import ytdl
@@ -236,3 +237,22 @@ def test_no_zero_volume_hint_at_a_normal_volume_or_when_not_sending(
     window.playctl._cool.clear()
     window.playctl.play("s0")
     assert not [t for t in said if "0%" in t]
+
+
+def test_space_ticks_a_clicked_box_in_settings_over_the_sounds_tab(window, player, monkeypatch):
+    """Settings is a page over the tabs: Space there is the box's, not play / pause."""
+    window.playctl.play("s0")
+    window.setctl.open_settings("privacy")
+    box = window.setctl._settings_dlg.offline_box
+    focused(monkeypatch, box)
+    focus(box, Qt.MouseFocusReason)
+    QTest.keyClick(box, Qt.Key_Space)
+    assert box.isChecked() and player.paused("s0") is False
+    QTest.keyClick(box, Qt.Key_Space)   # and back, so nothing stays offline
+    assert not box.isChecked()
+    window.setctl.close_settings()
+    btn = toolbar_button(window)
+    focused(monkeypatch, btn)
+    focus(btn, Qt.MouseFocusReason)
+    space(btn)
+    assert player.paused("s0") is True   # back on Sounds: Space pauses again
