@@ -285,7 +285,79 @@ class Ducker:
         return (10 ** (ramp / 20)).astype(F32)[:, None]
 
 
-__all__ = ["CEILING_DB", "DUCK_CHOICES", "Ducker", "Limiter", "SmartMono"]
+class VoiceLeveler:
+    """Keeps your voice at one volume, so nobody in the call has to keep turning you
+    up and down. Voice chats do this themselves (Discord's automatic gain control),
+    but that's one of the clean-ups that wipes out or pumps the sounds, so it's best
+    off there: this one runs on the voice alone, before the sounds are added.
+
+    How: the level while you talk (block RMS against a noise floor it tracks, as
+    Ducker) is averaged over about half a second, and the gain eases toward what
+    brings that to TARGET_DB: up slowly, down faster, never past MAX_UP_DB / MAX_DOWN_DB.
+    Between words the gain holds, so the room's hiss isn't pulled up in the pauses
+    (what makes an AGC "breathe"). A sudden shout is caught at once: the block's
+    peak is kept under PEAK_DB. Gain moves as a ramp over each block (no clicks)."""
+
+    TARGET_DB = -20.0         # speech level sent (RMS), where voice chats aim
+    MAX_UP_DB = 15.0          # most it lifts a quiet mic (more lifts the room too)
+    MAX_DOWN_DB = -12.0       # most it takes off a loud one
+    UP_DB_S = 3.0             # how fast it turns you up, dB per second
+    DOWN_DB_S = 10.0          # ...and down
+    AVG_S = 0.5               # the talking level's averaging time
+    PEAK_DB = -3.0            # a block's peak is never sent louder than this
+    ABOVE_FLOOR_DB = Ducker.ABOVE_FLOOR_DB
+    MIN_TALK_DB = -55.0
+
+    def __init__(self, rate: int):
+        self.rate = int(rate)
+        self.floor_db = -60.0
+        self.gain_db = 0.0
+        self.level_db: float | None = None   # your talking level (before the gain), once heard
+        self._pow = 0.0
+        self.talking = False
+
+    def process(self, x: np.ndarray) -> np.ndarray:
+        """x (n, channels) float32, the mic after the voice changer; returns it levelled."""
+        n = len(x)
+        if not n:
+            return x
+        dt = n / self.rate
+        p = float(np.mean(np.square(x, dtype=np.float64)))
+        lvl = 10 * math.log10(p + 1e-12)
+        if lvl < self.floor_db:
+            self.floor_db += (lvl - self.floor_db) * min(1.0, dt / 0.2)
+        else:
+            self.floor_db += min(lvl - self.floor_db, 3.0 * dt)   # 3 dB/s
+        self.talking = lvl > max(self.floor_db + self.ABOVE_FLOOR_DB, self.MIN_TALK_DB)
+        g0 = self.gain_db
+        g1 = g0
+        if self.talking:
+            if self.level_db is None:   # the first words: start from them
+                self._pow = p
+            else:
+                self._pow += (p - self._pow) * min(1.0, dt / self.AVG_S)
+            self.level_db = 10 * math.log10(self._pow + 1e-12)
+            want = min(self.MAX_UP_DB, max(self.MAX_DOWN_DB, self.TARGET_DB - self.level_db))
+            # far under (the first words, or back from a shout): catch up faster
+            up = self.UP_DB_S * (4.0 if want - g0 > 3.0 else 1.0)
+            step = (up if want > g0 else self.DOWN_DB_S) * dt
+            g1 = g0 + max(-step, min(step, want - g0))
+        pk = float(np.max(np.abs(x)))
+        if pk > 0:   # a shout: down at once, whatever the average says
+            cap = max(self.PEAK_DB - 20 * math.log10(pk), self.MAX_DOWN_DB - 12.0)
+            if cap < g1:
+                g0 = g1 = min(g0, cap)   # the whole block, not a ramp down into it
+        self.gain_db = g1
+        if g0 == g1 == 0.0:
+            return x
+        if g0 == g1:
+            return (x * F32(10 ** (g1 / 20))).astype(F32, copy=False)
+        ramp = np.linspace(g0, g1, n + 1, dtype=np.float64)[1:]
+        return (x * (10 ** (ramp / 20)).astype(F32)[:, None]).astype(F32, copy=False)
+
+
+__all__ = ["CEILING_DB", "DUCK_CHOICES", "Ducker", "Limiter", "SmartMono",
+           "VoiceLeveler"]
 
 
 class SafetyLimiter(Limiter):

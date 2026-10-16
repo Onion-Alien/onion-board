@@ -3483,5 +3483,7 @@
   "{n} popular station: search, or click a station to play it.": [
     "{n} popüler istasyon: arayın veya çalmak için bir istasyona tıklayın.",
     "{n} popüler istasyon: arayın veya çalmak için bir istasyona tıklayın."
-  ]
+  ],
+  "Evens out your voice, loud or quiet, so friends don't have to keep turning you up and down. Your voice chat's own automatic volume can then stay off: it cuts up your sounds.": "Sesini, yüksek ya da alçak, dengeler; böylece arkadaşların seni sürekli açıp kısmak zorunda kalmaz. Sesli sohbetin kendi otomatik ses ayarı kapalı kalabilir: seslerini kesip biçiyor.",
+  "Keep my voice at one volume": "Sesimi tek seviyede tut"
 }

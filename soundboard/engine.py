@@ -40,7 +40,8 @@ import sounddevice as sd
 from soundboard import destination, directmic, livefx, mapped
 from soundboard.dsp import hermite
 from soundboard.eq import EQ
-from soundboard.sendfx import CEILING_DB, SAFETY_DB, Ducker, Limiter, SafetyLimiter, SmartMono
+from soundboard.sendfx import (CEILING_DB, SAFETY_DB, Ducker, Limiter, SafetyLimiter, SmartMono,
+                               VoiceLeveler)
 from soundboard import errors
 from soundboard.i18n import _
 from soundboard.enginedevices import EngineDevices
@@ -298,6 +299,8 @@ class Engine(EngineTakes, EngineDevices, SoundCache):
         self.send_mono = True     # phase-aware mono into the send device (every voice chat is mono)
         self.duck_db = 0.0        # lower the sounds this much while you talk (0 = off)
         self.mic_gate = False     # mute your mic while a sound plays (only the sounds go out)
+        self.voice_level = False  # keep your voice at one volume (sendfx.VoiceLeveler)
+        self._leveler: VoiceLeveler | None = None   # made for the mic's rate, on first use
         self._gate: dict[str, float] = {}   # output -> the mic's current gate gain
         self.limiter_on = True    # hold the send device's peaks at sendfx.CEILING_DB
         self._send: dict[tuple[str, str], Any] = {}   # (out, kind) -> its sendfx stage
@@ -1463,6 +1466,11 @@ class Engine(EngineTakes, EngineDevices, SoundCache):
         chain = self.voice_chain
         if chain is not None:   # after the meter: that judges the real mic
             x = chain.process(x, self.rates["mic"])
+        if self.voice_level:   # after the voice changer: it levels what's sent
+            lv = self._leveler
+            if lv is None or lv.rate != self.rates["mic"]:
+                lv = self._leveler = VoiceLeveler(self.rates["mic"])
+            x = lv.process(x)
         if raw is not None and rec is not None:   # a test: the real mic and what's sent
             rec.append(np.stack([raw, x[:, 0]], 1))
         if take is not None and self._take_fx:

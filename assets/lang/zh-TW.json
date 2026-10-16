@@ -3406,5 +3406,7 @@
   "Search radio stations, genres, countries or cities…": "搜尋廣播電台、流派、國家或城市…",
   "{n} popular station: search, or click a station to play it.": [
     "{n}個熱門電台：進行搜尋，或點擊一個電台即可播放。"
-  ]
+  ],
+  "Evens out your voice, loud or quiet, so friends don't have to keep turning you up and down. Your voice chat's own automatic volume can then stay off: it cuts up your sounds.": "把你的聲音調勻，不管大聲還是小聲，朋友就不用一直把你調大調小。語音聊天內建的自動音量可以保持關閉：它會把你的音效切得斷斷續續。",
+  "Keep my voice at one volume": "讓我的聲音保持同一音量"
 }
