@@ -135,7 +135,7 @@ PRESS_MODES = ("overlap", "toggle", "solo", "queue")
 # the add-ons with install steps (their module.json id); any other is "other"
 ADDONS = ("ai-voices", "live-voice", "other")
 # the free sound packs (soundboard.packs BUILT_IN ids); any other is "other"
-PACKS = ("streamer", "esports", "podcast", "halloween", "gm-starter", "other")
+PACKS = ("streamer", "esports", "general", "podcast", "halloween", "gm-starter", "other")
 # Settings' pages (settings.SettingsDialog's page keys, without Show advanced)
 SETTINGS_PAGES = ("audio", "appearance", "hotkeys", "tabs", "general", "about",
                   "overlay", "privacy", "connection", "data", "updates", "help",
@@ -159,6 +159,7 @@ FEATURES = ("add-files", "youtube", "record", "clip", "clip-editor", "import-boa
             *(f"setup-closed-{k}" for k in ("mic", "headphones", "send", "last")),
             "setup-skipped-send", "setup-finished", "setup-finished-not-sending",
             "tour-shown", "tour-searched", "tour-files", "tour-skipped", "tour-ignored",
+            "starter-sounds",
             # the Triggers tab's Get Onion Watch window: shown, Get clicked, closed
             "watch-prompt-shown", "watch-prompt-get", "watch-prompt-closed",
             # Get FFmpeg clicked / failed; a file that couldn't play without it
@@ -181,9 +182,10 @@ FEATURES = ("add-files", "youtube", "record", "clip", "clip-editor", "import-boa
             # the side rail: Ctrl+1-9 / Ctrl+Tab, the version clicked for What's new,
             # kept shut (features_now)
             "tab-keys", "whats-new", "rail-shut",
-            # Show more under web search results; a pad's Edit: Effects tab, a picture
-            # from a file or a link
-            "search-show-more", "pad-effects", "pad-picture-file", "pad-picture-link",
+            # Show more under web search results, Trending on Myinstants opened; a pad's
+            # Edit: Effects tab, a picture from a file or a link
+            "search-show-more", "search-trending", "pad-effects", "pad-picture-file",
+            "pad-picture-link",
             # the Triggers tab (the Onion Watch add-on) says which of its features were
             # used or are set up (triggershost.BoardHost.count): onionwatch/usage.py's
             # FEATURES, keep in step

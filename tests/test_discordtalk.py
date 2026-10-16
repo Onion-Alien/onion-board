@@ -1,0 +1,166 @@
+"""Putting Discord back the way you talk on quit (soundboard.discordtalk): LevelDB's log
+format, the write into a fake Discord folder (never the real one: conftest), what's put
+back and when nothing is touched, and the board remembering how you talk."""
+import json
+import struct
+
+import pytest
+
+from soundboard import discordcfg as dc
+from soundboard import discordtalk as dt
+from test_mainwindow import window  # noqa: F401 - the real window, offscreen
+
+SOUND = {"activeInputProfile": "CUSTOM", "noiseCancellation": False,
+         "echoCancellation": False, "automaticGainControl": False,
+         "bypassSystemInputProcessing": False, "inputDeviceId": "default",
+         "modeOptions": {"vadUseKrisp": False, "autoThreshold": False, "threshold": -50}}
+
+
+def make_db(default: dict, client="discord", seq=500, manifest_seq=900, extra=b""):
+    """A Discord settings folder: CURRENT, a MANIFEST whose edit records `manifest_seq`,
+    and a log holding a put of the store at `seq` (plus `extra` bytes)."""
+    f = dc._appdata() / client / "Local Storage" / "leveldb"
+    f.mkdir(parents=True, exist_ok=True)
+    (f / "CURRENT").write_text("MANIFEST-000002\n", "ascii")
+    edit = (b"\x01" + dt._put_varint(26) + b"leveldb.BytewiseComparator"
+            + b"\x02\x03" + b"\x03\x05" + b"\x04" + dt._put_varint(manifest_seq))
+    (f / "MANIFEST-000002").write_bytes(dt.frame(edit, 0))
+    value = dt.encode_value(json.dumps({"default": default, "stream": {}}, separators=(",", ":")))
+    (f / "000003.log").write_bytes(dt.frame(dt.batch_put(seq, dt.KEY, value), 0) + extra)
+    (f / "LOCK").write_bytes(b"")
+    return f
+
+
+def settings(client="discord", name="Discord"):
+    return dc.read_client(client, name)
+
+
+# ---------------------------------------------------------------- the log format
+
+def test_crc32c_known_answer():
+    assert dt.crc32c(b"123456789") == 0xE3069283
+
+
+@pytest.mark.parametrize("offset", [0, 100, dt.BLOCK - 7, dt.BLOCK - 3, dt.BLOCK - 20])
+@pytest.mark.parametrize("size", [10, 40_000, 100_000])
+def test_frames_read_back_across_block_edges(offset, size):
+    data = dt.frame(b"a" * (offset - dt.HEADER), 0) if offset else b""
+    assert len(data) == offset
+    rec = bytes(range(256)) * (size // 256) + b"!"
+    data += dt.frame(rec, len(data))
+    got = dt.read_records(data)
+    assert got is not None and got[-1] == rec
+
+
+def test_a_damaged_log_reads_as_none():
+    data = bytearray(dt.frame(b"hello world", 0))
+    data[-1] ^= 1
+    assert dt.read_records(bytes(data)) is None
+    assert dt.read_records(dt.frame(b"x" * 50, 0)[:-5]) is None   # cut off
+
+
+def test_batch_value_round_trip():
+    v = dt.encode_value('{"a":"Mikrofon (Ünïcode ✓)"}')
+    assert v[:1] == b"\x00"   # not Latin-1: UTF-16
+    assert dt.decode_value(dt.batch_value(dt.batch_put(7, dt.KEY, v))) == \
+        '{"a":"Mikrofon (Ünïcode ✓)"}'
+
+
+# ---------------------------------------------------------------- putting it back
+
+def test_sound_mode_is_put_back_to_discords_defaults(tmp_path):
+    f = make_db(SOUND)
+    assert not dt.talking(settings())
+    assert dt.restore({}, tmp_path / "bk", running=set()) == []
+    s = settings()
+    assert s.krisp and s.echo and s.agc and s.auto
+    store = dt.read_store("discord")
+    assert store["default"]["modeOptions"]["threshold"] == -50   # the rest kept
+    assert store["stream"] == {}
+    recs = dt.read_records((f / "000003.log").read_bytes())
+    assert len(recs) == 2
+    seq = struct.unpack_from("<Q", recs[-1])[0]
+    assert seq == 901                                  # above the manifest's 900
+    assert list((tmp_path / "bk" / "discord").iterdir())   # a copy kept first
+
+
+def test_saved_talking_settings_win_over_the_defaults(tmp_path):
+    make_db(SOUND)
+    saved = {"discord": {"activeInputProfile": "VOICE_ISOLATION", "echoCancellation": True}}
+    dt.restore(saved, tmp_path / "bk", running=set())
+    s = settings()
+    assert s.profile == "VOICE_ISOLATION" and s.echo
+    assert not s.agc                                   # not in the saved ones: as it was
+
+
+def test_studio_is_left_for_custom(tmp_path):
+    make_db(dict(SOUND, activeInputProfile="STUDIO"))
+    dt.restore({}, tmp_path / "bk", running=set())
+    assert settings().profile == "CUSTOM"
+
+
+def test_a_running_discord_is_left_for_the_helper(tmp_path):
+    f = make_db(SOUND)
+    before = (f / "000003.log").read_bytes()
+    assert dt.restore({}, tmp_path / "bk", running={"discord"}) == ["discord"]
+    assert (f / "000003.log").read_bytes() == before
+
+
+def test_a_locked_database_is_not_touched(tmp_path):
+    import msvcrt
+    f = make_db(SOUND)
+    before = (f / "000003.log").read_bytes()
+    with open(f / "LOCK", "r+b") as held:   # as an open Discord holds it
+        msvcrt.locking(held.fileno(), msvcrt.LK_NBLCK, 1)
+        try:
+            assert dt.restore({}, tmp_path / "bk", running=set()) == ["discord"]
+        finally:
+            held.seek(0)
+            msvcrt.locking(held.fileno(), msvcrt.LK_UNLCK, 1)
+    assert (f / "000003.log").read_bytes() == before
+
+
+def test_a_damaged_database_is_not_touched(tmp_path):
+    f = make_db(SOUND, extra=b"\x01\x02\x03\x04\x05\x06\x07garbage")
+    before = (f / "000003.log").read_bytes()
+    assert dt.restore({}, tmp_path / "bk", running=set()) == []
+    assert (f / "000003.log").read_bytes() == before
+    assert not (tmp_path / "bk").exists()
+
+
+def test_already_talking_is_left_alone(tmp_path):
+    f = make_db(dict(SOUND, noiseCancellation=True))
+    before = (f / "000003.log").read_bytes()
+    dt.restore({}, tmp_path / "bk", running=set())
+    assert (f / "000003.log").read_bytes() == before
+
+
+def test_snapshot_takes_only_the_talking_keys():
+    snap = dt.snapshot({"default": dict(SOUND, noiseCancellation=True)})
+    assert snap["noiseCancellation"] is True
+    assert snap["modeOptions.autoThreshold"] is False
+    assert "inputDeviceId" not in snap and "modeOptions.threshold" not in snap
+
+
+# ---------------------------------------------------------------- in the board
+
+def test_the_board_remembers_how_you_talk_once(window):  # noqa: F811
+    talk = {"discord": {"noiseCancellation": True}}
+    found = [dc.parse({"default": dict(SOUND, noiseCancellation=True)})]
+    window.alertctl._on_discord((found, ("a",), talk))
+    assert window.cfg.discord_talk == talk
+    found = [dc.parse({"default": SOUND})]   # set up for sounds later: not taken
+    window.alertctl._on_discord((found, ("b",), {"discord": {"noiseCancellation": False}}))
+    assert window.cfg.discord_talk == talk
+
+
+def test_quitting_hands_an_open_discord_to_the_helper(window, monkeypatch):  # noqa: F811
+    started = []
+    monkeypatch.setattr(dt, "restore", lambda saved, root, **k: ["discord"])
+    monkeypatch.setattr(dt, "start_helper", lambda *a: started.append(a[2]))
+    window.cfg.discord_restore = False
+    window.alertctl.discord_quit()
+    assert started == []
+    window.cfg.discord_restore = True
+    window.alertctl.discord_quit()
+    assert started == [["discord"]]

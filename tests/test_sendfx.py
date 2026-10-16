@@ -163,3 +163,75 @@ def test_engine_ducks_sounds_under_the_mic():
         e.ring_main.write(_talk(0.05, seed=i))
         e._main(out, BLOCK)
     assert db(rms(out[-200:]) / before) < -15   # past the limiter's delay: sounds alone
+
+
+# ---------------------------------------------------------------- voice leveler
+
+def _speech(seconds, level_db, seed=0, rate=SR):
+    """Speech-like: noise in syllables (~4 a second) with short gaps, at an RMS
+    of about level_db while sounding, two channels."""
+    rng = np.random.default_rng(seed)
+    n = int(seconds * rate)
+    t = np.arange(n) / rate
+    env = np.clip(np.sin(2 * np.pi * 4 * t), 0, None) ** 0.5
+    x = rng.normal(0, 1, n) * env
+    x *= 10 ** (level_db / 20) / rms(x)
+    return np.stack([x, x], 1).astype(np.float32)
+
+
+def _talk_db(y):
+    """The level of the blocks that are talking (as the leveler sees them)."""
+    fr = y[: len(y) // BLOCK * BLOCK, 0].reshape(-1, BLOCK).astype(np.float64)
+    r = 10 * np.log10(np.mean(fr ** 2, 1) + 1e-12)
+    talk = r > r.max() - 20
+    return 10 * np.log10(np.mean(10 ** (r[talk] / 10)))
+
+
+@pytest.mark.parametrize("level", [-34.0, -26.0, -12.0])
+def test_leveler_brings_quiet_and_loud_voices_to_one_volume(level):
+    lv = sendfx.VoiceLeveler(SR)
+    y = blocks(lv, _speech(6, level))
+    assert abs(_talk_db(y[SR * 3:]) - lv.TARGET_DB) < 2.5
+
+
+def test_leveler_follows_you_leaning_back_from_the_mic():
+    lv = sendfx.VoiceLeveler(SR)
+    x = np.concatenate([_speech(4, -20, 1), _speech(6, -32, 2)])   # 12 dB quieter
+    y = blocks(lv, x)
+    assert abs(_talk_db(y[SR * 2:SR * 4]) - _talk_db(y[SR * 7:])) < 3.0   # was 12 dB apart
+
+
+def test_leveler_holds_in_pauses_so_the_room_is_not_pulled_up():
+    lv = sendfx.VoiceLeveler(SR)
+    rng = np.random.default_rng(3)
+    hiss = (rng.normal(0, 10 ** (-60 / 20), (SR * 4, 1)) * [1, 1]).astype(np.float32)
+    blocks(lv, _speech(3, -26))
+    g = lv.gain_db
+    y = blocks(lv, hiss)
+    assert abs(lv.gain_db - g) < 0.01            # silence: the gain doesn't move
+    assert db(rms(y[SR:])) < -60 + g + 0.5
+
+
+def test_leveler_catches_a_shout_at_once():
+    lv = sendfx.VoiceLeveler(SR)
+    blocks(lv, _speech(3, -34))                  # quiet mic: turned well up
+    assert lv.gain_db > 10
+    y = blocks(lv, _speech(1, -6, 5))            # then a shout
+    assert np.abs(y[BLOCK * 2:]).max() <= 10 ** (lv.PEAK_DB / 20) + 1e-4
+
+
+def test_engine_levels_the_voice_it_sends():
+    e = engine_with("main", send_stage=True)
+    e.main_stream = object()
+    e.ring_main.prefill = 0
+    e.rates["mic"] = SR
+    e.voice_level = True
+    x = _speech(4, -36)
+    sent = []
+    out = np.zeros((BLOCK, 2), np.float32)
+    for i in range(0, len(x), BLOCK):
+        e._mic(x[i:i + BLOCK])
+        e._main(out, BLOCK)
+        sent.append(out.copy())
+    y = np.concatenate(sent)
+    assert _talk_db(y[SR * 2:]) > -36 + 10       # turned up (off, it stays where it was)

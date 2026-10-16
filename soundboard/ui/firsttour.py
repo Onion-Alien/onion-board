@@ -18,6 +18,10 @@ It never forces anything: it takes no clicks (each one goes on to what was under
 the Radio tab, the cog…), and it ends for good when they leave the Sounds tab, open a
 menu, a dialog or Settings, sounds arrive, the window goes away, or they leave it alone
 for a minute (IDLE_S). Once only (Config.tips_seen).
+
+When the tour ends before they searched or added anything (skipped, ignored, left for
+another tab) and the board is still empty, a few starter sounds are added by themselves
+(soundboard/starter.py): the board never stays a bare page for someone who skipped it.
 """
 from __future__ import annotations
 
@@ -28,7 +32,7 @@ from PySide6.QtCore import QEvent, QPoint, QPointF, QRectF, Qt, QTimer
 from PySide6.QtGui import QColor, QFont, QFontMetrics, QPainter, QPainterPath, QPen
 from PySide6.QtWidgets import QApplication, QWidget
 
-from soundboard import net, theme, tips, usage
+from soundboard import net, starter, theme, tips, usage
 from soundboard.i18n import _
 from soundboard.ui.bunnywidget import BUBBLE, INK, BunnyWidget
 from soundboard.ui.ytsearch import SearchResults
@@ -168,6 +172,7 @@ class Tour(QWidget):
         if self._ended:
             return
         self._ended = True
+        starters = self.step in ("bun", "search", "add") and not self.win.cfg.sounds
         if skipped:
             usage.used("tour-skipped")
         elif count:
@@ -184,6 +189,8 @@ class Tour(QWidget):
         self.deleteLater()
         if _current is self:
             _current = None
+        if starters:   # they didn't search or add anything: the board isn't left bare
+            starter.add_to(self.win)
 
     def _gone(self) -> bool:
         """They're somewhere else now: another tab, Settings, a dialog, a menu (but

@@ -34,6 +34,22 @@
       "categories": ["Hype music", "Crowd", "Announcer", "Callouts", "Plays", "Memes"]
     },
     {
+      "id": "general",
+      "name": "General sound pack",
+      "emoji": "🔊",
+      "description": "483 sounds for everything, in 20 categories: memes (air horn, boom, bruh), comedy, game show buzzers, crowds, people, 25 animals, video game blips and power-ups, notifications, combat, impacts, whooshes, sci-fi, magic, horror, vehicles, household, nature ambiences, sports, music stings and party sounds.",
+      "url": "https://github.com/Onion-Alien/onion-board/releases/download/general-pack-1/onion-board-general-pack.zip",
+      "sha256": "9044bdf70427ef854e7c1ec698901bc9f8a7f59c23ade1af55a046573db57c58",
+      "size": 44324802,
+      "sounds": 483,
+      "license": "CC0",
+      "author": "Onion Board",
+      "preview": {"url": "https://github.com/Onion-Alien/onion-board/releases/download/general-pack-1/general-preview.zip",
+                  "sha256": "18a6154703c5a96e868e2b74d0e38ddb4c34cd8deffeddc39f64bbb116312985",
+                  "size": 356511},
+      "categories": ["Memes", "Comedy", "Game show", "Crowd", "People", "Animals", "Video game", "Notifications", "Combat", "Impacts", "Transitions", "Sci-fi", "Magic", "Horror", "Vehicles", "Household", "Nature", "Sports", "Music", "Party"]
+    },
+    {
       "id": "podcast",
       "name": "Podcast pack",
       "emoji": "🎙️",

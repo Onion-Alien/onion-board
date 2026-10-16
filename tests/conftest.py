@@ -365,10 +365,12 @@ def _never_touch_the_real_mic(monkeypatch, tmp_path):
 def _never_read_the_real_discord(monkeypatch, tmp_path):
     """Discord's voice settings (soundboard.discordcfg) come from an empty folder: the
     developer's own Discord must not put a banner in a test or a screenshot. Tests
-    write a fake store under discordcfg._appdata() when they need one."""
-    from soundboard import discordcfg
+    write a fake store under discordcfg._appdata() when they need one. Nor is it ever
+    written to (discordtalk), and no Discord helper process is started."""
+    from soundboard import discordcfg, discordtalk
     root = tmp_path / "guard" / "discord-appdata"
     monkeypatch.setattr(discordcfg, "_appdata", lambda: root)
+    monkeypatch.setattr(discordtalk, "start_helper", lambda *a, **k: False)
 
 
 @pytest.fixture(autouse=True)

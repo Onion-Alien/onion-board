@@ -46,6 +46,24 @@ DISCORD_URGENT = {
 }
 
 
+DISCORD_QUIT_S = 4.0   # the longest quitting waits for Discord's settings to be put back
+
+
+def _talk_snapshots(found: list, seen: set) -> dict:
+    """{Discord folder: discordtalk.snapshot} for each client seen for the first time
+    while set for talking (any thread: reads its files)."""
+    from soundboard import discordtalk
+    out = {}
+    for d, name in discordcfg.CLIENTS:
+        s = next((x for x in found if x.client == name), None)
+        if s is None or d in seen or not discordtalk.talking(s):
+            continue
+        store = discordtalk.read_store(d)
+        if store is not None:
+            out[d] = discordtalk.snapshot(store)
+    return out
+
+
 class AlertControl(Controller):
     """The urgent bar and its checks for one MainWindow (``mw``)."""
 
@@ -58,6 +76,7 @@ class AlertControl(Controller):
         self._discord_sig = None
         self._discord_reading = False
         self._discord_poll = PollThread("discord-settings")
+        self._talk_seen: set[str] = set()   # Discord folders looked at for how you talk
         # straight into my mic: an app recording the mic in raw mode skips Onion Board
         # and hears none of the sounds (rawmic)
         self.raw_watch = rawmic.BypassWatch()
@@ -179,27 +198,31 @@ class AlertControl(Controller):
             return
         self._discord_reading = True
         last = self._discord_sig
+        seen = set(self._talk_seen)
 
         def run():
-            found, sig = [], None
+            found, sig, talk = [], None, {}
             try:
                 from soundboard.ui.chatguide import DISCORD_EXES
                 names = {n for _p, n in appaudio._process_table().values()}
                 if names & set(DISCORD_EXES):
                     sig = discordcfg.signature()
                     found = None if sig == last else discordcfg.read()
+                    talk = _talk_snapshots(found or [], seen)
             except Exception:  # noqa: BLE001 - a check that can't run shows nothing
                 log.debug("reading Discord's settings failed", exc_info=True)
-            mw.bridge.discord.emit((found, sig))
+            mw.bridge.discord.emit((found, sig, talk))
         self._discord_poll.run(run)
 
     def _on_discord(self, res):
         mw = self.mw
-        found, sig = res
+        found, sig, *more = res   # (found, sig, talk snapshots)
+        talk = more[0] if more else {}
         self._discord_reading = False
         self._discord_sig = sig
         if found is None:   # unchanged
             return
+        self._remember_talk(found, talk)
         before = self.discord_problems()
         self.discord_found = found
         now = self.discord_problems()
@@ -209,6 +232,44 @@ class AlertControl(Controller):
         app = mw.appsetctl._setup_app
         if mw.appsetctl._setup_state == "done" and app is not None and app.guide == "discord":
             mw.appsetctl._show_setup("done", app)   # its ticks, live
+
+    def _remember_talk(self, found: list, talk: dict):
+        """How you talk in each Discord, as it was set when the board first saw it
+        (before it was set up for sounds): what's put back on quit (discordtalk)."""
+        mw = self.mw
+        dirs = {name: d for d, name in discordcfg.CLIENTS}
+        for s in found:
+            d = dirs.get(s.client)
+            if d is None or d in self._talk_seen:
+                continue
+            self._talk_seen.add(d)
+            if talk.get(d) and mw.cfg.discord_talk.get(d) != talk[d]:
+                mw.cfg.discord_talk = {**mw.cfg.discord_talk, d: talk[d]}
+                log.info("%s: remembered how you talk there", s.client)
+                mw._save_later()
+
+    def discord_quit(self):
+        """On quit: put each Discord left set for sounds back the way you talk, or
+        (still open) hand it to the helper that does it once Discord closes."""
+        cfg = self.mw.cfg
+        if not cfg.discord_restore:
+            return
+        import threading
+
+        from soundboard import discordtalk
+        from soundboard.library import APP_DIR
+        saved = dict(cfg.discord_talk)
+        out: list = []
+
+        def run():
+            out.append(discordtalk.restore(saved, APP_DIR / "discord-backup"))
+        t = threading.Thread(target=run, daemon=True, name="discord-restore")
+        t.start()
+        t.join(DISCORD_QUIT_S)   # files only, normally well under a second
+        if out and out[0]:
+            log.info("Discord still open (%s): the helper puts it back once it closes",
+                     ", ".join(out[0]))
+            discordtalk.start_helper(APP_DIR, saved, out[0])
 
     def _show_urgent(self):
         mw = self.mw

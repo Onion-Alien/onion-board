@@ -229,6 +229,7 @@ the launcher the shortcuts and PyInstaller use. The app is the `soundboard` pack
 | `soundboard/ui/routewarn.py` | the question on leaving Settings when "Send my sounds to" was just set to speakers or a headset: My mic, the virtual cable (use or install), or keep it |
 | `soundboard/ui/fit.py` | dialogs grow to fit their wrapped text instead of clipping it (`fit.watch(self)` in every dialog's `__init__`) |
 | `soundboard/ui/setupwizard.py` | the first-run guide with Bun (mic, headphones, where your sounds go: straight into your mic, or the cable or another way out, then Discord) and the Steam help |
+| `soundboard/starter.py` | The 25 starter sounds that ship in `assets/starter` (about 0.8 MB, CC0): added to a new board when the first-run tour ends with the board still empty; no download, once only |
 | `soundboard/ui/firsttour.py` | Bun's first-run tour of the empty board after that guide: the search box (or offline the Add button), then the results; takes no clicks, ends when ignored or left |
 | `soundboard/ui/bunnywidget.py` | Bun animated: bobs, blinks, talks along with your mic and throws music notes |
 | `soundboard/ui/bunmode.py` | Bun mode: the mini player as a floating Bun over everything, showing what the app is doing |
@@ -351,9 +352,10 @@ the launcher the shortcuts and PyInstaller use. The app is the `soundboard` pack
 | `soundboard/proxsim.py` | development tool: proximity chat on the listener's side (distance fade, walls, walkie-talkies and radios) from each game's published or decompiled defaults |
 | `soundboard/chatcheck.py` | the Discord check: a test sound, and how to tell from Discord's Mic Test playback whether its noise suppression, gate or gain control is changing your sounds |
 | `soundboard/discordcfg.py` | Discord's own voice settings, read from its files (its LevelDB web storage, read only): which ones are wiping out sounds |
+| `soundboard/discordtalk.py` | puts Discord's voice clean-up back the way you talk when the board closes: one record appended to its LevelDB log, only while Discord is closed (else the `--discord-restore` helper waits for it to close), after a backup |
 | `soundboard/ui/chatguide.py` | the Discord and game voice-chat guides (the settings that keep sounds clean) and the check that runs from them |
 | `soundboard/ui/streamguide.py` | the streamer guide for remote control (Stream Deck keys, channel points, chat commands, with the links to copy) and the prompt that lets an AI assistant set it up |
-| `soundboard/sendfx.py` | the send stage before what others hear (your mic, the cable or another device): phase-aware mono downmix, lookahead peak limiter, ducking under your voice |
+| `soundboard/sendfx.py` | the send stage before what others hear (your mic, the cable or another device): phase-aware mono downmix, lookahead peak limiter, ducking under your voice, levelling your voice |
 | `soundboard/cableremove.py` | the Setup tab's *Remove the virtual cable* (offered once straight into the mic works): runs VB-Audio's own setup program from Program Files with `-u -h`, as admin; other kinds of cable are left alone |
 | `soundboard/cableformat.py` | reads both ends of the virtual cable's Windows format and sets them to 48 kHz, so the cable passes sound through unconverted |
 | `modules/` | add-ons shipped with the app: `retro-fx` (an effects module, the example to copy), `live-voice` (a service module with its own Python environment) and the `translate-<language>` modules, one per *Speak in* language (a manifest naming a model that's downloaded only when picked). Remote add-ons such as Onion Pocket are installed into `%APPDATA%\OnionBoard\modules`. `ai-voices` (real-time voice conversion: onnxruntime + a Beatrice 2 model, see its README) lives here too but isn't built into the app: it's downloaded from its own release (`scripts/make_ai_voices_zip.py` packs it) |
@@ -446,6 +448,10 @@ backup is used, so the pad list is never silently reset.
   at -3 dBFS, because Opus puts peaks back up by ~2.5 dB and the listener's decoder
   clips them; it turns the level down around a peak instead of bending the
   waveform. Optionally the sounds duck under your voice while the mic hears you.
+  Your voice gets one stage of its own, before the sounds are added (on by default,
+  `VoiceLeveler`): a slow automatic volume that brings your talking level to about
+  -20 dBFS and holds still between words, so the voice chat's own automatic gain
+  (which pumps and cuts the sounds) can stay off without friends riding your volume.
 - Every device is opened at its **native** sample rate and resampled with soxr.
   Windows' built-in `auto_convert` resampler was measured garbling VB-Cable audio
   (about 70% junk), so it's never used.
