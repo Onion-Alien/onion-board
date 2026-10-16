@@ -236,7 +236,8 @@ def test_card_shows_every_voice_as_a_card_under_its_kind(qapp, app_dir, monkeypa
     shown = lambda: [vid for vid, b in p._tile.items() if not b.isHidden()]  # noqa: E731
     try:
         assert sorted(p._tile) == sorted(v["id"] for v in avl.BUILT_IN)
-        assert p._tile["titan"].isChecked() and p.picked_name.text() == "Titan"
+        assert p.picked_name.text() == "Titan"
+        assert not any(b.isChecked() for b in p._tile.values())   # off: none lit up
         assert p.lbl_about.text().startswith("Monster · Rumbling. Deeper than")
         assert p._tile["bear"].toolTip().startswith("Man · Very deep. ")
         assert p.b_edit.isHidden() and p.b_delete.isHidden()     # not one of yours
@@ -255,6 +256,9 @@ def test_card_shows_every_voice_as_a_card_under_its_kind(qapp, app_dir, monkeypa
         assert saved[-1]["voice"] == "bear" and p.current_voice() == "bear"
         assert starts == ["bear"] and p.is_on()
         assert p.picked_name.text() == "Bear" and not p._tile["titan"].isChecked()
+        assert p._tile["bear"].isChecked()                        # on: its card lit
+        p.stop()
+        assert not p.is_on() and not p._tile["bear"].isChecked()
         p.b_hear.click()
         assert p.previewer.heard == ["bear"]
     finally:
