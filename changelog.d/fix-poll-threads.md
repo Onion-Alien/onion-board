@@ -1,1 +1,0 @@
-- Fixed a rare freeze while sending sounds straight into your mic: the check for apps recording your mic (every 2 seconds) no longer starts a new thread each time, which could leave the window stuck. MIDI, the Onion Pocket network check and two Settings pages got the same fix.

@@ -1,1 +1,0 @@
-- Opening Settings no longer reads every language file again each time: the list of languages is read once, so Settings can't stall on a slow disk or while a virus scanner is busy.

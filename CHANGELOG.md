@@ -2,6 +2,34 @@
 
 Changes not released yet are in [changelog.d/](changelog.d/), one file per change.
 
+## 2.2.1 — 2026-10-16
+
+- A link whose download kept getting cut off no longer sits on "Adding… 90%" for good: after
+  a minute without new data it stops and says "The download stopped moving. Try again."
+- Radio: in a narrow window, where the map is hidden, the search box and the station count no longer tell you to click a dot on the map.
+- Mic effect set-up: when your picked mic can't be found, it now says why. If Windows no longer knows that mic, or two mics have names alike, it asks you to pick your mic again in Setup → Devices instead of saying it isn't plugged in.
+- Setup's Onion Pocket card says it's waiting for Windows to allow it while Windows asks
+  about the firewall, instead of "it couldn't start".
+- Making a new category (or subcategory) with a name you already have now says
+  "There's already a …" and goes to it, instead of doing nothing you could see.
+- Auto push-to-talk presses the game's key as a sound starts. With the board minimised it
+  came up to a quarter of a second late, so a game that only sends while the key is held
+  cut the start of the sound.
+- Fixed a rare freeze while sending sounds straight into your mic: the check for apps recording your mic (every 2 seconds) no longer starts a new thread each time, which could leave the window stuck. MIDI, the Onion Pocket network check and two Settings pages got the same fix.
+- Opening Settings no longer reads every language file again each time: the list of languages is read once, so Settings can't stall on a slow disk or while a virus scanner is busy.
+- Setup's Devices card now says when your headphones or mic won't open (unplugged), and
+  stops once they're back. Before, only a toast said it, and it faded.
+- On a slow first start (the virus scan checking a just-installed FFmpeg), the app waits up to a minute for FFmpeg to answer instead of 8 seconds, so it no longer calls a working FFmpeg broken and downloads it again.
+- Settings > Updates no longer says "Get FFmpeg" when FFmpeg is installed: the FFmpeg row now checks and shows "Working" even when Updates is opened before Data & quality.
+- Adding a free sound pack puts it in one tab named after it ("Streamer") with its
+  categories inside, instead of also making an empty tab for each of its categories.
+- Opening the Radio tab for the first time no longer freezes the whole window for several
+  seconds on a slow or busy disk.
+- FFmpeg got by the installer no longer shows as *FFmpeg won't start (some of its files are gone)* the first time the app opens, and the app no longer downloads a second copy of it: on PCs where winget can't make its usual shortcut to FFmpeg, the app now finds it in winget's own folder.
+- Importing the same soundboard yourself while the installer's import of it is still
+  running no longer adds every sound twice, or asks "Keep your imported sounds?" after
+  you already said yes.
+
 ## 2.2.0 — 2026-10-15
 
 - Stop all now silences the sound effects too: the echo and reverb no longer keep

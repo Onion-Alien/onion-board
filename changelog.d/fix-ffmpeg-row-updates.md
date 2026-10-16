@@ -1,1 +1,0 @@
-- Settings > Updates no longer says "Get FFmpeg" when FFmpeg is installed: the FFmpeg row now checks and shows "Working" even when Updates is opened before Data & quality.
