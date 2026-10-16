@@ -33,7 +33,7 @@ MAX_SEEN = 400          # message numbers kept to ignore a repeat
 
 
 def name_color(user: str, light_theme: bool = False) -> str:
-    """A steady colour for a person's name today (from their tag), readable on the
+    """A steady colour for a person's name (from their tag), readable on the
     theme's background: darker on a light one, lighter on a dark one."""
     h = (zlib.crc32(user.encode()) % 360) / 360
     r, g, b = colorsys.hls_to_rgb(h, 0.36 if light_theme else 0.64, 0.6)
@@ -41,7 +41,7 @@ def name_color(user: str, light_theme: bool = False) -> str:
 
 
 class MessageRow(QFrame):
-    """One message: who said it (a name that changes daily), what, and Mute / Report."""
+    """One message: who said it (a made-up name, new each launch), what, and Mute / Report."""
 
     def __init__(self, m: chat.Message, mine: bool, tab: ChatTab):
         super().__init__()
@@ -70,7 +70,7 @@ class MessageRow(QFrame):
         if not mine:
             self.btn_mute = QPushButton(_("Mute"))
             self.btn_mute.setProperty("quiet", True)
-            self.btn_mute.setToolTip(_("Hide everything this name says today"))
+            self.btn_mute.setToolTip(_("Hide everything this name says until the app is closed"))
             self.btn_mute.clicked.connect(lambda: tab.mute(m))
             h.addWidget(self.btn_mute, 0, Qt.AlignmentFlag.AlignTop)
             self.btn_report = icon_button("flag", _("Report this message"))
@@ -98,7 +98,7 @@ class ChatTab(QWidget):
         self._closed = False
         self._gen = 0             # the polling loop wanted now (older ones stop themselves)
         self._after = 0           # the newest message number seen
-        self._mine = ""           # today's tag for this install, learned from its first message
+        self._mine = ""           # this launch's tag, learned from its first message
         self._muted: set[str] = set()
         self._rows: list[MessageRow] = []
         self._seen: list[int] = []
@@ -111,8 +111,8 @@ class ChatTab(QWidget):
         outer.setContentsMargins(0, 0, 0, 0)
         outer.setSpacing(12)
         info = info_button(_("One room for everyone using Onion Board. Text only: no links or "
-                             "pictures. Your name is made up and changes every day, and only "
-                             "the last few messages are kept, in memory."))
+                             "pictures. Your name is made up and new every time you open the app, "
+                             "and only the last few messages are kept, in memory."))
         head, hv = card(_("Chat"), icon="chat", beside=info)
         head.setMaximumWidth(COLUMN_W)
         row = QHBoxLayout()
@@ -236,10 +236,10 @@ class ChatTab(QWidget):
         if not self.accepted():
             self._say("chat", _("Before you join"),
                       _("Chat is one room for everyone using Onion Board. It's anonymous: you "
-                        "get a made-up name that changes every day. Be decent: no hate, no "
-                        "threats, nothing about kids, no spam. Text only; links are blocked. "
-                        "Anyone can mute or report a message, and enough reports mute a "
-                        "person for an hour."),
+                        "get a made-up name like Cute Onion or Red Car, new every time you open "
+                        "the app. Be decent: no hate, no threats, nothing about kids, no spam. "
+                        "Text only; links are blocked. Anyone can mute or report a message, and "
+                        "enough reports mute a person for an hour."),
                       _("I agree, join the chat"), self.accept)
             return
         if not net.allowed(chat.FEATURE):
@@ -385,7 +385,7 @@ class ChatTab(QWidget):
         self._count("chat-said")
 
     def mute(self, m: chat.Message):
-        """Hide everything this name says today (the tag changes with the day)."""
+        """Hide everything this name says until the app is closed (the tag is new each launch)."""
         self._muted.add(m.user)
         for r in [r for r in self._rows if r.message.user == m.user]:
             self._rows.remove(r)

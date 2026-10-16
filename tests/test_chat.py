@@ -98,3 +98,25 @@ def test_switched_off_feature_is_refused_not_sent(monkeypatch):
     monkeypatch.setattr(net, "_offline", True)
     with pytest.raises(net.ProxyError):
         chat.poll("inst", 0, wait=False)
+
+
+def test_every_call_carries_this_launchs_session_and_no_name(monkeypatch):
+    got = []
+
+    class R:
+        def __enter__(self):
+            return self
+
+        def __exit__(self, *a):
+            return False
+
+        def read(self, n):
+            return b'{"messages": [], "last": 0}'
+
+    monkeypatch.setattr(net, "urlopen", lambda req, timeout=0, feature=None:
+                        got.append(dict(req.header_items())) or R())
+    chat.poll("inst", 0, wait=False)
+    h = got[0]
+    assert h["X-onion-session"] == chat.SESSION and len(chat.SESSION) == 16
+    int(chat.SESSION, 16)   # hex: what the server accepts
+    assert not any("name" in k.lower() for k in h)   # nobody picks a name

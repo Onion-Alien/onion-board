@@ -16,22 +16,35 @@ test("text is tidied and links are refused", () => {
   assert.equal(refuse("big bad-word here", ["badword"]), "not allowed");
 });
 
-test("names are stable for a hash and look like names", async () => {
+test("names are stable for a hash and look like two words", async () => {
   const h = await sha256("x");
   assert.equal(nameFor(h), nameFor(h));
-  assert.match(nameFor(h), /^[A-Z][a-z]+[A-Z][a-z]+\d\d$/);
+  assert.match(nameFor(h), /^[A-Z][a-z]+ [A-Z][a-z]+$/);
+  assert.notEqual(nameFor(h, 1), nameFor(h));
+});
+
+test("nobody shares a name, and a session keeps its own", async () => {
+  const r = new Room();
+  const same = "ab".repeat(32);   // two sessions whose hashes start the same
+  const a = r.nameOf("abababab", same);
+  const b = r.nameOf("cdcdcdcd", same);
+  assert.notEqual(a, b);
+  assert.equal(r.nameOf("abababab", same), a);
+  const seen = new Set();
+  for (let i = 0; i < 300; i++) seen.add(r.nameOf(String(i).padStart(8, "0"), await sha256(`s${i}`)));
+  assert.equal(seen.size, 300);   // 2862 names, and a taken one moves on to the next
 });
 
 test("rate limit, repeats, ip limit", () => {
   const r = new Room();
-  assert.ok(r.say(W, 1, "ip", "one", 10_000).ok);
-  assert.equal(r.say(W, 1, "ip", "two", 10_500).error, "slow down");
-  assert.equal(r.say(W, 1, "ip", "ONE", 12_000).error, "repeat");
-  assert.ok(r.say(W, 1, "ip", "three", 12_000).ok);
+  assert.ok(r.say(W, "ip", "one", 10_000).ok);
+  assert.equal(r.say(W, "ip", "two", 10_500).error, "slow down");
+  assert.equal(r.say(W, "ip", "ONE", 12_000).error, "repeat");
+  assert.ok(r.say(W, "ip", "three", 12_000).ok);
   const r2 = new Room();
   let t = 100_000, n = 0;
   for (let i = 0; i < 70; i++) {
-    const out = r2.say(`${i}`.padStart(64, "0"), 1, "same-ip", `m${i}`, (t += 10));
+    const out = r2.say(`${i}`.padStart(64, "0"), "same-ip", `m${i}`, (t += 10));
     if (out.ok) n++;
   }
   assert.equal(n, 60);
@@ -40,7 +53,7 @@ test("rate limit, repeats, ip limit", () => {
 test("history is capped and polls see only newer messages", () => {
   const r = new Room();
   for (let i = 0; i < 80; i++) {
-    const s = r.say(W, 1, "ip", `m${i}`, 1_000_000 + i * 4000);
+    const s = r.say(W, "ip", `m${i}`, 1_000_000 + i * 4000);
     r.push(s.msg, "u", "N");
   }
   assert.equal(r.msgs.length, 60);
@@ -50,26 +63,26 @@ test("history is capped and polls see only newer messages", () => {
 
 test("3 reports mute the author and clear their lines; ban and off work", () => {
   const r = new Room();
-  const s = r.say(W, 1, "ip", "rude", 5_000);
+  const s = r.say(W, "ip", "rude", 5_000);
   const m = r.push(s.msg, "u", "N");
-  r.push(r.say(W2, 1, "ip2", "fine", 5_000).msg, "v", "M");
+  r.push(r.say(W2, "ip2", "fine", 5_000).msg, "v", "M");
   assert.ok(r.report(m.id, "p1", 6_000).ok); assert.ok(r.report(m.id, "p1", 6_000).ok);
   assert.equal(r.muted.size, 0);
   r.report(m.id, "p2", 6_000); r.report(m.id, "p3", 6_000);
-  assert.equal(r.say(W, 1, "ip", "again", 9_000).error, "muted");
-  assert.equal(r.say(W, 1, "ip", "later", 5_000 + 3_700_000).ok, true);
+  assert.equal(r.say(W, "ip", "again", 9_000).error, "muted");
+  assert.equal(r.say(W, "ip", "later", 5_000 + 3_700_000).ok, true);
   assert.equal(r.msgs.length, 1);
   r.banned.add(W2);
-  assert.equal(r.say(W2, 1, "ip2", "hi", 99_000).error, "banned");
+  assert.equal(r.say(W2, "ip2", "hi", 99_000).error, "banned");
   r.off = true;
-  assert.equal(r.say("c".repeat(64), 1, "ip3", "hi", 99_000).error, "off");
+  assert.equal(r.say("c".repeat(64), "ip3", "hi", 99_000).error, "off");
   assert.equal(r.report(9999, "p1").error, "gone");
 });
 
 test("a waiting poll wakes when a message arrives, and gives up on time", async () => {
   const r = new Room();
   const waiting = r.wait(0, 5000);
-  r.push(r.say(W, 1, "ip", "hey", 10000000).msg, "u", "N");
+  r.push(r.say(W, "ip", "hey", 10000000).msg, "u", "N");
   await waiting;
   await r.wait(r.seq, 30);
   await r.wait(99, 30);   // lower seq than the client's: answers at once

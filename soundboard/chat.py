@@ -1,10 +1,11 @@
 """Anonymous chat (the Chat tab): one room, text only, for everyone using the app.
 
 It talks to the project's own small server (server/store in this repository, the same
-Cloudflare Worker as the sound store). Nobody picks a name: the server gives each install
-a funny one that changes every day, and keeps only the last few messages in memory. The
-app sends a random id it made itself (Config.store_id, shared with the store), which the
-server only keeps as a salted hash. Messages are plain text: no links, no pictures. The
+Cloudflare Worker as the sound store). Nobody picks a name: the server gives each launch of
+the app a silly two-word one ("Cute Onion", "Red Car"), and keeps only the last few messages
+in memory. The app sends a random id it made itself (Config.store_id, shared with the store)
+and a random one made at each start (SESSION), which the server only keeps mixed into salted
+hashes. Messages are plain text: no links, no pictures. The
 tab asks for new messages with a long poll, which waits on the server until something is
 said, so it goes through the proxy, Tor and Offline mode like every other feature. Chat
 has its own switch in Settings > Privacy & security (FEATURE)."""
@@ -30,6 +31,9 @@ POLL_S = 25               # how long one poll may wait (the server holds it for 
 LIST_LIMIT = 1 << 18      # 60 short messages are a few KB
 KEEP = 200                # messages the tab keeps on screen
 RULES_VERSION = 1         # bump to ask everyone to accept the rules again
+# made when the app starts: the server turns it into this launch's name, so a name lasts
+# until the app closes and never says who you are
+SESSION = secrets.token_hex(8)
 
 
 class ChatError(Exception):
@@ -40,7 +44,7 @@ class ChatError(Exception):
 class Message:
     id: int
     t: int          # milliseconds since 1970
-    user: str       # the day's short tag for who said it (for Mute and Report)
+    user: str       # the launch's short tag for who said it (for Mute and Report)
     name: str
     text: str
 
@@ -102,7 +106,8 @@ def _request(method: str, path: str, install: str, body: bytes | None = None,
              timeout: float = 15) -> bytes:
     """One call to the server; its answer. Raises ChatError (or net.ProxyError when chat
     is switched off or Offline). Call off the UI thread."""
-    headers = {"User-Agent": "OnionBoard (chat)", "X-Onion-Install": install}
+    headers = {"User-Agent": "OnionBoard (chat)", "X-Onion-Install": install,
+               "X-Onion-Session": SESSION}
     if body is not None:
         headers["Content-Type"] = "application/json"
     req = urllib.request.Request(BASE + path, data=body, headers=headers, method=method)

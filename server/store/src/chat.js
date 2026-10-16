@@ -1,8 +1,9 @@
 // The Chat tab's server: one anonymous, text-only room, kept in a Cloudflare Durable Object.
 //
-// Nobody picks a name and nothing is stored on disk. Each person gets a funny name made
-// from a salted hash of their install id and today's date, so it changes every day and
-// can't be used to track anyone. The room remembers only the last MAX_KEPT messages, in
+// Nobody picks a name and nothing is stored on disk. Each time the app is opened it makes
+// a random session id and the server turns it, with the install's hash, into a silly
+// two-word name ("Cute Onion", "Red Car", "Explicit Waterfall"), so a name lasts only
+// until the app is closed and can't be used to follow anyone. The room remembers only the last MAX_KEPT messages, in
 // memory. The app asks for new messages with a long poll (it holds the request open
 // until something arrives or POLL_MS passes), which keeps Offline mode, the proxy and
 // Tor working the same as every other feature.
@@ -21,13 +22,21 @@ const REPORTS_TO_MUTE = 3;
 const MUTE_MS = 3600 * 1000;
 const MAX_REPORTS = 200;
 const INSTALL_RE = /^[0-9a-f-]{16,64}$/;
+const SESSION_RE = /^[0-9a-f]{16,32}$/;
 
-const ADJ = ["Sleepy", "Soggy", "Crunchy", "Spicy", "Dizzy", "Fuzzy", "Grumpy", "Sneaky",
-  "Wobbly", "Cursed", "Moist", "Feral", "Salty", "Lumpy", "Shiny", "Bored", "Haunted",
-  "Chonky", "Mighty", "Suspicious", "Tiny", "Legendary", "Confused", "Hungry"];
-const NOUN = ["Onion", "Goblin", "Pickle", "Toaster", "Walrus", "Noodle", "Banana", "Raccoon",
-  "Wizard", "Potato", "Pigeon", "Muffin", "Gremlin", "Turnip", "Llama", "Cactus", "Badger",
-  "Waffle", "Penguin", "Moth", "Biscuit", "Otter", "Newt", "Kettle"];
+const ADJ = ["Cute", "Red", "Explicit", "Sleepy", "Soggy", "Crunchy", "Spicy", "Dizzy",
+  "Fuzzy", "Grumpy", "Sneaky", "Wobbly", "Cursed", "Moist", "Feral", "Salty", "Lumpy",
+  "Shiny", "Bored", "Haunted", "Chonky", "Mighty", "Suspicious", "Tiny", "Legendary",
+  "Confused", "Hungry", "Naughty", "Unhinged", "Sweaty", "Smug", "Angry", "Blue", "Green",
+  "Golden", "Greasy", "Damp", "Fancy", "Rogue", "Sticky", "Lazy", "Radical", "Cozy",
+  "Rowdy", "Awkward", "Majestic", "Unholy", "Slippery", "Jolly", "Wet", "Big", "Evil"];
+const NOUN = ["Onion", "Car", "Waterfall", "Goblin", "Pickle", "Toaster", "Walrus", "Noodle",
+  "Banana", "Raccoon", "Wizard", "Potato", "Pigeon", "Muffin", "Gremlin", "Turnip", "Llama",
+  "Cactus", "Badger", "Waffle", "Penguin", "Moth", "Biscuit", "Otter", "Newt", "Kettle",
+  "Sandwich", "Volcano", "Couch", "Sock", "Meatball", "Dumpster", "Bagel", "Pancake",
+  "Tractor", "Hamster", "Cabbage", "Trombone", "Lasagna", "Mushroom", "Fridge", "Ferret",
+  "Submarine", "Cheese", "Crab", "Lobster", "Bus", "Duck", "Ghost", "Sausage", "Parrot",
+  "Pizza", "Cloud", "Spoon", "Tomato", "Yeti"];
 
 // links of any kind (so no spam, no invites, no pictures): schemes, www., and name.tld/
 const LINK = /(https?:|ftp:|www\.|\b[a-z0-9-]{2,}\.(com|net|org|io|gg|ly|me|co|tv|xyz|app|dev|ru|to|cc)\b|discord\.gg|[a-z0-9-]+\.[a-z]{2,}\/)/i;
@@ -43,10 +52,10 @@ export function clean(text) {
     .replace(/\s+/g, " ").trim();
 }
 
-export function nameFor(hash) {
-  const n = parseInt(hash.slice(0, 8), 16);
-  return `${ADJ[n % ADJ.length]}${NOUN[Math.floor(n / ADJ.length) % NOUN.length]}${
-    (Math.floor(n / (ADJ.length * NOUN.length)) % 90) + 10}`;
+// the two-word name a hash gives ("Cute Onion"); `skip` > 0 gives the next one along
+export function nameFor(hash, skip = 0) {
+  const n = (parseInt(hash.slice(0, 8), 16) + skip * 7919) % (ADJ.length * NOUN.length);
+  return `${ADJ[n % ADJ.length]} ${NOUN[Math.floor(n / ADJ.length) % NOUN.length]}`;
 }
 
 // why `text` can't be said, or "" when it can
@@ -71,6 +80,7 @@ export class Room {
     this.seq = 0;
     this.last = new Map();     // who -> [time of last message, recent times, last text]
     this.ips = new Map();      // ip hash -> [window start, count]
+    this.names = new Map();    // session tag -> its name (kept so nobody shares a name)
     this.muted = new Map();    // who -> until (ms)
     this.banned = new Set();   // who hashes
     this.reports = [];         // {id, t, who, name, text, by: [reporters]}
@@ -84,8 +94,8 @@ export class Room {
       ({ id, t, u, name, text }));
   }
 
-  // who = install hash, day = today's number, ipk = address hash; returns {ok, ...} or {error}
-  say(who, day, ipk, rawText, now = Date.now()) {
+  // who = install hash, ipk = address hash; returns {ok, ...} or {error}
+  say(who, ipk, rawText, now = Date.now()) {
     if (this.off) return { error: "off", status: 503 };
     if (this.banned.has(who)) return { error: "banned", status: 403 };
     if ((this.muted.get(who) || 0) > now) return { error: "muted", status: 403 };
@@ -106,7 +116,19 @@ export class Room {
     rec[0] = now; rec[1].push(now); rec[2] = text.toLowerCase();
     this.last.set(who, rec);
     const msg = { id: ++this.seq, t: now, u: "", name: "", text, who };
-    return { ok: true, msg, day };
+    return { ok: true, msg };
+  }
+
+  // the name for session tag `u`: the same one every time, never one someone else has now
+  nameOf(u, hash) {
+    const had = this.names.get(u);
+    if (had) return had;
+    const used = new Set(this.names.values());
+    let name = nameFor(hash), k = 0;
+    while (used.has(name) && k < 40) name = nameFor(hash, ++k);
+    this.names.set(u, name);
+    if (this.names.size > 400) this.names.delete(this.names.keys().next().value);
+    return name;
   }
 
   push(msg, u, name) {
@@ -166,7 +188,7 @@ export class ChatRoom {
     const url = new URL(req.url);
     const who = req.headers.get("x-chat-who") || "";
     const ipk = req.headers.get("x-chat-ip") || "";
-    const day = Math.floor(Date.now() / 86400000);
+    const user = req.headers.get("x-chat-user") || "";
     const p = url.pathname;
     let g;
     if (p === "/v1/chat" && req.method === "GET") {
@@ -180,10 +202,10 @@ export class ChatRoom {
     if (p === "/v1/chat" && req.method === "POST") {
       let body;
       try { body = await req.json(); } catch { return json({ error: "bad request" }, 400); }
-      const r = room.say(who, day, ipk, body && body.text);
+      const r = room.say(who, ipk, body && body.text);
       if (r.error) return json({ error: r.error }, r.status);
-      const dh = await sha256(`${who}:${day}`);
-      const shown = room.push(r.msg, dh.slice(0, 8), nameFor(dh));
+      const u = user.slice(0, 8);
+      const shown = room.push(r.msg, u, room.nameOf(u, user));
       return json({ message: shown, last: room.seq });
     }
     if ((g = p.match(/^\/v1\/chat\/(\d+)\/report$/)) && req.method === "POST") {
@@ -220,10 +242,13 @@ export class ChatRoom {
 export async function chatRoute(req, env) {
   const id = (req.headers.get("x-onion-install") || "").toLowerCase();
   const p = new URL(req.url).pathname;
-  if (!p.startsWith("/v1/admin/") && !INSTALL_RE.test(id)) return json({ error: "install id" }, 400);
+  const session = (req.headers.get("x-onion-session") || "").toLowerCase();
+  if (!p.startsWith("/v1/admin/") && !(INSTALL_RE.test(id) && SESSION_RE.test(session)))
+    return json({ error: "install id" }, 400);
   const ip = req.headers.get("cf-connecting-ip") || "local";
   const headers = new Headers(req.headers);
   headers.set("x-chat-who", await sha256(`${env.SALT || ""}:chat:${id}`));
+  headers.set("x-chat-user", await sha256(`${env.SALT || ""}:chatname:${id}:${session}`));
   headers.set("x-chat-ip", await sha256(`${env.SALT || ""}:ip:${ip}`));
   const stub = env.CHAT.get(env.CHAT.idFromName("room"));
   return stub.fetch(new Request(req, { headers }));
