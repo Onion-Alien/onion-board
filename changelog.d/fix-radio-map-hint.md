@@ -1,1 +1,0 @@
-- Radio: in a narrow window, where the map is hidden, the search box and the station count no longer tell you to click a dot on the map.

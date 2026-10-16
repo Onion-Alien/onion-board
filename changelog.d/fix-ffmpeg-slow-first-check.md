@@ -1,1 +1,0 @@
-- On a slow first start (the virus scan checking a just-installed FFmpeg), the app waits up to a minute for FFmpeg to answer instead of 8 seconds, so it no longer calls a working FFmpeg broken and downloads it again.

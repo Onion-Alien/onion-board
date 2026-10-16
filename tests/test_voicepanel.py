@@ -1678,7 +1678,7 @@ def test_ai_voice_list_keeps_its_height_when_the_description_wraps(panel, qapp, 
     at its own width, or a two-line one is counted as one and squashes the voice cards."""
     p, _eng = panel
     ai = p.ai
-    about = "A light, high, young-sounding voice, good for cheerful characters. " * 3
+    about = "A light, high, young-sounding voice, good for cheerful characters. " * 6
     ai.voices = [{"id": "pixie", "name": "Pixie", "about": about}]
     ai._fill_tiles()
     ai.ready_box.setVisible(True)

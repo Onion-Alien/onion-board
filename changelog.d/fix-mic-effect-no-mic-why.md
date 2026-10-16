@@ -1,1 +1,0 @@
-- Mic effect set-up: when your picked mic can't be found, it now says why. If Windows no longer knows that mic, or two mics have names alike, it asks you to pick your mic again in Setup → Devices instead of saying it isn't plugged in.
