@@ -2,6 +2,22 @@
 
 Changes not released yet are in [changelog.d/](changelog.d/), one file per change.
 
+## 2.2.2 — 2026-10-16
+
+- AI voices: a voice card only lights up while the AI voice is on, like the Voice changer
+  cards, instead of the saved voice looking switched on when it was off.
+- Fixed a short freeze while the mic effect is on: re-checking the mic effect's state no
+  longer starts a new thread each time (the window waited for Windows to start it).
+- The FFmpeg check no longer fails with an error when Windows can't look at winget's
+  FFmpeg shortcut; it carries on looking elsewhere.
+- Settings > Connection: the Get Tor button now sits right next to the Tor choice.
+- Mic effect set-up no longer says your mic isn't plugged in while the meter shows it
+  working: it now finds the mic the same way the meter does (spacing and case ignored).
+- The anonymous usage count (if you left *Count me in* on) now sends the tabs and features
+  you used since the last daily count when you close the app, instead of a day later, so
+  the last day before someone stops using the app is counted too. Same names as
+  before; the close waits 2 s at most.
+
 ## 2.2.1 — 2026-10-16
 
 - A link whose download kept getting cut off no longer sits on "Adding… 90%" for good: after
