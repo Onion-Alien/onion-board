@@ -836,6 +836,25 @@ def _bun(p, fill):
         fill(eye)
 
 
+def _chat(p, fill):
+    """A speech bubble with a tail, and two lines of text in it."""
+    path = QPainterPath(QPointF(5, 4.5))
+    path.lineTo(19, 4.5)
+    path.quadTo(21, 4.5, 21, 6.5)
+    path.lineTo(21, 14.5)
+    path.quadTo(21, 16.5, 19, 16.5)
+    path.lineTo(11, 16.5)
+    path.lineTo(6.5, 20.5)
+    path.lineTo(6.5, 16.5)
+    path.lineTo(5, 16.5)
+    path.quadTo(3, 16.5, 3, 14.5)
+    path.lineTo(3, 6.5)
+    path.quadTo(3, 4.5, 5, 4.5)
+    p.drawPath(path)
+    p.drawLine(QPointF(7.5, 9), QPointF(16.5, 9))
+    p.drawLine(QPointF(7.5, 12.3), QPointF(13, 12.3))
+
+
 SHAPES = {
     "bun": _bun,
     "youtube": _youtube, "ytmusic": _ytmusic, "soundcloud": _soundcloud,
@@ -843,7 +862,7 @@ SHAPES = {
     "shuffle": _shuffle, "star": _star,
     "star_filled": lambda p, fill: _star(p, fill, True), "like": _like, "copy": _copy,
     "dislike": _dislike,
-    "upload": _upload, "flag": _flag, "store": _store,
+    "upload": _upload, "flag": _flag, "store": _store, "chat": _chat,
     "sort": _sort, "list": _list, "rename": _rename, "tag": _tag, "search": _search,
     "sounds": _grid, "browser": _globe, "offline": _offline, "tor": _tor, "phone": _phone,
     "voice": _mask, "setup": _sliders,

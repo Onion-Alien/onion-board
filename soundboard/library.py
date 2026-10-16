@@ -440,7 +440,7 @@ class Config:
     app_clips_keep_forever: bool = False   # otherwise expire after seven inactive days
     sidebar_open: bool = True   # the tab rail opened out to show the tabs' names
     sidebar_order: list[str] = field(default_factory=list)   # stable tab keys, visual order
-    # 0 = sounds, 1 = radio, 2 = apps, 3 = triggers, 4 = voice, 5 = setup, 6 = store
+    # 0 = sounds, 1 = radio, 2 = apps, 3 = triggers, 4 = voice, 5 = setup, 6 = store, 7 = chat
     tab: int = 0
     # Settings > Tabs: the tabs switched off ("radio", "apps", "triggers", "voice"), gone
     # from the window and never built (a new user starts with BASIC_TABS_OFF)
@@ -448,6 +448,8 @@ class Config:
     # the Store tab's random id for this install (soundboard.store: one vote per sound);
     # "" until the store is first used
     store_id: str = ""
+    # the version of the Chat tab's rules this user accepted (0 = not yet: soundboard.chat)
+    chat_rules: int = 0
     # fetch newer yt-dlp versions from PyPI by itself: opt-in, since that's code the app
     # runs (named *_optin so configs saved while it defaulted to on start off again)
     ytdlp_auto_optin: bool = False
@@ -726,7 +728,7 @@ class Config:
         cfg.route = "mic"
         cfg.mic_first = True
         cfg.duck_on = True
-        cfg.tabs_off = list(BASIC_TABS_OFF)   # a plain soundboard first; + More tabs adds them
+        cfg.tabs_off = [*BASIC_TABS_OFF, "chat"]   # a plain soundboard first; + More tabs adds them
         cfg.use_mode = ""   # the guide asks what it's for (and adds the tabs that fit)
         return cfg
 
@@ -861,6 +863,10 @@ class Config:
         raw.setdefault("setup_done", bool(raw.get("main_device")))
         # ...and from before What's new: everything in it is new to them
         raw.setdefault("whats_new_seen", "")
+        # ...and from before the Chat tab: it is opt-in, so it starts switched off
+        if "chat_rules" not in raw:
+            off = raw.get("tabs_off")
+            raw["tabs_off"] = [*(off if isinstance(off, list) else []), "chat"]
         # ...and from before the usage count: they installed an app that sent nothing,
         # so it starts switched off for them (new installs: on, unless the installer's
         # box was unticked)

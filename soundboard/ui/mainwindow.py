@@ -70,6 +70,7 @@ from soundboard.ui.appspanel import AppsTab
 from soundboard.ui.triggershost import BoardHost
 from soundboard.ui.triggerstab import TriggersTab
 from soundboard.ui.radiopanel import RadioOff, RadioTab
+from soundboard.ui.chattab import ChatTab
 from soundboard.ui.storetab import PREVIEW as STORE_PREVIEW, StoreTab
 from soundboard.ui.voicepanel import VoicePanel
 from soundboard.ui.widgets import (Meter, Pad, expand_dropped)
@@ -350,6 +351,7 @@ class MainWindow(QMainWindow):
     _video_win: Any
     voice: Any
     store: Any   # the Store tab (StoreTab), or its stand-in while switched off
+    chat: Any    # the Chat tab (ChatTab), or its stand-in while switched off (the default)
     vol_mic: VolumeControl
     vol_mon: VolumeControl
     vol_sound: VolumeControl
@@ -815,11 +817,13 @@ class MainWindow(QMainWindow):
     @overload
     def _make_tab(self, key: Literal["store"]) -> StoreTab | taboff.TabOff: ...
     @overload
-    def _make_tab(self, key: str) -> (VoicePanel | AppsTab | TriggersTab | StoreTab
+    def _make_tab(self, key: Literal["chat"]) -> ChatTab | taboff.TabOff: ...
+    @overload
+    def _make_tab(self, key: str) -> (VoicePanel | AppsTab | TriggersTab | StoreTab | ChatTab
                                       | taboff.TabOff): ...
 
     def _make_tab(self, key: str):
-        """The Apps, Triggers, Voice or Store tab, wired to the window; or, switched off in
+        """The Apps, Triggers, Voice, Store or Chat tab, wired to the window; or, switched off in
         Settings > Tabs, its stand-in (nothing of the tab is made or loaded)."""
         if not self.tabctl.tab_on(key):
             self.tab_info.pop(key, None)
@@ -851,6 +855,10 @@ class MainWindow(QMainWindow):
                          self._store_sample, lambda: self.setctl.open_settings("privacy"),
                          self._save_later, self._store_link)
             return v
+        elif key == "chat":
+            return ChatTab(self.cfg, lambda: self.setctl.open_settings("privacy"),
+                           self._save_later,
+                           lambda step: usage.step(self.cfg, step))
         else:
             # the Onion Watch add-on, or Hoot and its download button until it's
             # installed; loaded by load_triggers
@@ -1403,7 +1411,7 @@ class MainWindow(QMainWindow):
                      self.remctl._stop_remote_addons,
                      self._finish_count_at_quit,   # sent meanwhile; before Tor stops
                      self.radio.shutdown, tor.shutdown, self.apps.shutdown,
-                     self.triggers.shutdown, self.store.shutdown,
+                     self.triggers.shutdown, self.store.shutdown, self.chat.shutdown,
                      self.linkbar.shutdown, ytworker.drop_all,
                      self.voice.shutdown, self.engine.shutdown, shellicon.detach,
                      self.thumbbar.close,
