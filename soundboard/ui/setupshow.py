@@ -326,7 +326,7 @@ class SetupShow(BunnyWidget):
         p = QPainter(self)
         snap_to_pixels(p)
         p.setRenderHint(QPainter.RenderHint.Antialiasing)
-        pose = self.pose()
+        pose = self.springy(self.pose())
         r = self._bun_rect()
         phase = self.phase()
         p.setPen(Qt.PenStyle.NoPen)

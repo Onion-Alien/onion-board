@@ -335,3 +335,61 @@ def test_a_napping_bun_stays_up_for_the_end_of_his_act(qapp, monkeypatch):
     assert not b.asleep and b.pose()["prop"] == "hammer_broken"   # sees it fail, awake
     _frames(qapp, b, bw.FAIL_END)
     assert b.asleep                                               # then back to his nap
+
+
+def test_a_blink_shuts_fast_and_opens_slowly():
+    from soundboard.ui import bunnywidget as bw
+    assert bw.blink_amount(-0.1) == 0 and bw.blink_amount(1.0) == 0
+    assert bw.blink_amount(bw.BLINK_SHUT) == 1
+    assert bw.blink_amount(bw.BLINK_SHUT * 0.5) < 0.5               # speeding up as it shuts
+    opening = bw.BLINK_SHUT + bw.BLINK_HOLD
+    assert abs(bw.blink_amount(opening + bw.BLINK_OPEN * 0.5) - 0.5) < 1e-9   # halfway open
+    assert bw.BLINK_OPEN > 2 * bw.BLINK_SHUT                        # opens more slowly
+
+
+def test_landing_squashes_him_and_he_jiggles_back(qapp):
+    b = BunnyWidget("star", height=150, joy_lines=("yay",))
+    b.resize(b.sizeHint())
+    b.cheer()
+    t0 = b._joy_at
+    squash = []
+    for i in range(90):   # 1.5 s at 60 fps, on a pretend clock
+        b._spring(t0 + i / 60, 1 / 60)
+        squash.append(b._squash_s.x)
+    assert min(squash) < -0.03          # squashed on a landing
+    assert max(squash) > 0.01           # stretched as he takes off / falls
+    for i in range(90, 240):            # the hops are over: he settles back into shape
+        b._spring(t0 + i / 60, 1 / 60)
+    assert abs(b._squash_s.x) < 0.01
+
+
+def test_his_stretch_never_leaves_his_box(qapp):
+    b = BunnyWidget("star", height=150, pad=4)
+    b.resize(b.sizeHint())
+    b._squash_s.x = 0.15                # as tall as the spring lets him get
+    pose = b.springy({**b.pose(), "dy": -2.0})
+    top = b._bun_rect().top() - 2.0 + 150 * (1 - pose["sy"])
+    assert top >= 0
+
+
+def test_ears_trail_behind_and_settle(qapp):
+    b = BunnyWidget("plug")
+    b.resize(b.sizeHint())
+    now = time.monotonic()
+    b._spring(now, 1 / 60)
+    b._ears_s.x += 20                   # flung out (a hop)
+    peaks = []
+    for i in range(1, 120):
+        b._spring(now + i / 60, 1 / 60)
+        peaks.append(b._ears_s.x - b.pose(now + i / 60)["ears"])
+    assert min(peaks) < -1              # swings past where they rest: a wobble
+    assert abs(peaks[-1]) < 0.5         # ... and settles
+
+
+def test_bun_mode_keeps_going_behind_a_game_at_a_slower_pace(qapp):
+    from soundboard.ui import appstate
+    from soundboard.ui import bunnywidget as bw
+    b = BunnyWidget("plug", in_background=True)
+    b._resume()
+    assert b._timer.interval() == appstate.interval(bw.FAST_MS, bw.BACK_MS)
+    b._timer.stop()
