@@ -157,6 +157,7 @@ FEATURES = ("add-files", "youtube", "record", "clip", "clip-editor", "import-boa
             *(f"setup-closed-{k}" for k in ("mic", "headphones", "send", "last")),
             "setup-skipped-send", "setup-finished", "setup-finished-not-sending",
             "tour-shown", "tour-searched", "tour-files", "tour-skipped", "tour-ignored",
+            "starter-sounds",
             # the Triggers tab's Get Onion Watch window: shown, Get clicked, closed
             "watch-prompt-shown", "watch-prompt-get", "watch-prompt-closed",
             # Get FFmpeg clicked / failed; a file that couldn't play without it
