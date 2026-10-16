@@ -343,6 +343,7 @@ def test_a_cards_parts_line_up(qapp):
 
 
 @pytest.mark.windows
+@pytest.mark.fonts   # loads Segoe UI (conftest runs it last)
 def test_see_why_text_is_level_with_the_warning_icon(qapp):
     """Check the painted baseline with the Windows font the app ships with."""
     import os

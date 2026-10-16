@@ -178,15 +178,21 @@ def pytest_configure(config):
                             "(net.NEVER_THIS_PC) as in the app")
     config.addinivalue_line("markers", "windows: needs Windows itself (its registry, "
                             "DLLs or processes); skipped on Linux and macOS")
+    config.addinivalue_line("markers", "fonts: loads Windows' own fonts into Qt, which "
+                            "changes every later test's text in that process: run last")
     config.addinivalue_line("markers", "host: runs the real mic effect in its test or fuzz "
                             "host (CI's mic-effect job builds them and runs these, one at a "
                             "time: side by side they miss real time)")
 
 
 def pytest_collection_modifyitems(config, items):
-    """Off Windows the `windows` tests are skipped. `-m windows` / `-m "not windows"`
-    picks either set on any system (on Windows, `-m "not windows"` is what runs
-    elsewhere)."""
+    """The `fonts` tests go last: a font they load stays in Qt's caches for the rest of
+    the process (taking it out again doesn't undo it), so the tests after them
+    measured other text (a tick 2 px off level, a window too tall for 800x600) and
+    failed only in some orders. Off Windows the `windows` tests are skipped.
+    `-m windows` / `-m "not windows"` picks either set on any system (on Windows,
+    `-m "not windows"` is what runs elsewhere)."""
+    items.sort(key=lambda item: item.get_closest_marker("fonts") is not None)   # stable
     if sys.platform == "win32":
         return
     skip = pytest.mark.skip(reason="needs Windows")
@@ -223,6 +229,29 @@ def qapp():
         from soundboard.uigc import UiCollector
         app._collector = UiCollector(parent=app, freeze=False)
     return app
+
+
+@pytest.fixture(autouse=True)
+def _theme_back_after():
+    """A test that switched the app's theme (Comic Sans, a highlight colour, textures)
+    puts the one before back: the theme is the whole process's, and the tests after it
+    that read it without a window of their own (theme.stylesheet(), T) drew in it."""
+    theme = sys.modules.get("soundboard.theme")
+    before = None if theme is None else (theme.current_name, theme.live_override,
+                                         theme.textures_on)
+    yield
+    theme = sys.modules.get("soundboard.theme")
+    if theme is None or before is None:
+        return
+    if (theme.current_name, theme.live_override, theme.textures_on) == before:
+        return
+    from PySide6.QtWidgets import QApplication
+    name, theme.live_override, theme.textures_on = before
+    app = QApplication.instance()
+    if app is None:
+        theme.set_current(name)
+    else:
+        theme.apply(app, name)
 
 
 @pytest.fixture(autouse=True)
