@@ -793,6 +793,20 @@ def test_offline_mode_stops_a_running_tor(fake_tor, monkeypatch):
     net.configure_features()
 
 
+def test_offline_mode_after_a_failure_says_offline(fake_tor, monkeypatch):
+    t = fake_tor("die")
+    monkeypatch.setattr(tor, "_tor", t)
+    t.configure(True)
+    with pytest.raises(net.ProxyError):
+        t.gate(10)
+    assert t.state == tor.FAILED
+    net.configure_features(offline=True)
+    assert _wait(lambda: "Offline mode" in t.status_text())
+    assert t.state == tor.OFF
+    net.configure_features()
+    assert t.status_text() == "Tor starts the next time the app goes online."
+
+
 def test_leaving_offline_refreshes_status_without_starting_tor(fake_tor, monkeypatch):
     t = fake_tor()
     monkeypatch.setattr(tor, "_tor", t)
