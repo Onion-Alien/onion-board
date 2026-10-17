@@ -303,8 +303,9 @@ def test_a_click_cheer_hops_high_with_a_happy_face_and_squashes(qapp):
     assert landing["sy"] < 0.95 < landing["sx"]       # squashed on landing
 
 
-def test_idle_fidgets_now_and_then(qapp):
+def test_idle_fidgets_now_and_then(qapp, monkeypatch):
     from soundboard.ui import bunnywidget as bw
+    monkeypatch.setattr(bw.bunskits, "NEXT_PROB", 0.0)   # (a fidget, not his skit)
     b = BunnyWidget("headphones")
     b.resize(b.sizeHint())
     b._next_blink = b._next_flick = time.monotonic() + 600
@@ -521,6 +522,74 @@ def test_his_mouth_stays_shut_to_music_and_only_talks_to_speech(qapp, monkeypatc
     _beats(talk, clock, 2.0)
     assert talk.pose()["mouth"] > 0.5
 
+
+def test_every_themes_skit_plays_through_and_ends_clean(qapp, monkeypatch):
+    from soundboard import theme
+    from soundboard.ui import bunnywidget, bunskits
+    clock = _Clock()
+    monkeypatch.setattr(bunnywidget, "time", clock)
+    was = theme.current_name
+    try:
+        for name in [*bunskits.SKITS, "Textured"]:   # (Textured: no outfit, juggles)
+            theme.apply(qapp, name)
+            b = BunnyWidget(height=120)
+            b.resize(b.sizeHint())
+            b._next_fidget = 1e12
+            b.skit()
+            length = bunskits.for_theme(name)[0]
+            seen_hidden = False
+            for i in range(int(length * 12) + 3):   # (every 1/12 s, and one past the end)
+                clock.now += 1 / 12
+                b._step()
+                pose = b.pose()
+                seen_hidden |= pose["outfit"] is not None
+                if i % 4 == 0:
+                    assert not b.grab().isNull()
+            assert not b.skit_playing, name           # over: nothing left behind
+            pose = b.pose()
+            assert pose["outfit"] is None and pose["alpha"] == 1.0, name
+            if name == "Blood Moon":   # he took the moon out of the sky...
+                assert seen_hidden
+    finally:
+        theme.apply(qapp, was)
+
+
+def test_blood_moon_bun_bites_the_moon_and_its_cheese(qapp, monkeypatch):
+    from soundboard import theme
+    from soundboard.ui import bunnywidget, bunskits
+    clock = _Clock()
+    monkeypatch.setattr(bunnywidget, "time", clock)
+    was = theme.current_name
+    try:
+        theme.apply(qapp, "Blood Moon")
+        kit = bunskits.Kit()
+        bunskits.blood_moon(kit, 1.0)
+        assert "moon" not in kit.hide                    # still in the sky
+        kit = bunskits.Kit()
+        bunskits.blood_moon(kit, 3.3)
+        assert "moon" in kit.hide and kit.front           # in his paw, bitten
+        assert kit.pose["ears"] < -5                      # surprised: ears up
+    finally:
+        theme.apply(qapp, was)
+
+
+def test_a_skit_only_starts_when_hes_idle_and_stops_for_anything_else(qapp, monkeypatch):
+    from soundboard.ui import bunnywidget
+    clock = _Clock()
+    monkeypatch.setattr(bunnywidget, "time", clock)
+    monkeypatch.setattr(bunnywidget.bunskits, "NEXT_PROB", 1.0)
+    b = BunnyWidget(height=110)
+    b._next_fidget = clock.now
+    b.set_level(0.5)        # talking: no skit
+    b._step()
+    assert not b.skit_playing
+    b._level = 0.0
+    b._next_fidget = clock.now
+    _beats(b, clock, 0.1)
+    assert b.skit_playing   # idle: off he goes
+    b.set_groove(_Song(clock, "pop"))   # music: the skit stops, he dances
+    _beats(b, clock, 1.0)
+    assert not b.skit_playing
 
 def test_hiphop_nods_on_the_808_hits_themselves(qapp, monkeypatch):
     b, clock = _dance(monkeypatch, "hiphop")
