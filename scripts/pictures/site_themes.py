@@ -28,7 +28,7 @@ sys.path.insert(0, str(ROOT))
 from soundboard import theme  # noqa: E402
 
 DEFAULT = "Dark"   # the site's own pictures: no copies, no colour overrides
-SITE_THEMES = ["Blood Moon", "Synthwave", "Hacker", "Ocean", "Light"]
+SITE_THEMES = ["Halloween", "Blood Moon", "Synthwave", "Hacker", "Ocean", "Light"]
 BOARD_PICS = ["sounds", "voice", "triggers", "apps", "setup"]
 WATCH_PICS = ["main", "window-picker", "cut-picture", "health-bar", "categories"]
 OUT = ROOT / "site" / "screenshots" / "themes"
