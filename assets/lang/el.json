@@ -3803,5 +3803,14 @@
   "Rain, a crowd, an echo or sounds from your board, on top of any voice": "Βροχή, πλήθος, ηχώ ή ήχοι από το board σου πάνω σε οποιαδήποτε φωνή",
   "Take “{effect}” off": "Βγάλε το «{effect}»",
   "{site} didn't answer over Tor (it ignores some of Tor's addresses), and nor did {tries} other Tor routes. You can try this one without Tor: {site} would then see your own address.": "Το {site} δεν απάντησε μέσω Tor (αγνοεί κάποιες διευθύνσεις του Tor), ούτε μέσω {tries} άλλων διαδρομών Tor. Μπορείτε να δοκιμάσετε αυτό χωρίς Tor: το {site} θα έβλεπε τότε τη δική σας διεύθυνση.",
-  "Up next · {n} before it": "Επόμενο · {n} πριν από αυτό"
+  "Up next · {n} before it": "Επόμενο · {n} πριν από αυτό",
+  "13 new voice changer voices and 6 new AI voices.": "13 νέες φωνές αλλαγής φωνής και 6 νέες φωνές AI.",
+  "19 new voices": "19 νέες φωνές",
+  "A softer storybook look, and their own look in every theme.": "Πιο απαλή εμφάνιση παραμυθιού και δική τους εμφάνιση σε κάθε θέμα.",
+  "Bun and Hoot redrawn": "Ο Bun και ο Hoot ξανασχεδιασμένοι",
+  "Effects behind your voice, and new voices": "Εφέ πίσω από τη φωνή σου και νέες φωνές",
+  "Effects on any voice": "Εφέ σε κάθε φωνή",
+  "Share your voices and setups with everyone, and get theirs.": "Μοιράσου τις φωνές και τις ρυθμίσεις σου με όλους και πάρε τις δικές τους.",
+  "The voice bar's Effects button puts rain, a crowd, a fire or a sound from your board behind your voice.": "Το κουμπί Εφέ στη γραμμή φωνής βάζει βροχή, πλήθος, φωτιά ή έναν ήχο από το board σου πίσω από τη φωνή σου.",
+  "Open Appearance": "Άνοιγμα Εμφάνισης"
 }

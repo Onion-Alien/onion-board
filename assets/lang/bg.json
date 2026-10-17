@@ -3803,5 +3803,14 @@
   "Rain, a crowd, an echo or sounds from your board, on top of any voice": "Дъжд, тълпа, ехо или звуци от твоя борд върху всеки глас",
   "Take “{effect}” off": "Махни „{effect}“",
   "{site} didn't answer over Tor (it ignores some of Tor's addresses), and nor did {tries} other Tor routes. You can try this one without Tor: {site} would then see your own address.": "{site} не отговори през Tor (пренебрегва някои адреси на Tor), както и при {tries} други маршрута на Tor. Можете да опитате този без Tor: тогава {site} ще види вашия собствен адрес.",
-  "Up next · {n} before it": "Следва · {n} преди него"
+  "Up next · {n} before it": "Следва · {n} преди него",
+  "13 new voice changer voices and 6 new AI voices.": "13 нови гласа за смяна на гласа и 6 нови AI гласа.",
+  "19 new voices": "19 нови гласа",
+  "A softer storybook look, and their own look in every theme.": "По-мек приказен вид и собствен вид във всяка тема.",
+  "Bun and Hoot redrawn": "Bun и Hoot са прерисувани",
+  "Effects behind your voice, and new voices": "Ефекти зад гласа ти и нови гласове",
+  "Effects on any voice": "Ефекти върху всеки глас",
+  "Share your voices and setups with everyone, and get theirs.": "Сподели гласовете и настройките си с всички и вземи техните.",
+  "The voice bar's Effects button puts rain, a crowd, a fire or a sound from your board behind your voice.": "Бутонът Ефекти в лентата на гласа слага дъжд, тълпа, огън или звук от борда ти зад гласа ти.",
+  "Open Appearance": "Отвори Външен вид"
 }
