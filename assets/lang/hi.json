@@ -3649,5 +3649,9 @@
   "Send to others": "दूसरों को भेजें",
   "Who should hear the radio?": "रेडियो किसे सुनाई दे?",
   "only you hear it": "सिर्फ़ आप सुनते हैं",
-  "Click any dot to play that station. Press Send to others and your call hears it too.": "उस स्टेशन को चलाने के लिए किसी भी बिंदु पर क्लिक करें। दूसरों को भेजें दबाएँ और आपकी कॉल भी इसे सुनेगी।"
+  "Click any dot to play that station. Press Send to others and your call hears it too.": "उस स्टेशन को चलाने के लिए किसी भी बिंदु पर क्लिक करें। दूसरों को भेजें दबाएँ और आपकी कॉल भी इसे सुनेगी।",
+  "{n} min": [
+    "{n} मिनट",
+    "{n} मिनट"
+  ]
 }

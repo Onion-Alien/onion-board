@@ -3649,5 +3649,9 @@
   "Send to others": "Naar anderen sturen",
   "Who should hear the radio?": "Wie moet de radio horen?",
   "only you hear it": "alleen jij hoort het",
-  "Click any dot to play that station. Press Send to others and your call hears it too.": "Klik op een stip om die zender af te spelen. Druk op Naar anderen sturen en je gesprek hoort hem ook."
+  "Click any dot to play that station. Press Send to others and your call hears it too.": "Klik op een stip om die zender af te spelen. Druk op Naar anderen sturen en je gesprek hoort hem ook.",
+  "{n} min": [
+    "{n} min",
+    "{n} min"
+  ]
 }

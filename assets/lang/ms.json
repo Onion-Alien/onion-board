@@ -3572,5 +3572,8 @@
   "Send to others": "Hantar kepada orang lain",
   "Who should hear the radio?": "Siapa patut dengar radio?",
   "only you hear it": "hanya anda yang dengar",
-  "Click any dot to play that station. Press Send to others and your call hears it too.": "Klik mana-mana titik untuk memainkan stesen itu. Tekan Hantar kepada orang lain dan panggilan anda juga mendengarnya."
+  "Click any dot to play that station. Press Send to others and your call hears it too.": "Klik mana-mana titik untuk memainkan stesen itu. Tekan Hantar kepada orang lain dan panggilan anda juga mendengarnya.",
+  "{n} min": [
+    "{n} min"
+  ]
 }

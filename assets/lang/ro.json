@@ -3726,5 +3726,10 @@
   "Send to others": "Trimite altora",
   "Who should hear the radio?": "Cine să audă radioul?",
   "only you hear it": "doar tu îl auzi",
-  "Click any dot to play that station. Press Send to others and your call hears it too.": "Dă clic pe orice punct ca să pornești postul. Apasă Trimite altora și te aude și apelul."
+  "Click any dot to play that station. Press Send to others and your call hears it too.": "Dă clic pe orice punct ca să pornești postul. Apasă Trimite altora și te aude și apelul.",
+  "{n} min": [
+    "{n} min",
+    "{n} min",
+    "{n} min"
+  ]
 }

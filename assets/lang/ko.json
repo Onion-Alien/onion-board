@@ -3572,5 +3572,8 @@
   "Send to others": "다른 사람에게 보내기",
   "Who should hear the radio?": "누가 라디오를 들을까요?",
   "only you hear it": "나만 들려요",
-  "Click any dot to play that station. Press Send to others and your call hears it too.": "점을 클릭하면 그 방송국이 재생됩니다. 다른 사람에게 보내기를 누르면 통화 상대도 들을 수 있어요."
+  "Click any dot to play that station. Press Send to others and your call hears it too.": "점을 클릭하면 그 방송국이 재생됩니다. 다른 사람에게 보내기를 누르면 통화 상대도 들을 수 있어요.",
+  "{n} min": [
+    "{n}분"
+  ]
 }
