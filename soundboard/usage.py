@@ -54,6 +54,11 @@ PC's ID), the follow-up ticks under a pick (`improve/sounds/memes`: IMPROVE_MORE
 and what they typed under Other or Fewer bugs as dashed
 words (`improve/other/more-anime-sounds`), with email addresses, links and long numbers
 taken out first.
+And when someone answers *Enjoying Onion Board?* (shown once ever, after a few days of heavy
+use: enjoy.py), their thumb (`feedback/positive`, `feedback/negative`) and what they
+typed under it as dashed words (`feedback/positive/more-meme-sounds`, other_tag), plus
+`feedback/shown` and `feedback/dismissed` to see how many answer, with a one-off random
+session like the improve picks.
 Nothing else: no name, sounds, settings, devices, games or IP address in the message
 (GoatCounter sees the connection's address like any site does, and isn't sent it to
 keep or look up).
@@ -79,7 +84,7 @@ import urllib.request
 import uuid
 from pathlib import Path
 
-from soundboard import __version__, net, netlog
+from soundboard import __version__, enjoy, net, netlog
 
 log = logging.getLogger(__name__)
 
@@ -455,6 +460,7 @@ def open_tick(cfg, now: float | None = None) -> None:
     counting = enabled() and net.allowed(FEATURE)   # off: nothing piles up for later
     if counting and _open_mark is not None and 0 < now - _open_mark <= OPEN_GAP_S:
         cfg.stats_open_s = max(0.0, float(cfg.stats_open_s or 0)) + (now - _open_mark)
+        enjoy.add(cfg, now - _open_mark)   # per day, for *Enjoying Onion Board?*
     _open_mark = now
 
 
@@ -1222,6 +1228,24 @@ def improve(cfg, picks, other: str = "", bugs: str = "") -> bool:
     sid = uuid.uuid4().hex   # not install_id(cfg): the box says it isn't linked to this PC
     netlog.cause(FEATURE, "Anonymous usage count (feedback picks)")
     threading.Thread(target=send, args=([_event(e, sid) for e in events],), daemon=True,
+                     name="usage-count").start()
+    return True
+
+
+SURVEY = ("shown", "dismissed", "positive", "negative")   # feedback/<one of these>
+
+
+def survey(sid: str, what: str, said: str = "") -> bool:
+    """*Enjoying Onion Board?* (ui/enjoycontrol.py): `feedback/<what>` (SURVEY names
+    only), with what they typed as `feedback/<what>/<words>` (other_tag). `sid` is a
+    random session the bar made, never this PC's stats_id. False when nothing can be
+    sent (usage count off, offline, running from source)."""
+    if what not in SURVEY or not enabled() or not net.allowed(FEATURE):
+        return False
+    tag = other_tag(said) if what in ("positive", "negative") else ""
+    event = f"feedback/{what}/{tag}" if tag else f"feedback/{what}"
+    netlog.cause(FEATURE, "Anonymous usage count (feedback)")
+    threading.Thread(target=send, args=([_event(event, sid)],), daemon=True,
                      name="usage-count").start()
     return True
 

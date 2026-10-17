@@ -364,6 +364,13 @@ daily count: `improve/sounds`, `improve/looks`… (only the names in `IMPROVE` i
 `improve/bugs/said/crashes-when-i-alt-tab`, at most 100 and 200 characters; anything
 that looks like an email address, a link or a long number is taken out first).
 
+**Enjoying Onion Board?** (a bar shown once ever, after the app was open 2 hours or
+more on 3 different days, and only while the count is on) sends your thumb the same way, with
+a one-off random session: `feedback/positive` or `feedback/negative`, what you typed
+under it as dashed words (`feedback/positive/more-meme-sounds`, at most 100 characters,
+cleaned like the above), and `feedback/shown` / `feedback/dismissed` when it's shown or
+closed without a thumb.
+
 **Switching it off** (the installer's box, or Settings) sends one last
 `opt-out/installer` or `opt-out/settings` with no ID, tag or session, so it can't be
 tied to anything sent before (only when it was on until then, never in Offline or Tor
