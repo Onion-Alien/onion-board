@@ -27,8 +27,8 @@ import time
 from pathlib import Path
 
 from PySide6.QtCore import QEventLoop, QPointF, QRectF, Qt
-from PySide6.QtGui import (QColor, QCursor, QFont, QFontMetricsF, QGuiApplication, QImage,
-                           QPainter, QPainterPath, QPen, QRadialGradient)
+from PySide6.QtGui import (QColor, QCursor, QFont, QGuiApplication, QImage, QPainter,
+                           QPainterPath, QPen, QRadialGradient)
 from PySide6.QtWidgets import QApplication, QWidget
 
 from soundboard import __version__, theme
@@ -104,19 +104,16 @@ def _surface(w: float, h: float, scale: float) -> QImage:
             font.setPixelSize(18)
             font.setWeight(QFont.Weight.DemiBold)
             p.setFont(font)
-            # the name with the version small beside it, the two centred as one
-            name, version = "Onion Board", f"v{__version__}"
-            vfont = QFont(family)
-            vfont.setPixelSize(11)
-            vw = QFontMetricsF(vfont).horizontalAdvance(version)
-            nw = QFontMetricsF(font).horizontalAdvance(name)
-            x = (w - (nw + 6 + vw)) / 2
             p.setPen(QColor(theme.T["text_hi"]))
-            p.drawText(QRectF(x, 142, nw + 1, 26), Qt.AlignmentFlag.AlignVCenter, name)
-            base = 142 + 13 + QFontMetricsF(font).ascent() / 2 - QFontMetricsF(font).descent() / 2
+            p.drawText(QRectF(20, 142, w - 40, 26), Qt.AlignmentFlag.AlignCenter, "Onion Board")
+            # the version small in the top right corner: the name stays dead centre
+            vfont = QFont(family)
+            vfont.setPixelSize(10)
             p.setFont(vfont)
             p.setPen(QColor(theme.T["muted"]))
-            p.drawText(QPointF(x + nw + 6, base), version)
+            p.drawText(QRectF(20, 16, w - 40, 14),
+                       Qt.AlignmentFlag.AlignRight | Qt.AlignmentFlag.AlignVCenter,
+                       f"v{__version__}")
             font.setPixelSize(12)
             font.setWeight(QFont.Weight.Normal)
             p.setFont(font)
