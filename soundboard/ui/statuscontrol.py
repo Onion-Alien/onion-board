@@ -446,6 +446,9 @@ class StatusControl(Controller):
         for short in (True, False):
             if state == "off":
                 pill = _("Only you") if short else _("Not sending to others (only you hear sounds)")
+            elif route == "mic" and not mic_busy and directmic.unplugged(mw.cfg.mic_device):
+                # pulled out or switched off: nothing's broken, it works once it's back
+                pill = _("Unplugged") if short else _("Is your headset plugged in?")
             elif state == "ok" and route == "mic":
                 pill = (_("Connected") if short
                         else _("In your mic: Discord / games hear your sounds"))

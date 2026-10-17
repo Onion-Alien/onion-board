@@ -961,8 +961,8 @@ def works(state: str) -> bool:
 
 
 def unplugged(mic_name: str | None) -> bool:
-    """Windows knows the mic called `mic_name`, but it's unplugged right now (or its
-    headset is switched off), as the last status() for it found: no I/O."""
+    """The mic called `mic_name` isn't there right now: unplugged, its headset or Windows
+    switched it off, or Windows forgot it (as the last status() for it found: no I/O)."""
     return bool(mic_name) and _unplugged.get(mic_name, False)
 
 
@@ -971,11 +971,18 @@ def _status(mic_name: str | None) -> str:
     if mic_name is None:
         return _state(on[0], on) if on else "missing"
     guid = endpoint_for(mic_name)
-    _unplugged[mic_name] = guid is None and _match(
-        mic_name, [e for e in capture_endpoints() if e.get("out")]) is not None
+    _unplugged[mic_name] = guid is None and _not_here(mic_name)
     if not on:
         return "missing"
     return _state(guid, on)
+
+
+def _not_here(mic_name: str) -> bool:
+    """The mic isn't there: unplugged, switched off, or forgotten by Windows once it was
+    pulled out (and nothing the engine can open goes by that name either). Nothing to
+    set up or repair until it's back: the card asks whether it's plugged in, no louder."""
+    why = mic_lookup(mic_name)[1]
+    return why == "off" or why == "gone" and _engine_name(mic_name) is None
 
 
 def _state(guid: str | None, on: list[str]) -> str:

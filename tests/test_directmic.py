@@ -3417,6 +3417,8 @@ def test_an_unplugged_mic_asks_to_plug_it_in(window, monkeypatch, state):  # noq
     assert w.mic_pill.text() == "Unplugged"
     assert "My mic" in w.mic_reason.text() and "Repair" not in w.mic_reason.text()
     assert w.btn_install.isHidden()
+    # nothing's broken: the sidebar pill asks the same, no "Not working, click to fix"
+    assert w._pill_long == "Is your headset plugged in?"
     out[0] = False
     assert w.micctl._direct_health() != w._direct_shown   # the once-a-second check redraws it
     w.statusctl._update_flow()
@@ -3424,18 +3426,23 @@ def test_an_unplugged_mic_asks_to_plug_it_in(window, monkeypatch, state):  # noq
 
 
 def test_unplugged_follows_the_last_status_check(monkeypatch):
-    """status() notes whether the mic it was asked about is one Windows knows but has
-    unplugged (or not present: a wireless headset switched off); a mic Windows has
-    switched off by hand, or one it doesn't know at all, isn't "unplugged"."""
+    """status() notes whether the mic it was asked about isn't there: unplugged (or not
+    present: a wireless headset switched off), switched off in Windows, or one Windows
+    forgot and nothing the engine opens goes by. People pull mics out all the time:
+    each is "plugged in?", never a set-up click that can't work."""
     mics = [{"guid": "{a}", "name": "Headset Mic (G733)", "active": False, "out": True},
             {"guid": "{b}", "name": "Line In (Realtek)", "active": False, "out": False},
             {"guid": "{c}", "name": "Webcam Mic (USB)", "active": True, "out": False}]
     monkeypatch.setattr(dm, "capture_endpoints", lambda: mics)
     monkeypatch.setattr(dm, "installed_on", lambda: ["{a}"])
+    opens = {"Webcam Mic (USB)", "Odd Mic"}   # what the engine can open, by that name
+    monkeypatch.setattr(dm, "_engine_name", lambda name: name if name in opens else None)
     dm.forget_status()
     assert dm.status("Headset Mic (G733)") == "other" and dm.unplugged("Headset Mic (G733)")
-    assert dm.status("Line In (Realtek)") == "other" and not dm.unplugged("Line In (Realtek)")
-    assert dm.status("Nothing (gone)") == "other" and not dm.unplugged("Nothing (gone)")
+    assert dm.status("Line In (Realtek)") == "other" and dm.unplugged("Line In (Realtek)")
+    assert dm.status("Nothing (gone)") == "other" and dm.unplugged("Nothing (gone)")
+    # the engine opens it though Windows' list has no such name: it's there, not out
+    assert dm.status("Odd Mic") == "other" and not dm.unplugged("Odd Mic")
     assert not dm.unplugged("Webcam Mic (USB)") and not dm.unplugged(None)
     mics[0] = {**mics[0], "active": True, "out": False}   # plugged back in
     dm.forget_status()
