@@ -1,0 +1,1 @@
+- The Halloween theme's cobweb texture is redrawn: cobwebs now cover the whole card instead of a grid of tiny stamped webs.
