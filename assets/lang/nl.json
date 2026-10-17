@@ -3752,5 +3752,10 @@
   "“{name}” speaks {language}, so this may take a while. The radio goes quiet while the translation starts, then you hear it in {language}, a few seconds behind.": "“{name}” spreekt {language}, dus dit kan even duren. De radio wordt stil terwijl de vertaling start, daarna hoor je hem in het {language}, een paar seconden later.",
   "“{name}” speaks {language}, so this may take a while. Your programs go quiet while the translation starts, then you hear them in {language}, a few seconds behind.": "“{name}” spreekt {language}, dus dit kan even duren. Je programma's worden stil terwijl de vertaling start, daarna hoor je ze in het {language}, een paar seconden later.",
   "“{name}” speaks {language}, which needs speech recognition and the {language} download (Voice tab, Speak another language). The rest of it is on.": "“{name}” spreekt {language}, en daarvoor zijn spraakherkenning en de download voor {language} nodig (tabblad Stem, Spreek een andere taal). De rest staat aan.",
-  "Search sounds": "Geluiden zoeken"
+  "Search sounds": "Geluiden zoeken",
+  "Onion Board hit {n} problem since it started.": [
+    "Onion Board had {n} probleem sinds het opstartte.",
+    "Onion Board had {n} problemen sinds het opstartte."
+  ],
+  "See report": "Rapport bekijken"
 }

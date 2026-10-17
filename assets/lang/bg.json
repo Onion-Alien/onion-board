@@ -3752,5 +3752,10 @@
   "“{name}” speaks {language}, so this may take a while. The radio goes quiet while the translation starts, then you hear it in {language}, a few seconds behind.": "„{name}“ говори на {language}, така че това може да отнеме време. Радиото замлъква, докато преводът започне, после го чуваш на {language}, с няколко секунди закъснение.",
   "“{name}” speaks {language}, so this may take a while. Your programs go quiet while the translation starts, then you hear them in {language}, a few seconds behind.": "„{name}“ говори на {language}, така че това може да отнеме време. Програмите ти замлъкват, докато преводът започне, после ги чуваш на {language}, с няколко секунди закъснение.",
   "“{name}” speaks {language}, which needs speech recognition and the {language} download (Voice tab, Speak another language). The rest of it is on.": "„{name}“ говори на {language}, а за това трябват разпознаване на реч и изтеглянето за {language} (раздел Глас, Говорете друг език). Останалото от него е включено.",
-  "Search sounds": "Търси звуци"
+  "Search sounds": "Търси звуци",
+  "Onion Board hit {n} problem since it started.": [
+    "Onion Board срещна {n} проблем, откакто е пуснат.",
+    "Onion Board срещна {n} проблема, откакто е пуснат."
+  ],
+  "See report": "Виж доклада"
 }

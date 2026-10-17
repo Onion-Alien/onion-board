@@ -3752,5 +3752,10 @@
   "“{name}” speaks {language}, so this may take a while. The radio goes quiet while the translation starts, then you hear it in {language}, a few seconds behind.": "“{name}” fala {language}, por isso pode demorar um pouco. O rádio fica em silêncio enquanto a tradução arranca, depois ouve-o em {language}, alguns segundos atrasado.",
   "“{name}” speaks {language}, so this may take a while. Your programs go quiet while the translation starts, then you hear them in {language}, a few seconds behind.": "“{name}” fala {language}, por isso pode demorar um pouco. Os seus programas ficam em silêncio enquanto a tradução arranca, depois ouve-os em {language}, alguns segundos atrasados.",
   "“{name}” speaks {language}, which needs speech recognition and the {language} download (Voice tab, Speak another language). The rest of it is on.": "“{name}” fala {language}, o que precisa do reconhecimento de voz e da transferência de {language} (separador Voz, Fale outra língua). O resto está ligado.",
-  "Search sounds": "Procurar sons"
+  "Search sounds": "Procurar sons",
+  "Onion Board hit {n} problem since it started.": [
+    "O Onion Board teve {n} problema desde que abriu.",
+    "O Onion Board teve {n} problemas desde que abriu."
+  ],
+  "See report": "Ver relatório"
 }

@@ -5,13 +5,12 @@ link bar's queue and the Discord check's clean-up. Offscreen, fake devices."""
 import os
 import numpy as np
 import pytest
-import shiboken6
 from PySide6.QtCore import QEvent, QSize
 from PySide6.QtWidgets import QDialog, QVBoxLayout, QWidget
 
 from conftest import own_module, said
-from soundboard import appaudio, applog, autostart, library, net
-from soundboard.ui import chatguide, crashdialog, responsive
+from soundboard import appaudio, autostart, library, net
+from soundboard.ui import chatguide, responsive
 from soundboard.ui import importcontrol, playbackcontrol
 from soundboard.ui.dialogs import EditDialog
 from soundboard.ui import mainwindow as main
@@ -270,36 +269,6 @@ def test_saving_after_undo_puts_the_draft_on_the_sound_now_there(window, qapp):
     d.done(QDialog.Accepted)
     qapp.processEvents()
     assert window.meta("s0") is fresh and fresh.name == "On the new one"
-
-
-# --------------------------------------------------------------------------- crash dialog
-
-def test_crash_dialog_state_clears_when_its_parent_goes(qapp, tmp_path, monkeypatch):
-    log_path = tmp_path / applog.LOG_NAME
-    log_path.write_text("x\n", encoding="utf-8")
-    monkeypatch.setattr(applog, "_state", {"log_path": log_path, "version": "t",
-                                           "dialogs": 0, "seen": set(), "open": None,
-                                           "bridge": None, "pending": None})
-    parent = QWidget()
-
-    class Fake(QDialog):
-        def __init__(self, rep, _path, parent=None):
-            super().__init__(parent)
-
-        def show(self):
-            pass
-
-        def raise_(self):
-            pass
-    monkeypatch.setattr(crashdialog, "CrashDialog", Fake)
-    monkeypatch.setattr(applog, "_app_in_front", lambda: True)
-    monkeypatch.setattr("PySide6.QtWidgets.QApplication.activeWindow",
-                        staticmethod(lambda: parent))
-    rep = applog.Report(title="boom", text="x", fatal=False)
-    applog._show_dialog(rep)
-    assert applog._state["open"] is rep
-    shiboken6.delete(parent)   # takes the dialog with it, never finished
-    assert applog._state["open"] is None
 
 
 # --------------------------------------------------------------------------- loose files

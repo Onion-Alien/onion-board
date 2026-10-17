@@ -3830,5 +3830,11 @@
   "“{name}” speaks {language}, so this may take a while. The radio goes quiet while the translation starts, then you hear it in {language}, a few seconds behind.": "„{name}“ mluví jazykem {language}, takže to může chvíli trvat. Rádio ztichne, než se spustí překlad, a pak ho uslyšíš v jazyce {language}, o pár sekund později.",
   "“{name}” speaks {language}, so this may take a while. Your programs go quiet while the translation starts, then you hear them in {language}, a few seconds behind.": "„{name}“ mluví jazykem {language}, takže to může chvíli trvat. Tvoje programy ztichnou, než se spustí překlad, a pak je uslyšíš v jazyce {language}, o pár sekund později.",
   "“{name}” speaks {language}, which needs speech recognition and the {language} download (Voice tab, Speak another language). The rest of it is on.": "„{name}“ mluví jazykem {language}, k čemuž je potřeba rozpoznávání řeči a stažení jazyka {language} (karta Hlas, Mluvte jiným jazykem). Zbytek je zapnutý.",
-  "Search sounds": "Hledat zvuky"
+  "Search sounds": "Hledat zvuky",
+  "Onion Board hit {n} problem since it started.": [
+    "Onion Board od spuštění narazil na {n} problém.",
+    "Onion Board od spuštění narazil na {n} problémy.",
+    "Onion Board od spuštění narazil na {n} problémů."
+  ],
+  "See report": "Zobrazit hlášení"
 }

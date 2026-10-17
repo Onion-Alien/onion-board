@@ -3674,5 +3674,9 @@
   "“{name}” speaks {language}, so this may take a while. The radio goes quiet while the translation starts, then you hear it in {language}, a few seconds behind.": "“{name}” bercakap {language}, jadi ini mungkin ambil masa. Radio senyap semasa terjemahan bermula, kemudian anda dengarnya dalam {language}, lewat beberapa saat.",
   "“{name}” speaks {language}, so this may take a while. Your programs go quiet while the translation starts, then you hear them in {language}, a few seconds behind.": "“{name}” bercakap {language}, jadi ini mungkin ambil masa. Program anda senyap semasa terjemahan bermula, kemudian anda dengarnya dalam {language}, lewat beberapa saat.",
   "“{name}” speaks {language}, which needs speech recognition and the {language} download (Voice tab, Speak another language). The rest of it is on.": "“{name}” bercakap {language}, yang perlukan pengecaman pertuturan dan muat turun {language} (tab Suara, Cakap bahasa lain). Bahagian lain dihidupkan.",
-  "Search sounds": "Cari bunyi"
+  "Search sounds": "Cari bunyi",
+  "Onion Board hit {n} problem since it started.": [
+    "Onion Board menghadapi {n} masalah sejak dibuka."
+  ],
+  "See report": "Lihat laporan"
 }

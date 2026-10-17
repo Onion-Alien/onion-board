@@ -3830,5 +3830,11 @@
   "“{name}” speaks {language}, so this may take a while. The radio goes quiet while the translation starts, then you hear it in {language}, a few seconds behind.": "«{name}» говорит на языке {language}, так что это может занять время. Радио замолкает, пока запускается перевод, потом вы слышите его на языке {language}, с отставанием в несколько секунд.",
   "“{name}” speaks {language}, so this may take a while. Your programs go quiet while the translation starts, then you hear them in {language}, a few seconds behind.": "«{name}» говорит на языке {language}, так что это может занять время. Ваши программы замолкают, пока запускается перевод, потом вы слышите их на языке {language}, с отставанием в несколько секунд.",
   "“{name}” speaks {language}, which needs speech recognition and the {language} download (Voice tab, Speak another language). The rest of it is on.": "«{name}» говорит на языке {language}, а для этого нужны распознавание речи и загрузка языка {language} (вкладка «Голос», «Говорим на другом языке»). Остальное включено.",
-  "Search sounds": "Искать звуки"
+  "Search sounds": "Искать звуки",
+  "Onion Board hit {n} problem since it started.": [
+    "С момента запуска в Onion Board произошла {n} ошибка.",
+    "С момента запуска в Onion Board произошло {n} ошибки.",
+    "С момента запуска в Onion Board произошло {n} ошибок."
+  ],
+  "See report": "Посмотреть отчёт"
 }

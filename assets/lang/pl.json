@@ -3830,5 +3830,11 @@
   "“{name}” speaks {language}, so this may take a while. The radio goes quiet while the translation starts, then you hear it in {language}, a few seconds behind.": "„{name}” mówi w języku {language}, więc może to chwilę potrwać. Radio cichnie, aż tłumaczenie ruszy, potem słyszysz je w języku {language}, z kilkusekundowym opóźnieniem.",
   "“{name}” speaks {language}, so this may take a while. Your programs go quiet while the translation starts, then you hear them in {language}, a few seconds behind.": "„{name}” mówi w języku {language}, więc może to chwilę potrwać. Twoje programy cichną, aż tłumaczenie ruszy, potem słyszysz je w języku {language}, z kilkusekundowym opóźnieniem.",
   "“{name}” speaks {language}, which needs speech recognition and the {language} download (Voice tab, Speak another language). The rest of it is on.": "„{name}” mówi w języku {language}, do czego potrzebne są rozpoznawanie mowy i pobranie języka {language} (karta Głos, Mów w innym języku). Reszta jest włączona.",
-  "Search sounds": "Szukaj dźwięków"
+  "Search sounds": "Szukaj dźwięków",
+  "Onion Board hit {n} problem since it started.": [
+    "Onion Board napotkał {n} problem od uruchomienia.",
+    "Onion Board napotkał {n} problemy od uruchomienia.",
+    "Onion Board napotkał {n} problemów od uruchomienia."
+  ],
+  "See report": "Zobacz raport"
 }

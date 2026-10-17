@@ -3674,5 +3674,9 @@
   "“{name}” speaks {language}, so this may take a while. The radio goes quiet while the translation starts, then you hear it in {language}, a few seconds behind.": "“{name}” nói {language}, nên việc này có thể mất một lúc. Radio im lặng trong lúc bắt đầu dịch, rồi bạn nghe nó bằng {language}, chậm vài giây.",
   "“{name}” speaks {language}, so this may take a while. Your programs go quiet while the translation starts, then you hear them in {language}, a few seconds behind.": "“{name}” nói {language}, nên việc này có thể mất một lúc. Các chương trình của bạn im lặng trong lúc bắt đầu dịch, rồi bạn nghe chúng bằng {language}, chậm vài giây.",
   "“{name}” speaks {language}, which needs speech recognition and the {language} download (Voice tab, Speak another language). The rest of it is on.": "“{name}” nói {language}, việc này cần nhận dạng giọng nói và bản tải {language} (thẻ Giọng nói, Nói ngôn ngữ khác). Phần còn lại đang bật.",
-  "Search sounds": "Tìm âm thanh"
+  "Search sounds": "Tìm âm thanh",
+  "Onion Board hit {n} problem since it started.": [
+    "Onion Board đã gặp {n} sự cố từ khi khởi động."
+  ],
+  "See report": "Xem báo cáo"
 }

@@ -3830,5 +3830,11 @@
   "“{name}” speaks {language}, so this may take a while. The radio goes quiet while the translation starts, then you hear it in {language}, a few seconds behind.": "„{name}” vorbește {language}, așa că poate dura puțin. Radioul tace cât pornește traducerea, apoi îl auzi în {language}, cu câteva secunde întârziere.",
   "“{name}” speaks {language}, so this may take a while. Your programs go quiet while the translation starts, then you hear them in {language}, a few seconds behind.": "„{name}” vorbește {language}, așa că poate dura puțin. Programele tale tac cât pornește traducerea, apoi le auzi în {language}, cu câteva secunde întârziere.",
   "“{name}” speaks {language}, which needs speech recognition and the {language} download (Voice tab, Speak another language). The rest of it is on.": "„{name}” vorbește {language}, ceea ce cere recunoașterea vorbirii și descărcarea pentru {language} (fila Voce, Vorbește altă limbă). Restul e pornit.",
-  "Search sounds": "Caută sunete"
+  "Search sounds": "Caută sunete",
+  "Onion Board hit {n} problem since it started.": [
+    "Onion Board a avut {n} problemă de la pornire.",
+    "Onion Board a avut {n} probleme de la pornire.",
+    "Onion Board a avut {n} de probleme de la pornire."
+  ],
+  "See report": "Vezi raportul"
 }

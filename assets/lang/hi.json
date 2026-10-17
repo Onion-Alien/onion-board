@@ -3752,5 +3752,10 @@
   "“{name}” speaks {language}, so this may take a while. The radio goes quiet while the translation starts, then you hear it in {language}, a few seconds behind.": "“{name}” {language} बोलता है, इसलिए इसमें थोड़ा समय लग सकता है। अनुवाद शुरू होने तक रेडियो चुप रहता है, फिर आप उसे {language} में, कुछ सेकंड पीछे सुनते हैं।",
   "“{name}” speaks {language}, so this may take a while. Your programs go quiet while the translation starts, then you hear them in {language}, a few seconds behind.": "“{name}” {language} बोलता है, इसलिए इसमें थोड़ा समय लग सकता है। अनुवाद शुरू होने तक आपके प्रोग्राम चुप रहते हैं, फिर आप उन्हें {language} में, कुछ सेकंड पीछे सुनते हैं।",
   "“{name}” speaks {language}, which needs speech recognition and the {language} download (Voice tab, Speak another language). The rest of it is on.": "“{name}” {language} बोलता है, जिसके लिए स्पीच रिकग्निशन और {language} का डाउनलोड चाहिए (वॉइस टैब, अन्य भाषा बोलो)। बाकी सब चालू है।",
-  "Search sounds": "साउंड खोजें"
+  "Search sounds": "साउंड खोजें",
+  "Onion Board hit {n} problem since it started.": [
+    "शुरू होने के बाद से Onion Board में {n} समस्या आई।",
+    "शुरू होने के बाद से Onion Board में {n} समस्याएँ आईं।"
+  ],
+  "See report": "रिपोर्ट देखें"
 }

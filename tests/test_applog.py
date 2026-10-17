@@ -1,5 +1,5 @@
-"""Crash reporting: every unhandled error is logged, saved (scrubbed) and offered
-to the user once, from whichever thread it happened on."""
+"""Crash reporting: every unhandled error is logged and saved (scrubbed), from
+whichever thread it happened on, with no window unless it stops the app."""
 import threading
 from pathlib import Path
 
@@ -20,9 +20,9 @@ def fresh(tmp_path, monkeypatch):
     """A clean reporter writing into tmp_path; dialogs recorded instead of shown."""
     log_path = tmp_path / applog.LOG_NAME
     log_path.write_text("line one\nline two\n", encoding="utf-8")
-    monkeypatch.setattr(applog, "_state", {"log_path": log_path, "version": "9.9",
-                                           "dialogs": 0, "seen": set(), "open": None,
-                                           "bridge": None})
+    monkeypatch.setattr(applog, "_state", {"log_path": log_path, "version": "9.9", "bridge": None,
+                                           "saved": set(), "repeats": {}, "recent": [],
+                                           "on_problem": None})
     shown = []
     monkeypatch.setattr(applog, "_show_dialog", shown.append)
     return log_path, shown
@@ -46,7 +46,7 @@ def test_scrub_hides_home_and_user_name(monkeypatch):
     assert "malice" in text   # only whole words
 
 
-def test_report_saves_scrubbed_file_and_offers_it(fresh):
+def test_report_saves_scrubbed_file_and_shows_no_window(fresh):
     log_path, shown = fresh
     rep = applog.report(_raise(ValueError(f"bad file {Path.home()}\\a.wav")), where="loading")
     assert rep is not None and rep.title.startswith("ValueError: bad file %USERPROFILE%")
@@ -54,7 +54,8 @@ def test_report_saves_scrubbed_file_and_offers_it(fresh):
     assert "line two" in rep.text   # the log tail rides along
     assert rep.path is not None and rep.path.read_text(encoding="utf-8") == rep.text
     assert str(Path.home()) not in rep.path.read_text(encoding="utf-8")
-    assert shown == [rep]
+    assert shown == []   # no pop-up for a bug: it's counted, and listed in Settings
+    assert applog.recent() == [rep]
 
 
 def test_a_saved_report_takes_the_start_up_breadcrumb_with_it(fresh):
@@ -69,7 +70,7 @@ def test_a_saved_report_takes_the_start_up_breadcrumb_with_it(fresh):
     assert not (log_path.parent / bootmark.NAME).exists()
 
 
-def test_same_bug_is_offered_once(fresh):
+def test_same_bug_is_kept_once(fresh):
     _, shown = fresh
 
     def boom():
@@ -79,19 +80,16 @@ def test_same_bug_is_offered_once(fresh):
             boom()
         except KeyError:
             applog.report()
-    assert len(shown) == 1
+    assert len(applog.recent()) == 1 and shown == []
 
 
-def test_dialog_cap_and_open_dialog_collects_more(fresh):
+def test_only_an_error_that_stops_the_app_shows_its_window(fresh):
     _, shown = fresh
-    first = applog.report(_raise(ValueError("a")))
-    applog._state["open"] = first
-    applog.report(_raise(TypeError("b")))
-    assert len(shown) == 1 and first.extra == ["TypeError: b"]
-    applog._state["open"] = None
-    applog._state["dialogs"] = applog.MAX_DIALOGS
-    applog.report(_raise(OSError("c")))
-    assert len(shown) == 1   # capped, still logged and saved
+    applog.report(_raise(ValueError("a")))
+    applog.report(_raise(TypeError("b")), where="a background task")
+    assert shown == []
+    rep = applog.report(_raise(OSError("c")), where="starting up", fatal=True)
+    assert shown == [rep] and rep not in applog.recent()
 
 
 def test_report_with_nothing_to_report(fresh):
@@ -114,18 +112,21 @@ def test_old_reports_are_pruned(fresh):
 
 
 def test_thread_error_reaches_the_ui_thread(qapp, tmp_path, monkeypatch):
+    """A bug on a worker thread: on_problem's callback (MainWindow's count send) runs
+    on the UI thread, never on the worker."""
     log_path = tmp_path / applog.LOG_NAME
-    monkeypatch.setattr(applog, "_state", {"log_path": log_path, "version": "t", "dialogs": 0,
-                                           "seen": set(), "open": None, "bridge": None})
+    monkeypatch.setattr(applog, "_state", {"log_path": log_path, "version": "9.9", "bridge": None,
+                                           "saved": set(), "repeats": {}, "recent": [],
+                                           "on_problem": None})
     got = []
-    monkeypatch.setattr(applog, "_show_dialog", lambda rep: got.append(
+    applog.ui_ready()
+    applog.on_problem(lambda rep: got.append(
         (rep, threading.current_thread() is threading.main_thread())))
-    applog.ui_ready()   # binds the (patched) _show_dialog on this, the UI thread
     t = threading.Thread(target=lambda: applog.report(_raise(ZeroDivisionError("w")),
                                                       where="worker"))
     t.start()
     t.join()
-    assert got == []   # not shown from the worker thread itself
+    assert got == []   # not called from the worker thread itself
     qapp.processEvents()
     assert len(got) == 1 and got[0][1] is True
     assert "Where:    worker" in got[0][0].text
@@ -154,45 +155,9 @@ def _state_in(tmp_path, monkeypatch):
     log_path = tmp_path / applog.LOG_NAME
     log_path.write_text("x\n", encoding="utf-8")
     monkeypatch.setattr(applog, "_state", {"log_path": log_path, "version": "t",
-                                           "dialogs": 0, "seen": set(), "open": None,
-                                           "bridge": None, "pending": None})
+                                           "bridge": None, "saved": set(), "repeats": {},
+                                           "recent": [], "on_problem": None})
     return log_path
-
-
-def test_held_back_report_is_shown_once_the_app_is_in_front(qapp, tmp_path, monkeypatch):
-    """An error while a game had the focus waits; it must appear when the user comes
-    back (applicationStateChanged fires before activeWindow() is set: not enough)."""
-    from PySide6.QtWidgets import QApplication, QWidget
-
-    from soundboard.ui import crashdialog
-    from conftest import process_events
-    _state_in(tmp_path, monkeypatch)
-    shown = []
-
-    class FakeDialog:
-        def __init__(self, rep, *_a, **_k):
-            shown.append(rep)
-            self.finished = type("Sig", (), {"connect": lambda self, f: None})()
-
-        def show(self):
-            pass
-
-        def raise_(self):
-            pass
-    monkeypatch.setattr(crashdialog, "CrashDialog", FakeDialog)
-    applog.ui_ready()
-    try:
-        assert QApplication.activeWindow() is None
-        rep = applog.report(_raise(ValueError("boom")))
-        assert applog._state["pending"] is rep and shown == []
-        w = QWidget()
-        w.show()
-        w.activateWindow()
-        process_events(qapp, lambda: bool(shown), 3)
-        w.close()
-        assert shown == [rep] and applog._state["pending"] is None
-    finally:
-        qapp.focusWindowChanged.disconnect(applog._show_pending)
 
 
 USERS = r"C:\Users"   # + a made-up profile folder in each test
@@ -269,7 +234,7 @@ def test_same_bug_again_skips_the_file_and_logs_one_counted_line(fresh, monkeypa
             reps.append(applog.report())
     assert reps[0] is not None and reps[1:] == [None] * 49
     assert len(built) == 1 and len(list(folder.glob("crash-*.txt"))) == 1
-    assert len(shown) == 1
+    assert len(applog.recent()) == 1 and shown == []
     assert len(lines) == 1 and "1 time since" in lines[0]   # the first repeat
     now[0] += applog.REPEAT_LOG_S
     try:
@@ -286,13 +251,19 @@ def test_a_fatal_repeat_is_still_reported(fresh):
     assert rep is not None and rep.path is not None and shown[-1] is rep
 
 
-def test_open_dialog_lists_at_most_max_extra(fresh):
-    first = applog.report(_raise(ValueError("a")))
-    applog._state["open"] = first
+def test_see_report_lists_the_others_at_most_max_extra(fresh, qapp, monkeypatch):
+    from soundboard.ui import crashdialog
+    monkeypatch.setattr(crashdialog, "CrashDialog", lambda rep, *_a, **_k: type(
+        "D", (), {"show": lambda self: None, "raise_": lambda self: None})())
     for i in range(applog.MAX_EXTRA + 10):
         # same line, new exception type each time: a new bug each time
         applog.report(_raise(type(f"E{i}", (Exception,), {})(str(i))))
-    assert len(first.extra) == applog.MAX_EXTRA
+    recent = applog.recent()
+    assert len(recent) == applog.MAX_EXTRA   # the newest kept
+    last = recent[-1]
+    applog.show(last)
+    applog.show(last)   # twice: nothing listed twice
+    assert len(last.extra) == applog.MAX_EXTRA - 1 and last.title not in last.extra
 
 
 @pytest.fixture
@@ -407,18 +378,4 @@ def test_the_pcs_situation_is_said_plainly_not_reported_as_a_crash(fresh, monkey
 def test_a_missing_file_is_still_a_bug_worth_a_report(fresh):
     _log_path, shown = fresh
     assert applog.report(_raise(FileNotFoundError(2, "No such file"))) is not None
-    assert len(shown) == 1
-
-
-def test_a_late_callback_to_a_closed_window_is_saved_but_not_shown(fresh):
-    # a timer / signal reaching a freed widget: still counted, but the user lost nothing
-    _, shown = fresh
-    rep = applog.report(_raise(RuntimeError(
-        "Internal C++ object (QPushButton) already deleted.")))
-    assert rep is not None and rep.path is not None and rep.path.exists()
-    assert shown == []
-    try:   # another line, so not "the same bug again"
-        raise RuntimeError("something else")
-    except RuntimeError as e:
-        assert applog.report(e)
-    assert len(shown) == 1
+    assert len(applog.recent()) == 1
