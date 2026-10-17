@@ -71,7 +71,7 @@ test("names and texts that could break a screen come out as one plain line", asy
   assert.ok(!/[\u0000-\u001f\u007f\u200b\u202e\u2066\u2028]/.test(v.name + v.about));
   assert.ok([...v.name].length <= 32 && [...v.about].length <= 140);
   assert.ok(!/\p{M}{3}/u.test(v.name));                  // no "zalgo" pile-up
-  assert.ok(v.name.includes("<b>bold</b>"));              // kept as text: the app shows plain text
+  assert.ok(v.name.includes("b bold /b") && !/[<>`{}\\]/.test(v.name + v.about));   // as sound names
   assert.equal(v.emoji, "");                              // a joined sequence isn't one emoji
   assert.equal((await share(env, { ...VOICE, name: "\u200B\u202E \n" })).status, 400);
   assert.equal(plain("a\uD800b", 10), "a b");             // a lone surrogate goes

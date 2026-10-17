@@ -25,6 +25,8 @@ CAT_EMOJI = {"memes": "😂", "reactions": "😮", "games": "🎮", "movies": "�
              "music": "🎵", "sports": "⚽", "viral": "🔥", "pranks": "🤡", "politics": "🏛️",
              "streamer": "📡", "esports": "🏆", "podcast": "🎙️", "spooky": "👻"}
 FALLBACK = "🔊"
+# a community voice's kind (the Store's Voices) -> its tile's emoji when it has none
+KIND_EMOJI = {"fx": "🎭", "ai": "🤖", "setup": "🎛️"}
 
 # words in a sound's name or tags -> its emoji; the first that matches wins, so the
 # more telling words come first ("tavern crowd" is a tavern, not applause)
@@ -66,9 +68,12 @@ WORDS: tuple[tuple[str, str], ...] = (
 _WORD_RES = [(re.compile(r"(?<![a-z])(?:" + words + r")(?![a-z])"), e) for words, e in WORDS]
 
 
-def sound_emoji(s: store.Sound) -> str:
+def sound_emoji(s) -> str:
     """The emoji a sound's tile shows: from a word in its name, then its tags, then its
-    category's, else a speaker."""
+    category's, else a speaker. A community voice (storevoices.Voice): its own emoji,
+    else its kind's."""
+    if hasattr(s, "kind"):
+        return getattr(s, "emoji", "") or KIND_EMOJI.get(s.kind, "🎤")
     for text in (s.name, " ".join(s.tags)):
         low = (text or "").lower()
         for rx, emoji in _WORD_RES:
@@ -77,10 +82,10 @@ def sound_emoji(s: store.Sound) -> str:
     return CAT_EMOJI.get(s.cat, FALLBACK)
 
 
-def tile_hue(s: store.Sound) -> int:
+def tile_hue(s) -> int:
     """The tile's colour, 0..359: the category's own, else one from the sound's id (the
     same sound always gets the same colour)."""
-    if s.cat in store.CATS:
+    if getattr(s, "cat", "") in store.CATS:
         return round(store.CATS.index(s.cat) * 360 / len(store.CATS) + 12) % 360
     return zlib.crc32(s.id.encode()) % 360
 
@@ -95,7 +100,7 @@ class SoundTile(QWidget):
     """A sound's picture: its emoji on a rounded, coloured square. While its sample plays
     (`set_playing`) three bars bounce over the bottom of it. A click is the row's play."""
 
-    def __init__(self, s: store.Sound, on_click=None, parent=None):
+    def __init__(self, s, on_click=None, parent=None):   # a store.Sound or a Voice
         super().__init__(parent)
         self.emoji = sound_emoji(s)
         self.hue = tile_hue(s)

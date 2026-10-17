@@ -167,9 +167,13 @@ class StoreTab(QWidget):
     def __init__(self, cfg, add_file: Callable[[str], None],
                  play: Callable[[object, float], bool], open_privacy: Callable[[], object],
                  save: Callable[[], None] = lambda: None,
-                 link: Callable[[str, str, str], None] = lambda url, name, kind: None):
+                 link: Callable[[str, str, str], None] = lambda url, name, kind: None,
+                 voices=None):
         super().__init__()
         self.cfg = cfg
+        self.voices = voices   # ui.storevoices.VoiceHooks: the Voices list (None: Sounds only)
+        self._mode = "sounds"  # or "voices": community voices instead of sounds
+        self._kind = ""        # the Voices list's kind ("" all)
         self._save = save
         self._link = link   # (url, name, "play" / "add"): the window's link downloader
         self._add_file = add_file
@@ -229,7 +233,7 @@ class StoreTab(QWidget):
         words.addStretch(1)
         title_row = QHBoxLayout()
         title_row.setSpacing(8)
-        self.title = QLabel(_("Sound store"))
+        self.title = QLabel(_("Community"))
         self.title.setObjectName("storetitle")
         # the kit's display size (a whole page's title); a style sheet, as the theme's
         # QLabel font would win over setFont
@@ -239,11 +243,30 @@ class StoreTab(QWidget):
         title_row.addWidget(info, 0, Qt.AlignmentFlag.AlignVCenter)
         title_row.addStretch(1)
         words.addLayout(title_row)
-        self.tagline = hint_label(_("Free sounds for your board, picked by everyone's votes."))
+        self.tagline = hint_label(_("Sounds players share, picked by everyone's votes."))
         words.addWidget(self.tagline)
         words.addStretch(1)
         top.addLayout(words, 1)
         hv.addLayout(top)
+        # Sounds or Voices: one picked at a time, above everything they change
+        self.mode_btns: dict[str, QPushButton] = {}
+        if voices is not None:
+            modes_box = QWidget()
+            modes = QHBoxLayout(modes_box)
+            modes.setContentsMargins(0, 0, 0, 0)
+            modes.setSpacing(4)
+            for key, text, icon in (("sounds", _("Sounds"), "sounds"),
+                                    ("voices", _("Voices"), "voice")):
+                b = QPushButton(text)
+                b.setCheckable(True)
+                b.setAutoExclusive(True)
+                b.setChecked(key == "sounds")
+                icons.set_icon(b, icon, "text", "on_accent")
+                b.clicked.connect(lambda _c=False, k=key: self.set_mode(k))
+                modes.addWidget(b)
+                self.mode_btns[key] = b
+            modes.addStretch(1)
+            hv.addWidget(modes_box)
         # the main button on a row of its own: beside the search box and the order, the
         # card was wider than the smallest window (that turns into the mini player)
         # Share, then the sort buttons; they wrap under Share in a narrow window (in one
@@ -254,7 +277,8 @@ class StoreTab(QWidget):
         self.btn_share = QPushButton(_("Share a sound"))
         self.btn_share.setObjectName("primary")
         icons.set_icon(self.btn_share, "upload", "on_accent", "on_accent")
-        self.btn_share.clicked.connect(lambda: self.share())
+        self.btn_share.clicked.connect(lambda: self.share_voice() if self._mode == "voices"
+                                       else self.share())
         share_row.addWidget(self.btn_share)
         # the order: Top, New, or Trending on Myinstants, out in the open (inside a menu,
         # nobody found Trending), one picked at a time like the share window's file / link
@@ -409,6 +433,55 @@ class StoreTab(QWidget):
             self.cat_btns[self._cat].setChecked(True)
         self.reload()
 
+    def set_mode(self, mode: str):
+        """Sounds or Voices: the list, its chips and the Share button change with it."""
+        self._mode = "voices" if mode == "voices" and self.voices is not None else "sounds"
+        if self._mode in self.mode_btns:
+            self.mode_btns[self._mode].setChecked(True)
+        voices = self._mode == "voices"
+        self.btn_share.setText(_("Share a voice") if voices else _("Share a sound"))
+        self.tagline.setText(_("Voices people made, picked by everyone's votes.") if voices
+                             else _("Sounds players share, picked by everyone's votes."))
+        self.search.setPlaceholderText(_("Search the voices") if voices
+                                       else _("Search the store"))
+        self.sort_btns[TRENDING].setToolTip(
+            _("The voices people liked most this week") if voices
+            else _("What's hot on Myinstants right now, and the sounds people here liked "
+                   "this week"))
+        self._show_chips()
+        self.reload()
+
+    def set_kind(self, kind: str):
+        """Only one kind of voice ("" all of them)."""
+        self._kind = kind if kind in ("fx", "ai", "setup") else ""
+        if self._kind in self.cat_btns:
+            self.cat_btns[self._kind].setChecked(True)
+        self.reload()
+
+    def _show_chips(self):
+        """The chips above the list: the sounds' categories, or the voices' kinds."""
+        for b in self.cat_btns.values():
+            self._cat_flow.removeWidget(b)
+            b.deleteLater()
+        self.cat_btns.clear()
+        if self._mode == "sounds":
+            self.cats_box.hide()
+            self._fetch_cats()
+            return
+        from soundboard.ui.storevoices import kind_chips
+        for key, text in kind_chips():
+            b = QPushButton(text)
+            b.setObjectName("subchip")
+            b.setIcon(storelook.emoji_icon(storelook.KIND_EMOJI.get(key, "✨")))
+            b.setCheckable(True)
+            b.setAutoExclusive(True)
+            b.setChecked(key == self._kind)
+            b.setCursor(Qt.CursorShape.PointingHandCursor)
+            b.clicked.connect(lambda _c=False, k=key: self.set_kind(k))
+            self._cat_flow.addWidget(b)
+            self.cat_btns[key] = b
+        self.cats_box.show()
+
     def _fetch_cats(self):
         install = self.install()
 
@@ -421,7 +494,7 @@ class StoreTab(QWidget):
         threading.Thread(target=run, daemon=True, name="store-cats").start()
 
     def _on_cats(self, got):
-        if self._closed or got is None:
+        if self._closed or got is None or self._mode != "sounds":
             return
         cats, total = got
         for b in self.cat_btns.values():
@@ -484,17 +557,21 @@ class StoreTab(QWidget):
         self._serial += 1
         serial, sort, query, offset, cat = (self._serial, self._sort_key(), self.search.text(),
                                             0 if replace else self._offset, self._cat)
-        install = self.install()
+        install, voices, kind = self.install(), self._mode == "voices", self._kind
         if replace:
             self._say("store", _("Loading the store…"), "")
-            if not self.cat_btns:
+            if not self.cat_btns and not voices:
                 self._fetch_cats()
         else:
             busy.set_busy(self.btn_more, True)
 
         def run():
             try:
-                found, more = store.browse(install, sort, query, offset, cat)
+                if voices:
+                    from soundboard import storevoices
+                    found, more = storevoices.browse(install, kind, sort, query, offset)
+                else:
+                    found, more = store.browse(install, sort, query, offset, cat)
                 busy.emit(self._listed, serial, (replace, found), more, "")
             except Exception as e:  # noqa: BLE001 - offline, switched off, the server…
                 log.info("couldn't read the store: %s", e)
@@ -517,14 +594,22 @@ class StoreTab(QWidget):
         if replace:
             self._clear()
         self._offset += len(found)
+        from soundboard.storevoices import Voice
+        from soundboard.ui.storevoices import VoiceRow
         for s in found:
-            r = SoundRow(s, self)
+            r = VoiceRow(s, self) if isinstance(s, Voice) else SoundRow(s, self)
             self._list.insertWidget(self._list.indexOf(self.btn_more), r)
             self._rows.append(r)
         self.btn_more.setVisible(more)
         if not self._rows:
             if self.search.text().strip():
                 self._say("search", _("Nothing matches"), _("Try other words."))
+            elif self._mode == "voices" and self._kind:
+                self._say("search", _("Nothing matches"), "", _("All"), lambda: self.set_kind(""))
+            elif self._mode == "voices":
+                self._say("voice", _("No voices here yet"),
+                          _("Be the first: share a voice you made."), _("Share a voice"),
+                          self.share_voice)
             elif self._cat:   # (the chips are in the list: a way back to All here)
                 self._say("search", _("Nothing matches"), "", _("All"), lambda: self.set_cat(""))
             else:
@@ -585,6 +670,12 @@ class StoreTab(QWidget):
             self._decode(row, path)
 
     def add(self, row: SoundRow):
+        if self._is_voice(row):
+            assert self.voices is not None   # (only listed with them)
+            said = self.voices.take(row.sound)
+            usage.used("store-voice-added")
+            busy.toast(self.window(), html.escape(said), "ok")
+            return
         if row.sound.is_link:   # downloaded from its site, as a pasted link is
             usage.used("store-added")
             self.bun.cheer()
@@ -595,7 +686,39 @@ class StoreTab(QWidget):
         busy.set_busy(row.btn_add, True)
         self._get(row, "add")
 
+    @staticmethod
+    def _is_voice(row) -> bool:
+        from soundboard.storevoices import Voice
+        return isinstance(row.sound, Voice)
+
+    def _hear_voice(self, row: SoundRow):
+        """A community voice's sample: the line said through it, made off the UI thread."""
+        serial, v = self._hear_serial, row.sound
+        assert not isinstance(v, store.Sound)   # (a voice's row: _is_voice)
+        module = self.voices.ai_module() if self.voices is not None else None
+
+        def run():
+            from soundboard import storevoices
+            try:
+                data, left_out = storevoices.preview(v, module)
+                busy.emit(self._decoded, row, (data, left_out), 1.0, serial)
+            except Exception as e:  # noqa: BLE001 - no sound, no crash
+                log.info("couldn't make a voice's sample: %s", e)
+                busy.emit(self._decoded, row, None, 1.0, serial)
+        threading.Thread(target=run, daemon=True, name="store-voice-sample").start()
+
     def hear(self, row: SoundRow, on: bool):
+        if self._is_voice(row):
+            if self._playing is not None and self._playing is not row:
+                self._stop_preview()
+            self._hear_serial += 1
+            if not on:
+                self._stop_preview()
+                return
+            self._playing = row
+            row.playing_look(True)
+            self._hear_voice(row)
+            return
         if row.sound.is_link:   # the site's own download, played once (as a search hit)
             with _blocked(row.btn_play):
                 row.btn_play.setChecked(False)
@@ -629,6 +752,12 @@ class StoreTab(QWidget):
     def _on_decoded(self, row: SoundRow, data, gain: float, serial: int):
         if not self._row_alive(row) or serial != self._hear_serial or self._playing is not row:
             return
+        if isinstance(data, tuple):   # a voice's sample, and whether its AI part was left out
+            data, left_out = data
+            if left_out:
+                busy.toast(self.window(), html.escape(
+                    _("You're hearing it without its AI voice: get AI voices (Voice tab "
+                      "→ AI voices) to hear all of it.")), "warn", 7000)
         if data is None or not self._play(data, gain):
             self._stop_preview()
             if data is not None:
@@ -671,7 +800,11 @@ class StoreTab(QWidget):
 
         def run():
             try:
-                busy.emit(self._voted, row, store.vote(install, s.id, value), "")
+                if self._is_voice(row):
+                    from soundboard import storevoices
+                    busy.emit(self._voted, row, storevoices.vote(install, s.id, value), "")
+                else:
+                    busy.emit(self._voted, row, store.vote(install, s.id, value), "")
             except Exception as e:  # noqa: BLE001
                 busy.emit(self._voted, row, old,
                           str(e) if isinstance(e, store.StoreError) else errors.plain(e))
@@ -692,24 +825,34 @@ class StoreTab(QWidget):
     def report_menu(self, row: SoundRow):
         m = QMenu(self)
         m.setAttribute(Qt.WidgetAttribute.WA_DeleteOnClose)
-        for key, text in (("copyright", _("It's someone else's sound")),
-                          ("offensive", _("It's offensive")),
-                          ("broken", _("It doesn't play")),
-                          ("other", _("Something else"))):
+        reasons = ((("offensive", _("It's offensive")), ("broken", _("It doesn't work")),
+                    ("other", _("Something else"))) if self._is_voice(row) else
+                   (("copyright", _("It's someone else's sound")),
+                    ("offensive", _("It's offensive")),
+                    ("broken", _("It doesn't play")),
+                    ("other", _("Something else"))))
+        for key, text in reasons:
             m.addAction(text, lambda k=key: self.report(row, k))
         m.popup(row.btn_report.mapToGlobal(row.btn_report.rect().bottomLeft()))
 
     def report(self, row: SoundRow, reason: str):
         s, install = row.sound, self.install()
 
+        voice = self._is_voice(row)
+
         def run():
             try:
-                store.report(install, s.id, reason)
+                if voice:
+                    from soundboard import storevoices
+                    storevoices.report(install, s.id, reason)
+                else:
+                    store.report(install, s.id, reason)
                 busy.emit(self._voted, row, (s.up, s.down, s.mine), "")
             except Exception as e:  # noqa: BLE001
                 busy.emit(self._voted, row, (s.up, s.down, s.mine),
                           str(e) if isinstance(e, store.StoreError) else errors.plain(e))
-        busy.toast(self.window(), html.escape(_("Thanks: the sound will be checked.")), "ok")
+        busy.toast(self.window(), html.escape(_("Thanks: the voice will be checked.") if voice
+                                              else _("Thanks: the sound will be checked.")), "ok")
         threading.Thread(target=run, daemon=True, name="store-report").start()
 
     # ------------------------------------------------------------------ sharing
@@ -722,6 +865,18 @@ class StoreTab(QWidget):
         dlg = ShareDialog(self.install(), self, link, name)
         dlg.setAttribute(Qt.WidgetAttribute.WA_DeleteOnClose)
         dlg.show()
+
+    def share_voice(self, pick: str = ""):
+        """The Share a voice window (`pick`: the one picked first, as its list shows it)."""
+        if self.voices is None:
+            return
+        if not net.allowed(store.FEATURE):
+            busy.toast(self.window(), html.escape(net.off_message(store.FEATURE)), "error")
+            return
+        from soundboard.ui.storevoices import open_share
+        dlg = open_share(self, self.install(), self.voices, pick)
+        if dlg is not None:
+            dlg.accepted.connect(lambda: self._mode == "voices" and self.reload())
 
 
 def _title(text: str) -> QLabel:
