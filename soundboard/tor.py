@@ -802,7 +802,7 @@ def _follow_switches() -> None:
     if net.any_allowed():
         t._changed()   # clear the Offline status; connections still start it on demand
         return
-    if t.state in (STARTING, READY):
+    if t.state in (STARTING, READY, FAILED):   # (a failure's line would hide Offline's)
         threading.Thread(target=t.stop, daemon=True, name="tor-offline").start()
     else:
         t._changed()   # the status line says why it doesn't start
