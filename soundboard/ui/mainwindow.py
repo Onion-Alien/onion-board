@@ -447,7 +447,10 @@ class MainWindow(QMainWindow):
         # before the UI is built, so everything polishes in-theme
         if isinstance(app, QApplication):
             theme.textures_on = self.cfg.theme_texture
+            kept = self.cfg.kept_themes if isinstance(self.cfg.kept_themes, list) else []
+            theme.kept = {n for n in kept if isinstance(n, str)}   # (a hand-edited file)
             self.cfg.theme = theme.apply(app, self.cfg.theme, self.cfg.live_color)
+            self.themectl.keep_limited(save=False)   # (saved with the next change)
             self.cfg.live_color = theme.live_override
             app.commitDataRequest.connect(self._on_session_end)   # log-off / installer
         self.engine = Engine()

@@ -3894,5 +3894,8 @@
   "Hear {effect} (only you)": "Послушать {effect} (только ты)",
   "Mic only": "Только микро",
   "✓ The store is on again: loading it.": "✓ Магазин снова включён: загружается.",
-  "Background sounds": "Фоновые звуки"
+  "Background sounds": "Фоновые звуки",
+  "Limited edition": "Ограниченная серия",
+  "Limited edition: this one's yours to keep.": "Ограниченная серия: эта тема теперь твоя навсегда.",
+  "Limited edition: use it by {date} and it's yours to keep. After that it's gone for good.": "Ограниченная серия: используй её до {date}, и она останется твоей. Потом она исчезнет навсегда."
 }

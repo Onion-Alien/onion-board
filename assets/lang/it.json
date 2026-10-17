@@ -3816,5 +3816,8 @@
   "Hear {effect} (only you)": "Ascolta {effect} (solo tu)",
   "Mic only": "Solo mic",
   "✓ The store is on again: loading it.": "✓ Lo store è di nuovo attivo: caricamento.",
-  "Background sounds": "Suoni di sottofondo"
+  "Background sounds": "Suoni di sottofondo",
+  "Limited edition": "Edizione limitata",
+  "Limited edition: this one's yours to keep.": "Edizione limitata: questo è tuo per sempre.",
+  "Limited edition: use it by {date} and it's yours to keep. After that it's gone for good.": "Edizione limitata: usalo entro il {date} e resta tuo per sempre. Dopo sparisce per sempre."
 }

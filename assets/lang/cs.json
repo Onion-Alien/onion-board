@@ -3894,5 +3894,8 @@
   "Hear {effect} (only you)": "Poslechnout {effect} (jen ty)",
   "Mic only": "Jen mikrofon",
   "✓ The store is on again: loading it.": "✓ Obchod je zase zapnutý: načítá se.",
-  "Background sounds": "Zvuky v pozadí"
+  "Background sounds": "Zvuky v pozadí",
+  "Limited edition": "Limitovaná edice",
+  "Limited edition: this one's yours to keep.": "Limitovaná edice: tenhle už je tvůj napořád.",
+  "Limited edition: use it by {date} and it's yours to keep. After that it's gone for good.": "Limitovaná edice: použij ho do {date} a zůstane ti napořád. Potom navždy zmizí."
 }

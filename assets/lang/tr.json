@@ -3816,5 +3816,8 @@
   "Hear {effect} (only you)": "{effect} dinle (yalnızca sen)",
   "Mic only": "Yalnızca mikrofon",
   "✓ The store is on again: loading it.": "✓ Mağaza yeniden açık: yükleniyor.",
-  "Background sounds": "Arka plan sesleri"
+  "Background sounds": "Arka plan sesleri",
+  "Limited edition": "Sınırlı sürüm",
+  "Limited edition: this one's yours to keep.": "Sınırlı sürüm: bu artık sonsuza dek senin.",
+  "Limited edition: use it by {date} and it's yours to keep. After that it's gone for good.": "Sınırlı sürüm: {date} tarihine kadar kullan, sonsuza dek senin olsun. Sonrasında tamamen kaybolur."
 }

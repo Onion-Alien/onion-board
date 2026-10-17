@@ -3738,5 +3738,8 @@
   "Hear {effect} (only you)": "試聽 {effect}（只有你）",
   "Mic only": "僅麥克風",
   "✓ The store is on again: loading it.": "✓ 商店已重新開啟：正在載入。",
-  "Background sounds": "背景音效"
+  "Background sounds": "背景音效",
+  "Limited edition": "限定版",
+  "Limited edition: this one's yours to keep.": "限定版：這個主題永久歸你了。",
+  "Limited edition: use it by {date} and it's yours to keep. After that it's gone for good.": "限定版：在 {date} 前使用就能永久保留。之後將永遠消失。"
 }

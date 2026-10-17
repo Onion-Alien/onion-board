@@ -4,8 +4,9 @@ from __future__ import annotations
 import math
 import time
 
-from PySide6.QtCore import QRectF, QSize, QTimer, Qt
-from PySide6.QtGui import QBrush, QColor, QFont, QPainter, QPainterPath, QPixmap
+from PySide6.QtCore import QDate, QLocale, QPointF, QRectF, QSize, QTimer, Qt
+from PySide6.QtGui import (QBrush, QColor, QFont, QFontMetricsF, QLinearGradient, QPainter,
+                           QPainterPath, QPen, QPixmap)
 from PySide6.QtWidgets import (QButtonGroup, QCheckBox, QColorDialog, QComboBox, QFrame,
                                QGridLayout, QHBoxLayout, QLabel, QLayout, QPushButton, QRadioButton,
                                QSlider, QVBoxLayout, QWidget)
@@ -60,6 +61,68 @@ def wave_pose(t: float) -> dict | None:
             "blink": 1.0 if happy else 0.0, "mouth": 0.4 if happy else 0.0}
 
 
+def limited_tip(name: str) -> str:
+    """A limited-edition theme card's tooltip: until when it can be had, or that it's kept."""
+    if name in theme.kept:
+        return _("Limited edition: this one's yours to keep.")
+    last = theme.LIMITED[name]
+    day = QLocale().toString(QDate(last.year, last.month, last.day), "d MMMM")
+    return _("Limited edition: use it by {date} and it's yours to keep. After that it's "
+             "gone for good.", date=day)
+
+
+def paint_limited_tag(p: QPainter, x: float, y: float, font: QFont, max_w: float) -> None:
+    """The "Limited edition" tag: a glowing pumpkin-to-purple ribbon with a sparkle,
+    its top-left corner at (x, y), no wider than `max_w`."""
+    text = _("Limited edition")
+    f = QFont(font)
+    f.setFamily(theme.FONT)
+    f.setBold(True)
+    f.setPointSizeF(6.8)
+    fm = QFontMetricsF(f)
+    star = 9.0
+    pad = 6.0
+    text = fm.elidedText(text, Qt.TextElideMode.ElideRight, max_w - 2 * pad - star - 3)
+    w = min(max_w, 2 * pad + star + 3 + fm.horizontalAdvance(text))
+    h = 16.0
+    tag = QRectF(x, y, w, h)
+    p.save()
+    p.setRenderHint(QPainter.RenderHint.Antialiasing)
+    p.setPen(Qt.PenStyle.NoPen)
+    for grow, alpha in ((3.0, 40), (1.5, 70)):   # its glow
+        p.setBrush(QColor(255, 117, 24, alpha))
+        p.drawRoundedRect(tag.adjusted(-grow, -grow, grow, grow), h / 2 + grow, h / 2 + grow)
+    fill = QLinearGradient(tag.topLeft(), tag.topRight())
+    fill.setColorAt(0, QColor("#ff7518"))
+    fill.setColorAt(0.55, QColor("#e0469a"))
+    fill.setColorAt(1, QColor("#8f3ff0"))
+    p.setBrush(fill)
+    p.setPen(QPen(QColor(255, 255, 255, 120), 1))
+    p.drawRoundedRect(tag, h / 2, h / 2)
+    shine = QLinearGradient(tag.topLeft(), tag.bottomLeft())   # glossy top half
+    shine.setColorAt(0, QColor(255, 255, 255, 90))
+    shine.setColorAt(0.5, QColor(255, 255, 255, 0))
+    p.setPen(Qt.PenStyle.NoPen)
+    p.setBrush(shine)
+    p.drawRoundedRect(tag.adjusted(1, 1, -1, -h / 2), h / 2 - 1, h / 2 - 1)
+    cx, cy, r = x + pad + star / 2, y + h / 2, star / 2   # a four-point sparkle
+    spark = QPainterPath(QPointF(cx, cy - r))
+    for px, py in ((cx + r * 0.28, cy - r * 0.28), (cx + r, cy), (cx + r * 0.28, cy + r * 0.28),
+                   (cx, cy + r), (cx - r * 0.28, cy + r * 0.28), (cx - r, cy),
+                   (cx - r * 0.28, cy - r * 0.28), (cx, cy - r)):
+        spark.lineTo(QPointF(px, py))
+    p.setBrush(QColor("#fff3b0"))
+    p.drawPath(spark)
+    p.setFont(f)
+    p.setPen(QColor(0, 0, 0, 90))   # a soft drop shadow under the white text
+    text_at = QRectF(x + pad + star + 3, y, w, h)
+    p.drawText(text_at.translated(0, 1), Qt.AlignmentFlag.AlignLeft | Qt.AlignmentFlag.AlignVCenter,
+               text)
+    p.setPen(QColor("#ffffff"))
+    p.drawText(text_at, Qt.AlignmentFlag.AlignLeft | Qt.AlignmentFlag.AlignVCenter, text)
+    p.restore()
+
+
 class ThemeCard(QPushButton):
     """A clickable mini-preview of a theme: its colours, and with Textured on, its
     pattern on the panels and its glow behind them, so the switch shows what it does.
@@ -70,8 +133,11 @@ class ThemeCard(QPushButton):
         self.name = name
         self.setObjectName("themecard")
         self.setAccessibleName(name)   # it draws its name: a screen reader had nothing to say
+        if name in theme.LIMITED:
+            self.setToolTip(limited_tip(name))
+            self.setAccessibleDescription(_("Limited edition"))
         self.setCheckable(True)
-        self.setFixedSize(QSize(150, 112))
+        self.setFixedSize(QSize(150, 112))   # (ThemeGrid widens it to fill its column)
         self.setCursor(Qt.CursorShape.PointingHandCursor)
         self._hello = None   # when Bun started waving (time.monotonic), None: he isn't
         self._tick = QTimer(self)
@@ -113,13 +179,15 @@ class ThemeCard(QPushButton):
             if brush is not None:
                 p.setBrush(brush)
                 p.drawRoundedRect(QRectF(r.right() - 44, r.top() + 6, 38, r.height() - 12), 5, 5)
+        # two columns of pads across what the side panel leaves (a wider card: wider pads)
+        pw = max(40.0, (r.width() - 44 - 7 - 6 - 4) / 2)   # (40: the old fixed size)
         for i, col in enumerate(("#7c5cff", "#ff5c8a", "#1fb6ff", "#13ce66")):
-            x = r.left() + 7 + (i % 2) * 44
+            x = r.left() + 7 + (i % 2) * (pw + 4)
             y = r.top() + 7 + (i // 2) * 34
             for brush in (QColor(t["card"]), tile):
                 if brush is not None:
                     p.setBrush(brush)
-                    p.drawRoundedRect(QRectF(x, y, 40, 28), 5, 5)
+                    p.drawRoundedRect(QRectF(x, y, pw, 28), 5, 5)
             p.setBrush(QColor(col))
             p.drawRoundedRect(QRectF(x + 5, y + 5, 10, 3), 1.5, 1.5)
         # Bun on the side panel, standing at its foot: the theme's headphones, outfit
@@ -142,6 +210,8 @@ class ThemeCard(QPushButton):
         p.setFont(f)
         p.drawText(QRectF(10, self.height() - 28, self.width() - 20, 22),
                    Qt.AlignmentFlag.AlignLeft | Qt.AlignmentFlag.AlignVCenter, self.name)
+        if self.name in theme.LIMITED:   # just inside the preview's top-left corner
+            paint_limited_tag(p, r.left() + 5, r.top() + 5, self.font(), r.width() - 10)
         p.end()
 
 
@@ -168,12 +238,13 @@ class ThemeGrid(QWidget):
         # cards over the whole width, out of line with the groups above and below)
         columns = max(1, (self.width() + 12) // 162)
         self._reflow(columns)
-        # the width left over is shared out as equal gaps, first card on the left edge
-        # and a full row's last on the right (all of it sat on the right, an empty strip)
-        gap = 12
-        if columns > 1:
-            gap = max(12, (self.width() - columns * 150) // (columns - 1))
-        self.grid.setHorizontalSpacing(gap)
+        # the cards widen to share the width left over, first on the left edge and a full
+        # row's last on the right, with the same 12 px gap across as down (sharing it out
+        # as gaps instead left ~70 px between cards beside 12 px between rows)
+        width = max(150, (self.width() - 12 * (columns - 1)) // columns)
+        for card in self.cards:
+            card.setFixedWidth(width)
+        self.grid.setHorizontalSpacing(12)
 
     def _reflow(self, columns):
         if columns == self.columns:
@@ -207,7 +278,7 @@ class AppearancePage(Page):
         from soundboard.ui.panel import heading_row
         group_icons = {"Classic": "star", "Colourful": "palette", "Wild": "shuffle",
                        "Meme": "like"}
-        for group, names in theme.GROUPS:
+        for group, names in theme.groups():
             head, _title, _marks = heading_row(theme.group_name(group),
                                                group_icons.get(group, ""))
             tv.addLayout(head)
@@ -578,4 +649,6 @@ class AppearancePage(Page):
         self.dlg._sync_highlight()   # the theme's own colour, unless you picked one
         for c in self.dlg.theme_cards:
             c.setChecked(c.name == name)
+            if c.name in theme.LIMITED:   # picked in time: now it's theirs
+                c.setToolTip(limited_tip(c.name))
             c.update()

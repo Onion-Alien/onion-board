@@ -3816,5 +3816,8 @@
   "Hear {effect} (only you)": "Чуй {effect} (само ти)",
   "Mic only": "Само микрофон",
   "✓ The store is on again: loading it.": "✓ Магазинът пак е включен: зарежда се.",
-  "Background sounds": "Фонови звуци"
+  "Background sounds": "Фонови звуци",
+  "Limited edition": "Ограничено издание",
+  "Limited edition: this one's yours to keep.": "Ограничено издание: тази е твоя завинаги.",
+  "Limited edition: use it by {date} and it's yours to keep. After that it's gone for good.": "Ограничено издание: използвай я до {date} и остава твоя. След това изчезва завинаги."
 }

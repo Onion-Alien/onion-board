@@ -3738,5 +3738,8 @@
   "Hear {effect} (only you)": "Nghe thử {effect} (chỉ bạn)",
   "Mic only": "Chỉ mic",
   "✓ The store is on again: loading it.": "✓ Cửa hàng đã bật lại: đang tải.",
-  "Background sounds": "Âm thanh nền"
+  "Background sounds": "Âm thanh nền",
+  "Limited edition": "Phiên bản giới hạn",
+  "Limited edition: this one's yours to keep.": "Phiên bản giới hạn: cái này là của bạn mãi mãi.",
+  "Limited edition: use it by {date} and it's yours to keep. After that it's gone for good.": "Phiên bản giới hạn: dùng trước {date} là của bạn mãi mãi. Sau đó nó biến mất vĩnh viễn."
 }

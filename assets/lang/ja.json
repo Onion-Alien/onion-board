@@ -3738,5 +3738,8 @@
   "Hear {effect} (only you)": "{effect} を試聴 (自分だけ)",
   "Mic only": "マイクのみ",
   "✓ The store is on again: loading it.": "✓ ストアが再びオンになりました: 読み込み中。",
-  "Background sounds": "バックグラウンドの音"
+  "Background sounds": "バックグラウンドの音",
+  "Limited edition": "限定版",
+  "Limited edition: this one's yours to keep.": "限定版：このテーマはずっとあなたのものです。",
+  "Limited edition: use it by {date} and it's yours to keep. After that it's gone for good.": "限定版：{date}までに使えばずっとあなたのもの。それを過ぎると二度と手に入りません。"
 }

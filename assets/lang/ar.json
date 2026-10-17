@@ -4128,5 +4128,8 @@
   "Hear {effect} (only you)": "استمع إلى {effect} (أنت فقط)",
   "Mic only": "الميك فقط",
   "✓ The store is on again: loading it.": "✓ المتجر يعمل من جديد: جارٍ تحميله.",
-  "Background sounds": "أصوات الخلفية"
+  "Background sounds": "أصوات الخلفية",
+  "Limited edition": "إصدار محدود",
+  "Limited edition: this one's yours to keep.": "إصدار محدود: هذا لك للأبد.",
+  "Limited edition: use it by {date} and it's yours to keep. After that it's gone for good.": "إصدار محدود: استخدمه قبل {date} ويصبح لك للأبد. بعد ذلك يختفي نهائيًا."
 }

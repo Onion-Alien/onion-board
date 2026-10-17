@@ -9,6 +9,7 @@ Part of the style kit (see __init__.py): imports nothing from either app.
 """
 from __future__ import annotations
 
+import datetime
 import re
 from string import Template
 
@@ -261,7 +262,7 @@ THEMES: dict[str, dict[str, str]] = {
         border="#382841", border_hi="#6a4a74", groove="#35263b", inset="#0b070d",
         text="#f6e9dc", text_hi="#fff6ec", muted="#b39aa9", faint="#7a6475", section="#ff9a3c",
         accent="#ff7518", accent_hi="#ff8d3d", accent2="#a259ff", on_accent="#1a0900",
-        texture="webs",
+        texture="webs", logo="lantern",
         off="#4f3a56", badge="#312336", badge_text="#f3dcc8",
         **_DARK_STATUS | dict(ok_text="#8cff5a", ok_border="#3f7a2a", error_text="#ff7a7c"),
     ),
@@ -583,15 +584,18 @@ for _t in THEMES.values():
 DEFAULT = "Dark"
 # How the Settings window groups the theme cards. Every theme is in exactly one group.
 GROUPS: list[tuple[str, list[str]]] = [
-    ("Classic", ["Dark", "Light", "Midnight", "Carbon", "Slate", "Arctic", "Paper",
+    ("Classic", ["Halloween", "Dark", "Light", "Midnight", "Carbon", "Slate", "Arctic", "Paper",
                  "High Contrast"]),
     ("Colourful", ["Ocean", "Toxic", "Vampire", "Forest", "Mocha", "Sunset", "Royal", "Onion",
                    "Lilac", "Mint", "Cherry Blossom"]),
-    ("Wild", ["Synthwave", "Vaporwave", "Blood Moon", "Halloween", "Lava", "Amber Terminal",
-              "Hacker"]),
+    ("Wild", ["Synthwave", "Vaporwave", "Blood Moon", "Lava", "Amber Terminal", "Hacker"]),
     ("Meme", ["Flashbang", "Barbie", "Swamp", "Deep Fried", "Retro 98", "Comic Sans",
               "Brainrot"]),
 ]
+
+# Limited-edition themes: each one's last day on offer (the PC's own date). Pick it by
+# then and it's yours for good (the app's `kept` list); after it, nobody else sees it.
+LIMITED: dict[str, datetime.date] = {"Halloween": datetime.date(2026, 10, 31)}
 
 
 FONT = "Bahnschrift"   # ships with Windows 10+; a theme can swap it with a `font` token

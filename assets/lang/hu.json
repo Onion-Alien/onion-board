@@ -3816,5 +3816,8 @@
   "Hear {effect} (only you)": "{effect} meghallgatása (csak te)",
   "Mic only": "Csak mikrofon",
   "✓ The store is on again: loading it.": "✓ A bolt újra be van kapcsolva: betöltés.",
-  "Background sounds": "Háttérhangok"
+  "Background sounds": "Háttérhangok",
+  "Limited edition": "Limitált kiadás",
+  "Limited edition: this one's yours to keep.": "Limitált kiadás: ez már örökre a tiéd.",
+  "Limited edition: use it by {date} and it's yours to keep. After that it's gone for good.": "Limitált kiadás: használd {date}-ig, és örökre a tiéd marad. Utána végleg eltűnik."
 }

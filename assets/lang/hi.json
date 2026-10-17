@@ -3816,5 +3816,8 @@
   "Hear {effect} (only you)": "{effect} सुनें (सिर्फ़ आप)",
   "Mic only": "सिर्फ़ माइक",
   "✓ The store is on again: loading it.": "✓ स्टोर फिर से चालू है: लोड हो रहा है।",
-  "Background sounds": "बैकग्राउंड आवाज़ें"
+  "Background sounds": "बैकग्राउंड आवाज़ें",
+  "Limited edition": "लिमिटेड एडिशन",
+  "Limited edition: this one's yours to keep.": "लिमिटेड एडिशन: यह अब हमेशा के लिए आपका है।",
+  "Limited edition: use it by {date} and it's yours to keep. After that it's gone for good.": "लिमिटेड एडिशन: इसे {date} तक इस्तेमाल करें और यह हमेशा आपका रहेगा। उसके बाद यह हमेशा के लिए चला जाएगा।"
 }

@@ -3816,5 +3816,8 @@
   "Hear {effect} (only you)": "Hør {effect} (kun dig)",
   "Mic only": "Kun mik",
   "✓ The store is on again: loading it.": "✓ Butikken er tændt igen: indlæser den.",
-  "Background sounds": "Baggrundslyde"
+  "Background sounds": "Baggrundslyde",
+  "Limited edition": "Begrænset udgave",
+  "Limited edition: this one's yours to keep.": "Begrænset udgave: den her er din for altid.",
+  "Limited edition: use it by {date} and it's yours to keep. After that it's gone for good.": "Begrænset udgave: brug den senest {date}, så er den din for altid. Derefter forsvinder den for evigt."
 }

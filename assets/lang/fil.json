@@ -3816,5 +3816,8 @@
   "Hear {effect} (only you)": "Pakinggan ang {effect} (ikaw lang)",
   "Mic only": "Mic lang",
   "✓ The store is on again: loading it.": "✓ Naka-on ulit ang store: nilo-load na.",
-  "Background sounds": "Mga tunog sa background"
+  "Background sounds": "Mga tunog sa background",
+  "Limited edition": "Limitadong edisyon",
+  "Limited edition: this one's yours to keep.": "Limitadong edisyon: sa iyo na ito habambuhay.",
+  "Limited edition: use it by {date} and it's yours to keep. After that it's gone for good.": "Limitadong edisyon: gamitin ito bago ang {date} at sa iyo na ito habambuhay. Pagkatapos noon, mawawala na ito nang tuluyan."
 }

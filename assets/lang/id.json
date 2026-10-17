@@ -3738,5 +3738,8 @@
   "Hear {effect} (only you)": "Dengarkan {effect} (hanya kamu)",
   "Mic only": "Mik saja",
   "✓ The store is on again: loading it.": "✓ Toko aktif lagi: sedang dimuat.",
-  "Background sounds": "Suara latar"
+  "Background sounds": "Suara latar",
+  "Limited edition": "Edisi terbatas",
+  "Limited edition: this one's yours to keep.": "Edisi terbatas: yang ini milikmu selamanya.",
+  "Limited edition: use it by {date} and it's yours to keep. After that it's gone for good.": "Edisi terbatas: pakai sebelum {date} dan jadi milikmu selamanya. Setelah itu hilang untuk selamanya."
 }
