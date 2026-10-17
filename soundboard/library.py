@@ -482,6 +482,7 @@ class Config:
     speech: dict = field(default_factory=dict)     # text-to-speech / live voice settings
     overlay: dict = field(default_factory=dict)    # in-game overlay (ui.overlay.OverlaySettings)
     bun: dict = field(default_factory=dict)        # Bun mode: on, size, pos (ui.bunmode)
+    window_maximized: bool = False   # the window was maximised last time: it opens that way
     radio: dict = field(default_factory=dict)      # Radio tab: vol, monitor, favorites, last
     data: dict = field(default_factory=dict)       # Settings > Data & quality (soundboard.quality)
     apps: dict = field(default_factory=dict)       # Apps tab: exe -> {vol, monitor, to, path}
