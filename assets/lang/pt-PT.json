@@ -3649,5 +3649,6 @@
   "Send to others": "Enviar aos outros",
   "Who should hear the radio?": "Quem deve ouvir o rádio?",
   "only you hear it": "só tu ouves",
-  "Click any dot to play that station. Press Send to others and your call hears it too.": "Clica em qualquer ponto para tocar essa estação. Carrega em Enviar aos outros e a tua chamada também a ouve."
+  "Click any dot to play that station. Press Send to others and your call hears it too.": "Clica em qualquer ponto para tocar essa estação. Carrega em Enviar aos outros e a tua chamada também a ouve.",
+  "You already have a setup called “{name}”.": "Já tem um ajuste chamado “{name}”."
 }

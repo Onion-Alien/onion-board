@@ -3572,5 +3572,6 @@
   "Send to others": "发送给别人",
   "Who should hear the radio?": "谁应该听到电台？",
   "only you hear it": "只有你能听到",
-  "Click any dot to play that station. Press Send to others and your call hears it too.": "点击任意一个点即可播放该电台。按发送给别人，通话里的人也能听到。"
+  "Click any dot to play that station. Press Send to others and your call hears it too.": "点击任意一个点即可播放该电台。按发送给别人，通话里的人也能听到。",
+  "You already have a setup called “{name}”.": "你已经有一个名为“{name}”的组合了。"
 }

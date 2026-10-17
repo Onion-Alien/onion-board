@@ -3572,5 +3572,6 @@
   "Send to others": "Gửi cho người khác",
   "Who should hear the radio?": "Ai nên nghe radio?",
   "only you hear it": "chỉ bạn nghe thấy",
-  "Click any dot to play that station. Press Send to others and your call hears it too.": "Bấm vào chấm bất kỳ để phát đài đó. Nhấn Gửi cho người khác để cuộc gọi của bạn cũng nghe thấy."
+  "Click any dot to play that station. Press Send to others and your call hears it too.": "Bấm vào chấm bất kỳ để phát đài đó. Nhấn Gửi cho người khác để cuộc gọi của bạn cũng nghe thấy.",
+  "You already have a setup called “{name}”.": "Bạn đã có thiết lập tên “{name}”."
 }

@@ -135,8 +135,22 @@ class SetupsBar(QWidget):
 
     def _menu(self, name: str, at):
         m = QMenu(self)
+        m.addAction(icons.icon("edit"), _("Rename"), lambda: self._rename(name))
         m.addAction(_("Delete"), lambda: self._delete(name))
         m.exec(at)
+
+    def _rename(self, name: str):
+        if name not in self.store.setups:
+            return
+        new, ok = QInputDialog.getText(self, _("Rename"), _("New name:"), text=name)
+        new = voicesetups.clean_name(new)
+        if not ok or not new or new == name:
+            return
+        if self.store.taken(new, but=name):
+            self._say(_("You already have a setup called “{name}”.", name=new))
+            return
+        if self.store.rename(name, new):
+            self._say(_("Saved “{name}”.", name=new))
 
     def _delete(self, name: str):
         setup = self.store.remove(name)

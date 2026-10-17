@@ -3649,5 +3649,6 @@
   "Send to others": "Küldés másoknak",
   "Who should hear the radio?": "Ki hallja a rádiót?",
   "only you hear it": "csak te hallod",
-  "Click any dot to play that station. Press Send to others and your call hears it too.": "Kattints bármelyik pontra, és szól az állomás. Nyomd meg a Küldés másoknak gombot, és a hívásod is hallja."
+  "Click any dot to play that station. Press Send to others and your call hears it too.": "Kattints bármelyik pontra, és szól az állomás. Nyomd meg a Küldés másoknak gombot, és a hívásod is hallja.",
+  "You already have a setup called “{name}”.": "Már van „{name}” nevű beállításod."
 }

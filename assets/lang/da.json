@@ -3649,5 +3649,6 @@
   "Send to others": "Send til andre",
   "Who should hear the radio?": "Hvem skal høre radioen?",
   "only you hear it": "kun du hører den",
-  "Click any dot to play that station. Press Send to others and your call hears it too.": "Klik på en prik for at afspille stationen. Tryk på Send til andre, så hører dit opkald den også."
+  "Click any dot to play that station. Press Send to others and your call hears it too.": "Klik på en prik for at afspille stationen. Tryk på Send til andre, så hører dit opkald den også.",
+  "You already have a setup called “{name}”.": "Du har allerede en opsætning kaldet \"{name}\"."
 }

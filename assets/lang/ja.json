@@ -3572,5 +3572,6 @@
   "Send to others": "相手に送る",
   "Who should hear the radio?": "ラジオを誰に聞かせますか？",
   "only you hear it": "自分にだけ聞こえています",
-  "Click any dot to play that station. Press Send to others and your call hears it too.": "点をクリックするとその局が流れます。相手に送るを押すと通話相手にも聞こえます。"
+  "Click any dot to play that station. Press Send to others and your call hears it too.": "点をクリックするとその局が流れます。相手に送るを押すと通話相手にも聞こえます。",
+  "You already have a setup called “{name}”.": "「{name}」という名前のセットはもうあります。"
 }
