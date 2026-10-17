@@ -13,6 +13,7 @@ from PySide6.QtWidgets import (QAbstractButton, QApplication, QCheckBox, QComboB
                                QHBoxLayout, QLabel, QLineEdit, QListWidget, QListWidgetItem,
                                QPushButton, QScrollArea, QStyledItemDelegate, QTabWidget,
                                QVBoxLayout, QWidget)
+from shiboken6 import isValid as qt_valid
 
 
 from soundboard.ui import busy, icons, onionalien
@@ -279,8 +280,35 @@ class SettingsDialog(QDialog, Built):
             usage.used(f"settings-page-{self._page_keys[i]}")   # the page's name only
         self.categories.setCurrentRow(i)
 
+    def _advanced_only(self, w: QWidget, show_when_basic: bool = False,
+                       also: Callable[[], bool] | None = None) -> QWidget:
+        """A card (or `show_when_basic`: its "more" button) on a basic page that only
+        shows with Show advanced on: the expert ones (buffering, speech servers…) read as
+        things a new user had to understand. `also`: another rule it must pass too
+        (the voices card: only with the Voice tab)."""
+        if not hasattr(self, "_adv_widgets"):
+            self._adv_widgets: list[tuple[QWidget, bool]] = []
+        self._adv_widgets.append((w, show_when_basic))
+        w.setProperty("adv_card", not show_when_basic)
+        w._adv_also = also   # pyright: ignore[reportAttributeAccessIssue]
+        if not self._adv_shows(w, show_when_basic):
+            w.hide()   # (never show() it here: not in its page yet, it'd flash up as a
+        return w       # little window of its own)
+
+    def _adv_shows(self, w: QWidget, basic: bool = False) -> bool:
+        on = getattr(self, "_advanced", bool(getattr(self.mw.cfg, "settings_advanced", False)))
+        also = getattr(w, "_adv_also", None)
+        return on != basic and (also is None or also())
+
+    def _sync_advanced_cards(self):
+        for w, basic in getattr(self, "_adv_widgets", ()):
+            if qt_valid(w):
+                w.setVisible(self._adv_shows(w, basic))
+                w.setProperty("search_hid", False)
+
     def _set_advanced(self, on: bool):
         self._advanced = on
+        self._sync_advanced_cards()
         if on:
             usage.used("settings-advanced")
         if getattr(self.mw.cfg, "settings_advanced", None) != on:
@@ -390,6 +418,15 @@ class SettingsDialog(QDialog, Built):
                     continue
                 said = self._words_of(card) if words else ""
                 match = all(w in title or w in said for w in words)
+                if card.property("adv_card") and not self._advanced:
+                    # an advanced card on a basic page: only a search brings it out
+                    also = getattr(card, "_adv_also", None)
+                    match = match and (also is None or also())
+                    card.setVisible(bool(words) and match)
+                    hits += bool(words) and match
+                    if match and words:
+                        whole += min(len(r.findall(f"{title} {said}")) for r in starts)
+                    continue
                 if not match and not card.isHidden():
                     card.hide()
                     card.setProperty("search_hid", True)
@@ -578,7 +615,8 @@ class SettingsDialog(QDialog, Built):
         if key == "triggers" and hasattr(self, "_watch_refresh"):
             self._watch_refresh()
         if key == "voice" and hasattr(self, "voices_card"):
-            self.voices_card.setVisible(on)
+            self.voices_card.setVisible(on and (self._advanced or not self.voices_card.property(
+                "adv_card")))
 
     def _link_button(self, text: str, url: str, icon: str = "") -> QPushButton:
         btn = QPushButton(text)
@@ -641,21 +679,21 @@ class SettingsDialog(QDialog, Built):
                          "from GitHub, and downloads one from there when you press Add."),
         "sound_store": _("The Community tab: the project's own store, for its list, the "
                          "sounds and voices you play or add, your votes and what you share."),
-        "ytdlp_update": _("Reads the list of yt-dlp versions the app's makers approved "
-                          "(from GitHub), and fetches a newer one from PyPI when you press "
-                          "Update now or Reinstall (Updates > Helper programs), or by "
-                          "itself if you ticked Update automatically there."),
+        "ytdlp_update": _("Keeps downloading from YouTube and other sites working: checks "
+                          "GitHub for a version of yt-dlp the app's makers approved and "
+                          "gets it from PyPI when you update it (Updates > Helper "
+                          "programs), or by itself if you ticked Update automatically."),
         "radio": _("The station directory (Radio Browser) and the stations you play. Off: "
                    "the Radio tab contacts nobody."),
         "app_update": _("Asks GitHub for the latest release, and downloads its installer "
                         "when you press Update now."),
-        "addons": _("GitHub, for Onion Watch (Triggers tab) and its updates, and the "
-                    "packages an add-on's Install step downloads (pip)."),
-        "voices": _("Translation models (Voice tab), live voice's speech model (Hugging "
-                    "Face) and Windows' own voices (Windows Update). Off: live voice still "
-                    "works with a model it already has."),
-        "voice_servers": _("Voices in your voices folder that are a server on the "
-                           "internet. Ones on this PC (127.0.0.1) always work."),
+        "addons": _("Downloads Onion Watch (Triggers tab), its updates, and what an "
+                    "add-on needs when you install it (from GitHub and PyPI)."),
+        "voices": _("Downloads the extra voices and languages you pick on the Voice tab "
+                    "(from Hugging Face and Windows Update). Off: what's already here still "
+                    "works."),
+        "voice_servers": _("Voices you added that run on another computer over the "
+                           "internet. Ones running on this PC always work."),
         "setup_downloads": _("The setup guide's Install button downloads VB-Cable (the "
                              "virtual cable) from vb-audio.com. Not needed if your sounds go "
                              "straight into your mic, to another device or nowhere. Off: "
@@ -663,10 +701,9 @@ class SettingsDialog(QDialog, Built):
         "tor_download": _("Get Tor / Update Tor (Connection page) downloads Tor from the "
                           "Tor Project (dist.torproject.org). Off: a Tor that's already "
                           "here still works."),
-        "ffmpeg_download": _("Get FFmpeg (Data & quality) installs FFmpeg with winget, "
-                             "Microsoft's package manager, so M4A, AAC and video files "
-                             "play and can be added. Off: install FFmpeg yourself from "
-                             "ffmpeg.org."),
+        "ffmpeg_download": _("Get FFmpeg (Data & quality) installs FFmpeg, the free tool "
+                             "that plays M4A, AAC and video files (through Microsoft's "
+                             "winget). Off: install it yourself from ffmpeg.org."),
         "usage_stats": _("Anonymous usage stats once a day, to see what to improve. "
                          "Never your name, IP address or device info."),
     }

@@ -2,6 +2,7 @@
 the config and engine, the cable page reacts to the cable being there or not, and
 finishing marks setup done (only when the cable exists)."""
 import pytest
+from PySide6.QtWidgets import QDialog
 
 from soundboard import engine, library, winkeys
 from soundboard.library import Config
@@ -248,6 +249,9 @@ def test_install_shows_bun_building_and_each_step(wizard, devices, app_dir, monk
     monkeypatch.setattr(setupwizard.subprocess, "Popen",
                         lambda a, **kw: (argv.extend(a), proc)[1])
     wiz.btn_cable.click()
+    assert argv == []   # it asks first: the cable is only for those who need it
+    box = wiz.findChild(QDialog, "cableconfirm")
+    box.cable_button.click()   # Install the cable anyway
     status = app_dir / "cable-install-status.txt"
     assert str(status) in argv
     assert wiz.bun_cable.building and not wiz.cable_bar.isHidden()

@@ -345,12 +345,14 @@ def test_one_click_plays_a_pad(window, monkeypatch):
              else pad.mouseReleaseEvent)(ev)
     try:
         click()
-        assert played == []           # the default: a click only selects it
-        w.set_single_click(True)
+        assert played == ["s0"]       # the default: a click plays it (new users clicked
+        w.set_single_click(False)     # a pad, nothing happened, and they left)
+        pad._last_click = -1e9        # (not a double-click with the one before)
         click()
-        assert played == ["s0"]
+        assert played == ["s0"]       # off: a click only selects it
     finally:
-        Pad.single_click = False
+        Pad.single_click = True
+    assert Config().single_click   # (saved configs keep what they had)
 
 
 def test_a_double_click_plays_wherever_the_two_clicks_land(window, monkeypatch):
@@ -358,6 +360,7 @@ def test_a_double_click_plays_wherever_the_two_clicks_land(window, monkeypatch):
     played = []
     monkeypatch.setattr(w.playctl, "play", played.append)
     pad = w.pads["s0"]
+    monkeypatch.setattr(Pad, "single_click", False)   # (Settings: Play pads with one click, off)
 
     def click(x, y):
         pos = QPointF(x, y)

@@ -8,6 +8,7 @@ from PySide6.QtWidgets import QApplication, QColorDialog, QMenu
 
 from soundboard.i18n import _
 from soundboard.library import PAD_COLORS, SoundMeta
+from soundboard.ui.widgets import Pad
 from test_mainwindow import window as main_window  # noqa: F401  (the real MainWindow)
 
 
@@ -113,7 +114,8 @@ def test_category_colour_menu_is_the_bulk_one_with_no_colour(window, monkeypatch
     assert w.cfg.category_colors["Memes"] == "#123456"
 
 
-def test_ctrl_click_toggles_and_shift_click_picks_a_range(window):
+def test_ctrl_click_toggles_and_shift_click_picks_a_range(window, monkeypatch):
+    monkeypatch.setattr(Pad, "single_click", False)   # (Settings: Play pads with one click, off)
     w = window
     add_sounds(w, "A", "B")
     order = [p.meta.id for p in w.grid.pads]            # s0 s1 x0 x1
@@ -223,7 +225,8 @@ def test_keyboard_plays_picks_and_moves_focus(window):
     assert moved == [("s0", 1, 0)]
 
 
-def test_click_selects_double_click_plays(window):
+def test_click_selects_double_click_plays(window, monkeypatch):
+    monkeypatch.setattr(Pad, "single_click", False)   # (Settings: Play pads with one click, off)
     from PySide6.QtCore import QPoint
     from PySide6.QtTest import QTest
     w = window

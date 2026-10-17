@@ -288,11 +288,9 @@ class StatusControl(Controller):
                       "virtual cable is a download, and Offline mode is on. Voicemeeter, a "
                       "mixer or OBS? Pick that device under <b>Send my sounds to</b>.",
                       colour=warn) if net.offline() else
-                    _("<b style='color:{colour}'>One-time setup:</b> install the free virtual "
-                      "cable. It's what lets Discord and games hear your sounds. Without it, "
-                      "only you can hear them. Easier: set <b>Send my sounds to</b> to "
-                      "<b>My mic</b> (nothing to install). Voicemeeter, a mixer or OBS? Pick "
-                      "that device there.", colour=warn))
+                    _("<b style='color:{colour}'>One step left:</b> click <b>Put my sounds "
+                      "into my mic</b> and Discord and games hear them. Nothing to install.",
+                      colour=warn))
         elif vm and e.main_stream is not None:
             state = "ok"
             out = _("<b style='color:{colour}'>{device}</b>, your new mic "
@@ -400,6 +398,7 @@ class StatusControl(Controller):
                     icons.set_icon(mw.btn_install, *look)
         # the mic is the main way: on the cable route the cable's button comes second
         self._set_primary(mw.btn_install, route == "mic" and not update)   # (optional)
+        mw.install_glow.set_on(route == "mic" and not update)   # the main one glows
         self._set_primary(mw.btn_attach, route == "cable")
         # its mic in the fill's colour while it's the main button (text colour on the
         # accent was 1.0:1 on Hacker's green)
@@ -420,8 +419,12 @@ class StatusControl(Controller):
         if route == "mic":
             mw._direct_shown = mw.micctl._direct_health()
         mw.netctl._cable_follow_switch()
-        mw.btn_rescan.setVisible(state == "missing" and route != "mic")
+        # "check again" only once they've started a cable install: before, it was a
+        # fourth button about a thing they hadn't done
+        mw.btn_rescan.setVisible(state == "missing" and route != "mic"
+                                 and getattr(mw, "_cable_started", False))
         mw.btn_attach.setVisible(route == "cable" and not mw._attaching)
+        mw.ways_or.setVisible(not mw.btn_attach.isHidden() and not mw.btn_install.isHidden())
         if route == "mic":
             mw.micctl._cable_tip()
         # Discord / the game picks a mic, or keeps its own one: help with its settings

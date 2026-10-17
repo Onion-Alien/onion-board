@@ -61,7 +61,8 @@ def tips() -> dict:
 
 def live_tip(on: bool) -> str:
     from soundboard.i18n import _
-    return _("Live: click to mute") if on else _("Muted: click to go live")
+    return (_("Others hear you: click to mute") if on
+            else _("Muted: click so others hear you"))
 
 
 def light_windows() -> bool:

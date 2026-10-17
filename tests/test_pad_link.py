@@ -1,5 +1,5 @@
 """A pad whose sound plays from a file outside the library (Copy into library off) shows a
-small link mark; hovering just the mark names the file."""
+small link mark while the mouse is on it; hovering just the mark names the file."""
 from pathlib import Path
 
 from conftest import process_events
@@ -13,10 +13,11 @@ from soundboard.library import SoundMeta
 from soundboard.ui.widgets import Pad
 
 
-def _pad(file: Path, state="ready") -> Pad:
+def _pad(file: Path, state="ready", hover=True) -> Pad:
     p = Pad(SoundMeta(id="x", name="Vine boom", file=str(file), duration=1.2,
                       hotkey="Ctrl+1"), 240)   # room for the mark without real fonts (CI)
     p.state = state
+    p.hover = hover
     p.grab()   # paints it: the mark's place is worked out while painting
     return p
 
@@ -53,6 +54,20 @@ def test_a_slim_row_shows_the_mark_too(qapp, app_dir):
     p = Pad(SoundMeta(id="x", name="Vine boom", file=str(outside), duration=1.2), 320)
     p.setFixedSize(320, 30)   # the mini player's one-line row
     p.state = "ready"
+    p.hover = True
     p.grab()
     assert p._link_rect is not None
     assert _tip(p, p._link_rect.center().toPoint()) == f"Plays from: {outside}"
+
+
+def test_the_mark_waits_for_the_mouse(qapp, app_dir):
+    """On every pad at once it read as "a web link": only the hovered pad shows it."""
+    outside = app_dir / "Music" / "boom.wav"
+    idle = _pad(outside, hover=False)
+    assert idle.linked_file() == str(outside) and idle._link_rect is None
+    assert str(outside) in idle.accessibleDescription()   # still said, just not drawn
+    row = Pad(SoundMeta(id="x", name="Vine boom", file=str(outside), duration=1.2), 320)
+    row.setFixedSize(320, 30)
+    row.state = "ready"
+    row.grab()
+    assert row._link_rect is None

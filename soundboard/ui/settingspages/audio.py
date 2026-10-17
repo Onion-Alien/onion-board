@@ -17,7 +17,8 @@ class AudioPage(Page):
         w, v = self._page()
         v.addWidget(self._devices_card())
         from soundboard.ui.audiorecovery import RecoveryCard
-        v.addWidget(RecoveryCard(self.mw))
+        adv = self.dlg._advanced_only   # (Show advanced: the expert cards)
+        v.addWidget(RecoveryCard(self.mw))   # (stays: it fixes the default, mic route)
         card, cv = self._card(_("Your mic"),
                               _("Normally others hear your voice and your sounds together. "
                                 "Untick this for sounds only: they hear the sounds but not your "
@@ -27,8 +28,8 @@ class AudioPage(Page):
         send.setChecked(self.mw.cfg.mic_enabled)
         send.toggled.connect(self.mw.chk_mic.setChecked)   # the window applies it
         cv.addWidget(send)
-        v.addWidget(card)
-        v.addWidget(self._voices_card())
+        v.addWidget(adv(card))   # (the footer's Others hear it is the everyday one)
+        v.addWidget(adv(self._voices_card(), also=lambda: self.mw.tabctl.tab_on("voice")))
         card, cv = self._card(_("Who's listening"),
                               _("Voice chat squashes your sounds: mono, no deep bass, and in "
                                 "some games nothing above 8-12 kHz. Pick where people hear you "
@@ -62,7 +63,12 @@ class AudioPage(Page):
                                             e.stalls)))
         stat.setObjectName("hint")
         cv.addWidget(stat)
-        v.addWidget(card)
+        v.addWidget(adv(card))
+        more = QPushButton(_("More audio settings"))
+        more.setToolTip(_("Speech voices, buffering and your mic switch (Show advanced)"))
+        icons.set_icon(more, "sliders")
+        more.clicked.connect(lambda: self.dlg._set_advanced(True))
+        v.addWidget(adv(more, show_when_basic=True), 0, Qt.AlignmentFlag.AlignLeft)
         v.addStretch(1)
         return w
 

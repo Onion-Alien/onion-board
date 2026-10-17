@@ -36,7 +36,7 @@ from PySide6.QtWidgets import (
     QWidget,
 )
 
-from soundboard import backup, destination, net, otherboards, remote, theme, usage
+from soundboard import backup, destination, engine, net, otherboards, remote, theme, usage
 from soundboard.i18n import _
 from soundboard.library import PAD_COLORS
 from soundboard.ui import a11y, alsosend, busy, icons, sidebar, taboff
@@ -76,6 +76,8 @@ from soundboard.ui.setupshow import SetupShow
 from soundboard.ui.sidebar import SHUT_W, SideTabs
 from soundboard.ui.speedpitch import SpeedPitchButton
 from soundboard.ui.tabcontrol import TAB_INDEX, TAB_KEYS, TABS, rail_order
+from soundboard.ui import cableconfirm
+from soundboard.ui.glow import Glow
 from soundboard.ui.widgets import (
     DropdownMenu,
     EdgeMatch,
@@ -966,6 +968,7 @@ class WindowBuilder(Controller):
         mw.btn_check.setObjectName("miccheck")
         # its name by hand: a narrow window blanks the words (on_mic_check keeps it)
         mw.btn_check.setAccessibleName(_("Hear what they hear"))
+        mw.btn_check.setProperty("short_text", _("Listen"))   # a narrow window's word
         mw.btn_check.setCheckable(True)
         mw.btn_check.setToolTip(_("Plays your mic into your headphones on top of the sounds, "
                                     "exactly what others hear. A red banner shows while it's on."))
@@ -1045,8 +1048,9 @@ class WindowBuilder(Controller):
                        "muted")
         # the web search: Enter does it; this button shows the site it goes to and picks
         # another from its menu
-        mw.btn_yt = QPushButton()
-        mw.btn_yt.setAccessibleName(_("Search"))
+        # its words while there's room: a lone site logo didn't say it searches the web
+        mw.btn_yt = QPushButton(_("Search online"))
+        mw.btn_yt.setAccessibleName(_("Search online"))
         mw.btn_yt.setToolTip(_("Search YouTube, SoundCloud, TikTok sounds, Myinstants… for "
                                  "what's typed (or press Enter), play or add the audio"))
         icons.set_icon(mw.btn_yt, "youtube", "accent", "accent", size=18)
@@ -1564,24 +1568,48 @@ class WindowBuilder(Controller):
         cv.addWidget(mw.setup_show)
         mw.btn_install = QPushButton(_("Install the free virtual cable"))
         mw.btn_install.setObjectName("primary")
-        mw.btn_install.clicked.connect(
-            lambda: mw.micctl.attach_mic() if mw.cfg.route == "mic"
-            else mw.micctl.install_cable())
+        mw._cable_started = False   # (I've installed it: check again waits for this)
+        def install_clicked():
+            if mw.cfg.route == "mic":
+                mw.micctl.attach_mic()
+                return
+
+            def install():
+                mw._cable_started = True
+                mw.micctl.install_cable()
+            cableconfirm.ask(mw, install, mw.micctl.attach_mic)   # (only if they need it)
+        mw.btn_install.clicked.connect(install_clicked)
         # what set_icon last put on it (only set when it changes)
         mw._install_icon = None
-        mw.btn_attach = QPushButton(_("Straight into my mic instead"))   # (tip: no cable)
+        # on the mic route it's the main button (put my sounds into my mic): it glows then
+        mw.install_glow = Glow(mw.btn_install)
+        mw.install_glow.set_on(False)
+        mw.btn_attach = QPushButton(_("Put my sounds into my mic"))   # (tip: no cable)
         mw.btn_attach.setToolTip(_("Onion Board puts your sounds into your real mic, so "
                                      "Discord and games need no virtual cable and nothing picked"))
         mw.btn_attach.clicked.connect(mw.micctl.attach_mic)
         icons.set_icon(mw.btn_attach, "mic")
+        mw.attach_glow = Glow(mw.btn_attach)   # the one to press, among the card's colours
         mw.btn_attach.hide()
         # the ways to set it up, side by side at their own size (wraps when narrow)
         ways = Flow(gap=8)
-        ways.addWidget(mw.btn_attach)
+        # the mic on a row of its own, then "or" and the rest: the cable is the fallback
+        # for the few who'd rather not, not the next step
+        # (straight in the card, at its own width: a row with a stretch kept a gap of
+        # its own while the button was hidden, and the card came up short)
+        cv.addWidget(mw.btn_attach, 0, Qt.AlignmentFlag.AlignLeft)
+        mw.ways_or = QLabel(_("or"))
+        mw.ways_or.setObjectName("hint")
+        mw.ways_or.hide()
+        ways.addWidget(mw.ways_or)   # first in the row, level with the buttons' middle
         mw.btn_usecable = QPushButton(_("Use the cable"))   # (in its tile, below)
         mw.btn_usecable.setToolTip(_("Use a free virtual cable instead: you pick it as the "
                                        "mic in Discord and games"))
-        mw.btn_usecable.clicked.connect(mw.micctl.use_cable_instead)
+        # not installed yet: asked first (only for those who need it); there already,
+        # it just switches
+        mw.btn_usecable.clicked.connect(lambda: mw.micctl.use_cable_instead()
+                                        if engine.virtual_outputs() else cableconfirm.ask(
+            mw, mw.micctl.use_cable_instead, lambda: None, _("Keep using my mic")))
         icons.set_icon(mw.btn_usecable, "cable")
         mw.btn_usecable.hide()
         mw.mic_attached.connect(mw.micctl._mic_attached)
@@ -1590,6 +1618,8 @@ class WindowBuilder(Controller):
         mw._settle_until = 0.0      # just set up: Windows is still loading it
         mw._done_toast = None   # "done" / "updated": said once it works
         icons.set_icon(mw.btn_install, "cable", "on_accent")
+        mw.ways_or.setAlignment(Qt.AlignmentFlag.AlignVCenter)
+        mw.ways_or.setMinimumHeight(mw.btn_install.sizeHint().height())   # (the buttons')
         ways.addWidget(mw.btn_install)
         # Connect your chat is hidden until there's a chat to connect: its guide is here
         # meanwhile (that card held nothing else, while nothing was set up or on Nobody)
@@ -1597,6 +1627,7 @@ class WindowBuilder(Controller):
         mw.btn_guide.hide()
         mw.btn_guide.setProperty("quiet", True)
         ways.addWidget(mw.btn_guide)
+        # (the row straight in the card: inside another row its height came up short)
         cv.addLayout(ways)
         mw._ways = ways
         # straight into the mic works: the cable is only a fallback, so offer to remove it

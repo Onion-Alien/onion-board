@@ -80,12 +80,16 @@ def icon_only(button: QPushButton) -> Callable[[bool], None]:
     """Drop a button's text but keep its icon (its tooltip still explains it).
 
     The full text is kept in the "full_text" property, read back when it grows again,
-    so a label the app changes meanwhile (set that property too) isn't lost."""
+    so a label the app changes meanwhile (set that property too) isn't lost. A button
+    with a "short_text" property keeps that word instead (an icon alone said nothing to
+    someone new)."""
     def apply(compact: bool):
+        button.setProperty("compact", compact)
         if compact:
-            if button.text():
+            short = button.property("short_text") or ""
+            if button.text() and button.text() != short:
                 button.setProperty("full_text", button.text())
-            button.setText("")
+            button.setText(short)
         elif not button.text() and button.property("full_text"):
             button.setText(button.property("full_text"))
         icons.text_gap(button)

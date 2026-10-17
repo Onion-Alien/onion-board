@@ -536,7 +536,8 @@ class Config:
     # a sound's hotkey only works while its category is showing, so one key can play a
     # different sound in each category (keybind profiles)
     scoped_hotkeys: bool = False
-    single_click: bool = False        # one click on a pad plays it (not a double-click)
+    single_click: bool = True         # one click on a pad plays it (False: a double-click;
+                                      # saved configs keep theirs)
     category_hotkeys: dict = field(default_factory=dict)   # category -> its random-sound key
     voice_hotkeys: dict = field(default_factory=dict)      # voice name -> the key that picks it
     # Switch category when a program is in front (soundboard.catswitch): {"game.exe":

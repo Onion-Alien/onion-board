@@ -1229,3 +1229,24 @@ def test_downloads_card_shows_each_helper_program(window, qapp, monkeypatch, tmp
     finally:
         net.configure_features()
         d.accept()
+
+
+def test_expert_audio_cards_wait_for_show_advanced(window, qapp):  # noqa: F811
+    """Basic Audio is devices and who's listening: buffering, speech servers, recovery
+    and the mic switch (the footer has it) come with Show advanced, or a search."""
+    window.cfg.settings_advanced = False
+    d = SettingsDialog(window, "audio", lazy=True)
+    try:
+        page = d._tab_page(d._page_keys.index("audio"))
+        cards = [c for c in page.findChildren(QFrame, "setcard") if c.property("adv_card")]
+        assert len(cards) >= 3 and all(c.isHidden() for c in cards)
+        more = [b for b in page.findChildren(QPushButton) if b.text() == "More audio settings"]
+        assert len(more) == 1 and not more[0].isHidden()
+        d._apply_search("buffering")   # a search still finds one
+        assert any(not c.isHidden() for c in cards)
+        d._apply_search("")
+        assert all(c.isHidden() for c in cards)
+        more[0].click()
+        assert d._advanced and all(not c.isHidden() for c in cards) and more[0].isHidden()
+    finally:
+        d.done(0)

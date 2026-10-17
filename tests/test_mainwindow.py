@@ -657,7 +657,8 @@ def test_mute_switch_silences_what_others_hear(window, monkeypatch):
     e._main(out, 64)
     assert not out.any()
     window.set_sending(True)
-    assert e.sending and window.btn_air.isChecked() and "Live" in window.btn_air.accessibleName()
+    assert e.sending and window.btn_air.isChecked()
+    assert "others hear" in window.btn_air.accessibleName()
 
 
 def test_closing_the_window_ends_its_computer_voice_thread(window):
@@ -1183,6 +1184,8 @@ def test_sounds_toolbar_dropdown_menus_open_with_gap(window, qapp):
     from soundboard.wheelguard import DROP_GAP
     w = window
     w.show()
+    for _ in range(4):   # laid out first, as before any real click
+        qapp.processEvents()
     for btn in (w.btn_more, w.btn_keys, w.btn_view):
         menu = btn.menu()
         assert isinstance(menu, DropdownMenu)
