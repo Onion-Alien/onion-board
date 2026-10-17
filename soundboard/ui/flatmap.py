@@ -26,7 +26,7 @@ from collections.abc import Iterator
 import numpy as np
 from PySide6.QtCore import QPointF, QRectF, QSizeF, Qt, QTimer, Signal
 from PySide6.QtGui import (QColor, QFont, QFontMetricsF, QImage, QPainter, QPainterPath,
-                           QPen, QPixmap, QTransform)
+                           QPen, QPixmap, QRadialGradient, QTransform)
 from PySide6.QtWidgets import (QFrame, QHBoxLayout, QLabel, QPushButton, QToolTip,
                                QVBoxLayout, QWidget)
 
@@ -60,8 +60,23 @@ LABEL_GROW_MAX = 2.2                # country names grow up to this much zoomed 
 TOWN_ZOOM = 2.0                     # city and town names show from this zoom in...
 TOWNS_IN_VIEW = 40                  # ...at most this many at once, only those in view
 TOWN_SLICE_S = 0.0015               # new names drawn a paint, then the rest a moment later
-SPREAD_ZOOM = 4.0                   # stations on the very same spot fan out from here...
-SPREAD_PX = 2.4                     # ...this far apart (a spiral round the spot)
+# The most listened stations (HOT_SHARE of them, at least HOT_MIN plays today) are big
+# glowing dots, bigger the more they're played; the rest are small plain ones.
+HOT_SHARE = 0.1
+HOT_MIN = 10
+QUIET_R = 1.0                       # a quiet station's dot (pixels, before zoom)...
+HOT_R = (2.0, 5.0)                  # ...a popular one's, least to most played
+GLOW = 2.8                          # the glow round a popular dot, times its size
+# Dots that would cover each other move apart (where they are needn't be exact): each
+# takes the nearest free place round its spot, up to ROOM_PX away (more zoomed in, as
+# the dots grow), ROOM_GAP_PX apart. Worked out once per half zoom step (ROOM_STEPS a
+# doubling) and kept, a slice at a time (ROOM_BATCH dots a step, ROOM_SLICE_S a slice)
+# between frames, the dots where they were till it's done.
+ROOM_PX = 14.0
+ROOM_GAP_PX = 0.8
+ROOM_STEPS = 2
+ROOM_BATCH = 32
+ROOM_SLICE_S = 0.004
 NAMES_FIRST_S = 0.35                # the country names alone, before the dots...
 REVEAL_S = 1.4                      # ...then the first stations pop in over this long...
 POP_S = 0.3                         # ...each growing in over this (a little overshoot)
@@ -154,23 +169,81 @@ class _Loading(QFrame):
         super().hideEvent(e)
 
 
-def _fan_out(lon: np.ndarray, lat: np.ndarray) -> np.ndarray:
-    """For dots on the same spot (to ~100 m), an offset each in a sunflower spiral
-    round it, in steps of one: the last of them (the most listened, drawn on top)
-    keeps the middle. Dots alone on their spot get (0, 0)."""
-    fan = np.zeros((len(lon), 2))
-    groups: dict[tuple, list[int]] = {}
-    # plain floats: grouping 3000 numpy numbers one by one took ~3 ms a filter change
-    for i, key in enumerate(zip(np.round(lon, 3).tolist(), np.round(lat, 3).tolist())):
-        groups.setdefault(key, []).append(i)
-    golden = np.pi * (3 - np.sqrt(5))
-    for idx in groups.values():
-        if len(idx) < 2:
-            continue   # alone on its spot: stays (0, 0)
-        for n, i in enumerate(reversed(idx)):
-            r = np.sqrt(n)
-            fan[i] = (r * np.cos(n * golden), r * np.sin(n * golden))
-    return fan
+def _sizes(k: np.ndarray) -> tuple[np.ndarray, np.ndarray]:
+    """Plays today -> each dot's radius (before zoom) and whether it glows: the most
+    listened HOT_SHARE (HOT_MIN plays or more) big, on a log scale up to the most
+    played; the rest all QUIET_R."""
+    if not len(k):
+        return np.zeros(0), np.zeros(0, bool)
+    floor = max(float(HOT_MIN), float(np.quantile(k, 1 - HOT_SHARE)))
+    hot = k >= floor
+    lo, hi = math.log1p(floor), math.log1p(max(floor, float(k.max())))
+    q = np.clip((np.log1p(k) - lo) / max(1e-9, hi - lo), 0.0, 1.0)
+    r = np.where(hot, HOT_R[0] + (HOT_R[1] - HOT_R[0]) * np.sqrt(q), QUIET_R)
+    return r, hot
+
+
+def _make_room(x: np.ndarray, y: np.ndarray, r: np.ndarray, step: float,
+               room: float) -> Iterator[None]:
+    """The steps that work out how many pixels to move each dot by so none covers
+    another (the generator's return value, (n, 2)): from the last (the most listened,
+    which keeps its spot) to the first, each takes the first free place on a
+    sunflower spiral round its own spot (`step` apart), no further than `room`; with
+    none free it stays put. `x`, `y`: where the dots are, in pixels. All ~3000 in one
+    go took ~100 ms zoomed out, a stall: a step every ROOM_BATCH dots."""
+    n = len(x)
+    out = np.zeros((n, 2))
+    if not n:
+        return out
+    gap = ROOM_GAP_PX
+    j = np.arange(int((room / step) ** 2) + 1)
+    d = step * np.sqrt(j)
+    a = j * math.pi * (3 - math.sqrt(5))
+    tx, ty = (d * np.cos(a))[:, None], (d * np.sin(a))[:, None]   # (0, 0) first
+    reach = 2 * (room + float(r.max())) + gap   # two moved dots touching, at most
+    # the dots placed so far, by square (reach a side, by where each started): a dot
+    # looks only at the nine round its own, not at every dot placed
+    gx = np.floor(x / reach).astype(int).tolist()
+    gy = np.floor(y / reach).astype(int).tolist()
+    cells: dict[tuple[int, int], list[int]] = {}
+    px, py = x.copy(), y.copy()
+    for i in range(n - 1, -1, -1):
+        a, b = gx[i], gy[i]
+        near = [q for ca in (a - 1, a, a + 1) for cb in (b - 1, b, b + 1)
+                for q in cells.get((ca, cb), ())]
+        if near:
+            q = np.array(near)
+            lim = (r[i] + r[q] + gap) ** 2
+            free = (((x[i] + tx - px[q]) ** 2 + (y[i] + ty - py[q]) ** 2)
+                    >= lim).all(axis=1)
+            t = int(np.argmax(free))
+            if t and free[t]:   # not free anywhere near enough: it stays on its spot
+                out[i] = (tx[t, 0], ty[t, 0])
+                px[i], py[i] = x[i] + tx[t, 0], y[i] + ty[t, 0]
+        cells.setdefault((a, b), []).append(i)
+        if i % ROOM_BATCH == 0:
+            yield
+    return out
+
+
+def _glow_image(colour: QColor) -> QImage:
+    """A soft round glow in `colour`, fading to nothing at its edge: drawn stretched
+    under each popular dot."""
+    side = 64
+    img = QImage(side, side, QImage.Format.Format_ARGB32_Premultiplied)
+    img.fill(Qt.GlobalColor.transparent)
+    g = QRadialGradient(side / 2, side / 2, side / 2)
+    for at, alpha in ((0.0, 0.95), (0.3, 0.6), (0.6, 0.2), (1.0, 0.0)):
+        c = QColor(colour)
+        c.setAlphaF(alpha)
+        g.setColorAt(at, c)
+    p = QPainter(img)
+    p.setRenderHint(QPainter.RenderHint.Antialiasing)
+    p.setPen(Qt.PenStyle.NoPen)
+    p.setBrush(g)
+    p.drawEllipse(QRectF(0, 0, side, side))
+    p.end()
+    return img
 
 
 class FlatMap(QWidget):
@@ -192,9 +265,16 @@ class FlatMap(QWidget):
         self._index: dict[str, int] = {}   # a station's place in _points, by uuid
         self._lon = np.zeros(0)
         self._lat = np.zeros(0)
-        self._r = np.zeros(0)           # dot radius before zoom
+        self._r = np.zeros(0)           # dot radius before zoom (_sizes)
+        self._hot = np.zeros(0, bool)   # ...and which glow: the most listened
         self._buf: QImage | None = None  # the map drawn before its corners are rounded
-        self._fan = np.zeros((0, 2))    # where a stacked dot goes round its spot (SPREAD_PX)
+        self._room: dict[tuple, np.ndarray] = {}   # dots moved apart, per zoom (_spread)
+        self._room_job: tuple | None = None        # (zoom, its steps): being worked out
+        self._room_timer = QTimer(self)            # works on it a slice more (_room_step)
+        self._room_timer.setSingleShot(True)
+        self._room_timer.setInterval(SLICE_GAP_MS)
+        self._room_timer.timeout.connect(self._room_step)
+        self._look: tuple | None = None  # (accent, quiet, hot, glow picture): _dot_look
         self._current: str | None = None
         self._hover = -1
         self._msg = ""
@@ -313,9 +393,9 @@ class FlatMap(QWidget):
         self._lon = np.array([d["lo"] for d in pts], float)
         self._lat = np.array([d["la"] for d in pts], float)
         k = np.array([d.get("k", 0) for d in pts], float)
-        top = max(1.0, float(k.max())) if len(k) else 1.0
-        self._r = 1.1 + 1.7 * np.sqrt(k / top)
-        self._fan = _fan_out(self._lon, self._lat)
+        self._r, self._hot = _sizes(k)
+        self._room = {}
+        self._room_job = None
         self._hover = -1
         if pts:
             self._msg = ""
@@ -456,17 +536,58 @@ class FlatMap(QWidget):
     def _screen(self) -> tuple[np.ndarray, np.ndarray]:
         """Each dot's spot on screen: its copy of the world nearest the middle."""
         s = self._scale()
-        dx, dy = self._spread()
+        dx, dy = self._spread(s)
         return (self.width() / 2 + ((self._lon - self.cx + 180) % 360 - 180) * s + dx,
                 self.height() / 2 - (self._lat - self.cy) * s + dy)
 
-    def _spread(self) -> tuple[np.ndarray | float, np.ndarray | float]:
-        """Pixels to move each dot by: zoomed in, stations listed at the very same spot
-        (often a whole city's, at its centre) fan out so each can be seen and clicked."""
-        if self.zoom < SPREAD_ZOOM or not len(self._fan):
+    def _spread(self, s: float, wait: bool = False
+                ) -> tuple[np.ndarray | float, np.ndarray | float]:
+        """Pixels to move each dot by at scale `s` so none covers another: stations
+        close together, or listed at the very same spot (often a whole city's, at its
+        centre), move apart so each can be seen and clicked (_make_room). Worked out
+        for the half zoom step at or below `s` and kept: zooming further in only
+        spreads them more. Not worked out yet: it starts (_room_step), and till it's
+        done the dots are where the nearest zoom worked out had them (`wait`: now)."""
+        if not len(self._lon):
             return 0.0, 0.0
-        k = SPREAD_PX * self._grow()
-        return self._fan[:, 0] * k, self._fan[:, 1] * k
+        base = round(self._scale() / self.zoom, 6)
+        b = math.floor(math.log2(max(1.0, s / base)) * ROOM_STEPS + 1e-9)
+        room = self._room.get((b, base))
+        if room is None:
+            if self._room_job is None or self._room_job[0] != (b, base):
+                zoom = 2 ** (b / ROOM_STEPS)
+                grow = self._grow(zoom)
+                self._room_job = ((b, base), _make_room(
+                    self._lon * base * zoom, -self._lat * base * zoom, self._r * grow,
+                    (2 * QUIET_R * grow + ROOM_GAP_PX) * 1.05, ROOM_PX * grow * grow))
+                self._room_timer.start()
+            if wait:
+                self._room_step(math.inf)
+                return self._spread(s)
+            # meanwhile: the nearest zoom out worked out, else the nearest in, else none
+            done = sorted((k[0] for k in self._room if k[1] == base),
+                          key=lambda k: (k > b, abs(k - b)))
+            if not done:
+                return 0.0, 0.0
+            room = self._room[(done[0], base)]
+        return room[:, 0], room[:, 1]
+
+    def _room_step(self, budget: float = ROOM_SLICE_S):
+        """Works on the dots' places (_spread) for `budget` seconds; once they're done,
+        the map is drawn again with them."""
+        if self._room_job is None:
+            return
+        key, steps = self._room_job
+        end = time.perf_counter() + budget
+        try:
+            while time.perf_counter() < end:
+                next(steps)
+        except StopIteration as done:
+            self._room[key] = done.value
+            self._room_job = None
+            self._redraw()
+            return
+        self._room_timer.start()
 
     def _redraw(self):
         """What's drawn changed (stations, land, theme): draw it again (a tile at a
@@ -501,8 +622,52 @@ class FlatMap(QWidget):
         self._town_box.clear()
 
     # ------------------------------------------------------------------ painting
-    def _grow(self) -> float:
-        return min(2.0, 1 + (self.zoom - 1) * 0.15)   # dots get a little bigger zoomed in
+    def _grow(self, zoom: float | None = None) -> float:
+        zoom = self.zoom if zoom is None else zoom
+        return min(2.0, 1 + (zoom - 1) * 0.15)   # dots get a little bigger zoomed in
+
+    def _dot_look(self) -> tuple[QColor, QColor, QImage]:
+        """The dots' colours for the theme: a quiet station's, a popular one's (the
+        accent, lit up towards the brightest text: whiter on a dark theme, deeper on
+        a light one) and the glow round it."""
+        accent, hi = theme.T["accent"], theme.T["text_hi"]
+        if self._look is None or self._look[0] != (accent, hi):
+            quiet = QColor(accent)
+            quiet.setAlphaF(0.8)
+            self._look = ((accent, hi), quiet, _mix(accent, hi, 0.3),
+                          _glow_image(QColor(accent)))
+        return self._look[1:]
+
+    def _dots_steps(self, p: QPainter, xs, ys, which: np.ndarray, r: np.ndarray):
+        """Draws dots `which` (in order, most listened last) at `xs`, `ys`, `r` big:
+        the popular ones' glows first, so a glow never hides a dot, then the quiet
+        dots, then the popular ones on top. A step every 200 draws."""
+        quiet, hot, glow = self._dot_look()
+        which = np.asarray(which, int)
+        lit = which[self._hot[which]].tolist()
+        # plain floats for Qt
+        fx, fy, fr = (np.asarray(v, float).tolist() for v in (xs, ys, r))
+        p.save()
+        try:
+            p.setRenderHint(QPainter.RenderHint.SmoothPixmapTransform)
+            p.setPen(Qt.PenStyle.NoPen)
+            n = 0
+            src = QRectF(glow.rect())
+            for i in lit:
+                g = fr[i] * GLOW
+                p.drawImage(QRectF(fx[i] - g, fy[i] - g, 2 * g, 2 * g), glow, src)
+                n += 1
+                if n % 200 == 0:
+                    yield
+            for brush, part in ((quiet, which[~self._hot[which]].tolist()), (hot, lit)):
+                p.setBrush(brush)
+                for i in part:
+                    p.drawEllipse(QPointF(fx[i], fy[i]), fr[i], fr[i])
+                    n += 1
+                    if n % 200 == 0:
+                        yield
+        finally:
+            p.restore()
 
     def _map_steps(self, p: QPainter, tr: QTransform, s: float, rect: QRectF,
                    land_only: bool = False):
@@ -536,20 +701,13 @@ class FlatMap(QWidget):
                 return
             if len(self._points):
                 o = tr.map(QPointF(0, 0))
-                dx, dy = self._spread()
+                dx, dy = self._spread(s)
                 xs, ys = o.x() + self._lon * s + dx, o.y() - self._lat * s + dy
-                on = ((xs > rect.left() - 8) & (xs < rect.right() + 8)
-                      & (ys > rect.top() - 8) & (ys < rect.bottom() + 8))
-                accent = QColor(t["accent"])
-                accent.setAlphaF(0.85)
-                p.setPen(Qt.PenStyle.NoPen)
-                p.setBrush(accent)
-                grow = self._grow()
-                for k, i in enumerate(np.flatnonzero(on), 1):
-                    r = self._r[i] * grow
-                    p.drawEllipse(QPointF(xs[i], ys[i]), r, r)
-                    if k % 200 == 0:
-                        yield
+                r = self._r * self._grow()
+                pad = r * np.where(self._hot, GLOW, 1.0) + 2
+                on = ((xs > rect.left() - pad) & (xs < rect.right() + pad)
+                      & (ys > rect.top() - pad) & (ys < rect.bottom() + pad))
+                yield from self._dots_steps(p, xs, ys, np.flatnonzero(on), r)
             # country names last, outlined in the land's colour, so the dots don't hide them
             font, colour = self._label_style(s)
             fm = QFontMetricsF(font)
@@ -963,10 +1121,10 @@ class FlatMap(QWidget):
         else:
             size, done = np.ones(n), np.ones(n, bool)
         xs, ys = self._screen()
-        seen = (xs > -8) & (xs < self.width() + 8) & (ys > -8) & (ys < self.height() + 8)
-        accent = QColor(theme.T["accent"])
-        accent.setAlphaF(0.85)
         r = self._r * self._grow()
+        pad = r * np.where(self._hot, GLOW, 1.0) + 2
+        seen = ((xs > -pad) & (xs < self.width() + pad)
+                & (ys > -pad) & (ys < self.height() + pad))
         dpr = self.devicePixelRatioF()
         view = (round(self._scale(), 6), self.cx, self.cy, self.width(), self.height(),
                 dpr, self._ver, n)
@@ -981,18 +1139,14 @@ class FlatMap(QWidget):
         if len(new):
             q = QPainter(pic)
             q.setRenderHint(QPainter.RenderHint.Antialiasing)
-            q.setPen(Qt.PenStyle.NoPen)
-            q.setBrush(accent)
-            for i in new.tolist():
-                q.drawEllipse(QPointF(xs[i], ys[i]), r[i], r[i])
+            for _step in self._dots_steps(q, xs, ys, new, r):
+                pass
             q.end()
             drawn[new] = True
         p.drawImage(0, 0, pic)
-        p.setPen(Qt.PenStyle.NoPen)
-        p.setBrush(accent)
-        r = r * size
-        for i in np.flatnonzero((size > 0.05) & ~done & seen).tolist():
-            p.drawEllipse(QPointF(xs[i], ys[i]), r[i], r[i])
+        growing = np.flatnonzero((size > 0.05) & ~done & seen)
+        for _step in self._dots_steps(p, xs, ys, growing, r * size):
+            pass
 
     def _names_steps(self, pic: QPixmap, s: float):
         """The steps that draw the country names in view onto `pic`, a name a step."""

@@ -450,7 +450,8 @@ def test_the_dots_done_popping_in_are_drawn_once(qapp):
     m.grab()
     view, pic, drawn = m._dots_pic
     xs, ys = m._screen()
-    seen = (xs > -8) & (xs < m.width() + 8) & (ys > -8) & (ys < m.height() + 8)
+    pad = m._r * m._grow() * np.where(m._hot, flatmap.GLOW, 1.0) + 2   # a glow counts
+    seen = (xs > -pad) & (xs < m.width() + pad) & (ys > -pad) & (ys < m.height() + pad)
     assert drawn.sum() == seen.sum() > 100
     m.grab()
     assert m._dots_pic[1] is pic                  # the same picture, nothing drawn again
