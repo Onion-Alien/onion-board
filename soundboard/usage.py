@@ -150,6 +150,8 @@ FEATURES = ("add-files", "youtube", "record", "clip", "clip-editor", "import-boa
             *(f"tab-hidden-{k}" for k in ("radio", "apps", "triggers", "voice", "store")),
             # the Store tab: a sound heard, added to the board, voted on, or shared
             "store-heard", "store-added", "store-voted", "store-shared",
+            # its Voices: a community voice taken into yours, or one of yours shared
+            "store-voice-added", "store-voice-shared",
             # the first start's "What's it for?" answer (setupwizard.uses keys), or
             # the guide closed on that page
             *(f"use-{k}" for k in ("normal", "streamer", "games", "all", "skipped")),

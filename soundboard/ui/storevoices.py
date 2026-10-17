@@ -18,7 +18,7 @@ from PySide6.QtWidgets import (QComboBox, QDialog, QHBoxLayout, QLabel, QLineEdi
 from soundboard import errors, savedvoices, store, storevoices as sv, usage, voicefx, voicesetups
 from soundboard.i18n import _
 from soundboard.speech import aivoicelist as avl
-from soundboard.ui import busy, icons
+from soundboard.ui import busy, fit, icons
 from soundboard.ui.panel import HoverCard, icon_button
 from soundboard.ui.storetab import ROW_MAX_W, SoundRow
 from soundboard.ui.ytsearch import ClampLabel
@@ -246,6 +246,7 @@ class ShareVoiceDialog(QDialog):
             sv.plain(self.name.text(), sv.MAX_NAME)) and bool(self.items)))
         self._picked(self.pick.currentIndex())
         self.resize(420, self.sizeHint().height())
+        fit.watch(self)
 
     def _picked(self, i: int):
         if 0 <= i < len(self.items):
