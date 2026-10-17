@@ -436,22 +436,19 @@ def _alert(p, fill):
 
 
 def _onion(p, fill):
-    """Help and community (the rail's foot): the logo's onion, a bulb with two leaves
-    and one swaying layer."""
-    bulb = QPainterPath(QPointF(12, 7))
-    bulb.cubicTo(QPointF(13.8, 9), QPointF(19.8, 10), QPointF(19.8, 14.4))
-    bulb.cubicTo(QPointF(19.8, 18.4), QPointF(14.5, 20.2), QPointF(12, 21.2))
-    bulb.cubicTo(QPointF(9.5, 20.2), QPointF(4.2, 18.4), QPointF(4.2, 14.4))
-    bulb.cubicTo(QPointF(4.2, 10), QPointF(10.2, 9), QPointF(12, 7))
+    """Help and community (the rail's foot): a bulb, a layer and a curled leaf."""
+    bulb = QPainterPath(QPointF(12, 6.5))
+    bulb.cubicTo(QPointF(14, 9), QPointF(20.5, 10), QPointF(20.5, 14.8))
+    bulb.cubicTo(QPointF(20.5, 19), QPointF(16.5, 21), QPointF(12, 21))
+    bulb.cubicTo(QPointF(7.5, 21), QPointF(3.5, 19), QPointF(3.5, 14.8))
+    bulb.cubicTo(QPointF(3.5, 10), QPointF(10, 9), QPointF(12, 6.5))
     p.drawPath(bulb)
-    layer = QPainterPath(QPointF(12, 10.5))
-    layer.cubicTo(QPointF(14.4, 13), QPointF(9.6, 15.6), QPointF(12, 18.4))
+    layer = QPainterPath(QPointF(12, 9))
+    layer.cubicTo(QPointF(15, 12.5), QPointF(15, 17.5), QPointF(12.5, 21))
     p.drawPath(layer)
-    for sx in (-1, 1):
-        leaf = QPainterPath(QPointF(12, 7))
-        leaf.cubicTo(QPointF(12 + sx * 0.4, 5), QPointF(12 + sx * 1.6, 3.4),
-                     QPointF(12 + sx * 3.6, 2.6))
-        p.drawPath(leaf)
+    leaf = QPainterPath(QPointF(12, 6.5))
+    leaf.cubicTo(QPointF(12, 4.5), QPointF(13, 3), QPointF(15.5, 2.5))
+    p.drawPath(leaf)
 
 
 def _shield(p, fill):

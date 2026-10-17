@@ -264,12 +264,13 @@ def draw_owl(p: QPainter, rect: QRectF, look: float = 0.0, feather=None, dark=No
     p.restore()
     # wings: at his sides, clasped in front of the belly, or flung up
     for sx in (-1, 1):
-        x = 50 + sx * (_mix(33, 15, clasp) + 5 * flap)
-        y = 80 + 5 * clasp - 10 * flap
+        x = 50 + sx * (_mix(34, 15, clasp) + 5 * flap)
+        y = 84 + 3 * clasp - 12 * flap
         ang = -sx * (_mix(12, 30, clasp) - 70 * flap)
         p.save()
         p.translate(x, y)
         p.rotate(ang)
+        p.scale(1.15, 1.12)   # (big, soft wings, like the Storybook model)
         wing = _wing(sx)
         p.setPen(ink)
         p.setBrush(dark)
@@ -279,7 +280,7 @@ def draw_owl(p: QPainter, rect: QRectF, look: float = 0.0, feather=None, dark=No
     _fit(p, fit, "under", ink)
     # the big eyes
     shut = blink > 0.6
-    ew, eh = _mix(16, 18.5, plead), _mix(17.5, 20, plead)
+    ew, eh = _mix(17.5, 20, plead), _mix(19, 21.5, plead)
     for x in EYES:
         px, py = x + 2.8 * look, EYE_Y + 2.0 * look_y
         if shut:   # closed: a soft sleepy curve, or happy arcs while he cheers

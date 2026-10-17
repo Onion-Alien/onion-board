@@ -13,12 +13,12 @@ from pathlib import Path
 from string import Template
 
 from PySide6.QtCore import QObject, QPointF, QRectF, Qt
-from PySide6.QtGui import (QColor, QIcon, QImage, QPainter,
+from PySide6.QtGui import (QColor, QIcon, QImage, QLinearGradient, QPainter,
                            QPainterPath, QPen, QPixmap, QTransform)
 from shiboken6 import isValid as qt_valid
 
 from soundboard.i18n import _
-from soundboard.style import hooks, mark, palettes, textures
+from soundboard.style import hooks, palettes, textures
 # the colours and textures are in the style kit, shared with Onion Watch
 from soundboard.style.palettes import (DEFAULT, FONT, GROUPS, LIVE_NAMES,  # noqa: F401
                                        LIVE_STYLE, TEXT_ON,
@@ -1128,20 +1128,71 @@ def apply_live(app, colour: str) -> str:
 
 # --------------------------------------------------------------------------- logo
 
-def logo_finish(name: str | None = None) -> str:
-    """Which finish of the mark theme `name` (default: the current one) wears: Night
-    Shift (the onion on a dark tile, its layers lit in the theme's colours) in the
-    dark themes, Signal (the onion on a tile of the theme's colours) in the light
-    ones. The .exe and installer keep Signal in BRAND's colours."""
-    return "signal" if is_light(name) else "night"
+def paint_logo(p: QPainter, rect: QRectF, c1: str, c2: str, inset: float = 0.04):
+    """The Onion Board mark: a gradient squircle holding an onion whose layers
+    are drawn as sound-wave arcs — onion + soundboard in one shape."""
+    s = rect.width()
+    x0, y0 = rect.left(), rect.top()
+    p.save()
+    p.setRenderHint(QPainter.RenderHint.Antialiasing)
+    # body
+    g = QLinearGradient(QPointF(x0, y0), QPointF(x0 + s, y0 + s))
+    g.setColorAt(0.0, QColor(c1))
+    g.setColorAt(1.0, QColor(c2))
+    body = QPainterPath()
+    body.addRoundedRect(QRectF(x0 + s * inset, y0 + s * inset, s * (1 - 2 * inset), s * (1 - 2 * inset)),
+                        s * 0.26, s * 0.26)
+    p.fillPath(body, g)
+    # soft top highlight
+    hi = QLinearGradient(QPointF(x0, y0), QPointF(x0, y0 + s * 0.6))
+    hi.setColorAt(0.0, QColor(255, 255, 255, 60))
+    hi.setColorAt(1.0, QColor(255, 255, 255, 0))
+    p.fillPath(body, hi)
+    # the onion is white, or near-black on light accents (e.g. Toxic's lime) so it stays legible
+    a, b = QColor(c1), QColor(c2)
+    lum = sum((0.299 * q.red() + 0.587 * q.green() + 0.114 * q.blue()) / 2 for q in (a, b))
+    fg = QColor("#0b1a10") if lum > 165 else QColor("white")
+    cx = x0 + s * 0.5
 
+    def pt(dx, dy):   # offsets in units of s, from the top-centre of the icon
+        return QPointF(cx + dx * s, y0 + dy * s)
 
-def paint_logo(p: QPainter, rect: QRectF, c1: str, c2: str, inset: float = 0.04,
-               finish: str | None = None):
-    """The Onion Board mark (style/mark.py): an onion whose layers sway like a sound
-    wave, onion + soundboard in one shape, in the theme's finish (logo_finish) unless
-    `finish` says which."""
-    mark.paint_mark(p, rect, c1, c2, "board", finish or logo_finish(), inset)
+    def bulb(w):   # onion outline, w = half-width at the widest point
+        path = QPainterPath(pt(0, 0.27))
+        path.cubicTo(pt(w * 0.25, 0.36), pt(w, 0.42), pt(w, 0.59))
+        path.cubicTo(pt(w, 0.74), pt(w * 0.55, 0.81), pt(0, 0.81))
+        path.cubicTo(pt(-w * 0.55, 0.81), pt(-w, 0.74), pt(-w, 0.59))
+        path.cubicTo(pt(-w, 0.42), pt(-w * 0.25, 0.36), pt(0, 0.27))
+        return path
+
+    # sprout: two leaves curling out of the neck
+    pen = QPen(fg, max(1.2, s * 0.05))
+    pen.setCapStyle(Qt.PenCapStyle.RoundCap)
+    p.setPen(pen)
+    p.setBrush(Qt.BrushStyle.NoBrush)
+    leaf = QPainterPath(pt(0, 0.29))
+    leaf.cubicTo(pt(0, 0.20), pt(-0.04, 0.15), pt(-0.12, 0.12))
+    leaf.moveTo(pt(0, 0.27))
+    leaf.cubicTo(pt(0.01, 0.19), pt(0.05, 0.14), pt(0.10, 0.10))
+    p.drawPath(leaf)
+    # bulb
+    p.setPen(Qt.PenStyle.NoPen)
+    p.fillPath(bulb(0.29), fg)
+    # layers: inner outlines in the brand gradient, reading like sound waves
+    if s >= 20:
+        lp = QPen(g, max(1.0, s * 0.032))
+        lp.setCapStyle(Qt.PenCapStyle.RoundCap)
+        p.setPen(lp)
+        for w in ((0.17, 0.07) if s >= 40 else (0.13,)):
+            p.drawPath(bulb(w))
+    # roots
+    if s >= 32:
+        rp = QPen(fg, max(1.0, s * 0.03))
+        rp.setCapStyle(Qt.PenCapStyle.RoundCap)
+        p.setPen(rp)
+        for dx in (-0.06, 0.0, 0.06):
+            p.drawLine(pt(dx * 0.6, 0.81), pt(dx, 0.87))
+    p.restore()
 
 
 BRAND = ("#7c5cff", "#ff4d8d")   # the app icon keeps its own colours in every theme
@@ -1153,24 +1204,19 @@ ICON_INSET = 0.01
 
 
 def logo_pixmap(size: int, c1: str | None = None, c2: str | None = None,
-                inset: float = 0.04, finish: str | None = None) -> QPixmap:
-    """The mark, `size` px: in BRAND's colours as Signal (the .exe's look) when no
-    colours are given, else in the theme's finish unless `finish` says which."""
-    if c1 is None and finish is None:
-        finish = "signal"
+                inset: float = 0.04) -> QPixmap:
     pm = QPixmap(size, size)
     pm.fill(Qt.GlobalColor.transparent)
     p = QPainter(pm)
-    paint_logo(p, QRectF(0, 0, size, size), c1 or BRAND[0], c2 or BRAND[1], inset, finish)
+    paint_logo(p, QRectF(0, 0, size, size), c1 or BRAND[0], c2 or BRAND[1], inset)
     p.end()
     return pm
 
 
-def app_icon(c1: str | None = None, c2: str | None = None,
-             finish: str | None = None) -> QIcon:
+def app_icon(c1: str | None = None, c2: str | None = None) -> QIcon:
     icon = QIcon()
     for sz in (16, 24, 32, 48, 64, 128, 256):
-        icon.addPixmap(logo_pixmap(sz, c1, c2, ICON_INSET, finish))
+        icon.addPixmap(logo_pixmap(sz, c1, c2, ICON_INSET))
     return icon
 
 
@@ -1178,6 +1224,6 @@ def logo_image(size: int) -> QImage:
     img = QImage(size, size, QImage.Format.Format_ARGB32)
     img.fill(Qt.GlobalColor.transparent)
     p = QPainter(img)
-    paint_logo(p, QRectF(0, 0, size, size), *BRAND, inset=ICON_INSET, finish="signal")
+    paint_logo(p, QRectF(0, 0, size, size), *BRAND, inset=ICON_INSET)
     p.end()
     return img

@@ -9,8 +9,8 @@ from __future__ import annotations
 import math
 
 from PySide6.QtCore import QPointF, QRectF, Qt
-from PySide6.QtGui import (QColor, QImage, QPainter, QPainterPath, QPen, QPixmap,
-                           QRadialGradient, QTransform)
+from PySide6.QtGui import (QColor, QImage, QPainter, QPainterPath, QPainterPathStroker,
+                           QPen, QPixmap, QRadialGradient, QTransform)
 
 from soundboard import theme
 from soundboard.style import bunnyfit
@@ -29,7 +29,7 @@ PINK = QColor("#ffb3c7")
 NOSE = QColor("#ff8fae")
 NOSE_EDGE = QColor("#e0708f")
 MOUTH = QColor("#7a2a45")
-CHEEK = QColor(255, 128, 160, 120)
+CHEEK = QColor(255, 122, 150, 165)
 # his headphones are the current theme's accent (theme.T, read at paint time)
 
 PROPS = (None, "mic", "headphones", "plug", "star", "hammer", "bat", "wrench",
@@ -72,15 +72,28 @@ def _ellipse(p: QPainter, cx, cy, w, h, fill, pen: QPen | None = None, angle=0.0
     p.restore()
 
 
-def _soft(x, y, w, h, col: QColor) -> QRadialGradient:
-    """A blush or a shade: `col` in the middle, fading out to nothing at the edge."""
-    g = QRadialGradient(QPointF(x, y), max(w, h) / 2)
+def _oval(x, y, w, h) -> QPainterPath:
+    path = QPainterPath()
+    path.addEllipse(QRectF(x - w / 2, y - h / 2, w, h))
+    return path
+
+
+def _glow(p: QPainter, x, y, w, h, col: QColor):
+    """A soft oval spot (a blush, a shine): `col` in the middle, fading out to nothing
+    at its w x h edge."""
+    g = QRadialGradient(QPointF(0, 0), w / 2)
     g.setColorAt(0.0, col)
-    g.setColorAt(0.55, col)
+    g.setColorAt(0.5, col)
     edge = QColor(col)
     edge.setAlpha(0)
     g.setColorAt(1.0, edge)
-    return g
+    p.save()
+    p.translate(x, y)
+    p.scale(1, h / w)
+    p.setPen(Qt.PenStyle.NoPen)
+    p.setBrush(g)
+    p.drawEllipse(QPointF(0, 0), w / 2, w / 2)
+    p.restore()
 
 
 def _shade(p: QPainter, shape: QPainterPath, x, y, r, col: QColor, alpha: int):
@@ -103,8 +116,9 @@ def _smooth(k: float) -> float:
     return k * k * (3 - 2 * k)
 
 
-EAR_HINGE = -2.0   # where an ear folds: just above its middle (ear frame)
-REST_FOLD = 64.0   # his right ear (the viewer's right) always flops over a little
+EAR_HINGE = 0.5    # where an ear folds when he's sad: about its middle (ear frame)
+REST_FOLD = 100.0  # his right ear (the viewer's right) always flops over and down...
+REST_HINGE = 7.0   # ... bending a little below its middle, so a good bit stands up first
 
 
 def _ear_shape(w: float, h: float) -> QPainterPath:
@@ -119,28 +133,13 @@ def _ear_shape(w: float, h: float) -> QPainterPath:
     return path
 
 
-def _ear_bend(fold: float) -> QTransform:
-    """The ear frame's top half folded `fold` degrees about the hinge (+ = to his left,
+def _ear_bend(fold: float, hinge: float = EAR_HINGE) -> QTransform:
+    """The ear frame above `hinge` folded `fold` degrees about it (+ = to his left,
     the viewer's right)."""
-    return QTransform().translate(0, EAR_HINGE).rotate(fold).translate(0, -EAR_HINGE)
+    return QTransform().translate(0, hinge).rotate(fold).translate(0, -hinge)
 
 
-def _ear_path(w: float, h: float, fold: float) -> QPainterPath:
-    """An ear's outline in its own frame: straight, or bent at the hinge into a lower
-    half, a rounded knee and the flap hanging from it."""
-    full = _ear_shape(w, h)
-    if abs(fold) < 0.5:
-        return full
-    below, above = QPainterPath(), QPainterPath()
-    below.addRect(QRectF(-w, EAR_HINGE, 2 * w, h))
-    above.addRect(QRectF(-w, -h, 2 * w, h + EAR_HINGE))
-    knee = QPainterPath()
-    knee.addEllipse(QRectF(-w / 2, EAR_HINGE - w / 2, w, w))
-    flap = _ear_bend(fold).map(full.intersected(above))
-    return full.intersected(below).united(knee).united(flap)
-
-
-def _ear_pieces(w: float, h: float, bend: QTransform | None):
+def _ear_pieces(w: float, h: float, bend: QTransform | None, hinge: float = EAR_HINGE):
     """An ear in two pieces, its own frame: the part that stays up (ending in a round
     knee where it bends) and the flap folded over by `bend` (painted on top: it hides
     the inner ear behind it). Straight (`bend` None): the whole ear and no flap."""
@@ -148,40 +147,12 @@ def _ear_pieces(w: float, h: float, bend: QTransform | None):
     if bend is None:
         return full, None
     below, above = QPainterPath(), QPainterPath()
-    below.addRect(QRectF(-w, EAR_HINGE, 2 * w, h))
-    above.addRect(QRectF(-w, -h, 2 * w, h + EAR_HINGE))
+    below.addRect(QRectF(-w, hinge, 2 * w, h))
+    above.addRect(QRectF(-w, -h, 2 * w, h + hinge))
+    kw = w * 0.92   # (the ear's width there)
     knee = QPainterPath()
-    knee.addEllipse(QRectF(-w / 2, EAR_HINGE - w / 2, w, w))
+    knee.addEllipse(QRectF(-kw / 2, hinge - kw / 2, kw, kw))
     return full.intersected(below), bend.map(full.intersected(above)).united(knee)
-
-
-def _fold_part(p: QPainter, bend: QTransform, top_alpha: float, w, h, col, dx=0.0,
-               dy=3.0, folded: bool = False):
-    """Draw an inner-ear piece (an ear shape w x h, `dx`, `dy` off the ear's centre):
-    its lower half as is, its top half bent with the flap and faded by `top_alpha` (a
-    folded flap shows its back). `folded`: the lower half ends in a round where the
-    ear bends, not a straight cut."""
-    shape = QTransform().translate(dx, dy).map(_ear_shape(w, h))
-    lower = QPainterPath()
-    lower.addRect(QRectF(-30, EAR_HINGE, 60, 60))
-    if folded:
-        lower.addEllipse(QRectF(dx - w / 2, EAR_HINGE - w / 2, w, w))
-        lower = lower.simplified()
-    p.save()
-    p.setPen(Qt.PenStyle.NoPen)
-    p.setBrush(col)
-    p.drawPath(shape.intersected(lower))
-    p.restore()
-    if top_alpha <= 0:
-        return
-    p.save()
-    p.setTransform(bend, True)
-    p.setClipRect(QRectF(-30, -60, 60, 60 + EAR_HINGE), Qt.ClipOperation.IntersectClip)
-    p.setOpacity(p.opacity() * top_alpha)
-    p.setPen(Qt.PenStyle.NoPen)
-    p.setBrush(col)
-    p.drawPath(shape)
-    p.restore()
 
 
 def _stroke(p: QPainter, path: QPainterPath, col: QColor, width: float):
@@ -198,46 +169,31 @@ def _arc(x0, y0, cx, cy, x1, y1) -> QPainterPath:
 
 
 def _paws(p: QPainter, prop, sad: float, angry: float, fur: QColor, ink: QPen):
-    """His front paws: resting in his lap, clasped under his chin while he hopes
-    (`sad`), or arms folded when he's cross (`angry`). A prop that needs a paw takes
-    it (the prop draws that one)."""
+    """His arms folded when he's cross (`angry`, no prop). (Resting, his front legs
+    run down to his feet; hoping, _clasped brings his paws up under his chin.)"""
     if prop in BOTH_PAWS:
         return
     cross = _smooth((angry - 0.35) / 0.4) if prop is None else 0.0
-    clasp = _smooth((sad - 0.3) / 0.45) * (1 - cross) if prop is None else 0.0
-    if cross > 0.02:   # folded arms: one soft band across his chest, a paw on each end
+    if cross > 0.02:   # folded arms: two forearms crossed over his chest, paws on top
         p.save()
         p.setOpacity(p.opacity() * min(1.0, cross * 1.6))
-        y = 100 - 1.5 * cross
-        band = QPainterPath(QPointF(33, y - 4))
-        band.quadTo(QPointF(50, y), QPointF(67, y - 4))
-        band.cubicTo(QPointF(73.5, y - 4.5), QPointF(73.5, y + 6), QPointF(67, y + 6))
-        band.quadTo(QPointF(50, y + 9.5), QPointF(33, y + 6))
-        band.cubicTo(QPointF(26.5, y + 6), QPointF(26.5, y - 4.5), QPointF(33, y - 4))
-        band.closeSubpath()
-        p.setPen(ink)
-        p.setBrush(fur)
-        p.drawPath(band)
-        # where one arm crosses over the other, and the paw tucked under his elbow
-        _stroke(p, _arc(42.5, y - 1.5, 46.5, y + 2.5, 43, y + 7), ink.color(), 1.8)
-        _stroke(p, _arc(60, y - 2, 63, y - 3.4, 66, y - 2.4), FUR_LINE, 1.3)
-        p.restore()
-        if cross > 0.6:
-            return
-    rest = ((44.5, 112.5), (55.5, 112.5))
-    for i in (0, 1):
-        if i == 1 and prop in ONE_PAW:
-            continue
-        x, y = rest[i]
-        p.save()
-        p.setOpacity(p.opacity() * (1 - min(1.0, cross * 1.6)))
-        if clasp < 0.5:   # resting: tucked in his lap, only the bottom edge drawn
-            p.save()
-            p.setOpacity(p.opacity() * (1 - 2 * clasp))
-            _ellipse(p, x, y, 9.5, 7.5, fur, ink)
-            for dx in (-1.7, 1.7):
-                _stroke(p, _arc(x + dx, y + 1.4, x + dx, y + 2.8, x + dx, y + 3.4), FUR_LINE, 1.0)
-            p.restore()
+        dy = -1.5 * cross
+        # the back arm (his right) a little higher, its paw peeking over the elbow; the
+        # front arm across it, its paw tucked on the far side
+        for (x0, y0), (x1, y1) in (((32, 99.5), (61.5, 96.5)), ((68, 104.5), (38.5, 101.5))):
+            line = QPainterPath(QPointF(x0, y0 + dy))
+            line.quadTo(QPointF((x0 + x1) / 2, (y0 + y1) / 2 + dy + 2), QPointF(x1, y1 + dy))
+            st = QPainterPathStroker()
+            st.setWidth(8.5)
+            st.setCapStyle(Qt.PenCapStyle.RoundCap)
+            arm = st.createStroke(line).simplified()
+            arm = arm.united(_oval(x1, y1 + dy, 9.5, 8))   # the paw at its end
+            p.setPen(ink)
+            p.setBrush(fur)
+            p.drawPath(arm)
+            _stroke(p, _arc(x1 - (2.6 if x1 > 50 else -2.6), y1 + dy - 3,
+                            x1 - (3.4 if x1 > 50 else -3.4), y1 + dy,
+                            x1 - (2.6 if x1 > 50 else -2.6), y1 + dy + 3), FUR_LINE, 1.1)
         p.restore()
 
 
@@ -313,18 +269,19 @@ def draw_bunny(p: QPainter, rect: QRectF, prop: str | None = None, *,
 
     p.save()
     head()
-    for side, bx, cx, cy, h, a, tilt, rest in (
-            (-1, 36, 34.5, 25, 52, -9, -ears, 0.0),
-            (1, 64, 66, 27, 50, 21, ears, 0.0 if robot else REST_FOLD)):
+    for side, bx, cx, cy, w, h, a, tilt, rest in (
+            (-1, 37, 34.5, 27, 22, 50, -7, -ears, 0.0),
+            (1, 63, 65.5, 22, 19.5, 56, 13, ears, 0.0 if robot else REST_FOLD)):
         bent = max(fold, rest)
+        hinge = REST_HINGE if rest else EAR_HINGE
         p.save()
         p.translate(bx, 48)   # pivot at the base of the ear, where it meets the head
         p.rotate(tilt)
         p.translate(-bx, -48)
         p.translate(cx, cy)   # from here on: the ear's own frame, centred, upright
         p.rotate(a)
-        bend = _ear_bend(side * bent)
-        lower, flap = _ear_pieces(18, h, bend if bent > 0.5 else None)
+        bend = _ear_bend(side * bent, hinge)
+        lower, flap = _ear_pieces(w, h, bend if bent > 0.5 else None, hinge)
         # how much of the inner ear the flap shows: a flap folded right over (or his
         # floppy ear) shows its furry back
         inner_on = 0.0 if bent > 0.5 and (rest or bent > 50) else max(0.0, 1 - bent / 50)
@@ -339,7 +296,7 @@ def draw_bunny(p: QPainter, rect: QRectF, prop: str | None = None, *,
             parts = [inner(ROBOT_CYAN.lighter(100 + round(25 * led)), 8, h - 14),
                      inner(ROBOT_CYAN_HI, 3, h - 22)]
         else:
-            parts = [inner(PINK, 9, h - 15)]
+            parts = [inner(PINK, w * 0.5, h - 16)]
         for piece, mapped, alpha in ((lower, QTransform(), 1.0), (flap, bend, inner_on)):
             if piece is None:
                 continue
@@ -351,8 +308,8 @@ def draw_bunny(p: QPainter, rect: QRectF, prop: str | None = None, *,
             p.setPen(Qt.PenStyle.NoPen)
             if not robot:   # a soft shade down the outer edge
                 p.setBrush(edge)
-                p.drawPath(mapped.map(QTransform().translate(side * 7, 1).map(
-                    _ear_shape(8, h - 4))))
+                p.drawPath(mapped.map(QTransform().translate(side * w * 0.38, 1).map(
+                    _ear_shape(w * 0.45, h - 4))))
             if robot and led > 0 and piece is lower:
                 halo = QColor(ROBOT_CYAN)
                 halo.setAlpha(round(110 * led))
@@ -362,7 +319,7 @@ def draw_bunny(p: QPainter, rect: QRectF, prop: str | None = None, *,
                 for shape, col in parts:
                     if piece is flap:   # (only the half that went over with it)
                         top = QPainterPath()
-                        top.addRect(QRectF(-30, -60, 60, 60 + EAR_HINGE))
+                        top.addRect(QRectF(-30, -60, 60, 60 + hinge))
                         shape = bend.map(shape.intersected(top))
                     p.setBrush(col)
                     p.drawPath(shape)
@@ -371,8 +328,8 @@ def draw_bunny(p: QPainter, rect: QRectF, prop: str | None = None, *,
             # his floppy ear bends out and back: the pink inside shows right up to the
             # bend, rounded off there
             top = QPainterPath()
-            top.addRect(QRectF(-30, EAR_HINGE, 60, 60))
-            top.addEllipse(QRectF(-4.5, EAR_HINGE - 4.5, 9, 9))
+            top.addRect(QRectF(-30, hinge, 60, 60))
+            top.addEllipse(QRectF(-w * 0.25, hinge - w * 0.25, w * 0.5, w * 0.5))
             p.save()
             p.setClipPath(lower.united(flap))
             p.setPen(Qt.PenStyle.NoPen)
@@ -398,28 +355,33 @@ def draw_bunny(p: QPainter, rect: QRectF, prop: str | None = None, *,
             p.restore()
     p.restore()
 
-    # tail (peeking out behind him), body, feet
+    # tail (peeking out behind him), body, front legs, feet
     if not robot:
-        _ellipse(p, 22.5, 109.5, 13, 12, fur, ink)
-        _stroke(p, _arc(18.5, 106, 20.5, 104.5, 23.5, 105), FUR_LINE, 1.1)
+        _ellipse(p, 24, 111, 12.5, 11.5, fur, ink)
+        _stroke(p, _arc(20, 108, 22, 106.5, 25, 107), FUR_LINE, 1.1)
     p.setPen(ink)
     p.setBrush(fur)
     p.drawPath(body_shape)
-    _shade(p, body_shape, 70, 106, 22, fur_shade, 200)   # shade on his far side
-    if not robot:   # the soft lines of his haunches
-        _stroke(p, _arc(36, 100, 31, 107, 33.5, 112), FUR_LINE, 1.3)
-        _stroke(p, _arc(64, 100, 69, 107, 66.5, 112), FUR_LINE, 1.3)
-    for x, a in ((30.5, 8), (69.5, -8)):
-        _ellipse(p, x, 115.5, 18, 9.5, fur, ink, a)
+    _shade(p, body_shape, 70, 108, 20, fur_shade, 200)   # shade on his far side
+    legs = 1 - max(_smooth((sad - 0.3) / 0.45), _smooth((angry - 0.35) / 0.4)) \
+        if prop is None else 1.0
+    if legs > 0.02:   # his front legs, down the middle to his feet
+        c = QColor(ink_col)
+        c.setAlphaF(0.85 * legs)
+        _stroke(p, _arc(44.5, 98, 43, 104, 42.5, 109), c, 1.7)
+        if prop not in ONE_PAW:
+            _stroke(p, _arc(55.5, 98, 57, 104, 57.5, 109), c, 1.7)
+    for x, a in ((40.5, 4), (59.5, -4)):
+        _ellipse(p, x, 114, 20, 10.5, fur, ink, a)
         if not robot:
-            for dx in (-2.4, 2.4):
-                _stroke(p, _arc(x + dx, 112.4, x + dx * 1.1, 114.5, x + dx, 116), FUR_LINE, 1.0)
+            for dx in (-2.6, 2.6):
+                _stroke(p, _arc(x + dx, 110.8, x + dx * 1.08, 113, x + dx, 114.4), FUR_LINE, 1.1)
 
     if robot:
         # paw seam details
         p.setPen(QPen(QColor("#9da7b8"), 1.2))
-        p.drawLine(QPointF(30.5, 112), QPointF(30.5, 119))
-        p.drawLine(QPointF(69.5, 112), QPointF(69.5, 119))
+        p.drawLine(QPointF(40.5, 110), QPointF(40.5, 118))
+        p.drawLine(QPointF(59.5, 110), QPointF(59.5, 118))
         # glowing AI audio core on tummy
         _ellipse(p, 50, 100, 16, 16, QColor("#1c2230"), ink)
         if led > 0:
@@ -456,19 +418,19 @@ def draw_bunny(p: QPainter, rect: QRectF, prop: str | None = None, *,
         shine = QPainterPath(QPointF(28, 37))
         shine.cubicTo(QPointF(36, 30), QPointF(46, 29), QPointF(52, 29))
         _stroke(p, shine, phones_hi, 1.8)
-    for x, sx in ((8, -1), (79, 1)):
+    for x, sx in ((6.5, -1), (79.5, 1)):
         p.setPen(ink)
         p.setBrush(QColor("#222838") if robot else phones)
-        cup = QRectF(x, 51, 13, 25)
-        p.drawRoundedRect(cup, 6.5, 6.5)
+        cup = QRectF(x, 49.5, 14, 28)
+        p.drawRoundedRect(cup, 7, 7)
         if not robot:   # the cushion against his head, and a shine on the cup
-            cushion = QRectF(x + (9 if sx < 0 else 0), 54, 4, 19)
+            cushion = QRectF(x + (10 if sx < 0 else 0), 53, 4, 21)
             p.setPen(Qt.PenStyle.NoPen)
             p.setBrush(phones_lo)
             p.drawRoundedRect(cushion, 2, 2)
         p.setPen(Qt.PenStyle.NoPen)
         p.setBrush(ROBOT_CYAN if robot else phones_hi)
-        p.drawRoundedRect(QRectF(x + (3 if sx < 0 else 6), 55, 3.2, 10), 1.6, 1.6)
+        p.drawRoundedRect(QRectF(x + (3 if sx < 0 else 7), 54, 3.4, 11), 1.7, 1.7)
 
     if nightcap:
         _nightcap(p, ink)
@@ -500,18 +462,17 @@ def draw_bunny(p: QPainter, rect: QRectF, prop: str | None = None, *,
             _stroke(p, arc, INK, 2.3)
             continue
         ex = x + gx
-        ew, eh = 10.5 + 1.5 * sad, (13 + 1.5 * sad) * (1 - blink)
+        ew, eh = 12.4 + 1.5 * sad, (15 + 1.5 * sad) * (1 - blink)
         eye = QPainterPath()
         eye.addEllipse(QRectF(ex - ew / 2, EYE_Y - eh / 2, ew, eh))
         p.fillPath(eye, EYE)
         p.save()
         p.setClipPath(eye)
-        _ellipse(p, ex, EYE_Y + eh * 0.36, ew * 0.8, eh * 0.45, _soft(ex, EYE_Y + eh * 0.36,
-                                                                     ew * 0.8, eh * 0.5, EYE_LOW))
+        _glow(p, ex, EYE_Y + eh * 0.36, ew * 0.9, eh * 0.55, EYE_LOW)
         p.restore()
         if eh > 4:   # the shines: one big up on his right, a little one low on his left
-            _ellipse(p, ex + 2.1, EYE_Y - 3.2, 4.2 + sad, 4.6 + sad, QColor("white"))
-            _ellipse(p, ex - 2.3, EYE_Y + 3.4, 1.8, 1.8, QColor("white"))
+            _ellipse(p, ex + 2.4, EYE_Y - 3.7, 5 + sad, 5.4 + sad, QColor("white"))
+            _ellipse(p, ex - 2.7, EYE_Y + 4, 2.2, 2.2, QColor("white"))
         if smug and not hidden:   # heavy lids: fur over the top half, a flat lid line
             p.setPen(Qt.PenStyle.NoPen)
             p.setBrush(fur)
@@ -557,9 +518,9 @@ def draw_bunny(p: QPainter, rect: QRectF, prop: str | None = None, *,
         blush = QColor(CHEEK)
         if angry > 0.05:
             blush = QColor(255, 70, 100, min(255, 120 + round(110 * angry)))
-        for x in (28.5, 71.5):
-            w, h = 13 + 2 * angry, 8 + angry
-            _ellipse(p, x, 73, w, h, _soft(x, 73, w, h, blush))
+        for x in (27, 73):
+            w, h = 15 + 2 * angry, 9.5 + angry
+            _glow(p, x, 73, w, h, blush)
         nose = QPainterPath(QPointF(47.2, 69.3))
         nose.quadTo(QPointF(50, 68.4), QPointF(52.8, 69.3))
         nose.quadTo(QPointF(53.6, 69.8), QPointF(52.6, 71))
@@ -776,8 +737,7 @@ def _nightcap(p: QPainter, ink: QPen):
     p.save()
     p.setClipPath(body)
     p.setPen(Qt.PenStyle.NoPen)
-    p.setBrush(_soft(66, 46, 70, 26, cap.darker(125)))   # a fold of shade low down
-    p.drawEllipse(QRectF(31, 33, 70, 26))
+    _glow(p, 66, 46, 70, 26, cap.darker(125))   # a fold of shade low down
     for x, y, r in ((34, 37, 2.6), (48, 27, 2.2), (62, 34, 2.8), (76, 28, 2.2),
                     (83, 40, 2.0), (54, 41, 1.8)):
         _star(p, x, y, r, None, star)

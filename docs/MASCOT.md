@@ -32,8 +32,8 @@ download bar (`ui/downloadbar.py`); static pictures in `ui/dialogs.py` and the s
 ## Poses
 
 His look is the Storybook one: a round head a little wider at the cheeks
-(`bunnyfit.head_path`), a soft pear of a body (`bunnyfit.body_path`) with a tail, two
-front paws in his lap and two feet, big glossy eyes with the same two shines in both,
+(`bunnyfit.head_path`), a small sitting body under it (`bunnyfit.body_path`) with a
+tail, front legs running down to two big round feet, big glossy eyes with the same two shines in both,
 little resting brows, a pink nose over a soft double smile, and one ear up while the
 other always flops over at the middle (`bunny.REST_FOLD`). Lines are round-capped ink;
 shading is a couple of soft fades (`_shade`), never texture.
@@ -98,8 +98,8 @@ Rules the drawing keeps:
 - Dark (the default, and the installer art) and High Contrast stay plain.
 
 To add an outfit: draw the piece as a function in `bunnyfit.py` on the 100 x 120 canvas
-(head: `head_path()`, about the 68 x 56 oval centred at 50, 64; eyes at `EYES` (x 37.5 and
-62.5) on `EYE_Y` (63); ear bases at 36, 48 and 64, 48; neck about y 90), add it to `PIECES` with its layer (and to `HATS` if
+(head: `head_path()`, about the 68 x 56 oval centred at 50, 64; eyes at `EYES` (x 35.5 and
+64.5) on `EYE_Y` (63); ear bases at 37, 48 and 63, 48; neck about y 90), add it to `PIECES` with its layer (and to `HATS` if
 it sits on his head), list it under the theme in `OUTFITS`, then check the sheets.
 `tests/test_bunnyfit.py` checks every listed piece exists and draws.
 

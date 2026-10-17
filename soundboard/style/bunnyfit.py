@@ -92,7 +92,7 @@ def _col(key: str) -> QColor:
 
 # Bun's shape on the 100 x 120 canvas: bunny.py draws him from these, and the pieces
 # that sit on him clip to them, so his outline and theirs stay one
-EYES = (37.5, 62.5)   # his eyes' centres (x), on EYE_Y
+EYES = (35.5, 64.5)   # his eyes' centres (x), on EYE_Y
 EYE_Y = 63.0
 
 
@@ -109,13 +109,13 @@ def head_path() -> QPainterPath:
 
 
 def body_path() -> QPainterPath:
-    """His sitting body under the head: a soft pear, wider at the hips."""
-    path = QPainterPath(QPointF(50, 83))
-    path.cubicTo(QPointF(63, 83), QPointF(71, 91), QPointF(74.5, 102))
-    path.cubicTo(QPointF(78, 112), QPointF(73, 118.5), QPointF(62, 118.5))
-    path.lineTo(38, 118.5)
-    path.cubicTo(QPointF(27, 118.5), QPointF(22, 112), QPointF(25.5, 102))
-    path.cubicTo(QPointF(29, 91), QPointF(37, 83), QPointF(50, 83))
+    """His small sitting body under the big head, round at the haunches."""
+    path = QPainterPath(QPointF(50, 84))
+    path.cubicTo(QPointF(60, 84), QPointF(65, 89), QPointF(67, 96))
+    path.cubicTo(QPointF(75, 99), QPointF(77.5, 110), QPointF(71, 117.5))
+    path.lineTo(29, 117.5)
+    path.cubicTo(QPointF(22.5, 110), QPointF(25, 99), QPointF(33, 96))
+    path.cubicTo(QPointF(35, 89), QPointF(40, 84), QPointF(50, 84))
     path.closeSubpath()
     return path
 
@@ -562,14 +562,14 @@ def _lenses(p, ink, fill, shape="rect", frame: QColor | None = None):
     p.drawLine(QPointF(right + 8.5, y - 3), QPointF(82, y - 2))
     for i, x in enumerate(EYES):
         if shape == "round":
-            path = _circle(x, y, 8.2)
+            path = _circle(x, y, 8.8)
         elif shape == "heart":
             path = QPainterPath(QPointF(x, y + 9))
             path.cubicTo(QPointF(x - 14, y - 1), QPointF(x - 7.5, y - 13), QPointF(x, y - 5.5))
             path.cubicTo(QPointF(x + 7.5, y - 13), QPointF(x + 14, y - 1), QPointF(x, y + 9))
         else:
             path = QPainterPath()
-            path.addRoundedRect(QRectF(x - 9, y - 7, 18, 14), 4.5, 4.5)
+            path.addRoundedRect(QRectF(x - 9.3, y - 8, 18.6, 16), 5, 5)
         lens = fill[i] if isinstance(fill, tuple) else fill
         _fill(p, path, lens, pen)
         if shape != "round":                               # a glint
@@ -617,7 +617,7 @@ def _visor(p, ink):
     grad.setColorAt(0, QColor("#ff2fb4"))
     grad.setColorAt(1, QColor("#2fe6ff"))
     band = QPainterPath()
-    band.addRoundedRect(QRectF(23, EYE_Y - 7.5, 54, 15), 7.5, 7.5)
+    band.addRoundedRect(QRectF(22.5, EYE_Y - 8.5, 55, 17), 8.5, 8.5)
     _fill(p, band, grad, QPen(DARK, 2))
     p.setPen(QPen(QColor(255, 255, 255, 170), 1.5))
     p.drawLine(QPointF(30, EYE_Y - 3.5), QPointF(70, EYE_Y - 3.5))
@@ -639,7 +639,7 @@ def _spirals(p, ink):
     """Blinded: spirals for eyes."""
     y = EYE_Y
     for x in EYES:
-        _fill(p, _circle(x, y, 7.4), WHITE, QPen(INK_COL, 1.6))
+        _fill(p, _circle(x, y, 7.8), WHITE, QPen(INK_COL, 1.6))
         spin = QPainterPath(QPointF(x, y))
         for i in range(1, 41):
             a = i * 0.42 * (1 if x < 50 else -1)
