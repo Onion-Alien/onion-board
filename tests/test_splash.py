@@ -213,3 +213,36 @@ def test_rare_launch_glows_and_shows_its_drop_rate(qapp, monkeypatch):
         looks.add(img.copy(80, 30, 80, 96).bits().tobytes())
     assert len(looks) == len(splashacts.RARES)
     splash._surfaces.clear()
+
+
+def test_rare_tiers_sit_end_to_end():
+    """Each tier is exactly 1/odds of the roll: its edges, and nothing past the last."""
+    from soundboard.ui import splashacts
+    edge = 0.0
+    for name, (odds, *_) in splashacts.RARES.items():
+        start, edge = edge, edge + 1 / odds
+        assert splashacts.rare_for(start) == name
+        assert splashacts.rare_for(edge - 1e-12) == name
+    assert splashacts.rare_for(edge) is None
+    assert splashacts.rare_for(0.5) is None and splashacts.rare_for(0.999999) is None
+    assert abs(edge - (1 / 50 + 1 / 500 + 1 / 5000 + 1 / 50000)) < 1e-15   # ~2.2 % in all
+
+
+def test_rare_odds_hold_over_millions_of_launches():
+    """Rolled the way pick() rolls: each tier within 6 standard deviations of 1/odds
+    (2 million launches: gold 40000 +- 1200, ice 4000 +- 380, galaxy 400 +- 120,
+    rainbow 40 +- 38), so a 1/500 can't really be a 1/10."""
+    import math
+    import random
+
+    from soundboard.ui import splashacts
+    n = 2_000_000
+    rng = random.Random(20261018)
+    counts = dict.fromkeys(splashacts.RARES, 0)
+    for _ in range(n):
+        rare = splashacts.rare_for(rng.random())
+        if rare:
+            counts[rare] += 1
+    for name, (odds, *_) in splashacts.RARES.items():
+        expected = n / odds
+        assert abs(counts[name] - expected) <= 6 * math.sqrt(expected), (name, counts[name])
