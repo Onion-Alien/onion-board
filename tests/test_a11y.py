@@ -120,3 +120,31 @@ def test_the_sounds_page_and_the_hear_switch_have_names(window, qapp):
     b.setChecked(False)
     qapp.processEvents()
     assert b.accessibleName() == "Hear what they hear"
+
+
+def test_every_tab_stop_in_settings_has_a_name(window):
+    """The same on every Settings page: a drop-down with only a label beside it was read
+    as a bare "combo box" (Audio buffering, the device boxes, quality, the overlay's)."""
+    from PySide6.QtCore import Qt
+    from PySide6.QtWidgets import QAbstractButton, QAbstractScrollArea, QLabel
+    window.resize(1180, 760)
+    window.show()
+    window.setctl.open_settings("general")
+    dlg = window.setctl._settings_dlg
+    missing = {}
+    for key in [k for k in dlg._page_keys if k != dlg.ADVANCED]:
+        dlg.show_page(key)
+        a11y.label_tree(window, force=True)
+        buddied = {id(lab.buddy()) for lab in window.findChildren(QLabel) if lab.buddy()}
+        w = window.nextInFocusChain()
+        while w is not window:
+            if ((w.focusPolicy() & Qt.FocusPolicy.TabFocus) == Qt.FocusPolicy.TabFocus
+                    and w.isEnabled() and w.isVisibleTo(window)
+                    and not isinstance(w, QAbstractScrollArea)):
+                text = w.text() if isinstance(w, (QAbstractButton, QLineEdit)) else ""
+                if not (w.accessibleName() or a11y.has_words(text) or id(w) in buddied):
+                    shown = getattr(w, "currentText", lambda: "")()
+                    missing.setdefault(key, []).append(f"{type(w).__name__} {shown!r}")
+            w = w.nextInFocusChain()
+    window.setctl.close_settings()
+    assert missing == {}
