@@ -534,8 +534,6 @@ class WindowBuilder(Controller):
         mw.tabs.addTab(mw.setup_page, "")
         mw.store = mw._make_tab("store")
         mw.tabs.addTab(mw.store, "")
-        mw.chat = mw._make_tab("chat")
-        mw.tabs.addTab(mw.chat, "")
         for i, (text, _tip) in enumerate(TABS):   # no hover tip: the name says it
             mw.tabs.setTabText(i, text)
             icons.set_tab_icon(mw.tabs, i, TAB_KEYS[i])

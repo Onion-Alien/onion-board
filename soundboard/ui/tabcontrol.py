@@ -20,7 +20,6 @@ from soundboard.ui.appspanel import AppsTab
 from soundboard.ui.buncontrol import BUN_TIP
 from soundboard.ui.controller import Controller
 from soundboard.ui.livedot import set_tab_live
-from soundboard.ui.chattab import ChatTab
 from soundboard.ui.storetab import StoreTab
 from soundboard.ui.voicepanel import VoicePanel
 
@@ -32,7 +31,7 @@ log = logging.getLogger(__name__)
 # The tabs, in order: each one is a thing you can play (or, last, the setup). The
 # tooltip says what it's for in a few words.
 # the tabs' keys (never translated: settings, Tabs on/off, the usage count) and labels
-TAB_KEYS = ("sounds", "radio", "apps", "triggers", "voice", "setup", "store", "chat")
+TAB_KEYS = ("sounds", "radio", "apps", "triggers", "voice", "setup", "store")
 TABS = ((_("Sounds"), _("Your sound buttons: click one to play it")),
         (_("Radio"), _("Internet radio stations from around the world")),
         (_("Apps"), _("Send another program's sound (music player, game…)")),
@@ -40,16 +39,16 @@ TABS = ((_("Sounds"), _("Your sound buttons: click one to play it")),
         (_("Voice"), _("Change your voice, speak another language, or use text-to-speech")),
         (_("Setup"), _("Pick where your sounds go (Discord, games, OBS…), test it")),
         (_("Store"), _("Free sounds anyone can use, voted by players: add them or share "
-                       "your own")),
-        (_("Chat"), _("Talk to other players anonymously: one room, text only")))
+                       "your own")))
 TAB_INDEX = {key: i for i, key in enumerate(TAB_KEYS)}
-BEFORE_SETUP = ("store", "chat")   # last in TAB_KEYS, but on the rail before Setup
+BEFORE_SETUP = ("store",)   # last in TAB_KEYS, but on the rail before Setup
 
 
 def rail_order(saved: list[str]) -> list[str]:
     """The tabs' keys in the rail's order: as dragged (Config.sidebar_order), any tab
-    that order doesn't have in its usual place. Store and Chat come last in TAB_KEYS
-    (older configs keep their saved tab numbers) but sit before Setup on the rail."""
+    that order doesn't have in its usual place. Store comes last in TAB_KEYS
+    (older configs keep their saved tab numbers) but sits before Setup on the rail. A key
+    no tab has any more (the old "chat") is left out."""
     keys = [k for k in dict.fromkeys(saved) if k in TAB_INDEX]
     for k in TAB_KEYS:
         if k in keys:
@@ -180,9 +179,9 @@ class TabControl(Controller):
                      tab=TABS[TAB_INDEX[key]][0]))
 
     def _tab_live(self, key: str, on: bool):
-        """The live badge on the Voice, Triggers or Apps tab (Store and Chat have none)."""
+        """The live badge on the Voice, Triggers or Apps tab (Store has none)."""
         mw = self.mw
-        if key in ("store", "chat"):
+        if key == "store":
             return
         page = getattr(mw, key)
         if key == "voice":   # the active voice's picture, when there is one
@@ -246,7 +245,7 @@ class TabControl(Controller):
             mw.load_triggers()
         if hasattr(mw.fitctl, "_fit"):
             if key in ("voice", "triggers"):
-                assert not isinstance(new, (AppsTab, StoreTab, ChatTab))
+                assert not isinstance(new, (AppsTab, StoreTab))
                 mw.fitctl._tab_steps[key] = new.fit_steps()
                 mw.fitctl._fit.extend(mw.fitctl._tab_steps[key])
             if key == "voice":

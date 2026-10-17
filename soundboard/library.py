@@ -448,7 +448,8 @@ class Config:
     # the Store tab's random id for this install (soundboard.store: one vote per sound);
     # "" until the store is first used
     store_id: str = ""
-    # the version of the Chat tab's rules this user accepted (0 = not yet: soundboard.chat)
+    # the Chat tab's rules version this user accepted, from 2.3.0 and 2.3.1 (the tab is gone
+    # now): kept so a config saved here still tells those versions chat was dealt with
     chat_rules: int = 0
     # fetch newer yt-dlp versions from PyPI by itself: opt-in, since that's code the app
     # runs (named *_optin so configs saved while it defaulted to on start off again)
@@ -728,7 +729,9 @@ class Config:
         cfg.route = "mic"
         cfg.mic_first = True
         cfg.duck_on = True
-        cfg.tabs_off = [*BASIC_TABS_OFF, "chat"]   # a plain soundboard first; + More tabs adds them
+        # a plain soundboard first; + More tabs adds them ("chat": the removed Chat tab, so
+        # 2.3.0 / 2.3.1 opening this config keep it hidden)
+        cfg.tabs_off = [*BASIC_TABS_OFF, "chat"]
         cfg.use_mode = ""   # the guide asks what it's for (and adds the tabs that fit)
         return cfg
 
@@ -863,7 +866,8 @@ class Config:
         raw.setdefault("setup_done", bool(raw.get("main_device")))
         # ...and from before What's new: everything in it is new to them
         raw.setdefault("whats_new_seen", "")
-        # ...and from before the Chat tab: it is opt-in, so it starts switched off
+        # ...and from before the Chat tab (2.3.0 / 2.3.1 only): kept off, so going back to
+        # one of those versions doesn't show it
         if "chat_rules" not in raw:
             off = raw.get("tabs_off")
             raw["tabs_off"] = [*(off if isinstance(off, list) else []), "chat"]

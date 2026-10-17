@@ -208,8 +208,6 @@ the launcher the shortcuts and PyInstaller use. The app is the `soundboard` pack
 | `soundboard/packs.py` | free sound packs: the list (`packs/catalog.json` in this repo, with a built-in copy for offline) of ready-made boards in the backup format, added in one click; each pack's preview zip (`samples`) |
 | `soundboard/store.py` | the sound store (Store tab): the list, fetching a sound, votes, reports and uploads, talking to the project's own server (`server/store/`) |
 | `soundboard/ui/storetab.py` | the *Store* tab: free CC0 sounds to hear, add, vote on or report, and the *Share a sound* window |
-| `soundboard/chat.py` | the chat client (Chat tab): reads and posts to the anonymous room by long poll, through the same server |
-| `soundboard/ui/chattab.py` | the *Chat* tab: the rules, then one text-only room with Mute and Report; off until switched on |
 | `server/store/` | the sound store's server (and the chat room, `src/chat.js`): a Cloudflare Worker (`src/index.js`), its review page (`src/admin.js`) and database (`schema.sql`); its README says how to put it online |
 | `soundboard/ui/packsdialog.py` | the *Free sound packs* window (Sounds tab → Backup): the packs to add, a few of each one's sounds to hear first, and where to share your own |
 | `soundboard/otherboards/` | Import from another soundboard. `__init__.py`: what the readers share (Entry rows, the list of sources, the installer's queued-import note); only when the user asks (Backup menu, setup guide, the installer's boxes, or a dropped board file) |
