@@ -6,8 +6,6 @@ from pathlib import Path
 import numpy as np
 import pytest
 import soundfile as sf
-from PySide6.QtCore import Qt
-from PySide6.QtTest import QTest
 from PySide6.QtWidgets import QMessageBox
 
 from conftest import process_events
@@ -175,12 +173,10 @@ def test_a_dropped_spl_goes_to_the_soundpad_import(main_window, monkeypatch):  #
 
 
 @pytest.mark.windows   # Windows paths
-@pytest.mark.parametrize("answer, kept", [("Keep", 5), ("Remove", 2), (None, 5)])
-def test_the_installers_box_imports_on_first_start_then_asks_to_keep(
-        main_window, qapp, tmp_path, monkeypatch, answer, kept):  # noqa: F811
+def test_the_installers_box_imports_on_first_start_with_no_questions(
+        main_window, qapp, tmp_path, monkeypatch):  # noqa: F811
     """Ticked in the installer, it leaves a note; the first start does the import with
-    no question first (the tick was the yes), and only once. Once they're in, one box
-    asks whether to keep them: Remove takes them all off again, closing it keeps them."""
+    no question before or after (the tick was the yes), and only once."""
     w = main_window
     monkeypatch.setenv("APPDATA", str(tmp_path))
     _board(tmp_path)
@@ -188,23 +184,58 @@ def test_the_installers_box_imports_on_first_start_then_asks_to_keep(
     note.parent.mkdir(parents=True, exist_ok=True)
     note.write_text("soundpad", encoding="utf-8")
     monkeypatch.setattr(QMessageBox, "question", lambda *a, **k: pytest.fail("asked"))
-    asked = []
-
-    def answer_box(box):
-        asked.append(box.text())
-        if answer is None:
-            QTest.keyClick(box, Qt.Key_Escape)   # closed with Esc
-            return 0
-        next(b for b in box.buttons() if b.text() == answer).click()
-        return 0
-    monkeypatch.setattr(QMessageBox, "exec", answer_box)
+    monkeypatch.setattr(QMessageBox, "exec", lambda box: pytest.fail("asked to keep"))
     w.impctl.import_queued()
     assert not note.exists()
-    assert process_events(qapp, lambda: not w.impctl._pending_imports and asked)
-    assert "<b>3</b> sounds from Soundpad" in asked[0]
-    assert len(w.cfg.sounds) == kept
+    assert process_events(qapp, lambda: not w.impctl._pending_imports and len(w.cfg.sounds) == 5)
     w.impctl.import_queued()                            # no note: nothing happens
-    assert not w.impctl._pending_imports and len(w.cfg.sounds) == kept and len(asked) == 1
+    assert not w.impctl._pending_imports and len(w.cfg.sounds) == 5
+
+
+@pytest.mark.windows   # Windows paths
+def test_a_board_gets_its_own_category_shown_from_the_start(
+        main_window, qapp, tmp_path, monkeypatch):  # noqa: F811
+    """The board's category is made and shown before the first sound is in, so each
+    one lands there; the category showing before isn't put on them."""
+    w = main_window
+    monkeypatch.setenv("APPDATA", str(tmp_path))
+    _board(tmp_path)
+    w.cfg.categories.append("Old stuff")
+    w.catctl.set_category("Old stuff")
+    monkeypatch.setattr(QMessageBox, "question", lambda *a: QMessageBox.Yes)
+    at_first = []
+    real = w.impctl.on_imported
+
+    def first(meta, data, err):
+        if not at_first:
+            at_first.append((w.cfg.category, w.catctl.cat_tabs.tabText(
+                w.catctl.cat_tabs.currentIndex())))
+        real(meta, data, err)
+    w.bridge.imported.disconnect()
+    w.bridge.imported.connect(first)
+    w.impctl.import_other(soundpad.SOURCE)
+    assert process_events(qapp, lambda: not w.impctl._pending_imports and len(w.cfg.sounds) == 5)
+    assert at_first == [("Soundpad", "Soundpad")]
+    new = w.cfg.sounds[2:]
+    assert all("Soundpad" in m.tags and "Old stuff" not in m.tags for m in new)
+    assert w.cfg.category == "Soundpad" and not w.impctl._boards
+
+
+@pytest.mark.windows   # Windows paths
+def test_a_board_with_nothing_new_leaves_no_empty_category(
+        main_window, qapp, tmp_path, monkeypatch):  # noqa: F811
+    w = main_window
+    monkeypatch.setenv("APPDATA", str(tmp_path))
+    _board(tmp_path)
+    monkeypatch.setattr(QMessageBox, "question", lambda *a: QMessageBox.Yes)
+    w.impctl.import_other(soundpad.SOURCE)
+    assert process_events(qapp, lambda: not w.impctl._pending_imports and len(w.cfg.sounds) == 5)
+    w.catctl.delete_category("Soundpad")   # the sounds stay, the tab goes
+    assert "Soundpad" not in w.cfg.categories
+    w.impctl.import_other(soundpad.SOURCE)   # all already here: nothing to add
+    assert process_events(qapp, lambda: not w.impctl._pending_imports
+                          and "Soundpad" not in w.cfg.categories)
+    assert w.cfg.category == ""
 
 
 @pytest.mark.windows   # Windows paths
@@ -224,7 +255,7 @@ def test_an_import_from_the_menu_is_not_asked_again(
 def test_no_keep_box_when_they_imported_it_themselves(
         main_window, qapp, tmp_path, monkeypatch, first):  # noqa: F811
     """The installer's import is running (or still waiting) and they import the same
-    board from the menu too: they already said yes here, so no "keep them?" box."""
+    board from the menu too: no "keep them?" box, and no sound twice."""
     w = main_window
     monkeypatch.setenv("APPDATA", str(tmp_path))
     _board(tmp_path)
@@ -242,7 +273,7 @@ def test_no_keep_box_when_they_imported_it_themselves(
         w.impctl.import_queued()
         w.impctl.import_other(soundpad.SOURCE)
     assert process_events(qapp, lambda: not note.exists() and not w.impctl._pending_imports
-                          and not w.impctl._ask_keep and len(w.cfg.sounds) == 5)
+                          and not w.impctl._boards and len(w.cfg.sounds) == 5)
 
 
 @pytest.mark.windows   # Windows paths

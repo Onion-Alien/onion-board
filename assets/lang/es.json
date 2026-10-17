@@ -2940,16 +2940,6 @@
     "Se han añadido {n} clips a tus sonidos"
   ],
   "Copied “{name}”: Ctrl+V pastes it in an editor or on the Sounds tab": "Se ha copiado «{name}»: Ctrl+V lo pega en un editor o en la pestaña Sonidos",
-  "Keep": "Conservar",
-  "Keep your imported sounds?": "¿Conservar los sonidos importados?",
-  "We brought over <b>{n}</b> sound from your other soundboards. Keep it?": [
-    "Hemos traído <b>{n}</b> sonido de tus otras soundboards. ¿Lo conservas?",
-    "Hemos traído <b>{n}</b> sonidos de tus otras soundboards. ¿Los conservas?"
-  ],
-  "We brought over <b>{n}</b> sound from {name}. Keep it?": [
-    "Hemos traído <b>{n}</b> sonido de {name}. ¿Lo conservas?",
-    "Hemos traído <b>{n}</b> sonidos de {name}. ¿Los conservas?"
-  ],
   "Compatibility fixes for games, calls and browsers.": "Arreglos de compatibilidad para juegos, llamadas y navegadores.",
   "Install update": "Instalar actualización",
   "Mic updated: games, calls and browsers hear your sounds.": "Micrófono actualizado: juegos, llamadas y navegadores oyen tus sonidos.",
@@ -2986,7 +2976,6 @@
   "Your mic needs a quick repair": "Tu micrófono necesita una reparación rápida",
   "Mute or unmute your mic for others. Your sounds still play for them.": "Silencia o activa tu micrófono para los demás. Tus sonidos se siguen oyendo.",
   "That page has no sound Onion Board can add.": "Esa página no tiene ningún sonido que Onion Board pueda añadir.",
-  "Removed sounds come back with Undo, or later from Backup → Recently deleted sounds.": "Los sonidos quitados vuelven con Deshacer, o más tarde desde Copia de seguridad → Sonidos eliminados recientemente.",
   "Not configured": "Sin configurar",
   "Not configured: click to fix": "Sin configurar: haz clic para arreglarlo",
   "Can't send to {device}, click to fix": "No se puede enviar a {device}, haz clic para arreglarlo",

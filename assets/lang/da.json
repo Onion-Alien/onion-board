@@ -2940,16 +2940,6 @@
     "{n} klip tilføjet til dine lyde"
   ],
   "Copied “{name}”: Ctrl+V pastes it in an editor or on the Sounds tab": "“{name}” kopieret: Ctrl+V indsætter det i en editor eller på fanen Lyde",
-  "Keep": "Behold",
-  "Keep your imported sounds?": "Behold dine importerede lyde?",
-  "We brought over <b>{n}</b> sound from your other soundboards. Keep it?": [
-    "Vi hentede <b>{n}</b> lyd fra dine andre soundboards. Vil du beholde den?",
-    "Vi hentede <b>{n}</b> lyde fra dine andre soundboards. Vil du beholde dem?"
-  ],
-  "We brought over <b>{n}</b> sound from {name}. Keep it?": [
-    "Vi hentede <b>{n}</b> lyd fra {name}. Vil du beholde den?",
-    "Vi hentede <b>{n}</b> lyde fra {name}. Vil du beholde dem?"
-  ],
   "Compatibility fixes for games, calls and browsers.": "Kompatibilitetsrettelser til spil, opkald og browsere.",
   "Install update": "Installer opdatering",
   "Mic updated: games, calls and browsers hear your sounds.": "Mikrofon opdateret: spil, opkald og browsere hører dine lyde.",
@@ -2986,7 +2976,6 @@
   "Your mic needs a quick repair": "Din mikrofon skal have en hurtig reparation",
   "Mute or unmute your mic for others. Your sounds still play for them.": "Slå din mikrofon fra eller til for andre. Dine lyde spiller stadig for dem.",
   "That page has no sound Onion Board can add.": "Den side har ingen lyd, Onion Board kan tilføje.",
-  "Removed sounds come back with Undo, or later from Backup → Recently deleted sounds.": "Fjernede lyde kommer tilbage med Fortryd, eller senere fra Backup → Nyligt slettede lyde.",
   "Not configured": "Ikke sat op",
   "Not configured: click to fix": "Ikke sat op: klik for at rette",
   "Can't send to {device}, click to fix": "Kan ikke sende til {device}, klik for at rette",

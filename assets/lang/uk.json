@@ -3009,18 +3009,6 @@
     "Кліпів додано до ваших звуків: {n}"
   ],
   "Copied “{name}”: Ctrl+V pastes it in an editor or on the Sounds tab": "«{name}» скопійовано: Ctrl+V вставляє його в редактор або на вкладку «Звуки»",
-  "Keep": "Залишити",
-  "Keep your imported sounds?": "Залишити імпортовані звуки?",
-  "We brought over <b>{n}</b> sound from your other soundboards. Keep it?": [
-    "Перенесено звуків з інших твоїх саундбордів: <b>{n}</b>. Залишити їх?",
-    "Перенесено звуків з інших твоїх саундбордів: <b>{n}</b>. Залишити їх?",
-    "Перенесено звуків з інших твоїх саундбордів: <b>{n}</b>. Залишити їх?"
-  ],
-  "We brought over <b>{n}</b> sound from {name}. Keep it?": [
-    "Перенесено звуків із {name}: <b>{n}</b>. Залишити їх?",
-    "Перенесено звуків із {name}: <b>{n}</b>. Залишити їх?",
-    "Перенесено звуків із {name}: <b>{n}</b>. Залишити їх?"
-  ],
   "Compatibility fixes for games, calls and browsers.": "Виправлення сумісності для ігор, дзвінків і браузерів.",
   "Install update": "Встановити оновлення",
   "Mic updated: games, calls and browsers hear your sounds.": "Мікрофон оновлено: ігри, дзвінки й браузери чують твої звуки.",
@@ -3057,7 +3045,6 @@
   "Your mic needs a quick repair": "Мікрофону потрібен швидкий ремонт",
   "Mute or unmute your mic for others. Your sounds still play for them.": "Вимкни або увімкни мікрофон для інших. Твої звуки вони все одно чують.",
   "That page has no sound Onion Board can add.": "На цій сторінці немає звуку, який Onion Board може додати.",
-  "Removed sounds come back with Undo, or later from Backup → Recently deleted sounds.": "Видалені звуки повертає «Скасувати», а пізніше — Резервна копія → Нещодавно видалені звуки.",
   "Not configured": "Не налаштовано",
   "Not configured: click to fix": "Не налаштовано: натисни, щоб виправити",
   "Can't send to {device}, click to fix": "Не вдається надіслати на {device}, натисни, щоб виправити",

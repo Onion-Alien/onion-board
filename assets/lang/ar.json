@@ -3216,24 +3216,6 @@
     "عدد المقاطع المضافة إلى أصواتك: {n}"
   ],
   "Copied “{name}”: Ctrl+V pastes it in an editor or on the Sounds tab": "تم نسخ “{name}”: يلصقه Ctrl+V في محرر أو في تبويب الأصوات",
-  "Keep": "الاحتفاظ",
-  "Keep your imported sounds?": "هل تريد الاحتفاظ بالأصوات المستوردة؟",
-  "We brought over <b>{n}</b> sound from your other soundboards. Keep it?": [
-    "عدد الأصوات المنقولة من لوحات الأصوات الأخرى: <b>{n}</b>. هل تريد الاحتفاظ بها؟",
-    "عدد الأصوات المنقولة من لوحات الأصوات الأخرى: <b>{n}</b>. هل تريد الاحتفاظ بها؟",
-    "عدد الأصوات المنقولة من لوحات الأصوات الأخرى: <b>{n}</b>. هل تريد الاحتفاظ بها؟",
-    "عدد الأصوات المنقولة من لوحات الأصوات الأخرى: <b>{n}</b>. هل تريد الاحتفاظ بها؟",
-    "عدد الأصوات المنقولة من لوحات الأصوات الأخرى: <b>{n}</b>. هل تريد الاحتفاظ بها؟",
-    "عدد الأصوات المنقولة من لوحات الأصوات الأخرى: <b>{n}</b>. هل تريد الاحتفاظ بها؟"
-  ],
-  "We brought over <b>{n}</b> sound from {name}. Keep it?": [
-    "عدد الأصوات المنقولة من {name}: <b>{n}</b>. هل تريد الاحتفاظ بها؟",
-    "عدد الأصوات المنقولة من {name}: <b>{n}</b>. هل تريد الاحتفاظ بها؟",
-    "عدد الأصوات المنقولة من {name}: <b>{n}</b>. هل تريد الاحتفاظ بها؟",
-    "عدد الأصوات المنقولة من {name}: <b>{n}</b>. هل تريد الاحتفاظ بها؟",
-    "عدد الأصوات المنقولة من {name}: <b>{n}</b>. هل تريد الاحتفاظ بها؟",
-    "عدد الأصوات المنقولة من {name}: <b>{n}</b>. هل تريد الاحتفاظ بها؟"
-  ],
   "Compatibility fixes for games, calls and browsers.": "إصلاحات توافق للألعاب والمكالمات والمتصفحات.",
   "Install update": "تثبيت التحديث",
   "Mic updated: games, calls and browsers hear your sounds.": "تم تحديث الميكروفون: الألعاب والمكالمات والمتصفحات تسمع أصواتك.",
@@ -3270,7 +3252,6 @@
   "Your mic needs a quick repair": "ميكروفونك يحتاج إلى إصلاح سريع",
   "Mute or unmute your mic for others. Your sounds still play for them.": "اكتم أو شغّل ميكروفونك للآخرين. أصواتك تبقى مسموعة لهم.",
   "That page has no sound Onion Board can add.": "لا يوجد في هذه الصفحة صوت يمكن لـ Onion Board إضافته.",
-  "Removed sounds come back with Undo, or later from Backup → Recently deleted sounds.": "الأصوات المُزالة تعود عبر تراجع، أو لاحقًا من نسخ احتياطي ← الأصوات المحذوفة مؤخرًا.",
   "Not configured": "غير مُعد",
   "Not configured: click to fix": "غير مُعد: انقر للإصلاح",
   "Can't send to {device}, click to fix": "لا يمكن الإرسال إلى {device}، انقر للإصلاح",

@@ -2871,14 +2871,6 @@
     "{n} klip ditambahkan ke Suara kamu"
   ],
   "Copied “{name}”: Ctrl+V pastes it in an editor or on the Sounds tab": "“{name}” disalin: Ctrl+V menempelkannya di editor atau di tab Suara",
-  "Keep": "Simpan",
-  "Keep your imported sounds?": "Simpan suara yang diimpor?",
-  "We brought over <b>{n}</b> sound from your other soundboards. Keep it?": [
-    "Kami memindahkan <b>{n}</b> suara dari soundboard lainmu. Simpan?"
-  ],
-  "We brought over <b>{n}</b> sound from {name}. Keep it?": [
-    "Kami memindahkan <b>{n}</b> suara dari {name}. Simpan?"
-  ],
   "Compatibility fixes for games, calls and browsers.": "Perbaikan kompatibilitas untuk game, panggilan, dan browser.",
   "Install update": "Pasang pembaruan",
   "Mic updated: games, calls and browsers hear your sounds.": "Mic diperbarui: game, panggilan, dan browser mendengar suaramu.",
@@ -2915,7 +2907,6 @@
   "Your mic needs a quick repair": "Mic-mu perlu perbaikan cepat",
   "Mute or unmute your mic for others. Your sounds still play for them.": "Bisukan atau aktifkan mikmu untuk orang lain. Suaramu tetap terdengar oleh mereka.",
   "That page has no sound Onion Board can add.": "Halaman itu tidak punya suara yang bisa ditambahkan Onion Board.",
-  "Removed sounds come back with Undo, or later from Backup → Recently deleted sounds.": "Suara yang dihapus bisa kembali lewat Urungkan, atau nanti dari Cadangan → Suara baru dihapus.",
   "Not configured": "Belum diatur",
   "Not configured: click to fix": "Belum diatur: klik untuk memperbaiki",
   "Can't send to {device}, click to fix": "Tidak bisa mengirim ke {device}, klik untuk memperbaiki",

@@ -3009,18 +3009,6 @@
     "Clipuri adăugate la sunetele tale: {n}"
   ],
   "Copied “{name}”: Ctrl+V pastes it in an editor or on the Sounds tab": "„{name}” copiat: Ctrl+V îl lipește într-un editor sau în fila Sunete",
-  "Keep": "Păstrează",
-  "Keep your imported sounds?": "Păstrezi sunetele importate?",
-  "We brought over <b>{n}</b> sound from your other soundboards. Keep it?": [
-    "Sunete aduse din celelalte soundboarduri ale tale: <b>{n}</b>. Le păstrezi?",
-    "Sunete aduse din celelalte soundboarduri ale tale: <b>{n}</b>. Le păstrezi?",
-    "Sunete aduse din celelalte soundboarduri ale tale: <b>{n}</b>. Le păstrezi?"
-  ],
-  "We brought over <b>{n}</b> sound from {name}. Keep it?": [
-    "Sunete aduse din {name}: <b>{n}</b>. Le păstrezi?",
-    "Sunete aduse din {name}: <b>{n}</b>. Le păstrezi?",
-    "Sunete aduse din {name}: <b>{n}</b>. Le păstrezi?"
-  ],
   "Compatibility fixes for games, calls and browsers.": "Remedieri de compatibilitate pentru jocuri, apeluri și browsere.",
   "Install update": "Instalează actualizarea",
   "Mic updated: games, calls and browsers hear your sounds.": "Microfon actualizat: jocurile, apelurile și browserele îți aud sunetele.",
@@ -3057,7 +3045,6 @@
   "Your mic needs a quick repair": "Microfonul tău are nevoie de o reparare rapidă",
   "Mute or unmute your mic for others. Your sounds still play for them.": "Dezactivează sau activează microfonul pentru ceilalți. Sunetele tale se aud în continuare.",
   "That page has no sound Onion Board can add.": "Pagina aceea nu are niciun sunet pe care Onion Board să-l poată adăuga.",
-  "Removed sounds come back with Undo, or later from Backup → Recently deleted sounds.": "Sunetele eliminate revin cu Anulează sau mai târziu din Copie de rezervă → Sunete șterse recent.",
   "Not configured": "Neconfigurat",
   "Not configured: click to fix": "Neconfigurat: dă clic pentru a repara",
   "Can't send to {device}, click to fix": "Nu se poate trimite la {device}, dă clic pentru a repara",

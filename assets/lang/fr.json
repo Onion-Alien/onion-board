@@ -2940,16 +2940,6 @@
     "{n} extraits ajoutés à vos sons"
   ],
   "Copied “{name}”: Ctrl+V pastes it in an editor or on the Sounds tab": "« {name} » copié : Ctrl+V le colle dans un éditeur ou dans l'onglet Sons",
-  "Keep": "Garder",
-  "Keep your imported sounds?": "Garder les sons importés ?",
-  "We brought over <b>{n}</b> sound from your other soundboards. Keep it?": [
-    "On a récupéré <b>{n}</b> son depuis tes autres soundboards. Le garder ?",
-    "On a récupéré <b>{n}</b> sons depuis tes autres soundboards. Les garder ?"
-  ],
-  "We brought over <b>{n}</b> sound from {name}. Keep it?": [
-    "On a récupéré <b>{n}</b> son depuis {name}. Le garder ?",
-    "On a récupéré <b>{n}</b> sons depuis {name}. Les garder ?"
-  ],
   "Compatibility fixes for games, calls and browsers.": "Correctifs de compatibilité pour les jeux, les appels et les navigateurs.",
   "Install update": "Installer la mise à jour",
   "Mic updated: games, calls and browsers hear your sounds.": "Micro mis à jour : jeux, appels et navigateurs entendent tes sons.",
@@ -2986,7 +2976,6 @@
   "Your mic needs a quick repair": "Ton micro a besoin d'une petite réparation",
   "Mute or unmute your mic for others. Your sounds still play for them.": "Coupe ou active ton micro pour les autres. Tes sons continuent de leur parvenir.",
   "That page has no sound Onion Board can add.": "Cette page n'a aucun son qu'Onion Board peut ajouter.",
-  "Removed sounds come back with Undo, or later from Backup → Recently deleted sounds.": "Les sons retirés reviennent avec Annuler, ou plus tard depuis Sauvegarde → Sons supprimés récemment.",
   "Not configured": "Non configuré",
   "Not configured: click to fix": "Non configuré : clique pour corriger",
   "Can't send to {device}, click to fix": "Impossible d'envoyer vers {device}, clique pour corriger",

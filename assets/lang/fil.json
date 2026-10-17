@@ -2940,16 +2940,6 @@
     "Naidagdag ang {n} na clip sa iyong Sounds"
   ],
   "Copied “{name}”: Ctrl+V pastes it in an editor or on the Sounds tab": "Nakopya ang “{name}”: idinidikit ito ng Ctrl+V sa isang editor o sa tab na Sounds",
-  "Keep": "Itago",
-  "Keep your imported sounds?": "Itatago ba ang mga na-import na tunog?",
-  "We brought over <b>{n}</b> sound from your other soundboards. Keep it?": [
-    "Inilipat namin ang <b>{n}</b> tunog mula sa iba mong soundboard. Itatago ba?",
-    "Inilipat namin ang <b>{n}</b> tunog mula sa iba mong soundboard. Itatago ba?"
-  ],
-  "We brought over <b>{n}</b> sound from {name}. Keep it?": [
-    "Inilipat namin ang <b>{n}</b> tunog mula sa {name}. Itatago ba?",
-    "Inilipat namin ang <b>{n}</b> tunog mula sa {name}. Itatago ba?"
-  ],
   "Compatibility fixes for games, calls and browsers.": "Mga ayos sa compatibility para sa games, tawag at browser.",
   "Install update": "I-install ang update",
   "Mic updated: games, calls and browsers hear your sounds.": "Na-update ang mic: naririnig na ng games, tawag at browser ang sounds mo.",
@@ -2986,7 +2976,6 @@
   "Your mic needs a quick repair": "Kailangan ng mabilis na ayos ng mic mo",
   "Mute or unmute your mic for others. Your sounds still play for them.": "I-mute o i-unmute ang mikropono mo para sa iba. Naririnig pa rin nila ang mga sound mo.",
   "That page has no sound Onion Board can add.": "Walang sound sa page na iyon na maidadagdag ng Onion Board.",
-  "Removed sounds come back with Undo, or later from Backup → Recently deleted sounds.": "Bumabalik ang mga inalis na sound sa I-undo, o mamaya mula sa Backup → Kamakailang binurang mga sound.",
   "Not configured": "Hindi naka-set up",
   "Not configured: click to fix": "Hindi naka-set up: i-click para ayusin",
   "Can't send to {device}, click to fix": "Hindi makapagpadala sa {device}, i-click para ayusin",

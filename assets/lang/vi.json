@@ -2871,14 +2871,6 @@
     "Đã thêm {n} đoạn vào Âm thanh của bạn"
   ],
   "Copied “{name}”: Ctrl+V pastes it in an editor or on the Sounds tab": "Đã sao chép “{name}”: Ctrl+V dán vào trình chỉnh sửa hoặc thẻ Âm thanh",
-  "Keep": "Giữ lại",
-  "Keep your imported sounds?": "Giữ lại âm thanh đã nhập?",
-  "We brought over <b>{n}</b> sound from your other soundboards. Keep it?": [
-    "Đã chuyển <b>{n}</b> âm thanh từ các soundboard khác của bạn. Giữ lại không?"
-  ],
-  "We brought over <b>{n}</b> sound from {name}. Keep it?": [
-    "Đã chuyển <b>{n}</b> âm thanh từ {name}. Giữ lại không?"
-  ],
   "Compatibility fixes for games, calls and browsers.": "Sửa lỗi tương thích cho game, cuộc gọi và trình duyệt.",
   "Install update": "Cài bản cập nhật",
   "Mic updated: games, calls and browsers hear your sounds.": "Đã cập nhật mic: game, cuộc gọi và trình duyệt nghe được âm thanh của bạn.",
@@ -2915,7 +2907,6 @@
   "Your mic needs a quick repair": "Mic của bạn cần sửa nhanh",
   "Mute or unmute your mic for others. Your sounds still play for them.": "Tắt hoặc bật tiếng mic của bạn cho người khác. Âm thanh của bạn vẫn phát cho họ.",
   "That page has no sound Onion Board can add.": "Trang đó không có âm thanh nào Onion Board có thể thêm.",
-  "Removed sounds come back with Undo, or later from Backup → Recently deleted sounds.": "Âm thanh đã xóa có thể lấy lại bằng Hoàn tác, hoặc sau đó từ Sao lưu → Âm thanh đã xóa gần đây.",
   "Not configured": "Chưa thiết lập",
   "Not configured: click to fix": "Chưa thiết lập: bấm để sửa",
   "Can't send to {device}, click to fix": "Không gửi được tới {device}, bấm để sửa",

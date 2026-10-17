@@ -2940,16 +2940,6 @@
     "Προστέθηκαν {n} κλιπ στους ήχους σου"
   ],
   "Copied “{name}”: Ctrl+V pastes it in an editor or on the Sounds tab": "Αντιγράφηκε το «{name}»: το Ctrl+V το επικολλά σε έναν επεξεργαστή ή στην καρτέλα Ήχοι",
-  "Keep": "Διατήρηση",
-  "Keep your imported sounds?": "Να κρατηθούν οι εισαγόμενοι ήχοι;",
-  "We brought over <b>{n}</b> sound from your other soundboards. Keep it?": [
-    "Φέραμε <b>{n}</b> ήχο από τα άλλα σου soundboard. Να τον κρατήσεις;",
-    "Φέραμε <b>{n}</b> ήχους από τα άλλα σου soundboard. Να τους κρατήσεις;"
-  ],
-  "We brought over <b>{n}</b> sound from {name}. Keep it?": [
-    "Φέραμε <b>{n}</b> ήχο από το {name}. Να τον κρατήσεις;",
-    "Φέραμε <b>{n}</b> ήχους από το {name}. Να τους κρατήσεις;"
-  ],
   "Compatibility fixes for games, calls and browsers.": "Διορθώσεις συμβατότητας για παιχνίδια, κλήσεις και browsers.",
   "Install update": "Εγκατάσταση ενημέρωσης",
   "Mic updated: games, calls and browsers hear your sounds.": "Το μικρόφωνο ενημερώθηκε: παιχνίδια, κλήσεις και browsers ακούν τους ήχους σου.",
@@ -2986,7 +2976,6 @@
   "Your mic needs a quick repair": "Το μικρόφωνό σου θέλει μια γρήγορη επισκευή",
   "Mute or unmute your mic for others. Your sounds still play for them.": "Σίγασε ή ενεργοποίησε το μικρόφωνό σου για τους άλλους. Οι ήχοι σου συνεχίζουν να ακούγονται σε αυτούς.",
   "That page has no sound Onion Board can add.": "Αυτή η σελίδα δεν έχει ήχο που μπορεί να προσθέσει το Onion Board.",
-  "Removed sounds come back with Undo, or later from Backup → Recently deleted sounds.": "Οι ήχοι που αφαιρούνται επιστρέφουν με Αναίρεση, ή αργότερα από Αντίγραφο ασφαλείας → Πρόσφατα διαγραμμένοι ήχοι.",
   "Not configured": "Δεν έχει ρυθμιστεί",
   "Not configured: click to fix": "Δεν έχει ρυθμιστεί: κάνε κλικ για διόρθωση",
   "Can't send to {device}, click to fix": "Δεν γίνεται αποστολή στο {device}, κάνε κλικ για διόρθωση",

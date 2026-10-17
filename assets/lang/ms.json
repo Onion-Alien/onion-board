@@ -2871,14 +2871,6 @@
     "{n} klip ditambah ke Bunyi anda"
   ],
   "Copied “{name}”: Ctrl+V pastes it in an editor or on the Sounds tab": "“{name}” disalin: Ctrl+V menampalnya dalam editor atau pada tab Bunyi",
-  "Keep": "Simpan",
-  "Keep your imported sounds?": "Simpan bunyi yang diimport?",
-  "We brought over <b>{n}</b> sound from your other soundboards. Keep it?": [
-    "Kami bawa <b>{n}</b> bunyi dari soundboard anda yang lain. Simpan?"
-  ],
-  "We brought over <b>{n}</b> sound from {name}. Keep it?": [
-    "Kami bawa <b>{n}</b> bunyi dari {name}. Simpan?"
-  ],
   "Compatibility fixes for games, calls and browsers.": "Pembaikan keserasian untuk permainan, panggilan dan pelayar.",
   "Install update": "Pasang kemas kini",
   "Mic updated: games, calls and browsers hear your sounds.": "Mikrofon dikemas kini: permainan, panggilan dan pelayar mendengar bunyi anda.",
@@ -2915,7 +2907,6 @@
   "Your mic needs a quick repair": "Mikrofon anda perlu dibaiki sekejap",
   "Mute or unmute your mic for others. Your sounds still play for them.": "Bisukan atau hidupkan mikrofon anda untuk orang lain. Bunyi anda masih dimainkan untuk mereka.",
   "That page has no sound Onion Board can add.": "Halaman itu tiada bunyi yang boleh ditambah oleh Onion Board.",
-  "Removed sounds come back with Undo, or later from Backup → Recently deleted sounds.": "Bunyi yang dibuang kembali dengan Buat asal, atau kemudian dari Sandaran → Bunyi baru dipadam.",
   "Not configured": "Belum disediakan",
   "Not configured: click to fix": "Belum disediakan: klik untuk betulkan",
   "Can't send to {device}, click to fix": "Tidak boleh hantar ke {device}, klik untuk betulkan",
