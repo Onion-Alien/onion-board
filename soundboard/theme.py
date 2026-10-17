@@ -464,7 +464,13 @@ QPushButton#voicetile:checked { background:$accent; color:$on_accent; border:1px
 QPushButton#voicetile[art="true"] { padding:5px 10px 5px 6px; }
 QPushButton#voicetile:hover:!checked { border-color:$border_hi; }
 /* the Voice tab: its row of tabs, the voice changer's picture cards, the picked voice */
-QPushButton#voicetab { border-radius:10px; padding:7px 14px; background:$btn; border:1px solid $border; font-weight:600; }
+QPushButton#voicetab { border-radius:10px; padding:9px 16px; background:$btn; border:1px solid $border; font-weight:600; font-size:10pt; }
+QFrame#voicetabrule { background:$border; border:none; }
+QFrame#setupsstrip { border:1px solid $border; border-radius:10px; background:transparent; }
+QLabel#setupstitle { color:$muted; font-size:8.5pt; font-weight:600; background:transparent; }
+QWidget#setupsbar QPushButton#voicecat { border-radius:12px; padding:3px 10px; min-height:16px; font-size:8.5pt; background:$btn; border:1px solid transparent; color:$text; }
+QWidget#setupsbar QPushButton#voicecat:hover:!checked { background:$btn_hover; }
+QWidget#setupsbar QPushButton#voicecat:checked { background:$accent; border-color:$accent_hi; color:$on_accent; font-weight:600; }
 QPushButton#voicetab:hover:!checked { background:$btn_hover; border-color:$border_hi; }
 QPushButton#voicetab:checked { background:$accent; color:$on_accent; border-color:$accent_hi; }
 QPushButton#voicetab[live="true"]:!checked { color:$live_text; border-color:$live_border; }
@@ -906,7 +912,8 @@ OUTLINED = {"High Contrast"}
 OUTLINE_STYLE = Template("""
 QPushButton, QPushButton#danger, QLineEdit, QComboBox, QAbstractSpinBox,
 QFrame#chip, QFrame#card QFrame#chip, QFrame#fxcard, QLabel#pill, QPushButton#vchip,
-QFrame#card QToolButton#voicetile, QFrame#card QPushButton#voicecat { border:1px solid $border; }
+QFrame#card QToolButton#voicetile, QFrame#card QPushButton#voicecat,
+QWidget#setupsbar QPushButton#voicecat { border:1px solid $border; }
 QFrame#card, QFrame#setcard, QFrame#voicebar, QFrame#picked { border:1px solid $border; }
 """)
 

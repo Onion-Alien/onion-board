@@ -234,7 +234,18 @@ class VoicePanel(QWidget):
             tab = "addons"                # Custom voices joined Add-ons
         self._tab = tab if tab in TAB_KEYS else "fx"
         scroll.setWidget(page)
-        outer.addWidget(tab_row)
+        # the tabs are the tab's heading: a line under them keeps them apart from My
+        # setups (they looked like one row of the same buttons)
+        tab_head = QWidget()
+        th = QVBoxLayout(tab_head)
+        th.setContentsMargins(0, 0, 8, 0)
+        th.setSpacing(8)
+        th.addWidget(tab_row)
+        rule = QFrame()
+        rule.setObjectName("voicetabrule")
+        rule.setFixedHeight(1)
+        th.addWidget(rule)
+        outer.addWidget(tab_head)
         # My setups: under the tabs, so it's there whichever part is showing
         self.setups = voicesetups.Store()
         self._setups_at = outer.count()   # placed once the panels below are made
