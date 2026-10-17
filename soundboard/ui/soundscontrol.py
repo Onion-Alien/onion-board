@@ -136,10 +136,11 @@ class SoundsControl(Controller):
                      name=html.escape(meta.name), duration=meta.duration), "ok")
         return meta
 
-    def record_dialog(self):
+    def record_dialog(self, quick: bool = False):
         """Sounds tab → Record: record a sound with the mic, or a bit of what's playing.
         The window doesn't block the board: pads, web results, the radio and Space
-        still work while it's open (to play what's being recorded)."""
+        still work while it's open (to play what's being recorded). `quick` (the Voice
+        tab's Record): it starts recording your voice straight away."""
         mw = self.mw
         from soundboard.ui.recordmic import RecordDialog
         d = getattr(self, "_record_dlg", None)
@@ -170,6 +171,8 @@ class SoundsControl(Controller):
         d.finished.connect(closed)
         d.setModal(False)
         d.show()
+        if quick:
+            d.quick_start()
 
     def _playing_name(self) -> str:
         """What's playing now, for naming a recording of it: the player's sound (a pad

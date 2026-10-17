@@ -387,6 +387,30 @@ def test_the_record_window_leaves_the_board_usable(window):  # noqa: F811
     assert window.soundctl._record_dlg is None
 
 
+def test_quick_start_records_your_voice_changed_while_the_voice_changer_is_on(app_dir):
+    for voice_on, source in ((True, "fx"), (False, "mic")):
+        e = both_engine()
+        d = RecordDialog(e, lambda v=voice_on: v, lambda: [], lambda *a: True, lambda: None)
+        d.opt_play.setChecked(True)          # whatever was picked last time
+        assert d.quick_start()
+        assert RecordDialog.last_source == source
+        assert d.take is not None and not d.take.playing and not d.take.both
+        assert d.btn_rec.isChecked()
+        d.discard()
+        RecordDialog.last_source = "mic"
+        d.deleteLater()
+
+
+def test_the_voice_tabs_record_button_opens_the_record_window(window):  # noqa: F811
+    window.voice.bar.record_button.click()
+    d = window.soundctl._record_dlg
+    assert d is not None and d.isVisible()
+    d.discard()
+    d.reject()
+    assert window.soundctl._record_dlg is None
+    RecordDialog.last_source = "mic"
+
+
 # ------------------------------------------------------------------ both at once
 
 def both_engine() -> Engine:

@@ -1,0 +1,1 @@
+- Voice tab: a Record button next to Stop records your voice straight away (as others hear it while the voice changer is on), to keep as a sound.

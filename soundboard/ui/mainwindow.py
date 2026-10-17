@@ -876,6 +876,8 @@ class MainWindow(QMainWindow):
             v.fx.chat_help.connect(lambda: self.statusctl.show_chat_guide("discord"))
             v.fx.hotkey_asked.connect(self.hkctl.set_voice_hotkey)
             v.share_asked.connect(self.share_voice)
+            v.bar.record_button.clicked.connect(
+                lambda: self.soundctl.record_dialog(quick=True))
             v.fx.hotkey_cleared.connect(lambda n: self.hkctl.set_voice_hotkey(n, ""))
             v.fx.renamed.connect(self.hkctl.voice_renamed)
             v.fx.keys = dict(self.cfg.voice_hotkeys)

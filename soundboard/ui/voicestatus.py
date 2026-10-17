@@ -102,6 +102,15 @@ class VoiceStatusBar(QFrame):
         self.stop_button.setMinimumWidth(STOP_H * 2)
         icons.set_icon(self.stop_button, "stop", "danger_text", size=18)
         mh.addWidget(self.stop_button)
+        # quick record: opens Record a sound already recording your voice (as others
+        # hear it while the voice changer is on), to keep as a sound
+        self.record_button = QPushButton(_("Record"))
+        self.record_button.setToolTip(_("Record your voice as others hear it and keep it "
+                                        "as a sound"))
+        self.record_button.setCursor(Qt.CursorShape.PointingHandCursor)
+        self.record_button.setFixedHeight(STOP_H)
+        icons.set_icon(self.record_button, "record", "danger_text", size=16)
+        mh.addWidget(self.record_button)
         self.mic_icon = icon_label("mic", _("Your mic level"))
         mh.addWidget(self.mic_icon)
         self.lbl_mic = QLabel(_("No mic open"))   # only then: the icon says the rest
@@ -194,8 +203,9 @@ class VoiceStatusBar(QFrame):
         # would squeeze it below that, put them underneath instead. (Half the whole
         # bar, Stop included, sent two chips with their close buttons under the meter
         # on a window that had room for them.)
-        mic_labels = self._mic.minimumSizeHint().width() - self.meter.minimumWidth()
-        meter = (self.width() - self.stop_button.width() + 1) // 2
+        mic_labels = (self._mic.layout().sizeHint().width()
+                      - self.meter.sizeHint().width())
+        meter = (self.width() - self.stop_button.width() - self.record_button.width() + 1) // 2
         need = max(160, meter + mic_labels) + GAP + line
         d = QBoxLayout.Direction.LeftToRight if room >= need else QBoxLayout.Direction.TopToBottom
         # beside the meter the chips keep to one line; under it they wrap
