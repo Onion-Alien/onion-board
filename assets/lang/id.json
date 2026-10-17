@@ -2435,7 +2435,6 @@
   "Zoom out": "Perkecil",
   "headphones": "headphone",
   "mic": "mikrofon",
-  "only you hear the radio: press “Send” below so others hear it too": "hanya Anda yang mendengar radio: tekan “Kirim” di bawah agar orang lain juga mendengarnya",
   "others hear it": "orang lain mendengarnya",
   "sending": "mengirim",
   "{kbps} kbps +": "{kbps} kbps +",
@@ -3552,6 +3551,11 @@
   "Show tutorials": "Tunjukkan panduan",
   "Start some music or a game, then press Send on it. Everyone in your call hears it.": "Putar musik atau game, lalu tekan Mengirim di situ. Semua orang di panggilanmu mendengarnya.",
   "Turn on a trigger": "Nyalakan pemicu",
-  "Click any dot to play that station. Press Send and your call hears it too.": "Klik titik mana saja untuk memutar stasiun itu. Tekan Mengirim dan panggilanmu juga mendengarnya.",
-  "Pick a station on the globe": "Pilih stasiun di bola dunia"
+  "Pick a station on the globe": "Pilih stasiun di bola dunia",
+  "Just me": "Hanya saya",
+  "Me and others": "Saya dan orang lain",
+  "Send to others": "Kirim ke orang lain",
+  "Who should hear the radio?": "Siapa yang boleh dengar radionya?",
+  "only you hear it": "hanya kamu yang dengar",
+  "Click any dot to play that station. Press Send to others and your call hears it too.": "Klik titik mana saja untuk memutar stasiun itu. Tekan Kirim ke orang lain dan panggilanmu juga mendengarnya."
 }

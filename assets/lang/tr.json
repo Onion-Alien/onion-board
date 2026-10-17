@@ -2489,7 +2489,6 @@
   "Zoom out": "Uzaklaştır",
   "headphones": "kulaklıklar",
   "mic": "mikrofon",
-  "only you hear the radio: press “Send” below so others hear it too": "radyoyu yalnızca siz duyarsınız: başkalarının da duyması için aşağıdaki \"Gönder\"e basın",
   "others hear it": "diğerleri bunu duyuyor",
   "sending": "gönderme",
   "{kbps} kbps +": "{kbps} kbps +",
@@ -3629,6 +3628,11 @@
   "Show tutorials": "Nasıl yapılırları göster",
   "Start some music or a game, then press Send on it. Everyone in your call hears it.": "Biraz müzik ya da bir oyun aç, sonra yanındaki Göndermek'e bas. Görüşmendeki herkes duyar.",
   "Turn on a trigger": "Bir tetikleyici aç",
-  "Click any dot to play that station. Press Send and your call hears it too.": "O istasyonu çalmak için herhangi bir noktaya tıkla. Göndermek'e bas, görüşmendekiler de duysun.",
-  "Pick a station on the globe": "Küre üzerinden bir istasyon seç"
+  "Pick a station on the globe": "Küre üzerinden bir istasyon seç",
+  "Just me": "Sadece ben",
+  "Me and others": "Ben ve diğerleri",
+  "Send to others": "Diğerlerine gönder",
+  "Who should hear the radio?": "Radyoyu kim duysun?",
+  "only you hear it": "sadece sen duyuyorsun",
+  "Click any dot to play that station. Press Send to others and your call hears it too.": "O istasyonu çalmak için herhangi bir noktaya tıkla. Diğerlerine gönder'e bas, görüşmendekiler de duysun."
 }

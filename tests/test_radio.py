@@ -1629,7 +1629,7 @@ def test_a_click_on_a_station_plays_it_and_the_bar_shows_what_plays(qapp, tab, s
     from PySide6.QtTest import QTest
     for s in tab._stations.values():
         s.url = server.base + "/stream.wav"
-    assert tab.now.name == "" and tab.btn_live.text() == "Send"
+    assert tab.now.name == "" and tab.btn_live.text() == "Send to others"
     tab.list.resize(400, 400)
     it = tab.list.item(1)
     at = tab.list.visualItemRect(it).center()     # the row's name, not its badge
@@ -1642,9 +1642,71 @@ def test_a_click_on_a_station_plays_it_and_the_bar_shows_what_plays(qapp, tab, s
     process_events(qapp, lambda: False, timeout=0.1)
     assert tab.player is playing and tab.player.station.uuid == uuid   # not restarted
     tab.btn_live.click()
-    assert tab.btn_live.text() == "Sending" and tab.engine.radio_live
+    assert tab.btn_live.text() == "Others hear it" and tab.engine.radio_live
     tab.toggle_play()                                # Space / the Stop button
     assert tab.player.station is None and tab.now.name == ""
+
+
+def test_the_first_station_asks_once_who_hears_it_and_remembers(qapp, tab, server,
+                                                                 app_dir):
+    """Send used to start off on every launch with only a grey line saying so: people
+    played a station, heard it themselves and thought it was broken. Now the first
+    station asks once, the answer is kept, and the next start sends as chosen."""
+    from soundboard.ui.radiopanel import RadioTab
+    s = tab._stations["uuid-0"]
+    s.url = server.base + "/stream.wav"
+    assert tab.ask_bar.isHidden() and "send" not in tab.cfg.radio
+    tab.play(s)
+    assert not tab.ask_bar.isHidden() and not tab.engine.radio_live
+    assert "<a " not in tab.info.text()           # one question at a time
+    tab.stop()
+    assert tab.ask_bar.isHidden()                 # unanswered: asked again next time
+    tab.play(s)
+    assert not tab.ask_bar.isHidden()
+    tab.btn_ask_all.click()
+    assert tab.ask_bar.isHidden() and tab.engine.radio_live and tab.btn_live.isChecked()
+    assert tab.cfg.radio["send"] is True
+    tab.stop()
+    tab.play(s)
+    assert tab.ask_bar.isHidden()                 # asked once only
+    tab.stop()
+    again = RadioTab(FakeEngine(), tab.cfg, lambda: None, FakeMeter,
+                     directory=RadioDirectory(app_dir / "radio2", bases=(server.base,)),
+                     globe=False)
+    try:
+        assert again.engine.radio_live and again.btn_live.isChecked()
+        assert again.btn_live.text() == "Others hear it"
+        again.btn_live.click()                    # the button changes the kept choice too
+        assert again.cfg.radio["send"] is False and not again.engine.radio_live
+    finally:
+        again.shutdown()
+
+
+def test_just_me_is_kept_and_the_line_under_the_list_can_send(qapp, tab, server):
+    s = tab._stations["uuid-0"]
+    s.url = server.base + "/stream.wav"
+    tab.play(s)
+    tab.btn_ask_me.click()
+    assert tab.ask_bar.isHidden() and tab.cfg.radio["send"] is False
+    assert not tab.engine.radio_live
+    assert "only you hear it" in tab.info.text() and "<a " in tab.info.text()
+    tab.info.linkActivated.emit("send")           # "Send to others" on the hint line
+    assert tab.engine.radio_live and tab.btn_live.isChecked()
+    assert tab.cfg.radio["send"] is True and "others hear it" in tab.info.text()
+
+
+def test_send_is_ringed_only_while_a_station_plays_to_just_you(qapp, tab, server):
+    s = tab._stations["uuid-0"]
+    s.url = server.base + "/stream.wav"
+    assert not tab.btn_live.property("nudge")     # nothing playing
+    tab.play(s)
+    assert tab.btn_live.property("nudge")         # playing, only you hear it
+    tab.btn_live.click()                          # (answers the question too)
+    assert not tab.btn_live.property("nudge") and tab.ask_bar.isHidden()
+    tab.btn_live.click()
+    assert tab.btn_live.property("nudge")
+    tab.stop()
+    assert not tab.btn_live.property("nudge")
 
 
 def test_a_station_error_is_an_error_card_that_stays(tab):

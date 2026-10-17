@@ -71,7 +71,7 @@ def test_radio_bar_buttons_line_up_and_keep_their_size_when_narrow(window):  # n
     w.resize(800, 600)
     pump()
     # Now playing hidden: its room isn't shared out into Play / shuffle / Send (Play and
-    # Send keep the room of their other word, Stop / Sending, and no more)
+    # Send keep the room of their other word, Stop / Others hear it, and no more)
     for b in (r.btn_play, r.btn_random, r.btn_live):
         assert b.width() <= max(b.sizeHint().width(), b.minimumWidth()), \
             b.accessibleName() or b.text()
@@ -90,10 +90,10 @@ def test_radio_bar_buttons_stay_put_on_play_stop_and_send(window, monkeypatch): 
     monkeypatch.setattr(r.player, "station", SimpleNamespace(name="Some radio", uuid="u"))
     r._update_buttons()          # Play -> Stop
     r.btn_live.blockSignals(True)
-    r.btn_live.setChecked(True)  # Send -> Sending
+    r.btn_live.setChecked(True)  # Send to others -> Others hear it
     r._label_live()
     pump()
-    assert r.btn_play.text() == "Stop" and r.btn_live.text() == "Sending"
+    assert r.btn_play.text() == "Stop" and r.btn_live.text() == "Others hear it"
     assert spots() == before
     r.btn_live.setChecked(False)
     r._label_live()

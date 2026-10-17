@@ -2543,7 +2543,6 @@
   "Zoom out": "Pomniejsz",
   "headphones": "słuchawki",
   "mic": "mikrofon",
-  "only you hear the radio: press “Send” below so others hear it too": "tylko Ty słyszysz radio: naciśnij „Wyślij” poniżej, aby inni też je usłyszeli",
   "others hear it": "inni to słyszą",
   "sending": "przesyłka",
   "{kbps} kbps +": "{kbps} kb/s +",
@@ -3706,6 +3705,11 @@
   "Show tutorials": "Pokazuj poradniki",
   "Start some music or a game, then press Send on it. Everyone in your call hears it.": "Włącz muzykę albo grę, a potem naciśnij przy niej Wysłać. Wszyscy w rozmowie ją usłyszą.",
   "Turn on a trigger": "Włącz wyzwalacz",
-  "Click any dot to play that station. Press Send and your call hears it too.": "Kliknij dowolną kropkę, żeby włączyć tę stację. Naciśnij Wysłać, a usłyszy ją też twoja rozmowa.",
-  "Pick a station on the globe": "Wybierz stację na globusie"
+  "Pick a station on the globe": "Wybierz stację na globusie",
+  "Just me": "Tylko ja",
+  "Me and others": "Ja i inni",
+  "Send to others": "Wyślij innym",
+  "Who should hear the radio?": "Kto ma słyszeć radio?",
+  "only you hear it": "słyszysz to tylko ty",
+  "Click any dot to play that station. Press Send to others and your call hears it too.": "Kliknij dowolną kropkę, żeby włączyć tę stację. Naciśnij Wyślij innym, a usłyszy ją też twoja rozmowa."
 }

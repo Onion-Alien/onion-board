@@ -2489,7 +2489,6 @@
   "Zoom out": "Zoom ud",
   "headphones": "høretelefoner",
   "mic": "mikrofon",
-  "only you hear the radio: press “Send” below so others hear it too": "kun du hører radioen: tryk på \"Send\" nedenfor, så andre også hører den",
   "others hear it": "andre hører det",
   "sending": "afsendelse",
   "{kbps} kbps +": "{kbps} kbps +",
@@ -3629,6 +3628,11 @@
   "Show tutorials": "Vis vejledninger",
   "Start some music or a game, then press Send on it. Everyone in your call hears it.": "Start noget musik eller et spil, og tryk så på Sende ved det. Alle i dit opkald hører det.",
   "Turn on a trigger": "Slå en trigger til",
-  "Click any dot to play that station. Press Send and your call hears it too.": "Klik på en prik for at afspille stationen. Tryk på Sende, så hører dit opkald den også.",
-  "Pick a station on the globe": "Vælg en station på kloden"
+  "Pick a station on the globe": "Vælg en station på kloden",
+  "Just me": "Kun mig",
+  "Me and others": "Mig og andre",
+  "Send to others": "Send til andre",
+  "Who should hear the radio?": "Hvem skal høre radioen?",
+  "only you hear it": "kun du hører den",
+  "Click any dot to play that station. Press Send to others and your call hears it too.": "Klik på en prik for at afspille stationen. Tryk på Send til andre, så hører dit opkald den også."
 }

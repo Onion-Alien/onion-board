@@ -16,7 +16,7 @@ import time
 import numpy as np
 from PySide6.QtCore import QEvent, QRectF, Qt, QTimer, Signal
 from PySide6.QtGui import QColor, QFont, QPainter
-from PySide6.QtWidgets import (QButtonGroup, QCheckBox, QComboBox, QHBoxLayout, QLabel,
+from PySide6.QtWidgets import (QButtonGroup, QCheckBox, QComboBox, QFrame, QHBoxLayout, QLabel,
                                QLineEdit, QPushButton, QSizePolicy, QSplitter, QVBoxLayout,
                                QWidget)
 
@@ -277,7 +277,30 @@ class RadioTab(QWidget):
         self.info.setWordWrap(True)
         self.info.setTextFormat(Qt.TextFormat.RichText)
         self.info.setObjectName("muted")
+        self.info.setTextInteractionFlags(Qt.TextInteractionFlag.LinksAccessibleByMouse)
+        self.info.linkActivated.connect(lambda _link: self._on_live(True))   # Send to others
         v.addWidget(self.info)
+
+        # Who hears the radio: asked once, on the first station, then remembered
+        # (cfg.radio["send"]). The Send button changes it any time after.
+        self.ask_bar = QFrame()
+        self.ask_bar.setObjectName("tipbar")
+        ah = QHBoxLayout(self.ask_bar)
+        ah.setContentsMargins(12, 6, 6, 6)
+        ah.setSpacing(8)
+        ask = QLabel(_("Who should hear the radio?"))
+        ask.setWordWrap(True)
+        ah.addWidget(ask, 1)
+        self.btn_ask_all = QPushButton(_("Me and others"))
+        self.btn_ask_all.setObjectName("primary")
+        self.btn_ask_all.clicked.connect(lambda: self._on_live(True))
+        ah.addWidget(self.btn_ask_all)
+        self.btn_ask_me = QPushButton(_("Just me"))
+        self.btn_ask_me.setObjectName("small")
+        self.btn_ask_me.clicked.connect(lambda: self._on_live(False))
+        ah.addWidget(self.btn_ask_me)
+        self.ask_bar.hide()
+        v.addWidget(self.ask_bar)
 
         # ---- control bar: play, random, star | live ... record | volume | hear
         bar_, bh = bar()
@@ -343,8 +366,8 @@ class RadioTab(QWidget):
         bh.addWidget(self.chk_hear)
         v.addWidget(bar_)
 
-        # Send always starts off
-        self._on_live(False)
+        # Send as last chosen (asked on the first station played)
+        self._on_live(cfg.radio.get("send") is True, remember=False)
         self._on_vol(self.vol.value())
         hear = bool(cfg.radio.get("monitor", True))
         self.chk_hear.setChecked(hear)
@@ -682,6 +705,8 @@ class RadioTab(QWidget):
         self._save()
         self._select_on_globe(fly=True)
         self.listctl._restate_rows(rebuild=self.btn_recent.isChecked() and not self._query)
+        if "send" not in self.cfg.radio:
+            self.ask_bar.show()       # once: who should hear it?
         self._refresh_info()
         self._report_active()
 
@@ -759,6 +784,9 @@ class RadioTab(QWidget):
     def _update_buttons(self):
         on = self.player.station is not None
         self._update_now()
+        self._nudge_live()
+        if not on:
+            self.ask_bar.hide()       # stopped unanswered: asked again on the next one
         word = _("Stop") if on else _("Play")
         _steady_text(self.btn_play, "" if self._play_short else word, _("Stop"), _("Play"))
         self.btn_play.setAccessibleName(word)     # still named when it's only an icon
@@ -832,8 +860,10 @@ class RadioTab(QWidget):
                 text += (f"  <span style='color:{theme.status('ok')}'>· "
                          + _("others hear it") + "</span>")
             else:
-                text += "  · " + _("only you hear the radio: press “Send” below so others "
-                                   "hear it too")
+                text += "  · " + _("only you hear it")
+                if self.ask_bar.isHidden():   # (while it asks, it asks)
+                    text += (f"  · <a href='send' style='color:{theme.T['accent_link']};'>"
+                             + html.escape(_("Send to others")) + "</a>")
         self.info.setText(text)
 
     # ------------------------------------------------------------------ favourites
@@ -853,7 +883,13 @@ class RadioTab(QWidget):
         self.listctl._restate_rows(s.uuid, rebuild=self.btn_favs.isChecked() or bool(self._query))
 
     # ------------------------------------------------------------------ controls
-    def _on_live(self, on: bool):
+    def _on_live(self, on: bool, remember: bool = True):
+        """Others hear the radio (`on`) or only you do. A choice (the button, the ask bar,
+        the hint's link, a phone) is remembered for the next start."""
+        if remember:
+            self.cfg.radio["send"] = on
+            self.ask_bar.hide()
+            self._save()
         self.engine.radio_live = on
         self.btn_live.blockSignals(True)
         self.btn_live.setChecked(on)
@@ -865,11 +901,23 @@ class RadioTab(QWidget):
 
     def _label_live(self):
         on = self.btn_live.isChecked()
-        _steady_text(self.btn_live, _("Sending") if on else _("Send"), _("Sending"), _("Send"))
+        _steady_text(self.btn_live, _("Others hear it") if on else _("Send to others"),
+                     _("Others hear it"), _("Send to others"))
         icons.text_gap(self.btn_live)   # (its icon was set before it had words)
+        self._nudge_live()
         self.btn_live.setToolTip(_("Others hear the radio. Click so only you do.") if on else
                                  _("Send the radio out to others, the way your sounds go "
                                    "(Setup tab). Off: only you hear it."))
+
+    def _nudge_live(self):
+        """A station playing to only you: Send gets the accent edge, so it's found."""
+        nudge = self.player.station is not None and not self.btn_live.isChecked()
+        if bool(self.btn_live.property("nudge")) != nudge:
+            self.btn_live.setProperty("nudge", nudge)
+            icons.set_icon(self.btn_live, "live", "accent" if nudge else None,
+                           checked_color="on_live")
+            self.btn_live.style().unpolish(self.btn_live)
+            self.btn_live.style().polish(self.btn_live)
 
     def _search_hint(self):
         """The search box's hint, pointing at the map only while it's showing."""
