@@ -12,9 +12,10 @@ database_id = "db1ea851-8ee1-414c-8674-8be70a5b7f0c"
 binding = "FILES"
 id = "30ae4ae2184e43b5833d37116a390286"
 
-# once a day: drop action-log rows over 90 days old and old rate-limit counters
+# once a day: drop action-log rows over 90 days old and old rate-limit counters;
+# every 10 minutes: one page of Myinstants into the store as links (src/sync.js)
 [triggers]
-crons = ["17 3 * * *"]
+crons = ["17 3 * * *", "*/10 * * * *"]   # the daily clean-up; a site sync step
 
 # Secrets (never in this file): `npx wrangler secret put ADMIN_TOKEN` and `... SALT`
 

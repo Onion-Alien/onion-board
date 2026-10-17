@@ -4,6 +4,7 @@ import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import { DatabaseSync } from "node:sqlite";
 import worker, { prune } from "../src/index.js";
+import { jobs, parseMyinstants } from "../src/sync.js";
 
 const SCHEMA = readFileSync(new URL("../schema.sql", import.meta.url), "utf8");
 const TOKEN = "t".repeat(40);
@@ -23,6 +24,7 @@ class FakeD1 {
     };
     return st;
   }
+  async batch(stmts) { for (const st of stmts) await st.run(); }
   rows(sql, ...a) { return this.db.prepare(sql).all(...a); }
 }
 
@@ -370,4 +372,141 @@ test("unknown routes and the review page", async () => {
   const page = await call(env, "/admin");
   assert.equal(page.status, 200);
   assert.match(page.headers.get("content-security-policy"), /frame-ancestors 'none'/);
+});
+
+// ------------------------------------------------------------------ sites synced in
+
+const button = (file, title) => `<div class="instant"><button class="small-button" ` +
+  `onclick="play('/media/sounds/${file}.mp3', 'loader-1', 'x')"></button>` +
+  `<a href="/en/instant/${file}/" class="instant-link link-secondary">${title}</a></div>`;
+const PAGES = {
+  trending: button("vine-boom", "VINE BOOM") + button("bruh", "Bruh &amp; co"),
+  games: button("roblox-oof", "ROBLOX oof") + button("vine-boom", "Vine boom (games)") +
+         button("roblox-oof", "dupe on the page") + button("mario", "Mario jump"),
+};
+
+function fakeSite(calls = []) {
+  return async url => {
+    calls.push(url);
+    if (url.includes("/en/index/")) return new Response(PAGES.trending);
+    if (url.includes("/categories/games/")) return new Response(PAGES.games);
+    return new Response("<html>nothing</html>");
+  };
+}
+
+async function step(env, fetcher = fakeSite()) {
+  const real = globalThis.fetch;
+  globalThis.fetch = fetcher;
+  try {
+    return await call(env, "/v1/admin/sync", { method: "POST", admin: true });
+  } finally { globalThis.fetch = real; }
+}
+
+test("Myinstants' page is read for each button's name and MP3, once each", () => {
+  const hits = parseMyinstants(PAGES.games);
+  assert.deepEqual(hits.map(h => h.title), ["ROBLOX oof", "Vine boom (games)", "Mario jump"]);
+  assert.equal(hits[0].link, "https://www.myinstants.com/media/sounds/roblox-oof.mp3");
+  assert.equal(parseMyinstants(PAGES.trending)[1].title, "Bruh & co");
+  assert.equal(jobs().length, 50);
+  assert.ok(jobs()[0][1].includes("/categories/games/us/?page=1"));
+});
+
+test("a sync step adds Myinstants' sounds as live links with a category, never twice", async () => {
+  const env = store();
+  const calls = [];
+  const r = await step(env, fakeSite(calls));
+  assert.equal(r.status, 200);
+  assert.equal(r.body.added, 4);   // 2 trending + roblox + mario (vine boom is the same link)
+  assert.equal(calls.length, 2);
+  const rows = env.DB.rows("SELECT * FROM sounds ORDER BY name");
+  assert.ok(rows.every(s => s.status === "live" && s.ext === "link" && s.source === "myinstants" && s.author === "Myinstants"));
+  const byName = Object.fromEntries(rows.map(s => [s.name, s]));
+  assert.equal(byName["ROBLOX oof"].cat, "games");
+  assert.equal(byName["ROBLOX oof"].link, "https://myinstants.com/media/sounds/roblox-oof.mp3");
+  assert.equal(byName["VINE BOOM"].cat, "games");   // a trending one learns its category
+  assert.ok(byName["VINE BOOM"].hot > byName["Bruh & co"].hot);
+  assert.ok(byName["ROBLOX oof"].pop > byName["Mario jump"].pop);
+  // the first cycle doesn't fill New with them
+  assert.ok(byName["ROBLOX oof"].created < Date.now() / 1000 - 29 * 86400);
+  assert.equal(env.DB.rows("SELECT value FROM sync")[0].value, "1:0");
+  assert.equal(log(env).filter(a => a.kind === "sync").length, 1);
+  // the same pages again: nothing new, nothing logged
+  env.DB.db.exec("UPDATE sync SET value = '0:0'");
+  assert.equal((await step(env)).body.added, 0);
+  assert.equal(env.DB.rows("SELECT count(*) AS n FROM sounds")[0].n, 4);
+  assert.equal(log(env).filter(a => a.kind === "sync").length, 1);
+});
+
+test("a synced sound the owner rejected, or people reported, stays that way", async () => {
+  const env = store();
+  await step(env);
+  const oof = env.DB.rows("SELECT id FROM sounds WHERE name = 'ROBLOX oof'")[0].id;
+  await call(env, `/v1/admin/sounds/${oof}`, { method: "POST", admin: true, json: { action: "reject" } });
+  env.DB.db.exec("UPDATE sync SET value = '0:0'");
+  await step(env);
+  assert.equal(env.DB.rows("SELECT status FROM sounds WHERE id = ?", oof)[0].status, "rejected");
+  // and a link someone already shared isn't added again under Myinstants' name
+  const env2 = store();
+  await call(env2, "/v1/links", { method: "POST", json: { link: "https://www.myinstants.com/media/sounds/mario.mp3", name: "my mario", agree: "link-v1" } });
+  await step(env2);
+  assert.deepEqual(env2.DB.rows("SELECT name, status FROM sounds WHERE link LIKE '%mario%'").map(r => ({ ...r })),
+                   [{ name: "my mario", status: "pending" }]);
+});
+
+test("a site that's down is logged and the cycle moves on", async () => {
+  const env = store();
+  const r = await step(env, async () => new Response("no", { status: 503 }));
+  assert.equal(r.status, 200);
+  assert.match(r.body.note, /failed/);
+  assert.equal(env.DB.rows("SELECT value FROM sync")[0].value, "1:0");
+  assert.deepEqual(log(env).map(a => a.kind), ["sync", "sync"]);   // trending and the page
+});
+
+test("the cron runs a sync step every 10 minutes and the clean-up once a day", async () => {
+  const env = store();
+  const real = globalThis.fetch;
+  globalThis.fetch = fakeSite();
+  try {
+    await worker.scheduled({ cron: "*/10 * * * *" }, env);
+    assert.equal(env.DB.rows("SELECT count(*) AS n FROM sounds")[0].n, 4);
+    await worker.scheduled({ cron: "17 3 * * *" }, env);
+    assert.equal(env.DB.rows("SELECT count(*) AS n FROM sounds")[0].n, 4);
+  } finally { globalThis.fetch = real; }
+});
+
+test("categories: a filter, counts for the chips, and the store's own sounds mixed in", async () => {
+  const env = store();
+  await step(env);
+  const ours = await live(env, "Air horn");
+  env.DB.db.prepare("UPDATE sounds SET cat = 'memes' WHERE id = ?").run(ours);
+  const names = async q => (await call(env, "/v1/sounds" + q)).body.sounds.map(s => s.name);
+  assert.deepEqual((await names("?cat=games")).sort(), ["Mario jump", "ROBLOX oof", "VINE BOOM"]);
+  assert.deepEqual(await names("?cat=memes"), ["Air horn"]);
+  assert.equal((await names("?cat=nope")).length, 5);   // an unknown one is ignored
+  const c = (await call(env, "/v1/categories")).body;
+  assert.deepEqual(c.categories.map(r => ({ ...r })), [{ cat: "games", n: 3 }, { cat: "memes", n: 1 }]);
+  assert.equal(c.total, 5);
+  const one = (await call(env, "/v1/sounds?cat=games")).body.sounds[0];
+  assert.equal(one.source, "myinstants");
+  assert.equal(one.cat, "games");
+  // Top: no votes yet, so popularity on the site, with the store's own sounds mid-way
+  const top = await names("");
+  assert.ok(top.indexOf("Air horn") > top.indexOf("ROBLOX oof"));
+  // a thumbs up lifts any sound above the rest
+  const mario = env.DB.rows("SELECT id FROM sounds WHERE name = 'Mario jump'")[0].id;
+  await call(env, `/v1/sounds/${mario}/vote`, { method: "POST", json: { value: 1 } });
+  assert.equal((await names(""))[0], "Mario jump");
+});
+
+test("Trending: hot on the site now, plus this week's thumbs up here", async () => {
+  const env = store();
+  await step(env);
+  const names = async () => (await call(env, "/v1/sounds?sort=trending")).body.sounds.map(s => s.name);
+  assert.deepEqual((await names()).slice(0, 2), ["VINE BOOM", "Bruh & co"]);
+  const mario = env.DB.rows("SELECT id FROM sounds WHERE name = 'Mario jump'")[0].id;
+  for (let i = 0; i < 4; i++)
+    await call(env, `/v1/sounds/${mario}/vote`, { method: "POST", json: { value: 1 }, ip: `5.5.5.${i}`, install: `${i}`.padStart(20, "7") });
+  assert.equal((await names())[0], "VINE BOOM");   // 1000 hot vs 160
+  env.DB.db.exec("UPDATE sounds SET hot = 0");     // hours later, nothing's trending there
+  assert.equal((await names())[0], "Mario jump");
 });

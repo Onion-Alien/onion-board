@@ -204,6 +204,31 @@ def test_a_request_answered_busy_never_runs_later(qapp, ctl, monkeypatch):
     assert ctl.calls == []
 
 
+def test_start_up_waits_answer_requests_and_nothing_else(qapp, ctl):
+    """Behind Windows' own loading screen nothing handles events: the update check as
+    the app starts still answers a Stream Deck press at once (remote.answer_waiting),
+    without running timers or anything else early."""
+    from PySide6.QtCore import QTimer
+
+    from soundboard.ui.updatecontrol import UpdateControl
+    fired = []
+    QTimer.singleShot(0, lambda: fired.append(1))
+    out = {}
+
+    def press():
+        c = http.client.HTTPConnection(remote.HOST, ctl.port, timeout=5)
+        c.request("GET", "/api/stop", headers={"Authorization": f"Bearer {TOKEN}"})
+        out["status"] = c.getresponse().status
+        c.close()
+    t = threading.Thread(target=press)
+    t.start()
+    end = time.monotonic() + 2.5   # a slow GitHub
+    assert UpdateControl._wait(lambda: t.join(2.5), lambda: time.monotonic() > end, "test")
+    assert out.get("status") == 200 and ctl.calls == [("stop", {})]
+    assert not fired   # (the event loop's own, later)
+    process_events(qapp, lambda: bool(fired))
+
+
 def test_a_port_out_of_range_is_reported_not_raised(qapp):
     c = remote.RemoteControl(lambda a, p: (200, {}))
     assert not c.start(70000, TOKEN) and "isn't a valid port" in c.error

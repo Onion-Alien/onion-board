@@ -250,7 +250,8 @@ def test_picks_queue_behind_an_add_and_a_full_queue_says_so(qapp, monkeypatch):
     assert not bar.add() and toasts   # no crash, a message instead
     bar.cancel(f"{OTHER}1")           # a waiting pick: its row is told it's off
     assert done == [(f"{OTHER}1", "add", False)]
-    assert [q["url"] for q in bar._queue_list] == [f"{OTHER}0", f"{OTHER}2"]
+    assert [q["url"] for q in bar._queue_list] == [
+        f"{OTHER}{i}" for i in range(linkbar.MAX_QUEUED) if i != 1]
 
 
 def test_play_now_goes_before_adds_after_waiting_plays(qapp, monkeypatch):
