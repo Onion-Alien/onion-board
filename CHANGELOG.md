@@ -2,6 +2,17 @@
 
 Changes not released yet are in [changelog.d/](changelog.d/), one file per change.
 
+## 2.3.1 — 2026-10-17
+
+- Chat: with nobody talking, the Chat tab no longer asks the server again and again
+  without a pause; it waits for news and asks at most about once a second.
+- Chat and the sound store: reports now count once per internet address, so one person
+  can't mute someone or take a sound off the store with made-up installs. Mutes and bans
+  cover the address too, and reports and votes have their own limits.
+- Search results and the store: a title with HTML in it shows as plain text in its tooltip.
+- Settings: with the Sounds or Radio tab underneath, pressing Space on a box you clicked now
+  ticks it, instead of playing or pausing the sound.
+
 ## 2.3.0 — 2026-10-16
 
 - Pong with Bun opens again in the installed app: it stopped with a missing-module error.
