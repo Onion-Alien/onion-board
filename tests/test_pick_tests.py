@@ -101,3 +101,14 @@ def test_times_come_from_the_runs_junit_reports(tmp_path):
     reports = sorted(tmp_path.rglob("*.xml"))
     assert pick_tests.refresh_times(reports) == {"tests/test_a.py": 1.8,
                                                  "tests/test_b.py": 2.0}
+
+
+def test_shards_caps_the_number_of_jobs(capsys):
+    """main's run after a merge asks for fewer jobs (--shards=3): every test file still
+    runs, in no more jobs than asked."""
+    assert pick_tests.main(["pick_tests.py", "all", "--matrix", "--shards=3"]) == 0
+    import json
+    jobs = json.loads(capsys.readouterr().out)
+    assert [j["shard"] for j in jobs] == ["1/3", "2/3", "3/3"]
+    files = sorted(f for j in jobs for f in j["tests"].split())
+    assert files == pick_tests.all_tests()
