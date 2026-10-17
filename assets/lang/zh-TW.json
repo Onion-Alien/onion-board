@@ -4013,5 +4013,6 @@
   "Uncommon": "優秀",
   "<b>{device}</b> looks like speakers, so your mic hears itself. Keep them quiet or use headphones. If it starts to squeal, this switches off by itself.": "<b>{device}</b> 看起來是喇叭，麥克風會聽到自己。把音量調小，或戴耳機。如果開始嘯叫，這裡會自動關閉。",
   "Stopped <b>Hear what they hear</b>: your mic was picking up your speakers and started to squeal. Use headphones, or turn the speakers down.": "已停止<b>聽聽別人聽到什麼</b>：麥克風收到了喇叭的聲音，開始嘯叫。請戴耳機，或把喇叭調小。",
-  "Turn off {thing}": "關閉{thing}"
+  "Turn off {thing}": "關閉{thing}",
+  "Bun's almost done, one moment.": "Bun 快好了，請稍等。"
 }

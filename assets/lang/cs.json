@@ -4169,5 +4169,6 @@
   "Uncommon": "Neobvyklý",
   "<b>{device}</b> looks like speakers, so your mic hears itself. Keep them quiet or use headphones. If it starts to squeal, this switches off by itself.": "<b>{device}</b> vypadá jako reproduktory, takže mikrofon slyší sám sebe. Nech je potichu, nebo použij sluchátka. Když to začne pískat, samo se to vypne.",
   "Stopped <b>Hear what they hear</b>: your mic was picking up your speakers and started to squeal. Use headphones, or turn the speakers down.": "Zastaveno <b>Slyšet, co slyší oni</b>: mikrofon zachytával reproduktory a začal pískat. Použij sluchátka, nebo ztlum reproduktory.",
-  "Turn off {thing}": "Vypnout {thing}"
+  "Turn off {thing}": "Vypnout {thing}",
+  "Bun's almost done, one moment.": "Bun to má skoro hotové, chvilku."
 }

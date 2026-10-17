@@ -523,3 +523,62 @@ def test_effects_keeps_its_words_while_they_fit_and_its_name_always(qapp):
         bar.close()
         bar.deleteLater()
         fx.deleteLater()
+
+
+@pytest.mark.parametrize("layer", ["rain", "fire"])
+def test_weather_has_no_isolated_digital_cracks(layer):
+    x = backdrop.generate(layer, 5, seed=7)[SR:]
+    assert np.max(np.abs(x)) / _rms(x) < 8
+
+
+def test_crowd_contains_voiced_babble():
+    x = backdrop.generate("crowd", 3, seed=1)[SR:]
+    # Voiced talkers leave harmonic peaks; filtered white noise has no such
+    # structure. Compare narrow FFT bins with the surrounding 100 Hz band.
+    power = np.abs(np.fft.rfft(x * np.hanning(len(x)))) ** 2
+    hz = np.fft.rfftfreq(len(x), 1 / SR)
+    band = power[(hz > 300) & (hz < 1200)]
+    assert np.percentile(band, 99.5) / np.median(band) > 25
+
+
+@pytest.mark.parametrize("layer", ["engine", "space"])
+def test_background_tonal_motion_does_not_step_at_callback_edges(layer, monkeypatch):
+    cls = voicefx.REGISTRY["backdrop"]
+    monkeypatch.setattr(cls, "_noise", lambda self, n: np.zeros(n, np.float32))
+    a, b = cls(SR), cls(SR)
+    def render(e, block):
+        parts = []
+        for start in range(0, SR * 2, block):
+            n = min(block, SR * 2 - start)
+            parts.append(e.layer(layer, n, SR))
+            e.t += n / SR
+        return np.concatenate(parts)
+    assert np.allclose(render(a, 240), render(b, 2048), atol=2e-5)
+
+
+def test_idle_talk_gate_starts_closed():
+    e = voicefx.REGISTRY["backdrop"](SR, {"rain": 1, "talk": 1})
+    assert np.all(_run(e, np.zeros(SR, np.float32)) == 0)
+
+
+def test_typed_speech_uses_the_same_background_loops_as_the_mic():
+    chain = voicefx.VoiceChain()
+    chain.configure({"enabled": True, "effects": {
+        "backdrop": {"on": True, "rain": 1, "talk": 0}}})
+    chain.set_beds(backdrop.Beds({"rain": np.full(1000, 0.25, np.float32)},
+                                (("board", np.full(700, 0.5, np.float32), 1.0),)))
+    out = chain.render(np.zeros(4800, np.float32), SR, 480)
+    assert np.allclose(out[-480:], 0.75 * voicefx.REGISTRY["backdrop"].LEVEL)
+
+
+
+def test_wind_gusts_do_not_repeatedly_redesign_the_filter(monkeypatch):
+    from soundboard.voicefx import builtin
+    original = builtin.butter
+    designs = []
+    def design(*args, **kwargs):
+        designs.append(args)
+        return original(*args, **kwargs)
+    monkeypatch.setattr(builtin, "butter", design)
+    backdrop.generate("wind", 5, seed=1)
+    assert len(designs) == 2

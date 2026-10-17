@@ -281,7 +281,10 @@ class VoiceChain:
             cfg = self._spec.get("effects", {}).get(etype)
             if cfg and cfg.get("on") and etype not in self.errors:
                 try:
-                    effects.append(cls(rate, cfg))
+                    effect = cls(rate, cfg)
+                    if hasattr(effect, "beds"):
+                        effect.beds = self.beds  # pyright: ignore[reportAttributeAccessIssue] - Background loops
+                    effects.append(effect)
                 except Exception:  # noqa: BLE001
                     log.warning("voice effect %r couldn't start for the computer voice",
                                 etype, exc_info=True)

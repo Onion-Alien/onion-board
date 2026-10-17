@@ -4091,5 +4091,6 @@
   "Uncommon": "Uvanlig",
   "<b>{device}</b> looks like speakers, so your mic hears itself. Keep them quiet or use headphones. If it starts to squeal, this switches off by itself.": "<b>{device}</b> ser ut som høyttalere, så mikrofonen hører seg selv. Hold dem lavt eller bruk hodetelefoner. Hvis det begynner å hyle, slår dette seg av av seg selv.",
   "Stopped <b>Hear what they hear</b>: your mic was picking up your speakers and started to squeal. Use headphones, or turn the speakers down.": "Stoppet <b>Hør det de hører</b>: mikrofonen fanget opp høyttalerne og begynte å hyle. Bruk hodetelefoner, eller skru ned høyttalerne.",
-  "Turn off {thing}": "Slå av {thing}"
+  "Turn off {thing}": "Slå av {thing}",
+  "Bun's almost done, one moment.": "Bun er nesten ferdig, et øyeblikk."
 }

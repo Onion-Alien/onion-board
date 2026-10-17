@@ -1302,11 +1302,10 @@ def _paint_lantern(p: QPainter, x0: float, y0: float, s: float, inset: float) ->
     skin.setColorAt(1.0, QColor("#c2440a"))
     p.setPen(Qt.PenStyle.NoPen)
     p.fillPath(bulb(0.31), skin)
-    if s >= 20:   # ribs: the onion's layers
+    if s >= 20:   # ribs: the onion's layers (one at every size, like paint_logo's)
         rib = QPen(QColor(150, 50, 0, 150), max(1.0, s * 0.026))
         p.setPen(rib)
-        for w in ((0.19, 0.08) if s >= 40 else (0.15,)):
-            p.drawPath(bulb(w))
+        p.drawPath(bulb(0.15))
     glow = QLinearGradient(pt(0, 0.48), pt(0, 0.76))   # candlelight through the face
     glow.setColorAt(0.0, QColor("#fff6a8"))
     glow.setColorAt(1.0, QColor("#ffb020"))
@@ -1381,13 +1380,13 @@ def paint_logo(p: QPainter, rect: QRectF, c1: str, c2: str, inset: float = 0.04)
     # bulb
     p.setPen(Qt.PenStyle.NoPen)
     p.fillPath(bulb(0.29), fg)
-    # layers: inner outlines in the brand gradient, reading like sound waves
+    # layers: an inner outline in the brand gradient, reading like a sound wave. One at
+    # every size, so the taskbar's bigger icon is the same mark as the header's
     if s >= 20:
         lp = QPen(g, max(1.0, s * 0.032))
         lp.setCapStyle(Qt.PenCapStyle.RoundCap)
         p.setPen(lp)
-        for w in ((0.17, 0.07) if s >= 40 else (0.13,)):
-            p.drawPath(bulb(w))
+        p.drawPath(bulb(0.13))
     # roots
     if s >= 32:
         rp = QPen(fg, max(1.0, s * 0.03))
