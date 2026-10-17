@@ -12,14 +12,13 @@ from soundboard.ui import mainwindow as main
 from soundboard.ui import taboff
 from soundboard.ui.appspanel import AppsTab
 from soundboard.ui.radiopanel import RadioTab
-from soundboard.ui.chattab import ChatTab
 from soundboard.ui.storetab import StoreTab
 from soundboard.ui.tabcontrol import TAB_INDEX, TABS
 from soundboard.ui.triggerstab import TriggersTab
 from soundboard.ui.voicepanel import VoicePanel
 
 REAL = {"radio": RadioTab, "apps": AppsTab, "triggers": TriggersTab, "voice": VoicePanel,
-        "store": StoreTab, "chat": ChatTab}
+        "store": StoreTab}
 
 
 @pytest.fixture
@@ -98,7 +97,7 @@ def test_a_switched_off_tab_is_never_built(qapp, app_dir, monkeypatch):
         assert w.cfg.tabs_off == list(taboff.KEYS)
         assert w.tabs.isTabVisible(w.tabs.currentIndex())   # not the saved, hidden one
         assert [w.tabs.isTabVisible(i) for i in range(w.tabs.count())] == [
-            True, False, False, False, False, True, False, False]
+            True, False, False, False, False, True, False]
         assert w.engine.voice_chain is None
     finally:
         w.close()

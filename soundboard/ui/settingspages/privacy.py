@@ -692,7 +692,6 @@ class PrivacyPage(Page):
         self.dlg._net_subs = {}
         groups = (
             (_("Sounds and radio"), "music", ("sounds_web", "sound_packs", "sound_store", "radio")),
-            (_("Chat"), "chat", ("chat",)),
             (_("Voices"), "voice", ("voices", "voice_servers")),
             (_("Updates and add-ons"), "reload", ("app_update", "ytdlp_update", "addons")),
             (_("Setup downloads"), "download",

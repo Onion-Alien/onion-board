@@ -25,8 +25,6 @@ PITCH = {
                   "DIED, a kill, a queue popping."),
     "voice": _("Change your voice live: robots, monsters, other languages, or let it "
                "speak what you type."),
-    "chat": _("An anonymous room to talk to other players: text only, a new silly name "
-              "every day."),
 }
 
 
