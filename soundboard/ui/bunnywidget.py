@@ -61,6 +61,7 @@ from soundboard.bunny import (
     INK,
     PINK,
     PLANK_SPOT,
+    ROOM_TOP,
     ROBOT_CYAN,
     ROBOT_CYAN_HI,
     ROBOT_FUR,
@@ -71,6 +72,7 @@ from soundboard.bunny import (
     H,
     W,
     draw_bunny,
+    look_colour,
     music_note,
     sparkle,
 )
@@ -126,6 +128,7 @@ EAR_SPRING = (420.0, 13.0)     # ears trail his moves and wobble as they settle
 SQUASH_SPRING = (300.0, 15.0)  # his body jiggles back after a squash or stretch
 STRETCH = 0.05     # how tall and thin a fast move makes him, per Bun-height a second
 SQUASH = 0.6       # how hard a change of direction (a landing) squashes him
+BOB_UP = 2.2      # his idle bob, px each way
 EAR_DRAG = 9.0     # how far his ears trail behind, degrees per Bun-height a second
 BUBBLE = QColor("#fffaf0")
 BEG = 2.8          # how long a begging line stays up, seconds
@@ -411,11 +414,17 @@ class BunnyWidget(QWidget):
 
     def sizeHint(self) -> QSize:
         return QSize(round(self.bun_h * W / H) + 2 * self.pad + 20 + 2 * self.side,
-                     self.bun_h + 2 * self.pad)
+                     self.bun_h + 2 * self.pad + self._head())
 
     def minimumSizeHint(self) -> QSize:
         """The bubble's room gives way when space is short (it then overlaps him)."""
-        return QSize(round(self.bun_h * W / H) + 2 * self.pad + 20, self.bun_h + 2 * self.pad)
+        return QSize(round(self.bun_h * W / H) + 2 * self.pad + 20,
+                     self.bun_h + 2 * self.pad + self._head())
+
+    def _head(self) -> int:
+        """Extra room above him where `pad` is too small for an upright ear (or a tall
+        hat) at the top of his bob: they reach ROOM_TOP above his canvas."""
+        return max(0, math.ceil(self.bun_h * ROOM_TOP / H + BOB_UP) - self.pad)
 
     # ------------------------------------------------------------------ inputs
     def set_level(self, level: float):
@@ -623,7 +632,8 @@ class BunnyWidget(QWidget):
 
     def _bun_rect(self) -> QRectF:
         w = self.bun_h * W / H
-        return QRectF((self.width() - w) / 2, (self.height() - self.bun_h) / 2, w, self.bun_h)
+        return QRectF((self.width() - w) / 2, (self.height() - self.bun_h + self._head()) / 2,
+                      w, self.bun_h)
 
     def _spawn(self, strength: float = 1.0, calm: bool = False):
         r = self._bun_rect()
@@ -976,7 +986,7 @@ class BunnyWidget(QWidget):
         """`pose` with the springy layer on top (what paintEvent draws)."""
         s = self._squash_s.x
         if s > 0:   # stretched tall: never past the top of his box (his ears got cut)
-            room = self._bun_rect().top() + pose["dy"] - 1
+            room = self._bun_rect().top() + pose["dy"] - 1 - self.bun_h * ROOM_TOP / H
             s = min(s, max(0.0, room / (self.bun_h * pose["sy"])))
         return {**pose, "ears": self._ears_s.x, "sy": pose["sy"] * (1 + s),
                 "sx": pose["sx"] * (1 - 0.6 * s)}
@@ -1122,7 +1132,7 @@ class BunnyWidget(QWidget):
         if self._flick_at >= 0 and (f := now - self._flick_at) < 0.5:
             ears += 14 * math.sin(f / 0.5 * math.pi) * math.cos(f * 30) * (1 - f / 0.5)
         ears += self._mouth * 8 * math.sin(t * 11)
-        dy = 2.2 * math.sin(t * 2.2) * (1 - 0.5 * self._sad)
+        dy = BOB_UP * math.sin(t * 2.2) * (1 - 0.5 * self._sad)
         ears += 8 * self._sad    # (the droop itself: draw_bunny folds them with `sad`)
         sx = sy = 1.0
         angle, alpha, look_dx = 0.0, 1.0, 0.0
@@ -1599,10 +1609,10 @@ class BunnyWidget(QWidget):
                     p.rotate(tilt + 8 * math.sin(t * 13))
                     p.translate(0, -16 * u * up)
                     p.setPen(QPen(ROBOT_INK if self.robot else INK, 1.6))
-                    p.setBrush(ROBOT_FUR if self.robot else FUR)
+                    p.setBrush(ROBOT_FUR if self.robot else look_colour("fur"))
                     p.drawEllipse(QRectF(-5 * u, -12 * u, 10 * u, 26 * u))
                     p.setPen(Qt.PenStyle.NoPen)
-                    p.setBrush(ROBOT_CYAN if self.robot else PINK)
+                    p.setBrush(ROBOT_CYAN if self.robot else look_colour("inner"))
                     p.drawEllipse(QRectF(-2.4 * u, -8 * u, 4.8 * u, 18 * u))
                     p.restore()
         p.setPen(QPen(DUST_INK, 1.5))

@@ -1047,19 +1047,38 @@ def _sparkle(p: QPainter, x, y, r, col: QColor):
 sparkle = _sparkle
 
 
+# room round his canvas in a picture of him, canvas units: an upright ear reaches 7
+# above it and a collar (Vampire's) 5 past each side
+ROOM_TOP, ROOM_SIDE = 8.0, 7.0
+
+
+def look_colour(part: str) -> QColor:
+    """A colour of the current theme's look (`bunnyfit.LOOKS`: "fur", "inner", ...),
+    for bits of him drawn outside draw_bunny (a paw holding a skit's prop, his ears
+    popping out of the build cloud), so they match the rest of him."""
+    return QColor(bunnyfit.look()[part])
+
+
 def bunny_image(height: int, prop: str | None = None, dpr: float = 1.0,
-                robot: bool = False, smug: bool = False) -> QImage:
-    h = max(1, round(height * dpr))
-    w = max(1, round(h * W / H))
+                robot: bool = False, smug: bool = False, room: bool = True) -> QImage:
+    """Bun `height` px tall in the current theme, with ROOM_TOP above him and ROOM_SIDE
+    either side so an upright ear, a tall hat or a wide collar isn't cut off (`room`
+    False: just his canvas, for art that crops him itself)."""
+    s = height * dpr / H
+    top, side = (ROOM_TOP * s, ROOM_SIDE * s) if room else (0.0, 0.0)
+    h = max(1, math.ceil(height * dpr + top))
+    w = max(1, math.ceil(W * s + 2 * side))
     img = QImage(w, h, QImage.Format.Format_ARGB32_Premultiplied)
     img.fill(Qt.GlobalColor.transparent)
     p = QPainter(img)
-    draw_bunny(p, QRectF(0, 0, w, h), prop, robot=robot, smug=smug)
+    draw_bunny(p, QRectF(side, h - height * dpr, W * s, height * dpr), prop,
+               robot=robot, smug=smug)
     p.end()
     img.setDevicePixelRatio(dpr)
     return img
 
 
 def bunny_pixmap(height: int, prop: str | None = None, dpr: float = 1.0,
-                 robot: bool = False, smug: bool = False) -> QPixmap:
-    return QPixmap.fromImage(bunny_image(height, prop, dpr, robot=robot, smug=smug))
+                 robot: bool = False, smug: bool = False, room: bool = True) -> QPixmap:
+    return QPixmap.fromImage(bunny_image(height, prop, dpr, robot=robot, smug=smug,
+                                         room=room))

@@ -5,7 +5,7 @@ import math
 import time
 
 from PySide6.QtCore import QRectF, QSize, QTimer, Qt
-from PySide6.QtGui import QBrush, QColor, QFont, QImage, QPainter, QPainterPath, QPixmap
+from PySide6.QtGui import QBrush, QColor, QFont, QPainter, QPainterPath, QPixmap
 from PySide6.QtWidgets import (QButtonGroup, QCheckBox, QColorDialog, QComboBox, QFrame,
                                QGridLayout, QHBoxLayout, QLabel, QLayout, QPushButton, QRadioButton,
                                QSlider, QVBoxLayout, QWidget)
@@ -34,24 +34,14 @@ _buns: dict[tuple[str, float], QPixmap] = {}
 BUN_H = 58   # Bun's height on a theme card
 
 
-BUN_ROOM = 8   # room above him: an upright ear and a tall hat reach past his canvas
-
-
 def _bun(name: str, dpr: float) -> QPixmap:
     """Bun as he looks in theme `name` (its headphones, outfit and look), for its card,
-    BUN_ROOM taller than him so nothing on top of his head is cut off."""
+    with room above and beside him (bunny.bunny_image) so nothing on him is cut off."""
     key = (name, dpr)
     if key not in _buns:
-        from soundboard.bunny import H, W, draw_bunny
-        w, room, h = BUN_H * W / H * dpr, BUN_ROOM * dpr, BUN_H * dpr
-        img = QImage(math.ceil(w), math.ceil(room + h), QImage.Format.Format_ARGB32_Premultiplied)
-        img.fill(Qt.GlobalColor.transparent)
-        p = QPainter(img)
+        from soundboard.bunny import bunny_pixmap
         with theme.previewing(name):
-            draw_bunny(p, QRectF(0, room, w, h))
-        p.end()
-        img.setDevicePixelRatio(dpr)
-        _buns[key] = QPixmap.fromImage(img)
+            _buns[key] = bunny_pixmap(BUN_H, dpr=dpr)
     return _buns[key]
 
 

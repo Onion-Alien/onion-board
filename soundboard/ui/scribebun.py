@@ -28,7 +28,7 @@ from PySide6.QtGui import QColor, QPainter, QPainterPath, QPen, QPixmap
 from PySide6.QtWidgets import QSizePolicy, QWidget
 
 from soundboard import theme
-from soundboard.bunny import FUR, H, INK, W, WOOD, draw_bunny, sparkle
+from soundboard.bunny import H, INK, W, WOOD, draw_bunny, look_colour, sparkle
 from soundboard.ui.pixels import snap_to_pixels
 
 SLOT_W, SLOT_H = 56, 59          # about the old thumbnail's size: Bun's head over the scroll
@@ -641,5 +641,5 @@ class ScribeBunny(QWidget):
                       Qt.PenJoinStyle.RoundJoin))
         p.setBrush(QColor(theme.T["accent"]).lighter(125))
         p.drawPath(feather)
-        _oval(p, 4.5, -7, 12, 10, FUR, QPen(INK, 1.8))   # the paw
+        _oval(p, 4.5, -7, 12, 10, look_colour("fur"), QPen(INK, 1.8))   # the paw
         p.restore()

@@ -67,7 +67,7 @@ def _surface(w: float, h: float, scale: float) -> QImage:
     """Cache the stationary panel at the monitor's resolution, including its text."""
     status = _status or _("Starting…")
     family = theme.T.get("font", theme.FONT)
-    key = (w, h, scale, tuple(theme.T.items()), family, status)
+    key = (w, h, scale, theme.current_name, tuple(theme.T.items()), family, status)
     img = _surfaces.get(key)
     if img is None:
         img = QImage(round(w * scale), round(h * scale), QImage.Format.Format_ARGB32_Premultiplied)

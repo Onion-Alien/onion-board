@@ -25,7 +25,7 @@ from PySide6.QtCore import QPointF, QRectF, Qt
 from PySide6.QtGui import QColor, QFont, QPainter, QPainterPath, QPen, QRadialGradient
 
 from soundboard import theme
-from soundboard.bunny import FUR, INK, music_note, sparkle
+from soundboard.bunny import INK, look_colour, music_note, sparkle
 from soundboard.style import bunnyfit
 
 Draw = Callable[[QPainter], None]
@@ -111,8 +111,8 @@ def _oval(p: QPainter, x, y, w, h, fill, pen: QPen | None = None, angle: float =
 
 
 def paw(p: QPainter, x: float, y: float, angle: float = 0.0):
-    """One of his paws (they're only drawn when they hold something)."""
-    _oval(p, x, y, 12, 10.5, FUR, _ink(), angle)
+    """One of his paws (they're only drawn when they hold something), in his theme's fur."""
+    _oval(p, x, y, 12, 10.5, look_colour("fur"), _ink(), angle)
 
 
 def mark(p: QPainter, x: float, y: float, kind: str = "!", k: float = 1.0):

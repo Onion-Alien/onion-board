@@ -1,5 +1,7 @@
 """Every theme in theme.THEMES, not just Dark and Light: the bugs a full
 render of each one found, kept from coming back."""
+import math
+
 import pytest
 from PySide6.QtCore import QPoint, QSize
 from PySide6.QtGui import QColor, QIcon
@@ -228,15 +230,17 @@ def test_switched_on_icon_buttons_in_a_card_show_their_icon(qapp, name):
 def test_each_theme_card_shows_bun_as_he_looks_in_that_theme(qapp):
     """The card's Bun is that theme's (headphones, outfit, look), not the current one's,
     drawing him leaves the current theme as it was, and an upright ear isn't cut off."""
+    from soundboard.bunny import ROOM_TOP, H
     from soundboard.ui.settingspages import appearance
 
     before = dict(theme.T)
     royal, dark = appearance._bun("Royal", 1.0), appearance._bun("Dark", 1.0)
     assert theme.T == before
-    assert royal.height() == appearance.BUN_H + appearance.BUN_ROOM
+    room = appearance.BUN_H * ROOM_TOP / H
+    assert royal.height() == math.ceil(appearance.BUN_H + room)
     assert royal.toImage() != dark.toImage()
     img = appearance._bun("Light", 2.0).toImage()   # ears up: their tips in the room
-    top = [img.pixelColor(x, y).alpha() for y in range(appearance.BUN_ROOM * 2)
+    top = [img.pixelColor(x, y).alpha() for y in range(int(room * 2))
            for x in range(img.width())]
     assert max(top) > 200
     assert all(img.pixelColor(x, 0).alpha() == 0 for x in range(img.width()))
