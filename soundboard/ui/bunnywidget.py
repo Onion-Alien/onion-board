@@ -80,7 +80,7 @@ from soundboard.bunny import (
     sparkle,
 )
 from soundboard.i18n import _
-from soundboard.style import bunnyfit
+from soundboard.style import bunnyfit, mascotlines
 from soundboard.ui import appstate, bunskits
 from soundboard.ui.pixels import snap_to_pixels
 
@@ -484,7 +484,9 @@ class BunnyWidget(QWidget):
         """A happy hop, notes and a joyful line (what a click does)."""
         self._joy_at = time.monotonic()
         self.burst(6)
-        self._say(self.joy_lines, 1.6)
+        # his own lines for where he is, and his theme's character (mascotlines.py)
+        self.say = mascotlines.pick(self._rng, self.joy_lines + mascotlines.bun(), self.say)
+        self._say_until = time.monotonic() + mascotlines.read_secs(self.say)
 
     @property
     def asleep(self) -> bool:
@@ -1599,11 +1601,18 @@ class BunnyWidget(QWidget):
         f.setBold(True)
         p.setFont(f)
         fm = p.fontMetrics()
-        if fm.horizontalAdvance(text) > self.width() - 20:
+        room = self.width() - 20
+        lines = [text]
+        if fm.horizontalAdvance(text) > room and " " in text:
+            # a longer line goes on two, broken at the space nearest the middle
+            spaces = [i for i, c in enumerate(text) if c == " "]
+            cut = min(spaces, key=lambda i: abs(i - len(text) / 2))
+            lines = [text[:cut], text[cut + 1:]]
+        tw = max(fm.horizontalAdvance(t) for t in lines)
+        if tw > room:
             return   # no room for the whole line: say nothing rather than half of it
-        tw = fm.horizontalAdvance(text)
         pad = 7
-        bw, bh = tw + 2 * pad, fm.height() + 2 * pad - 4
+        bw, bh = tw + 2 * pad, fm.height() * len(lines) + 2 * pad - 4
         x = max(2.0, min(body.right() - body.width() * 0.05, self.width() - bw - 2))
         y = max(2.0, body.top() + body.height() * 0.05 - bh)
         box = QRectF(x, y, bw, bh)
@@ -1617,7 +1626,8 @@ class BunnyWidget(QWidget):
         p.setBrush(BUBBLE)
         p.drawPath(shape)
         p.setPen(INK)
-        p.drawText(box.adjusted(pad, 0, -pad, 0), Qt.AlignmentFlag.AlignCenter, text)
+        p.drawText(box.adjusted(pad, 0, -pad, 0), Qt.AlignmentFlag.AlignCenter,
+                   "\n".join(lines))
 
     def _paint_puffs(self, p: QPainter):
         p.setPen(Qt.PenStyle.NoPen)

@@ -57,10 +57,12 @@ def test_click_cheers(qapp):
     c = QPointF(w.width() / 2, w.height() / 2)
     w.mousePressEvent(QMouseEvent(QMouseEvent.MouseButtonPress, c, c, Qt.LeftButton,
                                   Qt.LeftButton, Qt.NoModifier))
-    assert hits and w.say == "yay"
+    from soundboard.style import mascotlines
+    assert hits and w.say in ("yay",) + mascotlines.hoot()   # his own line or his theme's
     w.step(0.4, mouse=None)
     assert "joy" in w.pose()
     w.step(2.0, mouse=None)
+    w.step(1.0, mouse=None)   # (a longer line stays up until it's read)
     assert "joy" not in w.pose() and w.say == ""
 
 

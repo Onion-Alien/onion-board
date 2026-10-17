@@ -112,7 +112,8 @@ def test_sad_bun_begs_in_a_bubble_and_cheers_when_clicked(qapp):
     hits = []
     b.clicked.connect(lambda: hits.append(1))
     b.cheer()
-    assert b.say == "yay"
+    from soundboard.style import mascotlines
+    assert b.say in ("yay",) + mascotlines.bun()   # his own line or his theme's
     _run(qapp, b, 15)
     assert b.pose()["sad"] < 0.3             # happy while cheering
 
