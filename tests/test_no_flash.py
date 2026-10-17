@@ -34,7 +34,7 @@ def windows_shown(qapp, build) -> list[str]:
 def test_an_app_card_sending_one_way_shows_its_list_inside_the_card(qapp):
     made = []
     assert windows_shown(qapp, lambda: made.append(AppRow("music.exe", Meter, to="call"))) == []
-    assert made[0].cb_to.parent() is made[0]
+    assert made[0].isAncestorOf(made[0].cb_to)
 
 
 def test_editing_a_loaded_sound_shows_its_trim_inside_the_dialog(qapp, monkeypatch):

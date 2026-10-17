@@ -163,6 +163,16 @@ QFrame#soundstoolbar QPushButton:pressed { background:$btn_press; }
 QFrame#soundstoolbar QPushButton:focus { border-color:$accent; }
 QFrame#soundstoolbar QPushButton#soundadd { color:$accent_link; font-weight:600; }
 QFrame#soundstoolbar QPushButton[toolbarMenu="true"] { padding-right:22px; }
+QFrame#viewtoggle { background:$field; border:1px solid $border; border-radius:10px; }
+QFrame#viewtoggle QPushButton#viewbtn, QFrame#soundstoolbar QFrame#viewtoggle QPushButton#viewbtn {
+    background:transparent; border:1px solid transparent; border-radius:7px; padding:0;
+    min-height:0; }
+QFrame#viewtoggle QPushButton#viewbtn:hover:!checked,
+QFrame#soundstoolbar QFrame#viewtoggle QPushButton#viewbtn:hover:!checked { background:$btn_hover; }
+QFrame#viewtoggle QPushButton#viewbtn:checked,
+QFrame#soundstoolbar QFrame#viewtoggle QPushButton#viewbtn:checked { background:$accent; }
+QFrame#viewtoggle QPushButton#viewbtn:focus,
+QFrame#soundstoolbar QFrame#viewtoggle QPushButton#viewbtn:focus { border:1px solid $text_hi; }
 QLineEdit#soundssearch { background:$field; border:1px solid $border; border-radius:10px;
     padding:0 10px 0 4px; }
 QLineEdit#soundssearch:hover { border-color:$border_hi; }
