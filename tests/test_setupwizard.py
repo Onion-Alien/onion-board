@@ -127,7 +127,8 @@ def test_mic_already_set_up_is_used_not_offered_again(wizard, monkeypatch):
     assert w.cfg.route == "mic" and not asked
 
 
-def test_missing_cable_offers_install_and_guide_returns(wizard, devices):
+def test_missing_cable_offers_install_and_finish_is_done(wizard, devices):
+    # Finish without sending set up opened the guide again on every start
     devices["cable"] = False
     w, wiz = wizard
     wiz.go(2)
@@ -135,7 +136,7 @@ def test_missing_cable_offers_install_and_guide_returns(wizard, devices):
     assert wiz.btn_next.text().startswith("Skip")
     wiz.go(3)
     wiz.next_clicked()
-    assert not library.Config.load().setup_done   # shown again next launch
+    assert library.Config.load().setup_done   # Finish: not shown again by itself
 
 
 def test_closing_the_guide_stops_it_opening_every_launch(wizard, devices):

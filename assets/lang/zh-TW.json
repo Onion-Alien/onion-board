@@ -3741,5 +3741,9 @@
   "Background sounds": "背景音效",
   "Limited edition": "限定版",
   "Limited edition: this one's yours to keep.": "限定版：這個主題永久歸你了。",
-  "Limited edition: use it by {date} and it's yours to keep. After that it's gone for good.": "限定版：在 {date} 前使用就能永久保留。之後將永遠消失。"
+  "Limited edition: use it by {date} and it's yours to keep. After that it's gone for good.": "限定版：在 {date} 前使用就能永久保留。之後將永遠消失。",
+  "Onion Board is still running without admin.": "Onion Board 仍以非系統管理員身分執行。",
+  "Restart as admin": "以系統管理員身分重新啟動",
+  "The game runs as admin, and Windows doesn't let other programs hear the keys you press in it. Start Onion Board as admin too to use your hotkeys there.": "這個遊戲以系統管理員身分執行，Windows 不允許其他程式聽到你在其中按下的按鍵。把 Onion Board 也以系統管理員身分啟動，才能在那裡使用快速鍵。",
+  "Your hotkeys can't reach this game": "你的快速鍵無法傳到這個遊戲"
 }

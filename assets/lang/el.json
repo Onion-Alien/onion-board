@@ -3819,5 +3819,9 @@
   "Background sounds": "Ήχοι φόντου",
   "Limited edition": "Περιορισμένη έκδοση",
   "Limited edition: this one's yours to keep.": "Περιορισμένη έκδοση: αυτό είναι δικό σου για πάντα.",
-  "Limited edition: use it by {date} and it's yours to keep. After that it's gone for good.": "Περιορισμένη έκδοση: χρησιμοποίησέ το έως {date} και μένει δικό σου. Μετά χάνεται για πάντα."
+  "Limited edition: use it by {date} and it's yours to keep. After that it's gone for good.": "Περιορισμένη έκδοση: χρησιμοποίησέ το έως {date} και μένει δικό σου. Μετά χάνεται για πάντα.",
+  "Onion Board is still running without admin.": "Το Onion Board τρέχει ακόμα χωρίς δικαιώματα διαχειριστή.",
+  "Restart as admin": "Επανεκκίνηση ως διαχειριστής",
+  "The game runs as admin, and Windows doesn't let other programs hear the keys you press in it. Start Onion Board as admin too to use your hotkeys there.": "Το παιχνίδι τρέχει ως διαχειριστής και τα Windows δεν αφήνουν άλλα προγράμματα να ακούν τα πλήκτρα που πατάς σε αυτό. Άνοιξε και το Onion Board ως διαχειριστής για να δουλεύουν εκεί τα πλήκτρα συντόμευσης.",
+  "Your hotkeys can't reach this game": "Τα πλήκτρα συντόμευσης δεν φτάνουν σε αυτό το παιχνίδι"
 }

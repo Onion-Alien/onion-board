@@ -3741,5 +3741,9 @@
   "Background sounds": "Suara latar",
   "Limited edition": "Edisi terbatas",
   "Limited edition: this one's yours to keep.": "Edisi terbatas: yang ini milikmu selamanya.",
-  "Limited edition: use it by {date} and it's yours to keep. After that it's gone for good.": "Edisi terbatas: pakai sebelum {date} dan jadi milikmu selamanya. Setelah itu hilang untuk selamanya."
+  "Limited edition: use it by {date} and it's yours to keep. After that it's gone for good.": "Edisi terbatas: pakai sebelum {date} dan jadi milikmu selamanya. Setelah itu hilang untuk selamanya.",
+  "Onion Board is still running without admin.": "Onion Board masih berjalan tanpa admin.",
+  "Restart as admin": "Mulai ulang sebagai admin",
+  "The game runs as admin, and Windows doesn't let other programs hear the keys you press in it. Start Onion Board as admin too to use your hotkeys there.": "Game ini berjalan sebagai admin, dan Windows tidak mengizinkan program lain mendengar tombol yang kamu tekan di dalamnya. Jalankan Onion Board sebagai admin juga agar hotkey-mu berfungsi di sana.",
+  "Your hotkeys can't reach this game": "Hotkey-mu tidak sampai ke game ini"
 }

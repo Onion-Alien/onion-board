@@ -3819,5 +3819,9 @@
   "Background sounds": "Фонови звуци",
   "Limited edition": "Ограничено издание",
   "Limited edition: this one's yours to keep.": "Ограничено издание: тази е твоя завинаги.",
-  "Limited edition: use it by {date} and it's yours to keep. After that it's gone for good.": "Ограничено издание: използвай я до {date} и остава твоя. След това изчезва завинаги."
+  "Limited edition: use it by {date} and it's yours to keep. After that it's gone for good.": "Ограничено издание: използвай я до {date} и остава твоя. След това изчезва завинаги.",
+  "Onion Board is still running without admin.": "Onion Board още работи без администраторски права.",
+  "Restart as admin": "Рестарт като администратор",
+  "The game runs as admin, and Windows doesn't let other programs hear the keys you press in it. Start Onion Board as admin too to use your hotkeys there.": "Играта работи като администратор и Windows не позволява на други програми да чуват клавишите, които натискаш в нея. Пусни и Onion Board като администратор, за да работят клавишите ти там.",
+  "Your hotkeys can't reach this game": "Клавишите ти не стигат до тази игра"
 }

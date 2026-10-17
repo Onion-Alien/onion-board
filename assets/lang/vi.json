@@ -3741,5 +3741,9 @@
   "Background sounds": "Âm thanh nền",
   "Limited edition": "Phiên bản giới hạn",
   "Limited edition: this one's yours to keep.": "Phiên bản giới hạn: cái này là của bạn mãi mãi.",
-  "Limited edition: use it by {date} and it's yours to keep. After that it's gone for good.": "Phiên bản giới hạn: dùng trước {date} là của bạn mãi mãi. Sau đó nó biến mất vĩnh viễn."
+  "Limited edition: use it by {date} and it's yours to keep. After that it's gone for good.": "Phiên bản giới hạn: dùng trước {date} là của bạn mãi mãi. Sau đó nó biến mất vĩnh viễn.",
+  "Onion Board is still running without admin.": "Onion Board vẫn đang chạy mà không có quyền quản trị.",
+  "Restart as admin": "Khởi động lại với quyền quản trị",
+  "The game runs as admin, and Windows doesn't let other programs hear the keys you press in it. Start Onion Board as admin too to use your hotkeys there.": "Trò chơi đang chạy với quyền quản trị, và Windows không cho chương trình khác nghe các phím bạn bấm trong đó. Hãy chạy Onion Board với quyền quản trị để dùng phím tắt ở đó.",
+  "Your hotkeys can't reach this game": "Phím tắt của bạn không tới được trò chơi này"
 }

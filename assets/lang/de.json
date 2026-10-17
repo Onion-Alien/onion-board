@@ -3819,5 +3819,9 @@
   "Background sounds": "Hintergrundgeräusche",
   "Limited edition": "Limitierte Edition",
   "Limited edition: this one's yours to keep.": "Limitierte Edition: Dieses gehört jetzt für immer dir.",
-  "Limited edition: use it by {date} and it's yours to keep. After that it's gone for good.": "Limitierte Edition: Nutze es bis {date}, dann gehört es für immer dir. Danach ist es für immer weg."
+  "Limited edition: use it by {date} and it's yours to keep. After that it's gone for good.": "Limitierte Edition: Nutze es bis {date}, dann gehört es für immer dir. Danach ist es für immer weg.",
+  "Onion Board is still running without admin.": "Onion Board läuft weiter ohne Administratorrechte.",
+  "Restart as admin": "Als Administrator neu starten",
+  "The game runs as admin, and Windows doesn't let other programs hear the keys you press in it. Start Onion Board as admin too to use your hotkeys there.": "Das Spiel läuft als Administrator, und Windows lässt andere Programme die Tasten nicht hören, die du darin drückst. Starte Onion Board auch als Administrator, damit deine Hotkeys dort funktionieren.",
+  "Your hotkeys can't reach this game": "Deine Hotkeys erreichen dieses Spiel nicht"
 }

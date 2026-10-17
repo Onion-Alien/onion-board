@@ -3741,5 +3741,9 @@
   "Background sounds": "バックグラウンドの音",
   "Limited edition": "限定版",
   "Limited edition: this one's yours to keep.": "限定版：このテーマはずっとあなたのものです。",
-  "Limited edition: use it by {date} and it's yours to keep. After that it's gone for good.": "限定版：{date}までに使えばずっとあなたのもの。それを過ぎると二度と手に入りません。"
+  "Limited edition: use it by {date} and it's yours to keep. After that it's gone for good.": "限定版：{date}までに使えばずっとあなたのもの。それを過ぎると二度と手に入りません。",
+  "Onion Board is still running without admin.": "Onion Board は管理者なしのまま動いています。",
+  "Restart as admin": "管理者として再起動",
+  "The game runs as admin, and Windows doesn't let other programs hear the keys you press in it. Start Onion Board as admin too to use your hotkeys there.": "このゲームは管理者として動いていて、Windows はほかのプログラムがゲーム内で押したキーを聞くことを許しません。そこでホットキーを使うには Onion Board も管理者として起動してください。",
+  "Your hotkeys can't reach this game": "ホットキーがこのゲームに届きません"
 }

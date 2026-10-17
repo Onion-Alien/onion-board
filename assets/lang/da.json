@@ -3819,5 +3819,9 @@
   "Background sounds": "Baggrundslyde",
   "Limited edition": "Begrænset udgave",
   "Limited edition: this one's yours to keep.": "Begrænset udgave: den her er din for altid.",
-  "Limited edition: use it by {date} and it's yours to keep. After that it's gone for good.": "Begrænset udgave: brug den senest {date}, så er den din for altid. Derefter forsvinder den for evigt."
+  "Limited edition: use it by {date} and it's yours to keep. After that it's gone for good.": "Begrænset udgave: brug den senest {date}, så er den din for altid. Derefter forsvinder den for evigt.",
+  "Onion Board is still running without admin.": "Onion Board kører stadig uden administrator.",
+  "Restart as admin": "Genstart som administrator",
+  "The game runs as admin, and Windows doesn't let other programs hear the keys you press in it. Start Onion Board as admin too to use your hotkeys there.": "Spillet kører som administrator, og Windows lader ikke andre programmer høre de taster, du trykker i det. Start også Onion Board som administrator for at bruge dine genvejstaster der.",
+  "Your hotkeys can't reach this game": "Dine genvejstaster kan ikke nå dette spil"
 }

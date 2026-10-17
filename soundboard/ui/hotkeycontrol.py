@@ -10,17 +10,19 @@ from __future__ import annotations
 
 import html
 import logging
+import threading
 import time
 from typing import TYPE_CHECKING
 
+from PySide6.QtCore import Signal
 from PySide6.QtWidgets import QMenu
 
-from soundboard import midi, theme, usage, winkeys
+from soundboard import adminfront, midi, theme, usage, winkeys
 from soundboard.engine import SR
 from soundboard.i18n import _, ngettext
 from soundboard.library import SoundMeta
 from soundboard.settings import HOTKEY_ACTIONS, HotkeyDialog, pretty_key
-from soundboard.ui import icons
+from soundboard.ui import busy, icons
 from soundboard.ui.controller import Controller
 from soundboard.ui.crashdialog import free_dialog
 
@@ -39,12 +41,15 @@ REPLAY_NOTE = _("Instant replay is on: your key keeps the last seconds you heard
 
 class HotkeyControl(Controller):
     """The hotkeys of one MainWindow (``mw``)."""
+    _admin_started = Signal(bool)   # the admin copy was started (True) or not
 
     def __init__(self, mw: MainWindow):
         super().__init__(mw)
         self._hotkeys_off = False         # "All hotkeys off": only that key still works
         self._off_remote = False          # ...turned off by the control API, which turns them on
         self._voice_was: bool | None = None   # voice changer state before a held key
+        self._admin: adminfront.Watcher | None = None   # looks for games run as admin
+        self._admin_started.connect(self._admin_answer)
 
     def _fit_overlay_key(self):
         """The default overlay key is the one left of 1 on a US keyboard, where it types
@@ -103,6 +108,38 @@ class HotkeyControl(Controller):
         mw.hotkeys.register(mapping)
         # instant replay listens only while its hotkey is set
         mw.replay.set_enabled(bool(mw.cfg.replay_hotkey), mw.cfg.replay_seconds)
+        if mapping and self._admin is None:
+            self._admin = adminfront.Watcher(self)
+            self._admin.found.connect(self._admin_in_front)
+            self._admin.start()
+
+    def _admin_in_front(self, _exe: str):
+        """A game run as admin came to the front (adminfront): Windows keeps its keys
+        from us, so say why the hotkeys go quiet there, and offer the way round it.
+        Once per game while the board runs; never while every hotkey is off."""
+        if self._hotkeys_off:
+            return
+        self.mw.tell(_("Your hotkeys can't reach this game"),
+                     _("The game runs as admin, and Windows doesn't let other programs "
+                       "hear the keys you press in it. Start Onion Board as admin too to "
+                       "use your hotkeys there."),
+                     "warn", 0, key="admin-game",
+                     action=(_("Restart as admin"), self.restart_as_admin))
+
+    def restart_as_admin(self):
+        """Start the board again as admin (Windows asks first), then quit this copy.
+        The prompt waits for an answer, so it's asked from a worker thread."""
+        args = self.mw.restart_args()
+        threading.Thread(target=lambda: busy.emit(self._admin_started,
+                                                  adminfront.start_elevated(args),
+                                                  owner=self),
+                         daemon=True, name="restart-admin").start()
+
+    def _admin_answer(self, started: bool):
+        if started:
+            self.mw.quit_app()   # the admin copy waits for this one to be gone
+        else:
+            self.mw.toast(_("Onion Board is still running without admin."), key="admin-game")
 
     def _hotkey_live(self, m: SoundMeta) -> bool:
         """Does m's hotkey work right now? Always, unless hotkeys follow the category
