@@ -9,6 +9,7 @@ from __future__ import annotations
 
 import html
 import threading
+from collections.abc import Callable
 
 from PySide6.QtCore import QRectF, Qt, QTimer, Signal
 from PySide6.QtGui import QColor, QLinearGradient, QPainter
@@ -174,6 +175,12 @@ class VoicePanel(QWidget):
         self._active = None              # last is_active() sent out (active_changed)
         self.chain = voicefx.VoiceChain()
         engine.voice_chain = self.chain
+        # the Background's loops (changed built-in sounds, board sounds), made on a
+        # worker and handed straight to the chain
+        from soundboard.voicefx import backdrop
+        self.backdrop = backdrop.Maker(self.chain.set_beds)
+        # the board's sounds (library.SoundMeta), for the Background: set by the main window
+        self.board_sounds: Callable[[], list] = list
         self.modules = mods.discover()
         mods.load_effects(self.modules)
 
@@ -296,7 +303,9 @@ class VoicePanel(QWidget):
         self.fx.picked.setProperty("pinned", True)
         self.fx.show_picked_row(self._tab == "fx")
         outer.addWidget(self.bar)
+        self.fx.sound_list = lambda: [(m.id, m.name, list(m.tags)) for m in self.board_sounds()]
         self.chain.configure(self.fx.spec())
+        self._update_backdrop(self.fx.spec())
         self._emit_active()
 
         # the voice changer's mic meter (only while the tab is showing)
@@ -431,9 +440,32 @@ class VoicePanel(QWidget):
         if self.chain.errors:              # give a bypassed effect another go after an edit
             self.chain.errors.clear()      # (configure rebuilds; clear_errors() would twice)
         self.chain.configure(spec)
+        self._update_backdrop(spec)
         self.fx.show_errors({})
         self.fx_changed.emit(spec)
         self._emit_active()
+
+    def _update_backdrop(self, spec: dict):
+        """Have the Background's loops made for these settings (a worker reads the board
+        sounds from disk and renders them; nothing when it's off)."""
+        cfg = (spec.get("effects") or {}).get("backdrop") if spec.get("enabled") else None
+        if cfg and cfg.get("on") and cfg.get("sounds"):
+            metas = {m.id: m for m in self.board_sounds()}   # read here, on the UI thread
+        else:
+            metas = {}
+
+        def load(sid: str):
+            from soundboard import library
+            m = metas.get(sid)
+            return library.load_sound(m) if m is not None else None
+        self.backdrop.update(cfg, load)
+
+    def board_changed(self):
+        """Sounds were added, renamed or deleted: the Background's names and loops again."""
+        refresh = getattr(self.fx.rows.get("backdrop"), "refresh_names", None)
+        if refresh is not None:
+            refresh()
+        self._update_backdrop(self.fx.spec())
 
     def _ai_changed(self, s: dict):
         self.speech.s["ai"] = s            # kept with the speech settings
@@ -718,4 +750,5 @@ class VoicePanel(QWidget):
         self.speech.installs._dl_cancel = True
         self.ai.shutdown()
         self.controller.shutdown()
+        self.backdrop.close()
         self.engine.voice_chain = None

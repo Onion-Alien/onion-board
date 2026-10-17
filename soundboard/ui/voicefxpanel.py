@@ -378,6 +378,7 @@ FX_ICONS = {"cleanup": "shield", "pitch": "mic", "growl": "wave", "robot": "keyb
             "compressor": "volume", "tone": "sliders", "radio": "radio", "distortion": "live",
             "shout": "speech", "helmet": "voice", "chorus": "shuffle", "echo": "history",
             "reverb": "headphones", "polish": "star", "harmony": "music", "ringmod": "wave",
+            "backdrop": "sounds",
             "flanger": "reload", "wobble": "ear"}
 # the Voice tab's "Make it yours" window's top and the effect cards' groups;
 # an effect from an add-on goes under Add-ons
@@ -386,7 +387,7 @@ HERO_TITLES = {"pitch": _("Pitch & voice")}
 GROUPS = ((_("Change the voice"), ("harmony", "growl", "robot", "ringmod")),
           (_("Character"), ("compressor", "tone", "radio", "distortion", "shout", "helmet",
                             "polish")),
-          (_("Room"), ("chorus", "flanger", "wobble", "echo", "reverb")))
+          (_("Room"), ("chorus", "flanger", "wobble", "echo", "reverb", "backdrop")))
 ADDON_GROUP = _("Add-ons")
 # your own setting, not part of a voice: picking or saving a voice leaves it as it is
 KEEP = frozenset({"cleanup"})
@@ -452,19 +453,24 @@ class EffectRow(QFrame):
         grid.setHorizontalSpacing(18)
         grid.setVerticalSpacing(8)
         self.sliders = []
-        cols = 2 if hero and len(cls.params) > 2 else 1
-        for i, q in enumerate(cls.params):
+        self._fill(grid, cfg)
+        v.addWidget(self.body)
+        self.chk.toggled.connect(self._toggled)
+        self._shown: tuple | None = None   # the (on, folded) the card last showed
+        self._paint_arrow()
+        self._show()
+
+    def _fill(self, grid: QGridLayout, cfg: dict):
+        """The settings under the title: a slider (or switch) per parameter. An effect
+        with settings of its own shape (the Background) overrides this."""
+        cols = 2 if self.hero and len(self.cls.params) > 2 else 1
+        for i, q in enumerate(self.cls.params):
             s = ParamSlider(q, cfg.get(q.key, q.default), compact=False)
             s.changed.connect(self._slid)
             grid.addWidget(s, i // cols, i % cols)
             self.sliders.append(s)
         for c in range(cols):
             grid.setColumnStretch(c, 1)
-        v.addWidget(self.body)
-        self.chk.toggled.connect(self._toggled)
-        self._shown: tuple | None = None   # the (on, folded) the card last showed
-        self._paint_arrow()
-        self._show()
 
     def _show(self):
         on = self.chk.isChecked()
@@ -568,14 +574,15 @@ VOICE_GROUPS = (
     ("funny", _("Funny"), ("Chipmunk", "High voice", "Hothead", "Singing monk",
                            "Underwater", "Drunk", "Choir", "Goblin", "Fairy")),
     ("scary", _("Scary"), ("Demon", "Dark lord", "Ghost", "Masked caller",
-                           "Haunted radio", "Zombie", "Evil twin", "Giant")),
+                           "Haunted radio", "Zombie", "Evil twin", "Giant", "Haunted house")),
     ("scifi", _("Robots & sci-fi"), ("Robot", "Dalek", "Alien", "Talkbox", "Autotune",
-                                     "Mecha", "Ship computer")),
+                                     "Mecha", "Ship computer", "Astronaut")),
     ("disguise", _("Disguise"), ("Deep voice", "Male voice", "Anonymous",
                                  "Secret detective")),
     ("places", _("Radio & places"), ("Walkie-talkie", "Old telephone", "Megaphone",
                                      "Stadium announcer", "Cave", "Podcast voice", "Pilot",
-                                     "Drive-thru speaker", "Old film", "Cathedral")),
+                                     "Drive-thru speaker", "Old film", "Cathedral", "Storm",
+                                     "Campfire story", "Fighter pilot", "Busy café")),
 )
 MINE = "mine"
 FAVS = "favs"
@@ -713,6 +720,9 @@ class VoiceFxPanel(QWidget):
         # your saved voices (Fine-tune -> "Save as a voice"): their own file, see
         # soundboard.savedvoices
         self.store = store if store is not None else savedvoices.Store()
+        # the board's sounds for the Background card's "Add a sound from my board":
+        # [(id, name, categories)], set by the main window
+        self.sound_list: Callable[[], list[tuple[str, str, list[str]]]] = list
         self._based_on = ""   # the saved voice Fine-tune started from (Save offers it)
         # cleaned: a damaged setting (hand-edited, an old backup) mustn't stop the app
         spec = {**default_fx_spec(), **voicefx.clean_spec(spec)}
@@ -1659,7 +1669,11 @@ class VoiceFxPanel(QWidget):
             if cfg is None:
                 # mic clean-up starts on: it only makes changed voices sound better
                 cfg = {"on": True} if etype in KEEP else {}
-            r = EffectRow(cls, cfg, hero=etype in HERO)
+            if etype == "backdrop":
+                from soundboard.ui.backdroprow import BackdropRow
+                r = BackdropRow(cls, cfg, lambda: self.sound_list())
+            else:
+                r = EffectRow(cls, cfg, hero=etype in HERO)
             r.changed.connect(lambda t=etype: self._edited(t))
             r.set_folded(etype in self._folded_fx)
             r.folded_changed.connect(lambda f, t=etype: self._card_folded(t, f))
