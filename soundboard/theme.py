@@ -194,7 +194,10 @@ QPushButton#primary { background:$accent; border:none; color:$on_accent; font-we
 QPushButton[guide="true"] { font-size:11pt; padding:9px 20px; border-radius:10px; }
 QPushButton#primary:hover { background:$accent_hover; }
 QPushButton#primary:focus { border:1px solid $text_hi; }
-QWidget#storebar QPushButton#primary:disabled { background:$btn; color:$muted; }   /* the store's down */
+/* the store's down: grey, one edge colour all round (the accent's lit top edge on grey
+   looked cut off) */
+QWidget#storebar QPushButton#primary:disabled { background:$btn; color:$muted;
+    border-color:$border; }
 QFrame#soundstoolbar { background:$panel; background-image:none; border:none;
     border-radius:12px; }
 QFrame#soundstoolbar QLabel, QFrame#soundstoolbar QSlider { background:transparent; }
@@ -226,9 +229,10 @@ QPushButton#danger[quiet="true"]:hover { background:$danger_bg; }
 QPushButton#danger:focus { border-color:$accent; }
 QPushButton#danger[mini="true"] { padding:0 6px; }   /* the mini player's "■ All": fits its narrowest row */
 QPushButton#small, QPushButton#danger[small="true"] { padding:2px 8px; font-size:8pt; }
-QPushButton#backhome { background:$btn; border:1px solid $border; color:$text_hi;
-    font-weight:600; font-size:10pt; padding:6px 14px 6px 10px; border-radius:8px; }
-QPushButton#backhome:hover { background:$btn_hover; border-color:$border_hi; }
+QPushButton#backhome { background:$danger_bg; border:2px solid $danger_text; color:$danger_text;
+    font-weight:600; font-size:10pt; padding:5px 13px 5px 9px; border-radius:8px;
+    margin:5px; }   /* room for the glow ytsearch.BackHome paints around it */
+QPushButton#backhome:hover { background:$danger_hover; }
 QPushButton#tabinfo { padding:0; border-radius:8px; background:transparent; border:1px solid transparent; }
 QPushButton#tabinfo:hover { background:$btn_hover; border-color:$border_hi; }
 QPushButton#tabinfo:pressed { background:$btn_press; border-color:$border_hi; }

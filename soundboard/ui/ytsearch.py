@@ -772,6 +772,33 @@ def _thumb_decoder() -> ThreadPoolExecutor:
     return _decoder
 
 
+class BackHome(QPushButton):
+    """The results' Back button: red, with a soft red glow around its border, so the
+    way out is easy to spot. The glow is painted in the button's own margin (the
+    sheet's `margin:` for #backhome is GLOW px), so no parent clips it."""
+
+    GLOW = 5     # px of glow around the box: must match the sheet's margin
+    RADIUS = 8   # the box's border-radius in the sheet
+
+    def __init__(self, text: str, parent=None):
+        super().__init__(text, parent)
+        self.setObjectName("backhome")
+
+    def paintEvent(self, e):
+        p = QPainter(self)
+        p.setRenderHint(QPainter.RenderHint.Antialiasing)
+        c = QColor(theme.tokens().get("danger_text", "red"))
+        box = QRectF(self.rect()).adjusted(self.GLOW, self.GLOW, -self.GLOW, -self.GLOW)
+        p.setBrush(Qt.BrushStyle.NoBrush)
+        for i in range(1, self.GLOW + 1):   # rings fading out from the border
+            c.setAlphaF(0.85 * (1 - i / (self.GLOW + 1)) ** 1.5)
+            p.setPen(c)
+            r = box.adjusted(-i + 0.5, -i + 0.5, i - 0.5, i - 0.5)
+            p.drawRoundedRect(r, self.RADIUS + i, self.RADIUS + i)
+        p.end()
+        super().paintEvent(e)
+
+
 class SearchResults(RoundedFrame):
     """`play(Result)` / `add(Result)` when a row's button is pressed; `closed()`
     when its "My sounds" back button is (the owner shows its pads again). Its site
@@ -810,11 +837,10 @@ class SearchResults(RoundedFrame):
         header.setSizePolicy(QSizePolicy.Policy.Preferred, QSizePolicy.Policy.Fixed)
         header.setContentsMargins(0, 0, 0, 0)   # Back starts where the cards' panels do
         head = Flow(header, gap=8)
-        back = self.btn_back = QPushButton(_("Back"))
+        back = self.btn_back = BackHome(_("Back"))   # the way out of the results
         back.setAccessibleName(_("Back to my sounds"))
-        back.setObjectName("backhome")   # the way out of the results: a plain button
         back.setCursor(Qt.CursorShape.PointingHandCursor)
-        icons.set_icon(back, "back", "text_hi", size=18)
+        icons.set_icon(back, "back", "danger_text", size=18)
         back.clicked.connect(self.close_results)
         head.addWidget(back)
         # what the cards are when no search words say it: "Trending on Myinstants"
