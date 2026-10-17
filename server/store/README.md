@@ -30,9 +30,14 @@ The app sends a random id it made itself (`X-Onion-Install`); the server keeps o
 salted hash of it, and of the address, for one vote per install and the daily limits
 (10 uploads per install, 20 per address, 400 votes per address, and at most 3 installs
 from one address ever counted on one sound). The review queue takes 1,000 sounds or 300 MB
-of files, then refuses more until some are reviewed. Files are checked by
-their first bytes (MP3, OGG, WAV, FLAC), up to 4 MB, and the same file can't be
-shared twice. A rejected sound's file is deleted at once.
+of files, then refuses more until some are reviewed. Files (MP3, OGG, WAV, FLAC, up to
+4 MB) are walked from end to end in `src/audio.js`: every MP3 frame, WAV chunk, Ogg page
+and FLAC header block has to be in place, tags and cover art may take 2 MB at most, and
+a file with web page, script or program text anywhere in it is refused. Names and tags
+lose markup characters (``<>`{}\``) and invisible or right-to-left ones. A served file is
+always a download (`content-disposition: attachment`, a sandboxing CSP, `nosniff`), and
+the app keeps one only when it starts like the sound it was told about. The same file
+can't be shared twice. A rejected sound's file is deleted at once.
 
 **Sounds from other sites.** Every 10 minutes a cron step (`src/sync.js`) reads Myinstants'
 trending page and one page of one of its categories (5 pages of 10 categories, a cycle
