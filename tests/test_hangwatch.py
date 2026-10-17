@@ -212,3 +212,30 @@ def test_a_freeze_that_held_every_thread_says_so(qapp, tmp_path, monkeypatch):
         assert hangwatch.ALL_HELD_NOTE not in hw.saved.read_text(encoding="utf-8")
     finally:
         hw.stop()
+
+
+def test_a_freeze_report_says_how_full_the_pcs_memory_was(qapp, tmp_path, monkeypatch):
+    """An idle window stuck at random lines for 10-30 s, over and over on one PC, looked
+    like Windows swapping the app to disk: the report now says how full memory was and
+    how fast the app page-faulted while it was stuck."""
+    from soundboard import applog, hangwatch
+    monkeypatch.setitem(applog._state, "log_path", tmp_path / "onionboard.log")
+    faults = iter([1000, 1000 + 3000])   # before and after the half-second sample
+    monkeypatch.setattr(hangwatch, "memory_load", lambda: 93)
+    monkeypatch.setattr(hangwatch, "page_faults", lambda: next(faults))
+    settle(qapp)
+    hw = HangWatch(hang_s=HANG_S)
+    try:
+        frozen_in_a_long_wait(hw, HANG_S * 2)
+        text = hw.saved.read_text(encoding="utf-8")
+        assert re.search(r"^PC memory in use: 93%$", text, re.M)
+        assert re.search(r"^Page faults: 6000/s$", text, re.M)
+    finally:
+        hw.stop()
+
+
+@pytest.mark.skipif(sys.platform != "win32", reason="Windows' own figures")
+def test_the_memory_figures_read_on_windows():
+    from soundboard import hangwatch
+    load, faults = hangwatch.memory_load(), hangwatch.page_faults()
+    assert 0 <= load <= 100 and faults > 0

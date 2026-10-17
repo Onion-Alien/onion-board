@@ -815,6 +815,23 @@ def _busy(window: str, others: str) -> str:
     return "busy-thread" + (f"@{where}" if where else "")
 
 
+# a PC short of memory (hangwatch._pc_memory): `mem-80` / `mem-90` from 80% in use, and
+# `paging` when the app page-faulted at least this fast while stuck (swapped to disk)
+MEM_HIGH = 80
+PAGING_PER_S = 2000
+
+
+def _memory(window: str) -> list[str]:
+    out = []
+    m = re.search(r"^PC memory in use: (\d+)%", window, re.M)
+    if m and int(m.group(1)) >= MEM_HIGH:
+        out.append(f"mem-{min(int(m.group(1)), 99) // 10 * 10}")
+    m = re.search(r"^Page faults: (\d+)/s", window, re.M)
+    if m and int(m.group(1)) >= PAGING_PER_S:
+        out.append("paging")
+    return out
+
+
 def _freeze_tag(head: str, window: str, others: str) -> str:
     """`@<deepest line><<its caller>~<stuck in>/<how long>/<who was busy>`, e.g.
     `@soundboard/ui/mainwindow.py:5898<soundboard/app.py:100~threading.wait/
@@ -830,6 +847,7 @@ def _freeze_tag(head: str, window: str, others: str) -> str:
     if ALL_HELD_MARK in window:   # the whole app, not the window alone
         rest.append("all-held")
     rest += [p for p in (_lasted(head), _busy(window, others)) if p]
+    rest += _memory(window)   # a PC short of memory: the likely cause of an idle freeze
     return tag + "".join(f"/{p}" for p in rest)
 
 

@@ -87,9 +87,11 @@ class HangWatch(QObject):
                 stack += f"\n{ALL_HELD_NOTE}\n"
             log.warning("the window hasn't responded for %.0f s; it's doing:\n%s",
                         stuck, stack)
+            faults = page_faults()
             cpu = self._cpu_use()
             if self._ui in cpu:
                 stack += f"\nWindow CPU: {cpu[self._ui]:.0%}\n"
+            stack += self._pc_memory(faults)
             from soundboard import applog
             self.saved = applog.save_freeze(stuck, stack + self._others(frames, cpu))
             self.reports += 1           # last: a report counts once it's logged and saved
@@ -115,6 +117,19 @@ class HangWatch(QObject):
             return {}
         after, dt = cpu_times(ids), time.monotonic() - t0
         return {i: max(0.0, after[i] - before[i]) / dt for i in before if i in after}
+
+    def _pc_memory(self, faults_before: int | None) -> str:
+        """How full the PC's memory is, and how fast this app page-faulted over the CPU
+        sample: an idle window stuck at random lines for 10-30 s, over and over on one
+        PC (2.6.1), looked like Windows swapping the app out to disk. "" when unknown."""
+        out = ""
+        load = memory_load()
+        if load is not None:
+            out += f"PC memory in use: {load}%\n"
+        after = page_faults()
+        if faults_before is not None and after is not None:
+            out += f"Page faults: {round(max(0, after - faults_before) / CPU_SAMPLE_S)}/s\n"
+        return out
 
     def _others(self, frames, cpu=None) -> str:
         """Every other thread's stack: a UI thread stuck in native code is often
@@ -155,6 +170,54 @@ def awake_clock() -> Callable[[], float]:
         except (OSError, AttributeError, ImportError):
             pass
     return time.monotonic
+
+
+def memory_load() -> int | None:
+    """Percent of the PC's memory in use (Windows' own figure); None where unknown."""
+    if sys.platform != "win32":
+        return None
+    try:
+        import ctypes
+        from ctypes import wintypes
+
+        class Status(ctypes.Structure):
+            _fields_ = [("dwLength", wintypes.DWORD), ("dwMemoryLoad", wintypes.DWORD),
+                        *((n, ctypes.c_ulonglong) for n in (
+                            "total", "avail", "total_pf", "avail_pf", "total_v", "avail_v",
+                            "avail_ext"))]
+        s = Status()
+        s.dwLength = ctypes.sizeof(Status)
+        if not ctypes.WinDLL("kernel32").GlobalMemoryStatusEx(ctypes.byref(s)):
+            return None
+        return int(s.dwMemoryLoad)
+    except (OSError, AttributeError, ValueError):
+        return None
+
+
+def page_faults() -> int | None:
+    """This app's page faults so far (soft and hard); None where unknown."""
+    if sys.platform != "win32":
+        return None
+    try:
+        import ctypes
+        from ctypes import wintypes
+
+        class Counters(ctypes.Structure):
+            _fields_ = [("cb", wintypes.DWORD), ("PageFaultCount", wintypes.DWORD),
+                        *((n, ctypes.c_size_t) for n in (
+                            "peak_ws", "ws", "peak_paged", "paged", "peak_nonpaged",
+                            "nonpaged", "pagefile", "peak_pagefile"))]
+        c = Counters()
+        c.cb = ctypes.sizeof(Counters)
+        k32 = ctypes.WinDLL("kernel32")
+        k32.GetCurrentProcess.restype = wintypes.HANDLE
+        get = ctypes.WinDLL("psapi").GetProcessMemoryInfo
+        get.argtypes = (wintypes.HANDLE, ctypes.c_void_p, wintypes.DWORD)
+        if not get(k32.GetCurrentProcess(), ctypes.byref(c), c.cb):
+            return None
+        return int(c.PageFaultCount)
+    except (OSError, AttributeError, ValueError):
+        return None
 
 
 _api = None   # (OpenThread, GetThreadTimes, CloseHandle), False if missing
