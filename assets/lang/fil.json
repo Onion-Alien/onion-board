@@ -4092,5 +4092,7 @@
   "Legendary": "Legendary",
   "Rare": "Rare",
   "Super Rare": "Super Rare",
-  "Uncommon": "Uncommon"
+  "Uncommon": "Uncommon",
+  "<b>{device}</b> looks like speakers, so your mic hears itself. Keep them quiet or use headphones. If it starts to squeal, this switches off by itself.": "Mukhang speaker ang <b>{device}</b>, kaya naririnig ng mic mo ang sarili niya. Hinaan mo o gumamit ng headphones. Kapag nagsimulang sumipol, kusa itong mamamatay.",
+  "Stopped <b>Hear what they hear</b>: your mic was picking up your speakers and started to squeal. Use headphones, or turn the speakers down.": "Itinigil ang <b>Pakinggan ang naririnig nila</b>: nasasagap ng mic mo ang speakers mo at nagsimulang sumipol. Gumamit ng headphones, o hinaan ang speakers."
 }

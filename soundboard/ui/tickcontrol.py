@@ -112,6 +112,9 @@ class TickControl(Controller):
             elif mw.cfg.route == "mic" and mw.micctl._direct_health() != mw._direct_shown:
                 mw.statusctl._update_flow()
             mw.voice.poll()
+        if e.howl_stopped:   # the mic squealed through the speakers (soundboard.howl)
+            e.howl_stopped = False
+            mw._howl_stopped()
         playing = e.playing()
         if mw.playctl._queue and LINK_ID not in playing and not any(sid in mw._meta
                                                               for sid in playing):

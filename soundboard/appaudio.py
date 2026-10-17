@@ -54,6 +54,7 @@ COINIT_MULTITHREADED = 0
 RPC_E_CHANGED_MODE = -2147417850
 VT_BLOB = 0x41
 VT_LPWSTR = 31
+VT_UI4 = 19
 STGM_READ = 0
 E_RENDER, E_CAPTURE, DEVICE_STATE_ACTIVE = 0, 1, 1
 E_CONSOLE = 0   # ERole: the default device (not the communications one)
@@ -166,6 +167,8 @@ class PROPERTYKEY(Structure):
 
 
 PKEY_Device_FriendlyName = PROPERTYKEY(GUID.of("A45C254E-DF1C-4EFD-8020-67D146A850E0"), 14)
+# what Windows thinks the device is (EndpointFormFactor): soundboard.howl reads it
+PKEY_AudioEndpoint_FormFactor = PROPERTYKEY(GUID.of("1DA5D803-D492-4EDD-8C23-E0C0FFEE7F0E"), 0)
 
 
 class BLOB(Structure):
@@ -173,7 +176,7 @@ class BLOB(Structure):
 
 
 class _PVU(Union):
-    _fields_ = [("blob", BLOB), ("pwszVal", c_void_p)]
+    _fields_ = [("blob", BLOB), ("pwszVal", c_void_p), ("ulVal", c_ulong)]
 
 
 class PROPVARIANT(Structure):
@@ -311,6 +314,46 @@ def _device_name(dev: Com) -> str:
     except ComError:
         log.debug("device name unavailable", exc_info=True)
     return ""
+
+
+def _form_factor(dev: Com) -> int | None:
+    store = c_void_p()
+    try:
+        dev.call(4, (c_ulong, POINTER(c_void_p)), STGM_READ, byref(store), what="OpenPropertyStore")
+        with Com(store.value) as s:
+            pv = PROPVARIANT()
+            s.call(5, (POINTER(PROPERTYKEY), POINTER(PROPVARIANT)),
+                   byref(PKEY_AudioEndpoint_FormFactor), byref(pv), what="GetValue")
+            try:
+                return int(pv.u.ulVal) if pv.vt == VT_UI4 else None
+            finally:
+                _ole32.PropVariantClear(byref(pv))
+    except ComError:
+        log.debug("form factor unavailable", exc_info=True)
+    return None
+
+
+def output_form_factors() -> dict[str, int]:
+    """Each playback device's name -> what Windows thinks it is (EndpointFormFactor:
+    1 speakers, 3 headphones, 5 a headset, 9 a screen over HDMI, ...). Asks Windows:
+    never on the UI thread. Empty when it can't be asked."""
+    if not _win:
+        return {}
+    out: dict[str, int] = {}
+    own = _co_init()
+    try:
+        with _enumerator() as en:
+            for dev in _render_devices(en):
+                with dev:
+                    name, ff = _device_name(dev), _form_factor(dev)
+                    if name and ff is not None:
+                        out[name] = ff
+    except ComError:
+        log.debug("no playback devices", exc_info=True)
+    finally:
+        if own:
+            _ole32.CoUninitialize()
+    return out
 
 
 def _cotaskmem_str(p: c_void_p) -> str:

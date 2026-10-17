@@ -39,6 +39,7 @@ import numpy as np
 import sounddevice as sd
 
 from soundboard import destination, directmic, livefx, mapped
+from soundboard.howl import HowlGuard
 from soundboard.dsp import hermite
 from soundboard.eq import EQ
 from soundboard.sendfx import (CEILING_DB, SAFETY_DB, Ducker, Limiter, SafetyLimiter, SmartMono,
@@ -297,6 +298,8 @@ class Engine(EngineTakes, EngineDevices, SoundCache):
         self._eqs: dict[tuple[str, str], EQ] = {}
         self.mic_check = False    # headphones also get your mic (= exactly what others hear)
         self.mon_voice_only = False   # ...but only your (changed) voice: the Voice tab's
+        self._howl: HowlGuard | None = None   # listens for a squeal while mic_check is on
+        self.howl_stopped = False  # it squealed: mic_check was switched off (the UI tells)
         self.voice_chain = None   # voicefx.VoiceChain: voice changer / live speech tap on the mic
         # the send stage (soundboard.sendfx): what makes the mix survive voice chat
         self.send_mono = True     # phase-aware mono into the send device (every voice chat is mono)
@@ -1553,6 +1556,20 @@ class Engine(EngineTakes, EngineDevices, SoundCache):
             x[:, d] = x[:, 1 - d]
         return x
 
+    def _howling(self, heard) -> bool:
+        """Hear what they hear on speakers: the mic picks the speakers up, and loud
+        enough the loop squeals (soundboard.howl). Once it does, mic_check goes off
+        here, at once; the UI sees howl_stopped, unticks the switch and says why."""
+        g = self._howl
+        if g is None or g.rate != self.rates["mic"]:
+            g = self._howl = HowlGuard(self.rates["mic"])
+        if not g.feed(heard):
+            return False
+        g.reset()
+        self.mic_check = False
+        self.howl_stopped = True
+        return True
+
     def _mic(self, indata, direct: bool = False):
         x = indata
         two = x.shape[1] >= 2
@@ -1573,6 +1590,7 @@ class Engine(EngineTakes, EngineDevices, SoundCache):
         take = self._take   # Record a sound: one copy and one append, nothing more
         if take is not None and not self._take_fx:
             take.append(x.copy())
+        heard = x[:, 0].copy() if self.mic_check else None   # the real mic, for the howl check
         chain = self.voice_chain
         if chain is not None:   # after the meter: that judges the real mic
             x = chain.process(x, self.rates["mic"])
@@ -1591,10 +1609,14 @@ class Engine(EngineTakes, EngineDevices, SoundCache):
             elif direct:   # straight into the mic: the same stretch goes out right after
                 self.fifo_direct.write(self._rs_main(x))
         fed = self.mic_check and self.mon_stream is not None
+        if fed and heard is not None and self._howling(heard):
+            fed = False   # the mic hears its own playback (speakers): stop feeding it
         if fed:
             self.ring_mon.write(self._rs_mon(x))
         elif self._mon_fed:   # mic check stopped: an emptied ring isn't clock drift
             self.ring_mon.clear()
+            if self._howl is not None:
+                self._howl.reset()
         self._mon_fed = fed
         fed = self.obs_voice and self.obs_stream is not None
         if fed:

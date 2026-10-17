@@ -4092,5 +4092,7 @@
   "Legendary": "Efsanevi",
   "Rare": "Nadir",
   "Super Rare": "Süper nadir",
-  "Uncommon": "Sıra dışı"
+  "Uncommon": "Sıra dışı",
+  "<b>{device}</b> looks like speakers, so your mic hears itself. Keep them quiet or use headphones. If it starts to squeal, this switches off by itself.": "<b>{device}</b> hoparlöre benziyor, bu yüzden mikrofon kendini duyuyor. Sesini kıs ya da kulaklık kullan. Cızlamaya başlarsa bu kendiliğinden kapanır.",
+  "Stopped <b>Hear what they hear</b>: your mic was picking up your speakers and started to squeal. Use headphones, or turn the speakers down.": "<b>Onların duyduğunu duy</b> durduruldu: mikrofonun hoparlörleri duyuyordu ve cızlamaya başladı. Kulaklık kullan ya da hoparlörlerin sesini kıs."
 }
