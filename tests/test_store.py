@@ -338,3 +338,13 @@ def test_trending_failures_and_switched_off(qapp, fake, monkeypatch):
     t.reload()
     assert t.msg_btn.text() == "Privacy && security settings"
     t.shutdown()
+
+
+def test_card_tooltips_never_read_html(qapp):
+    from soundboard.ui.ytsearch import ClampLabel, plain_tip
+    lbl = ClampLabel('<img src="x"><b>Loud</b> & proud')
+    assert lbl.toolTip() == plain_tip('<img src="x"><b>Loud</b> & proud')
+    assert "<img" not in lbl.toolTip() and "&lt;img" in lbl.toolTip()
+    lbl.set_full("a", "<b>b</b>")
+    assert lbl.toolTip() == "<p>&lt;b&gt;b&lt;/b&gt;</p>"
+    assert plain_tip("") == ""

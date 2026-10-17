@@ -356,6 +356,12 @@ class Thumb(QWidget):
             self.update()   # bouncing bars: every tick while it plays
 
 
+def plain_tip(text: str) -> str:
+    """`text` as a tooltip that shows exactly what it says: a tooltip reads anything
+    that looks like HTML as HTML, and titles come from the web and the store."""
+    return f"<p>{html.escape(text)}</p>" if text else ""
+
+
 class ClampLabel(QLabel):
     """Text (bold by default) wrapped onto at most `lines` lines, the last ending in "…" when it
     doesn't fit (the full text in the tooltip). Always that tall, so cards in a row
@@ -368,13 +374,13 @@ class ClampLabel(QLabel):
         f = self.font()
         f.setBold(bold)
         self.setFont(f)
-        self.setToolTip(text)
+        self.setToolTip(plain_tip(text))
         self.setSizePolicy(QSizePolicy.Policy.Ignored, QSizePolicy.Policy.Fixed)
         self._fit()
 
     def set_full(self, text: str, tip: str = ""):
         self.full = text
-        self.setToolTip(tip or text)
+        self.setToolTip(plain_tip(tip or text))
         self.update()
 
     def _fit(self):

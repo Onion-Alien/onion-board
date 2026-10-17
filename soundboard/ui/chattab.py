@@ -29,6 +29,7 @@ log = logging.getLogger(__name__)
 
 COLUMN_W = 760          # the room stays a readable column on a wide window
 RETRY_S = (3, 6, 12, 30)   # waits after a failed poll, then 30 s
+MIN_POLL_S = 1.0        # never ask the server more often than this, whatever it answers
 MAX_SEEN = 400          # message numbers kept to ignore a repeat
 
 
@@ -276,13 +277,19 @@ class ChatTab(QWidget):
         gen, install = self._gen, self.install()
 
         def run():
-            after, fails = self._after, 0
+            after, fails, first = self._after, 0, True
             while not self._closed and gen == self._gen:
+                start = time.monotonic()
                 try:
-                    got, last, off = chat.poll(install, after, wait=after != 0)
-                    fails = 0
-                    after = last if last < after else max([after, *(m.id for m in got)])
+                    # the first look answers at once; after that the server holds each
+                    # call until there's news (an empty room too: room number 0)
+                    got, last, off = chat.poll(install, after, wait=not first)
+                    first, fails = False, 0
+                    after = last   # the room's newest number, even one taken away since
                     busy.emit(self._polled, gen, got, last, off, "")
+                    while (time.monotonic() - start < MIN_POLL_S and not self._closed
+                           and gen == self._gen):
+                        time.sleep(0.05)
                 except Exception as e:  # noqa: BLE001 - offline, switched off, the server…
                     log.info("couldn't read the chat: %s", e)
                     busy.emit(self._polled, gen, [], after, False,

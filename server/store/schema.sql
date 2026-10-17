@@ -31,7 +31,7 @@ CREATE TABLE IF NOT EXISTS votes (
 
 CREATE TABLE IF NOT EXISTS reports (
   sound TEXT NOT NULL,
-  voter TEXT NOT NULL,
+  voter TEXT NOT NULL,               -- "ip:" + salted hash of the address: one per address
   reason TEXT NOT NULL DEFAULT '',
   created INTEGER NOT NULL,
   PRIMARY KEY (sound, voter)
