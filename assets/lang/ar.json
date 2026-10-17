@@ -10,7 +10,6 @@
   " · shows by itself when {progs} is in front": " · تظهر تلقائيًا عندما يكون {progs} في المقدمة",
   " · {hk} plays a random one": " · {hk} يشغّل صوتًا عشوائيًا",
   ", try Settings → Audio → Audio buffering: Safer": "• جرّب الإعدادات → الصوت → التخزين المؤقت للصوت: أكثر أمانًا",
-  "+{value} more": "+{value} أخرى",
   "<b>You don't need the virtual cable any more</b>, it was only the backup. Remove it, or keep it if another program uses it (Voicemeeter, another soundboard).": "<b>لم تعد بحاجة إلى الكابل الافتراضي</b>, كان مجرد خيار احتياطي. أزله، أو أبقه إن كان برنامج آخر يستخدمه (Voicemeeter، أو لوحة أصوات أخرى).",
   "<span style='color:{red}'>Couldn't search {site}: {err}</span>": "<span style='color:{red}'>تعذّر البحث في {site}: {err}</span>",
   "<span style='color:{status}'>Another program is already using {keys}, pick a different hotkey.</span>": "<span style='color:{status}'>برنامج آخر يستخدم {keys} بالفعل, اختر اختصارًا مختلفًا.</span>",
@@ -1407,7 +1406,6 @@
   "Voices in your voices folder that are a server on the internet. Ones on this PC (127.0.0.1) always work.": "الأصوات الموجودة في مجلد الأصوات الخاص بك والتي تعد خادمًا على الإنترنت. تعمل الأجهزة الموجودة على هذا الكمبيوتر (127.0.0.1) دائمًا.",
   "Wait first": "انتظر أولا",
   "Waiting to hear you… if the bar doesn't move, pick another mic.": "في انتظار سماعك... إذا لم يتحرك الشريط، فاختر ميكروفونًا آخر.",
-  "Waits for the sounds playing to finish": "ينتظر انتهاء الأصوات التي يتم تشغيلها",
   "Waits this long after the press before it plays, say for a punchline. Stop everything cancels it.": "ينتظر كل هذه المدة بعد الضغط على الأغنية قبل أن يتم تشغيلها، على سبيل المثال، لجملة من الكلمات. وقف كل شيء يلغي ذلك.",
   "Waking it up, so you don't have to restart (your sound may blip for a second)": "تنشيطه، حتى لا تضطر إلى إعادة التشغيل (قد ينقطع الصوت لثانية واحدة)",
   "Waveform shows once the sound has loaded": "يظهر الشكل الموجي بمجرد تحميل الصوت",
@@ -3890,5 +3888,7 @@
   "Is a sound in the store yours? Email {email} and it comes down.": "هل أحد أصوات المتجر لك؟ راسلنا على {email} وسنحذفه.",
   "Games get the key too": "الألعاب تحصل على المفتاح أيضًا",
   "Keys in games": "المفاتيح في الألعاب",
-  "With this on, a hotkey still does its normal job too: press F1 in a game and the game gets F1 while your sound plays. Off: only Onion Board gets the key, so a hotkey on W stops you walking.": "عند تفعيل هذا، يقوم مفتاح التشغيل السريع بعمله العادي أيضًا: اضغط F1 في لعبة وستحصل اللعبة على F1 بينما يعمل صوتك. عند الإيقاف: Onion Board وحده يحصل على المفتاح، لذا مفتاح تشغيل سريع على W يمنعك من المشي."
+  "With this on, a hotkey still does its normal job too: press F1 in a game and the game gets F1 while your sound plays. Off: only Onion Board gets the key, so a hotkey on W stops you walking.": "عند تفعيل هذا، يقوم مفتاح التشغيل السريع بعمله العادي أيضًا: اضغط F1 في لعبة وستحصل اللعبة على F1 بينما يعمل صوتك. عند الإيقاف: Onion Board وحده يحصل على المفتاح، لذا مفتاح تشغيل سريع على W يمنعك من المشي.",
+  "See everything waiting to play": "اعرض كل ما ينتظر التشغيل",
+  "Take everything out of the queue": "أخرج كل شيء من قائمة الانتظار"
 }

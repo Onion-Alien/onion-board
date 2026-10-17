@@ -11,7 +11,6 @@
   " · {hk} plays a random one": " · {hk} reproduce uno al azar",
   ", try Settings → Audio → Audio buffering: Safer": "• prueba Configuración → Audio → Búfer de audio: Más seguro",
   "(In a game? Press <b>Shift + Tab</b> and click the ⚙ gear.)": "(¿Estás en un juego? Presiona <b>Shift + Tab</b> y haz clic en el engranaje ⚙.)",
-  "+{value} more": "+{value} más",
   "<b style='color:{color}'>Discord is changing your sounds:</b><ul style='margin-left:-20px'>{fixes}</ul>Fix it, then check again.": "<b style='color:{color}'>Discord está cambiando tus sonidos:</b><ul style='margin-left:-20px'>{fixes}</ul>Corrígelo y vuelve a revisar.",
   "<b style='color:{color}'>✓ Discord passes your sounds through clean.</b> Nothing in its settings is changing them.": "<b style='color:{color}'>✓ Discord deja pasar tus sonidos limpios.</b> Nada en su configuración los está cambiando.",
   "<b style='color:{colour}'>(live)</b>": "<b style='color:{colour}'>(en vivo)</b>",
@@ -1229,7 +1228,6 @@
   "Volume for {count} (%):": "Volumen para {count} (%):",
   "Wait first": "Esperar antes",
   "Waiting to hear you… if the bar doesn't move, pick another mic.": "Esperando oírte… si la barra no se mueve, elige otro micrófono.",
-  "Waits for the sounds playing to finish": "Espera a que terminen los sonidos que están sonando",
   "Waits this long after the press before it plays, say for a punchline. Stop everything cancels it.": "Espera este tiempo después de presionarlo antes de sonar, por ejemplo para el remate de un chiste. Detener todo lo cancela.",
   "Waking it up, so you don't have to restart (your sound may blip for a second)": "Despertándolo, para que no tengas que reiniciar (tu sonido puede cortarse un segundo)",
   "Walks you through mic, headphones, where your sounds go (your mic, the cable, another device or nowhere) and Discord": "Te guía por el micrófono, los audífonos, a dónde van tus sonidos (tu micrófono, el cable, otro dispositivo o ningún lado) y Discord",
@@ -3582,5 +3580,7 @@
   "Is a sound in the store yours? Email {email} and it comes down.": "¿Un sonido de la tienda es tuyo? Escribe a {email} y lo quitamos.",
   "Games get the key too": "Los juegos también reciben la tecla",
   "Keys in games": "Teclas en los juegos",
-  "With this on, a hotkey still does its normal job too: press F1 in a game and the game gets F1 while your sound plays. Off: only Onion Board gets the key, so a hotkey on W stops you walking.": "Con esto activado, un atajo sigue haciendo también su función normal: presiona F1 en un juego y el juego recibe F1 mientras suena tu sonido. Desactivado: solo Onion Board recibe la tecla, así que un atajo en W te impide caminar."
+  "With this on, a hotkey still does its normal job too: press F1 in a game and the game gets F1 while your sound plays. Off: only Onion Board gets the key, so a hotkey on W stops you walking.": "Con esto activado, un atajo sigue haciendo también su función normal: presiona F1 en un juego y el juego recibe F1 mientras suena tu sonido. Desactivado: solo Onion Board recibe la tecla, así que un atajo en W te impide caminar.",
+  "See everything waiting to play": "Ver todo lo que espera para sonar",
+  "Take everything out of the queue": "Sacar todo de la cola"
 }

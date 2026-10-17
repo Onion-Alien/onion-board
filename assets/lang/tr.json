@@ -10,7 +10,6 @@
   " · shows by itself when {progs} is in front": " · {progs} öndeyken kendiliğinden görünür",
   " · {hk} plays a random one": " · {hk} rastgele birini çalar",
   ", try Settings → Audio → Audio buffering: Safer": "• Ayarlar → Ses → Ses tamponu: Daha güvenli seçeneğini dene",
-  "+{value} more": "+{value} tane daha",
   "<b>You don't need the virtual cable any more</b>, it was only the backup. Remove it, or keep it if another program uses it (Voicemeeter, another soundboard).": "<b>Sanal kabloya artık ihtiyacın yok</b>, sadece yedekti. Kaldır ya da başka bir program kullanıyorsa (Voicemeeter, başka bir soundboard) tut.",
   "<span style='color:{red}'>Couldn't search {site}: {err}</span>": "<span style='color:{red}'>{site} aranamadı: {err}</span>",
   "<span style='color:{status}'>Another program is already using {keys}, pick a different hotkey.</span>": "<span style='color:{status}'>{keys} zaten başka bir program tarafından kullanılıyor, başka bir kısayol tuşu seç.</span>",
@@ -1315,7 +1314,6 @@
   "Voices in your voices folder that are a server on the internet. Ones on this PC (127.0.0.1) always work.": "İnternetteki bir sunucu olan sesler klasörünüzdeki sesler. Bu bilgisayardakiler (127.0.0.1) her zaman çalışır.",
   "Wait first": "Önce bekle",
   "Waiting to hear you… if the bar doesn't move, pick another mic.": "Seni duymak için bekliyorum... eğer çubuk hareket etmezse başka bir mikrofon seç.",
-  "Waits for the sounds playing to finish": "Çalınan seslerin bitmesini bekler",
   "Waits this long after the press before it plays, say for a punchline. Stop everything cancels it.": "Basından sonra, örneğin can alıcı nokta için, oynatılmadan önce bu kadar bekler. Her şeyi durdur, onu iptal eder.",
   "Waking it up, so you don't have to restart (your sound may blip for a second)": "Yeniden başlatmanıza gerek kalmaması için uyandırılıyor (sesiniz bir saniyeliğine kesilebilir)",
   "Waveform shows once the sound has loaded": "Dalga formu, ses yüklendikten sonra gösterilir",
@@ -3582,5 +3580,7 @@
   "Is a sound in the store yours? Email {email} and it comes down.": "Mağazadaki bir ses senin mi? {email} adresine yaz, kaldırılsın.",
   "Games get the key too": "Oyunlar da tuşu alsın",
   "Keys in games": "Oyunlarda tuşlar",
-  "With this on, a hotkey still does its normal job too: press F1 in a game and the game gets F1 while your sound plays. Off: only Onion Board gets the key, so a hotkey on W stops you walking.": "Bu açıkken kısayol tuşu normal işini de yapar: oyunda F1'e bas, sesin çalarken oyun da F1'i alır. Kapalı: tuşu yalnızca Onion Board alır, yani W'ye atanmış bir kısayol yürümeni engeller."
+  "With this on, a hotkey still does its normal job too: press F1 in a game and the game gets F1 while your sound plays. Off: only Onion Board gets the key, so a hotkey on W stops you walking.": "Bu açıkken kısayol tuşu normal işini de yapar: oyunda F1'e bas, sesin çalarken oyun da F1'i alır. Kapalı: tuşu yalnızca Onion Board alır, yani W'ye atanmış bir kısayol yürümeni engeller.",
+  "See everything waiting to play": "Çalmayı bekleyen her şeyi gör",
+  "Take everything out of the queue": "Sıradaki her şeyi çıkar"
 }

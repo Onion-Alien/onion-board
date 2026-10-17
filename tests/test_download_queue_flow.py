@@ -176,14 +176,10 @@ def test_up_next_chips_play_now_or_come_out_and_stop_all_clears_them(net):
     assert not net.w.playing_row.isHidden() and net.w._chip_ids[2] == shown
     row, flow = net.w.playing_row, net.w._chips_hl
     assert flow.itemAt(0).widget().text() == "Now playing"     # first, then Up next
-    lbl, chips, more, total = net.w._waiting_chips
-    assert total == 3
-    row.resize(2000, row.height())
-    net.w.playctl._fit_up_next()
-    assert not lbl.isHidden() and all(not c.isHidden() for c in chips) and more.isHidden()
-    row.resize(330, row.height())                               # narrow: Now playing only
-    net.w.playctl._fit_up_next()
-    assert lbl.isHidden() and all(c.isHidden() for c in chips) and more.isHidden()
+    chip = net.w._up_next_chip                       # one chip: how many wait
+    assert chip.count.text() == "3"
+    row.resize(330, row.height())                     # narrow: it stays, the row wraps
+    assert not chip.isHidden()
     net.w.linkbar.drop_up_next(0, shown)              # Random's ✕
     net.w.linkbar.drop_up_next(0, shown)              # a double click: out of date
     assert net.w.linkbar.up_next() == ["Third", "Fourth"]

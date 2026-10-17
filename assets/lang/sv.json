@@ -11,7 +11,6 @@
   " · {hk} plays a random one": " · {hk} spelar ett slumpmässigt",
   ", try Settings → Audio → Audio buffering: Safer": "• prova Inställningar → Ljud → Ljudbuffring: Säkrare",
   "(In a game? Press <b>Shift + Tab</b> and click the ⚙ gear.)": "(I ett spel? Tryck <b>Shift + Tab</b> och klicka på kugghjulet ⚙.)",
-  "+{value} more": "+{value} till",
   "<b style='color:{color}'>Discord is changing your sounds:</b><ul style='margin-left:-20px'>{fixes}</ul>Fix it, then check again.": "<b style='color:{color}'>Discord ändrar dina ljud:</b><ul style='margin-left:-20px'>{fixes}</ul>Fixa det och kolla sedan igen.",
   "<b style='color:{color}'>✓ Discord passes your sounds through clean.</b> Nothing in its settings is changing them.": "<b style='color:{color}'>✓ Discord släpper igenom dina ljud rent.</b> Inget i dess inställningar ändrar dem.",
   "<b style='color:{colour}'>(live)</b>": "<b style='color:{colour}'>(live)</b>",
@@ -1229,7 +1228,6 @@
   "Volume for {count} (%):": "Volym för {count} (%):",
   "Wait first": "Vänta först",
   "Waiting to hear you… if the bar doesn't move, pick another mic.": "Väntar på att höra dig… om stapeln inte rör sig, välj en annan mikrofon.",
-  "Waits for the sounds playing to finish": "Väntar tills ljuden som spelas är klara",
   "Waits this long after the press before it plays, say for a punchline. Stop everything cancels it.": "Väntar så här länge efter trycket innan det spelas, t.ex. för en punchline. Stoppa allt avbryter det.",
   "Waking it up, so you don't have to restart (your sound may blip for a second)": "Väcker den, så att du slipper starta om (ditt ljud kan hacka en sekund)",
   "Walks you through mic, headphones, where your sounds go (your mic, the cable, another device or nowhere) and Discord": "Guidar dig genom mikrofon, hörlurar, vart dina ljud går (din mikrofon, kabeln, en annan enhet eller ingenstans) och Discord",
@@ -3582,5 +3580,7 @@
   "Is a sound in the store yours? Email {email} and it comes down.": "Är ett ljud i butiken ditt? Mejla {email} så tas det bort.",
   "Games get the key too": "Spel får också tangenten",
   "Keys in games": "Tangenter i spel",
-  "With this on, a hotkey still does its normal job too: press F1 in a game and the game gets F1 while your sound plays. Off: only Onion Board gets the key, so a hotkey on W stops you walking.": "När det här är på gör en snabbtangent också sitt vanliga jobb: tryck F1 i ett spel så får spelet F1 medan ditt ljud spelas. Av: bara Onion Board får tangenten, så en snabbtangent på W hindrar dig från att gå."
+  "With this on, a hotkey still does its normal job too: press F1 in a game and the game gets F1 while your sound plays. Off: only Onion Board gets the key, so a hotkey on W stops you walking.": "När det här är på gör en snabbtangent också sitt vanliga jobb: tryck F1 i ett spel så får spelet F1 medan ditt ljud spelas. Av: bara Onion Board får tangenten, så en snabbtangent på W hindrar dig från att gå.",
+  "See everything waiting to play": "Se allt som väntar på att spelas",
+  "Take everything out of the queue": "Ta bort allt ur kön"
 }

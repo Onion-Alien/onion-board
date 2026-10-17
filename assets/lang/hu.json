@@ -11,7 +11,6 @@
   " · {hk} plays a random one": " · {hk}: lejátszik egy véletlenszerűt",
   ", try Settings → Audio → Audio buffering: Safer": "• próbáld ezt: Beállítások → Hang → Hangpufferelés: Biztonságosabb",
   "(In a game? Press <b>Shift + Tab</b> and click the ⚙ gear.)": "(Játékban vagy? Nyomd meg a <b>Shift + Tab</b> gombot, és kattints a ⚙ fogaskerékre.)",
-  "+{value} more": "+{value} további",
   "<b style='color:{color}'>Discord is changing your sounds:</b><ul style='margin-left:-20px'>{fixes}</ul>Fix it, then check again.": "<b style='color:{color}'>A Discord módosítja a hangjaidat:</b><ul style='margin-left:-20px'>{fixes}</ul>Javítsd ki, aztán ellenőrizd újra.",
   "<b style='color:{color}'>✓ Discord passes your sounds through clean.</b> Nothing in its settings is changing them.": "<b style='color:{color}'>✓ A Discord tisztán átengedi a hangjaidat.</b> A beállításai közül semmi sem módosítja őket.",
   "<b style='color:{colour}'>(live)</b>": "<b style='color:{colour}'>(élő)</b>",
@@ -1229,7 +1228,6 @@
   "Volume for {count} (%):": "Hangerő ennyihez: {count} (%):",
   "Wait first": "Előtte várás",
   "Waiting to hear you… if the bar doesn't move, pick another mic.": "Várom, hogy halljalak… ha a sáv nem mozdul, válassz másik mikrofont.",
-  "Waits for the sounds playing to finish": "Megvárja, amíg a szóló hangok véget érnek",
   "Waits this long after the press before it plays, say for a punchline. Stop everything cancels it.": "Ennyit vár a nyomás után lejátszás előtt, mondjuk egy poénhoz. A Minden leállítása megszakítja.",
   "Waking it up, so you don't have to restart (your sound may blip for a second)": "Felébresztés, hogy ne kelljen újraindítanod (a hangod egy pillanatra kihagyhat)",
   "Walks you through mic, headphones, where your sounds go (your mic, the cable, another device or nowhere) and Discord": "Végigvezet a mikrofonon, fejhallgatón, azon, hová mennek a hangjaid (a mikrofonod, a kábel, másik eszköz vagy sehová), és a Discordon",
@@ -3582,5 +3580,7 @@
   "Is a sound in the store yours? Email {email} and it comes down.": "Az egyik hang a boltban a tiéd? Írj a(z) {email} címre, és levesszük.",
   "Games get the key too": "A játékok is megkapják a billentyűt",
   "Keys in games": "Billentyűk a játékokban",
-  "With this on, a hotkey still does its normal job too: press F1 in a game and the game gets F1 while your sound plays. Off: only Onion Board gets the key, so a hotkey on W stops you walking.": "Ha be van kapcsolva, a gyorsbillentyű a szokásos dolgát is végzi: nyomd meg az F1-et egy játékban, és a játék megkapja az F1-et, miközben szól a hangod. Kikapcsolva: csak az Onion Board kapja meg a billentyűt, így egy W-re tett gyorsbillentyű miatt nem tudsz sétálni."
+  "With this on, a hotkey still does its normal job too: press F1 in a game and the game gets F1 while your sound plays. Off: only Onion Board gets the key, so a hotkey on W stops you walking.": "Ha be van kapcsolva, a gyorsbillentyű a szokásos dolgát is végzi: nyomd meg az F1-et egy játékban, és a játék megkapja az F1-et, miközben szól a hangod. Kikapcsolva: csak az Onion Board kapja meg a billentyűt, így egy W-re tett gyorsbillentyű miatt nem tudsz sétálni.",
+  "See everything waiting to play": "Minden lejátszásra váró megjelenítése",
+  "Take everything out of the queue": "Mindent kivesz a sorból"
 }

@@ -10,7 +10,6 @@
   " · shows by itself when {progs} is in front": " · показва се сама, когато {progs} е отпред",
   " · {hk} plays a random one": " · {hk} пуска случаен звук",
   "(In a game? Press <b>Shift + Tab</b> and click the ⚙ gear.)": "(В игра ли си? Натисни <b>Shift + Tab</b> и кликни на зъбчатото колело ⚙.)",
-  "+{value} more": "+ още {value}",
   "<b style='color:{color}'>Discord is changing your sounds:</b><ul style='margin-left:-20px'>{fixes}</ul>Fix it, then check again.": "<b style='color:{color}'>Discord променя звуците ти:</b><ul style='margin-left:-20px'>{fixes}</ul>Оправи го и провери пак.",
   "<b style='color:{color}'>✓ Discord passes your sounds through clean.</b> Nothing in its settings is changing them.": "<b style='color:{color}'>✓ Discord пропуска звуците ти чисти.</b> Нищо в настройките му не ги променя.",
   "<b style='color:{colour}'>(live)</b>": "<b style='color:{colour}'>(на живо)</b>",
@@ -1154,7 +1153,6 @@
   "Volume for {count} (%):": "Сила на звука за {count} (%):",
   "Wait first": "Първо изчакай",
   "Waiting to hear you… if the bar doesn't move, pick another mic.": "Чакам да те чуя… ако лентата не мърда, избери друг микрофон.",
-  "Waits for the sounds playing to finish": "Чака звуците, които звучат, да свършат",
   "Waits this long after the press before it plays, say for a punchline. Stop everything cancels it.": "Чака толкова след натискането, преди да звучи, например за финала на шега. Спри всичко го отменя.",
   "Waking it up, so you don't have to restart (your sound may blip for a second)": "Събуждам го, за да не трябва да рестартираш (звукът ти може да прекъсне за секунда)",
   "Walks you through mic, headphones, where your sounds go (your mic, the cable, another device or nowhere) and Discord": "Води те през микрофона, слушалките, къде отиват звуците ти (микрофонът ти, кабелът, друго устройство или никъде) и Discord",
@@ -3582,5 +3580,7 @@
   "Is a sound in the store yours? Email {email} and it comes down.": "Някой звук в магазина е твой? Пиши на {email} и ще бъде махнат.",
   "Games get the key too": "Игрите също получават клавиша",
   "Keys in games": "Клавиши в игрите",
-  "With this on, a hotkey still does its normal job too: press F1 in a game and the game gets F1 while your sound plays. Off: only Onion Board gets the key, so a hotkey on W stops you walking.": "Когато е включено, бързият клавиш върши и обичайната си работа: натисни F1 в игра и играта получава F1, докато звукът ти свири. Изключено: само Onion Board получава клавиша, така че бърз клавиш на W те спира да вървиш."
+  "With this on, a hotkey still does its normal job too: press F1 in a game and the game gets F1 while your sound plays. Off: only Onion Board gets the key, so a hotkey on W stops you walking.": "Когато е включено, бързият клавиш върши и обичайната си работа: натисни F1 в игра и играта получава F1, докато звукът ти свири. Изключено: само Onion Board получава клавиша, така че бърз клавиш на W те спира да вървиш.",
+  "See everything waiting to play": "Виж всичко, което чака да се пусне",
+  "Take everything out of the queue": "Махни всичко от опашката"
 }

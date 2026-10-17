@@ -10,7 +10,6 @@
   " · shows by itself when {progs} is in front": " · muncul sendiri saat {progs} di depan",
   " · {hk} plays a random one": " · {hk} memutar salah satu secara acak",
   ", try Settings → Audio → Audio buffering: Safer": "• coba Pengaturan → Audio → Buffer audio: Lebih aman",
-  "+{value} more": "+{value} lagi",
   "<b>You don't need the virtual cable any more</b>, it was only the backup. Remove it, or keep it if another program uses it (Voicemeeter, another soundboard).": "<b>Kamu tidak butuh kabel virtual lagi</b>, itu cuma cadangan. Hapus saja, atau biarkan kalau program lain memakainya (Voicemeeter, soundboard lain).",
   "<span style='color:{red}'>Couldn't search {site}: {err}</span>": "<span style='color:{red}'>Gagal mencari di {site}: {err}</span>",
   "<span style='color:{status}'>Another program is already using {keys}, pick a different hotkey.</span>": "<span style='color:{status}'>Program lain sudah memakai {keys}, pilih hotkey lain.</span>",
@@ -1291,7 +1290,6 @@
   "Voices in your voices folder that are a server on the internet. Ones on this PC (127.0.0.1) always work.": "Suara di folder suara-suaramu yang berupa server di internet. Yang ada di PC ini (127.0.0.1) selalu jalan.",
   "Wait first": "Tunggu dulu",
   "Waiting to hear you… if the bar doesn't move, pick another mic.": "Menunggu untuk mendengar Anda… jika bilah tidak bergerak, pilih mikrofon lain.",
-  "Waits for the sounds playing to finish": "Menunggu hingga suara yang diputar selesai",
   "Waits this long after the press before it plays, say for a punchline. Stop everything cancels it.": "Menunggu selama ini setelah ditekan sebelum diputar, katakanlah untuk bagian lucunya. Hentikan semuanya membatalkannya.",
   "Waking it up, so you don't have to restart (your sound may blip for a second)": "Membangunkannya, jadi Anda tidak perlu memulai ulang (suara Anda mungkin akan berkedip sebentar)",
   "Waveform shows once the sound has loaded": "Bentuk gelombang muncul setelah suara dimuat",
@@ -3505,5 +3503,7 @@
   "Is a sound in the store yours? Email {email} and it comes down.": "Ada suara di toko yang milikmu? Kirim email ke {email} dan suaranya akan dihapus.",
   "Games get the key too": "Game juga dapat tombolnya",
   "Keys in games": "Tombol di game",
-  "With this on, a hotkey still does its normal job too: press F1 in a game and the game gets F1 while your sound plays. Off: only Onion Board gets the key, so a hotkey on W stops you walking.": "Kalau ini aktif, hotkey tetap menjalankan tugas normalnya juga: tekan F1 di game dan game tetap dapat F1 sementara suaramu diputar. Mati: hanya Onion Board yang dapat tombolnya, jadi hotkey di W membuatmu tidak bisa jalan."
+  "With this on, a hotkey still does its normal job too: press F1 in a game and the game gets F1 while your sound plays. Off: only Onion Board gets the key, so a hotkey on W stops you walking.": "Kalau ini aktif, hotkey tetap menjalankan tugas normalnya juga: tekan F1 di game dan game tetap dapat F1 sementara suaramu diputar. Mati: hanya Onion Board yang dapat tombolnya, jadi hotkey di W membuatmu tidak bisa jalan.",
+  "See everything waiting to play": "Lihat semua yang menunggu diputar",
+  "Take everything out of the queue": "Keluarkan semua dari antrean"
 }

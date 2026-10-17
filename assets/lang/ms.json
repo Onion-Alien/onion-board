@@ -11,7 +11,6 @@
   " · {hk} plays a random one": " · {hk} memainkan satu secara rawak",
   ", try Settings → Audio → Audio buffering: Safer": "• cuba Tetapan → Audio → Penimbalan audio: Lebih selamat",
   "(In a game? Press <b>Shift + Tab</b> and click the ⚙ gear.)": "(Dalam permainan? Tekan <b>Shift + Tab</b> dan klik gear ⚙.)",
-  "+{value} more": "+{value} lagi",
   "<b style='color:{color}'>Discord is changing your sounds:</b><ul style='margin-left:-20px'>{fixes}</ul>Fix it, then check again.": "<b style='color:{color}'>Discord sedang mengubah bunyi anda:</b><ul style='margin-left:-20px'>{fixes}</ul>Baikinya, kemudian semak lagi.",
   "<b style='color:{color}'>✓ Discord passes your sounds through clean.</b> Nothing in its settings is changing them.": "<b style='color:{color}'>✓ Discord menghantar bunyi anda dengan bersih.</b> Tiada apa dalam tetapannya yang mengubahnya.",
   "<b style='color:{colour}'>(live)</b>": "<b style='color:{colour}'>(langsung)</b>",
@@ -1212,7 +1211,6 @@
   "Volume for {count} (%):": "Kelantangan untuk {count} (%):",
   "Wait first": "Tunggu dahulu",
   "Waiting to hear you… if the bar doesn't move, pick another mic.": "Menunggu untuk mendengar anda… jika bar tidak bergerak, pilih mikrofon lain.",
-  "Waits for the sounds playing to finish": "Menunggu bunyi yang sedang dimainkan selesai",
   "Waits this long after the press before it plays, say for a punchline. Stop everything cancels it.": "Menunggu selama ini selepas ditekan sebelum dimainkan, contohnya untuk punchline. Hentikan semua membatalkannya.",
   "Waking it up, so you don't have to restart (your sound may blip for a second)": "Membangunkannya, supaya anda tidak perlu mula semula (bunyi anda mungkin hilang sesaat)",
   "Walks you through mic, headphones, where your sounds go (your mic, the cable, another device or nowhere) and Discord": "Membimbing anda melalui mikrofon, fon kepala, ke mana bunyi anda pergi (mikrofon anda, kabel, peranti lain atau tidak ke mana-mana) dan Discord",
@@ -3505,5 +3503,7 @@
   "Is a sound in the store yours? Email {email} and it comes down.": "Ada bunyi dalam kedai yang milik anda? E-mel ke {email} dan ia akan dibuang.",
   "Games get the key too": "Permainan pun dapat kekunci itu",
   "Keys in games": "Kekunci dalam permainan",
-  "With this on, a hotkey still does its normal job too: press F1 in a game and the game gets F1 while your sound plays. Off: only Onion Board gets the key, so a hotkey on W stops you walking.": "Bila ini hidup, hotkey tetap buat kerja biasanya juga: tekan F1 dalam permainan dan permainan dapat F1 sambil bunyi anda dimainkan. Mati: hanya Onion Board dapat kekunci itu, jadi hotkey pada W menghalang anda berjalan."
+  "With this on, a hotkey still does its normal job too: press F1 in a game and the game gets F1 while your sound plays. Off: only Onion Board gets the key, so a hotkey on W stops you walking.": "Bila ini hidup, hotkey tetap buat kerja biasanya juga: tekan F1 dalam permainan dan permainan dapat F1 sambil bunyi anda dimainkan. Mati: hanya Onion Board dapat kekunci itu, jadi hotkey pada W menghalang anda berjalan.",
+  "See everything waiting to play": "Lihat semua yang menunggu untuk dimainkan",
+  "Take everything out of the queue": "Keluarkan semua daripada baris gilir"
 }
