@@ -4168,5 +4168,6 @@
   "Super Rare": "Superrzadki",
   "Uncommon": "Niepospolity",
   "<b>{device}</b> looks like speakers, so your mic hears itself. Keep them quiet or use headphones. If it starts to squeal, this switches off by itself.": "<b>{device}</b> wygląda na głośniki, więc mikrofon słyszy sam siebie. Ścisz je albo użyj słuchawek. Jeśli zacznie piszczeć, to wyłączy się samo.",
-  "Stopped <b>Hear what they hear</b>: your mic was picking up your speakers and started to squeal. Use headphones, or turn the speakers down.": "Zatrzymano <b>Słuchaj jak inni</b>: mikrofon łapał dźwięk z głośników i zaczął piszczeć. Użyj słuchawek albo ścisz głośniki."
+  "Stopped <b>Hear what they hear</b>: your mic was picking up your speakers and started to squeal. Use headphones, or turn the speakers down.": "Zatrzymano <b>Słuchaj jak inni</b>: mikrofon łapał dźwięk z głośników i zaczął piszczeć. Użyj słuchawek albo ścisz głośniki.",
+  "Bun's almost done, one moment.": "Bun prawie skończył, chwileczkę."
 }

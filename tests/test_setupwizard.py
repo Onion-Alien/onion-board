@@ -640,9 +640,13 @@ def test_mic_attach_plays_show_in_wizard_without_blocking_buttons(mic_wizard, mo
 
 def test_the_guide_stays_open_while_the_mic_is_set_up(mic_wizard, monkeypatch):
     """While Bun puts the sounds into the mic, Back, Next, Esc and the X do nothing:
-    closed or moved on mid-way, they couldn't tell how it went. Afterwards they work
-    again, and a set-up that never answers lets them go after LOCK_MAX_S."""
+    closed or moved on mid-way, they couldn't tell how it went. Esc and the X say why
+    (the X doesn't look broken). Afterwards they work again, and a set-up that never
+    answers lets them go after LOCK_MAX_S."""
     w, wiz = mic_wizard
+    notes = []
+    monkeypatch.setattr(setupwizard.QToolTip, "showText",
+                        lambda pos, text, *a: notes.append(text))
     wiz.show()
     wiz.go(wiz.base + 2)
     w._attaching = True   # the set-up is running
@@ -651,6 +655,7 @@ def test_the_guide_stays_open_while_the_mic_is_set_up(mic_wizard, monkeypatch):
     for press in (wiz.next_clicked, wiz.back_clicked, wiz.reject, wiz.close):
         press()
         assert wiz.isVisible() and wiz.stack.currentIndex() == wiz.base + 2
+    assert notes == ["Bun's almost done, one moment."] * 2   # Esc and the X, not Back / Next
     w._attaching = False   # done
     wiz._tick()
     assert not busy.is_busy(wiz.btn_next) and not busy.is_busy(wiz.btn_back)

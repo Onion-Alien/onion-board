@@ -4090,5 +4090,6 @@
   "Super Rare": "Super rare",
   "Uncommon": "Peu commun",
   "<b>{device}</b> looks like speakers, so your mic hears itself. Keep them quiet or use headphones. If it starts to squeal, this switches off by itself.": "<b>{device}</b> ressemble à des haut-parleurs, donc ton micro s'entend lui-même. Garde-les bas ou utilise un casque. Si ça se met à siffler, ça se coupe tout seul.",
-  "Stopped <b>Hear what they hear</b>: your mic was picking up your speakers and started to squeal. Use headphones, or turn the speakers down.": "<b>Entendre ce qu'ils entendent</b> arrêté : ton micro captait tes haut-parleurs et s'est mis à siffler. Utilise un casque ou baisse les haut-parleurs."
+  "Stopped <b>Hear what they hear</b>: your mic was picking up your speakers and started to squeal. Use headphones, or turn the speakers down.": "<b>Entendre ce qu'ils entendent</b> arrêté : ton micro captait tes haut-parleurs et s'est mis à siffler. Utilise un casque ou baisse les haut-parleurs.",
+  "Bun's almost done, one moment.": "Bun a presque fini, un instant."
 }
