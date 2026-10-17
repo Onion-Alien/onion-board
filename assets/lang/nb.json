@@ -3491,7 +3491,6 @@
   "Couldn't get “{name}”: {error}": "Kunne ikke hente «{name}»: {error}",
   "Couldn't open the store": "Kunne ikke åpne butikken",
   "Couldn't reach the sound store. Check your internet and try again.": "Kunne ikke nå lydbutikken. Sjekk internett og prøv igjen.",
-  "Every sound here is CC0: free for anyone to use for anything, no credit needed. Sounds people share are checked before they show up. Vote for the ones you like so others find them.": "Alle lydene her er CC0: alle kan bruke dem til hva som helst, uten å kreditere noen. Delte lyder blir sjekket før de vises. Stem på dem du liker, så andre finner dem.",
   "Free sounds anyone can use, voted by players: add them or share your own": "Gratis lyder for alle, stemt frem av spillere: legg dem til eller del dine egne",
   "Free sounds other players shared, voted on: add them, or share your own.": "Gratis lyder som andre spillere har delt og stemt på: legg dem til eller del dine egne.",
   "Hear it (only you)": "Hør den (bare du)",
@@ -3548,7 +3547,6 @@
   "A YouTube, TikTok, SoundCloud or other video link. Only the link is kept: whoever adds it gets it from that site. It shows once it's been checked.": "En lenke til YouTube, TikTok, SoundCloud eller en annen video. Bare lenken lagres: den som legger den til, henter den fra siden. Den vises når den er sjekket.",
   "A file": "En fil",
   "A link": "En lenke",
-  "Order": "Rekkefølge",
   "Paste a link and name it first": "Lim inn en lenke og gi den et navn først",
   "Paste a link: https://www.youtube.com/watch?v=…": "Lim inn en lenke: https://www.youtube.com/watch?v=…",
   "Play it once (from the site)": "Spill av én gang (fra siden)",
@@ -3582,5 +3580,16 @@
   "Is a sound in the store yours? Email {email} and it comes down.": "Er en lyd i butikken din? Send e-post til {email}, så blir den fjernet.",
   "Games get the key too": "Spill får også tasten",
   "Keys in games": "Taster i spill",
-  "With this on, a hotkey still does its normal job too: press F1 in a game and the game gets F1 while your sound plays. Off: only Onion Board gets the key, so a hotkey on W stops you walking.": "Når dette er på, gjør en hurtigtast også den vanlige jobben sin: trykk F1 i et spill, så får spillet F1 mens lyden din spilles. Av: bare Onion Board får tasten, så en hurtigtast på W hindrer deg i å gå."
+  "With this on, a hotkey still does its normal job too: press F1 in a game and the game gets F1 while your sound plays. Off: only Onion Board gets the key, so a hotkey on W stops you walking.": "Når dette er på, gjør en hurtigtast også den vanlige jobben sin: trykk F1 i et spill, så får spillet F1 mens lyden din spilles. Av: bare Onion Board får tasten, så en hurtigtast på W hindrer deg i å gå.",
+  "Esports": "E-sport",
+  "Movies": "Filmer",
+  "Podcast": "Podkast",
+  "Politics": "Politikk",
+  "Pranks": "Spøk",
+  "Sounds people share here are CC0: free for anyone to use for anything, no credit needed, and checked before they show up. Sounds from Myinstants are links: they play and download from that site. Vote for the ones you like so others find them.": "Lyder folk deler her, er CC0: fritt for alle til alt, uten kreditering, og sjekkes før de vises. Lyder fra Myinstants er lenker: de spilles og lastes ned fra det nettstedet. Stem på dem du liker, så andre finner dem.",
+  "Spooky": "Skummelt",
+  "Sports": "Sport",
+  "TV": "TV",
+  "Viral": "Viralt",
+  "What's hot on Myinstants right now, and the sounds people here liked this week": "Det som er populært på Myinstants akkurat nå, og lydene folk her likte denne uka"
 }

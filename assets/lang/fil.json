@@ -3491,7 +3491,6 @@
   "Couldn't get “{name}”: {error}": "Hindi makuha ang “{name}”: {error}",
   "Couldn't open the store": "Hindi mabuksan ang store",
   "Couldn't reach the sound store. Check your internet and try again.": "Hindi maabot ang sound store. Tingnan ang internet mo at subukan ulit.",
-  "Every sound here is CC0: free for anyone to use for anything, no credit needed. Sounds people share are checked before they show up. Vote for the ones you like so others find them.": "CC0 ang bawat sound dito: puwedeng gamitin ng kahit sino sa kahit ano, walang kailangang i-credit. Sinusuri muna ang mga sini-share na sound bago lumabas. Iboto ang mga gusto mo para mahanap din ng iba.",
   "Free sounds anyone can use, voted by players: add them or share your own": "Libreng sounds para sa lahat, binoto ng mga player: idagdag o i-share ang sa iyo",
   "Free sounds other players shared, voted on: add them, or share your own.": "Libreng sounds na shinare at binoto ng ibang player: idagdag o i-share ang sa iyo.",
   "Hear it (only you)": "Pakinggan (ikaw lang)",
@@ -3548,7 +3547,6 @@
   "A YouTube, TikTok, SoundCloud or other video link. Only the link is kept: whoever adds it gets it from that site. It shows once it's been checked.": "Link ng YouTube, TikTok, SoundCloud o ibang video. Link lang ang itinatabi: kukunin ito ng magdadagdag mula sa site na iyon. Lalabas ito kapag nasuri na.",
   "A file": "Isang file",
   "A link": "Isang link",
-  "Order": "Pagkakasunod",
   "Paste a link and name it first": "Mag-paste muna ng link at pangalanan ito",
   "Paste a link: https://www.youtube.com/watch?v=…": "Mag-paste ng link: https://www.youtube.com/watch?v=…",
   "Play it once (from the site)": "Patugtugin nang isang beses (mula sa site)",
@@ -3582,5 +3580,16 @@
   "Is a sound in the store yours? Email {email} and it comes down.": "Sa iyo ba ang isang sound sa store? Mag-email sa {email} at aalisin ito.",
   "Games get the key too": "Makukuha rin ng laro ang key",
   "Keys in games": "Mga key sa laro",
-  "With this on, a hotkey still does its normal job too: press F1 in a game and the game gets F1 while your sound plays. Off: only Onion Board gets the key, so a hotkey on W stops you walking.": "Kapag naka-on ito, ginagawa pa rin ng hotkey ang normal nitong trabaho: pindutin ang F1 sa laro at makukuha ng laro ang F1 habang tumutugtog ang sound mo. Naka-off: Onion Board lang ang nakakakuha ng key, kaya ang hotkey sa W ay pipigil sa paglalakad mo."
+  "With this on, a hotkey still does its normal job too: press F1 in a game and the game gets F1 while your sound plays. Off: only Onion Board gets the key, so a hotkey on W stops you walking.": "Kapag naka-on ito, ginagawa pa rin ng hotkey ang normal nitong trabaho: pindutin ang F1 sa laro at makukuha ng laro ang F1 habang tumutugtog ang sound mo. Naka-off: Onion Board lang ang nakakakuha ng key, kaya ang hotkey sa W ay pipigil sa paglalakad mo.",
+  "Esports": "Esports",
+  "Movies": "Pelikula",
+  "Podcast": "Podcast",
+  "Politics": "Pulitika",
+  "Pranks": "Kalokohan",
+  "Sounds people share here are CC0: free for anyone to use for anything, no credit needed, and checked before they show up. Sounds from Myinstants are links: they play and download from that site. Vote for the ones you like so others find them.": "Ang mga sound na ibinabahagi rito ay CC0: libre sa kahit sino para sa kahit ano, walang credit na kailangan, at sinusuri bago lumabas. Ang mga sound mula sa Myinstants ay mga link: pine-play at dina-download ang mga ito mula sa site na iyon. Bumoto sa mga gusto mo para mahanap din ng iba.",
+  "Spooky": "Nakakatakot",
+  "Sports": "Sports",
+  "TV": "TV",
+  "Viral": "Viral",
+  "What's hot on Myinstants right now, and the sounds people here liked this week": "Ang uso sa Myinstants ngayon, at ang mga sound na nagustuhan ng mga tao rito ngayong linggo"
 }

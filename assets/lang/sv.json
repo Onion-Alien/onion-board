@@ -3491,7 +3491,6 @@
   "Couldn't get “{name}”: {error}": "Kunde inte hämta ”{name}”: {error}",
   "Couldn't open the store": "Kunde inte öppna butiken",
   "Couldn't reach the sound store. Check your internet and try again.": "Kunde inte nå ljudbutiken. Kolla ditt internet och försök igen.",
-  "Every sound here is CC0: free for anyone to use for anything, no credit needed. Sounds people share are checked before they show up. Vote for the ones you like so others find them.": "Alla ljud här är CC0: vem som helst får använda dem till vad som helst, utan att nämna någon. Delade ljud granskas innan de visas. Rösta på dem du gillar så att andra hittar dem.",
   "Free sounds anyone can use, voted by players: add them or share your own": "Gratis ljud för alla, röstade av spelare: lägg till dem eller dela dina egna",
   "Free sounds other players shared, voted on: add them, or share your own.": "Gratis ljud som andra spelare delat och röstat på: lägg till dem eller dela dina egna.",
   "Hear it (only you)": "Lyssna (bara du)",
@@ -3548,7 +3547,6 @@
   "A YouTube, TikTok, SoundCloud or other video link. Only the link is kept: whoever adds it gets it from that site. It shows once it's been checked.": "En länk till YouTube, TikTok, SoundCloud eller en annan video. Bara länken sparas: den som lägger till den hämtar den från sajten. Den visas när den har granskats.",
   "A file": "En fil",
   "A link": "En länk",
-  "Order": "Ordning",
   "Paste a link and name it first": "Klistra in en länk och ge den ett namn först",
   "Paste a link: https://www.youtube.com/watch?v=…": "Klistra in en länk: https://www.youtube.com/watch?v=…",
   "Play it once (from the site)": "Spela en gång (från sajten)",
@@ -3582,5 +3580,16 @@
   "Is a sound in the store yours? Email {email} and it comes down.": "Är ett ljud i butiken ditt? Mejla {email} så tas det bort.",
   "Games get the key too": "Spel får också tangenten",
   "Keys in games": "Tangenter i spel",
-  "With this on, a hotkey still does its normal job too: press F1 in a game and the game gets F1 while your sound plays. Off: only Onion Board gets the key, so a hotkey on W stops you walking.": "När det här är på gör en snabbtangent också sitt vanliga jobb: tryck F1 i ett spel så får spelet F1 medan ditt ljud spelas. Av: bara Onion Board får tangenten, så en snabbtangent på W hindrar dig från att gå."
+  "With this on, a hotkey still does its normal job too: press F1 in a game and the game gets F1 while your sound plays. Off: only Onion Board gets the key, so a hotkey on W stops you walking.": "När det här är på gör en snabbtangent också sitt vanliga jobb: tryck F1 i ett spel så får spelet F1 medan ditt ljud spelas. Av: bara Onion Board får tangenten, så en snabbtangent på W hindrar dig från att gå.",
+  "Esports": "E-sport",
+  "Movies": "Filmer",
+  "Podcast": "Podd",
+  "Politics": "Politik",
+  "Pranks": "Pranks",
+  "Sounds people share here are CC0: free for anyone to use for anything, no credit needed, and checked before they show up. Sounds from Myinstants are links: they play and download from that site. Vote for the ones you like so others find them.": "Ljud som folk delar här är CC0: fria för alla att använda till vad som helst, utan att ange upphovsperson, och de granskas innan de syns. Ljud från Myinstants är länkar: de spelas och laddas ner från den webbplatsen. Rösta på dem du gillar så att andra hittar dem.",
+  "Spooky": "Läskigt",
+  "Sports": "Sport",
+  "TV": "TV",
+  "Viral": "Viralt",
+  "What's hot on Myinstants right now, and the sounds people here liked this week": "Det som är hett på Myinstants just nu och ljuden som folk här gillade den här veckan"
 }

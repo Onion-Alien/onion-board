@@ -3414,7 +3414,6 @@
   "Couldn't get “{name}”: {error}": "Không lấy được “{name}”: {error}",
   "Couldn't open the store": "Không mở được cửa hàng",
   "Couldn't reach the sound store. Check your internet and try again.": "Không kết nối được cửa hàng âm thanh. Kiểm tra internet rồi thử lại.",
-  "Every sound here is CC0: free for anyone to use for anything, no credit needed. Sounds people share are checked before they show up. Vote for the ones you like so others find them.": "Mọi âm thanh ở đây đều là CC0: ai cũng dùng được cho mọi việc, không cần ghi nguồn. Âm thanh mọi người chia sẻ được kiểm tra trước khi hiện. Hãy bình chọn những cái bạn thích để người khác tìm thấy.",
   "Free sounds anyone can use, voted by players: add them or share your own": "Âm thanh miễn phí cho mọi người, do người chơi bình chọn: thêm vào hoặc chia sẻ của bạn",
   "Free sounds other players shared, voted on: add them, or share your own.": "Âm thanh miễn phí do người chơi khác chia sẻ và bình chọn: thêm vào hoặc chia sẻ của bạn.",
   "Hear it (only you)": "Nghe thử (chỉ bạn)",
@@ -3471,7 +3470,6 @@
   "A YouTube, TikTok, SoundCloud or other video link. Only the link is kept: whoever adds it gets it from that site. It shows once it's been checked.": "Liên kết YouTube, TikTok, SoundCloud hoặc video khác. Chỉ giữ liên kết: ai thêm nó sẽ lấy từ trang đó. Nó hiện sau khi được kiểm tra.",
   "A file": "Một tệp",
   "A link": "Một liên kết",
-  "Order": "Thứ tự",
   "Paste a link and name it first": "Dán liên kết và đặt tên trước đã",
   "Paste a link: https://www.youtube.com/watch?v=…": "Dán liên kết: https://www.youtube.com/watch?v=…",
   "Play it once (from the site)": "Phát một lần (từ trang)",
@@ -3505,5 +3503,16 @@
   "Is a sound in the store yours? Email {email} and it comes down.": "Có âm thanh nào trong cửa hàng là của bạn? Gửi email tới {email} và nó sẽ bị gỡ xuống.",
   "Games get the key too": "Game cũng nhận phím",
   "Keys in games": "Phím trong game",
-  "With this on, a hotkey still does its normal job too: press F1 in a game and the game gets F1 while your sound plays. Off: only Onion Board gets the key, so a hotkey on W stops you walking.": "Khi bật, phím nóng vẫn làm việc bình thường của nó: nhấn F1 trong game thì game vẫn nhận F1 trong khi âm thanh của bạn phát. Tắt: chỉ Onion Board nhận phím, nên phím nóng trên W khiến bạn không đi được."
+  "With this on, a hotkey still does its normal job too: press F1 in a game and the game gets F1 while your sound plays. Off: only Onion Board gets the key, so a hotkey on W stops you walking.": "Khi bật, phím nóng vẫn làm việc bình thường của nó: nhấn F1 trong game thì game vẫn nhận F1 trong khi âm thanh của bạn phát. Tắt: chỉ Onion Board nhận phím, nên phím nóng trên W khiến bạn không đi được.",
+  "Esports": "Thể thao điện tử",
+  "Movies": "Phim",
+  "Podcast": "Podcast",
+  "Politics": "Chính trị",
+  "Pranks": "Chơi khăm",
+  "Sounds people share here are CC0: free for anyone to use for anything, no credit needed, and checked before they show up. Sounds from Myinstants are links: they play and download from that site. Vote for the ones you like so others find them.": "Âm thanh mọi người chia sẻ ở đây là CC0: ai cũng dùng được cho mọi việc, không cần ghi công, và được kiểm tra trước khi hiện ra. Âm thanh từ Myinstants là liên kết: phát và tải về từ trang đó. Bình chọn những cái bạn thích để người khác tìm thấy.",
+  "Spooky": "Rùng rợn",
+  "Sports": "Thể thao",
+  "TV": "TV",
+  "Viral": "Lan truyền",
+  "What's hot on Myinstants right now, and the sounds people here liked this week": "Những gì đang hot trên Myinstants lúc này, và âm thanh mọi người ở đây thích tuần này"
 }

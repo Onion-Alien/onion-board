@@ -3568,7 +3568,6 @@
   "Couldn't get “{name}”: {error}": "Nu am putut lua „{name}”: {error}",
   "Couldn't open the store": "Nu am putut deschide magazinul",
   "Couldn't reach the sound store. Check your internet and try again.": "Magazinul de sunete nu poate fi accesat. Verifică internetul și încearcă din nou.",
-  "Every sound here is CC0: free for anyone to use for anything, no credit needed. Sounds people share are checked before they show up. Vote for the ones you like so others find them.": "Fiecare sunet de aici e CC0: oricine îl poate folosi pentru orice, fără să menționeze pe cineva. Sunetele distribuite sunt verificate înainte să apară. Votează-le pe cele care îți plac ca să le găsească și alții.",
   "Free sounds anyone can use, voted by players: add them or share your own": "Sunete gratuite pentru toți, votate de jucători: adaugă-le sau distribuie-le pe ale tale",
   "Free sounds other players shared, voted on: add them, or share your own.": "Sunete gratuite distribuite și votate de alți jucători: adaugă-le sau distribuie-le pe ale tale.",
   "Hear it (only you)": "Ascultă-l (doar tu)",
@@ -3625,7 +3624,6 @@
   "A YouTube, TikTok, SoundCloud or other video link. Only the link is kept: whoever adds it gets it from that site. It shows once it's been checked.": "Un link YouTube, TikTok, SoundCloud sau alt video. Se păstrează doar linkul: cine îl adaugă îl ia de pe acel site. Apare după ce e verificat.",
   "A file": "Un fișier",
   "A link": "Un link",
-  "Order": "Ordine",
   "Paste a link and name it first": "Întâi lipește un link și dă-i un nume",
   "Paste a link: https://www.youtube.com/watch?v=…": "Lipește un link: https://www.youtube.com/watch?v=…",
   "Play it once (from the site)": "Redă o dată (de pe site)",
@@ -3659,5 +3657,16 @@
   "Is a sound in the store yours? Email {email} and it comes down.": "Un sunet din magazin e al tău? Scrie la {email} și e scos.",
   "Games get the key too": "Și jocurile primesc tasta",
   "Keys in games": "Taste în jocuri",
-  "With this on, a hotkey still does its normal job too: press F1 in a game and the game gets F1 while your sound plays. Off: only Onion Board gets the key, so a hotkey on W stops you walking.": "Când e pornit, o tastă rapidă își face și treaba obișnuită: apasă F1 într-un joc și jocul primește F1 în timp ce sunetul tău cântă. Oprit: doar Onion Board primește tasta, așa că o tastă rapidă pe W te oprește din mers."
+  "With this on, a hotkey still does its normal job too: press F1 in a game and the game gets F1 while your sound plays. Off: only Onion Board gets the key, so a hotkey on W stops you walking.": "Când e pornit, o tastă rapidă își face și treaba obișnuită: apasă F1 într-un joc și jocul primește F1 în timp ce sunetul tău cântă. Oprit: doar Onion Board primește tasta, așa că o tastă rapidă pe W te oprește din mers.",
+  "Esports": "Esports",
+  "Movies": "Filme",
+  "Podcast": "Podcast",
+  "Politics": "Politică",
+  "Pranks": "Farse",
+  "Sounds people share here are CC0: free for anyone to use for anything, no credit needed, and checked before they show up. Sounds from Myinstants are links: they play and download from that site. Vote for the ones you like so others find them.": "Sunetele pe care oamenii le împart aici sunt CC0: libere pentru oricine și pentru orice, fără menționarea autorului, și sunt verificate înainte să apară. Sunetele de pe Myinstants sunt linkuri: se redau și se descarcă de pe acel site. Votează-le pe cele care îți plac, ca să le găsească și alții.",
+  "Spooky": "Înfricoșător",
+  "Sports": "Sport",
+  "TV": "TV",
+  "Viral": "Virale",
+  "What's hot on Myinstants right now, and the sounds people here liked this week": "Ce e la modă pe Myinstants acum și sunetele care le-au plăcut oamenilor de aici săptămâna asta"
 }

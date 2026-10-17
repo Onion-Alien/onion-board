@@ -3491,7 +3491,6 @@
   "Couldn't get “{name}”: {error}": "„{name}“ konnte nicht geladen werden: {error}",
   "Couldn't open the store": "Der Store konnte nicht geöffnet werden",
   "Couldn't reach the sound store. Check your internet and try again.": "Der Sound-Store ist nicht erreichbar. Prüfe dein Internet und versuche es noch mal.",
-  "Every sound here is CC0: free for anyone to use for anything, no credit needed. Sounds people share are checked before they show up. Vote for the ones you like so others find them.": "Jeder Sound hier ist CC0: Jeder darf ihn für alles nutzen, ohne Namensnennung. Geteilte Sounds werden geprüft, bevor sie erscheinen. Stimme für die ab, die du magst, damit andere sie finden.",
   "Free sounds anyone can use, voted by players: add them or share your own": "Kostenlose Sounds für alle, von Spielern bewertet: Füge sie hinzu oder teile deine eigenen",
   "Free sounds other players shared, voted on: add them, or share your own.": "Kostenlose Sounds, die andere Spieler geteilt und bewertet haben: Füge sie hinzu oder teile deine eigenen.",
   "Hear it (only you)": "Anhören (nur du)",
@@ -3548,7 +3547,6 @@
   "A YouTube, TikTok, SoundCloud or other video link. Only the link is kept: whoever adds it gets it from that site. It shows once it's been checked.": "Ein YouTube-, TikTok-, SoundCloud- oder anderer Video-Link. Nur der Link wird gespeichert: Wer ihn hinzufügt, holt ihn von dieser Seite. Er erscheint, sobald er geprüft wurde.",
   "A file": "Eine Datei",
   "A link": "Ein Link",
-  "Order": "Reihenfolge",
   "Paste a link and name it first": "Füge zuerst einen Link ein und gib ihm einen Namen",
   "Paste a link: https://www.youtube.com/watch?v=…": "Link einfügen: https://www.youtube.com/watch?v=…",
   "Play it once (from the site)": "Einmal abspielen (von der Seite)",
@@ -3582,5 +3580,16 @@
   "Is a sound in the store yours? Email {email} and it comes down.": "Ist ein Sound im Store von dir? Schreib an {email}, dann wird er entfernt.",
   "Games get the key too": "Spiele bekommen die Taste auch",
   "Keys in games": "Tasten in Spielen",
-  "With this on, a hotkey still does its normal job too: press F1 in a game and the game gets F1 while your sound plays. Off: only Onion Board gets the key, so a hotkey on W stops you walking.": "Wenn das an ist, macht ein Hotkey auch weiter seine normale Arbeit: Drück F1 im Spiel, und das Spiel bekommt F1, während dein Sound spielt. Aus: Nur Onion Board bekommt die Taste, ein Hotkey auf W hält dich also vom Laufen ab."
+  "With this on, a hotkey still does its normal job too: press F1 in a game and the game gets F1 while your sound plays. Off: only Onion Board gets the key, so a hotkey on W stops you walking.": "Wenn das an ist, macht ein Hotkey auch weiter seine normale Arbeit: Drück F1 im Spiel, und das Spiel bekommt F1, während dein Sound spielt. Aus: Nur Onion Board bekommt die Taste, ein Hotkey auf W hält dich also vom Laufen ab.",
+  "Esports": "E-Sport",
+  "Movies": "Filme",
+  "Podcast": "Podcast",
+  "Politics": "Politik",
+  "Pranks": "Streiche",
+  "Sounds people share here are CC0: free for anyone to use for anything, no credit needed, and checked before they show up. Sounds from Myinstants are links: they play and download from that site. Vote for the ones you like so others find them.": "Sounds, die hier geteilt werden, sind CC0: frei für alle und alles, ohne Namensnennung, und werden geprüft, bevor sie erscheinen. Sounds von Myinstants sind Links: Sie werden von dieser Seite abgespielt und geladen. Stimm für die ab, die dir gefallen, damit andere sie finden.",
+  "Spooky": "Gruselig",
+  "Sports": "Sport",
+  "TV": "TV",
+  "Viral": "Viral",
+  "What's hot on Myinstants right now, and the sounds people here liked this week": "Was gerade auf Myinstants angesagt ist, und die Sounds, die Leuten hier diese Woche gefallen haben"
 }

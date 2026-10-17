@@ -3491,7 +3491,6 @@
   "Couldn't get “{name}”: {error}": "Не успях да взема „{name}“: {error}",
   "Couldn't open the store": "Магазинът не можа да се отвори",
   "Couldn't reach the sound store. Check your internet and try again.": "Магазинът за звуци не е достъпен. Провери интернета си и опитай пак.",
-  "Every sound here is CC0: free for anyone to use for anything, no credit needed. Sounds people share are checked before they show up. Vote for the ones you like so others find them.": "Всеки звук тук е CC0: всеки може да го ползва за каквото и да е, без да посочва автор. Споделените звуци се проверяват, преди да се появят. Гласувай за тези, които харесваш, за да ги намерят и другите.",
   "Free sounds anyone can use, voted by players: add them or share your own": "Безплатни звуци за всички, гласувани от играчи: добави ги или сподели свои",
   "Free sounds other players shared, voted on: add them, or share your own.": "Безплатни звуци, споделени и гласувани от други играчи: добави ги или сподели свои.",
   "Hear it (only you)": "Чуй го (само ти)",
@@ -3548,7 +3547,6 @@
   "A YouTube, TikTok, SoundCloud or other video link. Only the link is kept: whoever adds it gets it from that site. It shows once it's been checked.": "Връзка към YouTube, TikTok, SoundCloud или друго видео. Пази се само връзката: който я добави, я взема от сайта. Появява се след проверка.",
   "A file": "Файл",
   "A link": "Връзка",
-  "Order": "Ред",
   "Paste a link and name it first": "Първо постави връзка и ѝ дай име",
   "Paste a link: https://www.youtube.com/watch?v=…": "Постави връзка: https://www.youtube.com/watch?v=…",
   "Play it once (from the site)": "Пусни го веднъж (от сайта)",
@@ -3582,5 +3580,16 @@
   "Is a sound in the store yours? Email {email} and it comes down.": "Някой звук в магазина е твой? Пиши на {email} и ще бъде махнат.",
   "Games get the key too": "Игрите също получават клавиша",
   "Keys in games": "Клавиши в игрите",
-  "With this on, a hotkey still does its normal job too: press F1 in a game and the game gets F1 while your sound plays. Off: only Onion Board gets the key, so a hotkey on W stops you walking.": "Когато е включено, бързият клавиш върши и обичайната си работа: натисни F1 в игра и играта получава F1, докато звукът ти свири. Изключено: само Onion Board получава клавиша, така че бърз клавиш на W те спира да вървиш."
+  "With this on, a hotkey still does its normal job too: press F1 in a game and the game gets F1 while your sound plays. Off: only Onion Board gets the key, so a hotkey on W stops you walking.": "Когато е включено, бързият клавиш върши и обичайната си работа: натисни F1 в игра и играта получава F1, докато звукът ти свири. Изключено: само Onion Board получава клавиша, така че бърз клавиш на W те спира да вървиш.",
+  "Esports": "Е-спорт",
+  "Movies": "Филми",
+  "Podcast": "Подкаст",
+  "Politics": "Политика",
+  "Pranks": "Шеги",
+  "Sounds people share here are CC0: free for anyone to use for anything, no credit needed, and checked before they show up. Sounds from Myinstants are links: they play and download from that site. Vote for the ones you like so others find them.": "Звуците, споделени тук, са CC0: свободни за всеки и за всичко, без да се посочва автор, и се проверяват, преди да се появят. Звуците от Myinstants са връзки: пускат се и се свалят от онзи сайт. Гласувай за тези, които харесваш, за да ги намерят и други.",
+  "Spooky": "Страшни",
+  "Sports": "Спорт",
+  "TV": "ТВ",
+  "Viral": "Вирусни",
+  "What's hot on Myinstants right now, and the sounds people here liked this week": "Какво е популярно в Myinstants в момента и звуците, които хората тук харесаха тази седмица"
 }
