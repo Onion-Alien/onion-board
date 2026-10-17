@@ -3491,7 +3491,6 @@
   "Couldn't get “{name}”: {error}": "Δεν ήταν δυνατή η λήψη του «{name}»: {error}",
   "Couldn't open the store": "Δεν άνοιξε το κατάστημα",
   "Couldn't reach the sound store. Check your internet and try again.": "Δεν είναι δυνατή η σύνδεση με το κατάστημα ήχων. Έλεγξε το ίντερνετ και δοκίμασε ξανά.",
-  "Every sound here is CC0: free for anyone to use for anything, no credit needed. Sounds people share are checked before they show up. Vote for the ones you like so others find them.": "Κάθε ήχος εδώ είναι CC0: ο καθένας μπορεί να τον χρησιμοποιήσει για οτιδήποτε, χωρίς αναφορά. Οι ήχοι που μοιράζεται ο κόσμος ελέγχονται πριν εμφανιστούν. Ψήφισε αυτούς που σου αρέσουν για να τους βρουν κι άλλοι.",
   "Free sounds anyone can use, voted by players: add them or share your own": "Δωρεάν ήχοι για όλους, ψηφισμένοι από παίκτες: πρόσθεσέ τους ή μοιράσου τους δικούς σου",
   "Free sounds other players shared, voted on: add them, or share your own.": "Δωρεάν ήχοι που μοιράστηκαν και ψήφισαν άλλοι παίκτες: πρόσθεσέ τους ή μοιράσου τους δικούς σου.",
   "Hear it (only you)": "Άκουσέ το (μόνο εσύ)",
@@ -3547,7 +3546,6 @@
   "A YouTube, TikTok, SoundCloud or other video link. Only the link is kept: whoever adds it gets it from that site. It shows once it's been checked.": "Σύνδεσμος YouTube, TikTok, SoundCloud ή άλλου βίντεο. Κρατιέται μόνο ο σύνδεσμος: όποιος τον προσθέσει τον παίρνει από εκείνο το site. Εμφανίζεται μόλις ελεγχθεί.",
   "A file": "Ένα αρχείο",
   "A link": "Ένας σύνδεσμος",
-  "Order": "Σειρά",
   "Paste a link and name it first": "Επικόλλησε πρώτα έναν σύνδεσμο και δώσ’ του όνομα",
   "Paste a link: https://www.youtube.com/watch?v=…": "Επικόλλησε σύνδεσμο: https://www.youtube.com/watch?v=…",
   "Play it once (from the site)": "Παίξ’ το μία φορά (από το site)",
@@ -3582,5 +3580,16 @@
   "Games get the key too": "Και τα παιχνίδια παίρνουν το πλήκτρο",
   "Keys in games": "Πλήκτρα στα παιχνίδια",
   "With this on, a hotkey still does its normal job too: press F1 in a game and the game gets F1 while your sound plays. Off: only Onion Board gets the key, so a hotkey on W stops you walking.": "Όταν είναι ενεργό, μια συντόμευση κάνει και την κανονική της δουλειά: πάτα F1 σε ένα παιχνίδι και το παιχνίδι παίρνει το F1 ενώ παίζει ο ήχος σου. Ανενεργό: μόνο το Onion Board παίρνει το πλήκτρο, οπότε μια συντόμευση στο W σε σταματά να περπατάς.",
-  "Free sounds": "Δωρεάν ήχοι"
+  "Free sounds": "Δωρεάν ήχοι",
+  "Esports": "Esports",
+  "Movies": "Ταινίες",
+  "Podcast": "Podcast",
+  "Politics": "Πολιτική",
+  "Pranks": "Φάρσες",
+  "Sounds people share here are CC0: free for anyone to use for anything, no credit needed, and checked before they show up. Sounds from Myinstants are links: they play and download from that site. Vote for the ones you like so others find them.": "Οι ήχοι που μοιράζονται εδώ είναι CC0: ελεύθεροι για όλους και για κάθε χρήση, χωρίς αναφορά, και ελέγχονται πριν εμφανιστούν. Οι ήχοι από το Myinstants είναι σύνδεσμοι: παίζουν και κατεβαίνουν από εκείνη τη σελίδα. Ψήφισε όσους σου αρέσουν για να τους βρουν κι άλλοι.",
+  "Spooky": "Τρομακτικά",
+  "Sports": "Αθλητικά",
+  "TV": "TV",
+  "Viral": "Viral",
+  "What's hot on Myinstants right now, and the sounds people here liked this week": "Τι είναι δημοφιλές στο Myinstants τώρα και οι ήχοι που άρεσαν στους χρήστες εδώ αυτή την εβδομάδα"
 }

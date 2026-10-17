@@ -3799,7 +3799,6 @@
   "Couldn't get “{name}”: {error}": "تعذّر جلب «{name}»: {error}",
   "Couldn't open the store": "تعذّر فتح المتجر",
   "Couldn't reach the sound store. Check your internet and try again.": "تعذّر الوصول إلى متجر الأصوات. تحقّق من الإنترنت وحاول مرة أخرى.",
-  "Every sound here is CC0: free for anyone to use for anything, no credit needed. Sounds people share are checked before they show up. Vote for the ones you like so others find them.": "كل صوت هنا بترخيص CC0: يمكن لأي شخص استخدامه لأي شيء دون ذكر أحد. تُراجَع الأصوات التي يشاركها الناس قبل ظهورها. صوّت للأصوات التي تعجبك ليجدها الآخرون.",
   "Free sounds anyone can use, voted by players: add them or share your own": "أصوات مجانية للجميع يصوّت عليها اللاعبون: أضِفها أو شارك أصواتك",
   "Free sounds other players shared, voted on: add them, or share your own.": "أصوات مجانية شاركها لاعبون آخرون وصوّتوا عليها: أضِفها أو شارك أصواتك.",
   "Hear it (only you)": "استمع إليه (أنت فقط)",
@@ -3855,7 +3854,6 @@
   "A YouTube, TikTok, SoundCloud or other video link. Only the link is kept: whoever adds it gets it from that site. It shows once it's been checked.": "رابط YouTube أو TikTok أو SoundCloud أو فيديو آخر. يُحفظ الرابط فقط: من يضيفه يجلبه من ذلك الموقع. يظهر بعد مراجعته.",
   "A file": "ملف",
   "A link": "رابط",
-  "Order": "الترتيب",
   "Paste a link and name it first": "الصق رابطًا وسمِّه أولًا",
   "Paste a link: https://www.youtube.com/watch?v=…": "الصق رابطًا: https://www.youtube.com/watch?v=…",
   "Play it once (from the site)": "شغّله مرة واحدة (من الموقع)",
@@ -3890,5 +3888,16 @@
   "Games get the key too": "الألعاب تحصل على المفتاح أيضًا",
   "Keys in games": "المفاتيح في الألعاب",
   "With this on, a hotkey still does its normal job too: press F1 in a game and the game gets F1 while your sound plays. Off: only Onion Board gets the key, so a hotkey on W stops you walking.": "عند تفعيل هذا، يقوم مفتاح التشغيل السريع بعمله العادي أيضًا: اضغط F1 في لعبة وستحصل اللعبة على F1 بينما يعمل صوتك. عند الإيقاف: Onion Board وحده يحصل على المفتاح، لذا مفتاح تشغيل سريع على W يمنعك من المشي.",
-  "Free sounds": "أصوات مجانية"
+  "Free sounds": "أصوات مجانية",
+  "Esports": "رياضات إلكترونية",
+  "Movies": "أفلام",
+  "Podcast": "بودكاست",
+  "Politics": "سياسة",
+  "Pranks": "مقالب",
+  "Sounds people share here are CC0: free for anyone to use for anything, no credit needed, and checked before they show up. Sounds from Myinstants are links: they play and download from that site. Vote for the ones you like so others find them.": "الأصوات التي يشاركها الناس هنا بترخيص CC0: مجانية لأي شخص ولأي استخدام، دون ذكر المصدر، وتُراجع قبل ظهورها. أصوات Myinstants روابط: تُشغَّل وتُنزَّل من ذلك الموقع. صوّت لما يعجبك ليجده الآخرون.",
+  "Spooky": "مخيف",
+  "Sports": "رياضة",
+  "TV": "تلفزيون",
+  "Viral": "منتشر",
+  "What's hot on Myinstants right now, and the sounds people here liked this week": "الرائج على Myinstants الآن، والأصوات التي أعجبت الناس هنا هذا الأسبوع"
 }

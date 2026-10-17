@@ -3491,7 +3491,6 @@
   "Couldn't get “{name}”: {error}": "“{name}” alınamadı: {error}",
   "Couldn't open the store": "Mağaza açılamadı",
   "Couldn't reach the sound store. Check your internet and try again.": "Ses mağazasına ulaşılamadı. İnternetini kontrol et ve tekrar dene.",
-  "Every sound here is CC0: free for anyone to use for anything, no credit needed. Sounds people share are checked before they show up. Vote for the ones you like so others find them.": "Buradaki her ses CC0: herkes her şey için kullanabilir, isim vermeye gerek yok. Paylaşılan sesler görünmeden önce kontrol edilir. Beğendiklerine oy ver ki başkaları da bulsun.",
   "Free sounds anyone can use, voted by players: add them or share your own": "Herkes için ücretsiz sesler, oyuncuların oylarıyla: ekle ya da kendininkileri paylaş",
   "Free sounds other players shared, voted on: add them, or share your own.": "Diğer oyuncuların paylaşıp oyladığı ücretsiz sesler: ekle ya da kendininkileri paylaş.",
   "Hear it (only you)": "Dinle (sadece sen)",
@@ -3547,7 +3546,6 @@
   "A YouTube, TikTok, SoundCloud or other video link. Only the link is kept: whoever adds it gets it from that site. It shows once it's been checked.": "YouTube, TikTok, SoundCloud ya da başka bir video bağlantısı. Yalnızca bağlantı saklanır: ekleyen kişi onu o siteden indirir. Kontrol edildikten sonra görünür.",
   "A file": "Bir dosya",
   "A link": "Bir bağlantı",
-  "Order": "Sıralama",
   "Paste a link and name it first": "Önce bir bağlantı yapıştır ve ad ver",
   "Paste a link: https://www.youtube.com/watch?v=…": "Bağlantı yapıştır: https://www.youtube.com/watch?v=…",
   "Play it once (from the site)": "Bir kez çal (siteden)",
@@ -3582,5 +3580,16 @@
   "Games get the key too": "Oyunlar da tuşu alsın",
   "Keys in games": "Oyunlarda tuşlar",
   "With this on, a hotkey still does its normal job too: press F1 in a game and the game gets F1 while your sound plays. Off: only Onion Board gets the key, so a hotkey on W stops you walking.": "Bu açıkken kısayol tuşu normal işini de yapar: oyunda F1'e bas, sesin çalarken oyun da F1'i alır. Kapalı: tuşu yalnızca Onion Board alır, yani W'ye atanmış bir kısayol yürümeni engeller.",
-  "Free sounds": "Ücretsiz sesler"
+  "Free sounds": "Ücretsiz sesler",
+  "Esports": "Espor",
+  "Movies": "Filmler",
+  "Podcast": "Podcast",
+  "Politics": "Siyaset",
+  "Pranks": "Şakalar",
+  "Sounds people share here are CC0: free for anyone to use for anything, no credit needed, and checked before they show up. Sounds from Myinstants are links: they play and download from that site. Vote for the ones you like so others find them.": "Burada paylaşılan sesler CC0'dır: herkes her şey için, kaynak göstermeden özgürce kullanabilir ve görünmeden önce kontrol edilir. Myinstants'taki sesler bağlantıdır: o siteden çalınır ve indirilir. Beğendiklerine oy ver ki başkaları da bulsun.",
+  "Spooky": "Ürkütücü",
+  "Sports": "Spor",
+  "TV": "TV",
+  "Viral": "Viral",
+  "What's hot on Myinstants right now, and the sounds people here liked this week": "Şu an Myinstants'ta popüler olanlar ve bu hafta buradakilerin beğendiği sesler"
 }

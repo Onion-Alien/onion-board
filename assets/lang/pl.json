@@ -3568,7 +3568,6 @@
   "Couldn't get “{name}”: {error}": "Nie udało się pobrać „{name}”: {error}",
   "Couldn't open the store": "Nie udało się otworzyć sklepu",
   "Couldn't reach the sound store. Check your internet and try again.": "Nie można połączyć się ze sklepem z dźwiękami. Sprawdź internet i spróbuj ponownie.",
-  "Every sound here is CC0: free for anyone to use for anything, no credit needed. Sounds people share are checked before they show up. Vote for the ones you like so others find them.": "Każdy dźwięk tutaj jest na CC0: każdy może go używać do czegokolwiek, bez podawania autora. Udostępnione dźwięki są sprawdzane, zanim się pojawią. Głosuj na te, które lubisz, żeby inni je znaleźli.",
   "Free sounds anyone can use, voted by players: add them or share your own": "Darmowe dźwięki dla każdego, oceniane przez graczy: dodaj je albo udostępnij swoje",
   "Free sounds other players shared, voted on: add them, or share your own.": "Darmowe dźwięki udostępnione i ocenione przez innych graczy: dodaj je albo udostępnij swoje.",
   "Hear it (only you)": "Posłuchaj (tylko ty)",
@@ -3624,7 +3623,6 @@
   "A YouTube, TikTok, SoundCloud or other video link. Only the link is kept: whoever adds it gets it from that site. It shows once it's been checked.": "Link do YouTube, TikToka, SoundClouda lub innego filmu. Zapisywany jest tylko link: kto go doda, pobierze go z tej strony. Pojawi się po sprawdzeniu.",
   "A file": "Plik",
   "A link": "Link",
-  "Order": "Kolejność",
   "Paste a link and name it first": "Najpierw wklej link i nadaj mu nazwę",
   "Paste a link: https://www.youtube.com/watch?v=…": "Wklej link: https://www.youtube.com/watch?v=…",
   "Play it once (from the site)": "Odtwórz raz (ze strony)",
@@ -3659,5 +3657,16 @@
   "Games get the key too": "Gry też dostają klawisz",
   "Keys in games": "Klawisze w grach",
   "With this on, a hotkey still does its normal job too: press F1 in a game and the game gets F1 while your sound plays. Off: only Onion Board gets the key, so a hotkey on W stops you walking.": "Gdy to jest włączone, klawisz skrótu dalej robi też swoje zwykłe zadanie: wciśnij F1 w grze, a gra dostanie F1, gdy gra twój dźwięk. Wyłączone: klawisz dostaje tylko Onion Board, więc skrót na W nie pozwoli ci chodzić.",
-  "Free sounds": "Darmowe dźwięki"
+  "Free sounds": "Darmowe dźwięki",
+  "Esports": "E-sport",
+  "Movies": "Filmy",
+  "Podcast": "Podcast",
+  "Politics": "Polityka",
+  "Pranks": "Żarty",
+  "Sounds people share here are CC0: free for anyone to use for anything, no credit needed, and checked before they show up. Sounds from Myinstants are links: they play and download from that site. Vote for the ones you like so others find them.": "Dźwięki udostępniane tutaj są na CC0: każdy może ich używać do czegokolwiek, bez podawania autora, i są sprawdzane, zanim się pojawią. Dźwięki z Myinstants to linki: odtwarzają się i pobierają z tamtej strony. Głosuj na te, które ci się podobają, żeby inni też je znaleźli.",
+  "Spooky": "Straszne",
+  "Sports": "Sport",
+  "TV": "TV",
+  "Viral": "Viral",
+  "What's hot on Myinstants right now, and the sounds people here liked this week": "Co jest teraz na topie w Myinstants i dźwięki, które ludzie tutaj polubili w tym tygodniu"
 }
