@@ -132,7 +132,7 @@
   // ------------------------------------------------------------------ sound
   // Made on the spot, only after a click or a key press (browsers allow nothing sooner).
   var VOL = 0.45;                // the page plays quietly: it's a demo, not the app
-  var ac = null, bus = null, an = null, master = null, noise = null, levels = null;
+  var ac = null, bus = null, comp = null, an = null, master = null, noise = null, levels = null;
   var muted = load("onion-site-muted") === "1";
   var muteBtn = $("#mute");
   // A headset that sleeps, wakes or gets unplugged leaves the old context playing into
@@ -157,7 +157,7 @@
       if (!C) return null;
       ac = new C();
       bus = ac.createGain();
-      var comp = ac.createDynamicsCompressor();
+      comp = ac.createDynamicsCompressor();
       comp.threshold.value = -16; comp.ratio.value = 6; comp.attack.value = 0.003; comp.release.value = 0.2;
       an = ac.createAnalyser(); an.fftSize = 1024;
       levels = new Uint8Array(an.fftSize);
@@ -400,6 +400,27 @@
     return d;
   }
 
+  // The clickable app demo (board-demo.js) shares these sounds, the mute button and the
+  // visit count. stop() cuts whatever is playing: every sound goes through `bus`, so a
+  // fresh bus leaves the old sounds talking to nothing.
+  window.onionSite = {
+    play: play,
+    clip: function (name) { return clips[name] || null; },
+    audio: function () { return audio() ? { ac: ac, out: bus } : null; },
+    stop: function () {
+      if (!ac) return;
+      var old = bus;
+      bus = ac.createGain(); bus.connect(comp); old.disconnect();
+      talkUntil = 0;
+    },
+    talk: function (seconds) {    // keeps the level meter going for the demo's own sounds
+      talkUntil = Math.max(talkUntil, performance.now() + seconds * 1000 + 80);
+      if (!looping) { looping = true; requestAnimationFrame(levelLoop); }
+    },
+    level: function () { return smooth; },
+    did: did
+  };
+
   // The level meter and Bun's mouth follow what's playing, like he does in the app.
   // The level is smoothed (opens fast, closes slowly) and Bun keeps talking until the
   // sound ends, so his mouth doesn't flicker between open and smiling on quiet bits.
@@ -559,6 +580,7 @@
   padEls.forEach(function (b) { b.addEventListener("click", function () { hitPad(b); }); });
   document.addEventListener("keydown", function (e) {
     if (current() !== "board" || e.ctrlKey || e.metaKey || e.altKey || e.repeat) return;
+    if (e.target.closest && e.target.closest(".ob")) return;   // the app demo has its own keys
     var tag = (e.target.tagName || "").toLowerCase();
     if (tag === "input" || tag === "textarea" || e.target.isContentEditable) return;
     var n = parseInt(e.key, 10);
@@ -817,6 +839,32 @@
       if (e.key === "Escape" && !lookMenu.hidden) { lookMenuOpen(false); lookBtn.focus(); }
     });
   }
+
+  // ------------------------------------------------------------------ the app demo
+  // The big Board screenshot becomes a clickable copy of the app. Its files (data, code,
+  // look) load only when the showcase comes near; if they can't load, the screenshot stays.
+  $$(".showcase[data-demo]").forEach(function (box) {
+    var v = box.getAttribute("data-v") || "";
+    function go() {
+      var files = ["board-demo-data.js", "board-demo.js"], css = document.createElement("link");
+      css.rel = "stylesheet"; css.href = "board-demo.css?v=" + v;
+      function next() {
+        var f = files.shift();
+        if (!f) { if (window.OnionBoardDemo) window.OnionBoardDemo.mount(box); return; }
+        var js = document.createElement("script");
+        js.src = f + "?v=" + v;
+        js.onload = next;
+        document.body.appendChild(js);
+      }
+      css.onload = next;
+      document.head.appendChild(css);
+    }
+    if (!("IntersectionObserver" in window)) return go();
+    var io = new IntersectionObserver(function (es) {
+      if (es.some(function (e) { return e.isIntersecting; })) { io.disconnect(); go(); }
+    }, { rootMargin: "900px 0px" });
+    io.observe(box);
+  });
 
   apply(location.hash === "#watch" ? "watch" : "board");
   did("open-" + current());       // which tab they landed on
