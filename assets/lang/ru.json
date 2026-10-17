@@ -3906,5 +3906,6 @@
   "Full board: the window got too small for the board, so it shows this mini player. Click (or drag the window bigger) to get the board back.": "Вся панель: окно стало слишком маленьким для панели, поэтому показан этот мини-плеер. Нажми (или растяни окно), чтобы вернуть панель.",
   "Hear {effect} (only you)": "Послушать {effect} (только ты)",
   "Mic only": "Только микро",
-  "✓ The store is on again: loading it.": "✓ Магазин снова включён: загружается."
+  "✓ The store is on again: loading it.": "✓ Магазин снова включён: загружается.",
+  "Background sounds": "Фоновые звуки"
 }

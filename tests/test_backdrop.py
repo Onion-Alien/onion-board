@@ -406,6 +406,36 @@ def test_the_effects_pop_up_adds_changes_and_takes_off(qapp, monkeypatch):
         p.deleteLater()
 
 
+def test_a_background_sound_can_be_heard_before_adding_it(qapp, monkeypatch):
+    """There was no way to hear Rain or Wind before keeping it: the ▶ dot inside its
+    chip plays a few seconds in your own headphones (again: stops)."""
+    from types import SimpleNamespace
+    from soundboard.ui import effectspopup
+    p = _voice_panel(monkeypatch)
+    try:
+        fx = p.fx
+        fx.btn_effects.click()
+        pop = fx.effects_pop
+        process_events(qapp, lambda: pop.isVisible(), timeout=5)
+        played, stopped = [], []
+        eng = SimpleNamespace(
+            play=lambda sid, data, gain, **kw: played.append((sid, len(data), kw)),
+            stop=stopped.append, playing=lambda: {s: 0 for s, *_r in played[-1:]})
+        monkeypatch.setattr(pop.panel, "window", lambda: SimpleNamespace(engine=eng))
+        dot = pop.listens["rain"]
+        assert dot.parent() is pop.adds["rain"]          # inside its chip: one pill
+        dot.click()
+        sid, n, kw = played[-1]
+        assert sid == effectspopup.LISTEN_SID and sid.endswith(":preview") and kw["preview"]
+        assert n == int(effectspopup.LISTEN_S * 48000)
+        assert dot.property("playing") and "rain" not in fx.on_top_state()["layers"]
+        dot.click()                                       # again: stops
+        assert stopped == [effectspopup.LISTEN_SID] and not dot.property("playing")
+    finally:
+        p.shutdown()
+        p.deleteLater()
+
+
 def test_effects_come_back_after_a_restart(qapp):
     from soundboard.ui.voicefxpanel import VoiceFxPanel
     fx = VoiceFxPanel({"enabled": True, "preset": "Robot",

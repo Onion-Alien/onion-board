@@ -4146,5 +4146,6 @@
   "Full board: the window got too small for the board, so it shows this mini player. Click (or drag the window bigger) to get the board back.": "اللوحة كاملة: صارت النافذة أصغر من اللوحة، لذا تعرض هذا المشغل المصغّر. انقر (أو كبّر النافذة بالسحب) لاستعادة اللوحة.",
   "Hear {effect} (only you)": "استمع إلى {effect} (أنت فقط)",
   "Mic only": "الميك فقط",
-  "✓ The store is on again: loading it.": "✓ المتجر يعمل من جديد: جارٍ تحميله."
+  "✓ The store is on again: loading it.": "✓ المتجر يعمل من جديد: جارٍ تحميله.",
+  "Background sounds": "أصوات الخلفية"
 }

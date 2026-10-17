@@ -3746,5 +3746,6 @@
   "Full board: the window got too small for the board, so it shows this mini player. Click (or drag the window bigger) to get the board back.": "完整面板：視窗太小放不下面板，所以顯示這個迷你播放器。點一下（或把視窗拖大）即可回到面板。",
   "Hear {effect} (only you)": "試聽 {effect}（只有你）",
   "Mic only": "僅麥克風",
-  "✓ The store is on again: loading it.": "✓ 商店已重新開啟：正在載入。"
+  "✓ The store is on again: loading it.": "✓ 商店已重新開啟：正在載入。",
+  "Background sounds": "背景音效"
 }

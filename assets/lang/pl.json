@@ -3906,5 +3906,6 @@
   "Full board: the window got too small for the board, so it shows this mini player. Click (or drag the window bigger) to get the board back.": "Pełna tablica: okno zrobiło się za małe na tablicę, więc pokazuje ten miniodtwarzacz. Kliknij (albo rozciągnij okno), żeby wrócić do tablicy.",
   "Hear {effect} (only you)": "Posłuchaj: {effect} (tylko ty)",
   "Mic only": "Tylko mikrofon",
-  "✓ The store is on again: loading it.": "✓ Sklep znowu włączony: wczytuję."
+  "✓ The store is on again: loading it.": "✓ Sklep znowu włączony: wczytuję.",
+  "Background sounds": "Dźwięki w tle"
 }

@@ -258,6 +258,10 @@ QFrame#transport, QFrame#deck { background:$panel; border-radius:12px; }
 QDialog#transport { background:$panel; }
 QDialog[popover="true"] { background:$panel; border:1px solid $border; }
 QWidget#effectsbody, QWidget#effectchips { background:transparent; }
+QWidget#effectchips QPushButton[listen="true"] { padding-right:30px; }
+QPushButton#chipplay { border-radius:10px; background:$accent_tint; border:none; padding:0; }
+QPushButton#chipplay:hover { background:$accent_tint_hi; }
+QPushButton#chipplay[playing="true"] { background:$accent; }
 QDialog#settingspage { background:transparent; }
 QFrame#mixer { background:transparent; }
 QFrame#card QPushButton#primary { background:$accent; color:$on_accent; border:none; padding:9px; }

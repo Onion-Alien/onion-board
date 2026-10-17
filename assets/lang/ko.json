@@ -3746,5 +3746,6 @@
   "Full board: the window got too small for the board, so it shows this mini player. Click (or drag the window bigger) to get the board back.": "전체 보드: 창이 보드에 비해 너무 작아져서 이 미니 플레이어를 보여 줘요. 클릭하거나 창을 크게 늘리면 보드가 돌아와요.",
   "Hear {effect} (only you)": "{effect} 들어보기 (나만)",
   "Mic only": "마이크만",
-  "✓ The store is on again: loading it.": "✓ 스토어가 다시 켜졌어요: 불러오는 중."
+  "✓ The store is on again: loading it.": "✓ 스토어가 다시 켜졌어요: 불러오는 중.",
+  "Background sounds": "배경 소리"
 }

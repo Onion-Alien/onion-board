@@ -3826,5 +3826,6 @@
   "Full board: the window got too small for the board, so it shows this mini player. Click (or drag the window bigger) to get the board back.": "Tam pano: pencere pano için fazla küçüldü, bu yüzden bu mini oynatıcıyı gösteriyor. Panoyu geri almak için tıkla (ya da pencereyi büyüt).",
   "Hear {effect} (only you)": "{effect} dinle (yalnızca sen)",
   "Mic only": "Yalnızca mikrofon",
-  "✓ The store is on again: loading it.": "✓ Mağaza yeniden açık: yükleniyor."
+  "✓ The store is on again: loading it.": "✓ Mağaza yeniden açık: yükleniyor.",
+  "Background sounds": "Arka plan sesleri"
 }

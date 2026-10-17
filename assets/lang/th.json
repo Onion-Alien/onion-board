@@ -3746,5 +3746,6 @@
   "Full board: the window got too small for the board, so it shows this mini player. Click (or drag the window bigger) to get the board back.": "บอร์ดเต็ม: หน้าต่างเล็กเกินไปสำหรับบอร์ด จึงแสดงมินิเพลเยอร์นี้ คลิก (หรือลากหน้าต่างให้ใหญ่ขึ้น) เพื่อกลับไปที่บอร์ด",
   "Hear {effect} (only you)": "ฟัง {effect} (เฉพาะคุณ)",
   "Mic only": "ไมค์อย่างเดียว",
-  "✓ The store is on again: loading it.": "✓ ร้านค้าเปิดอีกครั้ง: กำลังโหลด"
+  "✓ The store is on again: loading it.": "✓ ร้านค้าเปิดอีกครั้ง: กำลังโหลด",
+  "Background sounds": "เสียงพื้นหลัง"
 }

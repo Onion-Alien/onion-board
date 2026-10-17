@@ -3826,5 +3826,6 @@
   "Full board: the window got too small for the board, so it shows this mini player. Click (or drag the window bigger) to get the board back.": "Koko board: ikkuna kävi liian pieneksi boardille, joten se näyttää tämän minisoittimen. Napsauta (tai vedä ikkunaa isommaksi) saadaksesi boardin takaisin.",
   "Hear {effect} (only you)": "Kuuntele {effect} (vain sinä)",
   "Mic only": "Vain mikki",
-  "✓ The store is on again: loading it.": "✓ Kauppa on taas päällä: ladataan."
+  "✓ The store is on again: loading it.": "✓ Kauppa on taas päällä: ladataan.",
+  "Background sounds": "Taustaäänet"
 }

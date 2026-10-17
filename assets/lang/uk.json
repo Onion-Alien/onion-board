@@ -3906,5 +3906,6 @@
   "Full board: the window got too small for the board, so it shows this mini player. Click (or drag the window bigger) to get the board back.": "Уся панель: вікно стало замалим для панелі, тож показано цей мініплеєр. Натисни (або розтягни вікно), щоб повернути панель.",
   "Hear {effect} (only you)": "Послухати {effect} (лише ти)",
   "Mic only": "Лише мікро",
-  "✓ The store is on again: loading it.": "✓ Магазин знову ввімкнено: завантажується."
+  "✓ The store is on again: loading it.": "✓ Магазин знову ввімкнено: завантажується.",
+  "Background sounds": "Фонові звуки"
 }
