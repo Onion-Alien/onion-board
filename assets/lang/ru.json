@@ -9,7 +9,6 @@
   " · right-click to rename, delete or give it a random-sound hotkey · drag to reorder": " · ПКМ — переименовать, удалить или дать горячую клавишу случайного звука · перетащи, чтобы поменять порядок",
   " · shows by itself when {progs} is in front": " · сама открывается, когда {progs} на переднем плане",
   " · {hk} plays a random one": " · {hk} играет случайный звук",
-  "+{value} more": "+ещё {value}",
   "<span style='color:{red}'>Couldn't search {site}: {err}</span>": "<span style='color:{red}'>Не удалось поискать на {site}: {err}</span>",
   "<span style='color:{status}'>Can't play “{name}”{why}. If the file was moved or deleted, remove the pad and add the sound again.</span>": "<span style='color:{status}'>Не удаётся сыграть «{name}»{why}. Если файл перемещён или удалён, убери кнопку и добавь звук заново.</span>",
   "<span style='color:{status}'>Instant replay can't listen: {error}</span>": "<span style='color:{status}'>Мгновенный повтор не может слушать: {error}</span>",
@@ -1258,7 +1257,6 @@
   "Voices in your voices folder that are a server on the internet. Ones on this PC (127.0.0.1) always work.": "Голоса в твоей папке голосов, которые являются сервером в интернете. Те, что на этом ПК (127.0.0.1), работают всегда.",
   "Wait first": "Задержка",
   "Waiting to hear you… if the bar doesn't move, pick another mic.": "Жду, когда тебя услышу… если полоска не двигается, выбери другой микрофон.",
-  "Waits for the sounds playing to finish": "Ждёт, пока доиграют текущие звуки",
   "Waits this long after the press before it plays, say for a punchline. Stop everything cancels it.": "Ждёт столько после нажатия, прежде чем сыграть, например для панчлайна. «Остановить всё» отменяет это.",
   "Waking it up, so you don't have to restart (your sound may blip for a second)": "Бужу его, чтобы не пришлось перезагружаться (звук может мигнуть на секунду)",
   "Waveform shows once the sound has loaded": "Волна появится, когда звук загрузится",
@@ -3681,5 +3679,7 @@
   "Sports": "Спорт",
   "TV": "ТВ",
   "Viral": "Вирусные",
-  "What's hot on Myinstants right now, and the sounds people here liked this week": "Что сейчас популярно на Myinstants и звуки, которые здесь понравились людям на этой неделе"
+  "What's hot on Myinstants right now, and the sounds people here liked this week": "Что сейчас популярно на Myinstants и звуки, которые здесь понравились людям на этой неделе",
+  "See everything waiting to play": "Показать всё, что ждёт своей очереди",
+  "Take everything out of the queue": "Убрать всё из очереди"
 }

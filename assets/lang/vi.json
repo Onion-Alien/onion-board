@@ -10,7 +10,6 @@
   " · shows by itself when {progs} is in front": " · tự hiện khi {progs} ở phía trước",
   " · {hk} plays a random one": " · {hk} phát ngẫu nhiên một âm thanh",
   ", try Settings → Audio → Audio buffering: Safer": "• thử Cài đặt → Âm thanh → Bộ đệm âm thanh: An toàn hơn",
-  "+{value} more": "+{value} nữa",
   "<b>You don't need the virtual cable any more</b>, it was only the backup. Remove it, or keep it if another program uses it (Voicemeeter, another soundboard).": "<b>Bạn không cần cáp ảo nữa</b>, nó chỉ là phương án dự phòng. Gỡ nó đi, hoặc giữ lại nếu chương trình khác đang dùng (Voicemeeter, soundboard khác).",
   "<span style='color:{red}'>Couldn't search {site}: {err}</span>": "<span style='color:{red}'>Không tìm được trên {site}: {err}</span>",
   "<span style='color:{status}'>Another program is already using {keys}, pick a different hotkey.</span>": "<span style='color:{status}'>Chương trình khác đang dùng {keys}, hãy chọn phím tắt khác.</span>",
@@ -1292,7 +1291,6 @@
   "Voices in your voices folder that are a server on the internet. Ones on this PC (127.0.0.1) always work.": "Giọng nói trong thư mục giọng nói của bạn là một máy chủ trên internet. Những cái trên PC này (127.0.0.1) luôn hoạt động.",
   "Wait first": "Đợi trước đã",
   "Waiting to hear you… if the bar doesn't move, pick another mic.": "Đang chờ nghe bạn… nếu thanh không di chuyển, hãy chọn mic khác.",
-  "Waits for the sounds playing to finish": "Đợi âm thanh phát xong",
   "Waits this long after the press before it plays, say for a punchline. Stop everything cancels it.": "Phải đợi rất lâu sau khi nhấn trước khi nó phát, chẳng hạn như một câu kết. Dừng lại mọi thứ hủy bỏ nó.",
   "Waking it up, so you don't have to restart (your sound may blip for a second)": "Đánh thức nó lên để bạn không phải khởi động lại (âm thanh của bạn có thể bị tắt trong giây lát)",
   "Waveform shows once the sound has loaded": "Dạng sóng hiển thị khi âm thanh đã được tải",
@@ -3527,5 +3525,7 @@
   "Sports": "Thể thao",
   "TV": "TV",
   "Viral": "Lan truyền",
-  "What's hot on Myinstants right now, and the sounds people here liked this week": "Những gì đang hot trên Myinstants lúc này, và âm thanh mọi người ở đây thích tuần này"
+  "What's hot on Myinstants right now, and the sounds people here liked this week": "Những gì đang hot trên Myinstants lúc này, và âm thanh mọi người ở đây thích tuần này",
+  "See everything waiting to play": "Xem mọi thứ đang chờ phát",
+  "Take everything out of the queue": "Bỏ hết khỏi hàng đợi"
 }

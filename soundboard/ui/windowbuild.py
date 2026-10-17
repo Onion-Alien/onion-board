@@ -1190,13 +1190,13 @@ class WindowBuilder(Controller):
         mw.playing_row = QWidget()
         # the playing chips wrap onto more lines: one line of four overlapping sounds'
         # chips (~900 px) turned a narrower window into the mini player, and every
-        # playing sound must stay reachable, so none are left out. Up next only fills
-        # what's left of the line (_fit_up_next)
+        # playing sound must stay reachable, so none are left out. Up next is one chip
+        # after them, its list a pop-up (upnext.py)
         mw._chips_hl = Flow(mw.playing_row, gap=CHIPS_GAP)
         mw._chips = {}
         mw._chip_ids = ()
-        # (Up next label, its chips, "+n more", how many wait)
-        mw._waiting_chips = None
+        mw._up_next_chip = None     # the row's Up next chip, when anything waits
+        mw._up_next_popup = None    # its list, made the first time it's opened
         _Moved(mw.playing_row, mw.playctl._fit_up_next)
         mw.playing_row.hide()
         left.addWidget(mw.playing_row)

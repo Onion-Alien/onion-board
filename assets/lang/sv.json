@@ -11,7 +11,6 @@
   " · {hk} plays a random one": " · {hk} spelar ett slumpmässigt",
   ", try Settings → Audio → Audio buffering: Safer": "• prova Inställningar → Ljud → Ljudbuffring: Säkrare",
   "(In a game? Press <b>Shift + Tab</b> and click the ⚙ gear.)": "(I ett spel? Tryck <b>Shift + Tab</b> och klicka på kugghjulet ⚙.)",
-  "+{value} more": "+{value} till",
   "<b style='color:{color}'>Discord is changing your sounds:</b><ul style='margin-left:-20px'>{fixes}</ul>Fix it, then check again.": "<b style='color:{color}'>Discord ändrar dina ljud:</b><ul style='margin-left:-20px'>{fixes}</ul>Fixa det och kolla sedan igen.",
   "<b style='color:{color}'>✓ Discord passes your sounds through clean.</b> Nothing in its settings is changing them.": "<b style='color:{color}'>✓ Discord släpper igenom dina ljud rent.</b> Inget i dess inställningar ändrar dem.",
   "<b style='color:{colour}'>(live)</b>": "<b style='color:{colour}'>(live)</b>",
@@ -1229,7 +1228,6 @@
   "Volume for {count} (%):": "Volym för {count} (%):",
   "Wait first": "Vänta först",
   "Waiting to hear you… if the bar doesn't move, pick another mic.": "Väntar på att höra dig… om stapeln inte rör sig, välj en annan mikrofon.",
-  "Waits for the sounds playing to finish": "Väntar tills ljuden som spelas är klara",
   "Waits this long after the press before it plays, say for a punchline. Stop everything cancels it.": "Väntar så här länge efter trycket innan det spelas, t.ex. för en punchline. Stoppa allt avbryter det.",
   "Waking it up, so you don't have to restart (your sound may blip for a second)": "Väcker den, så att du slipper starta om (ditt ljud kan hacka en sekund)",
   "Walks you through mic, headphones, where your sounds go (your mic, the cable, another device or nowhere) and Discord": "Guidar dig genom mikrofon, hörlurar, vart dina ljud går (din mikrofon, kabeln, en annan enhet eller ingenstans) och Discord",
@@ -3604,5 +3602,7 @@
   "Sports": "Sport",
   "TV": "TV",
   "Viral": "Viralt",
-  "What's hot on Myinstants right now, and the sounds people here liked this week": "Det som är hett på Myinstants just nu och ljuden som folk här gillade den här veckan"
+  "What's hot on Myinstants right now, and the sounds people here liked this week": "Det som är hett på Myinstants just nu och ljuden som folk här gillade den här veckan",
+  "See everything waiting to play": "Se allt som väntar på att spelas",
+  "Take everything out of the queue": "Ta bort allt ur kön"
 }

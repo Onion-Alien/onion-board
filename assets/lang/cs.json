@@ -11,7 +11,6 @@
   " · {hk} plays a random one": " · {hk} přehraje náhodný",
   ", try Settings → Audio → Audio buffering: Safer": "• zkus Nastavení → Zvuk → Zvuková vyrovnávací paměť: Bezpečnější",
   "(In a game? Press <b>Shift + Tab</b> and click the ⚙ gear.)": "(Ve hře? Stiskni <b>Shift + Tab</b> a klikni na ozubené kolo ⚙.)",
-  "+{value} more": "+{value} dalších",
   "<b style='color:{color}'>Discord is changing your sounds:</b><ul style='margin-left:-20px'>{fixes}</ul>Fix it, then check again.": "<b style='color:{color}'>Discord mění tvoje zvuky:</b><ul style='margin-left:-20px'>{fixes}</ul>Oprav to a zkontroluj znovu.",
   "<b style='color:{color}'>✓ Discord passes your sounds through clean.</b> Nothing in its settings is changing them.": "<b style='color:{color}'>✓ Discord tvoje zvuky propouští čisté.</b> Nic v jeho nastavení je nemění.",
   "<b style='color:{colour}'>(live)</b>": "<b style='color:{colour}'>(živě)</b>",
@@ -1246,7 +1245,6 @@
   "Volume for {count} (%):": "Hlasitost pro {count} (%):",
   "Wait first": "Nejdřív počkat",
   "Waiting to hear you… if the bar doesn't move, pick another mic.": "Čekám, až tě uslyším… pokud se lišta nehýbe, vyber jiný mikrofon.",
-  "Waits for the sounds playing to finish": "Počká, až dohrají hrající zvuky",
   "Waits this long after the press before it plays, say for a punchline. Stop everything cancels it.": "Po stisku počká takhle dlouho, než začne hrát, třeba kvůli pointě. Zastavit všechno ho zruší.",
   "Waking it up, so you don't have to restart (your sound may blip for a second)": "Probouzím ho, ať není potřeba restart (zvuk může na vteřinu cuknout)",
   "Walks you through mic, headphones, where your sounds go (your mic, the cable, another device or nowhere) and Discord": "Provede tě mikrofonem, sluchátky, tím, kam jdou tvoje zvuky (tvůj mikrofon, kabel, jiné zařízení nebo nikam), a Discordem",
@@ -3681,5 +3679,7 @@
   "Sports": "Sport",
   "TV": "TV",
   "Viral": "Virální",
-  "What's hot on Myinstants right now, and the sounds people here liked this week": "Co je teď populární na Myinstants a zvuky, které se tu lidem líbily tento týden"
+  "What's hot on Myinstants right now, and the sounds people here liked this week": "Co je teď populární na Myinstants a zvuky, které se tu lidem líbily tento týden",
+  "See everything waiting to play": "Zobrazit vše, co čeká na přehrání",
+  "Take everything out of the queue": "Odebrat vše z fronty"
 }

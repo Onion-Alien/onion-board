@@ -11,7 +11,6 @@
   " · {hk} plays a random one": " · {hk} spiller en tilfeldig",
   ", try Settings → Audio → Audio buffering: Safer": "• prøv Innstillinger → Lyd → Lydbuffer: Tryggere",
   "(In a game? Press <b>Shift + Tab</b> and click the ⚙ gear.)": "(I et spill? Trykk <b>Shift + Tab</b> og klikk på tannhjulet ⚙.)",
-  "+{value} more": "+{value} til",
   "<b style='color:{color}'>Discord is changing your sounds:</b><ul style='margin-left:-20px'>{fixes}</ul>Fix it, then check again.": "<b style='color:{color}'>Discord endrer lydene dine:</b><ul style='margin-left:-20px'>{fixes}</ul>Fiks det, og sjekk igjen.",
   "<b style='color:{color}'>✓ Discord passes your sounds through clean.</b> Nothing in its settings is changing them.": "<b style='color:{color}'>✓ Discord slipper lydene dine rent gjennom.</b> Ingenting i innstillingene endrer dem.",
   "<b style='color:{colour}'>(live)</b>": "<b style='color:{colour}'>(live)</b>",
@@ -1229,7 +1228,6 @@
   "Volume for {count} (%):": "Volum for {count} (%):",
   "Wait first": "Vent først",
   "Waiting to hear you… if the bar doesn't move, pick another mic.": "Venter på å høre deg… hvis stolpen ikke beveger seg, velg en annen mikrofon.",
-  "Waits for the sounds playing to finish": "Venter til lydene som spilles, er ferdige",
   "Waits this long after the press before it plays, say for a punchline. Stop everything cancels it.": "Venter så lenge etter trykket før den spilles, for eksempel for en punchline. Stopp alt avbryter den.",
   "Waking it up, so you don't have to restart (your sound may blip for a second)": "Vekker den, så du slipper å starte på nytt (lyden kan falle ut et sekund)",
   "Walks you through mic, headphones, where your sounds go (your mic, the cable, another device or nowhere) and Discord": "Guider deg gjennom mikrofon, hodetelefoner, hvor lydene dine går (mikrofonen, kabelen, en annen enhet eller ingen steder) og Discord",
@@ -3604,5 +3602,7 @@
   "Sports": "Sport",
   "TV": "TV",
   "Viral": "Viralt",
-  "What's hot on Myinstants right now, and the sounds people here liked this week": "Det som er populært på Myinstants akkurat nå, og lydene folk her likte denne uka"
+  "What's hot on Myinstants right now, and the sounds people here liked this week": "Det som er populært på Myinstants akkurat nå, og lydene folk her likte denne uka",
+  "See everything waiting to play": "Se alt som venter på å spilles",
+  "Take everything out of the queue": "Ta alt ut av køen"
 }

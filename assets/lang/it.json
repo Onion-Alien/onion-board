@@ -10,7 +10,6 @@
   " · shows by itself when {progs} is in front": " · si mostra da sola quando {progs} è in primo piano",
   " · {hk} plays a random one": " · {hk} ne suona uno a caso",
   ", try Settings → Audio → Audio buffering: Safer": "• prova Impostazioni → Audio → Buffer audio: Più sicuro",
-  "+{value} more": "+{value} altri",
   "<b>You don't need the virtual cable any more</b>, it was only the backup. Remove it, or keep it if another program uses it (Voicemeeter, another soundboard).": "<b>Non ti serve più il cavo virtuale</b>: era solo il piano B. Rimuovilo, o tienilo se lo usa un altro programma (Voicemeeter, un'altra soundboard).",
   "<span style='color:{red}'>Couldn't search {site}: {err}</span>": "<span style='color:{red}'>Impossibile cercare su {site}: {err}</span>",
   "<span style='color:{status}'>Another program is already using {keys}, pick a different hotkey.</span>": "<span style='color:{status}'>Un altro programma usa già {keys}: scegli un'altra scorciatoia.</span>",
@@ -1315,7 +1314,6 @@
   "Voices in your voices folder that are a server on the internet. Ones on this PC (127.0.0.1) always work.": "Voci nella cartella delle voci che sono un server su Internet. Quelli su questo PC (127.0.0.1) funzionano sempre.",
   "Wait first": "Aspetta prima",
   "Waiting to hear you… if the bar doesn't move, pick another mic.": "In attesa di sentirti... se la barra non si muove, scegli un altro microfono.",
-  "Waits for the sounds playing to finish": "Attende che la riproduzione dei suoni finisca",
   "Waits this long after the press before it plays, say for a punchline. Stop everything cancels it.": "Aspetta così a lungo dopo la stampa prima di andare in onda, diciamo per una battuta finale. Ferma tutto lo annulla.",
   "Waking it up, so you don't have to restart (your sound may blip for a second)": "Riattivarlo, in modo da non dover riavviare (il suono potrebbe lampeggiare per un secondo)",
   "Waveform shows once the sound has loaded": "La forma d'onda viene visualizzata una volta caricato il suono",
@@ -3604,5 +3602,7 @@
   "Sports": "Sport",
   "TV": "TV",
   "Viral": "Virali",
-  "What's hot on Myinstants right now, and the sounds people here liked this week": "Cosa va forte su Myinstants adesso e i suoni che sono piaciuti qui questa settimana"
+  "What's hot on Myinstants right now, and the sounds people here liked this week": "Cosa va forte su Myinstants adesso e i suoni che sono piaciuti qui questa settimana",
+  "See everything waiting to play": "Vedi tutto ciò che aspetta di essere riprodotto",
+  "Take everything out of the queue": "Togli tutto dalla coda"
 }

@@ -223,3 +223,26 @@ def test_tray_item_brings_the_window_back_while_bun_is_up(window, qapp):
     window.bunctl.tray_bun()                             # Bun not up: turns into him
     assert window.bunctl.bun_up()
     window.bunctl.leave_bun_mode()
+
+
+def test_he_dances_to_whats_playing_and_gets_sad_when_nothing_does(window, qapp):
+    import numpy as np
+    _mini(window)
+    window.bunctl.enter_bun_mode()
+    bun = window.bunctl.bun_mode
+    state = dict(paused=False, level=0.3, sending=False, mic=True, downloading=False,
+                 failed=0)
+    song = np.zeros((48000 * 10, 2), np.int16)
+    bun.tick(live=True, song=(song, 0.5), **state)
+    assert bun.bun.groove is bun.groove and bun.groove._pos > 0   # listening to it
+    bun.tick(live=False, song=None, **state)
+    assert bun.bun.groove is None
+    # the moods: fine, bored, then sad; music again and he hops for joy
+    bun._quiet_since = None
+    assert bun._mood(0.0, False, False) == 0.0
+    assert bun._mood(bunmode.BORED_S + 1, False, False) == bunmode.BORED
+    assert bun._mood(bunmode.SAD_S + 1, False, False) == bunmode.LONELY
+    bun.bun._joy_at = -1.0
+    assert bun._mood(bunmode.SAD_S + 2, True, False) == 0.0
+    assert bun.bun._joy_at > 0
+    assert bun._mood(bunmode.SAD_S + 3, False, True) == 0.0   # busy (downloading): fine

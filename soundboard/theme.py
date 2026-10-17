@@ -599,6 +599,9 @@ QFrame#card QFrame#chip { background:$btn; border:1px solid transparent; border-
 QFrame#card QFrame#chip:hover { background:$btn_hover; }
 QFrame#card QFrame#chip[sel="true"] { border-color:$accent; }
 QFrame#card QFrame#chip QPushButton { background:transparent; border:none; }
+/* a card that pops up over the board (Up next's list): an edge, and its names from the left */
+QFrame#card[popup="true"] { border:1px solid $border_hi; }
+QFrame#card[popup="true"] QPushButton#chipname { text-align:left; }
 QFrame#card QFrame#chip QPushButton#chipname:hover { color:$text_hi; }
 QFrame#card QFrame#chip QPushButton#chipstop { border-radius:11px; color:$muted; }
 QFrame#card QFrame#chip QPushButton#chipstop:hover { background:$danger_bg; color:$danger_text; }

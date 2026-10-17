@@ -345,6 +345,14 @@ These are the current reference points. Copy their structure before inventing a 
   an optional one-line `QLabel#hint`, then the controls. One idea per card. If two cards
   could be one, make one: fewer sections beats more. Cards must look designed, not
   like a form: see *Cards that look designed* below.
+- **Breathing room: nothing touches an edge.** A card's pieces sit at least its
+  padding (14 px, `card()`) inside its edge; a scrolling list's items end 8 px before
+  its scroll bar (a right margin of 8 on the list's layout), and the scroll bar sits
+  inside the card's padding, never on its border. Rows in a list have 4 px between
+  them. This keeps coming back in pop-ups and lists built by hand, so it's tested:
+  any test that builds a card or a scrolling list calls
+  `uicheck.assert_breathing_room(widget)` (`tests/uicheck.py`), filled with enough
+  items to scroll, and the pictures are checked zoomed in at the right edge.
 - Long text wraps (`setWordWrap(True)`); it never widens the layout.
 - No huge empty gaps and no sideways scroll bars at any size in section 6's *Window*
   row.
@@ -605,6 +613,9 @@ Never draw a fixed colour except a sound's own colour, the user's own highlight 
 - A card that folds shut when the page fits the screen open. Folding is for a page
   that really doesn't fit, never a way to tidy up.
 - A one-click delete of something a person made.
+- Anything touching an edge: a row against its scroll bar, a scroll bar on a card's
+  border, a button on the card's edge (section 2, *Breathing room*). A pop-up card is
+  built with `card()`, not a bare `QFrame` with hand-set margins.
 
 ## 10. Checklist for every UI change
 
@@ -628,6 +639,9 @@ Never draw a fixed colour except a sound's own colour, the user's own highlight 
    zoomed grab with guide lines.
 8. Tests: the new widget's flow, and that tooltips/accessible names exist on icon
    buttons.
+9. Breathing room (section 2): the test calls `uicheck.assert_breathing_room` on
+   every new card, pop-up and scrolling list, filled until it scrolls; in the pictures,
+   zoom on its right edge and bottom: nothing touches the scroll bar or the border.
 
 ## 11. Modern standards this follows (2025-2026)
 

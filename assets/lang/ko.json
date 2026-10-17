@@ -10,7 +10,6 @@
   " · shows by itself when {progs} is in front": " · {progs}이(가) 앞에 있으면 자동으로 표시",
   " · {hk} plays a random one": " · {hk}: 랜덤 사운드 재생",
   ", try Settings → Audio → Audio buffering: Safer": "• 설정 → 오디오 → 오디오 버퍼링: 안전을 시도해 보세요",
-  "+{value} more": "+{value}개 더",
   "<b>You don't need the virtual cable any more</b>, it was only the backup. Remove it, or keep it if another program uses it (Voicemeeter, another soundboard).": "<b>이제 가상 케이블은 필요 없어요</b>, 예비용이었을 뿐이에요. 삭제하거나, 다른 프로그램(Voicemeeter, 다른 사운드보드)이 쓰고 있다면 그대로 두세요.",
   "<span style='color:{red}'>Couldn't search {site}: {err}</span>": "<span style='color:{red}'>{site} 검색 실패: {err}</span>",
   "<span style='color:{status}'>Another program is already using {keys}, pick a different hotkey.</span>": "<span style='color:{status}'>다른 프로그램이 이미 {keys}을(를) 쓰고 있어요, 다른 단축키를 골라 주세요.</span>",
@@ -1292,7 +1291,6 @@
   "Voices in your voices folder that are a server on the internet. Ones on this PC (127.0.0.1) always work.": "인터넷 서버인 음성 폴더에 있는 음성입니다. 이 PC(127.0.0.1)에 있는 것들은 항상 작동합니다.",
   "Wait first": "먼저 기다려",
   "Waiting to hear you… if the bar doesn't move, pick another mic.": "당신의 말을 기다리고 있습니다. 바가 움직이지 않으면 다른 마이크를 선택하세요.",
-  "Waits for the sounds playing to finish": "재생되는 소리가 끝날 때까지 기다립니다.",
   "Waits this long after the press before it plays, say for a punchline. Stop everything cancels it.": "언론이 재생되기 전에 이만큼 오래 기다립니다. 예를 들어 펀치라인을 위해 말이죠. 모든 것을 중지하면 취소됩니다.",
   "Waking it up, so you don't have to restart (your sound may blip for a second)": "깨우기 때문에 다시 시작할 필요가 없습니다(소리가 잠시 동안 삐걱거릴 수 있음)",
   "Waveform shows once the sound has loaded": "사운드가 로드되면 파형이 표시됩니다.",
@@ -3527,5 +3525,7 @@
   "Sports": "스포츠",
   "TV": "TV",
   "Viral": "바이럴",
-  "What's hot on Myinstants right now, and the sounds people here liked this week": "지금 Myinstants에서 뜨는 것과 이번 주 여기서 사람들이 좋아한 사운드"
+  "What's hot on Myinstants right now, and the sounds people here liked this week": "지금 Myinstants에서 뜨는 것과 이번 주 여기서 사람들이 좋아한 사운드",
+  "See everything waiting to play": "재생 대기 중인 항목 모두 보기",
+  "Take everything out of the queue": "대기열에서 모두 빼기"
 }

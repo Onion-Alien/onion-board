@@ -23,7 +23,8 @@ from soundboard.shuffle import ShuffleBag
 from soundboard.ui import icons, sidebar, worker
 from soundboard.ui.controller import Controller
 from soundboard.ui.linkbar import PLAY_ID as LINK_ID
-from soundboard.ui.widgets import fmt_pos, widget_at
+from soundboard.ui.upnext import UpNextChip, UpNextPopup, Waiting
+from soundboard.ui.widgets import fmt_pos
 
 if TYPE_CHECKING:
     from soundboard.ui.mainwindow import MainWindow
@@ -32,7 +33,6 @@ if TYPE_CHECKING:
 # (soundfx.preview_part): a 2-hour song's pitch shift took minutes to start playing
 PREVIEW_WHOLE_S = 5 * 60
 PREVIEW_S = 30
-QUEUE_CHIPS = 5          # queued sounds shown by name above the pads (then "+n more")
 CHIPS_GAP = 6         # between the now-playing row's chips
 CHIPS_ROW_H = 30      # the now-playing row: a chip's 24 px ■ button, its margins and border
 
@@ -525,9 +525,10 @@ class PlaybackControl(Controller):
         mw.voice.stop_all()   # the voice changer and the other voices go off too
 
     def _update_chips(self, playing):
-        """The row above the pads: every sound playing, each with its own ■, and the
-        queue, each with its own ✕. A web search / link's Play once counts too: it
-        isn't a pad, but it plays over them and needs its own ■. One rule, whatever
+        """The row above the pads: every sound playing, each with its own ■, then Up
+        next, one chip with how many wait that opens them all in a list (upnext.py). A
+        web search / link's Play once counts too: it isn't a pad, but it plays over
+        them and needs its own ■. One rule, whatever
         played before: a sound has a chip while it plays. (The row used to show only
         for two or more, so stopping one of two hid the other's chip too and it looked
         like ■ had stopped both.)"""
@@ -573,30 +574,21 @@ class PlaybackControl(Controller):
                     ch.addWidget(stop)
                     mw._chips_hl.addWidget(chip)
                     mw._chips[sid] = chip
-            mw._waiting_chips = None
-            if queue or links:
-                lbl = QLabel(_("Up next"))
-                lbl.setObjectName("muted")
-                mw._chips_hl.addWidget(lbl)
-                # web search / link songs, then the board's queued sounds
-                waiting: list[tuple] = [(title,
-                            lambda __=False, i=i, q=links: mw.linkbar.play_next(i, q),
-                            lambda __=False, i=i, q=links: mw.linkbar.drop_up_next(i, q))
-                           for i, title in enumerate(links)]
-                for i, sid in enumerate(queue):
-                    m = mw.meta(sid)
-                    waiting.append((m.name if m else sid,
-                                    lambda __=False, s=sid: self.select(s),
-                                    lambda __=False, i=i, q=queue: self._unqueue(i, q)))
-                chips = []
-                for text, on_click, on_x in waiting[:QUEUE_CHIPS]:
-                    chips.append(self._chip(text, _("Waits for the sounds playing to finish"),
-                                            on_click, _("Take it out of the queue"), on_x))
-                    mw._chips_hl.addWidget(chips[-1])
-                more = QLabel()
-                more.setObjectName("muted")
-                mw._chips_hl.addWidget(more)
-                mw._waiting_chips = (lbl, chips, more, len(waiting))
+            # Up next: one chip, "Up next" and how many wait, that opens the whole list
+            mw._up_next_chip = None
+            waiting = len(queue) + len(links)
+            if waiting:
+                chip = UpNextChip(waiting)
+                chip.clicked.connect(self.open_up_next)
+                mw._chips_hl.addWidget(chip)
+                mw._up_next_chip = chip
+            pop = mw._up_next_popup
+            if pop is not None and pop.isVisible():
+                if waiting:
+                    pop._anchor = mw._up_next_chip
+                    pop.show_items(self._up_next_items())
+                else:
+                    pop.close()
             self._fit_up_next()
             # at least a line high, taller when the chips wrap (the Flow's height for
             # its width); a row that shrank and grew back with every overlapping
@@ -610,63 +602,45 @@ class PlaybackControl(Controller):
                 chip.style().unpolish(chip)
                 chip.style().polish(chip)
 
-    def _fit_up_next(self):
-        """Up next shares the Now playing line and never starts a line of its own: the
-        playing chips always show (every playing sound keeps its ■), then as many Up
-        next chips as fit beside them, then "+n more". If not one fits (a narrow
-        window), Up next isn't shown at all."""
+    def _up_next_items(self) -> list[Waiting]:
+        """Everything waiting to play, in order: web search / link songs, then the
+        board's queued sounds; each with what clicking its name and its ✕ do."""
         mw = self.mw
-        if not mw._waiting_chips:
-            return
-        lbl, chips, more, total = mw._waiting_chips
-        if not all(qt_valid(w) for w in (lbl, more, *chips)):
-            return
-        gap = CHIPS_GAP
-        room = mw.playing_row.width()
-        for i in range(mw._chips_hl.count()):   # the Now playing label and chips
-            w = widget_at(mw._chips_hl, i)
-            if w is None:
-                continue
-            if w is lbl:
-                break
-            room -= w.sizeHint().width() + gap
-        room -= lbl.sizeHint().width() + gap
-        fm = more.fontMetrics()
-        shown = 0
-        for i, c in enumerate(chips):
-            left = total - i - 1
-            need = c.sizeHint().width() + gap
-            tail = fm.horizontalAdvance(_("+{value} more", value=left)) + gap if left else 0
-            if need + tail > room:
-                break
-            room -= need
-            shown += 1
-        lbl.setVisible(shown > 0)
-        for i, c in enumerate(chips):
-            c.setVisible(i < shown)
-        more.setText(_("+{value} more", value=total - shown))
-        more.setVisible(0 < shown < total)
+        links = tuple(mw.linkbar.up_next())
+        queue = tuple(self._queue)
+        waiting: list[Waiting] = [(title,
+                                   lambda __=False, i=i, q=links: mw.linkbar.play_next(i, q),
+                                   lambda __=False, i=i, q=links: mw.linkbar.drop_up_next(i, q))
+                                  for i, title in enumerate(links)]
+        for i, sid in enumerate(queue):
+            m = mw.meta(sid)
+            waiting.append((m.name if m else sid,
+                            lambda __=False, s=sid: self.select(s),
+                            lambda __=False, i=i, q=queue: self._unqueue(i, q)))
+        return waiting
 
-    def _chip(self, text: str, tip: str, on_click, x_tip: str, on_x) -> QFrame:
-        """A queued sound's chip: its name, and a ✕."""
-        chip = QFrame()
-        chip.setObjectName("chip")
-        ch = QHBoxLayout(chip)
-        ch.setContentsMargins(4, 2, 2, 2)
-        ch.setSpacing(2)
-        name = QPushButton(chip.fontMetrics().elidedText(text, Qt.TextElideMode.ElideRight, 150)
-                           .replace("&", "&&"))   # "R&B", not "RB" with a shortcut
-        name.setObjectName("chipname")
-        name.setToolTip(tip)
-        name.clicked.connect(on_click)
-        x = QPushButton()
-        x.setObjectName("chipstop")
-        x.setToolTip(x_tip)
-        icons.close_button(x, 24)
-        x.clicked.connect(on_x)
-        ch.addWidget(name)
-        ch.addWidget(x)
-        return chip
+    def open_up_next(self):
+        """The Up next chip: the whole list in a pop-up card above it."""
+        mw = self.mw
+        chip = mw._up_next_chip
+        if chip is None or not qt_valid(chip):
+            return
+        if mw._up_next_popup is None:
+            mw._up_next_popup = UpNextPopup(mw, self.clear_up_next)
+        mw._up_next_popup.open_at(chip, self._up_next_items())
+
+    def clear_up_next(self):
+        """The list's Clear: nothing waits any more; what plays keeps playing."""
+        self._queue.clear()
+        self._say_queue()
+        self.mw.linkbar.drop_up_next()
+        self._update_chips(self.mw.engine.playing())
+
+    def _fit_up_next(self):
+        """The row moved or changed size: the open Up next list stays on its chip."""
+        pop = self.mw._up_next_popup
+        if pop is not None and pop.isVisible():
+            pop._place()
 
     def _unqueue(self, i: int, shown: tuple[str, ...] | None = None):
         """The ✕ on the queue's chip `i`, of the queue as its row `shown` it. A row
