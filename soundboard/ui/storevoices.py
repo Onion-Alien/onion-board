@@ -18,7 +18,7 @@ from PySide6.QtWidgets import (QComboBox, QDialog, QHBoxLayout, QLabel, QLineEdi
 from soundboard import errors, savedvoices, store, storevoices as sv, usage, voicefx, voicesetups
 from soundboard.i18n import _
 from soundboard.speech import aivoicelist as avl
-from soundboard.ui import busy, fit, icons
+from soundboard.ui import busy, fit, icons, storelook
 from soundboard.ui.panel import HoverCard, icon_button
 from soundboard.ui.storetab import ROW_MAX_W, SoundRow
 from soundboard.ui.ytsearch import ClampLabel
@@ -67,8 +67,12 @@ class VoiceRow(SoundRow):
         self.sound = v   # (the name the tab's vote and hear code read)
         self.setMaximumWidth(ROW_MAX_W)
         h = QHBoxLayout(self)
-        h.setContentsMargins(10, 8, 12, 8)
+        h.setContentsMargins(8, 8, 12, 8)
         h.setSpacing(8)
+        # its picture, as a sound's: its emoji (else its kind's) on a coloured tile
+        self.tile = storelook.SoundTile(v, lambda: self.btn_play.click())
+        self.tile.setToolTip(_("Hear it (only you)"))
+        h.addWidget(self.tile)
         self.btn_play = icon_button("play", _("Hear it (only you)"))
         self.btn_play.setCheckable(True)
         icons.set_icon(self.btn_play, "play", checked_color="accent")
@@ -77,7 +81,7 @@ class VoiceRow(SoundRow):
         h.addWidget(self.btn_play)
         words = QVBoxLayout()
         words.setSpacing(0)
-        shown = f"{v.emoji} {v.name}" if v.emoji else v.name   # (one checked emoji)
+        shown = v.name   # (its one checked emoji is its picture)
         self.name = ClampLabel(shown, lines=1)
         self.name.set_full(shown, shown)
         meta = meta_line(v)
@@ -108,6 +112,7 @@ class VoiceRow(SoundRow):
     def playing_look(self, on: bool):
         icons.set_icon(self.btn_play, "stop" if on else "play", checked_color="accent")
         self.btn_play.setToolTip(_("Stop") if on else _("Hear it (only you)"))
+        self.tile.set_playing(on)
 
 
 class VoiceHooks:

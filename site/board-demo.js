@@ -1053,7 +1053,7 @@
     ]);
   }
 
-  // ------------------------------------------------------------------ Free sounds
+  // ------------------------------------------------------------------ Community (the store)
   // The sound store (ui/storetab.py): sounds people share, voted on. Hear one, or add it to
   // your pads for real; voting, sharing and reporting need the app.
   var STORE = [
@@ -1329,7 +1329,7 @@
       if (site.play) site.play("squeak");
     } }, [h("span", { class: "logo mark" }, [icon("onion")]), h("div", null, [h("b", { text: "Onion Board" }), h("small", { text: "v" + version })])]);
     R.nav = h("nav", { class: "ob-nav" });
-    [["sounds", "Sounds"], ["radio", "Radio"], ["apps", "Apps"], ["triggers", "Triggers"], ["voice", "Voice"], ["store", "Free sounds"], ["setup", "Setup"]].forEach(function (n) {
+    [["sounds", "Sounds"], ["radio", "Radio"], ["apps", "Apps"], ["triggers", "Triggers"], ["voice", "Voice"], ["store", "Community"], ["setup", "Setup"]].forEach(function (n) {
       R.nav.appendChild(h("button", { type: "button", "data-p": n[0], title: n[1], "aria-current": n[0] === "sounds" ? "page" : "false", onclick: function () { go(n[0]); } },
         [icon(n[0] === "voice" ? "voice" : n[0]), h("span", { class: "t", text: n[1] })]));
     });

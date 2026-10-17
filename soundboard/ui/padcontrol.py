@@ -254,7 +254,7 @@ class PadControl(Controller):
             from soundboard.ui.storetab import StoreTab
             if isinstance(mw.store, StoreTab) and store.link_ok(src["link"]):
                 a_src_share = add(("store",), _("Share to the store"),
-                                  _("Share this link in the Free sounds tab"), sm)
+                                  _("Share this link in the Community tab"), sm)
         a_show = add(("folder",), _("Open file location"))
         a_del = add(("trash", "danger_text"), _("Remove"), _("Goes to Recently deleted"))
         act = menu.exec(pos)

@@ -413,3 +413,47 @@ def test_a_store_name_never_leaves_the_store_folder_or_hides_its_type(fake):
         assert p.is_relative_to(root) and p.parent.name == "0123456789ab", name
         assert p.suffix == ".wav"
         assert not re.search("[\u200b-\u200f\u202a-\u202e\u2066-\u2069<>]", p.name), name
+
+
+def test_every_sound_gets_a_picture_from_its_name_tags_or_category():
+    """The Store rows' tiles: a word in the name first, then the tags, then the category's
+    picture, else a speaker; the same sound always gets the same colour."""
+    from soundboard.ui import storelook
+
+    def snd(**kw):
+        return store.Sound(**{"id": "000000000001", "name": "Xyz", "ext": "wav", **kw})
+    assert storelook.sound_emoji(snd(name="Air horn (stadium)")) == "📢"
+    assert storelook.sound_emoji(snd(name="Tavern crowd chatter")) == "🍺"
+    assert storelook.sound_emoji(snd(tags=["horror"])) == "👻"
+    assert storelook.sound_emoji(snd(cat="games")) == "🎮"
+    assert storelook.sound_emoji(snd(name="Whatever")) == storelook.FALLBACK
+    # whole words only: "Window" isn't "win", "Alright" isn't "right"
+    assert storelook.sound_emoji(snd(name="Window")) == storelook.FALLBACK
+    assert storelook.sound_emoji(snd(name="Alright")) == storelook.FALLBACK
+    assert storelook.tile_hue(snd(id="abc")) == storelook.tile_hue(snd(id="abc"))
+
+
+def test_a_row_plays_from_its_picture_and_shows_it_playing(qapp, fake):
+    """A click on a row's picture is its play; while the sample plays the picture's bars
+    bounce, and a narrow row keeps only the picture as its play button."""
+    from PySide6.QtCore import QPointF, Qt
+    from PySide6.QtGui import QMouseEvent
+    added, played = [], []
+    t = _tab(qapp, added, played)
+    assert _wait(qapp, lambda: len(t._rows) == 2)
+    r = t._rows[0]
+    press = QMouseEvent(QMouseEvent.Type.MouseButtonPress, QPointF(5, 5), QPointF(5, 5),
+                        Qt.MouseButton.LeftButton, Qt.MouseButton.LeftButton,
+                        Qt.KeyboardModifier.NoModifier)
+    r.tile.mousePressEvent(press)
+    assert r.btn_play.isChecked() and r.tile.playing
+    assert _wait(qapp, lambda: played and played[-1] is not None)
+    t._stop_preview()
+    assert not r.tile.playing and not r.btn_play.isChecked()
+    t.resize(440, 600)
+    assert _wait(qapp, lambda: not r.btn_play.isVisibleTo(r))
+    assert r.tile._badge
+    t.resize(900, 600)
+    assert _wait(qapp, lambda: r.btn_play.isVisibleTo(r))
+    assert not r.tile._badge
+    t.shutdown()
