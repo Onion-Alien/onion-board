@@ -144,6 +144,17 @@ def test_ended_by_windows_or_a_restart_is_not_a_problem(app_dir, monkeypatch,
     assert not list((app_dir / applog.REPORTS_DIR).glob("crash-*.txt"))
 
 
+def test_an_installer_that_didnt_start_takes_the_mark_back(app_dir):
+    """Marked before the update installer starts (it can end the app before it's back);
+    when it couldn't start, the app goes on and a later crash counts again."""
+    w = exitwatch.start(app_dir)
+    exitwatch.closed_by_windows()
+    exitwatch.staying()
+    state, _native = exitwatch.read_last(app_dir)
+    assert "closed_by_windows" not in state
+    w.stopped()
+
+
 def test_the_heartbeat_notes_a_stuck_window(app_dir, monkeypatch):
     monkeypatch.setattr(exitwatch, "HEARTBEAT_S", 0.02)
     exitwatch.start(app_dir, lambda: 9.0)

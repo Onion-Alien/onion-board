@@ -62,7 +62,7 @@ def test_update_now_downloads_then_restarts_into_the_installer(window, boxes, qa
 
     window.updctl._on_update(_rel(), "", True)    # "Check now" found it: the dialog opens
     assert boxes.shown[0][0] == "Update available" and "Release page" in boxes.shown[0][1]
-    assert process_events(qapp, lambda: started)
+    assert process_events(qapp, lambda: quit_)
     assert started == [setup] and quit_ == [1]
     assert window.btn_update.accessibleName() == "Restart to update"
     assert window.cfg.update_pending == "99.0.0"
@@ -144,6 +144,68 @@ def test_found_behind_the_loading_screen_it_installs_before_the_window(
     assert ("Updating to 99.0.0… 50%", 0.5) in said
     assert said[-1] == ("Installing Onion Board 99.0.0…", 1.0)
     assert window.cfg.update_pending == "99.0.0" and window.cfg.update_auto_tried == "99.0.0"
+
+
+def _closing_marks(monkeypatch):
+    """exitwatch's "an installer closes the app" mark, as calls: "closing" / "staying"."""
+    from soundboard import exitwatch
+    marks = []
+    monkeypatch.setattr(exitwatch, "closed_by_windows", lambda: marks.append("closing"))
+    monkeypatch.setattr(exitwatch, "staying", lambda: marks.append("staying"), raising=False)
+    return marks
+
+
+def test_a_slow_installer_start_never_freezes_the_window(window, boxes, qapp, monkeypatch,
+                                                        installer):
+    """Windows checking the downloaded installer held start_install for good: the window
+    froze until it was ended, and that was counted as a freeze and an unclean exit."""
+    import threading
+    import time
+    marks = _closing_marks(monkeypatch)
+    held, quit_ = threading.Event(), []
+    seen = []
+
+    def slow(path):
+        seen.append(list(marks))   # what exitwatch was told before it started
+        held.wait(3)
+    monkeypatch.setattr(updates, "start_install", slow)
+    monkeypatch.setattr(window, "quit_app", lambda: quit_.append(1))
+    t0 = time.monotonic()
+    window.updctl._start_install(_rel(), installer.setup)
+    assert time.monotonic() - t0 < 1.0          # back at once: the window keeps going
+    window.updctl._start_install(_rel(), installer.setup)   # a second click: nothing more
+    assert process_events(qapp, lambda: seen)
+    assert seen == [["closing"]] and quit_ == []
+    held.set()
+    assert process_events(qapp, lambda: quit_)
+    assert quit_ == [1] and marks == ["closing"]
+
+
+def test_an_installer_that_wont_start_says_so_and_stays(window, boxes, qapp, monkeypatch,
+                                                       installer):
+    marks = _closing_marks(monkeypatch)
+    quit_ = []
+
+    def fail(path):
+        raise OSError("blocked")
+    monkeypatch.setattr(updates, "start_install", fail)
+    monkeypatch.setattr(window, "quit_app", lambda: quit_.append(1))
+    window.updctl._start_install(_rel(), installer.setup)
+    assert process_events(qapp, lambda: window.updctl._update_err)
+    assert window.updctl._update_err and quit_ == []
+    assert marks == ["closing", "staying"] and window.cfg.update_pending == ""
+    window.updctl._start_install(_rel(), installer.setup)   # clicked again: it tries again
+    assert process_events(qapp, lambda: window.updctl._update_fails == 2)
+
+
+def test_behind_the_loading_screen_the_mark_comes_first(window, boxes, qapp, monkeypatch,
+                                                         installer):
+    marks = _closing_marks(monkeypatch)
+    seen = []
+    monkeypatch.setattr(updates, "check", lambda cfg, force=False, launch=False: _rel())
+    monkeypatch.setattr(updates, "start_install", lambda path: seen.append(list(marks)))
+    assert window.updctl.update_at_start() is True
+    assert seen == [["closing"]]
 
 
 def test_nothing_new_or_slow_the_app_opens_as_usual(window, qapp, monkeypatch, installer):
