@@ -104,3 +104,41 @@ def test_the_bar_keeps_moving_on_a_slow_job(qapp):
     assert at[20.0] < at[35.0] < at[120.0] < 1.0
     b.finish(True)
     assert b.progress() == 1.0
+
+
+def test_hidden_in_his_ending_he_is_gone(qapp):
+    """A first start plays the show on the Setup tab behind the guide, which then opens
+    Sounds mid-cheer: opening Setup later flashed the rest of it."""
+    from PySide6.QtWidgets import QVBoxLayout, QWidget
+    page = QWidget()
+    QVBoxLayout(page).addWidget(b := SetupShow())
+    page.resize(320, 200)
+    page.show()
+    ended = []
+    b.done.connect(lambda: ended.append(True))
+    b.start()
+    _run(b, 5)
+    b.finish(True)
+    _run(b, 1)
+    assert b.phase() == "yay"
+    page.hide()   # another tab
+    assert ended and not b.on
+    page.show()
+    assert b.isHidden()   # nothing left to flash
+    page.close()
+
+
+def test_hidden_mid_build_he_carries_on(qapp):
+    """Hidden before the answer (still setting up): the show waits, it doesn't end."""
+    from PySide6.QtWidgets import QVBoxLayout, QWidget
+    page = QWidget()
+    QVBoxLayout(page).addWidget(b := SetupShow())
+    page.resize(320, 200)
+    page.show()
+    b.start()
+    _run(b, 3)
+    page.hide()
+    assert b.on
+    page.show()
+    assert b.on and b.isVisible()
+    page.close()

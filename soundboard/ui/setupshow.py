@@ -117,6 +117,14 @@ class SetupShow(BunnyWidget):
             return
         self._result = ok
 
+    def hideEvent(self, ev):
+        super().hideEvent(ev)
+        # hidden in his ending (a first start plays it on the Setup tab behind the
+        # guide, which then opens Sounds): it's over, or the rest played in a flash the
+        # next time the tab opened
+        if self.on and (self._end_at >= 0 or self._result is not None):
+            self._stop()
+
     def _stop(self):
         self._t = self._act_t = -1.0
         self._result = None
