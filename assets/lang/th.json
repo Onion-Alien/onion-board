@@ -3593,5 +3593,9 @@
   "Couldn't start the AI voice: {why}": "เริ่มเสียง AI ไม่ได้: {why}",
   "Getting the AI voice ready…": "กำลังเตรียมเสียง AI…",
   "Putting the AI voice on “{name}”… {pct}%": "กำลังใส่เสียง AI ให้ “{name}”… {pct}%",
-  "The AI voices add-on isn't installed, so only the voice changer part of “{name}” is on.": "ยังไม่ได้ติดตั้งส่วนเสริมเสียง AI จึงเปิดแค่ส่วนเปลี่ยนเสียงของ “{name}”"
+  "The AI voices add-on isn't installed, so only the voice changer part of “{name}” is on.": "ยังไม่ได้ติดตั้งส่วนเสริมเสียง AI จึงเปิดแค่ส่วนเปลี่ยนเสียงของ “{name}”",
+  "Use “{name}”?": "ใช้ “{name}” ไหม?",
+  "“{name}” has an AI voice, so this may take a while. Each sound is made in that voice first, in the background, and plays when it's ready.": "“{name}” มีเสียง AI จึงอาจใช้เวลาสักพัก แต่ละเสียงจะถูกทำด้วยเสียงนั้นก่อนในเบื้องหลัง และเล่นเมื่อพร้อม",
+  "“{name}” has an AI voice, so this may take a while. The radio goes quiet until the AI voice is ready, then carries on in it.": "“{name}” มีเสียง AI จึงอาจใช้เวลาสักพัก วิทยุจะเงียบจนกว่าเสียง AI จะพร้อม แล้วเล่นต่อด้วยเสียงนั้น",
+  "“{name}” has an AI voice, so this may take a while. Your programs go quiet until the AI voice is ready, then carry on in it.": "“{name}” มีเสียง AI จึงอาจใช้เวลาสักพัก โปรแกรมของคุณจะเงียบจนกว่าเสียง AI จะพร้อม แล้วเล่นต่อด้วยเสียงนั้น"
 }

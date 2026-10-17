@@ -553,7 +553,9 @@ class SpeedPitchButton(QPushButton):
         if y < area.top():
             y = pos.y() + self.height() + 4
         y = max(area.top(), min(y, area.bottom() - self.pop.height() + 1))
-        x = pos.x() + self.width() - self.pop.width()
+        x = pos.x() + self.width() - self.pop.width()   # its right edge on the button's
+        if x < self.window().mapToGlobal(QPoint(0, 0)).x():
+            x = pos.x()   # a button near the window's left (Apps): it opens to the right
         x = max(area.left(), min(x, area.right() - self.pop.width() + 1))
         self.pop.move(x, y)
         self.pop.show()

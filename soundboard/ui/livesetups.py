@@ -9,7 +9,8 @@ Its voice changer part is live, so it's on at once. Its AI voice takes a while:
   render cached like Edit sound's: renderworker), one sound at a time. A sound that
   was playing pauses meanwhile and goes on from the same place.
 
-Either way Live controls shows how far it is with a Cancel, which puts back what was on
+A setup with an AI voice asks first ("this may take a while"). Then Live controls (and
+a card, when it's shut) shows how far it is with a Cancel, which puts back what was on
 before. Nothing here is saved: like the rest of Live controls, it's for now.
 """
 from __future__ import annotations
@@ -20,6 +21,7 @@ import logging
 from typing import TYPE_CHECKING
 
 from PySide6.QtCore import QTimer, Signal
+from PySide6.QtWidgets import QMessageBox
 
 from soundboard import errors, library, livesetup, renderworker, soundfx, voicesetups
 from soundboard.i18n import _
@@ -102,19 +104,21 @@ class LiveSetups(Controller):
         b.set_setups(items, self.names[tab])
 
     # ------------------------------------------------------------ picking one
-    def pick(self, tab: str, name: str):
+    def pick(self, tab: str, name: str, ask: bool = True):
         setup = self.setups().get(name) if name else None
         if name and setup is None:
             self.refresh(tab)   # deleted on the Voice tab meanwhile
             return
-        self._before[tab] = self.names[tab]
         module = None
         if livesetup.ai_of(setup) is not None:
             module = livesetup.ai_module()
+            if module is not None and ask and not self.ask(tab, name):
+                return   # No: what was on stays on
             if module is None:
                 self.mw.toast(_("The AI voices add-on isn't installed, so only the voice "
                                 "changer part of “{name}” is on.", name=html.escape(name)),
                               "warn")
+        self._before[tab] = self.names[tab]
         try:
             self._apply(tab, setup, module)
         except RuntimeError as e:
@@ -125,6 +129,28 @@ class LiveSetups(Controller):
         b = self.button(tab)
         if b is not None:
             b.set_setup(name)
+
+    def ask(self, tab: str, name: str) -> bool:
+        """A setup with an AI voice takes a while: say so, Yes or No first."""
+        return self.ask_box(tab, name).exec() == QMessageBox.StandardButton.Yes
+
+    def ask_box(self, tab: str, name: str) -> QMessageBox:
+        text = {
+            "sounds": _("“{name}” has an AI voice, so this may take a while. Each sound is "
+                        "made in that voice first, in the background, and plays when it's "
+                        "ready.", name=name),
+            "radio": _("“{name}” has an AI voice, so this may take a while. The radio goes "
+                       "quiet until the AI voice is ready, then carries on in it.", name=name),
+            "apps": _("“{name}” has an AI voice, so this may take a while. Your programs go "
+                      "quiet until the AI voice is ready, then carry on in it.", name=name),
+        }[tab]
+        box = QMessageBox(QMessageBox.Icon.Question, _("Use “{name}”?", name=name), text,
+                          QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No,
+                          self.mw)
+        box.button(QMessageBox.StandardButton.Yes).setText(_("Use it"))
+        box.button(QMessageBox.StandardButton.No).setText(_("Not now"))
+        box.setDefaultButton(QMessageBox.StandardButton.Yes)
+        return box
 
     def _apply(self, tab: str, setup: dict | None, module):
         eng = self.mw.engine
@@ -150,7 +176,7 @@ class LiveSetups(Controller):
             self._stop_jobs(resume=True)
             if not undo:
                 return
-        self.pick(tab, self._before.get(tab, ""))
+        self.pick(tab, self._before.get(tab, ""), ask=False)
         self._before[tab] = self.names[tab]
 
     # ------------------------------------------------------------ the radio, programs
@@ -317,6 +343,11 @@ class LiveSetups(Controller):
             fx = self._fx(sid)
             if fx is not None:
                 self._ready[(sid, soundfx.key(fx))] = data
+            m = self.mw.meta(sid)
+            if m is not None:   # the busy card turns into this one
+                self.mw.toast(_("✓ “{name}” is ready to play", name=html.escape(m.name)),
+                              "ok", key=TOAST_KEY)
+                self._shown_pct = -1
             if at is not None:
                 self._replay(sid, at, data)
                 self._ai_playing.add(sid)
