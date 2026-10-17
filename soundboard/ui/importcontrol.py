@@ -81,9 +81,8 @@ class ImportControl(Controller):
         self._imported_short = False      # a sound added in this batch is under SHORT_SOUND_S
         self._pending_imports = 0
         self._imported_ok = 0
-        # boards the installer's ticked box brought over: asked once they're in
-        self._ask_keep: list[str] = []
-        self._said_yes: set[str] = set()   # boards they chose to import here themselves
+        # other soundboards on their way in: each has its own category, named on the card
+        self._boards: list[str] = []
         self._exporting = False
         self._import_errors: list[importreport.Skipped] = []
         self._import_total = 0      # this batch, for the toast's "3 of 12"
@@ -340,10 +339,10 @@ class ImportControl(Controller):
             return
         if self._import_card_shut:
             return
-        if self._ask_keep:   # the installer's box: say where they're coming from
+        if self._boards:   # another soundboard: say where they're coming from
             text = (_("Bringing your sounds over from {name}: {done} of {total}…",
-                      name=self._ask_keep[0], done=done, total=total)
-                    if len(self._ask_keep) == 1 else
+                      name=self._boards[0], done=done, total=total)
+                    if len(self._boards) == 1 else
                     _("Bringing your sounds over from your other soundboards: {done} of "
                       "{total}…", done=done, total=total))
         text = "<b>{}</b><br>{}".format(text, _("Each sound shows up as soon as it's in. "
@@ -371,7 +370,8 @@ class ImportControl(Controller):
         mw = self.mw
         self._pending_imports -= 1
         if meta is not None:
-            mw.catctl._tag_new(meta)
+            if not set(meta.tags) & set(self._boards):   # a board's: in its own category
+                mw.catctl._tag_new(meta)
             meta.tags = library.merge_tags(meta.tags, mw.cfg.categories,
                                            mw.cfg.subcategories)
             key = library.clean_hotkey(self._import_keys.pop(meta.id, ""), meta.name)
@@ -408,9 +408,7 @@ class ImportControl(Controller):
         self._import_total = 0
         busy.set_busy(mw.btn_add, False)
         mw.triggers.import_done()   # a trigger's sound that failed to import
-        boards, self._ask_keep = self._ask_keep, []
-        if boards and ids and not self._keep_imported(boards, ids):
-            return
+        self._drop_empty_boards()
         if not n and not skipped:
             mw.toast(_("Nothing new to add"), key="import")
             return
@@ -426,34 +424,31 @@ class ImportControl(Controller):
             mw.toast(_("A sound you added is very short, so it may be barely "
                          "heard."), "warn")
 
-    def _keep_imported(self, boards: list[str], ids: list[str]) -> bool:
-        """The installer's box brought another soundboard's sounds over without asking:
-        ask now whether to keep them, so nobody has to delete a big board pad by pad.
-        False: they're removed (Undo and Recently deleted still have them)."""
+    def _show_board(self, name: str):
+        """Another soundboard's sounds are on their way in: its category is made and
+        shown now, so each sound is seen landing in it (not in All)."""
         mw = self.mw
-        text = (ngettext("We brought over <b>{n}</b> sound from {name}. Keep it?",
-                         "We brought over <b>{n}</b> sounds from {name}. Keep them?",
-                         len(ids), name=boards[0]) if len(boards) == 1 else
-                ngettext("We brought over <b>{n}</b> sound from your other soundboards. "
-                         "Keep it?",
-                         "We brought over <b>{n}</b> sounds from your other soundboards. "
-                         "Keep them?", len(ids)))
-        box = QMessageBox(QMessageBox.Icon.Question, _("Keep your imported sounds?"), text,
-                          QMessageBox.StandardButton.NoButton, mw)
-        # Bun, smug: got your board and its settings in one go
-        box.setIconPixmap(bunny.bunny_pixmap(84, dpr=mw.devicePixelRatioF(), smug=True))
-        keep = box.addButton(_("Keep"), QMessageBox.ButtonRole.YesRole)
-        remove = box.addButton(_("Remove"), QMessageBox.ButtonRole.NoRole)
-        box.setInformativeText(_("Removed sounds come back with Undo, or later from Backup "
-                                 "→ Recently deleted sounds."))
-        box.setDefaultButton(keep)
-        box.setEscapeButton(keep)   # closing it never deletes anything
-        box.exec()
-        kept = box.clickedButton() is not remove   # closed some other way: kept
-        free_dialog(box)
-        if not kept:
-            mw.rmctl.remove_sounds(ids)
-        return kept
+        if name not in self._boards:
+            self._boards.append(name)
+        cat = library.merge_tags([name], mw.cfg.categories)[0]
+        mw.catctl._fill_categories()
+        mw.catctl.set_category(cat)
+
+    def _drop_empty_boards(self):
+        """The import's done: a board's category that got nothing (all already here)
+        goes again."""
+        mw = self.mw
+        boards, self._boards = self._boards, []
+        empty = [c for c in mw.cfg.categories if c in boards
+                 and not any(c in m.tags for m in mw.cfg.sounds)]
+        if not empty:
+            return
+        for c in empty:
+            mw.cfg.categories.remove(c)
+        if mw.cfg.category in empty:
+            mw.catctl.set_category("")
+        mw.catctl._fill_categories()
+        mw._save_now()
 
     def _show_skipped(self, skipped):
         mw = self.mw
@@ -610,8 +605,6 @@ class ImportControl(Controller):
         note.unlink(missing_ok=True)
         for key in dict.fromkeys(keys):
             if (src := otherboards.by_key(key)) is not None:
-                if src.name not in self._said_yes:   # already imported it themselves
-                    self._ask_keep.append(src.name)
                 self.import_other(src, ask=False)
 
     def import_other(self, src: otherboards.Source, path: str = "", ask: bool = True):
@@ -711,11 +704,7 @@ class ImportControl(Controller):
                                     QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No
                                     ) != QMessageBox.StandardButton.Yes:
                 return
-            # their own yes: no "keep them?" at the end for this board, even when the
-            # installer's import of it is still running (it asked minutes later)
-            self._said_yes.add(src.name)
-            if src.name in self._ask_keep:
-                self._ask_keep.remove(src.name)
+        self._show_board(src.name)
         self.import_files([e.path for e in ok], {e.path: e for e in ok})
 
     def import_package(self, path: str):

@@ -2940,16 +2940,6 @@
     "{n} klipp har lagts till i dina ljud"
   ],
   "Copied “{name}”: Ctrl+V pastes it in an editor or on the Sounds tab": "”{name}” kopierat: Ctrl+V klistrar in det i en redigerare eller på fliken Ljud",
-  "Keep": "Behåll",
-  "Keep your imported sounds?": "Behålla de importerade ljuden?",
-  "We brought over <b>{n}</b> sound from your other soundboards. Keep it?": [
-    "Vi hämtade <b>{n}</b> ljud från dina andra soundboards. Vill du behålla det?",
-    "Vi hämtade <b>{n}</b> ljud från dina andra soundboards. Vill du behålla dem?"
-  ],
-  "We brought over <b>{n}</b> sound from {name}. Keep it?": [
-    "Vi hämtade <b>{n}</b> ljud från {name}. Vill du behålla det?",
-    "Vi hämtade <b>{n}</b> ljud från {name}. Vill du behålla dem?"
-  ],
   "Compatibility fixes for games, calls and browsers.": "Kompatibilitetsfixar för spel, samtal och webbläsare.",
   "Install update": "Installera uppdatering",
   "Mic updated: games, calls and browsers hear your sounds.": "Mikrofonen uppdaterad: spel, samtal och webbläsare hör dina ljud.",
@@ -2986,7 +2976,6 @@
   "Your mic needs a quick repair": "Din mikrofon behöver en snabb reparation",
   "Mute or unmute your mic for others. Your sounds still play for them.": "Stäng av eller slå på din mikrofon för andra. Dina ljud spelas fortfarande för dem.",
   "That page has no sound Onion Board can add.": "Den sidan har inget ljud som Onion Board kan lägga till.",
-  "Removed sounds come back with Undo, or later from Backup → Recently deleted sounds.": "Borttagna ljud kommer tillbaka med Ångra, eller senare från Säkerhetskopia → Nyligen raderade ljud.",
   "Not configured": "Inte inställt",
   "Not configured: click to fix": "Inte inställt: klicka för att fixa",
   "Can't send to {device}, click to fix": "Kan inte skicka till {device}, klicka för att fixa",

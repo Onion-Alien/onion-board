@@ -2940,16 +2940,6 @@
     "{n} clipes adicionados aos seus sons"
   ],
   "Copied “{name}”: Ctrl+V pastes it in an editor or on the Sounds tab": "“{name}” copiado: Ctrl+V cola em um editor ou na aba Sons",
-  "Keep": "Manter",
-  "Keep your imported sounds?": "Manter os sons importados?",
-  "We brought over <b>{n}</b> sound from your other soundboards. Keep it?": [
-    "Trouxemos <b>{n}</b> som das suas outras soundboards. Manter?",
-    "Trouxemos <b>{n}</b> sons das suas outras soundboards. Manter?"
-  ],
-  "We brought over <b>{n}</b> sound from {name}. Keep it?": [
-    "Trouxemos <b>{n}</b> som do {name}. Manter?",
-    "Trouxemos <b>{n}</b> sons do {name}. Manter?"
-  ],
   "Compatibility fixes for games, calls and browsers.": "Correções de compatibilidade para jogos, chamadas e navegadores.",
   "Install update": "Instalar atualização",
   "Mic updated: games, calls and browsers hear your sounds.": "Microfone atualizado: jogos, chamadas e navegadores ouvem seus sons.",
@@ -2986,7 +2976,6 @@
   "Your mic needs a quick repair": "Seu microfone precisa de um reparo rápido",
   "Mute or unmute your mic for others. Your sounds still play for them.": "Silencie ou ative seu microfone para os outros. Seus sons continuam tocando para eles.",
   "That page has no sound Onion Board can add.": "Essa página não tem nenhum som que o Onion Board possa adicionar.",
-  "Removed sounds come back with Undo, or later from Backup → Recently deleted sounds.": "Sons removidos voltam com Desfazer, ou depois em Backup → Sons excluídos recentemente.",
   "Not configured": "Não configurado",
   "Not configured: click to fix": "Não configurado: clique para corrigir",
   "Can't send to {device}, click to fix": "Não dá para enviar para {device}, clique para corrigir",

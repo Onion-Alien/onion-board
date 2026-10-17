@@ -2940,16 +2940,6 @@
     "{n} klip hozzáadva a hangjaidhoz"
   ],
   "Copied “{name}”: Ctrl+V pastes it in an editor or on the Sounds tab": "„{name}” másolva: a Ctrl+V beilleszti egy szerkesztőbe vagy a Hangok lapra",
-  "Keep": "Megtartás",
-  "Keep your imported sounds?": "Megtartod az importált hangokat?",
-  "We brought over <b>{n}</b> sound from your other soundboards. Keep it?": [
-    "Áthoztunk <b>{n}</b> hangot a többi soundboardodról. Megtartod?",
-    "Áthoztunk <b>{n}</b> hangot a többi soundboardodról. Megtartod őket?"
-  ],
-  "We brought over <b>{n}</b> sound from {name}. Keep it?": [
-    "Áthoztunk <b>{n}</b> hangot innen: {name}. Megtartod?",
-    "Áthoztunk <b>{n}</b> hangot innen: {name}. Megtartod őket?"
-  ],
   "Compatibility fixes for games, calls and browsers.": "Kompatibilitási javítások játékokhoz, hívásokhoz és böngészőkhöz.",
   "Install update": "Frissítés telepítése",
   "Mic updated: games, calls and browsers hear your sounds.": "Mikrofon frissítve: a játékok, hívások és böngészők hallják a hangjaidat.",
@@ -2986,7 +2976,6 @@
   "Your mic needs a quick repair": "A mikrofonodnak gyors javítás kell",
   "Mute or unmute your mic for others. Your sounds still play for them.": "Némítsd vagy kapcsold be a mikrofonod másoknak. A hangjaid továbbra is szólnak nekik.",
   "That page has no sound Onion Board can add.": "Ezen az oldalon nincs olyan hang, amit az Onion Board hozzá tudna adni.",
-  "Removed sounds come back with Undo, or later from Backup → Recently deleted sounds.": "Az eltávolított hangok visszajönnek a Visszavonással, vagy később a Biztonsági mentés → Nemrég törölt hangok menüből.",
   "Not configured": "Nincs beállítva",
   "Not configured: click to fix": "Nincs beállítva: kattints a javításhoz",
   "Can't send to {device}, click to fix": "Nem lehet küldeni ide: {device}, kattints a javításhoz",

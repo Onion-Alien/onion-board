@@ -3009,18 +3009,6 @@
     "Klipy dodane do twoich dźwięków: {n}"
   ],
   "Copied “{name}”: Ctrl+V pastes it in an editor or on the Sounds tab": "Skopiowano „{name}”: Ctrl+V wkleja go w edytorze lub na karcie Dźwięki",
-  "Keep": "Zachowaj",
-  "Keep your imported sounds?": "Zachować zaimportowane dźwięki?",
-  "We brought over <b>{n}</b> sound from your other soundboards. Keep it?": [
-    "Przeniesione dźwięki z twoich innych soundboardów: <b>{n}</b>. Zachować je?",
-    "Przeniesione dźwięki z twoich innych soundboardów: <b>{n}</b>. Zachować je?",
-    "Przeniesione dźwięki z twoich innych soundboardów: <b>{n}</b>. Zachować je?"
-  ],
-  "We brought over <b>{n}</b> sound from {name}. Keep it?": [
-    "Przeniesione dźwięki z {name}: <b>{n}</b>. Zachować je?",
-    "Przeniesione dźwięki z {name}: <b>{n}</b>. Zachować je?",
-    "Przeniesione dźwięki z {name}: <b>{n}</b>. Zachować je?"
-  ],
   "Compatibility fixes for games, calls and browsers.": "Poprawki zgodności z grami, rozmowami i przeglądarkami.",
   "Install update": "Zainstaluj aktualizację",
   "Mic updated: games, calls and browsers hear your sounds.": "Mikrofon zaktualizowany: gry, rozmowy i przeglądarki słyszą twoje dźwięki.",
@@ -3057,7 +3045,6 @@
   "Your mic needs a quick repair": "Twój mikrofon potrzebuje szybkiej naprawy",
   "Mute or unmute your mic for others. Your sounds still play for them.": "Wycisz lub włącz mikrofon dla innych. Twoje dźwięki nadal do nich docierają.",
   "That page has no sound Onion Board can add.": "Na tej stronie nie ma dźwięku, który Onion Board może dodać.",
-  "Removed sounds come back with Undo, or later from Backup → Recently deleted sounds.": "Usunięte dźwięki wrócą przez Cofnij albo później przez Kopia zapasowa → Ostatnio usunięte dźwięki.",
   "Not configured": "Nieskonfigurowane",
   "Not configured: click to fix": "Nieskonfigurowane: kliknij, aby naprawić",
   "Can't send to {device}, click to fix": "Nie można wysyłać do {device}, kliknij, aby naprawić",

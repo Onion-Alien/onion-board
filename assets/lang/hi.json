@@ -2940,16 +2940,6 @@
     "{n} क्लिप आपकी साउंड्स में जोड़ी गईं"
   ],
   "Copied “{name}”: Ctrl+V pastes it in an editor or on the Sounds tab": "“{name}” कॉपी किया गया: Ctrl+V इसे किसी एडिटर में या Sounds टैब पर पेस्ट करता है",
-  "Keep": "रखें",
-  "Keep your imported sounds?": "आयात की गई आवाज़ें रखें?",
-  "We brought over <b>{n}</b> sound from your other soundboards. Keep it?": [
-    "हमने आपके दूसरे साउंडबोर्ड से <b>{n}</b> आवाज़ लाई है। इसे रखें?",
-    "हमने आपके दूसरे साउंडबोर्ड से <b>{n}</b> आवाज़ें लाई हैं। इन्हें रखें?"
-  ],
-  "We brought over <b>{n}</b> sound from {name}. Keep it?": [
-    "हमने {name} से <b>{n}</b> आवाज़ लाई है। इसे रखें?",
-    "हमने {name} से <b>{n}</b> आवाज़ें लाई हैं। इन्हें रखें?"
-  ],
   "Compatibility fixes for games, calls and browsers.": "गेम, कॉल और ब्राउज़र के लिए कम्पैटिबिलिटी सुधार।",
   "Install update": "अपडेट इंस्टॉल करें",
   "Mic updated: games, calls and browsers hear your sounds.": "माइक अपडेट हो गया: गेम, कॉल और ब्राउज़र आपकी आवाज़ें सुनते हैं।",
@@ -2986,7 +2976,6 @@
   "Your mic needs a quick repair": "आपके माइक को जल्दी ठीक करना है",
   "Mute or unmute your mic for others. Your sounds still play for them.": "दूसरों के लिए अपना माइक म्यूट या अनम्यूट करें। आपके साउंड उन्हें सुनाई देते रहेंगे।",
   "That page has no sound Onion Board can add.": "उस पेज पर कोई साउंड नहीं है जिसे Onion Board जोड़ सके।",
-  "Removed sounds come back with Undo, or later from Backup → Recently deleted sounds.": "हटाए गए साउंड अनडू से, या बाद में बैकअप → हाल में डिलीट किए गए साउंड से वापस आ जाते हैं।",
   "Not configured": "सेट अप नहीं",
   "Not configured: click to fix": "सेट अप नहीं: ठीक करने के लिए क्लिक करें",
   "Can't send to {device}, click to fix": "{device} पर नहीं भेज सकते, ठीक करने के लिए क्लिक करें",

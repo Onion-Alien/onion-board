@@ -2940,16 +2940,6 @@
     "{n} klip seslerine eklendi"
   ],
   "Copied “{name}”: Ctrl+V pastes it in an editor or on the Sounds tab": "“{name}” kopyalandı: Ctrl+V onu bir düzenleyiciye veya Sesler sekmesine yapıştırır",
-  "Keep": "Sakla",
-  "Keep your imported sounds?": "İçe aktarılan sesler kalsın mı?",
-  "We brought over <b>{n}</b> sound from your other soundboards. Keep it?": [
-    "Diğer ses panolarından <b>{n}</b> ses getirdik. Kalsın mı?",
-    "Diğer ses panolarından <b>{n}</b> ses getirdik. Kalsınlar mı?"
-  ],
-  "We brought over <b>{n}</b> sound from {name}. Keep it?": [
-    "{name} uygulamasından <b>{n}</b> ses getirdik. Kalsın mı?",
-    "{name} uygulamasından <b>{n}</b> ses getirdik. Kalsınlar mı?"
-  ],
   "Compatibility fixes for games, calls and browsers.": "Oyunlar, aramalar ve tarayıcılar için uyumluluk düzeltmeleri.",
   "Install update": "Güncellemeyi kur",
   "Mic updated: games, calls and browsers hear your sounds.": "Mikrofon güncellendi: oyunlar, aramalar ve tarayıcılar seslerini duyuyor.",
@@ -2986,7 +2976,6 @@
   "Your mic needs a quick repair": "Mikrofonunun hızlı bir onarıma ihtiyacı var",
   "Mute or unmute your mic for others. Your sounds still play for them.": "Diğerleri için mikrofonunu sessize al veya aç. Seslerin onlara çalmaya devam eder.",
   "That page has no sound Onion Board can add.": "Bu sayfada Onion Board'un ekleyebileceği bir ses yok.",
-  "Removed sounds come back with Undo, or later from Backup → Recently deleted sounds.": "Kaldırılan sesler Geri al ile, ya da sonra Yedek → Son silinen sesler üzerinden geri gelir.",
   "Not configured": "Ayarlanmadı",
   "Not configured: click to fix": "Ayarlanmadı: düzeltmek için tıkla",
   "Can't send to {device}, click to fix": "{device} cihazına gönderilemiyor, düzeltmek için tıkla",

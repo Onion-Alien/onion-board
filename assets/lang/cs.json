@@ -3009,18 +3009,6 @@
     "Klipy přidané do vašich zvuků: {n}"
   ],
   "Copied “{name}”: Ctrl+V pastes it in an editor or on the Sounds tab": "„{name}“ zkopírováno: Ctrl+V jej vloží do editoru nebo na kartu Zvuky",
-  "Keep": "Ponechat",
-  "Keep your imported sounds?": "Ponechat importované zvuky?",
-  "We brought over <b>{n}</b> sound from your other soundboards. Keep it?": [
-    "Převzaté zvuky z tvých jiných soundboardů: <b>{n}</b>. Ponechat je?",
-    "Převzaté zvuky z tvých jiných soundboardů: <b>{n}</b>. Ponechat je?",
-    "Převzaté zvuky z tvých jiných soundboardů: <b>{n}</b>. Ponechat je?"
-  ],
-  "We brought over <b>{n}</b> sound from {name}. Keep it?": [
-    "Převzaté zvuky z {name}: <b>{n}</b>. Ponechat je?",
-    "Převzaté zvuky z {name}: <b>{n}</b>. Ponechat je?",
-    "Převzaté zvuky z {name}: <b>{n}</b>. Ponechat je?"
-  ],
   "Compatibility fixes for games, calls and browsers.": "Opravy kompatibility pro hry, hovory a prohlížeče.",
   "Install update": "Nainstalovat aktualizaci",
   "Mic updated: games, calls and browsers hear your sounds.": "Mikrofon aktualizován: hry, hovory i prohlížeče slyší tvoje zvuky.",
@@ -3057,7 +3045,6 @@
   "Your mic needs a quick repair": "Tvůj mikrofon potřebuje rychlou opravu",
   "Mute or unmute your mic for others. Your sounds still play for them.": "Ztlum nebo zapni mikrofon pro ostatní. Tvoje zvuky jim hrají dál.",
   "That page has no sound Onion Board can add.": "Na té stránce není žádný zvuk, který by Onion Board mohl přidat.",
-  "Removed sounds come back with Undo, or later from Backup → Recently deleted sounds.": "Odebrané zvuky vrátíš přes Zpět, nebo později přes Záloha → Nedávno smazané zvuky.",
   "Not configured": "Nenastaveno",
   "Not configured: click to fix": "Nenastaveno: klikni pro opravu",
   "Can't send to {device}, click to fix": "Nejde posílat do {device}, klikni pro opravu",

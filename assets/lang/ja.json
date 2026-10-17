@@ -2871,14 +2871,6 @@
     "{n} 個のクリップをサウンドに追加しました"
   ],
   "Copied “{name}”: Ctrl+V pastes it in an editor or on the Sounds tab": "「{name}」をコピーしました: Ctrl+V でエディターかサウンドタブに貼り付けられます",
-  "Keep": "残す",
-  "Keep your imported sounds?": "取り込んだサウンドを残しますか？",
-  "We brought over <b>{n}</b> sound from your other soundboards. Keep it?": [
-    "ほかのサウンドボードから <b>{n}</b> 個のサウンドを取り込みました。残しますか？"
-  ],
-  "We brought over <b>{n}</b> sound from {name}. Keep it?": [
-    "{name} から <b>{n}</b> 個のサウンドを取り込みました。残しますか？"
-  ],
   "Compatibility fixes for games, calls and browsers.": "ゲーム、通話、ブラウザーとの互換性を修正します。",
   "Install update": "アップデートをインストール",
   "Mic updated: games, calls and browsers hear your sounds.": "マイクを更新しました: ゲーム、通話、ブラウザーでサウンドが聞こえます。",
@@ -2915,7 +2907,6 @@
   "Your mic needs a quick repair": "マイクに簡単な修復が必要です",
   "Mute or unmute your mic for others. Your sounds still play for them.": "他の人に聞こえるマイクをミュートまたは解除します。サウンドは引き続き相手に聞こえます。",
   "That page has no sound Onion Board can add.": "そのページには Onion Board が追加できるサウンドがありません。",
-  "Removed sounds come back with Undo, or later from Backup → Recently deleted sounds.": "削除したサウンドは 元に戻す、または後から バックアップ → 最近削除したサウンド で戻せます。",
   "Not configured": "未設定",
   "Not configured: click to fix": "未設定：クリックして修正",
   "Can't send to {device}, click to fix": "{device} に送れません。クリックして修正",

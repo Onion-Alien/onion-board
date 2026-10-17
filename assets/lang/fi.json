@@ -2940,16 +2940,6 @@
     "{n} leikettä lisätty ääniisi"
   ],
   "Copied “{name}”: Ctrl+V pastes it in an editor or on the Sounds tab": "”{name}” kopioitu: Ctrl+V liittää sen editoriin tai Äänet-välilehdelle",
-  "Keep": "Säilytä",
-  "Keep your imported sounds?": "Säilytetäänkö tuodut äänet?",
-  "We brought over <b>{n}</b> sound from your other soundboards. Keep it?": [
-    "Toimme <b>{n}</b> äänen muista soundboardeistasi. Säilytetäänkö se?",
-    "Toimme <b>{n}</b> ääntä muista soundboardeistasi. Säilytetäänkö ne?"
-  ],
-  "We brought over <b>{n}</b> sound from {name}. Keep it?": [
-    "Toimme <b>{n}</b> äänen sovelluksesta {name}. Säilytetäänkö se?",
-    "Toimme <b>{n}</b> ääntä sovelluksesta {name}. Säilytetäänkö ne?"
-  ],
   "Compatibility fixes for games, calls and browsers.": "Yhteensopivuuskorjauksia peleihin, puheluihin ja selaimiin.",
   "Install update": "Asenna päivitys",
   "Mic updated: games, calls and browsers hear your sounds.": "Mikki päivitetty: pelit, puhelut ja selaimet kuulevat äänesi.",
@@ -2986,7 +2976,6 @@
   "Your mic needs a quick repair": "Mikkisi tarvitsee pikakorjauksen",
   "Mute or unmute your mic for others. Your sounds still play for them.": "Mykistä tai avaa mikrofonisi muille. Äänesi kuuluvat heille edelleen.",
   "That page has no sound Onion Board can add.": "Sivulla ei ole ääntä, jonka Onion Board voi lisätä.",
-  "Removed sounds come back with Undo, or later from Backup → Recently deleted sounds.": "Poistetut äänet saa takaisin Kumoa-painikkeella tai myöhemmin kohdasta Varmuuskopio → Äskettäin poistetut äänet.",
   "Not configured": "Ei määritetty",
   "Not configured: click to fix": "Ei määritetty: korjaa klikkaamalla",
   "Can't send to {device}, click to fix": "Ei voi lähettää laitteeseen {device}, korjaa klikkaamalla",

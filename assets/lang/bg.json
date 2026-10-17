@@ -2940,16 +2940,6 @@
     "Добавени са {n} клипа към звуците ви"
   ],
   "Copied “{name}”: Ctrl+V pastes it in an editor or on the Sounds tab": "„{name}“ е копиран: Ctrl+V го поставя в редактор или в раздела „Звуци“",
-  "Keep": "Запази",
-  "Keep your imported sounds?": "Да запазя ли внесените звуци?",
-  "We brought over <b>{n}</b> sound from your other soundboards. Keep it?": [
-    "Пренесохме <b>{n}</b> звук от другите ти саундбордове. Да го запазя ли?",
-    "Пренесохме <b>{n}</b> звука от другите ти саундбордове. Да ги запазя ли?"
-  ],
-  "We brought over <b>{n}</b> sound from {name}. Keep it?": [
-    "Пренесохме <b>{n}</b> звук от {name}. Да го запазя ли?",
-    "Пренесохме <b>{n}</b> звука от {name}. Да ги запазя ли?"
-  ],
   "Compatibility fixes for games, calls and browsers.": "Поправки за съвместимост с игри, разговори и браузъри.",
   "Install update": "Инсталирай обновлението",
   "Mic updated: games, calls and browsers hear your sounds.": "Микрофонът е обновен: игри, разговори и браузъри чуват звуците ти.",
@@ -2986,7 +2976,6 @@
   "Your mic needs a quick repair": "Микрофонът ти има нужда от бърз ремонт",
   "Mute or unmute your mic for others. Your sounds still play for them.": "Заглуши или включи микрофона за другите. Звуците ти продължават да се чуват при тях.",
   "That page has no sound Onion Board can add.": "На тази страница няма звук, който Onion Board може да добави.",
-  "Removed sounds come back with Undo, or later from Backup → Recently deleted sounds.": "Премахнатите звуци се връщат с Отмени или по-късно от Резервно копие → Наскоро изтрити звуци.",
   "Not configured": "Не е настроено",
   "Not configured: click to fix": "Не е настроено: кликни за поправка",
   "Can't send to {device}, click to fix": "Не може да се изпраща към {device}, кликни за поправка",

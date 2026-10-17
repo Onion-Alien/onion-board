@@ -2871,14 +2871,6 @@
     "เพิ่ม {n} คลิปไปยังเสียงของคุณแล้ว"
   ],
   "Copied “{name}”: Ctrl+V pastes it in an editor or on the Sounds tab": "คัดลอก “{name}” แล้ว: Ctrl+V จะวางในโปรแกรมแก้ไขหรือในแท็บเสียง",
-  "Keep": "เก็บไว้",
-  "Keep your imported sounds?": "เก็บเสียงที่นำเข้าไว้ไหม?",
-  "We brought over <b>{n}</b> sound from your other soundboards. Keep it?": [
-    "เราย้ายเสียง <b>{n}</b> เสียงมาจากซาวด์บอร์ดอื่นของคุณแล้ว เก็บไว้ไหม?"
-  ],
-  "We brought over <b>{n}</b> sound from {name}. Keep it?": [
-    "เราย้ายเสียง <b>{n}</b> เสียงมาจาก {name} แล้ว เก็บไว้ไหม?"
-  ],
   "Compatibility fixes for games, calls and browsers.": "แก้ปัญหาความเข้ากันได้กับเกม การโทร และเบราว์เซอร์",
   "Install update": "ติดตั้งอัปเดต",
   "Mic updated: games, calls and browsers hear your sounds.": "อัปเดตไมค์แล้ว: เกม การโทร และเบราว์เซอร์ได้ยินเสียงของคุณ",
@@ -2915,7 +2907,6 @@
   "Your mic needs a quick repair": "ไมค์ของคุณต้องซ่อมเล็กน้อย",
   "Mute or unmute your mic for others. Your sounds still play for them.": "ปิดหรือเปิดเสียงไมโครโฟนของคุณสำหรับผู้อื่น เสียงของคุณยังเล่นให้พวกเขาได้ยิน",
   "That page has no sound Onion Board can add.": "หน้านั้นไม่มีเสียงที่ Onion Board เพิ่มได้",
-  "Removed sounds come back with Undo, or later from Backup → Recently deleted sounds.": "เสียงที่ลบจะกลับมาได้ด้วย เลิกทำ หรือภายหลังจาก สำรอง → เสียงที่ลบล่าสุด",
   "Not configured": "ยังไม่ได้ตั้งค่า",
   "Not configured: click to fix": "ยังไม่ได้ตั้งค่า: คลิกเพื่อแก้",
   "Can't send to {device}, click to fix": "ส่งไปที่ {device} ไม่ได้ คลิกเพื่อแก้",

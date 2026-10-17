@@ -2871,14 +2871,6 @@
     "已将 {n} 个片段添加到你的声音"
   ],
   "Copied “{name}”: Ctrl+V pastes it in an editor or on the Sounds tab": "已复制“{name}”：按 Ctrl+V 可粘贴到编辑器或“声音”标签页",
-  "Keep": "保留",
-  "Keep your imported sounds?": "保留导入的音效吗？",
-  "We brought over <b>{n}</b> sound from your other soundboards. Keep it?": [
-    "已从你的其他音效板导入 <b>{n}</b> 个音效。要保留吗？"
-  ],
-  "We brought over <b>{n}</b> sound from {name}. Keep it?": [
-    "已从 {name} 导入 <b>{n}</b> 个音效。要保留吗？"
-  ],
   "Compatibility fixes for games, calls and browsers.": "修复与游戏、通话和浏览器的兼容性问题。",
   "Install update": "安装更新",
   "Mic updated: games, calls and browsers hear your sounds.": "麦克风已更新：游戏、通话和浏览器都能听到你的声音。",
@@ -2915,7 +2907,6 @@
   "Your mic needs a quick repair": "你的麦克风需要快速修复",
   "Mute or unmute your mic for others. Your sounds still play for them.": "为其他人静音或开启你的麦克风。你的音效他们仍然听得到。",
   "That page has no sound Onion Board can add.": "该页面没有 Onion Board 可以添加的音效。",
-  "Removed sounds come back with Undo, or later from Backup → Recently deleted sounds.": "移除的音效可以用撤销找回，之后也可以在 备份 → 最近删除的音效 中找回。",
   "Not configured": "未设置",
   "Not configured: click to fix": "未设置：点击修复",
   "Can't send to {device}, click to fix": "无法发送到 {device}，点击修复",

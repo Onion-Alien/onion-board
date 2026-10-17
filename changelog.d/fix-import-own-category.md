@@ -1,0 +1,2 @@
+- Importing from another soundboard puts its sounds straight into their own category (for example "Resanance"), shown from the first sound on, instead of All.
+- No more "Keep them?" box after an import you already said yes to.
