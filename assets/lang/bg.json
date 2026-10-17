@@ -4092,5 +4092,7 @@
   "Legendary": "Легендарен",
   "Rare": "Рядък",
   "Super Rare": "Супер рядък",
-  "Uncommon": "Необичаен"
+  "Uncommon": "Необичаен",
+  "<b>{device}</b> looks like speakers, so your mic hears itself. Keep them quiet or use headphones. If it starts to squeal, this switches off by itself.": "<b>{device}</b> изглежда като колони, така че микрофонът чува сам себе си. Дръж ги тихо или ползвай слушалки. Ако започне да свири, това се изключва само.",
+  "Stopped <b>Hear what they hear</b>: your mic was picking up your speakers and started to squeal. Use headphones, or turn the speakers down.": "Спряно <b>Чуй каквото чуват те</b>: микрофонът хващаше колоните и започна да свири. Ползвай слушалки или намали колоните."
 }

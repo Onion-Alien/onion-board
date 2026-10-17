@@ -1,11 +1,13 @@
 """The main window: pads, transport, web search, the audio panel, auto push-to-talk."""
 from __future__ import annotations
 
+import html
 import re
 import logging
 import os
 import subprocess
 import sys
+import threading
 from pathlib import Path
 from typing import TYPE_CHECKING, Any, Literal, overload
 
@@ -18,7 +20,7 @@ from PySide6.QtWidgets import (QApplication, QDialog, QMainWindow, QMenu, QMessa
 from soundboard import theme, ytworker
 from soundboard.engine import SR, Engine
 from soundboard import exitwatch
-from soundboard import (appaudio, autostart, library, remote, reset, trash, voicesdk)
+from soundboard import (appaudio, autostart, howl, library, remote, reset, trash, voicesdk)
 from soundboard import (ffmpegget, net, netlog,
                         profiles, quality, shellicon, thumbbar, tor,
                         usage, watchaddon)
@@ -1354,6 +1356,40 @@ class MainWindow(QMainWindow):
             self.say(_("<span style='color:{status}'>Sounds only: your mic isn't "
                        "sent, so nobody (including you) hears it.</span>",
                        status=theme.status('warn')), "warn", key="sounds-only")
+        if on and self.engine.names.get("mon"):   # (no answer off Windows)
+            self._check_speakers(self.engine.names["mon"])
+        if not on:
+            self.unsay("speakers")
+
+    def _check_speakers(self, name: str):
+        """Hear what they hear on speakers: the mic hears them, and loud enough it
+        squeals. Windows is asked on a thread what the headphones output really is."""
+        def work():
+            try:
+                ffs = appaudio.output_form_factors()
+            except Exception:  # noqa: BLE001 - only a warning: never fail loudly
+                log.debug("asking for the outputs' form factors failed", exc_info=True)
+                return
+            if howl.is_speaker(name, ffs):
+                busy.emit(self.device_step, lambda: self._warn_speakers(name))
+        threading.Thread(target=work, name="speaker-check", daemon=True).start()
+
+    def _warn_speakers(self, name: str):
+        if not self.engine.mic_check or self.engine.names.get("mon") != name:
+            return   # switched off, or moved to other headphones, meanwhile
+        self.say(_("<b>{device}</b> looks like speakers, so your mic hears itself. Keep "
+                   "them quiet or use headphones. If it starts to squeal, this switches "
+                   "off by itself.", device=html.escape(name)), "warn", ms=10000,
+                 key="speakers")
+
+    def _howl_stopped(self):
+        """The engine heard the mic squeal through the speakers and stopped playing
+        it back (soundboard.howl): untick the switch to match and say why."""
+        self.unsay("speakers")
+        self.btn_check.setChecked(False)   # -> on_mic_check
+        self.say(_("Stopped <b>Hear what they hear</b>: your mic was picking up your "
+                   "speakers and started to squeal. Use headphones, or turn the speakers "
+                   "down."), "warn", ms=12000, key="howl")
 
     # ------------------------------------------------------------------ tick
     # The window's visibility sets the UI timer's pace: 30/s for the meters and

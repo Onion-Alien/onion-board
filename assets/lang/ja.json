@@ -4014,5 +4014,7 @@
   "Legendary": "レジェンダリー",
   "Rare": "レア",
   "Super Rare": "スーパーレア",
-  "Uncommon": "アンコモン"
+  "Uncommon": "アンコモン",
+  "<b>{device}</b> looks like speakers, so your mic hears itself. Keep them quiet or use headphones. If it starts to squeal, this switches off by itself.": "<b>{device}</b> はスピーカーのようです。マイクが自分の音を拾います。音量を下げるか、ヘッドホンを使ってください。ハウリングが始まると自動でオフになります。",
+  "Stopped <b>Hear what they hear</b>: your mic was picking up your speakers and started to squeal. Use headphones, or turn the speakers down.": "<b>相手に聞こえる音を聞く</b> を止めました: マイクがスピーカーの音を拾ってハウリングし始めました。ヘッドホンを使うか、スピーカーの音量を下げてください。"
 }

@@ -4092,5 +4092,7 @@
   "Legendary": "Legendarisk",
   "Rare": "Sjælden",
   "Super Rare": "Super sjælden",
-  "Uncommon": "Usædvanlig"
+  "Uncommon": "Usædvanlig",
+  "<b>{device}</b> looks like speakers, so your mic hears itself. Keep them quiet or use headphones. If it starts to squeal, this switches off by itself.": "<b>{device}</b> ligner højttalere, så din mikrofon hører sig selv. Hold dem lave, eller brug hovedtelefoner. Hvis det begynder at hyle, slår det sig selv fra.",
+  "Stopped <b>Hear what they hear</b>: your mic was picking up your speakers and started to squeal. Use headphones, or turn the speakers down.": "Stoppede <b>Hør, hvad de hører</b>: din mikrofon opfangede dine højttalere og begyndte at hyle. Brug hovedtelefoner, eller skru ned for højttalerne."
 }

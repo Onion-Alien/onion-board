@@ -4092,5 +4092,7 @@
   "Legendary": "महान",
   "Rare": "दुर्लभ",
   "Super Rare": "बेहद दुर्लभ",
-  "Uncommon": "असामान्य"
+  "Uncommon": "असामान्य",
+  "<b>{device}</b> looks like speakers, so your mic hears itself. Keep them quiet or use headphones. If it starts to squeal, this switches off by itself.": "<b>{device}</b> स्पीकर जैसा लगता है, इसलिए आपका माइक खुद को सुनता है। आवाज़ कम रखें या हेडफ़ोन लगाएँ। अगर सीटी बजने लगे, तो यह अपने आप बंद हो जाएगा।",
+  "Stopped <b>Hear what they hear</b>: your mic was picking up your speakers and started to squeal. Use headphones, or turn the speakers down.": "<b>वही सुनें जो वे सुनते हैं</b> रोक दिया गया: आपका माइक स्पीकर की आवाज़ पकड़ रहा था और सीटी बजने लगी। हेडफ़ोन लगाएँ, या स्पीकर धीमे करें।"
 }
