@@ -3,6 +3,38 @@ changes: each setStyleSheet re-polishes the widget (the button: its whole popup)
 import pytest
 
 
+@pytest.mark.parametrize("what", ["sounds", "radio", "apps"])
+def test_live_reset_has_a_large_target_and_clears_controls(qapp, what):
+    from PySide6.QtCore import QPoint, Qt
+    from PySide6.QtTest import QTest
+    from PySide6.QtWidgets import QPushButton
+
+    from soundboard.ui.speedpitch import SpeedPitchButton
+
+    button = SpeedPitchButton(what)
+    try:
+        button.pop.show()
+        qapp.processEvents()
+        reset = button.pop.findChild(QPushButton, "liveReset")
+        assert reset.width() >= 96 and reset.height() >= 36
+        assert reset.width() >= reset.minimumSizeHint().width()
+        assert reset.iconSize().width() >= 18
+        assert reset.toolTip() and reset.text()
+        button.set_values(1.5 if button.has_speed else 1, 4, False)
+        button.set_fx({"bass": 6, "reverb": 0.3})
+        # The enlarged edge is clickable, not just padding around the old target.
+        QTest.mouseClick(reset, Qt.MouseButton.LeftButton,
+                         pos=QPoint(reset.width() - 3, reset.height() // 2))
+        assert button.speed.value() == 1
+        assert button.pitch.value() == 0
+        assert not button.keep.isChecked()
+        assert button.fx_values() == {}
+        assert button.pop.isVisible()
+    finally:
+        button.pop.close()
+        button.deleteLater()
+
+
 def _count_sheets(w):
     calls = []
     real = w.setStyleSheet
