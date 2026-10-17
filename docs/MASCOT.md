@@ -39,12 +39,15 @@ and waves, `wave_pose`, unless Windows animations are off). To find new ones: gr
 
 His look is the Storybook one: a round head a little wider at the cheeks
 (`bunnyfit.head_path`), a small sitting body under it (`bunnyfit.body_path`) with a
-tail and a soft tummy patch, two short stubby arms from his shoulders at the sides of his
-body (tucked under his head) to round paws, two plain oval feet, sparkle eyes (a dark eye,
+tail, a soft tummy patch with a little belly button and a fluffy poof of lighter fur on his
+chest under his chin (`bunny._poof`: pointed tufts, no ink outline), two short stubby arms from his shoulders at the sides of his
+body (tucked under his head) to round paws, two long oval feet, sparkle eyes (a dark eye,
 a coloured iris glowing up from the bottom, one big shine and two little ones), little
 resting brows, a pink nose over a soft double smile, and his ears as his theme's look
-says (plain Bun: one up, the other flopped over a little below the middle, its pink
-running on to the tip; `bunny.REST_FOLD`, `REST_HINGE`). No fur lines inside him (no toe
+says (plain Bun: one up, its top half curving softly out and down, `bunny.DROOP`; the
+other flopped right over a little below the middle, its pink running on to the tip and
+round the bend; `bunny.REST_FOLD`, `REST_HINGE`). An ear is three colours at most: the
+ink outline, his fur and the inner colour, no shading. No fur lines inside him (no toe
 or finger lines, no leg creases). Lines are round-capped ink; shading is a couple of soft
 fades (`_shade`), never texture.
 
@@ -97,8 +100,9 @@ with soft tufts, `"long"`, a pointy `"tuft"`, a `"heart"`), the colour low in hi
 (`"iris"`), inside his ears (`"inner"`) and his nose (`"nose"`), fur markings
 (`"pattern"` from `bunnyfit.PATTERNS`: a `"patch"` over his left eye, `"spots"`, a
 `"mask"` round both eyes with a stripe of fur down the middle, all in `"marks"`), his
-tummy patch colour (`"belly"`) and pad prints under his feet (`"pads"`: a big pad and three
-toe beans, plain shapes with no lines). Markings are clipped to his head and body; an eye
+tummy patch colour (`"belly"`) and pad prints under his feet (`"pads"`: a heart-shaped pad
+and four toe beans with a little shine, plain shapes with no lines, well inside the foot;
+smaller on his waving paw, toes up). Markings are clipped to his head and body; an eye
 on dark markings gets the light rim and face lines dark fur gets, and his smug lids take
 the markings' colour. A theme that isn't listed is plain Bun,
 `bunnyfit.VANILLA`: Dark, the default, stays plain. `draw_bunny(..., kit=None)` uses the
