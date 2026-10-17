@@ -259,6 +259,7 @@ the launcher the shortcuts and PyInstaller use. The app is the `soundboard` pack
 | `soundboard/ui/overlay.py` | the in-game overlay: a panel of pads that never takes focus, driven by number keys or clicks, on a chosen monitor and spot (or wherever it was dragged) |
 | `soundboard/ui/voicepanel.py` | the Voice tab: lays out its cards and bottom bar, the add-ons list |
 | `soundboard/ui/voicefxpanel.py` | the Voice tab's voice changer card: voice tiles, effect rows and their sliders |
+| `soundboard/ui/backdroprow.py` | the voice changer's Background card (built-in sounds and board sounds behind your voice) and its Speed and pitch pop-up |
 | `soundboard/ui/voicepicker.py` | Edit sound → Effects → Voice: picture cards of the voice changer's voices, the AI voices and your setups, to lay a voice over a sound |
 | `soundboard/ui/voicesetupsbar.py` | the Voice tab's My setups row: save what's on, turn a setup back on, delete with Undo |
 | `soundboard/ui/speechpanel.py` | the Voice tab's Languages card: text-to-speech, live voice-to-speech, translation |
@@ -266,7 +267,7 @@ the launcher the shortcuts and PyInstaller use. The app is the `soundboard` pack
 | `soundboard/ui/livesetups.py` | My setups in the three Live controls (`MainWindow.livesetups`): picks a setup, makes a sound again in its AI voice before it plays, Cancel |
 | `soundboard/ui/speechinstall.py` | the Languages card's downloads and installs: Windows voices, translation models, speech recognition |
 | `soundboard/ui/voicestatus.py` | the Voice tab's status bar: your mic level and a chip for everything changing what others hear |
-| `soundboard/voicefx/` | the voice-effect chain and the built-in effects (pitch, robot, radio, …) |
+| `soundboard/voicefx/` | the voice-effect chain and the built-in effects (pitch, robot, radio, …); `backdrop.py` makes the Background's loops |
 | `soundboard/speech/` | Windows text-to-speech (`tts.py`), custom voices — local TTS servers, TTS programs, Piper packs (`customvoices.py`), the live voice-to-speech client (`live.py`, `service.py`, `protocol.py`) translation model downloads (`translation.py`), which language you speak and the speech model that hears it (`spoken.py`) and one-click Windows voice installs (`winvoices.py`) |
 | `soundboard/modules.py` | finds, loads and installs add-ons in `modules\`: effects, services, translations and the Triggers tab's package (its host interface version checked first); installs a module zip only if it stays in its own folder; at start-up deletes old and half-swapped add-on copies, keeping the newest per add-on and any in use |
 | `soundboard/pocketaddon.py` | the Onion Pocket add-on (Settings → Remote → *Get Onion Pocket*): its latest GitHub release, downloading and checking it, installing it, and whether a newer one than the running copy is out (`check_update`, for the *Update Onion Pocket* button; `RemoteAccess.load_remote_addon` swaps it in); any failure is just `None` (`ONIONBOARD_ONION_POCKET_ZIP` uses a local zip instead) |
