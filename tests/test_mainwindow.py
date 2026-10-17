@@ -392,7 +392,8 @@ def test_refit_leaves_widgets_alone_when_nothing_crosses_an_edge(window, qapp):
     orig = [s[2] for s in window.fitctl._fit.steps]
     window.fitctl._fit.steps = [(p, a, (lambda c, f=f, i=i: (flips.append((i, c)), f(c))))
                          for i, ((p, a, _), f) in enumerate(zip(window.fitctl._fit.steps, orig))]
-    for w in range(930, 910, -2):                  # small moves, no edge crossed
+    for w in range(930, 916, -2):                  # small moves, no edge crossed (914:
+        # the radio's Send button at its narrowest)
         window.resize(w, 700)
         window.fitctl._refit()
     # New controls may move an edge into this interval. Each step may tighten once;

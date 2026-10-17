@@ -1096,6 +1096,28 @@ def _restyle(app, css: str) -> None:
             app.installEventFilter(live)
 
 
+@contextmanager
+def styled_after(app):
+    """Build a lot of widgets with the app sheet off, then style them all at once: Qt
+    re-applies an app-wide sheet to every widget added to a layout or tab, about half
+    of a window's build. Widgets that measure text re-measure on StyleChange
+    (ui/restyled.py)."""
+    css = app.styleSheet() if app is not None else ""
+    if app is None or not css:
+        yield
+        return
+    _restyle(app, "")
+    try:
+        yield
+    finally:
+        if not app.styleSheet():   # (apply() inside put a sheet up itself)
+            _restyle(app, css)
+            # a layout keeps the spacing it worked out in the plain style until told
+            for w in app.allWidgets():
+                if (lay := w.layout()) is not None:
+                    lay.invalidate()
+
+
 def apply(app, name: str, live: str | None = None) -> str:
     """Switch the whole app to theme `name` (live). `live`: the user's own highlight
     colour ("" = the theme's), None = keep the one set already."""

@@ -23,6 +23,7 @@ from soundboard.i18n import _, ngettext
 from soundboard.ui import busy, clipeditor, icons
 from soundboard.ui.clipeditor import fmt
 from soundboard.ui.panel import CONTROL_H, Flow, UndoBar, fold_button
+from soundboard.ui.restyled import on_restyle
 from soundboard.engine import SR
 from soundboard.library import level_gain
 from soundboard.wheelguard import no_wheel
@@ -173,6 +174,7 @@ class ClipShelf(QWidget):
         v.addLayout(filters)
         self.list = QTreeWidget()
         self.list.setAccessibleName(_("Saved clips"))
+        on_restyle(self.list, self._fit)   # (measured in the theme's font: see restyled)
         self.list.setHeaderLabels([_("Name"), _("Length"), _("From"), _("Created")])
         self.list.setRootIsDecorated(False)
         self.list.setUniformRowHeights(True)
@@ -306,11 +308,7 @@ class ClipShelf(QWidget):
         self.list.blockSignals(False)
         if not self._pending:
             self._fill_timer.stop()
-        rows = min(max(self._visible_count + len(self._groups), 1), ROWS_SHOWN)
-        row_h = self.list.sizeHintForRow(0) if self.shelf.clips else 22
-        self._fit_height = (self.list.header().sizeHint().height() + rows * max(row_h, 36)
-                            + 2 * self.list.frameWidth() + 2)
-        self._apply_height()
+        self._fit()
         self.resize_handle.setVisible(self._visible_count > 0)
         self.empty.setVisible(not self._pending and self._visible_count == 0)
         self.setVisible(bool(self.shelf.clips))
@@ -336,6 +334,14 @@ class ClipShelf(QWidget):
     def resizeEvent(self, event):
         super().resizeEvent(event)
         self._columns()
+
+    def _fit(self):
+        """As tall as the rows it shows (up to ROWS_SHOWN), in the theme's font."""
+        rows = min(max(self._visible_count + len(self._groups), 1), ROWS_SHOWN)
+        row_h = self.list.sizeHintForRow(0) if self.shelf.clips else 22
+        self._fit_height = (self.list.header().sizeHint().height() + rows * max(row_h, 36)
+                            + 2 * self.list.frameWidth() + 2)
+        self._apply_height()
 
     def _apply_height(self):
         height = self.cfg.app_clip_height if self._visible_count else 0

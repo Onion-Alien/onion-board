@@ -26,6 +26,7 @@ from soundboard.speech import customvoices, spoken, translation, tts, winvoices
 from soundboard.speech.live import SpeechController, clean_settings
 from soundboard.ui import busy, fit, icons
 from soundboard.ui.panel import bar, fold_button, hint_label, icon_label, section_label
+from soundboard.ui.restyled import measured, on_restyle
 from soundboard.ui.livevoice import MODELS, LiveVoice
 from soundboard.ui.speechinstall import SpeechInstalls
 from soundboard.wheelguard import no_wheel
@@ -109,6 +110,7 @@ class SpeechPanel(QWidget):
         self.cb_lang.setAccessibleName(_("Speak in"))
         self.cb_lang.setToolTip(_("Say it in your language; whichever voice is on says it in this "
                                   "language. Each language is a one-time download."))
+        on_restyle(self.cb_lang.view(), self._fit_lang_list)   # (see restyled)
         self.cb_lang.setMinimumWidth(120)   # a list, not a bar across the card: it
         self.cb_lang.setMaximumWidth(380)   # opens as wide as its names need
         trow.setSpacing(12)
@@ -142,9 +144,15 @@ class SpeechPanel(QWidget):
         self.lbl_who.setMinimumWidth(0)
         self.lbl_who.setTextFormat(Qt.TextFormat.PlainText)
         srow.addWidget(self.lbl_who, 1)
-        heads = max(self.lbl_said_by.sizeHint().width(), self.lbl_lang.sizeHint().width())
-        self.lbl_said_by.setMinimumWidth(heads)
-        self.lbl_lang.setMinimumWidth(heads)
+
+        def heads():   # the two row heads as wide as each other (in the theme's font)
+            for lbl in (self.lbl_said_by, self.lbl_lang):
+                lbl.setMinimumWidth(0)   # (a label's size hint grows to its minimum)
+            w = max(self.lbl_said_by.sizeHint().width(), self.lbl_lang.sizeHint().width())
+            self.lbl_said_by.setMinimumWidth(w)
+            self.lbl_lang.setMinimumWidth(w)
+
+        measured(self.lbl_said_by, heads)
         self._said_row.addLayout(srow)
         self._who = ""   # "ai:name" / "fx:name" / "": who's on elsewhere (said_by)
         # the language and who says it, together in one inner area; Start under it
@@ -587,15 +595,18 @@ class SpeechPanel(QWidget):
                                         size=translation.size_mb(m)),
                                  m.language)
         self.cb_lang.setIconSize(QSize(20, 20))
-        # the open list shows every name whole, even past the box's own width
-        view = self.cb_lang.view()
-        view.setMinimumWidth(view.sizeHintForColumn(0) + 40)    # + padding, scroll bar
+        self._fit_lang_list()
         self.cb_lang.setCurrentIndex(max(0, self.cb_lang.findData(self.s["translate"]))
                                      if self.s["translate_on"] else 0)
         self.cb_lang.blockSignals(False)
         self.lang_box.setVisible(self.module is not None and self.module.installed
                                  and bool(self.langs))
         self._refresh_translation()
+
+    def _fit_lang_list(self):
+        """The open list shows every name whole, even past the box's own width."""
+        view = self.cb_lang.view()
+        view.setMinimumWidth(view.sizeHintForColumn(0) + 40)    # + padding, scroll bar
 
     def _lang_picked(self, *_):
         """A language picked means speaking it; Don't translate is off."""

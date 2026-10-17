@@ -26,6 +26,7 @@ from soundboard.ui.widgets import CrispSlider, EqCurve, Meter
 from soundboard.wheelguard import no_wheel
 from soundboard.i18n import _
 from soundboard.ui.pixels import snap_to_pixels
+from soundboard.ui.restyled import measured
 
 # the two heights the main window's controls and bars share (DESIGN.md "size")
 CONTROL_H = 36   # a toolbar button, the search box, the player's buttons
@@ -51,14 +52,18 @@ def section_label(text: str) -> QLabel:
 def steady_number(lbl: QLabel, widest: str) -> QLabel:
     """A number that changes in place (9% → 100%) keeps its width: same-width digits,
     room for the widest value, right-aligned, so nothing beside it moves."""
-    lbl.ensurePolished()
-    f = lbl.font()
-    f.setFeature(QFont.Tag("tnum"), 1)
-    lbl.setFont(f)
-    text = lbl.text()
-    lbl.setText(widest)                 # its size hint counts the stylesheet's padding too
-    lbl.setMinimumWidth(lbl.sizeHint().width() + 2)
-    lbl.setText(text)
+    def fit():
+        lbl.ensurePolished()
+        f = lbl.font()
+        f.setFeature(QFont.Tag("tnum"), 1)
+        lbl.setFont(f)
+        text = lbl.text()
+        lbl.setMinimumWidth(0)              # (a label's size hint grows to its minimum)
+        lbl.setText(widest)                 # its size hint counts the stylesheet's padding too
+        lbl.setMinimumWidth(lbl.sizeHint().width() + 2)
+        lbl.setText(text)
+
+    measured(lbl, fit)   # (again in the theme's font: see restyled)
     lbl.setAlignment(Qt.AlignmentFlag.AlignRight | Qt.AlignmentFlag.AlignVCenter)
     return lbl
 

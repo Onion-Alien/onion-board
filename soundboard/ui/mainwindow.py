@@ -26,7 +26,7 @@ from soundboard.replay import InstantReplay
 from soundboard.library import (Config,
                                 SoundMeta)
 from soundboard.ui.crashdialog import free_dialog
-from soundboard.ui import worker
+from soundboard.ui import restyled, worker
 from soundboard.ui.ffmpegcontrol import FfmpegControl
 from soundboard.ui.netcontrol import NetControl
 from soundboard.ui.soundscontrol import SoundsControl
@@ -523,7 +523,9 @@ class MainWindow(QMainWindow):
         self._pill_long = ""              # the setup pill's whole text (its tip, its name)
         self._pill_good = False           # set up: the pill hides (_show_pill)
         self._default_out = appaudio.default_output_name()   # see _follow_default_output
-        self.builder._build_ui()
+        with theme.styled_after(QApplication.instance()):
+            self.builder._build_ui()
+        restyled.again()   # what measured text, in the theme's fonts now
         from soundboard.ui.livesetups import LiveSetups
         self.livesetups = LiveSetups(self)   # My setups in the three Live controls
         splash.pump()
