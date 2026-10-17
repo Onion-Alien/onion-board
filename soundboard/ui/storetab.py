@@ -226,7 +226,6 @@ class StoreTab(QWidget):
         top = QHBoxLayout()
         top.setSpacing(12)
         self.bun = storelook.make_bun(72)
-        head.bun = self.bun
         top.addWidget(self.bun, 0, Qt.AlignmentFlag.AlignVCenter)
         words = QVBoxLayout()
         words.setSpacing(2)
@@ -402,6 +401,10 @@ class StoreTab(QWidget):
         self._closed = True
         self._search_wait.stop()
         self._stop_preview()
+
+    def resizeEvent(self, e):
+        super().resizeEvent(e)
+        self.bun.setVisible(storelook.fits(self.width(), self.height()))   # (never raises)
 
     def showEvent(self, e):
         super().showEvent(e)

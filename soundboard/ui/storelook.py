@@ -8,9 +8,9 @@ import time
 import zlib
 from typing import TYPE_CHECKING
 
-from PySide6.QtCore import QRectF, Qt, QTimer
+from PySide6.QtCore import QRectF, QSize, Qt, QTimer
 from PySide6.QtGui import QColor, QFont, QLinearGradient, QPainter, QPainterPath
-from PySide6.QtWidgets import QFrame, QWidget
+from PySide6.QtWidgets import QFrame, QSizePolicy, QWidget
 
 from soundboard import store, theme
 
@@ -18,7 +18,8 @@ if TYPE_CHECKING:
     from soundboard.ui.bunnywidget import BunnyWidget
 
 TILE = 44        # a row's picture, px square
-BUN_ROOM = 470   # the banner hides Bun below this width (the title and buttons need it)
+BUN_ROOM = 470   # the tab hides Bun below this width (the title and buttons need it)
+BUN_TALL = 480   # ... or this height (the list needs it)
 
 # a category's own emoji (and its tile's colour, by its place in store.CATS)
 CAT_EMOJI = {"memes": "😂", "reactions": "😮", "games": "🎮", "movies": "🎬", "tv": "📺",
@@ -202,18 +203,11 @@ def _wave(x: float) -> float:
 
 class StoreBanner(QFrame):
     """The card at the top of the tab, on a soft glow from the accent to the logo's second
-    colour. `bun` (if any) sits at its start and goes when the card is too narrow for
-    him."""
+    colour."""
 
     def __init__(self, parent=None):
         super().__init__(parent)
         self.setObjectName("card")
-        self.bun: QWidget | None = None
-
-    def resizeEvent(self, e):
-        super().resizeEvent(e)
-        if self.bun is not None:
-            self.bun.setVisible(self.width() >= BUN_ROOM)
 
     def paintEvent(self, e):
         super().paintEvent(e)   # the card itself, from the style sheet
@@ -240,12 +234,18 @@ def make_bun(height: int = 62) -> BunnyWidget:
     from soundboard.ui.bunnywidget import BunnyWidget
 
     class StoreBun(BunnyWidget):
+        def minimumSizeHint(self) -> QSize:
+            # no room of his own in the tab's minimum: the tab hides him when it's
+            # small (`fits`), so he never makes a small window the mini player
+            return QSize(0, 0)
+
         def mousePressEvent(self, ev):
             if ev.button() == Qt.MouseButton.LeftButton:
                 self.cheer()
             super().mousePressEvent(ev)
 
     bun = StoreBun("headphones", height=height, pad=12, dances=True)
+    bun.setSizePolicy(QSizePolicy.Policy.Preferred, QSizePolicy.Policy.Preferred)
     bun.setCursor(Qt.CursorShape.PointingHandCursor)
     return bun
 
@@ -261,3 +261,8 @@ def emoji_icon(emoji: str, size: int = 16):
     p.drawText(QRectF(0, 0, size, size), Qt.AlignmentFlag.AlignCenter, emoji)
     p.end()
     return QIcon(pm)
+
+
+def fits(w: int, h: int) -> bool:
+    """Room for Bun in a tab this big."""
+    return w >= BUN_ROOM and h >= BUN_TALL
