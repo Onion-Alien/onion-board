@@ -1,8 +1,8 @@
 """Hoot alive (style/owl.OwlWidget, shared with Onion Watch): every act he does while
 he waits runs start to end and paints, the mouse coming near cuts an act short and
 perks him up, and a click cheers him. Offscreen, stepped by hand: no timers are waited on."""
-from PySide6.QtCore import Qt
-from PySide6.QtGui import QImage
+from PySide6.QtCore import QPointF, QRectF, Qt
+from PySide6.QtGui import QColor, QImage, QPainter, QPainterPath
 
 from soundboard.style import owl
 
@@ -67,6 +67,88 @@ def test_click_cheers(qapp):
 def test_owl_image_still_plain(qapp):
     img = owl.owl_image(120)
     assert img.height() == 120 and not img.isNull()
+
+
+def _hoot(k: int = 1, **kw) -> QImage:
+    img = QImage(100 * k, 120 * k, QImage.Format_ARGB32_Premultiplied)
+    img.fill(Qt.transparent)
+    p = QPainter(img)
+    owl.draw_owl(p, QRectF(0, 0, 100 * k, 120 * k), **kw)
+    p.end()
+    return img
+
+
+def test_every_look_names_a_theme_and_known_keys(qapp):
+    from soundboard import theme
+    for name, kit in owl.LOOKS.items():
+        assert name in theme.THEMES, name
+        assert set(kit) <= set(owl.VANILLA), name
+        assert kit.get("marks", "scallops") in owl.MARKS, name
+        assert kit.get("tufts", "point") in owl.TUFTS, name
+        for key in ("feather", "wing", "iris", "face", "belly", "mark", "beak", "feet"):
+            if kit.get(key) is not None:
+                assert QColor(kit[key]).isValid(), (name, key)
+
+
+def test_every_theme_but_the_plain_ones_has_its_own_hoot(qapp):
+    from soundboard import theme
+    plain = {"Dark", "High Contrast"}      # the default (artwork) and accessibility
+    for name in theme.THEMES:
+        assert (name in owl.LOOKS) == (name not in plain), name
+    assert owl.look("Dark") == owl.VANILLA
+    bare = _hoot(outfit=(), kit=owl.VANILLA)
+    for name in owl.LOOKS:
+        assert _hoot(outfit=(), kit=owl.look(name)) != bare, name
+
+
+def test_plain_hoot_keeps_his_old_colours(qapp):
+    assert owl.VANILLA["feather"] == owl.FEATHER.name()
+    assert owl.VANILLA["wing"] == owl.FEATHER_DARK.name()
+    assert owl.VANILLA["iris"] == owl.EYE_LOW.name()
+    assert owl.VANILLA["beak"] == owl.BEAK.name() and owl.VANILLA["feet"] is None
+    assert owl.VANILLA["marks"] == "scallops" and owl.VANILLA["tufts"] == "point"
+
+
+def test_every_look_change_shows(qapp):
+    plain = _hoot(outfit=(), kit=owl.VANILLA)
+    changes = [{"feather": "#ff3b2f"}, {"wing": "#3b2fff"}, {"iris": "#ffd66b"},
+               {"face": "#ffd0dc"}, {"belly": "#c9f2f7"}, {"mark": "#ff00ff"},
+               {"beak": "#39ff7a"}, {"feet": "#ff8cc6"}]
+    changes += [{"marks": m} for m in owl.MARKS if m != "scallops"]
+    changes += [{"tufts": t} for t in owl.TUFTS if t != "point"]
+    for kit in changes:
+        assert _hoot(outfit=(), kit=kit) != plain, kit
+    # every theme's keys show too (each draws something of its own)
+    for name, kit in owl.LOOKS.items():
+        for key, value in kit.items():
+            assert _hoot(outfit=(), kit={key: value}) != plain, (name, key)
+
+
+def test_belly_marks_stay_on_his_belly(qapp):
+    mark = "#ff00ff"   # (a colour nothing else on him uses)
+    belly = QPainterPath()
+    belly.addEllipse(QRectF(29, 70, 42, 42))
+    for kind in owl.MARKS:
+        img = _hoot(4, outfit=(), kit={"marks": kind, "mark": mark})
+        pink = [(x, y) for y in range(0, img.height(), 2) for x in range(0, img.width(), 2)
+                 if (c := img.pixelColor(x, y)).red() > 200 and c.blue() > 200
+                 and c.green() < 60]
+        assert bool(pink) == (kind != "plain"), kind
+        for x, y in pink:
+            assert belly.contains(QPointF(x / 4, y / 4)), (kind, x, y)
+
+
+def test_his_look_follows_the_theme(qapp, monkeypatch):
+    from soundboard import theme
+    monkeypatch.setattr(theme, "current_name", "Mocha")
+    assert _hoot(outfit=()) == _hoot(outfit=(), kit=owl.look("Mocha"))
+    assert _hoot(outfit=()) != _hoot(outfit=(), kit=owl.VANILLA)
+    monkeypatch.setattr(theme, "current_name", "Dark")
+    assert _hoot(outfit=()) == _hoot(outfit=(), kit=owl.VANILLA)
+    # given feathers still win over the look's (and their own shade goes with them)
+    assert (_hoot(outfit=(), feather="#ff0000")
+            == _hoot(outfit=(), feather="#ff0000", kit={"feather": "#00ff00",
+                                                        "wing": "#0000ff"}))
 
 
 
@@ -171,3 +253,14 @@ def test_his_beak_opens_when_he_cheers(qapp):
     w.cheer()
     w.step(0.3, mouse=None)
     assert w.pose()["beak"] > 0.3
+
+
+def test_wave_raises_one_wing_and_swings_it(qapp):
+    still = _hoot(outfit=(), kit=owl.VANILLA)
+    assert _hoot(outfit=(), kit=owl.VANILLA, wave=None) == still
+    a = _hoot(outfit=(), kit=owl.VANILLA, wave=-1.0)
+    b = _hoot(outfit=(), kit=owl.VANILLA, wave=1.0)
+    assert a != still and b != still and a != b
+    # only the wing on your left moves: his right half is as it was
+    right = [(x, y) for x in range(52, 100, 3) for y in range(0, 120, 3)]
+    assert all(a.pixelColor(x, y) == still.pixelColor(x, y) for x, y in right)

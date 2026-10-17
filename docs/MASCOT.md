@@ -152,7 +152,17 @@ onto his shape (head 12 higher, eyes 32 apart and scaled to match, neck pieces j
 beak; `OWN_PLACE` for the ones that need their own spot (tall hats stay full size: an
 oversized hat is the look); `NOT_ON_OWL` for the ones that don't suit him) and `draw_owl` calls it at
 the same five layers. `owl_image` (dialog artwork, his own
-teal) stays plain. A new piece drawn for Bun shows up on Hoot too: check it with
+teal) stays plain.
+
+Each theme also has its own Hoot, like Bun's looks: `owl.LOOKS` sets his feathers and
+wings, the colour low in his eyes, his face mask and belly, the marks on his belly
+(`MARKS`: plain Hoot's thin scallops, or bold spots, chevrons, hearts, none), his ear
+tufts (`TUFTS`: point, round, tall, swept, tiny), his beak and his toes. Keep them
+simple bold shapes, no feather lines. Dark and High Contrast are plain teal Hoot
+(`VANILLA`); `owl.look(name)` gives a theme's, `draw_owl(kit=...)` draws one.
+`tests/test_owl.py` checks every look names a real theme and every key shows.
+
+A new piece drawn for Bun shows up on Hoot too: check it with
 `bun_sheet.py owls` and `bun_sheet.py owl`. Both files are in the style kit
 (`soundboard/style/`), which Onion Watch copies whole, so Hoot wears the same outfits
 there; inside the board's Triggers tab the add-on draws him with the board's kit.
@@ -166,7 +176,7 @@ outfit and look), not only the accent colour: see `ScribeBunny._layer`.
 .venv\Scripts\python scripts\pictures\bun_sheet.py outfits   # every theme's outfit
 .venv\Scripts\python scripts\pictures\bun_sheet.py poses     # outfits x every pose
 .venv\Scripts\python scripts\pictures\bun_sheet.py live      # the real widgets, frame by frame
-.venv\Scripts\python scripts\pictures\bun_sheet.py owls      # Hoot in every theme's outfit
+.venv\Scripts\python scripts\pictures\bun_sheet.py owls      # Hoot in every theme's look + outfit
 .venv\Scripts\python scripts\pictures\bun_sheet.py owl       # Hoot's poses in a few outfits
 ```
 
