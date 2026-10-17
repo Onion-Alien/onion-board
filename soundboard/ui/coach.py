@@ -14,10 +14,16 @@ outside them. The overlay never takes a click itself (WA_TransparentForMouseEven
 watches the app's input (eventFilter) and lets through what lands in a ring, the card,
 or another window (a menu, a file picker, a dialog the ring's button opened).
 
-Something going wrong ends it at once ("failed"), so nobody is held on a thing that
-doesn't work (a station that won't play, a search that can't get through): an "error"
-or "warn" card (toast.PROBLEM_HOOKS), an error logged anywhere in the app, or a step's
-own `failed()`.
+Something going wrong stops it at once, so nobody is held on a thing that doesn't
+work (a station that won't play, a search that can't get through): an "error" or
+"warn" card (toast.PROBLEM_HOOKS), an error logged anywhere in the app, or a step's own
+`failed()`. The card then turns red, Bun goes sad, and it says what didn't work (the
+step's `oops`) and what to do (oops.py): Try again (the step once more; its `retry()`
+redoes what failed), close and reopen the app, or Report a problem. The window isn't
+held meanwhile (no dimming, clicks go through); Close ends the tour ("failed").
+When the page shows its own red card (the step's `page_oops`: the search results', the
+store's), that one speaks and the tour's card steps aside; its Try again carries the
+tour on.
 
 While the window isn't showing the tour's page (minimised, mini mode, Settings, a
 dialog in front) the tour hides and waits; `leave()` says when it's gone for good.
@@ -37,7 +43,8 @@ from PySide6.QtWidgets import (QApplication, QFrame, QGraphicsDropShadowEffect, 
                                QLabel, QPushButton, QVBoxLayout, QWidget)
 
 from soundboard import theme
-from soundboard.ui import toast
+from soundboard.i18n import _
+from soundboard.ui import oops, toast
 from soundboard.ui.bunnywidget import BunnyWidget
 
 log = logging.getLogger(__name__)
@@ -53,9 +60,11 @@ RING = QColor("#ffd23f")
 DIM = 150            # how dark the rest of the window gets (of 255)
 PAD = 6              # the ring this far outside what it rings
 CARD_W = 360         # the card's width at most (less in a small window)
+CARD_W_RED = 440     # ... red: three buttons (Report a problem, Close, Try again)
 EDGE = 12            # the card keeps this far in from the window's edges
 GAP = 16             # between the card and what it points at (its arrow spans it)
 ARROW = 9            # the arrow's half width at the card's edge
+RETRY_MS = 1500      # after Try again, a step's own failed() isn't asked this long
 
 _running: list[Tour] = []
 
@@ -91,6 +100,8 @@ QFrame#coachcard {{ background:{panel}; border:1px solid {border};
 QFrame#coachcard QLabel {{ background:transparent; }}
 QFrame#coachcard QLabel#coachtitle {{ font-size:13pt; font-weight:700; color:{text_hi}; }}
 QFrame#coachcard QLabel#coachbody {{ color:{text}; }}
+QFrame#coachcard[problem="true"] {{ border:2px solid {error_text}; }}
+QFrame#coachcard[problem="true"] QLabel#coachtitle {{ color:{error_text}; }}
 """
 
 
@@ -107,7 +118,11 @@ class Step:
     done: Callable[[], bool] | None = None
     button: str = ""
     skip: str = ""
-    failed: Callable[[], bool] | None = None   # polled; true = it can't work: the tour ends
+    failed: Callable[[], bool] | None = None   # polled; true = it can't work: the red card
+    oops: Callable[[], str] | str = ""   # the red card's line: what didn't work
+    oops_title: str = ""    # ... and its title ("" = That didn't work)
+    retry: Callable[[], None] | None = None   # Try again: redo what failed (reload the list)
+    page_oops: Callable[[], QWidget | None] | None = None   # the page's own red card
     enter: Callable[[], None] | None = None
     allow: Callable[[QWidget], bool] | None = None
     bun: str | None = "star"
@@ -204,6 +219,11 @@ class Card(QFrame):
         buttons.setContentsMargins(0, 6, 0, 0)
         buttons.setSpacing(8)
         buttons.addStretch(1)
+        self.btn_report = QPushButton(_("Report a problem"))
+        self.btn_report.setProperty("quiet", True)
+        self.btn_report.setObjectName("coachreport")
+        self.btn_report.hide()   # the red card's
+        buttons.addWidget(self.btn_report)
         self.btn_skip = QPushButton()
         self.btn_skip.setProperty("quiet", True)
         self.btn_skip.setObjectName("coachskip")
@@ -214,8 +234,42 @@ class Card(QFrame):
         col.addLayout(buttons)
         row.addLayout(col, 1)
         self._fit_for: tuple = ()
+        self.failing = False   # the red card (wider: three buttons)
+
+    def _problem(self, on: bool):
+        if bool(self.property("problem")) != on:
+            self.setProperty("problem", on)
+            for w in (self, self.title):
+                w.style().unpolish(w)
+                w.style().polish(w)
+        self.bun.sad = 1.0 if on else 0.0
+        self.bun.sulk = on
+        self.bun.prop = self.bun._home_prop = None if on else "star"   # (no star when sad)
+        self.btn_report.setVisible(on)
+
+    def fail(self, step: Step, own: bool = True):
+        """The red card: sad Bun, what didn't work and what to do about it (`own`: the
+        step's own failed() said so, so its own words; else something elsewhere)."""
+        self._problem(not step.extra.get("calm"))   # calm: nothing broke, no red
+        self.bun.sad, self.bun.sulk = 1.0, True
+        self.bun.prop = self.bun._home_prop = None
+        self.failing = True
+        self.btn_report.setVisible(not step.extra.get("calm"))
+        self.dots.hide()
+        line = (step.oops() if callable(step.oops) else step.oops) if own else ""
+        self.title.setText((step.oops_title if own else "") or _("That didn't work"))
+        line = line or _("Something went wrong.")
+        self.body.setText(line if step.extra.get("calm") else oops.with_hint(line))
+        self.body.show()
+        self.btn_go.setText(_("Try again"))
+        self.btn_go.show()
+        self.btn_skip.setText(_("Close"))
+        self.btn_skip.show()
+        self.bun.show()
 
     def fill(self, step: Step, at: int):
+        self._problem(False)
+        self.failing = False
         self.dots.at = at
         self.dots.setVisible(self.dots.total > 1 and step.blocks)
         self.dots.update()
@@ -230,10 +284,11 @@ class Card(QFrame):
 
     def fit(self, max_w: int):
         """As wide as CARD_W (less in a small window), as tall as the words need."""
-        w = max(220, min(CARD_W, max_w))
-        if self.width() != w or self._fit_for != (w, self.title.text(), self.body.text(),
-                                                   self.btn_skip.isVisible()):
-            self._fit_for = (w, self.title.text(), self.body.text(), self.btn_skip.isVisible())
+        w = max(220, min(CARD_W_RED if self.failing else CARD_W, max_w))
+        key = (w, self.title.text(), self.body.text(), self.btn_skip.isVisible(),
+               self.btn_report.isVisible())
+        if self.width() != w or self._fit_for != key:
+            self._fit_for = key
             self.setFixedWidth(w)
             lay = self.layout()
             if lay is not None:
@@ -259,12 +314,16 @@ class Tour(QWidget):
         self._hidden = False
         self._step_at = 0.0
         self._shake_at = -1e9
+        self.failing = False     # the red card's up (something didn't work)
+        self._retry_at = -1e9
+        self._page_said = False  # the page's own red card was up (step.page_oops)
         self.setAttribute(Qt.WidgetAttribute.WA_TransparentForMouseEvents)
         self.setFocusPolicy(Qt.FocusPolicy.NoFocus)
         self.setGeometry(win.rect())
         self.card = Card(win, sum(1 for s in steps if s.blocks))
         self.card.btn_go.clicked.connect(self._pressed_go)
-        self.card.btn_skip.clicked.connect(lambda: self.end("skipped"))
+        self.card.btn_skip.clicked.connect(self._pressed_skip)
+        self.card.btn_report.clicked.connect(self._report)
         if not _running:
             _errors.seen = False
             logging.getLogger().addHandler(_errors)
@@ -330,10 +389,80 @@ class Tour(QWidget):
     def _pressed_go(self):
         if time.monotonic() - self._step_at < ARM_MS / 1000:
             return   # a click meant for what was there before
+        if self.failing:
+            self.try_again()
+            return
         self.go(self.at + 1)
+
+    def _pressed_skip(self):
+        self.end("failed" if self.failing else "skipped")
+
+    # ------------------------------------------------------------------ the red card
+    def fail(self, own: bool = False):
+        """Something didn't work: the red card, until Try again or Close (`own`: the
+        step's own failed() said so)."""
+        if self._ended or self.failing:
+            return
+        if self.step is None:
+            self._broke()
+            return
+        self.failing = True
+        self._page_said = False
+        self._step_at = time.monotonic()   # (arms its buttons, as a new step's)
+        self.card.fail(self.step, own)
+        self._sync_card()
+        self._place()
+
+    def _page_card(self) -> bool:
+        """The page shows its own red card for this step (it speaks, not the tour)."""
+        s = self.step
+        if s is None or s.page_oops is None:
+            return False
+        try:
+            w = s.page_oops()
+            return w is not None and w.isVisible()
+        except RuntimeError:
+            return False
+
+    def _sync_card(self):
+        """The card shows unless hidden, or a red card whose page says it already."""
+        on = not self._hidden and not (self.failing and self._page_card())
+        if self.card.isVisible() != on:
+            self.card.setVisible(on)
+
+    def try_again(self, done_by_page: bool = False):
+        """The failed step once more (its retry() redoes what failed, unless the page's
+        own Try again just did)."""
+        s = self.step
+        self.failing = False
+        _errors.seen = False
+        self._retry_at = time.monotonic()
+        if s is not None and s.retry is not None and not done_by_page:
+            try:
+                s.retry()
+            except Exception:  # noqa: BLE001 - its own log line, not a new failure
+                log.warning("tour: retry", exc_info=True)
+        self._sync_card()
+        back = s.extra.get("retry_to") if s is not None else None
+        if back:   # (a search's results step: back to the search box)
+            self.go_to(back)
+        else:
+            self.go(self.at)
+
+    def _report(self):
+        oops.report(self.win)
+        self.end("failed")
+
+    def _broke(self):
+        """The tour itself broke (a bad step, a paint error): gone at once, no card."""
+        self.failing = True
+        self.end("failed")
 
     def end(self, how: str = "done"):
         if self._ended:
+            return
+        if how == "failed" and not self.failing:
+            self.fail()   # the red card first; its Close ends it
             return
         self._ended = True
         if self in _running:
@@ -367,18 +496,26 @@ class Tour(QWidget):
                 self.end("left")
                 return
             s = self.step
-            if _errors.seen or (s is not None and s.failed is not None and s.failed()):
-                self.end("failed")
-                return
+            if not self.failing and (_errors.seen or (
+                    s is not None and s.failed is not None
+                    and time.monotonic() - self._retry_at > RETRY_MS / 1000 and s.failed())):
+                self.fail(own=not _errors.seen)
             show = self.showing()
             if show == self._hidden:   # flipped
                 self._hidden = not show
                 self.setVisible(show)
-                self.card.setVisible(show)
+            if self.failing and s is not None and s.page_oops is not None:
+                page = self._page_card()
+                if page:
+                    self._page_said = True
+                elif self._page_said and show:   # its Try again (or it went): carry on
+                    self.try_again(done_by_page=True)
+                    return
+            self._sync_card()
             if not show:
                 return
             s = self.step
-            if s is not None and s.done is not None and s.done():
+            if not self.failing and s is not None and s.done is not None and s.done():
                 self.go(self.at + 1)
                 return
             self._place()
@@ -386,7 +523,7 @@ class Tour(QWidget):
             self.end("left")
         except Exception:  # noqa: BLE001 - a bad step never traps anyone
             log.exception("tour: tick")
-            self.end("failed")
+            self._broke()
 
     # ------------------------------------------------------------------ input
     def eventFilter(self, obj, ev):   # noqa: N802 - Qt
@@ -396,7 +533,7 @@ class Tour(QWidget):
             return self._input(obj, ev)
         except Exception:  # noqa: BLE001 - a broken tour lets go at once
             log.exception("tour: input")
-            QTimer.singleShot(0, self, lambda: self.end("failed"))
+            QTimer.singleShot(0, self, self._broke)
             return False
 
     _MOUSE = (QEvent.Type.MouseButtonPress, QEvent.Type.MouseButtonRelease,
@@ -406,6 +543,12 @@ class Tour(QWidget):
         t = ev.type()
         if self._ended or self._hidden or (t not in self._MOUSE
                                            and t != QEvent.Type.KeyPress):
+            return False
+        if self.failing:   # the window's theirs again; Esc closes the red card
+            if (t == QEvent.Type.KeyPress and ev.key() == Qt.Key.Key_Escape
+                    and isinstance(obj, QWidget) and obj.window() is self.win):
+                self.end("failed")
+                return True
             return False
         if not isinstance(obj, QWidget) or obj.window() is not self.win:
             return False   # another window (a menu, a file picker): not the tour's
@@ -541,6 +684,11 @@ class Tour(QWidget):
             p = QPainter(self)
             p.setRenderHint(QPainter.RenderHint.Antialiasing)
             rings = [QRectF(r).adjusted(-PAD, -PAD, PAD, PAD) for r in self._targets()]
+            if self.failing:   # no dimming, no ring: only the card's arrow
+                if self.card.isVisible():
+                    self._arrow(p, rings[0] if rings else None)
+                p.end()
+                return
             path = QPainterPath()
             path.addRect(QRectF(self.rect()))
             for r in rings:
@@ -559,7 +707,7 @@ class Tour(QWidget):
             p.end()
         except Exception:  # noqa: BLE001 - see eventFilter
             log.exception("tour: paint")
-            QTimer.singleShot(0, self, lambda: self.end("failed"))
+            QTimer.singleShot(0, self, self._broke)
 
     def _ring(self, p: QPainter, r: QRectF, breath: float, flash: bool,
               colour: QColor = RING, width: float = 3):

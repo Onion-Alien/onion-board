@@ -32,6 +32,7 @@ from PySide6.QtWidgets import (QFrame, QHBoxLayout, QLabel, QPushButton, QToolTi
 
 from soundboard import theme
 from soundboard.i18n import _, ngettext
+from soundboard.ui import oops
 from soundboard.ui.pixels import snap_to_pixels
 
 LAT_TOP, LAT_BOTTOM = 84.0, -58.0   # the inhabited world: no polar wastes
@@ -136,31 +137,9 @@ class _Loading(QFrame):
         self._notes = QTimer(self)
         self._notes.setInterval(700)
         self._notes.timeout.connect(lambda: self.bun.burst(2))
-        self.problem = ""
-
-    def set_problem(self, text: str):
-        """Something's wrong (the station list can't be had): sad Bun, no music notes,
-        and the words; "" is Bun tuning in again."""
-        self.problem = text
-        self.bun.sad = self.bun._home_sad = 0.85 if text else 0.0
-        # nothing to listen to: headphones off (their drawing has a note by the ear)
-        self.bun.prop = None if text else "headphones"
-        self.label.setText(text or LOADING_TEXT)
-        # about three lines for a problem, two for "Tuning in…" (as in __init__)
-        wide = self.label.fontMetrics().horizontalAdvance(text or LOADING_TEXT)
-        self.label.setFixedWidth(min(340, max(150, wide * (36 if text else 55) // 100)))
-        if text:
-            self._notes.stop()
-            self.bun.notes.clear()   # no music floating round a sad Bun
-            self.bun.update()
-        elif self.isVisible():
-            self._notes.start()
-        self.adjustSize()
 
     def showEvent(self, e):
         super().showEvent(e)
-        if self.problem:
-            return
         self.bun.burst(3)
         self._notes.start()
 
@@ -248,6 +227,7 @@ def _glow_image(colour: QColor) -> QImage:
 
 class FlatMap(QWidget):
     clicked = Signal(str)       # a station's uuid
+    retry = Signal()            # Try again on the red card (the station list once more)
 
     def __init__(self, parent=None):
         super().__init__(parent)
@@ -344,6 +324,8 @@ class FlatMap(QWidget):
             box.addWidget(b, 0, Qt.AlignmentFlag.AlignRight)
             self._buttons.append(b)
         self._loading = _Loading(self)   # until the stations come (set_points)
+        self.oops = oops.OopsPanel(self)   # ... or why they can't (show_message)
+        self.oops.hide()
         self.set_theme()
 
     # ------------------------------------------------------------------ what's shown
@@ -400,7 +382,7 @@ class FlatMap(QWidget):
         self._hover = -1
         if pts:
             self._msg = ""
-            self._loading.set_problem("")
+            self.oops.hide()
             self._loading.hide()
         if first:
             # the map fills up: the most listened first, the rest in a shuffled wave
@@ -465,19 +447,21 @@ class FlatMap(QWidget):
         self.update()
 
     def show_message(self, text: str):
-        """Why there are no stations (the list can't be fetched): sad Bun says it, in
-        his card; "" takes it away."""
+        """Why there are no stations (the list can't be fetched): the red card with sad
+        Bun says it, with Try again (`retry`); "" takes it away."""
         self._msg = text
-        self._loading.set_problem(text)
-        self._loading.setVisible(bool(text) or (self._loading.isVisibleTo(self)
-                                                and not self._points))
+        if text:
+            self.oops.show_problem(_("The radio couldn't connect"),
+                                   html.escape(text, quote=False), self.retry.emit)
+            self._loading.hide()
+        self.oops.setVisible(bool(text))
         self._place_loading()
         self.update()
 
     def set_loading(self, on: bool):
         """Bun waiting on the map for the stations (on from the start; the first
-        stations take him away). A message keeps him there, sad."""
-        self._loading.setVisible(bool(self._msg) or (on and not self._points))
+        stations take him away). Not under the red card (show_message)."""
+        self._loading.setVisible(not self._msg and on and not self._points)
         self._place_loading()
 
     def set_theme(self, *_):
@@ -499,6 +483,13 @@ class FlatMap(QWidget):
         width = min(size.width(), max(120, self.width() - 32))
         w.setGeometry((self.width() - width) // 2, (self.height() - size.height()) // 2,
                       width, size.height())
+        if self.oops.isVisibleTo(self):
+            o = self.oops
+            ow = min(oops.MAX_W, max(200, self.width() - 32))
+            o.setFixedWidth(ow)
+            o.fit_height(self.height() - 24)
+            oh = min(o.height_for(ow), max(60, self.height() - 16))
+            o.setGeometry((self.width() - ow) // 2, max(8, (self.height() - oh) // 2), ow, oh)
 
     def resizeEvent(self, e):
         super().resizeEvent(e)

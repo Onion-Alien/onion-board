@@ -863,6 +863,11 @@ class SearchResults(RoundedFrame):
         self.direct_btn.clicked.connect(self._without_tor)
         self.direct_btn.hide()
         mv.addWidget(self.direct_btn, 0, Qt.AlignmentFlag.AlignHCenter)
+        # the search couldn't get through: sad Bun says so, with Try again
+        from soundboard.ui import oops
+        self.oops = oops.OopsPanel()
+        self.oops.hide()
+        mv.addWidget(self.oops, 0, Qt.AlignmentFlag.AlignHCenter)
         mv.addStretch(3)
         self.message.hide()
         v.addWidget(self.message, 1)
@@ -990,6 +995,7 @@ class SearchResults(RoundedFrame):
             return True   # already showing (Enter after the paste looked it up)
         self.query = self.link = url
         self._running = None
+        self.failed = False
         self._set_trending(False)
         self._gen += 1
         self._clear()
@@ -1017,6 +1023,7 @@ class SearchResults(RoundedFrame):
             return True   # picked again while it shows (or is still on its way)
         self.query = self.link = ""
         self._running = None
+        self.failed = False
         self._set_trending(True)
         self._gen += 1
         self._clear()
@@ -1067,8 +1074,28 @@ class SearchResults(RoundedFrame):
     def _say(self, text: str):
         """A message in the middle of the results area, instead of cards."""
         self.title.setText(text)
+        self.title.show()
+        self.oops.hide()
         self.scroll_area.hide()
         self.message.show()
+
+    def _fail(self, title: str, err: str):
+        """The search (or the trending list, or a link) didn't work: the red card in the
+        middle of the results area, Try again runs it once more."""
+        self.title.hide()
+        self.oops.show_problem(title, err, self.try_again)
+        self.oops.show()
+        self.scroll_area.hide()
+        self.message.show()
+
+    def try_again(self):
+        """The same search (trending list, link) once more, the same way."""
+        if self.trending:
+            self.show_trending()
+        elif self.link:
+            self.show_link(self.link)
+        else:
+            self.search(self.query)
 
     def mark(self, url: str, kind: str, ok: bool | None = None):
         """A row's Play / Add: busy (ok None) while its audio is fetched, then done."""
@@ -1199,17 +1226,14 @@ class SearchResults(RoundedFrame):
         q = html.escape(self.query)
         self.failed = bool(err)
         if err:
-            red = theme.status("error")
-            if self.link:
-                why = _("Can't use this link: {error}", error=err)   # err: rich text
-                self._say(f"<span style='color:{red}'>{why}</span>")
-                busy.toast(self.window(), why, "error", 8000)   # not only in the panel
+            if self.link:   # err: rich text
+                self._fail(_("Can't use this link"), err)
+                busy.toast(self.window(), _("Can't use this link: {error}", error=err),
+                           "error", 8000)   # not only in the panel
             elif self.trending:
-                self._say(_("<span style='color:{red}'>Couldn't load what's trending on "
-                            "Myinstants: {err}</span>", red=red, err=err))
+                self._fail(_("Couldn't load what's trending on Myinstants"), err)
             else:
-                self._say(_("<span style='color:{red}'>Couldn't search {site}: {err}"
-                            "</span>", red=red, site=self.site, err=err))  # from _work
+                self._fail(_("Couldn't search {site}", site=self.site), err)  # from _work
             self.direct_btn.setVisible(results == "blocked")
             return
         if not results:

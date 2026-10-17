@@ -400,8 +400,9 @@ def test_bun_waits_on_the_map_and_the_first_stations_pop_in(qapp):
     m.set_points([])
     m.show_message("The radio is down right now.")
     m.set_loading(True)
-    assert m._loading.isVisible() and m._loading.bun.sad > 0.5   # sad Bun says what's wrong
-    assert m._loading.label.text() == "The radio is down right now."
+    assert m.oops.isVisible() and m.oops.bun.sad > 0.5   # sad Bun says what's wrong
+    assert m.oops.line.text() == "The radio is down right now."
+    assert not m._loading.isVisible()
     m.close()
 
 

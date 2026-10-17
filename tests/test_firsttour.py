@@ -250,16 +250,32 @@ def test_the_starter_sounds_ship_small_and_come_once(window, monkeypatch, added)
     assert not starter.add_to(window) and len(got) == 1   # once only
 
 
-def test_a_search_that_fails_ends_it(window, qapp, counted, added):
-    """A search that can't get through: it lets them go (and the board isn't bare)."""
+def test_a_search_that_fails_shows_the_red_card(window, qapp, counted, added):
+    """A search that can't get through: the card goes red and says so; Try again goes
+    back to the search box, Close lets them go (and the board isn't bare)."""
     to_search(window)
+    tour = firsttour._current
     window.ytresults.failed = True
-    assert process_events(qapp, lambda: firsttour._current is None, 2)
+    assert process_events(qapp, lambda: tour.failing, 2)
+    body = tour.card.body.text()
+    assert tour.card.property("problem") and "search couldn't get through" in body
+    tour._step_at = 0
+    tour.card.btn_go.click()   # Try again
+    assert not tour.failing and not window.ytresults.failed
+    assert tour.step.extra.get("name") == "search"
+    window.ytresults.failed = True
+    assert process_events(qapp, lambda: tour.failing, 3)
+    tour._step_at = 0
+    tour.card.btn_skip.click()   # Close
+    assert firsttour._current is None
     assert "tour-failed" in counted and added == [window]
 
 
 def test_an_error_card_ends_it(window, counted):
     from soundboard.ui import busy
     firsttour.start(window)
+    tour = firsttour._current
     busy.toast(window, "Couldn't do the thing", "error")
+    assert tour.failing and firsttour._current is tour
+    tour.end("failed")   # Close
     assert firsttour._current is None and "tour-failed" in counted

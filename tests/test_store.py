@@ -172,16 +172,16 @@ def test_tab_lists_votes_and_adds(qapp, fake):
 def test_a_failed_list_says_why_and_retries(qapp, fake):
     fake.fail = "The sound store had a problem. Try again in a bit."
     t = _tab(qapp, [], [])
-    assert _wait(qapp, lambda: t.stack.currentWidget() is t.message
-                 and t.msg_btn.isVisibleTo(t))
-    assert fake.fail in t.msg_text.text()
+    assert _wait(qapp, lambda: t.stack.currentWidget() is t.oops_page
+                 and t.oops.btn_retry.isVisibleTo(t))
+    assert fake.fail in t.oops.line.text() and t.failed
     fake.fail = ""
-    t.msg_btn.click()
+    t.oops.btn_retry.click()
     assert _wait(qapp, lambda: len(t._rows) == 2)
     t.shutdown()
 
 
-def test_store_down_shows_bun_kicking_the_ground_then_the_list(qapp, fake, monkeypatch):
+def test_store_down_shows_the_sad_bun_card_then_the_list(qapp, fake, monkeypatch):
     # the server answers with an error of its own: the store's down, not the user's fault
     down = store.StoreDown("Sorry, the store's down. We're working on getting it back up.")
     plain = store._request
@@ -192,20 +192,21 @@ def test_store_down_shows_bun_kicking_the_ground_then_the_list(qapp, fake, monke
         return plain(method, path, *a, **kw)
     monkeypatch.setattr(store, "_request", broken)
     t = _tab(qapp, [], [])
-    assert _wait(qapp, lambda: t.stack.currentWidget() is t.message
-                 and t.msg_btn.isVisibleTo(t))
-    assert t.msg_title.text() == storetab._("Sorry, the store's down")
-    assert "working on" in t.msg_text.text()
-    assert t.msg_bun.isVisibleTo(t) and t.msg_bun.sulk and not t.msg_icon.isVisibleTo(t)
-    assert not t.bun.isVisibleTo(t)   # one Bun, the sad one
-    t.resize(800, 300)                # no room for him: the words stay
-    assert _wait(qapp, lambda: not t.msg_bun.isVisibleTo(t))
-    assert t.msg_title.isVisibleTo(t)
+    assert _wait(qapp, lambda: t.stack.currentWidget() is t.oops_page
+                 and t.oops.btn_retry.isVisibleTo(t))
+    assert t.failed and t.oops.title.text() == storetab._("Sorry, the store's down")
+    assert "working on" in t.oops.line.text() and t.oops.property("tone") == "error"
+    assert t.oops.bun.isVisibleTo(t) and t.oops.bun.sulk and t.oops.btn_report.isVisibleTo(t)
+    t.resize(800, 260)                # no room for him: the words stay
+    assert _wait(qapp, lambda: not t.oops.bun.isVisibleTo(t))
+    assert t.oops.title.isVisibleTo(t)
     t.resize(800, 600)
+    assert _wait(qapp, lambda: t.oops.bun.isVisibleTo(t))
     monkeypatch.setattr(store, "_request", plain)
-    t.msg_btn.click()
+    t.oops.btn_retry.click()
     assert _wait(qapp, lambda: len(t._rows) == 2)
-    assert not t.msg_bun.isVisibleTo(t) and t.bun.isVisibleTo(t)
+    assert not t.failed and t.stack.currentWidget() is not t.oops_page
+    assert t.bun.isVisibleTo(t)
     t.shutdown()
 
 
