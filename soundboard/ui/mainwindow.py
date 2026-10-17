@@ -1446,6 +1446,13 @@ class MainWindow(QMainWindow):
             return
         self._shut_down = True
         exitwatch.quitting()   # a run that dies from here on died closing (exitwatch.py)
+        # the steps below block the window by design (some wait a little each): gone
+        # from the screen at once, and a slow quit isn't a freeze (exitwatch covers a
+        # quit that never ends)
+        self.hide()
+        hangwatch = getattr(QApplication.instance(), "hangwatch", None)
+        if hangwatch is not None:
+            hangwatch.stop()
         if self.bunctl.bun_mode is not None:   # (cfg.bun["on"] stays: it starts as Bun next time)
             self.bunctl.bun_mode.close()
         for step in (self.rmctl._finish_removals, self.rmctl._wait_bin, self.timer.stop,
