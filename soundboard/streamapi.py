@@ -36,6 +36,8 @@ from typing import TYPE_CHECKING
 
 from PySide6.QtCore import QTimer
 
+from soundboard import usage
+
 if TYPE_CHECKING:
     from soundboard.ui.mainwindow import MainWindow
 
@@ -430,6 +432,11 @@ def _log(mw: MainWindow, kind: str, **info) -> int:
     st = state(mw)
     n = next(st.ids)
     st.feed.append({"id": n, "time": round(time.time(), 3), "kind": kind, **info})
+    if kind == "chat":   # the names only (usage.py): never who, what or how much
+        usage.used("api-chat-command")
+    elif kind == "alert":
+        donation = info.get("type") == "donation"
+        usage.used("api-alert-donation" if donation else "api-alert")
     return n
 
 

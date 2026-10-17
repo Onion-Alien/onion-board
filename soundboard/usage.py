@@ -305,7 +305,16 @@ FEATURES = ("add-files", "youtube", "record", "clip", "clip-editor", "import-boa
             # Bun's games: which one was opened (BUN_GAMES; egg-pong-opened is any game)
             *(f"egg-game-{k}" for k in BUN_GAMES),
             # the Store tab's order (Top is the default) and a category picked
-            "store-sort-new", "store-sort-trending", "store-category")
+            "store-sort-new", "store-sort-trending", "store-category",
+            # the voice changer's Background on, with board sounds in it (features_now)
+            "voice-background", "voice-background-sounds",
+            # a category hidden from All (features_now); a My setups share code copied
+            "hidden-from-all", "setup-code-shared",
+            # the control API / a phone remote add-on actually answered a request; the
+            # API's chat commands and alerts set up (features_now) and used: a chat
+            # command, an alert, a donation's alert (never who, what or how much)
+            "remote-used-api", "remote-used-phone", "api-chat-rules", "api-alerts",
+            "api-chat-command", "api-alert", "api-alert-donation")
 STEPS = ("added-sound", "played-sound", "sent-to-others",
          # a tab a new user starts without (+ More tabs, Settings > Tabs)
          "added-radio-tab", "added-apps-tab", "added-triggers-tab")
@@ -600,6 +609,21 @@ def features_now(cfg) -> list[str]:
         out.append("hotkeys")
     if cfg.remote_addons or cfg.api_enabled:
         out.append("phone-remote")
+    stream = cfg.api_stream if cfg.api_enabled and isinstance(cfg.api_stream, dict) else {}
+    if stream.get("chat"):
+        out.append("api-chat-rules")
+    if stream.get("alerts") and stream.get("alerts_on", True) is not False:
+        out.append("api-alerts")
+    if cfg.hidden_from_all:
+        out.append("hidden-from-all")
+    fx = cfg.voice_fx if isinstance(cfg.voice_fx, dict) else {}
+    bg = (fx.get("effects") or {}).get("backdrop") if fx.get("enabled") else None
+    if isinstance(bg, dict) and bg.get("on"):
+        from soundboard.voicefx import backdrop
+        if bg.get("sounds") or any(_positive(bg.get(k)) for k in backdrop.LAYERS):
+            out.append("voice-background")
+        if bg.get("sounds"):
+            out.append("voice-background-sounds")
     if cfg.also_send:
         out.append("also-send")
     from soundboard import quality
@@ -639,6 +663,10 @@ def features_now(cfg) -> list[str]:
     if cfg.route == "mic" and michelper.known():   # its last check's answer, no new one
         out.append("mic-helper")
     return out
+
+
+def _positive(v) -> bool:
+    return isinstance(v, (int, float)) and not isinstance(v, bool) and v > 0
 
 
 def game_tag(name: str) -> str:
