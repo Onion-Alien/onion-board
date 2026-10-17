@@ -4099,7 +4099,6 @@
   "You're muted, so only you hear “{name}”.": "أنت مكتوم، لذا أنت وحدك تسمع «{name}».",
   "{name} closed: the clip editor keeps what it heard.": "أُغلق {name}: محرر المقاطع يحتفظ بما سمعه.",
   "Sorry, the store's down": "عذرًا، المتجر متوقف",
-  "Sorry, the store's down. We're working on getting it back up.": "عذرًا، المتجر متوقف. نعمل على إعادته.",
   "We're working on getting it back up. Try again in a bit.": "نعمل على إعادته. حاول مجددًا بعد قليل.",
   "A voice chat's noise suppression can wipe these out, deep bass too. Discord: Input Profile → Studio.": "إلغاء الضوضاء في دردشة صوتية قد يمحو هذه المؤثرات، والجهير العميق أيضًا. Discord: ملف الإدخال ← استوديو.",
   "Full board": "اللوحة كاملة",
@@ -4404,5 +4403,15 @@
   "<b>{device}</b> looks like speakers, so your mic hears itself. Keep them quiet or use headphones. If it starts to squeal, this switches off by itself.": "<b>{device}</b> يبدو أنه سماعات خارجية، لذلك يسمع المايك نفسه. اخفض صوتها أو استخدم سماعات رأس. إذا بدأ صفير، يتوقف هذا من تلقاء نفسه.",
   "Stopped <b>Hear what they hear</b>: your mic was picking up your speakers and started to squeal. Use headphones, or turn the speakers down.": "تم إيقاف <b>اسمع ما يسمعونه</b>: كان المايك يلتقط صوت السماعات الخارجية وبدأ يصفر. استخدم سماعات رأس، أو اخفض صوت السماعات.",
   "Turn off {thing}": "إيقاف {thing}",
-  "Bun's almost done, one moment.": "Bun على وشك الانتهاء، لحظة واحدة."
+  "Bun's almost done, one moment.": "Bun على وشك الانتهاء، لحظة واحدة.",
+  "It'll be back in about {n} hour.": [
+    "سيعود خلال {n} ساعة تقريبًا.",
+    "سيعود خلال {n} ساعة تقريبًا.",
+    "سيعود خلال {n} ساعات تقريبًا.",
+    "سيعود خلال {n} ساعات تقريبًا.",
+    "سيعود خلال {n} ساعة تقريبًا.",
+    "سيعود خلال {n} ساعة تقريبًا."
+  ],
+  "It'll be back in under an hour.": "سيعود خلال أقل من ساعة.",
+  "The store's down for maintenance": "المتجر متوقف للصيانة"
 }

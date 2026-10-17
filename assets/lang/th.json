@@ -3709,7 +3709,6 @@
   "You're muted, so only you hear “{name}”.": "คุณปิดเสียงอยู่ จึงมีแค่คุณที่ได้ยิน “{name}”",
   "{name} closed: the clip editor keeps what it heard.": "{name} ปิดไปแล้ว: ตัวแก้ไขคลิปเก็บสิ่งที่ได้ยินไว้",
   "Sorry, the store's down": "ขออภัย ร้านล่มอยู่",
-  "Sorry, the store's down. We're working on getting it back up.": "ขออภัย ร้านล่มอยู่ เรากำลังแก้ไขให้กลับมาใช้ได้",
   "We're working on getting it back up. Try again in a bit.": "เรากำลังแก้ไขให้กลับมาใช้ได้ ลองอีกครั้งในอีกสักครู่",
   "A voice chat's noise suppression can wipe these out, deep bass too. Discord: Input Profile → Studio.": "การลดเสียงรบกวนของแชทเสียงอาจลบเอฟเฟกต์เหล่านี้ไป รวมถึงเสียงเบสลึกด้วย Discord: โปรไฟล์อินพุต → สตูดิโอ",
   "Full board": "บอร์ดเต็ม",
@@ -4014,5 +4013,10 @@
   "<b>{device}</b> looks like speakers, so your mic hears itself. Keep them quiet or use headphones. If it starts to squeal, this switches off by itself.": "<b>{device}</b> ดูเหมือนเป็นลำโพง ไมค์จึงได้ยินเสียงตัวเอง ลดเสียงลงหรือใช้หูฟัง ถ้าเริ่มมีเสียงหอน ระบบจะปิดเอง",
   "Stopped <b>Hear what they hear</b>: your mic was picking up your speakers and started to squeal. Use headphones, or turn the speakers down.": "หยุด <b>ฟังสิ่งที่พวกเขาได้ยิน</b> แล้ว: ไมค์รับเสียงจากลำโพงจนเกิดเสียงหอน ใช้หูฟัง หรือลดเสียงลำโพงลง",
   "Turn off {thing}": "ปิด {thing}",
-  "Bun's almost done, one moment.": "Bun ใกล้เสร็จแล้ว รอสักครู่นะ"
+  "Bun's almost done, one moment.": "Bun ใกล้เสร็จแล้ว รอสักครู่นะ",
+  "It'll be back in about {n} hour.": [
+    "จะกลับมาในอีกประมาณ {n} ชั่วโมง"
+  ],
+  "It'll be back in under an hour.": "จะกลับมาภายในไม่ถึงหนึ่งชั่วโมง",
+  "The store's down for maintenance": "ร้านปิดปรับปรุงอยู่"
 }

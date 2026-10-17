@@ -13,6 +13,7 @@ from __future__ import annotations
 import json
 import logging
 import secrets
+import time
 import urllib.error
 import urllib.parse
 import urllib.request
@@ -22,7 +23,7 @@ from dataclasses import dataclass, field
 from pathlib import Path
 
 from soundboard import library, net, netlog
-from soundboard.i18n import _
+from soundboard.i18n import _, ngettext
 
 log = logging.getLogger(__name__)
 
@@ -57,7 +58,29 @@ class StoreError(Exception):
 
 class StoreDown(StoreError):
     """The store's server isn't working (it answered with an error of its own): nothing
-    the user did, and nothing they can fix."""
+    the user did, and nothing they can fix. `back`: when it said it's back (time.time()),
+    0 when it didn't say."""
+
+    def __init__(self, back: float = 0):
+        self.back = back
+        title, line = down_words(back)
+        super().__init__(f"{title}. {line}")
+
+
+def down_words(back: float = 0) -> tuple[str, str]:
+    """The store's down: a title and a line for the card. `back` (time.time(), 0 for
+    not known): the server's free daily allowance ran out and it said when it's back
+    (midnight UTC), so it's down for maintenance for about that long."""
+    if back:
+        hours = round((back - time.time()) / 3600)
+        if hours < 1:
+            return (_("The store's down for maintenance"),
+                    _("It'll be back in under an hour."))
+        return (_("The store's down for maintenance"),
+                ngettext("It'll be back in about {n} hour.",
+                         "It'll be back in about {n} hours.", hours, n=hours))
+    return (_("Sorry, the store's down"),
+            _("We're working on getting it back up. Try again in a bit."))
 
 
 _failing: set[str] = set()   # the calls (their paths, no query) the server last failed
@@ -164,13 +187,16 @@ def _request(method: str, path: str, install: str = "", body: bytes | None = Non
             data = r.read(limit + 1)
     except urllib.error.HTTPError as e:
         try:
-            err = json.loads(e.read(4096) or b"{}").get("error", "")
+            said = json.loads(e.read(4096) or b"{}")
+            err = str(said.get("error", ""))
         except (ValueError, AttributeError):
-            err = ""
+            said, err = {}, ""
         if e.code >= 500 and err not in ("queue full", "store full"):
             _failing.add(key)
-            raise StoreDown(_("Sorry, the store's down. We're working on getting it back "
-                              "up.")) from None
+            # the free plan's daily allowance ran out: it says how long until it's back
+            wait = said.get("in") if err == "maintenance" else None
+            ok = isinstance(wait, int) and 0 < wait <= 2 * 86400
+            raise StoreDown(time.time() + wait if isinstance(wait, int) and ok else 0) from None
         raise StoreError((why or _why)(e.code, err)) from None
     except net.ProxyError:
         raise

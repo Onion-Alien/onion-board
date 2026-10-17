@@ -3709,7 +3709,6 @@
   "You're muted, so only you hear “{name}”.": "음소거 중이라 “{name}”은(는) 나만 들려요.",
   "{name} closed: the clip editor keeps what it heard.": "{name}이(가) 종료됐어요. 클립 편집기는 들은 소리를 그대로 갖고 있어요.",
   "Sorry, the store's down": "죄송해요, 스토어가 멈췄어요",
-  "Sorry, the store's down. We're working on getting it back up.": "죄송해요, 스토어가 멈췄어요. 다시 열기 위해 작업 중이에요.",
   "We're working on getting it back up. Try again in a bit.": "다시 열기 위해 작업 중이에요. 잠시 후 다시 시도하세요.",
   "A voice chat's noise suppression can wipe these out, deep bass too. Discord: Input Profile → Studio.": "보이스 채팅의 소음 억제가 이 효과들을 지울 수 있어요. 깊은 저음도요. Discord: 입력 프로필 → 스튜디오.",
   "Full board": "전체 보드",
@@ -4014,5 +4013,10 @@
   "<b>{device}</b> looks like speakers, so your mic hears itself. Keep them quiet or use headphones. If it starts to squeal, this switches off by itself.": "<b>{device}</b> 장치는 스피커 같아서 마이크가 자기 소리를 듣습니다. 볼륨을 낮추거나 헤드폰을 쓰세요. 하울링이 생기면 저절로 꺼집니다.",
   "Stopped <b>Hear what they hear</b>: your mic was picking up your speakers and started to squeal. Use headphones, or turn the speakers down.": "<b>상대가 듣는 소리 듣기</b> 중지됨: 마이크가 스피커 소리를 받아 하울링이 생겼습니다. 헤드폰을 쓰거나 스피커 볼륨을 낮추세요.",
   "Turn off {thing}": "{thing} 끄기",
-  "Bun's almost done, one moment.": "Bun이 거의 다 끝났어요. 잠깐만요."
+  "Bun's almost done, one moment.": "Bun이 거의 다 끝났어요. 잠깐만요.",
+  "It'll be back in about {n} hour.": [
+    "약 {n}시간 뒤에 돌아와요."
+  ],
+  "It'll be back in under an hour.": "1시간 안에 돌아와요.",
+  "The store's down for maintenance": "스토어가 점검 중이에요"
 }

@@ -3709,7 +3709,6 @@
   "You're muted, so only you hear “{name}”.": "你已静音，所以只有你能听到“{name}”。",
   "{name} closed: the clip editor keeps what it heard.": "{name} 已关闭：剪辑编辑器会保留它听到的内容。",
   "Sorry, the store's down": "抱歉，商店暂时无法使用",
-  "Sorry, the store's down. We're working on getting it back up.": "抱歉，商店暂时无法使用。我们正在努力修复。",
   "We're working on getting it back up. Try again in a bit.": "我们正在努力修复。请稍后再试。",
   "A voice chat's noise suppression can wipe these out, deep bass too. Discord: Input Profile → Studio.": "语音聊天的噪音抑制可能会抹掉这些效果，低沉的低音也会。Discord：输入配置文件 → 录音室。",
   "Full board": "完整面板",
@@ -4014,5 +4013,10 @@
   "<b>{device}</b> looks like speakers, so your mic hears itself. Keep them quiet or use headphones. If it starts to squeal, this switches off by itself.": "<b>{device}</b> 看起来是音箱，麦克风会听到自己。把音量调小，或者戴耳机。如果开始啸叫，这里会自动关闭。",
   "Stopped <b>Hear what they hear</b>: your mic was picking up your speakers and started to squeal. Use headphones, or turn the speakers down.": "已停止<b>听听别人听到的</b>：麦克风收到了音箱的声音，开始啸叫。请戴耳机，或把音箱调小。",
   "Turn off {thing}": "关闭{thing}",
-  "Bun's almost done, one moment.": "Bun 快好了，请稍等。"
+  "Bun's almost done, one moment.": "Bun 快好了，请稍等。",
+  "It'll be back in about {n} hour.": [
+    "大约 {n} 小时后恢复。"
+  ],
+  "It'll be back in under an hour.": "不到一小时就会恢复。",
+  "The store's down for maintenance": "商店正在维护"
 }

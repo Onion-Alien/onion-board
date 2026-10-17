@@ -3709,7 +3709,6 @@
   "You're muted, so only you hear “{name}”.": "ミュート中なので「{name}」は自分にしか聞こえません。",
   "{name} closed: the clip editor keeps what it heard.": "{name} が終了しました。クリップエディターは聞いた音を残しています。",
   "Sorry, the store's down": "ごめんなさい、ストアが停止中です",
-  "Sorry, the store's down. We're working on getting it back up.": "ごめんなさい、ストアが停止中です。復旧に取り組んでいます。",
   "We're working on getting it back up. Try again in a bit.": "復旧に取り組んでいます。少ししてからもう一度お試しください。",
   "A voice chat's noise suppression can wipe these out, deep bass too. Discord: Input Profile → Studio.": "ボイスチャットのノイズ抑制で、これらの効果や深い低音が消えることがあります。Discord: 入力プロファイル → スタジオ。",
   "Full board": "フルボード",
@@ -4014,5 +4013,10 @@
   "<b>{device}</b> looks like speakers, so your mic hears itself. Keep them quiet or use headphones. If it starts to squeal, this switches off by itself.": "<b>{device}</b> はスピーカーのようです。マイクが自分の音を拾います。音量を下げるか、ヘッドホンを使ってください。ハウリングが始まると自動でオフになります。",
   "Stopped <b>Hear what they hear</b>: your mic was picking up your speakers and started to squeal. Use headphones, or turn the speakers down.": "<b>相手に聞こえる音を聞く</b> を止めました: マイクがスピーカーの音を拾ってハウリングし始めました。ヘッドホンを使うか、スピーカーの音量を下げてください。",
   "Turn off {thing}": "{thing} をオフ",
-  "Bun's almost done, one moment.": "Bun はもうすぐ終わります。少し待ってね。"
+  "Bun's almost done, one moment.": "Bun はもうすぐ終わります。少し待ってね。",
+  "It'll be back in about {n} hour.": [
+    "あと{n}時間ほどで戻ります。"
+  ],
+  "It'll be back in under an hour.": "1時間以内に戻ります。",
+  "The store's down for maintenance": "ストアはメンテナンス中です"
 }

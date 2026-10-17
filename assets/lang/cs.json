@@ -3865,7 +3865,6 @@
   "You're muted, so only you hear “{name}”.": "Jsi ztlumený, takže „{name}“ slyšíš jen ty.",
   "{name} closed: the clip editor keeps what it heard.": "{name} se zavřel: editor klipů si nechá, co slyšel.",
   "Sorry, the store's down": "Promiň, obchod nefunguje",
-  "Sorry, the store's down. We're working on getting it back up.": "Promiň, obchod nefunguje. Pracujeme na tom, aby zase běžel.",
   "We're working on getting it back up. Try again in a bit.": "Pracujeme na tom, aby zase běžel. Zkus to za chvíli.",
   "A voice chat's noise suppression can wipe these out, deep bass too. Discord: Input Profile → Studio.": "Potlačení šumu ve hlasovém chatu je může smazat, hluboké basy taky. Discord: Vstupní profil → Studio.",
   "Full board": "Celý board",
@@ -4170,5 +4169,12 @@
   "<b>{device}</b> looks like speakers, so your mic hears itself. Keep them quiet or use headphones. If it starts to squeal, this switches off by itself.": "<b>{device}</b> vypadá jako reproduktory, takže mikrofon slyší sám sebe. Nech je potichu, nebo použij sluchátka. Když to začne pískat, samo se to vypne.",
   "Stopped <b>Hear what they hear</b>: your mic was picking up your speakers and started to squeal. Use headphones, or turn the speakers down.": "Zastaveno <b>Slyšet, co slyší oni</b>: mikrofon zachytával reproduktory a začal pískat. Použij sluchátka, nebo ztlum reproduktory.",
   "Turn off {thing}": "Vypnout {thing}",
-  "Bun's almost done, one moment.": "Bun to má skoro hotové, chvilku."
+  "Bun's almost done, one moment.": "Bun to má skoro hotové, chvilku.",
+  "It'll be back in about {n} hour.": [
+    "Zpátky bude zhruba za {n} hodinu.",
+    "Zpátky bude zhruba za {n} hodiny.",
+    "Zpátky bude zhruba za {n} hodin."
+  ],
+  "It'll be back in under an hour.": "Zpátky bude za méně než hodinu.",
+  "The store's down for maintenance": "Obchod je mimo provoz kvůli údržbě"
 }

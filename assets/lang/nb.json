@@ -3787,7 +3787,6 @@
   "You're muted, so only you hear “{name}”.": "Du er dempet, så bare du hører «{name}».",
   "{name} closed: the clip editor keeps what it heard.": "{name} ble lukket: klippredigereren beholder det den hørte.",
   "Sorry, the store's down": "Beklager, butikken er nede",
-  "Sorry, the store's down. We're working on getting it back up.": "Beklager, butikken er nede. Vi jobber med å få den opp igjen.",
   "We're working on getting it back up. Try again in a bit.": "Vi jobber med å få den opp igjen. Prøv igjen om litt.",
   "A voice chat's noise suppression can wipe these out, deep bass too. Discord: Input Profile → Studio.": "Støydempingen i en talechat kan fjerne dem, dyp bass også. Discord: Inndataprofil → Studio.",
   "Full board": "Hele brettet",
@@ -4092,5 +4091,11 @@
   "<b>{device}</b> looks like speakers, so your mic hears itself. Keep them quiet or use headphones. If it starts to squeal, this switches off by itself.": "<b>{device}</b> ser ut som høyttalere, så mikrofonen hører seg selv. Hold dem lavt eller bruk hodetelefoner. Hvis det begynner å hyle, slår dette seg av av seg selv.",
   "Stopped <b>Hear what they hear</b>: your mic was picking up your speakers and started to squeal. Use headphones, or turn the speakers down.": "Stoppet <b>Hør det de hører</b>: mikrofonen fanget opp høyttalerne og begynte å hyle. Bruk hodetelefoner, eller skru ned høyttalerne.",
   "Turn off {thing}": "Slå av {thing}",
-  "Bun's almost done, one moment.": "Bun er nesten ferdig, et øyeblikk."
+  "Bun's almost done, one moment.": "Bun er nesten ferdig, et øyeblikk.",
+  "It'll be back in about {n} hour.": [
+    "Den er tilbake om omtrent {n} time.",
+    "Den er tilbake om omtrent {n} timer."
+  ],
+  "It'll be back in under an hour.": "Den er tilbake om under en time.",
+  "The store's down for maintenance": "Butikken er nede for vedlikehold"
 }
