@@ -3663,5 +3663,10 @@
   "✓ “{name}” is ready to play": "✓ “{name}” बजने के लिए तैयार है",
   "Show as a list": "सूची के रूप में दिखाएँ",
   "Show as cards": "कार्ड के रूप में दिखाएँ",
-  "Sort the pads: my order, A–Z, newest, most played": "पैड क्रम से लगाएँ: मेरा क्रम, A–Z, सबसे नए, सबसे ज़्यादा चलाए गए"
+  "Sort the pads: my order, A–Z, newest, most played": "पैड क्रम से लगाएँ: मेरा क्रम, A–Z, सबसे नए, सबसे ज़्यादा चलाए गए",
+  "Couldn't put the AI voice on “{name}”: {why}": "“{name}” पर एआई आवाज़ नहीं लग पाई: {why}",
+  "Couldn't start the AI voice: {why}": "एआई आवाज़ शुरू नहीं हो पाई: {why}",
+  "Getting the AI voice ready…": "एआई आवाज़ तैयार हो रही है…",
+  "Putting the AI voice on “{name}”… {pct}%": "“{name}” पर एआई आवाज़ लग रही है… {pct}%",
+  "The AI voices add-on isn't installed, so only the voice changer part of “{name}” is on.": "एआई आवाज़ों का ऐड-ऑन इंस्टॉल नहीं है, इसलिए “{name}” का सिर्फ़ आवाज परिवर्तक वाला हिस्सा चालू है।"
 }

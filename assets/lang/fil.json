@@ -3663,5 +3663,10 @@
   "✓ “{name}” is ready to play": "✓ Handa nang patugtugin ang “{name}”",
   "Show as a list": "Ipakita bilang listahan",
   "Show as cards": "Ipakita bilang cards",
-  "Sort the pads: my order, A–Z, newest, most played": "Ayusin ang pads: aking ayos, A–Z, pinakabago, pinakamadalas i-play"
+  "Sort the pads: my order, A–Z, newest, most played": "Ayusin ang pads: aking ayos, A–Z, pinakabago, pinakamadalas i-play",
+  "Couldn't put the AI voice on “{name}”: {why}": "Hindi nailagay ang AI voice sa “{name}”: {why}",
+  "Couldn't start the AI voice: {why}": "Hindi nasimulan ang AI voice: {why}",
+  "Getting the AI voice ready…": "Inihahanda ang AI voice…",
+  "Putting the AI voice on “{name}”… {pct}%": "Inilalagay ang AI voice sa “{name}”… {pct}%",
+  "The AI voices add-on isn't installed, so only the voice changer part of “{name}” is on.": "Hindi naka-install ang add-on ng AI voices, kaya ang voice changer lang ng “{name}” ang naka-on."
 }

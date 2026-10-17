@@ -1,6 +1,6 @@
 """Live speed / pitch / effects: a small button on a transport bar ("1x") that opens
-a movable window with the sliders. It changes what's playing right now and isn't
-saved; to keep a version of a sound, use its Edit → Effects tab instead.
+a pop-up with the sliders (a click outside closes it). It changes what's playing
+right now and isn't saved; to keep a version of a sound, use its Edit → Effects tab instead.
 
 Two columns: speed & pitch on the left, the live effects (soundboard.livefx: bass,
 treble, muffle, reverb, echo, distortion, and presets that set several) on the right.
@@ -12,15 +12,17 @@ meter shows the pitch instead, red past ±24 st."""
 from __future__ import annotations
 
 import math
+import time
 
-from PySide6.QtCore import QPoint, QPointF, QRectF, Qt, Signal
+from PySide6.QtCore import QEvent, QPoint, QPointF, QRectF, Qt, Signal
 from PySide6.QtGui import QColor, QFont, QPainter, QPen
 from PySide6.QtWidgets import (QApplication, QCheckBox, QDialog, QFrame, QGridLayout,
-                               QHBoxLayout, QLabel, QPushButton, QVBoxLayout, QWidget)
+                               QHBoxLayout, QLabel, QProgressBar, QPushButton, QVBoxLayout,
+                               QWidget)
 
 from soundboard import livefx, theme, voicefx
 from soundboard.ui import fit, icons
-from soundboard.ui.panel import hint_label, reset_button, section_label
+from soundboard.ui.panel import Flow, hint_label, reset_button, section_label
 from soundboard.ui.voicefxpanel import ParamSlider
 from soundboard.ui.widgets import widget_at
 from soundboard.i18n import _
@@ -154,11 +156,19 @@ class RevMeter(QWidget):
         p.end()
 
 
+def short(name: str, most: int = 14) -> str:
+    """A setup's name on the transport bar's button: long ones cut with "…"."""
+    return name if len(name) <= most else name[:most - 1].rstrip() + "…"
+
+
 class SpeedPitchButton(QPushButton):
     """`changed(speed, semitones, keep_pitch)` fires on every speed / pitch edit,
     `fx_changed(amounts)` on every effects edit (livefx.clean: only knobs off 0)."""
     changed = Signal(float, float, bool)
     fx_changed = Signal(dict)
+    setup_picked = Signal(str)   # a voice setup's name, "" = none (ui.livesetups)
+    setup_cancelled = Signal()   # Cancel while its AI voice gets ready
+    opening = Signal()           # about to pop up: the setups list is brought up to date
 
     def __init__(self, what: str = "sounds", hint: str = "",
                  redline: tuple[float, float] = REDLINE_SPEED):
@@ -178,13 +188,14 @@ class SpeedPitchButton(QPushButton):
         self._speed_hi = redline_speed(*redline)
         top = redline[1]
 
-        # A regular modeless window: its title bar can be dragged, and clicking
-        # the board does not dismiss the controls while configuring live audio.
-        self.pop = QDialog(self)
+        # A pop-up over the board, beside its button: a click outside, Escape or the
+        # button again closes it (the settings stay, it's only hidden)
+        self.pop = QDialog(self, Qt.WindowType.Popup | Qt.WindowType.FramelessWindowHint)
         fit.watch(self.pop)
         self.pop.setWindowTitle(_("Live controls"))
-        self.pop.setWindowFlag(Qt.WindowType.WindowContextHelpButtonHint, False)
-        self._placed = False
+        self.pop.setProperty("popover", True)   # its edge (theme.py)
+        self.pop.installEventFilter(self)
+        self._hidden_at = 0.0
         self.pop.setObjectName("transport")
         v = QVBoxLayout(self.pop)
         v.setContentsMargins(16, 12, 16, 14)
@@ -206,6 +217,42 @@ class SpeedPitchButton(QPushButton):
         head.addStretch(1)
         head.addWidget(reset)
         v.addLayout(head)
+        v.addWidget(self._rule())
+
+        # --- a voice setup (the Voice tab's My setups) on everything here
+        self.setup_name = ""
+        self._setup_chips: dict[str, QPushButton] = {}
+        srow = QGridLayout()   # the name, then its chips with the progress under them
+        srow.setHorizontalSpacing(12)
+        srow.setVerticalSpacing(6)
+        lab = section_label(_("My setups"))
+        srow.addWidget(lab, 0, 0, Qt.AlignmentFlag.AlignTop)
+        self.setups_box = QWidget()
+        self.setups_box.setObjectName("spcol")
+        self.setups_box.setStyleSheet("QWidget#spcol { background:transparent; }")
+        self.setups_flow = Flow(self.setups_box, gap=4)
+        srow.addWidget(self.setups_box, 0, 1)
+        srow.setColumnStretch(1, 1)
+        self.busy_row = QWidget()
+        self.busy_row.setObjectName("spcol")
+        self.busy_row.setStyleSheet("QWidget#spcol { background:transparent; }")
+        b = QHBoxLayout(self.busy_row)
+        b.setContentsMargins(0, 0, 0, 0)
+        b.setSpacing(8)
+        self.busy_text = QLabel()
+        self.busy_text.setObjectName("hint")
+        self.busy_bar = QProgressBar()
+        self.busy_bar.setTextVisible(False)
+        self.busy_bar.setFixedHeight(6)
+        self.busy_cancel = QPushButton(_("Cancel"))
+        self.busy_cancel.setObjectName("small")
+        self.busy_cancel.clicked.connect(self.setup_cancelled)
+        b.addWidget(self.busy_text)
+        b.addWidget(self.busy_bar, 1)
+        b.addWidget(self.busy_cancel)
+        self.busy_row.hide()
+        srow.addWidget(self.busy_row, 1, 1)
+        v.addLayout(srow)
         v.addWidget(self._rule())
 
         cols = QHBoxLayout()
@@ -296,7 +343,7 @@ class SpeedPitchButton(QPushButton):
         self.speed.changed.connect(self._edited)
         self.pitch.changed.connect(self._edited)
         self.keep.toggled.connect(lambda _b: self._edited())
-        self.clicked.connect(self._open)
+        self.clicked.connect(self._toggle)
         self._label()
 
     def _effects(self, box: QWidget):
@@ -386,7 +433,7 @@ class SpeedPitchButton(QPushButton):
         self.pitch.set_param(REDLINE_PITCH if on else PITCH)
         self.red_box.setVisible(on)        # the rev meter: the speed, or a stream's pitch
         if self.pop.isVisible():
-            self._open()                  # resize, retaining the user's position
+            self._open()                  # resize / re-place it for the new height
         self._edited()
 
     def values(self) -> tuple[float, float, bool]:
@@ -409,6 +456,55 @@ class SpeedPitchButton(QPushButton):
     def reset(self):
         self.set_values(1.0, 0.0, self.keep.isChecked())
         self.set_fx({})
+        if self.setup_name:
+            self.setup_picked.emit("")
+
+    # ---- voice setups (ui.livesetups fills them in and applies them)
+    def set_setups(self, items, current: str):
+        """items: [(name, icon or None, tip)]: a chip each, after "No voice"."""
+        while self.setups_flow.count():
+            it = self.setups_flow.takeAt(0)
+            w = it.widget() if it is not None else None
+            if w is not None:
+                w.deleteLater()
+        self._setup_chips = {}
+        for name, icon, tip in [("", None, "")] + list(items):
+            c = QPushButton(name or _("No voice"))
+            c.setObjectName("small")
+            c.setCheckable(True)
+            c.setCursor(Qt.CursorShape.PointingHandCursor)
+            if icon is not None:
+                c.setIcon(icon)
+            if tip:
+                c.setToolTip(tip)
+            c.clicked.connect(lambda _on=False, n=name: self._chip(n))
+            self._setup_chips[name] = c
+            self.setups_flow.addWidget(c)
+        self.set_setup(current if current in self._setup_chips else "")
+
+    def _chip(self, name: str):
+        self.set_setup(self.setup_name)   # stays as it is until it's applied
+        self.setup_picked.emit(name)
+
+    def set_setup(self, name: str):
+        """The setup that's on now ("" = none): its chip lit, its name on the button."""
+        self.setup_name = name
+        for n, c in self._setup_chips.items():
+            c.setChecked(n == name)
+        self._label()
+
+    def set_busy(self, text: str = "", frac: float | None = None):
+        """A setup's AI voice getting ready: `text` with a bar (frac 0..1, None: no
+        idea how long) and Cancel; "" hides it."""
+        self.busy_row.setVisible(bool(text))
+        self.busy_text.setText(text)
+        if frac is None:
+            self.busy_bar.setRange(0, 0)
+        else:
+            self.busy_bar.setRange(0, 100)
+            self.busy_bar.setValue(int(round(frac * 100)))
+        if self.pop.isVisible():
+            self._open()   # grows or shrinks for the row
 
     def fx_values(self) -> dict[str, float]:
         return livefx.clean({k: s.value() for k, s in self.fx.items()})
@@ -426,7 +522,21 @@ class SpeedPitchButton(QPushButton):
         self._label()
         self.fx_changed.emit(now)
 
+    def eventFilter(self, obj, ev):
+        if obj is self.pop and ev.type() == QEvent.Type.Hide:
+            self._hidden_at = time.monotonic()
+        return super().eventFilter(obj, ev)
+
+    def _toggle(self):
+        # a click on this button while it's open closes the pop-up first (Qt does that
+        # on the press): don't open it again on the release
+        if time.monotonic() - self._hidden_at < 0.3:
+            return
+        self._open()
+
     def _open(self):
+        if not self.pop.isVisible():
+            self.opening.emit()
         # settle the layouts first: right after Redline hides its box, the column's
         # and the popup's size hint (and the popup's minimum) still hold the old,
         # taller height, so adjustSize alone would never shrink it back
@@ -435,23 +545,18 @@ class SpeedPitchButton(QPushButton):
             if lay is not None:
                 lay.activate()
         self.pop.adjustSize()
-        if not self._placed:
-            # Open over the owner, rather than aligning a wide panel to a small
-            # Effects button near the left edge of the app.
-            owner = self.window().frameGeometry()
-            self.pop.move(owner.center() - self.pop.rect().center())
+        pos = self.mapToGlobal(QPoint(0, 0))
+        # kept on the screen the button is on (a second monitor can sit left of or
+        # above the primary one, at negative coordinates)
+        area = (QApplication.screenAt(pos) or self.screen()).availableGeometry()
+        y = pos.y() - self.pop.height() - 4     # above the bar, unless there's no room
+        if y < area.top():
+            y = pos.y() + self.height() + 4
+        y = max(area.top(), min(y, area.bottom() - self.pop.height() + 1))
+        x = pos.x() + self.width() - self.pop.width()
+        x = max(area.left(), min(x, area.right() - self.pop.width() + 1))
+        self.pop.move(x, y)
         self.pop.show()
-        # show() supplies the native title-bar size. Include that frame when
-        # keeping controls reachable, including monitors at negative coordinates.
-        frame = self.pop.frameGeometry()
-        screen = QApplication.screenAt(frame.center()) or self.screen()
-        area = screen.availableGeometry()
-        x = max(area.left(), min(frame.x(), area.right() - frame.width() + 1))
-        y = max(area.top(), min(frame.y(), area.bottom() - frame.height() + 1))
-        self.pop.move(QPoint(x, y))
-        self._placed = True
-        self.pop.raise_()
-        self.pop.activateWindow()
 
     def _label(self):
         s, p, _k = self.values()
@@ -462,11 +567,16 @@ class SpeedPitchButton(QPushButton):
                 txt += f" {p:+g}"
             if fx:
                 txt += " · FX"
+            if self.setup_name:
+                txt += f" · {short(self.setup_name)}"
         else:   # no speed to show: "Effects" until something's on
             parts = [f"{p:+g} st"] if abs(p) >= 1e-3 else []
             if fx:
                 parts.append("FX")
+            if self.setup_name:
+                parts.append(short(self.setup_name))
             txt = " · ".join(parts) or _("Effects")
+        fx = fx or bool(self.setup_name)
         self.setText(txt)
         hot = s >= REDLINE_AT - 1e-6 or abs(p) > PITCH.hi
         # scoped to this button: unscoped, it would cascade into the popup (a child).

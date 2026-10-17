@@ -5,8 +5,10 @@
 // Nothing here knows who anyone is. The app sends a random install id it made itself
 // (X-Onion-Install); it's kept only as a salted hash, so one install gets one vote per
 // sound. Addresses are kept the same way, only to stop one address flooding the store.
+import { voicesRoute, adminVoicesRoute } from "./voices.js";
 import { ADMIN_PAGE } from "./admin.js";
-import { chatRoute } from "./chat.js";
+import { audioType } from "./audio.js";
+import { chatRoute, refuse } from "./chat.js";
 import { syncStep } from "./sync.js";
 
 export { ChatRoom } from "./chat.js";   // the Durable Object wrangler.toml names
@@ -85,6 +87,10 @@ async function route(req, env) {
         "script-src 'unsafe-inline'; media-src 'self' blob:; frame-ancestors 'none'",
       "x-frame-options": "DENY", "referrer-policy": "no-referrer", "cache-control": "no-store" } });
   if (p === "/v1/chat" || /^\/v1\/chat\/\d+\/report$/.test(p)) return chatRoute(req, env);
+  if (p.startsWith("/v1/voices")) {
+    const r = await voicesRoute(req, env, url, p, VOICE_TOOLS);
+    if (r) return r;
+  }
   if (p === "/v1/sounds" && m === "GET") return list(url, req, env);
   if (p === "/v1/categories" && m === "GET") return categories(env);
   if (p === "/v1/sounds" && m === "POST") return upload(req, env);
@@ -98,6 +104,10 @@ async function route(req, env) {
   if (p.startsWith("/v1/admin/")) {
     await admin(req, env);
     if (p === "/v1/admin/chat" || p.startsWith("/v1/admin/chat/")) return chatRoute(req, env);
+    if (p.startsWith("/v1/admin/voices")) {
+      const r = await adminVoicesRoute(req, env, url, p, VOICE_TOOLS);
+      if (r) return r;
+    }
     if (p === "/v1/admin/queue" && m === "GET") return queue(url, env);
     if (p === "/v1/admin/log" && m === "GET") return actionLog(url, env);
     if (p === "/v1/admin/sync" && m === "POST") return json(await syncStep(env, TOOLS));
@@ -167,25 +177,18 @@ async function logAction(env, kind, { sound = "", ip = "", install = "", detail 
   }
 }
 
+// a name or tag as plain words: no control, invisible or right-to-left characters (they
+// can make "evil\u202e3pm.exe" read "evil.exe.mp3"), and none of the <>`{}\ that markup
+// and scripts are written with
 function cleanName(s) {
-  return String(s || "").replace(/[\u0000-\u001f\u007f]/g, " ").replace(/\s+/g, " ")
-    .trim().slice(0, 60);
+  return String(s || "").normalize("NFKC")
+    .replace(/[\u0000-\u001f\u007f-\u009f\u00ad\u061c\u180e\u200b-\u200f\u2028-\u202e\u2060-\u206f\ufeff\ufff9-\ufffb]/g, " ")
+    .replace(/[<>`{}\\]/g, " ").replace(/\s+/g, " ").trim().slice(0, 60).trim();
 }
 
 function cleanTags(s) {
   return String(s || "").toLowerCase().split(/[,#]/).map(t => cleanName(t).slice(0, 24))
     .filter(Boolean).slice(0, 8).join(",");
-}
-
-// the audio type from the file's first bytes (never from its name), or ""
-function sniff(b) {
-  const s = (i, n) => String.fromCharCode(...b.slice(i, i + n));
-  if (b.length < 12) return "";
-  if (s(0, 4) === "fLaC") return "flac";
-  if (s(0, 4) === "OggS") return "ogg";
-  if (s(0, 4) === "RIFF" && s(8, 4) === "WAVE") return "wav";
-  if (s(0, 3) === "ID3" || (b[0] === 0xff && (b[1] & 0xe0) === 0xe0)) return "mp3";
-  return "";
 }
 
 // one video's link written one way, so the same video can't be shared twice; "" when
@@ -201,12 +204,15 @@ function linkKey(raw) {
   const host = u.hostname.toLowerCase().replace(/^(www|m)\./, "");
   if (!LINK_SITES.some(s => host === s || host.endsWith("." + s))) return "";
   const path = u.pathname.replace(/\/+$/, "");
-  if (host === "youtu.be" && path) return "youtube.com/watch?v=" + path.slice(1);
+  // a video's id is letters, digits, - and _: anything else (quotes, <script>) isn't one
+  const video = v => /^[A-Za-z0-9_-]{6,20}$/.test(v || "") ? "youtube.com/watch?v=" + v : "";
+  if (host === "youtu.be") return video(path.slice(1));
   if (host === "youtube.com" || host === "music.youtube.com") {
-    if (path === "/watch" && u.searchParams.get("v"))
-      return "youtube.com/watch?v=" + u.searchParams.get("v");
-    if (path.startsWith("/shorts/")) return "youtube.com/watch?v=" + path.slice(8);
+    if (path === "/watch") return video(u.searchParams.get("v"));
+    if (path.startsWith("/shorts/")) return video(path.slice(8));
   }
+  // the path as the URL parser wrote it (anything odd %-escaped), and only a path
+  if (!/^[A-Za-z0-9\-._~%!$&'()*+,;=:@/]*$/.test(path) || path.includes("..")) return "";
   return host + path;
 }
 
@@ -218,6 +224,11 @@ function shown(r) {
 }
 
 const TOOLS = { sha256, linkKey, cleanName, now, logAction };
+// what voices.js shares with the sounds' routes (one vote, report and limit system)
+const VOICE_TOOLS = { json, fail, body, installHash, ipHash, allow, logAction, sha256, now,
+                      cleanTags, refuse, vote, report };
+// a sound under review is "pending"; a voice has no review, so reports hide it
+const TABLES = { sounds: "pending", voices: "hidden" };
 
 // ------------------------------------------------------------------ public routes
 
@@ -276,6 +287,9 @@ async function file(env, id, any) {
     "content-length": String(obj.byteLength),
     // an hour at most: a sound rejected after reports stops being served soon after
     "cache-control": any ? "no-store" : "public, max-age=3600",
+    // only ever a download: a browser that opens it runs nothing in it
+    "content-disposition": `attachment; filename="${id}.${row.ext}"`,
+    "content-security-policy": "default-src 'none'; sandbox",
     "x-content-type-options": "nosniff" } });
 }
 
@@ -296,7 +310,7 @@ async function upload(req, env, imported = false) {
   if (!imported && form.get("agree") !== AGREEMENT) fail("agreement");
   const bytes = new Uint8Array(await f.arrayBuffer());
   if (!bytes.length || bytes.length > MAX_BYTES) fail("too big", 413);
-  const ext = sniff(bytes);
+  const ext = audioType(bytes);   // the whole file walked, never its name (audio.js)
   if (!ext) fail("not audio", 415);
   const uploader = imported ? "owner" : await installHash(req, env);
   const ip = imported ? "owner" : await ipHash(req, env);
@@ -359,19 +373,20 @@ async function body(req) {
   }
 }
 
-async function counts(env, id) {
-  await env.DB.prepare("UPDATE sounds SET " +
+async function counts(env, id, table = "sounds") {
+  await env.DB.prepare(`UPDATE ${table} SET ` +
     "up = (SELECT count(*) FROM votes WHERE sound = ?1 AND value = 1), " +
     "down = (SELECT count(*) FROM votes WHERE sound = ?1 AND value = -1) WHERE id = ?1")
     .bind(id).run();
-  return env.DB.prepare("SELECT up, down FROM sounds WHERE id = ?").bind(id).first();
+  return env.DB.prepare(`SELECT up, down FROM ${table} WHERE id = ?`).bind(id).first();
 }
 
-async function vote(req, env, id) {
+async function vote(req, env, id, table = "sounds") {
+  if (!(table in TABLES)) fail("not found", 404);
   const voter = await installHash(req, env);
   const { value } = await body(req);
   if (![1, -1, 0].includes(value)) fail("value");
-  const row = await env.DB.prepare("SELECT status FROM sounds WHERE id = ?").bind(id).first();
+  const row = await env.DB.prepare(`SELECT status FROM ${table} WHERE id = ?`).bind(id).first();
   if (!row || row.status !== "live") fail("not found", 404);
   const ip = await ipHash(req, env);
   if (!await allow(env, "vote-ip", ip, VOTES_PER_IP_DAY)
@@ -401,18 +416,19 @@ async function vote(req, env, id) {
       "ON CONFLICT (sound, voter) DO UPDATE SET value = excluded.value")
       .bind(id, voter, value).run();
   }
-  const c = await counts(env, id);
+  const c = await counts(env, id, table);
   await logAction(env, "vote", { sound: id, ip, install: voter, detail: String(value) });
   return json({ id, up: c.up, down: c.down, mine: value });
 }
 
 // one report per address counts: a new install id is free to make, so counting installs
 // would let one person take any sound off the store
-async function report(req, env, id) {
+async function report(req, env, id, table = "sounds") {
+  if (!(table in TABLES)) fail("not found", 404);
   const install = await installHash(req, env);   // still required, as from the app
   const { reason } = await body(req);
   const why = ["copyright", "offensive", "broken", "other"].includes(reason) ? reason : "other";
-  const row = await env.DB.prepare("SELECT status FROM sounds WHERE id = ?").bind(id).first();
+  const row = await env.DB.prepare(`SELECT status FROM ${table} WHERE id = ?`).bind(id).first();
   if (!row || row.status !== "live") fail("not found", 404);
   const ip = await ipHash(req, env);
   if (!await allow(env, "report-ip", ip, REPORTS_PER_IP_DAY)) fail("slow down", 429);
@@ -421,12 +437,13 @@ async function report(req, env, id) {
   const n = (await env.DB.prepare("SELECT count(*) AS n FROM reports WHERE sound = ?")
     .bind(id).first()).n;
   // enough reports: off the store until the owner looks at it again
-  await env.DB.prepare("UPDATE sounds SET reports = ?, " +
-    "status = CASE WHEN ? >= ? THEN 'pending' ELSE status END WHERE id = ?")
-    .bind(n, n, REPORTS_TO_HIDE, id).run();
+  await env.DB.prepare(`UPDATE ${table} SET reports = ?, ` +
+    "status = CASE WHEN ? >= ? THEN ? ELSE status END WHERE id = ?")
+    .bind(n, n, REPORTS_TO_HIDE, TABLES[table], id).run();
   await logAction(env, "report", { sound: id, ip, install, detail: why });
   if (n === REPORTS_TO_HIDE)
-    await logAction(env, "hidden", { sound: id, detail: `${n} reports: back to review` });
+    await logAction(env, "hidden", { sound: id, detail: `${n} reports: ` +
+      (table === "sounds" ? "back to review" : "hidden") });
   return json({ id, reported: true });
 }
 

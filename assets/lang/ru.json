@@ -3741,5 +3741,10 @@
   "✓ “{name}” is ready to play": "✓ «{name}» готов к воспроизведению",
   "Show as a list": "Показать списком",
   "Show as cards": "Показать карточками",
-  "Sort the pads: my order, A–Z, newest, most played": "Сортировка кнопок: мой порядок, А–Я, новые, частые"
+  "Sort the pads: my order, A–Z, newest, most played": "Сортировка кнопок: мой порядок, А–Я, новые, частые",
+  "Couldn't put the AI voice on “{name}”: {why}": "Не удалось наложить ИИ-голос на «{name}»: {why}",
+  "Couldn't start the AI voice: {why}": "Не удалось запустить ИИ-голос: {why}",
+  "Getting the AI voice ready…": "Готовлю ИИ-голос…",
+  "Putting the AI voice on “{name}”… {pct}%": "Накладываю ИИ-голос на «{name}»… {pct}%",
+  "The AI voices add-on isn't installed, so only the voice changer part of “{name}” is on.": "Дополнение с ИИ-голосами не установлено, поэтому из «{name}» включена только смена голоса."
 }

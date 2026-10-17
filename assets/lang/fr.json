@@ -3663,5 +3663,10 @@
   "✓ “{name}” is ready to play": "✓ « {name} » est prêt à jouer",
   "Show as a list": "Afficher en liste",
   "Show as cards": "Afficher en cartes",
-  "Sort the pads: my order, A–Z, newest, most played": "Trier les pads : mon ordre, A–Z, plus récents, plus joués"
+  "Sort the pads: my order, A–Z, newest, most played": "Trier les pads : mon ordre, A–Z, plus récents, plus joués",
+  "Couldn't put the AI voice on “{name}”: {why}": "Impossible de mettre la voix IA sur « {name} » : {why}",
+  "Couldn't start the AI voice: {why}": "Impossible de lancer la voix IA : {why}",
+  "Getting the AI voice ready…": "Préparation de la voix IA…",
+  "Putting the AI voice on “{name}”… {pct}%": "Ajout de la voix IA sur « {name} »… {pct} %",
+  "The AI voices add-on isn't installed, so only the voice changer part of “{name}” is on.": "Le module des voix IA n'est pas installé : seule la partie changeur de voix de « {name} » est activée."
 }

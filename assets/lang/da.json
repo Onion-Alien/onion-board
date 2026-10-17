@@ -3663,5 +3663,10 @@
   "✓ “{name}” is ready to play": "✓ “{name}” er klar til at spille",
   "Show as a list": "Vis som liste",
   "Show as cards": "Vis som kort",
-  "Sort the pads: my order, A–Z, newest, most played": "Sortér knapperne: min rækkefølge, A–Z, nyeste, mest afspillet"
+  "Sort the pads: my order, A–Z, newest, most played": "Sortér knapperne: min rækkefølge, A–Z, nyeste, mest afspillet",
+  "Couldn't put the AI voice on “{name}”: {why}": "Kunne ikke lægge AI-stemmen på “{name}”: {why}",
+  "Couldn't start the AI voice: {why}": "Kunne ikke starte AI-stemmen: {why}",
+  "Getting the AI voice ready…": "Gør AI-stemmen klar…",
+  "Putting the AI voice on “{name}”… {pct}%": "Lægger AI-stemmen på “{name}”… {pct} %",
+  "The AI voices add-on isn't installed, so only the voice changer part of “{name}” is on.": "Tilføjelsen til AI-stemmer er ikke installeret, så kun stemmeskifter-delen af “{name}” er slået til."
 }

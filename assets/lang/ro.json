@@ -3741,5 +3741,10 @@
   "✓ “{name}” is ready to play": "✓ „{name}” e gata de redat",
   "Show as a list": "Afișează ca listă",
   "Show as cards": "Afișează ca carduri",
-  "Sort the pads: my order, A–Z, newest, most played": "Sortează butoanele: ordinea mea, A–Z, cele mai noi, cele mai redate"
+  "Sort the pads: my order, A–Z, newest, most played": "Sortează butoanele: ordinea mea, A–Z, cele mai noi, cele mai redate",
+  "Couldn't put the AI voice on “{name}”: {why}": "Vocea AI nu a putut fi pusă pe „{name}”: {why}",
+  "Couldn't start the AI voice: {why}": "Vocea AI nu a putut porni: {why}",
+  "Getting the AI voice ready…": "Se pregătește vocea AI…",
+  "Putting the AI voice on “{name}”… {pct}%": "Se pune vocea AI pe „{name}”… {pct}%",
+  "The AI voices add-on isn't installed, so only the voice changer part of “{name}” is on.": "Suplimentul pentru voci AI nu e instalat, așa că din „{name}” e pornit doar schimbătorul de voce."
 }

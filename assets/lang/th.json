@@ -3585,5 +3585,10 @@
   "✓ “{name}” is ready to play": "✓ “{name}” พร้อมเล่นแล้ว",
   "Show as a list": "แสดงเป็นรายการ",
   "Show as cards": "แสดงเป็นการ์ด",
-  "Sort the pads: my order, A–Z, newest, most played": "เรียงปุ่ม: ลำดับของฉัน, A–Z, ใหม่ล่าสุด, เล่นบ่อยที่สุด"
+  "Sort the pads: my order, A–Z, newest, most played": "เรียงปุ่ม: ลำดับของฉัน, A–Z, ใหม่ล่าสุด, เล่นบ่อยที่สุด",
+  "Couldn't put the AI voice on “{name}”: {why}": "ใส่เสียง AI ให้ “{name}” ไม่ได้: {why}",
+  "Couldn't start the AI voice: {why}": "เริ่มเสียง AI ไม่ได้: {why}",
+  "Getting the AI voice ready…": "กำลังเตรียมเสียง AI…",
+  "Putting the AI voice on “{name}”… {pct}%": "กำลังใส่เสียง AI ให้ “{name}”… {pct}%",
+  "The AI voices add-on isn't installed, so only the voice changer part of “{name}” is on.": "ยังไม่ได้ติดตั้งส่วนเสริมเสียง AI จึงเปิดแค่ส่วนเปลี่ยนเสียงของ “{name}”"
 }

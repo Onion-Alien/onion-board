@@ -3663,5 +3663,10 @@
   "✓ “{name}” is ready to play": "✓ Το \"{name}\" είναι έτοιμο να παίξει",
   "Show as a list": "Εμφάνιση ως λίστα",
   "Show as cards": "Εμφάνιση ως κάρτες",
-  "Sort the pads: my order, A–Z, newest, most played": "Ταξινόμηση κουμπιών: η σειρά μου, A–Z, νεότερα, πιο συχνά"
+  "Sort the pads: my order, A–Z, newest, most played": "Ταξινόμηση κουμπιών: η σειρά μου, A–Z, νεότερα, πιο συχνά",
+  "Couldn't put the AI voice on “{name}”: {why}": "Δεν μπήκε η φωνή AI στο \"{name}\": {why}",
+  "Couldn't start the AI voice: {why}": "Η φωνή AI δεν ξεκίνησε: {why}",
+  "Getting the AI voice ready…": "Ετοιμάζεται η φωνή AI…",
+  "Putting the AI voice on “{name}”… {pct}%": "Μπαίνει η φωνή AI στο \"{name}\"… {pct}%",
+  "The AI voices add-on isn't installed, so only the voice changer part of “{name}” is on.": "Το πρόσθετο φωνών AI δεν είναι εγκατεστημένο, οπότε από το \"{name}\" είναι ενεργή μόνο η αλλαγή φωνής."
 }

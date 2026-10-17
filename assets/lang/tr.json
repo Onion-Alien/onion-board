@@ -3663,5 +3663,10 @@
   "✓ “{name}” is ready to play": "✓ “{name}” çalmaya hazır",
   "Show as a list": "Liste olarak göster",
   "Show as cards": "Kart olarak göster",
-  "Sort the pads: my order, A–Z, newest, most played": "Pad'leri sırala: benim sıram, A–Z, en yeni, en çok çalınan"
+  "Sort the pads: my order, A–Z, newest, most played": "Pad'leri sırala: benim sıram, A–Z, en yeni, en çok çalınan",
+  "Couldn't put the AI voice on “{name}”: {why}": "Yapay zeka sesi “{name}” üzerine konamadı: {why}",
+  "Couldn't start the AI voice: {why}": "Yapay zeka sesi başlatılamadı: {why}",
+  "Getting the AI voice ready…": "Yapay zeka sesi hazırlanıyor…",
+  "Putting the AI voice on “{name}”… {pct}%": "Yapay zeka sesi “{name}” üzerine konuyor… %{pct}",
+  "The AI voices add-on isn't installed, so only the voice changer part of “{name}” is on.": "Yapay zeka sesleri eklentisi kurulu değil, bu yüzden “{name}” ayarının yalnızca ses değiştirici kısmı açık."
 }

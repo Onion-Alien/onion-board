@@ -3663,5 +3663,10 @@
   "✓ “{name}” is ready to play": "✓ “{name}” is klaar om te spelen",
   "Show as a list": "Als lijst tonen",
   "Show as cards": "Als kaarten tonen",
-  "Sort the pads: my order, A–Z, newest, most played": "Pads sorteren: mijn volgorde, A–Z, nieuwste, meest afgespeeld"
+  "Sort the pads: my order, A–Z, newest, most played": "Pads sorteren: mijn volgorde, A–Z, nieuwste, meest afgespeeld",
+  "Couldn't put the AI voice on “{name}”: {why}": "Kon de AI-stem niet op “{name}” zetten: {why}",
+  "Couldn't start the AI voice: {why}": "Kon de AI-stem niet starten: {why}",
+  "Getting the AI voice ready…": "AI-stem wordt klaargezet…",
+  "Putting the AI voice on “{name}”… {pct}%": "AI-stem wordt op “{name}” gezet… {pct}%",
+  "The AI voices add-on isn't installed, so only the voice changer part of “{name}” is on.": "De add-on voor AI-stemmen is niet geïnstalleerd, dus alleen de stemveranderaar van “{name}” staat aan."
 }

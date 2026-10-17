@@ -3741,5 +3741,10 @@
   "✓ “{name}” is ready to play": "✓ „{name}” jest gotowy do grania",
   "Show as a list": "Pokaż jako listę",
   "Show as cards": "Pokaż jako karty",
-  "Sort the pads: my order, A–Z, newest, most played": "Sortuj przyciski: moja kolejność, A–Z, najnowsze, najczęściej odtwarzane"
+  "Sort the pads: my order, A–Z, newest, most played": "Sortuj przyciski: moja kolejność, A–Z, najnowsze, najczęściej odtwarzane",
+  "Couldn't put the AI voice on “{name}”: {why}": "Nie udało się nałożyć głosu AI na „{name}”: {why}",
+  "Couldn't start the AI voice: {why}": "Nie udało się uruchomić głosu AI: {why}",
+  "Getting the AI voice ready…": "Przygotowuję głos AI…",
+  "Putting the AI voice on “{name}”… {pct}%": "Nakładam głos AI na „{name}”… {pct}%",
+  "The AI voices add-on isn't installed, so only the voice changer part of “{name}” is on.": "Dodatek z głosami AI nie jest zainstalowany, więc z „{name}” działa tylko zmieniacz głosu."
 }

@@ -3585,5 +3585,10 @@
   "✓ “{name}” is ready to play": "✓ “{name}” đã sẵn sàng để phát",
   "Show as a list": "Hiện dạng danh sách",
   "Show as cards": "Hiện dạng thẻ",
-  "Sort the pads: my order, A–Z, newest, most played": "Sắp xếp nút: thứ tự của tôi, A–Z, mới nhất, phát nhiều nhất"
+  "Sort the pads: my order, A–Z, newest, most played": "Sắp xếp nút: thứ tự của tôi, A–Z, mới nhất, phát nhiều nhất",
+  "Couldn't put the AI voice on “{name}”: {why}": "Không thể áp giọng AI cho “{name}”: {why}",
+  "Couldn't start the AI voice: {why}": "Không thể khởi động giọng AI: {why}",
+  "Getting the AI voice ready…": "Đang chuẩn bị giọng AI…",
+  "Putting the AI voice on “{name}”… {pct}%": "Đang áp giọng AI cho “{name}”… {pct}%",
+  "The AI voices add-on isn't installed, so only the voice changer part of “{name}” is on.": "Chưa cài tiện ích giọng AI nên chỉ phần đổi giọng nói của “{name}” được bật."
 }

@@ -3585,5 +3585,10 @@
   "✓ “{name}” is ready to play": "✓ 「{name}」を再生できます",
   "Show as a list": "リストで表示",
   "Show as cards": "カードで表示",
-  "Sort the pads: my order, A–Z, newest, most played": "パッドの並び順: 自分の順、A–Z、新しい順、よく再生する順"
+  "Sort the pads: my order, A–Z, newest, most played": "パッドの並び順: 自分の順、A–Z、新しい順、よく再生する順",
+  "Couldn't put the AI voice on “{name}”: {why}": "「{name}」にAIボイスを付けられませんでした：{why}",
+  "Couldn't start the AI voice: {why}": "AIボイスを開始できませんでした：{why}",
+  "Getting the AI voice ready…": "AIボイスを準備中…",
+  "Putting the AI voice on “{name}”… {pct}%": "「{name}」にAIボイスを付けています… {pct}%",
+  "The AI voices add-on isn't installed, so only the voice changer part of “{name}” is on.": "AIボイスのアドオンが入っていないため、「{name}」はボイスチェンジャー部分だけオンです。"
 }

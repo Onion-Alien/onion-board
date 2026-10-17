@@ -3663,5 +3663,10 @@
   "✓ “{name}” is ready to play": "✓ \"{name}\" on valmis soimaan",
   "Show as a list": "Näytä luettelona",
   "Show as cards": "Näytä kortteina",
-  "Sort the pads: my order, A–Z, newest, most played": "Lajittele painikkeet: oma järjestys, A–Ö, uusimmat, soitetuimmat"
+  "Sort the pads: my order, A–Z, newest, most played": "Lajittele painikkeet: oma järjestys, A–Ö, uusimmat, soitetuimmat",
+  "Couldn't put the AI voice on “{name}”: {why}": "AI-ääntä ei saatu lisättyä kohteeseen \"{name}\": {why}",
+  "Couldn't start the AI voice: {why}": "AI-ääni ei käynnistynyt: {why}",
+  "Getting the AI voice ready…": "AI-ääntä valmistellaan…",
+  "Putting the AI voice on “{name}”… {pct}%": "Lisätään AI-ääntä kohteeseen \"{name}\"… {pct} %",
+  "The AI voices add-on isn't installed, so only the voice changer part of “{name}” is on.": "AI-äänien lisäosaa ei ole asennettu, joten \"{name}\" on päällä vain äänenmuuttajan osalta."
 }

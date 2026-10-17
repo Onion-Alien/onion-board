@@ -3585,5 +3585,10 @@
   "✓ “{name}” is ready to play": "✓ “{name}” sedia dimainkan",
   "Show as a list": "Tunjuk sebagai senarai",
   "Show as cards": "Tunjuk sebagai kad",
-  "Sort the pads: my order, A–Z, newest, most played": "Isih pad: susunan saya, A–Z, terbaharu, paling kerap dimainkan"
+  "Sort the pads: my order, A–Z, newest, most played": "Isih pad: susunan saya, A–Z, terbaharu, paling kerap dimainkan",
+  "Couldn't put the AI voice on “{name}”: {why}": "Tidak dapat memasang suara AI pada “{name}”: {why}",
+  "Couldn't start the AI voice: {why}": "Tidak dapat memulakan suara AI: {why}",
+  "Getting the AI voice ready…": "Menyediakan suara AI…",
+  "Putting the AI voice on “{name}”… {pct}%": "Memasang suara AI pada “{name}”… {pct}%",
+  "The AI voices add-on isn't installed, so only the voice changer part of “{name}” is on.": "Alat tambah suara AI belum dipasang, jadi hanya bahagian penukar suara “{name}” yang dihidupkan."
 }
