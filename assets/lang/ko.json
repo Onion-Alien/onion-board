@@ -3723,5 +3723,14 @@
   "Rain, a crowd, an echo or sounds from your board, on top of any voice": "비, 군중, 메아리 또는 보드의 소리를 어떤 목소리 위에든",
   "Take “{effect}” off": "“{effect}” 빼기",
   "{site} didn't answer over Tor (it ignores some of Tor's addresses), and nor did {tries} other Tor routes. You can try this one without Tor: {site} would then see your own address.": "{site}이(가) Tor로 응답하지 않았고(Tor의 일부 주소를 무시함), 다른 Tor 경로 {tries}개에서도 마찬가지였습니다. Tor 없이 시도해 볼 수 있습니다. 그러면 {site}에 내 주소가 보입니다.",
-  "Up next · {n} before it": "다음 재생 · 앞에 {n}개"
+  "Up next · {n} before it": "다음 재생 · 앞에 {n}개",
+  "13 new voice changer voices and 6 new AI voices.": "새 음성 변조 목소리 13개와 새 AI 목소리 6개.",
+  "19 new voices": "새 목소리 19개",
+  "A softer storybook look, and their own look in every theme.": "더 부드러운 동화책 느낌, 테마마다 각자의 모습.",
+  "Bun and Hoot redrawn": "Bun과 Hoot을 새로 그렸어요",
+  "Effects behind your voice, and new voices": "목소리 뒤의 효과, 그리고 새 목소리",
+  "Effects on any voice": "어떤 목소리에도 효과",
+  "Share your voices and setups with everyone, and get theirs.": "내 목소리와 설정을 모두와 공유하고, 다른 사람 것도 받아 보세요.",
+  "The voice bar's Effects button puts rain, a crowd, a fire or a sound from your board behind your voice.": "보이스 바의 효과 버튼으로 비, 군중, 불 또는 보드의 사운드를 목소리 뒤에 깔 수 있어요.",
+  "Open Appearance": "모습 열기"
 }

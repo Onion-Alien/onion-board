@@ -3723,5 +3723,14 @@
   "Rain, a crowd, an echo or sounds from your board, on top of any voice": "雨聲、人群、回聲或你音板上的聲音，疊加在任何聲音上",
   "Take “{effect}” off": "移除「{effect}」",
   "{site} didn't answer over Tor (it ignores some of Tor's addresses), and nor did {tries} other Tor routes. You can try this one without Tor: {site} would then see your own address.": "{site} 沒有透過 Tor 回應（它會忽略 Tor 的部分位址），另外 {tries} 條 Tor 路由也是如此。您可以不用 Tor 再試一次：然後 {site} 會看到您自己的位址。",
-  "Up next · {n} before it": "下一首 · 前面還有 {n} 個"
+  "Up next · {n} before it": "下一首 · 前面還有 {n} 個",
+  "13 new voice changer voices and 6 new AI voices.": "13 個新的變聲器聲音和 6 個新的 AI 聲音。",
+  "19 new voices": "19 個新聲音",
+  "A softer storybook look, and their own look in every theme.": "更柔和的繪本風格，每個主題都有他們自己的樣子。",
+  "Bun and Hoot redrawn": "Bun 和 Hoot 重新繪製",
+  "Effects behind your voice, and new voices": "聲音背後的效果，以及新聲音",
+  "Effects on any voice": "任何聲音都能加效果",
+  "Share your voices and setups with everyone, and get theirs.": "和大家分享你的聲音和設定，也能拿到他們的。",
+  "The voice bar's Effects button puts rain, a crowd, a fire or a sound from your board behind your voice.": "聲音列的效果按鈕可以在你的聲音後面加上雨聲、人群、火堆或你音效板裡的音效。",
+  "Open Appearance": "開啟外觀"
 }

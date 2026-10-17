@@ -3723,5 +3723,14 @@
   "Rain, a crowd, an echo or sounds from your board, on top of any voice": "雨、人混み、エコー、ボードの音をどの声にも重ねる",
   "Take “{effect}” off": "「{effect}」を外す",
   "{site} didn't answer over Tor (it ignores some of Tor's addresses), and nor did {tries} other Tor routes. You can try this one without Tor: {site} would then see your own address.": "{site} が Tor 経由で応答しませんでした（Tor の一部のアドレスを無視します）。他の Tor ルート {tries} 本でも同じでした。Tor なしで試すこともできます。その場合、{site} にはあなた自身のアドレスが見えます。",
-  "Up next · {n} before it": "次に再生 · 前に{n}件"
+  "Up next · {n} before it": "次に再生 · 前に{n}件",
+  "13 new voice changer voices and 6 new AI voices.": "ボイスチェンジャーの新ボイス13種と新しいAIボイス6種。",
+  "19 new voices": "新しいボイス19種",
+  "A softer storybook look, and their own look in every theme.": "やわらかい絵本風の見た目に、テーマごとの見た目も。",
+  "Bun and Hoot redrawn": "Bun と Hoot が描き直されました",
+  "Effects behind your voice, and new voices": "声の後ろにエフェクト、そして新しいボイス",
+  "Effects on any voice": "どのボイスにもエフェクト",
+  "Share your voices and setups with everyone, and get theirs.": "あなたのボイスとセットアップをみんなと共有して、みんなのものももらえます。",
+  "The voice bar's Effects button puts rain, a crowd, a fire or a sound from your board behind your voice.": "ボイスバーのエフェクトボタンで、雨、群衆、焚き火、ボードのサウンドを声の後ろに流せます。",
+  "Open Appearance": "外観を開く"
 }

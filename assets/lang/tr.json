@@ -3803,5 +3803,14 @@
   "Rain, a crowd, an echo or sounds from your board, on top of any voice": "Yağmur, kalabalık, yankı ya da board'undaki sesler, her sesin üstünde",
   "Take “{effect}” off": "“{effect}” kaldır",
   "{site} didn't answer over Tor (it ignores some of Tor's addresses), and nor did {tries} other Tor routes. You can try this one without Tor: {site} would then see your own address.": "{site} Tor üzerinden yanıt vermedi (Tor'un bazı adreslerini yok sayar), {tries} başka Tor rotasında da vermedi. Bunu Tor olmadan deneyebilirsiniz: {site} o zaman kendi adresinizi görür.",
-  "Up next · {n} before it": "Sıradaki · önünde {n}"
+  "Up next · {n} before it": "Sıradaki · önünde {n}",
+  "13 new voice changer voices and 6 new AI voices.": "13 yeni ses değiştirici sesi ve 6 yeni yapay zekâ sesi.",
+  "19 new voices": "19 yeni ses",
+  "A softer storybook look, and their own look in every theme.": "Daha yumuşak bir masal kitabı görünümü ve her temada kendi görünümleri.",
+  "Bun and Hoot redrawn": "Bun ve Hoot yeniden çizildi",
+  "Effects behind your voice, and new voices": "Sesinin arkasında efektler ve yeni sesler",
+  "Effects on any voice": "Her seste efektler",
+  "Share your voices and setups with everyone, and get theirs.": "Seslerini ve ayarlarını herkesle paylaş, onlarınkini al.",
+  "The voice bar's Effects button puts rain, a crowd, a fire or a sound from your board behind your voice.": "Ses çubuğundaki Efektler düğmesi sesinin arkasına yağmur, kalabalık, ateş ya da board'undan bir ses koyar.",
+  "Open Appearance": "Görünümü aç"
 }

@@ -3803,5 +3803,14 @@
   "Rain, a crowd, an echo or sounds from your board, on top of any voice": "Ulan, crowd, echo o mga tunog mula sa board mo, sa ibabaw ng kahit anong boses",
   "Take “{effect}” off": "Alisin ang “{effect}”",
   "{site} didn't answer over Tor (it ignores some of Tor's addresses), and nor did {tries} other Tor routes. You can try this one without Tor: {site} would then see your own address.": "Hindi sumagot ang {site} sa Tor (binabalewala nito ang ilang address ng Tor), at hindi rin sa {tries} iba pang ruta ng Tor. Maaari mong subukan ang isang ito nang walang Tor: makikita ng {site} ang iyong sariling address.",
-  "Up next · {n} before it": "Susunod · {n} bago nito"
+  "Up next · {n} before it": "Susunod · {n} bago nito",
+  "13 new voice changer voices and 6 new AI voices.": "13 bagong boses ng voice changer at 6 na bagong AI na boses.",
+  "19 new voices": "19 na bagong boses",
+  "A softer storybook look, and their own look in every theme.": "Mas malambot na storybook na itsura, at sariling itsura sa bawat theme.",
+  "Bun and Hoot redrawn": "Bagong drawing nina Bun at Hoot",
+  "Effects behind your voice, and new voices": "Mga effect sa likod ng boses mo, at mga bagong boses",
+  "Effects on any voice": "Mga effect sa kahit anong boses",
+  "Share your voices and setups with everyone, and get theirs.": "I-share ang mga boses at setup mo sa lahat, at kunin ang sa kanila.",
+  "The voice bar's Effects button puts rain, a crowd, a fire or a sound from your board behind your voice.": "Ang Effects button ng voice bar ay naglalagay ng ulan, maraming tao, apoy o tunog mula sa board mo sa likod ng boses mo.",
+  "Open Appearance": "Buksan ang Itsura"
 }

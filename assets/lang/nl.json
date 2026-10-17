@@ -3803,5 +3803,14 @@
   "Rain, a crowd, an echo or sounds from your board, on top of any voice": "Regen, een menigte, echo of geluiden van je board bovenop elke stem",
   "Take “{effect}” off": "‘{effect}’ uitzetten",
   "{site} didn't answer over Tor (it ignores some of Tor's addresses), and nor did {tries} other Tor routes. You can try this one without Tor: {site} would then see your own address.": "{site} gaf geen antwoord via Tor ({site} negeert sommige adressen van Tor), en ook niet via {tries} andere Tor-routes. Je kunt dit zonder Tor proberen: {site} ziet dan je eigen adres.",
-  "Up next · {n} before it": "Hierna · {n} ervoor"
+  "Up next · {n} before it": "Hierna · {n} ervoor",
+  "13 new voice changer voices and 6 new AI voices.": "13 nieuwe stemvervormer-stemmen en 6 nieuwe AI-stemmen.",
+  "19 new voices": "19 nieuwe stemmen",
+  "A softer storybook look, and their own look in every theme.": "Een zachtere prentenboeklook, en hun eigen look in elk thema.",
+  "Bun and Hoot redrawn": "Bun en Hoot opnieuw getekend",
+  "Effects behind your voice, and new voices": "Effecten achter je stem, en nieuwe stemmen",
+  "Effects on any voice": "Effecten op elke stem",
+  "Share your voices and setups with everyone, and get theirs.": "Deel je stemmen en setups met iedereen, en krijg die van hen.",
+  "The voice bar's Effects button puts rain, a crowd, a fire or a sound from your board behind your voice.": "De knop Effecten in de stembalk zet regen, een menigte, een vuur of een geluid van je board achter je stem.",
+  "Open Appearance": "Verschijning openen"
 }
