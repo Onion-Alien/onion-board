@@ -17,7 +17,7 @@ from PySide6.QtCore import QEvent, QPoint, Qt, QTimer, Signal
 from PySide6.QtWidgets import (QApplication, QDialog, QHBoxLayout, QLabel, QPushButton,
                                QVBoxLayout, QWidget)
 
-from soundboard import voicefx
+from soundboard import usage, voicefx
 from soundboard.i18n import _
 from soundboard.ui import fit, icons
 from soundboard.ui.backdroprow import _row_slider
@@ -247,6 +247,7 @@ class EffectsPopup(QDialog):
             self._dot_look(key)
             return
         self._listening = key
+        usage.used("voice-background-hear")
         if was is not None:
             self._dot_look(was)
         self._dot_look(key)

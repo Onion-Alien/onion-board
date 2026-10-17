@@ -486,6 +486,7 @@ class BunnyWidget(QWidget):
         self.burst(6)
         # his own lines for where he is, and his theme's character (mascotlines.py)
         self.say = mascotlines.pick(self._rng, self.joy_lines + mascotlines.bun(), self.say)
+        usage.used("bun-talk")
         self._say_until = time.monotonic() + mascotlines.read_secs(self.say)
 
     @property

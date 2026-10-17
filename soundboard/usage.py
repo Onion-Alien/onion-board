@@ -145,6 +145,8 @@ PACKS = ("streamer", "esports", "general", "podcast", "halloween", "gm-starter",
 LIVE_TABS = ("sounds", "radio", "apps")
 # Bun's games (ui/bunpong.py games()); any other is "other"
 BUN_GAMES = ("pong", "draw", "rps", "ttt", "other")
+# the rare loading screens (ui/splashacts.py RARES' keys)
+SPLASH_RARES = ("gold", "ice", "galaxy", "rainbow")
 # Settings' pages (settings.SettingsDialog's page keys, without Show advanced)
 SETTINGS_PAGES = ("audio", "appearance", "hotkeys", "tabs", "general", "about",
                   "overlay", "privacy", "connection", "data", "updates", "help",
@@ -323,7 +325,28 @@ FEATURES = ("add-files", "youtube", "record", "clip", "clip-editor", "import-boa
             # API's chat commands and alerts set up (features_now) and used: a chat
             # command, an alert, a donation's alert (never who, what or how much)
             "remote-used-api", "remote-used-phone", "api-chat-rules", "api-alerts",
-            "api-chat-command", "api-alert", "api-alert-donation")
+            "api-chat-command", "api-alert", "api-alert-donation",
+            # a rare loading screen came up (ui/splashacts.py RARES: Golden, Ice, Galaxy,
+            # Rainbow Bun); Bun or Hoot clicked into saying a line
+            *(f"splash-{k}" for k in SPLASH_RARES), "bun-talk", "hoot-talk",
+            # a game run as admin in front with hotkeys set: the note, its Restart as admin
+            "admin-game", "admin-restart",
+            # the red "didn't work" card (ui/oops.py): Try again, Report a problem
+            "oops-retry", "oops-report",
+            # the Community tab's "store's down" page, and its down-for-maintenance one; a
+            # web search's site down or turning requests away
+            "store-down", "store-maintenance", "search-site-down",
+            # the setup guide's "almost done" note (closed while the mic is set up); the
+            # cable's "only if you need it" box, and its Use my mic instead
+            "setup-wait-note", "cable-confirm", "cable-confirm-mic",
+            # the Voice tab saying no mic is open; one voice bar chip's close button
+            "voice-no-mic", "voice-chip-off",
+            # a background sound's ▶ heard before adding it; the mini player's Full board
+            "voice-background-hear", "mini-full-board",
+            # a deleted category's Undo; a sound played while muted (the note), its Go live
+            "category-undo", "muted-note", "muted-go-live",
+            # Plain instead of Textured (features_now)
+            "textures-off")
 STEPS = ("added-sound", "played-sound", "sent-to-others",
          # a tab a new user starts without (+ More tabs, Settings > Tabs)
          "added-radio-tab", "added-apps-tab", "added-triggers-tab")
@@ -636,6 +659,8 @@ def features_now(cfg) -> list[str]:
             out.append("voice-background-sounds")
     if cfg.also_send:
         out.append("also-send")
+    if not cfg.theme_texture:
+        out.append("textures-off")
     from soundboard import quality
     if not quality.current.keep_source:
         out.append("source-off")

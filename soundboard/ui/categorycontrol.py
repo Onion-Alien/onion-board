@@ -23,7 +23,7 @@ from PySide6.QtWidgets import (
     QWidget,
 )
 
-from soundboard import catswitch, library
+from soundboard import catswitch, library, usage
 from soundboard.i18n import _, ngettext
 from soundboard.library import SoundMeta
 from soundboard.settings import pretty_key
@@ -571,6 +571,7 @@ class CategoryControl(Controller):
         cfg = mw.cfg
         if name in cfg.categories:
             return
+        usage.used("category-undo")
         cfg.categories.insert(min(was["at"], len(cfg.categories)), name)
         if was["hotkey"] and not mw.hkctl._hotkey_taken(was["hotkey"]):
             cfg.category_hotkeys[name] = was["hotkey"]

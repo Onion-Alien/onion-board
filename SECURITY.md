@@ -309,7 +309,20 @@ account or anything else about you.
     control API or a phone remote add-on answering a request (`used/remote-used-api`,
     `remote-used-phone`: never what it asked); a control API chat command or alert
     carried out (`used/api-chat-command`, `api-alert`, `api-alert-donation`: never the
-    viewer's name, the message or the amount);
+    viewer's name, the message or the amount); a rare loading screen (`used/splash-gold`,
+    `splash-ice`, `splash-galaxy`, `splash-rainbow`), Bun or Hoot clicked into talking
+    (`bun-talk`, `hoot-talk`); the note that hotkeys can't reach a game run as admin and
+    its *Restart as admin* (`admin-game`, `admin-restart`: never the game); the red
+    "didn't work" card's *Try again* and *Report a problem* (`oops-retry`,
+    `oops-report`); the Community tab's "store's down" or "down for maintenance" page and
+    a web search's site being down (`store-down`, `store-maintenance`,
+    `search-site-down`); the setup guide's "almost done" note, the virtual cable's "only
+    if you need it" box and its mic button (`setup-wait-note`, `cable-confirm`,
+    `cable-confirm-mic`); the Voice tab saying no mic is open, a voice bar chip's close
+    button, a background sound heard before adding it, the mini player's *Full board*
+    (`voice-no-mic`, `voice-chip-off`, `voice-background-hear`, `mini-full-board`); a
+    deleted category's *Undo*, and the "you're muted" note on a sound and its *Go live*
+    (`category-undo`, `muted-note`, `muted-go-live`: never which category or sound);
   - and every day they're set: *Remember where it came from* off, own Apps categories,
     the side menu kept shut, a proxy, Tor or Offline mode, the playing sound's picture
     behind the board, the mic helper set up, and any sound set to play other than one at
@@ -325,7 +338,8 @@ account or anything else about you.
     sounds in it, a category hidden from *All*, and the control API's chat commands and
     alerts set up (`used/voice-background`, `voice-background-sounds`,
     `hidden-from-all`, `api-chat-rules`, `api-alerts`: never which sounds, category,
-    commands or alerts).
+    commands or alerts); the themes' Plain look instead of Textured
+    (`used/textures-off`).
 
 **Problems, as counts only, soon after a start:**
 

@@ -119,6 +119,7 @@ class HotkeyControl(Controller):
         Once per game while the board runs; never while every hotkey is off."""
         if self._hotkeys_off:
             return
+        usage.used("admin-game")
         self.mw.tell(_("Your hotkeys can't reach this game"),
                      _("The game runs as admin, and Windows doesn't let other programs "
                        "hear the keys you press in it. Start Onion Board as admin too to "
@@ -129,6 +130,7 @@ class HotkeyControl(Controller):
     def restart_as_admin(self):
         """Start the board again as admin (Windows asks first), then quit this copy.
         The prompt waits for an answer, so it's asked from a worker thread."""
+        usage.used("admin-restart")
         args = self.mw.restart_args()
         threading.Thread(target=lambda: busy.emit(self._admin_started,
                                                   adminfront.start_elevated(args),

@@ -192,7 +192,7 @@ class VoicePanel(QWidget):
         self.bar = VoiceStatusBar()
         self.bar.open_card.connect(self._open_card)
         self.bar.stop_button.clicked.connect(self.stop_all)
-        self.bar.turn_off.connect(self.stop_one)
+        self.bar.turn_off.connect(lambda k: (usage.used("voice-chip-off"), self.stop_one(k)))
         scroll = self._scroll = QScrollArea()
         scroll.setWidgetResizable(True)
         scroll.setFrameShape(QFrame.Shape.NoFrame)
@@ -772,6 +772,8 @@ class VoicePanel(QWidget):
         # closed for a moment, and the strip shouldn't flash for that
         gone = why == self._no_mic_text()
         self._no_mic_polls = getattr(self, "_no_mic_polls", 0) + 1 if gone else 0
+        if gone and self._no_mic_polls >= 2:
+            usage.used("voice-no-mic")
         self._show_problem("" if gone and self._no_mic_polls < 2 else why)
 
     def problem(self) -> str:

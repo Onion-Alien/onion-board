@@ -8,6 +8,7 @@ from collections.abc import Callable
 
 from PySide6.QtWidgets import QDialog, QHBoxLayout, QLabel, QPushButton, QVBoxLayout
 
+from soundboard import usage
 from soundboard.i18n import _
 from soundboard.ui import fit, icons
 
@@ -17,6 +18,7 @@ def ask(parent, install: Callable[[], None], use_mic: Callable[[], None],
     """Open the box (not modal): `install` runs on Install the cable anyway, `use_mic`
     on the main button (`mic_text` its words, when the mic is set up already). Returns
     it, open."""
+    usage.used("cable-confirm")
     d = QDialog(parent)
     d.setObjectName("cableconfirm")
     d.setWindowTitle(_("Install the virtual cable?"))
@@ -45,7 +47,7 @@ def ask(parent, install: Callable[[], None], use_mic: Callable[[], None],
     mic.setObjectName("primary")
     mic.setDefault(True)   # Enter: the mic, never the cable
     icons.set_icon(mic, "mic", "on_accent")
-    mic.clicked.connect(lambda: (d.accept(), use_mic()))
+    mic.clicked.connect(lambda: (usage.used("cable-confirm-mic"), d.accept(), use_mic()))
     cable = QPushButton(_("Install the cable anyway"))
     icons.set_icon(cable, "cable")
     cable.clicked.connect(lambda: (d.accept(), install()))
