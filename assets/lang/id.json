@@ -850,7 +850,6 @@
   "Grey": "Abu-abu",
   "Group servers by site (googlevideo.com, not each r3---sn-abc.googlevideo.com)": "Kelompokkan server berdasarkan situs (googlevideo.com, tidak setiap r3---sn-abc.googlevideo.com)",
   "Half (-12 dB)": "Setengah (-12 dB)",
-  "Hey, thanks for actually using this. Onion Board started because every soundboard I tried was either ugly, full of ads, or quietly phoning home, so I made my own and it kind of snowballed from there. It's just me building it, a lot of late nights and a lot of testing, so if something's broken, ugly or confusing, tell me. Honestly. I'd way rather hear \"this part is cooked\" than have you quietly uninstall it.\n\nIt's free and it's staying free. Have fun with it, don't be a menace with it, and go make your friends jump in voice chat.\n\nOnionAlien": "Hei, makasih sudah beneran memakai ini. Onion Board lahir karena semua soundboard yang kucoba kalau nggak jelek, penuh iklan, ya diam-diam kirim data ke luar, jadi aku bikin sendiri dan lama-lama jadi sebesar ini. Yang bikin cuma aku sendiri, banyak begadang dan banyak tes, jadi kalau ada yang rusak, jelek, atau membingungkan, bilang aja. Serius. Aku jauh lebih suka dengar \"bagian ini ancur\" daripada kamu diam-diam uninstall.\n\nIni gratis dan bakal tetap gratis. Selamat bersenang-senang, jangan dipakai buat bikin rusuh, dan bikin teman-temanmu kaget di voice chat.\n• OnionAlien",
   "Hide after picking a sound": "Sembunyikan setelah memilih suara",
   "Hide that I'm using Tor": "Sembunyikan bahwa saya menggunakan Tor",
   "Highlight colour": "Warna sorotan",
@@ -3988,5 +3987,6 @@
   "whooo's laughing?": "siapa yang ketawa? huu?",
   "yo, what's good?": "yo, apa kabar?",
   "you shall not pass!": "kau tidak boleh lewat!",
-  "you smell like flowers": "kamu wangi bunga"
+  "you smell like flowers": "kamu wangi bunga",
+  "No ads, no account, no spying, free forever. Found a bug? Tell me. Have fun.\n\nOnionAlien": "Tanpa iklan, tanpa akun, tanpa mata-mata, gratis selamanya. Nemu bug? Kasih tahu aku. Selamat bersenang-senang.\n\nOnionAlien"
 }

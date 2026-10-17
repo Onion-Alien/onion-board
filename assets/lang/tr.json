@@ -870,7 +870,6 @@
   "Grey": "Gri",
   "Group servers by site (googlevideo.com, not each r3---sn-abc.googlevideo.com)": "Sunucuları siteye göre gruplandırın (googlevideo.com, her r3---sn-abc.googlevideo.com değil)",
   "Half (-12 dB)": "Yarım (-12 dB)",
-  "Hey, thanks for actually using this. Onion Board started because every soundboard I tried was either ugly, full of ads, or quietly phoning home, so I made my own and it kind of snowballed from there. It's just me building it, a lot of late nights and a lot of testing, so if something's broken, ugly or confusing, tell me. Honestly. I'd way rather hear \"this part is cooked\" than have you quietly uninstall it.\n\nIt's free and it's staying free. Have fun with it, don't be a menace with it, and go make your friends jump in voice chat.\n\nOnionAlien": "Hey, bunu gerçekten kullandığın için teşekkürler. Onion Board, denediğim her ses tahtasının ya çirkin olması, reklamlarla dolu olması ya da sessizce eve telefon etmesi nedeniyle başladı, ben de kendiminkini yaptım ve oradan kartopu gibi büyüdü. Onu sadece ben yapıyorum, gece geç saatlere kadar çalışıyorum ve çok fazla test yapıyorum, bu yüzden bir şey bozulursa, çirkinse ya da kafa karıştırıcıysa bana söyleyin. Açıkçası. Sessizce kaldırmanızdansa \"bu kısım pişmiş\" demeyi tercih ederim. Ücretsizdir ve ücretsiz kalacaktır. Onunla eğlenin, ona zarar vermeyin ve arkadaşlarınızın sesli sohbete katılmasını sağlayın., OnionAlien",
   "Hide after picking a sound": "Bir ses seçtikten sonra gizle",
   "Hide that I'm using Tor": "Tor kullandığımı gizle",
   "Highlight colour": "Rengi vurgula",
@@ -4066,5 +4065,6 @@
   "whooo's laughing?": "kim gülüyor? huu?",
   "yo, what's good?": "yo, naber?",
   "you shall not pass!": "geçemezsin!",
-  "you smell like flowers": "çiçek gibi kokuyorsun"
+  "you smell like flowers": "çiçek gibi kokuyorsun",
+  "No ads, no account, no spying, free forever. Found a bug? Tell me. Have fun.\n\nOnionAlien": "Reklam yok, hesap yok, gözetleme yok, sonsuza dek ücretsiz. Hata mı buldun? Bana söyle. İyi eğlenceler.\n\nOnionAlien"
 }

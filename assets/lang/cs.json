@@ -468,7 +468,6 @@
   "Half (-12 dB)": "Napůl (-12 dB)",
   "Hear it myself": "Slyšet to taky",
   "Hear what they hear": "Slyšet, co slyší oni",
-  "Hey, thanks for actually using this. Onion Board started because every soundboard I tried was either ugly, full of ads, or quietly phoning home, so I made my own and it kind of snowballed from there. It's just me building it, a lot of late nights and a lot of testing, so if something's broken, ugly or confusing, tell me. Honestly. I'd way rather hear \"this part is cooked\" than have you quietly uninstall it.\n\nIt's free and it's staying free. Have fun with it, don't be a menace with it, and go make your friends jump in voice chat.\n\nOnionAlien": "Čau, díky, že to fakt používáš. Onion Board vznikl, protože každý soundboard, co jsem zkoušel, byl buď ošklivý, plný reklam, nebo potichu posílal data domů, tak jsem si udělal vlastní a nějak se to nabalilo. Dělám ho jen já, spousta probdělých nocí a spousta testování, takže jestli je něco rozbité, ošklivé nebo matoucí, řekni mi to. Fakt. Mnohem radši uslyším „tahle část je totálně v háji“, než se dočkat tiché odinstalace.\n\nJe zdarma a zdarma zůstane. Užij si ho, nedělej s ním bordel a jdi vylekat kámoše ve voice chatu.\n• OnionAlien",
   "Hide": "Skrýt",
   "Hide after picking a sound": "Skrýt po výběru zvuku",
   "Hide that I'm using Tor": "Skrýt, že používám Tor",
@@ -4144,5 +4143,6 @@
   "whooo's laughing?": "kdo se směje? hú?",
   "yo, what's good?": "čau, jak je?",
   "you shall not pass!": "neprojdeš!",
-  "you smell like flowers": "voníš po květinách"
+  "you smell like flowers": "voníš po květinách",
+  "No ads, no account, no spying, free forever. Found a bug? Tell me. Have fun.\n\nOnionAlien": "Žádné reklamy, žádný účet, žádné špehování, zdarma navždy. Našel jsi chybu? Napiš mi. Bav se.\n\nOnionAlien"
 }

@@ -459,7 +459,6 @@
   "Half (-12 dB)": "Félig (-12 dB)",
   "Hear it myself": "Én is halljam",
   "Hear what they hear": "Halld, amit ők hallanak",
-  "Hey, thanks for actually using this. Onion Board started because every soundboard I tried was either ugly, full of ads, or quietly phoning home, so I made my own and it kind of snowballed from there. It's just me building it, a lot of late nights and a lot of testing, so if something's broken, ugly or confusing, tell me. Honestly. I'd way rather hear \"this part is cooked\" than have you quietly uninstall it.\n\nIt's free and it's staying free. Have fun with it, don't be a menace with it, and go make your friends jump in voice chat.\n\nOnionAlien": "Hé, köszi, hogy tényleg használod. Az Onion Board azért indult, mert minden soundboard, amit kipróbáltam, vagy csúnya volt, vagy tele reklámmal, vagy csendben hazatelefonált, úgyhogy csináltam egy sajátot, és onnan kicsit elszabadult. Csak én építem, sok késő éjszakával és rengeteg teszteléssel, szóval ha valami rossz, csúnya vagy zavaros, szólj. Komolyan. Sokkal szívesebben hallom, hogy „ez a rész szét van csúszva”, mint hogy csendben letöröld.\n\nIngyenes, és az is marad. Érezd jól magad vele, ne legyél vele csapás, és ijeszd meg a haverjaidat a beszédchatben.\n• OnionAlien",
   "Hide": "Elrejtés",
   "Hide after picking a sound": "Elrejtés hang kiválasztása után",
   "Hide that I'm using Tor": "Rejtsd el, hogy Tort használok",
@@ -4066,5 +4065,6 @@
   "whooo's laughing?": "ki nevet? huu?",
   "yo, what's good?": "cső, mi újság?",
   "you shall not pass!": "nem mehetsz át!",
-  "you smell like flowers": "virágillatod van"
+  "you smell like flowers": "virágillatod van",
+  "No ads, no account, no spying, free forever. Found a bug? Tell me. Have fun.\n\nOnionAlien": "Nincs reklám, nincs fiók, nincs kémkedés, örökre ingyenes. Hibát találtál? Szólj. Jó szórakozást.\n\nOnionAlien"
 }

@@ -459,7 +459,6 @@
   "Half (-12 dB)": "Puolet (-12 dB)",
   "Hear it myself": "Kuulen sen itse",
   "Hear what they hear": "Kuule mitä he kuulevat",
-  "Hey, thanks for actually using this. Onion Board started because every soundboard I tried was either ugly, full of ads, or quietly phoning home, so I made my own and it kind of snowballed from there. It's just me building it, a lot of late nights and a lot of testing, so if something's broken, ugly or confusing, tell me. Honestly. I'd way rather hear \"this part is cooked\" than have you quietly uninstall it.\n\nIt's free and it's staying free. Have fun with it, don't be a menace with it, and go make your friends jump in voice chat.\n\nOnionAlien": "Hei, kiitos että oikeasti käytät tätä. Onion Board sai alkunsa, koska jokainen kokeilemani soundboard oli joko ruma, täynnä mainoksia tai soitteli salaa kotiin, joten tein oman, ja siitä se sitten lähti lumipallona. Teen tätä yksin, paljon myöhäisiä iltoja ja paljon testausta, joten jos jokin on rikki, rumaa tai sekavaa, kerro minulle. Ihan oikeasti. Kuulen paljon mieluummin \"tää osa on ihan kuralla\" kuin että poistat sen hiljaa.\n\nSe on ilmainen ja pysyy ilmaisena. Pidä hauskaa, älä ole sillä riesa, ja säikyttele kavereitasi puhechatissa.\n• OnionAlien",
   "Hide": "Piilota",
   "Hide after picking a sound": "Piilota äänen valinnan jälkeen",
   "Hide that I'm using Tor": "Piilota, että käytän Toria",
@@ -4066,5 +4065,6 @@
   "whooo's laughing?": "kuka nauraa? huu?",
   "yo, what's good?": "moro, mitä kuuluu?",
   "you shall not pass!": "et pääse ohi!",
-  "you smell like flowers": "tuoksut kukilta"
+  "you smell like flowers": "tuoksut kukilta",
+  "No ads, no account, no spying, free forever. Found a bug? Tell me. Have fun.\n\nOnionAlien": "Ei mainoksia, ei tiliä, ei vakoilua, ilmainen ikuisesti. Löysitkö bugin? Kerro minulle. Pidä hauskaa.\n\nOnionAlien"
 }

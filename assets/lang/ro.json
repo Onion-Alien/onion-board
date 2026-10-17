@@ -468,7 +468,6 @@
   "Half (-12 dB)": "Jumătate (-12 dB)",
   "Hear it myself": "Aud și eu",
   "Hear what they hear": "Auzi ce aud ei",
-  "Hey, thanks for actually using this. Onion Board started because every soundboard I tried was either ugly, full of ads, or quietly phoning home, so I made my own and it kind of snowballed from there. It's just me building it, a lot of late nights and a lot of testing, so if something's broken, ugly or confusing, tell me. Honestly. I'd way rather hear \"this part is cooked\" than have you quietly uninstall it.\n\nIt's free and it's staying free. Have fun with it, don't be a menace with it, and go make your friends jump in voice chat.\n\nOnionAlien": "Hei, mersi că chiar folosești asta. Onion Board a pornit pentru că fiecare soundboard pe care l-am încercat era ori urât, ori plin de reclame, ori trimitea pe ascuns date acasă, așa că mi-am făcut unul și de acolo a luat-o razna. Îl construiesc doar eu, cu multe nopți nedormite și multe teste, așa că dacă ceva e stricat, urât sau confuz, spune-mi. Pe bune. Prefer de o mie de ori să aud „partea asta e varză” decât să-l dezinstalezi în liniște.\n\nE gratuit și rămâne gratuit. Distrează-te cu el, nu fi o pacoste cu el, și fă-ți prietenii să sară în chatul vocal.\n• OnionAlien",
   "Hide": "Ascunde",
   "Hide after picking a sound": "Ascunde după ce alegi un sunet",
   "Hide that I'm using Tor": "Ascunde că folosesc Tor",
@@ -4144,5 +4143,6 @@
   "whooo's laughing?": "cine râde? huu?",
   "yo, what's good?": "salut, ce faci?",
   "you shall not pass!": "nu vei trece!",
-  "you smell like flowers": "miroși a flori"
+  "you smell like flowers": "miroși a flori",
+  "No ads, no account, no spying, free forever. Found a bug? Tell me. Have fun.\n\nOnionAlien": "Fără reclame, fără cont, fără spionaj, gratuit pentru totdeauna. Ai găsit un bug? Spune-mi. Distracție plăcută.\n\nOnionAlien"
 }

@@ -459,7 +459,6 @@
   "Half (-12 dB)": "Halvparten (-12 dB)",
   "Hear it myself": "Hør den selv",
   "Hear what they hear": "Hør det de hører",
-  "Hey, thanks for actually using this. Onion Board started because every soundboard I tried was either ugly, full of ads, or quietly phoning home, so I made my own and it kind of snowballed from there. It's just me building it, a lot of late nights and a lot of testing, so if something's broken, ugly or confusing, tell me. Honestly. I'd way rather hear \"this part is cooked\" than have you quietly uninstall it.\n\nIt's free and it's staying free. Have fun with it, don't be a menace with it, and go make your friends jump in voice chat.\n\nOnionAlien": "Hei, takk for at du faktisk bruker dette. Onion Board startet fordi alle soundboardene jeg prøvde, enten var stygge, fulle av reklame eller i det stille ringte hjem, så jeg lagde mitt eget, og så balla det på seg derfra. Det er bare meg som bygger det, mange sene kvelder og mye testing, så hvis noe er ødelagt, stygt eller forvirrende, si fra. Ærlig talt. Jeg vil mye heller høre \"denne delen er helt kokt\" enn at du avinstallerer i det stille.\n\nDet er gratis, og det forblir gratis. Ha det gøy med det, ikke vær en plage med det, og få vennene dine til å hoppe i talechatten.\n• OnionAlien",
   "Hide": "Skjul",
   "Hide after picking a sound": "Skjul etter at en lyd er valgt",
   "Hide that I'm using Tor": "Skjul at jeg bruker Tor",
@@ -4066,5 +4065,6 @@
   "whooo's laughing?": "hvem ler? hoo?",
   "yo, what's good?": "halla, skjer'a?",
   "you shall not pass!": "du skal ikke passere!",
-  "you smell like flowers": "du lukter blomster"
+  "you smell like flowers": "du lukter blomster",
+  "No ads, no account, no spying, free forever. Found a bug? Tell me. Have fun.\n\nOnionAlien": "Ingen reklame, ingen konto, ingen overvåking, gratis for alltid. Funnet en feil? Si fra til meg. Ha det gøy.\n\nOnionAlien"
 }

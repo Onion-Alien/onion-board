@@ -890,7 +890,6 @@
   "Grey": "Szary",
   "Group servers by site (googlevideo.com, not each r3---sn-abc.googlevideo.com)": "Grupuj serwery według witryn (googlevideo.com, a nie każdy r3---sn-abc.googlevideo.com)",
   "Half (-12 dB)": "Połowa (-12 dB)",
-  "Hey, thanks for actually using this. Onion Board started because every soundboard I tried was either ugly, full of ads, or quietly phoning home, so I made my own and it kind of snowballed from there. It's just me building it, a lot of late nights and a lot of testing, so if something's broken, ugly or confusing, tell me. Honestly. I'd way rather hear \"this part is cooked\" than have you quietly uninstall it.\n\nIt's free and it's staying free. Have fun with it, don't be a menace with it, and go make your friends jump in voice chat.\n\nOnionAlien": "Hej, dziękuję, że faktycznie z tego skorzystałeś. Cebula Board powstała, ponieważ każda płyta rezonansowa, którą wypróbowałem, była albo brzydka, pełna reklam, albo cicho dzwoniła do domu, więc stworzyłam własną i od tego czasu wszystko potoczyło się lawinowo. To tylko ja to buduję, dużo przesiaduję do późna w nocy i dużo testuję, więc jeśli coś jest zepsute, brzydkie lub zagmatwane, powiedz mi. Szczerze mówiąc. Wolałbym usłyszeć, że „ta część jest ugotowana”, niż żebyś ją po cichu odinstalował. To nic nie kosztuje i pozostanie darmowe. Baw się z nim, nie bądź dla niego zagrożeniem i spraw, aby Twoi znajomi wskoczyli na czat głosowy., Cebulowy Alien",
   "Hide after picking a sound": "Ukryj po wybraniu dźwięku",
   "Hide that I'm using Tor": "Ukryj, że używam Tora",
   "Highlight colour": "Zaznacz kolor",
@@ -4144,5 +4143,6 @@
   "whooo's laughing?": "kto się śmieje? huu?",
   "yo, what's good?": "siema, co tam?",
   "you shall not pass!": "nie przejdziesz!",
-  "you smell like flowers": "pachniesz kwiatami"
+  "you smell like flowers": "pachniesz kwiatami",
+  "No ads, no account, no spying, free forever. Found a bug? Tell me. Have fun.\n\nOnionAlien": "Bez reklam, bez konta, bez szpiegowania, za darmo na zawsze. Znalazłeś błąd? Daj mi znać. Baw się dobrze.\n\nOnionAlien"
 }
