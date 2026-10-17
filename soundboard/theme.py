@@ -408,7 +408,7 @@ QRadioButton::indicator:disabled { image:url("$radio_off"); }
 QRadioButton::indicator:checked:disabled { image:url("$radio_on_off"); }
 QListWidget#settingscategories { background:transparent; border:none; outline:0; }
 QListWidget#settingscategories::item { padding:4px; border-radius:8px; }
-QListWidget#settingscategories::item:selected { background:$card_hi; color:$text_hi; }
+QListWidget#settingscategories::item:selected { background:$nav_sel; color:$text_hi; }
 QListWidget#settingscategories::item:hover:!selected { background:$inset; }
 QListWidget#pointlist { background:$inset; border:1px solid $border; border-radius:12px; padding:6px; outline:0; }
 QListWidget#pointlist::item { background:transparent; border:none; border-radius:8px; margin:2px 0; color:$muted; }
@@ -917,17 +917,48 @@ def is_light(name: str | None = None) -> bool:
     return 0.299 * c.red() + 0.587 * c.green() + 0.114 * c.blue() > 140
 
 
+def stand_out(base: str, towards: tuple[str, ...], need: float,
+              tk: dict[str, str]) -> str:
+    """`base` moved towards the first of `towards` that gets there until it stands out
+    from `base` by `need`:1 while text_hi still reads on it (4.5:1)."""
+    return next((c for c in (_mix(base, to, i / 50) for to in towards for i in range(2, 30))
+                 if _contrast(c, base) >= need and _contrast(c, tk["text_hi"]) >= 4.5),
+                _mix(base, tk["text"], 0.25))
+
+
+def rail_bg(tk: dict[str, str], outlined: bool) -> str:
+    """The side rail's colour: the window's with a little of the panel's in it."""
+    return tk["panel"] if outlined else _mix(tk["bg"], tk["panel"], 0.18)
+
+
+def rail_tint() -> tuple[str, float]:
+    """The rail's current tab's fill: the accent at a soft 16% where that shows, more
+    where it would vanish, and the darker accent_text where even that can't (Flashbang's
+    yellow on white was 1.07:1). (colour, alpha)"""
+    base = rail_bg(T, current_name in OUTLINED)
+    for key in ("accent", "accent_text"):
+        for a in range(16, 52, 2):
+            if _contrast(_mix(base, T[key], a / 100), base) >= 1.3:
+                return T[key], a / 100
+    return T["accent_text"], 0.5
+
+
 def stylesheet(name: str | None = None) -> str:
     tk = tokens(name)
     tk.setdefault("font", FONT)
     outlined = (name or current_name) in OUTLINED
     # Navigation belongs to the window background, with a quiet inner edge.
     # Outlined themes keep their deliberate surface and strong divider.
-    tk["rail_bg"] = tk["panel"] if outlined else _mix(tk["bg"], tk["panel"], 0.18)
+    tk["rail_bg"] = rail_bg(tk, outlined)
     tk["rail_border"] = tk["border"] if outlined else _mix(tk["bg"], tk["border"], 0.35)
     # card titles in the text colour; High Contrast keeps its yellow to scan by
     tk["heading"] = tk["section"] if outlined else tk["text_hi"]
     # a nudged button (DESIGN *Buttons*): a soft wash of the accent behind its edge
+    # the Settings list's page you're on, on the window: card_hi was 1.03:1 there in
+    # the light themes (Paper, Light: no visible mark). A theme whose own colour stood
+    # out more already keeps it (Swamp, Deep Fried, Retro 98).
+    tk["nav_sel"] = max((stand_out(tk["bg"], (tk["accent"], tk["text"]), 1.5, tk),
+                         tk["card_hi"]), key=lambda c: _contrast(c, tk["bg"]))
     tk["accent_tint"] = _rgba(tk["accent"], 0.30)
     tk["accent_tint_hi"] = _rgba(tk["accent"], 0.42)
     tk["check"] = _check_url(tk["on_accent"])

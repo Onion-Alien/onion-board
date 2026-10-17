@@ -46,7 +46,6 @@ ICON_PAD = " "   # Qt puts only ~4 px between a button's icon and its words, a
                       # (~6 px) in front of the words does
 TEXT_W = OPEN_W - 2 * SIDE_OPEN - ICON - 24   # a name's room on the open rail (icon,
                                               # padding, border, the gap after the icon)
-TINT_ALPHA = 0.16  # the current tab's soft accent fill (an outlined box looked heavy)
 
 
 class SideTabs(QTabWidget):
@@ -160,7 +159,7 @@ class RailTab(QToolButton):
     def paintEvent(self, e):
         r = QRectF(self.rect()).adjusted(0.5, 0.5, -0.5, -0.5)
         if self.isChecked():   # the current tab: a soft accent fill under the icon
-            self._fill(r, theme.T["accent"], TINT_ALPHA)
+            self._fill(r, *theme.rail_tint())
         super().paintEvent(e)
         if self.hasFocus() and self._kbd_focus:
             p = QPainter(self)
@@ -1586,8 +1585,9 @@ class SideRail(QFrame):
             r = r.adjusted(0.5, 0.5, -0.5, -0.5)
             fill = None
             if obj.isChecked():
-                fill = QColor(theme.T["accent"])
-                fill.setAlphaF(TINT_ALPHA)
+                colour, alpha = theme.rail_tint()
+                fill = QColor(colour)
+                fill.setAlphaF(alpha)
             elif obj.underMouse():
                 fill = QColor(theme.T["btn_hover"])
             ring = obj.hasFocus()
