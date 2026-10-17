@@ -73,7 +73,7 @@ def groups(today: datetime.date | None = None) -> list[tuple[str, list[str]]]:
 T: dict[str, str] = dict(THEMES[DEFAULT])   # current theme (read at paint time)
 current_name = DEFAULT
 live_override = ""   # the user's own highlight colour ("" = each theme's own)
-textures_on = False  # Settings > Appearance: Textured (each theme's pattern) or Plain
+textures_on = True  # Settings > Appearance: Textured (each theme's pattern, the default) or Plain
 # what the style kit (Bun's outfit, Hoot, the textures) paints in
 hooks.connect(palette=lambda: T, theme_name=lambda: current_name, tr=_)
 
