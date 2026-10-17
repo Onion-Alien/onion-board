@@ -89,7 +89,7 @@ class VoiceStatusBar(QFrame):
         mic = self._mic = QWidget()
         mic.setObjectName("voicebarpart")      # no fill of its own: the bar's shows
         mic.setFixedHeight(STOP_H)
-        mh = QHBoxLayout(mic)
+        mh = self._mic_row = QHBoxLayout(mic)
         mh.setContentsMargins(0, 0, 0, 0)
         mh.setSpacing(8)
         # a big red Stop with its word: the one way out of every voice at once, it
@@ -203,7 +203,7 @@ class VoiceStatusBar(QFrame):
         # would squeeze it below that, put them underneath instead. (Half the whole
         # bar, Stop included, sent two chips with their close buttons under the meter
         # on a window that had room for them.)
-        mic_labels = (self._mic.layout().sizeHint().width()
+        mic_labels = (self._mic_row.sizeHint().width()
                       - self.meter.sizeHint().width())
         meter = (self.width() - self.stop_button.width() - self.record_button.width() + 1) // 2
         need = max(160, meter + mic_labels) + GAP + line
