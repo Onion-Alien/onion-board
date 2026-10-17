@@ -409,6 +409,8 @@ class Config:
     hotkeys_share: bool = True        # the game still gets a hotkey's key (winkeys.Hotkeys.share)
     pong_sounds: bool = True          # Pong with Bun's sounds (its speaker button)
     theme: str = "Dark"
+    # limited-edition themes picked while on offer: theirs for good (theme.kept)
+    kept_themes: list[str] = field(default_factory=list)
     # the app's language, a catalog code (assets/lang); "" = never picked (i18n.startup)
     language: str = ""
     # the whole interface's size in percent (Settings > Appearance), on top of Windows'

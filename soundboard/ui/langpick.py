@@ -91,15 +91,20 @@ def paint_coin(p: QPainter, r: QRectF, mark: str, on: bool, font: QFont):
     p.restore()
 
 
-def coin_icon(mark: str, font: QFont, size: int = 26, dpr: float = 1.0) -> QIcon:
-    """The picked language's coin as an icon (the Settings button wears it)."""
-    pm = QPixmap(round(size * dpr), round(size * dpr))
+def coin_icon(mark: str, font: QFont, size: int = 26, dpr: float = 1.0,
+              gap: int = 0) -> QIcon:
+    """The picked language's coin as an icon (the Settings button wears it), with `gap`
+    clear pixels on its right: room before the button's text."""
+    pm = QPixmap(round((size + gap) * dpr), round(size * dpr))
     pm.setDevicePixelRatio(dpr)
     pm.fill(Qt.GlobalColor.transparent)
     p = QPainter(pm)
     paint_coin(p, QRectF(0, 0, size, size), mark, True, font)
     p.end()
     return QIcon(pm)
+
+
+COIN_GAP = 6   # between the button's coin and its text, on top of Qt's own few pixels
 
 
 class LangButton(QPushButton):
@@ -109,7 +114,8 @@ class LangButton(QPushButton):
     def __init__(self, parent=None):
         super().__init__(parent)
         self.mark = ""
-        self.setIconSize(QSize(26, 26))
+        self.setObjectName("langbutton")   # (less padding on its left: the coin's round)
+        self.setIconSize(QSize(26 + COIN_GAP, 26))
 
     def show_language(self, code: str, own: str):
         self.mark = glyph(code, own)
@@ -118,7 +124,8 @@ class LangButton(QPushButton):
 
     def _repaint_coin(self):
         if self.mark:
-            self.setIcon(coin_icon(self.mark, self.font(), 26, self.devicePixelRatioF()))
+            self.setIcon(coin_icon(self.mark, self.font(), 26, self.devicePixelRatioF(),
+                                   COIN_GAP))
 
     def changeEvent(self, e):
         super().changeEvent(e)

@@ -20,7 +20,7 @@ from PySide6.QtGui import (QColor, QCursor, QFont, QImage, QPainter, QPainterPat
                            QRadialGradient)
 from PySide6.QtWidgets import QSizePolicy, QWidget
 
-from . import appstate, bunnyfit, hooks
+from . import appstate, bunnyfit, hooks, mascotlines
 from .appstate import snap_to_pixels
 from .hooks import _
 
@@ -105,6 +105,9 @@ LOOKS: dict[str, dict] = {
     "Blood Moon": {"feather": "#4a3b4c", "wing": "#2e2430", "iris": "#ff3b2f", "face": "#e6d6d8",
                    "belly": "#c4a0a6", "marks": "chevrons", "mark": "#7a4652", "tufts": "tall",
                    "beak": "#ff8a3d"},
+    "Halloween": {"feather": "#4a3a56", "wing": "#2c2233", "iris": "#ff8a1f",
+                  "face": "#efe0ef", "belly": "#ffb066", "marks": "chevrons",
+                  "mark": "#ff7518", "tufts": "tall", "beak": "#ffcf40", "feet": "#ff8a1f"},
     "Lava": {"feather": "#e0482a", "wing": "#a02a14", "iris": "#ffd23d", "belly": "#ffe0b8",
              "marks": "spots", "mark": "#3d2c2c", "tufts": "swept", "beak": "#ffd23d"},
     "Amber Terminal": {"feather": "#c98a2a", "wing": "#8a5a14", "iris": "#ffb000",
@@ -694,6 +697,7 @@ class OwlWidget(QWidget):
         self._near = 0.0           # 0..1, how close the mouse is (smoothed)
         self._joy_t = -1.0         # seconds since he was clicked, or -1
         self.say = ""              # the speech bubble's text
+        self._say_until = 0.0      # when a click's line goes (self.t), or 0
         self._look = [0.0, 0.7]    # pupils, smoothed
         self._glance = (0.0, 0.7)  # where he looks when left alone
         self._next_glance = 1.5
@@ -765,7 +769,10 @@ class OwlWidget(QWidget):
         """A happy hop with sparkles (what a click does)."""
         self._joy_t = 0.0
         self._stop_act()
-        self.say = self._rng.choice(self.joy_lines) if self.joy_lines else ""
+        # his own lines for where he is, and his theme's character (mascotlines.py)
+        self.say = (mascotlines.pick(self._rng, self.joy_lines + mascotlines.hoot(), self.say)
+                    if self.joy_lines else "")
+        self._say_until = self.t + mascotlines.read_secs(self.say)
 
     # ------------------------------------------------------------------ time
     def _owl_rect(self) -> QRectF:
@@ -818,7 +825,11 @@ class OwlWidget(QWidget):
             self._joy_t += dt
             if self._joy_t > 1.6:
                 self._joy_t = -1.0
-                self.say = ""
+                if self.t >= self._say_until:
+                    self.say = ""
+        elif self.say and not self.act and 0 < self._say_until <= self.t:
+            self._say_until = 0.0   # a longer line from a click stays until it's read
+            self.say = ""
         if self.act:
             self._act_t += dt
             if self._act_t >= ACTS[self.act]:

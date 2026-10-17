@@ -6,6 +6,7 @@ the hand-painted widgets (pads, meters, EQ curve, logo) read the same tokens thr
 """
 from __future__ import annotations
 
+import datetime
 import re
 import tempfile
 from contextlib import contextmanager
@@ -14,14 +15,15 @@ from string import Template
 
 from PySide6.QtCore import QObject, QPointF, QRectF, Qt
 from PySide6.QtGui import (QColor, QIcon, QImage, QLinearGradient, QPainter,
-                           QPainterPath, QPen, QPixmap, QTransform)
+                           QPainterPath, QPen, QPixmap, QPolygonF, QRadialGradient,
+                           QTransform)
 from shiboken6 import isValid as qt_valid
 
 from soundboard.i18n import _
 from soundboard.style import hooks, palettes, textures
 # the colours and textures are in the style kit, shared with Onion Watch
-from soundboard.style.palettes import (DEFAULT, FONT, GROUPS, LIVE_NAMES,  # noqa: F401
-                                       LIVE_STYLE, TEXT_ON,
+from soundboard.style.palettes import (DEFAULT, FONT, GROUPS, LIMITED,  # noqa: F401
+                                       LIVE_NAMES, LIVE_STYLE, TEXT_ON,
                                        THEMES, _add_live_tokens, _contrast, _mix,
                                        font_families, is_light_colour, mix, valid_colour)
 from soundboard.style.textures import (AURORA, TEXTURE_TILE, TEXTURES,  # noqa: F401
@@ -33,6 +35,39 @@ def group_name(group: str) -> str:
     English; a function: this module can be imported before the language is)."""
     return {"Classic": _("Classic"), "Colourful": _("Colourful"), "Wild": _("Wild"),
             "Meme": _("Meme")}.get(group, group)
+
+
+kept: set[str] = set()   # limited-edition themes this user picked in time (Config.kept_themes)
+
+
+def _today() -> datetime.date:
+    return datetime.date.today()   # (the tests pin it inside every offer)
+
+
+def on_offer(name: str, today: datetime.date | None = None) -> bool:
+    """Whether limited-edition theme `name` can still be picked by anyone (False for an
+    everyday theme: it has no offer to end)."""
+    return name in LIMITED and (today or _today()) <= LIMITED[name]
+
+
+def offered(name: str, today: datetime.date | None = None) -> bool:
+    """Whether theme `name` is in this user's list: every everyday theme, and a limited
+    one while it's on offer or once they've kept it."""
+    return name in THEMES and (name not in LIMITED or name in kept or on_offer(name, today))
+
+
+def keep(name: str, today: datetime.date | None = None) -> bool:
+    """Theme `name` was used: a limited one still on offer is the user's for good.
+    True when that's new (the caller saves `kept`)."""
+    if name in kept or not on_offer(name, today):
+        return False
+    kept.add(name)
+    return True
+
+
+def groups(today: datetime.date | None = None) -> list[tuple[str, list[str]]]:
+    """GROUPS as this user's Settings shows them: limited themes gone once missed."""
+    return [(g, [n for n in names if offered(n, today)]) for g, names in GROUPS]
 
 
 T: dict[str, str] = dict(THEMES[DEFAULT])   # current theme (read at paint time)
@@ -77,7 +112,7 @@ def set_tone(label, kind: str = "") -> None:
 
 def set_current(name: str) -> str:
     global current_name
-    name = name if name in THEMES else DEFAULT
+    name = name if offered(name) else DEFAULT
     current_name = name
     T.clear()
     T.update(tokens(name))
@@ -260,6 +295,7 @@ QPushButton#railupdatecopy:focus { border-color:$accent; }
 QFrame#sidebar[compact="true"] QToolButton#railtab,
 QFrame#sidebar[compact="true"] QPushButton { padding-top:2px; padding-bottom:2px; }
 QPushButton#settings { padding:6px 14px; font-weight:600; }
+QPushButton#langbutton { padding-left:7px; }   /* ui/langpick.py: the round coin sits near its edge */
 QFrame#transport, QFrame#deck { background:$panel; border-radius:12px; }
 QDialog#transport { background:$panel; }
 QDialog[popover="true"] { background:$panel; border:1px solid $border; }
@@ -1210,10 +1246,87 @@ def apply_live(app, colour: str) -> str:
 
 # --------------------------------------------------------------------------- logo
 
+# a theme with logo="lantern" (Halloween) carves the onion into a jack-o'-lantern. Picked
+# by its accent pair, so every cache of the mark (keyed by its two colours) stays right.
+_LANTERN = {(t["accent"].lower(), t["accent2"].lower()) for t in THEMES.values()
+            if t.get("logo") == "lantern"}
+
+
+def _paint_lantern(p: QPainter, x0: float, y0: float, s: float, inset: float) -> None:
+    """The mark as a jack-o'-lantern: the onion's shape on a night-sky tile, pumpkin
+    orange with darker ribs where its layers are, a carved face glowing inside."""
+    body = QPainterPath()
+    body.addRoundedRect(QRectF(x0 + s * inset, y0 + s * inset, s * (1 - 2 * inset),
+                               s * (1 - 2 * inset)), s * 0.26, s * 0.26)
+    sky = QLinearGradient(QPointF(x0, y0), QPointF(x0 + s, y0 + s))
+    sky.setColorAt(0.0, QColor("#3b2152"))
+    sky.setColorAt(1.0, QColor("#120a18"))
+    p.fillPath(body, sky)
+    cx = x0 + s * 0.5
+
+    def pt(dx, dy):
+        return QPointF(cx + dx * s, y0 + dy * s)
+
+    def bulb(w):
+        path = QPainterPath(pt(0, 0.27))
+        path.cubicTo(pt(w * 0.25, 0.36), pt(w, 0.42), pt(w, 0.59))
+        path.cubicTo(pt(w, 0.74), pt(w * 0.55, 0.81), pt(0, 0.81))
+        path.cubicTo(pt(-w * 0.55, 0.81), pt(-w, 0.74), pt(-w, 0.59))
+        path.cubicTo(pt(-w, 0.42), pt(-w * 0.25, 0.36), pt(0, 0.27))
+        return path
+
+    halo = QRadialGradient(pt(0, 0.6), s * 0.45)   # the candle's light on the night
+    halo.setColorAt(0.0, QColor(255, 140, 40, 110))
+    halo.setColorAt(1.0, QColor(255, 140, 40, 0))
+    p.fillPath(body, halo)
+    stem = QPen(QColor("#6cc04a"), max(1.2, s * 0.055))
+    stem.setCapStyle(Qt.PenCapStyle.RoundCap)
+    p.setPen(stem)
+    p.setBrush(Qt.BrushStyle.NoBrush)
+    leaf = QPainterPath(pt(0, 0.29))
+    leaf.cubicTo(pt(0, 0.20), pt(-0.04, 0.15), pt(-0.12, 0.12))
+    leaf.moveTo(pt(0, 0.27))
+    leaf.cubicTo(pt(0.01, 0.19), pt(0.05, 0.14), pt(0.10, 0.10))
+    p.drawPath(leaf)
+    skin = QRadialGradient(pt(-0.06, 0.52), s * 0.36)
+    skin.setColorAt(0.0, QColor("#ffb347"))
+    skin.setColorAt(0.6, QColor("#ff7518"))
+    skin.setColorAt(1.0, QColor("#c2440a"))
+    p.setPen(Qt.PenStyle.NoPen)
+    p.fillPath(bulb(0.31), skin)
+    if s >= 20:   # ribs: the onion's layers
+        rib = QPen(QColor(150, 50, 0, 150), max(1.0, s * 0.026))
+        p.setPen(rib)
+        for w in ((0.19, 0.08) if s >= 40 else (0.15,)):
+            p.drawPath(bulb(w))
+    glow = QLinearGradient(pt(0, 0.48), pt(0, 0.76))   # candlelight through the face
+    glow.setColorAt(0.0, QColor("#fff6a8"))
+    glow.setColorAt(1.0, QColor("#ffb020"))
+    face = QPainterPath()
+    for sx in (-1, 1):   # two triangle eyes
+        face.addPolygon(QPolygonF([pt(sx * 0.17, 0.585), pt(sx * 0.05, 0.585),
+                                   pt(sx * 0.10, 0.48)]))
+        face.closeSubpath()
+    mouth = [(-0.20, 0.635), (-0.12, 0.665), (-0.08, 0.635), (-0.04, 0.665), (0.04, 0.665),
+             (0.08, 0.635), (0.12, 0.665), (0.20, 0.635), (0.14, 0.725), (0.06, 0.755),
+             (0.03, 0.725), (-0.03, 0.725), (-0.06, 0.755), (-0.14, 0.725)]
+    face.addPolygon(QPolygonF([pt(dx, dy) for dx, dy in mouth]))
+    face.closeSubpath()
+    p.setPen(Qt.PenStyle.NoPen)
+    p.fillPath(face, glow)
+
+
 def paint_logo(p: QPainter, rect: QRectF, c1: str, c2: str, inset: float = 0.04):
     """The Onion Board mark: a gradient squircle holding an onion whose layers
-    are drawn as sound-wave arcs — onion + soundboard in one shape."""
+    are drawn as sound-wave arcs — onion + soundboard in one shape. (Halloween's
+    colours carve it into a jack-o'-lantern: _LANTERN.)"""
     s = rect.width()
+    if (c1.lower(), c2.lower()) in _LANTERN:
+        p.save()
+        p.setRenderHint(QPainter.RenderHint.Antialiasing)
+        _paint_lantern(p, rect.left(), rect.top(), s, inset)
+        p.restore()
+        return
     x0, y0 = rect.left(), rect.top()
     p.save()
     p.setRenderHint(QPainter.RenderHint.Antialiasing)
