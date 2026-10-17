@@ -202,3 +202,13 @@ def test_a_lit_preset_clicked_again_puts_the_knobs_back(qapp):
     assert b.fx_presets[name].isChecked()
     b.fx_presets[name].click()
     assert b.fx_values() == {"reverb": 0.3}
+
+
+def test_my_setups_label_lines_up_with_its_chips(qapp):
+    """"My setups" sat a few pixels below "No voice": the section label's top padding."""
+    from soundboard.ui.speedpitch import SpeedPitchButton
+    b = SpeedPitchButton()
+    b.set_setups([], "")
+    chip = b._setup_chips[""]
+    assert b._setups_lab.property("head") is True
+    assert b._setups_lab.height() == chip.sizeHint().height()
