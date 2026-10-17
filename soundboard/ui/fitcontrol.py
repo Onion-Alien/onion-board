@@ -50,6 +50,9 @@ class FitControl(Controller):
         f.add(90, "w", self._squeeze_rail)
         f.add(10, "w", mw.padctl._fit_size_picker)
         f.add(18, "w", r.icon_only(mw.btn_view))   # its tooltip says what it is
+        # cards / list: only the other view's icon, one click away
+        f.add(19, "w", lambda tight: (mw.pad_view_toggle.set_compact(tight),
+                                      r.touch(mw.pad_view_toggle)))
         # the label and the dropdown go together: a lone "Clean" said nothing (the full
         # picker is on the Setup tab)
         # the ear button shrinks to its icon first: the level bar is the live part
@@ -83,8 +86,9 @@ class FitControl(Controller):
             mw.btn_yt.setVisible(not tight and mw.ytresults.available()),
             r.touch(mw.btn_yt)))
         f.add(64, "w", r.icon_only(mw.btn_more))
-        f.add(66, "w", lambda tight: (mw.pad_view_toggle.set_compact(tight),
-                                      r.touch(mw.pad_view_toggle)))
+        # the very narrowest: the cards / list switch steps aside too (as the search
+        # button does); the mini player is only a little further
+        f.add(66, "w", r.hide(mw.pad_view_toggle))
         mw._radio_steps = mw.radio.fit_steps()   # swapped with the tab (Privacy)
         f.extend(mw._radio_steps)
         self._tab_steps = {k: getattr(mw, k).fit_steps() for k in ("voice", "triggers")}

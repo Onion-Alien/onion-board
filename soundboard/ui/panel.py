@@ -620,7 +620,7 @@ class ViewToggle(QFrame):
         super().__init__()
         self.setObjectName("viewtoggle")
         h = QHBoxLayout(self)
-        h.setContentsMargins(2, 2, 2, 2)
+        h.setContentsMargins(3, 3, 3, 3)   # the same room on every side of the buttons
         h.setSpacing(2)
         self.buttons: dict[str, QPushButton] = {}
         self._compact = False
@@ -630,7 +630,7 @@ class ViewToggle(QFrame):
             b.setObjectName("viewbtn")
             b.setCheckable(True)
             b.setAutoExclusive(True)
-            b.setFixedSize(30, 26)
+            b.setFixedSize(26, 26)
             b.setCursor(Qt.CursorShape.PointingHandCursor)
             icons.set_icon(b, icon, "muted", "on_accent", size=16)
             b.setToolTip(tip)

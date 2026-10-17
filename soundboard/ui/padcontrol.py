@@ -88,7 +88,7 @@ class PadControl(Controller):
         if view not in library.PAD_VIEWS or view == mw.cfg.pad_view:
             return
         mw.cfg.pad_view = view
-        self._label_view()
+        # (the order button's label is left alone: its words may be folded away)
         mw.pad_view_toggle.set_view(view)
         self._show_size_picker()
         mw._save_now()
