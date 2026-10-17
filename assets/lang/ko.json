@@ -3679,18 +3679,13 @@
   "Votes": "투표",
   "Tutorials are off now. Settings → General turns them back on.": "사용법 안내를 껐어요. 설정 → 일반에서 다시 켤 수 있어요.",
   "Add a sound from my board": "내 보드에서 소리 추가",
-  "Astronaut": "우주비행사",
   "Bass boosted": "베이스 부스트",
-  "Busy café": "붐비는 카페",
-  "Campfire story": "모닥불 이야기",
   "Crackling fire": "타닥이는 불",
   "Crowd": "군중",
   "Engine hum": "엔진 소리",
   "Every sound is in already": "모든 소리가 이미 들어 있어요",
   "Far away": "멀리",
-  "Fighter pilot": "전투기 조종사",
   "From my board": "내 보드에서",
-  "Haunted house": "유령의 집",
   "Muffle": "먹먹함",
   "Next room": "옆방",
   "No sounds on your board yet": "보드에 아직 소리가 없어요",
@@ -3703,7 +3698,6 @@
   "Spaceship hum": "우주선 웅웅 소리",
   "Speed and pitch": "속도와 피치",
   "Speed, pitch, bass and where “{sound}” seems to be": "속도, 피치, 베이스, 그리고 “{sound}”이(가) 어디서 들리는 듯한지",
-  "Storm": "폭풍",
   "Take “{sound}” out of the background": "배경에서 “{sound}” 빼기",
   "Through a wall": "벽 너머",
   "Wind": "바람",
@@ -3712,14 +3706,20 @@
   "packed": "꽉 찬",
   "pouring": "폭우",
   "roaring": "활활",
-  "Background  ·  {n} on": [
-    "배경  ·  {n}개 켜짐"
-  ],
   "Edit voice": "목소리 편집",
   "Edit voice  ·  {n} on": [
     "목소리 편집  ·  {n}개 켜짐"
   ],
   "Make a voice of your own first: Voice tab → Voice changer → Edit voice, or Save what's on under My setups.": "먼저 나만의 목소리를 만드세요: 보이스 탭 → 보이스 체인저 → 목소리 편집, 또는 내 세트에서 켜진 것 저장.",
-  "Rain, wind, a crowd or sounds from your board behind your voice": "목소리 뒤에 비, 바람, 군중 또는 내 보드의 소리",
-  "Your own settings: Edit voice opens them": "나만의 설정: ‘목소리 편집’에서 열 수 있어요"
+  "Your own settings: Edit voice opens them": "나만의 설정: ‘목소리 편집’에서 열 수 있어요",
+  "A sound from my board": "내 보드의 소리",
+  "Add an effect": "효과 추가",
+  "Add {effect}": "{effect} 추가",
+  "Advanced: Edit voice": "고급: 목소리 편집",
+  "Effects  ·  {n}": [
+    "효과  ·  {n}"
+  ],
+  "On top of any voice: they stay when you pick another one.": "어떤 목소리 위에도: 다른 목소리를 골라도 그대로예요.",
+  "Rain, a crowd, an echo or sounds from your board, on top of any voice": "비, 군중, 메아리 또는 보드의 소리를 어떤 목소리 위에든",
+  "Take “{effect}” off": "“{effect}” 빼기"
 }

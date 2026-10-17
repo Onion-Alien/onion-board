@@ -3757,18 +3757,13 @@
   "Votes": "Oylar",
   "Tutorials are off now. Settings → General turns them back on.": "Nasıl yapılırlar şimdi kapalı. Ayarlar → Genel'den yeniden açılır.",
   "Add a sound from my board": "Board'umdan ses ekle",
-  "Astronaut": "Astronot",
   "Bass boosted": "Bas güçlendirilmiş",
-  "Busy café": "Kalabalık kafe",
-  "Campfire story": "Kamp ateşi hikâyesi",
   "Crackling fire": "Çıtırdayan ateş",
   "Crowd": "Kalabalık",
   "Engine hum": "Motor uğultusu",
   "Every sound is in already": "Tüm sesler zaten ekli",
   "Far away": "Uzakta",
-  "Fighter pilot": "Savaş pilotu",
   "From my board": "Board'umdan",
-  "Haunted house": "Perili ev",
   "Muffle": "Boğukluk",
   "Next room": "Yan oda",
   "No sounds on your board yet": "Board'unda henüz ses yok",
@@ -3781,7 +3776,6 @@
   "Spaceship hum": "Uzay gemisi uğultusu",
   "Speed and pitch": "Hız ve perde",
   "Speed, pitch, bass and where “{sound}” seems to be": "Hız, perde, bas ve “{sound}” sesinin nereden geliyormuş gibi duyulacağı",
-  "Storm": "Fırtına",
   "Take “{sound}” out of the background": "“{sound}” sesini arka plandan çıkar",
   "Through a wall": "Duvarın ardından",
   "Wind": "Rüzgâr",
@@ -3790,16 +3784,22 @@
   "packed": "tıklım tıklım",
   "pouring": "sağanak",
   "roaring": "harlı",
-  "Background  ·  {n} on": [
-    "Arka plan  ·  {n} açık",
-    "Arka plan  ·  {n} açık"
-  ],
   "Edit voice": "Sesi düzenle",
   "Edit voice  ·  {n} on": [
     "Sesi düzenle  ·  {n} açık",
     "Sesi düzenle  ·  {n} açık"
   ],
   "Make a voice of your own first: Voice tab → Voice changer → Edit voice, or Save what's on under My setups.": "Önce kendi sesini yap: Ses sekmesi → Ses değiştirici → Sesi düzenle ya da Ayarlarım altında Açık olanı kaydet.",
-  "Rain, wind, a crowd or sounds from your board behind your voice": "Sesinin arkasında yağmur, rüzgâr, kalabalık ya da board'undan sesler",
-  "Your own settings: Edit voice opens them": "Kendi ayarların: “Sesi düzenle” ile açılır"
+  "Your own settings: Edit voice opens them": "Kendi ayarların: “Sesi düzenle” ile açılır",
+  "A sound from my board": "Board'umdan bir ses",
+  "Add an effect": "Efekt ekle",
+  "Add {effect}": "{effect} ekle",
+  "Advanced: Edit voice": "Gelişmiş: Sesi düzenle",
+  "Effects  ·  {n}": [
+    "Efektler  ·  {n}",
+    "Efektler  ·  {n}"
+  ],
+  "On top of any voice: they stay when you pick another one.": "Her sesin üstünde: başka bir ses seçince de kalır.",
+  "Rain, a crowd, an echo or sounds from your board, on top of any voice": "Yağmur, kalabalık, yankı ya da board'undaki sesler, her sesin üstünde",
+  "Take “{effect}” off": "“{effect}” kaldır"
 }

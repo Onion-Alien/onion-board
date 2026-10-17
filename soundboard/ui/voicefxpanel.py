@@ -390,7 +390,15 @@ GROUPS = ((_("Change the voice"), ("harmony", "growl", "robot", "ringmod")),
           (_("Room"), ("chorus", "flanger", "wobble", "echo", "reverb", "backdrop")))
 ADDON_GROUP = _("Add-ons")
 # your own setting, not part of a voice: picking or saving a voice leaves it as it is
-KEEP = frozenset({"cleanup"})
+# yours, not the voice's: picking a voice leaves them as they are (your mic clean-up,
+# the Background's sounds); with the Effects pop-up's extras, they're "on top"
+KEEP = frozenset({"cleanup", "backdrop"})
+
+
+def on_top(etype: str) -> bool:
+    """Not part of the voice: kept when you pick another one, never saved with it."""
+    cls = voicefx.REGISTRY.get(etype)
+    return etype in KEEP or bool(cls is not None and cls.extra)
 
 
 class EffectRow(QFrame):
@@ -574,15 +582,14 @@ VOICE_GROUPS = (
     ("funny", _("Funny"), ("Chipmunk", "High voice", "Hothead", "Singing monk",
                            "Underwater", "Drunk", "Choir", "Goblin", "Fairy")),
     ("scary", _("Scary"), ("Demon", "Dark lord", "Ghost", "Masked caller",
-                           "Haunted radio", "Zombie", "Evil twin", "Giant", "Haunted house")),
+                           "Haunted radio", "Zombie", "Evil twin", "Giant")),
     ("scifi", _("Robots & sci-fi"), ("Robot", "Dalek", "Alien", "Talkbox", "Autotune",
-                                     "Mecha", "Ship computer", "Astronaut")),
+                                     "Mecha", "Ship computer")),
     ("disguise", _("Disguise"), ("Deep voice", "Male voice", "Anonymous",
                                  "Secret detective")),
     ("places", _("Radio & places"), ("Walkie-talkie", "Old telephone", "Megaphone",
                                      "Stadium announcer", "Cave", "Podcast voice", "Pilot",
-                                     "Drive-thru speaker", "Old film", "Cathedral", "Storm",
-                                     "Campfire story", "Fighter pilot", "Busy café")),
+                                     "Drive-thru speaker", "Old film", "Cathedral")),
 )
 MINE = "mine"
 FAVS = "favs"
@@ -899,13 +906,15 @@ class VoiceFxPanel(QWidget):
                                     "build your own voice in a window beside the app"))
         self.btn_tweak.clicked.connect(lambda: (usage.used("voice-tweak"), self.open_tweak()))
         pb.addWidget(self.btn_tweak)
-        # straight to the Background card (rain, a crowd, your own sounds behind you)
-        self.btn_backdrop = QPushButton(_("Background"))
-        icons.set_icon(self.btn_backdrop, "sounds")
-        self.btn_backdrop.setToolTip(_("Rain, wind, a crowd or sounds from your board "
-                                       "behind your voice"))
-        self.btn_backdrop.clicked.connect(self.open_backdrop)
-        pb.addWidget(self.btn_backdrop)
+        # what's on top of the voice (rain, a crowd, an echo, your own sounds): a small
+        # pop-up, before Edit voice (the full editor). It's the simple way in
+        self.btn_effects = QPushButton(_("Effects"))
+        icons.set_icon(self.btn_effects, "sounds")
+        self.btn_effects.setToolTip(_("Rain, a crowd, an echo or sounds from your board, on "
+                                      "top of any voice"))
+        self.btn_effects.clicked.connect(lambda: (usage.used("voice-effects"),
+                                                  self.open_effects()))
+        pb.insertWidget(0, self.btn_effects)
         # a short line said in this voice, in your headphones (play_sample, from the
         # Voice tab: without it there's nowhere to play it, and no button)
         self.play_sample = play_sample
@@ -1046,6 +1055,12 @@ class VoiceFxPanel(QWidget):
 
         self.rows: dict[str, EffectRow] = {}
         self._spec_effects = dict(spec.get("effects", {}))
+        # the Effects pop-up's extras that are on: {type: settings}
+        self._extras: dict[str, dict] = {
+            t: dict(c) for t, c in self._spec_effects.items()
+            if isinstance(c, dict) and c.get("on") and t in voicefx.REGISTRY
+            and voicefx.REGISTRY[t].extra}
+        self.effects_pop = None
         self._delay_cache: dict = {}
         self._device_ms: float | None = None
         self.add_new_effects()
@@ -1171,27 +1186,95 @@ class VoiceFxPanel(QWidget):
     # ------------------------------------------------------------------ the window
     DLG_SIZE = QSize(660, 720)
 
-    def _backdrop_count(self) -> int:
-        """How many sounds the Background has on (its levels above 0, board sounds)."""
+    def _backdrop_row(self):
+        """The Background's card (None before it's made, or an add-on took its place)."""
+        from soundboard.ui.backdroprow import BackdropRow
         row = self.rows.get("backdrop")
-        if row is None:
-            return 0
-        st = row.state()
-        if not st.get("on"):
-            return 0
-        from soundboard.voicefx import backdrop
-        return (sum(1 for k in backdrop.LAYERS if st.get(k, 0) > 0)
-                + sum(1 for d in st.get("sounds", []) if d.get("level", 0) > 0))
+        return row if isinstance(row, BackdropRow) else None
 
-    def open_backdrop(self):
-        """Edit voice, opened at the Background card (unfolded, in view)."""
-        self.open_tweak()
-        row = self.rows.get("backdrop")
+    def open_effects(self):
+        """The Effects pop-up, over the voice bar's button."""
+        if self.effects_pop is None:
+            from soundboard.ui.effectspopup import EffectsPopup
+            self.effects_pop = EffectsPopup(self)
+        self.effects_pop.open_for(self.btn_effects)
+
+    def on_top_state(self) -> dict:
+        """What the Effects pop-up shows: {"layers": {layer: level}, "sounds": [(id,
+        name, level)], "extras": {type: its slider's value}} (only what's on)."""
+        from soundboard.ui.effectspopup import EXTRAS
+        from soundboard.voicefx import backdrop
+        out: dict = {"layers": {}, "sounds": [], "extras": {}}
+        row = self._backdrop_row()
+        if row is not None and row.chk.isChecked():
+            st = row.state()
+            out["layers"] = {k: st.get(k, 0) for k in backdrop.LAYERS if st.get(k, 0) > 0}
+            names = {sid: name for sid, name, _c in row._list()}
+            out["sounds"] = [(d["id"], names.get(d["id"]) or _("Sound not found"),
+                              d.get("level", 0.5)) for d in row.picked]
+        for t, key in EXTRAS:
+            cfg = self._extras.get(t)
+            if cfg is not None and t in voicefx.REGISTRY:
+                out["extras"][t] = cfg.get(key, voicefx.defaults(t).get(key, 0))
+        return out
+
+    def set_on_top(self, key: str, value: float | None):
+        """Turn one thing on top of the voice on (at `value`), change it, or take it off
+        (None): a Background layer ("rain"), a board sound ("sound:<id>") or an extra
+        ("extra_echo")."""
+        from soundboard.voicefx import backdrop
+        row = self._backdrop_row()
+        if key in backdrop.LAYERS or key.startswith("sound:"):
+            if row is None:
+                return
+            if key.startswith("sound:"):
+                sid = key[len("sound:"):]
+                if value is None:
+                    row._remove(sid)
+                else:
+                    row._level(sid, value)
+            else:
+                st = row.state()
+                st[key] = 0.0 if value is None else value
+                row.load(st)
+            self._backdrop_on()
+            return
+        cls = voicefx.REGISTRY.get(key)
+        if cls is None or not cls.extra:
+            return
+        if value is None:
+            self._extras.pop(key, None)
+        else:
+            from soundboard.ui.effectspopup import EXTRAS
+            cfg = self._extras.get(key) or {"on": True, **voicefx.defaults(key)}
+            cfg[dict(EXTRAS)[key]] = value
+            self._extras[key] = cfg
+        self._refresh()
+        self._emit()
+
+    def _backdrop_on(self):
+        """The Background is on while it has a sound to play, off once it has none."""
+        from soundboard.voicefx import backdrop
+        row = self._backdrop_row()
         if row is None:
             return
-        row.set_folded(False, asked=True)
-        # once the window has laid out its cards (it may have only just been shown)
-        QTimer.singleShot(0, row, lambda: self._scroll.ensureWidgetVisible(row, 0, 24))
+        st = row.state()
+        st["on"] = any(st.get(k, 0) > 0 for k in backdrop.LAYERS) or bool(row.picked)
+        row.load(st)
+        self._edited("backdrop")
+
+    def board_sound_menu(self):
+        """The board's sounds, to add one behind your voice (None: no Background)."""
+        row = self._backdrop_row()
+        if row is None:
+            return None
+        m = row.add_menu()
+        m.triggered.connect(lambda _a: self._backdrop_on())   # picked: it goes on with it
+        return m
+
+    def effects_count(self) -> int:
+        st = self.on_top_state()
+        return len(st["layers"]) + len(st["sounds"]) + len(st["extras"])
 
     def open_tweak(self):
         """Show the Edit voice window (at the size you left it), or bring it up."""
@@ -1225,13 +1308,13 @@ class VoiceFxPanel(QWidget):
     def _fit_picked(self):
         """The voice bar, by its width: the first of these that fits. Buttons beside
         the voice's name; under it (squeezed, "Edit voice  ·  4 on" lost its words);
-        then Background as its icon alone (its tooltip and screen-reader name still
+        then Effects as its icon alone (its tooltip and screen-reader name still
         say it); then Edit voice without its count."""
         if getattr(self, "_fitting", False):
             return   # a text change below lays the bar out again
         self._fitting = True
         try:
-            tw, tb, pb = self.btn_tweak, self.btn_backdrop, self._picked_pb
+            tw, tb, pb = self.btn_tweak, self.btn_effects, self._picked_pb
 
             def width(b, text: str) -> int:   # b's width showing `text` (icon alone: "")
                 fm = b.fontMetrics()
@@ -1241,7 +1324,7 @@ class VoiceFxPanel(QWidget):
                 return base + (fm.horizontalAdvance(text) + 6 if text else 0)
 
             full = getattr(self, "_tweak_text", "") or _("Edit voice")
-            bd = getattr(self, "_backdrop_text", "") or _("Background")
+            bd = getattr(self, "_effects_text", "") or _("Effects")
             hear = (self.btn_sample.minimumSizeHint().width() + pb.spacing()
                     if not self.btn_sample.isHidden() else 0)
             m = self.picked_box.contentsMargins()
@@ -1308,7 +1391,7 @@ class VoiceFxPanel(QWidget):
         else:
             fx = self._custom
         return {t: dict(cfg) for t, cfg in fx.items()
-                if t not in KEEP and isinstance(cfg, dict) and cfg.get("on")}
+                if not on_top(t) and isinstance(cfg, dict) and cfg.get("on")}
 
     def hear(self, name: str):
         """Hear it: a short line in the voice `name`, in your headphones only. Made off
@@ -1754,12 +1837,12 @@ class VoiceFxPanel(QWidget):
         """Add cards for effect types registered since (modules loaded later)."""
         added = False
         for etype, cls in voicefx.REGISTRY.items():
-            if etype in self.rows:
+            if etype in self.rows or cls.extra:   # (the extras live in the Effects pop-up)
                 continue
             cfg = self._spec_effects.get(etype)
             if cfg is None:
                 # mic clean-up starts on: it only makes changed voices sound better
-                cfg = {"on": True} if etype in KEEP else {}
+                cfg = {"on": True} if etype == "cleanup" else {}
             if etype == "backdrop":
                 from soundboard.ui.backdroprow import BackdropRow
                 r = BackdropRow(cls, cfg, lambda: self.sound_list())
@@ -1846,6 +1929,7 @@ class VoiceFxPanel(QWidget):
 
     def spec(self) -> dict:
         effects = {t: r.state() for t, r in self.rows.items()}
+        effects.update({t: dict(c) for t, c in self._extras.items()})
         return {"enabled": self.btn_power.isChecked(), "preset": self._preset,
                 "effects": effects,
                 "custom": effects if self._mine() else self._custom,
@@ -1867,7 +1951,9 @@ class VoiceFxPanel(QWidget):
         self.tip_dismissed.emit()
 
     def _count_on(self) -> int:
-        return sum(r.chk.isChecked() for t, r in self.rows.items() if t not in HERO)
+        # the voice's own effects: what's on top of it is Effects' count
+        return sum(r.chk.isChecked() for t, r in self.rows.items()
+                   if t not in HERO and not on_top(t))
 
     def resizeEvent(self, e):
         super().resizeEvent(e)
@@ -1905,12 +1991,11 @@ class VoiceFxPanel(QWidget):
                             if n else _("Edit voice"))
         self.btn_tweak.setText(self._tweak_text)   # (_fit_picked may shorten it)
         self.btn_tweak.setAccessibleName(self._tweak_text)
-        nb = self._backdrop_count()
-        text = (ngettext("Background  ·  {n} on", "Background  ·  {n} on", nb) if nb
-                else _("Background"))
-        self.btn_backdrop.setAccessibleName(text)
-        self._backdrop_text = text
-        self.btn_backdrop.setText(text)
+        ne = self.effects_count()
+        text = ngettext("Effects  ·  {n}", "Effects  ·  {n}", ne) if ne else _("Effects")
+        self.btn_effects.setAccessibleName(text)
+        self._effects_text = text
+        self.btn_effects.setText(text)
         self._fit_picked()   # a longer count may not fit beside the name any more
         mine = self._preset in self.store.voices
         _enable(self.btn_share, mine, _("Turn on one of your saved voices to share it "
@@ -1940,7 +2025,7 @@ class VoiceFxPanel(QWidget):
         self.btn_sample.setVisible(self.play_sample is not None)
 
     def _edited(self, etype: str = ""):
-        if etype in KEEP:     # your mic clean-up: the voice you picked stays picked
+        if etype in KEEP:     # your mic clean-up, the Background: the voice stays picked
             self._refresh()
             self._emit()
             return

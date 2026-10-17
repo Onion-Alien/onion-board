@@ -3757,18 +3757,13 @@
   "Votes": "Bedømmelser",
   "Tutorials are off now. Settings → General turns them back on.": "Vejledninger er slået fra nu. Indstillinger → Generelt slår dem til igen.",
   "Add a sound from my board": "Tilføj en lyd fra mit board",
-  "Astronaut": "Astronaut",
   "Bass boosted": "Bas-boost",
-  "Busy café": "Travl café",
-  "Campfire story": "Lejrbålshistorie",
   "Crackling fire": "Knitrende bål",
   "Crowd": "Menneskemængde",
   "Engine hum": "Motorbrummen",
   "Every sound is in already": "Alle lyde er allerede med",
   "Far away": "Langt væk",
-  "Fighter pilot": "Kampflypilot",
   "From my board": "Fra mit board",
-  "Haunted house": "Spøgelseshus",
   "Muffle": "Dæmpet",
   "Next room": "Rummet ved siden af",
   "No sounds on your board yet": "Ingen lyde på dit board endnu",
@@ -3781,7 +3776,6 @@
   "Spaceship hum": "Rumskibsbrummen",
   "Speed and pitch": "Hastighed og tonehøjde",
   "Speed, pitch, bass and where “{sound}” seems to be": "Hastighed, tonehøjde, bas og hvor “{sound}” lader til at være",
-  "Storm": "Storm",
   "Take “{sound}” out of the background": "Tag “{sound}” ud af baggrunden",
   "Through a wall": "Gennem en væg",
   "Wind": "Vind",
@@ -3790,16 +3784,22 @@
   "packed": "proppet",
   "pouring": "skybrud",
   "roaring": "flammende",
-  "Background  ·  {n} on": [
-    "Baggrund  ·  {n} slået til",
-    "Baggrund  ·  {n} slået til"
-  ],
   "Edit voice": "Rediger stemme",
   "Edit voice  ·  {n} on": [
     "Rediger stemme  ·  {n} slået til",
     "Rediger stemme  ·  {n} slået til"
   ],
   "Make a voice of your own first: Voice tab → Voice changer → Edit voice, or Save what's on under My setups.": "Lav først din egen stemme: fanen Stemme → Stemmeskifter → Rediger stemme, eller Gem det, der er slået til, under Mine opsætninger.",
-  "Rain, wind, a crowd or sounds from your board behind your voice": "Regn, vind, en menneskemængde eller lyde fra dit board bag din stemme",
-  "Your own settings: Edit voice opens them": "Dine egne indstillinger: „Rediger stemme“ åbner dem"
+  "Your own settings: Edit voice opens them": "Dine egne indstillinger: „Rediger stemme“ åbner dem",
+  "A sound from my board": "En lyd fra mit board",
+  "Add an effect": "Tilføj en effekt",
+  "Add {effect}": "Tilføj {effect}",
+  "Advanced: Edit voice": "Avanceret: Rediger stemme",
+  "Effects  ·  {n}": [
+    "Effekter  ·  {n}",
+    "Effekter  ·  {n}"
+  ],
+  "On top of any voice: they stay when you pick another one.": "Oven på enhver stemme: de bliver, når du vælger en anden.",
+  "Rain, a crowd, an echo or sounds from your board, on top of any voice": "Regn, en menneskemængde, ekko eller lyde fra dit board oven på enhver stemme",
+  "Take “{effect}” off": "Fjern “{effect}”"
 }

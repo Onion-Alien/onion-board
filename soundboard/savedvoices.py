@@ -84,8 +84,9 @@ CODE_PREFIX = "OB"
 CODE_VERSION = 1
 MAX_CODE = 4096        # characters of code (a full 13-effect voice is ~300)
 MAX_JSON = 16384       # bytes it may unpack to (a zip bomb stops here)
-# your mic clean-up is yours, not the voice's (ui.voicefxpanel.KEEP): never shared
-NOT_SHARED = frozenset({"cleanup"})
+# your mic clean-up and what's on top of the voice (the Background, the Effects
+# pop-up's extras) are yours, not the voice's (ui.voicefxpanel.on_top): never shared
+NOT_SHARED = frozenset({"cleanup", "backdrop"})
 
 
 class CodeError(ValueError):
@@ -98,7 +99,7 @@ def shared_effects(effects: dict) -> dict:
     out = {}
     for etype, cfg in clean_effects(effects).items():
         cls = voicefx.REGISTRY.get(etype)
-        if cls is None or etype in NOT_SHARED or not cfg.get("on"):
+        if cls is None or etype in NOT_SHARED or cls.extra or not cfg.get("on"):
             continue
         d = {}
         for q in cls.params:
@@ -120,7 +121,7 @@ def from_shared(raw: dict) -> tuple[dict, list[str]]:
         if cls is None:
             unknown.append(str(etype)[:40])
             continue
-        if etype in NOT_SHARED:
+        if etype in NOT_SHARED or cls.extra:
             continue
         if not isinstance(cfg, dict):
             raise CodeError(_("That code is damaged: an effect's settings are missing."))

@@ -3757,18 +3757,13 @@
   "Votes": "Votos",
   "Tutorials are off now. Settings → General turns them back on.": "Os guias estão desligados. Configurações → Geral liga de novo.",
   "Add a sound from my board": "Adicionar um som do meu board",
-  "Astronaut": "Astronauta",
   "Bass boosted": "Grave turbinado",
-  "Busy café": "Café lotado",
-  "Campfire story": "História na fogueira",
   "Crackling fire": "Fogo crepitando",
   "Crowd": "Multidão",
   "Engine hum": "Ronco do motor",
   "Every sound is in already": "Todos os sons já estão aí",
   "Far away": "Longe",
-  "Fighter pilot": "Piloto de caça",
   "From my board": "Do meu board",
-  "Haunted house": "Casa assombrada",
   "Muffle": "Abafado",
   "Next room": "Quarto ao lado",
   "No sounds on your board yet": "Ainda não há sons no seu board",
@@ -3781,7 +3776,6 @@
   "Spaceship hum": "Ronco da nave",
   "Speed and pitch": "Velocidade e tom",
   "Speed, pitch, bass and where “{sound}” seems to be": "Velocidade, tom, grave e onde “{sound}” parece estar",
-  "Storm": "Tempestade",
   "Take “{sound}” out of the background": "Tirar “{sound}” do fundo",
   "Through a wall": "Através de uma parede",
   "Wind": "Vento",
@@ -3790,16 +3784,22 @@
   "packed": "lotado",
   "pouring": "toró",
   "roaring": "em chamas",
-  "Background  ·  {n} on": [
-    "Fundo  ·  {n} ativado",
-    "Fundo  ·  {n} ativados"
-  ],
   "Edit voice": "Editar voz",
   "Edit voice  ·  {n} on": [
     "Editar voz  ·  {n} ativado",
     "Editar voz  ·  {n} ativados"
   ],
   "Make a voice of your own first: Voice tab → Voice changer → Edit voice, or Save what's on under My setups.": "Primeiro faça uma voz sua: aba Voz → Mudador de voz → Editar voz, ou Salvar o que está ligado em Meus ajustes.",
-  "Rain, wind, a crowd or sounds from your board behind your voice": "Chuva, vento, uma multidão ou sons do seu board atrás da sua voz",
-  "Your own settings: Edit voice opens them": "Suas próprias configurações: abra em “Editar voz”"
+  "Your own settings: Edit voice opens them": "Suas próprias configurações: abra em “Editar voz”",
+  "A sound from my board": "Um som do meu board",
+  "Add an effect": "Adicionar um efeito",
+  "Add {effect}": "Adicionar {effect}",
+  "Advanced: Edit voice": "Avançado: Editar voz",
+  "Effects  ·  {n}": [
+    "Efeitos  ·  {n}",
+    "Efeitos  ·  {n}"
+  ],
+  "On top of any voice: they stay when you pick another one.": "Por cima de qualquer voz: continuam quando você escolhe outra.",
+  "Rain, a crowd, an echo or sounds from your board, on top of any voice": "Chuva, multidão, eco ou sons do seu board por cima de qualquer voz",
+  "Take “{effect}” off": "Tirar “{effect}”"
 }

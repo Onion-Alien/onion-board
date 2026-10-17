@@ -3679,18 +3679,13 @@
   "Votes": "Lượt bình chọn",
   "Tutorials are off now. Settings → General turns them back on.": "Đã tắt hướng dẫn. Cài đặt → Chung để bật lại.",
   "Add a sound from my board": "Thêm âm thanh từ board của tôi",
-  "Astronaut": "Phi hành gia",
   "Bass boosted": "Tăng bass",
-  "Busy café": "Quán cà phê đông",
-  "Campfire story": "Chuyện bên lửa trại",
   "Crackling fire": "Lửa lách tách",
   "Crowd": "Đám đông",
   "Engine hum": "Tiếng máy ù",
   "Every sound is in already": "Mọi âm thanh đã có rồi",
   "Far away": "Ở xa",
-  "Fighter pilot": "Phi công tiêm kích",
   "From my board": "Từ board của tôi",
-  "Haunted house": "Nhà ma",
   "Muffle": "Nghẹt",
   "Next room": "Phòng bên",
   "No sounds on your board yet": "Board của bạn chưa có âm thanh nào",
@@ -3703,7 +3698,6 @@
   "Spaceship hum": "Tiếng tàu vũ trụ ù",
   "Speed and pitch": "Tốc độ và cao độ",
   "Speed, pitch, bass and where “{sound}” seems to be": "Tốc độ, cao độ, bass và “{sound}” nghe như ở đâu",
-  "Storm": "Bão",
   "Take “{sound}” out of the background": "Bỏ “{sound}” khỏi nền",
   "Through a wall": "Qua bức tường",
   "Wind": "Gió",
@@ -3712,14 +3706,20 @@
   "packed": "chật cứng",
   "pouring": "như trút",
   "roaring": "rực cháy",
-  "Background  ·  {n} on": [
-    "Lý lịch  ·  {n} đang bật"
-  ],
   "Edit voice": "Chỉnh giọng",
   "Edit voice  ·  {n} on": [
     "Chỉnh giọng  ·  {n} đang bật"
   ],
   "Make a voice of your own first: Voice tab → Voice changer → Edit voice, or Save what's on under My setups.": "Hãy tạo giọng của riêng bạn trước: thẻ Giọng nói → Đổi giọng nói → Chỉnh giọng, hoặc Lưu những gì đang bật trong Thiết lập của tôi.",
-  "Rain, wind, a crowd or sounds from your board behind your voice": "Mưa, gió, đám đông hoặc âm thanh từ board của bạn phía sau giọng bạn",
-  "Your own settings: Edit voice opens them": "Cài đặt của riêng bạn: mở bằng “Chỉnh giọng”"
+  "Your own settings: Edit voice opens them": "Cài đặt của riêng bạn: mở bằng “Chỉnh giọng”",
+  "A sound from my board": "Âm thanh từ board của tôi",
+  "Add an effect": "Thêm hiệu ứng",
+  "Add {effect}": "Thêm {effect}",
+  "Advanced: Edit voice": "Nâng cao: Chỉnh giọng",
+  "Effects  ·  {n}": [
+    "Hiệu ứng  ·  {n}"
+  ],
+  "On top of any voice: they stay when you pick another one.": "Chồng lên bất kỳ giọng nào: vẫn giữ khi bạn chọn giọng khác.",
+  "Rain, a crowd, an echo or sounds from your board, on top of any voice": "Mưa, đám đông, tiếng vang hoặc âm thanh từ board của bạn, chồng lên bất kỳ giọng nào",
+  "Take “{effect}” off": "Bỏ “{effect}”"
 }

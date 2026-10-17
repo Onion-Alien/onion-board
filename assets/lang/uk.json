@@ -3835,18 +3835,13 @@
   "Votes": "Оцінки",
   "Tutorials are off now. Settings → General turns them back on.": "Підказки вимкнено. Налаштування → Загальні вмикає їх знову.",
   "Add a sound from my board": "Додати звук з мого борду",
-  "Astronaut": "Астронавт",
   "Bass boosted": "Бас-буст",
-  "Busy café": "Людне кафе",
-  "Campfire story": "Історія біля вогнища",
   "Crackling fire": "Тріск вогнища",
   "Crowd": "Натовп",
   "Engine hum": "Гул мотора",
   "Every sound is in already": "Усі звуки вже додано",
   "Far away": "Удалині",
-  "Fighter pilot": "Пілот винищувача",
   "From my board": "З мого борду",
-  "Haunted house": "Будинок з привидами",
   "Muffle": "Глушіння",
   "Next room": "Сусідня кімната",
   "No sounds on your board yet": "На твоєму борді ще немає звуків",
@@ -3859,7 +3854,6 @@
   "Spaceship hum": "Гул корабля",
   "Speed and pitch": "Швидкість і висота",
   "Speed, pitch, bass and where “{sound}” seems to be": "Швидкість, висота, бас і де ніби звучить «{sound}»",
-  "Storm": "Буря",
   "Take “{sound}” out of the background": "Прибрати «{sound}» з фону",
   "Through a wall": "Крізь стіну",
   "Wind": "Вітер",
@@ -3868,11 +3862,6 @@
   "packed": "вщент",
   "pouring": "злива",
   "roaring": "палає",
-  "Background  ·  {n} on": [
-    "Фон  ·  {n} увімк.",
-    "Фон  ·  {n} увімк.",
-    "Фон  ·  {n} увімк."
-  ],
   "Edit voice": "Змінити голос",
   "Edit voice  ·  {n} on": [
     "Змінити голос  ·  {n} увімк.",
@@ -3880,6 +3869,17 @@
     "Змінити голос  ·  {n} увімк."
   ],
   "Make a voice of your own first: Voice tab → Voice changer → Edit voice, or Save what's on under My setups.": "Спершу зробіть власний голос: вкладка Голос → Зміна голосу → Змінити голос, або Зберегти ввімкнене в Моїх наборах.",
-  "Rain, wind, a crowd or sounds from your board behind your voice": "Дощ, вітер, натовп або звуки з твого борду за твоїм голосом",
-  "Your own settings: Edit voice opens them": "Твої власні налаштування: відкриваються кнопкою «Змінити голос»"
+  "Your own settings: Edit voice opens them": "Твої власні налаштування: відкриваються кнопкою «Змінити голос»",
+  "A sound from my board": "Звук з мого борду",
+  "Add an effect": "Додати ефект",
+  "Add {effect}": "Додати {effect}",
+  "Advanced: Edit voice": "Додатково: Змінити голос",
+  "Effects  ·  {n}": [
+    "Ефекти  ·  {n}",
+    "Ефекти  ·  {n}",
+    "Ефекти  ·  {n}"
+  ],
+  "On top of any voice: they stay when you pick another one.": "Поверх будь-якого голосу: лишаються, коли вибираєш інший.",
+  "Rain, a crowd, an echo or sounds from your board, on top of any voice": "Дощ, натовп, луна чи звуки з твого борду поверх будь-якого голосу",
+  "Take “{effect}” off": "Прибрати «{effect}»"
 }

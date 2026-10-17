@@ -3679,18 +3679,13 @@
   "Votes": "โหวต",
   "Tutorials are off now. Settings → General turns them back on.": "ปิดวิธีใช้แล้ว เปิดอีกครั้งได้ใน การตั้งค่า → ทั่วไป",
   "Add a sound from my board": "เพิ่มเสียงจากบอร์ดของฉัน",
-  "Astronaut": "นักบินอวกาศ",
   "Bass boosted": "เบสหนัก",
-  "Busy café": "คาเฟ่คนแน่น",
-  "Campfire story": "เล่าเรื่องรอบกองไฟ",
   "Crackling fire": "ไฟปะทุ",
   "Crowd": "ฝูงชน",
   "Engine hum": "เสียงเครื่องยนต์",
   "Every sound is in already": "ใส่ครบทุกเสียงแล้ว",
   "Far away": "ไกลออกไป",
-  "Fighter pilot": "นักบินขับไล่",
   "From my board": "จากบอร์ดของฉัน",
-  "Haunted house": "บ้านผีสิง",
   "Muffle": "อู้อี้",
   "Next room": "ห้องข้างๆ",
   "No sounds on your board yet": "ยังไม่มีเสียงในบอร์ดของคุณ",
@@ -3703,7 +3698,6 @@
   "Spaceship hum": "เสียงหึ่งยานอวกาศ",
   "Speed and pitch": "ความเร็วและระดับเสียง",
   "Speed, pitch, bass and where “{sound}” seems to be": "ความเร็ว ระดับเสียง เบส และ “{sound}” ฟังดูเหมือนอยู่ที่ไหน",
-  "Storm": "พายุ",
   "Take “{sound}” out of the background": "เอา “{sound}” ออกจากพื้นหลัง",
   "Through a wall": "ผ่านกำแพง",
   "Wind": "ลม",
@@ -3712,14 +3706,20 @@
   "packed": "แน่นขนัด",
   "pouring": "ห่าใหญ่",
   "roaring": "ลุกโชน",
-  "Background  ·  {n} on": [
-    "พื้นหลัง  ·  เปิด {n}"
-  ],
   "Edit voice": "แก้ไขเสียง",
   "Edit voice  ·  {n} on": [
     "แก้ไขเสียง  ·  เปิด {n}"
   ],
   "Make a voice of your own first: Voice tab → Voice changer → Edit voice, or Save what's on under My setups.": "ทำเสียงของคุณเองก่อน: แท็บเสียง → โปรแกรมเปลี่ยนเสียง → แก้ไขเสียง หรือ บันทึกสิ่งที่เปิดอยู่ ในการตั้งค่าของฉัน",
-  "Rain, wind, a crowd or sounds from your board behind your voice": "ฝน ลม ฝูงชน หรือเสียงจากบอร์ดของคุณ อยู่หลังเสียงของคุณ",
-  "Your own settings: Edit voice opens them": "การตั้งค่าของคุณเอง: เปิดได้จาก “แก้ไขเสียง”"
+  "Your own settings: Edit voice opens them": "การตั้งค่าของคุณเอง: เปิดได้จาก “แก้ไขเสียง”",
+  "A sound from my board": "เสียงจากบอร์ดของฉัน",
+  "Add an effect": "เพิ่มเอฟเฟกต์",
+  "Add {effect}": "เพิ่ม {effect}",
+  "Advanced: Edit voice": "ขั้นสูง: แก้ไขเสียง",
+  "Effects  ·  {n}": [
+    "เอฟเฟกต์  ·  {n}"
+  ],
+  "On top of any voice: they stay when you pick another one.": "ซ้อนบนเสียงไหนก็ได้: ยังอยู่เมื่อคุณเลือกเสียงอื่น",
+  "Rain, a crowd, an echo or sounds from your board, on top of any voice": "ฝน ฝูงชน เสียงก้อง หรือเสียงจากบอร์ดของคุณ ซ้อนบนเสียงไหนก็ได้",
+  "Take “{effect}” off": "เอา “{effect}” ออก"
 }

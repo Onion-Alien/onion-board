@@ -3757,18 +3757,13 @@
   "Votes": "Voti",
   "Tutorials are off now. Settings → General turns them back on.": "Le guide ora sono spente. Impostazioni → Generale le riaccende.",
   "Add a sound from my board": "Aggiungi un suono dalla mia board",
-  "Astronaut": "Astronauta",
   "Bass boosted": "Bassi potenziati",
-  "Busy café": "Bar affollato",
-  "Campfire story": "Storia attorno al fuoco",
   "Crackling fire": "Fuoco scoppiettante",
   "Crowd": "Folla",
   "Engine hum": "Rombo del motore",
   "Every sound is in already": "Ci sono già tutti i suoni",
   "Far away": "Lontano",
-  "Fighter pilot": "Pilota da caccia",
   "From my board": "Dalla mia board",
-  "Haunted house": "Casa infestata",
   "Muffle": "Ovattato",
   "Next room": "Stanza accanto",
   "No sounds on your board yet": "Ancora nessun suono nella tua board",
@@ -3781,7 +3776,6 @@
   "Spaceship hum": "Ronzio dell'astronave",
   "Speed and pitch": "Velocità e tono",
   "Speed, pitch, bass and where “{sound}” seems to be": "Velocità, tono, bassi e dove sembra essere «{sound}»",
-  "Storm": "Temporale",
   "Take “{sound}” out of the background": "Togli «{sound}» dallo sfondo",
   "Through a wall": "Attraverso un muro",
   "Wind": "Vento",
@@ -3790,16 +3784,22 @@
   "packed": "pieno zeppo",
   "pouring": "diluvio",
   "roaring": "divampante",
-  "Background  ·  {n} on": [
-    "Sfondo  ·  {n} attivo",
-    "Sfondo  ·  {n} attivi"
-  ],
   "Edit voice": "Modifica voce",
   "Edit voice  ·  {n} on": [
     "Modifica voce  ·  {n} attivo",
     "Modifica voce  ·  {n} attivi"
   ],
   "Make a voice of your own first: Voice tab → Voice changer → Edit voice, or Save what's on under My setups.": "Prima fai una voce tua: scheda Voce → Cambia voce → Modifica voce, oppure Salva ciò che è attivo in I miei preset.",
-  "Rain, wind, a crowd or sounds from your board behind your voice": "Pioggia, vento, una folla o suoni dalla tua board dietro la tua voce",
-  "Your own settings: Edit voice opens them": "Le tue impostazioni: «Modifica voce» le apre"
+  "Your own settings: Edit voice opens them": "Le tue impostazioni: «Modifica voce» le apre",
+  "A sound from my board": "Un suono dalla mia board",
+  "Add an effect": "Aggiungi un effetto",
+  "Add {effect}": "Aggiungi {effect}",
+  "Advanced: Edit voice": "Avanzate: Modifica voce",
+  "Effects  ·  {n}": [
+    "Effetti  ·  {n}",
+    "Effetti  ·  {n}"
+  ],
+  "On top of any voice: they stay when you pick another one.": "Sopra qualsiasi voce: restano quando ne scegli un'altra.",
+  "Rain, a crowd, an echo or sounds from your board, on top of any voice": "Pioggia, folla, eco o suoni della tua board sopra qualsiasi voce",
+  "Take “{effect}” off": "Togli «{effect}»"
 }

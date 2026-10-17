@@ -3679,18 +3679,13 @@
   "Votes": "Undian",
   "Tutorials are off now. Settings → General turns them back on.": "Panduan kini dimatikan. Tetapan → Umum menghidupkannya semula.",
   "Add a sound from my board": "Tambah bunyi dari board saya",
-  "Astronaut": "Angkasawan",
   "Bass boosted": "Bass digandakan",
-  "Busy café": "Kafe sesak",
-  "Campfire story": "Cerita unggun api",
   "Crackling fire": "Api berdetak",
   "Crowd": "Orang ramai",
   "Engine hum": "Dengung enjin",
   "Every sound is in already": "Semua bunyi sudah dimasukkan",
   "Far away": "Jauh",
-  "Fighter pilot": "Juruterbang pejuang",
   "From my board": "Dari board saya",
-  "Haunted house": "Rumah berhantu",
   "Muffle": "Teredam",
   "Next room": "Bilik sebelah",
   "No sounds on your board yet": "Belum ada bunyi pada board anda",
@@ -3703,7 +3698,6 @@
   "Spaceship hum": "Dengung kapal angkasa",
   "Speed and pitch": "Kelajuan dan pic",
   "Speed, pitch, bass and where “{sound}” seems to be": "Kelajuan, pic, bass dan dari mana “{sound}” kedengaran",
-  "Storm": "Ribut",
   "Take “{sound}” out of the background": "Keluarkan “{sound}” daripada latar",
   "Through a wall": "Dari balik dinding",
   "Wind": "Angin",
@@ -3712,14 +3706,20 @@
   "packed": "padat",
   "pouring": "lebat",
   "roaring": "marak",
-  "Background  ·  {n} on": [
-    "Latar belakang  ·  {n} hidup"
-  ],
   "Edit voice": "Edit suara",
   "Edit voice  ·  {n} on": [
     "Edit suara  ·  {n} hidup"
   ],
   "Make a voice of your own first: Voice tab → Voice changer → Edit voice, or Save what's on under My setups.": "Buat suara sendiri dahulu: tab Suara → Penukar suara → Edit suara, atau Simpan yang hidup di Tetapan saya.",
-  "Rain, wind, a crowd or sounds from your board behind your voice": "Hujan, angin, orang ramai atau bunyi dari board anda di belakang suara anda",
-  "Your own settings: Edit voice opens them": "Tetapan anda sendiri: “Edit suara” membukanya"
+  "Your own settings: Edit voice opens them": "Tetapan anda sendiri: “Edit suara” membukanya",
+  "A sound from my board": "Bunyi dari board saya",
+  "Add an effect": "Tambah efek",
+  "Add {effect}": "Tambah {effect}",
+  "Advanced: Edit voice": "Lanjutan: Edit suara",
+  "Effects  ·  {n}": [
+    "Efek  ·  {n}"
+  ],
+  "On top of any voice: they stay when you pick another one.": "Di atas mana-mana suara: kekal apabila anda pilih yang lain.",
+  "Rain, a crowd, an echo or sounds from your board, on top of any voice": "Hujan, orang ramai, gema atau bunyi dari board anda di atas mana-mana suara",
+  "Take “{effect}” off": "Buang “{effect}”"
 }

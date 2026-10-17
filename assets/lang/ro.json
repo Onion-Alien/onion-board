@@ -3835,18 +3835,13 @@
   "Votes": "Voturi",
   "Tutorials are off now. Settings → General turns them back on.": "Ghidurile sunt oprite acum. Setări → General le pornește din nou.",
   "Add a sound from my board": "Adaugă un sunet de pe board-ul meu",
-  "Astronaut": "Astronaut",
   "Bass boosted": "Bas amplificat",
-  "Busy café": "Cafenea aglomerată",
-  "Campfire story": "Poveste la foc de tabără",
   "Crackling fire": "Foc trosnind",
   "Crowd": "Mulțime",
   "Engine hum": "Zumzet de motor",
   "Every sound is in already": "Toate sunetele sunt deja aici",
   "Far away": "Departe",
-  "Fighter pilot": "Pilot de vânătoare",
   "From my board": "De pe board-ul meu",
-  "Haunted house": "Casă bântuită",
   "Muffle": "Înfundat",
   "Next room": "Camera de alături",
   "No sounds on your board yet": "Încă nu ai sunete pe board",
@@ -3859,7 +3854,6 @@
   "Spaceship hum": "Zumzet de navă",
   "Speed and pitch": "Viteză și ton",
   "Speed, pitch, bass and where “{sound}” seems to be": "Viteză, ton, bas și unde pare să fie „{sound}”",
-  "Storm": "Furtună",
   "Take “{sound}” out of the background": "Scoate „{sound}” din fundal",
   "Through a wall": "Printr-un perete",
   "Wind": "Vânt",
@@ -3868,11 +3862,6 @@
   "packed": "arhiplin",
   "pouring": "ploaie torențială",
   "roaring": "vâlvătaie",
-  "Background  ·  {n} on": [
-    "Fundal  ·  {n} activat",
-    "Fundal  ·  {n} activate",
-    "Fundal  ·  {n} activate"
-  ],
   "Edit voice": "Editează vocea",
   "Edit voice  ·  {n} on": [
     "Editează vocea  ·  {n} activat",
@@ -3880,6 +3869,17 @@
     "Editează vocea  ·  {n} activate"
   ],
   "Make a voice of your own first: Voice tab → Voice changer → Edit voice, or Save what's on under My setups.": "Fă-ți întâi o voce proprie: fila Voce → Schimbator de voce → Editează vocea, sau Salvează ce e pornit la Setările mele.",
-  "Rain, wind, a crowd or sounds from your board behind your voice": "Ploaie, vânt, o mulțime sau sunete de pe board-ul tău în spatele vocii tale",
-  "Your own settings: Edit voice opens them": "Setările tale: „Editează vocea” le deschide"
+  "Your own settings: Edit voice opens them": "Setările tale: „Editează vocea” le deschide",
+  "A sound from my board": "Un sunet de pe board-ul meu",
+  "Add an effect": "Adaugă un efect",
+  "Add {effect}": "Adaugă {effect}",
+  "Advanced: Edit voice": "Avansat: Editează vocea",
+  "Effects  ·  {n}": [
+    "Efecte  ·  {n}",
+    "Efecte  ·  {n}",
+    "Efecte  ·  {n}"
+  ],
+  "On top of any voice: they stay when you pick another one.": "Peste orice voce: rămân când alegi alta.",
+  "Rain, a crowd, an echo or sounds from your board, on top of any voice": "Ploaie, mulțime, ecou sau sunete de pe board-ul tău peste orice voce",
+  "Take “{effect}” off": "Scoate „{effect}”"
 }

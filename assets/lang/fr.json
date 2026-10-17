@@ -3757,18 +3757,13 @@
   "Votes": "Votes",
   "Tutorials are off now. Settings → General turns them back on.": "Les guides sont coupés. Paramètres → Général les remet.",
   "Add a sound from my board": "Ajouter un son de mon board",
-  "Astronaut": "Astronaute",
   "Bass boosted": "Basses boostées",
-  "Busy café": "Café bondé",
-  "Campfire story": "Histoire au coin du feu",
   "Crackling fire": "Feu qui crépite",
   "Crowd": "Foule",
   "Engine hum": "Ronron de moteur",
   "Every sound is in already": "Tous les sons y sont déjà",
   "Far away": "Au loin",
-  "Fighter pilot": "Pilote de chasse",
   "From my board": "De mon board",
-  "Haunted house": "Maison hantée",
   "Muffle": "Étouffé",
   "Next room": "Pièce d'à côté",
   "No sounds on your board yet": "Pas encore de sons sur ton board",
@@ -3781,7 +3776,6 @@
   "Spaceship hum": "Ronron de vaisseau",
   "Speed and pitch": "Vitesse et hauteur",
   "Speed, pitch, bass and where “{sound}” seems to be": "Vitesse, hauteur, basses et où « {sound} » semble être",
-  "Storm": "Orage",
   "Take “{sound}” out of the background": "Retirer « {sound} » de l'arrière-plan",
   "Through a wall": "À travers un mur",
   "Wind": "Vent",
@@ -3790,16 +3784,22 @@
   "packed": "bondé",
   "pouring": "averse",
   "roaring": "flambant",
-  "Background  ·  {n} on": [
-    "Arrière-plan  ·  {n} activé",
-    "Arrière-plan  ·  {n} activés"
-  ],
   "Edit voice": "Modifier la voix",
   "Edit voice  ·  {n} on": [
     "Modifier la voix  ·  {n} activé",
     "Modifier la voix  ·  {n} activés"
   ],
   "Make a voice of your own first: Voice tab → Voice changer → Edit voice, or Save what's on under My setups.": "Fais d'abord ta propre voix : onglet Voix → Changeur de voix → Modifier la voix, ou Enregistrer ce qui est activé dans Mes réglages.",
-  "Rain, wind, a crowd or sounds from your board behind your voice": "Pluie, vent, foule ou sons de ton board derrière ta voix",
-  "Your own settings: Edit voice opens them": "Tes propres réglages : « Modifier la voix » les ouvre"
+  "Your own settings: Edit voice opens them": "Tes propres réglages : « Modifier la voix » les ouvre",
+  "A sound from my board": "Un son de mon board",
+  "Add an effect": "Ajouter un effet",
+  "Add {effect}": "Ajouter {effect}",
+  "Advanced: Edit voice": "Avancé: Modifier la voix",
+  "Effects  ·  {n}": [
+    "Effets  ·  {n}",
+    "Effets  ·  {n}"
+  ],
+  "On top of any voice: they stay when you pick another one.": "Par-dessus n'importe quelle voix : ils restent quand tu en choisis une autre.",
+  "Rain, a crowd, an echo or sounds from your board, on top of any voice": "Pluie, foule, écho ou sons de ton board par-dessus n'importe quelle voix",
+  "Take “{effect}” off": "Retirer « {effect} »"
 }

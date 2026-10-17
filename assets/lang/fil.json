@@ -3757,18 +3757,13 @@
   "Votes": "Mga boto",
   "Tutorials are off now. Settings → General turns them back on.": "Naka-off na ang mga gabay. Ino-on ulit ng Settings → General.",
   "Add a sound from my board": "Magdagdag ng tunog mula sa board ko",
-  "Astronaut": "Astronaut",
   "Bass boosted": "Bass boosted",
-  "Busy café": "Mataong café",
-  "Campfire story": "Kuwento sa siga",
   "Crackling fire": "Lumalagitik na apoy",
   "Crowd": "Madla",
   "Engine hum": "Ugong ng makina",
   "Every sound is in already": "Nandiyan na lahat ng tunog",
   "Far away": "Malayo",
-  "Fighter pilot": "Fighter pilot",
   "From my board": "Mula sa board ko",
-  "Haunted house": "Haunted na bahay",
   "Muffle": "Pahina",
   "Next room": "Katabing kuwarto",
   "No sounds on your board yet": "Wala pang tunog sa board mo",
@@ -3781,7 +3776,6 @@
   "Spaceship hum": "Ugong ng spaceship",
   "Speed and pitch": "Bilis at pitch",
   "Speed, pitch, bass and where “{sound}” seems to be": "Bilis, pitch, bass at kung saan parang nanggagaling ang “{sound}”",
-  "Storm": "Bagyo",
   "Take “{sound}” out of the background": "Alisin ang “{sound}” sa background",
   "Through a wall": "Sa likod ng pader",
   "Wind": "Hangin",
@@ -3790,16 +3784,22 @@
   "packed": "siksikan",
   "pouring": "buhos",
   "roaring": "naglalagablab",
-  "Background  ·  {n} on": [
-    "Background  ·  {n} naka-on",
-    "Background  ·  {n} naka-on"
-  ],
   "Edit voice": "I-edit ang boses",
   "Edit voice  ·  {n} on": [
     "I-edit ang boses  ·  {n} naka-on",
     "I-edit ang boses  ·  {n} naka-on"
   ],
   "Make a voice of your own first: Voice tab → Voice changer → Edit voice, or Save what's on under My setups.": "Gumawa muna ng sarili mong voice: Voice tab → Voice changer → I-edit ang boses, o I-save ang naka-on sa Mga setup ko.",
-  "Rain, wind, a crowd or sounds from your board behind your voice": "Ulan, hangin, madla o mga tunog mula sa board mo sa likod ng boses mo",
-  "Your own settings: Edit voice opens them": "Sarili mong mga setting: binubuksan ito ng “I-edit ang boses”"
+  "Your own settings: Edit voice opens them": "Sarili mong mga setting: binubuksan ito ng “I-edit ang boses”",
+  "A sound from my board": "Tunog mula sa board ko",
+  "Add an effect": "Magdagdag ng effect",
+  "Add {effect}": "Idagdag ang {effect}",
+  "Advanced: Edit voice": "Advanced: I-edit ang boses",
+  "Effects  ·  {n}": [
+    "Effects  ·  {n}",
+    "Effects  ·  {n}"
+  ],
+  "On top of any voice: they stay when you pick another one.": "Nasa ibabaw ng kahit anong boses: nananatili kahit pumili ka ng iba.",
+  "Rain, a crowd, an echo or sounds from your board, on top of any voice": "Ulan, crowd, echo o mga tunog mula sa board mo, sa ibabaw ng kahit anong boses",
+  "Take “{effect}” off": "Alisin ang “{effect}”"
 }

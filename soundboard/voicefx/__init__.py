@@ -60,6 +60,8 @@ class Effect:
     name: str = ""
     description: str = ""
     params: tuple[Param, ...] = ()
+    # one of the Effects pop-up's copies, on top of the voice (no card in Edit voice)
+    extra: bool = False
 
     def __init__(self, rate: int, values: dict | None = None):
         self.rate = rate

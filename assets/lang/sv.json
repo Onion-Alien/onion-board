@@ -3757,18 +3757,13 @@
   "Votes": "Betyg",
   "Tutorials are off now. Settings → General turns them back on.": "Guider är avstängda nu. Inställningar → Allmänt slår på dem igen.",
   "Add a sound from my board": "Lägg till ett ljud från mitt board",
-  "Astronaut": "Astronaut",
   "Bass boosted": "Basboost",
-  "Busy café": "Fullsatt kafé",
-  "Campfire story": "Lägerelds-historia",
   "Crackling fire": "Sprakande eld",
   "Crowd": "Folkmassa",
   "Engine hum": "Motorbrus",
   "Every sound is in already": "Alla ljud är redan med",
   "Far away": "Långt bort",
-  "Fighter pilot": "Stridspilot",
   "From my board": "Från mitt board",
-  "Haunted house": "Spökhus",
   "Muffle": "Dämpat",
   "Next room": "Rummet bredvid",
   "No sounds on your board yet": "Inga ljud på ditt board än",
@@ -3781,7 +3776,6 @@
   "Spaceship hum": "Rymdskeppsbrus",
   "Speed and pitch": "Hastighet och tonhöjd",
   "Speed, pitch, bass and where “{sound}” seems to be": "Hastighet, tonhöjd, bas och var ”{sound}” verkar vara",
-  "Storm": "Storm",
   "Take “{sound}” out of the background": "Ta bort ”{sound}” från bakgrunden",
   "Through a wall": "Genom en vägg",
   "Wind": "Vind",
@@ -3790,16 +3784,22 @@
   "packed": "fullsatt",
   "pouring": "skyfall",
   "roaring": "flammande",
-  "Background  ·  {n} on": [
-    "Bakgrund  ·  {n} på",
-    "Bakgrund  ·  {n} på"
-  ],
   "Edit voice": "Redigera röst",
   "Edit voice  ·  {n} on": [
     "Redigera röst  ·  {n} på",
     "Redigera röst  ·  {n} på"
   ],
   "Make a voice of your own first: Voice tab → Voice changer → Edit voice, or Save what's on under My setups.": "Gör en egen röst först: fliken Röst → Röstvändare → Redigera röst, eller Spara det som är på under Mina inställningar.",
-  "Rain, wind, a crowd or sounds from your board behind your voice": "Regn, vind, en folkmassa eller ljud från ditt board bakom din röst",
-  "Your own settings: Edit voice opens them": "Dina egna inställningar: ”Redigera röst” öppnar dem"
+  "Your own settings: Edit voice opens them": "Dina egna inställningar: ”Redigera röst” öppnar dem",
+  "A sound from my board": "Ett ljud från mitt board",
+  "Add an effect": "Lägg till en effekt",
+  "Add {effect}": "Lägg till {effect}",
+  "Advanced: Edit voice": "Avancerat: Redigera röst",
+  "Effects  ·  {n}": [
+    "Effekter  ·  {n}",
+    "Effekter  ·  {n}"
+  ],
+  "On top of any voice: they stay when you pick another one.": "Ovanpå vilken röst som helst: de stannar när du väljer en annan.",
+  "Rain, a crowd, an echo or sounds from your board, on top of any voice": "Regn, folkmassa, eko eller ljud från ditt board ovanpå vilken röst som helst",
+  "Take “{effect}” off": "Ta bort ”{effect}”"
 }

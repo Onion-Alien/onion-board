@@ -127,11 +127,14 @@ def test_a_saved_voice_keeps_its_background(tmp_path, monkeypatch):
     assert got["sounds"][0]["tweaks"]["pitch"] == 3
 
 
-def test_a_share_code_carries_the_levels_not_the_board_sounds():
-    effects = {"backdrop": {"on": True, "rain": 0.5,
-                            "sounds": [{"id": "abc", "level": 0.3}]}}
+def test_a_share_code_carries_the_voice_not_whats_on_top_of_it():
+    """The Background and the Effects extras are yours, on top of any voice: a code
+    (or the store) carries only the voice."""
+    effects = {"robot": {"on": True, "freq": 120},
+               "backdrop": {"on": True, "rain": 0.5, "sounds": [{"id": "abc", "level": 0.3}]},
+               "extra_echo": {"on": True, "mix": 0.5}}
     _name, got, _notes = savedvoices.read_code(savedvoices.share_code("Wet", effects))
-    assert got["backdrop"]["rain"] == 0.5 and "sounds" not in got["backdrop"]
+    assert set(got) == {"robot"}
 
 
 def test_a_loop_has_no_seam():
@@ -193,16 +196,10 @@ def test_maker_off_hands_over_nothing_to_play():
     assert got[-1].layers == {} and got[-1].sounds == ()
 
 
-def test_new_voices_with_a_background_run_in_the_chain():
-    names = [n for n, fx in voicefx.PRESETS.items() if "backdrop" in fx]
-    assert len(names) >= 6
-    x = np.stack([_voice(0.6)] * 2, 1)
-    for n in names:
-        ch = voicefx.VoiceChain()
-        fx = voicefx.PRESETS[n]
-        ch.configure({"enabled": True, "effects": {t: {"on": True, **c} for t, c in fx.items()}})
-        out = np.concatenate([ch.process(x[i:i + 480], SR) for i in range(0, len(x) - 479, 480)])
-        assert np.all(np.isfinite(out)) and not ch.errors, n
+def test_no_voice_comes_with_a_background():
+    """A background is something you add on top of any voice (Effects), never part
+    of one: picking a voice leaves yours as it is."""
+    assert not [n for n, fx in voicefx.PRESETS.items() if "backdrop" in fx]
 
 
 # ------------------------------------------------------------------ the card
@@ -326,47 +323,135 @@ def test_board_sound_rows_line_up_with_the_built_in_ones(row, qapp):
                - mine.val.mapTo(row, mine.val.rect().topLeft()).x()) <= 1
 
 
-def test_the_background_button_counts_whats_on_and_opens_the_card(qapp, monkeypatch):
+def _voice_panel(monkeypatch):
     from soundboard.speech import tts
     from soundboard.ui.voicepanel import VoicePanel
     from tests.test_voicepanel import FakeEngine
     monkeypatch.setattr(tts.SapiTTS, "warm_up", lambda self: ["Microsoft Zira Desktop"])
-    p = VoicePanel(FakeEngine(), {"enabled": False, "effects": {}},
-                   {"voice": "Microsoft Zira Desktop", "rate": 2})
+    return VoicePanel(FakeEngine(), {"enabled": False, "effects": {}},
+                      {"voice": "Microsoft Zira Desktop", "rate": 2})
+
+
+def test_effects_sit_on_top_of_the_voice_and_stay_when_you_pick_another(qapp, monkeypatch):
+    p = _voice_panel(monkeypatch)
     try:
         fx = p.fx
-        # (the names: the words themselves depend on the bar's width and the fonts)
-        assert fx.btn_tweak.accessibleName().startswith("Edit voice")
-        assert fx.btn_backdrop.accessibleName() == "Background"
-        fx.pick("Storm")                                  # rain and wind
-        assert fx.btn_backdrop.accessibleName() == "Background  ·  2 on"
-        row = fx.rows["backdrop"]
-        row.set_folded(True)
-        fx.btn_backdrop.click()
-        process_events(qapp, lambda: fx.dlg.isVisible() and not row.is_folded(), timeout=5)
-        assert fx.dlg.isVisible() and fx.dlg.windowTitle() == "Edit voice"
-        assert not row.is_folded()
+        fx.pick("Robot")
+        assert fx.btn_effects.accessibleName() == "Effects"
+        tweak = fx.btn_tweak.accessibleName()
+        fx.set_on_top("rain", 0.6)
+        fx.set_on_top("extra_echo", 0.4)
+        assert fx.btn_effects.accessibleName() == "Effects  ·  2"
+        assert fx.preset == "Robot"                       # still the voice you picked
+        assert fx.btn_tweak.accessibleName() == tweak     # (not counted as the voice's)
+        fx.pick("Deep voice")                             # another voice: they stay
+        spec = fx.spec()
+        assert fx.preset == "Deep voice"
+        assert spec["effects"]["backdrop"]["on"] and spec["effects"]["backdrop"]["rain"] == 0.6
+        assert spec["effects"]["extra_echo"] == {**voicefx.defaults("extra_echo"),
+                                                 "on": True, "mix": 0.4}
+        assert "robot" not in fx.effects_of("Deep voice")
+        # never part of a voice: not in what a sound takes, a setup or a share code
+        assert not {"backdrop", "extra_echo"} & set(fx.effects_of("Deep voice"))
+        assert not {"backdrop", "extra_echo"} & set(p.current_setup()["effects"])
+        assert not {"backdrop", "extra_echo"} & set(savedvoices.shared_effects(spec["effects"]))
+        fx.set_on_top("rain", None)
+        fx.set_on_top("extra_echo", None)
+        assert fx.btn_effects.accessibleName() == "Effects"
+        assert not fx.spec()["effects"]["backdrop"]["on"]   # nothing left to play: off
+        assert "extra_echo" not in fx.spec()["effects"]
+    finally:
+        p.shutdown()
+        p.deleteLater()
+
+
+def test_the_effects_pop_up_adds_changes_and_takes_off(qapp, monkeypatch):
+    from PySide6.QtCore import QPoint
+    p = _voice_panel(monkeypatch)
+    try:
+        fx = p.fx
+        fx.pick("Robot")
+        fx.btn_effects.click()
+        pop = fx.effects_pop
+        process_events(qapp, lambda: pop.isVisible(), timeout=5)
+        assert not pop.sliders and pop.hint.isVisibleTo(pop)   # nothing on yet
+        assert {"rain", "wind", "crowd", "fire", "extra_echo", "extra_robot",
+                "sound"} <= set(pop.adds)
+        b = fx.btn_effects
+        top = b.mapToGlobal(QPoint(0, 0)).y()
+
+        def beside():   # just above the button, or just under it (no room above)
+            g = pop.geometry()
+            return top - 12 < g.bottom() < top or top + b.height() < g.top() < top + b.height() + 12
+
+        assert beside()
+        pop.adds["wind"].click()
+        pop.adds["extra_reverb"].click()
+        assert set(pop.sliders) == {"wind", "extra_reverb"}
+        assert beside()   # taller now, and still beside it (it hung over the bar)
+        assert "wind" not in pop.adds                     # on: not offered again
+        assert fx.on_top_state()["layers"] == {"wind": 0.5}
+        sl = pop.sliders["wind"].slider
+        sl.setValue(sl.maximum())                         # as a drag does
+        assert fx.on_top_state()["layers"] == {"wind": 1.0}
+        pop.removes["extra_reverb"].click()
+        assert set(pop.sliders) == {"wind"} and "extra_reverb" in pop.adds
+        assert fx.btn_effects.accessibleName() == "Effects  ·  1"
+        pop.btn_advanced.click()                          # the full editor
+        process_events(qapp, lambda: fx.dlg.isVisible(), timeout=5)
+        assert not pop.isVisible()
         fx.dlg.close()
     finally:
         p.shutdown()
         p.deleteLater()
 
 
-def test_the_voice_bar_puts_its_buttons_under_the_name_when_narrow(qapp, monkeypatch):
+def test_effects_come_back_after_a_restart(qapp):
+    from soundboard.ui.voicefxpanel import VoiceFxPanel
+    fx = VoiceFxPanel({"enabled": True, "preset": "Robot",
+                       "effects": {"extra_radio": {"on": True, "drive": 12},
+                                   "backdrop": {"on": True, "crowd": 0.3}}})
+    try:
+        assert fx.on_top_state() == {"layers": {"crowd": 0.3}, "sounds": [],
+                                     "extras": {"extra_radio": 12}}
+        assert fx.spec()["effects"]["extra_radio"]["drive"] == 12
+        assert fx.btn_effects.accessibleName() == "Effects  ·  2"
+    finally:
+        fx.deleteLater()
+
+
+def test_the_extras_run_on_the_mic_after_the_voice():
+    chain = voicefx.VoiceChain()
+    chain.configure({"enabled": True, "effects": {"robot": {"on": True},
+                                                  "extra_echo": {"on": True}}})
+    chain._rebuild(48000)
+    types = [e.type for e in chain._effects]
+    assert types.index("robot") < types.index("extra_echo")
+    assert "extra_echo" not in {c.type for c in voicefx.REGISTRY.values() if not c.extra}
+
+
+def _picked_bar(qapp):
+    from PySide6.QtWidgets import QLayout
+    from soundboard.ui.voicefxpanel import VoiceFxPanel
+    fx = VoiceFxPanel({"enabled": False, "effects": {}})
+    fx.pick("Robot")
+    fx.set_on_top("rain", 0.6)
+    fx.set_on_top("wind", 0.5)
+    bar = fx.picked
+    fx.layout().removeWidget(bar)
+    bar.setParent(None)
+    # squeezable, as it is when laid out in the Voice tab
+    fx.picked_box.setSizeConstraint(QLayout.SizeConstraint.SetNoConstraint)
+    bar.show()
+    return fx, bar
+
+
+def test_the_voice_bar_puts_its_buttons_under_the_name_when_narrow(qapp):
     """The Voice tab pins the bar outside the panel, where a narrow window squeezes
     it: its buttons go under the voice's name instead of losing their words."""
     from PySide6.QtWidgets import QBoxLayout
-    from soundboard.ui.voicefxpanel import VoiceFxPanel
-    fx = VoiceFxPanel({"enabled": False, "effects": {}})
-    bar = fx.picked
+    fx, bar = _picked_bar(qapp)
     try:
-        fx.pick("Storm")
-        fx.layout().removeWidget(bar)
-        bar.setParent(None)
-        from PySide6.QtWidgets import QLayout
-        # squeezable, as it is when laid out in the Voice tab
-        fx.picked_box.setSizeConstraint(QLayout.SizeConstraint.SetNoConstraint)
-        bar.show()
         for width, want in ((1100, QBoxLayout.Direction.LeftToRight),
                             (300, QBoxLayout.Direction.TopToBottom),
                             (1100, QBoxLayout.Direction.LeftToRight)):
@@ -375,7 +460,7 @@ def test_the_voice_bar_puts_its_buttons_under_the_name_when_narrow(qapp, monkeyp
             assert fx.picked_box.direction() == want, width
         bar.resize(300, 200)
         process_events(qapp, lambda: False, timeout=0.1)
-        for b in (fx.btn_tweak, fx.btn_backdrop):
+        for b in (fx.btn_tweak, fx.btn_effects):
             assert b.width() >= b.minimumSizeHint().width() - 1   # nothing squeezed
     finally:
         bar.close()
@@ -383,35 +468,26 @@ def test_the_voice_bar_puts_its_buttons_under_the_name_when_narrow(qapp, monkeyp
         fx.deleteLater()
 
 
-def test_background_keeps_its_words_while_they_fit_and_its_name_always(qapp):
-    from soundboard.ui.voicefxpanel import VoiceFxPanel
-    fx = VoiceFxPanel({"enabled": False, "effects": {}})
-    bar = fx.picked
+def test_effects_keeps_its_words_while_they_fit_and_its_name_always(qapp):
+    fx, bar = _picked_bar(qapp)
     try:
-        fx.pick("Storm")
-        fx.layout().removeWidget(bar)
-        bar.setParent(None)
-        from PySide6.QtWidgets import QLayout
-        # squeezable, as it is when laid out in the Voice tab
-        fx.picked_box.setSizeConstraint(QLayout.SizeConstraint.SetNoConstraint)
-        bar.show()
-        on = len(fx.effects_of("Storm"))
+        on = fx._count_on()
         full = f"Edit voice  ·  {on} on"
         bar.resize(2000, 200)
         process_events(qapp, lambda: False, timeout=0.1)
         m = fx.picked_box.contentsMargins()
         # the folded line with every word: the three buttons side by side (font-free)
         folded = (sum(b.minimumSizeHint().width() for b in
-                      (fx.btn_tweak, fx.btn_backdrop, fx.btn_sample) if not b.isHidden())
+                      (fx.btn_tweak, fx.btn_effects, fx.btn_sample) if not b.isHidden())
                   + 2 * fx._picked_pb.spacing() + m.left() + m.right() + 4)
         for width, words, tweak in ((2000, True, full), (folded, True, full),
                                     (folded - 30, False, full), (120, False, "Edit voice"),
                                     (2000, True, full)):
             bar.resize(width, 200)
             process_events(qapp, lambda: False, timeout=0.1)
-            assert bool(fx.btn_backdrop.text()) == words, width
+            assert bool(fx.btn_effects.text()) == words, width
             assert fx.btn_tweak.text() == tweak, width
-            assert fx.btn_backdrop.accessibleName() == "Background  ·  2 on"
+            assert fx.btn_effects.accessibleName() == "Effects  ·  2"
             assert fx.btn_tweak.accessibleName() == full
     finally:
         bar.close()

@@ -3757,18 +3757,13 @@
   "Votes": "Beoordelingen",
   "Tutorials are off now. Settings → General turns them back on.": "Uitleg staat nu uit. Instellingen → Algemeen zet het weer aan.",
   "Add a sound from my board": "Geluid van mijn board toevoegen",
-  "Astronaut": "Astronaut",
   "Bass boosted": "Bass boosted",
-  "Busy café": "Druk café",
-  "Campfire story": "Kampvuurverhaal",
   "Crackling fire": "Knetterend vuur",
   "Crowd": "Menigte",
   "Engine hum": "Motorgebrom",
   "Every sound is in already": "Alle geluiden zitten er al in",
   "Far away": "Ver weg",
-  "Fighter pilot": "Straaljagerpiloot",
   "From my board": "Van mijn board",
-  "Haunted house": "Spookhuis",
   "Muffle": "Gedempt",
   "Next room": "Kamer ernaast",
   "No sounds on your board yet": "Nog geen geluiden op je board",
@@ -3781,7 +3776,6 @@
   "Spaceship hum": "Ruimteschipgebrom",
   "Speed and pitch": "Snelheid en toonhoogte",
   "Speed, pitch, bass and where “{sound}” seems to be": "Snelheid, toonhoogte, bas en waar ‘{sound}’ lijkt te zijn",
-  "Storm": "Storm",
   "Take “{sound}” out of the background": "‘{sound}’ uit de achtergrond halen",
   "Through a wall": "Door een muur",
   "Wind": "Wind",
@@ -3790,16 +3784,22 @@
   "packed": "afgeladen",
   "pouring": "stortbui",
   "roaring": "laaiend",
-  "Background  ·  {n} on": [
-    "Achtergrond  ·  {n} aan",
-    "Achtergrond  ·  {n} aan"
-  ],
   "Edit voice": "Stem bewerken",
   "Edit voice  ·  {n} on": [
     "Stem bewerken  ·  {n} aan",
     "Stem bewerken  ·  {n} aan"
   ],
   "Make a voice of your own first: Voice tab → Voice changer → Edit voice, or Save what's on under My setups.": "Maak eerst een eigen stem: tab Stem → Stemverander → Stem bewerken, of Opslaan wat aan staat onder Mijn instellingen.",
-  "Rain, wind, a crowd or sounds from your board behind your voice": "Regen, wind, een menigte of geluiden van je board achter je stem",
-  "Your own settings: Edit voice opens them": "Je eigen instellingen: ‘Stem bewerken’ opent ze"
+  "Your own settings: Edit voice opens them": "Je eigen instellingen: ‘Stem bewerken’ opent ze",
+  "A sound from my board": "Een geluid van mijn board",
+  "Add an effect": "Effect toevoegen",
+  "Add {effect}": "{effect} toevoegen",
+  "Advanced: Edit voice": "Geavanceerd: Stem bewerken",
+  "Effects  ·  {n}": [
+    "Effecten  ·  {n}",
+    "Effecten  ·  {n}"
+  ],
+  "On top of any voice: they stay when you pick another one.": "Bovenop elke stem: ze blijven als je een andere kiest.",
+  "Rain, a crowd, an echo or sounds from your board, on top of any voice": "Regen, een menigte, echo of geluiden van je board bovenop elke stem",
+  "Take “{effect}” off": "‘{effect}’ uitzetten"
 }

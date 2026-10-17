@@ -3757,18 +3757,13 @@
   "Votes": "Arviot",
   "Tutorials are off now. Settings → General turns them back on.": "Ohjeet ovat nyt pois. Asetukset → Yleiset laittaa ne takaisin päälle.",
   "Add a sound from my board": "Lisää ääni omalta boardilta",
-  "Astronaut": "Astronautti",
   "Bass boosted": "Bassot tappiin",
-  "Busy café": "Täysi kahvila",
-  "Campfire story": "Nuotiotarina",
   "Crackling fire": "Rätisevä tuli",
   "Crowd": "Väkijoukko",
   "Engine hum": "Moottorin hurina",
   "Every sound is in already": "Kaikki äänet ovat jo mukana",
   "Far away": "Kaukana",
-  "Fighter pilot": "Hävittäjälentäjä",
   "From my board": "Omalta boardilta",
-  "Haunted house": "Kummitustalo",
   "Muffle": "Vaimea",
   "Next room": "Viereinen huone",
   "No sounds on your board yet": "Boardillasi ei ole vielä ääniä",
@@ -3781,7 +3776,6 @@
   "Spaceship hum": "Avaruusaluksen hurina",
   "Speed and pitch": "Nopeus ja sävelkorkeus",
   "Speed, pitch, bass and where “{sound}” seems to be": "Nopeus, sävelkorkeus, basso ja missä ”{sound}” tuntuu olevan",
-  "Storm": "Myrsky",
   "Take “{sound}” out of the background": "Poista ”{sound}” taustalta",
   "Through a wall": "Seinän läpi",
   "Wind": "Tuuli",
@@ -3790,16 +3784,22 @@
   "packed": "täpötäysi",
   "pouring": "kaatosade",
   "roaring": "roihuava",
-  "Background  ·  {n} on": [
-    "Tausta  ·  {n} päällä",
-    "Tausta  ·  {n} päällä"
-  ],
   "Edit voice": "Muokkaa ääntä",
   "Edit voice  ·  {n} on": [
     "Muokkaa ääntä  ·  {n} päällä",
     "Muokkaa ääntä  ·  {n} päällä"
   ],
   "Make a voice of your own first: Voice tab → Voice changer → Edit voice, or Save what's on under My setups.": "Tee ensin oma ääni: Ääni-välilehti → Äänenmuuttaja → Muokkaa ääntä, tai Tallenna päällä olevat kohdassa Omat asetelmat.",
-  "Rain, wind, a crowd or sounds from your board behind your voice": "Sadetta, tuulta, väkijoukko tai ääniä boardiltasi äänesi takana",
-  "Your own settings: Edit voice opens them": "Omat asetuksesi: ”Muokkaa ääntä” avaa ne"
+  "Your own settings: Edit voice opens them": "Omat asetuksesi: ”Muokkaa ääntä” avaa ne",
+  "A sound from my board": "Ääni omalta boardilta",
+  "Add an effect": "Lisää efekti",
+  "Add {effect}": "Lisää {effect}",
+  "Advanced: Edit voice": "Lisäasetukset: Muokkaa ääntä",
+  "Effects  ·  {n}": [
+    "Efektit  ·  {n}",
+    "Efektit  ·  {n}"
+  ],
+  "On top of any voice: they stay when you pick another one.": "Minkä tahansa äänen päällä: pysyvät, kun valitset toisen.",
+  "Rain, a crowd, an echo or sounds from your board, on top of any voice": "Sade, väkijoukko, kaiku tai äänet boardiltasi minkä tahansa äänen päälle",
+  "Take “{effect}” off": "Poista ”{effect}”"
 }

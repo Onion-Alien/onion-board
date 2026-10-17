@@ -25,7 +25,7 @@ from soundboard.ui import a11y, appstate, art, busy, icons
 from soundboard.ui.panel import Flow, card, hint_label, icon_button, section_label
 from soundboard.ui.responsive import FitWidth
 from soundboard.ui.speechpanel import LIVE_MODULE, SpeechPanel
-from soundboard.ui.voicefxpanel import CUSTOM, KEEP, EffectRow, VoiceFxPanel
+from soundboard.ui.voicefxpanel import CUSTOM, EffectRow, VoiceFxPanel, on_top
 from soundboard.ui.voicestatus import VoiceStatusBar
 from soundboard.i18n import _
 from soundboard.ui.pixels import snap_to_pixels
@@ -328,7 +328,7 @@ class VoicePanel(QWidget):
         names = []
         if self.fx.btn_power.isChecked():
             effects = {t: c for t, c in self.fx.spec()["effects"].items()
-                       if c.get("on") and t not in KEEP}
+                       if c.get("on") and not on_top(t)}
             if effects:
                 name = self.fx.preset
                 out["fx"] = "" if name == CUSTOM else name
