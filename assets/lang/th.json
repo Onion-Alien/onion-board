@@ -3412,7 +3412,6 @@
   "Couldn't get “{name}”: {error}": "ดึง “{name}” ไม่ได้: {error}",
   "Couldn't open the store": "เปิดร้านไม่ได้",
   "Couldn't reach the sound store. Check your internet and try again.": "เชื่อมต่อร้านเสียงไม่ได้ ตรวจสอบอินเทอร์เน็ตแล้วลองอีกครั้ง",
-  "Every sound here is CC0: free for anyone to use for anything, no credit needed. Sounds people share are checked before they show up. Vote for the ones you like so others find them.": "ทุกเสียงที่นี่เป็น CC0: ใครก็ใช้ทำอะไรก็ได้ ไม่ต้องให้เครดิต เสียงที่คนแชร์จะถูกตรวจก่อนแสดง โหวตเสียงที่คุณชอบ เพื่อให้คนอื่นเจอ",
   "Free sounds anyone can use, voted by players: add them or share your own": "เสียงฟรีสำหรับทุกคน โหวตโดยผู้เล่น: เพิ่มไปใช้หรือแชร์เสียงของคุณ",
   "Free sounds other players shared, voted on: add them, or share your own.": "เสียงฟรีที่ผู้เล่นคนอื่นแชร์และโหวต: เพิ่มไปใช้หรือแชร์เสียงของคุณ",
   "Hear it (only you)": "ฟัง (เฉพาะคุณ)",
@@ -3467,7 +3466,6 @@
   "A YouTube, TikTok, SoundCloud or other video link. Only the link is kept: whoever adds it gets it from that site. It shows once it's been checked.": "ลิงก์ YouTube, TikTok, SoundCloud หรือวิดีโออื่น เก็บไว้แค่ลิงก์: คนที่เพิ่มจะดึงจากเว็บนั้นเอง จะแสดงเมื่อตรวจแล้ว",
   "A file": "ไฟล์",
   "A link": "ลิงก์",
-  "Order": "ลำดับ",
   "Paste a link and name it first": "วางลิงก์และตั้งชื่อก่อน",
   "Paste a link: https://www.youtube.com/watch?v=…": "วางลิงก์: https://www.youtube.com/watch?v=…",
   "Play it once (from the site)": "เล่นหนึ่งครั้ง (จากเว็บ)",
@@ -3505,5 +3503,16 @@
   "Take everything out of the queue": "เอาทุกอย่างออกจากคิว",
   "The Free sounds tab: the project's own sound store, for its list, the sounds you play or add, your votes and the sounds you share.": "แท็บเสียงฟรี: ร้านเสียงของโปรเจกต์เอง สำหรับรายการ เสียงที่คุณเล่นหรือเพิ่ม โหวตของคุณ และเสียงที่คุณแชร์",
   "Share this link in the Free sounds tab": "แชร์ลิงก์นี้ในแท็บเสียงฟรี",
-  "Free sounds": "เสียงฟรี"
+  "Free sounds": "เสียงฟรี",
+  "Esports": "อีสปอร์ต",
+  "Movies": "ภาพยนตร์",
+  "Podcast": "พอดแคสต์",
+  "Politics": "การเมือง",
+  "Pranks": "แกล้ง",
+  "Sounds people share here are CC0: free for anyone to use for anything, no credit needed, and checked before they show up. Sounds from Myinstants are links: they play and download from that site. Vote for the ones you like so others find them.": "เสียงที่คนแชร์ที่นี่เป็น CC0: ใครก็ใช้ได้ทุกอย่างฟรี ไม่ต้องให้เครดิต และจะถูกตรวจก่อนแสดง เสียงจาก Myinstants เป็นลิงก์: เล่นและดาวน์โหลดจากเว็บนั้น โหวตเสียงที่คุณชอบเพื่อให้คนอื่นเจอ",
+  "Spooky": "น่ากลัว",
+  "Sports": "กีฬา",
+  "TV": "ทีวี",
+  "Viral": "ไวรัล",
+  "What's hot on Myinstants right now, and the sounds people here liked this week": "สิ่งที่กำลังฮิตใน Myinstants ตอนนี้ และเสียงที่คนที่นี่ชอบในสัปดาห์นี้"
 }

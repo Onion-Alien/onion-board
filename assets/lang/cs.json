@@ -3566,7 +3566,6 @@
   "Couldn't get “{name}”: {error}": "„{name}“ se nepodařilo získat: {error}",
   "Couldn't open the store": "Obchod se nepodařilo otevřít",
   "Couldn't reach the sound store. Check your internet and try again.": "Obchod se zvuky není dostupný. Zkontroluj internet a zkus to znovu.",
-  "Every sound here is CC0: free for anyone to use for anything, no credit needed. Sounds people share are checked before they show up. Vote for the ones you like so others find them.": "Každý zvuk tady je CC0: kdokoli ho smí použít na cokoli, bez uvedení autora. Sdílené zvuky se před zveřejněním kontrolují. Hlasuj pro ty, které se ti líbí, ať je najdou i ostatní.",
   "Free sounds anyone can use, voted by players: add them or share your own": "Zvuky zdarma pro všechny, hodnocené hráči: přidej si je nebo sdílej svoje",
   "Free sounds other players shared, voted on: add them, or share your own.": "Zvuky zdarma, které sdíleli a ohodnotili ostatní hráči: přidej si je nebo sdílej svoje.",
   "Hear it (only you)": "Poslechnout (jen ty)",
@@ -3621,7 +3620,6 @@
   "A YouTube, TikTok, SoundCloud or other video link. Only the link is kept: whoever adds it gets it from that site. It shows once it's been checked.": "Odkaz na YouTube, TikTok, SoundCloud nebo jiné video. Uloží se jen odkaz: kdo ho přidá, stáhne si ho z té stránky. Objeví se po kontrole.",
   "A file": "Soubor",
   "A link": "Odkaz",
-  "Order": "Pořadí",
   "Paste a link and name it first": "Nejdřív vlož odkaz a pojmenuj ho",
   "Paste a link: https://www.youtube.com/watch?v=…": "Vlož odkaz: https://www.youtube.com/watch?v=…",
   "Play it once (from the site)": "Přehrát jednou (ze stránky)",
@@ -3659,5 +3657,16 @@
   "Take everything out of the queue": "Odebrat vše z fronty",
   "The Free sounds tab: the project's own sound store, for its list, the sounds you play or add, your votes and the sounds you share.": "Karta Zvuky zdarma: vlastní obchod se zvuky projektu, pro jeho seznam, zvuky, které přehráváš nebo přidáváš, tvoje hlasy a zvuky, které sdílíš.",
   "Share this link in the Free sounds tab": "Sdílet tento odkaz na kartě Zvuky zdarma",
-  "Free sounds": "Zvuky zdarma"
+  "Free sounds": "Zvuky zdarma",
+  "Esports": "Esport",
+  "Movies": "Filmy",
+  "Podcast": "Podcast",
+  "Politics": "Politika",
+  "Pranks": "Vtípky",
+  "Sounds people share here are CC0: free for anyone to use for anything, no credit needed, and checked before they show up. Sounds from Myinstants are links: they play and download from that site. Vote for the ones you like so others find them.": "Zvuky, které sem lidé sdílejí, jsou CC0: kdokoli je smí použít k čemukoli, bez uvedení autora, a před zveřejněním se kontrolují. Zvuky z Myinstants jsou odkazy: přehrávají a stahují se z toho webu. Hlasuj pro ty, které se ti líbí, ať je najdou i ostatní.",
+  "Spooky": "Strašidelné",
+  "Sports": "Sport",
+  "TV": "TV",
+  "Viral": "Virální",
+  "What's hot on Myinstants right now, and the sounds people here liked this week": "Co je teď populární na Myinstants a zvuky, které se tu lidem líbily tento týden"
 }

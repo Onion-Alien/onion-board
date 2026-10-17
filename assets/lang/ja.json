@@ -3412,7 +3412,6 @@
   "Couldn't get “{name}”: {error}": "「{name}」を取得できませんでした：{error}",
   "Couldn't open the store": "ストアを開けませんでした",
   "Couldn't reach the sound store. Check your internet and try again.": "サウンドストアに接続できません。インターネットを確認してもう一度試してください。",
-  "Every sound here is CC0: free for anyone to use for anything, no credit needed. Sounds people share are checked before they show up. Vote for the ones you like so others find them.": "ここのサウンドはすべて CC0：誰でも何にでも使えて、クレジットも不要です。共有されたサウンドは公開前にチェックされます。気に入ったものに投票すると、ほかの人も見つけやすくなります。",
   "Free sounds anyone can use, voted by players: add them or share your own": "誰でも使える無料サウンド、プレイヤーの投票つき：追加するか、自分のを共有しよう",
   "Free sounds other players shared, voted on: add them, or share your own.": "ほかのプレイヤーが共有して投票した無料サウンド：追加するか、自分のを共有しよう。",
   "Hear it (only you)": "試聴（自分だけ）",
@@ -3467,7 +3466,6 @@
   "A YouTube, TikTok, SoundCloud or other video link. Only the link is kept: whoever adds it gets it from that site. It shows once it's been checked.": "YouTube、TikTok、SoundCloud などの動画リンク。保存されるのはリンクだけ：追加した人がそのサイトから取得します。チェックが済むと表示されます。",
   "A file": "ファイル",
   "A link": "リンク",
-  "Order": "並び順",
   "Paste a link and name it first": "先にリンクを貼り付けて名前をつけてください",
   "Paste a link: https://www.youtube.com/watch?v=…": "リンクを貼り付け：https://www.youtube.com/watch?v=…",
   "Play it once (from the site)": "1 回再生（サイトから）",
@@ -3505,5 +3503,16 @@
   "Take everything out of the queue": "列からすべて外す",
   "The Free sounds tab: the project's own sound store, for its list, the sounds you play or add, your votes and the sounds you share.": "無料サウンドタブ：プロジェクト独自のサウンドストア。一覧、再生や追加したサウンド、投票、共有したサウンドに使います。",
   "Share this link in the Free sounds tab": "このリンクを無料サウンドタブで共有",
-  "Free sounds": "無料サウンド"
+  "Free sounds": "無料サウンド",
+  "Esports": "eスポーツ",
+  "Movies": "映画",
+  "Podcast": "ポッドキャスト",
+  "Politics": "政治",
+  "Pranks": "いたずら",
+  "Sounds people share here are CC0: free for anyone to use for anything, no credit needed, and checked before they show up. Sounds from Myinstants are links: they play and download from that site. Vote for the ones you like so others find them.": "ここで共有されるサウンドは CC0 です：誰でも何にでも自由に使え、クレジットも不要で、公開前にチェックされます。Myinstants のサウンドはリンクです：そのサイトから再生・ダウンロードされます。気に入ったものに投票して、ほかの人にも見つけてもらいましょう。",
+  "Spooky": "ホラー",
+  "Sports": "スポーツ",
+  "TV": "テレビ",
+  "Viral": "バズり",
+  "What's hot on Myinstants right now, and the sounds people here liked this week": "いま Myinstants で人気のものと、今週ここでみんなが気に入ったサウンド"
 }

@@ -3412,7 +3412,6 @@
   "Couldn't get “{name}”: {error}": "Tidak bisa mengambil “{name}”: {error}",
   "Couldn't open the store": "Tidak bisa membuka toko",
   "Couldn't reach the sound store. Check your internet and try again.": "Tidak bisa menghubungi toko suara. Cek internetmu lalu coba lagi.",
-  "Every sound here is CC0: free for anyone to use for anything, no credit needed. Sounds people share are checked before they show up. Vote for the ones you like so others find them.": "Semua suara di sini CC0: siapa pun boleh memakainya untuk apa saja, tanpa menyebut pembuatnya. Suara yang dibagikan diperiksa dulu sebelum muncul. Pilih yang kamu suka supaya orang lain menemukannya.",
   "Free sounds anyone can use, voted by players: add them or share your own": "Suara gratis untuk semua, dipilih para pemain: tambahkan atau bagikan punyamu",
   "Free sounds other players shared, voted on: add them, or share your own.": "Suara gratis yang dibagikan dan dipilih pemain lain: tambahkan atau bagikan punyamu.",
   "Hear it (only you)": "Dengarkan (hanya kamu)",
@@ -3467,7 +3466,6 @@
   "A YouTube, TikTok, SoundCloud or other video link. Only the link is kept: whoever adds it gets it from that site. It shows once it's been checked.": "Link YouTube, TikTok, SoundCloud, atau video lain. Hanya link-nya yang disimpan: yang menambahkannya mengambil dari situs itu. Muncul setelah diperiksa.",
   "A file": "File",
   "A link": "Link",
-  "Order": "Urutan",
   "Paste a link and name it first": "Tempel link dan beri nama dulu",
   "Paste a link: https://www.youtube.com/watch?v=…": "Tempel link: https://www.youtube.com/watch?v=…",
   "Play it once (from the site)": "Putar sekali (dari situsnya)",
@@ -3505,5 +3503,16 @@
   "Take everything out of the queue": "Keluarkan semua dari antrean",
   "The Free sounds tab: the project's own sound store, for its list, the sounds you play or add, your votes and the sounds you share.": "Tab Suara gratis: toko suara milik proyek ini, untuk daftarnya, suara yang kamu putar atau tambahkan, pilihanmu, dan suara yang kamu bagikan.",
   "Share this link in the Free sounds tab": "Bagikan link ini di tab Suara gratis",
-  "Free sounds": "Suara gratis"
+  "Free sounds": "Suara gratis",
+  "Esports": "Esports",
+  "Movies": "Film",
+  "Podcast": "Podcast",
+  "Politics": "Politik",
+  "Pranks": "Prank",
+  "Sounds people share here are CC0: free for anyone to use for anything, no credit needed, and checked before they show up. Sounds from Myinstants are links: they play and download from that site. Vote for the ones you like so others find them.": "Suara yang dibagikan orang di sini berlisensi CC0: bebas dipakai siapa saja untuk apa saja, tanpa perlu kredit, dan diperiksa sebelum muncul. Suara dari Myinstants berupa tautan: diputar dan diunduh dari situs itu. Beri suara untuk yang kamu suka agar orang lain menemukannya.",
+  "Spooky": "Seram",
+  "Sports": "Olahraga",
+  "TV": "TV",
+  "Viral": "Viral",
+  "What's hot on Myinstants right now, and the sounds people here liked this week": "Yang sedang ramai di Myinstants sekarang, dan suara yang disukai orang di sini minggu ini"
 }

@@ -3489,7 +3489,6 @@
   "Couldn't get “{name}”: {error}": "“{name}” नहीं मिल पाई: {error}",
   "Couldn't open the store": "स्टोर नहीं खुल पाया",
   "Couldn't reach the sound store. Check your internet and try again.": "साउंड स्टोर तक नहीं पहुँच पाए। अपना इंटरनेट देखें और फिर से कोशिश करें।",
-  "Every sound here is CC0: free for anyone to use for anything, no credit needed. Sounds people share are checked before they show up. Vote for the ones you like so others find them.": "यहाँ हर साउंड CC0 है: कोई भी इसे किसी भी काम में मुफ़्त इस्तेमाल कर सकता है, नाम देने की ज़रूरत नहीं। लोगों की शेयर की गई साउंड दिखने से पहले जाँची जाती हैं। जो पसंद आएँ उन्हें वोट दें ताकि दूसरे भी उन्हें पा सकें।",
   "Free sounds anyone can use, voted by players: add them or share your own": "सबके लिए मुफ़्त साउंड, खिलाड़ियों के वोट से: इन्हें जोड़ें या अपनी शेयर करें",
   "Free sounds other players shared, voted on: add them, or share your own.": "दूसरे खिलाड़ियों की शेयर और वोट की गई मुफ़्त साउंड: इन्हें जोड़ें या अपनी शेयर करें।",
   "Hear it (only you)": "सुनें (सिर्फ़ आप)",
@@ -3544,7 +3543,6 @@
   "A YouTube, TikTok, SoundCloud or other video link. Only the link is kept: whoever adds it gets it from that site. It shows once it's been checked.": "YouTube, TikTok, SoundCloud या किसी और वीडियो का लिंक। सिर्फ़ लिंक रखा जाता है: जो इसे जोड़ेगा, वह उसी साइट से लेगा। जाँच के बाद यह दिखेगा।",
   "A file": "एक फ़ाइल",
   "A link": "एक लिंक",
-  "Order": "क्रम",
   "Paste a link and name it first": "पहले लिंक पेस्ट करें और उसे नाम दें",
   "Paste a link: https://www.youtube.com/watch?v=…": "लिंक पेस्ट करें: https://www.youtube.com/watch?v=…",
   "Play it once (from the site)": "एक बार चलाएँ (साइट से)",
@@ -3582,5 +3580,16 @@
   "Take everything out of the queue": "कतार से सब कुछ हटाएँ",
   "The Free sounds tab: the project's own sound store, for its list, the sounds you play or add, your votes and the sounds you share.": "मुफ़्त साउंड टैब: प्रोजेक्ट का अपना साउंड स्टोर, उसकी सूची, आपकी चलाई या जोड़ी गई साउंड, आपके वोट और आपकी शेयर की गई साउंड के लिए।",
   "Share this link in the Free sounds tab": "यह लिंक मुफ़्त साउंड टैब में शेयर करें",
-  "Free sounds": "मुफ़्त साउंड"
+  "Free sounds": "मुफ़्त साउंड",
+  "Esports": "ईस्पोर्ट्स",
+  "Movies": "फ़िल्में",
+  "Podcast": "पॉडकास्ट",
+  "Politics": "राजनीति",
+  "Pranks": "प्रैंक",
+  "Sounds people share here are CC0: free for anyone to use for anything, no credit needed, and checked before they show up. Sounds from Myinstants are links: they play and download from that site. Vote for the ones you like so others find them.": "यहाँ लोग जो साउंड शेयर करते हैं वे CC0 हैं: कोई भी, किसी भी काम के लिए, बिना क्रेडिट दिए इस्तेमाल कर सकता है, और दिखने से पहले उनकी जाँच होती है। Myinstants के साउंड लिंक हैं: वे उसी साइट से चलते और डाउनलोड होते हैं। जो पसंद हों उन्हें वोट दें ताकि दूसरे भी उन्हें ढूँढ सकें।",
+  "Spooky": "डरावने",
+  "Sports": "खेल",
+  "TV": "टीवी",
+  "Viral": "वायरल",
+  "What's hot on Myinstants right now, and the sounds people here liked this week": "Myinstants पर अभी क्या ट्रेंड कर रहा है, और इस हफ़्ते यहाँ लोगों को कौन से साउंड पसंद आए"
 }

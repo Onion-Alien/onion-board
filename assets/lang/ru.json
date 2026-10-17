@@ -3566,7 +3566,6 @@
   "Couldn't get “{name}”: {error}": "Не удалось получить «{name}»: {error}",
   "Couldn't open the store": "Не удалось открыть магазин",
   "Couldn't reach the sound store. Check your internet and try again.": "Не удалось связаться с магазином звуков. Проверьте интернет и попробуйте снова.",
-  "Every sound here is CC0: free for anyone to use for anything, no credit needed. Sounds people share are checked before they show up. Vote for the ones you like so others find them.": "Все звуки здесь под CC0: любой может использовать их для чего угодно, без указания автора. Звуки, которыми делятся люди, проверяются перед публикацией. Голосуйте за понравившиеся, чтобы их нашли другие.",
   "Free sounds anyone can use, voted by players: add them or share your own": "Бесплатные звуки для всех, оценённые игроками: добавляйте их или делитесь своими",
   "Free sounds other players shared, voted on: add them, or share your own.": "Бесплатные звуки, которыми поделились и которые оценили другие игроки: добавляйте их или делитесь своими.",
   "Hear it (only you)": "Послушать (только вы)",
@@ -3621,7 +3620,6 @@
   "A YouTube, TikTok, SoundCloud or other video link. Only the link is kept: whoever adds it gets it from that site. It shows once it's been checked.": "Ссылка на YouTube, TikTok, SoundCloud или другое видео. Хранится только ссылка: кто её добавит, скачает с самого сайта. Появится после проверки.",
   "A file": "Файл",
   "A link": "Ссылка",
-  "Order": "Порядок",
   "Paste a link and name it first": "Сначала вставьте ссылку и назовите её",
   "Paste a link: https://www.youtube.com/watch?v=…": "Вставьте ссылку: https://www.youtube.com/watch?v=…",
   "Play it once (from the site)": "Проиграть один раз (с сайта)",
@@ -3659,5 +3657,16 @@
   "Take everything out of the queue": "Убрать всё из очереди",
   "The Free sounds tab: the project's own sound store, for its list, the sounds you play or add, your votes and the sounds you share.": "Вкладка «Бесплатные звуки»: собственный магазин звуков проекта, для его списка, звуков, которые вы слушаете или добавляете, ваших голосов и звуков, которыми вы делитесь.",
   "Share this link in the Free sounds tab": "Поделиться этой ссылкой во вкладке «Бесплатные звуки»",
-  "Free sounds": "Бесплатные звуки"
+  "Free sounds": "Бесплатные звуки",
+  "Esports": "Киберспорт",
+  "Movies": "Фильмы",
+  "Podcast": "Подкасты",
+  "Politics": "Политика",
+  "Pranks": "Пранки",
+  "Sounds people share here are CC0: free for anyone to use for anything, no credit needed, and checked before they show up. Sounds from Myinstants are links: they play and download from that site. Vote for the ones you like so others find them.": "Звуки, которыми здесь делятся, распространяются по CC0: любой может использовать их для чего угодно без указания автора, и их проверяют перед публикацией. Звуки с Myinstants — это ссылки: они играют и скачиваются с того сайта. Голосуй за понравившиеся, чтобы их нашли и другие.",
+  "Spooky": "Жуткие",
+  "Sports": "Спорт",
+  "TV": "ТВ",
+  "Viral": "Вирусные",
+  "What's hot on Myinstants right now, and the sounds people here liked this week": "Что сейчас популярно на Myinstants и звуки, которые здесь понравились людям на этой неделе"
 }

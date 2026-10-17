@@ -3489,7 +3489,6 @@
   "Couldn't get “{name}”: {error}": "Impossible d’obtenir « {name} » : {error}",
   "Couldn't open the store": "Impossible d’ouvrir la boutique",
   "Couldn't reach the sound store. Check your internet and try again.": "Impossible de joindre la boutique de sons. Vérifie ta connexion et réessaie.",
-  "Every sound here is CC0: free for anyone to use for anything, no credit needed. Sounds people share are checked before they show up. Vote for the ones you like so others find them.": "Tous les sons ici sont en CC0 : libres pour tout le monde et pour tout, sans crédit. Les sons partagés sont vérifiés avant d’apparaître. Vote pour ceux que tu aimes pour que les autres les trouvent.",
   "Free sounds anyone can use, voted by players: add them or share your own": "Des sons gratuits pour tous, notés par les joueurs : ajoute-les ou partage les tiens",
   "Free sounds other players shared, voted on: add them, or share your own.": "Des sons gratuits partagés et notés par d’autres joueurs : ajoute-les ou partage les tiens.",
   "Hear it (only you)": "L’écouter (toi seul)",
@@ -3544,7 +3543,6 @@
   "A YouTube, TikTok, SoundCloud or other video link. Only the link is kept: whoever adds it gets it from that site. It shows once it's been checked.": "Un lien YouTube, TikTok, SoundCloud ou d’une autre vidéo. Seul le lien est gardé : qui l’ajoute le récupère sur ce site. Il apparaît une fois vérifié.",
   "A file": "Un fichier",
   "A link": "Un lien",
-  "Order": "Ordre",
   "Paste a link and name it first": "Colle d’abord un lien et donne-lui un nom",
   "Paste a link: https://www.youtube.com/watch?v=…": "Colle un lien : https://www.youtube.com/watch?v=…",
   "Play it once (from the site)": "Le lire une fois (depuis le site)",
@@ -3582,5 +3580,16 @@
   "Take everything out of the queue": "Tout retirer de la file",
   "The Free sounds tab: the project's own sound store, for its list, the sounds you play or add, your votes and the sounds you share.": "L’onglet Sons gratuits : la boutique de sons du projet, pour sa liste, les sons que tu écoutes ou ajoutes, tes votes et les sons que tu partages.",
   "Share this link in the Free sounds tab": "Partager ce lien dans l’onglet Sons gratuits",
-  "Free sounds": "Sons gratuits"
+  "Free sounds": "Sons gratuits",
+  "Esports": "E-sport",
+  "Movies": "Films",
+  "Podcast": "Podcast",
+  "Politics": "Politique",
+  "Pranks": "Blagues",
+  "Sounds people share here are CC0: free for anyone to use for anything, no credit needed, and checked before they show up. Sounds from Myinstants are links: they play and download from that site. Vote for the ones you like so others find them.": "Les sons partagés ici sont en CC0 : libres pour tout le monde et pour tout usage, sans citer l'auteur, et vérifiés avant d'apparaître. Les sons de Myinstants sont des liens : ils sont lus et téléchargés depuis ce site. Vote pour ceux que tu aimes pour que d'autres les trouvent.",
+  "Spooky": "Effrayant",
+  "Sports": "Sport",
+  "TV": "Télé",
+  "Viral": "Viral",
+  "What's hot on Myinstants right now, and the sounds people here liked this week": "Ce qui cartonne sur Myinstants en ce moment, et les sons que les gens ici ont aimés cette semaine"
 }

@@ -3489,7 +3489,6 @@
   "Couldn't get “{name}”: {error}": "Nem sikerült lekérni: „{name}”: {error}",
   "Couldn't open the store": "Nem sikerült megnyitni a boltot",
   "Couldn't reach the sound store. Check your internet and try again.": "Nem érhető el a hangbolt. Nézd meg az internetet, és próbáld újra.",
-  "Every sound here is CC0: free for anyone to use for anything, no credit needed. Sounds people share are checked before they show up. Vote for the ones you like so others find them.": "Itt minden hang CC0: bárki bármire használhatja, forrásmegjelölés nélkül. A megosztott hangokat megjelenés előtt ellenőrizzük. Szavazz azokra, amelyek tetszenek, hogy mások is megtalálják őket.",
   "Free sounds anyone can use, voted by players: add them or share your own": "Ingyenes hangok mindenkinek, játékosok szavazatai alapján: add hozzá őket, vagy oszd meg a sajátjaidat",
   "Free sounds other players shared, voted on: add them, or share your own.": "Ingyenes hangok, amelyeket más játékosok osztottak meg és szavaztak meg: add hozzá őket, vagy oszd meg a sajátjaidat.",
   "Hear it (only you)": "Meghallgatás (csak te)",
@@ -3544,7 +3543,6 @@
   "A YouTube, TikTok, SoundCloud or other video link. Only the link is kept: whoever adds it gets it from that site. It shows once it's been checked.": "YouTube-, TikTok-, SoundCloud- vagy más videólink. Csak a linket tároljuk: aki hozzáadja, az oldalról tölti le. Ellenőrzés után jelenik meg.",
   "A file": "Egy fájl",
   "A link": "Egy link",
-  "Order": "Sorrend",
   "Paste a link and name it first": "Előbb illessz be egy linket, és adj neki nevet",
   "Paste a link: https://www.youtube.com/watch?v=…": "Illessz be egy linket: https://www.youtube.com/watch?v=…",
   "Play it once (from the site)": "Lejátszás egyszer (az oldalról)",
@@ -3582,5 +3580,16 @@
   "Take everything out of the queue": "Mindent kivesz a sorból",
   "The Free sounds tab: the project's own sound store, for its list, the sounds you play or add, your votes and the sounds you share.": "Az Ingyenes hangok fül: a projekt saját hangboltja, a listájához, a lejátszott vagy hozzáadott hangokhoz, a szavazataidhoz és a megosztott hangjaidhoz.",
   "Share this link in the Free sounds tab": "Link megosztása az Ingyenes hangok fülön",
-  "Free sounds": "Ingyenes hangok"
+  "Free sounds": "Ingyenes hangok",
+  "Esports": "E-sport",
+  "Movies": "Filmek",
+  "Podcast": "Podcast",
+  "Politics": "Politika",
+  "Pranks": "Csínyek",
+  "Sounds people share here are CC0: free for anyone to use for anything, no credit needed, and checked before they show up. Sounds from Myinstants are links: they play and download from that site. Vote for the ones you like so others find them.": "Az itt megosztott hangok CC0-sak: bárki bármire használhatja őket, forrásmegjelölés nélkül, és megjelenés előtt ellenőrizzük őket. A Myinstants hangjai linkek: arról az oldalról szólnak és töltődnek le. Szavazz azokra, amik tetszenek, hogy mások is megtalálják őket.",
+  "Spooky": "Ijesztő",
+  "Sports": "Sport",
+  "TV": "TV",
+  "Viral": "Virális",
+  "What's hot on Myinstants right now, and the sounds people here liked this week": "Ami most népszerű a Myinstantson, és a hangok, amik itt tetszettek az embereknek ezen a héten"
 }

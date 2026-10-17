@@ -3489,7 +3489,6 @@
   "Couldn't get “{name}”: {error}": "Kunne ikke hente “{name}”: {error}",
   "Couldn't open the store": "Kunne ikke åbne butikken",
   "Couldn't reach the sound store. Check your internet and try again.": "Kunne ikke nå lydbutikken. Tjek dit internet, og prøv igen.",
-  "Every sound here is CC0: free for anyone to use for anything, no credit needed. Sounds people share are checked before they show up. Vote for the ones you like so others find them.": "Alle lyde her er CC0: alle må bruge dem til alt, uden at kreditere nogen. Delte lyde bliver tjekket, før de vises. Stem på dem, du kan lide, så andre finder dem.",
   "Free sounds anyone can use, voted by players: add them or share your own": "Gratis lyde for alle, stemt frem af spillere: tilføj dem, eller del dine egne",
   "Free sounds other players shared, voted on: add them, or share your own.": "Gratis lyde, som andre spillere har delt og stemt på: tilføj dem, eller del dine egne.",
   "Hear it (only you)": "Hør den (kun dig)",
@@ -3544,7 +3543,6 @@
   "A YouTube, TikTok, SoundCloud or other video link. Only the link is kept: whoever adds it gets it from that site. It shows once it's been checked.": "Et link til YouTube, TikTok, SoundCloud eller en anden video. Kun linket gemmes: den, der tilføjer det, henter det fra siden. Det vises, når det er tjekket.",
   "A file": "En fil",
   "A link": "Et link",
-  "Order": "Rækkefølge",
   "Paste a link and name it first": "Indsæt et link, og giv det et navn først",
   "Paste a link: https://www.youtube.com/watch?v=…": "Indsæt et link: https://www.youtube.com/watch?v=…",
   "Play it once (from the site)": "Afspil den én gang (fra siden)",
@@ -3582,5 +3580,16 @@
   "Take everything out of the queue": "Tag alt ud af køen",
   "The Free sounds tab: the project's own sound store, for its list, the sounds you play or add, your votes and the sounds you share.": "Fanen Gratis lyde: projektets egen lydbutik, til listen, de lyde du afspiller eller tilføjer, dine stemmer og de lyde du deler.",
   "Share this link in the Free sounds tab": "Del dette link i fanen Gratis lyde",
-  "Free sounds": "Gratis lyde"
+  "Free sounds": "Gratis lyde",
+  "Esports": "E-sport",
+  "Movies": "Film",
+  "Podcast": "Podcast",
+  "Politics": "Politik",
+  "Pranks": "Pranks",
+  "Sounds people share here are CC0: free for anyone to use for anything, no credit needed, and checked before they show up. Sounds from Myinstants are links: they play and download from that site. Vote for the ones you like so others find them.": "Lyde, folk deler her, er CC0: frie for alle til alt, uden kreditering, og tjekkes, før de vises. Lyde fra Myinstants er links: de afspilles og hentes fra det site. Stem på dem, du kan lide, så andre finder dem.",
+  "Spooky": "Uhyggelig",
+  "Sports": "Sport",
+  "TV": "TV",
+  "Viral": "Viral",
+  "What's hot on Myinstants right now, and the sounds people here liked this week": "Det hotteste på Myinstants lige nu og de lyde, folk her kunne lide i denne uge"
 }
