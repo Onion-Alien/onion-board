@@ -82,7 +82,6 @@
     "<span style='color:{colour}'>{n} falha de áudio desde o início{tip}</span>",
     "<span style='color:{colour}'>{n} falhas de áudio desde o início{tip}</span>"
   ],
-  "<span style='color:{red}'>Couldn't search {site}: {err}</span>": "<span style='color:{red}'>Não foi possível procurar em {site}: {err}</span>",
   "<span style='color:{status}'>Another program is already using {keys}, pick a different hotkey.</span>": "<span style='color:{status}'>Outro programa já está a usar {keys}, escolhe outro atalho.</span>",
   "<span style='color:{status}'>Audio device problem: {problems}</span>": "<span style='color:{status}'>Problema no dispositivo de áudio: {problems}</span>",
   "<span style='color:{status}'>Can't play “{name}”{why}. If the file was moved or deleted, remove the pad and add the sound again.</span>": "<span style='color:{status}'>Não é possível tocar “{name}”{why}. Se o ficheiro foi movido ou eliminado, remove o botão e adiciona o som outra vez.</span>",
@@ -3520,7 +3519,6 @@
   "Onion Board turns its voice clean-up back on as soon as you close Discord. To talk clearly right now, click here and turn on Noise Suppression, Echo Cancellation and Automatic Gain Control.": "O Onion Board volta a ligar a limpeza de voz mal feches o Discord. Para falares com clareza já, clica aqui e liga Supressão de ruído, Cancelamento de eco e Controlo automático de ganho.",
   "Put Discord back for talking on close": "Repor o Discord para conversa ao fechar",
   "Starter": "Iniciais",
-  "<span style='color:{red}'>Couldn't load what's trending on Myinstants: {err}</span>": "<span style='color:{red}'>Não foi possível carregar o que está em destaque no Myinstants: {err}</span>",
   "Loading what's trending on Myinstants…": "A carregar o que está em destaque no Myinstants…",
   "Nothing is trending on Myinstants right now.": "Neste momento não há nada em destaque no Myinstants.",
   "The meme sounds people play most on Myinstants right now": "Os sons de memes mais tocados no Myinstants neste momento",
@@ -3820,5 +3818,20 @@
   "Onion Board is still running without admin.": "O Onion Board continua aberto sem permissões de administrador.",
   "Restart as admin": "Reiniciar como administrador",
   "The game runs as admin, and Windows doesn't let other programs hear the keys you press in it. Start Onion Board as admin too to use your hotkeys there.": "O jogo está a correr como administrador, e o Windows não deixa outros programas ouvir as teclas que carregas nele. Abre também o Onion Board como administrador para usares os teus atalhos lá.",
-  "Your hotkeys can't reach this game": "Os teus atalhos não chegam a este jogo"
+  "Your hotkeys can't reach this game": "Os teus atalhos não chegam a este jogo",
+  "A voice effect stopped after an error: {error}": "Um efeito de voz parou após um erro: {error}",
+  "Can't use this link": "Não é possível usar esta ligação",
+  "Couldn't load what's trending on Myinstants": "Não foi possível carregar o que está em destaque no Myinstants",
+  "Couldn't search {site}": "Não foi possível pesquisar em {site}",
+  "No program is making sound right now. Start some music or a game, then press Try again.": "Nenhum programa está a fazer som agora. Põe música ou um jogo e depois carrega em Tentar novamente.",
+  "Nothing to share yet": "Ainda nada para partilhar",
+  "That didn't work": "Não resultou",
+  "The community sounds couldn't be listed.": "Não foi possível mostrar os sons da comunidade.",
+  "The radio couldn't connect": "O rádio não conseguiu ligar-se",
+  "The search couldn't get through.": "A pesquisa não passou.",
+  "The stations couldn't load.": "Não foi possível carregar as estações.",
+  "The store couldn't load": "Não foi possível carregar a loja",
+  "Try again. If it keeps happening, close Onion Board and open it again. Still broken? Report it and we'll fix it.": "Tenta novamente. Se continuar, fecha o Onion Board e abre-o outra vez. Continua avariado? Comunica-o e nós resolvemos.",
+  "Your mic couldn't be opened: {error}": "Não foi possível abrir o teu microfone: {error}",
+  "Your voice couldn't be switched on": "Não foi possível ligar a tua voz"
 }

@@ -82,7 +82,6 @@
     "<span style='color:{colour}'>{n} διακοπή ήχου από την εκκίνηση{tip}</span>",
     "<span style='color:{colour}'>{n} διακοπές ήχου από την εκκίνηση{tip}</span>"
   ],
-  "<span style='color:{red}'>Couldn't search {site}: {err}</span>": "<span style='color:{red}'>Δεν έγινε αναζήτηση στο {site}: {err}</span>",
   "<span style='color:{status}'>Another program is already using {keys}, pick a different hotkey.</span>": "<span style='color:{status}'>Άλλο πρόγραμμα χρησιμοποιεί ήδη το {keys}, διάλεξε άλλη συντόμευση.</span>",
   "<span style='color:{status}'>Audio device problem: {problems}</span>": "<span style='color:{status}'>Πρόβλημα συσκευής ήχου: {problems}</span>",
   "<span style='color:{status}'>Can't play “{name}”{why}. If the file was moved or deleted, remove the pad and add the sound again.</span>": "<span style='color:{status}'>Δεν παίζει το «{name}»{why}. Αν το αρχείο μετακινήθηκε ή διαγράφηκε, αφαίρεσε το κουμπί και πρόσθεσε ξανά τον ήχο.</span>",
@@ -3520,7 +3519,6 @@
   "Onion Board turns its voice clean-up back on as soon as you close Discord. To talk clearly right now, click here and turn on Noise Suppression, Echo Cancellation and Automatic Gain Control.": "Το Onion Board ξανανάβει τον καθαρισμό φωνής μόλις κλείσεις το Discord. Για να μιλάς καθαρά τώρα, κάνε κλικ εδώ και άναψε την καταστολή θορύβου, την ακύρωση ηχούς και τον αυτόματο έλεγχο απολαβής.",
   "Put Discord back for talking on close": "Επαναφορά του Discord για ομιλία στο κλείσιμο",
   "Starter": "Εκκίνηση",
-  "<span style='color:{red}'>Couldn't load what's trending on Myinstants: {err}</span>": "<span style='color:{red}'>Δεν φορτώθηκαν τα δημοφιλή του Myinstants: {err}</span>",
   "Loading what's trending on Myinstants…": "Φόρτωση των δημοφιλών στο Myinstants…",
   "Nothing is trending on Myinstants right now.": "Τίποτα δεν είναι δημοφιλές στο Myinstants αυτή τη στιγμή.",
   "The meme sounds people play most on Myinstants right now": "Οι ήχοι meme που παίζουν περισσότερο στο Myinstants αυτή τη στιγμή",
@@ -3820,5 +3818,20 @@
   "Onion Board is still running without admin.": "Το Onion Board τρέχει ακόμα χωρίς δικαιώματα διαχειριστή.",
   "Restart as admin": "Επανεκκίνηση ως διαχειριστής",
   "The game runs as admin, and Windows doesn't let other programs hear the keys you press in it. Start Onion Board as admin too to use your hotkeys there.": "Το παιχνίδι τρέχει ως διαχειριστής και τα Windows δεν αφήνουν άλλα προγράμματα να ακούν τα πλήκτρα που πατάς σε αυτό. Άνοιξε και το Onion Board ως διαχειριστής για να δουλεύουν εκεί τα πλήκτρα συντόμευσης.",
-  "Your hotkeys can't reach this game": "Τα πλήκτρα συντόμευσης δεν φτάνουν σε αυτό το παιχνίδι"
+  "Your hotkeys can't reach this game": "Τα πλήκτρα συντόμευσης δεν φτάνουν σε αυτό το παιχνίδι",
+  "A voice effect stopped after an error: {error}": "Ένα εφέ φωνής σταμάτησε μετά από σφάλμα: {error}",
+  "Can't use this link": "Αυτός ο σύνδεσμος δεν γίνεται να χρησιμοποιηθεί",
+  "Couldn't load what's trending on Myinstants": "Δεν φορτώθηκαν τα δημοφιλή του Myinstants",
+  "Couldn't search {site}": "Δεν έγινε αναζήτηση στο {site}",
+  "No program is making sound right now. Start some music or a game, then press Try again.": "Κανένα πρόγραμμα δεν βγάζει ήχο τώρα. Βάλε μουσική ή ένα παιχνίδι και πάτα Δοκίμασε ξανά.",
+  "Nothing to share yet": "Τίποτα για κοινοποίηση ακόμα",
+  "That didn't work": "Δεν πέτυχε",
+  "The community sounds couldn't be listed.": "Οι ήχοι της κοινότητας δεν εμφανίστηκαν.",
+  "The radio couldn't connect": "Το ραδιόφωνο δεν συνδέθηκε",
+  "The search couldn't get through.": "Η αναζήτηση δεν πέρασε.",
+  "The stations couldn't load.": "Οι σταθμοί δεν φορτώθηκαν.",
+  "The store couldn't load": "Το κατάστημα δεν φορτώθηκε",
+  "Try again. If it keeps happening, close Onion Board and open it again. Still broken? Report it and we'll fix it.": "Δοκίμασε ξανά. Αν συνεχίσει, κλείσε το Onion Board και άνοιξέ το πάλι. Ακόμα χαλασμένο; Ανάφερέ το και θα το φτιάξουμε.",
+  "Your mic couldn't be opened: {error}": "Το μικρόφωνό σου δεν άνοιξε: {error}",
+  "Your voice couldn't be switched on": "Η φωνή σου δεν ενεργοποιήθηκε"
 }

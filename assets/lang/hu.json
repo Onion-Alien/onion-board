@@ -82,7 +82,6 @@
     "<span style='color:{colour}'>{n} hangkiesés indítás óta{tip}</span>",
     "<span style='color:{colour}'>{n} hangkiesés indítás óta{tip}</span>"
   ],
-  "<span style='color:{red}'>Couldn't search {site}: {err}</span>": "<span style='color:{red}'>Nem sikerült keresni itt: {site}: {err}</span>",
   "<span style='color:{status}'>Another program is already using {keys}, pick a different hotkey.</span>": "<span style='color:{status}'>Egy másik program már használja ezt: {keys}, válassz másik gyorsbillentyűt.</span>",
   "<span style='color:{status}'>Audio device problem: {problems}</span>": "<span style='color:{status}'>Hangeszköz-probléma: {problems}</span>",
   "<span style='color:{status}'>Can't play “{name}”{why}. If the file was moved or deleted, remove the pad and add the sound again.</span>": "<span style='color:{status}'>Nem játszható le: „{name}”{why}. Ha a fájlt áthelyezték vagy törölték, töröld a gombot, és add hozzá újra a hangot.</span>",
@@ -3520,7 +3519,6 @@
   "Onion Board turns its voice clean-up back on as soon as you close Discord. To talk clearly right now, click here and turn on Noise Suppression, Echo Cancellation and Automatic Gain Control.": "Az Onion Board visszakapcsolja a hangtisztítást, amint bezárod a Discordot. Hogy most rögtön tisztán beszélj, kattints ide, és kapcsold be a zajszűrést, a visszhangszűrést és az automatikus erősítésszabályzást.",
   "Put Discord back for talking on close": "Bezáráskor a Discord vissza beszédre",
   "Starter": "Kezdő",
-  "<span style='color:{red}'>Couldn't load what's trending on Myinstants: {err}</span>": "<span style='color:{red}'>Nem sikerült betölteni a Myinstants népszerű hangjait: {err}</span>",
   "Loading what's trending on Myinstants…": "A Myinstants népszerű hangjainak betöltése…",
   "Nothing is trending on Myinstants right now.": "Most semmi sem népszerű a Myinstantson.",
   "The meme sounds people play most on Myinstants right now": "A mémhangok, amelyeket most a legtöbben játszanak le a Myinstantson",
@@ -3820,5 +3818,20 @@
   "Onion Board is still running without admin.": "Az Onion Board továbbra is rendszergazda nélkül fut.",
   "Restart as admin": "Újraindítás rendszergazdaként",
   "The game runs as admin, and Windows doesn't let other programs hear the keys you press in it. Start Onion Board as admin too to use your hotkeys there.": "A játék rendszergazdaként fut, és a Windows nem engedi, hogy más programok hallják a benne lenyomott billentyűket. Indítsd az Onion Boardot is rendszergazdaként, hogy ott is működjenek a gyorsbillentyűid.",
-  "Your hotkeys can't reach this game": "A gyorsbillentyűid nem érik el ezt a játékot"
+  "Your hotkeys can't reach this game": "A gyorsbillentyűid nem érik el ezt a játékot",
+  "A voice effect stopped after an error: {error}": "Egy hangeffekt hiba után leállt: {error}",
+  "Can't use this link": "Ez a link nem használható",
+  "Couldn't load what's trending on Myinstants": "Nem sikerült betölteni a Myinstants népszerű hangjait",
+  "Couldn't search {site}": "Nem sikerült keresni itt: {site}",
+  "No program is making sound right now. Start some music or a game, then press Try again.": "Most egy program sem ad hangot. Indíts zenét vagy játékot, aztán nyomd meg az Újra gombot.",
+  "Nothing to share yet": "Még nincs mit megosztani",
+  "That didn't work": "Ez nem sikerült",
+  "The community sounds couldn't be listed.": "Nem sikerült megjeleníteni a közösség hangjait.",
+  "The radio couldn't connect": "A rádió nem tudott csatlakozni",
+  "The search couldn't get through.": "A keresés nem ment át.",
+  "The stations couldn't load.": "Nem sikerült betölteni az állomásokat.",
+  "The store couldn't load": "Nem sikerült betölteni a boltot",
+  "Try again. If it keeps happening, close Onion Board and open it again. Still broken? Report it and we'll fix it.": "Próbáld újra. Ha továbbra is így van, zárd be az Onion Boardot, és nyisd meg újra. Még mindig rossz? Jelentsd, és kijavítjuk.",
+  "Your mic couldn't be opened: {error}": "Nem sikerült megnyitni a mikrofonod: {error}",
+  "Your voice couldn't be switched on": "Nem sikerült bekapcsolni a hangod"
 }

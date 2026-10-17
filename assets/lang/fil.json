@@ -82,7 +82,6 @@
     "<span style='color:{colour}'>{n} audio drop-out mula sa simula{tip}</span>",
     "<span style='color:{colour}'>{n} audio drop-out mula sa simula{tip}</span>"
   ],
-  "<span style='color:{red}'>Couldn't search {site}: {err}</span>": "<span style='color:{red}'>Hindi makapaghanap sa {site}: {err}</span>",
   "<span style='color:{status}'>Another program is already using {keys}, pick a different hotkey.</span>": "<span style='color:{status}'>May ibang program na gumagamit na ng {keys}, pumili ng ibang hotkey.</span>",
   "<span style='color:{status}'>Audio device problem: {problems}</span>": "<span style='color:{status}'>Problema sa audio device: {problems}</span>",
   "<span style='color:{status}'>Can't play “{name}”{why}. If the file was moved or deleted, remove the pad and add the sound again.</span>": "<span style='color:{status}'>Hindi ma-play ang “{name}”{why}. Kung nailipat o nabura ang file, alisin ang pad at idagdag ulit ang sound.</span>",
@@ -3520,7 +3519,6 @@
   "Onion Board turns its voice clean-up back on as soon as you close Discord. To talk clearly right now, click here and turn on Noise Suppression, Echo Cancellation and Automatic Gain Control.": "Bubuksan ulit ng Onion Board ang paglilinis ng boses pagkasara mo ng Discord. Para malinaw kang magsalita ngayon, i-click dito at buksan ang Noise Suppression, Echo Cancellation at Automatic Gain Control.",
   "Put Discord back for talking on close": "Ibalik ang Discord para sa pag-uusap pagsara",
   "Starter": "Panimula",
-  "<span style='color:{red}'>Couldn't load what's trending on Myinstants: {err}</span>": "<span style='color:{red}'>Hindi ma-load ang trending sa Myinstants: {err}</span>",
   "Loading what's trending on Myinstants…": "Nilo-load ang trending sa Myinstants…",
   "Nothing is trending on Myinstants right now.": "Walang trending sa Myinstants ngayon.",
   "The meme sounds people play most on Myinstants right now": "Ang mga meme sound na pinakamaraming pinapatugtog sa Myinstants ngayon",
@@ -3820,5 +3818,20 @@
   "Onion Board is still running without admin.": "Tumatakbo pa rin ang Onion Board nang walang admin.",
   "Restart as admin": "I-restart bilang admin",
   "The game runs as admin, and Windows doesn't let other programs hear the keys you press in it. Start Onion Board as admin too to use your hotkeys there.": "Tumatakbo bilang admin ang laro, at hindi pinapayagan ng Windows ang ibang program na marinig ang mga key na pinipindot mo rito. Patakbuhin din ang Onion Board bilang admin para gumana roon ang mga hotkey mo.",
-  "Your hotkeys can't reach this game": "Hindi naaabot ng mga hotkey mo ang larong ito"
+  "Your hotkeys can't reach this game": "Hindi naaabot ng mga hotkey mo ang larong ito",
+  "A voice effect stopped after an error: {error}": "Huminto ang isang voice effect dahil sa error: {error}",
+  "Can't use this link": "Hindi magagamit ang link na ito",
+  "Couldn't load what's trending on Myinstants": "Hindi ma-load ang trending sa Myinstants",
+  "Couldn't search {site}": "Hindi makapag-search sa {site}",
+  "No program is making sound right now. Start some music or a game, then press Try again.": "Walang program na may tunog ngayon. Magpatugtog ng music o maglaro, tapos pindutin ang Subukan ulit.",
+  "Nothing to share yet": "Wala pang maibabahagi",
+  "That didn't work": "Hindi gumana",
+  "The community sounds couldn't be listed.": "Hindi maipakita ang mga tunog ng community.",
+  "The radio couldn't connect": "Hindi maka-connect ang radio",
+  "The search couldn't get through.": "Hindi natuloy ang search.",
+  "The stations couldn't load.": "Hindi ma-load ang mga istasyon.",
+  "The store couldn't load": "Hindi ma-load ang store",
+  "Try again. If it keeps happening, close Onion Board and open it again. Still broken? Report it and we'll fix it.": "Subukan ulit. Kung paulit-ulit, isara ang Onion Board at buksan ulit. Sira pa rin? I-report mo at aayusin namin.",
+  "Your mic couldn't be opened: {error}": "Hindi mabuksan ang mic mo: {error}",
+  "Your voice couldn't be switched on": "Hindi ma-on ang boses mo"
 }

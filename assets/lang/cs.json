@@ -83,7 +83,6 @@
     "<span style='color:{colour}'>{n} výpadky zvuku od spuštění{tip}</span>",
     "<span style='color:{colour}'>{n} výpadků zvuku od spuštění{tip}</span>"
   ],
-  "<span style='color:{red}'>Couldn't search {site}: {err}</span>": "<span style='color:{red}'>Hledání na {site} selhalo: {err}</span>",
   "<span style='color:{status}'>Another program is already using {keys}, pick a different hotkey.</span>": "<span style='color:{status}'>{keys} už používá jiný program, vyber jinou zkratku.</span>",
   "<span style='color:{status}'>Audio device problem: {problems}</span>": "<span style='color:{status}'>Problém se zvukovým zařízením: {problems}</span>",
   "<span style='color:{status}'>Can't play “{name}”{why}. If the file was moved or deleted, remove the pad and add the sound again.</span>": "<span style='color:{status}'>„{name}“ nejde přehrát{why}. Pokud byl soubor přesunut nebo smazán, odeber pad a přidej zvuk znovu.</span>",
@@ -3594,7 +3593,6 @@
   "Onion Board turns its voice clean-up back on as soon as you close Discord. To talk clearly right now, click here and turn on Noise Suppression, Echo Cancellation and Automatic Gain Control.": "Onion Board zapne čištění hlasu zpátky, jakmile zavřeš Discord. Abys mluvil čistě hned teď, klikni sem a zapni potlačení šumu, rušení ozvěny a automatické řízení zisku.",
   "Put Discord back for talking on close": "Při zavření vrátit Discord na mluvení",
   "Starter": "Startovní",
-  "<span style='color:{red}'>Couldn't load what's trending on Myinstants: {err}</span>": "<span style='color:{red}'>Trendy na Myinstants se nepodařilo načíst: {err}</span>",
   "Loading what's trending on Myinstants…": "Načítám trendy na Myinstants…",
   "Nothing is trending on Myinstants right now.": "Na Myinstants teď nic netrenduje.",
   "The meme sounds people play most on Myinstants right now": "Meme zvuky, které si lidé na Myinstants teď pouštějí nejvíc",
@@ -3898,5 +3896,20 @@
   "Onion Board is still running without admin.": "Onion Board pořád běží bez práv správce.",
   "Restart as admin": "Restartovat jako správce",
   "The game runs as admin, and Windows doesn't let other programs hear the keys you press in it. Start Onion Board as admin too to use your hotkeys there.": "Hra běží jako správce a Windows nedovolí jiným programům slyšet klávesy, které v ní mačkáš. Spusť Onion Board taky jako správce, aby tam tvoje klávesové zkratky fungovaly.",
-  "Your hotkeys can't reach this game": "Tvoje klávesové zkratky se do této hry nedostanou"
+  "Your hotkeys can't reach this game": "Tvoje klávesové zkratky se do této hry nedostanou",
+  "A voice effect stopped after an error: {error}": "Hlasový efekt se po chybě vypnul: {error}",
+  "Can't use this link": "Tenhle odkaz nejde použít",
+  "Couldn't load what's trending on Myinstants": "Nepodařilo se načíst, co frčí na Myinstants",
+  "Couldn't search {site}": "Nepodařilo se hledat na {site}",
+  "No program is making sound right now. Start some music or a game, then press Try again.": "Teď žádný program nehraje zvuk. Pusť hudbu nebo hru a pak stiskni Zkusit znovu.",
+  "Nothing to share yet": "Zatím není co sdílet",
+  "That didn't work": "Tohle nevyšlo",
+  "The community sounds couldn't be listed.": "Zvuky komunity se nepodařilo načíst.",
+  "The radio couldn't connect": "Rádio se nepřipojilo",
+  "The search couldn't get through.": "Hledání neprošlo.",
+  "The stations couldn't load.": "Stanice se nepodařilo načíst.",
+  "The store couldn't load": "Obchod se nepodařilo načíst",
+  "Try again. If it keeps happening, close Onion Board and open it again. Still broken? Report it and we'll fix it.": "Zkus to znovu. Když se to opakuje, zavři Onion Board a otevři ho znovu. Pořád nefunguje? Nahlas to a opravíme to.",
+  "Your mic couldn't be opened: {error}": "Mikrofon se nepodařilo otevřít: {error}",
+  "Your voice couldn't be switched on": "Hlas se nepodařilo zapnout"
 }

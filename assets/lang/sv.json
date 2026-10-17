@@ -82,7 +82,6 @@
     "<span style='color:{colour}'>{n} ljudavbrott sedan start{tip}</span>",
     "<span style='color:{colour}'>{n} ljudavbrott sedan start{tip}</span>"
   ],
-  "<span style='color:{red}'>Couldn't search {site}: {err}</span>": "<span style='color:{red}'>Kunde inte söka på {site}: {err}</span>",
   "<span style='color:{status}'>Another program is already using {keys}, pick a different hotkey.</span>": "<span style='color:{status}'>Ett annat program använder redan {keys}, välj en annan snabbtangent.</span>",
   "<span style='color:{status}'>Audio device problem: {problems}</span>": "<span style='color:{status}'>Problem med ljudenhet: {problems}</span>",
   "<span style='color:{status}'>Can't play “{name}”{why}. If the file was moved or deleted, remove the pad and add the sound again.</span>": "<span style='color:{status}'>Kan inte spela ”{name}”{why}. Om filen flyttats eller tagits bort, ta bort rutan och lägg till ljudet igen.</span>",
@@ -3520,7 +3519,6 @@
   "Onion Board turns its voice clean-up back on as soon as you close Discord. To talk clearly right now, click here and turn on Noise Suppression, Echo Cancellation and Automatic Gain Control.": "Onion Board slår på röstrensningen igen så fort du stänger Discord. För att prata tydligt redan nu: klicka här och slå på brusreducering, ekoeliminering och automatisk förstärkningskontroll.",
   "Put Discord back for talking on close": "Ställ tillbaka Discord för prat vid stängning",
   "Starter": "Start",
-  "<span style='color:{red}'>Couldn't load what's trending on Myinstants: {err}</span>": "<span style='color:{red}'>Kunde inte hämta det populära på Myinstants: {err}</span>",
   "Loading what's trending on Myinstants…": "Hämtar det populära på Myinstants…",
   "Nothing is trending on Myinstants right now.": "Inget är populärt på Myinstants just nu.",
   "The meme sounds people play most on Myinstants right now": "Memeljuden som spelas mest på Myinstants just nu",
@@ -3820,5 +3818,20 @@
   "Onion Board is still running without admin.": "Onion Board körs fortfarande utan administratör.",
   "Restart as admin": "Starta om som administratör",
   "The game runs as admin, and Windows doesn't let other programs hear the keys you press in it. Start Onion Board as admin too to use your hotkeys there.": "Spelet körs som administratör, och Windows låter inte andra program höra tangenterna du trycker i det. Starta Onion Board som administratör också för att använda dina snabbtangenter där.",
-  "Your hotkeys can't reach this game": "Dina snabbtangenter når inte det här spelet"
+  "Your hotkeys can't reach this game": "Dina snabbtangenter når inte det här spelet",
+  "A voice effect stopped after an error: {error}": "En rösteffekt stoppade efter ett fel: {error}",
+  "Can't use this link": "Den länken går inte att använda",
+  "Couldn't load what's trending on Myinstants": "Kunde inte ladda det som trendar på Myinstants",
+  "Couldn't search {site}": "Kunde inte söka på {site}",
+  "No program is making sound right now. Start some music or a game, then press Try again.": "Inget program spelar ljud just nu. Starta lite musik eller ett spel och tryck sedan Försök igen.",
+  "Nothing to share yet": "Inget att dela än",
+  "That didn't work": "Det gick inte",
+  "The community sounds couldn't be listed.": "Communityns ljud kunde inte visas.",
+  "The radio couldn't connect": "Radion kunde inte ansluta",
+  "The search couldn't get through.": "Sökningen gick inte igenom.",
+  "The stations couldn't load.": "Stationerna kunde inte laddas.",
+  "The store couldn't load": "Butiken kunde inte laddas",
+  "Try again. If it keeps happening, close Onion Board and open it again. Still broken? Report it and we'll fix it.": "Försök igen. Händer det igen, stäng Onion Board och öppna den igen. Fortfarande trasigt? Rapportera det så fixar vi det.",
+  "Your mic couldn't be opened: {error}": "Din mikrofon kunde inte öppnas: {error}",
+  "Your voice couldn't be switched on": "Din röst kunde inte slås på"
 }

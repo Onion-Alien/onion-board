@@ -70,7 +70,6 @@
     "<span style='color:{colour}'>{n} прекъсване на звука от старта{tip}</span>",
     "<span style='color:{colour}'>{n} прекъсвания на звука от старта{tip}</span>"
   ],
-  "<span style='color:{red}'>Couldn't search {site}: {err}</span>": "<span style='color:{red}'>Не успях да търся в {site}: {err}</span>",
   "<span style='color:{status}'>Can't play “{name}”{why}. If the file was moved or deleted, remove the pad and add the sound again.</span>": "<span style='color:{status}'>Не мога да пусна „{name}“{why}. Ако файлът е преместен или изтрит, махни бутона и добави звука отново.</span>",
   "<span style='color:{status}'>Instant replay can't listen: {error}</span>": "<span style='color:{status}'>Моменталният повтор не може да слуша: {error}</span>",
   "<span style='color:{status}'>Nothing to save: {why}.</span>": "<span style='color:{status}'>Нищо за запазване: {why}.</span>",
@@ -3520,7 +3519,6 @@
   "Onion Board turns its voice clean-up back on as soon as you close Discord. To talk clearly right now, click here and turn on Noise Suppression, Echo Cancellation and Automatic Gain Control.": "Onion Board включва отново изчистването на гласа веднага щом затвориш Discord. За да говориш ясно още сега, щракни тук и включи Noise Suppression, Echo Cancellation и Automatic Gain Control.",
   "Put Discord back for talking on close": "Върни Discord за говорене при затваряне",
   "Starter": "Начални",
-  "<span style='color:{red}'>Couldn't load what's trending on Myinstants: {err}</span>": "<span style='color:{red}'>Популярното в Myinstants не се зареди: {err}</span>",
   "Loading what's trending on Myinstants…": "Зареждане на популярното в Myinstants…",
   "Nothing is trending on Myinstants right now.": "В момента няма нищо популярно в Myinstants.",
   "The meme sounds people play most on Myinstants right now": "Мийм звуците, които хората пускат най-често в Myinstants в момента",
@@ -3820,5 +3818,20 @@
   "Onion Board is still running without admin.": "Onion Board още работи без администраторски права.",
   "Restart as admin": "Рестарт като администратор",
   "The game runs as admin, and Windows doesn't let other programs hear the keys you press in it. Start Onion Board as admin too to use your hotkeys there.": "Играта работи като администратор и Windows не позволява на други програми да чуват клавишите, които натискаш в нея. Пусни и Onion Board като администратор, за да работят клавишите ти там.",
-  "Your hotkeys can't reach this game": "Клавишите ти не стигат до тази игра"
+  "Your hotkeys can't reach this game": "Клавишите ти не стигат до тази игра",
+  "A voice effect stopped after an error: {error}": "Гласов ефект спря след грешка: {error}",
+  "Can't use this link": "Тази връзка не може да се използва",
+  "Couldn't load what's trending on Myinstants": "Не можахме да заредим популярното в Myinstants",
+  "Couldn't search {site}": "Не можахме да търсим в {site}",
+  "No program is making sound right now. Start some music or a game, then press Try again.": "Нито една програма не издава звук в момента. Пусни музика или игра, после натисни Опитай пак.",
+  "Nothing to share yet": "Още няма какво да споделиш",
+  "That didn't work": "Не се получи",
+  "The community sounds couldn't be listed.": "Звуците от общността не можаха да се покажат.",
+  "The radio couldn't connect": "Радиото не можа да се свърже",
+  "The search couldn't get through.": "Търсенето не мина.",
+  "The stations couldn't load.": "Станциите не можаха да се заредят.",
+  "The store couldn't load": "Магазинът не можа да се зареди",
+  "Try again. If it keeps happening, close Onion Board and open it again. Still broken? Report it and we'll fix it.": "Опитай пак. Ако продължава, затвори Onion Board и го отвори отново. Пак не работи? Докладвай го и ще го оправим.",
+  "Your mic couldn't be opened: {error}": "Микрофонът ти не можа да се отвори: {error}",
+  "Your voice couldn't be switched on": "Гласът ти не можа да се включи"
 }
