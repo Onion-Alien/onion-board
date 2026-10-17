@@ -62,10 +62,10 @@ def test_frames_draw_at_any_scale(qapp):
 def _frame(t):
     from PySide6.QtCore import Qt
     from PySide6.QtGui import QImage, QPainter
-    img = QImage(splash.CARD_W, splash.CARD_H, QImage.Format_ARGB32_Premultiplied)
+    img = QImage(splash.CARD_W, splash.card_h(), QImage.Format_ARGB32_Premultiplied)
     img.fill(Qt.transparent)
     p = QPainter(img)
-    splash.paint_frame(p, t, splash.CARD_W, splash.CARD_H)
+    splash.paint_frame(p, t, splash.CARD_W, splash.card_h())
     p.end()
     return img
 
@@ -198,7 +198,7 @@ def test_windows_animation_preference(monkeypatch):
 
 def test_rare_launch_glows_and_shows_its_drop_rate(qapp, monkeypatch):
     """A rare launch: a glow round the panel (in the margin a plain one leaves clear)
-    and its drop rate under the dots; each tier its own look."""
+    and its tier and drop rate under the dots, on a taller card; each tier its own look."""
     from soundboard.ui import splashacts
     monkeypatch.setattr(splash, "_animate", True)
     plain = _frame(0.3)
@@ -209,9 +209,11 @@ def test_rare_launch_glows_and_shows_its_drop_rate(qapp, monkeypatch):
         splash._surfaces.clear()
         img = _frame(0.3)
         assert img.pixelColor(5, splash.CARD_H // 2).alpha() > 0, rare   # the glow
-        assert img.copy(0, 222, img.width(), 18) != plain.copy(0, 222, img.width(), 18), rare
+        assert img.height() == splash.CARD_H + splash.RARE_H, rare   # room for its line
+        assert img.copy(0, 228, img.width(), 22) != plain.copy(0, 228, img.width(), 22), rare
         looks.add(img.copy(80, 30, 80, 96).bits().tobytes())
     assert len(looks) == len(splashacts.RARES)
+    assert len({splash.tier_name(r) for r in splashacts.RARES}) == len(splashacts.RARES)
     splash._surfaces.clear()
 
 

@@ -40,6 +40,8 @@ from soundboard.ui.pixels import snap_to_pixels
 log = logging.getLogger(__name__)
 
 CARD_W, CARD_H = 240, 248   # logical px, including 8 px around the rounded panel
+RARE_H = 26   # a rare launch's card is this much taller: its tier and drop rate under the dots
+DOTS_Y = CARD_H - 35   # the dots' resting centre (the bar sits there too)
 BUN_W, BUN_H = 80, 96
 PULSE_S = 1.35   # one complete left-to-right wave
 FRAME = 1 / 30   # seconds between repaints while pumping (the Qt fallback)
@@ -59,6 +61,17 @@ _show = splashacts.Show()   # this launch's act (splashacts.pick, in show())
 # (None = the dots): set_status, read by every frame (also on the native thread)
 _status = ""
 _progress: float | None = None
+
+
+def card_h() -> int:
+    """This launch's card height: taller on a rare launch, for its tier line."""
+    return CARD_H + RARE_H if _show.odds else CARD_H
+
+
+def tier_name(rare: str) -> str:
+    """A rare launch's tier, as the splash names it (RARES' keys, rarest first)."""
+    return {"rainbow": _("Super Rare"), "galaxy": _("Legendary"), "ice": _("Rare"),
+            "gold": _("Uncommon")}[rare]
 
 
 def set_status(text: str = "", progress: float | None = None):
@@ -97,17 +110,18 @@ def _surface(w: float, h: float, scale: float) -> QImage:
             p.setFont(font)
             p.setPen(QColor(theme.T["muted"]))
             p.drawText(QRectF(20, 171, w - 40, 22), Qt.AlignmentFlag.AlignCenter, status)
-            if _show.odds:   # a rare launch: its drop rate under the dots, between sparkles
+            if _show.odds:   # a rare launch: tier and drop rate under the dots, in sparkles
                 glow = QColor(splashacts.RARES[str(_show.rare)][2])
-                font.setPixelSize(11)
+                font.setPixelSize(12)
                 font.setWeight(QFont.Weight.Bold)
                 p.setFont(font)
                 p.setPen(glow)
-                rate = f"1/{_show.odds}"
-                p.drawText(QRectF(20, h - 29, w - 40, 15), Qt.AlignmentFlag.AlignCenter, rate)
-                half = p.fontMetrics().horizontalAdvance(rate) / 2
+                line = f"{tier_name(str(_show.rare))} · 1/{_show.odds}"
+                y = DOTS_Y + 18   # clear of the dots' hop, as far again from the panel's edge
+                p.drawText(QRectF(20, y, w - 40, 18), Qt.AlignmentFlag.AlignCenter, line)
+                half = p.fontMetrics().horizontalAdvance(line) / 2
                 for side in (-1, 1):
-                    sparkle(p, w / 2 + side * (half + 9), h - 21.5, 4.5, glow)
+                    sparkle(p, w / 2 + side * (half + 10), y + 9, 4.5, glow)
         finally:
             p.end()
         _surfaces[key] = img
@@ -162,7 +176,7 @@ def paint_frame(p: QPainter, t: float, w: float, h: float, scale: float = 1.0,
     resting = QColor(theme.T["muted"])
     progress = _progress
     if progress is not None:   # a bar where the dots were
-        bar = QRectF(40, h - 38, w - 80, 6)
+        bar = QRectF(40, DOTS_Y - 3, w - 80, 6)
         p.setBrush(QColor(theme.T.get("border", theme.T["muted"])))
         p.drawRoundedRect(bar, 3, 3)
         p.setBrush(accent)
@@ -182,7 +196,7 @@ def paint_frame(p: QPainter, t: float, w: float, h: float, scale: float = 1.0,
                               resting.blueF() + (accent.blueF() - resting.blueF()) * pulse))
         p.setBrush(c)
         radius = 3 + 2.5 * move
-        p.drawEllipse(QPointF(w / 2 + (i - 1) * 16, h - 35 - 5 * move), radius, radius)
+        p.drawEllipse(QPointF(w / 2 + (i - 1) * 16, DOTS_Y - 5 * move), radius, radius)
 
 
 def _animations_enabled() -> bool:
@@ -208,7 +222,7 @@ class Splash(QWidget):
         # don't take focus from a game
         self.setAttribute(Qt.WidgetAttribute.WA_ShowWithoutActivating)
         self.setWindowTitle("Onion Board")
-        self.setFixedSize(CARD_W, CARD_H)
+        self.setFixedSize(CARD_W, card_h())
         self._t0 = time.monotonic()
 
     def paintEvent(self, ev):
@@ -316,7 +330,7 @@ class NativeSplash:
         except Exception:  # noqa: BLE001 - no per-monitor DPI: 100 %
             pass
         k = dpi_x.value / 96
-        w, h = round(CARD_W * k), round(CARD_H * k)
+        w, h = round(CARD_W * k), round(card_h() * k)
         wa = mi.rcWork
         x = (wa.left + wa.right) // 2 - w // 2
         y = (wa.top + wa.bottom) // 2 - h // 2
@@ -364,7 +378,7 @@ class NativeSplash:
                 p = QPainter(img)
                 try:
                     p.scale(k, k)   # drawn at the monitor's real resolution, never stretched
-                    paint_frame(p, start - t0, CARD_W, CARD_H, k, leaving)
+                    paint_frame(p, start - t0, CARD_W, card_h(), k, leaving)
                 finally:
                     p.end()   # never leave img mid-paint: Qt aborts when it's freed
                 ctypes.memmove(bits, bytes(img.constBits()), nbytes)
@@ -417,7 +431,7 @@ def show() -> Splash | NativeSplash:
     screen = QGuiApplication.screenAt(QCursor.pos()) or QGuiApplication.primaryScreen()
     if screen is not None:
         geo = screen.availableGeometry()
-        _splash.move(geo.center().x() - CARD_W // 2, geo.center().y() - CARD_H // 2)
+        _splash.move(geo.center().x() - CARD_W // 2, geo.center().y() - card_h() // 2)
     _splash.show()
     _splash.repaint()
     QApplication.processEvents(QEventLoop.ProcessEventsFlag.ExcludeUserInputEvents)
