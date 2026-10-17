@@ -19,11 +19,11 @@ Rules, so the copy keeps working in both apps:
     palettes   THEMES, GROUPS, finish(), the colour maths, LIVE_STYLE / live_sheet()
     textures   Textured: TEXTURES, texture_image(), texture_style(), paint_glow()
     bunnyfit   Bun's outfit per theme and the pieces' drawing
-    owl        Hoot: draw_owl(), owl_image(), OwlWidget
+    owl        Hoot: draw_owl(), owl_image(), OwlWidget, his look per theme (LOOKS)
     appstate   active(), pause_in_background(), snap_to_pixels()
     cover      Cover, covered(): a theme switch fades in and out instead of flashing
     hooks      what the app plugs in
 """
 
-KIT_VERSION = 4   # 2: texture_style / paint_glow / live_sheet in the kit; 3: cover;
-                  # 4: Hoot's `beak`
+KIT_VERSION = 5   # 2: texture_style / paint_glow / live_sheet in the kit; 3: cover;
+                  # 4: Hoot's `beak`; 5: Hoot's look per theme (owl.LOOKS, `kit`)
