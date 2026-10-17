@@ -3784,3 +3784,26 @@ def test_the_effect_reads_further_back_while_a_sound_plays(monkeypatch):
     assert s.latency == dm.CUSHION_S
     e._check_cushion(111.0 + eng.CALM_S)
     assert s.latency == dm.LEAD_S
+
+
+def test_the_mic_box_flashes_when_it_starts_working(window, monkeypatch):  # noqa: F811
+    """Set up and working: the box lights up and the "your mic works" box folds away,
+    instead of boxes just vanishing (nobody could tell what had happened)."""
+    from soundboard.ui import reveal, toast
+    w = window
+    _routes(w, monkeypatch, "missing")
+    w.cfg.mic_device = "My mic"
+    monkeypatch.setattr(w.engine, "mic_stream", object(), raising=False)
+    monkeypatch.setattr(w.engine, "main_stream", object(), raising=False)
+    w.show()
+    w.tabs.setCurrentWidget(w.setup_page)
+    w.statusctl._update_flow()
+    assert not w.mic_voice.isHidden() and w.mic_status.findChild(reveal._Flash) is None
+    monkeypatch.setattr(toast, "ANIMATE", True)
+    monkeypatch.setattr(dm, "status", lambda name=None: "ready")
+    monkeypatch.setattr(type(w.engine), "effect_alive", lambda self: True)
+    w.statusctl._update_flow()
+    assert w.mic_status.findChild(reveal._Flash) is not None
+    assert not reveal.shown(w.mic_voice)   # folding away
+    w.statusctl._update_flow()   # the once-a-second redraw: no second flash
+    assert len(w.mic_status.findChildren(reveal._Flash)) == 1

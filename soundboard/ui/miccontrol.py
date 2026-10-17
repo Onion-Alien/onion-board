@@ -20,7 +20,7 @@ from soundboard import directmic, errors, michelper, net, theme, usage, voicesdk
 from soundboard import engine as eng
 from soundboard.i18n import _
 from soundboard.library import RESOURCE_DIR
-from soundboard.ui import busy, icons, worker
+from soundboard.ui import busy, icons, reveal, worker
 from soundboard.ui.controller import Controller
 from soundboard.ui.routecontrol import is_hands_free
 
@@ -249,7 +249,7 @@ class MicControl(Controller):
         # it yet: said in its own green row, with its level, above what's missing
         voice = (tone != "ok" and e.mic_stream is not None
                  and not directmic.unplugged(mw.cfg.mic_device))
-        mw.mic_voice.setVisible(voice)
+        reveal.set_shown(mw.mic_voice, voice)   # (folds away once the sounds are in)
         if voice:
             mw.mic_voice_sub.setText(name)
             mw.mic_voice_sub.setToolTip(name)
@@ -265,6 +265,11 @@ class MicControl(Controller):
             icons.set_label_icon(mw.mic_state_icon, icon, colour, size=20)
         mw.mic_pill.setText(pill)
         theme.set_tone(mw.mic_pill, tone)
+        if tone == "ok" and mw._mic_tone not in (None, "ok"):
+            # it just started working (set up, repaired, back on): say so with a flash,
+            # not only with boxes going away
+            reveal.flash(mw.mic_status, mw.mic_state_icon)
+        mw._mic_tone = tone
         return reason or "", button
 
     def _auto_fix(self, direct: str):

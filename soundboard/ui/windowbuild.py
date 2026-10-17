@@ -1534,6 +1534,7 @@ class WindowBuilder(Controller):
             mw.mic_ways.addWidget(b)
         box.hide()
         mw._mic_icon = None
+        mw._mic_tone = None   # the mic box's last tone (a flash when it turns "ok")
         mw._ways_in = None   # which row the set-up buttons are in (_place_ways)
         cv.addWidget(box)
         cv.addWidget(box)
