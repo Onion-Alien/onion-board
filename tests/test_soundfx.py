@@ -399,3 +399,56 @@ def test_edit_dialog_colour_swatches_are_named_and_exclusive(qapp):
     d.apply()
     assert m.color == "#123456"
     d.deleteLater()
+
+
+# ---------------------------------------------------------------- a voice on a sound
+
+ROBOT = {"robot": {"on": True, "freq": 100, "noise": 0.2, "mix": 1},
+         "reverb": {"on": True, "size": 0.25, "tone": 6000, "mix": 0.12}}
+
+
+def test_a_voice_keeps_only_its_effects_that_are_on():
+    v = soundfx.clean_voice({"name": "  My   robot ", "effects": {
+        **ROBOT, "echo": {"on": False}, "cleanup": {"on": True}, "nope": {"on": True}}})
+    assert v["name"] == "My robot" and set(v["effects"]) == {"robot", "reverb"}
+    assert soundfx.clean_voice({"name": "x", "effects": {"echo": {"on": False}}}) == {}
+    assert soundfx.clean_voice("Robot") == {} and soundfx.clean_voice(None) == {}
+    assert soundfx.clean({"voice": {"effects": "bad"}})["voice"] == {}
+
+
+def test_sounds_without_a_voice_keep_their_cache_keys():
+    """The voice key is left out of the hash when it's empty, so no cached sound has
+    to be rendered again after the update."""
+    import hashlib
+    import json
+    fx = {"speed": 1.5, "effects": {"reverb": {"on": True, "mix": 0.3}}}
+    f = soundfx.clean(fx)
+    for k in ("start", "end", "voice"):
+        del f[k]
+    old = hashlib.blake2b(json.dumps(f, sort_keys=True).encode(), digest_size=6).hexdigest()
+    assert soundfx.key(fx) == old
+    assert soundfx.key({**fx, "voice": {"name": "Robot", "effects": ROBOT}}) != old
+
+
+def test_a_voice_alone_changes_the_sound_and_is_named():
+    fx = {"voice": {"name": "Robot", "effects": ROBOT}}
+    assert not soundfx.is_neutral(fx)
+    assert "Robot" in soundfx.summary(fx)
+    x = sine(220, 1.0)
+    y = soundfx.render(x, fx)
+    assert abs(len(y) - len(x)) < SR // 2            # (plus a little reverb tail)
+    n = min(len(x), len(y))
+    assert rms(y[:n] - x[:n]) > 0.05                 # it really sounds different
+    assert np.all(np.isfinite(y)) and np.max(np.abs(y)) <= 1.0
+
+
+def test_a_voice_goes_under_the_sounds_own_effects():
+    """Its effects run before the sound's own (as on the mic, then nightcore and the
+    rest on top): a voice with reverb doesn't replace the sound's reverb, both are
+    heard (they're separate instances)."""
+    own = {"effects": {"reverb": {"on": True, "size": 0.9, "tone": 3000, "mix": 0.5}}}
+    both = {**own, "voice": {"name": "Robot", "effects": ROBOT}}
+    ids = [kind for kind, _t, _c in soundfx._chain(soundfx.clean(both))]
+    assert ids == ["voice:robot", "voice:reverb", "reverb"]
+    x = sine(330, 0.5)
+    assert rms(soundfx.render(x, both)[:len(x)] - soundfx.render(x, own)[:len(x)]) > 0.01

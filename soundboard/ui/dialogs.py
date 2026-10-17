@@ -104,11 +104,16 @@ class TabHelpPopup(QDialog):
 
 class EffectsPanel(QWidget):
     """Every per-sound effect setting. `changed` fires on any edit; `fx()` is the
-    settings dict for SoundMeta.fx ({} when nothing is changed)."""
+    settings dict for SoundMeta.fx ({} when nothing is changed).
+
+    `pick_voice(voice)` opens the voice picker (ui.voicepicker) on the sound's voice
+    and gives back the new one, or None if it was cancelled. The sound keeps a copy."""
     changed = Signal()
 
-    def __init__(self, fx: dict | None, meta: SoundMeta | None = None):
+    def __init__(self, fx: dict | None, meta: SoundMeta | None = None, pick_voice=None):
         super().__init__()
+        self._pick_voice = pick_voice
+        self._voice: dict = {}
         v = QVBoxLayout(self)
         v.setContentsMargins(0, 14, 8, 0)   # room under the dialog's tab bar
         v.setSpacing(8)
@@ -126,6 +131,23 @@ class EffectsPanel(QWidget):
         prow.addWidget(reset)
         prow.addStretch(1)
         v.addLayout(prow)
+
+        vrow = QHBoxLayout()
+        vrow.addWidget(QLabel(_("Voice")))
+        self.voice = QPushButton()
+        self.voice.setToolTip(_("Says this sound in a voice from the Voice tab, the way your "
+                                "mic sounds with it: a voice changer voice, an AI voice or "
+                                "your own setup"))
+        self.voice.setAccessibleName(_("Voice"))
+        icons.set_icon(self.voice, "voice", "muted")
+        self.voice.clicked.connect(self._open_voices)
+        self.voice.setEnabled(pick_voice is not None)
+        vrow.addWidget(self.voice)
+        self.voice_off = icon_button("close", _("Take the voice off"))
+        self.voice_off.clicked.connect(lambda: self.set_voice({}))
+        vrow.addWidget(self.voice_off)
+        vrow.addStretch(1)
+        v.addLayout(vrow)
 
         v.addWidget(section_label(_("Trim")))
         self._v = v
@@ -221,7 +243,27 @@ class EffectsPanel(QWidget):
             row.load(cfg if cfg and cfg.get("on") else {"on": False})
         for w in widgets:
             w.blockSignals(False)
+        self._voice = f["voice"]
+        self._show_voice()
         self._boost_hint()
+
+    def _show_voice(self):
+        from soundboard.ui.voicepicker import describe
+        self.voice.setText(describe(self._voice) if self._voice else _("Pick a voice"))
+        self.voice_off.setVisible(bool(self._voice))
+
+    def set_voice(self, voice: dict):
+        """Put a voice on the sound ({} takes it off)."""
+        self._voice = soundfx.clean_voice(voice)
+        self._show_voice()
+        self._edited()
+
+    def _open_voices(self):
+        if self._pick_voice is None:
+            return
+        got = self._pick_voice(self._voice)
+        if got is not None:
+            self.set_voice(got)
 
     def fx(self) -> dict:
         gains, on, _t, _p = self.eq.state()
@@ -231,7 +273,8 @@ class EffectsPanel(QWidget):
              "tape": self.tape.isChecked(), "gain_db": round(self.boost.value(), 2),
              "reverse": self.reverse.isChecked(),
              "eq": gains if on else [0.0] * len(gains),
-             "effects": {t: r.state() for t, r in self.rows.items() if r.chk.isChecked()}}
+             "effects": {t: r.state() for t, r in self.rows.items() if r.chk.isChecked()},
+             "voice": self._voice}
         return {} if soundfx.is_neutral(f) else soundfx.clean(f)
 
     def _boost_hint(self):
@@ -248,6 +291,7 @@ class EffectsPanel(QWidget):
     def _untrimmed(self) -> dict:
         f = soundfx.clean(self.fx())
         f["start"] = f["end"] = 0.0
+        f["voice"] = {}   # the voice is a layer of its own: presets don't set it
         return f
 
     def _matching_preset(self):
@@ -260,7 +304,8 @@ class EffectsPanel(QWidget):
     def _on_preset(self, name: str):
         if name in soundfx.PRESETS:
             start, end = self.trim.values()
-            self.load({**soundfx.PRESETS[name], "start": start, "end": end})
+            self.load({**soundfx.PRESETS[name], "start": start, "end": end,
+                       "voice": self._voice})
             self.changed.emit()
 
 
@@ -277,7 +322,7 @@ class EditDialog(QDialog):
     source_forgotten = Signal()   # Details → Delete info: saved at once, Save or Cancel
 
     def __init__(self, meta: SoundMeta, hotkeys: Hotkeys, preview_cb, parent=None,
-                 tab: str = "sound", others=None):
+                 tab: str = "sound", others=None, pick_voice=None):
         super().__init__(parent)
         fit.watch(self)   # grows to fit its text (ui/fit.py)
         self.setWindowTitle(_("Edit sound"))
@@ -495,7 +540,8 @@ class EditDialog(QDialog):
         self._set_color(self.color)
         self.tabs.addTab(basics, _("Sound"))
 
-        self.effects = EffectsPanel(meta.fx, meta)
+        self.effects = EffectsPanel(
+            meta.fx, meta, (lambda v: pick_voice(v, self)) if pick_voice else None)
         scroll = QScrollArea()
         scroll.setWidgetResizable(True)
         scroll.setWidget(self.effects)
