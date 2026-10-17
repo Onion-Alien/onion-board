@@ -25,6 +25,14 @@ def test_speed_pitch_button_restyles_only_when_its_look_changes(qapp):
     assert calls[-1] == "" and len(calls) <= 3
 
 
+@pytest.mark.parametrize("what", ["sounds", "radio"])
+def test_the_live_controls_button_has_a_name(qapp, what):
+    """Its text is the speed ("1x"): a screen reader said only that."""
+    from soundboard.ui.speedpitch import SpeedPitchButton
+    b = SpeedPitchButton(what)
+    assert b.accessibleName() == "Live controls" and b.accessibleDescription() == b.toolTip()
+
+
 def test_volume_control_restyles_only_when_its_colour_changes(qapp):
     from soundboard.ui.panel import VolumeControl
     vc = VolumeControl(1.0)

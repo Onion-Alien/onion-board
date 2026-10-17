@@ -61,6 +61,7 @@ def test_the_card_has_the_tag_and_says_until_when(qapp, monkeypatch):
     monkeypatch.setattr(theme, "kept", set())
     card, plain = ThemeCard("Halloween"), ThemeCard("Dark")
     assert card.toolTip() == limited_tip("Halloween") and "31" in card.toolTip()
+    assert card.accessibleDescription() == card.toolTip()   # a screen reader hears the date too
     assert plain.toolTip() == ""
     theme.kept.add("Halloween")
     assert limited_tip("Halloween") != card.toolTip()   # now: yours to keep

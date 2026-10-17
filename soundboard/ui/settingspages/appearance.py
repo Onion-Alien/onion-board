@@ -135,7 +135,7 @@ class ThemeCard(QPushButton):
         self.setAccessibleName(name)   # it draws its name: a screen reader had nothing to say
         if name in theme.LIMITED:
             self.setToolTip(limited_tip(name))
-            self.setAccessibleDescription(_("Limited edition"))
+            self.setAccessibleDescription(limited_tip(name))   # until when, or kept
         self.setCheckable(True)
         self.setFixedSize(QSize(150, 112))   # (ThemeGrid widens it to fill its column)
         self.setCursor(Qt.CursorShape.PointingHandCursor)
@@ -663,4 +663,5 @@ class AppearancePage(Page):
             c.setChecked(c.name == name)
             if c.name in theme.LIMITED:   # picked in time: now it's theirs
                 c.setToolTip(limited_tip(c.name))
+                c.setAccessibleDescription(c.toolTip())
             c.update()

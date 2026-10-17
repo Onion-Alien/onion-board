@@ -39,7 +39,7 @@ class UpNextChip(QFrame):
         self.setCursor(Qt.CursorShape.PointingHandCursor)
         self.setFocusPolicy(Qt.FocusPolicy.StrongFocus)
         self.setToolTip(_("See everything waiting to play"))
-        self.setAccessibleName(_("See everything waiting to play"))
+        self.setAccessibleDescription(_("See everything waiting to play"))
         self.setFixedHeight(CHIP_H)
         h = QHBoxLayout(self)
         h.setContentsMargins(10, 0, 10, 0)
@@ -57,9 +57,15 @@ class UpNextChip(QFrame):
         icons.set_label_icon(fold, "fold_up", "muted", size=12)
         for w in (pic, name, self.count, fold):
             h.addWidget(w, 0, Qt.AlignmentFlag.AlignVCenter)
+        self._name()
+
+    def _name(self):
+        """Its name for a screen reader: the words it shows, "Up next 3"."""
+        self.setAccessibleName(f"{_('Up next')} {self.count.text()}")
 
     def set_count(self, n: int):
         self.count.setText(str(n))
+        self._name()
 
     def click(self):
         self.clicked.emit()
