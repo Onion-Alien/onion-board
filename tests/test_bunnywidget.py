@@ -303,8 +303,9 @@ def test_a_click_cheer_hops_high_with_a_happy_face_and_squashes(qapp):
     assert landing["sy"] < 0.95 < landing["sx"]       # squashed on landing
 
 
-def test_idle_fidgets_now_and_then(qapp):
+def test_idle_fidgets_now_and_then(qapp, monkeypatch):
     from soundboard.ui import bunnywidget as bw
+    monkeypatch.setattr(bw.bunskits, "NEXT_PROB", 0.0)   # (a fidget, not his skit)
     b = BunnyWidget("headphones")
     b.resize(b.sizeHint())
     b._next_blink = b._next_flick = time.monotonic() + 600
@@ -417,6 +418,12 @@ class _Song:
 
     def beat(self, now=None):
         return ((self.clock.now if now is None else now) - self.t0) * self.bpm / 60
+
+    def last_hit(self, band, now):   # a hit on every beat
+        return ((now - self.t0) % (60 / self.bpm), 0.9)
+
+    def gap(self, band):
+        return 60 / self.bpm
 
 
 def _dance(monkeypatch, style, height=110, voice=0.5):
@@ -583,3 +590,17 @@ def test_a_skit_only_starts_when_hes_idle_and_stops_for_anything_else(qapp, monk
     b.set_groove(_Song(clock, "pop"))   # music: the skit stops, he dances
     _beats(b, clock, 1.0)
     assert not b.skit_playing
+
+def test_hiphop_nods_on_the_808_hits_themselves(qapp, monkeypatch):
+    b, clock = _dance(monkeypatch, "hiphop")
+    _beats(b, clock, 2.0)
+    song = b.groove
+    hits = [song.t0 + 3.0, song.t0 + 3.7]   # off any beat grid: syncopated 808s
+    song.last_hit = lambda band, now: next(((now - h, 1.0) for h in reversed(hits) if h <= now),
+                                           (float("inf"), 0.0))
+    clock.now = hits[0] - 0.02
+    before = b.pose()["dip"]
+    clock.now = hits[0] + 0.05
+    assert b.pose()["dip"] > before + 3   # down with the 808, not the grid
+    clock.now = hits[1] - 0.05
+    assert b.pose()["dip"] < 2            # back up before the next one
