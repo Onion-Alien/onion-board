@@ -30,6 +30,7 @@ from soundboard.ui import icons
 from soundboard.ui.scribebun import ScribeBunny
 from soundboard.ui.widgets import fmt_time
 from soundboard.ui.pixels import snap_to_pixels
+from soundboard.ui.restyled import measured, on_restyle
 
 
 BAR_W = 480   # the progress bar's length in the banner
@@ -522,6 +523,9 @@ class DownloadBar(QFrame):
         self.s_text = QLabel()
         self.s_text.setObjectName("hint")
         self.s_text.hide()
+        # as wide as "100%" from the start: 9% -> 10% mustn't nudge the bar beside it
+        measured(self.s_text, lambda: self.s_text.setMinimumWidth(
+            self.s_text.fontMetrics().horizontalAdvance("100%")))
         hl.addWidget(self.s_text, 0, Qt.AlignmentFlag.AlignVCenter)
         self.btn_stop_all = self._icon_button("stop_all", _("Stop all"))
         self.btn_stop_all.clicked.connect(self._on_stop_all)
@@ -600,6 +604,8 @@ class DownloadBar(QFrame):
         hang(self.lbl_meta, 1)
         row1.addStretch(1)
         col.addLayout(row1)
+        for w in (self.lbl_title, self.lbl_meta):   # (in the theme's fonts: see restyled)
+            on_restyle(w, self._line_up)
 
         # line 2: what it'll do, the bar, how far (or how it ended)
         row2 = self._row2 = QHBoxLayout()
@@ -617,8 +623,17 @@ class DownloadBar(QFrame):
         row2.addWidget(self.lbl_status, 0, Qt.AlignmentFlag.AlignVCenter)
         row2.addStretch(1)   # past the bar's length: room, not a gap before the number
         # as tall with the pill as without it (hidden when a pick ends): the title above
-        # mustn't hop up when one ends and down when the next starts
-        row2.addStrut(self.pill.sizeHint().height())
+        # mustn't hop up when one ends and down when the next starts (a strut, but one
+        # that follows the pill's font: see restyled)
+        strut = QSpacerItem(0, 0, QSizePolicy.Policy.Fixed, QSizePolicy.Policy.Fixed)
+        row2.addItem(strut)
+
+        def pill_high():
+            strut.changeSize(0, self.pill.sizeHint().height(), QSizePolicy.Policy.Fixed,
+                             QSizePolicy.Policy.Fixed)
+            row2.invalidate()
+
+        measured(self.pill, pill_high)
         col.addLayout(row2)
         h.addLayout(col, 1)
         h.setAlignment(col, Qt.AlignmentFlag.AlignVCenter)
@@ -908,8 +923,6 @@ class DownloadBar(QFrame):
                    1.0 if show_bar and self.url and self.stage == "done" else None)
         frac = jobprogress.batch(done, current, len(self._queue))
         self.s_text.setText(f"{frac * 100:.0f}%" if show_bar else "")
-        # as wide as "100%" from the start: 9% -> 10% mustn't nudge the bar beside it
-        self.s_text.setMinimumWidth(self.s_text.fontMetrics().horizontalAdvance("100%"))
         self.s_text.setAlignment(Qt.AlignmentFlag.AlignRight | Qt.AlignmentFlag.AlignVCenter)
         self.s_bar.set_progress(frac, busy=running and self.stage != "downloading")
 

@@ -140,6 +140,7 @@ the launcher the shortcuts and PyInstaller use. The app is the `soundboard` pack
 | `soundboard/ui/widgets.py` | hand-painted widgets: meter, EQ curve, seek slider, pads (picture, spectrum visualizer while playing) and their grid |
 | `soundboard/ui/playbutton.py` | playback button with a smooth circular edge in full and mini views |
 | `soundboard/ui/pixels.py` | `snap_to_pixels` (from the style kit's `appstate.py`): every hand-painted widget calls it first so its edges land on whole pixels at 125 % / 150 % scaling |
+| `soundboard/ui/restyled.py` | sizes worked out from a widget's text (`measured`, `on_restyle`), worked out again when its style or font changes: the window is built with the app's style sheet off (`theme.styled_after`) and `again()` re-runs them all once it's back on |
 | `soundboard/ui/iconrow.py` | label icons aligned to the first line's capital ink using the current font metrics |
 | `soundboard/ui/panel.py` | volume boxes, the equalizer panel (emit values; the window applies them) a wrapping row layout (`Flow`) and a grid of equal-width cards (`CardGrid`) |
 | `soundboard/ui/dialogs.py` | per-sound Edit dialog: the Sound tab (name, volume, hotkey, fades…) and the Effects tab |

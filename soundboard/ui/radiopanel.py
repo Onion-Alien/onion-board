@@ -34,6 +34,7 @@ from soundboard.ui.radiolist import (GENRE_LABELS, GENRES, LIST_MAX,  # noqa: F4
 from soundboard.ui.speedpitch import SpeedPitchButton
 from soundboard.ui.widgets import paint_now_playing
 from soundboard.ui.pixels import snap_to_pixels
+from soundboard.ui.restyled import on_restyle
 
 log = logging.getLogger(__name__)
 
@@ -61,6 +62,9 @@ def _steady_text(btn: QPushButton, text: str, *others: str):
     btn.blockSignals(blocked)
     btn.setText(text)
     btn.setMinimumWidth(widest if text else 0)
+    if btn.property("steady") is None:   # again in the theme's font (see restyled)
+        on_restyle(btn, lambda: _steady_text(btn, btn.text(), *btn.property("steady")))
+    btn.setProperty("steady", list(others))
 
 
 class NowPlaying(QWidget):
