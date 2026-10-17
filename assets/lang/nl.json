@@ -3816,5 +3816,9 @@
   "Hear {effect} (only you)": "{effect} beluisteren (alleen jij)",
   "Mic only": "Alleen mic",
   "✓ The store is on again: loading it.": "✓ De winkel staat weer aan: wordt geladen.",
-  "Background sounds": "Achtergrondgeluiden"
+  "Background sounds": "Achtergrondgeluiden",
+  "Onion Board is still running without admin.": "Onion Board draait nog zonder beheerdersrechten.",
+  "Restart as admin": "Opnieuw starten als beheerder",
+  "The game runs as admin, and Windows doesn't let other programs hear the keys you press in it. Start Onion Board as admin too to use your hotkeys there.": "De game draait als beheerder, en Windows laat andere programma's de toetsen die je erin indrukt niet horen. Start Onion Board ook als beheerder om je sneltoetsen daar te gebruiken.",
+  "Your hotkeys can't reach this game": "Je sneltoetsen bereiken deze game niet"
 }

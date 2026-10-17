@@ -3738,5 +3738,9 @@
   "Hear {effect} (only you)": "Nghe thử {effect} (chỉ bạn)",
   "Mic only": "Chỉ mic",
   "✓ The store is on again: loading it.": "✓ Cửa hàng đã bật lại: đang tải.",
-  "Background sounds": "Âm thanh nền"
+  "Background sounds": "Âm thanh nền",
+  "Onion Board is still running without admin.": "Onion Board vẫn đang chạy mà không có quyền quản trị.",
+  "Restart as admin": "Khởi động lại với quyền quản trị",
+  "The game runs as admin, and Windows doesn't let other programs hear the keys you press in it. Start Onion Board as admin too to use your hotkeys there.": "Trò chơi đang chạy với quyền quản trị, và Windows không cho chương trình khác nghe các phím bạn bấm trong đó. Hãy chạy Onion Board với quyền quản trị để dùng phím tắt ở đó.",
+  "Your hotkeys can't reach this game": "Phím tắt của bạn không tới được trò chơi này"
 }

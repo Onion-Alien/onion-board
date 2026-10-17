@@ -3816,5 +3816,9 @@
   "Hear {effect} (only you)": "Hør {effect} (bare deg)",
   "Mic only": "Bare mikrofon",
   "✓ The store is on again: loading it.": "✓ Butikken er på igjen: laster den.",
-  "Background sounds": "Bakgrunnslyder"
+  "Background sounds": "Bakgrunnslyder",
+  "Onion Board is still running without admin.": "Onion Board kjører fortsatt uten administrator.",
+  "Restart as admin": "Start på nytt som administrator",
+  "The game runs as admin, and Windows doesn't let other programs hear the keys you press in it. Start Onion Board as admin too to use your hotkeys there.": "Spillet kjører som administrator, og Windows lar ikke andre programmer høre tastene du trykker i det. Start Onion Board som administrator også for å bruke hurtigtastene dine der.",
+  "Your hotkeys can't reach this game": "Hurtigtastene dine når ikke dette spillet"
 }

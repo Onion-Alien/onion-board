@@ -3894,5 +3894,9 @@
   "Hear {effect} (only you)": "Poslechnout {effect} (jen ty)",
   "Mic only": "Jen mikrofon",
   "✓ The store is on again: loading it.": "✓ Obchod je zase zapnutý: načítá se.",
-  "Background sounds": "Zvuky v pozadí"
+  "Background sounds": "Zvuky v pozadí",
+  "Onion Board is still running without admin.": "Onion Board pořád běží bez práv správce.",
+  "Restart as admin": "Restartovat jako správce",
+  "The game runs as admin, and Windows doesn't let other programs hear the keys you press in it. Start Onion Board as admin too to use your hotkeys there.": "Hra běží jako správce a Windows nedovolí jiným programům slyšet klávesy, které v ní mačkáš. Spusť Onion Board taky jako správce, aby tam tvoje klávesové zkratky fungovaly.",
+  "Your hotkeys can't reach this game": "Tvoje klávesové zkratky se do této hry nedostanou"
 }

@@ -394,6 +394,15 @@ def _never_touch_the_real_mic(monkeypatch, tmp_path):
 
 
 @pytest.fixture(autouse=True)
+def _never_watch_the_real_front_window(monkeypatch):
+    """No test looks at this PC's window in front for games run as admin
+    (soundboard.adminfront): a full-screen admin program here would put a notice in it.
+    tests/test_adminfront.py drives the check with fakes."""
+    from soundboard import adminfront
+    monkeypatch.setattr(adminfront.Watcher, "start", lambda self: False)
+
+
+@pytest.fixture(autouse=True)
 def _never_read_the_real_discord(monkeypatch, tmp_path):
     """Discord's voice settings (soundboard.discordcfg) come from an empty folder: the
     developer's own Discord must not put a banner in a test or a screenshot. Tests

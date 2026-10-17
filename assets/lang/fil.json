@@ -3816,5 +3816,9 @@
   "Hear {effect} (only you)": "Pakinggan ang {effect} (ikaw lang)",
   "Mic only": "Mic lang",
   "✓ The store is on again: loading it.": "✓ Naka-on ulit ang store: nilo-load na.",
-  "Background sounds": "Mga tunog sa background"
+  "Background sounds": "Mga tunog sa background",
+  "Onion Board is still running without admin.": "Tumatakbo pa rin ang Onion Board nang walang admin.",
+  "Restart as admin": "I-restart bilang admin",
+  "The game runs as admin, and Windows doesn't let other programs hear the keys you press in it. Start Onion Board as admin too to use your hotkeys there.": "Tumatakbo bilang admin ang laro, at hindi pinapayagan ng Windows ang ibang program na marinig ang mga key na pinipindot mo rito. Patakbuhin din ang Onion Board bilang admin para gumana roon ang mga hotkey mo.",
+  "Your hotkeys can't reach this game": "Hindi naaabot ng mga hotkey mo ang larong ito"
 }

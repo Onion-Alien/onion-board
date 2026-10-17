@@ -3816,5 +3816,9 @@
   "Hear {effect} (only you)": "{effect} सुनें (सिर्फ़ आप)",
   "Mic only": "सिर्फ़ माइक",
   "✓ The store is on again: loading it.": "✓ स्टोर फिर से चालू है: लोड हो रहा है।",
-  "Background sounds": "बैकग्राउंड आवाज़ें"
+  "Background sounds": "बैकग्राउंड आवाज़ें",
+  "Onion Board is still running without admin.": "Onion Board अभी भी बिना एडमिन के चल रहा है।",
+  "Restart as admin": "एडमिन के रूप में फिर से शुरू करें",
+  "The game runs as admin, and Windows doesn't let other programs hear the keys you press in it. Start Onion Board as admin too to use your hotkeys there.": "गेम एडमिन के रूप में चल रहा है, और Windows दूसरे प्रोग्राम को उसमें दबाई गई कुंजियाँ सुनने नहीं देता। वहाँ अपनी हॉटकी इस्तेमाल करने के लिए Onion Board को भी एडमिन के रूप में चलाएँ।",
+  "Your hotkeys can't reach this game": "आपकी हॉटकी इस गेम तक नहीं पहुँचतीं"
 }

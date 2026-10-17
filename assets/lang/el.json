@@ -3816,5 +3816,9 @@
   "Hear {effect} (only you)": "Άκου {effect} (μόνο εσύ)",
   "Mic only": "Μόνο μικρόφωνο",
   "✓ The store is on again: loading it.": "✓ Το κατάστημα είναι ξανά ανοιχτό: φορτώνει.",
-  "Background sounds": "Ήχοι φόντου"
+  "Background sounds": "Ήχοι φόντου",
+  "Onion Board is still running without admin.": "Το Onion Board τρέχει ακόμα χωρίς δικαιώματα διαχειριστή.",
+  "Restart as admin": "Επανεκκίνηση ως διαχειριστής",
+  "The game runs as admin, and Windows doesn't let other programs hear the keys you press in it. Start Onion Board as admin too to use your hotkeys there.": "Το παιχνίδι τρέχει ως διαχειριστής και τα Windows δεν αφήνουν άλλα προγράμματα να ακούν τα πλήκτρα που πατάς σε αυτό. Άνοιξε και το Onion Board ως διαχειριστής για να δουλεύουν εκεί τα πλήκτρα συντόμευσης.",
+  "Your hotkeys can't reach this game": "Τα πλήκτρα συντόμευσης δεν φτάνουν σε αυτό το παιχνίδι"
 }

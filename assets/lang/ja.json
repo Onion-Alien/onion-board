@@ -3738,5 +3738,9 @@
   "Hear {effect} (only you)": "{effect} を試聴 (自分だけ)",
   "Mic only": "マイクのみ",
   "✓ The store is on again: loading it.": "✓ ストアが再びオンになりました: 読み込み中。",
-  "Background sounds": "バックグラウンドの音"
+  "Background sounds": "バックグラウンドの音",
+  "Onion Board is still running without admin.": "Onion Board は管理者なしのまま動いています。",
+  "Restart as admin": "管理者として再起動",
+  "The game runs as admin, and Windows doesn't let other programs hear the keys you press in it. Start Onion Board as admin too to use your hotkeys there.": "このゲームは管理者として動いていて、Windows はほかのプログラムがゲーム内で押したキーを聞くことを許しません。そこでホットキーを使うには Onion Board も管理者として起動してください。",
+  "Your hotkeys can't reach this game": "ホットキーがこのゲームに届きません"
 }

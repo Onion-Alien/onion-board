@@ -119,6 +119,8 @@ The full list. The [README](../README.md) has the short version and how to get s
   - A game that runs as administrator: Windows doesn't let other programs hear the
     keys pressed in it, so hotkeys (and auto push-to-talk) work there only when Onion
     Board runs as administrator too.
+    When a full-screen game like that comes to the front, the board says so, with a
+    *Restart as admin* button.
 - **Radio tab:** internet radio from all over the world, from the free
   [Radio Browser](https://www.radio-browser.info) directory. Click a dot on the
   world map to tune in (hover one for its country, genres, quality and how popular

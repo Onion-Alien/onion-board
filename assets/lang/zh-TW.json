@@ -3738,5 +3738,9 @@
   "Hear {effect} (only you)": "試聽 {effect}（只有你）",
   "Mic only": "僅麥克風",
   "✓ The store is on again: loading it.": "✓ 商店已重新開啟：正在載入。",
-  "Background sounds": "背景音效"
+  "Background sounds": "背景音效",
+  "Onion Board is still running without admin.": "Onion Board 仍以非系統管理員身分執行。",
+  "Restart as admin": "以系統管理員身分重新啟動",
+  "The game runs as admin, and Windows doesn't let other programs hear the keys you press in it. Start Onion Board as admin too to use your hotkeys there.": "這個遊戲以系統管理員身分執行，Windows 不允許其他程式聽到你在其中按下的按鍵。把 Onion Board 也以系統管理員身分啟動，才能在那裡使用快速鍵。",
+  "Your hotkeys can't reach this game": "你的快速鍵無法傳到這個遊戲"
 }

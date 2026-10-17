@@ -3816,5 +3816,9 @@
   "Hear {effect} (only you)": "{effect} meghallgatása (csak te)",
   "Mic only": "Csak mikrofon",
   "✓ The store is on again: loading it.": "✓ A bolt újra be van kapcsolva: betöltés.",
-  "Background sounds": "Háttérhangok"
+  "Background sounds": "Háttérhangok",
+  "Onion Board is still running without admin.": "Az Onion Board továbbra is rendszergazda nélkül fut.",
+  "Restart as admin": "Újraindítás rendszergazdaként",
+  "The game runs as admin, and Windows doesn't let other programs hear the keys you press in it. Start Onion Board as admin too to use your hotkeys there.": "A játék rendszergazdaként fut, és a Windows nem engedi, hogy más programok hallják a benne lenyomott billentyűket. Indítsd az Onion Boardot is rendszergazdaként, hogy ott is működjenek a gyorsbillentyűid.",
+  "Your hotkeys can't reach this game": "A gyorsbillentyűid nem érik el ezt a játékot"
 }
