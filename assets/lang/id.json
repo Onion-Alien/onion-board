@@ -3721,5 +3721,6 @@
   ],
   "Make a voice of your own first: Voice tab → Voice changer → Edit voice, or Save what's on under My setups.": "Buat suaramu sendiri dulu: tab Suara → Pengubah suara → Edit suara, atau Simpan yang aktif di Setelanku.",
   "Rain, wind, a crowd or sounds from your board behind your voice": "Hujan, angin, keramaian, atau suara dari board-mu di balik suaramu",
-  "Your own settings: Edit voice opens them": "Pengaturanmu sendiri: “Edit suara” membukanya"
+  "Your own settings: Edit voice opens them": "Pengaturanmu sendiri: “Edit suara” membukanya",
+  "{site} didn't answer over Tor (it ignores some of Tor's addresses), and nor did {tries} other Tor routes. You can try this one without Tor: {site} would then see your own address.": "{site} tidak menjawab lewat Tor (situs itu mengabaikan sebagian alamat Tor), begitu pula lewat {tries} rute Tor lainnya. Anda dapat mencoba yang ini tanpa Tor: {site} akan melihat alamat Anda sendiri."
 }

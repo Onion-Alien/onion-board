@@ -3801,5 +3801,6 @@
   ],
   "Make a voice of your own first: Voice tab → Voice changer → Edit voice, or Save what's on under My setups.": "Tee ensin oma ääni: Ääni-välilehti → Äänenmuuttaja → Muokkaa ääntä, tai Tallenna päällä olevat kohdassa Omat asetelmat.",
   "Rain, wind, a crowd or sounds from your board behind your voice": "Sadetta, tuulta, väkijoukko tai ääniä boardiltasi äänesi takana",
-  "Your own settings: Edit voice opens them": "Omat asetuksesi: ”Muokkaa ääntä” avaa ne"
+  "Your own settings: Edit voice opens them": "Omat asetuksesi: ”Muokkaa ääntä” avaa ne",
+  "{site} didn't answer over Tor (it ignores some of Tor's addresses), and nor did {tries} other Tor routes. You can try this one without Tor: {site} would then see your own address.": "{site} ei vastannut Torin kautta (se ohittaa osan Torin osoitteista), eikä myöskään {tries} muun Tor-reitin kautta. Voit kokeilla tätä ilman Toria: {site} näkisi silloin oman osoitteesi."
 }

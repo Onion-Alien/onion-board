@@ -3721,5 +3721,6 @@
   ],
   "Make a voice of your own first: Voice tab → Voice changer → Edit voice, or Save what's on under My setups.": "Hãy tạo giọng của riêng bạn trước: thẻ Giọng nói → Đổi giọng nói → Chỉnh giọng, hoặc Lưu những gì đang bật trong Thiết lập của tôi.",
   "Rain, wind, a crowd or sounds from your board behind your voice": "Mưa, gió, đám đông hoặc âm thanh từ board của bạn phía sau giọng bạn",
-  "Your own settings: Edit voice opens them": "Cài đặt của riêng bạn: mở bằng “Chỉnh giọng”"
+  "Your own settings: Edit voice opens them": "Cài đặt của riêng bạn: mở bằng “Chỉnh giọng”",
+  "{site} didn't answer over Tor (it ignores some of Tor's addresses), and nor did {tries} other Tor routes. You can try this one without Tor: {site} would then see your own address.": "{site} không trả lời qua Tor (trang này bỏ qua một số địa chỉ của Tor), và {tries} tuyến Tor khác cũng vậy. Bạn có thể thử cái này mà không cần Tor: {site} sẽ thấy địa chỉ của chính bạn."
 }

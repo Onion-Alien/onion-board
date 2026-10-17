@@ -3801,5 +3801,6 @@
   ],
   "Make a voice of your own first: Voice tab → Voice changer → Edit voice, or Save what's on under My setups.": "Φτιάξε πρώτα μια δική σου φωνή: καρτέλα Φωνή → Αλλαγη φωνης → Επεξεργασία φωνής, ή Αποθήκευσε ό,τι είναι ανοιχτό στις Ρυθμίσεις μου.",
   "Rain, wind, a crowd or sounds from your board behind your voice": "Βροχή, αέρας, πλήθος ή ήχοι από το board σου πίσω από τη φωνή σου",
-  "Your own settings: Edit voice opens them": "Οι δικές σου ρυθμίσεις: τις ανοίγει το «Επεξεργασία φωνής»"
+  "Your own settings: Edit voice opens them": "Οι δικές σου ρυθμίσεις: τις ανοίγει το «Επεξεργασία φωνής»",
+  "{site} didn't answer over Tor (it ignores some of Tor's addresses), and nor did {tries} other Tor routes. You can try this one without Tor: {site} would then see your own address.": "Το {site} δεν απάντησε μέσω Tor (αγνοεί κάποιες διευθύνσεις του Tor), ούτε μέσω {tries} άλλων διαδρομών Tor. Μπορείτε να δοκιμάσετε αυτό χωρίς Tor: το {site} θα έβλεπε τότε τη δική σας διεύθυνση."
 }

@@ -587,6 +587,56 @@ def test_no_retries_outside_tor_mode(monkeypatch):
     assert not isinstance(e.value, ytdl.TorBlocked)
 
 
+TIMEOUT = ("ERROR: [soundcloud:search] Unable to download API page: "
+           "(caused by TransportError('The read operation timed out'))")
+
+
+def test_a_site_that_doesnt_answer_tor_gets_a_new_identity(tor_mode, monkeypatch):
+    """SoundCloud ignores some Tor exits: the socket times out. Another exit, not a
+    longer wait, and never a direct connection."""
+    monkeypatch.setattr(net, "ytdlp_proxy", fake_relay)
+    answers = iter([Exception(TIMEOUT), {"entries": [
+        {"id": "1", "title": "what is love", "url": "https://soundcloud.com/a/b",
+         "duration": 30, "uploader": "a"}]}])
+
+    class TimesOutOnce(FakeYDL):
+        def extract_info(self, *a, **k):
+            r = next(answers)
+            if isinstance(r, Exception):
+                raise r
+            return r
+    import contextlib
+    import types
+    FakeYDL.opts = []
+    monkeypatch.setattr(ytdl, "_ydl", lambda: contextlib.nullcontext(
+        types.SimpleNamespace(YoutubeDL=TimesOutOnce)))
+    hits = ytdl.search("what is love", source="soundcloud")
+    assert [h.title for h in hits] == ["what is love"] and len(tor_mode) == 1
+    assert {o["proxy"] for o in FakeYDL.opts} == {fake_relay("sounds_web.soundcloud")}
+
+
+def test_a_site_silent_on_every_tor_route_names_the_site_not_your_internet(tor_mode):
+    def fetch():
+        raise ytdl._readable(Exception(TIMEOUT))
+    with pytest.raises(ytdl.TorBlocked, match="without Tor") as e:
+        ytdl._over_tor(fetch, "https://soundcloud.com")
+    assert len(tor_mode) == ytdl.TOR_TRIES
+    assert "soundcloud.com didn't answer over Tor" in str(e.value)
+    assert "internet" not in str(e.value)
+
+
+def test_a_timeout_outside_tor_mode_raises_at_once(monkeypatch):
+    monkeypatch.setattr(tor, "new_identity", lambda: pytest.fail("NEWNYM outside Tor mode"))
+    calls = []
+
+    def fetch():
+        calls.append(1)
+        raise ytdl._readable(Exception(TIMEOUT))
+    with pytest.raises(ytdl.FetchError, match="timed out") as e:
+        ytdl._over_tor(fetch, "https://soundcloud.com")
+    assert not isinstance(e.value, ytdl.TorBlocked) and calls == [1]
+
+
 class FakeYDL:
     """yt_dlp.YoutubeDL that records its options and always hits the bot wall."""
     opts: list[dict] = []

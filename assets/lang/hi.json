@@ -3801,5 +3801,6 @@
   ],
   "Make a voice of your own first: Voice tab → Voice changer → Edit voice, or Save what's on under My setups.": "पहले अपनी आवाज़ बनाएं: वॉइस टैब → आवाज परिवर्तक → आवाज़ बदलें, या मेरे सेटअप में जो चालू है उसे सेव करें।",
   "Rain, wind, a crowd or sounds from your board behind your voice": "आपकी आवाज़ के पीछे बारिश, हवा, भीड़ या आपके बोर्ड के साउंड",
-  "Your own settings: Edit voice opens them": "आपकी अपनी सेटिंग्स: “आवाज़ बदलें” इन्हें खोलता है"
+  "Your own settings: Edit voice opens them": "आपकी अपनी सेटिंग्स: “आवाज़ बदलें” इन्हें खोलता है",
+  "{site} didn't answer over Tor (it ignores some of Tor's addresses), and nor did {tries} other Tor routes. You can try this one without Tor: {site} would then see your own address.": "{site} ने Tor पर जवाब नहीं दिया (यह Tor के कुछ पतों को अनदेखा करता है), और {tries} दूसरे Tor रास्तों पर भी नहीं। आप इसे Tor के बिना आज़मा सकते हैं: तब {site} को आपका अपना पता दिखेगा।"
 }

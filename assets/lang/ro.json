@@ -3881,5 +3881,6 @@
   ],
   "Make a voice of your own first: Voice tab → Voice changer → Edit voice, or Save what's on under My setups.": "Fă-ți întâi o voce proprie: fila Voce → Schimbator de voce → Editează vocea, sau Salvează ce e pornit la Setările mele.",
   "Rain, wind, a crowd or sounds from your board behind your voice": "Ploaie, vânt, o mulțime sau sunete de pe board-ul tău în spatele vocii tale",
-  "Your own settings: Edit voice opens them": "Setările tale: „Editează vocea” le deschide"
+  "Your own settings: Edit voice opens them": "Setările tale: „Editează vocea” le deschide",
+  "{site} didn't answer over Tor (it ignores some of Tor's addresses), and nor did {tries} other Tor routes. You can try this one without Tor: {site} would then see your own address.": "{site} nu a răspuns prin Tor (ignoră unele adrese ale lui Tor), și nici prin {tries} alte rute Tor. Puteți încerca acesta fără Tor: {site} va vedea atunci propria dvs. adresă."
 }
