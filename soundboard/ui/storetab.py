@@ -379,6 +379,7 @@ class StoreTab(QWidget):
         from soundboard.ui.bunnywidget import BunnyWidget
         self.msg_bun = BunnyWidget(height=DOWN_BUN, pad=18, sad=1.0)
         self.msg_bun.sulk = True
+        self.msg_bun.setMinimumSize(1, 1)   # no say in the tab's minimum: hidden when short
         self.msg_bun.hide()
         mv.addWidget(self.msg_bun, 0, Qt.AlignmentFlag.AlignHCenter)
         self.msg_title = section_label("")
