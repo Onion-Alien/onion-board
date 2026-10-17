@@ -176,19 +176,19 @@ class StoreTab(QWidget):
         head.setMaximumWidth(ROW_MAX_W)
         # the main button on a row of its own: beside the search box and the order, the
         # card was wider than the smallest window (that turns into the mini player)
-        share_row = QHBoxLayout()
+        # it and the order wrap onto two lines when narrow (side by side they were wider
+        # than the smallest window too)
+        share_box = QWidget()
+        share_row = Flow(share_box, gap=6)
         self.btn_share = QPushButton(_("Share a sound"))
         self.btn_share.setObjectName("primary")
         icons.set_icon(self.btn_share, "upload", "on_accent", "on_accent")
         self.btn_share.clicked.connect(lambda: self.share())
         share_row.addWidget(self.btn_share)
-        share_row.addStretch(1)
         # the order: Top, New, or Trending on Myinstants, out in the open (inside a menu,
         # nobody found Trending), one picked at a time like the share window's file / link
         self._sort = "top"
         self.sort_btns: dict[str, QPushButton] = {}
-        sorts = QHBoxLayout()
-        sorts.setSpacing(4)
         for key, text, tip, icon in (
                 ("top", _("Top"), _("The best voted first"), ""),
                 ("new", _("New"), _("The newest first"), ""),
@@ -202,10 +202,9 @@ class StoreTab(QWidget):
             if icon:
                 icons.set_icon(b, icon, "text", "on_accent")
             b.clicked.connect(lambda _c=False, k=key: self.set_sort(k))
-            sorts.addWidget(b)
+            share_row.addWidget(b)
             self.sort_btns[key] = b
-        share_row.addLayout(sorts)
-        hv.addLayout(share_row)
+        hv.addWidget(share_box)
         row = QHBoxLayout()
         row.setSpacing(8)
         self.search = QLineEdit()
