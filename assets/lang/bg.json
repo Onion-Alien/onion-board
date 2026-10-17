@@ -3787,7 +3787,6 @@
   "You're muted, so only you hear “{name}”.": "Заглушен си, затова само ти чуваш „{name}“.",
   "{name} closed: the clip editor keeps what it heard.": "{name} се затвори: редакторът на клипове пази каквото е чул.",
   "Sorry, the store's down": "Съжаляваме, магазинът не работи",
-  "Sorry, the store's down. We're working on getting it back up.": "Съжаляваме, магазинът не работи. Работим по връщането му.",
   "We're working on getting it back up. Try again in a bit.": "Работим по връщането му. Опитай пак след малко.",
   "A voice chat's noise suppression can wipe these out, deep bass too. Discord: Input Profile → Studio.": "Потискането на шума в гласов чат може да ги изтрие, дълбокия бас също. Discord: Входен профил → Студио.",
   "Full board": "Цялото табло",
@@ -4091,5 +4090,11 @@
   "Uncommon": "Необичаен",
   "<b>{device}</b> looks like speakers, so your mic hears itself. Keep them quiet or use headphones. If it starts to squeal, this switches off by itself.": "<b>{device}</b> изглежда като колони, така че микрофонът чува сам себе си. Дръж ги тихо или ползвай слушалки. Ако започне да свири, това се изключва само.",
   "Stopped <b>Hear what they hear</b>: your mic was picking up your speakers and started to squeal. Use headphones, or turn the speakers down.": "Спряно <b>Чуй каквото чуват те</b>: микрофонът хващаше колоните и започна да свири. Ползвай слушалки или намали колоните.",
-  "Bun's almost done, one moment.": "Bun почти приключи, един момент."
+  "Bun's almost done, one moment.": "Bun почти приключи, един момент.",
+  "It'll be back in about {n} hour.": [
+    "Ще работи отново след около {n} час.",
+    "Ще работи отново след около {n} часа."
+  ],
+  "It'll be back in under an hour.": "Ще работи отново след по-малко от час.",
+  "The store's down for maintenance": "Магазинът е спрян за поддръжка"
 }

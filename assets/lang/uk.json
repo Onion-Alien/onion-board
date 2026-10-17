@@ -3865,7 +3865,6 @@
   "You're muted, so only you hear “{name}”.": "У тебе вимкнено звук для інших, тож «{name}» чуєш лише ти.",
   "{name} closed: the clip editor keeps what it heard.": "{name} закрилася: редактор кліпів зберігає те, що почув.",
   "Sorry, the store's down": "Вибач, магазин не працює",
-  "Sorry, the store's down. We're working on getting it back up.": "Вибач, магазин не працює. Ми вже лагодимо його.",
   "We're working on getting it back up. Try again in a bit.": "Ми вже лагодимо його. Спробуй ще раз трохи згодом.",
   "A voice chat's noise suppression can wipe these out, deep bass too. Discord: Input Profile → Studio.": "Шумозаглушення голосового чату може стерти ці ефекти, і глибокий бас теж. Discord: Профіль введення → Студія.",
   "Full board": "Уся панель",
@@ -4169,5 +4168,12 @@
   "Uncommon": "Незвичайний",
   "<b>{device}</b> looks like speakers, so your mic hears itself. Keep them quiet or use headphones. If it starts to squeal, this switches off by itself.": "<b>{device}</b> схоже на колонки, тож мікрофон чує сам себе. Зроби їх тихіше або вдягни навушники. Якщо почне свистіти, це вимкнеться само.",
   "Stopped <b>Hear what they hear</b>: your mic was picking up your speakers and started to squeal. Use headphones, or turn the speakers down.": "<b>Чути те, що чують вони</b> зупинено: мікрофон ловив звук колонок і почав свистіти. Вдягни навушники або зменш гучність колонок.",
-  "Bun's almost done, one moment.": "Bun майже закінчив, хвилинку."
+  "Bun's almost done, one moment.": "Bun майже закінчив, хвилинку.",
+  "It'll be back in about {n} hour.": [
+    "Він повернеться приблизно за {n} годину.",
+    "Він повернеться приблизно за {n} години.",
+    "Він повернеться приблизно за {n} годин."
+  ],
+  "It'll be back in under an hour.": "Він повернеться менш ніж за годину.",
+  "The store's down for maintenance": "Магазин зупинено на техобслуговування"
 }

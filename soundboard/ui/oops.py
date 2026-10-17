@@ -26,6 +26,7 @@ log = logging.getLogger(__name__)
 BUN_H = 72        # sad Bun's height on the card
 COMPACT_BUN_H = 56   # ... and beside the words (compact)
 MAX_W = 420       # the card's width at most
+MIN_W = 320       # ... and at least, when it's only a title and a line
 
 
 def hint() -> str:
@@ -144,11 +145,17 @@ class OopsPanel(QFrame):
         self.what.setText(hint())
 
     def show_problem(self, title: str, line: str = "", retry: Callable[[], object] | None = None,
-                     *, button: str = "", tone: str = "error"):
+                     *, button: str = "", tone: str = "error", fixable: bool = True):
         """Fill it: `title`, the `line` under it (rich text: escape plain words; an
         error's "Report it" link becomes the Report a problem button), and Try again
-        (`button` to word it otherwise) doing `retry`."""
+        (`button` to word it otherwise) doing `retry`. `fixable=False`: nothing the user
+        can do (a server that's down), so no "close and open it again" and no Report."""
         self.set_tone(tone)
+        if not fixable:
+            self.what.hide()
+            self.btn_report.hide()
+        if not self.compact:   # without the long "what to do" lines it'd shrink to the title
+            self.setMinimumWidth(0 if fixable else MIN_W)
         self.title.setText(title)
         line, self._report_url = split_report(line)
         self.line.setText(line)

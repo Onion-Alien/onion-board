@@ -3709,7 +3709,6 @@
   "You're muted, so only you hear “{name}”.": "Anda dibisukan, jadi hanya anda yang mendengar “{name}”.",
   "{name} closed: the clip editor keeps what it heard.": "{name} ditutup: editor klip menyimpan apa yang didengarnya.",
   "Sorry, the store's down": "Maaf, kedai sedang tergendala",
-  "Sorry, the store's down. We're working on getting it back up.": "Maaf, kedai sedang tergendala. Kami sedang berusaha memulihkannya.",
   "We're working on getting it back up. Try again in a bit.": "Kami sedang berusaha memulihkannya. Cuba lagi sebentar lagi.",
   "A voice chat's noise suppression can wipe these out, deep bass too. Discord: Input Profile → Studio.": "Penindasan hingar dalam sembang suara boleh memadamkannya, bes dalam juga. Discord: Profil Input → Studio.",
   "Full board": "Papan penuh",
@@ -4013,5 +4012,10 @@
   "Uncommon": "Luar Biasa",
   "<b>{device}</b> looks like speakers, so your mic hears itself. Keep them quiet or use headphones. If it starts to squeal, this switches off by itself.": "<b>{device}</b> nampaknya pembesar suara, jadi mikrofon anda mendengar dirinya sendiri. Perlahankannya atau guna fon kepala. Jika ia mula berdesing, ini akan mati sendiri.",
   "Stopped <b>Hear what they hear</b>: your mic was picking up your speakers and started to squeal. Use headphones, or turn the speakers down.": "<b>Dengar apa yang mereka dengar</b> dihentikan: mikrofon anda menangkap bunyi pembesar suara dan mula berdesing. Guna fon kepala, atau perlahankan pembesar suara.",
-  "Bun's almost done, one moment.": "Bun hampir siap, sekejap."
+  "Bun's almost done, one moment.": "Bun hampir siap, sekejap.",
+  "It'll be back in about {n} hour.": [
+    "Ia akan kembali dalam kira-kira {n} jam."
+  ],
+  "It'll be back in under an hour.": "Ia akan kembali dalam masa kurang sejam.",
+  "The store's down for maintenance": "Kedai ditutup untuk penyelenggaraan"
 }

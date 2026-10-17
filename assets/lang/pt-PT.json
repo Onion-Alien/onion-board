@@ -3787,7 +3787,6 @@
   "You're muted, so only you hear “{name}”.": "Estás silenciado, por isso só tu ouves «{name}».",
   "{name} closed: the clip editor keeps what it heard.": "{name} fechou: o editor de clips guarda o que ouviu.",
   "Sorry, the store's down": "Desculpa, a loja está em baixo",
-  "Sorry, the store's down. We're working on getting it back up.": "Desculpa, a loja está em baixo. Estamos a trabalhar para a pôr de volta.",
   "We're working on getting it back up. Try again in a bit.": "Estamos a trabalhar para a pôr de volta. Tenta novamente daqui a pouco.",
   "A voice chat's noise suppression can wipe these out, deep bass too. Discord: Input Profile → Studio.": "A supressão de ruído de um chat de voz pode apagar estes efeitos, e os graves profundos também. Discord: Perfil de entrada → Estúdio.",
   "Full board": "Painel completo",
@@ -4091,5 +4090,11 @@
   "Uncommon": "Invulgar",
   "<b>{device}</b> looks like speakers, so your mic hears itself. Keep them quiet or use headphones. If it starts to squeal, this switches off by itself.": "<b>{device}</b> parecem colunas, por isso o teu micro ouve-se a si próprio. Mantém-nas baixas ou usa auscultadores. Se começar a apitar, isto desliga-se sozinho.",
   "Stopped <b>Hear what they hear</b>: your mic was picking up your speakers and started to squeal. Use headphones, or turn the speakers down.": "<b>Ouvir o que eles ouvem</b> parado: o teu micro estava a captar as colunas e começou a apitar. Usa auscultadores ou baixa as colunas.",
-  "Bun's almost done, one moment.": "O Bun está quase a terminar, só um momento."
+  "Bun's almost done, one moment.": "O Bun está quase a terminar, só um momento.",
+  "It'll be back in about {n} hour.": [
+    "Volta dentro de cerca de {n} hora.",
+    "Volta dentro de cerca de {n} horas."
+  ],
+  "It'll be back in under an hour.": "Volta em menos de uma hora.",
+  "The store's down for maintenance": "A loja está em baixo para manutenção"
 }

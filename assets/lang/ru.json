@@ -3865,7 +3865,6 @@
   "You're muted, so only you hear “{name}”.": "У тебя выключен звук для других, поэтому «{name}» слышишь только ты.",
   "{name} closed: the clip editor keeps what it heard.": "{name} закрылась: редактор клипов сохраняет то, что услышал.",
   "Sorry, the store's down": "Извини, магазин не работает",
-  "Sorry, the store's down. We're working on getting it back up.": "Извини, магазин не работает. Мы уже чиним его.",
   "We're working on getting it back up. Try again in a bit.": "Мы уже чиним его. Попробуй ещё раз чуть позже.",
   "A voice chat's noise suppression can wipe these out, deep bass too. Discord: Input Profile → Studio.": "Шумоподавление голосового чата может стереть эти эффекты, и глубокий бас тоже. Discord: Профиль ввода → Студия.",
   "Full board": "Вся панель",
@@ -4169,5 +4168,12 @@
   "Uncommon": "Необычный",
   "<b>{device}</b> looks like speakers, so your mic hears itself. Keep them quiet or use headphones. If it starts to squeal, this switches off by itself.": "<b>{device}</b> похоже на колонки, поэтому микрофон слышит сам себя. Сделай их тише или надень наушники. Если начнёт свистеть, это выключится само.",
   "Stopped <b>Hear what they hear</b>: your mic was picking up your speakers and started to squeal. Use headphones, or turn the speakers down.": "<b>Слышать, что слышат они</b> остановлено: микрофон ловил звук колонок и начал свистеть. Надень наушники или убавь колонки.",
-  "Bun's almost done, one moment.": "Bun почти закончил, секунду."
+  "Bun's almost done, one moment.": "Bun почти закончил, секунду.",
+  "It'll be back in about {n} hour.": [
+    "Он вернётся примерно через {n} час.",
+    "Он вернётся примерно через {n} часа.",
+    "Он вернётся примерно через {n} часов."
+  ],
+  "It'll be back in under an hour.": "Он вернётся меньше чем через час.",
+  "The store's down for maintenance": "Магазин закрыт на техобслуживание"
 }

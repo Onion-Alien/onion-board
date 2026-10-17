@@ -3787,7 +3787,6 @@
   "You're muted, so only you hear “{name}”.": "Olet mykistetty, joten vain sinä kuulet ”{name}”.",
   "{name} closed: the clip editor keeps what it heard.": "{name} sulkeutui: leike-editori pitää sen, mitä se kuuli.",
   "Sorry, the store's down": "Sori, kauppa on alhaalla",
-  "Sorry, the store's down. We're working on getting it back up.": "Sori, kauppa on alhaalla. Korjaamme sitä takaisin toimintaan.",
   "We're working on getting it back up. Try again in a bit.": "Korjaamme sitä takaisin toimintaan. Yritä hetken päästä uudelleen.",
   "A voice chat's noise suppression can wipe these out, deep bass too. Discord: Input Profile → Studio.": "Äänichatin kohinanvaimennus voi pyyhkiä ne pois, myös syvän basson. Discord: Syöttöprofiili → Studio.",
   "Full board": "Koko board",
@@ -4091,5 +4090,11 @@
   "Uncommon": "Epätavallinen",
   "<b>{device}</b> looks like speakers, so your mic hears itself. Keep them quiet or use headphones. If it starts to squeal, this switches off by itself.": "<b>{device}</b> näyttää kaiuttimilta, joten mikrofoni kuulee itsensä. Pidä ne hiljaisella tai käytä kuulokkeita. Jos se alkaa ulvoa, tämä menee pois päältä itsestään.",
   "Stopped <b>Hear what they hear</b>: your mic was picking up your speakers and started to squeal. Use headphones, or turn the speakers down.": "<b>Kuule mitä he kuulevat</b> pysäytettiin: mikrofoni poimi kaiuttimien äänen ja alkoi ulvoa. Käytä kuulokkeita tai hiljennä kaiuttimia.",
-  "Bun's almost done, one moment.": "Bun on melkein valmis, hetki vain."
+  "Bun's almost done, one moment.": "Bun on melkein valmis, hetki vain.",
+  "It'll be back in about {n} hour.": [
+    "Se palaa noin {n} tunnissa.",
+    "Se palaa noin {n} tunnissa."
+  ],
+  "It'll be back in under an hour.": "Se palaa alle tunnissa.",
+  "The store's down for maintenance": "Kauppa on alhaalla huollon takia"
 }

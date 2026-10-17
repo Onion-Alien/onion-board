@@ -3787,7 +3787,6 @@
   "You're muted, so only you hear “{name}”.": "Je bent gedempt, dus alleen jij hoort ‘{name}’.",
   "{name} closed: the clip editor keeps what it heard.": "{name} is gesloten: de clipeditor houdt wat hij gehoord heeft.",
   "Sorry, the store's down": "Sorry, de winkel ligt eruit",
-  "Sorry, the store's down. We're working on getting it back up.": "Sorry, de winkel ligt eruit. We werken eraan om hem weer online te krijgen.",
   "We're working on getting it back up. Try again in a bit.": "We werken eraan om hem weer online te krijgen. Probeer het zo nog eens.",
   "A voice chat's noise suppression can wipe these out, deep bass too. Discord: Input Profile → Studio.": "De ruisonderdrukking van een voicechat kan ze wegpoetsen, diepe bas ook. Discord: Invoerprofiel → Studio.",
   "Full board": "Volledig board",
@@ -4091,5 +4090,11 @@
   "Uncommon": "Ongewoon",
   "<b>{device}</b> looks like speakers, so your mic hears itself. Keep them quiet or use headphones. If it starts to squeal, this switches off by itself.": "<b>{device}</b> lijkt op speakers, dus je mic hoort zichzelf. Houd ze zacht of gebruik een koptelefoon. Gaat het piepen, dan schakelt dit vanzelf uit.",
   "Stopped <b>Hear what they hear</b>: your mic was picking up your speakers and started to squeal. Use headphones, or turn the speakers down.": "<b>Hoor wat zij horen</b> gestopt: je mic ving je speakers op en begon te piepen. Gebruik een koptelefoon, of zet de speakers zachter.",
-  "Bun's almost done, one moment.": "Bun is bijna klaar, een momentje."
+  "Bun's almost done, one moment.": "Bun is bijna klaar, een momentje.",
+  "It'll be back in about {n} hour.": [
+    "Hij is over ongeveer {n} uur terug.",
+    "Hij is over ongeveer {n} uur terug."
+  ],
+  "It'll be back in under an hour.": "Hij is binnen een uur terug.",
+  "The store's down for maintenance": "De winkel ligt eruit voor onderhoud"
 }

@@ -3787,7 +3787,6 @@
   "You're muted, so only you hear “{name}”.": "आप म्यूट हैं, इसलिए “{name}” सिर्फ़ आप सुनते हैं।",
   "{name} closed: the clip editor keeps what it heard.": "{name} बंद हो गया: क्लिप एडिटर ने जो सुना वह रखता है।",
   "Sorry, the store's down": "माफ़ करें, स्टोर बंद है",
-  "Sorry, the store's down. We're working on getting it back up.": "माफ़ करें, स्टोर बंद है। हम इसे फिर से चालू करने पर काम कर रहे हैं।",
   "We're working on getting it back up. Try again in a bit.": "हम इसे फिर से चालू करने पर काम कर रहे हैं। थोड़ी देर में फिर से कोशिश करें।",
   "A voice chat's noise suppression can wipe these out, deep bass too. Discord: Input Profile → Studio.": "वॉइस चैट का नॉइज़ सप्रेशन इन्हें मिटा सकता है, गहरा बेस भी। Discord: इनपुट प्रोफ़ाइल → स्टूडियो।",
   "Full board": "पूरा बोर्ड",
@@ -4091,5 +4090,11 @@
   "Uncommon": "असामान्य",
   "<b>{device}</b> looks like speakers, so your mic hears itself. Keep them quiet or use headphones. If it starts to squeal, this switches off by itself.": "<b>{device}</b> स्पीकर जैसा लगता है, इसलिए आपका माइक खुद को सुनता है। आवाज़ कम रखें या हेडफ़ोन लगाएँ। अगर सीटी बजने लगे, तो यह अपने आप बंद हो जाएगा।",
   "Stopped <b>Hear what they hear</b>: your mic was picking up your speakers and started to squeal. Use headphones, or turn the speakers down.": "<b>वही सुनें जो वे सुनते हैं</b> रोक दिया गया: आपका माइक स्पीकर की आवाज़ पकड़ रहा था और सीटी बजने लगी। हेडफ़ोन लगाएँ, या स्पीकर धीमे करें।",
-  "Bun's almost done, one moment.": "Bun का काम लगभग हो गया, एक पल रुको।"
+  "Bun's almost done, one moment.": "Bun का काम लगभग हो गया, एक पल रुको।",
+  "It'll be back in about {n} hour.": [
+    "यह लगभग {n} घंटे में वापस आ जाएगा।",
+    "यह लगभग {n} घंटे में वापस आ जाएगा।"
+  ],
+  "It'll be back in under an hour.": "यह एक घंटे से कम में वापस आ जाएगा।",
+  "The store's down for maintenance": "स्टोर मेंटेनेंस के लिए बंद है"
 }
