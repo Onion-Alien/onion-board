@@ -418,6 +418,12 @@ class _Song:
     def beat(self, now=None):
         return ((self.clock.now if now is None else now) - self.t0) * self.bpm / 60
 
+    def last_hit(self, band, now):   # a hit on every beat
+        return ((now - self.t0) % (60 / self.bpm), 0.9)
+
+    def gap(self, band):
+        return 60 / self.bpm
+
 
 def _dance(monkeypatch, style, height=110, voice=0.5):
     from soundboard.ui import bunnywidget
@@ -514,3 +520,18 @@ def test_his_mouth_stays_shut_to_music_and_only_talks_to_speech(qapp, monkeypatc
     talk, clock = _dance(monkeypatch, "speech", voice=1.0)
     _beats(talk, clock, 2.0)
     assert talk.pose()["mouth"] > 0.5
+
+
+def test_hiphop_nods_on_the_808_hits_themselves(qapp, monkeypatch):
+    b, clock = _dance(monkeypatch, "hiphop")
+    _beats(b, clock, 2.0)
+    song = b.groove
+    hits = [song.t0 + 3.0, song.t0 + 3.7]   # off any beat grid: syncopated 808s
+    song.last_hit = lambda band, now: next(((now - h, 1.0) for h in reversed(hits) if h <= now),
+                                           (float("inf"), 0.0))
+    clock.now = hits[0] - 0.02
+    before = b.pose()["dip"]
+    clock.now = hits[0] + 0.05
+    assert b.pose()["dip"] > before + 3   # down with the 808, not the grid
+    clock.now = hits[1] - 0.05
+    assert b.pose()["dip"] < 2            # back up before the next one

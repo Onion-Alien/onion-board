@@ -39,6 +39,10 @@ _VOICE = slice(round(300 / _HZ), round(3000 / _HZ))
 _HIGH = slice(round(3000 / _HZ), round(10000 / _HZ))
 _FLAT = slice(round(1000 / _HZ), round(6000 / _HZ))     # where distortion fills it in
 _TOP = round(10000 / _HZ)
+_DRUMS = round(2000 / _HZ)   # kick, snare body, guitar chugs: no hi-hats or cymbals
+# hits: (refractory seconds, how far over its running average a frame must jump)
+HIT_RULES = {"bass": (0.14, 1.9), "drums": (0.16, 1.7)}
+HIT_KEEP = 6.0               # seconds of hits remembered
 _BINS = np.arange(1, _TOP, dtype=np.float32)
 
 
@@ -76,6 +80,13 @@ class Groove:
         self._beat0, self._t0 = 0.0, time.monotonic()
         self._peak = 1e-3
         self._vpeak = -90.0    # the vocal range's recent peak, dB (lip sync at any loudness)
+        # the hits themselves, (song time on the clock, strength 0..1): "bass" is the
+        # kick and the 808 (under ~140 Hz), "drums" kick, snare and riffs (under 2 kHz)
+        self.hits: dict[str, list[tuple[float, float]]] = {"bass": [], "drums": []}
+        self._hit_avg = {"bass": 0.0, "drums": 0.0}
+        self._hit_peak = {"bass": 1e-3, "drums": 1e-3}
+        self._hit_last = {"bass": -1e9, "drums": -1e9}
+        self._hit_prev = {"bass": 0.0, "drums": 0.0}
 
     # ------------------------------------------------------------------ input
     def feed(self, data: np.ndarray | None, frac: float, now: float | None = None):
@@ -102,7 +113,10 @@ class Groove:
         if data.dtype == np.int16:
             mono /= 32768.0
         mag = np.abs(np.fft.rfft(mono * _HANN, axis=1)).astype(np.float32) * (4.0 / WIN)
-        self._frames(mag)
+        # when each frame's new sound was heard: a rise shows once it's in the window's
+        # last quarter (the clock time of a sample: now, less how far before `frac` it is)
+        heard = now - (end + WIN - (starts + 0.75 * WIN)) / SR
+        self._frames(mag, heard)
         self._since_tempo += n
         self._since_style += n
         if self._since_tempo >= TEMPO_EVERY * 100 and self._n >= 300:
@@ -112,13 +126,16 @@ class Groove:
             self._since_style = 0
             self._vote(self.guess())
 
-    def _frames(self, mag: np.ndarray):
+    def _frames(self, mag: np.ndarray, heard: np.ndarray | None = None):
         lm = np.log1p(mag[:, 1:_TOP] * 10000)
         prev = lm[:1] if self._prev is None else self._prev[None, :]
         rise = np.maximum(0.0, np.diff(np.vstack([prev, lm]), axis=0))
         self._prev = lm[-1]
         flux = rise.mean(axis=1)
         kflux = rise[:, _KICK.start - 1:_KICK.stop - 1].mean(axis=1)
+        if heard is not None:
+            self._find_hits("bass", kflux, heard)
+            self._find_hits("drums", rise[:, :_DRUMS].mean(axis=1), heard)
         p = mag * mag
         total = p[:, 1:_TOP].sum(axis=1)
         band = p[:, _FLAT] + 1e-12
@@ -144,6 +161,37 @@ class Groove:
         self._peak = max(hit, self._peak * 0.995 ** k)
         self.onset = min(1.0, hit / self._peak) if self._peak > 1e-4 else 0.0
         self.kick = max(self.kick * 0.85 ** k, self.onset if self.onset > 0.45 else 0.0)
+
+    def _find_hits(self, band: str, env: np.ndarray, heard: np.ndarray):
+        """Note each frame where `band` jumps well over its running average (and over
+        a share of its recent peak), at most one a refractory gap."""
+        gap, over = HIT_RULES[band]
+        avg, peak = self._hit_avg[band], self._hit_peak[band]
+        last, prev = self._hit_last[band], self._hit_prev[band]
+        hits = self.hits[band]
+        for e, t in zip(env.tolist(), heard.tolist()):
+            peak = max(e, peak * 0.998)
+            if e > avg * over + 1e-3 and e > 0.3 * peak and e > prev and t - last >= gap:
+                hits.append((t, min(1.0, e / peak)))
+                last = t
+            avg = avg * 0.96 + e * 0.04
+            prev = e
+        self._hit_avg[band], self._hit_peak[band] = avg, peak
+        self._hit_last[band], self._hit_prev[band] = last, prev
+        if hits and hits[0][0] < last - HIT_KEEP:
+            self.hits[band] = [h for h in hits if h[0] >= last - HIT_KEEP]
+
+    def last_hit(self, band: str, now: float) -> tuple[float, float]:
+        """(seconds since, strength) of `band`'s latest hit; (inf, 0) if none."""
+        h = self.hits[band]
+        return (now - h[-1][0], h[-1][1]) if h else (float("inf"), 0.0)
+
+    def gap(self, band: str) -> float:
+        """The usual time between `band`'s hits lately (0: not enough of them)."""
+        h = self.hits[band][-9:]
+        if len(h) < 4:
+            return 0.0
+        return float(np.median(np.diff([t for t, _s in h])))
 
     # ------------------------------------------------------------------ beat
     def _env(self, frames: int) -> np.ndarray:
@@ -194,7 +242,11 @@ class Groove:
                 else:
                     self._doubt = 0
         self.confidence = self.confidence * 0.5 + conf * 0.5 if self.bpm else conf
-        # where the beats fall: the offset whose comb lines up with the most onsets
+        # where the beats fall: the offset whose comb lines up with the most kicks (the
+        # kick band alone: with the hi-hats in, it locked onto the off-beat)
+        kick_env = np.maximum(0.0, kick - np.convolve(kick, np.ones(20) / 20, "same"))
+        if kick_env.sum() > 0.05 * env.sum():
+            env = kick_env
         period = 6000 / new
         p = int(round(period))
         best, off = -1.0, 0
