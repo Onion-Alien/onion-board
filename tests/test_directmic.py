@@ -2688,6 +2688,10 @@ def test_a_slow_status_check_never_holds_up_the_window(monkeypatch):
     for _ in range(5):
         assert dm.status("My mic") == "ready"        # the last answer, no waiting
     assert time.monotonic() - start < 0.5
+    end = time.monotonic() + 5   # (the re-check's thread may not have got going yet)
+    while len(calls) < 2 and time.monotonic() < end:
+        time.sleep(0.01)
+    time.sleep(0.05)
     assert len(calls) == 2                            # one re-check at a time
     gate.set()
     end = time.monotonic() + 5
