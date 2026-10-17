@@ -612,6 +612,8 @@ def main():
     app.setStyle(AppStyle("Fusion"))   # also: the wheel never changes a dropdown or tab
     from soundboard.ui import a11y
     a11y.install(app)   # screen-reader names for icon-only controls, as focus moves
+    from soundboard.ui import numberbox
+    numberbox.install(app)   # a typed number counts without Enter; Enter presses no button
     from soundboard import theme
     app.setWindowIcon(theme.app_icon())   # every window, and the taskbar button
 
