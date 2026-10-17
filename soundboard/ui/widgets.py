@@ -12,7 +12,7 @@ from PySide6.QtCore import (QEasingCurve, QEvent, QMimeData, QObject, QPoint, QP
 from PySide6.QtGui import (QColor, QDrag, QFont, QFontMetrics, QLinearGradient, QPainter,
                            QPainterPath, QPen, QPixmap)
 from PySide6.QtWidgets import (QAbstractButton, QAbstractSlider, QApplication, QComboBox,
-                               QGridLayout, QLabel, QMainWindow, QMenu, QTabBar,
+                               QGridLayout, QLabel, QLineEdit, QMainWindow, QMenu, QTabBar,
                                QScrollArea,
                                QSlider, QStackedWidget, QStyle, QStyleOptionSlider,
                                QTabWidget, QToolTip,
@@ -67,6 +67,61 @@ def widget_at(layout, i: int):
     if type(layout).__module__.startswith("PySide6."):
         qt_invalidate(item)
     return w
+
+
+class InlineNameBox(QLineEdit):
+    """A name box that takes a "+" button's place when it's clicked, so a new
+    category is named right where it will show (no pop-up). Enter, or clicking away
+    with something typed, sends `named`; Esc or an empty box puts the button back.
+    Add it to the layout just before `button`."""
+
+    named = Signal(str)
+
+    def __init__(self, button: QAbstractButton, placeholder: str, width: int = 170,
+                 max_len: int = library.CATEGORY_MAX, parent: QWidget | None = None):
+        super().__init__(parent)
+        self.button = button
+        self.setAccessibleName(placeholder)
+        self.setPlaceholderText(placeholder)
+        self.setMaxLength(max_len)
+        self.setFixedWidth(width)
+        self.hide()
+        button.clicked.connect(self.start)
+
+    def start(self):
+        self.clear()
+        self.button.hide()
+        self.show()
+        self.setFocus(Qt.FocusReason.OtherFocusReason)
+
+    def _finish(self, text: str | None):
+        if not self.isVisible():   # already closed (hiding it moves the focus out)
+            return
+        self.hide()
+        self.button.show()
+        if text is not None and text.strip():
+            self.named.emit(text)
+
+    def event(self, e):
+        # Esc and Enter belong to the box while it's open, not to the window's shortcuts
+        if e.type() == QEvent.Type.ShortcutOverride and e.key() in (
+                Qt.Key.Key_Escape, Qt.Key.Key_Return, Qt.Key.Key_Enter):
+            e.accept()
+            return True
+        return super().event(e)
+
+    def keyPressEvent(self, e):
+        if e.key() == Qt.Key.Key_Escape:
+            self._finish(None)
+        elif e.key() in (Qt.Key.Key_Return, Qt.Key.Key_Enter):
+            self._finish(self.text())
+        else:
+            super().keyPressEvent(e)
+
+    def focusOutEvent(self, e):
+        super().focusOutEvent(e)
+        if e.reason() != Qt.FocusReason.PopupFocusReason:   # its own right-click menu
+            self._finish(self.text())
 
 
 class DropdownMenu(QMenu):
