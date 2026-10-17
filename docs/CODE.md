@@ -230,7 +230,9 @@ the launcher the shortcuts and PyInstaller use. The app is the `soundboard` pack
 | `soundboard/ui/fit.py` | dialogs grow to fit their wrapped text instead of clipping it (`fit.watch(self)` in every dialog's `__init__`) |
 | `soundboard/ui/setupwizard.py` | the first-run guide with Bun (mic, headphones, where your sounds go: straight into your mic, or the cable or another way out, then Discord) and the Steam help |
 | `soundboard/starter.py` | The 25 starter sounds that ship in `assets/starter` (about 0.8 MB, CC0): added to a new board when the first-run tour ends with the board still empty; no download, once only |
-| `soundboard/ui/firsttour.py` | Bun's first-run tour of the empty board after that guide: the search box (or offline the Add button), then the results; takes no clicks, ends when ignored or left |
+| `soundboard/ui/coach.py` | Guided tours: the dimmed window, the yellow ring, one card with Bun and the step's button; holds clicks outside until the action step's Not now |
+| `soundboard/ui/firsttour.py` | Bun's first-run tour of the empty board after that guide: the search box (or offline the Add button), the results, then "Nice" once a sound is added |
+| `soundboard/ui/tabtours.py` | Each tab's quick how-to on its first visit (Radio, Apps, Triggers, Voice, Store); Settings > General > Show tutorials |
 | `soundboard/ui/bunnywidget.py` | Bun animated: bobs, blinks, talks along with your mic and throws music notes |
 | `soundboard/ui/bunmode.py` | Bun mode: the mini player as a floating Bun over everything, showing what the app is doing |
 | `soundboard/ui/scribebun.py` | Bun the scribe: the download banner's picture for a sound with no thumbnail, writing a well-known piece as sheet music on a scroll as the download comes in |

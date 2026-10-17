@@ -32,6 +32,10 @@ class GeneralPage(Page):
                 cv, _("Show tips"),
                 _("A short “Did you know?” about a feature, at most once a day, never while a "
                   "game is up."), self.mw.cfg.tips_on, self.mw.tipctl.set_tips_on)
+            self.dlg.box_tutorials = self._option(
+                cv, _("Show tutorials"),
+                _("A quick how-to the first time you open each tab."),
+                self.mw.cfg.tutorials_on, self.mw.tipctl.set_tutorials_on)
         v.addWidget(card)
         v.addWidget(self._app_setup_card())
         if self.mw.cfg.category_programs:   # rules made before the category menu lost it

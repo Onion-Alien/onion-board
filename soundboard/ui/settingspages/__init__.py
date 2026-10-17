@@ -34,6 +34,7 @@ class Built:
     box_app_setup: Any
     box_programs: Any
     box_tips: Any
+    box_tutorials: Any
     btn_ffmpeg: Any
     copy_local_sounds: Any
     count_dialog: Any
