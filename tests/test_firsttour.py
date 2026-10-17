@@ -99,6 +99,13 @@ def test_not_with_tutorials_off(window):
     assert not firsttour.will_run(window) and firsttour.start(window) is None
 
 
+def test_bun_stays_calm_meanwhile(window):
+    """The board's Bun goes quiet for the card, but doesn't hop the whole time."""
+    tour = firsttour.start(window)
+    press_go(tour)
+    assert not window.grid.bun._hopeful and window.grid.bun.say == ""
+
+
 def test_one_card_for_every_step(window):
     """Every step speaks through the same card: one box, never a second bubble."""
     tour = firsttour.start(window)

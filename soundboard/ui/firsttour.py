@@ -167,14 +167,12 @@ class Tour(coach.Tour):
     # ------------------------------------------------------------------ steps' parts
     def _quiet_bun(self):
         self.bun.lines, self.bun.hope_lines = (), ()
-        self.bun.say = ""
-        self.bun.hope(True)   # happy to see them
+        self.bun.say = ""   # (calm: hope() would keep him hopping the whole tour)
 
     def _bun_back(self):
         """The board's Bun back to his own lines and mood."""
         if self.bun.lines == () and self._bun_lines is not None:
             self.bun.lines, self.bun.hope_lines = self._bun_lines
-            self.bun.hope(False)
 
     def _searched(self):
         if self._results_up():
