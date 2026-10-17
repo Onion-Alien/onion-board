@@ -17,7 +17,7 @@ import sounddevice as sd
 
 from soundboard import directmic, errors
 from soundboard.engineparts import (
-    BUFFER, CH, RETRY_S, SR, STALL_S, DEVICES, StreamResampler, _holding_devices,
+    BUFFER, CH, MIC_BUFFER, RETRY_S, SR, STALL_S, DEVICES, StreamResampler, _holding_devices,
     close_quietly, start_or_close,
 )
 from soundboard.i18n import _
@@ -46,6 +46,7 @@ class EngineDevices:
         cb_errors: dict[str, int]
         _cb_err_base: dict[str, int]
         _cb_err_seen: dict[str, int]
+        _cushioned: bool
         _last_cb: dict[str, float]
         _last_try: dict[str, float]
         _copy_try: dict[str, float]
@@ -67,6 +68,7 @@ class EngineDevices:
         def _cb_obs(self, outdata, frames, t, status) -> None: ...
         def _cb_mic(self, indata, frames, t, status) -> None: ...
         def _direct_voice_delay(self) -> float: ...
+        def _check_cushion(self, now: float) -> None: ...
         def direct_stream(self) -> Any: ...
         def _mic_direct(self, x: np.ndarray, rate: int) -> None: ...
         def _mic_direct_stopped(self) -> None: ...
@@ -118,6 +120,7 @@ class EngineDevices:
         except FileNotFoundError:
             raise RuntimeError(_("Onion Board isn't attached to your mic yet")) from None
         self.fifo_direct.clear()
+        self._cushioned = False   # a new stream starts at LEAD_S (check_streams re-cushions)
         self._last_cb["main"] = time.monotonic()
         s.start()
         self._stream_opened("main")
@@ -342,7 +345,7 @@ class EngineDevices:
                 rate = self._native_rate(idx)
                 chans = min(2, sd.query_devices(idx)["max_input_channels"])
                 s = sd.InputStream(device=idx, samplerate=rate, channels=chans, dtype="float32",
-                                   latency=BUFFER.get(self.latency, "low"),
+                                   latency=MIC_BUFFER.get(self.latency, "low"),
                                    callback=self._cb_mic)
                 # the mic callback resamples with these from its first block, so they're
                 # set before start (cheap: no ring is touched) and undone if it fails
@@ -399,6 +402,7 @@ class EngineDevices:
         if self._shut:
             return []
         now = time.monotonic()
+        self._check_cushion(now)
         with self._touched_lock:
             touched, self._touched = self._touched, []
         for key in self.KEYS:

@@ -72,6 +72,8 @@ LOUD_SAFE = 10 ** (SAFETY_DB / 20)
 # read at that rate (Voice.step). A 2-hour song's copy took 17 s, 1.2 GB of RAM and
 # held the GIL for seconds at a time (the app froze, the audio cut out)
 NO_COPY_S = 20 * 60
+CALM_S = 3.0      # nothing played this long, mic quiet: the effect's cushion goes
+CALM_MIC = 0.02   # the clean mic's peak under this counts as quiet (no word cut)
 READ_AHEAD_EVERY_S = 1.0               # how often the minutes ahead of a long sound are asked for
 # --------------------------------------------------------------------------- devices
 
@@ -221,7 +223,7 @@ class CableTap:
     hearing everything. The send mix is made on the mic's clock and the cable plays on
     its own, so it goes through a Ring that tracks the drift between them."""
 
-    def __init__(self, name: str, latency="low"):
+    def __init__(self, name: str, latency: float | str = "low"):
         idx = find_device("output", name)
         if idx is None:
             raise RuntimeError(_("device not found: {device}", device=name))
@@ -330,6 +332,8 @@ class Engine(EngineTakes, EngineDevices, SoundCache):
         self.main_direct = False
         self.direct_mode = directmic.MODE_REPLACE   # the send mix replaces the mic
         self.direct_lead_s = directmic.LEAD_S
+        self._cushioned = False   # the mic effect reads CUSHION_S behind (cushion)
+        self._calm_since = 0.0    # since when nothing plays and the mic is quiet
         self.fifo_direct = DirectFifo()
         # ...and the cable gets the same, for a voice app still set to it (CableTap)
         self.tap: CableTap | None = None
@@ -486,6 +490,36 @@ class Engine(EngineTakes, EngineDevices, SoundCache):
         return (self.radio_live and self.radio_vol > 0
                 and time.monotonic() - self._radio_heard < 0.5)
 
+    # ----------------------------------------------------------------- cushion
+    def cushion(self, on: bool = True):
+        """Straight into the mic: while something plays, the effect reads CUSHION_S
+        behind the board instead of LEAD_S. The board renders on Python threads, which
+        wait whenever the UI thread is in one long Qt call (a window or tab shown the
+        first time, an add-on installed: 60-200 ms), and with only LEAD_S queued the
+        sound skipped each time. The effect plays your plain mic while it falls back."""
+        s = self.direct_stream()
+        if s is None or on == self._cushioned:
+            return
+        self._cushioned = on
+        self._calm_since = 0.0
+        s.set_lead(directmic.CUSHION_S if on else self.direct_lead_s)
+        log.info("mic effect lead %.0f ms", s.latency * 1000)
+
+    def _check_cushion(self, now: float):
+        """check_streams, once a second: cushion while anything plays (radio and
+        captured programs too); back to LEAD_S once nothing has for CALM_S and your mic
+        is quiet, so the bit the effect jumps over is silence, not a word."""
+        if not self.quiet():
+            self.cushion(True)
+            self._calm_since = 0.0
+        elif self._cushioned:
+            if self.level_mic > CALM_MIC:
+                self._calm_since = 0.0
+            elif not self._calm_since:
+                self._calm_since = now
+            elif now - self._calm_since >= CALM_S:
+                self.cushion(False)
+
     # ----------------------------------------------------------------- aux sources
     def add_aux(self, key) -> AuxSource:
         """A new pushed source (a captured program). Feed it with feed_aux from any
@@ -574,6 +608,8 @@ class Engine(EngineTakes, EngineDevices, SoundCache):
             if v.finished:
                 return None
             self.voices = self.voices + (v,)
+        if "main" in v.data:
+            self.cushion(True)
         if any(mapped.is_mapped(d) for d in v.data.values()):
             self._follow()
         return v
