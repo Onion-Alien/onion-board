@@ -1231,9 +1231,12 @@ class Engine(EngineTakes, EngineDevices, SoundCache):
         # in mic check you hear the real output mix: sounds at their outgoing
         # level plus your mic, so you can judge the balance while a song plays
         hear = check and not voice
+        # Who's listening shapes only what's sent: your own playback stays as mixed,
+        # unless you hear what they hear
         mix, idle, play = self._bus("mon", frames, self.sound_vol if hear else 1.0, hear=hear,
                                     can_idle=not check,
-                                    previews_only=not (hear or self.monitor_sounds))
+                                    previews_only=not (hear or self.monitor_sounds),
+                                    makeup=hear)
         m = self.ring_mon.read(frames)
         # the main output sees the rest; this one counts with no send device too
         self.level_play = max(play, self.level_play)   # _main decays it; no main: the UI does
@@ -1249,14 +1252,15 @@ class Engine(EngineTakes, EngineDevices, SoundCache):
         else:
             finite(mix)
             if check:   # you hear what others get: the same send stage, your mic in it
-                mix = self._send_bus("mon", mix, m, sounds_vol=self.sound_vol if hear else 1.0)
+                mix = self._send_bus("mon", mix, m, sounds_vol=self.sound_vol if hear else 1.0,
+                                     shape=hear)
                 if self._mon_ramp:   # an empty limiter starts with its delay of silence
                     self._mon_ramp = False
                     mix = mix * np.linspace(0.0, 1.0, len(mix), dtype=np.float32)[:, None]
                 if self.limiter_on:
                     mix = self._stage("mon", Limiter).process(mix)
             elif not self._bus_quiet("mon", mix):
-                mix = self._dest("mon", self._eq("mon", "sounds", mix))
+                mix = self._eq("mon", "sounds", mix)
             mix = self._vol("mon", "out", mix, out_vol)
             mix = self._stage("mon", SafetyLimiter).process(loud_boost(mix, out_vol))
         outdata[:] = mix
@@ -1371,7 +1375,9 @@ class Engine(EngineTakes, EngineDevices, SoundCache):
                 took += r * np.float32(self.radio_vol)
         if took is not None and take is not None:
             take.append(took)
-        lowcut = self._lowcut() if out != "obs" else 0   # the stream output is clean
+        # the low cut's make-up goes only where the mode's shaping does: what's sent,
+        # and the headphones while they hear it (the stream output is clean)
+        lowcut = self._lowcut() if makeup else 0
         apps = None
         for a in self.aux:
             ring = a.ring_main if out == "main" else a.ring_mon if out == "mon" else a.ring_obs
@@ -1394,9 +1400,9 @@ class Engine(EngineTakes, EngineDevices, SoundCache):
 
     @staticmethod
     def _aux_gain(out: str, a: AuxSource, lowcut: int, hear: bool) -> float:
-        """A captured program's volume on `out` (0: not on it). Others and the
-        headphones get the make-up for the mode's low cut (AuxSource.gain, the
-        headphones get the mode's shaping too); the stream output gets it clean."""
+        """A captured program's volume on `out` (0: not on it), with the make-up for
+        the mode's low cut when `lowcut` (AuxSource.gain: what's sent, and the
+        headphones while they hear it); the stream output gets it clean."""
         if out == "obs":
             return a.vol if a.stream else 0.0
         on = a.live if out == "main" else (a.monitor or (hear and a.live))
@@ -1408,22 +1414,27 @@ class Engine(EngineTakes, EngineDevices, SoundCache):
 
     def _send_bus(self, out: str, mix: np.ndarray, m: np.ndarray | None,
                   add_mic: bool = True, silent: bool = False,
-                  sounds_vol: float = 1.0) -> np.ndarray:
+                  sounds_vol: float = 1.0, shape: bool = True) -> np.ndarray:
         """The sounds bus shaped for voice chat (EQ, destination mode, ducking under
         your voice, phase-aware mono), with the mic block `m` added on top (unless not
         `add_mic`: the mic effect's add mode, where Windows keeps the mic itself).
         `silent`: the bus is known to be zeros (_bus_idle), so there's nothing to shape.
-        `sounds_vol` over 100 %: the shaped bus has its peaks rounded (loud_boost)."""
+        `sounds_vol` over 100 %: the shaped bus has its peaks rounded (loud_boost).
+        Not `shape`: the sounds aren't sent (only your voice goes out), so they keep
+        the EQ alone, as your own playback does."""
         mic_on = m is not None and self.mic_enabled and not self.mic_muted
         quiet = self._bus_quiet(out, mix, silent)
         if not quiet:
-            mix = self._dest(out, self._eq(out, "sounds", mix))
-        if self.duck_db < 0 or (out, "Ducker") in self._send:
+            mix = self._eq(out, "sounds", mix)
+            if shape:
+                mix = self._dest(out, mix)
+        if shape and (self.duck_db < 0 or (out, "Ducker") in self._send):
             g = self._stage(out, Ducker).process(m if mic_on else None, len(mix), self.duck_db)
             if not isinstance(g, float) and not silent:
                 mix = mix * g
         # a mode that already made the bus mono (every built-in one) needs no second pass
-        if self.send_mono and not quiet and not (self.dest is not None and self.dest.mono):
+        if shape and self.send_mono and not quiet and not (self.dest is not None
+                                                           and self.dest.mono):
             mix = self._stage(out, SmartMono).process(mix)
         if sounds_vol > 1.0 and not quiet:   # last, so nothing after it rebuilds the peaks
             mix = loud_boost(mix, sounds_vol, self._loud_ceiling())

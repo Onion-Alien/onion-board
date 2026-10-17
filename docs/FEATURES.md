@@ -195,6 +195,8 @@ The full list. The [README](../README.md) has the short version and how to get s
   Settings → Audio): **Game** and **Voice chat** shape your sounds for the voice
   chat on the other end, working out which one by themselves; **Clean** sends them
   as mixed; **Advanced** picks an exact voice chat or your own custom mode.
+  Only what's sent is shaped: your own playback stays as mixed, unless you turn on
+  *Hear what they hear*.
   *What do these do?* explains each.
 - **Mute my mic while a sound plays** (Setup → *Who's listening*): others hear
   only the sound, clean, and your mic comes back the moment it ends. Or the
