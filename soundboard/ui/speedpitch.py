@@ -304,7 +304,11 @@ class SpeedPitchButton(QPushButton):
         srow = QGridLayout()   # the name, then its chips with the progress under them
         srow.setHorizontalSpacing(12)
         srow.setVerticalSpacing(6)
-        lab = section_label(_("My setups"))
+        lab = self._setups_lab = section_label(_("My setups"))
+        # on the chips' first row: as tall as a chip, its text centred in that (no
+        # padding above, which pushed it below the chips' words)
+        lab.setProperty("head", True)
+        lab.setAlignment(Qt.AlignmentFlag.AlignLeft | Qt.AlignmentFlag.AlignVCenter)
         srow.addWidget(lab, 0, 0, Qt.AlignmentFlag.AlignTop)
         self.setups_box = QWidget()
         self.setups_box.setObjectName("spcol")
@@ -568,6 +572,8 @@ class SpeedPitchButton(QPushButton):
             c.clicked.connect(lambda _on=False, n=name: self._chip(n))
             self._setup_chips[name] = c
             self.setups_flow.addWidget(c)
+        c.ensurePolished()
+        self._setups_lab.setFixedHeight(c.sizeHint().height())
         self.set_setup(current if current in self._setup_chips else "")
 
     def _chip(self, name: str):
