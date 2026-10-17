@@ -1341,7 +1341,7 @@
   "already in your library as “{name}”": "มีอยู่ในห้องสมุดของคุณแล้วในชื่อ “{name}”",
   "another action": "การกระทำอื่น",
   "applying effects…": "กำลังใช้เอฟเฟกต์...",
-  "applying…": "กำลังสมัคร...",
+  "applying…": "กำลังใช้…",
   "auto push-to-talk": "กดปุ่มเพื่อพูดอัตโนมัติ",
   "can't load": "ไม่สามารถโหลดได้",
   "can't load file": "ไม่สามารถโหลดไฟล์ได้",
@@ -3553,5 +3553,17 @@
   "Start some music or a game, then press Send on it. Everyone in your call hears it.": "เปิดเพลงหรือเกม แล้วกด ส่ง ที่โปรแกรมนั้น ทุกคนในสายจะได้ยิน",
   "Turn on a trigger": "เปิดทริกเกอร์",
   "Click any dot to play that station. Press Send and your call hears it too.": "คลิกจุดไหนก็ได้เพื่อเล่นสถานีนั้น กด ส่ง แล้วคนในสายก็จะได้ยินด้วย",
-  "Pick a station on the globe": "เลือกสถานีบนลูกโลก"
+  "Pick a station on the globe": "เลือกสถานีบนลูกโลก",
+  "Applying the effects": "กำลังใช้เอฟเฟกต์",
+  "Applying the effects: {how}": "กำลังใช้เอฟเฟกต์: {how}",
+  "Couldn't apply the effects: {why}": "ใช้เอฟเฟกต์ไม่สำเร็จ: {why}",
+  "Stop, keep the old effects": "หยุด และใช้เอฟเฟกต์เดิม",
+  "Stopped. “{name}” keeps its old effects": "หยุดแล้ว “{name}” ยังใช้เอฟเฟกต์เดิม",
+  "You can close this window: it keeps going, and the pad shows how far it is.": "ปิดหน้าต่างนี้ได้เลย งานจะทำต่อ และปุ่มจะบอกว่าไปถึงไหนแล้ว",
+  "applying effects… {pct}%": "กำลังใช้เอฟเฟกต์… {pct}%",
+  "applying… {pct}%": "กำลังใช้… {pct}%",
+  "{pct}%": "{pct}%",
+  "{pct}%, about {time} left": "{pct}% เหลืออีกประมาณ {time}",
+  "“{name}” can't play until its effects are applied ({how})": "“{name}” ยังเล่นไม่ได้จนกว่าจะใช้เอฟเฟกต์เสร็จ ({how})",
+  "✓ “{name}” is ready to play": "✓ “{name}” พร้อมเล่นแล้ว"
 }

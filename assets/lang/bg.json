@@ -3630,5 +3630,17 @@
   "Start some music or a game, then press Send on it. Everyone in your call hears it.": "Пусни музика или игра, после натисни Изпратете до нея. Всички в разговора ти я чуват.",
   "Turn on a trigger": "Включи тригер",
   "Click any dot to play that station. Press Send and your call hears it too.": "Кликни коя да е точка, за да пуснеш станцията. Натисни Изпратете и разговорът ти също я чува.",
-  "Pick a station on the globe": "Избери станция на глобуса"
+  "Pick a station on the globe": "Избери станция на глобуса",
+  "Applying the effects": "Прилагане на ефектите",
+  "Applying the effects: {how}": "Прилагам ефектите: {how}",
+  "Couldn't apply the effects: {why}": "Ефектите не можаха да се приложат: {why}",
+  "Stop, keep the old effects": "Спри, запази старите ефекти",
+  "Stopped. “{name}” keeps its old effects": "Спряно. „{name}“ запазва старите си ефекти",
+  "You can close this window: it keeps going, and the pad shows how far it is.": "Можеш да затвориш прозореца: продължава, а бутонът показва докъде е стигнало.",
+  "applying effects… {pct}%": "прилагам ефекти… {pct}%",
+  "applying… {pct}%": "прилагам… {pct}%",
+  "{pct}%": "{pct}%",
+  "{pct}%, about {time} left": "{pct}%, остават около {time}",
+  "“{name}” can't play until its effects are applied ({how})": "„{name}“ не може да свири, докато ефектите не се приложат ({how})",
+  "✓ “{name}” is ready to play": "✓ „{name}“ е готов за пускане"
 }

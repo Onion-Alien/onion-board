@@ -1299,7 +1299,7 @@
   "an app by Onion Alien · v{version_text}": "en app av Onion Alien · v{version_text}",
   "another action": "en annan funktion",
   "applying effects…": "lägger på effekter…",
-  "applying…": "verkställer…",
+  "applying…": "lägger på…",
   "auto push-to-talk": "automatisk push-to-talk",
   "can't load": "kan inte laddas",
   "can't load file": "kan inte ladda filen",
@@ -3630,5 +3630,17 @@
   "Start some music or a game, then press Send on it. Everyone in your call hears it.": "Starta lite musik eller ett spel och tryck på Skicka vid det. Alla i samtalet hör det.",
   "Turn on a trigger": "Slå på en trigger",
   "Click any dot to play that station. Press Send and your call hears it too.": "Klicka på en prick för att spela stationen. Tryck på Skicka så hör ditt samtal den också.",
-  "Pick a station on the globe": "Välj en station på jordgloben"
+  "Pick a station on the globe": "Välj en station på jordgloben",
+  "Applying the effects": "Lägger på effekterna",
+  "Applying the effects: {how}": "Lägger på effekterna: {how}",
+  "Couldn't apply the effects: {why}": "Kunde inte lägga på effekterna: {why}",
+  "Stop, keep the old effects": "Stoppa, behåll de gamla effekterna",
+  "Stopped. “{name}” keeps its old effects": "Stoppad. ”{name}” behåller sina gamla effekter",
+  "You can close this window: it keeps going, and the pad shows how far it is.": "Du kan stänga fönstret: det fortsätter, och knappen visar hur långt det har kommit.",
+  "applying effects… {pct}%": "lägger på effekter… {pct} %",
+  "applying… {pct}%": "lägger på… {pct} %",
+  "{pct}%": "{pct} %",
+  "{pct}%, about {time} left": "{pct} %, ungefär {time} kvar",
+  "“{name}” can't play until its effects are applied ({how})": "”{name}” kan inte spelas förrän effekterna är pålagda ({how})",
+  "✓ “{name}” is ready to play": "✓ ”{name}” är redo att spelas"
 }

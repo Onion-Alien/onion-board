@@ -3630,5 +3630,17 @@
   "Start some music or a game, then press Send on it. Everyone in your call hears it.": "Magpatugtog ng music o maglaro, tapos pindutin ang Ipadala dito. Maririnig ito ng lahat sa call mo.",
   "Turn on a trigger": "Mag-on ng trigger",
   "Click any dot to play that station. Press Send and your call hears it too.": "I-click ang kahit anong tuldok para i-play ang istasyong iyon. Pindutin ang Ipadala at maririnig din ito ng call mo.",
-  "Pick a station on the globe": "Pumili ng istasyon sa globo"
+  "Pick a station on the globe": "Pumili ng istasyon sa globo",
+  "Applying the effects": "Ina-apply ang effects",
+  "Applying the effects: {how}": "Ina-apply ang effects: {how}",
+  "Couldn't apply the effects: {why}": "Hindi ma-apply ang effects: {why}",
+  "Stop, keep the old effects": "Itigil, panatilihin ang lumang effects",
+  "Stopped. “{name}” keeps its old effects": "Itinigil. Nananatili sa “{name}” ang luma nitong effects",
+  "You can close this window: it keeps going, and the pad shows how far it is.": "Puwede mong isara ang window na ito: tuloy pa rin ito, at ipinapakita ng pad kung gaano na kalayo.",
+  "applying effects… {pct}%": "ina-apply ang effects… {pct}%",
+  "applying… {pct}%": "ina-apply… {pct}%",
+  "{pct}%": "{pct}%",
+  "{pct}%, about {time} left": "{pct}%, mga {time} pa",
+  "“{name}” can't play until its effects are applied ({how})": "Hindi pa mapapatugtog ang “{name}” hangga't hindi tapos ang effects nito ({how})",
+  "✓ “{name}” is ready to play": "✓ Handa nang patugtugin ang “{name}”"
 }

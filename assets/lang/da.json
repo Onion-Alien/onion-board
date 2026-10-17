@@ -3630,5 +3630,17 @@
   "Start some music or a game, then press Send on it. Everyone in your call hears it.": "Start noget musik eller et spil, og tryk så på Sende ved det. Alle i dit opkald hører det.",
   "Turn on a trigger": "Slå en trigger til",
   "Click any dot to play that station. Press Send and your call hears it too.": "Klik på en prik for at afspille stationen. Tryk på Sende, så hører dit opkald den også.",
-  "Pick a station on the globe": "Vælg en station på kloden"
+  "Pick a station on the globe": "Vælg en station på kloden",
+  "Applying the effects": "Lægger effekterne på",
+  "Applying the effects: {how}": "Lægger effekterne på: {how}",
+  "Couldn't apply the effects: {why}": "Kunne ikke lægge effekterne på: {why}",
+  "Stop, keep the old effects": "Stop, behold de gamle effekter",
+  "Stopped. “{name}” keeps its old effects": "Stoppet. “{name}” beholder sine gamle effekter",
+  "You can close this window: it keeps going, and the pad shows how far it is.": "Du kan lukke vinduet: det fortsætter, og knappen viser, hvor langt det er.",
+  "applying effects… {pct}%": "lægger effekter på… {pct}%",
+  "applying… {pct}%": "anvender… {pct}%",
+  "{pct}%": "{pct} %",
+  "{pct}%, about {time} left": "{pct} %, ca. {time} tilbage",
+  "“{name}” can't play until its effects are applied ({how})": "“{name}” kan ikke spille, før effekterne er lagt på ({how})",
+  "✓ “{name}” is ready to play": "✓ “{name}” er klar til at spille"
 }

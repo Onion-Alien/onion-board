@@ -3707,5 +3707,17 @@
   "Start some music or a game, then press Send on it. Everyone in your call hears it.": "Pornește niște muzică sau un joc, apoi apasă Trimite lângă el. Toți din apel îl aud.",
   "Turn on a trigger": "Pornește un declanșator",
   "Click any dot to play that station. Press Send and your call hears it too.": "Dă clic pe orice punct ca să pornești postul. Apasă Trimite și te aude și apelul.",
-  "Pick a station on the globe": "Alege un post pe glob"
+  "Pick a station on the globe": "Alege un post pe glob",
+  "Applying the effects": "Se aplică efectele",
+  "Applying the effects: {how}": "Se aplică efectele: {how}",
+  "Couldn't apply the effects: {why}": "Efectele nu au putut fi aplicate: {why}",
+  "Stop, keep the old effects": "Oprește, păstrează efectele vechi",
+  "Stopped. “{name}” keeps its old effects": "Oprit. „{name}” își păstrează efectele vechi",
+  "You can close this window: it keeps going, and the pad shows how far it is.": "Poți închide fereastra: continuă, iar butonul arată cât mai e.",
+  "applying effects… {pct}%": "se aplică efectele… {pct}%",
+  "applying… {pct}%": "se aplică… {pct}%",
+  "{pct}%": "{pct}%",
+  "{pct}%, about {time} left": "{pct}%, mai durează cam {time}",
+  "“{name}” can't play until its effects are applied ({how})": "„{name}” nu poate fi redat până nu i se aplică efectele ({how})",
+  "✓ “{name}” is ready to play": "✓ „{name}” e gata de redat"
 }

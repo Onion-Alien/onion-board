@@ -11,8 +11,8 @@ from PySide6.QtGui import QColor, QFont, QImage, QPixmap
 from shiboken6 import isValid as qt_valid
 from PySide6.QtWidgets import (QApplication, QButtonGroup, QCheckBox, QColorDialog, QComboBox,
                                QDialog, QDialogButtonBox, QFileDialog, QFrame, QGridLayout,
-                               QHBoxLayout, QInputDialog, QLabel, QLineEdit, QPushButton,
-                               QScrollArea, QSlider, QTabWidget, QVBoxLayout,
+                               QHBoxLayout, QInputDialog, QLabel, QLineEdit, QProgressBar,
+                               QPushButton, QScrollArea, QSlider, QTabWidget, QVBoxLayout,
                                QWidget)
 
 from soundboard import errors, net, soundfx, sourceinfo, theme, thumbs, usage, voicefx
@@ -322,8 +322,12 @@ class EditDialog(QDialog):
     source_forgotten = Signal()   # Details → Delete info: saved at once, Save or Cancel
 
     def __init__(self, meta: SoundMeta, hotkeys: Hotkeys, preview_cb, parent=None,
-                 tab: str = "sound", others=None, pick_voice=None):
+                 tab: str = "sound", others=None, pick_voice=None, save_hook=None,
+                 stop_render=None):
+        """save_hook(dialog) -> True when Save was handled and the window stays open (a
+        slow render, shown here: show_render); stop_render(sid): its ✕."""
         super().__init__(parent)
+        self.save_hook, self.stop_cb = save_hook, stop_render
         fit.watch(self)   # grows to fit its text (ui/fit.py)
         self.setWindowTitle(_("Edit sound"))
         self.meta = meta
@@ -603,7 +607,43 @@ class EditDialog(QDialog):
         brow.addWidget(prev)
         brow.addStretch(1)
         brow.addWidget(bb)
+        self._bb = bb
         lay.addLayout(brow)
+
+        # after Save, while a slow render runs: how far it is, ✕ to stop it, and Close
+        # (it keeps going: the pad shows it). The edits wait, greyed, until it's done.
+        rend = self.render_box = QWidget()
+        rl = QVBoxLayout(rend)
+        rl.setContentsMargins(0, 0, 0, 0)
+        rl.setSpacing(6)
+        self.render_words = QLabel()
+        rl.addWidget(self.render_words)
+        bar_row = QHBoxLayout()
+        bar_row.setSpacing(8)
+        self.render_bar = QProgressBar()
+        self.render_bar.setObjectName("downloadprogress")   # the theme's thin bar
+        self.render_bar.setRange(0, 1000)
+        self.render_bar.setTextVisible(False)
+        self.render_bar.setFixedHeight(6)
+        self.render_bar.setAccessibleName(_("Applying the effects"))
+        bar_row.addWidget(self.render_bar, 1)
+        self.render_stop = icon_button("close", _("Stop, keep the old effects"))
+        self.render_stop.clicked.connect(lambda: self.stop_cb and self.stop_cb(self.meta.id))
+        bar_row.addWidget(self.render_stop)
+        rl.addLayout(bar_row)
+        rhint = QLabel(_("You can close this window: it keeps going, and the pad shows "
+                         "how far it is."))
+        rhint.setObjectName("muted")
+        rhint.setWordWrap(True)
+        rl.addWidget(rhint)
+        close_row = QHBoxLayout()
+        close_row.addStretch(1)
+        self.render_close = QPushButton(_("Close"))
+        self.render_close.clicked.connect(self.reject)   # saved already: nothing to undo
+        close_row.addWidget(self.render_close)
+        rl.addLayout(close_row)
+        rend.hide()
+        lay.addWidget(rend)
         self.setMinimumWidth(500)
         self.resize(540, 640)
 
@@ -670,6 +710,7 @@ class EditDialog(QDialog):
             sl.setValue(int(round(min(max(value, 0.0), sl.maximum() / 10) * 10)))
         self._set_color(meta.color)
         self.effects.set_sound(meta)
+        self.show_render(None)   # (EditControl.edit shows this sound's, if it has one)
         self._fx_scroll.verticalScrollBar().setValue(0)
         busy.set_busy(self.btn_preview, False)
         self._saying = False
@@ -711,6 +752,41 @@ class EditDialog(QDialog):
 
     def fades(self) -> tuple[float, float]:
         return self.fade_in.value() / 10, self.fade_out.value() / 10
+
+    def accept(self):
+        """Save. A slow effects render keeps the window open to show it (save_hook)."""
+        if not self.as_copy and self.save_hook is not None and self.save_hook(self):
+            return
+        super().accept()
+
+    def render_shown(self) -> bool:
+        return not self.render_box.isHidden()
+
+    def show_render(self, frac: float | None, words: str = "", can_stop: bool = False):
+        """Its sound's effects render: how far (`frac`, 0..1, and `words`), or None when
+        there's none (then `words`, if any, says why it ended: shown where the effects
+        summary goes)."""
+        on = frac is not None
+        was = self.render_shown()
+        if on:
+            self.render_bar.setValue(int(round(frac * 1000)))
+            self.render_words.setText(_("Applying the effects: {how}", how=words))
+            self.render_bar.setAccessibleDescription(words)
+            self.render_stop.setVisible(can_stop)
+        if on == was:
+            return
+        self._bb.setVisible(not on)
+        self.btn_preview.setVisible(not on)
+        self.tabs.setEnabled(not on)   # the draft is saved: it waits while it renders
+        self.render_box.setVisible(on)
+        if on:
+            self.render_close.setDefault(True)
+            self.render_close.setFocus(Qt.FocusReason.OtherFocusReason)
+        else:
+            save = self._bb.button(QDialogButtonBox.StandardButton.Save)
+            save.setFocus(Qt.FocusReason.OtherFocusReason)
+            if words:
+                self._say(words, 6000)
 
     def _fx_note(self):
         if getattr(self, "_saying", False):

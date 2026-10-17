@@ -468,7 +468,7 @@ def test_saving_effects_again_stops_the_render_still_going(qapp, window, monkeyp
     from soundboard.ui import editcontrol
     real = editcontrol.load_sound
 
-    def slow(meta, cancel=None):
+    def slow(meta, cancel=None, **_k):
         if meta.fx.get("speed") == 2.0:   # the first save: still going when the next comes
             deadline = time.monotonic() + 10
             while not cancel() and time.monotonic() < deadline:

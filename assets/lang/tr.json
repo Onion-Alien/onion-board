@@ -1364,7 +1364,7 @@
   "already in your library as “{name}”": "zaten kitaplığınızda “{name}” olarak mevcut",
   "another action": "başka bir eylem",
   "applying effects…": "efektler uygulanıyor…",
-  "applying…": "başvuruyor…",
+  "applying…": "uygulanıyor…",
   "auto push-to-talk": "otomatik bas-konuş",
   "can't load": "yüklenemiyor",
   "can't load file": "dosya yüklenemiyor",
@@ -3630,5 +3630,17 @@
   "Start some music or a game, then press Send on it. Everyone in your call hears it.": "Biraz müzik ya da bir oyun aç, sonra yanındaki Göndermek'e bas. Görüşmendeki herkes duyar.",
   "Turn on a trigger": "Bir tetikleyici aç",
   "Click any dot to play that station. Press Send and your call hears it too.": "O istasyonu çalmak için herhangi bir noktaya tıkla. Göndermek'e bas, görüşmendekiler de duysun.",
-  "Pick a station on the globe": "Küre üzerinden bir istasyon seç"
+  "Pick a station on the globe": "Küre üzerinden bir istasyon seç",
+  "Applying the effects": "Efektler uygulanıyor",
+  "Applying the effects: {how}": "Efektler uygulanıyor: {how}",
+  "Couldn't apply the effects: {why}": "Efektler uygulanamadı: {why}",
+  "Stop, keep the old effects": "Durdur, eski efektler kalsın",
+  "Stopped. “{name}” keeps its old effects": "Durduruldu. “{name}” eski efektleriyle kalıyor",
+  "You can close this window: it keeps going, and the pad shows how far it is.": "Bu pencereyi kapatabilirsin: işlem sürer ve ped ne kadar kaldığını gösterir.",
+  "applying effects… {pct}%": "efektler uygulanıyor… %{pct}",
+  "applying… {pct}%": "uygulanıyor… %{pct}",
+  "{pct}%": "%{pct}",
+  "{pct}%, about {time} left": "%{pct}, yaklaşık {time} kaldı",
+  "“{name}” can't play until its effects are applied ({how})": "“{name}”, efektleri uygulanana kadar çalamaz ({how})",
+  "✓ “{name}” is ready to play": "✓ “{name}” çalmaya hazır"
 }

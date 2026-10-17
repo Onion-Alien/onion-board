@@ -3630,5 +3630,17 @@
   "Start some music or a game, then press Send on it. Everyone in your call hears it.": "Pon música o un juego y luego presiona Enviar en él. Todos en tu llamada lo escuchan.",
   "Turn on a trigger": "Activa un disparador",
   "Click any dot to play that station. Press Send and your call hears it too.": "Haz clic en cualquier punto para reproducir esa estación. Presiona Enviar y tu llamada también la escucha.",
-  "Pick a station on the globe": "Elige una estación en el globo"
+  "Pick a station on the globe": "Elige una estación en el globo",
+  "Applying the effects": "Aplicando los efectos",
+  "Applying the effects: {how}": "Aplicando los efectos: {how}",
+  "Couldn't apply the effects: {why}": "No se pudieron aplicar los efectos: {why}",
+  "Stop, keep the old effects": "Detener y dejar los efectos de antes",
+  "Stopped. “{name}” keeps its old effects": "Detenido. “{name}” se queda con sus efectos de antes",
+  "You can close this window: it keeps going, and the pad shows how far it is.": "Puedes cerrar esta ventana: sigue trabajando y el botón muestra cuánto falta.",
+  "applying effects… {pct}%": "aplicando efectos… {pct} %",
+  "applying… {pct}%": "aplicando… {pct} %",
+  "{pct}%": "{pct} %",
+  "{pct}%, about {time} left": "{pct} %, faltan unos {time}",
+  "“{name}” can't play until its effects are applied ({how})": "“{name}” no puede sonar hasta que se apliquen sus efectos ({how})",
+  "✓ “{name}” is ready to play": "✓ “{name}” está listo para sonar"
 }

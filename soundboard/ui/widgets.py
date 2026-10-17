@@ -664,6 +664,8 @@ _METER_WARM, _METER_HOT = QColor("#ffb84d"), QColor("#ff5a4f")   # a level meter
 _WHITE_DIM, _WHITE_MUTED = QColor(255, 255, 255, 170), QColor(255, 255, 255, 200)
 _ERROR_ON_PIC = QColor("#ff6b6b")
 LINK_PX = 12         # the linked-file mark: the footer text's height
+STOP_PX = 12         # the ✕ on an effects render in progress...
+STOP_HIT_PX = 24     # ...and where a click on it counts (WCAG 2.2 target size)
 _link_pm: dict = {}  # (colour, real pixels) -> its pixmap
 
 
@@ -701,6 +703,7 @@ class Pad(QAbstractButton):
     menu = Signal(str, QPoint)
     step = Signal(object, int, int)   # arrow key: this pad, columns, rows to move focus
     nudge = Signal(str, int)    # Ctrl+wheel: its volume this many steps up (+) or down (-)
+    stop_render = Signal(str)   # the ✕ on its effects render: stop it, keep the old effects
     single_click = False        # Settings: a click plays it (activated) instead of selecting
 
     def __init__(self, meta: SoundMeta, width: int):
@@ -715,8 +718,11 @@ class Pad(QAbstractButton):
         self.meter_peak = 0.0    # the meter's peak mark, falling slowly
         self.selected = False    # the sound in the transport bar
         self.picked = False      # one of several picked for a batch change (ui.padbatch)
-        self.state = "loading"   # loading | ready | error
+        self.state = "loading"   # loading | rendering | ready | error
         self.error = ""
+        self.render_frac: float | None = None   # rendering: how far, 0..1 (EditControl)
+        self.can_stop = False    # rendering: its ✕ shows (there are old effects to go back to)
+        self._stop_rect: QRectF | None = None   # where the ✕ was painted
         self.hover = False
         self._hover_k = 0.0      # 0..1, eased in and out (the card lights up smoothly)
         self._hover_anim = QVariantAnimation(self)
@@ -759,7 +765,9 @@ class Pad(QAbstractButton):
             bits.append(_("paused") if self.paused else _("playing"))
         if self.picked:
             bits.append(_("selected"))
-        if self.state in ("loading", "rendering"):
+        if self.state == "rendering" and self.render_frac is not None:
+            bits.append(_("applying effects… {pct}%", pct=int(self.render_frac * 100)))
+        elif self.state in ("loading", "rendering"):
             bits.append(_("loading"))
         elif self.state == "error":
             bits.append(_("can't load the file"))
@@ -803,7 +811,11 @@ class Pad(QAbstractButton):
         if e.type() == QEvent.Type.ToolTip:
             box = self._link_rect
             hit = box.adjusted(-4, -4, 4, 4) if box is not None else None
-            if hit is not None and hit.contains(QPointF(e.pos())) and self.linked_file():
+            stop = self._stop_hit(QPointF(e.pos()))
+            if stop is not None:
+                QToolTip.showText(e.globalPos(), _("Stop, keep the old effects"), self,
+                                  stop.toAlignedRect())
+            elif hit is not None and hit.contains(QPointF(e.pos())) and self.linked_file():
                 QToolTip.showText(e.globalPos(), _("Plays from: {path}",
                                                    path=self.linked_file()),
                                   self, hit.toAlignedRect())
@@ -1002,6 +1014,13 @@ class Pad(QAbstractButton):
         if e.button() == Qt.MouseButton.LeftButton and self._press is not None:
             self._press = None
             mods = e.modifiers()
+            if self._stop_hit(e.position()) is not None:
+                self.stop_render.emit(self.meta.id)
+                return
+            if self.state == "rendering" and not mods & (Qt.KeyboardModifier.ShiftModifier
+                                                         | Qt.KeyboardModifier.ControlModifier):
+                self.activated.emit(self.meta.id)   # it says why it can't play yet
+                return
             if not mods & (Qt.KeyboardModifier.ShiftModifier
                            | Qt.KeyboardModifier.ControlModifier):
                 self._last_click = time.monotonic() * 1000
@@ -1152,7 +1171,12 @@ class Pad(QAbstractButton):
         f, right, badge = self._footer(foot, f)
         p.setFont(f)
         self._link_rect = None
-        if self.state in ("loading", "rendering"):
+        self._stop_rect = None
+        if self.state == "rendering" and self.render_frac is not None:
+            self._paint_render(p, foot, QRectF(foot.left(), r.bottom() - 4.5, foot.width(), 3),
+                               muted, on_pic, _("applying… {pct}%",
+                                                pct=int(self.render_frac * 100)))
+        elif self.state in ("loading", "rendering"):
             p.setPen(muted)
             p.drawText(foot, Qt.AlignmentFlag.AlignLeft | Qt.AlignmentFlag.AlignVCenter,
                        _("applying effects…") if self.state == "rendering" else _("loading…"))
@@ -1249,7 +1273,12 @@ class Pad(QAbstractButton):
         f.setPointSizeF(8.0 if h < SLIM_PAD_H else 8.5 if h < ROW_MAX_H else 9.5)
         p.setFont(f)
         fm = p.fontMetrics()
-        if self.state in ("loading", "rendering"):
+        self._stop_rect = None
+        rendering = self.state == "rendering" and self.render_frac is not None
+        if rendering:
+            right = _("applying… {pct}%", pct=int((self.render_frac or 0.0) * 100))
+            rc = T["muted"]
+        elif self.state in ("loading", "rendering"):
             right = _("applying…") if self.state == "rendering" else _("loading…")
             rc = T["muted"]
         elif self.state == "error":
@@ -1269,9 +1298,22 @@ class Pad(QAbstractButton):
                                                      self.devicePixelRatioF()))
             self._link_rect = box
             rw += LINK_PX + 6
-        p.setPen(QColor(rc))
-        p.drawText(r.adjusted(0, 0, -9, 0), Qt.AlignmentFlag.AlignRight
-                   | Qt.AlignmentFlag.AlignVCenter, right)
+        if rendering:   # the ✕ at the end, the bar along the bottom
+            text_end = r.right() - 9
+            if self.can_stop:
+                text_end -= STOP_PX + 8
+                rw += STOP_PX + 8
+            self._paint_render(p, QRectF(r.left(), r.top(), r.right() - 9 - r.left(),
+                                         r.height()),
+                               QRectF(r.left() + 9, r.bottom() - 3, r.width() - 18, 2),
+                               QColor(rc), False, None)
+            p.setPen(QColor(rc))
+            p.drawText(QRectF(r.left(), r.top(), text_end - r.left(), r.height()),
+                       Qt.AlignmentFlag.AlignRight | Qt.AlignmentFlag.AlignVCenter, right)
+        else:
+            p.setPen(QColor(rc))
+            p.drawText(r.adjusted(0, 0, -9, 0), Qt.AlignmentFlag.AlignRight
+                       | Qt.AlignmentFlag.AlignVCenter, right)
         hk = self.meta.hotkey and (midi.short(self.meta.hotkey) if midi.is_midi(self.meta.hotkey)
                                    else pretty_key(self.meta.hotkey))
         if hk and r.width() >= 200:   # the key as a badge left of the length, room allowing
@@ -1291,6 +1333,57 @@ class Pad(QAbstractButton):
         p.drawText(text_r, Qt.AlignmentFlag.AlignLeft | Qt.AlignmentFlag.AlignVCenter,
                    p.fontMetrics().elidedText(self.meta.name, Qt.TextElideMode.ElideRight,
                                               int(text_r.width())))
+
+    def _stop_hit(self, pos: QPointF) -> QRectF | None:
+        """The ✕'s target (grown to a finger's size) when `pos` is on it."""
+        box = self._stop_rect
+        if box is None or self.state != "rendering" or not self.can_stop:
+            return None
+        grow = max(0.0, (STOP_HIT_PX - box.width()) / 2)
+        hit = box.adjusted(-grow, -grow, grow, grow)
+        return hit if hit.contains(pos) else None
+
+    def _paint_render(self, p: QPainter, row: QRectF, bar: QRectF, ink: QColor,
+                      on_pic: bool, text: str | None):
+        """An effects render in progress: `text` on the left of `row` (None: the caller
+        writes it), its ✕ at the right end (when it can be stopped) and the bar."""
+        x_w = STOP_PX if self.can_stop else 0
+        hi = QColor(theme.T.get("text_hi", "#ffffff"))
+        if text is not None:
+            p.setPen(ink)
+            tr = row.adjusted(0, 0, -(x_w + 6) if x_w else 0, 0)
+            p.drawText(tr, Qt.AlignmentFlag.AlignLeft | Qt.AlignmentFlag.AlignVCenter,
+                       p.fontMetrics().elidedText(text, Qt.TextElideMode.ElideRight,
+                                                  int(tr.width())))
+        if x_w:
+            c = QPointF(row.right() - x_w / 2, row.center().y())
+            box = QRectF(c.x() - x_w / 2, c.y() - x_w / 2, x_w, x_w)
+            self._stop_rect = box
+            if self.hover:   # a soft disc behind it while the mouse is on the pad
+                disc = QColor(_WHITE if on_pic else hi)
+                disc.setAlpha(40)
+                p.setPen(Qt.PenStyle.NoPen)
+                p.setBrush(disc)
+                p.drawEllipse(box.adjusted(-3, -3, 3, 3))
+            pen = QPen((_WHITE if on_pic else hi) if self.hover else ink, 1.5)
+            pen.setCapStyle(Qt.PenCapStyle.RoundCap)
+            p.setPen(pen)
+            k = x_w * 0.3
+            p.drawLine(QPointF(c.x() - k, c.y() - k), QPointF(c.x() + k, c.y() + k))
+            p.drawLine(QPointF(c.x() - k, c.y() + k), QPointF(c.x() + k, c.y() - k))
+        rad = bar.height() / 2
+        groove = QColor(_WHITE if on_pic else theme.T.get("groove", "#343849"))
+        if on_pic:
+            groove.setAlpha(70)
+        p.setPen(Qt.PenStyle.NoPen)
+        p.setBrush(groove)
+        p.drawRoundedRect(bar, rad, rad)
+        frac = min(1.0, max(0.0, self.render_frac or 0.0))
+        if frac > 0:
+            p.setBrush(QColor(theme.T.get("accent", "#7c5cff")))
+            p.drawRoundedRect(QRectF(bar.left(), bar.top(),
+                                     max(bar.height(), bar.width() * frac), bar.height()),
+                              rad, rad)
 
     def _paint_meter(self, p: QPainter, r: QRectF, accent: QColor):
         """A slim level meter up the card's left edge: how loud it is right now, with a

@@ -21,6 +21,11 @@ if __name__ == "__main__" and sys.argv[1:2] == ["--ytdl-worker"]:
     from soundboard.ytworker import child_main
     sys.exit(child_main())
 
+if __name__ == "__main__" and sys.argv[1:2] == ["--render-worker"]:
+    # the app's helper that renders a slow sound's effects (soundboard.renderworker)
+    from soundboard.renderworker import child_main as render_main
+    sys.exit(render_main())
+
 from soundboard import bootmark  # noqa: E402  (small: no Qt, no sound library)
 
 # no breadcrumb for the one-off commands app.main() runs and exits (one would look like

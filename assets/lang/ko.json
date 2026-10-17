@@ -1341,7 +1341,7 @@
   "already in your library as “{name}”": "이미 ' {name} '으로 라이브러리에 있습니다.",
   "another action": "또 다른 행동",
   "applying effects…": "효과 적용 중…",
-  "applying…": "신청하다…",
+  "applying…": "적용 중…",
   "auto push-to-talk": "자동 푸시 투 토크",
   "can't load": "로드할 수 없습니다",
   "can't load file": "파일을 로드할 수 없습니다",
@@ -3553,5 +3553,17 @@
   "Start some music or a game, then press Send on it. Everyone in your call hears it.": "음악이나 게임을 켜고 거기서 보내다를 누르세요. 통화 중인 모두가 듣습니다.",
   "Turn on a trigger": "트리거를 켜세요",
   "Click any dot to play that station. Press Send and your call hears it too.": "점을 클릭하면 그 방송국이 재생됩니다. 보내다를 누르면 통화 상대도 들을 수 있어요.",
-  "Pick a station on the globe": "지구본에서 방송국을 고르세요"
+  "Pick a station on the globe": "지구본에서 방송국을 고르세요",
+  "Applying the effects": "효과 적용 중",
+  "Applying the effects: {how}": "효과 적용 중: {how}",
+  "Couldn't apply the effects: {why}": "효과를 적용하지 못했어요: {why}",
+  "Stop, keep the old effects": "멈추고 예전 효과 유지",
+  "Stopped. “{name}” keeps its old effects": "멈췄어요. “{name}”은(는) 예전 효과를 그대로 써요",
+  "You can close this window: it keeps going, and the pad shows how far it is.": "이 창은 닫아도 돼요. 작업은 계속되고, 패드에 진행 상황이 보여요.",
+  "applying effects… {pct}%": "효과 적용 중… {pct}%",
+  "applying… {pct}%": "적용 중… {pct}%",
+  "{pct}%": "{pct}%",
+  "{pct}%, about {time} left": "{pct}%, 약 {time} 남음",
+  "“{name}” can't play until its effects are applied ({how})": "“{name}”은(는) 효과 적용이 끝나야 재생할 수 있어요 ({how})",
+  "✓ “{name}” is ready to play": "✓ “{name}”을(를) 재생할 수 있어요"
 }

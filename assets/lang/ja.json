@@ -1341,7 +1341,7 @@
   "already in your library as “{name}”": "すでにライブラリに「{name}」として存在しています",
   "another action": "別のアクション",
   "applying effects…": "エフェクトを適用しています…",
-  "applying…": "申請中…",
+  "applying…": "適用中…",
   "auto push-to-talk": "自動プッシュツートーク",
   "can't load": "ロードできません",
   "can't load file": "ファイルをロードできません",
@@ -3553,5 +3553,17 @@
   "Start some music or a game, then press Send on it. Everyone in your call hears it.": "音楽やゲームを流して、その送信を押そう。通話の全員に聞こえます。",
   "Turn on a trigger": "トリガーをオンにしよう",
   "Click any dot to play that station. Press Send and your call hears it too.": "点をクリックするとその局が流れます。送信を押すと通話相手にも聞こえます。",
-  "Pick a station on the globe": "地球儀から局を選ぼう"
+  "Pick a station on the globe": "地球儀から局を選ぼう",
+  "Applying the effects": "エフェクトを適用中",
+  "Applying the effects: {how}": "エフェクトを適用中：{how}",
+  "Couldn't apply the effects: {why}": "エフェクトを適用できませんでした：{why}",
+  "Stop, keep the old effects": "停止して元のエフェクトに戻す",
+  "Stopped. “{name}” keeps its old effects": "停止しました。「{name}」は元のエフェクトのままです",
+  "You can close this window: it keeps going, and the pad shows how far it is.": "このウィンドウは閉じても大丈夫です。処理は続き、パッドに進み具合が出ます。",
+  "applying effects… {pct}%": "エフェクトを適用中… {pct}%",
+  "applying… {pct}%": "適用中… {pct}%",
+  "{pct}%": "{pct}%",
+  "{pct}%, about {time} left": "{pct}%、残り約 {time}",
+  "“{name}” can't play until its effects are applied ({how})": "「{name}」はエフェクトの適用が終わるまで再生できません（{how}）",
+  "✓ “{name}” is ready to play": "✓ 「{name}」を再生できます"
 }
