@@ -229,9 +229,10 @@ QPushButton#danger[quiet="true"]:hover { background:$danger_bg; }
 QPushButton#danger:focus { border-color:$accent; }
 QPushButton#danger[mini="true"] { padding:0 6px; }   /* the mini player's "■ All": fits its narrowest row */
 QPushButton#small, QPushButton#danger[small="true"] { padding:2px 8px; font-size:8pt; }
-QPushButton#backhome { background:$btn; border:1px solid $border; color:$text_hi;
-    font-weight:600; font-size:10pt; padding:6px 14px 6px 10px; border-radius:8px; }
-QPushButton#backhome:hover { background:$btn_hover; border-color:$border_hi; }
+QPushButton#backhome { background:$danger_bg; border:2px solid $danger_text; color:$danger_text;
+    font-weight:600; font-size:10pt; padding:5px 13px 5px 9px; border-radius:8px;
+    margin:5px; }   /* room for the glow ytsearch.BackHome paints around it */
+QPushButton#backhome:hover { background:$danger_hover; }
 QPushButton#tabinfo { padding:0; border-radius:8px; background:transparent; border:1px solid transparent; }
 QPushButton#tabinfo:hover { background:$btn_hover; border-color:$border_hi; }
 QPushButton#tabinfo:pressed { background:$btn_press; border-color:$border_hi; }
