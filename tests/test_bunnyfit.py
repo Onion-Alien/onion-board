@@ -59,12 +59,15 @@ def test_dark_glasses_hide_his_tears_and_lift_his_brows(qapp):
         c = img.pixelColor(x, y)
         return c.blue() > 150 and c.blue() > c.red() + 20
 
-    assert tear_blue(_draw(4, sad=1.0, outfit=()), 156, 276)
+    # (on his left eye, x4: the tear just under it, the flat smug brow above it)
+    tx, ty = round(bunnyfit.EYES[0] * 4), round((bunnyfit.EYE_Y + 6.5) * 4)
+    assert tear_blue(_draw(4, sad=1.0, outfit=()), tx, ty)
     for shades in bunnyfit.HIDE_EYES:       # no tear peeking out under the lens
-        assert not tear_blue(_draw(4, sad=1.0, outfit=(shades,)), 156, 276), shades
+        assert not tear_blue(_draw(4, sad=1.0, outfit=(shades,)), tx, ty), shades
     # the smug flat brow sits above the lens, not along its top edge
-    assert not ink(_draw(4, smug=True, outfit=()), 156, 207)
-    assert ink(_draw(4, smug=True, outfit=("shades",)), 156, 207)
+    bx, by = round(bunnyfit.EYES[0] * 4), round((bunnyfit.EYE_Y - 13.3) * 4)
+    assert not ink(_draw(4, smug=True, outfit=()), bx, by)
+    assert ink(_draw(4, smug=True, outfit=("shades",)), bx, by)
 
 
 def test_hoot_wears_the_theme_outfit_but_not_in_artwork(qapp, monkeypatch):

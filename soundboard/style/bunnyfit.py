@@ -93,7 +93,7 @@ def _col(key: str) -> QColor:
 # Bun's shape on the 100 x 120 canvas: bunny.py draws him from these, and the pieces
 # that sit on him clip to them, so his outline and theirs stay one
 EYES = (35.5, 64.5)   # his eyes' centres (x), on EYE_Y
-EYE_Y = 63.0
+EYE_Y = 64.0
 
 
 def head_path() -> QPainterPath:
@@ -562,14 +562,14 @@ def _lenses(p, ink, fill, shape="rect", frame: QColor | None = None):
     p.drawLine(QPointF(right + 8.5, y - 3), QPointF(82, y - 2))
     for i, x in enumerate(EYES):
         if shape == "round":
-            path = _circle(x, y, 8.8)
+            path = _circle(x, y, 9.3)
         elif shape == "heart":
             path = QPainterPath(QPointF(x, y + 9))
             path.cubicTo(QPointF(x - 14, y - 1), QPointF(x - 7.5, y - 13), QPointF(x, y - 5.5))
             path.cubicTo(QPointF(x + 7.5, y - 13), QPointF(x + 14, y - 1), QPointF(x, y + 9))
         else:
             path = QPainterPath()
-            path.addRoundedRect(QRectF(x - 9.3, y - 8, 18.6, 16), 5, 5)
+            path.addRoundedRect(QRectF(x - 9.6, y - 8.6, 19.2, 17.2), 5.2, 5.2)
         lens = fill[i] if isinstance(fill, tuple) else fill
         _fill(p, path, lens, pen)
         if shape != "round":                               # a glint

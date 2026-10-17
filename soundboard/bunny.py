@@ -462,7 +462,7 @@ def draw_bunny(p: QPainter, rect: QRectF, prop: str | None = None, *,
             _stroke(p, arc, INK, 2.3)
             continue
         ex = x + gx
-        ew, eh = 12.4 + 1.5 * sad, (15 + 1.5 * sad) * (1 - blink)
+        ew, eh = 13.4 + 1.5 * sad, (16.4 + 1.5 * sad) * (1 - blink)
         eye = QPainterPath()
         eye.addEllipse(QRectF(ex - ew / 2, EYE_Y - eh / 2, ew, eh))
         p.fillPath(eye, EYE)
@@ -471,12 +471,12 @@ def draw_bunny(p: QPainter, rect: QRectF, prop: str | None = None, *,
         _glow(p, ex, EYE_Y + eh * 0.36, ew * 0.9, eh * 0.55, EYE_LOW)
         p.restore()
         if eh > 4:   # the shines: one big up on his right, a little one low on his left
-            _ellipse(p, ex + 2.4, EYE_Y - 3.7, 5 + sad, 5.4 + sad, QColor("white"))
-            _ellipse(p, ex - 2.7, EYE_Y + 4, 2.2, 2.2, QColor("white"))
+            _ellipse(p, ex + 2.6, EYE_Y - 4, 5.4 + sad, 5.8 + sad, QColor("white"))
+            _ellipse(p, ex - 2.9, EYE_Y + 4.4, 2.3, 2.3, QColor("white"))
         if smug and not hidden:   # heavy lids: fur over the top half, a flat lid line
             p.setPen(Qt.PenStyle.NoPen)
             p.setBrush(fur)
-            p.drawRect(QRectF(x - 6.5, EYE_Y - 8, 13, 7.5))
+            p.drawRect(QRectF(x - 7.5, EYE_Y - 9, 15, 8.5))
             _stroke(p, _arc(x - 5.6, EYE_Y - 0.5, x, EYE_Y - 1.2, x + 5.6, EYE_Y - 0.5),
                     INK, 2.4)
         if sad > 0.05 and not hidden:   # welling up
@@ -499,7 +499,7 @@ def draw_bunny(p: QPainter, rect: QRectF, prop: str | None = None, *,
             c = QColor(BROW)
             c.setAlphaF(BROW.alphaF() * calm)
             for x in EYES:
-                _stroke(p, _arc(x - 3.2, 53.3 - up, x, 51.3 - up, x + 3.2, 53.3 - up), c, 1.6)
+                _stroke(p, _arc(x - 3.2, 54.3 - up, x, 52.3 - up, x + 3.2, 54.3 - up), c, 1.6)
         if worried > 0.02:   # worried brows, inner ends lifted
             c = QColor(INK)
             c.setAlphaF(worried)
@@ -507,8 +507,9 @@ def draw_bunny(p: QPainter, rect: QRectF, prop: str | None = None, *,
                 _stroke(p, _arc(x + sx * 5.5, 53.5 + sad - up, x + sx * 1.5, 52 - up,
                                 x - sx * 3, 51.5 - 4 * sad - up), c, 2.2)
         if smug:                  # one brow flat, the other cocked up
-            _stroke(p, _arc(32.5, 54.5 - up, 37.5, 54 - up, 42.5, 54.8 - up), INK, 2.2)
-            _stroke(p, _arc(56.5, 52 - up, 62, 46.5 - up, 68, 50.5 - up), INK, 2.2)
+            lx, rx = EYES
+            _stroke(p, _arc(lx - 5.5, 54.5 - up, lx, 54 - up, lx + 5.5, 54.8 - up), INK, 2.2)
+            _stroke(p, _arc(rx - 6, 52 - up, rx - 0.5, 46.5 - up, rx + 5.5, 50.5 - up), INK, 2.2)
         if cross > 0.02:          # cross brows, inner ends pulled down
             c = QColor(INK)
             c.setAlphaF(cross)
@@ -520,7 +521,7 @@ def draw_bunny(p: QPainter, rect: QRectF, prop: str | None = None, *,
             blush = QColor(255, 70, 100, min(255, 120 + round(110 * angry)))
         for x in (27, 73):
             w, h = 15 + 2 * angry, 9.5 + angry
-            _glow(p, x, 73, w, h, blush)
+            _glow(p, x, 74, w, h, blush)
         nose = QPainterPath(QPointF(47.2, 69.3))
         nose.quadTo(QPointF(50, 68.4), QPointF(52.8, 69.3))
         nose.quadTo(QPointF(53.6, 69.8), QPointF(52.6, 71))

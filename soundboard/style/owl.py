@@ -280,7 +280,7 @@ def draw_owl(p: QPainter, rect: QRectF, look: float = 0.0, feather=None, dark=No
     _fit(p, fit, "under", ink)
     # the big eyes
     shut = blink > 0.6
-    ew, eh = _mix(17.5, 20, plead), _mix(19, 21.5, plead)
+    ew, eh = _mix(19, 21, plead), _mix(20.5, 22.5, plead)
     for x in EYES:
         px, py = x + 2.8 * look, EYE_Y + 2.0 * look_y
         if shut:   # closed: a soft sleepy curve, or happy arcs while he cheers
