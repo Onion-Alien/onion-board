@@ -153,3 +153,59 @@ def test_the_installer_marks_the_files_and_clears_it_before_opening_the_app():
     opens = [ln for ln in run.splitlines() if not ln.startswith(";") and (
         "postinstall" in ln or "Check: Relaunch" in ln)]
     assert len(opens) == 2 and all("BeforeInstall: EndInstallingMark" in ln for ln in opens)
+
+
+def test_the_check_comes_before_anything_a_half_copied_install_can_fail(monkeypatch, tmp_path):
+    """Started while the installer copies files, even bootmark (and what it imports) may
+    be half there: the mark is checked first, with only os, sys and time."""
+    import runpy
+    import sys
+    from pathlib import Path
+
+    import pytest
+    monkeypatch.setattr(sys, "frozen", True, raising=False)
+    monkeypatch.setattr(sys, "executable", str(tmp_path / "OnionBoard.exe"))
+    monkeypatch.setattr(sys, "argv", ["OnionBoard.exe"])
+    import soundboard
+    monkeypatch.setitem(sys.modules, "soundboard.bootmark", None)   # importing it fails
+    monkeypatch.delattr(soundboard, "bootmark", raising=False)
+    (tmp_path / bootmark.INSTALLING).write_text("setup", encoding="utf-8")
+    main_py = str(Path(__file__).resolve().parent.parent / "main.py")
+    with pytest.raises(SystemExit) as out:
+        runpy.run_path(main_py, run_name="__main__")
+    assert out.value.code == 0
+
+
+def test_installmark_needs_nothing_but_os_sys_and_time():
+    """The installer copies Python itself first (python3*.dll, VCRUNTIME, base_library.zip):
+    the check can't need any other library, which may not be copied yet."""
+    import ast
+    from pathlib import Path
+
+    from soundboard import installmark
+    tree = ast.parse(Path(installmark.__file__).read_text(encoding="utf-8"))
+    names = {a.name.split(".")[0] for n in ast.walk(tree) if isinstance(n, ast.Import)
+             for a in n.names}
+    names |= {n.module.split(".")[0] for n in ast.walk(tree)
+              if isinstance(n, ast.ImportFrom) and n.module}
+    assert names <= {"__future__", "os", "sys", "time"}, names
+    assert bootmark.ONE_OFF is installmark.ONE_OFF
+
+
+def test_the_installer_copies_python_first_and_the_exe_last_after_closing_copies():
+    """A copy stuck on the launcher's "Failed to load Python DLL" box kept OnionBoard.exe
+    open: the silent update gave up (Abort) and rolled back, leaving no _internal."""
+    from pathlib import Path
+    iss = (Path(__file__).resolve().parent.parent / "installer" / "OnionBoard.iss"
+           ).read_text(encoding="utf-8")
+    files = iss[iss.index("[Files]"):iss.index("[Icons]")]
+    lines = [ln for ln in files.splitlines() if ln.startswith("Source:") and "dist" in ln]
+    first, rest, last = lines[:3], lines[3], lines[-1]
+    assert len(lines) == 5
+    for want in ("python3*.dll", "VCRUNTIME140*.dll", "base_library.zip"):
+        assert any(want in ln for ln in first)
+        assert want in rest.split("Excludes:")[1]   # not copied a second time
+    assert "{#AppExeName}.exe" in rest.split("Excludes:")[1]
+    assert "{#AppExeName}.exe" in last and "BeforeInstall: CloseLeftoverCopies" in last
+    close = iss[iss.index("procedure CloseLeftoverCopies"):]
+    assert "BoardProcesses(True)" in close[:close.index("end;")]

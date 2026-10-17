@@ -26,14 +26,18 @@ if __name__ == "__main__" and sys.argv[1:2] == ["--render-worker"]:
     from soundboard.renderworker import child_main as render_main
     sys.exit(render_main())
 
+from soundboard import installmark  # noqa: E402  (os, sys and time only)
+
+# the installer is replacing these files: it opens the app once it's done. First, before
+# anything that a half-copied install could fail to import
+if __name__ == "__main__" and installmark.step_aside(sys.argv[1:]):
+    sys.exit(0)
+
 from soundboard import bootmark  # noqa: E402  (small: no Qt, no sound library)
 
 # no breadcrumb for the one-off commands app.main() runs and exits (one would look like
-# a start that failed: see soundboard/bootmark.py); the installer runs those itself
+# a start that failed: see soundboard/bootmark.py)
 if __name__ == "__main__" and not (set(sys.argv[1:]) & set(bootmark.ONE_OFF)):
-    if bootmark.installing():
-        # the installer is replacing these files: it opens the app once it's done
-        sys.exit(0)
     # a breadcrumb before the heavy import below, so a crash while it loads is counted
     from soundboard import __version__  # noqa: E402
     bootmark.start(__version__)
@@ -41,8 +45,8 @@ if __name__ == "__main__" and not (set(sys.argv[1:]) & set(bootmark.ONE_OFF)):
 try:
     from soundboard.app import main  # noqa: E402
 except Exception:
-    # the installer started replacing the files while this loaded (bootmark.installing)
-    if __name__ == "__main__" and bootmark.installing():
+    # the installer started replacing the files while this loaded (installmark)
+    if __name__ == "__main__" and installmark.installing():
         sys.exit(0)
     raise
 

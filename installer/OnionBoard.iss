@@ -129,7 +129,17 @@ Type: filesandordirs; Name: "{app}\_internal"
 ; Includes the add-ons in {app}\modules (build.ps1 copies them in; see soundboard/modules.py).
 ; live-voice's own .venv is made later, by the "livevoice" task or the Voice tab's button.
 #ifndef PREVIEW
-Source: "..\dist\OnionBoard\*"; DestDir: "{app}"; Flags: ignoreversion recursesubdirs createallsubdirs
+; In this order, for an app started while the files are replaced (a double-click during
+; an update): first what Python needs to start, so it gets as far as main.py's check
+; (soundboard/installmark.py) and quits quietly instead of the launcher's "Failed to load
+; Python DLL" box; OnionBoard.exe last, after closing any copy still running from {app}
+; (one stuck on that box kept the exe open: the silent update gave up and rolled back,
+; leaving no _internal and an app that wouldn't start).
+Source: "..\dist\OnionBoard\_internal\python3*.dll"; DestDir: "{app}\_internal"; Flags: ignoreversion
+Source: "..\dist\OnionBoard\_internal\VCRUNTIME140*.dll"; DestDir: "{app}\_internal"; Flags: ignoreversion
+Source: "..\dist\OnionBoard\_internal\base_library.zip"; DestDir: "{app}\_internal"; Flags: ignoreversion
+Source: "..\dist\OnionBoard\*"; DestDir: "{app}"; Flags: ignoreversion recursesubdirs createallsubdirs; Excludes: "\{#AppExeName}.exe,\_internal\python3*.dll,\_internal\VCRUNTIME140*.dll,\_internal\base_library.zip"
+Source: "..\dist\OnionBoard\{#AppExeName}.exe"; DestDir: "{app}"; Flags: ignoreversion; BeforeInstall: CloseLeftoverCopies
 #endif
 ; The cable step runs first, before the files above are copied (see CurStepChanged), so it
 ; needs its own copy of the script to extract into {tmp}.
@@ -1215,6 +1225,19 @@ begin
   if Exec('powershell.exe', '-NoProfile -ExecutionPolicy Bypass -File "' + Script + '"',
           '', SW_HIDE, ewWaitUntilTerminated, Code) and LoadStringFromFile(CountFile, S) then
     Result := StrToIntDef(Trim(String(S)), 0);
+end;
+
+// Just before OnionBoard.exe is replaced (last, see [Files]): close any copy still running
+// from {app}. CloseApplications only looked before the files were touched; one started
+// since (a double-click during the update) and stuck on the launcher's error box kept the
+// exe open, so the silent update gave up ("Abort" for its suppressed box) and rolled back.
+procedure CloseLeftoverCopies;
+var
+  N: Integer;
+begin
+  N := BoardProcesses(True);
+  if N > 0 then
+    Log('Closed ' + IntToStr(N) + ' Onion Board process(es) started during the install');
 end;
 
 // {app}\_internal can be renamed (nothing inside is open), tried for about Tries / 2 s.
