@@ -10,8 +10,10 @@
 //
 // Safety, because anyone can say anything: text only (no links, no pictures), a short
 // message, a rate limit per install and per address, repeats refused, reports (3
-// different people mute that person for an hour), a ban list the owner controls from
-// /v1/admin/chat/..., and a kill switch (CHAT_OFF=1, or POST /v1/admin/chat/off).
+// different people, from different addresses, mute that person and their address for an
+// hour), a ban list the owner controls from /v1/admin/chat/... (an install and the
+// addresses it spoke from), and a kill switch (CHAT_OFF=1, or POST /v1/admin/chat/off).
+// A new install id is free to make, so anything that counts people counts addresses too.
 
 const MAX_LEN = 280;
 const MAX_KEPT = 60;
@@ -21,6 +23,8 @@ const PER_IP_MINUTE = 60;
 const REPORTS_TO_MUTE = 3;
 const MUTE_MS = 3600 * 1000;
 const MAX_REPORTS = 200;
+const REPORTS_PER_IP = [600000, 10]; // at most 10 reports in 10 minutes from one address
+const PRUNE_MS = 10000;              // how often the rate-limit records are tidied
 const INSTALL_RE = /^[0-9a-f-]{16,64}$/;
 const SESSION_RE = /^[0-9a-f]{16,32}$/;
 
@@ -80,10 +84,13 @@ export class Room {
     this.seq = 0;
     this.last = new Map();     // who -> [time of last message, recent times, last text]
     this.ips = new Map();      // ip hash -> [window start, count]
+    this.reporting = new Map(); // ip hash -> times of its recent reports
     this.names = new Map();    // session tag -> its name (kept so nobody shares a name)
-    this.muted = new Map();    // who -> until (ms)
-    this.banned = new Set();   // who hashes
-    this.reports = [];         // {id, t, who, name, text, by: [reporters]}
+    this.muted = new Map();    // who or ip hash -> until (ms)
+    this.banned = new Set();   // who and ip hashes
+    this.linked = new Map();   // a banned who -> the ip hashes banned with it (for unbanning)
+    this.reports = [];         // {id, t, who, ip, name, text, by: [reporters], byIp: [their ips]}
+    this.pruned = 0;
     this.blocked = blocked.map(w => w.toLowerCase().replace(/[^a-z0-9]+/g, "")).filter(Boolean);
     this.off = false;
     this.waiters = [];
@@ -94,11 +101,42 @@ export class Room {
       ({ id, t, u, name, text }));
   }
 
+  // drop rate-limit records nobody needs any more, so new install ids can't fill the memory
+  prune(now) {
+    if (now - this.pruned < PRUNE_MS) return;
+    this.pruned = now;
+    for (const [k, rec] of this.last) if (now - rec[0] > 60000) this.last.delete(k);
+    for (const [k, ip] of this.ips) if (now - ip[0] > 60000) this.ips.delete(k);
+    for (const [k, until] of this.muted) if (until <= now) this.muted.delete(k);
+    for (const [k, ts] of this.reporting) {
+      const keep = ts.filter(t => now - t < REPORTS_PER_IP[0]);
+      if (keep.length) this.reporting.set(k, keep); else this.reporting.delete(k);
+    }
+  }
+
+  // ban an install and every address it said something from that the room still knows of
+  // (or one address on its own); `ban` false lifts it again
+  ban(hash, ban = true) {
+    const all = new Set([hash, ...(this.linked.get(hash) || [])]);
+    if (!ban) {
+      for (const h of all) this.banned.delete(h);
+      this.linked.delete(hash);
+      return all.size;
+    }
+    for (const m of [...this.msgs, ...this.reports]) if (m.who === hash && m.ip) all.add(m.ip);
+    for (const h of all) this.banned.add(h);
+    if (all.size > 1) this.linked.set(hash, [...all].filter(h => h !== hash));
+    this.msgs = this.msgs.filter(m => !all.has(m.who) && !all.has(m.ip));
+    return all.size;
+  }
+
   // who = install hash, ipk = address hash; returns {ok, ...} or {error}
   say(who, ipk, rawText, now = Date.now()) {
     if (this.off) return { error: "off", status: 503 };
-    if (this.banned.has(who)) return { error: "banned", status: 403 };
-    if ((this.muted.get(who) || 0) > now) return { error: "muted", status: 403 };
+    this.prune(now);
+    if (this.banned.has(who) || this.banned.has(ipk)) return { error: "banned", status: 403 };
+    if (Math.max(this.muted.get(who) || 0, this.muted.get(ipk) || 0) > now)
+      return { error: "muted", status: 403 };
     const text = clean(rawText);
     const why = refuse(text, this.blocked);
     if (why) return { error: why, status: 400 };
@@ -115,7 +153,7 @@ export class Room {
     this.ips.set(ipk, ip);
     rec[0] = now; rec[1].push(now); rec[2] = text.toLowerCase();
     this.last.set(who, rec);
-    const msg = { id: ++this.seq, t: now, u: "", name: "", text, who };
+    const msg = { id: ++this.seq, t: now, u: "", name: "", text, who, ip: ipk };
     return { ok: true, msg };
   }
 
@@ -132,29 +170,41 @@ export class Room {
   }
 
   push(msg, u, name) {
-    const { who, ...shown } = msg;
+    const { who, ip, ...shown } = msg;
     shown.u = u; shown.name = name;
-    this.msgs.push({ ...shown, who });
+    this.msgs.push({ ...shown, who, ip });
     if (this.msgs.length > MAX_KEPT) this.msgs.splice(0, this.msgs.length - MAX_KEPT);
     const w = this.waiters; this.waiters = [];
     for (const f of w) f();
     return shown;
   }
 
-  report(id, reporter, now = Date.now()) {
+  // `reporter` = install hash, `ipk` = its address hash. Only one report per address
+  // counts, so one person with made-up install ids can't mute anyone on their own.
+  report(id, reporter, ipk, now = Date.now()) {
+    this.prune(now);
     const m = this.msgs.find(x => x.id === id);
     if (!m) return { error: "gone", status: 404 };
+    const mine = (this.reporting.get(ipk) || []).filter(t => now - t < REPORTS_PER_IP[0]);
+    if (mine.length >= REPORTS_PER_IP[1]) return { error: "slow down", status: 429 };
+    mine.push(now);
+    this.reporting.set(ipk, mine);
+    if (reporter === m.who || ipk === m.ip) return { ok: true };   // your own: nothing to do
     let r = this.reports.find(x => x.id === id);
     if (!r) {
-      r = { id, t: now, who: m.who, name: m.name, text: m.text, by: [] };
+      r = { id, t: now, who: m.who, ip: m.ip, name: m.name, text: m.text, by: [], byIp: [] };
       this.reports.push(r);
       if (this.reports.length > MAX_REPORTS) this.reports.shift();
     }
-    if (!r.by.includes(reporter)) r.by.push(reporter);
+    if (!r.by.includes(reporter) && !r.byIp.includes(ipk)) {
+      r.by.push(reporter);
+      r.byIp.push(ipk);
+    }
     if (r.by.length >= REPORTS_TO_MUTE) {
       this.muted.set(m.who, now + MUTE_MS);
+      if (m.ip) this.muted.set(m.ip, now + MUTE_MS);
       // what they said comes off the screen for everyone
-      this.msgs = this.msgs.filter(x => x.who !== m.who);
+      this.msgs = this.msgs.filter(x => x.who !== m.who && (!m.ip || x.ip !== m.ip));
     }
     return { ok: true };
   }
@@ -176,8 +226,9 @@ export class ChatRoom {
     this.room = new Room(String(env.CHAT_BLOCK || "").split(","));
     this.room.off = String(env.CHAT_OFF || "") === "1";
     this.ready = state.blockConcurrencyWhile(async () => {
-      const kept = await state.storage.get(["banned", "off"]);
+      const kept = await state.storage.get(["banned", "linked", "off"]);
       if (kept.get("banned")) this.room.banned = new Set(kept.get("banned"));
+      if (kept.get("linked")) this.room.linked = new Map(kept.get("linked"));
       if (kept.get("off") !== undefined) this.room.off = !!kept.get("off");
     });
   }
@@ -209,13 +260,13 @@ export class ChatRoom {
       return json({ message: shown, last: room.seq });
     }
     if ((g = p.match(/^\/v1\/chat\/(\d+)\/report$/)) && req.method === "POST") {
-      const r = room.report(parseInt(g[1], 10), who);
+      const r = room.report(parseInt(g[1], 10), who, ipk);
       return r.error ? json({ error: r.error }, r.status) : json({ ok: true });
     }
     if (p === "/v1/admin/chat" && req.method === "GET") {
       return json({ off: room.off, banned: room.banned.size,
-        reports: room.reports.map(({ id, t, name, text, by, who: w }) =>
-          ({ id, t, name, text, reports: by.length, who: w })) });
+        reports: room.reports.map(({ id, t, name, text, by, who: w, ip }) =>
+          ({ id, t, name, text, reports: by.length, who: w, ip })) });
     }
     if (p === "/v1/admin/chat/off" && req.method === "POST") {
       const b = await req.json().catch(() => ({}));
@@ -228,9 +279,8 @@ export class ChatRoom {
       const b = await req.json().catch(() => ({}));
       const w = String(b.who || "");
       if (!/^[0-9a-f]{64}$/.test(w)) return json({ error: "who" }, 400);
-      if (b.ban === false) room.banned.delete(w); else room.banned.add(w);
-      room.msgs = room.msgs.filter(m => m.who !== w);
-      await this.state.storage.put("banned", [...room.banned]);
+      room.ban(w, b.ban !== false);
+      await this.state.storage.put({ banned: [...room.banned], linked: [...room.linked] });
       return json({ banned: room.banned.size });
     }
     return json({ error: "not found" }, 404);
