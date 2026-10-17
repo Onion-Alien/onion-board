@@ -37,6 +37,16 @@ CREATE TABLE IF NOT EXISTS reports (
   PRIMARY KEY (sound, voter)
 );
 
+-- which address each install voted on a sound from (a salted hash): only a few
+-- installs from one address count per sound, however many ids it makes up
+CREATE TABLE IF NOT EXISTS vote_from (
+  sound TEXT NOT NULL,
+  voter TEXT NOT NULL,               -- the install's hash ("x:" + address: the cap was hit)
+  ip TEXT NOT NULL,
+  PRIMARY KEY (sound, voter)
+);
+CREATE INDEX IF NOT EXISTS vote_from_ip ON vote_from (sound, ip);
+
 -- per-day counters for rate limits: key = "<what>:<hash>", day = days since 1970
 CREATE TABLE IF NOT EXISTS counters (
   key TEXT NOT NULL,
