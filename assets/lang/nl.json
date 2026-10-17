@@ -3801,5 +3801,6 @@
   ],
   "Make a voice of your own first: Voice tab → Voice changer → Edit voice, or Save what's on under My setups.": "Maak eerst een eigen stem: tab Stem → Stemverander → Stem bewerken, of Opslaan wat aan staat onder Mijn instellingen.",
   "Rain, wind, a crowd or sounds from your board behind your voice": "Regen, wind, een menigte of geluiden van je board achter je stem",
-  "Your own settings: Edit voice opens them": "Je eigen instellingen: ‘Stem bewerken’ opent ze"
+  "Your own settings: Edit voice opens them": "Je eigen instellingen: ‘Stem bewerken’ opent ze",
+  "{site} didn't answer over Tor (it ignores some of Tor's addresses), and nor did {tries} other Tor routes. You can try this one without Tor: {site} would then see your own address.": "{site} gaf geen antwoord via Tor ({site} negeert sommige adressen van Tor), en ook niet via {tries} andere Tor-routes. Je kunt dit zonder Tor proberen: {site} ziet dan je eigen adres."
 }

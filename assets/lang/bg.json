@@ -3801,5 +3801,6 @@
   ],
   "Make a voice of your own first: Voice tab → Voice changer → Edit voice, or Save what's on under My setups.": "Първо направи свой глас: раздел Глас → Промяна на гласа → Редактирай гласа, или Запази включеното в Моите настройки.",
   "Rain, wind, a crowd or sounds from your board behind your voice": "Дъжд, вятър, тълпа или звуци от твоя борд зад гласа ти",
-  "Your own settings: Edit voice opens them": "Твоите собствени настройки: „Редактирай гласа“ ги отваря"
+  "Your own settings: Edit voice opens them": "Твоите собствени настройки: „Редактирай гласа“ ги отваря",
+  "{site} didn't answer over Tor (it ignores some of Tor's addresses), and nor did {tries} other Tor routes. You can try this one without Tor: {site} would then see your own address.": "{site} не отговори през Tor (пренебрегва някои адреси на Tor), както и при {tries} други маршрута на Tor. Можете да опитате този без Tor: тогава {site} ще види вашия собствен адрес."
 }

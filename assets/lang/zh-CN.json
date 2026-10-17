@@ -3721,5 +3721,6 @@
   ],
   "Make a voice of your own first: Voice tab → Voice changer → Edit voice, or Save what's on under My setups.": "先做一个你自己的声音：语音标签 → 变声器 → 编辑声音，或者在我的组合里“保存开着的设置”。",
   "Rain, wind, a crowd or sounds from your board behind your voice": "在你的声音后面加上雨、风、人群或你音板上的声音",
-  "Your own settings: Edit voice opens them": "你自己的设置：点“编辑声音”打开"
+  "Your own settings: Edit voice opens them": "你自己的设置：点“编辑声音”打开",
+  "{site} didn't answer over Tor (it ignores some of Tor's addresses), and nor did {tries} other Tor routes. You can try this one without Tor: {site} would then see your own address.": "{site} 没有通过 Tor 回应（它会忽略 Tor 的部分地址），另外 {tries} 条 Tor 路由也是如此。您可以不用 Tor 再试一次：然后 {site} 会看到您自己的地址。"
 }

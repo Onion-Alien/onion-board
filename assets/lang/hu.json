@@ -3801,5 +3801,6 @@
   ],
   "Make a voice of your own first: Voice tab → Voice changer → Edit voice, or Save what's on under My setups.": "Előbb csinálj saját hangot: Hang fül → Hangváltó → Hang szerkesztése, vagy Ami be van kapcsolva, mentése a Saját beállításaimnál.",
   "Rain, wind, a crowd or sounds from your board behind your voice": "Eső, szél, tömeg vagy hangok a boardodról a hangod mögött",
-  "Your own settings: Edit voice opens them": "A saját beállításaid: a „Hang szerkesztése” nyitja meg őket"
+  "Your own settings: Edit voice opens them": "A saját beállításaid: a „Hang szerkesztése” nyitja meg őket",
+  "{site} didn't answer over Tor (it ignores some of Tor's addresses), and nor did {tries} other Tor routes. You can try this one without Tor: {site} would then see your own address.": "{site} nem válaszolt Toron keresztül (a Tor néhány címét figyelmen kívül hagyja), és {tries} másik Tor-útvonalon sem. Kipróbálhatja ezt Tor nélkül is: {site} ekkor látni fogja a saját címét."
 }

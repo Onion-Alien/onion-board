@@ -3801,5 +3801,6 @@
   ],
   "Make a voice of your own first: Voice tab → Voice changer → Edit voice, or Save what's on under My setups.": "Gör en egen röst först: fliken Röst → Röstvändare → Redigera röst, eller Spara det som är på under Mina inställningar.",
   "Rain, wind, a crowd or sounds from your board behind your voice": "Regn, vind, en folkmassa eller ljud från ditt board bakom din röst",
-  "Your own settings: Edit voice opens them": "Dina egna inställningar: ”Redigera röst” öppnar dem"
+  "Your own settings: Edit voice opens them": "Dina egna inställningar: ”Redigera röst” öppnar dem",
+  "{site} didn't answer over Tor (it ignores some of Tor's addresses), and nor did {tries} other Tor routes. You can try this one without Tor: {site} would then see your own address.": "{site} svarade inte via Tor (den ignorerar vissa av Tors adresser), och inte heller via {tries} andra Tor-rutter. Du kan prova den här utan Tor: {site} skulle då se din egen adress."
 }

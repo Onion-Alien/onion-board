@@ -185,8 +185,17 @@ _TOR_BLOCKED = re.compile(r"not a bot|confirm you.?re not|HTTP Error 429|Too Man
                           r"HTTP Error 403|unusual traffic|try again later", re.I)
 
 
+# A site that never answers a Tor exit (SoundCloud ignores some): the socket times out.
+# Waiting longer doesn't help, another exit does.
+_TOR_SILENT = re.compile(r"timed? ?out", re.I)
+
+
 def blocked_by_site(msg: str) -> bool:
     return bool(_TOR_BLOCKED.search(msg or ""))
+
+
+def silent_over_tor(msg: str) -> bool:
+    return bool(_TOR_SILENT.search(msg or ""))
 
 
 def _site_name(target: str) -> str:
@@ -197,9 +206,10 @@ def _site_name(target: str) -> str:
 
 
 def _over_tor[T](fn: Callable[[], T], target: str) -> T:
-    """fn(), and in Tor mode, when the site turns the Tor exit away, a new Tor identity
-    and another try, up to TOR_TRIES times. Never falls back to a direct connection:
-    the last refusal is raised as TorBlocked for the UI to offer that."""
+    """fn(), and in Tor mode, when the site turns the Tor exit away or doesn't answer
+    it, a new Tor identity and another try, up to TOR_TRIES times. Never falls back to
+    a direct connection: the last refusal is raised as TorBlocked for the UI to offer
+    that."""
     if net.mode() != net.TOR:
         return fn()
     from soundboard import tor
@@ -209,19 +219,28 @@ def _over_tor[T](fn: Callable[[], T], target: str) -> T:
         except SwitchedOff:
             raise
         except DownloadError as e:
-            if not blocked_by_site(f"{e} {getattr(e, 'raw', '')}"):
+            msg = f"{e} {getattr(e, 'raw', '')}"
+            silent = not blocked_by_site(msg) and silent_over_tor(msg)
+            if not (silent or blocked_by_site(msg)):
                 raise
             if not site_allowed(target):   # switched off meanwhile: no more tries
                 raise SwitchedOff(net.off_message(site_feature(target))) from None
             if attempt == TOR_TRIES:
                 site = _site_name(target)
+                if silent:
+                    raise TorBlocked(_(
+                        "{site} didn't answer over Tor (it ignores some of Tor's "
+                        "addresses), and nor did {tries} other Tor routes. You can try "
+                        "this one without Tor: {site} would then see your own address.",
+                        site=site, tries=TOR_TRIES)) from e
                 raise TorBlocked(_(
                     "{site} turned Tor away ({site} often blocks Tor's addresses), and "
                     "so did {tries} other Tor routes. You can try this one without "
                     "Tor: {site} would then see your own address.",
                     site=site, tries=TOR_TRIES)) from e
-            log.info("site turned Tor away (%s); new identity, try %d of %d",
-                     str(e)[:120], attempt + 1, TOR_TRIES)
+            log.info("site %s Tor (%s); new identity, try %d of %d",
+                     "didn't answer" if silent else "turned away", str(e)[:120],
+                     attempt + 1, TOR_TRIES)
             tor.new_identity()
     raise AssertionError("unreachable: the last try returns or raises")
 

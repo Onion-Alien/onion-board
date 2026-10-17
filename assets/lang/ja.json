@@ -3721,5 +3721,6 @@
   ],
   "Make a voice of your own first: Voice tab → Voice changer → Edit voice, or Save what's on under My setups.": "まず自分の声を作りましょう：ボイスタブ → ボイスチェンジャー → 声を編集、またはマイセットで「オンのものを保存」。",
   "Rain, wind, a crowd or sounds from your board behind your voice": "声の後ろに雨、風、人混み、またはボードの音",
-  "Your own settings: Edit voice opens them": "自分の設定: 「声を編集」で開きます"
+  "Your own settings: Edit voice opens them": "自分の設定: 「声を編集」で開きます",
+  "{site} didn't answer over Tor (it ignores some of Tor's addresses), and nor did {tries} other Tor routes. You can try this one without Tor: {site} would then see your own address.": "{site} が Tor 経由で応答しませんでした（Tor の一部のアドレスを無視します）。他の Tor ルート {tries} 本でも同じでした。Tor なしで試すこともできます。その場合、{site} にはあなた自身のアドレスが見えます。"
 }

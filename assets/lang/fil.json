@@ -3801,5 +3801,6 @@
   ],
   "Make a voice of your own first: Voice tab → Voice changer → Edit voice, or Save what's on under My setups.": "Gumawa muna ng sarili mong voice: Voice tab → Voice changer → I-edit ang boses, o I-save ang naka-on sa Mga setup ko.",
   "Rain, wind, a crowd or sounds from your board behind your voice": "Ulan, hangin, madla o mga tunog mula sa board mo sa likod ng boses mo",
-  "Your own settings: Edit voice opens them": "Sarili mong mga setting: binubuksan ito ng “I-edit ang boses”"
+  "Your own settings: Edit voice opens them": "Sarili mong mga setting: binubuksan ito ng “I-edit ang boses”",
+  "{site} didn't answer over Tor (it ignores some of Tor's addresses), and nor did {tries} other Tor routes. You can try this one without Tor: {site} would then see your own address.": "Hindi sumagot ang {site} sa Tor (binabalewala nito ang ilang address ng Tor), at hindi rin sa {tries} iba pang ruta ng Tor. Maaari mong subukan ang isang ito nang walang Tor: makikita ng {site} ang iyong sariling address."
 }

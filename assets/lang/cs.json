@@ -3881,5 +3881,6 @@
   ],
   "Make a voice of your own first: Voice tab → Voice changer → Edit voice, or Save what's on under My setups.": "Nejdřív si udělej vlastní hlas: karta Hlas → Měnič hlasu → Upravit hlas, nebo Uložit, co je zapnuté v Mých sestavách.",
   "Rain, wind, a crowd or sounds from your board behind your voice": "Déšť, vítr, dav nebo zvuky z tvého boardu za tvým hlasem",
-  "Your own settings: Edit voice opens them": "Tvoje vlastní nastavení: otevřeš je přes „Upravit hlas“"
+  "Your own settings: Edit voice opens them": "Tvoje vlastní nastavení: otevřeš je přes „Upravit hlas“",
+  "{site} didn't answer over Tor (it ignores some of Tor's addresses), and nor did {tries} other Tor routes. You can try this one without Tor: {site} would then see your own address.": "{site} přes Tor neodpověděl (některé adresy Toru ignoruje), a nepomohly ani {tries} jiné cesty Tor. Můžete to zkusit bez Toru: {site} by pak viděl vaši vlastní adresu."
 }

@@ -3881,5 +3881,6 @@
   ],
   "Make a voice of your own first: Voice tab → Voice changer → Edit voice, or Save what's on under My setups.": "Najpierw zrób własny głos: karta Głos → Zmieniacz głosu → Edytuj głos, albo Zapisz to, co włączone w Moich zestawach.",
   "Rain, wind, a crowd or sounds from your board behind your voice": "Deszcz, wiatr, tłum albo dźwięki z twojego boardu za twoim głosem",
-  "Your own settings: Edit voice opens them": "Twoje własne ustawienia: otwiera je „Edytuj głos”"
+  "Your own settings: Edit voice opens them": "Twoje własne ustawienia: otwiera je „Edytuj głos”",
+  "{site} didn't answer over Tor (it ignores some of Tor's addresses), and nor did {tries} other Tor routes. You can try this one without Tor: {site} would then see your own address.": "{site} nie odpowiedziała przez Tora (ignoruje niektóre adresy Tora), podobnie jak przez {tries} inne trasy Tora. Możesz wypróbować ten bez Tora: {site} zobaczy wtedy Twój własny adres."
 }

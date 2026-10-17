@@ -3801,5 +3801,6 @@
   ],
   "Make a voice of your own first: Voice tab → Voice changer → Edit voice, or Save what's on under My setups.": "Primero haz una voz tuya: pestaña Voz → Cambiador de voz → Editar voz, o Guardar lo activado en Mis ajustes.",
   "Rain, wind, a crowd or sounds from your board behind your voice": "Lluvia, viento, una multitud o sonidos de tu board detrás de tu voz",
-  "Your own settings: Edit voice opens them": "Tus propios ajustes: «Editar voz» los abre"
+  "Your own settings: Edit voice opens them": "Tus propios ajustes: «Editar voz» los abre",
+  "{site} didn't answer over Tor (it ignores some of Tor's addresses), and nor did {tries} other Tor routes. You can try this one without Tor: {site} would then see your own address.": "{site} no respondió por Tor (ignora algunas direcciones de Tor), ni tampoco por {tries} otras rutas de Tor. Puedes probar este sin Tor: {site} entonces verá tu propia dirección."
 }

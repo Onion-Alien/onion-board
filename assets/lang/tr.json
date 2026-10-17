@@ -3801,5 +3801,6 @@
   ],
   "Make a voice of your own first: Voice tab → Voice changer → Edit voice, or Save what's on under My setups.": "Önce kendi sesini yap: Ses sekmesi → Ses değiştirici → Sesi düzenle ya da Ayarlarım altında Açık olanı kaydet.",
   "Rain, wind, a crowd or sounds from your board behind your voice": "Sesinin arkasında yağmur, rüzgâr, kalabalık ya da board'undan sesler",
-  "Your own settings: Edit voice opens them": "Kendi ayarların: “Sesi düzenle” ile açılır"
+  "Your own settings: Edit voice opens them": "Kendi ayarların: “Sesi düzenle” ile açılır",
+  "{site} didn't answer over Tor (it ignores some of Tor's addresses), and nor did {tries} other Tor routes. You can try this one without Tor: {site} would then see your own address.": "{site} Tor üzerinden yanıt vermedi (Tor'un bazı adreslerini yok sayar), {tries} başka Tor rotasında da vermedi. Bunu Tor olmadan deneyebilirsiniz: {site} o zaman kendi adresinizi görür."
 }

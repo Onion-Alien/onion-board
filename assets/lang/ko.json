@@ -3721,5 +3721,6 @@
   ],
   "Make a voice of your own first: Voice tab → Voice changer → Edit voice, or Save what's on under My setups.": "먼저 나만의 목소리를 만드세요: 보이스 탭 → 보이스 체인저 → 목소리 편집, 또는 내 세트에서 켜진 것 저장.",
   "Rain, wind, a crowd or sounds from your board behind your voice": "목소리 뒤에 비, 바람, 군중 또는 내 보드의 소리",
-  "Your own settings: Edit voice opens them": "나만의 설정: ‘목소리 편집’에서 열 수 있어요"
+  "Your own settings: Edit voice opens them": "나만의 설정: ‘목소리 편집’에서 열 수 있어요",
+  "{site} didn't answer over Tor (it ignores some of Tor's addresses), and nor did {tries} other Tor routes. You can try this one without Tor: {site} would then see your own address.": "{site}이(가) Tor로 응답하지 않았고(Tor의 일부 주소를 무시함), 다른 Tor 경로 {tries}개에서도 마찬가지였습니다. Tor 없이 시도해 볼 수 있습니다. 그러면 {site}에 내 주소가 보입니다."
 }

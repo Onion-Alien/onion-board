@@ -4121,5 +4121,6 @@
   ],
   "Make a voice of your own first: Voice tab → Voice changer → Edit voice, or Save what's on under My setups.": "اصنع صوتًا خاصًا بك أولًا: تبويب الصوت ← مغير الصوت ← تعديل الصوت، أو احفظ ما هو مشغّل في إعداداتي.",
   "Rain, wind, a crowd or sounds from your board behind your voice": "مطر أو رياح أو حشد أو أصوات من لوحتك خلف صوتك",
-  "Your own settings: Edit voice opens them": "إعداداتك الخاصة: يفتحها زر «تعديل الصوت»"
+  "Your own settings: Edit voice opens them": "إعداداتك الخاصة: يفتحها زر «تعديل الصوت»",
+  "{site} didn't answer over Tor (it ignores some of Tor's addresses), and nor did {tries} other Tor routes. You can try this one without Tor: {site} would then see your own address.": "لم يردّ {site} عبر Tor (يتجاهل بعض عناوين Tor)، ولم تنجح {tries} طرق Tor أخرى أيضًا. يمكنك تجربة هذا بدون Tor: سيرى {site} عندها عنوانك الخاص."
 }
