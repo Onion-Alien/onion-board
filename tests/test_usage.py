@@ -916,6 +916,21 @@ def test_closing_the_window_sends_what_waits_and_saves(window, sent):  # noqa: F
     assert Config.load().stats_tabs == []
 
 
+def test_a_slow_quit_is_out_of_sight_and_no_freeze(window, sent, qapp):  # noqa: F811
+    # 2.3.1: a quit taking over 5 s, the window still showing, came in as a freeze
+    # stuck in the quit count's wait
+    from soundboard.hangwatch import HangWatch
+    window.show()
+    qapp.hangwatch = HangWatch(hang_s=60)
+    try:
+        window.shutdown()
+        assert not window.isVisible()
+        assert qapp.hangwatch._stop.is_set()
+    finally:
+        qapp.hangwatch.stop()
+        del qapp.hangwatch
+
+
 def test_what_comes_in_during_a_quit_send_stays(sent, app_dir):
     cfg = Config(stats_sent=1e18, stats_problems_seen=1.0, stats_pending=["a/1"])
     finish = usage.at_quit(cfg, app_dir=app_dir)
