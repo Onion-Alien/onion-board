@@ -941,7 +941,8 @@ def test_header_ends_where_its_words_do(mic_wizard, qapp):
     def y(wd, at_bottom=False):
         return wd.mapTo(wiz, QPoint(0, wd.height() if at_bottom else 0)).y()
     assert y(bun) == y(title)   # top-aligned with the title, not centred below it
-    assert bun.height() <= setupwizard.BUN_H + 2 * setupwizard.BUN_PAD
+    # (+ the room he keeps above him so an upright ear isn't cut at the top of his bob)
+    assert bun.height() <= setupwizard.BUN_H + 2 * setupwizard.BUN_PAD + bun._head()
     bottom = max(y(words, True), y(bun, True))
     tiles = y(wiz.use_buttons["normal"])
     assert tiles - bottom <= setupwizard.HEADER_GAP + 8   # (+ the page's own spacing)
