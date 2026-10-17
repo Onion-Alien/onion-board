@@ -25,6 +25,9 @@ const MUTE_MS = 3600 * 1000;
 const MAX_REPORTS = 200;
 const REPORTS_PER_IP = [600000, 10]; // at most 10 reports in 10 minutes from one address
 const PRUNE_MS = 10000;              // how often the rate-limit records are tidied
+const QUICK_MS = 2000;               // a poll this soon after the last answer waits for news
+const QUICK_HOLD_MS = 10000;         // ...this long at most when it didn't ask to wait (2.3.0
+                                     // gives up on those after 15 s)
 const INSTALL_RE = /^[0-9a-f-]{16,64}$/;
 const SESSION_RE = /^[0-9a-f]{16,32}$/;
 
@@ -85,6 +88,7 @@ export class Room {
     this.last = new Map();     // who -> [time of last message, recent times, last text]
     this.ips = new Map();      // ip hash -> [window start, count]
     this.reporting = new Map(); // ip hash -> times of its recent reports
+    this.polled = new Map();   // who -> when their last poll was answered
     this.names = new Map();    // session tag -> its name (kept so nobody shares a name)
     this.muted = new Map();    // who or ip hash -> until (ms)
     this.banned = new Set();   // who and ip hashes
@@ -108,6 +112,7 @@ export class Room {
     for (const [k, rec] of this.last) if (now - rec[0] > 60000) this.last.delete(k);
     for (const [k, ip] of this.ips) if (now - ip[0] > 60000) this.ips.delete(k);
     for (const [k, until] of this.muted) if (until <= now) this.muted.delete(k);
+    for (const [k, t] of this.polled) if (now - t > 60000) this.polled.delete(k);
     for (const [k, ts] of this.reporting) {
       const keep = ts.filter(t => now - t < REPORTS_PER_IP[0]);
       if (keep.length) this.reporting.set(k, keep); else this.reporting.delete(k);
@@ -209,6 +214,19 @@ export class Room {
     return { ok: true };
   }
 
+  // A poll: the messages after `after`, held until there's news when there's none yet
+  // (`wait`, or a poll this soon after the last one, so an app that asks again at once
+  // can't hammer the server). Resolves to [messages, room's last number].
+  async poll(who, after, wait, now = Date.now()) {
+    this.prune(now);
+    const all = after > this.seq ? 0 : after;   // higher than the room's: it started over
+    const quick = now - (this.polled.get(who) || -Infinity) < QUICK_MS;
+    if ((wait || quick) && !this.since(all).length)
+      await this.wait(this.seq, wait ? POLL_MS : QUICK_HOLD_MS);
+    this.polled.set(who, Date.now());
+    return [this.since(after > this.seq ? 0 : after), this.seq];
+  }
+
   wait(after, ms = POLL_MS) {
     if (this.seq !== after) return Promise.resolve();   // lower = the room started over
     return new Promise(res => {
@@ -245,10 +263,9 @@ export class ChatRoom {
     if (p === "/v1/chat" && req.method === "GET") {
       if (room.off) return json({ error: "off" }, 503);
       const after = Math.max(0, parseInt(url.searchParams.get("after") || "0", 10) || 0);
-      // a number lower than the room's means the room started over: send everything
-      if (url.searchParams.get("wait") === "1") await room.wait(after);
-      const all = after > room.seq ? 0 : after;
-      return json({ messages: room.since(all), last: room.seq, off: room.off });
+      const [messages, last] = await room.poll(who, after, url.searchParams.get("wait") === "1");
+      if (room.off) return json({ error: "off" }, 503);
+      return json({ messages, last, off: room.off });
     }
     if (p === "/v1/chat" && req.method === "POST") {
       let body;

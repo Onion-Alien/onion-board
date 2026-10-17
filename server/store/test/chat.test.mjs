@@ -142,3 +142,43 @@ test("a waiting poll wakes when a message arrives, and gives up on time", async 
   await r.wait(r.seq, 30);
   await r.wait(99, 30);   // lower seq than the client's: answers at once
 });
+
+test("a poll asked again at once waits for news instead of answering straight away", async () => {
+  const r = new Room();
+  let t0 = Date.now();
+  let [msgs, last] = await r.poll("w", 0, false);          // the first look: at once
+  assert.equal(msgs.length, 0); assert.equal(last, 0);
+  assert.ok(Date.now() - t0 < 200);
+  // an app that asks again at once (2.3.0 in an empty room) is held until someone speaks
+  t0 = Date.now();
+  const held = r.poll("w", 0, false);
+  setTimeout(() => r.push(r.say(W, "ip", "hi", Date.now()).msg, "u", "N"), 120);
+  [msgs, last] = await held;
+  assert.ok(Date.now() - t0 >= 100);
+  assert.equal(msgs.length, 1); assert.equal(last, 1);
+  // news waiting: answered at once, even when quick
+  r.push(r.say(W2, "ip2", "two", Date.now()).msg, "v", "M");
+  t0 = Date.now();
+  [msgs] = await r.poll("w", 1, true);
+  assert.equal(msgs.length, 1);
+  assert.ok(Date.now() - t0 < 200);
+});
+
+test("a waiting poll whose newest message was taken away doesn't spin", async () => {
+  const r = new Room();
+  r.push(r.say(W, "ip", "a", 5_000).msg, "u", "N");
+  r.ban(W);                       // message 1 is gone, the room's number is still 1
+  const t0 = Date.now();
+  const held = r.poll("w", 0, true);
+  setTimeout(() => r.push(r.say(W2, "ip2", "b", Date.now()).msg, "v", "M"), 120);
+  const [msgs, last] = await held;
+  assert.ok(Date.now() - t0 >= 100);
+  assert.deepEqual(msgs.map(m => m.text), ["b"]); assert.equal(last, 2);
+});
+
+test("a room that started over answers an old number with everything", async () => {
+  const r = new Room();
+  r.push(r.say(W, "ip", "a", 5_000).msg, "u", "N");
+  const [msgs, last] = await r.poll("w", 50, true);
+  assert.equal(msgs.length, 1); assert.equal(last, 1);
+});

@@ -15,7 +15,9 @@ const PAGE = 50;                     // sounds per list page
 const UPLOADS_PER_DAY = 10;          // per install
 const UPLOADS_PER_IP_DAY = 20;
 const VOTES_PER_IP_DAY = 400;
-const REPORTS_TO_HIDE = 3;           // reports from different installs: back to review
+const VOTES_PER_IP_SOUND_DAY = 6;    // one address can't stuff one sound's votes with made-up installs
+const REPORTS_PER_IP_DAY = 30;
+const REPORTS_TO_HIDE = 3;           // reports from different addresses: back to review
 const PENDING_CAP = 1000;            // a full review queue refuses new uploads
 const AGREEMENT = "own-cc0-v1";      // the version of the upload agreement accepted
 const LINK_AGREEMENT = "link-v1";    // a shared link: only the link is kept
@@ -61,7 +63,8 @@ async function route(req, env) {
   if (p === "/admin" && m === "GET")
     return new Response(ADMIN_PAGE, { headers: { "content-type": "text/html; charset=utf-8",
       "content-security-policy": "default-src 'self'; style-src 'unsafe-inline'; " +
-        "script-src 'unsafe-inline'; media-src 'self' blob:", "cache-control": "no-store" } });
+        "script-src 'unsafe-inline'; media-src 'self' blob:; frame-ancestors 'none'",
+      "x-frame-options": "DENY", "referrer-policy": "no-referrer", "cache-control": "no-store" } });
   if (p === "/v1/chat" || /^\/v1\/chat\/\d+\/report$/.test(p)) return chatRoute(req, env);
   if (p === "/v1/sounds" && m === "GET") return list(url, req, env);
   if (p === "/v1/sounds" && m === "POST") return upload(req, env);
@@ -215,6 +218,7 @@ async function file(env, id, any) {
 
 async function upload(req, env, imported = false) {
   const len = parseInt(req.headers.get("content-length") || "0");
+  if (!len) fail("length", 411);   // without one, the whole body would be read to find out
   if (len > MAX_BYTES + 64 * 1024) fail("too big", 413);
   let form;
   try {
@@ -300,7 +304,10 @@ async function vote(req, env, id) {
   if (![1, -1, 0].includes(value)) fail("value");
   const row = await env.DB.prepare("SELECT status FROM sounds WHERE id = ?").bind(id).first();
   if (!row || row.status !== "live") fail("not found", 404);
-  if (!await allow(env, "vote-ip", await ipHash(req, env), VOTES_PER_IP_DAY)) fail("slow down", 429);
+  const ip = await ipHash(req, env);
+  if (!await allow(env, "vote-ip", ip, VOTES_PER_IP_DAY)
+      || !await allow(env, "vote-ip-sound", `${ip}:${id}`, VOTES_PER_IP_SOUND_DAY))
+    fail("slow down", 429);
   if (value === 0) {
     await env.DB.prepare("DELETE FROM votes WHERE sound = ? AND voter = ?").bind(id, voter).run();
   } else {
@@ -312,15 +319,18 @@ async function vote(req, env, id) {
   return json({ id, up: c.up, down: c.down, mine: value });
 }
 
+// one report per address counts: a new install id is free to make, so counting installs
+// would let one person take any sound off the store
 async function report(req, env, id) {
-  const voter = await installHash(req, env);
+  await installHash(req, env);   // still required, as from the app
   const { reason } = await body(req);
   const why = ["copyright", "offensive", "broken", "other"].includes(reason) ? reason : "other";
   const row = await env.DB.prepare("SELECT status FROM sounds WHERE id = ?").bind(id).first();
   if (!row || row.status !== "live") fail("not found", 404);
-  if (!await allow(env, "vote-ip", await ipHash(req, env), VOTES_PER_IP_DAY)) fail("slow down", 429);
+  const ip = await ipHash(req, env);
+  if (!await allow(env, "report-ip", ip, REPORTS_PER_IP_DAY)) fail("slow down", 429);
   await env.DB.prepare("INSERT OR IGNORE INTO reports (sound, voter, reason, created) " +
-    "VALUES (?, ?, ?, ?)").bind(id, voter, why, now()).run();
+    "VALUES (?, ?, ?, ?)").bind(id, "ip:" + ip, why, now()).run();
   const n = (await env.DB.prepare("SELECT count(*) AS n FROM reports WHERE sound = ?")
     .bind(id).first()).n;
   // enough reports: off the store until the owner looks at it again

@@ -175,3 +175,17 @@ def test_hiding_the_tab_stops_the_polling(qapp, room):
     t.hide()
     assert t._gen > gen and not t._polling
     t.shutdown()
+
+
+def test_an_empty_room_is_not_asked_over_and_over(qapp, room, monkeypatch):
+    calls = []
+
+    def poll(install, after, wait=True):
+        calls.append(wait)
+        return [], 0, False   # an empty room that answers at once, whatever it's asked
+    monkeypatch.setattr(chat, "poll", poll)
+    t = _tab(qapp)
+    _wait(qapp, lambda: False, secs=1.6)
+    t.shutdown()
+    assert 1 <= len(calls) <= 3, calls       # about one a second, never a flood
+    assert calls[0] is False and all(calls[1:])   # only the first look doesn't wait
