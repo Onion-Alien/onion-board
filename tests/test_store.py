@@ -3,11 +3,13 @@ fake store: no test goes online."""
 import io
 import json
 import re
+import time
 import wave
 from pathlib import Path
 
 import numpy as np
 import pytest
+from PySide6.QtCore import QPoint
 from conftest import process_events
 from test_mainwindow import window as main_window  # noqa: F401  (the real MainWindow)
 
@@ -326,19 +328,21 @@ def test_categories_filter_the_list(qapp, fake):
     fake.cats = [("games", 3), ("memes", 1)]
     t = storetab.StoreTab(Config(), [].append, lambda d, g: True, lambda: None)
     t.show()
-    assert _wait(qapp, lambda: len(t._rows) == 2 and len(t.cat_btns) == 3)
-    assert t.cats_box.isVisibleTo(t)
-    assert [b.text() for b in t.cat_btns.values()] == ["All  4", "Games  3", "Memes  1"]
-    assert t.cat_btns[""].isChecked()
-    t.cat_btns["games"].click()
+    pick = t.cat_pick
+    assert _wait(qapp, lambda: len(t._rows) == 2 and pick.count() == 3)
+    assert [pick.itemText(i) for i in range(3)] == ["All categories", "Games  3", "Memes  1"]
+    assert pick.currentIndex() == 0
+    pick.activated.emit(pick.findData("games"))
     assert _wait(qapp, lambda: "cat=games" in fake.calls[-1][1])
-    assert t.cat_btns["games"].isChecked() and not t.cat_btns[""].isChecked()
-    # the order and the words keep the category
-    t.sort_btns[storetab.TRENDING].click()
-    assert _wait(qapp, lambda: "sort=trending" in fake.calls[-1][1]
+    assert pick.currentData() == "games"
+    # the order (a column's header) and the words keep the category
+    t.sort_btns["new"].click()
+    assert _wait(qapp, lambda: "sort=new" in fake.calls[-1][1]
                  and "cat=games" in fake.calls[-1][1])
+    assert t.sort_btns["top"].icon().isNull()
+    assert not t.sort_btns["new"].icon().isNull()   # the arrow moved to Added
     assert sum(c[1] == "/v1/categories" for c in fake.calls) == 1   # asked once
-    # an empty category: a way back to All (the chips are in the list)
+    # an empty category: a way back to All
     fake.sounds = {}
     t.set_cat("memes")
     assert _wait(qapp, lambda: t.msg_btn.isVisibleTo(t) and t.msg_btn.text() == "All")
@@ -347,13 +351,48 @@ def test_categories_filter_the_list(qapp, fake):
     t.shutdown()
 
 
-def test_no_categories_no_chips(qapp, fake):
+def test_no_categories_only_all(qapp, fake):
     fake.fail_cats = True
     t = storetab.StoreTab(Config(), [].append, lambda d, g: True, lambda: None)
     t.show()
     assert _wait(qapp, lambda: len(t._rows) == 2)
     qapp.processEvents()
-    assert not t.cats_box.isVisibleTo(t)
+    assert t.cat_pick.count() == 1 and t.cat_pick.currentData() == ""
+    t.shutdown()
+
+
+def test_the_table_header_sits_over_its_columns(qapp, fake):
+    fake.sounds = {f"{i:012x}": _sound(i, cat="games", created=int(time.time()) - 3 * 86400)
+                   for i in (1, 2)}
+    t = storetab.StoreTab(Config(), [].append, lambda d, g: True, lambda: None)
+    # wide: every column; narrower: no Category; the smallest: no Added either (its
+    # header still sorts, just before Votes)
+    for width, cat_shown, added_shown in ((800, True, True), (620, False, True),
+                                          (420, False, False)):
+        t.resize(width, 700)
+        t.show()
+        assert _wait(qapp, lambda: len(t._rows) == 2 and t.table_head.isVisible())
+        process_events(qapp, lambda: False, timeout=0.3)
+        r, head = t._rows[0], t.table_head
+
+        def x_of(w, head=head):
+            return w.mapTo(t, QPoint(0, 0)).x() - head.mapTo(t, QPoint(0, 0)).x()
+        assert r.cell_added.text() == "3 days ago" and r.cell_cat.text() == "Games"
+        assert r.cell_cat.isVisible() is cat_shown and t.head_cat.isVisible() is cat_shown
+        assert r.cell_added.isVisible() is added_shown and t.sort_btns["new"].isVisible()
+        assert t.sort_btns["top"].x() == x_of(r.btn_up)
+        assert r.width() <= t.list_area.viewport().width()   # nothing cut off
+        if added_shown:
+            assert t.sort_btns["new"].x() == x_of(r.cell_added)
+        else:
+            assert t.sort_btns["new"].geometry().right() < x_of(r.btn_up)
+        if cat_shown:
+            assert t.head_cat.x() == x_of(r.cell_cat)
+    # every width in between: a row never wider than the list (no column cut off)
+    for width in range(900, 419, -20):   # (down to the smallest window's tab)
+        t.resize(width, 700)
+        process_events(qapp, lambda: False, timeout=0.05)
+        assert t._rows[0].width() <= t.list_area.viewport().width(), width
     t.shutdown()
 
 
@@ -367,7 +406,7 @@ def test_a_sound_from_myinstants_is_voted_on_and_comes_from_the_site(qapp, fake)
     t.show()
     assert _wait(qapp, lambda: len(t._rows) == 1)
     r = t._rows[0]
-    assert r.meta.full == "From Myinstants · Memes"
+    assert r.meta.full == "From Myinstants" and r.cell_cat.text() == "Memes"
     assert r.btn_up.isVisibleTo(r) and r.btn_report.isVisibleTo(r)
     r.btn_up.click()
     assert _wait(qapp, lambda: any(c[1].endswith("/vote") for c in fake.calls))

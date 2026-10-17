@@ -42,3 +42,26 @@ def test_second_launch_gives_up_and_says_so(qapp, instance, monkeypatch):
     monkeypatch.setattr(si, "CONNECT_SECONDS", 0.3)
     assert not si.claim_single_instance()
     assert len(instance) == 1
+
+
+def test_window_comes_to_front_on_a_normal_start_only():
+    """The splash never takes the focus, so a normal start (the installer's "Open Onion
+    Board now") must bring the window forward itself, or it lands behind the browser;
+    a start with Windows (--tray) must not take the focus from a game."""
+    from soundboard.autostart import TRAY_ARG
+    assert si.comes_to_front(["main.py"], False)
+    assert si.comes_to_front(["main.py", "--resume-setup"], False)
+    assert not si.comes_to_front(["main.py", TRAY_ARG], False)
+    assert si.comes_to_front(["main.py", TRAY_ARG], True)   # launched again meanwhile
+
+
+def test_bring_to_front_raises_and_activates(qapp, monkeypatch):
+    from PySide6.QtWidgets import QWidget
+    w = QWidget()
+    calls = []
+    monkeypatch.setattr(w, "raise_", lambda: calls.append("raise"))
+    monkeypatch.setattr(w, "activateWindow", lambda: calls.append("activate"))
+    w.show()
+    si.bring_to_front(w)   # the Windows part never throws, even for an offscreen window
+    assert calls == ["raise", "activate"]
+    w.close()
