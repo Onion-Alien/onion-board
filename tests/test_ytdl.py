@@ -1186,6 +1186,16 @@ def test_direct_download_refuses_names_that_leave_its_folder(url, monkeypatch):
         ytdl._download_direct(url, None, None)
 
 
+def test_a_direct_download_that_isnt_an_mp3_is_not_kept(monkeypatch, tmp_path):
+    """A page, or anything else, sent under a sound's .mp3 name is refused and removed."""
+    monkeypatch.setattr(ytdl.net, "urlopen",
+                        lambda *a, **k: _Resp(b"<!doctype html><title>x</title>" + b" " * 200))
+    monkeypatch.setattr(ytdl.tempfile, "tempdir", str(tmp_path))
+    with pytest.raises(ytdl.DownloadError):
+        ytdl._download_direct("https://www.myinstants.com/media/sounds/vine-boom.mp3", None, None)
+    assert not list(tmp_path.glob("sb-ytdl-*"))
+
+
 def test_a_direct_download_cut_short_is_refused_and_cleared(monkeypatch, tmp_path):
     """The connection dropped part way: http's read() just ends (no error), so the
     bytes got are checked against Content-Length and a short file isn't kept."""
