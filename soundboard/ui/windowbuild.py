@@ -28,7 +28,6 @@ from PySide6.QtWidgets import (
     QScrollArea,
     QSizePolicy,
     QSlider,
-    QSpacerItem,
     QStyle,
     QStyleOptionButton,
     QStylePainter,
@@ -955,16 +954,9 @@ class WindowBuilder(Controller):
         mw.voice_only.setSizePolicy(QSizePolicy.Policy.Fixed, QSizePolicy.Policy.Fixed)
         mw.voice_only.hide()
         row.addWidget(mw.voice_only)
-        # its right end in line with the seek slider's above (EdgeMatch)
-        meter_pad = QSpacerItem(0, 0, QSizePolicy.Policy.Fixed, QSizePolicy.Policy.Minimum)
-        row.addItem(meter_pad)
-
-        def set_meter_pad(px: int, row=row):
-            meter_pad.changeSize(px, 0, QSizePolicy.Policy.Fixed, QSizePolicy.Policy.Minimum)
-            row.invalidate()
-
+        # Only the seek slider trims itself; matching must not resize this row.
         mw._bar_edges = EdgeMatch(mw.seek, mw._name_seek.set_pad_right,
-                                  mw.out_meter, set_meter_pad)
+                                  mw.out_meter)
         mw.btn_check = QPushButton(_("Hear what they hear"))
         mw.btn_check.setObjectName("miccheck")
         # its name by hand: a narrow window blanks the words (on_mic_check keeps it)
