@@ -1,0 +1,248 @@
+"""The control API's streamer endpoints (soundboard.streamapi): chat commands, alerts
+from bots and donation sites, the feed; and the endpoints for the newer features."""
+import http.client
+import json
+import threading
+
+import numpy as np
+import pytest
+
+from conftest import process_events
+from soundboard import remote, streamapi
+from test_mainwindow import window as main_window  # noqa: F401  (the real MainWindow)
+
+TOKEN = "test-token-123"
+
+
+@pytest.fixture
+def window(main_window):  # noqa: F811
+    w = main_window
+    for sid in ("s0", "s1"):
+        w.audio[sid] = np.zeros((480, 2), np.float32)
+    w.played = []
+    w.playctl.play = w.played.append
+    w.said = []
+    w.voice.speech.ctl.say = w.said.append
+    return w
+
+
+def d(w, action, **p):
+    return remote.dispatch(w, action, p)
+
+
+def test_chat_commands_play_list_and_wait_their_turn(qapp, window):
+    w = window
+    st, body = d(w, "chat", user="Ann", message="!sound airhorn")
+    assert st == 200 and body["handled"] and body["playing"] == "s1" and w.played == ["s1"]
+    st, body = d(w, "chat", user="Ann", message="!sound boom")   # within the cooldowns
+    assert not body["handled"] and body["reason"] == "cooldown" and body["wait"] > 0
+    st, body = d(w, "chat", user="Mo", message="!sound bo", mod="1")   # mods don't wait
+    assert body["handled"] and body["name"] == "Boom"            # (a unique start is enough)
+    st, body = d(w, "chat", user="Bea", message="!sounds")
+    assert body["handled"] and body["reply"] == "Sounds: Boom, Airhorn"
+    st, body = d(w, "chat", user="Mo", message="!sound airhron", mod="1")
+    assert not body["handled"] and "Airhorn" in body["reply"] and "@Mo" in body["reply"]
+    st, body = d(w, "chat", user="Bea", message="hello everyone")
+    assert body == {"handled": False, "user": "Bea", "reply": "", "reason": "not a command"}
+    assert d(w, "chat", user="Bea", message="!ban x")[1]["reason"].startswith("not one")
+    assert d(w, "chat", user="Bea")[0] == 400
+
+
+def test_who_may_use_each_command(qapp, window):
+    w = window
+    assert d(w, "chat", user="Ann", message="!say hi")[1]["reason"] == "not allowed"
+    assert d(w, "chat", user="Ann", message="!stop")[1]["reason"] == "not allowed"
+    st, rules = d(w, "chat_rules", say="subs", cooldown="0", user_cooldown="0")
+    assert st == 200 and rules["rules"]["say"] == "subs" and rules["rules"]["cooldown"] == 0
+    assert w.cfg.api_stream["chat"]["say"] == "subs"
+    assert d(w, "chat", user="Ann", message="!say hi")[1]["reason"] == "not allowed"
+    # Twitch's badges tag, as a bot passes it on
+    st, body = d(w, "chat", user="Ann", message="!say hi chat", badges="subscriber/12")
+    assert body["handled"] and w.said == ["hi chat"]
+    assert d(w, "chat", user="Bo", message="!say yo", broadcaster="true")[1]["handled"]
+    assert d(w, "chat_rules", say="admins")[0] == 400
+    assert d(w, "chat_rules", category="Nope")[0] == 404
+    assert d(w, "chat_rules", reset="1")[1]["rules"]["say"] == "off"
+
+
+def test_spoken_chat_drops_blocked_lines_and_reads_links_as_link(qapp, window):
+    w = window
+    d(w, "chat_rules", tts="everyone", cooldown="0", user_cooldown="0",
+      blocked="badword, worse thing", max_length="40")
+    st, body = d(w, "chat", user="Ann", message="look at https://evil.example/x now")
+    assert body["handled"] and w.said == ["Ann says look at link now"]
+    st, body = d(w, "chat", user="Ann", message="you BADWORD")
+    assert not body["handled"] and body["reason"] == "blocked word" and len(w.said) == 1
+    d(w, "chat", user="Ann", message="a" * 100)
+    assert w.said[-1] == "Ann says " + "a" * 40
+    d(w, "chat_rules", on="0")
+    assert d(w, "chat", user="Ann", message="!sound boom")[1]["reason"] == "chat commands are off"
+
+
+def test_alerts_pick_the_rule_for_the_amount_and_play_each_event_once(qapp, window):
+    w = window
+    assert d(w, "event", type="follow", user="Ann")[1]["handled"] is False   # nothing set
+    assert d(w, "alerts", type="donation", sound="boom")[0] == 200
+    st, body = d(w, "alerts", type="tip", min="10", sound="Airhorn",
+                 say="Thanks {user} for {amount} {currency}: {message}")
+    assert st == 200 and [r["min"] for r in body["alerts"]["donation"]] == [0, 10]
+    st, body = d(w, "event", type="Donation", user="Ann", amount="$5.00")
+    assert body["handled"] and body["name"] == "Boom" and not w.said
+    st, body = d(w, "event", type="kofi", user="Bo", amount="25", currency="EUR",
+                 message="go www.spam.example now", id="t-1")
+    assert body["name"] == "Airhorn" and w.said == ["Thanks Bo for 25 EUR: go link now"]
+    st, body = d(w, "event", type="donation", user="Bo", amount="25", id="t-1")   # resent
+    assert not body["handled"] and "twice" in body["reason"] and len(w.said) == 1
+    left = d(w, "alerts", type="donation", min="10", clear="1")[1]["alerts"]["donation"]
+    assert [r["min"] for r in left] == [0]
+    assert d(w, "alerts", on="0")[1]["on"] is False
+    assert d(w, "event", type="donation", amount="1")[1]["reason"] == "alerts are off"
+    # what the request says itself plays even with the alerts off
+    st, body = d(w, "event", type="raid", user="Cy", amount="40", sound="airhorn")
+    assert body["handled"] and body["name"] == "Airhorn" and body["event"]["amount"] == 40
+    assert d(w, "event")[0] == 400 and d(w, "alerts", type="follow")[0] == 400
+    assert d(w, "alerts", type="follow", sound="nope")[0] == 404
+
+
+def test_test_alerts_fill_in_a_viewer(qapp, window):
+    w = window
+    d(w, "alerts", type="sub", say="{user} subbed for {months} months")
+    st, body = d(w, "event", type="subscriber", test="1")
+    assert body["handled"] and w.said == ["TestViewer subbed for 3 months"]
+
+
+def test_the_json_other_tools_send_is_read(qapp):
+    n = streamapi.normalize
+    eventsub = {"subscription": {"type": "channel.cheer"},
+                "metadata": {"message_id": "m1"},
+                "event": {"user_name": "Ann", "bits": 500, "message": "cheer500 hi"}}
+    ev = n({"_body": eventsub})
+    assert (ev["type"], ev["user"], ev["amount"], ev["message"], ev["id"]) == \
+        ("cheer", "Ann", 500.0, "cheer500 hi", "m1")
+    redeem = {"subscription": {"type": "channel.channel_points_custom_reward_redemption.add"},
+              "event": {"id": "r1", "user_name": "Bo", "user_input": "say this",
+                        "reward": {"title": "Hydrate"}}}
+    ev = n({"_body": redeem})
+    assert (ev["type"], ev["reward"], ev["message"]) == ("redeem", "Hydrate", "say this")
+    labs = {"type": "donation", "message": [{"name": "Cy", "amount": "12.50",
+                                             "currency": "USD", "message": "gg", "_id": "x"}]}
+    ev = n({"_body": labs})
+    assert (ev["type"], ev["user"], ev["amount"], ev["id"]) == ("donation", "Cy", 12.5, "x")
+    se = {"listener": "tip-latest", "event": {"name": "Di", "amount": 3, "message": "hey"}}
+    assert n({"_body": se})["type"] == "donation" and n({"_body": se})["user"] == "Di"
+    kofi = json.dumps({"type": "Donation", "from_name": "Ed", "amount": "3.00",
+                       "currency": "GBP", "message": "tea", "kofi_transaction_id": "k9"})
+    ev = n({"data": kofi})
+    assert (ev["type"], ev["user"], ev["amount"], ev["id"]) == ("donation", "Ed", 3.0, "k9")
+    tiktok = n({"type": "gift", "nickname": "Fay", "giftName": "Rose", "repeatCount": "5"})
+    assert (tiktok["user"], tiktok["reward"], tiktok["count"]) == ("Fay", "Rose", 5)
+    assert n({"type": "x" * 100})["type"] == ""
+    assert streamapi.canonical("Channel.Follow") == "follow"
+    assert streamapi.canonical("hydrate") == "hydrate"
+
+
+def test_the_feed_lists_what_chat_and_alerts_did(qapp, window):
+    w = window
+    d(w, "chat", user="Ann", message="!sound boom")
+    d(w, "event", type="follow", user="Bo", sound="airhorn")
+    st, body = d(w, "feed")
+    assert [(e["kind"], e["user"]) for e in body["events"]] == [("chat", "Ann"), ("alert", "Bo")]
+    assert body["events"][1]["type"] == "follow" and body["events"][1]["name"] == "Airhorn"
+    first = body["events"][0]["id"]
+    assert [e["user"] for e in d(w, "feed", since=str(first))[1]["events"]] == ["Bo"]
+
+
+def test_a_voice_for_some_seconds_goes_back_after(qapp, window):
+    w = window
+    d(w, "voice", name="Robot")
+    st, body = d(w, "voice", name="chipmunk", seconds="0.05")
+    assert st == 200 and body["voice_name"] == "Chipmunk" and body["for_seconds"] == 0.05
+    assert process_events(qapp, lambda: w.voice.fx.preset == "Robot")
+    assert w.voice.fx.btn_power.isChecked()
+    d(w, "voice", on="0")
+    d(w, "voice", random="1", seconds="0.05")
+    assert w.voice.fx.btn_power.isChecked()
+    assert process_events(qapp, lambda: not w.voice.fx.btn_power.isChecked())
+    st, body = d(w, "voice", random="1")
+    assert st == 200 and body["voice"]
+    assert d(w, "voice", name="Robot", seconds="soon")[0] == 400
+
+
+def test_newer_features_endpoints(qapp, window):
+    w = window
+    st, sounds = d(w, "sounds", q="HORN")
+    assert st == 200 and [s["name"] for s in sounds] == ["Airhorn"]
+    assert {"volume", "loop", "press", "plays", "duration", "effects"} <= set(sounds[0])
+    assert d(w, "sounds", category="Nope")[0] == 404
+
+    w.cfg.hotkeys_off_hotkey = ""
+    assert d(w, "hotkeys", on="0") == (200, {"hotkeys": False})
+    w.hkctl.register_hotkeys()                     # (a settings change re-registers)
+    assert w.hkctl.hotkeys_on is False             # still off: the API turns them back on
+    assert d(w, "hotkeys") == (200, {"hotkeys": True})
+
+    assert d(w, "mic_gate", on="1") == (200, {"mic_gate": True})
+    assert w.cfg.mic_gate and w.engine.mic_gate
+    assert d(w, "mic_gate", on="0")[1] == {"mic_gate": False} and not w.engine.mic_gate
+
+    st, body = d(w, "setups")
+    assert st == 200 and isinstance(body["setups"], list) and body["on"]["sounds"] == ""
+    assert d(w, "setup", name="No such setup")[0] == 404
+    assert d(w, "setup", name="", tab="kitchen")[0] == 400 and d(w, "setup")[0] == 400
+    assert d(w, "setup", name="")[1]["on"]["sounds"] == ""
+
+    if remote._apps_tab(w) is None:
+        assert d(w, "apps") == (409, remote.APPS_OFF)
+    else:
+        assert d(w, "app")[0] == 400 and d(w, "app", name="nothing.exe")[0] == 404
+
+
+def test_help_lists_the_new_endpoints(qapp, window):
+    eps = d(window, "help")[1]["endpoints"]
+    for a in ("chat", "chat_rules", "event", "alerts", "feed", "apps", "app", "hotkeys",
+              "mic_gate"):
+        assert f"/api/{a}" in eps
+    assert "/api/event" in remote.setup_prompt(window.cfg, 7474)
+
+
+# --------------------------------------------------------------------------- over HTTP
+
+def post(qapp, ctl, path, body: bytes, kind="application/json"):
+    out = {}
+
+    def run():
+        c = http.client.HTTPConnection(remote.HOST, ctl.port, timeout=5)
+        c.request("POST", path, body=body, headers={"X-Token": TOKEN, "Content-Type": kind})
+        r = c.getresponse()
+        out["status"], out["body"] = r.status, json.loads(r.read() or b"null")
+        c.close()
+    t = threading.Thread(target=run)
+    t.start()
+    assert process_events(qapp, lambda: not t.is_alive())
+    return out["status"], out["body"]
+
+
+def test_a_post_body_is_read_as_the_values(qapp):
+    calls = []
+
+    def dispatch(action, params):
+        calls.append(params)
+        return 200, {"ok": action}
+    ctl = remote.RemoteControl(dispatch)
+    assert ctl.start(0, TOKEN)
+    try:
+        st, _ = post(qapp, ctl, "/api/event?user=Url",
+                     json.dumps({"type": "follow", "user": "Body", "live": True,
+                                 "event": {"x": 1}, "token": "nope"}).encode())
+        p = calls[-1]
+        assert st == 200 and p["type"] == "follow" and p["user"] == "Url"   # the URL wins
+        assert p["live"] == "1" and p["_body"]["event"] == {"x": 1} and "token" not in p
+        post(qapp, ctl, "/api/chat", b"user=Ann&message=%21sound+boom",
+             "application/x-www-form-urlencoded")
+        assert calls[-1] == {"user": "Ann", "message": "!sound boom"}
+        post(qapp, ctl, "/api/chat", b"not json")
+        assert calls[-1] == {}
+        st, body = post(qapp, ctl, "/api/chat", b"x" * (remote.BODY_MAX + 1))
+        assert st == 413 and len(calls) == 3
+    finally:
+        ctl.stop()
