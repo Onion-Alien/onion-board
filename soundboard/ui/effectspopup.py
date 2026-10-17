@@ -90,7 +90,7 @@ class EffectsPopup(QDialog):
     # ------------------------------------------------------------- building
     def rebuild(self):
         old = self.body
-        self.body = QWidget()
+        self.body = QWidget(self)
         self.body.setObjectName("effectsbody")
         self._v.replaceWidget(old, self.body)
         old.hide()
