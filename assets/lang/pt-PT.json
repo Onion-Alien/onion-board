@@ -3666,5 +3666,10 @@
   "{pct}%": "{pct}%",
   "{pct}%, about {time} left": "{pct}%, faltam cerca de {time}",
   "“{name}” can't play until its effects are applied ({how})": "“{name}” só pode tocar quando os efeitos estiverem aplicados ({how})",
-  "✓ “{name}” is ready to play": "✓ “{name}” está pronto a tocar"
+  "✓ “{name}” is ready to play": "✓ “{name}” está pronto a tocar",
+  "Couldn't put the AI voice on “{name}”: {why}": "Não foi possível pôr a voz de IA em “{name}”: {why}",
+  "Couldn't start the AI voice: {why}": "Não foi possível iniciar a voz de IA: {why}",
+  "Getting the AI voice ready…": "A preparar a voz de IA…",
+  "Putting the AI voice on “{name}”… {pct}%": "A pôr a voz de IA em “{name}”… {pct}%",
+  "The AI voices add-on isn't installed, so only the voice changer part of “{name}” is on.": "O suplemento de vozes de IA não está instalado, por isso só a parte do mudador de voz de “{name}” está ligada."
 }

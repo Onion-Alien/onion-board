@@ -3588,5 +3588,10 @@
   "{pct}%": "{pct}%",
   "{pct}%, about {time} left": "{pct}%，还剩约 {time}",
   "“{name}” can't play until its effects are applied ({how})": "“{name}”要等效果应用完才能播放（{how}）",
-  "✓ “{name}” is ready to play": "✓ “{name}”可以播放了"
+  "✓ “{name}” is ready to play": "✓ “{name}”可以播放了",
+  "Couldn't put the AI voice on “{name}”: {why}": "无法给“{name}”加上 AI 声音：{why}",
+  "Couldn't start the AI voice: {why}": "无法启动 AI 声音：{why}",
+  "Getting the AI voice ready…": "正在准备 AI 声音…",
+  "Putting the AI voice on “{name}”… {pct}%": "正在给“{name}”加上 AI 声音… {pct}%",
+  "The AI voices add-on isn't installed, so only the voice changer part of “{name}” is on.": "没有安装 AI 声音插件，所以“{name}”只开了变声器部分。"
 }

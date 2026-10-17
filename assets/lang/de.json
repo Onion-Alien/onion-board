@@ -3666,5 +3666,10 @@
   "{pct}%": "{pct} %",
   "{pct}%, about {time} left": "{pct} %, noch etwa {time}",
   "“{name}” can't play until its effects are applied ({how})": "„{name}“ kann erst spielen, wenn seine Effekte angewendet sind ({how})",
-  "✓ “{name}” is ready to play": "✓ „{name}“ ist bereit zum Abspielen"
+  "✓ “{name}” is ready to play": "✓ „{name}“ ist bereit zum Abspielen",
+  "Couldn't put the AI voice on “{name}”: {why}": "Die KI-Stimme konnte nicht auf „{name}“ gelegt werden: {why}",
+  "Couldn't start the AI voice: {why}": "Die KI-Stimme konnte nicht starten: {why}",
+  "Getting the AI voice ready…": "KI-Stimme wird vorbereitet…",
+  "Putting the AI voice on “{name}”… {pct}%": "KI-Stimme wird auf „{name}“ gelegt… {pct} %",
+  "The AI voices add-on isn't installed, so only the voice changer part of “{name}” is on.": "Das Add-on für KI-Stimmen ist nicht installiert, daher ist von „{name}“ nur der Stimmverzerrer an."
 }

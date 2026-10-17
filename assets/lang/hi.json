@@ -3666,5 +3666,10 @@
   "{pct}%": "{pct}%",
   "{pct}%, about {time} left": "{pct}%, लगभग {time} बाकी",
   "“{name}” can't play until its effects are applied ({how})": "“{name}” तब तक नहीं बजेगा जब तक इसके इफ़ेक्ट न लग जाएँ ({how})",
-  "✓ “{name}” is ready to play": "✓ “{name}” बजने के लिए तैयार है"
+  "✓ “{name}” is ready to play": "✓ “{name}” बजने के लिए तैयार है",
+  "Couldn't put the AI voice on “{name}”: {why}": "“{name}” पर एआई आवाज़ नहीं लग पाई: {why}",
+  "Couldn't start the AI voice: {why}": "एआई आवाज़ शुरू नहीं हो पाई: {why}",
+  "Getting the AI voice ready…": "एआई आवाज़ तैयार हो रही है…",
+  "Putting the AI voice on “{name}”… {pct}%": "“{name}” पर एआई आवाज़ लग रही है… {pct}%",
+  "The AI voices add-on isn't installed, so only the voice changer part of “{name}” is on.": "एआई आवाज़ों का ऐड-ऑन इंस्टॉल नहीं है, इसलिए “{name}” का सिर्फ़ आवाज परिवर्तक वाला हिस्सा चालू है।"
 }

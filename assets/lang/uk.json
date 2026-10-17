@@ -3744,5 +3744,10 @@
   "{pct}%": "{pct}%",
   "{pct}%, about {time} left": "{pct}%, лишилось близько {time}",
   "“{name}” can't play until its effects are applied ({how})": "«{name}» не зіграє, доки не застосуються його ефекти ({how})",
-  "✓ “{name}” is ready to play": "✓ «{name}» готовий до відтворення"
+  "✓ “{name}” is ready to play": "✓ «{name}» готовий до відтворення",
+  "Couldn't put the AI voice on “{name}”: {why}": "Не вдалося накласти ШІ-голос на «{name}»: {why}",
+  "Couldn't start the AI voice: {why}": "Не вдалося запустити ШІ-голос: {why}",
+  "Getting the AI voice ready…": "Готую ШІ-голос…",
+  "Putting the AI voice on “{name}”… {pct}%": "Накладаю ШІ-голос на «{name}»… {pct}%",
+  "The AI voices add-on isn't installed, so only the voice changer part of “{name}” is on.": "Доповнення з ШІ-голосами не встановлено, тож із «{name}» увімкнено лише зміну голосу."
 }

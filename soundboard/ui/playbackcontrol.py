@@ -109,6 +109,12 @@ class PlaybackControl(Controller):
             # the web song played from a search, now saved as this pad: one song, so
             # it starts again from the top instead of a second copy playing over it
             self._stop_sound(LINK_ID)
+        live = getattr(mw, "livesetups", None)
+        if live is not None:   # a Live controls setup's AI voice: its version of the sound
+            data = live.for_play(sid, data)
+            if data is None:
+                self.select(sid)
+                return   # being made in the AI voice first: it plays when it's ready
         self.select(sid)
         self._last_sid = sid
         if sid != LINK_ID:

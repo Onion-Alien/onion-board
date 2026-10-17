@@ -3744,5 +3744,10 @@
   "{pct}%": "{pct} %",
   "{pct}%, about {time} left": "{pct} %, zbývá asi {time}",
   "“{name}” can't play until its effects are applied ({how})": "„{name}“ nejde přehrát, dokud se nepoužijí jeho efekty ({how})",
-  "✓ “{name}” is ready to play": "✓ „{name}“ je připravený k přehrání"
+  "✓ “{name}” is ready to play": "✓ „{name}“ je připravený k přehrání",
+  "Couldn't put the AI voice on “{name}”: {why}": "AI hlas se nepodařilo dát na „{name}“: {why}",
+  "Couldn't start the AI voice: {why}": "AI hlas se nepodařilo spustit: {why}",
+  "Getting the AI voice ready…": "Připravuje se AI hlas…",
+  "Putting the AI voice on “{name}”… {pct}%": "Dává se AI hlas na „{name}“… {pct} %",
+  "The AI voices add-on isn't installed, so only the voice changer part of “{name}” is on.": "Doplněk AI hlasů není nainstalovaný, takže z „{name}“ je zapnutý jen měnič hlasu."
 }

@@ -3666,5 +3666,10 @@
   "{pct}%": "{pct} %",
   "{pct}%, about {time} left": "{pct} %, ungefär {time} kvar",
   "“{name}” can't play until its effects are applied ({how})": "”{name}” kan inte spelas förrän effekterna är pålagda ({how})",
-  "✓ “{name}” is ready to play": "✓ ”{name}” är redo att spelas"
+  "✓ “{name}” is ready to play": "✓ ”{name}” är redo att spelas",
+  "Couldn't put the AI voice on “{name}”: {why}": "Kunde inte lägga AI-rösten på ”{name}”: {why}",
+  "Couldn't start the AI voice: {why}": "Kunde inte starta AI-rösten: {why}",
+  "Getting the AI voice ready…": "Gör AI-rösten redo…",
+  "Putting the AI voice on “{name}”… {pct}%": "Lägger AI-rösten på ”{name}”… {pct} %",
+  "The AI voices add-on isn't installed, so only the voice changer part of “{name}” is on.": "Tillägget för AI-röster är inte installerat, så bara röstvändardelen av ”{name}” är på."
 }
