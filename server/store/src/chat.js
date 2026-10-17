@@ -46,7 +46,7 @@ const NOUN = ["Onion", "Car", "Waterfall", "Goblin", "Pickle", "Toaster", "Walru
   "Pizza", "Cloud", "Spoon", "Tomato", "Yeti"];
 
 // links of any kind (so no spam, no invites, no pictures): schemes, www., and name.tld/
-const LINK = /(https?:|ftp:|www\.|\b[a-z0-9-]{2,}\.(com|net|org|io|gg|ly|me|co|tv|xyz|app|dev|ru|to|cc)\b|discord\.gg|[a-z0-9-]+\.[a-z]{2,}\/)/i;
+const LINK = /(https?:|ftp:|file:|data:|javascript:|www\.|\b[a-z0-9-]{2,}\.(com|net|org|io|gg|ly|me|co|tv|xyz|app|dev|ru|to|cc|info|biz|site|online|shop|top|link|click|su|pw|cn|uk)\b|discord\.gg|[a-z0-9-]+\.[a-z]{2,}\/)/i;
 
 export async function sha256(s) {
   const h = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(s));
@@ -65,13 +65,38 @@ export function nameFor(hash, skip = 0) {
   return `${ADJ[n % ADJ.length]} ${NOUN[Math.floor(n / ADJ.length) % NOUN.length]}`;
 }
 
+// text as bare letters, so a blocked word can't hide behind accents, spaces, dots or
+// look-alike digits and signs ("Ş.h-1 t" -> "shit")
+const LEET = { "@": "a", "$": "s", "!": "i", "|": "i", "0": "o", "1": "i", "3": "e",
+               "4": "a", "5": "s", "7": "t", "8": "b", "9": "g" };
+export function squash(text) {
+  return String(text || "").normalize("NFKD").replace(/\p{M}/gu, "").toLowerCase()
+    .replace(/[@$!|013457890]/g, c => LEET[c] || c).replace(/[^a-z]+/g, "");
+}
+
+// a blocked word as a pattern on squashed text: each letter may be stretched ("fuuuck")
+const WORD_RE = new Map();
+function wordRe(w) {
+  let re = WORD_RE.get(w);
+  if (!re) {
+    re = new RegExp([...squash(w)].map(c => c + "+").join(""));
+    WORD_RE.set(w, re);
+  }
+  return re;
+}
+
+// whether `text` holds one of the `blocked` words (the owner's CHAT_BLOCK list)
+export function hasBlocked(text, blocked = []) {
+  const low = squash(text);
+  return blocked.some(w => squash(w) && wordRe(w).test(low));
+}
+
 // why `text` can't be said, or "" when it can
 export function refuse(text, blocked = []) {
   if (!text) return "empty";
   if (text.length > MAX_LEN) return "too long";
   if (LINK.test(text)) return "no links";
-  const low = text.toLowerCase().replace(/[^a-z0-9]+/g, "");
-  for (const w of blocked) if (w && low.includes(w)) return "not allowed";
+  if (hasBlocked(text, blocked)) return "not allowed";
   return "";
 }
 
@@ -95,7 +120,7 @@ export class Room {
     this.linked = new Map();   // a banned who -> the ip hashes banned with it (for unbanning)
     this.reports = [];         // {id, t, who, ip, name, text, by: [reporters], byIp: [their ips]}
     this.pruned = 0;
-    this.blocked = blocked.map(w => w.toLowerCase().replace(/[^a-z0-9]+/g, "")).filter(Boolean);
+    this.blocked = blocked.map(squash).filter(Boolean);
     this.off = false;
     this.waiters = [];
   }
