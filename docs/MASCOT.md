@@ -47,6 +47,16 @@ Animations never draw Bun themselves: they work out these numbers per frame and 
 `draw_bunny`, so a new piece of drawing in `bunny.py` or `bunnyfit.py` shows up in every
 animation at once.
 
+## Skits
+
+Now and then an idle `BunnyWidget` plays his theme's skit (`ui/bunskits.py`) instead of a
+fidget: everywhere he idles (the empty board, Bun mode, the YouTube search). A skit is a
+function of its time alone: it adds to his pose, hides the outfit pieces it moves and
+queues drawings behind him, with him (held things) or in front, on the canvas. No words
+(only "!" and "?"), so nothing to translate. A new theme with an outfit gets a skit in
+`bunskits.SKITS`; one without juggles. `tests/test_bunnywidget.py`
+plays every theme's skit through.
+
 ## Outfits
 
 `draw_bunny(..., outfit=None)` wears the current theme's outfit (`bunnyfit.outfit()`);

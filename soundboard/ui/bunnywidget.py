@@ -44,6 +44,7 @@ then he jiggles back into shape.
 """
 from __future__ import annotations
 
+import logging
 import math
 import random
 import time
@@ -73,8 +74,11 @@ from soundboard.bunny import (
     sparkle,
 )
 from soundboard.i18n import _
-from soundboard.ui import appstate
+from soundboard.style import bunnyfit
+from soundboard.ui import appstate, bunskits
 from soundboard.ui.pixels import snap_to_pixels
+
+log = logging.getLogger(__name__)
 
 NOTE_COLORS = ("#7c5cff", "#a48bff", "#1fb6ff", "#ff8fae", "#13ce66")
 SPARKLE_COLORS = ("#ffcf40", "#ff8fae", "#1fb6ff", "#a48bff")
@@ -96,6 +100,7 @@ FINALE = 2.8     # a finished build: the speaker plays beside him this long
 POP = 0.35       # popping back out of the dust cloud
 FIDGETS = {"yawn": 2.4, "look": 2.6, "tap": 3.2}   # idle fidgets and how long they take
 FIDGET_EVERY = (20.0, 40.0)
+FIRST_FIDGET = (10.0, 20.0)   # the first one comes a little sooner (an empty tab's Bun)
 SWING = 0.55     # one hammer blow, seconds
 TALK = 0.008       # mic level that counts as talking (-42 dBFS; also the wizard's "Hearing you")
 LOUD = 0.25        # mic level that opens his mouth all the way (-12 dBFS)
@@ -353,7 +358,10 @@ class BunnyWidget(QWidget):
         self._pop_t = -1.0              # seconds into popping out of the cloud, or -1
         self._fidget = ""               # the idle fidget going on ("" none)
         self._fidget_at = -1.0
-        self._next_fidget = self._t0 + self._rng.uniform(*FIDGET_EVERY)
+        self._next_fidget = self._t0 + self._rng.uniform(*FIRST_FIDGET)
+        self._skit = None               # the theme's skit playing (bunskits), or None
+        self._skit_at = -1.0
+        self._kit: bunskits.Kit | None = None   # ...this frame of it (pose, paintEvent)
         self.groove = None              # the song playing (set_groove), or None
         self._dance = 0.0               # how much he's dancing (0..1, fades in and out)
         self._style, self._style_was, self._blend = "", "", 1.0
@@ -958,19 +966,83 @@ class BunnyWidget(QWidget):
 
     def _idle(self, now: float) -> bool:
         return not (self.building or self._fail_t >= 0 or self._fin_t >= 0 or self.asleep
-                    or self._sad > 0.3 or self._angry > 0.05 or self._level > TALK
+                    or self._sad > 0.5 or self._angry > 0.05 or self._level > TALK
                     or self._hopeful or self.celebrate or self.say or self._dance > 0.05
                     or (self._joy_at >= 0 and now - self._joy_at < 1.4))
 
     def _step_fidget(self, now: float):
-        """Now and then a bored Bun fidgets (never in the middle of anything else)."""
+        """Now and then a bored Bun fidgets or plays his theme's skit (never in the
+        middle of anything else; anything else starting cuts a skit short)."""
         if self._fidget and now - self._fidget_at >= FIDGETS[self._fidget]:
             self._fidget = ""
+        if self._skit is not None and (now - self._skit_at >= self._skit[0]
+                                       or not self._idle(now)):
+            self._skit, self._kit = None, None
         if now < self._next_fidget:
             return
         self._next_fidget = now + self._rng.uniform(*FIDGET_EVERY)
-        if not self._fidget and self._idle(now):
-            self.fidget(self._rng.choice(tuple(FIDGETS)))
+        if not self._fidget and self._skit is None and self._idle(now):
+            if not self.robot and self._rng.random() < bunskits.NEXT_PROB:
+                self.skit()
+            else:
+                self.fidget(self._rng.choice(tuple(FIDGETS)))
+
+    def skit(self, name: str | None = None):
+        """Start the skit of theme `name` (default: the current theme's; bunskits)."""
+        self._fidget = ""
+        self._skit, self._skit_at = bunskits.for_theme(name), time.monotonic()
+
+    @property
+    def skit_playing(self) -> bool:
+        return self._skit is not None
+
+    def _skit_frame(self, now: float) -> bunskits.Kit | None:
+        """This frame of the skit playing (None: none, or it went wrong: then it stops,
+        as nothing in a paint may raise)."""
+        if self._skit is None:
+            return None
+        kit = bunskits.Kit()
+        try:
+            self._skit[1](kit, now - self._skit_at)
+        except Exception:   # noqa: BLE001  (a drawing bug must never take the app down)
+            log.exception("Bun's skit failed")
+            self._skit = None
+            return None
+        return kit
+
+    def _with_kit(self, out: dict, kit: bunskits.Kit) -> dict:
+        """The pose `out` with the skit's frame on top."""
+        k, u = kit.pose, self.bun_h / H
+        out["dy"] += k.get("dy", 0.0) * u
+        out["dx"] += k.get("dx", 0.0) * u
+        for key in ("angle", "ears", "nod", "dip", "sx", "sy"):
+            out[key] += k.get(key, 0.0)
+        for key in ("mouth", "blink", "sad", "angry"):
+            out[key] = max(out[key], k.get(key, 0.0))
+        out["smug"] = out["smug"] or k.get("smug", 0.0) > 0.5
+        out["alpha"] *= 1 - min(1.0, max(0.0, 1 - k.get("alpha", 1.0)))
+        out["shown"] = out["shown"] and out["alpha"] > 0.02
+        if kit.prop is not None:
+            out["prop"] = kit.prop or None
+        if kit.hide:
+            out["outfit"] = tuple(n for n in bunnyfit.outfit() if n not in kit.hide)
+        return out
+
+    def _paint_kit(self, p: QPainter, rect: QRectF, items):
+        """A skit's drawings, on the 100 x 120 canvas fitted to `rect`."""
+        if not items:
+            return
+        p.save()
+        p.translate(rect.left(), rect.top())
+        s = rect.height() / H
+        p.scale(s, s)
+        try:
+            for fn in items:
+                fn(p)
+        except Exception:   # noqa: BLE001  (see _skit_frame)
+            log.exception("Bun's skit failed to draw")
+            self._skit = None
+        p.restore()
 
     def fidget(self, kind: str):
         """Start an idle fidget: "yawn", "look" (round) or "tap" (a foot, to the beat)."""
@@ -1123,11 +1195,13 @@ class BunnyWidget(QWidget):
             dy = 1.8 * breath
             ears = 22 + 4 * breath
             mouth = 0.1 + 0.07 * max(0.0, breath)
-        return {"blink": blink, "mouth": mouth, "ears": ears, "dy": dy,
+        out = {"blink": blink, "mouth": mouth, "ears": ears, "dy": dy,
                 "dx": dx, "swing": swing, "shown": shown, "sad": self._sad,
                 "angry": self._angry, "sx": sx, "sy": sy, "angle": angle,
                 "alpha": alpha, "led": led, "prop": prop, "nod": nod, "dip": dip,
-                "smug": smug > 0.5, "intense": cross}
+                "smug": smug > 0.5, "intense": cross, "outfit": None}
+        self._kit = self._skit_frame(now)
+        return self._with_kit(out, self._kit) if self._kit is not None else out
 
     # ------------------------------------------------------------------ paint
     def paintEvent(self, ev):
@@ -1140,7 +1214,7 @@ class BunnyWidget(QWidget):
         # soft shadow on the "floor", shrinking as he rises
         lift = max(0.0, -pose["dy"])
         shade = QColor(0, 0, 0, round(max(20, 70 - int(lift * 6)) * pose["alpha"]))
-        sw = max(0.0, r.width() * (0.62 - lift * 0.012) * pose["sx"])
+        sw = max(0.0, r.width() * (0.62 - lift * 0.012) * abs(pose["sx"]))
         p.setPen(Qt.PenStyle.NoPen)
         p.setBrush(shade)
         if pose["shown"]:
@@ -1158,6 +1232,9 @@ class BunnyWidget(QWidget):
                 y = r.center().y() - 6 + math.sin(a) * (r.height() * 0.48)
                 sparkle(p, x, y, 3 + 4 * tw, QColor(col))
         body = r.translated(pose["dx"], pose["dy"])
+        kit = self._kit
+        if kit is not None:
+            self._paint_kit(p, r, kit.behind)
         self._paint_build(p, body, r, pose)
         if pose["shown"]:
             p.save()
@@ -1172,8 +1249,13 @@ class BunnyWidget(QWidget):
                        swing=pose["swing"], sad=pose["sad"],
                        angry=max(pose["angry"], pose["intense"]),
                        nightcap=self.asleep, robot=self.robot, led=pose["led"],
-                       nod=pose["nod"], dip=pose["dip"], smug=pose["smug"])
+                       nod=pose["nod"], dip=pose["dip"], smug=pose["smug"],
+                       outfit=pose["outfit"])
+            if kit is not None:
+                self._paint_kit(p, body, kit.front)
             p.restore()
+        if kit is not None:
+            self._paint_kit(p, r, kit.world)
         self._paint_screen(p, body, pose)
         if phase == "dash":   # (the cloud he dives into is in front of him)
             self._paint_scuffle(p)
@@ -1193,6 +1275,8 @@ class BunnyWidget(QWidget):
                 p.drawText(QPointF(x, y), "z" if k < 0.35 else "Z")
         for n in self.notes:
             paint_note(p, n)
+        if kit is not None and kit.flash > 0:   # (Flashbang's skit)
+            p.fillRect(self.rect(), QColor(255, 255, 255, round(215 * min(1.0, kit.flash))))
         p.end()
 
     def _speaker(self, p: QPainter, spot: QRectF, parts: int, at: float, thump: float = 0.0):
