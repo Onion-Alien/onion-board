@@ -462,6 +462,7 @@ def test_a_double_click_on_a_now_playing_chips_stop_stops_only_that_one(window):
 
 def test_the_mini_players_stop_all_says_all(window):
     assert window.mini_stop.text() == "All" and window.mini_st.text() == ""
+    assert window.mini_stop.accessibleName() == "Stop all"   # a screen reader says it all
 
 
 def test_the_mini_players_stop_all_is_whole_at_the_smallest_size(window):

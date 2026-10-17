@@ -262,6 +262,10 @@ def set_alerts(mw: MainWindow, params: dict) -> tuple[int, object]:
         return 200, alerts_answer(mw)
     rules = alert_rules(mw)
     have = rules.get(kind, [])
+    if not any(k in params for k in ("sound", "category", "say", "voice", "voice_seconds",
+                                      "on", "clear")):
+        # ?type=raid alone (or with &min=): that type's rules read back, nothing changed
+        return 200, {**alerts_answer(mw), "type": kind, "rules": have}
     low = _number(params.get("min") or "0", 0, 1e9) or 0.0
     if (params.get("clear") or "").strip() not in ("", "0"):
         rules[kind] = ([r for r in have if float(r.get("min") or 0) != low]
@@ -736,6 +740,8 @@ def pick_rule(rules: list[dict], amount: float | None) -> dict | None:
 def event(mw: MainWindow, params: dict) -> tuple[int, object]:
     test = (params.get("test") or "").strip() not in ("", "0")
     ev = normalize(params)
+    if not ev["type"] and test:
+        ev = {**ev, "type": "follow"}   # ?test=1 alone: a test follow
     if not ev["type"]:
         return 400, {"error": "say what happened: ?type=follow / sub / cheer / raid / "
                               "donation / redeem / gift …", "types": list(TYPES)}

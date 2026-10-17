@@ -93,7 +93,7 @@ Types: `follow`, `sub`, `resub`, `gift_sub`, `cheer`, `raid`, `donation`, `redee
 `gift`, `like`, `share`, `hype_train`, or a name of your own. Other tools' names are
 understood too (`tip`, `bits`, `subscriber`, `channel.follow`, `kofi`, `superchat`…). An
 `id` that came before is skipped, so an alert sent twice plays once. `test=1` fills in a
-test viewer.
+test viewer (and is a follow when there's no `type=`).
 
 What each type does is set once with `/api/alerts`:
 
@@ -108,7 +108,8 @@ What each type does is set once with `/api/alerts`:
 (`{user}`, `{amount}`, `{currency}`, `{message}`, `{reward}`, `{months}`, `{count}`,
 `{tier}`), `voice=` turns a voice on for `voice_seconds`. With `min=` the rule only
 counts from that amount up; the highest one reached is used. `clear=1` removes a rule,
-`on=0` switches every alert off. A request can also say it all itself
+`on=0` switches every alert off. `/api/alerts` alone lists every rule; `?type=raid` alone
+lists that type's rules (an empty list when it has none). A request can also say it all itself
 (`/api/event?type=raid&sound=Airhorn`), which needs nothing set.
 
 Viewer text that's spoken goes through the chat rules' blocked words, links and length.
