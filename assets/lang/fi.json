@@ -3745,5 +3745,13 @@
   "You're hearing it without its AI voice: get AI voices (Voice tab → AI voices) to hear all of it.": "Kuulet sen ilman sen AI-ääntä: hae AI-äänet (Ääni-välilehti → AI äänet), niin kuulet kaiken.",
   "Show as a list": "Näytä luettelona",
   "Show as cards": "Näytä kortteina",
-  "Sort the pads: my order, A–Z, newest, most played": "Lajittele painikkeet: oma järjestys, A–Ö, uusimmat, soitetuimmat"
+  "Sort the pads: my order, A–Z, newest, most played": "Lajittele painikkeet: oma järjestys, A–Ö, uusimmat, soitetuimmat",
+  "Couldn't put “{name}” into {language}: {why}": "Kohdetta \"{name}\" ei saatu kielelle {language}: {why}",
+  "Couldn't start translating: {why}": "Käännöstä ei saatu käyntiin: {why}",
+  "Couldn't translate: {why}": "Kääntäminen ei onnistunut: {why}",
+  "Putting “{name}” into {language}… {pct}%": "Muutetaan \"{name}\" kielelle {language}… {pct} %",
+  "“{name}” speaks {language}, so this may take a while. Each sound is put into {language} first, in the background, and plays when it's ready.": "\"{name}\" puhuu kieltä {language}, joten tämä voi kestää hetken. Jokainen ääni muutetaan ensin taustalla kielelle {language}, ja se soi, kun se on valmis.",
+  "“{name}” speaks {language}, so this may take a while. The radio goes quiet while the translation starts, then you hear it in {language}, a few seconds behind.": "\"{name}\" puhuu kieltä {language}, joten tämä voi kestää hetken. Radio hiljenee, kun käännös käynnistyy, ja sitten kuulet sen kielellä {language} muutaman sekunnin jäljessä.",
+  "“{name}” speaks {language}, so this may take a while. Your programs go quiet while the translation starts, then you hear them in {language}, a few seconds behind.": "\"{name}\" puhuu kieltä {language}, joten tämä voi kestää hetken. Ohjelmasi hiljenevät, kun käännös käynnistyy, ja sitten kuulet ne kielellä {language} muutaman sekunnin jäljessä.",
+  "“{name}” speaks {language}, which needs speech recognition and the {language} download (Voice tab, Speak another language). The rest of it is on.": "\"{name}\" puhuu kieltä {language}, mihin tarvitaan puheentunnistus ja kielen {language} lataus (Puhe-välilehti, Puhu toista kieltä). Muu osa siitä on päällä."
 }

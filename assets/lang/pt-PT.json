@@ -3745,5 +3745,13 @@
   "You're hearing it without its AI voice: get AI voices (Voice tab → AI voices) to hear all of it.": "Estás a ouvi-la sem a voz de IA: instala as vozes de IA (separador Voz → Vozes de IA) para ouvir tudo.",
   "Show as a list": "Mostrar como lista",
   "Show as cards": "Mostrar como cartões",
-  "Sort the pads: my order, A–Z, newest, most played": "Ordenar os pads: a minha ordem, A–Z, mais recentes, mais tocados"
+  "Sort the pads: my order, A–Z, newest, most played": "Ordenar os pads: a minha ordem, A–Z, mais recentes, mais tocados",
+  "Couldn't put “{name}” into {language}: {why}": "Não foi possível passar “{name}” para {language}: {why}",
+  "Couldn't start translating: {why}": "Não foi possível iniciar a tradução: {why}",
+  "Couldn't translate: {why}": "Não foi possível traduzir: {why}",
+  "Putting “{name}” into {language}… {pct}%": "A passar “{name}” para {language}… {pct}%",
+  "“{name}” speaks {language}, so this may take a while. Each sound is put into {language} first, in the background, and plays when it's ready.": "“{name}” fala {language}, por isso pode demorar um pouco. Cada som é primeiro passado para {language}, em segundo plano, e toca quando estiver pronto.",
+  "“{name}” speaks {language}, so this may take a while. The radio goes quiet while the translation starts, then you hear it in {language}, a few seconds behind.": "“{name}” fala {language}, por isso pode demorar um pouco. O rádio fica em silêncio enquanto a tradução arranca, depois ouve-o em {language}, alguns segundos atrasado.",
+  "“{name}” speaks {language}, so this may take a while. Your programs go quiet while the translation starts, then you hear them in {language}, a few seconds behind.": "“{name}” fala {language}, por isso pode demorar um pouco. Os seus programas ficam em silêncio enquanto a tradução arranca, depois ouve-os em {language}, alguns segundos atrasados.",
+  "“{name}” speaks {language}, which needs speech recognition and the {language} download (Voice tab, Speak another language). The rest of it is on.": "“{name}” fala {language}, o que precisa do reconhecimento de voz e da transferência de {language} (separador Voz, Fale outra língua). O resto está ligado."
 }

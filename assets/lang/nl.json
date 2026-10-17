@@ -3745,5 +3745,13 @@
   "You're hearing it without its AI voice: get AI voices (Voice tab → AI voices) to hear all of it.": "Je hoort hem zonder zijn AI-stem: haal AI-stemmen (tab Stem → AI-stemmen) om alles te horen.",
   "Show as a list": "Als lijst tonen",
   "Show as cards": "Als kaarten tonen",
-  "Sort the pads: my order, A–Z, newest, most played": "Pads sorteren: mijn volgorde, A–Z, nieuwste, meest afgespeeld"
+  "Sort the pads: my order, A–Z, newest, most played": "Pads sorteren: mijn volgorde, A–Z, nieuwste, meest afgespeeld",
+  "Couldn't put “{name}” into {language}: {why}": "Kon “{name}” niet in het {language} zetten: {why}",
+  "Couldn't start translating: {why}": "Kon de vertaling niet starten: {why}",
+  "Couldn't translate: {why}": "Kon niet vertalen: {why}",
+  "Putting “{name}” into {language}… {pct}%": "“{name}” wordt in het {language} gezet… {pct}%",
+  "“{name}” speaks {language}, so this may take a while. Each sound is put into {language} first, in the background, and plays when it's ready.": "“{name}” spreekt {language}, dus dit kan even duren. Elk geluid wordt eerst op de achtergrond in het {language} gezet en speelt zodra het klaar is.",
+  "“{name}” speaks {language}, so this may take a while. The radio goes quiet while the translation starts, then you hear it in {language}, a few seconds behind.": "“{name}” spreekt {language}, dus dit kan even duren. De radio wordt stil terwijl de vertaling start, daarna hoor je hem in het {language}, een paar seconden later.",
+  "“{name}” speaks {language}, so this may take a while. Your programs go quiet while the translation starts, then you hear them in {language}, a few seconds behind.": "“{name}” spreekt {language}, dus dit kan even duren. Je programma's worden stil terwijl de vertaling start, daarna hoor je ze in het {language}, een paar seconden later.",
+  "“{name}” speaks {language}, which needs speech recognition and the {language} download (Voice tab, Speak another language). The rest of it is on.": "“{name}” spreekt {language}, en daarvoor zijn spraakherkenning en de download voor {language} nodig (tabblad Stem, Spreek een andere taal). De rest staat aan."
 }

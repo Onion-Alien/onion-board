@@ -3667,5 +3667,13 @@
   "You're hearing it without its AI voice: get AI voices (Voice tab → AI voices) to hear all of it.": "AI 목소리 없이 듣고 있어요: 전부 들으려면 AI 목소리를 받으세요(보이스 탭 → AI 목소리).",
   "Show as a list": "목록으로 보기",
   "Show as cards": "카드로 보기",
-  "Sort the pads: my order, A–Z, newest, most played": "패드 정렬: 내 순서, A–Z, 최신순, 많이 재생한 순"
+  "Sort the pads: my order, A–Z, newest, most played": "패드 정렬: 내 순서, A–Z, 최신순, 많이 재생한 순",
+  "Couldn't put “{name}” into {language}: {why}": "“{name}”을(를) {language}(으)로 바꾸지 못했어요: {why}",
+  "Couldn't start translating: {why}": "번역을 시작하지 못했어요: {why}",
+  "Couldn't translate: {why}": "번역하지 못했어요: {why}",
+  "Putting “{name}” into {language}… {pct}%": "“{name}”을(를) {language}(으)로 바꾸는 중… {pct}%",
+  "“{name}” speaks {language}, so this may take a while. Each sound is put into {language} first, in the background, and plays when it's ready.": "“{name}”은(는) {language}을(를) 말해서 시간이 좀 걸릴 수 있어요. 각 사운드는 먼저 백그라운드에서 {language}(으)로 바뀌고, 준비되면 재생돼요.",
+  "“{name}” speaks {language}, so this may take a while. The radio goes quiet while the translation starts, then you hear it in {language}, a few seconds behind.": "“{name}”은(는) {language}을(를) 말해서 시간이 좀 걸릴 수 있어요. 번역이 시작되는 동안 라디오가 조용해지고, 그다음 몇 초 늦게 {language}(으)로 들려요.",
+  "“{name}” speaks {language}, so this may take a while. Your programs go quiet while the translation starts, then you hear them in {language}, a few seconds behind.": "“{name}”은(는) {language}을(를) 말해서 시간이 좀 걸릴 수 있어요. 번역이 시작되는 동안 프로그램이 조용해지고, 그다음 몇 초 늦게 {language}(으)로 들려요.",
+  "“{name}” speaks {language}, which needs speech recognition and the {language} download (Voice tab, Speak another language). The rest of it is on.": "“{name}”은(는) {language}을(를) 말하는데, 그러려면 음성 인식과 {language} 다운로드가 필요해요(음성 탭, 다른 언어로 말해보세요). 나머지는 켜져 있어요."
 }

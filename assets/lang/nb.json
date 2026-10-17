@@ -3745,5 +3745,13 @@
   "You're hearing it without its AI voice: get AI voices (Voice tab → AI voices) to hear all of it.": "Du hører den uten AI-stemmen: hent AI-stemmer (fanen Stemme → AI-stemmer) for å høre alt.",
   "Show as a list": "Vis som liste",
   "Show as cards": "Vis som kort",
-  "Sort the pads: my order, A–Z, newest, most played": "Sorter knappene: min rekkefølge, A–Å, nyeste, mest spilt"
+  "Sort the pads: my order, A–Z, newest, most played": "Sorter knappene: min rekkefølge, A–Å, nyeste, mest spilt",
+  "Couldn't put “{name}” into {language}: {why}": "Kunne ikke gjøre «{name}» om til {language}: {why}",
+  "Couldn't start translating: {why}": "Kunne ikke starte oversettelsen: {why}",
+  "Couldn't translate: {why}": "Kunne ikke oversette: {why}",
+  "Putting “{name}” into {language}… {pct}%": "Gjør «{name}» om til {language}… {pct} %",
+  "“{name}” speaks {language}, so this may take a while. Each sound is put into {language} first, in the background, and plays when it's ready.": "«{name}» snakker {language}, så dette kan ta litt tid. Hver lyd gjøres først om til {language} i bakgrunnen, og spilles når den er klar.",
+  "“{name}” speaks {language}, so this may take a while. The radio goes quiet while the translation starts, then you hear it in {language}, a few seconds behind.": "«{name}» snakker {language}, så dette kan ta litt tid. Radioen blir stille mens oversettelsen starter, så hører du den på {language}, noen sekunder forsinket.",
+  "“{name}” speaks {language}, so this may take a while. Your programs go quiet while the translation starts, then you hear them in {language}, a few seconds behind.": "«{name}» snakker {language}, så dette kan ta litt tid. Programmene dine blir stille mens oversettelsen starter, så hører du dem på {language}, noen sekunder forsinket.",
+  "“{name}” speaks {language}, which needs speech recognition and the {language} download (Voice tab, Speak another language). The rest of it is on.": "«{name}» snakker {language}, og det krever talegjenkjenning og nedlastingen for {language} (fanen Stemme, Snakk et annet språk). Resten av den er på."
 }

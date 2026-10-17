@@ -3745,5 +3745,13 @@
   "You're hearing it without its AI voice: get AI voices (Voice tab → AI voices) to hear all of it.": "Чуваш го без неговия AI глас: вземи AI гласовете (раздел Глас → AI гласове), за да го чуеш целия.",
   "Show as a list": "Покажи като списък",
   "Show as cards": "Покажи като карти",
-  "Sort the pads: my order, A–Z, newest, most played": "Подреди бутоните: моят ред, A–Z, най-нови, най-пускани"
+  "Sort the pads: my order, A–Z, newest, most played": "Подреди бутоните: моят ред, A–Z, най-нови, най-пускани",
+  "Couldn't put “{name}” into {language}: {why}": "„{name}“ не можа да се преведе на {language}: {why}",
+  "Couldn't start translating: {why}": "Преводът не можа да започне: {why}",
+  "Couldn't translate: {why}": "Не можа да се преведе: {why}",
+  "Putting “{name}” into {language}… {pct}%": "„{name}“ се превежда на {language}… {pct}%",
+  "“{name}” speaks {language}, so this may take a while. Each sound is put into {language} first, in the background, and plays when it's ready.": "„{name}“ говори на {language}, така че това може да отнеме време. Всеки звук първо се превежда на {language} във фонов режим и се пуска, когато е готов.",
+  "“{name}” speaks {language}, so this may take a while. The radio goes quiet while the translation starts, then you hear it in {language}, a few seconds behind.": "„{name}“ говори на {language}, така че това може да отнеме време. Радиото замлъква, докато преводът започне, после го чуваш на {language}, с няколко секунди закъснение.",
+  "“{name}” speaks {language}, so this may take a while. Your programs go quiet while the translation starts, then you hear them in {language}, a few seconds behind.": "„{name}“ говори на {language}, така че това може да отнеме време. Програмите ти замлъкват, докато преводът започне, после ги чуваш на {language}, с няколко секунди закъснение.",
+  "“{name}” speaks {language}, which needs speech recognition and the {language} download (Voice tab, Speak another language). The rest of it is on.": "„{name}“ говори на {language}, а за това трябват разпознаване на реч и изтеглянето за {language} (раздел Глас, Говорете друг език). Останалото от него е включено."
 }

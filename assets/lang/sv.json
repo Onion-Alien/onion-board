@@ -3745,5 +3745,13 @@
   "You're hearing it without its AI voice: get AI voices (Voice tab → AI voices) to hear all of it.": "Du hör den utan dess AI-röst: skaffa AI-röster (fliken Röst → AI-röster) för att höra allt.",
   "Show as a list": "Visa som lista",
   "Show as cards": "Visa som kort",
-  "Sort the pads: my order, A–Z, newest, most played": "Sortera knapparna: min ordning, A–Ö, nyaste, mest spelade"
+  "Sort the pads: my order, A–Z, newest, most played": "Sortera knapparna: min ordning, A–Ö, nyaste, mest spelade",
+  "Couldn't put “{name}” into {language}: {why}": "Kunde inte göra om ”{name}” till {language}: {why}",
+  "Couldn't start translating: {why}": "Kunde inte starta översättningen: {why}",
+  "Couldn't translate: {why}": "Kunde inte översätta: {why}",
+  "Putting “{name}” into {language}… {pct}%": "Gör om ”{name}” till {language}… {pct} %",
+  "“{name}” speaks {language}, so this may take a while. Each sound is put into {language} first, in the background, and plays when it's ready.": "”{name}” talar {language}, så det här kan ta en stund. Varje ljud görs först om till {language} i bakgrunden och spelas när det är klart.",
+  "“{name}” speaks {language}, so this may take a while. The radio goes quiet while the translation starts, then you hear it in {language}, a few seconds behind.": "”{name}” talar {language}, så det här kan ta en stund. Radion blir tyst medan översättningen startar, sedan hör du den på {language}, några sekunder efter.",
+  "“{name}” speaks {language}, so this may take a while. Your programs go quiet while the translation starts, then you hear them in {language}, a few seconds behind.": "”{name}” talar {language}, så det här kan ta en stund. Dina program blir tysta medan översättningen startar, sedan hör du dem på {language}, några sekunder efter.",
+  "“{name}” speaks {language}, which needs speech recognition and the {language} download (Voice tab, Speak another language). The rest of it is on.": "”{name}” talar {language}, och det kräver taligenkänning och nedladdningen för {language} (fliken Röst, Tala ett annat språk). Resten av den är på."
 }

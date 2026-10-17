@@ -3745,5 +3745,13 @@
   "You're hearing it without its AI voice: get AI voices (Voice tab → AI voices) to hear all of it.": "Onu yapay zeka sesi olmadan duyuyorsun: hepsini duymak için yapay zeka seslerini al (Ses sekmesi → Yapay zeka sesleri).",
   "Show as a list": "Liste olarak göster",
   "Show as cards": "Kart olarak göster",
-  "Sort the pads: my order, A–Z, newest, most played": "Pad'leri sırala: benim sıram, A–Z, en yeni, en çok çalınan"
+  "Sort the pads: my order, A–Z, newest, most played": "Pad'leri sırala: benim sıram, A–Z, en yeni, en çok çalınan",
+  "Couldn't put “{name}” into {language}: {why}": "“{name}” {language} diline çevrilemedi: {why}",
+  "Couldn't start translating: {why}": "Çeviri başlatılamadı: {why}",
+  "Couldn't translate: {why}": "Çevrilemedi: {why}",
+  "Putting “{name}” into {language}… {pct}%": "“{name}” {language} diline çevriliyor… %{pct}",
+  "“{name}” speaks {language}, so this may take a while. Each sound is put into {language} first, in the background, and plays when it's ready.": "“{name}” {language} konuşuyor, bu yüzden bu biraz sürebilir. Her ses önce arka planda {language} diline çevrilir ve hazır olunca çalar.",
+  "“{name}” speaks {language}, so this may take a while. The radio goes quiet while the translation starts, then you hear it in {language}, a few seconds behind.": "“{name}” {language} konuşuyor, bu yüzden bu biraz sürebilir. Çeviri başlarken radyo susar, sonra onu birkaç saniye geriden {language} dilinde duyarsın.",
+  "“{name}” speaks {language}, so this may take a while. Your programs go quiet while the translation starts, then you hear them in {language}, a few seconds behind.": "“{name}” {language} konuşuyor, bu yüzden bu biraz sürebilir. Çeviri başlarken programların susar, sonra onları birkaç saniye geriden {language} dilinde duyarsın.",
+  "“{name}” speaks {language}, which needs speech recognition and the {language} download (Voice tab, Speak another language). The rest of it is on.": "“{name}” {language} konuşuyor; bunun için konuşma tanıma ve {language} indirmesi gerekir (Ses sekmesi, Başka bir dil konuşun). Geri kalanı açık."
 }

@@ -3667,5 +3667,13 @@
   "You're hearing it without its AI voice: get AI voices (Voice tab → AI voices) to hear all of it.": "Bạn đang nghe nó mà không có giọng nói AI: hãy tải giọng nói AI (thẻ Giọng nói → Giọng nói AI) để nghe đầy đủ.",
   "Show as a list": "Hiện dạng danh sách",
   "Show as cards": "Hiện dạng thẻ",
-  "Sort the pads: my order, A–Z, newest, most played": "Sắp xếp nút: thứ tự của tôi, A–Z, mới nhất, phát nhiều nhất"
+  "Sort the pads: my order, A–Z, newest, most played": "Sắp xếp nút: thứ tự của tôi, A–Z, mới nhất, phát nhiều nhất",
+  "Couldn't put “{name}” into {language}: {why}": "Không thể chuyển “{name}” sang {language}: {why}",
+  "Couldn't start translating: {why}": "Không thể bắt đầu dịch: {why}",
+  "Couldn't translate: {why}": "Không thể dịch: {why}",
+  "Putting “{name}” into {language}… {pct}%": "Đang chuyển “{name}” sang {language}… {pct}%",
+  "“{name}” speaks {language}, so this may take a while. Each sound is put into {language} first, in the background, and plays when it's ready.": "“{name}” nói {language}, nên việc này có thể mất một lúc. Mỗi âm thanh được chuyển sang {language} trước, trong nền, và phát khi đã xong.",
+  "“{name}” speaks {language}, so this may take a while. The radio goes quiet while the translation starts, then you hear it in {language}, a few seconds behind.": "“{name}” nói {language}, nên việc này có thể mất một lúc. Radio im lặng trong lúc bắt đầu dịch, rồi bạn nghe nó bằng {language}, chậm vài giây.",
+  "“{name}” speaks {language}, so this may take a while. Your programs go quiet while the translation starts, then you hear them in {language}, a few seconds behind.": "“{name}” nói {language}, nên việc này có thể mất một lúc. Các chương trình của bạn im lặng trong lúc bắt đầu dịch, rồi bạn nghe chúng bằng {language}, chậm vài giây.",
+  "“{name}” speaks {language}, which needs speech recognition and the {language} download (Voice tab, Speak another language). The rest of it is on.": "“{name}” nói {language}, việc này cần nhận dạng giọng nói và bản tải {language} (thẻ Giọng nói, Nói ngôn ngữ khác). Phần còn lại đang bật."
 }

@@ -3745,5 +3745,13 @@
   "You're hearing it without its AI voice: get AI voices (Voice tab → AI voices) to hear all of it.": "Naririnig mo ito nang wala ang boses ng AI nito: kunin ang mga boses ng AI (Voice tab → Mga boses ng AI) para marinig lahat.",
   "Show as a list": "Ipakita bilang listahan",
   "Show as cards": "Ipakita bilang cards",
-  "Sort the pads: my order, A–Z, newest, most played": "Ayusin ang pads: aking ayos, A–Z, pinakabago, pinakamadalas i-play"
+  "Sort the pads: my order, A–Z, newest, most played": "Ayusin ang pads: aking ayos, A–Z, pinakabago, pinakamadalas i-play",
+  "Couldn't put “{name}” into {language}: {why}": "Hindi naisalin ang “{name}” sa {language}: {why}",
+  "Couldn't start translating: {why}": "Hindi nasimulan ang pagsasalin: {why}",
+  "Couldn't translate: {why}": "Hindi naisalin: {why}",
+  "Putting “{name}” into {language}… {pct}%": "Isinasalin ang “{name}” sa {language}… {pct}%",
+  "“{name}” speaks {language}, so this may take a while. Each sound is put into {language} first, in the background, and plays when it's ready.": "Nagsasalita ng {language} ang “{name}”, kaya baka matagalan ito. Isinasalin muna sa {language} ang bawat tunog, sa background, at tutugtog kapag handa na.",
+  "“{name}” speaks {language}, so this may take a while. The radio goes quiet while the translation starts, then you hear it in {language}, a few seconds behind.": "Nagsasalita ng {language} ang “{name}”, kaya baka matagalan ito. Tatahimik ang radyo habang nagsisimula ang pagsasalin, tapos maririnig mo ito sa {language}, ilang segundong huli.",
+  "“{name}” speaks {language}, so this may take a while. Your programs go quiet while the translation starts, then you hear them in {language}, a few seconds behind.": "Nagsasalita ng {language} ang “{name}”, kaya baka matagalan ito. Tatahimik ang mga program mo habang nagsisimula ang pagsasalin, tapos maririnig mo sila sa {language}, ilang segundong huli.",
+  "“{name}” speaks {language}, which needs speech recognition and the {language} download (Voice tab, Speak another language). The rest of it is on.": "Nagsasalita ng {language} ang “{name}”, na kailangan ng speech recognition at ng download ng {language} (Voice tab, Magsalita ng ibang wika). Naka-on ang iba pa nito."
 }
