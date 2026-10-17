@@ -36,6 +36,7 @@ class EditControl(Controller):
         super().__init__(mw)
         self._editors: dict[str, EditDialog] = {}
         self._render_gen: dict[str, int] = {}   # sid -> newest effects render (_rerender)
+        self._setup_store = None   # voicesetups.Store, read the first time the picker opens
 
     def edit(self, sid, tab: str = "sound"):
         """Edit sound beside the board, not over it: sounds, hotkeys and the other
@@ -105,24 +106,63 @@ class EditControl(Controller):
     def _new_editor(self, m: SoundMeta, tab: str) -> EditDialog:
         mw = self.mw
         d = EditDialog(m, mw.hotkeys, mw.playctl.preview, mw, tab=tab,
-                       others=lambda: list(mw._meta.values()), voices=self.voice_choices)
+                       others=lambda: list(mw._meta.values()), pick_voice=self.pick_voice)
         d.hotkeys_changed.connect(mw.hkctl.register_hotkeys)
         d.source_forgotten.connect(mw._save_now)
         d.finished.connect(lambda ok, d=d: self._edit_done(d.meta.id, d, ok))
         return d
 
-    def voice_choices(self) -> list[tuple[str, str, dict]]:
-        """The voices a sound can be said in (Edit sound → Effects → Voice): the voice
-        changer's own, then the ones saved on the Voice tab (while it's switched on)."""
-        out = [(n, voicefx.shown(n), {t: {"on": True, **cfg} for t, cfg in fx.items()})
-               for n, fx in voicefx.PRESETS.items()]
+    def voice_catalog(self):
+        """What the voice picker shows (ui.voicepicker.Catalog): the voice changer's
+        voices and your saved ones, the AI voices (when that add-on is set up), your
+        setups, and the Voice tab's Favorites (a star here is a star there)."""
+        from soundboard.speech import soundvoice
+        from soundboard.ui import art
+        from soundboard.ui.voicepicker import Catalog
         mw = self.mw
-        if mw.tabctl.tab_on("voice"):
-            store = getattr(getattr(mw.voice, "fx", None), "store", None)
-            for name, effects in (store.voices.items() if store is not None else ()):
-                if name not in voicefx.PRESETS:
-                    out.append((name, name, dict(effects)))
-        return out
+        cat = Catalog()
+        cat.fx = [(n, voicefx.shown(n), {t: {"on": True, **c} for t, c in fx.items()},
+                   art.icon(art.voice_key(n)), False) for n, fx in voicefx.PRESETS.items()]
+        tab = mw.voice if mw.tabctl.tab_on("voice") else None
+        fxp = getattr(tab, "fx", None)
+        if fxp is not None:
+            cat.fx += [(n, n, dict(e), None, True) for n, e in fxp.store.voices.items()
+                       if n not in voicefx.PRESETS]
+            cat.fx_favs = list(fxp.favorites)
+            cat.star_fx = fxp.set_favorite
+        ai = getattr(tab, "ai", None)
+        mod = getattr(ai, "module", None)
+        if ai is not None and mod is not None:
+            cat.ai = list(ai.voices)
+            cat.ai_ready = mod.installed and all((mod.path / "model" / f).is_file()
+                                                 for f in soundvoice.MODEL_FILES)
+            cat.ai_favs = list(getattr(ai, "_favs", []))
+            cat.star_ai = ai.set_favorite
+        from soundboard import voicesetups
+        cat.setups = [(n, voicesetups.sound_voice(s)) for n, s in self._setups().setups.items()
+                      if voicesetups.sound_voice(s)]   # (a language alone: not for sounds yet)
+        return cat
+
+    def _setups(self):
+        """The voice setups: the Voice tab's own (one Store, so both stay in step), else
+        read here the first time."""
+        mw = self.mw
+        if mw.tabctl.tab_on("voice") and getattr(mw.voice, "setups", None) is not None:
+            return mw.voice.setups
+        if self._setup_store is None:
+            from soundboard import voicesetups
+            self._setup_store = voicesetups.Store()
+        return self._setup_store
+
+    def pick_voice(self, voice: dict, parent=None) -> dict | None:
+        """Edit sound → Effects → Voice: the picker on `voice`; the new voice, or None."""
+        from soundboard.ui.voicepicker import VoicePicker
+        d = VoicePicker(self.voice_catalog(), voice,
+                        lambda name, v: self._setups().put(name, v), parent)
+        try:
+            return d.voice if d.exec() else None
+        finally:
+            d.deleteLater()
 
     def _close_editors(self, sids):
         """The sounds are going: their open Edit sound windows close, unsaved (the

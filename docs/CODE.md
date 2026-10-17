@@ -249,6 +249,8 @@ the launcher the shortcuts and PyInstaller use. The app is the `soundboard` pack
 | `soundboard/ui/overlay.py` | the in-game overlay: a panel of pads that never takes focus, driven by number keys or clicks, on a chosen monitor and spot (or wherever it was dragged) |
 | `soundboard/ui/voicepanel.py` | the Voice tab: lays out its cards and bottom bar, the add-ons list |
 | `soundboard/ui/voicefxpanel.py` | the Voice tab's voice changer card: voice tiles, effect rows and their sliders |
+| `soundboard/ui/voicepicker.py` | Edit sound → Effects → Voice: picture cards of the voice changer's voices, the AI voices and your setups, to lay a voice over a sound |
+| `soundboard/ui/voicesetupsbar.py` | the Voice tab's My setups row: save what's on, turn a setup back on, delete with Undo |
 | `soundboard/ui/speechpanel.py` | the Voice tab's Languages card: text-to-speech, live voice-to-speech, translation |
 | `soundboard/ui/livevoice.py` | the Languages card's live voice: Start, translating for the AI voice or voice changer, the helper's events |
 | `soundboard/ui/speechinstall.py` | the Languages card's downloads and installs: Windows voices, translation models, speech recognition |
@@ -260,6 +262,7 @@ the launcher the shortcuts and PyInstaller use. The app is the `soundboard` pack
 | `soundboard/firewall.py` | Windows Firewall rules for remote add-ons: Onion Board runs itself as admin (`--firewall-rule NAME PORT`, handled in `main.py`) so Windows' prompt names it |
 | `soundboard/aiaddon.py` | the optional AI voices add-on: its `ai-voices` GitHub release, downloading and checking it, installing and removing it (`ONIONBOARD_AI_VOICES_ZIP` uses a local zip instead). Not shipped with the app or its installer |
 | `soundboard/speech/aivoice.py` | AI voices in the mic chain: `VoiceSource` (`VoiceChain.source`: talk gate with pre-roll, jitter buffer, the backup voice if the helper stalls) and `AiVoiceController` (starts the helper: a `ServiceHost` with audio coming back) |
+| `soundboard/speech/soundvoice.py` | a sound said in an AI voice: runs the clip once through the AI voices helper (off the UI thread) and lines it back up |
 | `soundboard/ui/aivoicepanel.py` | the Voice tab's AI voices card: *Get AI voices*, install, voice cards (chips, Favorites, your own voices), pitch, start/stop, CPU readout, remove |
 | `soundboard/ui/aivoicebrowser.py` | the AI voices card's *Hear it* samples and the *Make your own voice* editor (blend two voices, deeper/brighter, how high) |
 | `soundboard/speech/aivoicelist.py` | the AI voices to pick from: the built-in list (same as the add-on's `voices.json`), writing it and your own voices into the installed add-on (`sync`, so old downloads get new voices), and your own voices' file and bin (`%APPDATA%\OnionBoard\ai-voices.json`) |
@@ -273,6 +276,7 @@ the launcher the shortcuts and PyInstaller use. The app is the `soundboard` pack
 | `soundboard/videos.py` | which pads came from a video (an imported video file, or a link added with *Also save the video*), in `videos.json` beside the config; `ui/videowindow.py` is the player's **Video** window, muted and kept in step with the pad's sound |
 | `soundboard/ui/videowindow.py` | the player's *Video* window: a video pad's picture, following the pad's own audio (play, pause, seek, speed) |
 | `soundboard/savedvoices.py` | the voice changer's saved voices and their bin, in `%APPDATA%\OnionBoard\voices.json` (not the config, so older versions can't drop them), and their share codes (`OB1-…`: name + effect numbers, checked and clamped on import) |
+| `soundboard/voicesetups.py` | voice setups (a voice changer voice, an AI voice and a language under one name), in `%APPDATA%\OnionBoard\voice-setups.json` |
 | `soundboard/trash.py` | Recently deleted: removed sounds (files and pad) and forgotten programs, kept 30 days in `%APPDATA%\OnionBoard\deleted` so they can be brought back |
 | `soundboard/reset.py` | Settings → General → Reset: puts the parts picked (settings, hotkeys, sounds, the bin, programs, devices) back to the start at the next launch, after saving a restore point in `%APPDATA%\OnionBoard\restore-points` that undoes it |
 | `soundboard/bunny.py` | Bun the mascot, drawn in code (setup guide and installer art) |

@@ -14,10 +14,13 @@ stays readable and new keys can be added without a migration:
      "end": 0.0,          seconds into the original where it ends; 0 = the very end
      "effects": {type: {"on": bool, param: value, ...}},   any voicefx effect,
                                                             modules' included
-     "voice": {"name": str, "effects": {...}}}   a voice changer voice, laid over the
-                                                 sound after its own effects (a copy:
-                                                 editing the saved voice later doesn't
-                                                 change the sound); {} = none
+     "voice": {"name": str,                     a voice laid over the sound, before
+               "fx": str, "effects": {...},      its own effects (a copy: editing the
+               "ai": {"id", "name", "pitch"}}}   saved voice later doesn't change the
+                                                 sound); {} = none. The AI voice part
+                                                 needs the AI voices add-on
+                                                 (speech.soundvoice); without it the
+                                                 sound plays without that part
 
 The trim is applied first, to the original, so the file itself is never cut and
 the trim can be moved or undone at any time.
@@ -61,20 +64,39 @@ def neutral() -> dict:
 
 MAX_VOICE_NAME = 60
 NOT_IN_VOICE = frozenset({"cleanup"})   # a mic's room noise clean-up: nothing to clean here
+AI_PITCH = (-12.0, 12.0)
+
+
+def _line(text, limit: int = MAX_VOICE_NAME) -> str:
+    return " ".join(str(text or "").split())[:limit]
 
 
 def clean_voice(raw) -> dict:
-    """{"name", "effects"} of a voice laid over a sound, only its effects that are on
-    (and known); {} if there's none left."""
-    if not isinstance(raw, dict) or not isinstance(raw.get("effects"), dict):
+    """{"name", "effects", "ai"} of a voice laid over a sound: only its effects that are
+    on (and known), the AI voice if one is picked; {} if there's nothing left."""
+    if not isinstance(raw, dict):
         return {}
-    spec = voicefx.clean_spec({"effects": raw["effects"]})["effects"]
+    spec = voicefx.clean_spec({"effects": raw.get("effects")})["effects"]
     effects = {t: cfg for t, cfg in spec.items()
                if cfg.get("on") and t in voicefx.REGISTRY and t not in NOT_IN_VOICE}
-    if not effects:
+    got = raw.get("ai")
+    ai: dict = got if isinstance(got, dict) else {}
+    ai_id = _line(ai.get("id"), 80)
+    out: dict = {}
+    if ai_id:
+        try:
+            pitch = float(ai.get("pitch", 0.0))
+        except (TypeError, ValueError):
+            pitch = 0.0
+        pitch = min(max(pitch, AI_PITCH[0]), AI_PITCH[1]) if math.isfinite(pitch) else 0.0
+        out["ai"] = {"id": ai_id, "name": _line(ai.get("name")) or ai_id, "pitch": pitch}
+    if effects:
+        out["effects"] = effects
+        if _line(raw.get("fx")):   # the voice changer voice they came from (its card)
+            out["fx"] = _line(raw.get("fx"))
+    if not out:
         return {}
-    name = " ".join(str(raw.get("name") or "").split())[:MAX_VOICE_NAME]
-    return {"name": name, "effects": effects}
+    return {"name": _line(raw.get("name")), "effects": effects, **out}
 
 
 def clean(fx: dict | None) -> dict:
@@ -118,15 +140,31 @@ def _active_effects(fx: dict) -> list[str]:
 
 
 def _chain(fx: dict) -> list[tuple[str, str, dict]]:
-    """(id, effect type, settings) of every effect to run, in order: the sound's own,
-    then its voice's (in the voice changer's order, as on the mic)."""
-    out = [(t, t, fx["effects"][t]) for t in _active_effects(fx)]
+    """(id, effect type, settings) of every effect to run, in order: the voice's (in the
+    voice changer's order, as on the mic), then the sound's own."""
+    out = []
     voice = fx.get("voice") or {}
     for t in voicefx.REGISTRY:
         cfg = voice.get("effects", {}).get(t)
         if cfg and cfg.get("on"):
             out.append(("voice:" + t, t, cfg))
-    return out
+    return out + [(t, t, fx["effects"][t]) for t in _active_effects(fx)]
+
+
+def _say(x: np.ndarray, voice: dict) -> np.ndarray:
+    """(n, 2) audio in the voice's AI voice (as float32, both channels the same: a
+    voice is mono). Unchanged if the AI voice can't be used here (logged)."""
+    ai = voice.get("ai")
+    if not ai or not len(x):
+        return x
+    from soundboard.speech import soundvoice
+    f = x.astype(F32) * F32(1 / 32767.0) if x.dtype == np.int16 else x.astype(F32)
+    try:
+        y = soundvoice.render(f.mean(axis=1), SR, ai["id"], ai.get("pitch", 0.0))
+    except soundvoice.Unavailable as e:
+        log.warning("AI voice %r left out of a sound: %s", ai.get("id"), e)
+        return x
+    return np.repeat(y[:, None], 2, axis=1)
 
 
 def is_trimmed(fx: dict | None) -> bool:
@@ -139,7 +177,7 @@ def is_neutral(fx: dict | None) -> bool:
     f = clean(fx)
     return (not is_trimmed(f) and abs(f["speed"] - 1) < 1e-3 and abs(f["pitch"]) < 1e-3
             and abs(f["gain_db"]) < 1e-3 and not f["reverse"]
-            and eq.design(f["eq"], SR) is None and not _chain(f))
+            and eq.design(f["eq"], SR) is None and not _chain(f) and not f["voice"])
 
 
 def key(fx: dict | None) -> str:
@@ -527,7 +565,7 @@ def _effects(pieces, fx: dict, skip: set):
 
 def _render_pieces(data: np.ndarray, f: dict, skip: set):
     """The rendered sound in float32 pieces, clipped, not reversed (f: cleaned)."""
-    x = trim(data, f)
+    x = _say(trim(data, f), f["voice"])
     pieces, _n = _speed_pitch(_pieces(x), len(x), f["speed"], f["pitch"], f["tape"])
     sos = eq.design(f["eq"], SR)
     if sos is not None:

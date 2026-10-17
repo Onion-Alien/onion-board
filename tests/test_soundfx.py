@@ -442,12 +442,13 @@ def test_a_voice_alone_changes_the_sound_and_is_named():
     assert np.all(np.isfinite(y)) and np.max(np.abs(y)) <= 1.0
 
 
-def test_a_voice_goes_on_top_of_the_sounds_own_effects():
-    """Its effects run after the sound's own: a voice with reverb doesn't replace the
-    sound's reverb, both are heard (they're separate instances)."""
+def test_a_voice_goes_under_the_sounds_own_effects():
+    """Its effects run before the sound's own (as on the mic, then nightcore and the
+    rest on top): a voice with reverb doesn't replace the sound's reverb, both are
+    heard (they're separate instances)."""
     own = {"effects": {"reverb": {"on": True, "size": 0.9, "tone": 3000, "mix": 0.5}}}
     both = {**own, "voice": {"name": "Robot", "effects": ROBOT}}
     ids = [kind for kind, _t, _c in soundfx._chain(soundfx.clean(both))]
-    assert ids == ["reverb", "voice:robot", "voice:reverb"]
+    assert ids == ["voice:robot", "voice:reverb", "reverb"]
     x = sine(330, 0.5)
     assert rms(soundfx.render(x, both)[:len(x)] - soundfx.render(x, own)[:len(x)]) > 0.01
