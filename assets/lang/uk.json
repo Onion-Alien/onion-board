@@ -3771,5 +3771,10 @@
   "Which voice": "Який голос",
   "You have the most AI voices of your own there can be: delete one first.": "У вас уже максимум власних ШІ голосів: спершу видаліть один.",
   "You have the most saved voices there can be: delete one first.": "У вас уже максимум збережених голосів: спершу видаліть один.",
-  "You're hearing it without its AI voice: get AI voices (Voice tab → AI voices) to hear all of it.": "Ви чуєте його без ШІ голосу: встановіть ШІ голоси (вкладка Голос → ШІ голоси), щоб почути все."
+  "You're hearing it without its AI voice: get AI voices (Voice tab → AI voices) to hear all of it.": "Ви чуєте його без ШІ голосу: встановіть ШІ голоси (вкладка Голос → ШІ голоси), щоб почути все.",
+  "Couldn't put the AI voice on “{name}”: {why}": "Не вдалося накласти ШІ-голос на «{name}»: {why}",
+  "Couldn't start the AI voice: {why}": "Не вдалося запустити ШІ-голос: {why}",
+  "Getting the AI voice ready…": "Готую ШІ-голос…",
+  "Putting the AI voice on “{name}”… {pct}%": "Накладаю ШІ-голос на «{name}»… {pct}%",
+  "The AI voices add-on isn't installed, so only the voice changer part of “{name}” is on.": "Доповнення з ШІ-голосами не встановлено, тож із «{name}» увімкнено лише зміну голосу."
 }

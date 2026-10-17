@@ -3693,5 +3693,10 @@
   "Which voice": "Mikä ääni",
   "You have the most AI voices of your own there can be: delete one first.": "Sinulla on jo enimmäismäärä omia AI-ääniä: poista ensin yksi.",
   "You have the most saved voices there can be: delete one first.": "Sinulla on jo enimmäismäärä tallennettuja ääniä: poista ensin yksi.",
-  "You're hearing it without its AI voice: get AI voices (Voice tab → AI voices) to hear all of it.": "Kuulet sen ilman sen AI-ääntä: hae AI-äänet (Ääni-välilehti → AI äänet), niin kuulet kaiken."
+  "You're hearing it without its AI voice: get AI voices (Voice tab → AI voices) to hear all of it.": "Kuulet sen ilman sen AI-ääntä: hae AI-äänet (Ääni-välilehti → AI äänet), niin kuulet kaiken.",
+  "Couldn't put the AI voice on “{name}”: {why}": "AI-ääntä ei saatu lisättyä kohteeseen \"{name}\": {why}",
+  "Couldn't start the AI voice: {why}": "AI-ääni ei käynnistynyt: {why}",
+  "Getting the AI voice ready…": "AI-ääntä valmistellaan…",
+  "Putting the AI voice on “{name}”… {pct}%": "Lisätään AI-ääntä kohteeseen \"{name}\"… {pct} %",
+  "The AI voices add-on isn't installed, so only the voice changer part of “{name}” is on.": "AI-äänien lisäosaa ei ole asennettu, joten \"{name}\" on päällä vain äänenmuuttajan osalta."
 }

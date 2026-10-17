@@ -3615,5 +3615,10 @@
   "Which voice": "Suara yang mana",
   "You have the most AI voices of your own there can be: delete one first.": "Kamu sudah punya suara AI sendiri sebanyak mungkin: hapus satu dulu.",
   "You have the most saved voices there can be: delete one first.": "Kamu sudah punya suara tersimpan sebanyak mungkin: hapus satu dulu.",
-  "You're hearing it without its AI voice: get AI voices (Voice tab → AI voices) to hear all of it.": "Kamu mendengarnya tanpa suara AI-nya: ambil suara AI (tab Suara → suara AI) untuk mendengar semuanya."
+  "You're hearing it without its AI voice: get AI voices (Voice tab → AI voices) to hear all of it.": "Kamu mendengarnya tanpa suara AI-nya: ambil suara AI (tab Suara → suara AI) untuk mendengar semuanya.",
+  "Couldn't put the AI voice on “{name}”: {why}": "Tidak bisa memasang suara AI ke “{name}”: {why}",
+  "Couldn't start the AI voice: {why}": "Tidak bisa memulai suara AI: {why}",
+  "Getting the AI voice ready…": "Menyiapkan suara AI…",
+  "Putting the AI voice on “{name}”… {pct}%": "Memasang suara AI ke “{name}”… {pct}%",
+  "The AI voices add-on isn't installed, so only the voice changer part of “{name}” is on.": "Add-on suara AI belum terpasang, jadi hanya bagian pengubah suara dari “{name}” yang aktif."
 }

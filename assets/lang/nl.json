@@ -3693,5 +3693,10 @@
   "Which voice": "Welke stem",
   "You have the most AI voices of your own there can be: delete one first.": "Je hebt al het maximum aan eigen AI-stemmen: verwijder er eerst een.",
   "You have the most saved voices there can be: delete one first.": "Je hebt al het maximum aan opgeslagen stemmen: verwijder er eerst een.",
-  "You're hearing it without its AI voice: get AI voices (Voice tab → AI voices) to hear all of it.": "Je hoort hem zonder zijn AI-stem: haal AI-stemmen (tab Stem → AI-stemmen) om alles te horen."
+  "You're hearing it without its AI voice: get AI voices (Voice tab → AI voices) to hear all of it.": "Je hoort hem zonder zijn AI-stem: haal AI-stemmen (tab Stem → AI-stemmen) om alles te horen.",
+  "Couldn't put the AI voice on “{name}”: {why}": "Kon de AI-stem niet op “{name}” zetten: {why}",
+  "Couldn't start the AI voice: {why}": "Kon de AI-stem niet starten: {why}",
+  "Getting the AI voice ready…": "AI-stem wordt klaargezet…",
+  "Putting the AI voice on “{name}”… {pct}%": "AI-stem wordt op “{name}” gezet… {pct}%",
+  "The AI voices add-on isn't installed, so only the voice changer part of “{name}” is on.": "De add-on voor AI-stemmen is niet geïnstalleerd, dus alleen de stemveranderaar van “{name}” staat aan."
 }

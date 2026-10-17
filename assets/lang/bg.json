@@ -3693,5 +3693,10 @@
   "Which voice": "Кой глас",
   "You have the most AI voices of your own there can be: delete one first.": "Вече имаш възможно най-много свои AI гласове: първо изтрий един.",
   "You have the most saved voices there can be: delete one first.": "Вече имаш възможно най-много запазени гласове: първо изтрий един.",
-  "You're hearing it without its AI voice: get AI voices (Voice tab → AI voices) to hear all of it.": "Чуваш го без неговия AI глас: вземи AI гласовете (раздел Глас → AI гласове), за да го чуеш целия."
+  "You're hearing it without its AI voice: get AI voices (Voice tab → AI voices) to hear all of it.": "Чуваш го без неговия AI глас: вземи AI гласовете (раздел Глас → AI гласове), за да го чуеш целия.",
+  "Couldn't put the AI voice on “{name}”: {why}": "AI гласът не можа да се сложи на „{name}“: {why}",
+  "Couldn't start the AI voice: {why}": "AI гласът не можа да стартира: {why}",
+  "Getting the AI voice ready…": "AI гласът се подготвя…",
+  "Putting the AI voice on “{name}”… {pct}%": "AI гласът се слага на „{name}“… {pct}%",
+  "The AI voices add-on isn't installed, so only the voice changer part of “{name}” is on.": "Добавката за AI гласове не е инсталирана, затова е включена само промяната на гласа от „{name}“."
 }

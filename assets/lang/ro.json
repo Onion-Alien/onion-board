@@ -3771,5 +3771,10 @@
   "Which voice": "Ce voce",
   "You have the most AI voices of your own there can be: delete one first.": "Ai deja numărul maxim de voci AI proprii: șterge întâi una.",
   "You have the most saved voices there can be: delete one first.": "Ai deja numărul maxim de voci salvate: șterge întâi una.",
-  "You're hearing it without its AI voice: get AI voices (Voice tab → AI voices) to hear all of it.": "O auzi fără vocea ei AI: ia vocile AI (fila Voce → voci AI) ca s-o auzi întreagă."
+  "You're hearing it without its AI voice: get AI voices (Voice tab → AI voices) to hear all of it.": "O auzi fără vocea ei AI: ia vocile AI (fila Voce → voci AI) ca s-o auzi întreagă.",
+  "Couldn't put the AI voice on “{name}”: {why}": "Vocea AI nu a putut fi pusă pe „{name}”: {why}",
+  "Couldn't start the AI voice: {why}": "Vocea AI nu a putut porni: {why}",
+  "Getting the AI voice ready…": "Se pregătește vocea AI…",
+  "Putting the AI voice on “{name}”… {pct}%": "Se pune vocea AI pe „{name}”… {pct}%",
+  "The AI voices add-on isn't installed, so only the voice changer part of “{name}” is on.": "Suplimentul pentru voci AI nu e instalat, așa că din „{name}” e pornit doar schimbătorul de voce."
 }

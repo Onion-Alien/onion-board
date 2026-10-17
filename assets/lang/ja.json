@@ -3615,5 +3615,10 @@
   "Which voice": "どの声",
   "You have the most AI voices of your own there can be: delete one first.": "自分のAIの声はもう上限です：先にひとつ削除してください。",
   "You have the most saved voices there can be: delete one first.": "保存した声はもう上限です：先にひとつ削除してください。",
-  "You're hearing it without its AI voice: get AI voices (Voice tab → AI voices) to hear all of it.": "AIの声なしで聞いています：全部聞くにはAIの声を入れてください（ボイスタブ → AIの声）。"
+  "You're hearing it without its AI voice: get AI voices (Voice tab → AI voices) to hear all of it.": "AIの声なしで聞いています：全部聞くにはAIの声を入れてください（ボイスタブ → AIの声）。",
+  "Couldn't put the AI voice on “{name}”: {why}": "「{name}」にAIボイスを付けられませんでした：{why}",
+  "Couldn't start the AI voice: {why}": "AIボイスを開始できませんでした：{why}",
+  "Getting the AI voice ready…": "AIボイスを準備中…",
+  "Putting the AI voice on “{name}”… {pct}%": "「{name}」にAIボイスを付けています… {pct}%",
+  "The AI voices add-on isn't installed, so only the voice changer part of “{name}” is on.": "AIボイスのアドオンが入っていないため、「{name}」はボイスチェンジャー部分だけオンです。"
 }

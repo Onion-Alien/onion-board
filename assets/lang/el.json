@@ -3693,5 +3693,10 @@
   "Which voice": "Ποια φωνή",
   "You have the most AI voices of your own there can be: delete one first.": "Έχεις ήδη τις περισσότερες δικές σου φωνές AI που γίνεται: σβήσε πρώτα μία.",
   "You have the most saved voices there can be: delete one first.": "Έχεις ήδη τις περισσότερες αποθηκευμένες φωνές που γίνεται: σβήσε πρώτα μία.",
-  "You're hearing it without its AI voice: get AI voices (Voice tab → AI voices) to hear all of it.": "Την ακούς χωρίς τη φωνή AI της: πάρε τις φωνές AI (καρτέλα Φωνή → φωνές AI) για να την ακούσεις ολόκληρη."
+  "You're hearing it without its AI voice: get AI voices (Voice tab → AI voices) to hear all of it.": "Την ακούς χωρίς τη φωνή AI της: πάρε τις φωνές AI (καρτέλα Φωνή → φωνές AI) για να την ακούσεις ολόκληρη.",
+  "Couldn't put the AI voice on “{name}”: {why}": "Δεν μπήκε η φωνή AI στο \"{name}\": {why}",
+  "Couldn't start the AI voice: {why}": "Η φωνή AI δεν ξεκίνησε: {why}",
+  "Getting the AI voice ready…": "Ετοιμάζεται η φωνή AI…",
+  "Putting the AI voice on “{name}”… {pct}%": "Μπαίνει η φωνή AI στο \"{name}\"… {pct}%",
+  "The AI voices add-on isn't installed, so only the voice changer part of “{name}” is on.": "Το πρόσθετο φωνών AI δεν είναι εγκατεστημένο, οπότε από το \"{name}\" είναι ενεργή μόνο η αλλαγή φωνής."
 }

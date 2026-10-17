@@ -3693,5 +3693,10 @@
   "Which voice": "Hangi ses",
   "You have the most AI voices of your own there can be: delete one first.": "Olabilecek en fazla kendi yapay zeka sesine sahipsin: önce birini sil.",
   "You have the most saved voices there can be: delete one first.": "Olabilecek en fazla kayıtlı sese sahipsin: önce birini sil.",
-  "You're hearing it without its AI voice: get AI voices (Voice tab → AI voices) to hear all of it.": "Onu yapay zeka sesi olmadan duyuyorsun: hepsini duymak için yapay zeka seslerini al (Ses sekmesi → Yapay zeka sesleri)."
+  "You're hearing it without its AI voice: get AI voices (Voice tab → AI voices) to hear all of it.": "Onu yapay zeka sesi olmadan duyuyorsun: hepsini duymak için yapay zeka seslerini al (Ses sekmesi → Yapay zeka sesleri).",
+  "Couldn't put the AI voice on “{name}”: {why}": "Yapay zeka sesi “{name}” üzerine konamadı: {why}",
+  "Couldn't start the AI voice: {why}": "Yapay zeka sesi başlatılamadı: {why}",
+  "Getting the AI voice ready…": "Yapay zeka sesi hazırlanıyor…",
+  "Putting the AI voice on “{name}”… {pct}%": "Yapay zeka sesi “{name}” üzerine konuyor… %{pct}",
+  "The AI voices add-on isn't installed, so only the voice changer part of “{name}” is on.": "Yapay zeka sesleri eklentisi kurulu değil, bu yüzden “{name}” ayarının yalnızca ses değiştirici kısmı açık."
 }

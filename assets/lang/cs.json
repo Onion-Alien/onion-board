@@ -3771,5 +3771,10 @@
   "Which voice": "Který hlas",
   "You have the most AI voices of your own there can be: delete one first.": "Máš už nejvíc vlastních hlasů AI, kolik může být: nejdřív jeden smaž.",
   "You have the most saved voices there can be: delete one first.": "Máš už nejvíc uložených hlasů, kolik může být: nejdřív jeden smaž.",
-  "You're hearing it without its AI voice: get AI voices (Voice tab → AI voices) to hear all of it.": "Slyšíš ho bez jeho hlasu AI: stáhni hlasy AI (karta Hlas → hlasy AI), abys slyšel všechno."
+  "You're hearing it without its AI voice: get AI voices (Voice tab → AI voices) to hear all of it.": "Slyšíš ho bez jeho hlasu AI: stáhni hlasy AI (karta Hlas → hlasy AI), abys slyšel všechno.",
+  "Couldn't put the AI voice on “{name}”: {why}": "AI hlas se nepodařilo dát na „{name}“: {why}",
+  "Couldn't start the AI voice: {why}": "AI hlas se nepodařilo spustit: {why}",
+  "Getting the AI voice ready…": "Připravuje se AI hlas…",
+  "Putting the AI voice on “{name}”… {pct}%": "Dává se AI hlas na „{name}“… {pct} %",
+  "The AI voices add-on isn't installed, so only the voice changer part of “{name}” is on.": "Doplněk AI hlasů není nainstalovaný, takže z „{name}“ je zapnutý jen měnič hlasu."
 }

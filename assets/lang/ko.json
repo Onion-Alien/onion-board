@@ -3615,5 +3615,10 @@
   "Which voice": "어떤 목소리",
   "You have the most AI voices of your own there can be: delete one first.": "내 AI 목소리가 이미 최대예요: 먼저 하나를 지우세요.",
   "You have the most saved voices there can be: delete one first.": "저장한 목소리가 이미 최대예요: 먼저 하나를 지우세요.",
-  "You're hearing it without its AI voice: get AI voices (Voice tab → AI voices) to hear all of it.": "AI 목소리 없이 듣고 있어요: 전부 들으려면 AI 목소리를 받으세요(보이스 탭 → AI 목소리)."
+  "You're hearing it without its AI voice: get AI voices (Voice tab → AI voices) to hear all of it.": "AI 목소리 없이 듣고 있어요: 전부 들으려면 AI 목소리를 받으세요(보이스 탭 → AI 목소리).",
+  "Couldn't put the AI voice on “{name}”: {why}": "“{name}”에 AI 목소리를 입히지 못했어요: {why}",
+  "Couldn't start the AI voice: {why}": "AI 목소리를 시작하지 못했어요: {why}",
+  "Getting the AI voice ready…": "AI 목소리 준비 중…",
+  "Putting the AI voice on “{name}”… {pct}%": "“{name}”에 AI 목소리를 입히는 중… {pct}%",
+  "The AI voices add-on isn't installed, so only the voice changer part of “{name}” is on.": "AI 목소리 애드온이 설치되지 않아 “{name}”의 보이스 체인저 부분만 켜졌어요."
 }

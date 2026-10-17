@@ -3693,5 +3693,10 @@
   "Which voice": "Aling voice",
   "You have the most AI voices of your own there can be: delete one first.": "Nasa pinakamaraming sariling boses ng AI ka na: magbura muna ng isa.",
   "You have the most saved voices there can be: delete one first.": "Nasa pinakamaraming naka-save na voice ka na: magbura muna ng isa.",
-  "You're hearing it without its AI voice: get AI voices (Voice tab → AI voices) to hear all of it.": "Naririnig mo ito nang wala ang boses ng AI nito: kunin ang mga boses ng AI (Voice tab → Mga boses ng AI) para marinig lahat."
+  "You're hearing it without its AI voice: get AI voices (Voice tab → AI voices) to hear all of it.": "Naririnig mo ito nang wala ang boses ng AI nito: kunin ang mga boses ng AI (Voice tab → Mga boses ng AI) para marinig lahat.",
+  "Couldn't put the AI voice on “{name}”: {why}": "Hindi nailagay ang AI voice sa “{name}”: {why}",
+  "Couldn't start the AI voice: {why}": "Hindi nasimulan ang AI voice: {why}",
+  "Getting the AI voice ready…": "Inihahanda ang AI voice…",
+  "Putting the AI voice on “{name}”… {pct}%": "Inilalagay ang AI voice sa “{name}”… {pct}%",
+  "The AI voices add-on isn't installed, so only the voice changer part of “{name}” is on.": "Hindi naka-install ang add-on ng AI voices, kaya ang voice changer lang ng “{name}” ang naka-on."
 }

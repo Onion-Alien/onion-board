@@ -3771,5 +3771,10 @@
   "Which voice": "Какой голос",
   "You have the most AI voices of your own there can be: delete one first.": "У вас уже максимум своих голосов ИИ: сначала удалите один.",
   "You have the most saved voices there can be: delete one first.": "У вас уже максимум сохранённых голосов: сначала удалите один.",
-  "You're hearing it without its AI voice: get AI voices (Voice tab → AI voices) to hear all of it.": "Вы слышите его без голоса ИИ: установите голоса ИИ (вкладка Голос → голоса ИИ), чтобы услышать всё."
+  "You're hearing it without its AI voice: get AI voices (Voice tab → AI voices) to hear all of it.": "Вы слышите его без голоса ИИ: установите голоса ИИ (вкладка Голос → голоса ИИ), чтобы услышать всё.",
+  "Couldn't put the AI voice on “{name}”: {why}": "Не удалось наложить ИИ-голос на «{name}»: {why}",
+  "Couldn't start the AI voice: {why}": "Не удалось запустить ИИ-голос: {why}",
+  "Getting the AI voice ready…": "Готовлю ИИ-голос…",
+  "Putting the AI voice on “{name}”… {pct}%": "Накладываю ИИ-голос на «{name}»… {pct}%",
+  "The AI voices add-on isn't installed, so only the voice changer part of “{name}” is on.": "Дополнение с ИИ-голосами не установлено, поэтому из «{name}» включена только смена голоса."
 }

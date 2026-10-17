@@ -3615,5 +3615,10 @@
   "Which voice": "哪個聲音",
   "You have the most AI voices of your own there can be: delete one first.": "你自己的人工智慧聲音已達上限：先刪掉一個。",
   "You have the most saved voices there can be: delete one first.": "你儲存的聲音已達上限：先刪掉一個。",
-  "You're hearing it without its AI voice: get AI voices (Voice tab → AI voices) to hear all of it.": "你聽到的是沒有人工智慧聲音的版本：安裝人工智慧聲音（語音分頁 → 人工智慧聲音）才能聽完整。"
+  "You're hearing it without its AI voice: get AI voices (Voice tab → AI voices) to hear all of it.": "你聽到的是沒有人工智慧聲音的版本：安裝人工智慧聲音（語音分頁 → 人工智慧聲音）才能聽完整。",
+  "Couldn't put the AI voice on “{name}”: {why}": "無法為「{name}」加上 AI 聲音：{why}",
+  "Couldn't start the AI voice: {why}": "無法啟動 AI 聲音：{why}",
+  "Getting the AI voice ready…": "正在準備 AI 聲音…",
+  "Putting the AI voice on “{name}”… {pct}%": "正在為「{name}」加上 AI 聲音… {pct}%",
+  "The AI voices add-on isn't installed, so only the voice changer part of “{name}” is on.": "沒有安裝 AI 聲音外掛，所以「{name}」只開了變聲器部分。"
 }

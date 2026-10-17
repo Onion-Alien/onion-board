@@ -3693,5 +3693,10 @@
   "Which voice": "Melyik hang",
   "You have the most AI voices of your own there can be: delete one first.": "Már annyi saját AI hangod van, amennyi lehet: előbb törölj egyet.",
   "You have the most saved voices there can be: delete one first.": "Már annyi mentett hangod van, amennyi lehet: előbb törölj egyet.",
-  "You're hearing it without its AI voice: get AI voices (Voice tab → AI voices) to hear all of it.": "Az AI hangja nélkül hallod: szerezd be az AI hangokat (Hang fül → AI hangok), hogy mindent hallj."
+  "You're hearing it without its AI voice: get AI voices (Voice tab → AI voices) to hear all of it.": "Az AI hangja nélkül hallod: szerezd be az AI hangokat (Hang fül → AI hangok), hogy mindent hallj.",
+  "Couldn't put the AI voice on “{name}”: {why}": "Nem sikerült rátenni az AI hangot erre: „{name}”: {why}",
+  "Couldn't start the AI voice: {why}": "Nem sikerült elindítani az AI hangot: {why}",
+  "Getting the AI voice ready…": "Az AI hang előkészítése…",
+  "Putting the AI voice on “{name}”… {pct}%": "AI hang rátétele erre: „{name}”… {pct}%",
+  "The AI voices add-on isn't installed, so only the voice changer part of “{name}” is on.": "Az AI hangok bővítménye nincs telepítve, ezért a(z) „{name}” beállításból csak a hangváltó van bekapcsolva."
 }

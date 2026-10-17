@@ -4005,5 +4005,10 @@
   "Which voice": "أي صوت",
   "You have the most AI voices of your own there can be: delete one first.": "لديك أكبر عدد ممكن من أصوات الذكاء الاصطناعي الخاصة بك: احذف واحدًا أولًا.",
   "You have the most saved voices there can be: delete one first.": "لديك أكبر عدد ممكن من الأصوات المحفوظة: احذف واحدًا أولًا.",
-  "You're hearing it without its AI voice: get AI voices (Voice tab → AI voices) to hear all of it.": "أنت تسمعه بدون صوت الذكاء الاصطناعي الخاص به: احصل على أصوات الذكاء الاصطناعي (تبويب الصوت ← أصوات الذكاء الاصطناعي) لتسمعه كاملًا."
+  "You're hearing it without its AI voice: get AI voices (Voice tab → AI voices) to hear all of it.": "أنت تسمعه بدون صوت الذكاء الاصطناعي الخاص به: احصل على أصوات الذكاء الاصطناعي (تبويب الصوت ← أصوات الذكاء الاصطناعي) لتسمعه كاملًا.",
+  "Couldn't put the AI voice on “{name}”: {why}": "تعذّر وضع صوت الذكاء الاصطناعي على “{name}”: {why}",
+  "Couldn't start the AI voice: {why}": "تعذّر تشغيل صوت الذكاء الاصطناعي: {why}",
+  "Getting the AI voice ready…": "جارٍ تجهيز صوت الذكاء الاصطناعي…",
+  "Putting the AI voice on “{name}”… {pct}%": "جارٍ وضع صوت الذكاء الاصطناعي على “{name}”… {pct}%",
+  "The AI voices add-on isn't installed, so only the voice changer part of “{name}” is on.": "إضافة أصوات الذكاء الاصطناعي غير مثبّتة، لذلك يعمل جزء مغيّر الصوت فقط من “{name}”."
 }

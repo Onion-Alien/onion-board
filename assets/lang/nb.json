@@ -3693,5 +3693,10 @@
   "Which voice": "Hvilken stemme",
   "You have the most AI voices of your own there can be: delete one first.": "Du har allerede så mange egne AI-stemmer som det kan være: slett en først.",
   "You have the most saved voices there can be: delete one first.": "Du har allerede så mange lagrede stemmer som det kan være: slett en først.",
-  "You're hearing it without its AI voice: get AI voices (Voice tab → AI voices) to hear all of it.": "Du hører den uten AI-stemmen: hent AI-stemmer (fanen Stemme → AI-stemmer) for å høre alt."
+  "You're hearing it without its AI voice: get AI voices (Voice tab → AI voices) to hear all of it.": "Du hører den uten AI-stemmen: hent AI-stemmer (fanen Stemme → AI-stemmer) for å høre alt.",
+  "Couldn't put the AI voice on “{name}”: {why}": "Kunne ikke legge AI-stemmen på «{name}»: {why}",
+  "Couldn't start the AI voice: {why}": "Kunne ikke starte AI-stemmen: {why}",
+  "Getting the AI voice ready…": "Gjør AI-stemmen klar…",
+  "Putting the AI voice on “{name}”… {pct}%": "Legger AI-stemmen på «{name}»… {pct} %",
+  "The AI voices add-on isn't installed, so only the voice changer part of “{name}” is on.": "Tillegget for AI-stemmer er ikke installert, så bare stemmeskifter-delen av «{name}» er på."
 }

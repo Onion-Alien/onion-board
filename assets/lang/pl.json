@@ -3771,5 +3771,10 @@
   "Which voice": "Który głos",
   "You have the most AI voices of your own there can be: delete one first.": "Masz już najwięcej własnych głosów AI, ile się da: najpierw usuń jeden.",
   "You have the most saved voices there can be: delete one first.": "Masz już najwięcej zapisanych głosów, ile się da: najpierw usuń jeden.",
-  "You're hearing it without its AI voice: get AI voices (Voice tab → AI voices) to hear all of it.": "Słyszysz go bez głosu AI: pobierz głosy AI (karta Głos → Głosy AI), żeby usłyszeć całość."
+  "You're hearing it without its AI voice: get AI voices (Voice tab → AI voices) to hear all of it.": "Słyszysz go bez głosu AI: pobierz głosy AI (karta Głos → Głosy AI), żeby usłyszeć całość.",
+  "Couldn't put the AI voice on “{name}”: {why}": "Nie udało się nałożyć głosu AI na „{name}”: {why}",
+  "Couldn't start the AI voice: {why}": "Nie udało się uruchomić głosu AI: {why}",
+  "Getting the AI voice ready…": "Przygotowuję głos AI…",
+  "Putting the AI voice on “{name}”… {pct}%": "Nakładam głos AI na „{name}”… {pct}%",
+  "The AI voices add-on isn't installed, so only the voice changer part of “{name}” is on.": "Dodatek z głosami AI nie jest zainstalowany, więc z „{name}” działa tylko zmieniacz głosu."
 }

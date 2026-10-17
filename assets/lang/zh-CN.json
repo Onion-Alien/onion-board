@@ -3615,5 +3615,10 @@
   "Which voice": "哪个声音",
   "You have the most AI voices of your own there can be: delete one first.": "你自己的人工智能声音已经达到上限：先删掉一个。",
   "You have the most saved voices there can be: delete one first.": "你保存的声音已经达到上限：先删掉一个。",
-  "You're hearing it without its AI voice: get AI voices (Voice tab → AI voices) to hear all of it.": "你听到的是没有人工智能声音的版本：安装人工智能声音（语音标签 → 人工智能声音）才能听全。"
+  "You're hearing it without its AI voice: get AI voices (Voice tab → AI voices) to hear all of it.": "你听到的是没有人工智能声音的版本：安装人工智能声音（语音标签 → 人工智能声音）才能听全。",
+  "Couldn't put the AI voice on “{name}”: {why}": "无法给“{name}”加上 AI 声音：{why}",
+  "Couldn't start the AI voice: {why}": "无法启动 AI 声音：{why}",
+  "Getting the AI voice ready…": "正在准备 AI 声音…",
+  "Putting the AI voice on “{name}”… {pct}%": "正在给“{name}”加上 AI 声音… {pct}%",
+  "The AI voices add-on isn't installed, so only the voice changer part of “{name}” is on.": "没有安装 AI 声音插件，所以“{name}”只开了变声器部分。"
 }

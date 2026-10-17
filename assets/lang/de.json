@@ -3693,5 +3693,10 @@
   "Which voice": "Welche Stimme",
   "You have the most AI voices of your own there can be: delete one first.": "Du hast schon die meisten eigenen KI-Stimmen, die es geben kann: Lösch zuerst eine.",
   "You have the most saved voices there can be: delete one first.": "Du hast schon die meisten gespeicherten Stimmen, die es geben kann: Lösch zuerst eine.",
-  "You're hearing it without its AI voice: get AI voices (Voice tab → AI voices) to hear all of it.": "Du hörst sie ohne ihre KI-Stimme: Hol dir KI-Stimmen (Stimme-Tab → KI-Stimmen), um alles zu hören."
+  "You're hearing it without its AI voice: get AI voices (Voice tab → AI voices) to hear all of it.": "Du hörst sie ohne ihre KI-Stimme: Hol dir KI-Stimmen (Stimme-Tab → KI-Stimmen), um alles zu hören.",
+  "Couldn't put the AI voice on “{name}”: {why}": "Die KI-Stimme konnte nicht auf „{name}“ gelegt werden: {why}",
+  "Couldn't start the AI voice: {why}": "Die KI-Stimme konnte nicht starten: {why}",
+  "Getting the AI voice ready…": "KI-Stimme wird vorbereitet…",
+  "Putting the AI voice on “{name}”… {pct}%": "KI-Stimme wird auf „{name}“ gelegt… {pct} %",
+  "The AI voices add-on isn't installed, so only the voice changer part of “{name}” is on.": "Das Add-on für KI-Stimmen ist nicht installiert, daher ist von „{name}“ nur der Stimmverzerrer an."
 }
