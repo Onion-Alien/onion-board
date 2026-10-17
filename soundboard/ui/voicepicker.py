@@ -147,13 +147,13 @@ class VoicePicker(QDialog):
         self.btn_save.setToolTip(_("Keep this mix under a name, to put it on other sounds "
                                    "with one click"))
         self.btn_save.clicked.connect(self._save)
-        self.btn_save.setVisible(save_setup is not None)
         row.addWidget(self.btn_save)
         cancel = QPushButton(_("Cancel"))
         cancel.clicked.connect(self.reject)
         row.addWidget(cancel)
         row.addStretch(1)
         v.addLayout(row)
+        self.btn_save.setVisible(save_setup is not None)
         self.resize(620, 680)
 
         self._show_fx(FAVS if cat.fx_favs else ALL)
