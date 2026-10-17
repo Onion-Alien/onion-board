@@ -253,3 +253,14 @@ def test_his_beak_opens_when_he_cheers(qapp):
     w.cheer()
     w.step(0.3, mouse=None)
     assert w.pose()["beak"] > 0.3
+
+
+def test_wave_raises_one_wing_and_swings_it(qapp):
+    still = _hoot(outfit=(), kit=owl.VANILLA)
+    assert _hoot(outfit=(), kit=owl.VANILLA, wave=None) == still
+    a = _hoot(outfit=(), kit=owl.VANILLA, wave=-1.0)
+    b = _hoot(outfit=(), kit=owl.VANILLA, wave=1.0)
+    assert a != still and b != still and a != b
+    # only the wing on your left moves: his right half is as it was
+    right = [(x, y) for x in range(52, 100, 3) for y in range(0, 120, 3)]
+    assert all(a.pixelColor(x, y) == still.pixelColor(x, y) for x, y in right)

@@ -26,4 +26,4 @@ Rules, so the copy keeps working in both apps:
 """
 
 KIT_VERSION = 5   # 2: texture_style / paint_glow / live_sheet in the kit; 3: cover;
-                  # 4: Hoot's `beak`; 5: Hoot's look per theme (owl.LOOKS, `kit`)
+                  # 4: Hoot's `beak`; 5: Hoot's look per theme (owl.LOOKS, `kit`), `wave`

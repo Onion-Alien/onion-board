@@ -337,14 +337,17 @@ def draw_owl(p: QPainter, rect: QRectF, look: float = 0.0, feather=None, dark=No
              *, look_y: float = 0.0, blink: float = 0.0, sad: float = 0.0,
              tufts: float = 0.0, clasp: float = 0.0, flap: float = 0.0,
              plead: float = 0.0, tear: float = 0.0, beak: float = 0.0,
-             outfit: tuple[str, ...] | None = None, kit: dict | None = None):
+             outfit: tuple[str, ...] | None = None, kit: dict | None = None,
+             wave: float | None = None):
     """Draw Hoot fitted (aspect kept, centred) into `rect`. `look` / `look_y` -1..1
     turn his eyes left / right and up / down: watching. The keywords pose him for
     OwlWidget: `blink` 0..1 closes the eyes, `sad` 0..1 worries the brows and wets
     the eyes, `tufts` droops the ear tufts by that many degrees (negative perks them
     up), `clasp` 0..1 brings the wings together in front (begging), `flap` 0..1 lifts
     them (joy), `plead` 0..1 makes the eyes big and shiny, `tear` 0..1 rolls a tear
-    down his cheek (0 = none) and `beak` 0..1 opens his beak (a cheer, a hoot). His
+    down his cheek (0 = none) and `beak` 0..1 opens his beak (a cheer, a hoot); `wave`
+    -1..1 (None: not waving) raises the wing on your left up by his head, swung that
+    far one way or the other (hello). His
     feathers are his look's unless `feather` / `dark` are given.
     `outfit`: Bun's outfit pieces to wear (None: the current theme's, (): none).
     `kit`: his look (look(): feathers, eyes, belly marks, tufts, beak, toes; None: the
@@ -421,6 +424,19 @@ def draw_owl(p: QPainter, rect: QRectF, look: float = 0.0, feather=None, dark=No
     p.restore()
     # wings: at his sides, clasped in front of the belly, or flung up
     for sx in (-1, 1):
+        if sx == -1 and wave is not None:   # waving hello, turned about his shoulder
+            p.save()
+            p.translate(21, 76)
+            p.rotate(148 + 18 * wave)
+            p.scale(1.15, 1.12)
+            p.translate(0, 19)
+            wing = _wing(sx)
+            p.setPen(ink)
+            p.setBrush(dark)
+            p.drawPath(wing)
+            _shade(p, wing, -sx * 4, -12, 14, feather, 150)
+            p.restore()
+            continue
         x = 50 + sx * (_mix(34, 15, clasp) + 5 * flap)
         y = 84 + 3 * clasp - 12 * flap
         ang = -sx * (_mix(12, 30, clasp) - 70 * flap)
