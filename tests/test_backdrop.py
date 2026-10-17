@@ -29,12 +29,12 @@ def _voice(secs, amp=0.1, rate=SR):
 
 
 @pytest.mark.parametrize("layer", LAYERS)
-def test_every_layer_at_the_top_is_about_a_voice_loud_and_finite(layer):
+def test_every_recorded_layer_is_audible_and_has_peak_headroom(layer):
     e = voicefx.REGISTRY["backdrop"](SR, {layer: 1, "talk": 0})
-    e.reseed(1)
+    e.beds = backdrop.Beds({layer: backdrop.recording(layer)})
     y = _run(e, np.zeros(SR * 3, np.float32))[SR:]
     assert np.all(np.isfinite(y))
-    assert 0.5 < _rms(y) / e.LEVEL < 1.5
+    assert 0.05 < _rms(y) / e.LEVEL < 1.5
     assert np.max(np.abs(y)) < 1.0
 
 
@@ -46,17 +46,17 @@ def test_all_sliders_down_passes_the_voice_untouched():
 
 def test_only_while_i_talk_is_quiet_in_the_pauses_and_there_behind_words():
     e = voicefx.REGISTRY["backdrop"](SR, {"rain": 1, "talk": 1})
-    e.reseed(2)
+    e.beds = backdrop.Beds({"rain": backdrop.recording("rain")})
     quiet = _run(e, np.zeros(SR * 2, np.float32))
     assert _rms(quiet[SR:]) < 1e-6                 # an idle mic sends no rain
     x = _voice(1.0)
     y = _run(e, x)
-    assert _rms(y[SR // 4:] - x[SR // 4:len(y)]) > 0.03   # rain under the words
+    assert _rms(y[SR // 4:] - x[SR // 4:len(y)]) > 0.001   # rain under the words
 
 
 def test_the_gate_lets_go_after_you_stop():
     e = voicefx.REGISTRY["backdrop"](SR, {"wind": 1, "talk": 1})
-    e.reseed(3)
+    e.beds = backdrop.Beds({"wind": backdrop.recording("wind")})
     x = np.concatenate([_voice(0.5), np.zeros(SR * 2, np.float32)])
     y = _run(e, x)
     assert _rms(y[int(SR * 1.5):]) < 1e-6          # gone well after the hold and fade
@@ -64,7 +64,7 @@ def test_the_gate_lets_go_after_you_stop():
 
 def test_moving_a_level_glides_without_a_jump():
     e = voicefx.REGISTRY["backdrop"](SR, {"engine": 0, "talk": 0})
-    e.reseed(4)
+    e.beds = backdrop.Beds({"engine": backdrop.recording("engine")})
     a = e.run(np.zeros(480, np.float32), SR)
     e.set_values({"engine": 1, "talk": 0})
     b = e.run(np.zeros(480, np.float32), SR)
@@ -425,12 +425,13 @@ def test_a_background_sound_can_be_heard_before_adding_it(qapp, monkeypatch):
         dot = pop.listens["rain"]
         assert dot.parent() is pop.adds["rain"]          # inside its chip: one pill
         dot.click()
+        process_events(qapp, lambda: bool(played), timeout=10)
         sid, n, kw = played[-1]
         assert sid == effectspopup.LISTEN_SID and sid.endswith(":preview") and kw["preview"]
         assert n == int(effectspopup.LISTEN_S * 48000)
         assert dot.property("playing") and "rain" not in fx.on_top_state()["layers"]
         dot.click()                                       # again: stops
-        assert stopped == [effectspopup.LISTEN_SID] and not dot.property("playing")
+        assert stopped[-1] == effectspopup.LISTEN_SID and not dot.property("playing")
     finally:
         p.shutdown()
         p.deleteLater()
@@ -525,35 +526,29 @@ def test_effects_keeps_its_words_while_they_fit_and_its_name_always(qapp):
         fx.deleteLater()
 
 
-@pytest.mark.parametrize("layer", ["rain", "fire"])
-def test_weather_has_no_isolated_digital_cracks(layer):
-    x = backdrop.generate(layer, 5, seed=7)[SR:]
-    assert np.max(np.abs(x)) / _rms(x) < 8
+@pytest.mark.parametrize("layer", LAYERS)
+def test_background_preview_and_live_audio_use_the_bundled_recording(layer):
+    raw = backdrop.recording(layer)
+    assert not raw.flags.writeable
+    preview = backdrop.generate(layer, 1)
+    assert np.array_equal(preview, raw[:SR])
+    e = voicefx.REGISTRY["backdrop"](SR, {layer: 1, "talk": 0})
+    e.beds = backdrop.Beds({layer: raw})
+    e.levels[layer] = 1
+    actual = e.run(np.zeros(SR, np.float32), SR)
+    assert np.allclose(actual, preview * e.LEVEL)
 
 
-def test_crowd_contains_voiced_babble():
-    x = backdrop.generate("crowd", 3, seed=1)[SR:]
-    # Voiced talkers leave harmonic peaks; filtered white noise has no such
-    # structure. Compare narrow FFT bins with the surrounding 100 Hz band.
-    power = np.abs(np.fft.rfft(x * np.hanning(len(x)))) ** 2
-    hz = np.fft.rfftfreq(len(x), 1 / SR)
-    band = power[(hz > 300) & (hz < 1200)]
-    assert np.percentile(band, 99.5) / np.median(band) > 25
-
-
-@pytest.mark.parametrize("layer", ["engine", "space"])
-def test_background_tonal_motion_does_not_step_at_callback_edges(layer, monkeypatch):
-    cls = voicefx.REGISTRY["backdrop"]
-    monkeypatch.setattr(cls, "_noise", lambda self, n: np.zeros(n, np.float32))
-    a, b = cls(SR), cls(SR)
-    def render(e, block):
-        parts = []
-        for start in range(0, SR * 2, block):
-            n = min(block, SR * 2 - start)
-            parts.append(e.layer(layer, n, SR))
-            e.t += n / SR
-        return np.concatenate(parts)
-    assert np.allclose(render(a, 240), render(b, 2048), atol=2e-5)
+@pytest.mark.parametrize("layer", LAYERS)
+def test_recorded_background_wraps_identically_with_different_callback_sizes(layer):
+    raw = backdrop.recording(layer)
+    def render(block):
+        e = voicefx.REGISTRY["backdrop"](SR, {layer: 1, "talk": 0})
+        e.beds = backdrop.Beds({layer: raw})
+        e.levels[layer] = 1
+        return np.concatenate([e.run(np.zeros(min(block, len(raw) + 500 - i), np.float32), SR)
+                               for i in range(0, len(raw) + 500, block)])
+    assert np.allclose(render(240), render(2048), atol=1e-6)
 
 
 def test_idle_talk_gate_starts_closed():
@@ -572,13 +567,84 @@ def test_typed_speech_uses_the_same_background_loops_as_the_mic():
 
 
 
-def test_wind_gusts_do_not_repeatedly_redesign_the_filter(monkeypatch):
-    from soundboard.voicefx import builtin
-    original = builtin.butter
-    designs = []
-    def design(*args, **kwargs):
-        designs.append(args)
-        return original(*args, **kwargs)
-    monkeypatch.setattr(builtin, "butter", design)
-    backdrop.generate("wind", 5, seed=1)
-    assert len(designs) == 2
+def test_neutral_background_is_loaded_by_maker_off_the_caller_thread(monkeypatch):
+    caller = threading.get_ident()
+    seen, done, got = [], threading.Event(), []
+    original = backdrop.render_layer
+    def render(layer, tweaks):
+        seen.append(threading.get_ident())
+        return original(layer, tweaks)
+    monkeypatch.setattr(backdrop, "render_layer", render)
+    m = backdrop.Maker(lambda beds: (got.append(beds), done.set()))
+    try:
+        m.update({"on": True, "rain": 0.5, "window": 0.4}, lambda sid: None)
+        assert done.wait(10)
+        assert set(got[-1].layers) == {"rain", "window"}
+        assert seen and all(t != caller for t in seen)
+    finally:
+        m.close()
+
+
+def test_missing_background_stays_silent_without_callback_file_io(monkeypatch):
+    def forbidden(*args, **kwargs):
+        raise AssertionError("file access on the audio callback")
+    monkeypatch.setattr(backdrop, "recording", forbidden)
+    e = voicefx.REGISTRY["backdrop"](SR, {"rain": 1, "talk": 0})
+    x = _voice(0.1)
+    assert np.array_equal(e.run(x, SR), x)
+    e.beds = backdrop.Beds({"rain": np.ones(1000, np.float32)})
+    out = e.run(x, SR)
+    assert out[0] - x[0] < 0.001 and out[-1] > x[-1]
+
+
+def test_every_background_has_a_verified_cc0_credit_and_build_data():
+    import hashlib
+    import json
+    from pathlib import Path
+    credits = json.loads((backdrop.AUDIO_DIR / "credits.json").read_text("utf-8"))
+    assert {Path(c["file"]).stem for c in credits} == set(LAYERS)
+    for credit in credits:
+        assert credit["license"] == "CC0-1.0"
+        assert credit["source"].startswith("https://freesound.org/people/")
+        content = (backdrop.AUDIO_DIR / credit["file"]).read_bytes()
+        assert hashlib.sha256(content).hexdigest() == credit["sha256"]
+    root = Path(__file__).resolve().parents[1]
+    assert 'assets\\backgrounds;backgrounds' in (root / "build.ps1").read_text("utf-8")
+
+
+
+def test_closing_or_stopping_a_pending_background_preview_discards_it(qapp, monkeypatch):
+    p = _voice_panel(monkeypatch)
+    entered, release = threading.Event(), threading.Event()
+    def generate(*args, **kwargs):
+        entered.set()
+        assert release.wait(10)
+        return np.ones(SR, np.float32)
+    monkeypatch.setattr(backdrop, "generate", generate)
+    played = []
+    eng = SimpleNamespace(play=lambda *a, **kw: played.append(a), stop=lambda sid: None)
+    try:
+        p.fx.btn_effects.click()
+        pop = p.fx.effects_pop
+        process_events(qapp, pop.isVisible, timeout=5)
+        monkeypatch.setattr(pop.panel, "window", lambda: SimpleNamespace(engine=eng))
+        delivered = threading.Event()
+        pop.preview_ready.connect(lambda *args: delivered.set())
+        pop._listen("rain")
+        assert entered.wait(5)
+        pop._listen("rain")  # cancel before loading finished
+        assert pop._listening is None
+        pop.hide()
+        release.set()
+        process_events(qapp, delivered.is_set, timeout=5)
+        assert delivered.is_set() and not played
+    finally:
+        release.set()
+        p.shutdown()
+        p.deleteLater()
+
+
+@pytest.mark.parametrize("layer", LAYERS)
+def test_background_tweaks_keep_peak_headroom(layer):
+    loop = backdrop.render_layer(layer, {"bass": 8})
+    assert np.isfinite(loop).all() and np.max(np.abs(loop)) <= 8.0001

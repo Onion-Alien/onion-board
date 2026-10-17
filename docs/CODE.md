@@ -267,7 +267,7 @@ the launcher the shortcuts and PyInstaller use. The app is the `soundboard` pack
 | `soundboard/ui/voicepanel.py` | the Voice tab: lays out its cards and bottom bar, the add-ons list |
 | `soundboard/ui/voicefxpanel.py` | the Voice tab's voice changer card: voice tiles, effect rows and their sliders |
 | `soundboard/ui/backdroprow.py` | the voice changer's Background card (built-in sounds and board sounds behind your voice) and its Speed and pitch pop-up |
-| `soundboard/ui/effectspopup.py` | the voice bar's Effects pop-up: background sounds, board sounds and the extra Robot, Radio, Echo and Reverb on top of any voice, one slider and a ✕ each |
+| `soundboard/ui/effectspopup.py` | the voice bar's Effects pop-up: bundled CC0 background sounds, board sounds and the extra Robot, Radio, Echo and Reverb on top of any voice, one slider and a ✕ each |
 | `soundboard/ui/voicepicker.py` | Edit sound → Effects → Voice: picture cards of the voice changer's voices, the AI voices and your setups, to lay a voice over a sound |
 | `soundboard/ui/voicesetupsbar.py` | the Voice tab's My setups row: save what's on, turn a setup back on, delete with Undo |
 | `soundboard/ui/speechpanel.py` | the Voice tab's Languages card: text-to-speech, live voice-to-speech, translation |
@@ -515,3 +515,14 @@ backup is used, so the pad list is never silently reset.
 - The audio callbacks never take the engine lock: the voice list is an immutable tuple
   swapped by the UI thread. An exception inside a callback is logged once and that
   block is silent; the stream keeps running.
+
+### Voice background recordings
+
+The voice changer bundles seven CC0 loops in `assets/backgrounds/`, including the
+extra rain-on-a-window choice. `credits.json` carries source pages, creators,
+licenses and file hashes; the packaged third-party notices include these credits.
+`voicefx/backdrop.py` decodes and caches active loops on its worker, including
+neutral settings. The audio callback only reads the finished loops, and preview
+loading also runs on a worker. A missing loop stays silent without falling back
+to synthesis. Source runs read `assets/backgrounds`; packaged builds read the
+bundled `backgrounds` directory. Playback requires no network access.

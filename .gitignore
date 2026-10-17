@@ -75,3 +75,6 @@ vendor/
 
 # the starter sounds that ship in the app (soundboard/starter.py)
 !assets/starter/*.ogg
+
+# Redistributable CC0 voice backgrounds, with source and license credits.
+!assets/backgrounds/*.flac

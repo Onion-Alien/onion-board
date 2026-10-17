@@ -1,11 +1,8 @@
 """The voice changer's Background: loops made off the audio thread.
 
-A built-in background sound (rain, wind...) is made live by the Background effect
-(voicefx.builtin.Background) while its speed and pitch are as they start. Changed
-(its "Speed and pitch" pop-up), and for every sound picked from your board, it is
-made here instead: 30 seconds of it, its speed, pitch, bass, muffle and reverb baked
-in (soundfx.render, the same code as a pad's effects), its end crossfaded into its
-start so it loops without a seam. The effect then only plays the loop back.
+Built-in CC0 recordings are decoded and prepared here on a worker, including
+neutral loops. Speed, pitch, bass, muffle and reverb are baked in before playback.
+The effect only reads finished loops; it never decodes a file on the audio thread.
 
 What the voice changer keeps (the effect's settings, so saved voices carry it):
 
@@ -20,6 +17,9 @@ from __future__ import annotations
 
 import logging
 import math
+import sys
+from functools import lru_cache
+from pathlib import Path
 import threading
 from collections.abc import Callable
 from dataclasses import dataclass, field
@@ -36,7 +36,9 @@ LOOP_S = 20.0         # a loop's length (a board sound shorter than this loops a
 SEAM_S = 1.0          # the crossfade where a loop's end runs into its start
 SHORT_SEAM_S = 0.05   # ...for a board sound: a beat's own gap isn't smeared
 MAX_SOUNDS = 4        # board sounds in one background
-LAYERS = ("rain", "wind", "engine", "crowd", "space", "fire")
+LAYERS = ("rain", "wind", "engine", "crowd", "space", "fire", "window")
+AUDIO_DIR = (Path(sys._MEIPASS) / "backgrounds" if hasattr(sys, "_MEIPASS")  # pyright: ignore[reportAttributeAccessIssue]
+             else Path(__file__).resolve().parents[2] / "assets" / "backgrounds")
 
 # the Speed and pitch pop-up's settings: like Live controls', for one sound
 TWEAKS = (Param("speed", "Speed", 0.5, 2.0, 1.0, "x", 0.05),
@@ -121,20 +123,30 @@ def fx_for(tweaks: dict) -> dict:
     return f
 
 
+@lru_cache(maxsize=len(LAYERS))
+def recording(layer: str) -> np.ndarray:
+    """Decode one bundled CC0 loop off the audio thread; shared read-only samples."""
+    import soundfile as sf
+    if layer not in LAYERS:
+        raise ValueError("unknown background layer")
+    audio, rate = sf.read(AUDIO_DIR / (layer + ".flac"), dtype="float32")
+    if rate != SR or audio.ndim != 1 or not len(audio) or not np.isfinite(audio).all():
+        raise ValueError("invalid background recording")
+    # Sparse drops can have high crest factors. Keep their natural dynamics
+    # without a single drop clipping at the full layer level (0.08).
+    audio = _norm(audio, peak=8.0)
+    audio.flags.writeable = False
+    return audio
+
+
 def generate(layer: str, seconds: float, rate: int = SR, seed: int | None = None) -> np.ndarray:
-    """`seconds` of a built-in layer at about RMS 1, mono float32 (the Background
-    effect's own generator, run ahead of time)."""
-    from soundboard.voicefx.builtin import Background
-    e = Background(rate, {layer: 1})
-    if seed is not None:
-        e.reseed(seed)
-    n = int(seconds * rate)
-    out = np.empty(n, F32)
-    blk = 1024
-    for i in range(0, n, blk):
-        k = min(blk, n - i)
-        out[i:i + k] = e.layer(layer, k, rate)
-        e.t += k / rate
+    """An excerpt of the same CC0 loop used live, RMS ~1, made off the audio thread."""
+    import soxr
+    raw = recording(layer)
+    n = int(seconds * SR)
+    out = np.tile(raw, max(1, math.ceil(n / len(raw))))[:n].copy()
+    if rate != SR:
+        out = soxr.resample(out, SR, rate).astype(F32)
     return out
 
 
@@ -158,11 +170,14 @@ def _mono(x: np.ndarray) -> np.ndarray:
     return x.astype(F32, copy=False).mean(axis=1).astype(F32)
 
 
-def _norm(x: np.ndarray) -> np.ndarray:
+def _norm(x: np.ndarray, peak: float | None = None) -> np.ndarray:
     """A board sound at about the built-in layers' loudness (RMS 1 before its level),
     so a slider means the same on every row. Silence stays silence."""
     rms = float(np.sqrt(np.mean(x * x))) if len(x) else 0.0
-    return (x / F32(rms)).astype(F32) if rms > 1e-5 else x
+    out = (x / F32(rms)).astype(F32) if rms > 1e-5 else x
+    if peak is not None and len(out):
+        out = out * F32(min(1.0, peak / max(float(np.max(np.abs(out))), 1e-9)))
+    return out
 
 
 def render_layer(layer: str, tweaks: dict) -> np.ndarray:
@@ -171,6 +186,8 @@ def render_layer(layer: str, tweaks: dict) -> np.ndarray:
 
     from soundboard import soundfx
     t = clean_tweaks(tweaks)
+    if is_neutral(t):
+        return recording(layer)
     # rain or wind has no tune to keep: speed and pitch are one resample (a tape sped
     # up), not soundfx's stretch, which took seconds of the app's time for 30 s
     factor = t["speed"] * 2 ** (t["pitch"] / 12)
@@ -179,7 +196,7 @@ def render_layer(layer: str, tweaks: dict) -> np.ndarray:
         raw = soxr.resample(raw, SR * factor, SR).astype(F32)
     st = np.stack([raw, raw], 1)
     out = _mono(soundfx.render(st, fx_for({**t, "speed": 1.0, "pitch": 0.0})))
-    return loopable(_norm(out[:int((LOOP_S + SEAM_S) * SR)]), SEAM_S)
+    return _norm(loopable(out[:int((LOOP_S + SEAM_S) * SR)], SEAM_S), peak=8.0)
 
 
 def render_sound(audio: np.ndarray, tweaks: dict | None) -> np.ndarray:
@@ -202,7 +219,7 @@ def _board_loop(load: Callable[[str], np.ndarray | None], sid: str, tweaks: dict
 @dataclass(frozen=True)
 class Beds:
     """Finished loops for the Background effect. `layers`: built-in layer -> its loop
-    (only changed ones; the rest are made live). `sounds`: (loop, level) per board
+    (including neutral recordings). `sounds`: (loop, level) per board
     sound. Swapped in whole: the audio thread reads one attribute."""
     layers: dict = field(default_factory=dict)
     sounds: tuple = ()
@@ -212,9 +229,11 @@ class Beds:
 def wanted(cfg: dict | None) -> tuple:
     """What a Background's settings need made: ((layer, tweaks...), (id, tweaks...)),
     hashable, so a change of level alone (no new loop) is seen as the same."""
-    extra = clean_extra(cfg or {})
-    layers = tuple(sorted((k, tuple(sorted(v.items())))
-                          for k, v in extra.get("tweaks", {}).items()))
+    cfg = cfg or {}
+    extra = clean_extra(cfg)
+    tweaks = extra.get("tweaks", {})
+    layers = tuple((k, tuple(sorted(clean_tweaks(tweaks.get(k)).items())))
+                   for k in LAYERS if Param(k, k, 0, 1, 0).clamp(cfg.get(k, 0)) > 0)
     sounds = tuple((d["id"], tuple(sorted(clean_tweaks(d.get("tweaks")).items())))
                    for d in extra.get("sounds", []))
     return layers, sounds

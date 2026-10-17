@@ -4168,5 +4168,6 @@
   "Super Rare": "Super rar",
   "Uncommon": "Neobișnuit",
   "<b>{device}</b> looks like speakers, so your mic hears itself. Keep them quiet or use headphones. If it starts to squeal, this switches off by itself.": "<b>{device}</b> pare să fie boxe, deci microfonul se aude pe sine. Ține-le încet sau folosește căști. Dacă începe să fluiere, se oprește singur.",
-  "Stopped <b>Hear what they hear</b>: your mic was picking up your speakers and started to squeal. Use headphones, or turn the speakers down.": "Oprit <b>Auzi ce aud ei</b>: microfonul prindea boxele și a început să fluiere. Folosește căști sau dă boxele mai încet."
+  "Stopped <b>Hear what they hear</b>: your mic was picking up your speakers and started to squeal. Use headphones, or turn the speakers down.": "Oprit <b>Auzi ce aud ei</b>: microfonul prindea boxele și a început să fluiere. Folosește căști sau dă boxele mai încet.",
+  "Rain on a window": "Ploaie pe geam"
 }

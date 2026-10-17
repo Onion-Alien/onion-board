@@ -4090,5 +4090,6 @@
   "Super Rare": "Superzeldzaam",
   "Uncommon": "Ongewoon",
   "<b>{device}</b> looks like speakers, so your mic hears itself. Keep them quiet or use headphones. If it starts to squeal, this switches off by itself.": "<b>{device}</b> lijkt op speakers, dus je mic hoort zichzelf. Houd ze zacht of gebruik een koptelefoon. Gaat het piepen, dan schakelt dit vanzelf uit.",
-  "Stopped <b>Hear what they hear</b>: your mic was picking up your speakers and started to squeal. Use headphones, or turn the speakers down.": "<b>Hoor wat zij horen</b> gestopt: je mic ving je speakers op en begon te piepen. Gebruik een koptelefoon, of zet de speakers zachter."
+  "Stopped <b>Hear what they hear</b>: your mic was picking up your speakers and started to squeal. Use headphones, or turn the speakers down.": "<b>Hoor wat zij horen</b> gestopt: je mic ving je speakers op en begon te piepen. Gebruik een koptelefoon, of zet de speakers zachter.",
+  "Rain on a window": "Regen tegen het raam"
 }

@@ -7,11 +7,13 @@ The pop-up only reads and writes through the panel (`VoiceFxPanel.on_top_state` 
 `set_on_top`), so the Background card in Edit voice and the pop-up always agree."""
 from __future__ import annotations
 
+import logging
+import threading
 from typing import TYPE_CHECKING
 
 import numpy as np
 
-from PySide6.QtCore import QEvent, QPoint, Qt, QTimer
+from PySide6.QtCore import QEvent, QPoint, Qt, QTimer, Signal
 from PySide6.QtWidgets import (QApplication, QDialog, QHBoxLayout, QLabel, QPushButton,
                                QVBoxLayout, QWidget)
 
@@ -31,6 +33,8 @@ EXTRAS = (("extra_robot", "mix"), ("extra_radio", "drive"), ("extra_echo", "mix"
 START = 0.5   # a background sound's level when you add it
 LISTEN_S, LISTEN_GAIN = 4.0, 0.12   # its ▶: seconds of it, and how loud (it's at RMS 1)
 LISTEN_SID = "effects-listen:preview"   # (":preview": the headphones only)
+log = logging.getLogger(__name__)
+
 LISTEN_DOT = 20   # the ▶ circle inside a background sound's chip
 
 
@@ -55,6 +59,8 @@ def item_name(key: str) -> str:
 class EffectsPopup(QDialog):
     """Over the voice bar, above its Effects button. Built again on every add or ✕;
     a slider only changes its own value (the rows stay put while you drag)."""
+
+    preview_ready = Signal(int, str, object)
 
     def __init__(self, panel: VoiceFxPanel):
         super().__init__(panel.window(), Qt.WindowType.Popup | Qt.WindowType.FramelessWindowHint)
@@ -92,6 +98,8 @@ class EffectsPopup(QDialog):
         self.removes: dict[str, QPushButton] = {}
         self.adds: dict[str, QPushButton] = {}
         self.listens: dict[str, QPushButton] = {}
+        self._preview_gen = 0
+        self.preview_ready.connect(self._preview_done)
         self._listening: str | None = None   # the background sound heard right now
 
     # ------------------------------------------------------------- building
@@ -231,23 +239,45 @@ class EffectsPopup(QDialog):
         if engine is None:
             return
         was = self._listening
-        if was == key and LISTEN_SID in engine.playing():
-            engine.stop(LISTEN_SID)
+        self._preview_gen += 1
+        gen = self._preview_gen
+        engine.stop(LISTEN_SID)
+        if was == key:
             self._listening = None
             self._dot_look(key)
             return
-        x = backdrop.generate(key, LISTEN_S, seed=1)
-        n = min(len(x), int(0.3 * backdrop.SR))   # faded in and out, no click
-        ramp = np.linspace(0.0, 1.0, n, dtype=np.float32)
-        x[:n] *= ramp
-        x[-n:] *= ramp[::-1]
-        engine.play(LISTEN_SID, np.stack([x, x], 1), LISTEN_GAIN, mode="restart",
-                    preview=True)
         self._listening = key
         if was is not None:
             self._dot_look(was)
         self._dot_look(key)
-        QTimer.singleShot(int(LISTEN_S * 1000) + 100, self, lambda k=key: self._heard(k))
+
+        def prepare():
+            try:
+                x = backdrop.generate(key, LISTEN_S)
+                n = min(len(x), int(0.3 * backdrop.SR))
+                ramp = np.linspace(0.0, 1.0, n, dtype=np.float32)
+                x[:n] *= ramp
+                x[-n:] *= ramp[::-1]
+                data = np.stack([x, x], 1)
+            except Exception:  # noqa: BLE001 - a missing asset doesn't stop the popup
+                log.warning("background preview couldn't be loaded: %s", key, exc_info=True)
+                data = None
+            try:
+                self.preview_ready.emit(gen, key, data)
+            except RuntimeError:  # the owner was deleted while the file loaded
+                pass
+        threading.Thread(target=prepare, name="background-preview", daemon=True).start()
+
+    def _preview_done(self, gen: int, key: str, data):
+        if gen != self._preview_gen or self._listening != key or not self.isVisible():
+            return
+        engine = getattr(self.panel.window(), "engine", None)
+        if data is None or engine is None:
+            self._heard(key)
+            return
+        engine.play(LISTEN_SID, data, LISTEN_GAIN, mode="restart", preview=True)
+        QTimer.singleShot(int(LISTEN_S * 1000) + 100, self,
+                          lambda g=gen, k=key: g == self._preview_gen and self._heard(k))
 
     def _heard(self, key: str):
         """Its few seconds are over: the dot is a ▶ again."""
@@ -256,6 +286,7 @@ class EffectsPopup(QDialog):
             self._dot_look(key)
 
     def hideEvent(self, e):
+        self._preview_gen += 1
         engine = getattr(self.panel.window(), "engine", None)
         if engine is not None and self._listening is not None:
             engine.stop(LISTEN_SID)   # closed: the sample goes with it

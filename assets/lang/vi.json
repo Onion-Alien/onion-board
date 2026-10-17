@@ -4012,5 +4012,6 @@
   "Super Rare": "Siêu hiếm",
   "Uncommon": "Không phổ biến",
   "<b>{device}</b> looks like speakers, so your mic hears itself. Keep them quiet or use headphones. If it starts to squeal, this switches off by itself.": "<b>{device}</b> có vẻ là loa, nên mic nghe thấy chính nó. Hãy để nhỏ hoặc dùng tai nghe. Nếu bắt đầu rú rít, chức năng này sẽ tự tắt.",
-  "Stopped <b>Hear what they hear</b>: your mic was picking up your speakers and started to squeal. Use headphones, or turn the speakers down.": "Đã dừng <b>Nghe như họ nghe</b>: mic thu lại tiếng loa và bắt đầu rú rít. Hãy dùng tai nghe, hoặc vặn nhỏ loa."
+  "Stopped <b>Hear what they hear</b>: your mic was picking up your speakers and started to squeal. Use headphones, or turn the speakers down.": "Đã dừng <b>Nghe như họ nghe</b>: mic thu lại tiếng loa và bắt đầu rú rít. Hãy dùng tai nghe, hoặc vặn nhỏ loa.",
+  "Rain on a window": "Mưa trên cửa sổ"
 }

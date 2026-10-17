@@ -4090,5 +4090,6 @@
   "Super Rare": "Súper raro",
   "Uncommon": "Poco común",
   "<b>{device}</b> looks like speakers, so your mic hears itself. Keep them quiet or use headphones. If it starts to squeal, this switches off by itself.": "<b>{device}</b> parece ser bocinas, así que tu micrófono se escucha a sí mismo. Bájales el volumen o usa audífonos. Si empieza a chillar, esto se apaga solo.",
-  "Stopped <b>Hear what they hear</b>: your mic was picking up your speakers and started to squeal. Use headphones, or turn the speakers down.": "Se detuvo <b>Oír lo que oyen</b>: tu micrófono captaba tus bocinas y empezó a chillar. Usa audífonos o bájale a las bocinas."
+  "Stopped <b>Hear what they hear</b>: your mic was picking up your speakers and started to squeal. Use headphones, or turn the speakers down.": "Se detuvo <b>Oír lo que oyen</b>: tu micrófono captaba tus bocinas y empezó a chillar. Usa audífonos o bájale a las bocinas.",
+  "Rain on a window": "Lluvia en la ventana"
 }
