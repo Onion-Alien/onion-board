@@ -3584,5 +3584,8 @@
   "Tic-tac-toe with Bun": "Cờ ca-rô với Bun",
   "Wait for it…": "Chờ đã…",
   "too early!": "sớm quá!",
-  "{ms} ms": "{ms} ms"
+  "{ms} ms": "{ms} ms",
+  "{n} min": [
+    "{n} phút"
+  ]
 }

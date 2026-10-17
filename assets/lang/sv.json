@@ -3661,5 +3661,9 @@
   "Tic-tac-toe with Bun": "Tre i rad med Bun",
   "Wait for it…": "Vänta…",
   "too early!": "för tidigt!",
-  "{ms} ms": "{ms} ms"
+  "{ms} ms": "{ms} ms",
+  "{n} min": [
+    "{n} min",
+    "{n} min"
+  ]
 }

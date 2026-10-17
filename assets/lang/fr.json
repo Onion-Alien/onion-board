@@ -3661,5 +3661,9 @@
   "Tic-tac-toe with Bun": "Morpion avec Bun",
   "Wait for it…": "Attends…",
   "too early!": "trop tôt !",
-  "{ms} ms": "{ms} ms"
+  "{ms} ms": "{ms} ms",
+  "{n} min": [
+    "{n} min",
+    "{n} min"
+  ]
 }

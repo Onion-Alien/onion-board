@@ -3738,5 +3738,10 @@
   "Tic-tac-toe with Bun": "Kółko i krzyżyk z Bunem",
   "Wait for it…": "Czekaj…",
   "too early!": "za wcześnie!",
-  "{ms} ms": "{ms} ms"
+  "{ms} ms": "{ms} ms",
+  "{n} min": [
+    "{n} min",
+    "{n} min",
+    "{n} min"
+  ]
 }

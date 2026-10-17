@@ -3584,5 +3584,8 @@
   "Tic-tac-toe with Bun": "Bunと三目並べ",
   "Wait for it…": "まだだよ…",
   "too early!": "早すぎ！",
-  "{ms} ms": "{ms} ミリ秒"
+  "{ms} ms": "{ms} ミリ秒",
+  "{n} min": [
+    "{n}分"
+  ]
 }

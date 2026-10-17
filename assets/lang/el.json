@@ -3661,5 +3661,9 @@
   "Tic-tac-toe with Bun": "Τρίλιζα με τον Bun",
   "Wait for it…": "Περίμενε…",
   "too early!": "πολύ νωρίς!",
-  "{ms} ms": "{ms} ms"
+  "{ms} ms": "{ms} ms",
+  "{n} min": [
+    "{n} λεπ.",
+    "{n} λεπ."
+  ]
 }

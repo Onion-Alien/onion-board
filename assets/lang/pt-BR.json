@@ -3661,5 +3661,9 @@
   "Tic-tac-toe with Bun": "Jogo da velha com o Bun",
   "Wait for it…": "Espera…",
   "too early!": "cedo demais!",
-  "{ms} ms": "{ms} ms"
+  "{ms} ms": "{ms} ms",
+  "{n} min": [
+    "{n} min",
+    "{n} min"
+  ]
 }

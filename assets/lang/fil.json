@@ -3661,5 +3661,9 @@
   "Tic-tac-toe with Bun": "Tic-tac-toe kasama si Bun",
   "Wait for it…": "Hintayin mo…",
   "too early!": "masyadong maaga!",
-  "{ms} ms": "{ms} ms"
+  "{ms} ms": "{ms} ms",
+  "{n} min": [
+    "{n} min",
+    "{n} min"
+  ]
 }

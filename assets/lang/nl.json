@@ -3661,5 +3661,9 @@
   "Tic-tac-toe with Bun": "Boter-kaas-en-eieren met Bun",
   "Wait for it…": "Wacht maar…",
   "too early!": "te vroeg!",
-  "{ms} ms": "{ms} ms"
+  "{ms} ms": "{ms} ms",
+  "{n} min": [
+    "{n} min",
+    "{n} min"
+  ]
 }

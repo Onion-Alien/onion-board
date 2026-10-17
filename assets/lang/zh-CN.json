@@ -3584,5 +3584,8 @@
   "Tic-tac-toe with Bun": "和 Bun 玩井字棋",
   "Wait for it…": "等一下…",
   "too early!": "太早了！",
-  "{ms} ms": "{ms} 毫秒"
+  "{ms} ms": "{ms} 毫秒",
+  "{n} min": [
+    "{n} 分钟"
+  ]
 }

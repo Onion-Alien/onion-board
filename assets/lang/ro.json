@@ -3738,5 +3738,10 @@
   "Tic-tac-toe with Bun": "X și 0 cu Bun",
   "Wait for it…": "Așteaptă…",
   "too early!": "prea devreme!",
-  "{ms} ms": "{ms} ms"
+  "{ms} ms": "{ms} ms",
+  "{n} min": [
+    "{n} min",
+    "{n} min",
+    "{n} min"
+  ]
 }

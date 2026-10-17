@@ -3661,5 +3661,9 @@
   "Tic-tac-toe with Bun": "Bondesjakk med Bun",
   "Wait for it…": "Vent på det…",
   "too early!": "for tidlig!",
-  "{ms} ms": "{ms} ms"
+  "{ms} ms": "{ms} ms",
+  "{n} min": [
+    "{n} min",
+    "{n} min"
+  ]
 }

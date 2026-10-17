@@ -3584,5 +3584,8 @@
   "Tic-tac-toe with Bun": "Tic-tac-toe dengan Bun",
   "Wait for it…": "Tunggu…",
   "too early!": "terlalu cepat!",
-  "{ms} ms": "{ms} ms"
+  "{ms} ms": "{ms} ms",
+  "{n} min": [
+    "{n} mnt"
+  ]
 }

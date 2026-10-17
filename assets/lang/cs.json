@@ -3738,5 +3738,10 @@
   "Tic-tac-toe with Bun": "Piškvorky s Bunem",
   "Wait for it…": "Počkej…",
   "too early!": "moc brzo!",
-  "{ms} ms": "{ms} ms"
+  "{ms} ms": "{ms} ms",
+  "{n} min": [
+    "{n} min",
+    "{n} min",
+    "{n} min"
+  ]
 }

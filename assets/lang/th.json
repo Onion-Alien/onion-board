@@ -3584,5 +3584,8 @@
   "Tic-tac-toe with Bun": "โอเอ็กซ์กับ Bun",
   "Wait for it…": "รอก่อน…",
   "too early!": "เร็วเกินไป!",
-  "{ms} ms": "{ms} ms"
+  "{ms} ms": "{ms} ms",
+  "{n} min": [
+    "{n} นาที"
+  ]
 }

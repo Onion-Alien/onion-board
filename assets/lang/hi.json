@@ -3661,5 +3661,9 @@
   "Tic-tac-toe with Bun": "Bun के साथ टिक-टैक-टो",
   "Wait for it…": "रुको…",
   "too early!": "बहुत जल्दी!",
-  "{ms} ms": "{ms} ms"
+  "{ms} ms": "{ms} ms",
+  "{n} min": [
+    "{n} मिनट",
+    "{n} मिनट"
+  ]
 }

@@ -3661,5 +3661,9 @@
   "Tic-tac-toe with Bun": "Ristinolla Bunin kanssa",
   "Wait for it…": "Odota…",
   "too early!": "liian aikaisin!",
-  "{ms} ms": "{ms} ms"
+  "{ms} ms": "{ms} ms",
+  "{n} min": [
+    "{n} min",
+    "{n} min"
+  ]
 }

@@ -3661,5 +3661,9 @@
   "Tic-tac-toe with Bun": "Морски шах с Bun",
   "Wait for it…": "Чакай…",
   "too early!": "твърде рано!",
-  "{ms} ms": "{ms} мс"
+  "{ms} ms": "{ms} мс",
+  "{n} min": [
+    "{n} мин",
+    "{n} мин"
+  ]
 }

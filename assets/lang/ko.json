@@ -3584,5 +3584,8 @@
   "Tic-tac-toe with Bun": "Bun과 틱택토",
   "Wait for it…": "기다려…",
   "too early!": "너무 빨라!",
-  "{ms} ms": "{ms}ms"
+  "{ms} ms": "{ms}ms",
+  "{n} min": [
+    "{n}분"
+  ]
 }
