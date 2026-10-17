@@ -61,10 +61,11 @@ class ThemeControl(Controller):
         mw = self.mw
         if theme.valid_colour(colour) == theme.live_override:
             return False
-        mw.set_option("live_color", theme.apply_live(QApplication.instance(), colour))
-        icons.retheme_live()
-        mw._pill_long = ""   # forces _update_flow to repaint its icon
-        mw.statusctl._update_status()
+        with themecover.blended(mw):   # (a fade from the old colour, not a swap)
+            mw.set_option("live_color", theme.apply_live(QApplication.instance(), colour))
+            icons.retheme_live()
+            mw._pill_long = ""   # forces _update_flow to repaint its icon
+            mw.statusctl._update_status()
         return True
 
     def set_theme_texture(self, on: bool):
