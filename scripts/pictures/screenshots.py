@@ -39,7 +39,7 @@ import soundfile as sf  # noqa: E402
 from PySide6.QtCore import QEventLoop  # noqa: E402
 from PySide6.QtWidgets import QApplication  # noqa: E402
 
-from soundboard import appaudio, autostart, engine, library, winkeys  # noqa: E402
+from soundboard import appaudio, autostart, engine, library, tips, winkeys  # noqa: E402
 
 winkeys.key_char = conftest.us_key_char   # hotkeys drawn as on a US keyboard
 
@@ -150,7 +150,10 @@ def demo_config(tmp: Path, theme: str, texture: bool):
     library.Config(sounds=sounds, categories=["Memes", "Reactions", "Music"],
                    setup_done=True, theme=theme, theme_texture=texture,
                    screen={"triggers": demo_triggers(tmp)},
-                   route="mic", mic_first=True).save()
+                   route="mic", mic_first=True,
+                   # like someone who's used it: no tab how-tos (or their "got it" toast)
+                   # and today's "Did you know?" tip already shown
+                   tips_seen=[f"tour-{t}" for t in library.TOUR_TABS], tip_day=tips.today()).save()
 
 
 def pad_picture(tmp: Path, name: str) -> str:
