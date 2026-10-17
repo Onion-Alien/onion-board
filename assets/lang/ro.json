@@ -3822,6 +3822,18 @@
     "Onion Board a avut {n} de probleme de la pornire."
   ],
   "See report": "Vezi raportul",
+  "The store doesn't take that name or those tags. Try other words (and no links).": "Magazinul nu acceptă acest nume sau aceste etichete. Încearcă alte cuvinte (și fără linkuri).",
+  "Add a voice someone sent you as a code (it starts with “OB”)": "Adaugă o voce pe care cineva ți-a trimis-o ca cod (începe cu „OB”)",
+  "Add “{name}”?": "Adăugați „{name}”?",
+  "That isn't a voice code (they start with “OB”).": "Acesta nu este un cod vocal (încep cu „OB”).",
+  " · hidden from All": " · ascunsă din Toate",
+  "Every sound except those in: {names} (right-click one of them, Advanced, to show it here again)": "Toate sunetele, în afară de cele din: {names} (clic dreapta pe una dintre ele, Avansat, ca s-o arăți din nou aici)",
+  "Hide its sounds from All": "Ascunde-i sunetele din Toate",
+  "“{name}” is hidden from All. Its sounds stay on its own tab.": "„{name}” e ascunsă din Toate. Sunetele ei rămân în fila ei.",
+  "“{name}” shows in All again": "„{name}” apare din nou în Toate",
+  "All categories": "Toate categoriile",
+  "Votes": "Voturi",
+  "Tutorials are off now. Settings → General turns them back on.": "Ghidurile sunt oprite acum. Setări → General le pornește din nou.",
   "Add a sound from my board": "Adaugă un sunet de pe board-ul meu",
   "Astronaut": "Astronaut",
   "Bass boosted": "Bas amplificat",
@@ -3856,12 +3868,6 @@
   "packed": "arhiplin",
   "pouring": "ploaie torențială",
   "roaring": "vâlvătaie",
-  "All categories": "Toate categoriile",
-  "Votes": "Voturi",
-  "The store doesn't take that name or those tags. Try other words (and no links).": "Magazinul nu acceptă acest nume sau aceste etichete. Încearcă alte cuvinte (și fără linkuri).",
-  "Add a voice someone sent you as a code (it starts with “OB”)": "Adaugă o voce pe care cineva ți-a trimis-o ca cod (începe cu „OB”)",
-  "Add “{name}”?": "Adăugați „{name}”?",
-  "That isn't a voice code (they start with “OB”).": "Acesta nu este un cod vocal (încep cu „OB”).",
   "Background  ·  {n} on": [
     "Fundal  ·  {n} activat",
     "Fundal  ·  {n} activate",
@@ -3875,10 +3881,5 @@
   ],
   "Make a voice of your own first: Voice tab → Voice changer → Edit voice, or Save what's on under My setups.": "Fă-ți întâi o voce proprie: fila Voce → Schimbator de voce → Editează vocea, sau Salvează ce e pornit la Setările mele.",
   "Rain, wind, a crowd or sounds from your board behind your voice": "Ploaie, vânt, o mulțime sau sunete de pe board-ul tău în spatele vocii tale",
-  "Your own settings: Edit voice opens them": "Setările tale: „Editează vocea” le deschide",
-  " · hidden from All": " · ascunsă din Toate",
-  "Every sound except those in: {names} (right-click one of them, Advanced, to show it here again)": "Toate sunetele, în afară de cele din: {names} (clic dreapta pe una dintre ele, Avansat, ca s-o arăți din nou aici)",
-  "Hide its sounds from All": "Ascunde-i sunetele din Toate",
-  "“{name}” is hidden from All. Its sounds stay on its own tab.": "„{name}” e ascunsă din Toate. Sunetele ei rămân în fila ei.",
-  "“{name}” shows in All again": "„{name}” apare din nou în Toate"
+  "Your own settings: Edit voice opens them": "Setările tale: „Editează vocea” le deschide"
 }

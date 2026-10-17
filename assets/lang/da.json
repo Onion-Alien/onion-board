@@ -3744,6 +3744,18 @@
     "Onion Board har ramt {n} problemer, siden det startede."
   ],
   "See report": "Se rapport",
+  "The store doesn't take that name or those tags. Try other words (and no links).": "Butikken tager ikke det navn eller de tags. Prøv andre ord (og ingen links).",
+  "Add a voice someone sent you as a code (it starts with “OB”)": "Tilføj en stemme, som nogen sendte dig som en kode (den starter med \"OB\")",
+  "Add “{name}”?": "Vil du tilføje “{name}”?",
+  "That isn't a voice code (they start with “OB”).": "Det er ikke en stemmekode (de starter med \"OB\").",
+  " · hidden from All": " · skjult fra Alle",
+  "Every sound except those in: {names} (right-click one of them, Advanced, to show it here again)": "Alle lyde undtagen dem i: {names} (højreklik på en af dem, Avanceret, for at vise den her igen)",
+  "Hide its sounds from All": "Skjul dens lyde fra Alle",
+  "“{name}” is hidden from All. Its sounds stay on its own tab.": "“{name}” er skjult fra Alle. Dens lyde bliver på dens egen fane.",
+  "“{name}” shows in All again": "“{name}” vises i Alle igen",
+  "All categories": "Alle kategorier",
+  "Votes": "Bedømmelser",
+  "Tutorials are off now. Settings → General turns them back on.": "Vejledninger er slået fra nu. Indstillinger → Generelt slår dem til igen.",
   "Add a sound from my board": "Tilføj en lyd fra mit board",
   "Astronaut": "Astronaut",
   "Bass boosted": "Bas-boost",
@@ -3778,12 +3790,6 @@
   "packed": "proppet",
   "pouring": "skybrud",
   "roaring": "flammende",
-  "All categories": "Alle kategorier",
-  "Votes": "Bedømmelser",
-  "The store doesn't take that name or those tags. Try other words (and no links).": "Butikken tager ikke det navn eller de tags. Prøv andre ord (og ingen links).",
-  "Add a voice someone sent you as a code (it starts with “OB”)": "Tilføj en stemme, som nogen sendte dig som en kode (den starter med \"OB\")",
-  "Add “{name}”?": "Vil du tilføje “{name}”?",
-  "That isn't a voice code (they start with “OB”).": "Det er ikke en stemmekode (de starter med \"OB\").",
   "Background  ·  {n} on": [
     "Baggrund  ·  {n} slået til",
     "Baggrund  ·  {n} slået til"
@@ -3795,10 +3801,5 @@
   ],
   "Make a voice of your own first: Voice tab → Voice changer → Edit voice, or Save what's on under My setups.": "Lav først din egen stemme: fanen Stemme → Stemmeskifter → Rediger stemme, eller Gem det, der er slået til, under Mine opsætninger.",
   "Rain, wind, a crowd or sounds from your board behind your voice": "Regn, vind, en menneskemængde eller lyde fra dit board bag din stemme",
-  "Your own settings: Edit voice opens them": "Dine egne indstillinger: „Rediger stemme“ åbner dem",
-  " · hidden from All": " · skjult fra Alle",
-  "Every sound except those in: {names} (right-click one of them, Advanced, to show it here again)": "Alle lyde undtagen dem i: {names} (højreklik på en af dem, Avanceret, for at vise den her igen)",
-  "Hide its sounds from All": "Skjul dens lyde fra Alle",
-  "“{name}” is hidden from All. Its sounds stay on its own tab.": "“{name}” er skjult fra Alle. Dens lyde bliver på dens egen fane.",
-  "“{name}” shows in All again": "“{name}” vises i Alle igen"
+  "Your own settings: Edit voice opens them": "Dine egne indstillinger: „Rediger stemme“ åbner dem"
 }

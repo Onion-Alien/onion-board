@@ -3822,6 +3822,18 @@
     "Onion Board od spuštění narazil na {n} problémů."
   ],
   "See report": "Zobrazit hlášení",
+  "The store doesn't take that name or those tags. Try other words (and no links).": "Obchod tento název nebo štítky nepřijme. Zkus jiná slova (a žádné odkazy).",
+  "Add a voice someone sent you as a code (it starts with “OB”)": "Přidejte hlas, který vám někdo poslal jako kód (začíná „OB“)",
+  "Add “{name}”?": "Přidat „{name}“?",
+  "That isn't a voice code (they start with “OB”).": "To není hlasový kód (začínají „OB“).",
+  " · hidden from All": " · skrytá ve Vše",
+  "Every sound except those in: {names} (right-click one of them, Advanced, to show it here again)": "Všechny zvuky kromě těch v: {names} (pravým klikem na jednu z nich, Pokročilé, ji tu zase ukážeš)",
+  "Hide its sounds from All": "Skrýt její zvuky ve Vše",
+  "“{name}” is hidden from All. Its sounds stay on its own tab.": "„{name}“ je skrytá ve Vše. Její zvuky zůstávají na její vlastní kartě.",
+  "“{name}” shows in All again": "„{name}“ se zase ukazuje ve Vše",
+  "All categories": "Všechny kategorie",
+  "Votes": "Hodnocení",
+  "Tutorials are off now. Settings → General turns them back on.": "Návody jsou teď vypnuté. V Nastavení → Obecné je zase zapneš.",
   "Add a sound from my board": "Přidat zvuk z mého boardu",
   "Astronaut": "Astronaut",
   "Bass boosted": "Zesílené basy",
@@ -3856,12 +3868,6 @@
   "packed": "narváno",
   "pouring": "liják",
   "roaring": "plápolající",
-  "All categories": "Všechny kategorie",
-  "Votes": "Hodnocení",
-  "The store doesn't take that name or those tags. Try other words (and no links).": "Obchod tento název nebo štítky nepřijme. Zkus jiná slova (a žádné odkazy).",
-  "Add a voice someone sent you as a code (it starts with “OB”)": "Přidejte hlas, který vám někdo poslal jako kód (začíná „OB“)",
-  "Add “{name}”?": "Přidat „{name}“?",
-  "That isn't a voice code (they start with “OB”).": "To není hlasový kód (začínají „OB“).",
   "Background  ·  {n} on": [
     "Pozadí  ·  {n} zapnuto",
     "Pozadí  ·  {n} zapnuto",
@@ -3875,10 +3881,5 @@
   ],
   "Make a voice of your own first: Voice tab → Voice changer → Edit voice, or Save what's on under My setups.": "Nejdřív si udělej vlastní hlas: karta Hlas → Měnič hlasu → Upravit hlas, nebo Uložit, co je zapnuté v Mých sestavách.",
   "Rain, wind, a crowd or sounds from your board behind your voice": "Déšť, vítr, dav nebo zvuky z tvého boardu za tvým hlasem",
-  "Your own settings: Edit voice opens them": "Tvoje vlastní nastavení: otevřeš je přes „Upravit hlas“",
-  " · hidden from All": " · skrytá ve Vše",
-  "Every sound except those in: {names} (right-click one of them, Advanced, to show it here again)": "Všechny zvuky kromě těch v: {names} (pravým klikem na jednu z nich, Pokročilé, ji tu zase ukážeš)",
-  "Hide its sounds from All": "Skrýt její zvuky ve Vše",
-  "“{name}” is hidden from All. Its sounds stay on its own tab.": "„{name}“ je skrytá ve Vše. Její zvuky zůstávají na její vlastní kartě.",
-  "“{name}” shows in All again": "„{name}“ se zase ukazuje ve Vše"
+  "Your own settings: Edit voice opens them": "Tvoje vlastní nastavení: otevřeš je přes „Upravit hlas“"
 }
