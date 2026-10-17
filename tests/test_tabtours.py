@@ -166,3 +166,32 @@ def test_no_station_list_ends_it(window, qapp):
     assert open_tab(window, qapp, "radio")
     window.radio._globe_error = "Can't reach the station list."
     assert process_events(qapp, lambda: tabtours._current is None, 2)
+
+
+def skip_open_tour(window, qapp, tab):
+    assert open_tab(window, qapp, tab)
+    tour = tabtours._current
+    tour._show_skip(tour.step)
+    tour.card.btn_skip.click()
+    window.tabs.setCurrentWidget(window.sounds_page)
+
+
+def test_two_quick_not_nows_switch_the_rest_off(window, qapp, counted, monkeypatch):
+    toasts = []
+    monkeypatch.setattr(tabtours.busy, "toast", lambda w, text, *a, **k: toasts.append(text))
+    skip_open_tour(window, qapp, "store")
+    assert window.cfg.tutorials_on and not toasts
+    skip_open_tour(window, qapp, "apps")
+    assert not window.cfg.tutorials_on and "tours-quit" in counted
+    assert toasts == ["Tutorials are off now. Settings → General turns them back on."]
+    assert not open_tab(window, qapp, "radio")   # the rest stay off
+    window.tipctl.set_tutorials_on(True)        # Settings brings back the ones not seen
+    window.tabs.setCurrentWidget(window.sounds_page)
+    assert open_tab(window, qapp, "radio")
+
+
+def test_not_nows_far_apart_keep_them_on(window, qapp):
+    skip_open_tour(window, qapp, "store")
+    window._tour_skipped_at -= tabtours.QUIT_S + 1   # (a minute and more ago)
+    skip_open_tour(window, qapp, "apps")
+    assert window.cfg.tutorials_on

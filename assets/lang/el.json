@@ -3744,6 +3744,18 @@
     "Το Onion Board είχε {n} προβλήματα από την εκκίνηση."
   ],
   "See report": "Δες την αναφορά",
+  "The store doesn't take that name or those tags. Try other words (and no links).": "Το κατάστημα δεν δέχεται αυτό το όνομα ή αυτές τις ετικέτες. Δοκίμασε άλλες λέξεις (και χωρίς συνδέσμους).",
+  "Add a voice someone sent you as a code (it starts with “OB”)": "Προσθέστε μια φωνή που σας έστειλε κάποιος ως κωδικός (ξεκινά με \"OB\")",
+  "Add “{name}”?": "Προσθήκη του «{name}»;",
+  "That isn't a voice code (they start with “OB”).": "Αυτός δεν είναι φωνητικός κωδικός (ξεκινούν με \"OB\").",
+  " · hidden from All": " · κρυφή από τα Όλα",
+  "Every sound except those in: {names} (right-click one of them, Advanced, to show it here again)": "Όλοι οι ήχοι εκτός από αυτούς σε: {names} (δεξί κλικ σε μία από αυτές, Για προχωρημένους, για να ξαναφανεί εδώ)",
+  "Hide its sounds from All": "Απόκρυψη των ήχων της από τα Όλα",
+  "“{name}” is hidden from All. Its sounds stay on its own tab.": "Η «{name}» είναι κρυφή από τα Όλα. Οι ήχοι της μένουν στη δική της καρτέλα.",
+  "“{name}” shows in All again": "Η «{name}» φαίνεται ξανά στα Όλα",
+  "All categories": "Όλες οι κατηγορίες",
+  "Votes": "Ψήφοι",
+  "Tutorials are off now. Settings → General turns them back on.": "Οι οδηγοί είναι τώρα κλειστοί. Οι Ρυθμίσεις → Γενικά τους ανοίγουν ξανά.",
   "Add a sound from my board": "Πρόσθεσε ήχο από το board μου",
   "Astronaut": "Αστροναύτης",
   "Bass boosted": "Ενισχυμένα μπάσα",
@@ -3778,12 +3790,6 @@
   "packed": "τίγκα",
   "pouring": "μπόρα",
   "roaring": "φλεγόμενη",
-  "All categories": "Όλες οι κατηγορίες",
-  "Votes": "Ψήφοι",
-  "The store doesn't take that name or those tags. Try other words (and no links).": "Το κατάστημα δεν δέχεται αυτό το όνομα ή αυτές τις ετικέτες. Δοκίμασε άλλες λέξεις (και χωρίς συνδέσμους).",
-  "Add a voice someone sent you as a code (it starts with “OB”)": "Προσθέστε μια φωνή που σας έστειλε κάποιος ως κωδικός (ξεκινά με \"OB\")",
-  "Add “{name}”?": "Προσθήκη του «{name}»;",
-  "That isn't a voice code (they start with “OB”).": "Αυτός δεν είναι φωνητικός κωδικός (ξεκινούν με \"OB\").",
   "Background  ·  {n} on": [
     "Φόντο  ·  {n} ενεργό",
     "Φόντο  ·  {n} ενεργά"
@@ -3795,10 +3801,5 @@
   ],
   "Make a voice of your own first: Voice tab → Voice changer → Edit voice, or Save what's on under My setups.": "Φτιάξε πρώτα μια δική σου φωνή: καρτέλα Φωνή → Αλλαγη φωνης → Επεξεργασία φωνής, ή Αποθήκευσε ό,τι είναι ανοιχτό στις Ρυθμίσεις μου.",
   "Rain, wind, a crowd or sounds from your board behind your voice": "Βροχή, αέρας, πλήθος ή ήχοι από το board σου πίσω από τη φωνή σου",
-  "Your own settings: Edit voice opens them": "Οι δικές σου ρυθμίσεις: τις ανοίγει το «Επεξεργασία φωνής»",
-  " · hidden from All": " · κρυφή από τα Όλα",
-  "Every sound except those in: {names} (right-click one of them, Advanced, to show it here again)": "Όλοι οι ήχοι εκτός από αυτούς σε: {names} (δεξί κλικ σε μία από αυτές, Για προχωρημένους, για να ξαναφανεί εδώ)",
-  "Hide its sounds from All": "Απόκρυψη των ήχων της από τα Όλα",
-  "“{name}” is hidden from All. Its sounds stay on its own tab.": "Η «{name}» είναι κρυφή από τα Όλα. Οι ήχοι της μένουν στη δική της καρτέλα.",
-  "“{name}” shows in All again": "Η «{name}» φαίνεται ξανά στα Όλα"
+  "Your own settings: Edit voice opens them": "Οι δικές σου ρυθμίσεις: τις ανοίγει το «Επεξεργασία φωνής»"
 }

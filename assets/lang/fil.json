@@ -3744,6 +3744,18 @@
     "Nagkaroon ang Onion Board ng {n} problema mula nang magsimula ito."
   ],
   "See report": "Tingnan ang report",
+  "The store doesn't take that name or those tags. Try other words (and no links).": "Hindi tinatanggap ng store ang pangalan o mga tag na iyan. Subukan ang ibang salita (at walang link).",
+  "Add a voice someone sent you as a code (it starts with “OB”)": "Magdagdag ng boses na ipinadala sa iyo ng isang tao bilang isang code (nagsisimula ito sa \"OB\")",
+  "Add “{name}”?": "Idagdag ang “{name}”?",
+  "That isn't a voice code (they start with “OB”).": "Hindi iyon voice code (nagsisimula sila sa “OB”).",
+  " · hidden from All": " · nakatago sa All",
+  "Every sound except those in: {names} (right-click one of them, Advanced, to show it here again)": "Lahat ng tunog maliban sa nasa: {names} (i-right-click ang isa, Advanced, para ipakita ulit dito)",
+  "Hide its sounds from All": "Itago ang mga tunog nito sa All",
+  "“{name}” is hidden from All. Its sounds stay on its own tab.": "Nakatago na ang “{name}” sa All. Nasa sarili nitong tab pa rin ang mga tunog nito.",
+  "“{name}” shows in All again": "Lumalabas na ulit ang “{name}” sa All",
+  "All categories": "Lahat ng kategorya",
+  "Votes": "Mga boto",
+  "Tutorials are off now. Settings → General turns them back on.": "Naka-off na ang mga gabay. Ino-on ulit ng Settings → General.",
   "Add a sound from my board": "Magdagdag ng tunog mula sa board ko",
   "Astronaut": "Astronaut",
   "Bass boosted": "Bass boosted",
@@ -3778,12 +3790,6 @@
   "packed": "siksikan",
   "pouring": "buhos",
   "roaring": "naglalagablab",
-  "All categories": "Lahat ng kategorya",
-  "Votes": "Mga boto",
-  "The store doesn't take that name or those tags. Try other words (and no links).": "Hindi tinatanggap ng store ang pangalan o mga tag na iyan. Subukan ang ibang salita (at walang link).",
-  "Add a voice someone sent you as a code (it starts with “OB”)": "Magdagdag ng boses na ipinadala sa iyo ng isang tao bilang isang code (nagsisimula ito sa \"OB\")",
-  "Add “{name}”?": "Idagdag ang “{name}”?",
-  "That isn't a voice code (they start with “OB”).": "Hindi iyon voice code (nagsisimula sila sa “OB”).",
   "Background  ·  {n} on": [
     "Background  ·  {n} naka-on",
     "Background  ·  {n} naka-on"
@@ -3795,10 +3801,5 @@
   ],
   "Make a voice of your own first: Voice tab → Voice changer → Edit voice, or Save what's on under My setups.": "Gumawa muna ng sarili mong voice: Voice tab → Voice changer → I-edit ang boses, o I-save ang naka-on sa Mga setup ko.",
   "Rain, wind, a crowd or sounds from your board behind your voice": "Ulan, hangin, madla o mga tunog mula sa board mo sa likod ng boses mo",
-  "Your own settings: Edit voice opens them": "Sarili mong mga setting: binubuksan ito ng “I-edit ang boses”",
-  " · hidden from All": " · nakatago sa All",
-  "Every sound except those in: {names} (right-click one of them, Advanced, to show it here again)": "Lahat ng tunog maliban sa nasa: {names} (i-right-click ang isa, Advanced, para ipakita ulit dito)",
-  "Hide its sounds from All": "Itago ang mga tunog nito sa All",
-  "“{name}” is hidden from All. Its sounds stay on its own tab.": "Nakatago na ang “{name}” sa All. Nasa sarili nitong tab pa rin ang mga tunog nito.",
-  "“{name}” shows in All again": "Lumalabas na ulit ang “{name}” sa All"
+  "Your own settings: Edit voice opens them": "Sarili mong mga setting: binubuksan ito ng “I-edit ang boses”"
 }

@@ -3666,6 +3666,18 @@
     "Onion Board menghadapi {n} masalah sejak dibuka."
   ],
   "See report": "Lihat laporan",
+  "The store doesn't take that name or those tags. Try other words (and no links).": "Kedai tidak menerima nama atau tag itu. Cuba perkataan lain (tanpa pautan).",
+  "Add a voice someone sent you as a code (it starts with “OB”)": "Tambahkan suara yang dihantar seseorang kepada anda sebagai kod (ia bermula dengan \"OB\")",
+  "Add “{name}”?": "Tambah “{name}”?",
+  "That isn't a voice code (they start with “OB”).": "Itu bukan kod suara (ia bermula dengan \"OB\").",
+  " · hidden from All": " · disembunyikan daripada Semua",
+  "Every sound except those in: {names} (right-click one of them, Advanced, to show it here again)": "Semua bunyi kecuali yang dalam: {names} (klik kanan salah satunya, Lanjutan, untuk menunjukkannya di sini semula)",
+  "Hide its sounds from All": "Sembunyikan bunyinya daripada Semua",
+  "“{name}” is hidden from All. Its sounds stay on its own tab.": "“{name}” disembunyikan daripada Semua. Bunyinya kekal di tabnya sendiri.",
+  "“{name}” shows in All again": "“{name}” ditunjukkan dalam Semua semula",
+  "All categories": "Semua kategori",
+  "Votes": "Undian",
+  "Tutorials are off now. Settings → General turns them back on.": "Panduan kini dimatikan. Tetapan → Umum menghidupkannya semula.",
   "Add a sound from my board": "Tambah bunyi dari board saya",
   "Astronaut": "Angkasawan",
   "Bass boosted": "Bass digandakan",
@@ -3700,12 +3712,6 @@
   "packed": "padat",
   "pouring": "lebat",
   "roaring": "marak",
-  "All categories": "Semua kategori",
-  "Votes": "Undian",
-  "The store doesn't take that name or those tags. Try other words (and no links).": "Kedai tidak menerima nama atau tag itu. Cuba perkataan lain (tanpa pautan).",
-  "Add a voice someone sent you as a code (it starts with “OB”)": "Tambahkan suara yang dihantar seseorang kepada anda sebagai kod (ia bermula dengan \"OB\")",
-  "Add “{name}”?": "Tambah “{name}”?",
-  "That isn't a voice code (they start with “OB”).": "Itu bukan kod suara (ia bermula dengan \"OB\").",
   "Background  ·  {n} on": [
     "Latar belakang  ·  {n} hidup"
   ],
@@ -3715,10 +3721,5 @@
   ],
   "Make a voice of your own first: Voice tab → Voice changer → Edit voice, or Save what's on under My setups.": "Buat suara sendiri dahulu: tab Suara → Penukar suara → Edit suara, atau Simpan yang hidup di Tetapan saya.",
   "Rain, wind, a crowd or sounds from your board behind your voice": "Hujan, angin, orang ramai atau bunyi dari board anda di belakang suara anda",
-  "Your own settings: Edit voice opens them": "Tetapan anda sendiri: “Edit suara” membukanya",
-  " · hidden from All": " · disembunyikan daripada Semua",
-  "Every sound except those in: {names} (right-click one of them, Advanced, to show it here again)": "Semua bunyi kecuali yang dalam: {names} (klik kanan salah satunya, Lanjutan, untuk menunjukkannya di sini semula)",
-  "Hide its sounds from All": "Sembunyikan bunyinya daripada Semua",
-  "“{name}” is hidden from All. Its sounds stay on its own tab.": "“{name}” disembunyikan daripada Semua. Bunyinya kekal di tabnya sendiri.",
-  "“{name}” shows in All again": "“{name}” ditunjukkan dalam Semua semula"
+  "Your own settings: Edit voice opens them": "Tetapan anda sendiri: “Edit suara” membukanya"
 }
