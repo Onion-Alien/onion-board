@@ -37,6 +37,8 @@ from soundboard.engine import SR
 from soundboard import library, net, usage
 from soundboard.library import RESOURCE_DIR
 from soundboard.pollthread import PollThread
+from soundboard.ui import cableconfirm
+from soundboard.ui.glow import Glow
 from soundboard.ui import busy, fit, icons, panel
 from soundboard.ui.bunnywidget import TALK, BunnyWidget
 from soundboard.ui.setupshow import SetupShow
@@ -845,6 +847,7 @@ class SetupWizard(QDialog):
         icons.set_icon(self.btn_attach, "mic", "on_accent")
         self.btn_attach.setObjectName("primary")
         self.btn_attach.clicked.connect(self.attach_mic)
+        self.attach_glow = Glow(self.btn_attach)   # the one to press, among the colours
         self.setup_show = SetupShow(height=96)
         self.setup_show.done.connect(lambda: self.recheck_cable(rescan=False))
         v.addWidget(self.setup_show)
@@ -875,9 +878,15 @@ class SetupWizard(QDialog):
         # the cable is only the backup: a plain button, never the big main one
         self.btn_cable = QPushButton(_cable_text(_("⬇  Install it now (free)")))
         icons.set_icon(self.btn_cable, "cable")
-        self.btn_cable.clicked.connect(self.install_cable)
+        self.btn_cable.clicked.connect(self._cable_clicked)
         buttons = QHBoxLayout()   # each button only as wide as its words
         buttons.setSpacing(10)
+        # "or" in front while the mic button is up: the cable and the other device are
+        # for the few who'd rather not, not a second step
+        self.cable_or = QLabel(_("or"))
+        self.cable_or.setObjectName("hint")
+        self.cable_or.hide()
+        buttons.addWidget(self.cable_or)
         buttons.addWidget(self.btn_cable)
         self.btn_recheck = QPushButton(_("⟳  Check again"))
         self.btn_recheck.clicked.connect(lambda: busy.run_busy(
@@ -978,6 +987,12 @@ class SetupWizard(QDialog):
         self.alt_card.hide()
         return self.alt_card
 
+    def _sync_or(self):
+        """The "or" before the cable's buttons: only between the mic button and them."""
+        if hasattr(self, "cable_or"):
+            self.cable_or.setVisible(not self.btn_attach.isHidden() and (
+                not self.btn_cable.isHidden() or not self.btn_other.isHidden()))
+
     def _show_other(self, on: bool):
         """The list of other places to send to: every output but your headphones (you'd
         hear everything twice), and nowhere. Filled when shown, after step 2's pick."""
@@ -989,6 +1004,7 @@ class SetupWizard(QDialog):
         self.other_box.setVisible(on)
         self.btn_other.setVisible(not on and self._proc is None)
         self.alt_other_row.setVisible(not on)   # the list is open below the status now
+        self._sync_or()
         if not on:
             return
         cfg = self.win.cfg
@@ -1186,6 +1202,7 @@ class SetupWizard(QDialog):
         busy.set_busy(self.btn_back, installing)
         mic_action = self._mic_action()
         self.btn_skip.setVisible(mic_action)
+        self._sync_or()
         if i == self.PAGES - 1:
             text, icon = _("Finish  ✓"), "check"
         elif i == self.base + 2 and self._was_locked:
@@ -1198,10 +1215,18 @@ class SetupWizard(QDialog):
             text, icon = _("Skip for now  →"), "nav_next"
         else:
             text, icon = _("Next  →"), "nav_next"
+        # skipping is the way out, not the step's main thing: a plain button, so the
+        # one filled button on the page is the one that sets it up
+        skip = (i == self.base + 2 and not mic_action and not self.route_ok()
+                and not self._was_locked)
+        if self.btn_next.objectName() != ("" if skip else "primary"):
+            self.btn_next.setObjectName("" if skip else "primary")
+            self.btn_next.style().unpolish(self.btn_next)
+            self.btn_next.style().polish(self.btn_next)
         if QApplication.isRightToLeft() and icon == "nav_next":
             icon = "nav_back"   # right to left: on is to the left
         self.btn_next.setText(_nav_words(text) + NAV_GAP)
-        icons.set_icon(self.btn_next, icon, "on_accent")
+        icons.set_icon(self.btn_next, icon, "text" if skip else "on_accent")
 
     _lock_since: float | None = None
     _was_locked = False
@@ -1572,9 +1597,11 @@ class SetupWizard(QDialog):
             self.btn_recheck.show()
         else:
             self.status_card.set_state("warn", _("Not set up"))
-            self.cable_status.setText(_("<b style='color:{colour}'>Not installed yet.</b> Without "
-                                        "it, only you can hear your sounds. Or put them straight "
-                                        "into your mic: nothing to install.", colour=_bad()))
+            # (said what "it" is: the step's title asks where the sounds go)
+            self.cable_status.setText(_("<b style='color:{colour}'>Only you can hear your sounds "
+                                        "so far.</b> Put them into your mic (nothing to "
+                                        "install), or install the free virtual cable.",
+                                        colour=_bad()))
             self.btn_cable.setText(_cable_text(_("⬇  Install it now (free)")))
             self.btn_cable.show()
             self.btn_recheck.hide()
@@ -1607,7 +1634,7 @@ class SetupWizard(QDialog):
         """Use the cable, from the optional card. With the driver working on the mic,
         ask first (CableConfirm): it's a step back for most people."""
         if not (self.win.cfg.route == "mic" and self.route_ok()):
-            self.install_cable()
+            self._cable_clicked()   # not installed: asks first (only for those who need it)
             return
         dlg = self._cable_confirm = CableConfirm(self, self.win.cfg.mic_device or "")
         dlg.btn_tell.clicked.connect(lambda: (dlg.reject(), self._tell_us()))
@@ -1630,6 +1657,15 @@ class SetupWizard(QDialog):
         self.win.micctl.attach_mic()
         self.recheck_cable(rescan=False)
         self._update_next()   # Back / Next wait for it
+
+    def _cable_clicked(self):
+        """The first install asks first (it's only for those who need it); a retry after a
+        failed one, or back from the restart, goes straight on."""
+        if self._cable_tries or self._resumed or (
+                self.win.cfg.route == "mic" and self.cable_ok()):
+            self.install_cable()
+        else:
+            cableconfirm.ask(self, self.install_cable, self.attach_mic)
 
     def install_cable(self):
         if self.setup_show.on:
@@ -1807,10 +1843,9 @@ class SetupWizard(QDialog):
             return
         if not name:
             self.discord_text.setText(
-                _("<span style='color:{colour}'>The virtual cable isn't set up yet, so only you "
-                  "will hear your sounds.</span> Go <b>Back</b> to install it (or pick another "
-                  "device there), or finish now and this guide will open again next time.",
-                  colour=_bad()))
+                _("<span style='color:{colour}'>Only you will hear your sounds for now.</span> "
+                  "Go <b>Back</b> and click <b>Put my sounds straight into my mic</b>, or finish "
+                  "now and this guide opens again next time.", colour=_bad()))
             self.btn_copy.hide()
             self.btn_discord.hide()
             return

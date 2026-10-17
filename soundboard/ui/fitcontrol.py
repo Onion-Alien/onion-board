@@ -49,6 +49,7 @@ class FitControl(Controller):
         # again at once when opened in a mid-sized window)
         f.add(90, "w", self._squeeze_rail)
         f.add(10, "w", mw.padctl._fit_size_picker)
+        f.add(17, "w", r.icon_only(mw.btn_yt))   # "Search online": its words first
         f.add(18, "w", r.icon_only(mw.btn_view))   # its tooltip says what it is
         # cards / list: only the other view's icon, one click away
         f.add(19, "w", lambda tight: (mw.pad_view_toggle.set_compact(tight),

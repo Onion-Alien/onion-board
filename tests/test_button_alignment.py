@@ -48,13 +48,19 @@ def test_setup_ways_share_one_height_and_check_again_stays_with_them(window, mon
     w.tabs.setCurrentIndex(TAB_INDEX["setup"])
     w.statusctl._update_flow()
     pump()
+    assert w.btn_rescan.isHidden()   # nothing installed by them yet: no "check again"
+    w._cable_started = True          # (they clicked Install the free virtual cable)
+    w.statusctl._update_flow()
+    pump()
     ways = (w.btn_attach, w.btn_install, w.btn_guide, w.btn_rescan)
+    assert not w.ways_or.isHidden()   # the cable is the fallback: "or" before it
     assert all(b.isVisible() for b in ways)
     assert w.btn_attach.objectName() == "primary"
     assert len({b.height() for b in ways}) == 1, [b.height() for b in ways]
     # check again is the last of the ways, in their row, not on a line of its own
     assert w._ways.indexOf(w.btn_rescan) > w._ways.indexOf(w.btn_guide) >= 0
-    assert w.btn_rescan.y() == w.btn_guide.y()
+    # (beside them, or wrapped just under them: "or" in front takes some of the row)
+    assert w.btn_rescan.y() in (w.btn_guide.y(), w.btn_guide.geometry().bottom() + 1 + 8)
     assert "(no cable)" not in w.btn_attach.text()   # the tip says it
 
 

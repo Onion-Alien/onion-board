@@ -373,7 +373,7 @@ class OutputBlock(QFrame):
         # Setup; green: working)
         self.dot = _Dot(self)
         mark.installEventFilter(self)
-        # hugs its word: the switch right after "Live" as after "Muted"
+        # hugs its word: the switch right after "On" as after "Muted"
         self.title = _HugLabel("")
         self.title.setObjectName("railoutputtitle")
         self.title.setWordWrap(True)
@@ -423,8 +423,8 @@ class OutputBlock(QFrame):
         pair.setSpacing(self.PAIR_GAP)
         self.mute = QPushButton()
         self.mute.setObjectName("railpair")
-        # checked: live, as the switch and every other on/off control (named "Live" or
-        # "Muted", so a screen reader says "Live, pressed", never "Live, not pressed")
+        # checked: live, as the switch and every other on/off control (named "On" or
+        # "Muted", so a screen reader says "Others hear, pressed", never "Others hear, not pressed")
         self.mute.setCheckable(True)
         self.mute.setChecked(power.isChecked())
         self.mute.toggled.connect(power.setChecked)
@@ -817,14 +817,14 @@ class OutputBlock(QFrame):
     def names(self) -> tuple[str, str]:
         """On and off. Off with your plain voice still going out (the window sets
         "voiceonly" on the switch: engine.mic_only) says so, never "Muted"."""
-        return _("Live"), (_("Only your mic") if self.power.property("voiceonly")
+        return _("On"), (_("Only your mic") if self.power.property("voiceonly")
                            else _("Muted"))
 
     def _words(self):
-        """Mute's and Stop all's words beside their icons ("Live" / "Muted", "Stop
+        """Mute's and Stop all's words beside their icons ("On" / "Muted", "Stop
         all"): what each does, without a hover. A word too long for its half (a
         long translation) leaves that button its icon alone, as the tip says it. Mute
-        keeps its words only if both of them fit: never "Live" with a bare muted icon."""
+        keeps its words only if both of them fit: never "On" with a bare muted icon."""
         on = self.power.isChecked()
         # (a plain space after the waves; none after the stop square, whose ink has
         # more air round it: the same gap to the eye)
@@ -861,7 +861,7 @@ class OutputBlock(QFrame):
         self._words()
 
     def _name(self, on: bool):
-        """"Live" while others hear you, "Muted" while they don't."""
+        """"On" while others hear you, "Muted" while they don't."""
         text = self.names()[0 if on else 1]
         self.title.setText(text)
         if hasattr(self, "caption"):

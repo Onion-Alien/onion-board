@@ -14,7 +14,7 @@ def test_collapsed_output_names_live_and_muted_without_hover(window, qapp, monke
     window.rail.set_open(False)
     window.routectl.on_mic_toggle(False)   # (mic sent: off says "Only your mic")
     output = window.rail.output
-    for on, name in ((True, "Live"), (False, "Muted"), (True, "Live")):
+    for on, name in ((True, "On"), (False, "Muted"), (True, "On")):
         window.set_sending(on)
         qapp.processEvents()
         assert output.caption.isVisible()
@@ -54,7 +54,7 @@ def test_labelled_output_switch_controls_engine_and_tracks_other_controls(window
     assert output.setup.hasFocus()
     window.btn_air.setChecked(True)
     assert output.mute.isChecked() and window.engine.sending
-    assert output.mute.accessibleName() == "Live"
+    assert output.mute.accessibleName() == "On"
     for _ in range(8):
         output.mute.click()
     assert output.mute.isChecked() and window.engine.sending
@@ -122,7 +122,7 @@ def test_collapsed_output_has_equal_visible_vertical_gaps(window, qapp, theme_na
 
 def _assert_pair(output):
     """Open: Mute and Stop all, the same width, the same padding round them and
-    between them, each icon and its words ("Live", "Stop all") in its button's
+    between them, each icon and its words ("On", "Stop all") in its button's
     middle."""
     from PySide6.QtWidgets import QApplication
     QApplication.processEvents()
@@ -366,4 +366,4 @@ def test_muted_rail_says_only_your_mic_while_the_plain_voice_still_goes(window, 
     assert output.mute.accessibleName() == "Only your mic"
     window.set_sending(True)
     qapp.processEvents()
-    assert output.mute.accessibleName() == "Live" and output.caption.text() == "Live"
+    assert output.mute.accessibleName() == "On" and output.caption.text() == "On"

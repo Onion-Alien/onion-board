@@ -35,7 +35,7 @@ def test_long_mute_shows_ring_and_time(qapp, monkeypatch):
     assert out._ring.isVisible() and out._ring.parentWidget() is host
     power.setChecked(True)
     assert out.muted_for() == ""
-    assert out.caption.text() == "Live"
+    assert out.caption.text() == "On"
     assert not out._muted_clock.isActive()
     assert not out._ring.isVisible()
     host.close()

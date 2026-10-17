@@ -121,19 +121,19 @@ def test_the_live_switch_never_says_others_hear_you_while_nothing_is_sent(win):
         assert win.btn_air.toolTip().startswith(win.btn_air.accessibleName())
         return win.btn_air.property("railtext"), win.btn_air.accessibleName()
     win.set_sending(True)
-    assert said() == ("Live", "Live: others hear you")
+    assert said() == ("On", "On: others hear you and your sounds")
     win.routectl.set_route("device", PHONES)      # the headphones: nothing is sent
     assert said() == ("Only you", "Only you hear sounds")
     win.routectl.set_route("off")
     assert said() == ("Only you", "Only you hear sounds")
     win.routectl.set_obs_device("Speakers")       # muting still silences the stream output
     devices_done(win)
-    assert said() == ("Live", "Live: stream output only")
+    assert said() == ("On", "On: only the stream hears your sounds")
     win.btn_air.setChecked(False)
     assert said() == ("Muted", "Muted: others hear nothing")
     win.btn_air.setChecked(True)
     win.routectl.set_route("cable")
-    assert said() == ("Live", "Live: others hear you")
+    assert said() == ("On", "On: others hear you and your sounds")
 
 
 def test_the_route_picker_and_its_settings_mirror(win, opened):

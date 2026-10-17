@@ -692,7 +692,7 @@ class Pad(QAbstractButton):
     step = Signal(object, int, int)   # arrow key: this pad, columns, rows to move focus
     nudge = Signal(str, int)    # Ctrl+wheel: its volume this many steps up (+) or down (-)
     stop_render = Signal(str)   # the ✕ on its effects render: stop it, keep the old effects
-    single_click = False        # Settings: a click plays it (activated) instead of selecting
+    single_click = True         # Settings: a click plays it (activated) instead of selecting
 
     def __init__(self, meta: SoundMeta, width: int):
         super().__init__()
@@ -1175,7 +1175,9 @@ class Pad(QAbstractButton):
         else:
             p.setPen(muted)
             p.drawText(foot, Qt.AlignmentFlag.AlignRight | Qt.AlignmentFlag.AlignVCenter, right)
-            if self.linked_file():   # a small chain link just before the length
+            # a small chain link just before the length, while the mouse is on the pad
+            # only: on every pad it was noise ("is it a web link?")
+            if self.hover and self.linked_file():
                 x = foot.right() - QFontMetrics(f).horizontalAdvance(right) - 5 - LINK_PX
                 if x >= foot.left() + (badge[1] + 6 if badge is not None else 0):
                     box = QRectF(x, foot.center().y() - LINK_PX / 2, LINK_PX, LINK_PX)
@@ -1279,7 +1281,7 @@ class Pad(QAbstractButton):
             rc = T["muted"]
         rw = fm.horizontalAdvance(right) + 4
         self._link_rect = None
-        if self.state == "ready" and self.linked_file() and r.width() >= 160:
+        if self.state == "ready" and self.hover and self.linked_file() and r.width() >= 160:
             box = QRectF(r.right() - 9 - rw - 2 - LINK_PX, r.center().y() - LINK_PX / 2,
                          LINK_PX, LINK_PX)
             p.drawPixmap(box.topLeft(), _link_pixmap(QColor(T["muted"]),

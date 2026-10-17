@@ -151,6 +151,7 @@ class MainWindow(QMainWindow):
     apps: Any
     _attach_release: Any
     _attaching: bool
+    attach_glow: Any   # ui/glow.py Glow on btn_attach
     _banner_fx: QGraphicsOpacityEffect
     _body_lay: Any
     btn_about: QPushButton
@@ -159,6 +160,9 @@ class MainWindow(QMainWindow):
     btn_attach: QPushButton
     btn_bin: QPushButton
     btn_cablefix: QPushButton
+    _cable_started: bool   # Install the free virtual cable was clicked (check again shows)
+    install_glow: Any      # ui/glow.py Glow on btn_install (the mic route's main button)
+    ways_or: Any           # the "or" before the cable's buttons on the Setup tab
     btn_chat: QPushButton
     btn_check: QPushButton
     btn_folder: QPushButton
@@ -1022,17 +1026,17 @@ class MainWindow(QMainWindow):
         elif not on:
             text = (_("Muted: others hear nothing"), _("Muted"), "")
         elif others:
-            text = (_("Live: others hear you"), _("Live"), "")
+            text = (_("On: others hear you and your sounds"), _("On"), "")
         elif stream:
-            text = (_("Live: stream output only"), _("Live"), "")
+            text = (_("On: only the stream hears your sounds"), _("On"), "")
         else:
             text = (_("Only you hear sounds"), _("Only you"), "")
-        # one word ("Live") on the open rail; the whole sentence leads its tooltip and
+        # one short word ("On") on the open rail; the whole sentence leads its tooltip and
         # is what a screen reader says
         if voice:
             tip = _("Click to send your sounds again: right now others hear only your mic")
         elif not on:
-            tip = _("Click to go live again: others hear you and your sounds")
+            tip = _("Click so others hear you and your sounds again")
         elif others:
             tip = (_("Click to mute your sounds for others (Discord, the game, OBS…). Your "
                      "mic still goes out unless a voice changer is on. You still hear "
@@ -1330,10 +1334,11 @@ class MainWindow(QMainWindow):
         self.engine.ring_mon.clear()
         self.engine.mic_check = on
         text = _("Stop hearing it") if on else _("Hear what they hear")
+        short = _("Stop") if on else _("Listen")
         self.btn_check.setProperty("full_text", text)   # what a compact window restores
+        self.btn_check.setProperty("short_text", short)   # ...and what it shows meanwhile
         self.btn_check.setAccessibleName(text)
-        if self.btn_check.text():   # blank while the window is too narrow for words
-            self.btn_check.setText(text)
+        self.btn_check.setText(short if self.btn_check.property("compact") else text)
         self.mic_banner.setVisible(on)
         # impossible to miss; turned on from the tray or behind a game it pulses once
         # the window is shown in front (_set_tick_rate)

@@ -174,7 +174,8 @@ class RouteControl(Controller):
         cb.blockSignals(False)
         for v in list(getattr(mw, "also_views", ())):   # (not built yet at start)
             v.rebuild()
-        mw.how_title.setText(_("Your virtual mic") if route == "cable" else
+        # (not "Your virtual mic": a name for a thing a new user doesn't have yet)
+        mw.how_title.setText(_("How others hear your sounds") if route == "cable" else
                                _("Your mic") if route == "mic" else _("Where your sounds go"))
 
     def _main_name(self) -> str | None:

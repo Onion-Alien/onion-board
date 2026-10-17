@@ -160,6 +160,7 @@ def test_an_open_settings_window_follows_the_triggers_tab(window, qapp):
 def test_an_open_settings_window_follows_the_voice_tab(window, qapp, monkeypatch):
     """The Audio page's Custom voices card belongs to the Voice tab: it goes with it,
     comes back with it, and its buttons reach the tab that's there now."""
+    window.cfg.settings_advanced = True   # (an expert card: Show advanced)
     d = SettingsDialog(window, "tabs")
     card = d.voices_card
     assert not card.isHidden()
@@ -181,6 +182,7 @@ def test_an_open_settings_window_follows_the_voice_tab(window, qapp, monkeypatch
 
 def test_settings_built_with_voice_off_has_the_card_once_it_is_on(window, qapp):
     window.tabctl.set_tab_on("voice", False)
+    window.cfg.settings_advanced = True   # (an expert card: Show advanced)
     d = SettingsDialog(window, "tabs")
     assert d.voices_card.isHidden()
     d.tab_boxes["voice"].setChecked(True)
