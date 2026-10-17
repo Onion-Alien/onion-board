@@ -9,6 +9,7 @@ Part of the style kit (see __init__.py): imports nothing from either app.
 """
 from __future__ import annotations
 
+import datetime
 import re
 from string import Template
 
@@ -254,6 +255,16 @@ THEMES: dict[str, dict[str, str]] = {
         texture="embers",
         off="#56313a", badge="#341c21", badge_text="#f0d6da",
         **_DARK_STATUS | dict(error_text="#ff7a7c"),
+    ),
+    "Halloween": dict(   # pumpkin orange and witch purple, cobwebs in the corners
+        bg="#100b13", panel="#19111d", card="#211725", card_hi="#2a1e2f",
+        btn="#261a2b", btn_hover="#312336", btn_press="#3d2c43",
+        border="#382841", border_hi="#6a4a74", groove="#35263b", inset="#0b070d",
+        text="#f6e9dc", text_hi="#fff6ec", muted="#b39aa9", faint="#7a6475", section="#ff9a3c",
+        accent="#ff7518", accent_hi="#ff8d3d", accent2="#a259ff", on_accent="#1a0900",
+        texture="webs", logo="lantern",
+        off="#4f3a56", badge="#312336", badge_text="#f3dcc8",
+        **_DARK_STATUS | dict(ok_text="#8cff5a", ok_border="#3f7a2a", error_text="#ff7a7c"),
     ),
     "Lava": dict(   # molten orange and yellow
         bg="#150805", panel="#1f0c07", card="#2a1109", card_hi="#35160b",
@@ -573,7 +584,7 @@ for _t in THEMES.values():
 DEFAULT = "Dark"
 # How the Settings window groups the theme cards. Every theme is in exactly one group.
 GROUPS: list[tuple[str, list[str]]] = [
-    ("Classic", ["Dark", "Light", "Midnight", "Carbon", "Slate", "Arctic", "Paper",
+    ("Classic", ["Halloween", "Dark", "Light", "Midnight", "Carbon", "Slate", "Arctic", "Paper",
                  "High Contrast"]),
     ("Colourful", ["Ocean", "Toxic", "Vampire", "Forest", "Mocha", "Sunset", "Royal", "Onion",
                    "Lilac", "Mint", "Cherry Blossom"]),
@@ -581,6 +592,10 @@ GROUPS: list[tuple[str, list[str]]] = [
     ("Meme", ["Flashbang", "Barbie", "Swamp", "Deep Fried", "Retro 98", "Comic Sans",
               "Brainrot"]),
 ]
+
+# Limited-edition themes: each one's last day on offer (the PC's own date). Pick it by
+# then and it's yours for good (the app's `kept` list); after it, nobody else sees it.
+LIMITED: dict[str, datetime.date] = {"Halloween": datetime.date(2026, 10, 31)}
 
 
 FONT = "Bahnschrift"   # ships with Windows 10+; a theme can swap it with a `font` token

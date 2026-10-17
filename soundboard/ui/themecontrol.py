@@ -36,6 +36,7 @@ class ThemeControl(Controller):
     def _apply_theme(self, name: str):
         mw = self.mw
         mw.cfg.theme = theme.apply(QApplication.instance(), name)
+        self.keep_limited()
         mw.setctl._drop_spare_dialogs()
         icons.retheme()
         mw.radio.retheme()
@@ -54,6 +55,13 @@ class ThemeControl(Controller):
         mw.rail.refresh_output()   # its status icon is a copy of the pill's: redrawn
         self._paint_logo()
         mw._save_later()
+
+    def keep_limited(self, save: bool = True):
+        """The theme in use is a limited edition still on offer: theirs to keep."""
+        if theme.keep(self.mw.cfg.theme):
+            self.mw.cfg.kept_themes = sorted(theme.kept)
+            if save:
+                self.mw._save_later()
 
     def set_live_color(self, colour: str) -> bool:
         """The user's own highlight colour ("" = the theme's). Only what's drawn in it

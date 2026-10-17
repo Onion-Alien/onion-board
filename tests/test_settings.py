@@ -467,8 +467,8 @@ def test_live_tabs_is_a_tab_of_the_look_box_tint_or_dot(window, qapp):  # noqa: 
     assert card.findChild(QLabel, "section").text() == "Live tabs"
     # one of the look box's tabs, the box right under the language
     names = [b.text() for b in d.look_tabs]
-    assert names[0] == "Themes" and "Live tabs" in names
-    assert d.look_pages.index(card) == names.index("Live tabs")
+    assert names == ["Themes", "Look"]   # its own part of the Look tab
+    assert card.parentWidget() is d.look_pages[1]
     assert d.look_box.parentWidget().layout().itemAt(1).widget() is d.look_box
     d.live_dot.click()
     assert window.cfg.live_tab_green is False
@@ -736,12 +736,12 @@ def test_search_theme_and_colour_terms_shows_every_theme(window, qapp, query):  
         window.setctl.close_settings()
 
 
-@pytest.mark.parametrize("query, tab", [("opacity", "Background"), ("interface size", "Size"),
-                                        ("textured", "Theme style"), ("synthwave", "Themes")])
+@pytest.mark.parametrize("query, tab", [("opacity", "Look"), ("interface size", "Look"),
+                                        ("textured", "Themes"), ("synthwave", "Themes")])
 @pytest.mark.parametrize("clicked_first", [False, True])
 def test_search_shows_the_look_tab_with_the_words(window, qapp, query, tab,  # noqa: F811
                                                   clicked_first):
-    """Also after every look tab was clicked once (ending on Background): the search
+    """Also after every look tab was clicked once (ending on Look): the search
     still moves the box to the tab with the words, typed into the box as a person does."""
     d = SettingsDialog(window, "appearance" if clicked_first else "general", lazy=True)
     try:
