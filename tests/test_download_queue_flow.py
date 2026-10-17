@@ -226,7 +226,8 @@ def test_play_goes_before_waiting_adds(net):
     assert net.added == ["Shrek", "Random"]
 
 
-def test_a_full_queue_refuses_more_and_cancel_starts_the_next(net):
+def test_a_full_queue_refuses_more_and_cancel_starts_the_next(net, monkeypatch):
+    monkeypatch.setattr(linkbar_mod, "MAX_QUEUED", 3)
     net.click(A, play=False)
     for u in (B, C, D):
         net.click(u, play=False)
@@ -291,3 +292,20 @@ def test_add_and_play_on_one_card_share_its_download(net):
     assert len(net.jobs) == 1
     net.land(A)
     assert net.added == ["Shrek"] and net.played() == [480] and not net.jobs
+
+
+def test_add_and_play_on_one_card_then_another_card_keeps_both(net):
+    """Add and Play on one card while it downloads, then a click on another card: the
+    Play used to be dropped, and dropping it told the bar the running download had
+    stopped, so the bar went blank while the Add was still downloading."""
+    net.click(A, play=False)
+    net.click(A, play=True)    # waits for A's download: no second one
+    net.click(B, play=False)   # another card: A's Play must stand
+    assert net.bar().shown and net.bar().url == A and net.bar().waiting == [B]
+    assert len(net.jobs) == 1
+    net.land(A)
+    assert net.added == ["Shrek"] and net.played() == [480]   # added, then played
+    assert net.bar().url == B and len(net.jobs) == 1          # B's turn, A not fetched twice
+    net.land(B)
+    assert net.added == ["Shrek", "Random"]
+    assert not net.w.ytresults._fetching   # every card's button came back
