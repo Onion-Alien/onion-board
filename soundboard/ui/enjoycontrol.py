@@ -106,7 +106,7 @@ class EnjoyControl(Controller):
         self.send_btn.setObjectName("primary")
         self.send_btn.setProperty("roomy", True)
         self.send_btn.clicked.connect(self.send_said)
-        row.addWidget(self.send_btn, 0, Qt.AlignmentFlag.AlignBottom)
+        row.addWidget(self.send_btn, 0, Qt.AlignmentFlag.AlignTop)
         row.addStretch(0)
         col.addWidget(self.answer)
         col.addStretch(1)
@@ -153,9 +153,13 @@ class EnjoyControl(Controller):
     def _fit_said(self):
         """As tall as its lines, up to SAID_LINES."""
         lines = max(1, min(SAID_LINES, round(self.said.document().size().height())))
-        m = self.said.contentsMargins()
-        pad = round(self.said.document().documentMargin() * 2) + m.top() + m.bottom()
-        self.said.setFixedHeight(lines * self.said.fontMetrics().lineSpacing() + pad)
+        # around the text: the document's margin, and the border and padding (the box's
+        # height less its viewport's), so the words sit in the middle
+        frame = self.said.height() - self.said.viewport().height()
+        pad = round(self.said.document().documentMargin() * 2) + frame
+        line = self.said.fontMetrics().lineSpacing()
+        self.said.setFixedHeight(lines * line + pad)
+        self.send_btn.setFixedHeight(line + pad)   # level with the box's first line
 
     @staticmethod
     def _thumb_button(icon: str, tip: str) -> QPushButton:

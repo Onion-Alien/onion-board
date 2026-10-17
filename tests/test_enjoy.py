@@ -140,6 +140,9 @@ def test_box_wraps_grows_and_enter_sends(window, monkeypatch):  # noqa: F811
     c.show()
     c.vote("negative")
     one = c.said.height()
+    assert c.send_btn.height() == one   # level with the box's first line
+    # the border and padding are counted, so the words aren't squeezed to the top
+    assert one >= c.said.fontMetrics().lineSpacing() + (one - c.said.viewport().height())
     c.said.setPlainText("word " * 60)   # past SAID_MAX: cut, and taller (it wraps)
     assert len(c.said.toPlainText()) == enjoycontrol.SAID_MAX
     tallest = enjoycontrol.SAID_LINES * c.said.fontMetrics().lineSpacing() + 30
