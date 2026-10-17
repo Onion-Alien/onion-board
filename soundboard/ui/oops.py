@@ -198,6 +198,9 @@ class _Page(QWidget):
         v.addStretch(1)
         v.addWidget(panel, 0, Qt.AlignmentFlag.AlignHCenter)
         v.addStretch(1)
+        # no say in its holder's minimum size (a stack sizes to its biggest page): a
+        # short tab squeezes it, and Bun steps out first (fit_height)
+        self.setMinimumSize(1, 1)
 
     def resizeEvent(self, e):   # noqa: N802 - Qt
         super().resizeEvent(e)
