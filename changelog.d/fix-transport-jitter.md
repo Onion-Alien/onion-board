@@ -1,0 +1,1 @@
+- Stop the bottom playback and audio controls from repeatedly shifting sideways when the output meter runs out of room.

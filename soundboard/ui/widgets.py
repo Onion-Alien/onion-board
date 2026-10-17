@@ -322,18 +322,21 @@ class SeekSlider(CrispSlider):
 
 
 class EdgeMatch(QObject):
-    """Lines up the right ends of two bars in different rows (the player's seek
-    slider and the "What others hear" meter): the one that reaches further gives up
-    the difference through its ``set_pad`` callable, so the two end in one line. Only
-    while both show, left to right, and the difference is small (a narrow window
-    lays the rows out differently: a big gap there looked worse)."""
+    """Trim the seek slider to the output meter's end when they are close.
+
+    Only the manually placed slider gives up space. Changing a spacer in the
+    meter's layout feeds back into that row's minimum width; at its limit the
+    added space cannot shrink the meter, so matching again adds more space until
+    MAX removes it and the cycle starts over.
+    """
 
     MAX = 24
 
-    def __init__(self, a: QWidget, pad_a, b: QWidget, pad_b):
+    def __init__(self, a: QWidget, pad_a, b: QWidget):
         super().__init__(a)
-        self._bars = ((a, pad_a), (b, pad_b))
-        self._pads = [0, 0]
+        self._bars = (a, b)
+        self._set_pad = pad_a
+        self._pad = 0
         self._queued = False
         for w in (a, b):
             w.installEventFilter(self)
@@ -347,22 +350,19 @@ class EdgeMatch(QObject):
 
     def match(self):
         self._queued = False
-        bars = [w for w, _ in self._bars]
+        bars = self._bars
         if not all(qt_valid(w) for w in bars):
             return
-        pads = [0, 0]
+        pad = 0
         win = bars[0].window()
         if (all(w.isVisible() and w.isLeftToRight() and w.window() is win for w in bars)):
-            # where each would end with no pad
-            ends = [w.mapTo(win, QPoint(w.width(), 0)).x() + p
-                    for w, p in zip(bars, self._pads)]
-            give = [e - min(ends) for e in ends]
-            if max(give) <= self.MAX:
-                pads = give
-        for i, (_w, set_pad) in enumerate(self._bars):
-            if pads[i] != self._pads[i]:
-                self._pads[i] = pads[i]
-                set_pad(pads[i])
+            ends = [w.mapTo(win, QPoint(w.width(), 0)).x() for w in bars]
+            give = ends[0] + self._pad - ends[1]
+            if 0 <= give <= self.MAX:
+                pad = give
+        if pad != self._pad:
+            self._pad = pad
+            self._set_pad(pad)
 
 
 class NameAndSeek(QWidget):
