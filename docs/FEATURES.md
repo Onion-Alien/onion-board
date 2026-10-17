@@ -148,7 +148,7 @@ The full list. The [README](../README.md) has the short version and how to get s
   distortion (oversampled, so it crunches without fizz), a studio polish (de-esser,
   warmth and a lookahead limiter), plus add-on effects such as an 8-bit bitcrusher;
   *Save as a voice* keeps your own
-  mix as a voice button (*Make it yours* tweaks it, a share code copies it to a
+  mix as a voice button (*Edit voice* tweaks it, a share code copies it to a
   friend and *Import a code* adds theirs; removed ones wait in *Recently deleted*),
   and the dice picks a random one; it shows how much delay the
   voice adds, starts off every time the app opens, and a big ON / OFF button shows

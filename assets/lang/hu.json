@@ -1818,11 +1818,6 @@
   "Low cut": "Alacsony vágás",
   "Made from {voice} with {percent}% {other}.": "Készült: {voice} , {percent}% {other}.",
   "Made from {voice}.": "Készült: {voice} .",
-  "Make it yours": "Legyen a tiéd",
-  "Make it yours  ·  {n} on": [
-    "Legyen a tiéd  ·  {n} bekapcsolva",
-    "Legyen a tiéd  ·  {n} bekapcsolva"
-  ],
   "Make your own voice": "Hozd ki a saját hangod",
   "Making a sample…": "Minta készítése…",
   "Male voice": "Férfi hang",
@@ -2142,7 +2137,6 @@
   ],
   "Your browser": "Az Ön böngészője",
   "Your mic level": "A mikrofon szintje",
-  "Your own settings: Make it yours opens them": "A saját beállításaid: a „Legyen a tiéd” nyitja meg őket",
   "Your own voices: a TTS server on your PC (Kokoro, AllTalk…) or Piper voice packs": "Saját hangok: TTS szerver a számítógépen (Kokoro, AllTalk…) vagy Piper hangcsomagok",
   "Your saved voice “{name}”. Click to turn the voice changer on with it; right-click to rename or delete it.": "Az Ön mentett hangja „{name}”. Kattintson rá a hangváltó bekapcsolásához; kattintson a jobb gombbal az átnevezéséhez vagy törléséhez.",
   "Your settings file was damaged and no backup could be read, so Onion Board started with default settings. Your sound files are still in {folder}.": "A beállítások fájlja megsérült, és a biztonsági másolatot nem lehetett olvasni, ezért az Onion Board az alapértelmezett beállításokkal indult. A hangfájlok továbbra is a(z {folder} mappában vannak.",
@@ -3711,7 +3705,6 @@
   "Be the first: share a voice you made.": "Légy az első: ossz meg egy hangot, amit csináltál.",
   "Couldn't keep that setup (100 setups at most).": "Nem sikerült megtartani a beállítást (legfeljebb 100 beállítás).",
   "It doesn't work": "Nem működik",
-  "Make a voice of your own first: Voice tab → Voice changer → Make it yours, or Save what's on under My setups.": "Előbb csinálj saját hangot: Hang fül → Hangváltó → Legyen a tiéd, vagy Ami be van kapcsolva, mentése a Saját beállításaimnál.",
   "No voices here yet": "Még nincsenek itt hangok",
   "Report this voice": "Hang jelentése",
   "Search the voices": "Keresés a hangok között",
@@ -3790,5 +3783,17 @@
   "The store doesn't take that name or those tags. Try other words (and no links).": "A bolt nem fogadja el ezt a nevet vagy ezeket a címkéket. Próbálj más szavakat (és ne linket).",
   "Add a voice someone sent you as a code (it starts with “OB”)": "Adjon hozzá egy hangot, amelyet valaki küldött Önnek kódként (az „OB” karakterlánccal kezdődik)",
   "Add “{name}”?": "Hozzáadja: „{name}”?",
-  "That isn't a voice code (they start with “OB”).": "Ez nem hangkód (az „OB”-vel kezdődnek)."
+  "That isn't a voice code (they start with “OB”).": "Ez nem hangkód (az „OB”-vel kezdődnek).",
+  "Background  ·  {n} on": [
+    "Háttér  ·  {n} bekapcsolva",
+    "Háttér  ·  {n} bekapcsolva"
+  ],
+  "Edit voice": "Hang szerkesztése",
+  "Edit voice  ·  {n} on": [
+    "Hang szerkesztése  ·  {n} bekapcsolva",
+    "Hang szerkesztése  ·  {n} bekapcsolva"
+  ],
+  "Make a voice of your own first: Voice tab → Voice changer → Edit voice, or Save what's on under My setups.": "Előbb csinálj saját hangot: Hang fül → Hangváltó → Hang szerkesztése, vagy Ami be van kapcsolva, mentése a Saját beállításaimnál.",
+  "Rain, wind, a crowd or sounds from your board behind your voice": "Eső, szél, tömeg vagy hangok a boardodról a hangod mögött",
+  "Your own settings: Edit voice opens them": "A saját beállításaid: a „Hang szerkesztése” nyitja meg őket"
 }

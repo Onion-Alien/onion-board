@@ -1820,11 +1820,6 @@
   "Low cut": "कम कटाई",
   "Made from {voice} with {percent}% {other}.": "{voice} से {percent}% {other} के साथ बनाया गया।",
   "Made from {voice}.": "{voice} से बना है.",
-  "Make it yours": "इसे अपना बनाएं",
-  "Make it yours  ·  {n} on": [
-    "इसे अपना बनाएं  ·  {n} चालू",
-    "इसे अपना बनाएं  ·  {n} चालू"
-  ],
   "Make your own voice": "अपनी आवाज खुद बनाओ",
   "Making a sample…": "एक नमूना बना रहा हूँ...",
   "Male voice": "पुरुष स्वर",
@@ -2142,7 +2137,6 @@
   ],
   "Your browser": "आपका ब्राउज़र",
   "Your mic level": "आपका माइक लेवल",
-  "Your own settings: Make it yours opens them": "आपकी अपनी सेटिंग्स: “इसे अपना बनाएं” इन्हें खोलता है",
   "Your own voices: a TTS server on your PC (Kokoro, AllTalk…) or Piper voice packs": "आपकी अपनी आवाज़ें: आपके पीसी पर एक टीटीएस सर्वर (कोकोरो, ऑलटॉक...) या पाइपर वॉयस पैक",
   "Your saved voice “{name}”. Click to turn the voice changer on with it; right-click to rename or delete it.": "आपकी सहेजी गई आवाज़ \"{name}\". इसके साथ वॉयस चेंजर चालू करने के लिए क्लिक करें; इसका नाम बदलने या हटाने के लिए राइट-क्लिक करें।",
   "Your settings file was damaged and no backup could be read, so Onion Board started with default settings. Your sound files are still in {folder}.": "आपकी सेटिंग्स फ़ाइल क्षतिग्रस्त हो गई थी और कोई बैकअप नहीं पढ़ा जा सका, इसलिए ओनियन बोर्ड डिफ़ॉल्ट सेटिंग्स के साथ शुरू हुआ। आपकी ध्वनि फ़ाइलें अभी भी {folder} में हैं।",
@@ -3711,7 +3705,6 @@
   "Be the first: share a voice you made.": "पहले बनें: अपनी बनाई कोई आवाज़ शेयर करें।",
   "Couldn't keep that setup (100 setups at most).": "वह सेटअप नहीं रखा जा सका (ज़्यादा से ज़्यादा 100 सेटअप)।",
   "It doesn't work": "यह काम नहीं करती",
-  "Make a voice of your own first: Voice tab → Voice changer → Make it yours, or Save what's on under My setups.": "पहले अपनी आवाज़ बनाएं: वॉइस टैब → आवाज परिवर्तक → इसे अपना बनाएं, या मेरे सेटअप में जो चालू है उसे सेव करें।",
   "No voices here yet": "अभी यहाँ कोई आवाज़ नहीं है",
   "Report this voice": "इस आवाज़ की रिपोर्ट करें",
   "Search the voices": "आवाज़ों में खोजें",
@@ -3790,5 +3783,17 @@
   "The store doesn't take that name or those tags. Try other words (and no links).": "स्टोर यह नाम या ये टैग नहीं लेता। दूसरे शब्द आज़माएं (और कोई लिंक नहीं)।",
   "Add a voice someone sent you as a code (it starts with “OB”)": "वह आवाज़ जोड़ें जो किसी ने आपको कोड के रूप में भेजी है (यह \"OB\" से शुरू होती है)",
   "Add “{name}”?": "“{name}” जोड़ें?",
-  "That isn't a voice code (they start with “OB”).": "वह ध्वनि कोड नहीं है (वे \"OB\" से शुरू होते हैं)।"
+  "That isn't a voice code (they start with “OB”).": "वह ध्वनि कोड नहीं है (वे \"OB\" से शुरू होते हैं)।",
+  "Background  ·  {n} on": [
+    "बैकग्राउंड  ·  {n} चालू",
+    "बैकग्राउंड  ·  {n} चालू"
+  ],
+  "Edit voice": "आवाज़ बदलें",
+  "Edit voice  ·  {n} on": [
+    "आवाज़ बदलें  ·  {n} चालू",
+    "आवाज़ बदलें  ·  {n} चालू"
+  ],
+  "Make a voice of your own first: Voice tab → Voice changer → Edit voice, or Save what's on under My setups.": "पहले अपनी आवाज़ बनाएं: वॉइस टैब → आवाज परिवर्तक → आवाज़ बदलें, या मेरे सेटअप में जो चालू है उसे सेव करें।",
+  "Rain, wind, a crowd or sounds from your board behind your voice": "आपकी आवाज़ के पीछे बारिश, हवा, भीड़ या आपके बोर्ड के साउंड",
+  "Your own settings: Edit voice opens them": "आपकी अपनी सेटिंग्स: “आवाज़ बदलें” इन्हें खोलता है"
 }

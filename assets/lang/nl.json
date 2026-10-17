@@ -1820,11 +1820,6 @@
   "Low cut": "Laag uitgesneden",
   "Made from {voice} with {percent}% {other}.": "Gemaakt van {voice} met {percent}% {other}.",
   "Made from {voice}.": "Gemaakt van {voice} .",
-  "Make it yours": "Maak het de jouwe",
-  "Make it yours  ·  {n} on": [
-    "Maak het de jouwe  ·  {n} aan",
-    "Maak het de jouwe  ·  {n} aan"
-  ],
   "Make your own voice": "Maak je eigen stem",
   "Making a sample…": "Een monster maken…",
   "Male voice": "Mannelijke stem",
@@ -2142,7 +2137,6 @@
   ],
   "Your browser": "Uw browser",
   "Your mic level": "Je microfoonniveau",
-  "Your own settings: Make it yours opens them": "Je eigen instellingen: ‘Maak het de jouwe’ opent ze",
   "Your own voices: a TTS server on your PC (Kokoro, AllTalk…) or Piper voice packs": "Je eigen stemmen: een TTS-server op je pc (Kokoro, AllTalk…) of Piper-spraakpakketten",
   "Your saved voice “{name}”. Click to turn the voice changer on with it; right-click to rename or delete it.": "Je opgeslagen stem ' {name} '. Klik om de stemwisselaar ermee in te schakelen; klik met de rechtermuisknop om de naam te wijzigen of te verwijderen.",
   "Your settings file was damaged and no backup could be read, so Onion Board started with default settings. Your sound files are still in {folder}.": "Uw instellingenbestand was beschadigd en er kon geen back-up worden gelezen, dus Onion Board begon met de standaardinstellingen. Je geluidsbestanden staan ​​nog steeds in {folder} .",
@@ -3711,7 +3705,6 @@
   "Be the first: share a voice you made.": "Wees de eerste: deel een stem die je hebt gemaakt.",
   "Couldn't keep that setup (100 setups at most).": "Kon die instelling niet bewaren (hoogstens 100 instellingen).",
   "It doesn't work": "Hij werkt niet",
-  "Make a voice of your own first: Voice tab → Voice changer → Make it yours, or Save what's on under My setups.": "Maak eerst een eigen stem: tab Stem → Stemverander → Maak het de jouwe, of Opslaan wat aan staat onder Mijn instellingen.",
   "No voices here yet": "Hier zijn nog geen stemmen",
   "Report this voice": "Deze stem melden",
   "Search the voices": "Zoeken in de stemmen",
@@ -3790,5 +3783,17 @@
   "The store doesn't take that name or those tags. Try other words (and no links).": "De winkel neemt die naam of tags niet aan. Probeer andere woorden (en geen links).",
   "Add a voice someone sent you as a code (it starts with “OB”)": "Voeg een stem toe die iemand je heeft gestuurd als code (deze begint met 'OB')",
   "Add “{name}”?": "“{name}” toevoegen?",
-  "That isn't a voice code (they start with “OB”).": "Dat is geen stemcode (ze beginnen met “OB”)."
+  "That isn't a voice code (they start with “OB”).": "Dat is geen stemcode (ze beginnen met “OB”).",
+  "Background  ·  {n} on": [
+    "Achtergrond  ·  {n} aan",
+    "Achtergrond  ·  {n} aan"
+  ],
+  "Edit voice": "Stem bewerken",
+  "Edit voice  ·  {n} on": [
+    "Stem bewerken  ·  {n} aan",
+    "Stem bewerken  ·  {n} aan"
+  ],
+  "Make a voice of your own first: Voice tab → Voice changer → Edit voice, or Save what's on under My setups.": "Maak eerst een eigen stem: tab Stem → Stemverander → Stem bewerken, of Opslaan wat aan staat onder Mijn instellingen.",
+  "Rain, wind, a crowd or sounds from your board behind your voice": "Regen, wind, een menigte of geluiden van je board achter je stem",
+  "Your own settings: Edit voice opens them": "Je eigen instellingen: ‘Stem bewerken’ opent ze"
 }

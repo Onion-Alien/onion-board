@@ -1820,11 +1820,6 @@
   "Low cut": "Düşük kesim",
   "Made from {voice} with {percent}% {other}.": "{percent}% {other} ile {voice} tan yapılmıştır.",
   "Made from {voice}.": "{voice} 'dan yapılmıştır.",
-  "Make it yours": "Senin olsun",
-  "Make it yours  ·  {n} on": [
-    "Senin olsun  ·  {n} açık",
-    "Senin olsun  ·  {n} açık"
-  ],
   "Make your own voice": "Kendi sesini yap",
   "Making a sample…": "Örnek yapmak…",
   "Male voice": "Erkek sesi",
@@ -2142,7 +2137,6 @@
   ],
   "Your browser": "Tarayıcınız",
   "Your mic level": "Mikrofon seviyeniz",
-  "Your own settings: Make it yours opens them": "Kendi ayarların: “Senin olsun” ile açılır",
   "Your own voices: a TTS server on your PC (Kokoro, AllTalk…) or Piper voice packs": "Kendi sesleriniz: PC'nizdeki bir TTS sunucusu (Kokoro, AllTalk…) veya Piper ses paketleri",
   "Your saved voice “{name}”. Click to turn the voice changer on with it; right-click to rename or delete it.": "Kayıtlı sesiniz “{name}”. Ses değiştiriciyi onunla açmak için tıklayın; yeniden adlandırmak veya silmek için sağ tıklayın.",
   "Your settings file was damaged and no backup could be read, so Onion Board started with default settings. Your sound files are still in {folder}.": "Ayarlar dosyanız hasar gördüğünden ve hiçbir yedekleme okunamadığından Onion Board varsayılan ayarlarla başlatıldı. Ses dosyalarınız hâlâ {folder} konumunda.",
@@ -3711,7 +3705,6 @@
   "Be the first: share a voice you made.": "İlk sen ol: yaptığın bir sesi paylaş.",
   "Couldn't keep that setup (100 setups at most).": "O ayar saklanamadı (en fazla 100 ayar).",
   "It doesn't work": "Çalışmıyor",
-  "Make a voice of your own first: Voice tab → Voice changer → Make it yours, or Save what's on under My setups.": "Önce kendi sesini yap: Ses sekmesi → Ses değiştirici → Senin olsun ya da Ayarlarım altında Açık olanı kaydet.",
   "No voices here yet": "Burada henüz ses yok",
   "Report this voice": "Bu sesi bildir",
   "Search the voices": "Seslerde ara",
@@ -3790,5 +3783,17 @@
   "The store doesn't take that name or those tags. Try other words (and no links).": "Mağaza bu adı ya da etiketleri kabul etmiyor. Başka kelimeler dene (link olmadan).",
   "Add a voice someone sent you as a code (it starts with “OB”)": "Birinin size kod olarak gönderdiği sesi ekleyin (“OB” ile başlar)",
   "Add “{name}”?": "“{name}” eklensin mi?",
-  "That isn't a voice code (they start with “OB”).": "Bu bir ses kodu değil (“OB” ile başlıyorlar)."
+  "That isn't a voice code (they start with “OB”).": "Bu bir ses kodu değil (“OB” ile başlıyorlar).",
+  "Background  ·  {n} on": [
+    "Arka plan  ·  {n} açık",
+    "Arka plan  ·  {n} açık"
+  ],
+  "Edit voice": "Sesi düzenle",
+  "Edit voice  ·  {n} on": [
+    "Sesi düzenle  ·  {n} açık",
+    "Sesi düzenle  ·  {n} açık"
+  ],
+  "Make a voice of your own first: Voice tab → Voice changer → Edit voice, or Save what's on under My setups.": "Önce kendi sesini yap: Ses sekmesi → Ses değiştirici → Sesi düzenle ya da Ayarlarım altında Açık olanı kaydet.",
+  "Rain, wind, a crowd or sounds from your board behind your voice": "Sesinin arkasında yağmur, rüzgâr, kalabalık ya da board'undan sesler",
+  "Your own settings: Edit voice opens them": "Kendi ayarların: “Sesi düzenle” ile açılır"
 }

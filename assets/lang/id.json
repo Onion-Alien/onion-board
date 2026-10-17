@@ -1776,10 +1776,6 @@
   "Low cut": "Potongan rendah",
   "Made from {voice} with {percent}% {other}.": "Terbuat dari {voice} dengan {percent}% {other}.",
   "Made from {voice}.": "Terbuat dari {voice} .",
-  "Make it yours": "Jadikan itu milikmu",
-  "Make it yours  ·  {n} on": [
-    "Jadikan itu milikmu  ·  {n} aktif"
-  ],
   "Make your own voice": "Ciptakan suaramu sendiri",
   "Making a sample…": "Membuat sampel…",
   "Male voice": "Suara laki-laki",
@@ -2094,7 +2090,6 @@
   ],
   "Your browser": "Peramban Anda",
   "Your mic level": "Tingkat mikrofon Anda",
-  "Your own settings: Make it yours opens them": "Pengaturanmu sendiri: “Jadikan itu milikmu” membukanya",
   "Your own voices: a TTS server on your PC (Kokoro, AllTalk…) or Piper voice packs": "Suara Anda sendiri: server TTS di PC Anda (Kokoro, AllTalk…) atau paket suara Piper",
   "Your saved voice “{name}”. Click to turn the voice changer on with it; right-click to rename or delete it.": "Suara Anda yang disimpan “{name}”. Klik untuk mengaktifkan pengubah suara; klik kanan untuk mengganti nama atau menghapusnya.",
   "Your settings file was damaged and no backup could be read, so Onion Board started with default settings. Your sound files are still in {folder}.": "File pengaturan Anda rusak dan tidak ada cadangan yang dapat dibaca, jadi Onion Board memulai dengan pengaturan default. File suara Anda masih ada di {folder} .",
@@ -3633,7 +3628,6 @@
   "Be the first: share a voice you made.": "Jadilah yang pertama: bagikan suara yang kamu buat.",
   "Couldn't keep that setup (100 setups at most).": "Setelan itu tidak bisa disimpan (paling banyak 100 setelan).",
   "It doesn't work": "Tidak berfungsi",
-  "Make a voice of your own first: Voice tab → Voice changer → Make it yours, or Save what's on under My setups.": "Buat suaramu sendiri dulu: tab Suara → Pengubah suara → Jadikan itu milikmu, atau Simpan yang aktif di Setelanku.",
   "No voices here yet": "Belum ada suara di sini",
   "Report this voice": "Laporkan suara ini",
   "Search the voices": "Cari suara",
@@ -3711,5 +3705,15 @@
   "The store doesn't take that name or those tags. Try other words (and no links).": "Toko tidak menerima nama atau tag itu. Coba kata lain (tanpa tautan).",
   "Add a voice someone sent you as a code (it starts with “OB”)": "Tambahkan suara yang dikirimkan seseorang kepada Anda sebagai kode (dimulai dengan “OB”)",
   "Add “{name}”?": "Tambahkan “{name}”?",
-  "That isn't a voice code (they start with “OB”).": "Itu bukan kode suara (dimulai dengan “OB”)."
+  "That isn't a voice code (they start with “OB”).": "Itu bukan kode suara (dimulai dengan “OB”).",
+  "Background  ·  {n} on": [
+    "Latar belakang  ·  {n} aktif"
+  ],
+  "Edit voice": "Edit suara",
+  "Edit voice  ·  {n} on": [
+    "Edit suara  ·  {n} aktif"
+  ],
+  "Make a voice of your own first: Voice tab → Voice changer → Edit voice, or Save what's on under My setups.": "Buat suaramu sendiri dulu: tab Suara → Pengubah suara → Edit suara, atau Simpan yang aktif di Setelanku.",
+  "Rain, wind, a crowd or sounds from your board behind your voice": "Hujan, angin, keramaian, atau suara dari board-mu di balik suaramu",
+  "Your own settings: Edit voice opens them": "Pengaturanmu sendiri: “Edit suara” membukanya"
 }

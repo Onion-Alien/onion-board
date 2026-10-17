@@ -148,7 +148,7 @@ def clean_spec(raw) -> dict:
     if isinstance(favs, list):
         out["favorites"] = list(dict.fromkeys(n for n in favs
                                                if isinstance(n, str) and n))[:200]
-    size = raw.get("panel_size")   # the Make it yours window's [width, height]
+    size = raw.get("panel_size")   # the Edit voice window's [width, height]
     if isinstance(size, list) and len(size) == 2 and all(
             isinstance(n, int) and not isinstance(n, bool) for n in size):
         out["panel_size"] = [min(max(size[0], 360), 4000), min(max(size[1], 300), 4000)]

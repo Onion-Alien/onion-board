@@ -1818,11 +1818,6 @@
   "Low cut": "Lavt snitt",
   "Made from {voice} with {percent}% {other}.": "Laget av {voice} med {percent}% {other}.",
   "Made from {voice}.": "Laget av {voice} .",
-  "Make it yours": "Gjør det til ditt",
-  "Make it yours  ·  {n} on": [
-    "Gjør det til ditt  ·  {n} på",
-    "Gjør det til ditt  ·  {n} på"
-  ],
   "Make your own voice": "Lag din egen stemme",
   "Making a sample…": "Tar en prøve...",
   "Male voice": "Mannsstemme",
@@ -2142,7 +2137,6 @@
   ],
   "Your browser": "Din nettleser",
   "Your mic level": "Mikrofonnivået ditt",
-  "Your own settings: Make it yours opens them": "Dine egne innstillinger: «Gjør det til ditt» åpner dem",
   "Your own voices: a TTS server on your PC (Kokoro, AllTalk…) or Piper voice packs": "Dine egne stemmer: en TTS-server på PC-en din (Kokoro, AllTalk ...) eller Piper-talepakker",
   "Your saved voice “{name}”. Click to turn the voice changer on with it; right-click to rename or delete it.": "Din lagrede stemme \"{name}\". Klikk for å slå på stemmeveksleren med den; høyreklikk for å gi nytt navn eller slette den.",
   "Your settings file was damaged and no backup could be read, so Onion Board started with default settings. Your sound files are still in {folder}.": "Innstillingsfilen din ble skadet og ingen sikkerhetskopi kunne leses, så Onion Board startet med standardinnstillinger. Lydfilene dine er fortsatt i {folder} .",
@@ -3711,7 +3705,6 @@
   "Be the first: share a voice you made.": "Vær den første: del en stemme du har laget.",
   "Couldn't keep that setup (100 setups at most).": "Kunne ikke lagre det oppsettet (maks 100 oppsett).",
   "It doesn't work": "Den virker ikke",
-  "Make a voice of your own first: Voice tab → Voice changer → Make it yours, or Save what's on under My setups.": "Lag din egen stemme først: fanen Stemme → Stemmeskifter → Gjør det til ditt, eller Lagre det som er på under Mine oppsett.",
   "No voices here yet": "Ingen stemmer her ennå",
   "Report this voice": "Rapporter denne stemmen",
   "Search the voices": "Søk i stemmene",
@@ -3790,5 +3783,17 @@
   "The store doesn't take that name or those tags. Try other words (and no links).": "Butikken tar ikke det navnet eller de taggene. Prøv andre ord (og ingen lenker).",
   "Add a voice someone sent you as a code (it starts with “OB”)": "Legg til en stemme noen sendte deg som en kode (den starter med \"OB\")",
   "Add “{name}”?": "Vil du legge til «{name}»?",
-  "That isn't a voice code (they start with “OB”).": "Det er ikke en stemmekode (de starter med \"OB\")."
+  "That isn't a voice code (they start with “OB”).": "Det er ikke en stemmekode (de starter med \"OB\").",
+  "Background  ·  {n} on": [
+    "Bakgrunn  ·  {n} på",
+    "Bakgrunn  ·  {n} på"
+  ],
+  "Edit voice": "Rediger stemme",
+  "Edit voice  ·  {n} on": [
+    "Rediger stemme  ·  {n} på",
+    "Rediger stemme  ·  {n} på"
+  ],
+  "Make a voice of your own first: Voice tab → Voice changer → Edit voice, or Save what's on under My setups.": "Lag din egen stemme først: fanen Stemme → Stemmeskifter → Rediger stemme, eller Lagre det som er på under Mine oppsett.",
+  "Rain, wind, a crowd or sounds from your board behind your voice": "Regn, vind, en folkemengde eller lyder fra boardet ditt bak stemmen din",
+  "Your own settings: Edit voice opens them": "Dine egne innstillinger: «Rediger stemme» åpner dem"
 }

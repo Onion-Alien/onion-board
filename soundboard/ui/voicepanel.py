@@ -225,7 +225,7 @@ class VoicePanel(QWidget):
         # (_section), at its height for the width. Not pv.addStretch(): with a stretch
         # under it the card got its one-line height instead, so a card with wrapped text
         # was squeezed (controls shorter than they can be, text cut off) when narrow
-        # "folded": Make it yours' folded effect cards ("fx.<type>"); "tab": the tab open
+        # "folded": Edit voice's folded effect cards ("fx.<type>"); "tab": the tab open
         saved_folds = speech.get("folded") if isinstance(speech, dict) else None
         self._folded = ({k for k in saved_folds if isinstance(k, str)}
                         if isinstance(saved_folds, list) else set())
@@ -247,7 +247,7 @@ class VoicePanel(QWidget):
                                play_sample=lambda data: engine.play(
                                    "__fx_voice_sample", data, 1.0, preview=True))
         self.fx.changed.connect(self._fx_changed)
-        # Make it yours' folded effect cards: "fx.<type>" in the same list
+        # Edit voice's folded effect cards: "fx.<type>" in the same list
         self.fx.set_folded(k[3:] for k in self._folded if k.startswith("fx."))
         self.fx.folds_changed.connect(self._fx_folds)
         self._section("fx", self.fx, self.fx.title, self.fx.head)
@@ -298,7 +298,7 @@ class VoicePanel(QWidget):
         self.fx.share_asked.connect(lambda n: self.share_asked.emit(f"{kind_name('fx')}: {n}"))
         outer.insertWidget(0, self.speech.say_bar)   # on top: the bottom has the mixer
         # the picked voice's bar, pinned under the cards while the voice changer shows:
-        # its Hear what they hear and Make it yours never scroll out of sight
+        # its Hear what they hear and Edit voice never scroll out of sight
         fx_lay = self.fx.layout()
         assert fx_lay is not None   # made in VoiceFxPanel.__init__
         fx_lay.removeWidget(self.fx.picked)
@@ -599,7 +599,10 @@ class VoicePanel(QWidget):
             head.addWidget(beside, 0, Qt.AlignmentFlag.AlignVCenter)
         title.hide()                      # the head shows it
         v.addLayout(head)
-        v.addWidget(panel)
+        # any height the card gets beyond what it needs (wrapped text measured at
+        # another width) goes to the panel, never around the title: at 440 px the
+        # title row sat in an 80 px gap
+        v.addWidget(panel, 1)
         panel.show()
         b = QPushButton(TAB_NAMES[key]())
         b.setObjectName("voicetab")

@@ -324,3 +324,88 @@ def test_board_sound_rows_line_up_with_the_built_in_ones(row, qapp):
     mine = row._mine_rows[0].findChildren(type(rain))[0]
     assert abs(rain.val.mapTo(row, rain.val.rect().topLeft()).x()
                - mine.val.mapTo(row, mine.val.rect().topLeft()).x()) <= 1
+
+
+def test_the_background_button_counts_whats_on_and_opens_the_card(qapp, monkeypatch):
+    from soundboard.speech import tts
+    from soundboard.ui.voicepanel import VoicePanel
+    from tests.test_voicepanel import FakeEngine
+    monkeypatch.setattr(tts.SapiTTS, "warm_up", lambda self: ["Microsoft Zira Desktop"])
+    p = VoicePanel(FakeEngine(), {"enabled": False, "effects": {}},
+                   {"voice": "Microsoft Zira Desktop", "rate": 2})
+    try:
+        fx = p.fx
+        assert fx.btn_tweak.text().startswith("Edit voice")
+        assert fx.btn_backdrop.text() == "Background"
+        fx.pick("Storm")                                  # rain and wind
+        assert fx.btn_backdrop.text() == "Background  ·  2 on"
+        row = fx.rows["backdrop"]
+        row.set_folded(True)
+        fx.btn_backdrop.click()
+        process_events(qapp, lambda: fx.dlg.isVisible() and not row.is_folded(), timeout=5)
+        assert fx.dlg.isVisible() and fx.dlg.windowTitle() == "Edit voice"
+        assert not row.is_folded()
+        fx.dlg.close()
+    finally:
+        p.shutdown()
+        p.deleteLater()
+
+
+def test_the_voice_bar_puts_its_buttons_under_the_name_when_narrow(qapp, monkeypatch):
+    """The Voice tab pins the bar outside the panel, where a narrow window squeezes
+    it: its buttons go under the voice's name instead of losing their words."""
+    from PySide6.QtWidgets import QBoxLayout
+    from soundboard.ui.voicefxpanel import VoiceFxPanel
+    fx = VoiceFxPanel({"enabled": False, "effects": {}})
+    bar = fx.picked
+    try:
+        fx.pick("Storm")
+        fx.layout().removeWidget(bar)
+        bar.setParent(None)
+        from PySide6.QtWidgets import QLayout
+        # squeezable, as it is when laid out in the Voice tab
+        fx.picked_box.setSizeConstraint(QLayout.SizeConstraint.SetNoConstraint)
+        bar.show()
+        for width, want in ((1100, QBoxLayout.Direction.LeftToRight),
+                            (300, QBoxLayout.Direction.TopToBottom),
+                            (1100, QBoxLayout.Direction.LeftToRight)):
+            bar.resize(width, bar.height())
+            process_events(qapp, lambda: False, timeout=0.1)
+            assert fx.picked_box.direction() == want, width
+        bar.resize(300, 200)
+        process_events(qapp, lambda: False, timeout=0.1)
+        for b in (fx.btn_tweak, fx.btn_backdrop):
+            assert b.width() >= b.minimumSizeHint().width() - 1   # nothing squeezed
+    finally:
+        bar.close()
+        bar.deleteLater()
+        fx.deleteLater()
+
+
+def test_background_keeps_its_words_while_they_fit_and_its_name_always(qapp):
+    from soundboard.ui.voicefxpanel import VoiceFxPanel
+    fx = VoiceFxPanel({"enabled": False, "effects": {}})
+    bar = fx.picked
+    try:
+        fx.pick("Storm")
+        fx.layout().removeWidget(bar)
+        bar.setParent(None)
+        from PySide6.QtWidgets import QLayout
+        # squeezable, as it is when laid out in the Voice tab
+        fx.picked_box.setSizeConstraint(QLayout.SizeConstraint.SetNoConstraint)
+        bar.show()
+        on = len(fx.effects_of("Storm"))
+        full = f"Edit voice  ·  {on} on"
+        for width, words, tweak in ((1100, True, full), (420, True, full),
+                                    (290, False, full), (200, False, "Edit voice"),
+                                    (1100, True, full)):
+            bar.resize(width, 200)
+            process_events(qapp, lambda: False, timeout=0.1)
+            assert bool(fx.btn_backdrop.text()) == words, width
+            assert fx.btn_tweak.text() == tweak, width
+            assert fx.btn_backdrop.accessibleName() == "Background  ·  2 on"
+            assert fx.btn_tweak.accessibleName() == full
+    finally:
+        bar.close()
+        bar.deleteLater()
+        fx.deleteLater()

@@ -1774,10 +1774,6 @@
   "Low cut": "Potongan rendah",
   "Made from {voice} with {percent}% {other}.": "Diperbuat daripada {voice} dengan {percent}% {other}.",
   "Made from {voice}.": "Diperbuat daripada {voice} .",
-  "Make it yours": "Jadikan ia milik anda",
-  "Make it yours  ·  {n} on": [
-    "Jadikan ia milik anda  ·  {n} hidup"
-  ],
   "Make your own voice": "Buat suara sendiri",
   "Making a sample…": "Membuat sampel…",
   "Male voice": "Suara lelaki",
@@ -2094,7 +2090,6 @@
   ],
   "Your browser": "pelayar anda",
   "Your mic level": "Tahap mikrofon anda",
-  "Your own settings: Make it yours opens them": "Tetapan anda sendiri: “Jadikan ia milik anda” membukanya",
   "Your own voices: a TTS server on your PC (Kokoro, AllTalk…) or Piper voice packs": "Suara anda sendiri: pelayan TTS pada PC anda (Kokoro, AllTalk…) atau pek suara Piper",
   "Your saved voice “{name}”. Click to turn the voice changer on with it; right-click to rename or delete it.": "Suara anda yang disimpan \"{name}\". Klik untuk menghidupkan penukar suara dengannya; klik kanan untuk menamakan semula atau memadamnya.",
   "Your settings file was damaged and no backup could be read, so Onion Board started with default settings. Your sound files are still in {folder}.": "Fail tetapan anda telah rosak dan tiada sandaran boleh dibaca, jadi Onion Board bermula dengan tetapan lalai. Fail bunyi anda masih dalam {folder} .",
@@ -3633,7 +3628,6 @@
   "Be the first: share a voice you made.": "Jadi yang pertama: kongsi suara yang anda buat.",
   "Couldn't keep that setup (100 setups at most).": "Tetapan itu tidak dapat disimpan (paling banyak 100 tetapan).",
   "It doesn't work": "Ia tidak berfungsi",
-  "Make a voice of your own first: Voice tab → Voice changer → Make it yours, or Save what's on under My setups.": "Buat suara sendiri dahulu: tab Suara → Penukar suara → Jadikan ia milik anda, atau Simpan yang hidup di Tetapan saya.",
   "No voices here yet": "Belum ada suara di sini",
   "Report this voice": "Laporkan suara ini",
   "Search the voices": "Cari suara",
@@ -3711,5 +3705,15 @@
   "The store doesn't take that name or those tags. Try other words (and no links).": "Kedai tidak menerima nama atau tag itu. Cuba perkataan lain (tanpa pautan).",
   "Add a voice someone sent you as a code (it starts with “OB”)": "Tambahkan suara yang dihantar seseorang kepada anda sebagai kod (ia bermula dengan \"OB\")",
   "Add “{name}”?": "Tambah “{name}”?",
-  "That isn't a voice code (they start with “OB”).": "Itu bukan kod suara (ia bermula dengan \"OB\")."
+  "That isn't a voice code (they start with “OB”).": "Itu bukan kod suara (ia bermula dengan \"OB\").",
+  "Background  ·  {n} on": [
+    "Latar belakang  ·  {n} hidup"
+  ],
+  "Edit voice": "Edit suara",
+  "Edit voice  ·  {n} on": [
+    "Edit suara  ·  {n} hidup"
+  ],
+  "Make a voice of your own first: Voice tab → Voice changer → Edit voice, or Save what's on under My setups.": "Buat suara sendiri dahulu: tab Suara → Penukar suara → Edit suara, atau Simpan yang hidup di Tetapan saya.",
+  "Rain, wind, a crowd or sounds from your board behind your voice": "Hujan, angin, orang ramai atau bunyi dari board anda di belakang suara anda",
+  "Your own settings: Edit voice opens them": "Tetapan anda sendiri: “Edit suara” membukanya"
 }

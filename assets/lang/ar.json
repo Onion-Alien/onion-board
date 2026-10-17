@@ -1996,15 +1996,6 @@
   "Low cut": "قطع منخفض",
   "Made from {voice} with {percent}% {other}.": "مصنوعة من {voice} بنسبة {percent}% {other}.",
   "Made from {voice}.": "مصنوعة من {voice} .",
-  "Make it yours": "اجعلها لك",
-  "Make it yours  ·  {n} on": [
-    "اجعلها لك  ·  {n} مفعّل",
-    "اجعلها لك  ·  {n} مفعّل",
-    "اجعلها لك  ·  {n} مفعّل",
-    "اجعلها لك  ·  {n} مفعّل",
-    "اجعلها لك  ·  {n} مفعّل",
-    "اجعلها لك  ·  {n} مفعّل"
-  ],
   "Make your own voice": "اصنع صوتك الخاص",
   "Making a sample…": "صنع عينة…",
   "Male voice": "صوت ذكر",
@@ -2334,7 +2325,6 @@
   ],
   "Your browser": "المتصفح الخاص بك",
   "Your mic level": "مستوى الميكروفون الخاص بك",
-  "Your own settings: Make it yours opens them": "إعداداتك الخاصة: يفتحها زر «اجعلها لك»",
   "Your own voices: a TTS server on your PC (Kokoro, AllTalk…) or Piper voice packs": "أصواتك الخاصة: خادم TTS على جهاز الكمبيوتر الخاص بك (Kokoro، AllTalk...) أو حزم صوت Piper",
   "Your saved voice “{name}”. Click to turn the voice changer on with it; right-click to rename or delete it.": "صوتك المحفوظ \"{name}\". انقر لتشغيل مغير الصوت معه؛ انقر بزر الماوس الأيمن لإعادة تسميته أو حذفه.",
   "Your settings file was damaged and no backup could be read, so Onion Board started with default settings. Your sound files are still in {folder}.": "كان ملف الإعدادات الخاص بك تالفًا ولا يمكن قراءة النسخة الاحتياطية، لذلك بدأ Onion Board بالإعدادات الافتراضية. ملفاتك الصوتية لا تزال موجودة في {folder} .",
@@ -4023,7 +4013,6 @@
   "Be the first: share a voice you made.": "كن الأول: شارك صوتًا صنعته.",
   "Couldn't keep that setup (100 setups at most).": "تعذّر حفظ هذا الإعداد (100 إعداد على الأكثر).",
   "It doesn't work": "لا يعمل",
-  "Make a voice of your own first: Voice tab → Voice changer → Make it yours, or Save what's on under My setups.": "اصنع صوتًا خاصًا بك أولًا: تبويب الصوت ← مغير الصوت ← اجعلها لك، أو احفظ ما هو مشغّل في إعداداتي.",
   "No voices here yet": "لا توجد أصوات هنا بعد",
   "Report this voice": "أبلغ عن هذا الصوت",
   "Search the voices": "ابحث في الأصوات",
@@ -4106,5 +4095,25 @@
   "The store doesn't take that name or those tags. Try other words (and no links).": "لا يقبل المتجر هذا الاسم أو هذه الوسوم. جرّب كلمات أخرى (وبدون روابط).",
   "Add a voice someone sent you as a code (it starts with “OB”)": "أضف صوتًا أرسله إليك أحد الأشخاص كرمز (يبدأ بـ \"OB\")",
   "Add “{name}”?": "أضف «{name}»؟",
-  "That isn't a voice code (they start with “OB”).": "هذا ليس رمزًا صوتيًا (يبدأ بـ \"OB\")."
+  "That isn't a voice code (they start with “OB”).": "هذا ليس رمزًا صوتيًا (يبدأ بـ \"OB\").",
+  "Background  ·  {n} on": [
+    "خلفية  ·  {n} مفعّل",
+    "خلفية  ·  {n} مفعّل",
+    "خلفية  ·  {n} مفعّل",
+    "خلفية  ·  {n} مفعّل",
+    "خلفية  ·  {n} مفعّل",
+    "خلفية  ·  {n} مفعّل"
+  ],
+  "Edit voice": "تعديل الصوت",
+  "Edit voice  ·  {n} on": [
+    "تعديل الصوت  ·  {n} مفعّل",
+    "تعديل الصوت  ·  {n} مفعّل",
+    "تعديل الصوت  ·  {n} مفعّل",
+    "تعديل الصوت  ·  {n} مفعّل",
+    "تعديل الصوت  ·  {n} مفعّل",
+    "تعديل الصوت  ·  {n} مفعّل"
+  ],
+  "Make a voice of your own first: Voice tab → Voice changer → Edit voice, or Save what's on under My setups.": "اصنع صوتًا خاصًا بك أولًا: تبويب الصوت ← مغير الصوت ← تعديل الصوت، أو احفظ ما هو مشغّل في إعداداتي.",
+  "Rain, wind, a crowd or sounds from your board behind your voice": "مطر أو رياح أو حشد أو أصوات من لوحتك خلف صوتك",
+  "Your own settings: Edit voice opens them": "إعداداتك الخاصة: يفتحها زر «تعديل الصوت»"
 }

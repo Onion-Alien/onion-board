@@ -1862,12 +1862,6 @@
   "Low cut": "Decoltat",
   "Made from {voice} with {percent}% {other}.": "Fabricat din {voice} cu {percent}% {other}.",
   "Made from {voice}.": "Fabricat din {voice} .",
-  "Make it yours": "Fă-l al tău",
-  "Make it yours  ·  {n} on": [
-    "Fă-l al tău  ·  {n} activat",
-    "Fă-l al tău  ·  {n} activate",
-    "Fă-l al tău  ·  {n} activate"
-  ],
   "Make your own voice": "Fă-ți propria voce",
   "Making a sample…": "Făcând o probă...",
   "Male voice": "Voce masculină",
@@ -2190,7 +2184,6 @@
   ],
   "Your browser": "Browserul dvs",
   "Your mic level": "Nivelul dvs. de microfon",
-  "Your own settings: Make it yours opens them": "Setările tale: „Fă-l al tău” le deschide",
   "Your own voices: a TTS server on your PC (Kokoro, AllTalk…) or Piper voice packs": "Voci proprii: un server TTS pe computer (Kokoro, AllTalk...) sau pachete de voce Piper",
   "Your saved voice “{name}”. Click to turn the voice changer on with it; right-click to rename or delete it.": "Vocea dvs. salvată „{name}”. Faceți clic pentru a porni schimbătorul de voce cu acesta; faceți clic dreapta pentru a-l redenumi sau șterge.",
   "Your settings file was damaged and no backup could be read, so Onion Board started with default settings. Your sound files are still in {folder}.": "Fișierul dvs. de setări a fost deteriorat și nu a putut fi citit nicio copie de rezervă, așa că Onion Board a început cu setările implicite. Fișierele dvs. de sunet sunt încă în {folder} .",
@@ -3789,7 +3782,6 @@
   "Be the first: share a voice you made.": "Fii primul: distribuie o voce pe care ai făcut-o.",
   "Couldn't keep that setup (100 setups at most).": "Setarea nu a putut fi păstrată (cel mult 100 de setări).",
   "It doesn't work": "Nu merge",
-  "Make a voice of your own first: Voice tab → Voice changer → Make it yours, or Save what's on under My setups.": "Fă-ți întâi o voce proprie: fila Voce → Schimbator de voce → Fă-l al tău, sau Salvează ce e pornit la Setările mele.",
   "No voices here yet": "Încă nu sunt voci aici",
   "Report this voice": "Raportează această voce",
   "Search the voices": "Caută în voci",
@@ -3869,5 +3861,19 @@
   "The store doesn't take that name or those tags. Try other words (and no links).": "Magazinul nu acceptă acest nume sau aceste etichete. Încearcă alte cuvinte (și fără linkuri).",
   "Add a voice someone sent you as a code (it starts with “OB”)": "Adaugă o voce pe care cineva ți-a trimis-o ca cod (începe cu „OB”)",
   "Add “{name}”?": "Adăugați „{name}”?",
-  "That isn't a voice code (they start with “OB”).": "Acesta nu este un cod vocal (încep cu „OB”)."
+  "That isn't a voice code (they start with “OB”).": "Acesta nu este un cod vocal (încep cu „OB”).",
+  "Background  ·  {n} on": [
+    "Fundal  ·  {n} activat",
+    "Fundal  ·  {n} activate",
+    "Fundal  ·  {n} activate"
+  ],
+  "Edit voice": "Editează vocea",
+  "Edit voice  ·  {n} on": [
+    "Editează vocea  ·  {n} activat",
+    "Editează vocea  ·  {n} activate",
+    "Editează vocea  ·  {n} activate"
+  ],
+  "Make a voice of your own first: Voice tab → Voice changer → Edit voice, or Save what's on under My setups.": "Fă-ți întâi o voce proprie: fila Voce → Schimbator de voce → Editează vocea, sau Salvează ce e pornit la Setările mele.",
+  "Rain, wind, a crowd or sounds from your board behind your voice": "Ploaie, vânt, o mulțime sau sunete de pe board-ul tău în spatele vocii tale",
+  "Your own settings: Edit voice opens them": "Setările tale: „Editează vocea” le deschide"
 }

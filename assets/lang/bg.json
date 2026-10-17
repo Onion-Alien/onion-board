@@ -1732,11 +1732,6 @@
   "Low bandwidth (8 kHz)": "Ниска честотна лента (8 kHz)",
   "Low cut": "Ниска кройка",
   "Made from {voice}.": "Направено от {voice} .",
-  "Make it yours": "Направи го твое",
-  "Make it yours  ·  {n} on": [
-    "Направи го твое  ·  {n} включено",
-    "Направи го твое  ·  {n} включено"
-  ],
   "Make your own voice": "Направете своя собствен глас",
   "Making a sample…": "Създаване на проба...",
   "Male voice": "Мъжки глас",
@@ -2053,7 +2048,6 @@
   ],
   "Your browser": "Вашият браузър",
   "Your mic level": "Вашето ниво на микрофона",
-  "Your own settings: Make it yours opens them": "Твоите собствени настройки: „Направи го твое“ ги отваря",
   "Your own voices: a TTS server on your PC (Kokoro, AllTalk…) or Piper voice packs": "Вашите собствени гласове: TTS сървър на вашия компютър (Kokoro, AllTalk…) или гласови пакети Piper",
   "Your saved voice “{name}”. Click to turn the voice changer on with it; right-click to rename or delete it.": "Вашият запазен глас „{name}“. Кликнете, за да включите гласовия чейнджър с него; щракнете с десния бутон, за да го преименувате или изтриете.",
   "Your settings file was damaged and no backup could be read, so Onion Board started with default settings. Your sound files are still in {folder}.": "Вашият файл с настройки беше повреден и не можеше да се прочете резервно копие, така че Onion Board стартира с настройките по подразбиране. Вашите звукови файлове все още са в {folder} .",
@@ -3711,7 +3705,6 @@
   "Be the first: share a voice you made.": "Бъди пръв: сподели глас, който си направил.",
   "Couldn't keep that setup (100 setups at most).": "Настройката не можа да се запази (най-много 100 настройки).",
   "It doesn't work": "Не работи",
-  "Make a voice of your own first: Voice tab → Voice changer → Make it yours, or Save what's on under My setups.": "Първо направи свой глас: раздел Глас → Промяна на гласа → Направи го твое, или Запази включеното в Моите настройки.",
   "No voices here yet": "Още няма гласове тук",
   "Report this voice": "Докладвай този глас",
   "Search the voices": "Търси в гласовете",
@@ -3790,5 +3783,17 @@
   "The store doesn't take that name or those tags. Try other words (and no links).": "Магазинът не приема това име или тези тагове. Опитай с други думи (и без връзки).",
   "Add a voice someone sent you as a code (it starts with “OB”)": "Добавете глас, който някой ви е изпратил като код (започва с „OB“)",
   "Add “{name}”?": "Добавяне на „{name}“?",
-  "That isn't a voice code (they start with “OB”).": "Това не е гласов код (те започват с “OB”)."
+  "That isn't a voice code (they start with “OB”).": "Това не е гласов код (те започват с “OB”).",
+  "Background  ·  {n} on": [
+    "Фон  ·  {n} включено",
+    "Фон  ·  {n} включено"
+  ],
+  "Edit voice": "Редактирай гласа",
+  "Edit voice  ·  {n} on": [
+    "Редактирай гласа  ·  {n} включено",
+    "Редактирай гласа  ·  {n} включено"
+  ],
+  "Make a voice of your own first: Voice tab → Voice changer → Edit voice, or Save what's on under My setups.": "Първо направи свой глас: раздел Глас → Промяна на гласа → Редактирай гласа, или Запази включеното в Моите настройки.",
+  "Rain, wind, a crowd or sounds from your board behind your voice": "Дъжд, вятър, тълпа или звуци от твоя борд зад гласа ти",
+  "Your own settings: Edit voice opens them": "Твоите собствени настройки: „Редактирай гласа“ ги отваря"
 }

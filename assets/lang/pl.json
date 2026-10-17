@@ -1864,12 +1864,6 @@
   "Low cut": "Niski krój",
   "Made from {voice} with {percent}% {other}.": "Wykonane z {voice} z {percent}% {other}.",
   "Made from {voice}.": "Wykonane z {voice} .",
-  "Make it yours": "Zrób to swoje",
-  "Make it yours  ·  {n} on": [
-    "Zrób to swoje  ·  {n} wł.",
-    "Zrób to swoje  ·  {n} wł.",
-    "Zrób to swoje  ·  {n} wł."
-  ],
   "Make your own voice": "Stwórz własny głos",
   "Making a sample…": "Robię próbkę…",
   "Male voice": "Męski głos",
@@ -2190,7 +2184,6 @@
   ],
   "Your browser": "Twoja przeglądarka",
   "Your mic level": "Twój poziom mikrofonu",
-  "Your own settings: Make it yours opens them": "Twoje własne ustawienia: otwiera je „Zrób to swoje”",
   "Your own voices: a TTS server on your PC (Kokoro, AllTalk…) or Piper voice packs": "Twoje własne głosy: serwer TTS na Twoim komputerze (Kokoro, AllTalk…) lub pakiety głosowe Piper",
   "Your saved voice “{name}”. Click to turn the voice changer on with it; right-click to rename or delete it.": "Twój zapisany głos „{name}”. Kliknij, aby włączyć za jego pomocą zmieniacz głosu; kliknij prawym przyciskiem myszy, aby zmienić jego nazwę lub usunąć.",
   "Your settings file was damaged and no backup could be read, so Onion Board started with default settings. Your sound files are still in {folder}.": "Twój plik ustawień został uszkodzony i nie można było odczytać kopii zapasowej, więc Onion Board uruchomił się z ustawieniami domyślnymi. Twoje pliki dźwiękowe nadal znajdują się w {folder} .",
@@ -3789,7 +3782,6 @@
   "Be the first: share a voice you made.": "Bądź pierwszy: udostępnij głos, który zrobiłeś.",
   "Couldn't keep that setup (100 setups at most).": "Nie udało się zachować zestawu (najwyżej 100 zestawów).",
   "It doesn't work": "Nie działa",
-  "Make a voice of your own first: Voice tab → Voice changer → Make it yours, or Save what's on under My setups.": "Najpierw zrób własny głos: karta Głos → Zmieniacz głosu → Zrób to swoje, albo Zapisz to, co włączone w Moich zestawach.",
   "No voices here yet": "Nie ma tu jeszcze głosów",
   "Report this voice": "Zgłoś ten głos",
   "Search the voices": "Szukaj w głosach",
@@ -3869,5 +3861,19 @@
   "The store doesn't take that name or those tags. Try other words (and no links).": "Sklep nie przyjmuje tej nazwy ani tagów. Spróbuj innych słów (bez linków).",
   "Add a voice someone sent you as a code (it starts with “OB”)": "Dodaj głos, który ktoś Ci wysłał jako kod (zaczyna się od „OB”)",
   "Add “{name}”?": "Dodać „{name}”?",
-  "That isn't a voice code (they start with “OB”).": "To nie jest kod głosowy (zaczynają się od „OB”)."
+  "That isn't a voice code (they start with “OB”).": "To nie jest kod głosowy (zaczynają się od „OB”).",
+  "Background  ·  {n} on": [
+    "Tło  ·  {n} wł.",
+    "Tło  ·  {n} wł.",
+    "Tło  ·  {n} wł."
+  ],
+  "Edit voice": "Edytuj głos",
+  "Edit voice  ·  {n} on": [
+    "Edytuj głos  ·  {n} wł.",
+    "Edytuj głos  ·  {n} wł.",
+    "Edytuj głos  ·  {n} wł."
+  ],
+  "Make a voice of your own first: Voice tab → Voice changer → Edit voice, or Save what's on under My setups.": "Najpierw zrób własny głos: karta Głos → Zmieniacz głosu → Edytuj głos, albo Zapisz to, co włączone w Moich zestawach.",
+  "Rain, wind, a crowd or sounds from your board behind your voice": "Deszcz, wiatr, tłum albo dźwięki z twojego boardu za twoim głosem",
+  "Your own settings: Edit voice opens them": "Twoje własne ustawienia: otwiera je „Edytuj głos”"
 }

@@ -1776,10 +1776,6 @@
   "Low cut": "Cắt thấp",
   "Made from {voice} with {percent}% {other}.": "Được tạo từ {voice} với {percent}% {other}.",
   "Made from {voice}.": "Được làm từ {voice} .",
-  "Make it yours": "Biến nó thành của bạn",
-  "Make it yours  ·  {n} on": [
-    "Biến nó thành của bạn  ·  {n} đang bật"
-  ],
   "Make your own voice": "Tạo giọng nói của riêng bạn",
   "Making a sample…": "Làm mẫu…",
   "Male voice": "Giọng nam",
@@ -2094,7 +2090,6 @@
   ],
   "Your browser": "Trình duyệt của bạn",
   "Your mic level": "Cấp độ micrô của bạn",
-  "Your own settings: Make it yours opens them": "Cài đặt của riêng bạn: mở bằng “Biến nó thành của bạn”",
   "Your own voices: a TTS server on your PC (Kokoro, AllTalk…) or Piper voice packs": "Giọng nói của riêng bạn: máy chủ TTS trên PC của bạn (Kokoro, AllTalk…) hoặc gói giọng nói Piper",
   "Your saved voice “{name}”. Click to turn the voice changer on with it; right-click to rename or delete it.": "Giọng nói đã lưu của bạn “{name}”. Nhấp để bật tính năng thay đổi giọng nói với nó; nhấp chuột phải để đổi tên hoặc xóa nó.",
   "Your settings file was damaged and no backup could be read, so Onion Board started with default settings. Your sound files are still in {folder}.": "Tệp cài đặt của bạn đã bị hỏng và không thể đọc được bản sao lưu, vì vậy Onion Board đã bắt đầu với cài đặt mặc định. Tệp âm thanh của bạn vẫn còn trong {folder} .",
@@ -3633,7 +3628,6 @@
   "Be the first: share a voice you made.": "Hãy là người đầu tiên: chia sẻ một giọng bạn đã làm.",
   "Couldn't keep that setup (100 setups at most).": "Không giữ được thiết lập đó (tối đa 100 thiết lập).",
   "It doesn't work": "Nó không hoạt động",
-  "Make a voice of your own first: Voice tab → Voice changer → Make it yours, or Save what's on under My setups.": "Hãy tạo giọng của riêng bạn trước: thẻ Giọng nói → Đổi giọng nói → Biến nó thành của bạn, hoặc Lưu những gì đang bật trong Thiết lập của tôi.",
   "No voices here yet": "Chưa có giọng nào",
   "Report this voice": "Báo cáo giọng này",
   "Search the voices": "Tìm trong các giọng",
@@ -3711,5 +3705,15 @@
   "The store doesn't take that name or those tags. Try other words (and no links).": "Cửa hàng không nhận tên hoặc thẻ đó. Hãy thử từ khác (và không có liên kết).",
   "Add a voice someone sent you as a code (it starts with “OB”)": "Thêm giọng nói mà ai đó đã gửi cho bạn dưới dạng mã (bắt đầu bằng “OB”)",
   "Add “{name}”?": "Thêm “{name}”?",
-  "That isn't a voice code (they start with “OB”).": "Đó không phải là mã thoại (chúng bắt đầu bằng “OB”)."
+  "That isn't a voice code (they start with “OB”).": "Đó không phải là mã thoại (chúng bắt đầu bằng “OB”).",
+  "Background  ·  {n} on": [
+    "Lý lịch  ·  {n} đang bật"
+  ],
+  "Edit voice": "Chỉnh giọng",
+  "Edit voice  ·  {n} on": [
+    "Chỉnh giọng  ·  {n} đang bật"
+  ],
+  "Make a voice of your own first: Voice tab → Voice changer → Edit voice, or Save what's on under My setups.": "Hãy tạo giọng của riêng bạn trước: thẻ Giọng nói → Đổi giọng nói → Chỉnh giọng, hoặc Lưu những gì đang bật trong Thiết lập của tôi.",
+  "Rain, wind, a crowd or sounds from your board behind your voice": "Mưa, gió, đám đông hoặc âm thanh từ board của bạn phía sau giọng bạn",
+  "Your own settings: Edit voice opens them": "Cài đặt của riêng bạn: mở bằng “Chỉnh giọng”"
 }

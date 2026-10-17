@@ -1776,10 +1776,6 @@
   "Low cut": "低切",
   "Made from {voice} with {percent}% {other}.": "由{voice}与{percent}% {other}制成。",
   "Made from {voice}.": "由{voice}制作。",
-  "Make it yours": "自定义",
-  "Make it yours  ·  {n} on": [
-    "自定义  ·  已开 {n} 项"
-  ],
   "Make your own voice": "发出自己的声音",
   "Making a sample…": "制作样品...",
   "Male voice": "男声",
@@ -2094,7 +2090,6 @@
   ],
   "Your browser": "您的浏览器",
   "Your mic level": "您的麦克风音量",
-  "Your own settings: Make it yours opens them": "你自己的设置：点“自定义”打开",
   "Your own voices: a TTS server on your PC (Kokoro, AllTalk…) or Piper voice packs": "您自己的声音：PC 上的 TTS 服务器（Kokoro、AllTalk...）或 Piper 语音包",
   "Your saved voice “{name}”. Click to turn the voice changer on with it; right-click to rename or delete it.": "您保存的声音“{name}”。单击可打开变声器；右键单击可重命名或删除它。",
   "Your settings file was damaged and no backup could be read, so Onion Board started with default settings. Your sound files are still in {folder}.": "您的设置文件已损坏并且无法读取备份，因此 Onion Board 以默认设置启动。您的声音文件仍在{folder}中。",
@@ -3633,7 +3628,6 @@
   "Be the first: share a voice you made.": "做第一个：分享一个你做的声音。",
   "Couldn't keep that setup (100 setups at most).": "无法保存这个组合（最多100个组合）。",
   "It doesn't work": "不能用",
-  "Make a voice of your own first: Voice tab → Voice changer → Make it yours, or Save what's on under My setups.": "先做一个你自己的声音：语音标签 → 变声器 → 自定义，或者在我的组合里“保存开着的设置”。",
   "No voices here yet": "这里还没有声音",
   "Report this voice": "举报这个声音",
   "Search the voices": "搜索声音",
@@ -3711,5 +3705,15 @@
   "The store doesn't take that name or those tags. Try other words (and no links).": "商店不接受这个名字或标签。换些词试试（也不要链接）。",
   "Add a voice someone sent you as a code (it starts with “OB”)": "添加某人发送给您的语音作为代码（以“OB”开头）",
   "Add “{name}”?": "添加“{name}”？",
-  "That isn't a voice code (they start with “OB”).": "这不是语音代码（它们以“OB”开头）。"
+  "That isn't a voice code (they start with “OB”).": "这不是语音代码（它们以“OB”开头）。",
+  "Background  ·  {n} on": [
+    "背景  ·  已开 {n} 项"
+  ],
+  "Edit voice": "编辑声音",
+  "Edit voice  ·  {n} on": [
+    "编辑声音  ·  已开 {n} 项"
+  ],
+  "Make a voice of your own first: Voice tab → Voice changer → Edit voice, or Save what's on under My setups.": "先做一个你自己的声音：语音标签 → 变声器 → 编辑声音，或者在我的组合里“保存开着的设置”。",
+  "Rain, wind, a crowd or sounds from your board behind your voice": "在你的声音后面加上雨、风、人群或你音板上的声音",
+  "Your own settings: Edit voice opens them": "你自己的设置：点“编辑声音”打开"
 }

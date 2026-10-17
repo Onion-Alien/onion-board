@@ -698,7 +698,7 @@ def test_random_voice_opens_fine_tune_with_what_it_set_lit_up(panel):
     import random
     p, _ = panel
     assert not p.fx.dlg.isVisible()
-    p.fx.btn_random.click()                  # the dice is in Make it yours
+    p.fx.btn_random.click()                  # the dice is in Edit voice
     assert p.fx.dlg.isVisible() and p.fx.preset == "Custom"
     p.fx.randomize(random.Random(3))
     on = {t for t, r in p.fx.rows.items() if r.chk.isChecked() and t != "cleanup"}
@@ -718,7 +718,7 @@ def test_my_own_mix_is_the_last_tile_and_voices_have_pictures(panel):
     assert order[-2:] == ["My own mix", "Random voice"]   # the die goes after the last card
     rt = p.fx.random_tile
     assert not rt.isCheckable() and rt not in p.fx.tiles.buttons() and not rt.star.isVisibleTo(rt)
-    assert p.fx.btn_random.window() is p.fx.dlg     # Randomize lives in Make it yours
+    assert p.fx.btn_random.window() is p.fx.dlg     # Randomize lives in Edit voice
     assert not p.fx.btn_random.icon().isNull()
     if art.exists(art.voice_key("Robot")):          # the repo's pictures are used
         assert p.fx._tile["Robot"].property("art")
@@ -1218,7 +1218,7 @@ def test_languages_tab_hides_when_speech_recognition_cant_hear_the_app(qapp, mon
         p.deleteLater()
 
 
-# ---------------------------------------------------------------- Make it yours window
+# ---------------------------------------------------------------- Edit voice window
 
 def test_the_card_is_just_the_switch_the_voices_and_one_button(panel):
     p, _ = panel
@@ -1553,7 +1553,7 @@ def test_first_visit_exposes_voice_presets(panel):
 
 
 def test_config_entries_sit_with_their_cards_main_controls(panel):
-    """Make it yours (the big editor) is in the picked voice's bar, pinned in
+    """Edit voice (the big editor) is in the picked voice's bar, pinned in
     sight under the voices (not under 24 of them, off the bottom); Speak another
     language's More options comes before the past-lines box; both More options use
     the one fold look and show/hide their fields."""

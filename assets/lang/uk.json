@@ -1864,12 +1864,6 @@
   "Low cut": "Низький виріз",
   "Made from {voice} with {percent}% {other}.": "Зроблено з {voice} з {percent}% {other}.",
   "Made from {voice}.": "Зроблено з {voice} .",
-  "Make it yours": "Зроби це своїм",
-  "Make it yours  ·  {n} on": [
-    "Зроби це своїм  ·  {n} увімк.",
-    "Зроби це своїм  ·  {n} увімк.",
-    "Зроби це своїм  ·  {n} увімк."
-  ],
   "Make your own voice": "Зробіть свій власний голос",
   "Making a sample…": "Виготовлення зразка…",
   "Male voice": "Чоловічий голос",
@@ -2190,7 +2184,6 @@
   ],
   "Your browser": "Ваш браузер",
   "Your mic level": "Ваш рівень мікрофона",
-  "Your own settings: Make it yours opens them": "Твої власні налаштування: відкриваються кнопкою «Зроби це своїм»",
   "Your own voices: a TTS server on your PC (Kokoro, AllTalk…) or Piper voice packs": "Ваші власні голоси: сервер TTS на вашому ПК (Kokoro, AllTalk…) або голосові пакети Piper",
   "Your saved voice “{name}”. Click to turn the voice changer on with it; right-click to rename or delete it.": "Ваш збережений голос “{name}”. Клацніть, щоб увімкнути з ним функцію зміни голосу; клацніть правою кнопкою миші, щоб перейменувати або видалити його.",
   "Your settings file was damaged and no backup could be read, so Onion Board started with default settings. Your sound files are still in {folder}.": "Ваш файл налаштувань було пошкоджено, і резервну копію не вдалося прочитати, тому Onion Board запустив налаштування за замовчуванням. Ваші звукові файли все ще знаходяться в {folder} .",
@@ -3789,7 +3782,6 @@
   "Be the first: share a voice you made.": "Будьте першим: поділіться голосом, який зробили.",
   "Couldn't keep that setup (100 setups at most).": "Не вдалося зберегти набір (щонайбільше 100 наборів).",
   "It doesn't work": "Він не працює",
-  "Make a voice of your own first: Voice tab → Voice changer → Make it yours, or Save what's on under My setups.": "Спершу зробіть власний голос: вкладка Голос → Зміна голосу → Зроби це своїм, або Зберегти ввімкнене в Моїх наборах.",
   "No voices here yet": "Тут поки немає голосів",
   "Report this voice": "Поскаржитися на голос",
   "Search the voices": "Пошук у голосах",
@@ -3869,5 +3861,19 @@
   "The store doesn't take that name or those tags. Try other words (and no links).": "Магазин не приймає таку назву чи теги. Спробуйте інші слова (і без посилань).",
   "Add a voice someone sent you as a code (it starts with “OB”)": "Додайте голос, надісланий вам як код (він починається з «OB»)",
   "Add “{name}”?": "Додати «{name}»?",
-  "That isn't a voice code (they start with “OB”).": "Це не голосовий код (вони починаються з «OB»)."
+  "That isn't a voice code (they start with “OB”).": "Це не голосовий код (вони починаються з «OB»).",
+  "Background  ·  {n} on": [
+    "Фон  ·  {n} увімк.",
+    "Фон  ·  {n} увімк.",
+    "Фон  ·  {n} увімк."
+  ],
+  "Edit voice": "Змінити голос",
+  "Edit voice  ·  {n} on": [
+    "Змінити голос  ·  {n} увімк.",
+    "Змінити голос  ·  {n} увімк.",
+    "Змінити голос  ·  {n} увімк."
+  ],
+  "Make a voice of your own first: Voice tab → Voice changer → Edit voice, or Save what's on under My setups.": "Спершу зробіть власний голос: вкладка Голос → Зміна голосу → Змінити голос, або Зберегти ввімкнене в Моїх наборах.",
+  "Rain, wind, a crowd or sounds from your board behind your voice": "Дощ, вітер, натовп або звуки з твого борду за твоїм голосом",
+  "Your own settings: Edit voice opens them": "Твої власні налаштування: відкриваються кнопкою «Змінити голос»"
 }
