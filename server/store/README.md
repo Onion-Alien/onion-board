@@ -93,3 +93,9 @@ Node's built-in SQLite standing in for D1 and a `Map` for KV.
 `schema.sql` is the whole schema for a new database, and safe to run again. A change to
 an existing table goes in `migrations/` too, numbered: run each new file once, before
 `schema.sql` (`npx wrangler d1 execute onion-board-store --remote --file migrations/<file>`).
+
+D1's free plan reads at most 5 million rows a day, and every row a query looks at counts.
+A list page goes through an index made for its order (`sounds_top`, `sounds_trend`, ... in
+`schema.sql`), so it reads about one page of rows; the category chips' counts are worked
+out by the cron once an hour. A new list order or filter needs its own index, and the
+query-plan test in `test/store.test.mjs` fails when one reads the whole table.

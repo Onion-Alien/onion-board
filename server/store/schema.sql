@@ -22,7 +22,8 @@ CREATE TABLE IF NOT EXISTS sounds (
   cat TEXT NOT NULL DEFAULT '',      -- one of index.js's CATS, or none
   source TEXT NOT NULL DEFAULT '',   -- "myinstants": synced from that site (sync.js); "" ours
   hot INTEGER NOT NULL DEFAULT 0,    -- how trending it is on its site now (fades each run)
-  pop INTEGER NOT NULL DEFAULT 0     -- how popular it is on its site (0-1000)
+  pop INTEGER NOT NULL DEFAULT 0,    -- how popular it is on its site (0-1000)
+  likes INTEGER NOT NULL DEFAULT 0   -- this week's 👍 here (vote() sets it, the daily cron ages it)
 );
 CREATE INDEX IF NOT EXISTS sounds_status ON sounds (status, created);
 
@@ -51,7 +52,8 @@ CREATE TABLE IF NOT EXISTS vote_from (
 );
 CREATE INDEX IF NOT EXISTS vote_from_ip ON vote_from (sound, ip);
 
--- where each site's sync is up to: "<next page>:<cycles done>"
+-- where each site's sync is up to: "<next page>:<cycles done>"; also, under 'categories',
+-- the category chips' counts (JSON) the cron works out each hour (index.js catCounts())
 CREATE TABLE IF NOT EXISTS sync (
   key TEXT PRIMARY KEY,
   value TEXT NOT NULL
@@ -79,7 +81,21 @@ CREATE TABLE IF NOT EXISTS actions (
 CREATE INDEX IF NOT EXISTS actions_at ON actions (at);
 CREATE INDEX IF NOT EXISTS actions_sound ON actions (sound, id);
 
-CREATE INDEX IF NOT EXISTS sounds_cat ON sounds (status, cat);
+-- the list's orders (index.js list()): with these a page of 50 reads about 50 rows instead of
+-- every live sound (D1's free plan allows 5 million row reads a day). An ORDER BY has to
+-- stay exactly as written here, or SQLite goes back to reading the whole table.
+DROP INDEX IF EXISTS sounds_cat;     -- sounds_new_cat starts with the same columns
+CREATE INDEX IF NOT EXISTS sounds_new_cat ON sounds (status, cat, created);
+CREATE INDEX IF NOT EXISTS sounds_top ON sounds (status, (up - down) DESC, up DESC,
+  (CASE WHEN source = '' THEN 500 ELSE pop END) DESC, created DESC);
+CREATE INDEX IF NOT EXISTS sounds_top_cat ON sounds (status, cat, (up - down) DESC, up DESC,
+  (CASE WHEN source = '' THEN 500 ELSE pop END) DESC, created DESC);
+CREATE INDEX IF NOT EXISTS sounds_trend ON sounds (status, (hot + 40 * likes) DESC,
+  (up - down) DESC, pop DESC);
+CREATE INDEX IF NOT EXISTS sounds_trend_cat ON sounds (status, cat, (hot + 40 * likes) DESC,
+  (up - down) DESC, pop DESC);
+-- the few sounds still fading from a site's trending page (sync.js)
+CREATE INDEX IF NOT EXISTS sounds_hot ON sounds (hot) WHERE hot > 0;
 CREATE INDEX IF NOT EXISTS sounds_actions_votes ON actions (sound, kind, at);
 
 -- community voices (src/voices.js): settings, never files; live as soon as they're shared,
@@ -100,6 +116,13 @@ CREATE TABLE IF NOT EXISTS voices (
   up INTEGER NOT NULL DEFAULT 0,
   down INTEGER NOT NULL DEFAULT 0,
   reports INTEGER NOT NULL DEFAULT 0,
-  created INTEGER NOT NULL           -- unix seconds
+  created INTEGER NOT NULL,          -- unix seconds
+  likes INTEGER NOT NULL DEFAULT 0   -- this week's 👍 (as the sounds')
 );
 CREATE INDEX IF NOT EXISTS voices_status ON voices (status, kind, created);
+-- the lists' orders (voices.js list()), so a page reads its own rows, not every voice
+CREATE INDEX IF NOT EXISTS voices_new ON voices (status, created);
+CREATE INDEX IF NOT EXISTS voices_top ON voices (status, (up - down) DESC, up DESC, created DESC);
+CREATE INDEX IF NOT EXISTS voices_top_kind ON voices (status, kind, (up - down) DESC, up DESC, created DESC);
+CREATE INDEX IF NOT EXISTS voices_trend ON voices (status, likes DESC, (up - down) DESC, created DESC);
+CREATE INDEX IF NOT EXISTS voices_trend_kind ON voices (status, kind, likes DESC, (up - down) DESC, created DESC);

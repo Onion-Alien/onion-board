@@ -3,7 +3,7 @@ import test from "node:test";
 import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import { DatabaseSync } from "node:sqlite";
-import worker, { prune } from "../src/index.js";
+import worker, { prune, catCounts } from "../src/index.js";
 import { jobs, parseMyinstants } from "../src/sync.js";
 import { audioType } from "../src/audio.js";
 
@@ -13,12 +13,12 @@ const INSTALL = "0123456789abcdef0123";
 
 // D1's calls on top of node:sqlite: prepare().bind().first() / all() / run()
 class FakeD1 {
-  constructor() { this.db = new DatabaseSync(":memory:"); this.db.exec(SCHEMA); }
+  constructor() { this.db = new DatabaseSync(":memory:"); this.db.exec(SCHEMA); this.seen = []; }
   prepare(sql) {
-    const db = this.db;
+    const db = this.db, seen = this.seen;
     let args = [];
     const st = {
-      bind(...a) { args = a; return st; },
+      bind(...a) { args = a; seen.push([sql, a]); return st; },
       async first() { return db.prepare(sql).get(...args) ?? null; },
       async all() { return { results: db.prepare(sql).all(...args) }; },
       async run() { db.prepare(sql).run(...args); return { success: true }; },
@@ -663,4 +663,85 @@ test("a shared sound's tags never reach the people who add it", async () => {
   assert.equal(f.status, 200);
   assert.ok(!Buffer.from(f.body).includes("Secret"));
   assert.equal(f.headers.get("content-length"), String(f.body.byteLength));
+});
+
+// ------------------------------------------------------------------ D1's daily row reads
+
+// what SQLite does for each statement a call ran: "SCAN s" alone (every row) or "USE TEMP
+// B-TREE FOR ORDER BY" (every match read, then sorted) means a page reads the whole table
+function plans(env, from) {
+  return env.DB.seen.slice(from).filter(([sql]) => /^SELECT/.test(sql))
+    .map(([sql, a]) => [sql, env.DB.rows("EXPLAIN QUERY PLAN " + sql, ...a).map(r => r.detail)]);
+}
+function fullReads(env, from) {
+  return plans(env, from).filter(([, p]) => p.some(d => /^SCAN \w+$|TEMP B-TREE/.test(d)));
+}
+
+test("every list order reads one page through an index, never the whole table", async () => {
+  const env = store();
+  await step(env);
+  await live(env, "Air horn");
+  for (const sort of ["top", "new", "trending"])
+    for (const cat of ["", "&cat=games"])
+      for (const install of [INSTALL, null]) {
+        const from = env.DB.seen.length;
+        const r = await call(env, `/v1/sounds?sort=${sort}${cat}`, { install });
+        assert.equal(r.status, 200);
+        assert.deepEqual(fullReads(env, from), [], `${sort}${cat}`);
+        assert.ok(plans(env, from).some(([, p]) => p.some(d => / USING INDEX sounds_/.test(d))));
+      }
+  for (const sort of ["top", "new", "trending"])
+    for (const kind of ["", "&kind=fx"]) {
+      const from = env.DB.seen.length;
+      assert.equal((await call(env, `/v1/voices?sort=${sort}${kind}`)).status, 200);
+      assert.deepEqual(fullReads(env, from), [], `voices ${sort}${kind}`);
+    }
+});
+
+test("the category chips read one stored row; the hourly cron counts them", async () => {
+  const env = store();
+  await step(env);
+  let from = env.DB.seen.length;
+  const first = (await call(env, "/v1/categories")).body;   // nothing stored yet: counted once
+  assert.deepEqual(first.categories.map(r => ({ ...r })), [{ cat: "games", n: 3 }]);
+  assert.equal(first.total, 4);
+  await live(env, "Air horn");
+  env.DB.db.exec("UPDATE sounds SET cat = 'memes' WHERE name = 'Air horn'");
+  from = env.DB.seen.length;
+  assert.equal((await call(env, "/v1/categories")).body.total, 4);   // cached
+  assert.ok(!env.DB.seen.slice(from).some(([sql]) => /FROM sounds/.test(sql)));
+  const real = globalThis.fetch;
+  globalThis.fetch = fakeSite();
+  try {   // the run at minute 20 leaves them; the one on the hour counts them again
+    await worker.scheduled({ cron: "*/10 * * * *", scheduledTime: Date.UTC(2026, 0, 1, 5, 20) }, env);
+    assert.equal((await call(env, "/v1/categories")).body.total, 4);
+    await worker.scheduled({ cron: "*/10 * * * *", scheduledTime: Date.UTC(2026, 0, 1, 6, 0) }, env);
+  } finally { globalThis.fetch = real; }
+  const c = (await call(env, "/v1/categories")).body;
+  assert.equal(c.total, 5);
+  assert.deepEqual(c.categories.map(r => r.cat), ["games", "memes"]);
+  assert.deepEqual((await catCounts(env)).total, 5);
+});
+
+test("a sync step never counts the whole table", async () => {
+  const env = store();
+  const from = env.DB.seen.length;
+  assert.equal((await step(env)).body.added, 4);
+  assert.ok(!env.DB.seen.slice(from).some(([sql]) => /count\(\*\) AS n FROM sounds"?$/.test(sql)));
+  assert.equal((await step(env)).body.added, 0);   // the same page again: nothing new
+});
+
+test("a thumbs up counts for Trending for a week, then the daily cron lets it go", async () => {
+  const env = store();
+  await step(env);
+  env.DB.db.exec("UPDATE sounds SET hot = 0");
+  const mario = env.DB.rows("SELECT id FROM sounds WHERE name = 'Mario jump'")[0].id;
+  await call(env, `/v1/sounds/${mario}/vote`, { method: "POST", json: { value: 1 } });
+  assert.equal(env.DB.rows("SELECT likes FROM sounds WHERE id = ?", mario)[0].likes, 1);
+  const names = async () => (await call(env, "/v1/sounds?sort=trending")).body.sounds.map(s => s.name);
+  assert.equal((await names())[0], "Mario jump");
+  await prune(env, Math.floor(Date.now() / 1000) + 3 * 86400);
+  assert.equal(env.DB.rows("SELECT likes FROM sounds WHERE id = ?", mario)[0].likes, 1);
+  await prune(env, Math.floor(Date.now() / 1000) + 8 * 86400);
+  assert.equal(env.DB.rows("SELECT likes FROM sounds WHERE id = ?", mario)[0].likes, 0);
 });
