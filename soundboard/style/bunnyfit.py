@@ -64,7 +64,7 @@ OUTFITS: dict[str, tuple[str, ...]] = {
 
 HATS = {"pom_beanie", "wizard", "captain", "beret", "crown", "onion", "horns", "bandana",
         "eyeshade", "pencil", "frog", "snapback", "party", "propeller", "blossom", "leaves",
-        "flower_crown", "mint_sprig", "bow", "dizzy"}
+        "flower_crown", "mint_sprig", "bow", "dizzy", "santa"}
 
 # glasses and visors: off while he sleeps under the nightcap
 EYEWEAR = {"shades", "round_glasses", "heart_glasses", "glasses_3d",
@@ -609,6 +609,27 @@ def _onion(p, ink):
     p.drawLine(QPointF(50, 11), QPointF(55, 2))
 
 
+def _santa(p, ink):
+    """A floppy red Santa hat (the start-up splash puts it on him in December): over
+    the headphone band, its tip and white bobble flopped down to the viewer's right."""
+    body = QPainterPath(QPointF(23, 50))
+    body.cubicTo(QPointF(22, 30), QPointF(39, 16), QPointF(57, 17))
+    body.cubicTo(QPointF(76, 18), QPointF(90, 30), QPointF(93, 50))
+    body.cubicTo(QPointF(87, 42), QPointF(81, 40), QPointF(77, 48))
+    body.quadTo(QPointF(50, 40), QPointF(23, 50))
+    _fill(p, body, QColor("#e0353f"), ink)
+    brim = QPainterPath(QPointF(21, 51))   # the white fur band round the bottom
+    brim.quadTo(QPointF(50, 39.5), QPointF(79, 49))
+    p.setBrush(Qt.BrushStyle.NoBrush)
+    p.setPen(QPen(INK_COL, 10.5, Qt.PenStyle.SolidLine, Qt.PenCapStyle.RoundCap))
+    p.drawPath(brim)
+    p.setPen(QPen(WHITE, 7.5, Qt.PenStyle.SolidLine, Qt.PenCapStyle.RoundCap))
+    p.drawPath(brim)
+    p.setPen(ink)
+    p.setBrush(WHITE)
+    p.drawEllipse(QPointF(93, 51), 6.5, 6.5)
+
+
 def _party(p, ink):
     col = _col("accent2")
     cone = _poly((36, 40), (60, 2), (66, 38))
@@ -880,6 +901,7 @@ PIECES = {
     "propeller": ("over", _propeller),
     "bow": ("over", _bow),
     "dizzy": ("over", _dizzy),
+    "santa": ("over", _santa),
     "sweater": ("face", _sweater),
     "shades": ("face", lambda p, ink: _lenses(p, ink, DARK)),
     "round_glasses": ("face", lambda p, ink: _lenses(p, ink, QColor(200, 230, 255, 60),
