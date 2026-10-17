@@ -662,6 +662,7 @@ class VoiceFxPanel(QWidget):
     hotkey_asked = Signal(str)     # right-click a voice -> Set hotkey: its name ("" key: clear)
     hotkey_cleared = Signal(str)
     renamed = Signal(str, str)     # a saved voice's old and new name
+    share_asked = Signal(str)      # right-click a saved voice -> Share to the store: its name
     _sampled = Signal(object, str)  # Hear it's worker: (the sample or None, why not)
 
     COLS = 3
@@ -1381,6 +1382,8 @@ class VoiceFxPanel(QWidget):
             m.addSeparator()
             m.addAction(icons.icon("edit"), _("Rename"), lambda: self.rename_voice(name))
             m.addAction(icons.icon("copy"), _("Copy share code"), lambda: self.copy_code(name))
+            m.addAction(icons.icon("upload"), _("Share to the store…"),
+                        lambda: self.share_asked.emit(name))
             m.addAction(icons.icon("trash", "danger_text"), _("Delete"),
                         lambda: self.delete_voice(name))
         m.exec(at)
