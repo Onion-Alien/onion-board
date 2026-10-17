@@ -24,6 +24,7 @@ import os
 import threading
 
 from PySide6.QtCore import QObject, Signal
+from PySide6.QtGui import QGuiApplication
 
 from soundboard import midi
 from soundboard.i18n import _
@@ -289,6 +290,15 @@ def own_window_in_front() -> bool:
     return pid.value == os.getpid()
 
 
+def takes_text(obj) -> bool:
+    """Is this focused widget a text box keys type into (search, rename, a number box)?
+    A read-only one, a button or a pad isn't."""
+    from PySide6.QtWidgets import QAbstractSpinBox, QLineEdit, QPlainTextEdit, QTextEdit
+    if isinstance(obj, (QLineEdit, QTextEdit, QPlainTextEdit)):
+        return not obj.isReadOnly()
+    return isinstance(obj, QAbstractSpinBox) and not obj.isReadOnly()
+
+
 user32.SetTimer.argtypes = (wt.HWND, ctypes.c_size_t, wt.UINT, ctypes.c_void_p)
 user32.SetTimer.restype = ctypes.c_size_t
 user32.KillTimer.argtypes = (wt.HWND, ctypes.c_size_t)
@@ -324,12 +334,19 @@ class Hotkeys(QObject):
         self._pending: tuple[dict[str, str], bool, set[str]] | None = None
         self.share = False               # the game gets the keys too (see the module doc)
         self.grab: set[str] = set()      # ...except these, kept from it (the overlay's)
+        self.text_focus = False          # a text box in the board has the cursor
+        app = QGuiApplication.instance()
+        if isinstance(app, QGuiApplication):
+            app.focusObjectChanged.connect(self._focus_changed)
         self._lock = threading.Lock()
         self._ready = threading.Event()
         self._tid = 0
         threading.Thread(target=self._loop, daemon=True, name="hotkeys").start()
         if not self._ready.wait(2):
             log.error("hotkey thread didn't start; global hotkeys won't work this session")
+
+    def _focus_changed(self, obj):
+        self.text_focus = takes_text(obj)   # read on the hotkey thread: a plain bool
 
     @property
     def alive(self) -> bool:
@@ -444,9 +461,10 @@ class Hotkeys(QObject):
         act = self._shared.get((mods, vk))
         if act is None:
             return
-        # typing in the board itself (its search box): a bare letter types, it doesn't play
+        # typing in one of the board's text boxes (search, rename): a bare letter types,
+        # it doesn't play. Anywhere else in the board (a pad, a tab) it plays
         if (is_typing_key(vk) and not mods & (MOD_CONTROL | MOD_ALT | MOD_WIN)
-                and own_window_in_front()):
+                and self.text_focus and own_window_in_front()):
             return
         self.fired.emit(act)
         self._held[vk] = act
