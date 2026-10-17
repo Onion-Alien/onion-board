@@ -407,7 +407,7 @@ def test_the_table_header_sits_over_its_columns(qapp, fake):
         assert r.cell_cat.isVisible() is cat_shown and t.head_cat.isVisible() is cat_shown
         assert r.cell_added.isVisible() is added_shown and t.sort_btns["new"].isVisible()
         assert t.sort_btns["top"].x() == x_of(r.btn_up)
-        assert r.width() <= t.list_area.viewport().width()   # nothing cut off
+        assert r.width() <= t.list_area.viewport().width() - storetab.LIST_GAP   # nothing cut off
         if added_shown:
             assert t.sort_btns["new"].x() == x_of(r.cell_added)
         else:
@@ -418,7 +418,21 @@ def test_the_table_header_sits_over_its_columns(qapp, fake):
     for width in range(900, 419, -20):   # (down to the smallest window's tab)
         t.resize(width, 700)
         process_events(qapp, lambda: False, timeout=0.05)
-        assert t._rows[0].width() <= t.list_area.viewport().width(), width
+        assert t._rows[0].width() <= t.list_area.viewport().width() - storetab.LIST_GAP, width
+    t.shutdown()
+
+
+def test_rows_keep_clear_of_the_scroll_bar(qapp, fake):
+    from uicheck import assert_breathing_room
+    fake.sounds = {f"{i:012x}": _sound(i) for i in range(1, 21)}   # enough to scroll
+    t = storetab.StoreTab(Config(), [].append, lambda d, g: True, lambda: None)
+    for width in (800, 620, 420):
+        t.resize(width, 500)
+        t.show()
+        assert _wait(qapp, lambda: len(t._rows) == 20)
+        process_events(qapp, lambda: False, timeout=0.2)
+        assert t.list_area.verticalScrollBar().isVisible()
+        assert_breathing_room(t.list_area, edge=0)   # 8 px between every row and the bar
     t.shutdown()
 
 

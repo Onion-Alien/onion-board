@@ -33,6 +33,7 @@ SEARCH_WAIT_MS = 400          # typing pauses this long before the store is sear
 ROW_MAX_W = 820               # the list stays a readable column, centred, on a wide window
 COUNT_W = "9.9k"              # the widest vote count kept room for
 PLAY_ROOM = 520               # a narrower list shows no play button (its picture plays)
+LIST_GAP = 8                  # between the rows and the scroll bar (DESIGN.md, *Breathing room*)
 CAT_W = 110                   # the table's Category column
 ADDED_W = 100                 # its Added column ("3 days ago")
 ONE_ROW = 720                 # a narrower tab puts the toolbar on two rows
@@ -354,7 +355,7 @@ class StoreTab(QWidget):
         scroll.viewport().installEventFilter(self)   # resized: the columns line up again
         body = QWidget()
         self._list = QVBoxLayout(body)
-        self._list.setContentsMargins(0, 0, 0, 0)
+        self._list.setContentsMargins(0, 0, LIST_GAP, 0)   # rows end before the scroll bar
         self._list.setSpacing(6)
         self._fill_cats([])
         self.btn_more = QPushButton(_("Show more"))
@@ -517,7 +518,7 @@ class StoreTab(QWidget):
         Then the header's words over their columns again."""
         if not self._rows:
             return
-        w = self.list_area.viewport().width()
+        w = self.list_area.viewport().width() - LIST_GAP
         for r in self._rows:
             r.show_play(w >= PLAY_ROOM)
         level = 2
@@ -544,9 +545,10 @@ class StoreTab(QWidget):
 
     @staticmethod
     def _needs(r) -> int:
-        """The row's smallest width, as its columns are now."""
+        """The row's smallest width, as its columns are now (its own frame included)."""
         lay = r.layout()
-        return lay.minimumSize().width() if lay is not None else 0
+        return max(lay.minimumSize().width() if lay is not None else 0,
+                   r.minimumSizeHint().width())
 
     def _align_head(self):
         """The header's words over the first row's cells (rows and header share one
