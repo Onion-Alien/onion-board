@@ -335,10 +335,11 @@ def test_the_background_button_counts_whats_on_and_opens_the_card(qapp, monkeypa
                    {"voice": "Microsoft Zira Desktop", "rate": 2})
     try:
         fx = p.fx
-        assert fx.btn_tweak.text().startswith("Edit voice")
-        assert fx.btn_backdrop.text() == "Background"
+        # (the names: the words themselves depend on the bar's width and the fonts)
+        assert fx.btn_tweak.accessibleName().startswith("Edit voice")
+        assert fx.btn_backdrop.accessibleName() == "Background"
         fx.pick("Storm")                                  # rain and wind
-        assert fx.btn_backdrop.text() == "Background  ·  2 on"
+        assert fx.btn_backdrop.accessibleName() == "Background  ·  2 on"
         row = fx.rows["backdrop"]
         row.set_folded(True)
         fx.btn_backdrop.click()
@@ -396,9 +397,16 @@ def test_background_keeps_its_words_while_they_fit_and_its_name_always(qapp):
         bar.show()
         on = len(fx.effects_of("Storm"))
         full = f"Edit voice  ·  {on} on"
-        for width, words, tweak in ((1100, True, full), (420, True, full),
-                                    (290, False, full), (200, False, "Edit voice"),
-                                    (1100, True, full)):
+        bar.resize(2000, 200)
+        process_events(qapp, lambda: False, timeout=0.1)
+        m = fx.picked_box.contentsMargins()
+        # the folded line with every word: the three buttons side by side (font-free)
+        folded = (sum(b.minimumSizeHint().width() for b in
+                      (fx.btn_tweak, fx.btn_backdrop, fx.btn_sample) if not b.isHidden())
+                  + 2 * fx._picked_pb.spacing() + m.left() + m.right() + 4)
+        for width, words, tweak in ((2000, True, full), (folded, True, full),
+                                    (folded - 30, False, full), (120, False, "Edit voice"),
+                                    (2000, True, full)):
             bar.resize(width, 200)
             process_events(qapp, lambda: False, timeout=0.1)
             assert bool(fx.btn_backdrop.text()) == words, width
