@@ -9,12 +9,13 @@ from __future__ import annotations
 import html
 from typing import TYPE_CHECKING
 
-from PySide6.QtCore import QSize, Qt, QTimer
+from PySide6.QtCore import QEvent, QSize, Qt, QTimer, Signal
 from PySide6.QtGui import QColor, QIcon, QPainter, QPixmap
 from PySide6.QtWidgets import (
     QApplication,
     QHBoxLayout,
     QInputDialog,
+    QLineEdit,
     QMenu,
     QMessageBox,
     QPushButton,
@@ -45,6 +46,35 @@ class SnugTabBar(QTabBar):
     def minimumSizeHint(self) -> QSize:
         m = super().minimumSizeHint()
         return QSize(min(m.width(), self.sizeHint().width()), m.height())
+
+
+class _NameBox(QLineEdit):
+    """The New category box in the tab row. `done` sends the text on Enter or when
+    it loses focus, None on Esc."""
+
+    done = Signal(object)
+
+    def event(self, e):
+        # Esc and Enter belong to the box while it's open, not to the window's shortcuts
+        if e.type() == QEvent.Type.ShortcutOverride and e.key() in (
+                Qt.Key.Key_Escape, Qt.Key.Key_Return, Qt.Key.Key_Enter):
+            e.accept()
+            return True
+        return super().event(e)
+
+    def keyPressEvent(self, e):
+        if e.key() == Qt.Key.Key_Escape:
+            self.done.emit(None)
+            return
+        if e.key() in (Qt.Key.Key_Return, Qt.Key.Key_Enter):
+            self.done.emit(self.text())
+            return
+        super().keyPressEvent(e)
+
+    def focusOutEvent(self, e):
+        super().focusOutEvent(e)
+        if e.reason() != Qt.FocusReason.PopupFocusReason:   # its own right-click menu
+            self.done.emit(self.text())
 
 
 class CategoryControl(Controller):
@@ -98,7 +128,17 @@ class CategoryControl(Controller):
         add.setToolTip(_("New category (a page of pads). Right-click a pad to put it in one; "
                          "right-click a category to rename or delete it."))
         icons.set_icon(add, "plus", size=12)
-        add.clicked.connect(lambda: self.new_category())
+        add.clicked.connect(self.start_typing_category)
+        # the box the name is typed into, right where the new tab will show
+        # (Enter adds it, Esc or an empty box puts the "+" back)
+        box = self.cat_name_box = _NameBox()
+        box.setAccessibleName(_("New category"))
+        box.setPlaceholderText(_("New category"))
+        box.setMaxLength(library.CATEGORY_MAX)
+        box.setFixedWidth(170)
+        box.hide()
+        box.done.connect(self._typed_category)
+        h.addWidget(box, 0, Qt.AlignmentFlag.AlignVCenter)
         h.addWidget(add, 0, Qt.AlignmentFlag.AlignVCenter)
         h.addStretch(1)
         self.btn_cat_add = add
@@ -410,6 +450,25 @@ class CategoryControl(Controller):
         if cut:
             self._say_cut(name)
         return name
+
+    def start_typing_category(self):
+        """The "+": swap it for a box right after the last tab to type the name in."""
+        box = self.cat_name_box
+        box.clear()
+        self.btn_cat_add.hide()
+        box.show()
+        box.setFocus(Qt.FocusReason.OtherFocusReason)
+
+    def _typed_category(self, text: str | None):
+        """The box closed: Enter (`text`) adds the category, Esc (None) doesn't.
+        Clicking away keeps what was typed, the way renaming a file does."""
+        box = self.cat_name_box
+        if not box.isVisible():
+            return
+        box.hide()
+        self.btn_cat_add.show()
+        if text is not None and text.strip():
+            self.new_category(name=text)
 
     def _typed_name(self, typed: str | None) -> tuple[str, bool]:
         """A name typed in a New / Rename box (None: the box was cancelled), cleaned
