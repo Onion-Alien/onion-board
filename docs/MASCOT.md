@@ -34,7 +34,10 @@ download bar (`ui/downloadbar.py`); static pictures in `ui/dialogs.py` and the s
 `draw_bunny` keywords, all 0 when he's at rest: `blink` (0..1, shut above 0.6), `mouth`
 (talking), `ears` (degrees outward), `swing` (hammer or bat), `sad` (worried face, and the
 ears fold down from the middle), `angry` (cross brows and the vein mark), `nightcap`
-(asleep), `robot` (Robo-Bun), `smug`, `led` (Robo-Bun's LEDs brighter, 0..1). Props:
+(asleep), `robot` (Robo-Bun), `smug`, `led` (Robo-Bun's LEDs brighter, 0..1), `nod` (his
+head tilted on his neck, degrees) and `dip` (his head dropped, canvas units): the body,
+and what's round his neck (`bunny.BODY_PIECES`), stay put. Bun mode's dances
+(`BunnyWidget.set_groove`, `_moves`) use them to headbang and nod on the beat. Props:
 `bunny.PROPS` (`hammer_broken`: the failed build's snapped plank and headless hammer).
 Everything an act shows stays inside the widget's own box: a widget is only a little wider
 than Bun, so moving him sideways out of view slices him at its edge. Squash, shrink or fade
@@ -43,6 +46,16 @@ What gets built is drawn on the canvas at `bunny.PLANK_SPOT` / `bunny.GADGET_SCR
 Animations never draw Bun themselves: they work out these numbers per frame and call
 `draw_bunny`, so a new piece of drawing in `bunny.py` or `bunnyfit.py` shows up in every
 animation at once.
+
+## Skits
+
+Now and then an idle `BunnyWidget` plays his theme's skit (`ui/bunskits.py`) instead of a
+fidget: everywhere he idles (the empty board, Bun mode, the YouTube search). A skit is a
+function of its time alone: it adds to his pose, hides the outfit pieces it moves and
+queues drawings behind him, with him (held things) or in front, on the canvas. No words
+(only "!" and "?"), so nothing to translate. Dark, the default, has his DJ act. A new theme with an outfit gets a skit in
+`bunskits.SKITS`; one without juggles. `tests/test_bunnywidget.py`
+plays every theme's skit through.
 
 ## Outfits
 

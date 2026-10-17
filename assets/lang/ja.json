@@ -10,7 +10,6 @@
   " · shows by itself when {progs} is in front": " · {progs} が前面にあると自動で表示",
   " · {hk} plays a random one": " · {hk} でランダムに1つ再生",
   ", try Settings → Audio → Audio buffering: Safer": "、設定 → オーディオ → オーディオバッファ: 安全 を試してください",
-  "+{value} more": "+{value} 件",
   "<b>You don't need the virtual cable any more</b>, it was only the backup. Remove it, or keep it if another program uses it (Voicemeeter, another soundboard).": "<b>仮想ケーブルはもう必要ありません</b>、予備にすぎませんでした。削除するか、ほかのプログラム（Voicemeeter や別のサウンドボード）で使っているなら残してください。",
   "<span style='color:{red}'>Couldn't search {site}: {err}</span>": "<span style='color:{red}'>{site} を検索できませんでした: {err}</span>",
   "<span style='color:{status}'>Another program is already using {keys}, pick a different hotkey.</span>": "<span style='color:{status}'>{keys} はほかのプログラムが使用中です、別のホットキーを選んでください。</span>",
@@ -1292,7 +1291,6 @@
   "Voices in your voices folder that are a server on the internet. Ones on this PC (127.0.0.1) always work.": "インターネット上のサーバーである音声フォルダー内の音声。この PC (127.0.0.1) 上のものは常に動作します。",
   "Wait first": "まず待ってください",
   "Waiting to hear you… if the bar doesn't move, pick another mic.": "あなたの声を待っています…バーが動かない場合は、別のマイクを選んでください。",
-  "Waits for the sounds playing to finish": "サウンドの再生が終了するのを待ちます",
   "Waits this long after the press before it plays, say for a punchline. Stop everything cancels it.": "ボタンを押してから、たとえばオチが再生されるまで、これだけ長い間待ちます。すべてを停止するとキャンセルされます。",
   "Waking it up, so you don't have to restart (your sound may blip for a second)": "ウェイクアップするため、再起動する必要はありません (音が一瞬鳴る場合があります)",
   "Waveform shows once the sound has loaded": "サウンドがロードされると波形が表示されます",
@@ -3541,5 +3539,7 @@
   "Sports": "スポーツ",
   "TV": "テレビ",
   "Viral": "バズり",
-  "What's hot on Myinstants right now, and the sounds people here liked this week": "いま Myinstants で人気のものと、今週ここでみんなが気に入ったサウンド"
+  "What's hot on Myinstants right now, and the sounds people here liked this week": "いま Myinstants で人気のものと、今週ここでみんなが気に入ったサウンド",
+  "See everything waiting to play": "再生待ちをすべて表示",
+  "Take everything out of the queue": "列からすべて外す"
 }

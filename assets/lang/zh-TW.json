@@ -10,7 +10,6 @@
   " · shows by itself when {progs} is in front": " · {progs} 在最前面時自動顯示",
   " · {hk} plays a random one": " · {hk} 隨機播放一個",
   ", try Settings → Audio → Audio buffering: Safer": "，試試 設定 → 音訊 → 音訊緩衝：較穩定",
-  "+{value} more": "+{value} 個",
   "<b>You don't need the virtual cable any more</b>, it was only the backup. Remove it, or keep it if another program uses it (Voicemeeter, another soundboard).": "<b>你已經不需要虛擬音源線了</b>，它只是備用方案。把它移除，或者如果有其他程式在用（Voicemeeter、其他音效板），就留著。",
   "<span style='color:{red}'>Couldn't search {site}: {err}</span>": "<span style='color:{red}'>無法搜尋 {site}：{err}</span>",
   "<span style='color:{status}'>Another program is already using {keys}, pick a different hotkey.</span>": "<span style='color:{status}'>{keys} 已經被其他程式占用，請換一個快速鍵。</span>",
@@ -1291,7 +1290,6 @@
   "Voices in your voices folder that are a server on the internet. Ones on this PC (127.0.0.1) always work.": "語音資料夾裡屬於網路伺服器的語音。這台電腦上的（127.0.0.1）一定可以使用。",
   "Wait first": "先等待",
   "Waiting to hear you… if the bar doesn't move, pick another mic.": "正在等你說話…如果量條沒有動，請選其他麥克風。",
-  "Waits for the sounds playing to finish": "等正在播放的音效播完",
   "Waits this long after the press before it plays, say for a punchline. Stop everything cancels it.": "按下後等待這段時間才播放，例如要配合笑點。「停止所有東西」會取消它。",
   "Waking it up, so you don't have to restart (your sound may blip for a second)": "正在喚醒它，這樣你就不用重新啟動（你的聲音可能會中斷一下）",
   "Waveform shows once the sound has loaded": "音效載入後會顯示波形",
@@ -3541,5 +3539,7 @@
   "Sports": "運動",
   "TV": "電視",
   "Viral": "爆紅",
-  "What's hot on Myinstants right now, and the sounds people here liked this week": "Myinstants 上現在正紅的，以及這週這裡大家喜歡的音效"
+  "What's hot on Myinstants right now, and the sounds people here liked this week": "Myinstants 上現在正紅的，以及這週這裡大家喜歡的音效",
+  "See everything waiting to play": "查看所有等待播放的內容",
+  "Take everything out of the queue": "清空佇列"
 }

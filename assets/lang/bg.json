@@ -10,7 +10,6 @@
   " · shows by itself when {progs} is in front": " · показва се сама, когато {progs} е отпред",
   " · {hk} plays a random one": " · {hk} пуска случаен звук",
   "(In a game? Press <b>Shift + Tab</b> and click the ⚙ gear.)": "(В игра ли си? Натисни <b>Shift + Tab</b> и кликни на зъбчатото колело ⚙.)",
-  "+{value} more": "+ още {value}",
   "<b style='color:{color}'>Discord is changing your sounds:</b><ul style='margin-left:-20px'>{fixes}</ul>Fix it, then check again.": "<b style='color:{color}'>Discord променя звуците ти:</b><ul style='margin-left:-20px'>{fixes}</ul>Оправи го и провери пак.",
   "<b style='color:{color}'>✓ Discord passes your sounds through clean.</b> Nothing in its settings is changing them.": "<b style='color:{color}'>✓ Discord пропуска звуците ти чисти.</b> Нищо в настройките му не ги променя.",
   "<b style='color:{colour}'>(live)</b>": "<b style='color:{colour}'>(на живо)</b>",
@@ -1154,7 +1153,6 @@
   "Volume for {count} (%):": "Сила на звука за {count} (%):",
   "Wait first": "Първо изчакай",
   "Waiting to hear you… if the bar doesn't move, pick another mic.": "Чакам да те чуя… ако лентата не мърда, избери друг микрофон.",
-  "Waits for the sounds playing to finish": "Чака звуците, които звучат, да свършат",
   "Waits this long after the press before it plays, say for a punchline. Stop everything cancels it.": "Чака толкова след натискането, преди да звучи, например за финала на шега. Спри всичко го отменя.",
   "Waking it up, so you don't have to restart (your sound may blip for a second)": "Събуждам го, за да не трябва да рестартираш (звукът ти може да прекъсне за секунда)",
   "Walks you through mic, headphones, where your sounds go (your mic, the cable, another device or nowhere) and Discord": "Води те през микрофона, слушалките, къде отиват звуците ти (микрофонът ти, кабелът, друго устройство или никъде) и Discord",
@@ -3618,5 +3616,7 @@
   "Sports": "Спорт",
   "TV": "ТВ",
   "Viral": "Вирусни",
-  "What's hot on Myinstants right now, and the sounds people here liked this week": "Какво е популярно в Myinstants в момента и звуците, които хората тук харесаха тази седмица"
+  "What's hot on Myinstants right now, and the sounds people here liked this week": "Какво е популярно в Myinstants в момента и звуците, които хората тук харесаха тази седмица",
+  "See everything waiting to play": "Виж всичко, което чака да се пусне",
+  "Take everything out of the queue": "Махни всичко от опашката"
 }

@@ -10,7 +10,6 @@
   " · shows by itself when {progs} is in front": " · з'являється сама, коли {progs} на передньому плані",
   " · {hk} plays a random one": " · {hk} грає випадковий",
   ", try Settings → Audio → Audio buffering: Safer": "• спробуй Налаштування → Аудіо → Буферизація аудіо: Надійніше",
-  "+{value} more": "+{value} ще",
   "<b>You don't need the virtual cable any more</b>, it was only the backup. Remove it, or keep it if another program uses it (Voicemeeter, another soundboard).": "<b>Віртуальний кабель тобі більше не потрібен</b>: він був лише запасним варіантом. Видали його або залиш, якщо ним користується інша програма (Voicemeeter, інший саундборд).",
   "<span style='color:{red}'>Couldn't search {site}: {err}</span>": "<span style='color:{red}'>Не вдалося шукати на {site}: {err}</span>",
   "<span style='color:{status}'>Another program is already using {keys}, pick a different hotkey.</span>": "<span style='color:{status}'>Інша програма вже використовує {keys}: вибери іншу гарячу клавішу.</span>",
@@ -1338,7 +1337,6 @@
   "Voices in your voices folder that are a server on the internet. Ones on this PC (127.0.0.1) always work.": "Голоси у вашій папці голосів, яка є сервером в Інтернеті. На цьому ПК (127.0.0.1) завжди працюють.",
   "Wait first": "Почекай спочатку",
   "Waiting to hear you… if the bar doesn't move, pick another mic.": "Чекаю, щоб почути вас… якщо панель не рухається, виберіть інший мікрофон.",
-  "Waits for the sounds playing to finish": "Чекає завершення відтворення звуків",
   "Waits this long after the press before it plays, say for a punchline. Stop everything cancels it.": "Чекає стільки часу після натискання, перш ніж відтворити, скажімо, для головної лінії. Зупинити все скасовує це.",
   "Waking it up, so you don't have to restart (your sound may blip for a second)": "Виведення з режиму сну, щоб вам не довелося перезапускати (ваш звук може миготіти на секунду)",
   "Waveform shows once the sound has loaded": "Форма хвилі відображається після завантаження звуку",
@@ -3695,5 +3693,7 @@
   "Sports": "Спорт",
   "TV": "ТБ",
   "Viral": "Вірусні",
-  "What's hot on Myinstants right now, and the sounds people here liked this week": "Що зараз популярне на Myinstants і звуки, які тут сподобалися людям цього тижня"
+  "What's hot on Myinstants right now, and the sounds people here liked this week": "Що зараз популярне на Myinstants і звуки, які тут сподобалися людям цього тижня",
+  "See everything waiting to play": "Показати все, що чекає на відтворення",
+  "Take everything out of the queue": "Прибрати все з черги"
 }

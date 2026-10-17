@@ -10,7 +10,6 @@
   " · shows by itself when {progs} is in front": " · verschijnt vanzelf als {progs} vooraan staat",
   " · {hk} plays a random one": " · {hk} speelt een willekeurig geluid",
   ", try Settings → Audio → Audio buffering: Safer": "• probeer Instellingen → Audio → Audiobuffer: Veiliger",
-  "+{value} more": "+{value} meer",
   "<b>You don't need the virtual cable any more</b>, it was only the backup. Remove it, or keep it if another program uses it (Voicemeeter, another soundboard).": "<b>Je hebt de virtuele kabel niet meer nodig</b>, die was alleen de reserve. Verwijder hem, of houd hem als een ander programma hem gebruikt (Voicemeeter, een andere soundboard).",
   "<span style='color:{red}'>Couldn't search {site}: {err}</span>": "<span style='color:{red}'>Kon {site} niet doorzoeken: {err}</span>",
   "<span style='color:{status}'>Another program is already using {keys}, pick a different hotkey.</span>": "<span style='color:{status}'>Een ander programma gebruikt {keys} al, kies een andere sneltoets.</span>",
@@ -1315,7 +1314,6 @@
   "Voices in your voices folder that are a server on the internet. Ones on this PC (127.0.0.1) always work.": "Stemmen in uw stemmenmap die een server op internet zijn. Degenen op deze pc (127.0.0.1) werken altijd.",
   "Wait first": "Wacht eerst",
   "Waiting to hear you… if the bar doesn't move, pick another mic.": "Ik wacht om je te horen... als de balk niet beweegt, kies dan een andere microfoon.",
-  "Waits for the sounds playing to finish": "Wacht tot het afspelen van geluiden is afgelopen",
   "Waits this long after the press before it plays, say for a punchline. Stop everything cancels it.": "Wacht zo lang na de pers voordat deze speelt, bijvoorbeeld voor een clou. Stop alles annuleert het.",
   "Waking it up, so you don't have to restart (your sound may blip for a second)": "Wakker maken, zodat u niet opnieuw hoeft op te starten (uw geluid kan even knipperen)",
   "Waveform shows once the sound has loaded": "De golfvorm wordt weergegeven zodra het geluid is geladen",
@@ -3618,5 +3616,7 @@
   "Sports": "Sport",
   "TV": "Tv",
   "Viral": "Viraal",
-  "What's hot on Myinstants right now, and the sounds people here liked this week": "Wat nu populair is op Myinstants, en de geluiden die mensen hier deze week leuk vonden"
+  "What's hot on Myinstants right now, and the sounds people here liked this week": "Wat nu populair is op Myinstants, en de geluiden die mensen hier deze week leuk vonden",
+  "See everything waiting to play": "Alles zien wat nog moet afspelen",
+  "Take everything out of the queue": "Alles uit de wachtrij halen"
 }

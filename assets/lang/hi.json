@@ -10,7 +10,6 @@
   " · shows by itself when {progs} is in front": " · {progs} सामने होने पर अपने आप दिखती है",
   " · {hk} plays a random one": " · {hk} कोई भी एक रैंडम चलाता है",
   ", try Settings → Audio → Audio buffering: Safer": "• सेटिंग्स → ऑडियो → ऑडियो बफ़रिंग: सुरक्षित आज़माएँ",
-  "+{value} more": "+{value} और",
   "<b>You don't need the virtual cable any more</b>, it was only the backup. Remove it, or keep it if another program uses it (Voicemeeter, another soundboard).": "<b>अब आपको वर्चुअल केबल की ज़रूरत नहीं है</b>, वह सिर्फ़ बैकअप था। इसे हटा दें, या रखें अगर कोई और प्रोग्राम इसे इस्तेमाल करता है (Voicemeeter, कोई और साउंडबोर्ड)।",
   "<span style='color:{red}'>Couldn't search {site}: {err}</span>": "<span style='color:{red}'>{site} पर सर्च नहीं हो सका: {err}</span>",
   "<span style='color:{status}'>Another program is already using {keys}, pick a different hotkey.</span>": "<span style='color:{status}'>{keys} पहले से कोई और प्रोग्राम इस्तेमाल कर रहा है, कोई दूसरी हॉटकी चुनें।</span>",
@@ -1315,7 +1314,6 @@
   "Voices in your voices folder that are a server on the internet. Ones on this PC (127.0.0.1) always work.": "आपके वॉयस फ़ोल्डर में आवाजें जो इंटरनेट पर एक सर्वर हैं। इस पीसी (127.0.0.1) पर वाले हमेशा काम करते हैं।",
   "Wait first": "पहले रुको",
   "Waiting to hear you… if the bar doesn't move, pick another mic.": "आपकी बात सुनने की प्रतीक्षा में... यदि बार नहीं हिलता है, तो दूसरा माइक उठा लें।",
-  "Waits for the sounds playing to finish": "बजने वाली ध्वनियों के ख़त्म होने का इंतज़ार करता है",
   "Waits this long after the press before it plays, say for a punchline. Stop everything cancels it.": "प्रेस के चलने से पहले काफी देर तक इंतजार करना पड़ता है, मान लीजिए पंचलाइन के लिए। सब कुछ रोकें इसे रद्द कर देता है।",
   "Waking it up, so you don't have to restart (your sound may blip for a second)": "इसे सक्रिय किया जा रहा है, ताकि आपको पुनः आरंभ न करना पड़े (आपकी ध्वनि एक सेकंड के लिए धीमी हो सकती है)",
   "Waveform shows once the sound has loaded": "ध्वनि लोड होने के बाद तरंगरूप दिखाई देता है",
@@ -3618,5 +3616,7 @@
   "Sports": "खेल",
   "TV": "टीवी",
   "Viral": "वायरल",
-  "What's hot on Myinstants right now, and the sounds people here liked this week": "Myinstants पर अभी क्या ट्रेंड कर रहा है, और इस हफ़्ते यहाँ लोगों को कौन से साउंड पसंद आए"
+  "What's hot on Myinstants right now, and the sounds people here liked this week": "Myinstants पर अभी क्या ट्रेंड कर रहा है, और इस हफ़्ते यहाँ लोगों को कौन से साउंड पसंद आए",
+  "See everything waiting to play": "चलने का इंतज़ार कर रही सब चीज़ें देखें",
+  "Take everything out of the queue": "कतार से सब कुछ हटाएँ"
 }

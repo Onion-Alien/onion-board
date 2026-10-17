@@ -11,7 +11,6 @@
   " · {hk} plays a random one": " · {hk} toca um ao acaso",
   ", try Settings → Audio → Audio buffering: Safer": "• experimenta Definições → Áudio → Buffer de áudio: Mais seguro",
   "(In a game? Press <b>Shift + Tab</b> and click the ⚙ gear.)": "(Num jogo? Carrega em <b>Shift + Tab</b> e clica na roda dentada ⚙.)",
-  "+{value} more": "+{value} mais",
   "<b style='color:{color}'>Discord is changing your sounds:</b><ul style='margin-left:-20px'>{fixes}</ul>Fix it, then check again.": "<b style='color:{color}'>O Discord está a alterar os teus sons:</b><ul style='margin-left:-20px'>{fixes}</ul>Corrige isto e verifica outra vez.",
   "<b style='color:{color}'>✓ Discord passes your sounds through clean.</b> Nothing in its settings is changing them.": "<b style='color:{color}'>✓ O Discord passa os teus sons sem mexer neles.</b> Nada nas definições dele os está a alterar.",
   "<b style='color:{colour}'>(live)</b>": "<b style='color:{colour}'>(em direto)</b>",
@@ -1229,7 +1228,6 @@
   "Volume for {count} (%):": "Volume de {count} (%):",
   "Wait first": "Esperar antes",
   "Waiting to hear you… if the bar doesn't move, pick another mic.": "À espera de te ouvir… se a barra não mexer, escolhe outro microfone.",
-  "Waits for the sounds playing to finish": "Espera que os sons a tocar acabem",
   "Waits this long after the press before it plays, say for a punchline. Stop everything cancels it.": "Espera este tempo depois de premires antes de tocar, por exemplo para uma piada. Parar tudo cancela-o.",
   "Waking it up, so you don't have to restart (your sound may blip for a second)": "A acordá-lo, para não teres de reiniciar (o teu som pode falhar durante um segundo)",
   "Walks you through mic, headphones, where your sounds go (your mic, the cable, another device or nowhere) and Discord": "Guia-te pelo microfone, auscultadores, para onde vão os teus sons (o teu microfone, o cabo, outro dispositivo ou lado nenhum) e o Discord",
@@ -3618,5 +3616,7 @@
   "Sports": "Desporto",
   "TV": "TV",
   "Viral": "Virais",
-  "What's hot on Myinstants right now, and the sounds people here liked this week": "O que está a dar no Myinstants neste momento e os sons de que as pessoas aqui gostaram esta semana"
+  "What's hot on Myinstants right now, and the sounds people here liked this week": "O que está a dar no Myinstants neste momento e os sons de que as pessoas aqui gostaram esta semana",
+  "See everything waiting to play": "Ver tudo o que espera para tocar",
+  "Take everything out of the queue": "Tirar tudo da fila"
 }

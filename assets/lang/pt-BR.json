@@ -10,7 +10,6 @@
   " · shows by itself when {progs} is in front": " · aparece sozinha quando {progs} está na frente",
   " · {hk} plays a random one": " · {hk} toca um aleatório",
   ", try Settings → Audio → Audio buffering: Safer": "• tente Configurações → Áudio → Buffer de áudio: Mais seguro",
-  "+{value} more": "+{value} a mais",
   "<b>You don't need the virtual cable any more</b>, it was only the backup. Remove it, or keep it if another program uses it (Voicemeeter, another soundboard).": "<b>Você não precisa mais do cabo virtual</b>, ele era só o reserva. Remova, ou mantenha se outro programa usa (Voicemeeter, outra soundboard).",
   "<span style='color:{red}'>Couldn't search {site}: {err}</span>": "<span style='color:{red}'>Não deu para buscar em {site}: {err}</span>",
   "<span style='color:{status}'>Another program is already using {keys}, pick a different hotkey.</span>": "<span style='color:{status}'>Outro programa já usa {keys}, escolha outro atalho.</span>",
@@ -1314,7 +1313,6 @@
   "Voices in your voices folder that are a server on the internet. Ones on this PC (127.0.0.1) always work.": "Vozes na sua pasta de vozes que são um servidor na internet. As que estão neste PC (127.0.0.1) sempre funcionam.",
   "Wait first": "Esperar antes",
   "Waiting to hear you… if the bar doesn't move, pick another mic.": "Esperando ouvir você… se a barra não mexer, escolha outro microfone.",
-  "Waits for the sounds playing to finish": "Espera os sons tocando terminarem",
   "Waits this long after the press before it plays, say for a punchline. Stop everything cancels it.": "Espera esse tempo depois do toque antes de tocar, por exemplo para o final de uma piada. Parar tudo cancela.",
   "Waking it up, so you don't have to restart (your sound may blip for a second)": "Acordando ele, para você não precisar reiniciar (seu som pode falhar por um segundo)",
   "Waveform shows once the sound has loaded": "A forma de onda aparece depois que o som carregar",
@@ -3618,5 +3616,7 @@
   "Sports": "Esportes",
   "TV": "TV",
   "Viral": "Virais",
-  "What's hot on Myinstants right now, and the sounds people here liked this week": "O que está bombando no Myinstants agora e os sons que a galera daqui curtiu esta semana"
+  "What's hot on Myinstants right now, and the sounds people here liked this week": "O que está bombando no Myinstants agora e os sons que a galera daqui curtiu esta semana",
+  "See everything waiting to play": "Ver tudo o que espera para tocar",
+  "Take everything out of the queue": "Tirar tudo da fila"
 }

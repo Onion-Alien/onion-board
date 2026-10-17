@@ -11,7 +11,6 @@
   " · {hk} plays a random one": " · {hk} soittaa satunnaisen",
   ", try Settings → Audio → Audio buffering: Safer": "• kokeile Asetukset → Ääni → Äänipuskurointi: Turvallisempi",
   "(In a game? Press <b>Shift + Tab</b> and click the ⚙ gear.)": "(Pelissä? Paina <b>Shift + Tab</b> ja klikkaa ⚙-ratasta.)",
-  "+{value} more": "+{value} lisää",
   "<b style='color:{color}'>Discord is changing your sounds:</b><ul style='margin-left:-20px'>{fixes}</ul>Fix it, then check again.": "<b style='color:{color}'>Discord muuttaa ääniäsi:</b><ul style='margin-left:-20px'>{fixes}</ul>Korjaa se ja tarkista uudelleen.",
   "<b style='color:{color}'>✓ Discord passes your sounds through clean.</b> Nothing in its settings is changing them.": "<b style='color:{color}'>✓ Discord päästää äänesi läpi puhtaina.</b> Mikään sen asetuksista ei muuta niitä.",
   "<b style='color:{colour}'>(live)</b>": "<b style='color:{colour}'>(live)</b>",
@@ -1229,7 +1228,6 @@
   "Volume for {count} (%):": "Äänenvoimakkuus ({count}) (%):",
   "Wait first": "Odota ensin",
   "Waiting to hear you… if the bar doesn't move, pick another mic.": "Odotetaan, että kuulen sinut… jos palkki ei liiku, valitse toinen mikki.",
-  "Waits for the sounds playing to finish": "Odottaa soivien äänien loppumista",
   "Waits this long after the press before it plays, say for a punchline. Stop everything cancels it.": "Odottaa näin kauan painalluksen jälkeen ennen soittamista, vaikka vitsin huipennusta varten. Pysäytä kaikki peruu sen.",
   "Waking it up, so you don't have to restart (your sound may blip for a second)": "Herätetään sitä, jottei sinun tarvitse käynnistää uudelleen (äänesi voi katketa sekunniksi)",
   "Walks you through mic, headphones, where your sounds go (your mic, the cable, another device or nowhere) and Discord": "Opastaa sinut läpi mikin, kuulokkeiden, sen minne äänesi menevät (mikkisi, kaapeli, toinen laite tai ei minnekään) ja Discordin",
@@ -3618,5 +3616,7 @@
   "Sports": "Urheilu",
   "TV": "TV",
   "Viral": "Viraalit",
-  "What's hot on Myinstants right now, and the sounds people here liked this week": "Mikä on suosittua Myinstantsissa juuri nyt ja äänet, joista täällä pidettiin tällä viikolla"
+  "What's hot on Myinstants right now, and the sounds people here liked this week": "Mikä on suosittua Myinstantsissa juuri nyt ja äänet, joista täällä pidettiin tällä viikolla",
+  "See everything waiting to play": "Näytä kaikki toistoa odottavat",
+  "Take everything out of the queue": "Poista kaikki jonosta"
 }

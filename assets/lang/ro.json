@@ -11,7 +11,6 @@
   " · {hk} plays a random one": " · {hk} redă unul la întâmplare",
   ", try Settings → Audio → Audio buffering: Safer": "• încearcă Setări → Audio → Buffer audio: Mai sigur",
   "(In a game? Press <b>Shift + Tab</b> and click the ⚙ gear.)": "(Ești într-un joc? Apasă <b>Shift + Tab</b> și dă clic pe rotița ⚙.)",
-  "+{value} more": "+încă {value}",
   "<b style='color:{color}'>Discord is changing your sounds:</b><ul style='margin-left:-20px'>{fixes}</ul>Fix it, then check again.": "<b style='color:{color}'>Discord îți modifică sunetele:</b><ul style='margin-left:-20px'>{fixes}</ul>Rezolvă asta, apoi verifică din nou.",
   "<b style='color:{color}'>✓ Discord passes your sounds through clean.</b> Nothing in its settings is changing them.": "<b style='color:{color}'>✓ Discord îți lasă sunetele să treacă curat.</b> Nimic din setările lui nu le modifică.",
   "<b style='color:{colour}'>(live)</b>": "<b style='color:{colour}'>(live)</b>",
@@ -1246,7 +1245,6 @@
   "Volume for {count} (%):": "Volum pentru {count} (%):",
   "Wait first": "Așteaptă întâi",
   "Waiting to hear you… if the bar doesn't move, pick another mic.": "Aștept să te aud… dacă bara nu se mișcă, alege alt microfon.",
-  "Waits for the sounds playing to finish": "Așteaptă să se termine sunetele care se redau",
   "Waits this long after the press before it plays, say for a punchline. Stop everything cancels it.": "Așteaptă atât după apăsare înainte să redea, de exemplu pentru o poantă. Oprește tot o anulează.",
   "Waking it up, so you don't have to restart (your sound may blip for a second)": "Îl trezesc, ca să nu trebuiască să repornești (sunetul poate sări o secundă)",
   "Walks you through mic, headphones, where your sounds go (your mic, the cable, another device or nowhere) and Discord": "Te ghidează prin microfon, căști, unde merg sunetele tale (microfonul, cablul, alt dispozitiv sau nicăieri) și Discord",
@@ -3695,5 +3693,7 @@
   "Sports": "Sport",
   "TV": "TV",
   "Viral": "Virale",
-  "What's hot on Myinstants right now, and the sounds people here liked this week": "Ce e la modă pe Myinstants acum și sunetele care le-au plăcut oamenilor de aici săptămâna asta"
+  "What's hot on Myinstants right now, and the sounds people here liked this week": "Ce e la modă pe Myinstants acum și sunetele care le-au plăcut oamenilor de aici săptămâna asta",
+  "See everything waiting to play": "Vezi tot ce așteaptă să fie redat",
+  "Take everything out of the queue": "Scoate tot din coadă"
 }
