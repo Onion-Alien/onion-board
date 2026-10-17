@@ -1075,3 +1075,31 @@ def test_spam_clicking_hear_what_they_hear_doesnt_click():
     # a 110 Hz sine at 0.5 moves under 0.01 a sample; a jump between the two ways was
     # several times that
     assert np.abs(np.diff(x, axis=0)).max() < 0.02
+
+
+def test_whos_listening_shapes_what_is_sent_not_your_own_playback():
+    """A mode's shaping (low cut, ceiling, mono) is for what others get: your
+    headphones play the sounds as mixed, and hear the shaping only with Hear what
+    they hear on."""
+    from soundboard import destination
+    t = np.arange(SR) / SR
+    song = np.stack([np.sin(2 * np.pi * 40 * t) * 0.3,             # sub-bass on the left,
+                     np.sin(2 * np.pi * 9000 * t) * 0.3], 1)        # treble on the right
+    song = song.astype(np.float32)
+
+    def heard(dest, check=False):
+        e = engine_with("main", "mon")
+        e.dest, e.mic_check, e.mon_vol = dest, check, 1.0
+        e.ring_mon.prefill = 0
+        e.play("s", song, 1.0)
+        out = np.zeros((480, 2), np.float32)
+        for _ in range(4):   # past the fades
+            e._mon(out, 480)
+        return out.copy()
+    plain = heard(None)
+    game = destination.BUILTIN_BY_KEY["game"]
+    assert game.mono and game.lowcut
+    np.testing.assert_allclose(heard(game), plain, atol=1e-6)   # your playback: untouched
+    shaped = heard(game, check=True)                             # hear what they hear
+    assert np.allclose(shaped[:, 0], shaped[:, 1])               # the mode's mono
+    assert not np.allclose(shaped, plain, atol=1e-3)

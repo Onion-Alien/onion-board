@@ -23,7 +23,8 @@ A mode pre-shapes the sounds bus for that pipeline:
            starts): levelling measured it *with* its sub-bass, so a bass-heavy song
            was levelled 8-10 dB quieter than the others and then lost its bass too
   ceiling  low-pass at the codec's ceiling: the encoder stops spending bits on
-           content nobody will hear, and what you monitor matches what they get
+           content nobody will hear, and Hear what they hear matches what they get
+           (your own playback is never shaped)
   comp     gentle RMS compressor, for custom modes. None of the engines wants it:
            it cost 2-5 dB and added distortion in every one, even behind an automatic
            gain, and pushed songs under a voice gate where the make-up kept them over
