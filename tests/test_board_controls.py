@@ -386,7 +386,8 @@ def test_a_double_click_on_a_queue_chips_x_takes_out_only_that_one(window, monke
     w.playctl.queue_sound("s1")
     w.playctl.queue_sound("s0")
     w.playctl._update_chips({"s0": (0.5, False)})
-    first_x = [b for b in w.playing_row.findChildren(QPushButton)
+    w.playctl.open_up_next()          # Up next's list
+    first_x = [b for b in w._up_next_popup.findChildren(QPushButton)
                if b.toolTip() == "Take it out of the queue"][0]
     first_x.click()
     first_x.click()                   # the same ✕ again before the row is remade
@@ -483,6 +484,40 @@ def test_the_queue_status_goes_once_the_queue_is_empty(window, monkeypatch, call
     w.playctl.queue_sound("s1")
     w.playctl.stop_all()
     assert not said(w).startswith("Up next")
+
+
+def test_up_next_is_one_chip_whose_list_reaches_every_queued_sound(window, monkeypatch):
+    """13 queued: the row used to show five cut-off names and "+8 more", so the 10th
+    couldn't be taken out. Now one chip says how many wait; its list has them all,
+    whole names, each with its ✕, and Clear."""
+    from soundboard.ui.upnext import UpNextChip
+    from uicheck import assert_breathing_room
+    w = window
+    w.resize(1200, 760)
+    w.show()
+    playing(monkeypatch, w, ["s0"])
+    w.playctl._queue = ["s1", "s0"] * 6 + ["s1"]
+    w.playctl._update_chips(w.engine.playing())
+    chip = w._up_next_chip
+    assert isinstance(chip, UpNextChip) and chip.count.text() == "13"
+    assert w._chips_hl.indexOf(chip) == w._chips_hl.count() - 1   # after Now playing
+    chip.click()
+    pop = w._up_next_popup
+    assert pop.isVisible() and pop.count.text() == "13"
+    assert_breathing_room(pop.card)   # 14 px inside the card, 8 px before the scroll bar
+    rows = [pop.rows_v.itemAt(i).widget() for i in range(pop.rows_v.count())]
+    rows = [r for r in rows if r is not None]
+    assert len(rows) == 13
+    tenth = rows[9]
+    assert tenth.findChildren(QPushButton)[0].toolTip() == "Boom"   # its whole name
+    w.playctl.select("s1")
+    tenth.findChildren(QPushButton)[-1].click()                    # the 10th's ✕
+    assert len(w.playctl._queue) == 12 and w.playctl._queue[9] == "s1"
+    assert pop.isVisible() and pop.count.text() == "12"           # refilled in place
+    assert w._up_next_chip.count.text() == "12"
+    pop.clear.click()                                              # Clear: all of them
+    assert w.playctl._queue == [] and not pop.isVisible()
+    assert w._up_next_chip is None and set(w.engine.playing()) == {"s0"}
 
 
 def test_a_trigger_deleted_while_its_pad_waits_or_queues_never_starts_it(window, monkeypatch,

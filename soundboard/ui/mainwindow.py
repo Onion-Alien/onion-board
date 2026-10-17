@@ -353,7 +353,8 @@ class MainWindow(QMainWindow):
     vol_mic: VolumeControl
     vol_mon: VolumeControl
     vol_sound: VolumeControl
-    _waiting_chips: tuple | None
+    _up_next_chip: Any
+    _up_next_popup: Any
     _ways: Any
     _ways_in: bool | None
     wordmark: QLabel
