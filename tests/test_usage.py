@@ -1071,6 +1071,34 @@ def test_press_modes_count_every_day_and_match_the_library():
     assert not any(k.startswith("press-") for k in usage.features_now(Config(sounds=[plain])))
 
 
+def test_views_hotkeys_leveler_and_sound_voices_count_every_day():
+    """A tab shown as a list, hotkeys kept from the game, a voice key, auto push-to-talk,
+    the leveler off and sounds with a voice: names only, every day they're set."""
+    ai = library.SoundMeta(id="a", name="A", file="a.wav",
+                           fx={"voice": {"name": "Robot", "ai": {"id": "x"}}})
+    cfg = Config(pad_view="list", app_view="list", voice_view="list", hotkeys_share=False,
+                 voice_hotkeys={"Robot": "F9"}, ptt_key="v", voice_level=False, sounds=[ai])
+    got = set(usage.features_now(cfg))
+    assert {"view-list-sounds", "view-list-apps", "view-list-voice", "hotkeys-share-off",
+            "voice-hotkeys", "auto-ptt", "voice-leveler-off", "sound-voice",
+            "sound-ai-voice"} <= got
+    assert got <= set(usage.FEATURES)
+    fx = library.SoundMeta(id="b", name="B", file="b.wav", fx={"voice": {"name": "Robot"}})
+    got = set(usage.features_now(Config(sounds=[fx])))
+    assert "sound-voice" in got and "sound-ai-voice" not in got
+    plain = set(usage.features_now(Config(sounds=[library.SoundMeta(id="c", name="C",
+                                                                     file="c.wav")])))
+    assert not {k for k in plain if k.startswith(("view-list-", "sound-", "voice-", "auto-",
+                                                  "hotkeys-share"))}
+
+
+def test_bun_games_are_counted_by_a_fixed_name():
+    from soundboard.ui import bunpong
+    assert set(bunpong.games()) <= set(usage.BUN_GAMES)
+    assert usage.game_tag("ttt") == "ttt" and usage.game_tag("chess") == "other"
+    assert all(f"egg-game-{g}" in usage.FEATURES for g in usage.BUN_GAMES)
+
+
 def test_addon_installs_are_counted_by_a_fixed_name(monkeypatch):
     """An add-on's install, failure and Repair: its id from ADDONS, anything else "other"."""
     from pathlib import Path

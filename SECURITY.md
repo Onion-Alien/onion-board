@@ -289,14 +289,31 @@ account or anything else about you.
     (`used/mic-unplugged`, `mic-silent`, `mic-silent-after-setup`: never the mic's
     name); a sound played at 0% Sounds volume and its *Set to 100%*
     (`used/sound-vol-0`, `sound-vol-0-fixed`); a hotkey that was refused
-    (`used/hotkey-refused`: never which key);
+    (`used/hotkey-refused`: never which key); a Live controls setup picked for sounds,
+    the radio or programs, *Not now* on its AI voice question, and one cancelled while
+    it got ready (`used/live-setup-sounds`, `live-setup-radio`, `live-setup-apps`,
+    `live-setup-ai-no`, `live-setup-cancel`: never the setup's name); a Voice tab setup
+    saved or renamed (`used/voice-setup-saved`, `voice-setup-renamed`); the *Up next*
+    list opened and cleared (`used/upnext-opened`, `upnext-cleared`); the Live switch's
+    "muted a long time" ring shown (`used/muted-ring`); the tray's Voice changer menu
+    used (`used/tray-voice-toggle`, `tray-voice-pick`: never which voice); *What's new*
+    shown after an update and its Settings button (`used/whats-new-shown`,
+    `whats-new-page`); which of Bun's games opened (`used/egg-game-pong`, `-draw`,
+    `-rps`, `-ttt`, `-other`); the Store tab's *New* or *Trending* order and a category
+    picked (`used/store-sort-new`, `store-sort-trending`, `store-category`: never which
+    category);
   - and every day they're set: *Remember where it came from* off, own Apps categories,
     the side menu kept shut, a proxy, Tor or Offline mode, the playing sound's picture
     behind the board, the mic helper set up, and any sound set to play other than one at
     a time (`used/source-off`, `apps-own-categories`, `rail-shut`, `net-proxy`,
     `net-tor`, `net-offline`, `playing-bg`, `mic-helper`, `press-overlap`,
     `press-toggle`, `press-solo`, `press-queue`: never the proxy's address or which
-    sounds).
+    sounds); the Sounds, Apps or Voice tab shown as a list, hotkeys set not to reach the
+    game, a key for a voice, an auto push-to-talk key, the voice leveler off, and a sound
+    with a voice (or an AI voice) laid over it (`used/view-list-sounds`,
+    `view-list-apps`, `view-list-voice`, `hotkeys-share-off`, `voice-hotkeys`,
+    `auto-ptt`, `voice-leveler-off`, `sound-voice`, `sound-ai-voice`: never the key,
+    the voice or which sounds).
 
 **Problems, as counts only, soon after a start:**
 

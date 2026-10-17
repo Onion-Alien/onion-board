@@ -243,7 +243,8 @@ class StoreTab(QWidget):
             b.setToolTip(tip)
             if icon:
                 icons.set_icon(b, icon, "text", "on_accent")
-            b.clicked.connect(lambda _c=False, k=key: self.set_sort(k))
+            b.clicked.connect(lambda _c=False, k=key: (
+                k != "top" and usage.used(f"store-sort-{k}"), self.set_sort(k)))
             sorts.addWidget(b)
             self.sort_btns[key] = b
         share_row.addWidget(sorts_box)
@@ -452,7 +453,8 @@ class StoreTab(QWidget):
             b.setAutoExclusive(True)
             b.setChecked(key == self._cat)
             b.setCursor(Qt.CursorShape.PointingHandCursor)
-            b.clicked.connect(lambda _c=False, k=key: self.set_cat(k))
+            b.clicked.connect(lambda _c=False, k=key: (
+                k and usage.used("store-category"), self.set_cat(k)))
             self._cat_flow.addWidget(b)
             self.cat_btns[key] = b
         self.cats_box.setVisible(len(self.cat_btns) > 1)

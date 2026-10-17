@@ -21,7 +21,7 @@ from PySide6.QtWidgets import (QApplication, QBoxLayout, QFrame, QHBoxLayout, QL
                                QSizePolicy, QSpacerItem, QStyle, QStyleOptionTabWidgetFrame,
                                QTabWidget, QToolButton, QVBoxLayout, QWidget)
 
-from soundboard import theme
+from soundboard import theme, usage
 from soundboard.i18n import _, ngettext
 from soundboard.ui import icons
 from soundboard.ui.panel import keep_focus_off
@@ -532,6 +532,7 @@ class OutputBlock(QFrame):
             if self._ring is not None:
                 self._ring.deleteLater()
             self._ring = _Ring(parent)
+        usage.used("muted-ring")   # a name in a set: cheap on every move
         out = self.RING_OUT
         self._ring.setGeometry(self.geometry().adjusted(-out, -out, out, out)
                                & parent.rect())
