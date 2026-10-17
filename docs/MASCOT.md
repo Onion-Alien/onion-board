@@ -25,7 +25,8 @@ lines in the files below.
 (`ui/chatguide.py`, `ui/streamguide.py`), Bun mode (`ui/bunmode.py`, the window as a
 floating Bun: `in_background=True` keeps him moving behind a game), the empty board (`ui/widgets.py`), the Apps tab
 (`ui/appspanel.py`, sad and begging), the Radio map (`ui/flatmap.py`), the YouTube search
-(`ui/ytsearch.py`), the mic part update (`ui/micupdate.py`) and Robo-Bun on the AI voice
+(`ui/ytsearch.py`), left of the Live controls title (`ui/speedpitch.py` `DjBunny`: his
+`bunskits.mixing` act on a loop, tapping sound pads and scratching a record), the mic part update (`ui/micupdate.py`) and Robo-Bun on the AI voice
 card (`ui/aivoicepanel.py`). `SetupShow` in the setup guide; `ScribeBunny` in the
 download bar (`ui/downloadbar.py`); static pictures in `ui/dialogs.py` and the smug box in
 `ui/mainwindow.py`; each theme's card in Settings > Appearance

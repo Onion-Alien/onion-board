@@ -45,6 +45,7 @@ spacing:               # multiples of 4 (Fluent's 4px ramp)
   card_padding: 14px sides, 12px top, 14px bottom   # settings._card
   dialog_padding: 16-18px
   between_cards: 12-16px
+  dropdown_gap: 8px     # a dropdown's list / a button's menu and its button (wheelguard.DROP_GAP)
 size:
   dialog_max_width: 620px
   dropdown_max_width: 360px
@@ -519,8 +520,11 @@ or macOS app? If it looks like a settings form from 2005, it isn't done.
 - Hover and selection highlights in menus and lists stay neutral (`card_hi`,
   `btn_hover`), not accent.
 - A menu's picked item (the search site, the sort order) shows in the accent colour,
-  its text and icon (`checked_color="accent"`); a dropdown opens with `DropdownMenu`'s
-  8 px gap under its button.
+  its text and icon (`checked_color="accent"`).
+- **A dropdown never touches its button.** Every dropdown's list (`QComboBox`) and every
+  button's menu opens 8 px below its button, or 8 px above when it opens upwards. The app
+  style does it for all of them (`wheelguard.drop_gap`): don't place a menu with a gap
+  of your own on top. Right-click menus open where the mouse is.
 - Controls above and below a card grid start where the cards' panels do (the search
   results' Back and Show more).
 - Status text uses `theme.set_tone(label, "ok" | "warn" | "error")`, not a colour.
@@ -679,7 +683,7 @@ The rules above are Onion Board's take on what the big design systems agree on n
 | Wrapping button rows (`Flow`), undo bar, steady numbers | `soundboard/ui/panel.py`, `settings._button_row` |
 | Settings cards | `settings.SettingsDialog._card` |
 | Left tab rail | `soundboard/ui/sidebar.py` |
-| Wheel guard, dropdown widths | `soundboard/wheelguard.py` |
+| Wheel guard, dropdown widths, the gap under a dropdown | `soundboard/wheelguard.py` |
 
 ## 13. UI workflow for agents and reviewers
 

@@ -21,7 +21,8 @@ from PySide6.QtWidgets import (QApplication, QCheckBox, QDialog, QFrame, QGridLa
                                QWidget)
 
 from soundboard import livefx, theme, voicefx
-from soundboard.ui import fit, icons
+from soundboard.ui import bunskits, fit, icons
+from soundboard.ui.bunnywidget import BunnyWidget
 from soundboard.ui.panel import Flow, hint_label, reset_button, section_label
 from soundboard.ui.voicefxpanel import ParamSlider
 from soundboard.ui.widgets import widget_at
@@ -156,6 +157,22 @@ class RevMeter(QWidget):
         p.end()
 
 
+class DjBunny(BunnyWidget):
+    """Bun left of the Live controls title, mixing sound pads and scratching a record round
+    and round (bunskits.mixing) while the pop-up is open. His own fidgets and his
+    theme's skit stay off: he's busy. Hidden, his timer stops (BunnyWidget)."""
+
+    def __init__(self, parent=None):
+        super().__init__(height=DJ_H, pad=4, parent=parent)
+
+    def _step_fidget(self, now: float):
+        if self._skit is None:
+            self._skit, self._skit_at = (bunskits.MIX_LOOP, bunskits.mixing), now
+
+
+DJ_H = 72   # Bun's height, left of the Live controls title
+
+
 def short(name: str, most: int = 14) -> str:
     """A setup's name on the transport bar's button: long ones cut with "…"."""
     return name if len(name) <= most else name[:most - 1].rstrip() + "…"
@@ -201,7 +218,7 @@ class SpeedPitchButton(QPushButton):
         v.setContentsMargins(16, 12, 16, 14)
         v.setSpacing(8)
 
-        # header: title on the left, Reset where it's easy to find
+        # header: Bun mixing, the title, Reset where it's easy to find
         head = QHBoxLayout()
         head.setSpacing(8)
         title = QLabel(_("Live controls"))
@@ -212,6 +229,8 @@ class SpeedPitchButton(QPushButton):
         reset = reset_button(_("Back to 1x, no pitch change and no effects") if self.has_speed
                              else _("Back to no pitch change and no effects"))
         reset.clicked.connect(self.reset)
+        self.dj = DjBunny()   # Bun mixing, left of the title
+        head.addWidget(self.dj)
         head.addWidget(title)
         head.addWidget(sub)
         head.addStretch(1)

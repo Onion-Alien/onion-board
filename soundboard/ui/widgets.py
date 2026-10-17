@@ -70,20 +70,8 @@ def widget_at(layout, i: int):
 
 
 class DropdownMenu(QMenu):
-    """A dropdown menu opened with a short gap from its button, not stuck to it."""
-    GAP = 8
-
-    def showEvent(self, ev):
-        super().showEvent(ev)
-        btn = self.parentWidget()
-        if isinstance(btn, QAbstractButton):
-            below = self.y() >= btn.mapToGlobal(btn.rect().center()).y()
-            gap = self.GAP if below else -self.GAP
-            room = btn.screen().availableGeometry() if btn.screen() else None
-            new_y = self.y() + gap
-            if room:
-                new_y = max(room.top(), min(new_y, room.bottom() + 1 - self.height()))
-            self.move(self.x(), new_y)
+    """A button's dropdown menu. Like every dropdown it opens a short gap from its
+    button, not stuck to it: the app style does that (wheelguard.drop_gap)."""
 
 
 class WindowRoot(QWidget):

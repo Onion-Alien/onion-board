@@ -12,7 +12,7 @@ from __future__ import annotations
 
 import time
 
-from PySide6.QtCore import QEvent, QObject, QPointF, Qt, QTimer
+from PySide6.QtCore import QEvent, QObject, QPoint, QPointF, Qt, QTimer
 from PySide6.QtGui import QCursor, QHelpEvent, QHoverEvent, QMouseEvent, QPalette
 from PySide6.QtWidgets import (QAbstractButton, QAbstractScrollArea, QAbstractSlider,
                                QAbstractSpinBox, QApplication, QCheckBox, QComboBox, QFormLayout,
@@ -43,6 +43,8 @@ class AppStyle(QProxyStyle):
       for Python's lock while an audio thread holds it (freezes of 11 s and 36 s).
       The wheel and slider changes are for the same reason _AppFilter on those
       widgets, not a styleHint override (~28k calls per switch).
+    - a dropdown's list and a button's menu open DROP_GAP below (or above) their
+      button, never stuck to its edge (drop_gap, also from _SubmenuEdge).
     - popups clear hover on the controls behind their mouse grab, so moving away
       while a menu is open never leaves its opener highlighted.
     - tick boxes take keyboard focus from Tab, so mouse clicks do not leave a
@@ -175,6 +177,9 @@ class _SubmenuEdge(QObject):
                 # Submenus and context menus have no dropdown opener.
                 # Qt's Python wrappers allow per-instance bookkeeping attributes.
                 obj._click_opener = opener  # pyright: ignore[reportAttributeAccessIssue]
+                if opener is not None and (isinstance(obj, QMenu)
+                                           or isinstance(obj.parentWidget(), QComboBox)):
+                    drop_gap(obj, opener)
             elif ev.type() == QEvent.Type.Hide:
                 opener = getattr(obj, "_click_opener", None)
                 if opener is not None:
@@ -205,6 +210,29 @@ class _SubmenuEdge(QObject):
                          else pg.left() - self.GAP - g.width())
                     obj.move(x, g.top())
         return False
+
+
+DROP_GAP = 8   # px between a dropdown's list or menu and the button it opened from
+
+
+def drop_gap(popup: QWidget, opener: QWidget):
+    """Leave DROP_GAP between a dropdown's list (or a button's menu) and its button,
+    instead of stuck to its edge: below it, or above it when it opened upwards. One
+    already placed away from the button (its own gap, beside it) is left alone."""
+    g = popup.geometry()
+    top = opener.mapToGlobal(QPoint(0, 0)).y()
+    bottom = top + opener.height()
+    if bottom - 2 <= g.top() <= bottom + 1:          # under it, touching
+        y = bottom + DROP_GAP
+    elif top - 2 <= g.bottom() + 1 <= top + 1:      # over it, touching
+        y = top - DROP_GAP - g.height()
+    else:
+        return
+    screen = opener.screen()
+    if screen is not None:
+        room = screen.availableGeometry()
+        y = max(room.top(), min(y, room.bottom() + 1 - g.height()))
+    popup.move(g.x(), y)
 
 
 _edge: _SubmenuEdge | None = None
