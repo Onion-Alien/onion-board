@@ -350,6 +350,32 @@ def test_long_download_list_folds_before_the_mini_player(window, qapp):
     bar._clear_and_hide()
 
 
+def test_a_failed_link_after_a_few_adds_folds_the_bar_not_the_window(window, qapp):
+    """A link failing after a few added ones gives the bar a long list (the failed row,
+    then the added ones). It folds for the room, and the window stays the whole board:
+    the folded bar's old height used to stay counted, so nothing seemed to fit and a
+    roomy window turned into the mini player, the search box gone with it."""
+    from PySide6.QtTest import QTest
+    window.show()
+    window.tabs.setCurrentWidget(window.sounds_page)
+    bar = window.download_bar
+    window.resize(1100, 600)
+    window.fitctl._refit()
+    links = [f"https://www.youtube.com/watch?v={c}" for c in "abcde"]
+    for u in links[:4]:
+        bar.set_active(u, "Added one", "add", None, "Someone", 60)
+        bar.set_done(u, "add", True)
+        QTest.qWait(1100)   # each end holds a second for its flash
+    bar.set_active(links[4], "Cut off", "add", None, "Someone", 60)
+    bar.set_failed(links[4], "add")
+    bar.set_done(links[4], "add", False)
+    QTest.qWait(1200)   # the flash, then the bar asks for a refit once it's laid out
+    assert not window.fitctl.is_mini()
+    assert window.search.isVisibleTo(window) and bar.isVisibleTo(window)
+    assert window._full.minimumSizeHint().height() <= 600
+    bar._clear_and_hide()
+
+
 def test_tiny_window_becomes_mini_player_and_back(window, qapp):
     """Too small to use: just the player (plus the pads if it's tall enough), and the
     whole window again, pads back in the Sounds tab, once it's big enough."""
