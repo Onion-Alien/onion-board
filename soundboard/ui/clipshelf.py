@@ -31,6 +31,7 @@ from soundboard.wheelguard import no_wheel
 
 log = logging.getLogger(__name__)
 
+VOICE_W = 640            # the Voice tab's Recordings: at most this wide
 ROWS_SHOWN = 5           # the list's height, in rows, before it scrolls
 PREVIEW = "clipshelf:preview"   # ":preview": headphones only
 SEND = "clipshelf-send"
@@ -222,11 +223,15 @@ class ClipShelf(QWidget):
             self.list.setColumnCount(5)
             self.list.headerItem().setText(4, "")
             h.setSectionResizeMode(4, QHeaderView.ResizeMode.ResizeToContents)
+            # narrow, on the left: a short name doesn't need the whole tab's width
+            self.list.setMaximumWidth(VOICE_W)
         v.addWidget(self.list)
         self.empty = QLabel(_("No matching clips"))
         self.empty.setObjectName("hint")
         v.addWidget(self.empty)
         self.resize_handle = ClipResizeHandle(self)
+        if voice:   # centred under the narrow list, not the tab
+            self.resize_handle.setMaximumWidth(VOICE_W)
         v.addWidget(self.resize_handle)
         self.undo_bar = UndoBar(_("Put the clip back in the list"))
         v.addWidget(self.undo_bar)
