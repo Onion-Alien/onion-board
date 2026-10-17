@@ -10,6 +10,7 @@ are replaced.
 """
 from __future__ import annotations
 
+import json
 import os
 import sys
 from pathlib import Path
@@ -30,6 +31,9 @@ KEYS = ["voice-chipmunk", "voice-deep-voice", "voice-demon", "voice-robot", "voi
         # the voices added later, which show a "?" until they get theirs
         "voice-high-voice", "voice-male-voice", "voice-talkbox", "voice-autotune",
         "voice-masked-caller", "voice-anonymous", "voice-dark-lord", "voice-hothead"]
+# the AI voices' cards: one per built-in voice in the add-on's list ("ai-voice-bear")
+KEYS += ["ai-voice-" + v["id"] for v in json.loads(
+    (ROOT / "modules" / "ai-voices" / "voices.json").read_text(encoding="utf-8"))["voices"]]
 
 
 def key_for(name: str) -> str:
