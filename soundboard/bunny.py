@@ -23,7 +23,7 @@ FUR_SHADE = QColor("#efe3d6")
 FUR_LINE = QColor(200, 176, 160, 150)   # soft fluff lines (the nightcap bobble)
 INK = QColor("#2b2340")
 EYE = QColor("#251c33")
-EYE_LOW = QColor("#5d4560")             # the warm shine low in his eyes
+IRIS = QColor("#8a5cc7")                # the coloured glow low in his eyes
 BROW = QColor(196, 140, 140, 150)       # his little resting brows
 PINK = QColor("#ffb3c7")
 NOSE = QColor("#ff8fae")
@@ -510,17 +510,18 @@ def draw_bunny(p: QPainter, rect: QRectF, prop: str | None = None, *,
             _stroke(p, arc, INK, 2.3)
             continue
         ex = x + gx
-        ew, eh = 13.4 + 1.5 * sad, (16.4 + 1.5 * sad) * (1 - blink)
+        ew, eh = 11.6 + sad, (12.6 + sad) * (1 - blink)
         eye = QPainterPath()
         eye.addEllipse(QRectF(ex - ew / 2, EYE_Y - eh / 2, ew, eh))
         p.fillPath(eye, EYE)
-        p.save()
+        p.save()   # a warm coloured iris glowing up from the bottom of the eye
         p.setClipPath(eye)
-        _glow(p, ex, EYE_Y + eh * 0.36, ew * 0.9, eh * 0.55, EYE_LOW)
+        _glow(p, ex, EYE_Y + eh * 0.22, ew * 0.8, eh * 0.6, IRIS)
         p.restore()
-        if eh > 4:   # the shines: one big up on his right, a little one low on his left
-            _ellipse(p, ex + 2.6, EYE_Y - 4, 5.4 + sad, 5.8 + sad, QColor("white"))
-            _ellipse(p, ex - 2.9, EYE_Y + 4.4, 2.3, 2.3, QColor("white"))
+        if eh > 4:   # the sparkles: a big shine up on his right, two little ones low
+            _ellipse(p, ex + 2.2, EYE_Y - 2.8, 4.4, 4.4, QColor("white"))
+            _ellipse(p, ex - 2.4, EYE_Y + 3.0, 1.8, 1.8, QColor("white"))
+            _ellipse(p, ex + 3.2, EYE_Y + 2.0, 1.1, 1.1, QColor("white"))
         if smug and not hidden:   # heavy lids: fur over the top half, a flat lid line
             p.setPen(Qt.PenStyle.NoPen)
             p.setBrush(fur)
