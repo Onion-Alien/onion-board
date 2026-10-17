@@ -3578,5 +3578,8 @@
   "Loading what's trending on Myinstants…": "Φόρτωση των δημοφιλών στο Myinstants…",
   "Nothing is trending on Myinstants right now.": "Τίποτα δεν είναι δημοφιλές στο Myinstants αυτή τη στιγμή.",
   "The meme sounds people play most on Myinstants right now": "Οι ήχοι meme που παίζουν περισσότερο στο Myinstants αυτή τη στιγμή",
-  "Trending on Myinstants": "Δημοφιλή στο Myinstants"
+  "Trending on Myinstants": "Δημοφιλή στο Myinstants",
+  "Games get the key too": "Και τα παιχνίδια παίρνουν το πλήκτρο",
+  "Keys in games": "Πλήκτρα στα παιχνίδια",
+  "With this on, a hotkey still does its normal job too: press F1 in a game and the game gets F1 while your sound plays. Off: only Onion Board gets the key, so a hotkey on W stops you walking.": "Όταν είναι ενεργό, μια συντόμευση κάνει και την κανονική της δουλειά: πάτα F1 σε ένα παιχνίδι και το παιχνίδι παίρνει το F1 ενώ παίζει ο ήχος σου. Ανενεργό: μόνο το Onion Board παίρνει το πλήκτρο, οπότε μια συντόμευση στο W σε σταματά να περπατάς."
 }

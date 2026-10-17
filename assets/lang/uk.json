@@ -3655,5 +3655,8 @@
   "Loading what's trending on Myinstants…": "Завантажую тренди Myinstants…",
   "Nothing is trending on Myinstants right now.": "Зараз на Myinstants нічого немає в тренді.",
   "The meme sounds people play most on Myinstants right now": "Мем-звуки, які зараз найчастіше вмикають на Myinstants",
-  "Trending on Myinstants": "У тренді на Myinstants"
+  "Trending on Myinstants": "У тренді на Myinstants",
+  "Games get the key too": "Ігри теж отримують клавішу",
+  "Keys in games": "Клавіші в іграх",
+  "With this on, a hotkey still does its normal job too: press F1 in a game and the game gets F1 while your sound plays. Off: only Onion Board gets the key, so a hotkey on W stops you walking.": "Коли ввімкнено, гаряча клавіша виконує і свою звичайну роботу: натисни F1 у грі, і гра отримає F1, поки грає твій звук. Вимкнено: клавішу отримує лише Onion Board, тож гаряча клавіша на W не дасть тобі ходити."
 }
