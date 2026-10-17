@@ -4012,6 +4012,7 @@
   "Uncommon": "ไม่ธรรมดา",
   "<b>{device}</b> looks like speakers, so your mic hears itself. Keep them quiet or use headphones. If it starts to squeal, this switches off by itself.": "<b>{device}</b> ดูเหมือนเป็นลำโพง ไมค์จึงได้ยินเสียงตัวเอง ลดเสียงลงหรือใช้หูฟัง ถ้าเริ่มมีเสียงหอน ระบบจะปิดเอง",
   "Stopped <b>Hear what they hear</b>: your mic was picking up your speakers and started to squeal. Use headphones, or turn the speakers down.": "หยุด <b>ฟังสิ่งที่พวกเขาได้ยิน</b> แล้ว: ไมค์รับเสียงจากลำโพงจนเกิดเสียงหอน ใช้หูฟัง หรือลดเสียงลำโพงลง",
+  "Rain on a window": "ฝนกระทบหน้าต่าง",
   "Bun's almost done, one moment.": "Bun ใกล้เสร็จแล้ว รอสักครู่นะ",
   "It'll be back in about {n} hour.": [
     "จะกลับมาในอีกประมาณ {n} ชั่วโมง"

@@ -4012,6 +4012,7 @@
   "Uncommon": "Tidak Umum",
   "<b>{device}</b> looks like speakers, so your mic hears itself. Keep them quiet or use headphones. If it starts to squeal, this switches off by itself.": "<b>{device}</b> sepertinya speaker, jadi mic kamu mendengar dirinya sendiri. Kecilkan volumenya atau pakai headphone. Kalau mulai berdenging, ini mati sendiri.",
   "Stopped <b>Hear what they hear</b>: your mic was picking up your speakers and started to squeal. Use headphones, or turn the speakers down.": "<b>Dengar yang mereka dengar</b> dihentikan: mic kamu menangkap suara speaker dan mulai berdenging. Pakai headphone, atau kecilkan speakernya.",
+  "Rain on a window": "Hujan di jendela",
   "Bun's almost done, one moment.": "Bun hampir selesai, tunggu sebentar.",
   "It'll be back in about {n} hour.": [
     "Akan kembali dalam sekitar {n} jam."

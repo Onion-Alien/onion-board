@@ -117,6 +117,9 @@ def main() -> None:
     parts = ["Onion Board includes the following third-party software.\n",
              "Onion Board itself is MIT licensed with the Commons Clause (free to use\n"
              "and share, not to sell); see LICENSE.txt.\n", EXTRA]
+    backgrounds = ROOT / "assets" / "backgrounds"
+    parts += ["CC0 voice backgrounds\n", (backgrounds / "README.md").read_text("utf-8"),
+              (backgrounds / "credits.json").read_text("utf-8")]
     parts += [section(d) for d in closure(ROOTS)]
     for name in ("QuickJS-ng-MIT.txt", "LGPL-3.0.txt", "GPL-3.0.txt"):
         parts += [f"{RULE}\n{name}\n{RULE}\n", (ROOT / "licenses" / name).read_text("utf-8")]

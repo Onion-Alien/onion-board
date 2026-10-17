@@ -4012,6 +4012,7 @@
   "Uncommon": "고급",
   "<b>{device}</b> looks like speakers, so your mic hears itself. Keep them quiet or use headphones. If it starts to squeal, this switches off by itself.": "<b>{device}</b> 장치는 스피커 같아서 마이크가 자기 소리를 듣습니다. 볼륨을 낮추거나 헤드폰을 쓰세요. 하울링이 생기면 저절로 꺼집니다.",
   "Stopped <b>Hear what they hear</b>: your mic was picking up your speakers and started to squeal. Use headphones, or turn the speakers down.": "<b>상대가 듣는 소리 듣기</b> 중지됨: 마이크가 스피커 소리를 받아 하울링이 생겼습니다. 헤드폰을 쓰거나 스피커 볼륨을 낮추세요.",
+  "Rain on a window": "창문에 내리는 비",
   "Bun's almost done, one moment.": "Bun이 거의 다 끝났어요. 잠깐만요.",
   "It'll be back in about {n} hour.": [
     "약 {n}시간 뒤에 돌아와요."

@@ -13,7 +13,6 @@ space. The presets at the bottom are built from these building blocks.
 from __future__ import annotations
 
 import collections
-import math
 from typing import TYPE_CHECKING
 
 import numpy as np
@@ -1860,49 +1859,6 @@ def _allpass(x, xh, yh, g):
 
 # --------------------------------------------------------------------------- background
 
-class _Drift:
-    """A level that wanders to a new random target every `lo`-`hi` seconds, gliding
-    there in a straight line: the syllables of a far-off talker, a gust of wind."""
-
-    def __init__(self, rng, lo: float, hi: float, floor: float = 0.0):
-        self.rng, self.lo, self.hi, self.floor = rng, lo, hi, floor
-        self.v = self.target = floor
-        self.step = 0.0
-        self.left = 0
-
-    def run(self, n: int, rate: int) -> np.ndarray:
-        out = np.empty(n, F32)
-        i = 0
-        while i < n:
-            if self.left <= 0:
-                self.left = max(1, int(rate * self.rng.uniform(self.lo, self.hi)))
-                self.target = self.floor + (1 - self.floor) * float(self.rng.random()) ** 1.5
-                self.step = (self.target - self.v) / self.left
-            c = min(n - i, self.left)
-            out[i:i + c] = self.v + self.step * np.arange(1, c + 1, dtype=F32)
-            self.v += self.step * c
-            self.left -= c
-            i += c
-        return out
-
-
-class _Hits:
-    """Sparse random clicks, about `per_s` a second, of random loudness (raindrops on a
-    window, a log cracking): an impulse train for a filter to colour."""
-
-    def __init__(self, rng, per_s: float, spread: float):
-        self.rng, self.per_s, self.spread = rng, per_s, spread
-
-    def run(self, n: int, rate: int) -> np.ndarray:
-        x = np.zeros(n, F32)
-        k = self.rng.poisson(self.per_s * n / rate)
-        if k:
-            at = self.rng.integers(0, n, k)
-            x[at] = (self.rng.random(k) ** self.spread
-                     * self.rng.choice((-1.0, 1.0), k)).astype(F32)
-        return x
-
-
 # ---- the Effects pop-up's own copies (ui/effectspopup.py): on top of whatever voice
 # is on, kept when you change voice. A voice's Robot or Echo is its own card in Edit
 # voice; these never show there, and run after the voice's effects
@@ -1932,14 +1888,11 @@ class ExtraReverb(Reverb):
 
 @register
 class Background(Effect):
-    """Sounds around you, made live (no recordings): rain, wind, an engine, a crowd,
-    a spaceship's hum, a fire. Mixed in under your voice after every other effect but
-    the studio polish, so the room and radio change you, not the weather.
+    """Bundled CC0 backgrounds behind your voice, read from worker-prepared loops.
 
-    Every layer is noise or a few sine waves through filters, scaled so a slider at
-    the top is about as loud as a normal headset voice (RMS ~0.08). "Only while I
-    talk" lets it in behind your words (a level gate with a 0.4 s hold), so nobody
-    hears rain from an idle mic all game."""
+    The audio callback only mixes samples. Missing or still-loading loops stay
+    silent until Maker hands them over; there is no synthetic fallback.
+    """
 
     type = "backdrop"
     name = "Background"
@@ -1950,111 +1903,22 @@ class Background(Effect):
               Param("crowd", "Crowd", 0, 1, 0, "", 0, ("off", "packed")),
               Param("space", "Spaceship hum", 0, 1, 0, "", 0, ("off", "loud")),
               Param("fire", "Crackling fire", 0, 1, 0, "", 0, ("off", "roaring")),
+              Param("window", "Rain on a window", 0, 1, 0, "", 0, ("off", "pouring")),
               Param("talk", "Only while I talk", 0, 1, 1, "", 1))
 
-    LAYERS = ("rain", "wind", "engine", "crowd", "space", "fire")
-    OPEN_DB = -45        # the gate's opening level (a quiet headset word is ~-35)
+    LAYERS = ("rain", "wind", "engine", "crowd", "space", "fire", "window")
+    OPEN_DB = -45
     HOLD_S = 0.4
-    ENGINE_HZ = 46.0     # a big turboprop / truck idle
-    SPACE_HZ = (55.0, 82.6, 110.4)    # slightly off harmonics: a slow beat
-    LEVEL = 0.08         # a layer at the top of its slider (RMS)
-    BED_RATE = 48000     # the rate loops are made at (backdrop.SR)
-    # each part's gain, measured so every layer comes out at RMS ~1 before LEVEL
-    GAIN = {"rumble": 6.0, "hum": 0.81, "air": 4.7, "drone": 1.2}
+    LEVEL = 0.08
+    BED_RATE = 48000
 
     def __init__(self, rate, values=None):
         super().__init__(rate, values)
-        rng = self.rng = np.random.default_rng()
-        self.f = {k: _Filter() for k in ("rain", "drops", "wind", "rumble", "fire",
-                                         "pops", "space", "wind_high", "crowd0", "crowd1",
-                                         "crowd2", "crowd3")}
-        self.gust = _Drift(rng, 0.8, 3.0, floor=0.25)     # wind strength
-        self.sweep = _Drift(rng, 1.5, 4.0)                # wind pitch
-        self.talkers = [_Drift(rng, 0.08, 0.3, floor=0.05) for _ in range(4)]
-        self.drops = _Hits(rng, 400, 2.0)
-        self.pops = _Hits(rng, 40, 3.0)
-        self.cphase = np.zeros(4)      # voiced babble, continuous across mic blocks
-        self.phase = np.zeros(6)      # engine harmonics' phases
-        self.sphase = np.zeros(len(self.SPACE_HZ))
-        self.t = 0.0                  # seconds since start (slow wobbles)
         self.g_gate = 0.0
         self.quiet = self.HOLD_S
-        self.levels: dict = {k: 0.0 for k in self.LAYERS}   # last block's, glided
-        self.pos: dict = {}          # where each loop is up to (in its own samples)
-        self.beds: Beds | None = None   # loops made ahead (VoiceChain.set_beds)
-
-    # each layer gives n samples at about RMS 1 (scaled by the slider later)
-    def _noise(self, n):
-        return self.rng.standard_normal(n).astype(F32)
-
-    def _band(self, key, x, lo, hi, rate, order=2):
-        hi = min(hi, rate * 0.45)
-        return self.f[key].run(x, (lo, hi), lambda: butter(order, [lo, hi], btype="band",
-                                                           fs=rate).astype(F32))
-
-    def _low(self, key, x, hz, rate):
-        return self.f[key].run(x, hz, lambda: butter(2, min(hz, rate * 0.45),
-                                                     btype="low", fs=rate).astype(F32))
-
-    def _rain(self, n, rate):
-        # A broad wash with soft droplets, rather than bright electrical crackle.
-        hiss = self._band("rain", self._noise(n), 350, 6500, rate) * 1.65
-        drops = self._band("drops", self.drops.run(n, rate), 1200, 4000, rate)
-        return hiss * 0.9 + np.tanh(drops * 18) * 0.5
-
-    def _wind(self, n, rate):
-        # Blend fixed bands sample by sample. Retuning one narrow filter at each
-        # block's last sweep value made gusts sound like a stepping wah pedal.
-        noise = self._noise(n)
-        low = self._band("wind", noise, 80, 650, rate) * 7
-        high = self._band("wind_high", noise, 300, 1800, rate) * 4.5
-        sweep = self.sweep.run(n, rate)
-        return (low * (1 - sweep) + high * sweep) * self.gust.run(n, rate) * 1.8
-
-    def _engine(self, n, rate):
-        t = self.t + np.arange(1, n + 1) / rate
-        y = np.zeros(n)
-        # Integrate the changing RPM; sampling the wobble once per callback made
-        # its character depend on the device's buffer size.
-        phase = np.cumsum(2 * math.pi * self.ENGINE_HZ
-                          * (1 + 0.004 * np.sin(2 * math.pi * 0.3 * t)) / rate)
-        for h in range(6):
-            y += math.pow(0.7, h) * np.sin(self.phase[h] + (h + 1) * phase)
-            self.phase[h] = (self.phase[h] + (h + 1) * phase[-1]) % (2 * math.pi)
-        rumble = self._low("rumble", self._noise(n), 220, rate) * self.GAIN["rumble"]
-        return (y * self.GAIN["hum"]).astype(F32) + rumble * 0.7
-
-    def _crowd(self, n, rate):
-        # Overlapping voiced talkers plus breath, with different pitch/formant
-        # bands and syllable envelopes. Noise alone sounded like a broken radio.
-        y = np.zeros(n, F32)
-        t = self.t + np.arange(1, n + 1) / rate
-        for i, (lo, hi) in enumerate(((300, 700), (550, 1200), (900, 1900), (1700, 3200))):
-            hz = (103 + i * 37) * (1 + 0.035 * np.sin(2 * math.pi * (0.7 + i * 0.13) * t))
-            ph = self.cphase[i] + np.cumsum(2 * math.pi * hz / rate)
-            self.cphase[i] = ph[-1] % (2 * math.pi)
-            voiced = sum(np.sin(h * ph) / h for h in range(1, 13))
-            excitation = (voiced * 2 + self._noise(n) * 0.45).astype(F32)
-            v = self._band(f"crowd{i}", excitation, lo, hi, rate)
-            y += v * self.talkers[i].run(n, rate)
-        return y * 1.75
-
-    def _space(self, n, rate):
-        t = np.arange(1, n + 1) / rate
-        y = np.zeros(n)
-        for i, hz in enumerate(self.SPACE_HZ):
-            w = 2 * math.pi * hz
-            y += np.sin(self.sphase[i] + w * t) / (i + 1)
-            self.sphase[i] = (self.sphase[i] + w * n / rate) % (2 * math.pi)
-        swell = 0.8 + 0.2 * np.sin(2 * math.pi * 0.1 * (self.t + t))
-        air = self._band("space", self._noise(n), 150, 400, rate) * self.GAIN["air"]
-        return (y * self.GAIN["drone"] * swell).astype(F32) + air * 0.6
-
-    def _fire(self, n, rate):
-        roar = self._low("fire", self._noise(n), 700, rate) * 5
-        pops = self._band("pops", self.pops.run(n, rate), 700, 4500, rate)
-        # Keep the texture of a log cracking without isolated full-scale spikes.
-        return roar * 0.85 + np.tanh(pops * 35) * 1.6
+        self.levels: dict = {k: 0.0 for k in self.LAYERS}
+        self.pos: dict = {}
+        self.beds: Beds | None = None
 
     def _gate(self, x, rate) -> float:
         """The talk gate's gain for this block (0 closed, 1 open)."""
@@ -2070,18 +1934,6 @@ class Background(Effect):
         else:
             self.g_gate = max(want, self.g_gate - len(x) / rate / 0.5)
         return self.g_gate
-
-    def layer(self, name: str, n: int, rate: int) -> np.ndarray:
-        """n samples of one built-in layer at about RMS 1 (voicefx.backdrop makes its
-        loops with this too)."""
-        return {"rain": self._rain, "wind": self._wind, "engine": self._engine,
-                "crowd": self._crowd, "space": self._space, "fire": self._fire}[name](n, rate)
-
-    def reseed(self, seed: int):
-        """The same sound every time (tests, loops made ahead)."""
-        self.rng = np.random.default_rng(seed)
-        for d in (self.gust, self.sweep, *self.talkers, self.drops, self.pops):
-            d.rng = self.rng
 
     @classmethod
     def clean_extra(cls, cfg: dict) -> dict:
@@ -2116,8 +1968,10 @@ class Background(Effect):
             # squared: the slider's middle is a background, not half as loud as you
             g = _glide(was * was * self.LEVEL, want * want * self.LEVEL, n)
             loop = beds.layers.get(k) if beds is not None else None
-            y += (self._bed(k, loop, n, rate) if loop is not None and len(loop)
-                  else self.layer(k, n, rate)) * g
+            if loop is not None and len(loop):
+                y += self._bed(k, loop, n, rate) * g
+            else:
+                self.levels[k] = 0.0  # fade in once the worker has finished loading
         seen = set()
         for sid, loop, want in (beds.sounds if beds is not None else ()):
             key = ("sound", sid)
@@ -2131,7 +1985,6 @@ class Background(Effect):
         for key in [k for k in self.levels if isinstance(k, tuple) and k not in seen]:
             del self.levels[key]      # a sound taken off: it starts from silence next time
             self.pos.pop(key, None)
-        self.t += n / rate
         if not y.any():
             return x
         if self.p["talk"] >= 0.5:
@@ -2579,6 +2432,7 @@ def shown_texts() -> dict[str, str]:
         "Crowd": _("Crowd"),
         "Spaceship hum": _("Spaceship hum"),
         "Crackling fire": _("Crackling fire"),
+        "Rain on a window": _("Rain on a window"),
         "Only while I talk": _("Only while I talk"),
         "Drive": _("Drive"),
         "Volume": _("Volume"),
