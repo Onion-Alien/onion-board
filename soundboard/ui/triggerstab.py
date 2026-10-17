@@ -35,6 +35,7 @@ from soundboard.ui import art, busy, icons
 from soundboard.style.owl import OwlWidget
 from soundboard.ui.panel import Flow, HoverCard, ShownStack, hint_label
 from soundboard.ui.widgets import LoadingBar
+from soundboard.ui.logoduel import LogoDuel
 from soundboard import errors
 
 log = logging.getLogger(__name__)
@@ -92,6 +93,7 @@ class TriggersTab(QWidget):
         self._dirs = dirs
         self.pending = defer               # load() hasn't run yet
         self.panel = None                  # the add-on's tab, once loaded
+        self.logo_duel = LogoDuel(self)
         self.info: modules.ModuleInfo | None = None
         self.offer: watchaddon.Offer | None = None   # a newer version to update to
         self._busy = False
@@ -355,6 +357,7 @@ class TriggersTab(QWidget):
 
     def showEvent(self, event):
         super().showEvent(event)
+        self.logo_duel.bind()
         if self.pending and not self._load_queued:
             # the tab changes at once (its first paint), then it loads; a timer as
             # well, in case that paint never comes
@@ -402,6 +405,7 @@ class TriggersTab(QWidget):
             QTimer.singleShot(0, self, self._get_page_shown)
             return False
         self.panel = panel
+        self.logo_duel.bind()
         lay = self.board_page.layout()
         assert isinstance(lay, QBoxLayout)   # made in __init__
         lay.addWidget(panel, 1)
@@ -570,6 +574,7 @@ class TriggersTab(QWidget):
             return
         was_active = self.is_active()
         panel, self.panel = self.panel, None
+        self.logo_duel.bind()
         if panel is not None:
             try:
                 panel.shutdown()
@@ -655,6 +660,7 @@ class TriggersTab(QWidget):
             self.panel.retheme()
 
     def shutdown(self):
+        self.logo_duel.stop()
         self._closed = True
         self._cancel = True
         if self.panel is not None:

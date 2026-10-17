@@ -265,6 +265,7 @@ the launcher the shortcuts and PyInstaller use. The app is the `soundboard` pack
 | `soundboard/ui/livedot.py` | marks a tab whose feature is live (a highlight-coloured icon, with the rail's bar beside it, or a small dot), e.g. the Voice tab while your voice is being changed |
 | `soundboard/ui/glow.py` | `Glow(button)`: a slow accent glow round the one button a step wants pressed (the setup card's mic button) |
 | `soundboard/ui/logowidget.py` | the header logo animated: a breathing glow and sheen, flaring with embers while sounds play |
+| `soundboard/ui/logoduel.py` | a silent laser exchange between the Board and Watch logos when clicked on the Triggers tab |
 | `soundboard/ui/overlay.py` | the in-game overlay: a panel of pads that never takes focus, driven by number keys or clicks, on a chosen monitor and spot (or wherever it was dragged) |
 | `soundboard/ui/voicepanel.py` | the Voice tab: lays out its cards and bottom bar, the add-ons list |
 | `soundboard/ui/voicefxpanel.py` | the Voice tab's voice changer card: voice tiles, effect rows and their sliders |
