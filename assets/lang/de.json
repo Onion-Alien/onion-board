@@ -4107,5 +4107,10 @@
   "Bun does a new act on every loading screen. Click Bun or Hoot and they talk like their theme's character.": "Bun führt auf jedem Ladebildschirm einen neuen Akt aus. Klicken Sie auf Bun oder Hoot und sie sprechen wie der Charakter ihres Themas.",
   "Watch for Golden, Ice, Galaxy and Rainbow Bun. Rainbow Bun appears only once in 50,000 starts.": "Achten Sie auf Golden, Ice, Galaxy und Rainbow Bun. Rainbow Bun erscheint nur einmal in 50.000 Starts.",
   "No mic is open, so there's no voice to change. Plug one in, or pick it in Settings → Audio.": "Kein Mikro offen, also gibt es keine Stimme zum Verändern. Schließen Sie eins an oder wählen Sie es unter Einstellungen → Audio.",
-  "Record your voice as others hear it and keep it as a sound": "Nimm deine Stimme so auf, wie andere sie hören, und behalte sie als Sound"
+  "Only you hear it, in your headphones": "Nur du hörst es, in deinen Kopfhörern",
+  "Play for me": "Für mich abspielen",
+  "Play through mic": "Übers Mikro abspielen",
+  "Recordings": "Aufnahmen",
+  "Recordings ({n})": "Aufnahmen ({n})",
+  "Record your voice as others hear it. It goes in Recordings, above": "Nimm deine Stimme so auf, wie andere sie hören. Sie landet oben in Aufnahmen"
 }

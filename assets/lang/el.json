@@ -4107,5 +4107,10 @@
   "Bun does a new act on every loading screen. Click Bun or Hoot and they talk like their theme's character.": "Το Bun κάνει μια νέα ενέργεια σε κάθε οθόνη φόρτωσης. Κάντε κλικ στο Bun ή στο Hoot και μιλούν σαν τον χαρακτήρα του θέματός τους.",
   "Watch for Golden, Ice, Galaxy and Rainbow Bun. Rainbow Bun appears only once in 50,000 starts.": "Παρακολουθήστε για Golden, Ice, Galaxy και Rainbow Bun. Το Rainbow Bun εμφανίζεται μόνο μία φορά στις 50.000 εκκινήσεις.",
   "No mic is open, so there's no voice to change. Plug one in, or pick it in Settings → Audio.": "Κανένα μικρόφωνο δεν είναι ανοιχτό, οπότε δεν υπάρχει φωνή να αλλάξει. Σύνδεσε ένα ή διάλεξέ το στις Ρυθμίσεις → Ήχος.",
-  "Record your voice as others hear it and keep it as a sound": "Ηχογράφησε τη φωνή σου όπως την ακούνε οι άλλοι και κράτησέ την ως ήχο"
+  "Only you hear it, in your headphones": "Το ακούς μόνο εσύ, στα ακουστικά σου",
+  "Play for me": "Παίξε για μένα",
+  "Play through mic": "Παίξε μέσα από το μικρόφωνο",
+  "Recordings": "Ηχογραφήσεις",
+  "Recordings ({n})": "Ηχογραφήσεις ({n})",
+  "Record your voice as others hear it. It goes in Recordings, above": "Ηχογράφησε τη φωνή σου όπως την ακούνε οι άλλοι. Πηγαίνει στις Ηχογραφήσεις, από πάνω"
 }

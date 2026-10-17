@@ -187,7 +187,7 @@ LIST_ROWS = ("small", "medium", "large")
 SETTING_RANGES = {"sound_vol": (0.0, VOLUME_MAX), "mic_vol": (0.0, VOLUME_MAX),
                   "mon_vol": (0.0, VOLUME_MAX), "obs_vol": (0.0, VOLUME_MAX),
                   "pad_width": PAD_WIDTH_RANGE, "app_card_width": (240, 480),
-                  "app_clip_height": (0, 600),
+                  "app_clip_height": (0, 600), "voice_clip_height": (0, 600),
                   "playing_background_opacity": (0, 100),
                   "duck_db": (-24.0, 0.0), "replay_seconds": (5, 120)}
 
@@ -449,6 +449,8 @@ class Config:
     app_clip_group: str = "app"   # saved clips grouped by app, day, or newest first
     app_clips_expanded: bool = True   # fold the saved clips down to their header
     app_clips_keep_forever: bool = False   # otherwise expire after seven inactive days
+    voice_clip_height: int = 0   # the Voice tab's recordings: as app_clip_height
+    voice_clips_expanded: bool = True   # ...folded down to their header or not
     sidebar_open: bool = True   # the tab rail opened out to show the tabs' names
     sidebar_order: list[str] = field(default_factory=list)   # stable tab keys, visual order
     # 0 = sounds, 1 = radio, 2 = apps, 3 = triggers, 4 = voice, 5 = setup, 6 = store, 7 = chat

@@ -873,10 +873,20 @@ class VoicePanel(QWidget):
             self.addons.shown.emit()   # never leave Refresh stuck on "Checking…"
             raise
 
+    def add_recordings(self, shelf):
+        """The Recordings list (ui.clipshelf.ClipShelf, voice=True): what the bar's
+        Record keeps, just above the bar. It hides itself while it's empty."""
+        self.recordings = shelf
+        outer = self.layout()
+        assert isinstance(outer, QVBoxLayout)
+        outer.insertWidget(outer.indexOf(self.bar), shelf)
+
     def shutdown(self):
         """Closing the app, or the tab switched off in Settings > Tabs. A download or
         install still running finishes quietly (busy.emit) or, a translation, stops."""
         self._meter_timer.stop()
+        if getattr(self, "recordings", None) is not None:
+            self.recordings.shutdown()
         self.speech.installs._dl_cancel = True
         self.ai.shutdown()
         self.controller.shutdown()

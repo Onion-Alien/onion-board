@@ -4186,5 +4186,10 @@
   "Bun does a new act on every loading screen. Click Bun or Hoot and they talk like their theme's character.": "Bun виконує нову дію на кожному екрані завантаження. Клацніть Bun або Hoot, і вони будуть говорити, як персонаж їхньої теми.",
   "Watch for Golden, Ice, Galaxy and Rainbow Bun. Rainbow Bun appears only once in 50,000 starts.": "Слідкуйте за Golden, Ice, Galaxy і Rainbow Bun. Rainbow Bun з'являється лише раз на 50 000 запусків.",
   "No mic is open, so there's no voice to change. Plug one in, or pick it in Settings → Audio.": "Мікрофон не відкритий, тож немає голосу, який можна змінити. Підключіть мікрофон або виберіть його в Налаштування → Аудіо.",
-  "Record your voice as others hear it and keep it as a sound": "Запиши свій голос так, як його чують інші, і збережи як звук"
+  "Only you hear it, in your headphones": "Чуєш лише ти, у навушниках",
+  "Play for me": "Увімкнути мені",
+  "Play through mic": "Увімкнути в мікрофон",
+  "Recordings": "Записи",
+  "Recordings ({n})": "Записи ({n})",
+  "Record your voice as others hear it. It goes in Recordings, above": "Запиши свій голос так, як його чують інші. Він потрапить у Записи, вище"
 }

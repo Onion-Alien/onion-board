@@ -4028,5 +4028,10 @@
   "Bun does a new act on every loading screen. Click Bun or Hoot and they talk like their theme's character.": "Bun ทำหน้าที่ใหม่ในทุกหน้าจอการโหลด คลิก Bun หรือ Hoot แล้วพวกมันจะพูดเหมือนตัวละครในธีม",
   "Watch for Golden, Ice, Galaxy and Rainbow Bun. Rainbow Bun appears only once in 50,000 starts.": "รับชม Golden, Ice, Galaxy และ Rainbow Bun Rainbow Bun จะปรากฏเพียงครั้งเดียวใน 50,000 ครั้ง",
   "No mic is open, so there's no voice to change. Plug one in, or pick it in Settings → Audio.": "ไม่มีไมค์เปิดอยู่ เลยไม่มีเสียงให้เปลี่ยน เสียบไมค์ หรือเลือกไมค์ใน การตั้งค่า → เสียง",
-  "Record your voice as others hear it and keep it as a sound": "อัดเสียงของคุณแบบที่คนอื่นได้ยิน แล้วเก็บไว้เป็นเสียง"
+  "Only you hear it, in your headphones": "คุณได้ยินคนเดียว ในหูฟัง",
+  "Play for me": "เล่นให้ฉันฟัง",
+  "Play through mic": "เล่นผ่านไมค์",
+  "Recordings": "เสียงที่อัดไว้",
+  "Recordings ({n})": "เสียงที่อัดไว้ ({n})",
+  "Record your voice as others hear it. It goes in Recordings, above": "อัดเสียงของคุณแบบที่คนอื่นได้ยิน จะไปอยู่ในเสียงที่อัดไว้ ด้านบน"
 }

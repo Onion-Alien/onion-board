@@ -103,10 +103,10 @@ class VoiceStatusBar(QFrame):
         icons.set_icon(self.stop_button, "stop", "danger_text", size=18)
         mh.addWidget(self.stop_button)
         # quick record: opens Record a sound already recording your voice (as others
-        # hear it while the voice changer is on), to keep as a sound
+        # hear it while the voice changer is on); Save keeps it in the tab's Recordings
         self.record_button = QPushButton(_("Record"))
-        self.record_button.setToolTip(_("Record your voice as others hear it and keep it "
-                                        "as a sound"))
+        self.record_button.setToolTip(_("Record your voice as others hear it. It goes in "
+                                        "Recordings, above"))
         self.record_button.setCursor(Qt.CursorShape.PointingHandCursor)
         self.record_button.setFixedHeight(STOP_H)
         icons.set_icon(self.record_button, "record", "danger_text", size=16)

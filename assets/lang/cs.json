@@ -4186,5 +4186,10 @@
   "Bun does a new act on every loading screen. Click Bun or Hoot and they talk like their theme's character.": "Bun dělá nový akt na každé obrazovce načítání. Klikněte na Bun nebo Hoot a budou mluvit jako postava jejich motivu.",
   "Watch for Golden, Ice, Galaxy and Rainbow Bun. Rainbow Bun appears only once in 50,000 starts.": "Sledujte Golden, Ice, Galaxy a Rainbow Bun. Rainbow Bun se objeví pouze jednou z 50 000 spuštění.",
   "No mic is open, so there's no voice to change. Plug one in, or pick it in Settings → Audio.": "Žádný mikrofon není otevřený, takže není co měnit. Připojte nějaký nebo ho vyberte v Nastavení → Zvuk.",
-  "Record your voice as others hear it and keep it as a sound": "Nahraj svůj hlas tak, jak ho slyší ostatní, a ulož si ho jako zvuk"
+  "Only you hear it, in your headphones": "Slyšíš to jen ty, ve sluchátkách",
+  "Play for me": "Přehrát mně",
+  "Play through mic": "Přehrát do mikrofonu",
+  "Recordings": "Nahrávky",
+  "Recordings ({n})": "Nahrávky ({n})",
+  "Record your voice as others hear it. It goes in Recordings, above": "Nahraj svůj hlas tak, jak ho slyší ostatní. Uloží se do Nahrávek, nahoře"
 }

@@ -4107,5 +4107,10 @@
   "Bun does a new act on every loading screen. Click Bun or Hoot and they talk like their theme's character.": "Bun her yükleme ekranında yeni bir eylem gerçekleştiriyor. Bun veya Hoot'a tıkladığınızda temalarının karakterleri gibi konuşurlar.",
   "Watch for Golden, Ice, Galaxy and Rainbow Bun. Rainbow Bun appears only once in 50,000 starts.": "Altın, Buz, Galaksi ve Gökkuşağı Çöreği'ni izleyin. Gökkuşağı Çöreği 50.000 başlangıçta yalnızca bir kez ortaya çıkar.",
   "No mic is open, so there's no voice to change. Plug one in, or pick it in Settings → Audio.": "Açık mikrofon yok, bu yüzden değiştirilecek bir ses yok. Bir mikrofon tak ya da Ayarlar → Ses bölümünden seç.",
-  "Record your voice as others hear it and keep it as a sound": "Sesini başkalarının duyduğu gibi kaydet ve ses olarak sakla"
+  "Only you hear it, in your headphones": "Sadece sen duyarsın, kulaklığında",
+  "Play for me": "Bana çal",
+  "Play through mic": "Mikrofondan çal",
+  "Recordings": "Kayıtlar",
+  "Recordings ({n})": "Kayıtlar ({n})",
+  "Record your voice as others hear it. It goes in Recordings, above": "Sesini başkalarının duyduğu gibi kaydet. Yukarıdaki Kayıtlar'a gider"
 }

@@ -4107,5 +4107,10 @@
   "Bun does a new act on every loading screen. Click Bun or Hoot and they talk like their theme's character.": "Gumagawa si Bun ng bagong pagkilos sa bawat screen ng paglo-load. I-click ang Bun o Hoot at nagsasalita sila tulad ng karakter ng kanilang tema.",
   "Watch for Golden, Ice, Galaxy and Rainbow Bun. Rainbow Bun appears only once in 50,000 starts.": "Panoorin ang Golden, Ice, Galaxy at Rainbow Bun. Isang beses lang lalabas ang Rainbow Bun sa 50,000 simula.",
   "No mic is open, so there's no voice to change. Plug one in, or pick it in Settings → Audio.": "Walang bukas na mikropono, kaya walang boses na mababago. Magsaksak ng isa, o piliin ito sa Settings → Audio.",
-  "Record your voice as others hear it and keep it as a sound": "I-record ang boses mo gaya ng naririnig ng iba at itago ito bilang sound"
+  "Only you hear it, in your headphones": "Ikaw lang ang makakarinig, sa headphones mo",
+  "Play for me": "I-play para sa akin",
+  "Play through mic": "I-play sa mic",
+  "Recordings": "Mga recording",
+  "Recordings ({n})": "Mga recording ({n})",
+  "Record your voice as others hear it. It goes in Recordings, above": "I-record ang boses mo gaya ng naririnig ng iba. Mapupunta ito sa Mga recording, sa itaas"
 }

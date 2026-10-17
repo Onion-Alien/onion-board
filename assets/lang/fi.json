@@ -4107,5 +4107,10 @@
   "Bun does a new act on every loading screen. Click Bun or Hoot and they talk like their theme's character.": "Bun tekee uuden teon jokaisella latausnäytöllä. Napsauta Bun tai Hoot ja he puhuvat kuin teemansa hahmo.",
   "Watch for Golden, Ice, Galaxy and Rainbow Bun. Rainbow Bun appears only once in 50,000 starts.": "Katso Golden, Ice, Galaxy ja Rainbow Bun. Rainbow Bun ilmestyy vain kerran 50 000 käynnistyksestä.",
   "No mic is open, so there's no voice to change. Plug one in, or pick it in Settings → Audio.": "Mikään mikrofoni ei ole auki, joten muutettavaa ääntä ei ole. Kytke mikrofoni tai valitse se kohdassa Asetukset → Ääni.",
-  "Record your voice as others hear it and keep it as a sound": "Nauhoita äänesi niin kuin muut sen kuulevat ja tallenna se ääneksi"
+  "Only you hear it, in your headphones": "Vain sinä kuulet sen, kuulokkeissasi",
+  "Play for me": "Soita minulle",
+  "Play through mic": "Soita mikin kautta",
+  "Recordings": "Nauhoitukset",
+  "Recordings ({n})": "Nauhoitukset ({n})",
+  "Record your voice as others hear it. It goes in Recordings, above": "Nauhoita äänesi niin kuin muut sen kuulevat. Se menee Nauhoituksiin, yläpuolelle"
 }

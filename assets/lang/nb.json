@@ -4107,5 +4107,10 @@
   "Bun does a new act on every loading screen. Click Bun or Hoot and they talk like their theme's character.": "Bun gjør en ny handling på hver lasteskjerm. Klikk på Bun eller Hoot og de snakker som temaets karakter.",
   "Watch for Golden, Ice, Galaxy and Rainbow Bun. Rainbow Bun appears only once in 50,000 starts.": "Se etter Golden, Ice, Galaxy og Rainbow Bun. Rainbow Bun vises bare én gang av 50 000 starter.",
   "No mic is open, so there's no voice to change. Plug one in, or pick it in Settings → Audio.": "Ingen mikrofon er åpen, så det er ingen stemme å endre. Koble til en, eller velg den under Innstillinger → Lyd.",
-  "Record your voice as others hear it and keep it as a sound": "Ta opp stemmen din slik andre hører den, og behold den som en lyd"
+  "Only you hear it, in your headphones": "Bare du hører det, i hodetelefonene",
+  "Play for me": "Spill for meg",
+  "Play through mic": "Spill gjennom mikken",
+  "Recordings": "Opptak",
+  "Recordings ({n})": "Opptak ({n})",
+  "Record your voice as others hear it. It goes in Recordings, above": "Ta opp stemmen din slik andre hører den. Den havner i Opptak, ovenfor"
 }

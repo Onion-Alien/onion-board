@@ -18,7 +18,7 @@ from PySide6.QtWidgets import (QAbstractItemView, QComboBox, QHBoxLayout, QHeade
                                QPushButton, QTreeWidget, QTreeWidgetItem, QVBoxLayout, QWidget)
 
 from soundboard import errors, theme
-from soundboard.clipshelf import Clip, Shelf
+from soundboard.clipshelf import Clip, Shelf, VoiceClip
 from soundboard.i18n import _, ngettext
 from soundboard.ui import busy, clipeditor, icons
 from soundboard.ui.clipeditor import fmt
@@ -96,10 +96,17 @@ class ClipShelf(QWidget):
     restore_finished = Signal(str, object)
     error = ""   # set by whoever adds it to Sounds, when it can't
 
-    def __init__(self, engine, cfg, parent=None):
+    def __init__(self, engine, cfg, parent=None, voice: bool = False):
+        """`voice`: the Voice tab's Recordings (its own folder, newest first, kept
+        until deleted, with Play for me and Play through mic buttons)."""
         super().__init__(parent)
         self.engine, self.cfg = engine, cfg
-        self.shelf = Shelf()
+        self.voice = voice
+        self._key = "voice" if voice else "app"   # its settings: <key>_clips_expanded...
+        self._preview_sid = "voiceclips:preview" if voice else PREVIEW
+        self._send_sid = "voiceclips-send" if voice else SEND
+        self.shelf = Shelf(VoiceClip if voice else Clip)
+        expanded = getattr(cfg, f"{self._key}_clips_expanded")
         self._closed = False
         self._worker = None
         self._items: dict[str, QTreeWidgetItem] = {}
@@ -116,17 +123,18 @@ class ClipShelf(QWidget):
         head = QHBoxLayout()
         head.setSpacing(12)
         self.body = QWidget(self)
-        self.title = fold_button(_("Saved clips"), self.body)
+        name = _("Recordings") if voice else _("Saved clips")
+        self.title = fold_button(name, self.body)
         self.title.setMinimumHeight(CONTROL_H)
-        self.title.setAccessibleName(_("Saved clips"))
-        self.title.setChecked(cfg.app_clips_expanded)
+        self.title.setAccessibleName(name)
+        self.title.setChecked(expanded)
         head.addWidget(self.title)
         # a parent from the start: shown with none (its row isn't in the shelf yet), it
         # flashed up as a little window of its own at start-up
         self.hint = QLabel(_("Double-click plays · F2 renames · right-click for more"), self)
         self.hint.setObjectName("hint")
         self.hint.setWordWrap(True)
-        self.hint.setVisible(cfg.app_clips_expanded)
+        self.hint.setVisible(expanded)
         head.addWidget(self.hint, 1)
         head.addStretch(1)
         v.addLayout(head)
@@ -142,10 +150,15 @@ class ClipShelf(QWidget):
         self.btn_add.clicked.connect(self.add_picked)
         actions.addWidget(self.btn_add)
         self.clip_buttons = []
-        for text, icon, slot in ((_("Preview"), "play", self.toggle_play),
-                                 (_("Rename"), "edit", self.rename),
-                                 (_("Delete"), "trash", self.delete_picked)):
+        plays = (((_("Play for me"), "headphones", self.toggle_play,
+                   _("Only you hear it, in your headphones")),
+                  (_("Play through mic"), "live", lambda: self.toggle_play(send=True),
+                   _("Send to whoever's listening"))) if voice else
+                 ((_("Preview"), "play", self.toggle_play, ""),))
+        for text, icon, slot, tip in (*plays, (_("Rename"), "edit", self.rename, ""),
+                                      (_("Delete"), "trash", self.delete_picked, "")):
             b = QPushButton(text)
+            b.setToolTip(tip)
             b.setMinimumHeight(CONTROL_H)
             b.setAccessibleName(text)
             icons.set_icon(b, icon, size=18)
@@ -168,12 +181,17 @@ class ClipShelf(QWidget):
         for text, key in ((_("By app"), "app"), (_("By day"), "day"),
                           (_("Newest first"), "newest")):
             self.group_by.addItem(text, key)
-        self.group_by.setCurrentIndex(max(0, self.group_by.findData(cfg.app_clip_group)))
+        self.group_by.setCurrentIndex(max(0, self.group_by.findData(
+            "newest" if voice else cfg.app_clip_group)))
         no_wheel(self.group_by)
         filters.addWidget(self.group_by)
-        v.addLayout(filters)
+        if voice:   # a short list of your own takes, newest first: nothing to sort
+            self.search.hide()
+            self.group_by.hide()
+        else:
+            v.addLayout(filters)
         self.list = QTreeWidget()
-        self.list.setAccessibleName(_("Saved clips"))
+        self.list.setAccessibleName(name)
         on_restyle(self.list, self._fit)   # (measured in the theme's font: see restyled)
         self.list.setHeaderLabels([_("Name"), _("Length"), _("From"), _("Created")])
         self.list.setRootIsDecorated(False)
@@ -253,7 +271,8 @@ class ClipShelf(QWidget):
             return ""
 
     def _group_changed(self):
-        self.cfg.app_clip_group = self.group_by.currentData()
+        if not self.voice:
+            self.cfg.app_clip_group = self.group_by.currentData()
         self.size_changed.emit()
         self.reload()
 
@@ -321,7 +340,7 @@ class ClipShelf(QWidget):
         self.list.setColumnHidden(3, grouped and self.width() < 420)
 
     def _fold(self, expanded):
-        self.cfg.app_clips_expanded = expanded
+        setattr(self.cfg, f"{self._key}_clips_expanded", expanded)
         self.hint.setVisible(expanded)
         self.resize_handle._drag = None
         layout = self.layout()
@@ -344,20 +363,22 @@ class ClipShelf(QWidget):
         self._apply_height()
 
     def _apply_height(self):
-        height = self.cfg.app_clip_height if self._visible_count else 0
+        height = getattr(self.cfg, f"{self._key}_clip_height") if self._visible_count else 0
         self.list.setFixedHeight(min(max(int(height), 72), 600) if height else self._fit_height)
 
     def resize_clips(self, height):
         if not self._visible_count or not self.title.isChecked():
             return
-        self.cfg.app_clip_height = min(max(int(height), 72), 600) if height else 0
+        setattr(self.cfg, f"{self._key}_clip_height",
+                min(max(int(height), 72), 600) if height else 0)
         self._apply_height()
         self.layout_changed.emit()
         self.size_changed.emit()
 
     def _sync(self):
         n = len(self.shelf.clips)
-        self.title.setText(_("Saved clips ({n})", n=n))
+        self.title.setText(_("Recordings ({n})", n=n) if self.voice
+                           else _("Saved clips ({n})", n=n))
         picked = bool(self._picked())
         self.btn_add.setEnabled(picked)
         for b in self.clip_buttons:
@@ -375,6 +396,15 @@ class ClipShelf(QWidget):
 
     def _item(self, cid: str) -> QTreeWidgetItem | None:
         return self._items.get(cid)
+
+    @property
+    def clip_error(self) -> str:
+        """SoundsController.on_clip says why a clip couldn't become a sound here."""
+        return self.error
+
+    @clip_error.setter
+    def clip_error(self, text: str):
+        self.error = text
 
     def add(self, data: np.ndarray, name: str, src: str = "") -> Clip:
         c = self.shelf.add(data, name, src)
@@ -398,7 +428,7 @@ class ClipShelf(QWidget):
     def toggle_play(self, it: QTreeWidgetItem | None = None, send: bool = False):
         it = it or self.list.currentItem()
         cid = it.data(0, Qt.ItemDataRole.UserRole) if it is not None else None
-        sid = SEND if send else PREVIEW
+        sid = self._send_sid if send else self._preview_sid
         again = self._playing == (sid, cid) and self.engine.state(sid) is not None
         self.stop()
         c = self.shelf.get(cid) if cid else None
@@ -501,9 +531,9 @@ class ClipShelf(QWidget):
                 a.setIcon(icons.icon(icon))
             a.triggered.connect(slot)
             return a
-        act(_("Stop") if playing_sid == PREVIEW else _("Play (headphones)"),
+        act(_("Stop") if playing_sid == self._preview_sid else _("Play (headphones)"),
             lambda: self.toggle_play(it), "play")
-        act(_("Stop sending") if playing_sid == SEND
+        act(_("Stop sending") if playing_sid == self._send_sid
             else _("Send to whoever's listening"), lambda: self.toggle_play(it, send=True),
             "live")
         m.addSeparator()
@@ -518,7 +548,7 @@ class ClipShelf(QWidget):
     def _maintain(self):
         if self._closed or (self._worker is not None and self._worker.is_alive()):
             return
-        keep = self.cfg.app_clips_keep_forever or self.undo_bar.active()
+        keep = self.voice or self.cfg.app_clips_keep_forever or self.undo_bar.active()
         playing = self._playing
         active = (playing[1] if playing is not None
                   and self.engine.state(playing[0]) is not None else None)
@@ -547,7 +577,7 @@ class ClipShelf(QWidget):
             return
         def undo():
             self._restore_background(gone)
-        if self.cfg.app_clips_keep_forever or self.undo_bar.active():
+        if self.voice or self.cfg.app_clips_keep_forever or self.undo_bar.active():
             undo()
             return
         self.reload()
@@ -595,4 +625,4 @@ class ClipShelf(QWidget):
         self._worker.start()
         self._worker.join(5)
         self.stop()
-        self.engine.forget(SEND)
+        self.engine.forget(self._send_sid)

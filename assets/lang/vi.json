@@ -4028,5 +4028,10 @@
   "Bun does a new act on every loading screen. Click Bun or Hoot and they talk like their theme's character.": "Bun thực hiện một hành động mới trên mỗi màn hình tải. Nhấp vào Bun hoặc Hoot và họ nói chuyện giống như nhân vật trong chủ đề của họ.",
   "Watch for Golden, Ice, Galaxy and Rainbow Bun. Rainbow Bun appears only once in 50,000 starts.": "Theo dõi Golden, Ice, Galaxy và Rainbow Bun. Rainbow Bun chỉ xuất hiện một lần trong 50.000 lần bắt đầu.",
   "No mic is open, so there's no voice to change. Plug one in, or pick it in Settings → Audio.": "Không mở mic nào, nên không có giọng để đổi. Cắm mic vào, hoặc chọn mic trong Cài đặt → Âm thanh.",
-  "Record your voice as others hear it and keep it as a sound": "Ghi âm giọng bạn như người khác nghe và giữ lại thành âm thanh"
+  "Only you hear it, in your headphones": "Chỉ bạn nghe, trong tai nghe",
+  "Play for me": "Phát cho tôi",
+  "Play through mic": "Phát qua mic",
+  "Recordings": "Bản ghi",
+  "Recordings ({n})": "Bản ghi ({n})",
+  "Record your voice as others hear it. It goes in Recordings, above": "Ghi âm giọng bạn như người khác nghe. Nó vào mục Bản ghi, ở trên"
 }

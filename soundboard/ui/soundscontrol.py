@@ -157,8 +157,24 @@ class SoundsControl(Controller):
         def open_devices():
             mw.tabs.setCurrentWidget(mw.setup_page)
 
-        d = RecordDialog(mw.engine, voice_on, lambda: [m.name for m in mw.cfg.sounds],
-                         self.add_recording, open_devices, mw,
+        recs = getattr(voice, "recordings", None) if quick else None
+        if recs is not None:
+            names = lambda: [c.name for c in recs.shelf.snapshot()]  # noqa: E731
+
+            def save(data, name, *_picture) -> bool:
+                """The Voice tab's Record keeps it in the tab's Recordings."""
+                try:
+                    recs.add(data, name, _("My changed voice")
+                             if RecordDialog.last_source == "fx" else _("My voice"))
+                except OSError as e:
+                    errors.warn(mw, _("Couldn't save clip"), e)
+                    return False
+                recs.title.setChecked(True)
+                recs.list.setFocus()
+                return True
+        else:
+            names, save = (lambda: [m.name for m in mw.cfg.sounds]), self.add_recording
+        d = RecordDialog(mw.engine, voice_on, names, save, open_devices, mw,
                          playing_name=self._playing_name,
                          playing_picture=self._playing_picture)
         self._record_dlg = d
