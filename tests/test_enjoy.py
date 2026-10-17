@@ -2,6 +2,7 @@
 the bar (ui/enjoycontrol.py)."""
 import time
 
+from conftest import own_module
 from test_mainwindow import window  # noqa: F401  (the real MainWindow)
 
 from soundboard import enjoy, usage
@@ -85,7 +86,7 @@ def test_survey_sends_fixed_names_and_cleaned_words(monkeypatch):
         def start(self):
             self.go()
 
-    monkeypatch.setattr(usage.threading, "Thread", Now)
+    own_module(monkeypatch, usage, "threading", Thread=Now)   # (usage's alone)
     assert usage.survey("abc", "positive", "Love it! mail me@example.com 0211234567")
     assert usage.survey("abc", "negative")
     assert usage.survey("abc", "shown", "ignored")
