@@ -1534,6 +1534,7 @@ class WindowBuilder(Controller):
             mw.mic_ways.addWidget(b)
         box.hide()
         mw._mic_icon = None
+        mw._mic_tone = None   # the mic box's last tone (a flash when it turns "ok")
         mw._ways_in = None   # which row the set-up buttons are in (_place_ways)
         cv.addWidget(box)
         cv.addWidget(box)
@@ -1563,7 +1564,7 @@ class WindowBuilder(Controller):
         nh.addWidget(mw.btn_micupdate, 0, Qt.AlignmentFlag.AlignVCenter)
         mw.mic_update_note.hide()
         cv.addWidget(mw.mic_update_note)
-        mw.setup_show = SetupShow(height=96, left=True)   # Bun builds it, by the buttons
+        mw.setup_show = SetupShow(height=96)   # Bun builds it, centred under the boxes
         mw.setup_show.done.connect(mw.statusctl._update_flow)   # (the button's back, if needed)
         cv.addWidget(mw.setup_show)
         mw.btn_install = QPushButton(_("Install the free virtual cable"))

@@ -14,7 +14,7 @@ from typing import TYPE_CHECKING
 from soundboard import directmic, michelper, net, theme, usage
 from soundboard import engine as eng
 from soundboard.i18n import _, ngettext
-from soundboard.ui import busy, icons, sidebar
+from soundboard.ui import busy, icons, reveal, sidebar
 from soundboard.ui.controller import Controller
 
 if TYPE_CHECKING:
@@ -328,11 +328,11 @@ class StatusControl(Controller):
         if mic_route:
             reason, button = mw.micctl._show_mic_status(direct, state, settling, step)
             mw.mic_reason.setText(reason)
-            mw.mic_reason.setVisible(bool(reason))
+            reveal.set_shown(mw.mic_reason, bool(reason))
             step = ""   # (said in the box)
         mw.mic_flow.setVisible(not mic_route)
         if not mic_route:
-            mw.mic_voice.hide()   # (_show_mic_status says when, on the mic)
+            reveal.set_shown(mw.mic_voice, False)   # (_show_mic_status says when, on the mic)
         mw.mic_status.setVisible(mic_route)
         mw.mic_pill.setVisible(mic_route)
         mw.step_lbl.setText(step)
@@ -404,7 +404,7 @@ class StatusControl(Controller):
         # accent was 1.0:1 on Hacker's green)
         icons.recolor(mw.btn_attach, "on_accent" if route == "cable" else None)
         # the other ways sit beside the main button as plain words, every time
-        mw.mic_alt.setVisible(route == "mic" and not mic_busy)   # also when it works
+        reveal.set_shown(mw.mic_alt, route == "mic" and not mic_busy)   # also when it works
         mw.alt_cable.setVisible(not mw._cable_gone)   # (back after a restart)
         mw.btn_usecable.setVisible(route == "mic" and not mic_busy and not mw._cable_gone)
         spare = route == "mic" and state == "ok" and mw.micctl._spare_cable()

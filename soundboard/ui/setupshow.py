@@ -26,6 +26,7 @@ from PySide6.QtWidgets import QSizePolicy
 from soundboard import theme
 from soundboard.bunny import H, INK, STEEL, W, WOOD, WOOD_DARK, draw_bunny, sparkle
 from soundboard.ui.bunnywidget import NOTE_COLORS, SPARKLE_COLORS, BunnyWidget, _Note, paint_note
+from soundboard.ui import reveal
 from soundboard.ui.pixels import snap_to_pixels
 
 # when each part of the show ends, in seconds from start()
@@ -103,7 +104,7 @@ class SetupShow(BunnyWidget):
         self._bits, self._booms, self._poofed = [], 0, False
         self.notes, self.puffs = [], []
         self.prop, self.sad, self._sad, self.celebrate = None, 0.0, 0.0, False
-        self.show()
+        reveal.set_shown(self, True)   # (folds out where the button was)
 
     def finish(self, ok: bool):
         """How it went: the ending plays once the speaker is far enough along. The first
@@ -119,7 +120,7 @@ class SetupShow(BunnyWidget):
     def _stop(self):
         self._t = self._act_t = -1.0
         self._result = None
-        self.hide()
+        reveal.set_shown(self, False)   # (he's gone: the empty stage folds away)
         self.done.emit()
 
     # ------------------------------------------------------------------ the show

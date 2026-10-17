@@ -253,6 +253,7 @@ the launcher the shortcuts and PyInstaller use. The app is the `soundboard` pack
 | `soundboard/ui/choicetile.py` | ChoiceTile (a choice as a fixed-size tile: icon, name, tick, optional level bar; the setup guide's devices) and FoldPill (a small pill that opens something under it) |
 | `soundboard/ui/micupdate.py` | the offer to update the mic part: a card over the window a second after it opens; Windows is asked only after *Install update* |
 | `soundboard/ui/setupshow.py` | Bun building your mic on the Setup tab while Onion Board goes onto it (Windows asking, then loading) |
+| `soundboard/ui/reveal.py` | Boxes that fold away and out instead of blinking (the Setup tab's mic card), and the green flash when the mic starts working |
 | `soundboard/ui/whatsnew.py` | the *What's new* window shown once after an update, with what the release added, a button to the settings it's about and a link to the Discord (`NOTES`, newest first: add one per release) |
 | `soundboard/ui/splash.py` | the start-up splash: Bun's act, the name and chasing dots mid-screen while a cold start loads |
 | `soundboard/ui/splashacts.py` | Bun's start-up acts (one picked at random each launch), rare Buns, the season's hat, his goodbye wave |

@@ -247,6 +247,7 @@ class MainWindow(QMainWindow):
     mic_banner: BannerButton
     mic_flow: QFrame
     _mic_icon: tuple[str, str] | None
+    _mic_tone: str | None
     mic_lbl: Any
     mic_line: QLabel
     mic_meter: Any
