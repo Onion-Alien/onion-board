@@ -3795,5 +3795,10 @@
   ],
   "Make a voice of your own first: Voice tab → Voice changer → Edit voice, or Save what's on under My setups.": "Lav først din egen stemme: fanen Stemme → Stemmeskifter → Rediger stemme, eller Gem det, der er slået til, under Mine opsætninger.",
   "Rain, wind, a crowd or sounds from your board behind your voice": "Regn, vind, en menneskemængde eller lyde fra dit board bag din stemme",
-  "Your own settings: Edit voice opens them": "Dine egne indstillinger: „Rediger stemme“ åbner dem"
+  "Your own settings: Edit voice opens them": "Dine egne indstillinger: „Rediger stemme“ åbner dem",
+  " · hidden from All": " · skjult fra Alle",
+  "Every sound except those in: {names} (right-click one of them, Advanced, to show it here again)": "Alle lyde undtagen dem i: {names} (højreklik på en af dem, Avanceret, for at vise den her igen)",
+  "Hide its sounds from All": "Skjul dens lyde fra Alle",
+  "“{name}” is hidden from All. Its sounds stay on its own tab.": "“{name}” er skjult fra Alle. Dens lyde bliver på dens egen fane.",
+  "“{name}” shows in All again": "“{name}” vises i Alle igen"
 }

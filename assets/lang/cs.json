@@ -3875,5 +3875,10 @@
   ],
   "Make a voice of your own first: Voice tab → Voice changer → Edit voice, or Save what's on under My setups.": "Nejdřív si udělej vlastní hlas: karta Hlas → Měnič hlasu → Upravit hlas, nebo Uložit, co je zapnuté v Mých sestavách.",
   "Rain, wind, a crowd or sounds from your board behind your voice": "Déšť, vítr, dav nebo zvuky z tvého boardu za tvým hlasem",
-  "Your own settings: Edit voice opens them": "Tvoje vlastní nastavení: otevřeš je přes „Upravit hlas“"
+  "Your own settings: Edit voice opens them": "Tvoje vlastní nastavení: otevřeš je přes „Upravit hlas“",
+  " · hidden from All": " · skrytá ve Vše",
+  "Every sound except those in: {names} (right-click one of them, Advanced, to show it here again)": "Všechny zvuky kromě těch v: {names} (pravým klikem na jednu z nich, Pokročilé, ji tu zase ukážeš)",
+  "Hide its sounds from All": "Skrýt její zvuky ve Vše",
+  "“{name}” is hidden from All. Its sounds stay on its own tab.": "„{name}“ je skrytá ve Vše. Její zvuky zůstávají na její vlastní kartě.",
+  "“{name}” shows in All again": "„{name}“ se zase ukazuje ve Vše"
 }

@@ -3715,5 +3715,10 @@
   ],
   "Make a voice of your own first: Voice tab → Voice changer → Edit voice, or Save what's on under My setups.": "Buat suaramu sendiri dulu: tab Suara → Pengubah suara → Edit suara, atau Simpan yang aktif di Setelanku.",
   "Rain, wind, a crowd or sounds from your board behind your voice": "Hujan, angin, keramaian, atau suara dari board-mu di balik suaramu",
-  "Your own settings: Edit voice opens them": "Pengaturanmu sendiri: “Edit suara” membukanya"
+  "Your own settings: Edit voice opens them": "Pengaturanmu sendiri: “Edit suara” membukanya",
+  " · hidden from All": " · disembunyikan dari Semua",
+  "Every sound except those in: {names} (right-click one of them, Advanced, to show it here again)": "Semua suara kecuali yang ada di: {names} (klik kanan salah satunya, Lanjutan, untuk menampilkannya di sini lagi)",
+  "Hide its sounds from All": "Sembunyikan suaranya dari Semua",
+  "“{name}” is hidden from All. Its sounds stay on its own tab.": "“{name}” disembunyikan dari Semua. Suaranya tetap ada di tabnya sendiri.",
+  "“{name}” shows in All again": "“{name}” tampil lagi di Semua"
 }

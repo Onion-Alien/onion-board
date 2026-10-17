@@ -3795,5 +3795,10 @@
   ],
   "Make a voice of your own first: Voice tab → Voice changer → Edit voice, or Save what's on under My setups.": "Önce kendi sesini yap: Ses sekmesi → Ses değiştirici → Sesi düzenle ya da Ayarlarım altında Açık olanı kaydet.",
   "Rain, wind, a crowd or sounds from your board behind your voice": "Sesinin arkasında yağmur, rüzgâr, kalabalık ya da board'undan sesler",
-  "Your own settings: Edit voice opens them": "Kendi ayarların: “Sesi düzenle” ile açılır"
+  "Your own settings: Edit voice opens them": "Kendi ayarların: “Sesi düzenle” ile açılır",
+  " · hidden from All": " · Tümü'nde gizli",
+  "Every sound except those in: {names} (right-click one of them, Advanced, to show it here again)": "Şunlardakiler hariç tüm sesler: {names} (birine sağ tıkla, Gelişmiş, burada yeniden göstermek için)",
+  "Hide its sounds from All": "Seslerini Tümü'nde gizle",
+  "“{name}” is hidden from All. Its sounds stay on its own tab.": "“{name}” Tümü'nde gizli. Sesleri kendi sekmesinde kalır.",
+  "“{name}” shows in All again": "“{name}” yeniden Tümü'nde görünüyor"
 }

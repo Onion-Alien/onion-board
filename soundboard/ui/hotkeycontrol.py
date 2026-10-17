@@ -43,6 +43,7 @@ class HotkeyControl(Controller):
     def __init__(self, mw: MainWindow):
         super().__init__(mw)
         self._hotkeys_off = False         # "All hotkeys off": only that key still works
+        self._off_remote = False          # ...turned off by the control API, which turns them on
         self._voice_was: bool | None = None   # voice changer state before a held key
 
     def _fit_overlay_key(self):
@@ -63,7 +64,7 @@ class HotkeyControl(Controller):
     def register_hotkeys(self):
         mw = self.mw
         mapping = {}
-        if self._hotkeys_off and not mw.cfg.hotkeys_off_hotkey:
+        if self._hotkeys_off and not mw.cfg.hotkeys_off_hotkey and not self._off_remote:
             # the key that turns them back on was cleared or given to something else:
             # nothing could turn them on again until a restart, so they're on now
             self._hotkeys_off = False
@@ -71,7 +72,8 @@ class HotkeyControl(Controller):
         mw.hotkeys.share = mw.cfg.hotkeys_share
         mw.hotkeys.grab = set()
         if self._hotkeys_off:   # only the key that turns them back on
-            mapping[mw.cfg.hotkeys_off_hotkey] = "__hotkeys__"
+            if mw.cfg.hotkeys_off_hotkey:
+                mapping[mw.cfg.hotkeys_off_hotkey] = "__hotkeys__"
             mw.hotkeys.register(mapping)
             mw.replay.set_enabled(bool(mw.cfg.replay_hotkey), mw.cfg.replay_seconds)
             return
@@ -396,17 +398,31 @@ class HotkeyControl(Controller):
     def toggle_hotkeys(self):
         """All hotkeys off (they type normally again), or back on. Not saved: the app
         always opens with them on."""
-        mw = self.mw
-        if not self._hotkeys_off and not mw.cfg.hotkeys_off_hotkey:
+        if not self._hotkeys_off and not self.mw.cfg.hotkeys_off_hotkey:
             return   # no key to turn them back on with
-        self._hotkeys_off = not self._hotkeys_off
+        self.set_hotkeys_on(self._hotkeys_off)
+
+    @property
+    def hotkeys_on(self) -> bool:
+        return not self._hotkeys_off
+
+    def set_hotkeys_on(self, on: bool, remote: bool = False):
+        """All hotkeys on, or off (the key that toggles them, or the control API's
+        /api/hotkeys with `remote`, turns them back on)."""
+        mw = self.mw
+        if on != self._hotkeys_off:
+            return   # already so
+        self._hotkeys_off = not on
+        self._off_remote = remote and not on
         if self._hotkeys_off and self._voice_was is not None:   # a held voice key
             self._set_voice(self._voice_was)
             self._voice_was = None
         self.register_hotkeys()
         mw.playctl.cue("stop" if self._hotkeys_off else "start")
         key = pretty_key(mw.cfg.hotkeys_off_hotkey)
-        if self._hotkeys_off:
+        if self._hotkeys_off and not mw.cfg.hotkeys_off_hotkey:
+            pass   # off from the control API, with no key: the button that did it says so
+        elif self._hotkeys_off:
             mw.say(_("<span style='color:{status}'>Hotkeys are off: {key} turns them back "
                        "on.</span>", status=theme.status('warn'), key=html.escape(key)),
                      "warn", key="hotkeys")

@@ -3795,5 +3795,10 @@
   ],
   "Make a voice of your own first: Voice tab → Voice changer → Edit voice, or Save what's on under My setups.": "Maak eerst een eigen stem: tab Stem → Stemverander → Stem bewerken, of Opslaan wat aan staat onder Mijn instellingen.",
   "Rain, wind, a crowd or sounds from your board behind your voice": "Regen, wind, een menigte of geluiden van je board achter je stem",
-  "Your own settings: Edit voice opens them": "Je eigen instellingen: ‘Stem bewerken’ opent ze"
+  "Your own settings: Edit voice opens them": "Je eigen instellingen: ‘Stem bewerken’ opent ze",
+  " · hidden from All": " · verborgen in Alle",
+  "Every sound except those in: {names} (right-click one of them, Advanced, to show it here again)": "Elk geluid behalve die in: {names} (rechtsklik op een ervan, Geavanceerd, om hem hier weer te tonen)",
+  "Hide its sounds from All": "De geluiden verbergen in Alle",
+  "“{name}” is hidden from All. Its sounds stay on its own tab.": "“{name}” is verborgen in Alle. De geluiden blijven op hun eigen tabblad.",
+  "“{name}” shows in All again": "“{name}” staat weer in Alle"
 }

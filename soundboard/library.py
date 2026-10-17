@@ -231,6 +231,8 @@ def clean_setting(k: str, v):
     if k in SETTING_RANGES:
         lo, hi = SETTING_RANGES[k]
         return min(max(v, lo), hi)
+    if k == "hidden_from_all":   # category names; ones that aren't a tab go after loading
+        return list(dict.fromkeys(x for x in v if isinstance(x, str) and x))
     if k == "category_programs":   # {exe file name: category}; anything else is dropped
         return clean_programs(v)
     if k == "net_mode":   # a mode this version doesn't know (a newer one's): fail
@@ -499,6 +501,7 @@ class Config:
     subcategories: dict = field(default_factory=dict)
     subcategory: str = ""             # the one showing inside `category`; "" = all of it
     category_colors: dict = field(default_factory=dict)   # category -> "#rrggbb" on its tab
+    hidden_from_all: list[str] = field(default_factory=list)   # categories All leaves out
     tray: bool = True                 # closing the window keeps the app in the tray
     autostart_hidden: bool = True     # started with Windows: straight to the tray
     # look at GitHub Releases for a newer version, at most every 6 hours (soundboard.updates).
@@ -546,6 +549,10 @@ class Config:
     api_enabled: bool = False
     api_port: int = 7474
     api_token: str = ""
+    # the control API's chat commands and alerts (soundboard.streamapi): {"chat": {...},
+    # "alerts": {type: [rule, ...]}, "alerts_on": bool}; set through /api/chat_rules
+    # and /api/alerts
+    api_stream: dict = field(default_factory=dict)
     # "remote" add-ons' own settings (soundboard.ui.remotehost), by add-on id: Onion
     # Pocket's on / off, port and key
     remote_addons: dict = field(default_factory=dict)
@@ -919,6 +926,7 @@ class Config:
         merge_tags(cats, cfg.categories, cfg.subcategories)
         for m in sounds:   # a category a sound is in always has a tab
             m.tags = merge_tags(m.tags, cfg.categories, cfg.subcategories)
+        cfg.hidden_from_all = [c for c in cfg.hidden_from_all if c in cfg.categories]
         if cfg.category not in cfg.categories:
             cfg.category = ""
         if cfg.subcategory not in cfg.subcategories.get(cfg.category, []):
@@ -1243,11 +1251,11 @@ def clean_tags(tags) -> list[str]:
     return out
 
 
-def in_view(tags: list[str], cat: str, sub: str = "") -> bool:
+def in_view(tags: list[str], cat: str, sub: str = "", hidden=()) -> bool:
     """Is a sound with `tags` on the Sounds tab showing `cat` (and its subcategory
-    `sub`)? "" for `cat` is every sound."""
+    `sub`)? "" for `cat` is All: every sound but those in a `hidden` category."""
     if not cat:
-        return True
+        return not any(split_tag(t)[0] in hidden for t in tags)
     return (sub_tag(cat, sub) if sub else cat) in tags
 
 

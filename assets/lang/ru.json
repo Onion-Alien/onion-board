@@ -3875,5 +3875,10 @@
   ],
   "Make a voice of your own first: Voice tab → Voice changer → Edit voice, or Save what's on under My setups.": "Сначала сделайте свой голос: вкладка Голос → Смена голоса → Изменить голос, или Сохранить включённое в Моих наборах.",
   "Rain, wind, a crowd or sounds from your board behind your voice": "Дождь, ветер, толпа или звуки с твоего борда за твоим голосом",
-  "Your own settings: Edit voice opens them": "Твои собственные настройки: открываются кнопкой «Изменить голос»"
+  "Your own settings: Edit voice opens them": "Твои собственные настройки: открываются кнопкой «Изменить голос»",
+  " · hidden from All": " · скрыта во «Все»",
+  "Every sound except those in: {names} (right-click one of them, Advanced, to show it here again)": "Все звуки, кроме звуков из: {names} (ПКМ по одной из них, Дополнительно, чтобы снова показать её здесь)",
+  "Hide its sounds from All": "Скрыть её звуки во «Все»",
+  "“{name}” is hidden from All. Its sounds stay on its own tab.": "«{name}» скрыта во «Все». Её звуки остаются на её вкладке.",
+  "“{name}” shows in All again": "«{name}» снова видна во «Все»"
 }

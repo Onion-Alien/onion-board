@@ -3715,5 +3715,10 @@
   ],
   "Make a voice of your own first: Voice tab → Voice changer → Edit voice, or Save what's on under My setups.": "先做一个你自己的声音：语音标签 → 变声器 → 编辑声音，或者在我的组合里“保存开着的设置”。",
   "Rain, wind, a crowd or sounds from your board behind your voice": "在你的声音后面加上雨、风、人群或你音板上的声音",
-  "Your own settings: Edit voice opens them": "你自己的设置：点“编辑声音”打开"
+  "Your own settings: Edit voice opens them": "你自己的设置：点“编辑声音”打开",
+  " · hidden from All": " · 已从全部中隐藏",
+  "Every sound except those in: {names} (right-click one of them, Advanced, to show it here again)": "除以下分类外的所有音效：{names}(右键点其中一个，高级，即可在这里重新显示)",
+  "Hide its sounds from All": "在全部中隐藏它的音效",
+  "“{name}” is hidden from All. Its sounds stay on its own tab.": "“{name}” 已从全部中隐藏。它的音效仍在自己的标签页里。",
+  "“{name}” shows in All again": "“{name}” 重新显示在全部中"
 }

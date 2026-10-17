@@ -3875,5 +3875,10 @@
   ],
   "Make a voice of your own first: Voice tab → Voice changer → Edit voice, or Save what's on under My setups.": "Najpierw zrób własny głos: karta Głos → Zmieniacz głosu → Edytuj głos, albo Zapisz to, co włączone w Moich zestawach.",
   "Rain, wind, a crowd or sounds from your board behind your voice": "Deszcz, wiatr, tłum albo dźwięki z twojego boardu za twoim głosem",
-  "Your own settings: Edit voice opens them": "Twoje własne ustawienia: otwiera je „Edytuj głos”"
+  "Your own settings: Edit voice opens them": "Twoje własne ustawienia: otwiera je „Edytuj głos”",
+  " · hidden from All": " · ukryta we Wszystkich",
+  "Every sound except those in: {names} (right-click one of them, Advanced, to show it here again)": "Każdy dźwięk poza tymi w: {names} (prawy klik na jedną z nich, Zaawansowany, by znów ją tu pokazać)",
+  "Hide its sounds from All": "Ukryj jej dźwięki we Wszystkich",
+  "“{name}” is hidden from All. Its sounds stay on its own tab.": "„{name}” jest ukryta we Wszystkich. Jej dźwięki zostają w jej własnej karcie.",
+  "“{name}” shows in All again": "„{name}” znów widać we Wszystkich"
 }

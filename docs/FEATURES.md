@@ -285,7 +285,12 @@ The full list. The [README](../README.md) has the short version and how to get s
   say a typed line in the computer voice, queue sounds or play a whole category in
   a row, turn the mic and *Hear what they hear* on or off, change the volume and
   category, save the instant replay, change the live speed, pitch and effects,
-  switch who's listening and run the radio; `/api/help` lists it all. New to it? The
+  switch who's listening, run the radio, send a program from the Apps tab, put on one
+  of *My setups*, switch every hotkey off while you type, and take **chat commands**
+  (`!sound`, `!random`, `!say`… with cooldowns and who may use each) and **alerts and
+  donations** (follows, subs, bits, raids, tips, channel points, TikTok gifts) from
+  Streamer.bot, Firebot, TikFinity and the like; `/api/help` lists it all and
+  [CONTROL-API.md](CONTROL-API.md) explains it. New to it? The
   **Streamer guide** there walks through Stream Deck keys, channel points and chat
   commands (Streamer.bot), and **Copy AI prompt** gives ChatGPT / Claude everything
   it needs (the links, your sounds) to set up whatever tools you use with you.

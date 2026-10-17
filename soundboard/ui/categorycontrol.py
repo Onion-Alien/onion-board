@@ -276,6 +276,10 @@ class CategoryControl(Controller):
         while tb.count():
             tb.removeTab(0)
         tb.addTab(ALL)
+        hidden = [c for c in mw.cfg.categories if c in mw.cfg.hidden_from_all]
+        tb.setTabToolTip(0, _("Every sound except those in: {names} (right-click one of "
+                              "them, Advanced, to show it here again)",
+                              names=", ".join(hidden)) if hidden else "")
         for c in mw.cfg.categories:
             n = sum(1 for m in mw.cfg.sounds if c in m.tags)
             i = tb.addTab(c.replace("&", "&&"))   # a lone & would be a shortcut key
@@ -289,6 +293,8 @@ class CategoryControl(Controller):
                              + (_(" · shows by itself when {progs} is in front",
                                   progs=', '.join(progs))
                                 if progs else "")
+                             + (_(" · hidden from All") if c in mw.cfg.hidden_from_all
+                                else "")
                              + _(" · right-click to rename, delete or give it a random-sound "
                                  "hotkey · drag to reorder"))
         cat = mw.cfg.category
@@ -368,7 +374,8 @@ class CategoryControl(Controller):
     def category_sounds(self) -> list[SoundMeta]:
         mw = self.mw
         return [m for m in mw.cfg.sounds
-                if library.in_view(m.tags, mw.cfg.category, mw.cfg.subcategory)]
+                if library.in_view(m.tags, mw.cfg.category, mw.cfg.subcategory,
+                                   mw.cfg.hidden_from_all)]
 
     def new_category(self, sid: str | None = None, name: str | None = None) -> str:
         """Add a category (asking for its name unless given), with `sid`'s sound in it
@@ -499,6 +506,8 @@ class CategoryControl(Controller):
             mw.cfg.subcategories[new] = mw.cfg.subcategories.pop(old)
         for m in mw.soundctl._live_metas():   # removed ones too, or Undo brings `old` back
             m.tags = [self._retag(t, old, new) for t in m.tags]
+        if old in mw.cfg.hidden_from_all:
+            mw.cfg.hidden_from_all[mw.cfg.hidden_from_all.index(old)] = new
         if mw.cfg.category == old:
             mw.cfg.category = new
         mw._save_now()
@@ -528,6 +537,8 @@ class CategoryControl(Controller):
         self._update_cat_timer()
         mw.playctl.shuffle.forget(name)
         mw.cfg.subcategories.pop(name, None)
+        if name in mw.cfg.hidden_from_all:   # its sounds are in All again
+            mw.cfg.hidden_from_all.remove(name)
         for m in mw.soundctl._live_metas():   # removed ones too, or Undo brings it back
             m.tags = [t for t in m.tags if library.split_tag(t)[0] != name]
         if mw.cfg.category == name:
@@ -546,19 +557,23 @@ class CategoryControl(Controller):
         name = self.cat_tabs.tabData(i)
         menu = QMenu(mw)
         a_ren = menu.addAction(icons.icon("edit"), _("Rename"))
-        hk = mw.cfg.category_hotkeys.get(name, "")
-        a_hk = menu.addAction(icons.icon("keyboard"),
-                              _("Random-sound hotkey: {hk} (change…)", hk=pretty_key(hk)) if hk
-                              else _("Set a random-sound hotkey"))
-        a_nohk = menu.addAction(icons.icon("trash"),
-                               _("Clear the random-sound hotkey")) if hk else None
         a_sub = menu.addAction(icons.icon("plus"), _("Add subcategory…"))
         a_rand = menu.addAction(icons.icon("play"), _("Play a random sound from it"))
-        a_exp = menu.addAction(icons.icon("folder"), _("Export as a sound pack"))
         cm = menu.addMenu(icons.icon("palette"), _("Colour"))
         # the same colour list as the bulk Colour menu: names, the current one ticked
         fill_colour_menu(cm, mw.cfg.category_colors.get(name, ""),
                          lambda col: self.set_category_color(name, col), none=True)
+        adv = menu.addMenu(icons.icon("sliders"), _("Advanced"))
+        a_hide = adv.addAction(_("Hide its sounds from All"))
+        a_hide.setCheckable(True)
+        a_hide.setChecked(name in mw.cfg.hidden_from_all)
+        hk = mw.cfg.category_hotkeys.get(name, "")
+        a_hk = adv.addAction(icons.icon("keyboard"),
+                             _("Random-sound hotkey: {hk} (change…)", hk=pretty_key(hk)) if hk
+                             else _("Set a random-sound hotkey"))
+        a_nohk = adv.addAction(icons.icon("trash"),
+                              _("Clear the random-sound hotkey")) if hk else None
+        a_exp = adv.addAction(icons.icon("folder"), _("Export as a sound pack"))
         menu.addSeparator()
         a_del = menu.addAction(icons.icon("trash", "danger_text"),
                                _("Delete category (keeps the sounds)"))
@@ -574,12 +589,33 @@ class CategoryControl(Controller):
             mw.hkctl.set_category_hotkey(name)
         elif act is not None and act == a_nohk:
             mw.hkctl.set_category_hotkey(name, "")
+        elif act == a_hide:
+            self.set_hidden_from_all(name, a_hide.isChecked())
         elif act == a_rand:
             mw.playctl.play_random(name)
         elif act == a_exp:
             mw.impctl.export_sounds([m for m in mw.cfg.sounds if name in m.tags], name)
         elif act == a_del:
             self.delete_category(name)
+
+    def set_hidden_from_all(self, name: str, hide: bool):
+        """Leave a category's sounds out of All (an imported pack you only want on its
+        own tab), or put them back. A sound in a hidden category stays out of All even
+        when it's in another category too."""
+        mw = self.mw
+        if name not in mw.cfg.categories or hide == (name in mw.cfg.hidden_from_all):
+            return
+        if hide:
+            mw.cfg.hidden_from_all.append(name)
+        else:
+            mw.cfg.hidden_from_all.remove(name)
+        mw.playctl.shuffle.forget("")   # All's random-sound pool changed
+        mw._save_now()
+        self._fill_categories()
+        mw.searchctl.apply_filter(mw.search.text())
+        mw.toast(_("“{name}” is hidden from All. Its sounds stay on its own tab.",
+                   name=html.escape(name)) if hide
+                 else _("“{name}” shows in All again", name=html.escape(name)), "ok")
 
     def _update_cat_timer(self):
         mw = self.mw

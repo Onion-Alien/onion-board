@@ -3795,5 +3795,10 @@
   ],
   "Make a voice of your own first: Voice tab → Voice changer → Edit voice, or Save what's on under My setups.": "Primero haz una voz tuya: pestaña Voz → Cambiador de voz → Editar voz, o Guardar lo activado en Mis ajustes.",
   "Rain, wind, a crowd or sounds from your board behind your voice": "Lluvia, viento, una multitud o sonidos de tu board detrás de tu voz",
-  "Your own settings: Edit voice opens them": "Tu propia configuración: “Editar voz” la abre"
+  "Your own settings: Edit voice opens them": "Tu propia configuración: “Editar voz” la abre",
+  " · hidden from All": " · oculta en Todo",
+  "Every sound except those in: {names} (right-click one of them, Advanced, to show it here again)": "Todos los sonidos menos los de: {names} (clic derecho en una de ellas, Avanzado, para mostrarla aquí de nuevo)",
+  "Hide its sounds from All": "Ocultar sus sonidos en Todo",
+  "“{name}” is hidden from All. Its sounds stay on its own tab.": "«{name}» está oculta en Todo. Sus sonidos siguen en su propia pestaña.",
+  "“{name}” shows in All again": "«{name}» vuelve a mostrarse en Todo"
 }

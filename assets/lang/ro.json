@@ -3875,5 +3875,10 @@
   ],
   "Make a voice of your own first: Voice tab → Voice changer → Edit voice, or Save what's on under My setups.": "Fă-ți întâi o voce proprie: fila Voce → Schimbator de voce → Editează vocea, sau Salvează ce e pornit la Setările mele.",
   "Rain, wind, a crowd or sounds from your board behind your voice": "Ploaie, vânt, o mulțime sau sunete de pe board-ul tău în spatele vocii tale",
-  "Your own settings: Edit voice opens them": "Setările tale: „Editează vocea” le deschide"
+  "Your own settings: Edit voice opens them": "Setările tale: „Editează vocea” le deschide",
+  " · hidden from All": " · ascunsă din Toate",
+  "Every sound except those in: {names} (right-click one of them, Advanced, to show it here again)": "Toate sunetele, în afară de cele din: {names} (clic dreapta pe una dintre ele, Avansat, ca s-o arăți din nou aici)",
+  "Hide its sounds from All": "Ascunde-i sunetele din Toate",
+  "“{name}” is hidden from All. Its sounds stay on its own tab.": "„{name}” e ascunsă din Toate. Sunetele ei rămân în fila ei.",
+  "“{name}” shows in All again": "„{name}” apare din nou în Toate"
 }
