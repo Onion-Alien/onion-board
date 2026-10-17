@@ -1903,6 +1903,33 @@ class _Hits:
         return x
 
 
+# ---- the Effects pop-up's own copies (ui/effectspopup.py): on top of whatever voice
+# is on, kept when you change voice. A voice's Robot or Echo is its own card in Edit
+# voice; these never show there, and run after the voice's effects
+@register
+class ExtraRobot(Robot):
+    type = "extra_robot"
+    extra = True
+
+
+@register
+class ExtraRadio(Radio):
+    type = "extra_radio"
+    extra = True
+
+
+@register
+class ExtraEcho(Echo):
+    type = "extra_echo"
+    extra = True
+
+
+@register
+class ExtraReverb(Reverb):
+    type = "extra_reverb"
+    extra = True
+
+
 @register
 class Background(Effect):
     """Sounds around you, made live (no recordings): rain, wind, an engine, a crowd,
@@ -2410,40 +2437,6 @@ PRESETS: dict[str, dict[str, dict]] = {
                   "tone": {"bass": 1, "mid": 0, "presence": 0, "treble": -1},
                   "echo": {"delay": 380, "feedback": 0.25, "mix": 0.15, "tone": 3000},
                   "reverb": {"size": 1, "tone": 4000, "mix": 0.55, "predelay": 70}},
-    # out in the weather: rain and gusts behind you, a little room of open air
-    "Storm": {"compressor": {"threshold": -24, "ratio": 3, "boost": 8},
-              "tone": {"bass": 1, "mid": 0, "presence": 2, "treble": -1},
-              "reverb": {"size": 0.3, "tone": 3000, "mix": 0.12},
-              "backdrop": {"rain": 0.6, "wind": 0.5, "talk": 1}},
-    # a low, warm storyteller by a crackling fire at night
-    "Campfire story": {"pitch": {"semitones": -2, "natural": 1, "size": 1.5},
-                       "compressor": {"threshold": -24, "ratio": 3, "boost": 8},
-                       "tone": {"bass": 3, "mid": 0, "presence": 1, "treble": -3},
-                       "reverb": {"size": 0.25, "tone": 2500, "mix": 0.1},
-                       "backdrop": {"fire": 0.55, "wind": 0.15, "talk": 1}},
-    # on the radio from the cockpit: squashed, clicks, the engines under it
-    "Fighter pilot": {"compressor": {"threshold": -30, "ratio": 8, "boost": 14},
-                      "radio": {"low": 350, "high": 3200, "drive": 10, "noise": 0.006,
-                                "squelch": 1},
-                      "backdrop": {"engine": 0.65, "talk": 1}},
-    # a crackly link from orbit with the station humming behind
-    "Astronaut": {"compressor": {"threshold": -28, "ratio": 6, "boost": 12},
-                  "radio": {"low": 300, "high": 3500, "drive": 6, "noise": 0.003,
-                            "squelch": 1},
-                  "reverb": {"size": 0.2, "tone": 6000, "mix": 0.08},
-                  "backdrop": {"space": 0.55, "talk": 1}},
-    # on the phone from a busy café: chatter all round, a bit of room
-    "Busy café": {"compressor": {"threshold": -24, "ratio": 3, "boost": 8},
-                  "tone": {"bass": -1, "mid": 2, "presence": 2, "treble": -1},
-                  "reverb": {"size": 0.35, "tone": 4000, "mix": 0.15},
-                  "backdrop": {"crowd": 0.5, "talk": 1}},
-    # a ghost in an old house: wind through it, echoing halls
-    "Haunted house": {"pitch": {"semitones": -2, "natural": 1, "size": 1},
-                      "compressor": {"threshold": -24, "ratio": 3, "boost": 10},
-                      "chorus": {"rate": 0.3, "depth": 6, "mix": 0.4},
-                      "echo": {"delay": 280, "feedback": 0.35, "mix": 0.2, "tone": 2500},
-                      "reverb": {"size": 0.85, "tone": 2500, "mix": 0.35},
-                      "backdrop": {"wind": 0.5, "talk": 1}},
 }
 
 PRESET_ICONS = {"Chipmunk": "🐿️", "Deep voice": "🐻", "High voice": "🎵", "Male voice": "👨",
@@ -2664,10 +2657,4 @@ def shown_texts() -> dict[str, str]:
         "Drive-thru speaker": _("Drive-thru speaker"),
         "Old film": _("Old film"),
         "Cathedral": _("Cathedral"),
-        "Storm": _("Storm"),
-        "Campfire story": _("Campfire story"),
-        "Fighter pilot": _("Fighter pilot"),
-        "Astronaut": _("Astronaut"),
-        "Busy café": _("Busy café"),
-        "Haunted house": _("Haunted house"),
     }

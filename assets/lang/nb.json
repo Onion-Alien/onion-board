@@ -3757,18 +3757,13 @@
   "Votes": "Vurderinger",
   "Tutorials are off now. Settings → General turns them back on.": "Veiledninger er slått av nå. Innstillinger → Generelt slår dem på igjen.",
   "Add a sound from my board": "Legg til en lyd fra boardet mitt",
-  "Astronaut": "Astronaut",
   "Bass boosted": "Bass-boost",
-  "Busy café": "Travel kafé",
-  "Campfire story": "Leirbålshistorie",
   "Crackling fire": "Knitrende bål",
   "Crowd": "Folkemengde",
   "Engine hum": "Motorbrumming",
   "Every sound is in already": "Alle lydene er allerede med",
   "Far away": "Langt borte",
-  "Fighter pilot": "Jagerflypilot",
   "From my board": "Fra boardet mitt",
-  "Haunted house": "Spøkelseshus",
   "Muffle": "Dempet",
   "Next room": "Rommet ved siden av",
   "No sounds on your board yet": "Ingen lyder på boardet ditt ennå",
@@ -3781,7 +3776,6 @@
   "Spaceship hum": "Romskipsbrumming",
   "Speed and pitch": "Hastighet og tonehøyde",
   "Speed, pitch, bass and where “{sound}” seems to be": "Hastighet, tonehøyde, bass og hvor «{sound}» ser ut til å være",
-  "Storm": "Storm",
   "Take “{sound}” out of the background": "Ta «{sound}» ut av bakgrunnen",
   "Through a wall": "Gjennom en vegg",
   "Wind": "Vind",
@@ -3790,17 +3784,23 @@
   "packed": "stappfullt",
   "pouring": "styrtregn",
   "roaring": "flammende",
-  "Background  ·  {n} on": [
-    "Bakgrunn  ·  {n} på",
-    "Bakgrunn  ·  {n} på"
-  ],
   "Edit voice": "Rediger stemme",
   "Edit voice  ·  {n} on": [
     "Rediger stemme  ·  {n} på",
     "Rediger stemme  ·  {n} på"
   ],
   "Make a voice of your own first: Voice tab → Voice changer → Edit voice, or Save what's on under My setups.": "Lag din egen stemme først: fanen Stemme → Stemmeskifter → Rediger stemme, eller Lagre det som er på under Mine oppsett.",
-  "Rain, wind, a crowd or sounds from your board behind your voice": "Regn, vind, en folkemengde eller lyder fra boardet ditt bak stemmen din",
   "Your own settings: Edit voice opens them": "Dine egne innstillinger: «Rediger stemme» åpner dem",
+  "A sound from my board": "En lyd fra boardet mitt",
+  "Add an effect": "Legg til en effekt",
+  "Add {effect}": "Legg til {effect}",
+  "Advanced: Edit voice": "Avansert: Rediger stemme",
+  "Effects  ·  {n}": [
+    "Effekter  ·  {n}",
+    "Effekter  ·  {n}"
+  ],
+  "On top of any voice: they stay when you pick another one.": "Oppå hvilken som helst stemme: de blir når du velger en annen.",
+  "Rain, a crowd, an echo or sounds from your board, on top of any voice": "Regn, folkemengde, ekko eller lyder fra boardet ditt oppå hvilken som helst stemme",
+  "Take “{effect}” off": "Fjern «{effect}»",
   "{site} didn't answer over Tor (it ignores some of Tor's addresses), and nor did {tries} other Tor routes. You can try this one without Tor: {site} would then see your own address.": "{site} svarte ikke over Tor (den ignorerer noen av Tors adresser), og heller ikke over {tries} andre Tor-ruter. Du kan prøve denne uten Tor: {site} vil da se din egen adresse."
 }

@@ -3835,18 +3835,13 @@
   "Votes": "Hodnocení",
   "Tutorials are off now. Settings → General turns them back on.": "Návody jsou teď vypnuté. V Nastavení → Obecné je zase zapneš.",
   "Add a sound from my board": "Přidat zvuk z mého boardu",
-  "Astronaut": "Astronaut",
   "Bass boosted": "Zesílené basy",
-  "Busy café": "Plná kavárna",
-  "Campfire story": "Příběh u táboráku",
   "Crackling fire": "Praskající oheň",
   "Crowd": "Dav",
   "Engine hum": "Hučení motoru",
   "Every sound is in already": "Všechny zvuky už tam jsou",
   "Far away": "Daleko",
-  "Fighter pilot": "Stíhací pilot",
   "From my board": "Z mého boardu",
-  "Haunted house": "Strašidelný dům",
   "Muffle": "Tlumení",
   "Next room": "Vedlejší pokoj",
   "No sounds on your board yet": "Na tvém boardu zatím nejsou žádné zvuky",
@@ -3859,7 +3854,6 @@
   "Spaceship hum": "Hučení lodi",
   "Speed and pitch": "Rychlost a výška",
   "Speed, pitch, bass and where “{sound}” seems to be": "Rychlost, výška, basy a kde se zdá být „{sound}“",
-  "Storm": "Bouřka",
   "Take “{sound}” out of the background": "Odebrat „{sound}“ z pozadí",
   "Through a wall": "Přes zeď",
   "Wind": "Vítr",
@@ -3868,11 +3862,6 @@
   "packed": "narváno",
   "pouring": "liják",
   "roaring": "plápolající",
-  "Background  ·  {n} on": [
-    "Pozadí  ·  {n} zapnuto",
-    "Pozadí  ·  {n} zapnuto",
-    "Pozadí  ·  {n} zapnuto"
-  ],
   "Edit voice": "Upravit hlas",
   "Edit voice  ·  {n} on": [
     "Upravit hlas  ·  {n} zapnuto",
@@ -3880,7 +3869,18 @@
     "Upravit hlas  ·  {n} zapnuto"
   ],
   "Make a voice of your own first: Voice tab → Voice changer → Edit voice, or Save what's on under My setups.": "Nejdřív si udělej vlastní hlas: karta Hlas → Měnič hlasu → Upravit hlas, nebo Uložit, co je zapnuté v Mých sestavách.",
-  "Rain, wind, a crowd or sounds from your board behind your voice": "Déšť, vítr, dav nebo zvuky z tvého boardu za tvým hlasem",
   "Your own settings: Edit voice opens them": "Tvoje vlastní nastavení: otevřeš je přes „Upravit hlas“",
+  "A sound from my board": "Zvuk z mého boardu",
+  "Add an effect": "Přidat efekt",
+  "Add {effect}": "Přidat {effect}",
+  "Advanced: Edit voice": "Pokročilé: Upravit hlas",
+  "Effects  ·  {n}": [
+    "Efekty  ·  {n}",
+    "Efekty  ·  {n}",
+    "Efekty  ·  {n}"
+  ],
+  "On top of any voice: they stay when you pick another one.": "Nad jakýmkoli hlasem: zůstanou, i když vybereš jiný.",
+  "Rain, a crowd, an echo or sounds from your board, on top of any voice": "Déšť, dav, ozvěna nebo zvuky z tvého boardu nad jakýmkoli hlasem",
+  "Take “{effect}” off": "Odebrat „{effect}“",
   "{site} didn't answer over Tor (it ignores some of Tor's addresses), and nor did {tries} other Tor routes. You can try this one without Tor: {site} would then see your own address.": "{site} přes Tor neodpověděl (některé adresy Toru ignoruje), a nepomohly ani {tries} jiné cesty Tor. Můžete to zkusit bez Toru: {site} by pak viděl vaši vlastní adresu."
 }

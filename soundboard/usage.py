@@ -265,6 +265,8 @@ FEATURES = ("add-files", "youtube", "record", "clip", "clip-editor", "import-boa
             "voice-code-shared", "voice-code-imported",
             # the Random voice card (or its key) and a voice changer voice's Hear it
             "voice-roll", "voice-hear",
+            # the voice bar's Effects pop-up opened
+            "voice-effects",
             # AI voices: switched on, a group picked, a voice starred, Hear it, one of
             # your own made (never which voice)
             "ai-voice", "ai-voice-group", "ai-voice-favorite", "ai-voice-hear",

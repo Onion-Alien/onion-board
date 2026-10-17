@@ -3757,18 +3757,13 @@
   "Votes": "Ψήφοι",
   "Tutorials are off now. Settings → General turns them back on.": "Οι οδηγοί είναι τώρα κλειστοί. Οι Ρυθμίσεις → Γενικά τους ανοίγουν ξανά.",
   "Add a sound from my board": "Πρόσθεσε ήχο από το board μου",
-  "Astronaut": "Αστροναύτης",
   "Bass boosted": "Ενισχυμένα μπάσα",
-  "Busy café": "Γεμάτο καφέ",
-  "Campfire story": "Ιστορία στη φωτιά",
   "Crackling fire": "Φωτιά που τριζοβολά",
   "Crowd": "Πλήθος",
   "Engine hum": "Βουητό μηχανής",
   "Every sound is in already": "Όλοι οι ήχοι είναι ήδη μέσα",
   "Far away": "Μακριά",
-  "Fighter pilot": "Πιλότος μαχητικού",
   "From my board": "Από το board μου",
-  "Haunted house": "Στοιχειωμένο σπίτι",
   "Muffle": "Πνιχτό",
   "Next room": "Διπλανό δωμάτιο",
   "No sounds on your board yet": "Δεν υπάρχουν ακόμα ήχοι στο board σου",
@@ -3781,7 +3776,6 @@
   "Spaceship hum": "Βουητό σκάφους",
   "Speed and pitch": "Ταχύτητα και τόνος",
   "Speed, pitch, bass and where “{sound}” seems to be": "Ταχύτητα, τόνος, μπάσα και πού μοιάζει να είναι το «{sound}»",
-  "Storm": "Καταιγίδα",
   "Take “{sound}” out of the background": "Βγάλε το «{sound}» από το φόντο",
   "Through a wall": "Μέσα από τοίχο",
   "Wind": "Αέρας",
@@ -3790,17 +3784,23 @@
   "packed": "τίγκα",
   "pouring": "μπόρα",
   "roaring": "φλεγόμενη",
-  "Background  ·  {n} on": [
-    "Φόντο  ·  {n} ενεργό",
-    "Φόντο  ·  {n} ενεργά"
-  ],
   "Edit voice": "Επεξεργασία φωνής",
   "Edit voice  ·  {n} on": [
     "Επεξεργασία φωνής  ·  {n} ενεργό",
     "Επεξεργασία φωνής  ·  {n} ενεργά"
   ],
   "Make a voice of your own first: Voice tab → Voice changer → Edit voice, or Save what's on under My setups.": "Φτιάξε πρώτα μια δική σου φωνή: καρτέλα Φωνή → Αλλαγη φωνης → Επεξεργασία φωνής, ή Αποθήκευσε ό,τι είναι ανοιχτό στις Ρυθμίσεις μου.",
-  "Rain, wind, a crowd or sounds from your board behind your voice": "Βροχή, αέρας, πλήθος ή ήχοι από το board σου πίσω από τη φωνή σου",
   "Your own settings: Edit voice opens them": "Οι δικές σου ρυθμίσεις: τις ανοίγει το «Επεξεργασία φωνής»",
+  "A sound from my board": "Ένας ήχος από το board μου",
+  "Add an effect": "Πρόσθεσε εφέ",
+  "Add {effect}": "Πρόσθεσε {effect}",
+  "Advanced: Edit voice": "Για προχωρημένους: Επεξεργασία φωνής",
+  "Effects  ·  {n}": [
+    "Εφέ  ·  {n}",
+    "Εφέ  ·  {n}"
+  ],
+  "On top of any voice: they stay when you pick another one.": "Πάνω σε οποιαδήποτε φωνή: μένουν όταν διαλέξεις άλλη.",
+  "Rain, a crowd, an echo or sounds from your board, on top of any voice": "Βροχή, πλήθος, ηχώ ή ήχοι από το board σου πάνω σε οποιαδήποτε φωνή",
+  "Take “{effect}” off": "Βγάλε το «{effect}»",
   "{site} didn't answer over Tor (it ignores some of Tor's addresses), and nor did {tries} other Tor routes. You can try this one without Tor: {site} would then see your own address.": "Το {site} δεν απάντησε μέσω Tor (αγνοεί κάποιες διευθύνσεις του Tor), ούτε μέσω {tries} άλλων διαδρομών Tor. Μπορείτε να δοκιμάσετε αυτό χωρίς Tor: το {site} θα έβλεπε τότε τη δική σας διεύθυνση."
 }

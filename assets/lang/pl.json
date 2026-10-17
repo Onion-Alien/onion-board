@@ -3835,18 +3835,13 @@
   "Votes": "Oceny",
   "Tutorials are off now. Settings → General turns them back on.": "Poradniki są teraz wyłączone. Ustawienia → Ogólne włącza je z powrotem.",
   "Add a sound from my board": "Dodaj dźwięk z mojego boardu",
-  "Astronaut": "Astronauta",
   "Bass boosted": "Podbity bas",
-  "Busy café": "Zatłoczona kawiarnia",
-  "Campfire story": "Opowieść przy ognisku",
   "Crackling fire": "Trzaskający ogień",
   "Crowd": "Tłum",
   "Engine hum": "Szum silnika",
   "Every sound is in already": "Wszystkie dźwięki już są",
   "Far away": "Daleko",
-  "Fighter pilot": "Pilot myśliwca",
   "From my board": "Z mojego boardu",
-  "Haunted house": "Nawiedzony dom",
   "Muffle": "Stłumienie",
   "Next room": "Pokój obok",
   "No sounds on your board yet": "Na twoim boardzie nie ma jeszcze dźwięków",
@@ -3859,7 +3854,6 @@
   "Spaceship hum": "Szum statku",
   "Speed and pitch": "Prędkość i wysokość",
   "Speed, pitch, bass and where “{sound}” seems to be": "Prędkość, wysokość, bas i gdzie zdaje się być „{sound}”",
-  "Storm": "Burza",
   "Take “{sound}” out of the background": "Usuń „{sound}” z tła",
   "Through a wall": "Przez ścianę",
   "Wind": "Wiatr",
@@ -3868,11 +3862,6 @@
   "packed": "pełno",
   "pouring": "ulewa",
   "roaring": "buzujący",
-  "Background  ·  {n} on": [
-    "Tło  ·  {n} wł.",
-    "Tło  ·  {n} wł.",
-    "Tło  ·  {n} wł."
-  ],
   "Edit voice": "Edytuj głos",
   "Edit voice  ·  {n} on": [
     "Edytuj głos  ·  {n} wł.",
@@ -3880,7 +3869,18 @@
     "Edytuj głos  ·  {n} wł."
   ],
   "Make a voice of your own first: Voice tab → Voice changer → Edit voice, or Save what's on under My setups.": "Najpierw zrób własny głos: karta Głos → Zmieniacz głosu → Edytuj głos, albo Zapisz to, co włączone w Moich zestawach.",
-  "Rain, wind, a crowd or sounds from your board behind your voice": "Deszcz, wiatr, tłum albo dźwięki z twojego boardu za twoim głosem",
   "Your own settings: Edit voice opens them": "Twoje własne ustawienia: otwiera je „Edytuj głos”",
+  "A sound from my board": "Dźwięk z mojego boardu",
+  "Add an effect": "Dodaj efekt",
+  "Add {effect}": "Dodaj {effect}",
+  "Advanced: Edit voice": "Zaawansowane: Edytuj głos",
+  "Effects  ·  {n}": [
+    "Efekty  ·  {n}",
+    "Efekty  ·  {n}",
+    "Efekty  ·  {n}"
+  ],
+  "On top of any voice: they stay when you pick another one.": "Na każdy głos: zostają, gdy wybierzesz inny.",
+  "Rain, a crowd, an echo or sounds from your board, on top of any voice": "Deszcz, tłum, echo lub dźwięki z twojego boardu na każdy głos",
+  "Take “{effect}” off": "Usuń „{effect}”",
   "{site} didn't answer over Tor (it ignores some of Tor's addresses), and nor did {tries} other Tor routes. You can try this one without Tor: {site} would then see your own address.": "{site} nie odpowiedziała przez Tora (ignoruje niektóre adresy Tora), podobnie jak przez {tries} inne trasy Tora. Możesz wypróbować ten bez Tora: {site} zobaczy wtedy Twój własny adres."
 }

@@ -35,7 +35,9 @@ def panel(qapp, monkeypatch):
 def test_panel_installs_the_chain_on_the_engine(panel):
     p, eng = panel
     assert eng.voice_chain is p.chain
-    assert set(voicefx.REGISTRY) <= set(p.fx.rows)       # built-ins and add-ons get rows
+    # built-ins and add-ons get rows (the Effects pop-up's extras live there instead)
+    assert {t for t, c in voicefx.REGISTRY.items() if not c.extra} <= set(p.fx.rows)
+    assert not {t for t, c in voicefx.REGISTRY.items() if c.extra} & set(p.fx.rows)
 
 
 @pytest.mark.parametrize("name", ["Hothead", "Autotune"])

@@ -3757,18 +3757,13 @@
   "Votes": "Szavazatok",
   "Tutorials are off now. Settings → General turns them back on.": "Az útmutatók most ki vannak kapcsolva. A Beállítások → Általános visszakapcsolja őket.",
   "Add a sound from my board": "Hang hozzáadása a boardomról",
-  "Astronaut": "Űrhajós",
   "Bass boosted": "Felturbózott basszus",
-  "Busy café": "Zsúfolt kávézó",
-  "Campfire story": "Tábortűzi mese",
   "Crackling fire": "Pattogó tűz",
   "Crowd": "Tömeg",
   "Engine hum": "Motorzúgás",
   "Every sound is in already": "Már minden hang benne van",
   "Far away": "Messze",
-  "Fighter pilot": "Vadászpilóta",
   "From my board": "A boardomról",
-  "Haunted house": "Kísértetház",
   "Muffle": "Tompítás",
   "Next room": "Szomszéd szoba",
   "No sounds on your board yet": "Még nincs hang a boardodon",
@@ -3781,7 +3776,6 @@
   "Spaceship hum": "Űrhajózúgás",
   "Speed and pitch": "Sebesség és hangmagasság",
   "Speed, pitch, bass and where “{sound}” seems to be": "Sebesség, hangmagasság, basszus és hogy hol szól a(z) „{sound}”",
-  "Storm": "Vihar",
   "Take “{sound}” out of the background": "„{sound}” kivétele a háttérből",
   "Through a wall": "Falon át",
   "Wind": "Szél",
@@ -3790,17 +3784,23 @@
   "packed": "tömött",
   "pouring": "felhőszakadás",
   "roaring": "lobogó",
-  "Background  ·  {n} on": [
-    "Háttér  ·  {n} bekapcsolva",
-    "Háttér  ·  {n} bekapcsolva"
-  ],
   "Edit voice": "Hang szerkesztése",
   "Edit voice  ·  {n} on": [
     "Hang szerkesztése  ·  {n} bekapcsolva",
     "Hang szerkesztése  ·  {n} bekapcsolva"
   ],
   "Make a voice of your own first: Voice tab → Voice changer → Edit voice, or Save what's on under My setups.": "Előbb csinálj saját hangot: Hang fül → Hangváltó → Hang szerkesztése, vagy Ami be van kapcsolva, mentése a Saját beállításaimnál.",
-  "Rain, wind, a crowd or sounds from your board behind your voice": "Eső, szél, tömeg vagy hangok a boardodról a hangod mögött",
   "Your own settings: Edit voice opens them": "A saját beállításaid: a „Hang szerkesztése” nyitja meg őket",
+  "A sound from my board": "Hang a boardomról",
+  "Add an effect": "Effekt hozzáadása",
+  "Add {effect}": "{effect} hozzáadása",
+  "Advanced: Edit voice": "Haladó: Hang szerkesztése",
+  "Effects  ·  {n}": [
+    "Effektek  ·  {n}",
+    "Effektek  ·  {n}"
+  ],
+  "On top of any voice: they stay when you pick another one.": "Bármelyik hang fölött: maradnak, ha másikat választasz.",
+  "Rain, a crowd, an echo or sounds from your board, on top of any voice": "Eső, tömeg, visszhang vagy hangok a boardodról bármelyik hang fölött",
+  "Take “{effect}” off": "„{effect}” levétele",
   "{site} didn't answer over Tor (it ignores some of Tor's addresses), and nor did {tries} other Tor routes. You can try this one without Tor: {site} would then see your own address.": "{site} nem válaszolt Toron keresztül (a Tor néhány címét figyelmen kívül hagyja), és {tries} másik Tor-útvonalon sem. Kipróbálhatja ezt Tor nélkül is: {site} ekkor látni fogja a saját címét."
 }

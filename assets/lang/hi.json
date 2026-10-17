@@ -3757,18 +3757,13 @@
   "Votes": "वोट",
   "Tutorials are off now. Settings → General turns them back on.": "तरीके अब बंद हैं। सेटिंग्स → सामान्य में इन्हें फिर से चालू करें।",
   "Add a sound from my board": "मेरे बोर्ड से साउंड जोड़ें",
-  "Astronaut": "अंतरिक्ष यात्री",
   "Bass boosted": "बास बूस्टेड",
-  "Busy café": "भीड़ भरा कैफ़े",
-  "Campfire story": "अलाव की कहानी",
   "Crackling fire": "चटकती आग",
   "Crowd": "भीड़",
   "Engine hum": "इंजन की गूँज",
   "Every sound is in already": "सारे साउंड पहले से जुड़े हैं",
   "Far away": "दूर",
-  "Fighter pilot": "फ़ाइटर पायलट",
   "From my board": "मेरे बोर्ड से",
-  "Haunted house": "भूतिया घर",
   "Muffle": "दबी आवाज़",
   "Next room": "बगल का कमरा",
   "No sounds on your board yet": "आपके बोर्ड पर अभी कोई साउंड नहीं है",
@@ -3781,7 +3776,6 @@
   "Spaceship hum": "स्पेसशिप की गूँज",
   "Speed and pitch": "स्पीड और पिच",
   "Speed, pitch, bass and where “{sound}” seems to be": "स्पीड, पिच, बास और “{sound}” कहाँ से आता लगे",
-  "Storm": "तूफ़ान",
   "Take “{sound}” out of the background": "“{sound}” को बैकग्राउंड से हटाएँ",
   "Through a wall": "दीवार के पार",
   "Wind": "हवा",
@@ -3790,17 +3784,23 @@
   "packed": "खचाखच",
   "pouring": "मूसलाधार",
   "roaring": "धधकती",
-  "Background  ·  {n} on": [
-    "बैकग्राउंड  ·  {n} चालू",
-    "बैकग्राउंड  ·  {n} चालू"
-  ],
   "Edit voice": "आवाज़ बदलें",
   "Edit voice  ·  {n} on": [
     "आवाज़ बदलें  ·  {n} चालू",
     "आवाज़ बदलें  ·  {n} चालू"
   ],
   "Make a voice of your own first: Voice tab → Voice changer → Edit voice, or Save what's on under My setups.": "पहले अपनी आवाज़ बनाएं: वॉइस टैब → आवाज परिवर्तक → आवाज़ बदलें, या मेरे सेटअप में जो चालू है उसे सेव करें।",
-  "Rain, wind, a crowd or sounds from your board behind your voice": "आपकी आवाज़ के पीछे बारिश, हवा, भीड़ या आपके बोर्ड के साउंड",
   "Your own settings: Edit voice opens them": "आपकी अपनी सेटिंग्स: “आवाज़ बदलें” इन्हें खोलता है",
+  "A sound from my board": "मेरे बोर्ड से एक साउंड",
+  "Add an effect": "इफ़ेक्ट जोड़ें",
+  "Add {effect}": "{effect} जोड़ें",
+  "Advanced: Edit voice": "एडवांस्ड: आवाज़ बदलें",
+  "Effects  ·  {n}": [
+    "इफ़ेक्ट  ·  {n}",
+    "इफ़ेक्ट  ·  {n}"
+  ],
+  "On top of any voice: they stay when you pick another one.": "किसी भी आवाज़ के ऊपर: दूसरी आवाज़ चुनने पर भी बने रहते हैं।",
+  "Rain, a crowd, an echo or sounds from your board, on top of any voice": "बारिश, भीड़, गूँज या आपके बोर्ड के साउंड, किसी भी आवाज़ के ऊपर",
+  "Take “{effect}” off": "“{effect}” हटाएँ",
   "{site} didn't answer over Tor (it ignores some of Tor's addresses), and nor did {tries} other Tor routes. You can try this one without Tor: {site} would then see your own address.": "{site} ने Tor पर जवाब नहीं दिया (यह Tor के कुछ पतों को अनदेखा करता है), और {tries} दूसरे Tor रास्तों पर भी नहीं। आप इसे Tor के बिना आज़मा सकते हैं: तब {site} को आपका अपना पता दिखेगा।"
 }

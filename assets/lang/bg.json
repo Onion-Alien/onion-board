@@ -3757,18 +3757,13 @@
   "Votes": "Оценки",
   "Tutorials are off now. Settings → General turns them back on.": "Обясненията са изключени. Настройки → Общи ги включва пак.",
   "Add a sound from my board": "Добави звук от моя борд",
-  "Astronaut": "Астронавт",
   "Bass boosted": "Усилен бас",
-  "Busy café": "Пълно кафене",
-  "Campfire story": "История край огъня",
   "Crackling fire": "Пращящ огън",
   "Crowd": "Тълпа",
   "Engine hum": "Бучене на двигател",
   "Every sound is in already": "Всички звуци вече са вътре",
   "Far away": "Далеч",
-  "Fighter pilot": "Пилот изтребител",
   "From my board": "От моя борд",
-  "Haunted house": "Обитавана къща",
   "Muffle": "Заглушаване",
   "Next room": "Съседната стая",
   "No sounds on your board yet": "Още няма звуци в борда ти",
@@ -3781,7 +3776,6 @@
   "Spaceship hum": "Бучене на кораб",
   "Speed and pitch": "Скорост и височина",
   "Speed, pitch, bass and where “{sound}” seems to be": "Скорост, височина, бас и къде изглежда, че е „{sound}“",
-  "Storm": "Буря",
   "Take “{sound}” out of the background": "Махни „{sound}“ от фона",
   "Through a wall": "През стена",
   "Wind": "Вятър",
@@ -3790,17 +3784,23 @@
   "packed": "претъпкано",
   "pouring": "порой",
   "roaring": "буен",
-  "Background  ·  {n} on": [
-    "Фон  ·  {n} включено",
-    "Фон  ·  {n} включено"
-  ],
   "Edit voice": "Редактирай гласа",
   "Edit voice  ·  {n} on": [
     "Редактирай гласа  ·  {n} включено",
     "Редактирай гласа  ·  {n} включено"
   ],
   "Make a voice of your own first: Voice tab → Voice changer → Edit voice, or Save what's on under My setups.": "Първо направи свой глас: раздел Глас → Промяна на гласа → Редактирай гласа, или Запази включеното в Моите настройки.",
-  "Rain, wind, a crowd or sounds from your board behind your voice": "Дъжд, вятър, тълпа или звуци от твоя борд зад гласа ти",
   "Your own settings: Edit voice opens them": "Твоите собствени настройки: „Редактирай гласа“ ги отваря",
+  "A sound from my board": "Звук от моя борд",
+  "Add an effect": "Добави ефект",
+  "Add {effect}": "Добави {effect}",
+  "Advanced: Edit voice": "Разширени: Редактирай гласа",
+  "Effects  ·  {n}": [
+    "Ефекти  ·  {n}",
+    "Ефекти  ·  {n}"
+  ],
+  "On top of any voice: they stay when you pick another one.": "Върху всеки глас: остават, когато избереш друг.",
+  "Rain, a crowd, an echo or sounds from your board, on top of any voice": "Дъжд, тълпа, ехо или звуци от твоя борд върху всеки глас",
+  "Take “{effect}” off": "Махни „{effect}“",
   "{site} didn't answer over Tor (it ignores some of Tor's addresses), and nor did {tries} other Tor routes. You can try this one without Tor: {site} would then see your own address.": "{site} не отговори през Tor (пренебрегва някои адреси на Tor), както и при {tries} други маршрута на Tor. Можете да опитате този без Tor: тогава {site} ще види вашия собствен адрес."
 }

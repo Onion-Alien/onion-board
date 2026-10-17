@@ -3679,18 +3679,13 @@
   "Votes": "投票",
   "Tutorials are off now. Settings → General turns them back on.": "使い方の案内をオフにしました。設定 → 一般 でまたオンにできます。",
   "Add a sound from my board": "自分のボードから音を追加",
-  "Astronaut": "宇宙飛行士",
   "Bass boosted": "低音ブースト",
-  "Busy café": "混んだカフェ",
-  "Campfire story": "たき火の語り",
   "Crackling fire": "パチパチ燃える火",
   "Crowd": "人混み",
   "Engine hum": "エンジン音",
   "Every sound is in already": "すべての音が追加済み",
   "Far away": "遠く",
-  "Fighter pilot": "戦闘機パイロット",
   "From my board": "自分のボードから",
-  "Haunted house": "お化け屋敷",
   "Muffle": "こもり",
   "Next room": "隣の部屋",
   "No sounds on your board yet": "ボードにまだ音がありません",
@@ -3703,7 +3698,6 @@
   "Spaceship hum": "宇宙船のうなり",
   "Speed and pitch": "速度とピッチ",
   "Speed, pitch, bass and where “{sound}” seems to be": "速度、ピッチ、低音、「{sound}」がどこで鳴っているように聞こえるか",
-  "Storm": "嵐",
   "Take “{sound}” out of the background": "「{sound}」を背景から外す",
   "Through a wall": "壁越し",
   "Wind": "風",
@@ -3712,15 +3706,21 @@
   "packed": "ぎっしり",
   "pouring": "土砂降り",
   "roaring": "燃え盛る",
-  "Background  ·  {n} on": [
-    "背景  ·  {n}個オン"
-  ],
   "Edit voice": "声を編集",
   "Edit voice  ·  {n} on": [
     "声を編集  ·  {n}個オン"
   ],
   "Make a voice of your own first: Voice tab → Voice changer → Edit voice, or Save what's on under My setups.": "まず自分の声を作りましょう：ボイスタブ → ボイスチェンジャー → 声を編集、またはマイセットで「オンのものを保存」。",
-  "Rain, wind, a crowd or sounds from your board behind your voice": "声の後ろに雨、風、人混み、またはボードの音",
   "Your own settings: Edit voice opens them": "自分の設定: 「声を編集」で開きます",
+  "A sound from my board": "自分のボードの音",
+  "Add an effect": "エフェクトを追加",
+  "Add {effect}": "{effect}を追加",
+  "Advanced: Edit voice": "詳細: 声を編集",
+  "Effects  ·  {n}": [
+    "エフェクト  ·  {n}"
+  ],
+  "On top of any voice: they stay when you pick another one.": "どの声にも重ねられます。別の声を選んでもそのままです。",
+  "Rain, a crowd, an echo or sounds from your board, on top of any voice": "雨、人混み、エコー、ボードの音をどの声にも重ねる",
+  "Take “{effect}” off": "「{effect}」を外す",
   "{site} didn't answer over Tor (it ignores some of Tor's addresses), and nor did {tries} other Tor routes. You can try this one without Tor: {site} would then see your own address.": "{site} が Tor 経由で応答しませんでした（Tor の一部のアドレスを無視します）。他の Tor ルート {tries} 本でも同じでした。Tor なしで試すこともできます。その場合、{site} にはあなた自身のアドレスが見えます。"
 }
