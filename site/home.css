@@ -91,9 +91,11 @@ html:not(.js) .switch { display: none; }
                 padding: 9px 16px; font-size: 14.5px; }
 .top.past .mini-dl { opacity: 1; transform: none; pointer-events: auto; }
 html:not(.js) .icon-btn { display: none; }
-.icon-btn.discord { color: #fff; background: #5865f2; border-color: #5865f2; }
-.icon-btn.discord:hover { background: #4752c4; }
-.icon-btn.discord svg { width: 20px; height: 20px; }
+/* same glass circle as its neighbours, holding Discord's own blue disc (like the look button's dot); never themed */
+.icon-btn.discord { color: #fff; }
+.icon-btn.discord svg { box-sizing: border-box; width: 28px; height: 28px; padding: 5px; border-radius: 50%;
+                        background: #5865f2; transition: background .2s, transform .2s; }
+.icon-btn.discord:hover svg { background: #4752c4; transform: scale(1.06); }
 html:not(.js) .icon-btn.discord { display: grid; }
 /* the look switcher: the apps' own themes, pictures and page colours together */
 .looks { position: relative; }
@@ -528,7 +530,7 @@ footer .pals svg:hover { transform: translateY(-6px) rotate(-6deg); }
   .top .wrap { gap: 8px; }
   .tools { gap: 5px; }
   .icon-btn { width: 32px; height: 32px; font-size: 15px; }
-  .icon-btn.discord svg { width: 17px; height: 17px; }
+  .icon-btn.discord svg { width: 24px; height: 24px; padding: 4px; }
 }
 @media (max-width: 420px) { .icon-btn.discord { display: none; } }   /* no room: the footer has it */
 @media (max-width: 400px) {
