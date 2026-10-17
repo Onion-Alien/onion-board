@@ -28,6 +28,18 @@ def test_sounds_not_a_list_is_ignored(app_dir):
     assert Config.load().sounds == []
 
 
+def test_sounds_of_the_wrong_type_load_the_backup_not_an_empty_board(app_dir):
+    """A hand-edited "sounds" that isn't a list is damage, not "no pads": the backup's
+    pads load and the edited file is kept, instead of the next save emptying the board."""
+    _write(library.CONFIG_PATH.with_name("config.json.1"),
+           {"stop_hotkey": "f9", "sounds": [_pad("a", "Boom")]})
+    _write(library.CONFIG_PATH, {"version": 1, "sounds": {"Boom": 1}})
+    cfg = Config.load()
+    assert [s.id for s in cfg.sounds] == ["a"] and cfg.stop_hotkey == "f9"
+    assert "damaged" in cfg.load_note and "config.json.1" in cfg.load_note
+    assert list(app_dir.glob("config.json.broken-*"))   # the edited file is kept
+
+
 def test_broken_config_uses_the_newest_backup_that_loads(app_dir):
     library.CONFIG_PATH.write_text("{not json", encoding="utf-8")
     library.CONFIG_PATH.with_name("config.json.1").write_text("{also broken", encoding="utf-8")

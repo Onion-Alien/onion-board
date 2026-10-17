@@ -841,8 +841,13 @@ class Config:
             raw["duck_on"] = True
         sounds = []
         blank = SoundMeta(id="", name="", file="")
-        raw_sounds = raw.pop("sounds", [])
-        for s in raw_sounds if isinstance(raw_sounds, list) else []:
+        raw_sounds = raw.pop("sounds", None)
+        if raw_sounds is None:
+            raw_sounds = []
+        elif not isinstance(raw_sounds, list):   # damaged / hand-edited: never save over
+            # the pads with an empty list; load() sets the file aside and recovers them
+            raise ValueError(f"config 'sounds' is a {type(raw_sounds).__name__}, not a list")
+        for s in raw_sounds:
             if not isinstance(s, dict) or not all(isinstance(s.get(k), str) and s.get(k)
                                                   for k in ("id", "name", "file")):
                 log.warning("skipped a damaged sound entry in the config: %r", s)
