@@ -3801,5 +3801,6 @@
   ],
   "On top of any voice: they stay when you pick another one.": "Върху всеки глас: остават, когато избереш друг.",
   "Rain, a crowd, an echo or sounds from your board, on top of any voice": "Дъжд, тълпа, ехо или звуци от твоя борд върху всеки глас",
-  "Take “{effect}” off": "Махни „{effect}“"
+  "Take “{effect}” off": "Махни „{effect}“",
+  "{site} didn't answer over Tor (it ignores some of Tor's addresses), and nor did {tries} other Tor routes. You can try this one without Tor: {site} would then see your own address.": "{site} не отговори през Tor (пренебрегва някои адреси на Tor), както и при {tries} други маршрута на Tor. Можете да опитате този без Tor: тогава {site} ще види вашия собствен адрес."
 }

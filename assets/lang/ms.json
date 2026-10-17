@@ -3721,5 +3721,6 @@
   ],
   "On top of any voice: they stay when you pick another one.": "Di atas mana-mana suara: kekal apabila anda pilih yang lain.",
   "Rain, a crowd, an echo or sounds from your board, on top of any voice": "Hujan, orang ramai, gema atau bunyi dari board anda di atas mana-mana suara",
-  "Take “{effect}” off": "Buang “{effect}”"
+  "Take “{effect}” off": "Buang “{effect}”",
+  "{site} didn't answer over Tor (it ignores some of Tor's addresses), and nor did {tries} other Tor routes. You can try this one without Tor: {site} would then see your own address.": "{site} tidak menjawab melalui Tor (ia mengabaikan sebahagian alamat Tor), begitu juga melalui {tries} laluan Tor yang lain. Anda boleh mencuba yang ini tanpa Tor: {site} kemudiannya akan melihat alamat anda sendiri."
 }

@@ -3721,5 +3721,6 @@
   ],
   "On top of any voice: they stay when you pick another one.": "疊加在任何聲音上：換別的聲音時也會保留。",
   "Rain, a crowd, an echo or sounds from your board, on top of any voice": "雨聲、人群、回聲或你音板上的聲音，疊加在任何聲音上",
-  "Take “{effect}” off": "移除「{effect}」"
+  "Take “{effect}” off": "移除「{effect}」",
+  "{site} didn't answer over Tor (it ignores some of Tor's addresses), and nor did {tries} other Tor routes. You can try this one without Tor: {site} would then see your own address.": "{site} 沒有透過 Tor 回應（它會忽略 Tor 的部分位址），另外 {tries} 條 Tor 路由也是如此。您可以不用 Tor 再試一次：然後 {site} 會看到您自己的位址。"
 }

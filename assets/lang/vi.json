@@ -3721,5 +3721,6 @@
   ],
   "On top of any voice: they stay when you pick another one.": "Chồng lên bất kỳ giọng nào: vẫn giữ khi bạn chọn giọng khác.",
   "Rain, a crowd, an echo or sounds from your board, on top of any voice": "Mưa, đám đông, tiếng vang hoặc âm thanh từ board của bạn, chồng lên bất kỳ giọng nào",
-  "Take “{effect}” off": "Bỏ “{effect}”"
+  "Take “{effect}” off": "Bỏ “{effect}”",
+  "{site} didn't answer over Tor (it ignores some of Tor's addresses), and nor did {tries} other Tor routes. You can try this one without Tor: {site} would then see your own address.": "{site} không trả lời qua Tor (trang này bỏ qua một số địa chỉ của Tor), và {tries} tuyến Tor khác cũng vậy. Bạn có thể thử cái này mà không cần Tor: {site} sẽ thấy địa chỉ của chính bạn."
 }

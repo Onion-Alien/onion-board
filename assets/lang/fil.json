@@ -3801,5 +3801,6 @@
   ],
   "On top of any voice: they stay when you pick another one.": "Nasa ibabaw ng kahit anong boses: nananatili kahit pumili ka ng iba.",
   "Rain, a crowd, an echo or sounds from your board, on top of any voice": "Ulan, crowd, echo o mga tunog mula sa board mo, sa ibabaw ng kahit anong boses",
-  "Take “{effect}” off": "Alisin ang “{effect}”"
+  "Take “{effect}” off": "Alisin ang “{effect}”",
+  "{site} didn't answer over Tor (it ignores some of Tor's addresses), and nor did {tries} other Tor routes. You can try this one without Tor: {site} would then see your own address.": "Hindi sumagot ang {site} sa Tor (binabalewala nito ang ilang address ng Tor), at hindi rin sa {tries} iba pang ruta ng Tor. Maaari mong subukan ang isang ito nang walang Tor: makikita ng {site} ang iyong sariling address."
 }

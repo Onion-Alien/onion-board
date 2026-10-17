@@ -3801,5 +3801,6 @@
   ],
   "On top of any voice: they stay when you pick another one.": "Por cima de qualquer voz: ficam quando escolhes outra.",
   "Rain, a crowd, an echo or sounds from your board, on top of any voice": "Chuva, multidão, eco ou sons do teu board por cima de qualquer voz",
-  "Take “{effect}” off": "Tirar «{effect}»"
+  "Take “{effect}” off": "Tirar «{effect}»",
+  "{site} didn't answer over Tor (it ignores some of Tor's addresses), and nor did {tries} other Tor routes. You can try this one without Tor: {site} would then see your own address.": "{site} não respondeu pelo Tor (ignora alguns endereços do Tor), nem por {tries} outras rotas do Tor. Pode tentar este sem o Tor: {site} veria o seu próprio endereço."
 }

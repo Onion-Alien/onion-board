@@ -4121,5 +4121,6 @@
   ],
   "On top of any voice: they stay when you pick another one.": "فوق أي صوت: تبقى عندما تختار صوتًا آخر.",
   "Rain, a crowd, an echo or sounds from your board, on top of any voice": "مطر أو حشد أو صدى أو أصوات من لوحتك، فوق أي صوت",
-  "Take “{effect}” off": "أزل ”{effect}“"
+  "Take “{effect}” off": "أزل ”{effect}“",
+  "{site} didn't answer over Tor (it ignores some of Tor's addresses), and nor did {tries} other Tor routes. You can try this one without Tor: {site} would then see your own address.": "لم يردّ {site} عبر Tor (يتجاهل بعض عناوين Tor)، ولم تنجح {tries} طرق Tor أخرى أيضًا. يمكنك تجربة هذا بدون Tor: سيرى {site} عندها عنوانك الخاص."
 }

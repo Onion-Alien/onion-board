@@ -3721,5 +3721,6 @@
   ],
   "On top of any voice: they stay when you pick another one.": "어떤 목소리 위에도: 다른 목소리를 골라도 그대로예요.",
   "Rain, a crowd, an echo or sounds from your board, on top of any voice": "비, 군중, 메아리 또는 보드의 소리를 어떤 목소리 위에든",
-  "Take “{effect}” off": "“{effect}” 빼기"
+  "Take “{effect}” off": "“{effect}” 빼기",
+  "{site} didn't answer over Tor (it ignores some of Tor's addresses), and nor did {tries} other Tor routes. You can try this one without Tor: {site} would then see your own address.": "{site}이(가) Tor로 응답하지 않았고(Tor의 일부 주소를 무시함), 다른 Tor 경로 {tries}개에서도 마찬가지였습니다. Tor 없이 시도해 볼 수 있습니다. 그러면 {site}에 내 주소가 보입니다."
 }

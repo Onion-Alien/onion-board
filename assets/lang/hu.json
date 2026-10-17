@@ -3801,5 +3801,6 @@
   ],
   "On top of any voice: they stay when you pick another one.": "Bármelyik hang fölött: maradnak, ha másikat választasz.",
   "Rain, a crowd, an echo or sounds from your board, on top of any voice": "Eső, tömeg, visszhang vagy hangok a boardodról bármelyik hang fölött",
-  "Take “{effect}” off": "„{effect}” levétele"
+  "Take “{effect}” off": "„{effect}” levétele",
+  "{site} didn't answer over Tor (it ignores some of Tor's addresses), and nor did {tries} other Tor routes. You can try this one without Tor: {site} would then see your own address.": "{site} nem válaszolt Toron keresztül (a Tor néhány címét figyelmen kívül hagyja), és {tries} másik Tor-útvonalon sem. Kipróbálhatja ezt Tor nélkül is: {site} ekkor látni fogja a saját címét."
 }

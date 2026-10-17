@@ -3801,5 +3801,6 @@
   ],
   "On top of any voice: they stay when you pick another one.": "Oven på enhver stemme: de bliver, når du vælger en anden.",
   "Rain, a crowd, an echo or sounds from your board, on top of any voice": "Regn, en menneskemængde, ekko eller lyde fra dit board oven på enhver stemme",
-  "Take “{effect}” off": "Fjern “{effect}”"
+  "Take “{effect}” off": "Fjern “{effect}”",
+  "{site} didn't answer over Tor (it ignores some of Tor's addresses), and nor did {tries} other Tor routes. You can try this one without Tor: {site} would then see your own address.": "{site} svarede ikke over Tor (den ignorerer nogle af Tors adresser), og det gjorde {tries} andre Tor-ruter heller ikke. Du kan prøve denne uden Tor: {site} vil så se din egen adresse."
 }
