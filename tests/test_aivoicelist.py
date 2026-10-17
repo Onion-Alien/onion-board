@@ -326,3 +326,16 @@ def test_voices_sort_into_who_and_how_high():
     assert avl.pitch_band({"pitch_hz": "junk"}) == "low"
 
 
+
+
+def test_a_built_in_voice_shows_its_picture_when_there_is_one(qapp, monkeypatch):
+    from PySide6.QtGui import QIcon, QPixmap
+    from soundboard.ui import aivoicepanel, art
+    pic = QIcon(QPixmap(8, 8))
+    asked = []
+    monkeypatch.setattr(art, "icon",
+                        lambda key: asked.append(key) or (pic if key == "ai-voice-bear" else None))
+    by_id = {v["id"]: v for v in avl.BUILT_IN}
+    assert aivoicepanel.voice_icon(by_id["bear"]) is pic
+    assert aivoicepanel.voice_icon(by_id["nova"]) is not pic       # no picture: its emoji
+    assert aivoicepanel.art_key(mine()) == "" and asked == ["ai-voice-bear", "ai-voice-nova"]
