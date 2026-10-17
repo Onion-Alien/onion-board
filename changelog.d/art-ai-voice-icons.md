@@ -1,1 +1,0 @@
-- The AI voices have pictures now, drawn like the voice changer's.
