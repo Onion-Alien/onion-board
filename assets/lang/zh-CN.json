@@ -3737,5 +3737,8 @@
   "Go live": "开始直播",
   "Nothing new since the last save: play something in the program first.": "自上次保存以来没有新内容：请先在程序里播放点什么。",
   "You're muted, so only you hear “{name}”.": "你已静音，所以只有你能听到“{name}”。",
-  "{name} closed: the clip editor keeps what it heard.": "{name} 已关闭：剪辑编辑器会保留它听到的内容。"
+  "{name} closed: the clip editor keeps what it heard.": "{name} 已关闭：剪辑编辑器会保留它听到的内容。",
+  "Sorry, the store's down": "抱歉，商店暂时无法使用",
+  "Sorry, the store's down. We're working on getting it back up.": "抱歉，商店暂时无法使用。我们正在努力修复。",
+  "We're working on getting it back up. Try again in a bit.": "我们正在努力修复。请稍后再试。"
 }

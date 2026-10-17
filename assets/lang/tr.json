@@ -3817,5 +3817,8 @@
   "Go live": "Canlıya geç",
   "Nothing new since the last save: play something in the program first.": "Son kaydetmeden beri yeni bir şey yok: önce programda bir şey çal.",
   "You're muted, so only you hear “{name}”.": "Sesin kapalı, bu yüzden “{name}” sesini yalnızca sen duyuyorsun.",
-  "{name} closed: the clip editor keeps what it heard.": "{name} kapandı: klip düzenleyici duyduğunu saklıyor."
+  "{name} closed: the clip editor keeps what it heard.": "{name} kapandı: klip düzenleyici duyduğunu saklıyor.",
+  "Sorry, the store's down": "Üzgünüz, mağaza çöktü",
+  "Sorry, the store's down. We're working on getting it back up.": "Üzgünüz, mağaza çöktü. Yeniden açmak için çalışıyoruz.",
+  "We're working on getting it back up. Try again in a bit.": "Yeniden açmak için çalışıyoruz. Biraz sonra tekrar dene."
 }

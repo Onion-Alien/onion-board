@@ -3897,5 +3897,8 @@
   "Go live": "В эфир",
   "Nothing new since the last save: play something in the program first.": "Ничего нового с последнего сохранения: сначала включи что-нибудь в программе.",
   "You're muted, so only you hear “{name}”.": "У тебя выключен звук для других, поэтому «{name}» слышишь только ты.",
-  "{name} closed: the clip editor keeps what it heard.": "{name} закрылась: редактор клипов сохраняет то, что услышал."
+  "{name} closed: the clip editor keeps what it heard.": "{name} закрылась: редактор клипов сохраняет то, что услышал.",
+  "Sorry, the store's down": "Извини, магазин не работает",
+  "Sorry, the store's down. We're working on getting it back up.": "Извини, магазин не работает. Мы уже чиним его.",
+  "We're working on getting it back up. Try again in a bit.": "Мы уже чиним его. Попробуй ещё раз чуть позже."
 }

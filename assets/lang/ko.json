@@ -3737,5 +3737,8 @@
   "Go live": "라이브 켜기",
   "Nothing new since the last save: play something in the program first.": "마지막 저장 이후 새로운 소리가 없어요. 먼저 프로그램에서 뭔가 재생하세요.",
   "You're muted, so only you hear “{name}”.": "음소거 중이라 “{name}”은(는) 나만 들려요.",
-  "{name} closed: the clip editor keeps what it heard.": "{name}이(가) 종료됐어요. 클립 편집기는 들은 소리를 그대로 갖고 있어요."
+  "{name} closed: the clip editor keeps what it heard.": "{name}이(가) 종료됐어요. 클립 편집기는 들은 소리를 그대로 갖고 있어요.",
+  "Sorry, the store's down": "죄송해요, 스토어가 멈췄어요",
+  "Sorry, the store's down. We're working on getting it back up.": "죄송해요, 스토어가 멈췄어요. 다시 열기 위해 작업 중이에요.",
+  "We're working on getting it back up. Try again in a bit.": "다시 열기 위해 작업 중이에요. 잠시 후 다시 시도하세요."
 }

@@ -3817,5 +3817,8 @@
   "Go live": "Mag-live",
   "Nothing new since the last save: play something in the program first.": "Walang bago mula sa huling pag-save: magpatugtog muna ng kahit ano sa program.",
   "You're muted, so only you hear “{name}”.": "Naka-mute ka, kaya ikaw lang ang nakakarinig ng “{name}”.",
-  "{name} closed: the clip editor keeps what it heard.": "Nagsara ang {name}: itinatago ng clip editor ang narinig nito."
+  "{name} closed: the clip editor keeps what it heard.": "Nagsara ang {name}: itinatago ng clip editor ang narinig nito.",
+  "Sorry, the store's down": "Sorry, down ang store",
+  "Sorry, the store's down. We're working on getting it back up.": "Sorry, down ang store. Inaayos na namin para bumalik ito.",
+  "We're working on getting it back up. Try again in a bit.": "Inaayos na namin para bumalik ito. Subukan ulit mamaya."
 }

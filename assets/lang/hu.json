@@ -3817,5 +3817,8 @@
   "Go live": "Élőbe",
   "Nothing new since the last save: play something in the program first.": "Nincs semmi új a legutóbbi mentés óta: előbb játssz le valamit a programban.",
   "You're muted, so only you hear “{name}”.": "Le vagy némítva, így a(z) „{name}” hangot csak te hallod.",
-  "{name} closed: the clip editor keeps what it heard.": "{name} bezárult: a klipszerkesztő megtartja, amit hallott."
+  "{name} closed: the clip editor keeps what it heard.": "{name} bezárult: a klipszerkesztő megtartja, amit hallott.",
+  "Sorry, the store's down": "Bocsi, a bolt nem működik",
+  "Sorry, the store's down. We're working on getting it back up.": "Bocsi, a bolt nem működik. Dolgozunk rajta, hogy újra menjen.",
+  "We're working on getting it back up. Try again in a bit.": "Dolgozunk rajta, hogy újra menjen. Próbáld újra egy kicsit később."
 }

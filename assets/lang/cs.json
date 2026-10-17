@@ -3897,5 +3897,8 @@
   "Go live": "Zapnout živě",
   "Nothing new since the last save: play something in the program first.": "Od posledního uložení nic nového: nejdřív v programu něco pusť.",
   "You're muted, so only you hear “{name}”.": "Jsi ztlumený, takže „{name}“ slyšíš jen ty.",
-  "{name} closed: the clip editor keeps what it heard.": "{name} se zavřel: editor klipů si nechá, co slyšel."
+  "{name} closed: the clip editor keeps what it heard.": "{name} se zavřel: editor klipů si nechá, co slyšel.",
+  "Sorry, the store's down": "Promiň, obchod nefunguje",
+  "Sorry, the store's down. We're working on getting it back up.": "Promiň, obchod nefunguje. Pracujeme na tom, aby zase běžel.",
+  "We're working on getting it back up. Try again in a bit.": "Pracujeme na tom, aby zase běžel. Zkus to za chvíli."
 }

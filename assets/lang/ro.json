@@ -3897,5 +3897,8 @@
   "Go live": "Intră live",
   "Nothing new since the last save: play something in the program first.": "Nimic nou de la ultima salvare: redă mai întâi ceva în program.",
   "You're muted, so only you hear “{name}”.": "Ești pe mut, așa că doar tu auzi „{name}”.",
-  "{name} closed: the clip editor keeps what it heard.": "{name} s-a închis: editorul de clipuri păstrează ce a auzit."
+  "{name} closed: the clip editor keeps what it heard.": "{name} s-a închis: editorul de clipuri păstrează ce a auzit.",
+  "Sorry, the store's down": "Ne pare rău, magazinul nu merge",
+  "Sorry, the store's down. We're working on getting it back up.": "Ne pare rău, magazinul nu merge. Lucrăm să-l repornim.",
+  "We're working on getting it back up. Try again in a bit.": "Lucrăm să-l repornim. Încearcă din nou puțin mai târziu."
 }

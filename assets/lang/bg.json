@@ -3817,5 +3817,8 @@
   "Go live": "Включи се",
   "Nothing new since the last save: play something in the program first.": "Нищо ново от последното запазване: първо пусни нещо в програмата.",
   "You're muted, so only you hear “{name}”.": "Заглушен си, затова само ти чуваш „{name}“.",
-  "{name} closed: the clip editor keeps what it heard.": "{name} се затвори: редакторът на клипове пази каквото е чул."
+  "{name} closed: the clip editor keeps what it heard.": "{name} се затвори: редакторът на клипове пази каквото е чул.",
+  "Sorry, the store's down": "Съжаляваме, магазинът не работи",
+  "Sorry, the store's down. We're working on getting it back up.": "Съжаляваме, магазинът не работи. Работим по връщането му.",
+  "We're working on getting it back up. Try again in a bit.": "Работим по връщането му. Опитай пак след малко."
 }

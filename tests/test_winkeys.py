@@ -198,12 +198,13 @@ def test_raw_keys_are_named_like_registered_ones(vkey, scan, flags, numlock, out
     assert wk.raw_vk(vkey, scan, flags, numlock) == out
 
 
-def _shared(monkeypatch, mapping, down=(), own_front=False):
+def _shared(monkeypatch, mapping, down=(), own_front=False, text_focus=False):
     from PySide6.QtCore import QObject
     hk = wk.Hotkeys.__new__(wk.Hotkeys)
     QObject.__init__(hk)
     hk._held, hk._timer = {}, 1                 # a timer already running: none started
     hk._shared = {wk.parse(c): a for c, a in mapping.items()}
+    hk.text_focus = text_focus
     held = set(down)
     monkeypatch.setattr(wk, "is_down", lambda vk: vk in held)
     monkeypatch.setattr(wk, "own_window_in_front", lambda: own_front)
@@ -237,12 +238,32 @@ def test_a_shared_key_needs_its_exact_modifiers(monkeypatch):
 def test_typing_in_the_board_itself_doesnt_play_shared_letters(monkeypatch):
     """Shared keys reach the window in front too: in the board's search box, W types."""
     hk, held, fired = _shared(monkeypatch, {"w": "sound:a", "f1": "sound:b",
-                                            "ctrl+q": "sound:c"}, own_front=True)
+                                            "ctrl+q": "sound:c"}, own_front=True,
+                              text_focus=True)
     hk._key_down(0x57)
     hk._key_down(0x70)                          # F1 doesn't type: it plays
     held.add(0x11)
     hk._key_down(0x51)                          # nor does Ctrl+Q
     assert fired == ["sound:b", "sound:c"]
+
+
+def test_shared_letters_play_in_the_board_away_from_text_boxes(monkeypatch):
+    """The board in front with a pad or tab focused: W plays, as with a grabbed key."""
+    hk, held, fired = _shared(monkeypatch, {"w": "sound:a"}, own_front=True)
+    hk._key_down(0x57)
+    assert fired == ["sound:a"]
+
+
+def test_text_focus_follows_the_cursor(qapp):
+    """Only a text box that takes typing counts: not a button, not a read-only box."""
+    from PySide6.QtWidgets import QLineEdit, QPlainTextEdit, QPushButton, QSpinBox
+    hk = wk.Hotkeys.__new__(wk.Hotkeys)
+    ro = QPlainTextEdit()
+    ro.setReadOnly(True)
+    for w, typing in ((QLineEdit(), True), (QSpinBox(), True), (QPlainTextEdit(), True),
+                      (ro, False), (QPushButton(), False), (None, False)):
+        hk._focus_changed(w)
+        assert hk.text_focus is typing, w
 
 
 @pytest.mark.windows   # RegisterHotKey and raw input

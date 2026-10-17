@@ -181,6 +181,58 @@ def test_a_failed_list_says_why_and_retries(qapp, fake):
     t.shutdown()
 
 
+def test_store_down_shows_bun_kicking_the_ground_then_the_list(qapp, fake, monkeypatch):
+    # the server answers with an error of its own: the store's down, not the user's fault
+    down = store.StoreDown("Sorry, the store's down. We're working on getting it back up.")
+    plain = store._request
+
+    def broken(method, path, *a, **kw):
+        if path.startswith("/v1/sounds?"):
+            raise down
+        return plain(method, path, *a, **kw)
+    monkeypatch.setattr(store, "_request", broken)
+    t = _tab(qapp, [], [])
+    assert _wait(qapp, lambda: t.stack.currentWidget() is t.message
+                 and t.msg_btn.isVisibleTo(t))
+    assert t.msg_title.text() == storetab._("Sorry, the store's down")
+    assert "working on" in t.msg_text.text()
+    assert t.msg_bun.isVisibleTo(t) and t.msg_bun.sulk and not t.msg_icon.isVisibleTo(t)
+    assert not t.bun.isVisibleTo(t)   # one Bun, the sad one
+    t.resize(800, 300)                # no room for him: the words stay
+    assert _wait(qapp, lambda: not t.msg_bun.isVisibleTo(t))
+    assert t.msg_title.isVisibleTo(t)
+    t.resize(800, 600)
+    monkeypatch.setattr(store, "_request", plain)
+    t.msg_btn.click()
+    assert _wait(qapp, lambda: len(t._rows) == 2)
+    assert not t.msg_bun.isVisibleTo(t) and t.bun.isVisibleTo(t)
+    t.shutdown()
+
+
+def test_server_errors_mean_the_store_is_down(monkeypatch):
+    import urllib.error
+
+    def answer(code, err):
+        def urlopen(req, timeout=0, feature=""):
+            raise urllib.error.HTTPError("u", code, "x", {},
+                                         io.BytesIO(json.dumps({"error": err}).encode()))
+        monkeypatch.setattr(net, "urlopen", urlopen)
+        with pytest.raises(store.StoreError) as e:
+            store._request("GET", "/v1/sounds")
+        return e.value
+    assert isinstance(answer(500, "server"), store.StoreDown)
+    assert isinstance(answer(502, ""), store.StoreDown)
+    assert not isinstance(answer(503, "queue full"), store.StoreDown)   # its own message
+    assert not isinstance(answer(404, "not found"), store.StoreDown)
+
+
+def test_bun_kicks_back_then_out_then_rests():
+    from soundboard.ui.bunnywidget import SULK_EVERY, sulk_kick
+    ks = [sulk_kick(SULK_EVERY * i / 100)[0] for i in range(100)]
+    assert min(ks) < -0.5 and max(ks) > 0.95 and ks[-1] == 0.0
+    assert ks.index(min(ks)) < ks.index(max(ks))   # draws back, then kicks
+
+
 def test_switched_off_contacts_nobody(qapp, fake, monkeypatch):
     monkeypatch.setattr(net, "allowed", lambda f: f != store.FEATURE)
     t = _tab(qapp, [], [])

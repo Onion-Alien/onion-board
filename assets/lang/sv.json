@@ -3817,5 +3817,8 @@
   "Go live": "Gå live",
   "Nothing new since the last save: play something in the program first.": "Inget nytt sedan senaste sparningen: spela upp något i programmet först.",
   "You're muted, so only you hear “{name}”.": "Du är tystad, så bara du hör ”{name}”.",
-  "{name} closed: the clip editor keeps what it heard.": "{name} stängdes: klippredigeraren behåller det den hörde."
+  "{name} closed: the clip editor keeps what it heard.": "{name} stängdes: klippredigeraren behåller det den hörde.",
+  "Sorry, the store's down": "Sorry, butiken ligger nere",
+  "Sorry, the store's down. We're working on getting it back up.": "Sorry, butiken ligger nere. Vi jobbar på att få upp den igen.",
+  "We're working on getting it back up. Try again in a bit.": "Vi jobbar på att få upp den igen. Försök igen om en stund."
 }

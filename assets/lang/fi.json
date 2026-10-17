@@ -3817,5 +3817,8 @@
   "Go live": "Mene liveen",
   "Nothing new since the last save: play something in the program first.": "Ei mitään uutta viime tallennuksen jälkeen: soita ensin jotain ohjelmassa.",
   "You're muted, so only you hear “{name}”.": "Olet mykistetty, joten vain sinä kuulet ”{name}”.",
-  "{name} closed: the clip editor keeps what it heard.": "{name} sulkeutui: leike-editori pitää sen, mitä se kuuli."
+  "{name} closed: the clip editor keeps what it heard.": "{name} sulkeutui: leike-editori pitää sen, mitä se kuuli.",
+  "Sorry, the store's down": "Sori, kauppa on alhaalla",
+  "Sorry, the store's down. We're working on getting it back up.": "Sori, kauppa on alhaalla. Korjaamme sitä takaisin toimintaan.",
+  "We're working on getting it back up. Try again in a bit.": "Korjaamme sitä takaisin toimintaan. Yritä hetken päästä uudelleen."
 }

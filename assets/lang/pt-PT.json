@@ -3817,5 +3817,8 @@
   "Go live": "Entrar em direto",
   "Nothing new since the last save: play something in the program first.": "Nada de novo desde a última gravação: reproduz primeiro algo no programa.",
   "You're muted, so only you hear “{name}”.": "Estás silenciado, por isso só tu ouves «{name}».",
-  "{name} closed: the clip editor keeps what it heard.": "{name} fechou: o editor de clips guarda o que ouviu."
+  "{name} closed: the clip editor keeps what it heard.": "{name} fechou: o editor de clips guarda o que ouviu.",
+  "Sorry, the store's down": "Desculpa, a loja está em baixo",
+  "Sorry, the store's down. We're working on getting it back up.": "Desculpa, a loja está em baixo. Estamos a trabalhar para a pôr de volta.",
+  "We're working on getting it back up. Try again in a bit.": "Estamos a trabalhar para a pôr de volta. Tenta novamente daqui a pouco."
 }

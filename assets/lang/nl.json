@@ -3817,5 +3817,8 @@
   "Go live": "Live gaan",
   "Nothing new since the last save: play something in the program first.": "Niets nieuws sinds de vorige keer opslaan: speel eerst iets af in het programma.",
   "You're muted, so only you hear “{name}”.": "Je bent gedempt, dus alleen jij hoort ‘{name}’.",
-  "{name} closed: the clip editor keeps what it heard.": "{name} is gesloten: de clipeditor houdt wat hij gehoord heeft."
+  "{name} closed: the clip editor keeps what it heard.": "{name} is gesloten: de clipeditor houdt wat hij gehoord heeft.",
+  "Sorry, the store's down": "Sorry, de winkel ligt eruit",
+  "Sorry, the store's down. We're working on getting it back up.": "Sorry, de winkel ligt eruit. We werken eraan om hem weer online te krijgen.",
+  "We're working on getting it back up. Try again in a bit.": "We werken eraan om hem weer online te krijgen. Probeer het zo nog eens."
 }

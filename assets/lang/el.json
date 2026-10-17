@@ -3817,5 +3817,8 @@
   "Go live": "Ζωντανά",
   "Nothing new since the last save: play something in the program first.": "Τίποτα νέο από την τελευταία αποθήκευση: παίξε πρώτα κάτι στο πρόγραμμα.",
   "You're muted, so only you hear “{name}”.": "Είσαι σε σίγαση, οπότε μόνο εσύ ακούς το «{name}».",
-  "{name} closed: the clip editor keeps what it heard.": "Το {name} έκλεισε: ο επεξεργαστής κλιπ κρατά ό,τι άκουσε."
+  "{name} closed: the clip editor keeps what it heard.": "Το {name} έκλεισε: ο επεξεργαστής κλιπ κρατά ό,τι άκουσε.",
+  "Sorry, the store's down": "Συγγνώμη, το κατάστημα δεν λειτουργεί",
+  "Sorry, the store's down. We're working on getting it back up.": "Συγγνώμη, το κατάστημα δεν λειτουργεί. Δουλεύουμε για να επανέλθει.",
+  "We're working on getting it back up. Try again in a bit.": "Δουλεύουμε για να επανέλθει. Δοκίμασε ξανά σε λίγο."
 }
