@@ -1011,9 +1011,9 @@
     cv.addEventListener("pointercancel", up);
     cv.addEventListener("pointerleave", function () { if (hover) { hover = null; redraw(); } tip.hidden = true; });
     cv.addEventListener("dblclick", function (e) { var p = local(e); zoomAt(2, p[0], p[1]); });
-    // the wheel zooms only full screen or with Ctrl: on the page it scrolls the page
+    // the wheel zooms only with Ctrl: on the page it scrolls the page
     cv.addEventListener("wheel", function (e) {
-      if (!e.ctrlKey && !root.classList.contains("full")) return;
+      if (!e.ctrlKey) return;
       e.preventDefault();
       var p = local(e);
       zoomAt(e.deltaY < 0 ? 1.25 : 0.8, p[0], p[1]);
@@ -2008,7 +2008,7 @@
 
     // its own hotkeys, while it has focus (in the app they work everywhere)
     root.addEventListener("keydown", function (e) {
-      if (e.key === "Escape") { if (R.pop && !R.menu && !root.querySelector(".ob-veil")) { var a = R.pop.anchor; closeLive(); a.focus({ preventScroll: true }); e.stopPropagation(); } else if (R.menu) { closeMenu(); e.stopPropagation(); } else if (root.classList.contains("full")) full(false); return; }
+      if (e.key === "Escape") { if (R.pop && !R.menu && !root.querySelector(".ob-veil")) { var a = R.pop.anchor; closeLive(); a.focus({ preventScroll: true }); e.stopPropagation(); } else if (R.menu) { closeMenu(); e.stopPropagation(); } return; }
       var tag = (e.target.tagName || "").toLowerCase();
       if (tag === "input" || tag === "select" || tag === "textarea" || e.repeat || root.querySelector(".ob-veil")) return;
       var k = (e.ctrlKey ? "Ctrl+" : "") + (e.altKey ? "Alt+" : "") + (e.shiftKey ? "Shift+" : "") + (e.key.length === 1 ? e.key.toUpperCase() : e.key);
@@ -2028,19 +2028,8 @@
     }).observe(root);
     return root;
   }
-  function full(on) {
-    root.classList.toggle("full", on);
-    document.body.classList.toggle("ob-locked", on);
-    if (on) {
-      R.unfull = h("button", { type: "button", class: "ob-unfull", text: "Exit full screen (Esc)", onclick: function () { full(false); } });
-      document.body.appendChild(R.unfull);
-      did("full");
-    } else if (R.unfull) { R.unfull.remove(); R.unfull = null; }
-    root.focus({ preventScroll: true });
-  }
-
   // The site's look switcher picks the same theme in the demo.
-  var lookToTheme = { dark: "Dark", light: "Light", ocean: "Ocean", hacker: "Hacker", synthwave: "Synthwave", "blood-moon": "Blood Moon" };
+  var lookToTheme = { dark: "Dark", light: "Light", ocean: "Ocean", hacker: "Hacker", synthwave: "Synthwave", "blood-moon": "Blood Moon", halloween: "Halloween" };
   window.OnionBoardDemo = {
     look: function (name) {
       var t = lookToTheme[name] || "Dark";
@@ -2054,8 +2043,7 @@
         var v = /^[\w.\-]+$/.test(r.version || "") ? r.version : "2";
         var el = build(v);
         var chrome = h("div", { class: "ob-chrome" }, [
-          h("span", { text: "A working copy of the app, right here. Click, right-click, drop in your own sounds." }),
-          h("button", { type: "button", onclick: function () { full(true); } }, ["⛶ Full screen"])
+          h("span", { text: "A working copy of the app, right here. Click, right-click, drop in your own sounds." })
         ]);
         frame.classList.add("live");
         box.classList.add("live");

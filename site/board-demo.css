@@ -25,7 +25,6 @@
 .ob .i.l { width: 22px; height: 22px; }
 .ob .sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
 .ob [hidden] { display: none !important; }
-.ob.full { position: fixed; inset: 0; z-index: 1000; height: auto; border-radius: 0; }
 .ob b, .ob strong { font-weight: 600; }
 
 /* ------------------------------------------------------------------ the sidebar */
@@ -393,12 +392,6 @@
 
 /* ------------------------------------------------------------------ the frame around it */
 .ob-chrome { display: flex; align-items: center; justify-content: center; gap: 10px; flex-wrap: wrap; margin: 0 0 12px; color: var(--muted); font-size: 14px; }
-.ob-chrome button { display: inline-flex; align-items: center; gap: 6px; padding: 5px 12px; border: 1px solid var(--edge2); border-radius: 999px;
-                    background: rgba(255,255,255,.04); color: var(--text); font: 13px var(--body); cursor: pointer; }
-.ob-chrome button:hover { background: rgba(255,255,255,.1); }
-.ob-unfull { position: fixed; top: 8px; right: 8px; z-index: 1001; padding: 6px 12px; border-radius: 8px; border: 1px solid #555;
-             background: #222; color: #fff; font: 13px system-ui, sans-serif; cursor: pointer; }
-body.ob-locked { overflow: hidden; }
 
 /* ------------------------------------------------------------------ narrow windows */
 @container ob (max-width: 1000px) {
