@@ -120,7 +120,8 @@ class VoiceStatusBar(QFrame):
         self.lbl_heard = icon_label("ear", _("What others hear from your mic"))
         self.lbl_heard.setFixedHeight(ROW_H)
         rh.addWidget(self.lbl_heard)
-        box.addWidget(right, 0)
+        # centred on the mic row: Stop is taller than the chips, which sat high
+        box.addWidget(right, 0, Qt.AlignmentFlag.AlignVCenter)
         self.chips: dict[str, Chip | QLabel] = {}
         self._no_mic = None
 
