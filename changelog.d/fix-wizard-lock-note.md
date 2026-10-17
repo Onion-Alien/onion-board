@@ -1,0 +1,1 @@
+- Quick setup: pressing X or Esc while Bun is putting your sounds into your mic now says "Bun's almost done, one moment" instead of doing nothing.

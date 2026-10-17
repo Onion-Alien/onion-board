@@ -3865,7 +3865,6 @@
   "You're muted, so only you hear “{name}”.": "Masz wyciszenie, więc tylko ty słyszysz „{name}”.",
   "{name} closed: the clip editor keeps what it heard.": "{name} się zamknął: edytor klipów zachowuje to, co usłyszał.",
   "Sorry, the store's down": "Przepraszamy, sklep nie działa",
-  "Sorry, the store's down. We're working on getting it back up.": "Przepraszamy, sklep nie działa. Pracujemy nad tym, żeby znów ruszył.",
   "We're working on getting it back up. Try again in a bit.": "Pracujemy nad tym, żeby znów ruszył. Spróbuj ponownie za chwilę.",
   "A voice chat's noise suppression can wipe these out, deep bass too. Discord: Input Profile → Studio.": "Tłumienie szumów w czacie głosowym może je wymazać, głęboki bas też. Discord: Profil wejścia → Studio.",
   "Full board": "Pełna tablica",
@@ -4169,5 +4168,13 @@
   "Uncommon": "Niepospolity",
   "<b>{device}</b> looks like speakers, so your mic hears itself. Keep them quiet or use headphones. If it starts to squeal, this switches off by itself.": "<b>{device}</b> wygląda na głośniki, więc mikrofon słyszy sam siebie. Ścisz je albo użyj słuchawek. Jeśli zacznie piszczeć, to wyłączy się samo.",
   "Stopped <b>Hear what they hear</b>: your mic was picking up your speakers and started to squeal. Use headphones, or turn the speakers down.": "Zatrzymano <b>Słuchaj jak inni</b>: mikrofon łapał dźwięk z głośników i zaczął piszczeć. Użyj słuchawek albo ścisz głośniki.",
-  "Rain on a window": "Deszcz na szybie"
+  "Rain on a window": "Deszcz na szybie",
+  "Bun's almost done, one moment.": "Bun prawie skończył, chwileczkę.",
+  "It'll be back in about {n} hour.": [
+    "Wróci za około {n} godzinę.",
+    "Wróci za około {n} godziny.",
+    "Wróci za około {n} godzin."
+  ],
+  "It'll be back in under an hour.": "Wróci za mniej niż godzinę.",
+  "The store's down for maintenance": "Sklep nie działa z powodu prac serwisowych"
 }

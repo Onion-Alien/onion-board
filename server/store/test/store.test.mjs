@@ -3,7 +3,7 @@ import test from "node:test";
 import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import { DatabaseSync } from "node:sqlite";
-import worker, { prune, catCounts } from "../src/index.js";
+import worker, { prune, catCounts, overLimit } from "../src/index.js";
 import { jobs, parseMyinstants } from "../src/sync.js";
 import { audioType } from "../src/audio.js";
 
@@ -744,4 +744,23 @@ test("a thumbs up counts for Trending for a week, then the daily cron lets it go
   assert.equal(env.DB.rows("SELECT likes FROM sounds WHERE id = ?", mario)[0].likes, 1);
   await prune(env, Math.floor(Date.now() / 1000) + 8 * 86400);
   assert.equal(env.DB.rows("SELECT likes FROM sounds WHERE id = ?", mario)[0].likes, 0);
+});
+
+test("the free plan's daily limit used up: 503 'maintenance' with when it's back, not a 500", async () => {
+  const env = store();
+  const limit = new Error("D1_ERROR: Your account has exceeded D1's free tier daily row read limit. "
+    + "Upgrade to a paid plan or wait until tomorrow (midnight UTC) to continue.");
+  env.DB.prepare = () => { throw limit; };
+  const res = await call(env, "/v1/sounds");
+  assert.equal(res.status, 503);
+  const body = res.body;
+  assert.equal(body.error, "maintenance");
+  assert.ok(body.in > 0 && body.in <= 86400);
+  assert.equal(res.headers.get("retry-after"), String(body.in));
+  env.DB.prepare = () => { throw new Error("no such column: x"); };   // a real bug stays a 500
+  const bug = await call(env, "/v1/sounds");
+  assert.equal(bug.status, 500);
+  assert.equal(bug.body.error, "server");
+  assert.ok(overLimit(new Error("KV get() limit exceeded for the day.")));
+  assert.ok(!overLimit(new Error("network connection lost")));
 });

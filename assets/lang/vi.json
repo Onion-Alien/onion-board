@@ -3709,7 +3709,6 @@
   "You're muted, so only you hear “{name}”.": "Bạn đang tắt tiếng, nên chỉ bạn nghe thấy “{name}”.",
   "{name} closed: the clip editor keeps what it heard.": "{name} đã đóng: trình chỉnh sửa clip giữ lại những gì nó đã nghe.",
   "Sorry, the store's down": "Xin lỗi, cửa hàng đang gặp sự cố",
-  "Sorry, the store's down. We're working on getting it back up.": "Xin lỗi, cửa hàng đang gặp sự cố. Chúng tôi đang khắc phục.",
   "We're working on getting it back up. Try again in a bit.": "Chúng tôi đang khắc phục. Hãy thử lại sau ít phút.",
   "A voice chat's noise suppression can wipe these out, deep bass too. Discord: Input Profile → Studio.": "Tính năng khử tiếng ồn của trò chuyện thoại có thể xóa mất các hiệu ứng này, cả âm trầm sâu. Discord: Hồ sơ đầu vào → Studio.",
   "Full board": "Bảng đầy đủ",
@@ -4013,5 +4012,11 @@
   "Uncommon": "Không phổ biến",
   "<b>{device}</b> looks like speakers, so your mic hears itself. Keep them quiet or use headphones. If it starts to squeal, this switches off by itself.": "<b>{device}</b> có vẻ là loa, nên mic nghe thấy chính nó. Hãy để nhỏ hoặc dùng tai nghe. Nếu bắt đầu rú rít, chức năng này sẽ tự tắt.",
   "Stopped <b>Hear what they hear</b>: your mic was picking up your speakers and started to squeal. Use headphones, or turn the speakers down.": "Đã dừng <b>Nghe như họ nghe</b>: mic thu lại tiếng loa và bắt đầu rú rít. Hãy dùng tai nghe, hoặc vặn nhỏ loa.",
-  "Rain on a window": "Mưa trên cửa sổ"
+  "Rain on a window": "Mưa trên cửa sổ",
+  "Bun's almost done, one moment.": "Bun sắp xong rồi, đợi một chút nhé.",
+  "It'll be back in about {n} hour.": [
+    "Sẽ hoạt động lại sau khoảng {n} giờ."
+  ],
+  "It'll be back in under an hour.": "Sẽ hoạt động lại trong chưa đầy một giờ.",
+  "The store's down for maintenance": "Cửa hàng đang bảo trì"
 }

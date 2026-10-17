@@ -56,6 +56,7 @@ TICK_MS = 40            # the mic page's meter
 SETTLE_MS = 60          # after a step change, the window settles to what the steps need
 SLOW_TICK_MS = 250      # the other pages: only the cable installer to keep up with
 LOCK_MAX_S = 180        # the mic set-up holds the guide shut at most this long
+LOCK_NOTE_MS = 3000     # how long "almost done" shows when they try to close it then
 DISCORD_READ_MS = 2000  # the last step re-reads Discord's own settings this often
 # ...on one kept thread for every guide: a new thread each time made the window wait in
 # Thread.start (2.2.2's freeze at _read_discord, pollthread.py)
@@ -1293,8 +1294,11 @@ class SetupWizard(QDialog):
     def reject(self):
         """Esc / the window's X. Mid-install, check first: the install carries on
         either way, and reopening the guide picks it back up. While the mic is set up,
-        they do nothing (_locked)."""
+        the guide stays open (_locked) and says so, so the X doesn't look broken."""
         if self._locked():
+            # the app's toast, spinner and all (one at a time: pressed again, it's renewed)
+            busy.toast(self, _("Bun's almost done, one moment."), "busy", LOCK_NOTE_MS,
+                       key="setup-almost-done")
             return
         if self._proc is not None and self._proc.poll() is None and QMessageBox.question(
                 self, _("Still installing"),

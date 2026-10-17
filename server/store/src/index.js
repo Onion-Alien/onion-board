@@ -45,6 +45,12 @@ export default {
     } catch (e) {
       if (e instanceof Answer) return e.response;
       console.error(e && e.stack || e);
+      // the free plan's daily limit is used up: nothing's broken, it's back at midnight UTC
+      // (the app says "down for maintenance, back in about N hours")
+      if (overLimit(e)) {
+        const wait = 86400 - now() % 86400;
+        return json({ error: "maintenance", in: wait }, 503, { "retry-after": String(wait) });
+      }
       return json({ error: "server" }, 500);
     }
   },
@@ -69,6 +75,12 @@ export async function prune(env, at = now()) {
 
 class Answer extends Error {
   constructor(response) { super("answer"); this.response = response; }
+}
+
+// one of Cloudflare's free-plan daily limits (D1's rows, KV's reads or writes) ran out
+export function overLimit(e) {
+  const msg = String(e && e.message || e);
+  return /free tier|daily .*limit|limit .*exceeded|exceeded .*limit/i.test(msg);
 }
 
 function json(body, status = 200, headers = {}) {

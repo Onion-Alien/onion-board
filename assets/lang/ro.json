@@ -3865,7 +3865,6 @@
   "You're muted, so only you hear “{name}”.": "Ești pe mut, așa că doar tu auzi „{name}”.",
   "{name} closed: the clip editor keeps what it heard.": "{name} s-a închis: editorul de clipuri păstrează ce a auzit.",
   "Sorry, the store's down": "Ne pare rău, magazinul nu merge",
-  "Sorry, the store's down. We're working on getting it back up.": "Ne pare rău, magazinul nu merge. Lucrăm să-l repornim.",
   "We're working on getting it back up. Try again in a bit.": "Lucrăm să-l repornim. Încearcă din nou puțin mai târziu.",
   "A voice chat's noise suppression can wipe these out, deep bass too. Discord: Input Profile → Studio.": "Suprimarea zgomotului dintr-un chat vocal le poate șterge, și basul adânc. Discord: Profil de intrare → Studio.",
   "Full board": "Board întreg",
@@ -4169,5 +4168,13 @@
   "Uncommon": "Neobișnuit",
   "<b>{device}</b> looks like speakers, so your mic hears itself. Keep them quiet or use headphones. If it starts to squeal, this switches off by itself.": "<b>{device}</b> pare să fie boxe, deci microfonul se aude pe sine. Ține-le încet sau folosește căști. Dacă începe să fluiere, se oprește singur.",
   "Stopped <b>Hear what they hear</b>: your mic was picking up your speakers and started to squeal. Use headphones, or turn the speakers down.": "Oprit <b>Auzi ce aud ei</b>: microfonul prindea boxele și a început să fluiere. Folosește căști sau dă boxele mai încet.",
-  "Rain on a window": "Ploaie pe geam"
+  "Rain on a window": "Ploaie pe geam",
+  "Bun's almost done, one moment.": "Bun aproape a terminat, o clipă.",
+  "It'll be back in about {n} hour.": [
+    "Revine în aproximativ {n} oră.",
+    "Revine în aproximativ {n} ore.",
+    "Revine în aproximativ {n} de ore."
+  ],
+  "It'll be back in under an hour.": "Revine în mai puțin de o oră.",
+  "The store's down for maintenance": "Magazinul e oprit pentru mentenanță"
 }
