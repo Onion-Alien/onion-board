@@ -842,6 +842,7 @@ class MainWindow(QMainWindow):
             v.fx.set_tip_enabled(not self.cfg.voice_discord_tip_shown)
             v.fx.chat_help.connect(lambda: self.statusctl.show_chat_guide("discord"))
             v.fx.hotkey_asked.connect(self.hkctl.set_voice_hotkey)
+            v.share_asked.connect(self.share_voice)
             v.fx.hotkey_cleared.connect(lambda n: self.hkctl.set_voice_hotkey(n, ""))
             v.fx.renamed.connect(self.hkctl.voice_renamed)
             v.fx.keys = dict(self.cfg.voice_hotkeys)
@@ -854,7 +855,7 @@ class MainWindow(QMainWindow):
         elif key == "store":
             v = StoreTab(self.cfg, lambda path: self.impctl.import_files([path]),
                          self._store_sample, lambda: self.setctl.open_settings("privacy"),
-                         self._save_later, self._store_link)
+                         self._save_later, self._store_link, self._voice_hooks())
             return v
         else:
             # the Onion Watch add-on, or Hoot and its download button until it's
@@ -862,6 +863,27 @@ class MainWindow(QMainWindow):
             v = TriggersTab(BoardHost(self), defer=True)
         v.active_changed.connect(lambda on, k=key: self.tabctl._tab_live(k, on))
         return v
+
+    def _voice_hooks(self):
+        """What the Store's Voices use of the Voice tab (its lists of your voices)."""
+        from soundboard.ui.storevoices import VoiceHooks
+        return VoiceHooks(lambda: (self.voice if isinstance(getattr(self, "voice", None),
+                                                            VoicePanel) else None))
+
+    def share_voice(self, pick: str = ""):
+        """The Voice tab's "Share to the store…": the Share a voice window on that voice."""
+        import html
+
+        from soundboard import net, store
+        from soundboard.ui.storevoices import open_share
+        if not net.allowed(store.FEATURE):
+            busy.toast(self, html.escape(net.off_message(store.FEATURE)), "error")
+            return
+        new = not getattr(self.cfg, "store_id", "")
+        install = store.install_id(self.cfg)
+        if new:
+            self._save_later()
+        open_share(self, install, self._voice_hooks(), pick)
 
     def _store_link(self, url: str, name: str, kind: str):
         """A shared link in the Store tab: played once or added, downloaded from its
