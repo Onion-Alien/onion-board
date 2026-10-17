@@ -3666,5 +3666,10 @@
   "{pct}%": "{pct} %",
   "{pct}%, about {time} left": "{pct} %, ca. {time} tilbage",
   "“{name}” can't play until its effects are applied ({how})": "“{name}” kan ikke spille, før effekterne er lagt på ({how})",
-  "✓ “{name}” is ready to play": "✓ “{name}” er klar til at spille"
+  "✓ “{name}” is ready to play": "✓ “{name}” er klar til at spille",
+  "Couldn't put the AI voice on “{name}”: {why}": "Kunne ikke lægge AI-stemmen på “{name}”: {why}",
+  "Couldn't start the AI voice: {why}": "Kunne ikke starte AI-stemmen: {why}",
+  "Getting the AI voice ready…": "Gør AI-stemmen klar…",
+  "Putting the AI voice on “{name}”… {pct}%": "Lægger AI-stemmen på “{name}”… {pct} %",
+  "The AI voices add-on isn't installed, so only the voice changer part of “{name}” is on.": "Tilføjelsen til AI-stemmer er ikke installeret, så kun stemmeskifter-delen af “{name}” er slået til."
 }

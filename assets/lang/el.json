@@ -3666,5 +3666,10 @@
   "{pct}%": "{pct}%",
   "{pct}%, about {time} left": "{pct}%, απομένουν περίπου {time}",
   "“{name}” can't play until its effects are applied ({how})": "Το \"{name}\" δεν μπορεί να παίξει μέχρι να εφαρμοστούν τα εφέ του ({how})",
-  "✓ “{name}” is ready to play": "✓ Το \"{name}\" είναι έτοιμο να παίξει"
+  "✓ “{name}” is ready to play": "✓ Το \"{name}\" είναι έτοιμο να παίξει",
+  "Couldn't put the AI voice on “{name}”: {why}": "Δεν μπήκε η φωνή AI στο \"{name}\": {why}",
+  "Couldn't start the AI voice: {why}": "Η φωνή AI δεν ξεκίνησε: {why}",
+  "Getting the AI voice ready…": "Ετοιμάζεται η φωνή AI…",
+  "Putting the AI voice on “{name}”… {pct}%": "Μπαίνει η φωνή AI στο \"{name}\"… {pct}%",
+  "The AI voices add-on isn't installed, so only the voice changer part of “{name}” is on.": "Το πρόσθετο φωνών AI δεν είναι εγκατεστημένο, οπότε από το \"{name}\" είναι ενεργή μόνο η αλλαγή φωνής."
 }

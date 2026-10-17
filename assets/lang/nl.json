@@ -3666,5 +3666,10 @@
   "{pct}%": "{pct}%",
   "{pct}%, about {time} left": "{pct}%, nog ongeveer {time}",
   "“{name}” can't play until its effects are applied ({how})": "“{name}” kan pas spelen als de effecten klaar zijn ({how})",
-  "✓ “{name}” is ready to play": "✓ “{name}” is klaar om te spelen"
+  "✓ “{name}” is ready to play": "✓ “{name}” is klaar om te spelen",
+  "Couldn't put the AI voice on “{name}”: {why}": "Kon de AI-stem niet op “{name}” zetten: {why}",
+  "Couldn't start the AI voice: {why}": "Kon de AI-stem niet starten: {why}",
+  "Getting the AI voice ready…": "AI-stem wordt klaargezet…",
+  "Putting the AI voice on “{name}”… {pct}%": "AI-stem wordt op “{name}” gezet… {pct}%",
+  "The AI voices add-on isn't installed, so only the voice changer part of “{name}” is on.": "De add-on voor AI-stemmen is niet geïnstalleerd, dus alleen de stemveranderaar van “{name}” staat aan."
 }

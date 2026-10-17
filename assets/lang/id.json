@@ -3588,5 +3588,10 @@
   "{pct}%": "{pct}%",
   "{pct}%, about {time} left": "{pct}%, sekitar {time} lagi",
   "“{name}” can't play until its effects are applied ({how})": "“{name}” belum bisa diputar sampai efeknya selesai diterapkan ({how})",
-  "✓ “{name}” is ready to play": "✓ “{name}” siap diputar"
+  "✓ “{name}” is ready to play": "✓ “{name}” siap diputar",
+  "Couldn't put the AI voice on “{name}”: {why}": "Tidak bisa memasang suara AI ke “{name}”: {why}",
+  "Couldn't start the AI voice: {why}": "Tidak bisa memulai suara AI: {why}",
+  "Getting the AI voice ready…": "Menyiapkan suara AI…",
+  "Putting the AI voice on “{name}”… {pct}%": "Memasang suara AI ke “{name}”… {pct}%",
+  "The AI voices add-on isn't installed, so only the voice changer part of “{name}” is on.": "Add-on suara AI belum terpasang, jadi hanya bagian pengubah suara dari “{name}” yang aktif."
 }

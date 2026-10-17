@@ -3744,5 +3744,10 @@
   "{pct}%": "{pct}%",
   "{pct}%, about {time} left": "{pct}%, осталось около {time}",
   "“{name}” can't play until its effects are applied ({how})": "«{name}» не сыграет, пока не применятся его эффекты ({how})",
-  "✓ “{name}” is ready to play": "✓ «{name}» готов к воспроизведению"
+  "✓ “{name}” is ready to play": "✓ «{name}» готов к воспроизведению",
+  "Couldn't put the AI voice on “{name}”: {why}": "Не удалось наложить ИИ-голос на «{name}»: {why}",
+  "Couldn't start the AI voice: {why}": "Не удалось запустить ИИ-голос: {why}",
+  "Getting the AI voice ready…": "Готовлю ИИ-голос…",
+  "Putting the AI voice on “{name}”… {pct}%": "Накладываю ИИ-голос на «{name}»… {pct}%",
+  "The AI voices add-on isn't installed, so only the voice changer part of “{name}” is on.": "Дополнение с ИИ-голосами не установлено, поэтому из «{name}» включена только смена голоса."
 }

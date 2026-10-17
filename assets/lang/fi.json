@@ -3666,5 +3666,10 @@
   "{pct}%": "{pct} %",
   "{pct}%, about {time} left": "{pct} %, noin {time} jäljellä",
   "“{name}” can't play until its effects are applied ({how})": "\"{name}\" ei soi ennen kuin sen efektit on lisätty ({how})",
-  "✓ “{name}” is ready to play": "✓ \"{name}\" on valmis soimaan"
+  "✓ “{name}” is ready to play": "✓ \"{name}\" on valmis soimaan",
+  "Couldn't put the AI voice on “{name}”: {why}": "AI-ääntä ei saatu lisättyä kohteeseen \"{name}\": {why}",
+  "Couldn't start the AI voice: {why}": "AI-ääni ei käynnistynyt: {why}",
+  "Getting the AI voice ready…": "AI-ääntä valmistellaan…",
+  "Putting the AI voice on “{name}”… {pct}%": "Lisätään AI-ääntä kohteeseen \"{name}\"… {pct} %",
+  "The AI voices add-on isn't installed, so only the voice changer part of “{name}” is on.": "AI-äänien lisäosaa ei ole asennettu, joten \"{name}\" on päällä vain äänenmuuttajan osalta."
 }

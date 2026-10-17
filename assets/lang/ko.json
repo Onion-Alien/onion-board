@@ -3588,5 +3588,10 @@
   "{pct}%": "{pct}%",
   "{pct}%, about {time} left": "{pct}%, 약 {time} 남음",
   "“{name}” can't play until its effects are applied ({how})": "“{name}”은(는) 효과 적용이 끝나야 재생할 수 있어요 ({how})",
-  "✓ “{name}” is ready to play": "✓ “{name}”을(를) 재생할 수 있어요"
+  "✓ “{name}” is ready to play": "✓ “{name}”을(를) 재생할 수 있어요",
+  "Couldn't put the AI voice on “{name}”: {why}": "“{name}”에 AI 목소리를 입히지 못했어요: {why}",
+  "Couldn't start the AI voice: {why}": "AI 목소리를 시작하지 못했어요: {why}",
+  "Getting the AI voice ready…": "AI 목소리 준비 중…",
+  "Putting the AI voice on “{name}”… {pct}%": "“{name}”에 AI 목소리를 입히는 중… {pct}%",
+  "The AI voices add-on isn't installed, so only the voice changer part of “{name}” is on.": "AI 목소리 애드온이 설치되지 않아 “{name}”의 보이스 체인저 부분만 켜졌어요."
 }

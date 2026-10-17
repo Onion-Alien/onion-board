@@ -3588,5 +3588,10 @@
   "{pct}%": "{pct}%",
   "{pct}%, about {time} left": "{pct}%, còn khoảng {time}",
   "“{name}” can't play until its effects are applied ({how})": "Chưa phát được “{name}” cho đến khi áp xong hiệu ứng ({how})",
-  "✓ “{name}” is ready to play": "✓ “{name}” đã sẵn sàng để phát"
+  "✓ “{name}” is ready to play": "✓ “{name}” đã sẵn sàng để phát",
+  "Couldn't put the AI voice on “{name}”: {why}": "Không thể áp giọng AI cho “{name}”: {why}",
+  "Couldn't start the AI voice: {why}": "Không thể khởi động giọng AI: {why}",
+  "Getting the AI voice ready…": "Đang chuẩn bị giọng AI…",
+  "Putting the AI voice on “{name}”… {pct}%": "Đang áp giọng AI cho “{name}”… {pct}%",
+  "The AI voices add-on isn't installed, so only the voice changer part of “{name}” is on.": "Chưa cài tiện ích giọng AI nên chỉ phần đổi giọng nói của “{name}” được bật."
 }

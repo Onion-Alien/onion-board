@@ -3666,5 +3666,10 @@
   "{pct}%": "%{pct}",
   "{pct}%, about {time} left": "%{pct}, yaklaşık {time} kaldı",
   "“{name}” can't play until its effects are applied ({how})": "“{name}”, efektleri uygulanana kadar çalamaz ({how})",
-  "✓ “{name}” is ready to play": "✓ “{name}” çalmaya hazır"
+  "✓ “{name}” is ready to play": "✓ “{name}” çalmaya hazır",
+  "Couldn't put the AI voice on “{name}”: {why}": "Yapay zeka sesi “{name}” üzerine konamadı: {why}",
+  "Couldn't start the AI voice: {why}": "Yapay zeka sesi başlatılamadı: {why}",
+  "Getting the AI voice ready…": "Yapay zeka sesi hazırlanıyor…",
+  "Putting the AI voice on “{name}”… {pct}%": "Yapay zeka sesi “{name}” üzerine konuyor… %{pct}",
+  "The AI voices add-on isn't installed, so only the voice changer part of “{name}” is on.": "Yapay zeka sesleri eklentisi kurulu değil, bu yüzden “{name}” ayarının yalnızca ses değiştirici kısmı açık."
 }

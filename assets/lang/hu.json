@@ -3666,5 +3666,10 @@
   "{pct}%": "{pct}%",
   "{pct}%, about {time} left": "{pct}%, még kb. {time}",
   "“{name}” can't play until its effects are applied ({how})": "A(z) „{name}” addig nem szólhat, amíg az effektjei el nem készülnek ({how})",
-  "✓ “{name}” is ready to play": "✓ A(z) „{name}” lejátszható"
+  "✓ “{name}” is ready to play": "✓ A(z) „{name}” lejátszható",
+  "Couldn't put the AI voice on “{name}”: {why}": "Nem sikerült rátenni az AI hangot erre: „{name}”: {why}",
+  "Couldn't start the AI voice: {why}": "Nem sikerült elindítani az AI hangot: {why}",
+  "Getting the AI voice ready…": "Az AI hang előkészítése…",
+  "Putting the AI voice on “{name}”… {pct}%": "AI hang rátétele erre: „{name}”… {pct}%",
+  "The AI voices add-on isn't installed, so only the voice changer part of “{name}” is on.": "Az AI hangok bővítménye nincs telepítve, ezért a(z) „{name}” beállításból csak a hangváltó van bekapcsolva."
 }

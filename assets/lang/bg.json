@@ -3666,5 +3666,10 @@
   "{pct}%": "{pct}%",
   "{pct}%, about {time} left": "{pct}%, остават около {time}",
   "“{name}” can't play until its effects are applied ({how})": "„{name}“ не може да свири, докато ефектите не се приложат ({how})",
-  "✓ “{name}” is ready to play": "✓ „{name}“ е готов за пускане"
+  "✓ “{name}” is ready to play": "✓ „{name}“ е готов за пускане",
+  "Couldn't put the AI voice on “{name}”: {why}": "AI гласът не можа да се сложи на „{name}“: {why}",
+  "Couldn't start the AI voice: {why}": "AI гласът не можа да стартира: {why}",
+  "Getting the AI voice ready…": "AI гласът се подготвя…",
+  "Putting the AI voice on “{name}”… {pct}%": "AI гласът се слага на „{name}“… {pct}%",
+  "The AI voices add-on isn't installed, so only the voice changer part of “{name}” is on.": "Добавката за AI гласове не е инсталирана, затова е включена само промяната на гласа от „{name}“."
 }

@@ -3978,5 +3978,10 @@
   "{pct}%": "{pct}%",
   "{pct}%, about {time} left": "{pct}%، بقي حوالي {time}",
   "“{name}” can't play until its effects are applied ({how})": "لا يمكن تشغيل “{name}” حتى يكتمل تطبيق تأثيراته ({how})",
-  "✓ “{name}” is ready to play": "✓ “{name}” جاهز للتشغيل"
+  "✓ “{name}” is ready to play": "✓ “{name}” جاهز للتشغيل",
+  "Couldn't put the AI voice on “{name}”: {why}": "تعذّر وضع صوت الذكاء الاصطناعي على “{name}”: {why}",
+  "Couldn't start the AI voice: {why}": "تعذّر تشغيل صوت الذكاء الاصطناعي: {why}",
+  "Getting the AI voice ready…": "جارٍ تجهيز صوت الذكاء الاصطناعي…",
+  "Putting the AI voice on “{name}”… {pct}%": "جارٍ وضع صوت الذكاء الاصطناعي على “{name}”… {pct}%",
+  "The AI voices add-on isn't installed, so only the voice changer part of “{name}” is on.": "إضافة أصوات الذكاء الاصطناعي غير مثبّتة، لذلك يعمل جزء مغيّر الصوت فقط من “{name}”."
 }

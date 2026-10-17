@@ -3588,5 +3588,10 @@
   "{pct}%": "{pct}%",
   "{pct}%, about {time} left": "{pct}%、残り約 {time}",
   "“{name}” can't play until its effects are applied ({how})": "「{name}」はエフェクトの適用が終わるまで再生できません（{how}）",
-  "✓ “{name}” is ready to play": "✓ 「{name}」を再生できます"
+  "✓ “{name}” is ready to play": "✓ 「{name}」を再生できます",
+  "Couldn't put the AI voice on “{name}”: {why}": "「{name}」にAIボイスを付けられませんでした：{why}",
+  "Couldn't start the AI voice: {why}": "AIボイスを開始できませんでした：{why}",
+  "Getting the AI voice ready…": "AIボイスを準備中…",
+  "Putting the AI voice on “{name}”… {pct}%": "「{name}」にAIボイスを付けています… {pct}%",
+  "The AI voices add-on isn't installed, so only the voice changer part of “{name}” is on.": "AIボイスのアドオンが入っていないため、「{name}」はボイスチェンジャー部分だけオンです。"
 }
