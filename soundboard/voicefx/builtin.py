@@ -1634,10 +1634,10 @@ class Wobble(Effect):
     name = "Wobble"
     description = "Pitch and volume wobble: drunk, seasick, an old film."
     params = (Param("rate", "Speed", 0.3, 12, 5, " Hz", 0.1),
-              Param("vibrato", "Vibrato", 0, 10, 2, " ms", 0.1, ("steady", "seasick")),
+              Param("vibrato", "Vibrato", 0, 40, 2, " ms", 0.1, ("steady", "seasick")),
               Param("tremolo", "Tremolo", 0, 1, 0.3, "", 0, ("steady", "flutter")))
 
-    MAX_MS = 12.0
+    MAX_MS = 42.0
 
     def __init__(self, rate, values=None):
         super().__init__(rate, values)
@@ -2086,6 +2086,85 @@ PRESETS: dict[str, dict[str, dict]] = {
                                          "attack": 8, "release": 120},
                           "tone": {"bass": 3, "presence": 3, "treble": 1},
                           "polish": {"deess": 0.5, "warmth": 0.3, "ceiling": -1}},
+    # funny: slurred and mumbly, the pitch swaying a semitone or two
+    "Drunk": {"pitch": {"semitones": -2, "natural": 1, "blur": 0.6},
+              "wobble": {"rate": 0.7, "vibrato": 35, "tremolo": 0.35},
+              "compressor": {"threshold": -24, "ratio": 3, "boost": 9},
+              "tone": {"bass": 2, "mid": 0, "presence": -4, "treble": -7}},
+    # a choir of you: you, a fifth and an octave above, in a hall
+    "Choir": {"harmony": {"first": 7, "second": 12, "level": 1},
+              "compressor": {"threshold": -24, "ratio": 3, "boost": 13},
+              "chorus": {"rate": 0.8, "depth": 6, "mix": 0.5},
+              "reverb": {"size": 0.9, "tone": 5000, "mix": 0.4}},
+    # high, a tiny throat, nasal and gritty
+    "Goblin": {"pitch": {"semitones": 5, "natural": 1, "size": -9},
+               "growl": {"amount": 0.25, "tone": 1800},
+               "compressor": {"threshold": -24, "ratio": 4, "boost": 0},
+               "tone": {"bass": -8, "mid": 9, "presence": 4, "treble": -2},
+               "distortion": {"drive": 14, "tone": 4000, "level": 0.4}},
+    # an octave higher and tiny, a faint bell sparkle, shimmering, in a bright hall
+    "Fairy": {"pitch": {"semitones": 12, "natural": 1, "size": -6},
+              "ringmod": {"freq": 1400, "mix": 0.15},
+              "compressor": {"threshold": -24, "ratio": 3, "boost": 14},
+              "tone": {"bass": -8, "mid": 0, "presence": 2, "treble": 5},
+              "chorus": {"rate": 3, "depth": 1.5, "mix": 0.4},
+              "reverb": {"size": 0.75, "tone": 10000, "mix": 0.35}},
+    # scary: a low raspy groan that sways slowly
+    "Zombie": {"pitch": {"semitones": -5, "natural": 1, "size": 4},
+               "growl": {"amount": 0.9, "tone": 500},
+               "compressor": {"threshold": -26, "ratio": 5, "boost": 4},
+               "tone": {"bass": 3, "mid": 2, "presence": -1, "treble": -3},
+               "distortion": {"drive": 10, "tone": 3500, "level": 0.7},
+               "wobble": {"rate": 0.5, "vibrato": 20, "tremolo": 0.25}},
+    # you and a deep copy of you an octave down, just as loud
+    "Evil twin": {"pitch": {"semitones": -12, "natural": 1, "size": 5, "mix": 0.5, "gap": 0},
+                  "growl": {"amount": 0.35, "tone": 900},
+                  "compressor": {"threshold": -24, "ratio": 4, "boost": 9},
+                  "reverb": {"size": 0.5, "tone": 4000, "mix": 0.2}},
+    # huge and slow-sounding: far lower, a much bigger throat, a rumble, a hall
+    "Giant": {"pitch": {"semitones": -10, "natural": 1, "size": 10},
+              "growl": {"amount": 0.2, "tone": 600},
+              "compressor": {"threshold": -24, "ratio": 4, "boost": 7},
+              "tone": {"bass": 6, "mid": 0, "presence": 0, "treble": -4},
+              "reverb": {"size": 0.95, "tone": 2500, "mix": 0.35},
+              "polish": {"deess": 0, "warmth": 0, "ceiling": -1}},
+    # robots & sci-fi: a huge robot suit, one low steady buzz in a metal shell
+    "Mecha": {"pitch": {"semitones": -5, "natural": 1, "size": 6},
+              "robot": {"freq": 45, "follow": 0, "noise": 0.05, "mix": 1},
+              "ringmod": {"freq": 60, "mix": 0.3},
+              "compressor": {"threshold": -24, "ratio": 4, "boost": 12},
+              "helmet": {"size": 6, "ring": 0.5, "mix": 0.5},
+              "reverb": {"size": 0.7, "tone": 4000, "mix": 0.25},
+              "polish": {"deess": 0, "warmth": 0, "ceiling": -1}},
+    # a calm spaceship computer: one smooth note, a shimmer, a small room
+    "Ship computer": {"pitch": {"semitones": 2, "natural": 1, "size": -2},
+                      "robot": {"freq": 190, "follow": 0, "noise": 0, "mix": 0.8},
+                      "compressor": {"threshold": -24, "ratio": 3, "boost": 15},
+                      "tone": {"bass": -4, "mid": 0, "presence": 3, "treble": 3},
+                      "chorus": {"rate": 0.5, "depth": 3, "mix": 0.4},
+                      "reverb": {"size": 0.4, "tone": 8000, "mix": 0.2}},
+    # radio & places: the captain on the cabin speakers, squashed, a short echo
+    "Pilot": {"compressor": {"threshold": -30, "ratio": 8, "boost": 13},
+              "tone": {"bass": 0, "mid": 3, "presence": 4, "treble": 0},
+              "radio": {"low": 400, "high": 3500, "drive": 8, "noise": 0.004, "squelch": 1},
+              "echo": {"delay": 60, "feedback": 0.2, "mix": 0.25, "tone": 3000}},
+    # a cheap speaker on a pole: a tiny band, blown out, crackling and cutting in and out
+    "Drive-thru speaker": {"compressor": {"threshold": -30, "ratio": 8, "boost": 6},
+                           "radio": {"low": 900, "high": 2200, "drive": 20, "noise": 0.03,
+                                     "squelch": 1},
+                           "distortion": {"drive": 20, "tone": 2500, "level": 0.45},
+                           "wobble": {"rate": 9, "vibrato": 0.5, "tremolo": 0.5}},
+    # a scratchy old reel: thin and hissy, the pitch fluttering
+    "Old film": {"compressor": {"threshold": -25, "ratio": 4, "boost": 10},
+                 "tone": {"bass": -6, "mid": 4, "presence": 0, "treble": -4},
+                 "radio": {"low": 250, "high": 3500, "drive": 4, "noise": 0.015},
+                 "wobble": {"rate": 7, "vibrato": 1.5, "tremolo": 0.2},
+                 "reverb": {"size": 0.2, "tone": 3000, "mix": 0.12}},
+    # a huge stone hall: a long tail and a late echo
+    "Cathedral": {"compressor": {"threshold": -24, "ratio": 3, "boost": 10},
+                  "tone": {"bass": 1, "mid": 0, "presence": 0, "treble": -1},
+                  "echo": {"delay": 380, "feedback": 0.25, "mix": 0.15, "tone": 3000},
+                  "reverb": {"size": 1, "tone": 4000, "mix": 0.55, "predelay": 70}},
 }
 
 PRESET_ICONS = {"Chipmunk": "🐿️", "Deep voice": "🐻", "High voice": "🎵", "Male voice": "👨",
@@ -2278,4 +2357,17 @@ def shown_texts() -> dict[str, str]:
         "Stadium announcer": _("Stadium announcer"),
         "Cave": _("Cave"),
         "Podcast voice": _("Podcast voice"),
+        "Drunk": _("Drunk"),
+        "Choir": _("Choir"),
+        "Goblin": _("Goblin"),
+        "Fairy": _("Fairy"),
+        "Zombie": _("Zombie"),
+        "Evil twin": _("Evil twin"),
+        "Giant": _("Giant"),
+        "Mecha": _("Mecha"),
+        "Ship computer": _("Ship computer"),
+        "Pilot": _("Pilot"),
+        "Drive-thru speaker": _("Drive-thru speaker"),
+        "Old film": _("Old film"),
+        "Cathedral": _("Cathedral"),
     }

@@ -3588,5 +3588,21 @@
   "{pct}%": "{pct}%",
   "{pct}%, about {time} left": "{pct}%，還剩約 {time}",
   "“{name}” can't play until its effects are applied ({how})": "「{name}」要等效果套用完才能播放（{how}）",
-  "✓ “{name}” is ready to play": "✓ 「{name}」可以播放了"
+  "✓ “{name}” is ready to play": "✓ 「{name}」可以播放了",
+  "Cathedral": "大教堂",
+  "Choir": "合唱團",
+  "Drive-thru speaker": "得來速喇叭",
+  "Drunk": "醉漢",
+  "Evil twin": "邪惡雙胞胎",
+  "Fairy": "仙女",
+  "Giant": "巨人",
+  "Goblin": "哥布林",
+  "Mecha": "機甲",
+  "Old film": "老電影",
+  "Pilot": "機長",
+  "Random voice": "隨機聲音",
+  "Ship computer": "飛船電腦",
+  "Turns on one of the voices shown here, picked at random. Click again for another.": "隨機開啟這裡顯示的其中一個聲音。再點一次換一個。",
+  "Turns the voice changer on with a voice picked at random from the ones the Voice tab shows (your favorites, when Favorites is picked).": "用「語音」分頁顯示的聲音中隨機選一個，開啟變聲器（選了收藏夾時從你的收藏裡選）。",
+  "Zombie": "殭屍"
 }

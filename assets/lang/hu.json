@@ -3666,5 +3666,21 @@
   "{pct}%": "{pct}%",
   "{pct}%, about {time} left": "{pct}%, még kb. {time}",
   "“{name}” can't play until its effects are applied ({how})": "A(z) „{name}” addig nem szólhat, amíg az effektjei el nem készülnek ({how})",
-  "✓ “{name}” is ready to play": "✓ A(z) „{name}” lejátszható"
+  "✓ “{name}” is ready to play": "✓ A(z) „{name}” lejátszható",
+  "Cathedral": "Katedrális",
+  "Choir": "Kórus",
+  "Drive-thru speaker": "Autós ablak hangszórója",
+  "Drunk": "Részeg",
+  "Evil twin": "Gonosz iker",
+  "Fairy": "Tündér",
+  "Giant": "Óriás",
+  "Goblin": "Kobold",
+  "Mecha": "Mecha",
+  "Old film": "Régi film",
+  "Pilot": "Pilóta",
+  "Random voice": "Véletlen hang",
+  "Ship computer": "Hajószámítógép",
+  "Turns on one of the voices shown here, picked at random. Click again for another.": "Bekapcsolja az itt látható hangok egyikét, véletlenszerűen. Kattints újra egy másikért.",
+  "Turns the voice changer on with a voice picked at random from the ones the Voice tab shows (your favorites, when Favorites is picked).": "Bekapcsolja a hangváltót egy véletlenszerű hanggal azok közül, amiket a Beszéd lap mutat (a kedvenceid közül, ha a Kedvencek van kiválasztva).",
+  "Zombie": "Zombi"
 }

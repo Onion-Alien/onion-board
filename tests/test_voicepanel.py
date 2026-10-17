@@ -690,7 +690,9 @@ def test_my_own_mix_is_the_last_tile_and_voices_have_pictures(panel):
     from soundboard.ui import art
     p, _ = panel
     order = _grid_order(p.fx)
-    assert order[-1] == "My own mix" and "Random voice" not in order
+    assert order[-2:] == ["My own mix", "Random voice"]   # the die goes after the last card
+    rt = p.fx.random_tile
+    assert not rt.isCheckable() and rt not in p.fx.tiles.buttons() and not rt.star.isVisibleTo(rt)
     assert p.fx.btn_random.window() is p.fx.dlg     # Randomize lives in Make it yours
     assert not p.fx.btn_random.icon().isNull()
     if art.exists(art.voice_key("Robot")):          # the repo's pictures are used
@@ -707,7 +709,7 @@ def test_save_as_a_voice_makes_a_tile_that_comes_back(panel, monkeypatch, qapp):
     p.fx.btn_save.click()
     assert asked == ["My voice"]
     assert p.fx.preset == "Squeaky" and p.fx._tile["Squeaky"].isChecked()
-    assert _grid_order(p.fx)[-2:] == ["My own mix", "Squeaky"]
+    assert _grid_order(p.fx)[-3:] == ["My own mix", "Squeaky", "Random voice"]
     assert p.fx.spec()["custom"] == mine           # "My own mix" is still that mix
     p.fx.pick("Robot")
     p.fx.pick("Squeaky")
@@ -800,7 +802,7 @@ def test_tiles_reflow_with_saved_voices(qapp, app_dir, monkeypatch):
     holder.show()
     fx.setGeometry(0, 0, 260, 1600)
     qapp.processEvents()
-    assert _grid_order(fx)[-3:] == ["My own mix", "A", "B"]
+    assert _grid_order(fx)[-4:] == ["My own mix", "A", "B", "Random voice"]
     assert max(b.geometry().right() for b in fx.tiles.buttons()) <= fx.width()
     holder.hide()
 
@@ -1747,3 +1749,88 @@ def test_voice_groups_and_favorites(qapp, monkeypatch):
     fx._tile["Robot"].star.click()                      # unstarred: it leaves Favorites
     assert shown() == {"Demon"} and fx.favorites == ["Demon"]
     assert voicefx.clean_spec({"favorites": ["A", 3, "A", ""]})["favorites"] == ["A"]
+
+
+def test_random_voice_turns_on_a_shown_voice_never_the_same_twice(panel):
+    import random
+    p, _ = panel
+    fx = p.fx
+    rng = random.Random(3)
+    seen = set()
+    last = ""
+    for _i in range(40):
+        name = fx.roll(rng)
+        assert name in voicefx.PRESETS and name != last     # never My own mix, never again
+        assert fx.btn_power.isChecked() and fx.preset == name and fx._tile[name].isChecked()
+        seen.add(name)
+        last = name
+    assert len(seen) > 10
+    fx.show_group("scary")                    # one group shown: picks from that group only
+    from soundboard.ui.voicefxpanel import voice_group
+    for _i in range(10):
+        assert voice_group(fx.roll(rng)) == "scary"
+    assert _grid_order(fx)[-1] == "Random voice"
+
+
+def test_random_voice_needs_two_voices_to_pick_from(panel):
+    p, _ = panel
+    fx = p.fx
+    fx.show_group("favs")
+    assert not fx.random_tile.isVisibleTo(fx) and fx.roll() == ""
+    fx.set_favorite("Ghost", True)
+    assert not fx.random_tile.isVisibleTo(fx)        # one favorite: nothing to roll
+    fx.set_favorite("Demon", True)
+    assert fx.random_tile.isVisibleTo(fx)
+    fx.random_tile.click()
+    assert fx.preset in ("Ghost", "Demon")
+    first = fx.preset
+    fx.random_tile.click()
+    assert fx.preset in ("Ghost", "Demon") and fx.preset != first
+
+
+def test_hear_it_plays_the_voice_in_the_headphones(panel, monkeypatch):
+    from soundboard.speech import aipreview
+    p, eng = panel
+    played = []
+    monkeypatch.setattr(eng, "play", lambda sid, data, gain, **k: played.append((sid, data, k)),
+                        raising=False)
+    t = np.arange(16000) / 16000
+    monkeypatch.setattr(aipreview, "sample", lambda: (0.5 * np.sin(2 * np.pi * 150 * t))
+                        .astype(np.float32))
+    monkeypatch.setattr(aipreview, "_cache", {})
+    fx = p.fx
+    fx.pick("Chipmunk")
+    assert fx.btn_sample.isVisibleTo(fx.picked)
+    fx.btn_sample.click()
+    from PySide6.QtWidgets import QApplication
+    assert process_events(QApplication.instance(), lambda: played), "no sample played"
+    sid, data, kw = played[0]
+    assert kw.get("preview") is True                  # your headphones only
+    assert data.ndim == 2 and data.shape[1] == 2 and 0.1 < np.max(np.abs(data)) <= 0.8
+    assert fx.btn_sample.text() == aipreview_text()   # the button came back
+    assert fx.effects_of("Chipmunk")["pitch"]["semitones"] == 8
+    assert "cleanup" not in fx.effects_of("Chipmunk")
+
+
+def aipreview_text():
+    from soundboard.ui.aivoicebrowser import HEAR
+    return HEAR
+
+
+def test_hear_it_failing_says_why_and_comes_back(panel, monkeypatch):
+    from soundboard.speech import aipreview
+    from soundboard.ui import busy
+    p, _ = panel
+    said = []
+    monkeypatch.setattr(busy, "toast", lambda w, text, kind="", *a, **k: said.append(text))
+
+    def fail():
+        raise aipreview.PreviewError("no speech voice")
+    monkeypatch.setattr(aipreview, "sample", fail)
+    monkeypatch.setattr(aipreview, "_cache", {})
+    p.fx.hear("Robot")
+    from PySide6.QtWidgets import QApplication
+    assert process_events(QApplication.instance(), lambda: said)
+    assert said and "no speech voice" in said[0]
+    from soundboard.ui.aivoicebrowser import HEAR
+    assert p.fx.btn_sample.text() == HEAR and not p.fx._hearing

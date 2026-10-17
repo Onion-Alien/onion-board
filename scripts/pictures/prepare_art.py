@@ -29,7 +29,10 @@ KEYS = ["voice-chipmunk", "voice-deep-voice", "voice-demon", "voice-robot", "voi
         "voice-random",
         # the voices added later, which show a "?" until they get theirs
         "voice-high-voice", "voice-male-voice", "voice-talkbox", "voice-autotune",
-        "voice-masked-caller", "voice-anonymous", "voice-dark-lord", "voice-hothead"]
+        "voice-masked-caller", "voice-anonymous", "voice-dark-lord", "voice-hothead",
+        "voice-drunk", "voice-choir", "voice-goblin", "voice-fairy", "voice-zombie",
+        "voice-evil-twin", "voice-giant", "voice-mecha", "voice-ship-computer", "voice-pilot",
+        "voice-drive-thru-speaker", "voice-old-film", "voice-cathedral"]
 
 
 def key_for(name: str) -> str:

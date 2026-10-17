@@ -3744,5 +3744,21 @@
   "{pct}%": "{pct} %",
   "{pct}%, about {time} left": "{pct} %, zbývá asi {time}",
   "“{name}” can't play until its effects are applied ({how})": "„{name}“ nejde přehrát, dokud se nepoužijí jeho efekty ({how})",
-  "✓ “{name}” is ready to play": "✓ „{name}“ je připravený k přehrání"
+  "✓ “{name}” is ready to play": "✓ „{name}“ je připravený k přehrání",
+  "Cathedral": "Katedrála",
+  "Choir": "Sbor",
+  "Drive-thru speaker": "Reproduktor u výdejního okénka",
+  "Drunk": "Opilý",
+  "Evil twin": "Zlé dvojče",
+  "Fairy": "Víla",
+  "Giant": "Obr",
+  "Goblin": "Skřet",
+  "Mecha": "Mecha",
+  "Old film": "Starý film",
+  "Pilot": "Pilot",
+  "Random voice": "Náhodný hlas",
+  "Ship computer": "Lodní počítač",
+  "Turns on one of the voices shown here, picked at random. Click again for another.": "Zapne jeden z hlasů zobrazených tady, vybraný náhodně. Klikni znovu pro další.",
+  "Turns the voice changer on with a voice picked at random from the ones the Voice tab shows (your favorites, when Favorites is picked).": "Zapne měnič hlasu s hlasem vybraným náhodně z těch, které ukazuje karta Hlas (tvoje oblíbené, když je vybráno Oblíbené).",
+  "Zombie": "Zombie"
 }

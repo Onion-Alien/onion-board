@@ -3666,5 +3666,21 @@
   "{pct}%": "{pct} %",
   "{pct}%, about {time} left": "{pct} %, noch etwa {time}",
   "“{name}” can't play until its effects are applied ({how})": "„{name}“ kann erst spielen, wenn seine Effekte angewendet sind ({how})",
-  "✓ “{name}” is ready to play": "✓ „{name}“ ist bereit zum Abspielen"
+  "✓ “{name}” is ready to play": "✓ „{name}“ ist bereit zum Abspielen",
+  "Cathedral": "Kathedrale",
+  "Choir": "Chor",
+  "Drive-thru speaker": "Drive-in-Lautsprecher",
+  "Drunk": "Betrunken",
+  "Evil twin": "Böser Zwilling",
+  "Fairy": "Fee",
+  "Giant": "Riese",
+  "Goblin": "Kobold",
+  "Mecha": "Mecha",
+  "Old film": "Alter Film",
+  "Pilot": "Pilot",
+  "Random voice": "Zufällige Stimme",
+  "Ship computer": "Bordcomputer",
+  "Turns on one of the voices shown here, picked at random. Click again for another.": "Schaltet eine der hier gezeigten Stimmen ein, zufällig gewählt. Nochmal klicken für eine andere.",
+  "Turns the voice changer on with a voice picked at random from the ones the Voice tab shows (your favorites, when Favorites is picked).": "Schaltet den Stimmverzerrer mit einer zufälligen Stimme aus denen ein, die der Stimme-Tab zeigt (deine Favoriten, wenn Favoriten gewählt ist).",
+  "Zombie": "Zombie"
 }

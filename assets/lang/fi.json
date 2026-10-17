@@ -3666,5 +3666,21 @@
   "{pct}%": "{pct} %",
   "{pct}%, about {time} left": "{pct} %, noin {time} jäljellä",
   "“{name}” can't play until its effects are applied ({how})": "\"{name}\" ei soi ennen kuin sen efektit on lisätty ({how})",
-  "✓ “{name}” is ready to play": "✓ \"{name}\" on valmis soimaan"
+  "✓ “{name}” is ready to play": "✓ \"{name}\" on valmis soimaan",
+  "Cathedral": "Katedraali",
+  "Choir": "Kuoro",
+  "Drive-thru speaker": "Autokaistan kaiutin",
+  "Drunk": "Humalainen",
+  "Evil twin": "Paha kaksonen",
+  "Fairy": "Keiju",
+  "Giant": "Jättiläinen",
+  "Goblin": "Peikko",
+  "Mecha": "Mecha",
+  "Old film": "Vanha elokuva",
+  "Pilot": "Lentäjä",
+  "Random voice": "Satunnainen ääni",
+  "Ship computer": "Aluksen tietokone",
+  "Turns on one of the voices shown here, picked at random. Click again for another.": "Laittaa päälle yhden tässä näkyvistä äänistä sattumalta. Klikkaa uudelleen, niin saat toisen.",
+  "Turns the voice changer on with a voice picked at random from the ones the Voice tab shows (your favorites, when Favorites is picked).": "Laittaa äänenmuuttajan päälle sattumalta valitulla äänellä niistä, jotka Puhe-välilehti näyttää (suosikkisi, kun Suosikit on valittu).",
+  "Zombie": "Zombi"
 }

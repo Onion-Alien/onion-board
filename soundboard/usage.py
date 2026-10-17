@@ -255,6 +255,8 @@ FEATURES = ("add-files", "youtube", "record", "clip", "clip-editor", "import-boa
             # yours opened, Randomize, Save as a voice, a share code copied or imported
             "voice-group", "voice-favorite", "voice-tweak", "voice-random", "voice-saved",
             "voice-code-shared", "voice-code-imported",
+            # the Random voice card (or its key) and a voice changer voice's Hear it
+            "voice-roll", "voice-hear",
             # AI voices: switched on, a group picked, a voice starred, Hear it, one of
             # your own made (never which voice)
             "ai-voice", "ai-voice-group", "ai-voice-favorite", "ai-voice-hear",

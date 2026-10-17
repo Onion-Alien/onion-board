@@ -3588,5 +3588,21 @@
   "{pct}%": "{pct}%",
   "{pct}%, about {time} left": "{pct}%、残り約 {time}",
   "“{name}” can't play until its effects are applied ({how})": "「{name}」はエフェクトの適用が終わるまで再生できません（{how}）",
-  "✓ “{name}” is ready to play": "✓ 「{name}」を再生できます"
+  "✓ “{name}” is ready to play": "✓ 「{name}」を再生できます",
+  "Cathedral": "大聖堂",
+  "Choir": "聖歌隊",
+  "Drive-thru speaker": "ドライブスルーのスピーカー",
+  "Drunk": "酔っぱらい",
+  "Evil twin": "悪い双子",
+  "Fairy": "妖精",
+  "Giant": "巨人",
+  "Goblin": "ゴブリン",
+  "Mecha": "メカ",
+  "Old film": "古い映画",
+  "Pilot": "パイロット",
+  "Random voice": "ランダムボイス",
+  "Ship computer": "宇宙船のコンピューター",
+  "Turns on one of the voices shown here, picked at random. Click again for another.": "ここに表示されているボイスからランダムに1つをオンにします。もう一度クリックで別のボイス。",
+  "Turns the voice changer on with a voice picked at random from the ones the Voice tab shows (your favorites, when Favorites is picked).": "ボイスタブに表示されているボイスからランダムに選んでボイスチェンジャーをオンにします（お気に入りを選んでいるときはお気に入りから）。",
+  "Zombie": "ゾンビ"
 }

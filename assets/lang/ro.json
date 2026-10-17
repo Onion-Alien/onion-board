@@ -3744,5 +3744,21 @@
   "{pct}%": "{pct}%",
   "{pct}%, about {time} left": "{pct}%, mai durează cam {time}",
   "“{name}” can't play until its effects are applied ({how})": "„{name}” nu poate fi redat până nu i se aplică efectele ({how})",
-  "✓ “{name}” is ready to play": "✓ „{name}” e gata de redat"
+  "✓ “{name}” is ready to play": "✓ „{name}” e gata de redat",
+  "Cathedral": "Catedrală",
+  "Choir": "Cor",
+  "Drive-thru speaker": "Difuzor de drive-thru",
+  "Drunk": "Beat",
+  "Evil twin": "Geamănul rău",
+  "Fairy": "Zână",
+  "Giant": "Uriaș",
+  "Goblin": "Spiriduș",
+  "Mecha": "Mecha",
+  "Old film": "Film vechi",
+  "Pilot": "Pilot",
+  "Random voice": "Voce la întâmplare",
+  "Ship computer": "Computerul navei",
+  "Turns on one of the voices shown here, picked at random. Click again for another.": "Pornește una dintre vocile arătate aici, aleasă la întâmplare. Apasă din nou pentru alta.",
+  "Turns the voice changer on with a voice picked at random from the ones the Voice tab shows (your favorites, when Favorites is picked).": "Pornește schimbătorul de voce cu o voce aleasă la întâmplare dintre cele pe care le arată fila Voce (favoritele tale, când e ales Favorite).",
+  "Zombie": "Zombi"
 }

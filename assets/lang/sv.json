@@ -3666,5 +3666,21 @@
   "{pct}%": "{pct} %",
   "{pct}%, about {time} left": "{pct} %, ungefär {time} kvar",
   "“{name}” can't play until its effects are applied ({how})": "”{name}” kan inte spelas förrän effekterna är pålagda ({how})",
-  "✓ “{name}” is ready to play": "✓ ”{name}” är redo att spelas"
+  "✓ “{name}” is ready to play": "✓ ”{name}” är redo att spelas",
+  "Cathedral": "Katedral",
+  "Choir": "Kör",
+  "Drive-thru speaker": "Drive-in-högtalare",
+  "Drunk": "Full",
+  "Evil twin": "Ond tvilling",
+  "Fairy": "Fe",
+  "Giant": "Jätte",
+  "Goblin": "Vätte",
+  "Mecha": "Mecha",
+  "Old film": "Gammal film",
+  "Pilot": "Pilot",
+  "Random voice": "Slumpad röst",
+  "Ship computer": "Skeppsdator",
+  "Turns on one of the voices shown here, picked at random. Click again for another.": "Slår på en av rösterna som visas här, vald slumpvis. Klicka igen för en annan.",
+  "Turns the voice changer on with a voice picked at random from the ones the Voice tab shows (your favorites, when Favorites is picked).": "Slår på röstvändaren med en slumpad röst bland dem fliken Röst visar (dina favoriter, när Favoriter är valt).",
+  "Zombie": "Zombie"
 }

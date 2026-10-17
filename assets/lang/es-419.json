@@ -3666,5 +3666,21 @@
   "{pct}%": "{pct} %",
   "{pct}%, about {time} left": "{pct} %, faltan unos {time}",
   "“{name}” can't play until its effects are applied ({how})": "“{name}” no puede sonar hasta que se apliquen sus efectos ({how})",
-  "✓ “{name}” is ready to play": "✓ “{name}” está listo para sonar"
+  "✓ “{name}” is ready to play": "✓ “{name}” está listo para sonar",
+  "Cathedral": "Catedral",
+  "Choir": "Coro",
+  "Drive-thru speaker": "Bocina del autoservicio",
+  "Drunk": "Borracho",
+  "Evil twin": "Gemelo malvado",
+  "Fairy": "Hada",
+  "Giant": "Gigante",
+  "Goblin": "Duende",
+  "Mecha": "Mecha",
+  "Old film": "Película vieja",
+  "Pilot": "Piloto",
+  "Random voice": "Voz al azar",
+  "Ship computer": "Computadora de la nave",
+  "Turns on one of the voices shown here, picked at random. Click again for another.": "Activa una de las voces que se muestran aquí, elegida al azar. Haz clic otra vez para otra.",
+  "Turns the voice changer on with a voice picked at random from the ones the Voice tab shows (your favorites, when Favorites is picked).": "Activa el cambiador de voz con una voz elegida al azar entre las que muestra la pestaña Voz (tus favoritos, si elegiste Favoritos).",
+  "Zombie": "Zombi"
 }

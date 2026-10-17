@@ -3978,5 +3978,21 @@
   "{pct}%": "{pct}%",
   "{pct}%, about {time} left": "{pct}%، بقي حوالي {time}",
   "“{name}” can't play until its effects are applied ({how})": "لا يمكن تشغيل “{name}” حتى يكتمل تطبيق تأثيراته ({how})",
-  "✓ “{name}” is ready to play": "✓ “{name}” جاهز للتشغيل"
+  "✓ “{name}” is ready to play": "✓ “{name}” جاهز للتشغيل",
+  "Cathedral": "كاتدرائية",
+  "Choir": "جوقة",
+  "Drive-thru speaker": "سماعة طلب السيارات",
+  "Drunk": "سكران",
+  "Evil twin": "التوأم الشرير",
+  "Fairy": "جنية",
+  "Giant": "عملاق",
+  "Goblin": "عفريت",
+  "Mecha": "ميكا",
+  "Old film": "فيلم قديم",
+  "Pilot": "طيار",
+  "Random voice": "صوت عشوائي",
+  "Ship computer": "حاسوب السفينة",
+  "Turns on one of the voices shown here, picked at random. Click again for another.": "يشغّل أحد الأصوات المعروضة هنا، يُختار عشوائيًا. انقر مرة أخرى لصوت آخر.",
+  "Turns the voice changer on with a voice picked at random from the ones the Voice tab shows (your favorites, when Favorites is picked).": "يشغّل مغير الصوت بصوت يُختار عشوائيًا من الأصوات التي يعرضها تبويب صوتك (مفضلتك، عند اختيار المفضلة).",
+  "Zombie": "زومبي"
 }

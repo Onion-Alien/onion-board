@@ -3588,5 +3588,21 @@
   "{pct}%": "{pct}%",
   "{pct}%, about {time} left": "{pct}%, còn khoảng {time}",
   "“{name}” can't play until its effects are applied ({how})": "Chưa phát được “{name}” cho đến khi áp xong hiệu ứng ({how})",
-  "✓ “{name}” is ready to play": "✓ “{name}” đã sẵn sàng để phát"
+  "✓ “{name}” is ready to play": "✓ “{name}” đã sẵn sàng để phát",
+  "Cathedral": "Nhà thờ lớn",
+  "Choir": "Dàn hợp xướng",
+  "Drive-thru speaker": "Loa quầy drive-thru",
+  "Drunk": "Say xỉn",
+  "Evil twin": "Song sinh độc ác",
+  "Fairy": "Tiên nữ",
+  "Giant": "Người khổng lồ",
+  "Goblin": "Yêu tinh",
+  "Mecha": "Mecha",
+  "Old film": "Phim cũ",
+  "Pilot": "Phi công",
+  "Random voice": "Giọng ngẫu nhiên",
+  "Ship computer": "Máy tính tàu",
+  "Turns on one of the voices shown here, picked at random. Click again for another.": "Bật một trong các giọng hiện ở đây, chọn ngẫu nhiên. Bấm lần nữa để đổi giọng khác.",
+  "Turns the voice changer on with a voice picked at random from the ones the Voice tab shows (your favorites, when Favorites is picked).": "Bật đổi giọng nói với một giọng chọn ngẫu nhiên trong các giọng thẻ Giọng nói đang hiện (trong mục yêu thích, khi chọn Yêu thích).",
+  "Zombie": "Xác sống"
 }

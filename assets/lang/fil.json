@@ -3666,5 +3666,21 @@
   "{pct}%": "{pct}%",
   "{pct}%, about {time} left": "{pct}%, mga {time} pa",
   "“{name}” can't play until its effects are applied ({how})": "Hindi pa mapapatugtog ang “{name}” hangga't hindi tapos ang effects nito ({how})",
-  "✓ “{name}” is ready to play": "✓ Handa nang patugtugin ang “{name}”"
+  "✓ “{name}” is ready to play": "✓ Handa nang patugtugin ang “{name}”",
+  "Cathedral": "Katedral",
+  "Choir": "Koro",
+  "Drive-thru speaker": "Speaker ng drive-thru",
+  "Drunk": "Lasing",
+  "Evil twin": "Masamang kambal",
+  "Fairy": "Diwata",
+  "Giant": "Higante",
+  "Goblin": "Duwende",
+  "Mecha": "Mecha",
+  "Old film": "Lumang pelikula",
+  "Pilot": "Piloto",
+  "Random voice": "Random na boses",
+  "Ship computer": "Computer ng barko",
+  "Turns on one of the voices shown here, picked at random. Click again for another.": "Binubuksan ang isa sa mga boses na nakikita rito, pinili nang random. I-click ulit para sa iba.",
+  "Turns the voice changer on with a voice picked at random from the ones the Voice tab shows (your favorites, when Favorites is picked).": "Binubuksan ang voice changer gamit ang boses na random na pinili sa mga ipinapakita ng Voice tab (ang mga paborito mo, kapag Mga paborito ang pinili).",
+  "Zombie": "Zombie"
 }
