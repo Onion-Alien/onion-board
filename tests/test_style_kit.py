@@ -70,3 +70,25 @@ def test_textured_rules_follow_the_switch():
     finally:
         theme.set_current(was[0])
         theme.textures_on = was[1]
+
+
+def test_redrawn_texture_never_reuses_an_old_tile_file(qapp, monkeypatch, tmp_path):
+    """The tile files in Temp outlive the app: one drawn by an older version must not
+    stand in for a redrawn texture just because the theme's colours are the same."""
+    from PySide6.QtGui import QColor, QImage
+
+    from soundboard.style import textures
+    monkeypatch.setattr(textures.tempfile, "gettempdir", lambda: str(tmp_path))
+    monkeypatch.setattr(textures, "_texture_urls", {})
+    tk = dict(palettes.THEMES["Halloween"])
+    old = textures.texture_url(tk)
+
+    def redrawn(kind, tk=None, size=None):
+        img = QImage(8, 8, QImage.Format.Format_ARGB32)
+        img.fill(QColor(1, 2, 3, 40))
+        return img
+    monkeypatch.setattr(textures, "texture_image", redrawn)
+    monkeypatch.setattr(textures, "_texture_urls", {})
+    new = textures.texture_url(tk)
+    assert new and new != old
+    assert QImage(new).size().width() == 8

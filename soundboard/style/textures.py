@@ -196,12 +196,16 @@ def texture_url(tk: dict[str, str]) -> str:
            tk.get("texture_ink", ""), tk.get("texture_strength", ""))
     if url := _texture_urls.get(key):
         return url
+    # named after the tile's own pixels, not its colours: a tile redrawn in a new version
+    # gets a new file instead of the old drawing left in Temp by an older copy
+    img = texture_image(kind, tk)
+    pixels = bytes(img.constBits())[:img.sizeInBytes()]
     folder = Path(tempfile.gettempdir()) / "onion-style"
-    path = folder / f"tex-{kind}-{hashlib.md5(repr(key).encode()).hexdigest()[:10]}.png"
+    path = folder / f"tex-{kind}-{hashlib.md5(pixels).hexdigest()[:10]}.png"
     try:
         folder.mkdir(exist_ok=True)
         if not path.exists():
-            texture_image(kind, tk).save(str(path))
+            img.save(str(path))
     except OSError:
         return ""
     _texture_urls[key] = url = path.as_posix()
