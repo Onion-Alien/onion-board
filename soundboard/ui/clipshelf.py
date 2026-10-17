@@ -532,8 +532,18 @@ class ClipShelf(QWidget):
         self._worker = threading.Thread(target=work, daemon=True, name="saved-clips-cleanup")
         self._worker.start()
 
+    def showEvent(self, event):
+        super().showEvent(event)
+        self._maintain()   # coming back to the Apps tab: drop clips deleted meanwhile
+
     def _cleanup_done(self, gone):
-        if self._closed or not gone:
+        if self._closed:
+            return
+        if self.shelf.pruned:
+            self.shelf.pruned = False
+            if not gone:
+                self.reload()
+        if not gone:
             return
         def undo():
             self._restore_background(gone)

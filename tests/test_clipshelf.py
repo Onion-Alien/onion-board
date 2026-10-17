@@ -105,3 +105,13 @@ def test_two_thousand_clips_are_kept_and_bulk_delete_undo_writes_once(app_dir, m
     assert len(gone) == 2001 and not sh.clips and len(writes) == 1
     sh.restore_many(gone)
     assert len(sh.clips) == 2001 and len(writes) == 2
+
+
+def test_clips_whose_file_was_deleted_by_hand_drop_out_without_an_undo(app_dir):
+    sh = Shelf()
+    a = sh.add(audio(), "Kept")
+    b = sh.add(audio(), "Deleted")
+    b.path.unlink()
+    assert sh.maintain() == []   # not "removed inactive clips": nothing to undo
+    assert [c.id for c in sh.clips] == [a.id] and sh.pruned
+    assert [r["id"] for r in json.loads(sh._index().read_text("utf-8"))] == [a.id]

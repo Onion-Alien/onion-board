@@ -66,6 +66,7 @@ class Shelf:
         self.clips: list[Clip] = []
         self._lock = threading.RLock()
         self._dirty = False
+        self.pruned = False   # prune_missing dropped some since the UI last looked
         self.load()
 
     def _index(self) -> Path:
@@ -154,6 +155,7 @@ class Shelf:
         """
         now = time.time() if now is None else now
         with self._lock:
+            self.prune_missing()
             gone = [(i, c) for i, c in enumerate(self.clips)
                     if not keep_forever and c.id != active and now - c.last_used >= KEEP_DAYS * DAY]
             if gone:
@@ -168,6 +170,18 @@ class Shelf:
             elif self._dirty:
                 self.save()
             return gone
+
+    def prune_missing(self) -> bool:
+        """Clips whose file was deleted outside the app leave the list (no Undo:
+        there's nothing to bring back). True if any did."""
+        with self._lock:
+            kept = [c for c in self.clips if c.path.is_file()]
+            if len(kept) == len(self.clips):
+                return False
+            self.clips = kept
+            self._dirty = True
+            self.pruned = True
+            return True
 
     def rename(self, cid: str, name: str) -> bool:
         with self._lock:

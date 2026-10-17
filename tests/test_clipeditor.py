@@ -1,6 +1,8 @@
 """The Apps tab's clip editor, with the Windows capture faked: it's off and
 unbuilt until a card's Clip editor is opened, opening it listens (and closing it
 stops), and the waveform's mouse and keys pick, play, cut up and save a bit."""
+import json
+
 import numpy as np
 import pytest
 from PySide6.QtCore import QPoint, Qt
@@ -647,6 +649,20 @@ def test_background_cleanup_hides_last_clip_and_undo_restores_it(tab, qapp):
     sh._worker.join(5)
     qapp.processEvents()
     assert sh.shelf.get(c.id) is not None and sh.isVisible()
+
+
+def test_a_clip_whose_file_was_deleted_leaves_the_list_when_apps_is_opened_again(tab, qapp):
+    saved(tab, qapp)
+    sh = tab.shelf
+    if sh._worker is not None:
+        sh._worker.join(5)
+    sh.shelf.clips[0].path.unlink()
+    tab.hide()
+    tab.show()
+    sh._worker.join(5)
+    qapp.processEvents()
+    assert not sh.shelf.clips and not sh._items
+    assert json.loads(sh.shelf._index().read_text("utf-8")) == []
 
 
 def test_preview_and_copy_refresh_activity(tab, qapp):
