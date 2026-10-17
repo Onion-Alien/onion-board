@@ -435,6 +435,7 @@ class DownloadBar(QFrame):
     room_changed = Signal()        # it needs more or less height: the window fits it again
     retry_requested = Signal(dict)  # a pick that failed: {url, title, kind, seconds}
     front_requested = Signal(str)   # a waiting pick clicked in the list: it's next up
+    up_next_drop = Signal(str)      # ✕ on an Up next row: that Play won't play after all
 
     def __init__(self, parent: QWidget | None = None):
         super().__init__(parent)
@@ -454,6 +455,9 @@ class DownloadBar(QFrame):
         self._queue: list[dict] = []
         self._failed: list[dict] = []   # picks that couldn't download, to retry
         self._added: list[dict] = []    # picks added to the sounds since the bar showed
+        # Plays downloaded and waiting for the song playing (linkbar's Up next), as
+        # (title, url): the running row's own says "Up next", the rest get a row each
+        self._up_next: list[tuple[str, str]] = []
         self._raw = ("", 0.0)   # the running pick's title as given, and its length
         self._failing = ""      # set_failed: the next set_done(False) for it is an error
         self._cancelling = ""   # our own Cancel / Stop all: its set_done isn't a failure
@@ -880,8 +884,10 @@ class DownloadBar(QFrame):
                 return _("Playing once"), "play", "live_text"
             return (ngettext("Adding {n} sound", "Adding {n} sounds", busy),
                     "download", "live_text")
+        if self._waits():
+            return _("Up next"), "list", "live_text"
         if self.stage == "done" and self.kind == "play" and self.url not in self._failed_urls():
-            return _("▶ Playing"), "play", "ok_text"
+            return _("Playing"), "play", "ok_text"
         if self._added:
             n = len(self._added)
             return ngettext("Added {n} sound", "Added {n} sounds", n), "check", "ok_text"
@@ -1105,8 +1111,9 @@ class DownloadBar(QFrame):
                 w.deleteLater()
         failed = self._others_failed()
         added = self._others_added()[::-1]
-        picks = ([(q, "wait") for q in self._queue] + [(f, "failed") for f in failed]
-                 + [(a, "added") for a in added])
+        nxt = [{"url": u, "title": t} for t, u in self._up_next if u != self.url]
+        picks = ([(q, "next") for q in nxt] + [(q, "wait") for q in self._queue]
+                 + [(f, "failed") for f in failed] + [(a, "added") for a in added])
         rows = [self._row(q, how, first=(how == "wait" and i == 0))
                 for i, (q, how) in enumerate(picks)]
         for row in rows:
@@ -1154,9 +1161,10 @@ class DownloadBar(QFrame):
         line = QHBoxLayout()
         line.setContentsMargins(0, 0, 0, 0)
         line.setSpacing(8)
-        why = QLabel({"wait": _("Waiting to add"), "failed": _("Couldn't download"),
+        why = QLabel({"next": _("Up next"), "wait": _("Waiting to add"),
+                      "failed": _("Couldn't download"),
                       "added": _("✓ Added to your sounds")}[how])
-        why.setObjectName("downloadmeta" if how == "wait" else "downloadstatus")
+        why.setObjectName("downloadmeta" if how in ("wait", "next") else "downloadstatus")
         theme.set_tone(why, {"failed": "error", "added": "ok"}.get(how, ""))
         line.addWidget(why)
         secs = q.get("seconds") or 0
@@ -1175,11 +1183,53 @@ class DownloadBar(QFrame):
             rl.addWidget(again, 0, Qt.AlignmentFlag.AlignVCenter)
         if how != "added":
             x = self._icon_button("close", _("Remove"), 24)
-            x.clicked.connect(lambda _c=False, u=q["url"], b=(how == "failed"):
-                              self._forget(u) if b
+            x.clicked.connect(lambda _c=False, u=q["url"], h=how:
+                              self._forget(u) if h == "failed"
+                              else self.up_next_drop.emit(u) if h == "next"
                               else (usage.used("dl-cancel"), self.cancel_requested.emit(u)))
             rl.addWidget(x, 0, Qt.AlignmentFlag.AlignVCenter)
         return row
+
+    # ------------------------------------------------------------------ Up next
+
+    def _waits(self) -> bool:
+        """The running row's Play is downloaded, but waits in Up next for the song
+        playing now: it mustn't say Playing (a click seemed to do nothing)."""
+        return (self.kind == "play" and self.stage == "done"
+                and any(u == self.url for _t, u in self._up_next))
+
+    def _say_play(self):
+        if self._waits():
+            ahead = next(i for i, (_t, u) in enumerate(self._up_next) if u == self.url)
+            self.lbl_status.setText(_("Up next · {n} before it", n=ahead) if ahead
+                                    else _("Up next"))
+            theme.set_tone(self.lbl_status, "")
+        else:
+            self.lbl_status.setText(_("▶ Playing"))
+            theme.set_tone(self.lbl_status, "ok")
+
+    def set_up_next(self, items: list[tuple[str, str]]):
+        """Up next changed (linkbar.up_next_items): the list shows what waits, in order,
+        and the bar stays up while anything does."""
+        was = self._waits()
+        self._up_next = list(items)
+        if self.kind == "play" and self.stage == "done" and self.url not in self._failed_urls():
+            self._say_play()
+        if self._up_next:
+            self._auto_hide.stop()
+        elif self.stage == "done" and not self._others_failed() and (was or self.url):
+            self._auto_hide.start(4000)   # (its Play starting says so: set_playing)
+        self._fill_rows()
+        self._sync_head()
+
+    def set_playing(self, url: str):
+        """A Play started (linkbar.played): the one that waited in Up next plays now."""
+        if url != self.url or self.kind != "play" or self.stage != "done":
+            return
+        self._say_play()
+        self._sync_head()
+        if not self._up_next and not self._others_failed():
+            self._auto_hide.start(7000)
 
     def _retry(self, url: str):
         """Retry: the failed pick is picked again (it starts, or waits its turn)."""
@@ -1242,12 +1292,12 @@ class DownloadBar(QFrame):
             self.bar.set_progress(1.0)
             theme.set_tone(self.lbl_status, "ok")
             if kind == "play":
-                self.lbl_status.setText(_("▶ Playing"))
+                self._say_play()
             else:
                 self.lbl_status.setText(_("✓ Added to your sounds"))
                 self._added = [a for a in self._added if a["url"] != url] + [{
                     "url": url, "title": self._raw[0], "kind": kind, "seconds": self._raw[1]}]
-            if not self._others_failed():   # the failed ones wait for Retry or ✕
+            if not self._others_failed() and not self._up_next:   # those stay up
                 self._auto_hide.start(7000 if kind == "play" else 4000)
         else:
             self._failed = [f for f in self._failed if f["url"] != url] + [{

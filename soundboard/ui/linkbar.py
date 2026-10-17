@@ -441,6 +441,16 @@ class LinkBar(QFrame):
         """The titles of the downloaded Plays waiting their turn, in order."""
         return [t for t, *_r in self._up_next]
 
+    def up_next_items(self) -> list[tuple[str, str]]:
+        """Up next as (title, url): the download bar lists them by their link."""
+        return [(t, u) for t, *_r, u in self._up_next]
+
+    def drop_up_next_url(self, url: str):
+        """Take the Play for `url` out of Up next (the download bar's ✕ on its row)."""
+        i = next((i for i, (*_r, u) in enumerate(self._up_next) if u == url), -1)
+        if i >= 0:
+            self.drop_up_next(i)
+
     def play_next(self, i: int = 0, shown=None) -> bool:
         """Start Up next's song `i` (the first: the one playing ended or was stopped;
         another: its chip was clicked, so it plays now). `shown`: Up next as the chips

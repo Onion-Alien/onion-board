@@ -305,3 +305,43 @@ def test_add_and_play_on_one_card_then_another_card_keeps_both(net):
     net.land(B)
     assert net.added == ["Shrek", "Random"]
     assert not net.w.ytresults._fetching   # every card's button came back
+
+
+def test_a_play_that_waits_its_turn_says_up_next_until_it_plays(net):
+    """The reported confusion: a Play landing while a song plays went to Up next, but
+    the bar said Playing, so it looked like nothing played. It says Up next (and stays
+    up) till its turn, lists the others waiting, and their ✕ takes them out."""
+    net.click(A, play=True)
+    net.land(A)
+    net.click(B, play=True)
+    net.land(B)
+    assert net.played() == [480] and net.w.linkbar.up_next() == ["Random"]
+    bar = net.w.download_bar
+    assert net.bar().url == B and net.bar().head == "Up next"
+    assert net.bar().status == "Up next" and not bar._auto_hide.isActive()
+    net.click(C, play=True)
+    net.land(C)
+    assert net.bar().url == C and net.bar().head == "Up next"
+    assert [u for _t, u in bar._up_next] == [B, C]
+    assert net.bar().status == "Up next · 1 before it"   # (B's row is listed under it)
+    bar.up_next_drop.emit(B)                          # B's row ✕
+    assert net.w.linkbar.up_next() == ["Third"]
+    net.end()                                         # A ends: C, the bar's own, plays
+    assert net.played() == [480, 1440]
+    assert net.bar().head == "Playing" and net.bar().status == "▶ Playing"
+    assert bar._auto_hide.isActive()
+
+
+def test_now_playing_and_up_next_show_on_every_tab(net):
+    """Played from Community (or any tab) while a song plays: the Now playing / Up
+    next row shows there too, not only on the Sounds tab."""
+    w = net.w
+    w.show()
+    w.tabs.setCurrentWidget(w.store)
+    net.click(A, play=True)
+    net.land(A)
+    net.click(B, play=True)
+    net.land(B)
+    w.playctl._update_chips(w.engine.playing())
+    assert w.playing_row.isVisible() and w._up_next_chip is not None
+    assert not w.sounds_page.isAncestorOf(w.playing_row)

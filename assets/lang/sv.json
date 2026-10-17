@@ -3802,5 +3802,6 @@
   "On top of any voice: they stay when you pick another one.": "Ovanpå vilken röst som helst: de stannar när du väljer en annan.",
   "Rain, a crowd, an echo or sounds from your board, on top of any voice": "Regn, folkmassa, eko eller ljud från ditt board ovanpå vilken röst som helst",
   "Take “{effect}” off": "Ta bort ”{effect}”",
-  "{site} didn't answer over Tor (it ignores some of Tor's addresses), and nor did {tries} other Tor routes. You can try this one without Tor: {site} would then see your own address.": "{site} svarade inte via Tor (den ignorerar vissa av Tors adresser), och inte heller via {tries} andra Tor-rutter. Du kan prova den här utan Tor: {site} skulle då se din egen adress."
+  "{site} didn't answer over Tor (it ignores some of Tor's addresses), and nor did {tries} other Tor routes. You can try this one without Tor: {site} would then see your own address.": "{site} svarade inte via Tor (den ignorerar vissa av Tors adresser), och inte heller via {tries} andra Tor-rutter. Du kan prova den här utan Tor: {site} skulle då se din egen adress.",
+  "Up next · {n} before it": "Härnäst · {n} före"
 }
