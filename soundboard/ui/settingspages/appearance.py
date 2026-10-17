@@ -265,9 +265,11 @@ class AppearancePage(Page):
     """Settings → Appearance: themes, texture, size, language and the highlight colour."""
 
     def _appearance(self):
-        """Language on its own, then one box for the look with a row of tabs (the
-        themes, highlight colour, style, size, live tabs, background): one after another
-        the page ran so long that some people never scrolled down to the themes."""
+        """Language on its own, then one box for the look with two tabs: Themes (Textured
+        or Plain on top, then the cards) and Look (highlight colour, size, live tabs and
+        background, one under another). One after another the page ran so long that some
+        people never scrolled down to the themes; six tabs of an option or two each were
+        a lot of clicking for little."""
         w, v = self._page()
         self.dlg.theme_cards = []
         v.addWidget(self._language_card())
@@ -275,6 +277,8 @@ class AppearancePage(Page):
                  "Meme": _("For when you want your soundboard to be a bit.")}
         themes, tv = self._card(_("Themes"), icon="palette")
         tv.setSpacing(6)
+        tv.addWidget(self._section(self._texture_card()))
+        tv.addSpacing(14)
         from soundboard.ui.panel import heading_row
         group_icons = {"Classic": "star", "Colourful": "palette", "Wild": "shuffle",
                        "Meme": "like"}
@@ -287,6 +291,7 @@ class AppearancePage(Page):
                 h.setObjectName("hint")
                 h.setWordWrap(True)
                 tv.addWidget(h)
+                tv.addSpacing(10)   # (the cards sat right under it)
             cards = []
             for name in names:
                 c = ThemeCard(name)
@@ -296,15 +301,22 @@ class AppearancePage(Page):
                 self.dlg.theme_cards.append(c)
             tv.addWidget(ThemeGrid(cards))
             tv.addSpacing(8)
-        pages = [(_("Themes"), themes),
-                 (_("Colour"), self._highlight_card()),
-                 (_("Theme style"), self._texture_card()),
-                 (_("Size"), self._ui_scale_card()),
-                 (_("Live tabs"), self._live_tabs_card()),
-                 (_("Background"), self._playing_background_card())]
-        v.addWidget(self._look_box(pages))
+        look, lv = self._card(_("Look"), icon="image")
+        lv.setSpacing(18)
+        for part in (self._highlight_card(), self._ui_scale_card(), self._live_tabs_card(),
+                     self._playing_background_card()):
+            lv.addWidget(self._section(part))
+        v.addWidget(self._look_box([(_("Themes"), themes), (_("Look"), look)]))
         v.addStretch(1)
         return w
+
+    @staticmethod
+    def _section(card: QFrame) -> QFrame:
+        """Settings card `card` as a part of a look tab: flat, its title a heading."""
+        card.setObjectName("lookpage")
+        if (lay := card.layout()) is not None:
+            lay.setContentsMargins(0, 0, 0, 0)
+        return card
 
     def _look_box(self, pages) -> QFrame:
         """One card holding `pages` [(tab name, card)], a tab row on top showing one at a
