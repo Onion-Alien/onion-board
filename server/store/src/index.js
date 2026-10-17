@@ -17,7 +17,8 @@ const UPLOADS_PER_IP_DAY = 20;
 const VOTES_PER_IP_DAY = 400;
 const VOTES_PER_IP_SOUND_DAY = 6;    // one address can't stuff one sound's votes with made-up installs
 const REPORTS_PER_IP_DAY = 30;
-const REPORTS_TO_HIDE = 3;           // reports from different addresses: back to review
+const REPORTS_TO_HIDE = 3;
+const LOG_DAYS = 90;                 // the action log keeps this many days           // reports from different addresses: back to review
 const PENDING_CAP = 1000;            // a full review queue refuses new uploads
 const AGREEMENT = "own-cc0-v1";      // the version of the upload agreement accepted
 const LINK_AGREEMENT = "link-v1";    // a shared link: only the link is kept
@@ -39,7 +40,17 @@ export default {
       return json({ error: "server" }, 500);
     }
   },
+  // the daily cron (wrangler.toml): old log rows and rate-limit counters go
+  async scheduled(event, env) {
+    await prune(env);
+  },
 };
+
+export async function prune(env, at = now()) {
+  await env.DB.prepare("DELETE FROM actions WHERE at < ?").bind(at - LOG_DAYS * 86400).run();
+  await env.DB.prepare("DELETE FROM counters WHERE day < ?")
+    .bind(Math.floor(at / 86400) - 2).run();
+}
 
 class Answer extends Error {
   constructor(response) { super("answer"); this.response = response; }
@@ -79,6 +90,7 @@ async function route(req, env) {
     await admin(req, env);
     if (p === "/v1/admin/chat" || p.startsWith("/v1/admin/chat/")) return chatRoute(req, env);
     if (p === "/v1/admin/queue" && m === "GET") return queue(url, env);
+    if (p === "/v1/admin/log" && m === "GET") return actionLog(url, env);
     if (p === "/v1/admin/import" && m === "POST") return upload(req, env, true);
     if ((g = p.match(/^\/v1\/admin\/sounds\/([0-9a-f]{12})\/file$/)) && m === "GET")
       return file(env, g[1], true);
@@ -119,10 +131,30 @@ async function allow(env, what, who, limit) {
   const day = today();
   const row = await env.DB.prepare("SELECT n FROM counters WHERE key = ? AND day = ?")
     .bind(key, day).first();
-  if (row && row.n >= limit) return false;
+  if (row && row.n >= limit) {
+    if (row.n === limit) {   // the first refusal today goes in the log, later ones don't
+      await env.DB.prepare("UPDATE counters SET n = n + 1 WHERE key = ? AND day = ?")
+        .bind(key, day).run();
+      const [hash, sound = ""] = who.split(":");   // "upload" counts installs, the rest addresses
+      await logAction(env, "limit", { sound, detail: what,
+        ...(what === "upload" ? { install: hash } : { ip: hash }) });
+    }
+    return false;
+  }
   await env.DB.prepare("INSERT INTO counters (key, day, n) VALUES (?, ?, 1) " +
     "ON CONFLICT (key, day) DO UPDATE SET n = n + 1").bind(key, day).run();
   return true;
+}
+
+// one line in the action log; never fails the request it's about
+async function logAction(env, kind, { sound = "", ip = "", install = "", detail = "" } = {}) {
+  try {
+    await env.DB.prepare("INSERT INTO actions (at, kind, sound, ip, install, detail) " +
+      "VALUES (?, ?, ?, ?, ?, ?)")
+      .bind(now(), kind, sound, ip, install, String(detail).slice(0, 200)).run();
+  } catch (e) {
+    console.error("log", e && e.message || e);
+  }
 }
 
 function cleanName(s) {
@@ -254,6 +286,8 @@ async function upload(req, env, imported = false) {
     .bind(id, name, cleanTags(form.get("tags")), ext, bytes.length, hash,
           imported ? cleanName(form.get("author")) || "Onion Board" : "",
           uploader, ip, imported ? "live" : "pending", now()).run();
+  await logAction(env, imported ? "import" : "upload",
+                  { sound: id, ip, install: imported ? "" : uploader, detail: name });
   return json({ id, status: imported ? "live" : "pending" }, 201);
 }
 
@@ -279,6 +313,7 @@ async function shareLink(req, env) {
   await env.DB.prepare("INSERT INTO sounds (id, name, tags, ext, link, size, sha256, author, " +
     "uploader, ip, status, created) VALUES (?, ?, ?, 'link', ?, 0, ?, '', ?, ?, 'pending', ?)")
     .bind(id, n, cleanTags(tags), "https://" + key, hash, uploader, ip, now()).run();
+  await logAction(env, "link", { sound: id, ip, install: uploader, detail: n });
   return json({ id, status: "pending" }, 201);
 }
 
@@ -316,13 +351,14 @@ async function vote(req, env, id) {
       .bind(id, voter, value).run();
   }
   const c = await counts(env, id);
+  await logAction(env, "vote", { sound: id, ip, install: voter, detail: String(value) });
   return json({ id, up: c.up, down: c.down, mine: value });
 }
 
 // one report per address counts: a new install id is free to make, so counting installs
 // would let one person take any sound off the store
 async function report(req, env, id) {
-  await installHash(req, env);   // still required, as from the app
+  const install = await installHash(req, env);   // still required, as from the app
   const { reason } = await body(req);
   const why = ["copyright", "offensive", "broken", "other"].includes(reason) ? reason : "other";
   const row = await env.DB.prepare("SELECT status FROM sounds WHERE id = ?").bind(id).first();
@@ -337,6 +373,9 @@ async function report(req, env, id) {
   await env.DB.prepare("UPDATE sounds SET reports = ?, " +
     "status = CASE WHEN ? >= ? THEN 'pending' ELSE status END WHERE id = ?")
     .bind(n, n, REPORTS_TO_HIDE, id).run();
+  await logAction(env, "report", { sound: id, ip, install, detail: why });
+  if (n === REPORTS_TO_HIDE)
+    await logAction(env, "hidden", { sound: id, detail: `${n} reports: back to review` });
   return json({ id, reported: true });
 }
 
@@ -354,19 +393,57 @@ async function admin(req, env) {
 }
 
 async function queue(url, env) {
-  const status = ["pending", "live", "rejected"].includes(url.searchParams.get("status"))
-    ? url.searchParams.get("status") : "pending";
+  const want = url.searchParams.get("status");
+  const status = ["pending", "live", "rejected", "all"].includes(want) ? want : "pending";
+  const q = cleanName(url.searchParams.get("q")).toLowerCase();
+  const offset = Math.max(0, Math.min(100000, parseInt(url.searchParams.get("offset")) || 0));
+  const where = [], args = [];
+  if (status !== "all") { where.push("status = ?"); args.push(status); }
+  if (q) {   // a name, a tag, or a sound's id
+    const like = `%${q.replace(/[\\%_]/g, c => "\\" + c)}%`;
+    where.push("(lower(name) LIKE ? ESCAPE '\\' OR tags LIKE ? ESCAPE '\\' OR id = ?)");
+    args.push(like, like, q);
+  }
+  // the review queue oldest first (most reported on top); the rest newest first
+  const order = status === "pending" ? "reports DESC, created ASC" : "created DESC";
   const rows = await env.DB.prepare(
     "SELECT s.*, (SELECT group_concat(reason) FROM reports r WHERE r.sound = s.id) AS why " +
-    "FROM sounds s WHERE status = ? ORDER BY reports DESC, created ASC LIMIT 200")
-    .bind(status).all();
-  return json({ sounds: (rows.results || []).map(r => ({ ...shown(r), status: r.status,
-    reports: r.reports, why: r.why || "" })) });
+    `FROM sounds s ${where.length ? "WHERE " + where.join(" AND ") : ""} ORDER BY ${order} ` +
+    "LIMIT ? OFFSET ?").bind(...args, 201, offset).all();
+  const res = rows.results || [];
+  const n = await env.DB.prepare("SELECT status, count(*) AS n FROM sounds GROUP BY status").all();
+  return json({ sounds: res.slice(0, 200).map(r => ({ ...shown(r), status: r.status,
+    reports: r.reports, why: r.why || "", uploader: r.uploader, ip: r.ip,
+    reviewed: r.reviewed || 0 })), more: res.length > 200,
+    counts: Object.fromEntries((n.results || []).map(r => [r.status, r.n])) });
+}
+
+// the action log, newest first: ?before=<row id>&kind=&sound=&who=<address or install hash>
+async function actionLog(url, env) {
+  const sp = url.searchParams;
+  const where = [], args = [];
+  const before = parseInt(sp.get("before")) || 0;
+  if (before > 0) { where.push("a.id < ?"); args.push(before); }
+  if (/^[a-z]{1,10}$/.test(sp.get("kind") || "")) { where.push("a.kind = ?"); args.push(sp.get("kind")); }
+  if (ID_RE.test(sp.get("sound") || "")) { where.push("a.sound = ?"); args.push(sp.get("sound")); }
+  if (/^([0-9a-f]{64}|owner)$/.test(sp.get("who") || "")) {
+    where.push("(a.ip = ? OR a.install = ?)"); args.push(sp.get("who"), sp.get("who"));
+  }
+  const limit = Math.max(1, Math.min(500, parseInt(sp.get("limit")) || 200));
+  const rows = await env.DB.prepare(
+    "SELECT a.*, s.name AS name FROM actions a LEFT JOIN sounds s ON s.id = a.sound " +
+    `${where.length ? "WHERE " + where.join(" AND ") : ""} ORDER BY a.id DESC LIMIT ?`)
+    .bind(...args, limit + 1).all();
+  const res = rows.results || [];
+  return json({ actions: res.slice(0, limit).map(r => ({ id: r.id, at: r.at, kind: r.kind,
+    sound: r.sound, name: r.name || "", ip: r.ip, install: r.install, detail: r.detail })),
+    more: res.length > limit, keep_days: LOG_DAYS });
 }
 
 async function review(req, env, id) {
   const { action, name } = await body(req);
-  const row = await env.DB.prepare("SELECT ext, status FROM sounds WHERE id = ?").bind(id).first();
+  const row = await env.DB.prepare("SELECT ext, status, name FROM sounds WHERE id = ?")
+    .bind(id).first();
   if (!row) fail("not found", 404);
   if (action === "approve") {
     // a rejected upload's file is deleted: it can't go live again (a link has no file)
@@ -387,5 +464,7 @@ async function review(req, env, id) {
   } else {
     fail("action");
   }
+  await logAction(env, action, { sound: id, ip: "owner", detail:
+    action === "rename" ? `${row.name} -> ${cleanName(name)}` : `was ${row.status}` });
   return json({ id, done: action });
 }

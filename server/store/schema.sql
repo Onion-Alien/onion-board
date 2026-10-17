@@ -44,3 +44,17 @@ CREATE TABLE IF NOT EXISTS counters (
   n INTEGER NOT NULL DEFAULT 0,
   PRIMARY KEY (key, day)
 );
+
+-- what happened in the store, newest last; the daily cron drops rows over 90 days old
+CREATE TABLE IF NOT EXISTS actions (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  at INTEGER NOT NULL,               -- unix seconds
+  kind TEXT NOT NULL,                -- upload | link | import | vote | report | hidden |
+                                     -- approve | reject | rename | limit
+  sound TEXT NOT NULL DEFAULT '',
+  ip TEXT NOT NULL DEFAULT '',       -- salted hash of the address ("owner" for /admin)
+  install TEXT NOT NULL DEFAULT '',  -- salted hash of the install id
+  detail TEXT NOT NULL DEFAULT ''
+);
+CREATE INDEX IF NOT EXISTS actions_at ON actions (at);
+CREATE INDEX IF NOT EXISTS actions_sound ON actions (sound, id);
