@@ -218,13 +218,13 @@ class SearchControl(Controller):
         # a link filters nothing, and nor does the box in the mini player, which hides
         # it: a web search's words left there showed a blank mini player
         t = "" if mw.linkbar.url or mw.fitctl.is_mini() else text.strip().lower()
-        cat, sub = mw.cfg.category, mw.cfg.subcategory
+        cat, sub, hidden = mw.cfg.category, mw.cfg.subcategory, mw.cfg.hidden_from_all
         changed = False
         for m in mw.cfg.sounds:
             p = mw.pads.get(m.id)
             if p:
                 hit = not t or t in m.name.lower() or any(t in g.lower() for g in m.tags)
-                hide = not hit or not library.in_view(m.tags, cat, sub)
+                hide = not hit or not library.in_view(m.tags, cat, sub, hidden)
                 changed = changed or bool(p.property("filtered")) != hide
                 p.setProperty("filtered", hide)
         if changed or not lazy:

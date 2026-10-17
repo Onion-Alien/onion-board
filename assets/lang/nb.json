@@ -3751,10 +3751,15 @@
     "Onion Board har støtt på {n} problemer siden det startet."
   ],
   "See report": "Se rapport",
-  "All categories": "Alle kategorier",
-  "Votes": "Vurderinger",
   "The store doesn't take that name or those tags. Try other words (and no links).": "Butikken tar ikke det navnet eller de taggene. Prøv andre ord (og ingen lenker).",
   "Add a voice someone sent you as a code (it starts with “OB”)": "Legg til en stemme noen sendte deg som en kode (den starter med \"OB\")",
   "Add “{name}”?": "Vil du legge til «{name}»?",
-  "That isn't a voice code (they start with “OB”).": "Det er ikke en stemmekode (de starter med \"OB\")."
+  "That isn't a voice code (they start with “OB”).": "Det er ikke en stemmekode (de starter med \"OB\").",
+  " · hidden from All": " · skjult fra Alle",
+  "Every sound except those in: {names} (right-click one of them, Advanced, to show it here again)": "Alle lyder unntatt dem i: {names} (høyreklikk på en av dem, Avansert, for å vise den her igjen)",
+  "Hide its sounds from All": "Skjul lydene fra Alle",
+  "“{name}” is hidden from All. Its sounds stay on its own tab.": "«{name}» er skjult fra Alle. Lydene blir på sin egen fane.",
+  "“{name}” shows in All again": "«{name}» vises i Alle igjen",
+  "All categories": "Alle kategorier",
+  "Votes": "Vurderinger"
 }

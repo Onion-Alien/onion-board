@@ -3751,10 +3751,15 @@
     "Nagkaroon ang Onion Board ng {n} problema mula nang magsimula ito."
   ],
   "See report": "Tingnan ang report",
-  "All categories": "Lahat ng kategorya",
-  "Votes": "Mga boto",
   "The store doesn't take that name or those tags. Try other words (and no links).": "Hindi tinatanggap ng store ang pangalan o mga tag na iyan. Subukan ang ibang salita (at walang link).",
   "Add a voice someone sent you as a code (it starts with “OB”)": "Magdagdag ng boses na ipinadala sa iyo ng isang tao bilang isang code (nagsisimula ito sa \"OB\")",
   "Add “{name}”?": "Idagdag ang “{name}”?",
-  "That isn't a voice code (they start with “OB”).": "Hindi iyon voice code (nagsisimula sila sa “OB”)."
+  "That isn't a voice code (they start with “OB”).": "Hindi iyon voice code (nagsisimula sila sa “OB”).",
+  " · hidden from All": " · nakatago sa All",
+  "Every sound except those in: {names} (right-click one of them, Advanced, to show it here again)": "Lahat ng tunog maliban sa nasa: {names} (i-right-click ang isa, Advanced, para ipakita ulit dito)",
+  "Hide its sounds from All": "Itago ang mga tunog nito sa All",
+  "“{name}” is hidden from All. Its sounds stay on its own tab.": "Nakatago na ang “{name}” sa All. Nasa sarili nitong tab pa rin ang mga tunog nito.",
+  "“{name}” shows in All again": "Lumalabas na ulit ang “{name}” sa All",
+  "All categories": "Lahat ng kategorya",
+  "Votes": "Mga boto"
 }

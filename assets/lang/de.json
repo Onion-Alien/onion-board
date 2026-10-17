@@ -3751,10 +3751,15 @@
     "Onion Board hatte seit dem Start {n} Probleme."
   ],
   "See report": "Bericht ansehen",
-  "All categories": "Alle Kategorien",
-  "Votes": "Bewertungen",
   "The store doesn't take that name or those tags. Try other words (and no links).": "Der Store nimmt diesen Namen oder diese Tags nicht an. Versuch andere Wörter (und keine Links).",
   "Add a voice someone sent you as a code (it starts with “OB”)": "Fügen Sie eine Stimme hinzu, die Ihnen jemand als Code gesendet hat (sie beginnt mit „OB“).",
   "Add “{name}”?": "„{name}“ hinzufügen?",
-  "That isn't a voice code (they start with “OB”).": "Das ist kein Sprachcode (sie beginnen mit „OB“)."
+  "That isn't a voice code (they start with “OB”).": "Das ist kein Sprachcode (sie beginnen mit „OB“).",
+  " · hidden from All": " · in Alle ausgeblendet",
+  "Every sound except those in: {names} (right-click one of them, Advanced, to show it here again)": "Alle Sounds außer denen in: {names} (Rechtsklick auf eine davon, Erweitert, um sie hier wieder zu zeigen)",
+  "Hide its sounds from All": "Ihre Sounds in Alle ausblenden",
+  "“{name}” is hidden from All. Its sounds stay on its own tab.": "„{name}“ ist in Alle ausgeblendet. Ihre Sounds bleiben auf ihrem eigenen Tab.",
+  "“{name}” shows in All again": "„{name}“ wird wieder in Alle gezeigt",
+  "All categories": "Alle Kategorien",
+  "Votes": "Bewertungen"
 }

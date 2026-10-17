@@ -3672,10 +3672,15 @@
     "Onion Board đã gặp {n} sự cố từ khi khởi động."
   ],
   "See report": "Xem báo cáo",
-  "All categories": "Tất cả danh mục",
-  "Votes": "Lượt bình chọn",
   "The store doesn't take that name or those tags. Try other words (and no links).": "Cửa hàng không nhận tên hoặc thẻ đó. Hãy thử từ khác (và không có liên kết).",
   "Add a voice someone sent you as a code (it starts with “OB”)": "Thêm giọng nói mà ai đó đã gửi cho bạn dưới dạng mã (bắt đầu bằng “OB”)",
   "Add “{name}”?": "Thêm “{name}”?",
-  "That isn't a voice code (they start with “OB”).": "Đó không phải là mã thoại (chúng bắt đầu bằng “OB”)."
+  "That isn't a voice code (they start with “OB”).": "Đó không phải là mã thoại (chúng bắt đầu bằng “OB”).",
+  " · hidden from All": " · ẩn khỏi Tất cả",
+  "Every sound except those in: {names} (right-click one of them, Advanced, to show it here again)": "Mọi âm thanh trừ các âm trong: {names} (chuột phải vào một mục, Nâng cao, để hiện lại ở đây)",
+  "Hide its sounds from All": "Ẩn âm thanh của mục này khỏi Tất cả",
+  "“{name}” is hidden from All. Its sounds stay on its own tab.": "“{name}” đã ẩn khỏi Tất cả. Âm thanh vẫn ở tab riêng của nó.",
+  "“{name}” shows in All again": "“{name}” hiện lại trong Tất cả",
+  "All categories": "Tất cả danh mục",
+  "Votes": "Lượt bình chọn"
 }

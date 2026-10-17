@@ -3672,10 +3672,15 @@
     "Onion Board menghadapi {n} masalah sejak dibuka."
   ],
   "See report": "Lihat laporan",
-  "All categories": "Semua kategori",
-  "Votes": "Undian",
   "The store doesn't take that name or those tags. Try other words (and no links).": "Kedai tidak menerima nama atau tag itu. Cuba perkataan lain (tanpa pautan).",
   "Add a voice someone sent you as a code (it starts with “OB”)": "Tambahkan suara yang dihantar seseorang kepada anda sebagai kod (ia bermula dengan \"OB\")",
   "Add “{name}”?": "Tambah “{name}”?",
-  "That isn't a voice code (they start with “OB”).": "Itu bukan kod suara (ia bermula dengan \"OB\")."
+  "That isn't a voice code (they start with “OB”).": "Itu bukan kod suara (ia bermula dengan \"OB\").",
+  " · hidden from All": " · disembunyikan daripada Semua",
+  "Every sound except those in: {names} (right-click one of them, Advanced, to show it here again)": "Semua bunyi kecuali yang dalam: {names} (klik kanan salah satunya, Lanjutan, untuk menunjukkannya di sini semula)",
+  "Hide its sounds from All": "Sembunyikan bunyinya daripada Semua",
+  "“{name}” is hidden from All. Its sounds stay on its own tab.": "“{name}” disembunyikan daripada Semua. Bunyinya kekal di tabnya sendiri.",
+  "“{name}” shows in All again": "“{name}” ditunjukkan dalam Semua semula",
+  "All categories": "Semua kategori",
+  "Votes": "Undian"
 }

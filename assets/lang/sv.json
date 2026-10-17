@@ -3751,10 +3751,15 @@
     "Onion Board har stött på {n} problem sedan start."
   ],
   "See report": "Visa rapport",
-  "All categories": "Alla kategorier",
-  "Votes": "Betyg",
   "The store doesn't take that name or those tags. Try other words (and no links).": "Butiken tar inte det namnet eller de taggarna. Prova andra ord (och inga länkar).",
   "Add a voice someone sent you as a code (it starts with “OB”)": "Lägg till en röst som någon skickade dig som en kod (den börjar med \"OB\")",
   "Add “{name}”?": "Lägg till ”{name}”?",
-  "That isn't a voice code (they start with “OB”).": "Det är inte en röstkod (de börjar med \"OB\")."
+  "That isn't a voice code (they start with “OB”).": "Det är inte en röstkod (de börjar med \"OB\").",
+  " · hidden from All": " · dold i Alla",
+  "Every sound except those in: {names} (right-click one of them, Advanced, to show it here again)": "Alla ljud utom de i: {names} (högerklicka på en av dem, Avancerat, för att visa den här igen)",
+  "Hide its sounds from All": "Dölj dess ljud i Alla",
+  "“{name}” is hidden from All. Its sounds stay on its own tab.": "”{name}” är dold i Alla. Dess ljud stannar på sin egen flik.",
+  "“{name}” shows in All again": "”{name}” syns i Alla igen",
+  "All categories": "Alla kategorier",
+  "Votes": "Betyg"
 }

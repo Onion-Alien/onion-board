@@ -998,6 +998,8 @@ class ImportControl(Controller):
                 mw.cfg.categories.remove(c)
                 mw.cfg.category_colors.pop(c, None)
                 mw.cfg.subcategories.pop(c, None)
+                if c in mw.cfg.hidden_from_all:
+                    mw.cfg.hidden_from_all.remove(c)
         if mw.cfg.category not in mw.cfg.categories:
             mw.cfg.category = mw.cfg.subcategory = ""
         mw._save_now()

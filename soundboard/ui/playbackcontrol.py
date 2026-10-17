@@ -463,8 +463,9 @@ class PlaybackControl(Controller):
         cat = mw.cfg.category if category is None else category
         if cat and cat not in mw.cfg.categories:
             return None
-        pool = [m.id for m in mw.cfg.sounds
-                if (not cat or cat in m.tags) and m.id in mw.audio]
+        pool = [m.id for m in mw.cfg.sounds   # All: not the categories hidden from it
+                if library.in_view(m.tags, cat, hidden=mw.cfg.hidden_from_all)
+                and m.id in mw.audio]
         sid = self.shuffle.next(cat, pool)
         if sid is None:
             self.cue("fail")

@@ -3672,10 +3672,15 @@
     "Onion Board 启动以来遇到了 {n} 个问题。"
   ],
   "See report": "查看报告",
-  "All categories": "全部分类",
-  "Votes": "投票",
   "The store doesn't take that name or those tags. Try other words (and no links).": "商店不接受这个名字或标签。换些词试试（也不要链接）。",
   "Add a voice someone sent you as a code (it starts with “OB”)": "添加某人发送给您的语音作为代码（以“OB”开头）",
   "Add “{name}”?": "添加“{name}”？",
-  "That isn't a voice code (they start with “OB”).": "这不是语音代码（它们以“OB”开头）。"
+  "That isn't a voice code (they start with “OB”).": "这不是语音代码（它们以“OB”开头）。",
+  " · hidden from All": " · 已从全部中隐藏",
+  "Every sound except those in: {names} (right-click one of them, Advanced, to show it here again)": "除以下分类外的所有音效：{names}(右键点其中一个，高级，即可在这里重新显示)",
+  "Hide its sounds from All": "在全部中隐藏它的音效",
+  "“{name}” is hidden from All. Its sounds stay on its own tab.": "“{name}” 已从全部中隐藏。它的音效仍在自己的标签页里。",
+  "“{name}” shows in All again": "“{name}” 重新显示在全部中",
+  "All categories": "全部分类",
+  "Votes": "投票"
 }

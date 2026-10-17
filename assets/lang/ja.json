@@ -3672,10 +3672,15 @@
     "Onion Board は起動してから {n} 件の問題が起きました。"
   ],
   "See report": "レポートを見る",
-  "All categories": "すべてのカテゴリ",
-  "Votes": "投票",
   "The store doesn't take that name or those tags. Try other words (and no links).": "その名前やタグはストアに載せられません。別の言葉にしてください（リンクも不可）。",
   "Add a voice someone sent you as a code (it starts with “OB”)": "誰かから送られてきた音声をコードとして追加します（「OB」で始まります）",
   "Add “{name}”?": "「{name}」を追加しますか?",
-  "That isn't a voice code (they start with “OB”).": "これは音声コードではありません (「OB」で始まります)。"
+  "That isn't a voice code (they start with “OB”).": "これは音声コードではありません (「OB」で始まります)。",
+  " · hidden from All": " · 「すべて」に非表示",
+  "Every sound except those in: {names} (right-click one of them, Advanced, to show it here again)": "次のカテゴリ以外のすべてのサウンド: {names}(どれかを右クリック→詳細で、またここに表示できます)",
+  "Hide its sounds from All": "サウンドを「すべて」に表示しない",
+  "“{name}” is hidden from All. Its sounds stay on its own tab.": "「{name}」は「すべて」に表示されません。サウンドは自分のタブに残ります。",
+  "“{name}” shows in All again": "「{name}」が「すべて」にまた表示されます",
+  "All categories": "すべてのカテゴリ",
+  "Votes": "投票"
 }

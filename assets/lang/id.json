@@ -3672,10 +3672,15 @@
     "Onion Board mengalami {n} masalah sejak dibuka."
   ],
   "See report": "Lihat laporan",
-  "All categories": "Semua kategori",
-  "Votes": "Penilaian",
   "The store doesn't take that name or those tags. Try other words (and no links).": "Toko tidak menerima nama atau tag itu. Coba kata lain (tanpa tautan).",
   "Add a voice someone sent you as a code (it starts with “OB”)": "Tambahkan suara yang dikirimkan seseorang kepada Anda sebagai kode (dimulai dengan “OB”)",
   "Add “{name}”?": "Tambahkan “{name}”?",
-  "That isn't a voice code (they start with “OB”).": "Itu bukan kode suara (dimulai dengan “OB”)."
+  "That isn't a voice code (they start with “OB”).": "Itu bukan kode suara (dimulai dengan “OB”).",
+  " · hidden from All": " · disembunyikan dari Semua",
+  "Every sound except those in: {names} (right-click one of them, Advanced, to show it here again)": "Semua suara kecuali yang ada di: {names} (klik kanan salah satunya, Lanjutan, untuk menampilkannya di sini lagi)",
+  "Hide its sounds from All": "Sembunyikan suaranya dari Semua",
+  "“{name}” is hidden from All. Its sounds stay on its own tab.": "“{name}” disembunyikan dari Semua. Suaranya tetap ada di tabnya sendiri.",
+  "“{name}” shows in All again": "“{name}” tampil lagi di Semua",
+  "All categories": "Semua kategori",
+  "Votes": "Penilaian"
 }
