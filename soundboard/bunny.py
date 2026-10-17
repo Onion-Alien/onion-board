@@ -35,10 +35,10 @@ CHEEK = QColor(255, 122, 150, 165)
 # his headphones are the current theme's accent (theme.T, read at paint time)
 
 PROPS = (None, "mic", "headphones", "plug", "star", "hammer", "bat", "wrench",
-         "hammer_broken")
+         "hammer_broken", "survey")
 # the props that take a paw (the one on the right, both): those paws leave his lap
 ONE_PAW = {"mic", "headphones", "plug", "bat", "hammer", "hammer_broken", "wrench"}
-BOTH_PAWS = {"star"}
+BOTH_PAWS = {"star", "survey"}
 WOOD = QColor("#c98a4b")
 WOOD_DARK = QColor("#9a6532")
 STEEL = QColor("#9aa0b4")
@@ -188,7 +188,8 @@ ARM_R = 4.6   # (the paw, PAW_R, a little rounder)
 PROP_PAWS = {"mic": (None, (76, 97)), "headphones": (None, (86, 72)),
              "plug": (None, (78, 100)), "star": ((20, 92), (80, 92)),
              "hammer": (None, (80, 92)), "hammer_broken": (None, (80, 92)),
-             "bat": (None, (80, 92)), "wrench": (None, (80, 92))}
+             "bat": (None, (80, 92)), "wrench": (None, (80, 92)),
+             "survey": ((33, 105), (67, 105))}
 PAW_R = 5.5   # the paw: rounder than the arm
 
 
@@ -944,6 +945,8 @@ def _draw_prop(p: QPainter, prop: str | None, ink: QPen, swing: float = 0.0,
         _ellipse(p, 0, 7, 7.5, 3.5, GRIP, ink)              # the knob
         p.restore()
         _ellipse(p, 80, 92, 12, 10, fur, ink)
+    elif prop == "survey":      # *Enjoying Onion Board?*: a clipboard in both paws
+        _survey(p, ink, fur)
     elif prop == "wrench":      # assembling: an AI gadget by his feet, a wrench in his paw
         # (light metal with an ink outline and a glowing screen: it reads on dark and
         # light themes alike)
@@ -968,6 +971,46 @@ def _draw_prop(p: QPainter, prop: str | None, ink: QPen, swing: float = 0.0,
         p.drawRect(QRectF(-3, -37, 6, 6))
         p.restore()
         _ellipse(p, 80, 92, 12, 10, fur, ink)
+
+
+def _survey(p: QPainter, ink: QPen, fur: QColor):
+    """A clipboard held up in both paws, turned to face you (he's showing you the
+    survey): a heart, a ticked box and an empty one, and a few sparkles. *Enjoying
+    Onion Board?*"""
+    p.save()
+    p.translate(50, 102)
+    p.rotate(-6)
+    p.setPen(ink)
+    p.setBrush(WOOD)
+    p.drawRoundedRect(QRectF(-16, -19, 32, 36), 4, 4)        # the board
+    p.setBrush(QColor("#fffdf6"))
+    p.drawRoundedRect(QRectF(-12.5, -14, 25, 28), 2, 2)      # the paper
+    p.setBrush(STEEL)
+    p.drawRoundedRect(QRectF(-7, -22, 14, 7), 2.5, 2.5)      # the clip
+    heart = QPainterPath(QPointF(0, -2.5))                   # a big heart at the top
+    heart.cubicTo(QPointF(-7.5, -7.5), QPointF(-4, -13.5), QPointF(0, -9.5))
+    heart.cubicTo(QPointF(4, -13.5), QPointF(7.5, -7.5), QPointF(0, -2.5))
+    p.setPen(QPen(NOSE_EDGE, 1.1))
+    p.setBrush(QColor("#ff6f91"))
+    p.drawPath(heart)
+    line = QPen(QColor("#b9b2c8"), 1.6, Qt.PenStyle.SolidLine, Qt.PenCapStyle.RoundCap)
+    for y, ticked in ((3, True), (9, False)):
+        p.setPen(QPen(QColor("#6d6880"), 1.1))
+        p.setBrush(QColor("#ffffff"))
+        p.drawRoundedRect(QRectF(-9, y - 2.5, 5, 5), 1, 1)
+        if ticked:
+            p.setPen(QPen(QColor("#13ce66"), 1.8, Qt.PenStyle.SolidLine,
+                          Qt.PenCapStyle.RoundCap, Qt.PenJoinStyle.RoundJoin))
+            p.drawPolyline([QPointF(-8.4, y - 0.2), QPointF(-6.7, y + 1.6),
+                            QPointF(-3.4, y - 3.4)])
+        p.setPen(line)
+        p.drawLine(QPointF(-1.5, y), QPointF(8.5, y))
+    p.restore()
+    _ellipse(p, 33, 105, 12, 10, fur, ink, -20)              # his paws on its sides
+    _ellipse(p, 67, 105, 12, 10, fur, ink, 20)
+    _sparkle(p, 12, 34, 6, QColor("#ffcf40"))
+    _sparkle(p, 90, 38, 5, QColor("#ff8fae"))
+    _sparkle(p, 86, 14, 3.5, QColor("#1fb6ff"))
 
 
 def _nightcap(p: QPainter, ink: QPen):

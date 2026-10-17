@@ -27,7 +27,7 @@ lines in the files below.
 floating Bun: `in_background=True` keeps him moving behind a game), the empty board (`ui/widgets.py`), the Apps tab
 (`ui/appspanel.py`, sad and begging), the Radio map (`ui/flatmap.py`), the YouTube search
 (`ui/ytsearch.py`), left of the Live controls title (`ui/speedpitch.py` `DjBunny`: his
-`bunskits.mixing` act on a loop, tapping sound pads and scratching a record), the mic part update (`ui/micupdate.py`) and Robo-Bun on the AI voice
+`bunskits.mixing` act on a loop, tapping sound pads and scratching a record), the mic part update (`ui/micupdate.py`), the *Enjoying Onion Board?* bar (`ui/enjoycontrol.py`, holding up the `survey` clipboard) and Robo-Bun on the AI voice
 card (`ui/aivoicepanel.py`). `SetupShow` in the setup guide; `ScribeBunny` in the
 download bar (`ui/downloadbar.py`); static pictures in `ui/dialogs.py` and the smug box in
 `ui/mainwindow.py`; each theme's card in Settings > Appearance
@@ -66,7 +66,8 @@ head tilts on top (its pose's `tilt`, added to `nod`): a slow curious lean, furt
 when he's hoping, into the cup he's listening with, side to side as he hops, lolled
 over asleep. Bun mode's dances
 (`BunnyWidget.set_groove`, `_moves`) use them to headbang and nod on the beat. Props:
-`bunny.PROPS` (`hammer_broken`: the failed build's snapped plank and headless hammer).
+`bunny.PROPS` (`hammer_broken`: the failed build's snapped plank and headless hammer;
+`survey`: a clipboard held up in both paws, facing you).
 Everything an act shows stays inside the widget's own box: a widget is only a little wider
 than Bun, so moving him sideways out of view slices him at its edge. Squash, shrink or fade
 him instead (the build act dives into its cloud, the setup show fades out before the edge).
