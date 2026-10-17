@@ -21,12 +21,18 @@ and neither needs a payment card on the account.
 | `/v1/admin/chat`, `/off`, `/ban` | the owner's: reports, the kill switch (`{"off": true}`), bans (`{"who": "<hash>"}`: an install's hash also bans the addresses the room saw it speak from; an address hash from the reports bans just that; `"ban": false` lifts it) |
 | `GET /admin` | the review page: listen, approve, reject |
 | `/v1/admin/...` | the review page's calls (`Authorization: Bearer <ADMIN_TOKEN>`), and `POST /v1/admin/import` to add a sound straight to the store |
+| `GET /v1/admin/queue?status=pending\|live\|rejected\|all&q=&offset=` | the owner's: sounds (200 a page) with their reports and hashes, and how many there are of each status |
+| `GET /v1/admin/log?before=&kind=&sound=&who=&limit=` | the owner's: the action log, newest first (uploads, links, votes, reports, reviews, and the first time each rate limit is hit in a day), filtered by kind, sound, or an address / install hash |
 
 The app sends a random id it made itself (`X-Onion-Install`); the server keeps only a
 salted hash of it, and of the address, for one vote per install and the daily limits
 (10 uploads per install, 20 per address, 400 votes per address). Files are checked by
 their first bytes (MP3, OGG, WAV, FLAC), up to 4 MB, and the same file can't be
 shared twice. A rejected sound's file is deleted at once.
+
+Every action is logged with its time and those hashes (never the address or id itself),
+for the owner to see who did what. A daily cron (`wrangler.toml`) deletes log lines older
+than 90 days and old rate-limit counters.
 
 ## Putting it online
 
@@ -50,3 +56,8 @@ Put `ADMIN_TOKEN=...` and `SALT=...` in a `.dev.vars` file here (git-ignored), t
 npx wrangler d1 execute onion-board-store --local --file schema.sql
 npx wrangler dev --local
 ```
+
+## Tests
+
+`node --test "test/*.test.mjs"` (Node 22.5 or newer; CI runs them): the routes against
+Node's built-in SQLite standing in for D1 and a `Map` for KV.
