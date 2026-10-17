@@ -859,6 +859,8 @@ class MainWindow(QMainWindow):
             v.fx.hotkey_cleared.connect(lambda n: self.hkctl.set_voice_hotkey(n, ""))
             v.fx.renamed.connect(self.hkctl.voice_renamed)
             v.fx.keys = dict(self.cfg.voice_hotkeys)
+            v.board_sounds = lambda: self.cfg.sounds   # the Background's "from my board"
+            v.board_changed()
             v.fx.set_view(self.cfg.voice_view)
             v.fx.view_toggle.changed.connect(lambda view: self.set_option("voice_view", view))
             v.fx.tip_dismissed.connect(
@@ -1101,6 +1103,9 @@ class MainWindow(QMainWindow):
         self._index()
         if getattr(self, "triggers", None) is not None:   # not built yet on the first call
             self.triggers.sounds_changed()
+        board_changed = getattr(getattr(self, "voice", None), "board_changed", None)
+        if board_changed is not None:   # the Voice tab's Background card's board sounds
+            board_changed()
         keep = {m.id for m in self.cfg.sounds}
         for sid in [s for s in self.pads if s not in keep]:
             p = self.pads.pop(sid)

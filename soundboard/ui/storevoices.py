@@ -326,7 +326,7 @@ def open_share(parent: QWidget, install: str, hooks: VoiceHooks, pick: str = "")
     items = hooks.shareable()
     if not items:
         busy.toast(parent, html.escape(_("Make a voice of your own first: Voice tab → "
-                                         "Voice changer → Make it yours, or Save what's "
+                                         "Voice changer → Edit voice, or Save what's "
                                          "on under My setups.")), "warn", 8000)
         return None
     dlg = ShareVoiceDialog(install, items, parent, pick)

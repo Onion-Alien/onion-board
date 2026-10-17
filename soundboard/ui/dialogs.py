@@ -184,6 +184,8 @@ class EffectsPanel(QWidget):
                 continue
             if etype == "cleanup":   # a mic's room noise: nothing to clean in a sound
                 continue
+            if etype == "backdrop":   # sounds behind your voice: the mic's, not a sound's
+                continue
             row = EffectRow(cls, {})
             row.changed.connect(self._edited)
             self.rows[etype] = row

@@ -16,7 +16,7 @@ import numpy as np
 
 from PySide6.QtCore import QEvent, QPointF, QRectF, QSize, Qt, QTimer, Signal
 from PySide6.QtGui import QColor, QGuiApplication, QIcon, QPainter
-from PySide6.QtWidgets import (QButtonGroup, QCheckBox, QDialog, QFrame, QGridLayout,
+from PySide6.QtWidgets import (QBoxLayout, QButtonGroup, QCheckBox, QDialog, QFrame, QGridLayout,
                                QHBoxLayout, QInputDialog, QLabel, QLineEdit, QMenu,
                                QMessageBox, QPushButton, QScrollArea, QSizePolicy,
                                QSlider, QStyle, QStyleOptionSlider, QToolButton,
@@ -378,15 +378,16 @@ FX_ICONS = {"cleanup": "shield", "pitch": "mic", "growl": "wave", "robot": "keyb
             "compressor": "volume", "tone": "sliders", "radio": "radio", "distortion": "live",
             "shout": "speech", "helmet": "voice", "chorus": "shuffle", "echo": "history",
             "reverb": "headphones", "polish": "star", "harmony": "music", "ringmod": "wave",
+            "backdrop": "sounds",
             "flanger": "reload", "wobble": "ear"}
-# the Voice tab's "Make it yours" window's top and the effect cards' groups;
+# the Voice tab's "Edit voice" window's top and the effect cards' groups;
 # an effect from an add-on goes under Add-ons
 HERO = ("pitch", "cleanup")
 HERO_TITLES = {"pitch": _("Pitch & voice")}
 GROUPS = ((_("Change the voice"), ("harmony", "growl", "robot", "ringmod")),
           (_("Character"), ("compressor", "tone", "radio", "distortion", "shout", "helmet",
                             "polish")),
-          (_("Room"), ("chorus", "flanger", "wobble", "echo", "reverb")))
+          (_("Room"), ("chorus", "flanger", "wobble", "echo", "reverb", "backdrop")))
 ADDON_GROUP = _("Add-ons")
 # your own setting, not part of a voice: picking or saving a voice leaves it as it is
 KEEP = frozenset({"cleanup"})
@@ -452,19 +453,24 @@ class EffectRow(QFrame):
         grid.setHorizontalSpacing(18)
         grid.setVerticalSpacing(8)
         self.sliders = []
-        cols = 2 if hero and len(cls.params) > 2 else 1
-        for i, q in enumerate(cls.params):
+        self._fill(grid, cfg)
+        v.addWidget(self.body)
+        self.chk.toggled.connect(self._toggled)
+        self._shown: tuple | None = None   # the (on, folded) the card last showed
+        self._paint_arrow()
+        self._show()
+
+    def _fill(self, grid: QGridLayout, cfg: dict):
+        """The settings under the title: a slider (or switch) per parameter. An effect
+        with settings of its own shape (the Background) overrides this."""
+        cols = 2 if self.hero and len(self.cls.params) > 2 else 1
+        for i, q in enumerate(self.cls.params):
             s = ParamSlider(q, cfg.get(q.key, q.default), compact=False)
             s.changed.connect(self._slid)
             grid.addWidget(s, i // cols, i % cols)
             self.sliders.append(s)
         for c in range(cols):
             grid.setColumnStretch(c, 1)
-        v.addWidget(self.body)
-        self.chk.toggled.connect(self._toggled)
-        self._shown: tuple | None = None   # the (on, folded) the card last showed
-        self._paint_arrow()
-        self._show()
 
     def _show(self):
         on = self.chk.isChecked()
@@ -568,14 +574,15 @@ VOICE_GROUPS = (
     ("funny", _("Funny"), ("Chipmunk", "High voice", "Hothead", "Singing monk",
                            "Underwater", "Drunk", "Choir", "Goblin", "Fairy")),
     ("scary", _("Scary"), ("Demon", "Dark lord", "Ghost", "Masked caller",
-                           "Haunted radio", "Zombie", "Evil twin", "Giant")),
+                           "Haunted radio", "Zombie", "Evil twin", "Giant", "Haunted house")),
     ("scifi", _("Robots & sci-fi"), ("Robot", "Dalek", "Alien", "Talkbox", "Autotune",
-                                     "Mecha", "Ship computer")),
+                                     "Mecha", "Ship computer", "Astronaut")),
     ("disguise", _("Disguise"), ("Deep voice", "Male voice", "Anonymous",
                                  "Secret detective")),
     ("places", _("Radio & places"), ("Walkie-talkie", "Old telephone", "Megaphone",
                                      "Stadium announcer", "Cave", "Podcast voice", "Pilot",
-                                     "Drive-thru speaker", "Old film", "Cathedral")),
+                                     "Drive-thru speaker", "Old film", "Cathedral", "Storm",
+                                     "Campfire story", "Fighter pilot", "Busy café")),
 )
 MINE = "mine"
 FAVS = "favs"
@@ -716,6 +723,9 @@ class VoiceFxPanel(QWidget):
         # your saved voices (Fine-tune -> "Save as a voice"): their own file, see
         # soundboard.savedvoices
         self.store = store if store is not None else savedvoices.Store()
+        # the board's sounds for the Background card's "Add a sound from my board":
+        # [(id, name, categories)], set by the main window
+        self.sound_list: Callable[[], list[tuple[str, str, list[str]]]] = list
         self._based_on = ""   # the saved voice Fine-tune started from (Save offers it)
         # cleaned: a damaged setting (hand-edited, an old backup) mustn't stop the app
         spec = {**default_fx_spec(), **voicefx.clean_spec(spec)}
@@ -835,7 +845,7 @@ class VoiceFxPanel(QWidget):
                                                     else None)
             b = self._make_tile(name, title, pic, VOICE_ICONS.get(name, "wave"))
             if name == CUSTOM:
-                b.setToolTip(_("Your own settings: Make it yours opens them"))
+                b.setToolTip(_("Your own settings: Edit voice opens them"))
         # the die: turns on one of the voices shown, at random. It isn't a voice itself,
         # so it never lights up and has no star; it goes after the last card
         self._shown: list[str] = []   # the voices the cards show now, in order
@@ -856,14 +866,23 @@ class VoiceFxPanel(QWidget):
         self.undo_bar = UndoBar(_("Bring the voice back, as it was"))
         v.addWidget(self.undo_bar)
 
-        # ---- the voice you picked, and Make it yours (hearing it: the mixer's Hear what
+        # ---- the voice you picked, and Edit voice (hearing it: the mixer's Hear what
         # they hear, the one switch, just below). The Voice tab pins it under
         # its scrolling cards (never scrolled out of sight); alone, it ends this panel
         self.picked = QFrame()
         self.picked.setObjectName("picked")
-        ph = QHBoxLayout(self.picked)
-        ph.setContentsMargins(12, 8, 12, 8)
+        # the voice's picture and name, then its buttons: side by side, or, when the
+        # bar is too narrow for both (_fit_picked), the buttons on a line of their own
+        self.picked_box = QBoxLayout(QBoxLayout.Direction.LeftToRight, self.picked)
+        self.picked_box.setContentsMargins(12, 8, 12, 8)
+        self.picked_box.setSpacing(10)
+        ph = QHBoxLayout()
         ph.setSpacing(10)
+        self.picked_box.addLayout(ph, 1)
+        pb = QHBoxLayout()
+        pb.setSpacing(10)
+        self.picked_box.addLayout(pb, 1)   # an equal share: the buttons start mid-bar
+        self._picked_pb = pb
         self.picked_pic = QLabel()
         self.picked_pic.setFixedSize(PICKED_ART, PICKED_ART)
         ph.addWidget(self.picked_pic)
@@ -874,12 +893,19 @@ class VoiceFxPanel(QWidget):
         ph.addWidget(self.picked_name, 1)
         # everything for making your own voice opens in a window of its own (on the
         # card it made the tab scroll forever)
-        self.btn_tweak = QPushButton(_("Make it yours"))
+        self.btn_tweak = QPushButton(_("Edit voice"))
         icons.set_icon(self.btn_tweak, "sliders")
         self.btn_tweak.setToolTip(_("Pitch, Randomize, every effect, and your saved voices: "
                                     "build your own voice in a window beside the app"))
         self.btn_tweak.clicked.connect(lambda: (usage.used("voice-tweak"), self.open_tweak()))
-        ph.addWidget(self.btn_tweak)
+        pb.addWidget(self.btn_tweak)
+        # straight to the Background card (rain, a crowd, your own sounds behind you)
+        self.btn_backdrop = QPushButton(_("Background"))
+        icons.set_icon(self.btn_backdrop, "sounds")
+        self.btn_backdrop.setToolTip(_("Rain, wind, a crowd or sounds from your board "
+                                       "behind your voice"))
+        self.btn_backdrop.clicked.connect(self.open_backdrop)
+        pb.addWidget(self.btn_backdrop)
         # a short line said in this voice, in your headphones (play_sample, from the
         # Voice tab: without it there's nowhere to play it, and no button)
         self.play_sample = play_sample
@@ -888,13 +914,14 @@ class VoiceFxPanel(QWidget):
         self.btn_sample = hear_button()
         self.btn_sample.clicked.connect(lambda: self.hear(self._preset))
         self.btn_sample.hide()
-        ph.addWidget(self.btn_sample)
-        ph.addStretch(1)
+        pb.addWidget(self.btn_sample)
+        pb.addStretch(1)
         v.addWidget(self.picked)
+        self.picked.installEventFilter(self)   # (after its buttons: _fit_picked reads them)
 
-        # ---- the "Make it yours" window: not modal, so the voices stay clickable
+        # ---- the "Edit voice" window: not modal, so the voices stay clickable
         self.dlg = QDialog(self)
-        self.dlg.setWindowTitle(_("Make it yours"))
+        self.dlg.setWindowTitle(_("Edit voice"))
         self.dlg.setModal(False)
         self.dlg.setWindowFlag(Qt.WindowType.WindowContextHelpButtonHint, False)
         self.dlg.finished.connect(self._tweak_closed)
@@ -923,7 +950,7 @@ class VoiceFxPanel(QWidget):
         tv.setContentsMargins(0, 0, 0, 0)
         tv.setSpacing(10)
         # the window's buttons, all along the top (they wrap when it's narrow); the
-        # title bar already says "Make it yours"
+        # title bar already says "Edit voice"
         tools = QWidget()
         srow = Flow(tools, gap=6)
         tv.addWidget(tools)
@@ -1059,7 +1086,7 @@ class VoiceFxPanel(QWidget):
                 for t, r in rows.items():
                     r.load(self._custom.get(t))
             self._own = True
-            self.open_tweak()   # your own mix lives in Make it yours
+            self.open_tweak()   # your own mix lives in Edit voice
         self.btn_power.blockSignals(True)
         self.btn_power.setChecked(True)
         self.btn_power.blockSignals(False)
@@ -1068,7 +1095,7 @@ class VoiceFxPanel(QWidget):
 
     def use_mix(self, effects: dict):
         """Turn the changer on with these effects as your own mix (a setup made from a
-        voice that's gone since), without opening Make it yours."""
+        voice that's gone since), without opening Edit voice."""
         rows = {t: r for t, r in self.rows.items() if t not in KEEP}
         for t, r in rows.items():
             r.load(effects.get(t))
@@ -1120,7 +1147,7 @@ class VoiceFxPanel(QWidget):
         self.btn_power.blockSignals(False)
         self._refresh()
         self._emit()
-        # show what it did: Make it yours opens with the effects it set lit up for a while
+        # show what it did: Edit voice opens with the effects it set lit up for a while
         self.open_tweak()
         for t, r in self.rows.items():
             r.set_fresh(t in chosen)
@@ -1135,7 +1162,7 @@ class VoiceFxPanel(QWidget):
             r.set_fresh(False)
 
     def _scroll_to_fresh(self):
-        """Inside Make it yours, bring the lit-up effects into view."""
+        """Inside Edit voice, bring the lit-up effects into view."""
         fresh = [r for r in self.rows.values() if r.is_fresh()]
         if fresh:
             self._scroll.ensureWidgetVisible(fresh[-1], 0, 24)
@@ -1144,8 +1171,30 @@ class VoiceFxPanel(QWidget):
     # ------------------------------------------------------------------ the window
     DLG_SIZE = QSize(660, 720)
 
+    def _backdrop_count(self) -> int:
+        """How many sounds the Background has on (its levels above 0, board sounds)."""
+        row = self.rows.get("backdrop")
+        if row is None:
+            return 0
+        st = row.state()
+        if not st.get("on"):
+            return 0
+        from soundboard.voicefx import backdrop
+        return (sum(1 for k in backdrop.LAYERS if st.get(k, 0) > 0)
+                + sum(1 for d in st.get("sounds", []) if d.get("level", 0) > 0))
+
+    def open_backdrop(self):
+        """Edit voice, opened at the Background card (unfolded, in view)."""
+        self.open_tweak()
+        row = self.rows.get("backdrop")
+        if row is None:
+            return
+        row.set_folded(False, asked=True)
+        # once the window has laid out its cards (it may have only just been shown)
+        QTimer.singleShot(0, row, lambda: self._scroll.ensureWidgetVisible(row, 0, 24))
+
     def open_tweak(self):
-        """Show the Make it yours window (at the size you left it), or bring it up."""
+        """Show the Edit voice window (at the size you left it), or bring it up."""
         if not self.dlg.isVisible():
             # owned by the app's window, not this panel: inside a card the theme makes
             # every widget see-through (QFrame#card QWidget), the window included
@@ -1165,7 +1214,7 @@ class VoiceFxPanel(QWidget):
 
     def hideEvent(self, e):
         super().hideEvent(e)
-        # the app went to the tray (not just another tab): Make it yours goes with it
+        # the app went to the tray (not just another tab): Edit voice goes with it
         if self.dlg.isVisible():
             QTimer.singleShot(0, self.dlg, self._close_if_app_hidden)   # (dropped if it's gone)
 
@@ -1173,7 +1222,51 @@ class VoiceFxPanel(QWidget):
         if qt_valid(self) and not self.window().isVisible():
             self.dlg.close()
 
+    def _fit_picked(self):
+        """The voice bar, by its width: the first of these that fits. Buttons beside
+        the voice's name; under it (squeezed, "Edit voice  ·  4 on" lost its words);
+        then Background as its icon alone (its tooltip and screen-reader name still
+        say it); then Edit voice without its count."""
+        if getattr(self, "_fitting", False):
+            return   # a text change below lays the bar out again
+        self._fitting = True
+        try:
+            tw, tb, pb = self.btn_tweak, self.btn_backdrop, self._picked_pb
+
+            def width(b, text: str) -> int:   # b's width showing `text` (icon alone: "")
+                fm = b.fontMetrics()
+                now = b.text()
+                base = b.minimumSizeHint().width() - (fm.horizontalAdvance(now) + 6
+                                                      if now else 0)
+                return base + (fm.horizontalAdvance(text) + 6 if text else 0)
+
+            full = getattr(self, "_tweak_text", "") or _("Edit voice")
+            bd = getattr(self, "_backdrop_text", "") or _("Background")
+            hear = (self.btn_sample.minimumSizeHint().width() + pb.spacing()
+                    if not self.btn_sample.isHidden() else 0)
+            m = self.picked_box.contentsMargins()
+            line = self.picked.width() - m.left() - m.right()
+            beside = (line - PICKED_ART - min(self.picked_name.sizeHint().width(), 140)
+                      - 2 * self.picked_box.spacing())
+            row, col = QBoxLayout.Direction.LeftToRight, QBoxLayout.Direction.TopToBottom
+            tries = ((row, full, bd, beside), (col, full, bd, line), (col, full, "", line),
+                     (col, _("Edit voice"), "", line))
+            want, t_text, b_text, _room = next(
+                (t for t in tries
+                 if width(tw, t[1]) + pb.spacing() + width(tb, t[2]) + hear <= t[3]),
+                tries[-1])
+            if self.picked_box.direction() != want:
+                self.picked_box.setDirection(want)
+            for b, text in ((tw, t_text), (tb, b_text)):
+                if b.text() != text:
+                    b.setText(text)
+                    icons.text_gap(b)
+        finally:
+            self._fitting = False
+
     def eventFilter(self, obj, e):
+        if obj is self.picked and e.type() == QEvent.Type.Resize:
+            self._fit_picked()
         if obj is self.dlg and e.type() == QEvent.Type.Resize:
             if self.dlg.isVisible():
                 self._dlg_size = QSize(e.size())
@@ -1457,7 +1550,7 @@ class VoiceFxPanel(QWidget):
                         "(right-click it) first.", savedvoices.MAX_VOICES)
 
     def _parent(self) -> QWidget:
-        """Where a question goes: over Make it yours while it's open."""
+        """Where a question goes: over Edit voice while it's open."""
         return self.dlg if self.dlg.isVisible() else self
 
     def copy_code(self, name: str) -> str:
@@ -1667,7 +1760,11 @@ class VoiceFxPanel(QWidget):
             if cfg is None:
                 # mic clean-up starts on: it only makes changed voices sound better
                 cfg = {"on": True} if etype in KEEP else {}
-            r = EffectRow(cls, cfg, hero=etype in HERO)
+            if etype == "backdrop":
+                from soundboard.ui.backdroprow import BackdropRow
+                r = BackdropRow(cls, cfg, lambda: self.sound_list())
+            else:
+                r = EffectRow(cls, cfg, hero=etype in HERO)
             r.changed.connect(lambda t=etype: self._edited(t))
             r.set_folded(etype in self._folded_fx)
             r.folded_changed.connect(lambda f, t=etype: self._card_folded(t, f))
@@ -1804,8 +1901,17 @@ class VoiceFxPanel(QWidget):
             b.setChecked(on and name == self._preset)
         self.tiles.setExclusive(True)
         n = self._count_on()
-        self.btn_tweak.setText(ngettext("Make it yours  ·  {n} on", "Make it yours  ·  {n} on",
-                                        n) if n else _("Make it yours"))
+        self._tweak_text = (ngettext("Edit voice  ·  {n} on", "Edit voice  ·  {n} on", n)
+                            if n else _("Edit voice"))
+        self.btn_tweak.setText(self._tweak_text)   # (_fit_picked may shorten it)
+        self.btn_tweak.setAccessibleName(self._tweak_text)
+        nb = self._backdrop_count()
+        text = (ngettext("Background  ·  {n} on", "Background  ·  {n} on", nb) if nb
+                else _("Background"))
+        self.btn_backdrop.setAccessibleName(text)
+        self._backdrop_text = text
+        self.btn_backdrop.setText(text)
+        self._fit_picked()   # a longer count may not fit beside the name any more
         mine = self._preset in self.store.voices
         _enable(self.btn_share, mine, _("Turn on one of your saved voices to share it "
                                         "(or right-click its button)"))

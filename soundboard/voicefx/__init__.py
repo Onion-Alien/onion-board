@@ -79,6 +79,12 @@ class Effect:
         the Voice tab). Most effects work sample by sample: 0."""
         return 0.0
 
+    @classmethod
+    def clean_extra(cls, cfg: dict) -> dict:
+        """Settings of this effect that aren't numbers (lists, names), cleaned from a
+        saved one (`clean_spec`). Most effects have none: {}."""
+        return {}
+
 
 REGISTRY: dict[str, type[Effect]] = {}
 
@@ -123,10 +129,18 @@ def clean_spec(raw) -> dict:
     if isinstance(raw.get("preset"), str):
         out["preset"] = RENAMED.get(raw["preset"], raw["preset"])
     def effects(v):
-        return {t: {k: x for k, x in cfg.items()
-                    if isinstance(k, str) and (isinstance(x, bool) if k == "on" else _number(x))}
-                for t, cfg in (v.items() if isinstance(v, dict) else ())
-                if isinstance(t, str) and isinstance(cfg, dict)}
+        out = {t: {k: x for k, x in cfg.items()
+                   if isinstance(k, str) and (isinstance(x, bool) if k == "on" else _number(x))}
+               for t, cfg in (v.items() if isinstance(v, dict) else ())
+               if isinstance(t, str) and isinstance(cfg, dict)}
+        for t, cfg in out.items():
+            cls = REGISTRY.get(t)
+            if cls is not None:
+                try:
+                    cfg.update(cls.clean_extra(v[t]))
+                except Exception as ex:  # noqa: BLE001 - an add-on's: its extras are dropped
+                    log.warning("effect %r: its other settings couldn't be read: %s", t, ex)
+        return out
     out["effects"] = effects(raw.get("effects"))
     if isinstance(raw.get("custom"), dict):   # "My own mix", kept while a preset is on
         out["custom"] = effects(raw["custom"])
@@ -134,7 +148,7 @@ def clean_spec(raw) -> dict:
     if isinstance(favs, list):
         out["favorites"] = list(dict.fromkeys(n for n in favs
                                                if isinstance(n, str) and n))[:200]
-    size = raw.get("panel_size")   # the Make it yours window's [width, height]
+    size = raw.get("panel_size")   # the Edit voice window's [width, height]
     if isinstance(size, list) and len(size) == 2 and all(
             isinstance(n, int) and not isinstance(n, bool) for n in size):
         out["panel_size"] = [min(max(size[0], 360), 4000), min(max(size[1], 300), 4000)]
@@ -175,6 +189,7 @@ class VoiceChain:
         self.replace = False
         self.source = None
         self.errors: dict[str, str] = {}      # effect type -> message (effect bypassed)
+        self.beds = None    # voicefx.backdrop.Beds: the Background's loops, made ahead
 
     # ------------------------------------------------------------ UI thread
     def configure(self, spec: dict):
@@ -208,8 +223,18 @@ class VoiceChain:
                 self.errors[etype] = errors.plain(ex)
                 log.error("voice effect %r failed to start; bypassed", etype, exc_info=ex)
                 continue
+            if hasattr(e, "beds"):
+                e.beds = self.beds  # pyright: ignore[reportAttributeAccessIssue] - the Background's
             new.append(e)
         self._effects = tuple(new)
+
+    def set_beds(self, beds):
+        """(Any thread.) The Background's loops, made by voicefx.backdrop.Maker: handed
+        to the effect now and to any it's rebuilt as later (one attribute write each)."""
+        self.beds = beds
+        for e in self._effects:
+            if hasattr(e, "beds"):
+                e.beds = beds  # pyright: ignore[reportAttributeAccessIssue] - the Background's
 
     @property
     def active(self) -> bool:

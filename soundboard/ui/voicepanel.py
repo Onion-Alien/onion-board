@@ -9,6 +9,7 @@ from __future__ import annotations
 
 import html
 import threading
+from collections.abc import Callable
 
 from PySide6.QtCore import QRectF, Qt, QTimer, Signal
 from PySide6.QtGui import QColor, QLinearGradient, QPainter
@@ -174,6 +175,12 @@ class VoicePanel(QWidget):
         self._active = None              # last is_active() sent out (active_changed)
         self.chain = voicefx.VoiceChain()
         engine.voice_chain = self.chain
+        # the Background's loops (changed built-in sounds, board sounds), made on a
+        # worker and handed straight to the chain
+        from soundboard.voicefx import backdrop
+        self.backdrop = backdrop.Maker(self.chain.set_beds)
+        # the board's sounds (library.SoundMeta), for the Background: set by the main window
+        self.board_sounds: Callable[[], list] = list
         self.modules = mods.discover()
         mods.load_effects(self.modules)
 
@@ -218,7 +225,7 @@ class VoicePanel(QWidget):
         # (_section), at its height for the width. Not pv.addStretch(): with a stretch
         # under it the card got its one-line height instead, so a card with wrapped text
         # was squeezed (controls shorter than they can be, text cut off) when narrow
-        # "folded": Make it yours' folded effect cards ("fx.<type>"); "tab": the tab open
+        # "folded": Edit voice's folded effect cards ("fx.<type>"); "tab": the tab open
         saved_folds = speech.get("folded") if isinstance(speech, dict) else None
         self._folded = ({k for k in saved_folds if isinstance(k, str)}
                         if isinstance(saved_folds, list) else set())
@@ -240,7 +247,7 @@ class VoicePanel(QWidget):
                                play_sample=lambda data: engine.play(
                                    "__fx_voice_sample", data, 1.0, preview=True))
         self.fx.changed.connect(self._fx_changed)
-        # Make it yours' folded effect cards: "fx.<type>" in the same list
+        # Edit voice's folded effect cards: "fx.<type>" in the same list
         self.fx.set_folded(k[3:] for k in self._folded if k.startswith("fx."))
         self.fx.folds_changed.connect(self._fx_folds)
         self._section("fx", self.fx, self.fx.title, self.fx.head)
@@ -291,7 +298,7 @@ class VoicePanel(QWidget):
         self.fx.share_asked.connect(lambda n: self.share_asked.emit(f"{kind_name('fx')}: {n}"))
         outer.insertWidget(0, self.speech.say_bar)   # on top: the bottom has the mixer
         # the picked voice's bar, pinned under the cards while the voice changer shows:
-        # its Hear what they hear and Make it yours never scroll out of sight
+        # its Hear what they hear and Edit voice never scroll out of sight
         fx_lay = self.fx.layout()
         assert fx_lay is not None   # made in VoiceFxPanel.__init__
         fx_lay.removeWidget(self.fx.picked)
@@ -299,7 +306,9 @@ class VoicePanel(QWidget):
         self.fx.picked.setProperty("pinned", True)
         self.fx.show_picked_row(self._tab == "fx")
         outer.addWidget(self.bar)
+        self.fx.sound_list = lambda: [(m.id, m.name, list(m.tags)) for m in self.board_sounds()]
         self.chain.configure(self.fx.spec())
+        self._update_backdrop(self.fx.spec())
         self._emit_active()
 
         # the voice changer's mic meter (only while the tab is showing)
@@ -473,9 +482,32 @@ class VoicePanel(QWidget):
         if self.chain.errors:              # give a bypassed effect another go after an edit
             self.chain.errors.clear()      # (configure rebuilds; clear_errors() would twice)
         self.chain.configure(spec)
+        self._update_backdrop(spec)
         self.fx.show_errors({})
         self.fx_changed.emit(spec)
         self._emit_active()
+
+    def _update_backdrop(self, spec: dict):
+        """Have the Background's loops made for these settings (a worker reads the board
+        sounds from disk and renders them; nothing when it's off)."""
+        cfg = (spec.get("effects") or {}).get("backdrop") if spec.get("enabled") else None
+        if cfg and cfg.get("on") and cfg.get("sounds"):
+            metas = {m.id: m for m in self.board_sounds()}   # read here, on the UI thread
+        else:
+            metas = {}
+
+        def load(sid: str):
+            from soundboard import library
+            m = metas.get(sid)
+            return library.load_sound(m) if m is not None else None
+        self.backdrop.update(cfg, load)
+
+    def board_changed(self):
+        """Sounds were added, renamed or deleted: the Background's names and loops again."""
+        refresh = getattr(self.fx.rows.get("backdrop"), "refresh_names", None)
+        if refresh is not None:
+            refresh()
+        self._update_backdrop(self.fx.spec())
 
     def _ai_changed(self, s: dict):
         self.speech.s["ai"] = s            # kept with the speech settings
@@ -567,7 +599,10 @@ class VoicePanel(QWidget):
             head.addWidget(beside, 0, Qt.AlignmentFlag.AlignVCenter)
         title.hide()                      # the head shows it
         v.addLayout(head)
-        v.addWidget(panel)
+        # any height the card gets beyond what it needs (wrapped text measured at
+        # another width) goes to the panel, never around the title: at 440 px the
+        # title row sat in an 80 px gap
+        v.addWidget(panel, 1)
         panel.show()
         b = QPushButton(TAB_NAMES[key]())
         b.setObjectName("voicetab")
@@ -760,4 +795,5 @@ class VoicePanel(QWidget):
         self.speech.installs._dl_cancel = True
         self.ai.shutdown()
         self.controller.shutdown()
+        self.backdrop.close()
         self.engine.voice_chain = None
