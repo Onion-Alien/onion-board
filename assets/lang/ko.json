@@ -3593,5 +3593,9 @@
   "Couldn't start the AI voice: {why}": "AI 목소리를 시작하지 못했어요: {why}",
   "Getting the AI voice ready…": "AI 목소리 준비 중…",
   "Putting the AI voice on “{name}”… {pct}%": "“{name}”에 AI 목소리를 입히는 중… {pct}%",
-  "The AI voices add-on isn't installed, so only the voice changer part of “{name}” is on.": "AI 목소리 애드온이 설치되지 않아 “{name}”의 보이스 체인저 부분만 켜졌어요."
+  "The AI voices add-on isn't installed, so only the voice changer part of “{name}” is on.": "AI 목소리 애드온이 설치되지 않아 “{name}”의 보이스 체인저 부분만 켜졌어요.",
+  "Use “{name}”?": "“{name}”을(를) 쓸까요?",
+  "“{name}” has an AI voice, so this may take a while. Each sound is made in that voice first, in the background, and plays when it's ready.": "“{name}”에는 AI 목소리가 있어서 시간이 좀 걸릴 수 있어요. 각 사운드를 먼저 백그라운드에서 그 목소리로 만들고, 준비되면 재생해요.",
+  "“{name}” has an AI voice, so this may take a while. The radio goes quiet until the AI voice is ready, then carries on in it.": "“{name}”에는 AI 목소리가 있어서 시간이 좀 걸릴 수 있어요. AI 목소리가 준비될 때까지 라디오가 조용해졌다가 그 목소리로 이어져요.",
+  "“{name}” has an AI voice, so this may take a while. Your programs go quiet until the AI voice is ready, then carry on in it.": "“{name}”에는 AI 목소리가 있어서 시간이 좀 걸릴 수 있어요. AI 목소리가 준비될 때까지 프로그램이 조용해졌다가 그 목소리로 이어져요."
 }

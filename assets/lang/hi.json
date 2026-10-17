@@ -3671,5 +3671,9 @@
   "Couldn't start the AI voice: {why}": "एआई आवाज़ शुरू नहीं हो पाई: {why}",
   "Getting the AI voice ready…": "एआई आवाज़ तैयार हो रही है…",
   "Putting the AI voice on “{name}”… {pct}%": "“{name}” पर एआई आवाज़ लग रही है… {pct}%",
-  "The AI voices add-on isn't installed, so only the voice changer part of “{name}” is on.": "एआई आवाज़ों का ऐड-ऑन इंस्टॉल नहीं है, इसलिए “{name}” का सिर्फ़ आवाज परिवर्तक वाला हिस्सा चालू है।"
+  "The AI voices add-on isn't installed, so only the voice changer part of “{name}” is on.": "एआई आवाज़ों का ऐड-ऑन इंस्टॉल नहीं है, इसलिए “{name}” का सिर्फ़ आवाज परिवर्तक वाला हिस्सा चालू है।",
+  "Use “{name}”?": "“{name}” इस्तेमाल करें?",
+  "“{name}” has an AI voice, so this may take a while. Each sound is made in that voice first, in the background, and plays when it's ready.": "“{name}” में एआई आवाज़ है, इसलिए इसमें थोड़ा समय लग सकता है। हर साउंड पहले बैकग्राउंड में उस आवाज़ में बनता है, और तैयार होते ही बजता है।",
+  "“{name}” has an AI voice, so this may take a while. The radio goes quiet until the AI voice is ready, then carries on in it.": "“{name}” में एआई आवाज़ है, इसलिए इसमें थोड़ा समय लग सकता है। एआई आवाज़ तैयार होने तक रेडियो चुप रहता है, फिर उसी में चलता है।",
+  "“{name}” has an AI voice, so this may take a while. Your programs go quiet until the AI voice is ready, then carry on in it.": "“{name}” में एआई आवाज़ है, इसलिए इसमें थोड़ा समय लग सकता है। एआई आवाज़ तैयार होने तक आपके प्रोग्राम चुप रहते हैं, फिर उसी में चलते हैं।"
 }
