@@ -3064,7 +3064,6 @@
   "The download kept going far past FFmpeg's size: not taking it.": "Le téléchargement a dépassé de loin la taille de FFmpeg : refusé.",
   "winget isn't on this PC.": "winget n'est pas sur ce PC.",
   "A whole folder": "Un dossier entier",
-  "Add sounds: files, a folder, a recording, a link or a free pack (or drag files onto the window)": "Ajoute des sons : fichiers, un dossier, un enregistrement, un lien ou un pack gratuit (ou glisse des fichiers sur la fenêtre)",
   "From a link": "Depuis un lien",
   "Paste a link into the search box": "Colle un lien dans la barre de recherche",
   "Record a sound with your mic: Add, then Record.": "Enregistre un son avec ton micro : Ajouter, puis Enregistrer.",
@@ -4106,5 +4105,8 @@
   "Pumpkin orange, witch purple and cobwebs, with Bun and Hoot in witch's hats. Pick it by 31 October and it's yours to keep.": "Orange citrouille, violet sorcière et toiles d'araignées, avec Bun et Hoot dans des chapeaux de sorcière. Choisissez-le avant le 31 octobre et il vous appartiendra de le conserver.",
   "Bun does a new act on every loading screen. Click Bun or Hoot and they talk like their theme's character.": "Bun fait un nouvel acte sur chaque écran de chargement. Cliquez sur Bun ou Hoot et ils parlent comme le personnage de leur thème.",
   "Watch for Golden, Ice, Galaxy and Rainbow Bun. Rainbow Bun appears only once in 50,000 starts.": "Surveillez Golden, Ice, Galaxy et Rainbow Bun. Rainbow Bun n'apparaît qu'une fois sur 50 000 démarrages.",
-  "No mic is open, so there's no voice to change. Plug one in, or pick it in Settings → Audio.": "Aucun micro ouvert, donc pas de voix à changer. Branches-en un ou choisis-le dans Paramètres → Audio."
+  "No mic is open, so there's no voice to change. Plug one in, or pick it in Settings → Audio.": "Aucun micro ouvert, donc pas de voix à changer. Branches-en un ou choisis-le dans Paramètres → Audio.",
+  "Add sounds: files, a folder, a recording or a link (or drag files onto the window)": "Ajouter des sons : fichiers, un dossier, un enregistrement ou un lien (ou glisse des fichiers sur la fenêtre)",
+  "Drag to change the order": "Glisse pour changer l'ordre",
+  "Play it now": "Le jouer maintenant"
 }

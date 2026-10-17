@@ -2994,7 +2994,6 @@
   "The download kept going far past FFmpeg's size: not taking it.": "다운로드가 FFmpeg 크기를 훨씬 넘어서 사용하지 않아요.",
   "winget isn't on this PC.": "이 PC에는 winget이 없어요.",
   "A whole folder": "폴더 통째로",
-  "Add sounds: files, a folder, a recording, a link or a free pack (or drag files onto the window)": "사운드 추가: 파일, 폴더, 녹음, 링크 또는 무료 팩 (파일을 창에 끌어다 놓아도 돼요)",
   "From a link": "링크에서",
   "Paste a link into the search box": "검색창에 링크를 붙여넣으세요",
   "Record a sound with your mic: Add, then Record.": "마이크로 사운드 녹음: 추가 → 녹음.",
@@ -4027,5 +4026,8 @@
   "Pumpkin orange, witch purple and cobwebs, with Bun and Hoot in witch's hats. Pick it by 31 October and it's yours to keep.": "호박 오렌지, 마녀 보라색, 거미줄, 마녀 모자를 쓴 롤빵과 후트. 10월 31일까지 선택하시면 보관하실 수 있습니다.",
   "Bun does a new act on every loading screen. Click Bun or Hoot and they talk like their theme's character.": "Bun은 로딩 화면마다 새로운 행동을 합니다. Bun이나 Hoot를 클릭하면 테마의 캐릭터처럼 이야기합니다.",
   "Watch for Golden, Ice, Galaxy and Rainbow Bun. Rainbow Bun appears only once in 50,000 starts.": "골든(Golden), 아이스(Ice), 갤럭시(Galaxy), 레인보우 번(Rainbow Bun)을 조심하세요. 레인보우 번은 50,000번의 시작에 한 번만 나타납니다.",
-  "No mic is open, so there's no voice to change. Plug one in, or pick it in Settings → Audio.": "열린 마이크가 없어서 바꿀 목소리가 없어요. 마이크를 연결하거나 설정 → 오디오에서 고르세요."
+  "No mic is open, so there's no voice to change. Plug one in, or pick it in Settings → Audio.": "열린 마이크가 없어서 바꿀 목소리가 없어요. 마이크를 연결하거나 설정 → 오디오에서 고르세요.",
+  "Add sounds: files, a folder, a recording or a link (or drag files onto the window)": "사운드 추가: 파일, 폴더, 녹음 또는 링크 (또는 파일을 창으로 끌어오기)",
+  "Drag to change the order": "끌어서 순서 바꾸기",
+  "Play it now": "지금 재생"
 }

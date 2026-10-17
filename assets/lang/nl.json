@@ -3064,7 +3064,6 @@
   "The download kept going far past FFmpeg's size: not taking it.": "De download ging ver voorbij de grootte van FFmpeg: niet gebruikt.",
   "winget isn't on this PC.": "winget staat niet op deze pc.",
   "A whole folder": "Een hele map",
-  "Add sounds: files, a folder, a recording, a link or a free pack (or drag files onto the window)": "Geluiden toevoegen: bestanden, een map, een opname, een link of een gratis pakket (of sleep bestanden naar het venster)",
   "From a link": "Via een link",
   "Paste a link into the search box": "Plak een link in het zoekvak",
   "Record a sound with your mic: Add, then Record.": "Neem een geluid op met je microfoon: Toevoegen, dan Opnemen.",
@@ -4106,5 +4105,8 @@
   "Pumpkin orange, witch purple and cobwebs, with Bun and Hoot in witch's hats. Pick it by 31 October and it's yours to keep.": "Pompoen oranje, heksenpaars en spinnenwebben, met Bun en Hoot in heksenhoeden. Kies hem vóór 31 oktober en je mag hem houden.",
   "Bun does a new act on every loading screen. Click Bun or Hoot and they talk like their theme's character.": "Bun doet op elk laadscherm een ​​nieuwe act. Klik op Bun of Hoot en ze praten als het karakter van hun thema.",
   "Watch for Golden, Ice, Galaxy and Rainbow Bun. Rainbow Bun appears only once in 50,000 starts.": "Kijk uit naar Golden, Ice, Galaxy en Rainbow Bun. Rainbow Bun verschijnt slechts één keer in de 50.000 starts.",
-  "No mic is open, so there's no voice to change. Plug one in, or pick it in Settings → Audio.": "Geen microfoon open, dus er is geen stem om te veranderen. Sluit er een aan, of kies hem in Instellingen → Audio."
+  "No mic is open, so there's no voice to change. Plug one in, or pick it in Settings → Audio.": "Geen microfoon open, dus er is geen stem om te veranderen. Sluit er een aan, of kies hem in Instellingen → Audio.",
+  "Add sounds: files, a folder, a recording or a link (or drag files onto the window)": "Geluiden toevoegen: bestanden, een map, een opname of een link (of sleep bestanden naar het venster)",
+  "Drag to change the order": "Sleep om de volgorde te wijzigen",
+  "Play it now": "Nu afspelen"
 }

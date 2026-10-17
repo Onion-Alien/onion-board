@@ -3064,7 +3064,6 @@
   "The download kept going far past FFmpeg's size: not taking it.": "Lataus jatkui paljon FFmpegin kokoa pidemmälle: ei käytetä.",
   "winget isn't on this PC.": "winget ei ole tällä tietokoneella.",
   "A whole folder": "Koko kansio",
-  "Add sounds: files, a folder, a recording, a link or a free pack (or drag files onto the window)": "Lisää ääniä: tiedostoja, kansio, nauhoitus, linkki tai ilmainen paketti (tai vedä tiedostot ikkunaan)",
   "From a link": "Linkistä",
   "Paste a link into the search box": "Liitä linkki hakukenttään",
   "Record a sound with your mic: Add, then Record.": "Nauhoita ääni mikrofonilla: Lisää, sitten Nauhoita.",
@@ -4106,5 +4105,8 @@
   "Pumpkin orange, witch purple and cobwebs, with Bun and Hoot in witch's hats. Pick it by 31 October and it's yours to keep.": "Kurpitsa-oranssi, noidanvioletti ja hämähäkinseitit, pulla ja Hoot noitahatuissa. Valitse se 31. lokakuuta mennessä, niin voit pitää sen.",
   "Bun does a new act on every loading screen. Click Bun or Hoot and they talk like their theme's character.": "Bun tekee uuden teon jokaisella latausnäytöllä. Napsauta Bun tai Hoot ja he puhuvat kuin teemansa hahmo.",
   "Watch for Golden, Ice, Galaxy and Rainbow Bun. Rainbow Bun appears only once in 50,000 starts.": "Katso Golden, Ice, Galaxy ja Rainbow Bun. Rainbow Bun ilmestyy vain kerran 50 000 käynnistyksestä.",
-  "No mic is open, so there's no voice to change. Plug one in, or pick it in Settings → Audio.": "Mikään mikrofoni ei ole auki, joten muutettavaa ääntä ei ole. Kytke mikrofoni tai valitse se kohdassa Asetukset → Ääni."
+  "No mic is open, so there's no voice to change. Plug one in, or pick it in Settings → Audio.": "Mikään mikrofoni ei ole auki, joten muutettavaa ääntä ei ole. Kytke mikrofoni tai valitse se kohdassa Asetukset → Ääni.",
+  "Add sounds: files, a folder, a recording or a link (or drag files onto the window)": "Lisää ääniä: tiedostoja, kansio, äänitys tai linkki (tai vedä tiedostot ikkunaan)",
+  "Drag to change the order": "Vedä vaihtaaksesi järjestystä",
+  "Play it now": "Soita nyt"
 }

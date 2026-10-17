@@ -3064,7 +3064,6 @@
   "The download kept going far past FFmpeg's size: not taking it.": "Der Download ging weit über die Größe von FFmpeg hinaus: wird nicht genommen.",
   "winget isn't on this PC.": "winget ist nicht auf diesem PC.",
   "A whole folder": "Einen ganzen Ordner",
-  "Add sounds: files, a folder, a recording, a link or a free pack (or drag files onto the window)": "Sounds hinzufügen: Dateien, ein Ordner, eine Aufnahme, ein Link oder ein kostenloses Paket (oder Dateien aufs Fenster ziehen)",
   "From a link": "Von einem Link",
   "Paste a link into the search box": "Füge einen Link ins Suchfeld ein",
   "Record a sound with your mic: Add, then Record.": "Nimm einen Sound mit deinem Mikro auf: Hinzufügen, dann Aufnehmen.",
@@ -4106,5 +4105,8 @@
   "Pumpkin orange, witch purple and cobwebs, with Bun and Hoot in witch's hats. Pick it by 31 October and it's yours to keep.": "Kürbisorange, Hexenpurpur und Spinnweben, mit Bun und Hoot in Hexenhüten. Wählen Sie es bis zum 31. Oktober aus und behalten Sie es.",
   "Bun does a new act on every loading screen. Click Bun or Hoot and they talk like their theme's character.": "Bun führt auf jedem Ladebildschirm einen neuen Akt aus. Klicken Sie auf Bun oder Hoot und sie sprechen wie der Charakter ihres Themas.",
   "Watch for Golden, Ice, Galaxy and Rainbow Bun. Rainbow Bun appears only once in 50,000 starts.": "Achten Sie auf Golden, Ice, Galaxy und Rainbow Bun. Rainbow Bun erscheint nur einmal in 50.000 Starts.",
-  "No mic is open, so there's no voice to change. Plug one in, or pick it in Settings → Audio.": "Kein Mikro offen, also gibt es keine Stimme zum Verändern. Schließen Sie eins an oder wählen Sie es unter Einstellungen → Audio."
+  "No mic is open, so there's no voice to change. Plug one in, or pick it in Settings → Audio.": "Kein Mikro offen, also gibt es keine Stimme zum Verändern. Schließen Sie eins an oder wählen Sie es unter Einstellungen → Audio.",
+  "Add sounds: files, a folder, a recording or a link (or drag files onto the window)": "Sounds hinzufügen: Dateien, ein Ordner, eine Aufnahme oder ein Link (oder Dateien ins Fenster ziehen)",
+  "Drag to change the order": "Ziehen, um die Reihenfolge zu ändern",
+  "Play it now": "Jetzt abspielen"
 }
