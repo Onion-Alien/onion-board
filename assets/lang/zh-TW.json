@@ -3613,5 +3613,10 @@
   "Updates install themselves": "更新自動安裝",
   "Voices on your sounds, and hotkeys in games": "幫音效配上聲音,快速鍵在遊戲裡也能用",
   "What's new in Onion Board {version}.": "Onion Board {version} 新功能。",
-  "Your voice at one volume": "你的聲音保持同一音量"
+  "Your voice at one volume": "你的聲音保持同一音量",
+  "Couldn't put the AI voice on “{name}”: {why}": "無法為「{name}」加上 AI 聲音：{why}",
+  "Couldn't start the AI voice: {why}": "無法啟動 AI 聲音：{why}",
+  "Getting the AI voice ready…": "正在準備 AI 聲音…",
+  "Putting the AI voice on “{name}”… {pct}%": "正在為「{name}」加上 AI 聲音… {pct}%",
+  "The AI voices add-on isn't installed, so only the voice changer part of “{name}” is on.": "沒有安裝 AI 聲音外掛，所以「{name}」只開了變聲器部分。"
 }

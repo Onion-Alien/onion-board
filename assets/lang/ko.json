@@ -3613,5 +3613,10 @@
   "Updates install themselves": "업데이트가 알아서 설치돼요",
   "Voices on your sounds, and hotkeys in games": "사운드에 목소리를, 게임에 단축키를",
   "What's new in Onion Board {version}.": "Onion Board {version}의 새로운 기능.",
-  "Your voice at one volume": "내 목소리를 같은 크기로"
+  "Your voice at one volume": "내 목소리를 같은 크기로",
+  "Couldn't put the AI voice on “{name}”: {why}": "“{name}”에 AI 목소리를 입히지 못했어요: {why}",
+  "Couldn't start the AI voice: {why}": "AI 목소리를 시작하지 못했어요: {why}",
+  "Getting the AI voice ready…": "AI 목소리 준비 중…",
+  "Putting the AI voice on “{name}”… {pct}%": "“{name}”에 AI 목소리를 입히는 중… {pct}%",
+  "The AI voices add-on isn't installed, so only the voice changer part of “{name}” is on.": "AI 목소리 애드온이 설치되지 않아 “{name}”의 보이스 체인저 부분만 켜졌어요."
 }

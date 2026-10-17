@@ -519,6 +519,8 @@ class MainWindow(QMainWindow):
         self._pill_good = False           # set up: the pill hides (_show_pill)
         self._default_out = appaudio.default_output_name()   # see _follow_default_output
         self.builder._build_ui()
+        from soundboard.ui.livesetups import LiveSetups
+        self.livesetups = LiveSetups(self)   # My setups in the three Live controls
         splash.pump()
         self.devctl._init_devices()
         splash.pump()
@@ -1418,6 +1420,7 @@ class MainWindow(QMainWindow):
                      self.radio.shutdown, tor.shutdown, self.apps.shutdown,
                      self.triggers.shutdown, self.store.shutdown,
                      self.linkbar.shutdown, ytworker.drop_all,
+                     self.livesetups.shutdown,
                      self.voice.shutdown, self.engine.shutdown, shellicon.detach,
                      self.thumbbar.close,
                      netlog.flush,   # what's still open, once the rest closed

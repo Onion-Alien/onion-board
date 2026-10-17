@@ -3769,5 +3769,10 @@
   "Updates install themselves": "Оновлення встановлюються самі",
   "Voices on your sounds, and hotkeys in games": "Голоси на твоїх звуках і гарячі клавіші в іграх",
   "What's new in Onion Board {version}.": "Що нового в Onion Board {version}.",
-  "Your voice at one volume": "Твій голос на одній гучності"
+  "Your voice at one volume": "Твій голос на одній гучності",
+  "Couldn't put the AI voice on “{name}”: {why}": "Не вдалося накласти ШІ-голос на «{name}»: {why}",
+  "Couldn't start the AI voice: {why}": "Не вдалося запустити ШІ-голос: {why}",
+  "Getting the AI voice ready…": "Готую ШІ-голос…",
+  "Putting the AI voice on “{name}”… {pct}%": "Накладаю ШІ-голос на «{name}»… {pct}%",
+  "The AI voices add-on isn't installed, so only the voice changer part of “{name}” is on.": "Доповнення з ШІ-голосами не встановлено, тож із «{name}» увімкнено лише зміну голосу."
 }

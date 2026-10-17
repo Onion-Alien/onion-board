@@ -324,6 +324,15 @@ class Engine(EngineTakes, EngineDevices, SoundCache):
         self.apps_pitch = 0.0
         self.apps_fx: dict = {}
         self._lpitch: dict[tuple[str, str], LivePitch] = {}
+        # a voice setup from Live controls (soundboard.livesetup): its voice changer
+        # live on the sounds (one chain per output), the whole setup where the radio and
+        # each captured program come in (one StreamVoice each)
+        self.sound_voice: dict = {}   # a VoiceChain spec, {} = none
+        self._sound_voice_gen = 0
+        self._svoice: dict[str, Any] = {}   # out -> (VoiceChain, gen it was set up for)
+        self.radio_voice: Any = None   # livesetup.StreamVoice, or None
+        self._apps_setup: tuple = (None, None, None)   # (setup, AI module, on_event)
+        self._aux_voice: dict = {}   # aux key -> livesetup.StreamVoice
 
         self.main_stream = self.mon_stream = self.mic_stream = self.obs_stream = None
         # "straight into my mic" (soundboard.directmic): what others hear goes into the
@@ -473,6 +482,9 @@ class Engine(EngineTakes, EngineDevices, SoundCache):
         a time (the radio's decoding thread), like feed_aux."""
         lvl = peak(x)
         self.level_radio = max(lvl * self.radio_vol, self.level_radio)
+        sv = self.radio_voice
+        if sv is not None:
+            x = sv.process(x, SR)
         tap = self.radio_tap
         if tap is not None:
             tap.append(np.array(x, np.float32))   # (a copy: the decoder may reuse x)
@@ -527,14 +539,62 @@ class Engine(EngineTakes, EngineDevices, SoundCache):
         src = AuxSource(key, self.rates)
         with self.lock:
             self.aux = tuple(a for a in self.aux if a.key != key) + (src,)
+        self._aux_setup(key)
         return src
 
     def remove_aux(self, key):
         with self.lock:
             self.aux = tuple(a for a in self.aux if a.key != key)
+        sv = self._aux_voice.pop(key, None)
+        if sv is not None:
+            sv.shutdown()
+
+    def set_sound_voice(self, spec: dict):
+        """(UI thread) A voice changer spec live on every sound ({} = none)."""
+        self.sound_voice = dict(spec or {})
+        self._sound_voice_gen += 1
+
+    def set_apps_setup(self, setup: dict | None, module=None, on_event=None):
+        """(UI thread) A voice setup on every captured program, now and from now on.
+        Raises RuntimeError when an AI voice's helper can't start."""
+        self._apps_setup = (setup, module, on_event)
+        for a in self.aux:
+            self._aux_setup(a.key)
+
+    def apps_waiting(self) -> bool:
+        """A captured program is held back while its AI voice gets ready."""
+        return any(sv.waiting for sv in self._aux_voice.values())
+
+    def _aux_setup(self, key):
+        setup, module, on_event = self._apps_setup
+        sv = self._aux_voice.get(key)
+        if not setup:
+            if sv is not None:
+                sv.stop()
+            return
+        if sv is None:
+            from soundboard.livesetup import StreamVoice
+            sv = self._aux_voice[key] = StreamVoice(on_event)
+        sv.set_setup(setup, module)
+
+    def _sound_voice_fx(self, out: str, x: np.ndarray) -> np.ndarray:
+        """The Live controls setup's voice changer on `out`'s sounds."""
+        spec, gen = self.sound_voice, self._sound_voice_gen
+        got = self._svoice.get(out)
+        if got is None or got[1] != gen:
+            chain = got[0] if got is not None else None
+            if chain is None:
+                from soundboard import voicefx
+                chain = voicefx.VoiceChain()
+            chain.configure(spec)
+            self._svoice[out] = got = (chain, gen)
+        return got[0].process(x, self.rates[out])
 
     def feed_aux(self, src: AuxSource, x: np.ndarray):
         """Push a chunk ((n, 2) float32 at SR) of a captured program's audio."""
+        sv = self._aux_voice.get(src.key)
+        if sv is not None:
+            x = sv.process(x, SR)
         src.feed(x, self.main_stream is not None, self.mon_stream is not None,
                  self.obs_stream is not None)
 
@@ -901,6 +961,8 @@ class Engine(EngineTakes, EngineDevices, SoundCache):
         _dest (the stream output, hear-my-voice)."""
         mix = self._fx(out, self._pitch(out, self._render(out, frames, previews_only,
                                                           makeup=makeup)))
+        if self.sound_voice:
+            mix = self._sound_voice_fx(out, mix)
         if any(v.fixed for v in self.voices):
             mix += self._render(out, frames, previews_only, fixed=True, makeup=makeup)
         return mix

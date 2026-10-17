@@ -3613,5 +3613,10 @@
   "Updates install themselves": "Bản cập nhật tự cài",
   "Voices on your sounds, and hotkeys in games": "Giọng cho âm thanh của bạn, phím nóng trong game",
   "What's new in Onion Board {version}.": "Có gì mới trong Onion Board {version}.",
-  "Your voice at one volume": "Giọng bạn ở một mức âm lượng"
+  "Your voice at one volume": "Giọng bạn ở một mức âm lượng",
+  "Couldn't put the AI voice on “{name}”: {why}": "Không thể áp giọng AI cho “{name}”: {why}",
+  "Couldn't start the AI voice: {why}": "Không thể khởi động giọng AI: {why}",
+  "Getting the AI voice ready…": "Đang chuẩn bị giọng AI…",
+  "Putting the AI voice on “{name}”… {pct}%": "Đang áp giọng AI cho “{name}”… {pct}%",
+  "The AI voices add-on isn't installed, so only the voice changer part of “{name}” is on.": "Chưa cài tiện ích giọng AI nên chỉ phần đổi giọng nói của “{name}” được bật."
 }

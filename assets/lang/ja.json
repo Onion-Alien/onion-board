@@ -3613,5 +3613,10 @@
   "Updates install themselves": "アップデートは自動でインストール",
   "Voices on your sounds, and hotkeys in games": "サウンドにボイス、ゲームでホットキー",
   "What's new in Onion Board {version}.": "Onion Board {version} の新機能。",
-  "Your voice at one volume": "声の音量を一定に"
+  "Your voice at one volume": "声の音量を一定に",
+  "Couldn't put the AI voice on “{name}”: {why}": "「{name}」にAIボイスを付けられませんでした：{why}",
+  "Couldn't start the AI voice: {why}": "AIボイスを開始できませんでした：{why}",
+  "Getting the AI voice ready…": "AIボイスを準備中…",
+  "Putting the AI voice on “{name}”… {pct}%": "「{name}」にAIボイスを付けています… {pct}%",
+  "The AI voices add-on isn't installed, so only the voice changer part of “{name}” is on.": "AIボイスのアドオンが入っていないため、「{name}」はボイスチェンジャー部分だけオンです。"
 }

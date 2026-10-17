@@ -3769,5 +3769,10 @@
   "Updates install themselves": "Aktualizace se instalují samy",
   "Voices on your sounds, and hotkeys in games": "Hlasy na tvých zvucích a zkratky ve hrách",
   "What's new in Onion Board {version}.": "Co je nového v Onion Board {version}.",
-  "Your voice at one volume": "Tvůj hlas na jedné hlasitosti"
+  "Your voice at one volume": "Tvůj hlas na jedné hlasitosti",
+  "Couldn't put the AI voice on “{name}”: {why}": "AI hlas se nepodařilo dát na „{name}“: {why}",
+  "Couldn't start the AI voice: {why}": "AI hlas se nepodařilo spustit: {why}",
+  "Getting the AI voice ready…": "Připravuje se AI hlas…",
+  "Putting the AI voice on “{name}”… {pct}%": "Dává se AI hlas na „{name}“… {pct} %",
+  "The AI voices add-on isn't installed, so only the voice changer part of “{name}” is on.": "Doplněk AI hlasů není nainstalovaný, takže z „{name}“ je zapnutý jen měnič hlasu."
 }

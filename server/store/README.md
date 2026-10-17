@@ -37,7 +37,7 @@ from one address ever counted on one sound). The review queue takes 1,000 sounds
 of files, then refuses more until some are reviewed. Files (MP3, OGG, WAV, FLAC, up to
 4 MB) are walked from end to end in `src/audio.js`: every MP3 frame, WAV chunk, Ogg page
 and FLAC header block has to be in place, tags and cover art may take 2 MB at most, and
-a file with web page, script or program text anywhere in it is refused. Names and tags
+a file with web page or script text, or a program, anywhere in it is refused. Names and tags
 lose markup characters (``<>`{}\``) and invisible or right-to-left ones. A served file is
 always a download (`content-disposition: attachment`, a sandboxing CSP, `nosniff`), and
 the app keeps one only when it starts like the sound it was told about. The same file

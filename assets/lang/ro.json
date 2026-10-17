@@ -3769,5 +3769,10 @@
   "Updates install themselves": "Actualizările se instalează singure",
   "Voices on your sounds, and hotkeys in games": "Voci pe sunetele tale și taste rapide în jocuri",
   "What's new in Onion Board {version}.": "Ce e nou în Onion Board {version}.",
-  "Your voice at one volume": "Vocea ta la un singur volum"
+  "Your voice at one volume": "Vocea ta la un singur volum",
+  "Couldn't put the AI voice on “{name}”: {why}": "Vocea AI nu a putut fi pusă pe „{name}”: {why}",
+  "Couldn't start the AI voice: {why}": "Vocea AI nu a putut porni: {why}",
+  "Getting the AI voice ready…": "Se pregătește vocea AI…",
+  "Putting the AI voice on “{name}”… {pct}%": "Se pune vocea AI pe „{name}”… {pct}%",
+  "The AI voices add-on isn't installed, so only the voice changer part of “{name}” is on.": "Suplimentul pentru voci AI nu e instalat, așa că din „{name}” e pornit doar schimbătorul de voce."
 }

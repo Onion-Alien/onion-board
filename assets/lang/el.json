@@ -3691,5 +3691,10 @@
   "Updates install themselves": "Οι ενημερώσεις εγκαθίστανται μόνες τους",
   "Voices on your sounds, and hotkeys in games": "Φωνές στους ήχους σου και συντομεύσεις στα παιχνίδια",
   "What's new in Onion Board {version}.": "Τι νέο υπάρχει στο Onion Board {version}.",
-  "Your voice at one volume": "Η φωνή σου σε μία ένταση"
+  "Your voice at one volume": "Η φωνή σου σε μία ένταση",
+  "Couldn't put the AI voice on “{name}”: {why}": "Δεν μπήκε η φωνή AI στο \"{name}\": {why}",
+  "Couldn't start the AI voice: {why}": "Η φωνή AI δεν ξεκίνησε: {why}",
+  "Getting the AI voice ready…": "Ετοιμάζεται η φωνή AI…",
+  "Putting the AI voice on “{name}”… {pct}%": "Μπαίνει η φωνή AI στο \"{name}\"… {pct}%",
+  "The AI voices add-on isn't installed, so only the voice changer part of “{name}” is on.": "Το πρόσθετο φωνών AI δεν είναι εγκατεστημένο, οπότε από το \"{name}\" είναι ενεργή μόνο η αλλαγή φωνής."
 }

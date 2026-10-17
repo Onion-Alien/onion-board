@@ -3691,5 +3691,10 @@
   "Updates install themselves": "Updates installeren zichzelf",
   "Voices on your sounds, and hotkeys in games": "Stemmen op je geluiden en sneltoetsen in games",
   "What's new in Onion Board {version}.": "Nieuw in Onion Board {version}.",
-  "Your voice at one volume": "Je stem op één volume"
+  "Your voice at one volume": "Je stem op één volume",
+  "Couldn't put the AI voice on “{name}”: {why}": "Kon de AI-stem niet op “{name}” zetten: {why}",
+  "Couldn't start the AI voice: {why}": "Kon de AI-stem niet starten: {why}",
+  "Getting the AI voice ready…": "AI-stem wordt klaargezet…",
+  "Putting the AI voice on “{name}”… {pct}%": "AI-stem wordt op “{name}” gezet… {pct}%",
+  "The AI voices add-on isn't installed, so only the voice changer part of “{name}” is on.": "De add-on voor AI-stemmen is niet geïnstalleerd, dus alleen de stemveranderaar van “{name}” staat aan."
 }

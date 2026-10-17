@@ -3613,5 +3613,10 @@
   "Updates install themselves": "Kemas kini memasang sendiri",
   "Voices on your sounds, and hotkeys in games": "Suara pada bunyi anda dan hotkey dalam permainan",
   "What's new in Onion Board {version}.": "Apa yang baharu dalam Onion Board {version}.",
-  "Your voice at one volume": "Suara anda pada satu kelantangan"
+  "Your voice at one volume": "Suara anda pada satu kelantangan",
+  "Couldn't put the AI voice on “{name}”: {why}": "Tidak dapat memasang suara AI pada “{name}”: {why}",
+  "Couldn't start the AI voice: {why}": "Tidak dapat memulakan suara AI: {why}",
+  "Getting the AI voice ready…": "Menyediakan suara AI…",
+  "Putting the AI voice on “{name}”… {pct}%": "Memasang suara AI pada “{name}”… {pct}%",
+  "The AI voices add-on isn't installed, so only the voice changer part of “{name}” is on.": "Alat tambah suara AI belum dipasang, jadi hanya bahagian penukar suara “{name}” yang dihidupkan."
 }

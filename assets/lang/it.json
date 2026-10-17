@@ -3691,5 +3691,10 @@
   "Updates install themselves": "Gli aggiornamenti si installano da soli",
   "Voices on your sounds, and hotkeys in games": "Voci sui tuoi suoni e scorciatoie nei giochi",
   "What's new in Onion Board {version}.": "Novità di Onion Board {version}.",
-  "Your voice at one volume": "La tua voce a un solo volume"
+  "Your voice at one volume": "La tua voce a un solo volume",
+  "Couldn't put the AI voice on “{name}”: {why}": "Impossibile mettere la voce IA su “{name}”: {why}",
+  "Couldn't start the AI voice: {why}": "Impossibile avviare la voce IA: {why}",
+  "Getting the AI voice ready…": "Preparazione della voce IA…",
+  "Putting the AI voice on “{name}”… {pct}%": "Applicazione della voce IA a “{name}”… {pct}%",
+  "The AI voices add-on isn't installed, so only the voice changer part of “{name}” is on.": "Il componente aggiuntivo delle voci IA non è installato, quindi di “{name}” è attivo solo il cambia voce."
 }

@@ -3691,5 +3691,10 @@
   "Updates install themselves": "Päivitykset asentuvat itsestään",
   "Voices on your sounds, and hotkeys in games": "Ääniä äänillesi ja pikanäppäimiä peleihin",
   "What's new in Onion Board {version}.": "Uutta Onion Boardissa {version}.",
-  "Your voice at one volume": "Äänesi samalla voimakkuudella"
+  "Your voice at one volume": "Äänesi samalla voimakkuudella",
+  "Couldn't put the AI voice on “{name}”: {why}": "AI-ääntä ei saatu lisättyä kohteeseen \"{name}\": {why}",
+  "Couldn't start the AI voice: {why}": "AI-ääni ei käynnistynyt: {why}",
+  "Getting the AI voice ready…": "AI-ääntä valmistellaan…",
+  "Putting the AI voice on “{name}”… {pct}%": "Lisätään AI-ääntä kohteeseen \"{name}\"… {pct} %",
+  "The AI voices add-on isn't installed, so only the voice changer part of “{name}” is on.": "AI-äänien lisäosaa ei ole asennettu, joten \"{name}\" on päällä vain äänenmuuttajan osalta."
 }

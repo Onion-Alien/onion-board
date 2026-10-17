@@ -3691,5 +3691,10 @@
   "Updates install themselves": "Güncellemeler kendiliğinden kuruluyor",
   "Voices on your sounds, and hotkeys in games": "Seslerinde sesler, oyunlarda kısayollar",
   "What's new in Onion Board {version}.": "Onion Board {version} yenilikleri.",
-  "Your voice at one volume": "Sesin tek seviyede"
+  "Your voice at one volume": "Sesin tek seviyede",
+  "Couldn't put the AI voice on “{name}”: {why}": "Yapay zeka sesi “{name}” üzerine konamadı: {why}",
+  "Couldn't start the AI voice: {why}": "Yapay zeka sesi başlatılamadı: {why}",
+  "Getting the AI voice ready…": "Yapay zeka sesi hazırlanıyor…",
+  "Putting the AI voice on “{name}”… {pct}%": "Yapay zeka sesi “{name}” üzerine konuyor… %{pct}",
+  "The AI voices add-on isn't installed, so only the voice changer part of “{name}” is on.": "Yapay zeka sesleri eklentisi kurulu değil, bu yüzden “{name}” ayarının yalnızca ses değiştirici kısmı açık."
 }

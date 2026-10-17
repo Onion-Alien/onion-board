@@ -3691,5 +3691,10 @@
   "Updates install themselves": "Kusang nag-i-install ang mga update",
   "Voices on your sounds, and hotkeys in games": "Mga boses sa sounds mo at hotkey sa laro",
   "What's new in Onion Board {version}.": "Ano'ng bago sa Onion Board {version}.",
-  "Your voice at one volume": "Iisang lakas ng boses mo"
+  "Your voice at one volume": "Iisang lakas ng boses mo",
+  "Couldn't put the AI voice on “{name}”: {why}": "Hindi nailagay ang AI voice sa “{name}”: {why}",
+  "Couldn't start the AI voice: {why}": "Hindi nasimulan ang AI voice: {why}",
+  "Getting the AI voice ready…": "Inihahanda ang AI voice…",
+  "Putting the AI voice on “{name}”… {pct}%": "Inilalagay ang AI voice sa “{name}”… {pct}%",
+  "The AI voices add-on isn't installed, so only the voice changer part of “{name}” is on.": "Hindi naka-install ang add-on ng AI voices, kaya ang voice changer lang ng “{name}” ang naka-on."
 }
