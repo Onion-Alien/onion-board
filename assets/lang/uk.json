@@ -3840,5 +3840,6 @@
   "“{name}” is hidden from All. Its sounds stay on its own tab.": "«{name}» прихована в «Усі». Її звуки лишаються на її вкладці.",
   "“{name}” shows in All again": "«{name}» знову видно в «Усі»",
   "All categories": "Усі категорії",
-  "Votes": "Оцінки"
+  "Votes": "Оцінки",
+  "Tutorials are off now. Settings → General turns them back on.": "Підказки вимкнено. Налаштування → Загальні вмикає їх знову."
 }

@@ -3761,5 +3761,6 @@
   "“{name}” is hidden from All. Its sounds stay on its own tab.": "„{name}” el van rejtve a Mindből. A hangjai a saját fülén maradnak.",
   "“{name}” shows in All again": "„{name}” újra látszik a Mindben",
   "All categories": "Minden kategória",
-  "Votes": "Szavazatok"
+  "Votes": "Szavazatok",
+  "Tutorials are off now. Settings → General turns them back on.": "Az útmutatók most ki vannak kapcsolva. A Beállítások → Általános visszakapcsolja őket."
 }

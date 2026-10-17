@@ -3761,5 +3761,6 @@
   "“{name}” is hidden from All. Its sounds stay on its own tab.": "Η «{name}» είναι κρυφή από τα Όλα. Οι ήχοι της μένουν στη δική της καρτέλα.",
   "“{name}” shows in All again": "Η «{name}» φαίνεται ξανά στα Όλα",
   "All categories": "Όλες οι κατηγορίες",
-  "Votes": "Ψήφοι"
+  "Votes": "Ψήφοι",
+  "Tutorials are off now. Settings → General turns them back on.": "Οι οδηγοί είναι τώρα κλειστοί. Οι Ρυθμίσεις → Γενικά τους ανοίγουν ξανά."
 }

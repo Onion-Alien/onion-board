@@ -9,12 +9,14 @@ step each, a few seconds long.
 Radio, Apps, Triggers, Voice and Store have one; Sounds has the first-run tour
 (firsttour.py) and Setup its own guide. None with tutorials switched off
 (Config.tutorials_on, Settings > General), none during the first-run tour or the setup
-guide, and none for tabs an older version already had (library.Config.from_raw marks
+guide (and "Not now" twice inside QUIT_S switches them off: they're clicking around,
+not learning), and none for tabs an older version already had (library.Config.from_raw marks
 those seen: they've been there).
 """
 from __future__ import annotations
 
 import logging
+import time
 from collections.abc import Callable
 
 from PySide6.QtCore import QRect, QTimer
@@ -29,6 +31,7 @@ log = logging.getLogger(__name__)
 
 TABS = TOUR_TABS
 START_MS = 450   # after the tab opens: it lays itself out first
+QUIT_S = 60      # "Not now" twice this close together: no more tours
 
 _current: TabTour | None = None
 
@@ -242,3 +245,18 @@ class TabTour(coach.Tour):
         usage.used(f"tour-{self.tab}-{how}")
         if how == "done":
             busy.toast(self.win, _("Nice, you've got it!"), "ok")
+        elif how == "skipped":
+            self._skipped()
+
+    def _skipped(self):
+        """Put off twice inside QUIT_S (hopping through the tabs): switch the rest off,
+        as Settings > General > Show tutorials does, which also brings them back."""
+        w = self.win
+        now = time.monotonic()
+        last = getattr(w, "_tour_skipped_at", None)
+        w._tour_skipped_at = now
+        if last is None or now - last > QUIT_S:
+            return
+        w.tipctl.set_tutorials_on(False)
+        usage.used("tours-quit")
+        busy.toast(w, _("Tutorials are off now. Settings → General turns them back on."), ms=6000)

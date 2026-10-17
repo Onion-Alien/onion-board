@@ -3761,5 +3761,6 @@
   "“{name}” is hidden from All. Its sounds stay on its own tab.": "«{name}» está oculta en Todo. Sus sonidos siguen en su propia pestaña.",
   "“{name}” shows in All again": "«{name}» vuelve a mostrarse en Todo",
   "All categories": "Todas las categorías",
-  "Votes": "Votos"
+  "Votes": "Votos",
+  "Tutorials are off now. Settings → General turns them back on.": "Las guías están desactivadas. Configuración → General las vuelve a activar."
 }

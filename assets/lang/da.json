@@ -3761,5 +3761,6 @@
   "“{name}” is hidden from All. Its sounds stay on its own tab.": "“{name}” er skjult fra Alle. Dens lyde bliver på dens egen fane.",
   "“{name}” shows in All again": "“{name}” vises i Alle igen",
   "All categories": "Alle kategorier",
-  "Votes": "Bedømmelser"
+  "Votes": "Bedømmelser",
+  "Tutorials are off now. Settings → General turns them back on.": "Vejledninger er slået fra nu. Indstillinger → Generelt slår dem til igen."
 }

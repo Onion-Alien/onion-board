@@ -3682,5 +3682,6 @@
   "“{name}” is hidden from All. Its sounds stay on its own tab.": "「{name}」は「すべて」に表示されません。サウンドは自分のタブに残ります。",
   "“{name}” shows in All again": "「{name}」が「すべて」にまた表示されます",
   "All categories": "すべてのカテゴリ",
-  "Votes": "投票"
+  "Votes": "投票",
+  "Tutorials are off now. Settings → General turns them back on.": "使い方の案内をオフにしました。設定 → 一般 でまたオンにできます。"
 }

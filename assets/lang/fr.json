@@ -3761,5 +3761,6 @@
   "“{name}” is hidden from All. Its sounds stay on its own tab.": "“{name}” est masquée dans Tous. Ses sons restent dans son propre onglet.",
   "“{name}” shows in All again": "“{name}” s'affiche de nouveau dans Tous",
   "All categories": "Toutes les catégories",
-  "Votes": "Votes"
+  "Votes": "Votes",
+  "Tutorials are off now. Settings → General turns them back on.": "Les guides sont coupés. Paramètres → Général les remet."
 }

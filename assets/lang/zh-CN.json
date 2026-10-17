@@ -3682,5 +3682,6 @@
   "“{name}” is hidden from All. Its sounds stay on its own tab.": "“{name}” 已从全部中隐藏。它的音效仍在自己的标签页里。",
   "“{name}” shows in All again": "“{name}” 重新显示在全部中",
   "All categories": "全部分类",
-  "Votes": "投票"
+  "Votes": "投票",
+  "Tutorials are off now. Settings → General turns them back on.": "教程已关闭。设置 → 常规 可以重新打开。"
 }

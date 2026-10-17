@@ -3761,5 +3761,6 @@
   "“{name}” is hidden from All. Its sounds stay on its own tab.": "”{name}” on piilotettu Kaikista. Sen äänet pysyvät sen omalla välilehdellä.",
   "“{name}” shows in All again": "”{name}” näkyy taas Kaikissa",
   "All categories": "Kaikki kategoriat",
-  "Votes": "Arviot"
+  "Votes": "Arviot",
+  "Tutorials are off now. Settings → General turns them back on.": "Ohjeet ovat nyt pois. Asetukset → Yleiset laittaa ne takaisin päälle."
 }

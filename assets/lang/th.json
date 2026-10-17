@@ -3682,5 +3682,6 @@
   "“{name}” is hidden from All. Its sounds stay on its own tab.": "“{name}” ถูกซ่อนจากทั้งหมดแล้ว เสียงยังอยู่ในแท็บของมันเอง",
   "“{name}” shows in All again": "“{name}” แสดงในทั้งหมดอีกครั้ง",
   "All categories": "ทุกหมวดหมู่",
-  "Votes": "โหวต"
+  "Votes": "โหวต",
+  "Tutorials are off now. Settings → General turns them back on.": "ปิดวิธีใช้แล้ว เปิดอีกครั้งได้ใน การตั้งค่า → ทั่วไป"
 }

@@ -3761,5 +3761,6 @@
   "“{name}” is hidden from All. Its sounds stay on its own tab.": "Nakatago na ang “{name}” sa All. Nasa sarili nitong tab pa rin ang mga tunog nito.",
   "“{name}” shows in All again": "Lumalabas na ulit ang “{name}” sa All",
   "All categories": "Lahat ng kategorya",
-  "Votes": "Mga boto"
+  "Votes": "Mga boto",
+  "Tutorials are off now. Settings → General turns them back on.": "Naka-off na ang mga gabay. Ino-on ulit ng Settings → General."
 }
