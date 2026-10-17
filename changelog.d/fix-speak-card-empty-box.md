@@ -1,0 +1,1 @@
+- Speak another language: no more empty box under Install speech recognition before it's installed.

@@ -599,9 +599,14 @@ class SpeechPanel(QWidget):
         self.cb_lang.setCurrentIndex(max(0, self.cb_lang.findData(self.s["translate"]))
                                      if self.s["translate_on"] else 0)
         self.cb_lang.blockSignals(False)
-        self.lang_box.setVisible(self.module is not None and self.module.installed
-                                 and bool(self.langs))
+        self.show_lang_box(self.module is not None and self.module.installed
+                           and bool(self.langs))
         self._refresh_translation()
+
+    def show_lang_box(self, on: bool):
+        """Speak in and its frame together: the frame alone was an empty box."""
+        self.lang_box.setVisible(on)
+        self.settings_box.setVisible(on)
 
     def _fit_lang_list(self):
         """The open list shows every name whole, even past the box's own width."""
