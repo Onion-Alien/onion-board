@@ -1179,6 +1179,7 @@ def test_mic_card_status_uses_painted_marks_on_one_line(window, monkeypatch):
 def test_sounds_toolbar_dropdown_menus_open_with_gap(window, qapp):
     """Dropdown menus on the sound page toolbar open with a short pixel gap from their button."""
     from soundboard.ui.widgets import DropdownMenu
+    from soundboard.wheelguard import DROP_GAP
     w = window
     w.show()
     for btn in (w.btn_more, w.btn_keys, w.btn_view):
@@ -1188,7 +1189,7 @@ def test_sounds_toolbar_dropdown_menus_open_with_gap(window, qapp):
         qapp.processEvents()
         try:
             bottom = btn.mapToGlobal(btn.rect().bottomLeft()).y()
-            assert menu.y() - bottom >= DropdownMenu.GAP
+            assert menu.y() - bottom >= DROP_GAP
         finally:
             menu.close()
             qapp.processEvents()
