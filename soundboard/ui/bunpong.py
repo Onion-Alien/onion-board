@@ -1,9 +1,14 @@
 """The Easter egg: poke Bun enough times (bunnywidget.py, `pong=True`) and he comes back
-with a baseball bat and challenges you to Pong, in a dialog like the app's guides.
+with a baseball bat and challenges you to a game, in a dialog like the app's guides.
 
-He holds his bat up as his paddle on the left; yours is on the right and follows the
-mouse (or the arrow keys). First to WIN_AT. Every hit speeds the ball up a little, and
-Bun only moves so fast, so a long rally is how you beat him.
+Which game is picked at random each time: Pong (here) or one of the small games in
+bungames.py (quick draw, rock paper scissors, tic-tac-toe). They all share `Game`: Bun
+on the left, the score, his quips, sparks and confetti, first to `win_at`.
+
+Pong: he holds his bat up as his paddle on the left; yours is on the right and follows
+the mouse's height (anywhere on screen, so leaving the court never sticks it) or the
+arrow keys (hold to glide). Every hit speeds the ball up a little, and Bun only moves
+so fast, so a long rally is how you beat him.
 
 Nothing is kept: Esc or Close ends the game and Bun calms down again. The game's
 sounds (pongsounds.py) play in your headphones only; the speaker button mutes them.
@@ -16,7 +21,7 @@ import random
 import time
 
 from PySide6.QtCore import QPointF, QRectF, Qt, QTimer
-from PySide6.QtGui import (QBrush, QColor, QFont, QImage, QLinearGradient, QPainter,
+from PySide6.QtGui import (QBrush, QColor, QCursor, QFont, QImage, QLinearGradient, QPainter,
                            QPainterPath, QPen, QPixmap, QRadialGradient)
 from PySide6.QtWidgets import (QDialog, QFrame, QHBoxLayout, QLabel, QPushButton, QVBoxLayout,
                                QWidget)
@@ -38,6 +43,11 @@ SPEED0 = 0.55         # serve speed, court widths a second
 SPEEDUP, SPEED_MAX = 1.07, 1.35
 BUN_SPEED = 0.95      # how fast Bun can move, court heights a second
 MAX_ANGLE = 55        # degrees off straight, hitting the very end of a paddle
+KEY_SPEED = (1.1, 2.0)   # your paddle on held keys, court heights a second: at first, then
+KEY_RAMP = 0.22          # after holding this many seconds
+KEY_TAP = 0.035          # a single tap's nudge, of the court height
+KEY_DIRS = {Qt.Key.Key_Up: -1, Qt.Key.Key_W: -1, Qt.Key.Key_Down: 1, Qt.Key.Key_S: 1}
+GO_KEYS = (Qt.Key.Key_Space, Qt.Key.Key_Return, Qt.Key.Key_Enter)
 BALL = QColor("#d8f25e")
 BUN_PINK = QColor("#ff8fae")   # his end of the court
 CONFETTI = ("#ffcf40", "#ff8fae", "#1fb6ff", "#13ce66", "#a48bff")
@@ -114,8 +124,16 @@ def _bubble(p: QPainter, text: str, x: float, y: float, px: int):
     p.drawText(box, Qt.AlignmentFlag.AlignCenter, text)
 
 
-class Court(QWidget):
-    """The game itself: the court, both paddles, the ball, the score."""
+class Game(QWidget):
+    """What every game with Bun shares: the court bed, Bun on the left with his quips,
+    the score, sparks and confetti, the sounds, and first to `win_at` ending it.
+
+    A game sets `state` ("ready" before it starts, "over" at the end, anything else
+    while playing), moves itself on in `step`, takes keys in `key` / `key_up`, and
+    paints its own part in `paint_game`."""
+
+    win_at = WIN_AT
+    net = False   # the court's middle line and circle (Pong's)
 
     def __init__(self, rng: random.Random | None = None, parent=None):
         super().__init__(parent)
@@ -124,32 +142,354 @@ class Court(QWidget):
         self.setMouseTracking(True)
         self.setMinimumSize(320, 220)
         self.setFocusPolicy(Qt.FocusPolicy.StrongFocus)
-        self.on_over: Callable[[], None] | None = None   # called when someone reaches WIN_AT
+        self.on_over: Callable[[], None] | None = None   # called when someone reaches win_at
         # plays one of pongsounds.NAMES: sound(name, **pongsounds.render's options)
         self.sound: Callable[..., None] | None = None
         self.end_bun_left = 0.0   # where Bun stands at the end (the dialog centres him)
         self.reset()
 
+    @staticmethod
+    def title() -> str:
+        raise NotImplementedError
+
+    def how(self) -> str:
+        """The line under the title: how to play."""
+        raise NotImplementedError
+
     # ------------------------------------------------------------------ state
     def reset(self):
         self.score = {"you": 0, "bun": 0}
-        self.state = "ready"       # ready (click to serve), play, point, over
+        self.state = "ready"
         self.st = 0.0              # seconds in this state
+        self.say, self.say_until = "", 0.0
+        self.swing = 0.0           # Bun's bat, 0 at rest, up to ~0.4 on a hit
+        self.sparks: list[_Spark] = []     # hit sparks and confetti, px
+        self.goal_flash: list | None = None   # [side "bun" / "you", age]: a point lost
+        self.pop = {"you": 9.0, "bun": 9.0}   # seconds since each side scored
+        self.shake = 0.0                   # seconds of court shake left
+
+    @property
+    def playing(self) -> bool:
+        return self.state not in ("ready", "over")
+
+    def _go(self, state: str):
+        self.state, self.st = state, 0.0
+
+    def _play(self, name: str, **kw):
+        if self.sound is not None:
+            self.sound(name, **kw)
+
+    def _say(self, text: str, secs: float = 1.2):
+        self.say, self.say_until = text, time.monotonic() + secs
+
+    def _point(self, who: str, quip: bool = True) -> bool:
+        """`who` ("you" / "bun") scores. True if that ends the game."""
+        self.score[who] += 1
+        self.pop[who] = 0.0
+        self.goal_flash = ["bun" if who == "you" else "you", 0.0]
+        self.shake = 0.28
+        if self.score[who] >= self.win_at:
+            usage.used("egg-pong-won" if who == "you" else "egg-pong-lost")
+            if who == "you":
+                self._confetti()
+            self._play("win" if who == "you" else "lose")
+            self._go("over")
+            self._say(_("aww…") if who == "you" else _("who's the champ!"), 1e9)
+            if self.on_over:
+                self.on_over()
+            return True
+        self._play("score_you" if who == "you" else "score_bun")
+        QTimer.singleShot(180, self, lambda: self._play("score_pop"))
+        if not quip:
+            pass
+        elif who == "you":
+            self._say(self.fx.choice((_("no way!"), _("lucky!"), _("hey!"))))
+        else:
+            self._say(self.fx.choice((_("ha!"), _("too slow!"), _("bonk!"))))
+        return False
+
+    def _confetti(self):
+        w = max(1, self.width())
+        for _i in range(70):
+            self.sparks.append(_Spark(self.fx.uniform(0, w), self.fx.uniform(-60, -4),
+                                      self.fx.uniform(-40, 40), self.fx.uniform(20, 120),
+                                      self.fx.uniform(1.6, 2.6),
+                                      self.fx.choice(CONFETTI), self.fx.uniform(3, 5),
+                                      spin=self.fx.uniform(4, 10)))
+
+    def _burst(self, x: float, y: float, col: QColor, n: int = 14, power: float = 1.0):
+        """Sparks flying out all round (x, y), px."""
+        for _i in range(n):
+            a = self.fx.uniform(0, math.tau)
+            v = self.fx.uniform(70, 200) * power
+            self.sparks.append(_Spark(x, y, math.cos(a) * v, math.sin(a) * v,
+                                      self.fx.uniform(0.25, 0.5),
+                                      col if self.fx.random() < 0.6 else BALL,
+                                      self.fx.uniform(1.4, 2.6)))
+
+    @property
+    def winner(self) -> str | None:
+        if self.state != "over":
+            return None
+        return "you" if self.score["you"] >= self.win_at else "bun"
+
+    # ------------------------------------------------------------------ geometry
+    def geo(self) -> dict:
+        """Pixel sizes for the current widget size."""
+        w, h = max(1, self.width()), max(1, self.height())
+        bh = h * 0.42                       # Bun's height
+        s = bh / H
+        return {"w": w, "h": h, "bh": bh, "s": s, "bun_x": 86 * s + 6,
+                # the games' own space, right of Bun
+                "x0": W * s + 26, "x1": w - 16}
+
+    def bun_rect(self, g: dict) -> QRectF:
+        s = g["s"]
+        if self.state == "over":   # beside the result, both centred on the court
+            return QRectF(self.end_bun_left, (g["h"] - g["bh"]) / 2, W * s, g["bh"])
+        return QRectF(14, (g["h"] - g["bh"]) / 2 + g["h"] * 0.08, W * s, g["bh"])
+
+    # ------------------------------------------------------------------ simulation
+    def step(self, dt: float):
+        self.st += dt
+        self.swing = max(0.0, self.swing - dt * 2.5)
+        for sp in self.sparks:
+            sp.age += dt
+            sp.x += sp.vx * dt
+            sp.y += sp.vy * dt
+            sp.vy += 260 * dt if sp.spin else 0.0   # confetti falls, sparks just fly
+            sp.vx *= 1 - dt * 2.5
+            if not sp.spin:
+                sp.vy *= 1 - dt * 2.5
+        self.sparks = [sp for sp in self.sparks if sp.age < sp.life]
+        if self.goal_flash is not None:
+            self.goal_flash[1] += dt
+            if self.goal_flash[1] > 0.7:
+                self.goal_flash = None
+        for k in self.pop:
+            self.pop[k] += dt
+        self.shake = max(0.0, self.shake - dt)
+
+    # ------------------------------------------------------------------ input
+    def key(self, k) -> bool:
+        """A key went down. True if the game used it."""
+        return False
+
+    def key_up(self, k) -> bool:
+        """A key came up. True if the game used it."""
+        return False
+
+    def press(self, ev, down: bool) -> bool:
+        """A key event (from the court or the dialog round it). True if used."""
+        k = ev.key()
+        if ev.isAutoRepeat():   # held keys are tracked from press to release
+            return k in KEY_DIRS or k in GO_KEYS
+        return self.key(k) if down else self.key_up(k)
+
+    def keyPressEvent(self, ev):
+        if not self.press(ev, True):
+            super().keyPressEvent(ev)
+
+    def keyReleaseEvent(self, ev):
+        if not self.press(ev, False):
+            super().keyReleaseEvent(ev)
+
+    # ------------------------------------------------------------------ paint
+    def paintEvent(self, ev):
+        p = QPainter(self)
+        snap_to_pixels(p)
+        p.setRenderHint(QPainter.RenderHint.Antialiasing)
+        g = self.geo()
+        w, h = g["w"], g["h"]
+        t = time.monotonic()
+        over = self.state == "over"
+        if self.shake > 0:   # a little jolt when a point goes in
+            k = self.shake / 0.28
+            p.translate(self.fx.uniform(-3, 3) * k, self.fx.uniform(-2, 2) * k)
+        self._paint_arena(p, w, h, over)
+        if not over:
+            self._paint_scores(p, w, h)
+            self.paint_back(p, g)
+        br = self._paint_bun(p, g, t)
+        self._paint_sparks(p)
+        if not over:
+            self.paint_game(p, g)
+        if self.say and time.monotonic() < self.say_until:
+            _bubble(p, self.say, br.center().x() + br.width() * 0.15,
+                    br.top() + br.height() * 0.1, max(10, round(g["bh"] * 0.12)))
+        p.end()
+
+    def paint_back(self, p: QPainter, g: dict):
+        """The game's part under Bun."""
+
+    def paint_game(self, p: QPainter, g: dict):
+        """The game's part over Bun (not at the end)."""
+
+    def bun_pose(self) -> dict:
+        """How Bun stands now: draw_bunny's keywords."""
+        lost = self.winner == "you"
+        won = self.winner == "bun"
+        return {"prop": "star" if won else None if lost else "bat", "swing": self.swing,
+                "sad": 0.9 if lost else 0.0, "angry": 0.0 if self.state == "over" else 0.6,
+                "ears": 30 if lost else -4}
+
+    def _paint_bun(self, p: QPainter, g: dict, t: float) -> QRectF:
+        br = self.bun_rect(g)
+        if self.winner == "bun":
+            br.translate(0, -6 * abs(math.sin(t * 3.4)))
+            for i, col in enumerate(("#ffcf40", "#ff8fae", "#1fb6ff", "#a48bff")):
+                a = t * 0.9 + i * math.pi / 2
+                sparkle(p, br.center().x() + math.cos(a) * br.width() * 0.52,
+                        br.center().y() + math.sin(a) * br.height() * 0.45,
+                        3 + 3 * abs(math.sin(t * 4 + i)), QColor(col))
+        blink = 1.0 if (t % 3.7) < 0.12 else 0.0
+        pose = self.bun_pose()
+        draw_bunny(p, br, pose.pop("prop"), blink=blink, **pose)
+        return br
+
+    def score_boxes(self, w: float, h: float) -> tuple[QRectF, QRectF]:
+        """Where Bun's and your numbers go: over Bun, top left (Pong puts them by the
+        net)."""
+        nw = h * 0.16
+        bun = QRectF(18, h * 0.04, nw, h * 0.18)
+        return bun, bun.translated(nw + h * 0.04, 0)
+
+    def _paint_scores(self, p: QPainter, w: float, h: float):
+        """The score: big and faint behind the play, popping when it goes up."""
+        f = QFont(self.font())
+        boxes = self.score_boxes(w, h)
+        for side, box in zip(("bun", "you"), boxes):
+            k = self.pop[side]
+            bump = 1 + 0.35 * max(0.0, 1 - k / 0.35) ** 2
+            col = QColor(theme.T["text_hi"])
+            col.setAlphaF(0.12 + 0.5 * max(0.0, 1 - k / 0.6))
+            f.setPixelSize(round(box.height() * 0.86 * bump))
+            f.setBold(True)
+            p.setFont(f)
+            p.setPen(col)
+            p.drawText(box.adjusted(-30, -30, 30, 30), Qt.AlignmentFlag.AlignCenter,
+                       str(self.score[side]))
+        f.setPixelSize(max(10, round(h * 0.045)))
+        f.setBold(False)
+        p.setFont(f)
+        p.setPen(QColor(theme.T["muted"]))
+        for name, box in zip((_("Bun"), _("You")), boxes):
+            under = QRectF(box.left() - 20, box.bottom() - 4, box.width() + 40, h * 0.07)
+            p.drawText(under, Qt.AlignmentFlag.AlignCenter, name)
+
+    def _paint_sparks(self, p: QPainter):
+        for sp in self.sparks:
+            k = sp.age / sp.life
+            p.setPen(Qt.PenStyle.NoPen)
+            p.setBrush(_alpha(sp.col, 1 - k * k))
+            if sp.spin:   # confetti: little turning paper strips
+                p.save()
+                p.translate(sp.x, sp.y)
+                p.rotate(sp.age * sp.spin * 60)
+                p.scale(1, abs(math.cos(sp.age * sp.spin)) + 0.15)
+                p.drawRect(QRectF(-sp.size / 2, -sp.size, sp.size, sp.size * 2))
+                p.restore()
+            else:
+                p.drawEllipse(QPointF(sp.x, sp.y), sp.size * (1 - 0.5 * k), sp.size * (1 - 0.5 * k))
+
+    def _prompt(self, p: QPainter, text: str, rect: QRectF, px: float, col: QColor | None = None):
+        f = QFont(self.font())
+        f.setPixelSize(max(11, round(px)))
+        f.setBold(True)
+        p.setFont(f)
+        p.setPen(col or QColor(theme.T["text_hi"]))
+        p.drawText(rect, Qt.AlignmentFlag.AlignCenter, text)
+
+    def _paint_arena(self, p: QPainter, w: float, h: float, over: bool):
+        """The court bed: sunk into the card, lit from the middle with the theme colour,
+        each end tinted for its player, with lines (and Pong's glowing net). All from
+        the theme's own colours, so it fits every theme."""
+        light = theme.is_light()
+        acc = QColor(theme.T["accent"])
+        hi = QColor(theme.T["text_hi"])
+        bed = QColor(theme.T.get("inset", theme.T["bg"]))
+        dark = QColor("white" if light else "black")
+        court = QRectF(0, 0, w, h)
+        path = QPainterPath()
+        path.addRoundedRect(court, 12, 12)
+        p.save()
+        p.setClipPath(path)
+        g = QLinearGradient(0, 0, 0, h)   # a sunken bed: shaded under the top lip
+        g.setColorAt(0, _mix(bed, dark, 0.25 if not light else 0.0))
+        g.setColorAt(0.12, bed)
+        g.setColorAt(1, _mix(bed, hi, 0.03))
+        p.fillRect(court, g)
+        glow = QRadialGradient(QPointF(w / 2, h / 2), max(w, h) * 0.55)
+        glow.setColorAt(0, _alpha(acc, 0.14 if not light else 0.08))
+        glow.setColorAt(1, _alpha(acc, 0.0))
+        p.fillRect(court, glow)
+        for x0, x1, col in ((0, w * 0.22, BUN_PINK), (w, w * 0.78, acc)):   # the ends
+            end = QLinearGradient(x0, 0, x1, 0)
+            end.setColorAt(0, _alpha(col, 0.13))
+            end.setColorAt(1, _alpha(col, 0.0))
+            p.fillRect(court, end)
+        if self.goal_flash is not None:   # a point just went in against this side
+            side, age = self.goal_flash
+            k = max(0.0, 1 - age / 0.7)
+            col = BUN_PINK if side == "you" else acc   # the scorer's colour
+            x0, x1 = (w, w * 0.6) if side == "you" else (0, w * 0.4)
+            fl = QLinearGradient(x0, 0, x1, 0)
+            fl.setColorAt(0, _alpha(col, 0.45 * k))
+            fl.setColorAt(1, _alpha(col, 0.0))
+            p.fillRect(court, fl)
+        p.fillRect(court, QBrush(_grain_tile(light)))
+        if not over:
+            line = _alpha(hi, 0.10)
+            p.setBrush(Qt.BrushStyle.NoBrush)
+            p.setPen(QPen(line, 1.5))
+            p.drawRoundedRect(court.adjusted(12, 12, -12, -12), 6, 6)
+            if self.net:
+                rr = h * 0.17
+                p.drawEllipse(QPointF(w / 2, h / 2), rr, rr)
+                p.setPen(QPen(_alpha(acc, 0.10), 7, Qt.PenStyle.SolidLine,
+                              Qt.PenCapStyle.RoundCap))
+                p.drawLine(QPointF(w / 2, 12), QPointF(w / 2, h - 12))   # the net's glow
+                dash = QPen(_alpha(hi, 0.35), 2, Qt.PenStyle.CustomDashLine,
+                            Qt.PenCapStyle.RoundCap)
+                dash.setDashPattern([2.5, 4])
+                p.setPen(dash)
+                p.drawLine(QPointF(w / 2, 12), QPointF(w / 2, h - 12))
+        p.restore()
+        # the lip: shade along the top edge, a catch of light along the bottom
+        p.setBrush(Qt.BrushStyle.NoBrush)
+        p.setPen(QPen(_alpha(hi, 0.08 if not light else 0.0), 1))
+        p.drawRoundedRect(court.adjusted(0.5, 0.5, -0.5, -0.5), 12, 12)
+
+
+class Court(Game):
+    """Pong: the court, both paddles, the ball."""
+
+    net = True
+
+    @staticmethod
+    def title() -> str:
+        return _("Pong with Bun")
+
+    def how(self) -> str:
+        return _("First to {n} wins. Move your paddle with the mouse or the arrow keys.",
+                 n=self.win_at)
+
+    # ------------------------------------------------------------------ state
+    def reset(self):
+        super().reset()
+        self.state = "ready"       # ready (click to serve), play, point, over
         self.you_y = self.bun_y = 0.5   # paddle centres, 0..1 of the court height
         self.aim_y = 0.5           # where the mouse / keys want your paddle
         self.bx, self.by = 0.5, 0.5     # the ball, 0..1 of the court
         self.vx = self.vy = 0.0         # court widths / heights a second
         self.trail: list[tuple[float, float]] = []
         self.flash: list[list] = []     # [x, y, age]: a ring where the ball was hit
-        self.swing = 0.0           # Bun's bat, 0 at rest, up to ~0.4 on a hit
         self.err = 0.0             # how far off Bun's guess is this rally
-        self.say, self.say_until = "", 0.0
         self.server = "you"
-        self.sparks: list[_Spark] = []     # hit sparks and confetti, px
         self.rally = 0                     # hits in a row this point
-        self.goal_flash: list | None = None   # [side "bun" / "you", age]: a goal let in
-        self.pop = {"you": 9.0, "bun": 9.0}   # seconds since each side scored
-        self.shake = 0.0                   # seconds of court shake left
+        self.held: set = set()     # arrow / W S keys held down
+        self.held_t = 0.0          # how long they've been held
+        self._cursor = QCursor.pos()   # the mouse, last seen (anywhere on screen)
 
     def _speed(self) -> float:
         return math.hypot(self.vx * self.width(), self.vy * self.height()) / max(1, self.width())
@@ -167,14 +507,10 @@ class Court(QWidget):
         self._play("serve")
 
     def _go(self, state: str):
-        self.state, self.st = state, 0.0
+        super()._go(state)
         # the pointer hides while you play (your paddle is the pointer)
         self.setCursor(Qt.CursorShape.BlankCursor if state in ("play", "point")
                        else Qt.CursorShape.ArrowCursor)
-
-    def _play(self, name: str, **kw):
-        if self.sound is not None:
-            self.sound(name, **kw)
 
     def _pan(self) -> float:
         """Where the ball is, as a stereo position: a little left of Bun to a little
@@ -183,9 +519,6 @@ class Court(QWidget):
 
     def _heat(self) -> float:
         return max(0.0, min(1.0, (self._speed() - SPEED0) / (SPEED_MAX - SPEED0)))
-
-    def _say(self, text: str, secs: float = 1.2):
-        self.say, self.say_until = text, time.monotonic() + secs
 
     def _guess_error(self) -> float:
         """How far from the ball Bun aims, in paddle half-lengths: mostly close, and
@@ -196,29 +529,32 @@ class Court(QWidget):
 
     # ------------------------------------------------------------------ geometry
     def geo(self) -> dict:
-        """Pixel sizes for the current widget size."""
-        w, h = max(1, self.width()), max(1, self.height())
-        bh = h * 0.42                       # Bun's height
-        s = bh / H
+        g = super().geo()
+        s, h = g["s"], g["h"]
         half = 26 * s / h                   # his bat's half length, 0..1 of the height
-        return {"w": w, "h": h, "bh": bh, "s": s, "r": max(5.0, h * 0.028),
-                "bun_x": 86 * s + 6,        # his bat, px from the left
-                "bun_half": half,
-                # how far up and down he can go and still be all on the court
-                "bun_min": (72 * s + 6) / h, "bun_max": 1 - (bh - 72 * s + 6) / h,
-                "you_x": w - 22, "you_half": 0.1, "pad_w": 9}
+        g.update({"r": max(5.0, h * 0.028), "bun_half": half,
+                  # how far up and down he can go and still be all on the court
+                  "bun_min": (72 * s + 6) / h, "bun_max": 1 - (g["bh"] - 72 * s + 6) / h,
+                  "you_x": g["w"] - 22, "you_half": 0.1, "pad_w": 9})
+        return g
 
     def bun_rect(self, g: dict) -> QRectF:
+        if self.state == "over":
+            return super().bun_rect(g)
         s = g["s"]
-        if self.state == "over":   # beside the result, both centred on the court
-            return QRectF(self.end_bun_left, (g["h"] - g["bh"]) / 2, W * s, g["bh"])
         return QRectF(g["bun_x"] - 86 * s, self.bun_y * g["h"] - 72 * s, W * s, g["bh"])
+
+    def score_boxes(self, w: float, h: float) -> tuple[QRectF, QRectF]:
+        nw = w * 0.16   # each side's number, just off the net
+        top = QRectF(w / 2 - nw - w * 0.03, h * 0.06, nw, h * 0.28)
+        return top, top.translated(nw + w * 0.06, 0)
 
     # ------------------------------------------------------------------ simulation
     def step(self, dt: float):
-        self.st += dt
+        super().step(dt)
         g = self.geo()
-        # your paddle: straight to the mouse, kept on the court
+        self._steer(dt, g)
+        # your paddle: straight to where the mouse / keys want it, kept on the court
         self.you_y = min(1 - g["you_half"], max(g["you_half"], self.aim_y))
         # Bun: chases where the ball will cross his line (plus his guess error) while
         # it's coming, drifts back to the middle while it's going away
@@ -229,26 +565,9 @@ class Court(QWidget):
         target = min(g["bun_max"], max(g["bun_min"], target))
         move = BUN_SPEED * dt
         self.bun_y += max(-move, min(move, target - self.bun_y))
-        self.swing = max(0.0, self.swing - dt * 2.5)
         for f in self.flash:
             f[2] += dt
         self.flash = [f for f in self.flash if f[2] < 0.35]
-        for sp in self.sparks:
-            sp.age += dt
-            sp.x += sp.vx * dt
-            sp.y += sp.vy * dt
-            sp.vy += 260 * dt if sp.spin else 0.0   # confetti falls, sparks just fly
-            sp.vx *= 1 - dt * 2.5
-            if not sp.spin:
-                sp.vy *= 1 - dt * 2.5
-        self.sparks = [sp for sp in self.sparks if sp.age < sp.life]
-        if self.goal_flash is not None:
-            self.goal_flash[1] += dt
-            if self.goal_flash[1] > 0.7:
-                self.goal_flash = None
-        for k in self.pop:
-            self.pop[k] += dt
-        self.shake = max(0.0, self.shake - dt)
         if self.state == "point" and self.st >= SERVE_PAUSE:
             self.serve(self.server)
         if self.state != "play":
@@ -260,6 +579,25 @@ class Court(QWidget):
                 break
         self.trail.append((self.bx, self.by))
         del self.trail[:-8]
+
+    def _steer(self, dt: float, g: dict):
+        """Where you want your paddle: the mouse's height whenever it has moved (read
+        from the screen, so it keeps working off the court and never sticks at the
+        edge), and held keys glide it, a little faster the longer they're held."""
+        pos = QCursor.pos()
+        if pos != self._cursor:
+            self._cursor = pos
+            if self.isVisible():
+                self.aim_y = self.mapFromGlobal(pos).y() / g["h"]
+        d = sum(KEY_DIRS[k] for k in self.held)
+        if d:
+            self.held_t += dt
+            ramp = min(1.0, self.held_t / KEY_RAMP)
+            self.aim_y += d * (KEY_SPEED[0] + (KEY_SPEED[1] - KEY_SPEED[0]) * ramp) * dt
+        else:
+            self.held_t = 0.0
+        # never further than the paddle can go: turning back starts at once
+        self.aim_y = min(1 - g["you_half"], max(g["you_half"], self.aim_y))
 
     def _predict(self, x: float) -> float:
         """Where the ball crosses x (0..1), bouncing off the top and bottom."""
@@ -337,46 +675,14 @@ class Court(QWidget):
                                       col if self.fx.random() < 0.6 else BALL,
                                       self.fx.uniform(1.4, 2.6)))
 
-    def _point(self, who: str):
-        self.score[who] += 1
+    def _point(self, who: str, quip: bool = True) -> bool:
         self.server = "bun" if who == "you" else "you"   # served toward who lost it
         self.trail.clear()
         self.rally = 0
-        self.pop[who] = 0.0
-        self.goal_flash = ["bun" if who == "you" else "you", 0.0]
-        self.shake = 0.28
-        if self.score[who] >= WIN_AT:
-            usage.used("egg-pong-won" if who == "you" else "egg-pong-lost")
-            if who == "you":
-                self._confetti()
-            self._play("win" if who == "you" else "lose")
-            self._go("over")
-            self._say(_("aww…") if who == "you" else _("who's the champ!"), 1e9)
-            if self.on_over:
-                self.on_over()
-            return
-        self._play("score_you" if who == "you" else "score_bun")
-        QTimer.singleShot(180, self, lambda: self._play("score_pop"))
-        if who == "you":
-            self._say(self.fx.choice((_("no way!"), _("lucky!"), _("hey!"))))
-        else:
-            self._say(self.fx.choice((_("ha!"), _("too slow!"), _("bonk!"))))
+        if super()._point(who, quip):
+            return True
         self._go("point")
-
-    def _confetti(self):
-        w = max(1, self.width())
-        for _i in range(70):
-            self.sparks.append(_Spark(self.fx.uniform(0, w), self.fx.uniform(-60, -4),
-                                      self.fx.uniform(-40, 40), self.fx.uniform(20, 120),
-                                      self.fx.uniform(1.6, 2.6),
-                                      self.fx.choice(CONFETTI), self.fx.uniform(3, 5),
-                                      spin=self.fx.uniform(4, 10)))
-
-    @property
-    def winner(self) -> str | None:
-        if self.state != "over":
-            return None
-        return "you" if self.score["you"] >= WIN_AT else "bun"
+        return False
 
     # ------------------------------------------------------------------ input
     def mouseMoveEvent(self, ev):
@@ -387,101 +693,55 @@ class Court(QWidget):
             self.serve("bun")
 
     def key(self, k) -> bool:
-        """The keys: arrows / W S move your paddle, Space or Enter serves. True if used."""
-        if k in (Qt.Key.Key_Up, Qt.Key.Key_W):
-            self.nudge(-0.08)
-        elif k in (Qt.Key.Key_Down, Qt.Key.Key_S):
-            self.nudge(0.08)
-        elif k in (Qt.Key.Key_Space, Qt.Key.Key_Return, Qt.Key.Key_Enter) and self.state == "ready":
+        """Arrows / W S move your paddle (a tap nudges it, holding glides it), Space or
+        Enter serves."""
+        if k in KEY_DIRS:
+            self.held.add(k)
+            self.nudge(KEY_DIRS[k] * KEY_TAP)
+        elif k in GO_KEYS and self.state == "ready":
             self.serve("bun")
         else:
             return False
         return True
 
-    def keyPressEvent(self, ev):
-        if not self.key(ev.key()):
-            super().keyPressEvent(ev)
+    def key_up(self, k) -> bool:
+        if k in self.held:
+            self.held.discard(k)
+            return True
+        return False
+
+    def focusOutEvent(self, ev):
+        self.held.clear()   # a key let go somewhere else must not keep it moving
+        super().focusOutEvent(ev)
 
     def nudge(self, d: float):
-        """The arrow keys: move your paddle by `d` of the court height."""
+        """Move your paddle by `d` of the court height."""
         self.aim_y = min(1.0, max(0.0, self.you_y + d))
         if self.state == "ready":
             self.serve("bun")
 
     # ------------------------------------------------------------------ paint
-    def paintEvent(self, ev):
-        p = QPainter(self)
-        snap_to_pixels(p)
-        p.setRenderHint(QPainter.RenderHint.Antialiasing)
-        g = self.geo()
+    def paint_back(self, p: QPainter, g: dict):
+        if self.rally >= RALLY_SHOWN and self.state == "play":
+            self._paint_rally(p, g["w"], g["h"])
+
+    def paint_game(self, p: QPainter, g: dict):
         w, h, r = g["w"], g["h"], g["r"]
-        t = time.monotonic()
-        over = self.state == "over"
-        if self.shake > 0:   # a little jolt when a point goes in
-            k = self.shake / 0.28
-            p.translate(self.fx.uniform(-3, 3) * k, self.fx.uniform(-2, 2) * k)
-        self._paint_arena(p, w, h, over)
-
-        # the score: big and faint behind the play, popping when it goes up
-        f = QFont(self.font())
-        if not over:
-            nw = w * 0.16   # each side's number, just off the net
-            top = QRectF(w / 2 - nw - w * 0.03, h * 0.06, nw, h * 0.28)
-            for side, box in (("bun", top), ("you", top.translated(nw + w * 0.06, 0))):
-                k = self.pop[side]
-                bump = 1 + 0.35 * max(0.0, 1 - k / 0.35) ** 2
-                col = QColor(theme.T["text_hi"])
-                col.setAlphaF(0.12 + 0.5 * max(0.0, 1 - k / 0.6))
-                f.setPixelSize(round(h * 0.24 * bump))
-                f.setBold(True)
-                p.setFont(f)
-                p.setPen(col)
-                p.drawText(box.adjusted(-30, -30, 30, 30), Qt.AlignmentFlag.AlignCenter,
-                           str(self.score[side]))
-            f.setPixelSize(max(10, round(h * 0.045)))
-            f.setBold(False)
-            p.setFont(f)
-            p.setPen(QColor(theme.T["muted"]))
-            under = QRectF(top.left(), top.bottom() - 4, nw, h * 0.07)
-            p.drawText(under, Qt.AlignmentFlag.AlignCenter, _("Bun"))
-            p.drawText(under.translated(nw + w * 0.06, 0), Qt.AlignmentFlag.AlignCenter, _("You"))
-            if self.rally >= RALLY_SHOWN and self.state == "play":
-                self._paint_rally(p, w, h)
-
-        # Bun with his bat up as a paddle (or not, at the end)
-        lost = over and self.winner == "you"
-        won = over and self.winner == "bun"
-        br = self.bun_rect(g)
-        if won:
-            br.translate(0, -6 * abs(math.sin(t * 3.4)))
-            for i, col in enumerate(("#ffcf40", "#ff8fae", "#1fb6ff", "#a48bff")):
-                a = t * 0.9 + i * math.pi / 2
-                sparkle(p, br.center().x() + math.cos(a) * br.width() * 0.52,
-                        br.center().y() + math.sin(a) * br.height() * 0.45,
-                        3 + 3 * abs(math.sin(t * 4 + i)), QColor(col))
-        blink = 1.0 if (t % 3.7) < 0.12 else 0.0
-        draw_bunny(p, br, "star" if won else None if lost else "bat", blink=blink,
-                   swing=self.swing, sad=0.9 if lost else 0.0,
-                   angry=0.0 if over else 0.6, ears=30 if lost else -4)
-
         # your paddle: a soft glow under a solid pill
         acc = QColor(theme.T["accent"])
-        if over:
-            acc.setAlphaF(0.0)
         px = g["you_x"] - g["pad_w"] / 2
         ph = g["you_half"] * 2 * h
         py = self.you_y * h - ph / 2
-        if not over:
-            p.setPen(Qt.PenStyle.NoPen)
-            for i, a in ((10, 0.06), (6, 0.12), (3, 0.2)):   # a soft glow round it
-                p.setBrush(_alpha(acc, a))
-                p.drawRoundedRect(QRectF(px - i, py - i, g["pad_w"] + 2 * i, ph + 2 * i),
-                                  g["pad_w"] / 2 + i, g["pad_w"] / 2 + i)
-            body = QLinearGradient(px, 0, px + g["pad_w"], 0)
-            body.setColorAt(0, _mix(acc, QColor("white"), 0.35))
-            body.setColorAt(1, acc)
-            p.setBrush(body)
-            p.drawRoundedRect(QRectF(px, py, g["pad_w"], ph), g["pad_w"] / 2, g["pad_w"] / 2)
+        p.setPen(Qt.PenStyle.NoPen)
+        for i, a in ((10, 0.06), (6, 0.12), (3, 0.2)):   # a soft glow round it
+            p.setBrush(_alpha(acc, a))
+            p.drawRoundedRect(QRectF(px - i, py - i, g["pad_w"] + 2 * i, ph + 2 * i),
+                              g["pad_w"] / 2 + i, g["pad_w"] / 2 + i)
+        body = QLinearGradient(px, 0, px + g["pad_w"], 0)
+        body.setColorAt(0, _mix(acc, QColor("white"), 0.35))
+        body.setColorAt(1, acc)
+        p.setBrush(body)
+        p.drawRoundedRect(QRectF(px, py, g["pad_w"], ph), g["pad_w"] / 2, g["pad_w"] / 2)
 
         # hit rings, the ball's trail, the ball
         for fx, fy, age in self.flash:
@@ -492,19 +752,6 @@ class Court(QWidget):
             p.setBrush(Qt.BrushStyle.NoBrush)
             rr = r * (1.2 + 2.2 * k)
             p.drawEllipse(QPointF(fx * w, fy * h), rr, rr)
-        for sp in self.sparks:
-            k = sp.age / sp.life
-            p.setPen(Qt.PenStyle.NoPen)
-            p.setBrush(_alpha(sp.col, 1 - k * k))
-            if sp.spin:   # confetti: little turning paper strips
-                p.save()
-                p.translate(sp.x, sp.y)
-                p.rotate(sp.age * sp.spin * 60)
-                p.scale(1, abs(math.cos(sp.age * sp.spin)) + 0.15)
-                p.drawRect(QRectF(-sp.size / 2, -sp.size, sp.size, sp.size * 2))
-                p.restore()
-            else:
-                p.drawEllipse(QPointF(sp.x, sp.y), sp.size * (1 - 0.5 * k), sp.size * (1 - 0.5 * k))
         if self.state in ("play", "ready"):
             heat = self._heat()
             hot = _mix(BALL, QColor(theme.T["accent"]), heat)
@@ -523,73 +770,7 @@ class Court(QWidget):
             self._paint_ball(p, self.bx * w, self.by * h, r)
 
         if self.state == "ready":
-            f.setPixelSize(max(11, round(h * 0.055)))
-            f.setBold(True)
-            p.setFont(f)
-            p.setPen(QColor(theme.T["text_hi"]))
-            p.drawText(QRectF(0, h * 0.62, w, h * 0.1), Qt.AlignmentFlag.AlignCenter,
-                       _("Click to serve"))
-        if self.say and time.monotonic() < self.say_until:
-            _bubble(p, self.say, br.center().x() + br.width() * 0.15,
-                    br.top() + br.height() * 0.1, max(10, round(g["bh"] * 0.12)))
-        p.end()
-
-    def _paint_arena(self, p: QPainter, w: float, h: float, over: bool):
-        """The court bed: sunk into the card, lit from the middle with the theme colour,
-        each end tinted for its player, with lines and a glowing net. All from the
-        theme's own colours, so it fits every theme."""
-        light = theme.is_light()
-        acc = QColor(theme.T["accent"])
-        hi = QColor(theme.T["text_hi"])
-        bed = QColor(theme.T.get("inset", theme.T["bg"]))
-        dark = QColor("white" if light else "black")
-        court = QRectF(0, 0, w, h)
-        path = QPainterPath()
-        path.addRoundedRect(court, 12, 12)
-        p.save()
-        p.setClipPath(path)
-        g = QLinearGradient(0, 0, 0, h)   # a sunken bed: shaded under the top lip
-        g.setColorAt(0, _mix(bed, dark, 0.25 if not light else 0.0))
-        g.setColorAt(0.12, bed)
-        g.setColorAt(1, _mix(bed, hi, 0.03))
-        p.fillRect(court, g)
-        glow = QRadialGradient(QPointF(w / 2, h / 2), max(w, h) * 0.55)
-        glow.setColorAt(0, _alpha(acc, 0.14 if not light else 0.08))
-        glow.setColorAt(1, _alpha(acc, 0.0))
-        p.fillRect(court, glow)
-        for x0, x1, col in ((0, w * 0.22, BUN_PINK), (w, w * 0.78, acc)):   # the ends
-            end = QLinearGradient(x0, 0, x1, 0)
-            end.setColorAt(0, _alpha(col, 0.13))
-            end.setColorAt(1, _alpha(col, 0.0))
-            p.fillRect(court, end)
-        if self.goal_flash is not None:   # a goal just went in at this end
-            side, age = self.goal_flash
-            k = max(0.0, 1 - age / 0.7)
-            col = BUN_PINK if side == "you" else acc   # the scorer's colour
-            x0, x1 = (w, w * 0.6) if side == "you" else (0, w * 0.4)
-            fl = QLinearGradient(x0, 0, x1, 0)
-            fl.setColorAt(0, _alpha(col, 0.45 * k))
-            fl.setColorAt(1, _alpha(col, 0.0))
-            p.fillRect(court, fl)
-        p.fillRect(court, QBrush(_grain_tile(light)))
-        if not over:
-            line = _alpha(hi, 0.10)
-            p.setBrush(Qt.BrushStyle.NoBrush)
-            p.setPen(QPen(line, 1.5))
-            p.drawRoundedRect(court.adjusted(12, 12, -12, -12), 6, 6)
-            rr = h * 0.17
-            p.drawEllipse(QPointF(w / 2, h / 2), rr, rr)
-            p.setPen(QPen(_alpha(acc, 0.10), 7, Qt.PenStyle.SolidLine, Qt.PenCapStyle.RoundCap))
-            p.drawLine(QPointF(w / 2, 12), QPointF(w / 2, h - 12))   # the net's glow
-            dash = QPen(_alpha(hi, 0.35), 2, Qt.PenStyle.CustomDashLine, Qt.PenCapStyle.RoundCap)
-            dash.setDashPattern([2.5, 4])
-            p.setPen(dash)
-            p.drawLine(QPointF(w / 2, 12), QPointF(w / 2, h - 12))
-        p.restore()
-        # the lip: shade along the top edge, a catch of light along the bottom
-        p.setBrush(Qt.BrushStyle.NoBrush)
-        p.setPen(QPen(_alpha(hi, 0.08 if not light else 0.0), 1))
-        p.drawRoundedRect(court.adjusted(0.5, 0.5, -0.5, -0.5), 12, 12)
+            self._prompt(p, _("Click to serve"), QRectF(0, h * 0.62, w, h * 0.1), h * 0.055)
 
     def _paint_rally(self, p: QPainter, w: float, h: float):
         """A pill at the bottom of the court counting the rally, like a combo meter."""
@@ -629,13 +810,32 @@ class Court(QWidget):
         p.drawArc(QRectF(x + r * 0.2, y - r * 0.8, r * 1.4, r * 1.6), 120 * 16, 120 * 16)
 
 
-def open_for(bun) -> BunPong:
-    """Open the game for Bun, over his window (one game at a time)."""
+def games() -> dict[str, type[Game]]:
+    """Every game Bun can pick, by name."""
+    from soundboard.ui import bungames
+    return {"pong": Court, **bungames.GAMES}
+
+
+_last_pick: list[str] = []
+
+
+def pick_game(rng: random.Random | None = None, but: str | None = None) -> str:
+    """A game at random, never the one just played (or `but`) twice in a row."""
+    rng = rng or random.Random()
+    avoid = {but} if but else set(_last_pick[-1:])
+    name = rng.choice([n for n in games() if n not in avoid])
+    _last_pick[:] = [name]
+    return name
+
+
+def open_for(bun, game: str | None = None) -> BunPong:
+    """Open a game (`game`, or one at random) for Bun, over his window (one game at a
+    time)."""
     win = bun.window()
     for old in win.findChildren(BunPong):
         old.finish()
-    dlg = BunPong(win, bun)
-    usage.used("egg-pong-opened")   # the names only (usage.py)
+    dlg = BunPong(win, bun, game=game or pick_game())
+    usage.used("egg-pong-opened")   # the names only (usage.py); every game counts here
     dlg.open()
     dlg.court.setFocus(Qt.FocusReason.OtherFocusReason)
     return dlg
@@ -644,41 +844,37 @@ def open_for(bun) -> BunPong:
 class BunPong(QDialog):
     """The game in a dialog built like the app's guides: a big title and a line on how
     to play, the court on the theme's card, and Close at the bottom. At the end Bun and
-    who won sit side by side, centred together on the court, with Play again."""
+    who won sit side by side, centred together on the court, with Play again and
+    Another game."""
 
-    def __init__(self, parent: QWidget, bun=None, rng: random.Random | None = None):
+    def __init__(self, parent: QWidget, bun=None, rng: random.Random | None = None,
+                 game: str = "pong"):
         super().__init__(parent)
         fit.watch(self)
         self.bun = bun
         self.win = parent   # the main window: its engine and settings, for the sounds
+        self.rng = rng
         self._done = False
-        self.setWindowTitle(_("Pong with Bun"))
         self.setMinimumWidth(640)
         v = QVBoxLayout(self)
         v.setContentsMargins(24, 20, 24, 18)
         v.setSpacing(12)
-        title = QLabel(_("Pong with Bun"))
-        title.setStyleSheet(TITLE_CSS)
-        body = QLabel(_("First to {n} wins. Move your paddle with the mouse or the arrow "
-                        "keys.", n=WIN_AT))
-        body.setWordWrap(True)
-        body.setStyleSheet(BODY_CSS)
-        v.addWidget(title)
-        v.addWidget(body)
+        self.title = QLabel()
+        self.title.setStyleSheet(TITLE_CSS)
+        self.body = QLabel()
+        self.body.setWordWrap(True)
+        self.body.setStyleSheet(BODY_CSS)
+        v.addWidget(self.title)
+        v.addWidget(self.body)
 
         self.card = QFrame()
         self.card.setObjectName("card")
-        cl = QVBoxLayout(self.card)
-        cl.setContentsMargins(0, 0, 0, 0)
-        self.court = Court(rng)
-        self.court.setMinimumHeight(320)
-        self.court.on_over = self._show_end
-        self.court.sound = self._sound
-        cl.addWidget(self.court)
+        self.card_lay = QVBoxLayout(self.card)
+        self.card_lay.setContentsMargins(0, 0, 0, 0)
         v.addWidget(self.card, 1)
 
-        # the end: who won and Play again, beside Bun (placed in _place_end)
-        self.end = QWidget(self.court)
+        # the end: who won, Play again and Another game, beside Bun (placed in _place_end)
+        self.end = QWidget()
         el = QVBoxLayout(self.end)
         el.setContentsMargins(0, 0, 0, 0)
         el.setSpacing(6)
@@ -690,12 +886,22 @@ class BunPong(QDialog):
         self.again.setObjectName("primary")
         self.again.setAutoDefault(False)
         self.again.clicked.connect(self.play_again)
+        self.other = QPushButton(_("Another game"))
+        self.other.setAutoDefault(False)
+        self.other.clicked.connect(self.another_game)
         el.addWidget(self.end_title)
         el.addWidget(self.end_score)
         el.addSpacing(8)
-        el.addWidget(self.again, 0, Qt.AlignmentFlag.AlignLeft)
-        self.end.setCursor(Qt.CursorShape.ArrowCursor)
-        self.end.hide()
+        buttons = QHBoxLayout()
+        buttons.setSpacing(8)
+        buttons.addWidget(self.again)
+        buttons.addWidget(self.other)
+        buttons.addStretch(1)
+        el.addLayout(buttons)
+
+        self.court: Game = None   # type: ignore[assignment]   # set_game makes it
+        self.game = ""
+        self.set_game(game)
 
         row = QHBoxLayout()
         row.addWidget(hint_label(_("Closing it ends the game. Nothing is kept.")), 1)
@@ -719,6 +925,27 @@ class BunPong(QDialog):
         appstate.pause_in_background(self, self._resume, self._timer.stop)
 
     # ------------------------------------------------------------------ flow
+    def set_game(self, name: str):
+        """Put game `name` on the card (in place of the one there)."""
+        old = self.court
+        court = games()[name](self.rng)
+        court.setMinimumHeight(320)
+        court.on_over = self._show_end
+        court.sound = self._sound
+        self.end.hide()
+        self.end.setParent(court)
+        self.end.setCursor(Qt.CursorShape.ArrowCursor)
+        if old is not None:
+            self.card_lay.replaceWidget(old, court)
+            old.deleteLater()
+        else:
+            self.card_lay.addWidget(court)
+        self.court, self.game = court, name
+        self.setWindowTitle(court.title())
+        self.title.setText(court.title())
+        self.body.setText(court.how())
+        court.setFocus(Qt.FocusReason.OtherFocusReason)
+
     def _show_end(self):
         c = self.court
         you, bun = c.score["you"], c.score["bun"]
@@ -731,6 +958,7 @@ class BunPong(QDialog):
         self.end.adjustSize()
         self._place_end()
         self.end.show()
+        self.end.raise_()
         self.again.setFocus()
 
     def _place_end(self):
@@ -744,6 +972,36 @@ class BunPong(QDialog):
         c.end_bun_left = left
         self.end.setGeometry(round(left + bun_w + gap), round((c.height() - sz.height()) / 2),
                              sz.width(), sz.height())
+
+    def play_again(self):
+        self.end.hide()
+        self.court.reset()
+        self.court.setFocus()
+
+    def another_game(self):
+        """A different game at random, from the start."""
+        self.set_game(pick_game(but=self.game))
+
+    def finish(self):
+        """End the game: nothing is kept, and Bun calms down."""
+        if self._done:
+            return
+        self._done = True
+        self._timer.stop()
+        if self.court.playing:   # left mid-game
+            usage.used("egg-pong-quit")
+        if self.bun is not None:
+            try:
+                self.bun.calm_down()
+            except RuntimeError:   # Bun's widget is already gone
+                pass
+        if self.isVisible():
+            self.reject()
+        self.deleteLater()
+
+    def step(self, dt: float):
+        """Move the game on by `dt` seconds (the timer's tick; tests call it too)."""
+        self.court.step(dt)
 
     # ------------------------------------------------------------------ sound
     def sounds_on(self) -> bool:
@@ -773,32 +1031,6 @@ class BunPong(QDialog):
         data = pongsounds.render(name, pongsounds.style_for(theme.current_name), **kw)
         eng.play(SOUND_SID, data, 1.0, mode="overlap", preview=True)
 
-    def play_again(self):
-        self.end.hide()
-        self.court.reset()
-        self.court.setFocus()
-
-    def finish(self):
-        """End the game: nothing is kept, and Bun calms down."""
-        if self._done:
-            return
-        self._done = True
-        self._timer.stop()
-        if self.court.state in ("play", "point"):   # left mid-game
-            usage.used("egg-pong-quit")
-        if self.bun is not None:
-            try:
-                self.bun.calm_down()
-            except RuntimeError:   # Bun's widget is already gone
-                pass
-        if self.isVisible():
-            self.reject()
-        self.deleteLater()
-
-    def step(self, dt: float):
-        """Move the game on by `dt` seconds (the timer's tick; tests call it too)."""
-        self.court.step(dt)
-
     # ------------------------------------------------------------------ timing
     def _tick(self):
         now = time.monotonic()
@@ -827,5 +1059,9 @@ class BunPong(QDialog):
             self._place_end()
 
     def keyPressEvent(self, ev):
-        if not self.court.key(ev.key()):
+        if not self.court.press(ev, True):
             super().keyPressEvent(ev)   # Esc closes, as in every dialog
+
+    def keyReleaseEvent(self, ev):
+        if not self.court.press(ev, False):
+            super().keyReleaseEvent(ev)
