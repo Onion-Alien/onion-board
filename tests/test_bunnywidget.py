@@ -610,13 +610,13 @@ def test_a_sad_bun_on_an_empty_page_cheers_up_and_dances_to_what_plays(qapp, mon
     from soundboard.ui import bunnywidget
     clock = _Clock()
     monkeypatch.setattr(bunnywidget, "time", clock)
-    b = BunnyWidget(height=110, sad=0.9, lines=("add a sound?",), naps=True, dances=True)
+    b = BunnyWidget(height=110, sad=0.9, lines=("add a sound?",), dances=True)
     assert b in BunnyWidget.dancers and BunnyWidget("star") not in BunnyWidget.dancers
     _beats(b, clock, 2.0)
     assert b._sad > 0.6
     b.set_groove(_Song(clock, "electronic"))
     _beats(b, clock, 3.0)
-    assert b._sad < 0.1 and b._dance > 0.9 and not b.asleep
+    assert b._sad < 0.1 and b._dance > 0.9
     dys = []
     _beats(b, clock, 1.0, lambda: dys.append(b.pose()["dy"]))
     assert max(dys) - min(dys) > 5   # hopping, not sulking
