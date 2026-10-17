@@ -611,6 +611,63 @@ def icon_button(name: str, tip: str, *, quiet: bool = True, size: int = 18,
     return b
 
 
+class ViewToggle(QFrame):
+    """Cards or a list: two icon buttons side by side, the one in use lit. The same
+    switch at the top right of the Sounds, Apps and Voice tabs."""
+    changed = Signal(str)   # "grid" or "list"
+
+    def __init__(self, view: str = "grid", what: str = ""):
+        super().__init__()
+        self.setObjectName("viewtoggle")
+        h = QHBoxLayout(self)
+        h.setContentsMargins(3, 3, 3, 3)   # the same room on every side of the buttons
+        h.setSpacing(2)
+        self.buttons: dict[str, QPushButton] = {}
+        self._compact = False
+        for key, icon, tip in (("grid", "sounds", _("Show as cards")),
+                               ("list", "list", _("Show as a list"))):
+            b = QPushButton()
+            b.setObjectName("viewbtn")
+            b.setCheckable(True)
+            b.setAutoExclusive(True)
+            b.setFixedSize(26, 26)
+            b.setCursor(Qt.CursorShape.PointingHandCursor)
+            icons.set_icon(b, icon, "muted", "on_accent", size=16)
+            b.setToolTip(tip)
+            b.setAccessibleName(f"{what}: {tip}" if what else tip)
+            b.clicked.connect(lambda __=False, k=key: self._pick(k))
+            h.addWidget(b)
+            self.buttons[key] = b
+        self.set_view(view)
+
+    def view(self) -> str:
+        return "list" if self.buttons["list"].isChecked() else "grid"
+
+    def set_view(self, view: str):
+        self.buttons["list" if view == "list" else "grid"].setChecked(True)
+        self._show_buttons()
+
+    def set_compact(self, on: bool):
+        """A very narrow window: only the other view's icon, one click away."""
+        self._compact = on
+        self._show_buttons()
+
+    def _show_buttons(self):
+        for b in self.buttons.values():
+            b.setVisible(not (self._compact and b.isChecked()))
+        lay = self.layout()
+        if lay is not None:
+            lay.invalidate()
+        self.updateGeometry()   # the toolbar's cached size of it is stale otherwise
+
+    def _pick(self, key: str):
+        had_focus = self.buttons[key].hasFocus()
+        self._show_buttons()
+        if had_focus and self._compact:   # the clicked icon went: focus to the one left
+            self.buttons["grid" if key == "list" else "list"].setFocus()
+        self.changed.emit(key)
+
+
 def info_button(tip: str) -> QPushButton:
     """The ⓘ beside a card's heading: 24 px (the smallest target), so the heading's
     row doesn't grow. `tip` is its tooltip and screen-reader name."""

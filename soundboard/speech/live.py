@@ -63,11 +63,15 @@ def clean_settings(raw) -> dict:
 
 
 class SpeechController:
-    def __init__(self, engine, chain: VoiceChain, on_event: Callable[[dict], None]):
+    def __init__(self, engine, chain: VoiceChain, on_event: Callable[[dict], None],
+                 tts: VoiceSet | None = None):
         """`on_event(dict)` gets every module event plus {"type": "tts_error"} —
-        from background threads, so the UI must hop to its own thread."""
+        from background threads, so the UI must hop to its own thread. `engine` plays
+        the lines (Engine.play / stop: a stream's livesetup.Lines does too); `tts`: the
+        voices of another controller to share (it keeps them open)."""
         self.engine, self.chain, self.on_event = engine, chain, on_event
-        self.tts = VoiceSet()     # Windows voices + custom ones
+        self._own_tts = tts is None
+        self.tts = VoiceSet() if tts is None else tts     # Windows voices + custom ones
         self.gain = 1.0
         self.speaker = Speaker(self.tts, self._play,
                                lambda m: self.on_event({"type": "tts_error", "text": m}))
@@ -193,4 +197,5 @@ class SpeechController:
     def shutdown(self):
         self.stop_live()
         self.speaker.close()
-        self.tts.close()
+        if self._own_tts:
+            self.tts.close()

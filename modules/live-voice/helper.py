@@ -12,6 +12,11 @@ translated from English before it's sent; "original" then carries what was said.
 The models go from English only: --task translate has Whisper hear any other
 language straight into English first.
 
+A whole clip (a sound to say in another language) comes as {"type": "clip", "id"},
+its audio, then {"type": "clip_end", "id"}: it's cut up the same way, and each line
+comes back with when it starts ({"type": "clip_line", "id", "at", "text"}), then
+{"type": "clip_done", "id"}.
+
 Runs in its own Python environment (install.bat makes it) so the ~100 MB of
 speech-recognition libraries never touch the app itself.
 """
@@ -105,6 +110,24 @@ class Segmenter:
             voiced, self.frames = self.voiced, []
             return utt if voiced >= self.min_frames else None
         return None
+
+
+def clip_segments(x: np.ndarray) -> list[tuple[float, np.ndarray]]:
+    """A whole clip's utterances, cut like the live stream's, each with when it starts
+    (seconds). The clip's end ends the last one."""
+    seg = Segmenter()
+    out: list[tuple[float, np.ndarray]] = []
+    start = 0
+    for k in range(len(x) // FRAME):
+        was = seg.speaking
+        utt = seg._frame(x[k * FRAME:(k + 1) * FRAME])
+        if not was and seg.speaking:   # its frames: the ones kept from before, and this
+            start = max(0, k + 1 - len(seg.frames))
+        if utt is not None:
+            out.append((start * FRAME / RATE, utt))
+    if seg.speaking and seg.voiced >= seg.min_frames:
+        out.append((start * FRAME / RATE, np.concatenate(seg.frames)))
+    return out
 
 
 class FakeTranscriber:
@@ -262,11 +285,11 @@ def main(argv=None) -> int:
     sock.settimeout(None)
     sock.setsockopt(socket.IPPROTO_TCP, socket.TCP_NODELAY, 1)
     link = Link(sock)
-    link.send(type="hello", token=args.token, name="live-voice", version="0.3.0")
+    link.send(type="hello", token=args.token, name="live-voice", version="0.4.0")
 
     ready = threading.Event()
     failed = threading.Event()
-    work: queue.Queue[np.ndarray | None] = queue.Queue(maxsize=8)
+    work: queue.Queue[np.ndarray | tuple | None] = queue.Queue(maxsize=8)
     seg = Segmenter()
 
     def fail(text: str):
@@ -320,33 +343,54 @@ def main(argv=None) -> int:
                 return
         ready.set()
         link.send(type="ready")
-        while (audio := work.get()) is not None:
+
+        def hear(audio: np.ndarray) -> tuple[str, str] | None:
+            """(what to say, what was said when it was translated, else "")."""
             t0 = time.monotonic()
             try:
                 text = t(audio)
             except Exception as e:  # noqa: BLE001
                 log.exception("transcription failed")
                 link.send(type="error", text=f"transcription failed: {e}")
-                continue
+                return None
             log.info("%.1fs of speech -> %r in %.2fs", len(audio) / RATE, text,
                      time.monotonic() - t0)
-            if text and tr is not None:
-                t0 = time.monotonic()
-                try:
-                    said = tr(text)
-                except Exception as e:  # noqa: BLE001
-                    log.exception("translation failed")
-                    link.send(type="error", text=f"translation failed: {e}")
-                    continue
-                log.info("  translated -> %r in %.2fs", said, time.monotonic() - t0)
-                if said:
-                    link.send(type="final", text=said, original=text)
-            elif text:
-                link.send(type="final", text=text)
+            if not text or tr is None:
+                return (text, "") if text else None
+            t0 = time.monotonic()
+            try:
+                said = tr(text)
+            except Exception as e:  # noqa: BLE001
+                log.exception("translation failed")
+                link.send(type="error", text=f"translation failed: {e}")
+                return None
+            log.info("  translated -> %r in %.2fs", said, time.monotonic() - t0)
+            return (said, text) if said else None
+
+        while (audio := work.get()) is not None:
+            if isinstance(audio, tuple):   # a whole clip: ("clip", id, its utterances)
+                _kind, cid, segs = audio
+                for i, (at, utt) in enumerate(segs):
+                    got = hear(utt)
+                    if got is not None:
+                        link.send(type="clip_line", id=cid, at=round(at, 3), text=got[0],
+                                  original=got[1])
+                    link.send(type="clip_progress", id=cid, done=i + 1, total=len(segs))
+                link.send(type="clip_done", id=cid)
+                continue
+            got = hear(audio)
+            if got is not None:
+                said, orig = got
+                if orig:
+                    link.send(type="final", text=said, original=orig)
+                else:
+                    link.send(type="final", text=said)
 
     threading.Thread(target=transcribe_loop, daemon=True).start()
 
     was = False
+    clip: list[np.ndarray] | None = None   # a whole clip's audio, while it comes in
+    clip_id = None
     while True:
         try:
             msg = protocol.recv(sock)
@@ -356,12 +400,23 @@ def main(argv=None) -> int:
             break
         kind, payload = msg
         if kind == protocol.JSON:
-            if protocol.decode_json(payload).get("type") == "quit":
+            obj = protocol.decode_json(payload)
+            t = obj.get("type")
+            if t == "quit":
                 break
+            if t == "clip":
+                clip, clip_id = [], obj.get("id")
+            elif t == "clip_end" and clip is not None:
+                x = np.concatenate(clip) if clip else np.zeros(0, np.float32)
+                work.put(("clip", clip_id, clip_segments(x)))   # waits its turn, all of it
+                clip = None
             continue
         if kind != protocol.AUDIO or not ready.is_set():
             continue
         x = np.frombuffer(payload, "<i2").astype(np.float32) / 32768.0
+        if clip is not None:
+            clip.append(x)
+            continue
         for utt in seg.feed(x):
             try:
                 work.put_nowait(utt)

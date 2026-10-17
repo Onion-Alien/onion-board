@@ -54,9 +54,8 @@ class PadControl(Controller):
         mw = self.mw
         b, c = mw.btn_view, mw.cfg
         b.setText(self._sort_names().get(c.pad_sort, ""))
-        icons.set_icon(b, "list" if c.pad_view == "list" else "sort")
-        b.setToolTip(_("Sort the pads (my order, A–Z, newest, most played) and show them as "
-                       "cards or a list"))
+        icons.set_icon(b, "sort")
+        b.setToolTip(_("Sort the pads: my order, A–Z, newest, most played"))
 
     def _fill_view_menu(self, menu: QMenu):
         mw = self.mw
@@ -74,17 +73,6 @@ class PadControl(Controller):
             a.setChecked(mw.cfg.pad_sort == key)
             a.setToolTip(tips[key])
             group.addAction(a)
-        menu.addSeparator()
-        views = QActionGroup(menu)
-        for key, name, icon, tip in (
-                ("grid", _("Cards"), "sounds", _("Cards, with pictures")),
-                ("list", _("List"), "list", _("One line each: many more sounds on the screen"))):
-            a = menu.addAction(name, lambda k=key: self.set_pad_view(k))
-            icons.set_icon(a, icon, checked_color="accent")
-            a.setCheckable(True)
-            a.setChecked(mw.cfg.pad_view == key)
-            a.setToolTip(tip)
-            views.addAction(a)
 
     def set_pad_sort(self, how: str):
         mw = self.mw
@@ -100,7 +88,8 @@ class PadControl(Controller):
         if view not in library.PAD_VIEWS or view == mw.cfg.pad_view:
             return
         mw.cfg.pad_view = view
-        self._label_view()
+        # (the order button's label is left alone: its words may be folded away)
+        mw.pad_view_toggle.set_view(view)
         self._show_size_picker()
         mw._save_now()
         mw.grid.set_listed(view == "list")
@@ -265,7 +254,7 @@ class PadControl(Controller):
             from soundboard.ui.storetab import StoreTab
             if isinstance(mw.store, StoreTab) and store.link_ok(src["link"]):
                 a_src_share = add(("store",), _("Share to the store"),
-                                  _("Share this link in the Free sounds tab"), sm)
+                                  _("Share this link in the Community tab"), sm)
         a_show = add(("folder",), _("Open file location"))
         a_del = add(("trash", "danger_text"), _("Remove"), _("Goes to Recently deleted"))
         act = menu.exec(pos)

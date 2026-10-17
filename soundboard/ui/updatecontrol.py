@@ -608,10 +608,12 @@ class UpdateControl(Controller):
             mw._save_later()
         if notes:
             dlg = whatsnew.WhatsNewDialog(mw, notes, updated)
+            usage.used("whats-new-shown")
             dlg.exec()
             page = dlg.page
             free_dialog(dlg)
             if page:
+                usage.used("whats-new-page")
                 mw.setctl.open_settings(page)
             return
         if not updated:

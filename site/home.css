@@ -91,6 +91,10 @@ html:not(.js) .switch { display: none; }
                 padding: 9px 16px; font-size: 14.5px; }
 .top.past .mini-dl { opacity: 1; transform: none; pointer-events: auto; }
 html:not(.js) .icon-btn { display: none; }
+.icon-btn.discord { color: #fff; background: #5865f2; border-color: #5865f2; }
+.icon-btn.discord:hover { background: #4752c4; }
+.icon-btn.discord svg { width: 20px; height: 20px; }
+html:not(.js) .icon-btn.discord { display: grid; }
 /* the look switcher: the apps' own themes, pictures and page colours together */
 .looks { position: relative; }
 html:not(.js) .looks { display: none; }
@@ -520,6 +524,13 @@ footer .pals svg:hover { transform: translateY(-6px) rotate(-6deg); }
   .bubble { left: auto; right: 0; top: -14px; max-width: 170px; font-size: 13.5px; }
   .dl { padding: 15px 22px; font-size: 17px; }
 }
+@media (max-width: 480px) {
+  .top .wrap { gap: 8px; }
+  .tools { gap: 5px; }
+  .icon-btn { width: 32px; height: 32px; font-size: 15px; }
+  .icon-btn.discord svg { width: 17px; height: 17px; }
+}
+@media (max-width: 420px) { .icon-btn.discord { display: none; } }   /* no room: the footer has it */
 @media (max-width: 400px) {
   .switch button { gap: 4px; padding: 6px 9px 6px 6px; font-size: 13px; }
   .brand img { width: 26px; height: 26px; }

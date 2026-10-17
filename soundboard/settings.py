@@ -531,7 +531,8 @@ class SettingsDialog(QDialog, Built):
         "triggers": _("Play a sound when something shows up on your screen (Onion Watch)."),
         "voice": _("The voice changer, AI voices and talking as a computer voice. Off: "
                    "your mic goes out as it is."),
-        "store": _("Free sounds other players shared, voted on: add them, or share your own."),
+        "store": _("Sounds and voices other players shared, voted on: add them, or share "
+                   "your own."),
     }
 
     def _tabs(self):
@@ -644,8 +645,8 @@ class SettingsDialog(QDialog, Built):
                         "searches your own sounds."),
         "sound_packs": _("Free sound packs (Sounds tab → Backup) reads the list of packs "
                          "from GitHub, and downloads one from there when you press Add."),
-        "sound_store": _("The Free sounds tab: the project's own sound store, for its list, the "
-                         "sounds you play or add, your votes and the sounds you share."),
+        "sound_store": _("The Community tab: the project's own store, for its list, the "
+                         "sounds and voices you play or add, your votes and what you share."),
         "ytdlp_update": _("Reads the list of yt-dlp versions the app's makers approved "
                           "(from GitHub), and fetches a newer one from PyPI when you press "
                           "Update now or Reinstall (Updates > Helper programs), or by "

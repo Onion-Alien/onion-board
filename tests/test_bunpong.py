@@ -230,10 +230,10 @@ def test_pong_counts_opened_quit_won_and_lost(qapp, monkeypatch):
     stack.show()
     bun.fetch_bat()
     game = bunpong.open_for(bun, game="pong")
-    assert usage._used == {"egg-pong-opened"}
+    assert usage._used == {"egg-pong-opened", "egg-game-pong"}
     game.court.serve("bun")
     game.reject()                       # closed mid-game
-    assert usage._used == {"egg-pong-opened", "egg-pong-quit"}
+    assert usage._used == {"egg-pong-opened", "egg-game-pong", "egg-pong-quit"}
     for who, key in (("you", "egg-pong-won"), ("bun", "egg-pong-lost")):
         usage._used.clear()
         stack2, g = _game()

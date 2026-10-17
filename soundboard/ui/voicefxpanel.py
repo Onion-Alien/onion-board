@@ -15,7 +15,7 @@ from collections.abc import Callable
 import numpy as np
 
 from PySide6.QtCore import QEvent, QPointF, QRectF, QSize, Qt, QTimer, Signal
-from PySide6.QtGui import QColor, QGuiApplication, QPainter
+from PySide6.QtGui import QColor, QGuiApplication, QIcon, QPainter
 from PySide6.QtWidgets import (QButtonGroup, QCheckBox, QDialog, QFrame, QGridLayout,
                                QHBoxLayout, QInputDialog, QLabel, QLineEdit, QMenu,
                                QMessageBox, QPushButton, QScrollArea, QSizePolicy,
@@ -28,7 +28,7 @@ from soundboard.speech import aipreview
 from soundboard.ui import art, busy, icons
 from soundboard.ui.aivoicebrowser import HEAR, MAKING, hear_button
 from soundboard.ui.widgets import take_out
-from soundboard.ui.panel import (Flow, UndoBar, hint_label, reset_button, section_label,
+from soundboard.ui.panel import (Flow, UndoBar, ViewToggle, hint_label, reset_button, section_label,
                                  steady_number)
 from soundboard.wheelguard import no_wheel
 from soundboard.i18n import _, ngettext
@@ -39,6 +39,8 @@ CUSTOM = "Custom"
 TILE_ART = 48     # px: a voice card's picture (when there is one, see ui/art.py)
 TILE_MIN_W = 124  # px: a voice card at its narrowest (the row holds as many as fit)
 TILE_GAP = 8      # px: between voice cards
+LIST_MIN_W = 190  # px: a voice row at its narrowest (the list view)
+LIST_ART = 30     # px: a voice row's picture
 MAX_COLS = 12     # voice cards a row, at most
 PICKED_ART = 32   # px: the picked voice's picture, under the cards
 
@@ -603,6 +605,7 @@ class VoiceTile(QToolButton):
         self.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Fixed)
         self.setAccessibleName(title)
         self._tip = ""          # its own tip; a cut-short name shows the whole name
+        self.listed = False     # the list view: a small picture beside the name
         self._cut = False
         # a favorite? the star in its top-right corner (always shown: never on hover only)
         self.star = QToolButton(self)
@@ -635,9 +638,45 @@ class VoiceTile(QToolButton):
         self._tip = tip
         super().setToolTip(tip or (self.title if self._cut else ""))
 
+    def set_listed(self, on: bool):
+        self.listed = on
+        self.setProperty("listed", on)
+        self.setMinimumWidth(LIST_MIN_W if on else TILE_MIN_W)
+        self.style().unpolish(self)
+        self.style().polish(self)
+        self.updateGeometry()
+        self._fit_name(self.width())
+
+    def sizeHint(self):
+        s = super().sizeHint()
+        return QSize(s.width(), LIST_ART + 14) if self.listed else s
+
+    def minimumSizeHint(self):
+        s = super().minimumSizeHint()
+        return QSize(LIST_MIN_W, LIST_ART + 14) if self.listed else s
+
+    def paintEvent(self, e):
+        if not self.listed:
+            return super().paintEvent(e)
+        from PySide6.QtWidgets import QStyle, QStyleOptionToolButton, QStylePainter
+        p = QStylePainter(self)
+        opt = QStyleOptionToolButton()
+        self.initStyleOption(opt)
+        opt.text, opt.icon = "", QIcon()
+        p.drawComplexControl(QStyle.ComplexControl.CC_ToolButton, opt)
+        h = self.height()
+        pic = self.icon().pixmap(QSize(LIST_ART, LIST_ART))
+        p.drawPixmap(10, (h - LIST_ART) // 2, pic)
+        p.setPen(self.palette().color(self.foregroundRole()))
+        x = 10 + LIST_ART + 10
+        p.drawText(QRectF(x, 0, self.width() - x - STAR - 8, h),
+                   Qt.AlignmentFlag.AlignVCenter | Qt.AlignmentFlag.AlignLeft,
+                   self.text().replace("&&", "&"))
+
     def _fit_name(self, width: int):
+        room = width - (LIST_ART + 20 + STAR + 8) if self.listed else width - 16
         shown = self.fontMetrics().elidedText(self.title, Qt.TextElideMode.ElideRight,
-                                              max(0, width - 16))
+                                              max(0, room))
         self.setText(shown.replace("&", "&&"))
         self._cut = shown != self.title
         self.setToolTip(self._tip)
@@ -645,7 +684,8 @@ class VoiceTile(QToolButton):
     def resizeEvent(self, e):
         super().resizeEvent(e)
         self._fit_name(self.width())
-        self.star.move(self.width() - STAR - 4, 4)
+        self.star.move(self.width() - STAR - (8 if self.listed else 4),
+                       (self.height() - STAR) // 2 if self.listed else 4)
 
 
 class VoiceFxPanel(QWidget):
@@ -759,7 +799,14 @@ class VoiceFxPanel(QWidget):
             self._cat_btns[key] = b
             cflow.addWidget(b)
         self._cat_btns[ALL].setChecked(True)
-        v.addWidget(self.cats)
+        self._listed = False
+        self.view_toggle = ViewToggle("grid", _("Voices"))
+        self.view_toggle.changed.connect(self.set_view)
+        chips = QHBoxLayout()
+        chips.setSpacing(12)
+        chips.addWidget(self.cats, 1)
+        chips.addWidget(self.view_toggle, 0, Qt.AlignmentFlag.AlignTop)
+        v.addLayout(chips)
         self._heads: dict[str, QLabel] = {}
         for key, text in (*((k, t) for k, t, _n in VOICE_GROUPS), (MINE, _("Mine"))):
             lbl = QLabel(text)
@@ -1199,6 +1246,8 @@ class VoiceFxPanel(QWidget):
         """A checkable voice card: its picture (ui/art.py), else a line icon, with the
         name under it."""
         b = VoiceTile(title)
+        if self._listed:
+            b.set_listed(True)
         if pic is not None:
             b.setIcon(pic)
             b.setProperty("art", True)
@@ -1278,6 +1327,15 @@ class VoiceFxPanel(QWidget):
         self.no_favs.setVisible(self._group == FAVS and not shown)
         for c in range(MAX_COLS):
             g.setColumnStretch(c, 1 if c < cols else 0)
+
+    def set_view(self, view: str):
+        """Picture cards, or a list: small pictures beside the names, more a screen."""
+        self._listed = view == "list"
+        self.view_toggle.set_view(view)
+        for b in self._tile.values():
+            b.set_listed(self._listed)
+        self._tile_cols = 0   # refit for the new width a voice needs
+        self._fit_width(self.width())
 
     def show_group(self, key: str):
         """Show one chip's voices (ALL, FAVS, MINE or a VOICE_GROUPS key)."""
@@ -1719,7 +1777,8 @@ class VoiceFxPanel(QWidget):
         assert lay is not None   # made in __init__
         m = lay.contentsMargins()
         room = width - m.left() - m.right()
-        cols = max(1, min(MAX_COLS, (room + TILE_GAP) // (TILE_MIN_W + TILE_GAP)))
+        least = LIST_MIN_W if self._listed else TILE_MIN_W
+        cols = max(1, min(MAX_COLS, (room + TILE_GAP) // (least + TILE_GAP)))
         if cols != self._tile_cols:
             self._tile_cols = cols
             self._place_tiles()

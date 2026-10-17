@@ -118,7 +118,7 @@ def feature_name(key: str) -> str:
     return {
         "sounds_web": _("Find and download sounds online"),
         "sound_packs": _("Download free sound packs"),
-        "sound_store": _("Sound store"),
+        "sound_store": _("Community"),
         "ytdlp_update": _("Update the downloader (yt-dlp)"),
         "radio": _("Radio"),
         "app_update": _("Check for and download Onion Board updates"),

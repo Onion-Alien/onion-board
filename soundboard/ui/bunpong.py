@@ -836,6 +836,7 @@ def open_for(bun, game: str | None = None) -> BunPong:
         old.finish()
     dlg = BunPong(win, bun, game=game or pick_game())
     usage.used("egg-pong-opened")   # the names only (usage.py); every game counts here
+    usage.used(f"egg-game-{usage.game_tag(dlg.game)}")
     dlg.open()
     dlg.court.setFocus(Qt.FocusReason.OtherFocusReason)
     return dlg

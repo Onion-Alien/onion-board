@@ -136,6 +136,10 @@ PRESS_MODES = ("overlap", "toggle", "solo", "queue")
 ADDONS = ("ai-voices", "live-voice", "other")
 # the free sound packs (soundboard.packs BUILT_IN ids); any other is "other"
 PACKS = ("streamer", "esports", "general", "podcast", "halloween", "gm-starter", "other")
+# the Live controls' tabs (ui/livesetups.py)
+LIVE_TABS = ("sounds", "radio", "apps")
+# Bun's games (ui/bunpong.py games()); any other is "other"
+BUN_GAMES = ("pong", "draw", "rps", "ttt", "other")
 # Settings' pages (settings.SettingsDialog's page keys, without Show advanced)
 SETTINGS_PAGES = ("audio", "appearance", "hotkeys", "tabs", "general", "about",
                   "overlay", "privacy", "connection", "data", "updates", "help",
@@ -276,7 +280,32 @@ FEATURES = ("add-files", "youtube", "record", "clip", "clip-editor", "import-boa
             "mic-unplugged", "mic-silent", "mic-silent-after-setup",
             # a sound played at 0% Sounds volume (the warning), its Set to 100%; a
             # hotkey no keyboard can press or Windows keeps (Win+L) refused
-            "sound-vol-0", "sound-vol-0-fixed", "hotkey-refused")
+            "sound-vol-0", "sound-vol-0-fixed", "hotkey-refused",
+            # Cards or a list (features_now): the Sounds, Apps or Voice tab set to a list
+            *(f"view-list-{k}" for k in ("sounds", "apps", "voice")),
+            # hotkeys: the game no longer gets the key (Settings), a key for a voice, auto
+            # push-to-talk's key set (all features_now)
+            "hotkeys-share-off", "voice-hotkeys", "auto-ptt",
+            # the voice leveler switched off; a sound with a voice laid over it, an AI
+            # voice among them (all features_now)
+            "voice-leveler-off", "sound-voice", "sound-ai-voice",
+            # Live controls: a setup picked for sounds, the radio or programs (LIVE_TABS),
+            # one speaking in another language; Not now on its "may take a while"
+            # question; one cancelled while it got ready
+            *(f"live-setup-{k}" for k in LIVE_TABS), "live-setup-language",
+            "live-setup-said-no", "live-setup-cancel",
+            # the Voice tab's setups: one saved, one renamed
+            "voice-setup-saved", "voice-setup-renamed",
+            # the Up next chip opened, its Clear; the Live switch's "muted a long time" ring
+            "upnext-opened", "upnext-cleared", "muted-ring",
+            # the tray's Voice changer menu: switched on / off, or a voice picked
+            "tray-voice-toggle", "tray-voice-pick",
+            # What's new shown by itself after an update, and its Settings button
+            "whats-new-shown", "whats-new-page",
+            # Bun's games: which one was opened (BUN_GAMES; egg-pong-opened is any game)
+            *(f"egg-game-{k}" for k in BUN_GAMES),
+            # the Store tab's order (Top is the default) and a category picked
+            "store-sort-new", "store-sort-trending", "store-category")
 STEPS = ("added-sound", "played-sound", "sent-to-others",
          # a tab a new user starts without (+ More tabs, Settings > Tabs)
          "added-radio-tab", "added-apps-tab", "added-triggers-tab")
@@ -588,10 +617,33 @@ def features_now(cfg) -> list[str]:
         out.append("playing-bg")
     modes = {getattr(m, "mode", "") for m in cfg.sounds}
     out += [f"press-{k}" for k in PRESS_MODES if k in modes]
+    for key, view in (("sounds", cfg.pad_view), ("apps", cfg.app_view),
+                      ("voice", cfg.voice_view)):
+        if view == "list":
+            out.append(f"view-list-{key}")
+    if not cfg.hotkeys_share:
+        out.append("hotkeys-share-off")
+    if cfg.voice_hotkeys:
+        out.append("voice-hotkeys")
+    if cfg.ptt_key:
+        out.append("auto-ptt")
+    if not cfg.voice_level:
+        out.append("voice-leveler-off")
+    voices = [(getattr(m, "fx", None) or {}).get("voice") for m in cfg.sounds]
+    voices = [v for v in voices if isinstance(v, dict) and v]
+    if voices:
+        out.append("sound-voice")
+    if any(v.get("ai") for v in voices):
+        out.append("sound-ai-voice")
     from soundboard import michelper
     if cfg.route == "mic" and michelper.known():   # its last check's answer, no new one
         out.append("mic-helper")
     return out
+
+
+def game_tag(name: str) -> str:
+    """A Bun game's name as a count's word: one of BUN_GAMES, else "other"."""
+    return name if name in BUN_GAMES else "other"
 
 
 def pack_tag(pack_id: str) -> str:

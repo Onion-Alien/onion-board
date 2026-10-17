@@ -210,6 +210,7 @@ the launcher the shortcuts and PyInstaller use. The app is the `soundboard` pack
 | `soundboard/packs.py` | free sound packs: the list (`packs/catalog.json` in this repo, with a built-in copy for offline) of ready-made boards in the backup format, added in one click; each pack's preview zip (`samples`) |
 | `soundboard/store.py` | the sound store (Store tab): the list, fetching a sound, votes, reports and uploads, talking to the project's own server (`server/store/`) |
 | `soundboard/ui/storetab.py` | the *Store* tab: free CC0 sounds to hear, add, vote on or report, and the *Share a sound* window |
+| `soundboard/ui/storelook.py` | the *Store* tab's pictures: a sound's emoji tile (from its name, tags and category; bars bounce while it plays), the banner with Bun |
 | `soundboard/storevoices.py` | the Store's community voices: packing your voice changer voices, AI voices and setups to share (settings only), checking every voice from the store again, taking one into your own lists, and its *Hear it* sample |
 | `soundboard/ui/storevoices.py` | the Store tab's *Voices*: a row per community voice and the *Share a voice* window |
 | `server/store/` | the sound store's server (and the chat room, `src/chat.js`): a Cloudflare Worker (`src/index.js`), its review page (`src/admin.js`) and database (`schema.sql`); its README says how to put it online |
