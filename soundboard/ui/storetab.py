@@ -213,6 +213,7 @@ class StoreTab(QWidget):
         self._voted.connect(self._on_voted)
         self._decoded.connect(self._on_decoded)
         self._cats.connect(self._on_cats)
+        net.on_change(self._net_changed)   # Settings > Privacy's switch, Offline mode
         self._cat = ""            # the category picked ("" all)
 
         # one column, centred in the tab (a wide window: room both sides, not all on
@@ -544,6 +545,19 @@ class StoreTab(QWidget):
         if not self._loaded or (self._off and net.allowed(store.FEATURE)):
             self._loaded = True
             QTimer.singleShot(0, self, self.reload)
+
+    def _net_changed(self):
+        QTimer.singleShot(0, self, self._follow_switch)   # (any thread)
+
+    def _follow_switch(self):
+        """Switched off while a list loads, its cut connection's late failure said
+        "Couldn't open the store": say it's off at once (and drop that answer). Back
+        on, the list comes again if the tab is showing."""
+        if self._closed or not self._loaded:
+            return
+        on = net.allowed(store.FEATURE)
+        if not on and not self._off or on and self._off and self.isVisible():
+            self.reload()
 
     def hideEvent(self, e):
         self._stop_preview()   # another tab: the sample stops

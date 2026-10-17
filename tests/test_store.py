@@ -208,6 +208,32 @@ def test_switched_off_while_loading_keeps_saying_off(qapp, fake, monkeypatch):
     t.shutdown()
 
 
+def test_switched_off_in_settings_while_loading_says_off(qapp, fake, monkeypatch):
+    # the switch in Settings > Privacy while the list is on its way, with no reload: the
+    # cut connection's late failure said "Couldn't open the store" over "The store is off"
+    import threading
+    go, asked = threading.Event(), threading.Event()
+    plain = store._request
+
+    def slow(method, path, *a, **kw):
+        if path.startswith("/v1/sounds?"):
+            asked.set()
+            go.wait(5)
+            raise store.StoreError("Couldn't reach the sound store. Check your internet.")
+        return plain(method, path, *a, **kw)
+    monkeypatch.setattr(store, "_request", slow)
+    t = _tab(qapp, [], [])
+    assert _wait(qapp, asked.is_set)
+    net.configure_features(off=[store.FEATURE])
+    go.set()
+    _wait(qapp, lambda: False, n=30)
+    assert t.msg_title.text() == storetab._("The store is off") and t.msg_btn.isVisibleTo(t)
+    monkeypatch.setattr(store, "_request", plain)
+    net.configure_features()   # back on: the list comes again
+    assert _wait(qapp, lambda: len(t._rows) == 2)
+    t.shutdown()
+
+
 def test_a_late_answer_after_shutdown_is_dropped(qapp, fake):
     t = _tab(qapp, [], [])
     t.shutdown()
