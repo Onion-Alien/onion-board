@@ -3756,5 +3756,6 @@
     "Onion Board срещна {n} проблем, откакто е пуснат.",
     "Onion Board срещна {n} проблема, откакто е пуснат."
   ],
-  "See report": "Виж доклада"
+  "See report": "Виж доклада",
+  "The store doesn't take that name or those tags. Try other words (and no links).": "Магазинът не приема това име или тези тагове. Опитай с други думи (и без връзки)."
 }

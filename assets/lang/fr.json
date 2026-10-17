@@ -3756,5 +3756,6 @@
     "Onion Board a rencontré {n} problème depuis son lancement.",
     "Onion Board a rencontré {n} problèmes depuis son lancement."
   ],
-  "See report": "Voir le rapport"
+  "See report": "Voir le rapport",
+  "The store doesn't take that name or those tags. Try other words (and no links).": "La boutique n'accepte pas ce nom ou ces tags. Essaie d'autres mots (et pas de liens)."
 }

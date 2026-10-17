@@ -3677,5 +3677,6 @@
   "Onion Board hit {n} problem since it started.": [
     "Onion Board가 시작된 뒤 문제가 {n}개 생겼어요."
   ],
-  "See report": "보고서 보기"
+  "See report": "보고서 보기",
+  "The store doesn't take that name or those tags. Try other words (and no links).": "스토어에서 그 이름이나 태그를 받지 않아요. 다른 말로 해 보세요(링크도 안 돼요)."
 }

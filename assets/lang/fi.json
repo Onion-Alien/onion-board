@@ -3756,5 +3756,6 @@
     "Onion Board on kohdannut {n} ongelman käynnistyksen jälkeen.",
     "Onion Board on kohdannut {n} ongelmaa käynnistyksen jälkeen."
   ],
-  "See report": "Näytä raportti"
+  "See report": "Näytä raportti",
+  "The store doesn't take that name or those tags. Try other words (and no links).": "Kauppa ei hyväksy tätä nimeä tai näitä tunnisteita. Kokeile muita sanoja (ei linkkejä)."
 }

@@ -3677,5 +3677,6 @@
   "Onion Board hit {n} problem since it started.": [
     "Onion Board 启动以来遇到了 {n} 个问题。"
   ],
-  "See report": "查看报告"
+  "See report": "查看报告",
+  "The store doesn't take that name or those tags. Try other words (and no links).": "商店不接受这个名字或标签。换些词试试（也不要链接）。"
 }

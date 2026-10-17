@@ -457,3 +457,10 @@ def test_a_row_plays_from_its_picture_and_shows_it_playing(qapp, fake):
     assert _wait(qapp, lambda: r.btn_play.isVisibleTo(r))
     assert not r.tile._badge
     t.shutdown()
+
+
+def test_a_refused_name_or_tags_says_so():
+    # the server refuses a link or a blocked word in a shared name or its tags
+    said = store._why(422, "not allowed")
+    assert "name" in said and "links" in said
+    assert said != store._why(500, "")
