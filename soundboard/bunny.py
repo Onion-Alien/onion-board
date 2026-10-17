@@ -45,6 +45,8 @@ GADGET = QColor("#b9c2d4")
 # the wrench prop's gadget screen, and the spot on the hammer's plank
 GADGET_SCREEN = QRectF(70, 109, 24, 6.5)
 PLANK_SPOT = QRectF(84, 91, 17, 18)
+# outfit pieces on his body, not his head: they stay put when he nods (draw_bunny `nod`)
+BODY_PIECES = bunnyfit.NECK | {"sweater", "collar"}
 
 
 def _ellipse(p: QPainter, cx, cy, w, h, fill: QColor, pen: QPen | None = None, angle=0.0):
@@ -104,7 +106,8 @@ def draw_bunny(p: QPainter, rect: QRectF, prop: str | None = None, *,
                blink: float = 0.0, mouth: float = 0.0, ears: float = 0.0,
                swing: float = 0.0, sad: float = 0.0, angry: float = 0.0,
                nightcap: bool = False, robot: bool = False, smug: bool = False,
-               outfit: tuple[str, ...] | None = None, led: float = 0.0):
+               outfit: tuple[str, ...] | None = None, led: float = 0.0,
+               nod: float = 0.0, dip: float = 0.0):
     """Draw Bun fitted (aspect kept, centred) into `rect`. The keywords pose Bun for
     animation (ui/bunnywidget.py): `blink` 0..1 closes the eyes, `mouth` 0..1 opens
     the mouth (talking), `ears` tilts both ears outward by that many degrees,
@@ -116,7 +119,9 @@ def draw_bunny(p: QPainter, rect: QRectF, prop: str | None = None, *,
     `smug`: half-shut eyes, one brow up and a lopsided smirk (he got away with it).
     `outfit`: bunnyfit pieces to dress him in (None: the current theme's, (): none).
     Robo-Bun wears no outfit. `led` 0..1 brightens Robo-Bun's LED ears and core (he
-    pulses them while he works)."""
+    pulses them while he works). `nod` tilts his head (and ears) on his neck by that many
+    degrees and `dip` drops it that far on the canvas, the body staying put: a headbang,
+    a nod to the beat."""
     fit = () if robot else bunnyfit.outfit() if outfit is None else outfit
     # dark glasses hide his eyes: no lids or tears under them, brows lifted clear
     hidden = not nightcap and any(name in bunnyfit.HIDE_EYES for name in fit)
@@ -138,6 +143,14 @@ def draw_bunny(p: QPainter, rect: QRectF, prop: str | None = None, *,
     # ears (behind the head): the right one flops a little for character. Sad, the top
     # half of each folds down and outward from the middle (droopy, not stuck out)
     fold = 115 * max(0.0, min(1.0, sad))
+
+    def head():   # the head's own frame: tilted on the neck, dipped
+        p.translate(50, 92 + dip)
+        p.rotate(nod)
+        p.translate(-50, -92)
+
+    p.save()
+    head()
     for side, bx, cx, cy, h, a, tilt in ((-1, 36, 36, 26, 50, -10, -ears),
                                          (1, 64, 66, 28, 48, 18, ears)):
         p.save()
@@ -179,6 +192,7 @@ def draw_bunny(p: QPainter, rect: QRectF, prop: str | None = None, *,
             _ellipse(p, 0, 0, 6, 6, ROBOT_BOLT, ink)
             _ellipse(p, 0, 0, 2, 2, ROBOT_INK, None)
             p.restore()
+    p.restore()
 
     # body, feet, head
     _ellipse(p, 50, 100, 50, 36, fur, ink)
@@ -200,9 +214,15 @@ def draw_bunny(p: QPainter, rect: QRectF, prop: str | None = None, *,
         _ellipse(p, 50, 97, 10, 10, ROBOT_CYAN, None)
         _ellipse(p, 50, 97, 4, 4, ROBOT_CYAN_HI, None)
 
-    bunnyfit.draw(p, fit, "back", ink)
+    # what's round his neck and on his body stays with the body when his head moves
+    body = tuple(n for n in fit if n in BODY_PIECES)
+    fit_head = tuple(n for n in fit if n not in BODY_PIECES)
+    bunnyfit.draw(p, body, "back", ink)
+    p.save()
+    head()
+    bunnyfit.draw(p, fit_head, "back", ink)
     _ellipse(p, 50, 64, 68, 56, fur, ink)
-    bunnyfit.draw(p, fit, "under", ink, hats=not nightcap)
+    bunnyfit.draw(p, fit_head, "under", ink, hats=not nightcap)
 
     # headphones: band over the head, cups on the sides
     band = QPainterPath(QPointF(17, 64))
@@ -223,7 +243,7 @@ def draw_bunny(p: QPainter, rect: QRectF, prop: str | None = None, *,
 
     if nightcap:
         _nightcap(p, ink)
-    bunnyfit.draw(p, fit, "over", ink, hats=not nightcap)
+    bunnyfit.draw(p, fit_head, "over", ink, hats=not nightcap)
 
     # face
     for x in (39, 61):
@@ -335,8 +355,9 @@ def draw_bunny(p: QPainter, rect: QRectF, prop: str | None = None, *,
         p.setBrush(Qt.BrushStyle.NoBrush)
         p.drawPath(path)
 
-    bunnyfit.draw(p, fit, "face", ink, hats=not nightcap, shut=blink > 0.6)
-    _draw_prop(p, prop, ink, swing, fur=fur)
+    bunnyfit.draw(p, fit_head, "face", ink, hats=not nightcap, shut=blink > 0.6)
+    if prop == "headphones":   # (his paw is on the ear cup: it goes with his head)
+        _draw_prop(p, prop, ink, swing, fur=fur)
     if angry > 0.5:           # the cartoon cross-vein mark, up on his forehead
         p.setPen(QPen(CROSS, 2.4, Qt.PenStyle.SolidLine, Qt.PenCapStyle.RoundCap))
         p.setBrush(Qt.BrushStyle.NoBrush)
@@ -345,6 +366,10 @@ def draw_bunny(p: QPainter, rect: QRectF, prop: str | None = None, *,
             arc = QPainterPath(QPointF(cx + ax * 1.5 * k, cy + ay * 6 * k))
             arc.quadTo(cx + ax * 1.5 * k, cy + ay * 1.5 * k, cx + ax * 6 * k, cy + ay * 1.5 * k)
             p.drawPath(arc)
+    p.restore()   # (the head's frame)
+    bunnyfit.draw(p, body, "face", ink, hats=not nightcap)
+    if prop != "headphones":
+        _draw_prop(p, prop, ink, swing, fur=fur)
     p.restore()
 
 

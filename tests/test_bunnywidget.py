@@ -393,3 +393,145 @@ def test_bun_mode_keeps_going_behind_a_game_at_a_slower_pace(qapp):
     b._resume()
     assert b._timer.interval() == appstate.interval(bw.FAST_MS, bw.BACK_MS)
     b._timer.stop()
+
+
+class _Clock:
+    """Pretend time for the module (time.monotonic), moved on by hand."""
+
+    def __init__(self):
+        self.now = 1000.0
+
+    def monotonic(self):
+        return self.now
+
+    def localtime(self):
+        return time.localtime()
+
+
+class _Song:
+    """What groove.Groove gives Bun: a steady beat at `bpm`, in `style`."""
+
+    def __init__(self, clock, style, bpm=120.0, voice=0.5):
+        self.clock, self.style, self.bpm, self.t0 = clock, style, bpm, clock.now
+        self.energy, self.kick, self.voice, self.onset = 0.8, 0.0, voice, 0.0
+
+    def beat(self, now=None):
+        return ((self.clock.now if now is None else now) - self.t0) * self.bpm / 60
+
+    def last_hit(self, band, now):   # a hit on every beat
+        return ((now - self.t0) % (60 / self.bpm), 0.9)
+
+    def gap(self, band):
+        return 60 / self.bpm
+
+
+def _dance(monkeypatch, style, height=110, voice=0.5):
+    from soundboard.ui import bunnywidget
+    clock = _Clock()
+    monkeypatch.setattr(bunnywidget, "time", clock)
+    b = BunnyWidget("headphones", height=height)
+    b.set_groove(_Song(clock, style, voice=voice))
+    return b, clock
+
+
+def _beats(b, clock, secs, each=None):
+    for _ in range(round(secs * 60)):
+        clock.now += 1 / 60
+        b._step()
+        if each:
+            each()
+
+
+def test_notes_grow_and_shrink_with_him(qapp):
+    small, big = BunnyWidget("headphones", height=40), BunnyWidget("headphones", height=400)
+    for b in (small, big):
+        b.resize(b.sizeHint())
+        b.burst(3)
+        assert not b.grab().isNull()
+    ks, kb = small.notes[0].k, big.notes[0].k
+    assert kb / ks > 5   # (they used to be the same size at any size of Bun)
+    speed = lambda b: sum(abs(n.vy) for n in b.notes) / len(b.notes)  # noqa: E731
+    assert speed(big) > speed(small) * 4   # ...and flew the same few pixels
+
+
+def test_he_dances_on_the_beat_and_notes_come_out_on_it(qapp, monkeypatch):
+    b, clock = _dance(monkeypatch, "electronic")
+    _beats(b, clock, 1.0)   # gets into it
+    times = []
+    count = [len(b.notes)]
+
+    def note_times():
+        if len(b.notes) > count[0]:
+            times.append(b.groove.beat())
+        count[0] = len(b.notes)
+    _beats(b, clock, 3.0, note_times)
+    assert len(times) >= 5   # 6 beats in 3 s at 120: notes on (nearly) every one
+    assert all(min(x % 1, 1 - x % 1) < 0.05 for x in times)   # on the beat, not a stream
+    # in the air between beats, down on them
+    clock.now = b.groove.t0 + 10 * 0.5 + 0.25          # half way through a beat
+    mid = b.pose()["dy"]
+    clock.now = b.groove.t0 + 11 * 0.5                  # on one
+    on = b.pose()["dy"]
+    assert mid < on - 5
+
+
+def test_a_bigger_bun_dances_bigger(qapp, monkeypatch):
+    heights = {}
+    for h in (60, 360):
+        b, clock = _dance(monkeypatch, "electronic", height=h)
+        _beats(b, clock, 2.0)
+        clock.now = b.groove.t0 + 6 * 0.5 + 0.25
+        heights[h] = -b.pose()["dy"]
+    assert heights[360] > heights[60] * 4
+
+
+def test_each_style_dances_its_own_way(qapp, monkeypatch):
+    rock, clock = _dance(monkeypatch, "rock")
+    _beats(rock, clock, 2.0)
+    clock.now = rock.groove.t0 + 6 * 0.5 + 0.04        # just after the beat: head down
+    assert rock.pose()["dip"] > 5 and rock.pose()["intense"] > 0.2
+    talk, clock = _dance(monkeypatch, "speech", voice=0.9)
+    _beats(talk, clock, 3.0)
+    assert talk.pose()["mouth"] > 0.5 and not talk.notes   # talking along, no notes
+    talk.groove.voice = 0.0
+    _beats(talk, clock, 0.5)
+    assert talk.pose()["mouth"] < 0.1
+    cool, clock = _dance(monkeypatch, "hiphop")
+    _beats(cool, clock, 2.0)
+    assert cool.pose()["smug"]
+    calm, clock = _dance(monkeypatch, "chill")
+    _beats(calm, clock, 2.0)
+    clock.now = calm.groove.t0 + 2 * 0.5   # (eyes shut, swaying)
+    assert calm.pose()["blink"] > 0.9
+    for b in (rock, talk, cool, calm):   # every style draws
+        b.resize(b.sizeHint())
+        assert not b.grab().isNull()
+    calm.set_groove(None)                # the song ends: he stops dancing
+    _beats(calm, clock, 2.0)
+    assert calm._dance < 0.01 and calm.pose()["nod"] == 0.0
+
+
+def test_his_mouth_stays_shut_to_music_and_only_talks_to_speech(qapp, monkeypatch):
+    for style in ("electronic", "rock", "hiphop", "chill", "pop"):
+        b, clock = _dance(monkeypatch, style, voice=1.0)   # (a loud singer, too)
+        widest = [0.0]
+        _beats(b, clock, 3.0, lambda w=widest, b=b: w.__setitem__(0, max(w[0], b.pose()["mouth"])))
+        assert widest[0] < 0.05, style
+    talk, clock = _dance(monkeypatch, "speech", voice=1.0)
+    _beats(talk, clock, 2.0)
+    assert talk.pose()["mouth"] > 0.5
+
+
+def test_hiphop_nods_on_the_808_hits_themselves(qapp, monkeypatch):
+    b, clock = _dance(monkeypatch, "hiphop")
+    _beats(b, clock, 2.0)
+    song = b.groove
+    hits = [song.t0 + 3.0, song.t0 + 3.7]   # off any beat grid: syncopated 808s
+    song.last_hit = lambda band, now: next(((now - h, 1.0) for h in reversed(hits) if h <= now),
+                                           (float("inf"), 0.0))
+    clock.now = hits[0] - 0.02
+    before = b.pose()["dip"]
+    clock.now = hits[0] + 0.05
+    assert b.pose()["dip"] > before + 3   # down with the 808, not the grid
+    clock.now = hits[1] - 0.05
+    assert b.pose()["dip"] < 2            # back up before the next one
