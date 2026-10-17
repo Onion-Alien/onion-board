@@ -183,3 +183,92 @@ def test_a_watched_key_fires_alone_and_releases(qapp, monkeypatch):
     down.clear()
     hk._poll_watched()
     assert fired == ["sound:a"] and released == ["sound:a"]
+
+
+# ---------------------------------------------------------------- shared keys (raw input)
+
+@pytest.mark.parametrize("vkey, scan, flags, numlock, out", [
+    (0x23, 0x4F, 0, True, 0x61),                # numpad 1 with Num Lock on: Num 1
+    (0x23, 0x4F, 0, False, 0x23),               # ...off: End, as Windows says
+    (0x23, 0x4F, wk.RI_KEY_E0, True, 0x23),     # the End key itself
+    (0x61, 0x4F, 0, True, 0x61),                # already the digit
+    (0x57, 0x11, 0, True, 0x57),                # W is W
+])
+def test_raw_keys_are_named_like_registered_ones(vkey, scan, flags, numlock, out):
+    assert wk.raw_vk(vkey, scan, flags, numlock) == out
+
+
+def _shared(monkeypatch, mapping, down=(), own_front=False):
+    from PySide6.QtCore import QObject
+    hk = wk.Hotkeys.__new__(wk.Hotkeys)
+    QObject.__init__(hk)
+    hk._held, hk._timer = {}, 1                 # a timer already running: none started
+    hk._shared = {wk.parse(c): a for c, a in mapping.items()}
+    held = set(down)
+    monkeypatch.setattr(wk, "is_down", lambda vk: vk in held)
+    monkeypatch.setattr(wk, "own_window_in_front", lambda: own_front)
+    fired = []
+    hk.fired.connect(fired.append)
+    return hk, held, fired
+
+
+def test_a_shared_key_fires_once_while_held(monkeypatch):
+    hk, held, fired = _shared(monkeypatch, {"w": "sound:a", "ctrl+w": "sound:b"})
+    held.add(0x57)
+    hk._key_down(0x57)
+    hk._key_down(0x57)                          # Windows repeats a held key: once only
+    assert fired == ["sound:a"] and hk._held == {0x57: "sound:a"}
+    held.clear()
+    hk._held.clear()                            # (the held-key timer lets it go)
+    held.add(0x11)
+    hk._key_down(0x57)                          # Ctrl+W is its own hotkey
+    hk._key_down(0x11)                          # a modifier alone is nothing
+    assert fired == ["sound:a", "sound:b"]
+
+
+def test_a_shared_key_needs_its_exact_modifiers(monkeypatch):
+    hk, held, fired = _shared(monkeypatch, {"ctrl+f1": "sound:a"})
+    hk._key_down(0x70)                          # F1 without Ctrl
+    held.update({0x11, 0x10})
+    hk._key_down(0x70)                          # Ctrl+Shift+F1
+    assert fired == []
+
+
+def test_typing_in_the_board_itself_doesnt_play_shared_letters(monkeypatch):
+    """Shared keys reach the window in front too: in the board's search box, W types."""
+    hk, held, fired = _shared(monkeypatch, {"w": "sound:a", "f1": "sound:b",
+                                            "ctrl+q": "sound:c"}, own_front=True)
+    hk._key_down(0x57)
+    hk._key_down(0x70)                          # F1 doesn't type: it plays
+    held.add(0x11)
+    hk._key_down(0x51)                          # nor does Ctrl+Q
+    assert fired == ["sound:b", "sound:c"]
+
+
+@pytest.mark.windows   # RegisterHotKey and raw input
+def test_shared_keys_are_read_not_registered_and_grabbed_ones_still_taken(qapp):
+    from conftest import process_events
+    shared, grabbed = "ctrl+alt+shift+f22", "ctrl+alt+shift+f21"   # nothing uses these
+    a, b = wk.Hotkeys(), wk.Hotkeys()
+    got = {"a": None, "b": None}
+    a.failed_changed.connect(lambda f: got.__setitem__("a", f))
+    b.failed_changed.connect(lambda f: got.__setitem__("b", f))
+    try:
+        a.share, a.grab = True, {grabbed}
+        a.register({shared: "x", grabbed: "y"})
+        assert process_events(qapp, lambda: got["a"] is not None, 3)
+        assert got["a"] == [] and a._raw_on and set(a._shared.values()) == {"x"}
+        b.register({shared: "z", grabbed: "w"})   # b takes keys the old way
+        assert process_events(qapp, lambda: got["b"] is not None, 3)
+        assert got["b"] == [grabbed]              # a still holds the grabbed one, not the other
+        got["a"] = None
+        a.share = False
+        a.register({})
+        assert process_events(qapp, lambda: got["a"] is not None, 3)
+        assert not a._raw_on and not a._shared
+    finally:
+        for h in (a, b):
+            h.register({})
+        process_events(qapp, lambda: False, 0.2)
+        a.stop()
+        b.stop()

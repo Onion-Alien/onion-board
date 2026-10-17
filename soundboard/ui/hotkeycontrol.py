@@ -68,6 +68,8 @@ class HotkeyControl(Controller):
             # nothing could turn them on again until a restart, so they're on now
             self._hotkeys_off = False
             mw.toast(_("Hotkeys are on again."), "ok", key="hotkeys")
+        mw.hotkeys.share = mw.cfg.hotkeys_share
+        mw.hotkeys.grab = set()
         if self._hotkeys_off:   # only the key that turns them back on
             mapping[mw.cfg.hotkeys_off_hotkey] = "__hotkeys__"
             mw.hotkeys.register(mapping)
@@ -90,7 +92,9 @@ class HotkeyControl(Controller):
             for name, combo in mw.cfg.voice_hotkeys.items():
                 if combo and name in known:
                     mapping.setdefault(combo, PICK_VOICE + name)
-        mapping.update(mw.overlay.layer())   # its keys, only while it's open
+        layer = mw.overlay.layer()   # its keys, only while it's open
+        mapping.update(layer)
+        mw.hotkeys.grab = set(layer)   # ...and they never reach the game
         # the game's push-to-talk key is pressed by us (auto-PTT) and by the player: as a
         # hotkey of ours, Windows would hand those presses to us instead of the game
         mapping.pop(mw.cfg.ptt_key, None)
@@ -105,6 +109,13 @@ class HotkeyControl(Controller):
         mw = self.mw
         cat = mw.cfg.category
         return not mw.cfg.scoped_hotkeys or not cat or not m.tags or cat in m.tags
+
+    def set_share_hotkeys(self, on: bool):
+        """Settings -> Hotkeys: the game still gets a hotkey's key (on), or only we do."""
+        mw = self.mw
+        mw.cfg.hotkeys_share = on
+        mw._save_now()
+        self.register_hotkeys()
 
     def set_scoped_hotkeys(self, on: bool):
         """Settings -> Hotkeys: a set of sound hotkeys per category."""

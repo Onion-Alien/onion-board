@@ -3578,5 +3578,8 @@
   "Loading what's trending on Myinstants…": "Caricamento delle tendenze di Myinstants…",
   "Nothing is trending on Myinstants right now.": "Al momento non c'è niente di tendenza su Myinstants.",
   "The meme sounds people play most on Myinstants right now": "I suoni meme più riprodotti su Myinstants in questo momento",
-  "Trending on Myinstants": "Di tendenza su Myinstants"
+  "Trending on Myinstants": "Di tendenza su Myinstants",
+  "Games get the key too": "Anche i giochi ricevono il tasto",
+  "Keys in games": "Tasti nei giochi",
+  "With this on, a hotkey still does its normal job too: press F1 in a game and the game gets F1 while your sound plays. Off: only Onion Board gets the key, so a hotkey on W stops you walking.": "Se attivo, un tasto di scelta rapida fa anche il suo lavoro normale: premi F1 in un gioco e il gioco riceve F1 mentre il tuo suono va. Disattivo: solo Onion Board riceve il tasto, quindi un tasto di scelta rapida su W ti impedisce di camminare."
 }

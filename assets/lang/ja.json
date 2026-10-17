@@ -3501,5 +3501,8 @@
   "Loading what's trending on Myinstants…": "Myinstantsのトレンドを読み込み中…",
   "Nothing is trending on Myinstants right now.": "いまMyinstantsでトレンドのものはありません。",
   "The meme sounds people play most on Myinstants right now": "いまMyinstantsでいちばん再生されているミーム音",
-  "Trending on Myinstants": "Myinstantsのトレンド"
+  "Trending on Myinstants": "Myinstantsのトレンド",
+  "Games get the key too": "ゲームにもキーを送る",
+  "Keys in games": "ゲーム中のキー",
+  "With this on, a hotkey still does its normal job too: press F1 in a game and the game gets F1 while your sound plays. Off: only Onion Board gets the key, so a hotkey on W stops you walking.": "オンにすると、ホットキーは本来の働きもします。ゲームで F1 を押すと、サウンドが鳴りつつゲームにも F1 が届きます。オフ：キーは Onion Board だけに届くので、W にホットキーを付けると歩けなくなります。"
 }
