@@ -1113,7 +1113,8 @@ def test_the_map_is_the_only_view_and_the_3d_globe_setting_moves_to_it(
     assert process_events(qapp, lambda: t.flat is not None and t._globe_list)
     assert isinstance(t.flat, FlatMap) and not hasattr(t, "view")
     assert len(t.flat._points) == 5               # the map takes every station
-    assert [b.text() for b in t.flat.findChildren(QPushButton)] == ["+", "−"]   # no HD
+    assert [b.text() for b in t.flat.findChildren(QPushButton)
+            if not t.flat.oops.isAncestorOf(b)] == ["+", "−"]   # no HD
     t.shutdown()
 
 
@@ -1751,11 +1752,16 @@ def test_the_radio_being_down_is_sad_bun_on_the_map_and_plain_words(tab):
     assert "↻" in text and "http" not in text
     if tab._map_says_it():            # (this tab's map area is hidden: then the list does)
         assert radio.directory_down() not in text + tab.list.item(0).text()
-    card = tab.flat._loading
-    assert tab.flat._msg == radio.directory_down() and card.label.text() == tab.flat._msg
-    assert card.isVisibleTo(tab.flat) and card.bun.sad > 0.5 and not card._notes.isActive()
+    card = tab.flat.oops
+    assert tab.flat._msg == radio.directory_down() and card.line.text() == tab.flat._msg
+    assert card.isVisibleTo(tab.flat) and card.bun.sad > 0.5 and card.property("tone") == "error"
+    assert not tab.flat._loading.isVisibleTo(tab.flat)   # one Bun: the sad one
+    reloads = []
+    tab.dir.load_globe = lambda force=False: reloads.append(force)
+    card.btn_retry.click()            # Try again: the station list once more
+    assert reloads == [True] and not tab._globe_error
     tab.flat.set_points([{"id": "u", "lo": 0.0, "la": 0.0, "k": 1}])
-    assert not card.isVisibleTo(tab.flat) and card.bun.sad == 0.0   # stations: happy again
+    assert not card.isVisibleTo(tab.flat)   # stations: the card goes
 
 
 def test_search_spammed_with_the_same_words_asks_once(qapp, server, tmp_path):

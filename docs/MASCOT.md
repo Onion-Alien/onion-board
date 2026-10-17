@@ -174,6 +174,17 @@ A new piece drawn for Bun shows up on Hoot too: check it with
 (`soundboard/style/`), which Onion Watch copies whole, so Hoot wears the same outfits
 there; inside the board's Triggers tab the add-on draws him with the board's kit.
 
+### What they say when clicked
+
+Each outfit comes with a character, and a click gets a line in it
+(`soundboard/style/mascotlines.py`: `bun()` / `hoot()` for the current theme): a sea
+captain in Ocean, a wizard in Midnight, Dracula in Vampire, a hacker in Hacker. They're
+mixed with the lines the place he sits in gives him (the empty board's "↑ Add sounds!",
+Hoot's "↓ that button!"), never the same line twice in a row, and stay up long enough to
+read (`read_secs`). A theme with no lines of its own says Dark's. A new theme gets four
+lines for Bun and three for Hoot, short enough for one bubble (a longer translation goes
+on two lines). `tests/test_mascotlines.py` checks every theme has them.
+
 **Anything that caches a picture of Bun must key it on `theme.current_name`** (his
 outfit and look), not only the accent colour: see `ScribeBunny._layer`.
 

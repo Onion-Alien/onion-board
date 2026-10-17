@@ -37,8 +37,6 @@ LIST_GAP = 8                  # between the rows and the scroll bar (DESIGN.md, 
 CAT_W = 110                   # the table's Category column
 ADDED_W = 100                 # its Added column ("3 days ago")
 ONE_ROW = 720                 # a narrower tab puts the toolbar on two rows
-DOWN_BUN = 140                # the store-is-down page's Bun, px tall
-DOWN_ROOM = 380               # ... shown in a tab at least this tall
 
 
 def meta_line(s: store.Sound) -> str:
@@ -312,6 +310,7 @@ class StoreTab(QWidget):
         # (in a box that only asks for the two rows' width: asking for one row's, a
         # narrow tab could never get narrow enough to switch to two)
         self.toolbar = QWidget()
+        self.toolbar.setObjectName("storebar")   # (theme.py: Share greyed out while down)
         tv = QVBoxLayout(self.toolbar)
         tv.setContentsMargins(0, 0, 0, 0)
         tv.setSpacing(10)
@@ -375,13 +374,6 @@ class StoreTab(QWidget):
         self.msg_icon = QLabel()
         self.msg_icon.setAlignment(Qt.AlignmentFlag.AlignCenter)
         mv.addWidget(self.msg_icon)
-        # the store's down: Bun, sad, kicking at the ground (in place of the icon)
-        from soundboard.ui.bunnywidget import BunnyWidget
-        self.msg_bun = BunnyWidget(height=DOWN_BUN, pad=18, sad=1.0)
-        self.msg_bun.sulk = True
-        self.msg_bun.setMinimumSize(1, 1)   # no say in the tab's minimum: hidden when short
-        self.msg_bun.hide()
-        mv.addWidget(self.msg_bun, 0, Qt.AlignmentFlag.AlignHCenter)
         self.msg_title = section_label("")
         self.msg_title.setAlignment(Qt.AlignmentFlag.AlignCenter)
         mv.addWidget(self.msg_title)
@@ -398,6 +390,12 @@ class StoreTab(QWidget):
         mv.addStretch(2)
         self._msg_do: Callable[[], object] | None = None
         self.stack.addWidget(self.message)
+        # the list couldn't be had (the store's down, no connection): sad Bun says so
+        from soundboard.ui import oops
+        self.oops = oops.OopsPanel()
+        self.oops_page = oops.centred(self.oops)
+        self.stack.addWidget(self.oops_page)
+        self.failed = False   # the list couldn't be had (the tab's tour asks, tabtours.py)
         col.addWidget(self.stack, 1)
         self.note = QLabel()   # the last action's result, for screen readers and tests
         self.note.hide()
@@ -437,12 +435,10 @@ class StoreTab(QWidget):
         self._fit_toolbar()
 
     def _fit_buns(self):
-        """The banner's Bun when there's room (`fits`), never while the down page's Bun
-        is out; that one only when the tab has the height for him."""
-        down = getattr(self, "_down", False)
-        self.bun.setVisible(storelook.fits(self.width(), self.height()) and not down)
-        self.msg_bun.setVisible(down and self.height() >= DOWN_ROOM)
-        self.msg_icon.setVisible(not down)
+        """The banner's Bun when there's room (`fits`), never while the red card's sad
+        Bun is out (one Bun at a time)."""
+        self.bun.setVisible(storelook.fits(self.width(), self.height())
+                            and not getattr(self, "failed", False))
 
     def eventFilter(self, obj, e):
         if e.type() == QEvent.Type.Resize and obj is self.list_area.viewport():
@@ -473,10 +469,14 @@ class StoreTab(QWidget):
         return _("Share a voice") if self._mode == "voices" else _("Share a sound")
 
     def _share_look(self):
-        """Share's words on it, or (narrow) its icon only with the words as its tooltip."""
+        """Share's words on it, or (narrow) its icon only with the words as its tooltip.
+        Greyed out, saying why, while the store's server is down."""
         label = self._share_label()
+        down = store.is_down()
+        self.btn_share.setEnabled(not down)
         self.btn_share.setText(label if self._share_words else "")
-        self.btn_share.setToolTip("" if self._share_words else label)
+        self.btn_share.setToolTip(store.down_share() if down
+                                  else "" if self._share_words else label)
         self.btn_share.setAccessibleName(label)
 
     def _share_w(self, text: str) -> int:
@@ -704,7 +704,10 @@ class StoreTab(QWidget):
         threading.Thread(target=run, daemon=True, name="store-cats").start()
 
     def _on_cats(self, got):
-        if self._closed or got is None or self._mode != "sounds":
+        if self._closed:
+            return
+        self._share_look()
+        if got is None or self._mode != "sounds":
             return
         cats, _total = got
         # the name, then how many (a number needs no words)
@@ -714,11 +717,10 @@ class StoreTab(QWidget):
 
     def _say(self, icon: str, title: str, text: str, button: str = "",
              do: Callable[[], object] | None = None):
-        """The page in place of the list: `icon` over a title, a line and a button.
-        icon "down": the store itself is down, and Bun kicks at the ground over it."""
-        self._down = icon == "down"
-        if not self._down:
-            self.msg_icon.setPixmap(icons.pixmap(icon, 44, icons.resolve("muted")))
+        """The page in place of the list: `icon` over a title, a line and a button
+        (a list that couldn't be had: `_problem`)."""
+        self.failed = False
+        self.msg_icon.setPixmap(icons.pixmap(icon, 44, icons.resolve("muted")))
         self._fit_buns()
         # Bun's down when the store can't show anything, fine while it loads
         self.bun.sad = 0.0 if icon == "store" and not button else 0.7
@@ -730,6 +732,15 @@ class StoreTab(QWidget):
         self._msg_do = do
         self.table_head.hide()
         self.stack.setCurrentWidget(self.message)
+
+    def _problem(self, title: str, line: str):
+        """The list couldn't be had (the store's down, no connection): the red card in
+        its place, Try again reloads."""
+        self.failed = True
+        self._fit_buns()
+        self.oops.show_problem(title, line, self.reload)
+        self.table_head.hide()
+        self.stack.setCurrentWidget(self.oops_page)
 
     def _message_action(self):
         if self._msg_do is not None:
@@ -787,15 +798,15 @@ class StoreTab(QWidget):
             return
         replace, found, down = got
         busy.set_busy(self.btn_more, False)
+        self._share_look()
         if found is None:
             if replace and down:
                 self._clear()
-                self._say("down", _("Sorry, the store's down"),
-                          _("We're working on getting it back up. Try again in a bit."),
-                          _("Try again"), self.reload)
+                self._problem(_("Sorry, the store's down"),
+                              _("We're working on getting it back up. Try again in a bit."))
             elif replace:
                 self._clear()
-                self._say("warn", _("Couldn't open the store"), err, _("Try again"), self.reload)
+                self._problem(_("Couldn't open the store"), html.escape(err, quote=False))
             else:
                 busy.toast(self.window(), html.escape(err), "error")
             return
@@ -820,18 +831,24 @@ class StoreTab(QWidget):
             elif self._mode == "voices" and self._kind:
                 self._say("search", _("Nothing matches"), "", _("All"), lambda: self.set_kind(""))
             elif self._mode == "voices":
-                self._say("voice", _("No voices here yet"),
-                          _("Be the first: share a voice you made."), _("Share a voice"),
-                          self.share_voice)
+                if store.is_down():   # (no Share button while it's down)
+                    self._say("voice", _("No voices here yet"), store.down_share())
+                else:
+                    self._say("voice", _("No voices here yet"),
+                              _("Be the first: share a voice you made."), _("Share a voice"),
+                              self.share_voice)
             elif self._cat:   # a way back to All, right here
                 self._say("search", _("Nothing matches"), "", _("All"), lambda: self.set_cat(""))
             else:
-                self._say("store", _("No sounds here yet"),
-                          _("Be the first: share a sound you made."), _("Share a sound"),
-                          self.share)
+                if store.is_down():   # (no Share button while it's down)
+                    self._say("store", _("No sounds here yet"), store.down_share())
+                else:
+                    self._say("store", _("No sounds here yet"),
+                              _("Be the first: share a sound you made."), _("Share a sound"),
+                              self.share)
             return
         self.bun.sad = 0.0
-        self._down = False
+        self.failed = False
         self._fit_buns()
         self.stack.setCurrentWidget(self.list_area)
         self.table_head.show()
@@ -1078,6 +1095,9 @@ class StoreTab(QWidget):
         was downloaded from it)."""
         if not net.allowed(store.FEATURE):
             busy.toast(self.window(), html.escape(net.off_message(store.FEATURE)), "error")
+            return
+        if store.is_down():
+            busy.toast(self.window(), html.escape(store.down_share()), "warn")
             return
         dlg = ShareDialog(self.install(), self, link, name)
         dlg.setAttribute(Qt.WidgetAttribute.WA_DeleteOnClose)

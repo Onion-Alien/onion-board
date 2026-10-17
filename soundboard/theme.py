@@ -158,6 +158,12 @@ QLabel#hint { font-size:8.5pt; }
 QLabel[tone="ok"], QLabel#hint[tone="ok"] { color:$ok_text; }
 QLabel[tone="warn"], QLabel#hint[tone="warn"] { color:$warn_text; }
 QLabel[tone="error"], QLabel#hint[tone="error"] { color:$error_text; }
+QFrame#oops { background:$panel; border:1px solid $border; border-radius:12px; }
+QFrame#oops[tone="error"] { border:2px solid $error_text; }
+QFrame#oops QLabel { background:transparent; border:none; padding:0; }
+QLabel#oopstitle { font-size:11pt; font-weight:700; color:$text_hi; }
+QLabel#oopstitle[tone="error"] { color:$error_text; }
+QLabel#oopsline { color:$text; }
 QLabel#eqlabel { color:$muted; font-size:8pt; }
 QLabel#empty { color:$muted; font-size:15px; padding:8px 40px 40px 40px; }
 QFrame#card QLabel#stepbox { background:$bg; border-radius:8px; padding:8px; margin-top:6px; }
@@ -188,6 +194,7 @@ QPushButton#primary { background:$accent; border:none; color:$on_accent; font-we
 QPushButton[guide="true"] { font-size:11pt; padding:9px 20px; border-radius:10px; }
 QPushButton#primary:hover { background:$accent_hover; }
 QPushButton#primary:focus { border:1px solid $text_hi; }
+QWidget#storebar QPushButton#primary:disabled { background:$btn; color:$muted; }   /* the store's down */
 QFrame#soundstoolbar { background:$panel; background-image:none; border:none;
     border-radius:12px; }
 QFrame#soundstoolbar QLabel, QFrame#soundstoolbar QSlider { background:transparent; }

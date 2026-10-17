@@ -172,16 +172,16 @@ def test_tab_lists_votes_and_adds(qapp, fake):
 def test_a_failed_list_says_why_and_retries(qapp, fake):
     fake.fail = "The sound store had a problem. Try again in a bit."
     t = _tab(qapp, [], [])
-    assert _wait(qapp, lambda: t.stack.currentWidget() is t.message
-                 and t.msg_btn.isVisibleTo(t))
-    assert fake.fail in t.msg_text.text()
+    assert _wait(qapp, lambda: t.stack.currentWidget() is t.oops_page
+                 and t.oops.btn_retry.isVisibleTo(t))
+    assert fake.fail in t.oops.line.text() and t.failed
     fake.fail = ""
-    t.msg_btn.click()
+    t.oops.btn_retry.click()
     assert _wait(qapp, lambda: len(t._rows) == 2)
     t.shutdown()
 
 
-def test_store_down_shows_bun_kicking_the_ground_then_the_list(qapp, fake, monkeypatch):
+def test_store_down_shows_the_sad_bun_card_then_the_list(qapp, fake, monkeypatch):
     # the server answers with an error of its own: the store's down, not the user's fault
     down = store.StoreDown("Sorry, the store's down. We're working on getting it back up.")
     plain = store._request
@@ -192,20 +192,21 @@ def test_store_down_shows_bun_kicking_the_ground_then_the_list(qapp, fake, monke
         return plain(method, path, *a, **kw)
     monkeypatch.setattr(store, "_request", broken)
     t = _tab(qapp, [], [])
-    assert _wait(qapp, lambda: t.stack.currentWidget() is t.message
-                 and t.msg_btn.isVisibleTo(t))
-    assert t.msg_title.text() == storetab._("Sorry, the store's down")
-    assert "working on" in t.msg_text.text()
-    assert t.msg_bun.isVisibleTo(t) and t.msg_bun.sulk and not t.msg_icon.isVisibleTo(t)
-    assert not t.bun.isVisibleTo(t)   # one Bun, the sad one
-    t.resize(800, 300)                # no room for him: the words stay
-    assert _wait(qapp, lambda: not t.msg_bun.isVisibleTo(t))
-    assert t.msg_title.isVisibleTo(t)
+    assert _wait(qapp, lambda: t.stack.currentWidget() is t.oops_page
+                 and t.oops.btn_retry.isVisibleTo(t))
+    assert t.failed and t.oops.title.text() == storetab._("Sorry, the store's down")
+    assert "working on" in t.oops.line.text() and t.oops.property("tone") == "error"
+    assert t.oops.bun.isVisibleTo(t) and t.oops.bun.sulk and t.oops.btn_report.isVisibleTo(t)
+    t.resize(800, 260)                # no room for him: the words stay
+    assert _wait(qapp, lambda: not t.oops.bun.isVisibleTo(t))
+    assert t.oops.title.isVisibleTo(t)
     t.resize(800, 600)
+    assert _wait(qapp, lambda: t.oops.bun.isVisibleTo(t))
     monkeypatch.setattr(store, "_request", plain)
-    t.msg_btn.click()
+    t.oops.btn_retry.click()
     assert _wait(qapp, lambda: len(t._rows) == 2)
-    assert not t.msg_bun.isVisibleTo(t) and t.bun.isVisibleTo(t)
+    assert not t.failed and t.stack.currentWidget() is not t.oops_page
+    assert t.bun.isVisibleTo(t)
     t.shutdown()
 
 
@@ -224,6 +225,68 @@ def test_server_errors_mean_the_store_is_down(monkeypatch):
     assert isinstance(answer(502, ""), store.StoreDown)
     assert not isinstance(answer(503, "queue full"), store.StoreDown)   # its own message
     assert not isinstance(answer(404, "not found"), store.StoreDown)
+
+
+@pytest.fixture(autouse=True)
+def _store_up():
+    store._failing.clear()   # (a 500 in one test would grey Share out in the next)
+    yield
+    store._failing.clear()
+
+
+def test_a_500_turns_sharing_off_until_that_call_works(monkeypatch):
+    import urllib.error
+    ok = {"/v1/categories": False}
+
+    class Answer(io.BytesIO):
+        def __enter__(self):
+            return self
+
+        def __exit__(self, *_a):
+            return False
+
+    def urlopen(req, timeout=0, feature=""):
+        path = req.full_url.removeprefix(store.BASE).split("?")[0]
+        if not ok.get(path, True):
+            raise urllib.error.HTTPError("u", 500, "x", {}, io.BytesIO(b'{"error": "server"}'))
+        return Answer(b'{"sounds": [], "more": false}')
+    monkeypatch.setattr(net, "urlopen", urlopen)
+    assert not store.is_down()
+    with pytest.raises(store.StoreDown):
+        store._request("GET", "/v1/categories")
+    assert store.is_down()
+    store._request("GET", "/v1/sounds?sort=top")   # another call working isn't enough
+    assert store.is_down()
+    ok["/v1/categories"] = True
+    store._request("GET", "/v1/categories")
+    assert not store.is_down()
+
+
+def test_share_is_greyed_out_while_the_store_is_down(qapp, fake, monkeypatch):
+    plain = store._request
+
+    def broken(method, path, *a, **kw):
+        if path == "/v1/categories":
+            store._failing.add(path)
+            raise store.StoreDown("down")
+        return plain(method, path, *a, **kw)
+    monkeypatch.setattr(store, "_request", broken)
+    t = _tab(qapp, [], [])
+    assert _wait(qapp, lambda: len(t._rows) == 2 and not t.btn_share.isEnabled())
+    assert t.btn_share.toolTip() == store.down_share()
+    opened = []
+    monkeypatch.setattr(storetab, "ShareDialog", lambda *a, **k: opened.append(a))
+    t.share("https://youtu.be/xyz", "Bruh")   # a pad's "Share to the store…" too
+    assert not opened
+
+    def fixed(*a, **k):
+        store._failing.clear()   # (the categories answer again)
+        return plain(*a, **k)
+    monkeypatch.setattr(store, "_request", fixed)
+    t.reload()
+    assert _wait(qapp, lambda: t.btn_share.isEnabled())
+    assert t.btn_share.toolTip() == ""
+    t.shutdown()
 
 
 def test_bun_kicks_back_then_out_then_rests():

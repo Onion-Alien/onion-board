@@ -112,16 +112,18 @@ class Tour(coach.Tour):
                     target=lambda: coach.rect_of(w, w.search),
                     done=lambda: bool(w.cfg.sounds) or self._results_up(),
                     skip=_("Not now"), enter=self._focus_search,
-                    failed=lambda: w.ytresults.failed,
+                    failed=lambda: w.ytresults.failed, oops=self._oops,
+                    retry=self._retry_search, page_oops=lambda: w.ytresults.oops,
                     allow=self._in_search, extra={"name": "search"}),
                 coach.Step(
                     _("Pick one, you'll love it!"),
                     _("Play to hear it, Add to keep it on your board."),
                     target=self._first_result, done=lambda: bool(w.cfg.sounds),
                     skip=_("Not now"), allow=self._in_results,
-                    failed=lambda: w.ytresults.failed,
+                    failed=lambda: w.ytresults.failed, oops=self._oops,
+                    retry=self._retry_search, page_oops=lambda: w.ytresults.oops,
                     enter=self._searched,
-                    extra={"name": "results"}),
+                    extra={"name": "results", "retry_to": "search"}),
             ]
         else:
             middle = [coach.Step(
@@ -184,6 +186,13 @@ class Tour(coach.Tour):
     def _searched(self):
         if self._results_up():
             usage.used("tour-searched")
+
+    def _oops(self) -> str:
+        return _("The search couldn't get through.")
+
+    def _retry_search(self):
+        """Try again: the search box again, ready for Enter (the same words)."""
+        self.win.ytresults.failed = False
 
     def _focus_search(self):
         self.win.search.setFocus()

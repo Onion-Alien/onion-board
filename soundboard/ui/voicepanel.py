@@ -308,6 +308,14 @@ class VoicePanel(QWidget):
         self.setups_bar.share = lambda n: self.share_asked.emit(f"{kind_name('setup')}: {n}")
         self.fx.share_asked.connect(lambda n: self.share_asked.emit(f"{kind_name('fx')}: {n}"))
         outer.insertWidget(0, self.speech.say_bar)   # on top: the bottom has the mixer
+        # the voice is on but can't work (the mic won't open, an effect broke): sad Bun
+        # says so across the top, with Try again (poll)
+        from soundboard.ui import oops
+        self.oops = oops.OopsPanel(compact=True)
+        self.oops.show_problem("", "", self.try_again)
+        self.oops.hide()
+        outer.insertWidget(1, self.oops)
+        self._oops_for = ""
         # the picked voice's bar, pinned under the cards while the voice changer shows:
         # its Hear what they hear and Edit voice never scroll out of sight
         fx_lay = self.fx.layout()
@@ -741,10 +749,47 @@ class VoicePanel(QWidget):
         return "voice"
 
     def poll(self):
-        """Call from the UI's status timer: surfaces effects the chain had to bypass."""
+        """Call from the UI's status timer: surfaces effects the chain had to bypass,
+        and the red strip while the voice is on but can't work."""
         errors = dict(self.chain.errors)   # the mic thread writes it
         if errors:
             self.fx.show_errors(errors)
+        self._show_problem(self.problem())
+
+    def problem(self) -> str:
+        """Why the voice that's on isn't working (rich text), or "": the mic won't open,
+        or an effect had to be turned off after an error."""
+        if not self.is_active():
+            return ""
+        mic = getattr(self.engine, "errors", {}).get("mic", "")
+        errors = dict(self.chain.errors)
+        why = (_("Your mic couldn't be opened: {error}", error=mic) if mic
+               else _("A voice effect stopped after an error: {error}",
+                      error=next(iter(errors.values()))) if errors else "")
+        return html.escape(why, quote=False)
+
+    def _show_problem(self, why: str):
+        if why == self._oops_for:
+            return
+        self._oops_for = why
+        if why:
+            self.oops.show_problem(_("Your voice couldn't be switched on"), why,
+                                   self.try_again)
+        self.oops.setVisible(bool(why))
+
+    def try_again(self):
+        """Try again on the red strip: the effects once more, and the mic opened again
+        (on a worker: opening a device never runs on the UI thread)."""
+        self.chain.errors.clear()
+        self.chain.configure(self.fx.spec())
+        self.fx.show_errors({})
+        eng = self.engine
+        name = getattr(eng, "names", {}).get("mic")
+        if getattr(eng, "errors", {}).get("mic") and hasattr(eng, "set_mic_device"):
+            threading.Thread(target=lambda: eng.set_mic_device(name), daemon=True,
+                             name="voice-retry-mic").start()
+        self._oops_for = ""
+        self.oops.hide()   # back if it still can't (the next poll)
 
     def rescan_modules(self, found: list | None = None, ai_voices: list | None = None):
         """`found` / `ai_voices`: already read from disk by _rescan_in_background."""

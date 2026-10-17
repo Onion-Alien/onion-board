@@ -432,6 +432,7 @@ class RadioTab(QWidget):
         from soundboard.ui.flatmap import FlatMap
         self.flat = FlatMap()
         self.flat.clicked.connect(self._on_globe_click)
+        self.flat.retry.connect(self._reload)
         self.globe_layout.addWidget(self.flat)
         if not self._outlines_hooked:
             self._outlines_hooked = True
@@ -499,6 +500,8 @@ class RadioTab(QWidget):
 
     def _reload(self):
         self._globe_error = ""
+        self._map("show_message", "")   # the red card goes: Bun tunes in again
+        self._map("set_loading", True)
         self._flash_until = 0.0
         self._reloading = True
         busy.set_busy(self.btn_refresh, True)   # back when the list (or an error) is in
@@ -769,8 +772,16 @@ class RadioTab(QWidget):
     def _on_error(self, msg: str):
         usage.used("radio-failed")
         self.listctl._restate_rows()
-        # the player's own plain words (radio.station_off_air, a switch's reason)
-        self._say(msg or radio.station_off_air(), "error")
+        # the player's own plain words (radio.station_off_air, a switch's reason), and
+        # Try again on the card: the same station once more
+        st = self._fed_by
+        text = html.escape(msg or radio.station_off_air())
+        if st is not None:
+            busy.toast(self, text, "error", action=(_("Try again"), lambda: self.play(st)))
+        else:
+            busy.toast(self, text, "error")
+        self._flash_until = 0.0
+        self._refresh_info()
         self._select_on_globe(fly=False)
 
     def _on_now_playing(self, title: str):

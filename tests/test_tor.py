@@ -733,7 +733,7 @@ def test_search_offers_without_tor(qapp, monkeypatch):
     panel.search("what is love")
     assert process_events(qapp, lambda: calls and not panel.loading.running())
     assert process_events(qapp, lambda: panel.direct_btn.isVisibleTo(panel))
-    assert "turned Tor away" in panel.title.text()
+    assert "turned Tor away" in panel.oops.line.text() and panel.oops.isVisibleTo(panel)
     panel.direct_btn.click()
     assert process_events(qapp, lambda: len(calls) == 2 and not panel.loading.running())
     assert calls == [False, True] and not panel.direct_btn.isVisibleTo(panel)

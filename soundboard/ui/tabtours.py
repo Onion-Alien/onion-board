@@ -15,6 +15,7 @@ those seen: they've been there).
 """
 from __future__ import annotations
 
+import html
 import logging
 import time
 from collections.abc import Callable
@@ -32,6 +33,8 @@ log = logging.getLogger(__name__)
 TABS = TOUR_TABS
 START_MS = 450   # after the tab opens: it lays itself out first
 QUIT_S = 60      # "Not now" twice this close together: no more tours
+EMPTY_S = 6      # Apps with no program making sound this long: the tour says so
+SETTLE_S = 1.2   # a voice picked: on this long without a problem before it's "done"
 
 _current: TabTour | None = None
 
@@ -136,6 +139,9 @@ def _radio(win, tab) -> list[coach.Step]:
         _("Click any dot to play that station. Press Send to others and your call hears it too."),
         target=globe, done=tab.is_active, skip=_("Not now"),
         failed=lambda: bool(getattr(tab, "_globe_error", "")),   # no stations to pick
+        oops=lambda: getattr(tab, "_globe_error", "") or _("The stations couldn't load."),
+        oops_title=_("The radio couldn't connect"), retry=getattr(tab, "_reload", None),
+        page_oops=lambda: getattr(getattr(tab, "flat", None), "oops", None),
         allow=_inside(getattr(tab, "station_panel", None), getattr(tab, "btn_play", None)))]
 
 
@@ -147,11 +153,23 @@ def _apps(win, tab) -> list[coach.Step]:
         if rows:
             return coach.rect_of(win, rows[0].btn_send)
         return coach.rect_of(win, tab.empty) or coach.rect_of(win, tab.scroll_area)
+    since = {"at": time.monotonic()}
+
+    def nothing() -> bool:
+        """No program making sound, EMPTY_S after the step showed (or Try again)."""
+        if any(r.isVisible() for r in tab.rows.values()):
+            since["at"] = time.monotonic()
+            return False
+        return time.monotonic() - since["at"] > EMPTY_S
     return [coach.Step(
         _("Send a program's sound"),
         _("Start some music or a game, then press Send on it. Everyone in your call hears "
           "it."),
-        target=area, done=tab.is_active, skip=_("Not now"), allow=_inside(tab.scroll_area))]
+        target=area, done=tab.is_active, skip=_("Not now"), allow=_inside(tab.scroll_area),
+        failed=nothing, retry=lambda: since.__setitem__("at", time.monotonic()),
+        oops_title=_("Nothing to share yet"),
+        oops=_("No program is making sound right now. Start some music or a game, then "
+               "press Try again."), extra={"calm": True})]
 
 
 def _triggers(win, tab) -> list[coach.Step]:
@@ -191,11 +209,28 @@ def _voice(win, panel) -> list[coach.Step]:
     def show_fx():
         if getattr(panel, "current_tab", lambda: "fx")() != "fx":
             panel.show_tab("fx")
+    def problem() -> str:
+        return getattr(panel, "problem", lambda: "")()
+    on_since: dict[str, float | None] = {"at": None}
+
+    def working() -> bool:
+        """Picked and on for SETTLE_S without a problem (the mic opening, an effect
+        breaking can take a moment to show)."""
+        if not (picked["on"] or panel.is_active()) or problem():
+            on_since["at"] = None
+            return False
+        if on_since["at"] is None:
+            on_since["at"] = time.monotonic()
+        return time.monotonic() - on_since["at"] >= SETTLE_S
     return [coach.Step(
         _("Pick a voice"),
         _("Click one, then talk: you hear yourself in your headphones."),
-        target=first_row, done=lambda: picked["on"] or panel.is_active(),
-        skip=_("Not now"), enter=show_fx, allow=_inside(fx))]
+        target=first_row, done=working, skip=_("Not now"), enter=show_fx,
+        allow=_inside(fx, getattr(panel, "oops", None)),
+        failed=lambda: bool(problem()), oops=lambda: html.unescape(problem()),
+        oops_title=_("Your voice couldn't be switched on"),
+        retry=getattr(panel, "try_again", None),
+        page_oops=lambda: getattr(panel, "oops", None))]
 
 
 def _store(win, tab) -> list[coach.Step]:
@@ -208,7 +243,11 @@ def _store(win, tab) -> list[coach.Step]:
         _("Hear one, then add it"),
         _("Press play to hear a sound. Add puts it on your board."),
         target=first, done=lambda: len(win.cfg.sounds) > count, skip=_("Not now"),
-        allow=_inside(tab.list_area))]
+        allow=_inside(tab.list_area, getattr(tab, "oops_page", None)),
+        failed=lambda: bool(getattr(tab, "failed", False)),
+        oops_title=_("The store couldn't load"),
+        oops=_("The community sounds couldn't be listed."),
+        retry=getattr(tab, "reload", None), page_oops=lambda: getattr(tab, "oops", None))]
 
 
 class TabTour(coach.Tour):
