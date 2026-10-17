@@ -91,14 +91,6 @@ def pretty_key(combo: str) -> str:
     return "+".join(part(p.strip()) for p in combo.split("+"))
 
 
-def is_typing_key(vk: int) -> bool:
-    """Letters, digits, punctuation, Space, Enter, Tab, Backspace, arrows: keys people
-    type with. F-keys, the numpad, Insert/Home/…, media keys are fine bare."""
-    return (0x30 <= vk <= 0x39 or 0x41 <= vk <= 0x5A or 0xBA <= vk <= 0xC0
-            or 0xDB <= vk <= 0xDF or 0x25 <= vk <= 0x28
-            or vk in (0x08, 0x09, 0x0D, 0x20, 0xE2))   # 0xE2: the extra key of ISO keyboards
-
-
 class HotkeyDialog(QDialog):
     """Asks for a key combo, or (with `pads`) a hit on a MIDI pad controller."""
 
@@ -130,6 +122,7 @@ class HotkeyDialog(QDialog):
         row.addWidget(cancel)
         lay.addLayout(row)
         self._warned_vk = None
+        self._takes_keys = not hotkeys.share   # read before pause() below
         self.setMinimumWidth(340)
         hotkeys.pause()   # so pressing an existing hotkey here doesn't trigger it
         if self._midi is not None:
@@ -185,8 +178,9 @@ class HotkeyDialog(QDialog):
                 | (winkeys.MOD_ALT if m & Qt.KeyboardModifier.AltModifier else 0)
                 | (winkeys.MOD_SHIFT if m & Qt.KeyboardModifier.ShiftModifier else 0)
                 | (winkeys.MOD_WIN if m & Qt.KeyboardModifier.MetaModifier else 0))
-        if not mods and is_typing_key(vk) and self._warned_vk != vk:
-            # a global hotkey takes the key away from every other program: warn once
+        if self._takes_keys and not mods and winkeys.is_typing_key(vk) and self._warned_vk != vk:
+            # a hotkey that takes its key (games don't get it) away from every other
+            # program: warn once. Shared keys still reach the game, so no warning there
             self._warned_vk = vk
             key = pretty_key(winkeys.combo_name(0, vk))
             warn = theme.status("warn")
@@ -208,6 +202,16 @@ class KeysPage(Page):
 
     def _hotkeys(self):
         w, v = self._page()
+        card, cv = self._card(_("Keys in games"),
+                              _("With this on, a hotkey still does its normal job too: press F1 "
+                                "in a game and the game gets F1 while your sound plays. Off: "
+                                "only Onion Board gets the key, so a hotkey on W stops you "
+                                "walking."), icon="gamepad")
+        share = QCheckBox(_("Games get the key too"))
+        share.setChecked(self.mw.cfg.hotkeys_share)
+        share.toggled.connect(self.mw.hkctl.set_share_hotkeys)
+        cv.addWidget(share)
+        v.addWidget(card)
         for (group, actions), icon in zip(HOTKEY_GROUPS, HOTKEY_GROUP_ICONS):
             card, cv = self._card(group, icon=icon)
             for attr, _action, label, desc in actions:

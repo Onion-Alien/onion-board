@@ -3502,5 +3502,8 @@
   "Nothing is trending on Myinstants right now.": "Myinstants 上現在沒有熱門內容。",
   "The meme sounds people play most on Myinstants right now": "此刻 Myinstants 上播放最多的迷因音效",
   "Trending on Myinstants": "Myinstants 熱門",
-  "Is a sound in the store yours? Email {email} and it comes down.": "商店裡有你的音效？寄信到 {email}，我們會把它下架。"
+  "Is a sound in the store yours? Email {email} and it comes down.": "商店裡有你的音效？寄信到 {email}，我們會把它下架。",
+  "Games get the key too": "遊戲也會收到按鍵",
+  "Keys in games": "遊戲中的按鍵",
+  "With this on, a hotkey still does its normal job too: press F1 in a game and the game gets F1 while your sound plays. Off: only Onion Board gets the key, so a hotkey on W stops you walking.": "開啟後，快速鍵也照常運作：在遊戲裡按 F1，聲音播放的同時遊戲也會收到 F1。關閉：只有 Onion Board 收到這個鍵，所以把快速鍵設在 W 上會讓你沒辦法走路。"
 }

@@ -680,3 +680,56 @@ def test_transport_time_is_blank_until_a_sound_is_picked(window):
     assert w.np_time.text() and not w.np_time.isHidden()
     w.rmctl.remove_sound("s0")   # back to "Pick a sound"
     assert w.np_time.text() == "" and w.np_time.isHidden()
+
+
+def test_hotkeys_let_the_game_have_the_key_unless_turned_off(window, monkeypatch):
+    """Settings → Hotkeys → Keys in games: on by default, the game still gets a hotkey's
+    key (F1 does the game's F1 too). The overlay's keys are always taken while it's up."""
+    from PySide6.QtWidgets import QCheckBox
+
+    from soundboard.settings import SettingsDialog
+    w = window
+    seen = []
+    monkeypatch.setattr(w.hotkeys, "register",
+                        lambda m: seen.append((dict(m), w.hotkeys.share, set(w.hotkeys.grab))))
+    assert Config().hotkeys_share is True
+    w.meta("s0").hotkey = "w"
+    w.hkctl.register_hotkeys()
+    mapping, share, grab = seen[-1]
+    assert mapping["w"] == "s0" and share and not grab
+    monkeypatch.setattr(w.overlay, "is_open", True)
+    w.hkctl.register_hotkeys()
+    mapping, share, grab = seen[-1]
+    assert share and grab and grab == set(w.overlay.layer()) and "w" not in grab
+    monkeypatch.setattr(w.overlay, "is_open", False)
+    d = SettingsDialog(w, "hotkeys")
+    box = next(b for b in d.findChildren(QCheckBox) if b.text() == "Games get the key too")
+    assert box.isChecked()
+    box.click()
+    assert w.cfg.hotkeys_share is False and seen[-1][1] is False
+    d.close()
+
+
+def test_the_hotkey_box_warns_about_a_bare_letter_only_when_games_lose_it(window, monkeypatch):
+    from PySide6.QtCore import QEvent, Qt
+    from PySide6.QtGui import QKeyEvent
+    from PySide6.QtWidgets import QApplication
+
+    from soundboard.settings import HotkeyDialog
+    w = window
+    monkeypatch.setattr(w.hotkeys, "register", lambda m: None)
+
+    def press_w(d):
+        QApplication.sendEvent(d, QKeyEvent(QEvent.Type.KeyPress, Qt.Key.Key_W,
+                                            Qt.KeyboardModifier.NoModifier, 0x11, 0x57, 0))
+
+    w.hotkeys.share = True                    # the game still gets W: nothing to warn about
+    d = HotkeyDialog(w.hotkeys, pads=False)
+    press_w(d)
+    assert d.result_combo == "w"
+    w.hotkeys.share = False                   # W would be taken from the game and from typing
+    d = HotkeyDialog(w.hotkeys, pads=False)
+    press_w(d)
+    assert d.result_combo is None and "games" in d.hint.text()
+    press_w(d)                                # again: use it anyway
+    assert d.result_combo == "w"

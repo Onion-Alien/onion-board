@@ -144,6 +144,12 @@ jobs:
         run: python scripts/i18n_extract.py --check
       - name: CODE.md lists every module
         run: python scripts/check_code_doc.py
+      # the Store tab's server (server/store): Node's own test runner, SQLite as its D1
+      - uses: actions/setup-node@v7
+        with:
+          node-version: "24"
+      - name: Store server tests
+        run: node --test "server/store/test/*.test.mjs"
 
   # pyright over the whole repo: errors not in scripts/pyright_baseline.json fail
   # (it's empty now, so any type error does). On Windows: Linux's PySide6 has no

@@ -207,11 +207,16 @@ h1 em, h2 em { font-style: normal; background: linear-gradient(100deg, var(--a1)
 .bun-g .band-c { stroke: var(--a1); } .bun-g .cup { fill: var(--a1); }
 .bun-g .cup-hi { fill: color-mix(in srgb, var(--a1) 55%, #fff); }
 /* Their theme outfits, like in the apps: home.js names the picked look on <html>. The
-   nightcap replaces hats and glasses while Bun naps. */
+   nightcap replaces hats and glasses while Bun naps.
+   The small copies (<use>) can't see <html>'s attribute, only what they inherit, so the
+   look switches the outfits through variables. */
 .fit { display: none; }
-html[data-look="blood-moon"] .fit.blood-moon, html[data-look="synthwave"] .fit.synthwave,
-html[data-look="hacker"] .fit.hacker, html[data-look="ocean"] .fit.ocean,
-html[data-look="light"] .fit.light { display: inline; }
+.fit.blood-moon { display: var(--fit-blood-moon, none); } .fit.synthwave { display: var(--fit-synthwave, none); }
+.fit.hacker { display: var(--fit-hacker, none); } .fit.ocean { display: var(--fit-ocean, none); }
+.fit.light { display: var(--fit-light, none); }
+html[data-look="blood-moon"] { --fit-blood-moon: inline; } html[data-look="synthwave"] { --fit-synthwave: inline; }
+html[data-look="hacker"] { --fit-hacker: inline; } html[data-look="ocean"] { --fit-ocean: inline; }
+html[data-look="light"] { --fit-light: inline; }
 .fit .rim { stroke: var(--a1); } .fit .tie { fill: var(--a2); }
 .fit .knot { fill: color-mix(in srgb, var(--a2) 83%, #000); }
 .fit.hat, .fit.eyewear { transition: opacity .3s; }
@@ -219,6 +224,13 @@ html[data-look="light"] .fit.light { display: inline; }
 .bun-g .mic { transform-box: view-box; transform-origin: 79px 98px; transition: transform .2s; }
 #bun.talking .mic { transform: rotate(-14deg) translate(-3px, -2px); }
 
+/* Hoot's feathers: his own teal in Dark, the picked look's accent otherwise (the apps'
+   owl.py), on every copy of him */
+html { --feather: #4fc3b0; --feather-d: #2f9c8c; }
+html[data-look]:not([data-look="dark"]) {
+  --feather: var(--a1); --feather-d: color-mix(in srgb, var(--a1) 74%, #000); }
+.hoot-g [fill="#4fc3b0"] { fill: var(--feather); }
+.hoot-g [fill="#2f9c8c"] { fill: var(--feather-d); }
 /* Hoot's moving parts */
 .hoot-g .body-turn { transform-box: view-box; transform-origin: 50px 112px; transition: transform .35s ease-out; }
 .hoot-g .pupils { transition: transform .1s ease-out; }
@@ -430,7 +442,7 @@ h2 { margin: 0 auto 14px; max-width: 820px; text-align: center; font: 800 clamp(
                       background: rgba(255,255,255,.07); color: var(--a1); font-size: 20px; font-weight: 500; transition: transform .3s; }
 .faq details[open] summary::after { transform: rotate(45deg); }
 .faq details > div { padding: 0 22px 20px; color: var(--muted); font-size: 16px; }
-.faq details > div p { margin: 0; }
+.faq details > div p { margin: 0; } .faq details > div p + p { margin-top: .7em; }
 
 .term { display: flex; align-items: center; gap: 12px; max-width: 820px; margin: 22px auto 0; padding: 12px 12px 12px 18px; border-radius: 16px;
         background: #07070c; border: 1px solid var(--edge); font-size: 15px; color: var(--muted); flex-wrap: wrap; }

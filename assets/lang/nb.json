@@ -3579,5 +3579,8 @@
   "Nothing is trending on Myinstants right now.": "Ingenting er populært på Myinstants akkurat nå.",
   "The meme sounds people play most on Myinstants right now": "Meme-lydene folk spiller mest på Myinstants akkurat nå",
   "Trending on Myinstants": "Populært på Myinstants",
-  "Is a sound in the store yours? Email {email} and it comes down.": "Er en lyd i butikken din? Send e-post til {email}, så blir den fjernet."
+  "Is a sound in the store yours? Email {email} and it comes down.": "Er en lyd i butikken din? Send e-post til {email}, så blir den fjernet.",
+  "Games get the key too": "Spill får også tasten",
+  "Keys in games": "Taster i spill",
+  "With this on, a hotkey still does its normal job too: press F1 in a game and the game gets F1 while your sound plays. Off: only Onion Board gets the key, so a hotkey on W stops you walking.": "Når dette er på, gjør en hurtigtast også den vanlige jobben sin: trykk F1 i et spill, så får spillet F1 mens lyden din spilles. Av: bare Onion Board får tasten, så en hurtigtast på W hindrer deg i å gå."
 }
