@@ -3727,5 +3727,10 @@
   "Who should hear the radio?": "Kdo má slyšet rádio?",
   "only you hear it": "slyšíš to jen ty",
   "Click any dot to play that station. Press Send to others and your call hears it too.": "Klikni na libovolnou tečku a stanice začne hrát. Stiskni Poslat ostatním a uslyší ji i tvůj hovor.",
-  "You already have a setup called “{name}”.": "Už máte sestavu s názvem „{name}“."
+  "You already have a setup called “{name}”.": "Už máte sestavu s názvem „{name}“.",
+  "{n} min": [
+    "{n} min",
+    "{n} min",
+    "{n} min"
+  ]
 }

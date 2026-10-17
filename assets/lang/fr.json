@@ -3650,5 +3650,9 @@
   "Who should hear the radio?": "Qui doit entendre la radio ?",
   "only you hear it": "toi seul l'entends",
   "Click any dot to play that station. Press Send to others and your call hears it too.": "Clique sur un point pour jouer cette station. Appuie sur Envoyer aux autres et ton appel l'entend aussi.",
-  "You already have a setup called “{name}”.": "Vous avez déjà un réglage appelé « {name} »."
+  "You already have a setup called “{name}”.": "Vous avez déjà un réglage appelé « {name} ».",
+  "{n} min": [
+    "{n} min",
+    "{n} min"
+  ]
 }

@@ -3650,5 +3650,9 @@
   "Who should hear the radio?": "रेडियो किसे सुनाई दे?",
   "only you hear it": "सिर्फ़ आप सुनते हैं",
   "Click any dot to play that station. Press Send to others and your call hears it too.": "उस स्टेशन को चलाने के लिए किसी भी बिंदु पर क्लिक करें। दूसरों को भेजें दबाएँ और आपकी कॉल भी इसे सुनेगी।",
-  "You already have a setup called “{name}”.": "आपके पास पहले से \"{name}\" नाम का सेटअप है।"
+  "You already have a setup called “{name}”.": "आपके पास पहले से \"{name}\" नाम का सेटअप है।",
+  "{n} min": [
+    "{n} मिनट",
+    "{n} मिनट"
+  ]
 }

@@ -3573,5 +3573,8 @@
   "Who should hear the radio?": "ใครควรได้ยินวิทยุ?",
   "only you hear it": "มีแค่คุณที่ได้ยิน",
   "Click any dot to play that station. Press Send to others and your call hears it too.": "คลิกจุดไหนก็ได้เพื่อเล่นสถานีนั้น กด ส่งให้คนอื่น แล้วคนในสายก็จะได้ยินด้วย",
-  "You already have a setup called “{name}”.": "คุณมีการตั้งค่าชื่อ “{name}” อยู่แล้ว"
+  "You already have a setup called “{name}”.": "คุณมีการตั้งค่าชื่อ “{name}” อยู่แล้ว",
+  "{n} min": [
+    "{n} นาที"
+  ]
 }

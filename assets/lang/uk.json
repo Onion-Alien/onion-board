@@ -3727,5 +3727,10 @@
   "Who should hear the radio?": "Хто має чути радіо?",
   "only you hear it": "чуєш лише ти",
   "Click any dot to play that station. Press Send to others and your call hears it too.": "Натисни на будь-яку точку, щоб увімкнути станцію. Натисни Надіслати іншим, і її почує твій дзвінок.",
-  "You already have a setup called “{name}”.": "У вас уже є набір із назвою «{name}»."
+  "You already have a setup called “{name}”.": "У вас уже є набір із назвою «{name}».",
+  "{n} min": [
+    "{n} хв",
+    "{n} хв",
+    "{n} хв"
+  ]
 }
