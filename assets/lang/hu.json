@@ -3752,5 +3752,10 @@
   "“{name}” speaks {language}, so this may take a while. The radio goes quiet while the translation starts, then you hear it in {language}, a few seconds behind.": "„{name}” {language} nyelven beszél, ezért ez eltarthat egy ideig. A rádió elhallgat, amíg a fordítás elindul, aztán {language} nyelven hallod, néhány másodperc késéssel.",
   "“{name}” speaks {language}, so this may take a while. Your programs go quiet while the translation starts, then you hear them in {language}, a few seconds behind.": "„{name}” {language} nyelven beszél, ezért ez eltarthat egy ideig. A programjaid elhallgatnak, amíg a fordítás elindul, aztán {language} nyelven hallod őket, néhány másodperc késéssel.",
   "“{name}” speaks {language}, which needs speech recognition and the {language} download (Voice tab, Speak another language). The rest of it is on.": "„{name}” {language} nyelven beszél, ehhez beszédfelismerés és a(z) {language} letöltése kell (Beszéd lap, Beszélj más nyelvet). A többi része be van kapcsolva.",
-  "Search sounds": "Hangok keresése"
+  "Search sounds": "Hangok keresése",
+  "Onion Board hit {n} problem since it started.": [
+    "Az Onion Board indulás óta {n} hibába futott.",
+    "Az Onion Board indulás óta {n} hibába futott."
+  ],
+  "See report": "Jelentés megnézése"
 }

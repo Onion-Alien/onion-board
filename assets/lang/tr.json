@@ -3752,5 +3752,10 @@
   "“{name}” speaks {language}, so this may take a while. The radio goes quiet while the translation starts, then you hear it in {language}, a few seconds behind.": "“{name}” {language} konuşuyor, bu yüzden bu biraz sürebilir. Çeviri başlarken radyo susar, sonra onu birkaç saniye geriden {language} dilinde duyarsın.",
   "“{name}” speaks {language}, so this may take a while. Your programs go quiet while the translation starts, then you hear them in {language}, a few seconds behind.": "“{name}” {language} konuşuyor, bu yüzden bu biraz sürebilir. Çeviri başlarken programların susar, sonra onları birkaç saniye geriden {language} dilinde duyarsın.",
   "“{name}” speaks {language}, which needs speech recognition and the {language} download (Voice tab, Speak another language). The rest of it is on.": "“{name}” {language} konuşuyor; bunun için konuşma tanıma ve {language} indirmesi gerekir (Ses sekmesi, Başka bir dil konuşun). Geri kalanı açık.",
-  "Search sounds": "Ses ara"
+  "Search sounds": "Ses ara",
+  "Onion Board hit {n} problem since it started.": [
+    "Onion Board açıldığından beri {n} sorunla karşılaştı.",
+    "Onion Board açıldığından beri {n} sorunla karşılaştı."
+  ],
+  "See report": "Raporu gör"
 }

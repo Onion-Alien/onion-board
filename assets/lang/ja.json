@@ -3674,5 +3674,9 @@
   "“{name}” speaks {language}, so this may take a while. The radio goes quiet while the translation starts, then you hear it in {language}, a few seconds behind.": "「{name}」は{language}を話すので、少し時間がかかることがあります。翻訳が始まるまでラジオは無音になり、その後数秒遅れて{language}で聞こえます。",
   "“{name}” speaks {language}, so this may take a while. Your programs go quiet while the translation starts, then you hear them in {language}, a few seconds behind.": "「{name}」は{language}を話すので、少し時間がかかることがあります。翻訳が始まるまでプログラムは無音になり、その後数秒遅れて{language}で聞こえます。",
   "“{name}” speaks {language}, which needs speech recognition and the {language} download (Voice tab, Speak another language). The rest of it is on.": "「{name}」は{language}を話しますが、それには音声認識と{language}のダウンロードが必要です（ボイスタブの「別の言語を話しましょう」）。残りの部分はオンです。",
-  "Search sounds": "サウンドを検索"
+  "Search sounds": "サウンドを検索",
+  "Onion Board hit {n} problem since it started.": [
+    "Onion Board は起動してから {n} 件の問題が起きました。"
+  ],
+  "See report": "レポートを見る"
 }

@@ -3752,5 +3752,10 @@
   "“{name}” speaks {language}, so this may take a while. The radio goes quiet while the translation starts, then you hear it in {language}, a few seconds behind.": "Nagsasalita ng {language} ang “{name}”, kaya baka matagalan ito. Tatahimik ang radyo habang nagsisimula ang pagsasalin, tapos maririnig mo ito sa {language}, ilang segundong huli.",
   "“{name}” speaks {language}, so this may take a while. Your programs go quiet while the translation starts, then you hear them in {language}, a few seconds behind.": "Nagsasalita ng {language} ang “{name}”, kaya baka matagalan ito. Tatahimik ang mga program mo habang nagsisimula ang pagsasalin, tapos maririnig mo sila sa {language}, ilang segundong huli.",
   "“{name}” speaks {language}, which needs speech recognition and the {language} download (Voice tab, Speak another language). The rest of it is on.": "Nagsasalita ng {language} ang “{name}”, na kailangan ng speech recognition at ng download ng {language} (Voice tab, Magsalita ng ibang wika). Naka-on ang iba pa nito.",
-  "Search sounds": "Maghanap ng mga tunog"
+  "Search sounds": "Maghanap ng mga tunog",
+  "Onion Board hit {n} problem since it started.": [
+    "Nagkaroon ang Onion Board ng {n} problema mula nang magsimula ito.",
+    "Nagkaroon ang Onion Board ng {n} problema mula nang magsimula ito."
+  ],
+  "See report": "Tingnan ang report"
 }

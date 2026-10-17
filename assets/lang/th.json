@@ -3674,5 +3674,9 @@
   "“{name}” speaks {language}, so this may take a while. The radio goes quiet while the translation starts, then you hear it in {language}, a few seconds behind.": "“{name}” พูด{language} จึงอาจใช้เวลาสักพัก วิทยุจะเงียบระหว่างที่การแปลเริ่ม จากนั้นคุณจะได้ยินเป็น{language} ช้ากว่าไม่กี่วินาที",
   "“{name}” speaks {language}, so this may take a while. Your programs go quiet while the translation starts, then you hear them in {language}, a few seconds behind.": "“{name}” พูด{language} จึงอาจใช้เวลาสักพัก โปรแกรมของคุณจะเงียบระหว่างที่การแปลเริ่ม จากนั้นคุณจะได้ยินเป็น{language} ช้ากว่าไม่กี่วินาที",
   "“{name}” speaks {language}, which needs speech recognition and the {language} download (Voice tab, Speak another language). The rest of it is on.": "“{name}” พูด{language} ซึ่งต้องใช้การรู้จำเสียงพูดและการดาวน์โหลด{language} (แท็บเสียง, พูดภาษาอื่น) ส่วนที่เหลือเปิดอยู่",
-  "Search sounds": "ค้นหาเสียง"
+  "Search sounds": "ค้นหาเสียง",
+  "Onion Board hit {n} problem since it started.": [
+    "Onion Board เจอปัญหา {n} ครั้งตั้งแต่เปิดใช้งาน"
+  ],
+  "See report": "ดูรายงาน"
 }

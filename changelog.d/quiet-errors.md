@@ -1,0 +1,1 @@
+- A bug no longer pops up an "Onion Board hit a problem" window while you use the app. It's saved on your PC and, with the usage count on, counted a minute later so it gets fixed. Settings → About shows *See report* if you want to send one yourself.

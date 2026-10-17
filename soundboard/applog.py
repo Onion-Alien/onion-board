@@ -7,11 +7,13 @@ Connection, config app_log): then the lines are kept in memory only, for a crash
 report's log excerpt, and gone when the app closes (see keep()).
 
 Any unhandled exception — on the UI thread, in a worker thread, or reported by
-code that caught something it didn't expect (`report()`) — is logged, saved as a
-crash report (`crash-reports\\`, personal paths scrubbed) and shown in a dialog
-that asks the user to send that report to the developer. Nothing is ever sent
-automatically: the dialog copies the report and opens the issue page, and the
-user decides what to post.
+code that caught something it didn't expect (`report()`) — is logged and saved as a
+crash report (`crash-reports\\`, personal paths scrubbed). No window pops up for it:
+the anonymous usage count (usage.py) tells the developer its type and line soon after
+(`on_problem()`), and Settings > Connection lists this run's reports for anyone who
+wants to send one (`recent()`). Only an error that closes the app shows its dialog,
+or the app would just vanish. The report itself is never sent automatically: the
+dialog copies it and opens the issue page, and the user decides what to post.
 
 Set ONIONBOARD_DEBUG=1 to log at DEBUG level.
 """
@@ -38,15 +40,14 @@ LOG_NAME = "onionboard.log"
 REPORTS_DIR = "crash-reports"
 KEEP_REPORTS = 10
 LOG_TAIL_LINES = 60
-MAX_DIALOGS = 3   # per run: a bug that fires every frame mustn't bury the user in popups
-MAX_EXTRA = 20    # later errors listed on an open (or held-back) report
+MAX_EXTRA = 20    # other errors listed on a report shown from Settings
 REPEAT_LOG_S = 60.0   # the same bug again: one short log line a minute at most
 FORMAT = "%(asctime)s %(levelname)-7s %(threadName)s %(name)s: %(message)s"
 
 log = logging.getLogger("crash")
 
-_state = {"log_path": None, "version": "?", "dialogs": 0, "seen": set(), "open": None,
-          "bridge": None, "pending": None, "saved": set(), "repeats": {}}
+_state = {"log_path": None, "version": "?", "bridge": None, "saved": set(), "repeats": {},
+          "recent": [], "on_problem": None}
 
 
 @dataclass
@@ -55,7 +56,7 @@ class Report:
     text: str                   # the full, scrubbed report
     fatal: bool = False
     path: Path | None = None    # where it was saved, if it was
-    extra: list[str] = field(default_factory=list)   # later errors while it was open
+    extra: list[str] = field(default_factory=list)   # other errors this run
 
 
 class _Memory(logging.Handler):
@@ -223,28 +224,45 @@ def install_hooks(log_path: Path, version: str):
 
 def ui_ready():
     """Call once on the UI thread after the QApplication exists: from then on an
-    error on any thread can bring up the report dialog (it's marshalled here)."""
+    error on any thread reaches the UI thread (the closing dialog, a plain-words box,
+    `on_problem()`'s callback)."""
     from PySide6.QtCore import QObject, Qt, Signal
 
     class _Bridge(QObject):
         show = Signal(object)
         plain = Signal(object)
+        problem = Signal(object)
 
     bridge = _Bridge()
     bridge.show.connect(_show_dialog, Qt.ConnectionType.QueuedConnection)
     bridge.plain.connect(_show_plain, Qt.ConnectionType.QueuedConnection)
+    bridge.problem.connect(_call_on_problem, Qt.ConnectionType.QueuedConnection)
     _state["bridge"] = bridge
-    # a report held back while another program was in front (see _show_dialog).
-    # focusWindowChanged, not applicationStateChanged: that one fires before
-    # activeWindow() is set, so the report would be held back again, forever.
-    from PySide6.QtWidgets import QApplication
-    app = QApplication.instance()
-    assert isinstance(app, QApplication)
-    app.focusWindowChanged.connect(_show_pending)
+
+
+def on_problem(callback) -> None:
+    """`callback(report)` on the UI thread after each new bug saved this run (not a
+    repeat, not one that closes the app): MainWindow sends the usage count soon after,
+    instead of at the next start or 6-hourly check, and refreshes Settings' list."""
+    _state["on_problem"] = callback
+
+
+def recent() -> list[Report]:
+    """This run's saved bug reports, oldest first (Settings > Connection)."""
+    return list(_state["recent"])
+
+
+def _call_on_problem(rep: Report):
+    cb = _state["on_problem"]
+    if cb is not None:
+        try:
+            cb(rep)
+        except Exception:  # noqa: BLE001 - the crash reporter must never crash
+            log.exception("on_problem callback failed")
 
 
 def report(exc_info=None, where: str = "", fatal: bool = False) -> Report | None:
-    """Log an exception, save a scrubbed crash report and offer it to the user.
+    """Log an exception and save a scrubbed crash report; show it only if `fatal`.
 
     Safe to call from any thread and from inside an `except` block (with no
     argument it reports the exception being handled). Returns the Report, or
@@ -275,8 +293,10 @@ def report(exc_info=None, where: str = "", fatal: bool = False) -> Report | None
             # that saved report is the trace of a start that died while loading: the
             # next start won't also count a startup-failed for the same crash
             _clear_bootmark(Path(_state["log_path"]).parent)
-        if fatal or not _late_callback(v):
-            _offer(rep, sig)
+        if fatal:
+            _offer(rep)
+        else:
+            _noted(rep)
         return rep
     except Exception:  # noqa: BLE001 - the crash reporter must never crash
         try:
@@ -284,13 +304,6 @@ def report(exc_info=None, where: str = "", fatal: bool = False) -> Report | None
         except Exception:  # noqa: BLE001
             pass
         return None
-
-
-def _late_callback(v) -> bool:
-    """A timer or signal reached a window that was already closed and freed ("Internal
-    C++ object (...) already deleted"). Still a bug, so it's saved and counted like any
-    other, but the window is gone and the user lost nothing: no dialog for it."""
-    return isinstance(v, RuntimeError) and "already deleted" in str(v)
 
 
 def _clear_bootmark(app_dir) -> None:
@@ -551,16 +564,21 @@ def note_freeze_end(path: Path | None, seconds: float):
         log.debug("couldn't note how long the freeze lasted", exc_info=True)
 
 
-def _offer(rep: Report, sig: tuple):
-    """Show the dialog on the UI thread, at most once per distinct bug and
-    MAX_DIALOGS per run. A dialog already open collects further errors instead."""
-    open_rep = _state["open"]
-    if open_rep is not None and not rep.fatal:
-        _add_extra(open_rep, rep.title)
-        return
-    if not rep.fatal and (sig in _state["seen"] or _state["dialogs"] >= MAX_DIALOGS):
-        return
-    _state["seen"].add(sig)
+def _noted(rep: Report):
+    """A bug that didn't stop the app: no window (a pop-up over someone's game or a
+    friend's first try says "broken" and helps nobody). Kept for Settings, and the
+    UI thread is told so the count goes out soon."""
+    recent_ = _state["recent"]
+    recent_.append(rep)
+    del recent_[:-MAX_EXTRA]
+    if threading.current_thread() is threading.main_thread():
+        _call_on_problem(rep)
+    elif _state["bridge"] is not None:
+        _state["bridge"].problem.emit(rep)
+
+
+def _offer(rep: Report):
+    """Show the closing dialog on the UI thread."""
     on_ui = threading.current_thread() is threading.main_thread()
     if on_ui:
         _show_dialog(rep)
@@ -568,42 +586,32 @@ def _offer(rep: Report, sig: tuple):
         _state["bridge"].show.emit(rep)
 
 
+def show(rep: Report, parent=None):
+    """The report dialog for `rep`, the others this run listed on it (Settings'
+    *See report*)."""
+    from soundboard.ui.crashdialog import CrashDialog
+    for other in _state["recent"]:
+        if other is not rep and other.title not in rep.extra:
+            _add_extra(rep, other.title)
+    dlg = CrashDialog(rep, _state["log_path"], parent=parent)
+    _state["dialog"] = dlg   # keep it alive while it's shown
+    dlg.show()
+    dlg.raise_()
+    return dlg
+
+
 def _show_dialog(rep: Report):
+    """An error that closes the app: say so at once, or it would just vanish."""
     try:
         from PySide6.QtWidgets import QApplication
         if QApplication.instance() is None:
             _native_box(rep)
             return
-        # An error that didn't stop the app must not put a window over the user's game
-        # (typically the app is in the tray while they play): hold it until they come
-        # back to Onion Board. A fatal one is shown at once: the app is about to quit.
-        if not rep.fatal and not _app_in_front():
-            if _state["pending"] is None:
-                _state["pending"] = rep
-            else:
-                _add_extra(_state["pending"], rep.title)
-            log.info("crash report held back until Onion Board is in front: %s", rep.title)
-            return
         from soundboard.ui.crashdialog import CrashDialog
-        _state["dialogs"] += 1
-        _state["open"] = rep
         dlg = CrashDialog(rep, _state["log_path"], parent=QApplication.activeWindow())
-        def closed(*_a, rep=rep):
-            if _state["open"] is rep:
-                _state["open"] = None
-        dlg.finished.connect(closed)
-        # its parent (the window in front then, maybe a dialog) can be deleted with it
-        # still open, and then finished never comes: later errors would be held forever
-        if hasattr(dlg, "destroyed"):
-            dlg.destroyed.connect(closed)
         _state["dialog"] = dlg   # keep it alive while it's shown
-        if rep.fatal:
-            dlg.exec()
-        else:
-            dlg.show()
-            dlg.raise_()
+        dlg.exec()
     except Exception:  # noqa: BLE001 - never let the crash reporter itself crash
-        _state["open"] = None
         log.exception("couldn't show the crash dialog")
         _native_box(rep)
 
@@ -617,14 +625,6 @@ def _app_in_front() -> bool:
     return (isinstance(app, QApplication)
             and app.applicationState() == Qt.ApplicationState.ApplicationActive
             and app.activeWindow() is not None)
-
-
-def _show_pending(_state_=None):
-    rep, _state["pending"] = _state["pending"], None
-    if rep is not None and _app_in_front():
-        _show_dialog(rep)
-    elif rep is not None:
-        _state["pending"] = rep
 
 
 def _native_box(rep: Report):

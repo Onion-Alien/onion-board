@@ -708,6 +708,13 @@ def main():
     recheck = QTimer(w)
     recheck.timeout.connect(w.send_usage)
     recheck.start(6 * 3600 * 1000)
+    # a bug saved mid-run (no window pops up for it, applog.py): its count goes out a
+    # minute later, a burst of them in one send, not at the next start
+    problem_send = QTimer(w)
+    problem_send.setSingleShot(True)
+    problem_send.setInterval(60_000)
+    problem_send.timeout.connect(w.send_usage)
+    applog.on_problem(lambda _rep: problem_send.isActive() or problem_send.start())
     from soundboard.hangwatch import HangWatch
     # a frozen window gets its stack logged
     app.hangwatch = HangWatch(parent=app)   # pyright: ignore[reportAttributeAccessIssue]  # kept alive on the app

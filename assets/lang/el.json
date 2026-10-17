@@ -3752,5 +3752,10 @@
   "“{name}” speaks {language}, so this may take a while. The radio goes quiet while the translation starts, then you hear it in {language}, a few seconds behind.": "Το \"{name}\" μιλά {language}, οπότε μπορεί να πάρει λίγη ώρα. Το ραδιόφωνο σωπαίνει όσο ξεκινά η μετάφραση, μετά το ακούς σε {language}, λίγα δευτερόλεπτα πίσω.",
   "“{name}” speaks {language}, so this may take a while. Your programs go quiet while the translation starts, then you hear them in {language}, a few seconds behind.": "Το \"{name}\" μιλά {language}, οπότε μπορεί να πάρει λίγη ώρα. Τα προγράμματά σου σωπαίνουν όσο ξεκινά η μετάφραση, μετά τα ακούς σε {language}, λίγα δευτερόλεπτα πίσω.",
   "“{name}” speaks {language}, which needs speech recognition and the {language} download (Voice tab, Speak another language). The rest of it is on.": "Το \"{name}\" μιλά {language}, που χρειάζεται αναγνώριση ομιλίας και τη λήψη για {language} (καρτέλα Φωνή, Μίλα άλλη γλώσσα). Τα υπόλοιπα είναι ενεργά.",
-  "Search sounds": "Αναζήτηση ήχων"
+  "Search sounds": "Αναζήτηση ήχων",
+  "Onion Board hit {n} problem since it started.": [
+    "Το Onion Board είχε {n} πρόβλημα από την εκκίνηση.",
+    "Το Onion Board είχε {n} προβλήματα από την εκκίνηση."
+  ],
+  "See report": "Δες την αναφορά"
 }

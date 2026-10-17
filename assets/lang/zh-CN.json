@@ -3674,5 +3674,9 @@
   "“{name}” speaks {language}, so this may take a while. The radio goes quiet while the translation starts, then you hear it in {language}, a few seconds behind.": "“{name}”说{language}，所以可能要等一会儿。翻译启动时电台会静音，之后你会听到它的{language}版本，晚几秒钟。",
   "“{name}” speaks {language}, so this may take a while. Your programs go quiet while the translation starts, then you hear them in {language}, a few seconds behind.": "“{name}”说{language}，所以可能要等一会儿。翻译启动时你的程序会静音，之后你会听到它们的{language}版本，晚几秒钟。",
   "“{name}” speaks {language}, which needs speech recognition and the {language} download (Voice tab, Speak another language). The rest of it is on.": "“{name}”说{language}，这需要语音识别和{language}的下载（语音选项卡，说另一种语言）。其余部分已开启。",
-  "Search sounds": "搜索音效"
+  "Search sounds": "搜索音效",
+  "Onion Board hit {n} problem since it started.": [
+    "Onion Board 启动以来遇到了 {n} 个问题。"
+  ],
+  "See report": "查看报告"
 }

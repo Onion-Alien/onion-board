@@ -5,7 +5,7 @@ from __future__ import annotations
 from PySide6.QtCore import Qt
 from PySide6.QtWidgets import QHBoxLayout, QLabel, QPushButton, QVBoxLayout, QWidget
 
-from soundboard.i18n import _
+from soundboard.i18n import _, ngettext
 from soundboard.ui import busy, icons
 from soundboard.ui.settingspages import Page, _button_row
 
@@ -32,6 +32,46 @@ DISCLAIMER = _(
     "<li><b>Other people's code.</b> Parts of Onion Board (Qt, yt-dlp and more) "
     "come under their own licenses; THIRD-PARTY-NOTICES.txt next to the app lists "
     "them.</li></ul>")
+
+
+class ProblemsLine(QWidget):
+    """"Onion Board hit 2 problems since it started. [See report]": quiet, and only
+    when there were some (applog.recent()). A bug never pops up a window; this is
+    where someone who wants to send one finds it. Checked each time it's shown."""
+
+    def __init__(self, parent=None):
+        super().__init__(parent)
+        lay = QHBoxLayout(self)
+        lay.setContentsMargins(0, 0, 0, 0)
+        self.text = QLabel()
+        self.text.setObjectName("hint")
+        self.text.setProperty("keepline", True)   # one line beside its button (settings.py)
+        self.see = QPushButton(_("See report"))
+        icons.set_icon(self.see, "warn")
+        self.see.clicked.connect(self._see)
+        lay.addWidget(self.text)
+        lay.addWidget(self.see)
+        lay.addStretch(1)
+        self.refresh()
+
+    def refresh(self):
+        from soundboard import applog
+        n = len(applog.recent())
+        self.text.setText(ngettext("Onion Board hit {n} problem since it started.",
+                                   "Onion Board hit {n} problems since it started.", n))
+        # the children, not this: a hidden widget gets no showEvent to come back on
+        self.text.setVisible(n > 0)
+        self.see.setVisible(n > 0)
+
+    def showEvent(self, e):
+        self.refresh()
+        super().showEvent(e)
+
+    def _see(self):
+        from soundboard import applog
+        reps = applog.recent()
+        if reps:
+            applog.show(reps[-1], self.window())
 
 
 class HelpPage(Page):
@@ -112,6 +152,7 @@ class HelpPage(Page):
             _("Report a security issue"), f"https://github.com/{REPO}/security/advisories/new",
             "shield"))
         cv.addLayout(row)
+        cv.addWidget(ProblemsLine(card))
         return card
 
     def _disclaimer_card(self):

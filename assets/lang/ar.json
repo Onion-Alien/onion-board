@@ -4064,5 +4064,14 @@
   "“{name}” speaks {language}, so this may take a while. The radio goes quiet while the translation starts, then you hear it in {language}, a few seconds behind.": "“{name}” يتكلم {language}، لذا قد يستغرق هذا بعض الوقت. يصمت الراديو ريثما تبدأ الترجمة، ثم تسمعه بـ{language} متأخرًا بضع ثوانٍ.",
   "“{name}” speaks {language}, so this may take a while. Your programs go quiet while the translation starts, then you hear them in {language}, a few seconds behind.": "“{name}” يتكلم {language}، لذا قد يستغرق هذا بعض الوقت. تصمت برامجك ريثما تبدأ الترجمة، ثم تسمعها بـ{language} متأخرة بضع ثوانٍ.",
   "“{name}” speaks {language}, which needs speech recognition and the {language} download (Voice tab, Speak another language). The rest of it is on.": "“{name}” يتكلم {language}، وهذا يحتاج إلى التعرّف على الكلام وتنزيل {language} (تبويب الصوت، تحدّث بلغة أخرى). باقي الإعداد مُفعَّل.",
-  "Search sounds": "ابحث في الأصوات"
+  "Search sounds": "ابحث في الأصوات",
+  "Onion Board hit {n} problem since it started.": [
+    "واجه Onion Board {n} مشكلة منذ بدايته.",
+    "واجه Onion Board مشكلة واحدة ({n}) منذ بدايته.",
+    "واجه Onion Board مشكلتين ({n}) منذ بدايته.",
+    "واجه Onion Board {n} مشاكل منذ بدايته.",
+    "واجه Onion Board {n} مشكلة منذ بدايته.",
+    "واجه Onion Board {n} مشكلة منذ بدايته."
+  ],
+  "See report": "عرض التقرير"
 }

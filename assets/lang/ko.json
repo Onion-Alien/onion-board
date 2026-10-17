@@ -3674,5 +3674,9 @@
   "“{name}” speaks {language}, so this may take a while. The radio goes quiet while the translation starts, then you hear it in {language}, a few seconds behind.": "“{name}”은(는) {language}을(를) 말해서 시간이 좀 걸릴 수 있어요. 번역이 시작되는 동안 라디오가 조용해지고, 그다음 몇 초 늦게 {language}(으)로 들려요.",
   "“{name}” speaks {language}, so this may take a while. Your programs go quiet while the translation starts, then you hear them in {language}, a few seconds behind.": "“{name}”은(는) {language}을(를) 말해서 시간이 좀 걸릴 수 있어요. 번역이 시작되는 동안 프로그램이 조용해지고, 그다음 몇 초 늦게 {language}(으)로 들려요.",
   "“{name}” speaks {language}, which needs speech recognition and the {language} download (Voice tab, Speak another language). The rest of it is on.": "“{name}”은(는) {language}을(를) 말하는데, 그러려면 음성 인식과 {language} 다운로드가 필요해요(음성 탭, 다른 언어로 말해보세요). 나머지는 켜져 있어요.",
-  "Search sounds": "사운드 검색"
+  "Search sounds": "사운드 검색",
+  "Onion Board hit {n} problem since it started.": [
+    "Onion Board가 시작된 뒤 문제가 {n}개 생겼어요."
+  ],
+  "See report": "보고서 보기"
 }

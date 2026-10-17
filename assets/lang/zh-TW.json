@@ -3674,5 +3674,9 @@
   "“{name}” speaks {language}, so this may take a while. The radio goes quiet while the translation starts, then you hear it in {language}, a few seconds behind.": "「{name}」說{language}，所以可能要等一下。翻譯啟動時電台會靜音，之後你會聽到它的{language}版本，晚幾秒鐘。",
   "“{name}” speaks {language}, so this may take a while. Your programs go quiet while the translation starts, then you hear them in {language}, a few seconds behind.": "「{name}」說{language}，所以可能要等一下。翻譯啟動時你的程式會靜音，之後你會聽到它們的{language}版本，晚幾秒鐘。",
   "“{name}” speaks {language}, which needs speech recognition and the {language} download (Voice tab, Speak another language). The rest of it is on.": "「{name}」說{language}，這需要語音辨識和{language}的下載（語音分頁，說另一種語言）。其餘部分已開啟。",
-  "Search sounds": "搜尋音效"
+  "Search sounds": "搜尋音效",
+  "Onion Board hit {n} problem since it started.": [
+    "Onion Board 啟動以來遇到了 {n} 個問題。"
+  ],
+  "See report": "查看報告"
 }

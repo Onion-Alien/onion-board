@@ -3752,5 +3752,10 @@
   "“{name}” speaks {language}, so this may take a while. The radio goes quiet while the translation starts, then you hear it in {language}, a few seconds behind.": "\"{name}\" puhuu kieltä {language}, joten tämä voi kestää hetken. Radio hiljenee, kun käännös käynnistyy, ja sitten kuulet sen kielellä {language} muutaman sekunnin jäljessä.",
   "“{name}” speaks {language}, so this may take a while. Your programs go quiet while the translation starts, then you hear them in {language}, a few seconds behind.": "\"{name}\" puhuu kieltä {language}, joten tämä voi kestää hetken. Ohjelmasi hiljenevät, kun käännös käynnistyy, ja sitten kuulet ne kielellä {language} muutaman sekunnin jäljessä.",
   "“{name}” speaks {language}, which needs speech recognition and the {language} download (Voice tab, Speak another language). The rest of it is on.": "\"{name}\" puhuu kieltä {language}, mihin tarvitaan puheentunnistus ja kielen {language} lataus (Puhe-välilehti, Puhu toista kieltä). Muu osa siitä on päällä.",
-  "Search sounds": "Hae ääniä"
+  "Search sounds": "Hae ääniä",
+  "Onion Board hit {n} problem since it started.": [
+    "Onion Board on kohdannut {n} ongelman käynnistyksen jälkeen.",
+    "Onion Board on kohdannut {n} ongelmaa käynnistyksen jälkeen."
+  ],
+  "See report": "Näytä raportti"
 }
