@@ -553,13 +553,8 @@ def chat(mw: MainWindow, params: dict) -> tuple[int, object]:
         cat = rules["category"] or ""
         if rest:
             cat = remote.find_category(mw.cfg, rest)
-            if cat is None:
-                return 200, {**out, "reason": "no such category",
-                             "reply": f"@{user} no category called “{rest[:60]}”"}
-            if rules["category"] and cat != rules["category"]:   # a real one, not chat's
-                return 200, {**out, "reason": "not chat's category",
-                             "reply": f"@{user} chat plays {rules['category']} sounds only: "
-                                      f"{prefix}random"}
+            if cat is None or (rules["category"] and cat != rules["category"]):
+                return 200, {**out, "reason": "no such category"}
         sid = mw.playctl.play_random(cat)
         m = mw.meta(sid) if sid is not None else None
         status, body = ((200, {"playing": sid, "name": m.name}) if m is not None
