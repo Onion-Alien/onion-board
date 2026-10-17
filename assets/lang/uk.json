@@ -4168,5 +4168,6 @@
   "Super Rare": "Суперрідкісний",
   "Uncommon": "Незвичайний",
   "<b>{device}</b> looks like speakers, so your mic hears itself. Keep them quiet or use headphones. If it starts to squeal, this switches off by itself.": "<b>{device}</b> схоже на колонки, тож мікрофон чує сам себе. Зроби їх тихіше або вдягни навушники. Якщо почне свистіти, це вимкнеться само.",
-  "Stopped <b>Hear what they hear</b>: your mic was picking up your speakers and started to squeal. Use headphones, or turn the speakers down.": "<b>Чути те, що чують вони</b> зупинено: мікрофон ловив звук колонок і почав свистіти. Вдягни навушники або зменш гучність колонок."
+  "Stopped <b>Hear what they hear</b>: your mic was picking up your speakers and started to squeal. Use headphones, or turn the speakers down.": "<b>Чути те, що чують вони</b> зупинено: мікрофон ловив звук колонок і почав свистіти. Вдягни навушники або зменш гучність колонок.",
+  "Turn off {thing}": "Вимкнути: {thing}"
 }

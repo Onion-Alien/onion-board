@@ -465,7 +465,10 @@ class PitchShift(Effect):
 
     Autotune snaps the voice to the nearest note: a pitch tracker on the input picks
     the correction, which glides in (slow: natural tuning) or jumps (100%: the hard
-    T-Pain effect).
+    T-Pain effect). At 100% it snaps to the notes of one key (A minor) instead of
+    every note: talking moves in small slides, and only bigger steps between held
+    notes make it sound sung. A note is kept until the voice is clearly past the
+    halfway point to the next one, so it flips cleanly instead of flickering.
 
     While bypassed (0 st) it keeps the last HIST_S of input, and switching on
     stretches that first, so the output doesn't go silent for the latency.
@@ -497,6 +500,8 @@ class PitchShift(Effect):
     GAP_PER_OCTAVE_S = 0.0073   # the shifted voice's extra delay per octave down
     BLUR_SIZE, BLUR_TONE = 0.0, 9000.0   # the room Blur puts round the shifted voice: small
     BLUR_SCOOP_HZ, BLUR_SCOOP_DB = 500.0, 20.0   # ...minus its middle
+    KEY = (0, 2, 3, 5, 7, 8, 10)    # Autotune at 100%: A minor (semitones above A)
+    TUNE_HOLD = 0.15    # how far past halfway (semitones) before Autotune changes note
 
     def __init__(self, rate, values=None, channels: int = 0):
         """channels: 0 for a mono voice ((n,) blocks); 2 for stereo (n, 2) blocks, cut
@@ -530,6 +535,7 @@ class PitchShift(Effect):
         self.lifter = max(8, int(rate * self.LIFTER_S))
         self.tracker: _PitchTracker | None = None
         self.tune_st = 0.0      # autotune's correction right now, in semitones
+        self.tune_note: float | None = None   # the note autotune is holding
         self._reset(1.0)
 
     def _need(self, tempo: float) -> int:
@@ -662,17 +668,30 @@ class PitchShift(Effect):
             f0 = tr.measure(recent[end - tr.window:end])
             if f0 > 0:
                 note = 12 * np.log2(f0 * base / 440.0)
-                want = round(note) - note
+                want = self._snap_note(note, tune >= 0.98) - note
                 tau = 0.005 + 0.15 * (1 - tune)          # 100%: jumps (T-Pain)
                 a = 1.0 if tune >= 0.98 else 1 - np.exp(-len(x) / (rate * tau))
                 self.tune_st += (want - self.tune_st) * a
         else:
-            self.tune_st = 0.0
+            self.tune_st, self.tune_note = 0.0, None
         ratio = base * 2.0 ** (self.tune_st / 12.0)
         # where the formants should end up, relative to your own voice: following the
         # pitch (a cartoon) or staying put (a real person), then made bigger/smaller
         want = base ** (1.0 - p.get("natural", 0.0)) * 2.0 ** (-p.get("size", 0.0) / 12.0)
         return ratio, want / ratio
+
+    def _snap_note(self, note: float, key: bool) -> float:
+        """The note (semitones from A 440) autotune pulls `note` to: the nearest one,
+        or the nearest in KEY, but the one it's holding until clearly past halfway."""
+        lo = int(np.floor(note)) - 2
+        notes = [k for k in range(lo, lo + 6) if not key or k % 12 in self.KEY]
+        best = min(notes, key=lambda k: abs(k - note))
+        held = self.tune_note
+        if (held is not None and abs(note - held) < abs(note - best) + self.TUNE_HOLD
+                and (not key or held % 12 in self.KEY)):
+            best = held
+        self.tune_note = best
+        return float(best)
 
     def _wants_formants(self) -> bool:
         p = self.p

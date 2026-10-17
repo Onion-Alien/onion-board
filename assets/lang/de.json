@@ -4090,5 +4090,6 @@
   "Super Rare": "Super selten",
   "Uncommon": "Ungewöhnlich",
   "<b>{device}</b> looks like speakers, so your mic hears itself. Keep them quiet or use headphones. If it starts to squeal, this switches off by itself.": "<b>{device}</b> sieht nach Lautsprechern aus, also hört dein Mikro sich selbst. Lass sie leise oder nimm Kopfhörer. Fängt es an zu pfeifen, schaltet sich das von selbst ab.",
-  "Stopped <b>Hear what they hear</b>: your mic was picking up your speakers and started to squeal. Use headphones, or turn the speakers down.": "<b>Hören, was sie hören</b> gestoppt: Dein Mikro hat deine Lautsprecher aufgenommen und angefangen zu pfeifen. Nimm Kopfhörer oder dreh die Lautsprecher leiser."
+  "Stopped <b>Hear what they hear</b>: your mic was picking up your speakers and started to squeal. Use headphones, or turn the speakers down.": "<b>Hören, was sie hören</b> gestoppt: Dein Mikro hat deine Lautsprecher aufgenommen und angefangen zu pfeifen. Nimm Kopfhörer oder dreh die Lautsprecher leiser.",
+  "Turn off {thing}": "{thing} ausschalten"
 }

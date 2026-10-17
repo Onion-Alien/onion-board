@@ -4012,5 +4012,6 @@
   "Super Rare": "超稀有",
   "Uncommon": "优秀",
   "<b>{device}</b> looks like speakers, so your mic hears itself. Keep them quiet or use headphones. If it starts to squeal, this switches off by itself.": "<b>{device}</b> 看起来是音箱，麦克风会听到自己。把音量调小，或者戴耳机。如果开始啸叫，这里会自动关闭。",
-  "Stopped <b>Hear what they hear</b>: your mic was picking up your speakers and started to squeal. Use headphones, or turn the speakers down.": "已停止<b>听听别人听到的</b>：麦克风收到了音箱的声音，开始啸叫。请戴耳机，或把音箱调小。"
+  "Stopped <b>Hear what they hear</b>: your mic was picking up your speakers and started to squeal. Use headphones, or turn the speakers down.": "已停止<b>听听别人听到的</b>：麦克风收到了音箱的声音，开始啸叫。请戴耳机，或把音箱调小。",
+  "Turn off {thing}": "关闭{thing}"
 }

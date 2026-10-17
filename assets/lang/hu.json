@@ -4090,5 +4090,6 @@
   "Super Rare": "Szuperritka",
   "Uncommon": "Szokatlan",
   "<b>{device}</b> looks like speakers, so your mic hears itself. Keep them quiet or use headphones. If it starts to squeal, this switches off by itself.": "A(z) <b>{device}</b> hangszórónak tűnik, így a mikrofon önmagát hallja. Tartsd halkan, vagy használj fejhallgatót. Ha sípolni kezd, ez magától kikapcsol.",
-  "Stopped <b>Hear what they hear</b>: your mic was picking up your speakers and started to squeal. Use headphones, or turn the speakers down.": "<b>Halld, amit ők hallanak</b> leállítva: a mikrofon felvette a hangszórókat, és sípolni kezdett. Használj fejhallgatót, vagy halkítsd le a hangszórókat."
+  "Stopped <b>Hear what they hear</b>: your mic was picking up your speakers and started to squeal. Use headphones, or turn the speakers down.": "<b>Halld, amit ők hallanak</b> leállítva: a mikrofon felvette a hangszórókat, és sípolni kezdett. Használj fejhallgatót, vagy halkítsd le a hangszórókat.",
+  "Turn off {thing}": "{thing} kikapcsolása"
 }

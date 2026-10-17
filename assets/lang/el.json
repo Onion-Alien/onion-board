@@ -4090,5 +4090,6 @@
   "Super Rare": "Υπερ-σπάνιο",
   "Uncommon": "Ασυνήθιστο",
   "<b>{device}</b> looks like speakers, so your mic hears itself. Keep them quiet or use headphones. If it starts to squeal, this switches off by itself.": "Το <b>{device}</b> μοιάζει με ηχεία, άρα το μικρόφωνο ακούει τον εαυτό του. Κράτα τα χαμηλά ή βάλε ακουστικά. Αν αρχίσει να σφυρίζει, αυτό κλείνει μόνο του.",
-  "Stopped <b>Hear what they hear</b>: your mic was picking up your speakers and started to squeal. Use headphones, or turn the speakers down.": "Σταμάτησε το <b>Άκου ό,τι ακούν</b>: το μικρόφωνο έπιανε τα ηχεία και άρχισε να σφυρίζει. Βάλε ακουστικά ή χαμήλωσε τα ηχεία."
+  "Stopped <b>Hear what they hear</b>: your mic was picking up your speakers and started to squeal. Use headphones, or turn the speakers down.": "Σταμάτησε το <b>Άκου ό,τι ακούν</b>: το μικρόφωνο έπιανε τα ηχεία και άρχισε να σφυρίζει. Βάλε ακουστικά ή χαμήλωσε τα ηχεία.",
+  "Turn off {thing}": "Απενεργοποίηση: {thing}"
 }

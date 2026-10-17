@@ -4090,5 +4090,6 @@
   "Super Rare": "Superharvinainen",
   "Uncommon": "Epätavallinen",
   "<b>{device}</b> looks like speakers, so your mic hears itself. Keep them quiet or use headphones. If it starts to squeal, this switches off by itself.": "<b>{device}</b> näyttää kaiuttimilta, joten mikrofoni kuulee itsensä. Pidä ne hiljaisella tai käytä kuulokkeita. Jos se alkaa ulvoa, tämä menee pois päältä itsestään.",
-  "Stopped <b>Hear what they hear</b>: your mic was picking up your speakers and started to squeal. Use headphones, or turn the speakers down.": "<b>Kuule mitä he kuulevat</b> pysäytettiin: mikrofoni poimi kaiuttimien äänen ja alkoi ulvoa. Käytä kuulokkeita tai hiljennä kaiuttimia."
+  "Stopped <b>Hear what they hear</b>: your mic was picking up your speakers and started to squeal. Use headphones, or turn the speakers down.": "<b>Kuule mitä he kuulevat</b> pysäytettiin: mikrofoni poimi kaiuttimien äänen ja alkoi ulvoa. Käytä kuulokkeita tai hiljennä kaiuttimia.",
+  "Turn off {thing}": "Sammuta {thing}"
 }

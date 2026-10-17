@@ -192,6 +192,7 @@ class VoicePanel(QWidget):
         self.bar = VoiceStatusBar()
         self.bar.open_card.connect(self._open_card)
         self.bar.stop_button.clicked.connect(self.stop_all)
+        self.bar.turn_off.connect(self.stop_one)
         scroll = self._scroll = QScrollArea()
         scroll.setWidgetResizable(True)
         scroll.setFrameShape(QFrame.Shape.NoFrame)
@@ -550,6 +551,18 @@ class VoicePanel(QWidget):
         self.speech.livevoice.b_live.setChecked(False)
         self.fx.btn_power.setChecked(False)   # its toggled handler applies it
         self.speech.stop_translating()
+
+    def stop_one(self, key: str):
+        """A status bar chip's ✕: just that one goes off, the others stay on."""
+        if key == "fx":
+            self.fx.btn_power.setChecked(False)   # its toggled handler applies it
+        elif key == "ai":
+            self.ai.stop()
+        elif key == "speak":
+            self.controller.stop_speaking()
+            self.speech.livevoice.b_live.setChecked(False)
+        elif key == "lang":
+            self.speech.stop_translating()
 
     def is_active(self) -> bool:
         """Something here is changing what others hear from your mic."""

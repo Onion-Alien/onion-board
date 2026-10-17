@@ -4402,5 +4402,6 @@
   "Super Rare": "نادر جدًا",
   "Uncommon": "غير شائع",
   "<b>{device}</b> looks like speakers, so your mic hears itself. Keep them quiet or use headphones. If it starts to squeal, this switches off by itself.": "<b>{device}</b> يبدو أنه سماعات خارجية، لذلك يسمع المايك نفسه. اخفض صوتها أو استخدم سماعات رأس. إذا بدأ صفير، يتوقف هذا من تلقاء نفسه.",
-  "Stopped <b>Hear what they hear</b>: your mic was picking up your speakers and started to squeal. Use headphones, or turn the speakers down.": "تم إيقاف <b>اسمع ما يسمعونه</b>: كان المايك يلتقط صوت السماعات الخارجية وبدأ يصفر. استخدم سماعات رأس، أو اخفض صوت السماعات."
+  "Stopped <b>Hear what they hear</b>: your mic was picking up your speakers and started to squeal. Use headphones, or turn the speakers down.": "تم إيقاف <b>اسمع ما يسمعونه</b>: كان المايك يلتقط صوت السماعات الخارجية وبدأ يصفر. استخدم سماعات رأس، أو اخفض صوت السماعات.",
+  "Turn off {thing}": "إيقاف {thing}"
 }

@@ -1512,6 +1512,23 @@ def test_status_bar_off_label_cannot_open_a_card(panel):
     assert opened == ["fx"] and p.current_tab() == "fx"
 
 
+def test_status_bar_chip_x_turns_off_only_that_one(panel):
+    p, _ = panel
+    p.fx.pick("Robot")
+    p.speech.livevoice.b_live.setChecked(True)
+    assert p.bar.texts() == ["Robot", "Computer voice"]
+    chip = p.bar.chips["fx"]
+    assert "Robot" in chip.off.toolTip()
+    opened = []
+    p.bar.open_card.connect(opened.append)
+    chip.off.click()                             # the voice changer goes, the voice stays
+    assert not p.fx.btn_power.isChecked() and p.speech.livevoice.b_live.isChecked()
+    assert p.bar.texts() == ["Computer voice"] and not opened
+    p.bar.chips["speak"].off.click()
+    assert not p.speech.livevoice.b_live.isChecked()
+    assert p.bar.texts() == ["Voice effects off: mic unchanged"]
+
+
 def test_status_bar_says_what_others_hear_and_opens_its_card(panel):
     p, eng = panel
     assert p.bar.texts() == ["Voice effects off: mic unchanged"]
