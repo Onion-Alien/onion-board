@@ -9,7 +9,7 @@ from __future__ import annotations
 import math
 
 from PySide6.QtCore import QPointF, QRectF, Qt
-from PySide6.QtGui import (QColor, QImage, QPainter, QPainterPath, QPainterPathStroker,
+from PySide6.QtGui import (QColor, QImage, QPainter, QPainterPath,
                            QPen, QPixmap, QRadialGradient, QTransform)
 
 from soundboard import theme
@@ -20,7 +20,7 @@ W, H = 100.0, 120.0
 
 FUR = QColor("#fdf8f1")
 FUR_SHADE = QColor("#efe3d6")
-FUR_LINE = QColor(200, 176, 160, 150)   # the soft lines inside his outline (legs, chin)
+FUR_LINE = QColor(200, 176, 160, 150)   # the soft crease of his haunches
 INK = QColor("#2b2340")
 EYE = QColor("#251c33")
 EYE_LOW = QColor("#5d4560")             # the warm shine low in his eyes
@@ -35,8 +35,8 @@ CHEEK = QColor(255, 122, 150, 165)
 PROPS = (None, "mic", "headphones", "plug", "star", "hammer", "bat", "wrench",
          "hammer_broken")
 # the props that take a paw (the one on the right, both): those paws leave his lap
-ONE_PAW = {"mic", "headphones", "plug", "bat"}
-BOTH_PAWS = {"star", "hammer", "hammer_broken", "wrench"}
+ONE_PAW = {"mic", "headphones", "plug", "bat", "hammer", "hammer_broken", "wrench"}
+BOTH_PAWS = {"star"}
 WOOD = QColor("#c98a4b")
 WOOD_DARK = QColor("#9a6532")
 STEEL = QColor("#9aa0b4")
@@ -168,50 +168,112 @@ def _arc(x0, y0, cx, cy, x1, y1) -> QPainterPath:
     return path
 
 
-def _paws(p: QPainter, prop, sad: float, angry: float, fur: QColor, ink: QPen):
-    """His arms folded when he's cross (`angry`, no prop). (Resting, his front legs
-    run down to his feet; hoping, _clasped brings his paws up under his chin.)"""
-    if prop in BOTH_PAWS:
-        return
-    cross = _smooth((angry - 0.35) / 0.4) if prop is None else 0.0
-    if cross > 0.02:   # folded arms: two forearms crossed over his chest, paws on top
-        p.save()
-        p.setOpacity(p.opacity() * min(1.0, cross * 1.6))
-        dy = -1.5 * cross
-        # the back arm (his right) a little higher, its paw peeking over the elbow; the
-        # front arm across it, its paw tucked on the far side
-        for (x0, y0), (x1, y1) in (((32, 99.5), (61.5, 96.5)), ((68, 104.5), (38.5, 101.5))):
-            line = QPainterPath(QPointF(x0, y0 + dy))
-            line.quadTo(QPointF((x0 + x1) / 2, (y0 + y1) / 2 + dy + 2), QPointF(x1, y1 + dy))
-            st = QPainterPathStroker()
-            st.setWidth(8.5)
-            st.setCapStyle(Qt.PenCapStyle.RoundCap)
-            arm = st.createStroke(line).simplified()
-            arm = arm.united(_oval(x1, y1 + dy, 9.5, 8))   # the paw at its end
-            p.setPen(ink)
-            p.setBrush(fur)
-            p.drawPath(arm)
-            _stroke(p, _arc(x1 - (2.6 if x1 > 50 else -2.6), y1 + dy - 3,
-                            x1 - (3.4 if x1 > 50 else -3.4), y1 + dy,
-                            x1 - (2.6 if x1 > 50 else -2.6), y1 + dy + 3), FUR_LINE, 1.1)
-        p.restore()
+# His little front paws: a bunny has no arms to speak of, just two bean-shaped paws
+# tucked up under his chin: (x, y, width, height, lean), the viewer's left one first.
+# Resting, a little apart; hoping, pressed together, tips touching; cross, folded one
+# over the other across his chest (the viewer's right one on top).
+PAWS_REST = ((42.2, 95.5, 10.5, 12.5, 10), (57.8, 95.5, 10.5, 12.5, -10))
+PAWS_HOPE = ((46.4, 95.2, 10, 13, 24), (53.6, 95.2, 10, 13, -24))
+PAWS_CROSS = ((55, 98.4, 10, 17, -76), (45, 100, 10, 17, 76))
+# where a prop puts each paw (None: that paw stays on his tummy). "headphones" is in the
+# head's frame: the paw is on the ear cup
+PROP_PAWS = {"mic": (None, (76, 97)), "headphones": (None, (86, 72)),
+             "plug": (None, (78, 100)), "star": ((20, 92), (80, 92)),
+             "hammer": (None, (80, 92)), "hammer_broken": (None, (80, 92)),
+             "bat": (None, (80, 92)), "wrench": (None, (80, 92))}
+PAW_R = 5.5   # the paw: rounder than the arm
 
 
-def _clasped(p: QPainter, prop, sad: float, angry: float, fur: QColor, ink: QPen):
-    """Hoping (`sad`): both paws held together up under his chin, in front of it."""
-    if prop is not None:
-        return
-    clasp = _smooth((sad - 0.3) / 0.45) * (1 - _smooth((angry - 0.35) / 0.4))
-    if clasp < 0.02:
-        return
-    p.save()
-    p.setOpacity(p.opacity() * min(1.0, clasp * 1.5))
-    y = 100 - 6 * clasp
-    _ellipse(p, 45.6, y + 0.6, 10.5, 9.5, fur, ink, -18)
-    _ellipse(p, 54.2, y, 10.5, 9.5, fur, ink, 14)
-    for x in (52.3, 55.6):
-        _stroke(p, _arc(x, y - 3.4, x + 0.3, y - 2, x + 0.6, y - 1.2), FUR_LINE, 1.0)
-    p.restore()
+def _lerp(a, b, k):
+    return tuple(x0 + (x1 - x0) * k for x0, x1 in zip(a, b))
+
+
+def _bean(x, y, w, h, lean) -> QPainterPath:
+    """A paw: a soft bean, rounder at the bottom (its toes), leaning `lean` degrees."""
+    path = QPainterPath(QPointF(0, -h / 2))
+    path.cubicTo(QPointF(w * 0.42, -h / 2), QPointF(w / 2, -h * 0.05), QPointF(w / 2, h * 0.12))
+    path.cubicTo(QPointF(w / 2, h * 0.38), QPointF(w * 0.3, h / 2), QPointF(0, h / 2))
+    path.cubicTo(QPointF(-w * 0.3, h / 2), QPointF(-w / 2, h * 0.38), QPointF(-w / 2, h * 0.12))
+    path.cubicTo(QPointF(-w / 2, -h * 0.05), QPointF(-w * 0.42, -h / 2), QPointF(0, -h / 2))
+    path.closeSubpath()
+    return QTransform().translate(x, y).rotate(lean).map(path)
+
+
+def _limb(a, c, b, r0: float, r1: float, n: int = 16) -> QPainterPath:
+    """A tapered limb along the curve a -> b (bent towards c): r0 thick at a, r1 at b,
+    round at both ends."""
+    left, right = [], []
+    for i in range(n + 1):
+        t = i / n
+        x = (1 - t) ** 2 * a[0] + 2 * (1 - t) * t * c[0] + t * t * b[0]
+        y = (1 - t) ** 2 * a[1] + 2 * (1 - t) * t * c[1] + t * t * b[1]
+        dx = 2 * (1 - t) * (c[0] - a[0]) + 2 * t * (b[0] - c[0])
+        dy = 2 * (1 - t) * (c[1] - a[1]) + 2 * t * (b[1] - c[1])
+        d = math.hypot(dx, dy) or 1.0
+        r = r0 + (r1 * 0.88 - r0) * t   # (narrowest at the wrist, the paw bulges past it)
+        left.append(QPointF(x - dy / d * r, y + dx / d * r))
+        right.append(QPointF(x + dy / d * r, y - dx / d * r))
+    path = QPainterPath(left[0])
+    for q in left[1:] + right[::-1]:
+        path.lineTo(q)
+    path.closeSubpath()
+    path = path.united(_oval(a[0], a[1], 2 * r0, 2 * r0))
+    return path.united(_oval(b[0], b[1], 2 * r1, 2 * r1)).simplified()
+
+
+def _arm(p: QPainter, arm, fur: QColor, ink: QPen):
+    """An arm reaching out to a prop: (shoulder, bend, paw, thickness). It's drawn
+    behind his body and head, so only the part out past them shows; the prop draws the
+    paw that holds it."""
+    a, c, b, r0 = arm
+    p.setPen(ink)
+    p.setBrush(fur)
+    p.drawPath(_limb(a, c, b, r0, PAW_R))
+
+
+def _prop_arm(shoulder, paw):
+    """An arm reaching from `shoulder` to a prop at `paw`, the elbow sagging a little."""
+    mx, my = (shoulder[0] + paw[0]) / 2, (shoulder[1] + paw[1]) / 2
+    dx, dy = paw[0] - shoulder[0], paw[1] - shoulder[1]
+    d = math.hypot(dx, dy) or 1.0
+    nx, ny = -dy / d, dx / d
+    if ny < 0:
+        nx, ny = -nx, -ny
+    return (shoulder, (mx + nx * 3, my + ny * 3), paw, 4.4)
+
+
+def _reach(p: QPainter, prop, fur: QColor, ink: QPen, head_xf: QTransform):
+    """The arms a prop takes (one or both), reaching out to it from behind his body."""
+    reach = PROP_PAWS.get(prop or "", (None, None))
+    for i in (0, 1):
+        if reach[i] is not None:
+            to = reach[i]
+            if prop == "headphones":   # (on the ear cup: it moves with his head)
+                q = head_xf.map(QPointF(*to))
+                to = (q.x(), q.y())
+            if prop == "headphones":   # up past his cheek, elbow out
+                _arm(p, ((62, 95), (85, 95), to, 5.4), fur, ink)
+            else:
+                _arm(p, _prop_arm((41, 97) if i == 0 else (59, 97), to), fur, ink)
+
+
+def _paws(p: QPainter, prop, sad: float, angry: float, fur: QColor, ink: QPen,
+          head: QPainterPath):
+    """His front paws, tucked up under his chin (`head`): they come together as `sad`
+    grows (hoping) and fold over each other when he's cross (`angry`). A paw a prop
+    takes isn't here: it's out holding it (_reach)."""
+    clasp = cross = 0.0
+    if prop is None:
+        cross = _smooth((angry - 0.35) / 0.4)
+        clasp = _smooth((sad - 0.3) / 0.45) * (1 - cross)
+    reach = PROP_PAWS.get(prop or "", (None, None))
+    for i in (0, 1):
+        if reach[i] is not None:
+            continue
+        x, y, w, h, lean = _lerp(_lerp(PAWS_REST[i], PAWS_HOPE[i], clasp), PAWS_CROSS[i], cross)
+        p.setPen(ink)
+        p.setBrush(fur)
+        p.drawPath(_bean(x, y, w, h, lean).subtracted(head))
 
 
 def draw_bunny(p: QPainter, rect: QRectF, prop: str | None = None, *,
@@ -358,44 +420,32 @@ def draw_bunny(p: QPainter, rect: QRectF, prop: str | None = None, *,
     # tail (peeking out behind him), body, front legs, feet
     if not robot:
         _ellipse(p, 24, 111, 12.5, 11.5, fur, ink)
-        _stroke(p, _arc(20, 108, 22, 106.5, 25, 107), FUR_LINE, 1.1)
+    head_xf = QTransform().translate(50, 92 + dip).rotate(nod).translate(-50, -92)
+    _reach(p, prop, ROBOT_FUR if robot else bunnyfit.sleeve(fit) or fur, ink, head_xf)
     p.setPen(ink)
     p.setBrush(fur)
     p.drawPath(body_shape)
     _shade(p, body_shape, 70, 108, 20, fur_shade, 200)   # shade on his far side
-    legs = 1 - max(_smooth((sad - 0.3) / 0.45), _smooth((angry - 0.35) / 0.4)) \
-        if prop is None else 1.0
-    if legs > 0.02:   # his front legs, down the middle to his feet
-        c = QColor(ink_col)
-        c.setAlphaF(0.85 * legs)
-        _stroke(p, _arc(44.5, 98, 43, 104, 42.5, 109), c, 1.7)
-        if prop not in ONE_PAW:
-            _stroke(p, _arc(55.5, 98, 57, 104, 57.5, 109), c, 1.7)
-    for x, a in ((40.5, 4), (59.5, -4)):
-        _ellipse(p, x, 114, 20, 10.5, fur, ink, a)
-        if not robot:
-            for dx in (-2.6, 2.6):
-                _stroke(p, _arc(x + dx, 110.8, x + dx * 1.08, 113, x + dx, 114.4), FUR_LINE, 1.1)
+    for sx in (-1, 1):   # his haunches: a soft crease from his side round to his foot
+        _stroke(p, _arc(50 + sx * 20.5, 102, 50 + sx * 15, 104.5, 50 + sx * 12.5, 111),
+                ROBOT_BOLT if robot else FUR_LINE, 1.5)
+    for x, a in ((36.5, 9), (63.5, -9)):   # his feet, poking out front, turned out a bit
+        _ellipse(p, x, 114.6, 16, 8.6, fur, ink, a)
 
     if robot:
-        # paw seam details
-        p.setPen(QPen(QColor("#9da7b8"), 1.2))
-        p.drawLine(QPointF(40.5, 110), QPointF(40.5, 118))
-        p.drawLine(QPointF(59.5, 110), QPointF(59.5, 118))
-        # glowing AI audio core on tummy
-        _ellipse(p, 50, 100, 16, 16, QColor("#1c2230"), ink)
+        # glowing AI audio core on his tummy, under his paws
+        _ellipse(p, 50, 107, 13, 13, QColor("#1c2230"), ink)
         if led > 0:
             halo = QColor(ROBOT_CYAN)
             halo.setAlpha(round(120 * led))
-            _ellipse(p, 50, 100, 14 + 4 * led, 14 + 4 * led, halo)
-        _ellipse(p, 50, 100, 10, 10, ROBOT_CYAN, None)
-        _ellipse(p, 50, 100, 4, 4, ROBOT_CYAN_HI, None)
+            _ellipse(p, 50, 107, 12 + 4 * led, 12 + 4 * led, halo)
+        _ellipse(p, 50, 107, 8, 8, ROBOT_CYAN, None)
+        _ellipse(p, 50, 107, 3.2, 3.2, ROBOT_CYAN_HI, None)
 
     # what's round his neck and on his body stays with the body when his head moves
     body = tuple(n for n in fit if n in BODY_PIECES)
     fit_head = tuple(n for n in fit if n not in BODY_PIECES)
     bunnyfit.draw(p, body, "back", ink)
-    _paws(p, prop, sad, angry, fur, ink)
     p.save()
     head()
     bunnyfit.draw(p, fit_head, "back", ink)
@@ -589,7 +639,7 @@ def draw_bunny(p: QPainter, rect: QRectF, prop: str | None = None, *,
             p.drawPath(arc)
     p.restore()   # (the head's frame)
     bunnyfit.draw(p, body, "face", ink, hats=not nightcap)
-    _clasped(p, prop, sad, angry, fur, ink)
+    _paws(p, prop, sad, angry, fur, ink, head_xf.map(head_shape))
     if prop != "headphones":
         _draw_prop(p, prop, ink, swing, fur=fur)
     p.restore()
@@ -654,7 +704,6 @@ def _draw_prop(p: QPainter, prop: str | None, ink: QPen, swing: float = 0.0,
             p.setPen(QPen(WOOD_DARK, 1.2, Qt.PenStyle.SolidLine, Qt.PenCapStyle.RoundCap))
             p.drawLine(QPointF(70, 113), QPointF(86, 113))
             p.drawLine(QPointF(92, 111.5), QPointF(106, 111.5))
-        _ellipse(p, 66, 108, 12, 10, fur, ink)                 # a paw holding the plank
         # the hammer pivots at the other paw, on his right so it never crosses his
         # face: up beside his head at 0, down on the plank at 1
         p.save()
@@ -708,7 +757,6 @@ def _draw_prop(p: QPainter, prop: str | None, ink: QPen, swing: float = 0.0,
         _ellipse(p, 104, 108.5, 6, 6, ROBOT_BOLT, ink)        # the bolt he's tightening
         p.setPen(QPen(ROBOT_INK, 1))
         p.drawLine(QPointF(102.3, 108.5), QPointF(105.7, 108.5))
-        _ellipse(p, 66, 108, 12, 10, fur, ink)                 # a paw holding the gadget
         p.save()
         p.translate(80, 92)
         p.rotate(25 + 98 * max(0.0, min(1.0, swing)))

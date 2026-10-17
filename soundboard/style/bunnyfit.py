@@ -90,6 +90,12 @@ def _col(key: str) -> QColor:
     return QColor(hooks.palette()[key])
 
 
+def sleeve(pieces: tuple[str, ...]) -> QColor | None:
+    """The colour of his little arms when `pieces` dress them (a sweater has sleeves),
+    else None: bare fur."""
+    return _col("accent2") if "sweater" in pieces else None
+
+
 # Bun's shape on the 100 x 120 canvas: bunny.py draws him from these, and the pieces
 # that sit on him clip to them, so his outline and theirs stay one
 EYES = (35.5, 64.5)   # his eyes' centres (x), on EYE_Y
