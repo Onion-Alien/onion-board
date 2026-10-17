@@ -3650,6 +3650,7 @@
   "Who should hear the radio?": "Kenen pitäisi kuulla radio?",
   "only you hear it": "vain sinä kuulet sen",
   "Click any dot to play that station. Press Send to others and your call hears it too.": "Napsauta mitä tahansa pistettä, niin asema soi. Paina Lähetä muille, niin puhelusikin kuulee sen.",
+  "You already have a setup called “{name}”.": "Sinulla on jo asetelma nimeltä \"{name}\".",
   "{n} min": [
     "{n} min",
     "{n} min"

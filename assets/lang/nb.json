@@ -3650,6 +3650,7 @@
   "Who should hear the radio?": "Hvem skal høre radioen?",
   "only you hear it": "bare du hører den",
   "Click any dot to play that station. Press Send to others and your call hears it too.": "Klikk på en prikk for å spille stasjonen. Trykk på Send til andre, så hører samtalen din den også.",
+  "You already have a setup called “{name}”.": "Du har allerede et oppsett som heter «{name}».",
   "{n} min": [
     "{n} min",
     "{n} min"

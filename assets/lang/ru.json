@@ -3727,6 +3727,7 @@
   "Who should hear the radio?": "Кто должен слышать радио?",
   "only you hear it": "слышишь только ты",
   "Click any dot to play that station. Press Send to others and your call hears it too.": "Нажми на любую точку, чтобы включить станцию. Нажми Отправить другим, и её услышит твой звонок.",
+  "You already have a setup called “{name}”.": "У вас уже есть набор с названием «{name}».",
   "{n} min": [
     "{n} мин",
     "{n} мин",

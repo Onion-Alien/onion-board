@@ -108,6 +108,23 @@ class Store:
         self.setups[name] = setup
         return name if self.save() else ""
 
+    def rename(self, old: str, new: str) -> str:
+        """Give a setup another name, in the same place in the row; the new name, or ""
+        if it can't be (empty, another setup's name, not saved)."""
+        new = clean_name(new)
+        if old not in self.setups or not new or not self.writable:
+            return ""
+        if any(n.casefold() == new.casefold() and n != old for n in self.setups):
+            return ""
+        self.setups = {(new if n == old else n): ({**v, "name": new} if n == old else v)
+                       for n, v in self.setups.items()}
+        return new if self.save() else ""
+
+    def taken(self, name: str, but: str = "") -> bool:
+        """Another setup (not `but`) already has this name, whatever its case."""
+        name = clean_name(name).casefold()
+        return any(n.casefold() == name and n != but for n in self.setups)
+
     def remove(self, name: str) -> dict | None:
         """Take a setup out; it's given back so it can be put back (Undo)."""
         setup = self.setups.pop(name, None)

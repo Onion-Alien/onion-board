@@ -3727,6 +3727,7 @@
   "Who should hear the radio?": "Cine să audă radioul?",
   "only you hear it": "doar tu îl auzi",
   "Click any dot to play that station. Press Send to others and your call hears it too.": "Dă clic pe orice punct ca să pornești postul. Apasă Trimite altora și te aude și apelul.",
+  "You already have a setup called “{name}”.": "Ai deja o setare numită „{name}”.",
   "{n} min": [
     "{n} min",
     "{n} min",

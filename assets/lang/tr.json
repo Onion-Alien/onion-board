@@ -3650,6 +3650,7 @@
   "Who should hear the radio?": "Radyoyu kim duysun?",
   "only you hear it": "sadece sen duyuyorsun",
   "Click any dot to play that station. Press Send to others and your call hears it too.": "O istasyonu çalmak için herhangi bir noktaya tıkla. Diğerlerine gönder'e bas, görüşmendekiler de duysun.",
+  "You already have a setup called “{name}”.": "Zaten “{name}” adında bir ayarın var.",
   "{n} min": [
     "{n} dk",
     "{n} dk"
