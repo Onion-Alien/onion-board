@@ -4097,5 +4097,6 @@
     "Θα επιστρέψει σε περίπου {n} ώρες."
   ],
   "It'll be back in under an hour.": "Θα επιστρέψει σε λιγότερο από μία ώρα.",
-  "The store's down for maintenance": "Το κατάστημα είναι εκτός λειτουργίας για συντήρηση"
+  "The store's down for maintenance": "Το κατάστημα είναι εκτός λειτουργίας για συντήρηση",
+  "Turn off {thing}": "Απενεργοποίηση: {thing}"
 }

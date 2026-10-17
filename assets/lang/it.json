@@ -4097,5 +4097,6 @@
     "Torna tra circa {n} ore."
   ],
   "It'll be back in under an hour.": "Torna tra meno di un'ora.",
-  "The store's down for maintenance": "Lo store è fermo per manutenzione"
+  "The store's down for maintenance": "Lo store è fermo per manutenzione",
+  "Turn off {thing}": "Disattiva {thing}"
 }

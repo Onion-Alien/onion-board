@@ -110,3 +110,24 @@ def test_translated_mic_status_fits_with_stop_and_meter(qapp, language):
         bar.deleteLater()
         i18n.set_language("en")
         qapp.setLayoutDirection(direction)
+
+
+def test_chips_sit_on_the_mic_row_centre_line(qapp):
+    bar = VoiceStatusBar()
+    bar.set_level(0.1)
+    bar.set_items([("fx", "Secret detective", "on", "voice", None, ""),
+                   ("ai", "Bear", "on", "wave", None, "")])
+    bar.resize(1100, 60)
+    bar.show()
+    try:
+        for _ in range(4):
+            qapp.processEvents()
+        assert bar._box.direction() == QBoxLayout.LeftToRight
+
+        def mid(w):
+            return w.mapTo(bar, QPoint(0, 0)).y() + w.height() // 2
+        line = mid(bar.meter)
+        assert [mid(w) for w in (bar.lbl_heard, *bar.chips.values())] == [line] * 3
+    finally:
+        bar.close()
+        bar.deleteLater()

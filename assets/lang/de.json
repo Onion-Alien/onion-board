@@ -4097,5 +4097,6 @@
     "Er ist in etwa {n} Stunden wieder da."
   ],
   "It'll be back in under an hour.": "Er ist in weniger als einer Stunde wieder da.",
-  "The store's down for maintenance": "Der Store ist wegen Wartung down"
+  "The store's down for maintenance": "Der Store ist wegen Wartung down",
+  "Turn off {thing}": "{thing} ausschalten"
 }

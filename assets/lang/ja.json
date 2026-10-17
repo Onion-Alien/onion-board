@@ -4018,5 +4018,6 @@
     "あと{n}時間ほどで戻ります。"
   ],
   "It'll be back in under an hour.": "1時間以内に戻ります。",
-  "The store's down for maintenance": "ストアはメンテナンス中です"
+  "The store's down for maintenance": "ストアはメンテナンス中です",
+  "Turn off {thing}": "{thing} をオフ"
 }

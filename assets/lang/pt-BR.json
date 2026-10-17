@@ -4097,5 +4097,6 @@
     "Ela volta em cerca de {n} horas."
   ],
   "It'll be back in under an hour.": "Ela volta em menos de uma hora.",
-  "The store's down for maintenance": "A loja está fora do ar para manutenção"
+  "The store's down for maintenance": "A loja está fora do ar para manutenção",
+  "Turn off {thing}": "Desligar {thing}"
 }

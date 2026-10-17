@@ -4018,5 +4018,6 @@
     "จะกลับมาในอีกประมาณ {n} ชั่วโมง"
   ],
   "It'll be back in under an hour.": "จะกลับมาภายในไม่ถึงหนึ่งชั่วโมง",
-  "The store's down for maintenance": "ร้านปิดปรับปรุงอยู่"
+  "The store's down for maintenance": "ร้านปิดปรับปรุงอยู่",
+  "Turn off {thing}": "ปิด {thing}"
 }

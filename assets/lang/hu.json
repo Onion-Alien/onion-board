@@ -4097,5 +4097,6 @@
     "Nagyjából {n} óra múlva visszajön."
   ],
   "It'll be back in under an hour.": "Kevesebb mint egy óra múlva visszajön.",
-  "The store's down for maintenance": "A bolt karbantartás miatt nem működik"
+  "The store's down for maintenance": "A bolt karbantartás miatt nem működik",
+  "Turn off {thing}": "{thing} kikapcsolása"
 }

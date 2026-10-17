@@ -4176,5 +4176,6 @@
     "Wróci za około {n} godzin."
   ],
   "It'll be back in under an hour.": "Wróci za mniej niż godzinę.",
-  "The store's down for maintenance": "Sklep nie działa z powodu prac serwisowych"
+  "The store's down for maintenance": "Sklep nie działa z powodu prac serwisowych",
+  "Turn off {thing}": "Wyłącz: {thing}"
 }

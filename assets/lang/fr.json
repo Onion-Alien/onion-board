@@ -4097,5 +4097,6 @@
     "Elle revient dans environ {n} heures."
   ],
   "It'll be back in under an hour.": "Elle revient dans moins d'une heure.",
-  "The store's down for maintenance": "La boutique est en maintenance"
+  "The store's down for maintenance": "La boutique est en maintenance",
+  "Turn off {thing}": "Désactiver {thing}"
 }

@@ -4176,5 +4176,6 @@
     "Він повернеться приблизно за {n} годин."
   ],
   "It'll be back in under an hour.": "Він повернеться менш ніж за годину.",
-  "The store's down for maintenance": "Магазин зупинено на техобслуговування"
+  "The store's down for maintenance": "Магазин зупинено на техобслуговування",
+  "Turn off {thing}": "Вимкнути: {thing}"
 }

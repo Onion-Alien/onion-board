@@ -4413,5 +4413,6 @@
     "سيعود خلال {n} ساعة تقريبًا."
   ],
   "It'll be back in under an hour.": "سيعود خلال أقل من ساعة.",
-  "The store's down for maintenance": "المتجر متوقف للصيانة"
+  "The store's down for maintenance": "المتجر متوقف للصيانة",
+  "Turn off {thing}": "إيقاف {thing}"
 }

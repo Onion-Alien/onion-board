@@ -4097,5 +4097,6 @@
     "Se palaa noin {n} tunnissa."
   ],
   "It'll be back in under an hour.": "Se palaa alle tunnissa.",
-  "The store's down for maintenance": "Kauppa on alhaalla huollon takia"
+  "The store's down for maintenance": "Kauppa on alhaalla huollon takia",
+  "Turn off {thing}": "Sammuta {thing}"
 }

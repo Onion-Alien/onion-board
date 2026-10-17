@@ -4097,5 +4097,6 @@
     "Yaklaşık {n} saat içinde geri gelecek."
   ],
   "It'll be back in under an hour.": "Bir saatten kısa sürede geri gelecek.",
-  "The store's down for maintenance": "Mağaza bakım için kapalı"
+  "The store's down for maintenance": "Mağaza bakım için kapalı",
+  "Turn off {thing}": "{thing} kapat"
 }

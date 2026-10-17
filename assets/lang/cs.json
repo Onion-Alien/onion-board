@@ -4176,5 +4176,6 @@
     "Zpátky bude zhruba za {n} hodin."
   ],
   "It'll be back in under an hour.": "Zpátky bude za méně než hodinu.",
-  "The store's down for maintenance": "Obchod je mimo provoz kvůli údržbě"
+  "The store's down for maintenance": "Obchod je mimo provoz kvůli údržbě",
+  "Turn off {thing}": "Vypnout {thing}"
 }

@@ -4018,5 +4018,6 @@
     "약 {n}시간 뒤에 돌아와요."
   ],
   "It'll be back in under an hour.": "1시간 안에 돌아와요.",
-  "The store's down for maintenance": "스토어가 점검 중이에요"
+  "The store's down for maintenance": "스토어가 점검 중이에요",
+  "Turn off {thing}": "{thing} 끄기"
 }

@@ -4097,5 +4097,6 @@
     "Ще работи отново след около {n} часа."
   ],
   "It'll be back in under an hour.": "Ще работи отново след по-малко от час.",
-  "The store's down for maintenance": "Магазинът е спрян за поддръжка"
+  "The store's down for maintenance": "Магазинът е спрян за поддръжка",
+  "Turn off {thing}": "Изключи {thing}"
 }

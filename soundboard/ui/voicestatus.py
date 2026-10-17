@@ -2,14 +2,15 @@
 and everything that's changing what others hear from it (the voice changer, the AI
 voice, the computer voice, the language you speak in), whichever cards are folded.
 
-Each thing that's on is a chip; clicking it opens its card. With nothing on, one
-plain label explains that the mic voice is unchanged."""
+Each thing that's on is a chip; clicking it opens its card, and its ✕ turns just
+that one off (Stop turns them all off). With nothing on, one plain label explains
+that the mic voice is unchanged."""
 from __future__ import annotations
 
 from PySide6.QtCore import QSize, Qt, Signal
 from PySide6.QtGui import QIcon
 from PySide6.QtWidgets import (QBoxLayout, QFrame, QHBoxLayout, QLabel, QPushButton,
-                               QSizePolicy, QWidget)
+                               QSizePolicy, QToolButton, QWidget)
 
 from soundboard.i18n import _
 from soundboard.ui import icons
@@ -19,6 +20,7 @@ from soundboard.ui.widgets import Meter, widget_at
 GAP = 16            # between the mic half and the chips, side by side
 ROW_H = 28          # every chip, label and the mic row: the bar never changes height
 STOP_H = 36         # the Stop button, bigger than the chips beside it
+X_SIDE = 18         # a chip's ✕, inside its right end
 
 
 class Chip(QPushButton):
@@ -34,6 +36,15 @@ class Chip(QPushButton):
         self.setIconSize(QSize(16, 16))
         self.setFixedHeight(ROW_H)
         self._look = ("", "", None)
+        # its own ✕: turns just this one off, the others stay on
+        self.off = QToolButton(self)
+        self.off.setObjectName("vchipx")
+        self.off.setFocusPolicy(Qt.FocusPolicy.TabFocus)
+        icons.close_button(self.off, X_SIDE)
+
+    def resizeEvent(self, e):
+        super().resizeEvent(e)
+        self.off.move(self.width() - X_SIDE - 3, (self.height() - X_SIDE) // 2)
 
     def show_as(self, text: str, state: str, icon: str = "", picture=None, tip: str = ""):
         """`state`: "on", "warn" or "off". `picture`: a ready QIcon (a voice's art),
@@ -44,6 +55,7 @@ class Chip(QPushButton):
         self._look = look
         self.setText(text)
         self.setToolTip(tip)
+        self.off.setToolTip(_("Turn off {thing}", thing=text))
         if picture is not None:
             self.setIcon(picture)
         elif icon:
@@ -59,8 +71,10 @@ class Chip(QPushButton):
 
 class VoiceStatusBar(QFrame):
     """`set_items([(key, text, state, icon, picture, tip), ...])` shows the chips;
-    `open_card(key)` is emitted when one is clicked. `set_level` feeds the meter."""
+    `open_card(key)` is emitted when one is clicked, `turn_off(key)` when its ✕ is.
+    `set_level` feeds the meter."""
     open_card = Signal(str)
+    turn_off = Signal(str)
 
     def __init__(self):
         super().__init__()
@@ -106,7 +120,8 @@ class VoiceStatusBar(QFrame):
         self.lbl_heard = icon_label("ear", _("What others hear from your mic"))
         self.lbl_heard.setFixedHeight(ROW_H)
         rh.addWidget(self.lbl_heard)
-        box.addWidget(right, 0)
+        # centred on the mic row: Stop is taller than the chips, which sat high
+        box.addWidget(right, 0, Qt.AlignmentFlag.AlignVCenter)
         self.chips: dict[str, Chip | QLabel] = {}
         self._no_mic = None
 
@@ -130,6 +145,7 @@ class VoiceStatusBar(QFrame):
                 else:
                     chip = Chip(key)
                     chip.clicked.connect(lambda _=False, k=key: self.open_card.emit(k))
+                    chip.off.clicked.connect(lambda _=False, k=key: self.turn_off.emit(k))
                 self.chips[key] = chip
             if isinstance(chip, Chip):
                 chip.show_as(text, state, icon, picture, tip)
@@ -174,10 +190,13 @@ class VoiceStatusBar(QFrame):
         m = self._box.contentsMargins()
         room = self.width() - m.left() - m.right()
         line = sum(w.sizeHint().width() + 6 for w in self._row_widgets())   # one line
-        # Keep at least half the bar for the meter. If the status chips would
-        # squeeze it below that, put them underneath instead.
+        # Keep at least half the bar beside Stop for the meter. If the status chips
+        # would squeeze it below that, put them underneath instead. (Half the whole
+        # bar, Stop included, sent two chips with their close buttons under the meter
+        # on a window that had room for them.)
         mic_labels = self._mic.minimumSizeHint().width() - self.meter.minimumWidth()
-        need = max(160, (self.width() + 1) // 2 + mic_labels) + GAP + line
+        meter = (self.width() - self.stop_button.width() + 1) // 2
+        need = max(160, meter + mic_labels) + GAP + line
         d = QBoxLayout.Direction.LeftToRight if room >= need else QBoxLayout.Direction.TopToBottom
         # beside the meter the chips keep to one line; under it they wrap
         self._right.setMinimumWidth(line if d == QBoxLayout.Direction.LeftToRight else 0)

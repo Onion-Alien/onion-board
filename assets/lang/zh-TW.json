@@ -4018,5 +4018,6 @@
     "大約 {n} 小時後恢復。"
   ],
   "It'll be back in under an hour.": "不到一小時就會恢復。",
-  "The store's down for maintenance": "商店正在維護"
+  "The store's down for maintenance": "商店正在維護",
+  "Turn off {thing}": "關閉{thing}"
 }

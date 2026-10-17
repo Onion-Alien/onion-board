@@ -4097,5 +4097,6 @@
     "Den är tillbaka om ungefär {n} timmar."
   ],
   "It'll be back in under an hour.": "Den är tillbaka om mindre än en timme.",
-  "The store's down for maintenance": "Butiken ligger nere för underhåll"
+  "The store's down for maintenance": "Butiken ligger nere för underhåll",
+  "Turn off {thing}": "Stäng av {thing}"
 }

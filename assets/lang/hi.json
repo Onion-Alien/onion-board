@@ -4097,5 +4097,6 @@
     "यह लगभग {n} घंटे में वापस आ जाएगा।"
   ],
   "It'll be back in under an hour.": "यह एक घंटे से कम में वापस आ जाएगा।",
-  "The store's down for maintenance": "स्टोर मेंटेनेंस के लिए बंद है"
+  "The store's down for maintenance": "स्टोर मेंटेनेंस के लिए बंद है",
+  "Turn off {thing}": "{thing} बंद करें"
 }
