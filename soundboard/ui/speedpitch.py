@@ -182,7 +182,7 @@ class ValueBox(QDoubleSpinBox):
         super().__init__()
         self.s = s
         self.setButtonSymbols(QAbstractSpinBox.ButtonSymbols.NoButtons)
-        self.setKeyboardTracking(False)   # a typed value counts on Enter / leaving
+        self.setKeyboardTracking(False)   # typed: counts on a pause, Enter, a click away
         self.setAlignment(Qt.AlignmentFlag.AlignRight | Qt.AlignmentFlag.AlignVCenter)
         self.setFocusPolicy(Qt.FocusPolicy.ClickFocus)   # (Tab stays on the sliders)
         self.setAccessibleName(voicefx.shown(s.q.label))

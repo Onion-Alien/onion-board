@@ -759,8 +759,8 @@ class _LevelDot(Meter):
 class _Pct(QSpinBox):
     """The typeable %: as wide as its longest value in the font the theme gives it
     (known only once styled: "1000 %" in Retro 98's Tahoma didn't fit a fixed 58 px).
-    Typing sets the volume once, on Enter or leaving it: as each digit came in,
-    "150" went 1 %, 15 %, 150 % (a dip on a live mic) and saved three times.
+    Typing sets the volume once, on a pause, Enter or a click away (ui/numberbox):
+    as each digit came in, "150" went 1 %, 15 %, 150 % (a dip on a live mic) and saved three times.
     A number past either end is capped there on Enter: Qt's own check dropped the key
     that took it out of range, so "5000" set 500 %, "9999" 999 % and "-50" +50 %."""
 
