@@ -138,7 +138,8 @@ class Groove:
         self.energy = min(1.0, max(0.0, (float(rows[2, -1]) + 48) / 48))
         vdb = float(rows[3, -1])
         self._vpeak = max(vdb, self._vpeak - 0.05 * k)   # (falls 5 dB a second)
-        self.voice = 0.0 if vdb < -65 else min(1.0, max(0.0, (vdb - self._vpeak + 30) / 30))
+        # (the top 20 dB of it: the dip between syllables then shuts his mouth)
+        self.voice = 0.0 if vdb < -65 else min(1.0, max(0.0, (vdb - self._vpeak + 20) / 20))
         hit = float((rows[0] + 2 * rows[1]).max())
         self._peak = max(hit, self._peak * 0.995 ** k)
         self.onset = min(1.0, hit / self._peak) if self._peak > 1e-4 else 0.0
@@ -262,11 +263,10 @@ class Groove:
         return "pop"
 
     def _vote(self, style: str):
-        if not self.style:
-            self.style = style
-            return
         last, n = self._votes
         n = n + 1 if style == last else 1
         self._votes = (style, n)
-        if style != self.style and n >= SWITCH_VOTES:
+        # the first guess needs two checks in a row to agree (a dance that changed style
+        # a second in looked wrong); a change after that, SWITCH_VOTES
+        if style != self.style and n >= (2 if not self.style else SWITCH_VOTES):
             self.style = style

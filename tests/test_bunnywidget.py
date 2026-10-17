@@ -503,3 +503,14 @@ def test_each_style_dances_its_own_way(qapp, monkeypatch):
     calm.set_groove(None)                # the song ends: he stops dancing
     _beats(calm, clock, 2.0)
     assert calm._dance < 0.01 and calm.pose()["nod"] == 0.0
+
+
+def test_his_mouth_stays_shut_to_music_and_only_talks_to_speech(qapp, monkeypatch):
+    for style in ("electronic", "rock", "hiphop", "chill", "pop"):
+        b, clock = _dance(monkeypatch, style, voice=1.0)   # (a loud singer, too)
+        widest = [0.0]
+        _beats(b, clock, 3.0, lambda: widest.__setitem__(0, max(widest[0], b.pose()["mouth"])))
+        assert widest[0] < 0.05, style
+    talk, clock = _dance(monkeypatch, "speech", voice=1.0)
+    _beats(talk, clock, 2.0)
+    assert talk.pose()["mouth"] > 0.5

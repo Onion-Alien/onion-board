@@ -795,7 +795,7 @@ class BunnyWidget(QWidget):
         self._dance += (float(on) - self._dance) * min(1.0, dt * DANCE_FADE)
         self._g_energy += (g.energy - self._g_energy) * min(1.0, dt * 8)
         v = g.voice   # the mouth: opens fast, closes a little slower
-        self._g_voice += (v - self._g_voice) * min(1.0, dt * (30 if v > self._g_voice else 14))
+        self._g_voice += (v - self._g_voice) * min(1.0, dt * (40 if v > self._g_voice else 26))
         if not on:   # the first seconds, the beat not found yet: a hop on each big hit
             if g.kick > 0.75 and now - self._kick_at > 0.3:
                 self._kick_at = now
@@ -829,7 +829,6 @@ class BunnyWidget(QWidget):
         moves (sizes are a share of his height, so a big Bun dances big)."""
         g, a = self.groove, self.bun_h
         e = 0.45 + 0.55 * self._g_energy
-        sing = max(0.0, min(1.0, (self._g_voice - 0.3) * 1.8))
         b = g.beat(now) if g is not None and g.bpm else t * 2
         if style in ("hiphop", "chill") and g is not None and g.bpm > 115:
             b /= 2   # (heard at double time: a nod every other beat)
@@ -838,37 +837,35 @@ class BunnyWidget(QWidget):
         hit = ph / 0.08 if ph < 0.08 else math.exp(-(ph - 0.08) * 5)   # snaps down on the beat
         side = math.sin(math.pi * b)                  # one way a beat, then the other
         slow = math.sin(math.pi * b / 2)              # one sway every two beats
-        kick = g.kick if g is not None else 0.0
         m = dict(dy=0.0, dx=0.0, angle=0.0, ears=0.0, sy=0.0, nod=0.0, dip=0.0,
                  mouth=0.0, blink=0.0, angry=0.0, smug=0.0)
-        if style == "electronic":   # quick hops on every beat, side to side
-            if b % 16 >= 12 and self._g_energy > 0.55:   # the phrase's last bar: double time
-                up = math.sin(math.pi * ((2 * b) % 1.0))
-            m.update(dy=-a * 0.11 * e * up, dx=a * 0.05 * side, angle=7 * side,
-                     ears=-14 * up - 6, sy=0.03 * up, nod=-5 * side, dip=2 * hit,
-                     mouth=0.2 + 0.4 * sing)
+        # (his mouth stays shut, his little smile, for music: only speech moves it)
+        if style == "electronic":   # a hop on every beat, swaying side to side
+            m.update(dy=-a * 0.07 * e * up, dx=a * 0.035 * slow, angle=5 * slow,
+                     ears=-10 * up - 4, sy=0.025 * up, nod=-4 * slow, dip=2 * hit)
         elif style == "rock":       # headbanging: head down hard on the beat, ears flying
             m.update(dip=13 * hit * e, nod=5 * hit * (1 if int(b) % 2 else -1),
                      dy=a * 0.03 * hit, sy=-0.05 * hit, ears=26 * hit - 4, angle=2 * side,
-                     mouth=max(0.15, 0.6 * kick), angry=0.35, blink=0.4 * hit)
-        elif style == "hiphop":     # a cool nod, leaning back, eyes half shut
-            m.update(dip=5 * hit, nod=3 * hit - 3, angle=-3 + 3 * slow, dx=a * 0.03 * slow,
-                     dy=-a * 0.02 * up, ears=6 * slow, mouth=0.5 * sing, smug=1.0)
+                     angry=0.35, blink=0.4 * hit)
+        elif style == "hiphop":     # a cool nod, leaning back; his face changes now and then
+            face = int(b // 8) % 4    # every two bars: cool, eyes shut vibing, cool, plain
+            swap = 1.0 if b % 8 < 0.18 else 0.0   # (a blink covers the change)
+            m.update(dip=5 * hit, nod=3 * hit - 3 - 3 * (face == 3), angle=-3 + 3 * slow,
+                     dx=a * 0.03 * slow, dy=-a * 0.02 * up, ears=6 * slow,
+                     smug=float(face in (0, 2)), blink=max(swap, float(face == 1)))
         elif style == "chill":      # a slow sway, eyes shut, lost in it
             awake = 6 <= b % 16 < 8   # (now and then he opens them)
             m.update(angle=6 * slow, dx=a * 0.035 * slow, nod=5 * slow,
-                     dy=-a * 0.012 * abs(slow), ears=8 * slow, mouth=0.35 * sing,
-                     blink=0.0 if awake else 1.0)
-        elif style == "speech":     # talking along: lips with the voice, head tilting
+                     dy=-a * 0.012 * abs(slow), ears=8 * slow, blink=0.0 if awake else 1.0)
+        elif style == "speech":     # talking along: his lips follow the voice
             onset = g.onset if g is not None else 0.0
-            flap = 0.7 + 0.3 * abs(math.sin(t * 15))   # (syllables)
-            m.update(mouth=max(0.0, min(1.0, (self._g_voice - 0.25) * 1.6)) * flap,
+            m.update(mouth=max(0.0, min(1.0, (self._g_voice - 0.3) * 1.7)),
                      nod=5 * math.sin(t * 1.7) + 3 * math.sin(t * 0.7), dip=2 * onset,
                      ears=-4 * min(1.0, self._g_voice * 2), dy=-a * 0.01 * onset,
                      angle=2 * math.sin(t * 0.9))
-        else:                       # anything else: a bounce on the beat, singing along
+        else:                       # anything else: a bounce on the beat
             m.update(dy=-a * 0.06 * e * up, angle=4 * slow, dx=a * 0.025 * slow, dip=4 * hit,
-                     ears=-8 * up, mouth=0.55 * sing)
+                     ears=-8 * up)
         return m
 
     def dance(self, now: float, t: float) -> dict:
