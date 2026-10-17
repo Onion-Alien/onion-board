@@ -1272,3 +1272,15 @@ def test_stream_api_counts_a_chat_command_and_an_alert_by_name(monkeypatch):
     streamapi._log(mw, "alert", type="donation", user="someone", amount=5.0)
     streamapi._log(mw, "alert", type="follow", user="someone", amount=None)
     assert usage._used == {"api-chat-command", "api-alert-donation", "api-alert"}
+
+
+def test_a_freeze_on_a_pc_short_of_memory_says_so(tmp_path):
+    """hangwatch notes how full the PC's memory was and how fast the app page-faulted:
+    the count says `mem-90` / `paging` (a PC swapping, not a bug), nothing below that."""
+    f = tmp_path / "crash-x.txt"
+    _freeze(f, "12 s", 0, "", inner="\nPC memory in use: 96%\nPage faults: 5400/s\n")
+    assert usage._report_event(f).endswith("/lasted-10-30s/idle/mem-90/paging")
+    _freeze(f, "12 s", 0, "", inner="\nPC memory in use: 84%\nPage faults: 40/s\n")
+    assert usage._report_event(f).endswith("/lasted-10-30s/idle/mem-80")
+    _freeze(f, "12 s", 0, "", inner="\nPC memory in use: 55%\nPage faults: 40/s\n")
+    assert usage._report_event(f).endswith("/lasted-10-30s/idle")
