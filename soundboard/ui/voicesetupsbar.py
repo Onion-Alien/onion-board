@@ -11,7 +11,7 @@ from PySide6.QtGui import QIcon
 from PySide6.QtWidgets import (QHBoxLayout, QInputDialog, QLabel, QMenu, QPushButton,
                                QVBoxLayout, QWidget)
 
-from soundboard import voicesetups
+from soundboard import usage, voicesetups
 from soundboard.i18n import _
 from soundboard.ui import icons
 from soundboard.ui.panel import Flow
@@ -131,6 +131,8 @@ class SetupsBar(QWidget):
         if not ok or not voicesetups.clean_name(name):
             return
         saved = self.store.put(name, setup)
+        if saved:
+            usage.used("voice-setup-saved")
         self._say(_("Saved “{name}”.", name=saved) if saved
                   else _("Couldn't save it (100 setups at most)."))
 
@@ -154,6 +156,7 @@ class SetupsBar(QWidget):
             self._say(_("You already have a setup called “{name}”.", name=new))
             return
         if self.store.rename(name, new):
+            usage.used("voice-setup-renamed")
             self._say(_("Saved “{name}”.", name=new))
 
     def _delete(self, name: str):

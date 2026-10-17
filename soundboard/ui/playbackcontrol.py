@@ -647,12 +647,14 @@ class PlaybackControl(Controller):
         chip = mw._up_next_chip
         if chip is None or not qt_valid(chip):
             return
+        usage.used("upnext-opened")
         if mw._up_next_popup is None:
             mw._up_next_popup = UpNextPopup(mw, self.clear_up_next)
         mw._up_next_popup.open_at(chip, self._up_next_items())
 
     def clear_up_next(self):
         """The list's Clear: nothing waits any more; what plays keeps playing."""
+        usage.used("upnext-cleared")
         self._queue.clear()
         self._say_queue()
         self.mw.linkbar.drop_up_next()

@@ -34,7 +34,8 @@ from typing import TYPE_CHECKING
 from PySide6.QtCore import QTimer, Signal
 from PySide6.QtWidgets import QMessageBox
 
-from soundboard import errors, langnames, library, livesetup, renderworker, soundfx, voicesetups
+from soundboard import (errors, langnames, library, livesetup, renderworker, soundfx,
+                        usage, voicesetups)
 from soundboard.i18n import _
 from soundboard.ui import worker
 from soundboard.ui.controller import Controller
@@ -128,6 +129,7 @@ class LiveSetups(Controller):
         lang, lang_name = self.lang_for(setup)
         if ((module is not None or lang is not None) and ask
                 and not self.ask(tab, name, lang)):
+            usage.used("live-setup-said-no")
             return   # No: what was on stays on
         if has_ai and module is None:
             self.mw.toast(_("The AI voices add-on isn't installed, so only the voice "
@@ -139,6 +141,10 @@ class LiveSetups(Controller):
                             "language). The rest of it is on.", name=html.escape(name),
                             language=html.escape(lang_name)), "warn")
         self._before[tab] = self.names[tab]
+        if name and ask:   # their pick (not a cancel putting the old one back)
+            usage.used(f"live-setup-{tab}")
+            if lang is not None:
+                usage.used("live-setup-language")
         try:
             self._apply(tab, setup, module, lang)
         except RuntimeError as e:
@@ -230,6 +236,7 @@ class LiveSetups(Controller):
     def cancel(self, tab: str):
         """Cancel while its AI voice gets ready: what was on before comes back (a sound
         pressed while the setup was already on just doesn't play)."""
+        usage.used("live-setup-cancel")
         if tab == "sounds":
             undo = self._from_pick
             self._stop_jobs(resume=True)

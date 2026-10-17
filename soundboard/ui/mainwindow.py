@@ -1187,7 +1187,7 @@ class MainWindow(QMainWindow):
             return
         on = fx.btn_power.isChecked()
         m.addAction(_("Turn off") if on else _("Turn on"),
-                    lambda: self.hkctl._set_voice(not on))
+                    lambda: (usage.used("tray-voice-toggle"), self.hkctl._set_voice(not on)))
         names = [n for n in fx.favorites if n in fx.voice_names()]
         names += [n for n in fx.saved_names() if n not in names]
         if not names:
@@ -1196,7 +1196,8 @@ class MainWindow(QMainWindow):
             return
         m.addSeparator()
         for n in names:
-            a = m.addAction(fx.title_of(n), lambda n=n: self.hkctl.pick_voice(n))
+            a = m.addAction(fx.title_of(n), lambda n=n: (usage.used("tray-voice-pick"),
+                                                         self.hkctl.pick_voice(n)))
             a.setCheckable(True)
             a.setChecked(on and fx.preset == n)
 
