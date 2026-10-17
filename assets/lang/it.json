@@ -1364,7 +1364,7 @@
   "already in your library as “{name}”": "già nella tua raccolta come \"{name}\"",
   "another action": "un'altra azione",
   "applying effects…": "applicazione degli effetti...",
-  "applying…": "applicando...",
+  "applying…": "applico…",
   "auto push-to-talk": "push-to-talk automatico",
   "can't load": "impossibile caricare",
   "can't load file": "impossibile caricare il file",
@@ -3654,5 +3654,17 @@
   "{n} min": [
     "{n} min",
     "{n} min"
-  ]
+  ],
+  "Applying the effects": "Applicazione degli effetti",
+  "Applying the effects: {how}": "Applico gli effetti: {how}",
+  "Couldn't apply the effects: {why}": "Impossibile applicare gli effetti: {why}",
+  "Stop, keep the old effects": "Ferma, tieni gli effetti di prima",
+  "Stopped. “{name}” keeps its old effects": "Fermato. “{name}” tiene i suoi effetti di prima",
+  "You can close this window: it keeps going, and the pad shows how far it is.": "Puoi chiudere questa finestra: continua lo stesso, e il pad mostra a che punto è.",
+  "applying effects… {pct}%": "applico gli effetti… {pct}%",
+  "applying… {pct}%": "applico… {pct}%",
+  "{pct}%": "{pct}%",
+  "{pct}%, about {time} left": "{pct}%, circa {time} alla fine",
+  "“{name}” can't play until its effects are applied ({how})": "“{name}” non può suonare finché i suoi effetti non sono applicati ({how})",
+  "✓ “{name}” is ready to play": "✓ “{name}” è pronto da suonare"
 }

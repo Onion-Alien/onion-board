@@ -1299,7 +1299,7 @@
   "an app by Onion Alien · v{version_text}": "az Onion Alien által készített alkalmazás · v {version_text}",
   "another action": "másik akció",
   "applying effects…": "effektusok alkalmazása…",
-  "applying…": "jelentkezés…",
+  "applying…": "alkalmazás…",
   "auto push-to-talk": "automatikus push-to-talk",
   "can't load": "nem lehet betölteni",
   "can't load file": "nem lehet betölteni a fájlt",
@@ -3654,5 +3654,17 @@
   "{n} min": [
     "{n} perc",
     "{n} perc"
-  ]
+  ],
+  "Applying the effects": "Effektek alkalmazása",
+  "Applying the effects: {how}": "Effektek alkalmazása: {how}",
+  "Couldn't apply the effects: {why}": "Nem sikerült alkalmazni az effekteket: {why}",
+  "Stop, keep the old effects": "Leállítás, a régi effektek maradnak",
+  "Stopped. “{name}” keeps its old effects": "Leállítva. A(z) „{name}” megtartja a régi effektjeit",
+  "You can close this window: it keeps going, and the pad shows how far it is.": "Bezárhatod ezt az ablakot: tovább fut, és a gomb mutatja, hol tart.",
+  "applying effects… {pct}%": "effektek alkalmazása… {pct}%",
+  "applying… {pct}%": "alkalmazás… {pct}%",
+  "{pct}%": "{pct}%",
+  "{pct}%, about {time} left": "{pct}%, még kb. {time}",
+  "“{name}” can't play until its effects are applied ({how})": "A(z) „{name}” addig nem szólhat, amíg az effektjei el nem készülnek ({how})",
+  "✓ “{name}” is ready to play": "✓ A(z) „{name}” lejátszható"
 }

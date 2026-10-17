@@ -1364,7 +1364,7 @@
   "already in your library as “{name}”": "al in uw bibliotheek als “{name}”",
   "another action": "nog een actie",
   "applying effects…": "effecten toepassen…",
-  "applying…": "solliciteren…",
+  "applying…": "toepassen…",
   "auto push-to-talk": "automatische push-to-talk",
   "can't load": "kan niet laden",
   "can't load file": "kan bestand niet laden",
@@ -3654,5 +3654,17 @@
   "{n} min": [
     "{n} min",
     "{n} min"
-  ]
+  ],
+  "Applying the effects": "Effecten toepassen",
+  "Applying the effects: {how}": "Effecten toepassen: {how}",
+  "Couldn't apply the effects: {why}": "Kon de effecten niet toepassen: {why}",
+  "Stop, keep the old effects": "Stoppen, oude effecten houden",
+  "Stopped. “{name}” keeps its old effects": "Gestopt. “{name}” houdt zijn oude effecten",
+  "You can close this window: it keeps going, and the pad shows how far it is.": "Je kunt dit venster sluiten: het gaat door, en de knop laat zien hoe ver het is.",
+  "applying effects… {pct}%": "effecten toepassen… {pct}%",
+  "applying… {pct}%": "toepassen… {pct}%",
+  "{pct}%": "{pct}%",
+  "{pct}%, about {time} left": "{pct}%, nog ongeveer {time}",
+  "“{name}” can't play until its effects are applied ({how})": "“{name}” kan pas spelen als de effecten klaar zijn ({how})",
+  "✓ “{name}” is ready to play": "✓ “{name}” is klaar om te spelen"
 }

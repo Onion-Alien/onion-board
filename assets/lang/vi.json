@@ -1341,7 +1341,7 @@
   "already in your library as “{name}”": "đã có trong thư viện của bạn với tên “{name}”",
   "another action": "hành động khác",
   "applying effects…": "áp dụng hiệu ứng…",
-  "applying…": "nộp đơn…",
+  "applying…": "đang áp…",
   "auto push-to-talk": "tự động nói chuyện",
   "can't load": "không thể tải",
   "can't load file": "không thể tải tập tin",
@@ -3576,5 +3576,17 @@
   "You already have a setup called “{name}”.": "Bạn đã có thiết lập tên “{name}”.",
   "{n} min": [
     "{n} phút"
-  ]
+  ],
+  "Applying the effects": "Đang áp hiệu ứng",
+  "Applying the effects: {how}": "Đang áp hiệu ứng: {how}",
+  "Couldn't apply the effects: {why}": "Không áp được hiệu ứng: {why}",
+  "Stop, keep the old effects": "Dừng, giữ hiệu ứng cũ",
+  "Stopped. “{name}” keeps its old effects": "Đã dừng. “{name}” giữ nguyên hiệu ứng cũ",
+  "You can close this window: it keeps going, and the pad shows how far it is.": "Bạn có thể đóng cửa sổ này: việc vẫn tiếp tục, và nút sẽ cho thấy đã xong bao nhiêu.",
+  "applying effects… {pct}%": "đang áp hiệu ứng… {pct}%",
+  "applying… {pct}%": "đang áp… {pct}%",
+  "{pct}%": "{pct}%",
+  "{pct}%, about {time} left": "{pct}%, còn khoảng {time}",
+  "“{name}” can't play until its effects are applied ({how})": "Chưa phát được “{name}” cho đến khi áp xong hiệu ứng ({how})",
+  "✓ “{name}” is ready to play": "✓ “{name}” đã sẵn sàng để phát"
 }

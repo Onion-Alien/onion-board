@@ -151,18 +151,21 @@ def _chain(fx: dict) -> list[tuple[str, str, dict]]:
     return out + [(t, t, fx["effects"][t]) for t in _active_effects(fx)]
 
 
-def _say(x: np.ndarray, voice: dict) -> np.ndarray:
+def _say(x: np.ndarray, voice: dict, cancel=None, progress=None) -> np.ndarray:
     """(n, 2) audio in the voice's AI voice (as float32, both channels the same: a
-    voice is mono). Unchanged if the AI voice can't be used here (logged)."""
+    voice is mono). Unchanged if the AI voice can't be used here (logged), or when
+    `cancel()` stopped it (the caller sees cancel() too and gives up)."""
     ai = voice.get("ai")
     if not ai or not len(x):
         return x
     from soundboard.speech import soundvoice
     f = x.astype(F32) * F32(1 / 32767.0) if x.dtype == np.int16 else x.astype(F32)
     try:
-        y = soundvoice.render(f.mean(axis=1), SR, ai["id"], ai.get("pitch", 0.0))
+        y = soundvoice.render(f.mean(axis=1), SR, ai["id"], ai.get("pitch", 0.0),
+                              cancel=cancel or (lambda: False), progress=progress)
     except soundvoice.Unavailable as e:
-        log.warning("AI voice %r left out of a sound: %s", ai.get("id"), e)
+        if cancel is None or not cancel():
+            log.warning("AI voice %r left out of a sound: %s", ai.get("id"), e)
         return x
     return np.repeat(y[:, None], 2, axis=1)
 
@@ -563,31 +566,48 @@ def _effects(pieces, fx: dict, skip: set):
         yield x[:end]
 
 
-def _render_pieces(data: np.ndarray, f: dict, skip: set):
-    """The rendered sound in float32 pieces, clipped, not reversed (f: cleaned)."""
-    x = _say(trim(data, f), f["voice"])
-    pieces, _n = _speed_pitch(_pieces(x), len(x), f["speed"], f["pitch"], f["tape"])
+# how long each part takes, per second of sound, to split one progress bar between
+# them: the AI voice ~0.3 s (a song's took 68 s for 240 s), the rest ~0.025 s
+AI_COST, FX_COST = 12.0, 1.0
+
+
+def _render_pieces(data: np.ndarray, f: dict, skip: set, cancel=None, progress=None):
+    """The rendered sound in float32 pieces, clipped, not reversed (f: cleaned).
+    progress(frac) now and then, 0..1 over the whole render."""
+    ai = AI_COST if (f["voice"] or {}).get("ai") else 0.0
+    share = ai / (ai + FX_COST)
+    said = None   # the AI voice's part of the bar
+    if progress is not None and ai:
+        said = lambda k, progress=progress: progress(share * k)  # noqa: E731
+    x = _say(trim(data, f), f["voice"], cancel, said)
+    pieces, n = _speed_pitch(_pieces(x), len(x), f["speed"], f["pitch"], f["tape"])
     sos = eq.design(f["eq"], SR)
     if sos is not None:
         e = dsp.SosRun(sos)
         pieces = (e.run(p) for p in pieces)
     pieces = _effects(pieces, f, skip)
     g = F32(10 ** (f["gain_db"] / 20)) if abs(f["gain_db"]) >= 1e-3 else None
+    done = 0
     for p in pieces:
+        if progress is not None:
+            done += len(p)
+            progress(share + (1 - share) * min(1.0, done / max(1, n)))
         yield np.clip(p * g if g is not None else p, -1.0, 1.0)
 
 
-def render_into(data: np.ndarray, fx: dict | None, start, put) -> None:
+def render_into(data: np.ndarray, fx: dict | None, start, put, cancel=None,
+                progress=None) -> None:
     """Render a sound piece by piece: start() before the first piece (and again, to
     begin from scratch, if a voice effect fails partway and is left out), then
     put(piece) for each (m, 2) float32 piece, clipped to [-1, 1]. Reverse is left to
-    the caller: it needs the end first."""
+    the caller: it needs the end first. cancel(): asked by the AI voice, which is one
+    long step (put() is where the caller gives up); progress(frac): see _render_pieces."""
     f = clean(fx)
     skip: set = set()
     while True:
         start()
         try:
-            for p in _render_pieces(data, f, skip):
+            for p in _render_pieces(data, f, skip, cancel, progress):
                 put(p)
             return
         except _Broken as b:

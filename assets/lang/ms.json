@@ -3576,5 +3576,17 @@
   "You already have a setup called “{name}”.": "Anda sudah ada tetapan bernama \"{name}\".",
   "{n} min": [
     "{n} min"
-  ]
+  ],
+  "Applying the effects": "Menerapkan kesan",
+  "Applying the effects: {how}": "Menerapkan kesan: {how}",
+  "Couldn't apply the effects: {why}": "Kesan tidak dapat diterapkan: {why}",
+  "Stop, keep the old effects": "Hentikan, kekalkan kesan lama",
+  "Stopped. “{name}” keeps its old effects": "Dihentikan. “{name}” kekal dengan kesan lamanya",
+  "You can close this window: it keeps going, and the pad shows how far it is.": "Anda boleh tutup tetingkap ini: ia terus berjalan, dan pad menunjukkan setakat mana.",
+  "applying effects… {pct}%": "menerapkan kesan… {pct}%",
+  "applying… {pct}%": "menerapkan… {pct}%",
+  "{pct}%": "{pct}%",
+  "{pct}%, about {time} left": "{pct}%, kira-kira {time} lagi",
+  "“{name}” can't play until its effects are applied ({how})": "“{name}” belum boleh dimainkan sehingga kesannya siap diterapkan ({how})",
+  "✓ “{name}” is ready to play": "✓ “{name}” sedia dimainkan"
 }

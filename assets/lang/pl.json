@@ -3732,5 +3732,17 @@
     "{n} min",
     "{n} min",
     "{n} min"
-  ]
+  ],
+  "Applying the effects": "Nakładanie efektów",
+  "Applying the effects: {how}": "Nakładanie efektów: {how}",
+  "Couldn't apply the effects: {why}": "Nie udało się nałożyć efektów: {why}",
+  "Stop, keep the old effects": "Zatrzymaj, zostaw stare efekty",
+  "Stopped. “{name}” keeps its old effects": "Zatrzymano. „{name}” zostaje ze starymi efektami",
+  "You can close this window: it keeps going, and the pad shows how far it is.": "Możesz zamknąć to okno: to dalej trwa, a przycisk pokazuje postęp.",
+  "applying effects… {pct}%": "nakładanie efektów… {pct}%",
+  "applying… {pct}%": "nakładanie… {pct}%",
+  "{pct}%": "{pct}%",
+  "{pct}%, about {time} left": "{pct}%, zostało ok. {time}",
+  "“{name}” can't play until its effects are applied ({how})": "„{name}” nie zagra, dopóki efekty nie zostaną nałożone ({how})",
+  "✓ “{name}” is ready to play": "✓ „{name}” jest gotowy do grania"
 }

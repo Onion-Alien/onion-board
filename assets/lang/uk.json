@@ -3732,5 +3732,17 @@
     "{n} хв",
     "{n} хв",
     "{n} хв"
-  ]
+  ],
+  "Applying the effects": "Застосування ефектів",
+  "Applying the effects: {how}": "Застосовую ефекти: {how}",
+  "Couldn't apply the effects: {why}": "Не вдалося застосувати ефекти: {why}",
+  "Stop, keep the old effects": "Зупинити, лишити старі ефекти",
+  "Stopped. “{name}” keeps its old effects": "Зупинено. У «{name}» лишаються старі ефекти",
+  "You can close this window: it keeps going, and the pad shows how far it is.": "Можна закрити це вікно: робота триватиме, а на кнопці видно, скільки готово.",
+  "applying effects… {pct}%": "застосовую ефекти… {pct}%",
+  "applying… {pct}%": "застосовую… {pct}%",
+  "{pct}%": "{pct}%",
+  "{pct}%, about {time} left": "{pct}%, лишилось близько {time}",
+  "“{name}” can't play until its effects are applied ({how})": "«{name}» не зіграє, доки не застосуються його ефекти ({how})",
+  "✓ “{name}” is ready to play": "✓ «{name}» готовий до відтворення"
 }

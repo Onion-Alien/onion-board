@@ -3654,5 +3654,17 @@
   "{n} min": [
     "{n} min",
     "{n} min"
-  ]
+  ],
+  "Applying the effects": "Application des effets",
+  "Applying the effects: {how}": "Application des effets : {how}",
+  "Couldn't apply the effects: {why}": "Impossible d'appliquer les effets : {why}",
+  "Stop, keep the old effects": "Arrêter, garder les anciens effets",
+  "Stopped. “{name}” keeps its old effects": "Arrêté. « {name} » garde ses anciens effets",
+  "You can close this window: it keeps going, and the pad shows how far it is.": "Tu peux fermer cette fenêtre : ça continue, et le pad montre où ça en est.",
+  "applying effects… {pct}%": "application des effets… {pct} %",
+  "applying… {pct}%": "application… {pct} %",
+  "{pct}%": "{pct} %",
+  "{pct}%, about {time} left": "{pct} %, encore environ {time}",
+  "“{name}” can't play until its effects are applied ({how})": "« {name} » ne peut pas être joué tant que ses effets ne sont pas appliqués ({how})",
+  "✓ “{name}” is ready to play": "✓ « {name} » est prêt à jouer"
 }

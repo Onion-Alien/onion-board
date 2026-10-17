@@ -3654,5 +3654,17 @@
   "{n} min": [
     "{n} λεπ.",
     "{n} λεπ."
-  ]
+  ],
+  "Applying the effects": "Εφαρμογή των εφέ",
+  "Applying the effects: {how}": "Εφαρμογή των εφέ: {how}",
+  "Couldn't apply the effects: {why}": "Δεν ήταν δυνατή η εφαρμογή των εφέ: {why}",
+  "Stop, keep the old effects": "Διακοπή, κράτα τα παλιά εφέ",
+  "Stopped. “{name}” keeps its old effects": "Σταμάτησε. Το \"{name}\" κρατά τα παλιά του εφέ",
+  "You can close this window: it keeps going, and the pad shows how far it is.": "Μπορείς να κλείσεις αυτό το παράθυρο: συνεχίζει, και το κουμπί δείχνει πόσο έχει προχωρήσει.",
+  "applying effects… {pct}%": "εφαρμογή εφέ… {pct}%",
+  "applying… {pct}%": "εφαρμογή… {pct}%",
+  "{pct}%": "{pct}%",
+  "{pct}%, about {time} left": "{pct}%, απομένουν περίπου {time}",
+  "“{name}” can't play until its effects are applied ({how})": "Το \"{name}\" δεν μπορεί να παίξει μέχρι να εφαρμοστούν τα εφέ του ({how})",
+  "✓ “{name}” is ready to play": "✓ Το \"{name}\" είναι έτοιμο να παίξει"
 }

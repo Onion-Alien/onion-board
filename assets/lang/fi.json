@@ -3654,5 +3654,17 @@
   "{n} min": [
     "{n} min",
     "{n} min"
-  ]
+  ],
+  "Applying the effects": "Efektejä lisätään",
+  "Applying the effects: {how}": "Efektejä lisätään: {how}",
+  "Couldn't apply the effects: {why}": "Efektejä ei voitu lisätä: {why}",
+  "Stop, keep the old effects": "Pysäytä, pidä vanhat efektit",
+  "Stopped. “{name}” keeps its old effects": "Pysäytetty. \"{name}\" pitää vanhat efektinsä",
+  "You can close this window: it keeps going, and the pad shows how far it is.": "Voit sulkea tämän ikkunan: työ jatkuu, ja painike näyttää, kuinka pitkällä se on.",
+  "applying effects… {pct}%": "efektejä lisätään… {pct} %",
+  "applying… {pct}%": "lisätään… {pct} %",
+  "{pct}%": "{pct} %",
+  "{pct}%, about {time} left": "{pct} %, noin {time} jäljellä",
+  "“{name}” can't play until its effects are applied ({how})": "\"{name}\" ei soi ennen kuin sen efektit on lisätty ({how})",
+  "✓ “{name}” is ready to play": "✓ \"{name}\" on valmis soimaan"
 }

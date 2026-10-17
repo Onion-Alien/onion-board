@@ -46,9 +46,11 @@ def module():
 
 
 def render(mono: np.ndarray, rate: int, voice_id: str, pitch: float = 0.0,
-           auto_pitch: bool = True, mod=None, cancel=lambda: False) -> np.ndarray:
+           auto_pitch: bool = True, mod=None, cancel=lambda: False,
+           progress=None) -> np.ndarray:
     """`mono` (float32 at `rate`) in the AI voice `voice_id`, the same length and rate.
-    Raises Unavailable if it can't be done. Slow: call it off the UI thread."""
+    Raises Unavailable if it can't be done. Slow: call it off the UI thread (a song takes
+    about a third of its length). progress(frac): how much of it has come back, 0..1."""
     if len(mono) / rate > MAX_S:
         raise Unavailable(f"longer than {MAX_S:.0f} s")
     mod = mod or module()
@@ -69,9 +71,12 @@ def render(mono: np.ndarray, rate: int, voice_id: str, pitch: float = 0.0,
             failed.append(str(ev.get("text") or t))
             ready.set()
 
+    back = [0]   # bytes of it back so far
+
     def on_audio(pcm: bytes):
         with lock:
             got.append(pcm)
+            back[0] += len(pcm)
 
     host = ServiceHost(mod.resolved_command(argv), on_event, cwd=mod.path,
                        log_path=library.APP_DIR / f"module-{mod.id}.log", name=mod.id,
@@ -87,20 +92,27 @@ def render(mono: np.ndarray, rate: int, voice_id: str, pitch: float = 0.0,
         x = np.concatenate([np.asarray(mono, np.float32),
                             np.zeros(int(TAIL_S * rate), np.float32)])
         step = max(1, int(BLOCK_S * rate))
+        want = int(len(x) / rate * HELPER_RATE) - int(0.05 * HELPER_RATE)
+
+        def have() -> int:
+            with lock:
+                return back[0] // 2
+
+        def told():
+            if progress is not None:
+                progress(min(1.0, have() / max(1, want)))
         for i in range(0, len(x), step):
             while host._q.qsize() > QUEUE_BLOCKS // 2:   # let the sender catch up
                 if cancel() or not host.running:
                     raise Unavailable("stopped")
                 time.sleep(0.005)
             host.feed(x[i:i + step], rate)
-        want = int(len(x) / rate * HELPER_RATE) - int(0.05 * HELPER_RATE)
-
-        def have() -> int:
-            with lock:
-                return sum(len(b) for b in got) // 2
+            if progress is not None and i % (step * 25) == 0:   # every half second of it
+                told()
         # it converts faster than real time on most PCs; give a slow one 3x the length
-        if not _wait(lambda: have() >= want or bool(failed), 20 + 3 * len(x) / rate, cancel):
-            raise Unavailable("the AI voice was too slow")
+        if not _wait(lambda: have() >= want or bool(failed), 20 + 3 * len(x) / rate, cancel,
+                     told):
+            raise Unavailable("stopped" if cancel() else "the AI voice was too slow")
     finally:
         host.stop()
     with lock:
@@ -136,12 +148,14 @@ def delay(a: np.ndarray, b: np.ndarray, rate: int, most_s: float = 0.3) -> int:
     return best * step
 
 
-def _wait(done, seconds: float, cancel) -> bool:
+def _wait(done, seconds: float, cancel, tick=None) -> bool:
     end = time.monotonic() + seconds
     while time.monotonic() < end:
         if done():
             return True
         if cancel():
             return False
+        if tick is not None:
+            tick()
         time.sleep(0.02)
     return done()
