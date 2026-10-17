@@ -501,7 +501,7 @@ def test_up_next_is_one_chip_whose_list_reaches_every_queued_sound(window, monke
     chip = w._up_next_chip
     assert isinstance(chip, UpNextChip) and chip.count.text() == "13"
     assert w._chips_hl.indexOf(chip) == w._chips_hl.count() - 1   # after Now playing
-    chip.open.click()
+    chip.click()
     pop = w._up_next_popup
     assert pop.isVisible() and pop.count.text() == "13"
     assert_breathing_room(pop.card)   # 14 px inside the card, 8 px before the scroll bar

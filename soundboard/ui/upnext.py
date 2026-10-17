@@ -8,6 +8,7 @@ from __future__ import annotations
 from collections.abc import Callable, Sequence
 
 from PySide6.QtCore import QPoint, Qt, Signal
+from PySide6.QtGui import QFont
 from PySide6.QtWidgets import (QFrame, QHBoxLayout, QLabel, QPushButton, QScrollArea,
                                QVBoxLayout, QWidget)
 from shiboken6 import isValid as qt_valid
@@ -18,6 +19,7 @@ from soundboard.ui.panel import icon_button
 
 POPUP_W = 400        # the list's card: narrow, a long name still fits most of itself
 POPUP_ROWS = 9       # rows shown before the list scrolls
+CHIP_H = 30          # as tall as the now-playing chips beside it
 ROW_H = 32           # a row: its 24 px ✕, margins and the 4 px gap
 LIST_GAP = 8         # between a scrolling list and its scroll bar (DESIGN: breathing room)
 
@@ -26,43 +28,52 @@ Waiting = tuple[str, Callable[[], object], Callable[[], object]]
 
 
 class UpNextChip(QFrame):
-    """The row's one Up next chip: a list icon, "Up next", the count and ^. A click
-    anywhere on it opens the list."""
+    """The row's one Up next chip: a list icon, "Up next", the count and ^, one even
+    6 px apart and in one font (a button's own padding and a smaller number made the
+    gaps uneven). The whole chip is the button: a click, Enter or Space opens the list."""
     clicked = Signal()
 
     def __init__(self, count: int):
         super().__init__()
         self.setObjectName("chip")
         self.setCursor(Qt.CursorShape.PointingHandCursor)
+        self.setFocusPolicy(Qt.FocusPolicy.StrongFocus)
+        self.setToolTip(_("See everything waiting to play"))
+        self.setAccessibleName(_("See everything waiting to play"))
+        self.setFixedHeight(CHIP_H)
         h = QHBoxLayout(self)
-        h.setContentsMargins(8, 2, 2, 2)
-        h.setSpacing(4)
+        h.setContentsMargins(10, 0, 10, 0)
+        h.setSpacing(6)
         pic = QLabel()
         icons.set_label_icon(pic, "list", "muted", size=14)   # a theme colour, kept on switch
-        self.name = QPushButton(_("Up next"))
-        self.name.setObjectName("chipname")
-        self.name.setToolTip(_("See everything waiting to play"))
-        self.name.clicked.connect(self.clicked)
+        name = QLabel(_("Up next"))
         self.count = QLabel(str(count))
-        self.count.setObjectName("decktitle")
-        self.open = QPushButton()
-        self.open.setObjectName("chipstop")
-        self.open.setAccessibleName(_("See everything waiting to play"))
-        icons.set_icon(self.open, "fold_up", "muted", size=12)
-        self.open.setFixedSize(24, 24)
-        self.open.clicked.connect(self.clicked)
-        h.addWidget(pic)
-        h.addWidget(self.name)
-        h.addWidget(self.count)
-        h.addWidget(self.open)
+        self.count.setObjectName("muted")
+        bold = name.font()
+        bold.setWeight(QFont.Weight.DemiBold)   # the chips' names are 600 too
+        for w in (name, self.count):
+            w.setFont(bold)
+        fold = QLabel()
+        icons.set_label_icon(fold, "fold_up", "muted", size=12)
+        for w in (pic, name, self.count, fold):
+            h.addWidget(w, 0, Qt.AlignmentFlag.AlignVCenter)
 
     def set_count(self, n: int):
         self.count.setText(str(n))
 
-    def mouseReleaseEvent(self, e):   # the icon and the number open it too
+    def click(self):
+        self.clicked.emit()
+
+    def mouseReleaseEvent(self, e):
         if e.button() == Qt.MouseButton.LeftButton and self.rect().contains(e.position().toPoint()):
             self.clicked.emit()
         super().mouseReleaseEvent(e)
+
+    def keyPressEvent(self, e):
+        if e.key() in (Qt.Key.Key_Return, Qt.Key.Key_Enter, Qt.Key.Key_Space):
+            self.clicked.emit()
+            return
+        super().keyPressEvent(e)
 
 
 class UpNextPopup(QWidget):
