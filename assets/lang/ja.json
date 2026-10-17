@@ -3442,7 +3442,6 @@
   "Shared by a player": "プレイヤーが共有",
   "Sharing…": "共有中…",
   "Sound store": "サウンドストア",
-  "Store": "ストア",
   "Tags": "タグ",
   "Tags, with commas (optional): meme, horn, game": "タグ（カンマ区切り、任意）：ミーム, クラクション, ゲーム",
   "Thanks for sharing!": "共有ありがとう！",
@@ -3454,7 +3453,6 @@
   "That sound is already in the store.": "そのサウンドはもうストアにあります。",
   "That sound isn't in the store any more.": "そのサウンドはもうストアにありません。",
   "That's a lot for one day. Try again tomorrow.": "1 日にしては多すぎます。明日もう一度試してください。",
-  "The Store tab: the project's own sound store, for its list, the sounds you play or add, your votes and the sounds you share.": "ストアタブ：プロジェクト独自のサウンドストア。一覧、再生や追加したサウンド、投票、共有したサウンドに使います。",
   "The best voted first": "投票が多い順",
   "The newest first": "新しい順",
   "The sound store had a problem. Try again in a bit.": "サウンドストアで問題が起きました。少ししてからもう一度試してください。",
@@ -3473,7 +3471,6 @@
   "Paste a link and name it first": "先にリンクを貼り付けて名前をつけてください",
   "Paste a link: https://www.youtube.com/watch?v=…": "リンクを貼り付け：https://www.youtube.com/watch?v=…",
   "Play it once (from the site)": "1 回再生（サイトから）",
-  "Share this link in the Store tab": "このリンクをストアタブで共有",
   "Share to the store": "ストアで共有",
   "The store takes links to YouTube, TikTok, SoundCloud and other video and sound sites.": "ストアは YouTube、TikTok、SoundCloud などの動画・サウンドサイトへのリンクを受け付けます。",
   "{site} link": "{site} のリンク",
@@ -3505,5 +3502,8 @@
   "Keys in games": "ゲーム中のキー",
   "With this on, a hotkey still does its normal job too: press F1 in a game and the game gets F1 while your sound plays. Off: only Onion Board gets the key, so a hotkey on W stops you walking.": "オンにすると、ホットキーは本来の働きもします。ゲームで F1 を押すと、サウンドが鳴りつつゲームにも F1 が届きます。オフ：キーは Onion Board だけに届くので、W にホットキーを付けると歩けなくなります。",
   "See everything waiting to play": "再生待ちをすべて表示",
-  "Take everything out of the queue": "列からすべて外す"
+  "Take everything out of the queue": "列からすべて外す",
+  "The Free sounds tab: the project's own sound store, for its list, the sounds you play or add, your votes and the sounds you share.": "無料サウンドタブ：プロジェクト独自のサウンドストア。一覧、再生や追加したサウンド、投票、共有したサウンドに使います。",
+  "Share this link in the Free sounds tab": "このリンクを無料サウンドタブで共有",
+  "Free sounds": "無料サウンド"
 }

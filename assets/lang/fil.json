@@ -3519,7 +3519,6 @@
   "Shared by a player": "Shinare ng isang player",
   "Sharing…": "Sine-share…",
   "Sound store": "Sound store",
-  "Store": "Store",
   "Tags": "Mga tag",
   "Tags, with commas (optional): meme, horn, game": "Mga tag, may kuwit (opsyonal): meme, busina, laro",
   "Thanks for sharing!": "Salamat sa pag-share!",
@@ -3531,7 +3530,6 @@
   "That sound is already in the store.": "Nasa store na ang sound na iyan.",
   "That sound isn't in the store any more.": "Wala na sa store ang sound na iyan.",
   "That's a lot for one day. Try again tomorrow.": "Marami na iyan para sa isang araw. Subukan ulit bukas.",
-  "The Store tab: the project's own sound store, for its list, the sounds you play or add, your votes and the sounds you share.": "Ang Store tab: ang sariling sound store ng proyekto, para sa listahan nito, mga sound na pinapatugtog o idinadagdag mo, mga boto mo at mga sound na shine-share mo.",
   "The best voted first": "Pinakamaraming boto muna",
   "The newest first": "Pinakabago muna",
   "The sound store had a problem. Try again in a bit.": "Nagkaproblema ang sound store. Subukan ulit mamaya.",
@@ -3550,7 +3548,6 @@
   "Paste a link and name it first": "Mag-paste muna ng link at pangalanan ito",
   "Paste a link: https://www.youtube.com/watch?v=…": "Mag-paste ng link: https://www.youtube.com/watch?v=…",
   "Play it once (from the site)": "Patugtugin nang isang beses (mula sa site)",
-  "Share this link in the Store tab": "I-share ang link na ito sa Store tab",
   "Share to the store": "I-share sa store",
   "The store takes links to YouTube, TikTok, SoundCloud and other video and sound sites.": "Tumatanggap ang store ng link sa YouTube, TikTok, SoundCloud at iba pang video at sound site.",
   "{site} link": "Link ng {site}",
@@ -3582,5 +3579,8 @@
   "Keys in games": "Mga key sa laro",
   "With this on, a hotkey still does its normal job too: press F1 in a game and the game gets F1 while your sound plays. Off: only Onion Board gets the key, so a hotkey on W stops you walking.": "Kapag naka-on ito, ginagawa pa rin ng hotkey ang normal nitong trabaho: pindutin ang F1 sa laro at makukuha ng laro ang F1 habang tumutugtog ang sound mo. Naka-off: Onion Board lang ang nakakakuha ng key, kaya ang hotkey sa W ay pipigil sa paglalakad mo.",
   "See everything waiting to play": "Tingnan lahat ng naghihintay tumugtog",
-  "Take everything out of the queue": "Alisin lahat sa pila"
+  "Take everything out of the queue": "Alisin lahat sa pila",
+  "The Free sounds tab: the project's own sound store, for its list, the sounds you play or add, your votes and the sounds you share.": "Ang Libreng sounds tab: ang sariling sound store ng proyekto, para sa listahan nito, mga sound na pinapatugtog o idinadagdag mo, mga boto mo at mga sound na shine-share mo.",
+  "Share this link in the Free sounds tab": "I-share ang link na ito sa Libreng sounds tab",
+  "Free sounds": "Libreng sounds"
 }

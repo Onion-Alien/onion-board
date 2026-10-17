@@ -3442,7 +3442,6 @@
   "Shared by a player": "Dikongsi oleh pemain",
   "Sharing…": "Berkongsi…",
   "Sound store": "Kedai bunyi",
-  "Store": "Kedai",
   "Tags": "Tag",
   "Tags, with commas (optional): meme, horn, game": "Tag, dengan koma (pilihan): meme, hon, permainan",
   "Thanks for sharing!": "Terima kasih kerana berkongsi!",
@@ -3454,7 +3453,6 @@
   "That sound is already in the store.": "Bunyi itu sudah ada di kedai.",
   "That sound isn't in the store any more.": "Bunyi itu tiada lagi di kedai.",
   "That's a lot for one day. Try again tomorrow.": "Itu banyak untuk sehari. Cuba lagi esok.",
-  "The Store tab: the project's own sound store, for its list, the sounds you play or add, your votes and the sounds you share.": "Tab Kedai: kedai bunyi projek sendiri, untuk senarainya, bunyi yang anda mainkan atau tambah, undian anda dan bunyi yang anda kongsi.",
   "The best voted first": "Paling banyak diundi dahulu",
   "The newest first": "Terbaharu dahulu",
   "The sound store had a problem. Try again in a bit.": "Kedai bunyi menghadapi masalah. Cuba lagi sebentar lagi.",
@@ -3473,7 +3471,6 @@
   "Paste a link and name it first": "Tampal pautan dan namakannya dahulu",
   "Paste a link: https://www.youtube.com/watch?v=…": "Tampal pautan: https://www.youtube.com/watch?v=…",
   "Play it once (from the site)": "Main sekali (dari laman)",
-  "Share this link in the Store tab": "Kongsi pautan ini dalam tab Kedai",
   "Share to the store": "Kongsi ke kedai",
   "The store takes links to YouTube, TikTok, SoundCloud and other video and sound sites.": "Kedai menerima pautan ke YouTube, TikTok, SoundCloud dan laman video serta bunyi lain.",
   "{site} link": "Pautan {site}",
@@ -3505,5 +3502,8 @@
   "Keys in games": "Kekunci dalam permainan",
   "With this on, a hotkey still does its normal job too: press F1 in a game and the game gets F1 while your sound plays. Off: only Onion Board gets the key, so a hotkey on W stops you walking.": "Bila ini hidup, hotkey tetap buat kerja biasanya juga: tekan F1 dalam permainan dan permainan dapat F1 sambil bunyi anda dimainkan. Mati: hanya Onion Board dapat kekunci itu, jadi hotkey pada W menghalang anda berjalan.",
   "See everything waiting to play": "Lihat semua yang menunggu untuk dimainkan",
-  "Take everything out of the queue": "Keluarkan semua daripada baris gilir"
+  "Take everything out of the queue": "Keluarkan semua daripada baris gilir",
+  "The Free sounds tab: the project's own sound store, for its list, the sounds you play or add, your votes and the sounds you share.": "Tab Bunyi percuma: kedai bunyi projek sendiri, untuk senarainya, bunyi yang anda mainkan atau tambah, undian anda dan bunyi yang anda kongsi.",
+  "Share this link in the Free sounds tab": "Kongsi pautan ini dalam tab Bunyi percuma",
+  "Free sounds": "Bunyi percuma"
 }

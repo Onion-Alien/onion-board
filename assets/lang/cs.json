@@ -3596,7 +3596,6 @@
   "Shared by a player": "Sdílel hráč",
   "Sharing…": "Sdílím…",
   "Sound store": "Obchod se zvuky",
-  "Store": "Obchod",
   "Tags": "Štítky",
   "Tags, with commas (optional): meme, horn, game": "Štítky, oddělené čárkami (nepovinné): meme, houkačka, hra",
   "Thanks for sharing!": "Díky za sdílení!",
@@ -3608,7 +3607,6 @@
   "That sound is already in the store.": "Ten zvuk už v obchodě je.",
   "That sound isn't in the store any more.": "Ten zvuk už v obchodě není.",
   "That's a lot for one day. Try again tomorrow.": "To je na jeden den hodně. Zkus to zítra.",
-  "The Store tab: the project's own sound store, for its list, the sounds you play or add, your votes and the sounds you share.": "Karta Obchod: vlastní obchod se zvuky projektu, pro jeho seznam, zvuky, které přehráváš nebo přidáváš, tvoje hlasy a zvuky, které sdílíš.",
   "The best voted first": "Nejlépe hodnocené první",
   "The newest first": "Nejnovější první",
   "The sound store had a problem. Try again in a bit.": "Obchod se zvuky měl problém. Zkus to za chvíli.",
@@ -3627,7 +3625,6 @@
   "Paste a link and name it first": "Nejdřív vlož odkaz a pojmenuj ho",
   "Paste a link: https://www.youtube.com/watch?v=…": "Vlož odkaz: https://www.youtube.com/watch?v=…",
   "Play it once (from the site)": "Přehrát jednou (ze stránky)",
-  "Share this link in the Store tab": "Sdílet tento odkaz na kartě Obchod",
   "Share to the store": "Sdílet do obchodu",
   "The store takes links to YouTube, TikTok, SoundCloud and other video and sound sites.": "Obchod bere odkazy na YouTube, TikTok, SoundCloud a jiné stránky s videi a zvuky.",
   "{site} link": "Odkaz na {site}",
@@ -3659,5 +3656,8 @@
   "Keys in games": "Klávesy ve hrách",
   "With this on, a hotkey still does its normal job too: press F1 in a game and the game gets F1 while your sound plays. Off: only Onion Board gets the key, so a hotkey on W stops you walking.": "Když je to zapnuté, zkratka dál dělá i svou běžnou práci: zmáčkni F1 ve hře a hra dostane F1, zatímco hraje tvůj zvuk. Vypnuto: klávesu dostane jen Onion Board, takže zkratka na W tě zastaví v chůzi.",
   "See everything waiting to play": "Zobrazit vše, co čeká na přehrání",
-  "Take everything out of the queue": "Odebrat vše z fronty"
+  "Take everything out of the queue": "Odebrat vše z fronty",
+  "The Free sounds tab: the project's own sound store, for its list, the sounds you play or add, your votes and the sounds you share.": "Karta Zvuky zdarma: vlastní obchod se zvuky projektu, pro jeho seznam, zvuky, které přehráváš nebo přidáváš, tvoje hlasy a zvuky, které sdílíš.",
+  "Share this link in the Free sounds tab": "Sdílet tento odkaz na kartě Zvuky zdarma",
+  "Free sounds": "Zvuky zdarma"
 }

@@ -3442,7 +3442,6 @@
   "Shared by a player": "由玩家分享",
   "Sharing…": "正在分享…",
   "Sound store": "音效商店",
-  "Store": "商店",
   "Tags": "标签",
   "Tags, with commas (optional): meme, horn, game": "标签，用逗号分隔（可选）：梗, 喇叭, 游戏",
   "Thanks for sharing!": "谢谢分享！",
@@ -3454,7 +3453,6 @@
   "That sound is already in the store.": "这个音效已经在商店里了。",
   "That sound isn't in the store any more.": "这个音效已经不在商店里了。",
   "That's a lot for one day. Try again tomorrow.": "一天这么多太多了。明天再试。",
-  "The Store tab: the project's own sound store, for its list, the sounds you play or add, your votes and the sounds you share.": "商店标签页：本项目自己的音效商店，用于列表、你播放或添加的音效、你的投票和你分享的音效。",
   "The best voted first": "票数最高的在前",
   "The newest first": "最新的在前",
   "The sound store had a problem. Try again in a bit.": "音效商店出了点问题。稍后再试。",
@@ -3473,7 +3471,6 @@
   "Paste a link and name it first": "先粘贴链接并起名",
   "Paste a link: https://www.youtube.com/watch?v=…": "粘贴链接：https://www.youtube.com/watch?v=…",
   "Play it once (from the site)": "播放一次（从网站）",
-  "Share this link in the Store tab": "在商店标签页分享这个链接",
   "Share to the store": "分享到商店",
   "The store takes links to YouTube, TikTok, SoundCloud and other video and sound sites.": "商店接受 YouTube、TikTok、SoundCloud 及其他视频和音频网站的链接。",
   "{site} link": "{site} 链接",
@@ -3505,5 +3502,8 @@
   "Keys in games": "游戏中的按键",
   "With this on, a hotkey still does its normal job too: press F1 in a game and the game gets F1 while your sound plays. Off: only Onion Board gets the key, so a hotkey on W stops you walking.": "开启后，快捷键也照常起作用：在游戏里按 F1，声音播放的同时游戏也会收到 F1。关闭：只有 Onion Board 收到这个键，所以把快捷键设在 W 上会让你没法走路。",
   "See everything waiting to play": "查看所有等待播放的内容",
-  "Take everything out of the queue": "清空队列"
+  "Take everything out of the queue": "清空队列",
+  "The Free sounds tab: the project's own sound store, for its list, the sounds you play or add, your votes and the sounds you share.": "免费音效标签页：本项目自己的音效商店，用于列表、你播放或添加的音效、你的投票和你分享的音效。",
+  "Share this link in the Free sounds tab": "在免费音效标签页分享这个链接",
+  "Free sounds": "免费音效"
 }

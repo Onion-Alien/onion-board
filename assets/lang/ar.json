@@ -3827,7 +3827,6 @@
   "Shared by a player": "شاركه لاعب",
   "Sharing…": "جارٍ المشاركة…",
   "Sound store": "متجر الأصوات",
-  "Store": "المتجر",
   "Tags": "الوسوم",
   "Tags, with commas (optional): meme, horn, game": "وسوم، بفواصل (اختياري): ميم، بوق، لعبة",
   "Thanks for sharing!": "شكرًا على المشاركة!",
@@ -3839,7 +3838,6 @@
   "That sound is already in the store.": "هذا الصوت موجود في المتجر بالفعل.",
   "That sound isn't in the store any more.": "هذا الصوت لم يعد في المتجر.",
   "That's a lot for one day. Try again tomorrow.": "هذا كثير ليوم واحد. حاول مرة أخرى غدًا.",
-  "The Store tab: the project's own sound store, for its list, the sounds you play or add, your votes and the sounds you share.": "تبويب المتجر: متجر الأصوات الخاص بالمشروع، لقائمته والأصوات التي تشغّلها أو تضيفها وتصويتاتك والأصوات التي تشاركها.",
   "The best voted first": "الأعلى تصويتًا أولًا",
   "The newest first": "الأحدث أولًا",
   "The sound store had a problem. Try again in a bit.": "حدثت مشكلة في متجر الأصوات. حاول مرة أخرى بعد قليل.",
@@ -3858,7 +3856,6 @@
   "Paste a link and name it first": "الصق رابطًا وسمِّه أولًا",
   "Paste a link: https://www.youtube.com/watch?v=…": "الصق رابطًا: https://www.youtube.com/watch?v=…",
   "Play it once (from the site)": "شغّله مرة واحدة (من الموقع)",
-  "Share this link in the Store tab": "شارك هذا الرابط في تبويب المتجر",
   "Share to the store": "شارك في المتجر",
   "The store takes links to YouTube, TikTok, SoundCloud and other video and sound sites.": "يقبل المتجر روابط YouTube وTikTok وSoundCloud ومواقع الفيديو والصوت الأخرى.",
   "{site} link": "رابط {site}",
@@ -3890,5 +3887,8 @@
   "Keys in games": "المفاتيح في الألعاب",
   "With this on, a hotkey still does its normal job too: press F1 in a game and the game gets F1 while your sound plays. Off: only Onion Board gets the key, so a hotkey on W stops you walking.": "عند تفعيل هذا، يقوم مفتاح التشغيل السريع بعمله العادي أيضًا: اضغط F1 في لعبة وستحصل اللعبة على F1 بينما يعمل صوتك. عند الإيقاف: Onion Board وحده يحصل على المفتاح، لذا مفتاح تشغيل سريع على W يمنعك من المشي.",
   "See everything waiting to play": "اعرض كل ما ينتظر التشغيل",
-  "Take everything out of the queue": "أخرج كل شيء من قائمة الانتظار"
+  "Take everything out of the queue": "أخرج كل شيء من قائمة الانتظار",
+  "The Free sounds tab: the project's own sound store, for its list, the sounds you play or add, your votes and the sounds you share.": "تبويب الأصوات المجانية: متجر الأصوات الخاص بالمشروع، لقائمته والأصوات التي تشغّلها أو تضيفها وتصويتاتك والأصوات التي تشاركها.",
+  "Share this link in the Free sounds tab": "شارك هذا الرابط في تبويب الأصوات المجانية",
+  "Free sounds": "أصوات مجانية"
 }

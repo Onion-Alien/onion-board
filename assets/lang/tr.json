@@ -3519,7 +3519,6 @@
   "Shared by a player": "Bir oyuncu paylaştı",
   "Sharing…": "Paylaşılıyor…",
   "Sound store": "Ses mağazası",
-  "Store": "Mağaza",
   "Tags": "Etiketler",
   "Tags, with commas (optional): meme, horn, game": "Etiketler, virgülle (isteğe bağlı): meme, korna, oyun",
   "Thanks for sharing!": "Paylaştığın için teşekkürler!",
@@ -3531,7 +3530,6 @@
   "That sound is already in the store.": "Bu ses zaten mağazada.",
   "That sound isn't in the store any more.": "Bu ses artık mağazada değil.",
   "That's a lot for one day. Try again tomorrow.": "Bir gün için çok fazla. Yarın tekrar dene.",
-  "The Store tab: the project's own sound store, for its list, the sounds you play or add, your votes and the sounds you share.": "Mağaza sekmesi: projenin kendi ses mağazası; listesi, çaldığın ya da eklediğin sesler, oyların ve paylaştığın sesler için.",
   "The best voted first": "En çok oy alanlar önce",
   "The newest first": "En yeniler önce",
   "The sound store had a problem. Try again in a bit.": "Ses mağazasında bir sorun oldu. Birazdan tekrar dene.",
@@ -3550,7 +3548,6 @@
   "Paste a link and name it first": "Önce bir bağlantı yapıştır ve ad ver",
   "Paste a link: https://www.youtube.com/watch?v=…": "Bağlantı yapıştır: https://www.youtube.com/watch?v=…",
   "Play it once (from the site)": "Bir kez çal (siteden)",
-  "Share this link in the Store tab": "Bu bağlantıyı Mağaza sekmesinde paylaş",
   "Share to the store": "Mağazada paylaş",
   "The store takes links to YouTube, TikTok, SoundCloud and other video and sound sites.": "Mağaza YouTube, TikTok, SoundCloud ve diğer video ve ses sitelerine bağlantılar alır.",
   "{site} link": "{site} bağlantısı",
@@ -3582,5 +3579,8 @@
   "Keys in games": "Oyunlarda tuşlar",
   "With this on, a hotkey still does its normal job too: press F1 in a game and the game gets F1 while your sound plays. Off: only Onion Board gets the key, so a hotkey on W stops you walking.": "Bu açıkken kısayol tuşu normal işini de yapar: oyunda F1'e bas, sesin çalarken oyun da F1'i alır. Kapalı: tuşu yalnızca Onion Board alır, yani W'ye atanmış bir kısayol yürümeni engeller.",
   "See everything waiting to play": "Çalmayı bekleyen her şeyi gör",
-  "Take everything out of the queue": "Sıradaki her şeyi çıkar"
+  "Take everything out of the queue": "Sıradaki her şeyi çıkar",
+  "The Free sounds tab: the project's own sound store, for its list, the sounds you play or add, your votes and the sounds you share.": "Ücretsiz sesler sekmesi: projenin kendi ses mağazası; listesi, çaldığın ya da eklediğin sesler, oyların ve paylaştığın sesler için.",
+  "Share this link in the Free sounds tab": "Bu bağlantıyı Ücretsiz sesler sekmesinde paylaş",
+  "Free sounds": "Ücretsiz sesler"
 }

@@ -3442,7 +3442,6 @@
   "Shared by a player": "ผู้เล่นคนหนึ่งแชร์",
   "Sharing…": "กำลังแชร์…",
   "Sound store": "ร้านเสียง",
-  "Store": "ร้าน",
   "Tags": "แท็ก",
   "Tags, with commas (optional): meme, horn, game": "แท็ก คั่นด้วยจุลภาค (ไม่บังคับ): มีม, แตร, เกม",
   "Thanks for sharing!": "ขอบคุณที่แชร์!",
@@ -3454,7 +3453,6 @@
   "That sound is already in the store.": "เสียงนั้นอยู่ในร้านแล้ว",
   "That sound isn't in the store any more.": "เสียงนั้นไม่อยู่ในร้านแล้ว",
   "That's a lot for one day. Try again tomorrow.": "วันเดียวเยอะไปแล้ว ลองอีกครั้งพรุ่งนี้",
-  "The Store tab: the project's own sound store, for its list, the sounds you play or add, your votes and the sounds you share.": "แท็บร้าน: ร้านเสียงของโปรเจกต์เอง สำหรับรายการ เสียงที่คุณเล่นหรือเพิ่ม โหวตของคุณ และเสียงที่คุณแชร์",
   "The best voted first": "โหวตมากสุดก่อน",
   "The newest first": "ใหม่สุดก่อน",
   "The sound store had a problem. Try again in a bit.": "ร้านเสียงมีปัญหา ลองอีกครั้งในอีกสักครู่",
@@ -3473,7 +3471,6 @@
   "Paste a link and name it first": "วางลิงก์และตั้งชื่อก่อน",
   "Paste a link: https://www.youtube.com/watch?v=…": "วางลิงก์: https://www.youtube.com/watch?v=…",
   "Play it once (from the site)": "เล่นหนึ่งครั้ง (จากเว็บ)",
-  "Share this link in the Store tab": "แชร์ลิงก์นี้ในแท็บร้าน",
   "Share to the store": "แชร์ไปที่ร้าน",
   "The store takes links to YouTube, TikTok, SoundCloud and other video and sound sites.": "ร้านรับลิงก์ไป YouTube, TikTok, SoundCloud และเว็บวิดีโอและเสียงอื่นๆ",
   "{site} link": "ลิงก์ {site}",
@@ -3505,5 +3502,8 @@
   "Keys in games": "ปุ่มในเกม",
   "With this on, a hotkey still does its normal job too: press F1 in a game and the game gets F1 while your sound plays. Off: only Onion Board gets the key, so a hotkey on W stops you walking.": "เมื่อเปิดไว้ ปุ่มลัดยังทำงานปกติของมันด้วย: กด F1 ในเกม เกมก็ได้รับ F1 ขณะที่เสียงของคุณเล่น ปิด: มีแค่ Onion Board ที่ได้รับปุ่ม ปุ่มลัดบน W จึงทำให้คุณเดินไม่ได้",
   "See everything waiting to play": "ดูทุกอย่างที่รอเล่น",
-  "Take everything out of the queue": "เอาทุกอย่างออกจากคิว"
+  "Take everything out of the queue": "เอาทุกอย่างออกจากคิว",
+  "The Free sounds tab: the project's own sound store, for its list, the sounds you play or add, your votes and the sounds you share.": "แท็บเสียงฟรี: ร้านเสียงของโปรเจกต์เอง สำหรับรายการ เสียงที่คุณเล่นหรือเพิ่ม โหวตของคุณ และเสียงที่คุณแชร์",
+  "Share this link in the Free sounds tab": "แชร์ลิงก์นี้ในแท็บเสียงฟรี",
+  "Free sounds": "เสียงฟรี"
 }

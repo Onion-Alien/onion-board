@@ -3596,7 +3596,6 @@
   "Shared by a player": "Поделился игрок",
   "Sharing…": "Отправка…",
   "Sound store": "Магазин звуков",
-  "Store": "Магазин",
   "Tags": "Теги",
   "Tags, with commas (optional): meme, horn, game": "Теги через запятую (необязательно): мем, гудок, игра",
   "Thanks for sharing!": "Спасибо, что поделились!",
@@ -3608,7 +3607,6 @@
   "That sound is already in the store.": "Этот звук уже есть в магазине.",
   "That sound isn't in the store any more.": "Этого звука больше нет в магазине.",
   "That's a lot for one day. Try again tomorrow.": "Это много для одного дня. Попробуйте завтра.",
-  "The Store tab: the project's own sound store, for its list, the sounds you play or add, your votes and the sounds you share.": "Вкладка «Магазин»: собственный магазин звуков проекта, для его списка, звуков, которые вы слушаете или добавляете, ваших голосов и звуков, которыми вы делитесь.",
   "The best voted first": "Сначала лучшие по голосам",
   "The newest first": "Сначала новые",
   "The sound store had a problem. Try again in a bit.": "У магазина звуков возникла проблема. Попробуйте чуть позже.",
@@ -3627,7 +3625,6 @@
   "Paste a link and name it first": "Сначала вставьте ссылку и назовите её",
   "Paste a link: https://www.youtube.com/watch?v=…": "Вставьте ссылку: https://www.youtube.com/watch?v=…",
   "Play it once (from the site)": "Проиграть один раз (с сайта)",
-  "Share this link in the Store tab": "Поделиться этой ссылкой во вкладке «Магазин»",
   "Share to the store": "Поделиться в магазине",
   "The store takes links to YouTube, TikTok, SoundCloud and other video and sound sites.": "Магазин принимает ссылки на YouTube, TikTok, SoundCloud и другие сайты с видео и звуками.",
   "{site} link": "Ссылка {site}",
@@ -3659,5 +3656,8 @@
   "Keys in games": "Клавиши в играх",
   "With this on, a hotkey still does its normal job too: press F1 in a game and the game gets F1 while your sound plays. Off: only Onion Board gets the key, so a hotkey on W stops you walking.": "Когда включено, горячая клавиша делает и свою обычную работу: нажми F1 в игре, и игра получит F1, пока играет твой звук. Выключено: клавишу получает только Onion Board, так что горячая клавиша на W не даст тебе ходить.",
   "See everything waiting to play": "Показать всё, что ждёт своей очереди",
-  "Take everything out of the queue": "Убрать всё из очереди"
+  "Take everything out of the queue": "Убрать всё из очереди",
+  "The Free sounds tab: the project's own sound store, for its list, the sounds you play or add, your votes and the sounds you share.": "Вкладка «Бесплатные звуки»: собственный магазин звуков проекта, для его списка, звуков, которые вы слушаете или добавляете, ваших голосов и звуков, которыми вы делитесь.",
+  "Share this link in the Free sounds tab": "Поделиться этой ссылкой во вкладке «Бесплатные звуки»",
+  "Free sounds": "Бесплатные звуки"
 }

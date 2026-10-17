@@ -3519,7 +3519,6 @@
   "Shared by a player": "Pelaajan jakama",
   "Sharing…": "Jaetaan…",
   "Sound store": "Äänikauppa",
-  "Store": "Kauppa",
   "Tags": "Tunnisteet",
   "Tags, with commas (optional): meme, horn, game": "Tunnisteet pilkuilla (valinnainen): meme, torvi, peli",
   "Thanks for sharing!": "Kiitos jakamisesta!",
@@ -3531,7 +3530,6 @@
   "That sound is already in the store.": "Se ääni on jo kaupassa.",
   "That sound isn't in the store any more.": "Se ääni ei ole enää kaupassa.",
   "That's a lot for one day. Try again tomorrow.": "Se on paljon yhdelle päivälle. Yritä huomenna uudelleen.",
-  "The Store tab: the project's own sound store, for its list, the sounds you play or add, your votes and the sounds you share.": "Kauppa-välilehti: projektin oma äänikauppa, sen lista, soittamasi tai lisäämäsi äänet, äänesi ja jakamasi äänet.",
   "The best voted first": "Parhaiten äänestetyt ensin",
   "The newest first": "Uusimmat ensin",
   "The sound store had a problem. Try again in a bit.": "Äänikaupassa oli ongelma. Yritä hetken päästä uudelleen.",
@@ -3550,7 +3548,6 @@
   "Paste a link and name it first": "Liitä ensin linkki ja anna sille nimi",
   "Paste a link: https://www.youtube.com/watch?v=…": "Liitä linkki: https://www.youtube.com/watch?v=…",
   "Play it once (from the site)": "Soita kerran (sivustolta)",
-  "Share this link in the Store tab": "Jaa tämä linkki Kauppa-välilehdellä",
   "Share to the store": "Jaa kauppaan",
   "The store takes links to YouTube, TikTok, SoundCloud and other video and sound sites.": "Kauppa ottaa linkkejä YouTubeen, TikTokiin, SoundCloudiin ja muille video- ja äänisivustoille.",
   "{site} link": "{site}-linkki",
@@ -3582,5 +3579,8 @@
   "Keys in games": "Näppäimet peleissä",
   "With this on, a hotkey still does its normal job too: press F1 in a game and the game gets F1 while your sound plays. Off: only Onion Board gets the key, so a hotkey on W stops you walking.": "Kun tämä on päällä, pikanäppäin tekee myös tavallisen työnsä: paina F1 pelissä, niin peli saa F1:n samalla kun äänesi soi. Pois: vain Onion Board saa näppäimen, joten W:n pikanäppäin estää sinua kävelemästä.",
   "See everything waiting to play": "Näytä kaikki toistoa odottavat",
-  "Take everything out of the queue": "Poista kaikki jonosta"
+  "Take everything out of the queue": "Poista kaikki jonosta",
+  "The Free sounds tab: the project's own sound store, for its list, the sounds you play or add, your votes and the sounds you share.": "Ilmaiset äänet -välilehti: projektin oma äänikauppa, sen lista, soittamasi tai lisäämäsi äänet, äänesi ja jakamasi äänet.",
+  "Share this link in the Free sounds tab": "Jaa tämä linkki Ilmaiset äänet -välilehdellä",
+  "Free sounds": "Ilmaiset äänet"
 }

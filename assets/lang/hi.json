@@ -3519,7 +3519,6 @@
   "Shared by a player": "एक खिलाड़ी ने शेयर की",
   "Sharing…": "शेयर हो रही है…",
   "Sound store": "साउंड स्टोर",
-  "Store": "स्टोर",
   "Tags": "टैग",
   "Tags, with commas (optional): meme, horn, game": "टैग, कॉमा से अलग (वैकल्पिक): मीम, हॉर्न, गेम",
   "Thanks for sharing!": "शेयर करने के लिए धन्यवाद!",
@@ -3531,7 +3530,6 @@
   "That sound is already in the store.": "वह साउंड पहले से स्टोर में है।",
   "That sound isn't in the store any more.": "वह साउंड अब स्टोर में नहीं है।",
   "That's a lot for one day. Try again tomorrow.": "एक दिन के लिए यह बहुत है। कल फिर कोशिश करें।",
-  "The Store tab: the project's own sound store, for its list, the sounds you play or add, your votes and the sounds you share.": "स्टोर टैब: प्रोजेक्ट का अपना साउंड स्टोर, उसकी सूची, आपकी चलाई या जोड़ी गई साउंड, आपके वोट और आपकी शेयर की गई साउंड के लिए।",
   "The best voted first": "सबसे ज़्यादा वोट वाली पहले",
   "The newest first": "सबसे नई पहले",
   "The sound store had a problem. Try again in a bit.": "साउंड स्टोर में कोई दिक्कत आई। थोड़ी देर में फिर कोशिश करें।",
@@ -3550,7 +3548,6 @@
   "Paste a link and name it first": "पहले लिंक पेस्ट करें और उसे नाम दें",
   "Paste a link: https://www.youtube.com/watch?v=…": "लिंक पेस्ट करें: https://www.youtube.com/watch?v=…",
   "Play it once (from the site)": "एक बार चलाएँ (साइट से)",
-  "Share this link in the Store tab": "यह लिंक स्टोर टैब में शेयर करें",
   "Share to the store": "स्टोर में शेयर करें",
   "The store takes links to YouTube, TikTok, SoundCloud and other video and sound sites.": "स्टोर YouTube, TikTok, SoundCloud और दूसरी वीडियो व साउंड साइटों के लिंक लेता है।",
   "{site} link": "{site} लिंक",
@@ -3582,5 +3579,8 @@
   "Keys in games": "गेम में कीज़",
   "With this on, a hotkey still does its normal job too: press F1 in a game and the game gets F1 while your sound plays. Off: only Onion Board gets the key, so a hotkey on W stops you walking.": "यह चालू होने पर हॉटकी अपना सामान्य काम भी करती है: गेम में F1 दबाएँ और गेम को F1 मिलता है, साथ ही आपकी साउंड बजती है। बंद: की सिर्फ़ Onion Board को मिलती है, इसलिए W पर हॉटकी आपको चलने नहीं देती।",
   "See everything waiting to play": "चलने का इंतज़ार कर रही सब चीज़ें देखें",
-  "Take everything out of the queue": "कतार से सब कुछ हटाएँ"
+  "Take everything out of the queue": "कतार से सब कुछ हटाएँ",
+  "The Free sounds tab: the project's own sound store, for its list, the sounds you play or add, your votes and the sounds you share.": "मुफ़्त साउंड टैब: प्रोजेक्ट का अपना साउंड स्टोर, उसकी सूची, आपकी चलाई या जोड़ी गई साउंड, आपके वोट और आपकी शेयर की गई साउंड के लिए।",
+  "Share this link in the Free sounds tab": "यह लिंक मुफ़्त साउंड टैब में शेयर करें",
+  "Free sounds": "मुफ़्त साउंड"
 }

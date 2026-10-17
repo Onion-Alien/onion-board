@@ -3596,7 +3596,6 @@
   "Shared by a player": "Distribuit de un jucător",
   "Sharing…": "Se distribuie…",
   "Sound store": "Magazin de sunete",
-  "Store": "Magazin",
   "Tags": "Etichete",
   "Tags, with commas (optional): meme, horn, game": "Etichete, cu virgule (opțional): meme, claxon, joc",
   "Thanks for sharing!": "Mersi că ai distribuit!",
@@ -3608,7 +3607,6 @@
   "That sound is already in the store.": "Sunetul e deja în magazin.",
   "That sound isn't in the store any more.": "Sunetul nu mai e în magazin.",
   "That's a lot for one day. Try again tomorrow.": "E mult pentru o zi. Încearcă din nou mâine.",
-  "The Store tab: the project's own sound store, for its list, the sounds you play or add, your votes and the sounds you share.": "Fila Magazin: magazinul de sunete al proiectului, pentru listă, sunetele pe care le asculți sau le adaugi, voturile tale și sunetele pe care le distribui.",
   "The best voted first": "Cele mai votate întâi",
   "The newest first": "Cele mai noi întâi",
   "The sound store had a problem. Try again in a bit.": "Magazinul de sunete a avut o problemă. Încearcă din nou puțin mai târziu.",
@@ -3627,7 +3625,6 @@
   "Paste a link and name it first": "Întâi lipește un link și dă-i un nume",
   "Paste a link: https://www.youtube.com/watch?v=…": "Lipește un link: https://www.youtube.com/watch?v=…",
   "Play it once (from the site)": "Redă o dată (de pe site)",
-  "Share this link in the Store tab": "Distribuie acest link în fila Magazin",
   "Share to the store": "Distribuie în magazin",
   "The store takes links to YouTube, TikTok, SoundCloud and other video and sound sites.": "Magazinul primește linkuri către YouTube, TikTok, SoundCloud și alte site-uri de video și sunet.",
   "{site} link": "Link {site}",
@@ -3659,5 +3656,8 @@
   "Keys in games": "Taste în jocuri",
   "With this on, a hotkey still does its normal job too: press F1 in a game and the game gets F1 while your sound plays. Off: only Onion Board gets the key, so a hotkey on W stops you walking.": "Când e pornit, o tastă rapidă își face și treaba obișnuită: apasă F1 într-un joc și jocul primește F1 în timp ce sunetul tău cântă. Oprit: doar Onion Board primește tasta, așa că o tastă rapidă pe W te oprește din mers.",
   "See everything waiting to play": "Vezi tot ce așteaptă să fie redat",
-  "Take everything out of the queue": "Scoate tot din coadă"
+  "Take everything out of the queue": "Scoate tot din coadă",
+  "The Free sounds tab: the project's own sound store, for its list, the sounds you play or add, your votes and the sounds you share.": "Fila Sunete gratuite: magazinul de sunete al proiectului, pentru listă, sunetele pe care le asculți sau le adaugi, voturile tale și sunetele pe care le distribui.",
+  "Share this link in the Free sounds tab": "Distribuie acest link în fila Sunete gratuite",
+  "Free sounds": "Sunete gratuite"
 }

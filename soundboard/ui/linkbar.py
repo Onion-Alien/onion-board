@@ -34,7 +34,7 @@ from soundboard.i18n import _
 log = logging.getLogger(__name__)
 
 PLAY_ID = "__link__"   # the engine voice of Play once
-MAX_QUEUED = 3         # picks of other links waiting their turn
+MAX_QUEUED = 30        # Adds of other links waiting their turn (Plays always queue)
 
 
 def _drop_temp(path) -> None:
@@ -84,6 +84,9 @@ class LinkBar(QFrame):
         # the link, like _got: a 15-minute song is ~170 MB
         self._kept = None
         self._queued = ""             # "add" / "play" asked for while another download ran
+        # ...on that running link (url, title, seconds): another card clicked or a search
+        # typed meanwhile doesn't drop it, it runs once that download is over
+        self._queued_pick = ("", "", 0.0)
         # (title, int16 audio, gain, url) of Plays that finished downloading while
         # another link was playing: they wait their turn instead of cutting it off
         self._up_next: list[tuple] = []
@@ -139,11 +142,8 @@ class LinkBar(QFrame):
         url = ytdl.as_link(text)
         if url == self.url:
             return
-        if self._queued:   # a pick waiting its turn is dropped: its row stops waiting
-            self.done.emit(self.url, self._queued, False)
         self.url = url
         self.title = ""
-        self._queued = ""
         self._blocked = ""
         self._fixable = ""
         if url:
@@ -174,10 +174,7 @@ class LinkBar(QFrame):
         """A video picked from the YouTube search: already looked up, so no probe."""
         self._via.setdefault(url, "search")   # a pasted link's own card stays "link"
         if url != self.url:
-            if self._queued:   # a pick waiting its turn is replaced: its row stops waiting
-                self.done.emit(self.url, self._queued, False)
             self.url = url
-            self._queued = ""
             self._blocked = ""
             self._fixable = ""
             self._drop_download()
@@ -231,7 +228,7 @@ class LinkBar(QFrame):
             if self.url == self._busy_url:
                 if self._busy == "add" or self._queued == "add":
                     return True
-                self._queued = "add"
+                self._queue_same("add")
                 return True
             return self._queue("add")
         self._start("add")
@@ -247,7 +244,7 @@ class LinkBar(QFrame):
         if self._busy and self._busy_url == self.url:
             if self._queued == "play":
                 return True
-            self._queued = "play"
+            self._queue_same("play")
             return True
         # another link is downloading: this one waits its turn. A Play already
         # loading isn't dropped: five Plays play all five, one after another (_play)
@@ -262,6 +259,11 @@ class LinkBar(QFrame):
             return True
         self._start("play")
         return True
+
+    def _queue_same(self, kind: str):
+        """Add and Play on the link that's downloading: the other one runs after it."""
+        self._queued = kind
+        self._queued_pick = (self.url, self.title or self._busy_title, self._secs)
 
     def _queue(self, kind: str) -> bool:
         """Another sound's download is running: an Add waits at the back of the queue,
@@ -333,7 +335,7 @@ class LinkBar(QFrame):
             self._stop.set()   # the worker skips the import / decode if not there yet
         self._busy, self._busy_url = "", ""
         self.done.emit(url, kind, False)
-        if self._queued and url == self.url:   # Add + Play on that link: both stop
+        if self._queued and url == self._queued_pick[0]:   # Add + Play on that link: both stop
             queued, self._queued = self._queued, ""
             self.done.emit(url, queued, False)
         self._buttons()
@@ -633,6 +635,11 @@ class LinkBar(QFrame):
                 busy.toast(self.window(), _("✓ Added <b>{name}</b> to your Sounds.",
                                             name=html.escape(meta.name)), "ok")
             self.done.emit(url, "add", True)
+            if not current and self._queued == "play" and url == self._queued_pick[0]:
+                # its Play was clicked too, then another card: it plays now, with no
+                # second download
+                self._queued = ""
+                self.done.emit(url, "play", self._play(data, meta.level_gain, busy_title, url))
         elif kind == "play":
             path, data, gain = payload
             if current:
@@ -651,7 +658,7 @@ class LinkBar(QFrame):
                 busy.toast(self.window(), payload, "error", 8000)
             self.failed.emit(url, was or "add")
             self.done.emit(url, was or "add", False)
-            if current and self._queued:
+            if self._queued and url == self._queued_pick[0]:
                 # Both clicks were waiting for this same failed download. A second
                 # fetch would leave an error visible even if the retry succeeded.
                 queued, self._queued = self._queued, ""
@@ -670,8 +677,11 @@ class LinkBar(QFrame):
         """The download finished or was cancelled: start what's waiting. The same
         link's other action first (Play after Add needs no download), then the other
         links' picks in the order they were clicked."""
-        if self._queued and self.url and not self._busy:
+        if self._queued and not self._busy:
             queued, self._queued = self._queued, ""
+            url, title, secs = self._queued_pick
+            if url != self.url:   # another card was picked meanwhile
+                self.open(url, title, secs)
             self.add() if queued == "add" else self.play_once()
         while self._queue_list and not self._busy:
             q = self._queue_list.pop(0)

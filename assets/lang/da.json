@@ -3519,7 +3519,6 @@
   "Shared by a player": "Delt af en spiller",
   "Sharing…": "Deler…",
   "Sound store": "Lydbutik",
-  "Store": "Butik",
   "Tags": "Tags",
   "Tags, with commas (optional): meme, horn, game": "Tags, med kommaer (valgfrit): meme, horn, spil",
   "Thanks for sharing!": "Tak, fordi du deler!",
@@ -3531,7 +3530,6 @@
   "That sound is already in the store.": "Den lyd er allerede i butikken.",
   "That sound isn't in the store any more.": "Den lyd er ikke i butikken længere.",
   "That's a lot for one day. Try again tomorrow.": "Det er meget for én dag. Prøv igen i morgen.",
-  "The Store tab: the project's own sound store, for its list, the sounds you play or add, your votes and the sounds you share.": "Fanen Butik: projektets egen lydbutik, til listen, de lyde du afspiller eller tilføjer, dine stemmer og de lyde du deler.",
   "The best voted first": "De bedst stemte først",
   "The newest first": "De nyeste først",
   "The sound store had a problem. Try again in a bit.": "Lydbutikken havde et problem. Prøv igen om lidt.",
@@ -3550,7 +3548,6 @@
   "Paste a link and name it first": "Indsæt et link, og giv det et navn først",
   "Paste a link: https://www.youtube.com/watch?v=…": "Indsæt et link: https://www.youtube.com/watch?v=…",
   "Play it once (from the site)": "Afspil den én gang (fra siden)",
-  "Share this link in the Store tab": "Del dette link i fanen Butik",
   "Share to the store": "Del i butikken",
   "The store takes links to YouTube, TikTok, SoundCloud and other video and sound sites.": "Butikken tager links til YouTube, TikTok, SoundCloud og andre video- og lydsider.",
   "{site} link": "{site}-link",
@@ -3582,5 +3579,8 @@
   "Keys in games": "Taster i spil",
   "With this on, a hotkey still does its normal job too: press F1 in a game and the game gets F1 while your sound plays. Off: only Onion Board gets the key, so a hotkey on W stops you walking.": "Når det er slået til, gør en genvejstast også sit normale job: tryk F1 i et spil, og spillet får F1, mens din lyd spiller. Fra: kun Onion Board får tasten, så en genvejstast på W stopper dig i at gå.",
   "See everything waiting to play": "Se alt, der venter på at blive afspillet",
-  "Take everything out of the queue": "Tag alt ud af køen"
+  "Take everything out of the queue": "Tag alt ud af køen",
+  "The Free sounds tab: the project's own sound store, for its list, the sounds you play or add, your votes and the sounds you share.": "Fanen Gratis lyde: projektets egen lydbutik, til listen, de lyde du afspiller eller tilføjer, dine stemmer og de lyde du deler.",
+  "Share this link in the Free sounds tab": "Del dette link i fanen Gratis lyde",
+  "Free sounds": "Gratis lyde"
 }
