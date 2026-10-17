@@ -4027,6 +4027,12 @@
   "Bun does a new act on every loading screen. Click Bun or Hoot and they talk like their theme's character.": "Bun 在每個載入畫面上都會執行一個新操作。點擊“髮髻”或“叫聲”，他們就會像主題人物一樣說話。",
   "Watch for Golden, Ice, Galaxy and Rainbow Bun. Rainbow Bun appears only once in 50,000 starts.": "留意金麵包、冰麵包、銀河麵包和彩虹麵包。彩虹包子每 50,000 次才出現一次。",
   "No mic is open, so there's no voice to change. Plug one in, or pick it in Settings → Audio.": "麥克風未開啟，沒有可以變的聲音。插上一個，或在 設定 → 音訊 裡選好它。",
+  "Only you hear it, in your headphones": "只有你聽得到，在你的耳機裡",
+  "Play for me": "只放給我聽",
+  "Play through mic": "透過麥克風播放",
+  "Recordings": "錄音",
+  "Recordings ({n})": "錄音 ({n})",
+  "Record your voice as others hear it. It goes in Recordings, above": "照別人聽到的樣子錄下你的聲音，會放進上方的「錄音」",
   "Add sounds: files, a folder, a recording or a link (or drag files onto the window)": "新增聲音：檔案、資料夾、錄音或連結（或把檔案拖到視窗上）",
   "Drag to change the order": "拖曳以調整順序",
   "Play it now": "立即播放"

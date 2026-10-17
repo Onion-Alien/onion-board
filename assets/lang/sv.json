@@ -4106,6 +4106,12 @@
   "Bun does a new act on every loading screen. Click Bun or Hoot and they talk like their theme's character.": "Bun gör en ny handling på varje laddningsskärm. Klicka på Bun eller Hoot och de pratar som deras temas karaktär.",
   "Watch for Golden, Ice, Galaxy and Rainbow Bun. Rainbow Bun appears only once in 50,000 starts.": "Håll utkik efter Golden, Ice, Galaxy och Rainbow Bun. Rainbow Bun dyker bara upp en gång på 50 000 starter.",
   "No mic is open, so there's no voice to change. Plug one in, or pick it in Settings → Audio.": "Ingen mikrofon är öppen, så det finns ingen röst att ändra. Koppla in en eller välj den under Inställningar → Ljud.",
+  "Only you hear it, in your headphones": "Bara du hör det, i dina hörlurar",
+  "Play for me": "Spela för mig",
+  "Play through mic": "Spela genom micken",
+  "Recordings": "Inspelningar",
+  "Recordings ({n})": "Inspelningar ({n})",
+  "Record your voice as others hear it. It goes in Recordings, above": "Spela in din röst som andra hör den. Den hamnar i Inspelningar, ovanför",
   "Add sounds: files, a folder, a recording or a link (or drag files onto the window)": "Lägg till ljud: filer, en mapp, en inspelning eller en länk (eller dra filer till fönstret)",
   "Drag to change the order": "Dra för att ändra ordningen",
   "Play it now": "Spela nu"

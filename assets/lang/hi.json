@@ -4106,6 +4106,12 @@
   "Bun does a new act on every loading screen. Click Bun or Hoot and they talk like their theme's character.": "बन प्रत्येक लोडिंग स्क्रीन पर एक नया कार्य करता है। बन या हूट पर क्लिक करें और वे अपने विषय के चरित्र की तरह बात करते हैं।",
   "Watch for Golden, Ice, Galaxy and Rainbow Bun. Rainbow Bun appears only once in 50,000 starts.": "गोल्डन, आइस, गैलेक्सी और रेनबो बन पर नजर रखें। रेनबो बन 50,000 प्रारंभों में केवल एक बार दिखाई देता है।",
   "No mic is open, so there's no voice to change. Plug one in, or pick it in Settings → Audio.": "कोई माइक नहीं खुला है, इसलिए बदलने को कोई आवाज़ नहीं है। एक माइक लगाएँ, या उसे सेटिंग्स → ऑडियो में चुनें।",
+  "Only you hear it, in your headphones": "सिर्फ़ आप सुनते हैं, अपने हेडफ़ोन में",
+  "Play for me": "मेरे लिए चलाएँ",
+  "Play through mic": "माइक से चलाएँ",
+  "Recordings": "रिकॉर्डिंग",
+  "Recordings ({n})": "रिकॉर्डिंग ({n})",
+  "Record your voice as others hear it. It goes in Recordings, above": "अपनी आवाज़ वैसे रिकॉर्ड करें जैसे दूसरे सुनते हैं। यह ऊपर रिकॉर्डिंग में जाती है",
   "Add sounds: files, a folder, a recording or a link (or drag files onto the window)": "साउंड जोड़ें: फ़ाइलें, एक फ़ोल्डर, एक रिकॉर्डिंग या एक लिंक (या फ़ाइलें विंडो पर खींचें)",
   "Drag to change the order": "क्रम बदलने के लिए खींचें",
   "Play it now": "अभी चलाएँ"

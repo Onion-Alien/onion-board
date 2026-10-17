@@ -4027,6 +4027,12 @@
   "Bun does a new act on every loading screen. Click Bun or Hoot and they talk like their theme's character.": "Bun은 로딩 화면마다 새로운 행동을 합니다. Bun이나 Hoot를 클릭하면 테마의 캐릭터처럼 이야기합니다.",
   "Watch for Golden, Ice, Galaxy and Rainbow Bun. Rainbow Bun appears only once in 50,000 starts.": "골든(Golden), 아이스(Ice), 갤럭시(Galaxy), 레인보우 번(Rainbow Bun)을 조심하세요. 레인보우 번은 50,000번의 시작에 한 번만 나타납니다.",
   "No mic is open, so there's no voice to change. Plug one in, or pick it in Settings → Audio.": "열린 마이크가 없어서 바꿀 목소리가 없어요. 마이크를 연결하거나 설정 → 오디오에서 고르세요.",
+  "Only you hear it, in your headphones": "헤드폰으로 나만 들어요",
+  "Play for me": "나만 듣기",
+  "Play through mic": "마이크로 재생",
+  "Recordings": "녹음",
+  "Recordings ({n})": "녹음 ({n})",
+  "Record your voice as others hear it. It goes in Recordings, above": "다른 사람이 듣는 그대로 목소리를 녹음해요. 위의 녹음에 들어가요",
   "Add sounds: files, a folder, a recording or a link (or drag files onto the window)": "사운드 추가: 파일, 폴더, 녹음 또는 링크 (또는 파일을 창으로 끌어오기)",
   "Drag to change the order": "끌어서 순서 바꾸기",
   "Play it now": "지금 재생"

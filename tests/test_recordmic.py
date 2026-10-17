@@ -387,6 +387,69 @@ def test_the_record_window_leaves_the_board_usable(window):  # noqa: F811
     assert window.soundctl._record_dlg is None
 
 
+def test_quick_start_records_your_voice_changed_while_the_voice_changer_is_on(app_dir):
+    for voice_on, source in ((True, "fx"), (False, "mic")):
+        e = both_engine()
+        d = RecordDialog(e, lambda v=voice_on: v, lambda: [], lambda *a: True, lambda: None)
+        d.opt_play.setChecked(True)          # whatever was picked last time
+        assert d.quick_start()
+        assert RecordDialog.last_source == source
+        assert d.take is not None and not d.take.playing and not d.take.both
+        assert d.btn_rec.isChecked()
+        d.discard()
+        RecordDialog.last_source = "mic"
+        d.deleteLater()
+
+
+def test_the_voice_tabs_record_button_opens_the_record_window(window):  # noqa: F811
+    window.voice.bar.record_button.click()
+    d = window.soundctl._record_dlg
+    assert d is not None and d.isVisible()
+    d.discard()
+    d.reject()
+    assert window.soundctl._record_dlg is None
+    RecordDialog.last_source = "mic"
+
+
+def test_the_voice_tabs_record_keeps_it_in_recordings_not_sounds(window):  # noqa: F811
+    from soundboard.clipshelf import VoiceClip, clips_dir
+    recs = window.voice.recordings
+    sounds = len(window.cfg.sounds)
+    window.soundctl.record_dialog(quick=True)
+    d = window.soundctl._record_dlg
+    d.discard()
+    d.data = np.full((SR, 2), 0.2, np.float32)
+    d.name.setText("Bruh")
+    assert d.save()
+    assert len(window.cfg.sounds) == sounds                 # not a pad
+    c = recs.shelf.snapshot()[0]
+    assert c.name == "Bruh" and isinstance(c, VoiceClip)
+    assert c.path.parent == clips_dir("voice-clips") and c.path.is_file()
+    assert not recs.isHidden() and recs.title.isChecked()
+    assert "Recordings (1)" in recs.title.text()
+    RecordDialog.last_source = "mic"
+
+
+def test_recordings_play_for_me_through_mic_and_add_to_sounds(window, monkeypatch):  # noqa: F811
+    recs = window.voice.recordings
+    c = recs.add(np.full((SR // 2, 2), 0.2, np.float32), "Take", "My voice")
+    played = []
+    monkeypatch.setattr(window.engine, "play",
+                        lambda sid, data, gain, mode="", preview=False: played.append(
+                            (sid, preview)) or object())
+    row = recs.list.itemWidget(recs._items[c.id], 4).buttons   # the row's own buttons
+    assert all(b.isVisibleTo(recs) and b.toolTip() for b in row.values())
+    assert not recs.btn_add.isVisibleTo(recs)                   # no bar above the list
+    row["me"].click()
+    row["mic"].click()
+    assert played == [("voiceclips:preview", True), ("voiceclips-send", False)]
+    sounds = len(window.cfg.sounds)
+    row["add"].click()
+    assert len(window.cfg.sounds) == sounds + 1 and window.cfg.sounds[-1].name == "Take"
+    assert recs.shelf.get(c.id) is not None                  # still in the list too
+    recs.stop()
+
+
 # ------------------------------------------------------------------ both at once
 
 def both_engine() -> Engine:

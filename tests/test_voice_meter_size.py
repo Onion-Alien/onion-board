@@ -27,8 +27,9 @@ def test_meter_uses_available_room_after_resizing(qapp, level):
             for _ in range(4):
                 qapp.processEvents()
             if width >= 800:
-                # The persistent stop action reserves its own width beside the meter.
-                assert bar.meter.width() >= (width - bar.stop_button.width()) // 2
+                # Stop and Record reserve their own width beside the meter.
+                buttons = bar.stop_button.width() + bar.record_button.width()
+                assert bar.meter.width() >= (width - buttons) // 2
             assert bar.meter.geometry().right() < bar._mic.width()
             assert bar._right.geometry().right() < bar.width()
     finally:
@@ -99,7 +100,7 @@ def test_translated_mic_status_fits_with_stop_and_meter(qapp, language):
             text_width = label.fontMetrics().horizontalAdvance(label.text())
             assert text_width <= label.contentsRect().width()
             assert bar.meter.width() >= bar.meter.minimumWidth()
-            for widget in (bar.stop_button, label, bar.meter):
+            for widget in (bar.stop_button, bar.record_button, label, bar.meter):
                 rect = widget.rect().translated(widget.mapTo(bar._mic, QPoint()))
                 assert bar._mic.rect().contains(rect)
             assert not bar.stop_button.icon().isNull()

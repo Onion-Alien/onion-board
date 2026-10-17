@@ -4106,6 +4106,12 @@
   "Bun does a new act on every loading screen. Click Bun or Hoot and they talk like their theme's character.": "A Bun minden betöltési képernyőn új műveletet hajt végre. Kattintson a Bun vagy Hoot lehetőségre, és úgy beszélnek, mint a témájuk karaktere.",
   "Watch for Golden, Ice, Galaxy and Rainbow Bun. Rainbow Bun appears only once in 50,000 starts.": "Figyelje a Golden, Ice, Galaxy és Rainbow Bun játékokat. A Rainbow Bun 50 000 indulásból csak egyszer jelenik meg.",
   "No mic is open, so there's no voice to change. Plug one in, or pick it in Settings → Audio.": "Nincs nyitva mikrofon, így nincs mit megváltoztatni. Csatlakoztass egyet, vagy válaszd ki a Beállítások → Hang részben.",
+  "Only you hear it, in your headphones": "Csak te hallod, a fejhallgatódban",
+  "Play for me": "Lejátszás nekem",
+  "Play through mic": "Lejátszás a mikrofonon",
+  "Recordings": "Felvételek",
+  "Recordings ({n})": "Felvételek ({n})",
+  "Record your voice as others hear it. It goes in Recordings, above": "Vedd fel a hangodat úgy, ahogy mások hallják. A Felvételekbe kerül, fent",
   "Add sounds: files, a folder, a recording or a link (or drag files onto the window)": "Hangok hozzáadása: fájlok, mappa, felvétel vagy link (vagy húzz fájlokat az ablakra)",
   "Drag to change the order": "Húzd a sorrend módosításához",
   "Play it now": "Lejátszás most"

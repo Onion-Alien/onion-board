@@ -4027,6 +4027,12 @@
   "Bun does a new act on every loading screen. Click Bun or Hoot and they talk like their theme's character.": "Bun melakukan tindakan baru di setiap layar pemuatan. Klik Bun atau Hoot dan mereka berbicara seperti karakter temanya.",
   "Watch for Golden, Ice, Galaxy and Rainbow Bun. Rainbow Bun appears only once in 50,000 starts.": "Perhatikan Roti Emas, Es, Galaksi, dan Pelangi. Rainbow Bun hanya muncul sekali dalam 50.000 permulaan.",
   "No mic is open, so there's no voice to change. Plug one in, or pick it in Settings → Audio.": "Tidak ada mikrofon yang terbuka, jadi tidak ada suara untuk diubah. Colokkan satu, atau pilih di Pengaturan → Audio.",
+  "Only you hear it, in your headphones": "Hanya kamu yang mendengar, di headphone-mu",
+  "Play for me": "Putar untukku",
+  "Play through mic": "Putar lewat mic",
+  "Recordings": "Rekaman",
+  "Recordings ({n})": "Rekaman ({n})",
+  "Record your voice as others hear it. It goes in Recordings, above": "Rekam suaramu seperti yang didengar orang lain. Masuk ke Rekaman, di atas",
   "Add sounds: files, a folder, a recording or a link (or drag files onto the window)": "Tambah suara: file, folder, rekaman, atau link (atau seret file ke jendela)",
   "Drag to change the order": "Seret untuk mengubah urutan",
   "Play it now": "Putar sekarang"

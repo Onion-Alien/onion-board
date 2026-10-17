@@ -4185,6 +4185,12 @@
   "Bun does a new act on every loading screen. Click Bun or Hoot and they talk like their theme's character.": "Bun face un act nou pe fiecare ecran de încărcare. Faceți clic pe Bun sau Hoot și vorbesc ca personajul temei lor.",
   "Watch for Golden, Ice, Galaxy and Rainbow Bun. Rainbow Bun appears only once in 50,000 starts.": "Uitați-vă la Golden, Ice, Galaxy și Rainbow Bun. Rainbow Bun apare o singură dată la 50.000 de porniri.",
   "No mic is open, so there's no voice to change. Plug one in, or pick it in Settings → Audio.": "Niciun microfon deschis, deci nu e nicio voce de schimbat. Conectează unul sau alege-l în Setări → Audio.",
+  "Only you hear it, in your headphones": "Doar tu auzi, în căști",
+  "Play for me": "Redă pentru mine",
+  "Play through mic": "Redă prin microfon",
+  "Recordings": "Înregistrări",
+  "Recordings ({n})": "Înregistrări ({n})",
+  "Record your voice as others hear it. It goes in Recordings, above": "Înregistrează-ți vocea așa cum o aud ceilalți. Ajunge în Înregistrări, mai sus",
   "Add sounds: files, a folder, a recording or a link (or drag files onto the window)": "Adaugă sunete: fișiere, un folder, o înregistrare sau un link (sau trage fișiere în fereastră)",
   "Drag to change the order": "Trage pentru a schimba ordinea",
   "Play it now": "Redă acum"

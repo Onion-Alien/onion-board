@@ -1,0 +1,1 @@
+- Voice tab: a Record button next to Stop records your voice straight away (as others hear it while the voice changer is on). Saved takes go in a new Recordings list above it, where you can play one to yourself, play it through your mic, or add it to your Sounds.

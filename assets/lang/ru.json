@@ -4185,6 +4185,12 @@
   "Bun does a new act on every loading screen. Click Bun or Hoot and they talk like their theme's character.": "Бан совершает новое действие на каждом экране загрузки. Нажмите «Бун» или «Ух», и они заговорят как персонаж своей темы.",
   "Watch for Golden, Ice, Galaxy and Rainbow Bun. Rainbow Bun appears only once in 50,000 starts.": "Следите за Золотым, Ледяным, Галактическим и Радужным булочками. Радужная булочка появляется только один раз из 50 000 запусков.",
   "No mic is open, so there's no voice to change. Plug one in, or pick it in Settings → Audio.": "Микрофон не открыт, так что менять нечего. Подключите микрофон или выберите его в Настройки → Аудио.",
+  "Only you hear it, in your headphones": "Слышишь только ты, в наушниках",
+  "Play for me": "Включить мне",
+  "Play through mic": "Включить в микрофон",
+  "Recordings": "Записи",
+  "Recordings ({n})": "Записи ({n})",
+  "Record your voice as others hear it. It goes in Recordings, above": "Запиши свой голос так, как его слышат другие. Он попадёт в Записи, выше",
   "Add sounds: files, a folder, a recording or a link (or drag files onto the window)": "Добавить звуки: файлы, папку, запись или ссылку (или перетащи файлы в окно)",
   "Drag to change the order": "Перетащи, чтобы изменить порядок",
   "Play it now": "Включить сейчас"

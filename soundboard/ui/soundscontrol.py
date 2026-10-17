@@ -136,10 +136,11 @@ class SoundsControl(Controller):
                      name=html.escape(meta.name), duration=meta.duration), "ok")
         return meta
 
-    def record_dialog(self):
+    def record_dialog(self, quick: bool = False):
         """Sounds tab → Record: record a sound with the mic, or a bit of what's playing.
         The window doesn't block the board: pads, web results, the radio and Space
-        still work while it's open (to play what's being recorded)."""
+        still work while it's open (to play what's being recorded). `quick` (the Voice
+        tab's Record): it starts recording your voice straight away."""
         mw = self.mw
         from soundboard.ui.recordmic import RecordDialog
         d = getattr(self, "_record_dlg", None)
@@ -156,8 +157,24 @@ class SoundsControl(Controller):
         def open_devices():
             mw.tabs.setCurrentWidget(mw.setup_page)
 
-        d = RecordDialog(mw.engine, voice_on, lambda: [m.name for m in mw.cfg.sounds],
-                         self.add_recording, open_devices, mw,
+        recs = getattr(voice, "recordings", None) if quick else None
+        if recs is not None:
+            names = lambda: [c.name for c in recs.shelf.snapshot()]  # noqa: E731
+
+            def save(data, name, picture: str = "") -> bool:
+                """The Voice tab's Record keeps it in the tab's Recordings."""
+                try:
+                    recs.add(data, name, _("My changed voice")
+                             if RecordDialog.last_source == "fx" else _("My voice"))
+                except OSError as e:
+                    errors.warn(mw, _("Couldn't save clip"), e)
+                    return False
+                recs.title.setChecked(True)
+                recs.list.setFocus()
+                return True
+        else:
+            names, save = (lambda: [m.name for m in mw.cfg.sounds]), self.add_recording
+        d = RecordDialog(mw.engine, voice_on, names, save, open_devices, mw,
                          playing_name=self._playing_name,
                          playing_picture=self._playing_picture)
         self._record_dlg = d
@@ -170,6 +187,8 @@ class SoundsControl(Controller):
         d.finished.connect(closed)
         d.setModal(False)
         d.show()
+        if quick:
+            d.quick_start()
 
     def _playing_name(self) -> str:
         """What's playing now, for naming a recording of it: the player's sound (a pad
