@@ -310,6 +310,7 @@ class StoreTab(QWidget):
         # (in a box that only asks for the two rows' width: asking for one row's, a
         # narrow tab could never get narrow enough to switch to two)
         self.toolbar = QWidget()
+        self.toolbar.setObjectName("storebar")   # (theme.py: Share greyed out while down)
         tv = QVBoxLayout(self.toolbar)
         tv.setContentsMargins(0, 0, 0, 0)
         tv.setSpacing(10)
@@ -468,10 +469,14 @@ class StoreTab(QWidget):
         return _("Share a voice") if self._mode == "voices" else _("Share a sound")
 
     def _share_look(self):
-        """Share's words on it, or (narrow) its icon only with the words as its tooltip."""
+        """Share's words on it, or (narrow) its icon only with the words as its tooltip.
+        Greyed out, saying why, while the store's server is down."""
         label = self._share_label()
+        down = store.is_down()
+        self.btn_share.setEnabled(not down)
         self.btn_share.setText(label if self._share_words else "")
-        self.btn_share.setToolTip("" if self._share_words else label)
+        self.btn_share.setToolTip(store.down_share() if down
+                                  else "" if self._share_words else label)
         self.btn_share.setAccessibleName(label)
 
     def _share_w(self, text: str) -> int:
@@ -699,7 +704,10 @@ class StoreTab(QWidget):
         threading.Thread(target=run, daemon=True, name="store-cats").start()
 
     def _on_cats(self, got):
-        if self._closed or got is None or self._mode != "sounds":
+        if self._closed:
+            return
+        self._share_look()
+        if got is None or self._mode != "sounds":
             return
         cats, _total = got
         # the name, then how many (a number needs no words)
@@ -790,6 +798,7 @@ class StoreTab(QWidget):
             return
         replace, found, down = got
         busy.set_busy(self.btn_more, False)
+        self._share_look()
         if found is None:
             if replace and down:
                 self._clear()
@@ -822,15 +831,21 @@ class StoreTab(QWidget):
             elif self._mode == "voices" and self._kind:
                 self._say("search", _("Nothing matches"), "", _("All"), lambda: self.set_kind(""))
             elif self._mode == "voices":
-                self._say("voice", _("No voices here yet"),
-                          _("Be the first: share a voice you made."), _("Share a voice"),
-                          self.share_voice)
+                if store.is_down():   # (no Share button while it's down)
+                    self._say("voice", _("No voices here yet"), store.down_share())
+                else:
+                    self._say("voice", _("No voices here yet"),
+                              _("Be the first: share a voice you made."), _("Share a voice"),
+                              self.share_voice)
             elif self._cat:   # a way back to All, right here
                 self._say("search", _("Nothing matches"), "", _("All"), lambda: self.set_cat(""))
             else:
-                self._say("store", _("No sounds here yet"),
-                          _("Be the first: share a sound you made."), _("Share a sound"),
-                          self.share)
+                if store.is_down():   # (no Share button while it's down)
+                    self._say("store", _("No sounds here yet"), store.down_share())
+                else:
+                    self._say("store", _("No sounds here yet"),
+                              _("Be the first: share a sound you made."), _("Share a sound"),
+                              self.share)
             return
         self.bun.sad = 0.0
         self.failed = False
@@ -1080,6 +1095,9 @@ class StoreTab(QWidget):
         was downloaded from it)."""
         if not net.allowed(store.FEATURE):
             busy.toast(self.window(), html.escape(net.off_message(store.FEATURE)), "error")
+            return
+        if store.is_down():
+            busy.toast(self.window(), html.escape(store.down_share()), "warn")
             return
         dlg = ShareDialog(self.install(), self, link, name)
         dlg.setAttribute(Qt.WidgetAttribute.WA_DeleteOnClose)
