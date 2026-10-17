@@ -49,7 +49,7 @@ OLD_APP_DIR = winpath.usable_dir(Path(os.environ.get("APPDATA", Path.home())) / 
 SOUNDS_DIR = winpath.usable_dir(APP_DIR / "sounds")
 CACHE_DIR = winpath.usable_dir(APP_DIR / "cache")
 # the tabs with a quick how-to on their first visit (ui/tabtours.py)
-TOUR_TABS = ("radio", "apps", "triggers", "voice", "store")
+TOUR_TABS = ("radio", "apps", "voice", "store")
 CACHE_GRACE_S = 600   # prune_cache leaves a new sound's cache this long (an import in flight)
 # cache files a delete was refused for (still mapped, see _unlink): not new imports, so
 # prune_cache retries them at once instead of after CACHE_GRACE_S
