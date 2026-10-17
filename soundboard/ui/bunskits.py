@@ -1266,6 +1266,72 @@ def _deck(p: QPainter, k, t, wiggle):
     p.restore()
 
 
+MIX_LOOP = 4.0   # seconds: `mixing` comes back round to where it started
+_BEAT = 0.5      # a pad hit every half second
+_PADS = ((21, 101.5), (33, 101.5), (21, 108.5), (33, 108.5))   # the 2 x 2 pads on the desk
+_HITS = (0, 3, 1, 2, 0, 2, 3, 1)   # which pad each beat of the loop hits
+_RECORD = (66.0, 105.0)
+
+
+def mixing(kit: Kit, t: float):
+    """Not a theme's skit: the Live controls' DJ (speedpitch.DjBunny). Bun at a little
+    desk, one paw tapping sound pads on the beat, the other scratching a record, his head
+    bopping. Loops every MIX_LOOP seconds with no seam."""
+    t %= MIX_LOOP
+    kit.prop = ""
+    beat = t / _BEAT
+    n, k = int(beat) % len(_HITS), beat % 1.0
+    tap = max(0.0, 1 - k / 0.3)          # the paw on the pad, lifting off
+    lit = max(0.0, 1 - k * _BEAT / 0.4)   # the pad just hit, fading
+    x0, y0 = _PADS[_HITS[n]]
+    x1, y1 = _PADS[_HITS[(n + 1) % len(_HITS)]]
+    move = eseg(k, 0.4, 0.95)
+    px = lerp(x0, x1, move)
+    py = lerp(y0, y1, move) - 3 - 6 * math.sin(math.pi * seg(k, 0.1, 1.0))
+    wiggle = math.sin(t * 2 * math.pi / _BEAT)   # the record, back and forth
+    kit.world.append(lambda p: _desk(p, t, _HITS[n], lit, wiggle))
+    kit.world.append(lambda p: paw(p, px, py, -10))   # (over the desk, so after it)
+    kit.world.append(lambda p: paw(p, _RECORD[0] + 6 * wiggle, 101, 10))
+    kit.add(nod=5 * math.sin(math.pi * beat), dip=2.5 * tap, ears=-5 * tap)
+    for at in (0.25, 1.25, 2.25, 3.25):   # a note off the record every second
+        kit.world.append(lambda p, at=at: burst(p, t - at, _RECORD[0], 96, 1, 30, 0.7,
+                                                _dj_note, gravity=-10, salt=int(at * 10),
+                                                up=1.2))
+
+
+def _desk(p: QPainter, t, hit: int, lit: float, wiggle):
+    p.save()
+    p.setPen(_ink(1.6))
+    p.setBrush(QColor("#3a3452"))
+    p.drawRoundedRect(QRectF(12, 97, 76, 18), 3.5, 3.5)
+    accent = QColor(theme.T["accent"])
+    for i, (x, y) in enumerate(_PADS):
+        glow = lit if i == hit else 0.0
+        if glow > 0:   # a soft halo round the pad just hit
+            halo = QColor(accent)
+            halo.setAlphaF(0.45 * glow)
+            _oval(p, x, y, 16, 10, halo)
+        base = QColor("#6a6288")
+        c = QColor.fromRgbF(lerp(base.redF(), accent.redF(), glow),
+                            lerp(base.greenF(), accent.greenF(), glow),
+                            lerp(base.blueF(), accent.blueF(), glow))
+        p.setPen(_ink(1.0))
+        p.setBrush(c)
+        p.drawRoundedRect(QRectF(x - 5, y - 2.6, 10, 5.2), 1.4, 1.4)
+    p.setPen(QPen(QColor("#15131f"), 1.6, Qt.PenStyle.SolidLine, Qt.PenCapStyle.RoundCap))
+    p.drawLine(QPointF(45, 100), QPointF(45, 111))   # a fader, riding the beat
+    _oval(p, 45, 105.5 + 3 * math.sin(t * math.pi * 2 / MIX_LOOP * 2), 5, 2.6,
+          QColor("#ffcf40"), _ink(0.9))
+    _oval(p, *_RECORD, 24, 10, QColor("#15131f"), _ink(1.2))   # the record
+    _oval(p, *_RECORD, 7, 3, accent)
+    p.setPen(QPen(QColor(255, 255, 255, 90), 1.0))
+    a = t * 2 * math.pi / MIX_LOOP * 4 + wiggle * 2   # its grooves catching the light
+    cx, cy = _RECORD
+    p.drawLine(QPointF(cx + 8 * math.cos(a), cy + 3 * math.sin(a)),
+               QPointF(cx + 10.5 * math.cos(a), cy + 4 * math.sin(a)))
+    p.restore()
+
+
 def _dj_note(p, x, y, fade, i):
     c = QColor(theme.T["accent"])
     c.setAlphaF(fade)
