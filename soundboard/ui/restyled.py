@@ -4,6 +4,7 @@ gets its fonts and padding at the end, so a width or height measured while it's 
 would be the plain font's; a theme switch changes them too."""
 from __future__ import annotations
 
+import weakref
 from collections.abc import Callable
 
 from PySide6.QtCore import QEvent, QObject
@@ -11,7 +12,9 @@ from PySide6.QtWidgets import QWidget
 from shiboken6 import isValid as qt_valid
 
 _AGAIN = (QEvent.Type.StyleChange, QEvent.Type.FontChange)
-_all: list[_Again] = []
+# weak: a tab that's turned off takes its measurements with it (each is its widget's
+# child, kept alive by it)
+_all: weakref.WeakSet[_Again] = weakref.WeakSet()
 
 
 class _Again(QObject):
@@ -20,7 +23,7 @@ class _Again(QObject):
         self._fn = fn
         self._busy = False   # fn itself may set a font (steady_number): no loop
         w.installEventFilter(self)
-        _all.append(self)
+        _all.add(self)
 
     def run(self):
         if not self._busy:
@@ -45,7 +48,6 @@ def again() -> None:
     """Every measurement again, now. After a whole app's sheet goes on: a widget hears
     StyleChange while Qt is still restyling, and some sizes (a label's padding) are
     only right once it has finished."""
-    _all[:] = [a for a in _all if qt_valid(a)]
     for a in list(_all):
         if qt_valid(a):
             a.run()
