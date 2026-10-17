@@ -214,6 +214,16 @@ def pytest_xdist_auto_num_workers(config):
     return min(4, os.cpu_count() or 1)
 
 
+def pytest_sessionfinish(session, exitstatus):
+    """Empty the clipboard before Python exits: on the offscreen platform a QMimeData
+    still on it (a test copied a clip) crashed the process at exit, after every test
+    had passed. The real Windows platform doesn't."""
+    from PySide6.QtWidgets import QApplication
+    app = QApplication.instance()
+    if app is not None:
+        QApplication.clipboard().clear()
+
+
 @pytest.fixture(scope="session")
 def qapp():
     from PySide6.QtWidgets import QApplication
