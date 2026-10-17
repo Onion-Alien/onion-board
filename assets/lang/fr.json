@@ -870,7 +870,6 @@
   "Grey": "Gris",
   "Group servers by site (googlevideo.com, not each r3---sn-abc.googlevideo.com)": "Regrouper les serveurs par site (googlevideo.com, pas chaque r3---sn-abc.googlevideo.com)",
   "Half (-12 dB)": "Moitié (-12 dB)",
-  "Hey, thanks for actually using this. Onion Board started because every soundboard I tried was either ugly, full of ads, or quietly phoning home, so I made my own and it kind of snowballed from there. It's just me building it, a lot of late nights and a lot of testing, so if something's broken, ugly or confusing, tell me. Honestly. I'd way rather hear \"this part is cooked\" than have you quietly uninstall it.\n\nIt's free and it's staying free. Have fun with it, don't be a menace with it, and go make your friends jump in voice chat.\n\nOnionAlien": "Hé, merci de vraiment utiliser ce truc. Onion Board est né parce que chaque soundboard que j'essayais était soit moche, soit pleine de pubs, soit en train d'envoyer des infos en douce, alors j'ai fait la mienne et ça a fait boule de neige. C'est juste moi qui le construis, plein de nuits blanches et plein de tests, donc si un truc est cassé, moche ou pas clair, dis-le-moi. Franchement. Je préfère mille fois entendre « cette partie est nulle » plutôt que tu le désinstalles en silence.\n\nC'est gratuit et ça va le rester. Amuse-toi avec, ne sois pas une plaie avec, et va faire sursauter tes potes en chat vocal.\n• OnionAlien",
   "Hide after picking a sound": "Masquer après avoir choisi un son",
   "Hide that I'm using Tor": "Cacher que j'utilise Tor",
   "Highlight colour": "Couleur d'accent",
@@ -4067,5 +4066,6 @@
   "yo, what's good?": "yo, quoi de neuf ?",
   "you shall not pass!": "vous ne passerez pas !",
   "you smell like flowers": "tu sens les fleurs",
+  "No ads, no account, no spying, free forever. Found a bug? Tell me. Have fun.\n\nOnionAlien": "Pas de pub, pas de compte, pas d'espionnage, gratuit pour toujours. Un bug ? Dis-le-moi. Amuse-toi bien.\n\nOnionAlien",
   "The store's down right now, so sharing is off. Try again later.": "La boutique est en panne pour l'instant, le partage est donc désactivé. Réessaie plus tard."
 }

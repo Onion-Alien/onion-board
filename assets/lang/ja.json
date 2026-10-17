@@ -850,7 +850,6 @@
   "Grey": "グレー",
   "Group servers by site (googlevideo.com, not each r3---sn-abc.googlevideo.com)": "サーバーをサイトごとにグループ化します (各 r3---sn-abc.googlevideo.com ではなく、googlevideo.com)",
   "Half (-12 dB)": "ハーフ (-12dB)",
-  "Hey, thanks for actually using this. Onion Board started because every soundboard I tried was either ugly, full of ads, or quietly phoning home, so I made my own and it kind of snowballed from there. It's just me building it, a lot of late nights and a lot of testing, so if something's broken, ugly or confusing, tell me. Honestly. I'd way rather hear \"this part is cooked\" than have you quietly uninstall it.\n\nIt's free and it's staying free. Have fun with it, don't be a menace with it, and go make your friends jump in voice chat.\n\nOnionAlien": "やあ、実際にご利用いただきありがとうございます。 Onion Board の始まりは、試したサウンドボードがどれも醜かったり、広告だらけだったり、家に静かに電話をかけてきたりするかのいずれかだったので、自分でサウンドボードを作ったところ、そこから雪だるま式に増えていきました。私一人で、夜遅くまでたくさんのテストをして構築しているので、何かが壊れていたり、醜かったり、混乱したりしている場合は、教えてください。正直に。黙ってアンインストールしてもらうよりも、「この部分は完了しました」と聞いてもらいたいです。それは無料であり、無料のままです。脅威にならずに楽しんで、友達をボイスチャットに参加させましょう。、オニオンエイリアン",
   "Hide after picking a sound": "音を選んだ後に非表示にする",
   "Hide that I'm using Tor": "Tor を使用していることを隠す",
   "Highlight colour": "ハイライトカラー",
@@ -3989,5 +3988,6 @@
   "yo, what's good?": "よう、元気？",
   "you shall not pass!": "ここは通さん！",
   "you smell like flowers": "お花のにおいがする",
+  "No ads, no account, no spying, free forever. Found a bug? Tell me. Have fun.\n\nOnionAlien": "広告なし、アカウント不要、のぞき見なし、ずっと無料。バグを見つけたら教えてね。楽しんで。\n\nOnionAlien",
   "The store's down right now, so sharing is off. Try again later.": "ストアが現在ダウンしているため、共有はオフです。後でもう一度お試しください。"
 }

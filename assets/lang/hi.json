@@ -870,7 +870,6 @@
   "Grey": "स्लेटी",
   "Group servers by site (googlevideo.com, not each r3---sn-abc.googlevideo.com)": "साइट के अनुसार समूह सर्वर (googlevideo.com, प्रत्येक r3---sn-abc.googlevideo.com नहीं)",
   "Half (-12 dB)": "आधा (-12 डीबी)",
-  "Hey, thanks for actually using this. Onion Board started because every soundboard I tried was either ugly, full of ads, or quietly phoning home, so I made my own and it kind of snowballed from there. It's just me building it, a lot of late nights and a lot of testing, so if something's broken, ugly or confusing, tell me. Honestly. I'd way rather hear \"this part is cooked\" than have you quietly uninstall it.\n\nIt's free and it's staying free. Have fun with it, don't be a menace with it, and go make your friends jump in voice chat.\n\nOnionAlien": "अरे, वास्तव में इसका उपयोग करने के लिए धन्यवाद। अनियन बोर्ड की शुरुआत इसलिए हुई क्योंकि मैंने जो भी साउंडबोर्ड आजमाया वह या तो बदसूरत था, विज्ञापनों से भरा था, या चुपचाप घर पर फोन कर रहा था, इसलिए मैंने अपना खुद का बनाया और वहां से यह एक तरह से स्नोबॉल हो गया। इसे मैं ही बना रहा हूं, बहुत देर रात तक और बहुत सारे परीक्षण, इसलिए यदि कुछ टूटा हुआ, बदसूरत या भ्रमित करने वाला है, तो मुझे बताएं। ईमानदारी से। मैं यह सुनना पसंद करूंगा कि \"यह हिस्सा पक गया है\" बजाय इसके कि आप इसे चुपचाप अनइंस्टॉल कर दें। यह मुफ़्त है और यह मुफ़्त रह रहा है। इसके साथ आनंद लें, इसके साथ खतरा न बनें, और अपने दोस्तों को वॉइस चैट में शामिल होने के लिए प्रेरित करें। - ओनियनएलियन",
   "Hide after picking a sound": "आवाज उठाने के बाद छुप जाएं",
   "Hide that I'm using Tor": "छुपाएं कि मैं टोर का उपयोग कर रहा हूं",
   "Highlight colour": "रंग हाइलाइट करें",
@@ -4067,5 +4066,6 @@
   "yo, what's good?": "यो, क्या हाल?",
   "you shall not pass!": "तुम नहीं गुज़र सकते!",
   "you smell like flowers": "तुमसे फूलों की ख़ुशबू आती है",
+  "No ads, no account, no spying, free forever. Found a bug? Tell me. Have fun.\n\nOnionAlien": "न विज्ञापन, न अकाउंट, न जासूसी, हमेशा के लिए मुफ़्त। कोई बग मिला? मुझे बताओ। मज़े करो।\n\nOnionAlien",
   "The store's down right now, so sharing is off. Try again later.": "स्टोर अभी बंद है, इसलिए शेयर करना बंद है। बाद में फिर कोशिश करें।"
 }

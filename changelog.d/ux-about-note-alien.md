@@ -1,0 +1,1 @@
+- Settings > About: a shorter note, said by a new mascot, the Onion Alien, in a speech bubble that types itself out.
