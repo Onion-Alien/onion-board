@@ -109,6 +109,26 @@ def test_ai_action_precedes_choices_and_status_wraps(qapp, monkeypatch, tmp_path
         panel.deleteLater()
 
 
+def test_no_empty_language_frame_before_speech_recognition_is_in(qapp, monkeypatch):
+    """Not installed yet: Speak in is hidden, and so is the frame around it (alone it
+    was an empty box under Install speech recognition)."""
+    monkeypatch.setattr(tts.SapiTTS, "warm_up", lambda self: [])
+    panel = VoicePanel(FakeEngine(), {}, {"tab": "speak"})
+    speech = panel.speech
+    try:
+        panel.show()
+        qapp.processEvents()
+        assert speech.installs.missing.isVisibleTo(speech)
+        assert not speech.lang_box.isVisibleTo(speech)
+        assert not speech.settings_box.isVisibleTo(speech)
+        speech.show_lang_box(True)
+        assert speech.settings_box.isVisibleTo(speech)
+    finally:
+        panel.shutdown()
+        panel.close()
+        panel.deleteLater()
+
+
 @pytest.mark.parametrize("name", ["Dark", "Light"])
 @pytest.mark.parametrize("width", [340, 580])
 def test_languages_card_reads_language_then_who_then_start(qapp, monkeypatch, tmp_path,
@@ -122,6 +142,7 @@ def test_languages_card_reads_language_then_who_then_start(qapp, monkeypatch, tm
         speech.setParent(None)
         speech.title.show()
         speech.livevoice.start_box.show()
+        speech.show_lang_box(True)
         speech.setFixedWidth(width)
         live = speech.livevoice
         live.lbl_state.setText("Starting: the computer voice is getting ready to speak "
