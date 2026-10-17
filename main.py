@@ -29,13 +29,22 @@ if __name__ == "__main__" and sys.argv[1:2] == ["--render-worker"]:
 from soundboard import bootmark  # noqa: E402  (small: no Qt, no sound library)
 
 # no breadcrumb for the one-off commands app.main() runs and exits (one would look like
-# a start that failed: see soundboard/bootmark.py)
+# a start that failed: see soundboard/bootmark.py); the installer runs those itself
 if __name__ == "__main__" and not (set(sys.argv[1:]) & set(bootmark.ONE_OFF)):
+    if bootmark.installing():
+        # the installer is replacing these files: it opens the app once it's done
+        sys.exit(0)
     # a breadcrumb before the heavy import below, so a crash while it loads is counted
     from soundboard import __version__  # noqa: E402
     bootmark.start(__version__)
 
-from soundboard.app import main  # noqa: E402
+try:
+    from soundboard.app import main  # noqa: E402
+except Exception:
+    # the installer started replacing the files while this loaded (bootmark.installing)
+    if __name__ == "__main__" and bootmark.installing():
+        sys.exit(0)
+    raise
 
 if __name__ == "__main__":
     main()

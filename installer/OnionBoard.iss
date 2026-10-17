@@ -164,7 +164,7 @@ Filename: "{app}\{#AppExeName}.exe"; Parameters: "--usage-count on{code:HeardArg
 ; ask for a restart.
 ; FFmpeg, live voice and Tor download from CurStepChanged in [Code] (RunExtra), so the
 ; window keeps working and Cancel can stop them.
-Filename: "{app}\{#AppExeName}.exe"; Description: "Open Onion Board now"; Flags: nowait postinstall skipifsilent
+Filename: "{app}\{#AppExeName}.exe"; Description: "Open Onion Board now"; Flags: nowait postinstall skipifsilent; BeforeInstall: EndInstallingMark
 ; The app's own updater (soundboard/updates.py) runs this silently with /RELAUNCH=1 after
 ; closing itself: open it again once the new version is in place.
 ; Through Explorer, so the app starts with the user's own environment like a
@@ -172,7 +172,7 @@ Filename: "{app}\{#AppExeName}.exe"; Description: "Open Onion Board now"; Flags:
 ; variables (PyInstaller's _PYI_*, PATH / QT_PLUGIN_PATH into its old _internal)
 ; setup inherits, and an app started straight from setup with them crashed on
 ; start (1.3.3 -> 1.4.0: "Importing the numpy C-extensions failed").
-Filename: "{win}\explorer.exe"; Parameters: """{app}\{#AppExeName}.exe"""; Flags: nowait; Check: Relaunch
+Filename: "{win}\explorer.exe"; Parameters: """{app}\{#AppExeName}.exe"""; Flags: nowait; Check: Relaunch; BeforeInstall: EndInstallingMark
 
 [UninstallRun]
 ; Straight into my mic: take Onion Board off the mic first, so every mic is exactly as
@@ -793,6 +793,26 @@ begin
             FileExists(ExpandConstant('{commonpf64}\WinGet\Links\ffmpeg.exe'));
 end;
 
+// installing.txt beside the exe while the files are replaced (soundboard/bootmark.py
+// INSTALLING): the app started meanwhile (a double-click mid-update) quits quietly
+// instead of loading half-copied libraries ("Unhandled exception in script", one box per
+// click). Gone before the app is opened again, and whatever way setup ends.
+var
+  InstallingMark: String;
+
+procedure StartInstallingMark;
+begin
+  ForceDirectories(ExpandConstant('{app}'));
+  InstallingMark := ExpandConstant('{app}\installing.txt');
+  SaveStringToFile(InstallingMark, 'Onion Board setup is replacing these files.', False);
+end;
+
+procedure EndInstallingMark;
+begin
+  if InstallingMark <> '' then
+    DeleteFile(InstallingMark);
+end;
+
 // /RELAUNCH=1: started by the app's "Restart to update" (see [Run])
 function Relaunch: Boolean;
 begin
@@ -933,6 +953,7 @@ procedure DeinitializeSetup;
 var
   Code: Integer;
 begin
+  EndInstallingMark;
   if not CableStarted or CableDone or WizardSilent then
     exit;
   Code := CableExitCode;
@@ -1266,7 +1287,11 @@ end;
 procedure CurStepChanged(CurStep: TSetupStep);
 begin
   if CurStep = ssInstall then
+    StartInstallingMark;
+  if CurStep = ssInstall then
     CheckInternalNotInUse;
+  if CurStep = ssPostInstall then
+    EndInstallingMark;
   // first, right after Install is clicked: Windows' permission box comes up while the
   // user is still looking, not minutes later at the end
   if (CurStep = ssInstall) and MayDownload('vbcable') then
