@@ -36,7 +36,8 @@ def test_splash_follows_the_saved_theme(qapp, tmp_path, monkeypatch):
         assert theme.current_name == "Toxic"
         img = s.grab().toImage()
         assert img.pixelColor(0, 0).alpha() == 0   # transparent outside the rounded panel
-        assert img.pixelColor(20, 20).name() == theme.T["panel"]
+        # bottom left: past both of the theme glow's blobs, the plain panel colour
+        assert img.pixelColor(20, splash.CARD_H - 20).name() == theme.T["panel"]
     finally:
         splash.close()
         theme.set_current(theme.DEFAULT)
@@ -57,6 +58,11 @@ def test_frames_draw_at_any_scale(qapp):
         assert img.pixelColor(0, 0).alpha() == 0
         assert any(img.pixelColor(x, img.height() // 2).alpha() == 255
                    for x in range(img.width()))   # the panel is solid
+
+
+def _panel(x, y):
+    """The bare panel's colour at (x, y): its theme glow, with nothing drawn over it."""
+    return splash._surface(splash.CARD_W, splash.card_h(), 1.0).pixelColor(x, y).name()
 
 
 def _frame(t):
@@ -154,7 +160,7 @@ def test_highlight_and_hop_travel_left_to_right(qapp, monkeypatch):
                 assert img.pixelColor(x + 4, 208) == accent   # visibly larger
             else:
                 assert img.pixelColor(x, 213) == resting
-                assert img.pixelColor(x, 205).name() == theme.T["panel"]
+                assert img.pixelColor(x, 205).name() == _panel(x, 205)
     a, b = _frame(0), _frame(splash.PULSE_S)
     assert a.copy(0, 200, a.width(), 48) == b.copy(0, 200, b.width(), 48)   # seamless repeat
 
@@ -173,8 +179,8 @@ def test_reduced_motion_moves_only_the_colour(qapp, monkeypatch):
         for dot in range(3):
             x = splash.CARD_W // 2 + (dot - 1) * 16
             assert img.pixelColor(x, 213) == (accent if dot == active else resting)
-            assert img.pixelColor(x + 4, 213).name() == theme.T["panel"]   # same size
-            assert img.pixelColor(x, 208).name() == theme.T["panel"]   # no hop
+            assert img.pixelColor(x + 4, 213).name() == _panel(x + 4, 213)   # same size
+            assert img.pixelColor(x, 208).name() == _panel(x, 208)   # no hop
     assert _frame(0) != _frame(splash.PULSE_S / 3)
 
 
@@ -248,3 +254,21 @@ def test_rare_odds_hold_over_millions_of_launches():
     for name, (odds, *_) in splashacts.RARES.items():
         expected = n / odds
         assert abs(counts[name] - expected) <= 6 * math.sqrt(expected), (name, counts[name])
+
+
+def test_panel_has_the_themes_soft_glow(qapp, monkeypatch):
+    """The panel isn't one flat colour: the theme's accent glows behind Bun and fades
+    out lower down. High Contrast keeps its flat panel."""
+    from soundboard import theme
+    from soundboard.ui import splashacts
+    monkeypatch.setattr(splash, "_show", splashacts.Show(act="hop"))
+    try:
+        for name, glows in (("Dark", True), ("High Contrast", False)):
+            theme.set_current(name)
+            splash._surfaces.clear()
+            img = splash._surface(splash.CARD_W, splash.CARD_H, 1.0)
+            top, bottom = img.pixelColor(30, 20), img.pixelColor(30, splash.CARD_H - 20)
+            assert (top != bottom) == glows, name
+    finally:
+        theme.set_current("")
+        splash._surfaces.clear()
