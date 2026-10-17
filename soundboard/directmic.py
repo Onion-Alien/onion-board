@@ -805,6 +805,11 @@ def mic_lookup(name: str | None) -> tuple[str | None, str]:
         exact = [e for e in active if _squash(e["name"]) == _squash(opened)]
         if len(exact) == 1:
             return exact[0]["guid"], ""
+    # the same mic in another USB port: Windows numbers it ("Microphone (2- USB Audio)"
+    # for the saved "Microphone (USB Audio)", or the other way round). Only when one fits
+    same = [e for e in active if _unnumbered(e["name"]) == _unnumbered(name)]
+    if len(same) == 1:
+        return same[0]["guid"], ""
     if len(_near(name, active)) > 1:
         return None, "unsure"
     others = [e for e in endpoints if not e["active"]]
@@ -827,6 +832,12 @@ def _engine_name(name: str) -> str | None:
 def _squash(name: str) -> str:
     """A name with Windows' odd spacing and case ironed out (as engine.find_device)."""
     return " ".join(name.split()).lower()
+
+
+def _unnumbered(name: str) -> str:
+    """_squash(name) without the port number Windows puts in front of a second copy's
+    name: "Microphone (2- USB Audio)" -> "microphone (usb audio)"."""
+    return re.sub(r"\(\d+-\s*", "(", _squash(name))
 
 
 def _near(name: str, mics: list[dict]) -> list[dict]:
