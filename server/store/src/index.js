@@ -5,8 +5,9 @@
 // Nothing here knows who anyone is. The app sends a random install id it made itself
 // (X-Onion-Install); it's kept only as a salted hash, so one install gets one vote per
 // sound. Addresses are kept the same way, only to stop one address flooding the store.
+import { voicesRoute, adminVoicesRoute } from "./voices.js";
 import { ADMIN_PAGE } from "./admin.js";
-import { chatRoute } from "./chat.js";
+import { chatRoute, refuse } from "./chat.js";
 import { syncStep } from "./sync.js";
 
 export { ChatRoom } from "./chat.js";   // the Durable Object wrangler.toml names
@@ -85,6 +86,10 @@ async function route(req, env) {
         "script-src 'unsafe-inline'; media-src 'self' blob:; frame-ancestors 'none'",
       "x-frame-options": "DENY", "referrer-policy": "no-referrer", "cache-control": "no-store" } });
   if (p === "/v1/chat" || /^\/v1\/chat\/\d+\/report$/.test(p)) return chatRoute(req, env);
+  if (p.startsWith("/v1/voices")) {
+    const r = await voicesRoute(req, env, url, p, VOICE_TOOLS);
+    if (r) return r;
+  }
   if (p === "/v1/sounds" && m === "GET") return list(url, req, env);
   if (p === "/v1/categories" && m === "GET") return categories(env);
   if (p === "/v1/sounds" && m === "POST") return upload(req, env);
@@ -98,6 +103,10 @@ async function route(req, env) {
   if (p.startsWith("/v1/admin/")) {
     await admin(req, env);
     if (p === "/v1/admin/chat" || p.startsWith("/v1/admin/chat/")) return chatRoute(req, env);
+    if (p.startsWith("/v1/admin/voices")) {
+      const r = await adminVoicesRoute(req, env, url, p, VOICE_TOOLS);
+      if (r) return r;
+    }
     if (p === "/v1/admin/queue" && m === "GET") return queue(url, env);
     if (p === "/v1/admin/log" && m === "GET") return actionLog(url, env);
     if (p === "/v1/admin/sync" && m === "POST") return json(await syncStep(env, TOOLS));
@@ -218,6 +227,11 @@ function shown(r) {
 }
 
 const TOOLS = { sha256, linkKey, cleanName, now, logAction };
+// what voices.js shares with the sounds' routes (one vote, report and limit system)
+const VOICE_TOOLS = { json, fail, body, installHash, ipHash, allow, logAction, sha256, now,
+                      cleanTags, refuse, vote, report };
+// a sound under review is "pending"; a voice has no review, so reports hide it
+const TABLES = { sounds: "pending", voices: "hidden" };
 
 // ------------------------------------------------------------------ public routes
 
@@ -359,19 +373,20 @@ async function body(req) {
   }
 }
 
-async function counts(env, id) {
-  await env.DB.prepare("UPDATE sounds SET " +
+async function counts(env, id, table = "sounds") {
+  await env.DB.prepare(`UPDATE ${table} SET ` +
     "up = (SELECT count(*) FROM votes WHERE sound = ?1 AND value = 1), " +
     "down = (SELECT count(*) FROM votes WHERE sound = ?1 AND value = -1) WHERE id = ?1")
     .bind(id).run();
-  return env.DB.prepare("SELECT up, down FROM sounds WHERE id = ?").bind(id).first();
+  return env.DB.prepare(`SELECT up, down FROM ${table} WHERE id = ?`).bind(id).first();
 }
 
-async function vote(req, env, id) {
+async function vote(req, env, id, table = "sounds") {
+  if (!(table in TABLES)) fail("not found", 404);
   const voter = await installHash(req, env);
   const { value } = await body(req);
   if (![1, -1, 0].includes(value)) fail("value");
-  const row = await env.DB.prepare("SELECT status FROM sounds WHERE id = ?").bind(id).first();
+  const row = await env.DB.prepare(`SELECT status FROM ${table} WHERE id = ?`).bind(id).first();
   if (!row || row.status !== "live") fail("not found", 404);
   const ip = await ipHash(req, env);
   if (!await allow(env, "vote-ip", ip, VOTES_PER_IP_DAY)
@@ -401,18 +416,19 @@ async function vote(req, env, id) {
       "ON CONFLICT (sound, voter) DO UPDATE SET value = excluded.value")
       .bind(id, voter, value).run();
   }
-  const c = await counts(env, id);
+  const c = await counts(env, id, table);
   await logAction(env, "vote", { sound: id, ip, install: voter, detail: String(value) });
   return json({ id, up: c.up, down: c.down, mine: value });
 }
 
 // one report per address counts: a new install id is free to make, so counting installs
 // would let one person take any sound off the store
-async function report(req, env, id) {
+async function report(req, env, id, table = "sounds") {
+  if (!(table in TABLES)) fail("not found", 404);
   const install = await installHash(req, env);   // still required, as from the app
   const { reason } = await body(req);
   const why = ["copyright", "offensive", "broken", "other"].includes(reason) ? reason : "other";
-  const row = await env.DB.prepare("SELECT status FROM sounds WHERE id = ?").bind(id).first();
+  const row = await env.DB.prepare(`SELECT status FROM ${table} WHERE id = ?`).bind(id).first();
   if (!row || row.status !== "live") fail("not found", 404);
   const ip = await ipHash(req, env);
   if (!await allow(env, "report-ip", ip, REPORTS_PER_IP_DAY)) fail("slow down", 429);
@@ -421,12 +437,13 @@ async function report(req, env, id) {
   const n = (await env.DB.prepare("SELECT count(*) AS n FROM reports WHERE sound = ?")
     .bind(id).first()).n;
   // enough reports: off the store until the owner looks at it again
-  await env.DB.prepare("UPDATE sounds SET reports = ?, " +
-    "status = CASE WHEN ? >= ? THEN 'pending' ELSE status END WHERE id = ?")
-    .bind(n, n, REPORTS_TO_HIDE, id).run();
+  await env.DB.prepare(`UPDATE ${table} SET reports = ?, ` +
+    "status = CASE WHEN ? >= ? THEN ? ELSE status END WHERE id = ?")
+    .bind(n, n, REPORTS_TO_HIDE, TABLES[table], id).run();
   await logAction(env, "report", { sound: id, ip, install, detail: why });
   if (n === REPORTS_TO_HIDE)
-    await logAction(env, "hidden", { sound: id, detail: `${n} reports: back to review` });
+    await logAction(env, "hidden", { sound: id, detail: `${n} reports: ` +
+      (table === "sounds" ? "back to review" : "hidden") });
   return json({ id, reported: true });
 }
 
