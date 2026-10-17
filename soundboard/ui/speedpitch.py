@@ -1,6 +1,6 @@
 """Live speed / pitch / effects: a small button on a transport bar ("1x") that opens
-a movable window with the sliders. It changes what's playing right now and isn't
-saved; to keep a version of a sound, use its Edit → Effects tab instead.
+a pop-up with the sliders (a click outside closes it). It changes what's playing
+right now and isn't saved; to keep a version of a sound, use its Edit → Effects tab instead.
 
 Two columns: speed & pitch on the left, the live effects (soundboard.livefx: bass,
 treble, muffle, reverb, echo, distortion, and presets that set several) on the right.
@@ -12,8 +12,9 @@ meter shows the pitch instead, red past ±24 st."""
 from __future__ import annotations
 
 import math
+import time
 
-from PySide6.QtCore import QPoint, QPointF, QRectF, Qt, Signal
+from PySide6.QtCore import QEvent, QPoint, QPointF, QRectF, Qt, Signal
 from PySide6.QtGui import QColor, QFont, QPainter, QPen
 from PySide6.QtWidgets import (QApplication, QCheckBox, QDialog, QFrame, QGridLayout,
                                QHBoxLayout, QLabel, QPushButton, QVBoxLayout, QWidget)
@@ -178,13 +179,14 @@ class SpeedPitchButton(QPushButton):
         self._speed_hi = redline_speed(*redline)
         top = redline[1]
 
-        # A regular modeless window: its title bar can be dragged, and clicking
-        # the board does not dismiss the controls while configuring live audio.
-        self.pop = QDialog(self)
+        # A pop-up over the board, beside its button: a click outside, Escape or the
+        # button again closes it (the settings stay, it's only hidden)
+        self.pop = QDialog(self, Qt.WindowType.Popup | Qt.WindowType.FramelessWindowHint)
         fit.watch(self.pop)
         self.pop.setWindowTitle(_("Live controls"))
-        self.pop.setWindowFlag(Qt.WindowType.WindowContextHelpButtonHint, False)
-        self._placed = False
+        self.pop.setProperty("popover", True)   # its edge (theme.py)
+        self.pop.installEventFilter(self)
+        self._hidden_at = 0.0
         self.pop.setObjectName("transport")
         v = QVBoxLayout(self.pop)
         v.setContentsMargins(16, 12, 16, 14)
@@ -296,7 +298,7 @@ class SpeedPitchButton(QPushButton):
         self.speed.changed.connect(self._edited)
         self.pitch.changed.connect(self._edited)
         self.keep.toggled.connect(lambda _b: self._edited())
-        self.clicked.connect(self._open)
+        self.clicked.connect(self._toggle)
         self._label()
 
     def _effects(self, box: QWidget):
@@ -386,7 +388,7 @@ class SpeedPitchButton(QPushButton):
         self.pitch.set_param(REDLINE_PITCH if on else PITCH)
         self.red_box.setVisible(on)        # the rev meter: the speed, or a stream's pitch
         if self.pop.isVisible():
-            self._open()                  # resize, retaining the user's position
+            self._open()                  # resize / re-place it for the new height
         self._edited()
 
     def values(self) -> tuple[float, float, bool]:
@@ -426,6 +428,18 @@ class SpeedPitchButton(QPushButton):
         self._label()
         self.fx_changed.emit(now)
 
+    def eventFilter(self, obj, ev):
+        if obj is self.pop and ev.type() == QEvent.Type.Hide:
+            self._hidden_at = time.monotonic()
+        return super().eventFilter(obj, ev)
+
+    def _toggle(self):
+        # a click on this button while it's open closes the pop-up first (Qt does that
+        # on the press): don't open it again on the release
+        if time.monotonic() - self._hidden_at < 0.3:
+            return
+        self._open()
+
     def _open(self):
         # settle the layouts first: right after Redline hides its box, the column's
         # and the popup's size hint (and the popup's minimum) still hold the old,
@@ -435,23 +449,18 @@ class SpeedPitchButton(QPushButton):
             if lay is not None:
                 lay.activate()
         self.pop.adjustSize()
-        if not self._placed:
-            # Open over the owner, rather than aligning a wide panel to a small
-            # Effects button near the left edge of the app.
-            owner = self.window().frameGeometry()
-            self.pop.move(owner.center() - self.pop.rect().center())
+        pos = self.mapToGlobal(QPoint(0, 0))
+        # kept on the screen the button is on (a second monitor can sit left of or
+        # above the primary one, at negative coordinates)
+        area = (QApplication.screenAt(pos) or self.screen()).availableGeometry()
+        y = pos.y() - self.pop.height() - 4     # above the bar, unless there's no room
+        if y < area.top():
+            y = pos.y() + self.height() + 4
+        y = max(area.top(), min(y, area.bottom() - self.pop.height() + 1))
+        x = pos.x() + self.width() - self.pop.width()
+        x = max(area.left(), min(x, area.right() - self.pop.width() + 1))
+        self.pop.move(x, y)
         self.pop.show()
-        # show() supplies the native title-bar size. Include that frame when
-        # keeping controls reachable, including monitors at negative coordinates.
-        frame = self.pop.frameGeometry()
-        screen = QApplication.screenAt(frame.center()) or self.screen()
-        area = screen.availableGeometry()
-        x = max(area.left(), min(frame.x(), area.right() - frame.width() + 1))
-        y = max(area.top(), min(frame.y(), area.bottom() - frame.height() + 1))
-        self.pop.move(QPoint(x, y))
-        self._placed = True
-        self.pop.raise_()
-        self.pop.activateWindow()
 
     def _label(self):
         s, p, _k = self.values()
