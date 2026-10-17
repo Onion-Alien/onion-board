@@ -3643,5 +3643,6 @@
   "Your sounds aren't in your mic yet": "Suara Anda belum ada di mikrofon Anda",
   "Your sounds aren't in your mic yet: one click to fix": "Suara Anda belum ada di mikrofon Anda: satu klik untuk memperbaikinya",
   "Your voice": "Suaramu",
-  "<b style='color:{colour}'>✓ Your mic works:</b> Onion Board hears <b>{mic}</b>. Now your sounds go into it too.": "<b style='color:{colour}'>✓ Mikrofon Anda berfungsi:</b> Onion Board mendengar <b>{mic}</b>. Sekarang suara Anda juga masuk ke dalamnya."
+  "<b style='color:{colour}'>✓ Your mic works:</b> Onion Board hears <b>{mic}</b>. Now your sounds go into it too.": "<b style='color:{colour}'>✓ Mikrofon Anda berfungsi:</b> Onion Board mendengar <b>{mic}</b>. Sekarang suara Anda juga masuk ke dalamnya.",
+  "Free sounds for your board, picked by everyone's votes.": "Suara gratis untuk papanmu, dipilih lewat vote semua orang."
 }

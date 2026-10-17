@@ -3643,5 +3643,6 @@
   "Your sounds aren't in your mic yet": "あなたのサウンドはまだマイクに入っていません",
   "Your sounds aren't in your mic yet: one click to fix": "あなたのサウンドはまだマイクに入っていません: ワンクリックで修正できます",
   "Your voice": "あなたの声",
-  "<b style='color:{colour}'>✓ Your mic works:</b> Onion Board hears <b>{mic}</b>. Now your sounds go into it too.": "<b style='color:{colour}'>✓ マイクが機能します:</b> Onion Board は<b>{mic}</b>を聞きます。これで、あなたのサウンドもそこに加わります。"
+  "<b style='color:{colour}'>✓ Your mic works:</b> Onion Board hears <b>{mic}</b>. Now your sounds go into it too.": "<b style='color:{colour}'>✓ マイクが機能します:</b> Onion Board は<b>{mic}</b>を聞きます。これで、あなたのサウンドもそこに加わります。",
+  "Free sounds for your board, picked by everyone's votes.": "みんなの投票で選ばれた、ボード用の無料サウンド。"
 }

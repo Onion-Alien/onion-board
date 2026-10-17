@@ -3721,5 +3721,6 @@
   "Your sounds aren't in your mic yet": "A hangok még nincsenek a mikrofonban",
   "Your sounds aren't in your mic yet: one click to fix": "A hangok még nincsenek a mikrofonban: egy kattintás a javításhoz",
   "Your voice": "A hangod",
-  "<b style='color:{colour}'>✓ Your mic works:</b> Onion Board hears <b>{mic}</b>. Now your sounds go into it too.": "<b style='color:{colour}'>✓ Működik a mikrofonod:</b> Az Onion Board hallja: <b>{mic}</b>. Most a te hangjaid is belemennek."
+  "<b style='color:{colour}'>✓ Your mic works:</b> Onion Board hears <b>{mic}</b>. Now your sounds go into it too.": "<b style='color:{colour}'>✓ Működik a mikrofonod:</b> Az Onion Board hallja: <b>{mic}</b>. Most a te hangjaid is belemennek.",
+  "Free sounds for your board, picked by everyone's votes.": "Ingyenes hangok a tábládra, mindenki szavazatai alapján."
 }

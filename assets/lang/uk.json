@@ -3799,5 +3799,6 @@
   "Your sounds aren't in your mic yet": "Ваших звуків ще немає у вашому мікрофоні",
   "Your sounds aren't in your mic yet: one click to fix": "Ваших звуків ще немає в мікрофоні: один клік, щоб виправити",
   "Your voice": "Ваш голос",
-  "<b style='color:{colour}'>✓ Your mic works:</b> Onion Board hears <b>{mic}</b>. Now your sounds go into it too.": "<b style='color:{colour}'>✓ Ваш мікрофон працює:</b> Onion Board чує <b>{mic}</b>. Тепер ваші звуки також входять до нього."
+  "<b style='color:{colour}'>✓ Your mic works:</b> Onion Board hears <b>{mic}</b>. Now your sounds go into it too.": "<b style='color:{colour}'>✓ Ваш мікрофон працює:</b> Onion Board чує <b>{mic}</b>. Тепер ваші звуки також входять до нього.",
+  "Free sounds for your board, picked by everyone's votes.": "Безкоштовні звуки для твоєї панелі, обрані голосами всіх."
 }

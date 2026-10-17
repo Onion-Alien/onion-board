@@ -3799,5 +3799,6 @@
   "Your sounds aren't in your mic yet": "Vaše zvuky ještě nejsou v mikrofonu",
   "Your sounds aren't in your mic yet: one click to fix": "Vaše zvuky ještě nejsou v mikrofonu: jedním kliknutím opravíte",
   "Your voice": "Tvůj hlas",
-  "<b style='color:{colour}'>✓ Your mic works:</b> Onion Board hears <b>{mic}</b>. Now your sounds go into it too.": "<b style='color:{colour}'>✓ Váš mikrofon funguje:</b> Onion Board slyší <b>{mic}</b>. Nyní do toho jdou i vaše zvuky."
+  "<b style='color:{colour}'>✓ Your mic works:</b> Onion Board hears <b>{mic}</b>. Now your sounds go into it too.": "<b style='color:{colour}'>✓ Váš mikrofon funguje:</b> Onion Board slyší <b>{mic}</b>. Nyní do toho jdou i vaše zvuky.",
+  "Free sounds for your board, picked by everyone's votes.": "Zvuky zdarma pro tvůj board, vybrané hlasy všech."
 }

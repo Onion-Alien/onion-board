@@ -3643,5 +3643,6 @@
   "Your sounds aren't in your mic yet": "Âm thanh của bạn chưa có trong micrô của bạn",
   "Your sounds aren't in your mic yet: one click to fix": "Âm thanh của bạn chưa có trong micrô: một cú nhấp chuột để khắc phục",
   "Your voice": "Giọng nói của bạn",
-  "<b style='color:{colour}'>✓ Your mic works:</b> Onion Board hears <b>{mic}</b>. Now your sounds go into it too.": "<b style='color:{colour}'>✓ Mic của bạn hoạt động:</b> Onion Board nghe thấy <b>{mic}</b>. Bây giờ âm thanh của bạn cũng đi vào đó."
+  "<b style='color:{colour}'>✓ Your mic works:</b> Onion Board hears <b>{mic}</b>. Now your sounds go into it too.": "<b style='color:{colour}'>✓ Mic của bạn hoạt động:</b> Onion Board nghe thấy <b>{mic}</b>. Bây giờ âm thanh của bạn cũng đi vào đó.",
+  "Free sounds for your board, picked by everyone's votes.": "Âm thanh miễn phí cho bảng của bạn, được chọn qua bình chọn của mọi người."
 }

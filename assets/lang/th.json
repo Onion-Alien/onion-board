@@ -3643,5 +3643,6 @@
   "Your sounds aren't in your mic yet": "เสียงของคุณยังไม่อยู่ในไมโครโฟน",
   "Your sounds aren't in your mic yet: one click to fix": "เสียงของคุณยังไม่อยู่ในไมโครโฟน คลิกเพียงครั้งเดียวเพื่อแก้ไข",
   "Your voice": "เสียงของคุณ",
-  "<b style='color:{colour}'>✓ Your mic works:</b> Onion Board hears <b>{mic}</b>. Now your sounds go into it too.": "<b style='color:{colour}'>✓ ไมค์ของคุณใช้งานได้:</b> Onion Board ได้ยิน <b>{mic}</b> ตอนนี้เสียงของคุณก็เข้าไปด้วย"
+  "<b style='color:{colour}'>✓ Your mic works:</b> Onion Board hears <b>{mic}</b>. Now your sounds go into it too.": "<b style='color:{colour}'>✓ ไมค์ของคุณใช้งานได้:</b> Onion Board ได้ยิน <b>{mic}</b> ตอนนี้เสียงของคุณก็เข้าไปด้วย",
+  "Free sounds for your board, picked by everyone's votes.": "เสียงฟรีสำหรับบอร์ดของคุณ คัดเลือกจากโหวตของทุกคน"
 }

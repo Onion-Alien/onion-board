@@ -3721,5 +3721,6 @@
   "Your sounds aren't in your mic yet": "Οι ήχοι σας δεν είναι ακόμα στο μικρόφωνό σας",
   "Your sounds aren't in your mic yet: one click to fix": "Οι ήχοι σας δεν είναι ακόμα στο μικρόφωνό σας: ένα κλικ για επιδιόρθωση",
   "Your voice": "Η φωνή σου",
-  "<b style='color:{colour}'>✓ Your mic works:</b> Onion Board hears <b>{mic}</b>. Now your sounds go into it too.": "<b style='color:{colour}'>✓ Το μικρόφωνό σας λειτουργεί:</b> Το Onion Board ακούει <b>{mic}</b>. Τώρα μπαίνουν και οι ήχοι σας."
+  "<b style='color:{colour}'>✓ Your mic works:</b> Onion Board hears <b>{mic}</b>. Now your sounds go into it too.": "<b style='color:{colour}'>✓ Το μικρόφωνό σας λειτουργεί:</b> Το Onion Board ακούει <b>{mic}</b>. Τώρα μπαίνουν και οι ήχοι σας.",
+  "Free sounds for your board, picked by everyone's votes.": "Δωρεάν ήχοι για τον πίνακά σου, επιλεγμένοι με τις ψήφους όλων."
 }

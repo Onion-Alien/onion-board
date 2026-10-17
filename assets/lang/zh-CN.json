@@ -3643,5 +3643,6 @@
   "Your sounds aren't in your mic yet": "你的声音还没有出现在你的麦克风中",
   "Your sounds aren't in your mic yet: one click to fix": "您的声音尚未出现在麦克风中：一键修复",
   "Your voice": "你的声音",
-  "<b style='color:{colour}'>✓ Your mic works:</b> Onion Board hears <b>{mic}</b>. Now your sounds go into it too.": "<b style='color:{colour}'>✓ 您的麦克风工作正常：</b> Onion Board 听到<b>{mic}</b> 。现在你的声音也进入其中。"
+  "<b style='color:{colour}'>✓ Your mic works:</b> Onion Board hears <b>{mic}</b>. Now your sounds go into it too.": "<b style='color:{colour}'>✓ 您的麦克风工作正常：</b> Onion Board 听到<b>{mic}</b> 。现在你的声音也进入其中。",
+  "Free sounds for your board, picked by everyone's votes.": "给你的音板用的免费音效，由大家投票选出。"
 }

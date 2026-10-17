@@ -3721,5 +3721,6 @@
   "Your sounds aren't in your mic yet": "Äänesi eivät vielä kuulu mikrofoniin",
   "Your sounds aren't in your mic yet: one click to fix": "Äänesi eivät ole vielä mikrofonissasi: korjaa se yhdellä napsautuksella",
   "Your voice": "Sinun äänesi",
-  "<b style='color:{colour}'>✓ Your mic works:</b> Onion Board hears <b>{mic}</b>. Now your sounds go into it too.": "<b style='color:{colour}'>✓ Mikrofonisi toimii:</b> Onion Board kuulee <b>{mic}</b>. Nyt äänesi menevät myös siihen."
+  "<b style='color:{colour}'>✓ Your mic works:</b> Onion Board hears <b>{mic}</b>. Now your sounds go into it too.": "<b style='color:{colour}'>✓ Mikrofonisi toimii:</b> Onion Board kuulee <b>{mic}</b>. Nyt äänesi menevät myös siihen.",
+  "Free sounds for your board, picked by everyone's votes.": "Ilmaisia ääniä tauluusi, kaikkien äänillä valittuja."
 }

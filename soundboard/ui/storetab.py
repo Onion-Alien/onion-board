@@ -20,17 +20,18 @@ from PySide6.QtWidgets import (QCheckBox, QDialog, QFileDialog, QHBoxLayout,
 from soundboard import errors, library, net, store, usage
 from soundboard.engine import SR
 from soundboard.i18n import _
-from soundboard.ui import busy, fit, icons
-from soundboard.ui.panel import (Flow, HoverCard, card, hint_label, icon_button,
-                                 info_button, section_label)
+from soundboard.ui import busy, fit, icons, storelook
+from soundboard.ui.panel import (Flow, HoverCard, hint_label, icon_button, info_button,
+                                 section_label)
 from soundboard.ui.ytsearch import ClampLabel
 
 log = logging.getLogger(__name__)
 
 PREVIEW = "__store_preview"   # the store's "hear it first" voice (headphones only)
 SEARCH_WAIT_MS = 400          # typing pauses this long before the store is searched
-ROW_MAX_W = 760               # the list stays a readable column on a wide window
+ROW_MAX_W = 820               # the list stays a readable column, centred, on a wide window
 COUNT_W = "9.9k"              # the widest vote count kept room for
+PLAY_ROOM = 520               # a narrower row shows no play button (its picture plays)
 TRENDING = "trending"         # the order: hot on Myinstants now + this week's thumbs up
 
 
@@ -60,10 +61,13 @@ class SoundRow(HoverCard):
         self.sound = s
         self.setMaximumWidth(ROW_MAX_W)
         h = QHBoxLayout(self)
-        h.setContentsMargins(10, 8, 12, 8)
+        h.setContentsMargins(8, 8, 12, 8)
         h.setSpacing(8)
-        self.btn_play = icon_button("play", _("Play it once (from the site)") if s.is_link
-                                    else _("Hear it (only you)"))
+        # its picture: an emoji for what it is, on its category's colour
+        self.tile = storelook.SoundTile(s, lambda: self.btn_play.click())
+        self.tile.setToolTip(self.btn_play_tip(s))
+        h.addWidget(self.tile)
+        self.btn_play = icon_button("play", self.btn_play_tip(s))
         self.btn_play.setCheckable(True)
         icons.set_icon(self.btn_play, "play", checked_color="accent")   # (playing_look)
         self.btn_play.setFixedSize(32, 32)
@@ -99,12 +103,27 @@ class SoundRow(HoverCard):
         h.addWidget(self.btn_report)
         self.show_votes()
 
+    def resizeEvent(self, e):
+        super().resizeEvent(e)
+        # narrow (the smallest window): the picture is the play button, so the name keeps
+        # some room and Report stays on the row
+        wide = self.width() >= PLAY_ROOM
+        if self.btn_play.isVisibleTo(self) != wide:
+            self.btn_play.setVisible(wide)
+            self.tile.set_badge(not wide)
+
+    @staticmethod
+    def btn_play_tip(s: store.Sound) -> str:
+        return _("Play it once (from the site)") if s.is_link else _("Hear it (only you)")
+
     def playing_look(self, on: bool):
-        """Play turned stop while its sample plays. The switched-on button stays clear on
-        the row (a quiet icon button in a card), so the square is drawn in the accent, as
-        the Apps rows' eye: on_accent there was black on near-black (1.05:1) in Amber Terminal."""
+        """Play turned stop (and the picture's bars bounce) while its sample plays. The
+        switched-on button stays clear on the row (a quiet icon button in a card), so the
+        square is drawn in the accent, as the Apps rows' eye: on_accent there was black on
+        near-black (1.05:1) in Amber Terminal."""
         icons.set_icon(self.btn_play, "stop" if on else "play", checked_color="accent")
         self.btn_play.setToolTip(_("Stop") if on else _("Hear it (only you)"))
+        self.tile.set_playing(on)
 
     def _vote_button(self, icon: str, tip: str) -> QPushButton:
         b = QPushButton()
@@ -172,9 +191,19 @@ class StoreTab(QWidget):
         self._cats.connect(self._on_cats)
         self._cat = ""            # the category picked ("" all)
 
-        outer = QVBoxLayout(self)
+        # one column, centred in the tab (a wide window: room both sides, not all on
+        # the right)
+        outer = QHBoxLayout(self)
         outer.setContentsMargins(0, 0, 0, 0)
-        outer.setSpacing(12)
+        outer.setSpacing(0)
+        column = QWidget()
+        column.setMaximumWidth(ROW_MAX_W)
+        col = QVBoxLayout(column)
+        col.setContentsMargins(0, 0, 0, 0)
+        col.setSpacing(12)
+        outer.addStretch(1)
+        outer.addWidget(column, 100)
+        outer.addStretch(1)
         info = info_button(_("Sounds people share here are CC0: free for anyone to use for "
                              "anything, no credit needed, and checked before they show up. "
                              "Sounds from Myinstants are links: they play and download from "
@@ -185,8 +214,36 @@ class StoreTab(QWidget):
         beta.setObjectName("pill")
         beta.setProperty("tone", "beta")
         beta.setToolTip(_("The sound store is new and still changing."))
-        head, hv = card(_("Sound store"), icon="store", beside=(beta, info))
-        head.setMaximumWidth(ROW_MAX_W)
+        # the banner: Bun in his headphones, the title big, what the store is under it
+        head = self.banner = storelook.StoreBanner()
+        hv = QVBoxLayout(head)
+        hv.setContentsMargins(14, 12, 14, 14)
+        hv.setSpacing(10)
+        top = QHBoxLayout()
+        top.setSpacing(12)
+        self.bun = storelook.make_bun(72)
+        head.bun = self.bun
+        top.addWidget(self.bun, 0, Qt.AlignmentFlag.AlignVCenter)
+        words = QVBoxLayout()
+        words.setSpacing(2)
+        words.addStretch(1)
+        title_row = QHBoxLayout()
+        title_row.setSpacing(8)
+        self.title = QLabel(_("Sound store"))
+        self.title.setObjectName("storetitle")
+        # the kit's display size (a whole page's title); a style sheet, as the theme's
+        # QLabel font would win over setFont
+        self.title.setStyleSheet("font-size: 17pt; font-weight: 800; background: transparent;")
+        title_row.addWidget(self.title)
+        title_row.addWidget(beta, 0, Qt.AlignmentFlag.AlignVCenter)
+        title_row.addWidget(info, 0, Qt.AlignmentFlag.AlignVCenter)
+        title_row.addStretch(1)
+        words.addLayout(title_row)
+        self.tagline = hint_label(_("Free sounds for your board, picked by everyone's votes."))
+        words.addWidget(self.tagline)
+        words.addStretch(1)
+        top.addLayout(words, 1)
+        hv.addLayout(top)
         # the main button on a row of its own: beside the search box and the order, the
         # card was wider than the smallest window (that turns into the mini player)
         # Share, then the sort buttons; they wrap under Share in a narrow window (in one
@@ -238,7 +295,7 @@ class StoreTab(QWidget):
         self.btn_reload.clicked.connect(lambda: self.reload())
         row.addWidget(self.btn_reload)
         hv.addLayout(row)
-        outer.addWidget(head)
+        col.addWidget(head)
 
         # the list, or a message in its place (loading, nothing found, off, failed)
         self.stack = QStackedWidget()
@@ -253,7 +310,6 @@ class StoreTab(QWidget):
         # the categories, as the Sounds tab's subcategory chips: at the top of the list
         # (it scrolls away), so the tab still fits the smallest window
         self.cats_box = QWidget()
-        self.cats_box.setMaximumWidth(ROW_MAX_W)
         self._cat_flow = Flow(self.cats_box, gap=6)
         self._cat_flow.setContentsMargins(0, 0, 0, 4)
         self.cat_btns: dict[str, QPushButton] = {}
@@ -262,7 +318,7 @@ class StoreTab(QWidget):
         self.btn_more = QPushButton(_("Show more"))
         self.btn_more.clicked.connect(self.more)
         self.btn_more.hide()
-        self._list.addWidget(self.btn_more, 0, Qt.AlignmentFlag.AlignLeft)
+        self._list.addWidget(self.btn_more, 0, Qt.AlignmentFlag.AlignHCenter)
         self._list.addStretch(1)
         scroll.setWidget(body)
         self.stack.addWidget(scroll)
@@ -290,8 +346,7 @@ class StoreTab(QWidget):
         mv.addStretch(2)
         self._msg_do: Callable[[], object] | None = None
         self.stack.addWidget(self.message)
-        self.stack.setMaximumWidth(ROW_MAX_W)   # the list and its messages: one column
-        outer.addWidget(self.stack, 1)
+        col.addWidget(self.stack, 1)
         self.note = QLabel()   # the last action's result, for screen readers and tests
         self.note.hide()
 
@@ -378,6 +433,7 @@ class StoreTab(QWidget):
             b = QPushButton(f"{store.cat_name(key) if key else _('All')}  {count_text(n)}"
                             .replace("&", "&&"))
             b.setObjectName("subchip")
+            b.setIcon(storelook.emoji_icon(storelook.CAT_EMOJI.get(key, "✨")))
             b.setCheckable(True)
             b.setAutoExclusive(True)
             b.setChecked(key == self._cat)
@@ -389,7 +445,9 @@ class StoreTab(QWidget):
 
     def _say(self, icon: str, title: str, text: str, button: str = "",
              do: Callable[[], object] | None = None):
-        self.msg_icon.setPixmap(icons.pixmap(icon, 32, icons.resolve("muted")))
+        self.msg_icon.setPixmap(icons.pixmap(icon, 44, icons.resolve("muted")))
+        # Bun's down when the store can't show anything, fine while it loads
+        self.bun.sad = 0.0 if icon == "store" and not button else 0.7
         self.msg_title.setText(title)
         self.msg_text.setText(text)
         self.msg_text.setVisible(bool(text))
@@ -474,6 +532,7 @@ class StoreTab(QWidget):
                           _("Be the first: share a sound you made."), _("Share a sound"),
                           self.share)
             return
+        self.bun.sad = 0.0
         self.stack.setCurrentWidget(self.list_area)
 
     def _clear(self):
@@ -520,6 +579,7 @@ class StoreTab(QWidget):
             return
         if what == "add":
             usage.used("store-added")
+            self.bun.cheer()
             self._add_file(path)   # (the window says "Added …" itself)
         else:
             self._decode(row, path)
@@ -527,6 +587,7 @@ class StoreTab(QWidget):
     def add(self, row: SoundRow):
         if row.sound.is_link:   # downloaded from its site, as a pasted link is
             usage.used("store-added")
+            self.bun.cheer()
             self._link(row.sound.link, row.sound.name, "add")
             return
         if (row.sound.id, "add") in self._busy:
@@ -575,6 +636,7 @@ class StoreTab(QWidget):
                     _("Pick your headphones in Settings → Audio to hear the samples.")), "warn")
             return
         usage.used("store-heard")
+        self.bun.burst(3)
         QTimer.singleShot(int(len(data) / SR * 1000) + 150, self,
                           lambda s=serial: s == self._hear_serial and self._stop_preview())
 
@@ -602,6 +664,8 @@ class StoreTab(QWidget):
         s.down += (value == -1) - (s.mine == -1)
         s.mine = value
         row.show_votes()
+        if value == 1:
+            self.bun.burst(4)
         self._busy.add((s.id, "vote"))
         install = self.install()
 

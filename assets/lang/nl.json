@@ -3721,5 +3721,6 @@
   "Your sounds aren't in your mic yet": "Je geluiden staan ​​nog niet in je microfoon",
   "Your sounds aren't in your mic yet: one click to fix": "Je geluiden staan ​​nog niet in je microfoon: één klik om het probleem op te lossen",
   "Your voice": "Jouw stem",
-  "<b style='color:{colour}'>✓ Your mic works:</b> Onion Board hears <b>{mic}</b>. Now your sounds go into it too.": "<b style='color:{colour}'>✓ Je microfoon werkt:</b> Onion Board hoort <b>{mic}</b>. Nu gaan jouw geluiden er ook in mee."
+  "<b style='color:{colour}'>✓ Your mic works:</b> Onion Board hears <b>{mic}</b>. Now your sounds go into it too.": "<b style='color:{colour}'>✓ Je microfoon werkt:</b> Onion Board hoort <b>{mic}</b>. Nu gaan jouw geluiden er ook in mee.",
+  "Free sounds for your board, picked by everyone's votes.": "Gratis geluiden voor je board, gekozen door ieders stemmen."
 }

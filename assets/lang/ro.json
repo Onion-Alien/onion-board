@@ -3799,5 +3799,6 @@
   "Your sounds aren't in your mic yet": "Sunetele tale nu sunt încă în microfon",
   "Your sounds aren't in your mic yet: one click to fix": "Sunetele tale nu sunt încă în microfon: un clic pentru a remedia",
   "Your voice": "Vocea ta",
-  "<b style='color:{colour}'>✓ Your mic works:</b> Onion Board hears <b>{mic}</b>. Now your sounds go into it too.": "<b style='color:{colour}'>✓ Microfonul tău funcționează:</b> Onion Board aude <b>{mic}</b>. Acum intră și sunetele tale."
+  "<b style='color:{colour}'>✓ Your mic works:</b> Onion Board hears <b>{mic}</b>. Now your sounds go into it too.": "<b style='color:{colour}'>✓ Microfonul tău funcționează:</b> Onion Board aude <b>{mic}</b>. Acum intră și sunetele tale.",
+  "Free sounds for your board, picked by everyone's votes.": "Sunete gratuite pentru panoul tău, alese prin voturile tuturor."
 }

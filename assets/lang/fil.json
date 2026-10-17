@@ -3721,5 +3721,6 @@
   "Your sounds aren't in your mic yet": "Ang iyong mga tunog ay wala pa sa iyong mikropono",
   "Your sounds aren't in your mic yet: one click to fix": "Ang iyong mga tunog ay wala pa sa iyong mikropono: isang pag-click upang ayusin",
   "Your voice": "boses mo",
-  "<b style='color:{colour}'>✓ Your mic works:</b> Onion Board hears <b>{mic}</b>. Now your sounds go into it too.": "<b style='color:{colour}'>✓ Gumagana ang iyong mikropono:</b> Naririnig ng Onion Board ang <b>{mic}</b>. Ngayon ang iyong mga tunog ay pumasok din dito."
+  "<b style='color:{colour}'>✓ Your mic works:</b> Onion Board hears <b>{mic}</b>. Now your sounds go into it too.": "<b style='color:{colour}'>✓ Gumagana ang iyong mikropono:</b> Naririnig ng Onion Board ang <b>{mic}</b>. Ngayon ang iyong mga tunog ay pumasok din dito.",
+  "Free sounds for your board, picked by everyone's votes.": "Libreng mga tunog para sa board mo, pinili ng boto ng lahat."
 }

@@ -3721,5 +3721,6 @@
   "Your sounds aren't in your mic yet": "Seus sons ainda não estão no microfone",
   "Your sounds aren't in your mic yet: one click to fix": "Seus sons ainda não estão no microfone: um clique para corrigir",
   "Your voice": "Sua voz",
-  "<b style='color:{colour}'>✓ Your mic works:</b> Onion Board hears <b>{mic}</b>. Now your sounds go into it too.": "<b style='color:{colour}'>✓ Seu microfone funciona:</b> Onion Board ouve <b>{mic}</b>. Agora seus sons também entram nisso."
+  "<b style='color:{colour}'>✓ Your mic works:</b> Onion Board hears <b>{mic}</b>. Now your sounds go into it too.": "<b style='color:{colour}'>✓ Seu microfone funciona:</b> Onion Board ouve <b>{mic}</b>. Agora seus sons também entram nisso.",
+  "Free sounds for your board, picked by everyone's votes.": "Sons grátis para o seu painel, escolhidos pelos votos de todos."
 }

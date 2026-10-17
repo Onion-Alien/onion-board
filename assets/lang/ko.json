@@ -3643,5 +3643,6 @@
   "Your sounds aren't in your mic yet": "당신의 소리는 아직 마이크에 없습니다",
   "Your sounds aren't in your mic yet: one click to fix": "아직 마이크에 소리가 포함되지 않았습니다. 클릭 한 번으로 문제를 해결할 수 있습니다.",
   "Your voice": "당신의 목소리",
-  "<b style='color:{colour}'>✓ Your mic works:</b> Onion Board hears <b>{mic}</b>. Now your sounds go into it too.": "<b style='color:{colour}'>✓ 마이크가 작동합니다.</b> Onion Board가 <b>{mic}</b> 듣습니다. 이제 당신의 소리도 여기에 들어갑니다."
+  "<b style='color:{colour}'>✓ Your mic works:</b> Onion Board hears <b>{mic}</b>. Now your sounds go into it too.": "<b style='color:{colour}'>✓ 마이크가 작동합니다.</b> Onion Board가 <b>{mic}</b> 듣습니다. 이제 당신의 소리도 여기에 들어갑니다.",
+  "Free sounds for your board, picked by everyone's votes.": "모두의 투표로 고른 보드용 무료 사운드."
 }

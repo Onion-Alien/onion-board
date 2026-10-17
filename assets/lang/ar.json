@@ -4033,5 +4033,6 @@
   "Your sounds aren't in your mic yet": "أصواتك ليست في الميكروفون الخاص بك بعد",
   "Your sounds aren't in your mic yet: one click to fix": "الأصوات الخاصة بك ليست في الميكروفون الخاص بك بعد: نقرة واحدة لإصلاحها",
   "Your voice": "صوتك",
-  "<b style='color:{colour}'>✓ Your mic works:</b> Onion Board hears <b>{mic}</b>. Now your sounds go into it too.": "<b style='color:{colour}'>✓ الميكروفون الخاص بك يعمل:</b> يسمع Onion Board <b>{mic}</b>. الآن أصواتك تدخل في هذا أيضًا."
+  "<b style='color:{colour}'>✓ Your mic works:</b> Onion Board hears <b>{mic}</b>. Now your sounds go into it too.": "<b style='color:{colour}'>✓ الميكروفون الخاص بك يعمل:</b> يسمع Onion Board <b>{mic}</b>. الآن أصواتك تدخل في هذا أيضًا.",
+  "Free sounds for your board, picked by everyone's votes.": "أصوات مجانية للوحتك، يختارها الجميع بتصويتهم."
 }
