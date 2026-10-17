@@ -27,7 +27,7 @@ Version **2.4.0** · Windows 10 / 11 · free, no account, no ads, anonymous usag
 
 <br>
 
-![Onion Board's sound pads](site/screenshots/sounds.png?v=2430adca)
+![Onion Board's sound pads](site/screenshots/sounds.png?v=4200cb93)
 
 <sub>Works with **Discord** · **your games** · **Zoom** · **Google Meet** · **OBS** · **Voicemeeter** · **Stream Deck** · **MIDI pads**</sub>
 
@@ -55,9 +55,9 @@ Version **2.4.0** · Windows 10 / 11 · free, no account, no ads, anonymous usag
 
 | | |
 |:---:|:---:|
-| ![Voice changer and text-to-speech](site/screenshots/voice.png?v=180c73f8) | ![Screen triggers](site/screenshots/triggers.png?v=840d06ac) |
+| ![Voice changer and text-to-speech](site/screenshots/voice.png?v=c80ff396) | ![Screen triggers](site/screenshots/triggers.png?v=94d90739) |
 | **Voice** · change your voice live, or type and a computer voice says it | **Triggers** · a sound the moment "YOU DIED" shows up in your game |
-| ![Send a program's sound](site/screenshots/apps.png?v=c2caeefb) | ![Setup at a glance](site/screenshots/setup.png?v=de659aa2) |
+| ![Send a program's sound](site/screenshots/apps.png?v=5189834b) | ![Setup at a glance](site/screenshots/setup.png?v=470a78d0) |
 | **Apps** · send one program's sound (music, a video) to your friends | **Setup** · one look tells you whether others can hear you |
 
 ## Get started in about a minute
