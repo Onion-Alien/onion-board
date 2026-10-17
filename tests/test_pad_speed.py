@@ -229,7 +229,8 @@ def test_the_grid_is_opaque_in_the_page_colour(qapp):
 
 
 def test_window_background_is_solid_and_near_the_page_colour(qapp):
-    """Every theme keeps an opaque, subtle background for smooth scrolling."""
+    """Every theme keeps an opaque background for smooth scrolling: Plain a subtle one
+    near the page colour, Textured (a new install's default) its accent glow over it."""
     from PySide6.QtCore import QRect
     from PySide6.QtGui import QPainter
     from soundboard import theme
@@ -237,17 +238,20 @@ def test_window_background_is_solid_and_near_the_page_colour(qapp):
     try:
         for name in theme.THEMES:
             theme.set_current(name)
-            img = QImage(200, 300, QImage.Format_ARGB32)
-            img.fill(Qt.transparent)
-            p = QPainter(img)
-            theme.paint_window_bg(p, QRect(0, 0, 200, 300), QPointF(-50, -100), 1400, 900)
-            p.end()
             bg = QColor(theme.T["bg"])
-            for x, y in ((0, 0), (199, 150), (100, 299)):
-                c = img.pixelColor(x, y)
-                assert c.alpha() == 255
-                assert max(abs(c.red() - bg.red()), abs(c.green() - bg.green()),
-                           abs(c.blue() - bg.blue())) < 12
+            for textured in (False, True):
+                img = QImage(200, 300, QImage.Format_ARGB32)
+                img.fill(Qt.transparent)
+                p = QPainter(img)
+                theme.paint_window_bg(p, QRect(0, 0, 200, 300), QPointF(-50, -100), 1400, 900,
+                                      textured=textured)
+                p.end()
+                for x, y in ((0, 0), (199, 150), (100, 299)):
+                    c = img.pixelColor(x, y)
+                    assert c.alpha() == 255
+                    if not textured:
+                        assert max(abs(c.red() - bg.red()), abs(c.green() - bg.green()),
+                                   abs(c.blue() - bg.blue())) < 12
     finally:
         theme.set_current(old)
 

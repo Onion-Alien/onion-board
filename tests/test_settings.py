@@ -477,19 +477,27 @@ def test_live_tabs_is_a_tab_of_the_look_box_tint_or_dot(window, qapp):  # noqa: 
 
 
 def test_theme_style_switches_textured_and_plain(window, qapp):  # noqa: F811
-    """Plain (the default) leaves the panels flat; Textured puts the theme's pattern on."""
-    from soundboard import theme
+    """Textured (a new install's default) puts the theme's pattern on; Plain leaves the
+    panels flat."""
+    from soundboard import library, theme
+    assert library.Config().theme_texture is True
     window.themectl.apply_theme("Amber Terminal")
     d = SettingsDialog(window, "appearance")
-    assert d.texture_off.isChecked() and window.cfg.theme_texture is False
+    assert d.texture_on.isChecked() == window.cfg.theme_texture
+    d.texture_off.click()
+    assert window.cfg.theme_texture is False and not theme.textures_on
     assert "/tex-" not in qapp.styleSheet()
     d.texture_on.click()
     assert window.cfg.theme_texture is True and theme.textures_on
     assert "/tex-" in qapp.styleSheet()
-    d.texture_off.click()
-    assert window.cfg.theme_texture is False and not theme.textures_on
-    assert "/tex-" not in qapp.styleSheet()
     d.close()
+
+
+def test_a_saved_plain_choice_stays_plain():
+    """Only new installs get Textured: a config that says Plain keeps it."""
+    from soundboard import library
+    assert library.Config.from_raw({"theme_texture": False}).theme_texture is False
+    assert library.Config.from_raw({}).theme_texture is True
 
 
 @pytest.mark.parametrize("kind", sorted(__import__("soundboard.theme").theme.TEXTURES))
