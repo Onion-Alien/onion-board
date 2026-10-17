@@ -98,6 +98,45 @@ def test_rename_and_delete_category_keep_the_sounds(window, monkeypatch):
     assert window.cfg.category == "" and len(window.cfg.sounds) == 2
 
 
+def test_a_deleted_category_comes_back_with_undo(window, monkeypatch):
+    """Deleting a category said nothing and had no way back: its toast's Undo brings
+    it back in its place, with its sounds, colour and hotkey."""
+    from PySide6.QtWidgets import QMessageBox
+    from soundboard.ui import toast
+    monkeypatch.setattr(QMessageBox, "question", lambda *a, **k: QMessageBox.Yes)
+    window.catctl.new_category("s0", name="Memes")
+    window.catctl.new_category("s1", name="Quotes")
+    window.cfg.category_colors["Memes"] = "#ff0000"
+    window.cfg.category_hotkeys["Memes"] = "ctrl+alt+9"
+    window.catctl.delete_category("Memes")
+    assert window.cfg.categories == ["Quotes"] and window.meta("s0").tags == []
+    card = [t for t in toast.shown(window) if t.key == "category-deleted"]
+    assert card and "Memes" in card[0].text()
+    card[0].card.action.click()
+    assert window.cfg.categories == ["Memes", "Quotes"]
+    assert window.meta("s0").tags == ["Memes"]
+    assert window.cfg.category_colors["Memes"] == "#ff0000"
+    assert window.cfg.category_hotkeys["Memes"] == "ctrl+alt+9"
+
+
+def test_a_sound_played_while_muted_says_only_you_hear_it(window, qapp, monkeypatch):
+    """Live off: a hotkey or the control API played into your headphones only, with
+    nothing saying why nobody else heard it. Once per mute."""
+    _loaded(window, qapp)
+    monkeypatch.setattr(window.routectl, "_main_name", lambda: "CABLE Input")
+    monkeypatch.setattr(window.engine, "play", lambda *a, **k: object())
+    window.cfg.route = "device"
+    window.set_sending(False)
+    window.playctl.play("s0")
+    assert "only you hear" in said(window)
+    unsay(window)
+    window.playctl.play("s1")
+    assert "only you hear" not in said(window)   # once per mute
+    window.set_sending(True)
+    window.playctl.play("s0")
+    assert "only you hear" not in said(window)
+
+
 def test_new_sounds_land_in_the_category_on_show(window):
     from soundboard.library import SoundMeta
     window.catctl.new_category(name="Clips")

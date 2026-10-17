@@ -3812,5 +3812,10 @@
   "Effects on any voice": "Effektek bármelyik hangon",
   "Share your voices and setups with everyone, and get theirs.": "Oszd meg a hangjaidat és beállításaidat mindenkivel, és szerezd meg az övéket.",
   "The voice bar's Effects button puts rain, a crowd, a fire or a sound from your board behind your voice.": "A hangsáv Effektek gombja esőt, tömeget, tüzet vagy egy hangot a boardodról tesz a hangod mögé.",
-  "Open Appearance": "Megjelenés megnyitása"
+  "Open Appearance": "Megjelenés megnyitása",
+  "Deleted the “{name}” category. Its sounds are still in All.": "A(z) „{name}” kategória törölve. A hangjai továbbra is a Mind alatt vannak.",
+  "Go live": "Élőbe",
+  "Nothing new since the last save: play something in the program first.": "Nincs semmi új a legutóbbi mentés óta: előbb játssz le valamit a programban.",
+  "You're muted, so only you hear “{name}”.": "Le vagy némítva, így a(z) „{name}” hangot csak te hallod.",
+  "{name} closed: the clip editor keeps what it heard.": "{name} bezárult: a klipszerkesztő megtartja, amit hallott."
 }

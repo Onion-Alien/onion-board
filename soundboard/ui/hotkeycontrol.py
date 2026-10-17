@@ -197,7 +197,8 @@ class HotkeyControl(Controller):
         mw.say(_("<span style='color:{status}'>Another program is already "
                    "using {keys}, pick a different hotkey.</span>",
                    status=theme.status('warn'),
-                   keys=html.escape(", ".join(pretty_key(c) for c in failed))), "warn")
+                   keys=html.escape(", ".join(pretty_key(c) for c in failed))), "warn",
+               key="hotkey")   # (in place of the "✓ … plays" just said for a key set now)
 
     def _valid_hotkey(self, combo: str) -> str | None:
         """`combo` as it's saved, or None (and a toast saying why) if no keyboard could

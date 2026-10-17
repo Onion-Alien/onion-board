@@ -284,3 +284,13 @@ def test_mascots_on_screen_dance_to_the_radio(qapp):
     TickControl._dance(tc, {}, now)
     assert eng.radio_tap is None
     bun.deleteLater()
+
+
+def test_settings_asked_for_from_bun_bring_the_window_back(window, qapp):
+    """In Bun mode Settings couldn't be opened: the page opened in the hidden window."""
+    _mini(window)
+    window.bunctl.enter_bun_mode()
+    assert not window.isVisible()
+    window.setctl.open_settings("appearance")
+    assert window.isVisible() and not window.bunctl.bun_up()
+    assert window._content.currentWidget() is window.setctl._settings_dlg

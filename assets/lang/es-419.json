@@ -3812,5 +3812,10 @@
   "Effects on any voice": "Efectos en cualquier voz",
   "Share your voices and setups with everyone, and get theirs.": "Comparte tus voces y configuraciones con todos y consigue las suyas.",
   "The voice bar's Effects button puts rain, a crowd, a fire or a sound from your board behind your voice.": "El botón Efectos de la barra de voz pone lluvia, una multitud, fuego o un sonido de tu tablero detrás de tu voz.",
-  "Open Appearance": "Abrir Apariencia"
+  "Open Appearance": "Abrir Apariencia",
+  "Deleted the “{name}” category. Its sounds are still in All.": "Se borró la categoría “{name}”. Sus sonidos siguen en Todos.",
+  "Go live": "Salir en vivo",
+  "Nothing new since the last save: play something in the program first.": "Nada nuevo desde el último guardado: primero reproduce algo en el programa.",
+  "You're muted, so only you hear “{name}”.": "Estás silenciado, así que solo tú oyes “{name}”.",
+  "{name} closed: the clip editor keeps what it heard.": "{name} se cerró: el editor de clips conserva lo que escuchó."
 }

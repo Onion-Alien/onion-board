@@ -3812,5 +3812,10 @@
   "Effects on any voice": "Εφέ σε κάθε φωνή",
   "Share your voices and setups with everyone, and get theirs.": "Μοιράσου τις φωνές και τις ρυθμίσεις σου με όλους και πάρε τις δικές τους.",
   "The voice bar's Effects button puts rain, a crowd, a fire or a sound from your board behind your voice.": "Το κουμπί Εφέ στη γραμμή φωνής βάζει βροχή, πλήθος, φωτιά ή έναν ήχο από το board σου πίσω από τη φωνή σου.",
-  "Open Appearance": "Άνοιγμα Εμφάνισης"
+  "Open Appearance": "Άνοιγμα Εμφάνισης",
+  "Deleted the “{name}” category. Its sounds are still in All.": "Η κατηγορία «{name}» διαγράφηκε. Οι ήχοι της είναι ακόμα στο Όλα.",
+  "Go live": "Ζωντανά",
+  "Nothing new since the last save: play something in the program first.": "Τίποτα νέο από την τελευταία αποθήκευση: παίξε πρώτα κάτι στο πρόγραμμα.",
+  "You're muted, so only you hear “{name}”.": "Είσαι σε σίγαση, οπότε μόνο εσύ ακούς το «{name}».",
+  "{name} closed: the clip editor keeps what it heard.": "Το {name} έκλεισε: ο επεξεργαστής κλιπ κρατά ό,τι άκουσε."
 }

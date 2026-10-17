@@ -330,6 +330,7 @@ class ClipEditor(QWidget):
         self.view = (0.0, 1.0)
         self._peaks: np.ndarray | None = None   # the take's waveform, made once per edit
         self._live_total = -1
+        self._saved_total = -1   # buf.total when all of it was last saved from live
         self._play: tuple[str, int, int] | None = None   # (sid, start, end) while playing
         self._msg = ""
         self._msg_timer = QTimer(self)
@@ -465,6 +466,7 @@ class ClipEditor(QWidget):
         """Listening (a buffer) or not (None: the card's editor was closed)."""
         self.buf = buf
         self._live_total = -1
+        self._saved_total = -1
         if buf is None:
             self.stop_playing()
             if self.take is not None and not self.take.edited:
@@ -699,11 +701,19 @@ class ClipEditor(QWidget):
         return a + st[0] * (b - a)
 
     def save(self):
+        buf = self.buf if self.take is None else None   # live
+        if buf is not None and buf.total == self._saved_total:   # in Saved clips already
+            self.flash(_("Nothing new since the last save: play something in the "
+                         "program first."))
+            return
+        total = buf.total if buf is not None else -1
         data, _start, whole = self._audio()
         if len(data) < int(0.05 * SR):
             self.flash(_("Select a bit to save first.") if self.take is not None
                        else _("Nothing heard yet."))
             return
+        if buf is not None and whole:
+            self._saved_total = total
         self.save_clip.emit(np.array(data, np.float32), whole)
 
     def set_big(self, on: bool):

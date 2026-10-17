@@ -964,8 +964,9 @@ def stylesheet(name: str | None = None) -> str:
     # a nudged button (DESIGN *Buttons*): a soft wash of the accent behind its edge
     # the Settings list's page you're on, on the window: card_hi was 1.03:1 there in
     # the light themes (Paper, Light: no visible mark). A theme whose own colour stood
-    # out more already keeps it (Swamp, Deep Fried, Retro 98).
-    tk["nav_sel"] = max((stand_out(tk["bg"], (tk["accent"], tk["text"]), 1.5, tk),
+    # out more already keeps it (Swamp, Deep Fried, Retro 98). 1.6 on the token, as the
+    # window's finish shades both a little: 1.5 measured 1.42:1 as drawn in Paper.
+    tk["nav_sel"] = max((stand_out(tk["bg"], (tk["accent"], tk["text"]), 1.6, tk),
                          tk["card_hi"]), key=lambda c: _contrast(c, tk["bg"]))
     tk["accent_tint"] = _rgba(tk["accent"], 0.30)
     tk["accent_tint_hi"] = _rgba(tk["accent"], 0.42)

@@ -67,6 +67,10 @@ class SettingsControl(Controller):
         while it's up. [Done], Escape or any tab on the rail goes back to the tab you
         were on. Asked for again while up: the same page, on `page` if one is named."""
         mw = self.mw
+        # asked for from Bun (his menu, a toast's button): the window comes back first,
+        # or the page opened in a window nobody could see
+        if mw.bunctl.bun_up():
+            mw.bunctl.leave_bun_mode(False)
         dlg = self._settings_dlg
         fresh = dlg is None or not qt_valid(dlg)
         if dlg is not None and not fresh:

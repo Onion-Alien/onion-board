@@ -3812,5 +3812,10 @@
   "Effects on any voice": "Effekter på hvilken som helst stemme",
   "Share your voices and setups with everyone, and get theirs.": "Del stemmene og oppsettene dine med alle, og få deres.",
   "The voice bar's Effects button puts rain, a crowd, a fire or a sound from your board behind your voice.": "Effekter-knappen i stemmelinjen legger regn, en folkemengde, et bål eller en lyd fra brettet ditt bak stemmen din.",
-  "Open Appearance": "Åpne Utseende"
+  "Open Appearance": "Åpne Utseende",
+  "Deleted the “{name}” category. Its sounds are still in All.": "Kategorien «{name}» er slettet. Lydene er fortsatt i Alle.",
+  "Go live": "Gå live",
+  "Nothing new since the last save: play something in the program first.": "Ingenting nytt siden forrige lagring: spill av noe i programmet først.",
+  "You're muted, so only you hear “{name}”.": "Du er dempet, så bare du hører «{name}».",
+  "{name} closed: the clip editor keeps what it heard.": "{name} ble lukket: klippredigereren beholder det den hørte."
 }

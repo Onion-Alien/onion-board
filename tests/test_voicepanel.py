@@ -802,6 +802,7 @@ def test_delete_a_saved_voice_then_undo_or_bring_it_back(panel, monkeypatch):
     monkeypatch.setattr(deleted.DeletedDialog, "exec", fake_exec)
     p.fx.show_deleted()
     assert seen[0].startswith("One") and "One" in p.fx._tile
+    assert list(p.fx.store.voices) == ["One", "Two"]   # in its old place, as Undo does
     assert p.fx.btn_bin.isHidden()
 
 

@@ -3732,5 +3732,10 @@
   "Effects on any voice": "任何声音都能加效果",
   "Share your voices and setups with everyone, and get theirs.": "和大家分享你的声音和设置，也能拿到他们的。",
   "The voice bar's Effects button puts rain, a crowd, a fire or a sound from your board behind your voice.": "声音栏的效果按钮可以在你的声音后面加上雨声、人群、火堆或你音效板里的音效。",
-  "Open Appearance": "打开外观"
+  "Open Appearance": "打开外观",
+  "Deleted the “{name}” category. Its sounds are still in All.": "已删除“{name}”分类。它的声音仍在“全部”中。",
+  "Go live": "开始直播",
+  "Nothing new since the last save: play something in the program first.": "自上次保存以来没有新内容：请先在程序里播放点什么。",
+  "You're muted, so only you hear “{name}”.": "你已静音，所以只有你能听到“{name}”。",
+  "{name} closed: the clip editor keeps what it heard.": "{name} 已关闭：剪辑编辑器会保留它听到的内容。"
 }

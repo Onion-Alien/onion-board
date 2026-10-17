@@ -3892,5 +3892,10 @@
   "Effects on any voice": "Ефекти на будь-якому голосі",
   "Share your voices and setups with everyone, and get theirs.": "Діліться своїми голосами й наборами з усіма та беріть чужі.",
   "The voice bar's Effects button puts rain, a crowd, a fire or a sound from your board behind your voice.": "Кнопка Ефекти на панелі голосу додає за ваш голос дощ, натовп, вогонь або звук із вашої дошки.",
-  "Open Appearance": "Відкрити Зовнішній вигляд"
+  "Open Appearance": "Відкрити Зовнішній вигляд",
+  "Deleted the “{name}” category. Its sounds are still in All.": "Категорію «{name}» видалено. Її звуки досі у «Всі».",
+  "Go live": "В ефір",
+  "Nothing new since the last save: play something in the program first.": "Нічого нового з останнього збереження: спершу ввімкни щось у програмі.",
+  "You're muted, so only you hear “{name}”.": "У тебе вимкнено звук для інших, тож «{name}» чуєш лише ти.",
+  "{name} closed: the clip editor keeps what it heard.": "{name} закрилася: редактор кліпів зберігає те, що почув."
 }
