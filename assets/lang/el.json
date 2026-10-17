@@ -3682,5 +3682,10 @@
   "Ship computer": "Υπολογιστής σκάφους",
   "Turns on one of the voices shown here, picked at random. Click again for another.": "Ανοίγει μία από τις φωνές που φαίνονται εδώ, τυχαία. Πάτα ξανά για άλλη.",
   "Turns the voice changer on with a voice picked at random from the ones the Voice tab shows (your favorites, when Favorites is picked).": "Ανοίγει την αλλαγή φωνής με μια τυχαία φωνή από αυτές που δείχνει η καρτέλα Φωνή (τα αγαπημένα σου, όταν είναι επιλεγμένα τα Αγαπημένα).",
-  "Zombie": "Ζόμπι"
+  "Zombie": "Ζόμπι",
+  "Couldn't put the AI voice on “{name}”: {why}": "Δεν μπήκε η φωνή AI στο \"{name}\": {why}",
+  "Couldn't start the AI voice: {why}": "Η φωνή AI δεν ξεκίνησε: {why}",
+  "Getting the AI voice ready…": "Ετοιμάζεται η φωνή AI…",
+  "Putting the AI voice on “{name}”… {pct}%": "Μπαίνει η φωνή AI στο \"{name}\"… {pct}%",
+  "The AI voices add-on isn't installed, so only the voice changer part of “{name}” is on.": "Το πρόσθετο φωνών AI δεν είναι εγκατεστημένο, οπότε από το \"{name}\" είναι ενεργή μόνο η αλλαγή φωνής."
 }

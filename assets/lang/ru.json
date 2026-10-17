@@ -3760,5 +3760,10 @@
   "Ship computer": "Бортовой компьютер",
   "Turns on one of the voices shown here, picked at random. Click again for another.": "Включает один из показанных здесь голосов, выбранный случайно. Нажми ещё раз — будет другой.",
   "Turns the voice changer on with a voice picked at random from the ones the Voice tab shows (your favorites, when Favorites is picked).": "Включает смену голоса со случайным голосом из тех, что показывает вкладка «Голос» (из избранного, когда выбрано «Избранное»).",
-  "Zombie": "Зомби"
+  "Zombie": "Зомби",
+  "Couldn't put the AI voice on “{name}”: {why}": "Не удалось наложить ИИ-голос на «{name}»: {why}",
+  "Couldn't start the AI voice: {why}": "Не удалось запустить ИИ-голос: {why}",
+  "Getting the AI voice ready…": "Готовлю ИИ-голос…",
+  "Putting the AI voice on “{name}”… {pct}%": "Накладываю ИИ-голос на «{name}»… {pct}%",
+  "The AI voices add-on isn't installed, so only the voice changer part of “{name}” is on.": "Дополнение с ИИ-голосами не установлено, поэтому из «{name}» включена только смена голоса."
 }

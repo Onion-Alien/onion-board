@@ -3682,5 +3682,10 @@
   "Ship computer": "Корабен компютър",
   "Turns on one of the voices shown here, picked at random. Click again for another.": "Включва един от показаните тук гласове, избран на случаен принцип. Кликни пак за друг.",
   "Turns the voice changer on with a voice picked at random from the ones the Voice tab shows (your favorites, when Favorites is picked).": "Включва промяната на гласа със случаен глас от показаните в раздела Глас (любимите ти, когато е избрано Любими).",
-  "Zombie": "Зомби"
+  "Zombie": "Зомби",
+  "Couldn't put the AI voice on “{name}”: {why}": "AI гласът не можа да се сложи на „{name}“: {why}",
+  "Couldn't start the AI voice: {why}": "AI гласът не можа да стартира: {why}",
+  "Getting the AI voice ready…": "AI гласът се подготвя…",
+  "Putting the AI voice on “{name}”… {pct}%": "AI гласът се слага на „{name}“… {pct}%",
+  "The AI voices add-on isn't installed, so only the voice changer part of “{name}” is on.": "Добавката за AI гласове не е инсталирана, затова е включена само промяната на гласа от „{name}“."
 }

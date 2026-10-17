@@ -3682,5 +3682,10 @@
   "Ship computer": "जहाज़ का कंप्यूटर",
   "Turns on one of the voices shown here, picked at random. Click again for another.": "यहाँ दिख रही आवाज़ों में से एक को बेतरतीब चुनकर चालू करता है। दूसरी के लिए फिर क्लिक करें।",
   "Turns the voice changer on with a voice picked at random from the ones the Voice tab shows (your favorites, when Favorites is picked).": "वॉइस टैब में दिख रही आवाज़ों में से बेतरतीब चुनी गई आवाज़ के साथ आवाज परिवर्तक चालू करता है (पसंदीदा चुना हो तो आपकी पसंदीदा में से)।",
-  "Zombie": "ज़ॉम्बी"
+  "Zombie": "ज़ॉम्बी",
+  "Couldn't put the AI voice on “{name}”: {why}": "“{name}” पर एआई आवाज़ नहीं लग पाई: {why}",
+  "Couldn't start the AI voice: {why}": "एआई आवाज़ शुरू नहीं हो पाई: {why}",
+  "Getting the AI voice ready…": "एआई आवाज़ तैयार हो रही है…",
+  "Putting the AI voice on “{name}”… {pct}%": "“{name}” पर एआई आवाज़ लग रही है… {pct}%",
+  "The AI voices add-on isn't installed, so only the voice changer part of “{name}” is on.": "एआई आवाज़ों का ऐड-ऑन इंस्टॉल नहीं है, इसलिए “{name}” का सिर्फ़ आवाज परिवर्तक वाला हिस्सा चालू है।"
 }

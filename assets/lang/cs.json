@@ -3760,5 +3760,10 @@
   "Ship computer": "Lodní počítač",
   "Turns on one of the voices shown here, picked at random. Click again for another.": "Zapne jeden z hlasů zobrazených tady, vybraný náhodně. Klikni znovu pro další.",
   "Turns the voice changer on with a voice picked at random from the ones the Voice tab shows (your favorites, when Favorites is picked).": "Zapne měnič hlasu s hlasem vybraným náhodně z těch, které ukazuje karta Hlas (tvoje oblíbené, když je vybráno Oblíbené).",
-  "Zombie": "Zombie"
+  "Zombie": "Zombie",
+  "Couldn't put the AI voice on “{name}”: {why}": "AI hlas se nepodařilo dát na „{name}“: {why}",
+  "Couldn't start the AI voice: {why}": "AI hlas se nepodařilo spustit: {why}",
+  "Getting the AI voice ready…": "Připravuje se AI hlas…",
+  "Putting the AI voice on “{name}”… {pct}%": "Dává se AI hlas na „{name}“… {pct} %",
+  "The AI voices add-on isn't installed, so only the voice changer part of “{name}” is on.": "Doplněk AI hlasů není nainstalovaný, takže z „{name}“ je zapnutý jen měnič hlasu."
 }

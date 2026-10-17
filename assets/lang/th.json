@@ -3604,5 +3604,10 @@
   "Ship computer": "คอมพิวเตอร์ยานอวกาศ",
   "Turns on one of the voices shown here, picked at random. Click again for another.": "เปิดเสียงหนึ่งจากเสียงที่แสดงตรงนี้แบบสุ่ม คลิกอีกครั้งเพื่อเปลี่ยนเสียง",
   "Turns the voice changer on with a voice picked at random from the ones the Voice tab shows (your favorites, when Favorites is picked).": "เปิดโปรแกรมเปลี่ยนเสียงด้วยเสียงที่สุ่มจากเสียงที่แท็บ เสียงพูด แสดงอยู่ (จากรายการโปรดของคุณ เมื่อเลือก รายการโปรด)",
-  "Zombie": "ซอมบี้"
+  "Zombie": "ซอมบี้",
+  "Couldn't put the AI voice on “{name}”: {why}": "ใส่เสียง AI ให้ “{name}” ไม่ได้: {why}",
+  "Couldn't start the AI voice: {why}": "เริ่มเสียง AI ไม่ได้: {why}",
+  "Getting the AI voice ready…": "กำลังเตรียมเสียง AI…",
+  "Putting the AI voice on “{name}”… {pct}%": "กำลังใส่เสียง AI ให้ “{name}”… {pct}%",
+  "The AI voices add-on isn't installed, so only the voice changer part of “{name}” is on.": "ยังไม่ได้ติดตั้งส่วนเสริมเสียง AI จึงเปิดแค่ส่วนเปลี่ยนเสียงของ “{name}”"
 }

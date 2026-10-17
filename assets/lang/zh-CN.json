@@ -3604,5 +3604,10 @@
   "Ship computer": "飞船电脑",
   "Turns on one of the voices shown here, picked at random. Click again for another.": "随机打开这里显示的其中一个声音。再点一次换一个。",
   "Turns the voice changer on with a voice picked at random from the ones the Voice tab shows (your favorites, when Favorites is picked).": "用“变声”标签页显示的声音中随机选一个，打开变声器（选了收藏夹时从你的收藏里选）。",
-  "Zombie": "僵尸"
+  "Zombie": "僵尸",
+  "Couldn't put the AI voice on “{name}”: {why}": "无法给“{name}”加上 AI 声音：{why}",
+  "Couldn't start the AI voice: {why}": "无法启动 AI 声音：{why}",
+  "Getting the AI voice ready…": "正在准备 AI 声音…",
+  "Putting the AI voice on “{name}”… {pct}%": "正在给“{name}”加上 AI 声音… {pct}%",
+  "The AI voices add-on isn't installed, so only the voice changer part of “{name}” is on.": "没有安装 AI 声音插件，所以“{name}”只开了变声器部分。"
 }

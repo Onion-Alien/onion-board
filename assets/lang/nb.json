@@ -3682,5 +3682,10 @@
   "Ship computer": "Skipsdatamaskin",
   "Turns on one of the voices shown here, picked at random. Click again for another.": "Slår på én av stemmene som vises her, valgt tilfeldig. Klikk igjen for en annen.",
   "Turns the voice changer on with a voice picked at random from the ones the Voice tab shows (your favorites, when Favorites is picked).": "Slår på stemmeskifteren med en tilfeldig stemme blant dem Stemme-fanen viser (favorittene dine, når Favoritter er valgt).",
-  "Zombie": "Zombie"
+  "Zombie": "Zombie",
+  "Couldn't put the AI voice on “{name}”: {why}": "Kunne ikke legge AI-stemmen på «{name}»: {why}",
+  "Couldn't start the AI voice: {why}": "Kunne ikke starte AI-stemmen: {why}",
+  "Getting the AI voice ready…": "Gjør AI-stemmen klar…",
+  "Putting the AI voice on “{name}”… {pct}%": "Legger AI-stemmen på «{name}»… {pct} %",
+  "The AI voices add-on isn't installed, so only the voice changer part of “{name}” is on.": "Tillegget for AI-stemmer er ikke installert, så bare stemmeskifter-delen av «{name}» er på."
 }

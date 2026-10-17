@@ -3682,5 +3682,10 @@
   "Ship computer": "Scheepscomputer",
   "Turns on one of the voices shown here, picked at random. Click again for another.": "Zet een van de stemmen die hier staan aan, willekeurig gekozen. Klik nog eens voor een andere.",
   "Turns the voice changer on with a voice picked at random from the ones the Voice tab shows (your favorites, when Favorites is picked).": "Zet de stemverander aan met een willekeurige stem uit de stemmen die het tabblad Stem toont (je favorieten, als Favorieten gekozen is).",
-  "Zombie": "Zombie"
+  "Zombie": "Zombie",
+  "Couldn't put the AI voice on “{name}”: {why}": "Kon de AI-stem niet op “{name}” zetten: {why}",
+  "Couldn't start the AI voice: {why}": "Kon de AI-stem niet starten: {why}",
+  "Getting the AI voice ready…": "AI-stem wordt klaargezet…",
+  "Putting the AI voice on “{name}”… {pct}%": "AI-stem wordt op “{name}” gezet… {pct}%",
+  "The AI voices add-on isn't installed, so only the voice changer part of “{name}” is on.": "De add-on voor AI-stemmen is niet geïnstalleerd, dus alleen de stemveranderaar van “{name}” staat aan."
 }

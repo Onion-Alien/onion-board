@@ -3682,5 +3682,10 @@
   "Ship computer": "Hajószámítógép",
   "Turns on one of the voices shown here, picked at random. Click again for another.": "Bekapcsolja az itt látható hangok egyikét, véletlenszerűen. Kattints újra egy másikért.",
   "Turns the voice changer on with a voice picked at random from the ones the Voice tab shows (your favorites, when Favorites is picked).": "Bekapcsolja a hangváltót egy véletlenszerű hanggal azok közül, amiket a Beszéd lap mutat (a kedvenceid közül, ha a Kedvencek van kiválasztva).",
-  "Zombie": "Zombi"
+  "Zombie": "Zombi",
+  "Couldn't put the AI voice on “{name}”: {why}": "Nem sikerült rátenni az AI hangot erre: „{name}”: {why}",
+  "Couldn't start the AI voice: {why}": "Nem sikerült elindítani az AI hangot: {why}",
+  "Getting the AI voice ready…": "Az AI hang előkészítése…",
+  "Putting the AI voice on “{name}”… {pct}%": "AI hang rátétele erre: „{name}”… {pct}%",
+  "The AI voices add-on isn't installed, so only the voice changer part of “{name}” is on.": "Az AI hangok bővítménye nincs telepítve, ezért a(z) „{name}” beállításból csak a hangváltó van bekapcsolva."
 }

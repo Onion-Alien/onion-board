@@ -3760,5 +3760,10 @@
   "Ship computer": "Komputer statku",
   "Turns on one of the voices shown here, picked at random. Click again for another.": "Włącza jeden z głosów pokazanych tutaj, wybrany losowo. Kliknij znowu, by dostać inny.",
   "Turns the voice changer on with a voice picked at random from the ones the Voice tab shows (your favorites, when Favorites is picked).": "Włącza zmieniacz głosu z losowym głosem spośród tych, które pokazuje karta Głos (twoje ulubione, gdy wybrane są Ulubione).",
-  "Zombie": "Zombie"
+  "Zombie": "Zombie",
+  "Couldn't put the AI voice on “{name}”: {why}": "Nie udało się nałożyć głosu AI na „{name}”: {why}",
+  "Couldn't start the AI voice: {why}": "Nie udało się uruchomić głosu AI: {why}",
+  "Getting the AI voice ready…": "Przygotowuję głos AI…",
+  "Putting the AI voice on “{name}”… {pct}%": "Nakładam głos AI na „{name}”… {pct}%",
+  "The AI voices add-on isn't installed, so only the voice changer part of “{name}” is on.": "Dodatek z głosami AI nie jest zainstalowany, więc z „{name}” działa tylko zmieniacz głosu."
 }

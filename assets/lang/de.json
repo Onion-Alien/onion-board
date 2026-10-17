@@ -3682,5 +3682,10 @@
   "Ship computer": "Bordcomputer",
   "Turns on one of the voices shown here, picked at random. Click again for another.": "Schaltet eine der hier gezeigten Stimmen ein, zufällig gewählt. Nochmal klicken für eine andere.",
   "Turns the voice changer on with a voice picked at random from the ones the Voice tab shows (your favorites, when Favorites is picked).": "Schaltet den Stimmverzerrer mit einer zufälligen Stimme aus denen ein, die der Stimme-Tab zeigt (deine Favoriten, wenn Favoriten gewählt ist).",
-  "Zombie": "Zombie"
+  "Zombie": "Zombie",
+  "Couldn't put the AI voice on “{name}”: {why}": "Die KI-Stimme konnte nicht auf „{name}“ gelegt werden: {why}",
+  "Couldn't start the AI voice: {why}": "Die KI-Stimme konnte nicht starten: {why}",
+  "Getting the AI voice ready…": "KI-Stimme wird vorbereitet…",
+  "Putting the AI voice on “{name}”… {pct}%": "KI-Stimme wird auf „{name}“ gelegt… {pct} %",
+  "The AI voices add-on isn't installed, so only the voice changer part of “{name}” is on.": "Das Add-on für KI-Stimmen ist nicht installiert, daher ist von „{name}“ nur der Stimmverzerrer an."
 }

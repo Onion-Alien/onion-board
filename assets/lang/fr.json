@@ -3682,5 +3682,10 @@
   "Ship computer": "Ordinateur de bord",
   "Turns on one of the voices shown here, picked at random. Click again for another.": "Active une des voix affichées ici, choisie au hasard. Clique encore pour une autre.",
   "Turns the voice changer on with a voice picked at random from the ones the Voice tab shows (your favorites, when Favorites is picked).": "Active le changeur de voix avec une voix choisie au hasard parmi celles que montre l'onglet Voix (tes favoris, quand Favoris est choisi).",
-  "Zombie": "Zombie"
+  "Zombie": "Zombie",
+  "Couldn't put the AI voice on “{name}”: {why}": "Impossible de mettre la voix IA sur « {name} » : {why}",
+  "Couldn't start the AI voice: {why}": "Impossible de lancer la voix IA : {why}",
+  "Getting the AI voice ready…": "Préparation de la voix IA…",
+  "Putting the AI voice on “{name}”… {pct}%": "Ajout de la voix IA sur « {name} »… {pct} %",
+  "The AI voices add-on isn't installed, so only the voice changer part of “{name}” is on.": "Le module des voix IA n'est pas installé : seule la partie changeur de voix de « {name} » est activée."
 }

@@ -3604,5 +3604,10 @@
   "Ship computer": "Máy tính tàu",
   "Turns on one of the voices shown here, picked at random. Click again for another.": "Bật một trong các giọng hiện ở đây, chọn ngẫu nhiên. Bấm lần nữa để đổi giọng khác.",
   "Turns the voice changer on with a voice picked at random from the ones the Voice tab shows (your favorites, when Favorites is picked).": "Bật đổi giọng nói với một giọng chọn ngẫu nhiên trong các giọng thẻ Giọng nói đang hiện (trong mục yêu thích, khi chọn Yêu thích).",
-  "Zombie": "Xác sống"
+  "Zombie": "Xác sống",
+  "Couldn't put the AI voice on “{name}”: {why}": "Không thể áp giọng AI cho “{name}”: {why}",
+  "Couldn't start the AI voice: {why}": "Không thể khởi động giọng AI: {why}",
+  "Getting the AI voice ready…": "Đang chuẩn bị giọng AI…",
+  "Putting the AI voice on “{name}”… {pct}%": "Đang áp giọng AI cho “{name}”… {pct}%",
+  "The AI voices add-on isn't installed, so only the voice changer part of “{name}” is on.": "Chưa cài tiện ích giọng AI nên chỉ phần đổi giọng nói của “{name}” được bật."
 }

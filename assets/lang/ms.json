@@ -3604,5 +3604,10 @@
   "Ship computer": "Komputer kapal",
   "Turns on one of the voices shown here, picked at random. Click again for another.": "Menghidupkan salah satu suara yang ditunjukkan di sini, dipilih secara rawak. Klik lagi untuk yang lain.",
   "Turns the voice changer on with a voice picked at random from the ones the Voice tab shows (your favorites, when Favorites is picked).": "Menghidupkan penukar suara dengan suara yang dipilih secara rawak daripada yang ditunjukkan oleh tab Suara (kegemaran anda, apabila Kegemaran dipilih).",
-  "Zombie": "Zombi"
+  "Zombie": "Zombi",
+  "Couldn't put the AI voice on “{name}”: {why}": "Tidak dapat memasang suara AI pada “{name}”: {why}",
+  "Couldn't start the AI voice: {why}": "Tidak dapat memulakan suara AI: {why}",
+  "Getting the AI voice ready…": "Menyediakan suara AI…",
+  "Putting the AI voice on “{name}”… {pct}%": "Memasang suara AI pada “{name}”… {pct}%",
+  "The AI voices add-on isn't installed, so only the voice changer part of “{name}” is on.": "Alat tambah suara AI belum dipasang, jadi hanya bahagian penukar suara “{name}” yang dihidupkan."
 }

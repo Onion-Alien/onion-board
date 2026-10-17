@@ -3604,5 +3604,10 @@
   "Ship computer": "宇宙船のコンピューター",
   "Turns on one of the voices shown here, picked at random. Click again for another.": "ここに表示されているボイスからランダムに1つをオンにします。もう一度クリックで別のボイス。",
   "Turns the voice changer on with a voice picked at random from the ones the Voice tab shows (your favorites, when Favorites is picked).": "ボイスタブに表示されているボイスからランダムに選んでボイスチェンジャーをオンにします（お気に入りを選んでいるときはお気に入りから）。",
-  "Zombie": "ゾンビ"
+  "Zombie": "ゾンビ",
+  "Couldn't put the AI voice on “{name}”: {why}": "「{name}」にAIボイスを付けられませんでした：{why}",
+  "Couldn't start the AI voice: {why}": "AIボイスを開始できませんでした：{why}",
+  "Getting the AI voice ready…": "AIボイスを準備中…",
+  "Putting the AI voice on “{name}”… {pct}%": "「{name}」にAIボイスを付けています… {pct}%",
+  "The AI voices add-on isn't installed, so only the voice changer part of “{name}” is on.": "AIボイスのアドオンが入っていないため、「{name}」はボイスチェンジャー部分だけオンです。"
 }

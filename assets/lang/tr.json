@@ -3682,5 +3682,10 @@
   "Ship computer": "Gemi bilgisayarı",
   "Turns on one of the voices shown here, picked at random. Click again for another.": "Burada gösterilen seslerden birini rastgele açar. Başka biri için tekrar tıkla.",
   "Turns the voice changer on with a voice picked at random from the ones the Voice tab shows (your favorites, when Favorites is picked).": "Ses değiştiriciyi, Ses sekmesinin gösterdiği seslerden rastgele seçilen biriyle açar (Favoriler seçiliyse favorilerinden).",
-  "Zombie": "Zombi"
+  "Zombie": "Zombi",
+  "Couldn't put the AI voice on “{name}”: {why}": "Yapay zeka sesi “{name}” üzerine konamadı: {why}",
+  "Couldn't start the AI voice: {why}": "Yapay zeka sesi başlatılamadı: {why}",
+  "Getting the AI voice ready…": "Yapay zeka sesi hazırlanıyor…",
+  "Putting the AI voice on “{name}”… {pct}%": "Yapay zeka sesi “{name}” üzerine konuyor… %{pct}",
+  "The AI voices add-on isn't installed, so only the voice changer part of “{name}” is on.": "Yapay zeka sesleri eklentisi kurulu değil, bu yüzden “{name}” ayarının yalnızca ses değiştirici kısmı açık."
 }

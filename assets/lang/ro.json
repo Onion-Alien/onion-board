@@ -3760,5 +3760,10 @@
   "Ship computer": "Computerul navei",
   "Turns on one of the voices shown here, picked at random. Click again for another.": "Pornește una dintre vocile arătate aici, aleasă la întâmplare. Apasă din nou pentru alta.",
   "Turns the voice changer on with a voice picked at random from the ones the Voice tab shows (your favorites, when Favorites is picked).": "Pornește schimbătorul de voce cu o voce aleasă la întâmplare dintre cele pe care le arată fila Voce (favoritele tale, când e ales Favorite).",
-  "Zombie": "Zombi"
+  "Zombie": "Zombi",
+  "Couldn't put the AI voice on “{name}”: {why}": "Vocea AI nu a putut fi pusă pe „{name}”: {why}",
+  "Couldn't start the AI voice: {why}": "Vocea AI nu a putut porni: {why}",
+  "Getting the AI voice ready…": "Se pregătește vocea AI…",
+  "Putting the AI voice on “{name}”… {pct}%": "Se pune vocea AI pe „{name}”… {pct}%",
+  "The AI voices add-on isn't installed, so only the voice changer part of “{name}” is on.": "Suplimentul pentru voci AI nu e instalat, așa că din „{name}” e pornit doar schimbătorul de voce."
 }

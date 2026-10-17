@@ -3682,5 +3682,10 @@
   "Ship computer": "Skeppsdator",
   "Turns on one of the voices shown here, picked at random. Click again for another.": "Slår på en av rösterna som visas här, vald slumpvis. Klicka igen för en annan.",
   "Turns the voice changer on with a voice picked at random from the ones the Voice tab shows (your favorites, when Favorites is picked).": "Slår på röstvändaren med en slumpad röst bland dem fliken Röst visar (dina favoriter, när Favoriter är valt).",
-  "Zombie": "Zombie"
+  "Zombie": "Zombie",
+  "Couldn't put the AI voice on “{name}”: {why}": "Kunde inte lägga AI-rösten på ”{name}”: {why}",
+  "Couldn't start the AI voice: {why}": "Kunde inte starta AI-rösten: {why}",
+  "Getting the AI voice ready…": "Gör AI-rösten redo…",
+  "Putting the AI voice on “{name}”… {pct}%": "Lägger AI-rösten på ”{name}”… {pct} %",
+  "The AI voices add-on isn't installed, so only the voice changer part of “{name}” is on.": "Tillägget för AI-röster är inte installerat, så bara röstvändardelen av ”{name}” är på."
 }
