@@ -3521,7 +3521,6 @@
   "Shared by a player": "Gedeeld door een speler",
   "Sharing…": "Delen…",
   "Sound store": "Geluidenwinkel",
-  "Store": "Winkel",
   "Tags": "Tags",
   "Tags, with commas (optional): meme, horn, game": "Tags, met komma’s (optioneel): meme, toeter, game",
   "Thanks for sharing!": "Bedankt voor het delen!",
@@ -3533,7 +3532,7 @@
   "That sound is already in the store.": "Dat geluid staat al in de winkel.",
   "That sound isn't in the store any more.": "Dat geluid staat niet meer in de winkel.",
   "That's a lot for one day. Try again tomorrow.": "Dat is veel voor één dag. Probeer het morgen opnieuw.",
-  "The Store tab: the project's own sound store, for its list, the sounds you play or add, your votes and the sounds you share.": "Het tabblad Winkel: de eigen geluidenwinkel van het project, voor de lijst, de geluiden die je afspeelt of toevoegt, je stemmen en de geluiden die je deelt.",
+  "The Free sounds tab: the project's own sound store, for its list, the sounds you play or add, your votes and the sounds you share.": "Het tabblad Gratis geluiden: de eigen geluidenwinkel van het project, voor de lijst, de geluiden die je afspeelt of toevoegt, je stemmen en de geluiden die je deelt.",
   "The best voted first": "De best beoordeelde eerst",
   "The newest first": "De nieuwste eerst",
   "The sound store had a problem. Try again in a bit.": "De geluidenwinkel had een probleem. Probeer het zo opnieuw.",
@@ -3552,7 +3551,7 @@
   "Paste a link and name it first": "Plak eerst een link en geef hem een naam",
   "Paste a link: https://www.youtube.com/watch?v=…": "Plak een link: https://www.youtube.com/watch?v=…",
   "Play it once (from the site)": "Eén keer afspelen (van de site)",
-  "Share this link in the Store tab": "Deel deze link in het tabblad Winkel",
+  "Share this link in the Free sounds tab": "Deel deze link in het tabblad Gratis geluiden",
   "Share to the store": "Delen in de winkel",
   "The store takes links to YouTube, TikTok, SoundCloud and other video and sound sites.": "De winkel neemt links naar YouTube, TikTok, SoundCloud en andere video- en geluidssites.",
   "{site} link": "{site}-link",
@@ -3582,5 +3581,6 @@
   "Is a sound in the store yours? Email {email} and it comes down.": "Is een geluid in de winkel van jou? Mail naar {email} en het wordt weggehaald.",
   "Games get the key too": "Games krijgen de toets ook",
   "Keys in games": "Toetsen in games",
-  "With this on, a hotkey still does its normal job too: press F1 in a game and the game gets F1 while your sound plays. Off: only Onion Board gets the key, so a hotkey on W stops you walking.": "Staat dit aan, dan doet een sneltoets ook gewoon zijn normale werk: druk op F1 in een game en de game krijgt F1 terwijl je geluid speelt. Uit: alleen Onion Board krijgt de toets, dus een sneltoets op W houdt je tegen met lopen."
+  "With this on, a hotkey still does its normal job too: press F1 in a game and the game gets F1 while your sound plays. Off: only Onion Board gets the key, so a hotkey on W stops you walking.": "Staat dit aan, dan doet een sneltoets ook gewoon zijn normale werk: druk op F1 in een game en de game krijgt F1 terwijl je geluid speelt. Uit: alleen Onion Board krijgt de toets, dus een sneltoets op W houdt je tegen met lopen.",
+  "Free sounds": "Gratis geluiden"
 }
