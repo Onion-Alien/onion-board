@@ -459,7 +459,6 @@
   "Half (-12 dB)": "Metade (-12 dB)",
   "Hear it myself": "Ouvir eu mesmo",
   "Hear what they hear": "Ouvir o que eles ouvem",
-  "Hey, thanks for actually using this. Onion Board started because every soundboard I tried was either ugly, full of ads, or quietly phoning home, so I made my own and it kind of snowballed from there. It's just me building it, a lot of late nights and a lot of testing, so if something's broken, ugly or confusing, tell me. Honestly. I'd way rather hear \"this part is cooked\" than have you quietly uninstall it.\n\nIt's free and it's staying free. Have fun with it, don't be a menace with it, and go make your friends jump in voice chat.\n\nOnionAlien": "Olá, obrigado por usares mesmo isto. O Onion Board começou porque todos os soundboards que experimentei eram feios, cheios de anúncios, ou mandavam dados para casa às escondidas, por isso fiz o meu e a coisa cresceu a partir daí. Sou só eu a fazê-lo, muitas noites até tarde e muitos testes, por isso se alguma coisa estiver avariada, feia ou confusa, diz-me. A sério. Prefiro mil vezes ouvir \"esta parte está estragada\" do que ver-te desinstalá-lo em silêncio.\n\nÉ gratuito e vai continuar gratuito. Diverte-te com ele, não sejas um terror com ele, e vai pregar sustos aos teus amigos no chat de voz.\n• OnionAlien",
   "Hide": "Ocultar",
   "Hide after picking a sound": "Ocultar depois de escolher um som",
   "Hide that I'm using Tor": "Esconder que estou a usar o Tor",
@@ -4075,5 +4074,7 @@
   "Sorry about that. What should we fix?": "Lamentamos. O que devemos corrigir?",
   "Thanks for telling us!": "Obrigado por nos dizeres!",
   "Type here": "Escreve aqui",
-  "Yes, I like it": "Sim, gosto"
+  "Yes, I like it": "Sim, gosto",
+  "No ads, no account, no spying, free forever. Found a bug? Tell me. Have fun.\n\nOnionAlien": "Sem anúncios, sem conta, sem espionagem, grátis para sempre. Encontraste um bug? Diz-me. Diverte-te.\n\nOnionAlien",
+  "The store's down right now, so sharing is off. Try again later.": "A loja está em baixo de momento, por isso a partilha está desligada. Tenta mais tarde."
 }

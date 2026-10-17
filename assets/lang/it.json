@@ -870,7 +870,6 @@
   "Grey": "Grigio",
   "Group servers by site (googlevideo.com, not each r3---sn-abc.googlevideo.com)": "Raggruppare i server per sito (googlevideo.com, non ciascuno r3---sn-abc.googlevideo.com)",
   "Half (-12 dB)": "Metà (-12 dB)",
-  "Hey, thanks for actually using this. Onion Board started because every soundboard I tried was either ugly, full of ads, or quietly phoning home, so I made my own and it kind of snowballed from there. It's just me building it, a lot of late nights and a lot of testing, so if something's broken, ugly or confusing, tell me. Honestly. I'd way rather hear \"this part is cooked\" than have you quietly uninstall it.\n\nIt's free and it's staying free. Have fun with it, don't be a menace with it, and go make your friends jump in voice chat.\n\nOnionAlien": "Ehi, grazie per averlo utilizzato davvero. Onion Board è iniziato perché ogni tavola armonica che ho provato era brutta, piena di pubblicità o telefonava silenziosamente a casa, quindi ne ho creata una mia e da lì la cosa è cresciuta a dismisura. Sono solo io a costruirlo, molte notti in ritardo e molti test, quindi se qualcosa è rotto, brutto o confuso, dimmelo. Onestamente. Preferirei sentire \"questa parte è cotta\" piuttosto che disinstallarla silenziosamente. È gratuito e rimarrà gratuito. Divertiti, non essere una minaccia e fai saltare i tuoi amici nella chat vocale., CipollaAlieno",
   "Hide after picking a sound": "Nasconditi dopo aver scelto un suono",
   "Hide that I'm using Tor": "Nascondi che sto usando Tor",
   "Highlight colour": "Evidenzia il colore",
@@ -4075,5 +4074,7 @@
   "Sorry about that. What should we fix?": "Ci dispiace. Cosa dovremmo sistemare?",
   "Thanks for telling us!": "Grazie per avercelo detto!",
   "Type here": "Scrivi qui",
-  "Yes, I like it": "Sì, mi piace"
+  "Yes, I like it": "Sì, mi piace",
+  "No ads, no account, no spying, free forever. Found a bug? Tell me. Have fun.\n\nOnionAlien": "Niente pubblicità, niente account, niente spionaggio, gratis per sempre. Trovato un bug? Dimmelo. Divertiti.\n\nOnionAlien",
+  "The store's down right now, so sharing is off. Try again later.": "Lo store al momento non funziona, quindi la condivisione è disattivata. Riprova più tardi."
 }

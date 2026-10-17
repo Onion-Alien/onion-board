@@ -15,7 +15,7 @@ from PySide6.QtWidgets import (QAbstractButton, QApplication, QCheckBox, QComboB
                                QVBoxLayout, QWidget)
 
 
-from soundboard.ui import busy, icons
+from soundboard.ui import busy, icons, onionalien
 from soundboard import theme, usage
 from soundboard.i18n import _
 from soundboard.ui.settingspages import Built, _button_row as _button_row
@@ -35,13 +35,8 @@ log = logging.getLogger(__name__)
 
 
 # Settings > About. The note is the author's own words, kept casual on purpose.
-NOTE = _("Hey, thanks for actually using this. Onion Board started because every soundboard "
-          "I tried was either ugly, full of ads, or quietly phoning home, so I made my own "
-          "and it kind of snowballed from there. It's just me building it, a lot of late "
-          "nights and a lot of testing, so if something's broken, ugly or confusing, tell "
-          "me. Honestly. I'd way rather hear \"this part is cooked\" than have you quietly "
-          "uninstall it.\n\nIt's free and it's staying free. Have fun with it, don't be a "
-          "menace with it, and go make your friends jump in voice chat.\n\nOnionAlien")
+NOTE = _("No ads, no account, no spying, free forever. Found a bug? Tell me. Have fun."
+         "\n\nOnionAlien")
 
 
 class _AdvancedRow(QStyledItemDelegate):
@@ -596,9 +591,8 @@ class SettingsDialog(QDialog, Built):
 
     def _note_card(self):
         card, cv = self._card(_("A note from me"), icon="edit")
-        note = QLabel(NOTE)
-        note.setWordWrap(True)
-        cv.addWidget(note)
+        self.alien_note = onionalien.AlienNote(NOTE)
+        cv.addWidget(self.alien_note)
         return card
 
     # ------------------------------------------------------------------ add-ons

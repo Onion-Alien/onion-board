@@ -60,6 +60,20 @@ class StoreDown(StoreError):
     the user did, and nothing they can fix."""
 
 
+_failing: set[str] = set()   # the calls (their paths, no query) the server last failed
+
+
+def is_down() -> bool:
+    """Whether the server failed one of its calls with an error of its own (a 500) and
+    hasn't answered that call since: sharing is off until it does."""
+    return bool(_failing)
+
+
+def down_share() -> str:
+    """Why sharing is greyed out."""
+    return _("The store's down right now, so sharing is off. Try again later.")
+
+
 @dataclass
 class Sound:
     id: str
@@ -144,6 +158,7 @@ def _request(method: str, path: str, install: str = "", body: bytes | None = Non
     if ctype:
         headers["Content-Type"] = ctype
     req = urllib.request.Request(BASE + path, data=body, headers=headers, method=method)
+    key = path.split("?", 1)[0]
     try:
         with net.urlopen(req, timeout=timeout, feature=FEATURE) as r:
             data = r.read(limit + 1)
@@ -153,6 +168,7 @@ def _request(method: str, path: str, install: str = "", body: bytes | None = Non
         except (ValueError, AttributeError):
             err = ""
         if e.code >= 500 and err not in ("queue full", "store full"):
+            _failing.add(key)
             raise StoreDown(_("Sorry, the store's down. We're working on getting it back "
                               "up.")) from None
         raise StoreError((why or _why)(e.code, err)) from None
@@ -162,6 +178,7 @@ def _request(method: str, path: str, install: str = "", body: bytes | None = Non
         log.info("store %s %s failed: %s", method, path, e)
         raise StoreError(_("Couldn't reach the sound store. Check your internet and try "
                            "again.")) from None
+    _failing.discard(key)
     if len(data) > limit:
         raise StoreError(_("The sound store sent more than it should, so it was left."))
     return data

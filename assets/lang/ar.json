@@ -950,7 +950,6 @@
   "Grey": "رمادي",
   "Group servers by site (googlevideo.com, not each r3---sn-abc.googlevideo.com)": "تجميع الخوادم حسب الموقع (googlevideo.com، وليس كل r3---sn-abc.googlevideo.com)",
   "Half (-12 dB)": "نصف (-12 ديسيبل)",
-  "Hey, thanks for actually using this. Onion Board started because every soundboard I tried was either ugly, full of ads, or quietly phoning home, so I made my own and it kind of snowballed from there. It's just me building it, a lot of late nights and a lot of testing, so if something's broken, ugly or confusing, tell me. Honestly. I'd way rather hear \"this part is cooked\" than have you quietly uninstall it.\n\nIt's free and it's staying free. Have fun with it, don't be a menace with it, and go make your friends jump in voice chat.\n\nOnionAlien": "مهلا، شكرا لاستخدام هذا في الواقع. بدأت Onion Board لأن كل لوحة صوت جربتها كانت إما قبيحة، أو مليئة بالإعلانات، أو تتصل بالمنزل بهدوء، لذلك صنعت لوحة الصوت الخاصة بي وتزايدت الأمور من هناك. أنا فقط من أقوم ببنائه، وأقضي الكثير من الليل في وقت متأخر والكثير من الاختبارات، لذلك إذا كان هناك شيء معطل أو قبيح أو مربك، أخبرني. بصدق. أفضّل أن أسمع عبارة \"تم طهي هذا الجزء\" بدلاً من إلغاء تثبيته بهدوء. إنه مجاني ويبقى مجانيًا. استمتع بها، ولا تشكل تهديدًا بها، واجعل أصدقاءك يشاركون في الدردشة الصوتية. - البصل الغريبة",
   "Hide after picking a sound": "إخفاء بعد اختيار الصوت",
   "Hide that I'm using Tor": "إخفاء أنني أستخدم Tor",
   "Highlight colour": "تسليط الضوء على اللون",
@@ -4387,5 +4386,7 @@
   "Sorry about that. What should we fix?": "آسفون لذلك. ما الذي يجب أن نصلحه؟",
   "Thanks for telling us!": "شكرًا لإخبارنا!",
   "Type here": "اكتب هنا",
-  "Yes, I like it": "نعم، يعجبني"
+  "Yes, I like it": "نعم، يعجبني",
+  "No ads, no account, no spying, free forever. Found a bug? Tell me. Have fun.\n\nOnionAlien": "بلا إعلانات، بلا حساب، بلا تجسس، ومجاني للأبد. لقيت خطأ؟ قل لي. استمتع.\n\nOnionAlien",
+  "The store's down right now, so sharing is off. Try again later.": "المتجر متوقف الآن، لذا المشاركة متوقفة. حاول لاحقًا."
 }

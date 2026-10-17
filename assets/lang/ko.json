@@ -850,7 +850,6 @@
   "Grey": "회색",
   "Group servers by site (googlevideo.com, not each r3---sn-abc.googlevideo.com)": "사이트별로 서버를 그룹화합니다(각 r3이 아닌 googlevideo.com---sn-abc.googlevideo.com).",
   "Half (-12 dB)": "절반(-12dB)",
-  "Hey, thanks for actually using this. Onion Board started because every soundboard I tried was either ugly, full of ads, or quietly phoning home, so I made my own and it kind of snowballed from there. It's just me building it, a lot of late nights and a lot of testing, so if something's broken, ugly or confusing, tell me. Honestly. I'd way rather hear \"this part is cooked\" than have you quietly uninstall it.\n\nIt's free and it's staying free. Have fun with it, don't be a menace with it, and go make your friends jump in voice chat.\n\nOnionAlien": "안녕하세요 실제로 사용해 주셔서 감사합니다. Onion Board는 제가 시도한 모든 사운드보드가 보기 흉하거나, 광고로 가득 차 있거나, 조용히 집에 전화를 걸기 때문에 시작되었습니다. 그래서 제가 직접 만들었고 거기서부터 눈덩이처럼 불어났습니다. 그냥 제가 만드는 일이고, 밤늦게까지 수많은 테스트를 거쳐서 문제가 있거나, 보기 흉하거나, 혼란스러운 것이 있으면 알려주세요. 솔직히. 조용히 제거하라는 것보다 \"이 부분은 익었습니다\"라는 말을 듣고 싶습니다. 무료이며 무료로 유지됩니다. 재미있게 즐기고, 위협하지 말고, 친구들이 음성 채팅에 뛰어들도록 하세요., 양파외계인",
   "Hide after picking a sound": "소리를 선택한 후 숨기기",
   "Hide that I'm using Tor": "내가 Tor를 사용하고 있다는 사실을 숨기세요",
   "Highlight colour": "하이라이트 컬러",
@@ -3997,5 +3996,7 @@
   "Sorry about that. What should we fix?": "죄송해요. 무엇을 고쳐야 할까요?",
   "Thanks for telling us!": "알려 주셔서 고마워요!",
   "Type here": "여기에 입력",
-  "Yes, I like it": "네, 좋아요"
+  "Yes, I like it": "네, 좋아요",
+  "No ads, no account, no spying, free forever. Found a bug? Tell me. Have fun.\n\nOnionAlien": "광고 없음, 계정 없음, 엿보기 없음, 영원히 무료. 버그를 찾았나요? 알려 주세요. 재밌게 즐기세요.\n\nOnionAlien",
+  "The store's down right now, so sharing is off. Try again later.": "지금 스토어가 다운되어 공유가 꺼져 있어요. 나중에 다시 시도하세요."
 }

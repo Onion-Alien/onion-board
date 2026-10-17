@@ -850,7 +850,6 @@
   "Grey": "สีเทา",
   "Group servers by site (googlevideo.com, not each r3---sn-abc.googlevideo.com)": "จัดกลุ่มเซิร์ฟเวอร์ตามไซต์ (googlevideo.com ไม่ใช่แต่ละ r3---sn-abc.googlevideo.com)",
   "Half (-12 dB)": "ครึ่งหนึ่ง (-12 เดซิเบล)",
-  "Hey, thanks for actually using this. Onion Board started because every soundboard I tried was either ugly, full of ads, or quietly phoning home, so I made my own and it kind of snowballed from there. It's just me building it, a lot of late nights and a lot of testing, so if something's broken, ugly or confusing, tell me. Honestly. I'd way rather hear \"this part is cooked\" than have you quietly uninstall it.\n\nIt's free and it's staying free. Have fun with it, don't be a menace with it, and go make your friends jump in voice chat.\n\nOnionAlien": "เฮ้ขอบคุณที่ใช้สิ่งนี้จริงๆ Onion Board เริ่มต้นเพราะซาวด์บอร์ดทุกตัวที่ฉันลองใช้นั้นน่าเกลียด มีโฆษณาเต็มไปหมด หรือไม่ก็โทรกลับบ้านอย่างเงียบๆ ฉันก็เลยสร้างซาวด์บอร์ดของตัวเองขึ้นมา และมันก็เหมือนหิมะจากที่นั่น ฉันแค่สร้างมันขึ้นมา ดึกดื่นมากมายและการทดสอบมากมาย ดังนั้นหากมีอะไรเสียหาย น่าเกลียด หรือสับสน บอกกับฉันหน่อย สุจริต. ฉันอยากได้ยินว่า \"ส่วนนี้สุกแล้ว\" มากกว่าให้คุณถอนการติดตั้งอย่างเงียบๆ ได้ฟรีและอยู่ฟรี ขอให้สนุกกับมัน อย่าคุกคามมัน และไปทำให้เพื่อนของคุณเข้าร่วมการแชทด้วยเสียง, หัวหอมเอเลี่ยน",
   "Hide after picking a sound": "ซ่อนหลังจากเลือกเสียง",
   "Hide that I'm using Tor": "ซ่อนไว้ว่าฉันใช้ Tor",
   "Highlight colour": "ไฮไลท์สี",
@@ -3997,5 +3996,7 @@
   "Sorry about that. What should we fix?": "ขอโทษด้วย เราควรแก้อะไร?",
   "Thanks for telling us!": "ขอบคุณที่บอกเรา!",
   "Type here": "พิมพ์ที่นี่",
-  "Yes, I like it": "ใช่ ชอบ"
+  "Yes, I like it": "ใช่ ชอบ",
+  "No ads, no account, no spying, free forever. Found a bug? Tell me. Have fun.\n\nOnionAlien": "ไม่มีโฆษณา ไม่ต้องมีบัญชี ไม่สอดแนม ฟรีตลอดไป เจอบั๊กเหรอ? บอกผมได้เลย ขอให้สนุกนะ\n\nOnionAlien",
+  "The store's down right now, so sharing is off. Try again later.": "ร้านค้าล่มอยู่ตอนนี้ จึงปิดการแชร์ไว้ ลองใหม่ภายหลัง"
 }

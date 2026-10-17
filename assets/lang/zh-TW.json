@@ -850,7 +850,6 @@
   "Grey": "灰色",
   "Group servers by site (googlevideo.com, not each r3---sn-abc.googlevideo.com)": "依網站分組伺服器（googlevideo.com，而不是每個 r3---sn-abc.googlevideo.com）",
   "Half (-12 dB)": "一半（-12 dB）",
-  "Hey, thanks for actually using this. Onion Board started because every soundboard I tried was either ugly, full of ads, or quietly phoning home, so I made my own and it kind of snowballed from there. It's just me building it, a lot of late nights and a lot of testing, so if something's broken, ugly or confusing, tell me. Honestly. I'd way rather hear \"this part is cooked\" than have you quietly uninstall it.\n\nIt's free and it's staying free. Have fun with it, don't be a menace with it, and go make your friends jump in voice chat.\n\nOnionAlien": "嘿，謝謝你真的有在用這個。會做 Onion Board，是因為我試過的每個音效板不是很醜、塞滿廣告，就是偷偷回傳資料，所以我就自己做了一個，然後越滾越大。從頭到尾都是我一個人在做，熬了很多夜、測了很多次，所以如果有什麼壞掉、很醜或看不懂，跟我說。真的。我寧願聽到「這部分爛掉了」，也不想你默默把它解除安裝。\n\n它是免費的，而且會一直免費。玩得開心，別拿它去當討厭鬼，然後去語音聊天嚇你的朋友一跳吧。，OnionAlien",
   "Hide after picking a sound": "選好音效後隱藏",
   "Hide that I'm using Tor": "隱藏我在使用 Tor",
   "Highlight colour": "強調色",
@@ -3997,5 +3996,7 @@
   "Sorry about that. What should we fix?": "很抱歉。我們該修好什麼?",
   "Thanks for telling us!": "謝謝你告訴我們!",
   "Type here": "在這裡輸入",
-  "Yes, I like it": "是的,我喜歡"
+  "Yes, I like it": "是的,我喜歡",
+  "No ads, no account, no spying, free forever. Found a bug? Tell me. Have fun.\n\nOnionAlien": "沒有廣告，不用帳號，不偷看你，永遠免費。發現 bug？跟我說。玩得開心。\n\nOnionAlien",
+  "The store's down right now, so sharing is off. Try again later.": "商店現在故障了，所以分享已關閉。請稍後再試。"
 }

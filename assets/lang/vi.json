@@ -850,7 +850,6 @@
   "Grey": "Xám",
   "Group servers by site (googlevideo.com, not each r3---sn-abc.googlevideo.com)": "Nhóm các máy chủ theo trang web (googlevideo.com, không phải từng r3---sn-abc.googlevideo.com)",
   "Half (-12 dB)": "Một nửa (-12 dB)",
-  "Hey, thanks for actually using this. Onion Board started because every soundboard I tried was either ugly, full of ads, or quietly phoning home, so I made my own and it kind of snowballed from there. It's just me building it, a lot of late nights and a lot of testing, so if something's broken, ugly or confusing, tell me. Honestly. I'd way rather hear \"this part is cooked\" than have you quietly uninstall it.\n\nIt's free and it's staying free. Have fun with it, don't be a menace with it, and go make your friends jump in voice chat.\n\nOnionAlien": "Này, cảm ơn vì đã thực sự sử dụng cái này. Onion Board bắt đầu bởi vì mọi soundboard mà tôi thử đều xấu, đầy quảng cáo hoặc lặng lẽ gọi điện về nhà, vì vậy tôi đã tự làm một chiếc soundboard của riêng mình và mọi chuyện bắt đầu phát triển từ đó. Chỉ là tôi đang xây dựng nó, rất nhiều đêm khuya và rất nhiều thử nghiệm, vì vậy nếu có gì đó hỏng hóc, xấu xí hoặc khó hiểu, hãy cho tôi biết. Thành thật. Tôi thà nghe \"phần này đã chín\" còn hơn là bạn lặng lẽ gỡ cài đặt nó. Nó miễn phí và nó vẫn miễn phí. Hãy vui vẻ với nó, đừng trở thành mối đe dọa với nó và hãy khiến bạn bè của bạn nhảy vào trò chuyện thoại. - Hành tâyNgười ngoài hành tinh",
   "Hide after picking a sound": "Ẩn sau khi chọn âm thanh",
   "Hide that I'm using Tor": "Ẩn việc tôi đang sử dụng Tor",
   "Highlight colour": "Màu nổi bật",
@@ -3997,5 +3996,7 @@
   "Sorry about that. What should we fix?": "Rất tiếc. Chúng tôi nên sửa gì?",
   "Thanks for telling us!": "Cảm ơn bạn đã cho biết!",
   "Type here": "Nhập ở đây",
-  "Yes, I like it": "Có, tôi thích"
+  "Yes, I like it": "Có, tôi thích",
+  "No ads, no account, no spying, free forever. Found a bug? Tell me. Have fun.\n\nOnionAlien": "Không quảng cáo, không tài khoản, không theo dõi, miễn phí mãi mãi. Thấy lỗi à? Báo mình nhé. Chơi vui nhé.\n\nOnionAlien",
+  "The store's down right now, so sharing is off. Try again later.": "Cửa hàng đang gặp sự cố nên tính năng chia sẻ đã tắt. Hãy thử lại sau."
 }

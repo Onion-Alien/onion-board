@@ -870,7 +870,6 @@
   "Grey": "Grau",
   "Group servers by site (googlevideo.com, not each r3---sn-abc.googlevideo.com)": "Server nach Seite gruppieren (googlevideo.com statt jedem r3---sn-abc.googlevideo.com)",
   "Half (-12 dB)": "Halb (-12 dB)",
-  "Hey, thanks for actually using this. Onion Board started because every soundboard I tried was either ugly, full of ads, or quietly phoning home, so I made my own and it kind of snowballed from there. It's just me building it, a lot of late nights and a lot of testing, so if something's broken, ugly or confusing, tell me. Honestly. I'd way rather hear \"this part is cooked\" than have you quietly uninstall it.\n\nIt's free and it's staying free. Have fun with it, don't be a menace with it, and go make your friends jump in voice chat.\n\nOnionAlien": "Hey, danke, dass du das hier wirklich benutzt. Onion Board ist entstanden, weil jedes Soundboard, das ich ausprobiert habe, entweder hässlich war, voller Werbung oder heimlich nach Hause telefoniert hat. Also hab ich mein eigenes gebaut, und von da an ist es irgendwie ausgeufert. Ich baue es ganz allein, mit vielen langen Nächten und viel Testen. Wenn also was kaputt, hässlich oder verwirrend ist, sag es mir. Ehrlich. Ich höre viel lieber „dieser Teil ist kaputt“, als dass du es still und heimlich deinstallierst.\n\nEs ist kostenlos und bleibt kostenlos. Hab Spaß damit, mach keinen Unfug damit, und bring deine Freunde im Voice-Chat zum Zusammenzucken.\n\n– OnionAlien",
   "Hide after picking a sound": "Nach der Soundwahl ausblenden",
   "Hide that I'm using Tor": "Verbergen, dass ich Tor nutze",
   "Highlight colour": "Akzentfarbe",
@@ -4075,5 +4074,7 @@
   "Sorry about that. What should we fix?": "Tut uns leid. Was sollen wir verbessern?",
   "Thanks for telling us!": "Danke für dein Feedback!",
   "Type here": "Hier schreiben",
-  "Yes, I like it": "Ja, gefällt mir"
+  "Yes, I like it": "Ja, gefällt mir",
+  "No ads, no account, no spying, free forever. Found a bug? Tell me. Have fun.\n\nOnionAlien": "Keine Werbung, kein Konto, kein Ausspionieren, für immer kostenlos. Einen Bug gefunden? Sag's mir. Viel Spaß.\n\nOnionAlien",
+  "The store's down right now, so sharing is off. Try again later.": "Der Store ist gerade down, darum ist Teilen aus. Versuch es später noch mal."
 }

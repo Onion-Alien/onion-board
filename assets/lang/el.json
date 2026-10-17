@@ -459,7 +459,6 @@
   "Half (-12 dB)": "Μισό (-12 dB)",
   "Hear it myself": "Να το ακούω κι εγώ",
   "Hear what they hear": "Άκου ό,τι ακούν",
-  "Hey, thanks for actually using this. Onion Board started because every soundboard I tried was either ugly, full of ads, or quietly phoning home, so I made my own and it kind of snowballed from there. It's just me building it, a lot of late nights and a lot of testing, so if something's broken, ugly or confusing, tell me. Honestly. I'd way rather hear \"this part is cooked\" than have you quietly uninstall it.\n\nIt's free and it's staying free. Have fun with it, don't be a menace with it, and go make your friends jump in voice chat.\n\nOnionAlien": "Γεια, ευχαριστώ που το χρησιμοποιείς στ' αλήθεια. Το Onion Board ξεκίνησε επειδή κάθε soundboard που δοκίμασα ήταν ή άσχημο, ή γεμάτο διαφημίσεις, ή έστελνε κρυφά δεδομένα κάπου, οπότε έφτιαξα το δικό μου και κάπως ξέφυγε από εκεί. Το φτιάχνω μόνος μου, με πολλά ξενύχτια και πολλές δοκιμές, οπότε αν κάτι είναι χαλασμένο, άσχημο ή μπερδεμένο, πες μου. Ειλικρινά. Προτιμώ πολύ να ακούσω «αυτό το κομμάτι είναι για πέταμα» παρά να το απεγκαταστήσεις στα κρυφά.\n\nΕίναι δωρεάν και θα μείνει δωρεάν. Διασκέδασέ το, μην το κάνεις όπλο ενόχλησης, και πήγαινε να κάνεις τους φίλους σου να πεταχτούν στο φωνητικό chat.\n• OnionAlien",
   "Hide": "Απόκρυψη",
   "Hide after picking a sound": "Απόκρυψη μετά την επιλογή ήχου",
   "Hide that I'm using Tor": "Κρύψε ότι χρησιμοποιώ Tor",
@@ -4075,5 +4074,7 @@
   "Sorry about that. What should we fix?": "Λυπούμαστε. Τι να διορθώσουμε;",
   "Thanks for telling us!": "Ευχαριστούμε που μας το είπες!",
   "Type here": "Γράψε εδώ",
-  "Yes, I like it": "Ναι, μου αρέσει"
+  "Yes, I like it": "Ναι, μου αρέσει",
+  "No ads, no account, no spying, free forever. Found a bug? Tell me. Have fun.\n\nOnionAlien": "Χωρίς διαφημίσεις, χωρίς λογαριασμό, χωρίς παρακολούθηση, δωρεάν για πάντα. Βρήκες bug; Πες μου. Καλή διασκέδαση.\n\nOnionAlien",
+  "The store's down right now, so sharing is off. Try again later.": "Το κατάστημα δεν λειτουργεί τώρα, οπότε η κοινοποίηση είναι κλειστή. Δοκίμασε αργότερα."
 }
