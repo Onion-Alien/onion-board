@@ -3521,7 +3521,6 @@
   "Shared by a player": "Τον μοιράστηκε ένας παίκτης",
   "Sharing…": "Αποστολή…",
   "Sound store": "Κατάστημα ήχων",
-  "Store": "Κατάστημα",
   "Tags": "Ετικέτες",
   "Tags, with commas (optional): meme, horn, game": "Ετικέτες, με κόμματα (προαιρετικά): meme, κόρνα, παιχνίδι",
   "Thanks for sharing!": "Ευχαριστούμε που το μοιράστηκες!",
@@ -3533,7 +3532,7 @@
   "That sound is already in the store.": "Αυτός ο ήχος υπάρχει ήδη στο κατάστημα.",
   "That sound isn't in the store any more.": "Αυτός ο ήχος δεν υπάρχει πια στο κατάστημα.",
   "That's a lot for one day. Try again tomorrow.": "Είναι πολλά για μία μέρα. Δοκίμασε ξανά αύριο.",
-  "The Store tab: the project's own sound store, for its list, the sounds you play or add, your votes and the sounds you share.": "Η καρτέλα Κατάστημα: το δικό μας κατάστημα ήχων του έργου, για τη λίστα, τους ήχους που ακούς ή προσθέτεις, τις ψήφους σου και τους ήχους που μοιράζεσαι.",
+  "The Free sounds tab: the project's own sound store, for its list, the sounds you play or add, your votes and the sounds you share.": "Η καρτέλα Δωρεάν ήχοι: το δικό μας κατάστημα ήχων του έργου, για τη λίστα, τους ήχους που ακούς ή προσθέτεις, τις ψήφους σου και τους ήχους που μοιράζεσαι.",
   "The best voted first": "Οι πιο ψηφισμένοι πρώτα",
   "The newest first": "Οι πιο νέοι πρώτα",
   "The sound store had a problem. Try again in a bit.": "Το κατάστημα ήχων είχε πρόβλημα. Δοκίμασε ξανά σε λίγο.",
@@ -3552,7 +3551,7 @@
   "Paste a link and name it first": "Επικόλλησε πρώτα έναν σύνδεσμο και δώσ’ του όνομα",
   "Paste a link: https://www.youtube.com/watch?v=…": "Επικόλλησε σύνδεσμο: https://www.youtube.com/watch?v=…",
   "Play it once (from the site)": "Παίξ’ το μία φορά (από το site)",
-  "Share this link in the Store tab": "Μοιράσου αυτόν τον σύνδεσμο στην καρτέλα Κατάστημα",
+  "Share this link in the Free sounds tab": "Μοιράσου αυτόν τον σύνδεσμο στην καρτέλα Δωρεάν ήχοι",
   "Share to the store": "Κοινοποίηση στο κατάστημα",
   "The store takes links to YouTube, TikTok, SoundCloud and other video and sound sites.": "Το κατάστημα δέχεται συνδέσμους σε YouTube, TikTok, SoundCloud και άλλα sites βίντεο και ήχου.",
   "{site} link": "Σύνδεσμος {site}",
@@ -3582,5 +3581,6 @@
   "Is a sound in the store yours? Email {email} and it comes down.": "Κάποιος ήχος στο κατάστημα είναι δικός σου; Στείλε email στο {email} και θα αφαιρεθεί.",
   "Games get the key too": "Και τα παιχνίδια παίρνουν το πλήκτρο",
   "Keys in games": "Πλήκτρα στα παιχνίδια",
-  "With this on, a hotkey still does its normal job too: press F1 in a game and the game gets F1 while your sound plays. Off: only Onion Board gets the key, so a hotkey on W stops you walking.": "Όταν είναι ενεργό, μια συντόμευση κάνει και την κανονική της δουλειά: πάτα F1 σε ένα παιχνίδι και το παιχνίδι παίρνει το F1 ενώ παίζει ο ήχος σου. Ανενεργό: μόνο το Onion Board παίρνει το πλήκτρο, οπότε μια συντόμευση στο W σε σταματά να περπατάς."
+  "With this on, a hotkey still does its normal job too: press F1 in a game and the game gets F1 while your sound plays. Off: only Onion Board gets the key, so a hotkey on W stops you walking.": "Όταν είναι ενεργό, μια συντόμευση κάνει και την κανονική της δουλειά: πάτα F1 σε ένα παιχνίδι και το παιχνίδι παίρνει το F1 ενώ παίζει ο ήχος σου. Ανενεργό: μόνο το Onion Board παίρνει το πλήκτρο, οπότε μια συντόμευση στο W σε σταματά να περπατάς.",
+  "Free sounds": "Δωρεάν ήχοι"
 }

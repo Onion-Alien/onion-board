@@ -3521,7 +3521,6 @@
   "Shared by a player": "Compartilhado por um jogador",
   "Sharing…": "Compartilhando…",
   "Sound store": "Loja de sons",
-  "Store": "Loja",
   "Tags": "Tags",
   "Tags, with commas (optional): meme, horn, game": "Tags, com vírgulas (opcional): meme, buzina, jogo",
   "Thanks for sharing!": "Valeu por compartilhar!",
@@ -3533,7 +3532,7 @@
   "That sound is already in the store.": "Esse som já está na loja.",
   "That sound isn't in the store any more.": "Esse som não está mais na loja.",
   "That's a lot for one day. Try again tomorrow.": "É muita coisa para um dia. Tente de novo amanhã.",
-  "The Store tab: the project's own sound store, for its list, the sounds you play or add, your votes and the sounds you share.": "A aba Loja: a loja de sons do próprio projeto, para a lista, os sons que você ouve ou adiciona, seus votos e os sons que você compartilha.",
+  "The Free sounds tab: the project's own sound store, for its list, the sounds you play or add, your votes and the sounds you share.": "A aba Sons grátis: a loja de sons do próprio projeto, para a lista, os sons que você ouve ou adiciona, seus votos e os sons que você compartilha.",
   "The best voted first": "Os mais votados primeiro",
   "The newest first": "Os mais novos primeiro",
   "The sound store had a problem. Try again in a bit.": "A loja de sons teve um problema. Tente de novo daqui a pouco.",
@@ -3552,7 +3551,7 @@
   "Paste a link and name it first": "Cole um link e dê um nome primeiro",
   "Paste a link: https://www.youtube.com/watch?v=…": "Cole um link: https://www.youtube.com/watch?v=…",
   "Play it once (from the site)": "Tocar uma vez (do site)",
-  "Share this link in the Store tab": "Compartilhar este link na aba Loja",
+  "Share this link in the Free sounds tab": "Compartilhar este link na aba Sons grátis",
   "Share to the store": "Compartilhar na loja",
   "The store takes links to YouTube, TikTok, SoundCloud and other video and sound sites.": "A loja aceita links do YouTube, TikTok, SoundCloud e outros sites de vídeo e som.",
   "{site} link": "Link do {site}",
@@ -3582,5 +3581,6 @@
   "Is a sound in the store yours? Email {email} and it comes down.": "Algum som da loja é seu? Mande um e-mail para {email} e ele sai do ar.",
   "Games get the key too": "Os jogos também recebem a tecla",
   "Keys in games": "Teclas nos jogos",
-  "With this on, a hotkey still does its normal job too: press F1 in a game and the game gets F1 while your sound plays. Off: only Onion Board gets the key, so a hotkey on W stops you walking.": "Com isso ligado, um atalho também continua fazendo seu trabalho normal: aperte F1 em um jogo e o jogo recebe F1 enquanto seu som toca. Desligado: só o Onion Board recebe a tecla, então um atalho no W te impede de andar."
+  "With this on, a hotkey still does its normal job too: press F1 in a game and the game gets F1 while your sound plays. Off: only Onion Board gets the key, so a hotkey on W stops you walking.": "Com isso ligado, um atalho também continua fazendo seu trabalho normal: aperte F1 em um jogo e o jogo recebe F1 enquanto seu som toca. Desligado: só o Onion Board recebe a tecla, então um atalho no W te impede de andar.",
+  "Free sounds": "Sons grátis"
 }

@@ -3521,7 +3521,6 @@
   "Shared by a player": "Споделен от играч",
   "Sharing…": "Споделяне…",
   "Sound store": "Магазин за звуци",
-  "Store": "Магазин",
   "Tags": "Етикети",
   "Tags, with commas (optional): meme, horn, game": "Етикети със запетаи (по избор): мем, клаксон, игра",
   "Thanks for sharing!": "Благодарим, че сподели!",
@@ -3533,7 +3532,7 @@
   "That sound is already in the store.": "Този звук вече е в магазина.",
   "That sound isn't in the store any more.": "Този звук вече не е в магазина.",
   "That's a lot for one day. Try again tomorrow.": "Това е много за един ден. Опитай пак утре.",
-  "The Store tab: the project's own sound store, for its list, the sounds you play or add, your votes and the sounds you share.": "Разделът Магазин: собственият магазин за звуци на проекта, за списъка, звуците, които пускаш или добавяш, гласовете ти и звуците, които споделяш.",
+  "The Free sounds tab: the project's own sound store, for its list, the sounds you play or add, your votes and the sounds you share.": "Разделът Безплатни звуци: собственият магазин за звуци на проекта, за списъка, звуците, които пускаш или добавяш, гласовете ти и звуците, които споделяш.",
   "The best voted first": "Най-гласуваните първо",
   "The newest first": "Най-новите първо",
   "The sound store had a problem. Try again in a bit.": "Магазинът за звуци имаше проблем. Опитай пак след малко.",
@@ -3552,7 +3551,7 @@
   "Paste a link and name it first": "Първо постави връзка и ѝ дай име",
   "Paste a link: https://www.youtube.com/watch?v=…": "Постави връзка: https://www.youtube.com/watch?v=…",
   "Play it once (from the site)": "Пусни го веднъж (от сайта)",
-  "Share this link in the Store tab": "Сподели тази връзка в раздела Магазин",
+  "Share this link in the Free sounds tab": "Сподели тази връзка в раздела Безплатни звуци",
   "Share to the store": "Сподели в магазина",
   "The store takes links to YouTube, TikTok, SoundCloud and other video and sound sites.": "Магазинът приема връзки към YouTube, TikTok, SoundCloud и други сайтове с видео и звук.",
   "{site} link": "Връзка към {site}",
@@ -3582,5 +3581,6 @@
   "Is a sound in the store yours? Email {email} and it comes down.": "Някой звук в магазина е твой? Пиши на {email} и ще бъде махнат.",
   "Games get the key too": "Игрите също получават клавиша",
   "Keys in games": "Клавиши в игрите",
-  "With this on, a hotkey still does its normal job too: press F1 in a game and the game gets F1 while your sound plays. Off: only Onion Board gets the key, so a hotkey on W stops you walking.": "Когато е включено, бързият клавиш върши и обичайната си работа: натисни F1 в игра и играта получава F1, докато звукът ти свири. Изключено: само Onion Board получава клавиша, така че бърз клавиш на W те спира да вървиш."
+  "With this on, a hotkey still does its normal job too: press F1 in a game and the game gets F1 while your sound plays. Off: only Onion Board gets the key, so a hotkey on W stops you walking.": "Когато е включено, бързият клавиш върши и обичайната си работа: натисни F1 в игра и играта получава F1, докато звукът ти свири. Изключено: само Onion Board получава клавиша, така че бърз клавиш на W те спира да вървиш.",
+  "Free sounds": "Безплатни звуци"
 }

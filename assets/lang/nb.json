@@ -3521,7 +3521,6 @@
   "Shared by a player": "Delt av en spiller",
   "Sharing…": "Deler…",
   "Sound store": "Lydbutikk",
-  "Store": "Butikk",
   "Tags": "Tagger",
   "Tags, with commas (optional): meme, horn, game": "Tagger, med komma (valgfritt): meme, horn, spill",
   "Thanks for sharing!": "Takk for at du deler!",
@@ -3533,7 +3532,7 @@
   "That sound is already in the store.": "Den lyden er allerede i butikken.",
   "That sound isn't in the store any more.": "Den lyden er ikke i butikken lenger.",
   "That's a lot for one day. Try again tomorrow.": "Det er mye for én dag. Prøv igjen i morgen.",
-  "The Store tab: the project's own sound store, for its list, the sounds you play or add, your votes and the sounds you share.": "Fanen Butikk: prosjektets egen lydbutikk, for listen, lydene du spiller av eller legger til, stemmene dine og lydene du deler.",
+  "The Free sounds tab: the project's own sound store, for its list, the sounds you play or add, your votes and the sounds you share.": "Fanen Gratis lyder: prosjektets egen lydbutikk, for listen, lydene du spiller av eller legger til, stemmene dine og lydene du deler.",
   "The best voted first": "De best stemte først",
   "The newest first": "De nyeste først",
   "The sound store had a problem. Try again in a bit.": "Lydbutikken fikk et problem. Prøv igjen om litt.",
@@ -3552,7 +3551,7 @@
   "Paste a link and name it first": "Lim inn en lenke og gi den et navn først",
   "Paste a link: https://www.youtube.com/watch?v=…": "Lim inn en lenke: https://www.youtube.com/watch?v=…",
   "Play it once (from the site)": "Spill av én gang (fra siden)",
-  "Share this link in the Store tab": "Del denne lenken i fanen Butikk",
+  "Share this link in the Free sounds tab": "Del denne lenken i fanen Gratis lyder",
   "Share to the store": "Del i butikken",
   "The store takes links to YouTube, TikTok, SoundCloud and other video and sound sites.": "Butikken tar lenker til YouTube, TikTok, SoundCloud og andre video- og lydsider.",
   "{site} link": "{site}-lenke",
@@ -3582,5 +3581,6 @@
   "Is a sound in the store yours? Email {email} and it comes down.": "Er en lyd i butikken din? Send e-post til {email}, så blir den fjernet.",
   "Games get the key too": "Spill får også tasten",
   "Keys in games": "Taster i spill",
-  "With this on, a hotkey still does its normal job too: press F1 in a game and the game gets F1 while your sound plays. Off: only Onion Board gets the key, so a hotkey on W stops you walking.": "Når dette er på, gjør en hurtigtast også den vanlige jobben sin: trykk F1 i et spill, så får spillet F1 mens lyden din spilles. Av: bare Onion Board får tasten, så en hurtigtast på W hindrer deg i å gå."
+  "With this on, a hotkey still does its normal job too: press F1 in a game and the game gets F1 while your sound plays. Off: only Onion Board gets the key, so a hotkey on W stops you walking.": "Når dette er på, gjør en hurtigtast også den vanlige jobben sin: trykk F1 i et spill, så får spillet F1 mens lyden din spilles. Av: bare Onion Board får tasten, så en hurtigtast på W hindrer deg i å gå.",
+  "Free sounds": "Gratis lyder"
 }
