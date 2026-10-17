@@ -3597,5 +3597,13 @@
   "Use “{name}”?": "ใช้ “{name}” ไหม?",
   "“{name}” has an AI voice, so this may take a while. Each sound is made in that voice first, in the background, and plays when it's ready.": "“{name}” มีเสียง AI จึงอาจใช้เวลาสักพัก แต่ละเสียงจะถูกทำด้วยเสียงนั้นก่อนในเบื้องหลัง และเล่นเมื่อพร้อม",
   "“{name}” has an AI voice, so this may take a while. The radio goes quiet until the AI voice is ready, then carries on in it.": "“{name}” มีเสียง AI จึงอาจใช้เวลาสักพัก วิทยุจะเงียบจนกว่าเสียง AI จะพร้อม แล้วเล่นต่อด้วยเสียงนั้น",
-  "“{name}” has an AI voice, so this may take a while. Your programs go quiet until the AI voice is ready, then carry on in it.": "“{name}” มีเสียง AI จึงอาจใช้เวลาสักพัก โปรแกรมของคุณจะเงียบจนกว่าเสียง AI จะพร้อม แล้วเล่นต่อด้วยเสียงนั้น"
+  "“{name}” has an AI voice, so this may take a while. Your programs go quiet until the AI voice is ready, then carry on in it.": "“{name}” มีเสียง AI จึงอาจใช้เวลาสักพัก โปรแกรมของคุณจะเงียบจนกว่าเสียง AI จะพร้อม แล้วเล่นต่อด้วยเสียงนั้น",
+  "Couldn't put “{name}” into {language}: {why}": "แปลง “{name}” เป็น{language}ไม่ได้: {why}",
+  "Couldn't start translating: {why}": "เริ่มการแปลไม่ได้: {why}",
+  "Couldn't translate: {why}": "แปลไม่ได้: {why}",
+  "Putting “{name}” into {language}… {pct}%": "กำลังแปลง “{name}” เป็น{language}… {pct}%",
+  "“{name}” speaks {language}, so this may take a while. Each sound is put into {language} first, in the background, and plays when it's ready.": "“{name}” พูด{language} จึงอาจใช้เวลาสักพัก แต่ละเสียงจะถูกแปลงเป็น{language}ก่อนในเบื้องหลัง แล้วเล่นเมื่อพร้อม",
+  "“{name}” speaks {language}, so this may take a while. The radio goes quiet while the translation starts, then you hear it in {language}, a few seconds behind.": "“{name}” พูด{language} จึงอาจใช้เวลาสักพัก วิทยุจะเงียบระหว่างที่การแปลเริ่ม จากนั้นคุณจะได้ยินเป็น{language} ช้ากว่าไม่กี่วินาที",
+  "“{name}” speaks {language}, so this may take a while. Your programs go quiet while the translation starts, then you hear them in {language}, a few seconds behind.": "“{name}” พูด{language} จึงอาจใช้เวลาสักพัก โปรแกรมของคุณจะเงียบระหว่างที่การแปลเริ่ม จากนั้นคุณจะได้ยินเป็น{language} ช้ากว่าไม่กี่วินาที",
+  "“{name}” speaks {language}, which needs speech recognition and the {language} download (Voice tab, Speak another language). The rest of it is on.": "“{name}” พูด{language} ซึ่งต้องใช้การรู้จำเสียงพูดและการดาวน์โหลด{language} (แท็บเสียง, พูดภาษาอื่น) ส่วนที่เหลือเปิดอยู่"
 }

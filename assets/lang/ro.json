@@ -3753,5 +3753,13 @@
   "Use “{name}”?": "Folosești „{name}”?",
   "“{name}” has an AI voice, so this may take a while. Each sound is made in that voice first, in the background, and plays when it's ready.": "„{name}” are o voce AI, așa că poate dura puțin. Fiecare sunet e făcut întâi cu vocea aceea, în fundal, și pornește când e gata.",
   "“{name}” has an AI voice, so this may take a while. The radio goes quiet until the AI voice is ready, then carries on in it.": "„{name}” are o voce AI, așa că poate dura puțin. Radioul tace până e gata vocea AI, apoi continuă cu ea.",
-  "“{name}” has an AI voice, so this may take a while. Your programs go quiet until the AI voice is ready, then carry on in it.": "„{name}” are o voce AI, așa că poate dura puțin. Programele tale tac până e gata vocea AI, apoi continuă cu ea."
+  "“{name}” has an AI voice, so this may take a while. Your programs go quiet until the AI voice is ready, then carry on in it.": "„{name}” are o voce AI, așa că poate dura puțin. Programele tale tac până e gata vocea AI, apoi continuă cu ea.",
+  "Couldn't put “{name}” into {language}: {why}": "„{name}” nu a putut fi trecut în {language}: {why}",
+  "Couldn't start translating: {why}": "Traducerea nu a putut porni: {why}",
+  "Couldn't translate: {why}": "Nu s-a putut traduce: {why}",
+  "Putting “{name}” into {language}… {pct}%": "Se trece „{name}” în {language}… {pct}%",
+  "“{name}” speaks {language}, so this may take a while. Each sound is put into {language} first, in the background, and plays when it's ready.": "„{name}” vorbește {language}, așa că poate dura puțin. Fiecare sunet e trecut mai întâi în {language}, în fundal, și pornește când e gata.",
+  "“{name}” speaks {language}, so this may take a while. The radio goes quiet while the translation starts, then you hear it in {language}, a few seconds behind.": "„{name}” vorbește {language}, așa că poate dura puțin. Radioul tace cât pornește traducerea, apoi îl auzi în {language}, cu câteva secunde întârziere.",
+  "“{name}” speaks {language}, so this may take a while. Your programs go quiet while the translation starts, then you hear them in {language}, a few seconds behind.": "„{name}” vorbește {language}, așa că poate dura puțin. Programele tale tac cât pornește traducerea, apoi le auzi în {language}, cu câteva secunde întârziere.",
+  "“{name}” speaks {language}, which needs speech recognition and the {language} download (Voice tab, Speak another language). The rest of it is on.": "„{name}” vorbește {language}, ceea ce cere recunoașterea vorbirii și descărcarea pentru {language} (fila Voce, Vorbește altă limbă). Restul e pornit."
 }

@@ -3987,5 +3987,13 @@
   "Use “{name}”?": "استخدام “{name}”؟",
   "“{name}” has an AI voice, so this may take a while. Each sound is made in that voice first, in the background, and plays when it's ready.": "في “{name}” صوت ذكاء اصطناعي، لذلك قد يستغرق هذا بعض الوقت. يُصنع كل صوت بهذا الصوت أولًا في الخلفية، ويُشغَّل عندما يجهز.",
   "“{name}” has an AI voice, so this may take a while. The radio goes quiet until the AI voice is ready, then carries on in it.": "في “{name}” صوت ذكاء اصطناعي، لذلك قد يستغرق هذا بعض الوقت. يصمت الراديو حتى يجهز صوت الذكاء الاصطناعي، ثم يكمل به.",
-  "“{name}” has an AI voice, so this may take a while. Your programs go quiet until the AI voice is ready, then carry on in it.": "في “{name}” صوت ذكاء اصطناعي، لذلك قد يستغرق هذا بعض الوقت. تصمت برامجك حتى يجهز صوت الذكاء الاصطناعي، ثم تكمل به."
+  "“{name}” has an AI voice, so this may take a while. Your programs go quiet until the AI voice is ready, then carry on in it.": "في “{name}” صوت ذكاء اصطناعي، لذلك قد يستغرق هذا بعض الوقت. تصمت برامجك حتى يجهز صوت الذكاء الاصطناعي، ثم تكمل به.",
+  "Couldn't put “{name}” into {language}: {why}": "تعذّر تحويل “{name}” إلى {language}: {why}",
+  "Couldn't start translating: {why}": "تعذّر بدء الترجمة: {why}",
+  "Couldn't translate: {why}": "تعذّرت الترجمة: {why}",
+  "Putting “{name}” into {language}… {pct}%": "جارٍ تحويل “{name}” إلى {language}… {pct}%",
+  "“{name}” speaks {language}, so this may take a while. Each sound is put into {language} first, in the background, and plays when it's ready.": "“{name}” يتكلم {language}، لذا قد يستغرق هذا بعض الوقت. يُحوَّل كل صوت إلى {language} أولًا في الخلفية، ويُشغَّل عندما يجهز.",
+  "“{name}” speaks {language}, so this may take a while. The radio goes quiet while the translation starts, then you hear it in {language}, a few seconds behind.": "“{name}” يتكلم {language}، لذا قد يستغرق هذا بعض الوقت. يصمت الراديو ريثما تبدأ الترجمة، ثم تسمعه بـ{language} متأخرًا بضع ثوانٍ.",
+  "“{name}” speaks {language}, so this may take a while. Your programs go quiet while the translation starts, then you hear them in {language}, a few seconds behind.": "“{name}” يتكلم {language}، لذا قد يستغرق هذا بعض الوقت. تصمت برامجك ريثما تبدأ الترجمة، ثم تسمعها بـ{language} متأخرة بضع ثوانٍ.",
+  "“{name}” speaks {language}, which needs speech recognition and the {language} download (Voice tab, Speak another language). The rest of it is on.": "“{name}” يتكلم {language}، وهذا يحتاج إلى التعرّف على الكلام وتنزيل {language} (تبويب الصوت، تحدّث بلغة أخرى). باقي الإعداد مُفعَّل."
 }

@@ -3753,5 +3753,13 @@
   "Use “{name}”?": "Použít „{name}“?",
   "“{name}” has an AI voice, so this may take a while. Each sound is made in that voice first, in the background, and plays when it's ready.": "„{name}“ má AI hlas, takže to může chvíli trvat. Každý zvuk se nejdřív na pozadí udělá tím hlasem a zahraje, až bude hotový.",
   "“{name}” has an AI voice, so this may take a while. The radio goes quiet until the AI voice is ready, then carries on in it.": "„{name}“ má AI hlas, takže to může chvíli trvat. Rádio ztichne, dokud nebude AI hlas připravený, pak pokračuje v něm.",
-  "“{name}” has an AI voice, so this may take a while. Your programs go quiet until the AI voice is ready, then carry on in it.": "„{name}“ má AI hlas, takže to může chvíli trvat. Tvoje programy ztichnou, dokud nebude AI hlas připravený, pak pokračují v něm."
+  "“{name}” has an AI voice, so this may take a while. Your programs go quiet until the AI voice is ready, then carry on in it.": "„{name}“ má AI hlas, takže to může chvíli trvat. Tvoje programy ztichnou, dokud nebude AI hlas připravený, pak pokračují v něm.",
+  "Couldn't put “{name}” into {language}: {why}": "„{name}“ se nepodařilo převést do jazyka {language}: {why}",
+  "Couldn't start translating: {why}": "Překlad se nepodařilo spustit: {why}",
+  "Couldn't translate: {why}": "Nepodařilo se přeložit: {why}",
+  "Putting “{name}” into {language}… {pct}%": "Převádí se „{name}“ do jazyka {language}… {pct} %",
+  "“{name}” speaks {language}, so this may take a while. Each sound is put into {language} first, in the background, and plays when it's ready.": "„{name}“ mluví jazykem {language}, takže to může chvíli trvat. Každý zvuk se nejdřív na pozadí převede do jazyka {language} a přehraje se, až bude hotový.",
+  "“{name}” speaks {language}, so this may take a while. The radio goes quiet while the translation starts, then you hear it in {language}, a few seconds behind.": "„{name}“ mluví jazykem {language}, takže to může chvíli trvat. Rádio ztichne, než se spustí překlad, a pak ho uslyšíš v jazyce {language}, o pár sekund později.",
+  "“{name}” speaks {language}, so this may take a while. Your programs go quiet while the translation starts, then you hear them in {language}, a few seconds behind.": "„{name}“ mluví jazykem {language}, takže to může chvíli trvat. Tvoje programy ztichnou, než se spustí překlad, a pak je uslyšíš v jazyce {language}, o pár sekund později.",
+  "“{name}” speaks {language}, which needs speech recognition and the {language} download (Voice tab, Speak another language). The rest of it is on.": "„{name}“ mluví jazykem {language}, k čemuž je potřeba rozpoznávání řeči a stažení jazyka {language} (karta Hlas, Mluvte jiným jazykem). Zbytek je zapnutý."
 }

@@ -3675,5 +3675,13 @@
   "Use “{name}”?": "¿Usar “{name}”?",
   "“{name}” has an AI voice, so this may take a while. Each sound is made in that voice first, in the background, and plays when it's ready.": "“{name}” tiene una voz de IA, así que esto puede tardar un poco. Cada sonido se hace primero con esa voz, en segundo plano, y suena cuando está listo.",
   "“{name}” has an AI voice, so this may take a while. The radio goes quiet until the AI voice is ready, then carries on in it.": "“{name}” tiene una voz de IA, así que esto puede tardar un poco. La radio se queda en silencio hasta que la voz de IA esté lista y luego sigue con ella.",
-  "“{name}” has an AI voice, so this may take a while. Your programs go quiet until the AI voice is ready, then carry on in it.": "“{name}” tiene una voz de IA, así que esto puede tardar un poco. Tus programas se quedan en silencio hasta que la voz de IA esté lista y luego siguen con ella."
+  "“{name}” has an AI voice, so this may take a while. Your programs go quiet until the AI voice is ready, then carry on in it.": "“{name}” tiene una voz de IA, así que esto puede tardar un poco. Tus programas se quedan en silencio hasta que la voz de IA esté lista y luego siguen con ella.",
+  "Couldn't put “{name}” into {language}: {why}": "No se ha podido pasar “{name}” a {language}: {why}",
+  "Couldn't start translating: {why}": "No se ha podido iniciar la traducción: {why}",
+  "Couldn't translate: {why}": "No se ha podido traducir: {why}",
+  "Putting “{name}” into {language}… {pct}%": "Pasando “{name}” a {language}… {pct} %",
+  "“{name}” speaks {language}, so this may take a while. Each sound is put into {language} first, in the background, and plays when it's ready.": "“{name}” habla {language}, así que esto puede tardar un poco. Cada sonido se pasa primero a {language}, en segundo plano, y suena cuando está listo.",
+  "“{name}” speaks {language}, so this may take a while. The radio goes quiet while the translation starts, then you hear it in {language}, a few seconds behind.": "“{name}” habla {language}, así que esto puede tardar un poco. La radio se queda en silencio mientras arranca la traducción y luego la oyes en {language}, unos segundos por detrás.",
+  "“{name}” speaks {language}, so this may take a while. Your programs go quiet while the translation starts, then you hear them in {language}, a few seconds behind.": "“{name}” habla {language}, así que esto puede tardar un poco. Tus programas se quedan en silencio mientras arranca la traducción y luego los oyes en {language}, unos segundos por detrás.",
+  "“{name}” speaks {language}, which needs speech recognition and the {language} download (Voice tab, Speak another language). The rest of it is on.": "“{name}” habla {language}, y para eso hacen falta el reconocimiento de voz y la descarga de {language} (pestaña Voz, Hablar otro idioma). El resto está activado."
 }

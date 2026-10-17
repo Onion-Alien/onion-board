@@ -3597,5 +3597,13 @@
   "Use “{name}”?": "Guna “{name}”?",
   "“{name}” has an AI voice, so this may take a while. Each sound is made in that voice first, in the background, and plays when it's ready.": "“{name}” ada suara AI, jadi ini mungkin ambil masa. Setiap bunyi dibuat dahulu dengan suara itu di latar belakang, dan dimainkan apabila siap.",
   "“{name}” has an AI voice, so this may take a while. The radio goes quiet until the AI voice is ready, then carries on in it.": "“{name}” ada suara AI, jadi ini mungkin ambil masa. Radio senyap sehingga suara AI siap, kemudian bersambung dengannya.",
-  "“{name}” has an AI voice, so this may take a while. Your programs go quiet until the AI voice is ready, then carry on in it.": "“{name}” ada suara AI, jadi ini mungkin ambil masa. Program anda senyap sehingga suara AI siap, kemudian bersambung dengannya."
+  "“{name}” has an AI voice, so this may take a while. Your programs go quiet until the AI voice is ready, then carry on in it.": "“{name}” ada suara AI, jadi ini mungkin ambil masa. Program anda senyap sehingga suara AI siap, kemudian bersambung dengannya.",
+  "Couldn't put “{name}” into {language}: {why}": "Tidak dapat menukar “{name}” ke {language}: {why}",
+  "Couldn't start translating: {why}": "Tidak dapat memulakan terjemahan: {why}",
+  "Couldn't translate: {why}": "Tidak dapat menterjemah: {why}",
+  "Putting “{name}” into {language}… {pct}%": "Menukar “{name}” ke {language}… {pct}%",
+  "“{name}” speaks {language}, so this may take a while. Each sound is put into {language} first, in the background, and plays when it's ready.": "“{name}” bercakap {language}, jadi ini mungkin ambil masa. Setiap bunyi ditukar ke {language} dahulu, di latar belakang, dan dimainkan apabila siap.",
+  "“{name}” speaks {language}, so this may take a while. The radio goes quiet while the translation starts, then you hear it in {language}, a few seconds behind.": "“{name}” bercakap {language}, jadi ini mungkin ambil masa. Radio senyap semasa terjemahan bermula, kemudian anda dengarnya dalam {language}, lewat beberapa saat.",
+  "“{name}” speaks {language}, so this may take a while. Your programs go quiet while the translation starts, then you hear them in {language}, a few seconds behind.": "“{name}” bercakap {language}, jadi ini mungkin ambil masa. Program anda senyap semasa terjemahan bermula, kemudian anda dengarnya dalam {language}, lewat beberapa saat.",
+  "“{name}” speaks {language}, which needs speech recognition and the {language} download (Voice tab, Speak another language). The rest of it is on.": "“{name}” bercakap {language}, yang perlukan pengecaman pertuturan dan muat turun {language} (tab Suara, Cakap bahasa lain). Bahagian lain dihidupkan."
 }

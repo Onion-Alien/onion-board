@@ -3675,5 +3675,13 @@
   "Use “{name}”?": "Használod ezt: „{name}”?",
   "“{name}” has an AI voice, so this may take a while. Each sound is made in that voice first, in the background, and plays when it's ready.": "A(z) „{name}” AI hangot használ, így ez eltarthat egy ideig. Minden hang előbb a háttérben elkészül ezzel a hanggal, és amikor kész, megszólal.",
   "“{name}” has an AI voice, so this may take a while. The radio goes quiet until the AI voice is ready, then carries on in it.": "A(z) „{name}” AI hangot használ, így ez eltarthat egy ideig. A rádió elhallgat, amíg az AI hang elkészül, aztán azzal szól tovább.",
-  "“{name}” has an AI voice, so this may take a while. Your programs go quiet until the AI voice is ready, then carry on in it.": "A(z) „{name}” AI hangot használ, így ez eltarthat egy ideig. A programjaid elhallgatnak, amíg az AI hang elkészül, aztán azzal szólnak tovább."
+  "“{name}” has an AI voice, so this may take a while. Your programs go quiet until the AI voice is ready, then carry on in it.": "A(z) „{name}” AI hangot használ, így ez eltarthat egy ideig. A programjaid elhallgatnak, amíg az AI hang elkészül, aztán azzal szólnak tovább.",
+  "Couldn't put “{name}” into {language}: {why}": "Nem sikerült {language} nyelvre átültetni ezt: „{name}”: {why}",
+  "Couldn't start translating: {why}": "Nem sikerült elindítani a fordítást: {why}",
+  "Couldn't translate: {why}": "Nem sikerült lefordítani: {why}",
+  "Putting “{name}” into {language}… {pct}%": "„{name}” átültetése {language} nyelvre… {pct}%",
+  "“{name}” speaks {language}, so this may take a while. Each sound is put into {language} first, in the background, and plays when it's ready.": "„{name}” {language} nyelven beszél, ezért ez eltarthat egy ideig. Minden hangot előbb a háttérben átültet {language} nyelvre, és akkor szól, amikor elkészült.",
+  "“{name}” speaks {language}, so this may take a while. The radio goes quiet while the translation starts, then you hear it in {language}, a few seconds behind.": "„{name}” {language} nyelven beszél, ezért ez eltarthat egy ideig. A rádió elhallgat, amíg a fordítás elindul, aztán {language} nyelven hallod, néhány másodperc késéssel.",
+  "“{name}” speaks {language}, so this may take a while. Your programs go quiet while the translation starts, then you hear them in {language}, a few seconds behind.": "„{name}” {language} nyelven beszél, ezért ez eltarthat egy ideig. A programjaid elhallgatnak, amíg a fordítás elindul, aztán {language} nyelven hallod őket, néhány másodperc késéssel.",
+  "“{name}” speaks {language}, which needs speech recognition and the {language} download (Voice tab, Speak another language). The rest of it is on.": "„{name}” {language} nyelven beszél, ehhez beszédfelismerés és a(z) {language} letöltése kell (Beszéd lap, Beszélj más nyelvet). A többi része be van kapcsolva."
 }

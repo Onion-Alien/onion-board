@@ -3597,5 +3597,13 @@
   "Use “{name}”?": "Dùng “{name}”?",
   "“{name}” has an AI voice, so this may take a while. Each sound is made in that voice first, in the background, and plays when it's ready.": "“{name}” có giọng AI nên có thể mất một lúc. Mỗi âm thanh sẽ được làm bằng giọng đó trước, chạy ngầm, và phát khi xong.",
   "“{name}” has an AI voice, so this may take a while. The radio goes quiet until the AI voice is ready, then carries on in it.": "“{name}” có giọng AI nên có thể mất một lúc. Radio sẽ im lặng đến khi giọng AI sẵn sàng, rồi phát tiếp bằng giọng đó.",
-  "“{name}” has an AI voice, so this may take a while. Your programs go quiet until the AI voice is ready, then carry on in it.": "“{name}” có giọng AI nên có thể mất một lúc. Các chương trình của bạn sẽ im lặng đến khi giọng AI sẵn sàng, rồi phát tiếp bằng giọng đó."
+  "“{name}” has an AI voice, so this may take a while. Your programs go quiet until the AI voice is ready, then carry on in it.": "“{name}” có giọng AI nên có thể mất một lúc. Các chương trình của bạn sẽ im lặng đến khi giọng AI sẵn sàng, rồi phát tiếp bằng giọng đó.",
+  "Couldn't put “{name}” into {language}: {why}": "Không thể chuyển “{name}” sang {language}: {why}",
+  "Couldn't start translating: {why}": "Không thể bắt đầu dịch: {why}",
+  "Couldn't translate: {why}": "Không thể dịch: {why}",
+  "Putting “{name}” into {language}… {pct}%": "Đang chuyển “{name}” sang {language}… {pct}%",
+  "“{name}” speaks {language}, so this may take a while. Each sound is put into {language} first, in the background, and plays when it's ready.": "“{name}” nói {language}, nên việc này có thể mất một lúc. Mỗi âm thanh được chuyển sang {language} trước, trong nền, và phát khi đã xong.",
+  "“{name}” speaks {language}, so this may take a while. The radio goes quiet while the translation starts, then you hear it in {language}, a few seconds behind.": "“{name}” nói {language}, nên việc này có thể mất một lúc. Radio im lặng trong lúc bắt đầu dịch, rồi bạn nghe nó bằng {language}, chậm vài giây.",
+  "“{name}” speaks {language}, so this may take a while. Your programs go quiet while the translation starts, then you hear them in {language}, a few seconds behind.": "“{name}” nói {language}, nên việc này có thể mất một lúc. Các chương trình của bạn im lặng trong lúc bắt đầu dịch, rồi bạn nghe chúng bằng {language}, chậm vài giây.",
+  "“{name}” speaks {language}, which needs speech recognition and the {language} download (Voice tab, Speak another language). The rest of it is on.": "“{name}” nói {language}, việc này cần nhận dạng giọng nói và bản tải {language} (thẻ Giọng nói, Nói ngôn ngữ khác). Phần còn lại đang bật."
 }

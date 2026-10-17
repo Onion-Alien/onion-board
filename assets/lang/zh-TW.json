@@ -3597,5 +3597,13 @@
   "Use “{name}”?": "使用「{name}」？",
   "“{name}” has an AI voice, so this may take a while. Each sound is made in that voice first, in the background, and plays when it's ready.": "「{name}」帶有 AI 聲音，所以可能需要一點時間。每個聲音會先在背景用這個聲音做好，做好後再播放。",
   "“{name}” has an AI voice, so this may take a while. The radio goes quiet until the AI voice is ready, then carries on in it.": "「{name}」帶有 AI 聲音，所以可能需要一點時間。電台會先靜音，等 AI 聲音準備好後用它繼續播放。",
-  "“{name}” has an AI voice, so this may take a while. Your programs go quiet until the AI voice is ready, then carry on in it.": "「{name}」帶有 AI 聲音，所以可能需要一點時間。你的程式會先靜音，等 AI 聲音準備好後用它繼續播放。"
+  "“{name}” has an AI voice, so this may take a while. Your programs go quiet until the AI voice is ready, then carry on in it.": "「{name}」帶有 AI 聲音，所以可能需要一點時間。你的程式會先靜音，等 AI 聲音準備好後用它繼續播放。",
+  "Couldn't put “{name}” into {language}: {why}": "無法把「{name}」變成{language}：{why}",
+  "Couldn't start translating: {why}": "無法開始翻譯：{why}",
+  "Couldn't translate: {why}": "無法翻譯：{why}",
+  "Putting “{name}” into {language}… {pct}%": "正在把「{name}」變成{language}… {pct}%",
+  "“{name}” speaks {language}, so this may take a while. Each sound is put into {language} first, in the background, and plays when it's ready.": "「{name}」說{language}，所以可能要等一下。每個聲音會先在背景變成{language}，好了就播放。",
+  "“{name}” speaks {language}, so this may take a while. The radio goes quiet while the translation starts, then you hear it in {language}, a few seconds behind.": "「{name}」說{language}，所以可能要等一下。翻譯啟動時電台會靜音，之後你會聽到它的{language}版本，晚幾秒鐘。",
+  "“{name}” speaks {language}, so this may take a while. Your programs go quiet while the translation starts, then you hear them in {language}, a few seconds behind.": "「{name}」說{language}，所以可能要等一下。翻譯啟動時你的程式會靜音，之後你會聽到它們的{language}版本，晚幾秒鐘。",
+  "“{name}” speaks {language}, which needs speech recognition and the {language} download (Voice tab, Speak another language). The rest of it is on.": "「{name}」說{language}，這需要語音辨識和{language}的下載（語音分頁，說另一種語言）。其餘部分已開啟。"
 }
