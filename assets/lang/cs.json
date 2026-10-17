@@ -3134,7 +3134,6 @@
   "The download kept going far past FFmpeg's size: not taking it.": "Stahování pokračovalo daleko za velikost FFmpeg: nepoužije se.",
   "winget isn't on this PC.": "winget na tomto PC není.",
   "A whole folder": "Celou složku",
-  "Add sounds: files, a folder, a recording, a link or a free pack (or drag files onto the window)": "Přidej zvuky: soubory, složku, nahrávku, odkaz nebo balíček zdarma (nebo přetáhni soubory do okna)",
   "From a link": "Z odkazu",
   "Paste a link into the search box": "Vlož odkaz do vyhledávacího pole",
   "Record a sound with your mic: Add, then Record.": "Nahraj zvuk mikrofonem: Přidat, pak Nahrát.",
@@ -4185,5 +4184,8 @@
   "Pumpkin orange, witch purple and cobwebs, with Bun and Hoot in witch's hats. Pick it by 31 October and it's yours to keep.": "Dýňová oranžová, čarodějnice purpurová a pavučiny, s drdolem a houskou v čarodějnických kloboucích. Vyberte si ji do 31. října a je na vás, abyste si ji ponechali.",
   "Bun does a new act on every loading screen. Click Bun or Hoot and they talk like their theme's character.": "Bun dělá nový akt na každé obrazovce načítání. Klikněte na Bun nebo Hoot a budou mluvit jako postava jejich motivu.",
   "Watch for Golden, Ice, Galaxy and Rainbow Bun. Rainbow Bun appears only once in 50,000 starts.": "Sledujte Golden, Ice, Galaxy a Rainbow Bun. Rainbow Bun se objeví pouze jednou z 50 000 spuštění.",
-  "No mic is open, so there's no voice to change. Plug one in, or pick it in Settings → Audio.": "Žádný mikrofon není otevřený, takže není co měnit. Připojte nějaký nebo ho vyberte v Nastavení → Zvuk."
+  "No mic is open, so there's no voice to change. Plug one in, or pick it in Settings → Audio.": "Žádný mikrofon není otevřený, takže není co měnit. Připojte nějaký nebo ho vyberte v Nastavení → Zvuk.",
+  "Add sounds: files, a folder, a recording or a link (or drag files onto the window)": "Přidat zvuky: soubory, složku, nahrávku nebo odkaz (nebo přetáhni soubory do okna)",
+  "Drag to change the order": "Přetažením změníš pořadí",
+  "Play it now": "Přehrát hned"
 }

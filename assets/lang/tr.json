@@ -3064,7 +3064,6 @@
   "The download kept going far past FFmpeg's size: not taking it.": "İndirme FFmpeg'in boyutunu çok aştı: kullanılmıyor.",
   "winget isn't on this PC.": "Bu bilgisayarda winget yok.",
   "A whole folder": "Bütün bir klasör",
-  "Add sounds: files, a folder, a recording, a link or a free pack (or drag files onto the window)": "Ses ekle: dosyalar, klasör, kayıt, bağlantı veya ücretsiz paket (ya da dosyaları pencereye sürükle)",
   "From a link": "Bir bağlantıdan",
   "Paste a link into the search box": "Arama kutusuna bir bağlantı yapıştır",
   "Record a sound with your mic: Add, then Record.": "Mikrofonunla ses kaydet: Ekle, sonra Kaydet.",
@@ -4106,5 +4105,8 @@
   "Pumpkin orange, witch purple and cobwebs, with Bun and Hoot in witch's hats. Pick it by 31 October and it's yours to keep.": "Balkabağı turuncusu, cadı moru ve örümcek ağları, cadı şapkalı Bun ve Hoot. 31 Ekim'e kadar seçin ve sizde kalsın.",
   "Bun does a new act on every loading screen. Click Bun or Hoot and they talk like their theme's character.": "Bun her yükleme ekranında yeni bir eylem gerçekleştiriyor. Bun veya Hoot'a tıkladığınızda temalarının karakterleri gibi konuşurlar.",
   "Watch for Golden, Ice, Galaxy and Rainbow Bun. Rainbow Bun appears only once in 50,000 starts.": "Altın, Buz, Galaksi ve Gökkuşağı Çöreği'ni izleyin. Gökkuşağı Çöreği 50.000 başlangıçta yalnızca bir kez ortaya çıkar.",
-  "No mic is open, so there's no voice to change. Plug one in, or pick it in Settings → Audio.": "Açık mikrofon yok, bu yüzden değiştirilecek bir ses yok. Bir mikrofon tak ya da Ayarlar → Ses bölümünden seç."
+  "No mic is open, so there's no voice to change. Plug one in, or pick it in Settings → Audio.": "Açık mikrofon yok, bu yüzden değiştirilecek bir ses yok. Bir mikrofon tak ya da Ayarlar → Ses bölümünden seç.",
+  "Add sounds: files, a folder, a recording or a link (or drag files onto the window)": "Ses ekle: dosyalar, bir klasör, bir kayıt veya bir bağlantı (ya da dosyaları pencereye sürükle)",
+  "Drag to change the order": "Sırayı değiştirmek için sürükle",
+  "Play it now": "Şimdi çal"
 }

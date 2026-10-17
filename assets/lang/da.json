@@ -3064,7 +3064,6 @@
   "The download kept going far past FFmpeg's size: not taking it.": "Downloaden blev ved langt ud over FFmpegs størrelse: bruges ikke.",
   "winget isn't on this PC.": "winget findes ikke på denne pc.",
   "A whole folder": "En hel mappe",
-  "Add sounds: files, a folder, a recording, a link or a free pack (or drag files onto the window)": "Tilføj lyde: filer, en mappe, en optagelse, et link eller en gratis pakke (eller træk filer ind i vinduet)",
   "From a link": "Fra et link",
   "Paste a link into the search box": "Indsæt et link i søgefeltet",
   "Record a sound with your mic: Add, then Record.": "Optag en lyd med din mikrofon: Tilføj, derefter Optag.",
@@ -4106,5 +4105,8 @@
   "Pumpkin orange, witch purple and cobwebs, with Bun and Hoot in witch's hats. Pick it by 31 October and it's yours to keep.": "Græskarappelsin, hekselilla og spindelvæv, med Bolle og Hoot i heksehatte. Vælg det inden den 31. oktober, og det er dit at beholde.",
   "Bun does a new act on every loading screen. Click Bun or Hoot and they talk like their theme's character.": "Bun laver en ny handling på hver indlæsningsskærm. Klik på Bun eller Hoot, og de taler som deres temas karakter.",
   "Watch for Golden, Ice, Galaxy and Rainbow Bun. Rainbow Bun appears only once in 50,000 starts.": "Hold øje med Golden, Ice, Galaxy og Rainbow Bun. Rainbow Bun optræder kun én gang ud af 50.000 starter.",
-  "No mic is open, so there's no voice to change. Plug one in, or pick it in Settings → Audio.": "Ingen mikrofon er åben, så der er ingen stemme at ændre. Sæt en i, eller vælg den under Indstillinger → Lyd."
+  "No mic is open, so there's no voice to change. Plug one in, or pick it in Settings → Audio.": "Ingen mikrofon er åben, så der er ingen stemme at ændre. Sæt en i, eller vælg den under Indstillinger → Lyd.",
+  "Add sounds: files, a folder, a recording or a link (or drag files onto the window)": "Tilføj lyde: filer, en mappe, en optagelse eller et link (eller træk filer ind i vinduet)",
+  "Drag to change the order": "Træk for at ændre rækkefølgen",
+  "Play it now": "Afspil nu"
 }

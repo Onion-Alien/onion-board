@@ -2994,7 +2994,6 @@
   "The download kept going far past FFmpeg's size: not taking it.": "ไฟล์ดาวน์โหลดใหญ่เกินขนาดของ FFmpeg ไปมาก: ไม่ใช้",
   "winget isn't on this PC.": "ไม่มี winget ในพีซีเครื่องนี้",
   "A whole folder": "ทั้งโฟลเดอร์",
-  "Add sounds: files, a folder, a recording, a link or a free pack (or drag files onto the window)": "เพิ่มเสียง: ไฟล์ โฟลเดอร์ เสียงที่อัด ลิงก์ หรือแพ็กฟรี (หรือลากไฟล์มาวางที่หน้าต่าง)",
   "From a link": "จากลิงก์",
   "Paste a link into the search box": "วางลิงก์ในช่องค้นหา",
   "Record a sound with your mic: Add, then Record.": "อัดเสียงด้วยไมค์ของคุณ: เพิ่ม แล้วกด อัด",
@@ -4027,5 +4026,8 @@
   "Pumpkin orange, witch purple and cobwebs, with Bun and Hoot in witch's hats. Pick it by 31 October and it's yours to keep.": "ส้มฟักทอง สีม่วงแม่มด และใยแมงมุม พร้อมด้วยขนมปังและบีบแตรในหมวกแม่มด เลือกได้ภายในวันที่ 31 ตุลาคม และคุณจะเก็บไว้เอง",
   "Bun does a new act on every loading screen. Click Bun or Hoot and they talk like their theme's character.": "Bun ทำหน้าที่ใหม่ในทุกหน้าจอการโหลด คลิก Bun หรือ Hoot แล้วพวกมันจะพูดเหมือนตัวละครในธีม",
   "Watch for Golden, Ice, Galaxy and Rainbow Bun. Rainbow Bun appears only once in 50,000 starts.": "รับชม Golden, Ice, Galaxy และ Rainbow Bun Rainbow Bun จะปรากฏเพียงครั้งเดียวใน 50,000 ครั้ง",
-  "No mic is open, so there's no voice to change. Plug one in, or pick it in Settings → Audio.": "ไม่มีไมค์เปิดอยู่ เลยไม่มีเสียงให้เปลี่ยน เสียบไมค์ หรือเลือกไมค์ใน การตั้งค่า → เสียง"
+  "No mic is open, so there's no voice to change. Plug one in, or pick it in Settings → Audio.": "ไม่มีไมค์เปิดอยู่ เลยไม่มีเสียงให้เปลี่ยน เสียบไมค์ หรือเลือกไมค์ใน การตั้งค่า → เสียง",
+  "Add sounds: files, a folder, a recording or a link (or drag files onto the window)": "เพิ่มเสียง: ไฟล์ โฟลเดอร์ การอัด หรือลิงก์ (หรือลากไฟล์มาวางที่หน้าต่าง)",
+  "Drag to change the order": "ลากเพื่อเปลี่ยนลำดับ",
+  "Play it now": "เล่นตอนนี้"
 }

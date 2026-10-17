@@ -426,6 +426,15 @@ def _more(p, fill):
     fill(dots)
 
 
+def _grip(p, fill):
+    """A handle to drag a row by: two columns of three dots."""
+    dots = QPainterPath()
+    for x in (9, 15):
+        for y in (6, 12, 18):
+            dots.addEllipse(QPointF(x, y), 1.8, 1.8)
+    fill(dots)
+
+
 def _alert(p, fill):
     """An error: a circle with an exclamation mark."""
     p.drawEllipse(QRectF(3, 3, 18, 18))
@@ -1050,6 +1059,7 @@ SHAPES = {
     "folder": _folder,
     "link": _link,
     "shield": _shield, "info": _info, "question": _question, "alert": _alert, "more": _more,
+    "grip": _grip,
     "onion": _onion,
     "next": _next, "edit": _edit, "trash": _trash, "keyboard": _keyboard,
     "palette": _palette, "gamepad": _gamepad, "image": _image, "video": _video, "radio": _radio,

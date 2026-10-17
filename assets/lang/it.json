@@ -3064,7 +3064,6 @@
   "The download kept going far past FFmpeg's size: not taking it.": "Il download è andato molto oltre la dimensione di FFmpeg: non lo prendo.",
   "winget isn't on this PC.": "winget non è su questo PC.",
   "A whole folder": "Un'intera cartella",
-  "Add sounds: files, a folder, a recording, a link or a free pack (or drag files onto the window)": "Aggiungi suoni: file, una cartella, una registrazione, un link o un pacchetto gratis (o trascina i file sulla finestra)",
   "From a link": "Da un link",
   "Paste a link into the search box": "Incolla un link nella casella di ricerca",
   "Record a sound with your mic: Add, then Record.": "Registra un suono con il microfono: Aggiungi, poi Registra.",
@@ -4106,5 +4105,8 @@
   "Pumpkin orange, witch purple and cobwebs, with Bun and Hoot in witch's hats. Pick it by 31 October and it's yours to keep.": "Arancione zucca, viola strega e ragnatele, con Bun e Hoot nei cappelli da strega. Sceglilo entro il 31 ottobre e sarà tuo.",
   "Bun does a new act on every loading screen. Click Bun or Hoot and they talk like their theme's character.": "Bun esegue un nuovo atto in ogni schermata di caricamento. Fai clic su Bun o Hoot e parleranno come il personaggio del loro tema.",
   "Watch for Golden, Ice, Galaxy and Rainbow Bun. Rainbow Bun appears only once in 50,000 starts.": "Fai attenzione a Golden, Ice, Galaxy e Rainbow Bun. Rainbow Bun appare solo una volta ogni 50.000 avviamenti.",
-  "No mic is open, so there's no voice to change. Plug one in, or pick it in Settings → Audio.": "Nessun microfono aperto, quindi non c'è nessuna voce da cambiare. Collegane uno o sceglilo in Impostazioni → Audio."
+  "No mic is open, so there's no voice to change. Plug one in, or pick it in Settings → Audio.": "Nessun microfono aperto, quindi non c'è nessuna voce da cambiare. Collegane uno o sceglilo in Impostazioni → Audio.",
+  "Add sounds: files, a folder, a recording or a link (or drag files onto the window)": "Aggiungi suoni: file, una cartella, una registrazione o un link (o trascina i file nella finestra)",
+  "Drag to change the order": "Trascina per cambiare l'ordine",
+  "Play it now": "Riproduci ora"
 }

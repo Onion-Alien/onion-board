@@ -3064,7 +3064,6 @@
   "The download kept going far past FFmpeg's size: not taking it.": "A transferência passou muito do tamanho do FFmpeg: não será usada.",
   "winget isn't on this PC.": "O winget não está neste PC.",
   "A whole folder": "Uma pasta inteira",
-  "Add sounds: files, a folder, a recording, a link or a free pack (or drag files onto the window)": "Adiciona sons: ficheiros, uma pasta, uma gravação, uma ligação ou um pacote grátis (ou arrasta ficheiros para a janela)",
   "From a link": "De uma ligação",
   "Paste a link into the search box": "Cola uma ligação na caixa de pesquisa",
   "Record a sound with your mic: Add, then Record.": "Grava um som com o teu microfone: Adicionar, depois Gravar.",
@@ -4106,5 +4105,8 @@
   "Pumpkin orange, witch purple and cobwebs, with Bun and Hoot in witch's hats. Pick it by 31 October and it's yours to keep.": "Laranja abóbora, roxo bruxa e teias de aranha, com Bun e Hoot em chapéus de bruxa. Escolha-o até 31 de outubro e será seu.",
   "Bun does a new act on every loading screen. Click Bun or Hoot and they talk like their theme's character.": "Bun faz uma nova atuação a cada ecrã de carregamento. Clica em Bun ou Hoot e eles falam como a personagem do tema.",
   "Watch for Golden, Ice, Galaxy and Rainbow Bun. Rainbow Bun appears only once in 50,000 starts.": "Cuidado com Golden, Ice, Galaxy e Rainbow Bun. Rainbow Bun aparece apenas uma vez em 50.000 combates.",
-  "No mic is open, so there's no voice to change. Plug one in, or pick it in Settings → Audio.": "Sem microfone aberto, por isso não há voz para mudar. Liga um ou escolhe-o em Definições → Áudio."
+  "No mic is open, so there's no voice to change. Plug one in, or pick it in Settings → Audio.": "Sem microfone aberto, por isso não há voz para mudar. Liga um ou escolhe-o em Definições → Áudio.",
+  "Add sounds: files, a folder, a recording or a link (or drag files onto the window)": "Adicionar sons: ficheiros, uma pasta, uma gravação ou uma ligação (ou arrasta ficheiros para a janela)",
+  "Drag to change the order": "Arrasta para mudar a ordem",
+  "Play it now": "Tocar agora"
 }

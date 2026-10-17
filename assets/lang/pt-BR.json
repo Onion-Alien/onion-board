@@ -3064,7 +3064,6 @@
   "The download kept going far past FFmpeg's size: not taking it.": "O download passou muito do tamanho do FFmpeg: não vou usar.",
   "winget isn't on this PC.": "O winget não está neste PC.",
   "A whole folder": "Uma pasta inteira",
-  "Add sounds: files, a folder, a recording, a link or a free pack (or drag files onto the window)": "Adicione sons: arquivos, uma pasta, uma gravação, um link ou um pacote grátis (ou arraste arquivos para a janela)",
   "From a link": "De um link",
   "Paste a link into the search box": "Cole um link na caixa de busca",
   "Record a sound with your mic: Add, then Record.": "Grave um som com seu microfone: Adicionar, depois Gravar.",
@@ -4106,5 +4105,8 @@
   "Pumpkin orange, witch purple and cobwebs, with Bun and Hoot in witch's hats. Pick it by 31 October and it's yours to keep.": "Laranja abóbora, roxo bruxa e teias de aranha, com Bun e Hoot em chapéus de bruxa. Escolha-o até 31 de outubro e ele será seu.",
   "Bun does a new act on every loading screen. Click Bun or Hoot and they talk like their theme's character.": "Bun faz uma nova atuação a cada tela de carregamento. Clique em Bun ou Hoot e eles falam como o personagem do tema.",
   "Watch for Golden, Ice, Galaxy and Rainbow Bun. Rainbow Bun appears only once in 50,000 starts.": "Cuidado com Golden, Ice, Galaxy e Rainbow Bun. Rainbow Bun aparece apenas uma vez em 50.000 partidas.",
-  "No mic is open, so there's no voice to change. Plug one in, or pick it in Settings → Audio.": "Nenhum microfone aberto, então não há voz para mudar. Conecte um ou escolha em Configurações → Áudio."
+  "No mic is open, so there's no voice to change. Plug one in, or pick it in Settings → Audio.": "Nenhum microfone aberto, então não há voz para mudar. Conecte um ou escolha em Configurações → Áudio.",
+  "Add sounds: files, a folder, a recording or a link (or drag files onto the window)": "Adicionar sons: arquivos, uma pasta, uma gravação ou um link (ou arraste arquivos para a janela)",
+  "Drag to change the order": "Arraste para mudar a ordem",
+  "Play it now": "Tocar agora"
 }

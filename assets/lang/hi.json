@@ -3064,7 +3064,6 @@
   "The download kept going far past FFmpeg's size: not taking it.": "डाउनलोड FFmpeg के साइज़ से बहुत आगे चला गया: इसे नहीं लिया जाएगा।",
   "winget isn't on this PC.": "इस PC पर winget नहीं है।",
   "A whole folder": "पूरा फ़ोल्डर",
-  "Add sounds: files, a folder, a recording, a link or a free pack (or drag files onto the window)": "साउंड जोड़ें: फ़ाइलें, फ़ोल्डर, रिकॉर्डिंग, लिंक या मुफ़्त पैक (या फ़ाइलें विंडो पर खींचें)",
   "From a link": "लिंक से",
   "Paste a link into the search box": "सर्च बॉक्स में लिंक पेस्ट करें",
   "Record a sound with your mic: Add, then Record.": "अपने माइक से साउंड रिकॉर्ड करें: जोड़ें, फिर रिकॉर्ड।",
@@ -4106,5 +4105,8 @@
   "Pumpkin orange, witch purple and cobwebs, with Bun and Hoot in witch's hats. Pick it by 31 October and it's yours to keep.": "कद्दू नारंगी, चुड़ैल बैंगनी और मकड़ी के जाले, चुड़ैल की टोपी में बन और हूट के साथ। इसे 31 अक्टूबर तक चुनें और इसे रखना आपका है।",
   "Bun does a new act on every loading screen. Click Bun or Hoot and they talk like their theme's character.": "बन प्रत्येक लोडिंग स्क्रीन पर एक नया कार्य करता है। बन या हूट पर क्लिक करें और वे अपने विषय के चरित्र की तरह बात करते हैं।",
   "Watch for Golden, Ice, Galaxy and Rainbow Bun. Rainbow Bun appears only once in 50,000 starts.": "गोल्डन, आइस, गैलेक्सी और रेनबो बन पर नजर रखें। रेनबो बन 50,000 प्रारंभों में केवल एक बार दिखाई देता है।",
-  "No mic is open, so there's no voice to change. Plug one in, or pick it in Settings → Audio.": "कोई माइक नहीं खुला है, इसलिए बदलने को कोई आवाज़ नहीं है। एक माइक लगाएँ, या उसे सेटिंग्स → ऑडियो में चुनें।"
+  "No mic is open, so there's no voice to change. Plug one in, or pick it in Settings → Audio.": "कोई माइक नहीं खुला है, इसलिए बदलने को कोई आवाज़ नहीं है। एक माइक लगाएँ, या उसे सेटिंग्स → ऑडियो में चुनें।",
+  "Add sounds: files, a folder, a recording or a link (or drag files onto the window)": "साउंड जोड़ें: फ़ाइलें, एक फ़ोल्डर, एक रिकॉर्डिंग या एक लिंक (या फ़ाइलें विंडो पर खींचें)",
+  "Drag to change the order": "क्रम बदलने के लिए खींचें",
+  "Play it now": "अभी चलाएँ"
 }

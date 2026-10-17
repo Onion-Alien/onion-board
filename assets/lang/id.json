@@ -2994,7 +2994,6 @@
   "The download kept going far past FFmpeg's size: not taking it.": "Unduhan terus berjalan jauh melebihi ukuran FFmpeg: tidak dipakai.",
   "winget isn't on this PC.": "winget tidak ada di PC ini.",
   "A whole folder": "Satu folder penuh",
-  "Add sounds: files, a folder, a recording, a link or a free pack (or drag files onto the window)": "Tambah suara: file, folder, rekaman, tautan, atau paket gratis (atau seret file ke jendela)",
   "From a link": "Dari tautan",
   "Paste a link into the search box": "Tempel tautan di kotak pencarian",
   "Record a sound with your mic: Add, then Record.": "Rekam suara dengan mikmu: Tambah, lalu Rekam.",
@@ -4027,5 +4026,8 @@
   "Pumpkin orange, witch purple and cobwebs, with Bun and Hoot in witch's hats. Pick it by 31 October and it's yours to keep.": "Oranye labu, ungu penyihir, dan sarang laba-laba, dengan Bun dan Hoot bertopi penyihir. Pilih paling lambat tanggal 31 Oktober dan itu milik Anda.",
   "Bun does a new act on every loading screen. Click Bun or Hoot and they talk like their theme's character.": "Bun melakukan tindakan baru di setiap layar pemuatan. Klik Bun atau Hoot dan mereka berbicara seperti karakter temanya.",
   "Watch for Golden, Ice, Galaxy and Rainbow Bun. Rainbow Bun appears only once in 50,000 starts.": "Perhatikan Roti Emas, Es, Galaksi, dan Pelangi. Rainbow Bun hanya muncul sekali dalam 50.000 permulaan.",
-  "No mic is open, so there's no voice to change. Plug one in, or pick it in Settings → Audio.": "Tidak ada mikrofon yang terbuka, jadi tidak ada suara untuk diubah. Colokkan satu, atau pilih di Pengaturan → Audio."
+  "No mic is open, so there's no voice to change. Plug one in, or pick it in Settings → Audio.": "Tidak ada mikrofon yang terbuka, jadi tidak ada suara untuk diubah. Colokkan satu, atau pilih di Pengaturan → Audio.",
+  "Add sounds: files, a folder, a recording or a link (or drag files onto the window)": "Tambah suara: file, folder, rekaman, atau link (atau seret file ke jendela)",
+  "Drag to change the order": "Seret untuk mengubah urutan",
+  "Play it now": "Putar sekarang"
 }
