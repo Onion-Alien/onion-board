@@ -344,9 +344,10 @@ def draw_bunny(p: QPainter, rect: QRectF, prop: str | None = None, *,
         p.rotate(a)
         bend = _ear_bend(side * bent, hinge)
         lower, flap = _ear_pieces(w, h, bend if bent > 0.5 else None, hinge)
-        # how much of the inner ear the flap shows: a flap folded right over (or his
-        # floppy ear) shows its furry back
-        inner_on = 0.0 if bent > 0.5 and (rest or bent > 50) else max(0.0, 1 - bent / 50)
+        # how much of the inner ear the flap shows: a flap folded right over shows its
+        # furry back; his floppy ear only bends, so its pink runs on to the tip
+        inner_on = (1.0 if rest and bent < rest + 8 else   # his floppy ear: pink to the tip
+                    0.0 if bent > 50 else max(0.0, 1 - bent / 50))
         edge = QColor(fur_shade)
         edge.setAlpha(150)
 
