@@ -38,7 +38,7 @@ class UpNextChip(QFrame):
         h.setContentsMargins(8, 2, 2, 2)
         h.setSpacing(4)
         pic = QLabel()
-        pic.setPixmap(icons.pixmap("list", 14, "accent"))
+        icons.set_label_icon(pic, "list", "muted", size=14)   # a theme colour, kept on switch
         self.name = QPushButton(_("Up next"))
         self.name.setObjectName("chipname")
         self.name.setToolTip(_("See everything waiting to play"))
