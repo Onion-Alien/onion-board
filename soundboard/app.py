@@ -633,6 +633,8 @@ def main():
     from soundboard import updates, usage
     unclean = usage.mark_running(APP_DIR)   # the last run ended without closing itself?
     usage.started(w.cfg)   # this launch, and updated/<from>-to-<to> after an update
+    if splash.rare():   # a rare loading screen came up (Golden Bun and the rest)
+        usage.used(f"splash-{splash.rare()}")
     failed_ver, failed_pid = bootmark.previous()   # a start that never got this far
     bootmark.clear(APP_DIR)   # running.txt (just written) is the marker from here on
     if unclean:   # work out why (Windows' log, the native-crash stacks) off this thread

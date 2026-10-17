@@ -1296,6 +1296,7 @@ class SetupWizard(QDialog):
         either way, and reopening the guide picks it back up. While the mic is set up,
         the guide stays open (_locked) and says so, so the X doesn't look broken."""
         if self._locked():
+            usage.used("setup-wait-note")
             # the app's toast, spinner and all (one at a time: pressed again, it's renewed)
             busy.toast(self, _("Bun's almost done, one moment."), "busy", LOCK_NOTE_MS,
                        key="setup-almost-done")

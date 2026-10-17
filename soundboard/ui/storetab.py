@@ -803,6 +803,7 @@ class StoreTab(QWidget):
         self._share_look()
         if found is None:
             if replace and down:
+                usage.used("store-maintenance" if down.back else "store-down")
                 self._clear()
                 self._problem(*store.down_words(down.back), fixable=False)
             elif replace:

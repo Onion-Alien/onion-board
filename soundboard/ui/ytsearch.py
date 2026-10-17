@@ -1085,6 +1085,8 @@ class SearchResults(RoundedFrame):
         isn't something closing the app fixes: no advice to (`errors.site_side`)."""
         self.title.hide()
         down = any(html.escape(w) in err or w in err for w in errors.site_side())
+        if down:
+            usage.used("search-site-down")
         self.oops.show_problem(title, err, self.try_again, fixable=not down)
         self.oops.show()
         self.scroll_area.hide()

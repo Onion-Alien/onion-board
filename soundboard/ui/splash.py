@@ -68,6 +68,11 @@ def card_h() -> int:
     return CARD_H + RARE_H if _show.odds else CARD_H
 
 
+def rare() -> str | None:
+    """This launch's rare Bun (a key of splashacts.RARES), or None."""
+    return _show.rare
+
+
 def tier_name(rare: str) -> str:
     """A rare launch's tier, as the splash names it (RARES' keys, rarest first)."""
     return {"rainbow": _("Super Rare"), "galaxy": _("Legendary"), "ice": _("Rare"),

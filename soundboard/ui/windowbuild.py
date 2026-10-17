@@ -852,7 +852,8 @@ class WindowBuilder(Controller):
                                   "bigger) to get the board back."))
         mw.mini_full.setAccessibleName(_("Full board"))
         icons.set_icon(mw.mini_full, "expand", size=18)
-        mw.mini_full.clicked.connect(mw.fitctl.grow_to_board)
+        mw.mini_full.clicked.connect(lambda: (usage.used("mini-full-board"),
+                                              mw.fitctl.grow_to_board()))
         connection.addWidget(mw.mini_full)
         cv.addLayout(connection)
         v.addWidget(card)

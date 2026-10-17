@@ -1284,3 +1284,22 @@ def test_a_freeze_on_a_pc_short_of_memory_says_so(tmp_path):
     assert usage._report_event(f).endswith("/lasted-10-30s/idle/mem-80")
     _freeze(f, "12 s", 0, "", inner="\nPC memory in use: 55%\nPage faults: 40/s\n")
     assert usage._report_event(f).endswith("/lasted-10-30s/idle")
+
+
+def test_a_rare_loading_screen_is_counted_by_its_tier(monkeypatch):
+    """Golden, Ice, Galaxy and Rainbow Bun: each has its name in FEATURES (one per key of
+    splashacts.RARES), and a launch that showed one notes it; a plain one notes none."""
+    from soundboard.ui import splash, splashacts
+    assert tuple(splashacts.RARES) == ("rainbow", "galaxy", "ice", "gold")
+    assert set(usage.SPLASH_RARES) == set(splashacts.RARES)
+    assert {f"splash-{k}" for k in usage.SPLASH_RARES} <= set(usage.FEATURES)
+    monkeypatch.setattr(splash, "_show", splashacts.Show(rare="ice"))
+    assert splash.rare() == "ice"
+    monkeypatch.setattr(splash, "_show", splashacts.Show())
+    assert splash.rare() is None
+
+
+def test_plain_themes_count_as_textures_off():
+    """Textured is the default: only a board set to Plain sends `textures-off`."""
+    assert "textures-off" not in usage.features_now(Config())
+    assert "textures-off" in usage.features_now(Config(theme_texture=False))

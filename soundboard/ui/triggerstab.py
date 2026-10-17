@@ -231,7 +231,8 @@ class TriggersTab(QWidget):
         side = 16
         self.hoot = OwlWidget(HOOT_PX, HOOT_BEGS, HOOT_JOY, left=side, right=side,
                               dances=True)
-        self.hoot.clicked.connect(lambda: self.btn_get.setFocus(Qt.FocusReason.OtherFocusReason))
+        self.hoot.clicked.connect(lambda: (usage.used("hoot-talk"),
+                                           self.btn_get.setFocus(Qt.FocusReason.OtherFocusReason)))
         row.addWidget(self.hoot, 0, Qt.AlignmentFlag.AlignCenter)
         bv.addLayout(row)
         # in the middle of the tab, a landing page rather than a box in its corner (a

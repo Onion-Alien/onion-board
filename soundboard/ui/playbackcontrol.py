@@ -146,9 +146,11 @@ class PlaybackControl(Controller):
                 or mw.routectl._main_name() is None):
             return
         self._muted_said = True
+        usage.used("muted-note")
         mw.toast(_("You're muted, so only you hear “{name}”.", name=html.escape(name)),
                  "warn", 8000, key="muted-play",
-                 action=(_("Go live"), lambda: mw.set_sending(True)))
+                 action=(_("Go live"), lambda: (usage.used("muted-go-live"),
+                                                mw.set_sending(True))))
 
     def sending_changed(self, on: bool):
         if on:
