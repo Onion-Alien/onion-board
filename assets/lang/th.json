@@ -3666,6 +3666,18 @@
     "Onion Board เจอปัญหา {n} ครั้งตั้งแต่เปิดใช้งาน"
   ],
   "See report": "ดูรายงาน",
+  "The store doesn't take that name or those tags. Try other words (and no links).": "ร้านไม่รับชื่อหรือแท็กนั้น ลองคำอื่น (และไม่มีลิงก์)",
+  "Add a voice someone sent you as a code (it starts with “OB”)": "เพิ่มเสียงที่ใครบางคนส่งให้คุณเป็นรหัส (เริ่มต้นด้วย \"OB\")",
+  "Add “{name}”?": "เพิ่ม “{name}” ไหม?",
+  "That isn't a voice code (they start with “OB”).": "นั่นไม่ใช่รหัสเสียง (ขึ้นต้นด้วย “OB”)",
+  " · hidden from All": " · ซ่อนจากทั้งหมด",
+  "Every sound except those in: {names} (right-click one of them, Advanced, to show it here again)": "ทุกเสียงยกเว้นเสียงใน: {names} (คลิกขวาที่หมวดหนึ่ง แล้วไปที่ ขั้นสูง เพื่อให้แสดงที่นี่อีกครั้ง)",
+  "Hide its sounds from All": "ซ่อนเสียงของหมวดนี้จากทั้งหมด",
+  "“{name}” is hidden from All. Its sounds stay on its own tab.": "“{name}” ถูกซ่อนจากทั้งหมดแล้ว เสียงยังอยู่ในแท็บของมันเอง",
+  "“{name}” shows in All again": "“{name}” แสดงในทั้งหมดอีกครั้ง",
+  "All categories": "ทุกหมวดหมู่",
+  "Votes": "โหวต",
+  "Tutorials are off now. Settings → General turns them back on.": "ปิดวิธีใช้แล้ว เปิดอีกครั้งได้ใน การตั้งค่า → ทั่วไป",
   "Add a sound from my board": "เพิ่มเสียงจากบอร์ดของฉัน",
   "Astronaut": "นักบินอวกาศ",
   "Bass boosted": "เบสหนัก",
@@ -3700,12 +3712,6 @@
   "packed": "แน่นขนัด",
   "pouring": "ห่าใหญ่",
   "roaring": "ลุกโชน",
-  "All categories": "ทุกหมวดหมู่",
-  "Votes": "โหวต",
-  "The store doesn't take that name or those tags. Try other words (and no links).": "ร้านไม่รับชื่อหรือแท็กนั้น ลองคำอื่น (และไม่มีลิงก์)",
-  "Add a voice someone sent you as a code (it starts with “OB”)": "เพิ่มเสียงที่ใครบางคนส่งให้คุณเป็นรหัส (เริ่มต้นด้วย \"OB\")",
-  "Add “{name}”?": "เพิ่ม “{name}” ไหม?",
-  "That isn't a voice code (they start with “OB”).": "นั่นไม่ใช่รหัสเสียง (ขึ้นต้นด้วย “OB”)",
   "Background  ·  {n} on": [
     "พื้นหลัง  ·  เปิด {n}"
   ],
@@ -3715,10 +3721,5 @@
   ],
   "Make a voice of your own first: Voice tab → Voice changer → Edit voice, or Save what's on under My setups.": "ทำเสียงของคุณเองก่อน: แท็บเสียง → โปรแกรมเปลี่ยนเสียง → แก้ไขเสียง หรือ บันทึกสิ่งที่เปิดอยู่ ในการตั้งค่าของฉัน",
   "Rain, wind, a crowd or sounds from your board behind your voice": "ฝน ลม ฝูงชน หรือเสียงจากบอร์ดของคุณ อยู่หลังเสียงของคุณ",
-  "Your own settings: Edit voice opens them": "การตั้งค่าของคุณเอง: เปิดได้จาก “แก้ไขเสียง”",
-  " · hidden from All": " · ซ่อนจากทั้งหมด",
-  "Every sound except those in: {names} (right-click one of them, Advanced, to show it here again)": "ทุกเสียงยกเว้นเสียงใน: {names} (คลิกขวาที่หมวดหนึ่ง แล้วไปที่ ขั้นสูง เพื่อให้แสดงที่นี่อีกครั้ง)",
-  "Hide its sounds from All": "ซ่อนเสียงของหมวดนี้จากทั้งหมด",
-  "“{name}” is hidden from All. Its sounds stay on its own tab.": "“{name}” ถูกซ่อนจากทั้งหมดแล้ว เสียงยังอยู่ในแท็บของมันเอง",
-  "“{name}” shows in All again": "“{name}” แสดงในทั้งหมดอีกครั้ง"
+  "Your own settings: Edit voice opens them": "การตั้งค่าของคุณเอง: เปิดได้จาก “แก้ไขเสียง”"
 }

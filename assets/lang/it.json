@@ -3744,6 +3744,18 @@
     "Onion Board ha avuto {n} problemi dall'avvio."
   ],
   "See report": "Vedi report",
+  "The store doesn't take that name or those tags. Try other words (and no links).": "Lo store non accetta quel nome o quei tag. Prova altre parole (e niente link).",
+  "Add a voice someone sent you as a code (it starts with “OB”)": "Aggiungi una voce che qualcuno ti ha inviato come codice (inizia con \"OB\")",
+  "Add “{name}”?": "Aggiungere “{name}”?",
+  "That isn't a voice code (they start with “OB”).": "Non si tratta di un codice vocale (iniziano con \"OB\").",
+  " · hidden from All": " · nascosta da Tutti",
+  "Every sound except those in: {names} (right-click one of them, Advanced, to show it here again)": "Tutti i suoni tranne quelli in: {names} (clic destro su una di esse, Avanzato, per mostrarla di nuovo qui)",
+  "Hide its sounds from All": "Nascondi i suoi suoni da Tutti",
+  "“{name}” is hidden from All. Its sounds stay on its own tab.": "“{name}” è nascosta da Tutti. I suoi suoni restano nella sua scheda.",
+  "“{name}” shows in All again": "“{name}” si vede di nuovo in Tutti",
+  "All categories": "Tutte le categorie",
+  "Votes": "Voti",
+  "Tutorials are off now. Settings → General turns them back on.": "Le guide ora sono spente. Impostazioni → Generale le riaccende.",
   "Add a sound from my board": "Aggiungi un suono dalla mia board",
   "Astronaut": "Astronauta",
   "Bass boosted": "Bassi potenziati",
@@ -3778,12 +3790,6 @@
   "packed": "pieno zeppo",
   "pouring": "diluvio",
   "roaring": "divampante",
-  "All categories": "Tutte le categorie",
-  "Votes": "Voti",
-  "The store doesn't take that name or those tags. Try other words (and no links).": "Lo store non accetta quel nome o quei tag. Prova altre parole (e niente link).",
-  "Add a voice someone sent you as a code (it starts with “OB”)": "Aggiungi una voce che qualcuno ti ha inviato come codice (inizia con \"OB\")",
-  "Add “{name}”?": "Aggiungere “{name}”?",
-  "That isn't a voice code (they start with “OB”).": "Non si tratta di un codice vocale (iniziano con \"OB\").",
   "Background  ·  {n} on": [
     "Sfondo  ·  {n} attivo",
     "Sfondo  ·  {n} attivi"
@@ -3795,10 +3801,5 @@
   ],
   "Make a voice of your own first: Voice tab → Voice changer → Edit voice, or Save what's on under My setups.": "Prima fai una voce tua: scheda Voce → Cambia voce → Modifica voce, oppure Salva ciò che è attivo in I miei preset.",
   "Rain, wind, a crowd or sounds from your board behind your voice": "Pioggia, vento, una folla o suoni dalla tua board dietro la tua voce",
-  "Your own settings: Edit voice opens them": "Le tue impostazioni: «Modifica voce» le apre",
-  " · hidden from All": " · nascosta da Tutti",
-  "Every sound except those in: {names} (right-click one of them, Advanced, to show it here again)": "Tutti i suoni tranne quelli in: {names} (clic destro su una di esse, Avanzato, per mostrarla di nuovo qui)",
-  "Hide its sounds from All": "Nascondi i suoi suoni da Tutti",
-  "“{name}” is hidden from All. Its sounds stay on its own tab.": "“{name}” è nascosta da Tutti. I suoi suoni restano nella sua scheda.",
-  "“{name}” shows in All again": "“{name}” si vede di nuovo in Tutti"
+  "Your own settings: Edit voice opens them": "Le tue impostazioni: «Modifica voce» le apre"
 }

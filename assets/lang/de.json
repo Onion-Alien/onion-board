@@ -3744,6 +3744,18 @@
     "Onion Board hatte seit dem Start {n} Probleme."
   ],
   "See report": "Bericht ansehen",
+  "The store doesn't take that name or those tags. Try other words (and no links).": "Der Store nimmt diesen Namen oder diese Tags nicht an. Versuch andere Wörter (und keine Links).",
+  "Add a voice someone sent you as a code (it starts with “OB”)": "Fügen Sie eine Stimme hinzu, die Ihnen jemand als Code gesendet hat (sie beginnt mit „OB“).",
+  "Add “{name}”?": "„{name}“ hinzufügen?",
+  "That isn't a voice code (they start with “OB”).": "Das ist kein Sprachcode (sie beginnen mit „OB“).",
+  " · hidden from All": " · in Alle ausgeblendet",
+  "Every sound except those in: {names} (right-click one of them, Advanced, to show it here again)": "Alle Sounds außer denen in: {names} (Rechtsklick auf eine davon, Erweitert, um sie hier wieder zu zeigen)",
+  "Hide its sounds from All": "Ihre Sounds in Alle ausblenden",
+  "“{name}” is hidden from All. Its sounds stay on its own tab.": "„{name}“ ist in Alle ausgeblendet. Ihre Sounds bleiben auf ihrem eigenen Tab.",
+  "“{name}” shows in All again": "„{name}“ wird wieder in Alle gezeigt",
+  "All categories": "Alle Kategorien",
+  "Votes": "Bewertungen",
+  "Tutorials are off now. Settings → General turns them back on.": "Anleitungen sind jetzt aus. Einstellungen → Allgemein schaltet sie wieder ein.",
   "Add a sound from my board": "Sound von meinem Board hinzufügen",
   "Astronaut": "Astronaut",
   "Bass boosted": "Bass-Boost",
@@ -3778,12 +3790,6 @@
   "packed": "brechend voll",
   "pouring": "Platzregen",
   "roaring": "lodernd",
-  "All categories": "Alle Kategorien",
-  "Votes": "Bewertungen",
-  "The store doesn't take that name or those tags. Try other words (and no links).": "Der Store nimmt diesen Namen oder diese Tags nicht an. Versuch andere Wörter (und keine Links).",
-  "Add a voice someone sent you as a code (it starts with “OB”)": "Fügen Sie eine Stimme hinzu, die Ihnen jemand als Code gesendet hat (sie beginnt mit „OB“).",
-  "Add “{name}”?": "„{name}“ hinzufügen?",
-  "That isn't a voice code (they start with “OB”).": "Das ist kein Sprachcode (sie beginnen mit „OB“).",
   "Background  ·  {n} on": [
     "Hintergrund  ·  {n} an",
     "Hintergrund  ·  {n} an"
@@ -3795,10 +3801,5 @@
   ],
   "Make a voice of your own first: Voice tab → Voice changer → Edit voice, or Save what's on under My setups.": "Mach zuerst eine eigene Stimme: Stimme-Tab → Stimmverzerrer → Stimme bearbeiten, oder Speichern, was an ist, unter Meine Setups.",
   "Rain, wind, a crowd or sounds from your board behind your voice": "Regen, Wind, eine Menge oder Sounds von deinem Board hinter deiner Stimme",
-  "Your own settings: Edit voice opens them": "Deine eigenen Einstellungen: „Stimme bearbeiten“ öffnet sie",
-  " · hidden from All": " · in Alle ausgeblendet",
-  "Every sound except those in: {names} (right-click one of them, Advanced, to show it here again)": "Alle Sounds außer denen in: {names} (Rechtsklick auf eine davon, Erweitert, um sie hier wieder zu zeigen)",
-  "Hide its sounds from All": "Ihre Sounds in Alle ausblenden",
-  "“{name}” is hidden from All. Its sounds stay on its own tab.": "„{name}“ ist in Alle ausgeblendet. Ihre Sounds bleiben auf ihrem eigenen Tab.",
-  "“{name}” shows in All again": "„{name}“ wird wieder in Alle gezeigt"
+  "Your own settings: Edit voice opens them": "Deine eigenen Einstellungen: „Stimme bearbeiten“ öffnet sie"
 }

@@ -3744,6 +3744,18 @@
     "Onion Board срещна {n} проблема, откакто е пуснат."
   ],
   "See report": "Виж доклада",
+  "The store doesn't take that name or those tags. Try other words (and no links).": "Магазинът не приема това име или тези тагове. Опитай с други думи (и без връзки).",
+  "Add a voice someone sent you as a code (it starts with “OB”)": "Добавете глас, който някой ви е изпратил като код (започва с „OB“)",
+  "Add “{name}”?": "Добавяне на „{name}“?",
+  "That isn't a voice code (they start with “OB”).": "Това не е гласов код (те започват с “OB”).",
+  " · hidden from All": " · скрита от Всички",
+  "Every sound except those in: {names} (right-click one of them, Advanced, to show it here again)": "Всеки звук без тези в: {names} (десен клик върху някоя, Разширени, за да я покажеш тук пак)",
+  "Hide its sounds from All": "Скрий звуците ѝ от Всички",
+  "“{name}” is hidden from All. Its sounds stay on its own tab.": "„{name}“ е скрита от Всички. Звуците ѝ остават в собствения ѝ раздел.",
+  "“{name}” shows in All again": "„{name}“ пак се показва във Всички",
+  "All categories": "Всички категории",
+  "Votes": "Оценки",
+  "Tutorials are off now. Settings → General turns them back on.": "Обясненията са изключени. Настройки → Общи ги включва пак.",
   "Add a sound from my board": "Добави звук от моя борд",
   "Astronaut": "Астронавт",
   "Bass boosted": "Усилен бас",
@@ -3778,12 +3790,6 @@
   "packed": "претъпкано",
   "pouring": "порой",
   "roaring": "буен",
-  "All categories": "Всички категории",
-  "Votes": "Оценки",
-  "The store doesn't take that name or those tags. Try other words (and no links).": "Магазинът не приема това име или тези тагове. Опитай с други думи (и без връзки).",
-  "Add a voice someone sent you as a code (it starts with “OB”)": "Добавете глас, който някой ви е изпратил като код (започва с „OB“)",
-  "Add “{name}”?": "Добавяне на „{name}“?",
-  "That isn't a voice code (they start with “OB”).": "Това не е гласов код (те започват с “OB”).",
   "Background  ·  {n} on": [
     "Фон  ·  {n} включено",
     "Фон  ·  {n} включено"
@@ -3795,10 +3801,5 @@
   ],
   "Make a voice of your own first: Voice tab → Voice changer → Edit voice, or Save what's on under My setups.": "Първо направи свой глас: раздел Глас → Промяна на гласа → Редактирай гласа, или Запази включеното в Моите настройки.",
   "Rain, wind, a crowd or sounds from your board behind your voice": "Дъжд, вятър, тълпа или звуци от твоя борд зад гласа ти",
-  "Your own settings: Edit voice opens them": "Твоите собствени настройки: „Редактирай гласа“ ги отваря",
-  " · hidden from All": " · скрита от Всички",
-  "Every sound except those in: {names} (right-click one of them, Advanced, to show it here again)": "Всеки звук без тези в: {names} (десен клик върху някоя, Разширени, за да я покажеш тук пак)",
-  "Hide its sounds from All": "Скрий звуците ѝ от Всички",
-  "“{name}” is hidden from All. Its sounds stay on its own tab.": "„{name}“ е скрита от Всички. Звуците ѝ остават в собствения ѝ раздел.",
-  "“{name}” shows in All again": "„{name}“ пак се показва във Всички"
+  "Your own settings: Edit voice opens them": "Твоите собствени настройки: „Редактирай гласа“ ги отваря"
 }

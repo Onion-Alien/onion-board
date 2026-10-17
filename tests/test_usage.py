@@ -1230,3 +1230,30 @@ def test_settings_pages_match_the_dialog():
     block = src[start:src.index("        self.categories = QListWidget()", start)]
     keys = set(re.findall(r'\("([a-z]+)", _\(', block))
     assert keys == set(usage.SETTINGS_PAGES)
+
+
+def test_background_hidden_categories_and_stream_api_count_every_day():
+    """The voice changer's Background (and board sounds in it), a category hidden from
+    All, and the control API's chat commands and alerts: names only, while they're set."""
+    bg = {"enabled": True, "effects": {"backdrop": {"on": True, "rain": 0.6,
+                                                    "sounds": [{"id": "x", "level": 0.5}]}}}
+    cfg = Config(voice_fx=bg, hidden_from_all=["Memes"], api_enabled=True,
+                 api_stream={"chat": {"tts": True}, "alerts": {"follow": [{"sound": "a"}]}})
+    got = set(usage.features_now(cfg))
+    assert {"voice-background", "voice-background-sounds", "hidden-from-all",
+            "api-chat-rules", "api-alerts"} <= got
+    assert got <= set(usage.FEATURES)
+    off = {"enabled": True, "effects": {"backdrop": {"on": True, "rain": 0, "talk": 1}}}
+    cfg = Config(voice_fx=off, api_enabled=False, api_stream=cfg.api_stream)
+    assert not {k for k in usage.features_now(cfg)
+                if k.startswith(("voice-background", "api-", "hidden-"))}
+
+
+def test_stream_api_counts_a_chat_command_and_an_alert_by_name(monkeypatch):
+    from soundboard import streamapi
+    monkeypatch.setattr(usage, "_used", set())
+    mw = type("Window", (), {})()   # anything a weak reference can point at
+    streamapi._log(mw, "chat", user="someone", command="tts", text="hi")
+    streamapi._log(mw, "alert", type="donation", user="someone", amount=5.0)
+    streamapi._log(mw, "alert", type="follow", user="someone", amount=None)
+    assert usage._used == {"api-chat-command", "api-alert-donation", "api-alert"}

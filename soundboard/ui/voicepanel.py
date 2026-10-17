@@ -399,6 +399,7 @@ class VoicePanel(QWidget):
         if not storevoices.can_share(payload):
             return False
         QGuiApplication.clipboard().setText(storevoices.share_code(payload))
+        usage.used("setup-code-shared")
         return True
 
     def take_code(self, v, notes: list[str]) -> str:

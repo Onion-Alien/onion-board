@@ -3822,6 +3822,18 @@
     "Від запуску в Onion Board сталося {n} помилок."
   ],
   "See report": "Переглянути звіт",
+  "The store doesn't take that name or those tags. Try other words (and no links).": "Магазин не приймає таку назву чи теги. Спробуйте інші слова (і без посилань).",
+  "Add a voice someone sent you as a code (it starts with “OB”)": "Додайте голос, надісланий вам як код (він починається з «OB»)",
+  "Add “{name}”?": "Додати «{name}»?",
+  "That isn't a voice code (they start with “OB”).": "Це не голосовий код (вони починаються з «OB»).",
+  " · hidden from All": " · прихована в «Усі»",
+  "Every sound except those in: {names} (right-click one of them, Advanced, to show it here again)": "Усі звуки, крім звуків із: {names} (правий клік на одній із них, Розширені, щоб знову показати її тут)",
+  "Hide its sounds from All": "Приховати її звуки в «Усі»",
+  "“{name}” is hidden from All. Its sounds stay on its own tab.": "«{name}» прихована в «Усі». Її звуки лишаються на її вкладці.",
+  "“{name}” shows in All again": "«{name}» знову видно в «Усі»",
+  "All categories": "Усі категорії",
+  "Votes": "Оцінки",
+  "Tutorials are off now. Settings → General turns them back on.": "Підказки вимкнено. Налаштування → Загальні вмикає їх знову.",
   "Add a sound from my board": "Додати звук з мого борду",
   "Astronaut": "Астронавт",
   "Bass boosted": "Бас-буст",
@@ -3856,12 +3868,6 @@
   "packed": "вщент",
   "pouring": "злива",
   "roaring": "палає",
-  "All categories": "Усі категорії",
-  "Votes": "Оцінки",
-  "The store doesn't take that name or those tags. Try other words (and no links).": "Магазин не приймає таку назву чи теги. Спробуйте інші слова (і без посилань).",
-  "Add a voice someone sent you as a code (it starts with “OB”)": "Додайте голос, надісланий вам як код (він починається з «OB»)",
-  "Add “{name}”?": "Додати «{name}»?",
-  "That isn't a voice code (they start with “OB”).": "Це не голосовий код (вони починаються з «OB»).",
   "Background  ·  {n} on": [
     "Фон  ·  {n} увімк.",
     "Фон  ·  {n} увімк.",
@@ -3875,10 +3881,5 @@
   ],
   "Make a voice of your own first: Voice tab → Voice changer → Edit voice, or Save what's on under My setups.": "Спершу зробіть власний голос: вкладка Голос → Зміна голосу → Змінити голос, або Зберегти ввімкнене в Моїх наборах.",
   "Rain, wind, a crowd or sounds from your board behind your voice": "Дощ, вітер, натовп або звуки з твого борду за твоїм голосом",
-  "Your own settings: Edit voice opens them": "Твої власні налаштування: відкриваються кнопкою «Змінити голос»",
-  " · hidden from All": " · прихована в «Усі»",
-  "Every sound except those in: {names} (right-click one of them, Advanced, to show it here again)": "Усі звуки, крім звуків із: {names} (правий клік на одній із них, Розширені, щоб знову показати її тут)",
-  "Hide its sounds from All": "Приховати її звуки в «Усі»",
-  "“{name}” is hidden from All. Its sounds stay on its own tab.": "«{name}» прихована в «Усі». Її звуки лишаються на її вкладці.",
-  "“{name}” shows in All again": "«{name}» знову видно в «Усі»"
+  "Your own settings: Edit voice opens them": "Твої власні налаштування: відкриваються кнопкою «Змінити голос»"
 }

@@ -4056,6 +4056,18 @@
     "واجه Onion Board {n} مشكلة منذ بدايته."
   ],
   "See report": "عرض التقرير",
+  "The store doesn't take that name or those tags. Try other words (and no links).": "لا يقبل المتجر هذا الاسم أو هذه الوسوم. جرّب كلمات أخرى (وبدون روابط).",
+  "Add a voice someone sent you as a code (it starts with “OB”)": "أضف صوتًا أرسله إليك أحد الأشخاص كرمز (يبدأ بـ \"OB\")",
+  "Add “{name}”?": "أضف «{name}»؟",
+  "That isn't a voice code (they start with “OB”).": "هذا ليس رمزًا صوتيًا (يبدأ بـ \"OB\").",
+  " · hidden from All": " · مخفية من الكل",
+  "Every sound except those in: {names} (right-click one of them, Advanced, to show it here again)": "كل الأصوات ما عدا الموجودة في: {names} (انقر بالزر الأيمن على إحداها، متقدم، لإظهارها هنا مجددًا)",
+  "Hide its sounds from All": "إخفاء أصواتها من الكل",
+  "“{name}” is hidden from All. Its sounds stay on its own tab.": "«{name}» مخفية من الكل. تبقى أصواتها في تبويبها.",
+  "“{name}” shows in All again": "«{name}» تظهر في الكل مجددًا",
+  "All categories": "كل الفئات",
+  "Votes": "التقييمات",
+  "Tutorials are off now. Settings → General turns them back on.": "أُوقفت الشروحات الآن. الإعدادات → عام تعيد تشغيلها.",
   "Add a sound from my board": "أضف صوتًا من لوحتي",
   "Astronaut": "رائد فضاء",
   "Bass boosted": "باص معزّز",
@@ -4090,12 +4102,6 @@
   "packed": "مكتظ",
   "pouring": "منهمر",
   "roaring": "مشتعلة",
-  "All categories": "كل الفئات",
-  "Votes": "التقييمات",
-  "The store doesn't take that name or those tags. Try other words (and no links).": "لا يقبل المتجر هذا الاسم أو هذه الوسوم. جرّب كلمات أخرى (وبدون روابط).",
-  "Add a voice someone sent you as a code (it starts with “OB”)": "أضف صوتًا أرسله إليك أحد الأشخاص كرمز (يبدأ بـ \"OB\")",
-  "Add “{name}”?": "أضف «{name}»؟",
-  "That isn't a voice code (they start with “OB”).": "هذا ليس رمزًا صوتيًا (يبدأ بـ \"OB\").",
   "Background  ·  {n} on": [
     "خلفية  ·  {n} مفعّل",
     "خلفية  ·  {n} مفعّل",
@@ -4115,10 +4121,5 @@
   ],
   "Make a voice of your own first: Voice tab → Voice changer → Edit voice, or Save what's on under My setups.": "اصنع صوتًا خاصًا بك أولًا: تبويب الصوت ← مغير الصوت ← تعديل الصوت، أو احفظ ما هو مشغّل في إعداداتي.",
   "Rain, wind, a crowd or sounds from your board behind your voice": "مطر أو رياح أو حشد أو أصوات من لوحتك خلف صوتك",
-  "Your own settings: Edit voice opens them": "إعداداتك الخاصة: يفتحها زر «تعديل الصوت»",
-  " · hidden from All": " · مخفية من الكل",
-  "Every sound except those in: {names} (right-click one of them, Advanced, to show it here again)": "كل الأصوات ما عدا الموجودة في: {names} (انقر بالزر الأيمن على إحداها، متقدم، لإظهارها هنا مجددًا)",
-  "Hide its sounds from All": "إخفاء أصواتها من الكل",
-  "“{name}” is hidden from All. Its sounds stay on its own tab.": "«{name}» مخفية من الكل. تبقى أصواتها في تبويبها.",
-  "“{name}” shows in All again": "«{name}» تظهر في الكل مجددًا"
+  "Your own settings: Edit voice opens them": "إعداداتك الخاصة: يفتحها زر «تعديل الصوت»"
 }

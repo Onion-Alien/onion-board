@@ -212,7 +212,8 @@ account or anything else about you.
   - a tab's quick how-to the first time it's opened, shown, done, put off or ended by
     an error (`used/tour-radio-shown`, `tour-radio-done`, `tour-radio-skipped`,
     `tour-radio-failed`, the same for
-    `apps`, `triggers`, `voice` and `store`);
+    `apps`, `triggers`, `voice` and `store`), and two put off quickly, which switches
+    the rest off (`used/tours-quit`);
   - sounds from the web: the site (`used/dl-youtube`, `dl-tiktok`, `dl-soundcloud`,
     `dl-instagram`, `dl-x`, `dl-reddit`, `dl-twitch`, `dl-myinstants` or `dl-other`), a
     pasted link or a search pick (`used/dl-link`, `dl-search`), *Add as sound* or *Play
@@ -304,6 +305,11 @@ account or anything else about you.
     `-rps`, `-ttt`, `-other`); the Store tab's *New* or *Trending* order and a category
     picked (`used/store-sort-new`, `store-sort-trending`, `store-category`: never which
     category);
+    a My setups share code copied (`used/setup-code-shared`: never the setup); the
+    control API or a phone remote add-on answering a request (`used/remote-used-api`,
+    `remote-used-phone`: never what it asked); a control API chat command or alert
+    carried out (`used/api-chat-command`, `api-alert`, `api-alert-donation`: never the
+    viewer's name, the message or the amount);
   - and every day they're set: *Remember where it came from* off, own Apps categories,
     the side menu kept shut, a proxy, Tor or Offline mode, the playing sound's picture
     behind the board, the mic helper set up, and any sound set to play other than one at
@@ -315,7 +321,11 @@ account or anything else about you.
     with a voice (or an AI voice) laid over it (`used/view-list-sounds`,
     `view-list-apps`, `view-list-voice`, `hotkeys-share-off`, `voice-hotkeys`,
     `auto-ptt`, `voice-leveler-off`, `sound-voice`, `sound-ai-voice`: never the key,
-    the voice or which sounds).
+    the voice or which sounds); the voice changer's Background on, and with board
+    sounds in it, a category hidden from *All*, and the control API's chat commands and
+    alerts set up (`used/voice-background`, `voice-background-sounds`,
+    `hidden-from-all`, `api-chat-rules`, `api-alerts`: never which sounds, category,
+    commands or alerts).
 
 **Problems, as counts only, soon after a start:**
 
