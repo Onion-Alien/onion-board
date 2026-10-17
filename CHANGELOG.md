@@ -2,6 +2,167 @@
 
 Changes not released yet are in [changelog.d/](changelog.d/), one file per change.
 
+## 2.5.0 — 2026-10-17
+
+- **A maximised window stays maximised:** close or restart Onion Board while it's maximised and it
+  opens maximised again, and bringing it back from the taskbar or the tray no longer turns it
+  into a normal-sized window.
+- Speak another language: no more empty box under Install speech recognition before it's installed.
+- The voice bar has an Effects button: a small pop-up where you add rain, wind, a crowd,
+  a fire, an engine or spaceship hum, a sound from your board, or an extra Robot, Radio,
+  Echo or Reverb on top of any voice, each with one slider and a ✕. They stay when you
+  pick another voice. Edit voice is still there for every setting ("Advanced: Edit voice").
+- The anonymous usage count (if it's on) now also says, by name only, whether the
+  newest features get used: the voice changer's Background, hiding a category from All,
+  setup share codes, the phone remote and control API, and its chat commands and alerts.
+  SECURITY.md lists each one.
+- Voice tab: the tabs at the top are bigger with a line under them, and My setups sits in its own slim box with smaller buttons, so the tabs, your setups and the card below no longer run together.
+- Pressing "Not now" on two tabs' how-tos within a minute switches the rest off, so
+  clicking through the tabs isn't held up on every one. Settings → General turns them
+  back on.
+- Switching the Community tab off in Settings while its list was loading made the tab
+  say "Couldn't open the store" instead of "The store is off". It says it's off now, and
+  the list comes back as soon as the tab is switched on again.
+- The Community tab refuses shared sounds, links and voices whose name or tags hold a link
+  or a blocked word, and blocked words can't sneak past with accents, spaces, dots,
+  look-alike numbers (b4d) or stretched letters. A refused share now says why.
+- A category can be left out of All: right-click its tab, Advanced, Hide its sounds from All.
+  Handy for a big imported pack you only want on its own tab. Advanced also holds the
+  random-sound hotkey and Export as a sound pack now.
+- The voice changer has a Background: rain, wind, an engine, a crowd, a spaceship hum or a
+  crackling fire behind your voice, each with its own level, or up to four sounds from
+  your board. Every one has a "Speed and pitch" button for its speed, pitch, bass, muffle
+  and reverb, with quick picks like "Next room" and "Through a wall". It plays only while
+  you talk unless you switch that off.
+- "Make it yours" is now called "Edit voice".
+- Onion Board now opens in front of your other windows when you start it (for example from
+  the installer's last page), instead of behind your browser. A start with Windows still
+  stays quiet in the tray.
+- The control API (Settings → Remote) takes chat commands: a bot like Streamer.bot sends
+  each chat line to `/api/chat` and viewers can use `!sound`, `!sounds`, `!random`, `!say`,
+  `!voice` and `!stop`, with cooldowns, who may use each, a category chat is kept to,
+  blocked words, and a reply for the bot to post back. It can read chat aloud too.
+- Alerts and donations: `/api/event` plays a sound, a random one from a category, says a
+  thank-you or puts on a voice for a while for follows, subs, bits, raids, tips, channel
+  points or TikTok gifts, set per type and amount with `/api/alerts`. It also reads what
+  Twitch, StreamElements, Streamlabs and Ko-fi send. `/api/feed` lists what they did.
+- The control API reaches the newer parts of the app: the Apps tab, My setups, a random
+  voice (or any voice for some seconds), all hotkeys off / on, *Mute my mic while a sound
+  plays*, and sound search. A POST can send its values as JSON or a form.
+- Share codes work for My setups now: right-click a setup → Copy share code, and Import a
+  code (next to Save what's on) adds it, AI voice and language included. AI voices get codes
+  too, from the Share a voice window. Old voice codes still import.
+- A setup someone else made no longer turns on a different voice of yours that happens to
+  have the same name.
+- Bun wears his theme's look everywhere now: his paw holding a skit's prop or the
+  download bar's quill, and his ears popping out of the build cloud, are his theme's
+  fur instead of plain white. Pictures of him (help cards, the theme switch, message
+  boxes, the Appearance cards) and the small Bun in the setup guide no longer cut off
+  the tip of an upright ear or the sides of a wide collar.
+- Hoot the owl (in the Triggers tab) dresses for every theme like Bun does: his own
+  feather colour, eye colour, belly marks, ear tufts and beak. Dark keeps plain teal Hoot.
+- A bug no longer pops up an "Onion Board hit a problem" window while you use the app. It's saved on your PC and, with the usage count on, counted a minute later so it gets fixed. Settings → About shows *See report* if you want to send one yourself.
+- Tor: switching on Offline mode after Tor couldn't connect now says Tor stays off in
+  Offline mode, instead of still showing the old connection error.
+- Fixed a short freeze the quick-setup guide could cause on its last step, where it keeps
+  checking Discord's settings.
+- Setting up the mic effect no longer says it can't find your mic after you plug it into
+  another USB port (Windows renames it "2- …" there).
+- The anonymous usage count (if it's on) now also says, by name only, which newer features
+  get used: Live controls setups, list view, voice keys, auto push-to-talk, the voice
+  leveler, Up next, Bun's games, the Store's order and categories. SECURITY.md lists each one.
+- The Free sounds tab is now called Community, with a new look: it sits in the middle
+  of the window, Bun greets you in his headphones at the top (he cheers when you add a
+  sound and looks sad when nothing turns up), and every sound and voice has a coloured
+  picture of what it is. A sound's bars bounce on its picture while it plays, and the
+  chips have pictures too.
+- A working mic no longer looks broken before your sounds are in it. The Setup tab
+  says "Your mic works" in green, with its level, above "Your sounds aren't in your mic
+  yet", and the sidebar and the mic card say "1 step left" instead of "Not set up". The
+  quick-setup guide says the same on its mic and send steps.
+- "What others hear" gets a "Voice only" tag until your sounds are in your mic, and its
+  meter no longer moves with sounds nobody else hears yet.
+- The guide's last step no longer shows an empty box when your sounds aren't in your
+  mic yet, when only you hear them, or when the virtual cable is missing.
+- Picking a setup with an AI voice in Live controls asks first, since it takes a while.
+  A sound made in the AI voice says when it's ready to play.
+- Updating no longer opens the setup guide again for people who already used an earlier
+  version (it did when the guide was finished before sounds reached voice chat). The
+  first thing after an update is now What's new.
+- What's new covers this version again (it had stopped at 1.9.20), in your language, and
+  an update over several versions shows only the newest few changes instead of a long list.
+- 13 new voice changer voices: Drunk, Choir, Goblin, Fairy, Zombie, Evil twin, Giant,
+  Mecha, Ship computer, Pilot, Drive-thru speaker, Old film and Cathedral, each with its
+  own picture.
+- A Random voice card after the last voice: it turns on one of the voices shown, picked
+  at random (from your favorites when Favorites is picked). Settings → Hotkeys has a
+  Random voice key for it.
+- Hear it for the voice changer: a short line said in the voice, in your headphones
+  only, from the bar under the voices or a voice's right-click menu.
+- Wobble's Vibrato now reaches 40 ms, enough for a slow sway of a semitone or two.
+- Bun and Hoot have been redrawn in a softer storybook style: rounder faces, sparkly eyes,
+  little brows, head tilts, Bun's floppy ear and tail, stubby arms that clasp when he hopes
+  and fold when he's cross, and Hoot's open beak when he cheers. Every outfit, act and
+  Easter egg is still there.
+- Bun looks different in every theme: his fur, ears, tail (fluffy, long, a tuft, a heart),
+  eye colour, markings (an eye patch, spots, a mask), nose and ear colours, and paw prints
+  under his feet. Dark keeps plain Bun.
+- Each theme card in Settings shows Bun dressed for that theme, and he waves when you
+  point at it.
+- Clearer icons: a solid speaker, mic, headphones, eye and gear, and rounder sound
+  bars.
+- Live controls on the Sounds, Radio and Apps tabs has **My setups**: put one of the voice
+  setups you saved on the Voice tab on everything playing. Its voice changer voice is on
+  at once. With an AI voice, a sound is made in that voice first (it pauses and carries
+  on from the same spot) and the radio or a program waits while the AI voice gets ready,
+  with a progress bar and Cancel.
+- Store → Voices: share your voice changer voices, AI voices and setups with everyone, and
+  get theirs. Hear any of them first, vote on them, report bad ones. Only settings are
+  shared, never your voice. Right-click one of your voices or setups → Share to the store.
+- Cards or a list, everywhere: two little icons at the top right of the Sounds, Apps and
+  Voice tabs switch between them, the one in use lit. Apps' list puts each program on one
+  line (level, Send, Record, volume); Voice's list shows a small picture beside each name,
+  more voices on the screen. Each tab remembers its choice. On Sounds the switch replaces
+  the Cards / List items in the order menu.
+- The AI voices have pictures now, drawn like the voice changer's.
+- Live controls (the speed, pitch and effects box on Sounds, Radio and Apps) is a pop-up
+  again: it opens right above its button and a click anywhere outside closes it, instead
+  of a separate window you had to drag and close. The sound modes' *What do these do?*
+  and a sound's source details work the same way.
+- The sound store checks every shared file from end to end, not just its first bytes: a
+  program, script or web page dressed up as an MP3 or WAV is refused, and sound names lose
+  markup and the hidden characters that can make "x.exe" look like "x.mp3". The app also
+  keeps a store download only when it really starts like the sound it says it is.
+- Your voice setups can be renamed to anything you like: right-click one under My setups
+  and pick Rename.
+- Six new AI voices: Atlas (a deep storyteller), Sarge (a barking drill sergeant), Nana (an
+  older woman), Zoe (a young woman), Onyx (a very low woman's voice) and Bean (a little kid).
+  They need no new download.
+- Muted for over a minute: the Live switch gets a yellow ring (and, with the side bar open, shows how long it's been muted), so a forgotten mute isn't mistaken for a broken app.
+- Saving a sound with a voice (or any slow effect) shows how far it is: a progress bar and
+  time left in the Edit window, which you can now close while it carries on, and a bar
+  with a percentage on the pad. An ✕ on either stops it and the sound keeps its old
+  effects. Pressing the pad meanwhile says why it can't play yet. The render now runs
+  outside the app, so long songs no longer make the app lag or the audio stutter.
+- Bun's Easter egg game: Pong's paddle now follows the mouse even when it leaves the court (it no longer sticks), and holding an arrow key glides it smoothly instead of needing fast taps.
+- Bun now picks a game at random when he challenges you: Pong, quick draw, rock paper scissors or tic-tac-toe, each with its own sounds in your theme's style. Another game at the end switches to a different one.
+- The Community tab's stop button is easy to see in every theme now (it was black on a
+  near-black row in Amber Terminal and other dark themes). Record buttons keep their red
+  when switched on in Hacker and other green or red themes, Setup's "Straight into my mic"
+  icon shows on its filled button, and a few icons on buttons in Barbie, Flashbang and
+  Retro 98 are darker so they read.
+- Switching the theme, its texture or your highlight colour blends now instead of flashing:
+  the dimming and Bun fade in over a tenth of a second (they used to appear in one frame),
+  and the old look fades a little more gently into the new one.
+- Radio: the first station you play asks once who should hear it (just you, or you
+  and others), and the app remembers. The Send button now says "Send to others" and is
+  outlined in your theme colour while only you hear the radio, and the line under the
+  list has a "Send to others" link right where you're looking.
+- Hoot moves like Bun now: his ear tufts and wings trail behind his hops and wobble back,
+  a landing squashes him a little, and his acts ease in and out instead of snapping (waking
+  up when the mouse comes near, a click cutting a beg short). His dance bob no longer jumps
+  at the end of each beat and lands right on the hit.
+
 ## 2.4.0 — 2026-10-17
 
 - Free sounds: switching it off in Settings > Privacy & security while its list was still

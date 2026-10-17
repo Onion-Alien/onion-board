@@ -4123,5 +4123,14 @@
   "Rain, a crowd, an echo or sounds from your board, on top of any voice": "مطر أو حشد أو صدى أو أصوات من لوحتك، فوق أي صوت",
   "Take “{effect}” off": "أزل ”{effect}“",
   "{site} didn't answer over Tor (it ignores some of Tor's addresses), and nor did {tries} other Tor routes. You can try this one without Tor: {site} would then see your own address.": "لم يردّ {site} عبر Tor (يتجاهل بعض عناوين Tor)، ولم تنجح {tries} طرق Tor أخرى أيضًا. يمكنك تجربة هذا بدون Tor: سيرى {site} عندها عنوانك الخاص.",
-  "Up next · {n} before it": "التالي · {n} قبله"
+  "Up next · {n} before it": "التالي · {n} قبله",
+  "13 new voice changer voices and 6 new AI voices.": "13 صوتًا جديدًا لمغيّر الصوت و6 أصوات ذكاء اصطناعي جديدة.",
+  "19 new voices": "19 صوتًا جديدًا",
+  "A softer storybook look, and their own look in every theme.": "مظهر قصصي أنعم، ومظهر خاص بهما في كل سمة.",
+  "Bun and Hoot redrawn": "Bun وHoot برسم جديد",
+  "Effects behind your voice, and new voices": "مؤثرات خلف صوتك، وأصوات جديدة",
+  "Effects on any voice": "مؤثرات على أي صوت",
+  "Share your voices and setups with everyone, and get theirs.": "شارك أصواتك وإعداداتك مع الجميع، واحصل على أصواتهم.",
+  "The voice bar's Effects button puts rain, a crowd, a fire or a sound from your board behind your voice.": "زر المؤثرات في شريط الصوت يضع المطر أو حشدًا أو نارًا أو صوتًا من لوحتك خلف صوتك.",
+  "Open Appearance": "فتح مظهر"
 }

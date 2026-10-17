@@ -34,6 +34,17 @@ def recent() -> tuple[Note, ...]:
     release (tests/test_whats_new.py checks this version has one): what a player
     notices, in their words, never the fixes only a log would show."""
     return (
+        Note("2.5.0", _("Effects behind your voice, and new voices"), (
+            ("voice", _("Effects on any voice"),
+             _("The voice bar's Effects button puts rain, a crowd, a fire or a sound from "
+               "your board behind your voice.")),
+            ("sounds", _("Community"),
+             _("Share your voices and setups with everyone, and get theirs.")),
+            ("plus", _("19 new voices"),
+             _("13 new voice changer voices and 6 new AI voices.")),
+            ("play", _("Bun and Hoot redrawn"),
+             _("A softer storybook look, and their own look in every theme.")),
+        ), "appearance", _("Open Appearance")),
         Note("2.4.0", _("Voices on your sounds, and hotkeys in games"), (
             ("voice", _("Say any sound in a voice"),
              _("Right-click a pad, open Effects and pick a Voice: any voice changer voice, "

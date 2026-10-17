@@ -3723,5 +3723,14 @@
   "Rain, a crowd, an echo or sounds from your board, on top of any voice": "ฝน ฝูงชน เสียงก้อง หรือเสียงจากบอร์ดของคุณ ซ้อนบนเสียงไหนก็ได้",
   "Take “{effect}” off": "เอา “{effect}” ออก",
   "{site} didn't answer over Tor (it ignores some of Tor's addresses), and nor did {tries} other Tor routes. You can try this one without Tor: {site} would then see your own address.": "{site} ไม่ตอบผ่าน Tor (มันเพิกเฉยต่อที่อยู่บางส่วนของ Tor) และอีก {tries} เส้นทาง Tor ก็ไม่ตอบเช่นกัน คุณสามารถลองอันนี้โดยไม่ใช้ Tor: {site} จะเห็นที่อยู่ของคุณเอง",
-  "Up next · {n} before it": "ถัดไป · ก่อนหน้า {n}"
+  "Up next · {n} before it": "ถัดไป · ก่อนหน้า {n}",
+  "13 new voice changer voices and 6 new AI voices.": "เสียงเปลี่ยนเสียงใหม่ 13 เสียง และเสียง AI ใหม่ 6 เสียง",
+  "19 new voices": "เสียงใหม่ 19 เสียง",
+  "A softer storybook look, and their own look in every theme.": "หน้าตาแบบนิทานที่นุ่มนวลขึ้น และหน้าตาของตัวเองในทุกธีม",
+  "Bun and Hoot redrawn": "Bun และ Hoot วาดใหม่",
+  "Effects behind your voice, and new voices": "เอฟเฟกต์ข้างหลังเสียงคุณ และเสียงใหม่",
+  "Effects on any voice": "เอฟเฟกต์บนเสียงไหนก็ได้",
+  "Share your voices and setups with everyone, and get theirs.": "แชร์เสียงและการตั้งค่าของคุณให้ทุกคน แล้วรับของพวกเขามา",
+  "The voice bar's Effects button puts rain, a crowd, a fire or a sound from your board behind your voice.": "ปุ่มเอฟเฟกต์ในแถบเสียงจะใส่เสียงฝน ฝูงชน กองไฟ หรือเสียงจากบอร์ดของคุณไว้ข้างหลังเสียงคุณ",
+  "Open Appearance": "เปิดหน้าตา"
 }

@@ -3883,5 +3883,14 @@
   "Rain, a crowd, an echo or sounds from your board, on top of any voice": "Déšť, dav, ozvěna nebo zvuky z tvého boardu nad jakýmkoli hlasem",
   "Take “{effect}” off": "Odebrat „{effect}“",
   "{site} didn't answer over Tor (it ignores some of Tor's addresses), and nor did {tries} other Tor routes. You can try this one without Tor: {site} would then see your own address.": "{site} přes Tor neodpověděl (některé adresy Toru ignoruje), a nepomohly ani {tries} jiné cesty Tor. Můžete to zkusit bez Toru: {site} by pak viděl vaši vlastní adresu.",
-  "Up next · {n} before it": "Další na řadě · {n} před ním"
+  "Up next · {n} before it": "Další na řadě · {n} před ním",
+  "13 new voice changer voices and 6 new AI voices.": "13 nových hlasů měniče hlasu a 6 nových AI hlasů.",
+  "19 new voices": "19 nových hlasů",
+  "A softer storybook look, and their own look in every theme.": "Měkčí pohádkový vzhled a vlastní vzhled v každém motivu.",
+  "Bun and Hoot redrawn": "Bun a Hoot nově nakreslení",
+  "Effects behind your voice, and new voices": "Efekty za tvým hlasem a nové hlasy",
+  "Effects on any voice": "Efekty na jakýkoli hlas",
+  "Share your voices and setups with everyone, and get theirs.": "Sdílej své hlasy a sestavy se všemi a získej jejich.",
+  "The voice bar's Effects button puts rain, a crowd, a fire or a sound from your board behind your voice.": "Tlačítko Efekty na liště hlasu dá za tvůj hlas déšť, dav, oheň nebo zvuk z tvé desky.",
+  "Open Appearance": "Otevřít Vzhled"
 }
