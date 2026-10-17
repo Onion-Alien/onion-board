@@ -2489,7 +2489,6 @@
   "Zoom out": "Mag-zoom out",
   "headphones": "mga headphone",
   "mic": "mic",
-  "only you hear the radio: press “Send” below so others hear it too": "ikaw lang ang nakakarinig ng radyo: pindutin ang “Send” sa ibaba para marinig din ito ng iba",
   "others hear it": "naririnig ito ng iba",
   "sending": "nagpapadala",
   "{kbps} kbps +": "{kbps} kbps +",
@@ -3629,7 +3628,6 @@
   "Show tutorials": "Ipakita ang mga gabay",
   "Start some music or a game, then press Send on it. Everyone in your call hears it.": "Magpatugtog ng music o maglaro, tapos pindutin ang Ipadala dito. Maririnig ito ng lahat sa call mo.",
   "Turn on a trigger": "Mag-on ng trigger",
-  "Click any dot to play that station. Press Send and your call hears it too.": "I-click ang kahit anong tuldok para i-play ang istasyong iyon. Pindutin ang Ipadala at maririnig din ito ng call mo.",
   "Pick a station on the globe": "Pumili ng istasyon sa globo",
   "Another game": "Ibang laro",
   "Click to start": "I-click para magsimula",
@@ -3643,5 +3641,13 @@
   "Tic-tac-toe with Bun": "Tic-tac-toe kasama si Bun",
   "Wait for it…": "Hintayin mo…",
   "too early!": "masyadong maaga!",
-  "{ms} ms": "{ms} ms"
+  "{ms} ms": "{ms} ms",
+  "Beta": "Beta",
+  "The sound store is new and still changing.": "Bago pa ang sound store at nagbabago pa ito.",
+  "Just me": "Ako lang",
+  "Me and others": "Ako at ang iba",
+  "Send to others": "Ipadala sa iba",
+  "Who should hear the radio?": "Sino ang dapat makarinig ng radyo?",
+  "only you hear it": "ikaw lang ang nakakarinig",
+  "Click any dot to play that station. Press Send to others and your call hears it too.": "I-click ang kahit anong tuldok para i-play ang istasyong iyon. Pindutin ang Ipadala sa iba at maririnig din ito ng call mo."
 }

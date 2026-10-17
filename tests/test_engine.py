@@ -9,7 +9,7 @@ import pytest
 from soundboard import engine as eng
 from soundboard import soundcache
 from soundboard.engine import SR, Engine, is_xrun
-from soundboard.engineparts import CUT_KEEP_S
+from soundboard.engineparts import CUT_KEEP_S, MIC_BUFFER
 
 
 class FakeStream:
@@ -463,8 +463,17 @@ def test_safer_buffering_asks_for_a_real_buffer(monkeypatch):
     e.latency = "high"
     e.set_mon_device("headphones")
     e.set_mic_device("mic")
-    assert made[0].kw["latency"] == "low"
-    assert made[1].kw["latency"] == made[2].kw["latency"] == eng.BUFFER["high"] >= 0.03
+    assert made[0].kw["latency"] == eng.BUFFER["low"] >= 0.1
+    assert made[1].kw["latency"] == eng.BUFFER["high"] > eng.BUFFER["low"]
+    assert made[2].kw["latency"] == MIC_BUFFER["high"] >= 0.03
+
+
+def test_outputs_queue_enough_to_ride_out_a_busy_ui():
+    # the callbacks wait on the UI thread through one long Qt call (60-150 ms showing a
+    # window the first time): the outputs keep at least that much queued, the mic
+    # (your voice's delay) stays short
+    assert eng.BUFFER["low"] >= 0.15
+    assert MIC_BUFFER["low"] == "low"
 
 
 def test_failed_start_closes_the_stream_and_keeps_the_rate(monkeypatch):

@@ -445,6 +445,8 @@ QTabBar QToolButton::left-arrow:disabled { image:url("$left_off"); }
 QTabBar QToolButton::right-arrow:disabled { image:url("$right_off"); }
 QTabBar::tear { width:0; border:none; }
 QPushButton#live { font-weight:700; }
+QPushButton[nudge="true"] { background:$accent_tint; border-color:$accent; color:$accent_text; }
+QPushButton[nudge="true"]:hover { background:$accent_tint_hi; }
 QPushButton#voicetile { text-align:left; padding:9px 10px; border-radius:10px; }
 QPushButton#voicetile:checked { background:$accent; color:$on_accent; border:1px solid $accent_hi; font-weight:700; }
 QPushButton#voicetile[art="true"] { padding:5px 10px 5px 6px; }
@@ -522,6 +524,7 @@ QLabel#pill[tone="muted"] { border-color:$muted; }
 QLabel#pill[tone="ok"] { color:$live_text; border-color:$live_border; }
 QLabel#pill[tone="warn"] { color:$warn_text; border-color:$warn_text; }
 QLabel#pill[tone="error"] { color:$error_text; border-color:$error_text; }
+QLabel#pill[tone="beta"] { color:$bg; background:$ok_text; border-color:$ok_text; border-radius:7px; padding:1px 8px; font-weight:700; }   /* ui/storetab.py: the green Beta tag */
 QPushButton#subchip { border-radius:11px; padding:2px 11px; min-height:18px; font-size:8.5pt;
     background:transparent; border:1px solid $border; color:$muted; }
 QPushButton#subchip:hover { color:$text; background:$btn_hover; }
@@ -910,6 +913,9 @@ def stylesheet(name: str | None = None) -> str:
     tk["rail_border"] = tk["border"] if outlined else _mix(tk["bg"], tk["border"], 0.35)
     # card titles in the text colour; High Contrast keeps its yellow to scan by
     tk["heading"] = tk["section"] if outlined else tk["text_hi"]
+    # a nudged button (DESIGN *Buttons*): a soft wash of the accent behind its edge
+    tk["accent_tint"] = _rgba(tk["accent"], 0.30)
+    tk["accent_tint_hi"] = _rgba(tk["accent"], 0.42)
     tk["check"] = _check_url(tk["on_accent"])
     tk["check_off"] = _check_url(tk["muted"])   # ticked but greyed out: on $inset
     tk["radio"] = _radio_url(tk["off"], tk["card"])

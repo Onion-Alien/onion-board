@@ -2489,7 +2489,6 @@
   "Zoom out": "Diminuir zoom",
   "headphones": "fones de ouvido",
   "mic": "microfone",
-  "only you hear the radio: press “Send” below so others hear it too": "só você ouve o rádio: pressione “Enviar” abaixo para que outras pessoas também ouçam",
   "others hear it": "outros ouvem",
   "sending": "enviando",
   "{kbps} kbps +": "{kbps} kbps +",
@@ -3629,7 +3628,6 @@
   "Show tutorials": "Mostrar guias",
   "Start some music or a game, then press Send on it. Everyone in your call hears it.": "Põe música ou um jogo a tocar e carrega em Enviar nele. Todos na tua chamada ouvem.",
   "Turn on a trigger": "Liga um gatilho",
-  "Click any dot to play that station. Press Send and your call hears it too.": "Clica em qualquer ponto para tocar essa estação. Carrega em Enviar e a tua chamada também a ouve.",
   "Pick a station on the globe": "Escolhe uma estação no globo",
   "Another game": "Outro jogo",
   "Click to start": "Clica para começar",
@@ -3643,5 +3641,13 @@
   "Tic-tac-toe with Bun": "Jogo do galo com o Bun",
   "Wait for it…": "Espera…",
   "too early!": "cedo demais!",
-  "{ms} ms": "{ms} ms"
+  "{ms} ms": "{ms} ms",
+  "Beta": "Beta",
+  "The sound store is new and still changing.": "A loja de sons é nova e ainda está a mudar.",
+  "Just me": "Só eu",
+  "Me and others": "Eu e os outros",
+  "Send to others": "Enviar aos outros",
+  "Who should hear the radio?": "Quem deve ouvir o rádio?",
+  "only you hear it": "só tu ouves",
+  "Click any dot to play that station. Press Send to others and your call hears it too.": "Clica em qualquer ponto para tocar essa estação. Carrega em Enviar aos outros e a tua chamada também a ouve."
 }

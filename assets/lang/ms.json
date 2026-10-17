@@ -2435,7 +2435,6 @@
   "Zoom out": "Zum keluar",
   "headphones": "fon kepala",
   "mic": "mikrofon",
-  "only you hear the radio: press “Send” below so others hear it too": "hanya anda yang mendengar radio: tekan \"Hantar\" di bawah supaya orang lain mendengarnya juga",
   "others hear it": "orang lain mendengarnya",
   "sending": "menghantar",
   "{kbps} kbps +": "{kbps} kbps +",
@@ -3552,7 +3551,6 @@
   "Show tutorials": "Tunjuk panduan",
   "Start some music or a game, then press Send on it. Everyone in your call hears it.": "Mainkan muzik atau permainan, kemudian tekan Hantar padanya. Semua orang dalam panggilan anda mendengarnya.",
   "Turn on a trigger": "Hidupkan pencetus",
-  "Click any dot to play that station. Press Send and your call hears it too.": "Klik mana-mana titik untuk memainkan stesen itu. Tekan Hantar dan panggilan anda juga mendengarnya.",
   "Pick a station on the globe": "Pilih stesen pada glob",
   "Another game": "Permainan lain",
   "Click to start": "Klik untuk mula",
@@ -3566,5 +3564,13 @@
   "Tic-tac-toe with Bun": "Tic-tac-toe dengan Bun",
   "Wait for it…": "Tunggu…",
   "too early!": "terlalu awal!",
-  "{ms} ms": "{ms} ms"
+  "{ms} ms": "{ms} ms",
+  "Beta": "Beta",
+  "The sound store is new and still changing.": "Kedai bunyi ini baharu dan masih berubah.",
+  "Just me": "Saya sahaja",
+  "Me and others": "Saya dan orang lain",
+  "Send to others": "Hantar kepada orang lain",
+  "Who should hear the radio?": "Siapa patut dengar radio?",
+  "only you hear it": "hanya anda yang dengar",
+  "Click any dot to play that station. Press Send to others and your call hears it too.": "Klik mana-mana titik untuk memainkan stesen itu. Tekan Hantar kepada orang lain dan panggilan anda juga mendengarnya."
 }

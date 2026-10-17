@@ -2435,7 +2435,6 @@
   "Zoom out": "축소",
   "headphones": "헤드폰",
   "mic": "마이크",
-  "only you hear the radio: press “Send” below so others hear it too": "라디오는 나만 들을 수 있습니다. 다른 사람도 들을 수 있도록 아래의 '보내기'를 누르세요.",
   "others hear it": "다른 사람들도 그걸 듣고",
   "sending": "배상",
   "{kbps} kbps +": "{kbps} kbps +",
@@ -3552,7 +3551,6 @@
   "Show tutorials": "사용법 표시",
   "Start some music or a game, then press Send on it. Everyone in your call hears it.": "음악이나 게임을 켜고 거기서 보내다를 누르세요. 통화 중인 모두가 듣습니다.",
   "Turn on a trigger": "트리거를 켜세요",
-  "Click any dot to play that station. Press Send and your call hears it too.": "점을 클릭하면 그 방송국이 재생됩니다. 보내다를 누르면 통화 상대도 들을 수 있어요.",
   "Pick a station on the globe": "지구본에서 방송국을 고르세요",
   "Another game": "다른 게임",
   "Click to start": "클릭해서 시작",
@@ -3566,5 +3564,13 @@
   "Tic-tac-toe with Bun": "Bun과 틱택토",
   "Wait for it…": "기다려…",
   "too early!": "너무 빨라!",
-  "{ms} ms": "{ms}ms"
+  "{ms} ms": "{ms}ms",
+  "Beta": "베타",
+  "The sound store is new and still changing.": "사운드 스토어는 새로 생겼고 아직 바뀌는 중이에요.",
+  "Just me": "나만",
+  "Me and others": "나와 다른 사람",
+  "Send to others": "다른 사람에게 보내기",
+  "Who should hear the radio?": "누가 라디오를 들을까요?",
+  "only you hear it": "나만 들려요",
+  "Click any dot to play that station. Press Send to others and your call hears it too.": "점을 클릭하면 그 방송국이 재생됩니다. 다른 사람에게 보내기를 누르면 통화 상대도 들을 수 있어요."
 }

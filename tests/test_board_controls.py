@@ -768,3 +768,18 @@ def test_the_hotkey_box_warns_about_a_bare_letter_only_when_games_lose_it(window
     assert d.result_combo is None and "games" in d.hint.text()
     press_w(d)                                # again: use it anyway
     assert d.result_combo == "w"
+
+
+def test_switching_tab_lets_go_of_a_picked_sound_that_isnt_playing(window, monkeypatch, calls):
+    w = window
+    w.catctl.new_category(name="Memes")
+    w.catctl.set_category("")
+    w.playctl.select("s0")                  # clicked, not played
+    w.catctl.set_category("Memes")          # an empty tab
+    assert w.current is None and not w.pads["s0"].selected
+    w.playctl.toggle_play_pause()           # what Space does on Sounds: nothing to play
+    assert calls == []
+    w.playctl.select("s1")
+    monkeypatch.setattr(w.engine, "state", lambda sid: (0.5, False) if sid == "s1" else None)
+    w.catctl.set_category("")               # playing: stays, so Space still pauses it
+    assert w.current == "s1"
