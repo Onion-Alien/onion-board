@@ -2205,6 +2205,21 @@ def test_the_mic_the_engine_opened_is_the_one_set_up(monkeypatch):
     assert dm.mic_lookup("USB Audio") == (None, "gone")
 
 
+def test_a_mic_moved_to_another_usb_port_is_still_found(monkeypatch):
+    # Windows numbers it again there ("2- "): the set-up said it didn't know the mic
+    # (no-mic-gone), with the mic plugged in and working
+    mics = [{"guid": "{a}", "name": "Microphone (2- USB Audio)", "active": True},
+            {"guid": "{b}", "name": "Line In (Realtek Audio)", "active": True}]
+    monkeypatch.setattr(dm, "capture_endpoints", lambda: mics)
+    monkeypatch.setattr(dm, "_engine_name", lambda name: None)
+    assert dm.mic_lookup("Microphone (USB Audio)") == ("{a}", "")
+    mics[0]["name"] = "Microphone (USB Audio)"   # and back to the first port
+    assert dm.mic_lookup("Microphone (3- USB Audio)") == ("{a}", "")
+    # two of the same mic plugged in: either could be it, so neither
+    mics.append({"guid": "{c}", "name": "Microphone (2- USB Audio)", "active": True})
+    assert dm.mic_lookup("Microphone (4- USB Audio)")[0] is None
+
+
 def test_a_mic_the_engine_cant_place_on_one_endpoint_isnt_guessed(monkeypatch):
     mics = [{"guid": "{a}", "name": "Microphone (USB Audio)", "active": True},
             {"guid": "{b}", "name": "Microphone (USB  Audio)", "active": True}]
