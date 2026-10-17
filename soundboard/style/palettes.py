@@ -338,7 +338,9 @@ THEMES: dict[str, dict[str, str]] = {
         accent="#000080", accent_hi="#0e6fae", accent2="#008080", on_accent="#ffffff",
         texture="dither",
         off="#a0a0a0", badge="#ffffff", badge_text="#000000",
-        **_LIGHT_STATUS | dict(ok_text="#004a18", warn_text="#5c3600", error_text="#880000"),
+        # danger_text darker: the shared light red was 2.7:1 on its grey buttons (Stop all)
+        **_LIGHT_STATUS | dict(ok_text="#004a18", warn_text="#5c3600", error_text="#880000",
+                               danger_text="#990000"),
         font="Tahoma",
     ),
     "Comic Sans": dict(   # the most serious theme
@@ -471,13 +473,14 @@ def _add_item_hover_token(t: dict[str, str]) -> None:
 
 def _add_accent_text_token(t: dict[str, str]) -> None:
     """The accent where it's drawn straight on a surface, not as a fill, in two
-    strengths. accent_text: icons and edges (3:1); Flashbang's yellow was 1.4:1 on white.
+    strengths. accent_text: icons and edges (3:1), on the buttons too (Barbie's and
+    Flashbang's Live icon was 2.7:1 on theirs); Flashbang's yellow was 1.4:1 on white.
     accent_link: words (links, an effect's value, a checked menu row, a small action
     label), which need 4.5:1 on every surface they sit on (TEXT_ON and a hovered menu
     row). Both are the accent moved towards the text colour only as far as needed; most
     themes' accent keeps its exact colour for icons."""
     if "accent_text" not in t:
-        t["accent_text"] = _readable_text(t["accent"], t, 3.0, ("bg", "panel", "card"))
+        t["accent_text"] = _readable_text(t["accent"], t, 3.0, ("bg", "panel", "card", "btn"))
     if "accent_link" not in t:
         t["accent_link"] = _readable_text(t["accent"], t, 4.5, TEXT_ON + ("item_hover",))
 

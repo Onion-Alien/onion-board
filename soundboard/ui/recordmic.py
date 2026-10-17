@@ -158,7 +158,7 @@ class RecordDialog(QDialog):
         self.btn_rec.setCheckable(True)
         self.btn_rec.setMinimumHeight(52)
         self.btn_rec.setMinimumWidth(132)
-        icons.set_icon(self.btn_rec, "record", "#ff4d4f", "#ffffff", size=16)
+        icons.set_icon(self.btn_rec, "record", "danger_text", "#ffffff", size=16)
         self.btn_rec.clicked.connect(self._rec_clicked)
         row.addWidget(self.btn_rec)
         col = QVBoxLayout()
@@ -275,7 +275,7 @@ class RecordDialog(QDialog):
         self.phase.style().unpolish(self.phase)
         self.phase.style().polish(self.phase)
         self.btn_rec.setText(_("Stop") if recording else _("Record"))
-        icons.set_icon(self.btn_rec, "stop" if recording else "record", "#ff4d4f", "#ffffff",
+        icons.set_icon(self.btn_rec, "stop" if recording else "record", "danger_text", "#ffffff",
                        size=16)
         self.review.setVisible(have)
         self.btn_again.setVisible(have)

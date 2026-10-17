@@ -587,7 +587,7 @@ class AppRow(HoverCard):
         self.btn_rec.setCheckable(True)
         self.btn_rec.setToolTip(_("Record this program to Saved clips. Click again to finish. "
                                   "Nobody hears it unless Send is on."))
-        icons.set_icon(self.btn_rec, "record", "#ff4d4f", "#ffffff", size=14)
+        icons.set_icon(self.btn_rec, "record", "danger_text", "#ffffff", size=14)
         self.btn_rec.toggled.connect(lambda on: self.rec_toggled.emit(self, on))
         for b in (self.btn_send, self.btn_rec):
             # as wide as their words
