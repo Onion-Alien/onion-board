@@ -19,10 +19,6 @@ and neither needs a payment card on the account.
 | `GET /v1/voices?kind=fx\|ai\|setup&sort=top\|new\|trending&q=&offset=` | a page (50) of community voices with their settings: voice changer voices, AI voices and voice setups |
 | `POST /v1/voices` | share a voice (JSON: `kind`, `name`, `about`, `emoji`, `tags`, `data`); live at once (below) |
 | `POST /v1/voices/<id>/vote`, `/report` | as for sounds; 3 reports hide it until the owner looks |
-| `GET /v1/chat?after=N&wait=1` | the Chat tab's room: messages after number N (held up to 20 s until one arrives); names are picked by the server from the install and per-launch ids (`X-Onion-Session`) |
-| `POST /v1/chat` | `{"text": "..."}`: say something (280 characters, no links, rate-limited) |
-| `POST /v1/chat/<n>/report` | report message n (10 reports per address in 10 minutes); 3 people from different addresses mute its author, and the address it came from, for an hour |
-| `/v1/admin/chat`, `/off`, `/ban` | the owner's: reports, the kill switch (`{"off": true}`), bans (`{"who": "<hash>"}`: an install's hash also bans the addresses the room saw it speak from; an address hash from the reports bans just that; `"ban": false` lifts it) |
 | `GET /admin` | the review page: listen, approve, reject |
 | `/v1/admin/...` | the review page's calls (`Authorization: Bearer <ADMIN_TOKEN>`), and `POST /v1/admin/import` to add a sound straight to the store |
 | `GET /v1/admin/queue?status=pending\|live\|rejected\|all&q=&offset=` | the owner's: sounds (200 a page) with their reports and hashes, and how many there are of each status |
@@ -49,7 +45,7 @@ from the fields it checked (known kinds, effect and setting names of plain lette
 number finite and pulled into range, an AI voice's 1–4 speakers, a language code) and
 drops everything else. Names (32 characters) and abouts (140) become one plain line: no
 control or format characters (bidi overrides, zero-width joiners), no piles of combining
-marks, and the chat's blocked words and links are refused. The same settings can't be
+marks, and the owner's blocked words and links are refused. The same settings can't be
 shared twice. 20 a day per install, 40 per address. The app checks every voice again
 when it takes one in.
 

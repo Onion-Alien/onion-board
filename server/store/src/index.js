@@ -9,10 +9,8 @@ import { voicesRoute, adminVoicesRoute } from "./voices.js";
 import { ADMIN_PAGE } from "./admin.js";
 import { audioType } from "./audio.js";
 import { stripAudio } from "./strip.js";
-import { chatRoute, refuse } from "./chat.js";
+import { refuse } from "./words.js";
 import { syncStep } from "./sync.js";
-
-export { ChatRoom } from "./chat.js";   // the Durable Object wrangler.toml names
 
 const MAX_BYTES = 4 << 20;          // the biggest sound accepted (4 MB)
 const PAGE = 50;                     // sounds per list page
@@ -87,7 +85,6 @@ async function route(req, env) {
       "content-security-policy": "default-src 'self'; style-src 'unsafe-inline'; " +
         "script-src 'unsafe-inline'; media-src 'self' blob:; frame-ancestors 'none'",
       "x-frame-options": "DENY", "referrer-policy": "no-referrer", "cache-control": "no-store" } });
-  if (p === "/v1/chat" || /^\/v1\/chat\/\d+\/report$/.test(p)) return chatRoute(req, env);
   if (p.startsWith("/v1/voices")) {
     const r = await voicesRoute(req, env, url, p, VOICE_TOOLS);
     if (r) return r;
@@ -104,7 +101,6 @@ async function route(req, env) {
     return report(req, env, g[1]);
   if (p.startsWith("/v1/admin/")) {
     await admin(req, env);
-    if (p === "/v1/admin/chat" || p.startsWith("/v1/admin/chat/")) return chatRoute(req, env);
     if (p.startsWith("/v1/admin/voices")) {
       const r = await adminVoicesRoute(req, env, url, p, VOICE_TOOLS);
       if (r) return r;
@@ -188,7 +184,7 @@ function cleanName(s) {
 }
 
 // a shared name or tags are shown to everyone: a link or a blocked word (the owner's
-// CHAT_BLOCK list, as chat and voices use) in them is refused
+// CHAT_BLOCK list, words.js) in them is refused
 function checkWords(env, ...texts) {
   const blocked = String(env.CHAT_BLOCK || "").split(",");
   for (const t of texts) if (t && refuse(t.slice(0, 200), blocked)) fail("not allowed", 422);
