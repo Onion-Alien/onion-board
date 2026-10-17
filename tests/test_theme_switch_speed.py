@@ -179,6 +179,23 @@ def test_a_hovered_menu_row_shows_in_every_theme(name):
     assert theme._contrast(t["item_hover"], t["text_hi"]) >= 4.5
 
 
+@pytest.mark.parametrize("name", list(theme.THEMES))
+def test_the_settings_page_youre_on_shows_in_every_theme(name):
+    """The Settings list's current page was 1.03:1 against the window in the light
+    themes (Paper, Light, Mint: no visible mark); the rail's current tab 1.07:1 in
+    Flashbang. Both stand out now, their words readable."""
+    import re
+    t = theme.tokens(name)
+    css = theme.stylesheet(name)
+    sel = re.search(r"#settingscategories::item:selected \{ background:(#\w+)", css)[1]
+    assert theme._contrast(sel, t["bg"]) >= 1.5
+    assert theme._contrast(sel, t["text_hi"]) >= 4.5
+    with theme.previewing(name):
+        colour, alpha = theme.rail_tint()
+        base = theme.rail_bg(theme.T, name in theme.OUTLINED)
+    assert theme._contrast(theme._mix(base, colour, alpha), base) >= 1.3
+
+
 def test_the_cover_fades_in_instead_of_dimming_in_one_frame(main_window):  # noqa: F811
     """It goes up as the window is (nothing changes on screen), then the dimming and
     Bun come in over a few frames; a highlight colour change is a plain blend."""
