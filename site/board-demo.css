@@ -328,7 +328,8 @@
 /* ------------------------------------------------------------------ Apps */
 .ob-apps-top { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
 .ob-sect { display: flex; align-items: center; gap: 8px; font-weight: 600; padding: 6px 0; border-bottom: 1px solid var(--border); margin-bottom: 10px; }
-.ob-appgrid { --app: 400px; display: grid; grid-template-columns: repeat(auto-fill, minmax(min(var(--app), 100%), 1fr)); gap: 10px; margin-bottom: 14px; }
+.ob-appgrid { --app: var(--appw, 340px); display: grid; grid-template-columns: repeat(auto-fill, minmax(min(var(--app), 100%), var(--app))); gap: 10px; margin-bottom: 14px; }
+.listed .ob-appgrid { grid-template-columns: 1fr; }
 .ob-app { display: flex; flex-direction: column; gap: 10px; padding: 12px 14px; border-radius: 10px; background: var(--panel); }
 .ob-app .atop { display: flex; align-items: center; gap: 10px; }
 .ob-app .atop .i { color: var(--accent); }
@@ -383,16 +384,10 @@
 .ob-scard2 .key { min-width: 170px; }
 .ob-scard2 .field { flex: 1 1 200px; max-width: 420px; }
 .ob-scard2 mark { background: color-mix(in srgb, var(--accent) 40%, transparent); color: inherit; border-radius: 3px; }
-.ob-themes { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 10px; }
+.ob-themes { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 12px; margin-top: 4px; }
 .ob-theme { display: flex; flex-direction: column; gap: 6px; padding: 7px 7px 8px; border: 2px solid var(--border); border-radius: 10px; background: none; text-align: left; }
 .ob-theme[aria-pressed="true"] { border-color: var(--accent); }
 .ob-theme:hover { border-color: var(--border_hi); }
-.ob-theme .pv { display: grid; grid-template-columns: 1fr 1fr 1fr; grid-template-rows: 1fr 1fr; gap: 4px; padding: 6px; height: 74px; border-radius: 6px; background: var(--pbg); }
-.ob-theme .pv i { border-radius: 4px; background: var(--pcard); position: relative; }
-.ob-theme .pv i::before { content: ""; position: absolute; left: 5px; top: 5px; width: 9px; height: 2px; border-radius: 1px; background: var(--pc); }
-.ob-theme .pv i.side { grid-column: 3; grid-row: 1 / span 2; display: grid; place-items: end center; padding-bottom: 6px; background: var(--ppanel); }
-.ob-theme .pv i.side::before { left: 6px; right: 6px; width: auto; background: linear-gradient(90deg, var(--pa) 60%, var(--pg) 60%); }
-.ob-theme .pv svg { width: 20px; height: 20px; }
 .ob-theme span { font-weight: 600; font-size: 12.5px; }
 .ob-subtabs { display: flex; gap: 6px; flex-wrap: wrap; }
 
@@ -482,7 +477,18 @@
 .ob-trow .tx { flex: 1; min-width: 0; }
 .ob-trow .tx b { display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .ob-trow .tx small { display: block; color: var(--muted); font-size: 11.5px; margin-top: 2px; }
-.ob small.ok, .ob .rdy i.ok { color: var(--ok_text); }
+.ob-trow .tx small { display: flex; gap: 10px; white-space: nowrap; overflow: hidden; }
+.ob-trow .st { display: inline-flex; align-items: center; gap: 5px; flex: none; color: var(--text); }
+.ob-trow .st i { width: 6px; height: 6px; border-radius: 50%; background: var(--muted); }
+.ob-trow .st.ok i { background: var(--accent); }
+.ob-trow .st.off { color: var(--muted); }
+.ob-trow .st.off i { background: var(--off, var(--muted)); }
+.ob-trow .st.warn { color: var(--warn_text); }
+.ob-trow .snd { overflow: hidden; text-overflow: ellipsis; }
+.ob-tmore { align-self: stretch; width: 22px; flex: none; display: grid; place-items: center; border: 1px solid var(--border); border-radius: 8px; background: var(--panel); color: var(--muted); }
+.ob-tmore:hover { color: var(--text_hi); border-color: var(--border_hi); }
+.ob small.ok { color: var(--ok_text); }
+.ob .rdy i.ok { color: var(--accent); }
 .ob small.warn { color: var(--warn_text); }
 .ob-tpic { display: grid; place-items: center; width: 70px; height: 46px; flex: none; border-radius: 7px; background: #0b0b0b;
            color: var(--tc); font: 700 8.5px/1 Georgia, serif; letter-spacing: 1px; text-shadow: 0 0 6px var(--tc); overflow: hidden; text-align: center; }
@@ -546,7 +552,8 @@
 .ob .chip[aria-pressed="true"] { color: var(--on_accent); }
 .ob-mic .grp.vol { flex: none; }
 .ob-mic .grp.lv .ob-meter { min-width: 60px; }
-@container ob (max-width: 1240px) { .ob-mic .hear .t { display: none; } .ob-mic .hear { width: 32px; padding: 0; } }
+.ob-mic .hear .ts { display: none; }
+@container ob (max-width: 1240px) { .ob-mic .hear .t { display: none; } .ob-mic .hear .ts { display: inline; } }
 /* the box can't size itself from its own container query: board-demo.js sets .narrow */
 .ob.narrow { grid-template-columns: 52px minmax(0, 1fr); height: 680px; }
 /* the onion mark, as the app paints it: the theme's accents behind a white onion */
@@ -755,3 +762,19 @@
   .ob-vstrip .st, .ob-vstrip .ob-vchip { flex: 1; min-width: 0; overflow: hidden; }
   .ob-vtabs .btn { padding: 0 10px; }
 }
+.ob-chatbtns { display: flex; flex-wrap: wrap; gap: 8px; }
+.ob-theme .pv2 { display: block; width: 100%; height: auto; aspect-ratio: 154 / 74; border-radius: 8px; object-fit: cover; }
+.ob-theme:hover .pv2 { animation: ob-hop .5s; }
+@keyframes ob-hop { 40% { transform: translateY(-2px); } }
+.ob-looktabs { margin-bottom: 10px; }
+.ob-lookpage { display: flex; flex-direction: column; gap: 6px; }
+.ob-lookpage .ob-scard2.flat { padding: 0; border: 0; background: none; box-shadow: none; margin-top: 8px; }
+.ob-radios { gap: 16px; }
+.ob .chk input[type="radio"] { border-radius: 50%; }
+.ob .chk input[type="radio"]:checked { background: var(--field, var(--card)); }
+.ob .chk input[type="radio"]:checked::after { left: 3px; top: 3px; width: 8px; height: 8px; border: 0; border-radius: 50%; background: var(--accent); transform: none; }
+/* Sounds: "Search online" says its words only while the search box keeps its room (fitcontrol: words first) */
+@container ob (max-width: 1500px) { .ob .srcw { display: none; } }
+.ob.lantern .ob-brand .logo.mark { background: url(demo/lantern.png) center / cover; box-shadow: 0 0 14px color-mix(in srgb, var(--accent) 45%, transparent); }
+.ob.lantern .ob-brand .logo.mark .i { visibility: hidden; }
+@container ob (max-width: 600px) { .ob-tmore { display: none; } }
