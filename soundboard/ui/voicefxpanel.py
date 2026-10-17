@@ -1251,9 +1251,10 @@ class VoiceFxPanel(QWidget):
             row, col = QBoxLayout.Direction.LeftToRight, QBoxLayout.Direction.TopToBottom
             tries = ((row, full, bd, beside), (col, full, bd, line), (col, full, "", line),
                      (col, _("Edit voice"), "", line))
-            for want, t_text, b_text, room in tries:
-                if width(tw, t_text) + pb.spacing() + width(tb, b_text) + hear <= room:
-                    break
+            want, t_text, b_text, _room = next(
+                (t for t in tries
+                 if width(tw, t[1]) + pb.spacing() + width(tb, t[2]) + hear <= t[3]),
+                tries[-1])
             if self.picked_box.direction() != want:
                 self.picked_box.setDirection(want)
             for b, text in ((tw, t_text), (tb, b_text)):
