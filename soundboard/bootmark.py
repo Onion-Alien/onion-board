@@ -21,17 +21,12 @@ from soundboard import winpath
 
 NAME = "starting.txt"
 
-# the one-off commands app.main() runs and exits (app.ONE_OFF_COMMANDS, the same names):
-# main.py leaves no breadcrumb for them, since one would look like a start that failed.
-# Kept here, not in app.py, because main.py reads it before the heavy imports.
-ONE_OFF = ("--selftest", "--get-tor", "--install-addon", "--set-offline", "--keep-netlog",
-           "--usage-count", "--uninstall-count", "--selftest-addon", "--discord-restore")
+# the installer's mark and the one-off commands: soundboard/installmark.py (main.py
+# reads them before anything else of the app is imported)
+from soundboard.installmark import (  # noqa: E402,F401
+    INSTALLING, INSTALLING_STALE_S, ONE_OFF, installing)
+
 _VERSION_RE = re.compile(r"[0-9][0-9A-Za-z.\-]{0,20}")
-# installer/OnionBoard.iss leaves this beside OnionBoard.exe while it replaces the app's
-# files, and removes it before it opens the app again. Older than INSTALLING_STALE_S it
-# was left by a setup that died: ignored.
-INSTALLING = "installing.txt"
-INSTALLING_STALE_S = 15 * 60
 
 
 def app_dir() -> Path:
@@ -39,24 +34,6 @@ def app_dir() -> Path:
     through a folder link Windows won't follow). Kept here, small: main.py writes the
     breadcrumb before the sound library is imported."""
     return winpath.usable_dir(Path(os.environ.get("APPDATA", Path.home())) / "OnionBoard")
-
-
-def installing(exe_dir: Path | None = None, now: float | None = None) -> bool:
-    """Is the installer replacing the app's files right now? Started then (a double-click
-    while an update installs), the app loaded half-copied libraries and Python's
-    "Unhandled exception in script" box came up, one per click; the installer opens the
-    app itself when it's done. Only for the installed app (from source: never)."""
-    if exe_dir is None:
-        import sys
-        if not getattr(sys, "frozen", False):
-            return False
-        exe_dir = Path(sys.executable).parent
-    try:
-        made = (Path(exe_dir) / INSTALLING).stat().st_mtime
-    except OSError:
-        return False
-    import time
-    return (time.time() if now is None else now) - made < INSTALLING_STALE_S
 
 
 _previous: tuple[str, int] = ("", 0)
