@@ -645,8 +645,7 @@ def test_the_guide_stays_open_while_the_mic_is_set_up(mic_wizard, monkeypatch):
     answers lets them go after LOCK_MAX_S."""
     w, wiz = mic_wizard
     notes = []
-    monkeypatch.setattr(setupwizard.QToolTip, "showText",
-                        lambda pos, text, *a: notes.append(text))
+    monkeypatch.setattr(busy, "toast", lambda win, text, *a, **kw: notes.append(text))
     wiz.show()
     wiz.go(wiz.base + 2)
     w._attaching = True   # the set-up is running

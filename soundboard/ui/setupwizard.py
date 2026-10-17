@@ -24,11 +24,11 @@ import subprocess
 import time
 
 import numpy as np
-from PySide6.QtCore import QEvent, QPoint, QPointF, QRectF, QSize, Qt, QTimer, Signal
+from PySide6.QtCore import QEvent, QPointF, QRectF, QSize, Qt, QTimer, Signal
 from PySide6.QtGui import QColor, QPainter, QPen
 from PySide6.QtWidgets import (QApplication, QButtonGroup, QCheckBox, QDialog, QFrame,
                                QGridLayout, QHBoxLayout, QLabel, QMessageBox, QProgressBar,
-                               QPushButton, QScrollArea, QToolTip, QVBoxLayout, QWidget)
+                               QPushButton, QScrollArea, QVBoxLayout, QWidget)
 
 from soundboard import directmic, discordcfg, michelper
 from soundboard import engine as eng
@@ -1296,15 +1296,9 @@ class SetupWizard(QDialog):
         either way, and reopening the guide picks it back up. While the mic is set up,
         the guide stays open (_locked) and says so, so the X doesn't look broken."""
         if self._locked():
-            # just over the greyed "Setting up…", lined up with its right edge: Qt puts a
-            # tip below the point (off the window here), so it's moved once it has a size
-            btn = self.btn_next
-            QToolTip.showText(btn.mapToGlobal(QPoint(0, 0)),
-                              _("Bun's almost done, one moment."), btn, btn.rect(), LOCK_NOTE_MS)
-            for tip in QApplication.topLevelWidgets():
-                if tip.metaObject().className() == "QTipLabel" and tip.isVisible():
-                    tip.move(btn.mapToGlobal(QPoint(btn.width() - tip.width(),
-                                                    -tip.height() - 6)))
+            # the app's toast, spinner and all (one at a time: pressed again, it's renewed)
+            busy.toast(self, _("Bun's almost done, one moment."), "busy", LOCK_NOTE_MS,
+                       key="setup-almost-done")
             return
         if self._proc is not None and self._proc.poll() is None and QMessageBox.question(
                 self, _("Still installing"),
