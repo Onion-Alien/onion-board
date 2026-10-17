@@ -7,7 +7,9 @@ around him has room for props, notes and confetti either side and a little above
 an act may draw outside the canvas (the splash clips it to the panel). Every act reads
 in its first half second: a cold start is often over in one or two.
 
-Now and then a launch is special (`pick`): Golden Bun (1 in 50), the Halloween theme's
+Now and then a launch is rare (`RARES`, `pick`): Golden Bun (1 in 50), Ice Bun (1 in
+500), Galaxy Bun (1 in 5000) and Rainbow Bun (1 in 50000), each with his own look and
+sparkles; the splash gives a rare launch a glowing border and its drop rate. The Halloween theme's
 witch hat and fangs all October, the Santa hat all December, and the sleepy act most
 nights. Animations never draw Bun themselves: they
 work out `draw_bunny`'s keywords per frame (docs/MASCOT.md).
@@ -17,7 +19,7 @@ from __future__ import annotations
 import datetime
 import math
 import random
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 
 from PySide6.QtCore import QPointF, QRectF, Qt
 from PySide6.QtGui import QColor, QImage, QPainter, QPainterPath, QPen
@@ -26,12 +28,22 @@ from soundboard import theme
 from soundboard.bunny import PAW_R, draw_bunny, look_colour, music_note, sparkle
 from soundboard.style import bunnyfit
 
-GOLD_ODDS = 50          # one launch in this many gets Golden Bun
 NIGHT = (22, 5)         # from 22:00 to 05:00 he's mostly sleepy
 NIGHT_WEIGHT = 8        # ... this many times as likely as any other act
 GOODBYE_S = 0.5         # his wave as the window comes up
-GOLD = {"fur": "#f6cf55", "belly": "#fde9a6", "inner": "#ffb0a8", "nose": "#ff8a73",
-        "iris": "#c8781e", "pattern": ()}
+# the rare launches, rarest first: (one launch in this many, his look over the theme's,
+# the border's glow and his sparkles). Rainbow Bun's fur also cycles round the hues.
+RARES = {
+    "rainbow": (50000, {"fur": "#ffd6e8", "belly": "#ffffff", "iris": "#ff4fa3",
+                        "inner": "#ffb0d6", "pattern": ()}, "#ff4fa3"),
+    "galaxy": (5000, {"fur": "#2d2a63", "belly": "#45408c", "inner": "#8f6bff",
+                      "iris": "#c38bff", "nose": "#ff8fd8", "pattern": ("spots",),
+                      "marks": "#f4f0ff", "pads": "#8f6bff"}, "#a46bff"),
+    "ice": (500, {"fur": "#d8f1ff", "belly": "#f3fbff", "inner": "#9fd8ff", "iris": "#1f9bff",
+                  "nose": "#7cc8ff", "pattern": (), "pads": "#9fd8ff"}, "#4fc3ff"),
+    "gold": (50, {"fur": "#f6cf55", "belly": "#fde9a6", "inner": "#ffb0a8", "nose": "#ff8a73",
+                  "iris": "#c8781e", "pattern": ()}, "#ffcf40"),
+}
 # what he wears by month, over the theme's outfit (its hats off); a piece that isn't in
 # bunnyfit.PIECES is skipped
 SEASONS = {10: ("witch_hat", "fangs"), 12: ("santa",)}
@@ -42,29 +54,53 @@ CONFETTI = ("#ff5d8f", "#ffcf40", "#1fb6ff", "#3cc46a", "#a46be8")
 class Show:
     """What this launch shows: the act, and anything special about Bun."""
     act: str = "headbang"
-    gold: bool = False
+    rare: str | None = None   # a key of RARES
     outfit: tuple[str, ...] | None = None   # None: the theme's
-    extras: dict = field(default_factory=dict)
+    t: float = 0.0   # the frame being drawn (Rainbow Bun's fur follows it)
+
+    @property
+    def odds(self) -> int:
+        return RARES[self.rare][0] if self.rare in RARES else 0
+
+    @property
+    def glow(self) -> QColor | None:
+        """The rare border's colour now (None: not rare)."""
+        if self.rare not in RARES:
+            return None
+        if self.rare == "rainbow":
+            return QColor.fromHsvF((self.t * 0.35) % 1.0, 0.75, 1.0)
+        return QColor(RARES[self.rare][2])
 
     def pose(self, **pose) -> dict:
         """`draw_bunny` keywords with this launch's look and outfit."""
-        if self.gold and not pose.get("robot"):
-            pose.setdefault("kit", {**bunnyfit.look(), **GOLD})
+        if self.rare in RARES and not pose.get("robot"):
+            kit = {**bunnyfit.look(), **RARES[self.rare][1]}
+            if self.rare == "rainbow":
+                kit["fur"] = QColor.fromHsvF((self.t * 0.35) % 1.0, 0.28, 1.0).name()
+                kit["inner"] = QColor.fromHsvF((self.t * 0.35 + 0.5) % 1.0, 0.45, 1.0).name()
+            pose.setdefault("kit", kit)
         if self.outfit is not None:
             pose.setdefault("outfit", self.outfit)
         return pose
 
 
 def pick(now: datetime.datetime | None = None, rng: random.Random | None = None) -> Show:
-    """This launch's act, picked at random (sleepy is the favourite at night), with
-    Golden Bun now and then and his season's hat (SEASONS)."""
+    """This launch's act, picked at random (sleepy is the favourite at night), now and
+    then a rare one (RARES), and his season's hat (SEASONS)."""
     now = now or datetime.datetime.now()
     rng = rng or random.Random()
     names = list(ACTS)
     late = now.hour >= NIGHT[0] or now.hour < NIGHT[1]
     weights = [NIGHT_WEIGHT if late and n == "sleepy" else 1 for n in names]
     show = Show(act=rng.choices(names, weights)[0])
-    show.gold = show.act != "robo" and rng.randrange(GOLD_ODDS) == 0
+    roll, edge = rng.random(), 0.0
+    for name, (odds, _kit, _glow) in RARES.items():   # rarest first
+        edge += 1 / odds
+        if roll < edge:
+            show.rare = name
+            if show.act == "robo":   # (Robo-Bun keeps his metal: someone else's act)
+                show.act = rng.choice([n for n in names if n != "robo"])
+            break
     season = tuple(n for n in SEASONS.get(now.month, ()) if n in bunnyfit.PIECES)
     if season:   # his own hat off, the season's on (neck pieces stay)
         show.outfit = tuple(n for n in bunnyfit.outfit()
@@ -503,6 +539,23 @@ ACTS = {"headbang": headbang, "karaoke": karaoke, "build": build, "batting": bat
         "drums": drums, "ears": ears, "peekaboo": peekaboo, "spin": spin}
 
 
+def _planets(p: QPainter, t: float, behind: bool):
+    """Galaxy Bun's two little planets on a tilted orbit round him: drawn behind him
+    on the far side, in front on the near side."""
+    for i, (r, col, speed) in enumerate(((5.5, "#ff9f5a", 0.45), (4, "#4fc3ff", 0.7))):
+        a = 2 * math.pi * (t * speed + i * 0.5)
+        if (math.sin(a) < 0) != behind:
+            continue
+        x, y = 50 + 66 * math.cos(a), 72 + 16 * math.sin(a) - 10 * math.cos(a)
+        p.setPen(Qt.PenStyle.NoPen)
+        p.setBrush(QColor(col))
+        p.drawEllipse(QPointF(x, y), r, r)
+        if i == 0:   # a ring round the bigger one
+            p.setPen(QPen(QColor("#ffd9a8"), 1.4))
+            p.setBrush(Qt.BrushStyle.NoBrush)
+            p.drawEllipse(QPointF(x, y), r * 1.9, r * 0.55)
+
+
 def _canvas(p: QPainter, rect: QRectF):
     p.translate(rect.x(), rect.y())
     p.scale(rect.width() / 100, rect.height() / 120)
@@ -513,10 +566,24 @@ def draw(p: QPainter, show: Show, t: float, rect: QRectF):
     p.save()
     try:
         _canvas(p, rect)
+        show.t = t
+        if show.rare == "galaxy":
+            _planets(p, t, behind=True)
         ACTS.get(show.act, headbang)(p, show, t)
-        if show.gold:
-            _sparkles(p, t * 0.8, ((-8, 30, 6), (104, 20, 7), (112, 78, 5), (-14, 88, 5),
-                                   (50, -12, 5)), QColor("#ffcf40"))
+        if show.rare == "galaxy":
+            _planets(p, t, behind=False)
+        glow = show.glow
+        if glow is not None:
+            spots = ((-8, 30, 6), (104, 20, 7), (112, 78, 5), (-14, 88, 5), (50, -12, 5))
+            if show.rare == "rainbow":
+                for i, (x, y, r) in enumerate(spots):
+                    _sparkles(p, t * 0.8 + i * 0.2, ((x, y, r),),
+                              QColor.fromHsvF((t * 0.35 + i / 5) % 1.0, 0.7, 1.0))
+            else:
+                _sparkles(p, t * 0.8, spots, glow)
+                if show.rare == "ice":
+                    _sparkles(p, t * 0.6 + 0.5, ((-20, 60, 4), (118, 48, 4), (20, -6, 3)),
+                              QColor("#ffffff"))
     finally:
         p.restore()
 

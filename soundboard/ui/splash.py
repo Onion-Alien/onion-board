@@ -28,10 +28,11 @@ from pathlib import Path
 
 from PySide6.QtCore import QEventLoop, QPointF, QRectF, Qt
 from PySide6.QtGui import (QColor, QCursor, QFont, QGuiApplication, QImage, QPainter,
-                           QPainterPath)
+                           QPainterPath, QPen)
 from PySide6.QtWidgets import QApplication, QWidget
 
 from soundboard import theme
+from soundboard.bunny import sparkle
 from soundboard.i18n import _
 from soundboard.ui import splashacts
 from soundboard.ui.pixels import snap_to_pixels
@@ -72,7 +73,8 @@ def _surface(w: float, h: float, scale: float) -> QImage:
     """Cache the stationary panel at the monitor's resolution, including its text."""
     status = _status or _("Starting…")
     family = theme.T.get("font", theme.FONT)
-    key = (w, h, scale, theme.current_name, tuple(theme.T.items()), family, status)
+    key = (w, h, scale, theme.current_name, tuple(theme.T.items()), family, status,
+           _show.rare)
     img = _surfaces.get(key)
     if img is None:
         img = QImage(round(w * scale), round(h * scale), QImage.Format.Format_ARGB32_Premultiplied)
@@ -95,6 +97,17 @@ def _surface(w: float, h: float, scale: float) -> QImage:
             p.setFont(font)
             p.setPen(QColor(theme.T["muted"]))
             p.drawText(QRectF(20, 171, w - 40, 22), Qt.AlignmentFlag.AlignCenter, status)
+            if _show.odds:   # a rare launch: its drop rate under the dots, between sparkles
+                glow = QColor(splashacts.RARES[str(_show.rare)][2])
+                font.setPixelSize(11)
+                font.setWeight(QFont.Weight.Bold)
+                p.setFont(font)
+                p.setPen(glow)
+                rate = f"1/{_show.odds}"
+                p.drawText(QRectF(20, h - 29, w - 40, 15), Qt.AlignmentFlag.AlignCenter, rate)
+                half = p.fontMetrics().horizontalAdvance(rate) / 2
+                for side in (-1, 1):
+                    sparkle(p, w / 2 + side * (half + 9), h - 21.5, 4.5, glow)
         finally:
             p.end()
         _surfaces[key] = img
@@ -119,6 +132,18 @@ def paint_frame(p: QPainter, t: float, w: float, h: float, scale: float = 1.0,
     p.setRenderHint(QPainter.RenderHint.Antialiasing)
     p.setRenderHint(QPainter.RenderHint.SmoothPixmapTransform)
     p.drawImage(QRectF(0, 0, w, h), _surface(w, h, scale))
+    _show.t = t
+    glow = _show.glow
+    if glow is not None:   # a rare launch: a soft glow round the panel, pulsing
+        pulse = 0.75 + 0.25 * math.sin(2 * math.pi * t / 1.2)
+        p.setBrush(Qt.BrushStyle.NoBrush)
+        for i in range(8):
+            c = QColor(glow)
+            c.setAlphaF(pulse * (0.9 if i == 0 else 0.42 * (1 - i / 8) ** 2))
+            p.setPen(QPen(c, 2.0 if i == 0 else 1.2))
+            p.drawRoundedRect(QRectF(8 - i * 0.9, 8 - i * 0.9, w - 16 + i * 1.8,
+                                     h - 16 + i * 1.8), 16 + i * 0.9, 16 + i * 0.9)
+        p.setPen(Qt.PenStyle.NoPen)
     p.save()
     room = QPainterPath()   # his act stays on the panel, above the name
     room.addRoundedRect(QRectF(8, 8, w - 16, h - 16), 16, 16)

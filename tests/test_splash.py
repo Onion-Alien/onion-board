@@ -94,8 +94,11 @@ def test_pick_rare_and_seasonal():
     day = datetime.datetime(2026, 6, 1, 14)
     seen = {splashacts.pick(day, random.Random(i)).act for i in range(400)}
     assert seen == set(splashacts.ACTS)   # every act turns up
-    golds = [splashacts.pick(day, random.Random(i)).gold for i in range(2000)]
-    assert 0 < sum(golds) < 120   # about 1 in 50
+    rares = [splashacts.pick(day, random.Random(i)) for i in range(4000)]
+    golds = sum(r.rare == "gold" for r in rares)
+    assert 40 < golds < 130   # about 1 in 50
+    assert all(r.act != "robo" for r in rares if r.rare)   # (Robo-Bun keeps his metal)
+    assert [odds for odds, *_ in splashacts.RARES.values()] == [50000, 5000, 500, 50]
     assert all(splashacts.pick(day, random.Random(i)).outfit is None for i in range(20))
     xmas = splashacts.pick(datetime.datetime(2026, 12, 20, 14), random.Random(1))
     assert xmas.outfit is not None and "santa" in xmas.outfit
@@ -191,3 +194,22 @@ def test_windows_animation_preference(monkeypatch):
     assert not splash._animations_enabled()
     user.SystemParametersInfoW = lambda *args: 0   # unavailable: retain the default
     assert splash._animations_enabled()
+
+
+def test_rare_launch_glows_and_shows_its_drop_rate(qapp, monkeypatch):
+    """A rare launch: a glow round the panel (in the margin a plain one leaves clear)
+    and its drop rate under the dots; each tier its own look."""
+    from soundboard.ui import splashacts
+    monkeypatch.setattr(splash, "_animate", True)
+    plain = _frame(0.3)
+    assert plain.pixelColor(4, splash.CARD_H // 2).alpha() == 0
+    looks = set()
+    for rare in splashacts.RARES:
+        monkeypatch.setattr(splash, "_show", splashacts.Show(act="hop", rare=rare))
+        splash._surfaces.clear()
+        img = _frame(0.3)
+        assert img.pixelColor(5, splash.CARD_H // 2).alpha() > 0, rare   # the glow
+        assert img.copy(0, 222, img.width(), 18) != plain.copy(0, 222, img.width(), 18), rare
+        looks.add(img.copy(80, 30, 80, 96).bits().tobytes())
+    assert len(looks) == len(splashacts.RARES)
+    splash._surfaces.clear()
