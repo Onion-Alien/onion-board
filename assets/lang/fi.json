@@ -3487,7 +3487,6 @@
   "Nothing matches": "Ei osumia",
   "Pick a file, name it and tick the box first": "Valitse ensin tiedosto, anna sille nimi ja rastita ruutu",
   "Report this sound": "Ilmoita tästä äänestä",
-  "Search the store": "Hae kaupasta",
   "Share": "Jaa",
   "Share a sound": "Jaa ääni",
   "Share a sound with everyone": "Jaa ääni kaikille",
@@ -3737,10 +3736,8 @@
   "You have the most AI voices of your own there can be: delete one first.": "Sinulla on jo enimmäismäärä omia AI-ääniä: poista ensin yksi.",
   "You have the most saved voices there can be: delete one first.": "Sinulla on jo enimmäismäärä tallennettuja ääniä: poista ensin yksi.",
   "You're hearing it without its AI voice: get AI voices (Voice tab → AI voices) to hear all of it.": "Kuulet sen ilman sen AI-ääntä: hae AI-äänet (Ääni-välilehti → AI äänet), niin kuulet kaiken.",
-  "Voices people made, picked by everyone's votes.": "Ihmisten tekemiä ääniä, kaikkien äänillä valittuja.",
   "Sounds and voices other players shared, voted on: add them, or share your own.": "Muiden pelaajien jakamia ja arvioimia ääniä ja ääniefektejä: lisää ne tai jaa omasi.",
   "Sounds and voices players share, voted on by everyone: add them or share your own": "Pelaajien jakamia ääniä ja ääniefektejä, kaikkien arvioimia: lisää ne tai jaa omasi",
-  "Sounds players share, picked by everyone's votes.": "Pelaajien jakamia ääniä, kaikkien äänillä valittuja.",
   "Community": "Yhteisö",
   "Share this link in the Community tab": "Jaa tämä linkki Yhteisö-välilehdellä",
   "The Community tab: the project's own store, for its list, the sounds and voices you play or add, your votes and what you share.": "Yhteisö-välilehti: projektin oma kauppa sen listalle, soittamillesi tai lisäämillesi äänille, äänestyksillesi ja jakamillesi asioille.",
@@ -3754,5 +3751,6 @@
   "“{name}” speaks {language}, so this may take a while. Each sound is put into {language} first, in the background, and plays when it's ready.": "\"{name}\" puhuu kieltä {language}, joten tämä voi kestää hetken. Jokainen ääni muutetaan ensin taustalla kielelle {language}, ja se soi, kun se on valmis.",
   "“{name}” speaks {language}, so this may take a while. The radio goes quiet while the translation starts, then you hear it in {language}, a few seconds behind.": "\"{name}\" puhuu kieltä {language}, joten tämä voi kestää hetken. Radio hiljenee, kun käännös käynnistyy, ja sitten kuulet sen kielellä {language} muutaman sekunnin jäljessä.",
   "“{name}” speaks {language}, so this may take a while. Your programs go quiet while the translation starts, then you hear them in {language}, a few seconds behind.": "\"{name}\" puhuu kieltä {language}, joten tämä voi kestää hetken. Ohjelmasi hiljenevät, kun käännös käynnistyy, ja sitten kuulet ne kielellä {language} muutaman sekunnin jäljessä.",
-  "“{name}” speaks {language}, which needs speech recognition and the {language} download (Voice tab, Speak another language). The rest of it is on.": "\"{name}\" puhuu kieltä {language}, mihin tarvitaan puheentunnistus ja kielen {language} lataus (Puhe-välilehti, Puhu toista kieltä). Muu osa siitä on päällä."
+  "“{name}” speaks {language}, which needs speech recognition and the {language} download (Voice tab, Speak another language). The rest of it is on.": "\"{name}\" puhuu kieltä {language}, mihin tarvitaan puheentunnistus ja kielen {language} lataus (Puhe-välilehti, Puhu toista kieltä). Muu osa siitä on päällä.",
+  "Search sounds": "Hae ääniä"
 }

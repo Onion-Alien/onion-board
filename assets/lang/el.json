@@ -3487,7 +3487,6 @@
   "Nothing matches": "Δεν βρέθηκε τίποτα",
   "Pick a file, name it and tick the box first": "Διάλεξε πρώτα αρχείο, δώσ’ του όνομα και τσέκαρε το κουτί",
   "Report this sound": "Ανάφερε αυτόν τον ήχο",
-  "Search the store": "Αναζήτηση στο κατάστημα",
   "Share": "Κοινοποίηση",
   "Share a sound": "Μοιράσου έναν ήχο",
   "Share a sound with everyone": "Μοιράσου έναν ήχο με όλους",
@@ -3737,10 +3736,8 @@
   "You have the most AI voices of your own there can be: delete one first.": "Έχεις ήδη τις περισσότερες δικές σου φωνές AI που γίνεται: σβήσε πρώτα μία.",
   "You have the most saved voices there can be: delete one first.": "Έχεις ήδη τις περισσότερες αποθηκευμένες φωνές που γίνεται: σβήσε πρώτα μία.",
   "You're hearing it without its AI voice: get AI voices (Voice tab → AI voices) to hear all of it.": "Την ακούς χωρίς τη φωνή AI της: πάρε τις φωνές AI (καρτέλα Φωνή → φωνές AI) για να την ακούσεις ολόκληρη.",
-  "Voices people made, picked by everyone's votes.": "Φωνές που έφτιαξαν άλλοι, επιλεγμένες με τις ψήφους όλων.",
   "Sounds and voices other players shared, voted on: add them, or share your own.": "Ήχοι και φωνές που μοιράστηκαν άλλοι παίκτες, με ψήφους: πρόσθεσέ τους ή μοιράσου τους δικούς σου.",
   "Sounds and voices players share, voted on by everyone: add them or share your own": "Ήχοι και φωνές που μοιράζονται οι παίκτες και ψηφίζουν όλοι: πρόσθεσέ τους ή μοιράσου τους δικούς σου",
-  "Sounds players share, picked by everyone's votes.": "Ήχοι που μοιράζονται οι παίκτες, επιλεγμένοι με τις ψήφους όλων.",
   "Community": "Κοινότητα",
   "Share this link in the Community tab": "Μοιράσου αυτόν τον σύνδεσμο στην καρτέλα Κοινότητα",
   "The Community tab: the project's own store, for its list, the sounds and voices you play or add, your votes and what you share.": "Η καρτέλα Κοινότητα: το δικό κατάστημα του έργου, για τη λίστα του, τους ήχους και τις φωνές που παίζεις ή προσθέτεις, τις ψήφους σου και ό,τι μοιράζεσαι.",
@@ -3754,5 +3751,6 @@
   "“{name}” speaks {language}, so this may take a while. Each sound is put into {language} first, in the background, and plays when it's ready.": "Το \"{name}\" μιλά {language}, οπότε μπορεί να πάρει λίγη ώρα. Κάθε ήχος γίνεται πρώτα σε {language} στο παρασκήνιο και παίζει μόλις είναι έτοιμος.",
   "“{name}” speaks {language}, so this may take a while. The radio goes quiet while the translation starts, then you hear it in {language}, a few seconds behind.": "Το \"{name}\" μιλά {language}, οπότε μπορεί να πάρει λίγη ώρα. Το ραδιόφωνο σωπαίνει όσο ξεκινά η μετάφραση, μετά το ακούς σε {language}, λίγα δευτερόλεπτα πίσω.",
   "“{name}” speaks {language}, so this may take a while. Your programs go quiet while the translation starts, then you hear them in {language}, a few seconds behind.": "Το \"{name}\" μιλά {language}, οπότε μπορεί να πάρει λίγη ώρα. Τα προγράμματά σου σωπαίνουν όσο ξεκινά η μετάφραση, μετά τα ακούς σε {language}, λίγα δευτερόλεπτα πίσω.",
-  "“{name}” speaks {language}, which needs speech recognition and the {language} download (Voice tab, Speak another language). The rest of it is on.": "Το \"{name}\" μιλά {language}, που χρειάζεται αναγνώριση ομιλίας και τη λήψη για {language} (καρτέλα Φωνή, Μίλα άλλη γλώσσα). Τα υπόλοιπα είναι ενεργά."
+  "“{name}” speaks {language}, which needs speech recognition and the {language} download (Voice tab, Speak another language). The rest of it is on.": "Το \"{name}\" μιλά {language}, που χρειάζεται αναγνώριση ομιλίας και τη λήψη για {language} (καρτέλα Φωνή, Μίλα άλλη γλώσσα). Τα υπόλοιπα είναι ενεργά.",
+  "Search sounds": "Αναζήτηση ήχων"
 }

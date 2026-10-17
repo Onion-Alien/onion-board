@@ -3410,7 +3410,6 @@
   "Nothing matches": "Không tìm thấy",
   "Pick a file, name it and tick the box first": "Chọn tệp, đặt tên và đánh dấu ô trước đã",
   "Report this sound": "Báo cáo âm thanh này",
-  "Search the store": "Tìm trong cửa hàng",
   "Share": "Chia sẻ",
   "Share a sound": "Chia sẻ âm thanh",
   "Share a sound with everyone": "Chia sẻ âm thanh với mọi người",
@@ -3659,10 +3658,8 @@
   "You have the most AI voices of your own there can be: delete one first.": "Bạn đã có tối đa giọng nói AI riêng: hãy xóa một cái trước.",
   "You have the most saved voices there can be: delete one first.": "Bạn đã có tối đa giọng đã lưu: hãy xóa một cái trước.",
   "You're hearing it without its AI voice: get AI voices (Voice tab → AI voices) to hear all of it.": "Bạn đang nghe nó mà không có giọng nói AI: hãy tải giọng nói AI (thẻ Giọng nói → Giọng nói AI) để nghe đầy đủ.",
-  "Voices people made, picked by everyone's votes.": "Giọng nói do mọi người tạo, được chọn qua bình chọn của mọi người.",
   "Sounds and voices other players shared, voted on: add them, or share your own.": "Âm thanh và giọng nói người chơi khác đã chia sẻ và bình chọn: thêm chúng, hoặc chia sẻ của bạn.",
   "Sounds and voices players share, voted on by everyone: add them or share your own": "Âm thanh và giọng nói người chơi chia sẻ, mọi người bình chọn: thêm chúng hoặc chia sẻ của bạn",
-  "Sounds players share, picked by everyone's votes.": "Âm thanh người chơi chia sẻ, được chọn qua bình chọn của mọi người.",
   "Community": "Cộng đồng",
   "Share this link in the Community tab": "Chia sẻ liên kết này trong thẻ Cộng đồng",
   "The Community tab: the project's own store, for its list, the sounds and voices you play or add, your votes and what you share.": "Thẻ Cộng đồng: cửa hàng riêng của dự án, cho danh sách, các âm thanh và giọng nói bạn phát hoặc thêm, lượt bình chọn của bạn và những gì bạn chia sẻ.",
@@ -3676,5 +3673,6 @@
   "“{name}” speaks {language}, so this may take a while. Each sound is put into {language} first, in the background, and plays when it's ready.": "“{name}” nói {language}, nên việc này có thể mất một lúc. Mỗi âm thanh được chuyển sang {language} trước, trong nền, và phát khi đã xong.",
   "“{name}” speaks {language}, so this may take a while. The radio goes quiet while the translation starts, then you hear it in {language}, a few seconds behind.": "“{name}” nói {language}, nên việc này có thể mất một lúc. Radio im lặng trong lúc bắt đầu dịch, rồi bạn nghe nó bằng {language}, chậm vài giây.",
   "“{name}” speaks {language}, so this may take a while. Your programs go quiet while the translation starts, then you hear them in {language}, a few seconds behind.": "“{name}” nói {language}, nên việc này có thể mất một lúc. Các chương trình của bạn im lặng trong lúc bắt đầu dịch, rồi bạn nghe chúng bằng {language}, chậm vài giây.",
-  "“{name}” speaks {language}, which needs speech recognition and the {language} download (Voice tab, Speak another language). The rest of it is on.": "“{name}” nói {language}, việc này cần nhận dạng giọng nói và bản tải {language} (thẻ Giọng nói, Nói ngôn ngữ khác). Phần còn lại đang bật."
+  "“{name}” speaks {language}, which needs speech recognition and the {language} download (Voice tab, Speak another language). The rest of it is on.": "“{name}” nói {language}, việc này cần nhận dạng giọng nói và bản tải {language} (thẻ Giọng nói, Nói ngôn ngữ khác). Phần còn lại đang bật.",
+  "Search sounds": "Tìm âm thanh"
 }

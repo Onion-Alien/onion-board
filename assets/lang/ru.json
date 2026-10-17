@@ -3564,7 +3564,6 @@
   "Nothing matches": "Ничего не найдено",
   "Pick a file, name it and tick the box first": "Сначала выберите файл, назовите его и поставьте галочку",
   "Report this sound": "Пожаловаться на звук",
-  "Search the store": "Поиск в магазине",
   "Share": "Поделиться",
   "Share a sound": "Поделиться звуком",
   "Share a sound with everyone": "Поделитесь звуком со всеми",
@@ -3815,10 +3814,8 @@
   "You have the most AI voices of your own there can be: delete one first.": "У вас уже максимум своих голосов ИИ: сначала удалите один.",
   "You have the most saved voices there can be: delete one first.": "У вас уже максимум сохранённых голосов: сначала удалите один.",
   "You're hearing it without its AI voice: get AI voices (Voice tab → AI voices) to hear all of it.": "Вы слышите его без голоса ИИ: установите голоса ИИ (вкладка Голос → голоса ИИ), чтобы услышать всё.",
-  "Voices people made, picked by everyone's votes.": "Голоса, созданные людьми, выбранные голосами всех.",
   "Sounds and voices other players shared, voted on: add them, or share your own.": "Звуки и голоса, которыми поделились другие игроки, с голосованием: добавь их или поделись своими.",
   "Sounds and voices players share, voted on by everyone: add them or share your own": "Звуки и голоса, которыми делятся игроки, с оценками всех: добавь их или поделись своими",
-  "Sounds players share, picked by everyone's votes.": "Звуки, которыми делятся игроки, выбранные голосами всех.",
   "Community": "Сообщество",
   "Share this link in the Community tab": "Поделиться этой ссылкой во вкладке «Сообщество»",
   "The Community tab: the project's own store, for its list, the sounds and voices you play or add, your votes and what you share.": "Вкладка «Сообщество»: собственный магазин проекта, для его списка, звуков и голосов, которые ты включаешь или добавляешь, твоих оценок и того, чем ты делишься.",
@@ -3832,5 +3829,6 @@
   "“{name}” speaks {language}, so this may take a while. Each sound is put into {language} first, in the background, and plays when it's ready.": "«{name}» говорит на языке {language}, так что это может занять время. Каждый звук сначала в фоне переводится на язык {language} и играет, когда готов.",
   "“{name}” speaks {language}, so this may take a while. The radio goes quiet while the translation starts, then you hear it in {language}, a few seconds behind.": "«{name}» говорит на языке {language}, так что это может занять время. Радио замолкает, пока запускается перевод, потом вы слышите его на языке {language}, с отставанием в несколько секунд.",
   "“{name}” speaks {language}, so this may take a while. Your programs go quiet while the translation starts, then you hear them in {language}, a few seconds behind.": "«{name}» говорит на языке {language}, так что это может занять время. Ваши программы замолкают, пока запускается перевод, потом вы слышите их на языке {language}, с отставанием в несколько секунд.",
-  "“{name}” speaks {language}, which needs speech recognition and the {language} download (Voice tab, Speak another language). The rest of it is on.": "«{name}» говорит на языке {language}, а для этого нужны распознавание речи и загрузка языка {language} (вкладка «Голос», «Говорим на другом языке»). Остальное включено."
+  "“{name}” speaks {language}, which needs speech recognition and the {language} download (Voice tab, Speak another language). The rest of it is on.": "«{name}» говорит на языке {language}, а для этого нужны распознавание речи и загрузка языка {language} (вкладка «Голос», «Говорим на другом языке»). Остальное включено.",
+  "Search sounds": "Искать звуки"
 }

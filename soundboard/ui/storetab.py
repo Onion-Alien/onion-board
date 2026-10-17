@@ -242,7 +242,9 @@ class StoreTab(QWidget):
         title_row.addWidget(info, 0, Qt.AlignmentFlag.AlignVCenter)
         title_row.addStretch(1)
         words.addLayout(title_row)
-        self.tagline = hint_label(_("Sounds players share, picked by everyone's votes."))
+        # (one line for Sounds and Voices: the same words as the tab's tooltip)
+        self.tagline = hint_label(_("Sounds and voices players share, voted on by everyone: "
+                                    "add them or share your own"))
         words.addWidget(self.tagline)
         words.addStretch(1)
         top.addLayout(words, 1)
@@ -307,9 +309,9 @@ class StoreTab(QWidget):
         row = QHBoxLayout()
         row.setSpacing(8)
         self.search = QLineEdit()
-        self.search.setPlaceholderText(_("Search the store"))
+        self.search.setPlaceholderText(_("Search sounds"))
         self.search.setClearButtonEnabled(True)
-        self.search.setAccessibleName(_("Search the store"))
+        self.search.setAccessibleName(_("Search sounds"))
         self._search_wait = QTimer(self, singleShot=True, interval=SEARCH_WAIT_MS)
         self._search_wait.timeout.connect(self.reload)
         self.search.textChanged.connect(lambda _t: self._search_wait.start())
@@ -443,10 +445,8 @@ class StoreTab(QWidget):
             self.mode_btns[self._mode].setChecked(True)
         voices = self._mode == "voices"
         self.btn_share.setText(_("Share a voice") if voices else _("Share a sound"))
-        self.tagline.setText(_("Voices people made, picked by everyone's votes.") if voices
-                             else _("Sounds players share, picked by everyone's votes."))
         self.search.setPlaceholderText(_("Search the voices") if voices
-                                       else _("Search the store"))
+                                       else _("Search sounds"))
         self.sort_btns[TRENDING].setToolTip(
             _("The voices people liked most this week") if voices
             else _("What's hot on Myinstants right now, and the sounds people here liked "

@@ -3487,7 +3487,6 @@
   "Nothing matches": "Nincs találat",
   "Pick a file, name it and tick the box first": "Előbb válassz fájlt, adj neki nevet, és pipáld ki a négyzetet",
   "Report this sound": "Hang jelentése",
-  "Search the store": "Keresés a boltban",
   "Share": "Megosztás",
   "Share a sound": "Hang megosztása",
   "Share a sound with everyone": "Oszd meg egy hangodat mindenkivel",
@@ -3737,10 +3736,8 @@
   "You have the most AI voices of your own there can be: delete one first.": "Már annyi saját AI hangod van, amennyi lehet: előbb törölj egyet.",
   "You have the most saved voices there can be: delete one first.": "Már annyi mentett hangod van, amennyi lehet: előbb törölj egyet.",
   "You're hearing it without its AI voice: get AI voices (Voice tab → AI voices) to hear all of it.": "Az AI hangja nélkül hallod: szerezd be az AI hangokat (Hang fül → AI hangok), hogy mindent hallj.",
-  "Voices people made, picked by everyone's votes.": "Mások által készített hangok, mindenki szavazatai alapján.",
   "Sounds and voices other players shared, voted on: add them, or share your own.": "Más játékosok által megosztott és értékelt hangok és hangeffektek: add hozzá őket, vagy oszd meg a sajátjaidat.",
   "Sounds and voices players share, voted on by everyone: add them or share your own": "Játékosok által megosztott hangok és hangeffektek, mindenki értékeli: add hozzá őket, vagy oszd meg a sajátjaidat",
-  "Sounds players share, picked by everyone's votes.": "Játékosok által megosztott hangok, mindenki szavazatai alapján.",
   "Community": "Közösség",
   "Share this link in the Community tab": "Link megosztása a Közösség lapon",
   "The Community tab: the project's own store, for its list, the sounds and voices you play or add, your votes and what you share.": "A Közösség lap: a projekt saját áruháza, a listájához, a lejátszott vagy hozzáadott hangokhoz, a szavazataidhoz és ahhoz, amit megosztasz.",
@@ -3754,5 +3751,6 @@
   "“{name}” speaks {language}, so this may take a while. Each sound is put into {language} first, in the background, and plays when it's ready.": "„{name}” {language} nyelven beszél, ezért ez eltarthat egy ideig. Minden hangot előbb a háttérben átültet {language} nyelvre, és akkor szól, amikor elkészült.",
   "“{name}” speaks {language}, so this may take a while. The radio goes quiet while the translation starts, then you hear it in {language}, a few seconds behind.": "„{name}” {language} nyelven beszél, ezért ez eltarthat egy ideig. A rádió elhallgat, amíg a fordítás elindul, aztán {language} nyelven hallod, néhány másodperc késéssel.",
   "“{name}” speaks {language}, so this may take a while. Your programs go quiet while the translation starts, then you hear them in {language}, a few seconds behind.": "„{name}” {language} nyelven beszél, ezért ez eltarthat egy ideig. A programjaid elhallgatnak, amíg a fordítás elindul, aztán {language} nyelven hallod őket, néhány másodperc késéssel.",
-  "“{name}” speaks {language}, which needs speech recognition and the {language} download (Voice tab, Speak another language). The rest of it is on.": "„{name}” {language} nyelven beszél, ehhez beszédfelismerés és a(z) {language} letöltése kell (Beszéd lap, Beszélj más nyelvet). A többi része be van kapcsolva."
+  "“{name}” speaks {language}, which needs speech recognition and the {language} download (Voice tab, Speak another language). The rest of it is on.": "„{name}” {language} nyelven beszél, ehhez beszédfelismerés és a(z) {language} letöltése kell (Beszéd lap, Beszélj más nyelvet). A többi része be van kapcsolva.",
+  "Search sounds": "Hangok keresése"
 }

@@ -3410,7 +3410,6 @@
   "Nothing matches": "Tiada padanan",
   "Pick a file, name it and tick the box first": "Pilih fail, namakannya dan tandakan kotak dahulu",
   "Report this sound": "Laporkan bunyi ini",
-  "Search the store": "Cari di kedai",
   "Share": "Kongsi",
   "Share a sound": "Kongsi bunyi",
   "Share a sound with everyone": "Kongsi bunyi dengan semua",
@@ -3659,10 +3658,8 @@
   "You have the most AI voices of your own there can be: delete one first.": "Anda sudah ada suara AI sendiri paling banyak: padam satu dahulu.",
   "You have the most saved voices there can be: delete one first.": "Anda sudah ada suara simpanan paling banyak: padam satu dahulu.",
   "You're hearing it without its AI voice: get AI voices (Voice tab → AI voices) to hear all of it.": "Anda mendengarnya tanpa suara AInya: dapatkan suara AI (tab Suara → Suara AI) untuk mendengar semuanya.",
-  "Voices people made, picked by everyone's votes.": "Suara buatan orang ramai, dipilih oleh undian semua orang.",
   "Sounds and voices other players shared, voted on: add them, or share your own.": "Bunyi dan suara yang dikongsi dan diundi pemain lain: tambahkannya, atau kongsi milik anda.",
   "Sounds and voices players share, voted on by everyone: add them or share your own": "Bunyi dan suara yang dikongsi pemain, diundi semua orang: tambahkannya atau kongsi milik anda",
-  "Sounds players share, picked by everyone's votes.": "Bunyi yang dikongsi pemain, dipilih oleh undian semua orang.",
   "Community": "Komuniti",
   "Share this link in the Community tab": "Kongsi pautan ini dalam tab Komuniti",
   "The Community tab: the project's own store, for its list, the sounds and voices you play or add, your votes and what you share.": "Tab Komuniti: kedai projek sendiri, untuk senarainya, bunyi dan suara yang anda mainkan atau tambah, undian anda dan apa yang anda kongsi.",
@@ -3676,5 +3673,6 @@
   "“{name}” speaks {language}, so this may take a while. Each sound is put into {language} first, in the background, and plays when it's ready.": "“{name}” bercakap {language}, jadi ini mungkin ambil masa. Setiap bunyi ditukar ke {language} dahulu, di latar belakang, dan dimainkan apabila siap.",
   "“{name}” speaks {language}, so this may take a while. The radio goes quiet while the translation starts, then you hear it in {language}, a few seconds behind.": "“{name}” bercakap {language}, jadi ini mungkin ambil masa. Radio senyap semasa terjemahan bermula, kemudian anda dengarnya dalam {language}, lewat beberapa saat.",
   "“{name}” speaks {language}, so this may take a while. Your programs go quiet while the translation starts, then you hear them in {language}, a few seconds behind.": "“{name}” bercakap {language}, jadi ini mungkin ambil masa. Program anda senyap semasa terjemahan bermula, kemudian anda dengarnya dalam {language}, lewat beberapa saat.",
-  "“{name}” speaks {language}, which needs speech recognition and the {language} download (Voice tab, Speak another language). The rest of it is on.": "“{name}” bercakap {language}, yang perlukan pengecaman pertuturan dan muat turun {language} (tab Suara, Cakap bahasa lain). Bahagian lain dihidupkan."
+  "“{name}” speaks {language}, which needs speech recognition and the {language} download (Voice tab, Speak another language). The rest of it is on.": "“{name}” bercakap {language}, yang perlukan pengecaman pertuturan dan muat turun {language} (tab Suara, Cakap bahasa lain). Bahagian lain dihidupkan.",
+  "Search sounds": "Cari bunyi"
 }

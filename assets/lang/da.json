@@ -3487,7 +3487,6 @@
   "Nothing matches": "Intet fundet",
   "Pick a file, name it and tick the box first": "Vælg en fil, giv den et navn, og sæt flueben først",
   "Report this sound": "Anmeld denne lyd",
-  "Search the store": "Søg i butikken",
   "Share": "Del",
   "Share a sound": "Del en lyd",
   "Share a sound with everyone": "Del en lyd med alle",
@@ -3737,10 +3736,8 @@
   "You have the most AI voices of your own there can be: delete one first.": "Du har allerede så mange egne AI-stemmer, som der kan være: slet en først.",
   "You have the most saved voices there can be: delete one first.": "Du har allerede så mange gemte stemmer, som der kan være: slet en først.",
   "You're hearing it without its AI voice: get AI voices (Voice tab → AI voices) to hear all of it.": "Du hører den uden dens AI-stemme: hent AI-stemmer (fanen Stemme → AI-stemmer) for at høre det hele.",
-  "Voices people made, picked by everyone's votes.": "Stemmer lavet af folk, valgt af alles stemmer.",
   "Sounds and voices other players shared, voted on: add them, or share your own.": "Lyde og stemmer, som andre spillere har delt og stemt på: tilføj dem, eller del dine egne.",
   "Sounds and voices players share, voted on by everyone: add them or share your own": "Lyde og stemmer, som spillere deler, og alle stemmer på: tilføj dem, eller del dine egne",
-  "Sounds players share, picked by everyone's votes.": "Lyde, som spillere deler, valgt af alles stemmer.",
   "Community": "Fællesskab",
   "Share this link in the Community tab": "Del dette link i fanen Fællesskab",
   "The Community tab: the project's own store, for its list, the sounds and voices you play or add, your votes and what you share.": "Fanen Fællesskab: projektets egen butik, til dens liste, de lyde og stemmer du afspiller eller tilføjer, dine stemmer og det, du deler.",
@@ -3754,5 +3751,6 @@
   "“{name}” speaks {language}, so this may take a while. Each sound is put into {language} first, in the background, and plays when it's ready.": "“{name}” taler {language}, så det kan tage et stykke tid. Hver lyd laves først om til {language} i baggrunden og afspilles, når den er klar.",
   "“{name}” speaks {language}, so this may take a while. The radio goes quiet while the translation starts, then you hear it in {language}, a few seconds behind.": "“{name}” taler {language}, så det kan tage et stykke tid. Radioen bliver stille, mens oversættelsen starter, og så hører du den på {language}, et par sekunder forsinket.",
   "“{name}” speaks {language}, so this may take a while. Your programs go quiet while the translation starts, then you hear them in {language}, a few seconds behind.": "“{name}” taler {language}, så det kan tage et stykke tid. Dine programmer bliver stille, mens oversættelsen starter, og så hører du dem på {language}, et par sekunder forsinket.",
-  "“{name}” speaks {language}, which needs speech recognition and the {language} download (Voice tab, Speak another language). The rest of it is on.": "“{name}” taler {language}, og det kræver talegenkendelse og downloaden af {language} (fanen Stemme, Tal et andet sprog). Resten af den er slået til."
+  "“{name}” speaks {language}, which needs speech recognition and the {language} download (Voice tab, Speak another language). The rest of it is on.": "“{name}” taler {language}, og det kræver talegenkendelse og downloaden af {language} (fanen Stemme, Tal et andet sprog). Resten af den er slået til.",
+  "Search sounds": "Søg i lyde"
 }

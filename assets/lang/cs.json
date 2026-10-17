@@ -3564,7 +3564,6 @@
   "Nothing matches": "Nic nenalezeno",
   "Pick a file, name it and tick the box first": "Nejdřív vyber soubor, pojmenuj ho a zaškrtni políčko",
   "Report this sound": "Nahlásit tento zvuk",
-  "Search the store": "Hledat v obchodě",
   "Share": "Sdílet",
   "Share a sound": "Sdílet zvuk",
   "Share a sound with everyone": "Sdílej zvuk se všemi",
@@ -3815,10 +3814,8 @@
   "You have the most AI voices of your own there can be: delete one first.": "Máš už nejvíc vlastních hlasů AI, kolik může být: nejdřív jeden smaž.",
   "You have the most saved voices there can be: delete one first.": "Máš už nejvíc uložených hlasů, kolik může být: nejdřív jeden smaž.",
   "You're hearing it without its AI voice: get AI voices (Voice tab → AI voices) to hear all of it.": "Slyšíš ho bez jeho hlasu AI: stáhni hlasy AI (karta Hlas → hlasy AI), abys slyšel všechno.",
-  "Voices people made, picked by everyone's votes.": "Hlasy, které lidé vytvořili, vybrané hlasy všech.",
   "Sounds and voices other players shared, voted on: add them, or share your own.": "Zvuky a hlasy, které sdíleli jiní hráči, s hlasováním: přidej si je, nebo sdílej své.",
   "Sounds and voices players share, voted on by everyone: add them or share your own": "Zvuky a hlasy, které hráči sdílejí a všichni hodnotí: přidej si je, nebo sdílej své",
-  "Sounds players share, picked by everyone's votes.": "Zvuky, které hráči sdílejí, vybrané hlasy všech.",
   "Community": "Komunita",
   "Share this link in the Community tab": "Sdílet tento odkaz v záložce Komunita",
   "The Community tab: the project's own store, for its list, the sounds and voices you play or add, your votes and what you share.": "Záložka Komunita: vlastní obchod projektu, pro jeho seznam, zvuky a hlasy, které přehráváš nebo přidáváš, tvé hlasy a to, co sdílíš.",
@@ -3832,5 +3829,6 @@
   "“{name}” speaks {language}, so this may take a while. Each sound is put into {language} first, in the background, and plays when it's ready.": "„{name}“ mluví jazykem {language}, takže to může chvíli trvat. Každý zvuk se nejdřív na pozadí převede do jazyka {language} a přehraje se, až bude hotový.",
   "“{name}” speaks {language}, so this may take a while. The radio goes quiet while the translation starts, then you hear it in {language}, a few seconds behind.": "„{name}“ mluví jazykem {language}, takže to může chvíli trvat. Rádio ztichne, než se spustí překlad, a pak ho uslyšíš v jazyce {language}, o pár sekund později.",
   "“{name}” speaks {language}, so this may take a while. Your programs go quiet while the translation starts, then you hear them in {language}, a few seconds behind.": "„{name}“ mluví jazykem {language}, takže to může chvíli trvat. Tvoje programy ztichnou, než se spustí překlad, a pak je uslyšíš v jazyce {language}, o pár sekund později.",
-  "“{name}” speaks {language}, which needs speech recognition and the {language} download (Voice tab, Speak another language). The rest of it is on.": "„{name}“ mluví jazykem {language}, k čemuž je potřeba rozpoznávání řeči a stažení jazyka {language} (karta Hlas, Mluvte jiným jazykem). Zbytek je zapnutý."
+  "“{name}” speaks {language}, which needs speech recognition and the {language} download (Voice tab, Speak another language). The rest of it is on.": "„{name}“ mluví jazykem {language}, k čemuž je potřeba rozpoznávání řeči a stažení jazyka {language} (karta Hlas, Mluvte jiným jazykem). Zbytek je zapnutý.",
+  "Search sounds": "Hledat zvuky"
 }

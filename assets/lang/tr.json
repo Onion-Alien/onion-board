@@ -3487,7 +3487,6 @@
   "Nothing matches": "Sonuç yok",
   "Pick a file, name it and tick the box first": "Önce bir dosya seç, ad ver ve kutuyu işaretle",
   "Report this sound": "Bu sesi bildir",
-  "Search the store": "Mağazada ara",
   "Share": "Paylaş",
   "Share a sound": "Ses paylaş",
   "Share a sound with everyone": "Herkesle bir ses paylaş",
@@ -3737,10 +3736,8 @@
   "You have the most AI voices of your own there can be: delete one first.": "Olabilecek en fazla kendi yapay zeka sesine sahipsin: önce birini sil.",
   "You have the most saved voices there can be: delete one first.": "Olabilecek en fazla kayıtlı sese sahipsin: önce birini sil.",
   "You're hearing it without its AI voice: get AI voices (Voice tab → AI voices) to hear all of it.": "Onu yapay zeka sesi olmadan duyuyorsun: hepsini duymak için yapay zeka seslerini al (Ses sekmesi → Yapay zeka sesleri).",
-  "Voices people made, picked by everyone's votes.": "İnsanların yaptığı sesler, herkesin oylarıyla seçildi.",
   "Sounds and voices other players shared, voted on: add them, or share your own.": "Diğer oyuncuların paylaşıp oyladığı sesler ve ses efektleri: ekle ya da kendininkini paylaş.",
   "Sounds and voices players share, voted on by everyone: add them or share your own": "Oyuncuların paylaştığı, herkesin oyladığı sesler ve ses efektleri: ekle ya da kendininkini paylaş",
-  "Sounds players share, picked by everyone's votes.": "Oyuncuların paylaştığı sesler, herkesin oylarıyla seçildi.",
   "Community": "Topluluk",
   "Share this link in the Community tab": "Bu bağlantıyı Topluluk sekmesinde paylaş",
   "The Community tab: the project's own store, for its list, the sounds and voices you play or add, your votes and what you share.": "Topluluk sekmesi: projenin kendi mağazası; listesi, çaldığın veya eklediğin sesler, oyların ve paylaştıkların için.",
@@ -3754,5 +3751,6 @@
   "“{name}” speaks {language}, so this may take a while. Each sound is put into {language} first, in the background, and plays when it's ready.": "“{name}” {language} konuşuyor, bu yüzden bu biraz sürebilir. Her ses önce arka planda {language} diline çevrilir ve hazır olunca çalar.",
   "“{name}” speaks {language}, so this may take a while. The radio goes quiet while the translation starts, then you hear it in {language}, a few seconds behind.": "“{name}” {language} konuşuyor, bu yüzden bu biraz sürebilir. Çeviri başlarken radyo susar, sonra onu birkaç saniye geriden {language} dilinde duyarsın.",
   "“{name}” speaks {language}, so this may take a while. Your programs go quiet while the translation starts, then you hear them in {language}, a few seconds behind.": "“{name}” {language} konuşuyor, bu yüzden bu biraz sürebilir. Çeviri başlarken programların susar, sonra onları birkaç saniye geriden {language} dilinde duyarsın.",
-  "“{name}” speaks {language}, which needs speech recognition and the {language} download (Voice tab, Speak another language). The rest of it is on.": "“{name}” {language} konuşuyor; bunun için konuşma tanıma ve {language} indirmesi gerekir (Ses sekmesi, Başka bir dil konuşun). Geri kalanı açık."
+  "“{name}” speaks {language}, which needs speech recognition and the {language} download (Voice tab, Speak another language). The rest of it is on.": "“{name}” {language} konuşuyor; bunun için konuşma tanıma ve {language} indirmesi gerekir (Ses sekmesi, Başka bir dil konuşun). Geri kalanı açık.",
+  "Search sounds": "Ses ara"
 }

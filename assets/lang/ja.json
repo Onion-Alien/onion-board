@@ -3410,7 +3410,6 @@
   "Nothing matches": "見つかりません",
   "Pick a file, name it and tick the box first": "先にファイルを選び、名前をつけて、チェックを入れてください",
   "Report this sound": "このサウンドを報告",
-  "Search the store": "ストアを検索",
   "Share": "共有",
   "Share a sound": "サウンドを共有",
   "Share a sound with everyone": "サウンドをみんなと共有",
@@ -3659,10 +3658,8 @@
   "You have the most AI voices of your own there can be: delete one first.": "自分のAIの声はもう上限です：先にひとつ削除してください。",
   "You have the most saved voices there can be: delete one first.": "保存した声はもう上限です：先にひとつ削除してください。",
   "You're hearing it without its AI voice: get AI voices (Voice tab → AI voices) to hear all of it.": "AIの声なしで聞いています：全部聞くにはAIの声を入れてください（ボイスタブ → AIの声）。",
-  "Voices people made, picked by everyone's votes.": "みんなが作った声。みんなの投票で選ばれています。",
   "Sounds and voices other players shared, voted on: add them, or share your own.": "ほかのプレイヤーが共有して投票したサウンドと声。追加するか、自分のものを共有しよう。",
   "Sounds and voices players share, voted on by everyone: add them or share your own": "プレイヤーが共有し、みんなが投票したサウンドと声。追加するか、自分のものを共有しよう",
-  "Sounds players share, picked by everyone's votes.": "プレイヤーが共有したサウンド。みんなの投票で選ばれています。",
   "Community": "コミュニティ",
   "Share this link in the Community tab": "このリンクをコミュニティタブで共有",
   "The Community tab: the project's own store, for its list, the sounds and voices you play or add, your votes and what you share.": "コミュニティタブ：このプロジェクト独自のストア。一覧、再生・追加したサウンドと声、あなたの投票、共有したもののために使います。",
@@ -3676,5 +3673,6 @@
   "“{name}” speaks {language}, so this may take a while. Each sound is put into {language} first, in the background, and plays when it's ready.": "「{name}」は{language}を話すので、少し時間がかかることがあります。各サウンドはまずバックグラウンドで{language}にされ、準備ができたら再生されます。",
   "“{name}” speaks {language}, so this may take a while. The radio goes quiet while the translation starts, then you hear it in {language}, a few seconds behind.": "「{name}」は{language}を話すので、少し時間がかかることがあります。翻訳が始まるまでラジオは無音になり、その後数秒遅れて{language}で聞こえます。",
   "“{name}” speaks {language}, so this may take a while. Your programs go quiet while the translation starts, then you hear them in {language}, a few seconds behind.": "「{name}」は{language}を話すので、少し時間がかかることがあります。翻訳が始まるまでプログラムは無音になり、その後数秒遅れて{language}で聞こえます。",
-  "“{name}” speaks {language}, which needs speech recognition and the {language} download (Voice tab, Speak another language). The rest of it is on.": "「{name}」は{language}を話しますが、それには音声認識と{language}のダウンロードが必要です（ボイスタブの「別の言語を話しましょう」）。残りの部分はオンです。"
+  "“{name}” speaks {language}, which needs speech recognition and the {language} download (Voice tab, Speak another language). The rest of it is on.": "「{name}」は{language}を話しますが、それには音声認識と{language}のダウンロードが必要です（ボイスタブの「別の言語を話しましょう」）。残りの部分はオンです。",
+  "Search sounds": "サウンドを検索"
 }

@@ -3410,7 +3410,6 @@
   "Nothing matches": "ไม่พบอะไร",
   "Pick a file, name it and tick the box first": "เลือกไฟล์ ตั้งชื่อ และติ๊กช่องก่อน",
   "Report this sound": "รายงานเสียงนี้",
-  "Search the store": "ค้นหาในร้าน",
   "Share": "แชร์",
   "Share a sound": "แชร์เสียง",
   "Share a sound with everyone": "แชร์เสียงให้ทุกคน",
@@ -3659,10 +3658,8 @@
   "You have the most AI voices of your own there can be: delete one first.": "คุณมีเสียงเอไอของตัวเองครบจำนวนแล้ว: ลบออกหนึ่งอันก่อน",
   "You have the most saved voices there can be: delete one first.": "คุณมีเสียงที่บันทึกไว้ครบจำนวนแล้ว: ลบออกหนึ่งอันก่อน",
   "You're hearing it without its AI voice: get AI voices (Voice tab → AI voices) to hear all of it.": "คุณกำลังฟังโดยไม่มีเสียงเอไอ: ติดตั้งเสียงเอไอ (แท็บเสียง → เสียงเอไอ) เพื่อฟังทั้งหมด",
-  "Voices people made, picked by everyone's votes.": "เสียงที่ทุกคนสร้าง คัดเลือกจากโหวตของทุกคน",
   "Sounds and voices other players shared, voted on: add them, or share your own.": "เสียงและเสียงพูดที่ผู้เล่นคนอื่นแชร์และโหวต: เพิ่มเลย หรือแชร์ของคุณเอง",
   "Sounds and voices players share, voted on by everyone: add them or share your own": "เสียงและเสียงพูดที่ผู้เล่นแชร์ ทุกคนโหวต: เพิ่มเลย หรือแชร์ของคุณเอง",
-  "Sounds players share, picked by everyone's votes.": "เสียงที่ผู้เล่นแชร์ คัดเลือกจากโหวตของทุกคน",
   "Community": "ชุมชน",
   "Share this link in the Community tab": "แชร์ลิงก์นี้ในแท็บชุมชน",
   "The Community tab: the project's own store, for its list, the sounds and voices you play or add, your votes and what you share.": "แท็บชุมชน: ร้านค้าของโปรเจกต์เอง ใช้สำหรับรายการ เสียงและเสียงพูดที่คุณเล่นหรือเพิ่ม โหวตของคุณ และสิ่งที่คุณแชร์",
@@ -3676,5 +3673,6 @@
   "“{name}” speaks {language}, so this may take a while. Each sound is put into {language} first, in the background, and plays when it's ready.": "“{name}” พูด{language} จึงอาจใช้เวลาสักพัก แต่ละเสียงจะถูกแปลงเป็น{language}ก่อนในเบื้องหลัง แล้วเล่นเมื่อพร้อม",
   "“{name}” speaks {language}, so this may take a while. The radio goes quiet while the translation starts, then you hear it in {language}, a few seconds behind.": "“{name}” พูด{language} จึงอาจใช้เวลาสักพัก วิทยุจะเงียบระหว่างที่การแปลเริ่ม จากนั้นคุณจะได้ยินเป็น{language} ช้ากว่าไม่กี่วินาที",
   "“{name}” speaks {language}, so this may take a while. Your programs go quiet while the translation starts, then you hear them in {language}, a few seconds behind.": "“{name}” พูด{language} จึงอาจใช้เวลาสักพัก โปรแกรมของคุณจะเงียบระหว่างที่การแปลเริ่ม จากนั้นคุณจะได้ยินเป็น{language} ช้ากว่าไม่กี่วินาที",
-  "“{name}” speaks {language}, which needs speech recognition and the {language} download (Voice tab, Speak another language). The rest of it is on.": "“{name}” พูด{language} ซึ่งต้องใช้การรู้จำเสียงพูดและการดาวน์โหลด{language} (แท็บเสียง, พูดภาษาอื่น) ส่วนที่เหลือเปิดอยู่"
+  "“{name}” speaks {language}, which needs speech recognition and the {language} download (Voice tab, Speak another language). The rest of it is on.": "“{name}” พูด{language} ซึ่งต้องใช้การรู้จำเสียงพูดและการดาวน์โหลด{language} (แท็บเสียง, พูดภาษาอื่น) ส่วนที่เหลือเปิดอยู่",
+  "Search sounds": "ค้นหาเสียง"
 }

@@ -3564,7 +3564,6 @@
   "Nothing matches": "Nimic găsit",
   "Pick a file, name it and tick the box first": "Întâi alege un fișier, dă-i un nume și bifează căsuța",
   "Report this sound": "Raportează acest sunet",
-  "Search the store": "Caută în magazin",
   "Share": "Distribuie",
   "Share a sound": "Distribuie un sunet",
   "Share a sound with everyone": "Distribuie un sunet cu toată lumea",
@@ -3815,10 +3814,8 @@
   "You have the most AI voices of your own there can be: delete one first.": "Ai deja numărul maxim de voci AI proprii: șterge întâi una.",
   "You have the most saved voices there can be: delete one first.": "Ai deja numărul maxim de voci salvate: șterge întâi una.",
   "You're hearing it without its AI voice: get AI voices (Voice tab → AI voices) to hear all of it.": "O auzi fără vocea ei AI: ia vocile AI (fila Voce → voci AI) ca s-o auzi întreagă.",
-  "Voices people made, picked by everyone's votes.": "Voci făcute de oameni, alese prin voturile tuturor.",
   "Sounds and voices other players shared, voted on: add them, or share your own.": "Sunete și voci distribuite și votate de alți jucători: adaugă-le sau distribuie-le pe ale tale.",
   "Sounds and voices players share, voted on by everyone: add them or share your own": "Sunete și voci pe care le distribuie jucătorii, votate de toți: adaugă-le sau distribuie-le pe ale tale",
-  "Sounds players share, picked by everyone's votes.": "Sunete distribuite de jucători, alese prin voturile tuturor.",
   "Community": "Comunitate",
   "Share this link in the Community tab": "Distribuie acest link în fila Comunitate",
   "The Community tab: the project's own store, for its list, the sounds and voices you play or add, your votes and what you share.": "Fila Comunitate: magazinul propriu al proiectului, pentru lista lui, sunetele și vocile pe care le redai sau le adaugi, voturile tale și ce distribui.",
@@ -3832,5 +3829,6 @@
   "“{name}” speaks {language}, so this may take a while. Each sound is put into {language} first, in the background, and plays when it's ready.": "„{name}” vorbește {language}, așa că poate dura puțin. Fiecare sunet e trecut mai întâi în {language}, în fundal, și pornește când e gata.",
   "“{name}” speaks {language}, so this may take a while. The radio goes quiet while the translation starts, then you hear it in {language}, a few seconds behind.": "„{name}” vorbește {language}, așa că poate dura puțin. Radioul tace cât pornește traducerea, apoi îl auzi în {language}, cu câteva secunde întârziere.",
   "“{name}” speaks {language}, so this may take a while. Your programs go quiet while the translation starts, then you hear them in {language}, a few seconds behind.": "„{name}” vorbește {language}, așa că poate dura puțin. Programele tale tac cât pornește traducerea, apoi le auzi în {language}, cu câteva secunde întârziere.",
-  "“{name}” speaks {language}, which needs speech recognition and the {language} download (Voice tab, Speak another language). The rest of it is on.": "„{name}” vorbește {language}, ceea ce cere recunoașterea vorbirii și descărcarea pentru {language} (fila Voce, Vorbește altă limbă). Restul e pornit."
+  "“{name}” speaks {language}, which needs speech recognition and the {language} download (Voice tab, Speak another language). The rest of it is on.": "„{name}” vorbește {language}, ceea ce cere recunoașterea vorbirii și descărcarea pentru {language} (fila Voce, Vorbește altă limbă). Restul e pornit.",
+  "Search sounds": "Caută sunete"
 }

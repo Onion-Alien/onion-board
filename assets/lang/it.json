@@ -3487,7 +3487,6 @@
   "Nothing matches": "Nessun risultato",
   "Pick a file, name it and tick the box first": "Prima scegli un file, dagli un nome e spunta la casella",
   "Report this sound": "Segnala questo suono",
-  "Search the store": "Cerca nello store",
   "Share": "Condividi",
   "Share a sound": "Condividi un suono",
   "Share a sound with everyone": "Condividi un suono con tutti",
@@ -3737,10 +3736,8 @@
   "You have the most AI voices of your own there can be: delete one first.": "Hai già il massimo di voci dell'IA tue: prima eliminane una.",
   "You have the most saved voices there can be: delete one first.": "Hai già il massimo di voci salvate: prima eliminane una.",
   "You're hearing it without its AI voice: get AI voices (Voice tab → AI voices) to hear all of it.": "La stai sentendo senza la sua voce dell'IA: scarica le voci dell'IA (scheda Voce → Voci dell'IA) per sentirla tutta.",
-  "Voices people made, picked by everyone's votes.": "Voci create dalla gente, scelte dai voti di tutti.",
   "Sounds and voices other players shared, voted on: add them, or share your own.": "Suoni e voci condivisi e votati da altri giocatori: aggiungili o condividi i tuoi.",
   "Sounds and voices players share, voted on by everyone: add them or share your own": "Suoni e voci che i giocatori condividono, votati da tutti: aggiungili o condividi i tuoi",
-  "Sounds players share, picked by everyone's votes.": "Suoni condivisi dai giocatori, scelti dai voti di tutti.",
   "Community": "Community",
   "Share this link in the Community tab": "Condividi questo link nella scheda Community",
   "The Community tab: the project's own store, for its list, the sounds and voices you play or add, your votes and what you share.": "La scheda Community: lo store del progetto, per il suo elenco, i suoni e le voci che riproduci o aggiungi, i tuoi voti e ciò che condividi.",
@@ -3754,5 +3751,6 @@
   "“{name}” speaks {language}, so this may take a while. Each sound is put into {language} first, in the background, and plays when it's ready.": "“{name}” parla {language}, quindi potrebbe volerci un po'. Ogni suono viene prima portato in {language}, in background, e parte quando è pronto.",
   "“{name}” speaks {language}, so this may take a while. The radio goes quiet while the translation starts, then you hear it in {language}, a few seconds behind.": "“{name}” parla {language}, quindi potrebbe volerci un po'. La radio tace mentre parte la traduzione, poi la senti in {language}, con qualche secondo di ritardo.",
   "“{name}” speaks {language}, so this may take a while. Your programs go quiet while the translation starts, then you hear them in {language}, a few seconds behind.": "“{name}” parla {language}, quindi potrebbe volerci un po'. I tuoi programmi tacciono mentre parte la traduzione, poi li senti in {language}, con qualche secondo di ritardo.",
-  "“{name}” speaks {language}, which needs speech recognition and the {language} download (Voice tab, Speak another language). The rest of it is on.": "“{name}” parla {language}, e per questo servono il riconoscimento vocale e il download di {language} (scheda Voce, Parla un'altra lingua). Il resto è attivo."
+  "“{name}” speaks {language}, which needs speech recognition and the {language} download (Voice tab, Speak another language). The rest of it is on.": "“{name}” parla {language}, e per questo servono il riconoscimento vocale e il download di {language} (scheda Voce, Parla un'altra lingua). Il resto è attivo.",
+  "Search sounds": "Cerca suoni"
 }

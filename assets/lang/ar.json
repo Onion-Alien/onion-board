@@ -3795,7 +3795,6 @@
   "Nothing matches": "لا نتائج",
   "Pick a file, name it and tick the box first": "اختر ملفًا وسمِّه وضع علامة في المربع أولًا",
   "Report this sound": "أبلغ عن هذا الصوت",
-  "Search the store": "ابحث في المتجر",
   "Share": "شارك",
   "Share a sound": "شارك صوتًا",
   "Share a sound with everyone": "شارك صوتًا مع الجميع",
@@ -4049,10 +4048,8 @@
   "You have the most AI voices of your own there can be: delete one first.": "لديك أكبر عدد ممكن من أصوات الذكاء الاصطناعي الخاصة بك: احذف واحدًا أولًا.",
   "You have the most saved voices there can be: delete one first.": "لديك أكبر عدد ممكن من الأصوات المحفوظة: احذف واحدًا أولًا.",
   "You're hearing it without its AI voice: get AI voices (Voice tab → AI voices) to hear all of it.": "أنت تسمعه بدون صوت الذكاء الاصطناعي الخاص به: احصل على أصوات الذكاء الاصطناعي (تبويب الصوت ← أصوات الذكاء الاصطناعي) لتسمعه كاملًا.",
-  "Voices people made, picked by everyone's votes.": "أصوات صنعها الناس، يختارها الجميع بتصويتهم.",
   "Sounds and voices other players shared, voted on: add them, or share your own.": "أصوات ومؤثرات صوتية شاركها لاعبون آخرون وصوّتوا عليها: أضفها أو شارك ما لديك.",
   "Sounds and voices players share, voted on by everyone: add them or share your own": "أصوات ومؤثرات صوتية يشاركها اللاعبون ويصوّت عليها الجميع: أضفها أو شارك ما لديك",
-  "Sounds players share, picked by everyone's votes.": "أصوات يشاركها اللاعبون، يختارها الجميع بتصويتهم.",
   "Community": "المجتمع",
   "Share this link in the Community tab": "شارك هذا الرابط في تبويب المجتمع",
   "The Community tab: the project's own store, for its list, the sounds and voices you play or add, your votes and what you share.": "تبويب المجتمع: متجر المشروع الخاص، لقائمته والأصوات التي تشغّلها أو تضيفها، وتصويتك وما تشاركه.",
@@ -4066,5 +4063,6 @@
   "“{name}” speaks {language}, so this may take a while. Each sound is put into {language} first, in the background, and plays when it's ready.": "“{name}” يتكلم {language}، لذا قد يستغرق هذا بعض الوقت. يُحوَّل كل صوت إلى {language} أولًا في الخلفية، ويُشغَّل عندما يجهز.",
   "“{name}” speaks {language}, so this may take a while. The radio goes quiet while the translation starts, then you hear it in {language}, a few seconds behind.": "“{name}” يتكلم {language}، لذا قد يستغرق هذا بعض الوقت. يصمت الراديو ريثما تبدأ الترجمة، ثم تسمعه بـ{language} متأخرًا بضع ثوانٍ.",
   "“{name}” speaks {language}, so this may take a while. Your programs go quiet while the translation starts, then you hear them in {language}, a few seconds behind.": "“{name}” يتكلم {language}، لذا قد يستغرق هذا بعض الوقت. تصمت برامجك ريثما تبدأ الترجمة، ثم تسمعها بـ{language} متأخرة بضع ثوانٍ.",
-  "“{name}” speaks {language}, which needs speech recognition and the {language} download (Voice tab, Speak another language). The rest of it is on.": "“{name}” يتكلم {language}، وهذا يحتاج إلى التعرّف على الكلام وتنزيل {language} (تبويب الصوت، تحدّث بلغة أخرى). باقي الإعداد مُفعَّل."
+  "“{name}” speaks {language}, which needs speech recognition and the {language} download (Voice tab, Speak another language). The rest of it is on.": "“{name}” يتكلم {language}، وهذا يحتاج إلى التعرّف على الكلام وتنزيل {language} (تبويب الصوت، تحدّث بلغة أخرى). باقي الإعداد مُفعَّل.",
+  "Search sounds": "ابحث في الأصوات"
 }

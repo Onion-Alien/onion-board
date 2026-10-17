@@ -3487,7 +3487,6 @@
   "Nothing matches": "Nichts gefunden",
   "Pick a file, name it and tick the box first": "Wähle zuerst eine Datei, gib ihr einen Namen und setze das Häkchen",
   "Report this sound": "Diesen Sound melden",
-  "Search the store": "Im Store suchen",
   "Share": "Teilen",
   "Share a sound": "Sound teilen",
   "Share a sound with everyone": "Teile einen Sound mit allen",
@@ -3737,10 +3736,8 @@
   "You have the most AI voices of your own there can be: delete one first.": "Du hast schon die meisten eigenen KI-Stimmen, die es geben kann: Lösch zuerst eine.",
   "You have the most saved voices there can be: delete one first.": "Du hast schon die meisten gespeicherten Stimmen, die es geben kann: Lösch zuerst eine.",
   "You're hearing it without its AI voice: get AI voices (Voice tab → AI voices) to hear all of it.": "Du hörst sie ohne ihre KI-Stimme: Hol dir KI-Stimmen (Stimme-Tab → KI-Stimmen), um alles zu hören.",
-  "Voices people made, picked by everyone's votes.": "Stimmen, die Leute gemacht haben, ausgewählt durch die Stimmen aller.",
   "Sounds and voices other players shared, voted on: add them, or share your own.": "Sounds und Stimmen, die andere Spieler geteilt und bewertet haben: füge sie hinzu oder teile deine eigenen.",
   "Sounds and voices players share, voted on by everyone: add them or share your own": "Sounds und Stimmen, die Spieler teilen und alle bewerten: füge sie hinzu oder teile deine eigenen",
-  "Sounds players share, picked by everyone's votes.": "Sounds, die Spieler teilen, ausgewählt durch die Stimmen aller.",
   "Community": "Community",
   "Share this link in the Community tab": "Diesen Link im Tab Community teilen",
   "The Community tab: the project's own store, for its list, the sounds and voices you play or add, your votes and what you share.": "Der Tab Community: der eigene Store des Projekts, für seine Liste, die Sounds und Stimmen, die du abspielst oder hinzufügst, deine Bewertungen und was du teilst.",
@@ -3754,5 +3751,6 @@
   "“{name}” speaks {language}, so this may take a while. Each sound is put into {language} first, in the background, and plays when it's ready.": "„{name}“ spricht {language}, das kann also etwas dauern. Jeder Sound wird zuerst im Hintergrund auf {language} gebracht und spielt, sobald er fertig ist.",
   "“{name}” speaks {language}, so this may take a while. The radio goes quiet while the translation starts, then you hear it in {language}, a few seconds behind.": "„{name}“ spricht {language}, das kann also etwas dauern. Das Radio ist still, während die Übersetzung startet, dann hörst du es auf {language}, ein paar Sekunden später.",
   "“{name}” speaks {language}, so this may take a while. Your programs go quiet while the translation starts, then you hear them in {language}, a few seconds behind.": "„{name}“ spricht {language}, das kann also etwas dauern. Deine Programme sind still, während die Übersetzung startet, dann hörst du sie auf {language}, ein paar Sekunden später.",
-  "“{name}” speaks {language}, which needs speech recognition and the {language} download (Voice tab, Speak another language). The rest of it is on.": "„{name}“ spricht {language}. Dafür braucht es die Spracherkennung und den Download für {language} (Tab Stimme, Eine andere Sprache sprechen). Der Rest davon ist an."
+  "“{name}” speaks {language}, which needs speech recognition and the {language} download (Voice tab, Speak another language). The rest of it is on.": "„{name}“ spricht {language}. Dafür braucht es die Spracherkennung und den Download für {language} (Tab Stimme, Eine andere Sprache sprechen). Der Rest davon ist an.",
+  "Search sounds": "Sounds suchen"
 }

@@ -3487,7 +3487,6 @@
   "Nothing matches": "Нищо не е намерено",
   "Pick a file, name it and tick the box first": "Първо избери файл, дай му име и отметни полето",
   "Report this sound": "Докладвай този звук",
-  "Search the store": "Търси в магазина",
   "Share": "Сподели",
   "Share a sound": "Сподели звук",
   "Share a sound with everyone": "Сподели звук с всички",
@@ -3737,10 +3736,8 @@
   "You have the most AI voices of your own there can be: delete one first.": "Вече имаш възможно най-много свои AI гласове: първо изтрий един.",
   "You have the most saved voices there can be: delete one first.": "Вече имаш възможно най-много запазени гласове: първо изтрий един.",
   "You're hearing it without its AI voice: get AI voices (Voice tab → AI voices) to hear all of it.": "Чуваш го без неговия AI глас: вземи AI гласовете (раздел Глас → AI гласове), за да го чуеш целия.",
-  "Voices people made, picked by everyone's votes.": "Гласове, направени от хората, избрани с гласовете на всички.",
   "Sounds and voices other players shared, voted on: add them, or share your own.": "Звуци и гласове, споделени от други играчи, с гласувания: добави ги или сподели свои.",
   "Sounds and voices players share, voted on by everyone: add them or share your own": "Звуци и гласове, които играчите споделят, гласувани от всички: добави ги или сподели свои",
-  "Sounds players share, picked by everyone's votes.": "Звуци, които играчите споделят, избрани с гласовете на всички.",
   "Community": "Общност",
   "Share this link in the Community tab": "Сподели този линк в раздела Общност",
   "The Community tab: the project's own store, for its list, the sounds and voices you play or add, your votes and what you share.": "Разделът Общност: собственият магазин на проекта, за списъка му, звуците и гласовете, които пускаш или добавяш, гласовете ти и това, което споделяш.",
@@ -3754,5 +3751,6 @@
   "“{name}” speaks {language}, so this may take a while. Each sound is put into {language} first, in the background, and plays when it's ready.": "„{name}“ говори на {language}, така че това може да отнеме време. Всеки звук първо се превежда на {language} във фонов режим и се пуска, когато е готов.",
   "“{name}” speaks {language}, so this may take a while. The radio goes quiet while the translation starts, then you hear it in {language}, a few seconds behind.": "„{name}“ говори на {language}, така че това може да отнеме време. Радиото замлъква, докато преводът започне, после го чуваш на {language}, с няколко секунди закъснение.",
   "“{name}” speaks {language}, so this may take a while. Your programs go quiet while the translation starts, then you hear them in {language}, a few seconds behind.": "„{name}“ говори на {language}, така че това може да отнеме време. Програмите ти замлъкват, докато преводът започне, после ги чуваш на {language}, с няколко секунди закъснение.",
-  "“{name}” speaks {language}, which needs speech recognition and the {language} download (Voice tab, Speak another language). The rest of it is on.": "„{name}“ говори на {language}, а за това трябват разпознаване на реч и изтеглянето за {language} (раздел Глас, Говорете друг език). Останалото от него е включено."
+  "“{name}” speaks {language}, which needs speech recognition and the {language} download (Voice tab, Speak another language). The rest of it is on.": "„{name}“ говори на {language}, а за това трябват разпознаване на реч и изтеглянето за {language} (раздел Глас, Говорете друг език). Останалото от него е включено.",
+  "Search sounds": "Търси звуци"
 }
