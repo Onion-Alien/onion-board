@@ -28,6 +28,14 @@ CAT_EMOJI = {"memes": "😂", "reactions": "😮", "games": "🎮", "movies": "�
 FALLBACK = "🔊"
 # a community voice's kind (the Store's Voices) -> its tile's emoji when it has none
 KIND_EMOJI = {"fx": "🎭", "ai": "🤖", "setup": "🎛️"}
+# the Category dropdown's line icons (icons.SHAPES): a category's, a voice kind's, and
+# "All categories"
+CAT_ICON = {"memes": "laugh", "reactions": "wow", "games": "gamepad", "movies": "clapper",
+            "tv": "tv", "music": "music", "sports": "ball", "viral": "flame",
+            "pranks": "wink", "politics": "columns", "streamer": "live", "esports": "trophy",
+            "podcast": "mic", "spooky": "ghost"}
+KIND_ICON = {"fx": "voice", "ai": "robot", "setup": "setup"}
+ALL_ICON = "sounds"
 
 # words in a sound's name or tags -> its emoji; the first that matches wins, so the
 # more telling words come first ("tavern crowd" is a tavern, not applause)
@@ -249,18 +257,6 @@ def make_bun(height: int = 62) -> BunnyWidget:
     bun.setCursor(Qt.CursorShape.PointingHandCursor)
     return bun
 
-
-def emoji_icon(emoji: str, size: int = 16):
-    """An emoji as a button's icon (a category chip's), drawn at 2x for a sharp edge."""
-    from PySide6.QtGui import QIcon, QPixmap
-    pm = QPixmap(size * 2, size * 2)
-    pm.setDevicePixelRatio(2.0)
-    pm.fill(Qt.GlobalColor.transparent)
-    p = QPainter(pm)
-    p.setFont(emoji_font(round(size * 0.9)))
-    p.drawText(QRectF(0, 0, size, size), Qt.AlignmentFlag.AlignCenter, emoji)
-    p.end()
-    return QIcon(pm)
 
 
 def fits(w: int, h: int) -> bool:
