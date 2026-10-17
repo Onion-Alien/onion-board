@@ -367,7 +367,7 @@ def draw_bunny(p: QPainter, rect: QRectF, prop: str | None = None, *,
                nightcap: bool = False, robot: bool = False, smug: bool = False,
                outfit: tuple[str, ...] | None = None, led: float = 0.0,
                nod: float = 0.0, dip: float = 0.0, look: float = 0.0,
-               kit: dict | None = None, wave: float | None = None):
+               kit: dict | None = None, wave: float | None = None, kick: float = 0.0):
     """Draw Bun fitted (aspect kept, centred) into `rect`. The keywords pose Bun for
     animation (ui/bunnywidget.py): `blink` 0..1 closes the eyes, `mouth` 0..1 opens
     the mouth (talking), `ears` tilts both ears outward by that many degrees,
@@ -385,6 +385,8 @@ def draw_bunny(p: QPainter, rect: QRectF, prop: str | None = None, *,
     a nod to the beat, a curious tilt. `look` -1..1 turns his eyes left / right.
     `wave` -1..1 (None: not waving): his right paw (the viewer's) up by his cheek,
     swung that far from side to side: hello! (only with no prop).
+    `kick` -1..1 moves his left foot (the viewer's right): back under him (-1), out in
+    front, lifted, toes up (1): a sulky kick at the ground.
     `kit`: his look (bunnyfit.look: fur, floppy ears, extras, tail, eye / ear / nose
     colours, markings, belly, pads; None: the current theme's)."""
     fit = () if robot else bunnyfit.outfit() if outfit is None else outfit
@@ -566,10 +568,14 @@ def draw_bunny(p: QPainter, rect: QRectF, prop: str | None = None, *,
     _ellipse(p, 50, 105, 28, 21, belly)   # tummy patch
     pads = QColor(kit["pads"]) if kit["pads"] and not robot else None
     for x, a in ((36.5, 9), (63.5, -9)):   # his feet, poking out front, turned out a bit
-        _ellipse(p, x, 114.6, 16, 8.6, fur, ink, a)
+        y = 114.6
+        if kick and x > 50:
+            x, y, a = (x + 14 * kick, y - 11 * kick, a - 45 * kick) if kick > 0 else (
+                x + 5 * kick, y + 3 * kick, a + 10 * kick)
+        _ellipse(p, x, y, 16, 8.6, fur, ink, a)
         if pads is not None:
             p.save()
-            p.translate(x, 114.6)
+            p.translate(x, y)
             p.rotate(a)
             _pads(p, pads)
             p.restore()

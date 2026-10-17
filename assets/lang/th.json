@@ -3732,5 +3732,8 @@
   "Effects on any voice": "เอฟเฟกต์บนเสียงไหนก็ได้",
   "Share your voices and setups with everyone, and get theirs.": "แชร์เสียงและการตั้งค่าของคุณให้ทุกคน แล้วรับของพวกเขามา",
   "The voice bar's Effects button puts rain, a crowd, a fire or a sound from your board behind your voice.": "ปุ่มเอฟเฟกต์ในแถบเสียงจะใส่เสียงฝน ฝูงชน กองไฟ หรือเสียงจากบอร์ดของคุณไว้ข้างหลังเสียงคุณ",
-  "Open Appearance": "เปิดหน้าตา"
+  "Open Appearance": "เปิดหน้าตา",
+  "Sorry, the store's down": "ขออภัย ร้านล่มอยู่",
+  "Sorry, the store's down. We're working on getting it back up.": "ขออภัย ร้านล่มอยู่ เรากำลังแก้ไขให้กลับมาใช้ได้",
+  "We're working on getting it back up. Try again in a bit.": "เรากำลังแก้ไขให้กลับมาใช้ได้ ลองอีกครั้งในอีกสักครู่"
 }

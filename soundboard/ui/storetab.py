@@ -37,6 +37,8 @@ LIST_GAP = 8                  # between the rows and the scroll bar (DESIGN.md, 
 CAT_W = 110                   # the table's Category column
 ADDED_W = 100                 # its Added column ("3 days ago")
 ONE_ROW = 720                 # a narrower tab puts the toolbar on two rows
+DOWN_BUN = 140                # the store-is-down page's Bun, px tall
+DOWN_ROOM = 380               # ... shown in a tab at least this tall
 
 
 def meta_line(s: store.Sound) -> str:
@@ -373,6 +375,13 @@ class StoreTab(QWidget):
         self.msg_icon = QLabel()
         self.msg_icon.setAlignment(Qt.AlignmentFlag.AlignCenter)
         mv.addWidget(self.msg_icon)
+        # the store's down: Bun, sad, kicking at the ground (in place of the icon)
+        from soundboard.ui.bunnywidget import BunnyWidget
+        self.msg_bun = BunnyWidget(height=DOWN_BUN, pad=18, sad=1.0)
+        self.msg_bun.sulk = True
+        self.msg_bun.setMinimumSize(1, 1)   # no say in the tab's minimum: hidden when short
+        self.msg_bun.hide()
+        mv.addWidget(self.msg_bun, 0, Qt.AlignmentFlag.AlignHCenter)
         self.msg_title = section_label("")
         self.msg_title.setAlignment(Qt.AlignmentFlag.AlignCenter)
         mv.addWidget(self.msg_title)
@@ -424,8 +433,16 @@ class StoreTab(QWidget):
 
     def resizeEvent(self, e):
         super().resizeEvent(e)
-        self.bun.setVisible(storelook.fits(self.width(), self.height()))   # (never raises)
+        self._fit_buns()
         self._fit_toolbar()
+
+    def _fit_buns(self):
+        """The banner's Bun when there's room (`fits`), never while the down page's Bun
+        is out; that one only when the tab has the height for him."""
+        down = getattr(self, "_down", False)
+        self.bun.setVisible(storelook.fits(self.width(), self.height()) and not down)
+        self.msg_bun.setVisible(down and self.height() >= DOWN_ROOM)
+        self.msg_icon.setVisible(not down)
 
     def eventFilter(self, obj, e):
         if e.type() == QEvent.Type.Resize and obj is self.list_area.viewport():
@@ -693,7 +710,12 @@ class StoreTab(QWidget):
 
     def _say(self, icon: str, title: str, text: str, button: str = "",
              do: Callable[[], object] | None = None):
-        self.msg_icon.setPixmap(icons.pixmap(icon, 44, icons.resolve("muted")))
+        """The page in place of the list: `icon` over a title, a line and a button.
+        icon "down": the store itself is down, and Bun kicks at the ground over it."""
+        self._down = icon == "down"
+        if not self._down:
+            self.msg_icon.setPixmap(icons.pixmap(icon, 44, icons.resolve("muted")))
+        self._fit_buns()
         # Bun's down when the store can't show anything, fine while it loads
         self.bun.sad = 0.0 if icon == "store" and not button else 0.7
         self.msg_title.setText(title)
@@ -748,20 +770,26 @@ class StoreTab(QWidget):
                     found, more = storevoices.browse(install, kind, sort, query, offset)
                 else:
                     found, more = store.browse(install, sort, query, offset, cat)
-                busy.emit(self._listed, serial, (replace, found), more, "")
+                busy.emit(self._listed, serial, (replace, found, False), more, "")
             except Exception as e:  # noqa: BLE001 - offline, switched off, the server…
                 log.info("couldn't read the store: %s", e)
-                busy.emit(self._listed, serial, (replace, None), False,
+                busy.emit(self._listed, serial,
+                          (replace, None, isinstance(e, store.StoreDown)), False,
                           str(e) if isinstance(e, store.StoreError) else errors.plain(e))
         threading.Thread(target=run, daemon=True, name="store-list").start()
 
     def _on_listed(self, serial: int, got, more: bool, err: str):
         if self._closed or serial != self._serial:
             return
-        replace, found = got
+        replace, found, down = got
         busy.set_busy(self.btn_more, False)
         if found is None:
-            if replace:
+            if replace and down:
+                self._clear()
+                self._say("down", _("Sorry, the store's down"),
+                          _("We're working on getting it back up. Try again in a bit."),
+                          _("Try again"), self.reload)
+            elif replace:
                 self._clear()
                 self._say("warn", _("Couldn't open the store"), err, _("Try again"), self.reload)
             else:
@@ -799,6 +827,8 @@ class StoreTab(QWidget):
                           self.share)
             return
         self.bun.sad = 0.0
+        self._down = False
+        self._fit_buns()
         self.stack.setCurrentWidget(self.list_area)
         self.table_head.show()
         self._fit_columns()
