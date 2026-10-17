@@ -21,7 +21,7 @@ from soundboard import errors, library, net, store, usage
 from soundboard.engine import SR
 from soundboard.i18n import _
 from soundboard.ui import busy, fit, icons, storelook
-from soundboard.ui.panel import (Flow, HoverCard, hint_label, icon_button, info_button,
+from soundboard.ui.panel import (Flow, HoverCard, hint_label, icon_button,
                                  section_label)
 from soundboard.ui.ytsearch import ClampLabel
 
@@ -208,11 +208,6 @@ class StoreTab(QWidget):
         outer.addStretch(1)
         outer.addWidget(column, 100)
         outer.addStretch(1)
-        info = info_button(_("Sounds people share here are CC0: free for anyone to use for "
-                             "anything, no credit needed, and checked before they show up. "
-                             "Sounds from Myinstants are links: they play and download from "
-                             "that site. Vote for the ones you like so others find them."))
-        # (no hint line: the ⓘ says it, and the tab fits the smallest window)
         # still new: a green Beta tag right after the title
         beta = QLabel(_("Beta"))
         beta.setObjectName("pill")
@@ -239,7 +234,6 @@ class StoreTab(QWidget):
         self.title.setStyleSheet("font-size: 17pt; font-weight: 800; background: transparent;")
         title_row.addWidget(self.title)
         title_row.addWidget(beta, 0, Qt.AlignmentFlag.AlignVCenter)
-        title_row.addWidget(info, 0, Qt.AlignmentFlag.AlignVCenter)
         title_row.addStretch(1)
         words.addLayout(title_row)
         # (one line for Sounds and Voices: the same words as the tab's tooltip)
