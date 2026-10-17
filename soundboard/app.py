@@ -675,7 +675,7 @@ def main():
             w.setctl.warm_triggers()
         if comes_to_front(sys.argv, server.show_requested):
             bring_to_front(w)   # the splash never takes the focus: take it now
-    splash.close()
+    splash.close(goodbye=bool(show))   # Bun waves as the window comes up
     from PySide6.QtCore import QTimer
     if "--resume-setup" in sys.argv:   # back after the restart the cable asked for
         QTimer.singleShot(400, lambda: w.run_setup(resumed=True))

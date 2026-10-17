@@ -1,5 +1,7 @@
-"""A small start-up panel: a steady Bun, the app name and three chasing dots.
-The theme is read straight from config.json; the rest of the settings load later.
+"""A small start-up panel: Bun playing one of his acts (ui/splashacts.py, a different
+one picked at random each launch), the app name and three chasing dots; as the window
+comes up he waves goodbye. The theme is read straight from config.json; the rest of the
+settings load later.
 
 A cold start (first launch after a reboot, files not yet cached) can spend several
 seconds importing and building the window, all on the UI thread. On Windows the
@@ -14,6 +16,7 @@ anywhere.
 """
 from __future__ import annotations
 
+import atexit
 import json
 import logging
 import math
@@ -24,12 +27,14 @@ import time
 from pathlib import Path
 
 from PySide6.QtCore import QEventLoop, QPointF, QRectF, Qt
-from PySide6.QtGui import QColor, QCursor, QFont, QGuiApplication, QImage, QPainter
+from PySide6.QtGui import (QColor, QCursor, QFont, QGuiApplication, QImage, QPainter,
+                           QPainterPath, QPen)
 from PySide6.QtWidgets import QApplication, QWidget
 
 from soundboard import theme
-from soundboard.bunny import draw_bunny
+from soundboard.bunny import sparkle
 from soundboard.i18n import _
+from soundboard.ui import splashacts
 from soundboard.ui.pixels import snap_to_pixels
 
 log = logging.getLogger(__name__)
@@ -47,8 +52,9 @@ CONFIG = Path(os.environ.get("APPDATA", Path.home())) / "OnionBoard" / "config.j
 
 _splash: Splash | NativeSplash | None = None
 _last = 0.0
-_surfaces: dict[tuple, QImage] = {}   # only the dots need drawing on each frame
+_surfaces: dict[tuple, QImage] = {}   # the panel and its text, drawn once
 _animate = True
+_show = splashacts.Show()   # this launch's act (splashacts.pick, in show())
 # what it says under the name ("" = Starting…) and a bar 0..1 instead of the dots
 # (None = the dots): set_status, read by every frame (also on the native thread)
 _status = ""
@@ -67,7 +73,8 @@ def _surface(w: float, h: float, scale: float) -> QImage:
     """Cache the stationary panel at the monitor's resolution, including its text."""
     status = _status or _("Starting…")
     family = theme.T.get("font", theme.FONT)
-    key = (w, h, scale, theme.current_name, tuple(theme.T.items()), family, status)
+    key = (w, h, scale, theme.current_name, tuple(theme.T.items()), family, status,
+           _show.rare)
     img = _surfaces.get(key)
     if img is None:
         img = QImage(round(w * scale), round(h * scale), QImage.Format.Format_ARGB32_Premultiplied)
@@ -79,7 +86,6 @@ def _surface(w: float, h: float, scale: float) -> QImage:
             p.setPen(Qt.PenStyle.NoPen)
             p.setBrush(QColor(theme.T["panel"]))
             p.drawRoundedRect(QRectF(8, 8, w - 16, h - 16), 16, 16)
-            draw_bunny(p, QRectF((w - BUN_W) / 2, 30, BUN_W, BUN_H))
             font = QFont(family)
             font.setPixelSize(18)
             font.setWeight(QFont.Weight.DemiBold)
@@ -91,17 +97,66 @@ def _surface(w: float, h: float, scale: float) -> QImage:
             p.setFont(font)
             p.setPen(QColor(theme.T["muted"]))
             p.drawText(QRectF(20, 171, w - 40, 22), Qt.AlignmentFlag.AlignCenter, status)
+            if _show.odds:   # a rare launch: its drop rate under the dots, between sparkles
+                glow = QColor(splashacts.RARES[str(_show.rare)][2])
+                font.setPixelSize(11)
+                font.setWeight(QFont.Weight.Bold)
+                p.setFont(font)
+                p.setPen(glow)
+                rate = f"1/{_show.odds}"
+                p.drawText(QRectF(20, h - 29, w - 40, 15), Qt.AlignmentFlag.AlignCenter, rate)
+                half = p.fontMetrics().horizontalAdvance(rate) / 2
+                for side in (-1, 1):
+                    sparkle(p, w / 2 + side * (half + 9), h - 21.5, 4.5, glow)
         finally:
             p.end()
         _surfaces[key] = img
     return img
 
 
-def paint_frame(p: QPainter, t: float, w: float, h: float, scale: float = 1.0):
-    """A stationary panel with an accent, growing hop travelling across the dots."""
+def _bun_rect(w: float) -> QRectF:
+    return QRectF((w - BUN_W) / 2, 30, BUN_W, BUN_H)
+
+
+def fade(leaving: float | None) -> float:
+    """How solid the splash is `leaving` 0..1 through his goodbye: the whole window
+    fades in its last part (fading Bun's shapes one by one shows them through each
+    other)."""
+    return 1.0 if leaving is None else min(1.0, max(0.0, (1 - leaving) / 0.45))
+
+
+def paint_frame(p: QPainter, t: float, w: float, h: float, scale: float = 1.0,
+                leaving: float | None = None):
+    """The panel, Bun's act `t` seconds in and an accent, growing hop travelling across
+    the dots. `leaving` 0..1: his goodbye instead (the window fades it out: `fade`)."""
     p.setRenderHint(QPainter.RenderHint.Antialiasing)
     p.setRenderHint(QPainter.RenderHint.SmoothPixmapTransform)
     p.drawImage(QRectF(0, 0, w, h), _surface(w, h, scale))
+    _show.t = t
+    glow = _show.glow
+    if glow is not None:   # a rare launch: a soft glow round the panel, pulsing
+        pulse = 0.75 + 0.25 * math.sin(2 * math.pi * t / 1.2)
+        p.setBrush(Qt.BrushStyle.NoBrush)
+        for i in range(8):
+            c = QColor(glow)
+            c.setAlphaF(pulse * (0.9 if i == 0 else 0.42 * (1 - i / 8) ** 2))
+            p.setPen(QPen(c, 2.0 if i == 0 else 1.2))
+            p.drawRoundedRect(QRectF(8 - i * 0.9, 8 - i * 0.9, w - 16 + i * 1.8,
+                                     h - 16 + i * 1.8), 16 + i * 0.9, 16 + i * 0.9)
+        p.setPen(Qt.PenStyle.NoPen)
+    p.save()
+    room = QPainterPath()   # his act stays on the panel, above the name
+    room.addRoundedRect(QRectF(8, 8, w - 16, h - 16), 16, 16)
+    above = QPainterPath()
+    above.addRect(QRectF(0, 0, w, 140))
+    p.setClipPath(room.intersected(above))
+    if leaving is not None:
+        splashacts.goodbye(p, _show, leaving, _bun_rect(w))
+    elif _animate:
+        splashacts.draw(p, _show, t, _bun_rect(w))
+    else:
+        splashacts.still(p, _show, _bun_rect(w))
+    p.restore()
     p.setPen(Qt.PenStyle.NoPen)
     accent = QColor(theme.T["accent"])
     resting = QColor(theme.T["muted"])
@@ -172,19 +227,32 @@ class NativeSplash:
         self._stop = threading.Event()
         self._up = threading.Event()
         self.ok = False   # the window came up and showed its first frame
+        self._leave: float | None = None   # when his goodbye started (time.monotonic)
         self._switch = sys.getswitchinterval()
         sys.setswitchinterval(min(SWITCH_S, self._switch))   # never coarser than the app's
         self._thread = threading.Thread(target=self._run, name="splash", daemon=True)
         self._thread.start()
+        atexit.register(self._halt)   # never mid-frame while Python shuts down
         self._up.wait(1.0)   # the first frame is on screen (or it gave up)
 
     def isVisible(self) -> bool:
         return self.ok and self._thread.is_alive() and not self._stop.is_set()
 
-    def close(self):
+    def close(self, goodbye: bool = False):
+        """Take it down; `goodbye`: after his wave (GOODBYE_S), without waiting for it."""
+        if goodbye and _animate and self.isVisible():
+            self._leave = time.monotonic()
+            return
+        self._halt()
+
+    def _halt(self):
         self._stop.set()
-        self._thread.join(1.0)
+        if self._thread is not threading.current_thread():
+            self._thread.join(1.0)
         sys.setswitchinterval(self._switch)
+
+    def leaving(self) -> bool:
+        return self._leave is not None and self._thread.is_alive()
 
     def deleteLater(self):
         pass
@@ -196,6 +264,10 @@ class NativeSplash:
             log.debug("native splash failed", exc_info=True)
         finally:
             self._up.set()
+            if self._leave is not None:   # it said goodbye on its own: tidy up after
+                sys.setswitchinterval(self._switch)
+                if _splash is None:
+                    _surfaces.clear()
 
     def _loop(self):
         import ctypes
@@ -283,14 +355,20 @@ class NativeSplash:
         try:
             while not self._stop.is_set():
                 start = time.monotonic()
+                leaving = None
+                if self._leave is not None:
+                    leaving = (start - self._leave) / splashacts.GOODBYE_S
+                    if leaving >= 1:
+                        break
                 img.fill(Qt.GlobalColor.transparent)
                 p = QPainter(img)
                 try:
                     p.scale(k, k)   # drawn at the monitor's real resolution, never stretched
-                    paint_frame(p, start - t0, CARD_W, CARD_H, k)
+                    paint_frame(p, start - t0, CARD_W, CARD_H, k, leaving)
                 finally:
                     p.end()   # never leave img mid-paint: Qt aborts when it's freed
                 ctypes.memmove(bits, bytes(img.constBits()), nbytes)
+                blend.alpha = round(255 * fade(leaving))
                 user.UpdateLayeredWindow(hwnd, None, ctypes.byref(dst), ctypes.byref(size),
                                          dc, ctypes.byref(src), 0, ctypes.byref(blend), 2)
                 if not self._up.is_set():
@@ -320,7 +398,7 @@ class _PumpOnImport:
 
 def show() -> Splash | NativeSplash:
     """Put the splash up, centred on the screen the mouse is on."""
-    global _splash, _animate
+    global _splash, _animate, _show
     _animate = _animations_enabled()
     set_status()
     try:
@@ -329,6 +407,7 @@ def show() -> Splash | NativeSplash:
         _updated(str(cfg.get("update_pending") or ""))
     except Exception:  # noqa: BLE001 - first launch, or unreadable: the default theme
         pass
+    _show = splashacts.pick()   # after the theme: his outfit is the theme's
     if QGuiApplication.platformName() == "windows":
         _splash = NativeSplash()   # draws itself on its own thread: nothing to pump
         if _splash.ok:
@@ -366,15 +445,22 @@ def pump():
     QApplication.processEvents(QEventLoop.ProcessEventsFlag.ExcludeUserInputEvents)
 
 
-def close():
-    """Take the splash down (the window is up, or start-up failed)."""
+def close(goodbye: bool = False):
+    """Take the splash down (the window is up, or start-up failed). `goodbye`: the
+    window is up, so Bun waves first (on Windows, on the splash's own thread: this
+    returns at once)."""
     global _splash
     try:
         sys.meta_path.remove(_PumpOnImport)
     except ValueError:
         pass
-    if _splash is not None:
+    leaving = False
+    if isinstance(_splash, NativeSplash):
+        _splash.close(goodbye)
+        leaving = _splash.leaving()
+    elif _splash is not None:
         _splash.close()
         _splash.deleteLater()
-        _splash = None
-    _surfaces.clear()
+    _splash = None
+    if not leaving:   # (still drawing his wave: its thread clears them when it's done)
+        _surfaces.clear()

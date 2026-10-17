@@ -70,16 +70,71 @@ def _frame(t):
     return img
 
 
-def test_only_loading_dots_animate(qapp, monkeypatch):
-    """The mascot and text stay still; motion is confined to the small indicator."""
+def test_bun_acts_while_the_text_stays_put(qapp, monkeypatch):
+    """Bun moves (his act), the name and status don't, and nothing he does reaches
+    the text below him."""
+    from soundboard.ui import splashacts
     monkeypatch.setattr(splash, "_animate", True)
-    first, later = _frame(0), _frame(0.9)
+    for act in splashacts.ACTS:
+        monkeypatch.setattr(splash, "_show", splashacts.Show(act=act))
+        frames = [_frame(t) for t in (0.0, 0.31, 0.77, 1.4)]
+        assert any(a.copy(0, 0, a.width(), 140) != b.copy(0, 0, b.width(), 140)
+                   for a, b in zip(frames, frames[1:])), act   # he moves
+        for img in frames[1:]:
+            assert img.copy(0, 141, img.width(), 50) == frames[0].copy(0, 141, img.width(), 50), act
     assert splash.CARD_W <= 240 and splash.CARD_H <= 248
-    assert first.copy(0, 0, first.width(), 200) == later.copy(0, 0, later.width(), 200)
-    changed = [(x, y) for y in range(200, first.height()) for x in range(first.width())
-               if first.pixel(x, y) != later.pixel(x, y)]
-    assert changed
-    assert all(98 <= x <= 142 and 202 <= y <= 216 for x, y in changed)
+
+
+def test_pick_rare_and_seasonal():
+    import datetime
+    import random
+
+    from soundboard.style import bunnyfit
+    from soundboard.ui import splashacts
+    day = datetime.datetime(2026, 6, 1, 14)
+    seen = {splashacts.pick(day, random.Random(i)).act for i in range(400)}
+    assert seen == set(splashacts.ACTS)   # every act turns up
+    rares = [splashacts.pick(day, random.Random(i)) for i in range(4000)]
+    golds = sum(r.rare == "gold" for r in rares)
+    assert 40 < golds < 130   # about 1 in 50
+    assert all(r.act != "robo" for r in rares if r.rare)   # (Robo-Bun keeps his metal)
+    assert [odds for odds, *_ in splashacts.RARES.values()] == [50000, 5000, 500, 50]
+    assert all(splashacts.pick(day, random.Random(i)).outfit is None for i in range(20))
+    xmas = splashacts.pick(datetime.datetime(2026, 12, 20, 14), random.Random(1))
+    assert xmas.outfit is not None and "santa" in xmas.outfit
+    assert not (set(xmas.outfit) - {"santa"}) & bunnyfit.HATS   # his own hat off
+    october = splashacts.pick(datetime.datetime(2026, 10, 31, 14), random.Random(1))
+    assert october.outfit is not None and "fangs" in october.outfit
+    if "witch_hat" in bunnyfit.PIECES:   # (the Halloween theme's hat)
+        assert "witch_hat" in october.outfit
+    night = [splashacts.pick(datetime.datetime(2026, 6, 1, 23), random.Random(i)).act
+             for i in range(300)]
+    assert night.count("sleepy") > 100   # sleepy is the favourite at night
+
+
+def test_goodbye_fades_out(qapp, monkeypatch):
+    from PySide6.QtCore import Qt
+    from PySide6.QtGui import QImage, QPainter
+    monkeypatch.setattr(splash, "_animate", True)
+
+    def leaving(u):
+        img = QImage(splash.CARD_W, splash.CARD_H, QImage.Format_ARGB32_Premultiplied)
+        img.fill(Qt.transparent)
+        p = QPainter(img)
+        splash.paint_frame(p, 0, splash.CARD_W, splash.CARD_H, 1.0, u)
+        p.end()
+        return img
+    start, mid = leaving(0.0), leaving(0.4)
+    assert start.pixelColor(20, 20).alpha() == 255
+    assert start.copy(0, 0, start.width(), 140) != mid.copy(0, 0, mid.width(), 140)  # waving
+    assert splash.fade(None) == splash.fade(0.5) == 1.0
+    assert 0 < splash.fade(0.8) < 1 and splash.fade(1.0) == 0.0   # the window fades out
+
+
+def test_reduced_motion_keeps_bun_still(qapp, monkeypatch):
+    monkeypatch.setattr(splash, "_animate", False)
+    a, b = _frame(0), _frame(0.77)
+    assert a.copy(0, 0, a.width(), 140) == b.copy(0, 0, b.width(), 140)
 
 
 def test_highlight_and_hop_travel_left_to_right(qapp, monkeypatch):
@@ -100,7 +155,8 @@ def test_highlight_and_hop_travel_left_to_right(qapp, monkeypatch):
             else:
                 assert img.pixelColor(x, 213) == resting
                 assert img.pixelColor(x, 205).name() == theme.T["panel"]
-    assert _frame(0) == _frame(splash.PULSE_S)   # seamless repeat
+    a, b = _frame(0), _frame(splash.PULSE_S)
+    assert a.copy(0, 200, a.width(), 48) == b.copy(0, 200, b.width(), 48)   # seamless repeat
 
 
 def test_reduced_motion_moves_only_the_colour(qapp, monkeypatch):
@@ -138,3 +194,22 @@ def test_windows_animation_preference(monkeypatch):
     assert not splash._animations_enabled()
     user.SystemParametersInfoW = lambda *args: 0   # unavailable: retain the default
     assert splash._animations_enabled()
+
+
+def test_rare_launch_glows_and_shows_its_drop_rate(qapp, monkeypatch):
+    """A rare launch: a glow round the panel (in the margin a plain one leaves clear)
+    and its drop rate under the dots; each tier its own look."""
+    from soundboard.ui import splashacts
+    monkeypatch.setattr(splash, "_animate", True)
+    plain = _frame(0.3)
+    assert plain.pixelColor(4, splash.CARD_H // 2).alpha() == 0
+    looks = set()
+    for rare in splashacts.RARES:
+        monkeypatch.setattr(splash, "_show", splashacts.Show(act="hop", rare=rare))
+        splash._surfaces.clear()
+        img = _frame(0.3)
+        assert img.pixelColor(5, splash.CARD_H // 2).alpha() > 0, rare   # the glow
+        assert img.copy(0, 222, img.width(), 18) != plain.copy(0, 222, img.width(), 18), rare
+        looks.add(img.copy(80, 30, 80, 96).bits().tobytes())
+    assert len(looks) == len(splashacts.RARES)
+    splash._surfaces.clear()
