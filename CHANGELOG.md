@@ -2,6 +2,21 @@
 
 Changes not released yet are in [changelog.d/](changelog.d/), one file per change.
 
+## 2.6.1 — 2026-10-17
+
+- A number you type into a box (speed, pitch, effects, volume, trim) now counts after a
+  short pause or a click anywhere else, without pressing Enter. Enter in the Live controls
+  no longer presses Reset all, which put a typed speed straight back to 1x.
+- Clicking Restart to update no longer freezes the window while Windows checks the
+  downloaded installer, and an update closing the app is no longer counted as a crash.
+- Sound modes (Game, Voice chat, Advanced) no longer change how sounds play in your
+  own headphones: only what others get is shaped, and *Hear what they hear* still
+  lets you listen to it.
+- Picking a voice while no mic is open now says why nothing changes ("No mic is open")
+  on the Voice tab, instead of doing nothing.
+- Saved clips whose sound file was deleted outside Onion Board no longer stay in the
+  list as clips that can't play.
+
 ## 2.6.0 — 2026-10-17
 
 - A link that failed after a few added ones no longer turns a roomy window into the
