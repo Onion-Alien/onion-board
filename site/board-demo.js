@@ -81,7 +81,7 @@
   var S = {                       // everything the demo remembers (only for this visit)
     page: "sounds", tab: "All", tabs: ["All", "Memes", "Reactions", "Music"], q: "",
     sort: "mine", view: "pads", pad: 150, speed: 1, vol: 1, phones: 0.7, hear: true,
-    live: true, mic: 1, theme: "Dark", rail: false, src: "youtube", removed: [], last: null,
+    live: true, mic: 1, theme: "Dark", textured: true, rail: false, src: "youtube", removed: [], last: null,
     setPage: "audio", advanced: false, toldSettings: false
   };
 
@@ -168,9 +168,21 @@
     var t = D.themes[name] || D.themes.Dark;
     S.theme = D.themes[name] ? name : "Dark";
     Object.keys(t).forEach(function (k) { root.style.setProperty("--" + k, t[k]); });
+    // Textured, as in the app: the theme's own pattern on the bars and cards (tiles from
+    // scripts/pictures/demo_textures.py) and a soft glow of its accents behind them
+    root.style.setProperty("--tex", t.tex || "none");
+    var k = light(t.bg) ? 0.55 : 1;
+    root.style.setProperty("--glow1", rgba(t.accent, 0.22 * k));
+    root.style.setProperty("--glow2", rgba(t.accent2, 0.14 * k));
+    root.style.setProperty("--glow3", rgba(t.accent, 0.07 * k));
+    root.classList.toggle("tex", S.textured);
     Array.prototype.forEach.call(root.querySelectorAll(".ob-theme"), function (b) { b.setAttribute("aria-pressed", b.dataset.name === S.theme ? "true" : "false"); });
     if (R.repaint) R.repaint();
   }
+
+  function rgb(c) { c = c.replace("#", ""); return [0, 2, 4].map(function (i) { return parseInt(c.substr(i, 2), 16); }); }
+  function rgba(c, a) { return "rgba(" + rgb(c).join(",") + "," + a.toFixed(3) + ")"; }
+  function light(c) { var v = rgb(c); return 0.2126 * v[0] + 0.7152 * v[1] + 0.0722 * v[2] > 128; }
 
   // One way of saying "the real app does this": the same toast everywhere.
   var toastT = 0;
@@ -1894,7 +1906,16 @@
   }
   function themesCard() {
     var wrap = h("div", { class: "ob-scard2" }, [h("div", { class: "r" }, [h("div", { class: "head" }, [icon("palette", "s"), h("span", { class: "t", text: "Theme" })])]),
-      h("div", { class: "h", text: "31 looks, from plain Dark to Deep Fried. The whole demo switches when you pick one." })]);
+      h("div", { class: "h", text: "33 looks, from plain Dark to Deep Fried. The whole demo switches when you pick one." })]);
+    var seg = h("div", { class: "ob-seg" });
+    [[true, "Textured"], [false, "Plain"]].forEach(function (o) {
+      seg.appendChild(btn("", o[1], null, function () {
+        S.textured = o[0];
+        Array.prototype.forEach.call(seg.children, function (b) { b.setAttribute("aria-pressed", b === this ? "true" : "false"); }, this);
+        theme(S.theme); did("texture");
+      }, { "aria-pressed": S.textured === o[0] ? "true" : "false" }));
+    });
+    wrap.appendChild(seg);
     D.groups.forEach(function (g) {
       wrap.appendChild(h("b", { text: g[0], style: "margin-top:6px" }));
       var grid = h("div", { class: "ob-themes" });

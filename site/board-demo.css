@@ -13,6 +13,12 @@
   isolation: isolate;
 }
 .ob *, .ob *::before, .ob *::after { box-sizing: border-box; }
+/* Textured (the app's Settings > Appearance): the theme's glow behind the window and its
+   pattern tiled on the bars and cards, over their own colour */
+.ob.tex { background: radial-gradient(circle at 12% 0%, var(--glow1), transparent 55%),
+                      radial-gradient(circle at 95% 105%, var(--glow2), transparent 60%),
+                      radial-gradient(circle at 60% 35%, var(--glow3), transparent 45%), var(--bg); }
+.ob.tex .ob-bar, .ob.tex .ob-scard2, .ob.tex .ob-vcard, .ob.tex .ob-twocol > div, .ob.tex .ob-okbox { background-image: var(--tex); }
 .ob img, .ob svg { -webkit-user-drag: none; }
 .ob img { pointer-events: none; }
 .ob button, .ob input, .ob select, .ob textarea { font: inherit; color: inherit; margin: 0; }
