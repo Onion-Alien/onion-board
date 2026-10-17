@@ -546,6 +546,10 @@ class Config:
     api_enabled: bool = False
     api_port: int = 7474
     api_token: str = ""
+    # the control API's chat commands and alerts (soundboard.streamapi): {"chat": {...},
+    # "alerts": {type: [rule, ...]}, "alerts_on": bool}; set through /api/chat_rules
+    # and /api/alerts
+    api_stream: dict = field(default_factory=dict)
     # "remote" add-ons' own settings (soundboard.ui.remotehost), by add-on id: Onion
     # Pocket's on / off, port and key
     remote_addons: dict = field(default_factory=dict)

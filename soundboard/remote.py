@@ -15,7 +15,8 @@ Every endpoint takes GET or POST and answers JSON (ENDPOINTS below is the list;
 
     /api/status                  version, what's playing / queued, category, live /
                                  voice / mic / hear, speed and effects, mode, radio
-    /api/sounds                  [{id, name, hotkey, categories, color, playing}]
+    /api/sounds[?q=…&category=…] [{id, name, hotkey, categories, color, playing,
+                                 volume, loop, press, plays, duration, effects}]
     /api/categories              ["Memes", ...]
     /api/play?id=… or ?name=…    play a pad (name: exact, any case)
     /api/stop?id=… or ?name=…    stop one sound;  /api/stop alone stops everything
@@ -31,7 +32,7 @@ Every endpoint takes GET or POST and answers JSON (ENDPOINTS below is the list;
     /api/live, /api/voice, /api/mic [?on=1|0|toggle]
                                  the Live / Muted switch, the voice changer, "others
                                  hear my mic" (no on=: toggle)
-    /api/voice?name=Robot        pick a voice (and turn the voice changer on)
+    /api/voice?name=Robot / ?random=1   pick a voice (and turn the voice changer on)
     /api/voices                  the voice changer's voices, and which one is on
     /api/say?text=… / ?stop=1    speak a typed line in the computer voice
     /api/hear[?on=1|0|toggle]    "Hear what they hear": your mic as others hear it
@@ -49,7 +50,20 @@ Every endpoint takes GET or POST and answers JSON (ENDPOINTS below is the list;
     /api/radio?id=… / ?on=1|0|toggle         play a station / play or stop the radio
     /api/radio_random, /api/radio_star[?id=…], /api/radio_live, /api/radio_hear,
     /api/radio_volume            the Radio tab's other controls
+    /api/apps                    the Apps tab's programs; /api/app?name=…&send=1|0|toggle
+                                 [&volume=0-1000] sends one to whoever's listening
+    /api/setups, /api/setup?name=…[&tab=sounds|radio|apps]
+                                 My setups (saved on the Voice tab) on the live controls
+    /api/hotkeys[?on=1|0|toggle] every global hotkey off (to type) or on
+    /api/mic_gate[?on=…]         mute my mic while a sound plays
+    /api/chat, /api/chat_rules, /api/event, /api/alerts, /api/feed
+                                 chat commands, alerts and donations from a streaming
+                                 bot (soundboard.streamapi)
     /api/help                    this list
+
+A POST may carry its values as a JSON object or a form instead of in the URL (a key in
+the URL wins); /api/event also reads the JSON Twitch EventSub, StreamElements,
+Streamlabs and Ko-fi send.
 
 The same server, given `lan=True`, is what "remote" add-ons such as Onion Pocket
 get (soundboard.ui.remotehost): it listens on this PC's address on the home network
@@ -103,7 +117,7 @@ from urllib.parse import parse_qs, urlsplit
 
 from PySide6.QtCore import QCoreApplication, QEvent, QObject, Qt, QTimer, Signal
 
-from soundboard import errors, netcategory
+from soundboard import errors, netcategory, streamapi
 from soundboard.pollthread import PollThread
 from soundboard.i18n import _
 
@@ -139,7 +153,9 @@ ENDPOINTS = {
     "status": "version, what's playing and what's queued, the category showing, live / "
               "voice (and which voice) / mic / hear / volume, the live speed and effects, "
               "the sound mode, the radio",
-    "sounds": "every sound: [{id, name, hotkey, categories, color, playing}]",
+    "sounds": "every sound: [{id, name, hotkey, categories, color, playing, volume (%), "
+              "loop, press (what pressing does), plays, duration (s), effects}]; "
+              "?q=horn keeps the names holding that, ?category=Chill one category's",
     "categories": "the category names",
     "play": "play one sound: ?name=Airhorn (exact name, any case) or ?id=…",
     "stop": "stop one sound (?name= or ?id=); with neither, stop everything",
@@ -158,7 +174,9 @@ ENDPOINTS = {
             "mic still goes out unless a voice changer is on or Send my mic is off): "
             "?on=1 / 0 / toggle",
     "voice": "the voice changer on / off: ?on=1 / 0 / toggle, or ?name=Robot picks that "
-             "voice and turns the changer on (/api/voices lists them)",
+             "voice and turns the changer on (/api/voices lists them); ?random=1 a random "
+             "one (never the one on); &seconds=30 with name= or random=: only for that "
+             "long, then back to what was on",
     "voices": "the voice changer's voices (the built-in ones and your saved ones), and "
               "which one is on",
     "say": "speak a typed line for others to hear, in the Voice tab's computer voice "
@@ -189,9 +207,44 @@ ENDPOINTS = {
     "radio_hear": "whether you hear the radio yourself: ?on=1 / 0 / toggle",
     "radio_volume": "the radio's volume in %: ?set=0-1000 (100: normal) or ?step=up / down "
                 "(10 % a step)",
+    "apps": "the Apps tab's programs: [{name, exe, running, sending, volume}]",
+    "app": "send one program's sound to whoever's listening: ?name=Spotify (its name or "
+           "its .exe) &send=1 / 0 / toggle, &volume=0-1000 (%)",
+    "setups": "My setups (voice setups saved on the Voice tab) and the one on each live "
+              "control (sounds, radio, apps)",
+    "setup": "put one of My setups on everything playing: ?name=… (name= blank: none) "
+             "&tab=sounds (default) / radio / apps",
+    "hotkeys": "every global hotkey off (so the keys type normally) or back on: "
+               "?on=1 / 0 / toggle",
+    "mic_gate": "mute my mic while a sound plays (others hear only the sound): "
+                "?on=1 / 0 / toggle",
+    "chat": "one chat line from a bot: ?user=…&message=… (&mod=1 / &sub=1 / &vip=1 / "
+            "&broadcaster=1, or &badges= as Twitch sends them). Lines starting with ! are "
+            "commands: !sound <name>, !sounds, !random [category], !say <text>, "
+            "!voice <name>, !stop; anything else is read out when tts is on. Answers "
+            "handled, why not (reason, wait) and reply: a line to post back in chat",
+    "chat_rules": "the chat commands' rules: who may use each (?sound= / sounds= / random= "
+                  "/ say= / voice= / stop= / tts= everyone, subs, vips, mods, broadcaster "
+                  "or off), ?user_cooldown= / cooldown= (s), ?category= (chat plays only "
+                  "these), ?blocked=word,word, ?links=0 / 1, ?max_length=, ?prefix=!, "
+                  "?voice_seconds=, ?tts_format=, ?reply_list= / reply_missing=, ?on=0 / 1, "
+                  "?reset=1; alone: the rules now",
+    "event": "an alert or donation: ?type=follow / sub / resub / gift_sub / cheer / raid / "
+             "donation / redeem / gift / like / share / hype_train (or a name of your own) "
+             "&user= &amount= &message= &reward= &currency= &id= (one id plays once). Does "
+             "what /api/alerts set for the type, or &sound= / &category= / &say= / &voice= "
+             "(&voice_seconds=) given here; &test=1 fills in a test viewer. A POST may send "
+             "Twitch EventSub, StreamElements, Streamlabs or Ko-fi JSON as it is",
+    "alerts": "what each alert does: ?type=donation&sound=Airhorn (or &category=Chill, "
+              "&say=Thanks {user} for {amount}: {message}, &voice=Robot&voice_seconds=30), "
+              "&min=10: only from that amount up (the highest one reached plays); "
+              "&clear=1 removes it; ?on=0 / 1 all alerts off / on; alone: what's set",
+    "feed": "what chat commands and alerts did, oldest first: ?since=<the last id you "
+            "got> (&limit=); answers events and last",
     "help": "this list",
 }
 ACTIONS = tuple(ENDPOINTS)
+BODY_MAX = 64 * 1024    # bytes in a POST's body
 _NONCE = re.compile(r"[A-Za-z0-9_-]{16,64}")
 
 
@@ -595,6 +648,42 @@ def _handler_for(ctl: RemoteControl):
             self.end_headers()
             self.wfile.write(body)
 
+        def _body(self) -> dict | None:
+            """A POST's JSON object or form as params (the JSON is also kept whole in
+            "_body"); None if it's too big."""
+            try:
+                n = int(self.headers.get("Content-Length") or 0)
+            except ValueError:
+                n = 0
+            if n <= 0:
+                return {}
+            if n > BODY_MAX:   # read (up to a point) so the client gets the answer
+                left = min(n, 16 * BODY_MAX)
+                while left > 0 and self.rfile.read(min(left, BODY_MAX)):
+                    left -= BODY_MAX
+                self.close_connection = True
+                return None
+            text = self.rfile.read(n).decode("utf-8", "replace")
+            kind = (self.headers.get("Content-Type") or "").split(";")[0].strip().lower()
+            if kind == "application/x-www-form-urlencoded":
+                return {k: v[0] for k, v in parse_qs(text, keep_blank_values=True).items()
+                        if k != "token"}
+            try:
+                data = json.loads(text)
+            except ValueError:
+                return {}
+            if not isinstance(data, dict):
+                return {}
+            out: dict[str, object] = {"_body": data}
+            for k, v in data.items():
+                if k == "token" or not isinstance(k, str):
+                    continue
+                if isinstance(v, bool):
+                    out[k] = "1" if v else "0"
+                elif isinstance(v, (str, int, float)):
+                    out[k] = str(v)
+            return out
+
         def _go(self):
             url = urlsplit(self.path)
             query = parse_qs(url.query, keep_blank_values=True)
@@ -618,7 +707,13 @@ def _handler_for(ctl: RemoteControl):
             if action not in ctl.actions:
                 return self._answer(404, {"error": "unknown endpoint",
                                           "endpoints": [f"/api/{a}" for a in ctl.actions]})
-            params = {k: v[0] for k, v in query.items() if k != "token"}
+            sent = self._body()
+            if sent is None:
+                return self._answer(413, {"error": f"the body is too big: at most "
+                                                   f"{BODY_MAX // 1024} KB"})
+            if ctl.lan:   # (read all the same:) X-Sig signs the URL, not the body
+                sent = {}
+            params = {**sent, **{k: v[0] for k, v in query.items() if k != "token"}}
             job = Job(action, params)
             ctl.request.emit(job)
             if not job.done.wait(ANSWER_S):
@@ -683,10 +778,20 @@ def dispatch(mw: MainWindow, action: str, params: dict) -> tuple[int, object]:
                      **live_state(mw), **mode_state(mw, full=False),
                      "radio": radio_state(mw)}
     if action == "sounds":
+        q = (params.get("q") or "").strip().casefold()
+        cat = None
+        if params.get("category"):
+            cat = find_category(cfg, params["category"])
+            if cat is None:
+                return 404, {"error": f"no category called {params['category']!r}",
+                             "categories": list(cfg.categories)}
         return 200, [{"id": m.id, "name": m.name, "hotkey": m.hotkey,
                       "categories": list(m.tags), "color": m.color,
-                      "playing": m.id in sounding}
-                     for m in cfg.sounds]
+                      "playing": m.id in sounding, "volume": round(m.volume * 100),
+                      "loop": m.loop, "press": m.mode, "plays": m.plays,
+                      "duration": round(m.duration, 2), "effects": bool(m.fx)}
+                     for m in cfg.sounds
+                     if (not q or q in m.name.casefold()) and (cat is None or cat in m.tags)]
     if action == "categories":
         return 200, list(cfg.categories)
     if action == "pause":
@@ -743,6 +848,24 @@ def dispatch(mw: MainWindow, action: str, params: dict) -> tuple[int, object]:
         return dispatch_live(mw, action, params)
     if action == "mode":
         return dispatch_mode(mw, params)
+    if action in APP_ACTIONS:
+        return dispatch_apps(mw, action, params)
+    if action in ("setups", "setup"):
+        return dispatch_setups(mw, action, params)
+    if action in streamapi.STREAM_ACTIONS:
+        return streamapi.dispatch(mw, action, params)
+    if action == "hotkeys":
+        on = on_value(params, mw.hkctl.hotkeys_on)
+        if on is None:
+            return 400, BAD_ON
+        mw.hkctl.set_hotkeys_on(on, remote=True)
+        return 200, {"hotkeys": mw.hkctl.hotkeys_on}
+    if action == "mic_gate":
+        on = on_value(params, bool(cfg.mic_gate))
+        if on is None:
+            return 400, BAD_ON
+        set_mic_gate(mw, on)
+        return 200, {"mic_gate": bool(cfg.mic_gate)}
     if action in RADIO_ACTIONS:
         return dispatch_radio(mw, action, params)
     if action == "live":
@@ -884,6 +1007,20 @@ def dispatch_voice(mw: MainWindow, action: str, params: dict) -> tuple[int, obje
             return 400, {"error": f"text= is too long: at most {SAY_MAX} characters"}
         sp.say_line(text)
         return 200, {"saying": text}
+    seconds = None
+    if "seconds" in params:
+        seconds = number(params, "seconds", 0, streamapi.VOICE_S_MAX)
+        if seconds is None:
+            return 400, {"error": f"seconds= takes a number, 0 to {streamapi.VOICE_S_MAX}"}
+    if (params.get("random") or "").strip() not in ("", "0"):
+        pool = fx._roll_pool()
+        if not pool:
+            return 404, {"error": "no other voice to pick"}
+        name = random.choice(pool)
+        if seconds:
+            return 200, streamapi.voice_for(mw, name, seconds)
+        fx.pick(name)
+        return 200, voice_state(mw)
     if "name" in params:   # voice?name=Robot
         want = params["name"].strip().casefold()
         names = voice_names(mw)
@@ -895,6 +1032,8 @@ def dispatch_voice(mw: MainWindow, action: str, params: dict) -> tuple[int, obje
             if close:
                 body["did_you_mean"] = close
             return 404, body
+        if seconds:
+            return 200, streamapi.voice_for(mw, match, seconds)
         fx.pick(match)
         return 200, voice_state(mw)
     on = on_value(params, fx.btn_power.isChecked())
@@ -1056,6 +1195,105 @@ def dispatch_mode(mw: MainWindow, params: dict) -> tuple[int, object]:
             return 404, {"error": f"no mode called {params['set']!r}", **mode_state(mw)}
         destpanel.set_exact(mw, match.key)
     return 200, mode_state(mw)
+
+
+# --------------------------------------------------------------------------- the Apps tab
+
+APP_ACTIONS = ("apps", "app")
+APPS_OFF = {"error": "the Apps tab is switched off in Onion Board's Settings > Tabs"}
+
+
+def _apps_tab(mw: MainWindow):
+    from soundboard.ui.appspanel import AppsTab
+    a = getattr(mw, "apps", None)
+    return a if isinstance(a, AppsTab) else None
+
+
+def app_dict(row) -> dict:
+    return {"name": row.name.text(), "exe": row.exe, "running": row.app is not None,
+            "sending": row.sending, "volume": row.vol.spin.value()}
+
+
+def dispatch_apps(mw: MainWindow, action: str, params: dict) -> tuple[int, object]:
+    """The Apps tab's Send switch and volume, through the cards themselves, so the PC
+    shows what a request did."""
+    tab = _apps_tab(mw)
+    if tab is None:
+        return 409, APPS_OFF
+    rows = list(tab.rows.values())
+    if action == "apps":
+        return 200, [app_dict(r) for r in rows]
+    asked = (params.get("name") or params.get("exe") or "").strip()
+    want = asked.casefold()
+    if not want:
+        return 400, {"error": "say which: ?name=… (/api/apps lists them)"}
+    row = next((r for r in rows
+                if want in (r.exe.casefold(), r.exe.casefold().removesuffix(".exe"),
+                            r.name.text().strip().casefold())), None)
+    if row is None:
+        return 404, {"error": f"no program called {asked!r} on the Apps tab",
+                     "apps": [r.exe for r in rows]}
+    if "volume" in params:
+        err = set_volume(row.vol.spin, {"set": params["volume"]})
+        if err:
+            return err
+    if "send" in params:
+        on = on_value({"on": params["send"]}, row.sending)
+        if on is None:
+            return 400, {"error": "send= takes 1, 0 or toggle"}
+        if on and row.app is None:
+            return 409, {"error": "that program isn't running", **app_dict(row)}
+        if on != row.sending:
+            row.btn_send.setChecked(on)   # -> AppsTab._on_send
+    return 200, app_dict(row)
+
+
+SETUP_TABS = ("sounds", "radio", "apps")
+
+
+def setups_state(mw: MainWindow) -> dict:
+    ls = mw.livesetups
+    return {"setups": list(ls.setups()),
+            "on": {t: ls.names.get(t, "") for t in SETUP_TABS if ls.button(t) is not None}}
+
+
+def dispatch_setups(mw: MainWindow, action: str, params: dict) -> tuple[int, object]:
+    """My setups on a live control, as its chips pick them (without the question an AI
+    voice or a language asks first: a button can't answer it)."""
+    ls = mw.livesetups
+    if action == "setups":
+        return 200, setups_state(mw)
+    tab = (params.get("tab") or "sounds").strip().lower()
+    if tab not in SETUP_TABS:
+        return 400, {"error": "tab= takes sounds, radio or apps"}
+    if ls.button(tab) is None:
+        return 409, RADIO_OFF if tab == "radio" else APPS_OFF
+    if "name" not in params:
+        return 400, {"error": "say which: ?name=… (/api/setups lists them)"}
+    want = params["name"].strip().casefold()
+    names = list(ls.setups())
+    match = next((n for n in names if n.casefold() == want), None)
+    if want and match is None:
+        body = {"error": f"no setup called {params['name']!r}", "setups": names}
+        close = difflib.get_close_matches(params["name"].strip(), names, 3, 0.5)
+        if close:
+            body["did_you_mean"] = close
+        return 404, body
+    ls.pick(tab, match or "", ask=False)
+    return 200, setups_state(mw)
+
+
+def set_mic_gate(mw: MainWindow, on: bool):
+    """Mute my mic while a sound plays: saved, on the engine, and the Who's listening
+    boxes showing it."""
+    from soundboard.ui import destpanel
+    mw.cfg.mic_gate = on
+    destpanel.apply_send(mw.cfg, mw.engine)
+    for panel in mw.findChildren(destpanel.DestPanel):
+        panel.chk_gate.blockSignals(True)
+        panel.chk_gate.setChecked(on)
+        panel.chk_gate.blockSignals(False)
+    mw._save_later()
 
 
 # --------------------------------------------------------------------------- the radio
@@ -1237,6 +1475,7 @@ def setup_prompt(cfg, port: int, token: str = "", voices: list[str] | None = Non
     voice_lines = (f"- Voice changer voices: {', '.join(voices)}" if voices else
                    "- Voice changer: the Voice tab is switched off in Settings → Tabs, so "
                    "/api/voice, /api/voices and /api/say answer 409 until it's back on")
+    thanks = quote("Thanks {user} for {amount}!")
     endpoints = "\n".join(f"- /api/{a} — {d}" for a, d in ENDPOINTS.items())
     key_note = ("" if token else
                 f"\nMy key isn't in this message: write {KEY_PLACEHOLDER} wherever it goes "
@@ -1266,8 +1505,23 @@ voice changer if it's on).
 sounds for a game or voice chat.
 - The Radio tab: play / stop a station, a random one, star it, its volume, whether \
 others hear it.
+- The Apps tab: send one program's sound (Spotify, a browser…) to whoever's \
+listening, and its volume.
+- All hotkeys off / on (to type in chat), and "mute my mic while a sound plays".
+- Chat commands: a bot passes every chat line to /api/chat and Onion Board runs \
+!sound <name>, !sounds, !random, !say, !voice and !stop by itself, with cooldowns, who \
+may use each (everyone, subs, VIPs, mods), a category chat is limited to and blocked \
+words (/api/chat_rules); it answers a "reply" line for the bot to post back. It can \
+also read every chat line aloud.
+- Alerts and donations: follows, subs, gift subs, bits, raids, tips / donations, \
+channel points, TikTok gifts… sent to /api/event play a sound, a random one from a \
+category, say a line ("Thanks {{user}} for {{amount}}!") or put on a voice for some \
+seconds, per type and per amount (/api/alerts). Streamer.bot, Firebot, Mix It Up, \
+SAMMI and TikFinity can send them; Twitch EventSub, StreamElements, Streamlabs and \
+Ko-fi JSON can be POSTed as it is.
 - Reading what's going on (/api/status): what's playing, what's queued, the voice, \
-live / muted, the mode, the radio — handy for a key that lights up.
+live / muted, the mode, the radio — handy for a key that lights up. /api/feed lists \
+what chat and alerts did, for an overlay.
 
 HOW THE API WORKS
 - Address: {base}  (it only listens on this PC: tools on another computer or phone \
@@ -1275,7 +1529,8 @@ can't reach it, so they must run on this PC. For a phone there's a separate add-
 Onion Pocket, in Settings → Remote: it needs no setup)
 - Every request needs my key, as ?token=KEY in the URL (simplest: works anywhere a URL \
 can be opened), an X-Token: KEY header, or Authorization: Bearer KEY.
-- GET or POST both work; every answer is JSON. The Host header must be 127.0.0.1 or \
+- GET or POST both work; every answer is JSON. A POST may send its values as a JSON \
+object or a form instead of in the URL. The Host header must be 127.0.0.1 or \
 localhost.
 - Sound, category and voice names must match exactly (any case) and be URL-encoded: a \
 space is %20, & is %26. A wrong sound or voice name answers 404 with "did_you_mean".
@@ -1304,6 +1559,17 @@ EXAMPLES
 lists the knobs and presets)
 - Sound mode for a game: {base}/api/mode?simple=game&token={key}
 - Radio on / off: {base}/api/radio?on=toggle&token={key}
+- Chat commands (a bot sends every chat line): \
+{base}/api/chat?user=NAME&message=MESSAGE&mod=0&sub=0&token={key} — post the answer's \
+"reply" back in chat when it isn't empty
+- Let subs use !say, with a 60-second cooldown per viewer: \
+{base}/api/chat_rules?say=subs&user_cooldown=60&token={key}
+- Set what a donation does: \
+{base}/api/alerts?type=donation&sound={quote(example)}&say={thanks}&token={key} \
+(&min=10: only from 10 up)
+- Send an alert: {base}/api/event?type=follow&user=NAME&token={key} (&test=1 to try one)
+- A channel-point reward that changes my voice for 30 s: \
+{base}/api/voice?name={quote(voice)}&seconds=30&token={key}
 
 WHERE EACH TOOL SENDS A REQUEST (as far as I know — correct me if a tool has changed)
 - Elgato Stream Deck app: System → Website action, paste the URL, tick "GET request in \
@@ -1311,7 +1577,16 @@ background" so no browser opens. (Or a free "API Request" plugin from the Market
 - Streamer.bot: an Action with the sub-action Core → Network → Fetch URL; triggers such \
 as Twitch → Channel Reward → Reward Redemption, chat commands, cheers / bits, raids, \
 follows. Fetch URL runs in the background. Its variables go in the URL too (URL-encode \
-anything a viewer typed), e.g. a !say command or a "say something" reward.
+anything a viewer typed), e.g. a !say command or a "say something" reward. For chat \
+commands: a Twitch → Chat Message trigger whose Fetch URL calls /api/chat with \
+user=%user%&message=%rawInput% and the isModerator / isSubscriber / isVip flags; for \
+alerts, each event's trigger calls /api/event?type=… with its %user% / %bits% / \
+%amount% / %message% variables.
+- Firebot: an "HTTP Request" effect (GET or POST) on its events and commands.
+- TikFinity (TikTok LIVE): Actions → "Call webhook" pointed at /api/event with \
+type=gift&user={{nickname}}&reward={{giftname}}&count={{repeatcount}}, or a sound per gift.
+- StreamElements / Streamlabs / Ko-fi send their alerts to the internet, not to this \
+PC: let Streamer.bot or Firebot receive them and pass them on to /api/event.
 - Touch Portal: the "HTTP Get" action (or a web-request plugin).
 - Bitfocus Companion: the "Generic HTTP" connection, a GET action with the full URL \
 (Companion must run on this PC).
