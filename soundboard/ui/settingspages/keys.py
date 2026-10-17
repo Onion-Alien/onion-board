@@ -49,6 +49,9 @@ HOTKEY_GROUPS = [
          _("Turns the voice changer on with the voice picked on the Voice tab, or off.")),
         ("voice_hold_hotkey", "__voicehold__", _("Change my voice while held"),
          _("The voice changer is on only while you hold this key down.")),
+        ("voice_random_hotkey", "__voicerandom__", _("Random voice"),
+         _("Turns the voice changer on with a voice picked at random from the ones the "
+           "Voice tab shows (your favorites, when Favorites is picked).")),
     ]),
     (_("Turn hotkeys off"), [
         ("hotkeys_off_hotkey", "__hotkeys__", _("All hotkeys off / on"),

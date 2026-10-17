@@ -1,7 +1,7 @@
 """What's new: shown once after an update (or the first start of a newer version over
-an older one's settings), with what the release added and a button straight to the
-settings it's about. Config.whats_new_seen is the newest version they've seen it
-for; a first start has nothing to catch up on (library.Config)."""
+an older one's settings), before anything else, with what the release added and a
+button straight to the settings it's about. Config.whats_new_seen is the newest
+version they've seen it for; a first start has nothing to catch up on (library.Config)."""
 from __future__ import annotations
 
 from dataclasses import dataclass
@@ -26,7 +26,58 @@ class Note:
     page_label: str = ""
 
 
-# newest first; add one per release that has something worth telling
+MAX_ITEMS = 6   # an update over several versions: the newest notes, this many rows at most
+
+
+def recent() -> tuple[Note, ...]:
+    """The notes from 2.0 on, newest first, in the language that's on now. Add one per
+    release (tests/test_whats_new.py checks this version has one): what a player
+    notices, in their words, never the fixes only a log would show."""
+    return (
+        Note("2.4.0", _("Voices on your sounds, and hotkeys in games"), (
+            ("voice", _("Say any sound in a voice"),
+             _("Right-click a pad, open Effects and pick a Voice: any voice changer voice, "
+               "AI voice or saved setup. Your original file is never changed.")),
+            ("check", _("Hotkeys work in your game"),
+             _("Press a hotkey in a game and the game still gets the key while your sound "
+               "plays. Settings → Hotkeys → Keys in games turns that off.")),
+            ("sounds", _("The Store is now Free sounds"),
+             _("Every sound in it is free, and Myinstants' sounds are in it now. The Chat "
+               "tab is gone.")),
+            ("play", _("Bun dances to your music"),
+             _("In Bun mode he dances in the song's style, and every theme has its own "
+               "little skit.")),
+        ), "hotkeys", _("Open Hotkeys")),
+        Note("2.3.0", _("A hotkey for every voice"), (
+            ("voice", _("Switch voices mid-call"),
+             _("Right-click a voice's card → Set a hotkey… and that key turns the voice "
+               "on. The tray menu can switch voices too.")),
+            ("mic", _("Your voice at one volume"),
+             _("Loud or quiet, your friends hear you at one level. Untick Keep my voice "
+               "at one volume to switch it off.")),
+            ("plus", _("483 more free sounds"),
+             _("Free sound packs has a new General pack: memes, game show, animals, "
+               "horror and more.")),
+        )),
+        Note("2.2.0", _("Updates install themselves"), (
+            ("download", _("No more update buttons"),
+             _("A new version downloads and installs while Onion Board opens. Untick "
+               "Install updates by themselves in Settings → Updates to be asked first.")),
+            ("stop", _("Stop means stop"),
+             _("Stop all cuts off echo and reverb too, and the radio goes quiet the "
+               "moment you press Stop.")),
+            ("voice", _("AI voices in one click"),
+             _("Click an AI voice and it's on. No more pressing Start.")),
+        ), "updates", _("Open Updates")),
+    )
+
+
+def notes() -> tuple[Note, ...]:
+    """Every note, newest first."""
+    return recent() + NOTES
+
+
+# before 2.0, newest first: English only (docs/TRANSLATING.md)
 NOTES = (
     Note("1.9.20", "Sort your pads, and a list view", (
         ("plus", "Sort and list your pads",
@@ -236,7 +287,7 @@ NOTES = (
 
 def unseen(seen: str) -> list[Note]:
     """The notes for versions newer than `seen` (none past this one), newest first."""
-    return [n for n in NOTES
+    return [n for n in notes()
             if updates.newer(n.version, seen or "0") and not updates.newer(n.version)]
 
 
@@ -261,15 +312,19 @@ class WhatsNewDialog(QDialog):
         lay = QVBoxLayout(self)
         lay.setContentsMargins(20, 18, 20, 16)
         lay.setSpacing(10)
-        top = notes[0]
-        lay.addWidget(_heading(top.headline))
+        shown, rows = [], 0   # newest first, MAX_ITEMS rows at most: an update over
+        for note in notes:    # several versions stays short
+            if shown and rows + len(note.items) > MAX_ITEMS:
+                break
+            shown.append(note)
+            rows += len(note.items)
+        notes = shown
+        lay.addWidget(_heading(notes[0].headline))
         lay.addWidget(hint_label(
-            _("Updated to Onion Board {version}. Nothing changes until you want it to: "
-              "everything works as before.", version=__version__) if updated else
-            _("New in Onion Board {version}. Nothing changes until you want it to: everything "
-              "works as before.", version=__version__)))
+            _("Updated to Onion Board {version}. Here's what's new.", version=__version__)
+            if updated else _("What's new in Onion Board {version}.", version=__version__)))
         for note in notes:
-            for icon, title, text in note.items:
+            for icon, title, text in note.items[:MAX_ITEMS]:
                 lay.addWidget(self._item(icon, title, text))
         lay.addStretch(1)   # any spare height goes here, not between the rows
         chat = self.discord_link = QLabel(   # the theme's colour: Qt's own blue is dark

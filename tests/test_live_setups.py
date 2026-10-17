@@ -6,6 +6,7 @@ from test_mainwindow import window  # noqa: F401  (the real MainWindow)
 
 from soundboard import library, livesetup, renderworker, voicesetups
 from soundboard.library import SR
+from soundboard.ui import toast
 
 ROBOT = {"robot": {"on": True, "freq": 100, "noise": 0.2, "mix": 1}}
 BEAR = {"id": "bear", "name": "Bear", "pitch": 0.0}
@@ -109,7 +110,12 @@ def test_a_sound_is_made_in_the_ai_voice_first_and_cancel_puts_it_back(
         return (tone() * 32767).astype(np.int16)
     monkeypatch.setattr(library, "load_sound", load_sound)
     live = window.livesetups
-    live.pick("sounds", "Bear")
+    asked = []
+    monkeypatch.setattr(live, "ask", lambda tab, name: asked.append(name) or False)
+    live.pick("sounds", "Bear")                    # "this may take a while": No
+    assert asked == ["Bear"] and live.names["sounds"] == "" and live._ai is None
+    monkeypatch.setattr(live, "ask", lambda tab, name: asked.append(name) or True)
+    live.pick("sounds", "Bear")                    # Yes
     assert live.names["sounds"] == "Bear"
     sid = window.cfg.sounds[0].id
     window.audio.setdefault(sid, (tone() * 32767).astype(np.int16))
@@ -119,6 +125,7 @@ def test_a_sound_is_made_in_the_ai_voice_first_and_cancel_puts_it_back(
         if live._job is None and not live._jobs:
             break
     assert made == ["bear"]
+    assert any("ready to play" in t.text() for t in toast.shown(window))
     assert live.for_play(sid, window.audio[sid]) is not None   # ready now: plays at once
     # Cancel while a setup's AI voice was being made: the one before comes back
     live._before["sounds"], live._from_pick = "", True

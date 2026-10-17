@@ -10,6 +10,8 @@ from PySide6.QtCore import QPointF, Qt
 from PySide6.QtGui import QMouseEvent
 from PySide6.QtWidgets import QApplication, QPushButton
 
+from soundboard import voicefx
+
 from soundboard.ui import responsive, toast
 from soundboard import backup, thumbbar
 from soundboard.library import Config, SoundMeta
@@ -86,6 +88,11 @@ def test_mic_and_voice_changer_keys(window):
     assert power.isChecked()
     w.hkctl.on_hotkey_released("__voicehold__")
     assert not power.isChecked()
+    w.hkctl.on_hotkey("__voicerandom__")       # the Random voice key: a voice, on
+    first = w.voice.fx.preset
+    assert power.isChecked() and first in voicefx.PRESETS
+    w.hkctl.on_hotkey("__voicerandom__")
+    assert power.isChecked() and w.voice.fx.preset != first
 
 
 def test_all_hotkeys_off_leaves_only_its_own_key(window, monkeypatch, calls):

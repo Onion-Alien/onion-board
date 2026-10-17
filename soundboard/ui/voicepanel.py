@@ -235,7 +235,10 @@ class VoicePanel(QWidget):
 
         # the voice changer. It always starts off (the voice you picked is kept):
         # left on from last time, it changed your mic the moment the app opened.
-        self.fx = VoiceFxPanel({**voicefx.clean_spec(fx_spec), "enabled": False})
+        # (Hear it on a voice: a sample in your headphones only)
+        self.fx = VoiceFxPanel({**voicefx.clean_spec(fx_spec), "enabled": False},
+                               play_sample=lambda data: engine.play(
+                                   "__fx_voice_sample", data, 1.0, preview=True))
         self.fx.changed.connect(self._fx_changed)
         # Make it yours' folded effect cards: "fx.<type>" in the same list
         self.fx.set_folded(k[3:] for k in self._folded if k.startswith("fx."))
