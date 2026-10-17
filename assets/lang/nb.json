@@ -3649,5 +3649,22 @@
   "Send to others": "Send til andre",
   "Who should hear the radio?": "Hvem skal høre radioen?",
   "only you hear it": "bare du hører den",
-  "Click any dot to play that station. Press Send to others and your call hears it too.": "Klikk på en prikk for å spille stasjonen. Trykk på Send til andre, så hører samtalen din den også."
+  "Click any dot to play that station. Press Send to others and your call hears it too.": "Klikk på en prikk for å spille stasjonen. Trykk på Send til andre, så hører samtalen din den også.",
+  "You already have a setup called “{name}”.": "Du har allerede et oppsett som heter «{name}».",
+  "{n} min": [
+    "{n} min",
+    "{n} min"
+  ],
+  "Applying the effects": "Legger på effektene",
+  "Applying the effects: {how}": "Legger på effektene: {how}",
+  "Couldn't apply the effects: {why}": "Klarte ikke å legge på effektene: {why}",
+  "Stop, keep the old effects": "Stopp, behold de gamle effektene",
+  "Stopped. “{name}” keeps its old effects": "Stoppet. «{name}» beholder de gamle effektene sine",
+  "You can close this window: it keeps going, and the pad shows how far it is.": "Du kan lukke vinduet: det fortsetter, og knappen viser hvor langt det har kommet.",
+  "applying effects… {pct}%": "legger på effekter… {pct} %",
+  "applying… {pct}%": "legger på… {pct} %",
+  "{pct}%": "{pct} %",
+  "{pct}%, about {time} left": "{pct} %, omtrent {time} igjen",
+  "“{name}” can't play until its effects are applied ({how})": "«{name}» kan ikke spilles før effektene er lagt på ({how})",
+  "✓ “{name}” is ready to play": "✓ «{name}» er klar til å spilles"
 }

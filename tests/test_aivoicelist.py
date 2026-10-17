@@ -80,7 +80,8 @@ def test_voices_are_cleaned():
 
 
 def test_blend_mixes_in_part_of_another_voice():
-    bear, nova = avl.BUILT_IN[0], avl.BUILT_IN[8]
+    by_id = {v["id"]: v for v in avl.BUILT_IN}
+    bear, nova = by_id["bear"], by_id["nova"]
     assert avl.blend(bear) == [[171, 0.5], [60, 0.25], [85, 0.25]]
     mix = dict(avl.blend(bear, nova, 0.2))
     assert mix[171] == pytest.approx(0.4) and mix[27] == pytest.approx(0.1)
@@ -244,7 +245,7 @@ def test_card_shows_every_voice_as_a_card_under_its_kind(qapp, app_dir, monkeypa
         p._cat_btns["women"].click()
         g = p._tile_grid
         order = sorted(shown(), key=lambda vid: (g.getItemPosition(g.indexOf(p._tile[vid]))))
-        assert order == ["ivy", "sage", "nova", "pixie"]          # lowest first
+        assert order == ["onyx", "ivy", "sage", "nana", "nova", "zoe", "pixie"]   # lowest first
         p._cat_btns["mine"].click()
         assert shown() == [] and not p.no_mine.isHidden()
         saved, starts = [], []
@@ -325,3 +326,16 @@ def test_voices_sort_into_who_and_how_high():
     assert avl.pitch_band({"pitch_hz": "junk"}) == "low"
 
 
+
+
+def test_a_built_in_voice_shows_its_picture_when_there_is_one(qapp, monkeypatch):
+    from PySide6.QtGui import QIcon, QPixmap
+    from soundboard.ui import aivoicepanel, art
+    pic = QIcon(QPixmap(8, 8))
+    asked = []
+    monkeypatch.setattr(art, "icon",
+                        lambda key: asked.append(key) or (pic if key == "ai-voice-bear" else None))
+    by_id = {v["id"]: v for v in avl.BUILT_IN}
+    assert aivoicepanel.voice_icon(by_id["bear"]) is pic
+    assert aivoicepanel.voice_icon(by_id["nova"]) is not pic       # no picture: its emoji
+    assert aivoicepanel.art_key(mine()) == "" and asked == ["ai-voice-bear", "ai-voice-nova"]

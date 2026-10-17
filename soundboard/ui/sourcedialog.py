@@ -33,7 +33,9 @@ class SourceDialog(QDialog):
     forgotten = Signal()   # Delete info: the owner saves the settings
 
     def __init__(self, meta, parent=None):
-        super().__init__(parent)
+        # a pop-up over the board: a click outside, Escape or Close shuts it
+        super().__init__(parent, Qt.WindowType.Popup | Qt.WindowType.FramelessWindowHint)
+        self.setProperty("popover", True)   # its edge (theme.py)
         usage.used("source-details")
         fit.watch(self)   # grows to fit its text (ui/fit.py)
         self.meta = meta
@@ -140,7 +142,8 @@ class SourceDialog(QDialog):
                           _("Delete where “{name}” came from?\n\nIts link, channel and other "
                             "details and their text file are deleted. The sound stays.",
                             name=self.meta.name),
-                          QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.Cancel, self)
+                          QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.Cancel,
+                          self.parentWidget() or self)   # (asking closes this pop-up)
         box.button(QMessageBox.StandardButton.Yes).setText(_("Delete"))
         box.setDefaultButton(QMessageBox.StandardButton.Cancel)
         if box.exec() != QMessageBox.StandardButton.Yes:

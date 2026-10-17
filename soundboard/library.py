@@ -1799,17 +1799,18 @@ class Cancelled(Exception):
     """A render given up on partway (render_cached's `cancel`): a newer one replaced it."""
 
 
-def load_sound(meta: SoundMeta, cancel: Callable[[], bool] | None = None) -> np.ndarray:
+def load_sound(meta: SoundMeta, cancel: Callable[[], bool] | None = None,
+               progress: Callable[[float], None] | None = None) -> np.ndarray:
     """int16 audio for a library sound as it plays, effects included. The first
     load after its effects change renders them (slow for long sounds); after that
-    it is one file read. cancel: see render_cached."""
+    it is one file read. cancel, progress: see render_cached."""
     from soundboard import soundfx
     key = soundfx.key(meta.fx)
     if not key:
         return load_original(meta)
     data = load_cached(meta.id, key)
     if data is None:
-        data = render_cached(meta.id, load_original(meta), meta.fx, cancel)
+        data = render_cached(meta.id, load_original(meta), meta.fx, cancel, progress)
     return data
 
 
@@ -1833,14 +1834,16 @@ def _reverse_frames(path: Path, frames: int) -> None:
 
 
 def render_cached(sid: str, data: np.ndarray, fx: dict | None,
-                  cancel: Callable[[], bool] | None = None) -> np.ndarray:
+                  cancel: Callable[[], bool] | None = None,
+                  progress: Callable[[float], None] | None = None) -> np.ndarray:
     """Render a sound's effects (soundfx.render_into) straight into its cache file for
     these effects and return it as int16 (a long one mapped, soundboard.mapped). Only
     a few seconds of it are in memory at a time, however long it is. If the file
     can't be written it's rendered in memory instead, like store_cached does.
     cancel: asked between pieces; True stops the render (raises Cancelled, nothing
     kept). A 2-hour song's pitch shift takes minutes, and each edit saved meanwhile
-    started another one alongside it."""
+    started another one alongside it. progress(frac): how far it is, 0..1, now and
+    then (from the rendering thread)."""
     from soundboard import soundfx
     key = soundfx.key(fx)
     if not key:
@@ -1866,7 +1869,7 @@ def render_cached(sid: str, data: np.ndarray, fx: dict | None,
                 f.write(_i16(x).tobytes())        # x is in [-1, 1]: no limiter
                 n += len(x)
 
-            soundfx.render_into(data, fx, start, put)
+            soundfx.render_into(data, fx, start, put, cancel, progress)
             _npy_header(f, n)
         if soundfx.clean(fx)["reverse"]:
             _reverse_frames(tmp, n)

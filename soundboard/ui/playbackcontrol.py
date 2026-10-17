@@ -97,6 +97,10 @@ class PlaybackControl(Controller):
                            "the file was moved or deleted, remove the pad and add the "
                            "sound again.</span>",
                            status=theme.status('error'), name=name, why=why), "error")
+            elif p is not None and p.state == "rendering" and mw.editctl.rendering(sid):
+                mw.toast(_("“{name}” can't play until its effects are applied ({how})",
+                           name=html.escape(m.name), how=mw.editctl.render_words(sid)),
+                         "warn", key="render-wait")
             else:
                 mw.toast(_("“{name}” is still loading…", name=html.escape(m.name)), "warn")
             return

@@ -196,7 +196,7 @@ the launcher the shortcuts and PyInstaller use. The app is the `soundboard` pack
 | `soundboard/sourceinfo.py` | where a sound added from a web link came from: link, channel, upload date, length and views picked from the download's own yt-dlp reply, kept as `SoundMeta.source` and as a text file next to its audio |
 | `soundboard/ui/sourcedialog.py` | the pad menu's *Details* for a downloaded sound: its picture, title, channel and dates, with *Open on YouTube*, *Copy link* and *Delete info* |
 | `soundboard/ui/spacekey.py` | Space plays / pauses on the Sounds and Radio tabs wherever the focus is (not in text boxes, or on a button reached with Tab) |
-| `soundboard/ui/speedpitch.py` | movable live controls windows: speed, pitch and effects for Sounds, and pitch and effects for Radio and Apps; the speed gauge turns red at 8x |
+| `soundboard/ui/speedpitch.py` | live controls pop-ups: speed, pitch and effects for Sounds, and pitch and effects for Radio and Apps; the speed gauge turns red at 8x |
 | `soundboard/livefx.py` | live effects on every playing sound (the speed & pitch popup): bass, treble, muffle, reverb, echo, distortion and presets; not saved |
 | `soundboard/soundfx.py` | per-sound effects: trim, speed / pitch (phase vocoder + soxr), EQ, boost, reverse and any voice effect, rendered off the audio thread a piece at a time (`render_into`; `library.render_cached` writes it straight into the cache file, so a long sound is never all in memory); the presets |
 | `soundboard/i18n.py` | translations: `_()` / `ngettext()` look the English up in the language picked (`assets/lang/<code>.json`) and fall back to it; Windows' language, plural rules, the pseudo-language `xx` and `unwrapped_texts` for layout checks (see [TRANSLATING.md](TRANSLATING.md)); `scripts/i18n_extract.py` lists missing / unused texts |
@@ -276,6 +276,7 @@ the launcher the shortcuts and PyInstaller use. The app is the `soundboard` pack
 | `soundboard/jobprogress.py` | one download job's progress as one bar that only goes forward: looking the link up, the download (in parts too) and converting are stretches of it; `batch()` for the download bar's whole list |
 | `soundboard/jsengine.py` | the JavaScript engine yt-dlp gets for YouTube's player challenge: Deno, Node or Bun if installed and new enough, else the bundled QuickJS (`scripts/fetch_qjs.py`); none is fine |
 | `soundboard/ytworker.py` | yt-dlp's look-ups and downloads in a helper process, so its long GIL-holding parsing never makes a sound stutter |
+| `soundboard/renderworker.py` | a slow effects render (a song said in an AI voice, a long sound) in a helper process at low priority, with progress and cancel, so it never stutters the audio or lags the window |
 | `soundboard/thumbs.py` | pad pictures: a link's video thumbnail, a file's cover art / first frame (ffmpeg), or a picture you pick or drop on a pad, scaled into `%APPDATA%\OnionBoard\thumbs` |
 | `soundboard/videos.py` | which pads came from a video (an imported video file, or a link added with *Also save the video*), in `videos.json` beside the config; `ui/videowindow.py` is the player's **Video** window, muted and kept in step with the pad's sound |
 | `soundboard/ui/videowindow.py` | the player's *Video* window: a video pad's picture, following the pad's own audio (play, pause, seek, speed) |

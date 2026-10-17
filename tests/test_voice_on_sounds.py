@@ -165,3 +165,32 @@ def test_deleting_a_setup_can_be_undone(window, app_dir):  # noqa: F811
     assert "Robo" not in vp.setups.setups and not vp.setups_bar.btn_undo.isHidden()
     vp.setups_bar.btn_undo.click()
     assert "Robo" in vp.setups.setups
+
+
+def test_a_setup_can_be_renamed_to_any_name_in_its_place(app_dir):
+    s = voicesetups.Store()
+    s.put("Chipmunk + Bear", {"effects": ECHO})
+    s.put("Robo", {"fx": "Robot", "effects": ROBOT})
+    assert s.rename("Chipmunk + Bear", "  funny   high pitch one ") == "funny high pitch one"
+    assert list(s.setups) == ["funny high pitch one", "Robo"]       # same place in the row
+    assert s.setups["funny high pitch one"]["name"] == "funny high pitch one"
+    assert s.rename("Robo", "FUNNY HIGH PITCH ONE") == ""           # another one's name
+    assert s.rename("Robo", "   ") == "" and s.rename("Gone", "x") == ""
+    assert s.rename("Robo", "ROBO") == "ROBO"                       # just its case
+    assert list(voicesetups.Store().setups) == ["funny high pitch one", "ROBO"]
+
+
+def test_the_setup_menu_renames_and_says_when_the_name_is_taken(window, app_dir, monkeypatch):  # noqa: F811
+    if not window.tabctl.tab_on("voice"):
+        return
+    from soundboard.ui import voicesetupsbar
+    vp = window.voice
+    vp.setups.put("Robo", {"fx": "Robot", "effects": ROBOT})
+    vp.setups.put("Echo", {"effects": ECHO})
+    answers = iter([("Echo", True), ("My robot", True)])
+    monkeypatch.setattr(voicesetupsbar.QInputDialog, "getText",
+                        staticmethod(lambda *a, **k: next(answers)))
+    vp.setups_bar._rename("Robo")
+    assert list(vp.setups.setups) == ["Robo", "Echo"] and "Echo" in vp.setups_bar.note.text()
+    vp.setups_bar._rename("Robo")
+    assert list(vp.setups.setups) == ["My robot", "Echo"] and "My robot" in vp.setups_bar.buttons

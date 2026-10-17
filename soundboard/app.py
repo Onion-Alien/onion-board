@@ -559,6 +559,8 @@ def main():
     tune_runtime_for_audio()
     from soundboard import ytworker
     ytworker.enabled = True   # web searches and downloads off the audio's GIL
+    from soundboard import renderworker
+    renderworker.enabled = True   # slow effects renders (an AI voice) too
     from soundboard import i18n
     i18n.startup(APP_DIR)   # before any window or module-level text is made
     import threading

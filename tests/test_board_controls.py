@@ -8,9 +8,9 @@ import pytest
 import numpy as np
 from PySide6.QtCore import QPointF, Qt
 from PySide6.QtGui import QMouseEvent
-from PySide6.QtWidgets import QPushButton
+from PySide6.QtWidgets import QApplication, QPushButton
 
-from soundboard.ui import toast
+from soundboard.ui import responsive, toast
 from soundboard import backup, thumbbar
 from soundboard.library import Config, SoundMeta
 from soundboard.ui.widgets import Pad
@@ -455,6 +455,16 @@ def test_a_double_click_on_a_now_playing_chips_stop_stops_only_that_one(window):
 
 def test_the_mini_players_stop_all_says_all(window):
     assert window.mini_stop.text() == "All" and window.mini_st.text() == ""
+
+
+def test_the_mini_players_stop_all_is_whole_at_the_smallest_size(window):
+    """At its narrowest the row squeezed "■ All" down to "■ A" (CI's fonts are wider)."""
+    w = window
+    w.show()
+    w.resize(responsive.MIN_SIZE.width(), 600)
+    QApplication.processEvents()
+    assert w.fitctl.is_mini()
+    assert w.mini_stop.shown().text == "All"   # whole: the ■ goes first if it must
 
 
 def test_stop_all_turns_the_voice_changer_off_but_the_say_bars_stop_doesnt(window):

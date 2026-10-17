@@ -3572,5 +3572,21 @@
   "Send to others": "傳送給別人",
   "Who should hear the radio?": "誰應該聽到電台？",
   "only you hear it": "只有你聽得到",
-  "Click any dot to play that station. Press Send to others and your call hears it too.": "點任一個點即可播放該電台。按傳送給別人，通話裡的人也聽得到。"
+  "Click any dot to play that station. Press Send to others and your call hears it too.": "點任一個點即可播放該電台。按傳送給別人，通話裡的人也聽得到。",
+  "You already have a setup called “{name}”.": "你已經有一個名為「{name}」的組合了。",
+  "{n} min": [
+    "{n} 分鐘"
+  ],
+  "Applying the effects": "正在套用效果",
+  "Applying the effects: {how}": "正在套用效果：{how}",
+  "Couldn't apply the effects: {why}": "無法套用效果：{why}",
+  "Stop, keep the old effects": "停止，保留原本的效果",
+  "Stopped. “{name}” keeps its old effects": "已停止。「{name}」保留原本的效果",
+  "You can close this window: it keeps going, and the pad shows how far it is.": "可以關掉這個視窗：處理會繼續，按鈕上會顯示進度。",
+  "applying effects… {pct}%": "正在套用效果… {pct}%",
+  "applying… {pct}%": "套用中… {pct}%",
+  "{pct}%": "{pct}%",
+  "{pct}%, about {time} left": "{pct}%，還剩約 {time}",
+  "“{name}” can't play until its effects are applied ({how})": "「{name}」要等效果套用完才能播放（{how}）",
+  "✓ “{name}” is ready to play": "✓ 「{name}」可以播放了"
 }

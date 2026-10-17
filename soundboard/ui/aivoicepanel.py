@@ -26,7 +26,7 @@ from soundboard import modules as mods
 from soundboard.i18n import _, ngettext
 from soundboard.speech import aivoice
 from soundboard.speech import aivoicelist as avl
-from soundboard.ui import busy, icons
+from soundboard.ui import art, busy, icons
 from soundboard.ui.aivoicebrowser import AiVoiceEditor, Previewer, hear_button
 from soundboard.ui.bunnywidget import BunnyWidget
 from soundboard.ui.panel import Flow, UndoBar, fold_button, hint_label, section_label
@@ -67,6 +67,18 @@ def emoji_icon(emoji: str, size: int = TILE_ART) -> QIcon:
     p.drawText(0, 0, size, size, Qt.AlignmentFlag.AlignCenter, emoji or "🎙️")
     p.end()
     return QIcon(pm)
+
+
+def art_key(voice: dict) -> str:
+    """A built-in AI voice's picture in assets/art: "ai-voice-bear" (yours have none)."""
+    return "" if avl.is_mine(voice) else "ai-voice-" + art.slug(str(voice.get("id", "")))
+
+
+def voice_icon(voice: dict, size: int = TILE_ART) -> QIcon:
+    """A voice's card picture: its drawing (ui/art.py) when there is one, else its emoji."""
+    key = art_key(voice)
+    pic = art.icon(key) if key else None
+    return pic or emoji_icon(str(voice.get("emoji") or ""), size)
 
 
 def read_voices(module: mods.ModuleInfo | None,
@@ -503,7 +515,9 @@ class AiVoicePanel(QWidget):
         tags = avl.tag_line(vo) if vo else ""
         text = str(vo.get("about") or vo.get("description") or "")
         self.picked_name.setText(str(vo.get("name", "")))
-        self.picked_pic.setPixmap(emoji_icon(str(vo.get("emoji") or ""), PICKED_ART)
+        key = art_key(vo) if vo else ""
+        pm = art.pixmap(key, PICKED_ART) if key else None
+        self.picked_pic.setPixmap(pm or emoji_icon(str(vo.get("emoji") or ""), PICKED_ART)
                                   .pixmap(PICKED_ART, PICKED_ART))
         self.lbl_about.setText(f"{tags}. {text}" if tags and text else tags or text)
         mine = avl.is_mine(vo)
@@ -540,7 +554,7 @@ class AiVoicePanel(QWidget):
         for vo in self.voices:
             vid = vo["id"]
             b = VoiceTile(vo["name"])
-            b.setIcon(emoji_icon(str(vo.get("emoji") or "")))
+            b.setIcon(voice_icon(vo))
             b.setIconSize(QSize(TILE_ART, TILE_ART))
             b.setCursor(Qt.CursorShape.PointingHandCursor)
             tags = avl.tag_line(vo)

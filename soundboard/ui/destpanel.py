@@ -104,15 +104,22 @@ def _refresh_views(mw):
 
 
 class ModesHelp(QDialog):
-    """What do these do?: every simple mode in plain words, and what it's doing now."""
+    """What do these do?: every simple mode in plain words, and what it's doing now.
+    A pop-up over the board: a click outside, Escape or Close shuts it."""
 
     def __init__(self, mw, parent=None):
-        super().__init__(parent or mw)
+        super().__init__(parent or mw, Qt.WindowType.Popup | Qt.WindowType.FramelessWindowHint)
         fit.watch(self)
         self.setWindowTitle(_("Sound modes: what each one does"))
+        self.setProperty("popover", True)   # its edge (theme.py)
         self.setMinimumWidth(520)
         v = QVBoxLayout(self)
+        v.setContentsMargins(18, 16, 18, 14)
         v.setSpacing(10)
+        title = QLabel(_("Sound modes: what each one does"))
+        title.setObjectName("helptitle")
+        title.setWordWrap(True)
+        v.addWidget(title)
         now = QLabel(_("<b>Right now:</b> {explain}", explain=html.escape(
             profiles.explain(_dest_cfg(mw), getattr(mw, "mode_why", "")))))
         now.setWordWrap(True)

@@ -132,6 +132,7 @@ class Bridge(QObject):
     counted = Signal(object)                   # a usage count went: what it clears (usage.py)
     imported = Signal(object, object, object)  # meta|None, data|None, Skipped|None
     preview = Signal(str, object, float, int)  # id, audio with unsaved effects|None, gain, gen
+    render_progress = Signal(str, int, float)  # id, which render (gen), how far 0..1
     ffmpeg = Signal(object, object)            # ffmpegget.Health, after a fix: "" or its error
     ffmpeg_progress = Signal(int)              # percent of FFmpeg downloaded (-1: not known)
 
@@ -470,6 +471,8 @@ class MainWindow(QMainWindow):
         self._save_failed_shown = False
         self.bridge = Bridge()
         self.bridge.loaded.connect(self.soundctl.on_loaded)
+        self.bridge.loaded.connect(self.editctl._on_loaded)   # after: the pad is ready
+        self.bridge.render_progress.connect(self.editctl._on_progress)
         self.bridge.imported.connect(self.impctl.on_imported)
         self.bridge.preview.connect(self.playctl._on_fx_preview)
         self.bridge.exported.connect(self.impctl._on_exported)
@@ -1080,7 +1083,11 @@ class MainWindow(QMainWindow):
                 p.nudge.connect(self.padctl.nudge_volume)
                 p.rename.connect(self.soundctl.rename_sound)
                 p.edit.connect(self.editctl.edit)
+                p.stop_render.connect(self.editctl.stop_render)
                 self.pads[m.id] = p
+                r = self.editctl.rendering(m.id)
+                if r is not None:   # (a new pad for a sound whose effects are rendering)
+                    p.state, p.render_frac, p.can_stop = "rendering", r.frac, r.old_fx is not None
             p.state = "ready" if m.id in self.audio else p.state
             p.selected = m.id == self.current
             ordered.append(p)

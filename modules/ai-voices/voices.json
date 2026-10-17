@@ -62,6 +62,28 @@
       "pitch_hz": 140
     },
     {
+      "id": "atlas",
+      "name": "Atlas",
+      "emoji": "🎬",
+      "description": "A smooth, deep storyteller.",
+      "about": "A calm, rich, deep man's voice, like a film trailer or a documentary. Good for narrating, a wise king or a game announcer.",
+      "tags": ["Man"],
+      "mix": [[85, 0.5], [171, 0.25], [188, 0.25]],
+      "formant": -0.5,
+      "pitch_hz": 105
+    },
+    {
+      "id": "sarge",
+      "name": "Sarge",
+      "emoji": "🪖",
+      "description": "Loud and barking.",
+      "about": "A hard, punchy man's voice made for shouting orders. Good for a drill sergeant, a coach or an angry boss.",
+      "tags": ["Man"],
+      "mix": [[156, 0.5], [60, 0.25], [5, 0.25]],
+      "formant": -0.5,
+      "pitch_hz": 128
+    },
+    {
       "id": "river",
       "name": "River",
       "emoji": "🌊",
@@ -117,6 +139,39 @@
       "pitch_hz": 265
     },
     {
+      "id": "nana",
+      "name": "Nana",
+      "emoji": "👵",
+      "description": "An older woman's voice.",
+      "about": "A grandma's voice: a little lower and softer than a young woman's. Good for a kind granny, a witch or an old shopkeeper.",
+      "tags": ["Woman"],
+      "mix": [[141, 0.5], [127, 0.25], [108, 0.25]],
+      "formant": -1.0,
+      "pitch_hz": 190
+    },
+    {
+      "id": "zoe",
+      "name": "Zoe",
+      "emoji": "🎧",
+      "description": "A young woman's voice.",
+      "about": "A bright, younger woman's voice, like someone in their late teens or early twenties.",
+      "tags": ["Woman"],
+      "mix": [[53, 0.5], [18, 0.25], [136, 0.25]],
+      "formant": 0.5,
+      "pitch_hz": 235
+    },
+    {
+      "id": "onyx",
+      "name": "Onyx",
+      "emoji": "🖤",
+      "description": "A very low woman's voice.",
+      "about": "A woman with a deep, dark, smoky voice, lower than Ivy. Good for a villain, a spy or a mysterious stranger.",
+      "tags": ["Woman"],
+      "mix": [[29, 0.5], [108, 0.25], [141, 0.25]],
+      "formant": -1.5,
+      "pitch_hz": 135
+    },
+    {
       "id": "squeak",
       "name": "Squeak",
       "emoji": "🐿️",
@@ -126,6 +181,17 @@
       "mix": [[18, 0.5], [110, 0.5]],
       "formant": 2.0,
       "pitch_hz": 360
+    },
+    {
+      "id": "bean",
+      "name": "Bean",
+      "emoji": "🧃",
+      "description": "A little kid.",
+      "about": "A high, small voice like a young child. Higher than Pixie, not as squeaky as Squeak.",
+      "tags": ["Cartoon"],
+      "mix": [[110, 0.5], [18, 0.25], [5, 0.25]],
+      "formant": 1.5,
+      "pitch_hz": 300
     },
     {
       "id": "titan",

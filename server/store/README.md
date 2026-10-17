@@ -16,6 +16,9 @@ and neither needs a payment card on the account.
 | `POST /v1/links` | share a link (JSON: `link`, `name`, `tags`, `agree=link-v1`): only the link is kept, and only to known video and sound sites; it waits for review |
 | `POST /v1/sounds/<id>/vote` | `{"value": 1 \| -1 \| 0}`, one per install |
 | `POST /v1/sounds/<id>/report` | `{"reason": "copyright" \| "offensive" \| "broken" \| "other"}`; 3 reports take it off until it's looked at again |
+| `GET /v1/voices?kind=fx\|ai\|setup&sort=top\|new\|trending&q=&offset=` | a page (50) of community voices with their settings: voice changer voices, AI voices and voice setups |
+| `POST /v1/voices` | share a voice (JSON: `kind`, `name`, `about`, `emoji`, `tags`, `data`); live at once (below) |
+| `POST /v1/voices/<id>/vote`, `/report` | as for sounds; 3 reports hide it until the owner looks |
 | `GET /v1/chat?after=N&wait=1` | the Chat tab's room: messages after number N (held up to 20 s until one arrives); names are picked by the server from the install and per-launch ids (`X-Onion-Session`) |
 | `POST /v1/chat` | `{"text": "..."}`: say something (280 characters, no links, rate-limited) |
 | `POST /v1/chat/<n>/report` | report message n (10 reports per address in 10 minutes); 3 people from different addresses mute its author, and the address it came from, for an hour |
@@ -24,6 +27,7 @@ and neither needs a payment card on the account.
 | `/v1/admin/...` | the review page's calls (`Authorization: Bearer <ADMIN_TOKEN>`), and `POST /v1/admin/import` to add a sound straight to the store |
 | `GET /v1/admin/queue?status=pending\|live\|rejected\|all&q=&offset=` | the owner's: sounds (200 a page) with their reports and hashes, and how many there are of each status |
 | `POST /v1/admin/sync` | the owner's: run one sync step now (below) |
+| `GET /v1/admin/voices?status=hidden\|live\|removed`, `POST /v1/admin/voices/<id>` | the owner's: voices (hidden ones by default, most reported first); `{"action": "live" \| "removed"}` |
 | `GET /v1/admin/log?before=&kind=&sound=&who=&limit=` | the owner's: the action log, newest first (uploads, links, votes, reports, reviews, and the first time each rate limit is hit in a day), filtered by kind, sound, or an address / install hash |
 
 The app sends a random id it made itself (`X-Onion-Install`); the server keeps only a
@@ -38,6 +42,16 @@ lose markup characters (``<>`{}\``) and invisible or right-to-left ones. A serve
 always a download (`content-disposition: attachment`, a sandboxing CSP, `nosniff`), and
 the app keeps one only when it starts like the sound it was told about. The same file
 can't be shared twice. A rejected sound's file is deleted at once.
+
+**Community voices** (`src/voices.js`) are settings, never files or recordings, so they
+go live with no review. Nothing is kept as it was sent: the server rebuilds each voice
+from the fields it checked (known kinds, effect and setting names of plain letters, every
+number finite and pulled into range, an AI voice's 1–4 speakers, a language code) and
+drops everything else. Names (32 characters) and abouts (140) become one plain line: no
+control or format characters (bidi overrides, zero-width joiners), no piles of combining
+marks, and the chat's blocked words and links are refused. The same settings can't be
+shared twice. 20 a day per install, 40 per address. The app checks every voice again
+when it takes one in.
 
 **Sounds from other sites.** Every 10 minutes a cron step (`src/sync.js`) reads Myinstants'
 trending page and one page of one of its categories (5 pages of 10 categories, a cycle

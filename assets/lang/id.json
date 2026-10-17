@@ -1340,7 +1340,7 @@
   "already in your library as “{name}”": "sudah ada di perpustakaan Anda sebagai “{name}”",
   "another action": "tindakan lain",
   "applying effects…": "menerapkan efek…",
-  "applying…": "melamar…",
+  "applying…": "menerapkan…",
   "auto push-to-talk": "push-to-talk otomatis",
   "can't load": "tidak dapat memuat",
   "can't load file": "tidak dapat memuat file",
@@ -3572,5 +3572,21 @@
   "Send to others": "Kirim ke orang lain",
   "Who should hear the radio?": "Siapa yang boleh dengar radionya?",
   "only you hear it": "hanya kamu yang dengar",
-  "Click any dot to play that station. Press Send to others and your call hears it too.": "Klik titik mana saja untuk memutar stasiun itu. Tekan Kirim ke orang lain dan panggilanmu juga mendengarnya."
+  "Click any dot to play that station. Press Send to others and your call hears it too.": "Klik titik mana saja untuk memutar stasiun itu. Tekan Kirim ke orang lain dan panggilanmu juga mendengarnya.",
+  "You already have a setup called “{name}”.": "Kamu sudah punya setelan bernama “{name}”.",
+  "{n} min": [
+    "{n} mnt"
+  ],
+  "Applying the effects": "Menerapkan efek",
+  "Applying the effects: {how}": "Menerapkan efek: {how}",
+  "Couldn't apply the effects: {why}": "Efek tidak bisa diterapkan: {why}",
+  "Stop, keep the old effects": "Hentikan, pakai efek lama",
+  "Stopped. “{name}” keeps its old effects": "Dihentikan. “{name}” tetap memakai efek lamanya",
+  "You can close this window: it keeps going, and the pad shows how far it is.": "Kamu bisa menutup jendela ini: prosesnya tetap jalan, dan pad menunjukkan sejauh mana.",
+  "applying effects… {pct}%": "menerapkan efek… {pct}%",
+  "applying… {pct}%": "menerapkan… {pct}%",
+  "{pct}%": "{pct}%",
+  "{pct}%, about {time} left": "{pct}%, sekitar {time} lagi",
+  "“{name}” can't play until its effects are applied ({how})": "“{name}” belum bisa diputar sampai efeknya selesai diterapkan ({how})",
+  "✓ “{name}” is ready to play": "✓ “{name}” siap diputar"
 }

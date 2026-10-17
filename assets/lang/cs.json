@@ -3726,5 +3726,23 @@
   "Send to others": "Poslat ostatním",
   "Who should hear the radio?": "Kdo má slyšet rádio?",
   "only you hear it": "slyšíš to jen ty",
-  "Click any dot to play that station. Press Send to others and your call hears it too.": "Klikni na libovolnou tečku a stanice začne hrát. Stiskni Poslat ostatním a uslyší ji i tvůj hovor."
+  "Click any dot to play that station. Press Send to others and your call hears it too.": "Klikni na libovolnou tečku a stanice začne hrát. Stiskni Poslat ostatním a uslyší ji i tvůj hovor.",
+  "You already have a setup called “{name}”.": "Už máte sestavu s názvem „{name}“.",
+  "{n} min": [
+    "{n} min",
+    "{n} min",
+    "{n} min"
+  ],
+  "Applying the effects": "Používání efektů",
+  "Applying the effects: {how}": "Používám efekty: {how}",
+  "Couldn't apply the effects: {why}": "Efekty se nepodařilo použít: {why}",
+  "Stop, keep the old effects": "Zastavit, nechat staré efekty",
+  "Stopped. “{name}” keeps its old effects": "Zastaveno. „{name}“ má dál své staré efekty",
+  "You can close this window: it keeps going, and the pad shows how far it is.": "Okno můžeš zavřít: pokračuje to dál a tlačítko ukazuje, jak daleko to je.",
+  "applying effects… {pct}%": "používám efekty… {pct}%",
+  "applying… {pct}%": "používám… {pct}%",
+  "{pct}%": "{pct} %",
+  "{pct}%, about {time} left": "{pct} %, zbývá asi {time}",
+  "“{name}” can't play until its effects are applied ({how})": "„{name}“ nejde přehrát, dokud se nepoužijí jeho efekty ({how})",
+  "✓ “{name}” is ready to play": "✓ „{name}“ je připravený k přehrání"
 }

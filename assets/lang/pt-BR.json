@@ -3649,5 +3649,22 @@
   "Send to others": "Enviar para os outros",
   "Who should hear the radio?": "Quem deve ouvir o rádio?",
   "only you hear it": "só você ouve",
-  "Click any dot to play that station. Press Send to others and your call hears it too.": "Clique em qualquer ponto para tocar essa estação. Aperte Enviar para os outros e sua chamada também ouve."
+  "Click any dot to play that station. Press Send to others and your call hears it too.": "Clique em qualquer ponto para tocar essa estação. Aperte Enviar para os outros e sua chamada também ouve.",
+  "You already have a setup called “{name}”.": "Você já tem um ajuste chamado “{name}”.",
+  "{n} min": [
+    "{n} min",
+    "{n} min"
+  ],
+  "Applying the effects": "Aplicando os efeitos",
+  "Applying the effects: {how}": "Aplicando os efeitos: {how}",
+  "Couldn't apply the effects: {why}": "Não deu para aplicar os efeitos: {why}",
+  "Stop, keep the old effects": "Parar e manter os efeitos antigos",
+  "Stopped. “{name}” keeps its old effects": "Parado. “{name}” continua com os efeitos antigos",
+  "You can close this window: it keeps going, and the pad shows how far it is.": "Você pode fechar esta janela: continua rodando, e o pad mostra quanto falta.",
+  "applying effects… {pct}%": "aplicando efeitos… {pct}%",
+  "applying… {pct}%": "aplicando… {pct}%",
+  "{pct}%": "{pct}%",
+  "{pct}%, about {time} left": "{pct}%, faltam uns {time}",
+  "“{name}” can't play until its effects are applied ({how})": "“{name}” só toca quando os efeitos forem aplicados ({how})",
+  "✓ “{name}” is ready to play": "✓ “{name}” está pronto para tocar"
 }
