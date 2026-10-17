@@ -29,6 +29,7 @@ FEATURE = "sound_store"   # its switch in Settings > Privacy & security (soundbo
 BASE = "https://onion-board-store.onion-alien.workers.dev"
 AGREEMENT = "own-cc0-v1"    # the upload agreement's version (the server checks it)
 LINK_AGREEMENT = "link-v1"  # sharing a link: only the link is kept
+CONTACT = "onionboard.contact@proton.me"   # copyright and takedown requests
 MAX_BYTES = 4 << 20         # the biggest sound the store takes
 EXTS = (".mp3", ".ogg", ".wav", ".flac")   # what it takes (checked from the bytes there)
 LIST_LIMIT = 1 << 20        # a page of the list is a few KB

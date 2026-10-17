@@ -753,8 +753,11 @@ class ShareDialog(QDialog):
         self.terms = terms = hint_label(_(
             "I made or recorded it myself, and I give it away as CC0: anyone may use it for "
             "anything, for free. No songs, clips from shows or games, or other people's "
-            "sounds: those are removed."))
+            "sounds: those are removed.") + " " + _(
+            "Is a sound in the store yours? Email {email} and it comes down.",
+            email=store.CONTACT))
         terms.setContentsMargins(26, 0, 0, 4)   # under the box's text, not its tick
+        terms.setTextInteractionFlags(Qt.TextInteractionFlag.TextSelectableByMouse)   # the email
         v.addWidget(terms)
         self.error = QLabel()
         self.error.setWordWrap(True)
