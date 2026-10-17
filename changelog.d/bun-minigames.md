@@ -1,0 +1,2 @@
+- Bun's Easter egg game: Pong's paddle now follows the mouse even when it leaves the court (it no longer sticks), and holding an arrow key glides it smoothly instead of needing fast taps.
+- Bun now picks a game at random when he challenges you: Pong, quick draw, rock paper scissors or tic-tac-toe, each with its own sounds in your theme's style. Another game at the end switches to a different one.

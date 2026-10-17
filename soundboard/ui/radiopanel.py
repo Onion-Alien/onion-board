@@ -337,7 +337,7 @@ class RadioTab(QWidget):
         self.btn_rec.setCheckable(True)
         self.btn_rec.setToolTip(_("Record the radio. Click again to stop and the clip is "
                                   "added to your Sounds."))
-        icons.set_icon(self.btn_rec, "record", "#ff4d4f", "#ffffff", size=14)
+        icons.set_icon(self.btn_rec, "record", "danger_text", "#ffffff", size=14)
         self.btn_rec.toggled.connect(self._on_rec)
         bh.addWidget(self.btn_rec)
         # Live controls: the radio's pitch and effects (no speed: it's a live stream)

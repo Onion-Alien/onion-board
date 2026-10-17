@@ -237,7 +237,8 @@ the launcher the shortcuts and PyInstaller use. The app is the `soundboard` pack
 | `soundboard/ui/bunnywidget.py` | Bun animated: bobs, blinks, talks along with your mic and throws music notes |
 | `soundboard/ui/bunmode.py` | Bun mode: the mini player as a floating Bun over everything, showing what the app is doing |
 | `soundboard/ui/scribebun.py` | Bun the scribe: the download banner's picture for a sound with no thumbnail, writing a well-known piece as sheet music on a scroll as the download comes in |
-| `soundboard/ui/bunpong.py` | the Easter egg: poke Bun enough and he challenges you to Pong (its sounds: `pongsounds.py`) |
+| `soundboard/ui/bunpong.py` | the Easter egg: poke Bun enough and he challenges you to a game picked at random; Pong, the games' shared base and the dialog (its sounds: `pongsounds.py`) |
+| `soundboard/ui/bungames.py` | Bun's other Easter egg games: quick draw, rock paper scissors, tic-tac-toe |
 | `soundboard/ui/choicetile.py` | ChoiceTile (a choice as a fixed-size tile: icon, name, tick, optional level bar; the setup guide's devices) and FoldPill (a small pill that opens something under it) |
 | `soundboard/ui/micupdate.py` | the offer to update the mic part: a card over the window a second after it opens; Windows is asked only after *Install update* |
 | `soundboard/ui/setupshow.py` | Bun building your mic on the Setup tab while Onion Board goes onto it (Windows asking, then loading) |

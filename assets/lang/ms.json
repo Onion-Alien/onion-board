@@ -3571,5 +3571,18 @@
   "Send to others": "Hantar kepada orang lain",
   "Who should hear the radio?": "Siapa patut dengar radio?",
   "only you hear it": "hanya anda yang dengar",
-  "Click any dot to play that station. Press Send to others and your call hears it too.": "Klik mana-mana titik untuk memainkan stesen itu. Tekan Hantar kepada orang lain dan panggilan anda juga mendengarnya."
+  "Click any dot to play that station. Press Send to others and your call hears it too.": "Klik mana-mana titik untuk memainkan stesen itu. Tekan Hantar kepada orang lain dan panggilan anda juga mendengarnya.",
+  "Another game": "Permainan lain",
+  "Click to start": "Klik untuk mula",
+  "Draw!": "Seri!",
+  "First to {n} wins. Pick rock, paper or scissors with a click, or the keys 1, 2 and 3.": "Yang pertama sampai {n} menang. Pilih batu, kertas atau gunting dengan klik, atau kekunci 1, 2 dan 3.",
+  "First to {n} wins. When it says GO, click or press Space before Bun does. Too early and the point is his.": "Yang pertama sampai {n} menang. Bila keluar GO, klik atau tekan Space sebelum Bun. Terlalu awal, mata itu miliknya.",
+  "GO!": "GO!",
+  "Quick draw with Bun": "Siapa pantas dengan Bun",
+  "Rock paper scissors with Bun": "Batu kertas gunting dengan Bun",
+  "Three in a row wins a round, first to {n} rounds wins. Click a square, or use the arrow keys and Space.": "Tiga sebaris menang pusingan, yang pertama menang {n} pusingan menang. Klik petak, atau guna kekunci anak panah dan Space.",
+  "Tic-tac-toe with Bun": "Tic-tac-toe dengan Bun",
+  "Wait for it…": "Tunggu…",
+  "too early!": "terlalu awal!",
+  "{ms} ms": "{ms} ms"
 }

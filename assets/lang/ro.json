@@ -3725,5 +3725,18 @@
   "Send to others": "Trimite altora",
   "Who should hear the radio?": "Cine să audă radioul?",
   "only you hear it": "doar tu îl auzi",
-  "Click any dot to play that station. Press Send to others and your call hears it too.": "Dă clic pe orice punct ca să pornești postul. Apasă Trimite altora și te aude și apelul."
+  "Click any dot to play that station. Press Send to others and your call hears it too.": "Dă clic pe orice punct ca să pornești postul. Apasă Trimite altora și te aude și apelul.",
+  "Another game": "Alt joc",
+  "Click to start": "Dă clic ca să începi",
+  "Draw!": "Egalitate!",
+  "First to {n} wins. Pick rock, paper or scissors with a click, or the keys 1, 2 and 3.": "Primul la {n} câștigă. Alege piatră, hârtie sau foarfecă cu un clic sau cu tastele 1, 2 și 3.",
+  "First to {n} wins. When it says GO, click or press Space before Bun does. Too early and the point is his.": "Primul la {n} câștigă. Când apare ACUM, dă clic sau apasă Space înaintea lui Bun. Prea devreme și punctul e al lui.",
+  "GO!": "ACUM!",
+  "Quick draw with Bun": "Duel de reflexe cu Bun",
+  "Rock paper scissors with Bun": "Piatră, hârtie, foarfecă cu Bun",
+  "Three in a row wins a round, first to {n} rounds wins. Click a square, or use the arrow keys and Space.": "Trei în linie câștigă runda, primul la {n} runde câștigă. Dă clic pe un pătrat sau folosește săgețile și Space.",
+  "Tic-tac-toe with Bun": "X și 0 cu Bun",
+  "Wait for it…": "Așteaptă…",
+  "too early!": "prea devreme!",
+  "{ms} ms": "{ms} ms"
 }

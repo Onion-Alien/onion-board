@@ -3648,5 +3648,18 @@
   "Send to others": "Diğerlerine gönder",
   "Who should hear the radio?": "Radyoyu kim duysun?",
   "only you hear it": "sadece sen duyuyorsun",
-  "Click any dot to play that station. Press Send to others and your call hears it too.": "O istasyonu çalmak için herhangi bir noktaya tıkla. Diğerlerine gönder'e bas, görüşmendekiler de duysun."
+  "Click any dot to play that station. Press Send to others and your call hears it too.": "O istasyonu çalmak için herhangi bir noktaya tıkla. Diğerlerine gönder'e bas, görüşmendekiler de duysun.",
+  "Another game": "Başka oyun",
+  "Click to start": "Başlamak için tıkla",
+  "Draw!": "Berabere!",
+  "First to {n} wins. Pick rock, paper or scissors with a click, or the keys 1, 2 and 3.": "İlk {n} puana ulaşan kazanır. Taş, kâğıt ya da makası tıklayarak veya 1, 2 ve 3 tuşlarıyla seç.",
+  "First to {n} wins. When it says GO, click or press Space before Bun does. Too early and the point is his.": "İlk {n} puana ulaşan kazanır. ŞİMDİ yazınca Bun'dan önce tıkla ya da boşluğa bas. Erken basarsan puan onun.",
+  "GO!": "ŞİMDİ!",
+  "Quick draw with Bun": "Bun ile hız düellosu",
+  "Rock paper scissors with Bun": "Bun ile taş kâğıt makas",
+  "Three in a row wins a round, first to {n} rounds wins. Click a square, or use the arrow keys and Space.": "Üçü bir sırada olan turu alır, ilk {n} turu kazanan kazanır. Bir kareye tıkla ya da ok tuşlarıyla boşluğu kullan.",
+  "Tic-tac-toe with Bun": "Bun ile XOX",
+  "Wait for it…": "Bekle…",
+  "too early!": "çok erken!",
+  "{ms} ms": "{ms} ms"
 }

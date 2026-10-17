@@ -3648,5 +3648,18 @@
   "Send to others": "Küldés másoknak",
   "Who should hear the radio?": "Ki hallja a rádiót?",
   "only you hear it": "csak te hallod",
-  "Click any dot to play that station. Press Send to others and your call hears it too.": "Kattints bármelyik pontra, és szól az állomás. Nyomd meg a Küldés másoknak gombot, és a hívásod is hallja."
+  "Click any dot to play that station. Press Send to others and your call hears it too.": "Kattints bármelyik pontra, és szól az állomás. Nyomd meg a Küldés másoknak gombot, és a hívásod is hallja.",
+  "Another game": "Másik játék",
+  "Click to start": "Kattints a kezdéshez",
+  "Draw!": "Döntetlen!",
+  "First to {n} wins. Pick rock, paper or scissors with a click, or the keys 1, 2 and 3.": "Aki előbb eléri a(z) {n} pontot, nyer. Válassz követ, ollót vagy papírt kattintással vagy az 1, 2 és 3 billentyűvel.",
+  "First to {n} wins. When it says GO, click or press Space before Bun does. Too early and the point is his.": "Aki előbb eléri a(z) {n} pontot, nyer. Amikor megjelenik a MOST, kattints vagy nyomd meg a szóközt Bun előtt. Ha túl korán, az ő pontja.",
+  "GO!": "MOST!",
+  "Quick draw with Bun": "Gyors kéz Bunnal",
+  "Rock paper scissors with Bun": "Kő, papír, olló Bunnal",
+  "Three in a row wins a round, first to {n} rounds wins. Click a square, or use the arrow keys and Space.": "Három egy sorban nyeri a kört, aki előbb nyer {n} kört, nyer. Kattints egy mezőre, vagy használd a nyilakat és a szóközt.",
+  "Tic-tac-toe with Bun": "Amőba Bunnal",
+  "Wait for it…": "Várj…",
+  "too early!": "túl korán!",
+  "{ms} ms": "{ms} ms"
 }

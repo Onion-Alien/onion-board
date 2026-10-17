@@ -229,7 +229,7 @@ def test_pong_counts_opened_quit_won_and_lost(qapp, monkeypatch):
     stack, page, _other, bun = _page_with_bun()
     stack.show()
     bun.fetch_bat()
-    game = bunpong.open_for(bun)
+    game = bunpong.open_for(bun, game="pong")
     assert usage._used == {"egg-pong-opened"}
     game.court.serve("bun")
     game.reject()                       # closed mid-game
@@ -328,5 +328,243 @@ def test_no_headphones_open_means_no_sound(qapp):
     eng.mon_stream = None
     game.court.serve("bun")
     assert not eng.played
+    game.finish()
+    stack.close()
+
+
+# ---------------------------------------------------------------- the controls
+
+class _Key:
+    """A stand-in key event."""
+
+    def __init__(self, key, repeat=False):
+        self._k, self._r = key, repeat
+
+    def key(self):
+        return self._k
+
+    def isAutoRepeat(self):
+        return self._r
+
+
+def test_holding_a_key_glides_the_paddle_and_letting_go_stops_it(qapp):
+    stack, game = _game()
+    c = game.court
+    c.serve("you")
+    c.vx = 0.0                                   # keep the ball out of the way
+    assert c.press(_Key(Qt.Key.Key_Down), True)
+    start = c.aim_y
+    for _ in range(15):                          # a quarter of a second held
+        assert c.press(_Key(Qt.Key.Key_Down, repeat=True), True)   # repeats do nothing
+        game.step(1 / 60)
+    moved = c.aim_y - start
+    assert 0.2 < moved < 0.6                     # smooth: no stutter, no teleport
+    c.press(_Key(Qt.Key.Key_Down), False)
+    stopped = c.aim_y
+    for _ in range(10):
+        game.step(1 / 60)
+    assert c.aim_y == stopped
+    # held to the bottom, then turned round: it comes back at once
+    c.press(_Key(Qt.Key.Key_Down), True)
+    for _ in range(120):
+        game.step(1 / 60)
+    c.press(_Key(Qt.Key.Key_Down), False)
+    c.press(_Key(Qt.Key.Key_Up), True)
+    game.step(1 / 60)
+    game.step(1 / 60)
+    assert c.you_y < 0.9 - 0.02
+    game.finish()
+    stack.close()
+
+
+def test_the_dialog_passes_key_releases_on(qapp):
+    stack, game = _game()
+    c = game.court
+    QTest.keyPress(game, Qt.Key.Key_Up)
+    assert Qt.Key.Key_Up in c.held
+    QTest.keyRelease(game, Qt.Key.Key_Up)
+    assert not c.held
+    game.finish()
+    stack.close()
+
+
+def test_the_mouse_steers_from_anywhere_even_off_the_court(qapp, monkeypatch):
+    stack, game = _game()
+    c = game.court
+    c.serve("you")
+    c.vx = 0.0
+    below = c.mapToGlobal(QPointF(-400, c.height() + 300).toPoint())   # off left and down
+    monkeypatch.setattr(bunpong.QCursor, "pos", staticmethod(lambda: below))
+    game.step(1 / 60)
+    assert c.you_y == pytest.approx(0.9)         # at the bottom, not stuck mid-court
+    mid = c.mapToGlobal(QPointF(c.width() + 200, c.height() * 0.4).toPoint())
+    monkeypatch.setattr(bunpong.QCursor, "pos", staticmethod(lambda: mid))
+    game.step(1 / 60)
+    assert c.you_y == pytest.approx(0.4, abs=0.01)
+    # a still mouse leaves the keys in charge
+    c.press(_Key(Qt.Key.Key_Down), True)
+    for _ in range(10):
+        game.step(1 / 60)
+    assert c.you_y > 0.45
+    game.finish()
+    stack.close()
+
+
+# ---------------------------------------------------------------- the other games
+
+def _play(name, seed=1):
+    stack, page, other, bun = _page_with_bun()
+    stack.show()
+    game = BunPong(stack, bun, rng=random.Random(seed), game=name)
+    game._timer.stop()
+    game.show()
+    return stack, game
+
+
+def test_each_open_picks_a_game_never_the_same_twice_running(qapp):
+    seen, last = set(), None
+    rng = random.Random(3)
+    for _ in range(40):
+        name = bunpong.pick_game(rng)
+        assert name != last
+        seen.add(name)
+        last = name
+    assert seen == set(bunpong.games())
+    assert len(seen) >= 4
+
+
+def test_another_game_switches_and_keeps_the_dialog(qapp):
+    stack, game = _play("pong")
+    for _ in range(WIN_AT):
+        game.court._point("you")
+    assert not game.end.isHidden()
+    old = game.game
+    game.other.click()
+    assert game.game != old and game.court.state != "over"
+    assert game.title.text() == game.court.title() == game.windowTitle()
+    assert game.end.isHidden() and game.end.parent() is game.court
+    for _ in range(game.court.win_at):
+        game.court._point("bun")
+    assert not game.end.isHidden() and "bun" in game.end_title.text().lower()
+    game.finish()
+    stack.close()
+
+
+def test_quick_draw_early_is_his_point_and_fast_is_yours(qapp):
+    stack, game = _play("draw")
+    c = game.court
+    QTest.mouseClick(c, Qt.MouseButton.LeftButton)
+    assert c.state == "wait"
+    QTest.keyClick(c, Qt.Key.Key_Space)           # before GO
+    assert c.score == {"you": 0, "bun": 1} and c.early
+    for _ in range(400):
+        game.step(1 / 60)
+        if c.state == "go":
+            break
+    assert c.state == "go"
+    c.fire()
+    assert c.score["you"] == 1 and c.shown[0] == "you"
+    for _ in range(400):                          # next round: you never fire
+        game.step(1 / 60)
+        if c.score["bun"] == 2:
+            break
+    assert c.score["bun"] == 2 and c.shown[0] == "bun"
+    game.finish()
+    stack.close()
+
+
+def test_rock_paper_scissors_plays_to_the_end(qapp):
+    stack, game = _play("rps")
+    c = game.court
+    keys = (Qt.Key.Key_1, Qt.Key.Key_2, Qt.Key.Key_3)
+    rounds = 0
+    while c.state != "over" and rounds < 60:
+        QTest.keyClick(c, keys[rounds % 3])
+        assert c.state == "shake"
+        for _ in range(140):
+            game.step(1 / 60)
+            if c.state in ("pick", "over"):
+                break
+        rounds += 1
+    assert c.state == "over" and max(c.score.values()) == c.win_at
+    assert not game.end.isHidden()
+    game.finish()
+    stack.close()
+
+
+def test_rock_paper_scissors_scores_the_right_side(qapp):
+    stack, game = _play("rps")
+    c = game.court
+    c.pick(0)
+    c.his = "scissors"                            # rock beats scissors
+    for _ in range(60):
+        game.step(1 / 60)
+    assert c.score == {"you": 1, "bun": 0} and c.won == "you"
+    for _ in range(100):
+        game.step(1 / 60)
+    c.pick(0)
+    c.his = "paper"
+    for _ in range(60):
+        game.step(1 / 60)
+    assert c.score == {"you": 1, "bun": 1}
+    game.finish()
+    stack.close()
+
+
+def test_tic_tac_toe_you_win_a_row_and_bun_blocks(qapp):
+    stack, game = _play("ttt")
+    c = game.court
+    c.board = ["you", "you", None, "bun", "bun", None, None, None, None]
+    c.place(2)
+    assert c.line == (0, 1, 2) and c.score["you"] == 1
+    for _ in range(100):
+        game.step(1 / 60)
+    assert c.state == "play" and c.first == "bun"   # his go first now
+    c.rng = random.Random(0)
+    c.rng.random = lambda: 0.99                   # no careless move this time
+    c.board = ["you", "you", None, None, "bun", None, None, None, None]
+    assert c._bun_move() == 2                     # blocks your row
+    c.board = ["bun", "bun", None, "you", "you", None, None, None, None]
+    assert c._bun_move() == 2                     # takes his own win first
+    game.finish()
+    stack.close()
+
+
+def test_tic_tac_toe_keys_and_clicks(qapp):
+    stack, game = _play("ttt")
+    c = game.court
+    QTest.keyClick(c, Qt.Key.Key_Left)
+    QTest.keyClick(c, Qt.Key.Key_Up)
+    QTest.keyClick(c, Qt.Key.Key_Space)
+    assert c.board[0] == "you" and c.turn == "bun"
+    for _ in range(60):
+        game.step(1 / 60)
+    assert c.board.count("bun") == 1 and c.turn == "you"
+    free = c.board.index(None)
+    x, y, _cell = c._cell_centre(c.geo(), free)
+    QTest.mouseClick(c, Qt.MouseButton.LeftButton, pos=QPointF(x, y).toPoint())
+    assert c.board[free] == "you"
+    game.finish()
+    stack.close()
+
+
+@pytest.mark.parametrize("name", ["draw", "rps", "ttt"])
+def test_every_game_paints_through_a_whole_match(qapp, name):
+    stack, game = _play(name, seed=5)
+    c = game.court
+    for i in range(60 * 90):
+        if name == "draw" and c.state in ("ready", "go") and c.st > 0.2:
+            c.fire()
+        elif name == "rps" and c.state == "pick":
+            c.pick(i % 3)
+        elif name == "ttt" and c.state == "play" and c.turn == "you":
+            c.place(c.board.index(None))
+        game.step(1 / 60)
+        if i % 40 == 0:
+            game.grab()
+        if c.state == "over":
+            break
+    assert c.state == "over" and not game.end.isHidden()
+    assert not game.grab().isNull()
     game.finish()
     stack.close()

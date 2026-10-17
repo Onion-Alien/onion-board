@@ -3648,5 +3648,18 @@
   "Send to others": "दूसरों को भेजें",
   "Who should hear the radio?": "रेडियो किसे सुनाई दे?",
   "only you hear it": "सिर्फ़ आप सुनते हैं",
-  "Click any dot to play that station. Press Send to others and your call hears it too.": "उस स्टेशन को चलाने के लिए किसी भी बिंदु पर क्लिक करें। दूसरों को भेजें दबाएँ और आपकी कॉल भी इसे सुनेगी।"
+  "Click any dot to play that station. Press Send to others and your call hears it too.": "उस स्टेशन को चलाने के लिए किसी भी बिंदु पर क्लिक करें। दूसरों को भेजें दबाएँ और आपकी कॉल भी इसे सुनेगी।",
+  "Another game": "दूसरा गेम",
+  "Click to start": "शुरू करने के लिए क्लिक करें",
+  "Draw!": "बराबरी!",
+  "First to {n} wins. Pick rock, paper or scissors with a click, or the keys 1, 2 and 3.": "पहले {n} तक पहुँचने वाला जीतता है। क्लिक से या 1, 2 और 3 कुंजियों से पत्थर, कागज़ या कैंची चुनें।",
+  "First to {n} wins. When it says GO, click or press Space before Bun does. Too early and the point is his.": "पहले {n} तक पहुँचने वाला जीतता है। जब चलो! दिखे, Bun से पहले क्लिक करें या Space दबाएँ। बहुत जल्दी किया तो अंक उसका।",
+  "GO!": "चलो!",
+  "Quick draw with Bun": "Bun के साथ फुर्ती का मुक़ाबला",
+  "Rock paper scissors with Bun": "Bun के साथ पत्थर कागज़ कैंची",
+  "Three in a row wins a round, first to {n} rounds wins. Click a square, or use the arrow keys and Space.": "एक लाइन में तीन से राउंड जीतें, पहले {n} राउंड जीतने वाला जीतता है। किसी खाने पर क्लिक करें, या तीर कुंजियाँ और Space इस्तेमाल करें।",
+  "Tic-tac-toe with Bun": "Bun के साथ टिक-टैक-टो",
+  "Wait for it…": "रुको…",
+  "too early!": "बहुत जल्दी!",
+  "{ms} ms": "{ms} ms"
 }

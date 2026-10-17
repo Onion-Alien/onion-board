@@ -3648,5 +3648,18 @@
   "Send to others": "Enviar a los demás",
   "Who should hear the radio?": "¿Quién debe oír la radio?",
   "only you hear it": "solo tú la oyes",
-  "Click any dot to play that station. Press Send to others and your call hears it too.": "Haz clic en cualquier punto para reproducir esa estación. Presiona Enviar a los demás y tu llamada también la escucha."
+  "Click any dot to play that station. Press Send to others and your call hears it too.": "Haz clic en cualquier punto para reproducir esa estación. Presiona Enviar a los demás y tu llamada también la escucha.",
+  "Another game": "Otro juego",
+  "Click to start": "Haz clic para empezar",
+  "Draw!": "¡Empate!",
+  "First to {n} wins. Pick rock, paper or scissors with a click, or the keys 1, 2 and 3.": "Gana el primero en llegar a {n}. Elige piedra, papel o tijera con un clic o con las teclas 1, 2 y 3.",
+  "First to {n} wins. When it says GO, click or press Space before Bun does. Too early and the point is his.": "Gana el primero en llegar a {n}. Cuando salga YA, haz clic o presiona Espacio antes que Bun. Si te adelantas, el punto es suyo.",
+  "GO!": "¡YA!",
+  "Quick draw with Bun": "Duelo rápido con Bun",
+  "Rock paper scissors with Bun": "Piedra, papel o tijera con Bun",
+  "Three in a row wins a round, first to {n} rounds wins. Click a square, or use the arrow keys and Space.": "Tres en línea gana la ronda, gana el primero en llegar a {n} rondas. Haz clic en una casilla o usa las flechas y Espacio.",
+  "Tic-tac-toe with Bun": "Gato con Bun",
+  "Wait for it…": "Espera…",
+  "too early!": "¡demasiado pronto!",
+  "{ms} ms": "{ms} ms"
 }

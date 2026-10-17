@@ -3571,5 +3571,18 @@
   "Send to others": "다른 사람에게 보내기",
   "Who should hear the radio?": "누가 라디오를 들을까요?",
   "only you hear it": "나만 들려요",
-  "Click any dot to play that station. Press Send to others and your call hears it too.": "점을 클릭하면 그 방송국이 재생됩니다. 다른 사람에게 보내기를 누르면 통화 상대도 들을 수 있어요."
+  "Click any dot to play that station. Press Send to others and your call hears it too.": "점을 클릭하면 그 방송국이 재생됩니다. 다른 사람에게 보내기를 누르면 통화 상대도 들을 수 있어요.",
+  "Another game": "다른 게임",
+  "Click to start": "클릭해서 시작",
+  "Draw!": "비겼다!",
+  "First to {n} wins. Pick rock, paper or scissors with a click, or the keys 1, 2 and 3.": "먼저 {n}점을 따면 승리. 클릭이나 1, 2, 3 키로 바위, 보, 가위를 골라요.",
+  "First to {n} wins. When it says GO, click or press Space before Bun does. Too early and the point is his.": "먼저 {n}점을 따면 승리. '지금!'이 뜨면 Bun보다 먼저 클릭하거나 스페이스를 눌러요. 너무 빠르면 점수는 Bun 거예요.",
+  "GO!": "지금!",
+  "Quick draw with Bun": "Bun과 순발력 대결",
+  "Rock paper scissors with Bun": "Bun과 가위바위보",
+  "Three in a row wins a round, first to {n} rounds wins. Click a square, or use the arrow keys and Space.": "세 칸을 한 줄로 놓으면 라운드 승리, 먼저 {n}라운드를 이기면 승리. 칸을 클릭하거나 방향키와 스페이스를 써요.",
+  "Tic-tac-toe with Bun": "Bun과 틱택토",
+  "Wait for it…": "기다려…",
+  "too early!": "너무 빨라!",
+  "{ms} ms": "{ms}ms"
 }

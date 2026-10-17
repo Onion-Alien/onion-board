@@ -3725,5 +3725,18 @@
   "Send to others": "Poslat ostatním",
   "Who should hear the radio?": "Kdo má slyšet rádio?",
   "only you hear it": "slyšíš to jen ty",
-  "Click any dot to play that station. Press Send to others and your call hears it too.": "Klikni na libovolnou tečku a stanice začne hrát. Stiskni Poslat ostatním a uslyší ji i tvůj hovor."
+  "Click any dot to play that station. Press Send to others and your call hears it too.": "Klikni na libovolnou tečku a stanice začne hrát. Stiskni Poslat ostatním a uslyší ji i tvůj hovor.",
+  "Another game": "Jiná hra",
+  "Click to start": "Klikni a začni",
+  "Draw!": "Remíza!",
+  "First to {n} wins. Pick rock, paper or scissors with a click, or the keys 1, 2 and 3.": "Kdo první získá {n}, vyhrává. Vyber kámen, nůžky nebo papír kliknutím nebo klávesami 1, 2 a 3.",
+  "First to {n} wins. When it says GO, click or press Space before Bun does. Too early and the point is his.": "Kdo první získá {n}, vyhrává. Když se ukáže TEĎ, klikni nebo zmáčkni mezerník dřív než Bun. Moc brzo a bod je jeho.",
+  "GO!": "TEĎ!",
+  "Quick draw with Bun": "Rychlá ruka s Bunem",
+  "Rock paper scissors with Bun": "Kámen, nůžky, papír s Bunem",
+  "Three in a row wins a round, first to {n} rounds wins. Click a square, or use the arrow keys and Space.": "Tři v řadě vyhrávají kolo, kdo první vyhraje {n} kola, vyhrává. Klikni na políčko nebo použij šipky a mezerník.",
+  "Tic-tac-toe with Bun": "Piškvorky s Bunem",
+  "Wait for it…": "Počkej…",
+  "too early!": "moc brzo!",
+  "{ms} ms": "{ms} ms"
 }

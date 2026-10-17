@@ -399,6 +399,9 @@ class StatusControl(Controller):
         # the mic is the main way: on the cable route the cable's button comes second
         self._set_primary(mw.btn_install, route == "mic" and not update)   # (optional)
         self._set_primary(mw.btn_attach, route == "cable")
+        # its mic in the fill's colour while it's the main button (text colour on the
+        # accent was 1.0:1 on Hacker's green)
+        icons.recolor(mw.btn_attach, "on_accent" if route == "cable" else None)
         # the other ways sit beside the main button as plain words, every time
         mw.mic_alt.setVisible(route == "mic" and not mic_busy)   # also when it works
         mw.alt_cable.setVisible(not mw._cable_gone)   # (back after a restart)

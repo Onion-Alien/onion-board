@@ -3648,5 +3648,18 @@
   "Send to others": "Send til andre",
   "Who should hear the radio?": "Hvem skal høre radioen?",
   "only you hear it": "kun du hører den",
-  "Click any dot to play that station. Press Send to others and your call hears it too.": "Klik på en prik for at afspille stationen. Tryk på Send til andre, så hører dit opkald den også."
+  "Click any dot to play that station. Press Send to others and your call hears it too.": "Klik på en prik for at afspille stationen. Tryk på Send til andre, så hører dit opkald den også.",
+  "Another game": "Et andet spil",
+  "Click to start": "Klik for at starte",
+  "Draw!": "Uafgjort!",
+  "First to {n} wins. Pick rock, paper or scissors with a click, or the keys 1, 2 and 3.": "Først til {n} vinder. Vælg sten, saks eller papir med et klik eller tasterne 1, 2 og 3.",
+  "First to {n} wins. When it says GO, click or press Space before Bun does. Too early and the point is his.": "Først til {n} vinder. Når der står NU, så klik eller tryk mellemrum før Bun. For tidligt, og pointet er hans.",
+  "GO!": "NU!",
+  "Quick draw with Bun": "Hurtigtræk med Bun",
+  "Rock paper scissors with Bun": "Sten, saks, papir med Bun",
+  "Three in a row wins a round, first to {n} rounds wins. Click a square, or use the arrow keys and Space.": "Tre på stribe vinder en runde, først til {n} runder vinder. Klik på et felt, eller brug piletasterne og mellemrum.",
+  "Tic-tac-toe with Bun": "Kryds og bolle med Bun",
+  "Wait for it…": "Vent på det…",
+  "too early!": "for tidligt!",
+  "{ms} ms": "{ms} ms"
 }

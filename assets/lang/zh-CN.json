@@ -3571,5 +3571,18 @@
   "Send to others": "发送给别人",
   "Who should hear the radio?": "谁应该听到电台？",
   "only you hear it": "只有你能听到",
-  "Click any dot to play that station. Press Send to others and your call hears it too.": "点击任意一个点即可播放该电台。按发送给别人，通话里的人也能听到。"
+  "Click any dot to play that station. Press Send to others and your call hears it too.": "点击任意一个点即可播放该电台。按发送给别人，通话里的人也能听到。",
+  "Another game": "换个游戏",
+  "Click to start": "点击开始",
+  "Draw!": "平局！",
+  "First to {n} wins. Pick rock, paper or scissors with a click, or the keys 1, 2 and 3.": "先拿到 {n} 分的赢。点击或按 1、2、3 键出石头、布或剪刀。",
+  "First to {n} wins. When it says GO, click or press Space before Bun does. Too early and the point is his.": "先拿到 {n} 分的赢。出现“上！”时，比 Bun 先点击或按空格。抢跑的话，分归他。",
+  "GO!": "上！",
+  "Quick draw with Bun": "和 Bun 比手快",
+  "Rock paper scissors with Bun": "和 Bun 玩石头剪刀布",
+  "Three in a row wins a round, first to {n} rounds wins. Click a square, or use the arrow keys and Space.": "连成三个赢一局，先赢 {n} 局的获胜。点击格子，或用方向键和空格。",
+  "Tic-tac-toe with Bun": "和 Bun 玩井字棋",
+  "Wait for it…": "等一下…",
+  "too early!": "太早了！",
+  "{ms} ms": "{ms} 毫秒"
 }

@@ -3571,5 +3571,18 @@
   "Send to others": "ส่งให้คนอื่น",
   "Who should hear the radio?": "ใครควรได้ยินวิทยุ?",
   "only you hear it": "มีแค่คุณที่ได้ยิน",
-  "Click any dot to play that station. Press Send to others and your call hears it too.": "คลิกจุดไหนก็ได้เพื่อเล่นสถานีนั้น กด ส่งให้คนอื่น แล้วคนในสายก็จะได้ยินด้วย"
+  "Click any dot to play that station. Press Send to others and your call hears it too.": "คลิกจุดไหนก็ได้เพื่อเล่นสถานีนั้น กด ส่งให้คนอื่น แล้วคนในสายก็จะได้ยินด้วย",
+  "Another game": "เกมอื่น",
+  "Click to start": "คลิกเพื่อเริ่ม",
+  "Draw!": "เสมอ!",
+  "First to {n} wins. Pick rock, paper or scissors with a click, or the keys 1, 2 and 3.": "ใครได้ {n} ก่อนชนะ เลือกค้อน กระดาษ หรือกรรไกรด้วยการคลิก หรือปุ่ม 1, 2 และ 3",
+  "First to {n} wins. When it says GO, click or press Space before Bun does. Too early and the point is his.": "ใครได้ {n} ก่อนชนะ พอขึ้นว่า ไป! ให้คลิกหรือกด Space ก่อน Bun ถ้าเร็วเกินไป แต้มเป็นของเขา",
+  "GO!": "ไป!",
+  "Quick draw with Bun": "ดวลความไวกับ Bun",
+  "Rock paper scissors with Bun": "เป่ายิ้งฉุบกับ Bun",
+  "Three in a row wins a round, first to {n} rounds wins. Click a square, or use the arrow keys and Space.": "เรียงสามช่องชนะรอบนั้น ใครชนะ {n} รอบก่อนชนะ คลิกช่อง หรือใช้ปุ่มลูกศรและ Space",
+  "Tic-tac-toe with Bun": "โอเอ็กซ์กับ Bun",
+  "Wait for it…": "รอก่อน…",
+  "too early!": "เร็วเกินไป!",
+  "{ms} ms": "{ms} ms"
 }
