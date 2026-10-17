@@ -178,6 +178,12 @@ class ExitWatch:
         self.state["alive"] = time.time()
         self._write()
 
+    def staying(self):
+        """closed_by_windows taken back: the installer didn't start after all."""
+        self.state.pop("closed_by_windows", None)
+        self.state["alive"] = time.time()
+        self._write()
+
     def stopped(self):
         """The quit finished: nothing to explain next time."""
         self._stop.set()
@@ -215,6 +221,11 @@ def quitting():
 def closed_by_windows():
     for w in _current:
         w.closed_by_windows()
+
+
+def staying():
+    for w in _current:
+        w.staying()
 
 
 def stopped():

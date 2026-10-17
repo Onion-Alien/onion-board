@@ -129,6 +129,8 @@ class Bridge(QObject):
     update_progress = Signal(object, object)   # bytes of the new version downloaded, of
                                                # how many (0: not known)
     update_ready = Signal(object, str)         # its installer's Path|None, error
+    update_started = Signal(object, object, str)  # Release, what start_install raised|None,
+                                                  # its traceback
     watch_update = Signal(object)              # a newer Onion Watch: watchaddon.Offer
     discord = Signal(object)                   # [discordcfg.Settings] read in the background
     mic_users = Signal(object)                 # [appaudio.App] recording the mic (rawmic)
@@ -500,6 +502,7 @@ class MainWindow(QMainWindow):
         self.bridge.update.connect(self.updctl._on_update)
         self.bridge.update_progress.connect(self.updctl._on_update_progress)
         self.bridge.update_ready.connect(self.updctl._on_update_ready)
+        self.bridge.update_started.connect(self.updctl._on_update_started)
         self.bridge.watch_update.connect(self.updctl._on_watch_update)
         self.bridge.discord.connect(self.alertctl._on_discord)
         self.bridge.mic_users.connect(self.alertctl._on_mic_users)

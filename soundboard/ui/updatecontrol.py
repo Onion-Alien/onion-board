@@ -54,6 +54,7 @@ class UpdateControl(Controller):
         self._auto = False
         self.start_checked = False   # update_at_start had GitHub's answer
         self._auto_install = False   # this download was started by itself: install it too
+        self._installing = False     # the installer is being started (start_install's thread)
 
     def check_updates(self, force: bool = False, why: str = "", launch: bool = False):
         """Look for a newer release on a thread (see updates.py). Without `force` only
@@ -182,17 +183,27 @@ class UpdateControl(Controller):
         usage.used("update-auto")
         cfg.update_pending = rel.version
         cfg.save()
-        try:
-            updates.start_install(path)
-        except OSError as e:
-            log.warning("couldn't start the update installer: %s", e)
+        # before it starts: the installer can close the app before start_install is back
+        exitwatch.closed_by_windows()
+        failed = []
+
+        def start():
+            try:
+                updates.start_install(path)
+            except Exception as e:  # noqa: BLE001 - the app opens with the card instead
+                failed.append(e)
+        # on a thread, the loading screen moving: Windows checks a freshly downloaded
+        # installer before it runs it, which can take a while
+        self._wait(start, lambda: False, "update-start-install")
+        if failed:
+            log.warning("couldn't start the update installer: %s", failed[0])
+            exitwatch.staying()
             cfg.update_pending = ""
             cfg.save()
             splash.set_status()
             QTimer.singleShot(0, mw, lambda: self._on_update(rel, "", False))
             return False
         log.info("installing %s as the app starts", rel.version)
-        exitwatch.closed_by_windows()   # the installer closes us if the quit is slow
         return True
 
     @staticmethod
@@ -536,33 +547,48 @@ class UpdateControl(Controller):
 
     def _start_install(self, rel, path: Path):
         mw = self.mw
+        if self._installing:
+            return
         if not path.is_file():   # removed meanwhile: fetch it again
             self._update_file = None
             self.download_update()
             return
         mw.cfg.update_pending = rel.version
         mw.cfg.save()
-        try:
-            updates.start_install(path)
-        except OSError as e:
-            log.warning("couldn't start the update installer: %s", e)
-            mw.cfg.update_pending = ""
-            mw._save_later()
+        # before it starts: the installer closes the app as soon as it runs, which can be
+        # before start_install is back. Ended that way, it's no crash or freeze to count
+        exitwatch.closed_by_windows()
+        self._installing = True
+
+        def failed(e):
             import traceback
-            self._update_detail = self._update_report(rel, errors.plain(e),
-                                                      traceback.format_exc(limit=8), "install")
-            self._update_fails += 1
-            self._update_err = errors.plain(e)
-            usage.used("update-install-failed")
-            self._show_update_state()   # "Couldn't update", click to try again
-            mw.tell(_("Couldn't update"),
-                      _("The installer couldn't be started ({e}). You can download it "
-                        "from the release page instead.", e=errors.plain(e)), "error",
-                      action=(_("Open the download page"),
-                              lambda: QDesktopServices.openUrl(QUrl(updates.RELEASES))))
+            return rel, e, traceback.format_exc(limit=8)
+        # on a thread: Windows checks a freshly downloaded installer before it runs it,
+        # and the window stayed frozen meanwhile (for good, when that check hung)
+        worker.run(lambda: (rel, updates.start_install(path), ""), mw.bridge.update_started,
+                   "update-start-install", error=failed, owner=mw)
+
+    def _on_update_started(self, rel, e, trace: str):
+        """start_install's answer: started (None), so the app quits; else what it raised."""
+        mw = self.mw
+        self._installing = False
+        if e is None:
+            mw.quit_app()
             return
-        exitwatch.closed_by_windows()   # the installer closes us if the quit is slow
-        mw.quit_app()
+        log.warning("couldn't start the update installer: %s", e)
+        exitwatch.staying()
+        mw.cfg.update_pending = ""
+        mw._save_later()
+        self._update_detail = self._update_report(rel, errors.plain(e), trace, "install")
+        self._update_fails += 1
+        self._update_err = errors.plain(e)
+        usage.used("update-install-failed")
+        self._show_update_state()   # "Couldn't update", click to try again
+        mw.tell(_("Couldn't update"),
+                  _("The installer couldn't be started ({e}). You can download it "
+                    "from the release page instead.", e=errors.plain(e)), "error",
+                  action=(_("Open the download page"),
+                          lambda: QDesktopServices.openUrl(QUrl(updates.RELEASES))))
 
     def after_update(self):
         """At start: remove downloaded installers and, the first time after an update
