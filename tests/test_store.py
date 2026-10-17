@@ -387,3 +387,29 @@ def test_parse_keeps_known_categories_only():
               ).read_text("utf-8")
     m = re.search(r"export const CATS = \[(.*?)\];", server, re.S)
     assert m and re.findall(r'"([a-z]+)"', m.group(1)) == list(store.CATS)
+
+
+def test_a_file_that_isnt_the_sound_it_says_is_not_kept(fake, monkeypatch):
+    """The server walks every file it takes; the app still keeps only what starts like the
+    sound it was told about (never a program or a page saved as "x.wav")."""
+    s = store.parse({"sounds": [_sound(7, name="tricky")]})[0][0]
+    assert store.looks_like(_wav(), "wav") and not store.looks_like(_wav(), "mp3")
+    for junk in (b"MZ\x90\x00" + bytes(100), b"<html><script>alert(1)</script></html>",
+                 b"#!/bin/sh\nrm -rf ~\n" * 4, b"", b"RIFF"):
+        monkeypatch.setattr(store, "_request", lambda *a, j=junk, **k: j)
+        with pytest.raises(store.StoreError):
+            store.fetch(s)
+        assert not s.path.exists() and not s.path.with_name(s.path.name + ".part").exists()
+    monkeypatch.setattr(store, "_request", fake)
+    assert store.fetch(s).read_bytes() == _wav()
+
+
+def test_a_store_name_never_leaves_the_store_folder_or_hides_its_type(fake):
+    root = (store.library.APP_DIR / "store").resolve()
+    for name in ("../../../evil", r"..\..\Startup\x", r"C:\Windows\x", "con", "a\u202e3pm.exe",
+                 "x\u200b\u2066.bat", "<script>"):
+        s = store.Sound(id="0123456789ab", name=name, ext="wav")
+        p = s.path.resolve()
+        assert p.is_relative_to(root) and p.parent.name == "0123456789ab", name
+        assert p.suffix == ".wav"
+        assert not re.search("[\u200b-\u200f\u202a-\u202e\u2066-\u2069<>]", p.name), name

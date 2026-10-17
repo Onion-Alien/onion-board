@@ -209,15 +209,31 @@ def categories(install: str) -> tuple[list[tuple[str, int]], int]:
         raise StoreError(_("The sound store had a problem. Try again in a bit.")) from None
 
 
+def looks_like(data: bytes, ext: str) -> bool:
+    """Whether `data` starts the way an `ext` sound does (mp3, ogg, wav, flac). The server
+    walks each whole file before it takes it; this only stops anything else being kept."""
+    if len(data) < 12:
+        return False
+    if ext == "mp3":
+        return data[:3] == b"ID3" or (data[0] == 0xFF and data[1] & 0xE0 == 0xE0)
+    return {"ogg": data[:4] == b"OggS", "flac": data[:4] == b"fLaC",
+            "wav": data[:4] == b"RIFF" and data[8:12] == b"WAVE"}.get(ext, False)
+
+
 def fetch(sound: Sound) -> Path:
     """The sound's file, fetched once into the app folder's "store". Call off the UI
     thread."""
     p = sound.path
     if p.is_file() and p.stat().st_size:
         return p
+    root = (library.APP_DIR / "store").resolve()
+    if sound.is_link or not p.resolve().is_relative_to(root):
+        raise StoreError(_("The sound store had a problem. Try again in a bit."))
     netlog.cause(FEATURE, f"You played or added {netlog.quoted(sound.name)} from the store")
     data = _request("GET", f"/v1/sounds/{sound.id}/file", limit=MAX_BYTES, timeout=30)
-    if not data:
+    if not data or not looks_like(data, sound.ext):
+        # the server checks every file it takes; this is in case it ever sends something else
+        log.warning("store sound %s isn't the %s it should be: not kept", sound.id, sound.ext)
         raise StoreError(_("The sound store had a problem. Try again in a bit."))
     p.parent.mkdir(parents=True, exist_ok=True)
     part = p.with_name(p.name + ".part")
