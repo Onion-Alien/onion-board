@@ -17,6 +17,7 @@ lines in the files below.
 | `soundboard/ui/splash.py` | The start-up splash (drawn before a theme is applied: plain Bun). |
 | `scripts/pictures/make_bunny.py`, `scripts/pictures/make_favicon.py` | Installer art and icons: always plain Bun (`outfit=()`, `kit=VANILLA`). |
 | `scripts/pictures/bun_sheet.py` | Picture sheets for checking a change by eye (below). |
+| `scripts/pictures/site_mascots.py` | The website's Bun and Hoot: runs `draw_bunny` / `draw_owl` in each theme of the site's look switcher through a painter that writes SVG, into `site/index.html` (the parts the page moves in their own groups) and `site/home.css` (each look's colours). Rerun it after changing either drawing. |
 
 ## Every place he shows up
 
