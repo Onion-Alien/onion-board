@@ -49,11 +49,6 @@ class Clip:
     def path(self) -> Path:
         return clips_dir(self.folder) / self.file
 
-
-class VoiceClip(Clip):
-    """The Voice tab's recordings: the same list, a folder of their own."""
-    folder: ClassVar[str] = "voice-clips"
-
     def audio(self) -> np.ndarray:
         data, sr = sf.read(str(self.path), dtype="float32", always_2d=True)
         if data.shape[1] == 1:
@@ -64,6 +59,11 @@ class VoiceClip(Clip):
             data = np.stack([np.interp(x, np.arange(len(data)), data[:, c]) for c in (0, 1)],
                             1).astype(np.float32)
         return np.ascontiguousarray(data[:, :2])
+
+
+class VoiceClip(Clip):
+    """The Voice tab's recordings: the same list, a folder of their own."""
+    folder: ClassVar[str] = "voice-clips"
 
 
 class Shelf:

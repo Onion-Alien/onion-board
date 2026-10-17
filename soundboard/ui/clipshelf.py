@@ -236,7 +236,8 @@ class ClipShelf(QWidget):
         self._cleanup_timer = QTimer(self)
         self._cleanup_timer.setInterval(60_000)
         self._cleanup_timer.timeout.connect(self._maintain)
-        self._cleanup_timer.start()
+        if not voice:
+            self._cleanup_timer.start()
         self.title.toggled.connect(self._fold)
         self.reload()
         QTimer.singleShot(0, self._maintain)
@@ -546,7 +547,9 @@ class ClipShelf(QWidget):
         m.exec(self.list.viewport().mapToGlobal(pos))
 
     def _maintain(self):
-        if self._closed or (self._worker is not None and self._worker.is_alive()):
+        # the Voice tab's recordings never expire: nothing to tidy, no worker thread
+        if self.voice or self._closed or (self._worker is not None
+                                          and self._worker.is_alive()):
             return
         keep = self.voice or self.cfg.app_clips_keep_forever or self.undo_bar.active()
         playing = self._playing
@@ -619,6 +622,10 @@ class ClipShelf(QWidget):
             self._worker.join(5)
         for worker in self._purge_workers:
             worker.join(5)
+        if self.voice:   # (no expiry: last-use times don't matter)
+            self.stop()
+            self.engine.forget(self._send_sid)
+            return
         # Persist the final activity timestamp off the UI thread as well.
         self._worker = threading.Thread(target=lambda: self.shelf.maintain(True),
                                         daemon=True, name="saved-clips-flush")

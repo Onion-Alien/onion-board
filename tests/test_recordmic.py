@@ -411,6 +411,43 @@ def test_the_voice_tabs_record_button_opens_the_record_window(window):  # noqa: 
     RecordDialog.last_source = "mic"
 
 
+def test_the_voice_tabs_record_keeps_it_in_recordings_not_sounds(window):  # noqa: F811
+    from soundboard.clipshelf import VoiceClip, clips_dir
+    recs = window.voice.recordings
+    sounds = len(window.cfg.sounds)
+    window.soundctl.record_dialog(quick=True)
+    d = window.soundctl._record_dlg
+    d.discard()
+    d.data = np.full((SR, 2), 0.2, np.float32)
+    d.name.setText("Bruh")
+    assert d.save()
+    assert len(window.cfg.sounds) == sounds                 # not a pad
+    c = recs.shelf.snapshot()[0]
+    assert c.name == "Bruh" and isinstance(c, VoiceClip)
+    assert c.path.parent == clips_dir("voice-clips") and c.path.is_file()
+    assert not recs.isHidden() and recs.title.isChecked()
+    assert "Recordings (1)" in recs.title.text()
+    RecordDialog.last_source = "mic"
+
+
+def test_recordings_play_for_me_through_mic_and_add_to_sounds(window, monkeypatch):  # noqa: F811
+    recs = window.voice.recordings
+    c = recs.add(np.full((SR // 2, 2), 0.2, np.float32), "Take", "My voice")
+    played = []
+    monkeypatch.setattr(window.engine, "play",
+                        lambda sid, data, gain, mode="", preview=False: played.append(
+                            (sid, preview)) or object())
+    texts = {b.text(): b for b in recs.clip_buttons}
+    texts["Play for me"].click()
+    texts["Play through mic"].click()
+    assert played == [("voiceclips:preview", True), ("voiceclips-send", False)]
+    sounds = len(window.cfg.sounds)
+    recs.add_picked()
+    assert len(window.cfg.sounds) == sounds + 1 and window.cfg.sounds[-1].name == "Take"
+    assert recs.shelf.get(c.id) is not None                  # still in the list too
+    recs.stop()
+
+
 # ------------------------------------------------------------------ both at once
 
 def both_engine() -> Engine:

@@ -161,7 +161,7 @@ class SoundsControl(Controller):
         if recs is not None:
             names = lambda: [c.name for c in recs.shelf.snapshot()]  # noqa: E731
 
-            def save(data, name, *_picture) -> bool:
+            def save(data, name, picture: str = "") -> bool:
                 """The Voice tab's Record keeps it in the tab's Recordings."""
                 try:
                     recs.add(data, name, _("My changed voice")
