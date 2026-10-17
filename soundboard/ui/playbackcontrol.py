@@ -238,6 +238,18 @@ class PlaybackControl(Controller):
             m = mw.meta(sid)
             mw._set_np_name(m.name if m else "")
 
+    def deselect(self):
+        """Nothing in the player: Space and ▶ have no sound to play until a pad is
+        picked again."""
+        mw = self.mw
+        if mw.current in mw.pads:
+            mw.pads[mw.current].selected = False
+            mw.pads[mw.current].update()
+        mw.current = None
+        mw.start_frac = 0.0
+        mw._set_np_name(_("Pick a sound"))
+        mw.np_name.setToolTip(_("Select a sound pad to use these playback controls."))
+
     def toggle_play_pause(self):
         mw = self.mw
         sid = mw.current
