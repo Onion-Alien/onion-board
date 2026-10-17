@@ -3677,5 +3677,6 @@
   "Onion Board hit {n} problem since it started.": [
     "Onion Board เจอปัญหา {n} ครั้งตั้งแต่เปิดใช้งาน"
   ],
-  "See report": "ดูรายงาน"
+  "See report": "ดูรายงาน",
+  "The store doesn't take that name or those tags. Try other words (and no links).": "ร้านไม่รับชื่อหรือแท็กนั้น ลองคำอื่น (และไม่มีลิงก์)"
 }

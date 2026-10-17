@@ -3756,5 +3756,6 @@
     "शुरू होने के बाद से Onion Board में {n} समस्या आई।",
     "शुरू होने के बाद से Onion Board में {n} समस्याएँ आईं।"
   ],
-  "See report": "रिपोर्ट देखें"
+  "See report": "रिपोर्ट देखें",
+  "The store doesn't take that name or those tags. Try other words (and no links).": "स्टोर यह नाम या ये टैग नहीं लेता। दूसरे शब्द आज़माएं (और कोई लिंक नहीं)।"
 }

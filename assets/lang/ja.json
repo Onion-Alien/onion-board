@@ -3677,5 +3677,6 @@
   "Onion Board hit {n} problem since it started.": [
     "Onion Board は起動してから {n} 件の問題が起きました。"
   ],
-  "See report": "レポートを見る"
+  "See report": "レポートを見る",
+  "The store doesn't take that name or those tags. Try other words (and no links).": "その名前やタグはストアに載せられません。別の言葉にしてください（リンクも不可）。"
 }

@@ -78,11 +78,12 @@ test("names and texts that could break a screen come out as one plain line", asy
   assert.equal(plain("🐿️🐿️🐿️", 2), "🐿️");                    // cut between characters, not inside
 });
 
-test("blocked words and links in a voice's name or about are refused", async () => {
+test("blocked words and links in a voice's name, about or tags are refused", async () => {
   const env = store({ CHAT_BLOCK: "badword" });
   assert.equal((await share(env, { ...VOICE, name: "my B.A.D word voice" })).status, 422);
   assert.equal((await share(env, { ...VOICE, about: "so badword" })).status, 422);
   assert.equal((await share(env, { ...VOICE, about: "visit https://x.com" })).status, 422);
+  assert.equal((await share(env, { ...VOICE, tags: "funny, b4dw0rd" })).status, 422);
   assert.equal((await share(env)).status, 201);
 });
 

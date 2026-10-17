@@ -3756,5 +3756,6 @@
     "Onion Board har støtt på {n} problem siden det startet.",
     "Onion Board har støtt på {n} problemer siden det startet."
   ],
-  "See report": "Se rapport"
+  "See report": "Se rapport",
+  "The store doesn't take that name or those tags. Try other words (and no links).": "Butikken tar ikke det navnet eller de taggene. Prøv andre ord (og ingen lenker)."
 }

@@ -3756,5 +3756,6 @@
     "Az Onion Board indulás óta {n} hibába futott.",
     "Az Onion Board indulás óta {n} hibába futott."
   ],
-  "See report": "Jelentés megnézése"
+  "See report": "Jelentés megnézése",
+  "The store doesn't take that name or those tags. Try other words (and no links).": "A bolt nem fogadja el ezt a nevet vagy ezeket a címkéket. Próbálj más szavakat (és ne linket)."
 }
