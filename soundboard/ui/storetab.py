@@ -733,12 +733,14 @@ class StoreTab(QWidget):
         self.table_head.hide()
         self.stack.setCurrentWidget(self.message)
 
-    def _problem(self, title: str, line: str):
+    def _problem(self, title: str, line: str, fixable: bool = True):
         """The list couldn't be had (the store's down, no connection): the red card in
-        its place, Try again reloads."""
+        its place, Try again reloads. `fixable=False`: the server's down, nothing for
+        the user to do but wait."""
         self.failed = True
         self._fit_buns()
-        self.oops.show_problem(title, line, self.reload)
+        self.oops.show_problem(title, html.escape(line, quote=False), self.reload,
+                               fixable=fixable)
         self.table_head.hide()
         self.stack.setCurrentWidget(self.oops_page)
 
@@ -789,7 +791,7 @@ class StoreTab(QWidget):
             except Exception as e:  # noqa: BLE001 - offline, switched off, the server…
                 log.info("couldn't read the store: %s", e)
                 busy.emit(self._listed, serial,
-                          (replace, None, isinstance(e, store.StoreDown)), False,
+                          (replace, None, e if isinstance(e, store.StoreDown) else None), False,
                           str(e) if isinstance(e, store.StoreError) else errors.plain(e))
         threading.Thread(target=run, daemon=True, name="store-list").start()
 
@@ -802,11 +804,10 @@ class StoreTab(QWidget):
         if found is None:
             if replace and down:
                 self._clear()
-                self._problem(_("Sorry, the store's down"),
-                              _("We're working on getting it back up. Try again in a bit."))
+                self._problem(*store.down_words(down.back), fixable=False)
             elif replace:
                 self._clear()
-                self._problem(_("Couldn't open the store"), html.escape(err, quote=False))
+                self._problem(_("Couldn't open the store"), err)
             else:
                 busy.toast(self.window(), html.escape(err), "error")
             return

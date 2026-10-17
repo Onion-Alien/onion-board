@@ -183,7 +183,7 @@ def test_a_failed_list_says_why_and_retries(qapp, fake):
 
 def test_store_down_shows_the_sad_bun_card_then_the_list(qapp, fake, monkeypatch):
     # the server answers with an error of its own: the store's down, not the user's fault
-    down = store.StoreDown("Sorry, the store's down. We're working on getting it back up.")
+    down = store.StoreDown()
     plain = store._request
 
     def broken(method, path, *a, **kw):
@@ -196,7 +196,9 @@ def test_store_down_shows_the_sad_bun_card_then_the_list(qapp, fake, monkeypatch
                  and t.oops.btn_retry.isVisibleTo(t))
     assert t.failed and t.oops.title.text() == storetab._("Sorry, the store's down")
     assert "working on" in t.oops.line.text() and t.oops.property("tone") == "error"
-    assert t.oops.bun.isVisibleTo(t) and t.oops.bun.sulk and t.oops.btn_report.isVisibleTo(t)
+    assert t.oops.bun.isVisibleTo(t) and t.oops.bun.sulk
+    # nothing the user can fix: no "close Onion Board and open it again", no Report
+    assert not t.oops.btn_report.isVisibleTo(t) and not t.oops.what.isVisibleTo(t)
     t.resize(800, 260)                # no room for him: the words stay
     assert _wait(qapp, lambda: not t.oops.bun.isVisibleTo(t))
     assert t.oops.title.isVisibleTo(t)
@@ -225,6 +227,43 @@ def test_server_errors_mean_the_store_is_down(monkeypatch):
     assert isinstance(answer(502, ""), store.StoreDown)
     assert not isinstance(answer(503, "queue full"), store.StoreDown)   # its own message
     assert not isinstance(answer(404, "not found"), store.StoreDown)
+    assert answer(500, "server").back == 0
+
+
+def test_the_free_plans_limit_used_up_is_maintenance_with_how_long(monkeypatch):
+    import urllib.error
+
+    def urlopen(req, timeout=0, feature=""):
+        raise urllib.error.HTTPError("u", 503, "x", {}, io.BytesIO(
+            json.dumps({"error": "maintenance", "in": 5 * 3600 + 600}).encode()))
+    monkeypatch.setattr(net, "urlopen", urlopen)
+    with pytest.raises(store.StoreDown) as e:
+        store._request("GET", "/v1/sounds")
+    assert store.is_down() and e.value.back > 0
+    title, line = store.down_words(e.value.back)
+    assert title == "The store's down for maintenance"
+    assert line == "It'll be back in about 5 hours."
+    assert str(e.value) == f"{title}. {line}"
+    assert store.down_words(store.time.time() + 600)[1] == "It'll be back in under an hour."
+    assert store.down_words(0)[0] == "Sorry, the store's down"
+
+
+def test_maintenance_card_says_how_long_and_nothing_to_fix(qapp, fake, monkeypatch):
+    plain = store._request
+    back = store.time.time() + 3 * 3600
+
+    def broken(method, path, *a, **kw):
+        if path.startswith("/v1/sounds?"):
+            raise store.StoreDown(back)
+        return plain(method, path, *a, **kw)
+    monkeypatch.setattr(store, "_request", broken)
+    t = _tab(qapp, [], [])
+    assert _wait(qapp, lambda: t.stack.currentWidget() is t.oops_page
+                 and t.oops.btn_retry.isVisibleTo(t))
+    assert t.oops.title.text() == "The store's down for maintenance"
+    assert "about 3 hours" in t.oops.line.text()
+    assert not t.oops.btn_report.isVisibleTo(t) and not t.oops.what.isVisibleTo(t)
+    t.shutdown()
 
 
 @pytest.fixture(autouse=True)
@@ -268,7 +307,7 @@ def test_share_is_greyed_out_while_the_store_is_down(qapp, fake, monkeypatch):
     def broken(method, path, *a, **kw):
         if path == "/v1/categories":
             store._failing.add(path)
-            raise store.StoreDown("down")
+            raise store.StoreDown()
         return plain(method, path, *a, **kw)
     monkeypatch.setattr(store, "_request", broken)
     t = _tab(qapp, [], [])

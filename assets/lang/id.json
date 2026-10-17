@@ -3709,7 +3709,6 @@
   "You're muted, so only you hear “{name}”.": "Kamu dibisukan, jadi hanya kamu yang mendengar “{name}”.",
   "{name} closed: the clip editor keeps what it heard.": "{name} ditutup: editor klip menyimpan apa yang didengarnya.",
   "Sorry, the store's down": "Maaf, toko sedang down",
-  "Sorry, the store's down. We're working on getting it back up.": "Maaf, toko sedang down. Kami sedang berusaha memulihkannya.",
   "We're working on getting it back up. Try again in a bit.": "Kami sedang berusaha memulihkannya. Coba lagi sebentar lagi.",
   "A voice chat's noise suppression can wipe these out, deep bass too. Discord: Input Profile → Studio.": "Peredam bising di obrolan suara bisa menghapus efek ini, bass dalam juga. Discord: Profil Input → Studio.",
   "Full board": "Board penuh",
@@ -4012,5 +4011,10 @@
   "Super Rare": "Super Langka",
   "Uncommon": "Tidak Umum",
   "<b>{device}</b> looks like speakers, so your mic hears itself. Keep them quiet or use headphones. If it starts to squeal, this switches off by itself.": "<b>{device}</b> sepertinya speaker, jadi mic kamu mendengar dirinya sendiri. Kecilkan volumenya atau pakai headphone. Kalau mulai berdenging, ini mati sendiri.",
-  "Stopped <b>Hear what they hear</b>: your mic was picking up your speakers and started to squeal. Use headphones, or turn the speakers down.": "<b>Dengar yang mereka dengar</b> dihentikan: mic kamu menangkap suara speaker dan mulai berdenging. Pakai headphone, atau kecilkan speakernya."
+  "Stopped <b>Hear what they hear</b>: your mic was picking up your speakers and started to squeal. Use headphones, or turn the speakers down.": "<b>Dengar yang mereka dengar</b> dihentikan: mic kamu menangkap suara speaker dan mulai berdenging. Pakai headphone, atau kecilkan speakernya.",
+  "It'll be back in about {n} hour.": [
+    "Akan kembali dalam sekitar {n} jam."
+  ],
+  "It'll be back in under an hour.": "Akan kembali dalam kurang dari satu jam.",
+  "The store's down for maintenance": "Toko sedang down untuk pemeliharaan"
 }

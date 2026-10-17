@@ -3787,7 +3787,6 @@
   "You're muted, so only you hear “{name}”.": "Είσαι σε σίγαση, οπότε μόνο εσύ ακούς το «{name}».",
   "{name} closed: the clip editor keeps what it heard.": "Το {name} έκλεισε: ο επεξεργαστής κλιπ κρατά ό,τι άκουσε.",
   "Sorry, the store's down": "Συγγνώμη, το κατάστημα δεν λειτουργεί",
-  "Sorry, the store's down. We're working on getting it back up.": "Συγγνώμη, το κατάστημα δεν λειτουργεί. Δουλεύουμε για να επανέλθει.",
   "We're working on getting it back up. Try again in a bit.": "Δουλεύουμε για να επανέλθει. Δοκίμασε ξανά σε λίγο.",
   "A voice chat's noise suppression can wipe these out, deep bass too. Discord: Input Profile → Studio.": "Η καταστολή θορύβου μιας φωνητικής συνομιλίας μπορεί να τα σβήσει, και τα βαθιά μπάσα. Discord: Προφίλ εισόδου → Studio.",
   "Full board": "Πλήρες board",
@@ -4090,5 +4089,11 @@
   "Super Rare": "Υπερ-σπάνιο",
   "Uncommon": "Ασυνήθιστο",
   "<b>{device}</b> looks like speakers, so your mic hears itself. Keep them quiet or use headphones. If it starts to squeal, this switches off by itself.": "Το <b>{device}</b> μοιάζει με ηχεία, άρα το μικρόφωνο ακούει τον εαυτό του. Κράτα τα χαμηλά ή βάλε ακουστικά. Αν αρχίσει να σφυρίζει, αυτό κλείνει μόνο του.",
-  "Stopped <b>Hear what they hear</b>: your mic was picking up your speakers and started to squeal. Use headphones, or turn the speakers down.": "Σταμάτησε το <b>Άκου ό,τι ακούν</b>: το μικρόφωνο έπιανε τα ηχεία και άρχισε να σφυρίζει. Βάλε ακουστικά ή χαμήλωσε τα ηχεία."
+  "Stopped <b>Hear what they hear</b>: your mic was picking up your speakers and started to squeal. Use headphones, or turn the speakers down.": "Σταμάτησε το <b>Άκου ό,τι ακούν</b>: το μικρόφωνο έπιανε τα ηχεία και άρχισε να σφυρίζει. Βάλε ακουστικά ή χαμήλωσε τα ηχεία.",
+  "It'll be back in about {n} hour.": [
+    "Θα επιστρέψει σε περίπου {n} ώρα.",
+    "Θα επιστρέψει σε περίπου {n} ώρες."
+  ],
+  "It'll be back in under an hour.": "Θα επιστρέψει σε λιγότερο από μία ώρα.",
+  "The store's down for maintenance": "Το κατάστημα είναι εκτός λειτουργίας για συντήρηση"
 }

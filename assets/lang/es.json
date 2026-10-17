@@ -3787,7 +3787,6 @@
   "You're muted, so only you hear “{name}”.": "Estás silenciado, así que solo tú oyes «{name}».",
   "{name} closed: the clip editor keeps what it heard.": "{name} se ha cerrado: el editor de clips conserva lo que escuchó.",
   "Sorry, the store's down": "Lo sentimos, la tienda está caída",
-  "Sorry, the store's down. We're working on getting it back up.": "Lo sentimos, la tienda está caída. Estamos trabajando para que vuelva.",
   "We're working on getting it back up. Try again in a bit.": "Estamos trabajando para que vuelva. Vuelve a intentarlo en un rato.",
   "A voice chat's noise suppression can wipe these out, deep bass too. Discord: Input Profile → Studio.": "La supresión de ruido de un chat de voz puede borrarlos, y también los graves profundos. Discord: Perfil de entrada → Estudio.",
   "Full board": "Tablero completo",
@@ -4090,5 +4089,11 @@
   "Super Rare": "Súper raro",
   "Uncommon": "Poco común",
   "<b>{device}</b> looks like speakers, so your mic hears itself. Keep them quiet or use headphones. If it starts to squeal, this switches off by itself.": "<b>{device}</b> parecen altavoces, así que tu micro se oye a sí mismo. Bájalos o usa auriculares. Si empieza a pitar, esto se apaga solo.",
-  "Stopped <b>Hear what they hear</b>: your mic was picking up your speakers and started to squeal. Use headphones, or turn the speakers down.": "Se ha parado <b>Oír lo que oyen</b>: tu micro captaba tus altavoces y empezó a pitar. Usa auriculares o baja los altavoces."
+  "Stopped <b>Hear what they hear</b>: your mic was picking up your speakers and started to squeal. Use headphones, or turn the speakers down.": "Se ha parado <b>Oír lo que oyen</b>: tu micro captaba tus altavoces y empezó a pitar. Usa auriculares o baja los altavoces.",
+  "It'll be back in about {n} hour.": [
+    "Vuelve en más o menos {n} hora.",
+    "Vuelve en más o menos {n} horas."
+  ],
+  "It'll be back in under an hour.": "Vuelve en menos de una hora.",
+  "The store's down for maintenance": "La tienda está caída por mantenimiento"
 }

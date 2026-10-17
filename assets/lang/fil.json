@@ -3787,7 +3787,6 @@
   "You're muted, so only you hear “{name}”.": "Naka-mute ka, kaya ikaw lang ang nakakarinig ng “{name}”.",
   "{name} closed: the clip editor keeps what it heard.": "Nagsara ang {name}: itinatago ng clip editor ang narinig nito.",
   "Sorry, the store's down": "Sorry, down ang store",
-  "Sorry, the store's down. We're working on getting it back up.": "Sorry, down ang store. Inaayos na namin para bumalik ito.",
   "We're working on getting it back up. Try again in a bit.": "Inaayos na namin para bumalik ito. Subukan ulit mamaya.",
   "A voice chat's noise suppression can wipe these out, deep bass too. Discord: Input Profile → Studio.": "Puwedeng burahin ng noise suppression ng voice chat ang mga ito, pati ang malalim na bass. Discord: Input Profile → Studio.",
   "Full board": "Buong board",
@@ -4090,5 +4089,11 @@
   "Super Rare": "Super Rare",
   "Uncommon": "Uncommon",
   "<b>{device}</b> looks like speakers, so your mic hears itself. Keep them quiet or use headphones. If it starts to squeal, this switches off by itself.": "Mukhang speaker ang <b>{device}</b>, kaya naririnig ng mic mo ang sarili niya. Hinaan mo o gumamit ng headphones. Kapag nagsimulang sumipol, kusa itong mamamatay.",
-  "Stopped <b>Hear what they hear</b>: your mic was picking up your speakers and started to squeal. Use headphones, or turn the speakers down.": "Itinigil ang <b>Pakinggan ang naririnig nila</b>: nasasagap ng mic mo ang speakers mo at nagsimulang sumipol. Gumamit ng headphones, o hinaan ang speakers."
+  "Stopped <b>Hear what they hear</b>: your mic was picking up your speakers and started to squeal. Use headphones, or turn the speakers down.": "Itinigil ang <b>Pakinggan ang naririnig nila</b>: nasasagap ng mic mo ang speakers mo at nagsimulang sumipol. Gumamit ng headphones, o hinaan ang speakers.",
+  "It'll be back in about {n} hour.": [
+    "Babalik ito sa loob ng mga {n} oras.",
+    "Babalik ito sa loob ng mga {n} oras."
+  ],
+  "It'll be back in under an hour.": "Babalik ito sa loob ng wala pang isang oras.",
+  "The store's down for maintenance": "Down ang store para sa maintenance"
 }
