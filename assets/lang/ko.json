@@ -3731,5 +3731,12 @@
   "{name} closed: the clip editor keeps what it heard.": "{name}이(가) 종료됐어요. 클립 편집기는 들은 소리를 그대로 갖고 있어요.",
   "Sorry, the store's down": "죄송해요, 스토어가 멈췄어요",
   "Sorry, the store's down. We're working on getting it back up.": "죄송해요, 스토어가 멈췄어요. 다시 열기 위해 작업 중이에요.",
-  "We're working on getting it back up. Try again in a bit.": "다시 열기 위해 작업 중이에요. 잠시 후 다시 시도하세요."
+  "We're working on getting it back up. Try again in a bit.": "다시 열기 위해 작업 중이에요. 잠시 후 다시 시도하세요.",
+  "A voice chat's noise suppression can wipe these out, deep bass too. Discord: Input Profile → Studio.": "보이스 채팅의 소음 억제가 이 효과들을 지울 수 있어요. 깊은 저음도요. Discord: 입력 프로필 → 스튜디오.",
+  "Full board": "전체 보드",
+  "Full board: the window got too small for the board, so it shows this mini player. Click (or drag the window bigger) to get the board back.": "전체 보드: 창이 보드에 비해 너무 작아져서 이 미니 플레이어를 보여 줘요. 클릭하거나 창을 크게 늘리면 보드가 돌아와요.",
+  "Hear {effect} (only you)": "{effect} 들어보기 (나만)",
+  "Mic only": "마이크만",
+  "✓ The store is on again: loading it.": "✓ 스토어가 다시 켜졌어요: 불러오는 중.",
+  "Background sounds": "배경 소리"
 }

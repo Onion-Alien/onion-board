@@ -3731,5 +3731,12 @@
   "{name} closed: the clip editor keeps what it heard.": "{name} ปิดไปแล้ว: ตัวแก้ไขคลิปเก็บสิ่งที่ได้ยินไว้",
   "Sorry, the store's down": "ขออภัย ร้านล่มอยู่",
   "Sorry, the store's down. We're working on getting it back up.": "ขออภัย ร้านล่มอยู่ เรากำลังแก้ไขให้กลับมาใช้ได้",
-  "We're working on getting it back up. Try again in a bit.": "เรากำลังแก้ไขให้กลับมาใช้ได้ ลองอีกครั้งในอีกสักครู่"
+  "We're working on getting it back up. Try again in a bit.": "เรากำลังแก้ไขให้กลับมาใช้ได้ ลองอีกครั้งในอีกสักครู่",
+  "A voice chat's noise suppression can wipe these out, deep bass too. Discord: Input Profile → Studio.": "การลดเสียงรบกวนของแชทเสียงอาจลบเอฟเฟกต์เหล่านี้ไป รวมถึงเสียงเบสลึกด้วย Discord: โปรไฟล์อินพุต → สตูดิโอ",
+  "Full board": "บอร์ดเต็ม",
+  "Full board: the window got too small for the board, so it shows this mini player. Click (or drag the window bigger) to get the board back.": "บอร์ดเต็ม: หน้าต่างเล็กเกินไปสำหรับบอร์ด จึงแสดงมินิเพลเยอร์นี้ คลิก (หรือลากหน้าต่างให้ใหญ่ขึ้น) เพื่อกลับไปที่บอร์ด",
+  "Hear {effect} (only you)": "ฟัง {effect} (เฉพาะคุณ)",
+  "Mic only": "ไมค์อย่างเดียว",
+  "✓ The store is on again: loading it.": "✓ ร้านค้าเปิดอีกครั้ง: กำลังโหลด",
+  "Background sounds": "เสียงพื้นหลัง"
 }

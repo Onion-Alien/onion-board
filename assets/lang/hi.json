@@ -3809,5 +3809,12 @@
   "{name} closed: the clip editor keeps what it heard.": "{name} बंद हो गया: क्लिप एडिटर ने जो सुना वह रखता है।",
   "Sorry, the store's down": "माफ़ करें, स्टोर बंद है",
   "Sorry, the store's down. We're working on getting it back up.": "माफ़ करें, स्टोर बंद है। हम इसे फिर से चालू करने पर काम कर रहे हैं।",
-  "We're working on getting it back up. Try again in a bit.": "हम इसे फिर से चालू करने पर काम कर रहे हैं। थोड़ी देर में फिर से कोशिश करें।"
+  "We're working on getting it back up. Try again in a bit.": "हम इसे फिर से चालू करने पर काम कर रहे हैं। थोड़ी देर में फिर से कोशिश करें।",
+  "A voice chat's noise suppression can wipe these out, deep bass too. Discord: Input Profile → Studio.": "वॉइस चैट का नॉइज़ सप्रेशन इन्हें मिटा सकता है, गहरा बेस भी। Discord: इनपुट प्रोफ़ाइल → स्टूडियो।",
+  "Full board": "पूरा बोर्ड",
+  "Full board: the window got too small for the board, so it shows this mini player. Click (or drag the window bigger) to get the board back.": "पूरा बोर्ड: विंडो बोर्ड के लिए बहुत छोटी हो गई, इसलिए यह मिनी प्लेयर दिखा रही है। बोर्ड वापस पाने के लिए क्लिक करें (या विंडो खींचकर बड़ी करें)।",
+  "Hear {effect} (only you)": "{effect} सुनें (सिर्फ़ आप)",
+  "Mic only": "सिर्फ़ माइक",
+  "✓ The store is on again: loading it.": "✓ स्टोर फिर से चालू है: लोड हो रहा है।",
+  "Background sounds": "बैकग्राउंड आवाज़ें"
 }

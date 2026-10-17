@@ -160,3 +160,37 @@ def test_no_change_sits_mid_slider_on_lopsided_ranges(qapp):
     assert b.speed.slider.value() * 2 == b.speed.slider.maximum()
     assert b.fx["muffle"].slider.value() == 0      # 0 to 100 %: starts at the left
     assert livefx.MUFFLE.default == livefx.MUFFLE.lo
+
+
+def test_the_values_can_be_typed(qapp):
+    """The sliders had positions only: each value is a box you can type in too."""
+    from soundboard.ui.speedpitch import SpeedPitchButton, ValueBox
+    b = SpeedPitchButton()
+    got = []
+    b.fx_changed.connect(got.append)
+    box = b.fx["bass"].val
+    assert isinstance(box, ValueBox) and box.suffix() == " dB"
+    box.setValue(7)                                   # typed, then Enter
+    assert b.fx["bass"].value() == 7 and got[-1]["bass"] == 7
+    b.fx["bass"].slider.setValue(b.fx["bass"].slider.maximum())
+    assert box.value() == 18                          # and it follows the slider
+    reverb = b.fx["reverb"].val
+    assert reverb.suffix() == "%" and reverb.maximum() == 100
+    reverb.setValue(40)
+    assert b.fx["reverb"].value() == 0.4
+    b.speed.val.setValue(1.5)
+    assert b.speed.value() == 1.5
+
+
+def test_a_lit_preset_clicked_again_puts_the_knobs_back(qapp):
+    """Clicked again, a lit preset turned every knob off, a tweak made before it too."""
+    from soundboard import livefx
+    from soundboard.ui.speedpitch import SpeedPitchButton
+    b = SpeedPitchButton()
+    b.set_fx({"reverb": 0.3})
+    name = next(n for n, a in livefx.PRESETS.items() if "reverb" not in a)
+    b.fx_presets[name].click()
+    assert b.fx_values() == livefx.clean(livefx.PRESETS[name])
+    assert b.fx_presets[name].isChecked()
+    b.fx_presets[name].click()
+    assert b.fx_values() == {"reverb": 0.3}

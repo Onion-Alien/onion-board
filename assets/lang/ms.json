@@ -3731,5 +3731,12 @@
   "{name} closed: the clip editor keeps what it heard.": "{name} ditutup: editor klip menyimpan apa yang didengarnya.",
   "Sorry, the store's down": "Maaf, kedai sedang tergendala",
   "Sorry, the store's down. We're working on getting it back up.": "Maaf, kedai sedang tergendala. Kami sedang berusaha memulihkannya.",
-  "We're working on getting it back up. Try again in a bit.": "Kami sedang berusaha memulihkannya. Cuba lagi sebentar lagi."
+  "We're working on getting it back up. Try again in a bit.": "Kami sedang berusaha memulihkannya. Cuba lagi sebentar lagi.",
+  "A voice chat's noise suppression can wipe these out, deep bass too. Discord: Input Profile → Studio.": "Penindasan hingar dalam sembang suara boleh memadamkannya, bes dalam juga. Discord: Profil Input → Studio.",
+  "Full board": "Papan penuh",
+  "Full board: the window got too small for the board, so it shows this mini player. Click (or drag the window bigger) to get the board back.": "Papan penuh: tetingkap jadi terlalu kecil untuk papan, jadi ia menunjukkan pemain mini ini. Klik (atau seret tetingkap lebih besar) untuk dapatkan papan semula.",
+  "Hear {effect} (only you)": "Dengar {effect} (anda sahaja)",
+  "Mic only": "Mik sahaja",
+  "✓ The store is on again: loading it.": "✓ Kedai dihidupkan semula: sedang dimuatkan.",
+  "Background sounds": "Bunyi latar"
 }

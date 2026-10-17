@@ -608,7 +608,11 @@ class StoreTab(QWidget):
             return
         on = net.allowed(store.FEATURE)
         if not on and not self._off or on and self._off and self.isVisible():
+            back = on and self._off
             self.reload()
+            if back:   # (the list just went to "Loading": say why it came back)
+                busy.toast(self, _("✓ The store is on again: loading it."), "ok",
+                           key="store-switch")
 
     def hideEvent(self, e):
         self._stop_preview()   # another tab: the sample stops

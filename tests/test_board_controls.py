@@ -475,6 +475,35 @@ def test_the_mini_players_stop_all_is_whole_at_the_smallest_size(window):
     assert w.mini_stop.shown().text == "All"   # whole: the ■ goes first if it must
 
 
+def test_the_mini_players_full_board_button_brings_the_board_back(window):
+    """Dragged under ~460 px the window turned into the mini player by itself, with
+    no way back on it but dragging: its Full board button grows it back."""
+    w = window
+    w.show()
+    w.resize(440, 600)
+    QApplication.processEvents()
+    assert w.fitctl.is_mini() and w.mini_full.isVisibleTo(w)
+    assert "mini player" in w.mini_full.toolTip()
+    w.mini_full.click()
+    QApplication.processEvents()
+    assert not w.fitctl.is_mini() and w.width() > 440
+
+
+def test_muted_with_the_mic_on_the_rail_button_keeps_a_word(window):
+    """Muted while your mic still goes out, "Only your mic" didn't fit the rail's
+    button and it lost its word: "Mic only" then."""
+    w = window
+    rail = w.rail.output
+    w.btn_air.setProperty("voiceonly", True)
+    w.btn_air.setChecked(False)
+    rail.refresh()
+    fm = rail.mute.fontMetrics()
+    room = rail.mute.width() - rail._px(rail.PAIR_ICON) - rail._px(10)
+    if fm.horizontalAdvance(" Only your mic") > room >= fm.horizontalAdvance(" Mic only"):
+        assert rail.mute.text().strip() == "Mic only"
+    assert rail.mute.text().strip() in ("Only your mic", "Mic only", "")
+
+
 def test_stop_all_turns_the_voice_changer_off_but_the_say_bars_stop_doesnt(window):
     w = window
     w.voice.fx.btn_power.setChecked(True)

@@ -3809,5 +3809,12 @@
   "{name} closed: the clip editor keeps what it heard.": "{name} fechou: o editor de clips guarda o que ouviu.",
   "Sorry, the store's down": "Desculpa, a loja está em baixo",
   "Sorry, the store's down. We're working on getting it back up.": "Desculpa, a loja está em baixo. Estamos a trabalhar para a pôr de volta.",
-  "We're working on getting it back up. Try again in a bit.": "Estamos a trabalhar para a pôr de volta. Tenta novamente daqui a pouco."
+  "We're working on getting it back up. Try again in a bit.": "Estamos a trabalhar para a pôr de volta. Tenta novamente daqui a pouco.",
+  "A voice chat's noise suppression can wipe these out, deep bass too. Discord: Input Profile → Studio.": "A supressão de ruído de um chat de voz pode apagar estes efeitos, e os graves profundos também. Discord: Perfil de entrada → Estúdio.",
+  "Full board": "Painel completo",
+  "Full board: the window got too small for the board, so it shows this mini player. Click (or drag the window bigger) to get the board back.": "Painel completo: a janela ficou pequena demais para o painel, por isso mostra este minileitor. Clica (ou arrasta a janela para a aumentar) para voltar ao painel.",
+  "Hear {effect} (only you)": "Ouvir {effect} (só tu)",
+  "Mic only": "Só micro",
+  "✓ The store is on again: loading it.": "✓ A loja está ligada outra vez: a carregar.",
+  "Background sounds": "Sons de fundo"
 }

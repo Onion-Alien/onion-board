@@ -3809,5 +3809,12 @@
   "{name} closed: the clip editor keeps what it heard.": "{name} sulkeutui: leike-editori pitää sen, mitä se kuuli.",
   "Sorry, the store's down": "Sori, kauppa on alhaalla",
   "Sorry, the store's down. We're working on getting it back up.": "Sori, kauppa on alhaalla. Korjaamme sitä takaisin toimintaan.",
-  "We're working on getting it back up. Try again in a bit.": "Korjaamme sitä takaisin toimintaan. Yritä hetken päästä uudelleen."
+  "We're working on getting it back up. Try again in a bit.": "Korjaamme sitä takaisin toimintaan. Yritä hetken päästä uudelleen.",
+  "A voice chat's noise suppression can wipe these out, deep bass too. Discord: Input Profile → Studio.": "Äänichatin kohinanvaimennus voi pyyhkiä ne pois, myös syvän basson. Discord: Syöttöprofiili → Studio.",
+  "Full board": "Koko board",
+  "Full board: the window got too small for the board, so it shows this mini player. Click (or drag the window bigger) to get the board back.": "Koko board: ikkuna kävi liian pieneksi boardille, joten se näyttää tämän minisoittimen. Napsauta (tai vedä ikkunaa isommaksi) saadaksesi boardin takaisin.",
+  "Hear {effect} (only you)": "Kuuntele {effect} (vain sinä)",
+  "Mic only": "Vain mikki",
+  "✓ The store is on again: loading it.": "✓ Kauppa on taas päällä: ladataan.",
+  "Background sounds": "Taustaäänet"
 }

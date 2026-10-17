@@ -3887,5 +3887,12 @@
   "{name} closed: the clip editor keeps what it heard.": "{name} se zavřel: editor klipů si nechá, co slyšel.",
   "Sorry, the store's down": "Promiň, obchod nefunguje",
   "Sorry, the store's down. We're working on getting it back up.": "Promiň, obchod nefunguje. Pracujeme na tom, aby zase běžel.",
-  "We're working on getting it back up. Try again in a bit.": "Pracujeme na tom, aby zase běžel. Zkus to za chvíli."
+  "We're working on getting it back up. Try again in a bit.": "Pracujeme na tom, aby zase běžel. Zkus to za chvíli.",
+  "A voice chat's noise suppression can wipe these out, deep bass too. Discord: Input Profile → Studio.": "Potlačení šumu ve hlasovém chatu je může smazat, hluboké basy taky. Discord: Vstupní profil → Studio.",
+  "Full board": "Celý board",
+  "Full board: the window got too small for the board, so it shows this mini player. Click (or drag the window bigger) to get the board back.": "Celý board: okno je na board moc malé, takže ukazuje tenhle mini přehrávač. Klikni (nebo okno roztáhni) a board je zpátky.",
+  "Hear {effect} (only you)": "Poslechnout {effect} (jen ty)",
+  "Mic only": "Jen mikrofon",
+  "✓ The store is on again: loading it.": "✓ Obchod je zase zapnutý: načítá se.",
+  "Background sounds": "Zvuky v pozadí"
 }

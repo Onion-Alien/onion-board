@@ -502,8 +502,8 @@ def test_live_effects_drive_the_engine(window):
     assert e.sound_fx == {"bass": 9} and "FX" in b.text()
     b.fx_presets["Concert hall"].click()                     # a preset replaces them all
     assert e.sound_fx == {"reverb": 0.55} and b.fx_presets["Concert hall"].isChecked()
-    b.fx_presets["Concert hall"].click()                     # clicked again: off
-    assert e.sound_fx == {}
+    b.fx_presets["Concert hall"].click()                     # clicked again: as before it
+    assert e.sound_fx == {"bass": 9}
     b.set_fx({"echo": 0.5})
     b.set_values(1.5, 2, True)
     b.reset()                                                # Reset all clears the effects
@@ -535,7 +535,8 @@ def test_speed_popup_shrinks_back_when_redline_locks(window, qapp):
     closed = b.pop.height()
     b.redline.click()
     qapp.processEvents()
-    assert b.pop.height() > closed                           # room for the rev meter
+    assert b.pop.height() >= closed                          # room for the rev meter
+    assert b.red_box.geometry().bottom() < b.red_box.parentWidget().height()
     b.redline.click()
     qapp.processEvents()
     assert b.pop.height() == closed                          # and gives it back

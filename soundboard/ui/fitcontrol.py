@@ -242,6 +242,26 @@ class FitControl(Controller):
         room = size.width() - m.left() - m.right() - g.left() - g.right() - bar
         return pad_height(mw.grid.fit_width(room, slim=False)[1]) + 10
 
+    def grow_to_board(self):
+        """The mini player's Full board button: the window grows, on its screen, to the
+        board's size (Bun's "Open the full board" size, or what the board needs)."""
+        mw = self.mw
+        if mw.isMaximized() or mw.isFullScreen():
+            mw.showNormal()
+        from soundboard.ui.buncontrol import FULL_FROM_BUN
+        room = mw.screen().availableGeometry() if mw.screen() else None
+        g = mw.frameGeometry()
+        want = FULL_FROM_BUN.expandedTo(self._fit.fit(mw._pages.size())
+                                        if hasattr(self, "_fit") else MINI_SIZE)
+        if room is not None:
+            want = want.boundedTo(QSize(room.width() - 40, room.height() - 40))
+        mw.resize(want.expandedTo(mw.size()))
+        if room is not None:   # kept on the screen it grew on
+            x = min(max(g.x(), room.left()), room.right() - mw.frameGeometry().width())
+            y = min(max(g.y(), room.top()), room.bottom() - mw.frameGeometry().height())
+            mw.move(max(x, room.left()), max(y, room.top()))
+        self._refit()
+
     def is_mini(self) -> bool:
         mw = self.mw
         return mw._pages.currentIndex() == 1

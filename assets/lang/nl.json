@@ -3809,5 +3809,12 @@
   "{name} closed: the clip editor keeps what it heard.": "{name} is gesloten: de clipeditor houdt wat hij gehoord heeft.",
   "Sorry, the store's down": "Sorry, de winkel ligt eruit",
   "Sorry, the store's down. We're working on getting it back up.": "Sorry, de winkel ligt eruit. We werken eraan om hem weer online te krijgen.",
-  "We're working on getting it back up. Try again in a bit.": "We werken eraan om hem weer online te krijgen. Probeer het zo nog eens."
+  "We're working on getting it back up. Try again in a bit.": "We werken eraan om hem weer online te krijgen. Probeer het zo nog eens.",
+  "A voice chat's noise suppression can wipe these out, deep bass too. Discord: Input Profile → Studio.": "De ruisonderdrukking van een voicechat kan ze wegpoetsen, diepe bas ook. Discord: Invoerprofiel → Studio.",
+  "Full board": "Volledig board",
+  "Full board: the window got too small for the board, so it shows this mini player. Click (or drag the window bigger) to get the board back.": "Volledig board: het venster werd te klein voor het board, dus toont het deze minispeler. Klik (of sleep het venster groter) om het board terug te krijgen.",
+  "Hear {effect} (only you)": "{effect} beluisteren (alleen jij)",
+  "Mic only": "Alleen mic",
+  "✓ The store is on again: loading it.": "✓ De winkel staat weer aan: wordt geladen.",
+  "Background sounds": "Achtergrondgeluiden"
 }

@@ -14,7 +14,8 @@ import time
 from PySide6.QtCore import QEvent, QMimeData, QObject, QRect, QSize, Qt, Signal
 from PySide6.QtGui import (QActionGroup, QColor, QDrag, QFont, QKeySequence, QPainter, QPixmap,
                            QShortcut)
-from PySide6.QtWidgets import (QApplication, QCheckBox, QComboBox, QHBoxLayout, QLabel,
+from PySide6.QtWidgets import (QApplication, QCheckBox, QComboBox, QGraphicsOpacityEffect,
+                               QHBoxLayout, QLabel,
                                QLayout, QMenu, QPushButton, QSizePolicy, QVBoxLayout, QWidget)
 
 from soundboard import appaudio, exeicon, theme, usage
@@ -910,6 +911,14 @@ class AppRow(HoverCard):
                               + self.folder)
             self.set_status("")
             self.sub.setText(_("Not running: it'll be picked up when it starts"))
+        # not running: its icon faded, so a remembered card doesn't pass for a live one
+        if running != (self.icon.graphicsEffect() is None):
+            if running:
+                self.icon.setGraphicsEffect(None)  # pyright: ignore[reportArgumentType] - None takes it off (Qt allows it)
+            else:
+                fade = QGraphicsOpacityEffect(self.icon)
+                fade.setOpacity(0.4)
+                self.icon.setGraphicsEffect(fade)
         self.btn_send.setEnabled(running)
         self.btn_rec.setEnabled(running)
         self.btn_clip.setEnabled(running or self.btn_clip.isChecked())

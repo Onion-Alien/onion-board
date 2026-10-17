@@ -3809,5 +3809,12 @@
   "{name} closed: the clip editor keeps what it heard.": "{name} се затвори: редакторът на клипове пази каквото е чул.",
   "Sorry, the store's down": "Съжаляваме, магазинът не работи",
   "Sorry, the store's down. We're working on getting it back up.": "Съжаляваме, магазинът не работи. Работим по връщането му.",
-  "We're working on getting it back up. Try again in a bit.": "Работим по връщането му. Опитай пак след малко."
+  "We're working on getting it back up. Try again in a bit.": "Работим по връщането му. Опитай пак след малко.",
+  "A voice chat's noise suppression can wipe these out, deep bass too. Discord: Input Profile → Studio.": "Потискането на шума в гласов чат може да ги изтрие, дълбокия бас също. Discord: Входен профил → Студио.",
+  "Full board": "Цялото табло",
+  "Full board: the window got too small for the board, so it shows this mini player. Click (or drag the window bigger) to get the board back.": "Цялото табло: прозорецът стана твърде малък за таблото, затова показва този мини плейър. Кликни (или издърпай прозореца по-голям), за да върнеш таблото.",
+  "Hear {effect} (only you)": "Чуй {effect} (само ти)",
+  "Mic only": "Само микрофон",
+  "✓ The store is on again: loading it.": "✓ Магазинът пак е включен: зарежда се.",
+  "Background sounds": "Фонови звуци"
 }

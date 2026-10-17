@@ -9,7 +9,9 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
-from PySide6.QtCore import QPoint, Qt
+import numpy as np
+
+from PySide6.QtCore import QEvent, QPoint, Qt, QTimer
 from PySide6.QtWidgets import (QApplication, QDialog, QHBoxLayout, QLabel, QPushButton,
                                QVBoxLayout, QWidget)
 
@@ -27,6 +29,9 @@ if TYPE_CHECKING:
 EXTRAS = (("extra_robot", "mix"), ("extra_radio", "drive"), ("extra_echo", "mix"),
           ("extra_reverb", "mix"))
 START = 0.5   # a background sound's level when you add it
+LISTEN_S, LISTEN_GAIN = 4.0, 0.12   # its ▶: seconds of it, and how loud (it's at RMS 1)
+LISTEN_SID = "effects-listen:preview"   # (":preview": the headphones only)
+LISTEN_DOT = 20   # the ▶ circle inside a background sound's chip
 
 
 def layer_param(key: str) -> Param:
@@ -86,6 +91,8 @@ class EffectsPopup(QDialog):
         self.sliders: dict[str, QWidget] = {}
         self.removes: dict[str, QPushButton] = {}
         self.adds: dict[str, QPushButton] = {}
+        self.listens: dict[str, QPushButton] = {}
+        self._listening: str | None = None   # the background sound heard right now
 
     # ------------------------------------------------------------- building
     def rebuild(self):
@@ -95,7 +102,7 @@ class EffectsPopup(QDialog):
         self._v.replaceWidget(old, self.body)
         old.hide()
         old.deleteLater()
-        self.sliders, self.removes, self.adds = {}, {}, {}
+        self.sliders, self.removes, self.adds, self.listens = {}, {}, {}, {}
         box = QVBoxLayout(self.body)
         box.setContentsMargins(0, 0, 0, 0)
         box.setSpacing(6)
@@ -122,24 +129,35 @@ class EffectsPopup(QDialog):
             s.changed.connect(lambda sl=s, k=key: self.panel.set_on_top(k, sl.value()))
             box.addLayout(self._with_remove(s, key, name))
         self.hint.setVisible(not on and not sounds)
-        add = hint_label(_("Add an effect"))
-        add.setObjectName("fxparam")
-        box.addSpacing(4)
-        box.addWidget(add)
-        chips = QWidget()
-        chips.setObjectName("effectchips")
-        flow = Flow(chips, gap=6)
         shown = {k for k, _l in on}
-        for key in (*backdrop.LAYERS, *(t for t, _k in EXTRAS)):
-            if key in shown or key not in backdrop.LAYERS and key not in voicefx.REGISTRY:
-                continue
-            flow.addWidget(self._add_button(key, item_name(key)))
-        if len(sounds) < backdrop.MAX_SOUNDS:
-            flow.addWidget(self._add_button("sound", _("A sound from my board")))
-        box.addWidget(chips)
+        backs = [k for k in backdrop.LAYERS if k not in shown]
+        extras = [t for t, _k in EXTRAS if t not in shown and t in voicefx.REGISTRY]
+        groups = []
+        if backs or len(sounds) < backdrop.MAX_SOUNDS:
+            groups.append((_("Background sounds"),
+                           [self._listen_chip(k) for k in backs]
+                           + ([self._add_button("sound", _("A sound from my board"))]
+                              if len(sounds) < backdrop.MAX_SOUNDS else [])))
+        if extras:
+            groups.append((_("Add an effect"),
+                           [self._add_button(t, item_name(t)) for t in extras]))
+        flows = []
+        for title, buttons in groups:
+            head = hint_label(title)
+            head.setObjectName("fxparam")
+            box.addSpacing(4)
+            box.addWidget(head)
+            chips = QWidget()
+            chips.setObjectName("effectchips")
+            flow = Flow(chips, gap=6)
+            for b in buttons:
+                flow.addWidget(b)
+            box.addWidget(chips)
+            flows.append((chips, flow))
         # a Flow's height follows its width only once laid out: fix it for this width
         inner = self.width() - self._v.contentsMargins().left() - self._v.contentsMargins().right()
-        chips.setMinimumHeight(flow.heightForWidth(inner))
+        for chips, flow in flows:
+            chips.setMinimumHeight(flow.heightForWidth(inner))
         # its new height now: a widget added to a shown window stays hidden (and
         # unmeasured) until shown, and placed with the old height it hung below the bar
         self.body.show()
@@ -172,14 +190,88 @@ class EffectsPopup(QDialog):
         self.adds[key] = b
         return b
 
+    def _listen_chip(self, key: str) -> QPushButton:
+        """A background sound's add chip, with a round ▶ inside its right end: a few
+        seconds of it in your own headphones first (you couldn't hear one before adding
+        it). One pill, so the row doesn't read as twice as many buttons."""
+        b = self._add_button(key, item_name(key))
+        b.setProperty("listen", True)
+        p = QPushButton(b)
+        p.setObjectName("chipplay")
+        p.setCursor(Qt.CursorShape.PointingHandCursor)
+        tip = _("Hear {effect} (only you)", effect=item_name(key))
+        p.setToolTip(tip)
+        p.setAccessibleName(tip)
+        p.setFixedSize(LISTEN_DOT, LISTEN_DOT)
+        p.clicked.connect(lambda _on=False, k=key: self._listen(k))
+        self.listens[key] = p
+        self._dot_look(key)
+        b.installEventFilter(self)   # keeps the dot at its right end as it's sized
+        return b
+
+    def eventFilter(self, obj, ev):
+        if ev.type() == QEvent.Type.Resize and obj.property("listen"):
+            for p in obj.findChildren(QPushButton, "chipplay"):
+                p.move(obj.width() - p.width() - 4, (obj.height() - p.height()) // 2)
+        return super().eventFilter(obj, ev)
+
+    def _dot_look(self, key: str):
+        p = self.listens.get(key)
+        if p is None:
+            return
+        on = self._listening == key
+        p.setProperty("playing", on)
+        p.style().unpolish(p)
+        p.style().polish(p)
+        icons.set_icon(p, "stop" if on else "play", "on_accent" if on else "text_hi", size=12)
+
+    def _listen(self, key: str):
+        """Play LISTEN_S of `key` in the headphones; again (the same one): stop it."""
+        engine = getattr(self.panel.window(), "engine", None)
+        if engine is None:
+            return
+        was = self._listening
+        if was == key and LISTEN_SID in engine.playing():
+            engine.stop(LISTEN_SID)
+            self._listening = None
+            self._dot_look(key)
+            return
+        x = backdrop.generate(key, LISTEN_S, seed=1)
+        n = min(len(x), int(0.3 * backdrop.SR))   # faded in and out, no click
+        ramp = np.linspace(0.0, 1.0, n, dtype=np.float32)
+        x[:n] *= ramp
+        x[-n:] *= ramp[::-1]
+        engine.play(LISTEN_SID, np.stack([x, x], 1), LISTEN_GAIN, mode="restart",
+                    preview=True)
+        self._listening = key
+        if was is not None:
+            self._dot_look(was)
+        self._dot_look(key)
+        QTimer.singleShot(int(LISTEN_S * 1000) + 100, self, lambda k=key: self._heard(k))
+
+    def _heard(self, key: str):
+        """Its few seconds are over: the dot is a ▶ again."""
+        if self._listening == key:
+            self._listening = None
+            self._dot_look(key)
+
+    def hideEvent(self, e):
+        engine = getattr(self.panel.window(), "engine", None)
+        if engine is not None and self._listening is not None:
+            engine.stop(LISTEN_SID)   # closed: the sample goes with it
+        self._listening = None
+        super().hideEvent(e)
+
     # ------------------------------------------------------------- actions
     def _add(self, key: str, button: QPushButton):
         if key == "sound":
             m = self.panel.board_sound_menu()
             if m is None:
                 return
-            m.exec(button.mapToGlobal(QPoint(0, button.height())))
+            picked = m.exec(button.mapToGlobal(QPoint(0, button.height())))
             m.deleteLater()
+            if picked is not None:   # its row shows once the sound's loop is made
+                QTimer.singleShot(300, self, lambda: self.isVisible() and self._again())
         else:
             self.panel.set_on_top(key, START if key in backdrop.LAYERS
                                   else extra_param(key).default)

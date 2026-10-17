@@ -3887,5 +3887,12 @@
   "{name} closed: the clip editor keeps what it heard.": "{name} s-a închis: editorul de clipuri păstrează ce a auzit.",
   "Sorry, the store's down": "Ne pare rău, magazinul nu merge",
   "Sorry, the store's down. We're working on getting it back up.": "Ne pare rău, magazinul nu merge. Lucrăm să-l repornim.",
-  "We're working on getting it back up. Try again in a bit.": "Lucrăm să-l repornim. Încearcă din nou puțin mai târziu."
+  "We're working on getting it back up. Try again in a bit.": "Lucrăm să-l repornim. Încearcă din nou puțin mai târziu.",
+  "A voice chat's noise suppression can wipe these out, deep bass too. Discord: Input Profile → Studio.": "Suprimarea zgomotului dintr-un chat vocal le poate șterge, și basul adânc. Discord: Profil de intrare → Studio.",
+  "Full board": "Board întreg",
+  "Full board: the window got too small for the board, so it shows this mini player. Click (or drag the window bigger) to get the board back.": "Board întreg: fereastra a devenit prea mică pentru board, așa că arată acest mini player. Dă clic (sau trage fereastra mai mare) ca să revină board-ul.",
+  "Hear {effect} (only you)": "Ascultă {effect} (doar tu)",
+  "Mic only": "Doar microfon",
+  "✓ The store is on again: loading it.": "✓ Magazinul e pornit din nou: se încarcă.",
+  "Background sounds": "Sunete de fundal"
 }

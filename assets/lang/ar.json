@@ -4121,5 +4121,12 @@
   "{name} closed: the clip editor keeps what it heard.": "أُغلق {name}: محرر المقاطع يحتفظ بما سمعه.",
   "Sorry, the store's down": "عذرًا، المتجر متوقف",
   "Sorry, the store's down. We're working on getting it back up.": "عذرًا، المتجر متوقف. نعمل على إعادته.",
-  "We're working on getting it back up. Try again in a bit.": "نعمل على إعادته. حاول مجددًا بعد قليل."
+  "We're working on getting it back up. Try again in a bit.": "نعمل على إعادته. حاول مجددًا بعد قليل.",
+  "A voice chat's noise suppression can wipe these out, deep bass too. Discord: Input Profile → Studio.": "إلغاء الضوضاء في دردشة صوتية قد يمحو هذه المؤثرات، والجهير العميق أيضًا. Discord: ملف الإدخال ← استوديو.",
+  "Full board": "اللوحة كاملة",
+  "Full board: the window got too small for the board, so it shows this mini player. Click (or drag the window bigger) to get the board back.": "اللوحة كاملة: صارت النافذة أصغر من اللوحة، لذا تعرض هذا المشغل المصغّر. انقر (أو كبّر النافذة بالسحب) لاستعادة اللوحة.",
+  "Hear {effect} (only you)": "استمع إلى {effect} (أنت فقط)",
+  "Mic only": "الميك فقط",
+  "✓ The store is on again: loading it.": "✓ المتجر يعمل من جديد: جارٍ تحميله.",
+  "Background sounds": "أصوات الخلفية"
 }
