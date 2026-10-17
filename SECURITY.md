@@ -212,7 +212,8 @@ account or anything else about you.
   - a tab's quick how-to the first time it's opened, shown, done, put off or ended by
     an error (`used/tour-radio-shown`, `tour-radio-done`, `tour-radio-skipped`,
     `tour-radio-failed`, the same for
-    `apps`, `triggers`, `voice` and `store`);
+    `apps`, `triggers`, `voice` and `store`), and two put off quickly, which switches
+    the rest off (`used/tours-quit`);
   - sounds from the web: the site (`used/dl-youtube`, `dl-tiktok`, `dl-soundcloud`,
     `dl-instagram`, `dl-x`, `dl-reddit`, `dl-twitch`, `dl-myinstants` or `dl-other`), a
     pasted link or a search pick (`used/dl-link`, `dl-search`), *Add as sound* or *Play
