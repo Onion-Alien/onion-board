@@ -1210,3 +1210,22 @@ def test_the_send_step_says_the_mic_works_before_what_is_missing(mic_wizard, mon
     monkeypatch.setattr(w.engine, "mic_stream", None)   # no mic open: not said
     wiz.recheck_cable(rescan=False)
     assert wiz.mic_done.isHidden()
+
+
+def test_discord_reads_keep_one_thread(mic_wizard, monkeypatch, qapp):
+    # a new thread every 2 s kept the window waiting in Thread.start (2.2.2's freeze at
+    # setupwizard._read_discord): every read runs on the same kept thread
+    import threading
+
+    from conftest import process_events
+    from soundboard import discordcfg
+    _, wiz = mic_wizard
+    threads = []
+    monkeypatch.setattr(discordcfg, "signature",
+                        lambda: threads.append(threading.current_thread()) or ("same",))
+    monkeypatch.setattr(discordcfg, "read", lambda: None)
+    for _ in range(3):
+        wiz._read_discord()
+        assert process_events(qapp, lambda: not wiz._discord_reading)
+    assert len(threads) == 3 and len(set(threads)) == 1
+    assert threading.main_thread() not in threads

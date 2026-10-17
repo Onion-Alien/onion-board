@@ -21,7 +21,6 @@ import html
 import logging
 import re
 import subprocess
-import threading
 import time
 
 import numpy as np
@@ -37,6 +36,7 @@ from soundboard import theme
 from soundboard.engine import SR
 from soundboard import library, net, usage
 from soundboard.library import RESOURCE_DIR
+from soundboard.pollthread import PollThread
 from soundboard.ui import busy, fit, icons, panel
 from soundboard.ui.bunnywidget import TALK, BunnyWidget
 from soundboard.ui.setupshow import SetupShow
@@ -55,6 +55,9 @@ SETTLE_MS = 60          # after a step change, the window settles to what the st
 SLOW_TICK_MS = 250      # the other pages: only the cable installer to keep up with
 LOCK_MAX_S = 180        # the mic set-up holds the guide shut at most this long
 DISCORD_READ_MS = 2000  # the last step re-reads Discord's own settings this often
+# ...on one kept thread for every guide: a new thread each time made the window wait in
+# Thread.start (2.2.2's freeze at _read_discord, pollthread.py)
+_DISCORD_POLL = PollThread("setup-discord-read")
 # the device steps by name, for the count of where the guide was closed (usage.py)
 PAGE_NAMES = ("mic", "headphones", "send", "last")
 
@@ -1868,8 +1871,8 @@ class SetupWizard(QDialog):
         if self._discord_reading:
             return
         self._discord_reading = True
-        threading.Thread(target=self._discord_worker, args=(self._discord_sig,), daemon=True,
-                         name="setup-discord-read").start()
+        last = self._discord_sig
+        _DISCORD_POLL.run(lambda: self._discord_worker(last))
 
     def _discord_worker(self, last):
         try:
