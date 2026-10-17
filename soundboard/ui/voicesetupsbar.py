@@ -9,7 +9,7 @@ from collections.abc import Callable
 
 from PySide6.QtCore import QTimer, Qt
 from PySide6.QtGui import QIcon
-from PySide6.QtWidgets import (QHBoxLayout, QInputDialog, QLabel, QMenu, QPushButton,
+from PySide6.QtWidgets import (QFrame, QHBoxLayout, QInputDialog, QLabel, QMenu, QPushButton,
                                QVBoxLayout, QWidget)
 
 from soundboard import usage, voicesetups
@@ -38,14 +38,22 @@ class SetupsBar(QWidget):
         self.copy_code = copy_code
         self._undo: tuple[str, dict] | None = None
         self.share: Callable[[str], None] | None = None   # Share to the store (its name)
-        v = QVBoxLayout(self)
-        v.setContentsMargins(0, 0, 8, 0)
+        # a slim outlined strip with small buttons, between the tabs and the card: its
+        # own thing, not more tabs (it read as one block with the tabs)
+        self.setObjectName("setupsbar")
+        self.setAttribute(Qt.WidgetAttribute.WA_StyledBackground)
+        outer = QVBoxLayout(self)
+        outer.setContentsMargins(0, 0, 8, 0)
+        strip = QFrame()
+        strip.setObjectName("setupsstrip")
+        outer.addWidget(strip)
+        v = QVBoxLayout(strip)
+        v.setContentsMargins(12, 6, 10, 6)
         v.setSpacing(4)
         row = QHBoxLayout()
-        row.setSpacing(8)
+        row.setSpacing(10)
         title = QLabel(_("My setups"))
-        title.setObjectName("section")
-        title.setProperty("head", True)
+        title.setObjectName("setupstitle")
         row.addWidget(title, 0, Qt.AlignmentFlag.AlignVCenter)
         self.chips = QWidget()
         self.flow = Flow(self.chips, gap=6)
