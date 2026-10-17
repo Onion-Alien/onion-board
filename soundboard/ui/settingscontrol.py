@@ -13,6 +13,7 @@ from PySide6.QtCore import QSize, Qt, QTimer
 from PySide6.QtWidgets import QApplication, QSizePolicy, QWidget
 from shiboken6 import isValid as qt_valid
 
+from soundboard import remote
 from soundboard.engine import is_virtual as is_virtual_cable
 from soundboard.settings import SettingsDialog
 from soundboard.ui import routewarn
@@ -233,6 +234,7 @@ class SettingsControl(Controller):
         100-300 ms to build); Settings' other pages follow one at a time once it's up."""
         mw = self.mw
         self._prebuild_settings()
+        remote.answer_waiting()   # a Stream Deck press meanwhile: between the two
         if self._spare_editor is None and mw.cfg.sounds:
             d = mw.editctl._new_editor(mw.cfg.sounds[0], "sound")
             d.hide()

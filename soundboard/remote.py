@@ -101,7 +101,7 @@ from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from typing import TYPE_CHECKING
 from urllib.parse import parse_qs, urlsplit
 
-from PySide6.QtCore import QObject, Qt, QTimer, Signal
+from PySide6.QtCore import QCoreApplication, QEvent, QObject, Qt, QTimer, Signal
 
 from soundboard import errors, netcategory
 from soundboard.pollthread import PollThread
@@ -326,6 +326,16 @@ def on_change(fn) -> None:
 def listening() -> list[RemoteControl]:
     """The servers listening now (the control API, a remote add-on's)."""
     return [s for s in list(_running) if s.running]
+
+
+def answer_waiting() -> None:
+    """The requests waiting on the UI thread, answered now: only they (no timers, no
+    other events). For start-up's long steps before the event loop runs (the update
+    check behind the loading screen, building Settings and Edit sound): a Stream Deck
+    press then waits one step for its answer, not all of them and then "busy". UI
+    thread only, once the window is built."""
+    for ctl in listening():
+        QCoreApplication.sendPostedEvents(ctl, QEvent.Type.MetaCall.value)
 
 
 def _changed() -> None:

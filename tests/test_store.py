@@ -2,7 +2,9 @@
 fake store: no test goes online."""
 import io
 import json
+import re
 import wave
+from pathlib import Path
 
 import numpy as np
 import pytest
@@ -39,11 +41,18 @@ class FakeStore:
         self.sounds = {s["id"]: s for s in sounds}
         self.calls = []
         self.fail = ""
+        self.cats = []          # [(category, how many)] for /v1/categories
+        self.fail_cats = False
 
     def __call__(self, method, path, install="", body=None, ctype="", limit=0, timeout=0):
         self.calls.append((method, path, install, body))
         if self.fail:
             raise store.StoreError(self.fail)
+        if path == "/v1/categories":
+            if self.fail_cats:
+                raise store.StoreError("down")
+            return json.dumps({"categories": [{"cat": c, "n": n} for c, n in self.cats],
+                               "total": sum(n for _c, n in self.cats)}).encode()
         if path.startswith("/v1/sounds?"):
             return json.dumps({"sounds": list(self.sounds.values()), "more": False}).encode()
         sid = path.split("/")[3] if path.count("/") >= 3 else ""
@@ -278,69 +287,6 @@ def test_share_window_on_a_link(qapp, fake):
     d.close()
 
 
-def test_trending_on_myinstants_in_the_order_menu(qapp, fake, monkeypatch):
-    from soundboard import ytdl
-    hits = [ytdl.Result(f"s{i}.mp3", f"Bruh {i}" if i % 2 else f"Horn {i}", "Myinstants",
-                        0, "myinstants", f"https://www.myinstants.com/media/sounds/s{i}.mp3")
-            for i in range(storetab.TREND_PAGE + 2)]
-    asked = []
-    monkeypatch.setattr(ytdl, "trending", lambda count=20, direct=False, start=1: (
-        asked.append((count, direct, start)), hits[start - 1:count])[1])
-    links = []
-    t = storetab.StoreTab(Config(), [].append, lambda d, g: True, lambda: None,
-                          link=lambda url, name, kind: links.append((url, name, kind)))
-    t.show()
-    assert _wait(qapp, lambda: len(t._rows) == 2)
-    t.sort_actions[storetab.TRENDING].trigger()
-    assert t.btn_sort.text() == "Trending"
-    assert _wait(qapp, lambda: len(t._rows) == storetab.TREND_PAGE)
-    r = t._rows[0]
-    assert r.meta.full == "Trending on Myinstants"
-    # not the store's: no votes or reports, played and added from Myinstants
-    assert not r.btn_up.isVisibleTo(r) and not r.btn_report.isVisibleTo(r)
-    r.btn_play.click()
-    r.btn_add.click()
-    url = "https://www.myinstants.com/media/sounds/s0.mp3"
-    assert links == [(url, "Horn 0", "play"), (url, "Horn 0", "add")]
-    assert t.btn_more.isVisibleTo(t)
-    t.more()
-    assert _wait(qapp, lambda: len(t._rows) == storetab.TREND_PAGE + 2)
-    assert asked[-1] == (2 * storetab.TREND_PAGE, False, storetab.TREND_PAGE + 1)
-    t.search.setText("bruh")   # the words filter what's trending
-    t.reload()
-    assert _wait(qapp, lambda: len(t._rows) == storetab.TREND_PAGE // 2)
-    assert all("Bruh" in r.sound.name for r in t._rows)
-    calls = len(fake.calls)
-    t.set_sort("top")          # back to the store's own
-    t.search.setText("")
-    t.reload()
-    assert _wait(qapp, lambda: len(t._rows) == 2 and len(fake.calls) > calls)
-    t.shutdown()
-
-
-def test_trending_failures_and_switched_off(qapp, fake, monkeypatch):
-    from soundboard import ytdl
-
-    def blocked(count=20, direct=False, start=1):
-        if direct:
-            return []
-        raise ytdl.TorBlocked("Myinstants turned Tor away")
-    monkeypatch.setattr(ytdl, "trending", blocked)
-    t = _tab(qapp, [], [])
-    t.set_sort(storetab.TRENDING)
-    assert _wait(qapp, lambda: t.msg_btn.text() == "Try this one without Tor")
-    assert "turned Tor away" in t.msg_text.text()
-    t.msg_btn.click()   # only that click goes without Tor
-    assert _wait(qapp, lambda: "Nothing is trending" in t.msg_title.text())
-    real = net.allowed
-    monkeypatch.setattr(net, "allowed", lambda f: f != ytdl.site_feature("myinstants")
-                        and real(f))
-    monkeypatch.setattr(ytdl, "trending", lambda **kw: pytest.fail("asked while off"))
-    t.reload()
-    assert t.msg_btn.text() == "Privacy && security settings"
-    t.shutdown()
-
-
 def test_card_tooltips_never_read_html(qapp):
     from soundboard.ui.ytsearch import ClampLabel, plain_tip
     lbl = ClampLabel('<img src="x"><b>Loud</b> & proud')
@@ -349,3 +295,70 @@ def test_card_tooltips_never_read_html(qapp):
     lbl.set_full("a", "<b>b</b>")
     assert lbl.toolTip() == "<p>&lt;b&gt;b&lt;/b&gt;</p>"
     assert plain_tip("") == ""
+
+
+def test_categories_filter_the_list(qapp, fake):
+    fake.cats = [("games", 3), ("memes", 1)]
+    t = storetab.StoreTab(Config(), [].append, lambda d, g: True, lambda: None)
+    t.show()
+    assert _wait(qapp, lambda: len(t._rows) == 2 and len(t.cat_btns) == 3)
+    assert t.cats_box.isVisibleTo(t)
+    assert [b.text() for b in t.cat_btns.values()] == ["All  4", "Games  3", "Memes  1"]
+    assert t.cat_btns[""].isChecked()
+    t.cat_btns["games"].click()
+    assert _wait(qapp, lambda: "cat=games" in fake.calls[-1][1])
+    assert t.cat_btns["games"].isChecked() and not t.cat_btns[""].isChecked()
+    # the order and the words keep the category
+    t.sort_btns[storetab.TRENDING].click()
+    assert _wait(qapp, lambda: "sort=trending" in fake.calls[-1][1]
+                 and "cat=games" in fake.calls[-1][1])
+    assert sum(c[1] == "/v1/categories" for c in fake.calls) == 1   # asked once
+    # an empty category: a way back to All (the chips are in the list)
+    fake.sounds = {}
+    t.set_cat("memes")
+    assert _wait(qapp, lambda: t.msg_btn.isVisibleTo(t) and t.msg_btn.text() == "All")
+    t.msg_btn.click()
+    assert _wait(qapp, lambda: "cat=" not in fake.calls[-1][1])
+    t.shutdown()
+
+
+def test_no_categories_no_chips(qapp, fake):
+    fake.fail_cats = True
+    t = storetab.StoreTab(Config(), [].append, lambda d, g: True, lambda: None)
+    t.show()
+    assert _wait(qapp, lambda: len(t._rows) == 2)
+    qapp.processEvents()
+    assert not t.cats_box.isVisibleTo(t)
+    t.shutdown()
+
+
+def test_a_sound_from_myinstants_is_voted_on_and_comes_from_the_site(qapp, fake):
+    fake.sounds = {f"{8:012x}": _sound(8, ext="link", name="Vine boom", up=3, tags=["memes"],
+                                       link="https://myinstants.com/media/sounds/vine-boom.mp3",
+                                       author="Myinstants", source="myinstants", cat="memes")}
+    links = []
+    t = storetab.StoreTab(Config(), [].append, lambda d, g: True, lambda: None,
+                          link=lambda url, name, kind: links.append((url, name, kind)))
+    t.show()
+    assert _wait(qapp, lambda: len(t._rows) == 1)
+    r = t._rows[0]
+    assert r.meta.full == "From Myinstants · Memes"
+    assert r.btn_up.isVisibleTo(r) and r.btn_report.isVisibleTo(r)
+    r.btn_up.click()
+    assert _wait(qapp, lambda: any(c[1].endswith("/vote") for c in fake.calls))
+    r.btn_add.click()
+    assert links == [("https://myinstants.com/media/sounds/vine-boom.mp3", "Vine boom", "add")]
+    assert not any(c[1].endswith("/file") for c in fake.calls)
+    t.shutdown()
+
+
+def test_parse_keeps_known_categories_only():
+    found, _more = store.parse({"sounds": [_sound(1, cat="games", source="myinstants"),
+                                           _sound(2, cat="bogus")]})
+    assert [(s.cat, s.source) for s in found] == [("games", "myinstants"), ("", "")]
+    assert store.cat_name("tv") == "TV" and store.cat_name("bogus") == ""
+    # the same list as the server's (server/store/src/index.js)
+    server = (Path(__file__).parent.parent / "server" / "store" / "src" / "index.js"
+              ).read_text("utf-8")
+    m = re.search(r"export const CATS = \[(.*?)\];", server, re.S)
+    assert m and re.findall(r'"([a-z]+)"', m.group(1)) == list(store.CATS)

@@ -172,9 +172,9 @@ and logo aren't covered, so your own version needs its own name.
 Onion Board comes with no sounds: only play what you have the right to use. It isn't affiliated with
 YouTube, SoundCloud, Myinstants, Discord, VB-Audio or any other service it mentions.
 
-**Copyright and takedowns:** if a sound in the Store (or anything else here) is yours and shouldn't
+**Copyright and takedowns:** if a sound in the Free sounds tab (or anything else here) is yours and shouldn't
 be, email **onionboard.contact@proton.me** with the sound's name and why, and it comes down. Anyone
-can also press *Report* on a sound in the Store.
+can also press *Report* on a sound in Free sounds.
 
 **Like it?** A ⭐ or telling a friend helps a lot.
 
