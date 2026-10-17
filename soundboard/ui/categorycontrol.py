@@ -356,6 +356,10 @@ class CategoryControl(Controller):
             self.cat_tabs.blockSignals(False)
         if changed:
             mw.overlay.page = 0
+            # a sound picked on the last tab and not playing: off the player, so Space
+            # on this tab doesn't play it (one that's playing stays, Space pauses it)
+            if mw.current and not mw.engine.state(mw.current):
+                mw.playctl.deselect()
             mw.searchctl.apply_filter(mw.search.text())
             mw._save_later()
             if mw.cfg.scoped_hotkeys:   # this category's set of sound hotkeys
