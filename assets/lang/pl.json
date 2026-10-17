@@ -1624,7 +1624,6 @@
   "About it": "O tym",
   "Accurate (small.en)": "Dokładne (small.en)",
   "Add a voice server": "Dodaj serwer głosowy",
-  "Add a voice someone sent you as a code (it starts with “OB1-”)": "Dodaj głos, który ktoś Ci wysłał jako kod (zaczyna się od „OB1-”)",
   "Add the voice “{name}”?<br><br>Effects: {effects}": "Dodać głos „{name}”?<br><br> Efekty: {effects}",
   "Add to Sounds": "Dodaj do Dźwięków",
   "Add voices": "Dodaj głosy",
@@ -2066,7 +2065,6 @@
   "That drive is read-only.": "Ten dysk jest tylko do odczytu.",
   "That isn't a Myinstants sound link.": "To nie jest łącze dźwiękowe Myinstants.",
   "That isn't a proxy address: it should look like socks5h://127.0.0.1:9050 or http://host:8080": "To nie jest adres proxy: powinien wyglądać jak skarpetki5h://127.0.0.1:9050 lub http://host:8080",
-  "That isn't a voice code (they start with “OB1-”).": "To nie jest kod głosowy (zaczynają się od „OB1-”).",
   "That mic isn't plugged in (or Windows doesn't list it).": "Ten mikrofon nie jest podłączony (lub system Windows go nie wyświetla).",
   "That needs signing in to the site, which Onion Board doesn't do.": "Wymaga to zalogowania się na stronie, czego Onion Board nie robi.",
   "That program isn't running any more.": "Ten program już nie działa.",
@@ -3834,5 +3832,8 @@
   "See report": "Zobacz raport",
   "All categories": "Wszystkie kategorie",
   "Votes": "Oceny",
-  "The store doesn't take that name or those tags. Try other words (and no links).": "Sklep nie przyjmuje tej nazwy ani tagów. Spróbuj innych słów (bez linków)."
+  "The store doesn't take that name or those tags. Try other words (and no links).": "Sklep nie przyjmuje tej nazwy ani tagów. Spróbuj innych słów (bez linków).",
+  "Add a voice someone sent you as a code (it starts with “OB”)": "Dodaj głos, który ktoś Ci wysłał jako kod (zaczyna się od „OB”)",
+  "Add “{name}”?": "Dodać „{name}”?",
+  "That isn't a voice code (they start with “OB”).": "To nie jest kod głosowy (zaczynają się od „OB”)."
 }

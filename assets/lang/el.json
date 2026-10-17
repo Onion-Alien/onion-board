@@ -1577,7 +1577,6 @@
   "About it": "Σχετικά με αυτό",
   "Accurate (small.en)": "Ακριβές (small.en)",
   "Add a voice server": "Προσθήκη διακομιστή φωνής",
-  "Add a voice someone sent you as a code (it starts with “OB1-”)": "Προσθέστε μια φωνή που σας έστειλε κάποιος ως κωδικός (ξεκινά με \"OB1-\")",
   "Add the voice “{name}”?<br><br>Effects: {effects}": "Προσθήκη της φωνής \"{name}\";<br><br> Εφέ: {effects}",
   "Add to Sounds": "Προσθήκη στους ήχους",
   "Add voices": "Προσθήκη φωνών",
@@ -2017,7 +2016,6 @@
   "That drive is read-only.": "Αυτή η μονάδα είναι μόνο για ανάγνωση.",
   "That isn't a Myinstants sound link.": "Αυτός δεν είναι σύνδεσμος ήχου του Myinstants.",
   "That isn't a proxy address: it should look like socks5h://127.0.0.1:9050 or http://host:8080": "Αυτή δεν είναι μια διεύθυνση μεσολάβησης: θα πρέπει να μοιάζει με socks5h://127.0.0.1:9050 ή http://host:8080",
-  "That isn't a voice code (they start with “OB1-”).": "Αυτός δεν είναι φωνητικός κωδικός (ξεκινούν με \"OB1-\").",
   "That mic isn't plugged in (or Windows doesn't list it).": "Αυτό το μικρόφωνο δεν είναι συνδεδεμένο (ή τα Windows δεν το αναφέρουν).",
   "That needs signing in to the site, which Onion Board doesn't do.": "Αυτό χρειάζεται σύνδεση στον ιστότοπο, κάτι που δεν κάνει το Onion Board.",
   "That program isn't running any more.": "Αυτό το πρόγραμμα δεν τρέχει πια.",
@@ -3755,5 +3753,8 @@
   "See report": "Δες την αναφορά",
   "All categories": "Όλες οι κατηγορίες",
   "Votes": "Ψήφοι",
-  "The store doesn't take that name or those tags. Try other words (and no links).": "Το κατάστημα δεν δέχεται αυτό το όνομα ή αυτές τις ετικέτες. Δοκίμασε άλλες λέξεις (και χωρίς συνδέσμους)."
+  "The store doesn't take that name or those tags. Try other words (and no links).": "Το κατάστημα δεν δέχεται αυτό το όνομα ή αυτές τις ετικέτες. Δοκίμασε άλλες λέξεις (και χωρίς συνδέσμους).",
+  "Add a voice someone sent you as a code (it starts with “OB”)": "Προσθέστε μια φωνή που σας έστειλε κάποιος ως κωδικός (ξεκινά με \"OB\")",
+  "Add “{name}”?": "Προσθήκη του «{name}»;",
+  "That isn't a voice code (they start with “OB”).": "Αυτός δεν είναι φωνητικός κωδικός (ξεκινούν με \"OB\")."
 }

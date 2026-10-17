@@ -1577,7 +1577,6 @@
   "About it": "Sobre eso",
   "Accurate (small.en)": "Preciso (small.en)",
   "Add a voice server": "Agregar un servidor de voz",
-  "Add a voice someone sent you as a code (it starts with “OB1-”)": "Agregue una voz que alguien le envió como código (comienza con \"OB1-\")",
   "Add the voice “{name}”?<br><br>Effects: {effects}": "¿Agregar la voz “{name}”?<br><br> Efectos: {effects}",
   "Add to Sounds": "Añadir a sonidos",
   "Add voices": "Añade voces",
@@ -2017,7 +2016,6 @@
   "That drive is read-only.": "Esa unidad es de sólo lectura.",
   "That isn't a Myinstants sound link.": "Ese no es un enlace de sonido de Myinstants.",
   "That isn't a proxy address: it should look like socks5h://127.0.0.1:9050 or http://host:8080": "Esa no es una dirección proxy: debería verse como calcetines5h://127.0.0.1:9050 o http://host:8080",
-  "That isn't a voice code (they start with “OB1-”).": "Eso no es un código de voz (empiezan con “OB1-”).",
   "That mic isn't plugged in (or Windows doesn't list it).": "Ese micrófono no está enchufado (o Windows no lo incluye).",
   "That needs signing in to the site, which Onion Board doesn't do.": "Para ello es necesario iniciar sesión en el sitio, algo que Onion Board no hace.",
   "That program isn't running any more.": "Ese programa ya no se ejecuta.",
@@ -3755,5 +3753,8 @@
   "See report": "Ver reporte",
   "All categories": "Todas las categorías",
   "Votes": "Votos",
-  "The store doesn't take that name or those tags. Try other words (and no links).": "La tienda no acepta ese nombre o esas etiquetas. Prueba con otras palabras (y sin enlaces)."
+  "The store doesn't take that name or those tags. Try other words (and no links).": "La tienda no acepta ese nombre o esas etiquetas. Prueba con otras palabras (y sin enlaces).",
+  "Add a voice someone sent you as a code (it starts with “OB”)": "Agregue una voz que alguien le envió como código (comienza con \"OB\")",
+  "Add “{name}”?": "¿Agregar «{name}»?",
+  "That isn't a voice code (they start with “OB”).": "Eso no es un código de voz (empiezan con “OB”)."
 }

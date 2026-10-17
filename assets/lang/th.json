@@ -1538,7 +1538,6 @@
   "About it": "เกี่ยวกับเรื่องนี้",
   "Accurate (small.en)": "แม่นยำ (small.en)",
   "Add a voice server": "เพิ่มเซิร์ฟเวอร์เสียง",
-  "Add a voice someone sent you as a code (it starts with “OB1-”)": "เพิ่มเสียงที่ใครบางคนส่งให้คุณเป็นรหัส (เริ่มต้นด้วย \"OB1-\")",
   "Add the voice “{name}”?<br><br>Effects: {effects}": "เพิ่มเสียง “{name}”?<br><br> เอฟเฟกต์: {effects}",
   "Add to Sounds": "เพิ่มลงในเสียง",
   "Add voices": "เพิ่มเสียง",
@@ -1972,7 +1971,6 @@
   "That drive is read-only.": "ไดรฟ์นั้นเป็นแบบอ่านอย่างเดียว",
   "That isn't a Myinstants sound link.": "นั่นไม่ใช่ลิงก์เสียงของ Myinstants",
   "That isn't a proxy address: it should look like socks5h://127.0.0.1:9050 or http://host:8080": "นั่นไม่ใช่ที่อยู่พร็อกซี: ควรมีลักษณะดังนี้ Socks5h://127.0.0.1:9050 หรือ http://host:8080",
-  "That isn't a voice code (they start with “OB1-”).": "นั่นไม่ใช่รหัสเสียง (ขึ้นต้นด้วย “OB1-”)",
   "That mic isn't plugged in (or Windows doesn't list it).": "ไม่ได้เสียบปลั๊กไมโครโฟน (หรือ Windows ไม่แสดงรายการ)",
   "That needs signing in to the site, which Onion Board doesn't do.": "จำเป็นต้องลงชื่อเข้าใช้ไซต์ ซึ่ง Onion Board ไม่ทำ",
   "That program isn't running any more.": "โปรแกรมนั้นไม่ทำงานอีกต่อไป",
@@ -3676,5 +3674,8 @@
   "See report": "ดูรายงาน",
   "All categories": "ทุกหมวดหมู่",
   "Votes": "โหวต",
-  "The store doesn't take that name or those tags. Try other words (and no links).": "ร้านไม่รับชื่อหรือแท็กนั้น ลองคำอื่น (และไม่มีลิงก์)"
+  "The store doesn't take that name or those tags. Try other words (and no links).": "ร้านไม่รับชื่อหรือแท็กนั้น ลองคำอื่น (และไม่มีลิงก์)",
+  "Add a voice someone sent you as a code (it starts with “OB”)": "เพิ่มเสียงที่ใครบางคนส่งให้คุณเป็นรหัส (เริ่มต้นด้วย \"OB\")",
+  "Add “{name}”?": "เพิ่ม “{name}” ไหม?",
+  "That isn't a voice code (they start with “OB”).": "นั่นไม่ใช่รหัสเสียง (ขึ้นต้นด้วย “OB”)"
 }

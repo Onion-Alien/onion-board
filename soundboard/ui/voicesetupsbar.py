@@ -1,7 +1,8 @@
 """The Voice tab's My setups row, above every part of the tab: your saved mixes of a
 voice changer voice, an AI voice and a language (voicesetups). Click one to turn the
-whole mix on; Save what's on keeps what you have on now. The same setups go on sounds
-from Edit sound → Effects → Voice."""
+whole mix on; Save what's on keeps what you have on now, Import a code adds one a
+friend sent (any share code). The same setups go on sounds from Edit sound → Effects →
+Voice."""
 from __future__ import annotations
 
 from collections.abc import Callable
@@ -22,14 +23,19 @@ NOTE_MS = 6000   # a "Saved" / "is on" line goes again after this
 
 class SetupsBar(QWidget):
     """`capture()` gives the setup that's on now ({} if nothing is), `apply(setup)` turns
-    one on, `icon_for(setup)` its picture, `describe(setup)` its parts in words."""
+    one on, `icon_for(setup)` its picture, `describe(setup)` its parts in words;
+    `copy_code(name)` puts one on the clipboard as a share code (False if it can't be
+    one) and `import_code()` asks for a code and adds what's in it."""
 
     def __init__(self, store: voicesetups.Store, capture: Callable[[], dict],
                  apply: Callable[[dict], None], icon_for: Callable[[dict], QIcon],
-                 describe: Callable[[dict], str]):
+                 describe: Callable[[dict], str],
+                 copy_code: Callable[[str], bool] | None = None,
+                 import_code: Callable[[], object] | None = None):
         super().__init__()
         self.store, self.capture, self.apply = store, capture, apply
         self.icon_for, self.describe = icon_for, describe
+        self.copy_code = copy_code
         self._undo: tuple[str, dict] | None = None
         self.share: Callable[[str], None] | None = None   # Share to the store (its name)
         v = QVBoxLayout(self)
@@ -54,6 +60,15 @@ class SetupsBar(QWidget):
                                    "again, and you can put it on sounds (Edit sound → "
                                    "Effects → Voice)"))
         self.btn_save.clicked.connect(self._save)
+        # a setup (or any voice) a friend sent as a code: after Save what's on
+        self.btn_import = QPushButton(_("Import a code"), self.chips)
+        self.btn_import.setObjectName("voicecat")
+        icons.set_icon(self.btn_import, "download", "muted")
+        self.btn_import.setToolTip(_("Add a voice someone sent you as a code (it starts "
+                                     "with “OB”)"))
+        if import_code is not None:
+            self.btn_import.clicked.connect(lambda: import_code())
+        self._importing = import_code is not None
         under = QHBoxLayout()
         under.setSpacing(8)
         self.note = QLabel()
@@ -90,6 +105,7 @@ class SetupsBar(QWidget):
             b.deleteLater()
         self.buttons = {}
         self.flow.removeWidget(self.btn_save)
+        self.flow.removeWidget(self.btn_import)
         for name, setup in self.store.setups.items():
             b = QPushButton(name.replace("&", "&&"))
             b.setObjectName("voicecat")
@@ -106,6 +122,11 @@ class SetupsBar(QWidget):
             self.buttons[name] = b
         self.flow.addWidget(self.btn_save)
         self.btn_save.show()
+        if self._importing:
+            self.flow.addWidget(self.btn_import)
+            self.btn_import.show()
+        else:
+            self.btn_import.hide()
 
     def _say(self, text: str, keep: bool = False):
         """A line under the row; it goes again after NOTE_MS unless `keep`."""
@@ -139,11 +160,18 @@ class SetupsBar(QWidget):
     def _menu(self, name: str, at):
         m = QMenu(self)
         m.addAction(icons.icon("edit"), _("Rename"), lambda: self._rename(name))
+        if self.copy_code is not None:
+            m.addAction(icons.icon("copy"), _("Copy share code"), lambda: self._copy(name))
         if self.share is not None:
             m.addAction(icons.icon("upload"), _("Share to the store…"),
                         lambda: self.share and self.share(name))
         m.addAction(_("Delete"), lambda: self._delete(name))
         m.exec(at)
+
+    def _copy(self, name: str):
+        if self.copy_code is not None and self.copy_code(name):
+            usage.used("voice-code-shared")
+            self._say(_("Copied “{name}” as a share code", name=name))
 
     def _rename(self, name: str):
         if name not in self.store.setups:

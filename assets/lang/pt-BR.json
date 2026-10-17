@@ -1581,7 +1581,6 @@
   "About it": "Sobre isso",
   "Accurate (small.en)": "Preciso (small.en)",
   "Add a voice server": "Adicionar um servidor de voz",
-  "Add a voice someone sent you as a code (it starts with “OB1-”)": "Adicione uma voz que alguém lhe enviou como um código (começa com “OB1-”)",
   "Add the voice “{name}”?<br><br>Effects: {effects}": "Adicionar a voz “{name}”?<br><br> Efeitos: {effects}",
   "Add to Sounds": "Adicionar aos sons",
   "Add voices": "Adicionar vozes",
@@ -2019,7 +2018,6 @@
   "That drive is read-only.": "Essa unidade é somente leitura.",
   "That isn't a Myinstants sound link.": "Esse não é um link de som do Myinstants.",
   "That isn't a proxy address: it should look like socks5h://127.0.0.1:9050 or http://host:8080": "Esse não é um endereço proxy: deve ser parecido com Socks5h://127.0.0.1:9050 ou http://host:8080",
-  "That isn't a voice code (they start with “OB1-”).": "Isso não é um código de voz (eles começam com “OB1-”).",
   "That mic isn't plugged in (or Windows doesn't list it).": "Esse microfone não está conectado (ou o Windows não o lista).",
   "That needs signing in to the site, which Onion Board doesn't do.": "Para isso é necessário fazer login no site, o que o Onion Board não faz.",
   "That program isn't running any more.": "Esse programa não está mais funcionando.",
@@ -3755,5 +3753,8 @@
   "See report": "Ver relatório",
   "All categories": "Todas as categorias",
   "Votes": "Votos",
-  "The store doesn't take that name or those tags. Try other words (and no links).": "A loja não aceita esse nome ou essas tags. Tente outras palavras (e sem links)."
+  "The store doesn't take that name or those tags. Try other words (and no links).": "A loja não aceita esse nome ou essas tags. Tente outras palavras (e sem links).",
+  "Add a voice someone sent you as a code (it starts with “OB”)": "Adicione uma voz que alguém lhe enviou como um código (começa com “OB”)",
+  "Add “{name}”?": "Adicionar “{name}”?",
+  "That isn't a voice code (they start with “OB”).": "Isso não é um código de voz (eles começam com “OB”)."
 }

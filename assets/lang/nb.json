@@ -1577,7 +1577,6 @@
   "About it": "Om det",
   "Accurate (small.en)": "Nøyaktig (small.no)",
   "Add a voice server": "Legg til en taleserver",
-  "Add a voice someone sent you as a code (it starts with “OB1-”)": "Legg til en stemme noen sendte deg som en kode (den starter med \"OB1-\")",
   "Add the voice “{name}”?<br><br>Effects: {effects}": "Vil du legge til stemmen \"{name}\"?<br><br> Effekter: {effects}",
   "Add to Sounds": "Legg til lyder",
   "Add voices": "Legg til stemmer",
@@ -2017,7 +2016,6 @@
   "That drive is read-only.": "Den stasjonen er skrivebeskyttet.",
   "That isn't a Myinstants sound link.": "Det er ikke en Myinstants-lydlenke.",
   "That isn't a proxy address: it should look like socks5h://127.0.0.1:9050 or http://host:8080": "Det er ikke en proxy-adresse: den skal se ut som socks5h://127.0.0.1:9050 eller http://host:8080",
-  "That isn't a voice code (they start with “OB1-”).": "Det er ikke en stemmekode (de starter med \"OB1-\").",
   "That mic isn't plugged in (or Windows doesn't list it).": "Den mikrofonen er ikke koblet til (eller Windows viser den ikke).",
   "That needs signing in to the site, which Onion Board doesn't do.": "Det må logges på nettstedet, noe Onion Board ikke gjør.",
   "That program isn't running any more.": "Det programmet kjører ikke lenger.",
@@ -3755,5 +3753,8 @@
   "See report": "Se rapport",
   "All categories": "Alle kategorier",
   "Votes": "Vurderinger",
-  "The store doesn't take that name or those tags. Try other words (and no links).": "Butikken tar ikke det navnet eller de taggene. Prøv andre ord (og ingen lenker)."
+  "The store doesn't take that name or those tags. Try other words (and no links).": "Butikken tar ikke det navnet eller de taggene. Prøv andre ord (og ingen lenker).",
+  "Add a voice someone sent you as a code (it starts with “OB”)": "Legg til en stemme noen sendte deg som en kode (den starter med \"OB\")",
+  "Add “{name}”?": "Vil du legge til «{name}»?",
+  "That isn't a voice code (they start with “OB”).": "Det er ikke en stemmekode (de starter med \"OB\")."
 }
