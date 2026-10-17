@@ -3814,7 +3814,6 @@
   "Downloads Onion Watch (Triggers tab), its updates, and what an add-on needs when you install it (from GitHub and PyPI).": "Lataa Onion Watchin (Laukaisimet-välilehti), sen päivitykset ja sen, mitä lisäosa tarvitsee asennettaessa (GitHubista ja PyPI:stä).",
   "Downloads the extra voices and languages you pick on the Voice tab (from Hugging Face and Windows Update). Off: what's already here still works.": "Lataa lisä-äänet ja -kielet, jotka valitset Puhe-välilehdellä (Hugging Facesta ja Windows Updatesta). Pois: se, mikä on jo täällä, toimii yhä.",
   "Get FFmpeg (Data & quality) installs FFmpeg, the free tool that plays M4A, AAC and video files (through Microsoft's winget). Off: install it yourself from ffmpeg.org.": "Hae FFmpeg (Data & laatu) asentaa FFmpegin, ilmaisen työkalun, joka toistaa M4A-, AAC- ja videotiedostoja (Microsoftin wingetillä). Pois: asenna se itse osoitteesta ffmpeg.org.",
-  "How others hear your sounds": "Miten muut kuulevat äänesi",
   "Keeps downloading from YouTube and other sites working: checks GitHub for a version of yt-dlp the app's makers approved and gets it from PyPI when you update it (Updates > Helper programs), or by itself if you ticked Update automatically.": "Pitää lataukset YouTubesta ja muilta sivuilta toiminnassa: tarkistaa GitHubista, minkä yt-dlp-version sovelluksen tekijät ovat hyväksyneet, ja hakee sen PyPI:stä, kun päivität (Päivitykset > Apuohjelmat), tai itsestään, jos olet ruksinut Päivitä automaattisesti.",
   "Listen": "Kuuntele",
   "More audio settings": "Lisää ääniasetuksia",
@@ -4079,5 +4078,6 @@
   "you shall not pass!": "et pääse ohi!",
   "you smell like flowers": "tuoksut kukilta",
   "No ads, no account, no spying, free forever. Found a bug? Tell me. Have fun.\n\nOnionAlien": "Ei mainoksia, ei tiliä, ei vakoilua, ilmainen ikuisesti. Löysitkö bugin? Kerro minulle. Pidä hauskaa.\n\nOnionAlien",
-  "The store's down right now, so sharing is off. Try again later.": "Kauppa on nyt alhaalla, joten jakaminen on pois päältä. Yritä myöhemmin uudelleen."
+  "The store's down right now, so sharing is off. Try again later.": "Kauppa on nyt alhaalla, joten jakaminen on pois päältä. Yritä myöhemmin uudelleen.",
+  "Send your sounds": "Lähetä äänesi"
 }

@@ -1202,7 +1202,7 @@ class SetupWizard(QDialog):
         busy.set_busy(self.btn_back, installing)
         mic_action = self._mic_action()
         self.btn_skip.setVisible(mic_action)
-        self._sync_or()
+        SetupWizard._sync_or(self)   # (by the class: tests drive this with a stand-in)
         if i == self.PAGES - 1:
             text, icon = _("Finish  ✓"), "check"
         elif i == self.base + 2 and self._was_locked:

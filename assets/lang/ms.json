@@ -3736,7 +3736,6 @@
   "Downloads Onion Watch (Triggers tab), its updates, and what an add-on needs when you install it (from GitHub and PyPI).": "Memuat turun Onion Watch (tab Pencetus), kemas kininya, dan apa yang diperlukan tambahan semasa anda memasangnya (dari GitHub dan PyPI).",
   "Downloads the extra voices and languages you pick on the Voice tab (from Hugging Face and Windows Update). Off: what's already here still works.": "Memuat turun suara dan bahasa tambahan yang anda pilih di tab Suara (dari Hugging Face dan Windows Update). Mati: apa yang sudah ada masih berfungsi.",
   "Get FFmpeg (Data & quality) installs FFmpeg, the free tool that plays M4A, AAC and video files (through Microsoft's winget). Off: install it yourself from ffmpeg.org.": "Dapatkan FFmpeg (Data & kualiti) memasang FFmpeg, alat percuma yang memainkan fail M4A, AAC dan video (melalui winget Microsoft). Mati: pasang sendiri daripada ffmpeg.org.",
-  "How others hear your sounds": "Cara orang lain mendengar bunyi anda",
   "Keeps downloading from YouTube and other sites working: checks GitHub for a version of yt-dlp the app's makers approved and gets it from PyPI when you update it (Updates > Helper programs), or by itself if you ticked Update automatically.": "Memastikan muat turun dari YouTube dan laman lain berfungsi: menyemak di GitHub versi yt-dlp yang diluluskan pembuat aplikasi dan mengambilnya dari PyPI apabila anda mengemas kini (Kemas kini > Program pembantu), atau sendiri jika anda menanda Kemas kini secara automatik.",
   "Listen": "Dengar",
   "More audio settings": "Lagi tetapan audio",
@@ -4001,5 +4000,6 @@
   "you shall not pass!": "kau tidak boleh lewat!",
   "you smell like flowers": "kamu bau bunga",
   "No ads, no account, no spying, free forever. Found a bug? Tell me. Have fun.\n\nOnionAlien": "Tiada iklan, tiada akaun, tiada intipan, percuma selama-lamanya. Jumpa pepijat? Beritahu saya. Selamat berseronok.\n\nOnionAlien",
-  "The store's down right now, so sharing is off. Try again later.": "Kedai sedang tergendala, jadi perkongsian dimatikan. Cuba lagi nanti."
+  "The store's down right now, so sharing is off. Try again later.": "Kedai sedang tergendala, jadi perkongsian dimatikan. Cuba lagi nanti.",
+  "Send your sounds": "Hantar bunyi anda"
 }

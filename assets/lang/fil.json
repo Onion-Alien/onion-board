@@ -3814,7 +3814,6 @@
   "Downloads Onion Watch (Triggers tab), its updates, and what an add-on needs when you install it (from GitHub and PyPI).": "Dina-download ang Onion Watch (tab na Triggers), ang mga update nito, at ang kailangan ng isang add-on kapag ini-install mo ito (mula sa GitHub at PyPI).",
   "Downloads the extra voices and languages you pick on the Voice tab (from Hugging Face and Windows Update). Off: what's already here still works.": "Dina-download ang mga dagdag na boses at wika na pinili mo sa tab na Voice (mula sa Hugging Face at Windows Update). Naka-off: gumagana pa rin ang nandito na.",
   "Get FFmpeg (Data & quality) installs FFmpeg, the free tool that plays M4A, AAC and video files (through Microsoft's winget). Off: install it yourself from ffmpeg.org.": "Ang Kunin ang FFmpeg (Data & kalidad) ay nag-i-install ng FFmpeg, ang libreng tool na nagpe-play ng mga file na M4A, AAC at video (gamit ang winget ng Microsoft). Naka-off: i-install ito mismo mula sa ffmpeg.org.",
-  "How others hear your sounds": "Paano naririnig ng iba ang mga sound mo",
   "Keeps downloading from YouTube and other sites working: checks GitHub for a version of yt-dlp the app's makers approved and gets it from PyPI when you update it (Updates > Helper programs), or by itself if you ticked Update automatically.": "Pinapanatiling gumagana ang pag-download mula sa YouTube at iba pang site: tinitingnan sa GitHub kung aling bersyon ng yt-dlp ang inaprubahan ng mga gumawa ng app at kinukuha ito sa PyPI kapag nag-update ka (Mga update > Mga helper program), o kusa kung na-tick mo ang Kusang mag-update.",
   "Listen": "Pakinggan",
   "More audio settings": "Iba pang setting ng audio",
@@ -4079,5 +4078,6 @@
   "you shall not pass!": "hindi ka makakadaan!",
   "you smell like flowers": "amoy bulaklak ka",
   "No ads, no account, no spying, free forever. Found a bug? Tell me. Have fun.\n\nOnionAlien": "Walang ads, walang account, walang paniniktik, libre habambuhay. May nakitang bug? Sabihin mo sa akin. Mag-enjoy ka.\n\nOnionAlien",
-  "The store's down right now, so sharing is off. Try again later.": "Down ang store ngayon, kaya naka-off ang pag-share. Subukan ulit mamaya."
+  "The store's down right now, so sharing is off. Try again later.": "Down ang store ngayon, kaya naka-off ang pag-share. Subukan ulit mamaya.",
+  "Send your sounds": "Ipadala ang mga sound mo"
 }

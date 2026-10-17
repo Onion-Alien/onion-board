@@ -3814,7 +3814,6 @@
   "Downloads Onion Watch (Triggers tab), its updates, and what an add-on needs when you install it (from GitHub and PyPI).": "Scarica Onion Watch (scheda Trigger), i suoi aggiornamenti e ciò che serve a un componente aggiuntivo quando lo installi (da GitHub e PyPI).",
   "Downloads the extra voices and languages you pick on the Voice tab (from Hugging Face and Windows Update). Off: what's already here still works.": "Scarica le voci e le lingue in più che scegli nella scheda Voce (da Hugging Face e Windows Update). Spento: quello che c'è già continua a funzionare.",
   "Get FFmpeg (Data & quality) installs FFmpeg, the free tool that plays M4A, AAC and video files (through Microsoft's winget). Off: install it yourself from ffmpeg.org.": "Ottieni FFmpeg (Dati e qualità) installa FFmpeg, lo strumento gratuito che riproduce i file M4A, AAC e video (tramite winget di Microsoft). Spento: installalo tu da ffmpeg.org.",
-  "How others hear your sounds": "Come gli altri sentono i tuoi suoni",
   "Keeps downloading from YouTube and other sites working: checks GitHub for a version of yt-dlp the app's makers approved and gets it from PyPI when you update it (Updates > Helper programs), or by itself if you ticked Update automatically.": "Fa funzionare i download da YouTube e da altri siti: controlla su GitHub quale versione di yt-dlp hanno approvato i creatori dell'app e la prende da PyPI quando la aggiorni (Aggiornamenti > Programmi di supporto), o da sola se hai spuntato Aggiorna automaticamente.",
   "Listen": "Ascolta",
   "More audio settings": "Altre impostazioni audio",
@@ -4079,5 +4078,6 @@
   "you shall not pass!": "tu non puoi passare!",
   "you smell like flowers": "profumi di fiori",
   "No ads, no account, no spying, free forever. Found a bug? Tell me. Have fun.\n\nOnionAlien": "Niente pubblicità, niente account, niente spionaggio, gratis per sempre. Trovato un bug? Dimmelo. Divertiti.\n\nOnionAlien",
-  "The store's down right now, so sharing is off. Try again later.": "Lo store al momento non funziona, quindi la condivisione è disattivata. Riprova più tardi."
+  "The store's down right now, so sharing is off. Try again later.": "Lo store al momento non funziona, quindi la condivisione è disattivata. Riprova più tardi.",
+  "Send your sounds": "Invia i tuoi suoni"
 }

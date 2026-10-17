@@ -3814,7 +3814,6 @@
   "Downloads Onion Watch (Triggers tab), its updates, and what an add-on needs when you install it (from GitHub and PyPI).": "Onion Watch'u (Tetikleyiciler sekmesi), güncellemelerini ve bir eklentinin kurulurken ihtiyaç duyduklarını indirir (GitHub ve PyPI'dan).",
   "Downloads the extra voices and languages you pick on the Voice tab (from Hugging Face and Windows Update). Off: what's already here still works.": "Ses sekmesinde seçtiğin ek sesleri ve dilleri indirir (Hugging Face ve Windows Update'ten). Kapalı: burada olanlar çalışmaya devam eder.",
   "Get FFmpeg (Data & quality) installs FFmpeg, the free tool that plays M4A, AAC and video files (through Microsoft's winget). Off: install it yourself from ffmpeg.org.": "FFmpeg'i edin (Veri & kalite), M4A, AAC ve video dosyalarını oynatan ücretsiz araç FFmpeg'i kurar (Microsoft'un winget'i ile). Kapalı: ffmpeg.org'dan kendin kur.",
-  "How others hear your sounds": "Başkaları seslerini nasıl duyuyor",
   "Keeps downloading from YouTube and other sites working: checks GitHub for a version of yt-dlp the app's makers approved and gets it from PyPI when you update it (Updates > Helper programs), or by itself if you ticked Update automatically.": "YouTube ve diğer sitelerden indirmeyi çalışır tutar: uygulamanın yapımcılarının onayladığı yt-dlp sürümünü GitHub'da kontrol eder ve güncellediğinde (Güncellemeler > Yardımcı programlar) ya da Otomatik olarak güncelle'yi işaretlediysen kendiliğinden PyPI'dan alır.",
   "Listen": "Dinle",
   "More audio settings": "Daha fazla ses ayarı",
@@ -4079,5 +4078,6 @@
   "you shall not pass!": "geçemezsin!",
   "you smell like flowers": "çiçek gibi kokuyorsun",
   "No ads, no account, no spying, free forever. Found a bug? Tell me. Have fun.\n\nOnionAlien": "Reklam yok, hesap yok, gözetleme yok, sonsuza dek ücretsiz. Hata mı buldun? Bana söyle. İyi eğlenceler.\n\nOnionAlien",
-  "The store's down right now, so sharing is off. Try again later.": "Mağaza şu an çalışmıyor, bu yüzden paylaşma kapalı. Daha sonra tekrar dene."
+  "The store's down right now, so sharing is off. Try again later.": "Mağaza şu an çalışmıyor, bu yüzden paylaşma kapalı. Daha sonra tekrar dene.",
+  "Send your sounds": "Seslerini gönder"
 }

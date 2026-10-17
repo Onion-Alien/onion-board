@@ -4126,7 +4126,6 @@
   "Downloads Onion Watch (Triggers tab), its updates, and what an add-on needs when you install it (from GitHub and PyPI).": "ينزّل Onion Watch (تبويب المحفّزات) وتحديثاته وما تحتاجه الإضافة عند تثبيتها (من GitHub وPyPI).",
   "Downloads the extra voices and languages you pick on the Voice tab (from Hugging Face and Windows Update). Off: what's already here still works.": "ينزّل الأصوات واللغات الإضافية التي تختارها في تبويب الصوت (من Hugging Face وWindows Update). موقوف: ما هو موجود يبقى يعمل.",
   "Get FFmpeg (Data & quality) installs FFmpeg, the free tool that plays M4A, AAC and video files (through Microsoft's winget). Off: install it yourself from ffmpeg.org.": "احصل على FFmpeg (البيانات والجودة) يثبّت FFmpeg، الأداة المجانية التي تشغّل ملفات M4A وAAC والفيديو (عبر winget من Microsoft). موقوف: ثبّته بنفسك من ffmpeg.org.",
-  "How others hear your sounds": "كيف يسمع الآخرون أصواتك",
   "Keeps downloading from YouTube and other sites working: checks GitHub for a version of yt-dlp the app's makers approved and gets it from PyPI when you update it (Updates > Helper programs), or by itself if you ticked Update automatically.": "يبقي التنزيل من YouTube ومواقع أخرى يعمل: يتحقق على GitHub من نسخة yt-dlp التي وافق عليها صانعو التطبيق ويجلبها من PyPI عندما تحدّثها (التحديثات > البرامج المساعدة)، أو من تلقاء نفسه إذا فعّلت التحديث تلقائيا.",
   "Listen": "استمع",
   "More audio settings": "المزيد من إعدادات الصوت",
@@ -4391,5 +4390,6 @@
   "you shall not pass!": "لن تمر!",
   "you smell like flowers": "رائحتك مثل الزهور",
   "No ads, no account, no spying, free forever. Found a bug? Tell me. Have fun.\n\nOnionAlien": "بلا إعلانات، بلا حساب، بلا تجسس، ومجاني للأبد. لقيت خطأ؟ قل لي. استمتع.\n\nOnionAlien",
-  "The store's down right now, so sharing is off. Try again later.": "المتجر متوقف الآن، لذا المشاركة متوقفة. حاول لاحقًا."
+  "The store's down right now, so sharing is off. Try again later.": "المتجر متوقف الآن، لذا المشاركة متوقفة. حاول لاحقًا.",
+  "Send your sounds": "أرسل أصواتك"
 }

@@ -3814,7 +3814,6 @@
   "Downloads Onion Watch (Triggers tab), its updates, and what an add-on needs when you install it (from GitHub and PyPI).": "Κατεβάζει το Onion Watch (καρτέλα Εναύσματα), τις ενημερώσεις του και ό,τι χρειάζεται ένα πρόσθετο όταν το εγκαθιστάς (από GitHub και PyPI).",
   "Downloads the extra voices and languages you pick on the Voice tab (from Hugging Face and Windows Update). Off: what's already here still works.": "Κατεβάζει τις επιπλέον φωνές και γλώσσες που διαλέγεις στην καρτέλα Φωνή (από Hugging Face και Windows Update). Ανενεργό: ό,τι υπάρχει ήδη συνεχίζει να δουλεύει.",
   "Get FFmpeg (Data & quality) installs FFmpeg, the free tool that plays M4A, AAC and video files (through Microsoft's winget). Off: install it yourself from ffmpeg.org.": "Το «Πάρε το FFmpeg» (Δεδομένα & ποιότητα) εγκαθιστά το FFmpeg, το δωρεάν εργαλείο που παίζει αρχεία M4A, AAC και βίντεο (μέσω του winget της Microsoft). Ανενεργό: εγκατέστησέ το μόνος σου από το ffmpeg.org.",
-  "How others hear your sounds": "Πώς ακούν οι άλλοι τους ήχους σου",
   "Keeps downloading from YouTube and other sites working: checks GitHub for a version of yt-dlp the app's makers approved and gets it from PyPI when you update it (Updates > Helper programs), or by itself if you ticked Update automatically.": "Κρατά σε λειτουργία τις λήψεις από το YouTube και άλλους ιστότοπους: ελέγχει στο GitHub ποια έκδοση του yt-dlp έχουν εγκρίνει οι δημιουργοί της εφαρμογής και την παίρνει από το PyPI όταν ενημερώνεις (Ενημερώσεις > Βοηθητικά προγράμματα), ή μόνο του αν έχεις τσεκάρει την Αυτόματη ενημέρωση.",
   "Listen": "Άκου",
   "More audio settings": "Περισσότερες ρυθμίσεις ήχου",
@@ -4079,5 +4078,6 @@
   "you shall not pass!": "δεν θα περάσεις!",
   "you smell like flowers": "μυρίζεις λουλούδια",
   "No ads, no account, no spying, free forever. Found a bug? Tell me. Have fun.\n\nOnionAlien": "Χωρίς διαφημίσεις, χωρίς λογαριασμό, χωρίς παρακολούθηση, δωρεάν για πάντα. Βρήκες bug; Πες μου. Καλή διασκέδαση.\n\nOnionAlien",
-  "The store's down right now, so sharing is off. Try again later.": "Το κατάστημα δεν λειτουργεί τώρα, οπότε η κοινοποίηση είναι κλειστή. Δοκίμασε αργότερα."
+  "The store's down right now, so sharing is off. Try again later.": "Το κατάστημα δεν λειτουργεί τώρα, οπότε η κοινοποίηση είναι κλειστή. Δοκίμασε αργότερα.",
+  "Send your sounds": "Αποστολή των ήχων σου"
 }

@@ -3814,7 +3814,6 @@
   "Downloads Onion Watch (Triggers tab), its updates, and what an add-on needs when you install it (from GitHub and PyPI).": "Letölti az Onion Watch-ot (Triggerek lap), a frissítéseit, és amire egy bővítménynek telepítéskor szüksége van (a GitHubról és a PyPI-ról).",
   "Downloads the extra voices and languages you pick on the Voice tab (from Hugging Face and Windows Update). Off: what's already here still works.": "Letölti a Beszéd lapon kiválasztott extra hangokat és nyelveket (a Hugging Face-ről és a Windows Update-ről). Kikapcsolva: ami már itt van, továbbra is működik.",
   "Get FFmpeg (Data & quality) installs FFmpeg, the free tool that plays M4A, AAC and video files (through Microsoft's winget). Off: install it yourself from ffmpeg.org.": "Az FFmpeg beszerzése (Adat & minőség) telepíti az FFmpeg-et, az ingyenes eszközt, ami lejátssza az M4A-, AAC- és videófájlokat (a Microsoft wingetjével). Kikapcsolva: telepítsd magad az ffmpeg.org oldalról.",
-  "How others hear your sounds": "Hogyan hallják mások a hangjaidat",
   "Keeps downloading from YouTube and other sites working: checks GitHub for a version of yt-dlp the app's makers approved and gets it from PyPI when you update it (Updates > Helper programs), or by itself if you ticked Update automatically.": "Működőképesen tartja a letöltést a YouTube-ról és más oldalakról: a GitHubon megnézi, melyik yt-dlp-verziót hagyták jóvá az alkalmazás készítői, és letölti a PyPI-ról, amikor frissíted (Frissítések > Segédprogramok), vagy magától, ha bepipáltad az Automatikus frissítést.",
   "Listen": "Meghallgatás",
   "More audio settings": "További hangbeállítások",
@@ -4079,5 +4078,6 @@
   "you shall not pass!": "nem mehetsz át!",
   "you smell like flowers": "virágillatod van",
   "No ads, no account, no spying, free forever. Found a bug? Tell me. Have fun.\n\nOnionAlien": "Nincs reklám, nincs fiók, nincs kémkedés, örökre ingyenes. Hibát találtál? Szólj. Jó szórakozást.\n\nOnionAlien",
-  "The store's down right now, so sharing is off. Try again later.": "Az áruház most nem működik, ezért a megosztás ki van kapcsolva. Próbáld újra később."
+  "The store's down right now, so sharing is off. Try again later.": "Az áruház most nem működik, ezért a megosztás ki van kapcsolva. Próbáld újra később.",
+  "Send your sounds": "Hangjaid küldése"
 }

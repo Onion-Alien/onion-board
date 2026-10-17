@@ -3814,7 +3814,6 @@
   "Downloads Onion Watch (Triggers tab), its updates, and what an add-on needs when you install it (from GitHub and PyPI).": "Télécharge Onion Watch (onglet Déclencheurs), ses mises à jour, et ce dont un module a besoin quand tu l'installes (depuis GitHub et PyPI).",
   "Downloads the extra voices and languages you pick on the Voice tab (from Hugging Face and Windows Update). Off: what's already here still works.": "Télécharge les voix et langues en plus que tu choisis dans l'onglet Voix (depuis Hugging Face et Windows Update). Coupé : ce qui est déjà là marche toujours.",
   "Get FFmpeg (Data & quality) installs FFmpeg, the free tool that plays M4A, AAC and video files (through Microsoft's winget). Off: install it yourself from ffmpeg.org.": "Obtenir FFmpeg (Données & qualité) installe FFmpeg, l'outil gratuit qui lit les fichiers M4A, AAC et vidéo (via winget de Microsoft). Coupé : installe-le toi-même depuis ffmpeg.org.",
-  "How others hear your sounds": "Comment les autres entendent tes sons",
   "Keeps downloading from YouTube and other sites working: checks GitHub for a version of yt-dlp the app's makers approved and gets it from PyPI when you update it (Updates > Helper programs), or by itself if you ticked Update automatically.": "Garde les téléchargements depuis YouTube et d'autres sites fonctionnels : vérifie sur GitHub la version de yt-dlp approuvée par les créateurs de l'app et la récupère sur PyPI quand tu la mets à jour (Mises à jour > Programmes d'appoint), ou toute seule si tu as coché Mettre à jour automatiquement.",
   "Listen": "Écouter",
   "More audio settings": "Plus de réglages audio",
@@ -4079,5 +4078,6 @@
   "you shall not pass!": "vous ne passerez pas !",
   "you smell like flowers": "tu sens les fleurs",
   "No ads, no account, no spying, free forever. Found a bug? Tell me. Have fun.\n\nOnionAlien": "Pas de pub, pas de compte, pas d'espionnage, gratuit pour toujours. Un bug ? Dis-le-moi. Amuse-toi bien.\n\nOnionAlien",
-  "The store's down right now, so sharing is off. Try again later.": "La boutique est en panne pour l'instant, le partage est donc désactivé. Réessaie plus tard."
+  "The store's down right now, so sharing is off. Try again later.": "La boutique est en panne pour l'instant, le partage est donc désactivé. Réessaie plus tard.",
+  "Send your sounds": "Envoyer tes sons"
 }

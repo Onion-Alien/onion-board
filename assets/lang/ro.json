@@ -3892,7 +3892,6 @@
   "Downloads Onion Watch (Triggers tab), its updates, and what an add-on needs when you install it (from GitHub and PyPI).": "Descarcă Onion Watch (fila Declanșatoare), actualizările lui și ce îi trebuie unui supliment când îl instalezi (de pe GitHub și PyPI).",
   "Downloads the extra voices and languages you pick on the Voice tab (from Hugging Face and Windows Update). Off: what's already here still works.": "Descarcă vocile și limbile în plus pe care le alegi în fila Voce (de pe Hugging Face și Windows Update). Dezactivat: ce e deja aici merge în continuare.",
   "Get FFmpeg (Data & quality) installs FFmpeg, the free tool that plays M4A, AAC and video files (through Microsoft's winget). Off: install it yourself from ffmpeg.org.": "Ia FFmpeg (Date & calitate) instalează FFmpeg, unealta gratuită care redă fișiere M4A, AAC și video (prin winget de la Microsoft). Dezactivat: instalează-l singur de pe ffmpeg.org.",
-  "How others hear your sounds": "Cum îți aud ceilalți sunetele",
   "Keeps downloading from YouTube and other sites working: checks GitHub for a version of yt-dlp the app's makers approved and gets it from PyPI when you update it (Updates > Helper programs), or by itself if you ticked Update automatically.": "Ține descărcările de pe YouTube și alte site-uri funcționale: verifică pe GitHub ce versiune de yt-dlp au aprobat creatorii aplicației și o ia de pe PyPI când actualizezi (Actualizări > Programe ajutătoare), sau singur dacă ai bifat Actualizează automat.",
   "Listen": "Ascultă",
   "More audio settings": "Mai multe setări audio",
@@ -4157,5 +4156,6 @@
   "you shall not pass!": "nu vei trece!",
   "you smell like flowers": "miroși a flori",
   "No ads, no account, no spying, free forever. Found a bug? Tell me. Have fun.\n\nOnionAlien": "Fără reclame, fără cont, fără spionaj, gratuit pentru totdeauna. Ai găsit un bug? Spune-mi. Distracție plăcută.\n\nOnionAlien",
-  "The store's down right now, so sharing is off. Try again later.": "Magazinul nu funcționează acum, așa că partajarea e oprită. Încearcă mai târziu."
+  "The store's down right now, so sharing is off. Try again later.": "Magazinul nu funcționează acum, așa că partajarea e oprită. Încearcă mai târziu.",
+  "Send your sounds": "Trimite-ți sunetele"
 }

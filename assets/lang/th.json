@@ -3736,7 +3736,6 @@
   "Downloads Onion Watch (Triggers tab), its updates, and what an add-on needs when you install it (from GitHub and PyPI).": "ดาวน์โหลด Onion Watch (แท็บทริกเกอร์) อัปเดตของมัน และสิ่งที่ส่วนเสริมต้องใช้เมื่อคุณติดตั้ง (จาก GitHub และ PyPI)",
   "Downloads the extra voices and languages you pick on the Voice tab (from Hugging Face and Windows Update). Off: what's already here still works.": "ดาวน์โหลดเสียงและภาษาเพิ่มเติมที่คุณเลือกในแท็บเสียงพูด (จาก Hugging Face และ Windows Update) ปิด: สิ่งที่มีอยู่แล้วยังใช้ได้",
   "Get FFmpeg (Data & quality) installs FFmpeg, the free tool that plays M4A, AAC and video files (through Microsoft's winget). Off: install it yourself from ffmpeg.org.": "รับ FFmpeg (ข้อมูล & คุณภาพ) ติดตั้ง FFmpeg เครื่องมือฟรีที่เล่นไฟล์ M4A, AAC และวิดีโอ (ผ่าน winget ของ Microsoft) ปิด: ติดตั้งเองจาก ffmpeg.org",
-  "How others hear your sounds": "คนอื่นได้ยินเสียงของคุณอย่างไร",
   "Keeps downloading from YouTube and other sites working: checks GitHub for a version of yt-dlp the app's makers approved and gets it from PyPI when you update it (Updates > Helper programs), or by itself if you ticked Update automatically.": "ทำให้การดาวน์โหลดจาก YouTube และเว็บอื่นยังใช้ได้: ตรวจใน GitHub ว่าผู้สร้างแอปอนุมัติ yt-dlp เวอร์ชันไหน แล้วดึงจาก PyPI เมื่อคุณอัปเดต (อัพเดท > โปรแกรมช่วยเหลือ) หรือทำเองถ้าคุณติ๊ก อัปเดตอัตโนมัติ ไว้",
   "Listen": "ฟัง",
   "More audio settings": "การตั้งค่าเสียงเพิ่มเติม",
@@ -4001,5 +4000,6 @@
   "you shall not pass!": "เจ้าผ่านไปไม่ได้!",
   "you smell like flowers": "หอมกลิ่นดอกไม้",
   "No ads, no account, no spying, free forever. Found a bug? Tell me. Have fun.\n\nOnionAlien": "ไม่มีโฆษณา ไม่ต้องมีบัญชี ไม่สอดแนม ฟรีตลอดไป เจอบั๊กเหรอ? บอกผมได้เลย ขอให้สนุกนะ\n\nOnionAlien",
-  "The store's down right now, so sharing is off. Try again later.": "ร้านค้าล่มอยู่ตอนนี้ จึงปิดการแชร์ไว้ ลองใหม่ภายหลัง"
+  "The store's down right now, so sharing is off. Try again later.": "ร้านค้าล่มอยู่ตอนนี้ จึงปิดการแชร์ไว้ ลองใหม่ภายหลัง",
+  "Send your sounds": "ส่งเสียงของคุณ"
 }

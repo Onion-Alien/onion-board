@@ -3814,7 +3814,6 @@
   "Downloads Onion Watch (Triggers tab), its updates, and what an add-on needs when you install it (from GitHub and PyPI).": "Onion Watch (ट्रिगर टैब), उसके अपडेट और किसी ऐड-ऑन को इंस्टॉल करते समय जो चाहिए, वह डाउनलोड करता है (GitHub और PyPI से)।",
   "Downloads the extra voices and languages you pick on the Voice tab (from Hugging Face and Windows Update). Off: what's already here still works.": "वॉइस टैब पर आप जो अतिरिक्त आवाज़ें और भाषाएँ चुनते हैं, उन्हें डाउनलोड करता है (Hugging Face और Windows Update से)। बंद: जो पहले से है, वह चलता रहेगा।",
   "Get FFmpeg (Data & quality) installs FFmpeg, the free tool that plays M4A, AAC and video files (through Microsoft's winget). Off: install it yourself from ffmpeg.org.": "FFmpeg प्राप्त करें (डेटा & गुणवत्ता) FFmpeg इंस्टॉल करता है, वह मुफ़्त टूल जो M4A, AAC और वीडियो फ़ाइलें चलाता है (Microsoft के winget से)। बंद: इसे खुद ffmpeg.org से इंस्टॉल करें।",
-  "How others hear your sounds": "दूसरे आपके साउंड कैसे सुनते हैं",
   "Keeps downloading from YouTube and other sites working: checks GitHub for a version of yt-dlp the app's makers approved and gets it from PyPI when you update it (Updates > Helper programs), or by itself if you ticked Update automatically.": "YouTube और दूसरी साइटों से डाउनलोड चालू रखता है: GitHub पर देखता है कि ऐप बनाने वालों ने yt-dlp का कौन सा वर्ज़न मंज़ूर किया है, और अपडेट करने पर (अपडेट > सहायक प्रोग्राम) या अगर आपने स्वचालित रूप से अपडेट करें पर टिक किया है तो अपने-आप, उसे PyPI से लाता है।",
   "Listen": "सुनें",
   "More audio settings": "और ऑडियो सेटिंग्स",
@@ -4079,5 +4078,6 @@
   "you shall not pass!": "तुम नहीं गुज़र सकते!",
   "you smell like flowers": "तुमसे फूलों की ख़ुशबू आती है",
   "No ads, no account, no spying, free forever. Found a bug? Tell me. Have fun.\n\nOnionAlien": "न विज्ञापन, न अकाउंट, न जासूसी, हमेशा के लिए मुफ़्त। कोई बग मिला? मुझे बताओ। मज़े करो।\n\nOnionAlien",
-  "The store's down right now, so sharing is off. Try again later.": "स्टोर अभी बंद है, इसलिए शेयर करना बंद है। बाद में फिर कोशिश करें।"
+  "The store's down right now, so sharing is off. Try again later.": "स्टोर अभी बंद है, इसलिए शेयर करना बंद है। बाद में फिर कोशिश करें।",
+  "Send your sounds": "अपने साउंड भेजें"
 }

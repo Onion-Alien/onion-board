@@ -3736,7 +3736,6 @@
   "Downloads Onion Watch (Triggers tab), its updates, and what an add-on needs when you install it (from GitHub and PyPI).": "Mengunduh Onion Watch (tab Pemicu), pembaruannya, dan apa yang dibutuhkan add-on saat kamu memasangnya (dari GitHub dan PyPI).",
   "Downloads the extra voices and languages you pick on the Voice tab (from Hugging Face and Windows Update). Off: what's already here still works.": "Mengunduh suara dan bahasa tambahan yang kamu pilih di tab Vokal (dari Hugging Face dan Windows Update). Nonaktif: yang sudah ada tetap jalan.",
   "Get FFmpeg (Data & quality) installs FFmpeg, the free tool that plays M4A, AAC and video files (through Microsoft's winget). Off: install it yourself from ffmpeg.org.": "Dapatkan FFmpeg (Data & kualitas) memasang FFmpeg, alat gratis yang memutar file M4A, AAC, dan video (lewat winget dari Microsoft). Nonaktif: pasang sendiri dari ffmpeg.org.",
-  "How others hear your sounds": "Bagaimana orang lain mendengar suaramu",
   "Keeps downloading from YouTube and other sites working: checks GitHub for a version of yt-dlp the app's makers approved and gets it from PyPI when you update it (Updates > Helper programs), or by itself if you ticked Update automatically.": "Menjaga unduhan dari YouTube dan situs lain tetap jalan: memeriksa di GitHub versi yt-dlp yang disetujui pembuat aplikasi dan mengambilnya dari PyPI saat kamu memperbarui (Pembaruan > Program pembantu), atau sendiri jika kamu mencentang Perbarui secara otomatis.",
   "Listen": "Dengarkan",
   "More audio settings": "Pengaturan audio lainnya",
@@ -4001,5 +4000,6 @@
   "you shall not pass!": "kau tidak boleh lewat!",
   "you smell like flowers": "kamu wangi bunga",
   "No ads, no account, no spying, free forever. Found a bug? Tell me. Have fun.\n\nOnionAlien": "Tanpa iklan, tanpa akun, tanpa mata-mata, gratis selamanya. Nemu bug? Kasih tahu aku. Selamat bersenang-senang.\n\nOnionAlien",
-  "The store's down right now, so sharing is off. Try again later.": "Toko sedang down, jadi berbagi dimatikan. Coba lagi nanti."
+  "The store's down right now, so sharing is off. Try again later.": "Toko sedang down, jadi berbagi dimatikan. Coba lagi nanti.",
+  "Send your sounds": "Kirim suaramu"
 }

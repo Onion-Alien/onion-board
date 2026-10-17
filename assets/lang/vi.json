@@ -3736,7 +3736,6 @@
   "Downloads Onion Watch (Triggers tab), its updates, and what an add-on needs when you install it (from GitHub and PyPI).": "Tải Onion Watch (thẻ Kích hoạt), các bản cập nhật của nó và những gì một tiện ích cần khi bạn cài (từ GitHub và PyPI).",
   "Downloads the extra voices and languages you pick on the Voice tab (from Hugging Face and Windows Update). Off: what's already here still works.": "Tải các giọng và ngôn ngữ thêm bạn chọn ở thẻ Giọng nói (từ Hugging Face và Windows Update). Tắt: những gì đã có vẫn chạy.",
   "Get FFmpeg (Data & quality) installs FFmpeg, the free tool that plays M4A, AAC and video files (through Microsoft's winget). Off: install it yourself from ffmpeg.org.": "Tải FFmpeg (Chất lượng & dữ liệu) cài FFmpeg, công cụ miễn phí phát tệp M4A, AAC và video (qua winget của Microsoft). Tắt: tự cài từ ffmpeg.org.",
-  "How others hear your sounds": "Mọi người nghe âm thanh của bạn thế nào",
   "Keeps downloading from YouTube and other sites working: checks GitHub for a version of yt-dlp the app's makers approved and gets it from PyPI when you update it (Updates > Helper programs), or by itself if you ticked Update automatically.": "Giữ cho việc tải từ YouTube và các trang khác hoạt động: kiểm tra trên GitHub phiên bản yt-dlp mà người làm ứng dụng đã duyệt và lấy nó từ PyPI khi bạn cập nhật (Cập nhật > Chương trình hỗ trợ), hoặc tự làm nếu bạn đã tích Cập nhật tự động.",
   "Listen": "Nghe thử",
   "More audio settings": "Thêm cài đặt âm thanh",
@@ -4001,5 +4000,6 @@
   "you shall not pass!": "ngươi không được qua!",
   "you smell like flowers": "cậu thơm mùi hoa",
   "No ads, no account, no spying, free forever. Found a bug? Tell me. Have fun.\n\nOnionAlien": "Không quảng cáo, không tài khoản, không theo dõi, miễn phí mãi mãi. Thấy lỗi à? Báo mình nhé. Chơi vui nhé.\n\nOnionAlien",
-  "The store's down right now, so sharing is off. Try again later.": "Cửa hàng đang gặp sự cố nên tính năng chia sẻ đã tắt. Hãy thử lại sau."
+  "The store's down right now, so sharing is off. Try again later.": "Cửa hàng đang gặp sự cố nên tính năng chia sẻ đã tắt. Hãy thử lại sau.",
+  "Send your sounds": "Gửi âm thanh của bạn"
 }

@@ -3736,7 +3736,6 @@
   "Downloads Onion Watch (Triggers tab), its updates, and what an add-on needs when you install it (from GitHub and PyPI).": "下载 Onion Watch（触发器标签）、它的更新，以及插件安装时需要的东西（来自 GitHub 和 PyPI）。",
   "Downloads the extra voices and languages you pick on the Voice tab (from Hugging Face and Windows Update). Off: what's already here still works.": "下载你在变声标签里选的额外声音和语言（来自 Hugging Face 和 Windows Update）。关闭：已有的仍然可用。",
   "Get FFmpeg (Data & quality) installs FFmpeg, the free tool that plays M4A, AAC and video files (through Microsoft's winget). Off: install it yourself from ffmpeg.org.": "“获取 FFmpeg”（流量 & 音质）会安装 FFmpeg，这个免费工具能播放 M4A、AAC 和视频文件（通过 Microsoft 的 winget）。关闭：请自行从 ffmpeg.org 安装。",
-  "How others hear your sounds": "别人怎么听到你的音效",
   "Keeps downloading from YouTube and other sites working: checks GitHub for a version of yt-dlp the app's makers approved and gets it from PyPI when you update it (Updates > Helper programs), or by itself if you ticked Update automatically.": "让从 YouTube 和其他网站的下载保持可用：在 GitHub 上查看应用作者批准的 yt-dlp 版本，并在你更新时（更新 > 辅助程序）从 PyPI 获取；如果你勾选了自动更新，也会自动获取。",
   "Listen": "试听",
   "More audio settings": "更多音频设置",
@@ -4001,5 +4000,6 @@
   "you shall not pass!": "你不能过去！",
   "you smell like flowers": "你身上有花香",
   "No ads, no account, no spying, free forever. Found a bug? Tell me. Have fun.\n\nOnionAlien": "没有广告，不用账号，不偷看你，永远免费。发现 bug？告诉我。玩得开心。\n\nOnionAlien",
-  "The store's down right now, so sharing is off. Try again later.": "商店现在出故障了，所以分享已关闭。请稍后再试。"
+  "The store's down right now, so sharing is off. Try again later.": "商店现在出故障了，所以分享已关闭。请稍后再试。",
+  "Send your sounds": "发送你的音效"
 }

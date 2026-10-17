@@ -3736,7 +3736,6 @@
   "Downloads Onion Watch (Triggers tab), its updates, and what an add-on needs when you install it (from GitHub and PyPI).": "Onion Watch（トリガータブ）とそのアップデート、アドオンのインストールに必要なものをダウンロードします（GitHub と PyPI から）。",
   "Downloads the extra voices and languages you pick on the Voice tab (from Hugging Face and Windows Update). Off: what's already here still works.": "ボイスタブで選んだ追加の声と言語をダウンロードします（Hugging Face と Windows Update から）。オフ: すでにあるものは引き続き使えます。",
   "Get FFmpeg (Data & quality) installs FFmpeg, the free tool that plays M4A, AAC and video files (through Microsoft's winget). Off: install it yourself from ffmpeg.org.": "「FFmpeg を入手」（データと品質）は、M4A・AAC・動画ファイルを再生する無料ツール FFmpeg をインストールします（Microsoft の winget 経由）。オフ: ffmpeg.org から自分でインストールしてください。",
-  "How others hear your sounds": "相手にあなたのサウンドがどう聞こえるか",
   "Keeps downloading from YouTube and other sites working: checks GitHub for a version of yt-dlp the app's makers approved and gets it from PyPI when you update it (Updates > Helper programs), or by itself if you ticked Update automatically.": "YouTube などのサイトからのダウンロードを使える状態に保ちます。アプリの作者が承認した yt-dlp のバージョンを GitHub で確認し、更新したとき（アップデート > 補助プログラム）、または自動更新にチェックしていれば自動で、PyPI から取得します。",
   "Listen": "聞く",
   "More audio settings": "その他のオーディオ設定",
@@ -4001,5 +4000,6 @@
   "you shall not pass!": "ここは通さん！",
   "you smell like flowers": "お花のにおいがする",
   "No ads, no account, no spying, free forever. Found a bug? Tell me. Have fun.\n\nOnionAlien": "広告なし、アカウント不要、のぞき見なし、ずっと無料。バグを見つけたら教えてね。楽しんで。\n\nOnionAlien",
-  "The store's down right now, so sharing is off. Try again later.": "ストアが現在ダウンしているため、共有はオフです。後でもう一度お試しください。"
+  "The store's down right now, so sharing is off. Try again later.": "ストアが現在ダウンしているため、共有はオフです。後でもう一度お試しください。",
+  "Send your sounds": "サウンドを送る"
 }

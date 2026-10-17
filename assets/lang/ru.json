@@ -3892,7 +3892,6 @@
   "Downloads Onion Watch (Triggers tab), its updates, and what an add-on needs when you install it (from GitHub and PyPI).": "Скачивает Onion Watch (вкладка Триггеры), его обновления и то, что нужно дополнению при установке (с GitHub и PyPI).",
   "Downloads the extra voices and languages you pick on the Voice tab (from Hugging Face and Windows Update). Off: what's already here still works.": "Скачивает дополнительные голоса и языки, которые ты выбираешь на вкладке Голос (с Hugging Face и Windows Update). Выкл.: то, что уже есть, продолжает работать.",
   "Get FFmpeg (Data & quality) installs FFmpeg, the free tool that plays M4A, AAC and video files (through Microsoft's winget). Off: install it yourself from ffmpeg.org.": "«Скачать FFmpeg» (Данные & качество) устанавливает FFmpeg, бесплатную программу, которая воспроизводит файлы M4A, AAC и видео (через winget от Microsoft). Выкл.: установи его сам с ffmpeg.org.",
-  "How others hear your sounds": "Как другие слышат твои звуки",
   "Keeps downloading from YouTube and other sites working: checks GitHub for a version of yt-dlp the app's makers approved and gets it from PyPI when you update it (Updates > Helper programs), or by itself if you ticked Update automatically.": "Поддерживает загрузки с YouTube и других сайтов в рабочем состоянии: проверяет на GitHub, какую версию yt-dlp одобрили создатели приложения, и берёт её с PyPI, когда ты обновляешь (Обновления > Вспомогательные программы), или сам, если ты отметил Обновлять автоматически.",
   "Listen": "Послушать",
   "More audio settings": "Ещё настройки звука",
@@ -4157,5 +4156,6 @@
   "you shall not pass!": "ты не пройдёшь!",
   "you smell like flowers": "ты пахнешь цветами",
   "No ads, no account, no spying, free forever. Found a bug? Tell me. Have fun.\n\nOnionAlien": "Без рекламы, без аккаунта, без слежки, бесплатно навсегда. Нашёл баг? Напиши мне. Развлекайся.\n\nOnionAlien",
-  "The store's down right now, so sharing is off. Try again later.": "Магазин сейчас не работает, поэтому делиться нельзя. Попробуй позже."
+  "The store's down right now, so sharing is off. Try again later.": "Магазин сейчас не работает, поэтому делиться нельзя. Попробуй позже.",
+  "Send your sounds": "Отправка звуков"
 }

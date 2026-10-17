@@ -3814,7 +3814,6 @@
   "Downloads Onion Watch (Triggers tab), its updates, and what an add-on needs when you install it (from GitHub and PyPI).": "Henter Onion Watch (fanen Triggere), dets opdateringer og det, en tilføjelse skal bruge, når du installerer den (fra GitHub og PyPI).",
   "Downloads the extra voices and languages you pick on the Voice tab (from Hugging Face and Windows Update). Off: what's already here still works.": "Henter de ekstra stemmer og sprog, du vælger på fanen Stemme (fra Hugging Face og Windows Update). Fra: det, der allerede er her, virker stadig.",
   "Get FFmpeg (Data & quality) installs FFmpeg, the free tool that plays M4A, AAC and video files (through Microsoft's winget). Off: install it yourself from ffmpeg.org.": "Hent FFmpeg (Data & kvalitet) installerer FFmpeg, det gratis værktøj, der afspiller M4A-, AAC- og videofiler (via Microsofts winget). Fra: installer det selv fra ffmpeg.org.",
-  "How others hear your sounds": "Sådan hører andre dine lyde",
   "Keeps downloading from YouTube and other sites working: checks GitHub for a version of yt-dlp the app's makers approved and gets it from PyPI when you update it (Updates > Helper programs), or by itself if you ticked Update automatically.": "Holder download fra YouTube og andre sider kørende: tjekker på GitHub, hvilken version af yt-dlp appens skabere har godkendt, og henter den fra PyPI, når du opdaterer den (Opdateringer > Hjælpeprogrammer), eller af sig selv, hvis du har sat flueben ved Opdater automatisk.",
   "Listen": "Lyt",
   "More audio settings": "Flere lydindstillinger",
@@ -4079,5 +4078,6 @@
   "you shall not pass!": "du skal ikke passere!",
   "you smell like flowers": "du dufter af blomster",
   "No ads, no account, no spying, free forever. Found a bug? Tell me. Have fun.\n\nOnionAlien": "Ingen reklamer, ingen konto, ingen overvågning, gratis for altid. Fundet en fejl? Sig det til mig. God fornøjelse.\n\nOnionAlien",
-  "The store's down right now, so sharing is off. Try again later.": "Butikken er nede lige nu, så deling er slået fra. Prøv igen senere."
+  "The store's down right now, so sharing is off. Try again later.": "Butikken er nede lige nu, så deling er slået fra. Prøv igen senere.",
+  "Send your sounds": "Send dine lyde"
 }

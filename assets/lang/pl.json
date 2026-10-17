@@ -3892,7 +3892,6 @@
   "Downloads Onion Watch (Triggers tab), its updates, and what an add-on needs when you install it (from GitHub and PyPI).": "Pobiera Onion Watch (karta Wyzwalacze), jego aktualizacje i to, czego dodatek potrzebuje przy instalacji (z GitHuba i PyPI).",
   "Downloads the extra voices and languages you pick on the Voice tab (from Hugging Face and Windows Update). Off: what's already here still works.": "Pobiera dodatkowe głosy i języki, które wybierasz na karcie Głos (z Hugging Face i Windows Update). Wyłączone: to, co już jest, dalej działa.",
   "Get FFmpeg (Data & quality) installs FFmpeg, the free tool that plays M4A, AAC and video files (through Microsoft's winget). Off: install it yourself from ffmpeg.org.": "Zdobądź FFmpeg (Dane i jakość) instaluje FFmpeg, darmowe narzędzie, które odtwarza pliki M4A, AAC i wideo (przez winget od Microsoftu). Wyłączone: zainstaluj go samodzielnie z ffmpeg.org.",
-  "How others hear your sounds": "Jak inni słyszą twoje dźwięki",
   "Keeps downloading from YouTube and other sites working: checks GitHub for a version of yt-dlp the app's makers approved and gets it from PyPI when you update it (Updates > Helper programs), or by itself if you ticked Update automatically.": "Utrzymuje działanie pobierania z YouTube i innych stron: sprawdza na GitHubie, którą wersję yt-dlp zatwierdzili twórcy aplikacji, i pobiera ją z PyPI, gdy aktualizujesz (Aktualizacje > Programy pomocnicze), albo sam, jeśli zaznaczysz Aktualizuj automatycznie.",
   "Listen": "Posłuchaj",
   "More audio settings": "Więcej ustawień dźwięku",
@@ -4157,5 +4156,6 @@
   "you shall not pass!": "nie przejdziesz!",
   "you smell like flowers": "pachniesz kwiatami",
   "No ads, no account, no spying, free forever. Found a bug? Tell me. Have fun.\n\nOnionAlien": "Bez reklam, bez konta, bez szpiegowania, za darmo na zawsze. Znalazłeś błąd? Daj mi znać. Baw się dobrze.\n\nOnionAlien",
-  "The store's down right now, so sharing is off. Try again later.": "Sklep teraz nie działa, więc udostępnianie jest wyłączone. Spróbuj później."
+  "The store's down right now, so sharing is off. Try again later.": "Sklep teraz nie działa, więc udostępnianie jest wyłączone. Spróbuj później.",
+  "Send your sounds": "Wysyłanie dźwięków"
 }

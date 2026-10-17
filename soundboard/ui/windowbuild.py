@@ -1592,13 +1592,13 @@ class WindowBuilder(Controller):
         ways = Flow(gap=8)
         # the mic on a row of its own, then "or" and the rest: the cable is the fallback
         # for the few who'd rather not, not the next step
-        attach_row = QHBoxLayout()
-        attach_row.addWidget(mw.btn_attach)
-        attach_row.addStretch(1)
-        cv.addLayout(attach_row)
+        # (straight in the card, at its own width: a row with a stretch kept a gap of
+        # its own while the button was hidden, and the card came up short)
+        cv.addWidget(mw.btn_attach, 0, Qt.AlignmentFlag.AlignLeft)
         mw.ways_or = QLabel(_("or"))
         mw.ways_or.setObjectName("hint")
         mw.ways_or.hide()
+        ways.addWidget(mw.ways_or)   # first in the row, level with the buttons' middle
         mw.btn_usecable = QPushButton(_("Use the cable"))   # (in its tile, below)
         mw.btn_usecable.setToolTip(_("Use a free virtual cable instead: you pick it as the "
                                        "mic in Discord and games"))
@@ -1615,6 +1615,8 @@ class WindowBuilder(Controller):
         mw._settle_until = 0.0      # just set up: Windows is still loading it
         mw._done_toast = None   # "done" / "updated": said once it works
         icons.set_icon(mw.btn_install, "cable", "on_accent")
+        mw.ways_or.setAlignment(Qt.AlignmentFlag.AlignVCenter)
+        mw.ways_or.setMinimumHeight(mw.btn_install.sizeHint().height())   # (the buttons')
         ways.addWidget(mw.btn_install)
         # Connect your chat is hidden until there's a chat to connect: its guide is here
         # meanwhile (that card held nothing else, while nothing was set up or on Nobody)
@@ -1622,11 +1624,8 @@ class WindowBuilder(Controller):
         mw.btn_guide.hide()
         mw.btn_guide.setProperty("quiet", True)
         ways.addWidget(mw.btn_guide)
-        or_row = QHBoxLayout()
-        or_row.setSpacing(10)
-        or_row.addWidget(mw.ways_or, 0, Qt.AlignmentFlag.AlignVCenter)
-        or_row.addLayout(ways, 1)
-        cv.addLayout(or_row)
+        # (the row straight in the card: inside another row its height came up short)
+        cv.addLayout(ways)
         mw._ways = ways
         # straight into the mic works: the cable is only a fallback, so offer to remove it
         mw.btn_rmcable = QPushButton(_("Remove"))   # (in the cable's tile: it says which)

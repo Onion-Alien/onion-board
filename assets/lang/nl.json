@@ -3814,7 +3814,6 @@
   "Downloads Onion Watch (Triggers tab), its updates, and what an add-on needs when you install it (from GitHub and PyPI).": "Downloadt Onion Watch (tab Triggers), de updates ervan en wat een add-on nodig heeft als je hem installeert (van GitHub en PyPI).",
   "Downloads the extra voices and languages you pick on the Voice tab (from Hugging Face and Windows Update). Off: what's already here still works.": "Downloadt de extra stemmen en talen die je kiest op de tab Stem (van Hugging Face en Windows Update). Uit: wat er al is, blijft werken.",
   "Get FFmpeg (Data & quality) installs FFmpeg, the free tool that plays M4A, AAC and video files (through Microsoft's winget). Off: install it yourself from ffmpeg.org.": "FFmpeg verkrijgen (Gegevens & kwaliteit) installeert FFmpeg, de gratis tool die M4A-, AAC- en videobestanden afspeelt (via winget van Microsoft). Uit: installeer het zelf vanaf ffmpeg.org.",
-  "How others hear your sounds": "Hoe anderen je geluiden horen",
   "Keeps downloading from YouTube and other sites working: checks GitHub for a version of yt-dlp the app's makers approved and gets it from PyPI when you update it (Updates > Helper programs), or by itself if you ticked Update automatically.": "Houdt downloaden van YouTube en andere sites werkend: kijkt op GitHub welke versie van yt-dlp de makers van de app hebben goedgekeurd en haalt die van PyPI als je bijwerkt (Updates > Hulpprogramma's), of vanzelf als je Automatisch bijwerken hebt aangevinkt.",
   "Listen": "Luisteren",
   "More audio settings": "Meer audio-instellingen",
@@ -4079,5 +4078,6 @@
   "you shall not pass!": "gij zult niet passeren!",
   "you smell like flowers": "je ruikt naar bloemen",
   "No ads, no account, no spying, free forever. Found a bug? Tell me. Have fun.\n\nOnionAlien": "Geen reclame, geen account, geen bespieden, voor altijd gratis. Een bug gevonden? Laat het me weten. Veel plezier.\n\nOnionAlien",
-  "The store's down right now, so sharing is off. Try again later.": "De store ligt er nu uit, dus delen staat uit. Probeer het later opnieuw."
+  "The store's down right now, so sharing is off. Try again later.": "De store ligt er nu uit, dus delen staat uit. Probeer het later opnieuw.",
+  "Send your sounds": "Je geluiden sturen"
 }
