@@ -299,6 +299,7 @@ class StoreTab(QWidget):
         self.cat_pick.activated.connect(self._cat_picked)
         self.btn_share = QPushButton(_("Share a sound"))
         self.btn_share.setObjectName("primary")
+        self._share_words = True   # (a narrow tab: its icon only, the words its tooltip)
         icons.set_icon(self.btn_share, "upload", "on_accent", "on_accent")
         self.btn_share.clicked.connect(lambda: self.share_voice() if self._mode == "voices"
                                        else self.share())
@@ -437,16 +438,47 @@ class StoreTab(QWidget):
         """One row when the card has room for all of it (and the tab is wide), else two."""
         room = min(self.width(), ROW_MAX_W) - 28   # (the banner's side margins)
         parts = self._toolbar_parts()
-        need = sum(w.minimumSizeHint().width() if w is self.search else w.sizeHint().width()
+        full = self._share_w(self._share_label())
+        need = sum(full if w is self.btn_share else w.minimumSizeHint().width()
+                   if w is self.search else w.sizeHint().width()
                    for w in parts) + 8 * (len(parts) - 1)
         self._lay_toolbar(self.width() >= ONE_ROW and room >= need)
+        # the first of two rows, Sounds / Voices and Share, wanted 487 px with Share's
+        # words: wider than the mini player's cut-off, so the window went mini on it
+        words = bool(self._one_row) or room >= self._modes_w() + 8 + full
+        if words != self._share_words:
+            self._share_words = words
+            self._share_look()
+
+    def _share_label(self) -> str:
+        return _("Share a voice") if self._mode == "voices" else _("Share a sound")
+
+    def _share_look(self):
+        """Share's words on it, or (narrow) its icon only with the words as its tooltip."""
+        label = self._share_label()
+        self.btn_share.setText(label if self._share_words else "")
+        self.btn_share.setToolTip("" if self._share_words else label)
+        self.btn_share.setAccessibleName(label)
+
+    def _share_w(self, text: str) -> int:
+        """The Share button's width with `text` on it."""
+        b = self.btn_share
+        was = b.text()
+        if was == text:
+            return b.sizeHint().width()
+        b.setText(text)
+        w = b.sizeHint().width()
+        b.setText(was)
+        return w
+
+    def _modes_w(self) -> int:
+        return self.modes_box.sizeHint().width() * (not self.modes_box.isHidden())
 
     def _lay_toolbar(self, one: bool):
         """The toolbar in one row (a wide tab), or two: Sounds / Voices and Share, then
         the search, the category and Refresh."""
         # the box asks for the two rows' width, whichever is shown
-        rows = (self.modes_box.sizeHint().width() * (not self.modes_box.isHidden())
-                + 8 + self.btn_share.sizeHint().width(),
+        rows = (self._modes_w() + 8 + self._share_w(""),
                 self.search.minimumSizeHint().width() + self.cat_pick.sizeHint().width()
                 + self.btn_reload.sizeHint().width() + 16)
         self.toolbar.setMinimumWidth(max(rows))
@@ -585,7 +617,7 @@ class StoreTab(QWidget):
         if self._mode in self.mode_btns:
             self.mode_btns[self._mode].setChecked(True)
         voices = self._mode == "voices"
-        self.btn_share.setText(_("Share a voice") if voices else _("Share a sound"))
+        self._share_look()
         self.search.setPlaceholderText(_("Search the voices") if voices
                                        else _("Search sounds"))
         self.head_name.setText(_("Voice") if voices else _("Sound"))
