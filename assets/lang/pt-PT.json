@@ -3758,5 +3758,10 @@
   "The store doesn't take that name or those tags. Try other words (and no links).": "A loja não aceita esse nome ou essas etiquetas. Experimenta outras palavras (e sem ligações).",
   "Add a voice someone sent you as a code (it starts with “OB”)": "Adicione uma voz que alguém lhe enviou como código (começa por “OB”)",
   "Add “{name}”?": "Adicionar “{name}”?",
-  "That isn't a voice code (they start with “OB”).": "Isto não é um código de voz (começam por “OB”)."
+  "That isn't a voice code (they start with “OB”).": "Isto não é um código de voz (começam por “OB”).",
+  " · hidden from All": " · oculta em Todos",
+  "Every sound except those in: {names} (right-click one of them, Advanced, to show it here again)": "Todos os sons, exceto os de: {names} (clica com o botão direito numa delas, Avançado, para a mostrar aqui outra vez)",
+  "Hide its sounds from All": "Ocultar os sons dela em Todos",
+  "“{name}” is hidden from All. Its sounds stay on its own tab.": "“{name}” está oculta em Todos. Os sons dela continuam no próprio separador.",
+  "“{name}” shows in All again": "“{name}” volta a aparecer em Todos"
 }

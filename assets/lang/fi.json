@@ -3758,5 +3758,10 @@
   "The store doesn't take that name or those tags. Try other words (and no links).": "Kauppa ei hyväksy tätä nimeä tai näitä tunnisteita. Kokeile muita sanoja (ei linkkejä).",
   "Add a voice someone sent you as a code (it starts with “OB”)": "Lisää koodina joku sinulle lähettämä ääni (se alkaa kirjaimella \"OB\")",
   "Add “{name}”?": "Lisätäänkö ”{name}”?",
-  "That isn't a voice code (they start with “OB”).": "Se ei ole äänikoodi (ne alkavat \"OB\")."
+  "That isn't a voice code (they start with “OB”).": "Se ei ole äänikoodi (ne alkavat \"OB\").",
+  " · hidden from All": " · piilotettu Kaikista",
+  "Every sound except those in: {names} (right-click one of them, Advanced, to show it here again)": "Kaikki äänet paitsi nämä: {names} (klikkaa yhtä oikealla, Lisäasetukset, näyttääksesi sen taas täällä)",
+  "Hide its sounds from All": "Piilota sen äänet Kaikista",
+  "“{name}” is hidden from All. Its sounds stay on its own tab.": "”{name}” on piilotettu Kaikista. Sen äänet pysyvät sen omalla välilehdellä.",
+  "“{name}” shows in All again": "”{name}” näkyy taas Kaikissa"
 }

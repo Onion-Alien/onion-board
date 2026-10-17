@@ -3758,5 +3758,10 @@
   "The store doesn't take that name or those tags. Try other words (and no links).": "De winkel neemt die naam of tags niet aan. Probeer andere woorden (en geen links).",
   "Add a voice someone sent you as a code (it starts with “OB”)": "Voeg een stem toe die iemand je heeft gestuurd als code (deze begint met 'OB')",
   "Add “{name}”?": "“{name}” toevoegen?",
-  "That isn't a voice code (they start with “OB”).": "Dat is geen stemcode (ze beginnen met “OB”)."
+  "That isn't a voice code (they start with “OB”).": "Dat is geen stemcode (ze beginnen met “OB”).",
+  " · hidden from All": " · verborgen in Alle",
+  "Every sound except those in: {names} (right-click one of them, Advanced, to show it here again)": "Elk geluid behalve die in: {names} (rechtsklik op een ervan, Geavanceerd, om hem hier weer te tonen)",
+  "Hide its sounds from All": "De geluiden verbergen in Alle",
+  "“{name}” is hidden from All. Its sounds stay on its own tab.": "“{name}” is verborgen in Alle. De geluiden blijven op hun eigen tabblad.",
+  "“{name}” shows in All again": "“{name}” staat weer in Alle"
 }

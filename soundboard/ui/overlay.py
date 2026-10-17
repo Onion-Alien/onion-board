@@ -238,10 +238,12 @@ class Overlay:
         until sounds_changed() or the category / sound list changes: a paint asks
         several times, and a big library made each ask a full pass."""
         cfg = self.host.cfg
-        key = (cfg.category, cfg.subcategory, id(cfg.sounds), len(cfg.sounds))
+        key = (cfg.category, cfg.subcategory, id(cfg.sounds), len(cfg.sounds),
+               tuple(cfg.hidden_from_all))
         if self._sounds is None or self._sounds[0] != key:
             self._sounds = (key, [m for m in cfg.sounds
-                                  if library.in_view(m.tags, cfg.category, cfg.subcategory)])
+                                  if library.in_view(m.tags, cfg.category, cfg.subcategory,
+                                                  cfg.hidden_from_all)])
         return self._sounds[1]
 
     def sounds_changed(self):

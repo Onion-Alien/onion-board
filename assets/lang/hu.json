@@ -3758,5 +3758,10 @@
   "The store doesn't take that name or those tags. Try other words (and no links).": "A bolt nem fogadja el ezt a nevet vagy ezeket a címkéket. Próbálj más szavakat (és ne linket).",
   "Add a voice someone sent you as a code (it starts with “OB”)": "Adjon hozzá egy hangot, amelyet valaki küldött Önnek kódként (az „OB” karakterlánccal kezdődik)",
   "Add “{name}”?": "Hozzáadja: „{name}”?",
-  "That isn't a voice code (they start with “OB”).": "Ez nem hangkód (az „OB”-vel kezdődnek)."
+  "That isn't a voice code (they start with “OB”).": "Ez nem hangkód (az „OB”-vel kezdődnek).",
+  " · hidden from All": " · elrejtve a Mindből",
+  "Every sound except those in: {names} (right-click one of them, Advanced, to show it here again)": "Minden hang, kivéve ezekben: {names} (jobb klikk valamelyikre, Haladó, hogy itt újra látszódjon)",
+  "Hide its sounds from All": "Hangjai elrejtése a Mindből",
+  "“{name}” is hidden from All. Its sounds stay on its own tab.": "„{name}” el van rejtve a Mindből. A hangjai a saját fülén maradnak.",
+  "“{name}” shows in All again": "„{name}” újra látszik a Mindben"
 }

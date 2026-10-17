@@ -3837,5 +3837,10 @@
   "The store doesn't take that name or those tags. Try other words (and no links).": "Магазин не приймає таку назву чи теги. Спробуйте інші слова (і без посилань).",
   "Add a voice someone sent you as a code (it starts with “OB”)": "Додайте голос, надісланий вам як код (він починається з «OB»)",
   "Add “{name}”?": "Додати «{name}»?",
-  "That isn't a voice code (they start with “OB”).": "Це не голосовий код (вони починаються з «OB»)."
+  "That isn't a voice code (they start with “OB”).": "Це не голосовий код (вони починаються з «OB»).",
+  " · hidden from All": " · прихована в «Усі»",
+  "Every sound except those in: {names} (right-click one of them, Advanced, to show it here again)": "Усі звуки, крім звуків із: {names} (правий клік на одній із них, Розширені, щоб знову показати її тут)",
+  "Hide its sounds from All": "Приховати її звуки в «Усі»",
+  "“{name}” is hidden from All. Its sounds stay on its own tab.": "«{name}» прихована в «Усі». Її звуки лишаються на її вкладці.",
+  "“{name}” shows in All again": "«{name}» знову видно в «Усі»"
 }

@@ -3837,5 +3837,10 @@
   "The store doesn't take that name or those tags. Try other words (and no links).": "Magazinul nu acceptă acest nume sau aceste etichete. Încearcă alte cuvinte (și fără linkuri).",
   "Add a voice someone sent you as a code (it starts with “OB”)": "Adaugă o voce pe care cineva ți-a trimis-o ca cod (începe cu „OB”)",
   "Add “{name}”?": "Adăugați „{name}”?",
-  "That isn't a voice code (they start with “OB”).": "Acesta nu este un cod vocal (încep cu „OB”)."
+  "That isn't a voice code (they start with “OB”).": "Acesta nu este un cod vocal (încep cu „OB”).",
+  " · hidden from All": " · ascunsă din Toate",
+  "Every sound except those in: {names} (right-click one of them, Advanced, to show it here again)": "Toate sunetele, în afară de cele din: {names} (clic dreapta pe una dintre ele, Avansat, ca s-o arăți din nou aici)",
+  "Hide its sounds from All": "Ascunde-i sunetele din Toate",
+  "“{name}” is hidden from All. Its sounds stay on its own tab.": "„{name}” e ascunsă din Toate. Sunetele ei rămân în fila ei.",
+  "“{name}” shows in All again": "„{name}” apare din nou în Toate"
 }

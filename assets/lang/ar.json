@@ -4074,5 +4074,10 @@
   "The store doesn't take that name or those tags. Try other words (and no links).": "لا يقبل المتجر هذا الاسم أو هذه الوسوم. جرّب كلمات أخرى (وبدون روابط).",
   "Add a voice someone sent you as a code (it starts with “OB”)": "أضف صوتًا أرسله إليك أحد الأشخاص كرمز (يبدأ بـ \"OB\")",
   "Add “{name}”?": "أضف «{name}»؟",
-  "That isn't a voice code (they start with “OB”).": "هذا ليس رمزًا صوتيًا (يبدأ بـ \"OB\")."
+  "That isn't a voice code (they start with “OB”).": "هذا ليس رمزًا صوتيًا (يبدأ بـ \"OB\").",
+  " · hidden from All": " · مخفية من الكل",
+  "Every sound except those in: {names} (right-click one of them, Advanced, to show it here again)": "كل الأصوات ما عدا الموجودة في: {names} (انقر بالزر الأيمن على إحداها، متقدم، لإظهارها هنا مجددًا)",
+  "Hide its sounds from All": "إخفاء أصواتها من الكل",
+  "“{name}” is hidden from All. Its sounds stay on its own tab.": "«{name}» مخفية من الكل. تبقى أصواتها في تبويبها.",
+  "“{name}” shows in All again": "«{name}» تظهر في الكل مجددًا"
 }

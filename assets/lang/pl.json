@@ -3837,5 +3837,10 @@
   "The store doesn't take that name or those tags. Try other words (and no links).": "Sklep nie przyjmuje tej nazwy ani tagów. Spróbuj innych słów (bez linków).",
   "Add a voice someone sent you as a code (it starts with “OB”)": "Dodaj głos, który ktoś Ci wysłał jako kod (zaczyna się od „OB”)",
   "Add “{name}”?": "Dodać „{name}”?",
-  "That isn't a voice code (they start with “OB”).": "To nie jest kod głosowy (zaczynają się od „OB”)."
+  "That isn't a voice code (they start with “OB”).": "To nie jest kod głosowy (zaczynają się od „OB”).",
+  " · hidden from All": " · ukryta we Wszystkich",
+  "Every sound except those in: {names} (right-click one of them, Advanced, to show it here again)": "Każdy dźwięk poza tymi w: {names} (prawy klik na jedną z nich, Zaawansowany, by znów ją tu pokazać)",
+  "Hide its sounds from All": "Ukryj jej dźwięki we Wszystkich",
+  "“{name}” is hidden from All. Its sounds stay on its own tab.": "„{name}” jest ukryta we Wszystkich. Jej dźwięki zostają w jej własnej karcie.",
+  "“{name}” shows in All again": "„{name}” znów widać we Wszystkich"
 }

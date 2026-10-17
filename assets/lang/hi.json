@@ -3758,5 +3758,10 @@
   "The store doesn't take that name or those tags. Try other words (and no links).": "स्टोर यह नाम या ये टैग नहीं लेता। दूसरे शब्द आज़माएं (और कोई लिंक नहीं)।",
   "Add a voice someone sent you as a code (it starts with “OB”)": "वह आवाज़ जोड़ें जो किसी ने आपको कोड के रूप में भेजी है (यह \"OB\" से शुरू होती है)",
   "Add “{name}”?": "“{name}” जोड़ें?",
-  "That isn't a voice code (they start with “OB”).": "वह ध्वनि कोड नहीं है (वे \"OB\" से शुरू होते हैं)।"
+  "That isn't a voice code (they start with “OB”).": "वह ध्वनि कोड नहीं है (वे \"OB\" से शुरू होते हैं)।",
+  " · hidden from All": " · सभी से छिपी",
+  "Every sound except those in: {names} (right-click one of them, Advanced, to show it here again)": "इनमें मौजूद आवाज़ों को छोड़कर हर आवाज़: {names} (इनमें से किसी पर राइट-क्लिक करें, उन्नत, ताकि वह यहाँ फिर दिखे)",
+  "Hide its sounds from All": "इसकी आवाज़ें सभी से छिपाएँ",
+  "“{name}” is hidden from All. Its sounds stay on its own tab.": "“{name}” सभी से छिपी है। इसकी आवाज़ें इसके अपने टैब पर रहती हैं।",
+  "“{name}” shows in All again": "“{name}” फिर से सभी में दिखती है"
 }
