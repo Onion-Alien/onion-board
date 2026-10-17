@@ -583,9 +583,7 @@ class UpdateControl(Controller):
         """The header's version, clicked: the newest release's notes, any time."""
         mw = self.mw
         from soundboard.ui import whatsnew
-        if not whatsnew.NOTES:
-            return
-        dlg = whatsnew.WhatsNewDialog(mw, [whatsnew.NOTES[0]])
+        dlg = whatsnew.WhatsNewDialog(mw, [whatsnew.notes()[0]])
         dlg.exec()
         page = dlg.page
         free_dialog(dlg)

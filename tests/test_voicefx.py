@@ -1056,3 +1056,46 @@ def test_new_voices_keep_speech_about_as_loud(name):
     assert np.all(np.isfinite(y))
     loss = np.sqrt(np.mean(y[SR // 2:] ** 2)) / np.sqrt(np.mean(x[SR // 2:len(y)] ** 2))
     assert 0.25 < loss < 4.0, loss
+
+
+def test_every_preset_has_a_group_on_the_voice_tab():
+    from soundboard.ui.voicefxpanel import VOICE_GROUPS
+    grouped = [n for _k, _t, names in VOICE_GROUPS for n in names]
+    assert sorted(grouped) == sorted(voicefx.PRESETS)   # each in one group, none left over
+
+
+def _speech_like(secs=2.0, f0=120.0):
+    """A voice-like test line: a buzzy vowel whose pitch glides, with pauses."""
+    t = np.arange(int(SR * secs)) / SR
+    f = f0 * (1 + 0.15 * np.sin(2 * np.pi * 0.7 * t))
+    ph = 2 * np.pi * np.cumsum(f) / SR
+    x = sum(np.sin(k * ph) / k for k in range(1, 30))
+    x *= (np.sin(2 * np.pi * 1.5 * t) > -0.3)       # words and gaps
+    return (0.3 * x / np.max(np.abs(x))).astype(np.float32)
+
+
+@pytest.mark.parametrize("name", ["Drunk", "Choir", "Goblin", "Fairy", "Zombie", "Evil twin",
+                                  "Giant", "Mecha", "Ship computer", "Pilot",
+                                  "Drive-thru speaker", "Old film", "Cathedral"])
+def test_new_voices_keep_the_loudness_of_your_voice(name):
+    x = _speech_like()
+    ch = VoiceChain()
+    ch.configure(spec_for(**voicefx.PRESETS[name]))
+    y = np.concatenate([ch.process(np.stack([x[i:i + 480]] * 2, 1), SR)[:, 0]
+                        for i in range(0, len(x), 480)])
+    db = 20 * np.log10(np.sqrt(np.mean(y ** 2)) / np.sqrt(np.mean(x ** 2)))
+    assert -7 < db < 7, f"{name}: {db:+.1f} dB"     # a voice, not a whisper or a blast
+    assert np.max(np.abs(y)) < 2.0
+
+
+def test_wobble_goes_deep_enough_to_sway_a_semitone():
+    # Drunk's slow sway: a delay swinging 35 ms at 0.7 Hz moves the pitch about
+    # +-7.7%, more than a semitone (6%); the old 10 ms top was a few cents' worth
+    e = REGISTRY["wobble"](SR, {"rate": 0.7, "vibrato": 35, "tremolo": 0})
+    t = np.arange(SR * 3) / SR
+    x = np.sin(2 * np.pi * 200 * t).astype(np.float32)
+    y = np.concatenate([e.run(x[i:i + 480], SR) for i in range(0, len(x), 480)])
+    z = np.where(np.diff(np.signbit(y[SR // 2:]).astype(np.int8)) != 0)[0]
+    per = np.diff(z[::2]) / SR
+    f = 1 / per
+    assert f.max() / f.min() > 2 ** (2 / 12)            # at least two semitones top to bottom

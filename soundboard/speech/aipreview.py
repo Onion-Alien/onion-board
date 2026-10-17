@@ -102,6 +102,24 @@ def render(module: ModuleInfo, voice: dict, mono16: np.ndarray) -> np.ndarray:
     return out
 
 
+def fx_sample(effects: dict) -> np.ndarray:
+    """The same line in a voice changer voice (`effects`: {type: {"on", setting: value}}),
+    made by the app's own effects: float32 stereo at 48 kHz, peak 0.8 at most, kept
+    for the rest of the run. Raises PreviewError (no Windows speech voice)."""
+    k = "fx:" + json.dumps(effects, sort_keys=True, default=str)
+    if k not in _cache:
+        from soundboard import voicefx
+        from soundboard.engine import SR, resample
+        chain = voicefx.VoiceChain()
+        chain.configure({"enabled": True, "effects": effects})
+        y = chain.render(resample(sample(), IN_RATE, SR), SR)
+        peak = float(np.max(np.abs(y))) if len(y) else 0.0
+        if peak > 0.8:
+            y = y * (0.8 / peak)
+        _cache[k] = np.ascontiguousarray(np.stack([y, y], axis=1), np.float32)
+    return _cache[k]
+
+
 def make(module: ModuleInfo, voice: dict) -> np.ndarray:
     """The sample in `voice`, ready for engine.play: float32 stereo at 48 kHz, peak
     0.8 at most. Raises PreviewError."""

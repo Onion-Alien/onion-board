@@ -31,6 +31,7 @@ class SetupsBar(QWidget):
         self.store, self.capture, self.apply = store, capture, apply
         self.icon_for, self.describe = icon_for, describe
         self._undo: tuple[str, dict] | None = None
+        self.share: Callable[[str], None] | None = None   # Share to the store (its name)
         v = QVBoxLayout(self)
         v.setContentsMargins(0, 0, 8, 0)
         v.setSpacing(4)
@@ -136,6 +137,9 @@ class SetupsBar(QWidget):
     def _menu(self, name: str, at):
         m = QMenu(self)
         m.addAction(icons.icon("edit"), _("Rename"), lambda: self._rename(name))
+        if self.share is not None:
+            m.addAction(icons.icon("upload"), _("Share to the store…"),
+                        lambda: self.share and self.share(name))
         m.addAction(_("Delete"), lambda: self._delete(name))
         m.exec(at)
 

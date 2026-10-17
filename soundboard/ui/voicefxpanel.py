@@ -9,6 +9,10 @@ from __future__ import annotations
 import functools
 import html
 import random
+import threading
+from collections.abc import Callable
+
+import numpy as np
 
 from PySide6.QtCore import QEvent, QPointF, QRectF, QSize, Qt, QTimer, Signal
 from PySide6.QtGui import QColor, QGuiApplication, QPainter
@@ -19,8 +23,10 @@ from PySide6.QtWidgets import (QButtonGroup, QCheckBox, QDialog, QFrame, QGridLa
                                QVBoxLayout, QWidget)
 from shiboken6 import isValid as qt_valid
 
-from soundboard import savedvoices, theme, usage, voicefx
+from soundboard import errors, savedvoices, theme, usage, voicefx
+from soundboard.speech import aipreview
 from soundboard.ui import art, busy, icons
+from soundboard.ui.aivoicebrowser import HEAR, MAKING, hear_button
 from soundboard.ui.widgets import take_out
 from soundboard.ui.panel import (Flow, UndoBar, hint_label, reset_button, section_label,
                                  steady_number)
@@ -558,14 +564,16 @@ VOICE_ICONS = {"Walkie-talkie": "radio", "Old telephone": "speech",
 # listed here (a new preset) lands in Funny until it's given a group.
 VOICE_GROUPS = (
     ("funny", _("Funny"), ("Chipmunk", "High voice", "Hothead", "Singing monk",
-                           "Underwater")),
+                           "Underwater", "Drunk", "Choir", "Goblin", "Fairy")),
     ("scary", _("Scary"), ("Demon", "Dark lord", "Ghost", "Masked caller",
-                           "Haunted radio")),
-    ("scifi", _("Robots & sci-fi"), ("Robot", "Dalek", "Alien", "Talkbox", "Autotune")),
+                           "Haunted radio", "Zombie", "Evil twin", "Giant")),
+    ("scifi", _("Robots & sci-fi"), ("Robot", "Dalek", "Alien", "Talkbox", "Autotune",
+                                     "Mecha", "Ship computer")),
     ("disguise", _("Disguise"), ("Deep voice", "Male voice", "Anonymous",
                                  "Secret detective")),
     ("places", _("Radio & places"), ("Walkie-talkie", "Old telephone", "Megaphone",
-                                     "Stadium announcer", "Cave", "Podcast voice")),
+                                     "Stadium announcer", "Cave", "Podcast voice", "Pilot",
+                                     "Drive-thru speaker", "Old film", "Cathedral")),
 )
 MINE = "mine"
 FAVS = "favs"
@@ -654,10 +662,13 @@ class VoiceFxPanel(QWidget):
     hotkey_asked = Signal(str)     # right-click a voice -> Set hotkey: its name ("" key: clear)
     hotkey_cleared = Signal(str)
     renamed = Signal(str, str)     # a saved voice's old and new name
+    share_asked = Signal(str)      # right-click a saved voice -> Share to the store: its name
+    _sampled = Signal(object, str)  # Hear it's worker: (the sample or None, why not)
 
     COLS = 3
 
-    def __init__(self, spec: dict, store: savedvoices.Store | None = None):
+    def __init__(self, spec: dict, store: savedvoices.Store | None = None,
+                 play_sample: Callable[[np.ndarray], object] | None = None):
         super().__init__()
         # your saved voices (Fine-tune -> "Save as a voice"): their own file, see
         # soundboard.savedvoices
@@ -775,6 +786,19 @@ class VoiceFxPanel(QWidget):
             b = self._make_tile(name, title, pic, VOICE_ICONS.get(name, "wave"))
             if name == CUSTOM:
                 b.setToolTip(_("Your own settings: Make it yours opens them"))
+        # the die: turns on one of the voices shown, at random. It isn't a voice itself,
+        # so it never lights up and has no star; it goes after the last card
+        self._shown: list[str] = []   # the voices the cards show now, in order
+        rt = self.random_tile = VoiceTile(_("Random voice"))
+        rt.setCheckable(False)
+        rt.star.hide()
+        rt.setIcon(art.random_icon())
+        rt.setProperty("art", True)
+        rt.setIconSize(QSize(TILE_ART, TILE_ART))
+        rt.setCursor(Qt.CursorShape.PointingHandCursor)
+        rt.setToolTip(_("Turns on one of the voices shown here, picked at random. Click "
+                        "again for another."))
+        rt.clicked.connect(lambda: (usage.used("voice-roll"), self.roll()))
         for c in range(self.COLS):
             grid.setColumnStretch(c, 1)
         v.addLayout(grid)
@@ -806,6 +830,15 @@ class VoiceFxPanel(QWidget):
                                     "build your own voice in a window beside the app"))
         self.btn_tweak.clicked.connect(lambda: (usage.used("voice-tweak"), self.open_tweak()))
         ph.addWidget(self.btn_tweak)
+        # a short line said in this voice, in your headphones (play_sample, from the
+        # Voice tab: without it there's nowhere to play it, and no button)
+        self.play_sample = play_sample
+        self._hearing = False
+        self._sampled.connect(self._sample_done)
+        self.btn_sample = hear_button()
+        self.btn_sample.clicked.connect(lambda: self.hear(self._preset))
+        self.btn_sample.hide()
+        ph.addWidget(self.btn_sample)
         ph.addStretch(1)
         v.addWidget(self.picked)
 
@@ -1002,7 +1035,8 @@ class VoiceFxPanel(QWidget):
 
     # never ear-splitting: louder settings are capped below their slider's top
     RANDOM_CAPS = {("compressor", "boost"): 9, ("distortion", "drive"): 20,
-                   ("echo", "feedback"): 0.6, ("radio", "drive"): 14}
+                   ("echo", "feedback"): 0.6, ("radio", "drive"): 14,
+                   ("wobble", "vibrato"): 10}
 
     def randomize(self, rng: random.Random | None = None):
         """A random mix for the lols: the pitch moved well away from normal plus one
@@ -1102,6 +1136,65 @@ class VoiceFxPanel(QWidget):
         return super().eventFilter(obj, e)
 
     # ------------------------------------------------------------------ saved voices
+    def _roll_pool(self, on: str | None = None) -> list[str]:
+        """The voices Random voice picks from: the cards shown, without your own mix
+        and without the voice that's on now (`on`; None: the one that's on)."""
+        if on is None:
+            on = self._preset if self.btn_power.isChecked() else ""
+        return [n for n in self._shown if n != CUSTOM and n != on]
+
+    def roll(self, rng: random.Random | None = None) -> str:
+        """Random voice: turn on one of the voices shown, never the one that's on.
+        Returns its name ("" when there's nothing to pick)."""
+        pool = self._roll_pool()
+        if not pool:
+            return ""
+        name = (rng or random.Random()).choice(pool)
+        self.pick(name)
+        return name
+
+    def effects_of(self, name: str) -> dict:
+        """A voice's effects as the chain takes them ({type: {"on", setting...}}), without
+        Clean up my mic (it's yours, not the voice's). Your own mix: as it is now."""
+        if name in voicefx.PRESETS:
+            return {t: {"on": True, **cfg} for t, cfg in voicefx.PRESETS[name].items()}
+        if name in self.store.voices:
+            fx = self.store.voices[name]
+        elif name == self._preset or name == CUSTOM:
+            fx = {t: r.state() for t, r in self.rows.items()}
+        else:
+            fx = self._custom
+        return {t: dict(cfg) for t, cfg in fx.items()
+                if t not in KEEP and isinstance(cfg, dict) and cfg.get("on")}
+
+    def hear(self, name: str):
+        """Hear it: a short line in the voice `name`, in your headphones only. Made off
+        the UI thread (the first one asks Windows' speech voice for the line)."""
+        if self.play_sample is None or self._hearing:
+            return
+        usage.used("voice-hear")
+        effects = self.effects_of(name)
+        self._hearing = True
+        self.btn_sample.setText(MAKING)
+
+        def work():
+            try:
+                busy.emit(self._sampled, aipreview.fx_sample(effects), "")
+            except aipreview.PreviewError as e:
+                busy.emit(self._sampled, None, str(e))
+            except Exception as e:  # noqa: BLE001 - the button must come back
+                busy.emit(self._sampled, None, errors.plain(e))
+        threading.Thread(target=work, name="voice-sample", daemon=True).start()
+
+    def _sample_done(self, data, err: str):
+        self._hearing = False
+        self.btn_sample.setText(HEAR)
+        if data is not None and self.play_sample is not None:
+            self.play_sample(data)
+        elif err:
+            busy.toast(self._parent(), html.escape(
+                _("⚠ Couldn't play a sample: {error}", error=err)), "warn")
+
     def _make_tile(self, name: str, title: str, pic, line_icon: str) -> VoiceTile:
         """A checkable voice card: its picture (ui/art.py), else a line icon, with the
         name under it."""
@@ -1148,7 +1241,7 @@ class VoiceFxPanel(QWidget):
         g, cols = self._tile_grid, self._tile_cols
         names = list(voicefx.PRESETS) + [CUSTOM] + [n for n in self.store.voices
                                                     if n in self._tile]
-        for w in (*self._tile.values(), *self._heads.values()):
+        for w in (*self._tile.values(), *self._heads.values(), self.random_tile):
             g.removeWidget(w)
         rows: list[tuple[str, list[str]]]
         if self._group == ALL:
@@ -1159,7 +1252,8 @@ class VoiceFxPanel(QWidget):
         else:
             rows = [("", [n for n in names if voice_group(n) == self._group])]
         shown: set[str] = set()
-        r = 0
+        self._shown = []
+        r = last = last_n = 0
         for head, group in rows:
             if not group:
                 continue
@@ -1168,8 +1262,15 @@ class VoiceFxPanel(QWidget):
                 r += 1
             for i, n in enumerate(group):
                 g.addWidget(self._tile[n], r + i // cols, i % cols)
+            last, last_n = r, len(group)
             r += (len(group) + cols - 1) // cols
             shown.update(group)
+            self._shown += group
+        # the die, right after the last card, while there are two voices to pick from
+        rolls = len(self._roll_pool(on="")) >= 2
+        if rolls:
+            g.addWidget(self.random_tile, last + last_n // cols, last_n % cols)
+        self.random_tile.setVisible(rolls)
         for k, lbl in self._heads.items():
             lbl.setVisible(self._group == ALL and any(voice_group(n) == k for n in shown))
         for n, b in self._tile.items():
@@ -1267,6 +1368,9 @@ class VoiceFxPanel(QWidget):
         share and delete."""
         from soundboard.settings import pretty_key
         m = QMenu(self)
+        if self.play_sample is not None:
+            m.addAction(icons.icon("headphones"), HEAR, lambda: self.hear(name))
+            m.addSeparator()
         key = self.keys.get(name, "")
         m.addAction(icons.icon("keyboard"),
                     _("Hotkey: {key}…", key=pretty_key(key)) if key else _("Set a hotkey…"),
@@ -1278,6 +1382,8 @@ class VoiceFxPanel(QWidget):
             m.addSeparator()
             m.addAction(icons.icon("edit"), _("Rename"), lambda: self.rename_voice(name))
             m.addAction(icons.icon("copy"), _("Copy share code"), lambda: self.copy_code(name))
+            m.addAction(icons.icon("upload"), _("Share to the store…"),
+                        lambda: self.share_asked.emit(name))
             m.addAction(icons.icon("trash", "danger_text"), _("Delete"),
                         lambda: self.delete_voice(name))
         m.exec(at)
@@ -1658,6 +1764,7 @@ class VoiceFxPanel(QWidget):
                                                                             PICKED_ART)
         self.picked_pic.setPixmap(pm)
         self.picked_name.setText(shown)
+        self.btn_sample.setVisible(self.play_sample is not None)
 
     def _edited(self, etype: str = ""):
         if etype in KEEP:     # your mic clean-up: the voice you picked stays picked

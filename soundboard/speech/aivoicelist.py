@@ -188,9 +188,12 @@ def clean_voice(raw, speakers: set[int] | None = None) -> dict | None:
         return None
     mix = []
     for pair in raw.get("mix", []) if isinstance(raw.get("mix"), list) else ():
+        if not isinstance(pair, (list, tuple)) or len(pair) != 2 \
+                or any(isinstance(x, bool) for x in pair):
+            continue
         try:
             s, w = int(pair[0]), float(pair[1])
-        except (TypeError, ValueError, IndexError, OverflowError):
+        except (TypeError, ValueError, OverflowError):
             continue
         if w > 0 and w == w and (speakers is None or s in speakers):
             mix.append([s, round(min(w, 1.0), 4)])

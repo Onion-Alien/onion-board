@@ -17,6 +17,7 @@ import urllib.error
 import urllib.parse
 import urllib.request
 import uuid
+from collections.abc import Callable
 from dataclasses import dataclass, field
 from pathlib import Path
 
@@ -127,9 +128,11 @@ def link_ok(url: str) -> bool:
 
 
 def _request(method: str, path: str, install: str = "", body: bytes | None = None,
-             ctype: str = "", limit: int = LIST_LIMIT, timeout: float = 15) -> bytes:
+             ctype: str = "", limit: int = LIST_LIMIT, timeout: float = 15,
+             why: Callable[[int, str], str] | None = None) -> bytes:
     """One call to the store; its answer. Raises StoreError (or net.ProxyError when the
-    store is switched off or Offline). Call off the UI thread."""
+    store is switched off or Offline), saying why in `why(status, error)`'s words (the
+    sounds' by default). Call off the UI thread."""
     headers = {"User-Agent": "OnionBoard (sound store)"}
     if install:
         headers["X-Onion-Install"] = install
@@ -144,7 +147,7 @@ def _request(method: str, path: str, install: str = "", body: bytes | None = Non
             err = json.loads(e.read(4096) or b"{}").get("error", "")
         except (ValueError, AttributeError):
             err = ""
-        raise StoreError(_why(e.code, err)) from None
+        raise StoreError((why or _why)(e.code, err)) from None
     except net.ProxyError:
         raise
     except OSError as e:
