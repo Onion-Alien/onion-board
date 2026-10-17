@@ -246,3 +246,41 @@ def test_he_dances_to_whats_playing_and_gets_sad_when_nothing_does(window, qapp)
     assert bun._mood(bunmode.SAD_S + 2, True, False) == 0.0
     assert bun.bun._joy_at > 0
     assert bun._mood(bunmode.SAD_S + 3, False, True) == 0.0   # busy (downloading): fine
+
+
+def test_mascots_on_screen_dance_to_the_radio(qapp):
+    """The tick hands what plays to every dancing mascot on screen: here the radio,
+    read through the engine's tap only while one of them is up."""
+    from types import SimpleNamespace
+
+    import numpy as np
+
+    from soundboard.groove import SR, Groove
+    from soundboard.ui.bunnywidget import BunnyWidget
+    from soundboard.ui.tickcontrol import TickControl
+    on = [True]
+    eng = SimpleNamespace(radio_tap=None)
+    mw = SimpleNamespace(engine=eng, radio=SimpleNamespace(is_active=lambda: on[0]),
+                         audio={}, _meta={})
+    tc = SimpleNamespace(mw=mw, groove=Groove())
+    bun = BunnyWidget(height=80, sad=0.9, dances=True)
+    bun.show()
+    beat = np.zeros(int(SR * 60 / 120), np.float32)
+    t = np.arange(int(0.12 * SR)) / SR
+    beat[:len(t)] = np.sin(2 * np.pi * (55 + 90 * np.exp(-t * 30)) * t) * np.exp(-t * 18) * 0.5
+    stream = np.repeat(np.tile(beat, 16)[:, None], 2, axis=1)
+    step, now = int(SR / 30), 0.0
+    for pos in range(0, len(stream) - step, step):
+        TickControl._dance(tc, {}, now)
+        assert eng.radio_tap is not None
+        eng.radio_tap.append(stream[pos:pos + step])
+        now += 1 / 30
+    assert bun.groove is tc.groove and tc.groove.bpm > 0
+    on[0] = False                   # the radio stops: no more tap, no more dance
+    TickControl._dance(tc, {}, now)
+    assert eng.radio_tap is None and bun.groove is None
+    bun.hide()
+    on[0] = True                    # nobody on screen: the radio isn't read at all
+    TickControl._dance(tc, {}, now)
+    assert eng.radio_tap is None
+    bun.deleteLater()

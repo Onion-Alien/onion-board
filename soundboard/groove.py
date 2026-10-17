@@ -76,7 +76,7 @@ class Groove:
         self._vt = np.zeros(0)  # the voice's level a frame (lip sync): when it's heard...
         self._vv = np.zeros(0)  # ...and how loud, 0..1
         self._t_last = 0.0     # when the newest frame read is heard
-        self._data_id = 0
+        self._data_id: int | str = 0   # which sound (its id), or "live" (feed_live)
         self._pos = -1         # next sample to read
         self._prev = None      # the last frame's log spectrum
         self._n = 0            # frames heard
@@ -100,6 +100,7 @@ class Groove:
         self._hit_last = {"bass": -1e9, "drums": -1e9}
         self._hit_prev = {"bass": 0.0, "drums": 0.0}
         self._bass_db: list[float] = []   # the bass level's last few frames, dB
+        self._buf = np.zeros(0, np.float32)   # a stream's samples not framed yet (feed_live)
 
     # ------------------------------------------------------------------ input
     def feed(self, data: np.ndarray | None, frac: float, now: float | None = None):
@@ -126,10 +127,32 @@ class Groove:
         mono = seg.mean(axis=2, dtype=np.float32)
         if data.dtype == np.int16:
             mono /= 32768.0
-        mag = np.abs(np.fft.rfft(mono * _HANN, axis=1)).astype(np.float32) * (4.0 / WIN)
         # when each frame's sound is heard (the clock time of a sample: now, plus how
         # far past what's playing it is)
-        heard = now + (starts + AT * WIN - play) / SR
+        self._read(mono, now + (starts + AT * WIN - play) / SR)
+
+    def feed_live(self, chunk: np.ndarray, now: float | None = None, lag: float = 0.0):
+        """A stream (the radio): `chunk` is the (n, 2) float32 audio that arrived since
+        the last call, its last sample heard `lag` seconds after `now`."""
+        now = time.monotonic() if now is None else now
+        if self._data_id != "live":   # (a sound's data is an id: an int)
+            self.reset()
+            self._data_id = "live"
+        mono = chunk.mean(axis=1, dtype=np.float32) if chunk.ndim == 2 else chunk
+        buf = np.concatenate([self._buf, mono])[-(BACKFILL * HOP + WIN):]
+        n = (len(buf) - WIN) // HOP + 1
+        if n <= 0:
+            self._buf = buf
+            return
+        starts = HOP * np.arange(n)
+        self._buf = buf[n * HOP:]
+        self._read(buf[starts[:, None] + np.arange(WIN)],
+                   now + lag - (len(buf) - (starts + AT * WIN)) / SR)
+
+    def _read(self, mono: np.ndarray, heard: np.ndarray):
+        """Hear a run of frames ((n, WIN) mono), each heard at its `heard` time."""
+        n = len(mono)
+        mag = np.abs(np.fft.rfft(mono * _HANN, axis=1)).astype(np.float32) * (4.0 / WIN)
         self._frames(mag, heard)
         self._since_tempo += n
         self._since_style += n

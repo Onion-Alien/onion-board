@@ -604,3 +604,48 @@ def test_hiphop_nods_on_the_808_hits_themselves(qapp, monkeypatch):
     assert b.pose()["dip"] > before + 3   # down with the 808, not the grid
     clock.now = hits[1] - 0.05
     assert b.pose()["dip"] < 2            # back up before the next one
+
+
+def test_a_sad_bun_on_an_empty_page_cheers_up_and_dances_to_what_plays(qapp, monkeypatch):
+    from soundboard.ui import bunnywidget
+    clock = _Clock()
+    monkeypatch.setattr(bunnywidget, "time", clock)
+    b = BunnyWidget(height=110, sad=0.9, lines=("add a sound?",), dances=True)
+    assert b in BunnyWidget.dancers and BunnyWidget("star") not in BunnyWidget.dancers
+    _beats(b, clock, 2.0)
+    assert b._sad > 0.6
+    b.set_groove(_Song(clock, "electronic"))
+    _beats(b, clock, 3.0)
+    assert b._sad < 0.1 and b._dance > 0.9
+    dys = []
+    _beats(b, clock, 1.0, lambda: dys.append(b.pose()["dy"]))
+    assert max(dys) - min(dys) > 5   # hopping, not sulking
+
+
+def test_hoot_bobs_to_the_hits(qapp, monkeypatch):
+    from soundboard.style import owl
+    clock = _Clock()
+    monkeypatch.setattr(owl, "time", clock)
+    o = owl.OwlWidget(96, dances=True)
+    assert o in owl.OwlWidget.dancers
+    song = _Song(clock, "hiphop")
+    hits = [clock.now + 2.0, clock.now + 2.6]
+    song.last_hit = lambda band, now: next(((now - h, 1.0) for h in reversed(hits) if h <= now),
+                                           (float("inf"), 0.0))
+    song.next_hit = lambda band, now: next(((h - now, 1.0) for h in hits if h > now),
+                                           (float("inf"), 0.0))
+    o.set_groove(song)
+    for _i in range(110):   # (dancing by the first hit)
+        clock.now += 1 / 60
+        o.step(1 / 60, mouse=None)
+    assert o._dance > 0.9 and o.act is None
+    clock.now = hits[0] - 0.1
+    before = o.pose()["dy"]
+    clock.now = hits[0]
+    assert o.pose()["dy"] > before + 3   # head down right on the hit
+    o.set_groove(None)
+    for _i in range(180):
+        o.step(1 / 60, mouse=None)
+    assert o._dance < 0.01
+    o.resize(o.sizeHint())
+    assert not o.grab().isNull()
