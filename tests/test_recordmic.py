@@ -1,7 +1,7 @@
 """Record a sound with the mic: the engine's take (raw or through the voice changer,
 never mixed up with the mic test's recording), its spool, and the window."""
 import numpy as np
-from PySide6.QtWidgets import QMessageBox
+from PySide6.QtWidgets import QApplication, QMessageBox
 
 from soundboard import library, recorder
 from soundboard.engine import SR, Engine
@@ -426,7 +426,7 @@ def test_the_voice_tabs_record_keeps_it_in_recordings_not_sounds(window):  # noq
     assert c.name == "Bruh" and isinstance(c, VoiceClip)
     assert c.path.parent == clips_dir("voice-clips") and c.path.is_file()
     assert not recs.isHidden() and recs.title.isChecked()
-    assert "Recordings (1)" in recs.title.text()
+    assert "Recordings" in recs.title.text() and recs.count.text() == "1"
     RecordDialog.last_source = "mic"
 
 
@@ -437,10 +437,18 @@ def test_recordings_play_for_me_through_mic_and_add_to_sounds(window, monkeypatc
     monkeypatch.setattr(window.engine, "play",
                         lambda sid, data, gain, mode="", preview=False: played.append(
                             (sid, preview)) or object())
-    row = recs.list.itemWidget(recs._items[c.id], 4).buttons   # the row's own buttons
-    assert all(b.isVisibleTo(recs) and b.toolTip() for b in row.values())
+    window.resize(1200, 800)
+    window.show()
+    window.tabs.setCurrentWidget(window.voice)
+    recs.title.setChecked(True)
+    QApplication.processEvents()
+    it = recs._items[c.id]
+    recs.list.setCurrentItem(it)                                # picked: its buttons show
+    row = recs.row_actions.buttons
+    assert recs.row_actions.isVisibleTo(recs) and recs._actions_item is it
+    assert all(b.toolTip() and b.accessibleName() for b in row.values())
     assert not recs.btn_add.isVisibleTo(recs)                   # no bar above the list
-    row["me"].click()
+    recs.toggle_play(it)                                        # the round play button
     row["mic"].click()
     assert played == [("voiceclips:preview", True), ("voiceclips-send", False)]
     sounds = len(window.cfg.sounds)
