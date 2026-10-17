@@ -27,7 +27,10 @@ floating Bun: `in_background=True` keeps him moving behind a game), the empty bo
 (`ui/ytsearch.py`), the mic part update (`ui/micupdate.py`) and Robo-Bun on the AI voice
 card (`ui/aivoicepanel.py`). `SetupShow` in the setup guide; `ScribeBunny` in the
 download bar (`ui/downloadbar.py`); static pictures in `ui/dialogs.py` and the smug box in
-`ui/mainwindow.py`. To find new ones: grep for `draw_bunny`, `BunnyWidget`, `bunny_pixmap`.
+`ui/mainwindow.py`; each theme's card in Settings > Appearance
+(`ui/settingspages/appearance.py`: Bun as he looks in that theme, drawn once per theme with
+room above him for an upright ear or a tall hat; when the mouse comes onto a card he hops
+and waves, `wave_pose`, unless Windows animations are off). To find new ones: grep for `draw_bunny`, `BunnyWidget`, `bunny_pixmap`.
 
 ## Poses
 
@@ -48,7 +51,9 @@ arcs, sleepy ones under the nightcap), `mouth` (talking), `ears` (degrees outwar
 with no prop his paws come up in front of his chest, hoping), `angry` (cross brows and the
 vein mark; with no prop his arms fold under his chin), `nightcap` (asleep), `robot` (Robo-Bun), `smug`,
 `led` (Robo-Bun's LEDs brighter, 0..1), `nod` (his head tilted on his neck, degrees),
-`dip` (his head dropped, canvas units) and `look` (his eyes, -1..1 left to right): the
+`dip` (his head dropped, canvas units), `look` (his eyes, -1..1 left to right) and
+`wave` (None, or -1..1: his right paw up by his cheek on a short arm, swung side to side
+as he says hello; no prop): the
 body, and what's round his neck (`bunny.BODY_PIECES`), stay put. His arms move between
 `bunny.ARMS_REST`, `ARMS_HOPE` and `ARMS_CROSS` (bend and paw per arm, from `SHOULDERS`),
 eased by `sad` and `angry`, so he never snaps between poses. A prop that needs a paw takes
@@ -83,7 +88,15 @@ Besides an outfit, every theme gives him a look (`bunnyfit.LOOKS`, read with
 `bunnyfit.look()`): his fur colour, which ear flops (`"up"`: neither, `"left"` /
 `"right"`: the viewer's, `"both"`) and extras (`"chomp"`: a bite out of the edge of an
 upright ear, `"earring"`: a gold hoop through one, `"shiner"`: a black eye, `"bandaid"`: a
-plaster on his cheek, `"freckles"`). A theme that isn't listed is plain Bun,
+plaster on his cheek, `"freckles"`), his tail (`bunnyfit.TAILS`: `"round"`, `"fluffy"`
+with soft tufts, `"long"`, a pointy `"tuft"`, a `"heart"`), the colour low in his eyes
+(`"iris"`), inside his ears (`"inner"`) and his nose (`"nose"`), fur markings
+(`"pattern"` from `bunnyfit.PATTERNS`: a `"patch"` over his left eye, `"spots"`, a
+`"mask"` round both eyes with a stripe of fur down the middle, all in `"marks"`), his
+tummy patch colour (`"belly"`) and pad prints under his feet (`"pads"`: a big pad and three
+toe beans, plain shapes with no lines). Markings are clipped to his head and body; an eye
+on dark markings gets the light rim and face lines dark fur gets, and his smug lids take
+the markings' colour. A theme that isn't listed is plain Bun,
 `bunnyfit.VANILLA`: Dark, the default, stays plain. `draw_bunny(..., kit=None)` uses the
 current theme's look; pass `kit=bunnyfit.VANILLA` for plain Bun (installer art). On dark fur
 (lightness under 0.45) his face is drawn in light lines (`bunny.FACE_LIGHT`), his eyes get a

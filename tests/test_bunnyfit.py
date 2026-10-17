@@ -1,7 +1,9 @@
 """Bun's outfits: every theme's pieces exist, every piece draws, and he's plain when
 asked (installer art) or as Robo-Bun."""
-from PySide6.QtCore import QRectF, Qt
-from PySide6.QtGui import QImage, QPainter
+import math
+
+from PySide6.QtCore import QPointF, QRectF, Qt
+from PySide6.QtGui import QColor, QImage, QPainter
 
 from soundboard import bunny, theme
 from soundboard.style import bunnyfit
@@ -98,10 +100,22 @@ def test_laser_eyes_stop_when_his_eyes_shut(qapp):
 def test_every_look_names_a_theme_and_known_extras(qapp):
     for name, kit in bunnyfit.LOOKS.items():
         assert name in theme.THEMES, name
-        assert set(kit) <= {"fur", "ears", "extras"}, name
+        assert set(kit) <= set(bunnyfit.VANILLA), name
         assert kit.get("ears", "right") in ("up", "left", "right", "both"), name
         assert set(kit.get("extras", ())) <= {"chomp", "earring", "shiner", "bandaid",
                                                "freckles"}, name
+        assert kit.get("tail", "round") in bunnyfit.TAILS, name
+        assert set(kit.get("pattern", ())) <= set(bunnyfit.PATTERNS), name
+        for key in ("fur", "iris", "inner", "nose", "marks", "belly", "pads"):
+            if kit.get(key) is not None:
+                assert QColor(kit[key]).isValid(), (name, key)
+
+
+def test_plain_bun_keeps_his_old_colours(qapp):
+    assert bunny.IRIS.name() == bunnyfit.VANILLA["iris"]
+    assert bunny.PINK.name() == bunnyfit.VANILLA["inner"]
+    assert bunny.NOSE.name() == bunnyfit.VANILLA["nose"]
+    assert bunnyfit.VANILLA["pattern"] == () and bunnyfit.VANILLA["pads"] is None
 
 
 def test_the_default_theme_is_plain_bun(qapp):
@@ -113,8 +127,49 @@ def test_every_look_change_shows(qapp):
     plain = _draw(outfit=(), kit=bunnyfit.VANILLA)
     changes = [{"fur": "#6f4630"}, {"ears": "up"}, {"ears": "both"}, {"ears": "left"}]
     changes += [{"extras": (x,)} for x in ("chomp", "earring", "shiner", "bandaid", "freckles")]
+    changes += [{"tail": t} for t in bunnyfit.TAILS if t != "round"]
+    changes += [{"pattern": (x,)} for x in bunnyfit.PATTERNS]
+    changes += [{"iris": "#ff3b2f"}, {"inner": "#9ea6e2"}, {"nose": "#3a2218"},
+                {"belly": "#c9f2f7"}, {"pads": "#ff9fbf"}]
     for kit in changes:
         assert _draw(outfit=(), kit=kit) != plain, kit
+    # every theme's new keys show too (each draws something of its own)
+    for name, kit in bunnyfit.LOOKS.items():
+        for key in ("tail", "iris", "inner", "nose", "pattern", "belly", "pads"):
+            if key in kit:
+                assert _draw(outfit=(), kit={key: kit[key]}) != plain, (name, key)
+
+
+def test_markings_stay_on_him_and_dark_ones_get_light_eye_rims(qapp):
+    """Spots and patches are clipped to his head and body; an eye on dark markings
+    gets the light rim dark fur gets, so it doesn't sink into them."""
+    marks = "#00ff00"   # (a colour nothing else on him uses)
+    for pattern in bunnyfit.PATTERNS:
+        img = _draw(4, outfit=(), kit={"pattern": (pattern,), "marks": marks})
+        green = [(x, y) for y in range(0, img.height(), 2) for x in range(0, img.width(), 2)
+                 if img.pixelColor(x, y).green() > 200 and img.pixelColor(x, y).red() < 60]
+        assert green, pattern
+        head, body = bunnyfit.head_path(), bunnyfit.body_path()
+        for x, y in green:
+            q = QPointF(x / 4, y / 4)
+            assert head.contains(q) or body.contains(q), (pattern, x, y)
+    # the rim: just outside the eye's edge, light on dark markings, the marks without
+    ex, ey = bunnyfit.EYES[1], bunnyfit.EYE_Y
+    px, py = round((ex + 7.0) * 4), round(ey * 4)
+    dark = _draw(4, outfit=(), kit={"pattern": ("patch",), "marks": "#3a2d47"})
+    light = _draw(4, outfit=(), kit={"pattern": ("patch",), "marks": "#f3e3cc"})
+    assert dark.pixelColor(px, py).lightness() > 200
+    assert math.isclose(light.pixelColor(px, py).lightness(),
+                        QColor("#f3e3cc").lightness(), abs_tol=25)
+
+
+def test_pads_are_shapes_under_his_feet(qapp):
+    pads = "#00ff00"
+    img = _draw(4, outfit=(), kit={"pads": pads})
+    for fx in (36.5, 63.5):   # the big pad's middle, on each foot
+        c = img.pixelColor(round(fx * 4), round((114.6 + 1.3) * 4))
+        assert c.green() > 200 and c.red() < 60, fx
+    assert _draw(robot=True, kit={"pads": pads}) == _draw(robot=True, kit=bunnyfit.VANILLA)
 
 
 def test_his_look_follows_the_theme_but_robot_keeps_his_own(qapp, monkeypatch):

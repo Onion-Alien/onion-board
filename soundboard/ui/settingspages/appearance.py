@@ -1,8 +1,11 @@
 """Settings → Appearance: themes, texture, size, language and the highlight colour."""
 from __future__ import annotations
 
+import math
+import time
+
 from PySide6.QtCore import QRectF, QSize, QTimer, Qt
-from PySide6.QtGui import QBrush, QColor, QFont, QPainter, QPainterPath, QPixmap
+from PySide6.QtGui import QBrush, QColor, QFont, QImage, QPainter, QPainterPath, QPixmap
 from PySide6.QtWidgets import (QButtonGroup, QCheckBox, QColorDialog, QComboBox, QFrame,
                                QGridLayout, QHBoxLayout, QLabel, QLayout, QPushButton, QRadioButton,
                                QSlider, QVBoxLayout, QWidget)
@@ -27,9 +30,50 @@ def _tile(name: str) -> QBrush | None:
     return _tiles[name]
 
 
+_buns: dict[tuple[str, float], QPixmap] = {}
+BUN_H = 58   # Bun's height on a theme card
+
+
+BUN_ROOM = 8   # room above him: an upright ear and a tall hat reach past his canvas
+
+
+def _bun(name: str, dpr: float) -> QPixmap:
+    """Bun as he looks in theme `name` (its headphones, outfit and look), for its card,
+    BUN_ROOM taller than him so nothing on top of his head is cut off."""
+    key = (name, dpr)
+    if key not in _buns:
+        from soundboard.bunny import H, W, draw_bunny
+        w, room, h = BUN_H * W / H * dpr, BUN_ROOM * dpr, BUN_H * dpr
+        img = QImage(math.ceil(w), math.ceil(room + h), QImage.Format.Format_ARGB32_Premultiplied)
+        img.fill(Qt.GlobalColor.transparent)
+        p = QPainter(img)
+        with theme.previewing(name):
+            draw_bunny(p, QRectF(0, room, w, h))
+        p.end()
+        img.setDevicePixelRatio(dpr)
+        _buns[key] = QPixmap.fromImage(img)
+    return _buns[key]
+
+
+WAVE_S = 1.7   # his hello when the mouse comes onto a card, seconds
+
+
+def wave_pose(t: float) -> dict | None:
+    """Bun's hello `t` seconds after the mouse came onto his card (None: done): a little
+    hop, then three waves of his paw with a happy face."""
+    if not 0 <= t < WAVE_S:
+        return None
+    k = min(1.0, t / 0.2, (WAVE_S - t) / 0.2)   # (the paw swings in and out softly)
+    happy = 0.35 <= t < 1.3
+    return {"hop": 3.5 * math.sin(math.pi * t / 0.3) if t < 0.3 else 0.0,
+            "wave": k * math.sin(2 * math.pi * 1.9 * (t - 0.15)),
+            "blink": 1.0 if happy else 0.0, "mouth": 0.4 if happy else 0.0}
+
+
 class ThemeCard(QPushButton):
     """A clickable mini-preview of a theme: its colours, and with Textured on, its
-    pattern on the panels and its glow behind them, so the switch shows what it does."""
+    pattern on the panels and its glow behind them, so the switch shows what it does.
+    Bun stands in its corner dressed for the theme."""
 
     def __init__(self, name: str):
         super().__init__()
@@ -39,6 +83,23 @@ class ThemeCard(QPushButton):
         self.setCheckable(True)
         self.setFixedSize(QSize(150, 112))
         self.setCursor(Qt.CursorShape.PointingHandCursor)
+        self._hello = None   # when Bun started waving (time.monotonic), None: he isn't
+        self._tick = QTimer(self)
+        self._tick.setInterval(33)
+        self._tick.timeout.connect(self._step)
+
+    def enterEvent(self, e):
+        super().enterEvent(e)
+        from soundboard.ui.toast import animations_on
+        if self._hello is None and animations_on():   # (once per visit: no restart)
+            self._hello = time.monotonic()
+            self._tick.start()
+
+    def _step(self):
+        if self._hello is not None and wave_pose(time.monotonic() - self._hello) is None:
+            self._hello = None
+            self._tick.stop()
+        self.update()
 
     def paintEvent(self, e):
         super().paintEvent(e)   # frame + checked border from the stylesheet
@@ -71,12 +132,18 @@ class ThemeCard(QPushButton):
                     p.drawRoundedRect(QRectF(x, y, 40, 28), 5, 5)
             p.setBrush(QColor(col))
             p.drawRoundedRect(QRectF(x + 5, y + 5, 10, 3), 1.5, 1.5)
-        p.setBrush(QColor(t["groove"]))
-        p.drawRoundedRect(QRectF(r.right() - 39, r.top() + 20, 28, 3), 1.5, 1.5)
-        p.setBrush(QColor(t["accent"]))
-        p.drawRoundedRect(QRectF(r.right() - 39, r.top() + 20, 17, 3), 1.5, 1.5)
-        theme.paint_logo(p, QRectF(r.right() - 36, r.bottom() - 30, 22, 22),
-                         t["accent"], t["accent2"])
+        # Bun on the side panel, standing at its foot: the theme's headphones, outfit
+        # and look, so you can see who you'd get
+        bun = _bun(self.name, self.devicePixelRatioF() or 1.0)
+        bw, bh = bun.width() / bun.devicePixelRatio(), bun.height() / bun.devicePixelRatio()
+        spot = QRectF(r.right() - 3 - bw, r.bottom() - 1 - BUN_H, bw, BUN_H)
+        pose = wave_pose(time.monotonic() - self._hello) if self._hello is not None else None
+        if pose is None:
+            p.drawPixmap(QRectF(spot.left(), spot.bottom() - bh, bw, bh), bun, QRectF(bun.rect()))
+        else:   # saying hello: drawn live in his theme
+            from soundboard.bunny import draw_bunny
+            with theme.previewing(self.name):
+                draw_bunny(p, spot.translated(0, -pose.pop("hop")), **pose)
         # name, in the theme's own font
         p.setPen(QColor(theme.T["text"]))
         f = QFont(self.font())
