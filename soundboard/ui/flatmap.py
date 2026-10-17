@@ -270,6 +270,7 @@ class FlatMap(QWidget):
         self._buf: QImage | None = None  # the map drawn before its corners are rounded
         self._room: dict[tuple, np.ndarray] = {}   # dots moved apart, per zoom (_spread)
         self._room_job: tuple | None = None        # (zoom, its steps): being worked out
+        self._room_shown: np.ndarray | None = None  # ...and what shows meanwhile
         self._room_timer = QTimer(self)            # works on it a slice more (_room_step)
         self._room_timer.setSingleShot(True)
         self._room_timer.setInterval(SLICE_GAP_MS)
@@ -568,8 +569,9 @@ class FlatMap(QWidget):
             done = sorted((k[0] for k in self._room if k[1] == base),
                           key=lambda k: (k > b, abs(k - b)))
             if not done:
+                self._room_shown = None
                 return 0.0, 0.0
-            room = self._room[(done[0], base)]
+            room = self._room_shown = self._room[(done[0], base)]
         return room[:, 0], room[:, 1]
 
     def _room_step(self, budget: float = ROOM_SLICE_S):
@@ -583,9 +585,13 @@ class FlatMap(QWidget):
             while time.perf_counter() < end:
                 next(steps)
         except StopIteration as done:
-            self._room[key] = done.value
+            self._room[key] = room = done.value
             self._room_job = None
-            self._redraw()
+            shown = self._room_shown
+            # drawn again only if they moved: nothing to move (a dot alone) redrew the
+            # whole map for nothing
+            if not (np.array_equal(room, shown) if shown is not None else not room.any()):
+                self._redraw()
             return
         self._room_timer.start()
 
@@ -1101,8 +1107,8 @@ class FlatMap(QWidget):
         self._slice.stop()
 
     def busy(self) -> bool:
-        """Tiles still to draw (tests, benches)."""
-        return self._build is not None or bool(self._queue)
+        """Tiles still to draw, or the dots' places still to work out (tests, benches)."""
+        return self._build is not None or bool(self._queue) or self._room_job is not None
 
     def _paint_reveal(self, p: QPainter):
         """The first stations popping in, drawn live over the map (the tiles with
