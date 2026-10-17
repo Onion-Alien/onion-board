@@ -313,3 +313,14 @@ def test_the_add_menu_lists_board_sounds_by_category_and_skips_picked_ones(row):
     subs = {a.text(): [b.text() for b in a.menu().actions()] for a in m.actions() if a.menu()}
     assert subs == {"Memes": ["Airhorn"], "Not in a category": ["Rain loop"]}
     m.deleteLater()
+
+
+def test_board_sound_rows_line_up_with_the_built_in_ones(row, qapp):
+    row.resize(520, 600)
+    row.show()
+    row._add("s1")
+    process_events(qapp, lambda: False, timeout=0.2)
+    rain = row.sliders[0]
+    mine = row._mine_rows[0].findChildren(type(rain))[0]
+    assert abs(rain.val.mapTo(row, rain.val.rect().topLeft()).x()
+               - mine.val.mapTo(row, mine.val.rect().topLeft()).x()) <= 1

@@ -20,7 +20,7 @@ from PySide6.QtWidgets import (QApplication, QDialog, QGridLayout, QHBoxLayout, 
 from soundboard import voicefx
 from soundboard.i18n import _
 from soundboard.ui import fit, icons
-from soundboard.ui.panel import hint_label, icon_button, reset_button
+from soundboard.ui.panel import hint_label, reset_button
 from soundboard.ui.voicefxpanel import EffectRow, ParamSlider
 from soundboard.voicefx import Param, backdrop
 
@@ -206,11 +206,16 @@ class BackdropRow(EffectRow):
         self.tweak_buttons[key] = b
         h.addWidget(b)
         if remove is not None:
-            x = icon_button("close", _("Take “{sound}” out of the background", sound=title),
-                            size=14)
-            x.setFixedSize(24, 24)
+            x = QPushButton()
+            x.setProperty("quiet", True)
+            tip = _("Take “{sound}” out of the background", sound=title)
+            x.setToolTip(tip)
+            x.setAccessibleName(tip)
+            icons.close_button(x, 24)   # a fixed 24 px square (a dense row's size)
             x.clicked.connect(remove)
             h.addWidget(x)
+        else:   # the ✕'s room, so every row's slider and value line up
+            h.addSpacing(24 + h.spacing())
         self._light(key)
         return h
 
