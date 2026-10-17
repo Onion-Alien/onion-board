@@ -4128,5 +4128,9 @@
   "Hear {effect} (only you)": "استمع إلى {effect} (أنت فقط)",
   "Mic only": "الميك فقط",
   "✓ The store is on again: loading it.": "✓ المتجر يعمل من جديد: جارٍ تحميله.",
-  "Background sounds": "أصوات الخلفية"
+  "Background sounds": "أصوات الخلفية",
+  "Onion Board is still running without admin.": "لا يزال Onion Board يعمل بدون صلاحيات المسؤول.",
+  "Restart as admin": "إعادة التشغيل كمسؤول",
+  "The game runs as admin, and Windows doesn't let other programs hear the keys you press in it. Start Onion Board as admin too to use your hotkeys there.": "اللعبة تعمل كمسؤول، وWindows لا يسمح للبرامج الأخرى بسماع المفاتيح التي تضغطها فيها. شغّل Onion Board كمسؤول أيضًا لتعمل اختصاراتك هناك.",
+  "Your hotkeys can't reach this game": "اختصاراتك لا تصل إلى هذه اللعبة"
 }

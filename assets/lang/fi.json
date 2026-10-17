@@ -3816,5 +3816,9 @@
   "Hear {effect} (only you)": "Kuuntele {effect} (vain sinä)",
   "Mic only": "Vain mikki",
   "✓ The store is on again: loading it.": "✓ Kauppa on taas päällä: ladataan.",
-  "Background sounds": "Taustaäänet"
+  "Background sounds": "Taustaäänet",
+  "Onion Board is still running without admin.": "Onion Board on yhä käynnissä ilman järjestelmänvalvojan oikeuksia.",
+  "Restart as admin": "Käynnistä uudelleen järjestelmänvalvojana",
+  "The game runs as admin, and Windows doesn't let other programs hear the keys you press in it. Start Onion Board as admin too to use your hotkeys there.": "Peli toimii järjestelmänvalvojana, eikä Windows anna muiden ohjelmien kuulla siinä painamiasi näppäimiä. Käynnistä myös Onion Board järjestelmänvalvojana, niin pikanäppäimesi toimivat siellä.",
+  "Your hotkeys can't reach this game": "Pikanäppäimesi eivät yllä tähän peliin"
 }

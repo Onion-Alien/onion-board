@@ -3738,5 +3738,9 @@
   "Hear {effect} (only you)": "ฟัง {effect} (เฉพาะคุณ)",
   "Mic only": "ไมค์อย่างเดียว",
   "✓ The store is on again: loading it.": "✓ ร้านค้าเปิดอีกครั้ง: กำลังโหลด",
-  "Background sounds": "เสียงพื้นหลัง"
+  "Background sounds": "เสียงพื้นหลัง",
+  "Onion Board is still running without admin.": "Onion Board ยังทำงานอยู่โดยไม่มีสิทธิ์แอดมิน",
+  "Restart as admin": "รีสตาร์ทในฐานะแอดมิน",
+  "The game runs as admin, and Windows doesn't let other programs hear the keys you press in it. Start Onion Board as admin too to use your hotkeys there.": "เกมนี้ทำงานในฐานะแอดมิน และ Windows ไม่ยอมให้โปรแกรมอื่นได้ยินปุ่มที่คุณกดในเกม เปิด Onion Board ในฐานะแอดมินด้วยเพื่อใช้ฮอตคีย์ในเกมนั้น",
+  "Your hotkeys can't reach this game": "ฮอตคีย์ของคุณไปไม่ถึงเกมนี้"
 }

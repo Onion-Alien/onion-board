@@ -3816,5 +3816,9 @@
   "Hear {effect} (only you)": "Чуй {effect} (само ти)",
   "Mic only": "Само микрофон",
   "✓ The store is on again: loading it.": "✓ Магазинът пак е включен: зарежда се.",
-  "Background sounds": "Фонови звуци"
+  "Background sounds": "Фонови звуци",
+  "Onion Board is still running without admin.": "Onion Board още работи без администраторски права.",
+  "Restart as admin": "Рестарт като администратор",
+  "The game runs as admin, and Windows doesn't let other programs hear the keys you press in it. Start Onion Board as admin too to use your hotkeys there.": "Играта работи като администратор и Windows не позволява на други програми да чуват клавишите, които натискаш в нея. Пусни и Onion Board като администратор, за да работят клавишите ти там.",
+  "Your hotkeys can't reach this game": "Клавишите ти не стигат до тази игра"
 }

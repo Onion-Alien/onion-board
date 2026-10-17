@@ -3894,5 +3894,9 @@
   "Hear {effect} (only you)": "Послухати {effect} (лише ти)",
   "Mic only": "Лише мікро",
   "✓ The store is on again: loading it.": "✓ Магазин знову ввімкнено: завантажується.",
-  "Background sounds": "Фонові звуки"
+  "Background sounds": "Фонові звуки",
+  "Onion Board is still running without admin.": "Onion Board і далі працює без прав адміністратора.",
+  "Restart as admin": "Перезапустити як адміністратор",
+  "The game runs as admin, and Windows doesn't let other programs hear the keys you press in it. Start Onion Board as admin too to use your hotkeys there.": "Гра запущена від імені адміністратора, і Windows не дає іншим програмам чути клавіші, які ви в ній натискаєте. Запустіть Onion Board теж як адміністратор, щоб гарячі клавіші працювали там.",
+  "Your hotkeys can't reach this game": "Гарячі клавіші не доходять до цієї гри"
 }

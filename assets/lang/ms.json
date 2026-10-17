@@ -3738,5 +3738,9 @@
   "Hear {effect} (only you)": "Dengar {effect} (anda sahaja)",
   "Mic only": "Mik sahaja",
   "✓ The store is on again: loading it.": "✓ Kedai dihidupkan semula: sedang dimuatkan.",
-  "Background sounds": "Bunyi latar"
+  "Background sounds": "Bunyi latar",
+  "Onion Board is still running without admin.": "Onion Board masih berjalan tanpa admin.",
+  "Restart as admin": "Mula semula sebagai admin",
+  "The game runs as admin, and Windows doesn't let other programs hear the keys you press in it. Start Onion Board as admin too to use your hotkeys there.": "Permainan ini berjalan sebagai admin, dan Windows tidak membenarkan program lain mendengar kekunci yang anda tekan di dalamnya. Jalankan Onion Board sebagai admin juga untuk menggunakan hotkey anda di sana.",
+  "Your hotkeys can't reach this game": "Hotkey anda tidak sampai ke permainan ini"
 }

@@ -3738,5 +3738,9 @@
   "Hear {effect} (only you)": "试听 {effect}（仅你自己）",
   "Mic only": "仅麦克风",
   "✓ The store is on again: loading it.": "✓ 商店已重新开启：正在加载。",
-  "Background sounds": "背景声音"
+  "Background sounds": "背景声音",
+  "Onion Board is still running without admin.": "Onion Board 仍在以非管理员身份运行。",
+  "Restart as admin": "以管理员身份重启",
+  "The game runs as admin, and Windows doesn't let other programs hear the keys you press in it. Start Onion Board as admin too to use your hotkeys there.": "这个游戏以管理员身份运行，Windows 不允许其他程序听到你在其中按下的按键。把 Onion Board 也以管理员身份启动，才能在那里使用热键。",
+  "Your hotkeys can't reach this game": "你的热键无法传到这个游戏"
 }

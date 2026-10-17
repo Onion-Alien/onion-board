@@ -3738,5 +3738,9 @@
   "Hear {effect} (only you)": "{effect} 들어보기 (나만)",
   "Mic only": "마이크만",
   "✓ The store is on again: loading it.": "✓ 스토어가 다시 켜졌어요: 불러오는 중.",
-  "Background sounds": "배경 소리"
+  "Background sounds": "배경 소리",
+  "Onion Board is still running without admin.": "Onion Board는 관리자 권한 없이 계속 실행 중입니다.",
+  "Restart as admin": "관리자로 다시 시작",
+  "The game runs as admin, and Windows doesn't let other programs hear the keys you press in it. Start Onion Board as admin too to use your hotkeys there.": "게임이 관리자로 실행 중이라 Windows가 다른 프로그램이 게임에서 누른 키를 듣지 못하게 합니다. 그곳에서 단축키를 쓰려면 Onion Board도 관리자로 실행하세요.",
+  "Your hotkeys can't reach this game": "단축키가 이 게임에 닿지 않아요"
 }

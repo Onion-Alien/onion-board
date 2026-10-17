@@ -3894,5 +3894,9 @@
   "Hear {effect} (only you)": "Послушать {effect} (только ты)",
   "Mic only": "Только микро",
   "✓ The store is on again: loading it.": "✓ Магазин снова включён: загружается.",
-  "Background sounds": "Фоновые звуки"
+  "Background sounds": "Фоновые звуки",
+  "Onion Board is still running without admin.": "Onion Board по-прежнему работает без прав администратора.",
+  "Restart as admin": "Перезапустить от имени администратора",
+  "The game runs as admin, and Windows doesn't let other programs hear the keys you press in it. Start Onion Board as admin too to use your hotkeys there.": "Игра запущена от имени администратора, и Windows не даёт другим программам слышать клавиши, которые вы в ней нажимаете. Запустите Onion Board тоже от имени администратора, чтобы горячие клавиши работали там.",
+  "Your hotkeys can't reach this game": "Горячие клавиши не доходят до этой игры"
 }

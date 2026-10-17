@@ -3894,5 +3894,9 @@
   "Hear {effect} (only you)": "Ascultă {effect} (doar tu)",
   "Mic only": "Doar microfon",
   "✓ The store is on again: loading it.": "✓ Magazinul e pornit din nou: se încarcă.",
-  "Background sounds": "Sunete de fundal"
+  "Background sounds": "Sunete de fundal",
+  "Onion Board is still running without admin.": "Onion Board încă rulează fără drepturi de administrator.",
+  "Restart as admin": "Repornește ca administrator",
+  "The game runs as admin, and Windows doesn't let other programs hear the keys you press in it. Start Onion Board as admin too to use your hotkeys there.": "Jocul rulează ca administrator, iar Windows nu lasă alte programe să audă tastele pe care le apeși în el. Pornește și Onion Board ca administrator ca să-ți folosești tastele rapide acolo.",
+  "Your hotkeys can't reach this game": "Tastele tale rapide nu ajung la acest joc"
 }

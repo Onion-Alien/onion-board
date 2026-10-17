@@ -3816,5 +3816,9 @@
   "Hear {effect} (only you)": "{effect} dinle (yalnızca sen)",
   "Mic only": "Yalnızca mikrofon",
   "✓ The store is on again: loading it.": "✓ Mağaza yeniden açık: yükleniyor.",
-  "Background sounds": "Arka plan sesleri"
+  "Background sounds": "Arka plan sesleri",
+  "Onion Board is still running without admin.": "Onion Board hâlâ yönetici olmadan çalışıyor.",
+  "Restart as admin": "Yönetici olarak yeniden başlat",
+  "The game runs as admin, and Windows doesn't let other programs hear the keys you press in it. Start Onion Board as admin too to use your hotkeys there.": "Oyun yönetici olarak çalışıyor ve Windows, içinde bastığın tuşları başka programların duymasına izin vermiyor. Kısayol tuşlarını orada kullanmak için Onion Board'u da yönetici olarak başlat.",
+  "Your hotkeys can't reach this game": "Kısayol tuşların bu oyuna ulaşamıyor"
 }
