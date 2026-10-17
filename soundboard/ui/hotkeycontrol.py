@@ -346,6 +346,8 @@ class HotkeyControl(Controller):
             mw.playctl.play_random(action[len(RANDOM):])
         elif action.startswith(PICK_VOICE):
             self.pick_voice(action[len(PICK_VOICE):])
+        elif action == "__voicerandom__":
+            self.random_voice()
         else:
             mw.playctl.play(action)
 
@@ -369,6 +371,17 @@ class HotkeyControl(Controller):
         self._voice_was = None
         fx.pick(name)
         mw.playctl.cue("start")
+
+    def random_voice(self):
+        """The Random voice key: the Voice tab's die, from anywhere."""
+        mw = self.mw
+        fx = self._voice_fx()
+        if fx is None:
+            mw.playctl.cue("fail")
+            mw.toast(_("The Voice tab is switched off (Settings > Tabs)."), "warn")
+            return
+        self._voice_was = None
+        mw.playctl.cue("start" if fx.roll() else "fail")
 
     def _set_voice(self, on: bool):
         """The voice changer's big ON / OFF switch, from a hotkey."""

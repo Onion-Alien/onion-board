@@ -165,6 +165,7 @@ class VoicePanel(QWidget):
     speech_changed = Signal(dict)
     active_changed = Signal(bool)   # the voice changer or the computer voice is on / off
     clip_ready = Signal(object, str)   # a typed line saved as a sound (SpeechPanel)
+    share_asked = Signal(str)   # Share to the store: the voice, as the Share window lists it
     _scanned = Signal(object, object)   # the Refresh button's worker: (modules, AI voices)
 
     def __init__(self, engine, fx_spec: dict | None = None, speech: dict | None = None):
@@ -234,7 +235,10 @@ class VoicePanel(QWidget):
 
         # the voice changer. It always starts off (the voice you picked is kept):
         # left on from last time, it changed your mic the moment the app opened.
-        self.fx = VoiceFxPanel({**voicefx.clean_spec(fx_spec), "enabled": False})
+        # (Hear it on a voice: a sample in your headphones only)
+        self.fx = VoiceFxPanel({**voicefx.clean_spec(fx_spec), "enabled": False},
+                               play_sample=lambda data: engine.play(
+                                   "__fx_voice_sample", data, 1.0, preview=True))
         self.fx.changed.connect(self._fx_changed)
         # Make it yours' folded effect cards: "fx.<type>" in the same list
         self.fx.set_folded(k[3:] for k in self._folded if k.startswith("fx."))
@@ -279,6 +283,9 @@ class VoicePanel(QWidget):
         self.setups_bar = SetupsBar(self.setups, self.current_setup, self.use_setup,
                                     self.setup_icon, self.setup_words)
         outer.insertWidget(self._setups_at, self.setups_bar)
+        from soundboard.ui.storevoices import kind_name
+        self.setups_bar.share = lambda n: self.share_asked.emit(f"{kind_name('setup')}: {n}")
+        self.fx.share_asked.connect(lambda n: self.share_asked.emit(f"{kind_name('fx')}: {n}"))
         outer.insertWidget(0, self.speech.say_bar)   # on top: the bottom has the mixer
         # the picked voice's bar, pinned under the cards while the voice changer shows:
         # its Hear what they hear and Make it yours never scroll out of sight

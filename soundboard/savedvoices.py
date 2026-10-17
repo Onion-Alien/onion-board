@@ -91,7 +91,9 @@ class CodeError(ValueError):
     """A share code that can't be read; str() says why, in plain words."""
 
 
-def share_code(name: str, effects: dict) -> str:
+def shared_effects(effects: dict) -> dict:
+    """A voice's effects as they're shared (codes, the store): only those that are on,
+    only settings that aren't at their default, {type: {param: number}}."""
     out = {}
     for etype, cfg in clean_effects(effects).items():
         cls = voicefx.REGISTRY.get(etype)
@@ -104,6 +106,39 @@ def share_code(name: str, effects: dict) -> str:
                 if v != q.default:
                     d[q.key] = round(v, 4)
         out[etype] = d
+    return out
+
+
+def from_shared(raw: dict) -> tuple[dict, list[str]]:
+    """Shared effects ({type: {param: number}}) as a voice's effects, every number put
+    inside its slider's range, and the effects this version doesn't have (left out).
+    Raises CodeError when an effect's settings aren't a dict."""
+    effects, unknown = {}, []
+    for etype, cfg in raw.items():
+        cls = voicefx.REGISTRY.get(etype) if isinstance(etype, str) else None
+        if cls is None:
+            unknown.append(str(etype)[:40])
+            continue
+        if etype in NOT_SHARED:
+            continue
+        if not isinstance(cfg, dict):
+            raise CodeError(_("That code is damaged: an effect's settings are missing."))
+        d: dict[str, bool | float] = {"on": True}
+        for q in cls.params:
+            v = cfg.get(q.key)
+            if isinstance(v, (int, float)) and not isinstance(v, bool):
+                try:
+                    v = float(v)
+                except OverflowError:   # an integer too big to be a number here
+                    continue
+                if math.isfinite(v):
+                    d[q.key] = q.clamp(v)
+        effects[etype] = d
+    return effects, unknown
+
+
+def share_code(name: str, effects: dict) -> str:
+    out = shared_effects(effects)
     raw = json.dumps({"n": clean_name(name) or _("My voice"), "e": out},
                      separators=(",", ":"), ensure_ascii=False).encode("utf-8")
     body = base64.urlsafe_b64encode(zlib.compress(raw, 9)).rstrip(b"=").decode("ascii")
@@ -145,27 +180,7 @@ def read_code(text) -> tuple[str, dict, list[str]]:
             or not isinstance(data.get("e"), dict):
         raise CodeError(_("That code is damaged: it doesn't hold a voice."))
     name = clean_name(data["n"]) or _("Shared voice")
-    effects, unknown = {}, []
-    for etype, cfg in data["e"].items():
-        cls = voicefx.REGISTRY.get(etype) if isinstance(etype, str) else None
-        if cls is None:
-            unknown.append(str(etype)[:40])
-            continue
-        if etype in NOT_SHARED:
-            continue
-        if not isinstance(cfg, dict):
-            raise CodeError(_("That code is damaged: an effect's settings are missing."))
-        d: dict[str, bool | float] = {"on": True}
-        for q in cls.params:
-            v = cfg.get(q.key)
-            if isinstance(v, (int, float)) and not isinstance(v, bool):
-                try:
-                    v = float(v)
-                except OverflowError:   # an integer too big to be a number here
-                    continue
-                if math.isfinite(v):
-                    d[q.key] = q.clamp(v)
-        effects[etype] = d
+    effects, unknown = from_shared(data["e"])
     notes = []
     if unknown:
         names = ", ".join(unknown[:5]) + ("…" if len(unknown) > 5 else "")

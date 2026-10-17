@@ -150,6 +150,8 @@ FEATURES = ("add-files", "youtube", "record", "clip", "clip-editor", "import-boa
             *(f"tab-hidden-{k}" for k in ("radio", "apps", "triggers", "voice", "store")),
             # the Store tab: a sound heard, added to the board, voted on, or shared
             "store-heard", "store-added", "store-voted", "store-shared",
+            # its Voices: a community voice taken into yours, or one of yours shared
+            "store-voice-added", "store-voice-shared",
             # the first start's "What's it for?" answer (setupwizard.uses keys), or
             # the guide closed on that page
             *(f"use-{k}" for k in ("normal", "streamer", "games", "all", "skipped")),
@@ -255,6 +257,8 @@ FEATURES = ("add-files", "youtube", "record", "clip", "clip-editor", "import-boa
             # yours opened, Randomize, Save as a voice, a share code copied or imported
             "voice-group", "voice-favorite", "voice-tweak", "voice-random", "voice-saved",
             "voice-code-shared", "voice-code-imported",
+            # the Random voice card (or its key) and a voice changer voice's Hear it
+            "voice-roll", "voice-hear",
             # AI voices: switched on, a group picked, a voice starred, Hear it, one of
             # your own made (never which voice)
             "ai-voice", "ai-voice-group", "ai-voice-favorite", "ai-voice-hear",

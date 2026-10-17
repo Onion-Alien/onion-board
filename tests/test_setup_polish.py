@@ -196,3 +196,36 @@ def test_unplugged_headphones_and_mic_stay_said_under_devices(window, monkeypatc
     w.statusctl._update_status()
     hint = w.setup_hint.text()
     assert "My headphones" not in hint and "(My mic)" in hint
+
+
+def test_a_working_mic_without_the_sounds_in_it_says_both(window, monkeypatch):  # noqa: F811
+    """The mic works (open, its level moving) but the sounds aren't in it yet: a green
+    "Your mic works" row with its level, then what's missing named as the sounds, never
+    "Your mic: Not set up" (which read as a broken mic while the meter moved)."""
+    w = window
+    _mic_works(w, monkeypatch)
+    monkeypatch.setattr(dm, "status", lambda name=None: "missing")
+    monkeypatch.setattr(w.engine, "mic_stream", _Stream())
+    w.routectl._show_route()
+    w.statusctl._update_status()
+    assert not w.mic_voice.isHidden()
+    assert w.mic_voice_sub.text() == "Microphone (Example Gaming Headset)"
+    assert w.mic_line.text() == "Your sounds aren't in your mic yet"
+    assert "your voice, but not your sounds" in w.mic_reason.text()
+    assert w.mic_pill.text() == "1 step left"
+    assert not w.voice_only.isHidden()   # by "What others hear": your voice alone
+    assert "Not set up" not in (w.mic_pill.text(), w.mic_line.text())
+    # no mic open: nothing to say it works, and nothing others hear
+    monkeypatch.setattr(w.engine, "mic_stream", None)
+    w.statusctl._update_status()
+    assert w.mic_voice.isHidden() and w.voice_only.isHidden()
+    # working: the one green status says it all
+    monkeypatch.setattr(w.engine, "mic_stream", _Stream())
+    monkeypatch.setattr(dm, "status", lambda name=None: "ready")
+    w.statusctl._update_status()
+    assert w.mic_voice.isHidden() and w.voice_only.isHidden()
+    # not on the mic at all: neither
+    monkeypatch.setattr(dm, "status", lambda name=None: "missing")
+    w.cfg.route = "off"
+    w.statusctl._update_status()
+    assert w.mic_voice.isHidden() and w.voice_only.isHidden()

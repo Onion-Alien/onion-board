@@ -1158,3 +1158,55 @@ def test_closing_the_guide_while_a_hint_flashes(wizard, qapp):
     other.deleteLater()
     qapp.sendPostedEvents(None, QEvent.DeferredDelete)
     QTest.qWait(150)   # past the flash: nothing left to touch the label
+
+
+@pytest.mark.parametrize("route, mic_state, cable", [
+    ("mic", "missing", True),    # not on the mic yet: no Discord tip, no Discord button
+    ("mic", "ready", True),      # working: the tip under its pill
+    ("off", "missing", True),    # sounds only for me
+    ("cable", "missing", False),  # the cable isn't installed
+    ("cable", "missing", True),  # on the cable: the Discord button, no tip
+    ("device", "missing", True),  # another device
+])
+def test_last_step_never_shows_an_empty_box(wizard, devices, monkeypatch, route,
+                                            mic_state, cable):
+    """The last step's Discord card shows only with something in it (it was an empty
+    box between the words and the closing line when the mic wasn't set up yet)."""
+    from soundboard import directmic
+    w, wiz = wizard
+    devices["cable"] = cable
+    monkeypatch.setattr(directmic, "status", lambda name=None: mic_state)
+    w.cfg.route = route
+    if route == "device":
+        w.cfg.main_device = "Speakers"
+    wiz.show()
+    wiz._fill_discord()
+    body = wiz.discord_body
+    if not body.isHidden():
+        assert (wiz.discord_tip.text() or wiz.discord_live.text()
+                or not wiz.btn_discord.isHidden())
+    if route == "mic" and mic_state == "missing" or route == "off":
+        assert body.isHidden()
+
+
+def test_the_send_step_says_the_mic_works_before_what_is_missing(mic_wizard, monkeypatch):
+    """Step 1 heard you; the send step, not set up, says the mic works (green) above
+    "Your sounds aren't in your mic yet", so it can't read as the mic breaking."""
+    from soundboard import directmic
+
+    class _S:
+        def stop(self):
+            pass
+        close = stop
+    w, wiz = mic_wizard
+    monkeypatch.setattr(directmic, "status", lambda name=None: "missing")
+    monkeypatch.setattr(w.engine, "mic_stream", _S())
+    wiz.show()
+    wiz.go(wiz.base + 2)
+    wiz.recheck_cable(rescan=False)
+    assert not wiz.mic_done.isHidden() and "Your mic works" in wiz.mic_done.text()
+    assert wiz.status_card.title.text() == "Your sounds aren't in your mic yet"
+    assert "your voice, but not your sounds" in wiz.cable_status.text()
+    monkeypatch.setattr(w.engine, "mic_stream", None)   # no mic open: not said
+    wiz.recheck_cable(rescan=False)
+    assert wiz.mic_done.isHidden()

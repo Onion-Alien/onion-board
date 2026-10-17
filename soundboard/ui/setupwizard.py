@@ -855,6 +855,11 @@ class SetupWizard(QDialog):
         self.status_card.action_box.addWidget(self.btn_attach, 0, Qt.AlignmentFlag.AlignLeft)
         v.insertSpacing(1, HEADER_GAP - SECTION_GAP)
         v.insertWidget(2, self.status_card)
+        # straight into the mic, not in it yet: step 1's mic works, said above what's
+        # still to do, so the two don't read as one broken mic
+        self.mic_done = _label("")
+        self.mic_done.hide()
+        v.insertWidget(2, self.mic_done)
         self.cable_bar = QProgressBar()
         self.cable_bar.setRange(0, 0)   # busy: we can't know how long Windows takes
         self.cable_bar.setTextVisible(False)
@@ -1376,6 +1381,16 @@ class SetupWizard(QDialog):
                 win.micctl.fix_cable_format(quiet=True)
         win.devctl._device_job(plan, opened)
 
+    def _say_mic_done(self):
+        """The mic itself works (it's open): a green line says so above the status."""
+        if self.win.engine.mic_stream is None:
+            return
+        mic = html.escape(self.win.cfg.mic_device or _("your mic"))
+        self.mic_done.setText(_("<b style='color:{colour}'>✓ Your mic works:</b> Onion Board "
+                                "hears <b>{mic}</b>. Now your sounds go into it too.",
+                                colour=_ok(), mic=mic))
+        self.mic_done.show()
+
     def recheck_cable(self, rescan: bool = True):
         if rescan:
             self.win.devctl.refresh_devices()   # picks up a driver installed while we're open
@@ -1398,6 +1413,7 @@ class SetupWizard(QDialog):
         self.btn_cable.setToolTip(_("Use a free virtual cable instead: you pick it as the mic "
                                     "in Discord and games") if route == "mic" else "")
         self.btn_other.setVisible(not busy and self.other_box.isHidden())
+        self.mic_done.hide()   # (shown below: on the mic, with the sounds not in it)
         self.alt_card.hide()   # the mic's other ways: shown below once it's the mic's page
         self.alt_fold_row.hide()
         attaching = self.win._attaching
@@ -1439,6 +1455,7 @@ class SetupWizard(QDialog):
             if self.route_ok():
                 self._show_working()
             elif directmic.needs_repair(state):
+                self._say_mic_done()
                 self.status_card.set_state("warn", "", _("Your mic needs a quick repair"))
                 self.cable_status.setText(_("Onion Board was on your mic but needs a quick "
                                             "repair: <b>one click</b>, and Windows asks for "
@@ -1446,13 +1463,17 @@ class SetupWizard(QDialog):
                                           _("Onion Board was on your mic but needs a quick "
                                             "repair: <b>one click</b>."))
             else:
-                self.status_card.set_state("", "", _("Not set up yet"))
-                self.cable_status.setText(_("Press <b>Put my sounds in my mic</b> below. Windows "
-                                            "asks once: click <b>Yes</b>. Your sound drops out "
-                                            "for a second while it sets up.") if ask else
-                                          _("Press <b>Put my sounds in my mic</b> below. Your "
-                                            "sound drops out for a second while Windows "
-                                            "reloads it."))
+                self._say_mic_done()
+                self.status_card.set_state("", "", _("Your sounds aren't in your mic yet"))
+                self.cable_status.setText(_("Others hear your voice, but not your sounds. Press "
+                                            "<b>Put my sounds in my mic</b> below: Onion Board "
+                                            "adds its audio driver to your mic. Windows asks "
+                                            "once: click <b>Yes</b>. Your sound drops out for a "
+                                            "second while it sets up.") if ask else
+                                          _("Others hear your voice, but not your sounds. Press "
+                                            "<b>Put my sounds in my mic</b> below: Onion Board "
+                                            "adds its audio driver to your mic. Your sound "
+                                            "drops out for a second while Windows reloads it."))
             # the other ways sit in their own card, not as buttons under the status
             self.btn_cable.hide()
             self.btn_other.hide()
@@ -1718,7 +1739,10 @@ class SetupWizard(QDialog):
         # where Discord's steps are on the page) the Discord button shows as it is
         tip = bool(self.discord_tip.text())
         self.discord_fold.setVisible(tip)
-        self.discord_body.setVisible(self._discord_open or not tip)
+        # nothing in it (not on the mic yet, sounds only for me, no cable): no empty box
+        # between the words and the closing line
+        filled = tip or bool(self.discord_live.text()) or not self.btn_discord.isHidden()
+        self.discord_body.setVisible(filled and (self._discord_open or not tip))
 
     def _fill_discord(self):
         self.discord_tip.setText("")
@@ -1916,8 +1940,11 @@ class SetupWizard(QDialog):
                 self.mic_heard.setText(_("<span style='color:{colour}'>Couldn't open that "
                                          "mic, try another one.</span>", colour=_bad()))
             elif self._mic_peak_seen:
-                self.mic_heard.setText(_("<b style='color:{colour}'>✓ Hearing you!</b>",
-                                         colour=_ok()))
+                # your voice, done; the sounds are a step of their own (said here, or
+                # "Not set up" two steps on read as the mic having stopped working)
+                self.mic_heard.setText(_("<b style='color:{colour}'>✓ Hearing you! Your mic "
+                                         "works.</b> That's your voice done: your sounds go "
+                                         "into this mic in a moment.", colour=_ok()))
             else:
                 self.mic_heard.setText(_("Waiting to hear you… if the bar doesn't move, pick "
                                          "another mic."))

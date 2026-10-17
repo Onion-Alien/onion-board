@@ -156,6 +156,14 @@ def run_pending() -> str:
     return ""
 
 
+def is_update(cfg: Config) -> bool:
+    """Another version ran on these settings last (cfg.stats_version, noted by
+    usage.started after the window is built); versions before it kept none, so a
+    profile with sounds or a finished setup and no version counts too."""
+    last = cfg.stats_version
+    return last != __version__ and bool(last or cfg.sounds or cfg.setup_done)
+
+
 def before_update(cfg: Config) -> Point | None:
     """At start, before anything moves or changes (library.tidy_files): when another
     version ran here last, save the settings as they were, so Restore points can put
@@ -163,7 +171,7 @@ def before_update(cfg: Config) -> Point | None:
     this one later); versions before it kept none, so a profile with sounds or a
     finished setup and no version is an update too. Never raises."""
     last = cfg.stats_version
-    if last == __version__ or cfg.read_only or not (last or cfg.sounds or cfg.setup_done):
+    if cfg.read_only or not is_update(cfg):
         return None
     try:
         for old in [p for p in points() if p.label == UPDATE][UPDATE_POINTS - 1:]:
