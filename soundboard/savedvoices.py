@@ -49,18 +49,39 @@ def clean_effects(raw) -> dict:
     return voicefx.clean_spec({"effects": raw})["effects"]
 
 
+def builtin_names() -> set[str]:
+    """The names a saved voice can't have (casefolded): the ready voices' (the English
+    names, what's saved, and how their cards read now) and the panel's own cards."""
+    names = (*voicefx.PRESETS, "Custom", "My own mix", "Random voice")
+    return {n.casefold() for n in (*names, *map(voicefx.shown, voicefx.PRESETS),
+                                   _("My own mix"))}
+
+
 def clean_list(raw) -> list[tuple[str, dict]]:
     """[{"name", "effects"}, ...] from a file or a backup, as (name, effects) pairs:
-    damaged entries are dropped, and a name used twice keeps its first."""
-    out, seen = [], set()
+    damaged entries are dropped, and a name used twice keeps its first. One named like
+    a ready voice (saved before that voice came out, or by hand) comes back as
+    "name (2)": under the ready voice's name its card would pick the ready voice."""
+    pairs, seen = [], set()
     for d in raw if isinstance(raw, list) else ():
         if not isinstance(d, dict):
             continue
         name = clean_name(d.get("name"))
         if name and name.casefold() not in seen and isinstance(d.get("effects"), dict):
             seen.add(name.casefold())
-            out.append((name, clean_effects(d["effects"])))
-    return out[:MAX_VOICES]
+            pairs.append((name, clean_effects(d["effects"])))
+    builtin = builtin_names()
+    taken = seen | builtin
+    out = []
+    for name, effects in pairs[:MAX_VOICES]:
+        if name.casefold() in builtin:
+            n = 2
+            while f"{name[:MAX_NAME - 5]} ({n})".casefold() in taken:
+                n += 1
+            name = f"{name[:MAX_NAME - 5]} ({n})"
+            taken.add(name.casefold())
+        out.append((name, effects))
+    return out
 
 
 def saved() -> list[dict]:
@@ -284,12 +305,17 @@ class Store:
         return next((n for n in self.voices if n.casefold() == key), None)
 
     def free_name(self, name: str) -> str:
-        """`name`, or "name (2)", "name (3)"... if that's taken."""
+        """`name`, or "name (2)", "name (3)"... if that's taken (a ready voice's name
+        is taken too)."""
         name = clean_name(name) or _("My voice")
-        if self.find(name) is None:
+        builtin = builtin_names()
+
+        def taken(n: str) -> bool:
+            return self.find(n) is not None or n.casefold() in builtin
+        if not taken(name):
             return name
         n = 2
-        while self.find(f"{name[:MAX_NAME - 5]} ({n})") is not None:
+        while taken(f"{name[:MAX_NAME - 5]} ({n})"):
             n += 1
         return f"{name[:MAX_NAME - 5]} ({n})"
 

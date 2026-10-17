@@ -123,3 +123,18 @@ def test_backup_settings_carry_them_and_merge_adds_only_new_names(app_dir):
 
 def test_no_saved_voices_no_key_in_the_backup(app_dir):
     assert backup.SAVED_VOICES not in backup.settings_of(library.Config())
+
+
+def test_a_voice_named_like_a_ready_voice_loads_under_a_free_name(app_dir):
+    # saved before that ready voice came out (or by hand): under the ready voice's name
+    # its card would pick the ready voice and never this one
+    savedvoices.path().write_text(json.dumps({"voices": [
+        {"name": "chipmunk", "effects": ROBOT},
+        {"name": "Chipmunk (2)", "effects": {}},
+        {"name": "Mine", "effects": {}}]}), encoding="utf-8")
+    s = Store()
+    assert list(s.voices) == ["chipmunk (3)", "Chipmunk (2)", "Mine"]
+    assert s.voices["chipmunk (3)"] == ROBOT
+    assert s.free_name("Fairy") == "Fairy (2)"
+    assert s.merge([{"name": "Robot", "effects": ROBOT}]) == 1
+    assert "Robot (2)" in s.voices

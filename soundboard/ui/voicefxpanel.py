@@ -1701,10 +1701,7 @@ class VoiceFxPanel(QWidget):
 
     @staticmethod
     def _builtin_names() -> set[str]:
-        # the English names (what's saved) and how they read on the tiles now
-        names = (*voicefx.PRESETS, CUSTOM, "My own mix", "Random voice")
-        return {n.casefold() for n in (*names, *map(voicefx.shown, voicefx.PRESETS),
-                                       _("My own mix"))}
+        return savedvoices.builtin_names()
 
     def rename_voice(self, old: str):
         new = self._ask_name(_("Rename voice"), old, keep=old)
