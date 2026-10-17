@@ -124,7 +124,10 @@ class UpNextPopup(QWidget):
                 w.setParent(None)
                 w.deleteLater()
         self.count.setText(str(len(items)))
-        name_w = POPUP_W - 130   # the card's margins, the number, the ✕ and a scroll bar
+        a = self._anchor
+        win = a.window().width() if a is not None and qt_valid(a) else POPUP_W + 16
+        self.setFixedWidth(max(240, min(POPUP_W, win - 16)))   # inside a narrow window
+        name_w = self.width() - 130   # the card's margins, the number, the ✕, a scroll bar
         for i, (text, on_click, on_x) in enumerate(items):
             row = QFrame()
             row.setObjectName("chip")
@@ -156,12 +159,14 @@ class UpNextPopup(QWidget):
     def open_at(self, anchor: QWidget, items: Sequence[Waiting]):
         self._anchor = anchor
         self.show_items(items)
+        self.list_area.verticalScrollBar().setValue(0)   # from the top, every time
         self.show()
         self._place()
 
     def _place(self):
         """Above its chip, left edges lined up (right edges in a right-to-left
-        language), kept on the window's screen; below it when there's no room above."""
+        language), kept inside the window and on its screen; below it when there's no
+        room above."""
         a = self._anchor
         if a is None or not qt_valid(a) or not a.isVisible():
             return
@@ -172,5 +177,7 @@ class UpNextPopup(QWidget):
         scr = a.screen().availableGeometry()
         if y < scr.top():
             y = a.mapToGlobal(QPoint(0, a.height())).y() + 6
-        x = max(scr.left(), min(top.x(), scr.right() - self.width()))
+        win = a.window().geometry()
+        left, right = max(scr.left(), win.left()), min(scr.right(), win.right())
+        x = max(left, min(top.x(), right - self.width()))
         self.move(x, y)
