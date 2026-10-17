@@ -99,6 +99,31 @@ def test_add_filter_rename_and_delete_a_subcategory(window, monkeypatch):
     assert w.cfg.subcategories == {} and w.meta("s0").tags == ["Funny"]
 
 
+def test_plus_subcategory_opens_a_name_box_in_the_chip_row(window):
+    """"+ Subcategory" swaps itself for a box where the new chip goes: Enter adds
+    it, Esc doesn't. No pop-up."""
+    from PySide6.QtCore import Qt
+    from PySide6.QtTest import QTest
+    from PySide6.QtWidgets import QApplication
+    w = window
+    w.tabs.setCurrentWidget(w.sounds_page)
+    w.show()
+    w.catctl.new_category(name="Memes")
+    w.catctl.new_subcategory("Memes", "s0", "Vine")
+    box = w.catctl.sub_name_box
+    box.button.click()
+    QApplication.processEvents()
+    assert box.isVisible() and not box.button.isVisible()
+    QTest.keyClicks(box, "Old")
+    QTest.keyClick(box, Qt.Key.Key_Escape)
+    assert w.cfg.subcategories == {"Memes": ["Vine"]} and box.button.isVisible()
+    box.button.click()
+    QTest.keyClicks(box, "Clips")
+    QTest.keyClick(box, Qt.Key.Key_Return)
+    assert w.cfg.subcategories == {"Memes": ["Vine", "Clips"]}
+    assert w.cfg.subcategory == "Clips"
+
+
 def test_switching_tab_leaves_the_subcategory_and_all_shows_everything(window):
     w = window
     w.catctl.new_category(name="Memes")

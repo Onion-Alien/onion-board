@@ -251,6 +251,25 @@ def test_custom_category_lifecycle(tab):
 
 
 
+def test_new_category_button_opens_a_name_box_in_its_place(tab, qapp):
+    """The Apps tab's "+ Category" swaps itself for a name box: Enter adds the
+    category, Esc doesn't. No pop-up."""
+    from PySide6.QtTest import QTest
+    tab.show()
+    box = tab.cat_name_box
+    tab.btn_add_cat.click()
+    qapp.processEvents()
+    assert box.isVisible() and not tab.btn_add_cat.isVisible()
+    QTest.keyClicks(box, "Work")
+    QTest.keyClick(box, Qt.Key.Key_Escape)
+    assert "Work" not in tab.grid.category_order and tab.btn_add_cat.isVisible()
+    tab.btn_add_cat.click()
+    QTest.keyClicks(box, "Work")
+    QTest.keyClick(box, Qt.Key.Key_Return)
+    assert "Work" in tab.grid.category_order and "Work" in tab.cfg.apps_categories
+    assert not box.isVisible() and tab.btn_add_cat.isVisible()
+
+
 def test_category_headings_have_a_keyboard_way_to_their_menu(tab, qapp, monkeypatch):
     """Tab reaches a heading (in the order shown: heading, its cards, the next one), it
     shows it has the focus, and the Menu key or Shift+F10 opens Rename / Delete."""
@@ -339,7 +358,7 @@ def test_built_in_category_names_show_in_the_language_and_save_in_english(qapp, 
         monkeypatch.setattr(appspanel.QInputDialog, "getText", answer("Spiele"))
         t._on_rename_category("Games")                       # OK on the shown name: no change
         assert asked == ["Spiele"] and "Games" in t.grid.category_order
-        t._prompt_new_category()                             # nor a second "Spiele"
+        t._add_category("Spiele")                            # nor a second "Spiele"
         assert "Spiele" not in t.grid.category_order
         monkeypatch.setattr(appspanel.QInputDialog, "getText", answer("Shooter"))
         t._on_rename_category("Games")

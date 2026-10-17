@@ -1,0 +1,1 @@
+- + Subcategory and the Apps tab's + Category also open a name box in place now, instead of a pop-up.
