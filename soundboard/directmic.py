@@ -100,6 +100,8 @@ MAGIC = 0x434D424F
 VERSION = 2
 MODE_ADD, MODE_REPLACE = 0, 1
 LEAD_S = 0.02               # how far behind the board the effect reads (its added delay)
+CUSHION_S = 0.11            # ...while something plays (the effect takes 0.12 at most): see
+                            # Engine.cushion
 BLOCK = 480                 # frames rendered per engine call (10 ms)
 ALIVE_MS = 250              # effect heard from this recently: it's running
 MIC_LIVE_MS = 150           # the clean mic arrived this recently: the board runs on it
@@ -532,6 +534,14 @@ class DirectMicStream:
     def set_mode(self, mode: int):
         self.mode = mode
         self._ring.set_mode(mode)
+
+    def set_lead(self, seconds: float):
+        """How far behind the board the effect reads from now on."""
+        try:
+            self._ring.set_lead(seconds)
+        except (ValueError, KeyError, AttributeError):   # closed
+            return
+        self.latency = seconds
 
     def set_mic_gain(self, g: float):
         """Add mode: the effect's own level for the mic (0 = muted)."""
