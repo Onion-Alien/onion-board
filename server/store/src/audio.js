@@ -128,22 +128,21 @@ function isWav(b) {
 
 function isOgg(b) {
   if (!tag(b, 0, "OggS")) return false;
-  let i = 0, first = true;
+  let i = 0, sound = false;
   while (i < b.length) {   // page after page, to the very end
     if (!tag(b, i, "OggS") || b[i + 4] !== 0) return false;
     const segs = b[i + 26];
     let n = 27 + segs;
     for (let k = 0; k < segs; k++) n += b[i + 27 + k];
     if (i + n > b.length) return false;
-    if (first) {   // the first packet says which codec: Vorbis, Opus or FLAC
-      const p = i + 27 + segs;
-      if (!(tag(b, p, "\x01vorbis") || tag(b, p, "OpusHead") || tag(b, p, "\x7fFLAC")))
-        return false;
-      first = false;
+    if (b[i + 5] & 2) {   // a stream's first page says its codec: Vorbis, Opus or FLAC
+      const p = i + 27 + segs;   // (or Skeleton, the index some files carry, never video)
+      if (tag(b, p, "\x01vorbis") || tag(b, p, "OpusHead") || tag(b, p, "\x7fFLAC")) sound = true;
+      else if (!tag(b, p, "fishead\0")) return false;
     }
     i += n;
   }
-  return true;
+  return sound;
 }
 
 // ------------------------------------------------------------------ FLAC

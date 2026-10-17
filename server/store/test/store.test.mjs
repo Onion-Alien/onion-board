@@ -542,11 +542,11 @@ function wav(samples = 4000, extraChunk = null) {
   const head = new Uint8Array(8); head.set(enc("RIFF")); new DataView(head.buffer).setUint32(4, body.length, true);
   return cat(head, body);
 }
-function oggPage(packet) {
+function oggPage(packet, first = false) {   // first: a stream's first page
   const segs = [];
   for (let n = packet.length; ; n -= 255) { segs.push(Math.min(255, n)); if (n < 255) break; }
   const head = new Uint8Array(27 + segs.length);
-  head.set(enc("OggS")); head[26] = segs.length; head.set(segs, 27);
+  head.set(enc("OggS")); head[5] = first ? 2 : 0; head[26] = segs.length; head.set(segs, 27);
   return cat(head, packet);
 }
 function flac(metaLen = 0) {
@@ -562,7 +562,13 @@ test("real sounds of each kind pass the whole-file check", () => {
   const v1 = new Uint8Array(128); v1.set(enc("TAG"));
   assert.equal(audioType(cat(mp3bytes(), v1)), "mp3");     // an ID3v1 tag at the end
   assert.equal(audioType(wav()), "wav");
-  assert.equal(audioType(cat(oggPage(cat(enc("OpusHead"), new Uint8Array(11))), oggPage(new Uint8Array(300)))), "ogg");
+  assert.equal(audioType(cat(oggPage(cat(enc("OpusHead"), new Uint8Array(11)), true), oggPage(new Uint8Array(300)))), "ogg");
+  // a Skeleton index stream before the sound's own (as Wikimedia's files have)
+  assert.equal(audioType(cat(oggPage(cat(enc("fishead\0"), new Uint8Array(56)), true),
+    oggPage(cat(enc("\x01vorbis"), new Uint8Array(23)), true), oggPage(new Uint8Array(300)))), "ogg");
+  // ... but only a Skeleton, or a video, isn't a sound
+  assert.equal(audioType(cat(oggPage(cat(enc("fishead\0"), new Uint8Array(56)), true), oggPage(new Uint8Array(300)))), "");
+  assert.equal(audioType(cat(oggPage(cat(enc("\x80theora"), new Uint8Array(40)), true), oggPage(new Uint8Array(300)))), "");
   assert.equal(audioType(flac()), "flac");
 });
 
@@ -579,7 +585,7 @@ test("a sound's header in front of something else is refused", () => {
   // a real sound with a program or a script tacked on after it
   assert.equal(audioType(cat(mp3bytes(), exe)), "");
   assert.equal(audioType(cat(wav(), exe)), "");
-  assert.equal(audioType(cat(oggPage(cat(enc("\x01vorbis"), new Uint8Array(23))), exe)), "");
+  assert.equal(audioType(cat(oggPage(cat(enc("\x01vorbis"), new Uint8Array(23)), true), exe)), "");
   // ... or hidden in its tags and chunks
   assert.equal(audioType(mp3bytes(0, "<script>fetch('//evil')</script>")), "");
   assert.equal(audioType(mp3bytes(0, "#!/bin/sh\nrm -rf ~")), "");
