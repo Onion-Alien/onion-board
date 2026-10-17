@@ -333,6 +333,8 @@ class StatusControl(Controller):
             mw.mic_reason.setVisible(bool(reason))
             step = ""   # (said in the box)
         mw.mic_flow.setVisible(not mic_route)
+        if not mic_route:
+            mw.mic_voice.hide()   # (_show_mic_status says when, on the mic)
         mw.mic_status.setVisible(mic_route)
         mw.mic_pill.setVisible(mic_route)
         mw.step_lbl.setText(step)
@@ -456,8 +458,8 @@ class StatusControl(Controller):
             elif route == "mic" and directmic.needs_repair(direct):
                 pill = _("Repair needed") if short else _("One click needed: repair your mic")
             elif route == "mic":
-                pill = (_("One click") if short
-                        else _("One click: put your sounds straight into your mic"))
+                pill = (_("1 step left") if short
+                        else _("Your sounds aren't in your mic yet: one click to fix"))
             elif state == "ok" and not vm:
                 pill = _("Connected") if short else _("Sending to:  {dev}", dev=dev)
             elif state == "ok":
@@ -478,6 +480,9 @@ class StatusControl(Controller):
         pill_short, pill = pills
         mw.setup_connection.setText(pill)
         mw.setup_connection.setVisible(route != "mic")   # (the mic card's pill says it)
+        # into the mic, not in it yet: "What others hear" moves with your voice alone
+        mw.voice_only.setVisible(route == "mic" and state not in ("ok", "off") and not mic_busy
+                                 and mw.engine.mic_stream is not None and mw.cfg.mic_enabled)
         mw.setup_connection.setProperty("tone", "ok" if state in ("ok", "off") else "warn")
         mw.setup_connection.style().unpolish(mw.setup_connection)
         mw.setup_connection.style().polish(mw.setup_connection)
