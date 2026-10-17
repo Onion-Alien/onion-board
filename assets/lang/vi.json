@@ -3553,5 +3553,18 @@
   "Start some music or a game, then press Send on it. Everyone in your call hears it.": "Mở nhạc hoặc game, rồi nhấn Gửi ở đó. Mọi người trong cuộc gọi đều nghe thấy.",
   "Turn on a trigger": "Bật một kích hoạt",
   "Click any dot to play that station. Press Send and your call hears it too.": "Bấm vào chấm bất kỳ để phát đài đó. Nhấn Gửi để cuộc gọi của bạn cũng nghe thấy.",
-  "Pick a station on the globe": "Chọn một đài trên quả địa cầu"
+  "Pick a station on the globe": "Chọn một đài trên quả địa cầu",
+  "Another game": "Trò khác",
+  "Click to start": "Bấm để bắt đầu",
+  "Draw!": "Hòa!",
+  "First to {n} wins. Pick rock, paper or scissors with a click, or the keys 1, 2 and 3.": "Ai đạt {n} trước sẽ thắng. Chọn búa, bao hoặc kéo bằng cú bấm, hoặc phím 1, 2 và 3.",
+  "First to {n} wins. When it says GO, click or press Space before Bun does. Too early and the point is his.": "Ai đạt {n} trước sẽ thắng. Khi hiện NGAY, bấm chuột hoặc phím cách trước Bun. Sớm quá thì điểm thuộc về Bun.",
+  "GO!": "NGAY!",
+  "Quick draw with Bun": "Đọ phản xạ với Bun",
+  "Rock paper scissors with Bun": "Oẳn tù tì với Bun",
+  "Three in a row wins a round, first to {n} rounds wins. Click a square, or use the arrow keys and Space.": "Ba ô thẳng hàng thắng một ván, ai thắng {n} ván trước sẽ thắng. Bấm vào một ô, hoặc dùng phím mũi tên và phím cách.",
+  "Tic-tac-toe with Bun": "Cờ ca-rô với Bun",
+  "Wait for it…": "Chờ đã…",
+  "too early!": "sớm quá!",
+  "{ms} ms": "{ms} ms"
 }

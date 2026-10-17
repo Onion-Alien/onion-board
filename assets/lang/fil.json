@@ -3630,5 +3630,18 @@
   "Start some music or a game, then press Send on it. Everyone in your call hears it.": "Magpatugtog ng music o maglaro, tapos pindutin ang Ipadala dito. Maririnig ito ng lahat sa call mo.",
   "Turn on a trigger": "Mag-on ng trigger",
   "Click any dot to play that station. Press Send and your call hears it too.": "I-click ang kahit anong tuldok para i-play ang istasyong iyon. Pindutin ang Ipadala at maririnig din ito ng call mo.",
-  "Pick a station on the globe": "Pumili ng istasyon sa globo"
+  "Pick a station on the globe": "Pumili ng istasyon sa globo",
+  "Another game": "Ibang laro",
+  "Click to start": "I-click para magsimula",
+  "Draw!": "Tabla!",
+  "First to {n} wins. Pick rock, paper or scissors with a click, or the keys 1, 2 and 3.": "Ang unang umabot sa {n} ang panalo. Pumili ng bato, papel o gunting sa pag-click, o sa mga key na 1, 2 at 3.",
+  "First to {n} wins. When it says GO, click or press Space before Bun does. Too early and the point is his.": "Ang unang umabot sa {n} ang panalo. Kapag lumabas ang GO, mag-click o pindutin ang Space bago si Bun. Kapag napaaga ka, kay Bun ang puntos.",
+  "GO!": "GO!",
+  "Quick draw with Bun": "Bilisan ng kamay kasama si Bun",
+  "Rock paper scissors with Bun": "Bato bato pik kasama si Bun",
+  "Three in a row wins a round, first to {n} rounds wins. Click a square, or use the arrow keys and Space.": "Tatlong sunod-sunod ang panalo sa round, ang unang umabot sa {n} round ang panalo. Mag-click ng kahon, o gamitin ang mga arrow key at Space.",
+  "Tic-tac-toe with Bun": "Tic-tac-toe kasama si Bun",
+  "Wait for it…": "Hintayin mo…",
+  "too early!": "masyadong maaga!",
+  "{ms} ms": "{ms} ms"
 }

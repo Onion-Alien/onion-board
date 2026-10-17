@@ -3630,5 +3630,18 @@
   "Start some music or a game, then press Send on it. Everyone in your call hears it.": "Start wat muziek of een game en druk erbij op Versturen. Iedereen in je gesprek hoort het.",
   "Turn on a trigger": "Zet een trigger aan",
   "Click any dot to play that station. Press Send and your call hears it too.": "Klik op een stip om die zender af te spelen. Druk op Versturen en je gesprek hoort hem ook.",
-  "Pick a station on the globe": "Kies een zender op de wereldbol"
+  "Pick a station on the globe": "Kies een zender op de wereldbol",
+  "Another game": "Ander spel",
+  "Click to start": "Klik om te beginnen",
+  "Draw!": "Gelijkspel!",
+  "First to {n} wins. Pick rock, paper or scissors with a click, or the keys 1, 2 and 3.": "Wie het eerst {n} heeft, wint. Kies steen, papier of schaar met een klik of met de toetsen 1, 2 en 3.",
+  "First to {n} wins. When it says GO, click or press Space before Bun does. Too early and the point is his.": "Wie het eerst {n} heeft, wint. Als er NU staat, klik of druk op spatie vóór Bun. Te vroeg en het punt is voor hem.",
+  "GO!": "NU!",
+  "Quick draw with Bun": "Snelle hand met Bun",
+  "Rock paper scissors with Bun": "Steen, papier, schaar met Bun",
+  "Three in a row wins a round, first to {n} rounds wins. Click a square, or use the arrow keys and Space.": "Drie op een rij wint de ronde, wie het eerst {n} rondes heeft, wint. Klik op een vakje of gebruik de pijltjestoetsen en spatie.",
+  "Tic-tac-toe with Bun": "Boter-kaas-en-eieren met Bun",
+  "Wait for it…": "Wacht maar…",
+  "too early!": "te vroeg!",
+  "{ms} ms": "{ms} ms"
 }

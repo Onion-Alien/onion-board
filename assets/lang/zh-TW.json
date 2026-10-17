@@ -3553,5 +3553,18 @@
   "Start some music or a game, then press Send on it. Everyone in your call hears it.": "放點音樂或開個遊戲，然後按它旁邊的傳送。通話裡的所有人都聽得到。",
   "Turn on a trigger": "打開一個觸發器",
   "Click any dot to play that station. Press Send and your call hears it too.": "點任一個點即可播放該電台。按傳送，通話裡的人也聽得到。",
-  "Pick a station on the globe": "在地球上選個電台"
+  "Pick a station on the globe": "在地球上選個電台",
+  "Another game": "換個遊戲",
+  "Click to start": "點一下開始",
+  "Draw!": "平手！",
+  "First to {n} wins. Pick rock, paper or scissors with a click, or the keys 1, 2 and 3.": "先拿到 {n} 分的贏。點一下或按 1、2、3 鍵出石頭、布或剪刀。",
+  "First to {n} wins. When it says GO, click or press Space before Bun does. Too early and the point is his.": "先拿到 {n} 分的贏。出現「上！」時，比 Bun 先點一下或按空白鍵。偷跑的話，分數歸他。",
+  "GO!": "上！",
+  "Quick draw with Bun": "和 Bun 比手快",
+  "Rock paper scissors with Bun": "和 Bun 玩剪刀石頭布",
+  "Three in a row wins a round, first to {n} rounds wins. Click a square, or use the arrow keys and Space.": "連成三個贏一局，先贏 {n} 局的獲勝。點一下格子，或用方向鍵和空白鍵。",
+  "Tic-tac-toe with Bun": "和 Bun 玩井字遊戲",
+  "Wait for it…": "等一下…",
+  "too early!": "太早了！",
+  "{ms} ms": "{ms} 毫秒"
 }

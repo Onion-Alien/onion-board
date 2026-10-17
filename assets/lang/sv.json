@@ -3630,5 +3630,18 @@
   "Start some music or a game, then press Send on it. Everyone in your call hears it.": "Starta lite musik eller ett spel och tryck på Skicka vid det. Alla i samtalet hör det.",
   "Turn on a trigger": "Slå på en trigger",
   "Click any dot to play that station. Press Send and your call hears it too.": "Klicka på en prick för att spela stationen. Tryck på Skicka så hör ditt samtal den också.",
-  "Pick a station on the globe": "Välj en station på jordgloben"
+  "Pick a station on the globe": "Välj en station på jordgloben",
+  "Another game": "Ett annat spel",
+  "Click to start": "Klicka för att börja",
+  "Draw!": "Oavgjort!",
+  "First to {n} wins. Pick rock, paper or scissors with a click, or the keys 1, 2 and 3.": "Först till {n} vinner. Välj sten, sax eller påse med ett klick eller med tangenterna 1, 2 och 3.",
+  "First to {n} wins. When it says GO, click or press Space before Bun does. Too early and the point is his.": "Först till {n} vinner. När det står NU, klicka eller tryck på mellanslag före Bun. För tidigt, så är poängen hans.",
+  "GO!": "NU!",
+  "Quick draw with Bun": "Snabbdrag med Bun",
+  "Rock paper scissors with Bun": "Sten, sax, påse med Bun",
+  "Three in a row wins a round, first to {n} rounds wins. Click a square, or use the arrow keys and Space.": "Tre i rad vinner rundan, först till {n} rundor vinner. Klicka på en ruta, eller använd piltangenterna och mellanslag.",
+  "Tic-tac-toe with Bun": "Tre i rad med Bun",
+  "Wait for it…": "Vänta…",
+  "too early!": "för tidigt!",
+  "{ms} ms": "{ms} ms"
 }
