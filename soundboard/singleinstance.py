@@ -68,6 +68,50 @@ class InstanceServer(QLocalServer):
     show_requested = False   # launched again before the window existed
 
 
+def comes_to_front(argv: list[str], show_requested: bool) -> bool:
+    """Whether the main window takes the focus once it first shows. Yes on a normal
+    start (the installer's "Open Onion Board now", a shortcut): the splash never takes
+    the focus, so without this the window lands behind the browser. Not when started
+    with Windows (--tray), where a game may be in front, unless someone launched it
+    again meanwhile (that copy already let us take the focus)."""
+    from soundboard.autostart import TRAY_ARG
+    return TRAY_ARG not in argv or show_requested
+
+
+def bring_to_front(w):
+    """raise_ + activateWindow, and on Windows past the foreground lock: the launcher
+    (the installer) has usually exited by now, so Windows keeps whatever is next in
+    front and only flashes the taskbar button. Joining the input of the window in front
+    for a moment lets SetForegroundWindow work."""
+    w.raise_()
+    w.activateWindow()
+    try:
+        from ctypes import wintypes
+        u32 = ctypes.WinDLL("user32", use_last_error=True)
+        k32 = ctypes.WinDLL("kernel32", use_last_error=True)
+        u32.GetForegroundWindow.restype = wintypes.HWND
+        u32.GetWindowThreadProcessId.argtypes = (wintypes.HWND, ctypes.c_void_p)
+        u32.GetWindowThreadProcessId.restype = wintypes.DWORD
+        u32.AttachThreadInput.argtypes = (wintypes.DWORD, wintypes.DWORD, wintypes.BOOL)
+        u32.BringWindowToTop.argtypes = (wintypes.HWND,)
+        u32.SetForegroundWindow.argtypes = (wintypes.HWND,)
+        hwnd = int(w.winId())
+        front = u32.GetForegroundWindow()
+        if not hwnd or front == hwnd:
+            return
+        theirs = u32.GetWindowThreadProcessId(front, None) if front else 0
+        mine = k32.GetCurrentThreadId()
+        joined = bool(theirs and theirs != mine and u32.AttachThreadInput(mine, theirs, True))
+        try:
+            u32.BringWindowToTop(hwnd)
+            u32.SetForegroundWindow(hwnd)
+        finally:
+            if joined:
+                u32.AttachThreadInput(mine, theirs, False)
+    except Exception:  # noqa: BLE001 - raise_ + activateWindow already ran
+        log.debug("couldn't bring the window to the front", exc_info=True)
+
+
 def listen_for_second_launch(app, get_window) -> InstanceServer:
     """Bring the window to the front when someone launches Onion Board again."""
     QLocalServer.removeServer(INSTANCE_NAME)
