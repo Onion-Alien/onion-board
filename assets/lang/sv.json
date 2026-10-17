@@ -3803,5 +3803,14 @@
   "Rain, a crowd, an echo or sounds from your board, on top of any voice": "Regn, folkmassa, eko eller ljud från ditt board ovanpå vilken röst som helst",
   "Take “{effect}” off": "Ta bort ”{effect}”",
   "{site} didn't answer over Tor (it ignores some of Tor's addresses), and nor did {tries} other Tor routes. You can try this one without Tor: {site} would then see your own address.": "{site} svarade inte via Tor (den ignorerar vissa av Tors adresser), och inte heller via {tries} andra Tor-rutter. Du kan prova den här utan Tor: {site} skulle då se din egen adress.",
-  "Up next · {n} before it": "Härnäst · {n} före"
+  "Up next · {n} before it": "Härnäst · {n} före",
+  "13 new voice changer voices and 6 new AI voices.": "13 nya röstförvrängarröster och 6 nya AI-röster.",
+  "19 new voices": "19 nya röster",
+  "A softer storybook look, and their own look in every theme.": "En mjukare sagoboksstil, och en egen stil i varje tema.",
+  "Bun and Hoot redrawn": "Bun och Hoot har ritats om",
+  "Effects behind your voice, and new voices": "Effekter bakom din röst, och nya röster",
+  "Effects on any voice": "Effekter på vilken röst som helst",
+  "Share your voices and setups with everyone, and get theirs.": "Dela dina röster och uppsättningar med alla, och få deras.",
+  "The voice bar's Effects button puts rain, a crowd, a fire or a sound from your board behind your voice.": "Röstfältets Effekter-knapp lägger regn, en folkmassa, en eld eller ett ljud från ditt board bakom din röst.",
+  "Open Appearance": "Öppna Utseende"
 }

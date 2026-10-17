@@ -3803,5 +3803,14 @@
   "Rain, a crowd, an echo or sounds from your board, on top of any voice": "Sade, väkijoukko, kaiku tai äänet boardiltasi minkä tahansa äänen päälle",
   "Take “{effect}” off": "Poista ”{effect}”",
   "{site} didn't answer over Tor (it ignores some of Tor's addresses), and nor did {tries} other Tor routes. You can try this one without Tor: {site} would then see your own address.": "{site} ei vastannut Torin kautta (se ohittaa osan Torin osoitteista), eikä myöskään {tries} muun Tor-reitin kautta. Voit kokeilla tätä ilman Toria: {site} näkisi silloin oman osoitteesi.",
-  "Up next · {n} before it": "Seuraavana · {n} ennen sitä"
+  "Up next · {n} before it": "Seuraavana · {n} ennen sitä",
+  "13 new voice changer voices and 6 new AI voices.": "13 uutta äänenmuuntimen ääntä ja 6 uutta tekoälyääntä.",
+  "19 new voices": "19 uutta ääntä",
+  "A softer storybook look, and their own look in every theme.": "Pehmeämpi satukirjatyyli ja oma tyyli jokaisessa teemassa.",
+  "Bun and Hoot redrawn": "Bun ja Hoot piirretty uudelleen",
+  "Effects behind your voice, and new voices": "Efektejä äänesi taakse ja uusia ääniä",
+  "Effects on any voice": "Efektit mihin tahansa ääneen",
+  "Share your voices and setups with everyone, and get theirs.": "Jaa äänesi ja asetelmasi kaikille ja saa heidän omansa.",
+  "The voice bar's Effects button puts rain, a crowd, a fire or a sound from your board behind your voice.": "Äänipalkin Efektit-painike laittaa sateen, väkijoukon, tulen tai äänen soundboardiltasi äänesi taakse.",
+  "Open Appearance": "Avaa Ulkoasu"
 }

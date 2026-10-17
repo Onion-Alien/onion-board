@@ -3883,5 +3883,14 @@
   "Rain, a crowd, an echo or sounds from your board, on top of any voice": "Дождь, толпа, эхо или звуки с твоего борда поверх любого голоса",
   "Take “{effect}” off": "Убрать «{effect}»",
   "{site} didn't answer over Tor (it ignores some of Tor's addresses), and nor did {tries} other Tor routes. You can try this one without Tor: {site} would then see your own address.": "{site} не ответил через Tor (он игнорирует некоторые адреса Tor), как и через {tries} других маршрута Tor. Вы можете попробовать это без Tor: тогда {site} увидит ваш собственный адрес.",
-  "Up next · {n} before it": "Дальше · перед ним: {n}"
+  "Up next · {n} before it": "Дальше · перед ним: {n}",
+  "13 new voice changer voices and 6 new AI voices.": "13 новых голосов модулятора и 6 новых ИИ-голосов.",
+  "19 new voices": "19 новых голосов",
+  "A softer storybook look, and their own look in every theme.": "Более мягкий сказочный вид и свой облик в каждой теме.",
+  "Bun and Hoot redrawn": "Bun и Hoot перерисованы",
+  "Effects behind your voice, and new voices": "Эффекты за голосом и новые голоса",
+  "Effects on any voice": "Эффекты на любом голосе",
+  "Share your voices and setups with everyone, and get theirs.": "Делитесь своими голосами и наборами со всеми и берите чужие.",
+  "The voice bar's Effects button puts rain, a crowd, a fire or a sound from your board behind your voice.": "Кнопка Эффекты на панели голоса добавляет за ваш голос дождь, толпу, огонь или звук с вашей панели.",
+  "Open Appearance": "Открыть Внешний вид"
 }

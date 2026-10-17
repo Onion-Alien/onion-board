@@ -1,1 +1,0 @@
-- Muted for over a minute: the Live switch gets a yellow ring (and, with the side bar open, shows how long it's been muted), so a forgotten mute isn't mistaken for a broken app.

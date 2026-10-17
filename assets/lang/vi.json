@@ -3723,5 +3723,14 @@
   "Rain, a crowd, an echo or sounds from your board, on top of any voice": "Mưa, đám đông, tiếng vang hoặc âm thanh từ board của bạn, chồng lên bất kỳ giọng nào",
   "Take “{effect}” off": "Bỏ “{effect}”",
   "{site} didn't answer over Tor (it ignores some of Tor's addresses), and nor did {tries} other Tor routes. You can try this one without Tor: {site} would then see your own address.": "{site} không trả lời qua Tor (trang này bỏ qua một số địa chỉ của Tor), và {tries} tuyến Tor khác cũng vậy. Bạn có thể thử cái này mà không cần Tor: {site} sẽ thấy địa chỉ của chính bạn.",
-  "Up next · {n} before it": "Tiếp theo · {n} trước đó"
+  "Up next · {n} before it": "Tiếp theo · {n} trước đó",
+  "13 new voice changer voices and 6 new AI voices.": "13 giọng đổi giọng mới và 6 giọng AI mới.",
+  "19 new voices": "19 giọng mới",
+  "A softer storybook look, and their own look in every theme.": "Phong cách truyện tranh mềm mại hơn, và vẻ riêng trong mỗi chủ đề.",
+  "Bun and Hoot redrawn": "Bun và Hoot được vẽ lại",
+  "Effects behind your voice, and new voices": "Hiệu ứng sau giọng bạn, và giọng mới",
+  "Effects on any voice": "Hiệu ứng trên mọi giọng",
+  "Share your voices and setups with everyone, and get theirs.": "Chia sẻ giọng và thiết lập của bạn với mọi người, và lấy của họ.",
+  "The voice bar's Effects button puts rain, a crowd, a fire or a sound from your board behind your voice.": "Nút Hiệu ứng trên thanh giọng đặt tiếng mưa, đám đông, lửa hoặc âm thanh từ board của bạn phía sau giọng bạn.",
+  "Open Appearance": "Mở Vẻ bề ngoài"
 }

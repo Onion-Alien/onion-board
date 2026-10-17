@@ -3803,5 +3803,14 @@
   "Rain, a crowd, an echo or sounds from your board, on top of any voice": "Chuva, multidão, eco ou sons do seu board por cima de qualquer voz",
   "Take “{effect}” off": "Tirar “{effect}”",
   "{site} didn't answer over Tor (it ignores some of Tor's addresses), and nor did {tries} other Tor routes. You can try this one without Tor: {site} would then see your own address.": "{site} não respondeu pelo Tor (ignora alguns endereços do Tor), nem por {tries} outras rotas do Tor. Você pode tentar este sem o Tor: {site} veria seu próprio endereço.",
-  "Up next · {n} before it": "A seguir · {n} antes"
+  "Up next · {n} before it": "A seguir · {n} antes",
+  "13 new voice changer voices and 6 new AI voices.": "13 vozes novas do modificador de voz e 6 vozes de IA novas.",
+  "19 new voices": "19 vozes novas",
+  "A softer storybook look, and their own look in every theme.": "Um visual de livro ilustrado mais suave, e um visual próprio em cada tema.",
+  "Bun and Hoot redrawn": "Bun e Hoot redesenhados",
+  "Effects behind your voice, and new voices": "Efeitos atrás da sua voz, e vozes novas",
+  "Effects on any voice": "Efeitos em qualquer voz",
+  "Share your voices and setups with everyone, and get theirs.": "Compartilhe suas vozes e configurações com todo mundo, e pegue as deles.",
+  "The voice bar's Effects button puts rain, a crowd, a fire or a sound from your board behind your voice.": "O botão Efeitos da barra de voz coloca chuva, uma multidão, fogo ou um som do seu painel atrás da sua voz.",
+  "Open Appearance": "Abrir Aparência"
 }

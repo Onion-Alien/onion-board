@@ -3883,5 +3883,14 @@
   "Rain, a crowd, an echo or sounds from your board, on top of any voice": "Ploaie, mulțime, ecou sau sunete de pe board-ul tău peste orice voce",
   "Take “{effect}” off": "Scoate „{effect}”",
   "{site} didn't answer over Tor (it ignores some of Tor's addresses), and nor did {tries} other Tor routes. You can try this one without Tor: {site} would then see your own address.": "{site} nu a răspuns prin Tor (ignoră unele adrese ale lui Tor), și nici prin {tries} alte rute Tor. Puteți încerca acesta fără Tor: {site} va vedea atunci propria dvs. adresă.",
-  "Up next · {n} before it": "Urmează · {n} înainte"
+  "Up next · {n} before it": "Urmează · {n} înainte",
+  "13 new voice changer voices and 6 new AI voices.": "13 voci noi pentru schimbătorul de voce și 6 voci AI noi.",
+  "19 new voices": "19 voci noi",
+  "A softer storybook look, and their own look in every theme.": "Un aspect mai blând, de carte de povești, și un aspect propriu în fiecare temă.",
+  "Bun and Hoot redrawn": "Bun și Hoot redesenați",
+  "Effects behind your voice, and new voices": "Efecte în spatele vocii tale și voci noi",
+  "Effects on any voice": "Efecte pe orice voce",
+  "Share your voices and setups with everyone, and get theirs.": "Împarte vocile și setările tale cu toată lumea și ia-le pe ale lor.",
+  "The voice bar's Effects button puts rain, a crowd, a fire or a sound from your board behind your voice.": "Butonul Efecte din bara vocii pune ploaie, o mulțime, un foc sau un sunet de pe board-ul tău în spatele vocii tale.",
+  "Open Appearance": "Deschide Aspect"
 }

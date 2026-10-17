@@ -1,1 +1,0 @@
-- Voice tab: the tabs at the top are bigger with a line under them, and My setups sits in its own slim box with smaller buttons, so the tabs, your setups and the card below no longer run together.
