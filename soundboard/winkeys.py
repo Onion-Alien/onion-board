@@ -6,7 +6,13 @@ Python process in the path of *every* keypress on the PC. When Python is busy
 and keys can appear stuck (a held W in a game kept "moving" for ~10 s).
 
 RegisterHotKey is different: Windows only notifies us when one of *our* combos
-is pressed, and never waits on us, so we can't lag or block anyone's input.
+is pressed, and never waits on us, so we can't lag or block anyone's input. But it
+takes the key: a game never sees a W that plays a sound.
+
+So by default (`Hotkeys.share`) keys are read from Windows' raw input instead: a copy
+of every key press is posted to our thread after the fact, so the game still gets the
+key and, as with RegisterHotKey, nobody ever waits on us. Keys that must not reach the
+game (the overlay's number keys while it's open) are still taken with RegisterHotKey.
 """
 from __future__ import annotations
 
@@ -14,6 +20,7 @@ import ctypes
 import ctypes.wintypes as wt
 import html
 import logging
+import os
 import threading
 
 from PySide6.QtCore import QObject, Signal
@@ -28,6 +35,7 @@ kernel32 = ctypes.WinDLL("kernel32", use_last_error=True)
 
 MOD_ALT, MOD_CONTROL, MOD_SHIFT, MOD_WIN, MOD_NOREPEAT = 0x1, 0x2, 0x4, 0x8, 0x4000
 WM_HOTKEY, WM_APP, WM_TIMER = 0x0312, 0x8000, 0x0113
+WM_INPUT = 0x00FF
 HELD_POLL_MS = 25     # while a hotkey is held: how often we look for it being let go
 MODS = {"ctrl": MOD_CONTROL, "alt": MOD_ALT, "shift": MOD_SHIFT, "windows": MOD_WIN}
 MOD_ALIASES = {"control": "ctrl", "win": "windows", "left windows": "windows",
@@ -203,6 +211,84 @@ def combo_name(mods: int, vk: int) -> str:
     return "+".join(parts)
 
 
+def is_typing_key(vk: int) -> bool:
+    """Letters, digits, punctuation, Space, Enter, Tab, Backspace, arrows: keys people
+    type with. F-keys, the numpad, Insert/Home/…, media keys are fine bare."""
+    return (0x30 <= vk <= 0x39 or 0x41 <= vk <= 0x5A or 0xBA <= vk <= 0xC0
+            or 0xDB <= vk <= 0xDF or 0x25 <= vk <= 0x28
+            or vk in (0x08, 0x09, 0x0D, 0x20, 0xE2))   # 0xE2: the extra key of ISO keyboards
+
+
+# ---------------------------------------------------------------- raw input (shared keys)
+
+RIM_TYPEKEYBOARD, RID_INPUT = 1, 0x10000003
+RIDEV_REMOVE, RIDEV_INPUTSINK = 0x1, 0x100
+RI_KEY_BREAK, RI_KEY_E0 = 0x1, 0x2
+HWND_MESSAGE = -3
+# the numpad's keys by scan code (no E0 prefix): with Num Lock on they're the digits
+NUMPAD_SCANS = {0x52: 0x60, 0x4F: 0x61, 0x50: 0x62, 0x51: 0x63, 0x4B: 0x64, 0x4C: 0x65,
+                0x4D: 0x66, 0x47: 0x67, 0x48: 0x68, 0x49: 0x69, 0x53: 0x6E}
+
+
+class _RAWINPUTDEVICE(ctypes.Structure):
+    _fields_ = [("usUsagePage", wt.USHORT), ("usUsage", wt.USHORT), ("dwFlags", wt.DWORD),
+                ("hwndTarget", wt.HWND)]
+
+
+class _RAWINPUTHEADER(ctypes.Structure):
+    _fields_ = [("dwType", wt.DWORD), ("dwSize", wt.DWORD), ("hDevice", wt.HANDLE),
+                ("wParam", wt.WPARAM)]
+
+
+class _RAWKEYBOARD(ctypes.Structure):
+    _fields_ = [("MakeCode", wt.USHORT), ("Flags", wt.USHORT), ("Reserved", wt.USHORT),
+                ("VKey", wt.USHORT), ("Message", wt.UINT), ("ExtraInformation", wt.ULONG)]
+
+
+class _RAWINPUT(ctypes.Structure):
+    _fields_ = [("header", _RAWINPUTHEADER), ("keyboard", _RAWKEYBOARD)]
+
+
+user32.RegisterRawInputDevices.argtypes = (ctypes.POINTER(_RAWINPUTDEVICE), wt.UINT, wt.UINT)
+user32.RegisterRawInputDevices.restype = wt.BOOL
+user32.GetRawInputData.argtypes = (wt.HANDLE, wt.UINT, ctypes.c_void_p,
+                                   ctypes.POINTER(wt.UINT), wt.UINT)
+user32.GetRawInputData.restype = wt.UINT
+user32.CreateWindowExW.argtypes = (wt.DWORD, wt.LPCWSTR, wt.LPCWSTR, wt.DWORD, ctypes.c_int,
+                                   ctypes.c_int, ctypes.c_int, ctypes.c_int, wt.HWND,
+                                   wt.HMENU, wt.HINSTANCE, wt.LPVOID)
+user32.CreateWindowExW.restype = wt.HWND
+user32.DestroyWindow.argtypes = (wt.HWND,)
+user32.DefWindowProcW.argtypes = (wt.HWND, wt.UINT, wt.WPARAM, wt.LPARAM)
+user32.DefWindowProcW.restype = ctypes.c_ssize_t
+user32.GetWindowThreadProcessId.argtypes = (wt.HWND, ctypes.POINTER(wt.DWORD))
+user32.GetKeyState.argtypes = (ctypes.c_int,)
+user32.GetKeyState.restype = ctypes.c_short
+
+
+def raw_vk(vkey: int, scan: int, flags: int, numlock: bool) -> int:
+    """A raw key press's key, named the way RegisterHotKey names it: with Num Lock on,
+    the numpad's keys are its digits (Num 1, not End)."""
+    if (numlock and not flags & RI_KEY_E0 and scan in NUMPAD_SCANS
+            and not 0x60 <= vkey <= 0x6F):
+        return NUMPAD_SCANS[scan]
+    return vkey
+
+
+def held_mods() -> int:
+    """The modifier flags (MOD_*) held down right now."""
+    return ((MOD_CONTROL if is_down(0x11) else 0) | (MOD_ALT if is_down(0x12) else 0)
+            | (MOD_SHIFT if is_down(0x10) else 0)
+            | (MOD_WIN if is_down(0x5B) or is_down(0x5C) else 0))
+
+
+def own_window_in_front() -> bool:
+    """Is one of this app's windows the one in front (where keys type)?"""
+    pid = wt.DWORD()
+    user32.GetWindowThreadProcessId(user32.GetForegroundWindow(), ctypes.byref(pid))
+    return pid.value == os.getpid()
+
+
 user32.SetTimer.argtypes = (wt.HWND, ctypes.c_size_t, wt.UINT, ctypes.c_void_p)
 user32.SetTimer.restype = ctypes.c_size_t
 user32.KillTimer.argtypes = (wt.HWND, ctypes.c_size_t)
@@ -216,6 +302,9 @@ class _MSG(ctypes.Structure):
 class Hotkeys(QObject):
     """RegisterHotKey on a private thread; emits `fired(action)` on the Qt thread, and
     `released(action)` when that key (or MIDI pad) is let go again, for hold-to-play.
+
+    With `share` on (set it before `register`), keys are read from raw input instead,
+    so the game in front still gets them; the combos in `grab` are always taken.
 
     Combos starting `midi:` are MIDI pads (soundboard.midi), handled by `self.midi`.
 
@@ -232,7 +321,9 @@ class Hotkeys(QObject):
         self._midi_map: dict[str, str] = {}
         self.midi.pressed.connect(self._midi_pressed)
         self.midi.released.connect(self._midi_released)
-        self._pending: dict[str, str] | None = None
+        self._pending: tuple[dict[str, str], bool, set[str]] | None = None
+        self.share = False               # the game gets the keys too (see the module doc)
+        self.grab: set[str] = set()      # ...except these, kept from it (the overlay's)
         self._lock = threading.Lock()
         self._ready = threading.Event()
         self._tid = 0
@@ -249,7 +340,8 @@ class Hotkeys(QObject):
         self._midi_map = {c: a for c, a in mapping.items() if midi.is_midi(c)}
         self.midi.want({p[2] for p in map(midi.parse, self._midi_map) if p})
         with self._lock:
-            self._pending = {c: a for c, a in mapping.items() if not midi.is_midi(c)}
+            self._pending = ({c: a for c, a in mapping.items() if not midi.is_midi(c)},
+                             bool(self.share), set(self.grab))
         if not self._tid or not user32.PostThreadMessageW(self._tid, WM_APP, 0, 0):
             log.error("can't reach the hotkey thread (error %d)", ctypes.get_last_error())
 
@@ -279,6 +371,9 @@ class Hotkeys(QObject):
         self._watch_seen: set[int] = set()         # watched keys down at the last check
         self._watch_down: set[int] = set()         # ... of those, the ones that fired
         self._watch_timer = 0
+        self._shared: dict[tuple[int, int], str] = {}   # (mods, vk) -> action, raw input
+        self._raw_hwnd = 0                         # the raw input's message-only window
+        self._raw_on = False
         try:
             self._tid = kernel32.GetCurrentThreadId()
             msg = _MSG()
@@ -297,9 +392,72 @@ class Hotkeys(QObject):
             self._ready.set()        # never leave __init__ waiting on a thread that died
             for hid in actions:
                 user32.UnregisterHotKey(None, hid)
+            try:
+                self._set_raw(False)
+                if self._raw_hwnd:
+                    user32.DestroyWindow(self._raw_hwnd)
+            except OSError:
+                pass
+
+    def _set_raw(self, on: bool) -> bool:
+        """Start (or stop) getting a copy of every key press. False if Windows says no."""
+        if on == self._raw_on:
+            return True
+        try:
+            if on and not self._raw_hwnd:
+                self._raw_hwnd = user32.CreateWindowExW(0, "STATIC", None, 0, 0, 0, 0, 0,
+                                                        HWND_MESSAGE, None, None, None) or 0
+                if not self._raw_hwnd:
+                    raise OSError(f"CreateWindowEx: error {ctypes.get_last_error()}")
+            dev = _RAWINPUTDEVICE(1, 6, RIDEV_INPUTSINK if on else RIDEV_REMOVE,
+                                  self._raw_hwnd if on else None)
+            if not user32.RegisterRawInputDevices(ctypes.byref(dev), 1, ctypes.sizeof(dev)):
+                raise OSError(f"RegisterRawInputDevices: error {ctypes.get_last_error()}")
+        except OSError as e:
+            log.warning("can't read keys without taking them (%s): hotkeys take them", e)
+            return False
+        self._raw_on = on
+        return True
+
+    def _on_raw(self, handle: int):
+        """A WM_INPUT: one key going down or up somewhere on the PC."""
+        size = wt.UINT(ctypes.sizeof(_RAWINPUT) + 16)
+        buf = ctypes.create_string_buffer(size.value)
+        got = user32.GetRawInputData(handle, RID_INPUT, buf, ctypes.byref(size),
+                                     ctypes.sizeof(_RAWINPUTHEADER))
+        if got == 0xFFFFFFFF or got < ctypes.sizeof(_RAWINPUT):
+            return
+        ri = _RAWINPUT.from_buffer_copy(buf.raw[:ctypes.sizeof(_RAWINPUT)])
+        if ri.header.dwType != RIM_TYPEKEYBOARD:
+            return
+        kb = ri.keyboard
+        if kb.Flags & RI_KEY_BREAK:
+            return   # let go: the held-key timer sees that, as for RegisterHotKey's keys
+        self._key_down(raw_vk(kb.VKey, kb.MakeCode, kb.Flags,
+                              bool(user32.GetKeyState(0x90) & 1)))
+
+    def _key_down(self, vk: int):
+        """A key went down (a held key repeats: once only). Fire its shared hotkey."""
+        if vk in MODIFIER_VKS or vk in self._held or not 0 < vk < 0xFF:
+            return
+        mods = held_mods()
+        act = self._shared.get((mods, vk))
+        if act is None:
+            return
+        # typing in the board itself (its search box): a bare letter types, it doesn't play
+        if (is_typing_key(vk) and not mods & (MOD_CONTROL | MOD_ALT | MOD_WIN)
+                and own_window_in_front()):
+            return
+        self.fired.emit(act)
+        self._held[vk] = act
+        if not self._timer:
+            self._timer = user32.SetTimer(None, 0, HELD_POLL_MS, None)
 
     def _handle(self, msg, actions: dict[int, tuple[str, int]]):
-        if msg.message == WM_HOTKEY:
+        if msg.message == WM_INPUT:
+            self._on_raw(msg.lParam)
+            user32.DefWindowProcW(msg.hwnd, msg.message, msg.wParam, msg.lParam)   # cleans up
+        elif msg.message == WM_HOTKEY:
             hit = actions.get(msg.wParam)
             if hit:
                 act, vk = hit
@@ -320,9 +478,10 @@ class Hotkeys(QObject):
                 self._timer = 0
         elif msg.message == WM_APP:
             with self._lock:
-                mapping, self._pending = self._pending, None
-            if mapping is None:
+                pending, self._pending = self._pending, None
+            if pending is None:
                 return
+            mapping, share, grab = pending
             for hid in actions:
                 user32.UnregisterHotKey(None, hid)
             actions.clear()
@@ -332,6 +491,11 @@ class Hotkeys(QObject):
             self._watched.clear()
             self._watch_down.clear()
             self._watch_seen.clear()
+            self._shared.clear()
+            shared = {c for c in mapping if share and c and c not in grab}
+            share = bool(shared) and self._set_raw(True)
+            if not share:
+                self._set_raw(False)
             failed = []
             for i, (combo, act) in enumerate(mapping.items(), start=1):
                 if not combo:
@@ -341,7 +505,9 @@ class Hotkeys(QObject):
                     failed.append(combo)   # shown as not working, not silently dropped
                     continue
                 mods, vk = parsed
-                if reserved(combo):
+                if share and combo in shared:
+                    self._shared.setdefault(parsed, act)
+                elif reserved(combo):
                     self._watched[vk] = act
                 elif user32.RegisterHotKey(None, i, mods | MOD_NOREPEAT, vk):
                     actions[i] = (act, vk)

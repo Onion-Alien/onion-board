@@ -38,7 +38,7 @@ TABS = ((_("Sounds"), _("Your sound buttons: click one to play it")),
         (_("Triggers"), _("Play a sound when something shows up on your screen (“YOU DIED”…)")),
         (_("Voice"), _("Change your voice, speak another language, or use text-to-speech")),
         (_("Setup"), _("Pick where your sounds go (Discord, games, OBS…), test it")),
-        (_("Store"), _("Free sounds anyone can use, voted by players: add them or share "
+        (_("Free sounds"), _("Free sounds anyone can use, voted by players: add them or share "
                        "your own")))
 TAB_INDEX = {key: i for i, key in enumerate(TAB_KEYS)}
 BEFORE_SETUP = ("store",)   # last in TAB_KEYS, but on the rail before Setup

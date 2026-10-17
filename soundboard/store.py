@@ -29,10 +29,24 @@ FEATURE = "sound_store"   # its switch in Settings > Privacy & security (soundbo
 BASE = "https://onion-board-store.onion-alien.workers.dev"
 AGREEMENT = "own-cc0-v1"    # the upload agreement's version (the server checks it)
 LINK_AGREEMENT = "link-v1"  # sharing a link: only the link is kept
+CONTACT = "onionboard.contact@proton.me"   # copyright and takedown requests
 MAX_BYTES = 4 << 20         # the biggest sound the store takes
 EXTS = (".mp3", ".ogg", ".wav", ".flac")   # what it takes (checked from the bytes there)
 LIST_LIMIT = 1 << 20        # a page of the list is a few KB
 REASONS = ("copyright", "offensive", "broken", "other")
+# the store's categories (the server's CATS), in the order the chips show them
+CATS = ("memes", "reactions", "games", "movies", "tv", "music", "sports", "viral", "pranks",
+        "politics", "streamer", "esports", "podcast", "spooky")
+
+
+def cat_name(key: str) -> str:
+    """A category's name, in the app's language ("" for none or one this version doesn't
+    know)."""
+    return {"memes": _("Memes"), "reactions": _("Reactions"), "games": _("Games"),
+            "movies": _("Movies"), "tv": _("TV"), "music": _("Music"), "sports": _("Sports"),
+            "viral": _("Viral"), "pranks": _("Pranks"), "politics": _("Politics"),
+            "streamer": _("Streaming"), "esports": _("Esports"), "podcast": _("Podcast"),
+            "spooky": _("Spooky")}.get(key, "")
 ID_LEN = 12
 
 
@@ -53,6 +67,8 @@ class Sound:
     mine: int = 0      # this install's vote: 1, -1 or 0
     tags: list[str] = field(default_factory=list)
     link: str = ""     # a shared link (ext "link"): no file, the site's own download
+    cat: str = ""      # one of CATS, or none
+    source: str = ""   # "myinstants": brought in from that site by the server; "" shared here
 
     @property
     def is_link(self) -> bool:
@@ -89,7 +105,9 @@ def parse(raw) -> tuple[list[Sound], bool]:
                       author=str(d.get("author") or "").strip()[:60],
                       created=int(d.get("created") or 0), mine=int(d.get("mine") or 0),
                       tags=[str(t)[:24] for t in d.get("tags") or [] if isinstance(t, str)][:8],
-                      link=str(d.get("link") or "")[:500])
+                      link=str(d.get("link") or "")[:500],
+                      cat=str(d.get("cat") or "") if d.get("cat") in CATS else "",
+                      source=str(d.get("source") or "")[:20])
         except (KeyError, TypeError, ValueError):
             continue
         if (len(s.id) != ID_LEN or not all(c in "0123456789abcdef" for c in s.id)
@@ -157,18 +175,34 @@ def _why(code: int, err: str) -> str:
     return _("The sound store had a problem. Try again in a bit.")
 
 
-def browse(install: str, sort: str = "top", query: str = "", offset: int = 0
-           ) -> tuple[list[Sound], bool]:
-    """A page of the store: the best first ("top") or the newest ("new"), only those
-    matching `query` when it isn't empty. Call off the UI thread."""
+def browse(install: str, sort: str = "top", query: str = "", offset: int = 0,
+           cat: str = "") -> tuple[list[Sound], bool]:
+    """A page of the store: the best first ("top"), the newest ("new") or what's hot now
+    ("trending"), only those in category `cat` and matching `query` when they're given.
+    Call off the UI thread."""
     netlog.cause(FEATURE, "You opened the Store tab: reading the list of sounds")
-    q = urllib.parse.urlencode({"sort": "new" if sort == "new" else "top",
+    q = urllib.parse.urlencode({"sort": sort if sort in ("new", "trending") else "top",
+                                **({"cat": cat} if cat in CATS else {}),
                                 **({"q": query[:60]} if query.strip() else {}),
                                 **({"offset": offset} if offset else {})})
     data = _request("GET", f"/v1/sounds?{q}", install)
     try:
         return parse(json.loads(data.decode("utf-8")))
     except ValueError:
+        raise StoreError(_("The sound store had a problem. Try again in a bit.")) from None
+
+
+def categories(install: str) -> tuple[list[tuple[str, int]], int]:
+    """The categories with sounds in them, the biggest first, as (key, how many), and how
+    many sounds there are in all. Call off the UI thread."""
+    netlog.cause(FEATURE, "You opened the Store tab: reading its categories")
+    data = _request("GET", "/v1/categories", install)
+    try:
+        raw = json.loads(data.decode("utf-8"))
+        cats = [(str(c["cat"]), max(0, int(c["n"]))) for c in raw.get("categories") or ()
+                if isinstance(c, dict) and c.get("cat") in CATS]
+        return cats, max(0, int(raw.get("total") or 0))
+    except (ValueError, TypeError, KeyError, AttributeError):
         raise StoreError(_("The sound store had a problem. Try again in a bit.")) from None
 
 

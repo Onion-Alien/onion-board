@@ -19,7 +19,7 @@ from PySide6.QtGui import QDesktopServices
 from PySide6.QtWidgets import QApplication, QMessageBox, QSystemTrayIcon
 from shiboken6 import isValid as qt_valid
 
-from soundboard import errors, exitwatch, net, netlog, updates, usage, watchaddon
+from soundboard import errors, exitwatch, net, netlog, remote, updates, usage, watchaddon
 from soundboard.i18n import _
 from soundboard.ui import busy, worker
 from soundboard.ui.controller import Controller
@@ -197,8 +197,10 @@ class UpdateControl(Controller):
 
     @staticmethod
     def _wait(fn, give_up, name: str) -> bool:
-        """Run `fn` on a thread, keeping the loading screen moving, until it's done
-        (True) or `give_up()` (False; the thread is left to finish on its own)."""
+        """Run `fn` on a thread, keeping the loading screen moving and the control API
+        answering (Windows' own loading screen handles no events: remote.answer_waiting),
+        until it's done (True) or `give_up()` (False; the thread is left to finish on
+        its own)."""
         import threading
 
         from soundboard.ui import splash
@@ -208,6 +210,7 @@ class UpdateControl(Controller):
             if give_up():
                 return False
             splash.pump()
+            remote.answer_waiting()
             t.join(0.03)
         return True
 

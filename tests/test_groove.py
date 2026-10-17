@@ -91,3 +91,21 @@ def test_reads_only_whats_been_played_and_copes_with_seeks():
     assert g.bpm == 0 and g.style == ""
     g.feed(None, 0.3)                # nothing to read: harmless
     g.feed(data[:100], 0.3)          # too short to hear: harmless
+
+
+def test_hits_carry_the_time_they_are_heard_and_are_read_a_little_ahead():
+    bpm = 120
+    data = _club(bpm, 8, np.random.default_rng(5))
+    g = Groove()
+    end = _play(g, data, 0, 6)
+    kicks = np.arange(0, 8, 60 / bpm)
+    times = [t for t, _s in g.hits["bass"]]
+    assert len(times) >= 6
+    # each on a kick, to within a 10 ms frame or so (Bun's head lands on these)
+    assert all(np.abs(kicks - t).min() < 0.02 for t in times), times
+    # the next kick is already known 30 ms before it's heard, and last_hit leaves it out
+    nxt = kicks[kicks > end + 0.1][0]
+    g.feed(data, (nxt - 0.03) * SR / len(data), now=nxt - 0.03)
+    until, _s = g.next_hit("bass", nxt - 0.03)
+    assert abs(until - 0.03) < 0.02
+    assert g.last_hit("bass", nxt - 0.03)[0] > 0.3

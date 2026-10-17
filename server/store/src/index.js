@@ -7,6 +7,7 @@
 // sound. Addresses are kept the same way, only to stop one address flooding the store.
 import { ADMIN_PAGE } from "./admin.js";
 import { chatRoute } from "./chat.js";
+import { syncStep } from "./sync.js";
 
 export { ChatRoom } from "./chat.js";   // the Durable Object wrangler.toml names
 
@@ -16,10 +17,12 @@ const UPLOADS_PER_DAY = 10;          // per install
 const UPLOADS_PER_IP_DAY = 20;
 const VOTES_PER_IP_DAY = 400;
 const VOTES_PER_IP_SOUND_DAY = 6;    // one address can't stuff one sound's votes with made-up installs
+const INSTALLS_PER_IP_SOUND = 3;     // ... nor over days: installs from one address that ever voted on it
 const REPORTS_PER_IP_DAY = 30;
 const REPORTS_TO_HIDE = 3;
 const LOG_DAYS = 90;                 // the action log keeps this many days           // reports from different addresses: back to review
 const PENDING_CAP = 1000;            // a full review queue refuses new uploads
+const PENDING_BYTES = 300 << 20;     // ... and so do 300 MB of waiting files (KV's free plan holds 1 GB)
 const AGREEMENT = "own-cc0-v1";      // the version of the upload agreement accepted
 const LINK_AGREEMENT = "link-v1";    // a shared link: only the link is kept
 // the sites a link may point at (as the app's soundboard/sourceinfo.py): never a file host
@@ -27,6 +30,10 @@ const LINK_SITES = ["youtube.com", "youtu.be", "music.youtube.com", "tiktok.com"
   "soundcloud.com", "instagram.com", "twitter.com", "x.com", "reddit.com", "twitch.tv",
   "vimeo.com", "bandcamp.com", "myinstants.com", "streamable.com", "dailymotion.com"];
 const ID_RE = /^[0-9a-f]{12}$/;
+// the store's categories (the app names them); a sound has one, or none
+export const CATS = ["memes", "reactions", "games", "movies", "tv", "music", "sports", "viral",
+  "pranks", "politics", "streamer", "esports", "podcast", "spooky"];
+const TRENDING_DAYS = 7;             // Trending counts the 👍 of the last week
 const INSTALL_RE = /^[0-9a-f-]{16,64}$/;
 const TYPES = { mp3: "audio/mpeg", ogg: "audio/ogg", wav: "audio/wav", flac: "audio/flac" };
 
@@ -42,7 +49,8 @@ export default {
   },
   // the daily cron (wrangler.toml): old log rows and rate-limit counters go
   async scheduled(event, env) {
-    await prune(env);
+    if (event.cron === "17 3 * * *") await prune(env);
+    else await syncStep(env, TOOLS);
   },
 };
 
@@ -78,6 +86,7 @@ async function route(req, env) {
       "x-frame-options": "DENY", "referrer-policy": "no-referrer", "cache-control": "no-store" } });
   if (p === "/v1/chat" || /^\/v1\/chat\/\d+\/report$/.test(p)) return chatRoute(req, env);
   if (p === "/v1/sounds" && m === "GET") return list(url, req, env);
+  if (p === "/v1/categories" && m === "GET") return categories(env);
   if (p === "/v1/sounds" && m === "POST") return upload(req, env);
   if (p === "/v1/links" && m === "POST") return shareLink(req, env);
   if ((g = p.match(/^\/v1\/sounds\/([0-9a-f]{12})\/file$/)) && m === "GET")
@@ -91,6 +100,7 @@ async function route(req, env) {
     if (p === "/v1/admin/chat" || p.startsWith("/v1/admin/chat/")) return chatRoute(req, env);
     if (p === "/v1/admin/queue" && m === "GET") return queue(url, env);
     if (p === "/v1/admin/log" && m === "GET") return actionLog(url, env);
+    if (p === "/v1/admin/sync" && m === "POST") return json(await syncStep(env, TOOLS));
     if (p === "/v1/admin/import" && m === "POST") return upload(req, env, true);
     if ((g = p.match(/^\/v1\/admin\/sounds\/([0-9a-f]{12})\/file$/)) && m === "GET")
       return file(env, g[1], true);
@@ -202,20 +212,25 @@ function linkKey(raw) {
 
 function shown(r) {
   return { id: r.id, name: r.name, tags: r.tags ? r.tags.split(",") : [], ext: r.ext,
-           link: r.link || "",
+           link: r.link || "", cat: r.cat || "", source: r.source || "",
            size: r.size, author: r.author, up: r.up, down: r.down, created: r.created,
            ...(r.mine !== undefined ? { mine: r.mine || 0 } : {}) };
 }
 
+const TOOLS = { sha256, linkKey, cleanName, now, logAction };
+
 // ------------------------------------------------------------------ public routes
 
 async function list(url, req, env) {
-  const sort = url.searchParams.get("sort") === "new" ? "new" : "top";
+  const sort = ["new", "trending"].includes(url.searchParams.get("sort"))
+    ? url.searchParams.get("sort") : "top";
+  const cat = url.searchParams.get("cat") || "";
   const q = cleanName(url.searchParams.get("q")).toLowerCase();
   const offset = Math.max(0, Math.min(10000, parseInt(url.searchParams.get("offset")) || 0));
   const voter = await installHash(req, env, false);
   const where = ["s.status = 'live'"];
   const args = [];
+  if (CATS.includes(cat)) { where.push("s.cat = ?"); args.push(cat); }
   if (q) {
     for (const word of q.split(" ").slice(0, 5)) {
       where.push("(lower(s.name) LIKE ? ESCAPE '\\' OR s.tags LIKE ? ESCAPE '\\')");
@@ -223,16 +238,31 @@ async function list(url, req, env) {
       args.push(like, like);
     }
   }
+  // Top: votes, then how popular it is where it came from (the store's own sounds sit
+  // mid-way); Trending: what's hot on the sites now plus this week's 👍 here
   const order = sort === "new" ? "s.created DESC"
-    : "(s.up - s.down) DESC, s.up DESC, s.created DESC";
+    : sort === "trending" ? "(s.hot + 40 * (SELECT count(*) FROM actions a WHERE a.sound = s.id " +
+      "AND a.kind = 'vote' AND a.detail = '1' AND a.at > ?)) DESC, (s.up - s.down) DESC, s.pop DESC"
+    : "(s.up - s.down) DESC, s.up DESC, (CASE WHEN s.source = '' THEN 500 ELSE s.pop END) DESC, " +
+      "s.created DESC";
+  const since = sort === "trending" ? [now() - TRENDING_DAYS * 86400] : [];
   const mine = voter ? ", (SELECT value FROM votes v WHERE v.sound = s.id AND v.voter = ?) AS mine" : "";
   const sql = `SELECT s.*${mine} FROM sounds s WHERE ${where.join(" AND ")} ` +
               `ORDER BY ${order} LIMIT ? OFFSET ?`;
   const rows = await env.DB.prepare(sql)
-    .bind(...(voter ? [voter] : []), ...args, PAGE + 1, offset).all();
+    .bind(...(voter ? [voter] : []), ...args, ...since, PAGE + 1, offset).all();
   const res = rows.results || [];
   return json({ sounds: res.slice(0, PAGE).map(shown), more: res.length > PAGE,
                 agreement: AGREEMENT, max_bytes: MAX_BYTES });
+}
+
+// how many live sounds each category has (the app's category chips)
+async function categories(env) {
+  const rows = await env.DB.prepare("SELECT cat, count(*) AS n FROM sounds " +
+    "WHERE status = 'live' AND cat != '' GROUP BY cat ORDER BY n DESC").all();
+  const total = await env.DB.prepare("SELECT count(*) AS n FROM sounds WHERE status = 'live'").first();
+  return json({ categories: (rows.results || []).filter(r => CATS.includes(r.cat)),
+                total: total.n }, 200, { "cache-control": "public, max-age=600" });
 }
 
 async function file(env, id, any) {
@@ -244,7 +274,8 @@ async function file(env, id, any) {
   return new Response(obj, { headers: {
     "content-type": TYPES[row.ext] || "application/octet-stream",
     "content-length": String(obj.byteLength),
-    "cache-control": any ? "no-store" : "public, max-age=86400",
+    // an hour at most: a sound rejected after reports stops being served soon after
+    "cache-control": any ? "no-store" : "public, max-age=3600",
     "x-content-type-options": "nosniff" } });
 }
 
@@ -273,9 +304,7 @@ async function upload(req, env, imported = false) {
   if (await env.DB.prepare("SELECT 1 FROM sounds WHERE sha256 = ?").bind(hash).first())
     fail("duplicate", 409);
   if (!imported) {
-    const pending = await env.DB.prepare(
-      "SELECT count(*) AS n FROM sounds WHERE status = 'pending'").first();
-    if (pending.n >= PENDING_CAP) fail("queue full", 503);
+    await roomInQueue(env, bytes.length);
     if (!await allow(env, "upload", uploader, UPLOADS_PER_DAY)
         || !await allow(env, "upload-ip", ip, UPLOADS_PER_IP_DAY)) fail("slow down", 429);
   }
@@ -302,9 +331,7 @@ async function shareLink(req, env) {
   const hash = await sha256("link:" + key);
   if (await env.DB.prepare("SELECT 1 FROM sounds WHERE sha256 = ?").bind(hash).first())
     fail("duplicate", 409);
-  const pending = await env.DB.prepare(
-    "SELECT count(*) AS n FROM sounds WHERE status = 'pending'").first();
-  if (pending.n >= PENDING_CAP) fail("queue full", 503);
+  await roomInQueue(env, 0);
   const uploader = await installHash(req, env);
   const ip = await ipHash(req, env);
   if (!await allow(env, "upload", uploader, UPLOADS_PER_DAY)
@@ -315,6 +342,13 @@ async function shareLink(req, env) {
     .bind(id, n, cleanTags(tags), "https://" + key, hash, uploader, ip, now()).run();
   await logAction(env, "link", { sound: id, ip, install: uploader, detail: n });
   return json({ id, status: "pending" }, 201);
+}
+
+// the review queue takes so many sounds, and so many bytes of files, then refuses more
+async function roomInQueue(env, size) {
+  const p = await env.DB.prepare("SELECT count(*) AS n, coalesce(sum(size), 0) AS b " +
+    "FROM sounds WHERE status = 'pending'").first();
+  if (p.n >= PENDING_CAP || p.b + size > PENDING_BYTES) fail("queue full", 503);
 }
 
 async function body(req) {
@@ -343,6 +377,23 @@ async function vote(req, env, id) {
   if (!await allow(env, "vote-ip", ip, VOTES_PER_IP_DAY)
       || !await allow(env, "vote-ip-sound", `${ip}:${id}`, VOTES_PER_IP_SOUND_DAY))
     fail("slow down", 429);
+  // a new install id is free to make: only so many from one address may vote on a sound,
+  // ever (taking a vote back doesn't free its place)
+  const known = await env.DB.prepare("SELECT 1 FROM vote_from WHERE sound = ? AND voter = ?")
+    .bind(id, voter).first();
+  if (!known && value !== 0) {
+    const n = (await env.DB.prepare("SELECT count(*) AS n FROM vote_from WHERE sound = ? AND ip = ?")
+      .bind(id, ip).first()).n;
+    if (n >= INSTALLS_PER_IP_SOUND) {
+      if (n === INSTALLS_PER_IP_SOUND)   // logged once: the place it's refused at is kept below
+        await logAction(env, "limit", { sound: id, ip, install: voter, detail: "vote-installs" });
+      await env.DB.prepare("INSERT OR IGNORE INTO vote_from (sound, voter, ip) VALUES (?, ?, ?)")
+        .bind(id, "x:" + ip, ip).run();
+      fail("slow down", 429);
+    }
+    await env.DB.prepare("INSERT INTO vote_from (sound, voter, ip) VALUES (?, ?, ?)")
+      .bind(id, voter, ip).run();
+  }
   if (value === 0) {
     await env.DB.prepare("DELETE FROM votes WHERE sound = ? AND voter = ?").bind(id, voter).run();
   } else {

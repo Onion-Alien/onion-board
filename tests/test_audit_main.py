@@ -319,16 +319,20 @@ def test_an_empty_loose_file_stops_the_timer(window):
 
 # --------------------------------------------------------------------------- link bar
 
-def test_link_bar_new_text_ends_a_queued_pick(qapp):
+def test_link_bar_new_text_keeps_a_queued_pick(qapp):
+    """Typing the next search while a download runs doesn't drop the Add or Play
+    clicked on that downloading link: it still runs once the download is over."""
     from soundboard.library import Config
     from soundboard.ui.linkbar import LinkBar
     bar = LinkBar(engine=None, cfg=Config(), color_for=lambda: "#fff", known_for=dict)
     bar.open("https://www.youtube.com/watch?v=abc", "Clip")
-    bar._queued = "add"
+    bar._busy, bar._busy_url = "play", bar.url
+    bar.add()
     got = []
     bar.done.connect(lambda *a: got.append(a))
     bar.set_text("something else")
-    assert got == [("https://www.youtube.com/watch?v=abc", "add", False)]
+    assert got == [] and bar._queued == "add"
+    assert bar._queued_pick[0] == "https://www.youtube.com/watch?v=abc"
 
 
 # --------------------------------------------------------------------------- discord check

@@ -4,8 +4,10 @@ Bun mode's Bun dances to it (ui/bunnywidget.py ``set_groove``): on the beat, and
 way that suits the song: he headbangs to rock, bounces fast to electronic music, nods
 to hip-hop, sways to something calm and talks along to someone speaking.
 
-Only what was just played is read (the same stretch as the pads' visualiser, see
-widgets.spectrum): a long sound is mapped from disk and what's ahead may not be in yet.
+It reads what was just played and a hair of what's about to be (LOOK: the sound is
+all there, decoded, and the system reads well ahead of it), so a hit is known the
+moment it's heard, not a tick later: every frame and hit carries the clock time it's
+heard at, and Bun's moves land on those times (`voice_at`, `last_hit`, `next_hit`).
 Each call does a few small FFTs (10 ms frames), so it's cheap enough for the UI tick;
 the tempo and style are worked out again from the last few seconds now and then.
 
@@ -25,10 +27,13 @@ HOP = SR // 100          # one frame every 10 ms
 WIN = 1024               # FFT size
 KEEP = 800               # frames remembered (8 s)
 BACKFILL = 400           # frames read at once when a song starts or jumps (4 s)
+LOOK = 0.07              # seconds read ahead of what's playing (over a tick and a frame)
+AT = 0.5                 # where in its window a frame's sound is heard (0: start, 1: end)
+KICK_PEAK = 0.035        # a kick is loudest this long after it starts
 TEMPO_EVERY = 0.5        # seconds of audio between tempo checks
 STYLE_EVERY = 1.0        # ... and style checks
 STYLE_MIN = 250          # frames heard before the first guess (2.5 s)
-SWITCH_VOTES = 3         # a new style must win this many checks in a row
+SWITCH_VOTES = 3         # another tempo or style must win this many checks in a row
 BPM_LO, BPM_HI = 60.0, 185.0
 STYLES = ("pop", "electronic", "rock", "hiphop", "chill", "speech")
 
@@ -40,8 +45,12 @@ _HIGH = slice(round(3000 / _HZ), round(10000 / _HZ))
 _FLAT = slice(round(1000 / _HZ), round(6000 / _HZ))     # where distortion fills it in
 _TOP = round(10000 / _HZ)
 _DRUMS = round(2000 / _HZ)   # kick, snare body, guitar chugs: no hi-hats or cymbals
-# hits: (refractory seconds, how far over its running average a frame must jump)
-HIT_RULES = {"bass": (0.14, 1.9), "drums": (0.16, 1.7)}
+# hits: (refractory seconds, how far over its running average a frame must jump);
+# "bass" goes by its level instead: BASS_RISE dB up on the last few frames' lowest
+HIT_RULES = {"bass": (0.12, 0.0), "drums": (0.16, 1.7)}
+BASS_RISE = 5.0
+BASS_FLOOR = 24.0            # ...and no more than this far under its recent peak
+VOICE_KEEP = 40              # frames of the voice's level kept for lip sync (0.4 s)
 HIT_KEEP = 6.0               # seconds of hits remembered
 _BINS = np.arange(1, _TOP, dtype=np.float32)
 
@@ -64,6 +73,9 @@ class Groove:
         self.kick = 0.0        # the latest onset's strength, 0..1 (decays)
         self.voice = 0.0       # how loud the vocal range is right now, 0..1 (lip sync)
         self.onset = 0.0       # 0..1 of the frame just read (a hit or a syllable)
+        self._vt = np.zeros(0)  # the voice's level a frame (lip sync): when it's heard...
+        self._vv = np.zeros(0)  # ...and how loud, 0..1
+        self._t_last = 0.0     # when the newest frame read is heard
         self._data_id = 0
         self._pos = -1         # next sample to read
         self._prev = None      # the last frame's log spectrum
@@ -87,6 +99,7 @@ class Groove:
         self._hit_peak = {"bass": 1e-3, "drums": 1e-3}
         self._hit_last = {"bass": -1e9, "drums": -1e9}
         self._hit_prev = {"bass": 0.0, "drums": 0.0}
+        self._bass_db: list[float] = []   # the bass level's last few frames, dB
 
     # ------------------------------------------------------------------ input
     def feed(self, data: np.ndarray | None, frac: float, now: float | None = None):
@@ -97,7 +110,8 @@ class Groove:
         if id(data) != self._data_id:   # another sound
             self.reset()
             self._data_id = id(data)
-        end = max(0, int(min(max(frac, 0.0), 1.0) * len(data)) - WIN)   # (just played)
+        play = int(min(max(frac, 0.0), 1.0) * len(data))   # the sample playing now
+        end = max(0, min(len(data), play + int(LOOK * SR)) - WIN)   # (a little ahead)
         if self._pos < 0 or end < self._pos or end - self._pos > BACKFILL * HOP:
             self._pos = max(0, end - BACKFILL * HOP)   # started, or a seek: catch up
             self._prev = None
@@ -113,15 +127,15 @@ class Groove:
         if data.dtype == np.int16:
             mono /= 32768.0
         mag = np.abs(np.fft.rfft(mono * _HANN, axis=1)).astype(np.float32) * (4.0 / WIN)
-        # when each frame's new sound was heard: a rise shows once it's in the window's
-        # last quarter (the clock time of a sample: now, less how far before `frac` it is)
-        heard = now - (end + WIN - (starts + 0.75 * WIN)) / SR
+        # when each frame's sound is heard (the clock time of a sample: now, plus how
+        # far past what's playing it is)
+        heard = now + (starts + AT * WIN - play) / SR
         self._frames(mag, heard)
         self._since_tempo += n
         self._since_style += n
         if self._since_tempo >= TEMPO_EVERY * 100 and self._n >= 300:
             self._since_tempo = 0
-            self._tempo(now)
+            self._tempo(self._t_last)
         if self._since_style >= STYLE_EVERY * 100 and self._n >= STYLE_MIN:
             self._since_style = 0
             self._vote(self.guess())
@@ -133,10 +147,11 @@ class Groove:
         self._prev = lm[-1]
         flux = rise.mean(axis=1)
         kflux = rise[:, _KICK.start - 1:_KICK.stop - 1].mean(axis=1)
-        if heard is not None:
-            self._find_hits("bass", kflux, heard)
-            self._find_hits("drums", rise[:, :_DRUMS].mean(axis=1), heard)
         p = mag * mag
+        if heard is not None:
+            self._t_last = float(heard[-1])
+            self._bass_hits(_db(p[:, _KICK].sum(axis=1)), heard)
+            self._find_hits("drums", rise[:, :_DRUMS].mean(axis=1), heard)
         total = p[:, 1:_TOP].sum(axis=1)
         band = p[:, _FLAT] + 1e-12
         flat = np.exp(np.log(band).mean(axis=1)) / band.mean(axis=1)
@@ -153,14 +168,45 @@ class Groove:
         self._n += k
         # right now: loudness on a -48..0 dB scale, the onset against the recent peak
         self.energy = min(1.0, max(0.0, (float(rows[2, -1]) + 48) / 48))
-        vdb = float(rows[3, -1])
-        self._vpeak = max(vdb, self._vpeak - 0.05 * k)   # (falls 5 dB a second)
-        # (the top 20 dB of it: the dip between syllables then shuts his mouth)
-        self.voice = 0.0 if vdb < -65 else min(1.0, max(0.0, (vdb - self._vpeak + 20) / 20))
+        # the voice (lip sync): the top 20 dB under its recent peak, which falls 5 dB a
+        # second (the dip between syllables then shuts his mouth, at any loudness)
+        lv = []
+        for v in rows[3, -VOICE_KEEP:].tolist():
+            self._vpeak = max(v, self._vpeak - 0.05)
+            lv.append(0.0 if v < -65 else min(1.0, max(0.0, (v - self._vpeak + 20) / 20)))
+        if heard is not None:
+            self._vt = np.concatenate([self._vt, heard[-len(lv):]])[-VOICE_KEEP:]
+            self._vv = np.concatenate([self._vv, lv])[-VOICE_KEEP:]
+        self.voice = lv[-1]
         hit = float((rows[0] + 2 * rows[1]).max())
         self._peak = max(hit, self._peak * 0.995 ** k)
         self.onset = min(1.0, hit / self._peak) if self._peak > 1e-4 else 0.0
         self.kick = max(self.kick * 0.85 ** k, self.onset if self.onset > 0.45 else 0.0)
+
+    def _bass_hits(self, db: np.ndarray, heard: np.ndarray):
+        """The kick and the 808: the bass level jumping BASS_RISE dB over its lowest of
+        the last three frames (a new note or a kick; a held 808's wobble doesn't)."""
+        gap = HIT_RULES["bass"][0]
+        hist, peak, last = self._bass_db, self._hit_peak["bass"], self._hit_last["bass"]
+        hits = self.hits["bass"]
+        for d, t in zip(db.tolist(), heard.tolist()):
+            peak = max(d, peak - 0.03)   # (falls 3 dB a second)
+            low = min(hist) if hist else d
+            if d - low > BASS_RISE and d > peak - BASS_FLOOR and d > -70 and t - last >= gap:
+                hits.append((t, min(1.0, (d - low) / 15)))
+                last = t
+            hist.append(d)
+            if len(hist) > 3:
+                del hist[0]
+        self._hit_peak["bass"], self._hit_last["bass"] = peak, last
+        if hits and hits[0][0] < last - HIT_KEEP:
+            self.hits["bass"] = [h for h in hits if h[0] >= last - HIT_KEEP]
+
+    def voice_at(self, now: float) -> float:
+        """How loud the voice is (0..1) at `now`, from the frames heard around it."""
+        if not len(self._vt):
+            return self.voice
+        return float(np.interp(now, self._vt, self._vv))
 
     def _find_hits(self, band: str, env: np.ndarray, heard: np.ndarray):
         """Note each frame where `band` jumps well over its running average (and over
@@ -182,9 +228,21 @@ class Groove:
             self.hits[band] = [h for h in hits if h[0] >= last - HIT_KEEP]
 
     def last_hit(self, band: str, now: float) -> tuple[float, float]:
-        """(seconds since, strength) of `band`'s latest hit; (inf, 0) if none."""
-        h = self.hits[band]
-        return (now - h[-1][0], h[-1][1]) if h else (float("inf"), 0.0)
+        """(seconds since, strength) of `band`'s latest hit heard by `now`; (inf, 0) if
+        none (it knows a little of what's coming: `next_hit`)."""
+        for t, s in reversed(self.hits[band]):
+            if t <= now:
+                return now - t, s
+        return float("inf"), 0.0
+
+    def next_hit(self, band: str, now: float) -> tuple[float, float]:
+        """(seconds until, strength) of `band`'s next hit, if it's read that far yet."""
+        nxt = (float("inf"), 0.0)
+        for t, s in reversed(self.hits[band]):
+            if t <= now:
+                break
+            nxt = (t - now, s)
+        return nxt
 
     def gap(self, band: str) -> float:
         """The usual time between `band`'s hits lately (0: not enough of them)."""
@@ -200,6 +258,7 @@ class Groove:
         return e - np.convolve(e, np.ones(20) / 20, "same")
 
     def _tempo(self, now: float):
+        """The tempo and where its beats fall (`now`: when the newest frame is heard)."""
         env = np.maximum(0.0, self._env(600))
         n = len(env)
         f = np.fft.rfft(env, 2 * n)
@@ -231,8 +290,9 @@ class Groove:
             if abs(ratio - 1) < 0.04:
                 new = self.bpm * 0.8 + new * 0.2   # the same tempo: steady it
                 self._doubt = 0
-            elif min(abs(ratio - 2), abs(ratio - 0.5) * 2) < 0.06:
-                new = self.bpm   # double or half of it: the same beat, keep his pace
+            elif min(abs(ratio - 2), abs(ratio - 0.5) * 2, abs(ratio - 1.5),
+                     abs(ratio - 2 / 3) * 1.5) < 0.06:
+                new = self.bpm   # double, half or 3:2 of it: the same beat, keep his pace
             else:   # really another tempo? only once it's heard it a few times running
                 same = self._other and abs(new / self._other - 1) < 0.04
                 self._doubt = self._doubt + 1 if same else 1
@@ -247,6 +307,12 @@ class Groove:
         kick_env = np.maximum(0.0, kick - np.convolve(kick, np.ones(20) / 20, "same"))
         if kick_env.sum() > 0.05 * env.sum():
             env = kick_env
+        late = 0.0
+        if self.style == "electronic":   # the kick is the loudest the bass gets (a jump
+            amp = 10 ** (self._ring[4, -n:] / 20)   # finds the off-beat bassline's starts)
+            rise = amp - np.minimum(np.minimum(np.roll(amp, 1), np.roll(amp, 2)), np.roll(amp, 3))
+            rise[:3] = 0.0
+            env, late = np.maximum(0.0, rise), KICK_PEAK * 100   # (in frames)
         period = 6000 / new
         p = int(round(period))
         best, off = -1.0, 0
@@ -255,7 +321,7 @@ class Groove:
             s = float(env[pts[pts >= 0]].sum())
             if s > best:
                 best, off = s, o
-        measured = off / period   # beats since the last one, now
+        measured = (off + late) / period   # beats since the last one, now
         if not self.bpm:
             self.bpm = new
             self._beat0, self._t0 = measured, now

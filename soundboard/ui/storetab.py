@@ -1,5 +1,6 @@
 """The Store tab: free sounds anyone can add to their board (soundboard.store), the best
-voted first, and a way to share your own.
+voted first, in categories, and a way to share your own. Sounds the server brings in from
+Myinstants are links like any shared one: played and added from that site.
 
 Nothing goes online until the tab is first opened. Every call runs on a worker thread
 and comes back through busy.emit, so a closed tab or window never gets a late answer."""
@@ -12,18 +13,16 @@ from collections.abc import Callable
 from pathlib import Path
 
 from PySide6.QtCore import QSize, Qt, QTimer, Signal
-from PySide6.QtGui import QActionGroup
 from PySide6.QtWidgets import (QCheckBox, QDialog, QFileDialog, QHBoxLayout,
                                QLabel, QLineEdit, QMenu, QPushButton, QScrollArea,
                                QSizePolicy, QStackedWidget, QVBoxLayout, QWidget)
 
-from soundboard import errors, library, net, store, usage, ytdl
+from soundboard import errors, library, net, store, usage
 from soundboard.engine import SR
 from soundboard.i18n import _
 from soundboard.ui import busy, fit, icons
-from soundboard.ui.panel import (HoverCard, card, hint_label, icon_button, info_button,
-                                 section_label)
-from soundboard.ui.widgets import DropdownMenu
+from soundboard.ui.panel import (Flow, HoverCard, card, hint_label, icon_button,
+                                 info_button, section_label)
 from soundboard.ui.ytsearch import ClampLabel
 
 log = logging.getLogger(__name__)
@@ -32,23 +31,21 @@ PREVIEW = "__store_preview"   # the store's "hear it first" voice (headphones on
 SEARCH_WAIT_MS = 400          # typing pauses this long before the store is searched
 ROW_MAX_W = 760               # the list stays a readable column on a wide window
 COUNT_W = "9.9k"              # the widest vote count kept room for
-TRENDING = "trending"         # the order menu's Trending on Myinstants: not the store's
-TREND_PAGE = 20               # trending sounds asked for at a time
+TRENDING = "trending"         # the order: hot on Myinstants now + this week's thumbs up
 
 
 def meta_line(s: store.Sound) -> str:
-    """"by Onion Board · tavern, music", "Shared by a player", or for a shared link
-    "YouTube link · Shared by a player"."""
+    """"by Onion Board · tavern, music", "Shared by a player", for a shared link
+    "YouTube link · Shared by a player", and for one the server brought in
+    "From Myinstants · Games"."""
     from soundboard import sourceinfo
-    who = _("by {name}", name=s.author) if s.author else _("Shared by a player")
     site = sourceinfo.site_of(s.link) if s.is_link else None
+    if s.source and site:
+        return " · ".join([_("From {site}", site=site[1]),
+                           *([store.cat_name(s.cat)] if store.cat_name(s.cat) else [])])
+    who = _("by {name}", name=s.author) if s.author else _("Shared by a player")
     where = [_("{site} link", site=site[1])] if site else []
     return " · ".join([*where, who, *([", ".join(s.tags)] if s.tags else [])])
-
-
-def trend_sound(r: ytdl.Result) -> store.Sound:
-    """A Myinstants trending hit as a row: a link, played or added from Myinstants."""
-    return store.Sound("myinstants:" + r.id, r.title, "link", link=r.url, author="Myinstants")
 
 
 def count_text(n: int) -> str:
@@ -58,10 +55,9 @@ def count_text(n: int) -> str:
 class SoundRow(HoverCard):
     """One sound: play it, vote on it, add it to your board, or report it."""
 
-    def __init__(self, s: store.Sound, tab: StoreTab, trending: bool = False):
+    def __init__(self, s: store.Sound, tab: StoreTab):
         super().__init__()
         self.sound = s
-        self.trending = trending   # from Myinstants: no votes or reports (not the store's)
         self.setMaximumWidth(ROW_MAX_W)
         h = QHBoxLayout(self)
         h.setContentsMargins(10, 8, 12, 8)
@@ -77,7 +73,7 @@ class SoundRow(HoverCard):
         # one line each, ending in "…" when the row is narrow (the whole text on hover)
         self.name = ClampLabel(s.name, lines=1)
         self.name.set_full(s.name, s.name)
-        meta = _("Trending on Myinstants") if trending else meta_line(s)
+        meta = meta_line(s)
         self.meta = ClampLabel(meta, lines=1, bold=False)
         self.meta.setObjectName("hint")
         self.meta.set_full(meta, meta)
@@ -100,8 +96,6 @@ class SoundRow(HoverCard):
         self.btn_report = icon_button("flag", _("Report this sound"))
         self.btn_report.clicked.connect(lambda: tab.report_menu(self))
         h.addWidget(self.btn_report)
-        for b in (self.btn_up, self.btn_down, self.btn_report):
-            b.setVisible(not trending)
         self.show_votes()
 
     def _vote_button(self, icon: str, tip: str) -> QPushButton:
@@ -141,6 +135,7 @@ class StoreTab(QWidget):
     _fetched = Signal(object, object, str)       # (row, (what, path), error): "play" / "add"
     _voted = Signal(object, object, str)         # (row, (up, down, mine) or None, error)
     _decoded = Signal(object, object, float, int)   # (row, data, gain, serial)
+    _cats = Signal(object)                       # [(category, how many)], all; None: failed
 
     def __init__(self, cfg, add_file: Callable[[str], None],
                  play: Callable[[object, float], bool], open_privacy: Callable[[], object],
@@ -166,13 +161,16 @@ class StoreTab(QWidget):
         self._fetched.connect(self._on_fetched)
         self._voted.connect(self._on_voted)
         self._decoded.connect(self._on_decoded)
+        self._cats.connect(self._on_cats)
+        self._cat = ""            # the category picked ("" all)
 
         outer = QVBoxLayout(self)
         outer.setContentsMargins(0, 0, 0, 0)
         outer.setSpacing(12)
-        info = info_button(_("Every sound here is CC0: free for anyone to use for anything, "
-                             "no credit needed. Sounds people share are checked before they "
-                             "show up. Vote for the ones you like so others find them."))
+        info = info_button(_("Sounds people share here are CC0: free for anyone to use for "
+                             "anything, no credit needed, and checked before they show up. "
+                             "Sounds from Myinstants are links: they play and download from "
+                             "that site. Vote for the ones you like so others find them."))
         # (no hint line: the ⓘ says it, and the tab fits the smallest window)
         head, hv = card(_("Sound store"), icon="store", beside=info)
         head.setMaximumWidth(ROW_MAX_W)
@@ -185,6 +183,28 @@ class StoreTab(QWidget):
         self.btn_share.clicked.connect(lambda: self.share())
         share_row.addWidget(self.btn_share)
         share_row.addStretch(1)
+        # the order: Top, New, or Trending on Myinstants, out in the open (inside a menu,
+        # nobody found Trending), one picked at a time like the share window's file / link
+        self._sort = "top"
+        self.sort_btns: dict[str, QPushButton] = {}
+        sorts = QHBoxLayout()
+        sorts.setSpacing(4)
+        for key, text, tip, icon in (
+                ("top", _("Top"), _("The best voted first"), ""),
+                ("new", _("New"), _("The newest first"), ""),
+                (TRENDING, _("Trending"), _("What's hot on Myinstants right now, and the "
+                                           "sounds people here liked this week"), "")):
+            b = QPushButton(text)
+            b.setCheckable(True)
+            b.setAutoExclusive(True)
+            b.setChecked(key == "top")
+            b.setToolTip(tip)
+            if icon:
+                icons.set_icon(b, icon, "text", "on_accent")
+            b.clicked.connect(lambda _c=False, k=key: self.set_sort(k))
+            sorts.addWidget(b)
+            self.sort_btns[key] = b
+        share_row.addLayout(sorts)
         hv.addLayout(share_row)
         row = QHBoxLayout()
         row.setSpacing(8)
@@ -196,34 +216,6 @@ class StoreTab(QWidget):
         self._search_wait.timeout.connect(self.reload)
         self.search.textChanged.connect(lambda _t: self._search_wait.start())
         row.addWidget(self.search, 1)
-        # the order: one quiet button with a menu, as the Sounds tab's order button
-        self._sort = "top"
-        self.btn_sort = QPushButton()
-        self.btn_sort.setProperty("quiet", True)
-        self.btn_sort.setProperty("toolbarMenu", True)
-        self.btn_sort.setAccessibleName(_("Order"))
-        icons.set_icon(self.btn_sort, "sort")
-        sort_menu = DropdownMenu(self.btn_sort)
-        sort_menu.setToolTipsVisible(True)
-        group = QActionGroup(sort_menu)
-        self.sort_actions = {}
-        for key, text, tip in (("top", _("Top"), _("The best voted first")),
-                               ("new", _("New"), _("The newest first")),
-                               (TRENDING, _("Trending on Myinstants"),
-                                _("The meme sounds people play most on Myinstants right "
-                                  "now"))):
-            if key == TRENDING:
-                sort_menu.addSeparator()
-            a = sort_menu.addAction(text)
-            a.setCheckable(True)
-            a.setChecked(key == "top")
-            a.setToolTip(tip)
-            group.addAction(a)
-            a.triggered.connect(lambda _c=False, k=key: self.set_sort(k))
-            self.sort_actions[key] = a
-        self.btn_sort.setMenu(sort_menu)
-        self.btn_sort.setText(_("Top"))
-        row.addWidget(self.btn_sort)
         self.btn_reload = icon_button("reload", _("Refresh"))
         self.btn_reload.clicked.connect(lambda: self.reload())
         row.addWidget(self.btn_reload)
@@ -240,6 +232,15 @@ class StoreTab(QWidget):
         self._list = QVBoxLayout(body)
         self._list.setContentsMargins(0, 0, 0, 0)
         self._list.setSpacing(6)
+        # the categories, as the Sounds tab's subcategory chips: at the top of the list
+        # (it scrolls away), so the tab still fits the smallest window
+        self.cats_box = QWidget()
+        self.cats_box.setMaximumWidth(ROW_MAX_W)
+        self._cat_flow = Flow(self.cats_box, gap=6)
+        self._cat_flow.setContentsMargins(0, 0, 0, 4)
+        self.cat_btns: dict[str, QPushButton] = {}
+        self.cats_box.hide()
+        self._list.addWidget(self.cats_box)
         self.btn_more = QPushButton(_("Show more"))
         self.btn_more.clicked.connect(self.more)
         self.btn_more.hide()
@@ -322,17 +323,51 @@ class StoreTab(QWidget):
         return self._sort
 
     def set_sort(self, key: str):
-        """Top (the best voted first), New, or Trending on Myinstants (not the store's
-        sounds: Myinstants' trending page, ytdl.trending)."""
+        """Top (the best voted first), New, or Trending (hot on Myinstants now, and this
+        week's thumbs up here)."""
         self._sort = key if key in ("new", TRENDING) else "top"
-        self.sort_actions[self._sort].setChecked(True)
-        self.btn_sort.setText({"new": _("New"), TRENDING: _("Trending")}.get(self._sort,
-                                                                            _("Top")))
+        self.sort_btns[self._sort].setChecked(True)
         self.reload()
 
-    @property
-    def trending(self) -> bool:
-        return self._sort == TRENDING
+    def set_cat(self, key: str):
+        """Only one category's sounds ("" all of them)."""
+        self._cat = key if key in store.CATS else ""
+        if self._cat in self.cat_btns:
+            self.cat_btns[self._cat].setChecked(True)
+        self.reload()
+
+    def _fetch_cats(self):
+        install = self.install()
+
+        def run():
+            try:
+                busy.emit(self._cats, store.categories(install))
+            except Exception as e:  # noqa: BLE001 - the list says why; the chips just wait
+                log.info("couldn't read the store's categories: %s", e)
+                busy.emit(self._cats, None)
+        threading.Thread(target=run, daemon=True, name="store-cats").start()
+
+    def _on_cats(self, got):
+        if self._closed or got is None:
+            return
+        cats, total = got
+        for b in self.cat_btns.values():
+            self._cat_flow.removeWidget(b)
+            b.deleteLater()
+        self.cat_btns.clear()
+        for key, n in [("", total), *cats]:
+            # the name, then how many (a number needs no words)
+            b = QPushButton(f"{store.cat_name(key) if key else _('All')}  {count_text(n)}"
+                            .replace("&", "&&"))
+            b.setObjectName("subchip")
+            b.setCheckable(True)
+            b.setAutoExclusive(True)
+            b.setChecked(key == self._cat)
+            b.setCursor(Qt.CursorShape.PointingHandCursor)
+            b.clicked.connect(lambda _c=False, k=key: self.set_cat(k))
+            self._cat_flow.addWidget(b)
+            self.cat_btns[key] = b
+        self.cats_box.setVisible(len(self.cat_btns) > 1)
 
     def _say(self, icon: str, title: str, text: str, button: str = "",
              do: Callable[[], object] | None = None):
@@ -349,21 +384,18 @@ class StoreTab(QWidget):
         if self._msg_do is not None:
             self._msg_do()
 
-    def reload(self, direct: bool = False):
-        """The list again from the top (the search or the order changed, Refresh).
-        `direct`: trending without Tor (the user's click, after Tor was turned away)."""
+    def reload(self):
+        """The list again from the top (the search, the order or the category changed,
+        Refresh)."""
         self._search_wait.stop()
         self._offset = 0
-        self._fetch_list(replace=True, direct=direct)
+        self._fetch_list(replace=True)
 
     def more(self):
         self._fetch_list(replace=False)
 
-    def _fetch_list(self, replace: bool, direct: bool = False):
+    def _fetch_list(self, replace: bool):
         if self._closed:
-            return
-        if self.trending:
-            self._fetch_trending(replace, direct)
             return
         self._off = not net.allowed(store.FEATURE)
         if self._off:
@@ -372,17 +404,19 @@ class StoreTab(QWidget):
                       _("Privacy && security settings"), self._open_privacy)
             return
         self._serial += 1
-        serial, sort, query, offset = (self._serial, self._sort_key(), self.search.text(),
-                                       0 if replace else self._offset)
+        serial, sort, query, offset, cat = (self._serial, self._sort_key(), self.search.text(),
+                                            0 if replace else self._offset, self._cat)
         install = self.install()
         if replace:
             self._say("store", _("Loading the store…"), "")
+            if not self.cat_btns:
+                self._fetch_cats()
         else:
             busy.set_busy(self.btn_more, True)
 
         def run():
             try:
-                found, more = store.browse(install, sort, query, offset)
+                found, more = store.browse(install, sort, query, offset, cat)
                 busy.emit(self._listed, serial, (replace, found), more, "")
             except Exception as e:  # noqa: BLE001 - offline, switched off, the server…
                 log.info("couldn't read the store: %s", e)
@@ -390,50 +424,13 @@ class StoreTab(QWidget):
                           str(e) if isinstance(e, store.StoreError) else errors.plain(e))
         threading.Thread(target=run, daemon=True, name="store-list").start()
 
-    def _fetch_trending(self, replace: bool, direct: bool):
-        """Myinstants' trending sounds, `TREND_PAGE` at a time; a search filters them
-        by name (Myinstants' trending page has no search of its own)."""
-        self._off = not ytdl.site_allowed("myinstants")
-        if self._off:
-            self._clear()
-            self._say("offline", _("Trending on Myinstants"),
-                      net.off_message(ytdl.site_feature("myinstants")),
-                      _("Privacy && security settings"), self._open_privacy)
-            return
-        self._serial += 1
-        serial, start = self._serial, 1 if replace else self._offset + 1
-        if replace:
-            usage.used("search-trending")
-            self._say("myinstants", _("Loading what's trending on Myinstants…"), "")
-        else:
-            busy.set_busy(self.btn_more, True)
-
-        def run():
-            try:
-                hits = ytdl.trending(count=start - 1 + TREND_PAGE, direct=direct, start=start)
-                busy.emit(self._listed, serial, (replace, [trend_sound(r) for r in hits]),
-                          len(hits) >= TREND_PAGE, "")
-            except ytdl.TorBlocked as e:   # offered without Tor, never done unasked
-                busy.emit(self._listed, serial, (replace, None), False, "tor:" + str(e))
-            except Exception as e:  # noqa: BLE001 - offline, switched off, the site…
-                log.info("couldn't read Myinstants' trending: %s", e)
-                busy.emit(self._listed, serial, (replace, None), False,
-                          str(e) if isinstance(e, ytdl.DownloadError) else errors.plain(e))
-        threading.Thread(target=run, daemon=True, name="store-trending").start()
-
     def _on_listed(self, serial: int, got, more: bool, err: str):
         if self._closed or serial != self._serial:
             return
         replace, found = got
         busy.set_busy(self.btn_more, False)
         if found is None:
-            if self.trending and replace:
-                self._clear()
-                tor = err.startswith("tor:")
-                self._say("warn", _("Trending on Myinstants"), err.removeprefix("tor:"),
-                          _("Try this one without Tor") if tor else _("Try again"),
-                          (lambda: self.reload(direct=True)) if tor else self.reload)
-            elif replace:
+            if replace:
                 self._clear()
                 self._say("warn", _("Couldn't open the store"), err, _("Try again"), self.reload)
             else:
@@ -442,22 +439,16 @@ class StoreTab(QWidget):
         if replace:
             self._clear()
         self._offset += len(found)
-        if self.trending:   # filtered by the search box's words, here
-            words = self.search.text().casefold().split()
-            found = [s for s in found if all(w in s.name.casefold() for w in words)]
         for s in found:
-            r = SoundRow(s, self, trending=self.trending)
+            r = SoundRow(s, self)
             self._list.insertWidget(self._list.indexOf(self.btn_more), r)
             self._rows.append(r)
         self.btn_more.setVisible(more)
         if not self._rows:
-            if self.trending and more and self.search.text().strip():
-                self.stack.setCurrentWidget(self.list_area)   # Show more may find some
-                return
-            if self.trending and not self.search.text().strip():
-                self._say("myinstants", _("Nothing is trending on Myinstants right now."), "")
-            elif self.search.text().strip():
+            if self.search.text().strip():
                 self._say("search", _("Nothing matches"), _("Try other words."))
+            elif self._cat:   # (the chips are in the list: a way back to All here)
+                self._say("search", _("Nothing matches"), "", _("All"), lambda: self.set_cat(""))
             else:
                 self._say("store", _("No sounds here yet"),
                           _("Be the first: share a sound you made."), _("Share a sound"),
@@ -753,8 +744,11 @@ class ShareDialog(QDialog):
         self.terms = terms = hint_label(_(
             "I made or recorded it myself, and I give it away as CC0: anyone may use it for "
             "anything, for free. No songs, clips from shows or games, or other people's "
-            "sounds: those are removed."))
+            "sounds: those are removed.") + " " + _(
+            "Is a sound in the store yours? Email {email} and it comes down.",
+            email=store.CONTACT))
         terms.setContentsMargins(26, 0, 0, 4)   # under the box's text, not its tick
+        terms.setTextInteractionFlags(Qt.TextInteractionFlag.TextSelectableByMouse)   # the email
         v.addWidget(terms)
         self.error = QLabel()
         self.error.setWordWrap(True)
