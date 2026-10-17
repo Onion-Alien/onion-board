@@ -53,7 +53,7 @@ Now and then an idle `BunnyWidget` plays his theme's skit (`ui/bunskits.py`) ins
 fidget: everywhere he idles (the empty board, Bun mode, the YouTube search). A skit is a
 function of its time alone: it adds to his pose, hides the outfit pieces it moves and
 queues drawings behind him, with him (held things) or in front, on the canvas. No words
-(only "!" and "?"), so nothing to translate. A new theme with an outfit gets a skit in
+(only "!" and "?"), so nothing to translate. Dark, the default, has his DJ act. A new theme with an outfit gets a skit in
 `bunskits.SKITS`; one without juggles. `tests/test_bunnywidget.py`
 plays every theme's skit through.
 

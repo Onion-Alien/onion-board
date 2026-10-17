@@ -523,7 +523,7 @@ def test_every_themes_skit_plays_through_and_ends_clean(qapp, monkeypatch):
     monkeypatch.setattr(bunnywidget, "time", clock)
     was = theme.current_name
     try:
-        for name in [*bunskits.SKITS, "Dark"]:
+        for name in [*bunskits.SKITS, "Textured"]:   # (Textured: no outfit, juggles)
             theme.apply(qapp, name)
             b = BunnyWidget(height=120)
             b.resize(b.sizeHint())

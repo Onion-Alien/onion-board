@@ -25,7 +25,7 @@ from PySide6.QtCore import QPointF, QRectF, Qt
 from PySide6.QtGui import QColor, QFont, QPainter, QPainterPath, QPen, QRadialGradient
 
 from soundboard import theme
-from soundboard.bunny import FUR, INK, sparkle
+from soundboard.bunny import FUR, INK, music_note, sparkle
 from soundboard.style import bunnyfit
 
 Draw = Callable[[QPainter], None]
@@ -1226,6 +1226,52 @@ def _ball(p: QPainter, x, y, col, alpha):
     p.restore()
 
 
+def dj(kit: Kit, t: float):
+    """Dark (the default theme, plain Bun in his headphones): a little turntable, a few
+    scratches with notes flying off it, then both paws up for the drop."""
+    kit.prop = ""
+    deck = held(t, 0.2, 3.6, 0.3)
+    scratch = held(t, 0.7, 2.6, 0.1)
+    wiggle = math.sin(t * 16) * scratch   # the record, back and forth under his paw
+    if deck:
+        kit.world.append(lambda p: _deck(p, deck, t, wiggle))
+        kit.front.append(lambda p: paw(p, 58 + 7 * wiggle, lerp(100, 97, deck)))
+        kit.front.append(lambda p: paw(p, 30, lerp(100, 96, deck)))
+    kit.add(nod=4 * wiggle, dip=2 * abs(wiggle), ears=-6 * scratch)
+    for at in (0.9, 1.3, 1.7, 2.1, 2.5):   # a note off each scratch
+        kit.world.append(lambda p, at=at: burst(p, t - at, 60, 92, 1, 30, 0.8, _dj_note,
+                                                gravity=-10, salt=int(at * 10), up=1.2))
+    drop = held(t, 2.75, 3.7, 0.15)
+    if drop:   # paws up, eyes shut, a hop
+        kit.front.append(lambda p: paw(p, 20, lerp(96, 70, drop), -30))
+        kit.front.append(lambda p: paw(p, 80, lerp(96, 70, drop), 30))
+        kit.most(blink=drop)
+        kit.add(dy=-7 * bump(t, 2.75, 3.15), ears=-12 * drop)
+    kit.world.append(lambda p: _sparkles(p, t - 2.8, 50, 40, n=9, salt=19))
+
+
+def _deck(p: QPainter, k, t, wiggle):
+    p.save()
+    p.setOpacity(k)
+    p.setPen(_ink(1.6))
+    p.setBrush(QColor("#3a3452"))
+    p.drawRoundedRect(QRectF(24, 98, 52, 16), 3, 3)
+    _oval(p, 58, 104, 22, 9, QColor("#15131f"), _ink(1.2))   # the record (seen from the front)
+    _oval(p, 58, 104, 7, 3, QColor(theme.T["accent"]))
+    p.setPen(QPen(QColor(255, 255, 255, 90), 1.0))
+    a = t * 4 + wiggle * 2   # its grooves catching the light, turning
+    p.drawLine(QPointF(58 + 8 * math.cos(a), 104 + 3 * math.sin(a)),
+               QPointF(58 + 10 * math.cos(a), 104 + 3.8 * math.sin(a)))
+    _oval(p, 32, 104, 5, 5, QColor("#ffcf40"), _ink(1.0))      # a knob
+    p.restore()
+
+
+def _dj_note(p, x, y, fade, i):
+    c = QColor(theme.T["accent"])
+    c.setAlphaF(fade)
+    music_note(p, x - 4, y - 8, 0.8, c)
+
+
 # theme -> (seconds, skit); a theme that isn't listed juggles
 SKITS: dict[str, tuple[float, Callable[[Kit, float], None]]] = {
     "Blood Moon": (5.2, blood_moon),
@@ -1258,6 +1304,7 @@ SKITS: dict[str, tuple[float, Callable[[Kit, float], None]]] = {
     "Carbon": (3.1, spin),
     "Slate": (4.0, reading),
     "Paper": (4.3, paper_plane),
+    "Dark": (3.9, dj),
 }
 GENERIC = (4.0, juggle)
 
