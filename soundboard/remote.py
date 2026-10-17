@@ -117,7 +117,7 @@ from urllib.parse import parse_qs, urlsplit
 
 from PySide6.QtCore import QCoreApplication, QEvent, QObject, Qt, QTimer, Signal
 
-from soundboard import errors, netcategory, streamapi
+from soundboard import errors, netcategory, streamapi, usage
 from soundboard.pollthread import PollThread
 from soundboard.i18n import _
 
@@ -530,6 +530,8 @@ class RemoteControl(QObject):
             job.started = True
         try:
             job.status, job.body = self.dispatch(job.action, job.params)
+            if job.status == 200:   # the name only (usage.py)
+                usage.used("remote-used-phone" if self.lan else "remote-used-api")
         except Exception:  # noqa: BLE001 - a bad request must never take the app down
             log.exception("%s request %s failed", self.name, job.action)
             job.status, job.body = 500, {"error": "internal error (see the log)"}
