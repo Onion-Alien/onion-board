@@ -2108,10 +2108,17 @@ def site_folder(url: str) -> str:
     return DOWNLOADS
 
 
+# characters that change how a name reads without showing: right-to-left marks and
+# overrides, zero-width spaces and joiners, soft hyphens, byte-order marks
+_HIDDEN = re.compile("[\u00ad\u061c\u180e\u200b-\u200f\u2028-\u202e\u2060-\u206f\ufeff]")
+
+
 def file_stem(name: str) -> str:
     """`name` as a file name Windows takes: no <>:"/|?* (or backslash) or control characters, no
-    trailing dot or space, not a device name (CON, NUL...), not too long."""
+    trailing dot or space, not a device name (CON, NUL...), not too long. Invisible and
+    right-to-left characters go too: they can make "a\u202e3pm.exe" read "a.exe.mp3"."""
     s = re.sub(r'[<>:"/\\|?*\x00-\x1f]', "_", name)
+    s = _HIDDEN.sub("", s)
     s = " ".join(s.split()).strip(" .")[:80].strip(" .")
     if s.split(".")[0].lower() in _RESERVED:
         s = f"_{s}"
