@@ -9,7 +9,8 @@ and neither needs a payment card on the account.
 
 | Route | What |
 |---|---|
-| `GET /v1/sounds?sort=top\|new&q=&offset=` | a page (50) of the sounds that are live |
+| `GET /v1/sounds?sort=top\|new\|trending&cat=&q=&offset=` | a page (50) of the sounds that are live, in one category or all; *trending* = hot on the synced sites now plus this week's 👍 here |
+| `GET /v1/categories` | how many live sounds each category has |
 | `GET /v1/sounds/<id>/file` | one sound's file |
 | `POST /v1/sounds` | share a sound (form: `file`, `name`, `tags`, `agree=own-cc0-v1`); it waits for review |
 | `POST /v1/links` | share a link (JSON: `link`, `name`, `tags`, `agree=link-v1`): only the link is kept, and only to known video and sound sites; it waits for review |
@@ -22,6 +23,7 @@ and neither needs a payment card on the account.
 | `GET /admin` | the review page: listen, approve, reject |
 | `/v1/admin/...` | the review page's calls (`Authorization: Bearer <ADMIN_TOKEN>`), and `POST /v1/admin/import` to add a sound straight to the store |
 | `GET /v1/admin/queue?status=pending\|live\|rejected\|all&q=&offset=` | the owner's: sounds (200 a page) with their reports and hashes, and how many there are of each status |
+| `POST /v1/admin/sync` | the owner's: run one sync step now (below) |
 | `GET /v1/admin/log?before=&kind=&sound=&who=&limit=` | the owner's: the action log, newest first (uploads, links, votes, reports, reviews, and the first time each rate limit is hit in a day), filtered by kind, sound, or an address / install hash |
 
 The app sends a random id it made itself (`X-Onion-Install`); the server keeps only a
@@ -31,6 +33,13 @@ from one address ever counted on one sound). The review queue takes 1,000 sounds
 of files, then refuses more until some are reviewed. Files are checked by
 their first bytes (MP3, OGG, WAV, FLAC), up to 4 MB, and the same file can't be
 shared twice. A rejected sound's file is deleted at once.
+
+**Sounds from other sites.** Every 10 minutes a cron step (`src/sync.js`) reads Myinstants'
+trending page and one page of one of its categories (5 pages of 10 categories, a cycle
+about every 8 hours) and adds what's new as live *links*: the name, the link and the
+category, never the file (the app plays and downloads it from Myinstants, as a pasted link).
+They're voted on, reported and reviewed like any other sound, and a later sync never brings
+back one that was rejected or taken off by reports.
 
 Every action is logged with its time and those hashes (never the address or id itself),
 for the owner to see who did what. A daily cron (`wrangler.toml`) deletes log lines older
@@ -63,3 +72,9 @@ npx wrangler dev --local
 
 `node --test "test/*.test.mjs"` (Node 22.5 or newer; CI runs them): the routes against
 Node's built-in SQLite standing in for D1 and a `Map` for KV.
+
+## Changing the database
+
+`schema.sql` is the whole schema for a new database, and safe to run again. A change to
+an existing table goes in `migrations/` too, numbered: run each new file once, before
+`schema.sql` (`npx wrangler d1 execute onion-board-store --remote --file migrations/<file>`).
