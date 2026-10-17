@@ -1003,6 +1003,7 @@ class MainWindow(QMainWindow):
         you. Not saved: the app always opens live, so nobody's left wondering why they're
         silent."""
         self.engine.sending = on
+        self.playctl.sending_changed(on)
         if self.btn_air.isChecked() != on:
             self.btn_air.setChecked(on)   # comes back here
             return

@@ -462,6 +462,8 @@ class BunMode(QWidget):
         icons.set_icon(menu.addAction(_("Open the full board"), self.full.emit), "sounds")
         menu.addSeparator()
         icons.set_icon(menu.addAction(_("Stop all sounds"), self.host.playctl.stop_all), "stop")
+        icons.set_icon(menu.addAction(_("Settings"), lambda: self.host.setctl.open_settings()),
+                       "settings")
         menu.addSeparator()
         icons.set_icon(menu.addAction(_("Quit"), self.host.quit_app), "stop")
         menu.popup(e.globalPos())

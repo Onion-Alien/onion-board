@@ -529,6 +529,18 @@ class CategoryControl(Controller):
                          "other categories they're in).",
                          n, name=name)) != QMessageBox.StandardButton.Yes:
             return
+        cfg = mw.cfg
+        was = {   # for Undo: everything below takes from it
+            "at": cfg.categories.index(name), "hotkey": cfg.category_hotkeys.get(name),
+            "color": cfg.category_colors.get(name),
+            "programs": {e: c for e, c in cfg.category_programs.items() if c == name},
+            "subs": cfg.subcategories.get(name),
+            "hidden": (cfg.hidden_from_all.index(name)
+                       if name in cfg.hidden_from_all else None),
+            "picked": (cfg.category, cfg.subcategory) if cfg.category == name else None,
+            "tags": [(m, list(m.tags)) for m in mw.soundctl._live_metas()
+                     if any(library.split_tag(t)[0] == name for t in m.tags)],
+        }
         mw.cfg.categories.remove(name)
         mw.cfg.category_hotkeys.pop(name, None)
         mw.cfg.category_colors.pop(name, None)
@@ -548,6 +560,39 @@ class CategoryControl(Controller):
         self._fill_categories()
         mw.searchctl.apply_filter(mw.search.text())
         mw.hkctl.register_hotkeys()   # let go of its random-sound hotkey
+        mw.toast(_("Deleted the “{name}” category. Its sounds are still in All.",
+                   name=html.escape(name)), "ok", 8000, key="category-deleted",
+                 action=(_("Undo"), lambda: self._undo_delete(name, was)))
+
+    def _undo_delete(self, name: str, was: dict):
+        """The delete's Undo: the category back where it was, with its sounds, hotkey,
+        colour, programs and subcategories (unless one by that name was made since)."""
+        mw = self.mw
+        cfg = mw.cfg
+        if name in cfg.categories:
+            return
+        cfg.categories.insert(min(was["at"], len(cfg.categories)), name)
+        if was["hotkey"] and not mw.hkctl._hotkey_taken(was["hotkey"]):
+            cfg.category_hotkeys[name] = was["hotkey"]
+        if was["color"]:
+            cfg.category_colors[name] = was["color"]
+        for exe, cat in was["programs"].items():
+            cfg.category_programs.setdefault(exe, cat)
+        self._update_cat_timer()
+        if was["subs"] is not None:
+            cfg.subcategories[name] = was["subs"]
+        if was["hidden"] is not None:
+            cfg.hidden_from_all.insert(min(was["hidden"], len(cfg.hidden_from_all)), name)
+        for m, tags in was["tags"]:   # (any tag added since stays)
+            m.tags = tags + [t for t in m.tags if t not in tags]
+        if was["picked"] and not cfg.category:
+            cfg.category, cfg.subcategory = was["picked"]
+        mw._save_now()
+        self._fill_categories()
+        mw.searchctl.apply_filter(mw.search.text())
+        mw.hkctl.register_hotkeys()
+        mw.toast(_("“{name}” is back.", name=html.escape(name)), "ok",
+                 key="category-deleted")
 
     def _category_menu(self, pos):
         mw = self.mw

@@ -671,6 +671,10 @@ class AppsTab(QWidget):
                 if not remembered and row.listen is None and not self.capctl._has_take(row):
                     self._drop_row(row)
                     continue
+                if row.app is not None and row.editor is not None and row.listen is not None:
+                    # it closed under its open clip editor: nothing new comes in now
+                    row.editor.say(_("{name} closed: the clip editor keeps what it heard.",
+                                     name=row.app.name), "warn")
                 row.set_app(None)
                 continue
             appeared = row.app is None

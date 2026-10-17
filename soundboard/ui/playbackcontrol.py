@@ -60,6 +60,7 @@ class PlaybackControl(Controller):
         self._preview_done = None         # its done(ok) callback while it renders
         self._seeking = False
         self._zero_vol_said = False   # the "Sounds volume is at 0%" toast, once per time
+        self._muted_said = False      # the "you're muted" one, once per mute
 
     def play(self, sid, now: bool = False):
         """Play a pad's sound as its settings say (by default one at a time: a new
@@ -134,6 +135,25 @@ class PlaybackControl(Controller):
             mw.say(_("<span style='color:{status}'>No audio device is open, pick "
                        "one in Setup.</span>", status=theme.status('warn')), "warn")
         self._say_zero_volume(v is not None)
+        self._say_muted(v is not None, m.name)
+
+    def _say_muted(self, played: bool, name: str):
+        """A sound started while muted (Live off): a hotkey or the control API plays it
+        in your own headphones only, with nothing on screen saying why nobody else hears
+        it. Said once, until you go live again (sending_changed)."""
+        mw = self.mw
+        if (not played or mw.engine.sending or self._muted_said or mw.cfg.route == "off"
+                or mw.routectl._main_name() is None):
+            return
+        self._muted_said = True
+        mw.toast(_("You're muted, so only you hear “{name}”.", name=html.escape(name)),
+                 "warn", 8000, key="muted-play",
+                 action=(_("Go live"), lambda: mw.set_sending(True)))
+
+    def sending_changed(self, on: bool):
+        if on:
+            self._muted_said = False   # muted again later: say it again
+            self.mw.unsay("muted-play")
 
     def _say_zero_volume(self, played: bool):
         """A sound started with the Sounds volume at 0%: it still plays in your own

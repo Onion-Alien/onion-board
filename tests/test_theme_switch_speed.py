@@ -188,7 +188,7 @@ def test_the_settings_page_youre_on_shows_in_every_theme(name):
     t = theme.tokens(name)
     css = theme.stylesheet(name)
     sel = re.search(r"#settingscategories::item:selected \{ background:(#\w+)", css)[1]
-    assert theme._contrast(sel, t["bg"]) >= 1.5
+    assert theme._contrast(sel, t["bg"]) >= 1.6   # (1.5 as drawn, on the finish)
     assert theme._contrast(sel, t["text_hi"]) >= 4.5
     with theme.previewing(name):
         colour, alpha = theme.rail_tint()

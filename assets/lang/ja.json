@@ -3733,6 +3733,11 @@
   "Share your voices and setups with everyone, and get theirs.": "あなたのボイスとセットアップをみんなと共有して、みんなのものももらえます。",
   "The voice bar's Effects button puts rain, a crowd, a fire or a sound from your board behind your voice.": "ボイスバーのエフェクトボタンで、雨、群衆、焚き火、ボードのサウンドを声の後ろに流せます。",
   "Open Appearance": "外観を開く",
+  "Deleted the “{name}” category. Its sounds are still in All.": "カテゴリ「{name}」を削除しました。サウンドは「すべて」に残っています。",
+  "Go live": "ライブにする",
+  "Nothing new since the last save: play something in the program first.": "前回の保存から新しい音はありません。先にプログラムで何か再生してください。",
+  "You're muted, so only you hear “{name}”.": "ミュート中なので「{name}」は自分にしか聞こえません。",
+  "{name} closed: the clip editor keeps what it heard.": "{name} が終了しました。クリップエディターは聞いた音を残しています。",
   "Sorry, the store's down": "ごめんなさい、ストアが停止中です",
   "Sorry, the store's down. We're working on getting it back up.": "ごめんなさい、ストアが停止中です。復旧に取り組んでいます。",
   "We're working on getting it back up. Try again in a bit.": "復旧に取り組んでいます。少ししてからもう一度お試しください。"

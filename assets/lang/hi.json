@@ -3813,6 +3813,11 @@
   "Share your voices and setups with everyone, and get theirs.": "अपनी आवाज़ें और सेटअप सबके साथ शेयर करें, और उनकी पाएँ।",
   "The voice bar's Effects button puts rain, a crowd, a fire or a sound from your board behind your voice.": "वॉइस बार का इफ़ेक्ट बटन आपकी आवाज़ के पीछे बारिश, भीड़, आग या आपके बोर्ड की कोई आवाज़ लगाता है।",
   "Open Appearance": "दिखावट खोलें",
+  "Deleted the “{name}” category. Its sounds are still in All.": "“{name}” श्रेणी हटा दी गई। इसकी आवाज़ें अभी भी सभी में हैं।",
+  "Go live": "लाइव जाएं",
+  "Nothing new since the last save: play something in the program first.": "पिछली बार सेव करने के बाद कुछ नया नहीं: पहले प्रोग्राम में कुछ चलाएं।",
+  "You're muted, so only you hear “{name}”.": "आप म्यूट हैं, इसलिए “{name}” सिर्फ़ आप सुनते हैं।",
+  "{name} closed: the clip editor keeps what it heard.": "{name} बंद हो गया: क्लिप एडिटर ने जो सुना वह रखता है।",
   "Sorry, the store's down": "माफ़ करें, स्टोर बंद है",
   "Sorry, the store's down. We're working on getting it back up.": "माफ़ करें, स्टोर बंद है। हम इसे फिर से चालू करने पर काम कर रहे हैं।",
   "We're working on getting it back up. Try again in a bit.": "हम इसे फिर से चालू करने पर काम कर रहे हैं। थोड़ी देर में फिर से कोशिश करें।"

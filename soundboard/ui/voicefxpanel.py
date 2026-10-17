@@ -1757,7 +1757,7 @@ class VoiceFxPanel(QWidget):
         self.undo_bar.finish()
 
         def back(item) -> bool:   # DeletedDialog has taken it out of the bin already
-            self.store.restore(item)
+            self.store.restore(item, item.index)   # in its old place, as Undo does
             self._fill_saved()
             self._emit()
             return True

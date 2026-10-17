@@ -3733,6 +3733,11 @@
   "Share your voices and setups with everyone, and get theirs.": "แชร์เสียงและการตั้งค่าของคุณให้ทุกคน แล้วรับของพวกเขามา",
   "The voice bar's Effects button puts rain, a crowd, a fire or a sound from your board behind your voice.": "ปุ่มเอฟเฟกต์ในแถบเสียงจะใส่เสียงฝน ฝูงชน กองไฟ หรือเสียงจากบอร์ดของคุณไว้ข้างหลังเสียงคุณ",
   "Open Appearance": "เปิดหน้าตา",
+  "Deleted the “{name}” category. Its sounds are still in All.": "ลบหมวด “{name}” แล้ว เสียงของหมวดนี้ยังอยู่ในทั้งหมด",
+  "Go live": "เริ่มไลฟ์",
+  "Nothing new since the last save: play something in the program first.": "ไม่มีอะไรใหม่ตั้งแต่บันทึกครั้งล่าสุด: เล่นอะไรสักอย่างในโปรแกรมก่อน",
+  "You're muted, so only you hear “{name}”.": "คุณปิดเสียงอยู่ จึงมีแค่คุณที่ได้ยิน “{name}”",
+  "{name} closed: the clip editor keeps what it heard.": "{name} ปิดไปแล้ว: ตัวแก้ไขคลิปเก็บสิ่งที่ได้ยินไว้",
   "Sorry, the store's down": "ขออภัย ร้านล่มอยู่",
   "Sorry, the store's down. We're working on getting it back up.": "ขออภัย ร้านล่มอยู่ เรากำลังแก้ไขให้กลับมาใช้ได้",
   "We're working on getting it back up. Try again in a bit.": "เรากำลังแก้ไขให้กลับมาใช้ได้ ลองอีกครั้งในอีกสักครู่"

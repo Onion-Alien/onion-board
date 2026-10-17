@@ -3813,6 +3813,11 @@
   "Share your voices and setups with everyone, and get theirs.": "Seslerini ve ayarlarını herkesle paylaş, onlarınkini al.",
   "The voice bar's Effects button puts rain, a crowd, a fire or a sound from your board behind your voice.": "Ses çubuğundaki Efektler düğmesi sesinin arkasına yağmur, kalabalık, ateş ya da board'undan bir ses koyar.",
   "Open Appearance": "Görünümü aç",
+  "Deleted the “{name}” category. Its sounds are still in All.": "“{name}” kategorisi silindi. Sesleri hâlâ Tümü'nde.",
+  "Go live": "Canlıya geç",
+  "Nothing new since the last save: play something in the program first.": "Son kaydetmeden beri yeni bir şey yok: önce programda bir şey çal.",
+  "You're muted, so only you hear “{name}”.": "Sesin kapalı, bu yüzden “{name}” sesini yalnızca sen duyuyorsun.",
+  "{name} closed: the clip editor keeps what it heard.": "{name} kapandı: klip düzenleyici duyduğunu saklıyor.",
   "Sorry, the store's down": "Üzgünüz, mağaza çöktü",
   "Sorry, the store's down. We're working on getting it back up.": "Üzgünüz, mağaza çöktü. Yeniden açmak için çalışıyoruz.",
   "We're working on getting it back up. Try again in a bit.": "Yeniden açmak için çalışıyoruz. Biraz sonra tekrar dene."

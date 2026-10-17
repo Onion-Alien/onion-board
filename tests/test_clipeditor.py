@@ -164,6 +164,25 @@ def test_saving_the_whole_take_trims_dead_air(tab, qapp):
     assert len(data) / SR == pytest.approx(1.05, abs=0.02)
 
 
+def test_saving_again_with_nothing_new_says_so(tab, qapp):
+    """Save to clips, again with nothing heard since: it kept a second copy, no word."""
+    row = opened(tab, qapp)
+    row.capture.sink(tone(1.0))
+    row.editor.save()
+    row.editor.save()
+    assert len(tab.shelf.shelf.clips) == 1
+    assert "Nothing new" in row.editor.info.text()
+    row.capture.sink(tone(1.0, freq=660))   # something new: it saves
+    row.editor.save()
+    assert len(tab.shelf.shelf.clips) == 2
+
+
+def test_the_program_closing_under_its_open_editor_says_so(tab, qapp):
+    row = opened(tab, qapp)
+    run(tab)   # it quit
+    assert said(row.editor, "closed")
+
+
 def test_preview_only_goes_to_headphones(tab, qapp):
     row = opened(tab, qapp)
     ed = row.editor

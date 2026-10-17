@@ -3813,6 +3813,11 @@
   "Share your voices and setups with everyone, and get theirs.": "Dela dina röster och uppsättningar med alla, och få deras.",
   "The voice bar's Effects button puts rain, a crowd, a fire or a sound from your board behind your voice.": "Röstfältets Effekter-knapp lägger regn, en folkmassa, en eld eller ett ljud från ditt board bakom din röst.",
   "Open Appearance": "Öppna Utseende",
+  "Deleted the “{name}” category. Its sounds are still in All.": "Kategorin ”{name}” är borttagen. Dess ljud finns kvar i Alla.",
+  "Go live": "Gå live",
+  "Nothing new since the last save: play something in the program first.": "Inget nytt sedan senaste sparningen: spela upp något i programmet först.",
+  "You're muted, so only you hear “{name}”.": "Du är tystad, så bara du hör ”{name}”.",
+  "{name} closed: the clip editor keeps what it heard.": "{name} stängdes: klippredigeraren behåller det den hörde.",
   "Sorry, the store's down": "Sorry, butiken ligger nere",
   "Sorry, the store's down. We're working on getting it back up.": "Sorry, butiken ligger nere. Vi jobbar på att få upp den igen.",
   "We're working on getting it back up. Try again in a bit.": "Vi jobbar på att få upp den igen. Försök igen om en stund."
