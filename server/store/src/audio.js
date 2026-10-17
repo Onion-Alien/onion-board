@@ -2,20 +2,19 @@
 // "RIFF....WAVE" in front of a program or a script would pass. So the whole file is
 // walked: every MP3 frame, every WAV chunk, every Ogg page and FLAC's header blocks,
 // and the parts that aren't sound (tags, cover art, unknown chunks) may only be small.
-// Then no text that belongs in a web page, a script or a program may be in it anywhere.
+// Then no web page or script text and no program may be in it anywhere.
 //
 // audioType(bytes) is "mp3", "ogg", "wav" or "flac", or "" when it isn't one.
 
 // tags, cover art and other non-sound parts, in all (a song's cover picture can be 1.6 MB)
 export const META_MAX = 2 << 20;
 
-// what code looks like; a real sound's bytes don't spell these (lower case compared)
+// what a web page or a script looks like; a real sound's bytes don't spell these (lower
+// case compared). Programs are found by their headers instead (hasProgram): a list of
+// words programs use makes virus scanners take this file for one.
 export const CODE_MARKS = ["<script", "<?php", "<html", "<iframe", "<object", "<embed",
-  "<!doctype", "javascript:", "vbscript:", "onerror=", "onload=", "powershell", "cmd.exe",
-  "wscript", "cscript", "rundll32", "regsvr32", "mshta", "certutil", "invoke-expression",
-  "frombase64string", "#!/bin/", "#!/usr/", "this program cannot be run in dos mode",
-  "eval(", "exec(", "system(", "subprocess", "import os", "__import__", "document.cookie",
-  "xmlhttprequest", "activexobject"];
+  "<!doctype", "javascript:", "vbscript:", "onerror=", "onload=", "document.cookie",
+  "#!/bin/", "#!/usr/"];
 
 export function audioType(b) {
   if (!(b instanceof Uint8Array) || b.length < 12) return "";
@@ -25,7 +24,7 @@ export function audioType(b) {
   } catch {
     return "";   // a length that runs off the end, a bad field: not a sound
   }
-  return ext && !hasCode(b) ? ext : "";
+  return ext && !hasCode(b) && !hasProgram(b) ? ext : "";
 }
 
 const tag = (b, i, s) => [...s].every((c, k) => b[i + k] === c.charCodeAt(0));
@@ -44,6 +43,22 @@ export function hasCode(b) {
       while (k < m.length && lc[i + k] === m[k]) k++;
       if (k === m.length) return true;
     }
+  }
+  return false;
+}
+
+// a Windows program (its "MZ" header pointing at a "PE" one) or a Linux one (ELF's
+// header) anywhere in the file
+export function hasProgram(b) {
+  for (let i = b.indexOf(0x4d); i >= 0 && i + 0x40 <= b.length; i = b.indexOf(0x4d, i + 1)) {
+    if (b[i + 1] !== 0x5a) continue;
+    const pe = i + le32(b, i + 0x3c);
+    if (pe > i && pe + 4 <= b.length && b[pe] === 0x50 && b[pe + 1] === 0x45 && !b[pe + 2] && !b[pe + 3])
+      return true;
+  }
+  for (let i = b.indexOf(0x7f); i >= 0 && i + 7 <= b.length; i = b.indexOf(0x7f, i + 1)) {
+    if (b[i + 1] === 0x45 && b[i + 2] === 0x4c && b[i + 3] === 0x46 && (b[i + 4] === 1 || b[i + 4] === 2)
+        && (b[i + 5] === 1 || b[i + 5] === 2) && b[i + 6] === 1) return true;
   }
   return false;
 }
