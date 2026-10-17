@@ -372,12 +372,12 @@ QFrame#stations QListWidget { border:none; outline:0; }
 QFrame#stations QPushButton#seg { border:none; border-radius:7px; padding:5px 10px;
     min-height:18px; background:transparent; color:$muted; font-weight:600; }
 QFrame#stations QPushButton#seg:hover { color:$text_hi; background:$card_hi; }
-QFrame#stations QPushButton#seg:checked { background:$accent; color:$on_accent; }
+QFrame#stations QPushButton#seg:checked { background:$fill; color:$on_accent; }
 QFrame#stations QWidget#segbox { background:$segbox; border-radius:9px; }
 QFrame#stations QPushButton#genre { border-radius:6px; padding:3px 10px; font-size:8.5pt;
     background:$btn; border:1px solid transparent; color:$text; }
 QFrame#stations QPushButton#genre:hover { background:$btn_hover; }
-QFrame#stations QPushButton#genre:checked { background:$accent; border-color:$accent;
+QFrame#stations QPushButton#genre:checked { background:$fill; border-color:$accent;
     color:$on_accent; }
 QFrame#stations QComboBox { background:$card_ctl; padding:4px 8px; font-size:9pt; }
 QFrame#stations QLabel#count { color:$muted; font-size:8.5pt; }
@@ -497,7 +497,8 @@ QFrame#stations QFrame#rule { background:$border; max-height:1px; border:none; }
         return panel
 
     def _style_panel(self):
-        self.tab.station_panel.setStyleSheet(self._PANEL_STYLE.substitute(theme.T)
+        self.tab.station_panel.setStyleSheet(self._PANEL_STYLE.substitute(
+                                            theme.T, fill=theme.accent_fill())
                                         + theme.texture_style("QFrame#stations"))
 
     # -- filters

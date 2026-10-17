@@ -754,6 +754,23 @@ QPushButton#transport_play:hover:!disabled {
     background:qlineargradient(x1:0, y1:0, x2:1, y2:1, stop:0 $accent_top_hi,
         stop:0.3 $accent_hover, stop:1 $accent_end_hi); }
 QPushButton#transport_play:pressed:!disabled { background:$accent_press; }
+/* every accent-filled on-state (tabs, mode tiles, chips) gets the main button's gloss */
+QPushButton:checked, QFrame#card QPushButton:checked, QFrame#setcard QPushButton:checked,
+QFrame#viewtoggle QPushButton#viewbtn:checked,
+QFrame#soundstoolbar QFrame#viewtoggle QPushButton#viewbtn:checked,
+QPushButton#chipplay[playing="true"], QPushButton#voicetile:checked,
+QFrame#card QToolButton#voicetile:checked, QWidget#setupsbar QPushButton#voicecat:checked,
+QFrame#card QPushButton#voicecat:checked, QPushButton#voicetab:checked,
+QPushButton#subchip:checked {
+    background:qlineargradient(x1:0, y1:0, x2:1, y2:1, stop:0 $accent_top, stop:0.3 $accent,
+        stop:1 $accent_end); }
+QPushButton:checked:hover, QPushButton#voicetile:checked:hover,
+QFrame#card QToolButton#voicetile:checked:hover,
+QWidget#setupsbar QPushButton#voicecat:checked:hover,
+QFrame#card QPushButton#voicecat:checked:hover, QPushButton#voicetab:checked:hover,
+QPushButton#subchip:checked:hover {
+    background:qlineargradient(x1:0, y1:0, x2:1, y2:1, stop:0 $accent_top_hi,
+        stop:0.3 $accent_hover, stop:1 $accent_end_hi); }
 QPushButton#onair:checked, QPushButton#power:checked, QFrame#card QPushButton#power:checked,
 QFrame#setcard QPushButton#power:checked, QPushButton#live:checked,
 QFrame#card QPushButton#live:checked {
