@@ -125,3 +125,54 @@ def test_unknown_effects_from_newer_versions_are_left_out_with_a_note():
 def test_long_and_empty_names():
     assert read_code(_code({"n": "x" * 500, "e": {}}))[0] == "x" * savedvoices.MAX_NAME
     assert read_code(_code({"n": "   ", "e": {}}))[0] == "Shared voice"
+
+
+# ------------------------------------------------- any voice or setup (storevoices)
+
+def test_a_setup_comes_back_from_its_code_whole():
+    from soundboard import storevoices as sv
+    mine = {"id": "my-abc", "name": "Gravel", "emoji": "🪨", "mix": [[171, 1.0]],
+            "formant": -1.0, "pitch_hz": 90}
+    setup = {"name": "x", "fx": "Robot", "effects": {"pitch": {"on": True, "semitones": 3.0}},
+             "ai": {"id": "my-abc", "name": "Gravel", "pitch": 1.0}, "language": "it"}
+    code = sv.share_code(sv.pack_setup("Bear + Italian", setup, mine))
+    assert code.startswith("OB2-") and "my-abc" in str(sv.read_code(code)[0].ai)
+    v, notes = sv.read_code(f" {code[:20]}\n{code[20:]} ")   # pasted over two lines
+    assert (v.kind, v.name, v.fx, v.language, notes) == ("setup", "Bear + Italian", "Robot",
+                                                          "it", [])
+    assert v.effects == {"pitch": {"on": True, "semitones": 3.0}}
+    assert v.ai["mix"] == [[171, 1.0]] and v.ai["pitch"] == 1.0
+    # an older version, which only reads "OB1-" codes, says to update
+    with pytest.raises(CodeError, match="newer version"):
+        read_code(code)
+
+
+def test_ai_voice_and_voice_changer_codes():
+    from soundboard import storevoices as sv
+    ai = sv.read_code(sv.share_code(sv.pack_ai(
+        {"name": "Gravel", "emoji": "🪨", "mix": [[171, 1.0]], "formant": 0.0,
+         "pitch_hz": 90})))[0]
+    assert (ai.kind, ai.name, ai.emoji) == ("ai", "Gravel", "🪨")
+    # a voice changer voice is still an "OB1-" code, so older versions read it too
+    fx = sv.share_code(sv.pack_fx("Squeaky", VOICE))
+    assert fx.startswith("OB1-") and read_code(fx)[0] == "Squeaky"
+    v, _notes = sv.read_code(share_code("Old one", VOICE))   # an old code still reads
+    assert (v.kind, v.name) == ("fx", "Old one") and _loaded(v.effects) == _loaded(VOICE)
+
+
+@pytest.mark.parametrize("data", [
+    {"k": "setup", "n": "x", "d": {}},                          # nothing in it
+    {"k": "sound", "n": "x", "d": {"e": {"pitch": {}}}},        # not a kind of voice
+    {"k": "setup", "n": "x", "d": {"ai": {"id": "C:/x"}, "lang": "../../"}},
+    {"k": "setup", "n": "x", "d": {"ai": {"id": "my-x"}}},      # its blend is missing
+    {"k": "ai", "n": "x", "d": {"mix": "lots"}},
+    {"n": "x", "d": []}, {"k": "setup", "d": {}}, [1, 2],
+])
+def test_a_code_that_cant_be_a_voice_says_so(data):
+    from soundboard import storevoices as sv
+    with pytest.raises(CodeError):
+        sv.read_code(_code(data, prefix="OB2-"))
+    with pytest.raises(CodeError, match="newer version"):
+        sv.read_code(_code({"n": "x", "e": {}}, prefix="OB3-"))
+    with pytest.raises(CodeError, match="start with"):
+        sv.read_code(_code({"n": "x", "e": {}}, prefix="OB0-"))

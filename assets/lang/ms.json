@@ -1534,7 +1534,6 @@
   "About it": "Mengenainya",
   "Accurate (small.en)": "Tepat (small.en)",
   "Add a voice server": "Tambahkan pelayan suara",
-  "Add a voice someone sent you as a code (it starts with “OB1-”)": "Tambahkan suara yang dihantar seseorang kepada anda sebagai kod (ia bermula dengan \"OB1-\")",
   "Add the voice “{name}”?<br><br>Effects: {effects}": "Tambahkan suara \"{name}\"?<br><br> Kesan: {effects}",
   "Add to Sounds": "Tambahkan pada Bunyi",
   "Add voices": "Tambahkan suara",
@@ -1970,7 +1969,6 @@
   "That drive is read-only.": "Pemacu itu adalah baca sahaja.",
   "That isn't a Myinstants sound link.": "Itu bukan pautan bunyi Myinstants.",
   "That isn't a proxy address: it should look like socks5h://127.0.0.1:9050 or http://host:8080": "Itu bukan alamat proksi: ia sepatutnya kelihatan seperti socks5h://127.0.0.1:9050 atau http://host:8080",
-  "That isn't a voice code (they start with “OB1-”).": "Itu bukan kod suara (ia bermula dengan \"OB1-\").",
   "That mic isn't plugged in (or Windows doesn't list it).": "Mikrofon itu tidak dipalamkan (atau Windows tidak menyenaraikannya).",
   "That needs signing in to the site, which Onion Board doesn't do.": "Itu perlu log masuk ke tapak, yang tidak dilakukan oleh Onion Board.",
   "That program isn't running any more.": "Program itu tidak berjalan lagi.",
@@ -3402,7 +3400,6 @@
   "Lots of sounds are waiting to be checked. Try again in a day or two.": "Banyak bunyi menunggu untuk disemak. Cuba lagi dalam sehari dua.",
   "MP3, OGG, WAV or FLAC, up to 4 MB. It shows in the store once it's been checked.": "MP3, OGG, WAV atau FLAC, sehingga 4 MB. Ia dipaparkan di kedai setelah disemak.",
   "Name (what it is)": "Nama (apa ini)",
-  "New": "Baharu",
   "No file picked": "Tiada fail dipilih",
   "No sounds here yet": "Belum ada bunyi di sini",
   "Not for me": "Bukan untuk saya",
@@ -3434,7 +3431,6 @@
   "The store is off": "Kedai dimatikan",
   "The store takes MP3, OGG, WAV or FLAC files.": "Kedai menerima fail MP3, OGG, WAV atau FLAC.",
   "This sound is mine to give away": "Bunyi ini milik saya untuk diberikan",
-  "Top": "Teratas",
   "Try other words.": "Cuba perkataan lain.",
   "Your vote didn't go through: {error}": "Undian anda tidak sampai: {error}",
   "A YouTube, TikTok, SoundCloud or other video link. Only the link is kept: whoever adds it gets it from that site. It shows once it's been checked.": "Pautan YouTube, TikTok, SoundCloud atau video lain. Hanya pautan disimpan: sesiapa yang menambahnya mengambil dari laman itu. Ia dipaparkan setelah disemak.",
@@ -3509,7 +3505,6 @@
   "Sports": "Sukan",
   "TV": "TV",
   "Viral": "Tular",
-  "What's hot on Myinstants right now, and the sounds people here liked this week": "Yang hangat di Myinstants sekarang, dan bunyi yang disukai orang di sini minggu ini",
   "See everything waiting to play": "Lihat semua yang menunggu untuk dimainkan",
   "Take everything out of the queue": "Keluarkan semua daripada baris gilir",
   "A quick how-to the first time you open each tab.": "Panduan ringkas kali pertama anda membuka setiap tab.",
@@ -3651,7 +3646,6 @@
   "That voice is already in the store.": "Suara itu sudah ada di kedai.",
   "That voice isn't in the store any more.": "Suara itu tiada lagi di kedai.",
   "The store doesn't take that name or description. Try other words (and no links).": "Kedai tidak menerima nama atau keterangan itu. Cuba perkataan lain (tanpa pautan).",
-  "The voices people liked most this week": "Suara yang paling disukai minggu ini",
   "What's it good for? (optional)": "Sesuai untuk apa? (pilihan)",
   "Which voice": "Suara yang mana",
   "You have the most AI voices of your own there can be: delete one first.": "Anda sudah ada suara AI sendiri paling banyak: padam satu dahulu.",
@@ -3677,5 +3671,11 @@
   "Onion Board hit {n} problem since it started.": [
     "Onion Board menghadapi {n} masalah sejak dibuka."
   ],
-  "See report": "Lihat laporan"
+  "See report": "Lihat laporan",
+  "All categories": "Semua kategori",
+  "Votes": "Undian",
+  "The store doesn't take that name or those tags. Try other words (and no links).": "Kedai tidak menerima nama atau tag itu. Cuba perkataan lain (tanpa pautan).",
+  "Add a voice someone sent you as a code (it starts with “OB”)": "Tambahkan suara yang dihantar seseorang kepada anda sebagai kod (ia bermula dengan \"OB\")",
+  "Add “{name}”?": "Tambah “{name}”?",
+  "That isn't a voice code (they start with “OB”).": "Itu bukan kod suara (ia bermula dengan \"OB\")."
 }

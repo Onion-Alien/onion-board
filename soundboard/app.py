@@ -18,7 +18,8 @@ from PySide6.QtWidgets import QApplication
 
 from soundboard import __version__, applog
 from soundboard.library import APP_DIR, migrate_from_soundboard
-from soundboard.singleinstance import claim_single_instance, listen_for_second_launch
+from soundboard.singleinstance import (bring_to_front, claim_single_instance,
+                                      comes_to_front, listen_for_second_launch)
 
 log = logging.getLogger(__name__)
 
@@ -672,6 +673,8 @@ def main():
             first_paint(app, w)
             w.setctl.warm_settings()
             w.setctl.warm_triggers()
+        if comes_to_front(sys.argv, server.show_requested):
+            bring_to_front(w)   # the splash never takes the focus: take it now
     splash.close()
     from PySide6.QtCore import QTimer
     if "--resume-setup" in sys.argv:   # back after the restart the cable asked for

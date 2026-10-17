@@ -424,7 +424,13 @@
   // The level meter and Bun's mouth follow what's playing, like he does in the app.
   // The level is smoothed (opens fast, closes slowly) and Bun keeps talking until the
   // sound ends, so his mouth doesn't flicker between open and smiling on quiet bits.
-  var meter = $("#meter"), mouth = $("#bun .mo"), tongue = $("#bun .tongue"), bunSvg = $("#bun");
+  var meter = $("#meter"), mouths = $$("#bun .mo, #mouth-clip .mo"), tongue = $("#bun .tongue"), bunSvg = $("#bun");
+  function mouthD(m) {             // bunny.py's open mouth, `m` 0..1 open (site_mascots.py: mouth_d)
+    var oh = 2.5 + 6.5 * Math.min(1, m), hw = 4.2 + 1.3 * m, b = (75.5 + oh * 1.25).toFixed(2);
+    var l = (50 - hw).toFixed(2), r = (50 + hw).toFixed(2);
+    return "M" + l + " 75.2Q" + (50 - hw / 2).toFixed(2) + " 77 50 75.4Q" + (50 + hw / 2).toFixed(2) +
+      " 77 " + r + " 75.2C" + r + " " + b + " " + l + " " + b + " " + l + " 75.2Z";
+  }
   var smooth = 0;
   function levelLoop() {
     var lvl = 0;
@@ -437,12 +443,11 @@
     smooth += (lvl - smooth) * (lvl > smooth ? 0.45 : 0.12);
     lvl = smooth;
     meter.style.transform = "scaleX(" + lvl.toFixed(3) + ")";
-    var m = Math.min(1, lvl * 1.4), oh = 2.5 + 6.5 * m;
-    mouth.setAttribute("ry", (oh / 2).toFixed(2));
-    mouth.setAttribute("rx", ((7 + 2 * m) / 2).toFixed(2));
-    mouth.setAttribute("cy", (76 + oh / 2).toFixed(2));
-    tongue.setAttribute("cy", (76 + oh * 0.78).toFixed(2));
-    tongue.setAttribute("ry", (oh * 0.2).toFixed(2));
+    var m = Math.min(1, lvl * 1.4), oh = 2.5 + 6.5 * m, d = mouthD(m);
+    mouths.forEach(function (el) { el.setAttribute("d", d); });
+    tongue.setAttribute("cy", (75.5 + oh * 0.95).toFixed(2));
+    tongue.setAttribute("rx", ((4.2 + 1.3 * m) * 0.65).toFixed(2));
+    tongue.setAttribute("ry", (oh * 0.3).toFixed(2));
     bunSvg.classList.add("talking");
     if (performance.now() < talkUntil) requestAnimationFrame(levelLoop);
     else { looping = false; smooth = 0; meter.style.transform = "scaleX(0)"; bunSvg.classList.remove("talking"); }

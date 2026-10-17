@@ -168,6 +168,9 @@ def _why(code: int, err: str) -> str:
         return _("That file is too big: the store takes sounds up to 4 MB.")
     if err == "not audio" or code == 415:
         return _("That file isn't a sound the store takes (MP3, OGG, WAV or FLAC).")
+    if err == "not allowed":
+        return _("The store doesn't take that name or those tags. Try other words "
+                 "(and no links).")
     if err == "bad link":
         return _("The store takes links to YouTube, TikTok, SoundCloud and other video "
                  "and sound sites.")

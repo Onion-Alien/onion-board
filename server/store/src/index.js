@@ -186,6 +186,13 @@ function cleanName(s) {
     .replace(/[<>`{}\\]/g, " ").replace(/\s+/g, " ").trim().slice(0, 60).trim();
 }
 
+// a shared name or tags are shown to everyone: a link or a blocked word (the owner's
+// CHAT_BLOCK list, as chat and voices use) in them is refused
+function checkWords(env, ...texts) {
+  const blocked = String(env.CHAT_BLOCK || "").split(",");
+  for (const t of texts) if (t && refuse(t.slice(0, 200), blocked)) fail("not allowed", 422);
+}
+
 function cleanTags(s) {
   return String(s || "").toLowerCase().split(/[,#]/).map(t => cleanName(t).slice(0, 24))
     .filter(Boolean).slice(0, 8).join(",");
@@ -308,6 +315,7 @@ async function upload(req, env, imported = false) {
   const name = cleanName(form.get("name"));
   if (!name) fail("name");
   if (!imported && form.get("agree") !== AGREEMENT) fail("agreement");
+  if (!imported) checkWords(env, name, cleanTags(form.get("tags")));
   const bytes = new Uint8Array(await f.arrayBuffer());
   if (!bytes.length || bytes.length > MAX_BYTES) fail("too big", 413);
   const ext = audioType(bytes);   // the whole file walked, never its name (audio.js)
@@ -340,6 +348,7 @@ async function shareLink(req, env) {
   if (agree !== LINK_AGREEMENT) fail("agreement");
   const n = cleanName(name);
   if (!n) fail("name");
+  checkWords(env, n, cleanTags(tags));
   const key = linkKey(link);
   if (!key || String(link).length > 500) fail("bad link", 415);
   const hash = await sha256("link:" + key);
