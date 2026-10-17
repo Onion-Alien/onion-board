@@ -767,7 +767,12 @@ class VoicePanel(QWidget):
         errors = dict(self.chain.errors)   # the mic thread writes it
         if errors:
             self.fx.show_errors(errors)
-        self._show_problem(self.problem())
+        why = self.problem()
+        # no mic for two polls in a row: a mic being reopened (a device switch) is
+        # closed for a moment, and the strip shouldn't flash for that
+        gone = why == self._no_mic_text()
+        self._no_mic_polls = getattr(self, "_no_mic_polls", 0) + 1 if gone else 0
+        self._show_problem("" if gone and self._no_mic_polls < 2 else why)
 
     def problem(self) -> str:
         """Why the voice that's on isn't working (rich text), or "": the mic won't open,
@@ -779,7 +784,14 @@ class VoicePanel(QWidget):
         why = (_("Your mic couldn't be opened: {error}", error=mic) if mic
                else _("A voice effect stopped after an error: {error}",
                       error=next(iter(errors.values()))) if errors else "")
+        if not why and getattr(self.engine, "mic_stream", True) is None:
+            return VoicePanel._no_mic_text()   # unplugged or none: the voice has nothing to change
         return html.escape(why, quote=False)
+
+    @staticmethod
+    def _no_mic_text() -> str:
+        return html.escape(_("No mic is open, so there's no voice to change. Plug one in, "
+                             "or pick it in Settings → Audio."), quote=False)
 
     def _show_problem(self, why: str):
         if why == self._oops_for:
@@ -798,7 +810,8 @@ class VoicePanel(QWidget):
         self.fx.show_errors({})
         eng = self.engine
         name = getattr(eng, "names", {}).get("mic")
-        if getattr(eng, "errors", {}).get("mic") and hasattr(eng, "set_mic_device"):
+        if ((getattr(eng, "errors", {}).get("mic") or getattr(eng, "mic_stream", True) is None)
+                and hasattr(eng, "set_mic_device")):
             threading.Thread(target=lambda: eng.set_mic_device(name), daemon=True,
                              name="voice-retry-mic").start()
         self._oops_for = ""

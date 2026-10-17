@@ -115,3 +115,8 @@ def test_the_voice_strip_shows_while_the_voice_cant_work():
     f.on, f.engine.errors = True, {}
     f.chain.errors["pitch"] = "bad <value>"
     assert VoicePanel.problem(f) == "A voice effect stopped after an error: bad &lt;value&gt;"
+    f.chain.errors = {}
+    f.engine.mic_stream = None    # no mic (unplugged, none at all): said, not silent
+    assert VoicePanel.problem(f).startswith("No mic is open")
+    f.on = False
+    assert VoicePanel.problem(f) == ""
