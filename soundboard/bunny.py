@@ -20,7 +20,7 @@ W, H = 100.0, 120.0
 
 FUR = QColor("#fdf8f1")
 FUR_SHADE = QColor("#efe3d6")
-FUR_LINE = QColor(200, 176, 160, 150)   # the soft crease of his haunches
+FUR_LINE = QColor(200, 176, 160, 150)   # soft fluff lines (the nightcap bobble)
 INK = QColor("#2b2340")
 EYE = QColor("#251c33")
 EYE_LOW = QColor("#5d4560")             # the warm shine low in his eyes
@@ -172,9 +172,9 @@ def _arc(x0, y0, cx, cy, x1, y1) -> QPainterPath:
 # tucked up under his chin: (x, y, width, height, lean), the viewer's left one first.
 # Resting, a little apart; hoping, pressed together, tips touching; cross, folded one
 # over the other across his chest (the viewer's right one on top).
-PAWS_REST = ((42.2, 95.5, 10.5, 12.5, 10), (57.8, 95.5, 10.5, 12.5, -10))
-PAWS_HOPE = ((46.4, 95.2, 10, 13, 24), (53.6, 95.2, 10, 13, -24))
-PAWS_CROSS = ((55, 98.4, 10, 17, -76), (45, 100, 10, 17, 76))
+PAWS_REST = ((42, 97.5, 10.5, 17, 9), (58, 97.5, 10.5, 17, -9))
+PAWS_HOPE = ((46.3, 96.2, 10, 16.5, 22), (53.7, 96.2, 10, 16.5, -22))
+PAWS_CROSS = ((54, 98.8, 10.5, 19, -74), (46, 100.4, 10.5, 19, 74))
 # where a prop puts each paw (None: that paw stays on his tummy). "headphones" is in the
 # head's frame: the paw is on the ear cup
 PROP_PAWS = {"mic": (None, (76, 97)), "headphones": (None, (86, 72)),
@@ -425,10 +425,7 @@ def draw_bunny(p: QPainter, rect: QRectF, prop: str | None = None, *,
     p.setPen(ink)
     p.setBrush(fur)
     p.drawPath(body_shape)
-    _shade(p, body_shape, 70, 108, 20, fur_shade, 200)   # shade on his far side
-    for sx in (-1, 1):   # his haunches: a soft crease from his side round to his foot
-        _stroke(p, _arc(50 + sx * 20.5, 102, 50 + sx * 15, 104.5, 50 + sx * 12.5, 111),
-                ROBOT_BOLT if robot else FUR_LINE, 1.5)
+    _ellipse(p, 50, 105, 28, 21, fur_shade)   # his tummy patch
     for x, a in ((36.5, 9), (63.5, -9)):   # his feet, poking out front, turned out a bit
         _ellipse(p, x, 114.6, 16, 8.6, fur, ink, a)
 
