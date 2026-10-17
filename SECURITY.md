@@ -290,9 +290,11 @@ account or anything else about you.
     name); a sound played at 0% Sounds volume and its *Set to 100%*
     (`used/sound-vol-0`, `sound-vol-0-fixed`); a hotkey that was refused
     (`used/hotkey-refused`: never which key); a Live controls setup picked for sounds,
-    the radio or programs, *Not now* on its AI voice question, and one cancelled while
-    it got ready (`used/live-setup-sounds`, `live-setup-radio`, `live-setup-apps`,
-    `live-setup-ai-no`, `live-setup-cancel`: never the setup's name); a Voice tab setup
+    the radio or programs, one that speaks in another language, *Not now* on its "this
+    may take a while" question, and one cancelled while it got ready
+    (`used/live-setup-sounds`, `live-setup-radio`, `live-setup-apps`,
+    `live-setup-language`, `live-setup-said-no`, `live-setup-cancel`: never the
+    setup's name or the language); a Voice tab setup
     saved or renamed (`used/voice-setup-saved`, `voice-setup-renamed`); the *Up next*
     list opened and cleared (`used/upnext-opened`, `upnext-cleared`); the Live switch's
     "muted a long time" ring shown (`used/muted-ring`); the tray's Voice changer menu

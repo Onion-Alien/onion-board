@@ -3667,5 +3667,13 @@
   "You're hearing it without its AI voice: get AI voices (Voice tab → AI voices) to hear all of it.": "AIの声なしで聞いています：全部聞くにはAIの声を入れてください（ボイスタブ → AIの声）。",
   "Show as a list": "リストで表示",
   "Show as cards": "カードで表示",
-  "Sort the pads: my order, A–Z, newest, most played": "パッドの並び順: 自分の順、A–Z、新しい順、よく再生する順"
+  "Sort the pads: my order, A–Z, newest, most played": "パッドの並び順: 自分の順、A–Z、新しい順、よく再生する順",
+  "Couldn't put “{name}” into {language}: {why}": "「{name}」を{language}にできませんでした：{why}",
+  "Couldn't start translating: {why}": "翻訳を開始できませんでした：{why}",
+  "Couldn't translate: {why}": "翻訳できませんでした：{why}",
+  "Putting “{name}” into {language}… {pct}%": "「{name}」を{language}にしています… {pct}%",
+  "“{name}” speaks {language}, so this may take a while. Each sound is put into {language} first, in the background, and plays when it's ready.": "「{name}」は{language}を話すので、少し時間がかかることがあります。各サウンドはまずバックグラウンドで{language}にされ、準備ができたら再生されます。",
+  "“{name}” speaks {language}, so this may take a while. The radio goes quiet while the translation starts, then you hear it in {language}, a few seconds behind.": "「{name}」は{language}を話すので、少し時間がかかることがあります。翻訳が始まるまでラジオは無音になり、その後数秒遅れて{language}で聞こえます。",
+  "“{name}” speaks {language}, so this may take a while. Your programs go quiet while the translation starts, then you hear them in {language}, a few seconds behind.": "「{name}」は{language}を話すので、少し時間がかかることがあります。翻訳が始まるまでプログラムは無音になり、その後数秒遅れて{language}で聞こえます。",
+  "“{name}” speaks {language}, which needs speech recognition and the {language} download (Voice tab, Speak another language). The rest of it is on.": "「{name}」は{language}を話しますが、それには音声認識と{language}のダウンロードが必要です（ボイスタブの「別の言語を話しましょう」）。残りの部分はオンです。"
 }

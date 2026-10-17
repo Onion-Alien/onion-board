@@ -3823,5 +3823,13 @@
   "You're hearing it without its AI voice: get AI voices (Voice tab → AI voices) to hear all of it.": "Вы слышите его без голоса ИИ: установите голоса ИИ (вкладка Голос → голоса ИИ), чтобы услышать всё.",
   "Show as a list": "Показать списком",
   "Show as cards": "Показать карточками",
-  "Sort the pads: my order, A–Z, newest, most played": "Сортировка кнопок: мой порядок, А–Я, новые, частые"
+  "Sort the pads: my order, A–Z, newest, most played": "Сортировка кнопок: мой порядок, А–Я, новые, частые",
+  "Couldn't put “{name}” into {language}: {why}": "Не удалось перевести «{name}» на язык {language}: {why}",
+  "Couldn't start translating: {why}": "Не удалось начать перевод: {why}",
+  "Couldn't translate: {why}": "Не удалось перевести: {why}",
+  "Putting “{name}” into {language}… {pct}%": "Перевожу «{name}» на язык {language}… {pct}%",
+  "“{name}” speaks {language}, so this may take a while. Each sound is put into {language} first, in the background, and plays when it's ready.": "«{name}» говорит на языке {language}, так что это может занять время. Каждый звук сначала в фоне переводится на язык {language} и играет, когда готов.",
+  "“{name}” speaks {language}, so this may take a while. The radio goes quiet while the translation starts, then you hear it in {language}, a few seconds behind.": "«{name}» говорит на языке {language}, так что это может занять время. Радио замолкает, пока запускается перевод, потом вы слышите его на языке {language}, с отставанием в несколько секунд.",
+  "“{name}” speaks {language}, so this may take a while. Your programs go quiet while the translation starts, then you hear them in {language}, a few seconds behind.": "«{name}» говорит на языке {language}, так что это может занять время. Ваши программы замолкают, пока запускается перевод, потом вы слышите их на языке {language}, с отставанием в несколько секунд.",
+  "“{name}” speaks {language}, which needs speech recognition and the {language} download (Voice tab, Speak another language). The rest of it is on.": "«{name}» говорит на языке {language}, а для этого нужны распознавание речи и загрузка языка {language} (вкладка «Голос», «Говорим на другом языке»). Остальное включено."
 }

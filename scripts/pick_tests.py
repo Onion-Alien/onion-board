@@ -17,14 +17,17 @@ change no test is about (the README, the changelog, the website) runs none. main
 the whole suite after every merge and every night, and so does a manual run of the
 workflow.
 
-Usage: python scripts/pick_tests.py [BASE] [--local] [--matrix]   (BASE: origin/main)
+Usage: python scripts/pick_tests.py [BASE] [--local] [--matrix] [--shards=N]
+(BASE: origin/main)
 Prints the test files, one per line: `tests` alone for all of them, nothing for none.
 --local also counts uncommitted and new files. Locally, scripts/precommit.ps1 runs
 ruff and the other quick checks; with -Tests these tests too.
 
 --matrix prints CI's test jobs as JSON instead (BASE "all": the whole suite): the
 picked files split into jobs of about the same length by test_times.json (each
-file's seconds in a full run): one per JOB_S of tests, SHARDS at most, or none.
+file's seconds in a full run): one per JOB_S of tests, SHARDS at most (--shards=N: N),
+or none. main's run after a merge takes fewer: nobody waits on it, and every job it
+holds is a Windows machine a pull request's run queues for.
 
 --refresh-times DIR [DIR...] rewrites test_times.json from the JUnit reports in each DIR
 (every test job keeps one: `gh run download <run> -p "times-*" -D DIR`, one DIR a run of
@@ -223,9 +226,9 @@ def shards(files: list[str], most: int = SHARDS) -> list[list[str]]:
     return [sorted(fs) for _t, fs in jobs if fs]
 
 
-def matrix(picked: list[str]) -> list[dict]:
+def matrix(picked: list[str], most: int = SHARDS) -> list[dict]:
     files = all_tests() if picked == ["tests"] else picked
-    jobs = shards(files)
+    jobs = shards(files, most)
     return [{"shard": f"{i}/{len(jobs)}", "tests": " ".join(fs)}
             for i, fs in enumerate(jobs, 1)]
 
@@ -247,7 +250,11 @@ def refresh_times(reports: list[Path]) -> dict[str, float]:
 
 
 def main(argv: list[str]) -> int:
-    flags = {a for a in argv[1:] if a.startswith("--")}
+    most = SHARDS
+    for a in argv[1:]:
+        if a.startswith("--shards="):
+            most = max(1, int(a.split("=", 1)[1]))
+    flags = {a.split("=", 1)[0] for a in argv[1:] if a.startswith("--")}
     args = [a for a in argv[1:] if not a.startswith("--")]
     if "--refresh-times" in flags:
         runs = [refresh_times(r) for a in args if (r := sorted(Path(a).rglob("*.xml")))]
@@ -265,7 +272,7 @@ def main(argv: list[str]) -> int:
     base = args[0] if args else "origin/main"
     picked = ["tests"] if base == "all" else pick(changed_files(base, "--local" in flags))
     if "--matrix" in flags:
-        print(json.dumps(matrix(picked)))
+        print(json.dumps(matrix(picked, most)))
         return 0
     for line in picked:
         print(line)

@@ -3745,5 +3745,13 @@
   "You're hearing it without its AI voice: get AI voices (Voice tab → AI voices) to hear all of it.": "Du hörst sie ohne ihre KI-Stimme: Hol dir KI-Stimmen (Stimme-Tab → KI-Stimmen), um alles zu hören.",
   "Show as a list": "Als Liste zeigen",
   "Show as cards": "Als Karten zeigen",
-  "Sort the pads: my order, A–Z, newest, most played": "Pads sortieren: meine Reihenfolge, A–Z, neueste, meistgespielt"
+  "Sort the pads: my order, A–Z, newest, most played": "Pads sortieren: meine Reihenfolge, A–Z, neueste, meistgespielt",
+  "Couldn't put “{name}” into {language}: {why}": "„{name}“ konnte nicht auf {language} gebracht werden: {why}",
+  "Couldn't start translating: {why}": "Die Übersetzung konnte nicht gestartet werden: {why}",
+  "Couldn't translate: {why}": "Übersetzen hat nicht geklappt: {why}",
+  "Putting “{name}” into {language}… {pct}%": "„{name}“ wird auf {language} gebracht… {pct} %",
+  "“{name}” speaks {language}, so this may take a while. Each sound is put into {language} first, in the background, and plays when it's ready.": "„{name}“ spricht {language}, das kann also etwas dauern. Jeder Sound wird zuerst im Hintergrund auf {language} gebracht und spielt, sobald er fertig ist.",
+  "“{name}” speaks {language}, so this may take a while. The radio goes quiet while the translation starts, then you hear it in {language}, a few seconds behind.": "„{name}“ spricht {language}, das kann also etwas dauern. Das Radio ist still, während die Übersetzung startet, dann hörst du es auf {language}, ein paar Sekunden später.",
+  "“{name}” speaks {language}, so this may take a while. Your programs go quiet while the translation starts, then you hear them in {language}, a few seconds behind.": "„{name}“ spricht {language}, das kann also etwas dauern. Deine Programme sind still, während die Übersetzung startet, dann hörst du sie auf {language}, ein paar Sekunden später.",
+  "“{name}” speaks {language}, which needs speech recognition and the {language} download (Voice tab, Speak another language). The rest of it is on.": "„{name}“ spricht {language}. Dafür braucht es die Spracherkennung und den Download für {language} (Tab Stimme, Eine andere Sprache sprechen). Der Rest davon ist an."
 }

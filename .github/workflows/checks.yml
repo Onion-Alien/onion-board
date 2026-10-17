@@ -98,6 +98,7 @@ jobs:
       shards: ${{ steps.pick.outputs.shards }}
       shard_tests: ${{ steps.pick.outputs.shard_tests }}
       mic: ${{ steps.pick.outputs.mic }}
+      py: ${{ steps.pick.outputs.py }}
     steps:
       - uses: actions/checkout@v6
         with:
@@ -109,15 +110,27 @@ jobs:
         env:
           EVENT: ${{ github.event_name }}
           BASE: ${{ github.base_ref }}
+          BEFORE: ${{ github.event.before }}
+          AFTER: ${{ github.event.after }}
         run: |
           if [ "$EVENT" = pull_request ]; then
             base="origin/$BASE"
+            changed=$(git diff --name-only "$base"...HEAD)
           else
             base=all
+            # main after a merge: what the push added; the nightly and a manual run: all
+            changed=ALL
+            if [ "$EVENT" = push ]; then
+              changed=$(git diff --name-only "$BEFORE" "$AFTER" 2>/dev/null) || changed=ALL
+            fi
           fi
           tests=$(python scripts/pick_tests.py "$base" | tr '\n' ' ')
-          # the test jobs: a long run split in up to six (about the same length each)
-          matrix=$(python scripts/pick_tests.py "$base" --matrix)
+          # the test jobs: a long run split in up to six (about the same length each).
+          # main's run after a merge in three: nobody waits for it, and every job it
+          # holds is a Windows machine the PRs' runs queue for (20 jobs at once in all)
+          shards=
+          if [ "$EVENT" = push ]; then shards=--shards=3; fi
+          matrix=$(python scripts/pick_tests.py "$base" --matrix $shards)
           echo "tests=$tests" >> "$GITHUB_OUTPUT"
           echo "matrix=$matrix" >> "$GITHUB_OUTPUT"
           # the test jobs' matrix is just the shard names ("1/4"), each job's files
@@ -125,16 +138,24 @@ jobs:
           # a name built from matrix.shard showed up on it as raw expression text
           echo "shards=$(jq -c '[.[].shard]' <<< "$matrix")" >> "$GITHUB_OUTPUT"
           echo "shard_tests=$(jq -c 'map({(.shard): .tests}) | add // {}' <<< "$matrix")" >> "$GITHUB_OUTPUT"
-          # the mic effect's own job: a PR that touches its C++ or what checks it;
-          # main and a manual run always
+          # the mic effect's own job: a change to its C++ or what checks it (a PR, or
+          # main after a merge); the nightly and a manual run always
           mic=true
-          if [ "$EVENT" = pull_request ] && ! git diff --name-only "$base"...HEAD | grep -qE \
-              '^(native/directmic/|scripts/(build|check|fuzz)_directmic\.py|tests/test_directmic\.py|soundboard/directmic\.py|\.github/workflows/checks\.yml)'; then
+          if [ "$changed" != ALL ] && ! grep -qE \
+              '^(native/directmic/|scripts/(build|check|fuzz)_directmic\.py|tests/test_directmic\.py|soundboard/directmic\.py|\.github/workflows/checks\.yml)' <<< "$changed"; then
             mic=false
           fi
           echo "mic=$mic" >> "$GITHUB_OUTPUT"
+          # the type check: a change to any Python, or to what pyright reads
+          py=true
+          if [ "$changed" != ALL ] && ! grep -qE \
+              '(\.pyi?$|^pyproject\.toml$|^requirements|^scripts/pyright_baseline\.json$|^\.github/workflows/checks\.yml$)' <<< "$changed"; then
+            py=false
+          fi
+          echo "py=$py" >> "$GITHUB_OUTPUT"
           echo "Tests to run: ${tests:-none}"
           echo "Mic effect job: $mic"
+          echo "Type check: $py"
           echo "Windows jobs: $matrix"
       - run: |
           python -m pip install -q "$(grep '^ruff==' requirements-dev.txt)"
@@ -154,8 +175,10 @@ jobs:
   # pyright over the whole repo: errors not in scripts/pyright_baseline.json fail
   # (it's empty now, so any type error does). On Windows: Linux's PySide6 has no
   # Windows-only APIs (QImage.fromHICON), so pyright there flags code that's fine.
-  # Same venv cache as the Windows test jobs.
+  # Same venv cache as the Windows test jobs. Only when Python changed (pick job).
   types:
+    needs: pick
+    if: ${{ needs.pick.result == 'success' && needs.pick.outputs.py == 'true' }}
     runs-on: windows-latest
     timeout-minutes: 10
     steps:
@@ -401,7 +424,7 @@ jobs:
           if [ "$PICK" != success ]; then
             echo "ruff or the test pick failed: see the pick job"; exit 1
           fi
-          if [ "$TYPES" != success ]; then
+          if [ "$TYPES" != success ] && [ "$TYPES" != skipped ]; then
             echo "new type errors: see the types job (scripts/check_types.py)"; exit 1
           fi
           if [ "$MIC" != success ] && [ "$MIC" != skipped ]; then

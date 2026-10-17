@@ -289,9 +289,11 @@ FEATURES = ("add-files", "youtube", "record", "clip", "clip-editor", "import-boa
             # the voice leveler switched off; a sound with a voice laid over it, an AI
             # voice among them (all features_now)
             "voice-leveler-off", "sound-voice", "sound-ai-voice",
-            # Live controls: a setup picked for sounds, the radio or programs (LIVE_TABS);
-            # Not now on the AI voice question; one cancelled while it got ready
-            *(f"live-setup-{k}" for k in LIVE_TABS), "live-setup-ai-no", "live-setup-cancel",
+            # Live controls: a setup picked for sounds, the radio or programs (LIVE_TABS),
+            # one speaking in another language; Not now on its "may take a while"
+            # question; one cancelled while it got ready
+            *(f"live-setup-{k}" for k in LIVE_TABS), "live-setup-language",
+            "live-setup-said-no", "live-setup-cancel",
             # the Voice tab's setups: one saved, one renamed
             "voice-setup-saved", "voice-setup-renamed",
             # the Up next chip opened, its Clear; the Live switch's "muted a long time" ring

@@ -9,22 +9,33 @@ Its voice changer part is live, so it's on at once. Its AI voice takes a while:
   render cached like Edit sound's: renderworker), one sound at a time. A sound that
   was playing pauses meanwhile and goes on from the same place.
 
-A setup with an AI voice asks first ("this may take a while"). Then Live controls (and
-a card, when it's shut) shows how far it is with a Cancel, which puts back what was on
-before. Nothing here is saved: like the rest of Live controls, it's for now.
+Its language (speaking another language) is the Voice tab's translation, run on what
+plays (livesetup.Lang), and takes a while too:
+
+- the radio and programs are heard as they play and said again in that language, in
+  the setup's AI voice or the language's computer voice, a few seconds behind;
+- a sound is made in that language first (what's said in it, translated and said
+  again where it was said), in the background, the way the AI voice's is.
+
+A setup with an AI voice or a language asks first ("this may take a while"). Then Live
+controls (and a card, when it's shut) shows how far it is with a Cancel, which puts
+back what was on before. Nothing here is saved: like the rest of Live controls, it's
+for now.
 """
 from __future__ import annotations
 
 import dataclasses
+import hashlib
 import html
+import json
 import logging
 from typing import TYPE_CHECKING
 
 from PySide6.QtCore import QTimer, Signal
 from PySide6.QtWidgets import QMessageBox
 
-from soundboard import (errors, library, livesetup, renderworker, soundfx, usage,
-                        voicesetups)
+from soundboard import (errors, langnames, library, livesetup, renderworker, soundfx,
+                        usage, voicesetups)
 from soundboard.i18n import _
 from soundboard.ui import worker
 from soundboard.ui.controller import Controller
@@ -52,6 +63,7 @@ class LiveSetups(Controller):
         self.names = {t: "" for t in TABS}   # the setup on each, "" = none
         self._before = dict(self.names)      # what Cancel puts back
         self._ai: dict | None = None         # the sounds' AI voice
+        self._lang: livesetup.Lang | None = None   # the sounds' language
         self._ready: dict[tuple[str, str], object] = {}   # (sid, fx key) -> rendered
         self._jobs: list[tuple[str, float | None]] = []   # (sid, resume at) to render
         self._job: tuple[int, str, float | None] | None = None   # (gen, sid, resume at)
@@ -111,43 +123,92 @@ class LiveSetups(Controller):
             self.refresh(tab)   # deleted on the Voice tab meanwhile
             return
         module = None
-        if livesetup.ai_of(setup) is not None:
+        has_ai = livesetup.ai_of(setup) is not None
+        if has_ai:
             module = livesetup.ai_module()
-            if module is not None and ask and not self.ask(tab, name):
-                usage.used("live-setup-ai-no")
-                return   # No: what was on stays on
-            if module is None:
-                self.mw.toast(_("The AI voices add-on isn't installed, so only the voice "
-                                "changer part of “{name}” is on.", name=html.escape(name)),
-                              "warn")
+        lang, lang_name = self.lang_for(setup)
+        if ((module is not None or lang is not None) and ask
+                and not self.ask(tab, name, lang)):
+            usage.used("live-setup-said-no")
+            return   # No: what was on stays on
+        if has_ai and module is None:
+            self.mw.toast(_("The AI voices add-on isn't installed, so only the voice "
+                            "changer part of “{name}” is on.", name=html.escape(name)),
+                          "warn")
+        if lang_name and lang is None:
+            self.mw.toast(_("“{name}” speaks {language}, which needs speech recognition "
+                            "and the {language} download (Voice tab, Speak another "
+                            "language). The rest of it is on.", name=html.escape(name),
+                            language=html.escape(lang_name)), "warn")
         self._before[tab] = self.names[tab]
         if name and ask:   # their pick (not a cancel putting the old one back)
             usage.used(f"live-setup-{tab}")
+            if lang is not None:
+                usage.used("live-setup-language")
         try:
-            self._apply(tab, setup, module)
+            self._apply(tab, setup, module, lang)
         except RuntimeError as e:
-            self.mw.toast(_("Couldn't start the AI voice: {why}",
-                            why=html.escape(errors.plain(e))), "error")
-            self._apply(tab, setup, None)
+            why = html.escape(errors.plain(e))
+            self.mw.toast(_("Couldn't start translating: {why}", why=why)
+                          if module is None else _("Couldn't start the AI voice: {why}",
+                                                   why=why), "error")
+            self._apply(tab, setup, None, None)
         self.names[tab] = name
         b = self.button(tab)
         if b is not None:
             b.set_setup(name)
 
-    def ask(self, tab: str, name: str) -> bool:
-        """A setup with an AI voice takes a while: say so, Yes or No first."""
-        return self.ask_box(tab, name).exec() == QMessageBox.StandardButton.Yes
+    def lang_for(self, setup: dict | None) -> tuple[livesetup.Lang | None, str]:
+        """The setup's language ready to run, and its name ("" when it has none). The
+        Lang is None when it can't run here: speech recognition or the language's
+        download is missing (the Voice tab's Speak another language has both)."""
+        code = livesetup.lang_of(setup)
+        if not code:
+            return None, ""
+        speech = getattr(self.mw.voice, "speech", None)
+        m = next((x for x in getattr(speech, "langs", ()) if x.language == code), None)
+        name = langnames.of(m) if m is not None else langnames.name(code, code)
+        live = getattr(speech, "module", None)
+        if speech is None or m is None or live is None or not live.installed or (
+                not m.installed):
+            return None, name
+        return livesetup.Lang(code, name, live,
+                              tuple(livesetup.lang_args(speech.s.get("model", ""), m)),
+                              speech._voice_for(m), speech.ctl.tts), name
 
-    def ask_box(self, tab: str, name: str) -> QMessageBox:
-        text = {
-            "sounds": _("“{name}” has an AI voice, so this may take a while. Each sound is "
-                        "made in that voice first, in the background, and plays when it's "
-                        "ready.", name=name),
-            "radio": _("“{name}” has an AI voice, so this may take a while. The radio goes "
-                       "quiet until the AI voice is ready, then carries on in it.", name=name),
-            "apps": _("“{name}” has an AI voice, so this may take a while. Your programs go "
-                      "quiet until the AI voice is ready, then carry on in it.", name=name),
-        }[tab]
+    def ask(self, tab: str, name: str, lang: livesetup.Lang | None = None) -> bool:
+        """A setup with an AI voice or a language takes a while: say so, Yes or No
+        first."""
+        return self.ask_box(tab, name, lang).exec() == QMessageBox.StandardButton.Yes
+
+    def ask_box(self, tab: str, name: str,
+                lang: livesetup.Lang | None = None) -> QMessageBox:
+        if lang is not None:
+            text = {
+                "sounds": _("“{name}” speaks {language}, so this may take a while. Each "
+                            "sound is put into {language} first, in the background, and "
+                            "plays when it's ready.", name=name, language=lang.name),
+                "radio": _("“{name}” speaks {language}, so this may take a while. The "
+                           "radio goes quiet while the translation starts, then you hear "
+                           "it in {language}, a few seconds behind.", name=name,
+                           language=lang.name),
+                "apps": _("“{name}” speaks {language}, so this may take a while. Your "
+                          "programs go quiet while the translation starts, then you hear "
+                          "them in {language}, a few seconds behind.", name=name,
+                          language=lang.name),
+            }[tab]
+        else:
+            text = {
+                "sounds": _("“{name}” has an AI voice, so this may take a while. Each sound "
+                            "is made in that voice first, in the background, and plays "
+                            "when it's ready.", name=name),
+                "radio": _("“{name}” has an AI voice, so this may take a while. The radio "
+                           "goes quiet until the AI voice is ready, then carries on in it.",
+                           name=name),
+                "apps": _("“{name}” has an AI voice, so this may take a while. Your "
+                          "programs go quiet until the AI voice is ready, then carry on "
+                          "in it.", name=name),
+            }[tab]
         box = QMessageBox(QMessageBox.Icon.Question, _("Use “{name}”?", name=name), text,
                           QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No,
                           self.mw)
@@ -156,20 +217,20 @@ class LiveSetups(Controller):
         box.setDefaultButton(QMessageBox.StandardButton.Yes)
         return box
 
-    def _apply(self, tab: str, setup: dict | None, module):
+    def _apply(self, tab: str, setup: dict | None, module, lang=None):
         eng = self.mw.engine
         if tab == "sounds":
             eng.set_sound_voice(livesetup.chain_spec(setup))
-            self._set_sound_ai(livesetup.ai_of(setup) if module is not None else None)
+            self._set_sound_ai(livesetup.ai_of(setup) if module is not None else None, lang)
         elif tab == "radio":
             sv = eng.radio_voice
             if sv is None and setup:
                 sv = eng.radio_voice = livesetup.StreamVoice(
                     lambda ev: self._event.emit("radio", ev))
             if sv is not None:
-                sv.set_setup(setup, module)
+                sv.set_setup(setup, module, lang)
         else:
-            eng.set_apps_setup(setup, module, lambda ev: self._event.emit("apps", ev))
+            eng.set_apps_setup(setup, module, lambda ev: self._event.emit("apps", ev), lang)
         self._check_streams()
 
     def cancel(self, tab: str):
@@ -185,40 +246,47 @@ class LiveSetups(Controller):
         self._before[tab] = self.names[tab]
 
     # ------------------------------------------------------------ the radio, programs
-    def _waiting(self, tab: str) -> bool:
+    def _waiting(self, tab: str) -> str:
+        """What the stream waits for: "ai", "lang" (livesetup.StreamVoice.starting), ""."""
         eng = self.mw.engine
         if tab == "radio":
-            return bool(eng.radio_voice is not None and eng.radio_voice.waiting)
-        return tab == "apps" and eng.apps_waiting()
+            return eng.radio_voice.starting if eng.radio_voice is not None else ""
+        return eng.apps_starting() if tab == "apps" else ""
 
     def _check_streams(self):
         busy = False
         for tab in ("radio", "apps"):
             b = self.button(tab)
             w = self._waiting(tab)
-            busy = busy or w
+            busy = busy or bool(w)
             if b is not None:
-                b.set_busy(_("Getting the AI voice ready…") if w else "")
+                b.set_busy(_("Getting the AI voice ready…") if w == "ai"
+                           else _("Starting the translation…") if w == "lang" else "")
         if busy and not self._poll.isActive():
             self._poll.start()
         elif not busy:
             self._poll.stop()
 
     def _on_event(self, tab: str, ev: dict):
-        if ev.get("type") == "error" and ev.get("text"):
+        t, text = ev.get("type"), str(ev.get("text") or "")
+        if ev.get("part") == "language":
+            if t in ("error", "tts_error") or (t == "stopped" and text):
+                self.mw.toast(_("Couldn't translate: {why}", why=html.escape(text or "?")),
+                              "error")
+        elif t == "error" and text:
             self.mw.toast(_("Couldn't start the AI voice: {why}",
-                            why=html.escape(str(ev["text"]))), "error")
+                            why=html.escape(text)), "error")
         self._check_streams()
 
     # ------------------------------------------------------------ sounds
-    def _set_sound_ai(self, ai: dict | None):
-        if ai == self._ai:
+    def _set_sound_ai(self, ai: dict | None, lang: livesetup.Lang | None = None):
+        if ai == self._ai and lang == self._lang:
             return
         self._stop_jobs(resume=False)
-        self._ai = ai
+        self._ai, self._lang = ai, lang
         self._ready.clear()
         playing = self._board_playing()
-        if ai is None:   # the AI voice off: what's playing in it goes back to plain
+        if ai is None and lang is None:   # off: what's playing in it goes back to plain
             for sid, frac in playing:
                 if sid in self._ai_playing:
                     self._replay(sid, frac, self.mw.audio.get(sid))
@@ -239,17 +307,31 @@ class LiveSetups(Controller):
         m = self.mw.meta(sid)
         return None if m is None else livesetup.sound_fx(m.fx, {"ai": self._ai})
 
+    def _key(self, sid: str) -> str | None:
+        """The name of `sid`'s version for the setup on the sounds (None: none needed)."""
+        if self._lang is None:
+            fx = self._fx(sid)
+            return None if fx is None else soundfx.key(fx)
+        m = self.mw.meta(sid)
+        if m is None:
+            return None
+        lang = self._lang
+        made = json.dumps([soundfx.key(m.fx), lang.code, lang.voice, self._ai],
+                          sort_keys=True)
+        return "lang-" + hashlib.sha1(made.encode()).hexdigest()[:16]
+
     def for_play(self, sid: str, data):
-        """What PlaybackControl plays for `sid`: its audio, or the AI voice's version.
-        None: that's being made first, and it plays when it's ready."""
-        if self._ai is None or data is None:
+        """What PlaybackControl plays for `sid`: its audio, or the setup's version (in
+        the AI voice, in its language). None: that's being made first, and it plays
+        when it's ready."""
+        if (self._ai is None and self._lang is None) or data is None:
             return data
-        fx = self._fx(sid)
-        if fx is None:
+        k = self._key(sid)
+        if k is None:
             return data
-        key = (sid, soundfx.key(fx))
+        key = (sid, k)
         got = self._ready.get(key)
-        if got is None:
+        if got is None and self._lang is None:   # (a language's stays in memory)
             got = library.load_cached(sid, key[1])
             if got is not None:
                 self._ready[key] = got
@@ -270,8 +352,9 @@ class LiveSetups(Controller):
             return
         sid, at = self._jobs.pop(0)
         m = self.mw.meta(sid)
-        fx = self._fx(sid)
-        if m is None or fx is None:
+        lang, ai = self._lang, self._ai
+        fx = self._fx(sid) if lang is None else m.fx if m is not None else None
+        if m is None or (fx is None and lang is None):
             self._next_job()
             return
         self._gen += 1
@@ -289,6 +372,10 @@ class LiveSetups(Controller):
 
         def run():
             try:
+                if lang is not None:   # its own effects on, then said in the language
+                    plain = library.load_sound(meta, cancel=cancel)
+                    said = livesetup.translate_sound(plain, lang, ai, cancel, progress)
+                    return gen, sid, library.to_int16(said), ""
                 data = None
                 if renderworker.enabled:
                     try:   # out of the app's process: no stutter, no lag
@@ -319,7 +406,9 @@ class LiveSetups(Controller):
             self._shown_pct = -1
             return
         pct = int(frac * 100)
-        text = _("Putting the AI voice on “{name}”… {pct}%", name=m.name, pct=pct)
+        text = (_("Putting “{name}” into {language}… {pct}%", name=m.name,
+                  language=self._lang.name, pct=pct) if self._lang is not None
+                else _("Putting the AI voice on “{name}”… {pct}%", name=m.name, pct=pct))
         b.set_busy(text, frac)
         # the pop-up may be shut: a card says it too, with the same Cancel
         if pct // 5 != self._shown_pct // 5 or self._shown_pct < 0:
@@ -339,15 +428,18 @@ class LiveSetups(Controller):
         at = job[2]
         if data is None:
             m = self.mw.meta(sid)
-            self.mw.toast(_("Couldn't put the AI voice on “{name}”: {why}",
-                            name=html.escape(m.name if m else sid),
-                            why=html.escape(err or "?")), "error")
+            name, why = html.escape(m.name if m else sid), html.escape(err or "?")
+            self.mw.toast(_("Couldn't put “{name}” into {language}: {why}", name=name,
+                            language=html.escape(self._lang.name), why=why)
+                          if self._lang is not None
+                          else _("Couldn't put the AI voice on “{name}”: {why}", name=name,
+                                 why=why), "error")
             if at is not None:
                 self.mw.engine.set_paused(sid, False)   # it goes on as it was
         else:
-            fx = self._fx(sid)
-            if fx is not None:
-                self._ready[(sid, soundfx.key(fx))] = data
+            k = self._key(sid)
+            if k is not None:
+                self._ready[(sid, k)] = data
             m = self.mw.meta(sid)
             if m is not None:   # the busy card turns into this one
                 self.mw.toast(_("✓ “{name}” is ready to play", name=html.escape(m.name)),

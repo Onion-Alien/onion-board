@@ -331,7 +331,7 @@ class Engine(EngineTakes, EngineDevices, SoundCache):
         self._sound_voice_gen = 0
         self._svoice: dict[str, Any] = {}   # out -> (VoiceChain, gen it was set up for)
         self.radio_voice: Any = None   # livesetup.StreamVoice, or None
-        self._apps_setup: tuple = (None, None, None)   # (setup, AI module, on_event)
+        self._apps_setup: tuple = (None, None, None, None)   # (setup, AI module, on_event, lang)
         self._aux_voice: dict = {}   # aux key -> livesetup.StreamVoice
 
         self.main_stream = self.mon_stream = self.mic_stream = self.obs_stream = None
@@ -554,19 +554,24 @@ class Engine(EngineTakes, EngineDevices, SoundCache):
         self.sound_voice = dict(spec or {})
         self._sound_voice_gen += 1
 
-    def set_apps_setup(self, setup: dict | None, module=None, on_event=None):
-        """(UI thread) A voice setup on every captured program, now and from now on.
-        Raises RuntimeError when an AI voice's helper can't start."""
-        self._apps_setup = (setup, module, on_event)
+    def set_apps_setup(self, setup: dict | None, module=None, on_event=None, lang=None):
+        """(UI thread) A voice setup on every captured program, now and from now on
+        (`lang`: its language, livesetup.Lang). Raises RuntimeError when an AI voice's
+        or a language's helper can't start."""
+        self._apps_setup = (setup, module, on_event, lang)
         for a in self.aux:
             self._aux_setup(a.key)
 
     def apps_waiting(self) -> bool:
-        """A captured program is held back while its AI voice gets ready."""
-        return any(sv.waiting for sv in self._aux_voice.values())
+        """A captured program is held back while its AI voice or language gets ready."""
+        return bool(self.apps_starting())
+
+    def apps_starting(self) -> str:
+        """What a captured program waits for: "ai", "lang" (StreamVoice.starting) or ""."""
+        return next((w for sv in list(self._aux_voice.values()) if (w := sv.starting)), "")
 
     def _aux_setup(self, key):
-        setup, module, on_event = self._apps_setup
+        setup, module, on_event, lang = self._apps_setup
         sv = self._aux_voice.get(key)
         if not setup:
             if sv is not None:
@@ -575,7 +580,7 @@ class Engine(EngineTakes, EngineDevices, SoundCache):
         if sv is None:
             from soundboard.livesetup import StreamVoice
             sv = self._aux_voice[key] = StreamVoice(on_event)
-        sv.set_setup(setup, module)
+        sv.set_setup(setup, module, lang)
 
     def _sound_voice_fx(self, out: str, x: np.ndarray) -> np.ndarray:
         """The Live controls setup's voice changer on `out`'s sounds."""

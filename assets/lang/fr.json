@@ -3745,5 +3745,13 @@
   "You're hearing it without its AI voice: get AI voices (Voice tab → AI voices) to hear all of it.": "Tu l'entends sans sa voix de l'IA : installe les voix de l'IA (onglet Voix → Voix de l'IA) pour tout entendre.",
   "Show as a list": "Afficher en liste",
   "Show as cards": "Afficher en cartes",
-  "Sort the pads: my order, A–Z, newest, most played": "Trier les pads : mon ordre, A–Z, plus récents, plus joués"
+  "Sort the pads: my order, A–Z, newest, most played": "Trier les pads : mon ordre, A–Z, plus récents, plus joués",
+  "Couldn't put “{name}” into {language}: {why}": "Impossible de mettre « {name} » en {language} : {why}",
+  "Couldn't start translating: {why}": "Impossible de lancer la traduction : {why}",
+  "Couldn't translate: {why}": "Impossible de traduire : {why}",
+  "Putting “{name}” into {language}… {pct}%": "Passage de « {name} » en {language}… {pct} %",
+  "“{name}” speaks {language}, so this may take a while. Each sound is put into {language} first, in the background, and plays when it's ready.": "« {name} » parle {language}, cela peut donc prendre un moment. Chaque son est d'abord mis en {language}, en arrière-plan, et se joue dès qu'il est prêt.",
+  "“{name}” speaks {language}, so this may take a while. The radio goes quiet while the translation starts, then you hear it in {language}, a few seconds behind.": "« {name} » parle {language}, cela peut donc prendre un moment. La radio se tait le temps que la traduction démarre, puis vous l'entendez en {language}, avec quelques secondes de retard.",
+  "“{name}” speaks {language}, so this may take a while. Your programs go quiet while the translation starts, then you hear them in {language}, a few seconds behind.": "« {name} » parle {language}, cela peut donc prendre un moment. Vos programmes se taisent le temps que la traduction démarre, puis vous les entendez en {language}, avec quelques secondes de retard.",
+  "“{name}” speaks {language}, which needs speech recognition and the {language} download (Voice tab, Speak another language). The rest of it is on.": "« {name} » parle {language}, ce qui demande la reconnaissance vocale et le téléchargement de {language} (onglet Voix, Parler une autre langue). Le reste est activé."
 }
