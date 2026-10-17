@@ -3713,5 +3713,10 @@
   "Send to others": "Отправить другим",
   "Who should hear the radio?": "Кто должен слышать радио?",
   "only you hear it": "слышишь только ты",
-  "Click any dot to play that station. Press Send to others and your call hears it too.": "Нажми на любую точку, чтобы включить станцию. Нажми Отправить другим, и её услышит твой звонок."
+  "Click any dot to play that station. Press Send to others and your call hears it too.": "Нажми на любую точку, чтобы включить станцию. Нажми Отправить другим, и её услышит твой звонок.",
+  "{n} min": [
+    "{n} мин",
+    "{n} мин",
+    "{n} мин"
+  ]
 }

@@ -3944,5 +3944,13 @@
   "Send to others": "أرسل للآخرين",
   "Who should hear the radio?": "من يجب أن يسمع الراديو؟",
   "only you hear it": "أنت فقط تسمعه",
-  "Click any dot to play that station. Press Send to others and your call hears it too.": "اضغط على أي نقطة لتشغيل تلك المحطة. اضغط أرسل للآخرين ليسمعها من في مكالمتك أيضًا."
+  "Click any dot to play that station. Press Send to others and your call hears it too.": "اضغط على أي نقطة لتشغيل تلك المحطة. اضغط أرسل للآخرين ليسمعها من في مكالمتك أيضًا.",
+  "{n} min": [
+    "{n} دقيقة",
+    "{n} دقيقة",
+    "{n} دقيقة",
+    "{n} دقيقة",
+    "{n} دقيقة",
+    "{n} دقيقة"
+  ]
 }

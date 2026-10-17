@@ -11,6 +11,7 @@ from __future__ import annotations
 import html
 import math
 import re
+import time
 from collections.abc import Sequence
 from dataclasses import dataclass
 
@@ -21,7 +22,7 @@ from PySide6.QtWidgets import (QApplication, QBoxLayout, QFrame, QHBoxLayout, QL
                                QTabWidget, QToolButton, QVBoxLayout, QWidget)
 
 from soundboard import theme
-from soundboard.i18n import _
+from soundboard.i18n import _, ngettext
 from soundboard.ui import icons
 from soundboard.ui.panel import keep_focus_off
 from soundboard.ui.pixels import snap_to_pixels
@@ -325,6 +326,8 @@ class OutputBlock(QFrame):
     PAIR_ICON = 18        # their icons
     INK_DOWN = 1          # the switch's and Stop all's ink this far under their box's
                           # centre: on the title's cap-height centre (measured)
+    MUTED_LONG_S = 60     # muted this long: a yellow ring round the card and how long
+                          # it's been, so a forgotten mute isn't taken for a broken app
 
     def __init__(self, power: QPushButton, connection: QPushButton,
                  stop: QPushButton | None = None):
@@ -363,6 +366,13 @@ class OutputBlock(QFrame):
         self.switch.setChecked(power.isChecked())
         self.switch.toggled.connect(power.setChecked)
         power.toggled.connect(self.switch.setChecked)
+        self._muted_at: float | None = None if power.isChecked() else time.monotonic()
+        self._muted_clock = QTimer(self)
+        self._muted_clock.setInterval(5000)
+        self._muted_clock.timeout.connect(self._muted_tick)
+        if self._muted_at is not None:
+            self._muted_clock.start()
+        power.toggled.connect(self._muted_changed)   # (before the words: they show it)
         power.toggled.connect(self._name)
         self._name(power.isChecked())
         top.addWidget(mark, 0, Qt.AlignmentFlag.AlignTop)
@@ -464,6 +474,42 @@ class OutputBlock(QFrame):
         self._lines: list[Line] = []
         self.net: list[_NetLine] = []
         self.refresh()
+
+    def _muted_changed(self, on: bool):
+        self._muted_at = None if on else time.monotonic()
+        if on:
+            self._muted_clock.stop()
+        else:
+            self._muted_clock.start()
+        self.update()
+
+    def _muted_tick(self):
+        self._name(self.power.isChecked())
+        self._words()
+        self.update()
+
+    def muted_for(self) -> str:
+        """How long others have heard nothing ("3 min"), once it's past MUTED_LONG_S;
+        "" before that and while live."""
+        if self._muted_at is None or self.power.isChecked():
+            return ""
+        s = time.monotonic() - self._muted_at
+        if s < self.MUTED_LONG_S:
+            return ""
+        n = int(s // 60)
+        return ngettext("{n} min", "{n} min", n)
+
+    def paintEvent(self, e):
+        super().paintEvent(e)
+        if not self.muted_for():
+            return
+        p = QPainter(self)
+        snap_to_pixels(p)
+        p.setRenderHint(QPainter.RenderHint.Antialiasing)
+        p.setPen(QPen(QColor(theme.T["warn_text"]), 2))
+        p.setBrush(Qt.BrushStyle.NoBrush)
+        p.drawRoundedRect(QRectF(self.rect()).adjusted(1, 1, -1, -1), 12, 12)
+        p.end()
 
     def _glyph(self, size: int = 0) -> QLabel:
         g = QLabel()
@@ -747,6 +793,10 @@ class OutputBlock(QFrame):
             fits = all(w and b.fontMetrics().horizontalAdvance(lead + w) <= room
                        for w in words)
             word = words[0 if on or len(words) == 1 else 1]
+            long = self.muted_for() if b is self.mute else ""
+            if fits and long:   # both if they fit, or the time beside the struck-out icon
+                both = f"{word} · {long}"
+                word = both if b.fontMetrics().horizontalAdvance(lead + both) <= room else long
             b.setText(lead + word if fits else "")
 
     def _mute_look(self, on: bool):
@@ -766,7 +816,8 @@ class OutputBlock(QFrame):
         text = self.names()[0 if on else 1]
         self.title.setText(text)
         if hasattr(self, "caption"):
-            self.caption.setText(text)
+            long = self.muted_for()
+            self.caption.setText(f"{text}\n{long}" if long else text)
         self.switch.setAccessibleName(text)
         icons.set_label_icon(self.mark, "live" if on else "live_off",
                              "accent" if on else "danger_text", size=self.mark.width())

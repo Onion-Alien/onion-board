@@ -3636,5 +3636,9 @@
   "Send to others": "Στείλε στους άλλους",
   "Who should hear the radio?": "Ποιος να ακούει το ραδιόφωνο;",
   "only you hear it": "μόνο εσύ το ακούς",
-  "Click any dot to play that station. Press Send to others and your call hears it too.": "Κάνε κλικ σε μια κουκκίδα για να παίξει ο σταθμός. Πάτα Στείλε στους άλλους και τον ακούει και η κλήση σου."
+  "Click any dot to play that station. Press Send to others and your call hears it too.": "Κάνε κλικ σε μια κουκκίδα για να παίξει ο σταθμός. Πάτα Στείλε στους άλλους και τον ακούει και η κλήση σου.",
+  "{n} min": [
+    "{n} λεπ.",
+    "{n} λεπ."
+  ]
 }

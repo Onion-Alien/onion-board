@@ -3636,5 +3636,9 @@
   "Send to others": "Enviar para os outros",
   "Who should hear the radio?": "Quem deve ouvir o rádio?",
   "only you hear it": "só você ouve",
-  "Click any dot to play that station. Press Send to others and your call hears it too.": "Clique em qualquer ponto para tocar essa estação. Aperte Enviar para os outros e sua chamada também ouve."
+  "Click any dot to play that station. Press Send to others and your call hears it too.": "Clique em qualquer ponto para tocar essa estação. Aperte Enviar para os outros e sua chamada também ouve.",
+  "{n} min": [
+    "{n} min",
+    "{n} min"
+  ]
 }
