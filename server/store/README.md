@@ -17,8 +17,8 @@ and neither needs a payment card on the account.
 | `POST /v1/sounds/<id>/report` | `{"reason": "copyright" \| "offensive" \| "broken" \| "other"}`; 3 reports take it off until it's looked at again |
 | `GET /v1/chat?after=N&wait=1` | the Chat tab's room: messages after number N (held up to 20 s until one arrives); names are picked by the server from the install and per-launch ids (`X-Onion-Session`) |
 | `POST /v1/chat` | `{"text": "..."}`: say something (280 characters, no links, rate-limited) |
-| `POST /v1/chat/<n>/report` | report message n; 3 different people mute its author for an hour |
-| `/v1/admin/chat`, `/off`, `/ban` | the owner's: reports, the kill switch (`{"off": true}`), bans (`{"who": "<hash>"}`) |
+| `POST /v1/chat/<n>/report` | report message n (10 reports per address in 10 minutes); 3 people from different addresses mute its author, and the address it came from, for an hour |
+| `/v1/admin/chat`, `/off`, `/ban` | the owner's: reports, the kill switch (`{"off": true}`), bans (`{"who": "<hash>"}`: an install's hash also bans the addresses the room saw it speak from; an address hash from the reports bans just that; `"ban": false` lifts it) |
 | `GET /admin` | the review page: listen, approve, reject |
 | `/v1/admin/...` | the review page's calls (`Authorization: Bearer <ADMIN_TOKEN>`), and `POST /v1/admin/import` to add a sound straight to the store |
 

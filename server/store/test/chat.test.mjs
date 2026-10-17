@@ -66,9 +66,9 @@ test("3 reports mute the author and clear their lines; ban and off work", () => 
   const s = r.say(W, "ip", "rude", 5_000);
   const m = r.push(s.msg, "u", "N");
   r.push(r.say(W2, "ip2", "fine", 5_000).msg, "v", "M");
-  assert.ok(r.report(m.id, "p1", 6_000).ok); assert.ok(r.report(m.id, "p1", 6_000).ok);
+  assert.ok(r.report(m.id, "p1", "i1", 6_000).ok); assert.ok(r.report(m.id, "p1", "i1", 6_000).ok);
   assert.equal(r.muted.size, 0);
-  r.report(m.id, "p2", 6_000); r.report(m.id, "p3", 6_000);
+  r.report(m.id, "p2", "i2", 6_000); r.report(m.id, "p3", "i3", 6_000);
   assert.equal(r.say(W, "ip", "again", 9_000).error, "muted");
   assert.equal(r.say(W, "ip", "later", 5_000 + 3_700_000).ok, true);
   assert.equal(r.msgs.length, 1);
@@ -76,7 +76,62 @@ test("3 reports mute the author and clear their lines; ban and off work", () => 
   assert.equal(r.say(W2, "ip2", "hi", 99_000).error, "banned");
   r.off = true;
   assert.equal(r.say("c".repeat(64), "ip3", "hi", 99_000).error, "off");
-  assert.equal(r.report(9999, "p1").error, "gone");
+  assert.equal(r.report(9999, "p1", "i1").error, "gone");
+});
+
+test("one person with made-up install ids can't mute anyone", () => {
+  const r = new Room();
+  const m = r.push(r.say(W, "ip", "hello everyone", 5_000).msg, "u", "N");
+  for (const fake of ["f1", "f2", "f3", "f4", "f5"]) assert.ok(r.report(m.id, fake, "troll-ip", 6_000).ok);
+  assert.equal(r.muted.size, 0);
+  assert.equal(r.msgs.length, 1);
+  assert.ok(r.say(W, "ip", "still here", 9_000).ok);
+  // reporting yourself counts for nothing either
+  r.report(m.id, W, "other", 9_500); r.report(m.id, "x", "ip", 9_500);
+  assert.equal(r.muted.size, 0);
+});
+
+test("a mute covers the address, so a new install id doesn't get round it", () => {
+  const r = new Room();
+  const m = r.push(r.say(W, "troll-ip", "rude", 5_000).msg, "u", "N");
+  for (const [p, i] of [["p1", "i1"], ["p2", "i2"], ["p3", "i3"]]) r.report(m.id, p, i, 6_000);
+  assert.equal(r.say(W2, "troll-ip", "new me", 9_000).error, "muted");
+  assert.ok(r.say(W2, "elsewhere", "hi", 9_000).ok);
+});
+
+test("reports are rate-limited per address", () => {
+  const r = new Room();
+  let t = 1_000_000;
+  const ids = [];
+  for (let i = 0; i < 12; i++)
+    ids.push(r.push(r.say(`${i}`.padStart(64, "0"), `ip${i}`, `m${i}`, (t += 10)).msg, "u", "N").id);
+  const out = ids.map(id => r.report(id, "p1", "one-ip", t + 1));
+  assert.equal(out.filter(o => o.ok).length, 10);
+  assert.equal(out[10].error, "slow down");
+  assert.ok(r.report(ids[11], "p1", "one-ip", t + 600_001).ok);   // ten minutes on: fine again
+});
+
+test("a ban covers the addresses the install spoke from, and lifting it frees them", () => {
+  const r = new Room();
+  r.push(r.say(W, "home", "a", 5_000).msg, "u", "N");
+  r.push(r.say(W, "phone", "b", 7_000).msg, "u", "N");
+  r.push(r.say(W2, "elsewhere", "c", 7_000).msg, "v", "M");
+  assert.equal(r.ban(W), 3);
+  assert.equal(r.msgs.length, 1);
+  assert.equal(r.say("c".repeat(64), "home", "new id", 9_000).error, "banned");
+  r.ban(W, false);
+  assert.equal(r.banned.size, 0);
+  assert.ok(r.say("c".repeat(64), "home", "back", 11_000).ok);
+});
+
+test("rate-limit records are tidied, so new install ids can't fill the memory", () => {
+  const r = new Room();
+  let t = 0;
+  for (let i = 0; i < 5000; i++) r.say(`id${i}`, `ip${i}`, `m${i}`, (t += 20));
+  assert.ok(r.last.size < 5000 && r.ips.size < 5000);
+  r.say("late", "late-ip", "hi", t + 120_000);
+  assert.equal(r.last.size, 1);
+  assert.equal(r.ips.size, 1);
 });
 
 test("a waiting poll wakes when a message arrives, and gives up on time", async () => {
