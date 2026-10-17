@@ -26,7 +26,7 @@ from PySide6.QtWidgets import (QFrame, QHBoxLayout, QLabel, QPushButton, QScroll
 
 from soundboard import jobprogress, theme, usage
 from soundboard.i18n import _, ngettext
-from soundboard.ui import icons
+from soundboard.ui import icons, responsive
 from soundboard.ui.scribebun import ScribeBunny
 from soundboard.ui.widgets import fmt_time
 from soundboard.ui.pixels import snap_to_pixels
@@ -842,6 +842,10 @@ class DownloadBar(QFrame):
         self._outer.setContentsMargins(8, 6 if folded else 8, 8, 6 if folded else 8)
         self._fold_icon()
         self._sync_head()
+        # the window's fitter measures again straight away: without this the box around
+        # the bar kept the open list's height, nothing seemed to fit, and a failed link
+        # sent a roomy window into the mini player (where the bar never re-measures)
+        responsive.touch(self.panel)
 
     # How much shows is one of three states, never a squashed step between them: the
     # whole list ("open"), just the running row ("row") or just the summary line
