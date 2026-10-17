@@ -245,6 +245,7 @@ QFrame#sidebar[compact="true"] QPushButton { padding-top:2px; padding-bottom:2px
 QPushButton#settings { padding:6px 14px; font-weight:600; }
 QFrame#transport, QFrame#deck { background:$panel; border-radius:12px; }
 QDialog#transport { background:$panel; }
+QDialog[popover="true"] { background:$panel; border:1px solid $border; }
 QDialog#settingspage { background:transparent; }
 QFrame#mixer { background:transparent; }
 QFrame#card QPushButton#primary { background:$accent; color:$on_accent; border:none; padding:9px; }

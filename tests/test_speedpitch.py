@@ -62,9 +62,11 @@ def test_live_stream_button_has_no_speed(qapp):
 
 
 @pytest.mark.parametrize("what", ["sounds", "radio", "apps"])
-def test_effects_window_opens_over_owner_and_keeps_its_position(qapp, what):
-    from PySide6.QtCore import QPoint, Qt
-    from PySide6.QtWidgets import QDialog, QVBoxLayout, QWidget
+def test_live_controls_pop_up_beside_the_button_and_click_away(qapp, what):
+    """A pop-up, not a window: it opens by its button, on the button's screen, a
+    click outside (or Escape) closes it, and the settings stay for next time."""
+    from PySide6.QtCore import Qt
+    from PySide6.QtWidgets import QVBoxLayout, QWidget
 
     from soundboard.ui.speedpitch import SpeedPitchButton
 
@@ -72,43 +74,34 @@ def test_effects_window_opens_over_owner_and_keeps_its_position(qapp, what):
     owner.setGeometry(30, 80, 760, 650)
     layout = QVBoxLayout(owner)
     button = SpeedPitchButton(what)
-    layout.addWidget(button, 0, Qt.AlignTop | Qt.AlignLeft)
+    layout.addWidget(button, 0, Qt.AlignBottom | Qt.AlignRight)
     owner.show()
     qapp.processEvents()
+    pop = button.pop
     try:
-        button._open()
+        button.click()
         qapp.processEvents()
-        dialog = button.pop
-        assert isinstance(dialog, QDialog)
-        assert dialog.windowType() == Qt.Dialog
-        assert not dialog.isModal()
-        assert owner.frameGeometry().contains(dialog.frameGeometry())
-        area = dialog.screen().availableGeometry()
-        assert area.contains(dialog.frameGeometry())
+        assert pop.isVisible() and pop.windowType() == Qt.Popup
+        area = button.screen().availableGeometry()
+        assert area.contains(pop.frameGeometry())
+        b = button.rect().translated(button.mapToGlobal(button.rect().topLeft()))
+        assert pop.geometry().bottom() < b.top()          # just above its button
+        assert abs(pop.geometry().right() - b.right()) <= 1
 
-        dialog.move(QPoint(area.left() + 10, area.top() + 10))
-        placed = dialog.pos()
-        dialog.close()
-        button._open()
-        assert dialog.pos() == placed
-        button.set_redline(True)
-        assert dialog.pos() == placed
+        button.set_redline(True)                          # taller: re-placed above it
+        assert pop.isVisible() and area.contains(pop.frameGeometry())
         button.set_redline(False)
-        assert dialog.pos() == placed
 
-        # Closing the window does not discard the live settings.
         button.set_fx({"bass": 4})
-        dialog.close()
-        button._open()
-        assert button.fx_values() == {"bass": 4}
-
-        # A stale placement (e.g. a removed monitor) remains reachable on reopen.
-        dialog.move(-10000, -10000)
-        dialog.close()
-        button._open()
-        assert dialog.screen().availableGeometry().contains(dialog.frameGeometry())
+        pop.close()                                       # a click outside / Escape
+        assert not pop.isVisible()
+        button.click()            # the press that closed it was on the button: stays shut
+        assert not pop.isVisible()
+        button._hidden_at = 0.0   # (a later click)
+        button.click()
+        assert pop.isVisible() and button.fx_values() == {"bass": 4}
     finally:
-        button.pop.close()
+        pop.close()
         owner.close()
 
 
