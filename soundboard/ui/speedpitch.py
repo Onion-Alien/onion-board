@@ -288,6 +288,9 @@ class SpeedPitchButton(QPushButton):
         sub.setObjectName("muted")
         reset = reset_button(_("Back to 1x, no pitch change and no effects") if self.has_speed
                              else _("Back to no pitch change and no effects"))
+        reset.setObjectName("liveReset")
+        reset.setMinimumSize(96, 36)
+        icons.set_icon(reset, "reload", size=18)
         reset.clicked.connect(self.reset)
         self.dj = DjBunny()   # Bun mixing, left of the title
         head.addWidget(self.dj)
