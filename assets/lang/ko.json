@@ -3622,5 +3622,21 @@
   "Updates install themselves": "업데이트가 알아서 설치돼요",
   "Voices on your sounds, and hotkeys in games": "사운드에 목소리를, 게임에 단축키를",
   "What's new in Onion Board {version}.": "Onion Board {version}의 새로운 기능.",
-  "Your voice at one volume": "내 목소리를 같은 크기로"
+  "Your voice at one volume": "내 목소리를 같은 크기로",
+  "Cathedral": "대성당",
+  "Choir": "합창단",
+  "Drive-thru speaker": "드라이브스루 스피커",
+  "Drunk": "술 취한",
+  "Evil twin": "사악한 쌍둥이",
+  "Fairy": "요정",
+  "Giant": "거인",
+  "Goblin": "고블린",
+  "Mecha": "메카",
+  "Old film": "옛날 영화",
+  "Pilot": "조종사",
+  "Random voice": "랜덤 목소리",
+  "Ship computer": "우주선 컴퓨터",
+  "Turns on one of the voices shown here, picked at random. Click again for another.": "여기 보이는 목소리 중 하나를 무작위로 켜요. 다시 클릭하면 다른 목소리예요.",
+  "Turns the voice changer on with a voice picked at random from the ones the Voice tab shows (your favorites, when Favorites is picked).": "음성 탭에 보이는 목소리 중 무작위로 골라 보이스 체인저를 켜요(즐겨찾기를 고르면 즐겨찾기에서).",
+  "Zombie": "좀비"
 }

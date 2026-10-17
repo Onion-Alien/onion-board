@@ -3622,5 +3622,21 @@
   "Updates install themselves": "อัปเดตติดตั้งเอง",
   "Voices on your sounds, and hotkeys in games": "เสียงพูดบนเสียงของคุณ และปุ่มลัดในเกม",
   "What's new in Onion Board {version}.": "มีอะไรใหม่ใน Onion Board {version}",
-  "Your voice at one volume": "เสียงของคุณดังเท่ากัน"
+  "Your voice at one volume": "เสียงของคุณดังเท่ากัน",
+  "Cathedral": "มหาวิหาร",
+  "Choir": "คณะประสานเสียง",
+  "Drive-thru speaker": "ลำโพงไดรฟ์ทรู",
+  "Drunk": "เมา",
+  "Evil twin": "แฝดร้าย",
+  "Fairy": "นางฟ้า",
+  "Giant": "ยักษ์",
+  "Goblin": "ก็อบลิน",
+  "Mecha": "เมคา",
+  "Old film": "หนังเก่า",
+  "Pilot": "นักบิน",
+  "Random voice": "เสียงสุ่ม",
+  "Ship computer": "คอมพิวเตอร์ยานอวกาศ",
+  "Turns on one of the voices shown here, picked at random. Click again for another.": "เปิดเสียงหนึ่งจากเสียงที่แสดงตรงนี้แบบสุ่ม คลิกอีกครั้งเพื่อเปลี่ยนเสียง",
+  "Turns the voice changer on with a voice picked at random from the ones the Voice tab shows (your favorites, when Favorites is picked).": "เปิดโปรแกรมเปลี่ยนเสียงด้วยเสียงที่สุ่มจากเสียงที่แท็บ เสียงพูด แสดงอยู่ (จากรายการโปรดของคุณ เมื่อเลือก รายการโปรด)",
+  "Zombie": "ซอมบี้"
 }

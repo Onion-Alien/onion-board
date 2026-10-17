@@ -3700,5 +3700,21 @@
   "Updates install themselves": "Kusang nag-i-install ang mga update",
   "Voices on your sounds, and hotkeys in games": "Mga boses sa sounds mo at hotkey sa laro",
   "What's new in Onion Board {version}.": "Ano'ng bago sa Onion Board {version}.",
-  "Your voice at one volume": "Iisang lakas ng boses mo"
+  "Your voice at one volume": "Iisang lakas ng boses mo",
+  "Cathedral": "Katedral",
+  "Choir": "Koro",
+  "Drive-thru speaker": "Speaker ng drive-thru",
+  "Drunk": "Lasing",
+  "Evil twin": "Masamang kambal",
+  "Fairy": "Diwata",
+  "Giant": "Higante",
+  "Goblin": "Duwende",
+  "Mecha": "Mecha",
+  "Old film": "Lumang pelikula",
+  "Pilot": "Piloto",
+  "Random voice": "Random na boses",
+  "Ship computer": "Computer ng barko",
+  "Turns on one of the voices shown here, picked at random. Click again for another.": "Binubuksan ang isa sa mga boses na nakikita rito, pinili nang random. I-click ulit para sa iba.",
+  "Turns the voice changer on with a voice picked at random from the ones the Voice tab shows (your favorites, when Favorites is picked).": "Binubuksan ang voice changer gamit ang boses na random na pinili sa mga ipinapakita ng Voice tab (ang mga paborito mo, kapag Mga paborito ang pinili).",
+  "Zombie": "Zombie"
 }

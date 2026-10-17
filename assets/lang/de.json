@@ -3700,5 +3700,21 @@
   "Updates install themselves": "Updates installieren sich selbst",
   "Voices on your sounds, and hotkeys in games": "Stimmen auf deinen Sounds und Hotkeys in Spielen",
   "What's new in Onion Board {version}.": "Neu in Onion Board {version}.",
-  "Your voice at one volume": "Deine Stimme gleich laut"
+  "Your voice at one volume": "Deine Stimme gleich laut",
+  "Cathedral": "Kathedrale",
+  "Choir": "Chor",
+  "Drive-thru speaker": "Drive-in-Lautsprecher",
+  "Drunk": "Betrunken",
+  "Evil twin": "Böser Zwilling",
+  "Fairy": "Fee",
+  "Giant": "Riese",
+  "Goblin": "Kobold",
+  "Mecha": "Mecha",
+  "Old film": "Alter Film",
+  "Pilot": "Pilot",
+  "Random voice": "Zufällige Stimme",
+  "Ship computer": "Bordcomputer",
+  "Turns on one of the voices shown here, picked at random. Click again for another.": "Schaltet eine der hier gezeigten Stimmen ein, zufällig gewählt. Nochmal klicken für eine andere.",
+  "Turns the voice changer on with a voice picked at random from the ones the Voice tab shows (your favorites, when Favorites is picked).": "Schaltet den Stimmverzerrer mit einer zufälligen Stimme aus denen ein, die der Stimme-Tab zeigt (deine Favoriten, wenn Favoriten gewählt ist).",
+  "Zombie": "Zombie"
 }

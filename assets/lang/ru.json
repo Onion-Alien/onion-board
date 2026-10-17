@@ -3778,5 +3778,21 @@
   "Updates install themselves": "Обновления ставятся сами",
   "Voices on your sounds, and hotkeys in games": "Голоса на твоих звуках и горячие клавиши в играх",
   "What's new in Onion Board {version}.": "Что нового в Onion Board {version}.",
-  "Your voice at one volume": "Твой голос на одной громкости"
+  "Your voice at one volume": "Твой голос на одной громкости",
+  "Cathedral": "Собор",
+  "Choir": "Хор",
+  "Drive-thru speaker": "Динамик в окошке авто",
+  "Drunk": "Пьяный",
+  "Evil twin": "Злой близнец",
+  "Fairy": "Фея",
+  "Giant": "Великан",
+  "Goblin": "Гоблин",
+  "Mecha": "Меха",
+  "Old film": "Старое кино",
+  "Pilot": "Пилот",
+  "Random voice": "Случайный голос",
+  "Ship computer": "Бортовой компьютер",
+  "Turns on one of the voices shown here, picked at random. Click again for another.": "Включает один из показанных здесь голосов, выбранный случайно. Нажми ещё раз — будет другой.",
+  "Turns the voice changer on with a voice picked at random from the ones the Voice tab shows (your favorites, when Favorites is picked).": "Включает смену голоса со случайным голосом из тех, что показывает вкладка «Голос» (из избранного, когда выбрано «Избранное»).",
+  "Zombie": "Зомби"
 }

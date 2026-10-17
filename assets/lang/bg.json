@@ -3700,5 +3700,21 @@
   "Updates install themselves": "Обновленията се инсталират сами",
   "Voices on your sounds, and hotkeys in games": "Гласове на звуците ти и бързи клавиши в игрите",
   "What's new in Onion Board {version}.": "Какво ново в Onion Board {version}.",
-  "Your voice at one volume": "Гласът ти на една сила"
+  "Your voice at one volume": "Гласът ти на една сила",
+  "Cathedral": "Катедрала",
+  "Choir": "Хор",
+  "Drive-thru speaker": "Говорител на драйв",
+  "Drunk": "Пиян",
+  "Evil twin": "Злият близнак",
+  "Fairy": "Фея",
+  "Giant": "Великан",
+  "Goblin": "Гоблин",
+  "Mecha": "Меха",
+  "Old film": "Стар филм",
+  "Pilot": "Пилот",
+  "Random voice": "Случаен глас",
+  "Ship computer": "Корабен компютър",
+  "Turns on one of the voices shown here, picked at random. Click again for another.": "Включва един от показаните тук гласове, избран на случаен принцип. Кликни пак за друг.",
+  "Turns the voice changer on with a voice picked at random from the ones the Voice tab shows (your favorites, when Favorites is picked).": "Включва промяната на гласа със случаен глас от показаните в раздела Глас (любимите ти, когато е избрано Любими).",
+  "Zombie": "Зомби"
 }

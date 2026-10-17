@@ -3622,5 +3622,21 @@
   "Updates install themselves": "更新自动安装",
   "Voices on your sounds, and hotkeys in games": "给音效配上声音,快捷键在游戏里也能用",
   "What's new in Onion Board {version}.": "Onion Board {version} 新功能。",
-  "Your voice at one volume": "你的声音保持同一音量"
+  "Your voice at one volume": "你的声音保持同一音量",
+  "Cathedral": "大教堂",
+  "Choir": "合唱团",
+  "Drive-thru speaker": "得来速喇叭",
+  "Drunk": "醉汉",
+  "Evil twin": "邪恶双胞胎",
+  "Fairy": "仙女",
+  "Giant": "巨人",
+  "Goblin": "哥布林",
+  "Mecha": "机甲",
+  "Old film": "老电影",
+  "Pilot": "机长",
+  "Random voice": "随机声音",
+  "Ship computer": "飞船电脑",
+  "Turns on one of the voices shown here, picked at random. Click again for another.": "随机打开这里显示的其中一个声音。再点一次换一个。",
+  "Turns the voice changer on with a voice picked at random from the ones the Voice tab shows (your favorites, when Favorites is picked).": "用“变声”标签页显示的声音中随机选一个，打开变声器（选了收藏夹时从你的收藏里选）。",
+  "Zombie": "僵尸"
 }

@@ -3700,5 +3700,21 @@
   "Updates install themselves": "Opdateringer installerer sig selv",
   "Voices on your sounds, and hotkeys in games": "Stemmer på dine lyde og genveje i spil",
   "What's new in Onion Board {version}.": "Nyt i Onion Board {version}.",
-  "Your voice at one volume": "Din stemme på én lydstyrke"
+  "Your voice at one volume": "Din stemme på én lydstyrke",
+  "Cathedral": "Katedral",
+  "Choir": "Kor",
+  "Drive-thru speaker": "Drive-in-højttaler",
+  "Drunk": "Fuld",
+  "Evil twin": "Ond tvilling",
+  "Fairy": "Fe",
+  "Giant": "Kæmpe",
+  "Goblin": "Nisse",
+  "Mecha": "Mecha",
+  "Old film": "Gammel film",
+  "Pilot": "Pilot",
+  "Random voice": "Tilfældig stemme",
+  "Ship computer": "Skibscomputer",
+  "Turns on one of the voices shown here, picked at random. Click again for another.": "Slår en af stemmerne vist her til, valgt tilfældigt. Klik igen for en anden.",
+  "Turns the voice changer on with a voice picked at random from the ones the Voice tab shows (your favorites, when Favorites is picked).": "Slår stemmeskifteren til med en tilfældig stemme blandt dem, fanen Stemme viser (dine favoritter, når Favoritter er valgt).",
+  "Zombie": "Zombie"
 }

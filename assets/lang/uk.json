@@ -3778,5 +3778,21 @@
   "Updates install themselves": "Оновлення встановлюються самі",
   "Voices on your sounds, and hotkeys in games": "Голоси на твоїх звуках і гарячі клавіші в іграх",
   "What's new in Onion Board {version}.": "Що нового в Onion Board {version}.",
-  "Your voice at one volume": "Твій голос на одній гучності"
+  "Your voice at one volume": "Твій голос на одній гучності",
+  "Cathedral": "Собор",
+  "Choir": "Хор",
+  "Drive-thru speaker": "Динамік у віконці авто",
+  "Drunk": "П'яний",
+  "Evil twin": "Злий близнюк",
+  "Fairy": "Фея",
+  "Giant": "Велетень",
+  "Goblin": "Гоблін",
+  "Mecha": "Меха",
+  "Old film": "Старе кіно",
+  "Pilot": "Пілот",
+  "Random voice": "Випадковий голос",
+  "Ship computer": "Бортовий комп'ютер",
+  "Turns on one of the voices shown here, picked at random. Click again for another.": "Вмикає один із показаних тут голосів, вибраний випадково. Натисни ще раз — буде інший.",
+  "Turns the voice changer on with a voice picked at random from the ones the Voice tab shows (your favorites, when Favorites is picked).": "Вмикає зміну голосу з випадковим голосом із тих, що показує вкладка «Голос» (з вибраного, коли вибрано «Вибране»).",
+  "Zombie": "Зомбі"
 }
