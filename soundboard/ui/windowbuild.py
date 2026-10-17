@@ -789,6 +789,7 @@ class WindowBuilder(Controller):
         mw.mini_stop.setObjectName("danger")
         mw.mini_stop.setProperty("mini", True)   # slim padding: never squeezed to "■ A"
         mw.mini_stop.setToolTip(mw.stop_btn.toolTip())
+        mw.mini_stop.setAccessibleName(_("Stop all"))   # read out whole, not just "All"
         mw.mini_stop.clicked.connect(mw.playctl.stop_all)
         icons.set_icon(mw.mini_stop, "stop", "danger_text", size=14)
         mw.mini_air.setFixedSize(38, 30)

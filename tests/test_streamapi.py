@@ -100,7 +100,13 @@ def test_alerts_pick_the_rule_for_the_amount_and_play_each_event_once(qapp, wind
     # what the request says itself plays even with the alerts off
     st, body = d(w, "event", type="raid", user="Cy", amount="40", sound="airhorn")
     assert body["handled"] and body["name"] == "Airhorn" and body["event"]["amount"] == 40
-    assert d(w, "event")[0] == 400 and d(w, "alerts", type="follow")[0] == 400
+    assert d(w, "event")[0] == 400
+    # a type alone reads its rules back (nothing set is an empty list, not an error)
+    st, body = d(w, "alerts", type="tip")
+    assert st == 200 and body["type"] == "donation" and [r["min"] for r in body["rules"]] == [0]
+    st, body = d(w, "alerts", type="follow")
+    assert st == 200 and body["rules"] == [] and "follow" not in body["alerts"]
+    assert d(w, "alerts", type="follow", say="")[0] == 400   # a rule that does nothing
     assert d(w, "alerts", type="follow", sound="nope")[0] == 404
 
 
@@ -109,6 +115,11 @@ def test_test_alerts_fill_in_a_viewer(qapp, window):
     d(w, "alerts", type="sub", say="{user} subbed for {months} months")
     st, body = d(w, "event", type="subscriber", test="1")
     assert body["handled"] and w.said == ["TestViewer subbed for 3 months"]
+    # test=1 without a type: a test follow, not an error
+    d(w, "alerts", type="follow", say="Thanks for the follow, {user}")
+    st, body = d(w, "event", test="1")
+    assert st == 200 and body["event"]["type"] == "follow" and body["handled"]
+    assert w.said[-1] == "Thanks for the follow, TestViewer"
 
 
 def test_the_json_other_tools_send_is_read(qapp):

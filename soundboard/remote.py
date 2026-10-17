@@ -233,12 +233,14 @@ ENDPOINTS = {
              "donation / redeem / gift / like / share / hype_train (or a name of your own) "
              "&user= &amount= &message= &reward= &currency= &id= (one id plays once). Does "
              "what /api/alerts set for the type, or &sound= / &category= / &say= / &voice= "
-             "(&voice_seconds=) given here; &test=1 fills in a test viewer. A POST may send "
-             "Twitch EventSub, StreamElements, Streamlabs or Ko-fi JSON as it is",
+             "(&voice_seconds=) given here; &test=1 fills in a test viewer (a follow "
+             "without type=). A POST may send Twitch EventSub, StreamElements, Streamlabs or "
+             "Ko-fi JSON as it is",
     "alerts": "what each alert does: ?type=donation&sound=Airhorn (or &category=Chill, "
               "&say=Thanks {user} for {amount}: {message}, &voice=Robot&voice_seconds=30), "
               "&min=10: only from that amount up (the highest one reached plays); "
-              "&clear=1 removes it; ?on=0 / 1 all alerts off / on; alone: what's set",
+              "&clear=1 removes it; ?on=0 / 1 all alerts off / on; alone: what's set "
+              "(?type=raid alone: that type's rules)",
     "feed": "what chat commands and alerts did, oldest first: ?since=<the last id you "
             "got> (&limit=); answers events and last",
     "help": "this list",
