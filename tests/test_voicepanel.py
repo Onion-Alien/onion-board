@@ -1900,3 +1900,25 @@ def test_a_shared_setup_never_turns_on_your_own_voice_of_the_same_name(panel, mo
     assert not effects.get("robot", {}).get("on")
     p.use_setup({"fx": "Squeaky", "effects": p.fx.store.voices["Squeaky"]})
     assert p.fx.preset == "Squeaky"               # the same voice: picked as itself
+
+
+def test_a_saved_voice_named_like_a_ready_voice_gets_its_own_card(qapp, monkeypatch):
+    # a voices.json from before "Chipmunk" was a ready voice: its card is its own
+    import json
+    from soundboard import savedvoices
+    mine = {"pitch": {"on": True, "semitones": -5.0}}
+    savedvoices.path().parent.mkdir(parents=True, exist_ok=True)
+    savedvoices.path().write_text(json.dumps({"voices": [{"name": "Chipmunk",
+                                                          "effects": mine}]}),
+                                  encoding="utf-8")
+    monkeypatch.setattr(tts.SapiTTS, "warm_up", lambda self: ["Microsoft Zira Desktop"])
+    from soundboard.ui.voicepanel import VoicePanel
+    p = VoicePanel(FakeEngine(), {"enabled": False, "effects": {}},
+                   {"voice": "Microsoft Zira Desktop", "rate": 2})
+    assert p.fx.saved_names() == ["Chipmunk (2)"]
+    assert p.fx._tile["Chipmunk"] is not p.fx._tile["Chipmunk (2)"]
+    p.fx._tile["Chipmunk (2)"].click()
+    assert p.fx.preset == "Chipmunk (2)"
+    assert p.fx.spec()["effects"]["pitch"]["semitones"] == -5.0
+    p.fx._tile["Chipmunk"].click()
+    assert p.fx.spec()["effects"]["pitch"]["semitones"] != -5.0
