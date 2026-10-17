@@ -95,6 +95,7 @@ test("an upload waits for review, then goes live; both are logged with hashes on
   const f = await call(env, `/v1/sounds/${up.body.id}/file`);
   assert.equal(f.status, 200);
   assert.equal(f.headers.get("content-type"), "audio/mpeg");
+  assert.equal(f.headers.get("cache-control"), "public, max-age=3600");
   const rows = log(env);
   assert.deepEqual(rows.map(r => r.kind), ["upload", "approve"]);
   assert.match(rows[0].ip, /^[0-9a-f]{64}$/);
@@ -174,10 +175,37 @@ test("one address can't stuff a sound's votes with made-up installs", async () =
       install: `${i}`.padStart(20, "0") });
     if (r.status === 200) ok++;
   }
-  assert.equal(ok, 6);
+  assert.equal(ok, 3);
   const lim = log(env).filter(r => r.kind === "limit");
-  assert.equal(lim.length, 1);
-  assert.equal(lim[0].sound, id);
+  assert.deepEqual(lim.map(r => r.detail), ["vote-installs", "vote-ip-sound"]);
+  assert.ok(lim.every(r => r.sound === id));
+  // the next day the daily counters are gone, but the same address still can't add installs
+  env.DB.db.exec("DELETE FROM counters");
+  const again = await call(env, `/v1/sounds/${id}/vote`, { method: "POST", json: { value: 1 }, install: "f".repeat(20) });
+  assert.equal(again.status, 429);
+  assert.equal(log(env).filter(r => r.kind === "limit").length, 2);   // logged once, not again
+  // the three who voted can still change their minds, and taking one back frees no place
+  const first = "0".repeat(20);
+  assert.equal((await call(env, `/v1/sounds/${id}/vote`, { method: "POST", json: { value: -1 }, install: first })).body.down, 1);
+  assert.equal((await call(env, `/v1/sounds/${id}/vote`, { method: "POST", json: { value: 0 }, install: first })).status, 200);
+  assert.equal((await call(env, `/v1/sounds/${id}/vote`, { method: "POST", json: { value: 1 }, install: "e".repeat(20) })).status, 429);
+  // another address isn't affected
+  assert.equal((await call(env, `/v1/sounds/${id}/vote`, { method: "POST", json: { value: 1 }, install: "e".repeat(20), ip: "8.8.8.8" })).status, 200);
+});
+
+test("the review queue refuses more once it holds 300 MB of files", async () => {
+  const env = store();
+  env.DB.db.prepare("INSERT INTO sounds (id, name, ext, size, sha256, uploader, ip, status, created) " +
+    "VALUES ('aaaaaaaaaaaa', 'big', 'mp3', ?, 'x', 'u', 'i', 'pending', 0)").run((300 << 20) - 10);
+  const r = await share(env);
+  assert.equal(r.status, 503);
+  assert.equal(r.body.error, "queue full");
+  // a link has no file: it still fits
+  const l = await call(env, "/v1/links", { method: "POST", json: { link: "https://youtu.be/q1", name: "x", agree: "link-v1" } });
+  assert.equal(l.status, 201);
+  // approving the big one makes room
+  await call(env, "/v1/admin/sounds/aaaaaaaaaaaa", { method: "POST", admin: true, json: { action: "approve" } });
+  assert.equal((await share(env)).status, 201);
 });
 
 test("3 reports from different addresses take a sound off; one address counts once", async () => {

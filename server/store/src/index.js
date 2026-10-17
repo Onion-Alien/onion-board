@@ -16,10 +16,12 @@ const UPLOADS_PER_DAY = 10;          // per install
 const UPLOADS_PER_IP_DAY = 20;
 const VOTES_PER_IP_DAY = 400;
 const VOTES_PER_IP_SOUND_DAY = 6;    // one address can't stuff one sound's votes with made-up installs
+const INSTALLS_PER_IP_SOUND = 3;     // ... nor over days: installs from one address that ever voted on it
 const REPORTS_PER_IP_DAY = 30;
 const REPORTS_TO_HIDE = 3;
 const LOG_DAYS = 90;                 // the action log keeps this many days           // reports from different addresses: back to review
 const PENDING_CAP = 1000;            // a full review queue refuses new uploads
+const PENDING_BYTES = 300 << 20;     // ... and so do 300 MB of waiting files (KV's free plan holds 1 GB)
 const AGREEMENT = "own-cc0-v1";      // the version of the upload agreement accepted
 const LINK_AGREEMENT = "link-v1";    // a shared link: only the link is kept
 // the sites a link may point at (as the app's soundboard/sourceinfo.py): never a file host
@@ -244,7 +246,8 @@ async function file(env, id, any) {
   return new Response(obj, { headers: {
     "content-type": TYPES[row.ext] || "application/octet-stream",
     "content-length": String(obj.byteLength),
-    "cache-control": any ? "no-store" : "public, max-age=86400",
+    // an hour at most: a sound rejected after reports stops being served soon after
+    "cache-control": any ? "no-store" : "public, max-age=3600",
     "x-content-type-options": "nosniff" } });
 }
 
@@ -273,9 +276,7 @@ async function upload(req, env, imported = false) {
   if (await env.DB.prepare("SELECT 1 FROM sounds WHERE sha256 = ?").bind(hash).first())
     fail("duplicate", 409);
   if (!imported) {
-    const pending = await env.DB.prepare(
-      "SELECT count(*) AS n FROM sounds WHERE status = 'pending'").first();
-    if (pending.n >= PENDING_CAP) fail("queue full", 503);
+    await roomInQueue(env, bytes.length);
     if (!await allow(env, "upload", uploader, UPLOADS_PER_DAY)
         || !await allow(env, "upload-ip", ip, UPLOADS_PER_IP_DAY)) fail("slow down", 429);
   }
@@ -302,9 +303,7 @@ async function shareLink(req, env) {
   const hash = await sha256("link:" + key);
   if (await env.DB.prepare("SELECT 1 FROM sounds WHERE sha256 = ?").bind(hash).first())
     fail("duplicate", 409);
-  const pending = await env.DB.prepare(
-    "SELECT count(*) AS n FROM sounds WHERE status = 'pending'").first();
-  if (pending.n >= PENDING_CAP) fail("queue full", 503);
+  await roomInQueue(env, 0);
   const uploader = await installHash(req, env);
   const ip = await ipHash(req, env);
   if (!await allow(env, "upload", uploader, UPLOADS_PER_DAY)
@@ -315,6 +314,13 @@ async function shareLink(req, env) {
     .bind(id, n, cleanTags(tags), "https://" + key, hash, uploader, ip, now()).run();
   await logAction(env, "link", { sound: id, ip, install: uploader, detail: n });
   return json({ id, status: "pending" }, 201);
+}
+
+// the review queue takes so many sounds, and so many bytes of files, then refuses more
+async function roomInQueue(env, size) {
+  const p = await env.DB.prepare("SELECT count(*) AS n, coalesce(sum(size), 0) AS b " +
+    "FROM sounds WHERE status = 'pending'").first();
+  if (p.n >= PENDING_CAP || p.b + size > PENDING_BYTES) fail("queue full", 503);
 }
 
 async function body(req) {
@@ -343,6 +349,23 @@ async function vote(req, env, id) {
   if (!await allow(env, "vote-ip", ip, VOTES_PER_IP_DAY)
       || !await allow(env, "vote-ip-sound", `${ip}:${id}`, VOTES_PER_IP_SOUND_DAY))
     fail("slow down", 429);
+  // a new install id is free to make: only so many from one address may vote on a sound,
+  // ever (taking a vote back doesn't free its place)
+  const known = await env.DB.prepare("SELECT 1 FROM vote_from WHERE sound = ? AND voter = ?")
+    .bind(id, voter).first();
+  if (!known && value !== 0) {
+    const n = (await env.DB.prepare("SELECT count(*) AS n FROM vote_from WHERE sound = ? AND ip = ?")
+      .bind(id, ip).first()).n;
+    if (n >= INSTALLS_PER_IP_SOUND) {
+      if (n === INSTALLS_PER_IP_SOUND)   // logged once: the place it's refused at is kept below
+        await logAction(env, "limit", { sound: id, ip, install: voter, detail: "vote-installs" });
+      await env.DB.prepare("INSERT OR IGNORE INTO vote_from (sound, voter, ip) VALUES (?, ?, ?)")
+        .bind(id, "x:" + ip, ip).run();
+      fail("slow down", 429);
+    }
+    await env.DB.prepare("INSERT INTO vote_from (sound, voter, ip) VALUES (?, ?, ?)")
+      .bind(id, voter, ip).run();
+  }
   if (value === 0) {
     await env.DB.prepare("DELETE FROM votes WHERE sound = ? AND voter = ?").bind(id, voter).run();
   } else {

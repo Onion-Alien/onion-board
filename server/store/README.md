@@ -26,7 +26,9 @@ and neither needs a payment card on the account.
 
 The app sends a random id it made itself (`X-Onion-Install`); the server keeps only a
 salted hash of it, and of the address, for one vote per install and the daily limits
-(10 uploads per install, 20 per address, 400 votes per address). Files are checked by
+(10 uploads per install, 20 per address, 400 votes per address, and at most 3 installs
+from one address ever counted on one sound). The review queue takes 1,000 sounds or 300 MB
+of files, then refuses more until some are reviewed. Files are checked by
 their first bytes (MP3, OGG, WAV, FLAC), up to 4 MB, and the same file can't be
 shared twice. A rejected sound's file is deleted at once.
 
