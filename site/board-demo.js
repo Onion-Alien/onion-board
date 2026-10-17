@@ -156,6 +156,7 @@
     var t = D.themes[name] || D.themes.Dark;
     S.theme = D.themes[name] ? name : "Dark";
     Object.keys(t).forEach(function (k) { root.style.setProperty("--" + k, t[k]); });
+    Array.prototype.forEach.call(root.querySelectorAll(".ob-theme"), function (b) { b.setAttribute("aria-pressed", b.dataset.name === S.theme ? "true" : "false"); });
   }
 
   // One way of saying "the real app does this": the same toast everywhere.
@@ -1246,11 +1247,10 @@
       g[1].forEach(function (name) {
         var t = D.themes[name]; if (!t) return;
         grid.appendChild(h("button", {
-          type: "button", class: "ob-theme", "aria-pressed": S.theme === name ? "true" : "false",
+          type: "button", class: "ob-theme", "data-name": name, "aria-pressed": S.theme === name ? "true" : "false",
           style: "--pbg:" + t.bg + ";--pcard:" + t.card + ";--pc:" + t.text + ";--ppanel:" + t.panel + ";--pa:" + t.accent + ";--pg:" + t.groove,
           onclick: function () {
             theme(name); did("theme");
-            Array.prototype.forEach.call(root.querySelectorAll(".ob-theme"), function (b) { b.setAttribute("aria-pressed", b === this ? "true" : "false"); }, this);
           }
         }, [h("span", { class: "pv" }, [h("i"), h("i"), h("i", { class: "side" }), h("i"), h("i")]), h("span", { text: name })]));
       });
@@ -1384,11 +1384,16 @@
     root.focus({ preventScroll: true });
   }
 
+  // The site's look switcher picks the same theme in the demo.
+  var lookToTheme = { dark: "Dark", light: "Light", ocean: "Ocean", hacker: "Hacker", synthwave: "Synthwave", "blood-moon": "Blood Moon" };
   window.OnionBoardDemo = {
+    look: function (name) {
+      var t = lookToTheme[name] || "Dark";
+      if (root) theme(t); else S.theme = t;
+    },
     mount: function (box) {
       var frame = box.querySelector(".frame");
       if (!frame || frame.classList.contains("live")) return;
-      var lookToTheme = { dark: "Dark", light: "Light", ocean: "Ocean", hacker: "Hacker", synthwave: "Synthwave", "blood-moon": "Blood Moon" };
       S.theme = lookToTheme[document.documentElement.dataset.look] || "Dark";
       fetch("release.json", { cache: "no-cache" }).then(function (r) { return r.ok ? r.json() : {}; }).catch(function () { return {}; }).then(function (r) {
         var v = /^[\w.\-]+$/.test(r.version || "") ? r.version : "2";
