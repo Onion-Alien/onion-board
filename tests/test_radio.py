@@ -201,28 +201,51 @@ def test_flat_map_hovers_clicks_and_follows_the_playing_station(qapp):
 
 
 
-def test_flat_map_fans_out_stations_on_the_same_spot(qapp):
-    """A whole city's stations listed at its centre come apart zoomed in, each its own
-    dot to click; zoomed out they stay one dot, and dots alone don't move."""
+def test_flat_map_moves_dots_apart_instead_of_covering(qapp):
+    """A whole city's stations listed at its centre come apart, zoomed out or in,
+    each its own dot to click; the busiest keeps the spot and a dot alone doesn't move."""
     pts = [{"id": f"s{i}", "la": 50.0, "lo": 10.0, "k": i} for i in range(20)]
     pts.append({"id": "alone", "la": 40.0, "lo": 0.0, "k": 5})
-    from soundboard.ui.flatmap import FlatMap
+    from soundboard.ui.flatmap import ROOM_PX, FlatMap
     m = FlatMap()
     m.resize(400, 300)
     m.set_points(pts)
     alone = [d["id"] for d in m._points].index("alone")
-    xs, ys = m._screen()
-    assert len({(round(x), round(y)) for x, y in zip(xs, ys)}) == 2
-    m.zoom, m.cx, m.cy = 50.0, 10.0, 50.0
-    xs, ys = m._screen()
-    spots = {(round(x), round(y)) for x, y in zip(xs, ys)}
-    assert len(spots) == 21
-    gap = min(np.hypot(xs[i] - xs[j], ys[i] - ys[j])
-              for i in range(21) for j in range(i) if alone not in (i, j))
-    assert gap >= 4                                   # far enough apart to tell apart
-    assert m._fan[alone].tolist() == [0, 0]
-    middle = [d["id"] for d, f in zip(m._points, m._fan) if not f.any()]
-    assert sorted(middle) == ["alone", "s19"]        # the busiest keeps the middle
+    busiest = [d["id"] for d in m._points].index("s19")
+    for zoom in (1.0, 50.0):
+        m.zoom, m.cx, m.cy = zoom, 10.0, 50.0
+        m._clamp()
+        dx, dy = m._spread(m._scale(), wait=True)
+        xs, ys = m._screen()
+        r = m._r * m._grow()
+        assert (dx[alone], dy[alone]) == (0, 0)
+        assert (dx[busiest], dy[busiest]) == (0, 0)   # the busiest keeps the middle
+        assert np.hypot(dx, dy).max() <= ROOM_PX * m._grow() ** 2 + 1e-6
+        apart = [all(np.hypot(xs[i] - xs[j], ys[i] - ys[j]) >= r[i] + r[j]
+                     for j in range(21) if j != i) for i in range(21)]
+        # zoomed out there's room near the spot for most; zoomed in, for all
+        assert sum(apart) >= (15 if zoom == 1 else 21)
+    m.grab()
+
+
+def test_flat_map_popular_stations_glow_bigger(qapp):
+    """The most played stations are big glowing dots, the more plays the bigger; the
+    rest are all the same small dot."""
+    from soundboard.ui.flatmap import HOT_R, QUIET_R, FlatMap
+    pts = [{"id": f"s{i}", "la": (i % 30) * 2.0, "lo": i // 30 * 2.0, "k": i % 7}
+           for i in range(300)]
+    pts += [{"id": "big", "la": -20.0, "lo": 50.0, "k": 4000},
+            {"id": "mid", "la": -30.0, "lo": 60.0, "k": 200}]
+    m = FlatMap()
+    m.resize(400, 300)
+    m.set_points(pts)
+    ids = [d["id"] for d in m._points]
+    big, mid = ids.index("big"), ids.index("mid")
+    assert m._hot[big] and m._hot[mid]
+    assert m._r[big] == pytest.approx(HOT_R[1])
+    assert HOT_R[0] <= m._r[mid] < m._r[big]
+    quiet = ~m._hot
+    assert quiet.sum() == 300 and (m._r[quiet] == QUIET_R).all()
     m.grab()
 
 
