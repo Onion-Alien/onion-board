@@ -2,6 +2,104 @@
 
 Changes not released yet are in [changelog.d/](changelog.d/), one file per change.
 
+## 2.6.0 — 2026-10-17
+
+- A link that failed after a few added ones no longer turns a roomy window into the
+  mini player (taking the search box with it, so later links did nothing): the download
+  list folds to fit instead.
+- A search that fails because the site is down no longer tells you to close and reopen
+  Onion Board: waiting is what fixes it.
+- Chat's `!random <category>` under a category limit now says the category is outside
+  chat's one (it said "no such category" for a real one) and gives the bot a line to post.
+- Screen readers: the Live controls button is called "Live controls" (not "1x"), the Up
+  next chip says what it shows ("Up next 3"), and a limited-edition theme card says until when.
+- Voice backgrounds now use bundled CC0 audio clips for rain, wind, engine, crowd,
+  spaceship and fire, with a new rain-on-a-window option. They work offline; previews
+  and live playback use the same clips, and source credits ship with the app.
+- Quick setup: pressing X or Esc while Bun is putting your sounds into your mic now says "Bun's almost done, one moment" instead of doing nothing.
+- **You can see your mic being set up now.** On the Setup tab, the boxes in the mic card
+  fold away and back out instead of blinking out, and when your sounds land in your mic
+  its box lights up green with a tick. Off when Windows' animation effects are off.
+- Autotune voice: a hard T-Pain style snap. It now sticks to the notes of one key and jumps cleanly between them (no flicker), with a brighter, doubled sound.
+- Voice bar: each chip (voice changer, AI voice, computer voice, language) has its own ✕, so you can turn one off without stopping them all.
+- Voice backgrounds have softer rain and fire, smoother wind and hums, and voiced crowd
+  babble. The talk gate starts quietly, and typed speech includes edited backgrounds
+  and sounds picked from the board.
+- **"Hear what they hear" no longer squeals on speakers.** With speakers as your headphones
+  output, the mic hears them, and loud enough the sound loops into a squeal. The app now
+  hears that squeal starting and switches the playback off by itself (and says why), and
+  turning it on with speakers warns you first. Talking, singing and shouting are left alone.
+- The Halloween theme's cobweb texture is redrawn: cobwebs now cover the whole card instead of a grid of tiny stamped webs.
+- The loading screen's card has a soft glow in its theme's colours instead of one flat
+  colour (High Contrast stays flat), and shows the version small in its top-right corner.
+- **Bun got a little cuter.** A fluffy poof on his chest, a belly button, longer feet with
+  neater toe beans that fit inside them, and longer, floppier ears. His ears lost the grey
+  strip and the odd pale corner at the bend, and the pad prints on his waving paw are the
+  right way up now.
+- Rare loading screens now name their tier: Uncommon (Golden Bun), Rare (Ice Bun),
+  Legendary (Galaxy Bun) and Super Rare (Rainbow Bun), with more room under the dots.
+- New installs play a sound with one click (Settings > General > Play pads with one click;
+  your existing setting is kept).
+- The setup steps lead with putting your sounds into your mic: that button glows, the
+  virtual cable comes after "or", and installing the cable asks first (it's only for
+  people who know they need it).
+- Clearer words: the rail's Live button says On, the search button says Search online, the
+  ear button says Listen, the Voice tab's Discord tip and the Privacy page are in plainer
+  words, and the setup card is shorter.
+- Settings > Audio shows the everyday cards; speech servers, buffering and the duplicate mic
+  switch are under More audio settings (Show advanced).
+- The chain-link mark on a sound kept outside the library shows while you point at it.
+- After a few days of heavy use (open 2 hours or more on 3 different days), a slim bar
+  asks once, ever, "Enjoying Onion Board?" with Bun holding up a survey: a thumb up or
+  down, then a few optional words. It waits for a calm moment (never over a game) and
+  only shows while the anonymous usage count is on; the answer goes with a one-off
+  random ID, never linked to you.
+- Settings > About: a shorter note, said by a new mascot, the Onion Alien, in a speech bubble that types itself out.
+- While the Community store's server is having trouble, **Share a sound** and **Share a voice**
+  are greyed out and say why, instead of letting you fill in the form and then fail. They come
+  back by themselves once the server answers again (Refresh checks).
+- When something doesn't work (a search that can't get through, the radio that can't
+  connect, the Community store that can't load, a voice that can't switch on), sad Bun
+  now says so on a red card with Try again and Report a problem, instead of a line of red
+  text. The tutorials do the same instead of vanishing, and carry on after Try again.
+- **Bun and Hoot have a personality in every theme.** Click them and they talk in their
+  outfit's character: a sea captain in Ocean, a wizard in Midnight, Dracula in Vampire, a
+  hacker in Hacker, a little witch in Halloween, and so on (four lines for Bun, three for
+  Hoot, in every theme and language).
+- Bun no longer sits still on the loading screen: each launch he does one of 13 acts,
+  picked at random (headbanging, karaoke, building, batting practice, a party, a nap,
+  Robo-Bun booting up, plugging in his headphones, hopping, drumming, an ear wiggle,
+  peekaboo, a spin), and waves goodbye as the window comes up. In October he wears a
+  witch hat and in December a Santa hat.
+- Rare loading screens, with a glowing border and their drop rate: Golden Bun (1/50),
+  Ice Bun (1/500), Galaxy Bun (1/5000) and Rainbow Bun (1/50000).
+- A game that runs as admin keeps its keys from other programs, so hotkeys went quiet
+  in it with no word why. Now the board tells you when such a game is in front, with a
+  *Restart as admin* button.
+- New limited-edition Halloween theme, the first card in Settings > Appearance > Themes:
+  pumpkin orange and witch purple with cobwebs, a jack-o'-lantern logo, and Bun and Hoot
+  in witch's hats. Use it by 31 October and it's yours to keep; after that it's gone.
+- Settings > Appearance has two tabs instead of six: Themes (with Textured or Plain on
+  top) and Look (highlight colour, size, live tabs and background together).
+- Finish in the setup guide now means done: it no longer opens again on the next start when
+  sending wasn't set up (the Setup tab's Step-by-step guide still opens it).
+- Bun shows his buttons, Back to the board among them, for a few seconds as he appears, so the
+  way back is seen even before you hover over him.
+- Importing from another soundboard puts its sounds straight into their own category (for example "Resanance"), shown from the first sound on, instead of All.
+- No more "Keep them?" box after an import you already said yes to.
+- **When the Community store is down, it says so.** Instead of "Couldn't open the store",
+  you get "Sorry, the store's down" with a sad Bun kicking at the ground, and Try again.
+- Control API: `/api/alerts?type=raid` alone now lists that type's rules instead of an
+  error, and `/api/event?test=1` without a type sends a test follow.
+- The mini player's red "All" pill is read out as "Stop all" by screen readers.
+- **Bun DJs in Live controls.** While Live controls is open, Bun sits left of its title tapping
+  sound pads and scratching a record, in every tab that has it (Sounds, Radio, Apps).
+- Dropdown lists and button menus now open with a small gap from their button instead of
+  stuck to it (the Store's category list, the Radio filters, Settings and the rest).
+- Radio map: the most played stations stand out now, as bigger glowing dots (the more
+  plays today, the bigger), and the rest are small plain dots. Stations crowded on one
+  spot (a whole city's) spread out round it at every zoom, so each can be seen and clicked.
+
 ## 2.5.0 — 2026-10-17
 
 - **A maximised window stays maximised:** close or restart Onion Board while it's maximised and it

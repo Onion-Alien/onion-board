@@ -34,6 +34,17 @@ def recent() -> tuple[Note, ...]:
     release (tests/test_whats_new.py checks this version has one): what a player
     notices, in their words, never the fixes only a log would show."""
     return (
+        Note("2.6.0", _("A Halloween theme, and Bun comes alive"), (
+            ("ghost", _("Halloween theme, for October only"),
+             _("Pumpkin orange, witch purple and cobwebs, with Bun and Hoot in witch's "
+               "hats. Pick it by 31 October and it's yours to keep.")),
+            ("bun", _("Bun and Hoot come alive"),
+             _("Bun does a new act on every loading screen. Click Bun or Hoot and they "
+               "talk like their theme's character.")),
+            ("star_filled", _("Rare loading screens"),
+             _("Watch for Golden, Ice, Galaxy and Rainbow Bun. Rainbow Bun appears only "
+               "once in 50,000 starts.")),
+        ), "appearance", _("Open Appearance")),
         Note("2.5.0", _("Effects behind your voice, and new voices"), (
             ("voice", _("Effects on any voice"),
              _("The voice bar's Effects button puts rain, a crowd, a fire or a sound from "
