@@ -3820,5 +3820,11 @@
   "{name} closed: the clip editor keeps what it heard.": "{name} ble lukket: klippredigereren beholder det den hørte.",
   "Sorry, the store's down": "Beklager, butikken er nede",
   "Sorry, the store's down. We're working on getting it back up.": "Beklager, butikken er nede. Vi jobber med å få den opp igjen.",
-  "We're working on getting it back up. Try again in a bit.": "Vi jobber med å få den opp igjen. Prøv igjen om litt."
+  "We're working on getting it back up. Try again in a bit.": "Vi jobber med å få den opp igjen. Prøv igjen om litt.",
+  "A voice chat's noise suppression can wipe these out, deep bass too. Discord: Input Profile → Studio.": "Støydempingen i en talechat kan fjerne dem, dyp bass også. Discord: Inndataprofil → Studio.",
+  "Full board": "Hele brettet",
+  "Full board: the window got too small for the board, so it shows this mini player. Click (or drag the window bigger) to get the board back.": "Hele brettet: vinduet ble for lite for brettet, så det viser denne minispilleren. Klikk (eller dra vinduet større) for å få brettet tilbake.",
+  "Hear {effect} (only you)": "Hør {effect} (bare deg)",
+  "Mic only": "Bare mikrofon",
+  "✓ The store is on again: loading it.": "✓ Butikken er på igjen: laster den."
 }

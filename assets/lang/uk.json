@@ -3900,5 +3900,11 @@
   "{name} closed: the clip editor keeps what it heard.": "{name} закрилася: редактор кліпів зберігає те, що почув.",
   "Sorry, the store's down": "Вибач, магазин не працює",
   "Sorry, the store's down. We're working on getting it back up.": "Вибач, магазин не працює. Ми вже лагодимо його.",
-  "We're working on getting it back up. Try again in a bit.": "Ми вже лагодимо його. Спробуй ще раз трохи згодом."
+  "We're working on getting it back up. Try again in a bit.": "Ми вже лагодимо його. Спробуй ще раз трохи згодом.",
+  "A voice chat's noise suppression can wipe these out, deep bass too. Discord: Input Profile → Studio.": "Шумозаглушення голосового чату може стерти ці ефекти, і глибокий бас теж. Discord: Профіль введення → Студія.",
+  "Full board": "Уся панель",
+  "Full board: the window got too small for the board, so it shows this mini player. Click (or drag the window bigger) to get the board back.": "Уся панель: вікно стало замалим для панелі, тож показано цей мініплеєр. Натисни (або розтягни вікно), щоб повернути панель.",
+  "Hear {effect} (only you)": "Послухати {effect} (лише ти)",
+  "Mic only": "Лише мікро",
+  "✓ The store is on again: loading it.": "✓ Магазин знову ввімкнено: завантажується."
 }

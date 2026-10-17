@@ -3740,5 +3740,11 @@
   "{name} closed: the clip editor keeps what it heard.": "{name} 已關閉：剪輯編輯器會保留它聽到的內容。",
   "Sorry, the store's down": "抱歉，商店暫時無法使用",
   "Sorry, the store's down. We're working on getting it back up.": "抱歉，商店暫時無法使用。我們正在努力修復。",
-  "We're working on getting it back up. Try again in a bit.": "我們正在努力修復。請稍後再試。"
+  "We're working on getting it back up. Try again in a bit.": "我們正在努力修復。請稍後再試。",
+  "A voice chat's noise suppression can wipe these out, deep bass too. Discord: Input Profile → Studio.": "語音聊天的雜音抑制可能會抹掉這些效果，低沉的低音也會。Discord：輸入設定檔 → 錄音室。",
+  "Full board": "完整面板",
+  "Full board: the window got too small for the board, so it shows this mini player. Click (or drag the window bigger) to get the board back.": "完整面板：視窗太小放不下面板，所以顯示這個迷你播放器。點一下（或把視窗拖大）即可回到面板。",
+  "Hear {effect} (only you)": "試聽 {effect}（只有你）",
+  "Mic only": "僅麥克風",
+  "✓ The store is on again: loading it.": "✓ 商店已重新開啟：正在載入。"
 }

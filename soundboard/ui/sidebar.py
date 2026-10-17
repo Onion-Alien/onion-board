@@ -834,6 +834,11 @@ class OutputBlock(QFrame):
                 continue
             # (Qt's 4 px after the icon, the border and a little air each side)
             room = b.width() - self._px(self.PAIR_ICON) - self._px(10)
+            if (b is self.mute and self.power.property("voiceonly")
+                    and b.fontMetrics().horizontalAdvance(lead + words[-1]) > room):
+                # "Only your mic" too long for it: the short word, not none at all
+                # (muted with the mic on, the button had no word left)
+                words = (words[0], _("Mic only"))
             fits = all(w and b.fontMetrics().horizontalAdvance(lead + w) <= room
                        for w in words)
             word = words[0 if on or len(words) == 1 else 1]

@@ -435,6 +435,25 @@ def test_categories_filter_the_list(qapp, fake):
     t.shutdown()
 
 
+def test_switched_back_on_the_store_says_so(qapp, fake):
+    """Community off and on again in Privacy: the list just reloaded, no word why."""
+    from conftest import said
+    from soundboard import net, store
+    t = storetab.StoreTab(Config(), [].append, lambda d, g: True, lambda: None)
+    t.show()
+    assert _wait(qapp, lambda: t._rows)
+    try:
+        net.configure_features([store.FEATURE])
+        t._follow_switch()
+        assert t._off
+        net.configure_features()
+        t._follow_switch()
+        assert "on again" in said(t)
+    finally:
+        net.configure_features()
+        t.shutdown()
+
+
 def test_no_categories_only_all(qapp, fake):
     fake.fail_cats = True
     t = storetab.StoreTab(Config(), [].append, lambda d, g: True, lambda: None)

@@ -3820,5 +3820,11 @@
   "{name} closed: the clip editor keeps what it heard.": "{name} kapandı: klip düzenleyici duyduğunu saklıyor.",
   "Sorry, the store's down": "Üzgünüz, mağaza çöktü",
   "Sorry, the store's down. We're working on getting it back up.": "Üzgünüz, mağaza çöktü. Yeniden açmak için çalışıyoruz.",
-  "We're working on getting it back up. Try again in a bit.": "Yeniden açmak için çalışıyoruz. Biraz sonra tekrar dene."
+  "We're working on getting it back up. Try again in a bit.": "Yeniden açmak için çalışıyoruz. Biraz sonra tekrar dene.",
+  "A voice chat's noise suppression can wipe these out, deep bass too. Discord: Input Profile → Studio.": "Bir sesli sohbetin gürültü bastırması bunları silebilir, derin bas da. Discord: Giriş Profili → Stüdyo.",
+  "Full board": "Tam pano",
+  "Full board: the window got too small for the board, so it shows this mini player. Click (or drag the window bigger) to get the board back.": "Tam pano: pencere pano için fazla küçüldü, bu yüzden bu mini oynatıcıyı gösteriyor. Panoyu geri almak için tıkla (ya da pencereyi büyüt).",
+  "Hear {effect} (only you)": "{effect} dinle (yalnızca sen)",
+  "Mic only": "Yalnızca mikrofon",
+  "✓ The store is on again: loading it.": "✓ Mağaza yeniden açık: yükleniyor."
 }

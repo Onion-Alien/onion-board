@@ -3740,5 +3740,11 @@
   "{name} closed: the clip editor keeps what it heard.": "{name} đã đóng: trình chỉnh sửa clip giữ lại những gì nó đã nghe.",
   "Sorry, the store's down": "Xin lỗi, cửa hàng đang gặp sự cố",
   "Sorry, the store's down. We're working on getting it back up.": "Xin lỗi, cửa hàng đang gặp sự cố. Chúng tôi đang khắc phục.",
-  "We're working on getting it back up. Try again in a bit.": "Chúng tôi đang khắc phục. Hãy thử lại sau ít phút."
+  "We're working on getting it back up. Try again in a bit.": "Chúng tôi đang khắc phục. Hãy thử lại sau ít phút.",
+  "A voice chat's noise suppression can wipe these out, deep bass too. Discord: Input Profile → Studio.": "Tính năng khử tiếng ồn của trò chuyện thoại có thể xóa mất các hiệu ứng này, cả âm trầm sâu. Discord: Hồ sơ đầu vào → Studio.",
+  "Full board": "Bảng đầy đủ",
+  "Full board: the window got too small for the board, so it shows this mini player. Click (or drag the window bigger) to get the board back.": "Bảng đầy đủ: cửa sổ quá nhỏ cho bảng nên đang hiện trình phát mini này. Bấm (hoặc kéo cửa sổ to ra) để quay lại bảng.",
+  "Hear {effect} (only you)": "Nghe thử {effect} (chỉ bạn)",
+  "Mic only": "Chỉ mic",
+  "✓ The store is on again: loading it.": "✓ Cửa hàng đã bật lại: đang tải."
 }

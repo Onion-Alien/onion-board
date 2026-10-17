@@ -305,9 +305,11 @@ def test_remembered_program_is_picked_up_again_when_it_restarts(tab):
     row = tab.rows["music.exe"]
     assert first.stopped and row.capture is None and not row.sending
     assert row.app is None and "Not running" in row.sub.text()
+    assert row.icon.graphicsEffect() is not None   # faded: not a live card
     assert "music.exe" in tab.cfg.apps           # still remembered
     tab._on_apps([music(pid=101)])               # it's back, under a new pid
     assert row.sending and row.capture is not None and row.capture.pid == 101
+    assert row.icon.graphicsEffect() is None
     assert row.capture is not first
 
 

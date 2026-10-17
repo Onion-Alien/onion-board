@@ -16,9 +16,9 @@ import time
 
 from PySide6.QtCore import QEvent, QPoint, QPointF, QRectF, Qt, Signal
 from PySide6.QtGui import QColor, QFont, QPainter, QPen
-from PySide6.QtWidgets import (QApplication, QCheckBox, QDialog, QFrame, QGridLayout,
-                               QHBoxLayout, QLabel, QProgressBar, QPushButton, QVBoxLayout,
-                               QWidget)
+from PySide6.QtWidgets import (QAbstractSpinBox, QApplication, QCheckBox, QDialog,
+                               QDoubleSpinBox, QFrame, QGridLayout, QHBoxLayout, QLabel,
+                               QProgressBar, QPushButton, QVBoxLayout, QWidget)
 
 from soundboard import livefx, theme, voicefx
 from soundboard.ui import bunskits, fit, icons
@@ -171,6 +171,63 @@ class DjBunny(BunnyWidget):
 
 
 DJ_H = 72   # Bun's height, left of the Live controls title
+
+
+class ValueBox(QDoubleSpinBox):
+    """A popup slider's value you can also type (2.5 dB, 1.3x, 40 %): the slider only
+    had its positions. It stands in for ParamSlider's value label (``setText`` is how
+    the slider tells it its value)."""
+
+    def __init__(self, s: ParamSlider):
+        super().__init__()
+        self.s = s
+        self.setButtonSymbols(QAbstractSpinBox.ButtonSymbols.NoButtons)
+        self.setKeyboardTracking(False)   # a typed value counts on Enter / leaving
+        self.setAlignment(Qt.AlignmentFlag.AlignRight | Qt.AlignmentFlag.AlignVCenter)
+        self.setFocusPolicy(Qt.FocusPolicy.ClickFocus)   # (Tab stays on the sliders)
+        self.setAccessibleName(voicefx.shown(s.q.label))
+        self._q = None
+        self.valueChanged.connect(self._typed)
+
+    def _fit(self):
+        q = self._q = self.s.q
+        pct = not q.unit and q.lo >= 0 and q.hi <= 1
+        self.scale = 100.0 if pct else 1.0
+        step = (q.step or (0.01 if pct else 0.05)) * self.scale
+        self.setDecimals(0 if step >= 1 else 2)
+        self.setSingleStep(step)
+        self.setRange(q.lo * self.scale, q.hi * self.scale)
+        self.setSuffix("%" if pct else q.unit)
+
+    def textFromValue(self, v: float) -> str:
+        text = super().textFromValue(v)
+        return "+" + text if v > 0 and self.minimum() < 0 else text   # +7 dB, as before
+
+    def valueFromText(self, text: str) -> float:
+        return super().valueFromText(text.lstrip("+"))
+
+    def validate(self, text: str, pos: int):
+        if text.startswith("+"):
+            state, t, p = super().validate(text[1:], max(pos - 1, 0))
+            return state, "+" + t, p + 1
+        return super().validate(text, pos)
+
+    def wheelEvent(self, e):
+        e.ignore()   # the popup scrolls, the value doesn't change under the mouse
+
+    def setText(self, _text: str):
+        if self._q is not self.s.q:
+            self.blockSignals(True)
+            self._fit()
+            self.blockSignals(False)
+        self.blockSignals(True)
+        self.setValue(self.s.value() * self.scale)
+        self.blockSignals(False)
+
+    def _typed(self, v: float):
+        self.s.set_value(v / self.scale)
+        self.s.changed.emit()
+        self.setText("")   # snapped to a step the slider has
 
 
 def short(name: str, most: int = 14) -> str:
@@ -382,15 +439,20 @@ class SpeedPitchButton(QPushButton):
         grid.setHorizontalSpacing(4)
         grid.setVerticalSpacing(4)
         self.fx_presets = {}
-        for i, (name, amounts) in enumerate(livefx.PRESETS.items()):
+        for i, name in enumerate(livefx.PRESETS):
             b = QPushButton(name)
             b.setObjectName("small")
             b.setCheckable(True)
             b.setCursor(Qt.CursorShape.PointingHandCursor)
-            b.clicked.connect(lambda on, a=amounts: self.set_fx(a if on else {}))
+            b.clicked.connect(lambda on, n=name: self._preset_clicked(n, on))
             self.fx_presets[name] = b
             grid.addWidget(b, i // 3, i % 3)
         v.addLayout(grid)
+        # what the far side does to them: a voice chat's noise removal and its cut of
+        # the lowest bass took a +12 dB bass boost down to nothing for the friend
+        self.fx_note = hint_label(_("A voice chat's noise suppression can wipe these out, "
+                                    "deep bass too. Discord: Input Profile → Studio."))
+        v.addWidget(self.fx_note)
 
     @staticmethod
     def _slider(q: voicefx.Param, value: float, name_w: int = NAME_W) -> ParamSlider:
@@ -404,8 +466,12 @@ class SpeedPitchButton(QPushButton):
         name_label = widget_at(h, 0)
         assert name_label is not None
         name_label.setFixedWidth(name_w)
-        s.val.setObjectName("")
-        s.val.setFixedWidth(VAL_W)
+        box = ValueBox(s)
+        box.setFixedWidth(VAL_W)
+        h.replaceWidget(s.val, box)
+        s.val.deleteLater()
+        s.val = box  # pyright: ignore[reportAttributeAccessIssue] - it stands in for the label (setText)
+        s._label()
         return s
 
     @staticmethod
@@ -533,6 +599,17 @@ class SpeedPitchButton(QPushButton):
         for k, s in self.fx.items():
             s.set_value(amounts.get(k, 0.0))
         self._fx_edited()
+
+    def _preset_clicked(self, name: str, on: bool):
+        """A preset sets its knobs; clicked again (lit) the knobs go back to how they
+        were before it, not all off: a tweak made before picking it isn't lost."""
+        if on:
+            before = self.fx_values()
+            self.set_fx(livefx.PRESETS[name])
+            self._before_preset = (name, before)
+            return
+        was = getattr(self, "_before_preset", None)
+        self.set_fx(was[1] if was and was[0] == name else {})
 
     def _fx_edited(self):
         now = self.fx_values()

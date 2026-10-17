@@ -256,6 +256,7 @@ class MainWindow(QMainWindow):
     mic_ways: Flow
     mini_air: QPushButton
     mini_bun: QPushButton
+    mini_full: QPushButton
     _mini_card: QFrame
     mini_connection: QPushButton
     mini_download_bar: DownloadBar

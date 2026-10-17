@@ -9,7 +9,9 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
-from PySide6.QtCore import QPoint, Qt
+import numpy as np
+
+from PySide6.QtCore import QPoint, Qt, QTimer
 from PySide6.QtWidgets import (QApplication, QDialog, QHBoxLayout, QLabel, QPushButton,
                                QVBoxLayout, QWidget)
 
@@ -27,6 +29,8 @@ if TYPE_CHECKING:
 EXTRAS = (("extra_robot", "mix"), ("extra_radio", "drive"), ("extra_echo", "mix"),
           ("extra_reverb", "mix"))
 START = 0.5   # a background sound's level when you add it
+LISTEN_S, LISTEN_GAIN = 4.0, 0.12   # its ▶: seconds of it, and how loud (it's at RMS 1)
+LISTEN_SID = "effects-listen:preview"   # (":preview": the headphones only)
 
 
 def layer_param(key: str) -> Param:
@@ -86,6 +90,8 @@ class EffectsPopup(QDialog):
         self.sliders: dict[str, QWidget] = {}
         self.removes: dict[str, QPushButton] = {}
         self.adds: dict[str, QPushButton] = {}
+        self.listens: dict[str, QPushButton] = {}
+        self._listening: str | None = None   # the background sound heard right now
 
     # ------------------------------------------------------------- building
     def rebuild(self):
@@ -95,7 +101,7 @@ class EffectsPopup(QDialog):
         self._v.replaceWidget(old, self.body)
         old.hide()
         old.deleteLater()
-        self.sliders, self.removes, self.adds = {}, {}, {}
+        self.sliders, self.removes, self.adds, self.listens = {}, {}, {}, {}
         box = QVBoxLayout(self.body)
         box.setContentsMargins(0, 0, 0, 0)
         box.setSpacing(6)
@@ -133,7 +139,8 @@ class EffectsPopup(QDialog):
         for key in (*backdrop.LAYERS, *(t for t, _k in EXTRAS)):
             if key in shown or key not in backdrop.LAYERS and key not in voicefx.REGISTRY:
                 continue
-            flow.addWidget(self._add_button(key, item_name(key)))
+            b = self._add_button(key, item_name(key))
+            flow.addWidget(self._with_listen(b, key) if key in backdrop.LAYERS else b)
         if len(sounds) < backdrop.MAX_SOUNDS:
             flow.addWidget(self._add_button("sound", _("A sound from my board")))
         box.addWidget(chips)
@@ -172,14 +179,62 @@ class EffectsPopup(QDialog):
         self.adds[key] = b
         return b
 
+    def _with_listen(self, b: QPushButton, key: str) -> QWidget:
+        """A background sound's add chip with a ▶ beside it: a few seconds of it in
+        your own headphones first (you couldn't hear one before adding it)."""
+        w = QWidget()
+        h = QHBoxLayout(w)
+        h.setContentsMargins(0, 0, 0, 0)
+        h.setSpacing(2)
+        h.addWidget(b)
+        p = QPushButton()
+        p.setObjectName("voicecat")   # the chip's other half: one split button
+        p.setFixedSize(30, b.sizeHint().height())
+        p.setCursor(Qt.CursorShape.PointingHandCursor)
+        tip = _("Hear {effect} (only you)", effect=item_name(key))
+        p.setToolTip(tip)
+        p.setAccessibleName(tip)
+        icons.set_icon(p, "play", size=14)
+        p.clicked.connect(lambda _on=False, k=key: self._listen(k))
+        h.addWidget(p)
+        self.listens[key] = p
+        return w
+
+    def _listen(self, key: str):
+        """Play LISTEN_S of `key` in the headphones; again (the same one): stop it."""
+        engine = getattr(self.panel.window(), "engine", None)
+        if engine is None:
+            return
+        if self._listening == key and LISTEN_SID in engine.playing():
+            engine.stop(LISTEN_SID)
+            self._listening = None
+            return
+        x = backdrop.generate(key, LISTEN_S, seed=1)
+        n = min(len(x), int(0.3 * backdrop.SR))   # faded in and out, no click
+        ramp = np.linspace(0.0, 1.0, n, dtype=np.float32)
+        x[:n] *= ramp
+        x[-n:] *= ramp[::-1]
+        engine.play(LISTEN_SID, np.stack([x, x], 1), LISTEN_GAIN, mode="restart",
+                    preview=True)
+        self._listening = key
+
+    def hideEvent(self, e):
+        engine = getattr(self.panel.window(), "engine", None)
+        if engine is not None and self._listening is not None:
+            engine.stop(LISTEN_SID)   # closed: the sample goes with it
+        self._listening = None
+        super().hideEvent(e)
+
     # ------------------------------------------------------------- actions
     def _add(self, key: str, button: QPushButton):
         if key == "sound":
             m = self.panel.board_sound_menu()
             if m is None:
                 return
-            m.exec(button.mapToGlobal(QPoint(0, button.height())))
+            picked = m.exec(button.mapToGlobal(QPoint(0, button.height())))
             m.deleteLater()
+            if picked is not None:   # its row shows once the sound's loop is made
+                QTimer.singleShot(300, self, lambda: self.isVisible() and self._again())
         else:
             self.panel.set_on_top(key, START if key in backdrop.LAYERS
                                   else extra_param(key).default)

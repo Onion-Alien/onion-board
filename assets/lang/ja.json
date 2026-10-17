@@ -3740,5 +3740,11 @@
   "{name} closed: the clip editor keeps what it heard.": "{name} が終了しました。クリップエディターは聞いた音を残しています。",
   "Sorry, the store's down": "ごめんなさい、ストアが停止中です",
   "Sorry, the store's down. We're working on getting it back up.": "ごめんなさい、ストアが停止中です。復旧に取り組んでいます。",
-  "We're working on getting it back up. Try again in a bit.": "復旧に取り組んでいます。少ししてからもう一度お試しください。"
+  "We're working on getting it back up. Try again in a bit.": "復旧に取り組んでいます。少ししてからもう一度お試しください。",
+  "A voice chat's noise suppression can wipe these out, deep bass too. Discord: Input Profile → Studio.": "ボイスチャットのノイズ抑制で、これらの効果や深い低音が消えることがあります。Discord: 入力プロファイル → スタジオ。",
+  "Full board": "フルボード",
+  "Full board: the window got too small for the board, so it shows this mini player. Click (or drag the window bigger) to get the board back.": "フルボード: ウィンドウがボードには小さすぎるため、このミニプレーヤーを表示しています。クリック(またはウィンドウを広げる)でボードに戻ります。",
+  "Hear {effect} (only you)": "{effect} を試聴 (自分だけ)",
+  "Mic only": "マイクのみ",
+  "✓ The store is on again: loading it.": "✓ ストアが再びオンになりました: 読み込み中。"
 }

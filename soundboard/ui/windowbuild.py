@@ -838,6 +838,17 @@ class WindowBuilder(Controller):
         self._paint_mini_bun()
         mw.mini_bun.clicked.connect(mw.bunctl.enter_bun_mode)
         connection.addWidget(mw.mini_bun)
+        # the way back: dragged too small for the board, the window turned into this by
+        # itself, with nothing on it saying so or how to get the board back
+        mw.mini_full = QPushButton()
+        mw.mini_full.setFixedSize(34, 28)
+        mw.mini_full.setToolTip(_("Full board: the window got too small for the board, so "
+                                  "it shows this mini player. Click (or drag the window "
+                                  "bigger) to get the board back."))
+        mw.mini_full.setAccessibleName(_("Full board"))
+        icons.set_icon(mw.mini_full, "expand", size=18)
+        mw.mini_full.clicked.connect(mw.fitctl.grow_to_board)
+        connection.addWidget(mw.mini_full)
         cv.addLayout(connection)
         v.addWidget(card)
         mw._sync_mini_mic()

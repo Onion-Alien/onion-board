@@ -3820,5 +3820,11 @@
   "{name} closed: the clip editor keeps what it heard.": "{name} bezárult: a klipszerkesztő megtartja, amit hallott.",
   "Sorry, the store's down": "Bocsi, a bolt nem működik",
   "Sorry, the store's down. We're working on getting it back up.": "Bocsi, a bolt nem működik. Dolgozunk rajta, hogy újra menjen.",
-  "We're working on getting it back up. Try again in a bit.": "Dolgozunk rajta, hogy újra menjen. Próbáld újra egy kicsit később."
+  "We're working on getting it back up. Try again in a bit.": "Dolgozunk rajta, hogy újra menjen. Próbáld újra egy kicsit később.",
+  "A voice chat's noise suppression can wipe these out, deep bass too. Discord: Input Profile → Studio.": "Egy hangcsevegés zajszűrése eltüntetheti ezeket, a mély basszust is. Discord: Bemeneti profil → Stúdió.",
+  "Full board": "Teljes tábla",
+  "Full board: the window got too small for the board, so it shows this mini player. Click (or drag the window bigger) to get the board back.": "Teljes tábla: az ablak túl kicsi lett a táblához, ezért ezt a minilejátszót mutatja. Kattints (vagy húzd nagyobbra az ablakot), hogy visszakapd a táblát.",
+  "Hear {effect} (only you)": "{effect} meghallgatása (csak te)",
+  "Mic only": "Csak mikrofon",
+  "✓ The store is on again: loading it.": "✓ A bolt újra be van kapcsolva: betöltés."
 }

@@ -3820,5 +3820,11 @@
   "{name} closed: the clip editor keeps what it heard.": "Nagsara ang {name}: itinatago ng clip editor ang narinig nito.",
   "Sorry, the store's down": "Sorry, down ang store",
   "Sorry, the store's down. We're working on getting it back up.": "Sorry, down ang store. Inaayos na namin para bumalik ito.",
-  "We're working on getting it back up. Try again in a bit.": "Inaayos na namin para bumalik ito. Subukan ulit mamaya."
+  "We're working on getting it back up. Try again in a bit.": "Inaayos na namin para bumalik ito. Subukan ulit mamaya.",
+  "A voice chat's noise suppression can wipe these out, deep bass too. Discord: Input Profile → Studio.": "Puwedeng burahin ng noise suppression ng voice chat ang mga ito, pati ang malalim na bass. Discord: Input Profile → Studio.",
+  "Full board": "Buong board",
+  "Full board: the window got too small for the board, so it shows this mini player. Click (or drag the window bigger) to get the board back.": "Buong board: lumiit ang window para sa board, kaya ipinapakita nito ang mini player na ito. I-click (o i-drag para lumaki ang window) para maibalik ang board.",
+  "Hear {effect} (only you)": "Pakinggan ang {effect} (ikaw lang)",
+  "Mic only": "Mic lang",
+  "✓ The store is on again: loading it.": "✓ Naka-on ulit ang store: nilo-load na."
 }
