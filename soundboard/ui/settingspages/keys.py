@@ -320,7 +320,7 @@ class KeysPage(Page):
         test.clicked.connect(lambda: self.mw.overlay.open_by_click())
         row = QHBoxLayout()   # beside how the key works: two lines, not three
         row.setSpacing(8)
-        row.addWidget(self._ov_combo("mode", ovl.MODES, s.mode))
+        row.addWidget(self._ov_combo("mode", ovl.MODES, s.mode, _("Open it")))
         row.addWidget(test)   # as wide as its words (it ran to the card's edge)
         row.addStretch(1)
         cv.addLayout(row)
@@ -329,7 +329,7 @@ class KeysPage(Page):
         card, cv = self._card(_("Pick sounds"),
                               _("Nine tiles a page, in the same order as your pads. Drag pads "
                                 "in the Sounds tab to rearrange them."), icon="sounds")
-        cv.addWidget(self._ov_combo("keys", ovl.KEY_CHOICES, s.keys))
+        cv.addWidget(self._ov_combo("keys", ovl.KEY_CHOICES, s.keys, _("Pick sounds")))
         after = QCheckBox(_("Hide after picking a sound"))
         after.setChecked(s.close_after_play)
         after.toggled.connect(lambda b: self._ov_set("close_after_play", b))
@@ -337,7 +337,8 @@ class KeysPage(Page):
         row = QHBoxLayout()
         row.setSpacing(12)
         row.addWidget(QLabel(_("Auto-hide after")))
-        row.addWidget(self._ov_combo("autohide", ovl.AUTOHIDE, s.autohide))
+        row.addWidget(self._ov_combo("autohide", ovl.AUTOHIDE, s.autohide,
+                                      _("Auto-hide after")))
         row.addStretch(1)   # the choice right after its label, not at the card's far edge
         cv.addLayout(row)
         from soundboard.ui.widgets import widget_at   # (it imports this module)
@@ -354,12 +355,14 @@ class KeysPage(Page):
         grid = QGridLayout()
         grid.setHorizontalSpacing(12)
         grid.addWidget(QLabel(_("Monitor")), 0, 0)
-        self.dlg.ov_monitor = self._ov_combo("monitor", self._monitor_choices(s.monitor), s.monitor)
+        self.dlg.ov_monitor = self._ov_combo("monitor", self._monitor_choices(s.monitor), s.monitor,
+                                             _("Monitor"))
         self.dlg.ov_monitor.setToolTip(_("With more than one monitor: put the overlay on the one "
                                          "you're gaming on, or keep it on a second one"))
         grid.addWidget(self.dlg.ov_monitor, 0, 1)
         grid.addWidget(QLabel(_("Position")), 1, 0)
-        self.dlg.ov_position = self._ov_combo("position", ovl.POSITIONS, s.position)
+        self.dlg.ov_position = self._ov_combo("position", ovl.POSITIONS, s.position,
+                                              _("Position"))
         grid.addWidget(self.dlg.ov_position, 1, 1)
         grid.addWidget(QLabel(_("Size")), 2, 0)
         grid.addLayout(self._ov_slider("scale", 60, 160, s.scale, _("Size")), 2, 1)
@@ -393,8 +396,9 @@ class KeysPage(Page):
         self._ov_sync()
         return w
 
-    def _ov_combo(self, key, choices, current):
+    def _ov_combo(self, key, choices, current, name):
         cb = QComboBox()
+        cb.setAccessibleName(name)   # what its card or label says, for a screen reader
         for value, label in choices:
             cb.addItem(label, value)
         cb.setCurrentIndex(max(0, cb.findData(current)))

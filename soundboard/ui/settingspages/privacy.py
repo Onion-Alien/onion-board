@@ -83,6 +83,7 @@ class PrivacyPage(Page):
         grid.setHorizontalSpacing(12)
         grid.addWidget(QLabel(_("Quality")), 0, 0)
         dl = QComboBox()
+        dl.setAccessibleName(_("Quality"))
         for key, (label, _fmt) in quality.DOWNLOADS.items():
             dl.addItem(label, key)
         dl.currentIndexChanged.connect(lambda _i: self._data_set(download=dl.currentData()))
@@ -91,6 +92,7 @@ class PrivacyPage(Page):
         no_wheel(dl)
         grid.addWidget(QLabel(_("Save sounds as")), 1, 0)
         fmt = QComboBox()
+        fmt.setAccessibleName(_("Save sounds as"))
         for key, label in quality.SAVE_FORMATS.items():
             fmt.addItem(label, key)
         fmt.setToolTip(save_hint)
@@ -125,6 +127,7 @@ class PrivacyPage(Page):
         grid.setContentsMargins(26, 0, 0, 0)
         grid.addWidget(QLabel(_("Video quality")), 0, 0)
         vh = QComboBox()
+        vh.setAccessibleName(_("Video quality"))
         for h in quality.VIDEO_HEIGHTS:
             vh.addItem(_("Up to {height}p", height=h), h)
         vh.currentIndexChanged.connect(lambda _i: self._data_set(video_height=vh.currentData()))
@@ -180,6 +183,7 @@ class PrivacyPage(Page):
         grid.setHorizontalSpacing(12)
         grid.addWidget(QLabel(_("Stations")), 0, 0)
         kb = QComboBox()
+        kb.setAccessibleName(_("Stations"))
         for kbps, label in quality.RADIO_KBPS.items():
             kb.addItem(label, kbps)
         kb.currentIndexChanged.connect(lambda _i: self._data_radio(kb.currentData()))

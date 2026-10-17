@@ -47,6 +47,7 @@ class AudioPage(Page):
                                 "uses bigger buffers: a little more delay, far fewer drop-outs."),
                               icon="sliders")
         lat = QComboBox()
+        lat.setAccessibleName(_("Audio buffering"))
         lat.addItem(_("Low (default)"), "low")
         lat.addItem(_("Safer: bigger buffers"), "high")
         lat.setCurrentIndex(max(0, lat.findData(self.mw.cfg.latency)))
@@ -121,6 +122,7 @@ class AudioPage(Page):
                 (_("Output: my headphones"), mw.cb_mon, "mon_device"),
                 (_("Send my sounds to"), mw.cb_route, "route"))):
             cb = QComboBox()
+            cb.setAccessibleName(text)   # its label beside it, for a screen reader
             cb.setMinimumWidth(120)
             # sized for a short name, the list opens wide enough for whole ones (device
             # names in "Send my sounds to" made the page scroll sideways)
