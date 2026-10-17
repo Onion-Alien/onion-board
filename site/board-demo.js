@@ -978,7 +978,7 @@
     var brand = h("button", { type: "button", class: "ob-brand", title: "Onion Board", onclick: function () {
       brand.classList.remove("wob"); void brand.offsetWidth; brand.classList.add("wob");
       if (site.play) site.play("squeak");
-    } }, [h("img", { class: "logo", src: "favicon.png", alt: "" }), h("div", null, [h("b", { text: "Onion Board" }), h("small", { text: "v" + version })])]);
+    } }, [h("span", { class: "logo mark" }, [icon("onion")]), h("div", null, [h("b", { text: "Onion Board" }), h("small", { text: "v" + version })])]);
     R.nav = h("nav", { class: "ob-nav" });
     [["sounds", "Sounds"], ["radio", "Radio"], ["apps", "Apps"], ["triggers", "Triggers"], ["voice", "Voice"], ["setup", "Setup"]].forEach(function (n) {
       R.nav.appendChild(h("button", { type: "button", "data-p": n[0], title: n[1], "aria-current": n[0] === "sounds" ? "page" : "false", onclick: function () { go(n[0]); } },

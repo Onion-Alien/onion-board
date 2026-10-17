@@ -486,3 +486,7 @@ body.ob-locked { overflow: hidden; }
 @container ob (max-width: 1240px) { .ob-mic .hear .t { display: none; } .ob-mic .hear { width: 32px; padding: 0; } }
 /* the box can't size itself from its own container query: board-demo.js sets .narrow */
 .ob.narrow { grid-template-columns: 52px minmax(0, 1fr); height: 680px; }
+/* the onion mark, as the app paints it: the theme's accents behind a white onion */
+.ob-brand .logo.mark { display: grid; place-items: center; border-radius: 9px; color: #fff;
+  background: linear-gradient(145deg, var(--accent2), var(--accent)); box-shadow: 0 0 14px color-mix(in srgb, var(--accent) 45%, transparent); }
+.ob-brand .logo.mark .i { width: 21px; height: 21px; }
