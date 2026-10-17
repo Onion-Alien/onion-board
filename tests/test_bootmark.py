@@ -192,20 +192,31 @@ def test_installmark_needs_nothing_but_os_sys_and_time():
     assert bootmark.ONE_OFF is installmark.ONE_OFF
 
 
-def test_the_installer_copies_python_first_and_the_exe_last_after_closing_copies():
-    """A copy stuck on the launcher's "Failed to load Python DLL" box kept OnionBoard.exe
-    open: the silent update gave up (Abort) and rolled back, leaving no _internal."""
+def test_the_installer_copies_python_first_and_the_exe_last_moving_the_old_aside():
+    """A copy stuck on the launcher's "Failed to load Python DLL" box (or started again
+    the moment it was closed) kept OnionBoard.exe open: the silent update gave up (Abort)
+    and rolled back, leaving no _internal. Now the old exe is renamed out of the way
+    (Windows allows that while it runs) after closing what runs from {app}."""
     from pathlib import Path
+    bs = chr(92)
     iss = (Path(__file__).resolve().parent.parent / "installer" / "OnionBoard.iss"
            ).read_text(encoding="utf-8")
     files = iss[iss.index("[Files]"):iss.index("[Icons]")]
     lines = [ln for ln in files.splitlines() if ln.startswith("Source:") and "dist" in ln]
     first, rest, last = lines[:3], lines[3], lines[-1]
     assert len(lines) == 5
-    for want in ("python3*.dll", "VCRUNTIME140*.dll", "base_library.zip"):
-        assert any(want in ln for ln in first)
-        assert want in rest.split("Excludes:")[1]   # not copied a second time
-    assert "{#AppExeName}.exe" in rest.split("Excludes:")[1]
-    assert "{#AppExeName}.exe" in last and "BeforeInstall: CloseLeftoverCopies" in last
-    close = iss[iss.index("procedure CloseLeftoverCopies"):]
-    assert "BoardProcesses(True)" in close[:close.index("end;")]
+    excludes = rest.split("Excludes:")[1]
+    for want in ("*.dll", "*.pyd", "base_library.zip"):
+        assert any(f"_internal{bs}{want}" in ln for ln in first)
+        assert f"{bs}_internal{bs}{want}" in excludes   # not copied a second time
+    assert f"{bs}{{#AppExeName}}.exe" in excludes
+    assert "{#AppExeName}.exe" in last and "BeforeInstall: MoveOldExeAside" in last
+    move = iss[iss.index("procedure MoveOldExeAside"):]
+    move = move[:move.index("\nend;\n")]
+    assert "BoardProcesses(True)" in move and "RenameFile(Exe, Old)" in move
+    # the moved exe goes at the end, else at the next install or by the uninstaller
+    assert "DeleteOldExe" in iss[iss.index("procedure CurStepChanged"):]
+    for section in ("[InstallDelete]", "[UninstallDelete]"):
+        part = iss[iss.index(section):]
+        part = part[:part.index("\n[", 1)]
+        assert "{#AppExeName}.exe.old*" in part, section
