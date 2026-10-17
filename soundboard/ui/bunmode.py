@@ -7,8 +7,13 @@ overlay, sounds, downloads.
 
 He shows how the app is doing:
 
-- a sound playing: headphones on, singing along with what plays, notes flying
+- a sound playing: headphones on, dancing to it (soundboard/groove.py hears its beat
+  and guesses its style): headbanging to rock, quick hops to electronic music, a cool
+  nod to hip-hop, a slow sway to something calm, talking along to someone speaking;
+  notes fly out on the beat, as big as he is
 - paused: headphones on, quiet
+- nothing playing for a while: bored (BORED_S), then sad (SAD_S); a sound starts and
+  he hops for joy
 - a download running: off for his hammer and building (BunnyWidget.build), a
   star and a hop when it's done, sad when it failed
 - a notice (any toast on the window): he says it in a bubble above his head;
@@ -36,6 +41,7 @@ from PySide6.QtGui import QColor, QFont, QFontMetrics, QGuiApplication, QPainter
 from PySide6.QtWidgets import QApplication, QFrame, QHBoxLayout, QMenu, QPushButton, QWidget
 
 from soundboard import theme
+from soundboard.groove import Groove
 from soundboard.bunny import H, INK, W
 from soundboard.i18n import _
 from soundboard.ui import a11y, icons
@@ -61,6 +67,8 @@ SAY_MS = {"error": 7000, "warn": 5000, "ok": 3000, "busy": 3000, "": 3500}
 SAD_ERROR = 0.85      # how sad an error makes him
 SETTLE_MS = 2500      # after a download's star, back to how he was
 EDGE = {"error": "#ff4d6d", "warn": "#f5a524", "ok": "#13ce66"}
+BORED_S, BORED = 45.0, 0.35   # nothing playing this long: this sad...
+SAD_S, LONELY = 150.0, 0.7    # ...and after this long, this sad
 
 
 class BunMode(QWidget):
@@ -94,6 +102,8 @@ class BunMode(QWidget):
         self._dl = False
         self._dl_failed = 0
         self._shown: tuple | None = None   # (playing, mic on) the buttons show
+        self.groove = Groove()   # the beat and style of what plays (he dances to it)
+        self._quiet_since: float | None = None   # nothing playing since then (moods)
         self._build_icons()
         self._hide_icons = QTimer(self, singleShot=True, interval=HIDE_ICONS_MS)
         self._hide_icons.timeout.connect(self._icons_off)
@@ -301,10 +311,18 @@ class BunMode(QWidget):
 
     # ------------------------------------------------------------------ status
     def tick(self, *, live: bool, paused: bool, level: float, sending: bool, mic: bool,
-             downloading: bool, failed: int):
-        """The app's state, from TickControl.tick (a few times a second or more)."""
+             downloading: bool, failed: int, song: tuple | None = None):
+        """The app's state, from TickControl.tick (a few times a second or more).
+        `song`: (samples, 0..1 position) of the sound playing, which he dances to."""
         b = self.bun
-        b.set_level(level if live else 0.0)
+        now = time.monotonic()
+        if live and song is not None and song[0] is not None:
+            self.groove.feed(song[0], song[1], now)
+            b.set_groove(self.groove)
+            b.set_level(0.0)
+        else:   # (nothing to read: the level alone, as before)
+            b.set_groove(None)
+            b.set_level(level if live else 0.0)
         b.naps = not (live or downloading)
         if downloading and not self._dl:
             self._settle.stop()
@@ -316,12 +334,12 @@ class BunMode(QWidget):
         self._dl = downloading
         if not b.building and not self._settle.isActive():
             b.prop = "headphones" if (live or paused) else None
-        now = time.monotonic()
+        mood = self._mood(now, live, paused or downloading or b.building)
         if self.text and now >= self._text_until:
             self.text = ""
             self.update()
         if not b.building and not self._settle.isActive():
-            b.sad = SAD_ERROR if self.text and self.kind == "error" else 0.0
+            b.sad = SAD_ERROR if self.text and self.kind == "error" else mood
         if self._shown != (live, mic):
             self._shown = (live, mic)
             icons.set_icon(self.b_play, "pause" if live else "play", size=ICON)
@@ -330,6 +348,19 @@ class BunMode(QWidget):
             self.b_air.setChecked(sending)
         if self.b_mic.isChecked() != mic:
             self.b_mic.setChecked(mic)
+
+    def _mood(self, now: float, live: bool, busy: bool) -> float:
+        """How sad nothing playing has made him: bored after BORED_S, sad after SAD_S.
+        Music again after he got bored: a hop for joy."""
+        if live or busy:
+            if live and self._quiet_since is not None and now - self._quiet_since >= BORED_S:
+                self.bun.cheer()
+            self._quiet_since = None
+            return 0.0
+        if self._quiet_since is None:
+            self._quiet_since = now
+        quiet = now - self._quiet_since
+        return LONELY if quiet >= SAD_S else BORED if quiet >= BORED_S else 0.0
 
     def _settled(self):
         self._settle.stop()

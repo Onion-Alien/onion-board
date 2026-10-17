@@ -34,7 +34,10 @@ download bar (`ui/downloadbar.py`); static pictures in `ui/dialogs.py` and the s
 `draw_bunny` keywords, all 0 when he's at rest: `blink` (0..1, shut above 0.6), `mouth`
 (talking), `ears` (degrees outward), `swing` (hammer or bat), `sad` (worried face, and the
 ears fold down from the middle), `angry` (cross brows and the vein mark), `nightcap`
-(asleep), `robot` (Robo-Bun), `smug`, `led` (Robo-Bun's LEDs brighter, 0..1). Props:
+(asleep), `robot` (Robo-Bun), `smug`, `led` (Robo-Bun's LEDs brighter, 0..1), `nod` (his
+head tilted on his neck, degrees) and `dip` (his head dropped, canvas units): the body,
+and what's round his neck (`bunny.BODY_PIECES`), stay put. Bun mode's dances
+(`BunnyWidget.set_groove`, `_moves`) use them to headbang and nod on the beat. Props:
 `bunny.PROPS` (`hammer_broken`: the failed build's snapped plank and headless hammer).
 Everything an act shows stays inside the widget's own box: a widget is only a little wider
 than Bun, so moving him sideways out of view slices him at its edge. Squash, shrink or fade

@@ -134,7 +134,10 @@ class TickControl(Controller):
         mw.overlay.tick(playing)
         if mw.bunctl.bun_mode is not None and mw.bunctl.bun_mode.isVisible():
             bar = mw.download_bar
-            mw.bunctl.bun_mode.tick(
+            song = next(((mw.audio.get(sid), prog) for sid, (prog, paused) in playing.items()
+                         if (sid in mw._meta or sid == LINK_ID) and not paused
+                         and prog is not None), None)   # (what he dances to)
+            mw.bunctl.bun_mode.tick(song=song,
                 live=live, level=e.level_play, sending=e.sending, mic=mw.cfg.mic_enabled,
                 paused=any(paused for sid, (_p, paused) in playing.items()
                            if sid in mw._meta or sid == LINK_ID),

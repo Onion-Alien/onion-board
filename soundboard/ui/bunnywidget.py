@@ -130,6 +130,10 @@ TAUNT = 1.5        # how long he taps the bat before the game opens, seconds
 NAP_HOURS = (2, 3, 4)   # local hours (2:00 to 4:59) he's asleep, with naps=True
 WOKEN_S = 30.0     # how long a click keeps him awake
 ZZZ_EVERY = 1.1    # seconds between Zs
+NOTE_H = 110       # notes come out their usual size at this Bun height (bigger Bun, bigger)
+DANCE_FADE = 3.0   # how fast he gets into a dance or out of it (1/s)
+STYLE_BLEND = 0.6  # seconds to change from one style of dance to another
+KICK_HOP = 0.26    # a hop on a hit, before the beat is known (seconds)
 
 
 def blink_amount(b: float) -> float:
@@ -172,12 +176,13 @@ def local_hour() -> int:
 
 
 class _Note:
-    __slots__ = ("x", "y", "vx", "vy", "age", "life", "size", "col", "spin", "calm")
+    __slots__ = ("x", "y", "vx", "vy", "age", "life", "size", "col", "spin", "calm", "k")
 
-    def __init__(self, x, y, rng: random.Random, strength: float = 1.0):
+    def __init__(self, x, y, rng: random.Random, strength: float = 1.0, k: float = 1.0):
         self.x, self.y = x, y
-        self.vx = rng.uniform(-18, 18)
-        self.vy = -rng.uniform(28, 48) * (0.8 + 0.4 * strength)
+        self.k = k   # Bun's size against the usual one: a big Bun's notes are big and fly far
+        self.vx = rng.uniform(-18, 18) * k
+        self.vy = -rng.uniform(28, 48) * (0.8 + 0.4 * strength) * k
         self.age, self.life = 0.0, rng.uniform(1.2, 1.9)
         self.size = rng.uniform(0.75, 1.15)
         self.col = QColor(rng.choice(NOTE_COLORS))
@@ -250,12 +255,14 @@ def paint_note(p: QPainter, n) -> None:
     p.translate(n.x, n.y)
     p.rotate(n.spin * math.sin(n.age * 4))
     col, rim = note_colors(n.col)
+    k = getattr(n, "k", 1.0)
     if n.size < 0.6:
-        sparkle(p, 0, 0, 5, col)
+        sparkle(p, 0, 0, 5 * k, col)
     else:
-        for ox, oy in ((-1, 0), (1, 0), (0, -1), (0, 1)):   # a soft rim so it reads
-            music_note(p, -5 + ox, -8 + oy, n.size, rim)
-        music_note(p, -5, -8, n.size, col)
+        s, o = n.size * k, min(1.6, max(1.0, 0.5 * k))   # (a thin rim at any size)
+        for ox, oy in ((-o, 0), (o, 0), (0, -o), (0, o)):   # a soft rim so it reads
+            music_note(p, -5 * k + ox, -8 * k + oy, s, rim)
+        music_note(p, -5 * k, -8 * k, s, col)
     p.restore()
 
 
@@ -347,6 +354,12 @@ class BunnyWidget(QWidget):
         self._fidget = ""               # the idle fidget going on ("" none)
         self._fidget_at = -1.0
         self._next_fidget = self._t0 + self._rng.uniform(*FIDGET_EVERY)
+        self.groove = None              # the song playing (set_groove), or None
+        self._dance = 0.0               # how much he's dancing (0..1, fades in and out)
+        self._style, self._style_was, self._blend = "", "", 1.0
+        self._last_beat: float | None = None
+        self._g_energy = self._g_voice = 0.0
+        self._kick_at = -1.0            # a hop on a hit, before the beat is known
 
     def sizeHint(self) -> QSize:
         return QSize(round(self.bun_h * W / H) + 2 * self.pad + 20 + 2 * self.side,
@@ -360,6 +373,15 @@ class BunnyWidget(QWidget):
     def set_level(self, level: float):
         """The live mic level, 0..1. Call it as often as you like (the wizard: 25/s)."""
         self._level = max(float(level), self._level * 0.8)
+
+    def note_k(self) -> float:
+        """How big his notes are, against the usual: they grow and shrink with him."""
+        return max(0.3, (self.bun_h / NOTE_H) ** 0.85)
+
+    def set_groove(self, groove):
+        """The song playing, as a groove.Groove (its beat and style), or None. He dances
+        to it: on the beat, in the song's style (see `_moves`), notes flying on the beats."""
+        self.groove = groove
 
     def burst(self, n: int = 6):
         """Throw a handful of notes out at once."""
@@ -563,7 +585,8 @@ class BunnyWidget(QWidget):
         if self.prop == "mic":
             spots.append((0.84, 0.66, 1))
         fx, fy, side = self._rng.choice(spots)
-        n = _Note(r.left() + r.width() * fx, r.top() + r.height() * fy, self._rng, strength)
+        n = _Note(r.left() + r.width() * fx, r.top() + r.height() * fy, self._rng, strength,
+                  self.note_k())
         n.vx = side * abs(n.vx) + side * 8
         n.calm = calm
         self.notes.append(n)
@@ -667,7 +690,7 @@ class BunnyWidget(QWidget):
                 for _i in range(3):
                     self._puff(x, y, 26, 4, 0.5)
                 if blows % 2 == 0:
-                    n = _Note(x, y - 6, self._rng, 0.6)
+                    n = _Note(x, y - 6, self._rng, 0.6, self.note_k())
                     n.col = QColor(self._rng.choice(SPARKLE_COLORS))
                     self.notes.append(n)
 
@@ -694,8 +717,11 @@ class BunnyWidget(QWidget):
         self._mouth += (target - self._mouth) * min(1.0, dt * (22 if target > self._mouth else 12))
         hop = (0.3 + 0.7 * loud) * 6 if talking else 0.0
         self._bounce += (hop - self._bounce) * min(1.0, dt * 10)
-        # notes: a stream while talking, scaled by how loud
-        if talking:
+        grooving = self._step_groove(now, dt)
+        # notes: a stream while talking, scaled by how loud (dancing: on the beat instead)
+        if grooving:
+            pass
+        elif talking:
             self._note_debt += dt * (2 + 10 * loud)
             while self._note_debt >= 1:
                 self._note_debt -= 1
@@ -755,6 +781,107 @@ class BunnyWidget(QWidget):
         self._spring(now, dt)
         self.update()
 
+    def _step_groove(self, now: float, dt: float) -> bool:
+        """Dancing to the song (set_groove): fades the dance in or out, follows the
+        song's style and throws notes on the beat. True while a song is playing."""
+        g = self.groove
+        if g is None or self.building or self._fail_t >= 0:
+            self._dance -= self._dance * min(1.0, dt * DANCE_FADE)
+            self._last_beat = None
+            if self._dance < 0.01:
+                self._style = ""
+            return False
+        on = bool(g.style) and bool(g.bpm)
+        self._dance += (float(on) - self._dance) * min(1.0, dt * DANCE_FADE)
+        self._g_energy += (g.energy - self._g_energy) * min(1.0, dt * 8)
+        v = g.voice   # the mouth: opens fast, closes a little slower
+        self._g_voice += (v - self._g_voice) * min(1.0, dt * (30 if v > self._g_voice else 14))
+        if not on:   # the first seconds, the beat not found yet: a hop on each big hit
+            if g.kick > 0.75 and now - self._kick_at > 0.3:
+                self._kick_at = now
+                self._spawn(0.9)
+            return True
+        if g.style != self._style:
+            self._style_was, self._style, self._blend = self._style, g.style, 0.0
+        self._blend = min(1.0, self._blend + dt / STYLE_BLEND)
+        b = g.beat(now)
+        if self._last_beat is not None and 0 < int(b) - int(self._last_beat) < 3:
+            self._beat_notes(int(b))
+        self._last_beat = b
+        return True
+
+    def _beat_notes(self, n: int):
+        """Beat `n` just landed: notes, as many and as lively as the song."""
+        style, e = self._style, self._g_energy
+        if style == "speech" or n % (2 if style in ("chill", "hiphop") else 1):
+            return
+        count = 1 + (style == "electronic" and e > 0.5) + (
+            n % 4 == 0 and e > 0.55 and style in ("rock", "electronic", "pop"))
+        strength = {"electronic": 1.4, "rock": 1.2, "hiphop": 0.8, "chill": 0.45}.get(style, 1.0)
+        for _i in range(count):
+            self._spawn(strength)
+            if style == "chill":   # drifting up slow and long
+                self.notes[-1].life *= 1.5
+                self.notes[-1].vy *= 0.6
+
+    def _moves(self, style: str, now: float, t: float) -> dict:
+        """This moment of his dance to `style`, on the song's beat: how far each part
+        moves (sizes are a share of his height, so a big Bun dances big)."""
+        g, a = self.groove, self.bun_h
+        e = 0.45 + 0.55 * self._g_energy
+        sing = max(0.0, min(1.0, (self._g_voice - 0.3) * 1.8))
+        b = g.beat(now) if g is not None and g.bpm else t * 2
+        if style in ("hiphop", "chill") and g is not None and g.bpm > 115:
+            b /= 2   # (heard at double time: a nod every other beat)
+        ph = b % 1.0
+        up = math.sin(math.pi * ph)                  # in the air between beats, down on them
+        hit = ph / 0.08 if ph < 0.08 else math.exp(-(ph - 0.08) * 5)   # snaps down on the beat
+        side = math.sin(math.pi * b)                  # one way a beat, then the other
+        slow = math.sin(math.pi * b / 2)              # one sway every two beats
+        kick = g.kick if g is not None else 0.0
+        m = dict(dy=0.0, dx=0.0, angle=0.0, ears=0.0, sy=0.0, nod=0.0, dip=0.0,
+                 mouth=0.0, blink=0.0, angry=0.0, smug=0.0)
+        if style == "electronic":   # quick hops on every beat, side to side
+            if b % 16 >= 12 and self._g_energy > 0.55:   # the phrase's last bar: double time
+                up = math.sin(math.pi * ((2 * b) % 1.0))
+            m.update(dy=-a * 0.11 * e * up, dx=a * 0.05 * side, angle=7 * side,
+                     ears=-14 * up - 6, sy=0.03 * up, nod=-5 * side, dip=2 * hit,
+                     mouth=0.2 + 0.4 * sing)
+        elif style == "rock":       # headbanging: head down hard on the beat, ears flying
+            m.update(dip=13 * hit * e, nod=5 * hit * (1 if int(b) % 2 else -1),
+                     dy=a * 0.03 * hit, sy=-0.05 * hit, ears=26 * hit - 4, angle=2 * side,
+                     mouth=max(0.15, 0.6 * kick), angry=0.35, blink=0.4 * hit)
+        elif style == "hiphop":     # a cool nod, leaning back, eyes half shut
+            m.update(dip=5 * hit, nod=3 * hit - 3, angle=-3 + 3 * slow, dx=a * 0.03 * slow,
+                     dy=-a * 0.02 * up, ears=6 * slow, mouth=0.5 * sing, smug=1.0)
+        elif style == "chill":      # a slow sway, eyes shut, lost in it
+            awake = 6 <= b % 16 < 8   # (now and then he opens them)
+            m.update(angle=6 * slow, dx=a * 0.035 * slow, nod=5 * slow,
+                     dy=-a * 0.012 * abs(slow), ears=8 * slow, mouth=0.35 * sing,
+                     blink=0.0 if awake else 1.0)
+        elif style == "speech":     # talking along: lips with the voice, head tilting
+            onset = g.onset if g is not None else 0.0
+            flap = 0.7 + 0.3 * abs(math.sin(t * 15))   # (syllables)
+            m.update(mouth=max(0.0, min(1.0, (self._g_voice - 0.25) * 1.6)) * flap,
+                     nod=5 * math.sin(t * 1.7) + 3 * math.sin(t * 0.7), dip=2 * onset,
+                     ears=-4 * min(1.0, self._g_voice * 2), dy=-a * 0.01 * onset,
+                     angle=2 * math.sin(t * 0.9))
+        else:                       # anything else: a bounce on the beat, singing along
+            m.update(dy=-a * 0.06 * e * up, angle=4 * slow, dx=a * 0.025 * slow, dip=4 * hit,
+                     ears=-8 * up, mouth=0.55 * sing)
+        return m
+
+    def dance(self, now: float, t: float) -> dict:
+        """The dance this moment, blended from the last style while it changes and
+        faded in and out with the song (all zeros when no song plays)."""
+        d = self._dance
+        m = self._moves(self._style, now, t)
+        if self._blend < 1 and self._style_was:
+            k = self._blend * self._blend * (3 - 2 * self._blend)
+            was = self._moves(self._style_was, now, t)
+            m = {key: was[key] + (m[key] - was[key]) * k for key in m}
+        return {key: v * d for key, v in m.items()}
+
     def _spring(self, now: float, dt: float):
         """Moves the springy layer on a frame: his ears trail behind his hops and
         wobble as they settle, a fast move stretches him and a change of direction (a
@@ -806,7 +933,7 @@ class BunnyWidget(QWidget):
             self._fin_t += dt
             if self._fin_t < FINALE - 0.6 and self._rng.random() < dt * 5:   # it plays
                 c = self._at(r, PLANK_SPOT.center().x(), 102)
-                n = _Note(c.x(), c.y(), self._rng, 1.0)
+                n = _Note(c.x(), c.y(), self._rng, 1.0, self.note_k())
                 n.vx = self._rng.uniform(10, 40)
                 self.notes.append(n)
             if self._fin_t >= FINALE:
@@ -835,7 +962,7 @@ class BunnyWidget(QWidget):
     def _idle(self, now: float) -> bool:
         return not (self.building or self._fail_t >= 0 or self._fin_t >= 0 or self.asleep
                     or self._sad > 0.3 or self._angry > 0.05 or self._level > TALK
-                    or self._hopeful or self.celebrate or self.say
+                    or self._hopeful or self.celebrate or self.say or self._dance > 0.05
                     or (self._joy_at >= 0 and now - self._joy_at < 1.4))
 
     def _step_fidget(self, now: float):
@@ -915,6 +1042,22 @@ class BunnyWidget(QWidget):
                 dy -= 2.2 * beat * env
                 angle += 4 * math.sin(math.pi * f * 1.1) * env
                 ears += 6 * math.sin(math.pi * f * 4.4) * env
+        nod = dip = 0.0
+        smug = cross = 0.0
+        if self._dance > 0.01 and self._style:
+            m = self.dance(now, t)
+            dy += m["dy"]
+            look_dx += m["dx"]
+            angle += m["angle"]
+            ears += m["ears"]
+            sy += m["sy"]
+            sx -= m["sy"] * 0.6
+            nod, dip, smug, cross = m["nod"], m["dip"], m["smug"], m["angry"]
+            mouth = max(mouth, m["mouth"])
+            blink = max(blink, m["blink"])
+        if self.groove is not None and self._kick_at >= 0 and (
+                k := now - self._kick_at) < KICK_HOP:   # a hop on a hit (no beat yet)
+            dy -= self.bun_h * 0.05 * math.sin(math.pi * k / KICK_HOP)
         if self._hopeful:
             dy -= 6 * abs(math.sin(t * 5))
         if self.celebrate:
@@ -986,7 +1129,8 @@ class BunnyWidget(QWidget):
         return {"blink": blink, "mouth": mouth, "ears": ears, "dy": dy,
                 "dx": dx, "swing": swing, "shown": shown, "sad": self._sad,
                 "angry": self._angry, "sx": sx, "sy": sy, "angle": angle,
-                "alpha": alpha, "led": led, "prop": prop}
+                "alpha": alpha, "led": led, "prop": prop, "nod": nod, "dip": dip,
+                "smug": smug > 0.5, "intense": cross}
 
     # ------------------------------------------------------------------ paint
     def paintEvent(self, ev):
@@ -1028,8 +1172,10 @@ class BunnyWidget(QWidget):
             p.setOpacity(pose["alpha"])
             draw_bunny(p, body, pose["prop"],
                        blink=pose["blink"], mouth=pose["mouth"], ears=pose["ears"],
-                       swing=pose["swing"], sad=pose["sad"], angry=pose["angry"],
-                       nightcap=self.asleep, robot=self.robot, led=pose["led"])
+                       swing=pose["swing"], sad=pose["sad"],
+                       angry=max(pose["angry"], pose["intense"]),
+                       nightcap=self.asleep, robot=self.robot, led=pose["led"],
+                       nod=pose["nod"], dip=pose["dip"], smug=pose["smug"])
             p.restore()
         self._paint_screen(p, body, pose)
         if phase == "dash":   # (the cloud he dives into is in front of him)
