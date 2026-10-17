@@ -1391,7 +1391,8 @@ class PadGrid(QWidget):
             lines=(_("add a sound?"), _("pleeease?"), _("it's so quiet…"),
                    _("drop one on me!"), _("just one sound?"), _("I'm bored…")),
             hope_lines=(_("yes! drop it!"), _("ooh, for me?!")),
-            joy_lines=(_("yay!!"), _("↑ Add sounds!"), _("hehe!")), pong=True, naps=True)
+            joy_lines=(_("yay!!"), _("↑ Add sounds!"), _("hehe!")), pong=True, naps=True,
+            dances=True)
         ev.addWidget(self.bun, 0, Qt.AlignmentFlag.AlignHCenter)
         self.empty_text = QLabel(self.HOW_TO)
         # short lines: fits the mini player

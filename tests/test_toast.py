@@ -526,3 +526,16 @@ def test_a_cards_buttons_are_the_windows_last_tab_stops(main_window, qapp):  # n
             stops.append(x)
         x = x.nextInFocusChain()
     assert stops[-2:] == [t.card.action, t.card.btn_close]
+
+
+def test_closing_a_card_for_a_deleted_widget_does_nothing(qapp):
+    # an Undo bar whose page was already deleted closes its card when it times out:
+    # that must not raise "Internal C++ object already deleted"
+    import shiboken6
+    w = _host(qapp)
+    child = QWidget(w)
+    busy.toast(w, "Removed 1 sound", key="gone")
+    shiboken6.delete(child)
+    toast.close(child, "gone")
+    toast.close(None, "gone")
+    w.close()

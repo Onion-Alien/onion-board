@@ -6,13 +6,20 @@ MainWindow makes one ``TickControl`` (``MainWindow.tickctl``); everything here r
 UI thread."""
 from __future__ import annotations
 
+import collections
 import time
 from typing import TYPE_CHECKING
 
+import numpy as np
+from shiboken6 import isValid
+
 from soundboard import thumbs, winkeys
+from soundboard.groove import Groove
 from soundboard.sendfx import CEILING_DB
 from soundboard.i18n import _
 from soundboard.ui import appstate
+from soundboard.style.owl import OwlWidget
+from soundboard.ui.bunnywidget import BunnyWidget
 from soundboard.ui.controller import Controller
 from soundboard.ui.linkbar import PLAY_ID as LINK_ID
 from soundboard.ui.livedot import set_tab_live
@@ -25,6 +32,7 @@ TICK_MS = 33         # the UI timer while the window is on screen (meters, visua
 TICK_QUIET_MS = 100  # on screen with nothing moving: no sound, radio, recording or level
 TICK_IDLE_MS = 250   # ...and while it's in the tray or minimised (push-to-talk, watchdog)
 LEVEL_QUIET = 0.003  # a level below this (-50 dB) shows as nothing on the meters
+RADIO_LAG = 0.1      # seconds between the radio's audio arriving and it being heard
 
 
 class TickControl(Controller):
@@ -38,6 +46,7 @@ class TickControl(Controller):
         self._sounds_live = False         # the Sounds tab's live dot is shown
         self._talk_until = 0.0            # "hearing you" indicator holds until this time
         self._talk_shown: bool | None = None
+        self.groove = Groove()            # what plays, for the mascots on screen (_dance)
 
     def _tick_pace(self) -> int:
         mw = self.mw
@@ -132,6 +141,7 @@ class TickControl(Controller):
         if mw._ui_live:
             self._tick_visuals(playing, now)
         mw.overlay.tick(playing)
+        self._dance(playing, now)
         if mw.bunctl.bun_mode is not None and mw.bunctl.bun_mode.isVisible():
             bar = mw.download_bar
             song = next(((mw.audio.get(sid), prog) for sid, (prog, paused) in playing.items()
@@ -147,6 +157,35 @@ class TickControl(Controller):
         e.level_mic *= 0.9
 
         self._sync_ptt()
+
+    def _dance(self, playing, now: float):
+        """The mascots on screen (Bun on an empty page, Hoot) dance to what plays: the
+        sound playing, else the radio."""
+        mw, e = self.mw, self.mw.engine
+        dancers = [w for w in (*BunnyWidget.dancers, *OwlWidget.dancers)
+                   if isValid(w) and w.isVisible()]   # (Qt may have deleted one)
+        on_radio = bool(dancers) and mw.radio.is_active()
+        if on_radio and e.radio_tap is None:
+            e.radio_tap = collections.deque(maxlen=200)
+        elif not on_radio:
+            e.radio_tap = None
+        if not dancers:
+            return
+        song = next(((mw.audio.get(sid), prog) for sid, (prog, paused) in playing.items()
+                     if (sid in mw._meta or sid == LINK_ID) and not paused
+                     and prog is not None and mw.audio.get(sid) is not None), None)
+        g: Groove | None = self.groove
+        if song is not None:
+            self.groove.feed(song[0], song[1], now)
+        elif on_radio and e.radio_tap:
+            tap = e.radio_tap
+            chunks = [tap.popleft() for _i in range(len(tap))]
+            # (it goes out through a short buffer: heard about RADIO_LAG after it's read)
+            self.groove.feed_live(np.concatenate(chunks), now, RADIO_LAG)
+        elif not on_radio:
+            g = None
+        for w in dancers:
+            w.set_groove(g)
 
     def _sync_ptt(self):
         """Auto push-to-talk: hold the game's PTT key only while a sound (or live

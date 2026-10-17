@@ -13,6 +13,7 @@ from __future__ import annotations
 import math
 import random
 import time
+import weakref
 
 from PySide6.QtCore import QPointF, QRectF, QSize, Qt, QTimer, Signal
 from PySide6.QtGui import QColor, QCursor, QFont, QImage, QPainter, QPainterPath, QPen
@@ -278,6 +279,22 @@ def _bell(k: float) -> float:
     return math.sin(math.pi * max(0.0, min(1.0, k)))
 
 
+# dancing (set_groove): the styles he bobs to the hits themselves, not the beat grid
+HIT_BANDS = {"hiphop": ("bass",), "rock": ("bass", "drums")}
+HIT_LEAD = 0.05   # seconds a bob starts before its hit, so it lands right on it
+
+
+def _hit(age: float, decay: float = 6.0) -> float:
+    """A hit `age` seconds ago (less than 0: still coming): down to 1 right on it,
+    then easing back."""
+    if age < -HIT_LEAD or age > 2:
+        return 0.0
+    if age < 0:
+        k = 1 + age / HIT_LEAD
+        return k * k
+    return math.exp(-age * decay)
+
+
 def _ease(k: float) -> float:
     k = max(0.0, min(1.0, k))
     return k * k * (3 - 2 * k)
@@ -296,10 +313,16 @@ class OwlWidget(QWidget):
     on screen."""
 
     clicked = Signal()
+    # the ones made with dances=True: the host hands each one on screen what's playing
+    dancers: weakref.WeakSet = weakref.WeakSet()
 
     def __init__(self, height: int = 96, lines=None, joy=None, parent=None, *,
-                 left: int | None = None, right: int | None = None):
+                 left: int | None = None, right: int | None = None, dances: bool = False):
         super().__init__(parent)
+        if dances:
+            OwlWidget.dancers.add(self)
+        self.groove = None         # what's playing (set_groove): he dances to it
+        self._dance = 0.0          # 0..1, how far into the dance (fades in and out)
         self.owl_h = height
         self.lines = tuple(wait_lines() if lines is None else lines)
         self.joy_lines = tuple(joy_lines() if joy is None else joy)
@@ -357,6 +380,26 @@ class OwlWidget(QWidget):
             self.clicked.emit()
         super().mousePressEvent(ev)
 
+    def set_groove(self, groove):
+        """What's playing, as a soundboard.groove.Groove (its beat, style and hits), or
+        None. He bobs his head to it."""
+        self.groove = groove
+
+    @staticmethod
+    def _accent(g, now: float) -> float:
+        """0..1, how far into a bob this moment: on the song's hits (hip-hop, rock) or
+        its beat (`g`: the groove)."""
+        bands = HIT_BANDS.get(g.style)
+        if bands:
+            best = 0.0
+            for band in bands:
+                age, s = g.last_hit(band, now)
+                until, s2 = g.next_hit(band, now)
+                best = max(best, _hit(age) * s, _hit(-until) * s2)
+            return best
+        ph = g.beat(now) % 1.0
+        return _hit((ph if ph < 0.75 else ph - 1) * 60 / g.bpm, 5 * 60 / g.bpm)
+
     def cheer(self):
         """A happy hop with sparkles (what a click does)."""
         self._joy_t = 0.0
@@ -390,6 +433,11 @@ class OwlWidget(QWidget):
     def step(self, dt: float, mouse=...):
         """Advance the animation by `dt` seconds (`mouse` overrides the cursor, tests)."""
         self.t += dt
+        g = self.groove
+        on = g is not None and bool(g.style) and bool(g.bpm)
+        self._dance += (float(on) - self._dance) * min(1.0, dt * 3)
+        if self._dance > 0.3 and self.act:   # (no sulking while he dances)
+            self.act, self.say = None, ""
         m = self._mouse() if mouse is ... else mouse
         dist = math.hypot(*m) if m else 99.0
         near = 1.0 if dist < 2.2 else 0.0
@@ -405,7 +453,8 @@ class OwlWidget(QWidget):
                 self.act = None
                 self.say = ""
                 self._next_act = self.t + self._rng.uniform(3.5, 7.0)
-        elif self._joy_t < 0 and self._near < 0.3 and self.t >= self._next_act:
+        elif (self._joy_t < 0 and self._near < 0.3 and self.t >= self._next_act
+              and self._dance < 0.3):
             self.start(self._rng.choice(list(ACTS)))
         if self.t >= self._next_blink:
             self._blink_t = self.t
@@ -474,6 +523,21 @@ class OwlWidget(QWidget):
                 dy -= 9 * _bell(j * 1.5)
                 tufts -= 25 * _bell(j)
                 extra["startle"] = j
+        d = self._dance
+        if d > 0.01 and self.groove is not None and self.groove.bpm:
+            # dancing: head bobbing down on the hits, swaying a beat each way, tufts
+            # bouncing, a flap of the wings on a big hit; cheered right up
+            g, now = self.groove, time.monotonic()
+            bob = self._accent(g, now)
+            sway = math.sin(math.pi * g.beat(now))
+            sad *= 1 - d
+            tufts += d * (-14 + 12 * bob)
+            dy += d * 9 * bob
+            rot += d * 7 * sway
+            if g.style in ("rock", "electronic"):
+                flap = max(flap, d * 0.7 * bob)
+            if g.style == "chill":   # eyes shut, lost in it
+                blink = max(blink, d)
         if self._joy_t >= 0:
             j = self._joy_t / 1.6
             e = _bell(j)

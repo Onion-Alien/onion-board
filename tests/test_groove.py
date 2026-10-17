@@ -109,3 +109,18 @@ def test_hits_carry_the_time_they_are_heard_and_are_read_a_little_ahead():
     until, _s = g.next_hit("bass", nxt - 0.03)
     assert abs(until - 0.03) < 0.02
     assert g.last_hit("bass", nxt - 0.03)[0] > 0.3
+
+
+def test_a_stream_like_the_radio_is_heard_chunk_by_chunk():
+    bpm = 128
+    data = _club(bpm, 14, np.random.default_rng(6)).astype(np.float32) / 32768
+    g = Groove()
+    step = int(SR * TICK)
+    for pos in range(0, len(data) - step, step):
+        g.feed_live(data[pos:pos + step], now=(pos + step) / SR)   # (heard as it arrives)
+    assert abs(g.bpm - bpm) < 2.5 and g.style and g.style != "speech"
+    kicks = np.arange(0, 14, 60 / bpm)
+    times = [t for t, _s in g.hits["bass"]]
+    assert len(times) >= 6 and all(np.abs(kicks - t).min() < 0.02 for t in times)
+    g.feed(_club(bpm, 2, np.random.default_rng(7)), 0.5)   # a sound now: starts again
+    assert g.bpm == 0
