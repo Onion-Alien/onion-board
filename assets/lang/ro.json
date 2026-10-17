@@ -3659,5 +3659,7 @@
   "Is a sound in the store yours? Email {email} and it comes down.": "Un sunet din magazin e al tău? Scrie la {email} și e scos.",
   "Games get the key too": "Și jocurile primesc tasta",
   "Keys in games": "Taste în jocuri",
-  "With this on, a hotkey still does its normal job too: press F1 in a game and the game gets F1 while your sound plays. Off: only Onion Board gets the key, so a hotkey on W stops you walking.": "Când e pornit, o tastă rapidă își face și treaba obișnuită: apasă F1 într-un joc și jocul primește F1 în timp ce sunetul tău cântă. Oprit: doar Onion Board primește tasta, așa că o tastă rapidă pe W te oprește din mers."
+  "With this on, a hotkey still does its normal job too: press F1 in a game and the game gets F1 while your sound plays. Off: only Onion Board gets the key, so a hotkey on W stops you walking.": "Când e pornit, o tastă rapidă își face și treaba obișnuită: apasă F1 într-un joc și jocul primește F1 în timp ce sunetul tău cântă. Oprit: doar Onion Board primește tasta, așa că o tastă rapidă pe W te oprește din mers.",
+  "No voice": "Fără voce",
+  "Says this sound in a voice from the Voice tab, the way your mic sounds with it. Your saved voices are here too.": "Redă acest sunet cu o voce din fila Voce, cum sună microfonul tău cu ea. Vocile tale salvate sunt și ele aici."
 }

@@ -3505,5 +3505,7 @@
   "Is a sound in the store yours? Email {email} and it comes down.": "스토어에 내 사운드가 있나요? {email}로 메일을 보내면 내릴게요.",
   "Games get the key too": "게임에도 키 전달",
   "Keys in games": "게임 속 키",
-  "With this on, a hotkey still does its normal job too: press F1 in a game and the game gets F1 while your sound plays. Off: only Onion Board gets the key, so a hotkey on W stops you walking.": "켜 두면 단축키가 원래 하던 일도 그대로 합니다. 게임에서 F1을 누르면 소리가 재생되면서 게임에도 F1이 전달돼요. 끄면: 키는 Onion Board만 받으므로 W에 단축키를 걸면 걸을 수 없게 됩니다."
+  "With this on, a hotkey still does its normal job too: press F1 in a game and the game gets F1 while your sound plays. Off: only Onion Board gets the key, so a hotkey on W stops you walking.": "켜 두면 단축키가 원래 하던 일도 그대로 합니다. 게임에서 F1을 누르면 소리가 재생되면서 게임에도 F1이 전달돼요. 끄면: 키는 Onion Board만 받으므로 W에 단축키를 걸면 걸을 수 없게 됩니다.",
+  "No voice": "음성 없음",
+  "Says this sound in a voice from the Voice tab, the way your mic sounds with it. Your saved voices are here too.": "이 소리를 음성 탭의 음성으로 재생합니다. 그 음성을 켠 마이크와 같은 소리예요. 저장한 음성도 여기 있어요."
 }

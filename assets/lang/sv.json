@@ -3582,5 +3582,7 @@
   "Is a sound in the store yours? Email {email} and it comes down.": "Är ett ljud i butiken ditt? Mejla {email} så tas det bort.",
   "Games get the key too": "Spel får också tangenten",
   "Keys in games": "Tangenter i spel",
-  "With this on, a hotkey still does its normal job too: press F1 in a game and the game gets F1 while your sound plays. Off: only Onion Board gets the key, so a hotkey on W stops you walking.": "När det här är på gör en snabbtangent också sitt vanliga jobb: tryck F1 i ett spel så får spelet F1 medan ditt ljud spelas. Av: bara Onion Board får tangenten, så en snabbtangent på W hindrar dig från att gå."
+  "With this on, a hotkey still does its normal job too: press F1 in a game and the game gets F1 while your sound plays. Off: only Onion Board gets the key, so a hotkey on W stops you walking.": "När det här är på gör en snabbtangent också sitt vanliga jobb: tryck F1 i ett spel så får spelet F1 medan ditt ljud spelas. Av: bara Onion Board får tangenten, så en snabbtangent på W hindrar dig från att gå.",
+  "No voice": "Ingen röst",
+  "Says this sound in a voice from the Voice tab, the way your mic sounds with it. Your saved voices are here too.": "Spelar ljudet med en röst från fliken Röst, så som din mikrofon låter med den. Dina sparade röster finns här också."
 }

@@ -3505,5 +3505,7 @@
   "Is a sound in the store yours? Email {email} and it comes down.": "商店里有你的音效？发邮件到 {email}，我们会把它下架。",
   "Games get the key too": "游戏也会收到按键",
   "Keys in games": "游戏中的按键",
-  "With this on, a hotkey still does its normal job too: press F1 in a game and the game gets F1 while your sound plays. Off: only Onion Board gets the key, so a hotkey on W stops you walking.": "开启后，快捷键也照常起作用：在游戏里按 F1，声音播放的同时游戏也会收到 F1。关闭：只有 Onion Board 收到这个键，所以把快捷键设在 W 上会让你没法走路。"
+  "With this on, a hotkey still does its normal job too: press F1 in a game and the game gets F1 while your sound plays. Off: only Onion Board gets the key, so a hotkey on W stops you walking.": "开启后，快捷键也照常起作用：在游戏里按 F1，声音播放的同时游戏也会收到 F1。关闭：只有 Onion Board 收到这个键，所以把快捷键设在 W 上会让你没法走路。",
+  "No voice": "不用变声",
+  "Says this sound in a voice from the Voice tab, the way your mic sounds with it. Your saved voices are here too.": "用“变声”标签页里的声音播放这个音效，就像你的麦克风用它时一样。你保存的声音也在这里。"
 }

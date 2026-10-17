@@ -3582,5 +3582,7 @@
   "Is a sound in the store yours? Email {email} and it comes down.": "Mağazadaki bir ses senin mi? {email} adresine yaz, kaldırılsın.",
   "Games get the key too": "Oyunlar da tuşu alsın",
   "Keys in games": "Oyunlarda tuşlar",
-  "With this on, a hotkey still does its normal job too: press F1 in a game and the game gets F1 while your sound plays. Off: only Onion Board gets the key, so a hotkey on W stops you walking.": "Bu açıkken kısayol tuşu normal işini de yapar: oyunda F1'e bas, sesin çalarken oyun da F1'i alır. Kapalı: tuşu yalnızca Onion Board alır, yani W'ye atanmış bir kısayol yürümeni engeller."
+  "With this on, a hotkey still does its normal job too: press F1 in a game and the game gets F1 while your sound plays. Off: only Onion Board gets the key, so a hotkey on W stops you walking.": "Bu açıkken kısayol tuşu normal işini de yapar: oyunda F1'e bas, sesin çalarken oyun da F1'i alır. Kapalı: tuşu yalnızca Onion Board alır, yani W'ye atanmış bir kısayol yürümeni engeller.",
+  "No voice": "Ses yok",
+  "Says this sound in a voice from the Voice tab, the way your mic sounds with it. Your saved voices are here too.": "Bu sesi Ses sekmesindeki bir sesle çalar, mikrofonun o sesle nasıl duyuluyorsa öyle. Kaydettiğin sesler de burada."
 }

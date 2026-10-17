@@ -3582,5 +3582,7 @@
   "Is a sound in the store yours? Email {email} and it comes down.": "Ist ein Sound im Store von dir? Schreib an {email}, dann wird er entfernt.",
   "Games get the key too": "Spiele bekommen die Taste auch",
   "Keys in games": "Tasten in Spielen",
-  "With this on, a hotkey still does its normal job too: press F1 in a game and the game gets F1 while your sound plays. Off: only Onion Board gets the key, so a hotkey on W stops you walking.": "Wenn das an ist, macht ein Hotkey auch weiter seine normale Arbeit: Drück F1 im Spiel, und das Spiel bekommt F1, während dein Sound spielt. Aus: Nur Onion Board bekommt die Taste, ein Hotkey auf W hält dich also vom Laufen ab."
+  "With this on, a hotkey still does its normal job too: press F1 in a game and the game gets F1 while your sound plays. Off: only Onion Board gets the key, so a hotkey on W stops you walking.": "Wenn das an ist, macht ein Hotkey auch weiter seine normale Arbeit: Drück F1 im Spiel, und das Spiel bekommt F1, während dein Sound spielt. Aus: Nur Onion Board bekommt die Taste, ein Hotkey auf W hält dich also vom Laufen ab.",
+  "No voice": "Keine Stimme",
+  "Says this sound in a voice from the Voice tab, the way your mic sounds with it. Your saved voices are here too.": "Spielt diesen Sound mit einer Stimme aus dem Stimme-Tab, so wie dein Mikro damit klingt. Deine gespeicherten Stimmen sind auch hier."
 }

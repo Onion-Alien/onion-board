@@ -3659,5 +3659,7 @@
   "Is a sound in the store yours? Email {email} and it comes down.": "Je některý zvuk v obchodě tvůj? Napiš na {email} a zmizí.",
   "Games get the key too": "Hry klávesu dostanou taky",
   "Keys in games": "Klávesy ve hrách",
-  "With this on, a hotkey still does its normal job too: press F1 in a game and the game gets F1 while your sound plays. Off: only Onion Board gets the key, so a hotkey on W stops you walking.": "Když je to zapnuté, zkratka dál dělá i svou běžnou práci: zmáčkni F1 ve hře a hra dostane F1, zatímco hraje tvůj zvuk. Vypnuto: klávesu dostane jen Onion Board, takže zkratka na W tě zastaví v chůzi."
+  "With this on, a hotkey still does its normal job too: press F1 in a game and the game gets F1 while your sound plays. Off: only Onion Board gets the key, so a hotkey on W stops you walking.": "Když je to zapnuté, zkratka dál dělá i svou běžnou práci: zmáčkni F1 ve hře a hra dostane F1, zatímco hraje tvůj zvuk. Vypnuto: klávesu dostane jen Onion Board, takže zkratka na W tě zastaví v chůzi.",
+  "No voice": "Bez hlasu",
+  "Says this sound in a voice from the Voice tab, the way your mic sounds with it. Your saved voices are here too.": "Zahraje tenhle zvuk hlasem z karty Hlas, tak jak s ním zní tvůj mikrofon. Jsou tu i tvoje uložené hlasy."
 }

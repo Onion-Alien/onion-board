@@ -3582,5 +3582,7 @@
   "Is a sound in the store yours? Email {email} and it comes down.": "Κάποιος ήχος στο κατάστημα είναι δικός σου; Στείλε email στο {email} και θα αφαιρεθεί.",
   "Games get the key too": "Και τα παιχνίδια παίρνουν το πλήκτρο",
   "Keys in games": "Πλήκτρα στα παιχνίδια",
-  "With this on, a hotkey still does its normal job too: press F1 in a game and the game gets F1 while your sound plays. Off: only Onion Board gets the key, so a hotkey on W stops you walking.": "Όταν είναι ενεργό, μια συντόμευση κάνει και την κανονική της δουλειά: πάτα F1 σε ένα παιχνίδι και το παιχνίδι παίρνει το F1 ενώ παίζει ο ήχος σου. Ανενεργό: μόνο το Onion Board παίρνει το πλήκτρο, οπότε μια συντόμευση στο W σε σταματά να περπατάς."
+  "With this on, a hotkey still does its normal job too: press F1 in a game and the game gets F1 while your sound plays. Off: only Onion Board gets the key, so a hotkey on W stops you walking.": "Όταν είναι ενεργό, μια συντόμευση κάνει και την κανονική της δουλειά: πάτα F1 σε ένα παιχνίδι και το παιχνίδι παίρνει το F1 ενώ παίζει ο ήχος σου. Ανενεργό: μόνο το Onion Board παίρνει το πλήκτρο, οπότε μια συντόμευση στο W σε σταματά να περπατάς.",
+  "No voice": "Χωρίς φωνή",
+  "Says this sound in a voice from the Voice tab, the way your mic sounds with it. Your saved voices are here too.": "Λέει αυτόν τον ήχο με μια φωνή από την καρτέλα Φωνή, όπως ακούγεται το μικρόφωνό σου με αυτήν. Οι αποθηκευμένες φωνές σου είναι κι αυτές εδώ."
 }

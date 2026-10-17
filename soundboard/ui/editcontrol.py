@@ -17,7 +17,7 @@ from PySide6.QtCore import QTimer, QUrl
 from PySide6.QtGui import QDesktopServices
 from shiboken6 import isValid as qt_valid
 
-from soundboard import errors, library, soundfx, videos
+from soundboard import errors, library, soundfx, videos, voicefx
 from soundboard.i18n import _
 from soundboard.library import SoundMeta, cache_keep, duplicate, load_sound, prune_cache
 from soundboard.ui import worker
@@ -105,11 +105,24 @@ class EditControl(Controller):
     def _new_editor(self, m: SoundMeta, tab: str) -> EditDialog:
         mw = self.mw
         d = EditDialog(m, mw.hotkeys, mw.playctl.preview, mw, tab=tab,
-                       others=lambda: list(mw._meta.values()))
+                       others=lambda: list(mw._meta.values()), voices=self.voice_choices)
         d.hotkeys_changed.connect(mw.hkctl.register_hotkeys)
         d.source_forgotten.connect(mw._save_now)
         d.finished.connect(lambda ok, d=d: self._edit_done(d.meta.id, d, ok))
         return d
+
+    def voice_choices(self) -> list[tuple[str, str, dict]]:
+        """The voices a sound can be said in (Edit sound → Effects → Voice): the voice
+        changer's own, then the ones saved on the Voice tab (while it's switched on)."""
+        out = [(n, voicefx.shown(n), {t: {"on": True, **cfg} for t, cfg in fx.items()})
+               for n, fx in voicefx.PRESETS.items()]
+        mw = self.mw
+        if mw.tabctl.tab_on("voice"):
+            store = getattr(getattr(mw.voice, "fx", None), "store", None)
+            for name, effects in (store.voices.items() if store is not None else ()):
+                if name not in voicefx.PRESETS:
+                    out.append((name, name, dict(effects)))
+        return out
 
     def _close_editors(self, sids):
         """The sounds are going: their open Edit sound windows close, unsaved (the

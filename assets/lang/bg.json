@@ -3582,5 +3582,7 @@
   "Is a sound in the store yours? Email {email} and it comes down.": "Някой звук в магазина е твой? Пиши на {email} и ще бъде махнат.",
   "Games get the key too": "Игрите също получават клавиша",
   "Keys in games": "Клавиши в игрите",
-  "With this on, a hotkey still does its normal job too: press F1 in a game and the game gets F1 while your sound plays. Off: only Onion Board gets the key, so a hotkey on W stops you walking.": "Когато е включено, бързият клавиш върши и обичайната си работа: натисни F1 в игра и играта получава F1, докато звукът ти свири. Изключено: само Onion Board получава клавиша, така че бърз клавиш на W те спира да вървиш."
+  "With this on, a hotkey still does its normal job too: press F1 in a game and the game gets F1 while your sound plays. Off: only Onion Board gets the key, so a hotkey on W stops you walking.": "Когато е включено, бързият клавиш върши и обичайната си работа: натисни F1 в игра и играта получава F1, докато звукът ти свири. Изключено: само Onion Board получава клавиша, така че бърз клавиш на W те спира да вървиш.",
+  "No voice": "Без глас",
+  "Says this sound in a voice from the Voice tab, the way your mic sounds with it. Your saved voices are here too.": "Пуска този звук с глас от раздела Глас, както звучи микрофонът ти с него. Запазените ти гласове също са тук."
 }

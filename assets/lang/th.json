@@ -3505,5 +3505,7 @@
   "Is a sound in the store yours? Email {email} and it comes down.": "มีเสียงในร้านที่เป็นของคุณไหม? อีเมลมาที่ {email} แล้วเราจะเอาออก",
   "Games get the key too": "เกมก็ได้รับปุ่มด้วย",
   "Keys in games": "ปุ่มในเกม",
-  "With this on, a hotkey still does its normal job too: press F1 in a game and the game gets F1 while your sound plays. Off: only Onion Board gets the key, so a hotkey on W stops you walking.": "เมื่อเปิดไว้ ปุ่มลัดยังทำงานปกติของมันด้วย: กด F1 ในเกม เกมก็ได้รับ F1 ขณะที่เสียงของคุณเล่น ปิด: มีแค่ Onion Board ที่ได้รับปุ่ม ปุ่มลัดบน W จึงทำให้คุณเดินไม่ได้"
+  "With this on, a hotkey still does its normal job too: press F1 in a game and the game gets F1 while your sound plays. Off: only Onion Board gets the key, so a hotkey on W stops you walking.": "เมื่อเปิดไว้ ปุ่มลัดยังทำงานปกติของมันด้วย: กด F1 ในเกม เกมก็ได้รับ F1 ขณะที่เสียงของคุณเล่น ปิด: มีแค่ Onion Board ที่ได้รับปุ่ม ปุ่มลัดบน W จึงทำให้คุณเดินไม่ได้",
+  "No voice": "ไม่ใช้เสียง",
+  "Says this sound in a voice from the Voice tab, the way your mic sounds with it. Your saved voices are here too.": "เล่นเสียงนี้ด้วยเสียงจากแท็บเสียงพูด แบบเดียวกับที่ไมค์ของคุณได้ยินเมื่อใช้เสียงนั้น เสียงที่คุณบันทึกไว้ก็อยู่ที่นี่ด้วย"
 }

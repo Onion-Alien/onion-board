@@ -3582,5 +3582,7 @@
   "Is a sound in the store yours? Email {email} and it comes down.": "स्टोर की कोई साउंड आपकी है? {email} पर ईमेल करें, उसे हटा दिया जाएगा।",
   "Games get the key too": "गेम को भी की मिलती है",
   "Keys in games": "गेम में कीज़",
-  "With this on, a hotkey still does its normal job too: press F1 in a game and the game gets F1 while your sound plays. Off: only Onion Board gets the key, so a hotkey on W stops you walking.": "यह चालू होने पर हॉटकी अपना सामान्य काम भी करती है: गेम में F1 दबाएँ और गेम को F1 मिलता है, साथ ही आपकी साउंड बजती है। बंद: की सिर्फ़ Onion Board को मिलती है, इसलिए W पर हॉटकी आपको चलने नहीं देती।"
+  "With this on, a hotkey still does its normal job too: press F1 in a game and the game gets F1 while your sound plays. Off: only Onion Board gets the key, so a hotkey on W stops you walking.": "यह चालू होने पर हॉटकी अपना सामान्य काम भी करती है: गेम में F1 दबाएँ और गेम को F1 मिलता है, साथ ही आपकी साउंड बजती है। बंद: की सिर्फ़ Onion Board को मिलती है, इसलिए W पर हॉटकी आपको चलने नहीं देती।",
+  "No voice": "कोई आवाज़ नहीं",
+  "Says this sound in a voice from the Voice tab, the way your mic sounds with it. Your saved voices are here too.": "इस साउंड को वॉइस टैब की किसी आवाज़ में बजाता है, जैसे उसके साथ आपका माइक सुनाई देता है। आपकी सेव की हुई आवाज़ें भी यहाँ हैं।"
 }

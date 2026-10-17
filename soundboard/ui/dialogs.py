@@ -104,11 +104,16 @@ class TabHelpPopup(QDialog):
 
 class EffectsPanel(QWidget):
     """Every per-sound effect setting. `changed` fires on any edit; `fx()` is the
-    settings dict for SoundMeta.fx ({} when nothing is changed)."""
+    settings dict for SoundMeta.fx ({} when nothing is changed).
+
+    `voices()` gives the voice changer's voices a sound can be said in: (name, name as
+    shown, effects). Picking one keeps a copy of its effects with the sound."""
     changed = Signal()
 
-    def __init__(self, fx: dict | None, meta: SoundMeta | None = None):
+    def __init__(self, fx: dict | None, meta: SoundMeta | None = None, voices=None):
         super().__init__()
+        self._voices = voices or (lambda: [])
+        self._voice: dict = {}
         v = QVBoxLayout(self)
         v.setContentsMargins(0, 14, 8, 0)   # room under the dialog's tab bar
         v.setSpacing(8)
@@ -126,6 +131,17 @@ class EffectsPanel(QWidget):
         prow.addWidget(reset)
         prow.addStretch(1)
         v.addLayout(prow)
+
+        vrow = QHBoxLayout()
+        vrow.addWidget(QLabel(_("Voice")))
+        self.voice = QComboBox()
+        self.voice.setToolTip(_("Says this sound in a voice from the Voice tab, the way your "
+                                "mic sounds with it. Your saved voices are here too."))
+        self.voice.setAccessibleName(_("Voice"))
+        no_wheel(self.voice)
+        vrow.addWidget(self.voice)
+        vrow.addStretch(1)
+        v.addLayout(vrow)
 
         v.addWidget(section_label(_("Trim")))
         self._v = v
@@ -177,6 +193,7 @@ class EffectsPanel(QWidget):
         self.eq.changed.connect(lambda *__: self._edited())
         self.preset.currentIndexChanged.connect(
             lambda __: self._on_preset(self.preset.currentData()))
+        self.voice.currentIndexChanged.connect(lambda __: self._on_voice())
         self._matching_preset()
 
     def _new_trim(self, meta: SoundMeta | None, at: int = -1) -> TrimPanel:
@@ -221,7 +238,35 @@ class EffectsPanel(QWidget):
             row.load(cfg if cfg and cfg.get("on") else {"on": False})
         for w in widgets:
             w.blockSignals(False)
+        self._voice = f["voice"]
+        self._fill_voices()
         self._boost_hint()
+
+    def _fill_voices(self):
+        """The voice list, fresh (a voice saved since last time shows up), with the
+        sound's own voice picked, even if it's no longer saved."""
+        self.voice.blockSignals(True)
+        self.voice.clear()
+        self.voice.addItem(_("No voice"), None)
+        names = set()
+        for name, shown, effects in self._voices():
+            self.voice.addItem(shown, {"name": name, "effects": effects})
+            names.add(name)
+        have = self._voice.get("name")
+        if self._voice and have not in names:   # deleted since (the sound kept its copy)
+            self.voice.addItem(have or _("Custom"), dict(self._voice))
+        at = 0
+        for i in range(1, self.voice.count()):
+            if self.voice.itemData(i)["name"] == have:
+                at = i
+                break
+        self.voice.setCurrentIndex(at if self._voice else 0)
+        self.voice.blockSignals(False)
+
+    def _on_voice(self):
+        data = self.voice.currentData()
+        self._voice = soundfx.clean_voice(data) if data else {}
+        self._edited()
 
     def fx(self) -> dict:
         gains, on, _t, _p = self.eq.state()
@@ -231,7 +276,8 @@ class EffectsPanel(QWidget):
              "tape": self.tape.isChecked(), "gain_db": round(self.boost.value(), 2),
              "reverse": self.reverse.isChecked(),
              "eq": gains if on else [0.0] * len(gains),
-             "effects": {t: r.state() for t, r in self.rows.items() if r.chk.isChecked()}}
+             "effects": {t: r.state() for t, r in self.rows.items() if r.chk.isChecked()},
+             "voice": self._voice}
         return {} if soundfx.is_neutral(f) else soundfx.clean(f)
 
     def _boost_hint(self):
@@ -248,6 +294,7 @@ class EffectsPanel(QWidget):
     def _untrimmed(self) -> dict:
         f = soundfx.clean(self.fx())
         f["start"] = f["end"] = 0.0
+        f["voice"] = {}   # the voice is a layer of its own: presets don't set it
         return f
 
     def _matching_preset(self):
@@ -260,7 +307,8 @@ class EffectsPanel(QWidget):
     def _on_preset(self, name: str):
         if name in soundfx.PRESETS:
             start, end = self.trim.values()
-            self.load({**soundfx.PRESETS[name], "start": start, "end": end})
+            self.load({**soundfx.PRESETS[name], "start": start, "end": end,
+                       "voice": self._voice})
             self.changed.emit()
 
 
@@ -277,7 +325,7 @@ class EditDialog(QDialog):
     source_forgotten = Signal()   # Details → Delete info: saved at once, Save or Cancel
 
     def __init__(self, meta: SoundMeta, hotkeys: Hotkeys, preview_cb, parent=None,
-                 tab: str = "sound", others=None):
+                 tab: str = "sound", others=None, voices=None):
         super().__init__(parent)
         fit.watch(self)   # grows to fit its text (ui/fit.py)
         self.setWindowTitle(_("Edit sound"))
@@ -495,7 +543,7 @@ class EditDialog(QDialog):
         self._set_color(self.color)
         self.tabs.addTab(basics, _("Sound"))
 
-        self.effects = EffectsPanel(meta.fx, meta)
+        self.effects = EffectsPanel(meta.fx, meta, voices)
         scroll = QScrollArea()
         scroll.setWidgetResizable(True)
         scroll.setWidget(self.effects)
