@@ -1,7 +1,7 @@
 // Run: node --test test/
 import test from "node:test";
 import assert from "node:assert/strict";
-import { Room, clean, nameFor, refuse, sha256 } from "../src/chat.js";
+import { Room, clean, hasBlocked, nameFor, refuse, sha256, squash } from "../src/chat.js";
 
 const W = "a".repeat(64), W2 = "b".repeat(64);
 
@@ -14,6 +14,19 @@ test("text is tidied and links are refused", () => {
   assert.equal(refuse("x".repeat(281)), "too long");
   assert.equal(refuse(""), "empty");
   assert.equal(refuse("big bad-word here", ["badword"]), "not allowed");
+});
+
+test("blocked words can't hide behind accents, look-alike digits, dots or stretched letters", () => {
+  assert.equal(squash("Ş.h-1 t"), "shit");
+  for (const bad of ["b4dw0rd", "B A D W O R D", "bäd.wörd", "baaaddwooord", "my $tinky b@dword!"])
+    assert.ok(hasBlocked(bad, ["badword"]), bad);
+  for (const ok of ["a bad sword", "a good word", "bawd"])
+    assert.ok(!hasBlocked(ok, ["badword"]), ok);
+  assert.ok(!hasBlocked("anything", ["", " ", "..."]));       // an empty entry blocks nothing
+  for (const bad of ["javascript:alert(1)", "data:text/html,x", "file:///c:/x", "free.site", "go.shop"])
+    assert.equal(refuse(bad), "no links", bad);
+  const room = new Room(["bad word"]);
+  assert.equal(room.blocked[0], "badword");
 });
 
 test("names are stable for a hash and look like two words", async () => {

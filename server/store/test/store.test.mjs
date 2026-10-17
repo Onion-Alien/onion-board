@@ -36,8 +36,8 @@ class FakeKV {
   async delete(k) { this.m.delete(k); }
 }
 
-function store() {
-  return { DB: new FakeD1(), FILES: new FakeKV(), SALT: "salt", ADMIN_TOKEN: TOKEN };
+function store(extra = {}) {
+  return { DB: new FakeD1(), FILES: new FakeKV(), SALT: "salt", ADMIN_TOKEN: TOKEN, ...extra };
 }
 
 async function call(env, path, { method = "GET", json, form, ip = "1.1.1.1", install = INSTALL,
@@ -617,6 +617,22 @@ test("an upload with code inside is refused; names lose markup and hidden charac
   assert.equal(row.name, "evil 3pm.exe img src=x onerror=alert(1)");
   assert.equal(row.tags, "b x /b,ok");
   assert.ok(!/[<>`{}\\\u200b-\u200f\u202a-\u202e\u2066-\u2069]/.test(row.name + row.tags));
+});
+
+test("a shared sound's or link's name and tags can't hold a link or a blocked word", async () => {
+  const env = store({ CHAT_BLOCK: "badword" });
+  const up = (name, tags = "") => call(env, "/v1/sounds", { method: "POST",
+    form: { file: mp3(), name, tags, agree: "own-cc0-v1" } });
+  const link = (name, tags = "") => call(env, "/v1/links", { method: "POST",
+    json: { link: "https://youtu.be/q1q1q1q1q1q", name, tags, agree: "link-v1" } });
+  for (const [name, tags] of [["b4d w0rd horn", ""], ["horn", "meme, baaadword"],
+                              ["free skins at evil.xyz", ""], ["horn", "javascript:alert(1)"]]) {
+    assert.equal((await up(name, tags)).status, 422, name + tags);
+    assert.equal((await link(name, tags)).status, 422, name + tags);
+  }
+  assert.equal(env.DB.rows("SELECT id FROM sounds").length, 0);
+  assert.equal((await up("air horn", "meme, horn")).status, 201);
+  assert.equal((await link("air horn")).status, 201);
 });
 
 test("a served file is only ever a download", async () => {

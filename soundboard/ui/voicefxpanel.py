@@ -710,6 +710,9 @@ class VoiceFxPanel(QWidget):
     hotkey_cleared = Signal(str)
     renamed = Signal(str, str)     # a saved voice's old and new name
     share_asked = Signal(str)      # right-click a saved voice -> Share to the store: its name
+    # an imported code holding an AI voice or a setup (storevoices.Voice, notes) -> the
+    # name it was added as, "" if not (the Voice tab adds those; None: not taken here)
+    take_code: Callable[[object, list], str] | None = None
     _sampled = Signal(object, str)  # Hear it's worker: (the sample or None, why not)
 
     COLS = 3
@@ -957,7 +960,7 @@ class VoiceFxPanel(QWidget):
         self.btn_import = QPushButton(_("Import a code"))
         icons.set_icon(self.btn_import, "plus")
         self.btn_import.setToolTip(_("Add a voice someone sent you as a code (it starts "
-                                     "with “OB1-”)"))
+                                     "with “OB”)"))
         self.btn_import.clicked.connect(lambda: self.import_code())
         srow.addWidget(self.btn_import)
         self.btn_bin = QPushButton(_("Recently deleted"))
@@ -1488,7 +1491,8 @@ class VoiceFxPanel(QWidget):
 
     def import_code(self, text: str | None = None) -> str:
         """Add a voice from a share code (asked for if not given) as a new saved voice,
-        renamed if the name's taken, and turn it on. Returns its name ("" if not)."""
+        renamed if the name's taken, and turn it on; a code holding an AI voice or a
+        setup goes to `take_code`. Returns the name it got ("" if none)."""
         title = _("Import a voice code")
         if text is None:
             text, ok = QInputDialog.getText(self._parent(), title,
@@ -1496,11 +1500,15 @@ class VoiceFxPanel(QWidget):
                                             QLineEdit.EchoMode.Normal, "")
             if not ok:   # OK on an empty box gets read_code's "There's no code there."
                 return ""
+        from soundboard import storevoices
         try:
-            name, effects, notes = savedvoices.read_code(text)
+            v, notes = storevoices.read_code(text)
         except savedvoices.CodeError as e:
             busy.toast(self._parent(), html.escape(str(e)), "warn")
             return ""
+        if v.kind != "fx":
+            return self.take_code(v, notes) if self.take_code is not None else ""
+        name, effects = v.name, v.effects
         if self.store.full():
             busy.toast(self._parent(), html.escape(self._full_text()), "warn", 8000)
             return ""

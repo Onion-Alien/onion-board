@@ -17,7 +17,7 @@ from PySide6.QtWidgets import (QButtonGroup, QFrame, QHBoxLayout, QLabel, QPushB
                                QScrollArea, QVBoxLayout, QWidget)
 
 from soundboard import modules as mods
-from soundboard import langnames, net, theme, usage, voicefx, voicesetups
+from soundboard import langnames, net, savedvoices, theme, usage, voicefx, voicesetups
 from soundboard.speech import spoken, translation
 from soundboard.speech.aivoice import AiVoiceController
 from soundboard.speech.live import SpeechController
@@ -288,8 +288,11 @@ class VoicePanel(QWidget):
 
         from soundboard.ui.voicesetupsbar import SetupsBar
         self.setups_bar = SetupsBar(self.setups, self.current_setup, self.use_setup,
-                                    self.setup_icon, self.setup_words)
+                                    self.setup_icon, self.setup_words,
+                                    copy_code=self.copy_setup_code,
+                                    import_code=self.fx.import_code)
         outer.insertWidget(self._setups_at, self.setups_bar)
+        self.fx.take_code = self.take_code   # a code with an AI voice or a setup in it
         from soundboard.ui.storevoices import kind_name
         self.setups_bar.share = lambda n: self.share_asked.emit(f"{kind_name('setup')}: {n}")
         self.fx.share_asked.connect(lambda n: self.share_asked.emit(f"{kind_name('fx')}: {n}"))
@@ -351,11 +354,14 @@ class VoicePanel(QWidget):
         """Turn a setup's whole mix on for your mic (what it hasn't got goes off)."""
         effects = setup.get("effects") or {}
         name = setup.get("fx") or ""
+        saved = self.fx.store.voices.get(name)
         if not effects:
             self.fx.btn_power.setChecked(False)
-        elif name in voicefx.PRESETS or name in self.fx.store.voices:
+        elif name in voicefx.PRESETS or (saved is not None and savedvoices.shared_effects(
+                saved) == savedvoices.shared_effects(effects)):
             self.fx.pick(name)
-        else:
+        else:   # its own mix, or a voice of that name here that isn't the same one
+
             self.fx.use_mix(effects)
         ai = setup.get("ai")
         if ai and self.ai.module is not None and any(
@@ -366,6 +372,42 @@ class VoicePanel(QWidget):
         i = self.speech.cb_lang.findData(setup.get("language") or "")
         self.speech.cb_lang.setCurrentIndex(max(0, i))
         self._update_heads()
+
+    def copy_setup_code(self, name: str) -> bool:
+        """A setup as a share code, onto the clipboard (its own AI voice's blend goes
+        too, as nobody else has it). False if there's nothing in it to share."""
+        from PySide6.QtGui import QGuiApplication
+
+        from soundboard import storevoices
+        setup = self.setups.setups.get(name)
+        if setup is None:
+            return False
+        ai = setup.get("ai") or {}
+        payload = storevoices.pack_setup(name, setup,
+                                         self.ai.store.get(ai["id"]) if ai.get("id") else None)
+        if not storevoices.can_share(payload):
+            return False
+        QGuiApplication.clipboard().setText(storevoices.share_code(payload))
+        return True
+
+    def take_code(self, v, notes: list[str]) -> str:
+        """An AI voice or setup from a share code (storevoices.Voice): asked about, then
+        added to yours as a Store voice is. The name it got, "" if none."""
+        from PySide6.QtWidgets import QMessageBox
+
+        from soundboard.ui.storevoices import VoiceHooks, meta_line
+        title = _("Import a voice code")
+        ask = (_("Add “{name}”?", name=html.escape(v.name))
+               + f"<br><br>{html.escape(meta_line(v))}"
+               + "".join(f"<br><br>{html.escape(n)}" for n in notes))
+        if QMessageBox.question(self, title, ask) != QMessageBox.StandardButton.Yes:
+            return ""
+        hooks = VoiceHooks(lambda: self)
+        said = hooks.take(v)
+        if hooks.last:
+            usage.used("voice-code-imported")
+        busy.toast(self, html.escape(said), "ok" if hooks.last else "warn")
+        return hooks.last
 
     def setup_icon(self, setup: dict):
         """A setup's picture: its AI voice's emoji, else its voice changer voice's."""

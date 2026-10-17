@@ -1859,3 +1859,42 @@ def test_hear_it_failing_says_why_and_comes_back(panel, monkeypatch):
     assert said and "no speech voice" in said[0]
     from soundboard.ui.aivoicebrowser import HEAR
     assert p.fx.btn_sample.text() == HEAR and not p.fx._hearing
+
+
+def test_a_setup_goes_to_a_friend_as_a_code_and_comes_back(panel, monkeypatch):
+    from PySide6.QtGui import QGuiApplication
+    from PySide6.QtWidgets import QMessageBox
+
+    from soundboard.ui import busy
+    p, _ = panel
+    bar = p.setups_bar
+    assert bar.btn_import.isVisibleTo(bar) and bar.btn_import.parentWidget() is bar.chips
+    p.fx.pick("Chipmunk")
+    assert p.setups.put("Chip", p.current_setup()) == "Chip"
+    assert p.copy_setup_code("Chip")
+    code = QGuiApplication.clipboard().text()
+    assert code.startswith("OB2-")
+    asked, said = [], []
+    monkeypatch.setattr(QMessageBox, "question", lambda *a: asked.append(a[2]) or QMessageBox.Yes)
+    monkeypatch.setattr(busy, "toast", lambda *a, **k: said.append(a[1]))
+    _ask(monkeypatch, code)
+    bar.btn_import.click()          # the My setups row's own Import a code
+    assert "Chip" in asked[0] and list(p.setups.setups) == ["Chip", "Chip (2)"]
+    assert "Chip (2)" in bar.buttons and "My setups" in said[-1]
+    # the voice changer's Import a code takes a setup code too
+    assert p.fx.import_code(code) == "Chip (3)"
+    assert not p.fx.store.voices                 # (a setup, not a saved voice)
+
+
+def test_a_shared_setup_never_turns_on_your_own_voice_of_the_same_name(panel, monkeypatch):
+    p, _ = panel
+    p.fx.pick("Robot")
+    _ask(monkeypatch, "Squeaky")
+    p.fx.save_voice()                             # yours: a robot
+    theirs = {"pitch": {"on": True, "semitones": 9.0}}
+    p.use_setup({"fx": "Squeaky", "effects": theirs})
+    effects = p.fx.spec()["effects"]
+    assert p.fx.preset != "Squeaky" and effects["pitch"]["semitones"] == 9.0
+    assert not effects.get("robot", {}).get("on")
+    p.use_setup({"fx": "Squeaky", "effects": p.fx.store.voices["Squeaky"]})
+    assert p.fx.preset == "Squeaky"               # the same voice: picked as itself

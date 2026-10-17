@@ -78,7 +78,8 @@ def saved() -> list[dict]:
 # padding) of zlib-compressed compact JSON {"n": name, "e": {type: {"on", param...}}}.
 # Only the name and the effects' numbers go in: no paths, nothing about this PC.
 # Effects that are off and settings left at their default are left out (they load
-# that way anyway), so codes stay short.
+# that way anyway), so codes stay short. "OB2-" codes (any of your voices or setups,
+# packed the same way) are storevoices.share_code's.
 CODE_PREFIX = "OB"
 CODE_VERSION = 1
 MAX_CODE = 4096        # characters of code (a full 13-effect voice is ~300)
@@ -137,18 +138,17 @@ def from_shared(raw: dict) -> tuple[dict, list[str]]:
     return effects, unknown
 
 
-def share_code(name: str, effects: dict) -> str:
-    out = shared_effects(effects)
-    raw = json.dumps({"n": clean_name(name) or _("My voice"), "e": out},
-                     separators=(",", ":"), ensure_ascii=False).encode("utf-8")
+def pack_code(obj: dict, version: int = CODE_VERSION) -> str:
+    """`obj` as a code: "OB<version>-" + base64url (no padding) of zlib'd compact JSON."""
+    raw = json.dumps(obj, separators=(",", ":"), ensure_ascii=False).encode("utf-8")
     body = base64.urlsafe_b64encode(zlib.compress(raw, 9)).rstrip(b"=").decode("ascii")
-    return f"{CODE_PREFIX}{CODE_VERSION}-{body}"
+    return f"{CODE_PREFIX}{version}-{body}"
 
 
-def read_code(text) -> tuple[str, dict, list[str]]:
-    """(name, effects, notes) from a share code, or CodeError. Every number is put
-    inside its slider's range; effects this version doesn't have are left out and
-    named in `notes`."""
+def unpack_code(text, newest: int = CODE_VERSION) -> tuple[int, dict]:
+    """(version, the JSON object) from a code made by pack_code, or CodeError: one
+    pasted over two lines or with spaces around still reads, one that's too long,
+    unpacks to too much or was made by a version newer than `newest` doesn't."""
     code = "".join(str(text or "").split())   # pasted over two lines, spaces around
     if not code:
         raise CodeError(_("There's no code there."))
@@ -157,9 +157,9 @@ def read_code(text) -> tuple[str, dict, list[str]]:
     head, dash, body = code.partition("-")
     version = head[len(CODE_PREFIX):]
     if not dash or not head.upper().startswith(CODE_PREFIX) \
-            or not (version.isascii() and version.isdecimal()):
-        raise CodeError(_("That isn't a voice code (they start with “OB1-”)."))
-    if int(version) > CODE_VERSION:
+            or not (version.isascii() and version.isdecimal()) or int(version) < 1:
+        raise CodeError(_("That isn't a voice code (they start with “OB”)."))
+    if int(version) > newest:
         raise CodeError(_("That code was made by a newer version of the app. Update to "
                           "use it."))
     try:
@@ -176,17 +176,35 @@ def read_code(text) -> tuple[str, dict, list[str]]:
     except (ValueError, zlib.error, RecursionError):
         raise CodeError(_("That code is damaged or cut short. Copy the whole thing "
                           "and try again.")) from None
-    if not isinstance(data, dict) or not isinstance(data.get("n"), str) \
-            or not isinstance(data.get("e"), dict):
+    if not isinstance(data, dict):
+        raise CodeError(_("That code is damaged: it doesn't hold a voice."))
+    return int(version), data
+
+
+def unknown_note(unknown: list[str]) -> list[str]:
+    """The note for effects a code or store voice has that this version doesn't."""
+    if not unknown:
+        return []
+    names = ", ".join(unknown[:5]) + ("…" if len(unknown) > 5 else "")
+    return [_("Left out effects this version doesn't have: {effects}. "
+              "Updating the app may add them.", effects=names)]
+
+
+def share_code(name: str, effects: dict) -> str:
+    return pack_code({"n": clean_name(name) or _("My voice"), "e": shared_effects(effects)},
+                     CODE_VERSION)
+
+
+def read_code(text) -> tuple[str, dict, list[str]]:
+    """(name, effects, notes) from a voice changer voice's "OB1-" code, or CodeError.
+    Every number is put inside its slider's range; effects this version doesn't have
+    are left out and named in `notes`. (Any kind of code: storevoices.read_code.)"""
+    _version, data = unpack_code(text, CODE_VERSION)
+    if not isinstance(data.get("n"), str) or not isinstance(data.get("e"), dict):
         raise CodeError(_("That code is damaged: it doesn't hold a voice."))
     name = clean_name(data["n"]) or _("Shared voice")
     effects, unknown = from_shared(data["e"])
-    notes = []
-    if unknown:
-        names = ", ".join(unknown[:5]) + ("…" if len(unknown) > 5 else "")
-        notes.append(_("Left out effects this version doesn't have: {effects}. "
-                       "Updating the app may add them.", effects=names))
-    return name, effects, notes
+    return name, effects, unknown_note(unknown)
 
 
 class Store:
