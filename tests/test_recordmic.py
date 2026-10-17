@@ -437,12 +437,14 @@ def test_recordings_play_for_me_through_mic_and_add_to_sounds(window, monkeypatc
     monkeypatch.setattr(window.engine, "play",
                         lambda sid, data, gain, mode="", preview=False: played.append(
                             (sid, preview)) or object())
-    texts = {b.text(): b for b in recs.clip_buttons}
-    texts["Play for me"].click()
-    texts["Play through mic"].click()
+    row = recs.list.itemWidget(recs._items[c.id], 4).buttons   # the row's own buttons
+    assert all(b.isVisibleTo(recs) and b.toolTip() for b in row.values())
+    assert not recs.btn_add.isVisibleTo(recs)                   # no bar above the list
+    row["me"].click()
+    row["mic"].click()
     assert played == [("voiceclips:preview", True), ("voiceclips-send", False)]
     sounds = len(window.cfg.sounds)
-    recs.add_picked()
+    row["add"].click()
     assert len(window.cfg.sounds) == sounds + 1 and window.cfg.sounds[-1].name == "Take"
     assert recs.shelf.get(c.id) is not None                  # still in the list too
     recs.stop()

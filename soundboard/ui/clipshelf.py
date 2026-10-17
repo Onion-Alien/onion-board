@@ -15,7 +15,8 @@ from PySide6.QtCore import QSize, Qt, QTimer, Signal
 from PySide6.QtGui import QAction, QColor, QKeySequence, QPainter, QPen
 from PySide6.QtWidgets import (QAbstractItemView, QComboBox, QHBoxLayout, QHeaderView,
                                QLabel, QLineEdit, QMenu,
-                               QPushButton, QTreeWidget, QTreeWidgetItem, QVBoxLayout, QWidget)
+                               QPushButton, QToolButton, QTreeWidget, QTreeWidgetItem,
+                               QVBoxLayout, QWidget)
 
 from soundboard import errors, theme
 from soundboard.clipshelf import Clip, Shelf, VoiceClip
@@ -165,7 +166,12 @@ class ClipShelf(QWidget):
             b.clicked.connect(lambda _checked=False, fn=slot: fn())
             actions.addWidget(b)
             self.clip_buttons.append(b)
-        v.addLayout(actions)
+        if voice:   # each row has its own buttons instead (_row_buttons)
+            for b in (self.btn_add, *self.clip_buttons):
+                b.setParent(self)
+                b.hide()
+        else:
+            v.addLayout(actions)
         filters = Flow(gap=8)
         self.search = QLineEdit()
         self.search.setPlaceholderText(_("Find clips"))
@@ -212,6 +218,10 @@ class ClipShelf(QWidget):
         h.setSectionResizeMode(2, QHeaderView.ResizeMode.ResizeToContents)
         h.setSectionResizeMode(3, QHeaderView.ResizeMode.ResizeToContents)
         h.setResizeContentsPrecision(100)
+        if voice:   # a last column with the row's own play / mic / add / delete buttons
+            self.list.setColumnCount(5)
+            self.list.headerItem().setText(4, "")
+            h.setSectionResizeMode(4, QHeaderView.ResizeMode.ResizeToContents)
         v.addWidget(self.list)
         self.empty = QLabel(_("No matching clips"))
         self.empty.setObjectName("hint")
@@ -319,6 +329,8 @@ class ClipShelf(QWidget):
                 self.list.addTopLevelItem(it)
             else:
                 parent.addChild(it)
+            if self.voice:
+                self.list.setItemWidget(it, 4, self._row_buttons(it))
             if c.id == self._pick:
                 ancestor = it.parent()
                 while ancestor is not None:
@@ -334,6 +346,35 @@ class ClipShelf(QWidget):
         self.setVisible(bool(self.shelf.clips))
         self._sync()
         self.layout_changed.emit()
+
+    def _row_buttons(self, it: QTreeWidgetItem) -> QWidget:
+        """A recording's own icon buttons: play it to me, play it through the mic,
+        add it to Sounds, delete it."""
+        box = QWidget()
+        row = QHBoxLayout(box)
+        row.setContentsMargins(4, 0, 4, 0)
+        row.setSpacing(4)
+
+        def only_this():
+            self.list.clearSelection()
+            self.list.setCurrentItem(it)
+        box.buttons = {}   # pyright: ignore[reportAttributeAccessIssue]  # (tests)
+        for key, icon, tip, fn in (
+                ("me", "headphones", _("Play for me"), lambda: self.toggle_play(it)),
+                ("mic", "live", _("Play through mic"), lambda: self.toggle_play(it, send=True)),
+                ("add", "plus", _("Add to Sounds"), lambda: (only_this(), self.add_picked())),
+                ("delete", "trash", _("Delete"), lambda: (only_this(), self.delete_picked()))):
+            b = QToolButton()
+            b.setAutoRaise(True)
+            b.setCursor(Qt.CursorShape.PointingHandCursor)
+            b.setToolTip(tip)
+            b.setAccessibleName(tip)
+            b.setFixedSize(30, 30)
+            icons.set_icon(b, icon, size=18)
+            b.clicked.connect(lambda _c=False, f=fn: f())
+            row.addWidget(b)
+            box.buttons[key] = b   # pyright: ignore[reportAttributeAccessIssue]
+        return box
 
     def _columns(self):
         grouped = self.group_by.currentData() != "newest"
