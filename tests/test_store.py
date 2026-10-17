@@ -389,7 +389,7 @@ def test_the_table_header_sits_over_its_columns(qapp, fake):
         if cat_shown:
             assert t.head_cat.x() == x_of(r.cell_cat)
     # every width in between: a row never wider than the list (no column cut off)
-    for width in range(900, 399, -20):
+    for width in range(900, 419, -20):   # (down to the smallest window's tab)
         t.resize(width, 700)
         process_events(qapp, lambda: False, timeout=0.05)
         assert t._rows[0].width() <= t.list_area.viewport().width(), width

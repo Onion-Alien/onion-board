@@ -32,11 +32,9 @@ PREVIEW = "__store_preview"   # the store's "hear it first" voice (headphones on
 SEARCH_WAIT_MS = 400          # typing pauses this long before the store is searched
 ROW_MAX_W = 820               # the list stays a readable column, centred, on a wide window
 COUNT_W = "9.9k"              # the widest vote count kept room for
-PLAY_ROOM = 520               # a narrower row shows no play button (its picture plays)
+PLAY_ROOM = 520               # a narrower list shows no play button (its picture plays)
 CAT_W = 110                   # the table's Category column
 ADDED_W = 100                 # its Added column ("3 days ago")
-CAT_ROOM = 680                # a narrower list shows no Category column (the dropdown filters)
-ADDED_ROOM = 560              # nor Added (its header still sorts)
 ONE_ROW = 720                 # a narrower tab puts the toolbar on two rows
 
 
@@ -126,11 +124,10 @@ class SoundRow(HoverCard):
         h.addWidget(self.btn_report)
         self.show_votes()
 
-    def resizeEvent(self, e):
-        super().resizeEvent(e)
-        # narrow (the smallest window): the picture is the play button, so the name keeps
-        # some room and Report stays on the row
-        wide = self.width() >= PLAY_ROOM
+    def show_play(self, wide: bool):
+        """Narrow (the smallest window): the picture is the play button, so the name
+        keeps some room and Report stays on the row. The list decides, from its own
+        width: the row's can't go below its play button's room."""
         if self.btn_play.isVisibleTo(self) != wide:
             self.btn_play.setVisible(wide)
             self.tile.set_badge(not wide)
@@ -307,10 +304,17 @@ class StoreTab(QWidget):
                                        else self.share())
         self.btn_reload = icon_button("reload", _("Refresh"))
         self.btn_reload.clicked.connect(lambda: self.reload())
+        # (in a box that only asks for the two rows' width: asking for one row's, a
+        # narrow tab could never get narrow enough to switch to two)
+        self.toolbar = QWidget()
+        tv = QVBoxLayout(self.toolbar)
+        tv.setContentsMargins(0, 0, 0, 0)
+        tv.setSpacing(10)
         self._bars = (QHBoxLayout(), QHBoxLayout())
         for bar in self._bars:
             bar.setSpacing(8)
-            hv.addLayout(bar)
+            tv.addLayout(bar)
+        hv.addWidget(self.toolbar)
         self._one_row: bool | None = None
         self._lay_toolbar(False)
         col.addWidget(head)
@@ -418,16 +422,34 @@ class StoreTab(QWidget):
     def resizeEvent(self, e):
         super().resizeEvent(e)
         self.bun.setVisible(storelook.fits(self.width(), self.height()))   # (never raises)
-        self._lay_toolbar(min(self.width(), ROW_MAX_W) >= ONE_ROW)
+        self._fit_toolbar()
 
     def eventFilter(self, obj, e):
         if e.type() == QEvent.Type.Resize and obj is self.list_area.viewport():
             self._fit_columns()
         return super().eventFilter(obj, e)
 
+    def _toolbar_parts(self) -> list[QWidget]:
+        return [w for w in (self.modes_box, self.search, self.cat_pick, self.btn_share,
+                            self.btn_reload) if not w.isHidden()]
+
+    def _fit_toolbar(self):
+        """One row when the card has room for all of it (and the tab is wide), else two."""
+        room = min(self.width(), ROW_MAX_W) - 28   # (the banner's side margins)
+        parts = self._toolbar_parts()
+        need = sum(w.minimumSizeHint().width() if w is self.search else w.sizeHint().width()
+                   for w in parts) + 8 * (len(parts) - 1)
+        self._lay_toolbar(self.width() >= ONE_ROW and room >= need)
+
     def _lay_toolbar(self, one: bool):
         """The toolbar in one row (a wide tab), or two: Sounds / Voices and Share, then
         the search, the category and Refresh."""
+        # the box asks for the two rows' width, whichever is shown
+        rows = (self.modes_box.sizeHint().width() * (not self.modes_box.isHidden())
+                + 8 + self.btn_share.sizeHint().width(),
+                self.search.minimumSizeHint().width() + self.cat_pick.sizeHint().width()
+                + self.btn_reload.sizeHint().width() + 16)
+        self.toolbar.setMinimumWidth(max(rows))
         if one == self._one_row:
             return
         self._one_row = one
@@ -455,21 +477,43 @@ class StoreTab(QWidget):
                 b.setIcon(QIcon())
 
     def _fit_columns(self):
-        """No Category column in a narrow list (the dropdown still picks one), nor Added
-        in the smallest (its header still sorts), then the header's words over their
-        columns again."""
+        """Every column when the rows fit the list; no Category in a narrower one (the
+        dropdown still picks one); in the smallest no Added either (its header still
+        sorts) and tighter rows, so Report is never under the scroll bar. Measured on the
+        first row, so longer words or other fonts move the steps, never cut a row off.
+        Then the header's words over their columns again."""
+        if not self._rows:
+            return
         w = self.list_area.viewport().width()
         for r in self._rows:
-            r.cell_cat.setVisible(w >= CAT_ROOM)
-            r.cell_added.setVisible(w >= ADDED_ROOM)
-            # the smallest: tighter gaps and names, so Report isn't under the scroll bar
-            if (lay := r.layout()) is not None:
-                lay.setSpacing(8 if w >= ADDED_ROOM else 4)
-            for lbl in (r.name, r.meta):
-                lbl.setMinimumWidth(40 if w >= ADDED_ROOM else 28)
-        self.head_cat.setVisible(w >= CAT_ROOM)
-        self.head_name.setVisible(w >= ADDED_ROOM)   # (the smallest: Added's header there)
+            r.show_play(w >= PLAY_ROOM)
+        level = 2
+        for level in range(3):
+            self._set_level(self._rows[0], level)
+            if self._needs(self._rows[0]) <= w:
+                break
+        for r in self._rows:
+            self._set_level(r, level)
+        self.head_cat.setVisible(level == 0)
+        self.head_name.setVisible(level < 2)   # (the smallest: Added's header there)
         QTimer.singleShot(0, self, self._align_head)
+
+    @staticmethod
+    def _set_level(r, level: int):
+        """0: every column, 1: no Category, 2: no Added either, tighter."""
+        r.cell_cat.setVisible(level == 0)
+        r.cell_added.setVisible(level < 2)
+        if (lay := r.layout()) is not None:
+            lay.setSpacing(8 if level < 2 else 4)
+            lay.invalidate()
+        for lbl in (r.name, r.meta):
+            lbl.setMinimumWidth(40 if level < 2 else 28)
+
+    @staticmethod
+    def _needs(r) -> int:
+        """The row's smallest width, as its columns are now."""
+        lay = r.layout()
+        return lay.minimumSize().width() if lay is not None else 0
 
     def _align_head(self):
         """The header's words over the first row's cells (rows and header share one
@@ -572,6 +616,8 @@ class StoreTab(QWidget):
         for key, text, emoji in items:
             self.cat_pick.addItem(storelook.emoji_icon(emoji), text, key)
         wheelguard.snug_combo(self.cat_pick)
+        if self._one_row is not None:   # (its width changed: still room for one row?)
+            self._fit_toolbar()
 
     def _fetch_cats(self):
         install = self.install()
