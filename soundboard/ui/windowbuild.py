@@ -170,19 +170,26 @@ class BannerButton(QPushButton):
 
 
 class CutPill(QPushButton):
-    """A button whose words end in "…" when it's narrower than them. A plain button
-    cut them off on both sides ("ic: Conne") in the mini player's narrowest sizes."""
+    """A button that never cuts its words off on both sides when it's squeezed: it
+    drops its icon first, then ends the words in "…". A plain button showed "ic: Conne"
+    and "■ A" in the mini player's narrowest sizes (and fonts)."""
 
-    def paintEvent(self, _e):
+    def shown(self) -> QStyleOptionButton:
+        """What it paints at its width: its icon only when the words still fit."""
         opt = QStyleOptionButton()
         self.initStyleOption(opt)
         room = self.style().subElementRect(QStyle.SubElement.SE_PushButtonContents,
                                            opt, self).width()
-        if opt.iconSize.width() and not opt.icon.isNull():
-            room -= opt.iconSize.width()
-        opt.text = self.fontMetrics().elidedText(self.text(), Qt.TextElideMode.ElideRight,
-                                                 max(0, room))
-        QStylePainter(self).drawControl(QStyle.ControlElement.CE_PushButton, opt)
+        words = self.fontMetrics().horizontalAdvance(opt.text)
+        if not opt.icon.isNull() and opt.iconSize.width() + words > room:
+            opt.icon = QIcon()
+        if opt.icon.isNull() and opt.text:
+            opt.text = self.fontMetrics().elidedText(opt.text, Qt.TextElideMode.ElideRight,
+                                                     max(0, room))
+        return opt
+
+    def paintEvent(self, _e):
+        QStylePainter(self).drawControl(QStyle.ControlElement.CE_PushButton, self.shown())
 
 
 class _Moved(QObject):
@@ -768,7 +775,7 @@ class WindowBuilder(Controller):
         icons.set_icon(mw.mini_air, "live", "danger_text", "on_live")
         # "All" in words: an icon-only ■ here looked just like the one-sound ■ on
         # the left, and stopped everything
-        mw.mini_stop = QPushButton(_("All"))
+        mw.mini_stop = CutPill(_("All"))   # squeezed: the word stays, the ■ goes
         mw.mini_stop.setObjectName("danger")
         mw.mini_stop.setProperty("mini", True)   # slim padding: never squeezed to "■ A"
         mw.mini_stop.setToolTip(mw.stop_btn.toolTip())
