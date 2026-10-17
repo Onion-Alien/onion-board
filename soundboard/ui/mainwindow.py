@@ -529,6 +529,10 @@ class MainWindow(QMainWindow):
             self.rail.sync()   # (it heard nothing)
         if reset.before_update(self.cfg):   # a restore point first, when this is an update
             usage.used("restore-point-update")
+        if reset.is_update(self.cfg) and not self.cfg.setup_done:
+            # they used an earlier version: an update never opens the setup guide again
+            # (What's new comes first; the Setup tab still says what isn't set up)
+            self.cfg.setup_done = True
         library.tidy_files(self.cfg)   # files from before library folders move in
         self._rebuild_pads()
         splash.pump()
