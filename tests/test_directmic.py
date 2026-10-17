@@ -3722,3 +3722,39 @@ def test_no_such_mic_says_why_as_a_fixed_word(monkeypatch, picked, why):
 def test_every_fail_word_is_counted():
     from soundboard import usage
     assert set(dm.FAIL_KINDS) == set(usage.MIC_FAILS)
+
+
+def test_the_effect_reads_further_back_while_a_sound_plays(monkeypatch):
+    # the board waits on the UI thread through long Qt calls: while anything plays the
+    # effect keeps CUSHION_S queued, and drops back to LEAD_S only once nothing has
+    # played for CALM_S and the mic is quiet (the stretch it jumps over is silence)
+    from soundboard import engine as eng
+    from soundboard.engine import SR, Engine
+
+    class Stream:
+        latency = dm.LEAD_S
+
+        def set_lead(self, s):
+            self.latency = s
+
+    s = Stream()
+    e = Engine()
+    monkeypatch.setattr(e, "direct_stream", lambda: s)
+    monkeypatch.setattr(e, "active_outputs", lambda: {"main"})
+    e.rates["main"] = SR
+    v = e.play("a", np.zeros((SR, 2), np.float32), 1.0)
+    assert v is not None and s.latency == dm.CUSHION_S
+    assert dm.CUSHION_S <= 0.12   # the most the effect takes
+    e._check_cushion(100.0)        # still playing: stays
+    assert s.latency == dm.CUSHION_S
+    e.voices = ()
+    e.level_mic = 0.5              # talking: never cut a word
+    for t in (101.0, 102.0, 110.0):
+        e._check_cushion(t)
+    assert s.latency == dm.CUSHION_S
+    e.level_mic = 0.0
+    e._check_cushion(111.0)
+    e._check_cushion(111.0 + eng.CALM_S - 0.5)
+    assert s.latency == dm.CUSHION_S
+    e._check_cushion(111.0 + eng.CALM_S)
+    assert s.latency == dm.LEAD_S
