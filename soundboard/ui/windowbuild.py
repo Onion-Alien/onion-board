@@ -36,7 +36,7 @@ from PySide6.QtWidgets import (
     QWidget,
 )
 
-from soundboard import backup, destination, net, otherboards, remote, usage
+from soundboard import backup, destination, net, otherboards, remote, theme, usage
 from soundboard.i18n import _
 from soundboard.library import PAD_COLORS
 from soundboard.ui import a11y, alsosend, busy, icons, sidebar, taboff
@@ -915,6 +915,18 @@ class WindowBuilder(Controller):
         mw.out_meter.setMinimumWidth(60)
         mw.out_meter.setToolTip(_("Level of what others receive (Discord, the game, OBS…)"))
         row.addWidget(mw.out_meter, 1)
+        # straight into the mic, not in it yet: the meter moves with your voice, but the
+        # sounds don't reach anyone. Said right by it, until they're in (statuscontrol)
+        mw.voice_only = QPushButton(_("Voice only"))
+        mw.voice_only.setObjectName("vchip")
+        mw.voice_only.setProperty("state", "warn")
+        mw.voice_only.setCursor(Qt.CursorShape.PointingHandCursor)
+        mw.voice_only.setToolTip(_("Others hear your voice, but not your sounds: they aren't "
+                                     "in your mic yet. Click to set it up."))
+        mw.voice_only.clicked.connect(lambda: mw.tabs.setCurrentWidget(mw.setup_page))
+        mw.voice_only.setSizePolicy(QSizePolicy.Policy.Fixed, QSizePolicy.Policy.Fixed)
+        mw.voice_only.hide()
+        row.addWidget(mw.voice_only)
         # its right end in line with the seek slider's above (EdgeMatch)
         meter_pad = QSpacerItem(0, 0, QSizePolicy.Policy.Fixed, QSizePolicy.Policy.Minimum)
         row.addItem(meter_pad)
@@ -1393,6 +1405,44 @@ class WindowBuilder(Controller):
             else:
                 fv.addLayout(row)
         cv.addWidget(flow)
+        # straight into the mic, not in it yet: the mic itself works (its level moves)
+        # and the sounds aren't in it, two different things. A box of its own says the
+        # first, with a tick and the live level, so "Not set up" under it can't read as
+        # "your mic is broken"
+        voice = mw.mic_voice = QFrame()
+        voice.setObjectName("micstatus")
+        vh = QHBoxLayout(voice)
+        vh.setContentsMargins(12, 10, 12, 10)
+        vh.setSpacing(10)
+        tick = QLabel()
+        tick.setFixedSize(20, 20)
+        icons.set_label_icon(tick, "check", "ok_text", size=20)
+        vh.addWidget(tick, 0, Qt.AlignmentFlag.AlignTop)
+        vlines = QVBoxLayout()
+        vlines.setSpacing(4)
+        vh.addLayout(vlines, 1)
+        vtop = QHBoxLayout()
+        vtop.setSpacing(10)
+        works = QLabel(_("Your mic works"))
+        works.setObjectName("micline")
+        theme.set_tone(works, "ok")
+        vtop.addWidget(works, 0, Qt.AlignmentFlag.AlignVCenter)
+        mw.mic_voice_sub = ElidedLabel()
+        mw.mic_voice_sub.setObjectName("hint")
+        mw.mic_voice_sub.setMinimumWidth(40)
+        vtop.addWidget(mw.mic_voice_sub, 0, Qt.AlignmentFlag.AlignVCenter)
+        mw.voice_meter = Meter()
+        mw.voice_meter.setFixedWidth(90)
+        mw.voice_meter.setToolTip(_("Your voice"))
+        vtop.addWidget(mw.voice_meter, 0, Qt.AlignmentFlag.AlignVCenter)
+        vtop.addStretch(1)
+        vlines.addLayout(vtop)
+        heard = QLabel(_("Onion Board hears you, and Discord and games already hear your "
+                         "voice through it."))
+        heard.setWordWrap(True)
+        vlines.addWidget(heard)
+        voice.hide()
+        cv.addWidget(voice)
         # straight into the mic: one status box instead of the picture above (it works
         # by itself, and the mic helper puts it back when Windows takes it off): a big
         # icon, what's happening, the mic's name and its live level. The step below

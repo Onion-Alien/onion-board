@@ -261,6 +261,10 @@ def test_what_others_hear_shows_your_voice_before_the_mic_effect(window, monkeyp
     window.cfg.route, e.main_direct = "mic", False   # into the mic, effect not set up:
     window.tickctl._tick_visuals({}, 0.0)                    # apps take the real mic as it is
     assert window.out_meter.level == 0.6
+    e.level_main = 0.9                               # a sound playing: sent to nobody yet
+    window.tickctl._tick_visuals({}, 0.0)
+    assert window.out_meter.level == 0.6
+    e.level_main = 0.0
     e.main_direct = True                             # in the mic: only what's sent
     window.tickctl._tick_visuals({}, 0.0)
     assert window.out_meter.level == 0.0

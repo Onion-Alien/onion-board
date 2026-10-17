@@ -205,11 +205,12 @@ class TickControl(Controller):
     def _heard_level(self) -> float:
         """The "What others hear" meter. Sending into the mic but not in it yet (no mic
         effect): voice apps still take the real mic as it is, so others hear your voice
-        even with nothing sent; the meter showed nothing while you talked."""
+        even with nothing sent (the meter showed nothing while you talked), and none of
+        the sounds (it moved with them, as if they went out)."""
         mw = self.mw
         e = mw.engine
         if mw.cfg.route == "mic" and not e.main_direct and e.mic_stream is not None:
-            return max(e.level_main, e.level_mic)
+            return e.level_mic
         return e.level_main
 
     def _tick_visuals(self, playing, now: float):
@@ -258,6 +259,8 @@ class TickControl(Controller):
         mw.mic_meter.set_level(e.level_mic if e.mic_stream else 0.0)
         if mw.card_meter.isVisible():
             mw.card_meter.set_level(e.level_mic if e.mic_stream else 0.0)
+        if mw.voice_meter.isVisible():
+            mw.voice_meter.set_level(e.level_mic if e.mic_stream else 0.0)
         talking = e.mic_stream is not None and e.level_mic > 0.05
         if talking:
             self._talk_until = now + 0.8

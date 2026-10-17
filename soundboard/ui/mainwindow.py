@@ -250,6 +250,8 @@ class MainWindow(QMainWindow):
     mic_update_icon: Any
     mic_update_note: QFrame
     mic_update_text: QLabel
+    mic_voice: QFrame
+    mic_voice_sub: ElidedLabel
     mic_ways: Flow
     mini_air: QPushButton
     mini_bun: QPushButton
@@ -350,6 +352,8 @@ class MainWindow(QMainWindow):
     _video_for: tuple[str | None, Path | None]
     _video_win: Any
     voice: Any
+    voice_meter: Meter
+    voice_only: QPushButton
     store: Any   # the Store tab (StoreTab), or its stand-in while switched off
     vol_mic: VolumeControl
     vol_mon: VolumeControl

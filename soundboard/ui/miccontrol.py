@@ -209,13 +209,18 @@ class MicControl(Controller):
                             "A driver or Windows update does that. Click <b>Repair</b>, then "
                             "<b>Yes</b> when Windows asks.")), _("Repair (one click)"))
         elif not directmic.works(direct):
+            # named for what's missing (the sounds), never "your mic": the mic works, its
+            # level moves, and "Your mic: Not set up" read as a broken mic
             look = ("warn", "mic",
-                    _("Not in your mic yet") if direct == "missing" else _("On another mic"),
-                    _("Not set up"), needed(
-                        _("One click puts your sounds straight into your mic, so Discord and "
-                          "games hear them. Windows asks once: click <b>Yes</b>.") if ask else
-                        _("One click puts your sounds straight into your mic, so Discord and "
-                          "games hear them.")), _("Put my sounds straight into my mic"))
+                    _("Your sounds aren't in your mic yet") if direct == "missing"
+                    else _("Your sounds are on another mic"),
+                    _("1 step left"), needed(
+                        _("Others hear your voice, but not your sounds. One click adds Onion "
+                          "Board's audio driver to this mic, so Discord and games hear your "
+                          "sounds too. Windows asks once: click <b>Yes</b>.") if ask else
+                        _("Others hear your voice, but not your sounds. One click adds Onion "
+                          "Board's audio driver to this mic, so Discord and games hear your "
+                          "sounds too.")), _("Put my sounds straight into my mic"))
         elif state == "ok" and self._mic_sends_nothing():
             # the mic itself sends exact zeros: a wireless headset switched off (its
             # dongle stays plugged in), the mic's own mute or its boom mic pulled out.
@@ -240,6 +245,15 @@ class MicControl(Controller):
             sub = _("{mic} · off", mic=name)
         else:
             sub = name
+        # the mic itself works (it's open and not unplugged) while the sounds aren't in
+        # it yet: said in its own green row, with its level, above what's missing
+        voice = (tone != "ok" and e.mic_stream is not None
+                 and not directmic.unplugged(mw.cfg.mic_device))
+        mw.mic_voice.setVisible(voice)
+        if voice:
+            mw.mic_voice_sub.setText(name)
+            mw.mic_voice_sub.setToolTip(name)
+            sub = ""   # (named in the row above)
         mw.mic_sub.setToolTip(sub)
         mw.mic_line.setText(headline)
         theme.set_tone(mw.mic_line, tone)
