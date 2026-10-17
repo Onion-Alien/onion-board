@@ -233,6 +233,40 @@ def test_effects_tab_has_the_trim(window):
     d.reject()
 
 
+def test_a_maximised_window_stays_maximised(window, qapp):
+    """Maximised, it opens maximised next time, and comes back from minimised (the
+    taskbar, the tray) maximised: it used to come back as a normal window both times."""
+    from PySide6.QtCore import QEvent
+    from soundboard.library import Config
+    from soundboard.ui import mainwindow
+    window.show()
+    window.showMaximized()
+    qapp.processEvents()
+    assert window.cfg.window_maximized
+    window.showMinimized()
+    qapp.processEvents()
+    assert window.cfg.window_maximized   # minimised remembers what it was
+    window.show_from_tray()
+    qapp.processEvents()
+    assert window.isMaximized()
+    window.cfg.save()
+    assert Config.load().window_maximized
+    again = mainwindow.MainWindow()   # the next start
+    try:
+        again.soundctl._load_thread.join(15)
+        again.show()
+        qapp.processEvents()
+        assert again.isMaximized()
+    finally:
+        again.close()
+        again.soundctl._load_thread.join(15)
+        again.deleteLater()
+        qapp.sendPostedEvents(None, QEvent.DeferredDelete)
+    window.showNormal()
+    qapp.processEvents()
+    assert not window.cfg.window_maximized
+
+
 def test_without_a_tray_close_quits_and_never_starts_hidden(window):
     if window.tray is None:
         assert not window.can_hide()

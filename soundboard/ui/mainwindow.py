@@ -601,6 +601,8 @@ class MainWindow(QMainWindow):
             self._default_timer.start(DEFAULT_POLL_MS)
         self.fitctl._init_fit()
         self.resize(1180, 720)
+        if self.cfg.window_maximized:   # shows maximised, as it was when it closed
+            self.setWindowState(Qt.WindowState.WindowMaximized)
         if self.cfg.always_on_top:
             self.setWindowFlag(Qt.WindowType.WindowStaysOnTopHint, True)
         self._init_tray()
@@ -1221,8 +1223,8 @@ class MainWindow(QMainWindow):
     # ------------------------------------------------------------------ Bun mode
     def show_from_tray(self):
         self.bunctl._bun_away()
-        if self.isMinimized():
-            self.showNormal()
+        if self.isMinimized():   # back the way it was: showNormal() un-maximised it
+            self.showMaximized() if self.cfg.window_maximized else self.showNormal()
         else:
             self.show()
         self.raise_()
@@ -1375,6 +1377,8 @@ class MainWindow(QMainWindow):
         super().changeEvent(ev)
         if ev.type() == QEvent.Type.WindowStateChange:
             self.tickctl._set_tick_rate()
+            if self.isVisible() and not self.isMinimized():   # (minimised keeps what it was)
+                self.cfg.window_maximized = self.isMaximized()
 
     # ------------------------------------------------------------------ small windows
     def _show_pill(self):
