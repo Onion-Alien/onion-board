@@ -490,3 +490,83 @@ body.ob-locked { overflow: hidden; }
 .ob-brand .logo.mark { display: grid; place-items: center; border-radius: 9px; color: #fff;
   background: linear-gradient(145deg, var(--accent2), var(--accent)); box-shadow: 0 0 14px color-mix(in srgb, var(--accent) 45%, transparent); }
 .ob-brand .logo.mark .i { width: 21px; height: 21px; }
+
+/* ------------------------------------------------------------------ Live controls (the 1x / Effects pop-up) */
+.ob .btn.ob-lc.set { color: var(--warn_text); font-weight: 700; }
+.ob .btn.ob-lc.hot { color: #ff4d4f; }
+.ob-lpop { position: absolute; z-index: 33; display: flex; flex-direction: column; gap: 8px; width: min(746px, calc(100% - 16px));
+           max-height: calc(100% - 16px); overflow-y: auto; scrollbar-width: thin; padding: 12px 16px 14px; border-radius: 10px;
+           background: var(--bg); border: 1px solid var(--border_hi); box-shadow: 0 16px 40px rgba(0,0,0,.55); }
+.ob-lpop hr { margin: 0; border: 0; border-top: 1px solid var(--border); }
+.ob-lpop .lhead { display: flex; align-items: center; gap: 8px; }
+.ob-lpop .lhead b { font-size: 14px; font-weight: 700; }
+.ob-lpop .lhead .lsub { color: var(--muted); }
+.ob-lpop .lhead .btn { margin-left: auto; color: var(--muted); }
+.ob-lpop .lsetups { display: flex; align-items: flex-start; gap: 12px; }
+.ob-lpop .lsetups > b { line-height: 24px; flex: none; }
+.ob-lpop .lchips { display: flex; flex-wrap: wrap; gap: 4px; }
+.ob-lpop .chip { height: 24px; }
+.ob-lpop .chip.ghost { background: none; color: var(--muted); font-weight: 500; }
+.ob-lpop .chip.ghost:hover { color: var(--text); background: var(--card); }
+.ob-lpop .lcols { display: grid; grid-template-columns: minmax(0, 1fr) 1px minmax(0, 1fr); gap: 16px; }
+.ob-lpop .lcols > i { background: var(--border); }
+.ob-lpop .lcol { display: flex; flex-direction: column; gap: 8px; min-width: 0; --nw: 48px; }
+.ob-lpop .lcol.fx { --nw: 70px; }
+.ob-lrow { display: grid; grid-template-columns: var(--nw) minmax(0, 1fr) 52px; gap: 10px; align-items: center; min-height: 26px; }
+.ob-lrow .v { text-align: right; font-variant-numeric: tabular-nums; }
+.ob-lquick { display: flex; gap: 4px; padding-left: calc(var(--nw) + 10px); }
+.ob-lquick .btn, .ob-lpresets .btn { flex: 1; min-width: 0; min-height: 22px; padding: 0 5px; border-radius: 11px; font-size: 11.5px; font-weight: 500; }
+.ob-lpresets { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 4px; padding-top: 4px; }
+.ob-lpop .lred { display: flex; align-items: center; gap: 8px; }
+.ob-lpop .lred > div { flex: 1; min-width: 0; }
+.ob-lpop .lred b { display: block; font-weight: 700; }
+.ob-lpop .lred .btn { min-width: 84px; }
+.ob-gauge svg { display: block; width: 210px; max-width: 100%; height: auto; margin: 0 auto; font-family: var(--font); }
+@container ob (max-width: 760px) {
+  .ob-lpop .lcols { grid-template-columns: minmax(0, 1fr); }
+  .ob-lpop .lcols > i { height: 1px; }
+}
+
+/* ------------------------------------------------------------------ Voice: setups, groups, AI voices, the mic strip */
+.ob-vscroll { flex: 1; min-height: 0; display: flex; flex-direction: column; gap: 10px; }
+.ob-setups { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
+.ob-setups > b { margin-right: 4px; }
+.ob-setups .chip .i { width: 13px; height: 13px; }
+.ob-vcard .chips { display: flex; gap: 6px; flex-wrap: wrap; }
+.ob-voices { grid-template-columns: repeat(auto-fill, 128px); }
+.ob-voice:focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; }
+.ob-install { display: flex; align-items: center; gap: 24px; padding: 14px 24px; border-radius: 10px; border: 1px solid var(--border); }
+.ob-install .bun { color: var(--accent); }
+.ob-install .bun .i { width: 64px; height: 64px; }
+.ob-install p { margin: 0 0 8px; }
+.ob-aivs { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 8px; }
+.ob-aivs button { display: flex; align-items: center; gap: 10px; padding: 8px 10px; border: 0; border-radius: 9px; background: var(--card); text-align: left; }
+.ob-aivs button:hover { background: var(--card_hi); }
+.ob-aivs img { width: 44px; height: 44px; border-radius: 10px; flex: none; }
+.ob-aivs b { display: block; }
+.ob-aivs small { display: block; color: var(--muted); font-size: 11.5px; }
+.ob-vstrip { flex: none; gap: 10px; }
+.ob-vstrip .ob-meter { flex: 1; }
+.ob-vstrip .st { display: inline-flex; align-items: center; gap: 6px; min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
+/* ------------------------------------------------------------------ Free sounds (the sound store) */
+.ob-storehead { max-width: 760px; }
+.ob-storehead .hd b { flex: none; }
+.ob-storehead .row { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+.ob-beta { padding: 1px 9px; border-radius: 9px; background: #1db954; color: #04130a; font-size: 11px; font-weight: 700; }
+.ob-sorts { display: flex; gap: 4px; }
+.ob-store { display: flex; flex-direction: column; gap: 6px; max-width: 760px; }
+.ob-srow { display: flex; align-items: center; gap: 6px; padding: 6px 8px; border-radius: 10px; background: var(--card); }
+.ob-srow:hover { background: var(--card_hi); }
+.ob-srow .tx { flex: 1; min-width: 0; }
+.ob-srow .tx b, .ob-srow .tx small { display: block; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.ob-srow .tx small { color: var(--muted); font-size: 11.5px; }
+@container ob (max-width: 600px) {
+  .ob-srow .btn.small .t { display: none; }
+  .ob-srow .btn[title="Not for me"], .ob-srow .btn[title="Report this sound"] { display: none; }
+  .ob-vstrip .ob-meter, .ob-vstrip > .i, .ob-vstrip .st .i { display: none; }
+  .ob-vstrip .st { flex: 1; }
+  .ob-install { flex-direction: column; text-align: center; gap: 10px; padding: 12px; }
+  .ob-voices { grid-template-columns: repeat(auto-fill, minmax(94px, 1fr)); }
+}
+.ob-page > .chips { display: flex; gap: 6px; flex-wrap: wrap; flex: none; }

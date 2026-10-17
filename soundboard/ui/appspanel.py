@@ -42,7 +42,7 @@ from soundboard.ui.approw import (APP_CATEGORIES, APP_DRAG_MIME,  # noqa: F401
 from soundboard.ui.bunnywidget import BunnyWidget
 from soundboard.ui.clipeditor import WAVE_H
 from soundboard.ui.clipshelf import ClipShelf
-from soundboard.ui.panel import UndoBar, hint_label
+from soundboard.ui.panel import UndoBar, ViewToggle, hint_label
 from soundboard.ui.responsive import FitWidth
 from soundboard.ui.speedpitch import SpeedPitchButton
 from soundboard.wheelguard import no_wheel
@@ -114,6 +114,8 @@ class AppsTab(QWidget):
         self.btn_add_cat.clicked.connect(self._prompt_new_category)
         toolbar.addWidget(self.btn_add_cat)
         toolbar.addStretch(1)
+        self.view_toggle = ViewToggle(cfg.app_view, _("Apps"))
+        self.view_toggle.changed.connect(self.set_view)
         size_label = self.size_label = QLabel(_("Card size"))
         size_label.setObjectName("muted")
         toolbar.addWidget(size_label)
@@ -125,6 +127,7 @@ class AppsTab(QWidget):
         self.card_size.setToolTip(_("App card size: smaller fits more programs across"))
         no_wheel(self.card_size)
         toolbar.addWidget(self.card_size)
+        toolbar.addWidget(self.view_toggle)
         v.addLayout(toolbar)
         self.undo_bar = UndoBar(_("Remember the program again, as it was"))
         v.addWidget(self.undo_bar)
@@ -141,6 +144,7 @@ class AppsTab(QWidget):
                             min_w=self.card_size.value(), gap=10, even=False)
         self._wire_headings()
         self.card_size.valueChanged.connect(self._set_card_size)
+        self.grid.listed = cfg.app_view == "list"
         # nothing playing: Bun waits, a bit glum, above the how-to, halfway down the page
         self.empty = QWidget()
         ev = QVBoxLayout(self.empty)
@@ -210,6 +214,21 @@ class AppsTab(QWidget):
         self._label_bin()
         if self.rows:   # remembered programs are picked up even if this tab is never opened
             QTimer.singleShot(1500, self.start)
+
+    def set_view(self, view: str):
+        """Cards, or a list: one program a line."""
+        listed = view == "list"
+        self.view_toggle.set_view(view)
+        if self.cfg.app_view != view:
+            self.cfg.app_view = view
+            self._save()
+        self.grid.listed = listed
+        self._tools_for_rows()
+        for row in self.rows.values():
+            row.set_listed(listed)
+        self.grid.invalidate()
+        self.list.updateGeometry()
+        self.list_layout.activate()
 
     def _set_card_size(self, width: int):
         self.cfg.app_card_width = width
@@ -470,6 +489,7 @@ class AppsTab(QWidget):
             row = self.rows[key] = AppRow(exe, self._meter_cls, vol, hear, to, key, path,
                                           category=cat)
             row.show_to(self._stream_output())
+            row.set_listed(self.grid.listed)
             row.send_toggled.connect(self._on_send)
             row.rec_toggled.connect(self.capctl._on_rec)
             row.vol_changed.connect(self._on_vol)
@@ -485,10 +505,13 @@ class AppsTab(QWidget):
         return row
 
     def _tools_for_rows(self):
-        """The effects button and the card-size slider only mean something with a
-        card to apply them to: hidden over the empty page."""
-        for w in (self.fx_btn, self.btn_add_cat, self.size_label, self.card_size):
+        """The effects button, the card-size slider and cards / list only mean
+        something with a card to apply them to: hidden over the empty page. The list
+        view's rows are the tab's width: no card size there."""
+        for w in (self.fx_btn, self.btn_add_cat, self.view_toggle):
             w.setVisible(bool(self.rows))
+        for w in (self.size_label, self.card_size):
+            w.setVisible(bool(self.rows) and not self.grid.listed)
 
     def _drop_row(self, row: AppRow):
         row.close_view()
