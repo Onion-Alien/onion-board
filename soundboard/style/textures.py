@@ -50,7 +50,7 @@ TEXTURES = {
     "ruled": (24, "accent2"), "waves": (32, "accent"),
     "crosshatch": (8, "lift"), "diamond": (20, "accent"), "scales": (24, "accent"),
     "embers": (96, "accent2"), "petals": (64, "accent2"), "dither": (2, "shade"),
-    "halftone": (10, "shade"), "frost": (64, "lift"),
+    "halftone": (10, "shade"), "frost": (64, "lift"), "webs": (72, "lift"),
 }
 TEXTURE_TILE = {k: v[0] for k, v in TEXTURES.items()}
 
@@ -144,6 +144,29 @@ def texture_image(kind: str, tk: dict[str, str] | None = None, size: int | None 
             x, y, r = rng.uniform(4, size - 4), rng.uniform(4, size - 4), rng.uniform(1.5, 3)
             p.setBrush(a(0.20))
             p.drawEllipse(QPointF(x, y), r * 1.3, r)
+    elif kind == "webs":        # a cobweb in the middle of each tile, clear of its edges
+        import math
+        p.setRenderHint(QPainter.RenderHint.Antialiasing)
+        p.setPen(QPen(a(0.07), 1))
+        p.setBrush(Qt.BrushStyle.NoBrush)
+        c, spokes = size / 2, 8
+        ends = [(math.cos(i / spokes * 2 * math.pi + 0.3), math.sin(i / spokes * 2 * math.pi + 0.3))
+                for i in range(spokes)]
+        for dx, dy in ends:
+            p.drawLine(QPointF(c, c), QPointF(c + dx * size * 0.4, c + dy * size * 0.4))
+        for r in (0.12, 0.22, 0.32):   # threads between the spokes, sagging to the middle
+            ring = QPainterPath()
+            for i in range(spokes + 1):
+                dx, dy = ends[i % spokes]
+                pt = QPointF(c + dx * size * r, c + dy * size * r)
+                if i == 0:
+                    ring.moveTo(pt)
+                else:
+                    px, py = ends[i - 1]
+                    mid = QPointF(c + (px + dx) / 2 * size * r * 0.8,
+                                  c + (py + dy) / 2 * size * r * 0.8)
+                    ring.quadTo(mid, pt)
+            p.drawPath(ring)
     elif kind == "dither":      # a 1-pixel checkerboard, like 256-colour dithering
         img.setPixelColor(0, 0, a(0.10))
         img.setPixelColor(1, 1, a(0.10))

@@ -41,7 +41,7 @@ Version **2.5.0** · Windows 10 / 11 · free, no account, no ads, anonymous usag
 | ⌨️ **Hotkeys that work in-game**<br>Plus an in-game overlay, MIDI pads and Stream Deck. Open your game and the board switches to its sounds. | 📦 **Bring your board over**<br>Coming from Soundpad, Resanance, Soundux or EXP Soundboard? Sounds, names and hotkeys come with you in one click. |
 | 🎛️ **Effects on any sound**<br>Trim, speed, pitch, bass boost, reverse. One-click *Deep fried*, *Nightcore*, *Slowed + reverb*. | 🤖 **Voice changer and text-to-speech**<br>Change your voice live, or type and a computer voice says it, in 33 languages. Optional AI voices: 12 characters, or blend your own. |
 | ✅ **Checks Discord for you**<br>Spots the Discord settings that would cut your sounds out and shows how to fix them. | ⏪ **Instant replay**<br>One key turns the last 30 seconds you heard into a pad. Or record with your mic. |
-| 📱 **Your pads on your phone**<br>With the free [Onion Pocket](https://github.com/Onion-Alien/onion-pocket) add-on: scan a QR code, tap a pad, it plays on your PC. | 📻 **And more**<br>Screen triggers, world radio, sharing a program's sound, a clean OBS output, 31 themes, 32 languages. |
+| 📱 **Your pads on your phone**<br>With the free [Onion Pocket](https://github.com/Onion-Alien/onion-pocket) add-on: scan a QR code, tap a pad, it plays on your PC. | 📻 **And more**<br>Screen triggers, world radio, sharing a program's sound, a clean OBS output, 32 themes, 32 languages. |
 
 <div align="center">
 

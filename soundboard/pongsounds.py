@@ -26,6 +26,7 @@ STYLES: dict[str, str] = {
     "Arctic": "glass", "Ocean": "glass", "Midnight": "glass", "Mint": "glass",
     "Cherry Blossom": "glass", "Vaporwave": "glass",
     "Paper": "wood", "Mocha": "wood", "Forest": "wood", "Swamp": "wood",
+    "Halloween": "wood",
     "Retro 98": "chip", "Hacker": "chip", "Amber Terminal": "chip", "High Contrast": "chip",
     "Synthwave": "neon", "Toxic": "neon", "Sunset": "neon", "Blood Moon": "neon",
     "Lava": "neon", "Brainrot": "neon",
