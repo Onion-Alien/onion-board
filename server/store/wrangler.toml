@@ -19,11 +19,12 @@ crons = ["17 3 * * *", "*/10 * * * *"]   # the daily clean-up; a site sync step
 
 # Secrets (never in this file): `npx wrangler secret put ADMIN_TOKEN` and `... SALT`
 
-# the Chat tab's room: one Durable Object, kept in memory (SQLite-backed, free plan)
-[[durable_objects.bindings]]
-name = "CHAT"
-class_name = "ChatRoom"
-
+# the Chat tab's room was a Durable Object; it's retired, and v2 deletes it (the v1
+# migration that made it has to stay listed for that)
 [[migrations]]
 tag = "v1"
 new_sqlite_classes = ["ChatRoom"]
+
+[[migrations]]
+tag = "v2"
+deleted_classes = ["ChatRoom"]
