@@ -1753,7 +1753,6 @@
   "About it": "حوله",
   "Accurate (small.en)": "دقيق (small.en)",
   "Add a voice server": "إضافة خادم صوتي",
-  "Add a voice someone sent you as a code (it starts with “OB1-”)": "أضف صوتًا أرسله إليك أحد الأشخاص كرمز (يبدأ بـ \"OB1-\")",
   "Add the voice “{name}”?<br><br>Effects: {effects}": "أضف الصوت \"{name}\"؟<br><br> التأثيرات: {effects}",
   "Add to Sounds": "إضافة إلى الأصوات",
   "Add voices": "إضافة أصوات",
@@ -2207,7 +2206,6 @@
   "That drive is read-only.": "محرك الأقراص هذا للقراءة فقط.",
   "That isn't a Myinstants sound link.": "هذا ليس رابط صوت Myinstants.",
   "That isn't a proxy address: it should look like socks5h://127.0.0.1:9050 or http://host:8080": "هذا ليس عنوان وكيل: يجب أن يبدو مثل socks5h://127.0.0.1:9050 أو http://host:8080",
-  "That isn't a voice code (they start with “OB1-”).": "هذا ليس رمزًا صوتيًا (يبدأ بـ \"OB1-\").",
   "That mic isn't plugged in (or Windows doesn't list it).": "هذا الميكروفون غير متصل (أو أن Windows لا يدرجه).",
   "That needs signing in to the site, which Onion Board doesn't do.": "ويتطلب ذلك تسجيل الدخول إلى الموقع، وهو ما لا يقوم به Onion Board.",
   "That program isn't running any more.": "هذا البرنامج لا يعمل بعد الآن.",
@@ -4073,5 +4071,8 @@
     "واجه Onion Board {n} مشكلة منذ بدايته."
   ],
   "See report": "عرض التقرير",
-  "The store doesn't take that name or those tags. Try other words (and no links).": "لا يقبل المتجر هذا الاسم أو هذه الوسوم. جرّب كلمات أخرى (وبدون روابط)."
+  "The store doesn't take that name or those tags. Try other words (and no links).": "لا يقبل المتجر هذا الاسم أو هذه الوسوم. جرّب كلمات أخرى (وبدون روابط).",
+  "Add a voice someone sent you as a code (it starts with “OB”)": "أضف صوتًا أرسله إليك أحد الأشخاص كرمز (يبدأ بـ \"OB\")",
+  "Add “{name}”?": "أضف «{name}»؟",
+  "That isn't a voice code (they start with “OB”).": "هذا ليس رمزًا صوتيًا (يبدأ بـ \"OB\")."
 }

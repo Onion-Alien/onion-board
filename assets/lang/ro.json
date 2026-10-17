@@ -1620,7 +1620,6 @@
   "About it": "Despre",
   "Accurate (small.en)": "Precis (small.ro)",
   "Add a voice server": "Adaugă un server de voce",
-  "Add a voice someone sent you as a code (it starts with “OB1-”)": "Adaugă o voce pe care cineva ți-a trimis-o ca cod (începe cu „OB1-”)",
   "Add the voice “{name}”?<br><br>Effects: {effects}": "Adăugați vocea „{name}”?<br><br> Efecte: {effects}",
   "Add to Sounds": "Adăugați la Sunete",
   "Add voices": "Adaugă voci",
@@ -2064,7 +2063,6 @@
   "That drive is read-only.": "Acea unitate este doar pentru citire.",
   "That isn't a Myinstants sound link.": "Acesta nu este un link de sunet Myinstants.",
   "That isn't a proxy address: it should look like socks5h://127.0.0.1:9050 or http://host:8080": "Aceasta nu este o adresă proxy: ar trebui să arate ca socks5h://127.0.0.1:9050 sau http://host:8080",
-  "That isn't a voice code (they start with “OB1-”).": "Acesta nu este un cod vocal (încep cu „OB1-”).",
   "That mic isn't plugged in (or Windows doesn't list it).": "Microfonul nu este conectat (sau Windows nu îl listează).",
   "That needs signing in to the site, which Onion Board doesn't do.": "Este nevoie să vă conectați pe site, ceea ce Onion Board nu face.",
   "That program isn't running any more.": "Acel program nu mai rulează.",
@@ -3836,5 +3834,8 @@
     "Onion Board a avut {n} de probleme de la pornire."
   ],
   "See report": "Vezi raportul",
-  "The store doesn't take that name or those tags. Try other words (and no links).": "Magazinul nu acceptă acest nume sau aceste etichete. Încearcă alte cuvinte (și fără linkuri)."
+  "The store doesn't take that name or those tags. Try other words (and no links).": "Magazinul nu acceptă acest nume sau aceste etichete. Încearcă alte cuvinte (și fără linkuri).",
+  "Add a voice someone sent you as a code (it starts with “OB”)": "Adaugă o voce pe care cineva ți-a trimis-o ca cod (începe cu „OB”)",
+  "Add “{name}”?": "Adăugați „{name}”?",
+  "That isn't a voice code (they start with “OB”).": "Acesta nu este un cod vocal (încep cu „OB”)."
 }

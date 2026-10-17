@@ -1538,7 +1538,6 @@
   "About it": "Tentang itu",
   "Accurate (small.en)": "Akurat (kecil.en)",
   "Add a voice server": "Tambahkan server suara",
-  "Add a voice someone sent you as a code (it starts with “OB1-”)": "Tambahkan suara yang dikirimkan seseorang kepada Anda sebagai kode (dimulai dengan “OB1-”)",
   "Add the voice “{name}”?<br><br>Effects: {effects}": "Tambahkan suara “{name}”?<br><br> Efek: {effects}",
   "Add to Sounds": "Tambahkan ke Suara",
   "Add voices": "Tambahkan suara",
@@ -1972,7 +1971,6 @@
   "That drive is read-only.": "Drive itu hanya bisa dibaca.",
   "That isn't a Myinstants sound link.": "Itu bukan tautan suara Myinstants.",
   "That isn't a proxy address: it should look like socks5h://127.0.0.1:9050 or http://host:8080": "Itu bukan alamat proxy: alamatnya akan terlihat seperti socks5h://127.0.0.1:9050 atau http://host:8080",
-  "That isn't a voice code (they start with “OB1-”).": "Itu bukan kode suara (dimulai dengan “OB1-”).",
   "That mic isn't plugged in (or Windows doesn't list it).": "Mikrofon tersebut tidak dicolokkan (atau Windows tidak mencantumkannya).",
   "That needs signing in to the site, which Onion Board doesn't do.": "Itu perlu masuk ke situs, yang tidak dilakukan Onion Board.",
   "That program isn't running any more.": "Program itu tidak berjalan lagi.",
@@ -3678,5 +3676,8 @@
     "Onion Board mengalami {n} masalah sejak dibuka."
   ],
   "See report": "Lihat laporan",
-  "The store doesn't take that name or those tags. Try other words (and no links).": "Toko tidak menerima nama atau tag itu. Coba kata lain (tanpa tautan)."
+  "The store doesn't take that name or those tags. Try other words (and no links).": "Toko tidak menerima nama atau tag itu. Coba kata lain (tanpa tautan).",
+  "Add a voice someone sent you as a code (it starts with “OB”)": "Tambahkan suara yang dikirimkan seseorang kepada Anda sebagai kode (dimulai dengan “OB”)",
+  "Add “{name}”?": "Tambahkan “{name}”?",
+  "That isn't a voice code (they start with “OB”).": "Itu bukan kode suara (dimulai dengan “OB”)."
 }

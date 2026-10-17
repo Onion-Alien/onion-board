@@ -229,6 +229,46 @@ def can_share(payload: dict) -> bool:
         else bool(d.get("mix")) if payload["kind"] == "ai" else bool(d))
 
 
+# ---------------------------------------------------------------- share codes
+# Any of your voices or setups as a line of text to paste to a friend: what sharing it
+# to the store would send, {"k": kind, "n": name, "d": data, "m"?: emoji}, packed as
+# savedvoices' codes under "OB2-", and read back through voice_from (the checks a voice
+# from the store gets). A voice changer voice is still an "OB1-" code, which every
+# version reads; an older version told an "OB2-" one says to update.
+CODE_VERSION = 2
+_CODE_ID = "0" * store.ID_LEN   # (voice_from checks a store id: a code has none)
+
+
+def share_code(payload: dict) -> str:
+    """A payload from pack_fx / pack_ai / pack_setup as a share code."""
+    d = payload.get("data") or {}
+    if payload["kind"] == "fx":
+        return savedvoices.pack_code({"n": payload["name"], "e": d.get("e") or {}}, 1)
+    obj = {"k": payload["kind"], "n": payload["name"], "d": d}
+    if payload.get("emoji"):
+        obj["m"] = payload["emoji"]
+    return savedvoices.pack_code(obj, CODE_VERSION)
+
+
+def read_code(text) -> tuple[Voice, list[str]]:
+    """(the voice, notes) from any share code, or savedvoices.CodeError. The voice is
+    checked as one from the store is; what this version can't use is left out."""
+    version, data = savedvoices.unpack_code(text, CODE_VERSION)
+    if version == 1:
+        name, effects, notes = savedvoices.read_code(text)
+        return Voice(id="", kind="fx", name=plain(name, MAX_NAME) or _("Shared voice"),
+                     effects=effects), notes
+    if not isinstance(data.get("n"), str) or not isinstance(data.get("d"), dict):
+        raise savedvoices.CodeError(_("That code is damaged: it doesn't hold a voice."))
+    v = voice_from({"id": _CODE_ID, "kind": data.get("k"), "data": data["d"],
+                    "name": plain(data["n"], MAX_NAME) or _("Shared voice"),
+                    "emoji": data.get("m")})
+    if v is None:
+        raise savedvoices.CodeError(_("That code is damaged: it doesn't hold a voice."))
+    v.id = ""
+    return v, savedvoices.unknown_note(v.unknown)
+
+
 # ---------------------------------------------------------------- the store's calls
 
 def _why(code: int, err: str) -> str:

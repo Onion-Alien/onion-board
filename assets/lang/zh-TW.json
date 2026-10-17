@@ -1538,7 +1538,6 @@
   "About it": "關於它",
   "Accurate (small.en)": "準確（small.en）",
   "Add a voice server": "新增語音伺服器",
-  "Add a voice someone sent you as a code (it starts with “OB1-”)": "添加某人發送給您的語音作為代碼（以“OB1-”開頭）",
   "Add the voice “{name}”?<br><br>Effects: {effects}": "新增語音“{name}”？<br><br>效果： {effects}",
   "Add to Sounds": "添加到聲音",
   "Add voices": "添加聲音",
@@ -1972,7 +1971,6 @@
   "That drive is read-only.": "該驅動器是唯讀的。",
   "That isn't a Myinstants sound link.": "這不是 Myinstants 聲音連結。",
   "That isn't a proxy address: it should look like socks5h://127.0.0.1:9050 or http://host:8080": "這不是代理位址：它應該看起來像socks5h://127.0.0.1:9050 或http://host:8080",
-  "That isn't a voice code (they start with “OB1-”).": "這不是語音代碼（它們以“OB1-”開頭）。",
   "That mic isn't plugged in (or Windows doesn't list it).": "此麥克風未插入（或 Windows 未列出它）。",
   "That needs signing in to the site, which Onion Board doesn't do.": "這需要登入網站，但 Onion Board 不這樣做。",
   "That program isn't running any more.": "該程式不再運行。",
@@ -3678,5 +3676,8 @@
     "Onion Board 啟動以來遇到了 {n} 個問題。"
   ],
   "See report": "查看報告",
-  "The store doesn't take that name or those tags. Try other words (and no links).": "商店不接受這個名稱或標籤。換些詞試試（也不要連結）。"
+  "The store doesn't take that name or those tags. Try other words (and no links).": "商店不接受這個名稱或標籤。換些詞試試（也不要連結）。",
+  "Add a voice someone sent you as a code (it starts with “OB”)": "添加某人發送給您的語音作為代碼（以“OB”開頭）",
+  "Add “{name}”?": "新增「{name}」？",
+  "That isn't a voice code (they start with “OB”).": "這不是語音代碼（它們以“OB”開頭）。"
 }

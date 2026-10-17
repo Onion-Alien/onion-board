@@ -1581,7 +1581,6 @@
   "About it": "इसके बारे में",
   "Accurate (small.en)": "सटीक (छोटा.en)",
   "Add a voice server": "वॉइस सर्वर जोड़ें",
-  "Add a voice someone sent you as a code (it starts with “OB1-”)": "वह आवाज़ जोड़ें जो किसी ने आपको कोड के रूप में भेजी है (यह \"OB1-\" से शुरू होती है)",
   "Add the voice “{name}”?<br><br>Effects: {effects}": "आवाज़ \"{name}\" जोड़ें?<br><br> प्रभाव: {effects}",
   "Add to Sounds": "ध्वनि में जोड़ें",
   "Add voices": "आवाजें जोड़ें",
@@ -2019,7 +2018,6 @@
   "That drive is read-only.": "वह ड्राइव केवल पढ़ने के लिए है.",
   "That isn't a Myinstants sound link.": "वह Myinstants ध्वनि लिंक नहीं है।",
   "That isn't a proxy address: it should look like socks5h://127.0.0.1:9050 or http://host:8080": "यह कोई प्रॉक्सी पता नहीं है: इसे socks5h://127.0.0.1:9050 या http://host:8080 जैसा दिखना चाहिए",
-  "That isn't a voice code (they start with “OB1-”).": "वह ध्वनि कोड नहीं है (वे \"OB1-\" से शुरू होते हैं)।",
   "That mic isn't plugged in (or Windows doesn't list it).": "वह माइक प्लग इन नहीं है (या विंडोज़ उसे सूचीबद्ध नहीं करता है)।",
   "That needs signing in to the site, which Onion Board doesn't do.": "इसके लिए साइट पर साइन इन करना आवश्यक है, जो कि ओनियन बोर्ड नहीं करता है।",
   "That program isn't running any more.": "वह प्रोग्राम अब नहीं चल रहा है.",
@@ -3757,5 +3755,8 @@
     "शुरू होने के बाद से Onion Board में {n} समस्याएँ आईं।"
   ],
   "See report": "रिपोर्ट देखें",
-  "The store doesn't take that name or those tags. Try other words (and no links).": "स्टोर यह नाम या ये टैग नहीं लेता। दूसरे शब्द आज़माएं (और कोई लिंक नहीं)।"
+  "The store doesn't take that name or those tags. Try other words (and no links).": "स्टोर यह नाम या ये टैग नहीं लेता। दूसरे शब्द आज़माएं (और कोई लिंक नहीं)।",
+  "Add a voice someone sent you as a code (it starts with “OB”)": "वह आवाज़ जोड़ें जो किसी ने आपको कोड के रूप में भेजी है (यह \"OB\" से शुरू होती है)",
+  "Add “{name}”?": "“{name}” जोड़ें?",
+  "That isn't a voice code (they start with “OB”).": "वह ध्वनि कोड नहीं है (वे \"OB\" से शुरू होते हैं)।"
 }

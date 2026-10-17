@@ -1534,7 +1534,6 @@
   "About it": "Mengenainya",
   "Accurate (small.en)": "Tepat (small.en)",
   "Add a voice server": "Tambahkan pelayan suara",
-  "Add a voice someone sent you as a code (it starts with “OB1-”)": "Tambahkan suara yang dihantar seseorang kepada anda sebagai kod (ia bermula dengan \"OB1-\")",
   "Add the voice “{name}”?<br><br>Effects: {effects}": "Tambahkan suara \"{name}\"?<br><br> Kesan: {effects}",
   "Add to Sounds": "Tambahkan pada Bunyi",
   "Add voices": "Tambahkan suara",
@@ -1970,7 +1969,6 @@
   "That drive is read-only.": "Pemacu itu adalah baca sahaja.",
   "That isn't a Myinstants sound link.": "Itu bukan pautan bunyi Myinstants.",
   "That isn't a proxy address: it should look like socks5h://127.0.0.1:9050 or http://host:8080": "Itu bukan alamat proksi: ia sepatutnya kelihatan seperti socks5h://127.0.0.1:9050 atau http://host:8080",
-  "That isn't a voice code (they start with “OB1-”).": "Itu bukan kod suara (ia bermula dengan \"OB1-\").",
   "That mic isn't plugged in (or Windows doesn't list it).": "Mikrofon itu tidak dipalamkan (atau Windows tidak menyenaraikannya).",
   "That needs signing in to the site, which Onion Board doesn't do.": "Itu perlu log masuk ke tapak, yang tidak dilakukan oleh Onion Board.",
   "That program isn't running any more.": "Program itu tidak berjalan lagi.",
@@ -3678,5 +3676,8 @@
     "Onion Board menghadapi {n} masalah sejak dibuka."
   ],
   "See report": "Lihat laporan",
-  "The store doesn't take that name or those tags. Try other words (and no links).": "Kedai tidak menerima nama atau tag itu. Cuba perkataan lain (tanpa pautan)."
+  "The store doesn't take that name or those tags. Try other words (and no links).": "Kedai tidak menerima nama atau tag itu. Cuba perkataan lain (tanpa pautan).",
+  "Add a voice someone sent you as a code (it starts with “OB”)": "Tambahkan suara yang dihantar seseorang kepada anda sebagai kod (ia bermula dengan \"OB\")",
+  "Add “{name}”?": "Tambah “{name}”?",
+  "That isn't a voice code (they start with “OB”).": "Itu bukan kod suara (ia bermula dengan \"OB\")."
 }
