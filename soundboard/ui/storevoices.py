@@ -322,7 +322,11 @@ class ShareVoiceDialog(QDialog):
 
 
 def open_share(parent: QWidget, install: str, hooks: VoiceHooks, pick: str = ""):
-    """The Share a voice window, or a line saying there's nothing to share yet."""
+    """The Share a voice window, or a line saying there's nothing to share yet (or that
+    the store's down)."""
+    if store.is_down():
+        busy.toast(parent, html.escape(store.down_share()), "warn")
+        return None
     items = hooks.shareable()
     if not items:
         busy.toast(parent, html.escape(_("Make a voice of your own first: Voice tab → "

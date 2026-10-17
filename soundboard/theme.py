@@ -194,6 +194,7 @@ QPushButton#primary { background:$accent; border:none; color:$on_accent; font-we
 QPushButton[guide="true"] { font-size:11pt; padding:9px 20px; border-radius:10px; }
 QPushButton#primary:hover { background:$accent_hover; }
 QPushButton#primary:focus { border:1px solid $text_hi; }
+QWidget#storebar QPushButton#primary:disabled { background:$btn; color:$muted; }   /* the store's down */
 QFrame#soundstoolbar { background:$panel; background-image:none; border:none;
     border-radius:12px; }
 QFrame#soundstoolbar QLabel, QFrame#soundstoolbar QSlider { background:transparent; }
