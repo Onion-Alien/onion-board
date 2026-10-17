@@ -7,10 +7,11 @@ from __future__ import annotations
 import html
 
 import math
+import re
 from contextlib import contextmanager
 
 from PySide6.QtCore import QEvent, QObject, QPoint, QRect, QRectF, QSize, Qt, QTimer, Signal
-from PySide6.QtGui import QColor, QFont, QPainter, QPainterPath, QRegion
+from PySide6.QtGui import QColor, QFont, QPainter, QPainterPath, QRegion, QValidator
 from shiboken6 import isValid as qt_valid
 from PySide6.QtWidgets import (QApplication, QBoxLayout, QCheckBox, QComboBox, QFrame, QGridLayout,
                                QHBoxLayout, QLabel, QLayout, QListWidget, QPushButton,
@@ -759,11 +760,28 @@ class _Pct(QSpinBox):
     """The typeable %: as wide as its longest value in the font the theme gives it
     (known only once styled: "1000 %" in Retro 98's Tahoma didn't fit a fixed 58 px).
     Typing sets the volume once, on Enter or leaving it: as each digit came in,
-    "150" went 1 %, 15 %, 150 % (a dip on a live mic) and saved three times."""
+    "150" went 1 %, 15 %, 150 % (a dip on a live mic) and saved three times.
+    A number past either end is capped there on Enter: Qt's own check dropped the key
+    that took it out of range, so "5000" set 500 %, "9999" 999 % and "-50" +50 %."""
 
     def __init__(self):
         super().__init__()
         self.setKeyboardTracking(False)
+
+    def _typed(self, text: str) -> str:
+        return text.removesuffix(self.suffix()).strip()
+
+    def validate(self, text, pos):
+        state, text, pos = super().validate(text, pos)
+        if state == QValidator.State.Invalid and re.fullmatch(r"-?\d{0,6}", self._typed(text)):
+            state = QValidator.State.Intermediate   # fixup() caps it on Enter
+        return state, text, pos
+
+    def fixup(self, text):
+        num = self._typed(text)
+        if re.fullmatch(r"-?\d{1,6}", num):
+            return self.textFromValue(min(max(int(num), self.minimum()), self.maximum()))
+        return super().fixup(text)
 
     def changeEvent(self, e):
         super().changeEvent(e)
