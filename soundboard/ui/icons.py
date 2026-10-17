@@ -139,8 +139,8 @@ def _volume(p, fill):
     body.quadTo(QPointF(2.6, 9.2), QPointF(3.6, 9.2))
     body.closeSubpath()
     fill(body)
-    p.drawArc(QRectF(11, 8, 6, 8), -60 * 16, 120 * 16)
-    p.drawArc(QRectF(11, 4.5, 10, 15), -60 * 16, 120 * 16)
+    p.drawArc(QRectF(11, 8, 6, 8), -75 * 16, 150 * 16)
+    p.drawArc(QRectF(11, 4.5, 10, 15), -75 * 16, 150 * 16)
 
 
 def _volume_off(p, fill):
@@ -876,7 +876,153 @@ def _chat(p, fill):
     p.drawLine(QPointF(7.5, 12.3), QPointF(13, 12.3))
 
 
+# the Store's categories (its Category dropdown)
+
+def _face(p, fill):
+    p.drawEllipse(QPointF(12, 12), 9, 9)
+
+
+def _dots(fill, *points, r=1.3):
+    path = QPainterPath()
+    for x, y in points:
+        path.addEllipse(QPointF(x, y), r, r)
+    fill(path)
+
+
+def _laugh(p, fill):
+    """Memes: a face laughing, eyes shut, mouth wide open."""
+    _face(p, fill)
+    p.drawPolyline([QPointF(7.5, 10), QPointF(9, 8.5), QPointF(10.5, 10)])
+    p.drawPolyline([QPointF(13.5, 10), QPointF(15, 8.5), QPointF(16.5, 10)])
+    mouth = QPainterPath(QPointF(7.5, 13))
+    mouth.arcTo(QRectF(7.5, 8.5, 9, 9), 180, 180)
+    mouth.closeSubpath()
+    fill(mouth)
+
+
+def _wow(p, fill):
+    """Reactions: a surprised face, its mouth an O."""
+    _face(p, fill)
+    _dots(fill, (9, 9.5), (15, 9.5))
+    p.drawEllipse(QPointF(12, 15.5), 1.8, 2.2)
+
+
+def _wink(p, fill):
+    """Pranks: a cheeky face, winking with its tongue out."""
+    _face(p, fill)
+    _dots(fill, (9, 9.5))
+    p.drawLine(QPointF(13.5, 9.5), QPointF(16.5, 9.5))
+    p.drawArc(QRectF(7.5, 9, 9, 7), 200 * 16, 140 * 16)
+    tongue = QPainterPath(QPointF(12, 15.4))
+    tongue.arcTo(QRectF(12, 13.6, 3.6, 4.4), 180, 180)
+    tongue.closeSubpath()
+    fill(tongue)
+
+
+def _clapper(p, fill):
+    """Movies: a clapperboard, its top swung open."""
+    p.drawRoundedRect(QRectF(3, 10, 18, 10.5), 1.5, 1.5)
+    p.save()
+    p.translate(3, 10)
+    p.rotate(-12)
+    p.drawRect(QRectF(0, -4.5, 18, 4.5))
+    p.drawLine(QPointF(5, -4.5), QPointF(7.5, 0))
+    p.drawLine(QPointF(10.5, -4.5), QPointF(13, 0))
+    p.restore()
+
+
+def _tv(p, fill):
+    """TV: an old set with rabbit ears."""
+    p.drawRoundedRect(QRectF(2.5, 8, 19, 12.5), 2.5, 2.5)
+    p.drawPolyline([QPointF(8, 3), QPointF(12, 8), QPointF(16, 3)])
+
+
+def _ball(p, fill):
+    """Sports: a basketball and its seams."""
+    p.drawEllipse(QPointF(12, 12), 9, 9)
+    p.drawLine(QPointF(12, 3), QPointF(12, 21))
+    p.drawLine(QPointF(3, 12), QPointF(21, 12))
+    p.drawArc(QRectF(-1.5, 4.5, 12, 15), -75 * 16, 150 * 16)
+    p.drawArc(QRectF(13.5, 4.5, 12, 15), 105 * 16, 150 * 16)
+
+
+def _flame(p, fill):
+    """Viral: a flame with a small one inside."""
+    path = QPainterPath(QPointF(12, 2.5))
+    path.cubicTo(QPointF(15, 6), QPointF(19, 9.5), QPointF(19, 14.5))
+    path.cubicTo(QPointF(19, 18.5), QPointF(16, 21.5), QPointF(12, 21.5))
+    path.cubicTo(QPointF(8, 21.5), QPointF(5, 18.5), QPointF(5, 14.5))
+    path.cubicTo(QPointF(5, 11.5), QPointF(6.5, 9.5), QPointF(8, 8))
+    path.cubicTo(QPointF(8.5, 10), QPointF(9.5, 11), QPointF(10.5, 11.5))
+    path.cubicTo(QPointF(10, 8), QPointF(10.5, 5), QPointF(12, 2.5))
+    p.drawPath(path)
+    inner = QPainterPath(QPointF(12, 18.5))
+    inner.cubicTo(QPointF(10.5, 18.5), QPointF(9.5, 17.3), QPointF(10, 16))
+    inner.cubicTo(QPointF(10.4, 15), QPointF(11.5, 14.4), QPointF(12, 13.3))
+    inner.cubicTo(QPointF(12.8, 14.4), QPointF(14.3, 15.4), QPointF(14, 16.7))
+    inner.cubicTo(QPointF(13.8, 17.8), QPointF(13, 18.5), QPointF(12, 18.5))
+    fill(inner)
+
+
+def _columns(p, fill):
+    """Politics: a hall with a pointed roof on three columns."""
+    roof = QPainterPath(QPointF(3, 8.5))
+    roof.lineTo(12, 3)
+    roof.lineTo(21, 8.5)
+    roof.closeSubpath()
+    p.drawPath(roof)
+    for x in (7, 12, 17):
+        p.drawLine(QPointF(x, 11.5), QPointF(x, 17.5))
+    p.drawLine(QPointF(3, 20.5), QPointF(21, 20.5))
+
+
+def _trophy(p, fill):
+    """Esports: a cup with handles on a stand."""
+    cup = QPainterPath(QPointF(7, 3.5))
+    cup.lineTo(7, 8)
+    cup.cubicTo(QPointF(7, 11.5), QPointF(9.5, 13.5), QPointF(12, 13.5))
+    cup.cubicTo(QPointF(14.5, 13.5), QPointF(17, 11.5), QPointF(17, 8))
+    cup.lineTo(17, 3.5)
+    cup.closeSubpath()
+    p.drawPath(cup)
+    left = QPainterPath(QPointF(7, 5.5))
+    left.cubicTo(QPointF(3, 5.5), QPointF(3, 10.5), QPointF(7.6, 10.5))
+    right = QPainterPath(QPointF(17, 5.5))
+    right.cubicTo(QPointF(21, 5.5), QPointF(21, 10.5), QPointF(16.4, 10.5))
+    p.drawPath(left)
+    p.drawPath(right)
+    p.drawLine(QPointF(12, 13.5), QPointF(12, 20.5))
+    p.drawLine(QPointF(8, 20.5), QPointF(16, 20.5))
+
+
+def _ghost(p, fill):
+    """Spooky: a ghost with a wavy hem."""
+    path = QPainterPath(QPointF(5, 20.5))
+    path.lineTo(5, 11)
+    path.cubicTo(QPointF(5, 6), QPointF(8, 3), QPointF(12, 3))
+    path.cubicTo(QPointF(16, 3), QPointF(19, 6), QPointF(19, 11))
+    path.lineTo(19, 20.5)
+    for pt in ((16.7, 18.5), (14.3, 20.5), (12, 18.5), (9.7, 20.5), (7.3, 18.5)):
+        path.lineTo(*pt)
+    path.closeSubpath()
+    p.drawPath(path)
+    _dots(fill, (9.5, 10.5), (14.5, 10.5), r=1.4)
+
+
+def _robot(p, fill):
+    """AI voices: a robot's head with an antenna."""
+    p.drawRoundedRect(QRectF(4, 8, 16, 12), 3, 3)
+    p.drawLine(QPointF(12, 8), QPointF(12, 5))
+    p.drawLine(QPointF(2, 12), QPointF(2, 16))
+    p.drawLine(QPointF(22, 12), QPointF(22, 16))
+    _dots(fill, (12, 3.6), (9, 13), (15, 13), r=1.4)
+    p.drawLine(QPointF(10, 16.8), QPointF(14, 16.8))
+
+
 SHAPES = {
+    "laugh": _laugh, "wow": _wow, "wink": _wink, "clapper": _clapper, "tv": _tv,
+    "ball": _ball, "flame": _flame, "columns": _columns, "trophy": _trophy,
+    "ghost": _ghost, "robot": _robot,
     "bun": _bun,
     "youtube": _youtube, "ytmusic": _ytmusic, "soundcloud": _soundcloud,
     "tiktok": _tiktok, "myinstants": _myinstants,

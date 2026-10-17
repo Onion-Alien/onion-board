@@ -651,17 +651,21 @@ class StoreTab(QWidget):
             self._fetch_cats()
             return
         from soundboard.ui.storevoices import kind_chips
-        self._fill_cats([(key, text, storelook.KIND_EMOJI.get(key, "✨"))
+        self._fill_cats([(key, text, storelook.KIND_ICON.get(key, storelook.ALL_ICON))
                          for key, text in kind_chips() if key])
         self._show_picked(self._kind)
 
     def _fill_cats(self, items: list[tuple[str, str, str]]):
-        """"All categories", then (key, text, emoji) for each."""
+        """"All categories", then (key, text, icon name) for each."""
         self.cat_pick.clear()
-        self.cat_pick.addItem(storelook.emoji_icon("✨"), _("All categories"), "")
-        for key, text, emoji in items:
-            self.cat_pick.addItem(storelook.emoji_icon(emoji), text, key)
+        self.cat_pick.addItem(_("All categories"), "")
+        for key, text, _icon in items:
+            self.cat_pick.addItem(text, key)
+        icons.set_item_icons(self.cat_pick, [storelook.ALL_ICON] + [i for _k, _t, i in items])
         wheelguard.snug_combo(self.cat_pick)
+        # the list as wide as its longest name (+ padding and scroll bar), never cut off
+        view = self.cat_pick.view()
+        view.setMinimumWidth(view.sizeHintForColumn(0) + 40)
         if self._one_row is not None:   # (its width changed: still room for one row?)
             self._fit_toolbar()
 
@@ -682,7 +686,7 @@ class StoreTab(QWidget):
         cats, _total = got
         # the name, then how many (a number needs no words)
         self._fill_cats([(key, f"{store.cat_name(key)}  {count_text(n)}",
-                          storelook.CAT_EMOJI.get(key, "✨")) for key, n in cats])
+                          storelook.CAT_ICON.get(key, storelook.ALL_ICON)) for key, n in cats])
         self._show_picked(self._cat)
 
     def _say(self, icon: str, title: str, text: str, button: str = "",
