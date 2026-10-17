@@ -39,7 +39,7 @@
     watch: ["https://github.com/Onion-Alien/onion-watch/releases/latest/download/OnionWatch-Installer.exe", "download-watch-board-site-nav"]
   };
   var tabs = $$(".switch [role=tab]"), pill = $(".switch .pill"), panels = $$(".panel");
-  var brandImg = $(".brand img"), brandName = $("[data-name]"), miniDl = $(".mini-dl");
+  var brand = $(".brand"), brandName = $("[data-name]"), miniDl = $(".mini-dl");
   var favicons = $$("link[rel=icon]");
   favicons.forEach(function (l) { l.setAttribute("data-board-href", l.getAttribute("href")); });
 
@@ -62,13 +62,13 @@
       t.tabIndex = on ? 0 : -1;
     });
     panels.forEach(function (p) { p.classList.toggle("on", p.dataset.panel === name); });
-    brandImg.src = brandImg.getAttribute("data-" + name + "-src");
+    $$(".brand .logo").forEach(function (l) { l.toggleAttribute("hidden", l.getAttribute("data-logo") !== name); });
     brandName.textContent = name === "watch" ? "Onion Watch" : "Onion Board";
     miniDl.href = NAV_DL[name][0];
     miniDl.setAttribute("data-goatcounter-click", NAV_DL[name][1]);
     document.title = TITLES[name];
     favicons.forEach(function (l) {       // the browser tab shows Bun or Hoot too
-      l.href = name === "watch" ? brandImg.getAttribute("data-watch-src") : l.getAttribute("data-board-href");
+      l.href = name === "watch" ? brand.getAttribute("data-watch-icon") : l.getAttribute("data-board-href");
     });
     placePill();
     onScroll();
@@ -105,7 +105,7 @@
       if (e.target.classList.contains("mascot")) p.classList.remove("enter");
     });
   });
-  new Image().src = brandImg.getAttribute("data-watch-src");   // no blank logo on the first switch
+  new Image().src = brand.getAttribute("data-watch-icon");   // no blank tab icon on the first switch
   window.addEventListener("resize", placePill);
   if (document.fonts && document.fonts.ready) document.fonts.ready.then(placePill);
 

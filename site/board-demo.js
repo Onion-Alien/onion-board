@@ -6,6 +6,13 @@
   "use strict";
   var D = window.ONION_BOARD_DATA, site = window.onionSite || {};
   if (!D) return;
+  // a few line icons the app paints that the data has no copy of yet
+  var EXTRA = {
+    globe: '<g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c2.5 2.6 3.8 5.6 3.8 9s-1.3 6.4-3.8 9c-2.5-2.6-3.8-5.6-3.8-9S9.5 5.6 12 3z"/></g>',
+    chev: '<path d="M9 6l6 6-6 6" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>',
+    grid: '<g fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><rect x="4" y="4" width="6.5" height="6.5" rx="1.5"/><rect x="13.5" y="4" width="6.5" height="6.5" rx="1.5"/><rect x="4" y="13.5" width="6.5" height="6.5" rx="1.5"/><rect x="13.5" y="13.5" width="6.5" height="6.5" rx="1.5"/></g>'
+  };
+  Object.keys(EXTRA).forEach(function (k) { if (!D.icons[k]) D.icons[k] = EXTRA[k]; });
   var DL = "https://github.com/Onion-Alien/onion-board/releases/latest/download/OnionBoardSetup.exe";
 
   // ------------------------------------------------------------------ helpers
@@ -35,6 +42,11 @@
     var b = h("button", Object.assign({ type: "button", class: "btn " + (cls || ""), onclick: onclick }, attrs || {}));
     if (iconName) b.appendChild(icon(iconName, "s"));
     if (label) b.appendChild(h("span", { class: "t", text: label }));
+    return b;
+  }
+  function recBtn(cls, onclick) {
+    var b = btn("rec " + (cls || ""), "Record", null, onclick);
+    b.insertBefore(h("span", { class: "dotr" }), b.firstChild);
     return b;
   }
   function dd(b) { b.appendChild(icon("next", "dd")); b.lastChild.style.transform = "rotate(90deg)"; return b; }
@@ -157,6 +169,7 @@
     S.theme = D.themes[name] ? name : "Dark";
     Object.keys(t).forEach(function (k) { root.style.setProperty("--" + k, t[k]); });
     Array.prototype.forEach.call(root.querySelectorAll(".ob-theme"), function (b) { b.setAttribute("aria-pressed", b.dataset.name === S.theme ? "true" : "false"); });
+    if (R.repaint) R.repaint();
   }
 
   // One way of saying "the real app does this": the same toast everywhere.
@@ -755,50 +768,382 @@
   }
 
   // ------------------------------------------------------------------ Radio
-  var STATIONS = [
-    ["🇺🇸", "Lofi Hip Hop Radio", "Lo-fi · United States", "Lo-fi"], ["🇬🇧", "BBC Radio 1", "Pop · United Kingdom", "Pop"],
-    ["🇫🇷", "FIP", "Jazz · France", "Jazz"], ["🇯🇵", "J-Pop Powerplay", "Pop · Japan", "Pop"],
-    ["🇩🇪", "Rock Antenne", "Rock · Germany", "Rock"], ["🇧🇷", "Rádio Funk", "Dance · Brazil", "Dance"],
-    ["🇳🇱", "Radio 538", "Dance · Netherlands", "Dance"], ["🇨🇦", "CBC Music", "Classical · Canada", "Classical"],
-    ["🇦🇺", "triple j", "Rock · Australia", "Rock"], ["🇮🇹", "Radio Monte Carlo", "Jazz · Italy", "Jazz"],
-    ["🇺🇸", "NPR News", "News · United States", "News"], ["🇰🇷", "K-Pop Hits", "Pop · South Korea", "Pop"],
-    ["🇸🇪", "Synthwave Sverige", "Electronic · Sweden", "Electronic"], ["🇮🇪", "RTÉ Gold", "Oldies · Ireland", "Oldies"]
+  // The Radio tab (ui/radiopanel.py): the app's flat world map (ui/flatmap.py, the same
+  // outlines) with a dot per station, and the list beside it. Made-up stations: nothing
+  // streams here, clicking one shows what the app does and points to the download.
+  var CITIES = [
+    ["US", "United States", "New York", 40.7, -74, ["Pop", "Hip-hop", "News & Talk"]], ["US", "United States", "Los Angeles", 34.1, -118.2, ["Hip-hop", "Pop", "Chill"]],
+    ["US", "United States", "Nashville", 36.2, -86.8, ["Country & Folk", "Rock"]], ["US", "United States", "Chicago", 41.9, -87.6, ["Jazz & Soul", "Dance"]],
+    ["US", "United States", "Seattle", 47.6, -122.3, ["Rock", "Chill"]], ["US", "United States", "Miami", 25.8, -80.2, ["Latin", "Dance"]],
+    ["US", "United States", "New Orleans", 30, -90.1, ["Jazz & Soul"]], ["US", "United States", "Denver", 39.7, -105, ["Chill", "Rock"]],
+    ["CA", "Canada", "Toronto", 43.7, -79.4, ["Pop", "Classical"]], ["CA", "Canada", "Montréal", 45.5, -73.6, ["Jazz & Soul", "News & Talk"]],
+    ["CA", "Canada", "Vancouver", 49.3, -123.1, ["Chill", "Rock"]], ["MX", "Mexico", "Mexico City", 19.4, -99.1, ["Latin", "Pop"]],
+    ["JM", "Jamaica", "Kingston", 18, -76.8, ["Reggae"]], ["CU", "Cuba", "Havana", 23.1, -82.4, ["Latin", "Jazz & Soul"]],
+    ["BR", "Brazil", "São Paulo", -23.6, -46.6, ["Dance", "Latin"]], ["BR", "Brazil", "Rio de Janeiro", -22.9, -43.2, ["Latin", "Chill"]],
+    ["AR", "Argentina", "Buenos Aires", -34.6, -58.4, ["Latin", "Rock"]], ["CO", "Colombia", "Bogotá", 4.7, -74.1, ["Latin", "Pop"]],
+    ["CL", "Chile", "Santiago", -33.4, -70.7, ["Rock", "News & Talk"]], ["PE", "Peru", "Lima", -12, -77, ["Latin"]],
+    ["GB", "United Kingdom", "London", 51.5, -0.1, ["Pop", "Dance", "News & Talk"]], ["GB", "United Kingdom", "Manchester", 53.5, -2.2, ["Rock", "Dance"]],
+    ["IE", "Ireland", "Dublin", 53.3, -6.3, ["Oldies", "Country & Folk"]], ["FR", "France", "Paris", 48.9, 2.4, ["Jazz & Soul", "Pop", "News & Talk"]],
+    ["FR", "France", "Marseille", 43.3, 5.4, ["Hip-hop"]], ["ES", "Spain", "Madrid", 40.4, -3.7, ["Pop", "Latin"]],
+    ["ES", "Spain", "Barcelona", 41.4, 2.2, ["Dance", "Chill"]], ["PT", "Portugal", "Lisbon", 38.7, -9.1, ["Country & Folk", "Chill"]],
+    ["DE", "Germany", "Berlin", 52.5, 13.4, ["Dance", "Rock"]], ["DE", "Germany", "Munich", 48.1, 11.6, ["Rock", "Classical"]],
+    ["NL", "Netherlands", "Amsterdam", 52.4, 4.9, ["Dance", "Pop"]], ["BE", "Belgium", "Brussels", 50.8, 4.4, ["News & Talk", "Pop"]],
+    ["IT", "Italy", "Rome", 41.9, 12.5, ["Pop", "Oldies"]], ["IT", "Italy", "Milan", 45.5, 9.2, ["Jazz & Soul", "Dance"]],
+    ["AT", "Austria", "Vienna", 48.2, 16.4, ["Classical"]], ["CH", "Switzerland", "Zürich", 47.4, 8.5, ["Chill", "Classical"]],
+    ["SE", "Sweden", "Stockholm", 59.3, 18.1, ["Pop", "Dance"]], ["NO", "Norway", "Oslo", 59.9, 10.8, ["Rock"]],
+    ["FI", "Finland", "Helsinki", 60.2, 24.9, ["Rock", "Classical"]], ["DK", "Denmark", "Copenhagen", 55.7, 12.6, ["Chill"]],
+    ["PL", "Poland", "Warsaw", 52.2, 21, ["Pop", "Rock"]], ["CZ", "Czechia", "Prague", 50.1, 14.4, ["Classical", "Oldies"]],
+    ["GR", "Greece", "Athens", 38, 23.7, ["Pop", "Country & Folk"]], ["TR", "Turkey", "Istanbul", 41, 29, ["Pop", "Country & Folk"]],
+    ["UA", "Ukraine", "Kyiv", 50.5, 30.5, ["Pop", "News & Talk"]], ["RU", "Russia", "Moscow", 55.8, 37.6, ["Dance", "Rock"]],
+    ["EG", "Egypt", "Cairo", 30, 31.2, ["Pop", "Country & Folk"]], ["MA", "Morocco", "Casablanca", 33.6, -7.6, ["Country & Folk"]],
+    ["NG", "Nigeria", "Lagos", 6.5, 3.4, ["Hip-hop", "Dance"]], ["GH", "Ghana", "Accra", 5.6, -0.2, ["Hip-hop", "Reggae"]],
+    ["KE", "Kenya", "Nairobi", -1.3, 36.8, ["Pop", "News & Talk"]], ["ZA", "South Africa", "Johannesburg", -26.2, 28, ["Dance", "Jazz & Soul"]],
+    ["ZA", "South Africa", "Cape Town", -33.9, 18.4, ["Chill", "Rock"]], ["AE", "United Arab Emirates", "Dubai", 25.2, 55.3, ["Pop", "Chill"]],
+    ["IN", "India", "Mumbai", 19.1, 72.9, ["Pop", "Dance"]], ["IN", "India", "Delhi", 28.6, 77.2, ["Pop", "News & Talk"]],
+    ["TH", "Thailand", "Bangkok", 13.8, 100.5, ["Pop", "Chill"]], ["SG", "Singapore", "Singapore", 1.3, 103.8, ["Pop", "Jazz & Soul"]],
+    ["ID", "Indonesia", "Jakarta", -6.2, 106.8, ["Pop", "Dance"]], ["PH", "Philippines", "Manila", 14.6, 121, ["Pop", "Oldies"]],
+    ["VN", "Vietnam", "Hanoi", 21, 105.8, ["Pop"]], ["CN", "China", "Shanghai", 31.2, 121.5, ["Pop", "Classical"]],
+    ["HK", "Hong Kong", "Hong Kong", 22.3, 114.2, ["Pop", "Jazz & Soul"]], ["TW", "Taiwan", "Taipei", 25, 121.6, ["Pop", "Chill"]],
+    ["KR", "South Korea", "Seoul", 37.6, 127, ["Pop", "Hip-hop"]], ["JP", "Japan", "Tokyo", 35.7, 139.7, ["Pop", "Chill", "Rock"]],
+    ["JP", "Japan", "Osaka", 34.7, 135.5, ["Jazz & Soul", "Dance"]], ["AU", "Australia", "Sydney", -33.9, 151.2, ["Rock", "Pop"]],
+    ["AU", "Australia", "Melbourne", -37.8, 145, ["Dance", "Jazz & Soul"]], ["AU", "Australia", "Perth", -31.9, 115.9, ["Chill"]],
+    ["NZ", "New Zealand", "Auckland", -36.8, 174.8, ["Reggae", "Rock"]], ["IS", "Iceland", "Reykjavík", 64.1, -21.9, ["Chill", "Rock"]]
   ];
-  var radio = { genre: "All", q: "", on: null, stars: {} };
-  function radioPage() {
-    var list = h("div", { class: "ob-list ob-scroll" });
-    function draw() {
-      list.replaceChildren();
-      var q = radio.q.toLowerCase();
-      var rows = STATIONS.filter(function (s) {
-        return (radio.genre === "All" || (radio.genre === "★" ? radio.stars[s[1]] : s[3] === radio.genre)) &&
-               (!q || (s[1] + " " + s[2]).toLowerCase().indexOf(q) >= 0);
-      });
-      rows.forEach(function (s) {
-        var star = h("button", { type: "button", class: "btn flat icon small star" + (radio.stars[s[1]] ? " on" : ""), "aria-label": "Favourite", onclick: function (e) {
-          e.stopPropagation(); radio.stars[s[1]] = !radio.stars[s[1]]; draw();
-        } }, [icon(radio.stars[s[1]] ? "star_filled" : "star", "s")]);
-        list.appendChild(h("div", { class: "ob-st" + (radio.on === s[1] ? " on" : ""), onclick: function () {
-          radio.on = s[1]; draw(); tryIt("Live radio from around the world");
-        } }, [h("span", { class: "fl", text: s[0] }), h("span", { class: "tx" }, [h("b", { text: s[1] }), h("small", { text: s[2] })]), star]));
-      });
-      if (!rows.length) list.appendChild(h("div", { class: "ob-none", text: radio.genre === "★" ? "Star a station to keep it here." : "No stations match." }));
+  var KINDS = { "Pop": ["Hits", "Pop FM", "Top 40"], "Rock": ["Rock", "Classic Rock", "Alt Rock"], "Dance": ["Dance", "House Nation", "Club FM"],
+    "Hip-hop": ["Hip-Hop", "Beats", "Rap Radio"], "Jazz & Soul": ["Jazz", "Soul Café", "Blue Note"], "Classical": ["Classical", "Symphony", "Opera"],
+    "Chill": ["Lo-fi", "Chill", "Ambient"], "Oldies": ["Gold", "Oldies", "Retro"], "Country & Folk": ["Folk", "Country", "Roots"],
+    "Latin": ["Latina", "Salsa", "Ritmo"], "Reggae": ["Reggae", "Roots Rock", "Dub"], "News & Talk": ["News", "Talk", "Info"] };
+  var GENRES = ["Pop", "Rock", "Dance", "Hip-hop", "Jazz & Soul", "Classical", "Chill", "Oldies", "Country & Folk", "Latin", "Reggae", "News & Talk"];
+  var STATIONS = [];
+  CITIES.forEach(function (c, ci) {
+    c[5].forEach(function (g, gi) {
+      var k = KINDS[g][(ci + gi) % 3], city = c[2];
+      STATIONS.push({ cc: c[0], country: c[1], city: city, lat: c[3] + (gi ? (gi % 2 ? 0.7 : -0.8) : 0), lon: c[4] + (gi ? (gi % 2 ? -0.9 : 1) : 0),
+        genre: g, name: (ci + gi) % 2 ? city + " " + k : k + " " + city, kbps: [128, 320, 192, 128, 256][(ci * 3 + gi) % 5],
+        tags: [g.toLowerCase().replace(" & ", ", "), city.toLowerCase()].join(", "), votes: (ci * 7919 + gi * 3571) % 9000 + (gi ? 0 : 2000) });
+    });
+  });
+  STATIONS.sort(function (a, b) { return b.votes - a.votes; });
+  var radio = { list: "popular", genre: "All", q: "", country: "", quality: "", order: "", on: null, playing: false, stars: {}, recent: [],
+                view: null, toldPlay: false };
+
+  function hex2rgb(c) {
+    c = String(c).trim();
+    var m = /^#([0-9a-f]{3,8})$/i.exec(c);
+    if (m) {
+      var x = m[1].length < 6 ? m[1].replace(/./g, "$&$&") : m[1];
+      return [parseInt(x.slice(0, 2), 16), parseInt(x.slice(2, 4), 16), parseInt(x.slice(4, 6), 16)];
     }
+    m = /rgba?\(([^)]+)\)/.exec(c);
+    return m ? m[1].split(",").slice(0, 3).map(Number) : [128, 128, 128];
+  }
+  function mix(a, b, t, alpha) {
+    var x = hex2rgb(a), y = hex2rgb(b);
+    return "rgba(" + [0, 1, 2].map(function (i) { return Math.round(x[i] + (y[i] - x[i]) * t); }).join(",") + "," + (alpha === undefined ? 1 : alpha) + ")";
+  }
+  function themeVar(n) { return root.style.getPropertyValue("--" + n) || "#888"; }
+
+  // The flat map: drag (mouse or finger) moves it round the world, pinch or + / − zoom,
+  // a dot is a station. Drawn on a canvas only when something changes.
+  var LAT_TOP = 84, LAT_BOTTOM = -58;
+  var landPath = null;
+  function worldMap(onPick) {
+    var box = h("div", { class: "ob-map", role: "application", "aria-label": "World map of radio stations: drag to move, + and − to zoom" });
+    var cv = h("canvas", { "aria-hidden": "true" });
+    var tip = h("div", { class: "ob-maptip", hidden: true });
+    var V = radio.view || (radio.view = { cx: 12, cy: 22, zoom: 1 });
+    var W = 0, H = 0, dpr = 1, want = 0, shown = [], hover = null, fly = 0;
+    if (!landPath && D.map) landPath = new Path2D(D.map.d);
+    function scale() { return Math.max(W / 360, H / (LAT_TOP - LAT_BOTTOM)) * V.zoom; }
+    function clamp() {
+      V.zoom = Math.min(40, Math.max(1, V.zoom));
+      var s = scale(), half = H / s / 2;
+      V.cx = ((V.cx + 180) % 360 + 360) % 360 - 180;
+      var lo = LAT_BOTTOM + half, hi = LAT_TOP - half;
+      V.cy = lo <= hi ? Math.min(hi, Math.max(lo, V.cy)) : (LAT_TOP + LAT_BOTTOM) / 2;
+    }
+    function at(st) {   // a dot's spot: its copy of the world nearest the middle
+      var s = scale();
+      return [W / 2 + ((st.lon - V.cx + 540) % 360 - 180) * s, H / 2 - (st.lat - V.cy) * s];
+    }
+    function draw() {
+      want = 0;
+      if (!W || !H) return;
+      clamp();
+      var c = cv.getContext("2d"), s = scale(), bg = themeVar("bg"), text = themeVar("text"), accent = themeVar("accent");
+      c.setTransform(dpr, 0, 0, dpr, 0, 0);
+      c.fillStyle = mix(bg, accent, 0.06);
+      c.fillRect(0, 0, W, H);
+      if (landPath) {
+        c.fillStyle = mix(bg, text, 0.14);
+        c.strokeStyle = mix(bg, text, 0.3);
+        c.lineWidth = 0.8 / (s / 10);
+        c.lineJoin = "round";
+        [-360, 0, 360].forEach(function (k) {
+          var left = W / 2 + (k - 180 - V.cx) * s;
+          if (left > W || left + 360 * s < 0) return;
+          c.setTransform(dpr * s / 10, 0, 0, dpr * s / 10, dpr * (W / 2 + (k - V.cx) * s), dpr * (H / 2 + V.cy * s));
+          c.fill(landPath, "evenodd");
+          c.stroke(landPath);
+        });
+        c.setTransform(dpr, 0, 0, dpr, 0, 0);
+      }
+      // the stations: accent dots, the one playing ringed
+      var grow = Math.min(2, 1 + Math.log2(V.zoom) * 0.25);
+      c.fillStyle = mix(accent, accent, 0, 0.85);
+      shown.forEach(function (st) {
+        var p = at(st);
+        if (p[0] < -10 || p[0] > W + 10 || p[1] < -10 || p[1] > H + 10) return;
+        c.beginPath();
+        c.arc(p[0], p[1], (st === hover ? 4.6 : 3.3) * grow, 0, 7);
+        c.fill();
+      });
+      if (radio.on && shown.indexOf(radio.on) >= 0) {
+        var q = at(radio.on);
+        c.beginPath(); c.arc(q[0], q[1], 5.5 * grow, 0, 7); c.fillStyle = accent; c.fill();
+        c.beginPath(); c.arc(q[0], q[1], 9.5 * grow, 0, 7); c.strokeStyle = mix(accent, "#ffffff", 0.3); c.lineWidth = 2; c.stroke();
+      }
+      // the country names last, haloed in the land's colour, where they fit
+      var fs = Math.min(2.2, Math.max(1, 1 + 0.4 * Math.log2(Math.max(V.zoom, 1) / 1.5))) * 10.5;
+      c.font = "600 " + fs.toFixed(1) + "px " + getComputedStyle(root).fontFamily;
+      c.textAlign = "center"; c.textBaseline = "middle";
+      c.lineJoin = "round"; c.lineWidth = 3;
+      c.strokeStyle = mix(bg, text, 0.14); c.fillStyle = themeVar("text_hi");
+      var taken = [];
+      (D.map ? D.map.labels : []).slice().sort(function (a, b) { return b[3] - a[3]; }).forEach(function (l) {
+        var x = W / 2 + ((l[1] - V.cx + 540) % 360 - 180) * s, y = H / 2 - (l[2] - V.cy) * s;
+        if (x < -80 || x > W + 80 || y < -20 || y > H + 20) return;
+        var w = c.measureText(l[0]).width;
+        if (w > Math.max(l[3] * s * 1.25, 18)) return;
+        var b = [x - w / 2 - 3, y - fs / 2 - 2, x + w / 2 + 3, y + fs / 2 + 2];
+        if (taken.some(function (t) { return b[0] < t[2] && b[2] > t[0] && b[1] < t[3] && b[3] > t[1]; })) return;
+        taken.push(b);
+        c.strokeText(l[0], x, y);
+        c.fillText(l[0], x, y);
+      });
+    }
+    function redraw() { if (!want) want = requestAnimationFrame(draw); }
+    function size() {
+      var r = box.getBoundingClientRect();
+      dpr = Math.min(2, window.devicePixelRatio || 1);
+      W = Math.max(1, Math.round(r.width)); H = Math.max(1, Math.round(r.height));
+      cv.width = W * dpr; cv.height = H * dpr;
+      draw();
+    }
+    function nearest(x, y) {
+      var best = null, bd = 12 * 12;
+      shown.forEach(function (st) {
+        var p = at(st), d = (p[0] - x) * (p[0] - x) + (p[1] - y) * (p[1] - y);
+        if (d < bd) { bd = d; best = st; }
+      });
+      return best;
+    }
+    function zoomAt(f, x, y) {
+      var s0 = scale();
+      if (x === undefined) { x = W / 2; y = H / 2; }
+      var lon = V.cx + (x - W / 2) / s0, lat = V.cy - (y - H / 2) / s0;
+      V.zoom *= f; clamp();
+      var s1 = scale();
+      V.cx = lon - (x - W / 2) / s1; V.cy = lat + (y - H / 2) / s1;
+      redraw();
+    }
+    function flyTo(st) {
+      cancelAnimationFrame(fly);
+      var a = { cx: V.cx, cy: V.cy, zoom: V.zoom }, z = Math.max(V.zoom, 3), t0 = performance.now();
+      var dx = ((st.lon - a.cx + 540) % 360) - 180;
+      (function step(now) {
+        var t = Math.min(1, (now - t0) / 550), e = t < 0.5 ? 2 * t * t : 1 - Math.pow(-2 * t + 2, 2) / 2;
+        V.cx = a.cx + dx * e; V.cy = a.cy + (st.lat - a.cy) * e; V.zoom = a.zoom + (z - a.zoom) * e;
+        draw();
+        if (t < 1) fly = requestAnimationFrame(step);
+      })(t0);
+    }
+    // pointers: one drags, two pinch; a tap without moving picks the dot under it
+    var pts = {}, moved = false, pinch = 0;
+    function local(e) { var r = cv.getBoundingClientRect(); return [e.clientX - r.left, e.clientY - r.top]; }
+    cv.addEventListener("pointerdown", function (e) {
+      cv.setPointerCapture(e.pointerId);
+      pts[e.pointerId] = local(e);
+      moved = false; pinch = 0;
+      cancelAnimationFrame(fly);
+      box.classList.add("drag");
+    });
+    cv.addEventListener("pointermove", function (e) {
+      var p = local(e), ids = Object.keys(pts);
+      if (!pts[e.pointerId]) {      // hovering: the dot under the mouse, and its name
+        var st = nearest(p[0], p[1]);
+        if (st !== hover) { hover = st; redraw(); }
+        cv.style.cursor = st ? "pointer" : "";
+        if (st) {
+          tip.hidden = false;
+          tip.replaceChildren(h("b", { text: st.name }), h("span", { text: st.city + ", " + st.country + " · " + st.genre }));
+          tip.style.left = Math.min(p[0] + 12, W - tip.offsetWidth - 6) + "px";
+          tip.style.top = Math.max(6, p[1] - tip.offsetHeight - 10) + "px";
+        } else tip.hidden = true;
+        return;
+      }
+      tip.hidden = true;
+      var o = pts[e.pointerId];
+      if (ids.length >= 2) {
+        var other = pts[ids[0] === String(e.pointerId) ? ids[1] : ids[0]];
+        var d0 = Math.hypot(o[0] - other[0], o[1] - other[1]), d1 = Math.hypot(p[0] - other[0], p[1] - other[1]);
+        if (d0 > 4) zoomAt(d1 / d0, (p[0] + other[0]) / 2, (p[1] + other[1]) / 2);
+        pinch = 1; moved = true;
+      } else {
+        if (Math.abs(p[0] - o[0]) + Math.abs(p[1] - o[1]) > 1) moved = moved || Math.hypot(p[0] - o[0], p[1] - o[1]) > 4;
+        var s = scale();
+        V.cx -= (p[0] - o[0]) / s; V.cy += (p[1] - o[1]) / s;
+        redraw();
+      }
+      pts[e.pointerId] = p;
+    });
+    function up(e) {
+      if (!pts[e.pointerId]) return;
+      var p = local(e);
+      delete pts[e.pointerId];
+      if (!Object.keys(pts).length) box.classList.remove("drag");
+      if (!moved && !pinch && e.type === "pointerup") {
+        var st = nearest(p[0], p[1]);
+        if (st) { did("radio-dot"); onPick(st); }
+      }
+    }
+    cv.addEventListener("pointerup", up);
+    cv.addEventListener("pointercancel", up);
+    cv.addEventListener("pointerleave", function () { if (hover) { hover = null; redraw(); } tip.hidden = true; });
+    cv.addEventListener("dblclick", function (e) { var p = local(e); zoomAt(2, p[0], p[1]); });
+    // the wheel zooms only full screen or with Ctrl: on the page it scrolls the page
+    cv.addEventListener("wheel", function (e) {
+      if (!e.ctrlKey && !root.classList.contains("full")) return;
+      e.preventDefault();
+      var p = local(e);
+      zoomAt(e.deltaY < 0 ? 1.25 : 0.8, p[0], p[1]);
+    }, { passive: false });
+    var zin = h("button", { type: "button", class: "mapbtn", "aria-label": "Zoom in", title: "Zoom in", text: "+", onclick: function () { zoomAt(1.6); } });
+    var zout = h("button", { type: "button", class: "mapbtn", "aria-label": "Zoom out", title: "Zoom out", text: "−", onclick: function () { zoomAt(1 / 1.6); } });
+    box.append(cv, tip, h("div", { class: "zoom" }, [zin, zout]));
+    if ("ResizeObserver" in window) new ResizeObserver(size).observe(box);
+    else setTimeout(size, 0);
+    return { el: box, redraw: redraw, flyTo: flyTo, setShown: function (list) { shown = list; redraw(); } };
+  }
+
+  function ccColour(cc) {
+    var n = (cc.charCodeAt(0) * 31 + cc.charCodeAt(1) * 7) % 360;
+    return "hsl(" + n + ",38%,42%)";
+  }
+  function radioPage() {
+    var map, list = h("div", { class: "ob-list ob-scroll" }), count = h("div", { class: "cnt" }), help = h("div", { class: "hint ob-rhelp" });
+    function matches(s) {
+      var q = radio.q.trim().toLowerCase();
+      if (radio.list === "favs" && !radio.stars[s.name]) return false;
+      if (radio.list === "recent" && radio.recent.indexOf(s) < 0) return false;
+      if (radio.genre !== "All" && s.genre !== radio.genre) return false;
+      if (radio.country && s.country !== radio.country) return false;
+      if (radio.quality && s.kbps < +radio.quality) return false;
+      return !q || (s.name + " " + s.city + " " + s.country + " " + s.tags).toLowerCase().indexOf(q) >= 0;
+    }
+    function rows() {
+      var r = STATIONS.filter(matches);
+      if (radio.list === "recent") r.sort(function (a, b) { return radio.recent.indexOf(a) - radio.recent.indexOf(b); });
+      if (radio.order === "az") r.sort(function (a, b) { return a.name.localeCompare(b.name); });
+      if (radio.order === "kbps") r.sort(function (a, b) { return b.kbps - a.kbps; });
+      return r;
+    }
+    function draw() {
+      var r = rows();
+      list.replaceChildren();
+      r.forEach(function (s) {
+        var row = h("button", { type: "button", class: "ob-st" + (radio.on === s ? " on" : ""), title: s.name + "\n" + s.city + ", " + s.country, onclick: function () { pick(s, false); } },
+          [h("span", { class: "fl", style: "--cc:" + ccColour(s.cc), text: s.cc }),
+           h("span", { class: "tx" }, [h("b", { text: s.name }), h("small", { text: s.country + " · " + s.tags })]),
+           h("span", { class: "kbps" + (s.kbps >= 320 ? " hi" : ""), text: s.kbps + "k" })]);
+        list.appendChild(row);
+      });
+      if (!r.length) list.appendChild(h("div", { class: "ob-none", text: radio.list === "favs" ? "Star a station (the star by Play) to keep it here." :
+        radio.list === "recent" ? "Stations you play show up here." : "No stations match. Try other words." }));
+      count.textContent = r.length + (r.length === 1 ? " station" : " stations");
+      help.textContent = radio.list === "popular" && !radio.q ? r.length + " popular stations: click a dot on the map, or search. Click a station to play it."
+        : r.length + " stations: click one to play it.";
+      if (map) map.setShown(r);
+    }
+    function pick(s, fromMap) {
+      radio.on = s; radio.playing = true;
+      radio.recent = [s].concat(radio.recent.filter(function (x) { return x !== s; })).slice(0, 12);
+      if (!fromMap) map.flyTo(s); else map.redraw();
+      draw(); bar();
+      var row = list.querySelector(".ob-st.on");
+      if (row) row.scrollIntoView({ block: "nearest" });
+      if (!radio.toldPlay) { radio.toldPlay = true; tryIt("Live radio from 30,000 stations round the world"); }
+    }
+    map = worldMap(function (s) { pick(s, true); });
+    R.repaint = map.redraw;
+
+    // the list's own controls: Popular / Favorites / Recent, the genres, the filters
+    var seg = h("div", { class: "ob-seg" });
+    seg._i = { popular: 0, favs: 1, recent: 2 };
+    [["popular", "Popular", null], ["favs", "Favorites", "star"], ["recent", "Recent", null]].forEach(function (t) {
+      seg.appendChild(btn("", t[1], t[2], function () {
+        radio.list = t[0];
+        Array.prototype.forEach.call(seg.children, function (b, i) { b.setAttribute("aria-pressed", i === seg._i[t[0]] ? "true" : "false"); });
+        draw();
+      }, { "aria-pressed": radio.list === t[0] ? "true" : "false" }));
+    });
     var chips = h("div", { class: "chips" });
-    ["All", "★", "Pop", "Rock", "Lo-fi", "Jazz", "Dance", "Electronic", "News", "Classical", "Oldies"].forEach(function (g) {
-      chips.appendChild(h("button", { type: "button", class: "chip", "data-g": g, "aria-pressed": radio.genre === g ? "true" : "false", text: g === "★" ? "★ Favourites" : g, onclick: function () {
+    ["All"].concat(GENRES).forEach(function (g) {
+      chips.appendChild(h("button", { type: "button", class: "chip", "data-g": g, "aria-pressed": radio.genre === g ? "true" : "false", text: g, onclick: function () {
         radio.genre = g; Array.prototype.forEach.call(chips.children, function (c) { c.setAttribute("aria-pressed", c.dataset.g === g ? "true" : "false"); }); draw();
       } }));
     });
-    var find = h("input", { type: "search", placeholder: "Search 30,000 stations", "aria-label": "Search stations", value: radio.q });
+    function sel(label, opts, cur, fn) {
+      var s = h("select", { "aria-label": label, onchange: function () { fn(s.value); draw(); } });
+      opts.forEach(function (o) { s.appendChild(h("option", { value: o[0], text: o[1], selected: o[0] === cur })); });
+      return h("span", { class: "sel" }, [s]);
+    }
+    var countries = STATIONS.map(function (s) { return s.country; }).filter(function (c, i, a) { return a.indexOf(c) === i; }).sort();
+    var filters = h("div", { class: "filters" }, [
+      sel("Country", [["", "All countries"]].concat(countries.map(function (c) { return [c, c]; })), radio.country, function (v) { radio.country = v; }),
+      sel("Quality", [["", "Any quality"], ["192", "192k and up"], ["320", "320k only"]], radio.quality, function (v) { radio.quality = v; }),
+      sel("Order", [["", "Default order"], ["az", "A to Z"], ["kbps", "Best quality first"]], radio.order, function (v) { radio.order = v; })]);
+    var find = h("input", { type: "search", placeholder: "Search radio stations, genres, countries or cities…  (or click a dot on the map)", "aria-label": "Search stations", value: radio.q });
     find.addEventListener("input", function () { radio.q = find.value; draw(); });
+
+    // the radio's own player bar
+    var playB = btn("", "Play", "play", function () {
+      if (!radio.on) return pick(rows()[0] || STATIONS[0], false);
+      radio.playing = !radio.playing; bar();
+      if (radio.playing) tryIt("Live radio from 30,000 stations round the world");
+    });
+    var shuffle = btn("icon", null, "shuffle", function () { var r = rows(); if (r.length) pick(r[Math.floor(Math.random() * r.length)], false); },
+      { "aria-label": "A random station", title: "A random station" });
+    var star = btn("icon", null, "star", function () {
+      if (!radio.on) return toast("Pick a station first", "Then star it to keep it under Favorites.");
+      radio.stars[radio.on.name] = !radio.stars[radio.on.name]; bar(); draw();
+    }, { "aria-label": "Favorite", title: "Add to Favorites" });
+    var now = h("div", { class: "rnow" });
+    var vol = h("input", { type: "range", min: "0", max: "100", value: "100", "aria-label": "Radio volume" });
+    var volPct = h("span", { class: "pct", text: "100%" });
+    setRange(vol);
+    vol.addEventListener("input", function () { volPct.textContent = vol.value + "%"; setRange(vol); });
+    var hear = h("input", { type: "checkbox", checked: true });
+    function bar() {
+      playB.replaceChildren(icon(radio.playing ? "pause" : "play", "s"), h("span", { class: "t", text: radio.playing ? "Pause" : "Play" }));
+      star.replaceChildren(icon(radio.on && radio.stars[radio.on.name] ? "star_filled" : "star", "s"));
+      star.classList.toggle("lit", !!(radio.on && radio.stars[radio.on.name]));
+      now.replaceChildren();
+      if (!radio.on) now.appendChild(h("span", { class: "hint", text: "Nothing playing: click a station" }));
+      else now.append(h("span", { class: "eq" + (radio.playing ? " on" : "") }, [h("i"), h("i"), h("i"), h("i")]),
+        h("span", { class: "tx" }, [h("b", { text: radio.on.name }), h("small", { text: radio.on.city + ", " + radio.on.country + " · " + radio.on.kbps + "k" })]));
+    }
+    bar();
     draw();
     return h("div", { class: "ob-page" }, [
       h("div", { class: "ob-bar" }, [h("label", { class: "field", style: "flex:1" }, [icon("search", "s"), find]),
-        liveBtn("radio"),
-        btn("rec", "Record", null, function () { tryIt("Recording the radio into a pad"); }),
-        btn("", "Send to others", "live", function () { tryIt("Playing the radio into your call"); })]),
-      h("div", { class: "ob-stations", style: "flex:1;min-height:0" }, [chips, list])
+        btn("icon", null, "reload", function () { draw(); }, { "aria-label": "Load the stations again", title: "Load the stations again" })]),
+      h("div", { class: "ob-radio" }, [map.el, h("div", { class: "ob-stations" }, [seg, chips, filters, count, list])]),
+      help,
+      h("div", { class: "ob-bar ob-rplayer" }, [playB, shuffle, star, btn("ob-hide-s", "Send to others", "live", function () { tryIt("Playing the radio into your call"); }),
+        now, recBtn("ob-hide-s", function () { tryIt("Recording the radio into a pad"); }), liveBtn("radio"),
+        h("span", { class: "ob-hide-m rvol" }, [icon("volume", "s"), vol, volPct]),
+        h("label", { class: "chk ob-hide-m" }, [hear, h("span", { text: "Hear it myself" })])])
     ]);
   }
 
@@ -853,67 +1198,196 @@
   }
 
   // ------------------------------------------------------------------ Triggers
+  // The Triggers tab is Onion Watch inside the board (onionwatch/board.py): its own
+  // Triggers / Log / Settings tabs, the trigger cards on the left and the one picked in
+  // the editor. Start watching pretends a game showed a picture a moment later, so the
+  // sound plays like it would.
   var TRIG = [
-    { name: "Died", what: "YOU DIED", col: "#c0392b", on: true, when: "The picture shows up", pad: 3 },
-    { name: "Boss beaten", what: "VICTORY", col: "#d4a017", on: true, when: "The picture shows up", pad: 6 },
-    { name: "Headshot", what: "HEADSHOT", col: "#e67e22", on: false, when: "The picture shows up", pad: 2 }
+    { name: "Died", what: "YOU DIED", col: "#c0392b", on: true, when: "the picture shows up", pad: 3, keep: false, cat: "Boss fights", match: 80 },
+    { name: "Boss beaten", what: "VICTORY", col: "#d4a017", on: true, when: "the picture shows up", pad: 6, keep: false, cat: "Boss fights", match: 80 },
+    { name: "Headshot", what: "HEADSHOT", col: "#e67e22", on: false, when: "the picture shows up", pad: 2, keep: false, cat: "Uncategorised", match: 75 },
+    { name: "Queue popped", what: "MATCH FOUND", col: "#2ecc71", on: true, when: "the picture shows up", pad: 10, keep: true, cat: "Uncategorised", match: 85 }
   ];
-  var trigSel = 0;
+  var WHENS = ["the picture shows up", "the picture goes away", "an area changes", "an area stops changing", "a bar drops below"];
+  var trig = { sel: 0, tab: "triggers", q: "", watching: false, timer: 0, log: [], more: false };
+  function trigStatus(t) {
+    var p = PADS.filter(function (x) { return x.id === t.pad; })[0];
+    if (!p) return ["warn", "Pick the sound to play"];
+    if (!t.on) return ["", "Paused"];
+    return trig.watching ? ["ok", "Watching"] : ["ok", "Ready"];
+  }
   function triggersPage() {
-    var list = h("div", { class: "ob-tlist" }), detail = h("div", { class: "ob-tdetail ob-scroll" });
+    var body = h("div", { class: "ob-wbody" });
+    var tabs = h("div", { class: "ob-wtabs", role: "tablist" });
     function thumb(t, big) { return h("span", { class: "ob-tpic" + (big ? " big" : ""), style: "--tc:" + t.col, text: t.what }); }
-    function drawList() {
-      list.replaceChildren(btn("small", "New trigger", "plus", function () { tryIt("Cutting a new picture out of your game"); }));
-      TRIG.forEach(function (t, i) {
-        var sw = h("button", { type: "button", class: "sw", role: "switch", "aria-checked": t.on ? "true" : "false", "aria-label": "On", onclick: function (e) {
-          e.stopPropagation(); t.on = !t.on; sw.setAttribute("aria-checked", t.on ? "true" : "false");
-        } });
-        list.appendChild(h("div", { class: "ob-trow" + (i === trigSel ? " on" : ""), onclick: function () { trigSel = i; drawList(); drawDetail(); } },
-          [thumb(t), h("span", { class: "tx" }, [h("b", { text: t.name }), h("small", { text: t.on ? "Ready" : "Paused" })]), sw]));
+    function drawTabs() {
+      tabs.replaceChildren(h("img", { class: "wlogo", src: "screenshots/watch/icon.png", alt: "Onion Watch", width: "22", height: "22" }));
+      [["triggers", "Triggers", "eye"], ["log", "Log", "history"], ["settings", "Settings", "settings"]].forEach(function (x) {
+        var b = h("button", { type: "button", role: "tab", "aria-selected": trig.tab === x[0] ? "true" : "false", onclick: function () { trig.tab = x[0]; drawTabs(); drawBody(); } },
+          [icon(x[2], "s"), h("span", { text: x[1] })]);
+        tabs.appendChild(b);
       });
     }
+    var list, detail;
+    function drawList() {
+      list.replaceChildren();
+      var q = trig.q.trim().toLowerCase();
+      TRIG.forEach(function (t, i) {
+        if (q && t.name.toLowerCase().indexOf(q) < 0) return;
+        var st = trigStatus(t);
+        var sw = h("button", { type: "button", class: "sw", role: "switch", "aria-checked": t.on ? "true" : "false", "aria-label": t.name + " on", onclick: function (e) {
+          e.stopPropagation(); t.on = !t.on; drawList(); if (i === trig.sel) drawDetail();
+        } });
+        list.appendChild(h("div", { class: "ob-trow" + (i === trig.sel ? " on" : "") + (t.fired ? " fired" : ""), role: "button", tabindex: "0",
+          onclick: function () { trig.sel = i; drawList(); drawDetail(); },
+          onkeydown: function (e) { if (e.target === e.currentTarget && (e.key === "Enter" || e.key === " ")) { e.preventDefault(); trig.sel = i; drawList(); drawDetail(); } } },
+          [thumb(t), h("span", { class: "tx" }, [h("b", { text: t.name }), h("small", { class: st[0], text: st[1] })]),
+           trig.more ? h("span", { class: "hint ob-hide-s", text: t.match + "%" }) : null, sw]));
+      });
+      if (!list.children.length) list.appendChild(h("div", { class: "ob-none", text: "No triggers called “" + trig.q + "”." }));
+    }
+    function sel(items, cur, fn, cls) {
+      var s = h("select", { onchange: function () { fn(s.value); } });
+      items.forEach(function (o) { s.appendChild(h("option", { text: o, value: o, selected: o === cur })); });
+      return h("span", { class: "sel " + (cls || "") }, [s]);
+    }
     function drawDetail() {
-      var t = TRIG[trigSel];
-      function sel(items, cur, fn) {
-        var s = h("select", { onchange: function () { fn(s.value); } });
-        items.forEach(function (o) { s.appendChild(h("option", { text: o, value: o, selected: o === cur })); });
-        return h("span", { class: "sel" }, [s]);
-      }
-      var padNames = PADS.map(function (p) { return p.name; });
-      var cur = PADS.filter(function (p) { return p.id === t.pad; })[0] || PADS[0];
+      var t = TRIG[trig.sel];
+      if (!t) return detail.replaceChildren(h("div", { class: "ob-none", text: "Make a trigger: New trigger, then cut a picture out of your game." }));
+      var st = trigStatus(t), pad = PADS.filter(function (p) { return p.id === t.pad; })[0];
+      var sw = h("button", { type: "button", class: "sw", role: "switch", "aria-checked": t.on ? "true" : "false", "aria-label": "On", onclick: function () {
+        t.on = !t.on; drawList(); drawDetail();
+      } });
+      var chip = pad ? h("span", { class: "ob-schip" }, [icon("volume", "s"), h("span", { text: pad.name }),
+        h("button", { type: "button", "aria-label": "Take it off", title: "Take it off", onclick: function () { t.pad = 0; drawList(); drawDetail(); } }, [icon("close", "s")])])
+        : h("span", { class: "hint warn", text: "No sound yet" });
+      var addSound = btn("icon small", null, "plus", function (e) {
+        menuAt(addSound, PADS.map(function (p) { return { t: p.name, tick: p.id === t.pad, fn: function () { t.pad = p.id; drawList(); drawDetail(); } }; }));
+      }, { "aria-label": "Pick the sound", title: "Pick the sound" });
+      var keep = h("input", { type: "checkbox", checked: t.keep });
+      keep.addEventListener("change", function () { t.keep = keep.checked; });
+      var match = h("input", { type: "range", min: "50", max: "99", value: String(t.match), "aria-label": "How alike" });
+      var matchV = h("span", { class: "pct", text: t.match + "%" });
+      setRange(match);
+      match.addEventListener("input", function () { t.match = +match.value; matchV.textContent = t.match + "%"; setRange(match); });
+      var picture = /picture/.test(t.when);
       detail.replaceChildren(
-        h("div", { class: "ob-thead" }, [thumb(t, true), h("div", { class: "tx" }, [h("b", { text: t.name }), h("small", { class: "hint", text: "Plays " + cur.name + " when this shows up in your game." })])]),
-        h("div", { class: "ob-dlg", style: "width:auto;border:0;box-shadow:none;padding:0;background:none" }, [
-          h("div", { class: "row" }, [h("span", { class: "lbl", text: "When" }), sel(["The picture shows up", "The picture goes away", "The picture changes"], t.when, function (v) { t.when = v; })]),
-          h("div", { class: "row" }, [h("span", { class: "lbl", text: "Look in" }), sel(["Default (Screen 1)", "Screen 2", "Your game's window"], "Default (Screen 1)", function () {})]),
-          h("div", { class: "row" }, [h("span", { class: "lbl", text: "Then play" }), sel(padNames, cur.name, function (v) {
-            t.pad = PADS.filter(function (p) { return p.name === v; })[0].id; drawDetail();
-          })])
-        ]),
-        h("div", { class: "row", style: "display:flex;gap:8px;flex-wrap:wrap" }, [
-          btn("", "Test", "play", function () { start(cur); }),
-          btn("", "Duplicate", "copy", function () { var c = Object.assign({}, t, { name: t.name + " copy" }); TRIG.splice(trigSel + 1, 0, c); trigSel++; drawList(); drawDetail(); }),
-          btn("danger", "Delete", "trash", function () { if (TRIG.length > 1) { TRIG.splice(trigSel, 1); trigSel = Math.max(0, trigSel - 1); drawList(); drawDetail(); } })
-        ])
+        h("div", { class: "ob-thead" }, [thumb(t, true), h("div", { class: "tx" }, [
+          h("input", { class: "tname", value: t.name, maxlength: "40", "aria-label": "Trigger's name", oninput: function (e) { t.name = e.target.value || "Trigger"; drawList(); } }),
+          h("small", { class: st[0], text: pad ? "Plays " + pad.name + " when " + t.when.replace("the picture", "this picture").replace("a bar", "this bar").replace("an area", "this area") + "." : "Pick the sound to play" })]),
+          h("span", { class: "rdy" }, [h("i", { class: st[0] }), h("span", { text: st[1] }), sw])]),
+        h("hr"),
+        h("div", { class: "wrow" }, [h("b", { text: "When" }), sel(WHENS, t.when, function (v) { t.when = v; drawDetail(); }, "acc"),
+          h("b", { text: "in" }), sel(["Default (Screen 1)", "Screen 2", "Your game's window"], "Default (Screen 1)", function () {}, "acc"),
+          picture ? h("span", { class: "wsub" }, [h("span", { class: "hint", text: "Alike" }), match, matchV]) : null]),
+        h("div", { class: "hint", text: picture ? "Cut the picture out of your game (Set picture) and it plays the moment it shows up, even in a window behind others."
+          : "Works best on the game's own window, not a whole screen." }),
+        h("div", { class: "wrow" }, [h("b", { text: "Play" }), chip, addSound]),
+        h("label", { class: "chk" }, [keep, h("span", { text: "Keep playing" })]),
+        h("div", null, [btn("small", "Extra settings", "sliders", function () { tryIt("A trigger's extra settings (cooldown, hotkey, how often it looks)"); })]),
+        h("div", { class: "ob-wfoot" }, [
+          btn("acc", "Test", "play", function () { if (pad) start(pad); else toast("Pick the sound first", "Then Test plays it, like the trigger will."); }),
+          icon("folder", "s"), sel(["Uncategorised", "Boss fights", "Ranked"], t.cat, function (v) { t.cat = v; }),
+          btn("flat", "Duplicate", "copy", function () {
+            var c = Object.assign({}, t, { name: t.name + " copy", fired: false });
+            TRIG.splice(trig.sel + 1, 0, c); trig.sel++; drawList(); drawDetail();
+          }),
+          btn("flat", "Delete", "trash", function () { TRIG.splice(trig.sel, 1); trig.sel = Math.max(0, Math.min(trig.sel, TRIG.length - 1)); drawList(); drawDetail(); })])
       );
     }
-    drawList(); drawDetail();
-    return h("div", { class: "ob-page" }, [
-      h("div", { class: "ob-trig" }, [list, detail]),
-      h("div", { class: "ob-bar" }, [btn("acc", "Start watching", "eye", function () { tryIt("Watching your game's screen"); }),
-        btn("", "Set picture", "image", function () { tryIt("Cutting a picture out of your game"); }),
-        h("span", { class: "hint ob-hide-s", text: "Test plays the sound. In the app it plays by itself when your game shows the picture." })])
+    function drawTriggers() {
+      list = h("div", { class: "ob-tlist ob-scroll" });
+      detail = h("div", { class: "ob-tdetail ob-scroll" });
+      var find = h("input", { type: "search", placeholder: "Search triggers", "aria-label": "Search triggers", value: trig.q });
+      find.addEventListener("input", function () { trig.q = find.value; drawList(); });
+      var more = h("input", { type: "checkbox", checked: trig.more });
+      more.addEventListener("change", function () { trig.more = more.checked; drawList(); });
+      body.append(
+        h("div", { class: "ob-wtool" }, [
+          btn("ob-newt", "New trigger", "plus", function () {
+            TRIG.push({ name: "Trigger " + (TRIG.length + 1), what: "NEW", col: "#7f8c8d", on: false, when: "the picture shows up", pad: 0, keep: false, cat: "Uncategorised", match: 80 });
+            trig.sel = TRIG.length - 1; drawList(); drawDetail();
+            toast("Now cut its picture", "In the app you drag a box round the thing in your game to watch for: a word, a health bar, a pop-up.");
+          }),
+          h("label", { class: "field ob-wfind" }, [icon("search", "s"), find]),
+          h("span", { class: "sp" }),
+          sel(["List and editor", "Just the list", "Big pictures"], "List and editor", function () { tryIt("The other views of your triggers"); }, "ob-hide-s"),
+          h("label", { class: "chk ob-hide-m" }, [more, h("span", { text: "Show more info" })])]),
+        h("div", { class: "ob-trig" }, [list, detail]));
+      drawList(); drawDetail();
+    }
+    function drawLog() {
+      var box = h("div", { class: "ob-wlog ob-scroll" });
+      if (!trig.log.length) box.appendChild(h("div", { class: "ob-none", text: "Nothing yet. Start watching, and what it saw and played shows up here." }));
+      trig.log.forEach(function (l) {
+        box.appendChild(h("div", { class: "ln" }, [h("span", { class: "tm", text: l[0] }), h("b", { text: l[1] }), h("span", { class: "hint", text: l[2] })]));
+      });
+      body.append(h("div", { class: "ob-wtool" }, [h("b", { text: "What it saw" }), h("span", { class: "sp" }),
+        btn("small", "Clear", "trash", function () { trig.log = []; drawBody(); })]), box);
+    }
+    function drawSettings() {
+      function chk(t, on) { var c = h("input", { type: "checkbox", checked: on, onchange: function () { tryIt("Onion Watch's settings"); } }); return h("label", { class: "chk" }, [c, h("span", { text: t })]); }
+      body.append(h("div", { class: "ob-wset ob-scroll" }, [
+        h("div", { class: "ob-scard2" }, [h("div", { class: "head" }, [icon("eye", "s"), h("span", { class: "t", text: "Watching" })]),
+          chk("Start watching when Onion Board starts", false), chk("Only while a game is open", true), chk("Pause while I'm typing", true)]),
+        h("div", { class: "ob-scard2" }, [h("div", { class: "head" }, [icon("volume", "s"), h("span", { class: "t", text: "Sounds" })]),
+          chk("Play trigger sounds to my friends too", false), chk("One sound at a time", true)]),
+        h("div", { class: "ob-scard2" }, [h("div", { class: "head" }, [icon("shield", "s"), h("span", { class: "t", text: "Only looks" })]),
+          h("div", { class: "h", text: "Onion Watch only looks at your screen: it never clicks, types or reads your game's memory." })])]));
+    }
+    function drawBody() {
+      body.replaceChildren();
+      if (trig.tab === "log") drawLog(); else if (trig.tab === "settings") drawSettings(); else drawTriggers();
+    }
+    var watchB = btn("", "Start watching", "eye", toggleWatch);
+    var nowP = h("span", { class: "ob-wnow" }, [icon("volume", "s"), h("span", { text: "Nothing playing" })]);
+    function toggleWatch() {
+      trig.watching = !trig.watching;
+      clearTimeout(trig.timer);
+      watchB.replaceChildren(icon(trig.watching ? "stop" : "eye", "s"), h("span", { class: "t", text: trig.watching ? "Stop watching" : "Start watching" }));
+      watchB.classList.toggle("acc", trig.watching);
+      if (trig.watching) {
+        did("watch");
+        toast("Watching… (pretend)", "Here a game “shows” one of your pictures in a moment. In the app Onion Watch looks at your real game.");
+        var ready = TRIG.filter(function (t) { return t.on && PADS.some(function (p) { return p.id === t.pad; }); });
+        trig.timer = setTimeout(function fire() {
+          if (!trig.watching || !ready.length || !watchB.isConnected) { trig.watching = false; return; }
+          var t = ready[Math.floor(Math.random() * ready.length)], p = PADS.filter(function (x) { return x.id === t.pad; })[0];
+          if (!p) return;
+          start(p);
+          var d = new Date();
+          trig.log.unshift([("0" + d.getHours()).slice(-2) + ":" + ("0" + d.getMinutes()).slice(-2) + ":" + ("0" + d.getSeconds()).slice(-2), t.name, "seen (" + (t.match + 12) + "% alike), played " + p.name]);
+          nowP.replaceChildren(icon("volume", "s"), h("span", { text: p.name + " · " + t.name }));
+          t.fired = true;
+          if (trig.tab === "triggers" && list && list.isConnected) drawList(); else if (trig.tab === "log") drawBody();
+          setTimeout(function () { t.fired = false; if (list && list.isConnected) drawList(); }, 1600);
+          trig.timer = setTimeout(fire, 6000 + Math.random() * 4000);
+        }, 2600);
+      } else nowP.replaceChildren(icon("volume", "s"), h("span", { text: "Nothing playing" }));
+      if (list && list.isConnected) { drawList(); drawDetail(); }
+    }
+    if (trig.watching) { trig.watching = false; clearTimeout(trig.timer); }
+    drawTabs(); drawBody();
+    return h("div", { class: "ob-page ob-watch" }, [tabs, body,
+      h("div", { class: "ob-bar ob-wbar" }, [watchB, dd(btn("ob-hide-s", "More", "history", function () { trig.tab = "log"; drawTabs(); drawBody(); })),
+        h("span", { class: "hint ob-hide-m", style: "color:var(--text)", text: "Look in" }), h("span", { class: "ob-hide-m" }, [sel(["Screen 1", "Screen 2", "Your game's window"], "Screen 1", function () {})])]),
+      h("div", { class: "ob-bar ob-wbar" }, [nowP, h("span", { class: "sp" }),
+        btn("", "Chances", "sliders", function () { tryIt("Chances: how likely each trigger is to fire"); }),
+        btn("", "Stop all", "stop", stopAll)])
     ]);
   }
 
   // ------------------------------------------------------------------ Voice
-  // The voice changer's cards in the app's groups (ui/voicefxpanel.py VOICE_GROUPS), My setups
-  // over the tabs (they show up in Live controls too) and the AI voices with their pictures.
-  var VGROUPS = [["funny", "Funny", ["Chipmunk", "High voice", "Hothead", "Singing monk", "Underwater"]],
-    ["scary", "Scary", ["Demon", "Masked caller", "Dark lord", "Ghost", "Haunted radio"]],
-    ["scifi", "Robots & sci-fi", ["Robot", "Talkbox", "Autotune", "Alien", "Dalek"]],
+  // The Voice tab (ui/voicepanel.py): Say, its four parts (Voice changer, AI voices,
+  // Languages, Add-ons), My setups over them, and the voice changer's cards in the app's
+  // groups (ui/voicefxpanel.py VOICE_GROUPS). The voice picked shows in a bar under the
+  // cards with Effects (what goes on top of any voice) and Edit voice (the full editor).
+  var VGROUPS = [["funny", "Funny", ["Chipmunk", "High voice", "Hothead", "Singing monk", "Underwater", "Drunk", "Choir", "Goblin", "Fairy"]],
+    ["scary", "Scary", ["Demon", "Dark lord", "Ghost", "Masked caller", "Haunted radio", "Zombie", "Evil twin", "Giant"]],
+    ["scifi", "Robots & sci-fi", ["Robot", "Dalek", "Alien", "Talkbox", "Autotune", "Mecha", "Ship computer"]],
     ["disguise", "Disguise", ["Deep voice", "Male voice", "Anonymous", "Secret detective"]],
-    ["places", "Radio & places", ["Walkie-talkie", "Old telephone", "Megaphone", "Stadium announcer", "Cave", "Podcast voice"]],
+    ["places", "Radio & places", ["Walkie-talkie", "Old telephone", "Megaphone", "Stadium announcer", "Cave", "Podcast voice", "Pilot",
+      "Drive-thru speaker", "Old film", "Cathedral"]],
     ["mine", "Mine", ["My own mix"]]];
   var AI_VOICES = [["bear", "Bear", "A big, deep voice."], ["duke", "Duke", "Older and gravelly."], ["brick", "Brick", "Gruff and grounded."],
     ["max", "Max", "An everyday guy."], ["riley", "Riley", "A young guy."], ["atlas", "Atlas", "A smooth, deep storyteller."],
@@ -921,8 +1395,12 @@
     ["sage", "Sage", "A calm, low woman's voice."], ["nova", "Nova", "A clear, soft woman's voice."], ["pixie", "Pixie", "Light and young-sounding."],
     ["nana", "Nana", "An older woman's voice."], ["zoe", "Zoe", "A young woman's voice."], ["onyx", "Onyx", "A very low woman's voice."],
     ["squeak", "Squeak", "A tiny cartoon voice."], ["bean", "Bean", "A little kid."], ["titan", "Titan", "A huge, rumbling voice."]];
+  var ON_TOP = ["Rain", "Wind", "Engine hum", "Crowd", "Spaceship hum", "Crackling fire", "Robot", "Radio", "Echo", "Reverb"];
+  var LANGS = ["English", "Spanish", "French", "German", "Japanese", "Korean", "Portuguese (Brazil)", "Italian", "Dutch", "Polish", "Turkish", "Chinese"];
   function voicePic(name) { return name === "My own mix" ? "custom" : name.toLowerCase().replace(/ /g, "-"); }
-  var voiceTab = "changer", pickedVoice = null, voiceGroup = "", voiceFavs = { "Demon": true };
+  var voiceTab = "changer", pickedVoice = null, voiceGroup = "", voiceFavs = { "Demon": true, "Robot": true }, voiceList = false,
+      voiceWarned = false, voiceOnTop = {}, voiceFold = {}, voiceSaid = [], voiceLang = "Spanish";
+  function voiceCount() { return pickedVoice ? 4 + Object.keys(voiceOnTop).length : Object.keys(voiceOnTop).length; }
   function voicePage() {
     var say = h("input", { placeholder: "Type a line and press Enter", "aria-label": "Text to say" });
     function speak() {
@@ -934,18 +1412,25 @@
       u.volume = (document.getElementById("mute") || {}).getAttribute && document.getElementById("mute").getAttribute("aria-pressed") === "true" ? 0 : 0.8;
       speechSynthesis.speak(u);
       did("say");
+      voiceSaid.unshift(v);
+      say.value = "";
+      if (voiceTab === "lang") drawBody();
       toast("Said it to you", "The app says it into your call, in 100+ voices and languages.");
     }
     say.addEventListener("keydown", function (e) { if (e.key === "Enter") speak(); });
     var tabs = h("div", { class: "ob-vtabs" });
     var setups = h("div", { class: "ob-setups" });
     var body = h("div", { class: "ob-vcard" });
+    var picked = h("div", { class: "ob-picked" });
     var strip = h("div", { class: "ob-bar ob-vstrip" });
-    function drawAll() { drawTabs(); drawSetups(); drawBody(); drawStrip(); }
+    function chipBtn(t, ic, fn) { return h("button", { type: "button", class: "chip ghost", onclick: fn }, [icon(ic, "s"), t]); }
+    function drawAll() { drawTabs(); drawSetups(); drawBody(); drawPicked(); drawStrip(); }
     function drawTabs() {
       tabs.replaceChildren();
-      [["changer", "Voice changer", "voice"], ["ai", "AI voices", "wave"], ["lang", "Languages", "speech"], ["addons", "Add-ons", "puzzle"]].forEach(function (t) {
-        tabs.appendChild(btn("", t[1], t[2], function () { voiceTab = t[0]; drawAll(); }, { "aria-pressed": voiceTab === t[0] ? "true" : "false" }));
+      [["changer", "Voice changer", "voice"], ["ai", "AI voices", "wave"], ["lang", "Languages", "globe"], ["addons", "Add-ons", "puzzle"]].forEach(function (t) {
+        var b = btn(t[0] === "changer" && pickedVoice && voiceTab !== "changer" ? "lit" : "", t[1], t[2], function () { voiceTab = t[0]; closeLive(); drawAll(); },
+          { "aria-pressed": voiceTab === t[0] ? "true" : "false" });
+        tabs.appendChild(b);
       });
     }
     function drawSetups() {     // My setups: under the tabs, whichever part is showing
@@ -958,15 +1443,16 @@
             menu(e.clientX, e.clientY, [
               { t: "Use on my sounds", icon: "sounds", fn: function () { LIVE.sounds.setup = s.name; paintLive("sounds"); tryIt("Playing your sounds in your “" + s.name + "” voice"); } },
               { t: "Set a hotkey…", icon: "keyboard", fn: function () { tryIt("A hotkey for a setup"); } },
+              { t: "Copy share code", icon: "copy", fn: function () { tryIt("Sharing a setup with a code"); } },
               "-",
               { t: "Delete", icon: "trash", fn: function () {
                 SETUPS.splice(SETUPS.indexOf(s), 1);
                 Object.keys(LIVE).forEach(function (k) { if (LIVE[k].setup === s.name) { LIVE[k].setup = ""; paintLive(k); } });
                 drawSetups();
               } }]);
-          } }, [icon("voice", "s"), s.name]));
+          } }, [h("img", { src: "demo/voices/" + voicePic(s.voice) + ".webp", alt: "" }), s.name]));
       });
-      setups.appendChild(btn("small", "Save what's on", "plus", function () {
+      setups.appendChild(chipBtn("Save what's on", "plus", function () {
         if (!pickedVoice) return toast("Nothing's on yet", "Pick a voice first, then save it here. Your setups show up in Live controls, to play your sounds in them.");
         var name = h("input", { value: pickedVoice, maxlength: "32", "aria-label": "Name" });
         dialog("Save what's on", [h("p", { class: "hint", text: "A voice, an AI voice and a language, saved under a name. One click turns it all on, and Live controls puts it on your sounds, the radio or other apps." }),
@@ -979,22 +1465,34 @@
           } }]);
         setTimeout(function () { name.focus(); name.select(); }, 0);
       }));
+      setups.appendChild(chipBtn("Import a code", "download", function () { tryIt("Importing a voice someone shared as a code"); }));
+    }
+    function head(ic, title, extra) {
+      return h("div", { class: "hd" }, [h("span", { class: "ic" }, [icon(ic)]), h("b", { text: title })].concat(extra || []));
+    }
+    function fold(key, label, kids) {
+      var open = !!voiceFold[key];
+      var b = h("button", { type: "button", class: "ob-fold", "aria-expanded": open ? "true" : "false", onclick: function () { voiceFold[key] = !open; drawBody(); } },
+        [icon("chev"), h("span", { text: label })]);
+      return [b].concat(open ? kids : []);
+    }
+    function pick(v) {
+      pickedVoice = pickedVoice === v ? null : v;
+      closeLive();
+      drawAll();
+      if (pickedVoice) toast("Voice changer: " + v, "In the app your mic sounds like this, live. Save it as a setup and Live controls plays your sounds in it too.", true);
     }
     function card(v) {
-      var star = h("button", { type: "button", class: "star" + (voiceFavs[v] ? " on" : ""), "aria-label": voiceFavs[v] ? "Remove from favourites" : "Add to favourites",
+      var star = h("button", { type: "button", class: "star" + (voiceFavs[v] ? " on" : ""), "aria-label": voiceFavs[v] ? "Remove from favorites" : "Add to favorites",
+        title: voiceFavs[v] ? "Remove from favorites" : "Add to favorites",
         onclick: function (e) { e.stopPropagation(); voiceFavs[v] = !voiceFavs[v]; drawBody(); } }, [icon(voiceFavs[v] ? "star_filled" : "star", "s")]);
-      function pick() {
-        pickedVoice = pickedVoice === v ? null : v;
-        drawAll();
-        if (pickedVoice) toast("Voice changer: " + v, "In the app your mic sounds like this, live. Save it as a setup and Live controls plays your sounds in it too.", true);
-      }
-      return h("div", { class: "ob-voice", role: "button", tabindex: "0", "aria-pressed": pickedVoice === v ? "true" : "false", onclick: pick,
-        onkeydown: function (e) { if (e.target === e.currentTarget && (e.key === "Enter" || e.key === " ")) { e.preventDefault(); pick(); } } },
+      return h("div", { class: "ob-voice", role: "button", tabindex: "0", "aria-pressed": pickedVoice === v ? "true" : "false", onclick: function () { pick(v); },
+        onkeydown: function (e) { if (e.target === e.currentTarget && (e.key === "Enter" || e.key === " ")) { e.preventDefault(); pick(v); } } },
         [h("img", { src: "demo/voices/" + voicePic(v) + ".webp", alt: "", loading: "lazy" }), h("span", { text: v }), star]);
     }
     function drawChanger() {
       var sw = h("button", { type: "button", class: "sw", role: "switch", "aria-checked": pickedVoice ? "true" : "false", "aria-label": "Voice changer on" });
-      sw.addEventListener("click", function () { if (pickedVoice) { pickedVoice = null; drawAll(); } else tryIt("Changing your voice live"); });
+      sw.addEventListener("click", function () { if (pickedVoice) { pickedVoice = null; drawAll(); } else pick("Demon"); });
       var chips = h("div", { class: "chips" });
       [["", "All"], ["favs", "Favorites"]].concat(VGROUPS.map(function (g) { return [g[0], g[1]]; })).forEach(function (g) {
         var c = h("button", { type: "button", class: "chip", "aria-pressed": voiceGroup === g[0] ? "true" : "false", onclick: function () { voiceGroup = g[0]; drawBody(); } });
@@ -1002,46 +1500,147 @@
         c.appendChild(document.createTextNode(g[1]));
         chips.appendChild(c);
       });
-      body.append(h("div", { class: "hd" }, [h("span", { class: "ic" }, [icon("voice")]), h("b", { text: "Voice changer" }), sw, h("span", { text: pickedVoice ? "On" : "Off" })]),
-        h("p", { class: "hint", text: "Change your mic live for whoever you send sounds to (Discord, a game, OBS). Pick a voice to turn it on, then use Hear what they hear at the bottom to try it." }),
-        chips);
+      var views = h("div", { class: "ob-views" }, [
+        h("button", { type: "button", "aria-pressed": voiceList ? "false" : "true", "aria-label": "Show as cards", title: "Show as cards", onclick: function () { voiceList = false; drawBody(); } }, [icon("grid", "s")]),
+        h("button", { type: "button", "aria-pressed": voiceList ? "true" : "false", "aria-label": "Show as a list", title: "Show as a list", onclick: function () { voiceList = true; drawBody(); } }, [icon("list", "s")])]);
+      body.append(head("voice", "Voice changer", [h("span", { class: "onoff" }, [sw, h("span", { text: pickedVoice ? "On" : "Off" })])]),
+        h("p", { class: "hint", text: "Change your mic live for whoever you send sounds to (Discord, a game, OBS). Pick a voice to turn it on, then use Hear what they hear at the bottom to try it." }));
+      if (!voiceWarned) body.appendChild(h("div", { class: "ob-warnbox" }, [h("p", null, [h("span", { text: "⚠ Discord deletes most of a changed voice unless its noise suppression is off: Settings → Voice & Video → " }),
+          h("b", { text: "Input Profile Custom, Noise Suppression None" }), h("span", { text: ". Game voice chats' noise suppression does the same." })]),
+        btn("", "Show me how", null, function () { tryIt("Bun showing you Discord's settings, step by step"); }),
+        btn("", "Got it", null, function () { voiceWarned = true; drawBody(); })]));
+      body.appendChild(h("div", { class: "ob-vchips" }, [chips, views]));
+      var grids = h("div", { class: "ob-vgroups" + (voiceList ? " list" : "") });
       if (voiceGroup === "favs") {
         var favs = Object.keys(voiceFavs).filter(function (v) { return voiceFavs[v]; });
-        body.appendChild(favs.length ? h("div", { class: "ob-voices" }, favs.map(card)) : h("div", { class: "ob-none", text: "Star a voice to keep it here." }));
-        return;
-      }
-      VGROUPS.forEach(function (g) {
+        grids.appendChild(favs.length ? h("div", { class: "ob-voices" }, favs.map(card)) : h("div", { class: "ob-none", text: "Star a voice to keep it here." }));
+      } else VGROUPS.forEach(function (g) {
         if (voiceGroup && voiceGroup !== g[0]) return;
-        if (!voiceGroup) body.appendChild(h("div", { class: "ob-vgroup", text: g[1] }));
-        body.appendChild(h("div", { class: "ob-voices" }, g[2].map(card)));
+        if (!voiceGroup) grids.appendChild(h("div", { class: "ob-vgroup", text: g[1] }));
+        grids.appendChild(h("div", { class: "ob-voices" }, g[2].map(card)));
       });
+      body.appendChild(grids);
+    }
+    function installBox(pic, text, label, what, folder) {
+      return h("div", { class: "ob-install" }, [pic, h("div", null, [h("p", { class: "hint", text: text }),
+        h("div", { class: "r" }, [btn("", label, "plus", function () { tryIt(what); }),
+          folder ? btn("flat icon", null, "folder", function () { tryIt(what); }, { "aria-label": "Open the folder", title: "Open the folder" }) : null])])]);
     }
     function drawAi() {
-      body.append(h("div", { class: "hd" }, [h("span", { class: "ic" }, [icon("wave")]), h("b", { text: "AI voices" })]),
-        h("p", { class: "hint", text: "Your words and tone, a different voice. Live on this PC." }),
-        h("div", { class: "ob-install" }, [h("span", { class: "bun" }, [icon("bun")]), h("div", null, [
-          h("p", { class: "hint", text: "AI voices need a one-time install first: about 90 MB (the voice model and its runtime)." }),
-          btn("", "Install AI voices", "plus", function () { tryIt("AI voices"); })])]),
-        h("div", { class: "ob-vgroup", text: "The voices you get" }),
-        h("div", { class: "ob-aivs" }, AI_VOICES.map(function (v) {
-          return h("button", { type: "button", onclick: function () { tryIt("Talking in " + v[1] + "'s voice"); } },
-            [h("img", { src: "demo/ai/" + v[0] + ".webp", alt: "", loading: "lazy" }), h("span", null, [h("b", { text: v[1] }), h("small", { text: v[2] })])]);
-        })));
+      body.append(head("wave", "AI voices"), h("p", { class: "hint", text: "Your words and tone, a different voice. Live on this PC." }),
+        installBox(h("img", { class: "bun", src: "demo/ai/bun-robot.webp", alt: "" }), "AI voices need a one-time install first: about 90 MB (the voice model and its runtime).",
+          "Install AI voices", "AI voices"));
+      body.append.apply(body, fold("ai", "The voices you get", [h("div", { class: "ob-aivs" }, AI_VOICES.map(function (v) {
+        return h("button", { type: "button", onclick: function () { tryIt("Talking in " + v[1] + "'s voice"); } },
+          [h("img", { src: "demo/ai/" + v[0] + ".webp", alt: "", loading: "lazy" }), h("span", null, [h("b", { text: v[1] }), h("small", { text: v[2] })])]);
+      }))]));
+    }
+    function drawLang() {
+      var s = h("select", { "aria-label": "Speak in", onchange: function () { voiceLang = s.value; tryIt("Speaking " + s.value + " in your call"); } });
+      LANGS.forEach(function (l) { s.appendChild(h("option", { text: l, selected: l === voiceLang })); });
+      body.append(head("globe", "Speak another language"), h("p", { class: "hint", text: "Talk in your language and others hear another one. Pick it under Speak in." }),
+        installBox(null, "Speaking another language needs speech recognition installed first (runs on this PC; what you say never leaves it).",
+          "Install speech recognition", "Speaking another language", true));
+      body.append.apply(body, fold("lang", "More options", [h("div", { class: "r" }, [h("span", { text: "Speak in" }), h("span", { class: "sel" }, [s])])]));
+      body.append(h("b", { text: "What the voice said" }),
+        voiceSaid.length ? h("div", { class: "ob-lines" }, voiceSaid.slice(0, 6).map(function (l) { return h("div", null, [h("small", { text: "You typed" }), l]); }))
+          : h("div", { class: "hint", style: "padding:6px 12px", text: "Nothing yet. Lines show up here as they're spoken." }));
+    }
+    function drawAddons() {
+      function ln(name, ver, st) { return h("div", { class: "ln" }, [h("b", { text: name }), h("span", { class: "hint", text: " " + ver + " · " + st })]); }
+      body.append(head("puzzle", "Add-ons"),
+        h("div", { class: "ob-addons" }, [ln("AI voices", "0.1.0", "not set up yet"), ln("Live voice-to-speech", "0.4.0", "not set up yet: press Install speech recognition above"),
+          ln("Retro effects", "0.2.0", "on"), ln("Languages", "", "32 of them can be downloaded under Speak in")]),
+        h("div", { class: "r" }, [btn("", "Refresh", null, function () { tryIt("Add-ons"); }), btn("flat icon", null, "folder", function () { tryIt("Add-ons"); }, { "aria-label": "Open the folder" })]),
+        h("b", { text: "Custom voices" }),
+        h("p", { class: "hint", text: "Use a TTS server running on your PC (Kokoro, AllTalk, any OpenAI-style one) or drop voice packs (Piper) into the voices folder. They join the Voice list above." }),
+        h("div", { class: "r" }, [btn("", "Add a voice server", "plus", function () { tryIt("Your own voice server"); }), btn("", "Open voices folder", null, function () { tryIt("Your own voice packs"); })]));
     }
     function drawBody() {
       body.replaceChildren();
-      if (voiceTab === "changer") return drawChanger();
-      if (voiceTab === "ai") return drawAi();
-      var names = { lang: ["Languages", "Type in one language and it's said in another, in your call."],
-                    addons: ["Add-ons", "Extra voice packs and engines, one click each."] }[voiceTab];
-      body.append(h("div", { class: "hd" }, [h("span", { class: "ic" }, [icon(voiceTab === "lang" ? "speech" : "puzzle")]), h("b", { text: names[0] })]),
-        h("p", { class: "hint", text: names[1] }),
-        h("div", null, [btn("acc", "Download free to try these", "download", function () { location.href = DL; })]));
+      if (voiceTab === "changer") drawChanger(); else if (voiceTab === "ai") drawAi(); else if (voiceTab === "lang") drawLang(); else drawAddons();
+    }
+    // the voice picked, pinned under the cards: Effects, Edit voice, Hear it
+    function drawPicked() {
+      picked.hidden = !pickedVoice || voiceTab !== "changer";
+      if (picked.hidden) return picked.replaceChildren();
+      var fx = btn("", "Effects", "sounds", function () { openEffects(fx); }, { "aria-haspopup": "dialog" });
+      var n = voiceCount();
+      picked.replaceChildren(h("img", { src: "demo/voices/" + voicePic(pickedVoice) + ".webp", alt: "" }), h("b", { text: pickedVoice }),
+        h("div", { class: "pb" }, [fx, btn("", "Edit voice" + (n ? "  ·  " + n + " on" : ""), "sliders", editVoice),
+          btn("", "Hear it", "headphones", function () { tryIt("Hearing a line said in " + pickedVoice); })]));
+    }
+    function openEffects(anchor) {
+      if (R.pop && R.pop.anchor === anchor) return closeLive();
+      closeLive(); closeMenu();
+      var el = h("div", { class: "ob-lpop ob-fxpop", role: "dialog", "aria-label": "Effects" });
+      function draw() {
+        el.replaceChildren(h("b", { class: "tt", text: "Effects" }), h("div", { class: "hint", text: "On top of any voice: they stay when you pick another one." }),
+          h("b", { text: "Add an effect" }),
+          h("div", { class: "fxchips" }, ON_TOP.concat(["A sound from my board"]).map(function (n) {
+            var on = !!voiceOnTop[n];
+            return btn("", n, on ? "check" : "plus", function () {
+              if (on) delete voiceOnTop[n]; else { voiceOnTop[n] = 1; tryIt("“" + n + "” on top of your voice"); }
+              draw(); drawPicked();
+            }, { "aria-pressed": on ? "true" : "false" });
+          })),
+          btn("flat", "Advanced: Edit voice", "sliders", function () { closeLive(); editVoice(); }));
+        var box = root.getBoundingClientRect(), a = anchor.getBoundingClientRect();
+        var x = Math.max(8, Math.min(a.left - box.left, box.width - el.offsetWidth - 8));
+        var y = a.top - box.top - el.offsetHeight - 6;
+        if (y < 8) y = a.bottom - box.top + 6;
+        el.style.left = x + "px"; el.style.top = Math.max(8, y) + "px";
+      }
+      root.appendChild(el);
+      R.pop = { el: el, anchor: anchor };
+      anchor.setAttribute("aria-expanded", "true");
+      draw();
+      did("voice-effects");
+    }
+    // Edit voice: the full editor, in a window of its own in the app
+    function editVoice() {
+      function sl(name, v, lo, hi, unit, ends) {
+        var r = h("input", { type: "range", min: String(lo), max: String(hi), value: String(v), "aria-label": name });
+        var val = h("b", { class: "v" });
+        function show() { val.textContent = (unit === " st" || unit === "" ) && +r.value > 0 ? "+" + r.value + unit : r.value + unit; setRange(r); }
+        r.addEventListener("input", show);
+        r.addEventListener("change", function () { tryIt("Building your own voice"); });
+        show();
+        return h("div", { class: "sl" }, [h("div", { class: "t" }, [h("span", { text: name }), val]), r, h("div", { class: "ends" }, [h("span", { text: ends[0] }), h("span", { text: ends[1] })])]);
+      }
+      function fxcard(ic, name, on, hint, sliders) {
+        var sw = h("button", { type: "button", class: "sw", role: "switch", "aria-checked": on ? "true" : "false", "aria-label": name + " on",
+          onclick: function () { sw.setAttribute("aria-checked", sw.getAttribute("aria-checked") === "true" ? "false" : "true"); c.classList.toggle("on"); } });
+        var c = h("div", { class: "ob-fxcard" + (on ? " on" : "") }, [h("div", { class: "hd2" }, [icon(ic, "s"), h("b", { text: name }),
+          on && sliders ? btn("flat small", "Reset", "reload", function () {}) : null, sw]), hint ? h("div", { class: "hint", text: hint }) : null,
+          sliders ? h("div", { class: "sls" }, sliders) : null]);
+        return c;
+      }
+      var deep = /Demon|Dark lord|Giant|Deep|Zombie|Monster/.test(pickedVoice || "");
+      dialog("Edit voice", [
+        h("div", { class: "ob-evtop" }, [btn("", "Randomize", "reload", function () { tryIt("Randomize: a new voice every click"); }),
+          btn("", "Save as a voice", "plus", function () { tryIt("Saving your own voice"); }),
+          btn("", "Copy share code", "copy", function () { tryIt("Sharing a voice as a code"); }),
+          btn("", "Import a code", "plus", function () { tryIt("Importing a voice someone shared"); })]),
+        h("div", { class: "hint", text: "71 ms delay" }),
+        fxcard("mic", "Pitch & voice", true, "Higher or lower; a cartoon or a real-sounding person; a bigger or smaller throat; autotune.", [
+          sl("Pitch", deep ? -6 : 4, -12, 12, " st", ["lower", "higher"]), sl("Natural sound", 100, 0, 100, "%", ["cartoon", "real person"]),
+          sl("Voice size", deep ? 5 : -3, -10, 10, "", ["smaller", "bigger"]), sl("Autotune", 0, 0, 100, "%", ["off", "robotic"]),
+          sl("Mix", 100, 0, 100, "%", ["", ""]), sl("Gap between voices", 100, 0, 100, "%", ["together", "echo"])]),
+        fxcard("shield", "Clean up my mic", true, "Removes hum, hiss and room noise before the other effects.", [
+          sl("Noise gate", 60, 0, 100, "%", ["off", "strong"]), sl("Hiss removal", 50, 0, 100, "%", ["off", "strong"])]),
+        h("b", { text: "All effects" }),
+        h("div", { class: "hint", text: "Switch effects on and drag their sliders to build your own voice. Changing anything switches to “My own mix”; like it? Save it as a voice and it gets a button of its own." }),
+        h("div", { class: "ob-fxgrid" }, [fxcard("music", "Harmony", false), fxcard("wave", "Monster growl", deep), fxcard("headphones", "Echo", !!voiceOnTop.Echo),
+          fxcard("sliders", "Distortion", false), fxcard("phone", "Old phone", false), fxcard("live", "Radio", !!voiceOnTop.Radio)])
+      ], [{ t: "Done", acc: true, fn: function () {} }]).el.classList.add("wide", "ob-editv");
+      did("voice-edit");
     }
     function drawStrip() {      // the Voice tab's own bar: your mic and what's changing it
-      strip.replaceChildren(btn("danger small", "Stop", "stop", function () { pickedVoice = null; drawAll(); }, { title: "Turn the voice changer off" }),
-        icon("mic", "s"), h("span", { class: "hint ob-hide-s", text: "No mic open" }), h("span", { class: "ob-meter" }, [h("i")]),
-        h("span", { class: "hint st" }, [icon("ear", "s"), pickedVoice ? "Voice changer: " + pickedVoice : "Voice effects off: mic unchanged"]));
+      strip.replaceChildren(btn("danger", "Stop", "stop", function () { pickedVoice = null; voiceOnTop = {}; drawAll(); }, { title: "Turn the voice changer off" }),
+        icon("mic", "s mic"), h("span", { class: "hint ob-hide-s", text: "No mic open" }), h("span", { class: "ob-meter" }, [h("i")]), icon("ear", "s"),
+        pickedVoice ? h("span", { class: "ob-vchip" }, [h("img", { src: "demo/voices/" + voicePic(pickedVoice) + ".webp", alt: "" }), pickedVoice])
+          : h("span", { class: "hint st", text: "Voice effects off: mic unchanged" }));
     }
     drawAll();
     return h("div", { class: "ob-page" }, [
@@ -1049,82 +1648,137 @@
         h("div", { class: "ob-bar ob-say" }, [icon("speech", "s"), h("label", { class: "field" }, [say]), btn("", "Say", null, speak),
           btn("ob-hide-s", "Save as sound", "plus", function () { tryIt("Saving a spoken line as a pad"); }),
           btn("", "Stop", null, function () { if (window.speechSynthesis) speechSynthesis.cancel(); })]),
-        tabs, setups, body]),
-      strip
+        tabs, h("hr", { class: "ob-vline" }), setups, body]),
+      picked, strip
     ]);
   }
 
   // ------------------------------------------------------------------ Community (the store)
-  // The sound store (ui/storetab.py): sounds people share, voted on. Hear one, or add it to
-  // your pads for real; voting, sharing and reporting need the app.
+  // The Community tab (ui/storetab.py): sounds and voices people share, voted on. Bun in
+  // his headphones over it, then a row per sound: its picture (an emoji on its category's
+  // colour), play, who shared it, its category, when, the votes, add, report. Hear one or
+  // add it to your pads for real; sharing and reporting need the app.
+  var CATS = ["memes", "reactions", "games", "movies", "tv", "music", "sports", "viral", "pranks", "politics", "streamer", "esports", "podcast", "spooky"];
+  var CAT_NAMES = { memes: "Memes", reactions: "Reactions", games: "Games", movies: "Movies", tv: "TV", music: "Music", sports: "Sports", viral: "Viral",
+    pranks: "Pranks", politics: "Politics", streamer: "Streaming", esports: "Esports", podcast: "Podcast", spooky: "Spooky" };
   var STORE = [
-    { sfx: "boom", name: "Vine boom (extra bass)", by: "by bassboi", tags: "meme, boom", up: 4210, cat: "memes" },
-    { sfx: "horn", name: "MLG air horn", by: "by Onion Board", tags: "meme, horn", up: 3870, cat: "memes" },
-    { sfx: "buzzer", name: "Wrong answer", by: "Shared by a player", tags: "game show", up: 2950, cat: "reactions" },
-    { sfx: "trombone", name: "Sad trombone", by: "by Onion Board", tags: "fail", up: 2410, cat: "reactions" },
-    { sfx: "rimshot", name: "Ba dum tss", by: "by jokester", tags: "drum, joke", up: 1980, cat: "reactions" },
-    { sfx: "coin", name: "Coin pickup", by: "Shared by a player", tags: "retro, game", up: 1630, cat: "games" },
-    { sfx: "laser", name: "Laser zap", by: "by pewpew", tags: "sci-fi", up: 1120, cat: "games" },
-    { sfx: "drop", name: "Bass drop", by: "by dj_onion", tags: "music, drop", up: 980, cat: "music" },
-    { sfx: "clap", name: "Crowd applause", by: "Shared by a player", tags: "crowd", up: 870, cat: "reactions" },
-    { sfx: "hoot", name: "Owl at night", by: "by Hoot", tags: "animal, spooky", up: 410, cat: "pranks" }
+    { sfx: "boom", name: "Vine boom (extra bass)", by: "by bassboi", tags: "meme, boom", up: 4210, down: 38, cat: "memes", art: "💥", days: 3 },
+    { sfx: "horn", name: "MLG air horn", by: "by Onion Board", tags: "meme, horn", up: 3870, down: 52, cat: "memes", art: "📯", days: 41 },
+    { sfx: "buzzer", name: "Wrong answer", by: "Shared by a player", tags: "game show", up: 2950, down: 21, cat: "reactions", art: "❌", days: 12 },
+    { sfx: "trombone", name: "Sad trombone", by: "by Onion Board", tags: "fail, comedy", up: 2410, down: 17, cat: "reactions", art: "😢", days: 60 },
+    { sfx: "rimshot", name: "Ba dum tss", by: "by jokester", tags: "drum, joke", up: 1980, down: 30, cat: "reactions", art: "🥁", days: 8 },
+    { sfx: "coin", name: "Coin pickup", by: "Shared by a player", tags: "retro, game", up: 1630, down: 9, cat: "games", art: "🪙", days: 1 },
+    { sfx: "laser", name: "Laser zap", by: "by pewpew", tags: "sci-fi", up: 1120, down: 14, cat: "games", art: "⚡", days: 19 },
+    { sfx: "drop", name: "Bass drop", by: "by dj_onion", tags: "music, drop", up: 980, down: 22, cat: "music", art: "🔊", days: 5 },
+    { sfx: "clap", name: "Crowd applause", by: "Shared by a player", tags: "crowd", up: 870, down: 4, cat: "sports", art: "👏", days: 27 },
+    { sfx: "ring", name: "Stream alert ding", by: "by Onion Board", tags: "alert, stream", up: 640, down: 3, cat: "streamer", art: "🔔", days: 2 },
+    { sfx: "squeak", name: "Tiny squeak", by: "Shared by a player", tags: "prank, mouse", up: 520, down: 11, cat: "pranks", art: "🐭", days: 6 },
+    { sfx: "hoot", name: "Owl at night", by: "by Hoot", tags: "animal, spooky", up: 410, down: 2, cat: "spooky", art: "🦉", days: 14 }
   ];
-  var store = { sort: "top", cat: "", q: "" };
+  var SHARED_VOICES = [
+    { name: "Raid boss", by: "by bassboi", kind: "Voice changer", pic: "dark-lord", up: 1320, down: 12, days: 4 },
+    { name: "Space station AI", by: "Shared by a player", kind: "Voice changer", pic: "ship-computer", up: 990, down: 8, days: 9 },
+    { name: "Radio DJ at 3am", by: "by dj_onion", kind: "A setup", pic: "podcast-voice", up: 760, down: 5, days: 2 },
+    { name: "Grumpy goblin", by: "Shared by a player", kind: "Voice changer", pic: "goblin", up: 540, down: 9, days: 17 },
+    { name: "Cathedral choir", by: "by Onion Board", kind: "A setup", pic: "choir", up: 380, down: 1, days: 30 }
+  ];
+  var store = { tab: "sounds", sort: "votes", cat: "", q: "", voted: {}, told: false };
+  function catHue(cat) { return Math.round(CATS.indexOf(cat) * 360 / CATS.length + 12) % 360; }
+  function ago(d) { return d <= 0 ? "today" : d === 1 ? "yesterday" : d < 14 ? d + " days ago" : d < 60 ? Math.round(d / 7) + " weeks ago" : Math.round(d / 30) + " months ago"; }
+  function count(n) { return n >= 1000 ? (n / 1000).toFixed(1).replace(".0", "") + "k" : String(n); }
   function storePage() {
     var list = h("div", { class: "ob-store" });
-    function count(n) { return n >= 1000 ? (n / 1000).toFixed(1).replace(".0", "") + "k" : String(n); }
+    function vote(s, way) {
+      var was = store.voted[s.name] || 0;
+      store.voted[s.name] = was === way ? 0 : way;
+      if (!store.told) { store.told = true; toast("Thanks for voting", "Here your vote stays on this page. In the app it counts for everyone, so the best sounds rise to the top."); }
+      draw();
+    }
+    function voteBtns(s) {
+      var v = store.voted[s.name] || 0;
+      return [btn("vote", count(s.up + (v === 1 ? 1 : 0)), "like", function () { vote(s, 1); }, { title: "I like it", "aria-pressed": v === 1 ? "true" : "false" }),
+        btn("vote", count(s.down + (v === -1 ? 1 : 0)), "dislike", function () { vote(s, -1); }, { title: "Not for me", "aria-pressed": v === -1 ? "true" : "false" })];
+    }
+    function head() {
+      function col(key, label) {
+        if (!key) return h("span", { class: "c", text: label });
+        var on = store.sort === key;
+        var b = h("button", { type: "button", class: "c srt" + (on ? " on" : ""), onclick: function () { store.sort = key; draw(); } }, [h("span", { text: label })]);
+        if (on) b.appendChild(icon("chev", "dn"));
+        return b;
+      }
+      return h("div", { class: "ob-shead" }, [col("", store.tab === "voices" ? "Voice" : "Sound"), col("", store.tab === "voices" ? "Kind" : "Category"), col("added", "Added"), col("votes", "Votes"), h("span", { class: "c" })]);
+    }
     function draw() {
-      list.replaceChildren();
+      list.replaceChildren(head());
       var q = store.q.trim().toLowerCase();
+      if (store.tab === "voices") {
+        var vs = SHARED_VOICES.filter(function (v) { return !q || (v.name + " " + v.kind).toLowerCase().indexOf(q) >= 0; });
+        vs.sort(store.sort === "added" ? function (a, b) { return a.days - b.days; } : function (a, b) { return b.up - a.up; });
+        vs.forEach(function (v) {
+          list.appendChild(h("div", { class: "ob-srow" }, [h("img", { class: "tile", src: "demo/voices/" + v.pic + ".webp", alt: "" }),
+            btn("flat icon", null, "headphones", function () { tryIt("Hearing a shared voice"); }, { "aria-label": "Hear it", title: "Hear a line in it (only you)" }),
+            h("div", { class: "tx" }, [h("b", { text: v.name }), h("small", { text: v.by })]),
+            h("span", { class: "cat" }, [icon("voice", "s"), h("span", { text: v.kind })]), h("span", { class: "ago", text: ago(v.days) })]
+            .concat(voteBtns(v), [btn("icon add", null, "plus", function () { tryIt("Adding a shared voice to your Voice tab"); }, { "aria-label": "Add it to your voices", title: "Add it to your voices" }),
+              btn("flat icon", null, "flag", function () { tryIt("Reporting a voice"); }, { "aria-label": "Report it", title: "Report it" })])));
+        });
+        if (!vs.length) list.appendChild(h("div", { class: "ob-none", text: "Nothing matches. Try other words." }));
+        return;
+      }
       var rows = STORE.filter(function (s) { return (!store.cat || s.cat === store.cat) && (!q || (s.name + " " + s.tags).toLowerCase().indexOf(q) >= 0); });
-      if (store.sort === "new") rows = rows.slice().reverse();
-      if (store.sort === "trending") rows = rows.slice(2).concat(rows.slice(0, 2));
+      rows.sort(store.sort === "added" ? function (a, b) { return a.days - b.days; } : function (a, b) { return b.up - a.up; });
       rows.forEach(function (s) {
         var added = PADS.some(function (p) { return p.fromStore === s.name; });
-        var play = btn("flat icon", null, "play", function () { if (site.play) site.play(s.sfx); did("store-play"); }, { "aria-label": "Hear it (only you)", title: "Hear it (only you)" });
-        var up = btn("flat small", count(s.up), "like", function () { tryIt("Voting on shared sounds"); }, { title: "I like it" });
-        var down = btn("flat small", null, "dislike", function () { tryIt("Voting on shared sounds"); }, { title: "Not for me", "aria-label": "Not for me" });
-        var add = btn(added ? "small" : "small acc", added ? "Added" : null, added ? "check" : "plus", function () {
+        function hear() { if (site.play) site.play(s.sfx); did("store-play"); }
+        var add = btn(added ? "icon add done" : "icon add", null, added ? "check" : "plus", function () {
           if (added) return go("sounds");
-          PADS.push({ sfx: s.sfx, name: s.name, art: "🎵", c: COLOURS[nextId % COLOURS.length], key: "", tabs: [], id: nextId++, len: LENS[s.sfx] || 1, plays: 0, fromStore: s.name });
+          PADS.push({ sfx: s.sfx, name: s.name, art: s.art, c: COLOURS[nextId % COLOURS.length], key: "", tabs: [], id: nextId++, len: LENS[s.sfx] || 1, plays: 0, fromStore: s.name });
           did("store-add");
           draw();
           toast("Added “" + s.name + "”", "It's on your Sounds tab now. Shared sounds are free for anyone to use (CC0).");
         }, { title: added ? "On your Sounds tab" : "Add it to your Sounds", "aria-label": added ? "Added" : "Add it to your Sounds" });
-        var flag = btn("flat icon", null, "flag", function () { tryIt("Reporting a sound"); }, { "aria-label": "Report this sound", title: "Report this sound" });
-        list.appendChild(h("div", { class: "ob-srow" }, [play, h("div", { class: "tx" }, [h("b", { text: s.name }), h("small", { text: s.by + " · " + s.tags })]), up, down, add, flag]));
+        list.appendChild(h("div", { class: "ob-srow" }, [
+          h("button", { type: "button", class: "tile", style: "--h:" + catHue(s.cat), "aria-label": "Hear " + s.name, onclick: hear }, [h("span", { text: s.art })]),
+          btn("flat icon", null, "play", hear, { "aria-label": "Hear it (only you)", title: "Hear it (only you)" }),
+          h("div", { class: "tx" }, [h("b", { text: s.name }), h("small", { text: s.by + " · " + s.tags })]),
+          h("span", { class: "cat", text: CAT_NAMES[s.cat] }), h("span", { class: "ago", text: ago(s.days) })]
+          .concat(voteBtns(s), [add, btn("flat icon", null, "flag", function () { tryIt("Reporting a sound"); }, { "aria-label": "Report this sound", title: "Report this sound" })])));
       });
       if (!rows.length) list.appendChild(h("div", { class: "ob-none", text: "Nothing matches. Try other words." }));
     }
-    var SORTS = [["top", "Top", "The best voted first"], ["new", "New", "The newest first"],
-      ["trending", "Trending", "What's hot on Myinstants right now, and the sounds people here liked this week"]];
-    var sorts = h("div", { class: "ob-sorts" });
-    SORTS.forEach(function (s) {
-      sorts.appendChild(btn("", s[1], null, function () {
-        store.sort = s[0];
-        Array.prototype.forEach.call(sorts.children, function (b, i) { b.setAttribute("aria-pressed", SORTS[i][0] === s[0] ? "true" : "false"); });
-        draw();
-      }, { title: s[2], "aria-pressed": store.sort === s[0] ? "true" : "false" }));
-    });
-    var find = h("input", { type: "search", placeholder: "Search the store", "aria-label": "Search the store", value: store.q });
+    var seg = h("div", { class: "ob-seg" });
+    function drawSeg() {
+      seg.replaceChildren();
+      [["sounds", "Sounds", "sounds"], ["voices", "Voices", "voice"]].forEach(function (t) {
+        seg.appendChild(btn("", t[1], t[2], function () { store.tab = t[0]; drawSeg(); find.placeholder = t[0] === "voices" ? "Search voices" : "Search sounds"; catSel.hidden = t[0] === "voices"; share.querySelector(".t").textContent = t[0] === "voices" ? "Share a voice" : "Share a sound"; draw(); },
+          { "aria-pressed": store.tab === t[0] ? "true" : "false" }));
+      });
+    }
+    var find = h("input", { type: "search", placeholder: store.tab === "voices" ? "Search voices" : "Search sounds", "aria-label": "Search the store", value: store.q });
     find.addEventListener("input", function () { store.q = find.value; draw(); });
-    var cats = h("div", { class: "chips" });
-    [["", "All"], ["memes", "Memes"], ["reactions", "Reactions"], ["games", "Games"], ["music", "Music"], ["pranks", "Pranks"]].forEach(function (c) {
-      cats.appendChild(h("button", { type: "button", class: "chip", "data-c": c[0], "aria-pressed": store.cat === c[0] ? "true" : "false", text: c[1], onclick: function () {
-        store.cat = c[0];
-        Array.prototype.forEach.call(cats.children, function (b) { b.setAttribute("aria-pressed", b.dataset.c === c[0] ? "true" : "false"); });
-        draw();
-      } }));
-    });
+    var cs = h("select", { "aria-label": "Category", onchange: function () { store.cat = cs.value; draw(); } });
+    [["", "All categories"]].concat(CATS.map(function (c) { return [c, CAT_NAMES[c]]; })).forEach(function (c) { cs.appendChild(h("option", { value: c[0], text: c[1], selected: store.cat === c[0] })); });
+    var catSel = h("span", { class: "sel withic" }, [icon("grid", "s"), cs]);
+    catSel.hidden = store.tab === "voices";
+    var share = btn("acc", store.tab === "voices" ? "Share a voice" : "Share a sound", "upload", function () { tryIt("Sharing your own " + (store.tab === "voices" ? "voice" : "sound") + " with everyone"); });
+    drawSeg();
     draw();
-    return h("div", { class: "ob-page ob-scroll" }, [
-      h("div", { class: "ob-vcard ob-storehead" }, [
-        h("div", { class: "hd" }, [icon("store", "s"), h("b", { text: "Sound store" }), h("span", { class: "ob-beta", text: "Beta", title: "The sound store is new and still changing." }),
-          btn("flat icon small", null, "info", function () { toast("Free to use", "Sounds people share here are CC0: free for anyone to use for anything. Each one is checked before it shows."); }, { "aria-label": "About the store" })]),
-        h("div", { class: "row" }, [btn("acc", "Share a sound", "upload", function () { tryIt("Sharing your own sound with everyone"); }), sorts]),
-        h("div", { class: "row" }, [h("label", { class: "field", style: "flex:1" }, [icon("search", "s"), find]),
+    var bun = document.getElementById("bun-icon") ? (function () {
+      var s = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+      s.setAttribute("viewBox", "-6 -10 112 140"); s.setAttribute("class", "bun"); s.setAttribute("aria-hidden", "true");
+      s.innerHTML = '<use href="#bun-icon"/>';
+      return s;
+    })() : h("img", { class: "bun", src: "demo/ai/bun-robot.webp", alt: "" });
+    return h("div", { class: "ob-page ob-scroll ob-storepg" }, [
+      h("div", { class: "ob-shero" }, [
+        h("div", { class: "top" }, [bun, h("div", { class: "tt" }, [
+          h("div", { class: "ln1" }, [h("b", { text: "Community" }), h("span", { class: "ob-beta", text: "Beta", title: "The Community tab is new and still changing." }),
+            btn("flat icon small", null, "info", function () { toast("Free to use", "Sounds people share here are CC0: free for anyone to use for anything. Each one is checked before it shows."); }, { "aria-label": "About the store" })]),
+          h("span", { class: "hint", text: "Sounds and voices players share, voted on by everyone: add them or share your own" })])]),
+        h("div", { class: "row" }, [seg, h("label", { class: "field" }, [icon("search", "s"), find]), catSel, share,
           btn("flat icon", null, "reload", function () { draw(); }, { "aria-label": "Refresh", title: "Refresh" })])]),
-      cats, list
+      list
     ]);
   }
 
@@ -1310,6 +1964,7 @@
   // ------------------------------------------------------------------ frame and pages
   function go(page) {
     closeMenu(); closeLive();
+    R.repaint = null;
     S.page = page;
     did("page-" + page);
     var p = page === "sounds" ? soundsPage() : page === "voice" ? voicePage() : page === "settings" ? settingsPage() : page === "radio" ? radioPage() : page === "apps" ? appsPage() :
