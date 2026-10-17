@@ -1,7 +1,7 @@
-"""A small start-up panel: Bun playing one of his acts (ui/splashacts.py, a different
-one picked at random each launch), the app name and three chasing dots; as the window
-comes up he waves goodbye. The theme is read straight from config.json; the rest of the
-settings load later.
+"""A small start-up panel in a soft glow of the theme's colours: Bun playing one of
+his acts (ui/splashacts.py, a different one picked at random each launch), the app name
+and three chasing dots; as the window comes up he waves goodbye. The theme is read
+straight from config.json; the rest of the settings load later.
 
 A cold start (first launch after a reboot, files not yet cached) can spend several
 seconds importing and building the window, all on the UI thread. On Windows the
@@ -28,10 +28,10 @@ from pathlib import Path
 
 from PySide6.QtCore import QEventLoop, QPointF, QRectF, Qt
 from PySide6.QtGui import (QColor, QCursor, QFont, QGuiApplication, QImage, QPainter,
-                           QPainterPath, QPen)
+                           QPainterPath, QPen, QRadialGradient)
 from PySide6.QtWidgets import QApplication, QWidget
 
-from soundboard import theme
+from soundboard import __version__, theme
 from soundboard.bunny import sparkle
 from soundboard.i18n import _
 from soundboard.ui import splashacts
@@ -99,12 +99,21 @@ def _surface(w: float, h: float, scale: float) -> QImage:
             p.setPen(Qt.PenStyle.NoPen)
             p.setBrush(QColor(theme.T["panel"]))
             p.drawRoundedRect(QRectF(8, 8, w - 16, h - 16), 16, 16)
+            _paint_glow(p, QRectF(8, 8, w - 16, h - 16))
             font = QFont(family)
             font.setPixelSize(18)
             font.setWeight(QFont.Weight.DemiBold)
             p.setFont(font)
             p.setPen(QColor(theme.T["text_hi"]))
             p.drawText(QRectF(20, 142, w - 40, 26), Qt.AlignmentFlag.AlignCenter, "Onion Board")
+            # the version small in the top right corner: the name stays dead centre
+            vfont = QFont(family)
+            vfont.setPixelSize(10)
+            p.setFont(vfont)
+            p.setPen(QColor(theme.T["muted"]))
+            p.drawText(QRectF(20, 16, w - 40, 14),
+                       Qt.AlignmentFlag.AlignRight | Qt.AlignmentFlag.AlignVCenter,
+                       f"v{__version__}")
             font.setPixelSize(12)
             font.setWeight(QFont.Weight.Normal)
             p.setFont(font)
@@ -126,6 +135,30 @@ def _surface(w: float, h: float, scale: float) -> QImage:
             p.end()
         _surfaces[key] = img
     return img
+
+
+# the card's soft wash of the theme's colours: (centre x, centre y, radius) as fractions
+# of the panel, which colour, how strong on a dark theme (light themes get 60 % of it)
+GLOW = (((0.5, 0.05, 0.75), "accent", 0.22), ((1.0, 1.0, 0.7), "accent2", 0.12))
+
+
+def _paint_glow(p: QPainter, panel: QRectF):
+    """A soft glow of the theme's two accent colours over the panel: the accent behind
+    Bun, the second one rising from a bottom corner. High Contrast keeps its flat panel."""
+    if not theme.polished():
+        return
+    light = theme.is_light_colour(theme.T["panel"])
+    path = QPainterPath()
+    path.addRoundedRect(panel, 16, 16)
+    for (cx, cy, r), key, strength in GLOW:
+        g = QRadialGradient(QPointF(panel.x() + cx * panel.width(),
+                                    panel.y() + cy * panel.height()), r * panel.height())
+        c = QColor(theme.T.get(key, theme.T["accent"]))
+        c.setAlphaF(strength * (0.6 if light else 1.0))
+        g.setColorAt(0, c)
+        c.setAlphaF(0)
+        g.setColorAt(1, c)
+        p.fillPath(path, g)
 
 
 def _bun_rect(w: float) -> QRectF:
@@ -441,7 +474,6 @@ def show() -> Splash | NativeSplash:
 
 def _updated(pending: str):
     """The first start after an update: "Updated to X" instead of Starting…."""
-    from soundboard import __version__
     if pending and pending == __version__:
         set_status(_("Updated to {version}", version=__version__))
 
