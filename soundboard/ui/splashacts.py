@@ -84,6 +84,18 @@ class Show:
         return pose
 
 
+def rare_for(roll: float) -> str | None:
+    """The rare Bun a `roll` (0 <= roll < 1, uniform) lands on, or None. The tiers sit
+    end to end from 0, rarest first, each exactly 1/odds wide, so each comes up 1 launch
+    in its odds and they never overlap."""
+    edge = 0.0
+    for name, (odds, _kit, _glow) in RARES.items():
+        edge += 1 / odds
+        if roll < edge:
+            return name
+    return None
+
+
 def pick(now: datetime.datetime | None = None, rng: random.Random | None = None) -> Show:
     """This launch's act, picked at random (sleepy is the favourite at night), now and
     then a rare one (RARES), and his season's hat (SEASONS)."""
@@ -93,14 +105,9 @@ def pick(now: datetime.datetime | None = None, rng: random.Random | None = None)
     late = now.hour >= NIGHT[0] or now.hour < NIGHT[1]
     weights = [NIGHT_WEIGHT if late and n == "sleepy" else 1 for n in names]
     show = Show(act=rng.choices(names, weights)[0])
-    roll, edge = rng.random(), 0.0
-    for name, (odds, _kit, _glow) in RARES.items():   # rarest first
-        edge += 1 / odds
-        if roll < edge:
-            show.rare = name
-            if show.act == "robo":   # (Robo-Bun keeps his metal: someone else's act)
-                show.act = rng.choice([n for n in names if n != "robo"])
-            break
+    show.rare = rare_for(rng.random())
+    if show.rare and show.act == "robo":   # (Robo-Bun keeps his metal: someone else's act)
+        show.act = rng.choice([n for n in names if n != "robo"])
     season = tuple(n for n in SEASONS.get(now.month, ()) if n in bunnyfit.PIECES)
     if season:   # his own hat off, the season's on (neck pieces stay)
         show.outfit = tuple(n for n in bunnyfit.outfit()
