@@ -2,6 +2,13 @@
 
 Changes not released yet are in [changelog.d/](changelog.d/), one file per change.
 
+## 2.6.2 — 2026-10-17
+
+- Opening Onion Board while an update is installing no longer shows "Unhandled exception
+  in script" error boxes: it steps aside, and the installer opens it once it's done.
+- The window no longer freezes for seconds right after installing, when a tab is first
+  opened while the radio player is getting ready in the background.
+
 ## 2.6.1 — 2026-10-17
 
 - A number you type into a box (speed, pitch, effects, volume, trim) now counts after a
