@@ -404,6 +404,8 @@ class StoreTab(QWidget):
             return
         self._off = not net.allowed(store.FEATURE)
         if self._off:
+            self._serial += 1   # a list still on its way would say "Couldn't open" over this
+            busy.set_busy(self.btn_more, False)
             self._clear()
             self._say("offline", _("The store is off"), net.off_message(store.FEATURE),
                       _("Privacy && security settings"), self._open_privacy)

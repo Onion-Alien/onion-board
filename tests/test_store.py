@@ -181,6 +181,31 @@ def test_switched_off_contacts_nobody(qapp, fake, monkeypatch):
     t.shutdown()
 
 
+def test_switched_off_while_loading_keeps_saying_off(qapp, fake, monkeypatch):
+    # the list still on its way when the store is switched off: its late refusal
+    # mustn't replace "The store is off" (and its way to Settings) with "Couldn't open"
+    import threading
+    go, asked = threading.Event(), threading.Event()
+    plain = store._request
+
+    def slow(method, path, *a, **kw):
+        if path.startswith("/v1/sounds?"):
+            asked.set()
+            go.wait(5)
+            raise store.StoreError("The sound store is switched off.")
+        return plain(method, path, *a, **kw)
+    monkeypatch.setattr(store, "_request", slow)
+    t = _tab(qapp, [], [])
+    assert _wait(qapp, asked.is_set)
+    monkeypatch.setattr(net, "allowed", lambda f: f != store.FEATURE)
+    t.reload()
+    assert "off" in t.msg_title.text().lower()
+    go.set()
+    _wait(qapp, lambda: False, n=30)
+    assert t.msg_title.text() == storetab._("The store is off") and t.msg_btn.isVisibleTo(t)
+    t.shutdown()
+
+
 def test_a_late_answer_after_shutdown_is_dropped(qapp, fake):
     t = _tab(qapp, [], [])
     t.shutdown()
