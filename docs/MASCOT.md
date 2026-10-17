@@ -15,7 +15,7 @@ lines in the files below.
 | `soundboard/ui/scribebun.py` | `ScribeBunny`: the download bar's picture, Bun writing the tune on a scroll in a 56 x 59 slot. Caches pictures of him in `_layer`. |
 | `soundboard/ui/bunpong.py` | The Pong Easter egg; draws Bun with his bat (or the star when he wins). |
 | `soundboard/ui/splash.py` | The start-up splash: the panel, the name and the dots; Bun's part is `splashacts.py`. |
-| `soundboard/ui/splashacts.py` | Bun's start-up acts, one picked at random each launch (`pick`): headbang, karaoke, build, batting, party, sleepy (the favourite at night), Robo-Bun booting, plugging in his headphones, hop, drums, ear wiggle, peekaboo, spin. rare launches (`RARES`, rarest first): Golden Bun 1 in 50, Ice Bun 1 in 500, Galaxy Bun 1 in 5000 (planets orbit him), Rainbow Bun 1 in 50000 (his fur cycles the hues), each with a glowing border in its colour and its drop rate (`1/500`, no words to translate) under the dots; the season's pieces by month (`SEASONS`: October the Halloween hat and fangs, December the Santa hat); his goodbye wave as the window comes up. Every act reads in its first half second and loops; `still` is Bun at rest for Windows' Animation effects off. An act that hides part of him (peekaboo's hole) draws him on a picture first (`_bun_above`): `draw_bunny` sets clips of its own. |
+| `soundboard/ui/splashacts.py` | Bun's start-up acts, one picked at random each launch (`pick`): headbang, karaoke, build, batting, party, sleepy (the favourite at night), Robo-Bun booting, plugging in his headphones, hop, drums, ear wiggle, peekaboo, spin. rare launches (`RARES`, rarest first): Golden Bun 1 in 50, Ice Bun 1 in 500, Galaxy Bun 1 in 5000 (planets orbit him), Rainbow Bun 1 in 50000 (his fur cycles the hues), each with a glowing border in its colour and its tier and drop rate (`Rare · 1/500`, tier names from `splash.tier_name`: Uncommon, Rare, Legendary, Super Rare) on a taller card under the dots; the season's pieces by month (`SEASONS`: October the Halloween hat and fangs, December the Santa hat); his goodbye wave as the window comes up. Every act reads in its first half second and loops; `still` is Bun at rest for Windows' Animation effects off. An act that hides part of him (peekaboo's hole) draws him on a picture first (`_bun_above`): `draw_bunny` sets clips of its own. |
 | `scripts/pictures/make_bunny.py`, `scripts/pictures/make_favicon.py` | Installer art and icons: always plain Bun (`outfit=()`, `kit=VANILLA`). |
 | `scripts/pictures/bun_sheet.py` | Picture sheets for checking a change by eye (below). |
 | `scripts/pictures/site_mascots.py` | The website's Bun and Hoot: runs `draw_bunny` / `draw_owl` in each theme of the site's look switcher through a painter that writes SVG, into `site/index.html` (the parts the page moves in their own groups) and `site/home.css` (each look's colours). Rerun it after changing either drawing. |
@@ -27,7 +27,7 @@ lines in the files below.
 floating Bun: `in_background=True` keeps him moving behind a game), the empty board (`ui/widgets.py`), the Apps tab
 (`ui/appspanel.py`, sad and begging), the Radio map (`ui/flatmap.py`), the YouTube search
 (`ui/ytsearch.py`), left of the Live controls title (`ui/speedpitch.py` `DjBunny`: his
-`bunskits.mixing` act on a loop, tapping sound pads and scratching a record), the mic part update (`ui/micupdate.py`) and Robo-Bun on the AI voice
+`bunskits.mixing` act on a loop, tapping sound pads and scratching a record), the mic part update (`ui/micupdate.py`), the *Enjoying Onion Board?* bar (`ui/enjoycontrol.py`, holding up the `survey` clipboard) and Robo-Bun on the AI voice
 card (`ui/aivoicepanel.py`). `SetupShow` in the setup guide; `ScribeBunny` in the
 download bar (`ui/downloadbar.py`); static pictures in `ui/dialogs.py` and the smug box in
 `ui/mainwindow.py`; each theme's card in Settings > Appearance
@@ -39,12 +39,15 @@ and waves, `wave_pose`, unless Windows animations are off). To find new ones: gr
 
 His look is the Storybook one: a round head a little wider at the cheeks
 (`bunnyfit.head_path`), a small sitting body under it (`bunnyfit.body_path`) with a
-tail and a soft tummy patch, two short stubby arms from his shoulders at the sides of his
-body (tucked under his head) to round paws, two plain oval feet, sparkle eyes (a dark eye,
+tail, a soft tummy patch with a little belly button and a fluffy poof of lighter fur on his
+chest under his chin (`bunny._poof`: pointed tufts, no ink outline), two short stubby arms from his shoulders at the sides of his
+body (tucked under his head) to round paws, two long oval feet, sparkle eyes (a dark eye,
 a coloured iris glowing up from the bottom, one big shine and two little ones), little
 resting brows, a pink nose over a soft double smile, and his ears as his theme's look
-says (plain Bun: one up, the other flopped over a little below the middle, its pink
-running on to the tip; `bunny.REST_FOLD`, `REST_HINGE`). No fur lines inside him (no toe
+says (plain Bun: one up, its top half curving softly out and down, `bunny.DROOP`; the
+other flopped right over a little below the middle, its pink running on to the tip and
+round the bend; `bunny.REST_FOLD`, `REST_HINGE`). An ear is three colours at most: the
+ink outline, his fur and the inner colour, no shading. No fur lines inside him (no toe
 or finger lines, no leg creases). Lines are round-capped ink; shading is a couple of soft
 fades (`_shade`), never texture.
 
@@ -66,7 +69,8 @@ head tilts on top (its pose's `tilt`, added to `nod`): a slow curious lean, furt
 when he's hoping, into the cup he's listening with, side to side as he hops, lolled
 over asleep. Bun mode's dances
 (`BunnyWidget.set_groove`, `_moves`) use them to headbang and nod on the beat. Props:
-`bunny.PROPS` (`hammer_broken`: the failed build's snapped plank and headless hammer).
+`bunny.PROPS` (`hammer_broken`: the failed build's snapped plank and headless hammer;
+`survey`: a clipboard held up in both paws, facing you).
 Everything an act shows stays inside the widget's own box: a widget is only a little wider
 than Bun, so moving him sideways out of view slices him at its edge. Squash, shrink or fade
 him instead (the build act dives into its cloud, the setup show fades out before the edge).
@@ -96,8 +100,9 @@ with soft tufts, `"long"`, a pointy `"tuft"`, a `"heart"`), the colour low in hi
 (`"iris"`), inside his ears (`"inner"`) and his nose (`"nose"`), fur markings
 (`"pattern"` from `bunnyfit.PATTERNS`: a `"patch"` over his left eye, `"spots"`, a
 `"mask"` round both eyes with a stripe of fur down the middle, all in `"marks"`), his
-tummy patch colour (`"belly"`) and pad prints under his feet (`"pads"`: a big pad and three
-toe beans, plain shapes with no lines). Markings are clipped to his head and body; an eye
+tummy patch colour (`"belly"`) and pad prints under his feet (`"pads"`: a heart-shaped pad
+and four toe beans with a little shine, plain shapes with no lines, well inside the foot;
+smaller on his waving paw, toes up). Markings are clipped to his head and body; an eye
 on dark markings gets the light rim and face lines dark fur gets, and his smug lids take
 the markings' colour. A theme that isn't listed is plain Bun,
 `bunnyfit.VANILLA`: Dark, the default, stays plain. `draw_bunny(..., kit=None)` uses the

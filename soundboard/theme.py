@@ -368,6 +368,11 @@ QFrame#urgentbar { background:$warn_bg; border:1px solid $warn_text; border-radi
 QFrame#tipbar { background:$panel; border:1px solid $border_hi; border-radius:10px; }
 QFrame#tipbar QLabel { background:transparent; color:$text; }
 QFrame#tipbar QPushButton#primary { padding:2px 8px; font-size:8pt; }   /* as small as Not now */
+QFrame#tipbar QLabel#hint { color:$muted; }
+QFrame#tipbar QPlainTextEdit#enjoysaid { background:$field; color:$text; border:1px solid $border;
+    border-radius:8px; padding:4px 6px 1px 6px; }   /* the words centred on their cap height */
+QFrame#tipbar QPlainTextEdit#enjoysaid:focus { border-color:$accent; }
+QFrame#tipbar QPushButton#primary[roomy="true"] { padding:0 14px; font-size:9pt; }   /* beside a text box, as tall as it */
 QFrame#tipbar QPushButton#urgenthide { background:transparent; color:$muted; border:none;
                                        border-radius:6px; font-weight:700; font-size:12pt; }
 QFrame#tipbar QPushButton#urgenthide:hover { background:$btn_hover; }

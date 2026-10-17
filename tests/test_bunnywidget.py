@@ -173,10 +173,10 @@ def test_sad_ears_fold_down_from_the_middle(qapp):
     from soundboard.bunny import bunny_image
     tops = []
     for sad in (0.0, 1.0):
-        img = QImage(100, 120, QImage.Format_ARGB32_Premultiplied)
-        img.fill(0)
-        p = QPainter(img)
-        draw_bunny(p, QRectF(0, 0, 100, 120), sad=sad, outfit=())
+        img = QImage(100, 140, QImage.Format_ARGB32_Premultiplied)   # (room above: an
+        img.fill(0)                                                  # upright ear's tip
+        p = QPainter(img)                                            # reaches past him)
+        draw_bunny(p, QRectF(0, 20, 100, 120), sad=sad, outfit=())
         p.end()
         tops.append(_top_ink_row(img))
     assert tops[1] > tops[0] + 12        # the tips came down a long way

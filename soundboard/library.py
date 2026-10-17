@@ -601,6 +601,9 @@ class Config:
     stats_launches: int = 0
     stats_version: str = ""
     stats_pending: list[str] = field(default_factory=list)
+    # *Enjoying Onion Board?* (soundboard.enjoy): seconds open per date, "" / "done"
+    enjoy_days: dict = field(default_factory=dict)
+    enjoy_state: str = ""
     # an observed FFmpeg startup/get failure awaiting a verified working copy
     stats_ffmpeg_failed: bool = False
     sounds: list[SoundMeta] = field(default_factory=list)

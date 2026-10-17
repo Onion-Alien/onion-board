@@ -499,6 +499,9 @@ class WindowBuilder(Controller):
         mw._lang_offered = ""
         rv.addWidget(mw.lang_bar)
 
+        mw.enjoy_bar = mw.enjoyctl.build_bar()   # *Enjoying Onion Board?* (ui/enjoycontrol.py)
+        rv.addWidget(mw.enjoy_bar)
+
         # the bars' buttons take focus from Tab only, never a click: a clicked ✕ held the
         # focus, its bar hid, and Qt passed the focus on to the sidebar's Sounds button
         for name in mw.TOP_BARS:
@@ -538,7 +541,7 @@ class WindowBuilder(Controller):
         av.setContentsMargins(0, 0, 0, 0)
         av.setSpacing(rv.spacing())
         for strip in (mw.mic_banner, mw.urgent_bar, mw.tip_bar, mw.setup_bar,
-                      mw.ff_bar, mw.lang_bar):
+                      mw.ff_bar, mw.lang_bar, mw.enjoy_bar):
             rv.removeWidget(strip)
             av.addWidget(strip)
         av.addWidget(tabs_box, 1)

@@ -9,10 +9,10 @@ in its first half second: a cold start is often over in one or two.
 
 Now and then a launch is rare (`RARES`, `pick`): Golden Bun (1 in 50), Ice Bun (1 in
 500), Galaxy Bun (1 in 5000) and Rainbow Bun (1 in 50000), each with his own look and
-sparkles; the splash gives a rare launch a glowing border and its drop rate. The Halloween theme's
-witch hat and fangs all October, the Santa hat all December, and the sleepy act most
-nights. Animations never draw Bun themselves: they
-work out `draw_bunny`'s keywords per frame (docs/MASCOT.md).
+sparkles; the splash gives a rare launch a glowing border and its tier and drop rate.
+The Halloween theme's witch hat and fangs all October, the Santa hat all December, and
+the sleepy act most nights. Animations never draw Bun themselves: they work out
+`draw_bunny`'s keywords per frame (docs/MASCOT.md).
 """
 from __future__ import annotations
 

@@ -50,6 +50,7 @@ from soundboard.ui.miccontrol import MIC_OFFER_MS, MicControl
 from soundboard.ui.routecontrol import RouteControl
 from soundboard.ui.devicecontrol import DeviceControl
 from soundboard.ui.editcontrol import EditControl
+from soundboard.ui.enjoycontrol import EnjoyControl
 from soundboard.ui.removecontrol import RemoveControl
 from soundboard.ui.padcontrol import PadControl
 from soundboard.ui.remoteaccess import RemoteAccess
@@ -341,6 +342,7 @@ class MainWindow(QMainWindow):
     tagline: sidebar.ClickLabel
     tip: tips.Tip | None
     tip_bar: QFrame
+    enjoy_bar: QFrame
     tip_btn: QPushButton
     tip_lbl: QLabel
     _toolbar_hold: QWidget
@@ -397,7 +399,7 @@ class MainWindow(QMainWindow):
     bin_filled = Signal(object)    # removed sounds are in the bin: its sound count|None
 
     # the slim bars across the top of the window (urgent fix, tip, app offer, FFmpeg, language)
-    TOP_BARS = ("urgent_bar", "tip_bar", "setup_bar", "ff_bar", "lang_bar")
+    TOP_BARS = ("urgent_bar", "tip_bar", "setup_bar", "ff_bar", "lang_bar", "enjoy_bar")
 
     def __init__(self):
         super().__init__()
@@ -412,6 +414,7 @@ class MainWindow(QMainWindow):
         self.appsetctl = AppSetupControl(self)
         self.langctl = LanguageControl(self)
         self.tipctl = TipControl(self)
+        self.enjoyctl = EnjoyControl(self)
         self.hkctl = HotkeyControl(self)
         self.aboutctl = AboutControl(self)
         self.themectl = ThemeControl(self)
@@ -593,6 +596,7 @@ class MainWindow(QMainWindow):
         # a tip once things have settled; tried again now and then while the window is
         # hidden or a game is up, until one has been shown this start
         QTimer.singleShot(TIP_DELAY_MS, self, self.tipctl._start_tips)
+        self.enjoyctl.start()   # *Enjoying Onion Board?* once it's due (enjoy.py)
         tabtours.hook(self)   # each tab's quick how-to on its first visit
         self.langctl._offer_language()
         # the check started behind the loading screen (app.py); its answer, and a
