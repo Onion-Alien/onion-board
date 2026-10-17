@@ -489,3 +489,61 @@ def test_the_decoder_is_loaded_off_the_ui_thread_once(qapp, monkeypatch):
     assert any(n.startswith("avcodec") for n in names)
     assert len(names) == len(set(names))                       # once, for both calls
     assert all(t == "radio-preload" for _, t in loaded)        # never the UI thread
+
+
+def test_each_decoder_image_is_made_before_the_loader_takes_it(qapp, monkeypatch):
+    """A file Windows hasn't seen yet (just installed) is checked as its image is made.
+    In LoadLibrary that's under the loader lock, and every thread start waits for it:
+    the window froze 6 s as the Apps tab started its lister. Each image is made first,
+    on the preload thread, outside the lock, and kept until it's loaded."""
+    import ctypes
+    import sys
+
+    if sys.platform != "win32":
+        pytest.skip("Windows only")
+    steps = []
+    made = {}
+
+    def image(path):
+        steps.append(("image", Path(path).name, threading.current_thread().name))
+        made[Path(path).name] = (len(made) + 1, 0)
+        return made[Path(path).name]
+
+    monkeypatch.setattr(radio, "_image_section", image)
+    monkeypatch.setattr(radio, "_close", lambda h: steps.append(("close", h, "")))
+    monkeypatch.setattr(ctypes, "WinDLL", lambda path: steps.append(
+        ("load", Path(path).name, threading.current_thread().name)))
+    monkeypatch.setattr(radio, "_preloaded", False)
+    radio.preload_decoder()
+    end = time.monotonic() + 5
+    while sum(s[0] == "close" for s in steps) < len(made or [1]) and time.monotonic() < end:
+        time.sleep(0.01)
+    images = [n for kind, n, _ in steps if kind == "image"]
+    loads = [n for kind, n, _ in steps if kind == "load"]
+    assert images and images == loads                       # every one, in load order
+    first_load = next(i for i, s in enumerate(steps) if s[0] == "load")
+    assert all(s[0] == "image" for s in steps[:first_load])  # all made before any load
+    assert all(t == "radio-preload" for kind, _, t in steps if kind != "close")
+    closes = [h for kind, h, _ in steps if kind == "close"]
+    assert sorted(closes) == sorted(made.values())          # let go of, after the loads
+    assert steps.index(("close", closes[0], "")) > max(
+        i for i, s in enumerate(steps) if s[0] == "load")
+
+
+def test_a_decoder_image_is_really_made(tmp_path):
+    """The real call: Windows makes the image of one of Qt's FFmpeg DLLs, and a file
+    that isn't one gets none (the load then goes on as before)."""
+    import sys
+
+    if sys.platform != "win32":
+        pytest.skip("Windows only")
+    dll = radio._decoder_files()[0]
+    fh, section = radio._image_section(dll)
+    assert fh and section
+    radio._close((fh, section))
+    junk = tmp_path / "not-a.dll"
+    junk.write_bytes(b"not a program")
+    fh, section = radio._image_section(junk)
+    assert fh and not section
+    radio._close((fh, section))
+    assert radio._image_section(tmp_path / "missing.dll") == (0, 0)
