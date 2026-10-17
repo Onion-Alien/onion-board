@@ -25,4 +25,5 @@ Rules, so the copy keeps working in both apps:
     hooks      what the app plugs in
 """
 
-KIT_VERSION = 3   # 2: texture_style / paint_glow / live_sheet in the kit; 3: cover
+KIT_VERSION = 4   # 2: texture_style / paint_glow / live_sheet in the kit; 3: cover;
+                  # 4: Hoot's `beak`

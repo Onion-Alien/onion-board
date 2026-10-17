@@ -223,3 +223,45 @@ def test_switched_on_icon_buttons_in_a_card_show_their_icon(qapp, name):
         theme.T.clear()
         theme.T.update(old)
         theme.set_current(theme.DEFAULT)
+
+
+def test_each_theme_card_shows_bun_as_he_looks_in_that_theme(qapp):
+    """The card's Bun is that theme's (headphones, outfit, look), not the current one's,
+    drawing him leaves the current theme as it was, and an upright ear isn't cut off."""
+    from soundboard.ui.settingspages import appearance
+
+    before = dict(theme.T)
+    royal, dark = appearance._bun("Royal", 1.0), appearance._bun("Dark", 1.0)
+    assert theme.T == before
+    assert royal.height() == appearance.BUN_H + appearance.BUN_ROOM
+    assert royal.toImage() != dark.toImage()
+    img = appearance._bun("Light", 2.0).toImage()   # ears up: their tips in the room
+    top = [img.pixelColor(x, y).alpha() for y in range(appearance.BUN_ROOM * 2)
+           for x in range(img.width())]
+    assert max(top) > 200
+    assert all(img.pixelColor(x, 0).alpha() == 0 for x in range(img.width()))
+
+
+def test_hovering_a_theme_card_makes_bun_wave(qapp, monkeypatch):
+    from PySide6.QtCore import QPointF
+    from PySide6.QtGui import QEnterEvent
+
+    from soundboard.ui import toast
+    from soundboard.ui.settingspages import appearance
+
+    clock = [10.0]
+    monkeypatch.setattr(appearance.time, "monotonic", lambda: clock[0])
+    monkeypatch.setattr(toast, "ANIMATE", True)
+    card = ThemeCard("Royal")
+    card.resize(card.sizeHint())
+    still = card.grab().toImage()
+    card.enterEvent(QEnterEvent(QPointF(5, 5), QPointF(5, 5), QPointF(5, 5)))
+    assert card._tick.isActive()
+    clock[0] += 0.6
+    assert card.grab().toImage() != still   # waving
+    clock[0] += appearance.WAVE_S
+    card._step()
+    assert not card._tick.isActive() and card.grab().toImage() == still
+    monkeypatch.setattr(toast, "ANIMATE", False)   # animations off: he stays still
+    card.enterEvent(QEnterEvent(QPointF(5, 5), QPointF(5, 5), QPointF(5, 5)))
+    assert not card._tick.isActive()

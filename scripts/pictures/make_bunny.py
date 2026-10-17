@@ -24,6 +24,7 @@ OUT = ROOT / "installer"
 def side_panel(w: int, h: int) -> QImage:
     """The tall picture on the installer's Welcome and Finish pages."""
     from soundboard.bunny import draw_bunny
+    from soundboard.style.bunnyfit import VANILLA
     img = QImage(w, h, QImage.Format_RGB32)
     p = QPainter(img)
     g = QLinearGradient(0, 0, 0, h)
@@ -33,7 +34,8 @@ def side_panel(w: int, h: int) -> QImage:
     p.setPen(QColor(255, 255, 255, 60))
     p.setBrush(QColor(255, 255, 255, 45))
     p.drawEllipse(QRectF(w * 0.08, h * 0.30, w * 0.84, w * 0.84))
-    draw_bunny(p, QRectF(w * 0.1, h * 0.26, w * 0.8, h * 0.44), "headphones", outfit=())
+    draw_bunny(p, QRectF(w * 0.1, h * 0.26, w * 0.8, h * 0.44), "headphones", outfit=(),
+               kit=VANILLA)
     f = p.font()
     f.setPixelSize(max(12, w // 7))
     f.setBold(True)
@@ -51,10 +53,11 @@ def side_panel(w: int, h: int) -> QImage:
 def small_corner(s: int) -> QImage:
     """The little picture in the top-right corner of the other installer pages."""
     from soundboard.bunny import draw_bunny
+    from soundboard.style.bunnyfit import VANILLA
     img = QImage(s, s, QImage.Format_RGB32)
     img.fill(QColor("white"))
     p = QPainter(img)
-    draw_bunny(p, QRectF(0, 0, s, s), None, outfit=())   # installer art: plain Bun
+    draw_bunny(p, QRectF(0, 0, s, s), None, outfit=(), kit=VANILLA)   # installer art: plain Bun
     p.end()
     return img
 
@@ -69,11 +72,12 @@ def main():
     print(f"wrote installer artwork to {OUT}")
     if "--preview" in sys.argv:
         from soundboard.bunny import PROPS, draw_bunny
+        from soundboard.style.bunnyfit import VANILLA
         sheet = QImage(200 * len(PROPS), 240, QImage.Format_RGB32)
         sheet.fill(QColor("#1e1b2e"))
         p = QPainter(sheet)
         for i, prop in enumerate(PROPS):
-            draw_bunny(p, QRectF(200 * i + 10, 10, 180, 220), prop, outfit=())
+            draw_bunny(p, QRectF(200 * i + 10, 10, 180, 220), prop, outfit=(), kit=VANILLA)
         p.end()
         sheet.save(str(OUT / "bunny-preview.png"))
         side_panel(328, 628).save(str(OUT / "side-preview.png"))

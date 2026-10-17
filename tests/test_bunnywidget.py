@@ -649,3 +649,23 @@ def test_hoot_bobs_to_the_hits(qapp, monkeypatch):
     assert o._dance < 0.01
     o.resize(o.sizeHint())
     assert not o.grab().isNull()
+
+
+def test_his_paws_clasp_when_he_hopes_and_fold_when_hes_cross(qapp):
+    def chest(**kw):   # his chest, just under his chin, where the paws come up to
+        img = QImage(400, 480, QImage.Format_ARGB32_Premultiplied)
+        img.fill(0)
+        p = QPainter(img)
+        draw_bunny(p, QRectF(0, 0, 400, 480), outfit=(), **kw)
+        p.end()
+        return img.copy(120, 368, 160, 56)
+    calm = chest()
+    assert chest(sad=1.0) != calm
+    assert chest(angry=1.0) != calm
+    assert chest(angry=1.0, prop="bat") != chest(angry=1.0)   # the bat takes a paw
+
+
+def test_his_head_tilts_on_its_own_but_not_while_dancing(qapp):
+    b = BunnyWidget()
+    tilts = {round(b.pose(b._t0 + t)["tilt"], 2) for t in (0.5, 2.0, 4.0)}
+    assert len(tilts) > 1 and all(abs(t) < 8 for t in tilts)

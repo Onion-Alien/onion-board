@@ -153,3 +153,21 @@ def test_his_bob_on_the_beat_never_jumps(qapp, monkeypatch):
              and tail[i] > max(tail) - 1]
     for i in peaks:                      # bottoms out right on the beat
         assert abs(((120 + i + 1) / 60 * 2 + 0.5) % 1 - 0.5) < 0.04
+
+
+def test_his_beak_opens_when_he_cheers(qapp):
+    from PySide6.QtCore import QRectF
+    from PySide6.QtGui import QPainter
+
+    def hoot(**kw):
+        img = QImage(100, 120, QImage.Format.Format_ARGB32_Premultiplied)
+        img.fill(0)
+        p = QPainter(img)
+        owl.draw_owl(p, QRectF(0, 0, 100, 120), outfit=(), **kw)
+        p.end()
+        return img
+    assert hoot(beak=1.0) != hoot()
+    w = owl.OwlWidget(96)
+    w.cheer()
+    w.step(0.3, mouse=None)
+    assert w.pose()["beak"] > 0.3

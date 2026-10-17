@@ -90,10 +90,141 @@ def _col(key: str) -> QColor:
     return QColor(hooks.palette()[key])
 
 
-def _head() -> QPainterPath:
-    path = QPainterPath()
-    path.addEllipse(QRectF(16, 36, 68, 56))
+# each theme's own Bun: his fur, which ear flops ("up": neither, "left" / "right": the
+# viewer's, "both") and little extras ("chomp": a bite out of an ear, "earring", "shiner",
+# "bandaid", "freckles"); his tail (TAILS), the colour low in his eyes ("iris"), inside his
+# ears ("inner") and his nose; fur markings ("pattern": "patch" over one eye, "spots",
+# a "mask" round both eyes, all in the "marks" colour), his tummy patch ("belly", None: a
+# shade of his fur) and the pad prints under his feet ("pads", None: none). A theme that
+# isn't listed is plain Bun: VANILLA.
+TAILS = ("round", "fluffy", "long", "tuft", "heart")
+PATTERNS = ("patch", "spots", "mask")
+VANILLA = {"fur": "#fdf8f1", "ears": "right", "extras": (), "tail": "round",
+           "iris": "#8a5cc7", "inner": "#ffb3c7", "nose": "#ff8fae", "pattern": (),
+           "marks": "#a57a52", "belly": None, "pads": None}
+LOOKS: dict[str, dict] = {
+    "Light": {"ears": "up", "tail": "fluffy", "iris": "#3d8fe0", "pads": "#ffb3c7"},
+    "Lilac": {"fur": "#e9e0f7", "ears": "left", "tail": "fluffy", "iris": "#a46be8",
+              "inner": "#d6b4f2", "nose": "#c58ad9", "belly": "#f8f3fe", "pads": "#d6b4f2"},
+    "Toxic": {"fur": "#e2f2d3", "extras": ("chomp", "shiner"), "tail": "tuft",
+              "iris": "#6cc622", "inner": "#c2ea86", "nose": "#86c84a", "pattern": ("spots",),
+              "marks": "#9fd46a", "pads": "#c2ea86"},
+    "Ocean": {"ears": "up", "extras": ("earring",), "iris": "#1aa0c8", "inner": "#ffc0ae",
+              "nose": "#ff8a73", "pattern": ("patch",), "marks": "#8fbcd6", "pads": "#ffc0ae"},
+    "Cherry Blossom": {"fur": "#fde3ec", "ears": "both", "tail": "heart", "iris": "#e0608f",
+                       "inner": "#ff9fbf", "nose": "#ff7aa5", "belly": "#fff4f8",
+                       "pads": "#ff9fbf"},
+    "Carbon": {"fur": "#5c5964", "extras": ("earring", "bandaid"), "tail": "long",
+               "iris": "#ff9a3c", "inner": "#c9a3ad", "nose": "#2b2730", "pattern": ("patch",),
+               "marks": "#e6e2ea", "pads": "#c9a3ad"},
+    "Midnight": {"fur": "#3e4366", "ears": "up", "tail": "fluffy", "iris": "#ffd66b",
+                 "inner": "#9ea6e2", "nose": "#b9a4f0", "pattern": ("spots",),
+                 "marks": "#6c74aa", "belly": "#5b6290", "pads": "#9ea6e2"},
+    "Slate": {"fur": "#e0e1e6", "iris": "#5f7da3", "inner": "#e3b7bf", "nose": "#c98a96",
+              "pattern": ("mask",), "marks": "#8d919e", "pads": "#e3b7bf"},
+    "Arctic": {"ears": "up", "extras": ("freckles",), "tail": "fluffy", "iris": "#4cc2ee",
+               "inner": "#ffd0dc", "pads": "#ffd0dc"},
+    "Paper": {"fur": "#f6edda", "extras": ("freckles",), "iris": "#7a5a34", "inner": "#f2c6b2",
+              "nose": "#d98f7a", "pattern": ("spots",), "marks": "#3a3550", "pads": "#f2c6b2"},
+    "Vampire": {"fur": "#ece7f1", "ears": "left", "extras": ("chomp",), "tail": "tuft",
+                "iris": "#d4213d", "inner": "#c25a7a", "nose": "#8f2a4a", "pattern": ("mask",),
+                "marks": "#3a2d47", "belly": "#d9cfe3", "pads": "#c25a7a"},
+    "Forest": {"fur": "#a57a52", "ears": "up", "tail": "long", "iris": "#5fae3c",
+               "inner": "#f0bea6", "nose": "#5a3a28", "pattern": ("spots",), "marks": "#e9d6ba",
+               "belly": "#e9d6ba", "pads": "#f0bea6"},
+    "Mocha": {"fur": "#6f4630", "ears": "both", "iris": "#e3a24e", "inner": "#e8b0a0",
+              "nose": "#3a2218", "pattern": ("patch",), "marks": "#f3e3cc", "belly": "#f3e3cc",
+              "pads": "#e8b0a0"},
+    "Sunset": {"fur": "#fcdcc4", "ears": "up", "extras": ("earring",), "tail": "fluffy",
+               "iris": "#ff7a3c", "inner": "#ffb38a", "nose": "#ff6e6e", "belly": "#fff1e4",
+               "pads": "#ffb38a"},
+    "Royal": {"ears": "up", "extras": ("earring",), "iris": "#d9a521", "inner": "#c9a3f0",
+              "nose": "#b583e8", "pads": "#c9a3f0"},
+    "Onion": {"iris": "#9b5de5", "inner": "#e2b6f0", "nose": "#c47ad9", "pads": "#e2b6f0"},
+    "Mint": {"fur": "#dbf3e7", "ears": "left", "tail": "fluffy", "iris": "#22b585",
+             "inner": "#a8e6c8", "nose": "#ff9fb3", "pattern": ("spots",), "marks": "#5a3a28",
+             "pads": "#a8e6c8"},
+    "Synthwave": {"fur": "#f6d9ef", "ears": "up", "extras": ("earring",), "tail": "tuft",
+                  "iris": "#ff3fb4", "inner": "#ff7ad9", "nose": "#ff4fa0", "pattern": ("mask",),
+                  "marks": "#9b5de5", "pads": "#6ee7ff"},
+    "Vaporwave": {"fur": "#f2dcf5", "tail": "heart", "iris": "#3fcbdc", "inner": "#b8a4ff",
+                  "nose": "#ff9fe0", "belly": "#c9f2f7", "pads": "#b8a4ff"},
+    "Blood Moon": {"fur": "#433b4c", "ears": "left", "extras": ("chomp", "shiner"),
+                   "tail": "tuft", "iris": "#ff3b2f", "inner": "#c4505a", "nose": "#241d29",
+                   "pattern": ("spots",), "marks": "#7a4652", "pads": "#c4505a"},
+    "Lava": {"fur": "#f3cdae", "extras": ("bandaid", "chomp"), "tail": "tuft", "iris": "#ff5a1f",
+             "inner": "#ff9a6b", "nose": "#e0482a", "pattern": ("patch",), "marks": "#3d2c2c",
+             "pads": "#ff9a6b"},
+    "Amber Terminal": {"fur": "#f3e7c8", "iris": "#f0a000", "inner": "#f0c890",
+                       "nose": "#d98a3a", "pattern": ("mask",), "marks": "#c99a52",
+                       "pads": "#f0c890"},
+    "Hacker": {"fur": "#45424d", "ears": "up", "extras": ("earring", "chomp"), "tail": "long",
+               "iris": "#39ff7a", "inner": "#7fbf8f", "nose": "#1e1c22", "pads": "#7fbf8f"},
+    "Flashbang": {"ears": "both", "extras": ("shiner", "bandaid"), "tail": "fluffy",
+                  "iris": "#f5c400", "pads": "#ffb3c7"},
+    "Barbie": {"fur": "#fcd8e8", "ears": "up", "extras": ("earring",), "tail": "heart",
+               "iris": "#ff4fa3", "inner": "#ff8cc6", "nose": "#ff4fa3", "belly": "#fff0f7",
+               "pads": "#ff8cc6"},
+    "Swamp": {"fur": "#68703f", "ears": "both", "tail": "long", "iris": "#e8d84a",
+              "inner": "#c8b878", "nose": "#3e4424", "pattern": ("spots",), "marks": "#97a35a",
+              "belly": "#c9cf8f", "pads": "#c8b878"},
+    "Deep Fried": {"fur": "#f1d394", "extras": ("shiner", "bandaid", "chomp"), "tail": "tuft",
+                   "iris": "#ff2a00", "inner": "#ff9a3a", "nose": "#c83a14",
+                   "pattern": ("spots",), "marks": "#c8862a", "pads": "#ff9a3a"},
+    "Retro 98": {"fur": "#d8d4cc", "iris": "#1a2ab0", "inner": "#e0b0c0", "nose": "#c08090",
+                 "pattern": ("patch",), "marks": "#8a8a8a", "pads": "#e0b0c0"},
+    "Comic Sans": {"ears": "both", "extras": ("freckles",), "tail": "fluffy",
+                   "iris": "#2f80ff", "pattern": ("spots",), "marks": "#86b8ff",
+                   "pads": "#ffb3c7"},
+    "Brainrot": {"ears": "left", "extras": ("freckles", "bandaid"), "tail": "long",
+                 "iris": "#8fe000", "inner": "#ff9fe0", "nose": "#7a5cff", "pattern": ("patch",),
+                 "marks": "#9fd8ff", "pads": "#ff9fe0"},
+}
+
+
+def look(name: str | None = None) -> dict:
+    """Theme `name`'s Bun (default: the current theme's): VANILLA with its changes."""
+    return {**VANILLA, **LOOKS.get(name or hooks.theme_name(), {})}
+
+
+def sleeve(pieces: tuple[str, ...]) -> QColor | None:
+    """The colour of his little arms when `pieces` dress them (a sweater has sleeves),
+    else None: bare fur."""
+    return _col("accent2") if "sweater" in pieces else None
+
+
+# Bun's shape on the 100 x 120 canvas: bunny.py draws him from these, and the pieces
+# that sit on him clip to them, so his outline and theirs stay one
+EYES = (35.5, 64.5)   # his eyes' centres (x), on EYE_Y
+EYE_Y = 64.0
+
+
+def head_path() -> QPainterPath:
+    """His head: round on top, a little wider and softer at the cheeks (about the
+    68 x 56 oval centred at 50, 64 the pieces are placed on)."""
+    path = QPainterPath(QPointF(50, 36.5))
+    path.cubicTo(QPointF(71.5, 36.5), QPointF(85.5, 47), QPointF(85.5, 66))
+    path.cubicTo(QPointF(85.5, 84), QPointF(69, 92), QPointF(50, 92))
+    path.cubicTo(QPointF(31, 92), QPointF(14.5, 84), QPointF(14.5, 66))
+    path.cubicTo(QPointF(14.5, 47), QPointF(28.5, 36.5), QPointF(50, 36.5))
+    path.closeSubpath()
     return path
+
+
+def body_path() -> QPainterPath:
+    """His small sitting body under the big head, round at the haunches."""
+    path = QPainterPath(QPointF(50, 84))
+    path.cubicTo(QPointF(60, 84), QPointF(65, 89), QPointF(67, 96))
+    path.cubicTo(QPointF(75, 99), QPointF(77.5, 110), QPointF(71, 117.5))
+    path.lineTo(29, 117.5)
+    path.cubicTo(QPointF(22.5, 110), QPointF(25, 99), QPointF(33, 96))
+    path.cubicTo(QPointF(35, 89), QPointF(40, 84), QPointF(50, 84))
+    path.closeSubpath()
+    return path
+
+
+def _head() -> QPainterPath:
+    return head_path()
 
 
 def _fill(p: QPainter, path: QPainterPath, fill, ink: QPen | None):
@@ -213,7 +344,8 @@ def _bandana(p, ink):
     p.save()
     p.setClipRect(QRectF(0, 0, 100, 53))     # his outline, only where the band covered it
     p.setPen(ink)
-    p.drawEllipse(QRectF(16, 36, 68, 56))
+    p.setBrush(Qt.BrushStyle.NoBrush)
+    p.drawPath(_head())
     p.restore()
     # the knot and its two tails, out on his left
     _fill(p, _circle(84, 50, 3.5), col, ink)
@@ -526,38 +658,41 @@ def _lenses(p, ink, fill, shape="rect", frame: QColor | None = None):
     frame = frame or DARK
     pen = QPen(frame, 2)
     p.setPen(pen)
-    p.drawLine(QPointF(46, 60), QPointF(54, 60))          # bridge
-    p.drawLine(QPointF(31, 59), QPointF(20, 60))          # arms to the headphones
-    p.drawLine(QPointF(69, 59), QPointF(80, 60))
-    for i, x in enumerate((39, 61)):
+    y = EYE_Y
+    left, right = EYES
+    p.drawLine(QPointF(left + 8, y - 2.5), QPointF(right - 8, y - 2.5))   # bridge
+    p.drawLine(QPointF(left - 8.5, y - 3), QPointF(18, y - 2))   # arms to the headphones
+    p.drawLine(QPointF(right + 8.5, y - 3), QPointF(82, y - 2))
+    for i, x in enumerate(EYES):
         if shape == "round":
-            path = _circle(x, 62, 7.5)
+            path = _circle(x, y, 9.3)
         elif shape == "heart":
-            path = QPainterPath(QPointF(x, 70))
-            path.cubicTo(QPointF(x - 13, 61), QPointF(x - 7, 50), QPointF(x, 57))
-            path.cubicTo(QPointF(x + 7, 50), QPointF(x + 13, 61), QPointF(x, 70))
+            path = QPainterPath(QPointF(x, y + 9))
+            path.cubicTo(QPointF(x - 14, y - 1), QPointF(x - 7.5, y - 13), QPointF(x, y - 5.5))
+            path.cubicTo(QPointF(x + 7.5, y - 13), QPointF(x + 14, y - 1), QPointF(x, y + 9))
         else:
             path = QPainterPath()
-            path.addRoundedRect(QRectF(x - 8.5, 55.5, 17, 12), 4, 4)
+            path.addRoundedRect(QRectF(x - 9.6, y - 8.6, 19.2, 17.2), 5.2, 5.2)
         lens = fill[i] if isinstance(fill, tuple) else fill
         _fill(p, path, lens, pen)
         if shape != "round":                               # a glint
             p.setPen(QPen(QColor(255, 255, 255, 150), 1.6, Qt.PenStyle.SolidLine,
                           Qt.PenCapStyle.RoundCap))
-            p.drawLine(QPointF(x - 5, 63), QPointF(x - 1, 58))
+            p.drawLine(QPointF(x - 5, y + 1.5), QPointF(x - 1, y - 3.5))
 
 
 def _laser(p, ink):
-    for x, sx in ((39, -1), (61, 1)):
-        grad = QLinearGradient(x, 62, x + sx * 60, 54)
+    y = EYE_Y
+    for x, sx in ((EYES[0], -1), (EYES[1], 1)):
+        grad = QLinearGradient(x, y, x + sx * 60, y - 8)
         grad.setColorAt(0, QColor(255, 40, 40, 230))
         grad.setColorAt(1, QColor(255, 40, 40, 0))
-        beam = _poly((x, 59), (x + sx * 70, 44), (x + sx * 70, 64), (x, 65))
+        beam = _poly((x, y - 3), (x + sx * 70, y - 18), (x + sx * 70, y + 2), (x, y + 3))
         _fill(p, beam, grad, None)
         glow = QColor(255, 60, 60, 120)
-        _fill(p, _circle(x, 62, 9), glow, None)
-        _fill(p, _circle(x, 62, 4.5), QColor("#ff2b2b"), None)
-        _fill(p, _circle(x, 62, 2), WHITE, None)
+        _fill(p, _circle(x, y, 9.5), glow, None)
+        _fill(p, _circle(x, y, 5), QColor("#ff2b2b"), None)
+        _fill(p, _circle(x, y, 2.2), WHITE, None)
 
 
 def _pixel_shades(p, ink):
@@ -566,7 +701,7 @@ def _pixel_shades(p, ink):
             " XWXXXXX  XWXXXXX ",
             " XXWXXXX  XXWXXXX ",
             "  XXXXX    XXXXX  ")
-    x0, y0 = 50 - 9 * k, 56
+    x0, y0 = 50 - 9 * k, EYE_Y - 6
     for r, row in enumerate(rows):
         for c, ch in enumerate(row):
             if ch != " ":
@@ -585,13 +720,13 @@ def _visor(p, ink):
     grad.setColorAt(0, QColor("#ff2fb4"))
     grad.setColorAt(1, QColor("#2fe6ff"))
     band = QPainterPath()
-    band.addRoundedRect(QRectF(24, 55, 52, 13), 6.5, 6.5)
+    band.addRoundedRect(QRectF(22.5, EYE_Y - 8.5, 55, 17), 8.5, 8.5)
     _fill(p, band, grad, QPen(DARK, 2))
     p.setPen(QPen(QColor(255, 255, 255, 170), 1.5))
-    p.drawLine(QPointF(30, 59), QPointF(70, 59))
+    p.drawLine(QPointF(30, EYE_Y - 3.5), QPointF(70, EYE_Y - 3.5))
     p.setPen(QPen(DARK, 2))
-    p.drawLine(QPointF(24, 61), QPointF(20, 61))
-    p.drawLine(QPointF(76, 61), QPointF(80, 61))
+    p.drawLine(QPointF(23, EYE_Y - 1), QPointF(18, EYE_Y - 1))
+    p.drawLine(QPointF(77, EYE_Y - 1), QPointF(82, EYE_Y - 1))
 
 
 def _strings(p, ink):
@@ -605,13 +740,14 @@ def _strings(p, ink):
 
 def _spirals(p, ink):
     """Blinded: spirals for eyes."""
-    for x in (39, 61):
-        _fill(p, _circle(x, 62, 6.8), WHITE, QPen(INK_COL, 1.6))
-        spin = QPainterPath(QPointF(x, 62))
+    y = EYE_Y
+    for x in EYES:
+        _fill(p, _circle(x, y, 7.8), WHITE, QPen(INK_COL, 1.6))
+        spin = QPainterPath(QPointF(x, y))
         for i in range(1, 41):
             a = i * 0.42 * (1 if x < 50 else -1)
-            r = 5.6 * i / 40
-            spin.lineTo(x + r * math.cos(a), 62 + r * math.sin(a))
+            r = 6.2 * i / 40
+            spin.lineTo(x + r * math.cos(a), y + r * math.sin(a))
         p.setPen(QPen(INK_COL, 1.5, Qt.PenStyle.SolidLine, Qt.PenCapStyle.RoundCap))
         p.setBrush(Qt.BrushStyle.NoBrush)
         p.drawPath(spin)
@@ -621,21 +757,21 @@ def _readers(p, ink):
     """Half-moon reading glasses, low on his nose."""
     frame = QPen(QColor("#4a3326"), 1.8)
     p.setPen(frame)
-    p.drawLine(QPointF(46.5, 64.5), QPointF(53.5, 64.5))
-    p.drawLine(QPointF(32.5, 64.5), QPointF(20, 61))
-    p.drawLine(QPointF(67.5, 64.5), QPointF(80, 61))
-    for x in (40, 60):
-        lens = QPainterPath(QPointF(x - 7, 64.5))
-        lens.lineTo(x + 7, 64.5)
-        lens.cubicTo(QPointF(x + 7, 72), QPointF(x - 7, 72), QPointF(x - 7, 64.5))
+    y = EYE_Y + 2.5
+    p.drawLine(QPointF(EYES[0] + 7.5, y), QPointF(EYES[1] - 7.5, y))
+    p.drawLine(QPointF(EYES[0] - 7.5, y), QPointF(18, y - 4))
+    p.drawLine(QPointF(EYES[1] + 7.5, y), QPointF(82, y - 4))
+    for x in EYES:
+        lens = QPainterPath(QPointF(x - 7.5, y))
+        lens.lineTo(x + 7.5, y)
+        lens.cubicTo(QPointF(x + 7.5, y + 8), QPointF(x - 7.5, y + 8), QPointF(x - 7.5, y))
         _fill(p, lens, QColor(200, 230, 255, 80), frame)
 
 
 def _sweater(p, ink):
     """The body of a turtleneck sweater (the collar is its own piece)."""
     col = _col("accent2")
-    body = QPainterPath()
-    body.addEllipse(QRectF(25, 82, 50, 36))
+    body = body_path()
     hem = QPainterPath()
     hem.addRect(QRectF(0, 0, 100, 111))
     body = body.intersected(hem).subtracted(_head())

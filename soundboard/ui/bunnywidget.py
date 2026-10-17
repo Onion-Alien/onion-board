@@ -1127,6 +1127,14 @@ class BunnyWidget(QWidget):
         sx = sy = 1.0
         angle, alpha, look_dx = 0.0, 1.0, 0.0
         mouth = self._mouth
+        # his head tilts, the way he looks at things: a slow curious lean, further
+        # over when he's hoping, a little bob while he talks, and his eyes drift
+        tilt = (3.5 * math.sin(t * 0.55) + 1.5 * math.sin(t * 1.3)) * (1 - self._sad)
+        tilt -= 7 * self._sad
+        tilt += 2.5 * self._mouth * math.sin(t * 4.2)
+        if self.prop == "headphones":   # leaning into the cup he's listening with
+            tilt += 5
+        look = 0.25 * math.sin(t * 0.37)
         if self._sigh_at >= 0 and (s := now - self._sigh_at) < 1.6:
             b = math.sin(math.pi * s / 1.6) * self._sad
             dy += 4 * b
@@ -1148,6 +1156,7 @@ class BunnyWidget(QWidget):
                 dy -= self.bun_h * hops[n] * up
                 sy += 0.06 * up * hops[n] / hops[0]
                 ears -= 12 * up
+                tilt += (6 if n % 2 else -6) * up
             for i, land in enumerate((0.4, 0.8, 1.2)):
                 if (d := abs(j - land)) < 0.1:
                     sy -= 0.16 * hops[i] / hops[0] * (1 - d / 0.1)
@@ -1169,6 +1178,8 @@ class BunnyWidget(QWidget):
             elif self._fidget == "look":   # a look round: leans one way, then the other
                 angle += 7 * math.sin(2 * math.pi * f / d) * env
                 look_dx = 3 * math.sin(2 * math.pi * f / d) * env
+                look += math.sin(2 * math.pi * f / d) * env
+                tilt += 7 * math.sin(2 * math.pi * f / d + 0.4) * env
                 ears += 6 * math.sin(2 * math.pi * f / d + 0.6) * env
                 dy -= 1.5 * env
             else:   # "tap": a foot tap and a sway, to whatever's in his headphones
@@ -1187,6 +1198,7 @@ class BunnyWidget(QWidget):
             sy += m["sy"]
             sx -= m["sy"] * 0.6
             nod, dip, smug, cross = m["nod"], m["dip"], m["smug"], m["angry"]
+            tilt *= 1 - self._dance   # (the dance moves his head its own way)
             mouth = max(mouth, m["mouth"])
             blink = max(blink, m["blink"])
         if self.groove is not None and self._kick_at >= 0 and (
@@ -1260,10 +1272,12 @@ class BunnyWidget(QWidget):
             dy = 1.8 * breath
             ears = 22 + 4 * breath
             mouth = 0.1 + 0.07 * max(0.0, breath)
+            tilt, look = 8 + 1.5 * breath, 0.0   # his head lolls over to one side
         out = {"blink": blink, "mouth": mouth, "ears": ears, "dy": dy,
                 "dx": dx, "swing": swing, "shown": shown, "sad": self._sad,
                 "angry": self._angry, "sx": sx, "sy": sy, "angle": angle,
                 "alpha": alpha, "led": led, "prop": prop, "nod": nod, "dip": dip,
+                "tilt": tilt, "look": look,
                 "smug": smug > 0.5, "intense": cross, "outfit": None}
         self._kit = self._skit_frame(now)
         return self._with_kit(out, self._kit) if self._kit is not None else out
@@ -1314,8 +1328,9 @@ class BunnyWidget(QWidget):
                        swing=pose["swing"], sad=pose["sad"],
                        angry=max(pose["angry"], pose["intense"]),
                        nightcap=self.asleep, robot=self.robot, led=pose["led"],
-                       nod=pose["nod"], dip=pose["dip"], smug=pose["smug"],
-                       outfit=pose["outfit"])
+                       nod=pose["nod"] + pose.get("tilt", 0.0), dip=pose["dip"],
+                       smug=pose["smug"],
+                       outfit=pose["outfit"], look=pose.get("look", 0.0))
             if kit is not None:
                 self._paint_kit(p, body, kit.front)
             p.restore()
