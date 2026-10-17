@@ -509,7 +509,7 @@ def test_his_mouth_stays_shut_to_music_and_only_talks_to_speech(qapp, monkeypatc
     for style in ("electronic", "rock", "hiphop", "chill", "pop"):
         b, clock = _dance(monkeypatch, style, voice=1.0)   # (a loud singer, too)
         widest = [0.0]
-        _beats(b, clock, 3.0, lambda: widest.__setitem__(0, max(widest[0], b.pose()["mouth"])))
+        _beats(b, clock, 3.0, lambda w=widest, b=b: w.__setitem__(0, max(w[0], b.pose()["mouth"])))
         assert widest[0] < 0.05, style
     talk, clock = _dance(monkeypatch, "speech", voice=1.0)
     _beats(talk, clock, 2.0)
