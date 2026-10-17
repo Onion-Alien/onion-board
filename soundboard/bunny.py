@@ -119,7 +119,7 @@ def _smooth(k: float) -> float:
 
 
 EAR_HINGE = 4.5    # where an ear folds when he's sad: about its middle (ear frame)
-REST_FOLD = 122.0  # his right ear (the viewer's right) always flops over and down...
+REST_FOLD = 122.0  # a floppy ear (the look's "ears": some themes flop one) folds over and down...
 REST_HINGE = 12.0  # ... bending a little below its middle, so a good bit stands up first
 DROOP = (11.0, 6.5)  # an upright ear's top curves out and down this far (ear frame)
 
@@ -481,7 +481,7 @@ def draw_bunny(p: QPainter, rect: QRectF, prop: str | None = None, *,
     body_shape = bunnyfit.body_path()
 
     bunnyfit.draw(p, fit, "behind", ink)
-    # ears (behind the head): the left one stands up, the right one always flops over
+    # ears (behind the head): both stand up, unless his look flops one or both over
     # at the middle. Sad, the top half of each folds down and outward (droopy, not
     # stuck out)
     fold = 115 * max(0.0, min(1.0, sad))

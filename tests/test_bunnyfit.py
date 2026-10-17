@@ -101,7 +101,7 @@ def test_every_look_names_a_theme_and_known_extras(qapp):
     for name, kit in bunnyfit.LOOKS.items():
         assert name in theme.THEMES, name
         assert set(kit) <= set(bunnyfit.VANILLA), name
-        assert kit.get("ears", "right") in ("up", "left", "right", "both"), name
+        assert kit.get("ears", "up") in ("up", "left", "right", "both"), name
         assert set(kit.get("extras", ())) <= {"chomp", "earring", "shiner", "bandaid",
                                                "freckles"}, name
         assert kit.get("tail", "round") in bunnyfit.TAILS, name
@@ -125,7 +125,7 @@ def test_the_default_theme_is_plain_bun(qapp):
 
 def test_every_look_change_shows(qapp):
     plain = _draw(outfit=(), kit=bunnyfit.VANILLA)
-    changes = [{"fur": "#6f4630"}, {"ears": "up"}, {"ears": "both"}, {"ears": "left"}]
+    changes = [{"fur": "#6f4630"}, {"ears": "right"}, {"ears": "both"}, {"ears": "left"}]
     changes += [{"extras": (x,)} for x in ("chomp", "earring", "shiner", "bandaid", "freckles")]
     changes += [{"tail": t} for t in bunnyfit.TAILS if t != "round"]
     changes += [{"pattern": (x,)} for x in bunnyfit.PATTERNS]
