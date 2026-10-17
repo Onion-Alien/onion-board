@@ -1538,7 +1538,6 @@
   "About it": "그것에 대해",
   "Accurate (small.en)": "정확함(small.en)",
   "Add a voice server": "음성 서버 추가",
-  "Add a voice someone sent you as a code (it starts with “OB1-”)": "누군가가 보낸 음성을 코드로 추가하세요(\"OB1-\"로 시작함)",
   "Add the voice “{name}”?<br><br>Effects: {effects}": "“{name}” 음성을 추가하시겠습니까?<br><br> 효과: {effects}",
   "Add to Sounds": "소리에 추가",
   "Add voices": "목소리 추가",
@@ -1972,7 +1971,6 @@
   "That drive is read-only.": "해당 드라이브는 읽기 전용입니다.",
   "That isn't a Myinstants sound link.": "Myinstants 사운드 링크가 아닙니다.",
   "That isn't a proxy address: it should look like socks5h://127.0.0.1:9050 or http://host:8080": "이는 프록시 주소가 아닙니다. 양말5h://127.0.0.1:9050 또는 http://host:8080과 같아야 합니다.",
-  "That isn't a voice code (they start with “OB1-”).": "이는 음성 코드가 아닙니다(\"OB1-\"로 시작함).",
   "That mic isn't plugged in (or Windows doesn't list it).": "마이크가 연결되어 있지 않습니다(또는 Windows에 마이크가 표시되지 않습니다).",
   "That needs signing in to the site, which Onion Board doesn't do.": "이를 위해서는 사이트에 로그인해야 하는데 Onion Board에서는 그렇지 않습니다.",
   "That program isn't running any more.": "해당 프로그램은 더 이상 실행되지 않습니다.",
@@ -3678,5 +3676,8 @@
   "Onion Board hit {n} problem since it started.": [
     "Onion Board가 시작된 뒤 문제가 {n}개 생겼어요."
   ],
-  "See report": "보고서 보기"
+  "See report": "보고서 보기",
+  "Add a voice someone sent you as a code (it starts with “OB”)": "누군가가 보낸 음성을 코드로 추가하세요(\"OB\"로 시작함)",
+  "Add “{name}”?": "“{name}”을(를) 추가하시겠습니까?",
+  "That isn't a voice code (they start with “OB”).": "이는 음성 코드가 아닙니다(\"OB\"로 시작함)."
 }

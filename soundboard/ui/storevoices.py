@@ -12,6 +12,7 @@ from collections.abc import Callable
 from typing import TYPE_CHECKING
 
 from PySide6.QtCore import Qt, Signal
+from PySide6.QtGui import QGuiApplication
 from PySide6.QtWidgets import (QComboBox, QDialog, QHBoxLayout, QLabel, QLineEdit,
                                QPushButton, QSizePolicy, QVBoxLayout, QWidget)
 
@@ -122,6 +123,7 @@ class VoiceHooks:
 
     def __init__(self, panel: Callable[[], VoicePanel | None]):
         self.panel = panel
+        self.last = ""   # the name take() last added a voice under
 
     def _stores(self):
         p = self.panel()
@@ -140,8 +142,9 @@ class VoiceHooks:
         """Add a community voice to yours; what happened, in words."""
         saved, ai_store, setups = self._stores()
         p = self.panel()
+        self.last = ""
         if v.kind == "fx":
-            name = sv.take_fx(v, saved)
+            name = self.last = sv.take_fx(v, saved)
             if not name:
                 return _("You have the most saved voices there can be: delete one first.")
             if p is not None:
@@ -152,10 +155,11 @@ class VoiceHooks:
             if got is None:
                 return _("You have the most AI voices of your own there can be: delete "
                          "one first.")
+            self.last = got["name"]
             if p is not None:
                 p.ai._resync()   # noqa: SLF001 - writes it into the add-on too
             return _("Added “{name}” to your AI voices (Mine).", name=got["name"])
-        name = sv.take_setup(v, setups, ai_store)
+        name = self.last = sv.take_setup(v, setups, ai_store)
         if not name:
             return _("Couldn't keep that setup (100 setups at most).")
         if p is not None and v.ai.get("mix"):
@@ -236,6 +240,11 @@ class ShareVoiceDialog(QDialog):
         theme.set_tone(self.error, "error")
         v.addWidget(self.error)
         row = QHBoxLayout()
+        # or just to a friend: the same voice as a line of text to paste them
+        self.btn_code = QPushButton(_("Copy share code"))
+        icons.set_icon(self.btn_code, "copy")
+        self.btn_code.clicked.connect(self.copy_code)
+        row.addWidget(self.btn_code)
         row.addStretch(1)
         cancel = QPushButton(_("Cancel"))
         cancel.clicked.connect(self.reject)
@@ -247,11 +256,15 @@ class ShareVoiceDialog(QDialog):
         self.btn_send.setDefault(True)
         row.addWidget(self.btn_send)
         v.addLayout(row)
-        self.name.textChanged.connect(lambda _t: self.btn_send.setEnabled(bool(
-            sv.plain(self.name.text(), sv.MAX_NAME)) and bool(self.items)))
+        self.name.textChanged.connect(self._named)
         self._picked(self.pick.currentIndex())
         self.resize(420, self.sizeHint().height())
         fit.watch(self)
+
+    def _named(self, _text: str = ""):
+        ok = bool(sv.plain(self.name.text(), sv.MAX_NAME)) and bool(self.items)
+        self.btn_send.setEnabled(ok)
+        self.btn_code.setEnabled(ok)
 
     def _picked(self, i: int):
         if 0 <= i < len(self.items):
@@ -267,6 +280,17 @@ class ShareVoiceDialog(QDialog):
         p["name"] = sv.plain(self.name.text(), sv.MAX_NAME)
         p["about"] = sv.plain(self.about.text(), sv.MAX_ABOUT)
         return p if p["name"] else None
+
+    def copy_code(self) -> str:
+        """The picked voice, under the name typed, as a share code on the clipboard."""
+        p = self.payload()
+        if p is None:
+            return ""
+        code = sv.share_code(p)
+        QGuiApplication.clipboard().setText(code)
+        usage.used("voice-code-shared")
+        busy.flash(self.btn_code, _("✓ Copied"))
+        return code
 
     def send(self):
         p = self.payload()

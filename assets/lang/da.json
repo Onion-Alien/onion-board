@@ -1577,7 +1577,6 @@
   "About it": "Om det",
   "Accurate (small.en)": "Nøjagtig (small.da)",
   "Add a voice server": "Tilføj en stemmeserver",
-  "Add a voice someone sent you as a code (it starts with “OB1-”)": "Tilføj en stemme, som nogen sendte dig som en kode (den starter med \"OB1-\")",
   "Add the voice “{name}”?<br><br>Effects: {effects}": "Vil du tilføje stemmen \"{name}\"?<br><br> Effekter: {effects}",
   "Add to Sounds": "Føj til lyde",
   "Add voices": "Tilføj stemmer",
@@ -2017,7 +2016,6 @@
   "That drive is read-only.": "Det drev er skrivebeskyttet.",
   "That isn't a Myinstants sound link.": "Det er ikke et Myinstants-lydlink.",
   "That isn't a proxy address: it should look like socks5h://127.0.0.1:9050 or http://host:8080": "Det er ikke en proxy-adresse: den skal ligne socks5h://127.0.0.1:9050 eller http://host:8080",
-  "That isn't a voice code (they start with “OB1-”).": "Det er ikke en stemmekode (de starter med \"OB1-\").",
   "That mic isn't plugged in (or Windows doesn't list it).": "Den mikrofon er ikke tilsluttet (eller Windows viser den ikke).",
   "That needs signing in to the site, which Onion Board doesn't do.": "Det kræver at man logger ind på siden, hvilket Onion Board ikke gør.",
   "That program isn't running any more.": "Det program kører ikke mere.",
@@ -3757,5 +3755,8 @@
     "Onion Board har ramt {n} problem, siden det startede.",
     "Onion Board har ramt {n} problemer, siden det startede."
   ],
-  "See report": "Se rapport"
+  "See report": "Se rapport",
+  "Add a voice someone sent you as a code (it starts with “OB”)": "Tilføj en stemme, som nogen sendte dig som en kode (den starter med \"OB\")",
+  "Add “{name}”?": "Vil du tilføje “{name}”?",
+  "That isn't a voice code (they start with “OB”).": "Det er ikke en stemmekode (de starter med \"OB\")."
 }

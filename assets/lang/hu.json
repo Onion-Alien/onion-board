@@ -1577,7 +1577,6 @@
   "About it": "Arról",
   "Accurate (small.en)": "Pontos (small.en)",
   "Add a voice server": "Hangkiszolgáló hozzáadása",
-  "Add a voice someone sent you as a code (it starts with “OB1-”)": "Adjon hozzá egy hangot, amelyet valaki küldött Önnek kódként (az „OB1-” karakterlánccal kezdődik)",
   "Add the voice “{name}”?<br><br>Effects: {effects}": "Hozzáadja a „{name}” hangot?<br><br> Hatások: {effects}",
   "Add to Sounds": "Hozzáadás a Hangokhoz",
   "Add voices": "Hangok hozzáadása",
@@ -2017,7 +2016,6 @@
   "That drive is read-only.": "Ez a meghajtó csak olvasható.",
   "That isn't a Myinstants sound link.": "Ez nem egy Myinstants hanglink.",
   "That isn't a proxy address: it should look like socks5h://127.0.0.1:9050 or http://host:8080": "Ez nem proxycím: így kell kinéznie: socks5h://127.0.0.1:9050 vagy http://host:8080",
-  "That isn't a voice code (they start with “OB1-”).": "Ez nem hangkód (az „OB1-”-vel kezdődnek).",
   "That mic isn't plugged in (or Windows doesn't list it).": "Ez a mikrofon nincs bedugva (vagy a Windows nem tartalmazza).",
   "That needs signing in to the site, which Onion Board doesn't do.": "Ehhez be kell jelentkezni az oldalra, amit az Onion Board nem tesz meg.",
   "That program isn't running any more.": "Ez a program már nem fut.",
@@ -3757,5 +3755,8 @@
     "Az Onion Board indulás óta {n} hibába futott.",
     "Az Onion Board indulás óta {n} hibába futott."
   ],
-  "See report": "Jelentés megnézése"
+  "See report": "Jelentés megnézése",
+  "Add a voice someone sent you as a code (it starts with “OB”)": "Adjon hozzá egy hangot, amelyet valaki küldött Önnek kódként (az „OB” karakterlánccal kezdődik)",
+  "Add “{name}”?": "Hozzáadja: „{name}”?",
+  "That isn't a voice code (they start with “OB”).": "Ez nem hangkód (az „OB”-vel kezdődnek)."
 }

@@ -1577,7 +1577,6 @@
   "About it": "Sobre isso",
   "Accurate (small.en)": "Preciso (small.pt)",
   "Add a voice server": "Adicionar um servidor de voz",
-  "Add a voice someone sent you as a code (it starts with “OB1-”)": "Adicione uma voz que alguém lhe enviou como código (começa por “OB1-”)",
   "Add the voice “{name}”?<br><br>Effects: {effects}": "Adicionar a voz “{name}”?<br><br> Efeitos: {effects}",
   "Add to Sounds": "Adicionar aos sons",
   "Add voices": "Adicionar vozes",
@@ -2017,7 +2016,6 @@
   "That drive is read-only.": "Esta unidade é de leitura apenas.",
   "That isn't a Myinstants sound link.": "Esse não é um link de som do Myinstants.",
   "That isn't a proxy address: it should look like socks5h://127.0.0.1:9050 or http://host:8080": "Este não é um endereço proxy: deve ser semelhante ao Socks5h://127.0.0.1:9050 ou http://host:8080",
-  "That isn't a voice code (they start with “OB1-”).": "Isto não é um código de voz (começam por “OB1-”).",
   "That mic isn't plugged in (or Windows doesn't list it).": "Esse microfone não está ligado (ou o Windows não o lista).",
   "That needs signing in to the site, which Onion Board doesn't do.": "Para isso é necessário fazer login no site, o que o Onion Board não faz.",
   "That program isn't running any more.": "Esse programa já não está a funcionar.",
@@ -3757,5 +3755,8 @@
     "O Onion Board teve {n} problema desde que abriu.",
     "O Onion Board teve {n} problemas desde que abriu."
   ],
-  "See report": "Ver relatório"
+  "See report": "Ver relatório",
+  "Add a voice someone sent you as a code (it starts with “OB”)": "Adicione uma voz que alguém lhe enviou como código (começa por “OB”)",
+  "Add “{name}”?": "Adicionar “{name}”?",
+  "That isn't a voice code (they start with “OB”).": "Isto não é um código de voz (começam por “OB”)."
 }

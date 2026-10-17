@@ -1581,7 +1581,6 @@
   "About it": "Bu konuda",
   "Accurate (small.en)": "Doğru (small.en)",
   "Add a voice server": "Ses sunucusu ekle",
-  "Add a voice someone sent you as a code (it starts with “OB1-”)": "Birinin size kod olarak gönderdiği sesi ekleyin (“OB1-” ile başlar)",
   "Add the voice “{name}”?<br><br>Effects: {effects}": "“{name}” sesi eklensin mi?<br><br> Efektler: {effects}",
   "Add to Sounds": "Seslere Ekle",
   "Add voices": "Ses ekle",
@@ -2019,7 +2018,6 @@
   "That drive is read-only.": "Bu sürücü salt okunurdur.",
   "That isn't a Myinstants sound link.": "Bu bir Myinstants ses bağlantısı değil.",
   "That isn't a proxy address: it should look like socks5h://127.0.0.1:9050 or http://host:8080": "Bu bir proxy adresi değil: çorap5h://127.0.0.1:9050 veya http://host:8080 gibi görünmelidir.",
-  "That isn't a voice code (they start with “OB1-”).": "Bu bir ses kodu değil (“OB1-” ile başlıyorlar).",
   "That mic isn't plugged in (or Windows doesn't list it).": "Bu mikrofon takılı değil (veya Windows onu listelemiyor).",
   "That needs signing in to the site, which Onion Board doesn't do.": "Bu, Onion Board'un yapmadığı sitede oturum açmayı gerektirir.",
   "That program isn't running any more.": "O program artık çalışmıyor.",
@@ -3757,5 +3755,8 @@
     "Onion Board açıldığından beri {n} sorunla karşılaştı.",
     "Onion Board açıldığından beri {n} sorunla karşılaştı."
   ],
-  "See report": "Raporu gör"
+  "See report": "Raporu gör",
+  "Add a voice someone sent you as a code (it starts with “OB”)": "Birinin size kod olarak gönderdiği sesi ekleyin (“OB” ile başlar)",
+  "Add “{name}”?": "“{name}” eklensin mi?",
+  "That isn't a voice code (they start with “OB”).": "Bu bir ses kodu değil (“OB” ile başlıyorlar)."
 }

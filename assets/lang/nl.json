@@ -1581,7 +1581,6 @@
   "About it": "Over het",
   "Accurate (small.en)": "Nauwkeurig (klein.nl)",
   "Add a voice server": "Voeg een voiceserver toe",
-  "Add a voice someone sent you as a code (it starts with “OB1-”)": "Voeg een stem toe die iemand je heeft gestuurd als code (deze begint met 'OB1-')",
   "Add the voice “{name}”?<br><br>Effects: {effects}": "De stem “{name}” toevoegen?<br><br> Effecten: {effects}",
   "Add to Sounds": "Voeg toe aan geluiden",
   "Add voices": "Stemmen toevoegen",
@@ -2019,7 +2018,6 @@
   "That drive is read-only.": "Die schijf is alleen-lezen.",
   "That isn't a Myinstants sound link.": "Dat is geen Myinstants-geluidslink.",
   "That isn't a proxy address: it should look like socks5h://127.0.0.1:9050 or http://host:8080": "Dat is geen proxy-adres: het zou eruit moeten zien als sokken5h://127.0.0.1:9050 of http://host:8080",
-  "That isn't a voice code (they start with “OB1-”).": "Dat is geen stemcode (ze beginnen met “OB1-”).",
   "That mic isn't plugged in (or Windows doesn't list it).": "Die microfoon is niet aangesloten (of Windows vermeldt deze niet).",
   "That needs signing in to the site, which Onion Board doesn't do.": "Daarvoor is inloggen op de site nodig, wat Onion Board niet doet.",
   "That program isn't running any more.": "Dat programma draait niet meer.",
@@ -3757,5 +3755,8 @@
     "Onion Board had {n} probleem sinds het opstartte.",
     "Onion Board had {n} problemen sinds het opstartte."
   ],
-  "See report": "Rapport bekijken"
+  "See report": "Rapport bekijken",
+  "Add a voice someone sent you as a code (it starts with “OB”)": "Voeg een stem toe die iemand je heeft gestuurd als code (deze begint met 'OB')",
+  "Add “{name}”?": "“{name}” toevoegen?",
+  "That isn't a voice code (they start with “OB”).": "Dat is geen stemcode (ze beginnen met “OB”)."
 }

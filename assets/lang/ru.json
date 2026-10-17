@@ -1540,7 +1540,6 @@
   "About it": "Об этом",
   "Accurate (small.en)": "Точный (small.ru)",
   "Add a voice server": "Добавить голосовой сервер",
-  "Add a voice someone sent you as a code (it starts with “OB1-”)": "Добавьте голос, который кто-то прислал вам в виде кода (он начинается с «OB1-»)",
   "Add the voice “{name}”?<br><br>Effects: {effects}": "Добавить голос «{name}»?<br><br> Эффекты: {effects}",
   "Add to Sounds": "Добавить в Звуки",
   "Add voices": "Добавить голоса",
@@ -1978,7 +1977,6 @@
   "That drive is read-only.": "Этот диск доступен только для чтения.",
   "That isn't a Myinstants sound link.": "Это не звуковая ссылка Myinstants.",
   "That isn't a proxy address: it should look like socks5h://127.0.0.1:9050 or http://host:8080": "Это не прокси-адрес: он должен выглядеть так: socks5h://127.0.0.1:9050 или http://host:8080.",
-  "That isn't a voice code (they start with “OB1-”).": "Это не голосовой код (они начинаются с «OB1-»).",
   "That mic isn't plugged in (or Windows doesn't list it).": "Этот микрофон не подключен (или Windows его не показывает).",
   "That needs signing in to the site, which Onion Board doesn't do.": "Для этого необходимо войти на сайт, чего Onion Board не делает.",
   "That program isn't running any more.": "Эта программа больше не работает.",
@@ -3836,5 +3834,8 @@
     "С момента запуска в Onion Board произошло {n} ошибки.",
     "С момента запуска в Onion Board произошло {n} ошибок."
   ],
-  "See report": "Посмотреть отчёт"
+  "See report": "Посмотреть отчёт",
+  "Add a voice someone sent you as a code (it starts with “OB”)": "Добавьте голос, который кто-то прислал вам в виде кода (он начинается с «OB»)",
+  "Add “{name}”?": "Добавить «{name}»?",
+  "That isn't a voice code (they start with “OB”).": "Это не голосовой код (они начинаются с «OB»)."
 }
