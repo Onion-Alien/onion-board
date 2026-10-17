@@ -3666,5 +3666,14 @@
   "{pct}%": "{pct} %",
   "{pct}%, about {time} left": "{pct} %, noch etwa {time}",
   "“{name}” can't play until its effects are applied ({how})": "„{name}“ kann erst spielen, wenn seine Effekte angewendet sind ({how})",
-  "✓ “{name}” is ready to play": "✓ „{name}“ ist bereit zum Abspielen"
+  "✓ “{name}” is ready to play": "✓ „{name}“ ist bereit zum Abspielen",
+  "Couldn't put the AI voice on “{name}”: {why}": "Die KI-Stimme konnte nicht auf „{name}“ gelegt werden: {why}",
+  "Couldn't start the AI voice: {why}": "Die KI-Stimme konnte nicht starten: {why}",
+  "Getting the AI voice ready…": "KI-Stimme wird vorbereitet…",
+  "Putting the AI voice on “{name}”… {pct}%": "KI-Stimme wird auf „{name}“ gelegt… {pct} %",
+  "The AI voices add-on isn't installed, so only the voice changer part of “{name}” is on.": "Das Add-on für KI-Stimmen ist nicht installiert, daher ist von „{name}“ nur der Stimmverzerrer an.",
+  "Use “{name}”?": "„{name}“ nutzen?",
+  "“{name}” has an AI voice, so this may take a while. Each sound is made in that voice first, in the background, and plays when it's ready.": "„{name}“ hat eine KI-Stimme, das kann also etwas dauern. Jeder Sound wird zuerst im Hintergrund in dieser Stimme erstellt und spielt, sobald er fertig ist.",
+  "“{name}” has an AI voice, so this may take a while. The radio goes quiet until the AI voice is ready, then carries on in it.": "„{name}“ hat eine KI-Stimme, das kann also etwas dauern. Das Radio ist still, bis die KI-Stimme bereit ist, und spielt dann in ihr weiter.",
+  "“{name}” has an AI voice, so this may take a while. Your programs go quiet until the AI voice is ready, then carry on in it.": "„{name}“ hat eine KI-Stimme, das kann also etwas dauern. Deine Programme sind still, bis die KI-Stimme bereit ist, und laufen dann in ihr weiter."
 }

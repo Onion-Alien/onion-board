@@ -3744,5 +3744,14 @@
   "{pct}%": "{pct}%",
   "{pct}%, about {time} left": "{pct}%, mai durează cam {time}",
   "“{name}” can't play until its effects are applied ({how})": "„{name}” nu poate fi redat până nu i se aplică efectele ({how})",
-  "✓ “{name}” is ready to play": "✓ „{name}” e gata de redat"
+  "✓ “{name}” is ready to play": "✓ „{name}” e gata de redat",
+  "Couldn't put the AI voice on “{name}”: {why}": "Vocea AI nu a putut fi pusă pe „{name}”: {why}",
+  "Couldn't start the AI voice: {why}": "Vocea AI nu a putut porni: {why}",
+  "Getting the AI voice ready…": "Se pregătește vocea AI…",
+  "Putting the AI voice on “{name}”… {pct}%": "Se pune vocea AI pe „{name}”… {pct}%",
+  "The AI voices add-on isn't installed, so only the voice changer part of “{name}” is on.": "Suplimentul pentru voci AI nu e instalat, așa că din „{name}” e pornit doar schimbătorul de voce.",
+  "Use “{name}”?": "Folosești „{name}”?",
+  "“{name}” has an AI voice, so this may take a while. Each sound is made in that voice first, in the background, and plays when it's ready.": "„{name}” are o voce AI, așa că poate dura puțin. Fiecare sunet e făcut întâi cu vocea aceea, în fundal, și pornește când e gata.",
+  "“{name}” has an AI voice, so this may take a while. The radio goes quiet until the AI voice is ready, then carries on in it.": "„{name}” are o voce AI, așa că poate dura puțin. Radioul tace până e gata vocea AI, apoi continuă cu ea.",
+  "“{name}” has an AI voice, so this may take a while. Your programs go quiet until the AI voice is ready, then carry on in it.": "„{name}” are o voce AI, așa că poate dura puțin. Programele tale tac până e gata vocea AI, apoi continuă cu ea."
 }

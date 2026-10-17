@@ -3978,5 +3978,14 @@
   "{pct}%": "{pct}%",
   "{pct}%, about {time} left": "{pct}%، بقي حوالي {time}",
   "“{name}” can't play until its effects are applied ({how})": "لا يمكن تشغيل “{name}” حتى يكتمل تطبيق تأثيراته ({how})",
-  "✓ “{name}” is ready to play": "✓ “{name}” جاهز للتشغيل"
+  "✓ “{name}” is ready to play": "✓ “{name}” جاهز للتشغيل",
+  "Couldn't put the AI voice on “{name}”: {why}": "تعذّر وضع صوت الذكاء الاصطناعي على “{name}”: {why}",
+  "Couldn't start the AI voice: {why}": "تعذّر تشغيل صوت الذكاء الاصطناعي: {why}",
+  "Getting the AI voice ready…": "جارٍ تجهيز صوت الذكاء الاصطناعي…",
+  "Putting the AI voice on “{name}”… {pct}%": "جارٍ وضع صوت الذكاء الاصطناعي على “{name}”… {pct}%",
+  "The AI voices add-on isn't installed, so only the voice changer part of “{name}” is on.": "إضافة أصوات الذكاء الاصطناعي غير مثبّتة، لذلك يعمل جزء مغيّر الصوت فقط من “{name}”.",
+  "Use “{name}”?": "استخدام “{name}”؟",
+  "“{name}” has an AI voice, so this may take a while. Each sound is made in that voice first, in the background, and plays when it's ready.": "في “{name}” صوت ذكاء اصطناعي، لذلك قد يستغرق هذا بعض الوقت. يُصنع كل صوت بهذا الصوت أولًا في الخلفية، ويُشغَّل عندما يجهز.",
+  "“{name}” has an AI voice, so this may take a while. The radio goes quiet until the AI voice is ready, then carries on in it.": "في “{name}” صوت ذكاء اصطناعي، لذلك قد يستغرق هذا بعض الوقت. يصمت الراديو حتى يجهز صوت الذكاء الاصطناعي، ثم يكمل به.",
+  "“{name}” has an AI voice, so this may take a while. Your programs go quiet until the AI voice is ready, then carry on in it.": "في “{name}” صوت ذكاء اصطناعي، لذلك قد يستغرق هذا بعض الوقت. تصمت برامجك حتى يجهز صوت الذكاء الاصطناعي، ثم تكمل به."
 }

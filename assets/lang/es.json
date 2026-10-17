@@ -3666,5 +3666,14 @@
   "{pct}%": "{pct} %",
   "{pct}%, about {time} left": "{pct} %, quedan unos {time}",
   "“{name}” can't play until its effects are applied ({how})": "“{name}” no puede sonar hasta que se apliquen sus efectos ({how})",
-  "✓ “{name}” is ready to play": "✓ “{name}” ya puede sonar"
+  "✓ “{name}” is ready to play": "✓ “{name}” ya puede sonar",
+  "Couldn't put the AI voice on “{name}”: {why}": "No se ha podido poner la voz de IA en “{name}”: {why}",
+  "Couldn't start the AI voice: {why}": "No se ha podido iniciar la voz de IA: {why}",
+  "Getting the AI voice ready…": "Preparando la voz de IA…",
+  "Putting the AI voice on “{name}”… {pct}%": "Poniendo la voz de IA en “{name}”… {pct} %",
+  "The AI voices add-on isn't installed, so only the voice changer part of “{name}” is on.": "El complemento de voces de IA no está instalado, así que solo está activo el cambiador de voz de “{name}”.",
+  "Use “{name}”?": "¿Usar “{name}”?",
+  "“{name}” has an AI voice, so this may take a while. Each sound is made in that voice first, in the background, and plays when it's ready.": "“{name}” tiene una voz de IA, así que esto puede tardar un poco. Cada sonido se hace primero con esa voz, en segundo plano, y suena cuando está listo.",
+  "“{name}” has an AI voice, so this may take a while. The radio goes quiet until the AI voice is ready, then carries on in it.": "“{name}” tiene una voz de IA, así que esto puede tardar un poco. La radio se queda en silencio hasta que la voz de IA esté lista y luego sigue con ella.",
+  "“{name}” has an AI voice, so this may take a while. Your programs go quiet until the AI voice is ready, then carry on in it.": "“{name}” tiene una voz de IA, así que esto puede tardar un poco. Tus programas se quedan en silencio hasta que la voz de IA esté lista y luego siguen con ella."
 }
