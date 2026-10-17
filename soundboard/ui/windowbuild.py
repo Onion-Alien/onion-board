@@ -29,6 +29,9 @@ from PySide6.QtWidgets import (
     QSizePolicy,
     QSlider,
     QSpacerItem,
+    QStyle,
+    QStyleOptionButton,
+    QStylePainter,
     QVBoxLayout,
     QWidget,
 )
@@ -164,6 +167,29 @@ class BannerButton(QPushButton):
         if text != self.text():
             self.setText(text)
             self.setToolTip("" if text == self._full else self._full)   # only when cut
+
+
+class CutPill(QPushButton):
+    """A button that never cuts its words off on both sides when it's squeezed: it
+    drops its icon first, then ends the words in "…". A plain button showed "ic: Conne"
+    and "■ A" in the mini player's narrowest sizes (and fonts)."""
+
+    def shown(self) -> QStyleOptionButton:
+        """What it paints at its width: its icon only when the words still fit."""
+        opt = QStyleOptionButton()
+        self.initStyleOption(opt)
+        room = self.style().subElementRect(QStyle.SubElement.SE_PushButtonContents,
+                                           opt, self).width()
+        words = self.fontMetrics().horizontalAdvance(opt.text)
+        if not opt.icon.isNull() and opt.iconSize.width() + words > room:
+            opt.icon = QIcon()
+        if opt.icon.isNull() and opt.text:
+            opt.text = self.fontMetrics().elidedText(opt.text, Qt.TextElideMode.ElideRight,
+                                                     max(0, room))
+        return opt
+
+    def paintEvent(self, _e):
+        QStylePainter(self).drawControl(QStyle.ControlElement.CE_PushButton, self.shown())
 
 
 class _Moved(QObject):
@@ -735,7 +761,7 @@ class WindowBuilder(Controller):
         mw.mini_name = ElidedLabel(mw.np_name.text(), hide_overflow=True)
         mw.mini_name.setTextFormat(Qt.TextFormat.PlainText)   # sound names are user / web text
         mw.mini_name.setStyleSheet("font-weight:600;")
-        mw.mini_name.setMinimumWidth(30)
+        mw.mini_name.setMinimumWidth(0)   # it hides when it doesn't fit: its room goes to "■ All"
         mw.mini_name.setSizePolicy(QSizePolicy.Policy.Ignored, QSizePolicy.Policy.Preferred)
         top.addWidget(mw.mini_name, 1)
         mw.mini_air = QPushButton()
@@ -749,8 +775,9 @@ class WindowBuilder(Controller):
         icons.set_icon(mw.mini_air, "live", "danger_text", "on_live")
         # "All" in words: an icon-only ■ here looked just like the one-sound ■ on
         # the left, and stopped everything
-        mw.mini_stop = QPushButton(_("All"))
+        mw.mini_stop = CutPill(_("All"))   # squeezed: the word stays, the ■ goes
         mw.mini_stop.setObjectName("danger")
+        mw.mini_stop.setProperty("mini", True)   # slim padding: never squeezed to "■ A"
         mw.mini_stop.setToolTip(mw.stop_btn.toolTip())
         mw.mini_stop.clicked.connect(mw.playctl.stop_all)
         icons.set_icon(mw.mini_stop, "stop", "danger_text", size=14)
@@ -777,7 +804,7 @@ class WindowBuilder(Controller):
         bottom.addWidget(mw.mini_time)
         cv.addLayout(bottom)
         connection = QHBoxLayout()
-        mw.mini_connection = QPushButton()
+        mw.mini_connection = CutPill()
         mw.mini_connection.setObjectName("pill")
         mw.mini_connection.setMinimumWidth(0)
         mw.mini_connection.setSizePolicy(QSizePolicy.Policy.Ignored, QSizePolicy.Policy.Fixed)
