@@ -69,7 +69,7 @@ CREATE TABLE IF NOT EXISTS counters (
 CREATE TABLE IF NOT EXISTS actions (
   id INTEGER PRIMARY KEY AUTOINCREMENT,
   at INTEGER NOT NULL,               -- unix seconds
-  kind TEXT NOT NULL,                -- upload | link | import | vote | report | hidden |
+  kind TEXT NOT NULL,                -- upload | link | import | voice | vote | report | hidden |
                                      -- approve | reject | rename | limit
   sound TEXT NOT NULL DEFAULT '',
   ip TEXT NOT NULL DEFAULT '',       -- salted hash of the address ("owner" for /admin)
@@ -81,3 +81,25 @@ CREATE INDEX IF NOT EXISTS actions_sound ON actions (sound, id);
 
 CREATE INDEX IF NOT EXISTS sounds_cat ON sounds (status, cat);
 CREATE INDEX IF NOT EXISTS sounds_actions_votes ON actions (sound, kind, at);
+
+-- community voices (src/voices.js): settings, never files; live as soon as they're shared,
+-- hidden by reports. Their votes and reports share the sounds' tables (ids never clash:
+-- both are 12 random hex characters).
+CREATE TABLE IF NOT EXISTS voices (
+  id TEXT PRIMARY KEY,               -- 12 hex characters
+  kind TEXT NOT NULL,                -- fx (voice changer) | ai (AI voice) | setup
+  name TEXT NOT NULL,
+  about TEXT NOT NULL DEFAULT '',
+  emoji TEXT NOT NULL DEFAULT '',
+  tags TEXT NOT NULL DEFAULT '',     -- comma-separated, lower case
+  data TEXT NOT NULL,                -- the settings as voices.js rebuilt them (JSON)
+  sha256 TEXT NOT NULL UNIQUE,       -- of kind + data: the same voice can't be shared twice
+  uploader TEXT NOT NULL,            -- salted hash of the sharer's install id
+  ip TEXT NOT NULL,                  -- salted hash of the address (rate limits)
+  status TEXT NOT NULL DEFAULT 'live',   -- live | hidden (reports) | removed (owner)
+  up INTEGER NOT NULL DEFAULT 0,
+  down INTEGER NOT NULL DEFAULT 0,
+  reports INTEGER NOT NULL DEFAULT 0,
+  created INTEGER NOT NULL           -- unix seconds
+);
+CREATE INDEX IF NOT EXISTS voices_status ON voices (status, kind, created);
