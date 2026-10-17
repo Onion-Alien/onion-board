@@ -120,8 +120,8 @@ def test_a_nasty_name_from_the_store_is_shown_as_plain_text(qapp, fake):
     t.set_mode("voices")
     assert process_events(qapp, lambda: len(t._rows) == 1)
     r = t._rows[0]
-    assert r.sound.name == "<img src=x> <b>Evil</b> X"
-    assert "<b>" in r.name.full                     # shown as the letters, never as markup
+    assert r.sound.name == "img src=x b Evil /b X"   # no <>: as the store's sound names
+    assert r.name.full == r.sound.name
     assert "‮" not in r.name.toolTip()
     t.shutdown()
 

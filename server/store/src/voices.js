@@ -27,12 +27,13 @@ const LANG_RE = /^[A-Za-z]{2,3}(-[A-Za-z0-9]{2,8})?$/;
 const EMOJI_RE = /^\p{Extended_Pictographic}(️)?(\p{Emoji_Modifier})?$/u;
 
 // One line of plain text: Unicode-normalised, no control, format (bidi overrides,
-// zero-width joiners), private-use or unpaired surrogate characters, at most two
-// combining marks in a row (no "zalgo" text spilling over the lines around it), runs of
-// spaces made one, cut to `max` characters (not halfway through a character).
+// zero-width joiners), private-use or unpaired surrogate characters, none of <>`{}\
+// (as a sound's name), at most two combining marks in a row (no "zalgo" text spilling
+// over the lines around it), runs of spaces made one, cut to `max` characters (not
+// halfway through a character).
 export function plain(s, max) {
   let t = String(s ?? "").normalize("NFKC")
-    .replace(/[\p{Cc}\p{Cf}\p{Co}\p{Cs}\p{Zl}\p{Zp}]/gu, " ")
+    .replace(/[\p{Cc}\p{Cf}\p{Co}\p{Cs}\p{Zl}\p{Zp}<>`{}\\]/gu, " ")
     .replace(/(\p{M}{2})\p{M}+/gu, "$1")
     .replace(/\s+/g, " ").trim();
   t = [...t].slice(0, max).join("").trim();

@@ -39,16 +39,17 @@ REASONS = ("offensive", "broken", "other")
 _LANG = re.compile(r"^[A-Za-z]{2,3}(-[A-Za-z0-9]{2,8})?$")
 _AI_ID = re.compile(r"^[a-z0-9][a-z0-9-]{0,39}$")
 _GONE = {"Cc", "Cf", "Co", "Cs", "Cn", "Zl", "Zp"}
+_MARKUP = set("<>`{}\\")   # never in a name (as the store's sound names)
 
 
 def plain(text, limit: int) -> str:
     """One line of plain text: normalised, no control / format (bidi overrides, zero
-    width) / private-use characters, at most two combining marks in a row, runs of
-    spaces made one, at most `limit` characters."""
+    width) / private-use characters, none of <>`{}\\, at most two combining marks in a
+    row, runs of spaces made one, at most `limit` characters."""
     out, marks = [], 0
     for ch in unicodedata.normalize("NFKC", str(text or "")):
         cat = unicodedata.category(ch)
-        if cat in _GONE:
+        if cat in _GONE or ch in _MARKUP:
             ch, cat = " ", "Zs"
         if cat.startswith("M"):
             marks += 1

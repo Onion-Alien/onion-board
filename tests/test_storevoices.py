@@ -27,7 +27,7 @@ def test_plain_text_is_one_safe_line():
     t = sv.plain(nasty, 32)
     assert "\u202e" not in t and "\u200b" not in t and "\x00" not in t and "\n" not in t
     assert "\ue000" not in t and "\u0301\u0301\u0301" not in t
-    assert len(t) <= 32 and "<b>x</b>" in t        # shown as plain text, never as markup
+    assert len(t) <= 32 and "b x /b" in t and not set("<>`{}\\") & set(t)   # as sound names
     assert sv.plain("\u200b \u202e", 10) == ""
     assert sv.one_emoji("🤖") == "🤖" and sv.one_emoji("🐿️") == "🐿️"
     assert sv.one_emoji("👨‍👩‍👧") == "" and sv.one_emoji("ab") == ""
