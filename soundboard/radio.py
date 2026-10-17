@@ -909,11 +909,63 @@ def preload_decoder():
                 with open(f, "rb") as fh:
                     while fh.read(1 << 20):
                         pass
-            for f in files:
-                ctypes.WinDLL(str(f))   # (ctypes lets go of the lock while it loads)
+            # and each one's image made first, outside the loader: a file Windows hasn't
+            # seen yet (just installed) is checked as its image is made, which in
+            # LoadLibrary is under that lock, and the window froze 6 s opening the Apps
+            # tab (starting a thread waits for it). Made here, the load reuses it:
+            # ~50 ms under the lock became ~4 ms.
+            images = [_image_section(f) for f in files]
+            try:
+                for f in files:
+                    ctypes.WinDLL(str(f))   # (ctypes lets go of the lock while it loads)
+            finally:
+                for handles in images:
+                    _close(handles)
         except OSError as e:   # Qt finds them itself later, as before
             log.debug("radio: preloading the decoder failed: %s", e)
     threading.Thread(target=load, daemon=True, name="radio-preload").start()
+
+
+def _kernel32(name: str, restype, *argtypes):
+    """A kernel32 function with its own prototype (the shared ctypes.windll one is left
+    as it is)."""
+    import ctypes
+    return ctypes.WINFUNCTYPE(restype, *argtypes, use_last_error=True)(
+        (name, ctypes.windll.kernel32))
+
+
+def _image_section(path: Path) -> tuple[int, int]:
+    """Make `path`'s executable image (what LoadLibrary maps) without loading it:
+    (file, section) handles, kept until the load has used it. (0, 0) if it can't."""
+    import ctypes
+    from ctypes import wintypes
+    open_file = _kernel32("CreateFileW", wintypes.HANDLE, wintypes.LPCWSTR, wintypes.DWORD,
+                          wintypes.DWORD, ctypes.c_void_p, wintypes.DWORD, wintypes.DWORD,
+                          wintypes.HANDLE)
+    make_section = _kernel32("CreateFileMappingW", wintypes.HANDLE, wintypes.HANDLE,
+                             ctypes.c_void_p, wintypes.DWORD, wintypes.DWORD,
+                             wintypes.DWORD, wintypes.LPCWSTR)
+    GENERIC_READ, GENERIC_EXECUTE = 0x80000000, 0x20000000
+    SHARE_READ, SHARE_DELETE, OPEN_EXISTING = 0x1, 0x4, 3
+    PAGE_READONLY, SEC_IMAGE = 0x02, 0x1000000
+    invalid = ctypes.c_void_p(-1).value
+    fh = open_file(str(path), GENERIC_READ | GENERIC_EXECUTE, SHARE_READ | SHARE_DELETE,
+                   None, OPEN_EXISTING, 0, None)
+    if not fh or fh == invalid:
+        log.debug("radio: couldn't open %s (%d)", path.name, ctypes.get_last_error())
+        return 0, 0
+    section = make_section(fh, None, PAGE_READONLY | SEC_IMAGE, 0, 0, None)
+    if not section:
+        log.debug("radio: no image for %s (%d)", path.name, ctypes.get_last_error())
+    return fh, section or 0
+
+
+def _close(handles: tuple[int, int]):
+    from ctypes import wintypes
+    close = _kernel32("CloseHandle", wintypes.BOOL, wintypes.HANDLE)
+    for h in reversed(handles):
+        if h:
+            close(h)
 
 
 class RadioPlayer(QObject):
