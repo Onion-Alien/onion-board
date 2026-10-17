@@ -48,6 +48,22 @@ def test_chat_commands_play_list_and_wait_their_turn(qapp, window):
     assert d(w, "chat", user="Bea")[0] == 400
 
 
+def test_random_names_a_category_outside_chats_one(qapp, window):
+    """Under a category limit, !random <another real category> says that's not chat's
+    one (it used to answer "no such category", and posted nothing)."""
+    w = window
+    w.cfg.categories = ["Music", "Memes"]
+    for m, tag in zip(w.cfg.sounds, ("Music", "Memes")):
+        m.tags = [tag]
+    d(w, "chat_rules", category="Music", cooldown="0", user_cooldown="0")
+    body = d(w, "chat", user="Ann", message="!random memes")[1]
+    assert not body["handled"] and body["reason"] == "not chat's category"
+    assert "@Ann" in body["reply"] and "Music" in body["reply"]
+    body = d(w, "chat", user="Ann", message="!random Nope")[1]
+    assert body["reason"] == "no such category" and "Nope" in body["reply"]
+    assert d(w, "chat", user="Ann", message="!random music")[1]["handled"]
+
+
 def test_who_may_use_each_command(qapp, window):
     w = window
     assert d(w, "chat", user="Ann", message="!say hi")[1]["reason"] == "not allowed"

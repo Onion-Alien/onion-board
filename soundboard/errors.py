@@ -87,6 +87,13 @@ def _scrub(text: str) -> str:
 
 # -- known messages --------------------------------------------------------------
 
+def site_side() -> tuple[str, ...]:
+    """The words for a site that's down or turning requests away: waiting fixes it,
+    closing and opening Onion Board doesn't (the red card leaves that advice out)."""
+    return (_("The site is having trouble right now. Try again later."),
+            _("The site is turning down too many requests. Try again in a few minutes."))
+
+
 # (pattern on the cleaned message, plain words). First match wins. Functions, not
 # tables: this module is imported before the language is picked (app.main), so the
 # words are translated when they're used.

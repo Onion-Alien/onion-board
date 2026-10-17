@@ -69,6 +69,31 @@ def test_a_failed_search_shows_the_red_card_and_try_again_runs_it(qapp, monkeypa
     assert not panel.oops.isVisibleTo(panel)
 
 
+def test_a_site_thats_down_gets_no_restart_the_app_advice(qapp, monkeypatch):
+    """The site answered 5xx: waiting fixes that, closing Onion Board doesn't, so the
+    card says only the site's trouble and Try again (no "close and open it again")."""
+    from soundboard import ytdl
+    from soundboard.ui.ytsearch import SearchResults
+    calls = []
+
+    def search(query, count=20, source="youtube", direct=False, start=1):
+        calls.append(query)
+        if len(calls) == 1:
+            raise ytdl._readable(RuntimeError("HTTP Error 503: Service Unavailable"))
+        raise ConnectionError("The connection timed out")
+    monkeypatch.setattr(ytdl, "search", search)
+    panel = SearchResults()
+    panel.search("lofi beats")
+    assert process_events(qapp, lambda: panel.failed and panel.oops.isVisibleTo(panel))
+    assert "having trouble" in panel.oops.line.text()
+    assert not panel.oops.what.isVisibleTo(panel) and not panel.oops.btn_report.isVisibleTo(panel)
+    assert panel.oops.btn_retry.isVisibleTo(panel)
+    panel.oops.btn_retry.click()   # now our side (a time-out): the advice is back
+    assert process_events(qapp, lambda: len(calls) == 2 and panel.failed
+                          and not panel.loading.running())
+    assert panel.oops.what.isVisibleTo(panel)
+
+
 def test_the_voice_strip_shows_while_the_voice_cant_work():
     """Logic only: problem() says why the voice that's on can't work, "" when it can."""
     from soundboard.ui.voicepanel import VoicePanel

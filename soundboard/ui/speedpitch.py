@@ -256,6 +256,9 @@ class SpeedPitchButton(QPushButton):
         self.setToolTip({"radio": _("Pitch and effects of the radio"),
                          "apps": _("Pitch and effects of the programs you send")}.get(
             what, _("Speed, pitch and effects of the sounds playing now")))
+        # its text is the speed ("1x"): a screen reader said only that
+        self.setAccessibleName(_("Live controls"))
+        self.setAccessibleDescription(self.toolTip())
         self.setCursor(Qt.CursorShape.PointingHandCursor)
         if not self.has_speed:   # "Effects" on its own reads as a label: show it's a control
             icons.set_icon(self, "wave", size=14)

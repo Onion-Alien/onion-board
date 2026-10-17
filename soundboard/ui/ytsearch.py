@@ -1081,9 +1081,11 @@ class SearchResults(RoundedFrame):
 
     def _fail(self, title: str, err: str):
         """The search (or the trending list, or a link) didn't work: the red card in the
-        middle of the results area, Try again runs it once more."""
+        middle of the results area, Try again runs it once more. The site being down
+        isn't something closing the app fixes: no advice to (`errors.site_side`)."""
         self.title.hide()
-        self.oops.show_problem(title, err, self.try_again)
+        down = any(html.escape(w) in err or w in err for w in errors.site_side())
+        self.oops.show_problem(title, err, self.try_again, fixable=not down)
         self.oops.show()
         self.scroll_area.hide()
         self.message.show()
