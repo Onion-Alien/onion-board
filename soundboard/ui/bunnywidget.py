@@ -135,16 +135,37 @@ DANCE_FADE = 3.0   # how fast he gets into a dance or out of it (1/s)
 STYLE_BLEND = 0.6  # seconds to change from one style of dance to another
 KICK_HOP = 0.26    # a hop on a hit, before the beat is known (seconds)
 # the styles he moves to the hits themselves (groove.Groove.hits), not a beat grid: the
-# 808 for hip-hop, the drums and riffs for rock (electronic music's steady kick is the
-# grid itself, lined up on the kicks)
-HIT_BAND = {"hiphop": "bass", "rock": "drums"}
+# 808 for hip-hop, the kick drums and the snare and riffs for rock (electronic music's
+# steady kick is the grid itself, lined up on the kicks)
+HIT_BAND = {"hiphop": ("bass",), "rock": ("bass", "drums")}
+
+
+HIT_LEAD = 0.05   # seconds a move starts before its hit, so it lands right on it
 
 
 def hit_curve(age: float, decay: float = 5.0) -> float:
-    """A hit `age` seconds ago: snaps to 1 in 40 ms, then eases back."""
-    if age < 0 or age > 2:
+    """A hit `age` seconds ago (less than 0: still coming): speeds down to 1 right on
+    it, like a head coming down on the beat, then eases back."""
+    if age < -HIT_LEAD or age > 2:
         return 0.0
-    return age / 0.04 if age < 0.04 else math.exp(-(age - 0.04) * decay)
+    if age < 0:
+        k = 1 + age / HIT_LEAD
+        return k * k
+    return math.exp(-age * decay)
+
+
+def accent(groove, bands: tuple, now: float, decay: float = 5.0) -> tuple[float, float]:
+    """(0..1 how far into a move, strength) for the hits in `bands` around `now`: the
+    last one easing off or the next one, already read, coming down on its time."""
+    best = (0.0, 0.0)
+    nxt = getattr(groove, "next_hit", None)
+    for band in bands:
+        age, s = groove.last_hit(band, now)
+        best = max(best, (hit_curve(age, decay) * s, s))
+        if nxt is not None:
+            until, s = nxt(band, now)
+            best = max(best, (hit_curve(-until, decay) * s, s))
+    return best
 
 
 def blink_amount(b: float) -> float:
@@ -806,8 +827,11 @@ class BunnyWidget(QWidget):
         on = bool(g.style) and bool(g.bpm)
         self._dance += (float(on) - self._dance) * min(1.0, dt * DANCE_FADE)
         self._g_energy += (g.energy - self._g_energy) * min(1.0, dt * 8)
-        v = g.voice   # the mouth: opens fast, closes a little slower
-        self._g_voice += (v - self._g_voice) * min(1.0, dt * (40 if v > self._g_voice else 26))
+        # the mouth: the voice as it's heard right now, opening at once and shutting a
+        # touch slower
+        at = getattr(g, "voice_at", None)
+        v = at(now) if at is not None else g.voice
+        self._g_voice += (v - self._g_voice) * min(1.0, dt * (90 if v > self._g_voice else 45))
         if not on:   # the first seconds, the style not settled yet: a hop on each bass hit
             age, s = g.last_hit("bass", now)
             if age < 0.1 and s > 0.5 and now - age - self._kick_at > 0.3:
@@ -817,9 +841,9 @@ class BunnyWidget(QWidget):
         if g.style != self._style:
             self._style_was, self._style, self._blend = self._style, g.style, 0.0
         self._blend = min(1.0, self._blend + dt / STYLE_BLEND)
-        band = HIT_BAND.get(g.style)
-        if band:   # notes on the hits he moves to
-            age, s = g.last_hit(band, now)
+        bands = HIT_BAND.get(g.style)
+        if bands:   # notes on the hits he moves to
+            age, s = min(g.last_hit(b, now) for b in bands)
             if age < 0.1 and s > 0.45 and now - age - self._note_hit > 0.22:
                 self._note_hit = now - age
                 self._hit_notes(s)
@@ -862,21 +886,20 @@ class BunnyWidget(QWidget):
             b /= 2   # (heard at double time: a nod every other beat)
         ph = b % 1.0
         up = math.sin(math.pi * ph)                  # in the air between beats, down on them
-        hit = ph / 0.08 if ph < 0.08 else math.exp(-(ph - 0.08) * 5)   # snaps down on the beat
+        spb = 60 / g.bpm if g is not None and g.bpm else 0.5
+        hit = hit_curve((ph if ph < 0.75 else ph - 1) * spb, 5 * spb)   # down on the beat
         side = math.sin(math.pi * b)                  # one way a beat, then the other
         slow = math.sin(math.pi * b / 2)              # one sway every two beats
         m = dict(dy=0.0, dx=0.0, angle=0.0, ears=0.0, sy=0.0, nod=0.0, dip=0.0,
                  mouth=0.0, blink=0.0, angry=0.0, smug=0.0)
         # (his mouth stays shut, his little smile, for music: only speech moves it)
         if style in HIT_BAND and g is not None:   # moving to the hits themselves
-            age, s = g.last_hit(HIT_BAND[style], now)
-            s = 0.55 + 0.45 * s
-            hit = hit_curve(age) * s
+            hit, s = accent(g, HIT_BAND[style], now, 12.0 if style == "rock" else 5.0)
+            hit *= (0.55 + 0.45 * s) / max(s, 1e-3)
         if style == "electronic":   # a hop a kick: up between them, down on the next one
             m.update(dy=-a * 0.07 * e * up, dx=a * 0.035 * slow, angle=5 * slow,
                      ears=-10 * up - 4, sy=0.025 * up, nod=-4 * slow, dip=2 * hit)
         elif style == "rock":       # headbanging: head down hard on each hit, ears flying
-            hit = hit_curve(age, 7.0) * s
             m.update(dip=13 * hit * e, nod=5 * hit * (1 if int(t / 0.9) % 2 else -1),
                      dy=a * 0.03 * hit, sy=-0.05 * hit, ears=26 * hit - 4, angle=2 * side,
                      angry=0.35, blink=0.4 * hit)
