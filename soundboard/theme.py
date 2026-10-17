@@ -584,8 +584,8 @@ QFrame#voicebar { background:$panel; border-radius:12px; }
 QWidget#voicebarpart, QFrame#voicebar QLabel { background:transparent; }
 QLabel#voicebarlabel { color:$muted; font-size:9pt; font-weight:600; }
 QFrame#voicebar QPushButton#iconbutton { padding:0; min-width:0; }
-QPushButton#vchip { background:$inset; border:1px solid transparent; border-radius:13px; padding:4px 28px 4px 11px; color:$muted; font-size:9pt; font-weight:600; min-height:0; }
-QToolButton#vchipx { background:transparent; border:none; border-radius:10px; padding:0; }
+QPushButton#vchip { background:$inset; border:1px solid transparent; border-radius:13px; padding:4px 24px 4px 11px; color:$muted; font-size:9pt; font-weight:600; min-height:0; }
+QToolButton#vchipx { background:transparent; border:none; border-radius:9px; padding:0; }
 QToolButton#vchipx:hover { background:$btn_hover; }
 QPushButton#vchip:hover { color:$text; }
 QPushButton#vchip[state="on"] { color:$live_text; border-color:$live_border; }

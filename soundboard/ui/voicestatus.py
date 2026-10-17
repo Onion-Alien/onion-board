@@ -20,7 +20,7 @@ from soundboard.ui.widgets import Meter, widget_at
 GAP = 16            # between the mic half and the chips, side by side
 ROW_H = 28          # every chip, label and the mic row: the bar never changes height
 STOP_H = 36         # the Stop button, bigger than the chips beside it
-X_SIDE = 20         # a chip's ✕, inside its right end
+X_SIDE = 18         # a chip's ✕, inside its right end
 
 
 class Chip(QPushButton):
@@ -44,7 +44,7 @@ class Chip(QPushButton):
 
     def resizeEvent(self, e):
         super().resizeEvent(e)
-        self.off.move(self.width() - X_SIDE - 4, (self.height() - X_SIDE) // 2)
+        self.off.move(self.width() - X_SIDE - 3, (self.height() - X_SIDE) // 2)
 
     def show_as(self, text: str, state: str, icon: str = "", picture=None, tip: str = ""):
         """`state`: "on", "warn" or "off". `picture`: a ready QIcon (a voice's art),
@@ -189,10 +189,13 @@ class VoiceStatusBar(QFrame):
         m = self._box.contentsMargins()
         room = self.width() - m.left() - m.right()
         line = sum(w.sizeHint().width() + 6 for w in self._row_widgets())   # one line
-        # Keep at least half the bar for the meter. If the status chips would
-        # squeeze it below that, put them underneath instead.
+        # Keep at least half the bar beside Stop for the meter. If the status chips
+        # would squeeze it below that, put them underneath instead. (Half the whole
+        # bar, Stop included, sent two chips with their close buttons under the meter
+        # on a window that had room for them.)
         mic_labels = self._mic.minimumSizeHint().width() - self.meter.minimumWidth()
-        need = max(160, (self.width() + 1) // 2 + mic_labels) + GAP + line
+        meter = (self.width() - self.stop_button.width() + 1) // 2
+        need = max(160, meter + mic_labels) + GAP + line
         d = QBoxLayout.Direction.LeftToRight if room >= need else QBoxLayout.Direction.TopToBottom
         # beside the meter the chips keep to one line; under it they wrap
         self._right.setMinimumWidth(line if d == QBoxLayout.Direction.LeftToRight else 0)
