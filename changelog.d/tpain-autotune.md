@@ -1,2 +1,0 @@
-- Autotune voice: a hard T-Pain style snap. It now sticks to the notes of one key and jumps cleanly between them (no flicker), with a brighter, doubled sound.
-- Voice bar: each chip (voice changer, AI voice, computer voice, language) has its own ✕, so you can turn one off without stopping them all.
