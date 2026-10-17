@@ -54,7 +54,8 @@ RULES: list[tuple[str, re.Pattern[str]]] = [(name, re.compile(rx)) for name, rx 
 
 # e-mails that are fine to publish
 EMAIL_OK = re.compile(r"(?i)^(?:noreply|no-reply)@|@anthropic\.com$"
-                      r"|^support@github\.com$")  # dependabot's Signed-off-by
+                      r"|^support@github\.com$"  # dependabot's Signed-off-by
+                      r"|^onionboard\.contact@proton\.me$")  # the project's public contact
 
 
 def load_private_rules() -> list[tuple[str, re.Pattern[str]]]:
