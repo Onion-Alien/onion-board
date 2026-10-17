@@ -9,7 +9,7 @@ from __future__ import annotations
 import math
 
 from PySide6.QtCore import QPointF, QRectF, Qt
-from PySide6.QtGui import (QColor, QImage, QPainter, QPainterPath,
+from PySide6.QtGui import (QColor, QImage, QPainter, QPainterPath, QPainterPathStroker,
                            QPen, QPixmap, QRadialGradient, QTransform)
 
 from soundboard import theme
@@ -24,6 +24,7 @@ FUR_LINE = QColor(200, 176, 160, 150)   # soft fluff lines (the nightcap bobble)
 INK = QColor("#2b2340")
 EYE = QColor("#251c33")
 IRIS = QColor("#8a5cc7")                # the coloured glow low in his eyes
+FACE_LIGHT = QColor("#f4ecf6")          # his face lines and eye rims on dark fur
 BROW = QColor(196, 140, 140, 150)       # his little resting brows
 PINK = QColor("#ffb3c7")
 NOSE = QColor("#ff8fae")
@@ -139,11 +140,15 @@ def _ear_bend(fold: float, hinge: float = EAR_HINGE) -> QTransform:
     return QTransform().translate(0, hinge).rotate(fold).translate(0, -hinge)
 
 
-def _ear_pieces(w: float, h: float, bend: QTransform | None, hinge: float = EAR_HINGE):
+def _ear_pieces(w: float, h: float, bend: QTransform | None, hinge: float = EAR_HINGE,
+                bite: QPainterPath | None = None):
     """An ear in two pieces, its own frame: the part that stays up (ending in a round
     knee where it bends) and the flap folded over by `bend` (painted on top: it hides
-    the inner ear behind it). Straight (`bend` None): the whole ear and no flap."""
+    the inner ear behind it). Straight (`bend` None): the whole ear and no flap. `bite`:
+    a chomp taken out of it."""
     full = _ear_shape(w, h)
+    if bite is not None:
+        full = full.subtracted(bite)
     if bend is None:
         return full, None
     below, above = QPainterPath(), QPainterPath()
@@ -168,13 +173,15 @@ def _arc(x0, y0, cx, cy, x1, y1) -> QPainterPath:
     return path
 
 
-# His little front paws: a bunny has no arms to speak of, just two bean-shaped paws
-# tucked up under his chin: (x, y, width, height, lean), the viewer's left one first.
-# Resting, a little apart; hoping, pressed together, tips touching; cross, folded one
-# over the other across his chest (the viewer's right one on top).
-PAWS_REST = ((42, 97.5, 10.5, 17, 9), (58, 97.5, 10.5, 17, -9))
-PAWS_HOPE = ((46.3, 96.2, 10, 16.5, 22), (53.7, 96.2, 10, 16.5, -22))
-PAWS_CROSS = ((54, 98.8, 10.5, 19, -74), (46, 100.4, 10.5, 19, 74))
+# His arms: short stubby bunny arms from his shoulders at the sides of his body (tucked
+# under his head), each along a gentle curve to a round paw: (bend, paw), the viewer's
+# left one first. Resting, they hang at his sides; hoping, the paws come up in front of
+# his chest; cross, they fold across it (the viewer's right one on top).
+SHOULDERS = ((35.5, 92.5), (64.5, 92.5))
+ARMS_REST = (((31.3, 96.7), (32.7, 101.6)), ((68.7, 96.7), (67.3, 101.6)))
+ARMS_HOPE = (((32.4, 100.5), (43.1, 96.0)), ((67.7, 100.5), (56.9, 96.0)))
+ARMS_CROSS = (((29.6, 102.6), (51.6, 100.2)), ((70.5, 102.6), (48.4, 101.4)))
+ARM_R = 4.6   # (the paw, PAW_R, a little rounder)
 # where a prop puts each paw (None: that paw stays on his tummy). "headphones" is in the
 # head's frame: the paw is on the ear cup
 PROP_PAWS = {"mic": (None, (76, 97)), "headphones": (None, (86, 72)),
@@ -257,23 +264,34 @@ def _reach(p: QPainter, prop, fur: QColor, ink: QPen, head_xf: QTransform):
                 _arm(p, _prop_arm((41, 97) if i == 0 else (59, 97), to), fur, ink)
 
 
-def _paws(p: QPainter, prop, sad: float, angry: float, fur: QColor, ink: QPen,
-          head: QPainterPath):
-    """His front paws, tucked up under his chin (`head`): they come together as `sad`
-    grows (hoping) and fold over each other when he's cross (`angry`). A paw a prop
-    takes isn't here: it's out holding it (_reach)."""
+def _paws(p: QPainter, prop, sad: float, angry: float, paw_fur: QColor, ink: QPen,
+          sleeve: QColor | None = None):
+    """His arms, from the sides of his body to his paws: they bring the paws together
+    under his chin as `sad` grows (hoping) and go on his hips, elbows out, when he's
+    cross (`angry`). An arm a prop takes isn't here: it's out holding it (_reach)."""
     clasp = cross = 0.0
     if prop is None:
         cross = _smooth((angry - 0.35) / 0.4)
         clasp = _smooth((sad - 0.3) / 0.45) * (1 - cross)
     reach = PROP_PAWS.get(prop or "", (None, None))
+    fur = sleeve or paw_fur
     for i in (0, 1):
         if reach[i] is not None:
             continue
-        x, y, w, h, lean = _lerp(_lerp(PAWS_REST[i], PAWS_HOPE[i], clasp), PAWS_CROSS[i], cross)
+        (bx, by), (px, py) = (_lerp(_lerp(ARMS_REST[i][k], ARMS_HOPE[i][k], clasp),
+                                    ARMS_CROSS[i][k], cross) for k in (0, 1))
+        line = QPainterPath(QPointF(*SHOULDERS[i]))
+        line.quadTo(QPointF(bx, by), QPointF(px, py))
+        st = QPainterPathStroker()
+        st.setWidth(2 * ARM_R)
+        st.setCapStyle(Qt.PenCapStyle.RoundCap)
+        st.setJoinStyle(Qt.PenJoinStyle.RoundJoin)
+        arm = st.createStroke(line).united(_oval(px, py, 2 * PAW_R, 2 * PAW_R)).simplified()
         p.setPen(ink)
         p.setBrush(fur)
-        p.drawPath(_bean(x, y, w, h, lean).subtracted(head))
+        p.drawPath(arm)
+        if sleeve is not None:   # a sweater's sleeve: his paw out of the cuff
+            _ellipse(p, px, py, 2 * PAW_R, 2 * PAW_R, paw_fur, ink)
 
 
 def draw_bunny(p: QPainter, rect: QRectF, prop: str | None = None, *,
@@ -281,7 +299,8 @@ def draw_bunny(p: QPainter, rect: QRectF, prop: str | None = None, *,
                swing: float = 0.0, sad: float = 0.0, angry: float = 0.0,
                nightcap: bool = False, robot: bool = False, smug: bool = False,
                outfit: tuple[str, ...] | None = None, led: float = 0.0,
-               nod: float = 0.0, dip: float = 0.0, look: float = 0.0):
+               nod: float = 0.0, dip: float = 0.0, look: float = 0.0,
+               kit: dict | None = None):
     """Draw Bun fitted (aspect kept, centred) into `rect`. The keywords pose Bun for
     animation (ui/bunnywidget.py): `blink` 0..1 closes the eyes, `mouth` 0..1 opens
     the mouth (talking), `ears` tilts both ears outward by that many degrees,
@@ -296,8 +315,14 @@ def draw_bunny(p: QPainter, rect: QRectF, prop: str | None = None, *,
     Robo-Bun wears no outfit. `led` 0..1 brightens Robo-Bun's LED ears and core (he
     pulses them while he works). `nod` tilts his head (and ears) on his neck by that many
     degrees and `dip` drops it that far on the canvas, the body staying put: a headbang,
-    a nod to the beat, a curious tilt. `look` -1..1 turns his eyes left / right."""
+    a nod to the beat, a curious tilt. `look` -1..1 turns his eyes left / right.
+    `kit`: his look (bunnyfit.look: fur, floppy ears, extras; None: the current
+    theme's)."""
     fit = () if robot else bunnyfit.outfit() if outfit is None else outfit
+    if kit is None:
+        kit = bunnyfit.look()
+    kit = {**bunnyfit.VANILLA, **kit}
+    extras = () if robot else kit["extras"]
     # dark glasses hide his eyes: no lids or tears under them, brows lifted clear
     hidden = not nightcap and any(name in bunnyfit.HIDE_EYES for name in fit)
     phones = QColor(theme.T["accent"])
@@ -309,8 +334,10 @@ def draw_bunny(p: QPainter, rect: QRectF, prop: str | None = None, *,
     p.translate(rect.center().x() - W * s / 2, rect.center().y() - H * s / 2)
     p.scale(s, s)
 
-    fur = ROBOT_FUR if robot else FUR
-    fur_shade = ROBOT_FUR_SHADE if robot else FUR_SHADE
+    fur = ROBOT_FUR if robot else QColor(kit["fur"])
+    fur_shade = (ROBOT_FUR_SHADE if robot else FUR_SHADE if fur == FUR else fur.darker(107))
+    dark = not robot and fur.lightnessF() < 0.45   # dark fur: his face drawn in light lines
+    face = FACE_LIGHT if dark else INK
     ink_col = ROBOT_INK if robot else INK
     ink = QPen(ink_col, 2.4)
     ink.setJoinStyle(Qt.PenJoinStyle.RoundJoin)
@@ -331,9 +358,11 @@ def draw_bunny(p: QPainter, rect: QRectF, prop: str | None = None, *,
 
     p.save()
     head()
-    for side, bx, cx, cy, w, h, a, tilt, rest in (
-            (-1, 37, 34.5, 27, 22, 50, -7, -ears, 0.0),
-            (1, 63, 65.5, 22, 19.5, 56, 13, ears, 0.0 if robot else REST_FOLD)):
+    flops = {"up": (), "left": (-1,), "right": (1,), "both": (-1, 1)}[kit["ears"]]
+    upright = [sd for sd in (-1, 1) if sd not in flops] or [-1]
+    for side, bx, cx, cy, w, h, a, tilt in (
+            (-1, 37, 34.5, 27, 22, 50, -7, -ears), (1, 63, 65.5, 22, 19.5, 56, 13, ears)):
+        rest = REST_FOLD if side in flops and not robot else 0.0
         bent = max(fold, rest)
         hinge = REST_HINGE if rest else EAR_HINGE
         p.save()
@@ -343,7 +372,11 @@ def draw_bunny(p: QPainter, rect: QRectF, prop: str | None = None, *,
         p.translate(cx, cy)   # from here on: the ear's own frame, centred, upright
         p.rotate(a)
         bend = _ear_bend(side * bent, hinge)
-        lower, flap = _ear_pieces(w, h, bend if bent > 0.5 else None, hinge)
+        bite = None
+        if "chomp" in extras and side == upright[-1]:   # a bite out of the outer edge
+            bite = _oval(side * w * 0.5, -h * 0.17, 9, 8.5).united(
+                _oval(side * w * 0.55, -h * 0.02, 6.5, 6.5))
+        lower, flap = _ear_pieces(w, h, bend if bent > 0.5 else None, hinge, bite)
         # how much of the inner ear the flap shows: a flap folded right over shows its
         # furry back; his floppy ear only bends, so its pink runs on to the tip
         inner_on = (1.0 if rest and bent < rest + 8 else   # his floppy ear: pink to the tip
@@ -399,6 +432,13 @@ def draw_bunny(p: QPainter, rect: QRectF, prop: str | None = None, *,
             p.setBrush(PINK)
             p.drawPath(parts[0][0].intersected(top.simplified()))
             p.restore()
+        if "earring" in extras and side == upright[0]:   # a gold hoop through the edge
+            ex_, ey_ = side * w * 0.47, -h * 0.02
+            ring = QPainterPath()
+            ring.addEllipse(QPointF(ex_ + side * 2.2, ey_ + 3.4), 3.3, 3.6)
+            _stroke(p, ring, ink_col, 3.8)
+            _stroke(p, ring, bunnyfit.GOLD, 2.0)
+            _ellipse(p, ex_, ey_, 2.6, 2.6, bunnyfit.GOLD, QPen(ink_col, 1.1))
         if robot:   # antenna bulb at the ear tip (which folds down with the flap)
             tip = bend.map(QPointF(0, -h / 2 + 2))
             if led > 0:
@@ -426,7 +466,7 @@ def draw_bunny(p: QPainter, rect: QRectF, prop: str | None = None, *,
     p.setPen(ink)
     p.setBrush(fur)
     p.drawPath(body_shape)
-    _ellipse(p, 50, 105, 28, 21, fur_shade)   # his tummy patch
+    _ellipse(p, 50, 105, 28, 21, fur.lighter(125) if dark else fur_shade)   # tummy patch
     for x, a in ((36.5, 9), (63.5, -9)):   # his feet, poking out front, turned out a bit
         _ellipse(p, x, 114.6, 16, 8.6, fur, ink, a)
 
@@ -444,6 +484,11 @@ def draw_bunny(p: QPainter, rect: QRectF, prop: str | None = None, *,
     body = tuple(n for n in fit if n in BODY_PIECES)
     fit_head = tuple(n for n in fit if n not in BODY_PIECES)
     bunnyfit.draw(p, body, "back", ink)
+    # what's on his body (a sweater) under his arms, his arms under his head; what's
+    # round his neck goes over his head's chin, after it
+    worn = tuple(n for n in body if n not in bunnyfit.NECK)
+    bunnyfit.draw(p, worn, "face", ink, hats=not nightcap)
+    _paws(p, prop, sad, angry, fur, ink, None if robot else bunnyfit.sleeve(fit))
     p.save()
     head()
     bunnyfit.draw(p, fit_head, "back", ink)
@@ -485,6 +530,9 @@ def draw_bunny(p: QPainter, rect: QRectF, prop: str | None = None, *,
     bunnyfit.draw(p, fit_head, "over", ink, hats=not nightcap)
 
     # face
+    if "shiner" in extras:   # a black eye: a soft purple bruise round his left eye
+        _glow(p, EYES[0], EYE_Y + 0.5, 22, 21, QColor(110, 70, 160, 175))
+        _glow(p, EYES[0] - 1.5, EYE_Y + 7.5, 13, 6, QColor(205, 175, 70, 110))
     shut = blink > 0.6
     gx = 1.6 * max(-1.0, min(1.0, look))
     for x in EYES:
@@ -507,10 +555,12 @@ def draw_bunny(p: QPainter, rect: QRectF, prop: str | None = None, *,
                 arc = _arc(x - 5, EYE_Y, x, EYE_Y + 3.6, x + 5, EYE_Y)
             else:
                 arc = _arc(x - 5, EYE_Y + 1.5, x, EYE_Y - 3, x + 5, EYE_Y + 1.5)
-            _stroke(p, arc, INK, 2.3)
+            _stroke(p, arc, face, 2.3)
             continue
         ex = x + gx
         ew, eh = 11.6 + sad, (12.6 + sad) * (1 - blink)
+        if dark and eh > 1:   # a light rim, so his eyes show on dark fur
+            _ellipse(p, ex, EYE_Y, ew + 3.4, eh + 3.4, FACE_LIGHT)
         eye = QPainterPath()
         eye.addEllipse(QRectF(ex - ew / 2, EYE_Y - eh / 2, ew, eh))
         p.fillPath(eye, EYE)
@@ -527,7 +577,7 @@ def draw_bunny(p: QPainter, rect: QRectF, prop: str | None = None, *,
             p.setBrush(fur)
             p.drawRect(QRectF(x - 7.5, EYE_Y - 9, 15, 8.5))
             _stroke(p, _arc(x - 5.6, EYE_Y - 0.5, x, EYE_Y - 1.2, x + 5.6, EYE_Y - 0.5),
-                    INK, 2.4)
+                    face, 2.4)
         if sad > 0.05 and not hidden:   # welling up
             c = QColor("#8fd3ff")
             c.setAlphaF(0.8 * sad)
@@ -550,17 +600,17 @@ def draw_bunny(p: QPainter, rect: QRectF, prop: str | None = None, *,
             for x in EYES:
                 _stroke(p, _arc(x - 3.2, 54.3 - up, x, 52.3 - up, x + 3.2, 54.3 - up), c, 1.6)
         if worried > 0.02:   # worried brows, inner ends lifted
-            c = QColor(INK)
+            c = QColor(face)
             c.setAlphaF(worried)
             for x, sx in ((EYES[0], -1), (EYES[1], 1)):
                 _stroke(p, _arc(x + sx * 5.5, 53.5 + sad - up, x + sx * 1.5, 52 - up,
                                 x - sx * 3, 51.5 - 4 * sad - up), c, 2.2)
         if smug:                  # one brow flat, the other cocked up
             lx, rx = EYES
-            _stroke(p, _arc(lx - 5.5, 54.5 - up, lx, 54 - up, lx + 5.5, 54.8 - up), INK, 2.2)
-            _stroke(p, _arc(rx - 6, 52 - up, rx - 0.5, 46.5 - up, rx + 5.5, 50.5 - up), INK, 2.2)
+            _stroke(p, _arc(lx - 5.5, 54.5 - up, lx, 54 - up, lx + 5.5, 54.8 - up), face, 2.2)
+            _stroke(p, _arc(rx - 6, 52 - up, rx - 0.5, 46.5 - up, rx + 5.5, 50.5 - up), face, 2.2)
         if cross > 0.02:          # cross brows, inner ends pulled down
-            c = QColor(INK)
+            c = QColor(face)
             c.setAlphaF(cross)
             for x, sx in ((EYES[0], -1), (EYES[1], 1)):
                 _stroke(p, _arc(x + sx * 6, 51.5 - 2 * angry - up, x + sx * 1, 51.5 - up,
@@ -571,6 +621,20 @@ def draw_bunny(p: QPainter, rect: QRectF, prop: str | None = None, *,
         for x in (27, 73):
             w, h = 15 + 2 * angry, 9.5 + angry
             _glow(p, x, 74, w, h, blush)
+        if "freckles" in extras:
+            for x, y in ((24, 71.5), (28, 70.5), (26.5, 74), (76, 71.5), (72, 70.5), (73.5, 74)):
+                _ellipse(p, x, y, 1.5, 1.5, QColor(196, 120, 110, 190))
+        if "bandaid" in extras:   # a plaster on his right cheek
+            p.save()
+            p.translate(73, 72)
+            p.rotate(-28)
+            p.setPen(QPen(ink_col, 1.3))
+            p.setBrush(QColor("#f3c79a"))
+            p.drawRoundedRect(QRectF(-7, -2.6, 14, 5.2), 2.6, 2.6)
+            p.setPen(Qt.PenStyle.NoPen)
+            p.setBrush(QColor("#e2a877"))
+            p.drawRoundedRect(QRectF(-2.4, -1.9, 4.8, 3.8), 1, 1)
+            p.restore()
         nose = QPainterPath(QPointF(47.2, 69.3))
         nose.quadTo(QPointF(50, 68.4), QPointF(52.8, 69.3))
         nose.quadTo(QPointF(53.6, 69.8), QPointF(52.6, 71))
@@ -584,7 +648,7 @@ def draw_bunny(p: QPainter, rect: QRectF, prop: str | None = None, *,
         p.setBrush(NOSE)
         p.drawPath(nose)
         _ellipse(p, 49, 69.8, 1.8, 1, QColor(255, 255, 255, 170))
-    line = ROBOT_CYAN if robot else INK
+    line = ROBOT_CYAN if robot else face
     if mouth > 0.08:          # open, as if talking: the smile's top, a round bottom
         oh = 2.5 + 6.5 * min(1.0, mouth)
         hw = 4.2 + 1.3 * mouth
@@ -609,12 +673,12 @@ def draw_bunny(p: QPainter, rect: QRectF, prop: str | None = None, *,
             p.setClipPath(shape)
             _ellipse(p, 50, 75.5 + oh * 0.95, hw * 1.3, oh * 0.6, NOSE)
             p.restore()
-            p.setPen(QPen(INK, 1.7, Qt.PenStyle.SolidLine, Qt.PenCapStyle.RoundCap,
+            p.setPen(QPen(face, 1.7, Qt.PenStyle.SolidLine, Qt.PenCapStyle.RoundCap,
                           Qt.PenJoinStyle.RoundJoin))
             p.setBrush(Qt.BrushStyle.NoBrush)
             p.drawPath(shape)
     elif smug and not robot:  # a lopsided smirk, up on one side
-        _stroke(p, _arc(44, 76.5, 51, 79.5, 57, 74), INK, 1.8)
+        _stroke(p, _arc(44, 76.5, 51, 79.5, 57, 74), face, 1.8)
     elif sad > 0.5 or angry > 0.4:   # a little wobbly frown
         _stroke(p, _arc(45.5, 78.5, 50, 74.8, 54.5, 78.5), line, 1.8)
     else:                     # his resting smile: a soft double curve under the nose
@@ -623,7 +687,7 @@ def draw_bunny(p: QPainter, rect: QRectF, prop: str | None = None, *,
         smile.quadTo(QPointF(52.6, 78.4), QPointF(55.2, 75))
         _stroke(p, smile, line, 1.8)
     if not robot:   # the little line from his nose to his mouth
-        _stroke(p, _arc(50, 72.8, 50, 74.2, 50, 75.4), INK, 1.4)
+        _stroke(p, _arc(50, 72.8, 50, 74.2, 50, 75.4), face, 1.4)
 
     bunnyfit.draw(p, fit_head, "face", ink, hats=not nightcap, shut=shut)
     if prop == "headphones":   # (his paw is on the ear cup: it goes with his head)
@@ -637,8 +701,8 @@ def draw_bunny(p: QPainter, rect: QRectF, prop: str | None = None, *,
             arc.quadTo(cx + ax * 1.5 * k, cy + ay * 1.5 * k, cx + ax * 6 * k, cy + ay * 1.5 * k)
             p.drawPath(arc)
     p.restore()   # (the head's frame)
-    bunnyfit.draw(p, body, "face", ink, hats=not nightcap)
-    _paws(p, prop, sad, angry, fur, ink, head_xf.map(head_shape))
+    bunnyfit.draw(p, tuple(n for n in body if n in bunnyfit.NECK), "face", ink,
+                  hats=not nightcap)
     if prop != "headphones":
         _draw_prop(p, prop, ink, swing, fur=fur)
     p.restore()

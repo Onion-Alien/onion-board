@@ -93,3 +93,32 @@ def test_hoot_wears_the_theme_outfit_but_not_in_artwork(qapp, monkeypatch):
 def test_laser_eyes_stop_when_his_eyes_shut(qapp):
     assert _draw(blink=1.0, outfit=("laser",)) == _draw(blink=1.0, outfit=())
     assert _draw(outfit=("laser",)) != _draw(outfit=())
+
+
+def test_every_look_names_a_theme_and_known_extras(qapp):
+    for name, kit in bunnyfit.LOOKS.items():
+        assert name in theme.THEMES, name
+        assert set(kit) <= {"fur", "ears", "extras"}, name
+        assert kit.get("ears", "right") in ("up", "left", "right", "both"), name
+        assert set(kit.get("extras", ())) <= {"chomp", "earring", "shiner", "bandaid",
+                                               "freckles"}, name
+
+
+def test_the_default_theme_is_plain_bun(qapp):
+    assert "Dark" not in bunnyfit.LOOKS
+    assert bunnyfit.look("Dark") == bunnyfit.VANILLA
+
+
+def test_every_look_change_shows(qapp):
+    plain = _draw(outfit=(), kit=bunnyfit.VANILLA)
+    changes = [{"fur": "#6f4630"}, {"ears": "up"}, {"ears": "both"}, {"ears": "left"}]
+    changes += [{"extras": (x,)} for x in ("chomp", "earring", "shiner", "bandaid", "freckles")]
+    for kit in changes:
+        assert _draw(outfit=(), kit=kit) != plain, kit
+
+
+def test_his_look_follows_the_theme_but_robot_keeps_his_own(qapp, monkeypatch):
+    monkeypatch.setattr(theme, "current_name", "Mocha")
+    assert _draw(outfit=()) == _draw(outfit=(), kit=bunnyfit.look("Mocha"))
+    assert _draw(outfit=()) != _draw(outfit=(), kit=bunnyfit.VANILLA)
+    assert _draw(robot=True) == _draw(robot=True, kit=bunnyfit.VANILLA)

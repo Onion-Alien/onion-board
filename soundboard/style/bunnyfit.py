@@ -90,6 +90,48 @@ def _col(key: str) -> QColor:
     return QColor(hooks.palette()[key])
 
 
+# each theme's own Bun: his fur, which ear flops ("up": neither, "left" / "right": the
+# viewer's, "both") and little extras ("chomp": a bite out of an ear, "earring", "shiner",
+# "bandaid", "freckles"). A theme that isn't listed is plain Bun: VANILLA.
+VANILLA = {"fur": "#fdf8f1", "ears": "right", "extras": ()}
+LOOKS: dict[str, dict] = {
+    "Light": {"ears": "up"},
+    "Lilac": {"fur": "#e9e0f7", "ears": "left"},
+    "Toxic": {"fur": "#e2f2d3", "extras": ("chomp", "shiner")},
+    "Ocean": {"ears": "up", "extras": ("earring",)},
+    "Cherry Blossom": {"fur": "#fde3ec", "ears": "both"},
+    "Carbon": {"fur": "#5c5964", "extras": ("earring", "bandaid")},
+    "Midnight": {"fur": "#3e4366", "ears": "up"},
+    "Slate": {"fur": "#e0e1e6"},
+    "Arctic": {"ears": "up", "extras": ("freckles",)},
+    "Paper": {"fur": "#f6edda", "extras": ("freckles",)},
+    "Vampire": {"fur": "#ece7f1", "ears": "left", "extras": ("chomp",)},
+    "Forest": {"fur": "#a57a52", "ears": "up"},
+    "Mocha": {"fur": "#6f4630", "ears": "both"},
+    "Sunset": {"fur": "#fcdcc4", "ears": "up", "extras": ("earring",)},
+    "Royal": {"ears": "up", "extras": ("earring",)},
+    "Mint": {"fur": "#dbf3e7", "ears": "left"},
+    "Synthwave": {"fur": "#f6d9ef", "ears": "up", "extras": ("earring",)},
+    "Vaporwave": {"fur": "#f2dcf5"},
+    "Blood Moon": {"fur": "#433b4c", "ears": "left", "extras": ("chomp", "shiner")},
+    "Lava": {"fur": "#f3cdae", "extras": ("bandaid", "chomp")},
+    "Amber Terminal": {"fur": "#f3e7c8"},
+    "Hacker": {"fur": "#45424d", "ears": "up", "extras": ("earring", "chomp")},
+    "Flashbang": {"ears": "both", "extras": ("shiner", "bandaid")},
+    "Barbie": {"fur": "#fcd8e8", "ears": "up", "extras": ("earring",)},
+    "Swamp": {"fur": "#68703f", "ears": "both"},
+    "Deep Fried": {"fur": "#f1d394", "extras": ("shiner", "bandaid", "chomp")},
+    "Retro 98": {"fur": "#d8d4cc"},
+    "Comic Sans": {"ears": "both", "extras": ("freckles",)},
+    "Brainrot": {"ears": "left", "extras": ("freckles", "bandaid")},
+}
+
+
+def look(name: str | None = None) -> dict:
+    """Theme `name`'s Bun (default: the current theme's): VANILLA with its changes."""
+    return {**VANILLA, **LOOKS.get(name or hooks.theme_name(), {})}
+
+
 def sleeve(pieces: tuple[str, ...]) -> QColor | None:
     """The colour of his little arms when `pieces` dress them (a sweater has sleeves),
     else None: bare fur."""
