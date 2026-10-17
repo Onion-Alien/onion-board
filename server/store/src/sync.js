@@ -78,9 +78,12 @@ export async function syncStep(env, tools, fetcher = fetch) {
               await sha256("link:" + key), created - i, cat, hot ? hot - i * 20 : 0, pop));
     }
     if (!stmts.length) return;
-    const before = (await env.DB.prepare("SELECT count(*) AS n FROM sounds").first()).n;
+    // a new row gets the next rowid; an updated one keeps its own (counting the table would
+    // read every row, twice a run)
+    const last = async () => (await env.DB.prepare("SELECT max(rowid) AS n FROM sounds").first()).n || 0;
+    const before = await last();
     await env.DB.batch(stmts);
-    added += (await env.DB.prepare("SELECT count(*) AS n FROM sounds").first()).n - before;
+    added += await last() - before;
   }
 
   // Trending: what's hot there now, fading by a tenth each run once it isn't

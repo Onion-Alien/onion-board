@@ -192,14 +192,12 @@ async function list(url, req, env, t) {
     }
   }
   const order = sort === "new" ? "v.created DESC"
-    : sort === "trending" ? "(SELECT count(*) FROM actions a WHERE a.sound = v.id " +
-      "AND a.kind = 'vote' AND a.detail = '1' AND a.at > ?) DESC, (v.up - v.down) DESC, v.created DESC"
-    : "(v.up - v.down) DESC, v.up DESC, v.created DESC";
-  const since = sort === "trending" ? [t.now() - 7 * 86400] : [];
+    : sort === "trending" ? "v.likes DESC, (v.up - v.down) DESC, v.created DESC"
+    : "(v.up - v.down) DESC, v.up DESC, v.created DESC";   // each as an index in schema.sql
   const mine = voter ? ", (SELECT value FROM votes x WHERE x.sound = v.id AND x.voter = ?) AS mine" : "";
   const rows = await env.DB.prepare(`SELECT v.*${mine} FROM voices v WHERE ${where.join(" AND ")} ` +
                                     `ORDER BY ${order} LIMIT ? OFFSET ?`)
-    .bind(...(voter ? [voter] : []), ...args, ...since, PAGE + 1, offset).all();
+    .bind(...(voter ? [voter] : []), ...args, PAGE + 1, offset).all();
   const res = rows.results || [];
   return t.json({ voices: res.slice(0, PAGE).map(shown), more: res.length > PAGE });
 }

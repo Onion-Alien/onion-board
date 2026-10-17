@@ -50,8 +50,10 @@ export default {
   },
   // the daily cron (wrangler.toml): old log rows and rate-limit counters go
   async scheduled(event, env) {
-    if (event.cron === "17 3 * * *") await prune(env);
-    else await syncStep(env, TOOLS);
+    if (event.cron === "17 3 * * *") return prune(env);
+    await syncStep(env, TOOLS);
+    // the category chips' counts, once an hour (they read every live sound)
+    if (new Date(event.scheduledTime || Date.now()).getUTCMinutes() < 10) await catCounts(env);
   },
 };
 
@@ -59,6 +61,10 @@ export async function prune(env, at = now()) {
   await env.DB.prepare("DELETE FROM actions WHERE at < ?").bind(at - LOG_DAYS * 86400).run();
   await env.DB.prepare("DELETE FROM counters WHERE day < ?")
     .bind(Math.floor(at / 86400) - 2).run();
+  // 👍 older than a week leave Trending (only sounds that have some are looked at)
+  for (const table of ["sounds", "voices"])
+    await env.DB.prepare(`UPDATE ${table} SET ${LIKES.replace("{t}", table)} WHERE likes > 0`)
+      .bind(at - TRENDING_DAYS * 86400).run();
 }
 
 class Answer extends Error {
@@ -254,30 +260,47 @@ async function list(url, req, env) {
     }
   }
   // Top: votes, then how popular it is where it came from (the store's own sounds sit
-  // mid-way); Trending: what's hot on the sites now plus this week's 👍 here
+  // mid-way); Trending: what's hot on the sites now plus this week's 👍 here. Each order
+  // matches an index in schema.sql word for word, so a page reads only its own rows.
   const order = sort === "new" ? "s.created DESC"
-    : sort === "trending" ? "(s.hot + 40 * (SELECT count(*) FROM actions a WHERE a.sound = s.id " +
-      "AND a.kind = 'vote' AND a.detail = '1' AND a.at > ?)) DESC, (s.up - s.down) DESC, s.pop DESC"
+    : sort === "trending" ? "(s.hot + 40 * s.likes) DESC, (s.up - s.down) DESC, s.pop DESC"
     : "(s.up - s.down) DESC, s.up DESC, (CASE WHEN s.source = '' THEN 500 ELSE s.pop END) DESC, " +
       "s.created DESC";
-  const since = sort === "trending" ? [now() - TRENDING_DAYS * 86400] : [];
   const mine = voter ? ", (SELECT value FROM votes v WHERE v.sound = s.id AND v.voter = ?) AS mine" : "";
   const sql = `SELECT s.*${mine} FROM sounds s WHERE ${where.join(" AND ")} ` +
               `ORDER BY ${order} LIMIT ? OFFSET ?`;
   const rows = await env.DB.prepare(sql)
-    .bind(...(voter ? [voter] : []), ...args, ...since, PAGE + 1, offset).all();
+    .bind(...(voter ? [voter] : []), ...args, PAGE + 1, offset).all();
   const res = rows.results || [];
   return json({ sounds: res.slice(0, PAGE).map(shown), more: res.length > PAGE,
                 agreement: AGREEMENT, max_bytes: MAX_BYTES });
 }
 
-// how many live sounds each category has (the app's category chips)
-async function categories(env) {
+// how many live sounds each category has (the app's category chips). Counting reads every
+// live sound, so the hourly cron does it (catCounts) and a call reads the one stored row,
+// kept in memory for a few minutes on top.
+let catCache = null;                 // [database, when, body]
+const CAT_CACHE_MS = 5 * 60 * 1000;
+
+export async function catCounts(env) {
   const rows = await env.DB.prepare("SELECT cat, count(*) AS n FROM sounds " +
-    "WHERE status = 'live' AND cat != '' GROUP BY cat ORDER BY n DESC").all();
-  const total = await env.DB.prepare("SELECT count(*) AS n FROM sounds WHERE status = 'live'").first();
-  return json({ categories: (rows.results || []).filter(r => CATS.includes(r.cat)),
-                total: total.n }, 200, { "cache-control": "public, max-age=600" });
+    "WHERE status = 'live' GROUP BY cat").all();
+  const all = rows.results || [];
+  const body = { categories: all.filter(r => CATS.includes(r.cat)).sort((a, b) => b.n - a.n)
+                   .map(r => ({ cat: r.cat, n: r.n })),
+                 total: all.reduce((t, r) => t + r.n, 0) };
+  await env.DB.prepare("INSERT INTO sync (key, value) VALUES ('categories', ?) " +
+    "ON CONFLICT (key) DO UPDATE SET value = excluded.value").bind(JSON.stringify(body)).run();
+  catCache = null;
+  return body;
+}
+
+async function categories(env) {
+  if (!catCache || catCache[0] !== env.DB || Date.now() - catCache[1] > CAT_CACHE_MS) {
+    const row = await env.DB.prepare("SELECT value FROM sync WHERE key = 'categories'").first();
+    catCache = [env.DB, Date.now(), row ? JSON.parse(row.value) : await catCounts(env)];
+  }
+  return json(catCache[2], 200, { "cache-control": "public, max-age=600" });
 }
 
 async function file(env, id, any) {
@@ -382,11 +405,16 @@ async function body(req) {
   }
 }
 
+// a sound's (or voice's) votes, and its 👍 of the last week for Trending
+const LIKES = "likes = (SELECT count(*) FROM actions a WHERE a.sound = {t}.id " +
+  "AND a.kind = 'vote' AND a.detail = '1' AND a.at > ?)";
+
 async function counts(env, id, table = "sounds") {
   await env.DB.prepare(`UPDATE ${table} SET ` +
     "up = (SELECT count(*) FROM votes WHERE sound = ?1 AND value = 1), " +
-    "down = (SELECT count(*) FROM votes WHERE sound = ?1 AND value = -1) WHERE id = ?1")
-    .bind(id).run();
+    "down = (SELECT count(*) FROM votes WHERE sound = ?1 AND value = -1), " +
+    LIKES.replace("{t}", table).replace("?", "?2") + " WHERE id = ?1")
+    .bind(id, now() - TRENDING_DAYS * 86400).run();
   return env.DB.prepare(`SELECT up, down FROM ${table} WHERE id = ?`).bind(id).first();
 }
 
@@ -425,8 +453,8 @@ async function vote(req, env, id, table = "sounds") {
       "ON CONFLICT (sound, voter) DO UPDATE SET value = excluded.value")
       .bind(id, voter, value).run();
   }
-  const c = await counts(env, id, table);
   await logAction(env, "vote", { sound: id, ip, install: voter, detail: String(value) });
+  const c = await counts(env, id, table);
   return json({ id, up: c.up, down: c.down, mine: value });
 }
 
