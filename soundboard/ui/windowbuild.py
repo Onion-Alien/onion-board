@@ -29,6 +29,9 @@ from PySide6.QtWidgets import (
     QSizePolicy,
     QSlider,
     QSpacerItem,
+    QStyle,
+    QStyleOptionButton,
+    QStylePainter,
     QVBoxLayout,
     QWidget,
 )
@@ -164,6 +167,22 @@ class BannerButton(QPushButton):
         if text != self.text():
             self.setText(text)
             self.setToolTip("" if text == self._full else self._full)   # only when cut
+
+
+class CutPill(QPushButton):
+    """A button whose words end in "…" when it's narrower than them. A plain button
+    cut them off on both sides ("ic: Conne") in the mini player's narrowest sizes."""
+
+    def paintEvent(self, _e):
+        opt = QStyleOptionButton()
+        self.initStyleOption(opt)
+        room = self.style().subElementRect(QStyle.SubElement.SE_PushButtonContents,
+                                           opt, self).width()
+        if opt.iconSize.width() and not opt.icon.isNull():
+            room -= opt.iconSize.width()
+        opt.text = self.fontMetrics().elidedText(self.text(), Qt.TextElideMode.ElideRight,
+                                                 max(0, room))
+        QStylePainter(self).drawControl(QStyle.ControlElement.CE_PushButton, opt)
 
 
 class _Moved(QObject):
@@ -735,7 +754,7 @@ class WindowBuilder(Controller):
         mw.mini_name = ElidedLabel(mw.np_name.text(), hide_overflow=True)
         mw.mini_name.setTextFormat(Qt.TextFormat.PlainText)   # sound names are user / web text
         mw.mini_name.setStyleSheet("font-weight:600;")
-        mw.mini_name.setMinimumWidth(30)
+        mw.mini_name.setMinimumWidth(0)   # it hides when it doesn't fit: its room goes to "■ All"
         mw.mini_name.setSizePolicy(QSizePolicy.Policy.Ignored, QSizePolicy.Policy.Preferred)
         top.addWidget(mw.mini_name, 1)
         mw.mini_air = QPushButton()
@@ -751,6 +770,7 @@ class WindowBuilder(Controller):
         # the left, and stopped everything
         mw.mini_stop = QPushButton(_("All"))
         mw.mini_stop.setObjectName("danger")
+        mw.mini_stop.setProperty("mini", True)   # slim padding: never squeezed to "■ A"
         mw.mini_stop.setToolTip(mw.stop_btn.toolTip())
         mw.mini_stop.clicked.connect(mw.playctl.stop_all)
         icons.set_icon(mw.mini_stop, "stop", "danger_text", size=14)
@@ -777,7 +797,7 @@ class WindowBuilder(Controller):
         bottom.addWidget(mw.mini_time)
         cv.addLayout(bottom)
         connection = QHBoxLayout()
-        mw.mini_connection = QPushButton()
+        mw.mini_connection = CutPill()
         mw.mini_connection.setObjectName("pill")
         mw.mini_connection.setMinimumWidth(0)
         mw.mini_connection.setSizePolicy(QSizePolicy.Policy.Ignored, QSizePolicy.Policy.Fixed)
