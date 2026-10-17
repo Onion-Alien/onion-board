@@ -31,12 +31,25 @@ download bar (`ui/downloadbar.py`); static pictures in `ui/dialogs.py` and the s
 
 ## Poses
 
-`draw_bunny` keywords, all 0 when he's at rest: `blink` (0..1, shut above 0.6), `mouth`
-(talking), `ears` (degrees outward), `swing` (hammer or bat), `sad` (worried face, and the
-ears fold down from the middle), `angry` (cross brows and the vein mark), `nightcap`
-(asleep), `robot` (Robo-Bun), `smug`, `led` (Robo-Bun's LEDs brighter, 0..1), `nod` (his
-head tilted on his neck, degrees) and `dip` (his head dropped, canvas units): the body,
-and what's round his neck (`bunny.BODY_PIECES`), stay put. Bun mode's dances
+His look is the Storybook one: a round head a little wider at the cheeks
+(`bunnyfit.head_path`), a soft pear of a body (`bunnyfit.body_path`) with a tail, two
+front paws in his lap and two feet, big glossy eyes with the same two shines in both,
+little resting brows, a pink nose over a soft double smile, and one ear up while the
+other always flops over at the middle (`bunny.REST_FOLD`). Lines are round-capped ink;
+shading is a couple of soft fades (`_shade`), never texture.
+
+`draw_bunny` keywords, all 0 when he's at rest: `blink` (0..1, shut above 0.6: happy
+arcs, sleepy ones under the nightcap), `mouth` (talking), `ears` (degrees outward),
+`swing` (hammer or bat), `sad` (worried face, the ears fold down from the middle, and
+with no prop his paws come up under his chin, hoping), `angry` (cross brows and the vein
+mark; with no prop he folds his arms), `nightcap` (asleep), `robot` (Robo-Bun), `smug`,
+`led` (Robo-Bun's LEDs brighter, 0..1), `nod` (his head tilted on his neck, degrees),
+`dip` (his head dropped, canvas units) and `look` (his eyes, -1..1 left to right): the
+body, and what's round his neck (`bunny.BODY_PIECES`), stay put. A prop that needs a paw
+takes it from his lap (`bunny.ONE_PAW`, `bunny.BOTH_PAWS`). `BunnyWidget` gives him his
+head tilts on top (its pose's `tilt`, added to `nod`): a slow curious lean, further over
+when he's hoping, into the cup he's listening with, side to side as he hops, lolled
+over asleep. Bun mode's dances
 (`BunnyWidget.set_groove`, `_moves`) use them to headbang and nod on the beat. Props:
 `bunny.PROPS` (`hammer_broken`: the failed build's snapped plank and headless hammer).
 Everything an act shows stays inside the widget's own box: a widget is only a little wider
@@ -85,16 +98,21 @@ Rules the drawing keeps:
 - Dark (the default, and the installer art) and High Contrast stay plain.
 
 To add an outfit: draw the piece as a function in `bunnyfit.py` on the 100 x 120 canvas
-(head: the ellipse centred at 50, 64, 68 x 56; eyes at x 39 and 61, y 62; ear bases at
-36, 48 and 64, 48; neck about y 90), add it to `PIECES` with its layer (and to `HATS` if
+(head: `head_path()`, about the 68 x 56 oval centred at 50, 64; eyes at `EYES` (x 37.5 and
+62.5) on `EYE_Y` (63); ear bases at 36, 48 and 64, 48; neck about y 90), add it to `PIECES` with its layer (and to `HATS` if
 it sits on his head), list it under the theme in `OUTFITS`, then check the sheets.
 `tests/test_bunnyfit.py` checks every listed piece exists and draws.
 
 ### Hoot wears them too
 
+Hoot has the same Storybook look: a round teal egg with two soft feather points on
+each cheek, curved tufts, a joined cream mask round big glossy eyes (shines placed as
+Bun's), an amber beak (`beak` 0..1 opens it: he cheers, he hoots while he begs), a
+scalloped belly, wings with feather tips as his only forelimbs, and three-toed feet.
+
 Hoot the owl (`soundboard/style/owl.py`, the Triggers tab before Onion Watch is installed)
 wears the same theme outfit. He has no pieces of his own: `owl._fit` moves Bun's pieces
-onto his shape (head 12 higher, eyes 28 apart and scaled 1.3, neck pieces just under his
+onto his shape (head 12 higher, eyes 32 apart and scaled to match, neck pieces just under his
 beak; `OWN_PLACE` for the ones that need their own spot (tall hats stay full size: an
 oversized hat is the look); `NOT_ON_OWL` for the ones that don't suit him) and `draw_owl` calls it at
 the same five layers. `owl_image` (dialog artwork, his own

@@ -90,10 +90,38 @@ def _col(key: str) -> QColor:
     return QColor(hooks.palette()[key])
 
 
-def _head() -> QPainterPath:
-    path = QPainterPath()
-    path.addEllipse(QRectF(16, 36, 68, 56))
+# Bun's shape on the 100 x 120 canvas: bunny.py draws him from these, and the pieces
+# that sit on him clip to them, so his outline and theirs stay one
+EYES = (37.5, 62.5)   # his eyes' centres (x), on EYE_Y
+EYE_Y = 63.0
+
+
+def head_path() -> QPainterPath:
+    """His head: round on top, a little wider and softer at the cheeks (about the
+    68 x 56 oval centred at 50, 64 the pieces are placed on)."""
+    path = QPainterPath(QPointF(50, 36.5))
+    path.cubicTo(QPointF(71.5, 36.5), QPointF(85.5, 47), QPointF(85.5, 66))
+    path.cubicTo(QPointF(85.5, 84), QPointF(69, 92), QPointF(50, 92))
+    path.cubicTo(QPointF(31, 92), QPointF(14.5, 84), QPointF(14.5, 66))
+    path.cubicTo(QPointF(14.5, 47), QPointF(28.5, 36.5), QPointF(50, 36.5))
+    path.closeSubpath()
     return path
+
+
+def body_path() -> QPainterPath:
+    """His sitting body under the head: a soft pear, wider at the hips."""
+    path = QPainterPath(QPointF(50, 83))
+    path.cubicTo(QPointF(63, 83), QPointF(71, 91), QPointF(74.5, 102))
+    path.cubicTo(QPointF(78, 112), QPointF(73, 118.5), QPointF(62, 118.5))
+    path.lineTo(38, 118.5)
+    path.cubicTo(QPointF(27, 118.5), QPointF(22, 112), QPointF(25.5, 102))
+    path.cubicTo(QPointF(29, 91), QPointF(37, 83), QPointF(50, 83))
+    path.closeSubpath()
+    return path
+
+
+def _head() -> QPainterPath:
+    return head_path()
 
 
 def _fill(p: QPainter, path: QPainterPath, fill, ink: QPen | None):
@@ -213,7 +241,8 @@ def _bandana(p, ink):
     p.save()
     p.setClipRect(QRectF(0, 0, 100, 53))     # his outline, only where the band covered it
     p.setPen(ink)
-    p.drawEllipse(QRectF(16, 36, 68, 56))
+    p.setBrush(Qt.BrushStyle.NoBrush)
+    p.drawPath(_head())
     p.restore()
     # the knot and its two tails, out on his left
     _fill(p, _circle(84, 50, 3.5), col, ink)
@@ -526,38 +555,41 @@ def _lenses(p, ink, fill, shape="rect", frame: QColor | None = None):
     frame = frame or DARK
     pen = QPen(frame, 2)
     p.setPen(pen)
-    p.drawLine(QPointF(46, 60), QPointF(54, 60))          # bridge
-    p.drawLine(QPointF(31, 59), QPointF(20, 60))          # arms to the headphones
-    p.drawLine(QPointF(69, 59), QPointF(80, 60))
-    for i, x in enumerate((39, 61)):
+    y = EYE_Y
+    left, right = EYES
+    p.drawLine(QPointF(left + 8, y - 2.5), QPointF(right - 8, y - 2.5))   # bridge
+    p.drawLine(QPointF(left - 8.5, y - 3), QPointF(18, y - 2))   # arms to the headphones
+    p.drawLine(QPointF(right + 8.5, y - 3), QPointF(82, y - 2))
+    for i, x in enumerate(EYES):
         if shape == "round":
-            path = _circle(x, 62, 7.5)
+            path = _circle(x, y, 8.2)
         elif shape == "heart":
-            path = QPainterPath(QPointF(x, 70))
-            path.cubicTo(QPointF(x - 13, 61), QPointF(x - 7, 50), QPointF(x, 57))
-            path.cubicTo(QPointF(x + 7, 50), QPointF(x + 13, 61), QPointF(x, 70))
+            path = QPainterPath(QPointF(x, y + 9))
+            path.cubicTo(QPointF(x - 14, y - 1), QPointF(x - 7.5, y - 13), QPointF(x, y - 5.5))
+            path.cubicTo(QPointF(x + 7.5, y - 13), QPointF(x + 14, y - 1), QPointF(x, y + 9))
         else:
             path = QPainterPath()
-            path.addRoundedRect(QRectF(x - 8.5, 55.5, 17, 12), 4, 4)
+            path.addRoundedRect(QRectF(x - 9, y - 7, 18, 14), 4.5, 4.5)
         lens = fill[i] if isinstance(fill, tuple) else fill
         _fill(p, path, lens, pen)
         if shape != "round":                               # a glint
             p.setPen(QPen(QColor(255, 255, 255, 150), 1.6, Qt.PenStyle.SolidLine,
                           Qt.PenCapStyle.RoundCap))
-            p.drawLine(QPointF(x - 5, 63), QPointF(x - 1, 58))
+            p.drawLine(QPointF(x - 5, y + 1.5), QPointF(x - 1, y - 3.5))
 
 
 def _laser(p, ink):
-    for x, sx in ((39, -1), (61, 1)):
-        grad = QLinearGradient(x, 62, x + sx * 60, 54)
+    y = EYE_Y
+    for x, sx in ((EYES[0], -1), (EYES[1], 1)):
+        grad = QLinearGradient(x, y, x + sx * 60, y - 8)
         grad.setColorAt(0, QColor(255, 40, 40, 230))
         grad.setColorAt(1, QColor(255, 40, 40, 0))
-        beam = _poly((x, 59), (x + sx * 70, 44), (x + sx * 70, 64), (x, 65))
+        beam = _poly((x, y - 3), (x + sx * 70, y - 18), (x + sx * 70, y + 2), (x, y + 3))
         _fill(p, beam, grad, None)
         glow = QColor(255, 60, 60, 120)
-        _fill(p, _circle(x, 62, 9), glow, None)
-        _fill(p, _circle(x, 62, 4.5), QColor("#ff2b2b"), None)
-        _fill(p, _circle(x, 62, 2), WHITE, None)
+        _fill(p, _circle(x, y, 9.5), glow, None)
+        _fill(p, _circle(x, y, 5), QColor("#ff2b2b"), None)
+        _fill(p, _circle(x, y, 2.2), WHITE, None)
 
 
 def _pixel_shades(p, ink):
@@ -566,7 +598,7 @@ def _pixel_shades(p, ink):
             " XWXXXXX  XWXXXXX ",
             " XXWXXXX  XXWXXXX ",
             "  XXXXX    XXXXX  ")
-    x0, y0 = 50 - 9 * k, 56
+    x0, y0 = 50 - 9 * k, EYE_Y - 6
     for r, row in enumerate(rows):
         for c, ch in enumerate(row):
             if ch != " ":
@@ -585,13 +617,13 @@ def _visor(p, ink):
     grad.setColorAt(0, QColor("#ff2fb4"))
     grad.setColorAt(1, QColor("#2fe6ff"))
     band = QPainterPath()
-    band.addRoundedRect(QRectF(24, 55, 52, 13), 6.5, 6.5)
+    band.addRoundedRect(QRectF(23, EYE_Y - 7.5, 54, 15), 7.5, 7.5)
     _fill(p, band, grad, QPen(DARK, 2))
     p.setPen(QPen(QColor(255, 255, 255, 170), 1.5))
-    p.drawLine(QPointF(30, 59), QPointF(70, 59))
+    p.drawLine(QPointF(30, EYE_Y - 3.5), QPointF(70, EYE_Y - 3.5))
     p.setPen(QPen(DARK, 2))
-    p.drawLine(QPointF(24, 61), QPointF(20, 61))
-    p.drawLine(QPointF(76, 61), QPointF(80, 61))
+    p.drawLine(QPointF(23, EYE_Y - 1), QPointF(18, EYE_Y - 1))
+    p.drawLine(QPointF(77, EYE_Y - 1), QPointF(82, EYE_Y - 1))
 
 
 def _strings(p, ink):
@@ -605,13 +637,14 @@ def _strings(p, ink):
 
 def _spirals(p, ink):
     """Blinded: spirals for eyes."""
-    for x in (39, 61):
-        _fill(p, _circle(x, 62, 6.8), WHITE, QPen(INK_COL, 1.6))
-        spin = QPainterPath(QPointF(x, 62))
+    y = EYE_Y
+    for x in EYES:
+        _fill(p, _circle(x, y, 7.4), WHITE, QPen(INK_COL, 1.6))
+        spin = QPainterPath(QPointF(x, y))
         for i in range(1, 41):
             a = i * 0.42 * (1 if x < 50 else -1)
-            r = 5.6 * i / 40
-            spin.lineTo(x + r * math.cos(a), 62 + r * math.sin(a))
+            r = 6.2 * i / 40
+            spin.lineTo(x + r * math.cos(a), y + r * math.sin(a))
         p.setPen(QPen(INK_COL, 1.5, Qt.PenStyle.SolidLine, Qt.PenCapStyle.RoundCap))
         p.setBrush(Qt.BrushStyle.NoBrush)
         p.drawPath(spin)
@@ -621,21 +654,21 @@ def _readers(p, ink):
     """Half-moon reading glasses, low on his nose."""
     frame = QPen(QColor("#4a3326"), 1.8)
     p.setPen(frame)
-    p.drawLine(QPointF(46.5, 64.5), QPointF(53.5, 64.5))
-    p.drawLine(QPointF(32.5, 64.5), QPointF(20, 61))
-    p.drawLine(QPointF(67.5, 64.5), QPointF(80, 61))
-    for x in (40, 60):
-        lens = QPainterPath(QPointF(x - 7, 64.5))
-        lens.lineTo(x + 7, 64.5)
-        lens.cubicTo(QPointF(x + 7, 72), QPointF(x - 7, 72), QPointF(x - 7, 64.5))
+    y = EYE_Y + 2.5
+    p.drawLine(QPointF(EYES[0] + 7.5, y), QPointF(EYES[1] - 7.5, y))
+    p.drawLine(QPointF(EYES[0] - 7.5, y), QPointF(18, y - 4))
+    p.drawLine(QPointF(EYES[1] + 7.5, y), QPointF(82, y - 4))
+    for x in EYES:
+        lens = QPainterPath(QPointF(x - 7.5, y))
+        lens.lineTo(x + 7.5, y)
+        lens.cubicTo(QPointF(x + 7.5, y + 8), QPointF(x - 7.5, y + 8), QPointF(x - 7.5, y))
         _fill(p, lens, QColor(200, 230, 255, 80), frame)
 
 
 def _sweater(p, ink):
     """The body of a turtleneck sweater (the collar is its own piece)."""
     col = _col("accent2")
-    body = QPainterPath()
-    body.addEllipse(QRectF(25, 82, 50, 36))
+    body = body_path()
     hem = QPainterPath()
     hem.addRect(QRectF(0, 0, 100, 111))
     body = body.intersected(hem).subtracted(_head())

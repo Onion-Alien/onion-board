@@ -1,4 +1,5 @@
-"""The header logo, alive: the onion mark from theme.paint_logo with a glow around it.
+"""The header logo, alive: the onion mark from theme.paint_logo (in the theme's finish)
+with a glow around it.
 
 At rest the glow breathes slowly and a sheen sweeps across the tile every few seconds.
 Feed it the level of whatever is playing (`set_level`, 0..1: sounds, the radio,
@@ -42,13 +43,18 @@ def _mix(a: QColor, b: QColor, t: float) -> QColor:
                   round(a.blue() + (b.blue() - a.blue()) * t))
 
 
-@lru_cache(maxsize=64)
-def glow_icon(c1: str, c2: str, amount: float) -> QIcon:
+def glow_icon(c1: str, c2: str, amount: float, finish: str | None = None) -> QIcon:
     """The app icon for the title bar, taskbar and tray, glowing warm by `amount`
     (0..1) the way the header logo does while something plays. At 0 it's the plain
-    theme.app_icon; above, the mark shrinks a little inside a flame-coloured halo."""
+    theme.app_icon; above, the mark shrinks a little inside a flame-coloured halo.
+    In the theme's finish (theme.logo_finish) unless `finish` says which."""
+    return _glow_icon(c1, c2, amount, finish or theme.logo_finish())
+
+
+@lru_cache(maxsize=64)
+def _glow_icon(c1: str, c2: str, amount: float, finish: str) -> QIcon:
     if amount <= 0:
-        return theme.app_icon(c1, c2)
+        return theme.app_icon(c1, c2, finish)
     icon = QIcon()
     for sz in (16, 24, 32, 48, 64, 128, 256):
         pm = QPixmap(sz, sz)
@@ -66,7 +72,7 @@ def glow_icon(c1: str, c2: str, amount: float) -> QIcon:
         p.setBrush(rg)
         p.drawEllipse(QPointF(c, c), c, c)
         m = sz * (0.86 - 0.08 * amount)   # the halo needs room at the edge
-        theme.paint_logo(p, QRectF(c - m / 2, c - m / 2, m, m), c1, c2)
+        theme.paint_logo(p, QRectF(c - m / 2, c - m / 2, m, m), c1, c2, finish=finish)
         p.end()
         icon.addPixmap(pm)
     return icon
@@ -150,7 +156,7 @@ class LogoWidget(QWidget):
     # ---- painting
     def _mark_pixmap(self, c1: str, c2: str) -> QPixmap:
         dpr = self.devicePixelRatioF() or 1.0
-        key = (c1, c2, self.mark, dpr)
+        key = (c1, c2, self.mark, dpr, theme.logo_finish())
         if self._cache is None or self._cache[0] != key:
             pm = theme.logo_pixmap(round(self.mark * dpr), c1, c2)
             pm.setDevicePixelRatio(dpr)

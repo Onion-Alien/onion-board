@@ -16,7 +16,8 @@ import time
 import weakref
 
 from PySide6.QtCore import QPointF, QRectF, QSize, Qt, QTimer, Signal
-from PySide6.QtGui import QColor, QCursor, QFont, QImage, QPainter, QPainterPath, QPen
+from PySide6.QtGui import (QColor, QCursor, QFont, QImage, QPainter, QPainterPath, QPen,
+                           QRadialGradient)
 from PySide6.QtWidgets import QSizePolicy, QWidget
 
 from . import appstate, bunnyfit, hooks
@@ -26,17 +27,23 @@ from .hooks import _
 # drawn on a 100 x 120 canvas, scaled to the requested height
 W, H = 100.0, 120.0
 INK = QColor("#2b2340")
-FEATHER = QColor("#4fc3b0")
-FEATHER_DARK = QColor("#2f9c8c")
-BELLY = QColor("#f4efe6")
-BELLY_MARK = QColor("#d9cfbf")
-BEAK = QColor("#ffb347")
-EYE_RING = QColor("#fff6d8")
-CHEEK = QColor(255, 128, 160, 110)
+FEATHER = QColor("#2fbfae")
+FEATHER_DARK = QColor("#1f9a8c")
+BELLY = QColor("#fbf3e3")
+BELLY_MARK = QColor("#e2cfae")
+FACE = QColor("#fdf8ee")
+EYE = QColor("#251c33")
+EYE_LOW = QColor("#5d4560")
+BEAK = QColor("#ffb43c")
+BEAK_DARK = QColor("#e8892a")
+MOUTH = QColor("#c2413b")
+EYE_RING = FACE   # (older name for the colour round his eyes)
+CHEEK = QColor(255, 128, 160, 120)
 TEAR = QColor("#8fd3ff")
 BUBBLE = QColor("#fffaf0")
 SPARKLE_COLORS = ("#ffcf40", "#ff8fae", "#1fb6ff", "#a48bff")
-EYES = (36, 64)
+EYES = (34, 66)
+EYE_Y = 53.0
 FPS = 30
 FAST_MS = 1000 // FPS
 
@@ -55,11 +62,102 @@ def _mix(a: float, b: float, k: float) -> float:
     return a + (b - a) * k
 
 
+def _arc(x0, y0, cx, cy, x1, y1) -> QPainterPath:
+    path = QPainterPath(QPointF(x0, y0))
+    path.quadTo(QPointF(cx, cy), QPointF(x1, y1))
+    return path
+
+
+def _stroke(p: QPainter, path: QPainterPath, col: QColor, width: float):
+    p.setPen(QPen(col, width, Qt.PenStyle.SolidLine, Qt.PenCapStyle.RoundCap,
+                  Qt.PenJoinStyle.RoundJoin))
+    p.setBrush(Qt.BrushStyle.NoBrush)
+    p.drawPath(path)
+
+
+def _shade(p: QPainter, shape: QPainterPath, x, y, r, col: QColor, alpha: int):
+    """A soft round shade inside `shape`, darkest at x, y and gone `r` away."""
+    c = QColor(col)
+    c.setAlpha(alpha)
+    edge = QColor(col)
+    edge.setAlpha(0)
+    g = QRadialGradient(QPointF(x, y), r)
+    g.setColorAt(0.0, c)
+    g.setColorAt(1.0, edge)
+    p.save()
+    p.setClipPath(shape)
+    p.fillRect(QRectF(x - r, y - r, 2 * r, 2 * r), g)
+    p.restore()
+
+
+def body_path() -> QPainterPath:
+    """His round, egg-shaped body (owls are all head), with two soft feather points
+    on each cheek."""
+    path = QPainterPath(QPointF(50, 21))
+    path.cubicTo(QPointF(74, 21), QPointF(86, 38), QPointF(86, 60))
+    path.cubicTo(QPointF(86, 92), QPointF(74, 114), QPointF(50, 114))
+    path.cubicTo(QPointF(26, 114), QPointF(14, 92), QPointF(14, 60))
+    path.cubicTo(QPointF(14, 38), QPointF(26, 21), QPointF(50, 21))
+    path.closeSubpath()
+    for sx in (-1, 1):
+        for y, d in ((55, 5.5), (63.5, 4.5)):
+            tip = QPainterPath(QPointF(50 + sx * 33.5, y - 5))
+            tip.quadTo(QPointF(50 + sx * (36 + d * 0.4), y - 1), QPointF(50 + sx * (36 + d), y + 2))
+            tip.quadTo(QPointF(50 + sx * 36, y + 3), QPointF(50 + sx * 34.5, y + 5))
+            tip.closeSubpath()
+            path = path.united(tip)
+    return path
+
+
+def _tuft(sx: int) -> QPainterPath:
+    """An ear tuft on his `sx` side: a soft curved point with a little notch."""
+    def m(x, y):
+        return QPointF(50 + sx * (x - 50), y)
+    path = QPainterPath(m(70, 27))
+    path.cubicTo(m(74, 22), m(78, 16), m(79, 8))
+    path.cubicTo(m(82, 13), m(84, 18), m(83, 24))
+    path.quadTo(m(86.5, 23), m(88, 21))
+    path.cubicTo(m(88, 30), m(85, 37), m(80, 41))
+    path.closeSubpath()
+    return path
+
+
+def _wing(sx: int) -> QPainterPath:
+    """A wing in its own frame (upright, its top at 0, 0): round at the shoulder,
+    ending in three soft feather points."""
+    def m(x, y):
+        return QPointF(sx * x, y)
+    path = QPainterPath(m(0, -19))
+    path.cubicTo(m(7.5, -19), m(9.5, -6), m(9, 6))
+    path.cubicTo(m(8.6, 12), m(6, 17), m(4, 20))
+    path.quadTo(m(2.6, 18.5), m(1.2, 18.6))
+    path.quadTo(m(0, 21.5), m(-1.4, 20.5))
+    path.quadTo(m(-2.6, 18.5), m(-4, 18))
+    path.cubicTo(m(-8, 12), m(-9, 2), m(-8, -6))
+    path.cubicTo(m(-7, -14), m(-4.5, -19), m(0, -19))
+    path.closeSubpath()
+    return path
+
+
+def _face_path() -> QPainterPath:
+    """The cream mask round his eyes: two joined discs, the feathers dipping in
+    between them on top, meeting in a soft point under his beak."""
+    path = QPainterPath()
+    for x in EYES:
+        path.addEllipse(QPointF(x, EYE_Y), 17.5, 16.5)
+    chin = QPainterPath(QPointF(36, 62))
+    chin.cubicTo(QPointF(42, 70), QPointF(46, 73), QPointF(50, 74))
+    chin.cubicTo(QPointF(54, 73), QPointF(58, 70), QPointF(64, 62))
+    chin.closeSubpath()
+    return path.united(chin).simplified()
+
+
 # where Bun's pieces go on Hoot, as (dx, dy, scale) from Bun's canvas: his head sits 12
-# higher than Bun's; his eyes are 28 apart (Bun's 22) and 9 higher; he has no neck, so
-# a bow tie or scarf goes just under his beak
+# higher than Bun's; his eyes are 32 apart (Bun's 25) and 10 higher; he has no neck,
+# so a bow tie or scarf goes just under his beak
+_K = (EYES[1] - EYES[0]) / (bunnyfit.EYES[1] - bunnyfit.EYES[0])
 HEAD = (0, -12, 1.0)
-EYES_AT = (50 - 50 * 1.3, 53 - 62 * 1.3, 1.3)
+EYES_AT = (50 - 50 * _K, EYE_Y - bunnyfit.EYE_Y * _K, _K)
 NECK_AT = (0, -14, 1.0)
 # pieces that need their own place: the frog's eyes and the mint would poke out of the
 # top of his picture (moved a little lower). Tall hats stay full size on purpose: an
@@ -92,21 +190,24 @@ def _fit(p: QPainter, fit, layer: str, ink: QPen, shut: bool = False):
 def draw_owl(p: QPainter, rect: QRectF, look: float = 0.0, feather=None, dark=None,
              *, look_y: float = 0.0, blink: float = 0.0, sad: float = 0.0,
              tufts: float = 0.0, clasp: float = 0.0, flap: float = 0.0,
-             plead: float = 0.0, tear: float = 0.0, outfit: tuple[str, ...] | None = None):
+             plead: float = 0.0, tear: float = 0.0, beak: float = 0.0,
+             outfit: tuple[str, ...] | None = None):
     """Draw Hoot fitted (aspect kept, centred) into `rect`. `look` / `look_y` -1..1
-    turn the pupils left / right and up / down: watching. The keywords pose him for
+    turn his eyes left / right and up / down: watching. The keywords pose him for
     OwlWidget: `blink` 0..1 closes the eyes, `sad` 0..1 worries the brows and wets
     the eyes, `tufts` droops the ear tufts by that many degrees (negative perks them
     up), `clasp` 0..1 brings the wings together in front (begging), `flap` 0..1 lifts
-    them (joy), `plead` 0..1 makes the pupils big and shiny, and `tear` 0..1 rolls a
-    tear down his cheek (0 = none). His feathers are the current theme's accent
-    unless `feather` / `dark` are given (FEATHER / FEATHER_DARK are his own teal).
+    them (joy), `plead` 0..1 makes the eyes big and shiny, `tear` 0..1 rolls a tear
+    down his cheek (0 = none) and `beak` 0..1 opens his beak (a cheer, a hoot). His
+    feathers are the current theme's accent unless `feather` / `dark` are given
+    (FEATHER / FEATHER_DARK are his own teal).
     `outfit`: Bun's outfit pieces to wear (None: the current theme's, (): none)."""
     fit = bunnyfit.outfit() if outfit is None else outfit
     if feather is None:
         feather = QColor(hooks.palette()["accent"])
     if dark is None:
         dark = QColor(feather).darker(135)
+    feather, dark = QColor(feather), QColor(dark)
     s = min(rect.width() / W, rect.height() / H)
     p.save()
     p.setRenderHint(QPainter.RenderHint.Antialiasing)
@@ -124,112 +225,151 @@ def draw_owl(p: QPainter, rect: QRectF, look: float = 0.0, feather=None, dark=No
         p.translate(50 + sx * 25, 38)
         p.rotate(sx * tufts)
         p.translate(-(50 + sx * 25), -38)
-        tuft = QPainterPath(QPointF(50 + sx * 16, 34))
-        tuft.quadTo(QPointF(50 + sx * 30, 22), QPointF(50 + sx * 34, 10))
-        tuft.quadTo(QPointF(50 + sx * 36, 30), QPointF(50 + sx * 34, 44))
-        tuft.closeSubpath()
+        tuft = _tuft(sx)
         p.setPen(ink)
-        p.setBrush(dark)
+        p.setBrush(feather)
         p.drawPath(tuft)
+        _shade(p, tuft, 50 + sx * 82, 34, 12, dark, 150)
         p.restore()
-    # body (one round egg: owls are all head)
-    body = QPainterPath()
-    body.addRoundedRect(QRectF(16, 24, 68, 88), 34, 36)
+    # body: feathers, lit from up on his right, deeper underneath
+    body = body_path()
     p.setPen(ink)
     p.setBrush(feather)
     p.drawPath(body)
-    # belly with little feather marks
-    _e(p, 50, 88, 42, 40, BELLY)
-    p.setPen(QPen(BELLY_MARK, 1.8, Qt.PenStyle.SolidLine, Qt.PenCapStyle.RoundCap))
-    p.setBrush(Qt.BrushStyle.NoBrush)
-    for x, y in ((42, 80), (50, 84), (58, 80), (46, 92), (54, 92), (50, 100)):
-        m = QPainterPath(QPointF(x - 3, y))
-        m.quadTo(x, y + 3, x + 3, y)
-        p.drawPath(m)
-    # feet
-    for x in (40, 60):
-        p.setPen(ink)
-        p.setBrush(BEAK)
-        for dx in (-3.5, 0, 3.5):
-            _e(p, x + dx, 113, 4.2, 6, BEAK, QPen(INK, 1.6))
+    _shade(p, body, 50, 122, 46, dark, 190)
+    _shade(p, body, 40, 30, 26, feather.lighter(125), 150)
+    # belly, with rows of little feather scallops
+    belly = QPainterPath()
+    belly.addEllipse(QRectF(29, 70, 42, 42))
+    p.fillPath(belly, BELLY)
+    _shade(p, belly, 50, 114, 22, BELLY_MARK, 110)
+    for x, y in ((42, 84), (50, 84), (58, 84), (46, 92.5), (54, 92.5), (50, 101)):
+        _stroke(p, _arc(x - 3.6, y, x, y + 3.4, x + 3.6, y), BELLY_MARK, 1.7)
+    # feet: three round toes each
+    for x in (39, 61):
+        for dx, dy in ((-3.8, 0.5), (0, 1.2), (3.8, 0.5)):
+            _e(p, x + dx, 113 + dy, 4.8, 6.2, BEAK, QPen(INK, 1.7))
+    # the face: a cream mask, soft-edged, the cheeks blushing
+    face = _face_path()
+    p.fillPath(face, FACE)
+    _shade(p, face, 50, 78, 22, BELLY_MARK, 90)
+    p.save()
+    p.setClipPath(face)
+    for x in (22.5, 77.5):
+        g = QRadialGradient(QPointF(x, 63.5), 6.5)
+        g.setColorAt(0, CHEEK)
+        g.setColorAt(0.55, CHEEK)
+        g.setColorAt(1, QColor(255, 128, 160, 0))
+        p.fillRect(QRectF(x - 7, 56.5, 14, 14), g)
+    p.restore()
     # wings: at his sides, clasped in front of the belly, or flung up
     for sx in (-1, 1):
         x = 50 + sx * (_mix(33, 15, clasp) + 5 * flap)
         y = 80 + 5 * clasp - 10 * flap
         ang = -sx * (_mix(12, 30, clasp) - 70 * flap)
-        _e(p, x, y, 16, 38, dark, ink, ang)
-    # face disc
-    face = QPainterPath(QPointF(50, 40))
-    face.cubicTo(QPointF(40, 30), QPointF(18, 34), QPointF(20, 54))
-    face.cubicTo(QPointF(22, 70), QPointF(42, 72), QPointF(50, 64))
-    face.cubicTo(QPointF(58, 72), QPointF(78, 70), QPointF(80, 54))
-    face.cubicTo(QPointF(82, 34), QPointF(60, 30), QPointF(50, 40))
-    p.setPen(Qt.PenStyle.NoPen)
-    p.setBrush(QColor(255, 255, 255, 70))
-    p.drawPath(face)
+        p.save()
+        p.translate(x, y)
+        p.rotate(ang)
+        wing = _wing(sx)
+        p.setPen(ink)
+        p.setBrush(dark)
+        p.drawPath(wing)
+        _shade(p, wing, -sx * 4, -12, 14, feather, 150)   # a lighter shoulder
+        p.restore()
     _fit(p, fit, "under", ink)
     # the big eyes
-    pw, ph = _mix(13, 16.5, plead), _mix(14, 17.5, plead)
+    shut = blink > 0.6
+    ew, eh = _mix(16, 18.5, plead), _mix(17.5, 20, plead)
     for x in EYES:
-        _e(p, x, 53, 24, 24, EYE_RING, ink)
-        ring = QPainterPath()
-        ring.addEllipse(QRectF(x - 11, 42, 22, 22))
+        px, py = x + 2.8 * look, EYE_Y + 2.0 * look_y
+        if shut:   # closed: a soft sleepy curve, or happy arcs while he cheers
+            if flap > 0.3 or beak > 0.3:
+                _stroke(p, _arc(x - 6.5, EYE_Y + 2.5, x, EYE_Y - 3.5, x + 6.5, EYE_Y + 2.5),
+                        INK, 2.4)
+            else:
+                _stroke(p, _arc(x - 6.5, EYE_Y + 1, x, EYE_Y + 5, x + 6.5, EYE_Y + 1), INK, 2.4)
+            continue
+        eye = QPainterPath()
+        eye.addEllipse(QRectF(px - ew / 2, py - eh / 2, ew, eh))
+        p.fillPath(eye, EYE)
         p.save()
-        p.setClipPath(ring)
-        px, py = x + 3.5 * look, 54 + 3.0 * look_y
-        _e(p, px, py, pw, ph, INK)
-        _e(p, px + 2.2, py - 3.5, _mix(4.6, 6.2, plead), _mix(4.8, 6.4, plead), QColor("white"))
-        _e(p, px - 2.4, py + 3.5, 2, 2, QColor("white"))
+        p.setClipPath(eye)
+        g = QRadialGradient(QPointF(px, py + eh * 0.42), ew * 0.45)
+        g.setColorAt(0, EYE_LOW)
+        g.setColorAt(1, QColor(EYE_LOW.red(), EYE_LOW.green(), EYE_LOW.blue(), 0))
+        p.fillRect(QRectF(px - ew, py, 2 * ew, eh), g)
+        _e(p, px + 3.2, py - 3.6, _mix(6, 7.4, plead), _mix(6.4, 7.8, plead), QColor("white"))
+        _e(p, px - 3.3, py + 4.0, 2.4, 2.4, QColor("white"))
         if plead > 0.05:   # the extra glint that makes puppy eyes
             c = QColor("white")
             c.setAlphaF(plead)
-            _e(p, px + 3.4, py + 2.2, 2.6, 2.6, c)
+            _e(p, px + 4.3, py + 3, 2.8, 2.8, c)
         if sad > 0.05:     # welling up: water along the bottom of each eye
             c = QColor(TEAR)
-            c.setAlphaF(0.55 * sad)
-            _e(p, x, 64, 22, 7 * sad, c)
+            c.setAlphaF(0.6 * sad)
+            _e(p, px, py + eh / 2 - 1, ew, 7 * sad, c)
         if blink > 0.01:   # the lid comes down from the top
-            lid = 24 * blink
+            lid = (eh + 2) * blink
             p.setPen(Qt.PenStyle.NoPen)
-            p.setBrush(feather)
-            p.drawRect(QRectF(x - 13, 41, 26, lid))
-            p.setPen(ink)
-            p.drawLine(QPointF(x - 12, 41 + lid), QPointF(x + 12, 41 + lid))
+            p.setBrush(FACE)
+            p.drawRect(QRectF(px - ew, py - eh / 2 - 1, 2 * ew, lid))
+            _stroke(p, _arc(px - ew / 2, py - eh / 2 - 1 + lid, px, py - eh / 2 + lid + 1,
+                            px + ew / 2, py - eh / 2 - 1 + lid), INK, 2.2)
         p.restore()
-        p.setPen(ink)
-        p.setBrush(Qt.BrushStyle.NoBrush)
-        p.drawEllipse(QRectF(x - 12, 41, 24, 24))
-    # worried brows: inner ends lifted
-    if sad > 0.05:
-        c = QColor(INK)
-        c.setAlphaF(min(1.0, sad * 1.4))
-        p.setPen(QPen(c, 2.6, Qt.PenStyle.SolidLine, Qt.PenCapStyle.RoundCap))
-        for x, sx in ((36, -1), (64, 1)):
-            p.drawLine(QPointF(x + sx * 9, 38.5 + 1.5 * sad), QPointF(x - sx * 5, 38 - 5 * sad))
-    _e(p, 25, 68, 10, 6, CHEEK)
-    _e(p, 75, 68, 10, 6, CHEEK)
-    # beak
-    beak = QPainterPath(QPointF(45.5, 62))
-    beak.lineTo(54.5, 62)
-    beak.quadTo(52, 70, 50, 72)
-    beak.quadTo(48, 70, 45.5, 62)
-    p.setPen(QPen(INK, 1.8, Qt.PenStyle.SolidLine, Qt.PenCapStyle.RoundCap,
-                  Qt.PenJoinStyle.RoundJoin))
+    # brows: resting soft ticks above the eyes, or worried (inner ends lifted)
+    worried = min(1.0, sad * 1.4)
+    for x, sx in ((EYES[0], -1), (EYES[1], 1)):
+        if worried > 0.05:
+            c = QColor(INK)
+            c.setAlphaF(worried)
+            _stroke(p, _arc(x + sx * 8, 41.5 + 1.5 * sad, x + sx * 2, 40,
+                            x - sx * 4.5, 40.5 - 5 * sad), c, 2.5)
+    # beak: a soft amber point, open when he cheers
+    o = max(0.0, min(1.0, beak))
+    top = QPainterPath(QPointF(45, 59.5))
+    top.quadTo(QPointF(50, 57.6), QPointF(55, 59.5))
+    top.quadTo(QPointF(55.6, 60.3), QPointF(54.8, 61.6))
+    top.quadTo(QPointF(52.4, 66 - 2 * o), QPointF(50.8, 68.5 - 3 * o))
+    top.quadTo(QPointF(50, 69.5 - 3 * o), QPointF(49.2, 68.5 - 3 * o))
+    top.quadTo(QPointF(47.6, 66 - 2 * o), QPointF(45.2, 61.6))
+    top.quadTo(QPointF(44.4, 60.3), QPointF(45, 59.5))
+    top.closeSubpath()
+    bp = QPen(INK, 1.8, Qt.PenStyle.SolidLine, Qt.PenCapStyle.RoundCap,
+              Qt.PenJoinStyle.RoundJoin)
+    if o > 0.05:   # the open mouth and lower beak below the top one
+        low = QPainterPath(QPointF(46.5, 63))
+        low.quadTo(QPointF(50, 63 + 2 * o), QPointF(53.5, 63))
+        low.quadTo(QPointF(52.5, 66 + 4 * o), QPointF(50, 67.5 + 5 * o))
+        low.quadTo(QPointF(47.5, 66 + 4 * o), QPointF(46.5, 63))
+        low.closeSubpath()
+        p.setPen(bp)
+        p.setBrush(MOUTH)
+        p.drawPath(low)
+        p.save()
+        p.setClipPath(low)
+        _e(p, 50, 67 + 5 * o, 6, 4 * o, BEAK_DARK)
+        p.restore()
+    p.setPen(bp)
     p.setBrush(BEAK)
-    p.drawPath(beak)
+    p.drawPath(top)
+    p.save()
+    p.setClipPath(top)
+    _e(p, 52, 64.5 - 2 * o, 6, 7, BEAK_DARK)
+    _e(p, 48.2, 60.6, 3.4, 1.6, QColor(255, 255, 255, 170))
+    p.restore()
     # a tear rolling down from the outer corner of his left eye
     if 0 < tear < 1:
         c = QColor(TEAR)
         c.setAlphaF(min(1.0, tear * 5, (1 - tear) * 3))
-        ty = 63 + 24 * tear * tear
-        drop = QPainterPath(QPointF(26, ty - 7))
-        drop.cubicTo(QPointF(30.5, ty - 1), QPointF(31, ty + 4.5), QPointF(26, ty + 4.5))
-        drop.cubicTo(QPointF(21, ty + 4.5), QPointF(21.5, ty - 1), QPointF(26, ty - 7))
+        tx, ty = 23, 63 + 24 * tear * tear
+        drop = QPainterPath(QPointF(tx, ty - 7))
+        drop.cubicTo(QPointF(tx + 4.5, ty - 1), QPointF(tx + 5, ty + 4.5), QPointF(tx, ty + 4.5))
+        drop.cubicTo(QPointF(tx - 5, ty + 4.5), QPointF(tx - 4.5, ty - 1), QPointF(tx, ty - 7))
         p.setPen(QPen(QColor(INK.red(), INK.green(), INK.blue(), round(160 * c.alphaF())), 1))
         p.setBrush(c)
         p.drawPath(drop)
     _fit(p, fit, "over", ink)
-    _fit(p, fit, "face", ink, shut=blink > 0.6)
+    _fit(p, fit, "face", ink, shut=shut)
     p.restore()
 
 
@@ -559,7 +699,7 @@ class OwlWidget(QWidget):
             o.update(dy=5 * b, tufts=14 * b, blink=0.45 * b, puff=k)
         elif a == "plead":     # wings clasped, puppy eyes, hopeful little hops
             e = _ease(k / 0.15) * _ease((1 - k) / 0.15)
-            o.update(clasp=e, plead=e, sad=0.9 * e, tufts=-10 * e,
+            o.update(clasp=e, plead=e, sad=0.9 * e, tufts=-10 * e, beak=0.45 * e,
                      dy=-4 * e * abs(math.sin(k * math.pi * 6)))
         elif a == "tear":
             o.update(tear=k, sad=_ease(k / 0.12) * _ease((1 - k) / 0.12),
@@ -599,7 +739,7 @@ class OwlWidget(QWidget):
         blink = 0.0
         if self._blink_t >= 0 and (b := t - self._blink_t) < 0.18:
             blink = _soft(b / 0.18)
-        clasp = flap = plead = tear = 0.0
+        clasp = flap = plead = tear = beak = 0.0
         extra = {}
         acts = []
         if self.act:
@@ -618,6 +758,7 @@ class OwlWidget(QWidget):
             sad = max(sad, o.get("sad", 0.0) * w)
             clasp = max(clasp, o.get("clasp", 0.0) * w)
             plead = max(plead, o.get("plead", 0.0) * w)
+            beak = max(beak, o.get("beak", 0.0) * w)
             if "tear" in o:
                 tear = o["tear"]
             for key in ("puff", "zzz", "startle"):
@@ -644,6 +785,7 @@ class OwlWidget(QWidget):
                 f, b = f0 + (f - f0) * k, b0 + (b - b0) * k
             flap = max(flap, d * f)
             blink = max(blink, d * b)
+            beak = max(beak, d * 0.5 * bob)
         if self._joy_t >= 0:
             j = self._joy_t / 1.6
             e = _bell(j)
@@ -652,9 +794,11 @@ class OwlWidget(QWidget):
             dy -= 16 * abs(math.sin(j * math.pi * 2)) * (1 - j)
             blink *= 1 - _ease(j / 0.08)
             plead = max(plead, 0.6 * e)
+            beak = max(beak, e)
             extra["joy"] = j
         return {"look": self._look[0], "look_y": self._look[1], "blink": blink, "sad": sad,
                 "tufts": tufts, "clasp": clasp, "flap": flap, "plead": plead, "tear": tear,
+                "beak": beak,
                 "dy": dy, "rot": rot, **extra}
 
     def _spring(self, dt: float):
@@ -712,7 +856,7 @@ class OwlWidget(QWidget):
         body = r.translated(0, pose["dy"])
         draw_owl(p, body, pose["look"], look_y=pose["look_y"], blink=pose["blink"],
                  sad=pose["sad"], tufts=pose["tufts"], clasp=pose["clasp"],
-                 flap=pose["flap"], plead=pose["plead"], tear=pose["tear"])
+                 flap=pose["flap"], plead=pose["plead"], tear=pose["tear"], beak=pose["beak"])
         p.restore()
         head = QPointF(body.center().x(), body.top() + 18 * u)
         if "puff" in pose:

@@ -67,8 +67,11 @@ def _phone(p, fill):
 
 
 def _wave(p, fill):
-    for x, h in ((4, 4), (8, 10), (12, 16), (16, 10), (20, 4)):
-        p.drawLine(QPointF(x, 12 - h / 2), QPointF(x, 12 + h / 2))
+    """A sound wave: rounded bars, tallest in the middle."""
+    bars = QPainterPath()
+    for x, h in ((3, 5), (6.6, 10), (10.2, 16), (13.8, 12), (17.4, 7), (21, 3.5)):
+        bars.addRoundedRect(QRectF(x - 1.15, 12 - h / 2, 2.3, h), 1.15, 1.15)
+    fill(bars)
 
 
 def _scissors(p, fill):
@@ -99,9 +102,12 @@ def _sliders(p, fill):
 
 
 def _mic(p, fill):
-    p.drawRoundedRect(QRectF(9, 2.5, 6, 11), 3, 3)
-    p.drawArc(QRectF(5, 5, 14, 12), 200 * 16, 140 * 16)
-    p.drawLine(QPointF(12, 17), QPointF(12, 21))
+    """A microphone: a solid capsule in a cradle, on a short stand."""
+    head = QPainterPath()
+    head.addRoundedRect(QRectF(8.6, 2.5, 6.8, 11.5), 3.4, 3.4)
+    fill(head)
+    p.drawArc(QRectF(5, 5, 14, 12.5), 200 * 16, 140 * 16)
+    p.drawLine(QPointF(12, 17.5), QPointF(12, 21))
     p.drawLine(QPointF(8.5, 21), QPointF(15.5, 21))
 
 
@@ -112,30 +118,42 @@ def _mic_off(p, fill):
 
 
 def _headphones(p, fill):
+    """Headphones: a band and two solid ear cups."""
     p.drawArc(QRectF(4, 4, 16, 16), 0, 180 * 16)
-    p.drawLine(QPointF(4, 12), QPointF(4, 15))
-    p.drawLine(QPointF(20, 12), QPointF(20, 15))
-    p.drawRoundedRect(QRectF(3, 13, 4, 7), 1.5, 1.5)
-    p.drawRoundedRect(QRectF(17, 13, 4, 7), 1.5, 1.5)
+    p.drawLine(QPointF(4, 12), QPointF(4, 14))
+    p.drawLine(QPointF(20, 12), QPointF(20, 14))
+    cups = QPainterPath()
+    cups.addRoundedRect(QRectF(2.6, 12.5, 5.4, 8.5), 2.2, 2.2)
+    cups.addRoundedRect(QRectF(16, 12.5, 5.4, 8.5), 2.2, 2.2)
+    fill(cups)
 
 
 def _volume(p, fill):
-    path = QPainterPath(QPointF(3, 9.5))
-    for pt in ((7, 9.5), (12, 5), (12, 19), (7, 14.5), (3, 14.5)):
-        path.lineTo(*pt)
-    path.closeSubpath()
-    p.drawPath(path)
+    """A solid speaker with two sound waves."""
+    body = QPainterPath(QPointF(3.6, 9.2))
+    for pt in ((7, 9.2), (11.2, 5.4), (12.4, 5.6), (12.4, 18.4), (11.2, 18.6), (7, 14.8),
+               (3.6, 14.8)):
+        body.lineTo(*pt)
+    body.quadTo(QPointF(2.6, 14.8), QPointF(2.6, 13.8))
+    body.lineTo(2.6, 10.2)
+    body.quadTo(QPointF(2.6, 9.2), QPointF(3.6, 9.2))
+    body.closeSubpath()
+    fill(body)
     p.drawArc(QRectF(11, 8, 6, 8), -60 * 16, 120 * 16)
     p.drawArc(QRectF(11, 4.5, 10, 15), -60 * 16, 120 * 16)
 
 
 def _volume_off(p, fill):
     """The speaker with a cross where its sound waves were: muted."""
-    path = QPainterPath(QPointF(3, 9.5))
-    for pt in ((7, 9.5), (12, 5), (12, 19), (7, 14.5), (3, 14.5)):
-        path.lineTo(*pt)
-    path.closeSubpath()
-    p.drawPath(path)
+    body = QPainterPath(QPointF(3.6, 9.2))
+    for pt in ((7, 9.2), (11.2, 5.4), (12.4, 5.6), (12.4, 18.4), (11.2, 18.6), (7, 14.8),
+               (3.6, 14.8)):
+        body.lineTo(*pt)
+    body.quadTo(QPointF(2.6, 14.8), QPointF(2.6, 13.8))
+    body.lineTo(2.6, 10.2)
+    body.quadTo(QPointF(2.6, 9.2), QPointF(3.6, 9.2))
+    body.closeSubpath()
+    fill(body)
     p.drawLine(QPointF(15.5, 9), QPointF(21, 15))
     p.drawLine(QPointF(21, 9), QPointF(15.5, 15))
 
@@ -153,9 +171,9 @@ def _play(p, fill):
 
 
 def _pause(p, fill):
-    for x in (6.8, 13.8):
+    for x in (6.4, 13.6):
         path = QPainterPath()
-        path.addRoundedRect(QRectF(x, 5.5, 3.4, 13), 1.7, 1.7)
+        path.addRoundedRect(QRectF(x, 5, 4, 14), 2, 2)
         fill(path)
 
 
@@ -186,7 +204,7 @@ def _expand(p, fill):
 
 def _record(p, fill):
     path = QPainterPath()
-    path.addEllipse(QPointF(12, 12), 6, 6)
+    path.addEllipse(QPointF(12, 12), 7, 7)
     fill(path)
 
 
@@ -209,16 +227,18 @@ def _download(p, fill):
 
 
 def _gear(p, fill):
-    """Six chunky rounded teeth on a ring: reads as a gear even at 16 px."""
+    """Six chunky rounded teeth on a solid wheel with a hole: reads as a gear even at
+    16 px."""
     body = QPainterPath()
-    body.addEllipse(QPointF(12, 12), 6.6, 6.6)
+    body.addEllipse(QPointF(12, 12), 7.2, 7.2)
     for i in range(6):
         tooth = QPainterPath()
-        tooth.addRoundedRect(QRectF(-2.3, -9.6, 4.6, 5.5), 1.3, 1.3)
+        tooth.addRoundedRect(QRectF(-2.6, -10.2, 5.2, 5.6), 1.4, 1.4)
         a = math.degrees(math.pi * 2 * i / 6)
         body = body.united(QTransform().translate(12, 12).rotate(a).map(tooth))
-    p.drawPath(body.simplified())
-    p.drawEllipse(QPointF(12, 12), 2.8, 2.8)
+    hole = QPainterPath()
+    hole.addEllipse(QPointF(12, 12), 2.9, 2.9)
+    fill(body.simplified().subtracted(hole))
 
 
 def _history(p, fill):
@@ -416,19 +436,22 @@ def _alert(p, fill):
 
 
 def _onion(p, fill):
-    """Help and community (the rail's foot): a bulb, a layer and a curled leaf."""
-    bulb = QPainterPath(QPointF(12, 6.5))
-    bulb.cubicTo(QPointF(14, 9), QPointF(20.5, 10), QPointF(20.5, 14.8))
-    bulb.cubicTo(QPointF(20.5, 19), QPointF(16.5, 21), QPointF(12, 21))
-    bulb.cubicTo(QPointF(7.5, 21), QPointF(3.5, 19), QPointF(3.5, 14.8))
-    bulb.cubicTo(QPointF(3.5, 10), QPointF(10, 9), QPointF(12, 6.5))
+    """Help and community (the rail's foot): the logo's onion, a bulb with two leaves
+    and one swaying layer."""
+    bulb = QPainterPath(QPointF(12, 7))
+    bulb.cubicTo(QPointF(13.8, 9), QPointF(19.8, 10), QPointF(19.8, 14.4))
+    bulb.cubicTo(QPointF(19.8, 18.4), QPointF(14.5, 20.2), QPointF(12, 21.2))
+    bulb.cubicTo(QPointF(9.5, 20.2), QPointF(4.2, 18.4), QPointF(4.2, 14.4))
+    bulb.cubicTo(QPointF(4.2, 10), QPointF(10.2, 9), QPointF(12, 7))
     p.drawPath(bulb)
-    layer = QPainterPath(QPointF(12, 9))
-    layer.cubicTo(QPointF(15, 12.5), QPointF(15, 17.5), QPointF(12.5, 21))
+    layer = QPainterPath(QPointF(12, 10.5))
+    layer.cubicTo(QPointF(14.4, 13), QPointF(9.6, 15.6), QPointF(12, 18.4))
     p.drawPath(layer)
-    leaf = QPainterPath(QPointF(12, 6.5))
-    leaf.cubicTo(QPointF(12, 4.5), QPointF(13, 3), QPointF(15.5, 2.5))
-    p.drawPath(leaf)
+    for sx in (-1, 1):
+        leaf = QPainterPath(QPointF(12, 7))
+        leaf.cubicTo(QPointF(12 + sx * 0.4, 5), QPointF(12 + sx * 1.6, 3.4),
+                     QPointF(12 + sx * 3.6, 2.6))
+        p.drawPath(leaf)
 
 
 def _shield(p, fill):
@@ -607,15 +630,16 @@ def _apps(p, fill):
 
 
 def _eye(p, fill):
-    """The Triggers tab: an eye, watching the screen."""
+    """The Triggers tab: an eye, watching the screen (a solid iris with a glint)."""
     path = QPainterPath(QPointF(2.5, 12))
     path.cubicTo(QPointF(6, 5.5), QPointF(18, 5.5), QPointF(21.5, 12))
     path.cubicTo(QPointF(18, 18.5), QPointF(6, 18.5), QPointF(2.5, 12))
     p.drawPath(path)
-    p.drawEllipse(QPointF(12, 12), 3.2, 3.2)
-    dot = QPainterPath()
-    dot.addEllipse(QPointF(12, 12), 1.3, 1.3)
-    fill(dot)
+    iris = QPainterPath()
+    iris.addEllipse(QPointF(12, 12), 4, 4)
+    glint = QPainterPath()
+    glint.addEllipse(QPointF(13.4, 10.6), 1.2, 1.2)
+    fill(iris.subtracted(glint))
 
 
 def _chevron(direction):

@@ -76,7 +76,7 @@ class ThemeCard(QPushButton):
         p.setBrush(QColor(t["accent"]))
         p.drawRoundedRect(QRectF(r.right() - 39, r.top() + 20, 17, 3), 1.5, 1.5)
         theme.paint_logo(p, QRectF(r.right() - 36, r.bottom() - 30, 22, 22),
-                         t["accent"], t["accent2"])
+                         t["accent"], t["accent2"], finish=theme.logo_finish(self.name))
         # name, in the theme's own font
         p.setPen(QColor(theme.T["text"]))
         f = QFont(self.font())
