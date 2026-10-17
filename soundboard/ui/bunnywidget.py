@@ -29,6 +29,9 @@ poke him `ANNOY_CLICKS` times and he storms off the same way, comes back with a
 baseball bat and challenges you to Pong (ui/bunpong.py) over the page.
 Closing the game calls `calm_down()`, and he's back to how he was.
 
+`sulk = True`: he's down and kicks at the ground, over and over, a puff of dust each
+time (the Store tab while the store is down).
+
 `naps=True`: in the small hours (NAP_HOURS, by this PC's own clock; nothing is sent
 anywhere) he's asleep in a nightcap, breathing slowly, with Zzz floating up. A click
 wakes him, grumpy, for WOKEN_S seconds; then he nods off again.
@@ -175,6 +178,27 @@ def accent(groove, bands: tuple, now: float, decay: float = 5.0) -> tuple[float,
             until, s = nxt(band, now)
             best = max(best, (hit_curve(-until, decay) * s, s))
     return best
+
+
+SULK_EVERY = 1.7    # seconds a sulky kick takes (sulk)
+SULK_SCUFF = 0.4    # ... and where in it his foot scuffs the ground
+
+
+def sulk_kick(t: float) -> tuple[float, float]:
+    """A sulky kick at `t` seconds in (repeating): the foot's swing for draw_bunny's
+    `kick` (-1 back .. 1 out in front), and how far through this kick (0..1)."""
+    u = t % SULK_EVERY / SULK_EVERY
+    if u < 0.3:                      # draws his foot back
+        k = -0.7 * math.sin(u / 0.3 * math.pi / 2)
+    elif u < 0.45:                   # ... swings it out
+        v = (u - 0.3) / 0.15
+        k = -0.7 + 1.7 * v * v * (3 - 2 * v)
+    elif u < 0.75:                   # ... and lets it drop back
+        v = (u - 0.45) / 0.3
+        k = 1 - v * v * (3 - 2 * v)
+    else:
+        k = 0.0
+    return k, u
 
 
 def blink_amount(b: float) -> float:
@@ -346,6 +370,8 @@ class BunnyWidget(QWidget):
         if joy_lines:
             self.setCursor(Qt.CursorShape.PointingHandCursor)
         self.sad = sad             # his mood at rest
+        self.sulk = False          # kicking at the ground (see the module's notes)
+        self._kicks = -1           # the last sulky kick that threw up dust
         self._home_sad = sad       # ... which a failed build only dents until the next try
         self._sad = sad            # ... and right now (smoothed)
         self._hopeful = False
@@ -630,6 +656,17 @@ class BunnyWidget(QWidget):
         self._level = 0.0
         super().hideEvent(ev)
 
+    def _step_sulk(self, now: float):
+        """A puff of dust each time his sulky kick scuffs the ground."""
+        n = int((now - self._t0) / SULK_EVERY)
+        if n == self._kicks or (now - self._t0) % SULK_EVERY / SULK_EVERY < SULK_SCUFF:
+            return
+        self._kicks = n
+        body = self._bun_rect()
+        at = self._at(body, 80, 112)
+        for _i in range(5):
+            self._puff(at.x(), at.y(), self.bun_h * 0.35, self.bun_h * 0.05, 0.6)
+
     def _bun_rect(self) -> QRectF:
         w = self.bun_h * W / H
         return QRectF((self.width() - w) / 2, (self.height() - self.bun_h + self._head()) / 2,
@@ -766,6 +803,8 @@ class BunnyWidget(QWidget):
             f.vx *= 1 - dt * 2
             f.vy *= 1 - dt * 2
         self.puffs = [f for f in self.puffs if f.age < f.life]
+        if self.sulk:
+            self._step_sulk(now)
         talking = self._level > TALK
         # mouth follows the voice with a quick attack and a flappy wobble
         loud = loudness(self._level)
@@ -1283,7 +1322,17 @@ class BunnyWidget(QWidget):
             ears = 22 + 4 * breath
             mouth = 0.1 + 0.07 * max(0.0, breath)
             tilt, look = 8 + 1.5 * breath, 0.0   # his head lolls over to one side
-        out = {"blink": blink, "mouth": mouth, "ears": ears, "dy": dy,
+        kick = 0.0
+        if self.sulk and not self.asleep and phase is None:
+            kick, u = sulk_kick(now - self._t0)
+            angle -= 6 * kick                     # leaning into it
+            dx -= 3 * kick
+            dy += 2 * max(0.0, kick)
+            ears += 10                             # ears down
+            dip += 2.5                             # head hung
+            blink = max(blink, 0.3)                # eyes on his feet
+            look = 0.4 * kick
+        out = {"blink": blink, "mouth": mouth, "ears": ears, "dy": dy, "kick": kick,
                 "dx": dx, "swing": swing, "shown": shown, "sad": self._sad,
                 "angry": self._angry, "sx": sx, "sy": sy, "angle": angle,
                 "alpha": alpha, "led": led, "prop": prop, "nod": nod, "dip": dip,
@@ -1340,7 +1389,8 @@ class BunnyWidget(QWidget):
                        nightcap=self.asleep, robot=self.robot, led=pose["led"],
                        nod=pose["nod"] + pose.get("tilt", 0.0), dip=pose["dip"],
                        smug=pose["smug"],
-                       outfit=pose["outfit"], look=pose.get("look", 0.0))
+                       outfit=pose["outfit"], look=pose.get("look", 0.0),
+                       kick=pose.get("kick", 0.0))
             if kit is not None:
                 self._paint_kit(p, body, kit.front)
             p.restore()

@@ -3812,5 +3812,8 @@
   "Effects on any voice": "Effektek bármelyik hangon",
   "Share your voices and setups with everyone, and get theirs.": "Oszd meg a hangjaidat és beállításaidat mindenkivel, és szerezd meg az övéket.",
   "The voice bar's Effects button puts rain, a crowd, a fire or a sound from your board behind your voice.": "A hangsáv Effektek gombja esőt, tömeget, tüzet vagy egy hangot a boardodról tesz a hangod mögé.",
-  "Open Appearance": "Megjelenés megnyitása"
+  "Open Appearance": "Megjelenés megnyitása",
+  "Sorry, the store's down": "Bocsi, a bolt nem működik",
+  "Sorry, the store's down. We're working on getting it back up.": "Bocsi, a bolt nem működik. Dolgozunk rajta, hogy újra menjen.",
+  "We're working on getting it back up. Try again in a bit.": "Dolgozunk rajta, hogy újra menjen. Próbáld újra egy kicsit később."
 }

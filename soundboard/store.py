@@ -55,6 +55,11 @@ class StoreError(Exception):
     """What went wrong, in words for the user."""
 
 
+class StoreDown(StoreError):
+    """The store's server isn't working (it answered with an error of its own): nothing
+    the user did, and nothing they can fix."""
+
+
 @dataclass
 class Sound:
     id: str
@@ -147,6 +152,9 @@ def _request(method: str, path: str, install: str = "", body: bytes | None = Non
             err = json.loads(e.read(4096) or b"{}").get("error", "")
         except (ValueError, AttributeError):
             err = ""
+        if e.code >= 500 and err not in ("queue full", "store full"):
+            raise StoreDown(_("Sorry, the store's down. We're working on getting it back "
+                              "up.")) from None
         raise StoreError((why or _why)(e.code, err)) from None
     except net.ProxyError:
         raise
