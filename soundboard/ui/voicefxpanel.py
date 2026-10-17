@@ -983,6 +983,23 @@ class VoiceFxPanel(QWidget):
         self._refresh()
         self._emit()
 
+    def use_mix(self, effects: dict):
+        """Turn the changer on with these effects as your own mix (a setup made from a
+        voice that's gone since), without opening Make it yours."""
+        rows = {t: r for t, r in self.rows.items() if t not in KEEP}
+        for t, r in rows.items():
+            r.load(effects.get(t))
+        self._custom = {t: r.state() for t, r in self.rows.items()}
+        self._preset = CUSTOM
+        self._own = True
+        self._based_on = ""
+        self._clear_fresh()
+        self.btn_power.blockSignals(True)
+        self.btn_power.setChecked(True)
+        self.btn_power.blockSignals(False)
+        self._refresh()
+        self._emit()
+
     # never ear-splitting: louder settings are capped below their slider's top
     RANDOM_CAPS = {("compressor", "boost"): 9, ("distortion", "drive"): 20,
                    ("echo", "feedback"): 0.6, ("radio", "drive"): 14}

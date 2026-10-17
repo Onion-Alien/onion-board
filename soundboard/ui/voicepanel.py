@@ -16,7 +16,7 @@ from PySide6.QtWidgets import (QButtonGroup, QFrame, QHBoxLayout, QLabel, QPushB
                                QScrollArea, QVBoxLayout, QWidget)
 
 from soundboard import modules as mods
-from soundboard import langnames, net, theme, usage, voicefx
+from soundboard import langnames, net, theme, usage, voicefx, voicesetups
 from soundboard.speech import spoken, translation
 from soundboard.speech.aivoice import AiVoiceController
 from soundboard.speech.live import SpeechController
@@ -24,7 +24,7 @@ from soundboard.ui import a11y, appstate, art, busy, icons
 from soundboard.ui.panel import Flow, card, hint_label, icon_button, section_label
 from soundboard.ui.responsive import FitWidth
 from soundboard.ui.speechpanel import LIVE_MODULE, SpeechPanel
-from soundboard.ui.voicefxpanel import CUSTOM, EffectRow, VoiceFxPanel
+from soundboard.ui.voicefxpanel import CUSTOM, KEEP, EffectRow, VoiceFxPanel
 from soundboard.ui.voicestatus import VoiceStatusBar
 from soundboard.i18n import _
 from soundboard.ui.pixels import snap_to_pixels
@@ -227,6 +227,9 @@ class VoicePanel(QWidget):
         self._tab = tab if tab in TAB_KEYS else "fx"
         scroll.setWidget(page)
         outer.addWidget(tab_row)
+        # My setups: under the tabs, so it's there whichever part is showing
+        self.setups = voicesetups.Store()
+        self._setups_at = outer.count()   # placed once the panels below are made
         outer.addWidget(scroll, 1)
 
         # the voice changer. It always starts off (the voice you picked is kept):
@@ -272,6 +275,10 @@ class VoicePanel(QWidget):
         self._section("addons", self.addons, self.addons.title)
         self.show_tab(self._tab if self._tabs[self._tab].isVisibleTo(self) else "fx")
 
+        from soundboard.ui.voicesetupsbar import SetupsBar
+        self.setups_bar = SetupsBar(self.setups, self.current_setup, self.use_setup,
+                                    self.setup_icon, self.setup_words)
+        outer.insertWidget(self._setups_at, self.setups_bar)
         outer.insertWidget(0, self.speech.say_bar)   # on top: the bottom has the mixer
         # the picked voice's bar, pinned under the cards while the voice changer shows:
         # its Hear what they hear and Make it yours never scroll out of sight
@@ -293,6 +300,81 @@ class VoicePanel(QWidget):
     def showEvent(self, e):
         super().showEvent(e)
         self._meter_timer.start(appstate.interval(50))
+
+    # ---- My setups (voicesetups)
+    def current_setup(self) -> dict:
+        """What's on now as a setup: the voice changer's voice, the AI voice, the
+        language spoken; {} when none of them is on. Its "name" is a suggestion."""
+        out: dict = {}
+        names = []
+        if self.fx.btn_power.isChecked():
+            effects = {t: c for t, c in self.fx.spec()["effects"].items()
+                       if c.get("on") and t not in KEEP}
+            if effects:
+                name = self.fx.preset
+                out["fx"] = "" if name == CUSTOM else name
+                out["effects"] = effects
+                names.append(_("My own mix") if name == CUSTOM else voicefx.shown(name))
+        if self.ai.is_on():
+            vid = self.ai.s.get("voice", "")
+            vo = next((v for v in self.ai.voices if v.get("id") == vid), None)
+            if vo is not None:
+                out["ai"] = {"id": vid, "name": vo.get("name", vid),
+                             "pitch": float(self.ai.s.get("pitch", 0.0) or 0.0)}
+                names.append(out["ai"]["name"])
+        lang = self.speech.cb_lang.currentData() or ""
+        if lang:
+            out["language"] = lang
+            m = next((m for m in self.speech.langs if m.language == lang), None)
+            names.append(langnames.of(m) if m is not None else lang)
+        if out:
+            out["name"] = " + ".join(names)[:voicesetups.MAX_NAME]
+        return out
+
+    def use_setup(self, setup: dict):
+        """Turn a setup's whole mix on for your mic (what it hasn't got goes off)."""
+        effects = setup.get("effects") or {}
+        name = setup.get("fx") or ""
+        if not effects:
+            self.fx.btn_power.setChecked(False)
+        elif name in voicefx.PRESETS or name in self.fx.store.voices:
+            self.fx.pick(name)
+        else:
+            self.fx.use_mix(effects)
+        ai = setup.get("ai")
+        if ai and self.ai.module is not None and any(
+                v.get("id") == ai["id"] for v in self.ai.voices):
+            self.ai.use(ai["id"])
+        else:
+            self.ai.stop()
+        i = self.speech.cb_lang.findData(setup.get("language") or "")
+        self.speech.cb_lang.setCurrentIndex(max(0, i))
+        self._update_heads()
+
+    def setup_icon(self, setup: dict):
+        """A setup's picture: its AI voice's emoji, else its voice changer voice's."""
+        ai = setup.get("ai")
+        vo = next((v for v in self.ai.voices if ai and v.get("id") == ai["id"]), None)
+        if vo is not None:
+            from soundboard.ui.aivoicepanel import emoji_icon
+            return emoji_icon(str(vo.get("emoji") or ""))
+        pic = art.icon(art.voice_key(setup["fx"])) if setup.get("fx") else None
+        return pic or icons.icon("sliders" if setup.get("effects") else "browser", "muted")
+
+    def setup_words(self, setup: dict) -> str:
+        """What's in a setup, in words."""
+        parts = []
+        if setup.get("effects"):
+            fx = setup.get("fx") or ""
+            parts.append(_("Voice changer: {voice}", voice=voicefx.shown(fx) if fx
+                           else _("My own mix")))
+        if setup.get("ai"):
+            parts.append(_("AI voice: {voice}", voice=setup["ai"].get("name", "")))
+        lang = setup.get("language")
+        if lang:
+            m = next((m for m in self.speech.langs if m.language == lang), None)
+            parts.append(_("Speaks {language}", language=langnames.of(m) if m else lang))
+        return " · ".join(parts)
 
     def hideEvent(self, e):
         super().hideEvent(e)
