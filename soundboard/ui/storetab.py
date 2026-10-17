@@ -463,7 +463,8 @@ class StoreTab(QWidget):
             r.cell_cat.setVisible(w >= CAT_ROOM)
             r.cell_added.setVisible(w >= ADDED_ROOM)
             # the smallest: tighter gaps and names, so Report isn't under the scroll bar
-            r.layout().setSpacing(8 if w >= ADDED_ROOM else 4)
+            if (lay := r.layout()) is not None:
+                lay.setSpacing(8 if w >= ADDED_ROOM else 4)
             for lbl in (r.name, r.meta):
                 lbl.setMinimumWidth(40 if w >= ADDED_ROOM else 28)
         self.head_cat.setVisible(w >= CAT_ROOM)
