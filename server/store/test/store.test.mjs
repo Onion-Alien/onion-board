@@ -644,3 +644,23 @@ test("a served file is only ever a download", async () => {
   assert.equal(f.headers.get("content-security-policy"), "default-src 'none'; sandbox");
   assert.equal(f.headers.get("x-content-type-options"), "nosniff");
 });
+
+test("a shared sound's tags never reach the people who add it", async () => {
+  const env = store();
+  const raw = mp3bytes(0, "TPE1 Secret Name");
+  const tagged = () => new Blob([raw], { type: "audio/mpeg" });
+  const up = await share(env, "boom", { form: { file: tagged(), name: "boom", agree: "own-cc0-v1" } });
+  assert.equal(up.status, 201);
+  const kept = new Uint8Array(await env.FILES.get(`${up.body.id}.mp3`, "arrayBuffer"));
+  assert.ok(!Buffer.from(kept).includes("Secret"));
+  assert.equal(env.DB.rows("SELECT size FROM sounds")[0].size, kept.length);
+  // the same file sent again is still the same file
+  assert.equal((await share(env, "boom", { form: { file: tagged(), name: "boom", agree: "own-cc0-v1" } })).status, 409);
+  // one kept from before files were cleaned is cleaned as it's served
+  await env.FILES.put(`${up.body.id}.mp3`, mp3bytes(0, "TPE1 Old Secret"));
+  await call(env, `/v1/admin/sounds/${up.body.id}`, { method: "POST", admin: true, json: { action: "approve" } });
+  const f = await call(env, `/v1/sounds/${up.body.id}/file`);
+  assert.equal(f.status, 200);
+  assert.ok(!Buffer.from(f.body).includes("Secret"));
+  assert.equal(f.headers.get("content-length"), String(f.body.byteLength));
+});

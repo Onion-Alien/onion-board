@@ -999,6 +999,11 @@ def _download_direct(url, dest, progress, direct: bool = False) -> tuple[Path, s
             if total and got != total:   # a dropped connection just ends read()
                 raise DownloadError(_("Download failed ({error})",
                                       error=_("The connection was dropped.")))
+        with open(path, "rb") as f:   # a page or anything else under an .mp3 name isn't kept
+            head = f.read(4)
+        frame = len(head) > 1 and head[0] == 0xFF and head[1] & 0xE0 == 0xE0
+        if not (head[:3] == b"ID3" or frame):
+            raise DownloadError(_("That isn't a Myinstants sound link."))
     except DownloadError:
         drop()
         raise

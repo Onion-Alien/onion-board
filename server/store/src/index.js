@@ -8,6 +8,7 @@
 import { voicesRoute, adminVoicesRoute } from "./voices.js";
 import { ADMIN_PAGE } from "./admin.js";
 import { audioType } from "./audio.js";
+import { stripAudio } from "./strip.js";
 import { chatRoute, refuse } from "./chat.js";
 import { syncStep } from "./sync.js";
 
@@ -287,8 +288,10 @@ async function file(env, id, any) {
   const row = await env.DB.prepare("SELECT ext, status FROM sounds WHERE id = ?").bind(id).first();
   if (!row || row.ext === "link" || (!any && row.status !== "live"))
     return json({ error: "not found" }, 404);
-  const obj = await env.FILES.get(`${id}.${row.ext}`, "arrayBuffer");
-  if (!obj) return json({ error: "not found" }, 404);
+  const got = await env.FILES.get(`${id}.${row.ext}`, "arrayBuffer");
+  if (!got) return json({ error: "not found" }, 404);
+  // tags and pictures out, files kept from before uploads were cleaned too (strip.js)
+  const obj = stripAudio(new Uint8Array(got), row.ext);
   return new Response(obj, { headers: {
     "content-type": TYPES[row.ext] || "application/octet-stream",
     "content-length": String(obj.byteLength),
@@ -322,7 +325,8 @@ async function upload(req, env, imported = false) {
   if (!ext) fail("not audio", 415);
   const uploader = imported ? "owner" : await installHash(req, env);
   const ip = imported ? "owner" : await ipHash(req, env);
-  const hash = await sha256(bytes);
+  const hash = await sha256(bytes);   // the file as sent: the same one can't come twice
+  const kept = stripAudio(bytes, ext);   // only the sound: no tags or pictures (strip.js)
   if (await env.DB.prepare("SELECT 1 FROM sounds WHERE sha256 = ?").bind(hash).first())
     fail("duplicate", 409);
   if (!imported) {
@@ -331,10 +335,10 @@ async function upload(req, env, imported = false) {
         || !await allow(env, "upload-ip", ip, UPLOADS_PER_IP_DAY)) fail("slow down", 429);
   }
   const id = (await sha256(crypto.randomUUID())).slice(0, 12);
-  await env.FILES.put(`${id}.${ext}`, bytes);
+  await env.FILES.put(`${id}.${ext}`, kept);
   await env.DB.prepare("INSERT INTO sounds (id, name, tags, ext, size, sha256, author, " +
     "uploader, ip, status, created) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)")
-    .bind(id, name, cleanTags(form.get("tags")), ext, bytes.length, hash,
+    .bind(id, name, cleanTags(form.get("tags")), ext, kept.length, hash,
           imported ? cleanName(form.get("author")) || "Onion Board" : "",
           uploader, ip, imported ? "live" : "pending", now()).run();
   await logAction(env, imported ? "import" : "upload",

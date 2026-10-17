@@ -117,6 +117,12 @@ def test_upload_sends_the_agreement(fake, tmp_path):
     method, path, install, body = fake.calls[-1]
     assert method == "POST" and path == "/v1/sounds" and install == "id-1234567890abcdef"
     assert store.AGREEMENT.encode() in body and b"Horn" in body
+    # the file's own name stays on this PC
+    mine = tmp_path / "My Name mic take.wav"
+    mine.write_bytes(_wav() + b"x")
+    store.upload("id-1234567890abcdef", str(mine), "Horn 2")
+    body = fake.calls[-1][3]
+    assert b'filename="sound.wav"' in body and b"My" not in body.replace(b"Horn", b"")
 
 
 def test_rail_shows_store_before_setup():

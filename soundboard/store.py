@@ -282,7 +282,8 @@ def check_file(path: str) -> str:
 
 
 def _form(fields: dict[str, str], file_name: str, data: bytes) -> tuple[bytes, str]:
-    """A multipart form with `fields` and the file; (body, content type)."""
+    """A multipart form with `fields` and the file; (body, content type). `file_name` is
+    never the file's own ("sound.mp3"): a name on this PC says nothing to the store."""
     b = secrets.token_hex(16)
     out = []
     for k, v in fields.items():
@@ -306,7 +307,7 @@ def upload(install: str, path: str, name: str, tags: str = "") -> str:
     except OSError:
         raise StoreError(_("That file can't be opened.")) from None
     body, ctype = _form({"name": name.strip()[:60], "tags": tags.strip()[:200],
-                         "agree": AGREEMENT}, Path(path).name, data)
+                         "agree": AGREEMENT}, "sound" + Path(path).suffix.lower(), data)
     out = _request("POST", "/v1/sounds", install, body, ctype, timeout=60)
     try:
         return str(json.loads(out.decode("utf-8"))["id"])
