@@ -279,9 +279,44 @@ def _bell(k: float) -> float:
     return math.sin(math.pi * max(0.0, min(1.0, k)))
 
 
+def _soft(k: float) -> float:
+    """0 → 1 → 0 over k = 0..1, starting and stopping still (a move eases in and out)."""
+    return _bell(k) ** 2
+
+
+# the springy layer over the pose (OwlWidget._spring): stiffness (1/s²), damping (1/s)
+TUFT_SPRING = (420.0, 16.0)    # ear tufts trail his moves and wobble as they settle
+WING_SPRING = (600.0, 28.0)    # wings trail too, a little stiffer (they flap)
+SQUASH_SPRING = (300.0, 15.0)  # his body jiggles back after a squash or stretch
+TUFT_DRAG = 8.0    # how far his tufts trail behind, degrees per owl-height a second
+WING_DRAG = 0.3    # how far his wings trail behind (flap), per owl-height a second
+STRETCH = 0.03     # how tall and thin a fast move makes him, per owl-height a second
+SQUASH = 0.3       # how hard a change of direction (a landing) squashes him
+ACT_OUT = 0.35     # seconds an act cut short (the mouse, a click, a song) takes to go
+
+
+class _Spring:
+    """A damped spring chasing a target: the lag, overshoot and wobble that make a
+    move look alive instead of on rails (Bun's, in Onion Board's bunnywidget.py)."""
+    __slots__ = ("x", "v")
+
+    def __init__(self, x: float = 0.0):
+        self.x, self.v = x, 0.0
+
+    def step(self, target: float, dt: float, k: float, d: float) -> float:
+        n = max(1, math.ceil(dt / 0.008))   # small steps: steady at any frame rate
+        h = dt / n
+        for _i in range(n):
+            self.v += (k * (target - self.x) - d * self.v) * h
+            self.x += self.v * h
+        return self.x
+
+
 # dancing (set_groove): the styles he bobs to the hits themselves, not the beat grid
 HIT_BANDS = {"hiphop": ("bass",), "rock": ("bass", "drums")}
-HIT_LEAD = 0.05   # seconds a bob starts before its hit, so it lands right on it
+HIT_LEAD = 0.1    # seconds a bob starts before its hit, so it lands right on it
+# (three frames at his 30 fps: a shorter run-in jumped)
+STYLE_BLEND = 0.6  # seconds to change from one style of dance to another
 
 
 def _hit(age: float, decay: float = 6.0) -> float:
@@ -289,9 +324,9 @@ def _hit(age: float, decay: float = 6.0) -> float:
     then easing back."""
     if age < -HIT_LEAD or age > 2:
         return 0.0
-    if age < 0:
+    if age < 0:   # speeding down, still moving when it lands (a thud, not a stop)
         k = 1 + age / HIT_LEAD
-        return k * k
+        return k * k * (2 - k)
     return math.exp(-age * decay)
 
 
@@ -349,6 +384,17 @@ class OwlWidget(QWidget):
         self._look = [0.0, 0.7]    # pupils, smoothed
         self._glance = (0.0, 0.7)  # where he looks when left alone
         self._next_glance = 1.5
+        self._was: tuple[str, float] | None = None   # an act cut short, fading out:
+        self._was_w = 0.0                            # (act, how far in), 1..0
+        self._g_last = None        # the groove he's still fading out of
+        self._style = self._style_was = ""
+        self._blend = 1.0          # 0..1 from the last style of dance to this one
+        self._tufts_s = _Spring()  # the springy layer (_spring): tufts,
+        self._wing_s = _Spring()   # ... wings,
+        self._squash_s = _Spring()  # ... squash and stretch
+        self._sprung = False       # (the springs start where the pose is)
+        self._dy_last = 0.0
+        self._vy = 0.0
         self._timer = QTimer(self)
         self._timer.setInterval(FAST_MS)
         self._timer.timeout.connect(self._tick)
@@ -397,13 +443,15 @@ class OwlWidget(QWidget):
                 until, s2 = g.next_hit(band, now)
                 best = max(best, _hit(age) * s, _hit(-until) * s2)
             return best
-        ph = g.beat(now) % 1.0
-        return _hit((ph if ph < 0.75 else ph - 1) * 60 / g.bpm, 5 * 60 / g.bpm)
+        # the beat that went and the one coming, whichever is further in (one curve:
+        # never a jump from one to the next), easing back over about a beat
+        ph, beat = g.beat(now) % 1.0, 60 / g.bpm
+        return max(_hit(ph * beat, 4 / beat), _hit((ph - 1) * beat, 4 / beat))
 
     def cheer(self):
         """A happy hop with sparkles (what a click does)."""
         self._joy_t = 0.0
-        self.act = None
+        self._stop_act()
         self.say = self._rng.choice(self.joy_lines) if self.joy_lines else ""
 
     # ------------------------------------------------------------------ time
@@ -435,9 +483,20 @@ class OwlWidget(QWidget):
         self.t += dt
         g = self.groove
         on = g is not None and bool(g.style) and bool(g.bpm)
+        if g is not None and on:
+            self._g_last = g
+            if g.style != self._style:
+                self._style_was, self._style, self._blend = self._style, g.style, 0.0
+        self._blend = min(1.0, self._blend + dt / STYLE_BLEND)
         self._dance += (float(on) - self._dance) * min(1.0, dt * 3)
+        if self._dance < 0.01 and not on:
+            self._g_last, self._style = None, ""
         if self._dance > 0.3 and self.act:   # (no sulking while he dances)
-            self.act, self.say = None, ""
+            self._stop_act()
+        if self._was is not None:
+            self._was_w -= dt / ACT_OUT
+            if self._was_w <= 0:
+                self._was = None
         m = self._mouse() if mouse is ... else mouse
         dist = math.hypot(*m) if m else 99.0
         near = 1.0 if dist < 2.2 else 0.0
@@ -449,10 +508,12 @@ class OwlWidget(QWidget):
                 self.say = ""
         if self.act:
             self._act_t += dt
-            if self._act_t >= ACTS[self.act] or self._near > 0.6:
+            if self._act_t >= ACTS[self.act]:
                 self.act = None
                 self.say = ""
                 self._next_act = self.t + self._rng.uniform(3.5, 7.0)
+            elif self._near > 0.6:
+                self._stop_act()
         elif (self._joy_t < 0 and self._near < 0.3 and self.t >= self._next_act
               and self._dance < 0.3):
             self.start(self._rng.choice(list(ACTS)))
@@ -472,14 +533,64 @@ class OwlWidget(QWidget):
         k = min(1.0, dt * 8)
         self._look[0] += (tx - self._look[0]) * k
         self._look[1] += (ty - self._look[1]) * k
+        self._spring(dt)
 
     def start(self, act: str):
         """Begin one of ACTS now."""
         self.act, self._act_t = act, 0.0
         self.say = self._rng.choice(self.lines) if act == "plead" and self.lines else ""
 
-    def pose(self) -> dict:
-        """Everything draw_owl and the extras need for this moment."""
+    def _stop_act(self):
+        """Cut the act short: it fades out over ACT_OUT instead of snapping off."""
+        if self.act:
+            self._was, self._was_w = (self.act, self._act_t / ACTS[self.act]), 1.0
+            self._next_act = self.t + self._rng.uniform(3.5, 7.0)
+        self.act = None
+        self.say = ""
+
+    @staticmethod
+    def _act(a: str, k: float, t: float) -> dict:
+        """What act `a`, `k` 0..1 of the way through, does to the pose: moves to add
+        (dy, rot, tufts), floors to raise (blink, sad, clasp, plead), the tear and the
+        extras paintEvent draws. Every move starts and ends still."""
+        o: dict = {}
+        if a == "sigh":        # sinks, eyes half shut, a puff of breath
+            b = _soft(k)
+            o.update(dy=5 * b, tufts=14 * b, blink=0.45 * b, puff=k)
+        elif a == "plead":     # wings clasped, puppy eyes, hopeful little hops
+            e = _ease(k / 0.15) * _ease((1 - k) / 0.15)
+            o.update(clasp=e, plead=e, sad=0.9 * e, tufts=-10 * e,
+                     dy=-4 * e * abs(math.sin(k * math.pi * 6)))
+        elif a == "tear":
+            o.update(tear=k, sad=_ease(k / 0.12) * _ease((1 - k) / 0.12),
+                     blink=0.25 * _soft(k))
+        elif a == "peek":      # leans over to look down at the buttons
+            b = _soft(k)
+            o.update(rot=9 * b, ask=b)
+        elif a == "doze":      # nods off... and jolts awake
+            if k < 0.78:
+                d, w, j = _ease(k / 0.3), 1.0, -1.0
+            else:              # the doze falls away fast as he jolts
+                j = (k - 0.78) / 0.22
+                d, w = 1.0, 1 - _ease(j / 0.1)
+            o.update(blink=0.9 * d * w, dy=3 * d * w,
+                     rot=(-4 * d + 1.5 * math.sin(t * 1.5) * d) * w)
+            if k < 0.78:
+                o["zzz"] = k
+            if j >= 0:
+                o["dy"] -= 9 * _soft(min(1.0, j * 1.5))
+                o["tufts"] = -25 * _soft(j)
+                o["startle"] = j
+        return o
+
+    def _dance_style(self, style: str, bob: float) -> tuple[float, float]:
+        """(flap, blink) a style of dance adds: wings on a big hit for rock and
+        electronic, eyes shut for chill."""
+        return (0.7 * bob if style in ("rock", "electronic") else 0.0,
+                1.0 if style == "chill" else 0.0)
+
+    def base_pose(self) -> dict:
+        """The pose this moment before the springy layer (see pose())."""
         t, near = self.t, self._near
         sad = 0.85 * (1 - near)
         tufts = 24 * sad - 10 * near + 3 * math.sin(t * 1.1)
@@ -487,69 +598,95 @@ class OwlWidget(QWidget):
         rot = 2.5 * math.sin(t * 0.8)
         blink = 0.0
         if self._blink_t >= 0 and (b := t - self._blink_t) < 0.18:
-            blink = 1 - abs(b - 0.09) / 0.09
+            blink = _soft(b / 0.18)
         clasp = flap = plead = tear = 0.0
         extra = {}
-        a, k = self.act, (self._act_t / ACTS[self.act] if self.act else 0.0)
-        if a == "sigh":        # sinks, eyes half shut, a puff of breath
-            b = _bell(k)
-            dy += 5 * b
-            tufts += 14 * b
-            blink = max(blink, 0.45 * b)
-            extra["puff"] = k
-        elif a == "plead":     # wings clasped, puppy eyes, hopeful little hops
-            e = _ease(k / 0.15) * _ease((1 - k) / 0.15)
-            clasp, plead = e, e
-            sad = max(sad, 0.9 * e)
-            tufts -= 10 * e
-            dy -= 4 * e * abs(math.sin(k * math.pi * 6))
-        elif a == "tear":
-            tear = k
-            sad = 1.0
-            blink = max(blink, 0.25 * _bell(k))
-        elif a == "peek":      # leans over to look down at the buttons
-            b = _bell(k)
-            rot += 9 * b
-            extra["ask"] = b
-        elif a == "doze":      # nods off... and jolts awake
-            if k < 0.78:
-                d = _ease(k / 0.3)
-                blink = max(blink, 0.9 * d)
-                dy += 3 * d
-                rot += -4 * d + 1.5 * math.sin(t * 1.5) * d
-                extra["zzz"] = k
-            else:
-                j = (k - 0.78) / 0.22
-                dy -= 9 * _bell(j * 1.5)
-                tufts -= 25 * _bell(j)
-                extra["startle"] = j
+        acts = []
+        if self.act:
+            acts.append((self._act(self.act, self._act_t / ACTS[self.act], t), 1.0))
+        if self._was is not None:
+            a, k = self._was
+            o = self._act(a, k, t)
+            if "tear" in o:    # a tear cut short drops off his cheek
+                o["tear"] = k + (1 - k) * (1 - self._was_w)
+            acts.append((o, _ease(self._was_w)))
+        for o, w in acts:
+            dy += o.get("dy", 0.0) * w
+            rot += o.get("rot", 0.0) * w
+            tufts += o.get("tufts", 0.0) * w
+            blink = max(blink, o.get("blink", 0.0) * w)
+            sad = max(sad, o.get("sad", 0.0) * w)
+            clasp = max(clasp, o.get("clasp", 0.0) * w)
+            plead = max(plead, o.get("plead", 0.0) * w)
+            if "tear" in o:
+                tear = o["tear"]
+            for key in ("puff", "zzz", "startle"):
+                if key in o:
+                    extra[key], extra[key + "_a"] = o[key], w
+            if "ask" in o:
+                extra["ask"] = o["ask"] * w
         d = self._dance
-        if d > 0.01 and self.groove is not None and self.groove.bpm:
+        g = self.groove if self.groove is not None else self._g_last
+        if d > 0.01 and g is not None and g.bpm:
             # dancing: head bobbing down on the hits, swaying a beat each way, tufts
             # bouncing, a flap of the wings on a big hit; cheered right up
-            g, now = self.groove, time.monotonic()
+            now = time.monotonic()
             bob = self._accent(g, now)
             sway = math.sin(math.pi * g.beat(now))
             sad *= 1 - d
-            tufts += d * (-14 + 12 * bob)
+            tufts += d * (-14 + 5 * bob)   # (the springs add the bounce)
             dy += d * 9 * bob
             rot += d * 7 * sway
-            if g.style in ("rock", "electronic"):
-                flap = max(flap, d * 0.7 * bob)
-            if g.style == "chill":   # eyes shut, lost in it
-                blink = max(blink, d)
+            f, b = self._dance_style(self._style, bob)
+            if self._blend < 1:   # changing style: blended, never a jump
+                k = _ease(self._blend)
+                f0, b0 = self._dance_style(self._style_was, bob)
+                f, b = f0 + (f - f0) * k, b0 + (b - b0) * k
+            flap = max(flap, d * f)
+            blink = max(blink, d * b)
         if self._joy_t >= 0:
             j = self._joy_t / 1.6
             e = _bell(j)
             sad, tufts = sad * (1 - e), tufts - 30 * e
             flap = abs(math.sin(self._joy_t * 14)) * e
             dy -= 16 * abs(math.sin(j * math.pi * 2)) * (1 - j)
-            blink = 0.0
-            plead = 0.6 * e
+            blink *= 1 - _ease(j / 0.08)
+            plead = max(plead, 0.6 * e)
             extra["joy"] = j
         return {"look": self._look[0], "look_y": self._look[1], "blink": blink, "sad": sad,
                 "tufts": tufts, "clasp": clasp, "flap": flap, "plead": plead, "tear": tear,
                 "dy": dy, "rot": rot, **extra}
+
+    def _spring(self, dt: float):
+        """Moves the springy layer on a frame: his tufts and wings trail behind his
+        hops and wobble as they settle, a fast move stretches him and a change of
+        direction (a landing, a take-off) squashes him, then he jiggles back."""
+        if dt <= 0:
+            return
+        pose = self.base_pose()
+        if not self._sprung:   # first frame: start where he is, no fling
+            self._sprung = True
+            self._tufts_s.x, self._wing_s.x, self._dy_last = pose["tufts"], pose["flap"], pose["dy"]
+        vy = (pose["dy"] - self._dy_last) / dt / max(1, self.owl_h)
+        self._dy_last = pose["dy"]
+        dv = max(-4.0, min(4.0, vy - self._vy))   # (a jump cut can't fling him)
+        self._vy = vy
+        # landing (dv < 0): squash; softer on every bob of a dance (not a jelly)
+        self._squash_s.v += SQUASH * (1 - 0.7 * self._dance) * dv * 10
+        self._squash_s.step(min(0.08, abs(vy) * STRETCH), dt, *SQUASH_SPRING)
+        self._squash_s.x = max(-0.2, min(0.15, self._squash_s.x))
+        self._tufts_s.step(pose["tufts"] - vy * TUFT_DRAG, dt, *TUFT_SPRING)
+        self._wing_s.step(pose["flap"] + vy * WING_DRAG, dt, *WING_SPRING)
+
+    def pose(self) -> dict:
+        """Everything draw_owl and the extras need for this moment: base_pose() with
+        the springy layer on top (tufts and wings trailing, `sx` / `sy` squash)."""
+        pose = self.base_pose()
+        if not self._sprung:
+            return {**pose, "sx": 1.0, "sy": 1.0}
+        s = self._squash_s.x
+        return {**pose, "tufts": self._tufts_s.x, "sx": 1 - 0.6 * s, "sy": 1 + s,
+                "flap": max(-0.2, min(1.3, self._wing_s.x))}
 
     # ------------------------------------------------------------------ paint
     def paintEvent(self, ev):
@@ -570,6 +707,7 @@ class OwlWidget(QWidget):
         foot = QPointF(r.center().x(), r.bottom())
         p.translate(foot)
         p.rotate(pose["rot"])
+        p.scale(pose["sx"], pose["sy"])   # squash and stretch, about his feet
         p.translate(-foot)
         body = r.translated(0, pose["dy"])
         draw_owl(p, body, pose["look"], look_y=pose["look_y"], blink=pose["blink"],
@@ -581,7 +719,7 @@ class OwlWidget(QWidget):
             k = pose["puff"]
             if 0.25 < k < 0.95:
                 q = (k - 0.25) / 0.7
-                p.setOpacity(0.7 * (1 - q))
+                p.setOpacity(0.7 * (1 - q) * pose.get("puff_a", 1.0))
                 p.setBrush(QColor("#d9d2e6"))
                 for i in range(3):
                     rr = (3 + 5 * q + i) * u
@@ -596,14 +734,16 @@ class OwlWidget(QWidget):
             for i in range(3):
                 q = (pose["zzz"] * 2.2 - i * 0.35) % 1.3
                 if q < 1:
-                    p.setOpacity(_bell(q))
+                    p.setOpacity(_bell(q) * pose.get("zzz_a", 1.0))
                     self._text(p, "z", head.x() + (26 + 16 * q + i * 4) * u,
                                head.y() - (8 + 34 * q) * u, (10 + 6 * q) * u,
                                QColor(SPARKLE_COLORS[3]))
             p.setOpacity(1.0)
         if "startle" in pose:
+            p.setOpacity(pose.get("startle_a", 1.0))
             self._text(p, "!", head.x() + 28 * u, body.top() + 4 * u,
                        22 * u * _bell(pose["startle"]), QColor(SPARKLE_COLORS[1]))
+            p.setOpacity(1.0)
         if "joy" in pose:
             j = pose["joy"]
             for i, col in enumerate(SPARKLE_COLORS * 2):
