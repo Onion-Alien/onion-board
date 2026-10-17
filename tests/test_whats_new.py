@@ -40,11 +40,13 @@ def test_an_upgraded_config_sees_it_once_and_its_button_opens_the_newest_page(wi
     opened = []
     monkeypatch.setattr(window.setctl, "open_settings", lambda page="privacy": opened.append(page))
     window.cfg.whats_new_seen = ""   # as loaded from an older version's config
-    shown.press = "appearance"
+    shown.press = "hotkeys"
     window.updctl.after_update()
-    assert len(shown) == 1 and any("Privacy & security" in t for t in shown[0])
-    assert any("Update Onion Pocket" in t for t in shown[0])
-    assert opened == ["appearance"]   # the newest note with a Settings page
+    newest = whatsnew.notes()[0]
+    assert len(shown) == 1 and newest.headline in shown[0]
+    assert all(title in shown[0] for __, title, __ in newest.items)
+    assert not any("Privacy & security" in t for t in shown[0])   # years back: left out
+    assert opened == [newest.page]   # the newest note with a Settings page
     assert window.cfg.whats_new_seen == __version__
     window.updctl.after_update()   # the next start: nothing new
     assert len(shown) == 1
@@ -75,6 +77,52 @@ def test_notes_for_a_version_after_this_one_wait(monkeypatch):
     future = whatsnew.Note("99.0.0", "Later", (("shield", "x", "y"),))
     monkeypatch.setattr(whatsnew, "NOTES", (future,) + whatsnew.NOTES)
     assert future not in whatsnew.unseen("")
+
+
+def test_this_version_has_its_notes():
+    """The header's version and the window after an update show this release, not one
+    from months ago: every x.y release gets a note (patch releases may share it)."""
+    newest = whatsnew.notes()[0]
+    assert newest.version.split(".")[:2] == __version__.split(".")[:2]
+    assert [n.version for n in whatsnew.notes()] == sorted(
+        (n.version for n in whatsnew.notes()),
+        key=lambda v: tuple(int(x) for x in v.split(".")), reverse=True)
+
+
+def test_an_update_over_many_versions_stays_short(window):
+    dlg = whatsnew.WhatsNewDialog(window, whatsnew.unseen(""), updated=True)
+    from PySide6.QtWidgets import QFrame
+    rows = [f for f in dlg.findChildren(QFrame) if f.objectName() == "setcard"]
+    assert 0 < len(rows) <= whatsnew.MAX_ITEMS
+    dlg.close()
+
+
+def test_an_update_never_opens_the_setup_guide_again(qapp, app_dir, monkeypatch):
+    """Set up on an older version (the guide finished while sending didn't work yet,
+    so setup_done stayed off): after the update the app opens on What's new, not on
+    the setup guide."""
+    from soundboard import engine, winkeys
+    from soundboard.ui import mainwindow as main
+    for name in ("set_main_device", "set_mon_device", "set_mic_device"):
+        monkeypatch.setattr(engine.Engine, name, lambda self, n, _k=name: None)
+    monkeypatch.setattr(winkeys.Hotkeys, "register", lambda self, m: None)
+    Config(stats_version="2.2.2", setup_done=False, whats_new_seen="2.2.2").save()
+    w = main.MainWindow()
+    try:
+        assert w.cfg.setup_done   # app.py opens the guide only while this is off
+    finally:
+        w.soundctl._load_thread.join(15)
+        w.close()
+        from PySide6.QtCore import QEvent
+        w.deleteLater()
+        qapp.sendPostedEvents(None, QEvent.DeferredDelete)
+
+
+def test_a_first_start_still_gets_the_setup_guide(app_dir):
+    from soundboard import reset
+    assert not reset.is_update(Config(stats_version=""))
+    assert not reset.is_update(Config(stats_version=__version__))
+    assert reset.is_update(Config(stats_version="2.2.2"))
 
 
 def test_it_waits_for_the_tray_and_the_setup_guide(window, shown):
