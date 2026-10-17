@@ -13,12 +13,13 @@ from PySide6.QtWidgets import (QFrame, QHBoxLayout, QLabel, QPushButton, QScroll
 from shiboken6 import isValid as qt_valid
 
 from soundboard.i18n import _
-from soundboard.ui import icons
+from soundboard.ui import icons, panel
 from soundboard.ui.panel import icon_button
 
 POPUP_W = 400        # the list's card: narrow, a long name still fits most of itself
 POPUP_ROWS = 9       # rows shown before the list scrolls
 ROW_H = 32           # a row: its 24 px ✕, margins and the 4 px gap
+LIST_GAP = 8         # between a scrolling list and its scroll bar (DESIGN: breathing room)
 
 # one waiting sound: its name, what clicking the name does, what its ✕ does
 Waiting = tuple[str, Callable[[], object], Callable[[], object]]
@@ -73,19 +74,6 @@ class UpNextPopup(QWidget):
         self.setAttribute(Qt.WidgetAttribute.WA_TranslucentBackground)
         outer = QVBoxLayout(self)
         outer.setContentsMargins(0, 0, 0, 0)
-        card = QFrame()
-        card.setObjectName("card")
-        card.setProperty("popup", True)
-        outer.addWidget(card)
-        v = QVBoxLayout(card)
-        v.setContentsMargins(10, 8, 10, 10)
-        v.setSpacing(6)
-        top = QHBoxLayout()
-        top.setSpacing(6)
-        pic = QLabel()
-        pic.setPixmap(icons.pixmap("list", 16, "accent"))
-        title = QLabel(_("Up next"))
-        title.setObjectName("decktitle")
         self.count = QLabel()
         self.count.setObjectName("muted")
         self.clear = QPushButton(_("Clear"))
@@ -95,16 +83,16 @@ class UpNextPopup(QWidget):
         self.clear.clicked.connect(self.close)
         close = icon_button("fold_open", _("Close"), size=14)
         close.clicked.connect(self.close)
-        top.addWidget(pic)
-        top.addWidget(title)
-        top.addWidget(self.count)
-        top.addStretch(1)
-        top.addWidget(self.clear)
-        top.addWidget(close)
-        v.addLayout(top)
+        # the standard card (DESIGN: card recipe): its heading, and 14 px all round
+        card, v = panel.card(_("Up next"), icon="list", beside=self.count,
+                             end=(self.clear, close))
+        card.setProperty("popup", True)
+        outer.addWidget(card)
+        self.card = card
         self.rows = QWidget()
         self.rows_v = QVBoxLayout(self.rows)
-        self.rows_v.setContentsMargins(0, 0, 0, 0)
+        # 8 px between the rows and the scroll bar: a row's ✕ never touches it
+        self.rows_v.setContentsMargins(0, 0, LIST_GAP, 0)
         self.rows_v.setSpacing(4)
         self.list_area = QScrollArea()
         self.list_area.setWidgetResizable(True)
@@ -127,7 +115,7 @@ class UpNextPopup(QWidget):
         a = self._anchor
         win = a.window().width() if a is not None and qt_valid(a) else POPUP_W + 16
         self.setFixedWidth(max(240, min(POPUP_W, win - 16)))   # inside a narrow window
-        name_w = self.width() - 130   # the card's margins, the number, the ✕, a scroll bar
+        name_w = self.width() - 150   # the card's margins, the number, the ✕, a scroll bar
         for i, (text, on_click, on_x) in enumerate(items):
             row = QFrame()
             row.setObjectName("chip")

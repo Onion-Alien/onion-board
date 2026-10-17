@@ -491,6 +491,7 @@ def test_up_next_is_one_chip_whose_list_reaches_every_queued_sound(window, monke
     couldn't be taken out. Now one chip says how many wait; its list has them all,
     whole names, each with its ✕, and Clear."""
     from soundboard.ui.upnext import UpNextChip
+    from uicheck import assert_breathing_room
     w = window
     w.resize(1200, 760)
     w.show()
@@ -503,6 +504,7 @@ def test_up_next_is_one_chip_whose_list_reaches_every_queued_sound(window, monke
     chip.open.click()
     pop = w._up_next_popup
     assert pop.isVisible() and pop.count.text() == "13"
+    assert_breathing_room(pop.card)   # 14 px inside the card, 8 px before the scroll bar
     rows = [pop.rows_v.itemAt(i).widget() for i in range(pop.rows_v.count())]
     rows = [r for r in rows if r is not None]
     assert len(rows) == 13
