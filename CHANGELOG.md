@@ -2,6 +2,14 @@
 
 Changes not released yet are in [changelog.d/](changelog.d/), one file per change.
 
+## 2.6.3 — 2026-10-17
+
+- New installs start with Textured themes (each theme's own pattern on the panels). If
+  you already picked Plain or Textured, that stays.
+- Opening Onion Board at the wrong moment of an update could make the update fail and
+  leave the app unable to start until it was reinstalled. The installer now closes any
+  copy opened meanwhile before it finishes, and the app steps aside while it installs.
+
 ## 2.6.2 — 2026-10-17
 
 - Opening Onion Board while an update is installing no longer shows "Unhandled exception
