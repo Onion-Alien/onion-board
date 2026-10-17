@@ -290,6 +290,24 @@ class _Dot(QWidget):
         p.end()
 
 
+class _Ring(QWidget):
+    """OutputBlock's yellow "muted a long time" ring, drawn over the card (never
+    takes clicks)."""
+
+    def __init__(self, parent: QWidget):
+        super().__init__(parent)
+        self.setAttribute(Qt.WidgetAttribute.WA_TransparentForMouseEvents)
+
+    def paintEvent(self, _e):
+        p = QPainter(self)
+        snap_to_pixels(p)
+        p.setRenderHint(QPainter.RenderHint.Antialiasing)
+        p.setPen(QPen(QColor(theme.T["warn_text"]), 2))
+        p.setBrush(Qt.BrushStyle.NoBrush)
+        p.drawRoundedRect(QRectF(self.rect()).adjusted(1, 1, -1, -1), 14, 14)
+        p.end()
+
+
 class OutputBlock(QFrame):
     """Named output switch and connection help for the expanded rail.
 
@@ -328,6 +346,8 @@ class OutputBlock(QFrame):
                           # centre: on the title's cap-height centre (measured)
     MUTED_LONG_S = 60     # muted this long: a yellow ring round the card and how long
                           # it's been, so a forgotten mute isn't taken for a broken app
+    RING_OUT = 4          # the ring this far outside the card (the shut card is only
+                          # as wide as its switch)
 
     def __init__(self, power: QPushButton, connection: QPushButton,
                  stop: QPushButton | None = None):
@@ -367,6 +387,7 @@ class OutputBlock(QFrame):
         self.switch.toggled.connect(power.setChecked)
         power.toggled.connect(self.switch.setChecked)
         self._muted_at: float | None = None if power.isChecked() else time.monotonic()
+        self._ring: _Ring | None = None
         self._muted_clock = QTimer(self)
         self._muted_clock.setInterval(5000)
         self._muted_clock.timeout.connect(self._muted_tick)
@@ -481,12 +502,12 @@ class OutputBlock(QFrame):
             self._muted_clock.stop()
         else:
             self._muted_clock.start()
-        self.update()
+        self._follow_ring()
 
     def _muted_tick(self):
         self._name(self.power.isChecked())
         self._words()
-        self.update()
+        self._follow_ring()
 
     def muted_for(self) -> str:
         """How long others have heard nothing ("3 min"), once it's past MUTED_LONG_S;
@@ -499,17 +520,40 @@ class OutputBlock(QFrame):
         n = int(s // 60)
         return ngettext("{n} min", "{n} min", n)
 
-    def paintEvent(self, e):
-        super().paintEvent(e)
-        if not self.muted_for():
+    def _follow_ring(self):
+        """The ring round the card while muted_for() says something: a sibling over the
+        card, so it's drawn over the switch, RING_OUT outside the card's edge."""
+        parent = self.parentWidget()
+        if not (self.muted_for() and self.isVisible() and parent is not None):
+            if self._ring is not None:
+                self._ring.hide()
             return
-        p = QPainter(self)
-        snap_to_pixels(p)
-        p.setRenderHint(QPainter.RenderHint.Antialiasing)
-        p.setPen(QPen(QColor(theme.T["warn_text"]), 2))
-        p.setBrush(Qt.BrushStyle.NoBrush)
-        p.drawRoundedRect(QRectF(self.rect()).adjusted(1, 1, -1, -1), 12, 12)
-        p.end()
+        if self._ring is None or self._ring.parentWidget() is not parent:
+            if self._ring is not None:
+                self._ring.deleteLater()
+            self._ring = _Ring(parent)
+        out = self.RING_OUT
+        self._ring.setGeometry(self.geometry().adjusted(-out, -out, out, out)
+                               & parent.rect())
+        self._ring.raise_()
+        self._ring.show()
+        self._ring.update()
+
+    def moveEvent(self, e):
+        super().moveEvent(e)
+        self._follow_ring()
+
+    def resizeEvent(self, e):
+        super().resizeEvent(e)
+        self._follow_ring()
+
+    def showEvent(self, e):
+        super().showEvent(e)
+        self._follow_ring()
+
+    def hideEvent(self, e):
+        super().hideEvent(e)
+        self._follow_ring()
 
     def _glyph(self, size: int = 0) -> QLabel:
         g = QLabel()
