@@ -724,7 +724,9 @@ def show(window: QWidget | None, text: str, kind: str = "", ms: int = TOAST_MS, 
 
 def close(window: QWidget | None, key: str):
     """Take down the card shown with ``key`` on ``window`` (or the dialog in front)."""
-    for host in {w.window() for w in (QApplication.activeModalWidget(), window) if w}:
+    # `window` may already be deleted (an Undo bar whose page closed before its card did)
+    for host in {w.window() for w in (QApplication.activeModalWidget(), window)
+                 if w is not None and shiboken6.isValid(w)}:
         s = host.findChild(_Stack, "toaststack", Qt.FindChildOption.FindDirectChildrenOnly)
         t = s.find("", "", key) if s is not None else None
         if t is not None:
