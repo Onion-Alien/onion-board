@@ -150,7 +150,8 @@ class AppsTab(QWidget):
         self.bun = BunnyWidget(height=130, pad=18, sad=0.6,
                                lines=(_("play something?"), _("so quiet…"),
                                       _("music, please?")),
-                               joy_lines=(_("hehe!"), _("yay!")), pong=True, naps=True)
+                               joy_lines=(_("hehe!"), _("yay!")), pong=True, naps=True,
+                               dances=True)
         ev.addWidget(self.bun, 0, Qt.AlignmentFlag.AlignHCenter)
         self.empty_text = hint_label(_("Nothing is playing sound right now. Start some music, "
                                        "a video or a call and it'll show up here."))

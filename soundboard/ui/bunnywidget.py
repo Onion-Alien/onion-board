@@ -48,6 +48,7 @@ import logging
 import math
 import random
 import time
+import weakref
 
 from PySide6.QtCore import QPointF, QRectF, QSize, Qt, QTimer, Signal
 from PySide6.QtGui import QColor, QFont, QPainter, QPainterPath, QPen
@@ -306,12 +307,18 @@ def paint_note(p: QPainter, n) -> None:
 class BunnyWidget(QWidget):
     clicked = Signal()
     challenge = Signal()   # (pong=True) back with his bat: open the game
+    # the ones made with dances=True: the main window's tick hands each one on screen
+    # what's playing (set_groove), so he dances to any sound or the radio
+    dancers: weakref.WeakSet = weakref.WeakSet()
 
     def __init__(self, prop: str | None = None, height: int = 110, pad: int = 26,
                  celebrate: bool = False, parent=None, *, sad: float = 0.0,
                  lines=(), hope_lines=(), joy_lines=(), pong: bool = False,
-                 naps: bool = False, robot: bool = False, in_background: bool = False):
+                 naps: bool = False, robot: bool = False, in_background: bool = False,
+                 dances: bool = False):
         super().__init__(parent)
+        if dances:
+            BunnyWidget.dancers.add(self)
         self.in_background = in_background   # keeps moving with a game in front (Bun mode)
         self.robot = robot              # Robo-Bun: metal, LEDs, a wrench instead of a hammer
         self.pong = pong
@@ -451,7 +458,7 @@ class BunnyWidget(QWidget):
         if not self.naps or self.building or self._fail_t >= 0 or self._fin_t >= 0:
             return False
         now = time.monotonic()
-        if now < self._woken_until:
+        if now < self._woken_until or self._dance > 0.05:   # (music wakes him)
             return False
         if now - self._hour_at > 5:
             self._hour, self._hour_at = local_hour(), now
@@ -791,7 +798,8 @@ class BunnyWidget(QWidget):
         cross = now < self._cross_until or (self._act_kind == "bat" and self.building)
         self._angry += (float(cross) - self._angry) * min(1.0, dt * (10 if cross else 2))
         shocked = 0 <= self._fail_t < FAIL_DROP   # (staring at what just happened)
-        target = 0.0 if self._hopeful or cheering or cross or shocked else self.sad
+        dancing = self._dance > 0.3   # (a sad Bun cheers up when something plays)
+        target = 0.0 if self._hopeful or cheering or cross or shocked or dancing else self.sad
         rise = 5 if self._fail_t >= FAIL_DROP else 1.5   # the failure: ears drop at once
         self._sad += (target - self._sad) * min(1.0, dt * (8 if target < self._sad else rise))
         if self._sad > 0.3 and now >= self._next_sigh:

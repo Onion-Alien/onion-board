@@ -28,6 +28,7 @@ Per-sound effects are baked in ahead of time instead (soundboard.soundfx).
 """
 from __future__ import annotations
 
+import collections
 import logging
 import threading
 import time
@@ -386,6 +387,9 @@ class Engine(EngineTakes, EngineDevices, SoundCache):
         self.level_mon = 0.0
         self.level_obs = 0.0
         self.level_radio = 0.0
+        # what the radio played lately, chunk by chunk, while the UI wants it (a dancing
+        # mascot: TickControl sets a deque here and empties it each tick)
+        self.radio_tap: collections.deque | None = None
         # anything playing — sounds, the radio, captured programs — wherever it goes
         # (to others or only to your headphones), without your mic: the logo's cue
         self.level_play = 0.0
@@ -465,6 +469,9 @@ class Engine(EngineTakes, EngineDevices, SoundCache):
         a time (the radio's decoding thread), like feed_aux."""
         lvl = peak(x)
         self.level_radio = max(lvl * self.radio_vol, self.level_radio)
+        tap = self.radio_tap
+        if tap is not None:
+            tap.append(np.array(x, np.float32))   # (a copy: the decoder may reuse x)
         if lvl > 0.003:
             self._radio_heard = time.monotonic()
         if self.main_stream is not None:
