@@ -816,8 +816,7 @@ class OutputBlock(QFrame):
         text = self.names()[0 if on else 1]
         self.title.setText(text)
         if hasattr(self, "caption"):
-            long = self.muted_for()
-            self.caption.setText(f"{text}\n{long}" if long else text)
+            self.caption.setText(text)   # (shut: the ring alone, a time read badly there)
         self.switch.setAccessibleName(text)
         icons.set_label_icon(self.mark, "live" if on else "live_off",
                              "accent" if on else "danger_text", size=self.mark.width())

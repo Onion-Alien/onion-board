@@ -1,5 +1,6 @@
 """Muted for over a minute: the On Air card gets a yellow ring and says how long, so a
-forgotten mute isn't taken for a broken app. Live again: both go."""
+forgotten mute isn't taken for a broken app (the time only on the open rail). Live
+again: both go."""
 from PySide6.QtWidgets import QPushButton
 
 from soundboard.ui import sidebar
@@ -22,10 +23,10 @@ def test_long_mute_shows_ring_and_time(qapp, monkeypatch):
     now[0] += 2
     out._muted_tick()
     assert out.muted_for() == "1 min"
-    assert out.caption.text() == "Muted\n1 min"
+    assert out.caption.text() == "Muted"   # shut: the ring alone
     now[0] += 120
     out._muted_tick()
-    assert out.caption.text() == "Muted\n3 min"
+    assert out.muted_for() == "3 min"
     power.setChecked(True)
     assert out.muted_for() == ""
     assert out.caption.text() == "Live"
