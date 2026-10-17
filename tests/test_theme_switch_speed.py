@@ -177,3 +177,24 @@ def test_a_hovered_menu_row_shows_in_every_theme(name):
     t = theme.THEMES[name]
     assert theme._contrast(t["item_hover"], t["card"]) >= 1.6
     assert theme._contrast(t["item_hover"], t["text_hi"]) >= 4.5
+
+
+def test_the_cover_fades_in_instead_of_dimming_in_one_frame(main_window):  # noqa: F811
+    """It goes up as the window is (nothing changes on screen), then the dimming and
+    Bun come in over a few frames; a highlight colour change is a plain blend."""
+    from soundboard.style import cover as kit
+    from soundboard.ui import themecover
+    main_window.show()
+    ks = []
+    real = kit.Cover.repaint
+    kit.Cover.repaint = lambda self: (ks.append(self.k), real(self))[1]
+    try:
+        with themecover.covered(main_window, "Light") as covers:
+            assert len(covers) == 1
+        with themecover.blended(main_window) as plain:
+            assert plain[0].scrim is None and plain[0].mascot is None
+    finally:
+        kit.Cover.repaint = real
+    assert ks[0] == 0.0 and ks[-2] == 1.0          # up first as it is, then faded in
+    assert max(b - a for a, b in zip(ks[:-1], ks[1:-1])) < 0.7   # never one jump
+    assert ks[-1] == 0.0                           # the blend: no dimming at all
