@@ -3653,13 +3653,11 @@
   "A quick how-to the first time you open each tab.": "Krótki poradnik, gdy pierwszy raz otwierasz każdą kartę.",
   "Click it to play it. Each tab shows you a quick how-to like this the first time you open it.": "Kliknij, żeby go odtworzyć. Każda karta pokazuje taki krótki poradnik, gdy otworzysz ją pierwszy raz.",
   "Click one, then talk: you hear yourself in your headphones.": "Kliknij jeden i mów: słyszysz się w słuchawkach.",
-  "Double-click any station to play it. Press Send and your call hears it too.": "Kliknij dwa razy stację, żeby ją włączyć. Naciśnij Wysłać, a usłyszy ją też twoja rozmowa.",
   "Get the free Onion Watch add-on": "Pobierz darmowy dodatek Onion Watch",
   "Hear one, then add it": "Posłuchaj jednego, a potem go dodaj",
   "It watches your game and plays a sound when something shows up, like “YOU DIED”.": "Pilnuje twojej gry i puszcza dźwięk, gdy coś się pojawi, na przykład „YOU DIED”.",
   "Nice, that's your first sound!": "Super, to twój pierwszy dźwięk!",
   "Nice, you've got it!": "Super, ogarniasz!",
-  "Pick a station and listen": "Wybierz stację i słuchaj",
   "Pick a voice": "Wybierz głos",
   "Pick what to watch for on your screen, then switch it on.": "Wybierz, czego pilnować na ekranie, a potem to włącz.",
   "Press play to hear a sound. Add puts it on your board.": "Naciśnij odtwarzanie, żeby usłyszeć dźwięk. Dodaj wrzuca go na twoją tablicę.",
@@ -3681,5 +3679,7 @@
   "Viral": "Viral",
   "What's hot on Myinstants right now, and the sounds people here liked this week": "Co jest teraz na topie w Myinstants i dźwięki, które ludzie tutaj polubili w tym tygodniu",
   "See everything waiting to play": "Pokaż wszystko, co czeka na odtworzenie",
-  "Take everything out of the queue": "Usuń wszystko z kolejki"
+  "Take everything out of the queue": "Usuń wszystko z kolejki",
+  "Click any dot to play that station. Press Send and your call hears it too.": "Kliknij dowolną kropkę, żeby włączyć tę stację. Naciśnij Wysłać, a usłyszy ją też twoja rozmowa.",
+  "Pick a station on the globe": "Wybierz stację na globusie"
 }

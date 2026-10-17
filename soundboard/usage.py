@@ -159,10 +159,10 @@ FEATURES = ("add-files", "youtube", "record", "clip", "clip-editor", "import-boa
             *(f"setup-closed-{k}" for k in ("mic", "headphones", "send", "last")),
             "setup-skipped-send", "setup-finished", "setup-finished-not-sending",
             "tour-shown", "tour-searched", "tour-files", "tour-skipped", "tour-ignored",
-            "tour-added",
-            # a tab's first-visit how-to (ui/tabtours.py): shown, done, or put off
+            "tour-added", "tour-failed",
+            # a tab's first-visit how-to (ui/tabtours.py): shown, done, put off, or an error
             *(f"tour-{t}-{k}" for t in ("radio", "apps", "triggers", "voice", "store")
-              for k in ("shown", "done", "skipped")),
+              for k in ("shown", "done", "skipped", "failed")),
             "starter-sounds",
             # the Triggers tab's Get Onion Watch window: shown, Get clicked, closed
             "watch-prompt-shown", "watch-prompt-get", "watch-prompt-closed",

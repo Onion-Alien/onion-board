@@ -3576,13 +3576,11 @@
   "A quick how-to the first time you open each tab.": "Una guía rápida la primera vez que abres cada pestaña.",
   "Click it to play it. Each tab shows you a quick how-to like this the first time you open it.": "Haz clic para reproducirlo. Cada pestaña te enseña una guía rápida como esta la primera vez que la abres.",
   "Click one, then talk: you hear yourself in your headphones.": "Haz clic en una y luego habla: te oyes en tus auriculares.",
-  "Double-click any station to play it. Press Send and your call hears it too.": "Haz doble clic en una emisora para reproducirla. Pulsa Enviar y tu llamada también la oye.",
   "Get the free Onion Watch add-on": "Consigue el complemento gratis Onion Watch",
   "Hear one, then add it": "Escucha uno y luego añádelo",
   "It watches your game and plays a sound when something shows up, like “YOU DIED”.": "Vigila tu juego y reproduce un sonido cuando aparece algo, como «YOU DIED».",
   "Nice, that's your first sound!": "¡Genial, ese es tu primer sonido!",
   "Nice, you've got it!": "¡Genial, ya lo tienes!",
-  "Pick a station and listen": "Elige una emisora y escucha",
   "Pick a voice": "Elige una voz",
   "Pick what to watch for on your screen, then switch it on.": "Elige qué vigilar en tu pantalla y luego actívalo.",
   "Press play to hear a sound. Add puts it on your board.": "Pulsa reproducir para oír un sonido. Añadir lo pone en tu tablero.",
@@ -3604,5 +3602,7 @@
   "Viral": "Virales",
   "What's hot on Myinstants right now, and the sounds people here liked this week": "Lo más popular en Myinstants ahora mismo y los sonidos que gustaron aquí esta semana",
   "See everything waiting to play": "Ver todo lo que espera para sonar",
-  "Take everything out of the queue": "Quitar todo de la cola"
+  "Take everything out of the queue": "Quitar todo de la cola",
+  "Click any dot to play that station. Press Send and your call hears it too.": "Haz clic en cualquier punto para reproducir esa emisora. Pulsa Enviar y tu llamada también la oye.",
+  "Pick a station on the globe": "Elige una emisora en el globo"
 }

@@ -3499,13 +3499,11 @@
   "A quick how-to the first time you open each tab.": "วิธีใช้สั้นๆ ตอนเปิดแต่ละแท็บครั้งแรก",
   "Click it to play it. Each tab shows you a quick how-to like this the first time you open it.": "คลิกเพื่อเล่น ทุกแท็บจะแสดงวิธีใช้สั้นๆ แบบนี้ตอนที่คุณเปิดครั้งแรก",
   "Click one, then talk: you hear yourself in your headphones.": "คลิกเสียงหนึ่ง แล้วพูดเลย คุณจะได้ยินเสียงตัวเองในหูฟัง",
-  "Double-click any station to play it. Press Send and your call hears it too.": "ดับเบิลคลิกสถานีไหนก็ได้เพื่อเล่น กด ส่ง แล้วคนในสายก็จะได้ยินด้วย",
   "Get the free Onion Watch add-on": "รับส่วนเสริม Onion Watch ฟรี",
   "Hear one, then add it": "ฟังสักเสียง แล้วเพิ่มเลย",
   "It watches your game and plays a sound when something shows up, like “YOU DIED”.": "คอยดูเกมของคุณและเล่นเสียงเมื่อมีอะไรขึ้นมา เช่น “YOU DIED”",
   "Nice, that's your first sound!": "เยี่ยม นี่คือเสียงแรกของคุณ!",
   "Nice, you've got it!": "เยี่ยม คุณเข้าใจแล้ว!",
-  "Pick a station and listen": "เลือกสถานีแล้วฟังเลย",
   "Pick a voice": "เลือกเสียง",
   "Pick what to watch for on your screen, then switch it on.": "เลือกสิ่งที่จะคอยดูบนหน้าจอ แล้วเปิดใช้งาน",
   "Press play to hear a sound. Add puts it on your board.": "กดเล่นเพื่อฟังเสียง กด เพิ่ม เพื่อใส่ลงในบอร์ดของคุณ",
@@ -3527,5 +3525,7 @@
   "Viral": "ไวรัล",
   "What's hot on Myinstants right now, and the sounds people here liked this week": "สิ่งที่กำลังฮิตใน Myinstants ตอนนี้ และเสียงที่คนที่นี่ชอบในสัปดาห์นี้",
   "See everything waiting to play": "ดูทุกอย่างที่รอเล่น",
-  "Take everything out of the queue": "เอาทุกอย่างออกจากคิว"
+  "Take everything out of the queue": "เอาทุกอย่างออกจากคิว",
+  "Click any dot to play that station. Press Send and your call hears it too.": "คลิกจุดไหนก็ได้เพื่อเล่นสถานีนั้น กด ส่ง แล้วคนในสายก็จะได้ยินด้วย",
+  "Pick a station on the globe": "เลือกสถานีบนลูกโลก"
 }

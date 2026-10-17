@@ -9,7 +9,7 @@ from PySide6.QtTest import QTest
 
 from soundboard import __version__, engine, net, usage, winkeys
 from soundboard.library import Config, SoundMeta
-from soundboard.ui import busy, coach, firsttour, tabtours
+from soundboard.ui import coach, firsttour, tabtours
 from soundboard.ui import mainwindow as main
 
 TAB_TOURS = True   # (conftest switches them off everywhere else)
@@ -28,7 +28,6 @@ def window(qapp, app_dir, monkeypatch, counted):
         monkeypatch.setattr(engine.Engine, name, lambda self, n, _k=name: None)
     monkeypatch.setattr(winkeys.Hotkeys, "register", lambda self, m: None)
     monkeypatch.setattr(net, "offline", lambda: False)
-    monkeypatch.setattr(busy, "toast", lambda *a, **k: None)
     Config(stats_version=__version__, setup_done=True, tabs_off=[],
            tips_seen=[firsttour.KEY],
            sounds=[SoundMeta(id="a", name="A", file="a.wav")]).save()
@@ -116,3 +115,54 @@ def test_updating_from_an_older_version_marks_them_seen():
     assert not any(tabtours.key(t) in new.tips_seen for t in tabtours.TABS)
     fresh = Config.from_raw({})   # never set up: a new user
     assert not any(tabtours.key(t) in fresh.tips_seen for t in tabtours.TABS)
+
+
+# ---- something going wrong ends it at once: nobody is held on a thing that doesn't work
+
+def test_a_station_that_wont_play_ends_it(window, qapp, counted):
+    """The radio's own error card (a station off the air) lets them go straight away."""
+    assert open_tab(window, qapp, "radio")
+    window.radio._on_error("Station off the air")
+    assert tabtours._current is None and tabtours.key("radio") in window.cfg.tips_seen
+    assert "tour-radio-failed" in counted
+
+
+def test_an_error_logged_anywhere_ends_it(window, qapp):
+    import logging
+    assert open_tab(window, qapp, "store")
+    logging.getLogger("soundboard.somewhere").error("it broke")
+    assert process_events(qapp, lambda: tabtours._current is None, 2)
+
+
+def test_a_warning_logged_doesnt(window, qapp):
+    import logging
+    assert open_tab(window, qapp, "store")
+    logging.getLogger("soundboard.somewhere").warning("just so you know")
+    process_events(qapp, lambda: False, 0.4)
+    assert tabtours._current is not None
+
+
+def test_a_broken_step_lets_go(window, qapp):
+    """A step whose own test raises: the tour ends, it doesn't keep the window."""
+    assert open_tab(window, qapp, "apps")
+
+    def boom():
+        raise ValueError("bad step")
+    tabtours._current.step.done = boom
+    assert process_events(qapp, lambda: tabtours._current is None, 2)
+
+
+def test_the_radio_one_rings_the_globe(window, qapp):
+    assert open_tab(window, qapp, "radio")
+    tour = tabtours._current
+    flat = window.radio.flat
+    assert flat is not None and flat.isVisible()
+    rings = tour._targets()
+    assert rings and rings[0] == coach.rect_of(window, flat)[0]
+
+
+def test_no_station_list_ends_it(window, qapp):
+    """The globe couldn't get its stations (sad Bun on the map): nothing to pick."""
+    assert open_tab(window, qapp, "radio")
+    window.radio._globe_error = "Can't reach the station list."
+    assert process_events(qapp, lambda: tabtours._current is None, 2)

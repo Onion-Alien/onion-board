@@ -3576,13 +3576,11 @@
   "A quick how-to the first time you open each tab.": "En snabb guide första gången du öppnar varje flik.",
   "Click it to play it. Each tab shows you a quick how-to like this the first time you open it.": "Klicka på det för att spela det. Varje flik visar en snabb guide som den här första gången du öppnar den.",
   "Click one, then talk: you hear yourself in your headphones.": "Klicka på en och prata: du hör dig själv i hörlurarna.",
-  "Double-click any station to play it. Press Send and your call hears it too.": "Dubbelklicka på en station för att spela den. Tryck på Skicka så hör ditt samtal den också.",
   "Get the free Onion Watch add-on": "Skaffa det gratis tillägget Onion Watch",
   "Hear one, then add it": "Lyssna på ett, lägg sedan till det",
   "It watches your game and plays a sound when something shows up, like “YOU DIED”.": "Det håller koll på ditt spel och spelar ett ljud när något dyker upp, som ”YOU DIED”.",
   "Nice, that's your first sound!": "Snyggt, det är ditt första ljud!",
   "Nice, you've got it!": "Snyggt, du har koll!",
-  "Pick a station and listen": "Välj en station och lyssna",
   "Pick a voice": "Välj en röst",
   "Pick what to watch for on your screen, then switch it on.": "Välj vad som ska bevakas på skärmen och slå sedan på det.",
   "Press play to hear a sound. Add puts it on your board.": "Tryck på spela för att höra ett ljud. Lägg till sätter det på din board.",
@@ -3604,5 +3602,7 @@
   "Viral": "Viralt",
   "What's hot on Myinstants right now, and the sounds people here liked this week": "Det som är hett på Myinstants just nu och ljuden som folk här gillade den här veckan",
   "See everything waiting to play": "Se allt som väntar på att spelas",
-  "Take everything out of the queue": "Ta bort allt ur kön"
+  "Take everything out of the queue": "Ta bort allt ur kön",
+  "Click any dot to play that station. Press Send and your call hears it too.": "Klicka på en prick för att spela stationen. Tryck på Skicka så hör ditt samtal den också.",
+  "Pick a station on the globe": "Välj en station på jordgloben"
 }

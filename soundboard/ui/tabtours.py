@@ -1,7 +1,9 @@
 """Each tab's quick how-to, the first time it's opened: the window dims, the thing to use
 sits in the yellow ring, and one card (coach.py) says what to do. It stays until they've
-done it (played a station, sent a program, picked a voice…) or pressed its "Not now",
-which shows after a moment; either way it never comes back (Config.tips_seen). One
+done it (played a station on the globe, sent a program, picked a voice…) or pressed
+its "Not now", which shows after a moment, or something went wrong (a station that
+won't play: it ends at once, coach.py); either way it never comes back
+(Config.tips_seen). One
 step each, a few seconds long.
 
 Radio, Apps, Triggers, Voice and Store have one; Sounds has the first-run tour
@@ -122,11 +124,16 @@ def _inside(*parents) -> Callable[[QWidget], bool]:
 
 
 def _radio(win, tab) -> list[coach.Step]:
+    def globe() -> list[QRect]:
+        """The globe (the map of stations), else the station list beside it."""
+        return (coach.rect_of(win, getattr(tab, "flat", None))
+                or coach.rect_of(win, getattr(tab, "station_panel", None)))
     return [coach.Step(
-        _("Pick a station and listen"),
-        _("Double-click any station to play it. Press Send and your call hears it too."),
-        target=lambda: coach.rect_of(win, getattr(tab, "station_panel", None)),
-        done=tab.is_active, skip=_("Not now"), allow=_inside(getattr(tab, "btn_play", None)))]
+        _("Pick a station on the globe"),
+        _("Click any dot to play that station. Press Send and your call hears it too."),
+        target=globe, done=tab.is_active, skip=_("Not now"),
+        failed=lambda: bool(getattr(tab, "_globe_error", "")),   # no stations to pick
+        allow=_inside(getattr(tab, "station_panel", None), getattr(tab, "btn_play", None)))]
 
 
 def _apps(win, tab) -> list[coach.Step]:
@@ -226,10 +233,12 @@ class TabTour(coach.Tour):
             _current = None
         if how == "left":
             return   # not seen: next time
+        # (failed: something went wrong, a station that won't play: it doesn't come back
+        # to hold them on it again)
         cfg = self.win.cfg
         if key(self.tab) not in cfg.tips_seen:
             cfg.tips_seen = [*cfg.tips_seen, key(self.tab)]
             self.win._save_later()
-        usage.used(f"tour-{self.tab}-{'done' if how == 'done' else 'skipped'}")
+        usage.used(f"tour-{self.tab}-{how}")
         if how == "done":
             busy.toast(self.win, _("Nice, you've got it!"), "ok")

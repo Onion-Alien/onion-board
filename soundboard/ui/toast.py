@@ -30,6 +30,7 @@ game. Animations are skipped when Windows' "Animation effects" setting is off.
 """
 from __future__ import annotations
 
+import logging
 import re
 import sys
 from collections.abc import Callable
@@ -48,7 +49,12 @@ from soundboard.i18n import _
 from soundboard.ui import icons
 from soundboard.ui.pixels import snap_to_pixels
 
+log = logging.getLogger(__name__)
+
 TOAST_MS = 4000
+# called with the kind when an "error" or "warn" card shows (coach.py: a tutorial that's
+# up ends at once instead of holding someone on a thing that doesn't work)
+PROBLEM_HOOKS: list[Callable[[str], None]] = []
 BUSY_MS = 5 * 60 * 1000   # a "busy" card nobody finished goes eventually
 MAX_SHOWN = 3
 UNDER = 28                # where the text starts: past the icon (18) and a gap (10)
@@ -684,6 +690,12 @@ def show(window: QWidget | None, text: str, kind: str = "", ms: int = TOAST_MS, 
         kind = kind or "ok"
     if kind == "" and text.rstrip().endswith("…"):
         kind = "busy"
+    if kind in ("error", "warn"):
+        for hook in list(PROBLEM_HOOKS):
+            try:
+                hook(kind)
+            except Exception:  # noqa: BLE001 - a hook never stops the card
+                log.exception("toast problem hook")
     seen = getattr(getattr(host, "bunctl", None), "toast_seen", None)   # Bun says it too
     if callable(seen):
         seen(text, kind)

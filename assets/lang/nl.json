@@ -3576,13 +3576,11 @@
   "A quick how-to the first time you open each tab.": "Een korte uitleg de eerste keer dat je elk tabblad opent.",
   "Click it to play it. Each tab shows you a quick how-to like this the first time you open it.": "Klik erop om hem af te spelen. Elk tabblad laat je zo'n korte uitleg zien de eerste keer dat je het opent.",
   "Click one, then talk: you hear yourself in your headphones.": "Klik er een aan en praat: je hoort jezelf in je koptelefoon.",
-  "Double-click any station to play it. Press Send and your call hears it too.": "Dubbelklik op een zender om hem af te spelen. Druk op Versturen en je gesprek hoort hem ook.",
   "Get the free Onion Watch add-on": "Haal de gratis add-on Onion Watch",
   "Hear one, then add it": "Luister er een, en voeg hem toe",
   "It watches your game and plays a sound when something shows up, like “YOU DIED”.": "Hij houdt je game in de gaten en speelt een geluid als er iets verschijnt, zoals ‘YOU DIED’.",
   "Nice, that's your first sound!": "Top, dat is je eerste geluid!",
   "Nice, you've got it!": "Top, je snapt het!",
-  "Pick a station and listen": "Kies een zender en luister",
   "Pick a voice": "Kies een stem",
   "Pick what to watch for on your screen, then switch it on.": "Kies waar op je scherm op gelet moet worden en zet het aan.",
   "Press play to hear a sound. Add puts it on your board.": "Druk op afspelen om een geluid te horen. Toevoegen zet het op je bord.",
@@ -3604,5 +3602,7 @@
   "Viral": "Viraal",
   "What's hot on Myinstants right now, and the sounds people here liked this week": "Wat nu populair is op Myinstants, en de geluiden die mensen hier deze week leuk vonden",
   "See everything waiting to play": "Alles zien wat nog moet afspelen",
-  "Take everything out of the queue": "Alles uit de wachtrij halen"
+  "Take everything out of the queue": "Alles uit de wachtrij halen",
+  "Click any dot to play that station. Press Send and your call hears it too.": "Klik op een stip om die zender af te spelen. Druk op Versturen en je gesprek hoort hem ook.",
+  "Pick a station on the globe": "Kies een zender op de wereldbol"
 }

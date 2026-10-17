@@ -14,6 +14,11 @@ outside them. The overlay never takes a click itself (WA_TransparentForMouseEven
 watches the app's input (eventFilter) and lets through what lands in a ring, the card,
 or another window (a menu, a file picker, a dialog the ring's button opened).
 
+Something going wrong ends it at once ("failed"), so nobody is held on a thing that
+doesn't work (a station that won't play, a search that can't get through): an "error"
+or "warn" card (toast.PROBLEM_HOOKS), an error logged anywhere in the app, or a step's
+own `failed()`.
+
 While the window isn't showing the tour's page (minimised, mini mode, Settings, a
 dialog in front) the tour hides and waits; `leave()` says when it's gone for good.
 """
@@ -32,6 +37,7 @@ from PySide6.QtWidgets import (QApplication, QFrame, QGraphicsDropShadowEffect, 
                                QLabel, QPushButton, QVBoxLayout, QWidget)
 
 from soundboard import theme
+from soundboard.ui import toast
 from soundboard.ui.bunnywidget import BunnyWidget
 
 log = logging.getLogger(__name__)
@@ -50,6 +56,34 @@ CARD_W = 360         # the card's width at most (less in a small window)
 EDGE = 12            # the card keeps this far in from the window's edges
 GAP = 16             # between the card and what it points at (its arrow spans it)
 ARROW = 9            # the arrow's half width at the card's edge
+
+_running: list[Tour] = []
+
+
+def abort(_kind: str = ""):
+    """Something went wrong: every tour that's up ends now."""
+    for t in list(_running):
+        t.end("failed")
+
+
+toast.PROBLEM_HOOKS.append(abort)
+
+
+class _Errors(logging.Handler):
+    """An error logged anywhere while a tour is up (any thread): the tour's next tick
+    ends it. Only a flag here: Qt isn't touched off the UI thread."""
+
+    def __init__(self):
+        super().__init__(logging.ERROR)
+        self.seen = False
+
+    def emit(self, record):
+        if not record.name.startswith(__name__):   # (its own log lines aren't news)
+            self.seen = True
+
+
+_errors = _Errors()
+
 
 CARD_STYLE = """
 QFrame#coachcard {{ background:{panel}; border:1px solid {border};
@@ -73,6 +107,7 @@ class Step:
     done: Callable[[], bool] | None = None
     button: str = ""
     skip: str = ""
+    failed: Callable[[], bool] | None = None   # polled; true = it can't work: the tour ends
     enter: Callable[[], None] | None = None
     allow: Callable[[QWidget], bool] | None = None
     bun: str | None = "star"
@@ -230,6 +265,10 @@ class Tour(QWidget):
         self.card = Card(win, sum(1 for s in steps if s.blocks))
         self.card.btn_go.clicked.connect(self._pressed_go)
         self.card.btn_skip.clicked.connect(lambda: self.end("skipped"))
+        if not _running:
+            _errors.seen = False
+            logging.getLogger().addHandler(_errors)
+        _running.append(self)
         self.timer = QTimer(self)
         self.timer.timeout.connect(self._tick)
         self.timer.start(TICK_MS)
@@ -252,7 +291,7 @@ class Tour(QWidget):
         return False
 
     def finished(self, how: str):
-        """Over: "done", "skipped" or "left"."""
+        """Over: "done", "skipped", "failed" (something went wrong) or "left"."""
 
     def entered(self, step: Step):
         """A step just showed."""
@@ -297,6 +336,10 @@ class Tour(QWidget):
         if self._ended:
             return
         self._ended = True
+        if self in _running:
+            _running.remove(self)
+        if not _running:
+            logging.getLogger().removeHandler(_errors)
         self.timer.stop()
         app = QApplication.instance()
         if app is not None:
@@ -323,6 +366,10 @@ class Tour(QWidget):
             if self.leave():
                 self.end("left")
                 return
+            s = self.step
+            if _errors.seen or (s is not None and s.failed is not None and s.failed()):
+                self.end("failed")
+                return
             show = self.showing()
             if show == self._hidden:   # flipped
                 self._hidden = not show
@@ -339,7 +386,7 @@ class Tour(QWidget):
             self.end("left")
         except Exception:  # noqa: BLE001 - a bad step never traps anyone
             log.exception("tour: tick")
-            self.end("left")
+            self.end("failed")
 
     # ------------------------------------------------------------------ input
     def eventFilter(self, obj, ev):   # noqa: N802 - Qt
@@ -347,8 +394,9 @@ class Tour(QWidget):
         # it can free another class's override meanwhile, AGENT-RULES)
         try:
             return self._input(obj, ev)
-        except Exception:  # noqa: BLE001
+        except Exception:  # noqa: BLE001 - a broken tour lets go at once
             log.exception("tour: input")
+            QTimer.singleShot(0, self, lambda: self.end("failed"))
             return False
 
     _MOUSE = (QEvent.Type.MouseButtonPress, QEvent.Type.MouseButtonRelease,
@@ -511,6 +559,7 @@ class Tour(QWidget):
             p.end()
         except Exception:  # noqa: BLE001 - see eventFilter
             log.exception("tour: paint")
+            QTimer.singleShot(0, self, lambda: self.end("failed"))
 
     def _ring(self, p: QPainter, r: QRectF, breath: float, flash: bool,
               colour: QColor = RING, width: float = 3):

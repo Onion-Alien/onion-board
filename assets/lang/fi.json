@@ -3576,13 +3576,11 @@
   "A quick how-to the first time you open each tab.": "Pikaohje, kun avaat välilehden ensimmäistä kertaa.",
   "Click it to play it. Each tab shows you a quick how-to like this the first time you open it.": "Napsauta sitä, niin se soi. Jokainen välilehti näyttää tällaisen pikaohjeen, kun avaat sen ensimmäistä kertaa.",
   "Click one, then talk: you hear yourself in your headphones.": "Napsauta yhtä ja puhu: kuulet itsesi kuulokkeista.",
-  "Double-click any station to play it. Press Send and your call hears it too.": "Kaksoisnapsauta asemaa, niin se soi. Paina Lähetä, niin puhelusikin kuulee sen.",
   "Get the free Onion Watch add-on": "Hanki ilmainen Onion Watch -lisäosa",
   "Hear one, then add it": "Kuuntele yksi ja lisää se sitten",
   "It watches your game and plays a sound when something shows up, like “YOU DIED”.": "Se tarkkailee peliäsi ja soittaa äänen, kun jotain ilmestyy, kuten ”YOU DIED”.",
   "Nice, that's your first sound!": "Hienoa, tuo on ensimmäinen äänesi!",
   "Nice, you've got it!": "Hienoa, osaat sen jo!",
-  "Pick a station and listen": "Valitse asema ja kuuntele",
   "Pick a voice": "Valitse ääni",
   "Pick what to watch for on your screen, then switch it on.": "Valitse, mitä näytöltäsi tarkkaillaan, ja kytke se sitten päälle.",
   "Press play to hear a sound. Add puts it on your board.": "Paina toistoa kuullaksesi äänen. Lisää laittaa sen taulullesi.",
@@ -3604,5 +3602,7 @@
   "Viral": "Viraalit",
   "What's hot on Myinstants right now, and the sounds people here liked this week": "Mikä on suosittua Myinstantsissa juuri nyt ja äänet, joista täällä pidettiin tällä viikolla",
   "See everything waiting to play": "Näytä kaikki toistoa odottavat",
-  "Take everything out of the queue": "Poista kaikki jonosta"
+  "Take everything out of the queue": "Poista kaikki jonosta",
+  "Click any dot to play that station. Press Send and your call hears it too.": "Napsauta mitä tahansa pistettä, niin asema soi. Paina Lähetä, niin puhelusikin kuulee sen.",
+  "Pick a station on the globe": "Valitse asema maapallolta"
 }

@@ -205,11 +205,13 @@ account or anything else about you.
     `setup-finished-not-sending`), the Setup tab's *Step-by-step guide*
     (`used/setup-guide-opened`);
   - Bun's first-run tour of the empty board shown, searched from, a first sound added
-    (`tour-files` in the version for Offline mode), or put off (`used/tour-shown`,
-    `tour-searched`, `tour-added`, `tour-files`, `tour-skipped`; `tour-ignored` from
+    (`tour-files` in the version for Offline mode), put off, or ended by an error
+    (`used/tour-shown`, `tour-searched`, `tour-added`, `tour-files`, `tour-skipped`,
+    `tour-failed`; `tour-ignored` from
     older versions; never what was searched);
-  - a tab's quick how-to the first time it's opened, shown, done or put off
-    (`used/tour-radio-shown`, `tour-radio-done`, `tour-radio-skipped`, the same for
+  - a tab's quick how-to the first time it's opened, shown, done, put off or ended by
+    an error (`used/tour-radio-shown`, `tour-radio-done`, `tour-radio-skipped`,
+    `tour-radio-failed`, the same for
     `apps`, `triggers`, `voice` and `store`);
   - sounds from the web: the site (`used/dl-youtube`, `dl-tiktok`, `dl-soundcloud`,
     `dl-instagram`, `dl-x`, `dl-reddit`, `dl-twitch`, `dl-myinstants` or `dl-other`), a

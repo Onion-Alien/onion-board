@@ -3576,13 +3576,11 @@
   "A quick how-to the first time you open each tab.": "Um guia rápido da primeira vez que abres cada separador.",
   "Click it to play it. Each tab shows you a quick how-to like this the first time you open it.": "Clica nele para o tocar. Cada separador mostra-te um guia rápido como este da primeira vez que o abres.",
   "Click one, then talk: you hear yourself in your headphones.": "Clica numa e fala: ouves-te nos teus auscultadores.",
-  "Double-click any station to play it. Press Send and your call hears it too.": "Faz duplo clique numa estação para a tocar. Carrega em Enviar e a tua chamada também a ouve.",
   "Get the free Onion Watch add-on": "Obtém o suplemento gratuito Onion Watch",
   "Hear one, then add it": "Ouve um e depois adiciona-o",
   "It watches your game and plays a sound when something shows up, like “YOU DIED”.": "Vigia o teu jogo e toca um som quando aparece algo, como «YOU DIED».",
   "Nice, that's your first sound!": "Boa, é o teu primeiro som!",
   "Nice, you've got it!": "Boa, já percebeste!",
-  "Pick a station and listen": "Escolhe uma estação e ouve",
   "Pick a voice": "Escolhe uma voz",
   "Pick what to watch for on your screen, then switch it on.": "Escolhe o que vigiar no ecrã e depois liga-o.",
   "Press play to hear a sound. Add puts it on your board.": "Carrega em reproduzir para ouvir um som. Adicionar põe-no no teu painel.",
@@ -3604,5 +3602,7 @@
   "Viral": "Virais",
   "What's hot on Myinstants right now, and the sounds people here liked this week": "O que está a dar no Myinstants neste momento e os sons de que as pessoas aqui gostaram esta semana",
   "See everything waiting to play": "Ver tudo o que espera para tocar",
-  "Take everything out of the queue": "Tirar tudo da fila"
+  "Take everything out of the queue": "Tirar tudo da fila",
+  "Click any dot to play that station. Press Send and your call hears it too.": "Clica em qualquer ponto para tocar essa estação. Carrega em Enviar e a tua chamada também a ouve.",
+  "Pick a station on the globe": "Escolhe uma estação no globo"
 }

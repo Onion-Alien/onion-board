@@ -3499,13 +3499,11 @@
   "A quick how-to the first time you open each tab.": "탭을 처음 열 때마다 짧은 사용법을 보여 줍니다.",
   "Click it to play it. Each tab shows you a quick how-to like this the first time you open it.": "클릭하면 재생됩니다. 각 탭을 처음 열면 이런 짧은 사용법이 나옵니다.",
   "Click one, then talk: you hear yourself in your headphones.": "하나를 클릭하고 말해 보세요. 헤드폰으로 내 목소리가 들립니다.",
-  "Double-click any station to play it. Press Send and your call hears it too.": "방송국을 더블클릭하면 재생됩니다. 보내다를 누르면 통화 상대도 들을 수 있어요.",
   "Get the free Onion Watch add-on": "무료 애드온 Onion Watch 받기",
   "Hear one, then add it": "하나 들어 보고 추가하세요",
   "It watches your game and plays a sound when something shows up, like “YOU DIED”.": "게임을 지켜보다가 “YOU DIED” 같은 게 뜨면 소리를 재생합니다.",
   "Nice, that's your first sound!": "좋아요, 첫 사운드예요!",
   "Nice, you've got it!": "좋아요, 이제 할 줄 아네요!",
-  "Pick a station and listen": "방송국을 골라 들어 보세요",
   "Pick a voice": "목소리를 고르세요",
   "Pick what to watch for on your screen, then switch it on.": "화면에서 지켜볼 것을 고르고 켜세요.",
   "Press play to hear a sound. Add puts it on your board.": "재생을 누르면 소리를 들을 수 있어요. 추가를 누르면 보드에 들어갑니다.",
@@ -3527,5 +3525,7 @@
   "Viral": "바이럴",
   "What's hot on Myinstants right now, and the sounds people here liked this week": "지금 Myinstants에서 뜨는 것과 이번 주 여기서 사람들이 좋아한 사운드",
   "See everything waiting to play": "재생 대기 중인 항목 모두 보기",
-  "Take everything out of the queue": "대기열에서 모두 빼기"
+  "Take everything out of the queue": "대기열에서 모두 빼기",
+  "Click any dot to play that station. Press Send and your call hears it too.": "점을 클릭하면 그 방송국이 재생됩니다. 보내다를 누르면 통화 상대도 들을 수 있어요.",
+  "Pick a station on the globe": "지구본에서 방송국을 고르세요"
 }

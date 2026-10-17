@@ -3499,13 +3499,11 @@
   "A quick how-to the first time you open each tab.": "Hướng dẫn nhanh lần đầu bạn mở mỗi thẻ.",
   "Click it to play it. Each tab shows you a quick how-to like this the first time you open it.": "Bấm vào để phát. Mỗi thẻ sẽ hiện một hướng dẫn nhanh như thế này lần đầu bạn mở nó.",
   "Click one, then talk: you hear yourself in your headphones.": "Bấm vào một giọng rồi nói: bạn nghe chính mình trong tai nghe.",
-  "Double-click any station to play it. Press Send and your call hears it too.": "Bấm đúp vào một đài để phát. Nhấn Gửi để cuộc gọi của bạn cũng nghe thấy.",
   "Get the free Onion Watch add-on": "Tải tiện ích miễn phí Onion Watch",
   "Hear one, then add it": "Nghe thử một cái rồi thêm vào",
   "It watches your game and plays a sound when something shows up, like “YOU DIED”.": "Nó theo dõi game của bạn và phát âm thanh khi có gì đó hiện lên, như “YOU DIED”.",
   "Nice, that's your first sound!": "Tuyệt, đó là âm thanh đầu tiên của bạn!",
   "Nice, you've got it!": "Tuyệt, bạn làm được rồi!",
-  "Pick a station and listen": "Chọn một đài và nghe",
   "Pick a voice": "Chọn một giọng",
   "Pick what to watch for on your screen, then switch it on.": "Chọn thứ cần theo dõi trên màn hình, rồi bật lên.",
   "Press play to hear a sound. Add puts it on your board.": "Nhấn phát để nghe âm thanh. Thêm sẽ đưa nó lên bảng của bạn.",
@@ -3527,5 +3525,7 @@
   "Viral": "Lan truyền",
   "What's hot on Myinstants right now, and the sounds people here liked this week": "Những gì đang hot trên Myinstants lúc này, và âm thanh mọi người ở đây thích tuần này",
   "See everything waiting to play": "Xem mọi thứ đang chờ phát",
-  "Take everything out of the queue": "Bỏ hết khỏi hàng đợi"
+  "Take everything out of the queue": "Bỏ hết khỏi hàng đợi",
+  "Click any dot to play that station. Press Send and your call hears it too.": "Bấm vào chấm bất kỳ để phát đài đó. Nhấn Gửi để cuộc gọi của bạn cũng nghe thấy.",
+  "Pick a station on the globe": "Chọn một đài trên quả địa cầu"
 }

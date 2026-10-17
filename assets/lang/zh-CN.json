@@ -3499,13 +3499,11 @@
   "A quick how-to the first time you open each tab.": "第一次打开每个标签页时给你一个快速教程。",
   "Click it to play it. Each tab shows you a quick how-to like this the first time you open it.": "点击即可播放。每个标签页第一次打开时都会给你一个这样的快速教程。",
   "Click one, then talk: you hear yourself in your headphones.": "点一个，然后说话：你会在耳机里听到自己。",
-  "Double-click any station to play it. Press Send and your call hears it too.": "双击任意电台即可播放。按发送，通话里的人也能听到。",
   "Get the free Onion Watch add-on": "获取免费的 Onion Watch 插件",
   "Hear one, then add it": "先听一个，再添加",
   "It watches your game and plays a sound when something shows up, like “YOU DIED”.": "它会盯着你的游戏，出现“YOU DIED”之类的画面时播放声音。",
   "Nice, that's your first sound!": "太好了，这是你的第一个声音！",
   "Nice, you've got it!": "太好了，你学会了！",
-  "Pick a station and listen": "选个电台听听",
   "Pick a voice": "选个声音",
   "Pick what to watch for on your screen, then switch it on.": "选好要在屏幕上盯着什么，然后打开它。",
   "Press play to hear a sound. Add puts it on your board.": "按播放可以试听。添加会把它放到你的面板上。",
@@ -3527,5 +3525,7 @@
   "Viral": "爆火",
   "What's hot on Myinstants right now, and the sounds people here liked this week": "Myinstants 上现在正火的，以及这周这里大家喜欢的音效",
   "See everything waiting to play": "查看所有等待播放的内容",
-  "Take everything out of the queue": "清空队列"
+  "Take everything out of the queue": "清空队列",
+  "Click any dot to play that station. Press Send and your call hears it too.": "点击任意一个点即可播放该电台。按发送，通话里的人也能听到。",
+  "Pick a station on the globe": "在地球上选个电台"
 }

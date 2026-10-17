@@ -3576,13 +3576,11 @@
   "A quick how-to the first time you open each tab.": "En rask veiledning første gang du åpner hver fane.",
   "Click it to play it. Each tab shows you a quick how-to like this the first time you open it.": "Klikk på den for å spille den av. Hver fane viser deg en rask veiledning som denne første gang du åpner den.",
   "Click one, then talk: you hear yourself in your headphones.": "Klikk på en, og snakk: du hører deg selv i hodetelefonene.",
-  "Double-click any station to play it. Press Send and your call hears it too.": "Dobbeltklikk på en stasjon for å spille den. Trykk på Sende, så hører samtalen din den også.",
   "Get the free Onion Watch add-on": "Hent det gratis tillegget Onion Watch",
   "Hear one, then add it": "Hør på en, og legg den til",
   "It watches your game and plays a sound when something shows up, like “YOU DIED”.": "Den følger med på spillet ditt og spiller en lyd når noe dukker opp, som «YOU DIED».",
   "Nice, that's your first sound!": "Topp, det er din første lyd!",
   "Nice, you've got it!": "Topp, du har skjønt det!",
-  "Pick a station and listen": "Velg en stasjon og lytt",
   "Pick a voice": "Velg en stemme",
   "Pick what to watch for on your screen, then switch it on.": "Velg hva som skal følges med på skjermen, og slå det på.",
   "Press play to hear a sound. Add puts it on your board.": "Trykk på spill av for å høre en lyd. Legg til setter den på brettet ditt.",
@@ -3604,5 +3602,7 @@
   "Viral": "Viralt",
   "What's hot on Myinstants right now, and the sounds people here liked this week": "Det som er populært på Myinstants akkurat nå, og lydene folk her likte denne uka",
   "See everything waiting to play": "Se alt som venter på å spilles",
-  "Take everything out of the queue": "Ta alt ut av køen"
+  "Take everything out of the queue": "Ta alt ut av køen",
+  "Click any dot to play that station. Press Send and your call hears it too.": "Klikk på en prikk for å spille stasjonen. Trykk på Sende, så hører samtalen din den også.",
+  "Pick a station on the globe": "Velg en stasjon på kloden"
 }

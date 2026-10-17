@@ -791,6 +791,7 @@ class SearchResults(RoundedFrame):
         self.trending = False   # Myinstants' trending sounds (show_trending), not a search
         self.source = "youtube"
         self._gen = 0
+        self.failed = False   # the last search came back with an error (firsttour.py)
         self._running: tuple[str, str] | None = None   # (query, site) still being searched
         self._asked = PAGE      # hits asked for so far (Show more asks for the next PAGE)
         self._rows: list[ResultRow] = []
@@ -956,6 +957,7 @@ class SearchResults(RoundedFrame):
         if not direct and self._running == (query, self.source) and not self.isHidden():
             return True   # Enter spammed: the same search is still on its way
         self._running = (query, self.source)
+        self.failed = False
         self.query = query
         self.link = ""
         self._set_trending(False)
@@ -1193,6 +1195,7 @@ class SearchResults(RoundedFrame):
         self._loading(False)
         self.more_btn.hide()
         q = html.escape(self.query)
+        self.failed = bool(err)
         if err:
             red = theme.status("error")
             if self.link:

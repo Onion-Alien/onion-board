@@ -3576,13 +3576,11 @@
   "A quick how-to the first time you open each tab.": "Gyors útmutató, amikor először nyitsz meg egy lapot.",
   "Click it to play it. Each tab shows you a quick how-to like this the first time you open it.": "Kattints rá a lejátszáshoz. Minden lap ilyen gyors útmutatót mutat, amikor először megnyitod.",
   "Click one, then talk: you hear yourself in your headphones.": "Kattints az egyikre, aztán beszélj: hallod magad a fejhallgatódban.",
-  "Double-click any station to play it. Press Send and your call hears it too.": "Kattints duplán egy állomásra a lejátszáshoz. Nyomd meg az Elküld gombot, és a hívásod is hallja.",
   "Get the free Onion Watch add-on": "Szerezd meg az ingyenes Onion Watch bővítményt",
   "Hear one, then add it": "Hallgass meg egyet, aztán add hozzá",
   "It watches your game and plays a sound when something shows up, like “YOU DIED”.": "Figyeli a játékodat, és hangot játszik le, ha valami megjelenik, például „YOU DIED”.",
   "Nice, that's your first sound!": "Szuper, ez az első hangod!",
   "Nice, you've got it!": "Szuper, megy ez neked!",
-  "Pick a station and listen": "Válassz egy állomást és hallgasd",
   "Pick a voice": "Válassz egy hangot",
   "Pick what to watch for on your screen, then switch it on.": "Válaszd ki, mit figyeljen a képernyődön, aztán kapcsold be.",
   "Press play to hear a sound. Add puts it on your board.": "Nyomd meg a lejátszást egy hang meghallgatásához. A Hozzáadás a táblára teszi.",
@@ -3604,5 +3602,7 @@
   "Viral": "Virális",
   "What's hot on Myinstants right now, and the sounds people here liked this week": "Ami most népszerű a Myinstantson, és a hangok, amik itt tetszettek az embereknek ezen a héten",
   "See everything waiting to play": "Minden lejátszásra váró megjelenítése",
-  "Take everything out of the queue": "Mindent kivesz a sorból"
+  "Take everything out of the queue": "Mindent kivesz a sorból",
+  "Click any dot to play that station. Press Send and your call hears it too.": "Kattints bármelyik pontra, és szól az állomás. Nyomd meg az Elküld gombot, és a hívásod is hallja.",
+  "Pick a station on the globe": "Válassz egy állomást a földgömbön"
 }

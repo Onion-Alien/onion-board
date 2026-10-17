@@ -248,3 +248,18 @@ def test_the_starter_sounds_ship_small_and_come_once(window, monkeypatch, added)
     assert {e.tags[0] for e in got[0][1].values()} == {"Starter"}   # a tab of their own
     assert starter.KEY in window.cfg.tips_seen
     assert not starter.add_to(window) and len(got) == 1   # once only
+
+
+def test_a_search_that_fails_ends_it(window, qapp, counted, added):
+    """A search that can't get through: it lets them go (and the board isn't bare)."""
+    to_search(window)
+    window.ytresults.failed = True
+    assert process_events(qapp, lambda: firsttour._current is None, 2)
+    assert "tour-failed" in counted and added == [window]
+
+
+def test_an_error_card_ends_it(window, counted):
+    from soundboard.ui import busy
+    firsttour.start(window)
+    busy.toast(window, "Couldn't do the thing", "error")
+    assert firsttour._current is None and "tour-failed" in counted

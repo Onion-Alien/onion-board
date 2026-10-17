@@ -15,7 +15,10 @@ It can't be clicked away: a click outside the ring and the card does nothing unt
 search (or Add) step, whose quiet "Not now" shows after a moment (coach.SKIP_MS). Once
 only (Config.tips_seen); never with tutorials switched off (Config.tutorials_on).
 
-When the tour ends before they added anything (put off, or the window went) and the
+Anything going wrong (a search that can't get through, an error card, an error logged)
+ends it at once (coach.py): it never holds anyone on something that doesn't work.
+
+When the tour ends before they added anything (put off, failed, or the window went) and the
 board is still empty, a few starter sounds are added by themselves (soundboard/starter.py):
 the board never stays a bare page for someone who skipped it.
 """
@@ -109,12 +112,14 @@ class Tour(coach.Tour):
                     target=lambda: coach.rect_of(w, w.search),
                     done=lambda: bool(w.cfg.sounds) or self._results_up(),
                     skip=_("Not now"), enter=self._focus_search,
+                    failed=lambda: w.ytresults.failed,
                     allow=self._in_search, extra={"name": "search"}),
                 coach.Step(
                     _("Pick one, you'll love it!"),
                     _("Play to hear it, Add to keep it on your board."),
                     target=self._first_result, done=lambda: bool(w.cfg.sounds),
                     skip=_("Not now"), allow=self._in_results,
+                    failed=lambda: w.ytresults.failed,
                     enter=self._searched,
                     extra={"name": "results"}),
             ]
@@ -157,6 +162,8 @@ class Tour(coach.Tour):
             pass
         if how == "skipped" and not self.added:
             usage.used("tour-skipped")
+        elif how == "failed" and not self.added:
+            usage.used("tour-failed")
         try:
             empty = not self.win.cfg.sounds
         except RuntimeError:
