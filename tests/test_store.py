@@ -227,6 +227,68 @@ def test_server_errors_mean_the_store_is_down(monkeypatch):
     assert not isinstance(answer(404, "not found"), store.StoreDown)
 
 
+@pytest.fixture(autouse=True)
+def _store_up():
+    store._failing.clear()   # (a 500 in one test would grey Share out in the next)
+    yield
+    store._failing.clear()
+
+
+def test_a_500_turns_sharing_off_until_that_call_works(monkeypatch):
+    import urllib.error
+    ok = {"/v1/categories": False}
+
+    class Answer(io.BytesIO):
+        def __enter__(self):
+            return self
+
+        def __exit__(self, *_a):
+            return False
+
+    def urlopen(req, timeout=0, feature=""):
+        path = req.full_url.removeprefix(store.BASE).split("?")[0]
+        if not ok.get(path, True):
+            raise urllib.error.HTTPError("u", 500, "x", {}, io.BytesIO(b'{"error": "server"}'))
+        return Answer(b'{"sounds": [], "more": false}')
+    monkeypatch.setattr(net, "urlopen", urlopen)
+    assert not store.is_down()
+    with pytest.raises(store.StoreDown):
+        store._request("GET", "/v1/categories")
+    assert store.is_down()
+    store._request("GET", "/v1/sounds?sort=top")   # another call working isn't enough
+    assert store.is_down()
+    ok["/v1/categories"] = True
+    store._request("GET", "/v1/categories")
+    assert not store.is_down()
+
+
+def test_share_is_greyed_out_while_the_store_is_down(qapp, fake, monkeypatch):
+    plain = store._request
+
+    def broken(method, path, *a, **kw):
+        if path == "/v1/categories":
+            store._failing.add(path)
+            raise store.StoreDown("down")
+        return plain(method, path, *a, **kw)
+    monkeypatch.setattr(store, "_request", broken)
+    t = _tab(qapp, [], [])
+    assert _wait(qapp, lambda: len(t._rows) == 2 and not t.btn_share.isEnabled())
+    assert t.btn_share.toolTip() == store.down_share()
+    opened = []
+    monkeypatch.setattr(storetab, "ShareDialog", lambda *a, **k: opened.append(a))
+    t.share("https://youtu.be/xyz", "Bruh")   # a pad's "Share to the store…" too
+    assert not opened
+
+    def fixed(*a, **k):
+        store._failing.clear()   # (the categories answer again)
+        return plain(*a, **k)
+    monkeypatch.setattr(store, "_request", fixed)
+    t.reload()
+    assert _wait(qapp, lambda: t.btn_share.isEnabled())
+    assert t.btn_share.toolTip() == ""
+    t.shutdown()
+
+
 def test_bun_kicks_back_then_out_then_rests():
     from soundboard.ui.bunnywidget import SULK_EVERY, sulk_kick
     ks = [sulk_kick(SULK_EVERY * i / 100)[0] for i in range(100)]
