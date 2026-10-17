@@ -131,6 +131,13 @@ def test_cards_or_list_switch_by_the_order_button(window):
     assert w.grid.listed
     w.padctl.set_pad_view("grid")   # set some other way: the switch follows
     assert t.view() == "grid" and not w.grid.listed
+    t.set_compact(True)   # a very narrow window: only the other view's icon
+    assert t.buttons["grid"].isHidden() and not t.buttons["list"].isHidden()
+    t.buttons["list"].click()
+    assert w.grid.listed and t.buttons["list"].isHidden() and not t.buttons["grid"].isHidden()
+    t.set_compact(False)
+    assert not any(b.isHidden() for b in t.buttons.values())
+    w.padctl.set_pad_view("grid")
 
 
 def test_list_view_rows_in_columns(window):

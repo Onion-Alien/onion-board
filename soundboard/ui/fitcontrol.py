@@ -83,6 +83,8 @@ class FitControl(Controller):
             mw.btn_yt.setVisible(not tight and mw.ytresults.available()),
             r.touch(mw.btn_yt)))
         f.add(64, "w", r.icon_only(mw.btn_more))
+        f.add(66, "w", lambda tight: (mw.pad_view_toggle.set_compact(tight),
+                                      r.touch(mw.pad_view_toggle)))
         mw._radio_steps = mw.radio.fit_steps()   # swapped with the tab (Privacy)
         f.extend(mw._radio_steps)
         self._tab_steps = {k: getattr(mw, k).fit_steps() for k in ("voice", "triggers")}
