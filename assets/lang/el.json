@@ -3064,7 +3064,6 @@
   "The download kept going far past FFmpeg's size: not taking it.": "Η λήψη ξεπέρασε κατά πολύ το μέγεθος του FFmpeg: δεν χρησιμοποιείται.",
   "winget isn't on this PC.": "Το winget δεν υπάρχει σε αυτόν τον υπολογιστή.",
   "A whole folder": "Ολόκληρο φάκελο",
-  "Add sounds: files, a folder, a recording, a link or a free pack (or drag files onto the window)": "Πρόσθεσε ήχους: αρχεία, φάκελο, ηχογράφηση, σύνδεσμο ή δωρεάν πακέτο (ή σύρε αρχεία στο παράθυρο)",
   "From a link": "Από σύνδεσμο",
   "Paste a link into the search box": "Επικόλλησε έναν σύνδεσμο στο πλαίσιο αναζήτησης",
   "Record a sound with your mic: Add, then Record.": "Ηχογράφησε έναν ήχο με το μικρόφωνο: Προσθήκη, μετά Ηχογράφηση.",
@@ -4112,5 +4111,8 @@
   "Play through mic": "Παίξε μέσα από το μικρόφωνο",
   "Recordings": "Ηχογραφήσεις",
   "Recordings ({n})": "Ηχογραφήσεις ({n})",
-  "Record your voice as others hear it. It goes in Recordings, above": "Ηχογράφησε τη φωνή σου όπως την ακούνε οι άλλοι. Πηγαίνει στις Ηχογραφήσεις, από πάνω"
+  "Record your voice as others hear it. It goes in Recordings, above": "Ηχογράφησε τη φωνή σου όπως την ακούνε οι άλλοι. Πηγαίνει στις Ηχογραφήσεις, από πάνω",
+  "Add sounds: files, a folder, a recording or a link (or drag files onto the window)": "Πρόσθεσε ήχους: αρχεία, φάκελο, ηχογράφηση ή σύνδεσμο (ή σύρε αρχεία στο παράθυρο)",
+  "Drag to change the order": "Σύρε για να αλλάξεις τη σειρά",
+  "Play it now": "Παίξ' το τώρα"
 }

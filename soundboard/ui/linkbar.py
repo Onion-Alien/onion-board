@@ -463,6 +463,16 @@ class LinkBar(QFrame):
         self.up_next_changed.emit(self.up_next())
         return self._start_playing(data, gain, title, url)
 
+    def move_up_next(self, i: int, to: int, shown=None) -> bool:
+        """Up next's song `i` dragged to place `to`. Out of date `shown` does nothing."""
+        if shown is not None and tuple(self.up_next()) != tuple(shown):
+            return False
+        if not (0 <= i < len(self._up_next) and 0 <= to < len(self._up_next)):
+            return False
+        self._up_next.insert(to, self._up_next.pop(i))
+        self.up_next_changed.emit(self.up_next())
+        return True
+
     def drop_up_next(self, i: int = -1, shown=None):
         """Take Up next's song `i` out (a chip's ✕), or all of them (Stop all)."""
         if shown is not None and tuple(self.up_next()) != tuple(shown):

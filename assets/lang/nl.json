@@ -3064,7 +3064,6 @@
   "The download kept going far past FFmpeg's size: not taking it.": "De download ging ver voorbij de grootte van FFmpeg: niet gebruikt.",
   "winget isn't on this PC.": "winget staat niet op deze pc.",
   "A whole folder": "Een hele map",
-  "Add sounds: files, a folder, a recording, a link or a free pack (or drag files onto the window)": "Geluiden toevoegen: bestanden, een map, een opname, een link of een gratis pakket (of sleep bestanden naar het venster)",
   "From a link": "Via een link",
   "Paste a link into the search box": "Plak een link in het zoekvak",
   "Record a sound with your mic: Add, then Record.": "Neem een geluid op met je microfoon: Toevoegen, dan Opnemen.",
@@ -4112,5 +4111,8 @@
   "Play through mic": "Speel via de mic",
   "Recordings": "Opnames",
   "Recordings ({n})": "Opnames ({n})",
-  "Record your voice as others hear it. It goes in Recordings, above": "Neem je stem op zoals anderen hem horen. Hij komt in Opnames, hierboven"
+  "Record your voice as others hear it. It goes in Recordings, above": "Neem je stem op zoals anderen hem horen. Hij komt in Opnames, hierboven",
+  "Add sounds: files, a folder, a recording or a link (or drag files onto the window)": "Geluiden toevoegen: bestanden, een map, een opname of een link (of sleep bestanden naar het venster)",
+  "Drag to change the order": "Sleep om de volgorde te wijzigen",
+  "Play it now": "Nu afspelen"
 }

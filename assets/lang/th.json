@@ -2994,7 +2994,6 @@
   "The download kept going far past FFmpeg's size: not taking it.": "ไฟล์ดาวน์โหลดใหญ่เกินขนาดของ FFmpeg ไปมาก: ไม่ใช้",
   "winget isn't on this PC.": "ไม่มี winget ในพีซีเครื่องนี้",
   "A whole folder": "ทั้งโฟลเดอร์",
-  "Add sounds: files, a folder, a recording, a link or a free pack (or drag files onto the window)": "เพิ่มเสียง: ไฟล์ โฟลเดอร์ เสียงที่อัด ลิงก์ หรือแพ็กฟรี (หรือลากไฟล์มาวางที่หน้าต่าง)",
   "From a link": "จากลิงก์",
   "Paste a link into the search box": "วางลิงก์ในช่องค้นหา",
   "Record a sound with your mic: Add, then Record.": "อัดเสียงด้วยไมค์ของคุณ: เพิ่ม แล้วกด อัด",
@@ -4033,5 +4032,8 @@
   "Play through mic": "เล่นผ่านไมค์",
   "Recordings": "เสียงที่อัดไว้",
   "Recordings ({n})": "เสียงที่อัดไว้ ({n})",
-  "Record your voice as others hear it. It goes in Recordings, above": "อัดเสียงของคุณแบบที่คนอื่นได้ยิน จะไปอยู่ในเสียงที่อัดไว้ ด้านบน"
+  "Record your voice as others hear it. It goes in Recordings, above": "อัดเสียงของคุณแบบที่คนอื่นได้ยิน จะไปอยู่ในเสียงที่อัดไว้ ด้านบน",
+  "Add sounds: files, a folder, a recording or a link (or drag files onto the window)": "เพิ่มเสียง: ไฟล์ โฟลเดอร์ การอัด หรือลิงก์ (หรือลากไฟล์มาวางที่หน้าต่าง)",
+  "Drag to change the order": "ลากเพื่อเปลี่ยนลำดับ",
+  "Play it now": "เล่นตอนนี้"
 }

@@ -3064,7 +3064,6 @@
   "The download kept going far past FFmpeg's size: not taking it.": "Изтеглянето продължи далеч над размера на FFmpeg: не се използва.",
   "winget isn't on this PC.": "winget го няма на този компютър.",
   "A whole folder": "Цяла папка",
-  "Add sounds: files, a folder, a recording, a link or a free pack (or drag files onto the window)": "Добави звуци: файлове, папка, запис, линк или безплатен пакет (или плъзни файлове в прозореца)",
   "From a link": "От линк",
   "Paste a link into the search box": "Постави линк в полето за търсене",
   "Record a sound with your mic: Add, then Record.": "Запиши звук с микрофона: Добави, после Запис.",
@@ -4112,5 +4111,8 @@
   "Play through mic": "Пусни през микрофона",
   "Recordings": "Записи",
   "Recordings ({n})": "Записи ({n})",
-  "Record your voice as others hear it. It goes in Recordings, above": "Запиши гласа си, както го чуват другите. Отива в Записи, отгоре"
+  "Record your voice as others hear it. It goes in Recordings, above": "Запиши гласа си, както го чуват другите. Отива в Записи, отгоре",
+  "Add sounds: files, a folder, a recording or a link (or drag files onto the window)": "Добави звуци: файлове, папка, запис или линк (или пусни файлове в прозореца)",
+  "Drag to change the order": "Плъзни, за да смениш реда",
+  "Play it now": "Пусни го сега"
 }

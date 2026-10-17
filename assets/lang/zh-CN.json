@@ -2994,7 +2994,6 @@
   "The download kept going far past FFmpeg's size: not taking it.": "下载远远超出了 FFmpeg 的大小：不予使用。",
   "winget isn't on this PC.": "这台电脑上没有 winget。",
   "A whole folder": "整个文件夹",
-  "Add sounds: files, a folder, a recording, a link or a free pack (or drag files onto the window)": "添加音效：文件、文件夹、录音、链接或免费音效包（也可以把文件拖到窗口上）",
   "From a link": "从链接",
   "Paste a link into the search box": "把链接粘贴到搜索框",
   "Record a sound with your mic: Add, then Record.": "用麦克风录制音效：添加 → 录制。",
@@ -4033,5 +4032,8 @@
   "Play through mic": "通过麦克风播放",
   "Recordings": "录音",
   "Recordings ({n})": "录音 ({n})",
-  "Record your voice as others hear it. It goes in Recordings, above": "按别人听到的样子录下你的声音，会放进上方的“录音”"
+  "Record your voice as others hear it. It goes in Recordings, above": "按别人听到的样子录下你的声音，会放进上方的“录音”",
+  "Add sounds: files, a folder, a recording or a link (or drag files onto the window)": "添加声音：文件、文件夹、录音或链接（或把文件拖到窗口上）",
+  "Drag to change the order": "拖动以调整顺序",
+  "Play it now": "立即播放"
 }

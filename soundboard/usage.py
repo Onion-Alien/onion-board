@@ -307,8 +307,10 @@ FEATURES = ("add-files", "youtube", "record", "clip", "clip-editor", "import-boa
             "live-setup-said-no", "live-setup-cancel",
             # the Voice tab's setups: one saved, one renamed
             "voice-setup-saved", "voice-setup-renamed",
-            # the Up next chip opened, its Clear; the Live switch's "muted a long time" ring
-            "upnext-opened", "upnext-cleared", "muted-ring",
+            # the Up next chip opened, its Clear, a row played now or dragged; the Live
+            # switch's "muted a long time" ring
+            "upnext-opened", "upnext-cleared", "upnext-play-now", "upnext-reordered",
+            "muted-ring",
             # the tray's Voice changer menu: switched on / off, or a voice picked
             "tray-voice-toggle", "tray-voice-pick",
             # What's new shown by itself after an update, and its Settings button

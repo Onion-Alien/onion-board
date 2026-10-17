@@ -3064,7 +3064,6 @@
   "The download kept going far past FFmpeg's size: not taking it.": "Lumampas nang malayo ang download sa laki ng FFmpeg: hindi gagamitin.",
   "winget isn't on this PC.": "Wala ang winget sa PC na ito.",
   "A whole folder": "Isang buong folder",
-  "Add sounds: files, a folder, a recording, a link or a free pack (or drag files onto the window)": "Magdagdag ng sounds: mga file, isang folder, recording, link o libreng pack (o i-drag ang mga file sa window)",
   "From a link": "Mula sa link",
   "Paste a link into the search box": "Mag-paste ng link sa search box",
   "Record a sound with your mic: Add, then Record.": "Mag-record ng tunog gamit ang mic mo: Magdagdag, tapos I-record.",
@@ -4112,5 +4111,8 @@
   "Play through mic": "I-play sa mic",
   "Recordings": "Mga recording",
   "Recordings ({n})": "Mga recording ({n})",
-  "Record your voice as others hear it. It goes in Recordings, above": "I-record ang boses mo gaya ng naririnig ng iba. Mapupunta ito sa Mga recording, sa itaas"
+  "Record your voice as others hear it. It goes in Recordings, above": "I-record ang boses mo gaya ng naririnig ng iba. Mapupunta ito sa Mga recording, sa itaas",
+  "Add sounds: files, a folder, a recording or a link (or drag files onto the window)": "Magdagdag ng sounds: files, isang folder, isang recording o isang link (o i-drag ang files sa window)",
+  "Drag to change the order": "I-drag para baguhin ang ayos",
+  "Play it now": "I-play ngayon"
 }

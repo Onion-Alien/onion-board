@@ -3064,7 +3064,6 @@
   "The download kept going far past FFmpeg's size: not taking it.": "Nedladdningen fortsatte långt förbi FFmpegs storlek: används inte.",
   "winget isn't on this PC.": "winget finns inte på den här datorn.",
   "A whole folder": "En hel mapp",
-  "Add sounds: files, a folder, a recording, a link or a free pack (or drag files onto the window)": "Lägg till ljud: filer, en mapp, en inspelning, en länk eller ett gratis paket (eller dra filer till fönstret)",
   "From a link": "Från en länk",
   "Paste a link into the search box": "Klistra in en länk i sökrutan",
   "Record a sound with your mic: Add, then Record.": "Spela in ett ljud med mikrofonen: Lägg till, sedan Spela in.",
@@ -4112,5 +4111,8 @@
   "Play through mic": "Spela genom micken",
   "Recordings": "Inspelningar",
   "Recordings ({n})": "Inspelningar ({n})",
-  "Record your voice as others hear it. It goes in Recordings, above": "Spela in din röst som andra hör den. Den hamnar i Inspelningar, ovanför"
+  "Record your voice as others hear it. It goes in Recordings, above": "Spela in din röst som andra hör den. Den hamnar i Inspelningar, ovanför",
+  "Add sounds: files, a folder, a recording or a link (or drag files onto the window)": "Lägg till ljud: filer, en mapp, en inspelning eller en länk (eller dra filer till fönstret)",
+  "Drag to change the order": "Dra för att ändra ordningen",
+  "Play it now": "Spela nu"
 }

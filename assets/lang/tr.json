@@ -3064,7 +3064,6 @@
   "The download kept going far past FFmpeg's size: not taking it.": "İndirme FFmpeg'in boyutunu çok aştı: kullanılmıyor.",
   "winget isn't on this PC.": "Bu bilgisayarda winget yok.",
   "A whole folder": "Bütün bir klasör",
-  "Add sounds: files, a folder, a recording, a link or a free pack (or drag files onto the window)": "Ses ekle: dosyalar, klasör, kayıt, bağlantı veya ücretsiz paket (ya da dosyaları pencereye sürükle)",
   "From a link": "Bir bağlantıdan",
   "Paste a link into the search box": "Arama kutusuna bir bağlantı yapıştır",
   "Record a sound with your mic: Add, then Record.": "Mikrofonunla ses kaydet: Ekle, sonra Kaydet.",
@@ -4112,5 +4111,8 @@
   "Play through mic": "Mikrofondan çal",
   "Recordings": "Kayıtlar",
   "Recordings ({n})": "Kayıtlar ({n})",
-  "Record your voice as others hear it. It goes in Recordings, above": "Sesini başkalarının duyduğu gibi kaydet. Yukarıdaki Kayıtlar'a gider"
+  "Record your voice as others hear it. It goes in Recordings, above": "Sesini başkalarının duyduğu gibi kaydet. Yukarıdaki Kayıtlar'a gider",
+  "Add sounds: files, a folder, a recording or a link (or drag files onto the window)": "Ses ekle: dosyalar, bir klasör, bir kayıt veya bir bağlantı (ya da dosyaları pencereye sürükle)",
+  "Drag to change the order": "Sırayı değiştirmek için sürükle",
+  "Play it now": "Şimdi çal"
 }

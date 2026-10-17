@@ -35,6 +35,36 @@ def test_categories_filter_the_pads_and_the_overlay(window):
     assert window.cfg.category == "" and window.catctl.cat_tabs.currentIndex() == 0
 
 
+def test_plus_opens_a_name_box_right_after_the_tabs(window):
+    """The "+" swaps itself for a box where the new tab will show: Enter adds the
+    category, Esc and an empty Enter just put the "+" back. No pop-up."""
+    from PySide6.QtCore import Qt
+    from PySide6.QtTest import QTest
+    from PySide6.QtWidgets import QApplication
+    window.tabs.setCurrentWidget(window.sounds_page)
+    window.show()
+    cat = window.catctl
+    box = cat.cat_name_box
+    cat.btn_cat_add.click()
+    QApplication.processEvents()
+    assert box.isVisible() and not cat.btn_cat_add.isVisible()
+    last = cat.cat_tabs.tabRect(cat.cat_tabs.count() - 1)
+    assert box.x() - (cat.cat_tabs.x() + last.right()) < 16   # right after the last tab
+    QTest.keyClicks(box, "Memes")
+    QTest.keyClick(box, Qt.Key.Key_Escape)           # Esc: nothing added
+    assert not box.isVisible() and cat.btn_cat_add.isVisible()
+    assert "Memes" not in window.cfg.categories
+    cat.btn_cat_add.click()
+    assert box.text() == ""                          # starts empty again
+    QTest.keyClick(box, Qt.Key.Key_Return)           # empty Enter: nothing either
+    assert not box.isVisible() and window.cfg.categories == []
+    cat.btn_cat_add.click()
+    QTest.keyClicks(box, "Memes")
+    QTest.keyClick(box, Qt.Key.Key_Return)
+    assert window.cfg.categories == ["Memes"] and window.cfg.category == "Memes"
+    assert not box.isVisible() and cat.btn_cat_add.isVisible()
+
+
 def test_web_results_put_a_back_button_in_place_of_the_category_tabs(window, monkeypatch):
     """The category tabs pick pads, so they step aside while web results take the
     pads' place; the results' own back button brings both back. The new-category

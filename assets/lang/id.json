@@ -2994,7 +2994,6 @@
   "The download kept going far past FFmpeg's size: not taking it.": "Unduhan terus berjalan jauh melebihi ukuran FFmpeg: tidak dipakai.",
   "winget isn't on this PC.": "winget tidak ada di PC ini.",
   "A whole folder": "Satu folder penuh",
-  "Add sounds: files, a folder, a recording, a link or a free pack (or drag files onto the window)": "Tambah suara: file, folder, rekaman, tautan, atau paket gratis (atau seret file ke jendela)",
   "From a link": "Dari tautan",
   "Paste a link into the search box": "Tempel tautan di kotak pencarian",
   "Record a sound with your mic: Add, then Record.": "Rekam suara dengan mikmu: Tambah, lalu Rekam.",
@@ -4033,5 +4032,8 @@
   "Play through mic": "Putar lewat mic",
   "Recordings": "Rekaman",
   "Recordings ({n})": "Rekaman ({n})",
-  "Record your voice as others hear it. It goes in Recordings, above": "Rekam suaramu seperti yang didengar orang lain. Masuk ke Rekaman, di atas"
+  "Record your voice as others hear it. It goes in Recordings, above": "Rekam suaramu seperti yang didengar orang lain. Masuk ke Rekaman, di atas",
+  "Add sounds: files, a folder, a recording or a link (or drag files onto the window)": "Tambah suara: file, folder, rekaman, atau link (atau seret file ke jendela)",
+  "Drag to change the order": "Seret untuk mengubah urutan",
+  "Play it now": "Putar sekarang"
 }

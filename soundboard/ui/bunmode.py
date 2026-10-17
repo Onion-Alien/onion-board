@@ -170,8 +170,9 @@ class BunMode(QWidget):
         plain = (f"QPushButton {{ background:{t['btn']}; {shape} }}"
                  f"QPushButton:hover {{ background:{t['btn_hover']}; border-color:{ring}; }}"
                  f"QPushButton:pressed {{ background:{t['btn_press']}; }}"
-                 f"QPushButton:checked {{ background:{t['accent']}; border-color:{t['accent']}; }}"
-                 f"QPushButton:checked:hover {{ background:{t['accent_hover']}; "
+                 f"QPushButton:checked {{ background:{theme.accent_fill()}; "
+                 f"border-color:{t['accent']}; }}"
+                 f"QPushButton:checked:hover {{ background:{theme.accent_fill(hover=True)}; "
                  f"border-color:{ring}; }}")
         for b in (self.b_play, self.b_stop, self.b_mic):
             b.setStyleSheet(plain)

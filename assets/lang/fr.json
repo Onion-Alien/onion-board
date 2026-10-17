@@ -3064,7 +3064,6 @@
   "The download kept going far past FFmpeg's size: not taking it.": "Le téléchargement a dépassé de loin la taille de FFmpeg : refusé.",
   "winget isn't on this PC.": "winget n'est pas sur ce PC.",
   "A whole folder": "Un dossier entier",
-  "Add sounds: files, a folder, a recording, a link or a free pack (or drag files onto the window)": "Ajoute des sons : fichiers, un dossier, un enregistrement, un lien ou un pack gratuit (ou glisse des fichiers sur la fenêtre)",
   "From a link": "Depuis un lien",
   "Paste a link into the search box": "Colle un lien dans la barre de recherche",
   "Record a sound with your mic: Add, then Record.": "Enregistre un son avec ton micro : Ajouter, puis Enregistrer.",
@@ -4112,5 +4111,8 @@
   "Play through mic": "Jouer dans le micro",
   "Recordings": "Enregistrements",
   "Recordings ({n})": "Enregistrements ({n})",
-  "Record your voice as others hear it. It goes in Recordings, above": "Enregistre ta voix telle que les autres l'entendent. Elle va dans Enregistrements, au-dessus"
+  "Record your voice as others hear it. It goes in Recordings, above": "Enregistre ta voix telle que les autres l'entendent. Elle va dans Enregistrements, au-dessus",
+  "Add sounds: files, a folder, a recording or a link (or drag files onto the window)": "Ajouter des sons : fichiers, un dossier, un enregistrement ou un lien (ou glisse des fichiers sur la fenêtre)",
+  "Drag to change the order": "Glisse pour changer l'ordre",
+  "Play it now": "Le jouer maintenant"
 }

@@ -569,15 +569,18 @@ class PlaybackControl(Controller):
         mw.triggers.cancel_pending()
         mw.voice.stop_all()   # the voice changer and the other voices go off too
 
-    def _update_chips(self, playing):
+    def _update_chips(self, playing, force: bool = False):
         """The row above the pads: every sound playing, each with its own ■, then Up
         next, one chip with how many wait that opens them all in a list (upnext.py). A
         web search / link's Play once counts too: it isn't a pad, but it plays over
         them and needs its own ■. One rule, whatever
         played before: a sound has a chip while it plays. (The row used to show only
         for two or more, so stopping one of two hid the other's chip too and it looked
-        like ■ had stopped both.)"""
+        like ■ had stopped both.) `force`: remade even when nothing changed (a dragged
+        Up next row put back)."""
         mw = self.mw
+        if force:
+            mw._chip_ids = ("remake",)   # never equal to a real (ids, queue, links)
         ids = tuple(s for s in mw.pads if s in playing)
         if LINK_ID in playing:
             ids += (LINK_ID,)
@@ -653,16 +656,77 @@ class PlaybackControl(Controller):
         mw = self.mw
         links = tuple(mw.linkbar.up_next())
         queue = tuple(self._queue)
-        waiting: list[Waiting] = [(title,
-                                   lambda __=False, i=i, q=links: mw.linkbar.play_next(i, q),
-                                   lambda __=False, i=i, q=links: mw.linkbar.drop_up_next(i, q))
-                                  for i, title in enumerate(links)]
+        waiting: list[Waiting] = [
+            Waiting(title,
+                    lambda __=False, i=i, q=links: mw.linkbar.play_next(i, q),
+                    lambda __=False, i=i, q=links: mw.linkbar.drop_up_next(i, q),
+                    lambda __=False, i=i, q=links: self._play_link_now(i, q),
+                    lambda to, i=i, q=links: self._move_link(i, to, q), "links")
+            for i, title in enumerate(links)]
         for i, sid in enumerate(queue):
             m = mw.meta(sid)
-            waiting.append((m.name if m else sid,
-                            lambda __=False, s=sid: self.select(s),
-                            lambda __=False, i=i, q=queue: self._unqueue(i, q)))
+            waiting.append(Waiting(
+                m.name if m else sid,
+                lambda __=False, s=sid: self.select(s),
+                lambda __=False, i=i, q=queue: self._unqueue(i, q),
+                lambda __=False, i=i, q=queue: self._play_queued_now(i, q),
+                lambda to, i=i, q=queue: self._move_queued(i, to, q), "board"))
         return waiting
+
+    def _make_way(self):
+        """What plays makes way for an Up next sound played now (as ⏭ does): the
+        board's sounds (a looping one stays) and a web search's song."""
+        mw = self.mw
+        for sid in mw.engine.playing():
+            if sid == LINK_ID or (sid in mw._meta and not mw._meta[sid].loop):
+                mw.engine.stop(sid)
+
+    def _play_queued_now(self, i: int, shown: tuple[str, ...]):
+        """A queued sound's ▶ in Up next: it plays now, the rest keep waiting after it.
+        A list that's out of date does nothing (a double click hit a moved row)."""
+        mw = self.mw
+        if tuple(self._queue) != shown or not 0 <= i < len(self._queue):
+            return
+        usage.used("upnext-play-now")
+        sid = self._queue.pop(i)
+        self._make_way()
+        mw.searchctl._drop_link()
+        if mw.meta(sid) is not None and sid in mw.audio:
+            self.play(sid, now=True)
+        self._say_queue()
+        self._update_chips(mw.engine.playing())
+        mw.tickctl._wake()
+
+    def _play_link_now(self, i: int, shown: tuple[str, ...]):
+        """A web search / link song's ▶ in Up next: it plays now."""
+        mw = self.mw
+        if tuple(mw.linkbar.up_next()) != tuple(shown):
+            return
+        usage.used("upnext-play-now")
+        self._make_way()
+        mw.linkbar.play_next(i, shown)
+        self._update_chips(mw.engine.playing())
+        mw.tickctl._wake()
+
+    def _move_queued(self, i: int, to: int, shown: tuple[str, ...]):
+        """A queued sound dragged from place `i` to `to` in Up next."""
+        if tuple(self._queue) != shown or not (0 <= i < len(self._queue)
+                                               and 0 <= to < len(self._queue)):
+            self._update_chips(self.mw.engine.playing(), force=True)   # back as it was
+            return
+        usage.used("upnext-reordered")
+        self._queue.insert(to, self._queue.pop(i))
+        self._say_queue()
+        self._update_chips(self.mw.engine.playing())
+
+    def _move_link(self, i: int, to: int, shown: tuple[str, ...]):
+        """A web search / link song dragged from place `i` to `to` in Up next."""
+        mw = self.mw
+        if not mw.linkbar.move_up_next(i, to, shown):
+            self._update_chips(mw.engine.playing(), force=True)
+            return
+        usage.used("upnext-reordered")
+        self._update_chips(mw.engine.playing())
 
     def open_up_next(self):
         """The Up next chip: the whole list in a pop-up card above it."""

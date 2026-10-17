@@ -3134,7 +3134,6 @@
   "The download kept going far past FFmpeg's size: not taking it.": "Descărcarea a depășit cu mult mărimea FFmpeg: nu e folosită.",
   "winget isn't on this PC.": "winget nu e pe acest PC.",
   "A whole folder": "Un folder întreg",
-  "Add sounds: files, a folder, a recording, a link or a free pack (or drag files onto the window)": "Adaugă sunete: fișiere, un folder, o înregistrare, un link sau un pachet gratuit (sau trage fișierele pe fereastră)",
   "From a link": "Dintr-un link",
   "Paste a link into the search box": "Lipește un link în caseta de căutare",
   "Record a sound with your mic: Add, then Record.": "Înregistrează un sunet cu microfonul: Adaugă, apoi Înregistrează.",
@@ -4191,5 +4190,8 @@
   "Play through mic": "Redă prin microfon",
   "Recordings": "Înregistrări",
   "Recordings ({n})": "Înregistrări ({n})",
-  "Record your voice as others hear it. It goes in Recordings, above": "Înregistrează-ți vocea așa cum o aud ceilalți. Ajunge în Înregistrări, mai sus"
+  "Record your voice as others hear it. It goes in Recordings, above": "Înregistrează-ți vocea așa cum o aud ceilalți. Ajunge în Înregistrări, mai sus",
+  "Add sounds: files, a folder, a recording or a link (or drag files onto the window)": "Adaugă sunete: fișiere, un folder, o înregistrare sau un link (sau trage fișiere în fereastră)",
+  "Drag to change the order": "Trage pentru a schimba ordinea",
+  "Play it now": "Redă acum"
 }

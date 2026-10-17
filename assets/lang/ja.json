@@ -2994,7 +2994,6 @@
   "The download kept going far past FFmpeg's size: not taking it.": "ダウンロードが FFmpeg のサイズを大きく超えたため使いません。",
   "winget isn't on this PC.": "この PC には winget がありません。",
   "A whole folder": "フォルダーごと",
-  "Add sounds: files, a folder, a recording, a link or a free pack (or drag files onto the window)": "サウンドを追加：ファイル、フォルダー、録音、リンク、無料パック（ファイルをウィンドウにドラッグしてもOK）",
   "From a link": "リンクから",
   "Paste a link into the search box": "検索ボックスにリンクを貼り付けてください",
   "Record a sound with your mic: Add, then Record.": "マイクでサウンドを録音：追加 → 録音。",
@@ -4033,5 +4032,8 @@
   "Play through mic": "マイクで再生",
   "Recordings": "録音",
   "Recordings ({n})": "録音 ({n})",
-  "Record your voice as others hear it. It goes in Recordings, above": "みんなに聞こえている声を録音します。上の「録音」に入ります"
+  "Record your voice as others hear it. It goes in Recordings, above": "みんなに聞こえている声を録音します。上の「録音」に入ります",
+  "Add sounds: files, a folder, a recording or a link (or drag files onto the window)": "サウンドを追加: ファイル、フォルダー、録音、リンク(またはファイルをウィンドウにドラッグ)",
+  "Drag to change the order": "ドラッグで順番を変更",
+  "Play it now": "今すぐ再生"
 }

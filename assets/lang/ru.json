@@ -3134,7 +3134,6 @@
   "The download kept going far past FFmpeg's size: not taking it.": "Загрузка ушла далеко за размер FFmpeg: не используется.",
   "winget isn't on this PC.": "На этом ПК нет winget.",
   "A whole folder": "Целую папку",
-  "Add sounds: files, a folder, a recording, a link or a free pack (or drag files onto the window)": "Добавить звуки: файлы, папку, запись, ссылку или бесплатный пак (или перетащи файлы в окно)",
   "From a link": "По ссылке",
   "Paste a link into the search box": "Вставь ссылку в поле поиска",
   "Record a sound with your mic: Add, then Record.": "Запиши звук с микрофона: Добавить, затем Запись.",
@@ -4191,5 +4190,8 @@
   "Play through mic": "Включить в микрофон",
   "Recordings": "Записи",
   "Recordings ({n})": "Записи ({n})",
-  "Record your voice as others hear it. It goes in Recordings, above": "Запиши свой голос так, как его слышат другие. Он попадёт в Записи, выше"
+  "Record your voice as others hear it. It goes in Recordings, above": "Запиши свой голос так, как его слышат другие. Он попадёт в Записи, выше",
+  "Add sounds: files, a folder, a recording or a link (or drag files onto the window)": "Добавить звуки: файлы, папку, запись или ссылку (или перетащи файлы в окно)",
+  "Drag to change the order": "Перетащи, чтобы изменить порядок",
+  "Play it now": "Включить сейчас"
 }

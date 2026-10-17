@@ -1,0 +1,2 @@
+- Drag sounds in the Up next list by their grip to change the order, and use a sound's ▶ to play it now (the rest keep waiting).
+- Free sound packs is now only in the Library menu, not in the Add menu as well.
