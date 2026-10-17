@@ -2394,7 +2394,6 @@
   "Zoom out": "Намаляване",
   "headphones": "слушалки",
   "mic": "микрофон",
-  "only you hear the radio: press “Send” below so others hear it too": "само вие чувате радиото: натиснете „Изпрати“ по-долу, за да го чуят и другите",
   "others hear it": "други го чуват",
   "sending": "изпращане",
   "{kbps} kbps +": "{kbps} kbps +",
@@ -3629,7 +3628,6 @@
   "Show tutorials": "Показвай обясненията",
   "Start some music or a game, then press Send on it. Everyone in your call hears it.": "Пусни музика или игра, после натисни Изпратете до нея. Всички в разговора ти я чуват.",
   "Turn on a trigger": "Включи тригер",
-  "Click any dot to play that station. Press Send and your call hears it too.": "Кликни коя да е точка, за да пуснеш станцията. Натисни Изпратете и разговорът ти също я чува.",
   "Pick a station on the globe": "Избери станция на глобуса",
   "Applying the effects": "Прилагане на ефектите",
   "Applying the effects: {how}": "Прилагам ефектите: {how}",
@@ -3642,5 +3640,13 @@
   "{pct}%": "{pct}%",
   "{pct}%, about {time} left": "{pct}%, остават около {time}",
   "“{name}” can't play until its effects are applied ({how})": "„{name}“ не може да свири, докато ефектите не се приложат ({how})",
-  "✓ “{name}” is ready to play": "✓ „{name}“ е готов за пускане"
+  "✓ “{name}” is ready to play": "✓ „{name}“ е готов за пускане",
+  "Beta": "Бета",
+  "The sound store is new and still changing.": "Магазинът за звуци е нов и още се променя.",
+  "Just me": "Само аз",
+  "Me and others": "Аз и другите",
+  "Send to others": "Изпрати на другите",
+  "Who should hear the radio?": "Кой да чува радиото?",
+  "only you hear it": "само ти го чуваш",
+  "Click any dot to play that station. Press Send to others and your call hears it too.": "Кликни коя да е точка, за да пуснеш станцията. Натисни Изпрати на другите и разговорът ти също я чува."
 }

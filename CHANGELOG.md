@@ -2,6 +2,61 @@
 
 Changes not released yet are in [changelog.d/](changelog.d/), one file per change.
 
+## 2.4.0 — 2026-10-17
+
+- Free sounds: switching it off in Settings > Privacy & security while its list was still
+  loading now says *The store is off* with a way to Settings, instead of
+  *Couldn't open the store*.
+- Fixed an error that could pop up when an Undo card closed after the page it belonged to
+  was already gone.
+- The first-run tour is one card now, and it can't be clicked away by accident: clicks
+  around it do nothing until the search step, which has a Not now button. Add a sound
+  and it says well done.
+- Radio, Apps, Triggers, Voice and Store each show a quick how-to the first time you
+  open them: do the thing (play a station, pick a voice…) or press Not now. Turn them
+  off in Settings > General > Show tutorials.
+- Up next is now one chip with how many sounds wait. Click it for the whole list: every
+  name in full, a ✕ on each (even the 10th of 13, which you couldn't reach before) and
+  Clear for all of them.
+- Sounds can be said in a voice: right-click a pad → Effects → *Voice* opens picture cards
+  of every voice changer voice, the AI voices and your setups (Favorites and your own
+  first). A voice changer voice and an AI voice can go on together. It's laid on once
+  and kept; the original file is never changed.
+- Voice tab → *My setups*: save the voice changer voice, AI voice and language you have
+  on as one named setup, turn it all on again with one click, or put it on sounds.
+- Spamming Play and Add on lots of search results works: up to 30 Adds wait their turn
+  (it was 3), and a Play or Add clicked on a song that's still downloading isn't lost
+  when you click another song or type a new search. That used to blank the download
+  bar while the song kept downloading.
+- Bun has a little skit for every theme, played now and then while he's idle (on an
+  empty board, in Bun mode): in Blood Moon he grabs the moon out of the sky, takes a
+  bite and finds it's cheese; in Retro 98 his shades drop onto his face; in Brainrot his
+  propeller lifts him off the ground; and so on. Themes without an outfit juggle.
+- Sound store: Myinstants' sounds are in the store's list now, with thumbs up and down like
+  the rest (they play and download from Myinstants). Every sound has a category to pick,
+  and Top, New and Trending are buttons on the card instead of a menu.
+- The Store tab is now called Free sounds, so nobody mistakes it for a shop: every sound
+  in it is free.
+- Stream Deck and other control-API presses right after the app starts are answered at
+  once, not after a few seconds or with "the app is busy": the update check and the
+  start-up work behind the loading screen no longer hold them up.
+- Bun mode's Bun dances to what's playing: on the beat, and in the song's style. He
+  headbangs to rock and metal, hops side to side to electronic music, nods along to
+  hip-hop, sways with his eyes shut to something calm and talks along when someone's
+  speaking. His notes come out on the beat and grow and shrink with him, and he gets
+  bored, then sad, when nothing has played for a while.
+- Sound store: the share window, the README and the website now say how to get a sound
+  taken down: email onionboard.contact@proton.me.
+- Hotkeys no longer take the key away from your game: press F1 (or W) in a game and the
+  game still gets it while your sound plays. Settings → Hotkeys → *Keys in games* turns
+  it off if you'd rather only Onion Board got the key. The overlay's number keys are
+  still kept from the game while it's open.
+- Settings: every drop-down now has a name a screen reader says (Audio buffering, your mic
+  and headphones, Send my sounds to, download and video quality, radio stations, and the
+  overlay's), instead of a bare "combo box".
+- The Chat tab is gone. Chat was switched off for everyone on 2026-10-17, and the tab is
+  now removed from the app. Settings saved with it open just fine.
+
 ## 2.3.1 — 2026-10-17
 
 - Chat: with nobody talking, the Chat tab no longer asks the server again and again

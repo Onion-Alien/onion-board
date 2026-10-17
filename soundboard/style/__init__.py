@@ -21,7 +21,8 @@ Rules, so the copy keeps working in both apps:
     bunnyfit   Bun's outfit per theme and the pieces' drawing
     owl        Hoot: draw_owl(), owl_image(), OwlWidget
     appstate   active(), pause_in_background(), snap_to_pixels()
+    cover      Cover, covered(): a theme switch fades in and out instead of flashing
     hooks      what the app plugs in
 """
 
-KIT_VERSION = 2   # 2: texture_style / paint_glow / live_sheet in the kit
+KIT_VERSION = 3   # 2: texture_style / paint_glow / live_sheet in the kit; 3: cover

@@ -2489,7 +2489,6 @@
   "Zoom out": "alejar",
   "headphones": "auriculares",
   "mic": "micrófono",
-  "only you hear the radio: press “Send” below so others hear it too": "Sólo tú escuchas la radio: presiona “Enviar” a continuación para que otros también la escuchen",
   "others hear it": "otros lo escuchan",
   "sending": "envío",
   "{kbps} kbps +": "{kbps} kbits +",
@@ -3629,7 +3628,6 @@
   "Show tutorials": "Mostrar guías",
   "Start some music or a game, then press Send on it. Everyone in your call hears it.": "Pon música o un juego y luego presiona Enviar en él. Todos en tu llamada lo escuchan.",
   "Turn on a trigger": "Activa un disparador",
-  "Click any dot to play that station. Press Send and your call hears it too.": "Haz clic en cualquier punto para reproducir esa estación. Presiona Enviar y tu llamada también la escucha.",
   "Pick a station on the globe": "Elige una estación en el globo",
   "Applying the effects": "Aplicando los efectos",
   "Applying the effects: {how}": "Aplicando los efectos: {how}",
@@ -3642,5 +3640,13 @@
   "{pct}%": "{pct} %",
   "{pct}%, about {time} left": "{pct} %, faltan unos {time}",
   "“{name}” can't play until its effects are applied ({how})": "“{name}” no puede sonar hasta que se apliquen sus efectos ({how})",
-  "✓ “{name}” is ready to play": "✓ “{name}” está listo para sonar"
+  "✓ “{name}” is ready to play": "✓ “{name}” está listo para sonar",
+  "Beta": "Beta",
+  "The sound store is new and still changing.": "La tienda de sonidos es nueva y todavía está cambiando.",
+  "Just me": "Solo yo",
+  "Me and others": "Yo y los demás",
+  "Send to others": "Enviar a los demás",
+  "Who should hear the radio?": "¿Quién debe oír la radio?",
+  "only you hear it": "solo tú la oyes",
+  "Click any dot to play that station. Press Send to others and your call hears it too.": "Haz clic en cualquier punto para reproducir esa estación. Presiona Enviar a los demás y tu llamada también la escucha."
 }

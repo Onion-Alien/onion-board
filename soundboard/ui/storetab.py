@@ -172,7 +172,12 @@ class StoreTab(QWidget):
                              "Sounds from Myinstants are links: they play and download from "
                              "that site. Vote for the ones you like so others find them."))
         # (no hint line: the ⓘ says it, and the tab fits the smallest window)
-        head, hv = card(_("Sound store"), icon="store", beside=info)
+        # still new: a green Beta tag right after the title
+        beta = QLabel(_("Beta"))
+        beta.setObjectName("pill")
+        beta.setProperty("tone", "beta")
+        beta.setToolTip(_("The sound store is new and still changing."))
+        head, hv = card(_("Sound store"), icon="store", beside=(beta, info))
         head.setMaximumWidth(ROW_MAX_W)
         # the main button on a row of its own: beside the search box and the order, the
         # card was wider than the smallest window (that turns into the mini player)

@@ -33,10 +33,16 @@ RETRY_S = 5.0   # how often to retry a device that failed to open
 # a sound cut off by its outputs closing (a rescan, a stalled device) waits this long
 # for one to reopen before it counts as finished (a slow driver can take seconds)
 CUT_KEEP_S = 30.0
-# What each Audio buffering choice asks PortAudio for. Windows' shared mode never goes
-# below its own 10 ms period, so 'low' and PortAudio's 'high' (10 ms) both came out as
-# 22 ms with ~10 ms to spare per block; asking for a number buys real room.
-BUFFER = {"low": "low", "high": 0.04}
+# What each Audio buffering choice asks PortAudio for, for the outputs. Windows' shared
+# mode never goes below its own 10 ms period, so 'low' and PortAudio's 'high' (10 ms)
+# both came out as 22 ms with ~10 ms to spare per block; asking for a number buys real
+# room. The audio callbacks run Python, so they wait whenever the UI thread is in one
+# long Qt call (a window or page shown the first time: 60-150 ms on a real screen), and
+# with ~10 ms to spare a sound playing skipped each time. 150 ms queued
+# covers those; the sounds come that much later, which nobody hears on a soundboard.
+BUFFER = {"low": 0.15, "high": 0.25}
+# ...and for the mic: what's queued there is your voice's delay, so it stays short
+MIC_BUFFER = {"low": "low", "high": 0.04}
 # the app's own playback: the test recording, cue beeps, the setup wizard's tune, the
 # Pong game's sounds (ui/bunpong.py). With
 # previews ("<sid>:preview", "<sid>~fx:preview") they ignore the live speed / pitch

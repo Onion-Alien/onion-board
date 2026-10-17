@@ -2435,7 +2435,6 @@
   "Zoom out": "ズームアウト",
   "headphones": "ヘッドフォン",
   "mic": "マイク",
-  "only you hear the radio: press “Send” below so others hear it too": "あなただけにラジオが聞こえます: 下の「送信」を押すと他の人にもラジオが聞こえます",
   "others hear it": "他の人がそれを聞く",
   "sending": "送信する",
   "{kbps} kbps +": "{kbps} kbps +",
@@ -3552,7 +3551,6 @@
   "Show tutorials": "使い方を表示する",
   "Start some music or a game, then press Send on it. Everyone in your call hears it.": "音楽やゲームを流して、その送信を押そう。通話の全員に聞こえます。",
   "Turn on a trigger": "トリガーをオンにしよう",
-  "Click any dot to play that station. Press Send and your call hears it too.": "点をクリックするとその局が流れます。送信を押すと通話相手にも聞こえます。",
   "Pick a station on the globe": "地球儀から局を選ぼう",
   "Applying the effects": "エフェクトを適用中",
   "Applying the effects: {how}": "エフェクトを適用中：{how}",
@@ -3565,5 +3563,13 @@
   "{pct}%": "{pct}%",
   "{pct}%, about {time} left": "{pct}%、残り約 {time}",
   "“{name}” can't play until its effects are applied ({how})": "「{name}」はエフェクトの適用が終わるまで再生できません（{how}）",
-  "✓ “{name}” is ready to play": "✓ 「{name}」を再生できます"
+  "✓ “{name}” is ready to play": "✓ 「{name}」を再生できます",
+  "Beta": "ベータ",
+  "The sound store is new and still changing.": "サウンドストアは新しく、まだ変わっていきます。",
+  "Just me": "自分だけ",
+  "Me and others": "自分と相手",
+  "Send to others": "相手に送る",
+  "Who should hear the radio?": "ラジオを誰に聞かせますか？",
+  "only you hear it": "自分にだけ聞こえています",
+  "Click any dot to play that station. Press Send to others and your call hears it too.": "点をクリックするとその局が流れます。相手に送るを押すと通話相手にも聞こえます。"
 }

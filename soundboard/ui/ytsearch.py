@@ -101,11 +101,13 @@ class _BusyOwl(OwlWidget):
     def busy(self) -> bool:
         return True   # always scanning: never the slow idle frames
 
-    def pose(self) -> dict:
-        d = super().pose()
+    def base_pose(self) -> dict:
+        d = super().base_pose()   # (the springy layer goes on top: tufts trail his turns)
         d["sad"] = 0.0
+        scan = math.sin(self.t * 1.6)
         d["tufts"] = -8 + 3 * math.sin(self.t * 1.1)
-        d["look"] = 0.8 * math.sin(self.t * 1.6)     # scanning the results
+        d["look"] = 0.8 * scan                       # scanning the results,
+        d["rot"] += 2.5 * scan                       # leaning into each look
         d["look_y"] = 0.25
         return d
 
