@@ -519,6 +519,7 @@ QPushButton#voicetile:hover:!checked { border-color:$border_hi; }
 /* the Voice tab: its row of tabs, the voice changer's picture cards, the picked voice */
 QPushButton#voicetab { border-radius:10px; padding:9px 16px; background:$btn; border:1px solid $border; font-weight:600; font-size:10pt; }
 QFrame#voicetabrule { background:$border; border:none; }
+QWidget#setupsbar { background:transparent; }
 QFrame#setupsstrip { border:1px solid $border; border-radius:10px; background:transparent; }
 QLabel#setupstitle { color:$muted; font-size:8.5pt; font-weight:600; background:transparent; }
 QWidget#setupsbar QPushButton#voicecat { border-radius:12px; padding:3px 10px; min-height:16px; font-size:8.5pt; background:$btn; border:1px solid transparent; color:$text; }
