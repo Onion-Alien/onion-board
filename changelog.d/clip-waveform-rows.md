@@ -1,0 +1,2 @@
+- **Recordings** (Voice tab) and **Saved clips** (Apps tab) have a new look: each clip is a row with a round play button, its name, where it came from and when ("Today 14:02"), its waveform (which fills in as it plays) and its length. A **Live** label shows while one plays through your mic.
+- The row you point at (or pick) gets its buttons: play through mic, add to Sounds and more. Space plays a clip for you, Enter plays it through your mic, Esc stops it.
