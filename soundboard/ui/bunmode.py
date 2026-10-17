@@ -21,12 +21,12 @@ He shows how the app is doing:
 - the small hours: asleep in his nightcap, unless something plays
 
 Hovering shows play / pause, stop all, Live, the mic and Back to the board under
-him; Back brings the window back as it was (the mini player), in front with the
-keyboard. A click on him only makes him hop (a mouse that double clicks by itself
-kept switching back mid-drag). Drag to move him; the mouse wheel
-or the corner grip makes him any size from tiny to most of the screen. Back to the
-board is only ever on purpose: the button, or the right-click menu (which also has
-the full board).
+him (and for a few seconds as he lands, FIRST_LOOK_MS); Back brings the window back
+as it was (the mini player), in front with the keyboard. A click on him only makes
+him hop (a mouse that double clicks by itself kept switching back mid-drag). Drag to
+move him; the mouse wheel or the corner grip makes him any size from tiny to most of
+the screen. Back to the board is only ever on purpose: the button, or the right-click
+menu (which also has the full board).
 
 His window never takes focus (a game keeps its keyboard), sits on top, and is see-
 through around him, so clicks there go to whatever is underneath. Size and place
@@ -63,6 +63,7 @@ GRIP_MIN = 7          # ...down to this (a 16 px corner beside a tiny Bun looked
 MARGIN = 24           # from the screen's edge, where he first lands
 RESIZE_REST_MS = 350   # the wheel stopped this long: the buttons come back
 HIDE_ICONS_MS = 450   # the mouse left: the buttons go after this
+FIRST_LOOK_MS = 4000  # as he lands, his buttons show this long (then on hover)
 SAY_MS = {"error": 7000, "warn": 5000, "ok": 3000, "busy": 3000, "": 3500}
 SAD_ERROR = 0.85      # how sad an error makes him
 SETTLE_MS = 2500      # after a download's star, back to how he was
@@ -272,6 +273,14 @@ class BunMode(QWidget):
             self._keep_on_screen()
         self.show()
         self.raise_()
+        # his buttons for a moment as he lands, so the way back is seen once even by
+        # someone who doesn't know to hover; then they come with the mouse
+        self.icons.show()
+        QTimer.singleShot(FIRST_LOOK_MS, self, self._first_look_over)
+
+    def _first_look_over(self):
+        if not self._hover and self._press is None:
+            self.icons.hide()
 
     def _on_a_screen(self, top_left: QPoint) -> bool:
         spot = top_left + QPoint(self.width() // 2, self.height() // 2)

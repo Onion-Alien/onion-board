@@ -1254,8 +1254,11 @@ class SetupWizard(QDialog):
 
     def finish(self):
         cfg = self.win.cfg
-        cfg.setup_done = self.route_ok()   # without the cable, offer the guide again next time
-        usage.used("setup-finished" if cfg.setup_done else "setup-finished-not-sending")
+        # Finish means done, sending set up or not: like closing it, the guide doesn't
+        # open by itself again (the Setup tab's Step-by-step guide still opens it, and
+        # the status pill says when only they hear the sounds)
+        cfg.setup_done = True
+        usage.used("setup-finished" if self.route_ok() else "setup-finished-not-sending")
         cfg.mic_enabled = self.chk_send.isChecked()
         self.win.chk_mic.setChecked(cfg.mic_enabled)
         cfg.save()

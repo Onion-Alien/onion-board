@@ -129,6 +129,20 @@ def test_hover_shows_the_buttons_and_paints_the_grip(window, qapp):
     assert not bun.icons.isVisible()
 
 
+def test_buttons_show_as_he_lands_then_go(window, qapp):
+    # the buttons (and Back to the board) only ever came with a hover, so someone who
+    # didn't know to hover saw no way back
+    _mini(window)
+    window.bunctl.enter_bun_mode()
+    bun = window.bunctl.bun_mode
+    assert bun.icons.isVisible() and not bun.b_back.isHidden()
+    bun._first_look_over()
+    assert not bun.icons.isVisible()
+    bun.enterEvent(None)          # the mouse on him by then: they stay
+    bun._first_look_over()
+    assert bun.icons.isVisible()
+
+
 def test_dragging_his_corner_only_resizes_him(window, qapp):
     """Grip drags, fast and erratic ones too, change his size and nothing else: his
     top-left corner stays put and the button row stays out of the way until the drop."""
