@@ -3477,7 +3477,6 @@
   "Lots of sounds are waiting to be checked. Try again in a day or two.": "Moni ääni odottaa tarkistusta. Yritä uudelleen päivän tai kahden päästä.",
   "MP3, OGG, WAV or FLAC, up to 4 MB. It shows in the store once it's been checked.": "MP3, OGG, WAV tai FLAC, enintään 4 Mt. Se näkyy kaupassa, kun se on tarkistettu.",
   "Name (what it is)": "Nimi (mikä se on)",
-  "New": "Uusimmat",
   "No file picked": "Tiedostoa ei ole valittu",
   "No sounds here yet": "Täällä ei ole vielä ääniä",
   "Not for me": "Ei minulle",
@@ -3509,7 +3508,6 @@
   "The store is off": "Kauppa on pois päältä",
   "The store takes MP3, OGG, WAV or FLAC files.": "Kauppa ottaa MP3-, OGG-, WAV- tai FLAC-tiedostoja.",
   "This sound is mine to give away": "Tämä ääni on minun annettavissani",
-  "Top": "Parhaat",
   "Try other words.": "Kokeile muita sanoja.",
   "Your vote didn't go through: {error}": "Äänesi ei mennyt perille: {error}",
   "A YouTube, TikTok, SoundCloud or other video link. Only the link is kept: whoever adds it gets it from that site. It shows once it's been checked.": "YouTube-, TikTok-, SoundCloud- tai muu videolinkki. Vain linkki tallennetaan: lisääjä hakee sen siltä sivustolta. Se näkyy, kun se on tarkistettu.",
@@ -3584,7 +3582,6 @@
   "Sports": "Urheilu",
   "TV": "TV",
   "Viral": "Viraalit",
-  "What's hot on Myinstants right now, and the sounds people here liked this week": "Mikä on suosittua Myinstantsissa juuri nyt ja äänet, joista täällä pidettiin tällä viikolla",
   "See everything waiting to play": "Näytä kaikki toistoa odottavat",
   "Take everything out of the queue": "Poista kaikki jonosta",
   "A quick how-to the first time you open each tab.": "Pikaohje, kun avaat välilehden ensimmäistä kertaa.",
@@ -3727,7 +3724,6 @@
   "That voice is already in the store.": "Tämä ääni on jo kaupassa.",
   "That voice isn't in the store any more.": "Tämä ääni ei ole enää kaupassa.",
   "The store doesn't take that name or description. Try other words (and no links).": "Kauppa ei hyväksy tätä nimeä tai kuvausta. Kokeile muita sanoja (ei linkkejä).",
-  "The voices people liked most this week": "Äänet, joista tykättiin eniten tällä viikolla",
   "What's it good for? (optional)": "Mihin se sopii? (valinnainen)",
   "Which voice": "Mikä ääni",
   "You have the most AI voices of your own there can be: delete one first.": "Sinulla on jo enimmäismäärä omia AI-ääniä: poista ensin yksi.",
@@ -3763,5 +3759,7 @@
   "Every sound except those in: {names} (right-click one of them, Advanced, to show it here again)": "Kaikki äänet paitsi nämä: {names} (klikkaa yhtä oikealla, Lisäasetukset, näyttääksesi sen taas täällä)",
   "Hide its sounds from All": "Piilota sen äänet Kaikista",
   "“{name}” is hidden from All. Its sounds stay on its own tab.": "”{name}” on piilotettu Kaikista. Sen äänet pysyvät sen omalla välilehdellä.",
-  "“{name}” shows in All again": "”{name}” näkyy taas Kaikissa"
+  "“{name}” shows in All again": "”{name}” näkyy taas Kaikissa",
+  "All categories": "Kaikki kategoriat",
+  "Votes": "Arviot"
 }

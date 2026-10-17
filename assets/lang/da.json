@@ -3477,7 +3477,6 @@
   "Lots of sounds are waiting to be checked. Try again in a day or two.": "Mange lyde venter på at blive tjekket. Prøv igen om en dag eller to.",
   "MP3, OGG, WAV or FLAC, up to 4 MB. It shows in the store once it's been checked.": "MP3, OGG, WAV eller FLAC, op til 4 MB. Den vises i butikken, når den er tjekket.",
   "Name (what it is)": "Navn (hvad det er)",
-  "New": "Nye",
   "No file picked": "Ingen fil valgt",
   "No sounds here yet": "Ingen lyde her endnu",
   "Not for me": "Ikke noget for mig",
@@ -3509,7 +3508,6 @@
   "The store is off": "Butikken er slået fra",
   "The store takes MP3, OGG, WAV or FLAC files.": "Butikken tager MP3-, OGG-, WAV- eller FLAC-filer.",
   "This sound is mine to give away": "Denne lyd er min at give væk",
-  "Top": "Top",
   "Try other words.": "Prøv andre ord.",
   "Your vote didn't go through: {error}": "Din stemme kom ikke igennem: {error}",
   "A YouTube, TikTok, SoundCloud or other video link. Only the link is kept: whoever adds it gets it from that site. It shows once it's been checked.": "Et link til YouTube, TikTok, SoundCloud eller en anden video. Kun linket gemmes: den, der tilføjer det, henter det fra siden. Det vises, når det er tjekket.",
@@ -3584,7 +3582,6 @@
   "Sports": "Sport",
   "TV": "TV",
   "Viral": "Viral",
-  "What's hot on Myinstants right now, and the sounds people here liked this week": "Det hotteste på Myinstants lige nu og de lyde, folk her kunne lide i denne uge",
   "See everything waiting to play": "Se alt, der venter på at blive afspillet",
   "Take everything out of the queue": "Tag alt ud af køen",
   "A quick how-to the first time you open each tab.": "En hurtig vejledning første gang du åbner hver fane.",
@@ -3727,7 +3724,6 @@
   "That voice is already in the store.": "Den stemme er allerede i butikken.",
   "That voice isn't in the store any more.": "Den stemme er ikke i butikken længere.",
   "The store doesn't take that name or description. Try other words (and no links).": "Butikken tager ikke det navn eller den beskrivelse. Prøv andre ord (og ingen links).",
-  "The voices people liked most this week": "De stemmer, folk kunne lide mest i denne uge",
   "What's it good for? (optional)": "Hvad er den god til? (valgfrit)",
   "Which voice": "Hvilken stemme",
   "You have the most AI voices of your own there can be: delete one first.": "Du har allerede så mange egne AI-stemmer, som der kan være: slet en først.",
@@ -3763,5 +3759,7 @@
   "Every sound except those in: {names} (right-click one of them, Advanced, to show it here again)": "Alle lyde undtagen dem i: {names} (højreklik på en af dem, Avanceret, for at vise den her igen)",
   "Hide its sounds from All": "Skjul dens lyde fra Alle",
   "“{name}” is hidden from All. Its sounds stay on its own tab.": "“{name}” er skjult fra Alle. Dens lyde bliver på dens egen fane.",
-  "“{name}” shows in All again": "“{name}” vises i Alle igen"
+  "“{name}” shows in All again": "“{name}” vises i Alle igen",
+  "All categories": "Alle kategorier",
+  "Votes": "Bedømmelser"
 }

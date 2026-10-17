@@ -3400,7 +3400,6 @@
   "Lots of sounds are waiting to be checked. Try again in a day or two.": "Nhiều âm thanh đang chờ kiểm tra. Thử lại sau một hai ngày.",
   "MP3, OGG, WAV or FLAC, up to 4 MB. It shows in the store once it's been checked.": "MP3, OGG, WAV hoặc FLAC, tối đa 4 MB. Nó sẽ hiện trong cửa hàng sau khi được kiểm tra.",
   "Name (what it is)": "Tên (nó là gì)",
-  "New": "Mới",
   "No file picked": "Chưa chọn tệp",
   "No sounds here yet": "Chưa có âm thanh nào",
   "Not for me": "Không hợp với tôi",
@@ -3432,7 +3431,6 @@
   "The store is off": "Cửa hàng đang tắt",
   "The store takes MP3, OGG, WAV or FLAC files.": "Cửa hàng nhận tệp MP3, OGG, WAV hoặc FLAC.",
   "This sound is mine to give away": "Âm thanh này là của tôi để cho đi",
-  "Top": "Hàng đầu",
   "Try other words.": "Thử từ khác.",
   "Your vote didn't go through: {error}": "Bình chọn của bạn không được gửi: {error}",
   "A YouTube, TikTok, SoundCloud or other video link. Only the link is kept: whoever adds it gets it from that site. It shows once it's been checked.": "Liên kết YouTube, TikTok, SoundCloud hoặc video khác. Chỉ giữ liên kết: ai thêm nó sẽ lấy từ trang đó. Nó hiện sau khi được kiểm tra.",
@@ -3507,7 +3505,6 @@
   "Sports": "Thể thao",
   "TV": "TV",
   "Viral": "Lan truyền",
-  "What's hot on Myinstants right now, and the sounds people here liked this week": "Những gì đang hot trên Myinstants lúc này, và âm thanh mọi người ở đây thích tuần này",
   "See everything waiting to play": "Xem mọi thứ đang chờ phát",
   "Take everything out of the queue": "Bỏ hết khỏi hàng đợi",
   "A quick how-to the first time you open each tab.": "Hướng dẫn nhanh lần đầu bạn mở mỗi thẻ.",
@@ -3649,7 +3646,6 @@
   "That voice is already in the store.": "Giọng đó đã có trong cửa hàng.",
   "That voice isn't in the store any more.": "Giọng đó không còn trong cửa hàng nữa.",
   "The store doesn't take that name or description. Try other words (and no links).": "Cửa hàng không nhận tên hoặc mô tả đó. Hãy thử từ khác (và không có liên kết).",
-  "The voices people liked most this week": "Những giọng được thích nhiều nhất tuần này",
   "What's it good for? (optional)": "Nó hợp để làm gì? (không bắt buộc)",
   "Which voice": "Giọng nào",
   "You have the most AI voices of your own there can be: delete one first.": "Bạn đã có tối đa giọng nói AI riêng: hãy xóa một cái trước.",
@@ -3684,5 +3680,7 @@
   "Every sound except those in: {names} (right-click one of them, Advanced, to show it here again)": "Mọi âm thanh trừ các âm trong: {names} (chuột phải vào một mục, Nâng cao, để hiện lại ở đây)",
   "Hide its sounds from All": "Ẩn âm thanh của mục này khỏi Tất cả",
   "“{name}” is hidden from All. Its sounds stay on its own tab.": "“{name}” đã ẩn khỏi Tất cả. Âm thanh vẫn ở tab riêng của nó.",
-  "“{name}” shows in All again": "“{name}” hiện lại trong Tất cả"
+  "“{name}” shows in All again": "“{name}” hiện lại trong Tất cả",
+  "All categories": "Tất cả danh mục",
+  "Votes": "Lượt bình chọn"
 }

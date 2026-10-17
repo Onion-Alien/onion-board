@@ -3477,7 +3477,6 @@
   "Lots of sounds are waiting to be checked. Try again in a day or two.": "Maraming sound ang naghihintay masuri. Subukan ulit sa isa o dalawang araw.",
   "MP3, OGG, WAV or FLAC, up to 4 MB. It shows in the store once it's been checked.": "MP3, OGG, WAV o FLAC, hanggang 4 MB. Lalabas ito sa store kapag nasuri na.",
   "Name (what it is)": "Pangalan (ano ito)",
-  "New": "Bago",
   "No file picked": "Walang napiling file",
   "No sounds here yet": "Wala pang sounds dito",
   "Not for me": "Hindi para sa akin",
@@ -3509,7 +3508,6 @@
   "The store is off": "Naka-off ang store",
   "The store takes MP3, OGG, WAV or FLAC files.": "MP3, OGG, WAV o FLAC na file ang tinatanggap ng store.",
   "This sound is mine to give away": "Akin ang sound na ito at puwede kong ibigay",
-  "Top": "Top",
   "Try other words.": "Subukan ang ibang salita.",
   "Your vote didn't go through: {error}": "Hindi pumasok ang boto mo: {error}",
   "A YouTube, TikTok, SoundCloud or other video link. Only the link is kept: whoever adds it gets it from that site. It shows once it's been checked.": "Link ng YouTube, TikTok, SoundCloud o ibang video. Link lang ang itinatabi: kukunin ito ng magdadagdag mula sa site na iyon. Lalabas ito kapag nasuri na.",
@@ -3584,7 +3582,6 @@
   "Sports": "Sports",
   "TV": "TV",
   "Viral": "Viral",
-  "What's hot on Myinstants right now, and the sounds people here liked this week": "Ang uso sa Myinstants ngayon, at ang mga sound na nagustuhan ng mga tao rito ngayong linggo",
   "See everything waiting to play": "Tingnan lahat ng naghihintay tumugtog",
   "Take everything out of the queue": "Alisin lahat sa pila",
   "A quick how-to the first time you open each tab.": "Mabilis na gabay sa unang beses mong buksan ang bawat tab.",
@@ -3727,7 +3724,6 @@
   "That voice is already in the store.": "Nasa store na ang voice na iyan.",
   "That voice isn't in the store any more.": "Wala na sa store ang voice na iyan.",
   "The store doesn't take that name or description. Try other words (and no links).": "Hindi tinatanggap ng store ang pangalan o paglalarawang iyan. Subukan ang ibang salita (at walang link).",
-  "The voices people liked most this week": "Ang mga voice na pinakanagustuhan ngayong linggo",
   "What's it good for? (optional)": "Para saan ito? (opsyonal)",
   "Which voice": "Aling voice",
   "You have the most AI voices of your own there can be: delete one first.": "Nasa pinakamaraming sariling boses ng AI ka na: magbura muna ng isa.",
@@ -3763,5 +3759,7 @@
   "Every sound except those in: {names} (right-click one of them, Advanced, to show it here again)": "Lahat ng tunog maliban sa nasa: {names} (i-right-click ang isa, Advanced, para ipakita ulit dito)",
   "Hide its sounds from All": "Itago ang mga tunog nito sa All",
   "“{name}” is hidden from All. Its sounds stay on its own tab.": "Nakatago na ang “{name}” sa All. Nasa sarili nitong tab pa rin ang mga tunog nito.",
-  "“{name}” shows in All again": "Lumalabas na ulit ang “{name}” sa All"
+  "“{name}” shows in All again": "Lumalabas na ulit ang “{name}” sa All",
+  "All categories": "Lahat ng kategorya",
+  "Votes": "Mga boto"
 }

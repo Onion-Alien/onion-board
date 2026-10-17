@@ -3400,7 +3400,6 @@
   "Lots of sounds are waiting to be checked. Try again in a day or two.": "확인을 기다리는 사운드가 많습니다. 하루이틀 뒤에 다시 시도하세요.",
   "MP3, OGG, WAV or FLAC, up to 4 MB. It shows in the store once it's been checked.": "MP3, OGG, WAV 또는 FLAC, 최대 4MB. 확인이 끝나면 스토어에 올라옵니다.",
   "Name (what it is)": "이름 (무슨 소리인지)",
-  "New": "최신",
   "No file picked": "선택한 파일 없음",
   "No sounds here yet": "아직 사운드가 없어요",
   "Not for me": "취향 아님",
@@ -3432,7 +3431,6 @@
   "The store is off": "스토어가 꺼져 있어요",
   "The store takes MP3, OGG, WAV or FLAC files.": "스토어는 MP3, OGG, WAV 또는 FLAC 파일을 받습니다.",
   "This sound is mine to give away": "이 사운드는 내 것이고 내줄 수 있어요",
-  "Top": "인기",
   "Try other words.": "다른 단어로 찾아보세요.",
   "Your vote didn't go through: {error}": "투표가 전달되지 않았습니다: {error}",
   "A YouTube, TikTok, SoundCloud or other video link. Only the link is kept: whoever adds it gets it from that site. It shows once it's been checked.": "YouTube, TikTok, SoundCloud 등 영상 링크. 링크만 저장됩니다: 추가하는 사람이 그 사이트에서 받아요. 확인이 끝나면 올라옵니다.",
@@ -3507,7 +3505,6 @@
   "Sports": "스포츠",
   "TV": "TV",
   "Viral": "바이럴",
-  "What's hot on Myinstants right now, and the sounds people here liked this week": "지금 Myinstants에서 뜨는 것과 이번 주 여기서 사람들이 좋아한 사운드",
   "See everything waiting to play": "재생 대기 중인 항목 모두 보기",
   "Take everything out of the queue": "대기열에서 모두 빼기",
   "A quick how-to the first time you open each tab.": "탭을 처음 열 때마다 짧은 사용법을 보여 줍니다.",
@@ -3649,7 +3646,6 @@
   "That voice is already in the store.": "그 목소리는 이미 스토어에 있어요.",
   "That voice isn't in the store any more.": "그 목소리는 더 이상 스토어에 없어요.",
   "The store doesn't take that name or description. Try other words (and no links).": "스토어에서 그 이름이나 설명을 받지 않아요. 다른 말로 해 보세요(링크도 안 돼요).",
-  "The voices people liked most this week": "이번 주 가장 사랑받은 목소리",
   "What's it good for? (optional)": "어디에 좋은가요? (선택)",
   "Which voice": "어떤 목소리",
   "You have the most AI voices of your own there can be: delete one first.": "내 AI 목소리가 이미 최대예요: 먼저 하나를 지우세요.",
@@ -3684,5 +3680,7 @@
   "Every sound except those in: {names} (right-click one of them, Advanced, to show it here again)": "다음에 있는 소리를 뺀 모든 소리: {names} (하나를 우클릭하고 고급에서 다시 여기 보이게 할 수 있어요)",
   "Hide its sounds from All": "전체에서 이 소리들 숨기기",
   "“{name}” is hidden from All. Its sounds stay on its own tab.": "“{name}” 카테고리가 전체에서 숨겨졌어요. 소리는 자기 탭에 그대로 있어요.",
-  "“{name}” shows in All again": "“{name}” 카테고리가 다시 전체에 보여요"
+  "“{name}” shows in All again": "“{name}” 카테고리가 다시 전체에 보여요",
+  "All categories": "전체 카테고리",
+  "Votes": "투표"
 }

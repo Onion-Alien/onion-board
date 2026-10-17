@@ -3554,7 +3554,6 @@
   "Lots of sounds are waiting to be checked. Try again in a day or two.": "Багато звуків чекають на перевірку. Спробуйте через день-два.",
   "MP3, OGG, WAV or FLAC, up to 4 MB. It shows in the store once it's been checked.": "MP3, OGG, WAV або FLAC, до 4 МБ. Він з’явиться в магазині після перевірки.",
   "Name (what it is)": "Назва (що це)",
-  "New": "Нові",
   "No file picked": "Файл не вибрано",
   "No sounds here yet": "Тут поки немає звуків",
   "Not for me": "Не моє",
@@ -3586,7 +3585,6 @@
   "The store is off": "Магазин вимкнено",
   "The store takes MP3, OGG, WAV or FLAC files.": "Магазин приймає файли MP3, OGG, WAV або FLAC.",
   "This sound is mine to give away": "Цей звук мій, і я можу його віддати",
-  "Top": "Найкращі",
   "Try other words.": "Спробуйте інші слова.",
   "Your vote didn't go through: {error}": "Ваш голос не зараховано: {error}",
   "A YouTube, TikTok, SoundCloud or other video link. Only the link is kept: whoever adds it gets it from that site. It shows once it's been checked.": "Посилання на YouTube, TikTok, SoundCloud чи інше відео. Зберігається лише посилання: хто його додасть, завантажить із самого сайту. З’явиться після перевірки.",
@@ -3661,7 +3659,6 @@
   "Sports": "Спорт",
   "TV": "ТБ",
   "Viral": "Вірусні",
-  "What's hot on Myinstants right now, and the sounds people here liked this week": "Що зараз популярне на Myinstants і звуки, які тут сподобалися людям цього тижня",
   "See everything waiting to play": "Показати все, що чекає на відтворення",
   "Take everything out of the queue": "Прибрати все з черги",
   "A quick how-to the first time you open each tab.": "Коротка підказка, коли вперше відкриваєш кожну вкладку.",
@@ -3805,7 +3802,6 @@
   "That voice is already in the store.": "Цей голос уже є в магазині.",
   "That voice isn't in the store any more.": "Цього голосу вже немає в магазині.",
   "The store doesn't take that name or description. Try other words (and no links).": "Магазин не приймає таку назву чи опис. Спробуйте інші слова (і без посилань).",
-  "The voices people liked most this week": "Голоси, які найбільше сподобалися цього тижня",
   "What's it good for? (optional)": "Для чого він? (необов'язково)",
   "Which voice": "Який голос",
   "You have the most AI voices of your own there can be: delete one first.": "У вас уже максимум власних ШІ голосів: спершу видаліть один.",
@@ -3842,5 +3838,7 @@
   "Every sound except those in: {names} (right-click one of them, Advanced, to show it here again)": "Усі звуки, крім звуків із: {names} (правий клік на одній із них, Розширені, щоб знову показати її тут)",
   "Hide its sounds from All": "Приховати її звуки в «Усі»",
   "“{name}” is hidden from All. Its sounds stay on its own tab.": "«{name}» прихована в «Усі». Її звуки лишаються на її вкладці.",
-  "“{name}” shows in All again": "«{name}» знову видно в «Усі»"
+  "“{name}” shows in All again": "«{name}» знову видно в «Усі»",
+  "All categories": "Усі категорії",
+  "Votes": "Оцінки"
 }

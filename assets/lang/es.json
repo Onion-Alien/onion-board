@@ -3477,7 +3477,6 @@
   "Lots of sounds are waiting to be checked. Try again in a day or two.": "Hay muchos sonidos esperando revisión. Vuelve a intentarlo en uno o dos días.",
   "MP3, OGG, WAV or FLAC, up to 4 MB. It shows in the store once it's been checked.": "MP3, OGG, WAV o FLAC, hasta 4 MB. Aparece en la tienda cuando se revisa.",
   "Name (what it is)": "Nombre (qué es)",
-  "New": "Nuevos",
   "No file picked": "Ningún archivo elegido",
   "No sounds here yet": "Aún no hay sonidos",
   "Not for me": "No es para mí",
@@ -3509,7 +3508,6 @@
   "The store is off": "La tienda está apagada",
   "The store takes MP3, OGG, WAV or FLAC files.": "La tienda acepta archivos MP3, OGG, WAV o FLAC.",
   "This sound is mine to give away": "Este sonido es mío y puedo regalarlo",
-  "Top": "Top",
   "Try other words.": "Prueba con otras palabras.",
   "Your vote didn't go through: {error}": "Tu voto no se envió: {error}",
   "A YouTube, TikTok, SoundCloud or other video link. Only the link is kept: whoever adds it gets it from that site. It shows once it's been checked.": "Un enlace de YouTube, TikTok, SoundCloud u otro video. Solo se guarda el enlace: quien lo añada lo obtiene de ese sitio. Aparece cuando se revisa.",
@@ -3584,7 +3582,6 @@
   "Sports": "Deportes",
   "TV": "TV",
   "Viral": "Virales",
-  "What's hot on Myinstants right now, and the sounds people here liked this week": "Lo más popular en Myinstants ahora mismo y los sonidos que gustaron aquí esta semana",
   "See everything waiting to play": "Ver todo lo que espera para sonar",
   "Take everything out of the queue": "Quitar todo de la cola",
   "A quick how-to the first time you open each tab.": "Una guía rápida la primera vez que abres cada pestaña.",
@@ -3727,7 +3724,6 @@
   "That voice is already in the store.": "Esa voz ya está en la tienda.",
   "That voice isn't in the store any more.": "Esa voz ya no está en la tienda.",
   "The store doesn't take that name or description. Try other words (and no links).": "La tienda no acepta ese nombre o descripción. Prueba con otras palabras (y sin enlaces).",
-  "The voices people liked most this week": "Las voces que más gustaron esta semana",
   "What's it good for? (optional)": "¿Para qué sirve? (opcional)",
   "Which voice": "Qué voz",
   "You have the most AI voices of your own there can be: delete one first.": "Ya tienes el máximo de voces de IA propias: borra una primero.",
@@ -3763,5 +3759,7 @@
   "Every sound except those in: {names} (right-click one of them, Advanced, to show it here again)": "Todos los sonidos menos los de: {names} (clic derecho en una de ellas, Avanzado, para mostrarla aquí de nuevo)",
   "Hide its sounds from All": "Ocultar sus sonidos en Todo",
   "“{name}” is hidden from All. Its sounds stay on its own tab.": "«{name}» está oculta en Todo. Sus sonidos siguen en su propia pestaña.",
-  "“{name}” shows in All again": "«{name}» vuelve a mostrarse en Todo"
+  "“{name}” shows in All again": "«{name}» vuelve a mostrarse en Todo",
+  "All categories": "Todas las categorías",
+  "Votes": "Votos"
 }

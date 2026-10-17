@@ -3785,7 +3785,6 @@
   "Lots of sounds are waiting to be checked. Try again in a day or two.": "هناك أصوات كثيرة تنتظر المراجعة. حاول مرة أخرى بعد يوم أو يومين.",
   "MP3, OGG, WAV or FLAC, up to 4 MB. It shows in the store once it's been checked.": "MP3 أو OGG أو WAV أو FLAC، حتى 4 ميغابايت. يظهر في المتجر بعد مراجعته.",
   "Name (what it is)": "الاسم (ما هو)",
-  "New": "الأحدث",
   "No file picked": "لم يُختر أي ملف",
   "No sounds here yet": "لا توجد أصوات هنا بعد",
   "Not for me": "ليس لي",
@@ -3817,7 +3816,6 @@
   "The store is off": "المتجر متوقف",
   "The store takes MP3, OGG, WAV or FLAC files.": "يقبل المتجر ملفات MP3 أو OGG أو WAV أو FLAC.",
   "This sound is mine to give away": "هذا الصوت ملكي ويمكنني التنازل عنه",
-  "Top": "الأفضل",
   "Try other words.": "جرّب كلمات أخرى.",
   "Your vote didn't go through: {error}": "لم يُحتسب تصويتك: {error}",
   "A YouTube, TikTok, SoundCloud or other video link. Only the link is kept: whoever adds it gets it from that site. It shows once it's been checked.": "رابط YouTube أو TikTok أو SoundCloud أو فيديو آخر. يُحفظ الرابط فقط: من يضيفه يجلبه من ذلك الموقع. يظهر بعد مراجعته.",
@@ -3892,7 +3890,6 @@
   "Sports": "رياضة",
   "TV": "تلفزيون",
   "Viral": "منتشر",
-  "What's hot on Myinstants right now, and the sounds people here liked this week": "الرائج على Myinstants الآن، والأصوات التي أعجبت الناس هنا هذا الأسبوع",
   "See everything waiting to play": "اعرض كل ما ينتظر التشغيل",
   "Take everything out of the queue": "أخرج كل شيء من قائمة الانتظار",
   "A quick how-to the first time you open each tab.": "شرح سريع أول مرة تفتح فيها كل تبويب.",
@@ -4039,7 +4036,6 @@
   "That voice is already in the store.": "هذا الصوت موجود في المتجر بالفعل.",
   "That voice isn't in the store any more.": "هذا الصوت لم يعد في المتجر.",
   "The store doesn't take that name or description. Try other words (and no links).": "لا يقبل المتجر هذا الاسم أو الوصف. جرّب كلمات أخرى (وبدون روابط).",
-  "The voices people liked most this week": "الأصوات التي أعجبت الناس أكثر هذا الأسبوع",
   "What's it good for? (optional)": "لمَ يصلح؟ (اختياري)",
   "Which voice": "أي صوت",
   "You have the most AI voices of your own there can be: delete one first.": "لديك أكبر عدد ممكن من أصوات الذكاء الاصطناعي الخاصة بك: احذف واحدًا أولًا.",
@@ -4079,5 +4075,7 @@
   "Every sound except those in: {names} (right-click one of them, Advanced, to show it here again)": "كل الأصوات ما عدا الموجودة في: {names} (انقر بالزر الأيمن على إحداها، متقدم، لإظهارها هنا مجددًا)",
   "Hide its sounds from All": "إخفاء أصواتها من الكل",
   "“{name}” is hidden from All. Its sounds stay on its own tab.": "«{name}» مخفية من الكل. تبقى أصواتها في تبويبها.",
-  "“{name}” shows in All again": "«{name}» تظهر في الكل مجددًا"
+  "“{name}” shows in All again": "«{name}» تظهر في الكل مجددًا",
+  "All categories": "كل الفئات",
+  "Votes": "التقييمات"
 }
