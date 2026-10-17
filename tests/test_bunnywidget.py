@@ -669,3 +669,48 @@ def test_his_head_tilts_on_its_own_but_not_while_dancing(qapp):
     b = BunnyWidget()
     tilts = {round(b.pose(b._t0 + t)["tilt"], 2) for t in (0.5, 2.0, 4.0)}
     assert len(tilts) > 1 and all(abs(t) < 8 for t in tilts)
+
+
+def test_pictures_of_bun_leave_room_for_an_upright_ear_and_a_wide_collar(qapp):
+    """bunny_image's canvas cut the tip off an upright ear (Light) and the sides off
+    Vampire's collar: they're inside the picture now, with clear edges."""
+    from soundboard import theme
+    from soundboard.bunny import bunny_image
+
+    for name, edge in (("Light", "top"), ("Vampire", "sides")):
+        with theme.previewing(name):
+            img = bunny_image(120)
+        w, h = img.width(), img.height()
+        if edge == "top":
+            line = [img.pixelColor(x, 0).alpha() for x in range(w)]
+        else:
+            line = [img.pixelColor(x, y).alpha() for y in range(h) for x in (0, w - 1)]
+        assert max(line) == 0, name
+
+
+def test_bits_of_bun_drawn_outside_draw_bunny_wear_his_theme_fur(qapp):
+    """A skit's paw was always plain white fur, even on Mocha's brown Bun."""
+    from soundboard import theme
+    from soundboard.style import bunnyfit
+    from soundboard.ui import bunskits
+
+    with theme.previewing("Mocha"):
+        img = QImage(40, 40, QImage.Format.Format_ARGB32_Premultiplied)
+        img.fill(0)
+        p = QPainter(img)
+        p.setRenderHint(QPainter.RenderHint.Antialiasing)
+        bunskits.paw(p, 20, 20)
+        p.end()
+        assert img.pixelColor(20, 20).rgb() == QColor(bunnyfit.look()["fur"]).rgb()
+
+
+def test_a_small_bun_widget_has_room_above_him_for_an_upright_ear(qapp):
+    """The setup guide's 74 px Bun had 5 px above him: an upright ear's tip was cut off
+    at the top of every bob."""
+    from soundboard.bunny import ROOM_TOP, H
+    from soundboard.ui.bunnywidget import BOB_UP
+
+    b = BunnyWidget("star", height=74, pad=5)
+    b.resize(b.sizeHint())
+    assert b._bun_rect().top() >= 74 * ROOM_TOP / H + BOB_UP
+    assert b.height() - b._bun_rect().bottom() >= 5   # (his shadow's room kept)

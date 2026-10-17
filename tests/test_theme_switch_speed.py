@@ -152,7 +152,7 @@ def test_the_cover_shows_bun_in_the_theme_being_switched_to(main_window):  # noq
     """Bun and the dimming on the cover were drawn in the theme being left (his
     headphones in its accent): they're the new theme's, and the current one stays."""
     from soundboard.bunny import bunny_image
-    from soundboard.ui.themecover import ThemeCover
+    from soundboard.ui.themecover import BUNNY_H, ThemeCover
     old, new = "Dark", "Royal"   # different accents and bg, and Royal dresses Bun up
     theme.set_current(old)
     main_window.show()   # covers only go over a window on screen
@@ -162,10 +162,10 @@ def test_the_cover_shows_bun_in_the_theme_being_switched_to(main_window):  # noq
         assert cover.scrim.rgb() == QColor(theme.tokens(new)["bg"]).rgb()
         assert cover.scrim.alpha() == 150
         with theme.previewing(new):
-            want = bunny_image(cover.bunny.height(), dpr=1.0)
+            want = bunny_image(BUNNY_H, dpr=1.0)
         assert cover.bunny.toImage().convertToFormat(want.format()) == want
         assert cover.bunny.toImage().convertToFormat(want.format()) != bunny_image(
-            cover.bunny.height(), dpr=1.0)
+            BUNNY_H, dpr=1.0)
     finally:
         cover.deleteLater()
 

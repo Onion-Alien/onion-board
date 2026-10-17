@@ -8,7 +8,7 @@ lines in the files below.
 
 | File | What it does |
 | --- | --- |
-| `soundboard/bunny.py` | `draw_bunny(p, rect, prop, **pose)`: one still picture of Bun on a 100 x 120 canvas. Everything else calls this. Also `bunny_image` / `bunny_pixmap` for static pictures. |
+| `soundboard/bunny.py` | `draw_bunny(p, rect, prop, **pose)`: one still picture of Bun on a 100 x 120 canvas. Everything else calls this. Also `bunny_image` / `bunny_pixmap` for static pictures (with `ROOM_TOP` above him and `ROOM_SIDE` either side: an upright ear and a wide collar reach past his canvas). |
 | `soundboard/style/bunnyfit.py` | His outfit per theme (`OUTFITS`) and the pieces' drawing (`PIECES`), in layers `draw_bunny` calls between its own; his look per theme (`LOOKS`: fur, floppy ears, extras). |
 | `soundboard/ui/bunnywidget.py` | `BunnyWidget`: Bun alive. Bobs, blinks, flicks ears, idle fidgets (yawn, look round, foot tap), talks with the mic level, music notes, begging bubbles, naps, the click cheer, the build act (dives into a dust cloud, rummages, hammers a speaker together; the snap when it fails), Robo-Bun's version (gadget screen, sparks, LED pulse), the Pong dare (cross face, bat). Its `pose(now)` turns the clock into `draw_bunny`'s keywords plus his squash (`sx`, `sy`), lean (`angle`) and fade (`alpha`). |
 | `soundboard/ui/setupshow.py` | `SetupShow(BunnyWidget)`: the mic set-up show (toolbox, speaker parts popping on, progress dots). |
@@ -103,7 +103,11 @@ current theme's look; pass `kit=bunnyfit.VANILLA` for plain Bun (installer art).
 light rim and his tummy patch is lighter than his fur, so his face still reads. Robo-Bun
 keeps his own metal look. A sweater gives his arms sleeves in its colour
 (`bunnyfit.sleeve`). `tests/test_bunnyfit.py` checks every look names a real theme and
-every change shows.
+every change shows. A bit of him drawn outside `draw_bunny` (a skit's paw, the scribe's
+paw on the quill, his ears out of the build cloud) takes its colours from
+`bunny.look_colour("fur")` / `look_colour("inner")`, never `FUR` or `PINK` (plain
+Bun's), or a white paw shows on a brown Bun. A `BunnyWidget` whose `pad` is too small
+for an upright ear at the top of his bob gets the difference above him (`_head`).
 
 ## Outfits
 

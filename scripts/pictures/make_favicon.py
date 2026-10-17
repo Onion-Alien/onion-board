@@ -30,7 +30,7 @@ def png_bytes(img) -> bytes:
 def head(size: int, bg: QColor | None = None) -> QImage:
     """Bun's head centred in a size x size square, on `bg` (else transparent)."""
     from soundboard.bunny import bunny_image
-    big = bunny_image(1024)
+    big = bunny_image(1024, room=False)
     crop = big.copy(QRect(0, 0, big.width(), round(big.height() * HEAD)))
     img = QImage(size, size, QImage.Format_ARGB32_Premultiplied)
     img.fill(bg if bg is not None else Qt.transparent)
