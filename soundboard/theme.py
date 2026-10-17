@@ -539,6 +539,8 @@ QPushButton#live:checked, QFrame#card QPushButton#live:checked { background:$liv
 QPushButton#live:checked:hover, QFrame#card QPushButton#live:checked:hover { background:$live_hover; }
 QPushButton#rec { min-height:18px; }   /* its 14px dot: as tall as Send beside it */
 QPushButton#rec:checked { background:#d32f2f; border:1px solid #ff6b6b; color:white; font-weight:700; }
+/* in a card too (an app row's Record): the card's accent fill had its white icon on Hacker's green */
+QFrame#card QPushButton#rec:checked { background:#d32f2f; border:1px solid #ff6b6b; color:white; }
 QDialog#recorddialog QLabel#recordtitle { font-size:19pt; font-weight:700; color:$text_hi; }
 QDialog#recorddialog QPushButton#recordmark { background:$panel; border:1px solid $border; border-radius:14px; padding:0; }
 QDialog#recorddialog QRadioButton#recordsource { background:$panel; border:1px solid $border; border-radius:12px; padding:12px 14px; spacing:8px; font-weight:600; }

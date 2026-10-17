@@ -1090,6 +1090,16 @@ def text_gap(button):
             return
 
 
+def recolor(button, color: str | None):
+    """The same icon in another colour: a button that turned into the filled main one
+    (on_accent) or back (None: the text colour). Its old colour would sit on the new fill."""
+    for ref, name, old, checked, __ in _applied:
+        if ref() is button:
+            if old != color:
+                set_icon(button, name, color, checked, button.iconSize().height())
+            return
+
+
 _labels: list[tuple[weakref.ref, str, str, int]] = []
 
 

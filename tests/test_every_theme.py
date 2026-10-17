@@ -3,7 +3,8 @@ render of each one found, kept from coming back."""
 import pytest
 from PySide6.QtCore import QPoint, QSize
 from PySide6.QtGui import QColor, QIcon
-from PySide6.QtWidgets import QAbstractButton, QApplication, QFrame, QTabBar, QVBoxLayout
+from PySide6.QtWidgets import (QAbstractButton, QApplication, QFrame, QPushButton, QTabBar,
+                               QVBoxLayout)
 from test_mainwindow import window as main_window  # noqa: F401 - the real window, offscreen
 
 from soundboard import theme
@@ -149,3 +150,76 @@ def test_scroll_area_corner_is_not_drawn(qapp, name):
         holder.close()
     finally:
         qapp.setStyleSheet(old_sheet)
+
+
+def _ink_contrast(button) -> float:
+    """The icon against what's behind it, from the pixels: the button drawn with its
+    icon and with a blank one the same size, the pixels that change are the icon."""
+    from PySide6.QtCore import Qt as _Qt
+    from PySide6.QtGui import QPixmap
+    host = button.parentWidget()
+    with_icon = host.grab(button.geometry()).toImage()
+    ico = button.icon()
+    blank = QPixmap(button.iconSize())
+    blank.fill(_Qt.GlobalColor.transparent)
+    button.setIcon(QIcon(blank))
+    without = host.grab(button.geometry()).toImage()
+    button.setIcon(ico)
+    pairs = []
+    for y in range(with_icon.height()):
+        for x in range(with_icon.width()):
+            a, b = QColor(with_icon.pixel(x, y)), QColor(without.pixel(x, y))
+            d = abs(a.red() - b.red()) + abs(a.green() - b.green()) + abs(a.blue() - b.blue())
+            if d > 24:
+                pairs.append((d, a.name(), b.name()))
+    assert len(pairs) > 4, "no icon drawn"
+    pairs.sort(reverse=True)
+    __, ink, bg = pairs[len(pairs) // 10]   # the icon's solid middle, not its soft edge
+    return theme._contrast(ink, bg)
+
+
+@pytest.mark.parametrize("name", list(theme.THEMES))
+def test_switched_on_icon_buttons_in_a_card_show_their_icon(qapp, name):
+    """A Store row's play turned stop drew its on_accent square on the row's own
+    colour (a quiet icon button stays clear when switched on): black on near-black in
+    Amber Terminal. An app row's Record, switched on, drew its white dot on the card's
+    accent (Hacker's green, 1.4:1) instead of its red, and its red dot was 2.5:1 on
+    Light's grey button."""
+    from soundboard import store
+    from soundboard.ui import icons
+    from soundboard.ui.storetab import SoundRow
+    old = dict(theme.T)
+    theme.set_current(name)
+    try:
+        frame = QFrame()
+        lay = QVBoxLayout(frame)
+        row = SoundRow(store.Sound(id="s", name="Owl hoot", ext="mp3"), object())
+        rec_card = QFrame()
+        rec_card.setObjectName("card")
+        rec = QPushButton("Record")
+        rec.setObjectName("rec")
+        rec.setCheckable(True)
+        icons.set_icon(rec, "record", "danger_text", "#ffffff", size=14)   # as approw's
+        QVBoxLayout(rec_card).addWidget(rec)
+        lay.addWidget(row)
+        lay.addWidget(rec_card)
+        frame.setStyleSheet(theme.stylesheet(name))
+        frame.resize(560, 160)
+        frame.show()
+        QApplication.processEvents()
+        play = row.btn_play
+        for b in (play, rec):
+            assert _ink_contrast(b) >= 3.0, (b.text() or "play", "off")
+        play.blockSignals(True)
+        play.setChecked(True)
+        play.blockSignals(False)
+        row.playing_look(True)
+        rec.setChecked(True)
+        QApplication.processEvents()
+        for b in (play, rec):
+            assert _ink_contrast(b) >= 3.0, (b.text() or "stop", "on")
+        frame.close()
+    finally:
+        theme.T.clear()
+        theme.T.update(old)
+        theme.set_current(theme.DEFAULT)

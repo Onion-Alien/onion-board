@@ -65,6 +65,7 @@ class SoundRow(HoverCard):
         self.btn_play = icon_button("play", _("Play it once (from the site)") if s.is_link
                                     else _("Hear it (only you)"))
         self.btn_play.setCheckable(True)
+        icons.set_icon(self.btn_play, "play", checked_color="accent")   # (playing_look)
         self.btn_play.setFixedSize(32, 32)
         self.btn_play.toggled.connect(lambda on: tab.hear(self, on))
         h.addWidget(self.btn_play)
@@ -97,6 +98,13 @@ class SoundRow(HoverCard):
         self.btn_report.clicked.connect(lambda: tab.report_menu(self))
         h.addWidget(self.btn_report)
         self.show_votes()
+
+    def playing_look(self, on: bool):
+        """Play turned stop while its sample plays. The switched-on button stays clear on
+        the row (a quiet icon button in a card), so the square is drawn in the accent, as
+        the Apps rows' eye: on_accent there was black on near-black (1.05:1) in Amber Terminal."""
+        icons.set_icon(self.btn_play, "stop" if on else "play", checked_color="accent")
+        self.btn_play.setToolTip(_("Stop") if on else _("Hear it (only you)"))
 
     def _vote_button(self, icon: str, tip: str) -> QPushButton:
         b = QPushButton()
@@ -542,8 +550,7 @@ class StoreTab(QWidget):
             self._stop_preview()
             return
         self._playing = row
-        icons.set_icon(row.btn_play, "stop")
-        row.btn_play.setToolTip(_("Stop"))
+        row.playing_look(True)
         self._get(row, "play")
 
     def _decode(self, row: SoundRow, path: str):
@@ -577,8 +584,7 @@ class StoreTab(QWidget):
             try:
                 with _blocked(row.btn_play):
                     row.btn_play.setChecked(False)
-                icons.set_icon(row.btn_play, "play")
-                row.btn_play.setToolTip(_("Hear it (only you)"))
+                row.playing_look(False)
             except RuntimeError:   # its row went meanwhile
                 pass
             self._play(None, 1.0)
