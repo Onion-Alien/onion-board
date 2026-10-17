@@ -549,7 +549,7 @@ body.ob-locked { overflow: hidden; }
 .ob-vstrip .ob-meter { flex: 1; }
 .ob-vstrip .st { display: inline-flex; align-items: center; gap: 6px; min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 
-/* ------------------------------------------------------------------ Free sounds (the sound store) */
+/* ------------------------------------------------------------------ Community (the sound store) */
 .ob-storehead { max-width: 760px; }
 .ob-storehead .hd b { flex: none; }
 .ob-storehead .row { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
