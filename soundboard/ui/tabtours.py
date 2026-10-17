@@ -6,12 +6,12 @@ won't play: it ends at once, coach.py); either way it never comes back
 (Config.tips_seen). One
 step each, a few seconds long.
 
-Radio, Apps, Triggers, Voice and Store have one; Sounds has the first-run tour
-(firsttour.py) and Setup its own guide. None with tutorials switched off
-(Config.tutorials_on, Settings > General), none during the first-run tour or the setup
-guide (and "Not now" twice inside QUIT_S switches them off: they're clicking around,
-not learning), and none for tabs an older version already had (library.Config.from_raw marks
-those seen: they've been there).
+Radio, Apps, Voice and Store have one (Triggers has none: its page says it all);
+Sounds has the first-run tour (firsttour.py) and Setup its own guide. None with
+tutorials switched off (Config.tutorials_on, Settings > General), none during the
+first-run tour or the setup guide (and "Not now" twice inside QUIT_S switches them off:
+they're clicking around, not learning), and none for tabs an older version already had
+(library.Config.from_raw marks those seen: they've been there).
 """
 from __future__ import annotations
 
@@ -117,8 +117,7 @@ def _steps(win, tab: str) -> list[coach.Step]:
     w = _widget(win, tab)
     make: dict[str, Callable[[], list[coach.Step]]] = {
         "radio": lambda: _radio(win, w), "apps": lambda: _apps(win, w),
-        "triggers": lambda: _triggers(win, w), "voice": lambda: _voice(win, w),
-        "store": lambda: _store(win, w)}
+        "voice": lambda: _voice(win, w), "store": lambda: _store(win, w)}
     return make[tab]()
 
 
@@ -170,25 +169,6 @@ def _apps(win, tab) -> list[coach.Step]:
         oops_title=_("Nothing to share yet"),
         oops=_("No program is making sound right now. Start some music or a game, then "
                "press Try again."), extra={"calm": True})]
-
-
-def _triggers(win, tab) -> list[coach.Step]:
-    got = {"get": False}
-    btn = getattr(tab, "btn_get", None)
-    if getattr(tab, "panel", None) is None and btn is not None:   # not installed yet
-        btn.clicked.connect(lambda: got.__setitem__("get", True))
-        return [coach.Step(
-            _("Get the free Onion Watch add-on"),
-            _("It watches your game and plays a sound when something shows up, like "
-              "“YOU DIED”."),
-            target=lambda: coach.rect_of(win, btn),
-            done=lambda: got["get"] or getattr(tab, "panel", None) is not None,
-            skip=_("Not now"))]
-    return [coach.Step(
-        _("Turn on a trigger"),
-        _("Pick what to watch for on your screen, then switch it on."),
-        target=lambda: coach.rect_of(win, tab),
-        done=lambda: bool(getattr(tab, "is_active", lambda: False)()), skip=_("Not now"))]
 
 
 def _voice(win, panel) -> list[coach.Step]:
