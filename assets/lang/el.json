@@ -2489,7 +2489,6 @@
   "Zoom out": "Σμίκρυνση",
   "headphones": "ακουστικά",
   "mic": "μικρόφωνο",
-  "only you hear the radio: press “Send” below so others hear it too": "μόνο εσείς ακούτε το ραδιόφωνο: πατήστε \"Αποστολή\" παρακάτω για να το ακούσουν και άλλοι",
   "others hear it": "το ακούν άλλοι",
   "sending": "αποστολή",
   "{kbps} kbps +": "{kbps} kbps +",
@@ -3629,8 +3628,13 @@
   "Show tutorials": "Εμφάνιση οδηγών",
   "Start some music or a game, then press Send on it. Everyone in your call hears it.": "Βάλε μουσική ή ένα παιχνίδι και μετά πάτα Στέλνω σε αυτό. Όλοι στην κλήση σου το ακούνε.",
   "Turn on a trigger": "Άναψε ένα έναυσμα",
-  "Click any dot to play that station. Press Send and your call hears it too.": "Κάνε κλικ σε μια κουκκίδα για να παίξει ο σταθμός. Πάτα Στέλνω και τον ακούει και η κλήση σου.",
   "Pick a station on the globe": "Διάλεξε σταθμό στην υδρόγειο",
   "Beta": "Beta",
-  "The sound store is new and still changing.": "Το κατάστημα ήχων είναι καινούργιο και ακόμα αλλάζει."
+  "The sound store is new and still changing.": "Το κατάστημα ήχων είναι καινούργιο και ακόμα αλλάζει.",
+  "Just me": "Μόνο εγώ",
+  "Me and others": "Εγώ και οι άλλοι",
+  "Send to others": "Στείλε στους άλλους",
+  "Who should hear the radio?": "Ποιος να ακούει το ραδιόφωνο;",
+  "only you hear it": "μόνο εσύ το ακούς",
+  "Click any dot to play that station. Press Send to others and your call hears it too.": "Κάνε κλικ σε μια κουκκίδα για να παίξει ο σταθμός. Πάτα Στείλε στους άλλους και τον ακούει και η κλήση σου."
 }

@@ -2489,7 +2489,6 @@
   "Zoom out": "Zooma ut",
   "headphones": "hörlurar",
   "mic": "mikrofon",
-  "only you hear the radio: press “Send” below so others hear it too": "bara du hör radion: tryck på \"Skicka\" nedan så att andra också hör den",
   "others hear it": "andra hör det",
   "sending": "sändning",
   "{kbps} kbps +": "{kbps} kbps +",
@@ -3629,8 +3628,13 @@
   "Show tutorials": "Visa guider",
   "Start some music or a game, then press Send on it. Everyone in your call hears it.": "Starta lite musik eller ett spel och tryck på Skicka vid det. Alla i samtalet hör det.",
   "Turn on a trigger": "Slå på en trigger",
-  "Click any dot to play that station. Press Send and your call hears it too.": "Klicka på en prick för att spela stationen. Tryck på Skicka så hör ditt samtal den också.",
   "Pick a station on the globe": "Välj en station på jordgloben",
   "Beta": "Beta",
-  "The sound store is new and still changing.": "Ljudbutiken är ny och ändras fortfarande."
+  "The sound store is new and still changing.": "Ljudbutiken är ny och ändras fortfarande.",
+  "Just me": "Bara jag",
+  "Me and others": "Jag och andra",
+  "Send to others": "Skicka till andra",
+  "Who should hear the radio?": "Vem ska höra radion?",
+  "only you hear it": "bara du hör den",
+  "Click any dot to play that station. Press Send to others and your call hears it too.": "Klicka på en prick för att spela stationen. Tryck på Skicka till andra så hör ditt samtal den också."
 }

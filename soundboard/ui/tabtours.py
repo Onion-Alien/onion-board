@@ -130,7 +130,7 @@ def _radio(win, tab) -> list[coach.Step]:
                 or coach.rect_of(win, getattr(tab, "station_panel", None)))
     return [coach.Step(
         _("Pick a station on the globe"),
-        _("Click any dot to play that station. Press Send and your call hears it too."),
+        _("Click any dot to play that station. Press Send to others and your call hears it too."),
         target=globe, done=tab.is_active, skip=_("Not now"),
         failed=lambda: bool(getattr(tab, "_globe_error", "")),   # no stations to pick
         allow=_inside(getattr(tab, "station_panel", None), getattr(tab, "btn_play", None)))]

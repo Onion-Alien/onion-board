@@ -2489,7 +2489,6 @@
   "Zoom out": "Herauszoomen",
   "headphones": "Kopfhörer",
   "mic": "Mikrofon",
-  "only you hear the radio: press “Send” below so others hear it too": "Nur Sie hören das Radio: Klicken Sie unten auf „Senden“, damit auch andere es hören",
   "others hear it": "andere hören es",
   "sending": "Senden",
   "{kbps} kbps +": "{kbps} kbps +",
@@ -3629,8 +3628,13 @@
   "Show tutorials": "Anleitungen zeigen",
   "Start some music or a game, then press Send on it. Everyone in your call hears it.": "Starte Musik oder ein Spiel und drück dann daneben auf Schicken. Alle in deinem Call hören es.",
   "Turn on a trigger": "Schalt einen Trigger ein",
-  "Click any dot to play that station. Press Send and your call hears it too.": "Klick auf einen Punkt, um den Sender abzuspielen. Drück Schicken, dann hört ihn dein Call auch.",
   "Pick a station on the globe": "Such dir einen Sender auf dem Globus aus",
   "Beta": "Beta",
-  "The sound store is new and still changing.": "Der Sound-Store ist neu und ändert sich noch."
+  "The sound store is new and still changing.": "Der Sound-Store ist neu und ändert sich noch.",
+  "Just me": "Nur ich",
+  "Me and others": "Ich und andere",
+  "Send to others": "An andere schicken",
+  "Who should hear the radio?": "Wer soll das Radio hören?",
+  "only you hear it": "nur du hörst es",
+  "Click any dot to play that station. Press Send to others and your call hears it too.": "Klick auf einen Punkt, um den Sender abzuspielen. Drück An andere schicken, dann hört ihn dein Call auch."
 }

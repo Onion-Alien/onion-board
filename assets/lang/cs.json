@@ -2543,7 +2543,6 @@
   "Zoom out": "Oddálit",
   "headphones": "sluchátka",
   "mic": "mic",
-  "only you hear the radio: press “Send” below so others hear it too": "rádio slyšíte pouze vy: stiskněte tlačítko „Odeslat“ níže, aby ho slyšeli i ostatní",
   "others hear it": "ostatní to slyší",
   "sending": "odesílání",
   "{kbps} kbps +": "{kbps} kbps +",
@@ -3706,8 +3705,13 @@
   "Show tutorials": "Zobrazovat návody",
   "Start some music or a game, then press Send on it. Everyone in your call hears it.": "Pusť hudbu nebo hru a pak u ní stiskni Poslat. Uslyší ji všichni v hovoru.",
   "Turn on a trigger": "Zapni spouštěč",
-  "Click any dot to play that station. Press Send and your call hears it too.": "Klikni na libovolnou tečku a stanice začne hrát. Stiskni Poslat a uslyší ji i tvůj hovor.",
   "Pick a station on the globe": "Vyber stanici na zeměkouli",
   "Beta": "Beta",
-  "The sound store is new and still changing.": "Obchod se zvuky je nový a pořád se mění."
+  "The sound store is new and still changing.": "Obchod se zvuky je nový a pořád se mění.",
+  "Just me": "Jen já",
+  "Me and others": "Já a ostatní",
+  "Send to others": "Poslat ostatním",
+  "Who should hear the radio?": "Kdo má slyšet rádio?",
+  "only you hear it": "slyšíš to jen ty",
+  "Click any dot to play that station. Press Send to others and your call hears it too.": "Klikni na libovolnou tečku a stanice začne hrát. Stiskni Poslat ostatním a uslyší ji i tvůj hovor."
 }
