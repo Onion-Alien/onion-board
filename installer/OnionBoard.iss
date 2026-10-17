@@ -124,12 +124,26 @@ Name: "vbcable"; Description: "The free virtual cable (VB-Cable): only if you kn
 ; user's lives there: settings, sounds and downloaded add-ons are in %APPDATA%\OnionBoard,
 ; and {app}\modules (live-voice's own .venv, and its .python when it got one) is left alone.
 Type: filesandordirs; Name: "{app}\_internal"
+; the exe a past update moved aside (MoveOldExeAside), if it was still running then
+Type: files; Name: "{app}\{#AppExeName}.exe.old*"
 
 [Files]
 ; Includes the add-ons in {app}\modules (build.ps1 copies them in; see soundboard/modules.py).
 ; live-voice's own .venv is made later, by the "livevoice" task or the Voice tab's button.
 #ifndef PREVIEW
-Source: "..\dist\OnionBoard\*"; DestDir: "{app}"; Flags: ignoreversion recursesubdirs createallsubdirs
+; In this order, for an app started while the files are replaced (a double-click during
+; an update): first Python itself (the .dll / .pyd files at the top of _internal and
+; base_library.zip), so a start gets past the launcher and Python's start-up hooks to
+; main.py's check (soundboard/installmark.py) and quits quietly; then the rest;
+; OnionBoard.exe last, after closing any copy running from {app} and moving the old exe
+; aside (MoveOldExeAside). A copy stuck on the launcher's error box kept the exe open: the
+; silent update gave up (Abort) and rolled back, leaving no _internal and an app that
+; wouldn't start. Windows lets a running program's file be renamed, never replaced.
+Source: "..\dist\OnionBoard\_internal\*.dll"; DestDir: "{app}\_internal"; Flags: ignoreversion
+Source: "..\dist\OnionBoard\_internal\*.pyd"; DestDir: "{app}\_internal"; Flags: ignoreversion
+Source: "..\dist\OnionBoard\_internal\base_library.zip"; DestDir: "{app}\_internal"; Flags: ignoreversion
+Source: "..\dist\OnionBoard\*"; DestDir: "{app}"; Flags: ignoreversion recursesubdirs createallsubdirs; Excludes: "\{#AppExeName}.exe,\_internal\*.dll,\_internal\*.pyd,\_internal\base_library.zip"
+Source: "..\dist\OnionBoard\{#AppExeName}.exe"; DestDir: "{app}"; Flags: ignoreversion; BeforeInstall: MoveOldExeAside
 #endif
 ; The cable step runs first, before the files above are copied (see CurStepChanged), so it
 ; needs its own copy of the script to extract into {tmp}.
@@ -186,6 +200,8 @@ Filename: "{app}\{#AppExeName}.exe"; Parameters: "--direct-mic remove"; \
 Root: HKCU; Subkey: "Software\Microsoft\Windows\CurrentVersion\Run"; ValueType: none; ValueName: "OnionBoard"; Flags: uninsdeletevalue dontcreatekey
 
 [UninstallDelete]
+; the exe an update moved aside (MoveOldExeAside)
+Type: files; Name: "{app}\{#AppExeName}.exe.old*"
 ; made after install: a module's own Python environment and bytecode
 Type: filesandordirs; Name: "{app}\modules"
 
@@ -799,6 +815,7 @@ end;
 // click). Gone before the app is opened again, and whatever way setup ends.
 var
   InstallingMark: String;
+  OldExe: String;
 
 procedure StartInstallingMark;
 begin
@@ -1217,6 +1234,43 @@ begin
     Result := StrToIntDef(Trim(String(S)), 0);
 end;
 
+// Just before OnionBoard.exe is replaced (last, see [Files]): close any copy running from
+// {app}, then move the old exe aside. CloseApplications only looked before the files were
+// touched; a copy started since (a double-click during the update), stuck on the
+// launcher's error box or started again in between, kept the exe open, and replacing it
+// failed: the silent update chose Abort and rolled back, deleting _internal. Renaming
+// works even while it runs, so nothing can stop the new exe going in. The old one is
+// deleted at the end if it can be, else by the next install or the uninstaller.
+procedure MoveOldExeAside;
+var
+  Exe, Old: String;
+  N: Integer;
+begin
+  N := BoardProcesses(True);
+  if N > 0 then
+    Log('Closed ' + IntToStr(N) + ' Onion Board process(es) started during the install');
+  Exe := ExpandConstant('{app}\{#AppExeName}.exe');
+  if not FileExists(Exe) then
+    exit;
+  Old := Exe + '.old';
+  if FileExists(Old) and not DeleteFile(Old) then
+    Old := Exe + '.old' + GetDateTimeString('yyyymmddhhnnss', #0, #0);
+  if RenameFile(Exe, Old) then
+  begin
+    OldExe := Old;
+    Log('Moved the old exe aside: ' + Old);
+  end else
+    Log('Could not move the old exe aside; replacing it in place');
+end;
+
+// The exe MoveOldExeAside moved: gone once nothing runs it (else the next install's
+// [InstallDelete] or the uninstaller takes it).
+procedure DeleteOldExe;
+begin
+  if (OldExe <> '') and DeleteFile(OldExe) then
+    OldExe := '';
+end;
+
 // {app}\_internal can be renamed (nothing inside is open), tried for about Tries / 2 s.
 // It's renamed straight back.
 function InternalFree(Tries: Integer): Boolean;
@@ -1292,6 +1346,8 @@ begin
     CheckInternalNotInUse;
   if CurStep = ssPostInstall then
     EndInstallingMark;
+  if CurStep = ssPostInstall then
+    DeleteOldExe;
   // first, right after Install is clicked: Windows' permission box comes up while the
   // user is still looking, not minutes later at the end
   if (CurStep = ssInstall) and MayDownload('vbcable') then
