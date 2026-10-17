@@ -67,7 +67,12 @@ html.textured .bg::before { display: none; }   /* its own pattern stands in for 
 .top .wrap { display: flex; align-items: center; gap: 12px; }
 .brand { display: flex; align-items: center; gap: 9px; color: var(--text); text-decoration: none;
          font: 700 18px/1 var(--display); letter-spacing: -.01em; white-space: nowrap; }
-.brand img { width: 30px; height: 30px; }
+.brand .logo { width: 34px; height: 34px; flex: none; overflow: visible; transition: transform .35s cubic-bezier(.3,1.6,.5,1); }
+.brand .logo .ears { transform-origin: 50% 40%; }
+.brand:hover .logo { transform: translateY(-2px) rotate(-6deg) scale(1.06); }
+.brand:hover .logo .ears { animation: brand-ears .6s ease-in-out; }
+.brand .logo[hidden] { display: none; }
+@keyframes brand-ears { 30% { transform: rotate(-5deg); } 65% { transform: rotate(4deg); } }
 .switch { position: relative; display: flex; margin: 0 auto; padding: 4px; border-radius: 999px;
           background: rgba(255,255,255,.05); border: 1px solid var(--edge); }
 .switch button { position: relative; z-index: 1; display: flex; align-items: center; gap: 7px;
@@ -531,7 +536,7 @@ footer .pals svg:hover { transform: translateY(-6px) rotate(-6deg); }
 @media (max-width: 420px) { .icon-btn.discord { display: none; } }   /* no room: the footer has it */
 @media (max-width: 400px) {
   .switch button { gap: 4px; padding: 6px 9px 6px 6px; font-size: 13px; }
-  .brand img { width: 26px; height: 26px; }
+  .brand .logo { width: 30px; height: 30px; }
   .pad { padding: 10px 4px 8px; font-size: 12.5px; }
 }
 
@@ -540,6 +545,7 @@ footer .pals svg:hover { transform: translateY(-6px) rotate(-6deg); }
    slide-ins, the hop between tabs); Bun, Hoot and the little loops stay alive. */
 @media (prefers-reduced-motion: reduce) {
   html { scroll-behavior: auto; }
+  .brand .logo, .brand .logo .ears { transition: none; animation: none !important; }
   .bg i, .marquee div { animation: none !important; }
   /* Still strip: one copy of the words in centred rows, no edge fade (a faded strip
      that doesn't move looks cut off, and the mask flickered on fast scrolls). */
