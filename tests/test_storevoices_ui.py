@@ -83,7 +83,8 @@ def test_voices_list_hear_vote_get_and_report(qapp, fake):
     assert process_events(qapp, lambda: len(t._rows) == 3)
     assert all(isinstance(r, VoiceRow) for r in t._rows)
     assert t.btn_share.text() == "Share a voice"
-    assert [k for k in t.cat_btns] == ["", "fx", "ai", "setup"]
+    assert [t.cat_pick.itemData(i) for i in range(t.cat_pick.count())] == [
+        "", "fx", "ai", "setup"]
     fx, ai, setup = t._rows
     assert fx.meta.full.startswith("Voice changer") and "for fun" in fx.meta.full
     assert setup.meta.full.startswith("Setup · ") and "Bear" in setup.meta.full
@@ -105,8 +106,8 @@ def test_voices_list_hear_vote_get_and_report(qapp, fake):
     t.report(fx, "offensive")
     assert process_events(qapp, lambda: ("POST", f"/v1/voices/{fx.sound.id}/report")
                           in fake.calls)
-    # a kind chip filters; back to Sounds lists sounds again
-    t.cat_btns["ai"].click()
+    # a kind filters; back to Sounds lists sounds again
+    t.cat_pick.activated.emit(t.cat_pick.findData("ai"))
     assert process_events(qapp, lambda: len(t._rows) == 1 and t._rows[0].sound.kind == "ai")
     t.mode_btns["sounds"].click()
     assert process_events(qapp, lambda: t.btn_share.text() == "Share a sound")

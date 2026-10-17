@@ -3402,7 +3402,6 @@
   "Lots of sounds are waiting to be checked. Try again in a day or two.": "มีเสียงรอตรวจเยอะมาก ลองอีกครั้งในอีกวันสองวัน",
   "MP3, OGG, WAV or FLAC, up to 4 MB. It shows in the store once it's been checked.": "MP3, OGG, WAV หรือ FLAC ไม่เกิน 4 MB จะแสดงในร้านเมื่อตรวจแล้ว",
   "Name (what it is)": "ชื่อ (คืออะไร)",
-  "New": "ใหม่",
   "No file picked": "ยังไม่ได้เลือกไฟล์",
   "No sounds here yet": "ยังไม่มีเสียงที่นี่",
   "Not for me": "ไม่ใช่สำหรับฉัน",
@@ -3434,7 +3433,6 @@
   "The store is off": "ร้านปิดอยู่",
   "The store takes MP3, OGG, WAV or FLAC files.": "ร้านรับไฟล์ MP3, OGG, WAV หรือ FLAC",
   "This sound is mine to give away": "เสียงนี้เป็นของฉันและยกให้ได้",
-  "Top": "ยอดนิยม",
   "Try other words.": "ลองคำอื่น",
   "Your vote didn't go through: {error}": "โหวตของคุณไม่ผ่าน: {error}",
   "A YouTube, TikTok, SoundCloud or other video link. Only the link is kept: whoever adds it gets it from that site. It shows once it's been checked.": "ลิงก์ YouTube, TikTok, SoundCloud หรือวิดีโออื่น เก็บไว้แค่ลิงก์: คนที่เพิ่มจะดึงจากเว็บนั้นเอง จะแสดงเมื่อตรวจแล้ว",
@@ -3509,7 +3507,6 @@
   "Sports": "กีฬา",
   "TV": "ทีวี",
   "Viral": "ไวรัล",
-  "What's hot on Myinstants right now, and the sounds people here liked this week": "สิ่งที่กำลังฮิตใน Myinstants ตอนนี้ และเสียงที่คนที่นี่ชอบในสัปดาห์นี้",
   "See everything waiting to play": "ดูทุกอย่างที่รอเล่น",
   "Take everything out of the queue": "เอาทุกอย่างออกจากคิว",
   "A quick how-to the first time you open each tab.": "วิธีใช้สั้นๆ ตอนเปิดแต่ละแท็บครั้งแรก",
@@ -3651,7 +3648,6 @@
   "That voice is already in the store.": "เสียงนั้นอยู่ในร้านแล้ว",
   "That voice isn't in the store any more.": "เสียงนั้นไม่อยู่ในร้านแล้ว",
   "The store doesn't take that name or description. Try other words (and no links).": "ร้านไม่รับชื่อหรือคำอธิบายนั้น ลองคำอื่น (และไม่มีลิงก์)",
-  "The voices people liked most this week": "เสียงที่คนชอบมากที่สุดสัปดาห์นี้",
   "What's it good for? (optional)": "เหมาะกับอะไร? (ไม่บังคับ)",
   "Which voice": "เสียงไหน",
   "You have the most AI voices of your own there can be: delete one first.": "คุณมีเสียงเอไอของตัวเองครบจำนวนแล้ว: ลบออกหนึ่งอันก่อน",
@@ -3677,5 +3673,7 @@
   "Onion Board hit {n} problem since it started.": [
     "Onion Board เจอปัญหา {n} ครั้งตั้งแต่เปิดใช้งาน"
   ],
-  "See report": "ดูรายงาน"
+  "See report": "ดูรายงาน",
+  "All categories": "ทุกหมวดหมู่",
+  "Votes": "โหวต"
 }

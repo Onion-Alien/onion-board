@@ -3479,7 +3479,6 @@
   "Lots of sounds are waiting to be checked. Try again in a day or two.": "बहुत सारी साउंड जाँच का इंतज़ार कर रही हैं। एक-दो दिन में फिर कोशिश करें।",
   "MP3, OGG, WAV or FLAC, up to 4 MB. It shows in the store once it's been checked.": "MP3, OGG, WAV या FLAC, 4 MB तक। जाँच के बाद यह स्टोर में दिखेगी।",
   "Name (what it is)": "नाम (यह क्या है)",
-  "New": "नई",
   "No file picked": "कोई फ़ाइल नहीं चुनी",
   "No sounds here yet": "अभी यहाँ कोई साउंड नहीं है",
   "Not for me": "मेरे लिए नहीं",
@@ -3511,7 +3510,6 @@
   "The store is off": "स्टोर बंद है",
   "The store takes MP3, OGG, WAV or FLAC files.": "स्टोर MP3, OGG, WAV या FLAC फ़ाइलें लेता है।",
   "This sound is mine to give away": "यह साउंड मेरी है और मैं इसे दे सकता हूँ",
-  "Top": "टॉप",
   "Try other words.": "दूसरे शब्द आज़माएँ।",
   "Your vote didn't go through: {error}": "आपका वोट नहीं गया: {error}",
   "A YouTube, TikTok, SoundCloud or other video link. Only the link is kept: whoever adds it gets it from that site. It shows once it's been checked.": "YouTube, TikTok, SoundCloud या किसी और वीडियो का लिंक। सिर्फ़ लिंक रखा जाता है: जो इसे जोड़ेगा, वह उसी साइट से लेगा। जाँच के बाद यह दिखेगा।",
@@ -3586,7 +3584,6 @@
   "Sports": "खेल",
   "TV": "टीवी",
   "Viral": "वायरल",
-  "What's hot on Myinstants right now, and the sounds people here liked this week": "Myinstants पर अभी क्या ट्रेंड कर रहा है, और इस हफ़्ते यहाँ लोगों को कौन से साउंड पसंद आए",
   "See everything waiting to play": "चलने का इंतज़ार कर रही सब चीज़ें देखें",
   "Take everything out of the queue": "कतार से सब कुछ हटाएँ",
   "A quick how-to the first time you open each tab.": "हर टैब पहली बार खोलने पर एक छोटा-सा तरीका।",
@@ -3729,7 +3726,6 @@
   "That voice is already in the store.": "यह आवाज़ पहले से स्टोर में है।",
   "That voice isn't in the store any more.": "यह आवाज़ अब स्टोर में नहीं है।",
   "The store doesn't take that name or description. Try other words (and no links).": "स्टोर यह नाम या विवरण नहीं लेता। दूसरे शब्द आज़माएं (और कोई लिंक नहीं)।",
-  "The voices people liked most this week": "इस हफ़्ते लोगों को सबसे ज़्यादा पसंद आई आवाज़ें",
   "What's it good for? (optional)": "यह किस काम की है? (वैकल्पिक)",
   "Which voice": "कौन सी आवाज़",
   "You have the most AI voices of your own there can be: delete one first.": "आपके पास पहले से ही ज़्यादा से ज़्यादा अपनी एआई आवाज़ें हैं: पहले एक हटाएं।",
@@ -3756,5 +3752,7 @@
     "शुरू होने के बाद से Onion Board में {n} समस्या आई।",
     "शुरू होने के बाद से Onion Board में {n} समस्याएँ आईं।"
   ],
-  "See report": "रिपोर्ट देखें"
+  "See report": "रिपोर्ट देखें",
+  "All categories": "सभी कैटेगरी",
+  "Votes": "वोट"
 }

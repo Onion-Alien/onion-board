@@ -3479,7 +3479,6 @@
   "Lots of sounds are waiting to be checked. Try again in a day or two.": "Gerade warten viele Sounds auf die Prüfung. Versuche es in ein, zwei Tagen noch mal.",
   "MP3, OGG, WAV or FLAC, up to 4 MB. It shows in the store once it's been checked.": "MP3, OGG, WAV oder FLAC, bis 4 MB. Er erscheint im Store, sobald er geprüft wurde.",
   "Name (what it is)": "Name (was es ist)",
-  "New": "Neu",
   "No file picked": "Keine Datei gewählt",
   "No sounds here yet": "Hier gibt es noch keine Sounds",
   "Not for me": "Nicht meins",
@@ -3511,7 +3510,6 @@
   "The store is off": "Der Store ist aus",
   "The store takes MP3, OGG, WAV or FLAC files.": "Der Store nimmt MP3-, OGG-, WAV- oder FLAC-Dateien.",
   "This sound is mine to give away": "Dieser Sound gehört mir und ich darf ihn verschenken",
-  "Top": "Top",
   "Try other words.": "Versuche andere Wörter.",
   "Your vote didn't go through: {error}": "Deine Stimme ist nicht angekommen: {error}",
   "A YouTube, TikTok, SoundCloud or other video link. Only the link is kept: whoever adds it gets it from that site. It shows once it's been checked.": "Ein YouTube-, TikTok-, SoundCloud- oder anderer Video-Link. Nur der Link wird gespeichert: Wer ihn hinzufügt, holt ihn von dieser Seite. Er erscheint, sobald er geprüft wurde.",
@@ -3586,7 +3584,6 @@
   "Sports": "Sport",
   "TV": "TV",
   "Viral": "Viral",
-  "What's hot on Myinstants right now, and the sounds people here liked this week": "Was gerade auf Myinstants angesagt ist, und die Sounds, die Leuten hier diese Woche gefallen haben",
   "See everything waiting to play": "Alles anzeigen, was noch abgespielt wird",
   "Take everything out of the queue": "Alles aus der Warteschlange nehmen",
   "A quick how-to the first time you open each tab.": "Eine kurze Anleitung, wenn du einen Tab zum ersten Mal öffnest.",
@@ -3729,7 +3726,6 @@
   "That voice is already in the store.": "Diese Stimme ist schon im Store.",
   "That voice isn't in the store any more.": "Diese Stimme ist nicht mehr im Store.",
   "The store doesn't take that name or description. Try other words (and no links).": "Der Store nimmt diesen Namen oder diese Beschreibung nicht an. Versuch andere Wörter (und keine Links).",
-  "The voices people liked most this week": "Die Stimmen, die diese Woche am meisten gemocht wurden",
   "What's it good for? (optional)": "Wofür ist sie gut? (optional)",
   "Which voice": "Welche Stimme",
   "You have the most AI voices of your own there can be: delete one first.": "Du hast schon die meisten eigenen KI-Stimmen, die es geben kann: Lösch zuerst eine.",
@@ -3756,5 +3752,7 @@
     "Onion Board hatte seit dem Start {n} Problem.",
     "Onion Board hatte seit dem Start {n} Probleme."
   ],
-  "See report": "Bericht ansehen"
+  "See report": "Bericht ansehen",
+  "All categories": "Alle Kategorien",
+  "Votes": "Bewertungen"
 }

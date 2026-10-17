@@ -3479,7 +3479,6 @@
   "Lots of sounds are waiting to be checked. Try again in a day or two.": "Много звуци чакат проверка. Опитай пак след ден-два.",
   "MP3, OGG, WAV or FLAC, up to 4 MB. It shows in the store once it's been checked.": "MP3, OGG, WAV или FLAC, до 4 MB. Появява се в магазина, след като бъде проверен.",
   "Name (what it is)": "Име (какво е)",
-  "New": "Нови",
   "No file picked": "Няма избран файл",
   "No sounds here yet": "Още няма звуци тук",
   "Not for me": "Не е за мен",
@@ -3511,7 +3510,6 @@
   "The store is off": "Магазинът е изключен",
   "The store takes MP3, OGG, WAV or FLAC files.": "Магазинът приема файлове MP3, OGG, WAV или FLAC.",
   "This sound is mine to give away": "Този звук е мой и мога да го дам",
-  "Top": "Топ",
   "Try other words.": "Опитай с други думи.",
   "Your vote didn't go through: {error}": "Гласът ти не мина: {error}",
   "A YouTube, TikTok, SoundCloud or other video link. Only the link is kept: whoever adds it gets it from that site. It shows once it's been checked.": "Връзка към YouTube, TikTok, SoundCloud или друго видео. Пази се само връзката: който я добави, я взема от сайта. Появява се след проверка.",
@@ -3586,7 +3584,6 @@
   "Sports": "Спорт",
   "TV": "ТВ",
   "Viral": "Вирусни",
-  "What's hot on Myinstants right now, and the sounds people here liked this week": "Какво е популярно в Myinstants в момента и звуците, които хората тук харесаха тази седмица",
   "See everything waiting to play": "Виж всичко, което чака да се пусне",
   "Take everything out of the queue": "Махни всичко от опашката",
   "A quick how-to the first time you open each tab.": "Кратко обяснение първия път, когато отвориш всеки раздел.",
@@ -3729,7 +3726,6 @@
   "That voice is already in the store.": "Този глас вече е в магазина.",
   "That voice isn't in the store any more.": "Този глас вече не е в магазина.",
   "The store doesn't take that name or description. Try other words (and no links).": "Магазинът не приема това име или описание. Опитай с други думи (и без връзки).",
-  "The voices people liked most this week": "Гласовете, които хората харесаха най-много тази седмица",
   "What's it good for? (optional)": "За какво е добър? (по желание)",
   "Which voice": "Кой глас",
   "You have the most AI voices of your own there can be: delete one first.": "Вече имаш възможно най-много свои AI гласове: първо изтрий един.",
@@ -3756,5 +3752,7 @@
     "Onion Board срещна {n} проблем, откакто е пуснат.",
     "Onion Board срещна {n} проблема, откакто е пуснат."
   ],
-  "See report": "Виж доклада"
+  "See report": "Виж доклада",
+  "All categories": "Всички категории",
+  "Votes": "Оценки"
 }

@@ -3556,7 +3556,6 @@
   "Lots of sounds are waiting to be checked. Try again in a day or two.": "Multe sunete așteaptă verificarea. Încearcă din nou peste o zi sau două.",
   "MP3, OGG, WAV or FLAC, up to 4 MB. It shows in the store once it's been checked.": "MP3, OGG, WAV sau FLAC, până la 4 MB. Apare în magazin după ce e verificat.",
   "Name (what it is)": "Nume (ce este)",
-  "New": "Noi",
   "No file picked": "Niciun fișier ales",
   "No sounds here yet": "Încă nu sunt sunete aici",
   "Not for me": "Nu e pentru mine",
@@ -3588,7 +3587,6 @@
   "The store is off": "Magazinul e oprit",
   "The store takes MP3, OGG, WAV or FLAC files.": "Magazinul primește fișiere MP3, OGG, WAV sau FLAC.",
   "This sound is mine to give away": "Sunetul ăsta e al meu și îl pot da",
-  "Top": "Top",
   "Try other words.": "Încearcă alte cuvinte.",
   "Your vote didn't go through: {error}": "Votul tău nu a trecut: {error}",
   "A YouTube, TikTok, SoundCloud or other video link. Only the link is kept: whoever adds it gets it from that site. It shows once it's been checked.": "Un link YouTube, TikTok, SoundCloud sau alt video. Se păstrează doar linkul: cine îl adaugă îl ia de pe acel site. Apare după ce e verificat.",
@@ -3663,7 +3661,6 @@
   "Sports": "Sport",
   "TV": "TV",
   "Viral": "Virale",
-  "What's hot on Myinstants right now, and the sounds people here liked this week": "Ce e la modă pe Myinstants acum și sunetele care le-au plăcut oamenilor de aici săptămâna asta",
   "See everything waiting to play": "Vezi tot ce așteaptă să fie redat",
   "Take everything out of the queue": "Scoate tot din coadă",
   "A quick how-to the first time you open each tab.": "Un ghid rapid prima dată când deschizi fiecare filă.",
@@ -3807,7 +3804,6 @@
   "That voice is already in the store.": "Vocea asta e deja în magazin.",
   "That voice isn't in the store any more.": "Vocea asta nu mai e în magazin.",
   "The store doesn't take that name or description. Try other words (and no links).": "Magazinul nu acceptă acest nume sau această descriere. Încearcă alte cuvinte (și fără linkuri).",
-  "The voices people liked most this week": "Vocile cele mai apreciate săptămâna asta",
   "What's it good for? (optional)": "La ce e bună? (opțional)",
   "Which voice": "Ce voce",
   "You have the most AI voices of your own there can be: delete one first.": "Ai deja numărul maxim de voci AI proprii: șterge întâi una.",
@@ -3835,5 +3831,7 @@
     "Onion Board a avut {n} probleme de la pornire.",
     "Onion Board a avut {n} de probleme de la pornire."
   ],
-  "See report": "Vezi raportul"
+  "See report": "Vezi raportul",
+  "All categories": "Toate categoriile",
+  "Votes": "Voturi"
 }

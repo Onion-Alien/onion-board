@@ -3479,7 +3479,6 @@
   "Lots of sounds are waiting to be checked. Try again in a day or two.": "Molti suoni aspettano di essere controllati. Riprova tra un giorno o due.",
   "MP3, OGG, WAV or FLAC, up to 4 MB. It shows in the store once it's been checked.": "MP3, OGG, WAV o FLAC, fino a 4 MB. Compare nello store una volta controllato.",
   "Name (what it is)": "Nome (cos’è)",
-  "New": "Nuovi",
   "No file picked": "Nessun file scelto",
   "No sounds here yet": "Ancora nessun suono qui",
   "Not for me": "Non fa per me",
@@ -3511,7 +3510,6 @@
   "The store is off": "Lo store è disattivato",
   "The store takes MP3, OGG, WAV or FLAC files.": "Lo store accetta file MP3, OGG, WAV o FLAC.",
   "This sound is mine to give away": "Questo suono è mio e posso regalarlo",
-  "Top": "Top",
   "Try other words.": "Prova altre parole.",
   "Your vote didn't go through: {error}": "Il tuo voto non è arrivato: {error}",
   "A YouTube, TikTok, SoundCloud or other video link. Only the link is kept: whoever adds it gets it from that site. It shows once it's been checked.": "Un link di YouTube, TikTok, SoundCloud o di un altro video. Si tiene solo il link: chi lo aggiunge lo prende da quel sito. Compare una volta controllato.",
@@ -3586,7 +3584,6 @@
   "Sports": "Sport",
   "TV": "TV",
   "Viral": "Virali",
-  "What's hot on Myinstants right now, and the sounds people here liked this week": "Cosa va forte su Myinstants adesso e i suoni che sono piaciuti qui questa settimana",
   "See everything waiting to play": "Vedi tutto ciò che aspetta di essere riprodotto",
   "Take everything out of the queue": "Togli tutto dalla coda",
   "A quick how-to the first time you open each tab.": "Una guida veloce la prima volta che apri ogni scheda.",
@@ -3729,7 +3726,6 @@
   "That voice is already in the store.": "Quella voce è già nello store.",
   "That voice isn't in the store any more.": "Quella voce non è più nello store.",
   "The store doesn't take that name or description. Try other words (and no links).": "Lo store non accetta quel nome o quella descrizione. Prova altre parole (e niente link).",
-  "The voices people liked most this week": "Le voci più apprezzate questa settimana",
   "What's it good for? (optional)": "A cosa serve? (facoltativo)",
   "Which voice": "Quale voce",
   "You have the most AI voices of your own there can be: delete one first.": "Hai già il massimo di voci dell'IA tue: prima eliminane una.",
@@ -3756,5 +3752,7 @@
     "Onion Board ha avuto {n} problema dall'avvio.",
     "Onion Board ha avuto {n} problemi dall'avvio."
   ],
-  "See report": "Vedi report"
+  "See report": "Vedi report",
+  "All categories": "Tutte le categorie",
+  "Votes": "Voti"
 }

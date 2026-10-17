@@ -3402,7 +3402,6 @@
   "Lots of sounds are waiting to be checked. Try again in a day or two.": "チェック待ちのサウンドがたくさんあります。1〜2 日後にもう一度試してください。",
   "MP3, OGG, WAV or FLAC, up to 4 MB. It shows in the store once it's been checked.": "MP3、OGG、WAV、FLAC で 4 MB まで。チェックが済むとストアに表示されます。",
   "Name (what it is)": "名前（何の音か）",
-  "New": "新着",
   "No file picked": "ファイルが選ばれていません",
   "No sounds here yet": "まだサウンドがありません",
   "Not for me": "好みじゃない",
@@ -3434,7 +3433,6 @@
   "The store is off": "ストアはオフです",
   "The store takes MP3, OGG, WAV or FLAC files.": "ストアは MP3、OGG、WAV、FLAC ファイルを受け付けます。",
   "This sound is mine to give away": "このサウンドは自分のもので、提供できます",
-  "Top": "人気",
   "Try other words.": "別の言葉で試してください。",
   "Your vote didn't go through: {error}": "投票できませんでした：{error}",
   "A YouTube, TikTok, SoundCloud or other video link. Only the link is kept: whoever adds it gets it from that site. It shows once it's been checked.": "YouTube、TikTok、SoundCloud などの動画リンク。保存されるのはリンクだけ：追加した人がそのサイトから取得します。チェックが済むと表示されます。",
@@ -3509,7 +3507,6 @@
   "Sports": "スポーツ",
   "TV": "テレビ",
   "Viral": "バズり",
-  "What's hot on Myinstants right now, and the sounds people here liked this week": "いま Myinstants で人気のものと、今週ここでみんなが気に入ったサウンド",
   "See everything waiting to play": "再生待ちをすべて表示",
   "Take everything out of the queue": "列からすべて外す",
   "A quick how-to the first time you open each tab.": "各タブを初めて開いたときにかんたんな使い方を表示します。",
@@ -3651,7 +3648,6 @@
   "That voice is already in the store.": "その声はもうストアにあります。",
   "That voice isn't in the store any more.": "その声はもうストアにありません。",
   "The store doesn't take that name or description. Try other words (and no links).": "その名前や説明はストアに載せられません。別の言葉にしてください（リンクも不可）。",
-  "The voices people liked most this week": "今週いちばん好かれた声",
   "What's it good for? (optional)": "どんな時に使える？（任意）",
   "Which voice": "どの声",
   "You have the most AI voices of your own there can be: delete one first.": "自分のAIの声はもう上限です：先にひとつ削除してください。",
@@ -3677,5 +3673,7 @@
   "Onion Board hit {n} problem since it started.": [
     "Onion Board は起動してから {n} 件の問題が起きました。"
   ],
-  "See report": "レポートを見る"
+  "See report": "レポートを見る",
+  "All categories": "すべてのカテゴリ",
+  "Votes": "投票"
 }

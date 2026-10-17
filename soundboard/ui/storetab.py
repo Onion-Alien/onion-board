@@ -12,17 +12,18 @@ import threading
 from collections.abc import Callable
 from pathlib import Path
 
-from PySide6.QtCore import QSize, Qt, QTimer, Signal
-from PySide6.QtWidgets import (QCheckBox, QDialog, QFileDialog, QHBoxLayout,
+from PySide6.QtCore import QEvent, QPoint, QSize, Qt, QTimer, Signal
+from PySide6.QtGui import QIcon
+from PySide6.QtWidgets import (QCheckBox, QComboBox, QDialog, QFileDialog, QHBoxLayout,
                                QLabel, QLineEdit, QMenu, QPushButton, QScrollArea,
                                QSizePolicy, QStackedWidget, QVBoxLayout, QWidget)
 
-from soundboard import errors, library, net, store, usage
+from soundboard import errors, library, net, store, usage, wheelguard
 from soundboard.engine import SR
 from soundboard.i18n import _
 from soundboard.ui import busy, fit, icons, storelook
-from soundboard.ui.panel import (Flow, HoverCard, hint_label, icon_button,
-                                 section_label)
+from soundboard.trash import ago
+from soundboard.ui.panel import HoverCard, hint_label, icon_button, section_label
 from soundboard.ui.ytsearch import ClampLabel
 
 log = logging.getLogger(__name__)
@@ -32,18 +33,21 @@ SEARCH_WAIT_MS = 400          # typing pauses this long before the store is sear
 ROW_MAX_W = 820               # the list stays a readable column, centred, on a wide window
 COUNT_W = "9.9k"              # the widest vote count kept room for
 PLAY_ROOM = 520               # a narrower row shows no play button (its picture plays)
-TRENDING = "trending"         # the order: hot on Myinstants now + this week's thumbs up
+CAT_W = 110                   # the table's Category column
+ADDED_W = 100                 # its Added column ("3 days ago")
+CAT_ROOM = 680                # a narrower list shows no Category column (the dropdown filters)
+ADDED_ROOM = 560              # nor Added (its header still sorts)
+ONE_ROW = 720                 # a narrower tab puts the toolbar on two rows
 
 
 def meta_line(s: store.Sound) -> str:
     """"by Onion Board · tavern, music", "Shared by a player", for a shared link
     "YouTube link · Shared by a player", and for one the server brought in
-    "From Myinstants · Games"."""
+    "From Myinstants" (its category has a column of its own)."""
     from soundboard import sourceinfo
     site = sourceinfo.site_of(s.link) if s.is_link else None
     if s.source and site:
-        return " · ".join([_("From {site}", site=site[1]),
-                           *([store.cat_name(s.cat)] if store.cat_name(s.cat) else [])])
+        return _("From {site}", site=site[1])
     who = _("by {name}", name=s.author) if s.author else _("Shared by a player")
     where = [_("{site} link", site=site[1])] if site else []
     return " · ".join([*where, who, *([", ".join(s.tags)] if s.tags else [])])
@@ -53,8 +57,27 @@ def count_text(n: int) -> str:
     return f"{n / 1000:.1f}k".replace(".0k", "k") if n >= 1000 else str(n)
 
 
+def add_cells(row, cat: str, created: int):
+    """A sound's or voice's row gets the table's Category and Added columns, just before
+    its votes."""
+    h = row.layout()
+    row.cell_cat = QLabel(cat)
+    row.cell_cat.setTextFormat(Qt.TextFormat.PlainText)
+    row.cell_cat.setFixedWidth(CAT_W)
+    row.cell_added = QLabel(ago(created) if created else "")
+    row.cell_added.setFixedWidth(ADDED_W)
+    row.cell_added.setAlignment(Qt.AlignmentFlag.AlignCenter)
+    for lbl in (row.cell_cat, row.cell_added):
+        lbl.setObjectName("hint")
+    i = h.indexOf(row.btn_up)
+    h.insertWidget(i, row.cell_added)
+    h.insertWidget(i, row.cell_cat)
+
+
 class SoundRow(HoverCard):
     """One sound: play it, vote on it, add it to your board, or report it."""
+    cell_cat: QLabel     # the table's Category and Added columns (add_cells)
+    cell_added: QLabel
 
     def __init__(self, s: store.Sound, tab: StoreTab):
         super().__init__()
@@ -243,13 +266,15 @@ class StoreTab(QWidget):
         words.addStretch(1)
         top.addLayout(words, 1)
         hv.addLayout(top)
-        # Sounds or Voices: one picked at a time, above everything they change
+        # the toolbar: Sounds or Voices, the search, the category, Share and Refresh. One
+        # row in a wide tab; two in a narrow one, so the card fits the smallest window
+        # (wider, a narrow window became the mini player)
         self.mode_btns: dict[str, QPushButton] = {}
+        self.modes_box = QWidget()
+        modes = QHBoxLayout(self.modes_box)
+        modes.setContentsMargins(0, 0, 0, 0)
+        modes.setSpacing(4)
         if voices is not None:
-            modes_box = QWidget()
-            modes = QHBoxLayout(modes_box)
-            modes.setContentsMargins(0, 0, 0, 0)
-            modes.setSpacing(4)
             for key, text, icon in (("sounds", _("Sounds"), "sounds"),
                                     ("voices", _("Voices"), "voice")):
                 b = QPushButton(text)
@@ -260,62 +285,59 @@ class StoreTab(QWidget):
                 b.clicked.connect(lambda _c=False, k=key: self.set_mode(k))
                 modes.addWidget(b)
                 self.mode_btns[key] = b
-            modes.addStretch(1)
-            hv.addWidget(modes_box)
-        # the main button on a row of its own: beside the search box and the order, the
-        # card was wider than the smallest window (that turns into the mini player)
-        # Share, then the sort buttons; they wrap under Share in a narrow window (in one
-        # row they made the Store card 346 px wide, so a narrow window became the mini
-        # player)
-        share_box = QWidget()
-        share_row = Flow(share_box, gap=8)
+        else:
+            self.modes_box.hide()
+        self.search = QLineEdit()
+        self.search.setPlaceholderText(_("Search sounds"))
+        self.search.setClearButtonEnabled(True)
+        self.search.setAccessibleName(_("Search sounds"))
+        self.search.setMinimumWidth(120)
+        self._search_wait = QTimer(self, singleShot=True, interval=SEARCH_WAIT_MS)
+        self._search_wait.timeout.connect(self.reload)
+        self.search.textChanged.connect(lambda _t: self._search_wait.start())
+        # the sounds' categories (or the voices' kinds), each with how many
+        self.cat_pick = QComboBox()
+        self.cat_pick.setAccessibleName(_("Category"))
+        self.cat_pick.setToolTip(_("Category"))
+        self.cat_pick.activated.connect(self._cat_picked)
         self.btn_share = QPushButton(_("Share a sound"))
         self.btn_share.setObjectName("primary")
         icons.set_icon(self.btn_share, "upload", "on_accent", "on_accent")
         self.btn_share.clicked.connect(lambda: self.share_voice() if self._mode == "voices"
                                        else self.share())
-        share_row.addWidget(self.btn_share)
-        # the order: Top, New, or Trending on Myinstants, out in the open (inside a menu,
-        # nobody found Trending), one picked at a time like the share window's file / link
-        self._sort = "top"
-        self.sort_btns: dict[str, QPushButton] = {}
-        sorts_box = QWidget()
-        sorts = QHBoxLayout(sorts_box)
-        sorts.setContentsMargins(0, 0, 0, 0)
-        sorts.setSpacing(4)
-        for key, text, tip, icon in (
-                ("top", _("Top"), _("The best voted first"), ""),
-                ("new", _("New"), _("The newest first"), ""),
-                (TRENDING, _("Trending"), _("What's hot on Myinstants right now, and the "
-                                           "sounds people here liked this week"), "")):
-            b = QPushButton(text)
-            b.setCheckable(True)
-            b.setAutoExclusive(True)
-            b.setChecked(key == "top")
-            b.setToolTip(tip)
-            if icon:
-                icons.set_icon(b, icon, "text", "on_accent")
-            b.clicked.connect(lambda _c=False, k=key: (
-                k != "top" and usage.used(f"store-sort-{k}"), self.set_sort(k)))
-            sorts.addWidget(b)
-            self.sort_btns[key] = b
-        share_row.addWidget(sorts_box)
-        hv.addWidget(share_box)
-        row = QHBoxLayout()
-        row.setSpacing(8)
-        self.search = QLineEdit()
-        self.search.setPlaceholderText(_("Search sounds"))
-        self.search.setClearButtonEnabled(True)
-        self.search.setAccessibleName(_("Search sounds"))
-        self._search_wait = QTimer(self, singleShot=True, interval=SEARCH_WAIT_MS)
-        self._search_wait.timeout.connect(self.reload)
-        self.search.textChanged.connect(lambda _t: self._search_wait.start())
-        row.addWidget(self.search, 1)
         self.btn_reload = icon_button("reload", _("Refresh"))
         self.btn_reload.clicked.connect(lambda: self.reload())
-        row.addWidget(self.btn_reload)
-        hv.addLayout(row)
+        self._bars = (QHBoxLayout(), QHBoxLayout())
+        for bar in self._bars:
+            bar.setSpacing(8)
+            hv.addLayout(bar)
+        self._one_row: bool | None = None
+        self._lay_toolbar(False)
         col.addWidget(head)
+        # the table's header, over its columns; Added and Votes sort the list (the
+        # words are placed over the first row's cells: _align_head)
+        self.table_head = QWidget()
+        self.head_name = QLabel(_("Sound"), self.table_head)
+        self.head_cat = QLabel(_("Category"), self.table_head)
+        for lbl in (self.head_name, self.head_cat):
+            lbl.setObjectName("hint")
+            lbl.setAlignment(Qt.AlignmentFlag.AlignVCenter | Qt.AlignmentFlag.AlignLeft)
+        self._sort = "top"
+        self.sort_btns: dict[str, QPushButton] = {}
+        for key, text, tip in (("new", _("Added"), _("The newest first")),
+                               ("top", _("Votes"), _("The best voted first"))):
+            b = QPushButton(text, self.table_head)
+            b.setObjectName("small")   # header-sized; the arrow after the words says
+            b.setProperty("quiet", True)   # which one sorts (not checkable: no filled pill)
+            b.setLayoutDirection(Qt.LayoutDirection.RightToLeft)
+            b.setToolTip(tip)
+            b.setCursor(Qt.CursorShape.PointingHandCursor)
+            b.clicked.connect(lambda _c=False, k=key: (
+                k != "top" and usage.used(f"store-sort-{k}"), self.set_sort(k)))
+            self.sort_btns[key] = b
+        self._sort_look()
+        self.table_head.hide()
+        col.addWidget(self.table_head)
 
         # the list, or a message in its place (loading, nothing found, off, failed)
         self.stack = QStackedWidget()
@@ -323,18 +345,12 @@ class StoreTab(QWidget):
         scroll.setWidgetResizable(True)
         scroll.setFrameShape(QScrollArea.Shape.NoFrame)
         scroll.setHorizontalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
+        scroll.viewport().installEventFilter(self)   # resized: the columns line up again
         body = QWidget()
         self._list = QVBoxLayout(body)
         self._list.setContentsMargins(0, 0, 0, 0)
         self._list.setSpacing(6)
-        # the categories, as the Sounds tab's subcategory chips: at the top of the list
-        # (it scrolls away), so the tab still fits the smallest window
-        self.cats_box = QWidget()
-        self._cat_flow = Flow(self.cats_box, gap=6)
-        self._cat_flow.setContentsMargins(0, 0, 0, 4)
-        self.cat_btns: dict[str, QPushButton] = {}
-        self.cats_box.hide()
-        self._list.addWidget(self.cats_box)
+        self._fill_cats([])
         self.btn_more = QPushButton(_("Show more"))
         self.btn_more.clicked.connect(self.more)
         self.btn_more.hide()
@@ -402,6 +418,79 @@ class StoreTab(QWidget):
     def resizeEvent(self, e):
         super().resizeEvent(e)
         self.bun.setVisible(storelook.fits(self.width(), self.height()))   # (never raises)
+        self._lay_toolbar(min(self.width(), ROW_MAX_W) >= ONE_ROW)
+
+    def eventFilter(self, obj, e):
+        if e.type() == QEvent.Type.Resize and obj is self.list_area.viewport():
+            self._fit_columns()
+        return super().eventFilter(obj, e)
+
+    def _lay_toolbar(self, one: bool):
+        """The toolbar in one row (a wide tab), or two: Sounds / Voices and Share, then
+        the search, the category and Refresh."""
+        if one == self._one_row:
+            return
+        self._one_row = one
+        for bar in self._bars:
+            while bar.count():
+                bar.takeAt(0)   # (the widgets stay the card's; the stretch goes)
+        first, second = self._bars[0], self._bars[0 if one else 1]
+        first.addWidget(self.modes_box)
+        if not one:
+            first.addStretch(1)
+            first.addWidget(self.btn_share)
+        second.addWidget(self.search, 1)
+        second.addWidget(self.cat_pick)
+        if one:
+            second.addWidget(self.btn_share)
+        second.addWidget(self.btn_reload)
+
+    # ------------------------------------------------------------------ the table
+    def _sort_look(self):
+        """The order the list is in: its column's header with an arrow."""
+        for key, b in self.sort_btns.items():
+            if key == self._sort:
+                icons.set_icon(b, "fold_open", "accent", "accent", size=14)
+            else:
+                b.setIcon(QIcon())
+
+    def _fit_columns(self):
+        """No Category column in a narrow list (the dropdown still picks one), nor Added
+        in the smallest (its header still sorts), then the header's words over their
+        columns again."""
+        w = self.list_area.viewport().width()
+        for r in self._rows:
+            r.cell_cat.setVisible(w >= CAT_ROOM)
+            r.cell_added.setVisible(w >= ADDED_ROOM)
+            # the smallest: tighter gaps and names, so Report isn't under the scroll bar
+            r.layout().setSpacing(8 if w >= ADDED_ROOM else 4)
+            for lbl in (r.name, r.meta):
+                lbl.setMinimumWidth(40 if w >= ADDED_ROOM else 28)
+        self.head_cat.setVisible(w >= CAT_ROOM)
+        self.head_name.setVisible(w >= ADDED_ROOM)   # (the smallest: Added's header there)
+        QTimer.singleShot(0, self, self._align_head)
+
+    def _align_head(self):
+        """The header's words over the first row's cells (rows and header share one
+        column, so the header follows the rows whatever their width)."""
+        if self._closed or not self._rows:
+            return
+        r = self._rows[0]
+        h = max(b.sizeHint().height() for b in self.sort_btns.values())
+        self.table_head.setFixedHeight(h)
+        head_x = self.table_head.mapTo(self, QPoint(0, 0)).x()
+
+        def x_of(w) -> int:   # (the row's cell, in the header: both mapped to the tab)
+            return w.mapTo(self, QPoint(0, 0)).x() - head_x
+        left = x_of(r.btn_up)
+        # (no Added column: its header just before Votes, over the names' end)
+        added = x_of(r.cell_added) if r.cell_added.isVisible() else left - 8 - ADDED_W
+        end = x_of(r.cell_cat) if r.cell_cat.isVisible() else added
+        self.head_name.setGeometry(x_of(r.tile), 0, max(0, end - x_of(r.tile) - 8), h)
+        self.head_cat.setGeometry(x_of(r.cell_cat), 0, CAT_W, h)
+        self.sort_btns["new"].setGeometry(added, 0, ADDED_W, h)
+        self.sort_btns["top"].setGeometry(left, 0, x_of(r.btn_down) + r.btn_down.width() - left,
+                                          h)
 
     def showEvent(self, e):
         super().showEvent(e)
@@ -420,18 +509,30 @@ class StoreTab(QWidget):
         return self._sort
 
     def set_sort(self, key: str):
-        """Top (the best voted first), New, or Trending (hot on Myinstants now, and this
-        week's thumbs up here)."""
-        self._sort = key if key in ("new", TRENDING) else "top"
-        self.sort_btns[self._sort].setChecked(True)
+        """Votes (the best voted first, "top") or Added (the newest first, "new")."""
+        self._sort = "new" if key == "new" else "top"
+        self._sort_look()
         self.reload()
 
     def set_cat(self, key: str):
         """Only one category's sounds ("" all of them)."""
         self._cat = key if key in store.CATS else ""
-        if self._cat in self.cat_btns:
-            self.cat_btns[self._cat].setChecked(True)
+        self._show_picked(self._cat)
         self.reload()
+
+    def _show_picked(self, key: str):
+        i = self.cat_pick.findData(key)
+        if i >= 0:
+            self.cat_pick.setCurrentIndex(i)
+
+    def _cat_picked(self, i: int):
+        key = self.cat_pick.itemData(i) or ""
+        if self._mode == "voices":
+            self.set_kind(key)
+        else:
+            if key:
+                usage.used("store-category")
+            self.set_cat(key)
 
     def set_mode(self, mode: str):
         """Sounds or Voices: the list, its chips and the Share button change with it."""
@@ -442,43 +543,34 @@ class StoreTab(QWidget):
         self.btn_share.setText(_("Share a voice") if voices else _("Share a sound"))
         self.search.setPlaceholderText(_("Search the voices") if voices
                                        else _("Search sounds"))
-        self.sort_btns[TRENDING].setToolTip(
-            _("The voices people liked most this week") if voices
-            else _("What's hot on Myinstants right now, and the sounds people here liked "
-                   "this week"))
-        self._show_chips()
+        self.head_name.setText(_("Voice") if voices else _("Sound"))
+        self._show_cats()
         self.reload()
 
     def set_kind(self, kind: str):
         """Only one kind of voice ("" all of them)."""
         self._kind = kind if kind in ("fx", "ai", "setup") else ""
-        if self._kind in self.cat_btns:
-            self.cat_btns[self._kind].setChecked(True)
+        self._show_picked(self._kind)
         self.reload()
 
-    def _show_chips(self):
-        """The chips above the list: the sounds' categories, or the voices' kinds."""
-        for b in self.cat_btns.values():
-            self._cat_flow.removeWidget(b)
-            b.deleteLater()
-        self.cat_btns.clear()
+    def _show_cats(self):
+        """The dropdown's choices: the sounds' categories, or the voices' kinds."""
         if self._mode == "sounds":
-            self.cats_box.hide()
+            self._fill_cats([])
             self._fetch_cats()
             return
         from soundboard.ui.storevoices import kind_chips
-        for key, text in kind_chips():
-            b = QPushButton(text)
-            b.setObjectName("subchip")
-            b.setIcon(storelook.emoji_icon(storelook.KIND_EMOJI.get(key, "✨")))
-            b.setCheckable(True)
-            b.setAutoExclusive(True)
-            b.setChecked(key == self._kind)
-            b.setCursor(Qt.CursorShape.PointingHandCursor)
-            b.clicked.connect(lambda _c=False, k=key: self.set_kind(k))
-            self._cat_flow.addWidget(b)
-            self.cat_btns[key] = b
-        self.cats_box.show()
+        self._fill_cats([(key, text, storelook.KIND_EMOJI.get(key, "✨"))
+                         for key, text in kind_chips() if key])
+        self._show_picked(self._kind)
+
+    def _fill_cats(self, items: list[tuple[str, str, str]]):
+        """"All categories", then (key, text, emoji) for each."""
+        self.cat_pick.clear()
+        self.cat_pick.addItem(storelook.emoji_icon("✨"), _("All categories"), "")
+        for key, text, emoji in items:
+            self.cat_pick.addItem(storelook.emoji_icon(emoji), text, key)
+        wheelguard.snug_combo(self.cat_pick)
 
     def _fetch_cats(self):
         install = self.install()
@@ -494,26 +586,11 @@ class StoreTab(QWidget):
     def _on_cats(self, got):
         if self._closed or got is None or self._mode != "sounds":
             return
-        cats, total = got
-        for b in self.cat_btns.values():
-            self._cat_flow.removeWidget(b)
-            b.deleteLater()
-        self.cat_btns.clear()
-        for key, n in [("", total), *cats]:
-            # the name, then how many (a number needs no words)
-            b = QPushButton(f"{store.cat_name(key) if key else _('All')}  {count_text(n)}"
-                            .replace("&", "&&"))
-            b.setObjectName("subchip")
-            b.setIcon(storelook.emoji_icon(storelook.CAT_EMOJI.get(key, "✨")))
-            b.setCheckable(True)
-            b.setAutoExclusive(True)
-            b.setChecked(key == self._cat)
-            b.setCursor(Qt.CursorShape.PointingHandCursor)
-            b.clicked.connect(lambda _c=False, k=key: (
-                k and usage.used("store-category"), self.set_cat(k)))
-            self._cat_flow.addWidget(b)
-            self.cat_btns[key] = b
-        self.cats_box.setVisible(len(self.cat_btns) > 1)
+        cats, _total = got
+        # the name, then how many (a number needs no words)
+        self._fill_cats([(key, f"{store.cat_name(key)}  {count_text(n)}",
+                          storelook.CAT_EMOJI.get(key, "✨")) for key, n in cats])
+        self._show_picked(self._cat)
 
     def _say(self, icon: str, title: str, text: str, button: str = "",
              do: Callable[[], object] | None = None):
@@ -526,6 +603,7 @@ class StoreTab(QWidget):
         self.msg_btn.setText(button)
         self.msg_btn.setVisible(bool(button))
         self._msg_do = do
+        self.table_head.hide()
         self.stack.setCurrentWidget(self.message)
 
     def _message_action(self):
@@ -559,7 +637,7 @@ class StoreTab(QWidget):
         install, voices, kind = self.install(), self._mode == "voices", self._kind
         if replace:
             self._say("store", _("Loading the store…"), "")
-            if not self.cat_btns and not voices:
+            if self.cat_pick.count() < 2 and not voices:
                 self._fetch_cats()
         else:
             busy.set_busy(self.btn_more, True)
@@ -594,9 +672,14 @@ class StoreTab(QWidget):
             self._clear()
         self._offset += len(found)
         from soundboard.storevoices import Voice
-        from soundboard.ui.storevoices import VoiceRow
+        from soundboard.ui.storevoices import VoiceRow, kind_name
         for s in found:
-            r = VoiceRow(s, self) if isinstance(s, Voice) else SoundRow(s, self)
+            if isinstance(s, Voice):
+                r = VoiceRow(s, self)
+                add_cells(r, kind_name(s.kind), s.created)
+            else:
+                r = SoundRow(s, self)
+                add_cells(r, store.cat_name(s.cat), s.created)
             self._list.insertWidget(self._list.indexOf(self.btn_more), r)
             self._rows.append(r)
         self.btn_more.setVisible(more)
@@ -609,7 +692,7 @@ class StoreTab(QWidget):
                 self._say("voice", _("No voices here yet"),
                           _("Be the first: share a voice you made."), _("Share a voice"),
                           self.share_voice)
-            elif self._cat:   # (the chips are in the list: a way back to All here)
+            elif self._cat:   # a way back to All, right here
                 self._say("search", _("Nothing matches"), "", _("All"), lambda: self.set_cat(""))
             else:
                 self._say("store", _("No sounds here yet"),
@@ -618,6 +701,8 @@ class StoreTab(QWidget):
             return
         self.bun.sad = 0.0
         self.stack.setCurrentWidget(self.list_area)
+        self.table_head.show()
+        self._fit_columns()
 
     def _clear(self):
         self._stop_preview()
