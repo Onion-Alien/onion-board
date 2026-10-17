@@ -159,6 +159,7 @@ fixed gap (`HEADER_GAP`) to what's below; the parts under it share one gap
 | Removing something a person made | do it at once, then offer **Undo** (`panel.UndoBar` or `toast(..., action=(_("Undo"), fn))`), into Recently deleted | "Are you sure?" for something that can be undone |
 | Something that can't be undone (delete for good, reset everything) | a small modal dialog: the consequence in words, `[Delete for good] [Cancel]`, the verb on a `#danger` button | `QMessageBox.question` with Yes/No |
 | Explain how something works | an ⓘ icon button opening an anchored help pop-up; Esc / click outside closes | a paragraph on the card, a modal |
+| Walk a new user through a tab once (do the thing) | `coach.Tour` with `coach.Step`s (`ui/coach.py`): the window dims, what to use sits in the yellow ring, one card (Bun, step dots, title, one line, its button) points at it; `Not now` only on the action step | two bubbles or panels at once, a tour that any click dismisses |
 | A card's few extra actions | quiet buttons in the card's own button row | a ⋯ menu that hides two or three options |
 | Many actions on an item in a list | right-click `QMenu`, plus a ⋯ icon button (`widgets.DropdownMenu`) with the same actions | actions only on right-click |
 | Ask a short question or a choice | a small `QDialog` (the dialog recipe below) | a chain of message boxes |

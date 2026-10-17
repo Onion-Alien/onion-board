@@ -60,7 +60,7 @@ from soundboard.ui.importcontrol import ImportControl
 from soundboard.ui.updatecontrol import UpdateControl
 from soundboard.ui import toast as toastmod
 from soundboard.ui import (a11y, appstate, busy, icons, livesize, responsive,
-                           splash, taboff)
+                           splash, taboff, tabtours)
 from soundboard.ui.linkbar import PLAY_ID as LINK_ID
 from soundboard.ui.logowidget import glow_icon
 from soundboard.ui import sidebar
@@ -569,6 +569,7 @@ class MainWindow(QMainWindow):
         # a tip once things have settled; tried again now and then while the window is
         # hidden or a game is up, until one has been shown this start
         QTimer.singleShot(TIP_DELAY_MS, self, self.tipctl._start_tips)
+        tabtours.hook(self)   # each tab's quick how-to on its first visit
         self.langctl._offer_language()
         # the check started behind the loading screen (app.py); its answer, and a
         # download if one is needed, once the window is up

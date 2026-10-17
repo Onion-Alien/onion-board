@@ -39,6 +39,12 @@ class TipControl(Controller):
         mw = self.mw
         return mw.overlay.is_open or tips.fullscreen_in_front()
 
+    @staticmethod
+    def _touring() -> bool:
+        """A tutorial is up: the tip waits (one thing at a time)."""
+        from soundboard.ui import firsttour, tabtours
+        return firsttour._current is not None or tabtours._current is not None
+
     def _maybe_tip(self) -> bool:
         """Show today's tip if it's time. True when there's nothing more to try this
         start (one shown, or none due)."""
@@ -47,7 +53,7 @@ class TipControl(Controller):
         if tip is None:
             self._tip_timer.stop()
             return True
-        if not mw.isVisible() or mw.isMinimized() or self._game_up():
+        if not mw.isVisible() or mw.isMinimized() or self._game_up() or self._touring():
             return False
         self.show_tip(tip)
         self._tip_timer.stop()
@@ -90,6 +96,16 @@ class TipControl(Controller):
         mw.cfg.tips_on = bool(on)
         if not on:
             mw.tip_bar.hide()
+        mw._save_later()
+
+    def set_tutorials_on(self, on: bool):
+        """Settings > General > Show tutorials: off ends a running one too."""
+        mw = self.mw
+        mw.cfg.tutorials_on = bool(on)
+        if not on:
+            from soundboard.ui import firsttour, tabtours
+            firsttour.stop(mw)
+            tabtours.stop(mw)
         mw._save_later()
 
     def _tab_info_at(self, i: int) -> tuple[str, str] | None:

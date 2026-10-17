@@ -48,6 +48,8 @@ APP_DIR = winpath.usable_dir(Path(os.environ.get("APPDATA", Path.home())) / "Oni
 OLD_APP_DIR = winpath.usable_dir(Path(os.environ.get("APPDATA", Path.home())) / "Soundboard")
 SOUNDS_DIR = winpath.usable_dir(APP_DIR / "sounds")
 CACHE_DIR = winpath.usable_dir(APP_DIR / "cache")
+# the tabs with a quick how-to on their first visit (ui/tabtours.py)
+TOUR_TABS = ("radio", "apps", "triggers", "voice", "store")
 CACHE_GRACE_S = 600   # prune_cache leaves a new sound's cache this long (an import in flight)
 # cache files a delete was refused for (still mapped, see _unlink): not new imports, so
 # prune_cache retries them at once instead of after CACHE_GRACE_S
@@ -463,6 +465,9 @@ class Config:
     use_mode: str = "normal"
     # "Did you know?" tips (soundboard.tips): on / off, the ones shown, the day of the last
     tips_on: bool = True
+    # each tab's quick how-to the first time it's opened, and the first-run tour
+    # (ui/tabtours.py, ui/firsttour.py); seen ones are in tips_seen
+    tutorials_on: bool = True
     tips_seen: list = field(default_factory=list)
     tip_day: str = ""
     voice_discord_tip_shown: bool = False   # "Got it" on the voice changer's Studio notice
@@ -865,6 +870,11 @@ class Config:
         # configs from before the setup guide existed: whoever already picked an output
         # device has been set up by hand, so don't greet them with the guide
         raw.setdefault("setup_done", bool(raw.get("main_device")))
+        # ...and from before the tabs' how-tos: they've been using those tabs already
+        if "tutorials_on" not in raw and raw.get("setup_done"):
+            seen = raw.get("tips_seen")
+            raw["tips_seen"] = [*(seen if isinstance(seen, list) else []),
+                                *(f"tour-{t}" for t in TOUR_TABS)]
         # ...and from before What's new: everything in it is new to them
         raw.setdefault("whats_new_seen", "")
         # ...and from before the Chat tab (2.3.0 / 2.3.1 only): kept off, so going back to
