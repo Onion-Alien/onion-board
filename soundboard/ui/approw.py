@@ -210,6 +210,7 @@ class AppGrid(CardGrid):
 
         self.custom_categories = set(self.category_order) - set(default_cats)
         self.headings: dict[str, AppCategoryHeading] = {}
+        self.listed = False   # the list view: one program a row, the tab's width
         self._tab_key: list[int] = []   # the shown order the Tab chain was last set to
         for category in self.category_order:
             self._create_heading(category)
@@ -282,6 +283,9 @@ class AppGrid(CardGrid):
             if cat in self.headings:
                 new_headings[cat] = self.headings[cat]
         self.headings = new_headings
+
+    def columns(self, width: int) -> int:
+        return 1 if self.listed else super().columns(width)
 
     def _place(self, rect: QRect, move: bool) -> int:
         shown = [item for item in self._items if not item.isEmpty()]
@@ -534,12 +538,12 @@ class AppRow(HoverCard):
         self.editor: ClipEditor | None = None   # made the first time it's opened
         self.status_text = ""
         self.status_error = False
-        v = QVBoxLayout(self)
+        v = self._v = QVBoxLayout(self)
         v.setContentsMargins(12, 10, 12, 10)
         v.setSpacing(8)
         self.header = QWidget()
         self.header.setCursor(Qt.CursorShape.OpenHandCursor)
-        top = QHBoxLayout(self.header)
+        top = self._top = QHBoxLayout(self.header)
         top.setContentsMargins(0, 0, 0, 0)
         top.setSpacing(10)
         self.icon = QLabel()
@@ -573,7 +577,9 @@ class AppRow(HoverCard):
         self.meter = meter_cls()
         self.meter.setMinimumWidth(60)
         v.addWidget(self.meter)
-        buttons = QHBoxLayout()
+        self.buttons_w = QWidget()
+        buttons = QHBoxLayout(self.buttons_w)
+        buttons.setContentsMargins(0, 0, 0, 0)
         buttons.setSpacing(6)
         self.btn_send = QPushButton()
         self.btn_send.setObjectName("live")
@@ -619,8 +625,10 @@ class AppRow(HoverCard):
         self.cb_to.setVisible(self.to != "both")
         buttons.addWidget(self.cb_to)
         buttons.addStretch(1)
-        v.addLayout(buttons)
-        mix = QHBoxLayout()
+        v.addWidget(self.buttons_w)
+        self.mix_w = QWidget()
+        mix = QHBoxLayout(self.mix_w)
+        mix.setContentsMargins(0, 0, 0, 0)
         mix.setSpacing(8)
         self.vol = VolumeControl(vol, tip=_("This program's volume in the mix"))
         self.vol.slider.setMaximumWidth(16777215)   # the card's width, not a row's sliver
@@ -632,13 +640,64 @@ class AppRow(HoverCard):
         self.chk_hear.setChecked(hear)
         self.chk_hear.toggled.connect(lambda on: self.hear_toggled.emit(self, on))
         self.chk_hear.hide()   # optional duplicate monitoring lives in the card menu
-        v.addLayout(mix)
+        v.addWidget(self.mix_w)
+        self.listed = False
+        self._as_line = False    # laid out on one line (the list view, room enough)
+        self._line = QWidget(self)   # the list view's one row
+        self._line_lay = QHBoxLayout(self._line)
+        self._line_lay.setContentsMargins(0, 0, 0, 0)
+        self._line_lay.setSpacing(12)
+        self._line.hide()
         self.view = WindowView(self)
         self.btn_view.toggled.connect(self._on_view)
         v.addWidget(self.view)
         self._tight = 0   # how many of _TIGHTEN are applied (a narrow window)
         self._label_send()
         self.set_app(None)
+
+    def set_listed(self, on: bool):
+        """The list view: everything on one line (name, level, buttons, volume, ✕),
+        the window picture still folding out below. A row narrower than LINE_MIN_W
+        stacks as the card does, still one a line: squeezed onto one line, the
+        buttons were crushed to slivers."""
+        if on == self.listed:
+            return
+        self.listed = on
+        self._tight = -1
+        self._fit_width(self.width())
+
+    def _arrange(self, as_line: bool):
+        self._as_line = as_line
+        v, line = self._v, self._line_lay
+        if as_line:
+            line.addWidget(self.header, 3)
+            line.addWidget(self.meter, 1)
+            line.addWidget(self.buttons_w)
+            line.addWidget(self.mix_w, 1)
+            self.header.setMinimumWidth(150)   # the name never squeezed away
+            self.meter.setMinimumWidth(50)
+            self.meter.setMaximumWidth(120)
+            self.buttons_w.setSizePolicy(QSizePolicy.Policy.Maximum, QSizePolicy.Policy.Fixed)
+            self.mix_w.setMinimumWidth(110)
+            self.mix_w.setMaximumWidth(190)
+            self._top.removeWidget(self.btn_forget)
+            line.addWidget(self.btn_forget)
+            v.insertWidget(0, self._line)
+            self._line.show()
+            v.setContentsMargins(12, 6, 8, 6)
+        else:
+            self._top.addWidget(self.btn_forget, 0, Qt.AlignmentFlag.AlignTop)
+            for i, w in enumerate((self.header, self.meter, self.buttons_w, self.mix_w)):
+                v.insertWidget(i, w)
+            self.meter.setMinimumWidth(60)
+            self.meter.setMaximumWidth(16777215)
+            self.header.setMinimumWidth(0)
+            self.buttons_w.setSizePolicy(QSizePolicy.Policy.Preferred,
+                                         QSizePolicy.Policy.Preferred)
+            self.mix_w.setMinimumWidth(0)
+            self.mix_w.setMaximumWidth(16777215)
+            self._line.hide()
+            v.setContentsMargins(12, 10, 12, 10)
 
     def mousePressEvent(self, event):
         if event.button() == Qt.MouseButton.LeftButton:
@@ -748,6 +807,7 @@ class AppRow(HoverCard):
     # narrow card, in this order: the typed volume goes, the buttons keep only their
     # icons (their tooltips say what they are)
     _TIGHTEN = ("spin", "send", "rec")
+    LINE_MIN_W = 720   # px: the list view's one line with its words dropped, and room
 
     def resizeEvent(self, e):
         super().resizeEvent(e)
@@ -765,6 +825,10 @@ class AppRow(HoverCard):
         return self.minimumSizeHint().width() + self.NAME_ROOM
 
     def _fit_width(self, width: int):
+        as_line = self.listed and width >= self.LINE_MIN_W
+        if as_line != self._as_line:
+            self._arrange(as_line)
+            self._tight = -1
         want = 0
         while want < len(self._TIGHTEN):
             self._set_tight(want)

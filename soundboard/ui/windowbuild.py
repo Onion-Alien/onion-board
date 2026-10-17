@@ -52,6 +52,7 @@ from soundboard.ui.livedot import set_tint as set_live_tint
 from soundboard.ui.logowidget import LogoWidget
 from soundboard.ui.padbatch import PadSelection
 from soundboard.ui.panel import (
+    ViewToggle,
     BAR_H,
     CONTROL_H,
     EqPanel,
@@ -1082,9 +1083,9 @@ class WindowBuilder(Controller):
         tb.addWidget(vsep())
         tb.addWidget(more)
         tb.addWidget(vsep())
-        # the pads' order (as dragged, A-Z, newest, most played) and cards or a list
+        # the pads' order (as dragged, A-Z, newest, most played)
         mw.btn_view = QPushButton()
-        mw.btn_view.setAccessibleName(_("Order and view"))
+        mw.btn_view.setAccessibleName(_("Sort by"))
         vm = DropdownMenu(mw.btn_view)
         vm.setToolTipsVisible(True)
         vm.aboutToShow.connect(lambda: mw.padctl._fill_view_menu(vm))
@@ -1092,6 +1093,10 @@ class WindowBuilder(Controller):
         mw.btn_view.setProperty("toolbarMenu", True)
         mw.padctl._label_view()
         tb.addWidget(mw.btn_view)
+        # cards or a list, the same switch as the Apps and Voice tabs
+        mw.pad_view_toggle = ViewToggle(c.pad_view, _("Sounds"))
+        mw.pad_view_toggle.changed.connect(mw.padctl.set_pad_view)
+        tb.addWidget(mw.pad_view_toggle)
         # Creation actions have their own surfaces; library tools stay quiet.
         for b in (mw.btn_folder, more, mw.btn_bin, mw.btn_keys,
                   mw.btn_yt, mw.btn_view):

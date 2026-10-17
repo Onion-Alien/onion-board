@@ -83,6 +83,44 @@ def test_card_size_reflows_and_survives_reopening(tab, qapp):
     reopened.shutdown()
 
 
+def test_list_view_puts_each_program_on_one_line_and_is_remembered(tab, qapp, monkeypatch):
+    apps = [music(), App(200, "game.exe")]
+    monkeypatch.setattr(appaudio, "list_apps", lambda strict=False, **_: apps)
+    assert tab.view_toggle.isHidden()            # nothing to show as cards or a list yet
+    tab.resize(1200, 640)
+    tab.show()
+    tab._on_apps(apps)
+    qapp.processEvents()
+    row = tab.rows["music.exe"]
+    card_h = row.height()
+    tab.view_toggle.buttons["list"].click()
+    qapp.processEvents()
+    assert tab.cfg.app_view == "list" and tab.saved
+    assert tab.grid.columns(tab.list.width()) == 1
+    assert row.listed and row.height() < card_h
+    assert tab.card_size.isHidden()   # one row the width of the tab: no card size
+    assert row.btn_send.isVisible() and row.vol.isVisible() and row.name.width() >= 100
+    apps.append(App(300, "chat.exe"))
+    tab._on_apps(apps)
+    assert tab.rows["chat.exe"].listed            # a program that turns up later too
+    assert tab.card_size.isHidden()               # and the card size stays away
+    tab.resize(520, 640)                          # too narrow for one line: stacked
+    qapp.processEvents()
+    assert row.listed and not row._as_line
+    for b in (row.btn_send, row.btn_rec, row.btn_view, row.btn_clip):
+        assert b.width() >= b.minimumSizeHint().width()   # never crushed to a sliver
+    tab.resize(1200, 640)
+    qapp.processEvents()
+    assert row._as_line
+    reopened = AppsTab(Engine(), tab.cfg, lambda: None, Meter)
+    assert reopened.view_toggle.view() == "list" and reopened.grid.listed
+    reopened.shutdown()
+    tab.view_toggle.buttons["grid"].click()
+    qapp.processEvents()
+    assert not row.listed and tab.cfg.app_view == "grid"
+    assert abs(row.height() - card_h) <= 2 and not tab.card_size.isHidden()
+
+
 def test_rows_follow_running_programs_and_send_captures_into_the_engine(tab):
     assert tab.empty.isVisibleTo(tab)
     tab._on_apps([music(), App(200, "game.exe")])

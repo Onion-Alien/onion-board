@@ -178,7 +178,7 @@ ROUTES = ("cable", "device", "off", "mic")
 # settings whose unknown value (a newer version's choice) clean_setting replaces with
 # a safe one: the value as it was is still written back (see _with_raw)
 NEWER_CHOICES = ("route", "net_mode", "tor_bridges", "pad_sort", "pad_view", "list_rows",
-                 "app_clip_group")
+                 "app_clip_group", "app_view", "voice_view")
 # the Sounds tab's orders: as dragged, A-Z, the newest first, the most played first
 PAD_SORTS = ("custom", "name", "newest", "plays")
 PAD_VIEWS = ("grid", "list")
@@ -242,7 +242,7 @@ def clean_setting(k: str, v):
         return v if v in ROUTES else "cable"
     if k == "pad_sort":
         return v if v in PAD_SORTS else "custom"
-    if k == "pad_view":
+    if k in ("pad_view", "app_view", "voice_view"):
         return v if v in PAD_VIEWS else "grid"
     if k == "list_rows":
         return v if v in LIST_ROWS else "medium"
@@ -437,6 +437,8 @@ class Config:
     pad_view: str = "grid"     # "grid" (cards) or "list" (one-line rows)
     list_rows: str = "medium"  # the list view's row height: LIST_ROWS
     app_card_width: int = 300
+    app_view: str = "grid"     # the Apps tab: cards or a list (PAD_VIEWS)
+    voice_view: str = "grid"   # the Voice tab's voices: picture cards or a list
     app_clip_height: int = 0   # saved clips: 0 fits the rows, otherwise the dragged height
     app_clip_group: str = "app"   # saved clips grouped by app, day, or newest first
     app_clips_expanded: bool = True   # fold the saved clips down to their header

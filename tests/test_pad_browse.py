@@ -110,14 +110,27 @@ def test_dragging_while_sorted_keeps_the_own_order(window):
     assert [m.id for m in w.cfg.sounds] == ["s1", "s0"]
 
 
-def test_view_menu_lists_orders_and_views(window):
+def test_view_menu_lists_only_the_orders(window):
     w = window
     menu = w.btn_view.menu()
     w.padctl._fill_view_menu(menu)
     names = [a.text() for a in menu.actions() if a.text()]
-    assert names == ["My order", "A–Z", "Newest", "Most played", "Cards", "List"]
+    assert names == ["My order", "A–Z", "Newest", "Most played"]
     checked = [a.text() for a in menu.actions() if a.isChecked()]
-    assert checked == ["My order", "Cards"]
+    assert checked == ["My order"]
+
+
+def test_cards_or_list_switch_by_the_order_button(window):
+    """Two icons beside the order button: cards or a list, the one in use lit."""
+    w = window
+    t = w.pad_view_toggle
+    assert t.view() == "grid" and t.buttons["grid"].isChecked()
+    t.buttons["list"].click()
+    assert w.grid.listed and w.cfg.pad_view == "list" and t.view() == "list"
+    t.buttons["list"].click()   # clicking the lit one again changes nothing
+    assert w.grid.listed
+    w.padctl.set_pad_view("grid")   # set some other way: the switch follows
+    assert t.view() == "grid" and not w.grid.listed
 
 
 def test_list_view_rows_in_columns(window):
@@ -160,6 +173,12 @@ def test_list_view_swaps_card_size_for_row_size(window):
     w.padctl._fit_size_picker(True)   # a narrow window: neither
     assert all(x.isHidden() for x in (*w._pad_size, *w._row_size))
     w.padctl._fit_size_picker(False)
+
+
+def test_a_newer_view_loads_as_cards():
+    for key in ("pad_view", "app_view", "voice_view"):
+        assert library.clean_setting(key, "gallery") == "grid"
+        assert library.clean_setting(key, "list") == "list"
 
 
 def test_a_newer_row_size_loads_as_medium():

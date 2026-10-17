@@ -578,6 +578,31 @@ def test_my_own_mix_is_kept_across_restarts(qapp, monkeypatch):
         p.deleteLater()
 
 
+def test_voices_as_a_list(qapp, monkeypatch):
+    """The list view: a small picture beside each name, shorter rows, the star kept."""
+    monkeypatch.setattr(tts.SapiTTS, "warm_up", lambda self: [])
+    from PySide6.QtWidgets import QWidget
+
+    from soundboard.ui.voicefxpanel import LIST_MIN_W, VoiceFxPanel
+    holder = QWidget()
+    fx = VoiceFxPanel({})
+    fx.setParent(holder)
+    holder.show()
+    fx.setGeometry(0, 0, 1200, 1400)
+    qapp.processEvents()
+    tile = next(iter(fx._tile.values()))
+    card_h = tile.height()
+    fx.view_toggle.buttons["list"].click()
+    qapp.processEvents()
+    assert fx.view_toggle.view() == "list" and tile.listed
+    assert tile.height() < card_h and tile.width() >= LIST_MIN_W
+    assert tile.star.geometry().right() <= tile.width()
+    tile.grab()   # paints its own row without trouble
+    fx.set_view("grid")
+    qapp.processEvents()
+    assert not tile.listed and fx.view_toggle.view() == "grid"
+
+
 def test_voice_tiles_reflow_in_a_narrow_window(qapp, monkeypatch):
     """Voice cards: as many a row as the width holds, down to one; never off the side."""
     monkeypatch.setattr(tts.SapiTTS, "warm_up", lambda self: [])

@@ -107,7 +107,7 @@ if TYPE_CHECKING:
     from soundboard.ui.linkbar import LinkBar
     from soundboard.ui.logowidget import LogoWidget
     from soundboard.ui.padbatch import PadSelection
-    from soundboard.ui.panel import EqPanel, Flow, TileRow, VolumeControl
+    from soundboard.ui.panel import EqPanel, Flow, TileRow, ViewToggle, VolumeControl
     from soundboard.ui.playbutton import PlayButton
     from soundboard.ui.setupshow import SetupShow
     from soundboard.ui.sidebar import SideTabs
@@ -186,6 +186,7 @@ class MainWindow(QMainWindow):
     btn_usecable: QPushButton
     btn_video: QPushButton
     btn_view: QPushButton
+    pad_view_toggle: ViewToggle
     btn_yt: QPushButton
     _cable_gone: bool
     card_meter: Meter
@@ -845,6 +846,8 @@ class MainWindow(QMainWindow):
             v.fx.hotkey_cleared.connect(lambda n: self.hkctl.set_voice_hotkey(n, ""))
             v.fx.renamed.connect(self.hkctl.voice_renamed)
             v.fx.keys = dict(self.cfg.voice_hotkeys)
+            v.fx.set_view(self.cfg.voice_view)
+            v.fx.view_toggle.changed.connect(lambda view: self.set_option("voice_view", view))
             v.fx.tip_dismissed.connect(
                 lambda: self.set_option("voice_discord_tip_shown", True))
         elif key == "apps":

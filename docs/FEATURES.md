@@ -88,6 +88,9 @@ The full list. The [README](../README.md) has the short version and how to get s
   effects while it plays** (the `1x` button: 0.25×–2×, ±12 semitones, keep the pitch
   or not, plus bass, treble, muffle, reverb, echo, distortion and presets on every
   sound playing). That's for listening and isn't saved; use Effects to keep a version.
+- **Cards or a list:** two icons at the top right of the Sounds, Apps and Voice tabs.
+  The list fits many more on the screen: sounds as one-line rows, each program on one
+  line, voices as a small picture beside the name. Each tab remembers its choice.
 - **Any window size:** less important controls tuck away as it gets smaller and come
   back when it grows. Small enough (below roughly 440 × 380) it becomes a mini
   player with your pads and the play / stop controls, down to 260 × 120.
