@@ -116,9 +116,9 @@ class VoicePicker(QDialog):
         if cat.ai_ready and cat.ai:
             self.ai_chips = self._chips(cv, self._show_ai, bool(cat.ai_favs), False)
             self.ai_grid = self._grid(cv)
-            from soundboard.ui.aivoicepanel import emoji_icon
+            from soundboard.ui.aivoicepanel import voice_icon
             for vo in cat.ai:
-                t = self._tile(vo["name"], emoji_icon(str(vo.get("emoji") or "")))
+                t = self._tile(vo["name"], voice_icon(vo))
                 t.setToolTip(str(vo.get("description") or ""))
                 t.star.setChecked(vo["id"] in cat.ai_favs)
                 t.star.toggled.connect(lambda on, i=vo["id"]: self._star_ai(i, on))
@@ -234,8 +234,8 @@ class VoicePicker(QDialog):
         if ai:
             vo = next((v for v in self.cat.ai if v["id"] == ai["id"]), None)
             if vo is not None:
-                from soundboard.ui.aivoicepanel import emoji_icon
-                return emoji_icon(str(vo.get("emoji") or ""))
+                from soundboard.ui.aivoicepanel import voice_icon
+                return voice_icon(vo)
         name = voice.get("fx") or self._fx_name_for(voice)
         pic = next((p for n, _s, _e, p, _m in self.cat.fx if n == name), None)
         return pic or icons.icon("sliders", "muted")

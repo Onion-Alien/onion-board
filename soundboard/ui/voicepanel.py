@@ -356,8 +356,8 @@ class VoicePanel(QWidget):
         ai = setup.get("ai")
         vo = next((v for v in self.ai.voices if ai and v.get("id") == ai["id"]), None)
         if vo is not None:
-            from soundboard.ui.aivoicepanel import emoji_icon
-            return emoji_icon(str(vo.get("emoji") or ""))
+            from soundboard.ui.aivoicepanel import voice_icon
+            return voice_icon(vo)
         pic = art.icon(art.voice_key(setup["fx"])) if setup.get("fx") else None
         return pic or icons.icon("sliders" if setup.get("effects") else "browser", "muted")
 

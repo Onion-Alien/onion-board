@@ -66,6 +66,14 @@ BUILT_IN = [
        "A lighter, younger man's voice, like someone in their late teens or early "
        "twenties.",
        ["Man"], [[5, 0.5], [80, 0.25], [188, 0.25]], 0.5, 140),
+    _v("atlas", "Atlas", "🎬", "A smooth, deep storyteller.",
+       "A calm, rich, deep man's voice, like a film trailer or a documentary. Good for "
+       "narrating, a wise king or a game announcer.",
+       ["Man"], [[85, 0.5], [171, 0.25], [188, 0.25]], -0.5, 105),
+    _v("sarge", "Sarge", "🪖", "Loud and barking.",
+       "A hard, punchy man's voice made for shouting orders. Good for a drill sergeant, "
+       "a coach or an angry boss.",
+       ["Man"], [[156, 0.5], [60, 0.25], [5, 0.25]], -0.5, 128),
     _v("river", "River", "🌊", "Somewhere in between.",
        "Sits between a man's and a woman's voice, so it's hard to tell which. Good if "
        "you'd rather not be either.",
@@ -83,10 +91,26 @@ BUILT_IN = [
     _v("pixie", "Pixie", "🧚", "Light and young-sounding.",
        "A light, high, young-sounding voice. Good for cheerful or cartoon-like characters.",
        ["Woman"], [[18, 0.5], [110, 0.25], [141, 0.25]], 1.0, 265),
+    _v("nana", "Nana", "👵", "An older woman's voice.",
+       "A grandma's voice: a little lower and softer than a young woman's. Good for a "
+       "kind granny, a witch or an old shopkeeper.",
+       ["Woman"], [[141, 0.5], [127, 0.25], [108, 0.25]], -1.0, 190),
+    _v("zoe", "Zoe", "🎧", "A young woman's voice.",
+       "A bright, younger woman's voice, like someone in their late teens or early "
+       "twenties.",
+       ["Woman"], [[53, 0.5], [18, 0.25], [136, 0.25]], 0.5, 235),
+    _v("onyx", "Onyx", "🖤", "A very low woman's voice.",
+       "A woman with a deep, dark, smoky voice, lower than Ivy. Good for a villain, a "
+       "spy or a mysterious stranger.",
+       ["Woman"], [[29, 0.5], [108, 0.25], [141, 0.25]], -1.5, 135),
     _v("squeak", "Squeak", "🐿️", "A tiny cartoon voice.",
        "Very high and squeaky, like a chipmunk or a cartoon sidekick. Just for fun: "
        "nobody will think it's real.",
        ["Cartoon"], [[18, 0.5], [110, 0.5]], 2.0, 360),
+    _v("bean", "Bean", "🧃", "A little kid.",
+       "A high, small voice like a young child. Higher than Pixie, not as squeaky as "
+       "Squeak.",
+       ["Cartoon"], [[110, 0.5], [18, 0.25], [5, 0.25]], 1.5, 300),
     _v("titan", "Titan", "🗿", "A huge, rumbling voice.",
        "Deeper than anyone really talks: a giant, an ogre or a monster. Best for laughs "
        "and villains, not for passing as a real person.",
