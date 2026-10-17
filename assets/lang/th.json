@@ -3722,5 +3722,6 @@
   "On top of any voice: they stay when you pick another one.": "ซ้อนบนเสียงไหนก็ได้: ยังอยู่เมื่อคุณเลือกเสียงอื่น",
   "Rain, a crowd, an echo or sounds from your board, on top of any voice": "ฝน ฝูงชน เสียงก้อง หรือเสียงจากบอร์ดของคุณ ซ้อนบนเสียงไหนก็ได้",
   "Take “{effect}” off": "เอา “{effect}” ออก",
-  "{site} didn't answer over Tor (it ignores some of Tor's addresses), and nor did {tries} other Tor routes. You can try this one without Tor: {site} would then see your own address.": "{site} ไม่ตอบผ่าน Tor (มันเพิกเฉยต่อที่อยู่บางส่วนของ Tor) และอีก {tries} เส้นทาง Tor ก็ไม่ตอบเช่นกัน คุณสามารถลองอันนี้โดยไม่ใช้ Tor: {site} จะเห็นที่อยู่ของคุณเอง"
+  "{site} didn't answer over Tor (it ignores some of Tor's addresses), and nor did {tries} other Tor routes. You can try this one without Tor: {site} would then see your own address.": "{site} ไม่ตอบผ่าน Tor (มันเพิกเฉยต่อที่อยู่บางส่วนของ Tor) และอีก {tries} เส้นทาง Tor ก็ไม่ตอบเช่นกัน คุณสามารถลองอันนี้โดยไม่ใช้ Tor: {site} จะเห็นที่อยู่ของคุณเอง",
+  "Up next · {n} before it": "ถัดไป · ก่อนหน้า {n}"
 }

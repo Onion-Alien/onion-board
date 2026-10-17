@@ -3882,5 +3882,6 @@
   "On top of any voice: they stay when you pick another one.": "Peste orice voce: rămân când alegi alta.",
   "Rain, a crowd, an echo or sounds from your board, on top of any voice": "Ploaie, mulțime, ecou sau sunete de pe board-ul tău peste orice voce",
   "Take “{effect}” off": "Scoate „{effect}”",
-  "{site} didn't answer over Tor (it ignores some of Tor's addresses), and nor did {tries} other Tor routes. You can try this one without Tor: {site} would then see your own address.": "{site} nu a răspuns prin Tor (ignoră unele adrese ale lui Tor), și nici prin {tries} alte rute Tor. Puteți încerca acesta fără Tor: {site} va vedea atunci propria dvs. adresă."
+  "{site} didn't answer over Tor (it ignores some of Tor's addresses), and nor did {tries} other Tor routes. You can try this one without Tor: {site} would then see your own address.": "{site} nu a răspuns prin Tor (ignoră unele adrese ale lui Tor), și nici prin {tries} alte rute Tor. Puteți încerca acesta fără Tor: {site} va vedea atunci propria dvs. adresă.",
+  "Up next · {n} before it": "Urmează · {n} înainte"
 }

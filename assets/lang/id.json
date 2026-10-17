@@ -3722,5 +3722,6 @@
   "On top of any voice: they stay when you pick another one.": "Di atas suara apa pun: tetap ada saat kamu memilih yang lain.",
   "Rain, a crowd, an echo or sounds from your board, on top of any voice": "Hujan, keramaian, gema, atau suara dari board-mu di atas suara apa pun",
   "Take “{effect}” off": "Lepas “{effect}”",
-  "{site} didn't answer over Tor (it ignores some of Tor's addresses), and nor did {tries} other Tor routes. You can try this one without Tor: {site} would then see your own address.": "{site} tidak menjawab lewat Tor (situs itu mengabaikan sebagian alamat Tor), begitu pula lewat {tries} rute Tor lainnya. Anda dapat mencoba yang ini tanpa Tor: {site} akan melihat alamat Anda sendiri."
+  "{site} didn't answer over Tor (it ignores some of Tor's addresses), and nor did {tries} other Tor routes. You can try this one without Tor: {site} would then see your own address.": "{site} tidak menjawab lewat Tor (situs itu mengabaikan sebagian alamat Tor), begitu pula lewat {tries} rute Tor lainnya. Anda dapat mencoba yang ini tanpa Tor: {site} akan melihat alamat Anda sendiri.",
+  "Up next · {n} before it": "Berikutnya · {n} sebelumnya"
 }

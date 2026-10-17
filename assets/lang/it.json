@@ -3802,5 +3802,6 @@
   "On top of any voice: they stay when you pick another one.": "Sopra qualsiasi voce: restano quando ne scegli un'altra.",
   "Rain, a crowd, an echo or sounds from your board, on top of any voice": "Pioggia, folla, eco o suoni della tua board sopra qualsiasi voce",
   "Take “{effect}” off": "Togli «{effect}»",
-  "{site} didn't answer over Tor (it ignores some of Tor's addresses), and nor did {tries} other Tor routes. You can try this one without Tor: {site} would then see your own address.": "{site} non ha risposto tramite Tor (ignora alcuni indirizzi di Tor), e nemmeno tramite {tries} altri percorsi Tor. Puoi provarlo senza Tor: {site} vedrebbe quindi il tuo indirizzo."
+  "{site} didn't answer over Tor (it ignores some of Tor's addresses), and nor did {tries} other Tor routes. You can try this one without Tor: {site} would then see your own address.": "{site} non ha risposto tramite Tor (ignora alcuni indirizzi di Tor), e nemmeno tramite {tries} altri percorsi Tor. Puoi provarlo senza Tor: {site} vedrebbe quindi il tuo indirizzo.",
+  "Up next · {n} before it": "Prossimo · {n} prima"
 }

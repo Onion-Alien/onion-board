@@ -685,6 +685,9 @@ class WindowBuilder(Controller):
         mw.netctl._search_follow_switch()
         net.on_change(mw.netctl._follow_switches)
 
+        # Now playing and Up next, over the player: on every tab, so a sound played from
+        # Community (or anywhere) that waits its turn is seen waiting, not lost
+        rv.addWidget(mw.playing_row)
         # the Sounds tab's player; right under the page, where it sat inside it
         rv.addWidget(mw.transport)
         mw.tabs.currentChanged.connect(lambda _i: mw.transctl._show_transport())
@@ -711,6 +714,12 @@ class WindowBuilder(Controller):
         mw.mini_download_bar.front_requested.connect(mw.linkbar.move_to_front)
         mw.linkbar.queue_updated.connect(mw.download_bar.set_queue)
         mw.linkbar.queue_updated.connect(mw.mini_download_bar.set_queue)
+        for b in (mw.download_bar, mw.mini_download_bar):
+            # a Play that waits for the song playing says Up next there, not Playing
+            mw.linkbar.up_next_changed.connect(
+                lambda *__, b=b: b.set_up_next(mw.linkbar.up_next_items()))
+            mw.linkbar.played.connect(lambda *a, b=b: b.set_playing(a[3]))
+            b.up_next_drop.connect(mw.linkbar.drop_up_next_url)
         mw.download_bar.cancel_requested.connect(mw.linkbar.cancel)
         mw.mini_download_bar.cancel_requested.connect(mw.linkbar.cancel)
         mw.download_bar.stop_all_requested.connect(mw.linkbar.cancel_all)
@@ -1242,8 +1251,7 @@ class WindowBuilder(Controller):
         mw._up_next_chip = None     # the row's Up next chip, when anything waits
         mw._up_next_popup = None    # its list, made the first time it's opened
         _Moved(mw.playing_row, mw.playctl._fit_up_next)
-        mw.playing_row.hide()
-        left.addWidget(mw.playing_row)
+        mw.playing_row.hide()   # (placed over the player bar, on every tab: _build)
 
 
         f, th = bar()

@@ -3802,5 +3802,6 @@
   "On top of any voice: they stay when you pick another one.": "Minkä tahansa äänen päällä: pysyvät, kun valitset toisen.",
   "Rain, a crowd, an echo or sounds from your board, on top of any voice": "Sade, väkijoukko, kaiku tai äänet boardiltasi minkä tahansa äänen päälle",
   "Take “{effect}” off": "Poista ”{effect}”",
-  "{site} didn't answer over Tor (it ignores some of Tor's addresses), and nor did {tries} other Tor routes. You can try this one without Tor: {site} would then see your own address.": "{site} ei vastannut Torin kautta (se ohittaa osan Torin osoitteista), eikä myöskään {tries} muun Tor-reitin kautta. Voit kokeilla tätä ilman Toria: {site} näkisi silloin oman osoitteesi."
+  "{site} didn't answer over Tor (it ignores some of Tor's addresses), and nor did {tries} other Tor routes. You can try this one without Tor: {site} would then see your own address.": "{site} ei vastannut Torin kautta (se ohittaa osan Torin osoitteista), eikä myöskään {tries} muun Tor-reitin kautta. Voit kokeilla tätä ilman Toria: {site} näkisi silloin oman osoitteesi.",
+  "Up next · {n} before it": "Seuraavana · {n} ennen sitä"
 }

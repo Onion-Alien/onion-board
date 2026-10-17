@@ -3802,5 +3802,6 @@
   "On top of any voice: they stay when you pick another one.": "Πάνω σε οποιαδήποτε φωνή: μένουν όταν διαλέξεις άλλη.",
   "Rain, a crowd, an echo or sounds from your board, on top of any voice": "Βροχή, πλήθος, ηχώ ή ήχοι από το board σου πάνω σε οποιαδήποτε φωνή",
   "Take “{effect}” off": "Βγάλε το «{effect}»",
-  "{site} didn't answer over Tor (it ignores some of Tor's addresses), and nor did {tries} other Tor routes. You can try this one without Tor: {site} would then see your own address.": "Το {site} δεν απάντησε μέσω Tor (αγνοεί κάποιες διευθύνσεις του Tor), ούτε μέσω {tries} άλλων διαδρομών Tor. Μπορείτε να δοκιμάσετε αυτό χωρίς Tor: το {site} θα έβλεπε τότε τη δική σας διεύθυνση."
+  "{site} didn't answer over Tor (it ignores some of Tor's addresses), and nor did {tries} other Tor routes. You can try this one without Tor: {site} would then see your own address.": "Το {site} δεν απάντησε μέσω Tor (αγνοεί κάποιες διευθύνσεις του Tor), ούτε μέσω {tries} άλλων διαδρομών Tor. Μπορείτε να δοκιμάσετε αυτό χωρίς Tor: το {site} θα έβλεπε τότε τη δική σας διεύθυνση.",
+  "Up next · {n} before it": "Επόμενο · {n} πριν από αυτό"
 }
