@@ -68,7 +68,7 @@ def _clip(x: np.ndarray) -> np.ndarray:
 
 
 def _sources(args) -> list[tuple[str, np.ndarray]]:
-    from soundboard import library
+    from soundboard.sounds import library
     out = []
     if args.library:
         cfg = library.Config.load()

@@ -1988,7 +1988,7 @@ def test_engine_reports_a_missing_effect(tmp_path, monkeypatch):
 # ---------------------------------------------------------------------- set-up states
 
 def test_new_users_go_straight_into_their_mic_old_settings_keep_the_cable(app_dir):
-    from soundboard import library
+    from soundboard.sounds import library
     assert library.Config.load().route == "mic"   # no settings yet: a first start
     assert library.Config().route == "cable"
     # 1.9.1: settings on the cable move to the mic once; other routes stay put, and a
@@ -3239,7 +3239,7 @@ def test_window_starts_on_the_mic_with_the_cable_copy(qapp, app_dir, monkeypatch
     """A whole start-up on the mic route with the effect working and a cable there
     (an upgraded 1.9.0 cable config): no crash, live in the mic, the copy opened."""
     from soundboard import engine as eng
-    from soundboard import library
+    from soundboard.sounds import library
     from soundboard.control import winkeys
     from soundboard.ui import mainwindow as main
     monkeypatch.setattr(dm, "status", lambda name=None: "outdated")

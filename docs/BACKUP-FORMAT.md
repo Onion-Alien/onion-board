@@ -98,7 +98,7 @@ Only `name` and `audio` are needed; everything else falls back to the defaults.
 
 ## `settings.json`
 
-The app's settings (`Config` in `soundboard/library.py`) minus anything that
+The app's settings (`Config` in `soundboard/sounds/library.py`) minus anything that
 belongs to one PC or that must only be switched on by hand (`LOCAL_SETTINGS` in
 `soundboard/backup.py`): audio devices, where sounds are sent (straight into the mic,
 the cable, another device or nowhere), the setup-guide state, per-program Apps

@@ -56,8 +56,9 @@ from dataclasses import dataclass
 from pathlib import Path
 
 from soundboard.online import jsengine, net, ytworker
-from soundboard import library, quality, sourceinfo, updates
-from soundboard.library import MAX_SECONDS
+from soundboard.sounds import library, sourceinfo
+from soundboard import quality, updates
+from soundboard.sounds.library import MAX_SECONDS
 from soundboard import errors
 from soundboard.i18n import _
 
@@ -1123,7 +1124,7 @@ def _opts(dest: Path | None = None, progress=None, thumbnail: bool = False,
         "format": quality.current.audio_format(),   # Settings > Data & quality
         "outtmpl": str((dest or Path(tempfile.gettempdir())) / "%(id)s.%(ext)s"),
         "noplaylist": True,            # a video in a playlist: just that video
-        "writethumbnail": thumbnail,   # the pad's picture (soundboard.thumbs)
+        "writethumbnail": thumbnail,   # the pad's picture (soundboard.sounds.thumbs)
         "quiet": True,
         "no_warnings": True,
         "noprogress": True,

@@ -10,7 +10,7 @@ import threading
 import numpy as np
 
 from soundboard.engine import SR
-from soundboard.library import MAX_SECONDS
+from soundboard.sounds.library import MAX_SECONDS
 
 LISTEN_S = 60            # how far back a listening card can go
 BIN = 240                # frames per waveform column (5 ms): fine enough to zoom into

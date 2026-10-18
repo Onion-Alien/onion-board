@@ -106,7 +106,7 @@ def save() -> None:
     with _lock:
         _timer = None
         todo = {d: dict(t) for d, t in _dirs.items()}
-    from soundboard import library   # imports engine, which imports this module
+    from soundboard.sounds import library  # imports engine, which imports this module
     for folder, table in todo.items():
         table = {n: v for n, v in table.items() if os.path.exists(os.path.join(folder, n))}
         out = os.path.join(folder, NAME)

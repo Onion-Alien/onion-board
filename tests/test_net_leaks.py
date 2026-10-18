@@ -239,7 +239,7 @@ class _Inline:
 
 
 def test_usage_count_through_the_proxy(sites, socks, guard, counter):
-    from soundboard.library import Config
+    from soundboard.sounds.library import Config
     cfg = Config()
     counter.maybe_send(cfg)
     assert cfg.stats_sent > 0 and socks.hosts_asked() == {"counter.test"}
@@ -255,7 +255,7 @@ def test_usage_count_switched_off_never_reaches_the_counter(sites, socks, guard,
                                                             monkeypatch, why):
     """Not just maybe_send's own check: net refuses it too, so a count already on its
     way when the switch goes off (or anything calling send() directly) stops."""
-    from soundboard.library import Config
+    from soundboard.sounds.library import Config
     cfg = Config()
     if why == "off while waiting":
         def thread(target, **kw):     # switched off between the check and the send

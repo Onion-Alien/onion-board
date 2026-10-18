@@ -4,7 +4,7 @@ drag across, preview, trim and save.
 It's opt-in and folded away: a card builds one only when its *Clip editor* is
 opened, and nothing listens, keeps audio or draws while it's closed. Live, the
 waveform scrolls (newest on the right). The first press on it freezes what's
-there into a take to edit (soundboard.clipedit.Take); the program keeps being
+there into a take to edit (soundboard.sounds.clipedit.Take); the program keeps being
 kept behind it, and **Live** goes back. Drag selects; Space plays the selection
 in your headphones; Ctrl+X / C / V, Delete, Ctrl+Z work as in any editor; Enter
 keeps it in the tab's Saved clips (soundboard.ui.clipshelf) and returns to live
@@ -22,10 +22,10 @@ from PySide6.QtWidgets import (QApplication, QHBoxLayout, QLabel, QMenu, QPushBu
                                QSizePolicy, QVBoxLayout, QWidget)
 
 from soundboard import theme
-from soundboard.clipedit import BIN, LiveBuffer, Take, bin_peaks
+from soundboard.sounds.clipedit import BIN, LiveBuffer, Take, bin_peaks
 from soundboard.engine import SR
 from soundboard.i18n import _
-from soundboard.library import level_gain
+from soundboard.sounds.library import level_gain
 from soundboard.ui import appstate, busy, icons
 from soundboard.ui.panel import CONTROL_H, Flow
 from soundboard.ui.pixels import snap_to_pixels

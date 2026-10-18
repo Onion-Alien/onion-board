@@ -5,9 +5,9 @@ import pytest
 import numpy as np
 from PySide6.QtWidgets import QMenu, QMessageBox
 
-from soundboard import library
+from soundboard.sounds import library
 from soundboard.i18n import _
-from soundboard.library import Config, SoundMeta
+from soundboard.sounds.library import Config, SoundMeta
 from test_mainwindow import window as main_window  # noqa: F401  (the real MainWindow)
 
 

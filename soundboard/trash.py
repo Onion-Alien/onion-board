@@ -21,9 +21,9 @@ import uuid
 from dataclasses import asdict, dataclass, field
 from pathlib import Path
 
-from soundboard import library, sourceinfo
+from soundboard.sounds import library, sourceinfo
 from soundboard.i18n import _, ngettext
-from soundboard.library import SoundMeta
+from soundboard.sounds.library import SoundMeta
 
 log = logging.getLogger(__name__)
 

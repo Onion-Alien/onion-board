@@ -28,7 +28,8 @@ from PySide6.QtCore import Qt, QTimer, Signal
 from PySide6.QtWidgets import (QFrame, QHBoxLayout, QInputDialog, QLabel, QLayoutItem,
                                QPushButton, QScrollArea, QSlider, QVBoxLayout, QWidget)
 
-from soundboard import appaudio, library, theme, trash, usage
+from soundboard import appaudio, theme, trash, usage
+from soundboard.sounds import library
 from soundboard.i18n import _
 from soundboard.ui import a11y, appstate, icons
 from soundboard.ui.widgets import InlineNameBox, widget_at

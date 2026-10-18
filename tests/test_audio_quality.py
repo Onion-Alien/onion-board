@@ -271,7 +271,7 @@ def test_sounds_over_100_percent_go_out_louder_on_every_send_path(path):
 def test_loud_masters_are_stored_without_flat_tops():
     # a loud master decodes ~1 dB over full scale: clipped into the 16-bit cache, every
     # peak had a flat top (crackle). It's turned down around the peaks instead.
-    from soundboard.library import to_int16
+    from soundboard.sounds.library import to_int16
     t = np.arange(SR * 2) / SR
     x = np.stack([np.sin(2 * np.pi * 220 * t) * 1.12] * 2, 1).astype(np.float32)
     y = to_int16(x).astype(np.float32) / 32767

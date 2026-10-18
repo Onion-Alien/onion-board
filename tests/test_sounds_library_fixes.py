@@ -9,8 +9,9 @@ import numpy as np
 import pytest
 import soundfile as sf
 
-from soundboard import backup, library
-from soundboard.library import SR, Config, SoundMeta
+from soundboard import backup
+from soundboard.sounds import library
+from soundboard.sounds.library import SR, Config, SoundMeta
 
 
 def _tone(path, seconds=0.2, fmt=None):
@@ -155,6 +156,6 @@ def test_a_folder_listed_twice_in_the_manifest_is_one_sound(app_dir, tmp_path):
 
 
 def test_a_config_with_a_version_below_one_still_loads():
-    from soundboard.library import Config
+    from soundboard.sounds.library import Config
     c = Config.from_raw({"version": -3, "sound_vol": 0.5})
     assert c.sound_vol == 0.5

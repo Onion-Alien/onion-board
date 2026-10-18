@@ -9,8 +9,9 @@ from types import SimpleNamespace
 import numpy as np
 from test_mainwindow import window  # noqa: F401  (the real MainWindow)
 
-from soundboard import library, livesetup, renderworker, voicesetups
-from soundboard.library import SR
+from soundboard.sounds import library
+from soundboard import livesetup, renderworker, voicesetups
+from soundboard.sounds.library import SR
 from soundboard.ui import toast
 
 ROBOT = {"robot": {"on": True, "freq": 100, "noise": 0.2, "mix": 1}}

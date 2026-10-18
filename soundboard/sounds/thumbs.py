@@ -30,9 +30,9 @@ from PySide6.QtCore import QObject, Qt, Signal
 from PySide6.QtGui import QColor, QImage, QLinearGradient, QPainter, QPainterPath, QPixmap
 from shiboken6 import isValid as qt_valid
 
-from soundboard import library
+from soundboard.sounds import library
 from soundboard.i18n import _
-from soundboard.library import SoundMeta
+from soundboard.sounds.library import SoundMeta
 
 log = logging.getLogger(__name__)
 

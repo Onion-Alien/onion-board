@@ -9,7 +9,8 @@ from test_cache_and_import import wav
 from test_engine import engine_with
 from test_mainwindow import window  # noqa: F401
 
-from soundboard import backup, eq, library, mapped, soundfx, trash
+from soundboard import backup, eq, mapped, soundfx, trash
+from soundboard.sounds import library
 
 
 def test_setting_defaults_and_roundtrips(app_dir):

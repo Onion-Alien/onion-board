@@ -10,9 +10,9 @@ from PySide6.QtTest import QTest
 
 from soundboard import appaudio
 from soundboard.appaudio import App
-from soundboard.clipedit import BIN
+from soundboard.sounds.clipedit import BIN
 from soundboard.engine import SR, Engine
-from soundboard.library import Config
+from soundboard.sounds.library import Config
 from soundboard.ui import clipeditor
 from soundboard.ui.appspanel import AppsTab
 from soundboard.ui.clipeditor import ClipEditor, columns
@@ -366,7 +366,7 @@ def test_saved_clips_play_rename_add_and_delete_with_undo(tab, qapp):
 
 
 def test_saved_clips_are_kept_for_next_time(tab, qapp):
-    from soundboard.clipshelf import Shelf
+    from soundboard.sounds.clipshelf import Shelf
     ed = saved(tab, qapp).editor
     ed.freeze()
     ed.take.select(0, SR // 2)
@@ -634,7 +634,7 @@ def test_large_shelf_groups_searches_and_cancels_stale_batches(tab, qapp):
 
 
 def test_background_cleanup_hides_last_clip_and_undo_restores_it(tab, qapp):
-    from soundboard.clipshelf import DAY
+    from soundboard.sounds.clipshelf import DAY
     saved(tab, qapp)
     sh = tab.shelf
     c = sh.shelf.clips[0]

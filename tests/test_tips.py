@@ -2,7 +2,7 @@
 from test_mainwindow import window  # noqa: F401  (the real MainWindow)
 
 from soundboard import tips
-from soundboard.library import Config
+from soundboard.sounds.library import Config
 
 
 def cfg(**kw):

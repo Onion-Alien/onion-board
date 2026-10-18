@@ -205,7 +205,7 @@ def test_a_program_saved_in_a_category_that_is_gone_still_gets_a_place(qapp, mon
     """A remembered program whose category isn't in the list any more (a restored
     backup, a category deleted while it wasn't listed) goes to its usual one: the
     layout only places the categories it knows, so the card would vanish."""
-    from soundboard.library import Config
+    from soundboard.sounds.library import Config
     from tests.test_appspanel import AppsTab, Engine, FakeCapture, Meter
     monkeypatch.setattr(appspanel.appaudio, "AppCapture", FakeCapture)
     monkeypatch.setattr(appspanel.appaudio, "list_apps", lambda strict=False, **_: [])
@@ -327,7 +327,7 @@ def _focus_chain(start, n=60):
 def test_built_in_category_names_show_in_the_language_and_save_in_english(qapp, monkeypatch):
     from soundboard import i18n
     from soundboard.engine import Engine
-    from soundboard.library import Config
+    from soundboard.sounds.library import Config
     from soundboard.ui.widgets import Meter
     monkeypatch.setattr(appspanel.appaudio, "list_apps", lambda strict=False, **_: [])
     i18n.set_language("de")

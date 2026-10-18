@@ -24,7 +24,7 @@ def test_saved_clip_retention_setting_persists(window, qapp):  # noqa: F811
     d.keep_clips.click()
     assert window.cfg.app_clips_keep_forever
     window.cfg.save()
-    from soundboard.library import Config
+    from soundboard.sounds.library import Config
     assert Config.load().app_clips_keep_forever
     d.keep_clips.click()
     assert not window.cfg.app_clips_keep_forever
@@ -418,7 +418,7 @@ def test_a_new_remote_key_says_made_only_once_it_is_saved(window, monkeypatch): 
     """New key: saved on the saver's thread, never cfg.save() on the UI thread; "made"
     only once it's on disk. A failed save says so instead (after a restart the old key
     would be back, and a Stream Deck set up with the new one would stop working)."""
-    from soundboard import library
+    from soundboard.sounds import library
     from soundboard.ui import remoteaccess
     flashed, toasts, ui_saves = [], [], []
     monkeypatch.setattr(busy, "flash", lambda btn, text, ms=0: flashed.append(text))
@@ -479,7 +479,8 @@ def test_live_tabs_is_a_tab_of_the_look_box_tint_or_dot(window, qapp):  # noqa: 
 def test_theme_style_switches_textured_and_plain(window, qapp):  # noqa: F811
     """Textured (a new install's default) puts the theme's pattern on; Plain leaves the
     panels flat."""
-    from soundboard import library, theme
+    from soundboard.sounds import library
+    from soundboard import theme
     assert library.Config().theme_texture is True
     window.themectl.apply_theme("Amber Terminal")
     d = SettingsDialog(window, "appearance")
@@ -495,7 +496,7 @@ def test_theme_style_switches_textured_and_plain(window, qapp):  # noqa: F811
 
 def test_a_saved_plain_choice_stays_plain():
     """Only new installs get Textured: a config that says Plain keeps it."""
-    from soundboard import library
+    from soundboard.sounds import library
     assert library.Config.from_raw({"theme_texture": False}).theme_texture is False
     assert library.Config.from_raw({}).theme_texture is True
 

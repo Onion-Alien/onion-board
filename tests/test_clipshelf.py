@@ -4,8 +4,8 @@ import json
 import numpy as np
 import pytest
 
-from soundboard import clipshelf
-from soundboard.clipshelf import DAY, Shelf
+from soundboard.sounds import clipshelf
+from soundboard.sounds.clipshelf import DAY, Shelf
 from soundboard.engine import SR
 
 

@@ -21,15 +21,15 @@ from soundboard import theme
 from soundboard.online import ytworker
 from soundboard.engine import SR, Engine
 from soundboard import exitwatch
-from soundboard import appaudio, autostart, howl, library, reset, trash, voicesdk
+from soundboard import appaudio, autostart, howl, reset, trash, voicesdk
+from soundboard.sounds import library
 from soundboard.control import remote
 from soundboard.online import ffmpegget, net, netlog, tor
 from soundboard import profiles, quality, usage
 from soundboard.win import shellicon, thumbbar
 from soundboard.addons import watchaddon
 from soundboard.replay import InstantReplay
-from soundboard.library import (Config,
-                                SoundMeta)
+from soundboard.sounds.library import Config, SoundMeta
 from soundboard.ui.crashdialog import free_dialog
 from soundboard.ui import restyled, worker
 from soundboard.ui.ffmpegcontrol import FfmpegControl

@@ -10,9 +10,10 @@ from types import SimpleNamespace
 
 import pytest
 
-from soundboard import __version__, app, applog, library, reset, usage
+from soundboard import __version__, app, applog, reset, usage
+from soundboard.sounds import library
 from soundboard.online import net
-from soundboard.library import Config
+from soundboard.sounds.library import Config
 from test_mainwindow import window  # noqa: F401 - the real window, offscreen
 
 
@@ -1225,7 +1226,7 @@ def test_ffmpeg_recovery_doesnt_track_while_the_count_is_off(sent, monkeypatch, 
 def test_packs_settings_pages_and_ytdlp_buttons_count_by_fixed_names():
     """Free packs by their built-in id (a newer one is "other"), Settings' pages by
     their key, yt-dlp's buttons by their job: every name is in FEATURES."""
-    from soundboard import packs
+    from soundboard.sounds import packs
     from soundboard.online import ytdl
     from soundboard.ui.settingspages import connection
     ids = {p.id for p in packs.built_in()}

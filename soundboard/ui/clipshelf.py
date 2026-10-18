@@ -1,5 +1,5 @@
 """Saved clips (the Apps tab, what the clip editor's Save keeps) and Recordings (the
-Voice tab, what Record keeps), stored by soundboard.clipshelf. One list for both:
+Voice tab, what Record keeps), stored by soundboard.sounds.clipshelf. One list for both:
 each clip is a painted row (ClipRowDelegate) with a round play button, its name,
 where it came from and when, its waveform (which fills in as it plays) and its
 length. The hovered or picked row gets Play through mic, Add to Sounds and More
@@ -21,14 +21,14 @@ from PySide6.QtWidgets import (QAbstractItemView, QComboBox, QHBoxLayout, QLabel
                                QToolTip, QTreeWidget, QTreeWidgetItem, QVBoxLayout, QWidget)
 
 from soundboard import errors, theme
-from soundboard.clipshelf import Clip, Shelf, VoiceClip
+from soundboard.sounds.clipshelf import Clip, Shelf, VoiceClip
 from soundboard.i18n import _, ngettext
 from soundboard.ui import busy, clipeditor, icons
 from soundboard.ui.clipeditor import fmt
 from soundboard.ui.panel import CONTROL_H, UndoBar, fold_button
 from soundboard.ui.restyled import on_restyle
 from soundboard.engine import SR
-from soundboard.library import level_gain
+from soundboard.sounds.library import level_gain
 from soundboard.wheelguard import no_wheel
 
 log = logging.getLogger(__name__)

@@ -12,8 +12,9 @@ from PySide6.QtCore import QPoint, Qt
 from PySide6.QtTest import QTest
 from test_mainwindow import window  # noqa: F401
 
-from soundboard import library, renderworker, soundfx
-from soundboard.library import SR, SoundMeta
+from soundboard.sounds import library
+from soundboard import renderworker, soundfx
+from soundboard.sounds.library import SR, SoundMeta
 from soundboard.ui import editcontrol
 
 VOICE = {"voice": {"name": "Bear", "ai": {"id": "bear", "name": "Bear", "pitch": 0.0}}}

@@ -5,7 +5,7 @@ from PySide6.QtGui import QMouseEvent
 from PySide6.QtTest import QTest
 from PySide6.QtWidgets import QLabel, QPushButton, QVBoxLayout, QWidget
 
-from soundboard.library import Config
+from soundboard.sounds.library import Config
 from soundboard.ui.sidebar import SideRail, SideTabs
 
 

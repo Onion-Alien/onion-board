@@ -67,7 +67,7 @@ from dataclasses import dataclass, field
 from pathlib import Path, PurePosixPath
 
 from soundboard import voicefx
-from soundboard import library
+from soundboard.sounds import library
 from soundboard.online import net
 from soundboard import errors
 from soundboard.i18n import _, ngettext

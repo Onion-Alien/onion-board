@@ -25,9 +25,9 @@ from PySide6.QtWidgets import (
     QWidgetAction,
 )
 
-from soundboard import library, sourceinfo, thumbs
+from soundboard.sounds import library, sourceinfo, thumbs
 from soundboard.i18n import _, ngettext
-from soundboard.library import SoundMeta
+from soundboard.sounds.library import SoundMeta
 from soundboard.ui.hotkeypick import pretty_key
 from soundboard.ui import clipeditor, icons, responsive, sourcedialog
 from soundboard.ui.controller import Controller

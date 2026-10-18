@@ -9,8 +9,10 @@ from conftest import process_events
 from test_engine import engine_with
 from test_mainwindow import window  # noqa: F401 - the real MainWindow, offscreen
 
-from soundboard import library, mapped, trash
-from soundboard.library import SR, SoundMeta, cache_path, load_cached, prune_cache, store_cached
+from soundboard.sounds import library
+from soundboard import mapped, trash
+from soundboard.sounds.library import (SR, SoundMeta, cache_path, load_cached, prune_cache,
+                                       store_cached)
 
 
 @pytest.fixture

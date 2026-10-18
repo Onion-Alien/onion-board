@@ -15,9 +15,10 @@ import numpy as np
 from PySide6.QtCore import Qt
 from PySide6.QtWidgets import QMessageBox
 
-from soundboard import backup, library, trash
+from soundboard import backup, trash
+from soundboard.sounds import library
 from soundboard.i18n import _, ngettext
-from soundboard.library import SoundMeta
+from soundboard.sounds.library import SoundMeta
 from soundboard.ui import toast as toastmod
 from soundboard.ui import worker
 from soundboard.ui.controller import Controller

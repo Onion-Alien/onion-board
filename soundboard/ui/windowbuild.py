@@ -39,7 +39,7 @@ from soundboard import backup, destination, engine, otherboards, theme, usage
 from soundboard.online import net
 from soundboard.control import remote
 from soundboard.i18n import _
-from soundboard.library import PAD_COLORS
+from soundboard.sounds.library import PAD_COLORS
 from soundboard.ui import a11y, alsosend, busy, icons, lite, sidebar, taboff
 from soundboard.ui.appspanel import ElidedLabel
 from soundboard.ui.buncontrol import BUN_TIP
@@ -1320,7 +1320,7 @@ class WindowBuilder(Controller):
         mw._name_seek = NameAndSeek(mw.np_name, mw.seek, 190)
         th.addWidget(mw._name_seek, 1)
         th.addWidget(mw.np_time)
-        # only for a pad made from a video (soundboard.videos): shows it in step
+        # only for a pad made from a video (soundboard.sounds.videos): shows it in step
         mw.btn_video = QPushButton(_("Video"))
         mw.btn_video.setToolTip(_("Watch this sound's video while it plays. The sound still "
                                     "goes out as normal; the video is only for you."))

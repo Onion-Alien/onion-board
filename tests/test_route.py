@@ -5,7 +5,7 @@ import numpy as np
 import pytest
 
 from soundboard import backup, engine, reset
-from soundboard.library import Config
+from soundboard.sounds.library import Config
 from soundboard.settings import SettingsDialog
 from soundboard.ui import mainwindow as main
 from soundboard.ui import setupwizard

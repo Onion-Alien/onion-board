@@ -26,7 +26,8 @@ from PySide6.QtGui import (QBrush, QColor, QCursor, QFont, QImage, QLinearGradie
 from PySide6.QtWidgets import (QDialog, QFrame, QHBoxLayout, QLabel, QPushButton, QVBoxLayout,
                                QWidget)
 
-from soundboard import pongsounds, theme, usage
+from soundboard.sounds import pongsounds
+from soundboard import theme, usage
 from soundboard.bunny import INK, H, W, draw_bunny, sparkle
 from soundboard.i18n import _
 from soundboard.ui import appstate, fit, icons

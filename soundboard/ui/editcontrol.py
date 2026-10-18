@@ -20,9 +20,10 @@ from PySide6.QtCore import QTimer, QUrl
 from PySide6.QtGui import QDesktopServices
 from shiboken6 import isValid as qt_valid
 
-from soundboard import errors, library, renderworker, soundfx, videos, voicefx
+from soundboard import errors, renderworker, soundfx, voicefx
+from soundboard.sounds import library, videos
 from soundboard.i18n import _
-from soundboard.library import SoundMeta, cache_keep, duplicate, load_sound, prune_cache
+from soundboard.sounds.library import SoundMeta, cache_keep, duplicate, load_sound, prune_cache
 from soundboard.ui import worker
 from soundboard.ui.controller import Controller
 from soundboard.ui.crashdialog import free_dialog, rehome_crash_reports

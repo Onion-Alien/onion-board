@@ -1,13 +1,13 @@
-"""Pad pictures (soundboard.thumbs) and the playing pad's spectrum visualizer."""
+"""Pad pictures (soundboard.sounds.thumbs) and the playing pad's spectrum visualizer."""
 import json
 
 import numpy as np
 import pytest
 from PySide6.QtGui import QColor, QImage
 
-from soundboard import library, thumbs
+from soundboard.sounds import library, thumbs
 from soundboard.online import net as thumbs_net
-from soundboard.library import SR, Config, SoundMeta
+from soundboard.sounds.library import SR, Config, SoundMeta
 from soundboard.ui.widgets import Pad, loudness, spectrum
 
 

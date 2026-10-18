@@ -44,7 +44,8 @@ class PrivacyPage(Page):
         from PySide6.QtGui import QDesktopServices
         from PySide6.QtWidgets import QFileDialog, QSizePolicy
 
-        from soundboard import library, quality
+        from soundboard.sounds import library
+        from soundboard import quality
         from soundboard.ui.panel import icon_button
         q = quality.current
         w, v = self._page()

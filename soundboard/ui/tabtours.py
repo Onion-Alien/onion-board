@@ -24,7 +24,7 @@ from PySide6.QtCore import QRect, QTimer
 from PySide6.QtWidgets import QApplication, QWidget
 
 from soundboard import usage
-from soundboard.library import TOUR_TABS
+from soundboard.sounds.library import TOUR_TABS
 from soundboard.i18n import _
 from soundboard.ui import busy, coach
 

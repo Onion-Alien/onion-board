@@ -10,7 +10,7 @@ import zipfile
 import pytest
 
 from soundboard.online import ffmpegget, net
-from soundboard import library
+from soundboard.sounds import library
 
 # the real steps, before conftest's _ffmpeg_works blocks them for every test
 REAL = {name: getattr(ffmpegget, name)

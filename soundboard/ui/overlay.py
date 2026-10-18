@@ -32,7 +32,8 @@ from PySide6.QtGui import (QColor, QFont, QFontMetrics, QGuiApplication, QPainte
                            QPen, QPixmap, QPolygonF)
 from PySide6.QtWidgets import QApplication, QWidget
 
-from soundboard import library, theme
+from soundboard.sounds import library
+from soundboard import theme
 from soundboard.control import winkeys
 from soundboard.i18n import _, ngettext
 from soundboard.ui import lite

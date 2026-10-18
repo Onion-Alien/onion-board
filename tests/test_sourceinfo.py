@@ -9,10 +9,11 @@ import numpy as np
 import pytest
 import soundfile as sf
 
-from soundboard import library, sourceinfo, trash
+from soundboard.sounds import library, sourceinfo
+from soundboard import trash
 from soundboard.online import ytdl
 from soundboard.engine import SR
-from soundboard.library import Config, SoundMeta
+from soundboard.sounds.library import Config, SoundMeta
 
 INFO = {"id": "dQw4w9WgXcQ", "title": "Never Gonna Give You Up (Official Video)",
         "webpage_url": "https://www.youtube.com/watch?v=dQw4w9WgXcQ",

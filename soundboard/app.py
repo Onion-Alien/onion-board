@@ -17,7 +17,7 @@ from pathlib import Path
 from PySide6.QtWidgets import QApplication
 
 from soundboard import __version__, applog
-from soundboard.library import APP_DIR, migrate_from_soundboard
+from soundboard.sounds.library import APP_DIR, migrate_from_soundboard
 from soundboard.singleinstance import (bring_to_front, claim_single_instance,
                                       comes_to_front, listen_for_second_launch)
 
@@ -244,7 +244,7 @@ def get_tor() -> int:
     a proxy set there is used. No window. Returns 0 when Tor is there (already, or
     now), 1 if it couldn't be got."""
     applog.setup(APP_DIR)
-    from soundboard import library
+    from soundboard.sounds import library
     from soundboard.online import net, tor, torget
     if torget.installed():
         return 0
@@ -270,7 +270,7 @@ def install_addon(module_id: str) -> int:
     (soundboard.online.pyget), the way the saved Connection setting says. No window. Returns
     0 when it's set up (already, or now), 1 if it couldn't be."""
     applog.setup(APP_DIR)
-    from soundboard import library
+    from soundboard.sounds import library
     from soundboard.online import net, tor
     from soundboard.addons import modules
     info = next((m for m in modules.discover() if m.id == module_id), None)
@@ -301,7 +301,7 @@ def set_offline() -> int:
     connects. No window. Returns 0 once it's saved, 1 if it couldn't be."""
     migrate_from_soundboard()   # an old %APPDATA%\Soundboard moves only while there's no config
     applog.setup(APP_DIR)
-    from soundboard import library
+    from soundboard.sounds import library
     cfg = library.Config.load()
     if cfg.read_only:   # locked: saving would overwrite the newest settings with a backup
         print("FAIL: config.json is locked by another program", file=sys.stderr)
@@ -322,7 +322,7 @@ def keep_netlog() -> int:
     kept; nothing connects. No window. Returns 0 once it's saved, 1 if it couldn't be."""
     migrate_from_soundboard()
     applog.setup(APP_DIR)
-    from soundboard import library
+    from soundboard.sounds import library
     cfg = library.Config.load()
     if cfg.read_only:
         print("FAIL: config.json is locked by another program", file=sys.stderr)
@@ -347,7 +347,7 @@ def set_usage_count(on: bool, heard: str = "") -> int:
     saved, 1 if it couldn't be."""
     migrate_from_soundboard()
     applog.setup(APP_DIR)
-    from soundboard import library
+    from soundboard.sounds import library
     cfg = library.Config.load()
     if cfg.read_only:
         print("FAIL: config.json is locked by another program", file=sys.stderr)
@@ -380,7 +380,8 @@ def uninstall_count() -> int:
     never waits on, or fails for, this."""
     try:
         applog.setup(APP_DIR)
-        from soundboard import library, usage
+        from soundboard.sounds import library
+        from soundboard import usage
         from soundboard.online import net
         cfg = library.Config.load()
         if not cfg.stats_id:   # never counted (switched off, or from before the count)
@@ -464,7 +465,7 @@ def ui_scale_startup(app_dir: Path) -> int:
     """Size the whole interface by config.json's `ui_scale` (Settings > Appearance >
     Interface size). Qt can only scale before the QApplication is made, so a change
     shows after a restart. QT_SCALE_FACTOR set from outside wins (scripts, tests)."""
-    from soundboard.library import UI_SCALES
+    from soundboard.sounds.library import UI_SCALES
     if "QT_SCALE_FACTOR" in os.environ:
         return 100
     try:
@@ -564,7 +565,7 @@ def main():
     log_path = applog.setup(APP_DIR)
     applog.install_hooks(log_path, __version__)
     exitwatch.arm_early(APP_DIR)   # faulthandler on before the window is built (native crashes)
-    from soundboard.library import MIGRATION_ERRORS
+    from soundboard.sounds.library import MIGRATION_ERRORS
     for msg in MIGRATION_ERRORS:
         log.error("%s", msg)
     tune_runtime_for_audio()

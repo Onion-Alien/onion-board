@@ -8,8 +8,8 @@ import pytest
 from PySide6.QtCore import QPoint, QPointF, Qt
 from PySide6.QtGui import QWheelEvent
 
-from soundboard import library
-from soundboard.library import Config, SoundMeta, sorted_sounds
+from soundboard.sounds import library
+from soundboard.sounds.library import Config, SoundMeta, sorted_sounds
 from soundboard.speech import tts
 from soundboard.ui.widgets import LIST_ROW_H, PAD_SHRINK, SLIM_PAD_H, Pad, pad_height
 from test_mainwindow import window as main_window  # noqa: F401  (the real MainWindow)

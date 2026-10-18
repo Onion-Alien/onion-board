@@ -2,7 +2,8 @@
 import pytest
 from PySide6.QtWidgets import QCheckBox, QComboBox, QLabel
 
-from soundboard import library, quality
+from soundboard.sounds import library
+from soundboard import quality
 from soundboard.online import radio, ytdl
 from soundboard.settings import SettingsDialog
 from test_mainwindow import window  # noqa: F401  (the real MainWindow fixture)

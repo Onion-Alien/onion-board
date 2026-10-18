@@ -1,11 +1,11 @@
-"""Pong with Bun's sounds (soundboard/pongsounds.py): every sound in every theme's
+"""Pong with Bun's sounds (soundboard/sounds/pongsounds.py): every sound in every theme's
 style is clean (in range, no click at either end, not silent), the rally climbs, and
 a sound sits on the side of the court the ball is on."""
 
 import numpy as np
 import pytest
 
-from soundboard import pongsounds as ps
+from soundboard.sounds import pongsounds as ps
 from soundboard import theme
 from soundboard.engine import SR
 

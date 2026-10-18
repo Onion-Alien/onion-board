@@ -3,7 +3,7 @@ real MainWindow (offscreen). Nothing is really listened to: the detectors are st
 import pytest
 
 from soundboard import appsetup, profiles
-from soundboard.library import Config
+from soundboard.sounds.library import Config
 from soundboard.settings import SettingsDialog
 from soundboard.ui import toast
 from test_mainwindow import window as main_window  # noqa: F401 - the real window, offscreen

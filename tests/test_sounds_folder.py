@@ -7,8 +7,8 @@ from conftest import process_events
 from PySide6.QtGui import QDesktopServices
 from test_mainwindow import window as main_window  # noqa: F401 - the real window, offscreen
 
-from soundboard import library
-from soundboard.library import SR, Config, SoundMeta
+from soundboard.sounds import library
+from soundboard.sounds.library import SR, Config, SoundMeta
 from soundboard.ui import importcontrol
 
 

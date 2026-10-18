@@ -257,7 +257,7 @@ class AlertControl(Controller):
         import threading
 
         from soundboard import discordtalk
-        from soundboard.library import APP_DIR
+        from soundboard.sounds.library import APP_DIR
         saved = dict(cfg.discord_talk)
         out: list = []
 

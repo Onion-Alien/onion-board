@@ -18,7 +18,8 @@ from PySide6.QtWidgets import (QCheckBox, QComboBox, QDialog, QFileDialog, QGrid
                                QHBoxLayout, QLabel, QLineEdit, QMenu, QPushButton, QScrollArea,
                                QSizePolicy, QStackedWidget, QVBoxLayout, QWidget)
 
-from soundboard import errors, library, usage, wheelguard
+from soundboard import errors, usage, wheelguard
+from soundboard.sounds import library
 from soundboard.online import net, store
 from soundboard.engine import SR
 from soundboard.i18n import _
@@ -44,7 +45,7 @@ def meta_line(s: store.Sound) -> str:
     """"by Onion Board · tavern, music", "Shared by a player", for a shared link
     "YouTube link · Shared by a player", and for one the server brought in
     "From Myinstants" (its category has a column of its own)."""
-    from soundboard import sourceinfo
+    from soundboard.sounds import sourceinfo
     site = sourceinfo.site_of(s.link) if s.is_link else None
     if s.source and site:
         return _("From {site}", site=site[1])

@@ -6,7 +6,7 @@ from PySide6.QtCore import QPoint, Qt
 from test_mainwindow import window as main_window  # noqa: F401  (the real MainWindow)
 
 from soundboard.control import remote
-from soundboard.library import Config, clean_setting
+from soundboard.sounds.library import Config, clean_setting
 from soundboard.settings import SettingsDialog
 from soundboard.ui import mainwindow as main
 from soundboard.ui import taboff
