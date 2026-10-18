@@ -1,5 +1,5 @@
 """7-band equalizer: matched peak / shelf biquads run by our own filter engine
-(soundboard.dsp).
+(soundboard.audio.dsp).
 
 The bands are designed to follow the analog EQ they describe all the way up to
 Nyquist (dsp.matched_biquad), so the 6 kHz and 12 kHz bands sound the same at
@@ -16,7 +16,7 @@ import math
 
 import numpy as np
 
-from soundboard import dsp
+from soundboard.audio import dsp
 
 # (centre Hz, kind): ends are shelves, the middle are bell/peaking filters
 BANDS = [(60, "lowshelf"), (150, "peak"), (400, "peak"), (1000, "peak"),

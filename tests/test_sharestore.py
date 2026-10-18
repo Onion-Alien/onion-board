@@ -6,8 +6,8 @@ import os
 import numpy as np
 
 from soundboard.mic import destination, sharestore
-from soundboard import engine as eng
-from soundboard.engine import SR, Engine
+from soundboard.audio import engine as eng
+from soundboard.audio.engine import SR, Engine
 
 
 def _mapped(path, seconds=3.0, amp=0.3):

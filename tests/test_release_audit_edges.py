@@ -96,7 +96,7 @@ def test_failed_ai_status_does_not_claim_voice_masking_when_backup_is_real_mic(w
 
 
 def test_setup_failure_disappears_with_isolated_device_inventory(window, monkeypatch):
-    from soundboard import engine
+    from soundboard.audio import engine
     from test_mainwindow import test_setup_not_done_yet_is_one_orange_step_not_red_crosses
     monkeypatch.setattr(engine, "virtual_outputs", lambda: [])
     test_setup_not_done_yet_is_one_orange_step_not_red_crosses(window, monkeypatch)

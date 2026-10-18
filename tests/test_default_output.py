@@ -6,8 +6,8 @@ import time
 
 import pytest
 
-from soundboard import appaudio
-from soundboard import engine as eng
+from soundboard.audio import appaudio
+from soundboard.audio import engine as eng
 from conftest import devices_done, said
 from test_mainwindow import window as main_window  # noqa: F401 - the real window, offscreen
 

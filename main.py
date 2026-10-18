@@ -22,8 +22,8 @@ if __name__ == "__main__" and sys.argv[1:2] == ["--ytdl-worker"]:
     sys.exit(child_main())
 
 if __name__ == "__main__" and sys.argv[1:2] == ["--render-worker"]:
-    # the app's helper that renders a slow sound's effects (soundboard.renderworker)
-    from soundboard.renderworker import child_main as render_main
+    # the app's helper that renders a slow sound's effects (soundboard.audio.renderworker)
+    from soundboard.audio.renderworker import child_main as render_main
     sys.exit(render_main())
 
 from soundboard.core import installmark  # noqa: E402  (os, sys and time only)

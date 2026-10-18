@@ -6,8 +6,8 @@ import numpy as np
 import pytest
 
 from soundboard.sim import codecsim
-from soundboard import sendfx
-from soundboard.sendfx import Ducker, Limiter, SmartMono
+from soundboard.audio import sendfx
+from soundboard.audio.sendfx import Ducker, Limiter, SmartMono
 from tests.test_engine import engine_with
 
 SR = 48000

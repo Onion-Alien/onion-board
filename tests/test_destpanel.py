@@ -200,7 +200,7 @@ def test_what_do_these_do_lists_every_mode(window):  # noqa: F811
 
 
 def test_game_mode_picks_the_shaping_by_itself(window, monkeypatch):  # noqa: F811
-    from soundboard import engine as eng
+    from soundboard.audio import engine as eng
     monkeypatch.setattr(eng, "virtual_mic_for", lambda name: "CABLE Output (fake)")
     toasts = []
     monkeypatch.setattr(window, "toast", lambda text, kind="": toasts.append(text))
@@ -296,7 +296,7 @@ class Heard:
 
 
 def test_the_program_listening_to_the_cable_beats_the_game_in_front(window, monkeypatch):  # noqa: F811
-    from soundboard import engine as eng
+    from soundboard.audio import engine as eng
     monkeypatch.setattr(eng, "virtual_mic_for", lambda name: "CABLE Output (fake)")
     panel = window.dest_panel
 
@@ -321,7 +321,7 @@ def test_the_program_listening_to_the_cable_beats_the_game_in_front(window, monk
 
 
 def test_switch_by_itself_follows_whoever_listens(window, monkeypatch):  # noqa: F811
-    from soundboard import engine as eng
+    from soundboard.audio import engine as eng
     monkeypatch.setattr(eng, "virtual_mic_for", lambda name: "CABLE Output (fake)")
     toasts = []
     monkeypatch.setattr(window, "toast", lambda text, kind="": toasts.append(text))

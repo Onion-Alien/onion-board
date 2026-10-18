@@ -34,7 +34,8 @@ from typing import Any
 import numpy as np
 
 from soundboard.sounds import library
-from soundboard import soundfx, voicefx
+from soundboard.audio import soundfx
+from soundboard import voicefx
 from soundboard.sounds.library import SR
 
 log = logging.getLogger(__name__)
@@ -112,7 +113,7 @@ class Lines:
 
     def play(self, sid: str, data: np.ndarray, gain: float, mode: str = "overlap",
              src_rate: int = SR, **_kw) -> bool:
-        from soundboard.engine import resample
+        from soundboard.audio.engine import resample
         mono = np.asarray(data, np.float32)
         mono = mono[:, 0] if mono.ndim == 2 else mono
         mono = np.asarray(resample(mono * np.float32(gain), src_rate, SR), np.float32)
@@ -333,7 +334,7 @@ def translate_sound(audio: np.ndarray, lang: Lang, ai: dict | None = None,
     put in the AI voice `ai` (when given). (m, 2) float32, at least as long. A sound
     with nothing said in it comes back as it is. Raises RuntimeError or
     library.Cancelled. Slow: off the UI thread."""
-    from soundboard.engine import resample
+    from soundboard.audio.engine import resample
     tell = progress or (lambda f: None)
     x = np.asarray(audio)
     f = x.astype(np.float32) / 32767.0 if x.dtype == np.int16 else x.astype(np.float32)

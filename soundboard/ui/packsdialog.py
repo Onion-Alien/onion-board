@@ -20,7 +20,7 @@ from PySide6.QtWidgets import (QDialog, QDialogButtonBox, QFrame, QGridLayout, Q
 from soundboard.core import errors, updates
 from soundboard.sounds import library, packs
 from soundboard.online import net
-from soundboard.engine import SR
+from soundboard.audio.engine import SR
 from soundboard.ui import busy, fit, icons
 from soundboard.ui.panel import hint_label
 from soundboard.ui.widgets import take_out

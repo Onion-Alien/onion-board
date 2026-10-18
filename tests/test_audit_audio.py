@@ -6,10 +6,10 @@ from types import SimpleNamespace
 import numpy as np
 import pytest
 
-from soundboard import appaudio, livefx
+from soundboard.audio import appaudio, livefx
 from soundboard.mic import cableformat
 from soundboard.mic.destination import Dest
-from soundboard.engine import CH, SR, Engine, Ring, Voice
+from soundboard.audio.engine import CH, SR, Engine, Ring, Voice
 
 
 class FakeStream:

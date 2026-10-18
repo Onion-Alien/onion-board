@@ -6,10 +6,10 @@ from types import SimpleNamespace
 import numpy as np
 import pytest
 
-from soundboard import engine as eng
-from soundboard import soundcache
-from soundboard.engine import SR, Engine, is_xrun
-from soundboard.engineparts import CUT_KEEP_S, MIC_BUFFER
+from soundboard.audio import engine as eng
+from soundboard.audio import soundcache
+from soundboard.audio.engine import SR, Engine, is_xrun
+from soundboard.audio.engineparts import CUT_KEEP_S, MIC_BUFFER
 
 
 class FakeStream:
@@ -635,7 +635,7 @@ def test_play_gives_up_when_every_output_went_away_or_changed_rate(monkeypatch):
 def test_eq_and_destination_drop_their_state_when_turned_off():
     e = engine_with("main")
     x = np.zeros((64, 2), np.float32)
-    from soundboard.eq import EQ
+    from soundboard.audio.eq import EQ
     e._eqs[("main", "sounds")] = EQ(e.rates["main"])   # idle: nothing left to fade out
     e._dests["main"] = object()
     e.eq_gains = None

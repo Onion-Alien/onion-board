@@ -74,7 +74,7 @@ def sample() -> np.ndarray:
     """The line to convert: float32 mono at 16 kHz (made once per run)."""
     global _sample
     if _sample is None:
-        from soundboard.engine import resample
+        from soundboard.audio.engine import resample
         from soundboard.speech.tts import SapiTTS
         tts = SapiTTS()
         try:
@@ -122,7 +122,7 @@ def fx_sample(effects: dict) -> np.ndarray:
     k = "fx:" + json.dumps(effects, sort_keys=True, default=str)
     if k not in _cache:
         from soundboard import voicefx
-        from soundboard.engine import SR, resample
+        from soundboard.audio.engine import SR, resample
         chain = voicefx.VoiceChain()
         chain.configure({"enabled": True, "effects": effects})
         y = chain.render(resample(sample(), IN_RATE, SR), SR)
@@ -138,7 +138,7 @@ def make(module: ModuleInfo, voice: dict) -> np.ndarray:
     0.8 at most. Raises PreviewError."""
     k = key(voice)
     if k not in _cache:
-        from soundboard.engine import SR, resample
+        from soundboard.audio.engine import SR, resample
         y = resample(render(module, voice, sample()), OUT_RATE, SR)
         peak = float(np.max(np.abs(y))) if len(y) else 0.0
         if peak > 0.8:

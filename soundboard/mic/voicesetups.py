@@ -22,7 +22,7 @@ from collections.abc import Callable
 from pathlib import Path
 
 from soundboard.sounds import library
-from soundboard import soundfx
+from soundboard.audio import soundfx
 
 log = logging.getLogger(__name__)
 

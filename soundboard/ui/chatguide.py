@@ -78,9 +78,9 @@ def _bun(prop: str) -> BunnyWidget:
 # --------------------------------------------------------------------------- the check
 
 def find_discord():
-    """The running Discord program with an audio session (soundboard.appaudio.App),
+    """The running Discord program with an audio session (soundboard.audio.appaudio.App),
     or None."""
-    from soundboard import appaudio
+    from soundboard.audio import appaudio
     try:
         apps = appaudio.list_apps()
     except Exception:  # noqa: BLE001 - the check just can't run
@@ -251,7 +251,7 @@ class ChatCheck(QObject):
             self.done.emit({"issues": [], "error": _("Pick where your sounds go first "
                                                      "(Setup tab → Step-by-step guide).")})
             return
-        from soundboard import appaudio
+        from soundboard.audio import appaudio
         can, why = appaudio.supported()
         if not can:
             self.done.emit({"issues": [], "error": why})
@@ -288,7 +288,7 @@ class ChatCheck(QObject):
                 "Couldn't find Discord playing anything. Open Discord → ⚙ User Settings → "
                 "Voice & Video, click Let's Check, then check again.")})
             return
-        from soundboard import appaudio
+        from soundboard.audio import appaudio
         self._heard = []
         cap = appaudio.AppCapture(app.pid, self._heard.append, name=app.name)
         if not cap.start(wait=False):

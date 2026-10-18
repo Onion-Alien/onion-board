@@ -416,7 +416,7 @@ def read_store(client_dir: str, appdata: Path | None = None) -> dict | None:
 # ---------------------------------------------------------------- on quit
 
 def running_clients() -> set[str]:
-    from soundboard import appaudio
+    from soundboard.audio import appaudio
     names = {n for _p, n in appaudio._process_table().values()}
     return {c for c, exe in EXES.items() if exe in names}
 

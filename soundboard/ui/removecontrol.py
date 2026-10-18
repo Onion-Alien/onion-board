@@ -149,7 +149,7 @@ class RemoveControl(Controller):
         """The undo window is over: the removed sounds go to Recently deleted
         (soundboard.core.trash), where they can still be brought back for a while."""
         # let go of their audio first: Windows won't delete a mapped cache file
-        # (soundboard.mapped) while an array still points into it
+        # (soundboard.audio.mapped) while an array still points into it
         mw = self.mw
         done, self._removed = [(m, i) for m, i, _d in self._removed], []
         toastmod.close(mw, UNDO_KEY)   # (its on_close comes back here: nothing left)

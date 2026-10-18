@@ -12,7 +12,7 @@ from PySide6.QtCore import Qt
 from PySide6.QtWidgets import (QCheckBox, QComboBox, QGridLayout, QHBoxLayout, QLabel,
                                QPushButton, QWidget)
 
-from soundboard import engine as eng
+from soundboard.audio import engine as eng
 from soundboard.ui import icons
 from soundboard.ui.panel import VolumeControl, icon_label
 from soundboard.wheelguard import no_wheel

@@ -3,7 +3,7 @@ import pytest
 from PySide6.QtCore import QEvent, QPointF, Qt
 from PySide6.QtGui import QMouseEvent
 
-from soundboard.appaudio import App
+from soundboard.audio.appaudio import App
 from soundboard.ui import appspanel, approw
 from tests.test_appspanel import tab as app_tab_fixture
 
@@ -326,7 +326,7 @@ def _focus_chain(start, n=60):
 
 def test_built_in_category_names_show_in_the_language_and_save_in_english(qapp, monkeypatch):
     from soundboard import i18n
-    from soundboard.engine import Engine
+    from soundboard.audio.engine import Engine
     from soundboard.sounds.library import Config
     from soundboard.ui.widgets import Meter
     monkeypatch.setattr(appspanel.appaudio, "list_apps", lambda strict=False, **_: [])

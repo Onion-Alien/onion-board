@@ -6,8 +6,8 @@ import pytest
 import soundfile as sf
 
 from soundboard.sounds import library
-from soundboard import soundfx
-from soundboard.engine import SR, Engine, loop_xf
+from soundboard.audio import soundfx
+from soundboard.audio.engine import SR, Engine, loop_xf
 from soundboard.sounds.library import SoundMeta
 
 

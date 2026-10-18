@@ -36,7 +36,7 @@ from PySide6.QtWidgets import QMessageBox
 
 from soundboard.core import errors, langnames, usage
 from soundboard.mic import livesetup, voicesetups
-from soundboard import renderworker, soundfx
+from soundboard.audio import renderworker, soundfx
 from soundboard.sounds import library
 from soundboard.i18n import _
 from soundboard.ui import worker

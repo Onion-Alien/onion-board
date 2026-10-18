@@ -915,7 +915,7 @@ def test_the_feeds_thread_goes_on_after_an_exception(ring_file, monkeypatch):
 def test_the_engines_clean_mic_failing_is_counted_not_fatal():
     """Engine._mic_direct is guarded like the device mic's callback: the failure shows
     in cb_errors and errors (so the window can say so), and the next block goes in."""
-    from soundboard.engine import Engine
+    from soundboard.audio.engine import Engine
     e = Engine()
     seen = []
 
@@ -968,7 +968,7 @@ def test_stream_knows_how_long_the_mic_sent_only_silence(ring_file, monkeypatch)
 
 
 def test_direct_fifo_pads_once_then_keeps_up():
-    from soundboard.engine import DirectFifo
+    from soundboard.audio.engine import DirectFifo
     f = DirectFifo()
     assert f.read(480) is None
     f.write(np.ones((470, 2), np.float32))   # a resampler's start-up: 10 short
@@ -986,7 +986,7 @@ def test_direct_fifo_keeps_a_late_wake_up_whole():
     """The board's thread woke 100 ms late: it writes all that mic at once and renders
     it in 10 ms reads. Every frame goes out, in order (dropping all but the last read
     cut holes in the voice whenever the PC was busy)."""
-    from soundboard.engine import DirectFifo
+    from soundboard.audio.engine import DirectFifo
     f = DirectFifo()
     x = np.arange(4800, dtype=np.float32)[:, None].repeat(2, axis=1)
     f.write(x)
@@ -998,7 +998,7 @@ def test_mic_rate_goes_back_to_the_devices_when_the_clean_mic_stops(ring_file):
     """The clean mic from the mic effect switched the board's mic to the effect's rate,
     and nothing switched it back: once it stopped, the mic device's 44.1 kHz blocks were
     taken as 48 kHz (mic check, voice effects and recordings at the wrong pitch)."""
-    from soundboard.engine import Engine
+    from soundboard.audio.engine import Engine
     e = Engine()
     e.rates["main"] = e.rates["mon"] = e.rates["obs"] = 48000
     e._mic_dev_rate = e.rates["mic"] = 44100   # the mic device's rate
@@ -1034,7 +1034,7 @@ def test_the_device_mic_is_taken_under_the_feeds_lock(ring_file):
     """While straight-into-the-mic is on, the mic device's block runs under the feed's
     lock: its thread can go live on the clean mic (and switch the mic's rate) meanwhile,
     and _mic ran on both threads at once at that flip."""
-    from soundboard.engine import Engine
+    from soundboard.audio.engine import Engine
     e = Engine()
     s = dm.DirectMicStream(lambda out, *a: out.fill(0), ring_file)
     e.main_direct, e.main_stream = True, s
@@ -1056,7 +1056,7 @@ def test_the_device_mic_is_taken_under_the_feeds_lock(ring_file):
 
 def test_late_pump_sends_all_the_voice(ring_file):
     """A late pump in the real engine: the voice sent is the mic it got, with no holes."""
-    from soundboard.engine import Engine
+    from soundboard.audio.engine import Engine
     e = Engine()
     e.main_direct = True
     e.main_stream = object()   # "open": the mic goes to the send mix
@@ -1460,7 +1460,7 @@ def test_board_tells_the_effect_where_its_audio_came_from(ring_file):
 def test_engine_voice_delay_is_what_it_adds(ring_file):
     """Engine._direct_voice_delay matches the delay the send mix really has on the voice
     (limiter lookahead; a resampler's hold-back at other mic rates)."""
-    from soundboard.engine import Engine
+    from soundboard.audio.engine import Engine
     for rate in (48000, 44100):
         e = Engine()
         e.main_direct = True
@@ -1516,7 +1516,7 @@ def test_replace_mode_falls_back_to_the_mic_when_the_board_stops(ring_file):
 @realtime
 def test_audio_engine_restart_keeps_the_board_on_the_mic(ring_file, instances, monkeypatch):
     """Windows' audio engine exits and reloads the effect while the board keeps sending."""
-    from soundboard.engine import Engine
+    from soundboard.audio.engine import Engine
     from test_engine import tone
     monkeypatch.setattr(dm, "ring_path", lambda: ring_file)
     engine = Engine()
@@ -1913,7 +1913,7 @@ def test_engine_runs_on_the_clean_mic(ring_file, monkeypatch):
     """Route "mic": the board's mic is the clean mic the effect hands over (the
     board's own mic stream carries its sounds by then, so it's ignored), and in
     replace mode the send mix carries the processed voice."""
-    from soundboard.engine import Engine
+    from soundboard.audio.engine import Engine
     monkeypatch.setattr(dm, "ring_path", lambda: ring_file)
     e = Engine()
     e.set_main_device(dm.DEVICE)
@@ -1946,7 +1946,7 @@ def test_engine_runs_on_the_clean_mic(ring_file, monkeypatch):
 
 
 def test_engine_add_mode_leaves_the_voice_to_the_effect(ring_file, monkeypatch):
-    from soundboard.engine import Engine
+    from soundboard.audio.engine import Engine
     monkeypatch.setattr(dm, "ring_path", lambda: ring_file)
     e = Engine()
     e.direct_mode = dm.MODE_ADD
@@ -1978,7 +1978,7 @@ def test_engine_add_mode_leaves_the_voice_to_the_effect(ring_file, monkeypatch):
 
 
 def test_engine_reports_a_missing_effect(tmp_path, monkeypatch):
-    from soundboard.engine import Engine
+    from soundboard.audio.engine import Engine
     monkeypatch.setattr(dm, "ring_path", lambda: tmp_path / "nope" / "ring2.bin")
     e = Engine()
     e.set_main_device(dm.DEVICE)
@@ -2337,7 +2337,7 @@ def test_who_is_listening_looks_at_the_mic_itself(window, monkeypatch):  # noqa:
     w.cfg.route = "mic"
     w.cfg.mic_device = "Microphone (Test Headset)"
     monkeypatch.setattr(w.engine, "direct_stream", lambda: object())
-    from soundboard import engine as eng
+    from soundboard.audio import engine as eng
     monkeypatch.setattr(eng, "virtual_outputs", lambda: [])
     assert w.appsetctl._heard_device() == ("Microphone (Test Headset)",)
     monkeypatch.setattr(eng, "virtual_outputs", lambda: ["CABLE Input (VB-Audio Virtual Cable)"])
@@ -2372,7 +2372,7 @@ CABLE_IN = "CABLE Input (VB-Audio Virtual Cable)"
 
 
 def _routes(w, monkeypatch, state, cables=(CABLE_IN,)):
-    from soundboard import engine as eng
+    from soundboard.audio import engine as eng
     monkeypatch.setattr(dm, "status", lambda name=None: state)
     monkeypatch.setattr(eng, "virtual_outputs", lambda: list(cables))
     w.cfg.route = "mic"
@@ -3143,7 +3143,7 @@ def test_cable_remover_finds_vb_audios_setup(tmp_path, monkeypatch):
 
 
 def test_cable_tap_plays_the_send_mix_on_the_cables_clock(monkeypatch):
-    from soundboard import engine as eng
+    from soundboard.audio import engine as eng
     monkeypatch.setattr(eng, "find_device", lambda kind, name: 7)
     monkeypatch.setattr(eng.sd, "query_devices", lambda idx: {"default_samplerate": 48000})
     tap = eng.CableTap(CABLE_IN)
@@ -3161,7 +3161,7 @@ def test_cable_tap_plays_the_send_mix_on_the_cables_clock(monkeypatch):
 
 def test_cable_tap_closes_its_stream_when_start_fails(monkeypatch):
     # a busy cable used to leak one PortAudio stream on every retry
-    from soundboard import engine as eng
+    from soundboard.audio import engine as eng
     made = []
 
     class BusyStream:
@@ -3185,7 +3185,7 @@ def test_cable_tap_closes_its_stream_when_start_fails(monkeypatch):
 
 
 def test_engine_feeds_the_cable_only_while_straight_into_the_mic(ring_file, monkeypatch):
-    from soundboard.engine import Engine
+    from soundboard.audio.engine import Engine
     monkeypatch.setattr(dm, "ring_path", lambda: ring_file)
     got = []
 
@@ -3224,7 +3224,7 @@ def test_the_cable_copy_opens_at_start(window, monkeypatch):  # noqa: F811
 
 
 def test_reopening_every_stream_reopens_the_cable_copy(monkeypatch):
-    from soundboard.engine import Engine
+    from soundboard.audio.engine import Engine
     e = Engine()
     seen = []
     monkeypatch.setattr(Engine, "set_tap_device", lambda self, name: seen.append(name))
@@ -3238,7 +3238,7 @@ def test_reopening_every_stream_reopens_the_cable_copy(monkeypatch):
 def test_window_starts_on_the_mic_with_the_cable_copy(qapp, app_dir, monkeypatch):
     """A whole start-up on the mic route with the effect working and a cable there
     (an upgraded 1.9.0 cable config): no crash, live in the mic, the copy opened."""
-    from soundboard import engine as eng
+    from soundboard.audio import engine as eng
     from soundboard.sounds import library
     from soundboard.control import winkeys
     from soundboard.ui import mainwindow as main
@@ -3755,8 +3755,8 @@ def test_the_effect_reads_further_back_while_a_sound_plays(monkeypatch):
     # the board waits on the UI thread through long Qt calls: while anything plays the
     # effect keeps CUSHION_S queued, and drops back to LEAD_S only once nothing has
     # played for CALM_S and the mic is quiet (the stretch it jumps over is silence)
-    from soundboard import engine as eng
-    from soundboard.engine import SR, Engine
+    from soundboard.audio import engine as eng
+    from soundboard.audio.engine import SR, Engine
 
     class Stream:
         latency = dm.LEAD_S

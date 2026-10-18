@@ -1,7 +1,7 @@
 import numpy as np
 
-from soundboard.recorder import CLIP_S, Recorder
-from soundboard.engine import SR
+from soundboard.audio.recorder import CLIP_S, Recorder
+from soundboard.audio.engine import SR
 
 
 def chunk(start, n=1024):

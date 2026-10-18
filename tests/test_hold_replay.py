@@ -7,8 +7,8 @@ import numpy as np
 import pytest
 
 from conftest import process_events, said
-from soundboard import replay as rp
-from soundboard.engine import SR
+from soundboard.audio import replay as rp
+from soundboard.audio.engine import SR
 from soundboard.sounds.library import SoundMeta
 from test_mainwindow import window as main_window  # noqa: F401  (the real MainWindow)
 

@@ -12,7 +12,8 @@ from PySide6.QtGui import QWheelEvent
 from PySide6.QtWidgets import (QApplication, QLabel, QMenu, QScrollArea, QSlider, QVBoxLayout,
                                QWidget)
 
-from soundboard import __version__, engine
+from soundboard import __version__
+from soundboard.audio import engine
 from soundboard.sounds import library
 from soundboard.control import winkeys
 from soundboard.sounds.library import SR, Config, SoundMeta
@@ -1158,7 +1159,7 @@ def test_no_language_offer_on_an_english_windows(window, monkeypatch):
 def test_setup_not_done_yet_is_one_orange_step_not_red_crosses(window, monkeypatch):
     """Cable route, no cable, mic closed: the card's two lines say what's still to
     do in the warn colour; the red cross is for things that are wrong."""
-    from soundboard import engine as eng
+    from soundboard.audio import engine as eng
     from soundboard import theme
     # the real device list: a PC with a virtual cable installed isn't "no cable"
     monkeypatch.setattr(eng, "virtual_outputs", lambda: [])
@@ -1180,7 +1181,7 @@ def test_mic_card_status_uses_painted_marks_on_one_line(window, monkeypatch):
     from PySide6.QtWidgets import QApplication
 
     from soundboard.mic import directmic as dm
-    from soundboard import engine as eng
+    from soundboard.audio import engine as eng
     from soundboard import theme
     from soundboard.ui import icons
     w = window

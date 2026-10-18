@@ -17,14 +17,14 @@ from typing import TYPE_CHECKING
 
 from PySide6.QtCore import QObject
 
-from soundboard import appaudio
+from soundboard.audio import appaudio
 from soundboard.core import errors, usage
 from soundboard.sounds import library
 from soundboard.sounds.clipedit import LiveBuffer
-from soundboard.engine import SR
+from soundboard.audio.engine import SR
 from soundboard.i18n import _
 from soundboard.sounds.library import MAX_SECONDS, trim_silence
-from soundboard.recorder import ArmedRecorder
+from soundboard.audio.recorder import ArmedRecorder
 from soundboard.ui import appstate, busy
 from soundboard.ui.approw import AppRow, _route, is_path_key
 from soundboard.ui.clipeditor import ClipEditor

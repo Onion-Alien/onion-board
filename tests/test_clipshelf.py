@@ -6,7 +6,7 @@ import pytest
 
 from soundboard.sounds import clipshelf
 from soundboard.sounds.clipshelf import DAY, Shelf
-from soundboard.engine import SR
+from soundboard.audio.engine import SR
 
 
 def audio():

@@ -19,9 +19,9 @@ from PySide6.QtWidgets import (QApplication, QDialog, QMainWindow, QMenu, QMessa
 
 from soundboard import theme
 from soundboard.online import ytworker
-from soundboard.engine import SR, Engine
+from soundboard.audio.engine import SR, Engine
 from soundboard.core import exitwatch
-from soundboard import appaudio, howl
+from soundboard.audio import appaudio, howl
 from soundboard.mic import voicesdk
 from soundboard.core import autostart, reset, trash
 from soundboard.sounds import library
@@ -32,7 +32,7 @@ from soundboard import quality
 from soundboard.core import usage
 from soundboard.win import shellicon, thumbbar
 from soundboard.addons import watchaddon
-from soundboard.replay import InstantReplay
+from soundboard.audio.replay import InstantReplay
 from soundboard.sounds.library import Config, SoundMeta
 from soundboard.ui.crashdialog import free_dialog
 from soundboard.ui import restyled, worker
@@ -1442,7 +1442,7 @@ class MainWindow(QMainWindow):
 
     def _howl_stopped(self):
         """The engine heard the mic squeal through the speakers and stopped playing
-        it back (soundboard.howl): untick the switch to match and say why."""
+        it back (soundboard.audio.howl): untick the switch to match and say why."""
         self.unsay("speakers")
         self.btn_check.setChecked(False)   # -> on_mic_check
         self.say(_("Stopped <b>Hear what they hear</b>: your mic was picking up your "

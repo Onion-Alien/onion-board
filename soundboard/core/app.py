@@ -225,7 +225,8 @@ def selftest() -> int:
     from PySide6.QtMultimedia import QMediaPlayer
     _app = QApplication(sys.argv)   # kept until the checks below have run
     from soundboard.ui import mainwindow, setupwizard, crashdialog  # noqa: F401
-    from soundboard import engine, theme  # noqa: F401
+    from soundboard.audio import engine  # noqa: F401
+    from soundboard import theme  # noqa: F401
     from soundboard.online import radio  # noqa: F401
     theme.app_icon()
     QMediaPlayer()   # loads the FFmpeg multimedia plugin
@@ -572,7 +573,7 @@ def main():
     tune_runtime_for_audio()
     from soundboard.online import ytworker
     ytworker.enabled = True   # web searches and downloads off the audio's GIL
-    from soundboard import renderworker
+    from soundboard.audio import renderworker
     renderworker.enabled = True   # slow effects renders (an AI voice) too
     from soundboard import i18n
     i18n.startup(APP_DIR)   # before any window or module-level text is made

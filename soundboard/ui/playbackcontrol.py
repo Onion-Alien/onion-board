@@ -16,12 +16,13 @@ from PySide6.QtWidgets import QApplication, QFrame, QHBoxLayout, QLabel, QPushBu
 from shiboken6 import isValid as qt_valid
 
 from soundboard.sounds import library
-from soundboard import soundfx, theme
+from soundboard.audio import soundfx
+from soundboard import theme
 from soundboard.core import usage
-from soundboard.engine import SR
+from soundboard.audio.engine import SR
 from soundboard.i18n import _
 from soundboard.sounds.library import PRESS_MODE, load_original
-from soundboard.shuffle import ShuffleBag
+from soundboard.audio.shuffle import ShuffleBag
 from soundboard.ui import icons, sidebar, worker
 from soundboard.ui.controller import Controller
 from soundboard.ui.linkbar import PLAY_ID as LINK_ID

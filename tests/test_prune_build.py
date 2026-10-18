@@ -127,7 +127,7 @@ def test_every_qt_module_the_app_imports_is_kept():
 def test_the_app_never_imports_a_module_the_build_leaves_out():
     """build.ps1 leaves parts of scipy out of the built app (`--exclude-module`): an
     app module importing one works from source and fails with ModuleNotFoundError in
-    the built app (Pong's sounds did, with scipy.signal). soundboard.dsp has the filters."""
+    the built app (Pong's sounds did, with scipy.signal). soundboard.audio.dsp has the filters."""
     import ast
     import re
     from pathlib import Path

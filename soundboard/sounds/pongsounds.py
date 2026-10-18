@@ -18,8 +18,8 @@ from functools import lru_cache
 
 import numpy as np
 
-from soundboard.dsp import butter, sosfilt   # not scipy.signal: the built app leaves it out
-from soundboard.engine import SR
+from soundboard.audio.dsp import (butter, sosfilt)  # not scipy.signal: the built app leaves it out
+from soundboard.audio.engine import SR
 
 # each theme's sound style; a theme that isn't listed gets "soft"
 STYLES: dict[str, str] = {

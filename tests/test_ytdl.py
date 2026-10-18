@@ -19,7 +19,7 @@ import soundfile as sf
 
 from conftest import process_events
 from soundboard.online import net, ytdl
-from soundboard.engine import SR
+from soundboard.audio.engine import SR
 from soundboard.sounds.library import Config
 from PySide6.QtWidgets import QLabel, QPushButton
 

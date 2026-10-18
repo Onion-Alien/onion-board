@@ -12,7 +12,7 @@ import soundfile as sf
 from soundboard.sounds import library, sourceinfo
 from soundboard.core import trash
 from soundboard.online import ytdl
-from soundboard.engine import SR
+from soundboard.audio.engine import SR
 from soundboard.sounds.library import Config, SoundMeta
 
 INFO = {"id": "dQw4w9WgXcQ", "title": "Never Gonna Give You Up (Official Video)",

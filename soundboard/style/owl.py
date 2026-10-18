@@ -822,7 +822,7 @@ class OwlWidget(QWidget):
         super().mousePressEvent(ev)
 
     def set_groove(self, groove):
-        """What's playing, as a soundboard.groove.Groove (its beat, style and hits), or
+        """What's playing, as a soundboard.audio.groove.Groove (its beat, style and hits), or
         None. He bobs his head to it."""
         self.groove = groove
         if groove is not None:

@@ -12,7 +12,7 @@ Then, with nothing else talking into the cable:
     python scripts/voicetests/discord_roundtrip.py --modes onion    # just the app, your settings
     python scripts/voicetests/discord_roundtrip.py --listen 20      # 20 s of you talking (mic path)
 
-The listener is recorded by process loopback (soundboard.appaudio, the Apps tab's
+The listener is recorded by process loopback (soundboard.audio.appaudio, the Apps tab's
 capture), so its output device and volume don't matter, muted speakers included.
 The cable's far end (CABLE Output) is recorded at the same time, which splits every
 change into what the app did (source -> cable) and what the chat did (cable -> ear).
@@ -38,10 +38,10 @@ import soundfile as sf
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
 
-from soundboard import appaudio  # noqa: E402
+from soundboard.audio import appaudio  # noqa: E402
 from soundboard.mic import destination  # noqa: E402
 from soundboard.sim import codecsim  # noqa: E402
-from soundboard.engine import Engine  # noqa: E402
+from soundboard.audio.engine import Engine  # noqa: E402
 from soundboard.sounds.library import _ffmpeg, level_gain  # noqa: E402
 
 SR = 48000

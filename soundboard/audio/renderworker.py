@@ -44,7 +44,7 @@ class Unavailable(RuntimeError):
 
 def worth_it(fx: dict | None, duration: float) -> bool:
     """A render slow enough for the helper: an AI voice, or a long sound."""
-    from soundboard import soundfx
+    from soundboard.audio import soundfx
     voice = soundfx.clean(fx).get("voice") or {}
     return bool(voice.get("ai")) or duration >= SLOW_S
 
@@ -52,7 +52,7 @@ def worth_it(fx: dict | None, duration: float) -> bool:
 def _command() -> list[str]:
     if getattr(sys, "frozen", False):
         return [sys.executable, ARG]
-    main = Path(__file__).resolve().parent.parent / "main.py"
+    main = Path(__file__).resolve().parents[2] / "main.py"
     return [sys.executable, str(main), ARG]
 
 

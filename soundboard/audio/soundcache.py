@@ -17,11 +17,11 @@ import numpy as np
 import soxr
 
 from soundboard.mic import destination, sharestore
-from soundboard import mapped
-from soundboard.engineparts import I16_SCALE, SR
+from soundboard.audio import mapped
+from soundboard.audio.engineparts import I16_SCALE, SR
 
 # the engine's logger, as before the move (log lines and filters keep their name)
-log = logging.getLogger("soundboard.engine")
+log = logging.getLogger("soundboard.audio.engine")
 
 CACHE_BUDGET = 192 << 20               # bytes of resampled copies kept for non-48 kHz devices
 

@@ -167,7 +167,7 @@ class PROPERTYKEY(Structure):
 
 
 PKEY_Device_FriendlyName = PROPERTYKEY(GUID.of("A45C254E-DF1C-4EFD-8020-67D146A850E0"), 14)
-# what Windows thinks the device is (EndpointFormFactor): soundboard.howl reads it
+# what Windows thinks the device is (EndpointFormFactor): soundboard.audio.howl reads it
 PKEY_AudioEndpoint_FormFactor = PROPERTYKEY(GUID.of("1DA5D803-D492-4EDD-8C23-E0C0FFEE7F0E"), 0)
 
 

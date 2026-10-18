@@ -43,7 +43,7 @@ class CableEnd:
 
 
 def _policy():
-    from soundboard.appaudio import GUID, CLSCTX_ALL, ComError, Com, _ole32
+    from soundboard.audio.appaudio import GUID, CLSCTX_ALL, ComError, Com, _ole32
     clsid = GUID.of("870AF99C-171D-4F9E-AF0D-E63DF40C2BC9")   # CPolicyConfigClient
     iid = GUID.of("F8679F50-850A-41CF-9C72-430F290290C8")     # IPolicyConfig (Win 7+)
     out = c_void_p()
@@ -55,8 +55,8 @@ def _policy():
 
 def _devices(flow: int) -> list[tuple[str, str]]:
     """(id, friendly name) of the active endpoints of one flow."""
-    from soundboard.appaudio import (DEVICE_STATE_ACTIVE, Com, _cotaskmem_str, _device_name,
-                                     _enumerator)
+    from soundboard.audio.appaudio import (DEVICE_STATE_ACTIVE, Com, _cotaskmem_str,
+                                           _device_name, _enumerator)
     out = []
     with _enumerator() as en:
         coll = c_void_p()
@@ -79,7 +79,7 @@ def _get_format(pc, dev_id: str, mix: bool):
     """(WAVEFORMATEX copy, raw bytes) of the device (or its mix) format."""
     from ctypes import string_at
 
-    from soundboard.appaudio import WAVEFORMATEX, _ole32
+    from soundboard.audio.appaudio import WAVEFORMATEX, _ole32
     p = c_void_p()
     if mix:
         pc.call(3, (c_wchar_p, POINTER(c_void_p)), dev_id, byref(p), what="GetMixFormat")
@@ -97,13 +97,13 @@ def _get_format(pc, dev_id: str, mix: bool):
 
 def _parse(raw: bytearray) -> tuple[int, int, int]:
     """(rate, bits, channels) of a WAVEFORMATEX(TENSIBLE) blob."""
-    from soundboard.appaudio import WAVEFORMATEX
+    from soundboard.audio.appaudio import WAVEFORMATEX
     wf = WAVEFORMATEX.from_buffer_copy(bytes(raw[:18]))
     return int(wf.nSamplesPerSec), int(wf.wBitsPerSample), int(wf.nChannels)
 
 
 def _with_rate(raw: bytearray, rate: int) -> bytearray:
-    from soundboard.appaudio import WAVEFORMATEX
+    from soundboard.audio.appaudio import WAVEFORMATEX
     out = bytearray(raw)
     wf = WAVEFORMATEX.from_buffer(out)
     wf.nSamplesPerSec = rate
@@ -115,8 +115,8 @@ def cable_ends(names_hint=None) -> list[CableEnd]:
     """Every virtual-cable endpoint with its current format ([] when it can't tell)."""
     if not _win:
         return []
-    from soundboard.appaudio import ComError, _co_init, _ole32
-    from soundboard.engine import is_virtual
+    from soundboard.audio.appaudio import ComError, _co_init, _ole32
+    from soundboard.audio.engine import is_virtual
     owned = False
     try:
         owned = _co_init()
@@ -153,7 +153,7 @@ def set_rate(end: CableEnd, rate: int = RATE) -> bool:
     """Put one end of the cable on `rate` (keeping its bit depth and channels)."""
     if not _win:
         return False
-    from soundboard.appaudio import ComError, _co_init, _ole32
+    from soundboard.audio.appaudio import ComError, _co_init, _ole32
     owned = False
     try:
         owned = _co_init()

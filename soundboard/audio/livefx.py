@@ -13,7 +13,7 @@ from __future__ import annotations
 
 import numpy as np
 
-from soundboard.dsp import SmoothSos, butter, matched_biquad
+from soundboard.audio.dsp import SmoothSos, butter, matched_biquad
 from soundboard.voicefx import Param
 from soundboard.voicefx.builtin import Distortion, Echo, Reverb
 

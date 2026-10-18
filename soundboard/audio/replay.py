@@ -2,9 +2,9 @@
 in Discord, the game, a video) and saves them as a new pad on a hotkey, for the
 "clip that!" moment after someone says something funny.
 
-It's Windows' process loopback (soundboard.appaudio) in "everything except this
+It's Windows' process loopback (soundboard.audio.appaudio) in "everything except this
 process" mode, so Onion Board's own sounds and radio aren't in the clip. The audio is
-only held in memory (a ring buffer, soundboard.recorder.Recorder) and nothing is
+only held in memory (a ring buffer, soundboard.audio.recorder.Recorder) and nothing is
 kept until the hotkey is pressed. It only runs while the hotkey is set.
 """
 from __future__ import annotations
@@ -17,9 +17,9 @@ import time
 import numpy as np
 from PySide6.QtCore import QObject, QTimer, Signal
 
-from soundboard import appaudio
+from soundboard.audio import appaudio
 from soundboard.sounds.library import trim_silence
-from soundboard.recorder import Recorder
+from soundboard.audio.recorder import Recorder
 
 log = logging.getLogger(__name__)
 

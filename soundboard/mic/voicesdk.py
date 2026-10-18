@@ -18,7 +18,7 @@ only use it for accounts or achievements, single-player ones included), Steam vo
 
 Better than the game in front: the program actually recording your mic (straight
 into my mic) or the virtual cable's far end (Listeners). Windows lists who records
-a device the same way it lists who plays (soundboard.appaudio.recording_apps), so a
+a device the same way it lists who plays (soundboard.audio.appaudio.recording_apps), so a
 voice chat app is named by its exe (VOICE_APPS) and a game by the files in its
 folder, as above.
 
@@ -256,7 +256,7 @@ class Watcher:
         self._fg = foreground or (lambda: foreground_process())
         self._scan = scanner or (lambda path: scan(path))
         if alive is None:
-            from soundboard.appaudio import is_running
+            from soundboard.audio.appaudio import is_running
             alive = is_running
         self._alive = alive
         self._cache: dict[str, str | None] = {}
@@ -306,7 +306,7 @@ class Listeners:
 
     def __init__(self, lister=None, scanner=None):
         if lister is None:
-            from soundboard.appaudio import recording_apps
+            from soundboard.audio.appaudio import recording_apps
             lister = recording_apps
         self._list = lister
         self._scan = scanner or (lambda path: scan(path))

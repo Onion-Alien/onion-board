@@ -29,7 +29,7 @@ A mode pre-shapes the sounds bus for that pipeline:
            it cost 2-5 dB and added distortion in every one, even behind an automatic
            gain, and pushed songs under a voice gate where the make-up kept them over
   mono     one channel, the way the mic capture will send it, with the
-           phase-aware downmix (soundboard.sendfx.SmartMono) so stereo effects
+           phase-aware downmix (soundboard.audio.sendfx.SmartMono) so stereo effects
            that would cancel in a plain average don't
 
 Built-in modes are one per voice chat engine; custom ones (Settings) let you
@@ -44,7 +44,7 @@ from functools import lru_cache
 
 import numpy as np
 
-from soundboard.dsp import butter, lfilter, sos_response, sosfilt
+from soundboard.audio.dsp import butter, lfilter, sos_response, sosfilt
 from soundboard.i18n import _
 
 F32 = np.float32
@@ -365,7 +365,7 @@ class Processor:
             x = self._compress(x, d.comp)
         if d.mono:
             if self._mono is None:
-                from soundboard.sendfx import SmartMono
+                from soundboard.audio.sendfx import SmartMono
                 self._mono = SmartMono(self.rate)
             x = self._mono.process(x)
         return np.ascontiguousarray(x, dtype=F32)

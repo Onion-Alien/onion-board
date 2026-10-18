@@ -152,7 +152,7 @@ def test_the_engine_is_quiet_only_with_nothing_playing():
     import time
     from types import SimpleNamespace
 
-    from soundboard.engine import Engine
+    from soundboard.audio.engine import Engine
     e = Engine.__new__(Engine)                 # just the state quiet() reads
     e.voices, e.aux, e._radio_heard = (), (), 0.0
     assert e.quiet()

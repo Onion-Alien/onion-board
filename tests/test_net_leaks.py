@@ -22,7 +22,7 @@ from conftest import closed_port, process_events
 from fakeproxy import Socks5, no_leaks
 from soundboard.online import net
 from soundboard.core import updates
-from soundboard.engine import SR
+from soundboard.audio.engine import SR
 from test_radio import wav_bytes
 
 

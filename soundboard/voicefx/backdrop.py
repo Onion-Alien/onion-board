@@ -108,7 +108,7 @@ def clean_extra(cfg: dict) -> dict:
 def fx_for(tweaks: dict) -> dict:
     """The pop-up's settings as a pad's effects (soundfx): speed keeps the pitch, bass
     is the bottom two EQ bands, muffle pulls the top three down, reverb is a hall."""
-    from soundboard import eq, soundfx
+    from soundboard.audio import eq, soundfx
     t = clean_tweaks(tweaks)
     f = soundfx.neutral()
     f["speed"], f["pitch"] = t["speed"], t["pitch"]
@@ -184,7 +184,7 @@ def render_layer(layer: str, tweaks: dict) -> np.ndarray:
     """A built-in layer with its pop-up settings, as a loop (mono, SR, RMS ~1)."""
     import soxr
 
-    from soundboard import soundfx
+    from soundboard.audio import soundfx
     t = clean_tweaks(tweaks)
     if is_neutral(t):
         return recording(layer)
@@ -202,7 +202,7 @@ def render_layer(layer: str, tweaks: dict) -> np.ndarray:
 def render_sound(audio: np.ndarray, tweaks: dict | None) -> np.ndarray:
     """A board sound ((n, 2) int16 or float32 at SR, its own effects in) with the
     pop-up's settings, as a loop (mono, SR, RMS ~1). Only its first LOOP_S seconds."""
-    from soundboard import soundfx
+    from soundboard.audio import soundfx
     t = clean_tweaks(tweaks)
     cut = audio[:int((LOOP_S * t["speed"] + SHORT_SEAM_S) * SR)]
     out = soundfx.render(cut, fx_for(t)) if not is_neutral(t) else cut

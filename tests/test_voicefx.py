@@ -3,7 +3,7 @@ import numpy as np
 import pytest
 
 from soundboard import voicefx
-from soundboard.engine import Engine
+from soundboard.audio.engine import Engine
 from soundboard.voicefx import REGISTRY, VoiceChain, defaults
 
 RATE = 48000
@@ -66,7 +66,7 @@ def test_pitch_latency_is_a_few_blocks_and_stays_put():
 def test_live_pitch_switching_on_and_off_has_no_gap_or_click():
     """It used to start from silence for its latency (~40 ms) when switched on,
     and jump when switched off."""
-    from soundboard.engine import LivePitch
+    from soundboard.audio.engine import LivePitch
     x = np.repeat(sine(440, 1.0, amp=0.5)[:, None], 2, 1)
     lp = LivePitch(RATE)
     sts = [0.0] * 10 + [3.0] * 30 + [0.0] * 20
@@ -365,7 +365,7 @@ SR = 48000
 
 def _vowel(f0=120.0, secs=1.5):
     """A buzzy vowel: a pulse train through three formant resonators."""
-    from soundboard.dsp import lfilter
+    from soundboard.audio.dsp import lfilter
     n = int(SR * secs)
     ph = np.cumsum(np.full(n, f0 / SR))
     x = (np.diff(np.floor(ph), prepend=0) > 0).astype(np.float64)
@@ -810,7 +810,7 @@ def test_compressor_attack_and_release_follow_the_sliders():
 
 def _vowel_then_s():
     """A buzzy vowel, a 150 ms "sss" (noise in 5-9 kHz), the vowel again."""
-    from soundboard.dsp import butter, sosfilt
+    from soundboard.audio.dsp import butter, sosfilt
     t = np.arange(int(RATE * 0.4)) / RATE
     vowel = sum(np.sin(2 * np.pi * 150 * k * t) / k for k in range(1, 20)) * 0.08
     noise = np.random.default_rng(0).standard_normal(int(RATE * 0.15))
@@ -978,7 +978,7 @@ def test_reverb_has_early_reflections_before_the_tail():
 def test_reverb_old_settings_keep_their_tail():
     """Size, Brightness and Mix mean what they did: the decay at Size 0.5 is still
     about a second, and highs die faster than lows."""
-    from soundboard.dsp import butter, sosfilt
+    from soundboard.audio.dsp import butter, sosfilt
     ir = _impulse_response(predelay=0, size=0.5)
 
     def t60(lo, hi):

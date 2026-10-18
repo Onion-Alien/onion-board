@@ -54,7 +54,7 @@ RUN_ALL = {
 # what most of the app reaches through signals, callbacks and lazy imports: a change
 # to one runs the whole suite rather than trust the imports to find every test
 HUBS = {
-    "soundboard/ui/mainwindow.py", "soundboard/engine.py", "soundboard/sounds/library.py",
+    "soundboard/ui/mainwindow.py", "soundboard/audio/engine.py", "soundboard/sounds/library.py",
     "soundboard/settings.py",
 }
 # too common to say which test is about it

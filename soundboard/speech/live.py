@@ -98,7 +98,7 @@ class SpeechController:
             raise RuntimeError("this voice can't read that text")
         if (self.voice_fx or self.fx_always) and self.chain.enabled:
             mono = self.chain.render(mono, rate)
-        from soundboard.engine import resample
+        from soundboard.audio.engine import resample
         mono = resample(np.asarray(mono, np.float32), rate, library.SR)
         return np.ascontiguousarray(np.repeat(mono[:, None], 2, axis=1), np.float32)
 

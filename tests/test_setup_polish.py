@@ -4,7 +4,7 @@ from PySide6.QtWidgets import QApplication
 from test_mainwindow import window  # noqa: F401
 
 from soundboard.mic import directmic as dm
-from soundboard import engine as eng
+from soundboard.audio import engine as eng
 
 
 def pump():

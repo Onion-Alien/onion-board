@@ -71,7 +71,7 @@ def test_hiding_it_lasts_until_the_settings_change(window, monkeypatch):
 
 def test_the_tick_reads_on_a_worker(window, monkeypatch, qapp):
     from conftest import process_events
-    from soundboard import appaudio
+    from soundboard.audio import appaudio
     (folder() / "000005.log").write_bytes(store(activeInputProfile="STUDIO"))
     monkeypatch.setattr(chatguide, "on_mic", lambda mw: True)
     monkeypatch.setattr(appaudio, "_process_table", lambda: {7: (1, "discord.exe")})

@@ -11,7 +11,7 @@ import logging
 import time
 from typing import TYPE_CHECKING
 
-from soundboard import appaudio
+from soundboard.audio import appaudio
 from soundboard.mic import directmic, discordcfg, rawmic
 from soundboard.core import updates
 from soundboard.i18n import _

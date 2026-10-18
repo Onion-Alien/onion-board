@@ -7,7 +7,7 @@ import numpy as np
 
 from soundboard.sounds import clipedit
 from soundboard.sounds.clipedit import BIN, LiveBuffer, Take, bin_peaks
-from soundboard.engine import SR
+from soundboard.audio.engine import SR
 
 
 def ramp_audio(n, start=0):

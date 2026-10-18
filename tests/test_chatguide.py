@@ -3,7 +3,7 @@ capture) and the cable-format fix on the Setup tab. Offscreen, fake devices."""
 import numpy as np
 import pytest
 
-from soundboard import appaudio
+from soundboard.audio import appaudio
 from soundboard.mic import cableformat
 from soundboard.sim import chatcheck
 from soundboard.ui import chatguide, setupwizard
@@ -254,7 +254,7 @@ def test_cable_end_ok_only_at_48k(rate):
 
 @pytest.mark.windows   # Windows' struct layouts (a 4-byte long)
 def test_with_rate_rewrites_rate_and_byte_rate():
-    from soundboard.appaudio import WAVEFORMATEX
+    from soundboard.audio.appaudio import WAVEFORMATEX
     wf = WAVEFORMATEX(1, 2, 44100, 44100 * 4, 4, 16, 0)
     raw = bytearray(bytes(wf))
     out = cableformat._with_rate(raw, 48000)

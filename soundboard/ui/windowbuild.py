@@ -37,7 +37,8 @@ from PySide6.QtWidgets import (
 
 from soundboard.core import backup, usage
 from soundboard.mic import destination
-from soundboard import engine, otherboards, theme
+from soundboard.audio import engine
+from soundboard import otherboards, theme
 from soundboard.online import net
 from soundboard.control import remote
 from soundboard.i18n import _

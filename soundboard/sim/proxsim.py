@@ -24,7 +24,7 @@ from dataclasses import dataclass, field
 
 import numpy as np
 
-from soundboard.dsp import butter, lfilter, sosfilt
+from soundboard.audio.dsp import butter, lfilter, sosfilt
 
 SR = 48000
 F32 = np.float32

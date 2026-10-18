@@ -1,7 +1,7 @@
-"""Live effects on the sounds bus (soundboard.livefx)."""
+"""Live effects on the sounds bus (soundboard.audio.livefx)."""
 import numpy as np
 
-from soundboard import livefx
+from soundboard.audio import livefx
 
 RATE = 48000
 BLOCK = 512

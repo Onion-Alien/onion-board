@@ -4,9 +4,9 @@ import numpy as np
 from PySide6.QtWidgets import QApplication, QMessageBox
 
 from soundboard.sounds import library
-from soundboard import recorder
-from soundboard.engine import SR, Engine
-from soundboard.recorder import MicTake
+from soundboard.audio import recorder
+from soundboard.audio.engine import SR, Engine
+from soundboard.audio.recorder import MicTake
 from soundboard.ui import recordmic
 from soundboard.ui.recordmic import RecordDialog, next_name, quiet_bounds
 
@@ -90,7 +90,7 @@ def test_mic_take_spools_to_disk_and_resamples_to_sr(app_dir):
 
 
 def test_mic_take_stops_at_the_cap(app_dir, monkeypatch):
-    monkeypatch.setattr("soundboard.recorder.MAX_SECONDS", 0.05)
+    monkeypatch.setattr("soundboard.audio.recorder.MAX_SECONDS", 0.05)
     e = mic_engine()
     t = MicTake(e, spool_path=app_dir / "take.wav")
     feed(e, 0.5, 10)   # 0.1 s

@@ -10,7 +10,7 @@ from test_engine import engine_with
 from test_mainwindow import window  # noqa: F401
 
 from soundboard.core import backup, trash
-from soundboard import eq, mapped, soundfx
+from soundboard.audio import eq, mapped, soundfx
 from soundboard.sounds import library
 
 

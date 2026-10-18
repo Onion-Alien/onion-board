@@ -893,7 +893,7 @@ def dispatch(mw: MainWindow, action: str, params: dict) -> tuple[int, object]:
         mw.btn_check.setChecked(on)   # -> on_mic_check
         return 200, {"hear": bool(mw.engine.mic_check)}
     if action == "replay":
-        from soundboard.engine import SR
+        from soundboard.audio.engine import SR
         if len(mw.replay.clip()) < int(0.2 * SR):
             return 409, {"error": mw.replay.error or "nothing has played on this PC lately"}
         mw.hkctl.save_replay()
@@ -1084,7 +1084,7 @@ LIVE_ACTIONS = ("speed", "pitch", "effects", "reset")
 
 
 def live_state(mw: MainWindow) -> dict:
-    from soundboard import livefx
+    from soundboard.audio import livefx
     b = mw.speed_btn
     speed, pitch, keep = b.values()
     fx = b.fx_values()
@@ -1094,7 +1094,7 @@ def live_state(mw: MainWindow) -> dict:
 
 
 def dispatch_live(mw: MainWindow, action: str, params: dict) -> tuple[int, object]:
-    from soundboard import livefx
+    from soundboard.audio import livefx
     from soundboard.ui import speedpitch as sp
     b = mw.speed_btn
     speed, pitch, keep = b.values()

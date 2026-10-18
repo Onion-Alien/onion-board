@@ -15,7 +15,7 @@ from soundboard.mic import directmic, michelper
 from soundboard import theme
 from soundboard.core import usage
 from soundboard.online import net
-from soundboard import engine as eng
+from soundboard.audio import engine as eng
 from soundboard.i18n import _, ngettext
 from soundboard.ui import busy, icons, reveal, sidebar
 from soundboard.ui.controller import Controller

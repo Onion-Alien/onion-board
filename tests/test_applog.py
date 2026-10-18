@@ -188,7 +188,7 @@ def test_scrub_catches_other_spellings_of_the_home_folder(monkeypatch, text):
 def test_device_names_carrying_the_owners_name_are_cut_from_the_log(tmp_path, monkeypatch):
     """Windows names Bluetooth headsets after their owner, and the log names devices."""
     log_path = _state_in(tmp_path, monkeypatch)
-    log_path.write_text("INFO soundboard.engine: opened mic: Headset (Alex's AirPods Pro)\n"
+    log_path.write_text("INFO soundboard.audio.engine: opened mic: Headset (Alex's AirPods Pro)\n"
                         "INFO it's fine\n", encoding="utf-8")
     rep = applog.build_report((ValueError, ValueError("x"), None))
     assert "Alex" not in rep.text and "Headset (<name>'s AirPods Pro)" in rep.text

@@ -9,7 +9,7 @@ keeps the program's last minute as a live waveform to cut bits out of; closed,
 nothing of it runs. Its Save puts the bit in *Saved clips* under the cards
 (soundboard.ui.clipshelf), and its Big view button gives one card the whole tab.
 
-The capture is Windows' per-process loopback (soundboard.appaudio), a *copy* of
+The capture is Windows' per-process loopback (soundboard.audio.appaudio), a *copy* of
 the program's audio: the program keeps playing on your speakers. Programs you
 switch on are remembered by their .exe and folder (path_key), and picked up again
 next time they run.
@@ -28,7 +28,8 @@ from PySide6.QtCore import Qt, QTimer, Signal
 from PySide6.QtWidgets import (QFrame, QHBoxLayout, QInputDialog, QLabel, QLayoutItem,
                                QPushButton, QScrollArea, QSlider, QVBoxLayout, QWidget)
 
-from soundboard import appaudio, theme
+from soundboard.audio import appaudio
+from soundboard import theme
 from soundboard.core import trash, usage
 from soundboard.sounds import library
 from soundboard.i18n import _

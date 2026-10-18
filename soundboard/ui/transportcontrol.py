@@ -13,7 +13,7 @@ from typing import TYPE_CHECKING
 from PySide6.QtCore import Qt, QTimer
 
 from soundboard.sounds import videos
-from soundboard.engine import SR
+from soundboard.audio.engine import SR
 from soundboard.i18n import _
 from soundboard.ui import worker
 from soundboard.ui.controller import Controller

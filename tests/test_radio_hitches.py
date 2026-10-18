@@ -221,7 +221,7 @@ def audio_late_while(work):
     import sounddevice as sd
 
     from soundboard.core.app import SWITCH_S
-    from soundboard.engine import Engine
+    from soundboard.audio.engine import Engine
     e = Engine()
     e.main_stream = e.mon_stream = object()    # stands in for open outputs: no device
     t = np.arange(48000 * 5) / 48000

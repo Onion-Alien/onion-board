@@ -43,7 +43,7 @@ class Switcher:
     def __init__(self, foreground=None, alive=None):
         self._fg = foreground or (lambda: voicesdk.foreground_process())
         if alive is None:
-            from soundboard.appaudio import is_running
+            from soundboard.audio.appaudio import is_running
             alive = is_running
         self._alive = alive
         self.front_pid = 0          # the last real program in front (not us, not Windows')

@@ -560,7 +560,7 @@ def _never_look_at_the_real_foreground():
     """The main window asks which game is in front (soundboard.mic.voicesdk) to suggest a
     Who's listening mode: in tests nothing is, whatever the developer is playing.
     For the whole session: test windows outlive their test, timers and all."""
-    from soundboard import appaudio
+    from soundboard.audio import appaudio
     from soundboard.mic import voicesdk
     with pytest.MonkeyPatch.context() as mp:
         mp.setattr(voicesdk, "foreground_process", lambda: (0, ""))

@@ -180,7 +180,7 @@ def test_redline_starts_at_eight_times(qapp):
 def test_no_change_sits_mid_slider_on_lopsided_ranges(qapp):
     """1x speed and +0 dB bass sit in the middle like 0 st pitch does, though
     their ranges are lopsided (0.25x to 2x, -12 to +18 dB)."""
-    from soundboard import livefx
+    from soundboard.audio import livefx
     from soundboard.ui.speedpitch import SpeedPitchButton
     b = SpeedPitchButton()
     for s in (b.speed, b.pitch, b.fx["bass"], b.fx["treble"]):
@@ -224,7 +224,7 @@ def test_the_values_can_be_typed(qapp):
 
 def test_a_lit_preset_clicked_again_puts_the_knobs_back(qapp):
     """Clicked again, a lit preset turned every knob off, a tweak made before it too."""
-    from soundboard import livefx
+    from soundboard.audio import livefx
     from soundboard.ui.speedpitch import SpeedPitchButton
     b = SpeedPitchButton()
     b.set_fx({"reverb": 0.3})

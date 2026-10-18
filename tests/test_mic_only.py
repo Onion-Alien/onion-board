@@ -2,7 +2,7 @@
 out while your mic is sent and no voice changer is on (Engine.mic_only)."""
 import numpy as np
 
-from soundboard.engine import SR, Engine
+from soundboard.audio.engine import SR, Engine
 from soundboard.voicefx import VoiceChain
 
 BLOCK = 480

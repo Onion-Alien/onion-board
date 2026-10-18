@@ -22,7 +22,7 @@ from dataclasses import dataclass
 import numpy as np
 import soxr
 
-from soundboard.dsp import butter, sosfilt
+from soundboard.audio.dsp import butter, sosfilt
 from soundboard.sounds.library import FFMPEG_TIMEOUT, _ffmpeg
 
 SR = 48000

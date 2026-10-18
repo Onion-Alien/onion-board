@@ -7,7 +7,7 @@ overlay, sounds, downloads.
 
 He shows how the app is doing:
 
-- a sound playing: headphones on, dancing to it (soundboard/groove.py hears its beat
+- a sound playing: headphones on, dancing to it (soundboard/audio/groove.py hears its beat
   and guesses its style): headbanging to rock, quick hops to electronic music, a cool
   nod to hip-hop, a slow sway to something calm, talking along to someone speaking;
   notes fly out on the beat, as big as he is
@@ -41,7 +41,7 @@ from PySide6.QtGui import QColor, QFont, QFontMetrics, QGuiApplication, QPainter
 from PySide6.QtWidgets import QApplication, QFrame, QHBoxLayout, QMenu, QPushButton, QWidget
 
 from soundboard import theme
-from soundboard.groove import Groove
+from soundboard.audio.groove import Groove
 from soundboard.bunny import H, INK, W
 from soundboard.i18n import _
 from soundboard.ui import a11y, icons

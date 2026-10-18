@@ -1,4 +1,4 @@
-"""Long sounds stay on disk (soundboard.mapped): mapped cache files, warmed before
+"""Long sounds stay on disk (soundboard.audio.mapped): mapped cache files, warmed before
 they play, and deletes that cope with Windows refusing to remove a mapped file."""
 import gc
 import time
@@ -10,7 +10,7 @@ from test_engine import engine_with
 from test_mainwindow import window  # noqa: F401 - the real MainWindow, offscreen
 
 from soundboard.sounds import library
-from soundboard import mapped
+from soundboard.audio import mapped
 from soundboard.core import trash
 from soundboard.sounds.library import (SR, SoundMeta, cache_path, load_cached, prune_cache,
                                        store_cached)
@@ -150,7 +150,7 @@ def test_warm_and_prefetch_ask_for_minutes_not_the_whole_file(app_dir, map_all, 
 
 
 def test_a_long_sound_playing_keeps_its_next_minutes_asked_for(app_dir, map_all, monkeypatch):
-    from soundboard import engine as E
+    from soundboard.audio import engine as E
     store_cached("long", song(3.0))
     d = load_cached("long")
     asked = []
@@ -174,7 +174,7 @@ def test_a_long_sound_playing_keeps_its_next_minutes_asked_for(app_dir, map_all,
 
 def test_a_very_long_sound_is_never_copied_at_another_rate(app_dir, map_all, monkeypatch):
     """It plays read at the device's rate: a 2-hour song's copy took 17 s and 1.2 GB."""
-    from soundboard import engine as E
+    from soundboard.audio import engine as E
     store_cached("long", song(3.0))
     d = load_cached("long")
     e = engine_with("main")

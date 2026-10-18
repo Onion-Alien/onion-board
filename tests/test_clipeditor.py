@@ -8,10 +8,10 @@ import pytest
 from PySide6.QtCore import QPoint, Qt
 from PySide6.QtTest import QTest
 
-from soundboard import appaudio
-from soundboard.appaudio import App
+from soundboard.audio import appaudio
+from soundboard.audio.appaudio import App
 from soundboard.sounds.clipedit import BIN
-from soundboard.engine import SR, Engine
+from soundboard.audio.engine import SR, Engine
 from soundboard.sounds.library import Config
 from soundboard.ui import clipeditor
 from soundboard.ui.appspanel import AppsTab

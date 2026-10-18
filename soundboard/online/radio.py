@@ -51,7 +51,7 @@ from soundboard.sounds import library
 from soundboard import quality
 from soundboard.online import net, netlog
 from soundboard.i18n import _
-from soundboard.engine import SR
+from soundboard.audio.engine import SR
 
 log = logging.getLogger(__name__)
 

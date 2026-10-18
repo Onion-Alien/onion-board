@@ -731,7 +731,7 @@ def test_the_admin_part_runs_without_numpy():
             "from soundboard.mic import directmic as dm, michelper as mh\n"
             "assert dm.np is None and len(dm.new_ring_bytes()) == dm.FILE_BYTES\n"
             "assert mh.allowed(['uninstall'])\n"
-            "from soundboard import appaudio\n"
+            "from soundboard.audio import appaudio\n"
             "assert appaudio.np is None and callable(appaudio.mic_is_silent)\n")
     r = subprocess.run([sys.executable, "-c", code], cwd=ROOT, capture_output=True,
                        text=True, timeout=60)
