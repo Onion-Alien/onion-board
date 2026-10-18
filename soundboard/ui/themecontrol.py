@@ -8,6 +8,7 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
+from PySide6.QtCore import QTimer
 from PySide6.QtWidgets import QApplication
 
 from soundboard import shellicon, theme
@@ -18,6 +19,8 @@ from soundboard.ui.logowidget import glow_icon
 
 if TYPE_CHECKING:
     from soundboard.ui.mainwindow import MainWindow
+
+SPARE_AFTER_MS = 1500   # after a theme switch, the spare Edit sound is made again
 
 
 class ThemeControl(Controller):
@@ -54,7 +57,9 @@ class ThemeControl(Controller):
         mw.statusctl._update_status()   # the hints and flow, in this theme's status colours
         mw.rail.refresh_output()   # its status icon is a copy of the pill's: redrawn
         self._paint_logo()
-        mw.setctl.prebuild_editor()   # under the cover: the next Edit opens at once
+        # the next Edit opens at once: a spare made again a moment later, on its own
+        # (~250 ms, ~1 s on a slower PC), not added to this restyle's wait
+        QTimer.singleShot(SPARE_AFTER_MS, mw, mw.setctl.prebuild_editor)
         mw._save_later()
 
     def keep_limited(self, save: bool = True):
