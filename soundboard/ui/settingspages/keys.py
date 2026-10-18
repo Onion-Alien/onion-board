@@ -220,6 +220,7 @@ class KeysPage(Page):
         v.addWidget(note)
         v.addStretch(1)
         self._ov_sync()
+        self._refresh_hk()   # its hotkey button's text (this page is built after Hotkeys)
         return w
 
     def _ov_combo(self, key, choices, current, name):
