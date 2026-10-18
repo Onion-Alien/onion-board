@@ -10,7 +10,7 @@ import soundfile as sf
 
 from soundboard import otherboards
 from soundboard.otherboards import expboard, resanance, soundux
-from soundboard.library import SR
+from soundboard.sounds.library import SR
 
 PAGE = resanance.PAGE
 

@@ -3,8 +3,8 @@ is told when their settings came from a backup or the defaults."""
 import json
 
 from conftest import own_time
-from soundboard import library
-from soundboard.library import Config
+from soundboard.sounds import library
+from soundboard.sounds.library import Config
 
 
 def _write(path, raw):

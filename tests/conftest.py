@@ -233,7 +233,7 @@ def qapp():
     wheelguard.TIP_DELAY = 0   # tests ask for tooltips at once; test_tooltip_wait checks it
     if not app.styleSheet():   # the app's theme and font, as the window applies them:
         from soundboard import theme   # without it a worker's first tests measured
-        from soundboard.library import Config   # text in Qt's plain font, and the
+        from soundboard.sounds.library import Config  # text in Qt's plain font, and the
         theme.apply(app, Config().theme)   # ones after a window in the app's
     if not hasattr(app, "_collector"):   # collects while a test spins the event loop
         from soundboard.uigc import UiCollector
@@ -318,7 +318,7 @@ def devices_done(win, timeout=8.0):
 @pytest.fixture
 def app_dir(tmp_path, monkeypatch):
     """Point library's config/sounds paths at a temp folder."""
-    from soundboard import library
+    from soundboard.sounds import library
     monkeypatch.setattr(library, "APP_DIR", tmp_path)
     monkeypatch.setattr(library, "SOUNDS_DIR", tmp_path / "sounds")
     monkeypatch.setattr(library, "CACHE_DIR", tmp_path / "cache")
@@ -341,7 +341,7 @@ def _temp_files_in_the_tests_folder(monkeypatch, tmp_path):
 @pytest.fixture(autouse=True)
 def _never_touch_real_appdata(monkeypatch, tmp_path):
     """Any test that forgets `app_dir` still can't write into %APPDATA%\\OnionBoard."""
-    from soundboard import library
+    from soundboard.sounds import library
     monkeypatch.setattr(library, "USE_RECYCLE_BIN", False)   # removed test files: just deleted
     real = library.APP_DIR.parent   # read once: the loop re-points APP_DIR itself
     for name in ("APP_DIR", "OLD_APP_DIR", "SOUNDS_DIR", "CACHE_DIR", "THUMBS_DIR",
@@ -439,7 +439,7 @@ def _pictures_load_at_once(monkeypatch):
     """Pad pictures are read on a worker thread in the app (thumbs.LOAD_ASYNC); tests
     that check pictures and their caches get them at once, so a grab shows them. The
     tests of the worker itself turn it back on."""
-    from soundboard import thumbs
+    from soundboard.sounds import thumbs
     monkeypatch.setattr(thumbs, "LOAD_ASYNC", False, raising=False)
 
 

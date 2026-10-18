@@ -8,9 +8,10 @@ from pathlib import Path
 import numpy as np
 import soundfile as sf
 
-from soundboard import backup, library, reset, trash
+from soundboard import backup, reset, trash
+from soundboard.sounds import library
 from soundboard.engine import SR
-from soundboard.library import Config, SoundMeta
+from soundboard.sounds.library import Config, SoundMeta
 
 
 def _wav(path: Path, seconds: float = 0.2) -> Path:

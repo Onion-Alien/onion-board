@@ -33,8 +33,9 @@ from typing import Any
 
 import numpy as np
 
-from soundboard import library, soundfx, voicefx
-from soundboard.library import SR
+from soundboard.sounds import library
+from soundboard import soundfx, voicefx
+from soundboard.sounds.library import SR
 
 log = logging.getLogger(__name__)
 

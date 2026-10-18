@@ -5,8 +5,8 @@ import time
 
 import numpy as np
 
-from soundboard import library
-from soundboard.library import SR, SoundMeta, cache_path, prune_cache, store_cached
+from soundboard.sounds import library
+from soundboard.sounds.library import SR, SoundMeta, cache_path, prune_cache, store_cached
 
 
 def _old_to_int16(data):

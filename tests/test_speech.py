@@ -400,7 +400,7 @@ def test_typed_text_is_spoken_in_order_as_a_sound():
 
 
 def test_live_voice_speaks_what_the_module_heard(tmp_path, monkeypatch):
-    from soundboard import library
+    from soundboard.sounds import library
     monkeypatch.setattr(library, "APP_DIR", tmp_path)
     events = []
     c, eng = controller(events)
@@ -916,7 +916,7 @@ def test_a_listed_size_over_the_cap_is_refused_before_reading(tmp_path, monkeypa
 
 
 def test_live_voice_speaks_the_translation_in_the_languages_voice(tmp_path, monkeypatch):
-    from soundboard import library
+    from soundboard.sounds import library
     monkeypatch.setattr(library, "APP_DIR", tmp_path)
     events = []
     c, eng = controller(events)

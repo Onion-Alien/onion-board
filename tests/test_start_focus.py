@@ -6,7 +6,7 @@ from PySide6.QtCore import QEvent
 
 from soundboard import __version__, engine
 from soundboard.control import winkeys
-from soundboard.library import Config
+from soundboard.sounds.library import Config
 from soundboard.ui import mainwindow as main
 from soundboard.ui.tabcontrol import TAB_INDEX
 

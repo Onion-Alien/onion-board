@@ -11,9 +11,10 @@ import numpy as np
 import pytest
 import soundfile as sf
 
-from soundboard import library
-from soundboard.library import (SR, SoundMeta, cache_path, fingerprint, import_file, load_cached,
-                     load_sound, prune_cache, save_clip, store_cached, to_float32, to_int16)
+from soundboard.sounds import library
+from soundboard.sounds.library import (SR, SoundMeta, cache_path, fingerprint, import_file,
+                                       load_cached, load_sound, prune_cache, save_clip,
+                                       store_cached, to_float32, to_int16)
 
 
 def wav(path, seconds=1.0, rate=SR, hz=440, channels=2):

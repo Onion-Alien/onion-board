@@ -11,7 +11,8 @@ from pathlib import Path
 
 import pytest
 
-from soundboard import app, applog, library
+from soundboard import app, applog
+from soundboard.sounds import library
 from soundboard.online import net, netlog
 
 

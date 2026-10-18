@@ -1,6 +1,6 @@
 from test_mainwindow import window  # noqa: F401
 
-from soundboard.library import Config, SoundMeta
+from soundboard.sounds.library import Config, SoundMeta
 from PySide6.QtCore import QRectF, QSize
 import pytest
 

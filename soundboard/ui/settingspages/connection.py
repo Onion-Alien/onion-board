@@ -360,7 +360,7 @@ class ConnectionPage(Page):
         applog.keep(on)
 
     def _set_netlog_keep(self, on: bool):
-        from soundboard import library
+        from soundboard.sounds import library
         from soundboard.online import netlog
         self.mw.set_option("netlog_keep", on)
         netlog.keep(library.APP_DIR / netlog.FILE_NAME if on else None)

@@ -68,7 +68,7 @@ def ico_bytes(c1: str, c2: str, sizes=ICO_SIZES) -> bytes:
 
 
 def icon_dir() -> Path:
-    from soundboard import library
+    from soundboard.sounds import library
     return library.APP_DIR / "icons"
 
 

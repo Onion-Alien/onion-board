@@ -31,7 +31,7 @@ import urllib.request
 from collections.abc import Callable
 from pathlib import Path
 
-from soundboard import library
+from soundboard.sounds import library
 from soundboard.online import net
 from soundboard import errors
 from soundboard.i18n import _

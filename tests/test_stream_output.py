@@ -1,7 +1,7 @@
 """The stream output (OBS): what others hear, clean, on a device of its own."""
 import numpy as np
 
-from soundboard.library import Config
+from soundboard.sounds.library import Config
 from soundboard.sendfx import SafetyLimiter
 from conftest import devices_done
 from test_engine import engine_with, tone

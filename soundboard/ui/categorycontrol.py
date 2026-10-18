@@ -23,9 +23,10 @@ from PySide6.QtWidgets import (
     QWidget,
 )
 
-from soundboard import catswitch, library, usage
+from soundboard.sounds import catswitch, library
+from soundboard import usage
 from soundboard.i18n import _, ngettext
-from soundboard.library import SoundMeta
+from soundboard.sounds.library import SoundMeta
 from soundboard.ui.hotkeypick import pretty_key
 from soundboard.ui import icons
 from soundboard.ui.controller import Controller

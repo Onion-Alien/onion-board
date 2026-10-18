@@ -15,11 +15,12 @@ from PySide6.QtWidgets import (QApplication, QButtonGroup, QCheckBox, QColorDial
                                QPushButton, QScrollArea, QSlider, QTabWidget, QVBoxLayout,
                                QWidget)
 
-from soundboard import errors, soundfx, sourceinfo, theme, thumbs, usage, voicefx
+from soundboard import errors, soundfx, theme, usage, voicefx
+from soundboard.sounds import sourceinfo, thumbs
 from soundboard.online import net
 from soundboard.eq import PRESETS as EQ_PRESETS
-from soundboard.library import (MAX_COOLDOWN_S, MAX_DELAY_S, MAX_FADE_S, PAD_COLORS,
-                                SoundMeta, original_peaks)
+from soundboard.sounds.library import (MAX_COOLDOWN_S, MAX_DELAY_S, MAX_FADE_S, PAD_COLORS,
+                                       SoundMeta, original_peaks)
 from soundboard.ui.hotkeypick import HotkeyDialog, pretty_key
 from soundboard.ui import busy, fit, icons, sourcedialog, toast
 from soundboard.ui.panel import (EqPanel, hint_label, icon_button, reset_button,
@@ -453,7 +454,7 @@ class EditDialog(QDialog):
         self.picture_fetched.connect(self._on_picture_fetched)
         self._show_picture()
 
-        # where a downloaded sound came from (soundboard.sourceinfo)
+        # where a downloaded sound came from (soundboard.sounds.sourceinfo)
         self._look, self._source_at = g, g.rowCount()
         self.btn_source = self.source_row = None
         self._fill_source()

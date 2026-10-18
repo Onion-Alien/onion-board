@@ -436,7 +436,7 @@ def test_loopback_stays_direct_in_tor_mode():
 
 
 def test_mode_survives_a_config_round_trip():
-    from soundboard.library import clean_setting
+    from soundboard.sounds.library import clean_setting
     assert clean_setting("net_mode", "tor") == "tor"
     assert clean_setting("net_mode", "i2p") == "proxy"           # unknown: fail closed
     assert clean_setting("tor_bridges", "obfs4") == "obfs4"
@@ -484,7 +484,7 @@ def test_usage_count_goes_through_tor(tor_socks, monkeypatch, app_dir):
     import types
 
     from soundboard import usage
-    from soundboard.library import Config
+    from soundboard.sounds.library import Config
     sites, p = tor_socks
     sites.routes["/api/v0/count"] = (b"", "")
     monkeypatch.setattr(usage, "ENDPOINT", sites.url("counter", "/api/v0/count"))
@@ -697,7 +697,7 @@ def test_without_tor_only_when_asked(tor_mode, fake_ydl, monkeypatch):
 # ---------------------------------------------------------------- the UI
 
 def test_link_bar_offers_without_tor_and_only_its_click_goes_direct(qapp, monkeypatch):
-    from soundboard.library import Config
+    from soundboard.sounds.library import Config
     from soundboard.ui.linkbar import LinkBar
     calls = []
 

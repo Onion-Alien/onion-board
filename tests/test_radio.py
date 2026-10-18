@@ -22,7 +22,7 @@ from PySide6.QtWidgets import QWidget
 from conftest import closed_port, process_events
 from soundboard.online import radio
 from soundboard.engine import SR, Engine
-from soundboard.library import Config
+from soundboard.sounds.library import Config
 from soundboard.online.radio import RadioDirectory, RadioPlayer, Station
 
 

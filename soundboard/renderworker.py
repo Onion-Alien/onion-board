@@ -61,7 +61,7 @@ def render(meta, cancel, progress=None) -> None:
     cancel() is asked a few times a second: True stops it (raises library.Cancelled);
     progress(frac) as it goes. Raises Unavailable when there's no helper (render it
     in-process), RuntimeError with the helper's words when the render failed."""
-    from soundboard import library
+    from soundboard.sounds import library
     key = os.urandom(32)
     listener = Listener(family="AF_PIPE" if sys.platform == "win32" else "AF_UNIX",
                         authkey=key)
@@ -178,7 +178,7 @@ def child_main() -> int:
         return 0
     if op != "render":
         return 2
-    from soundboard import library
+    from soundboard.sounds import library
     library.APP_DIR, library.CACHE_DIR = Path(app_dir), Path(cache_dir)
     stop = [False]
 

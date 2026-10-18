@@ -24,9 +24,10 @@ from pathlib import Path
 from PySide6.QtCore import Qt, QTimer, Signal
 from PySide6.QtWidgets import QFrame, QHBoxLayout, QLabel, QPushButton
 
-from soundboard import library, quality, sourceinfo, theme, thumbs, usage, videos
+from soundboard.sounds import library, sourceinfo, thumbs, videos
+from soundboard import quality, theme, usage
 from soundboard.online import net, netlog, ytdl
-from soundboard.library import SR, decode_int16, fingerprint, import_file, site_folder
+from soundboard.sounds.library import SR, decode_int16, fingerprint, import_file, site_folder
 from soundboard.ui import busy
 from soundboard.ui.widgets import fmt_time
 from soundboard import errors

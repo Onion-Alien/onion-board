@@ -4,8 +4,9 @@ from pathlib import Path
 from conftest import said
 import pytest
 
-from soundboard import backup, library, reset
-from soundboard.library import Config, SoundMeta
+from soundboard import backup, reset
+from soundboard.sounds import library
+from soundboard.sounds.library import Config, SoundMeta
 from test_mainwindow import window as main_window  # noqa: F401
 
 

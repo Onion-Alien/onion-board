@@ -4,7 +4,7 @@ web link shows where it came from."""
 from PySide6.QtGui import QImage
 from PySide6.QtWidgets import QDialog, QFileDialog, QLabel
 
-from soundboard import library, thumbs
+from soundboard.sounds import library, thumbs
 from soundboard.ui.dialogs import EditDialog
 from test_mainwindow import window  # noqa: F401  (the real MainWindow fixture)
 from test_thumbs import make_image

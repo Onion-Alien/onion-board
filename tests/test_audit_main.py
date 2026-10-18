@@ -9,7 +9,8 @@ from PySide6.QtCore import QEvent, QSize
 from PySide6.QtWidgets import QDialog, QVBoxLayout, QWidget
 
 from conftest import own_module, said
-from soundboard import appaudio, autostart, library
+from soundboard import appaudio, autostart
+from soundboard.sounds import library
 from soundboard.online import net
 from soundboard.ui import chatguide, responsive
 from soundboard.ui import importcontrol, playbackcontrol
@@ -292,7 +293,7 @@ def test_an_empty_loose_file_stops_the_timer(window):
 def test_link_bar_new_text_keeps_a_queued_pick(qapp):
     """Typing the next search while a download runs doesn't drop the Add or Play
     clicked on that downloading link: it still runs once the download is over."""
-    from soundboard.library import Config
+    from soundboard.sounds.library import Config
     from soundboard.ui.linkbar import LinkBar
     bar = LinkBar(engine=None, cfg=Config(), color_for=lambda: "#fff", known_for=dict)
     bar.open("https://www.youtube.com/watch?v=abc", "Clip")

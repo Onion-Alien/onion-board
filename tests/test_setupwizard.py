@@ -5,9 +5,10 @@ import pytest
 from PySide6.QtCore import QEvent
 from PySide6.QtWidgets import QApplication, QDialog
 
-from soundboard import engine, library
+from soundboard import engine
+from soundboard.sounds import library
 from soundboard.control import winkeys
-from soundboard.library import Config
+from soundboard.sounds.library import Config
 from soundboard.ui import mainwindow as main
 from soundboard.ui import busy, setupwizard
 

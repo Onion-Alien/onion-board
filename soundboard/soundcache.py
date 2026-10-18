@@ -86,7 +86,7 @@ class SoundCache:
             if not out.flags.writeable:
                 out = out.copy()
             if len(out) and float(np.max(np.abs(out))) > 1.0:   # resampling overshot
-                from soundboard.library import _under_full_scale   # (it imports us)
+                from soundboard.sounds.library import _under_full_scale  # (it imports us)
                 out = _under_full_scale(out)
             out *= 32767.0
             np.rint(out, out=out)

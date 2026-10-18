@@ -36,9 +36,10 @@ from soundboard import autostart, directmic, discordcfg, michelper
 from soundboard import engine as eng
 from soundboard import theme
 from soundboard.engine import SR
-from soundboard import library, usage
+from soundboard.sounds import library
+from soundboard import usage
 from soundboard.online import net
-from soundboard.library import RESOURCE_DIR
+from soundboard.sounds.library import RESOURCE_DIR
 from soundboard.pollthread import PollThread
 from soundboard.ui import cableconfirm
 from soundboard.ui.glow import Glow

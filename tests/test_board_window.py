@@ -168,7 +168,7 @@ def test_a_sound_played_while_muted_says_only_you_hear_it(window, qapp, monkeypa
 
 
 def test_new_sounds_land_in_the_category_on_show(window):
-    from soundboard.library import SoundMeta
+    from soundboard.sounds.library import SoundMeta
     window.catctl.new_category(name="Clips")
     m = SoundMeta(id="n1", name="new", file="x.wav")
     window.impctl._pending_imports = 1
@@ -256,7 +256,7 @@ def test_zip_files_go_to_the_importer(window, qapp, monkeypatch, tmp_path):
 def _wav_bytes(tmp_path, freq):
     import numpy as np
     import soundfile as sf
-    from soundboard.library import SR
+    from soundboard.sounds.library import SR
     t = np.arange(SR // 10) / SR
     p = tmp_path / f"{freq}.wav"
     sf.write(p, np.stack([np.sin(2 * np.pi * freq * t)] * 2, 1) * 0.3, SR)
@@ -306,7 +306,7 @@ def test_a_maximised_window_stays_maximised(window, qapp):
     """Maximised, it opens maximised next time, and comes back from minimised (the
     taskbar, the tray) maximised: it used to come back as a normal window both times."""
     from PySide6.QtCore import QEvent
-    from soundboard.library import Config
+    from soundboard.sounds.library import Config
     from soundboard.ui import mainwindow
     window.show()
     window.showMaximized()
@@ -382,8 +382,8 @@ def test_a_sound_on_the_undo_bar_isnt_taken_back_in_as_a_loose_file(window, qapp
     import numpy as np
     import soundfile as sf
 
-    from soundboard import library
-    from soundboard.library import SR
+    from soundboard.sounds import library
+    from soundboard.sounds.library import SR
     _loaded(window, qapp)
     m = window.meta("s1")
     library.SOUNDS_DIR.mkdir(parents=True, exist_ok=True)

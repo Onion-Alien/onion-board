@@ -8,8 +8,9 @@ import time
 import numpy as np
 import pytest
 
-from soundboard import autostart, library, soundfx, updates
-from soundboard.library import SR, Config, SoundMeta
+from soundboard import autostart, soundfx, updates
+from soundboard.sounds import library
+from soundboard.sounds.library import SR, Config, SoundMeta
 
 
 # --------------------------------------------------------------------------- trim

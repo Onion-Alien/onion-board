@@ -41,7 +41,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
 from soundboard import appaudio, destination  # noqa: E402
 from soundboard.sim import codecsim  # noqa: E402
 from soundboard.engine import Engine  # noqa: E402
-from soundboard.library import _ffmpeg, level_gain  # noqa: E402
+from soundboard.sounds.library import _ffmpeg, level_gain  # noqa: E402
 
 SR = 48000
 BANDS = ((50, 120), (120, 300), (300, 1000), (1000, 3000), (3000, 6000), (6000, 12000),

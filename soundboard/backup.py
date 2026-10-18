@@ -36,9 +36,10 @@ from pathlib import Path, PurePosixPath
 
 import soundfile as sf
 
-from soundboard import __version__, library, savedvoices, videos, voicefx
-from soundboard.library import (AUDIO_EXTS, Config, SoundMeta, clean_fade, clean_setting,
-                                clean_tags, fits_type)
+from soundboard import __version__, savedvoices, voicefx
+from soundboard.sounds import library, videos
+from soundboard.sounds.library import (AUDIO_EXTS, Config, SoundMeta, clean_fade,
+                                       clean_setting, clean_tags, fits_type)
 from soundboard.speech.live import clean_settings as clean_speech_settings
 from soundboard import errors
 from soundboard.i18n import _
@@ -634,7 +635,7 @@ def _apply_entry(meta: SoundMeta, entry: dict, color: str | None):
 
 def _put_picture(src: _Source, ps: PackedSound, meta: SoundMeta,
                  budget: _Budget | None = None):
-    from soundboard import thumbs
+    from soundboard.sounds import thumbs
     if not ps.picture:
         return
     with tempfile.TemporaryDirectory(prefix="onionboard-import-") as td:
@@ -684,7 +685,7 @@ def _pack_id(src: Path) -> str:
 
 
 def _is_free_download(src: Path) -> bool:
-    """A free pack's download (soundboard.packs saves it as packs/<its id>.zip), not a
+    """A free pack's download (soundboard.sounds.packs saves it as packs/<its id>.zip), not a
     pack kept under its content id."""
     d = packs_dir()
     return (src.is_file() and src.suffix.lower() == ".zip" and src.parent.resolve() ==
@@ -742,12 +743,12 @@ def keep_pack(pkg: Package) -> str:
 def _free_pack_name(free_id: str) -> str:
     """A free pack's name as the list of packs has it ("Streamer pack"), not its
     file's ("streamer")."""
-    from soundboard import packs as free   # it imports this module
+    from soundboard.sounds import packs as free  # it imports this module
     return next((p.name for p in free.built_in() if p.id == free_id), free_id)[:60]
 
 
 def kept_free_pack(free_id: str) -> Path | None:
-    """The kept copy of the free pack `free_id` (soundboard.packs), if it's kept."""
+    """The kept copy of the free pack `free_id` (soundboard.sounds.packs), if it's kept."""
     for j in packs_dir().glob("*.json") if packs_dir().is_dir() else []:
         try:
             free = json.loads(j.read_text("utf-8")).get("free")

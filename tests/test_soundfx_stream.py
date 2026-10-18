@@ -6,7 +6,8 @@ import numpy as np
 import pytest
 import soxr
 
-from soundboard import dsp, eq, library, soundfx, voicefx
+from soundboard import dsp, eq, soundfx, voicefx
+from soundboard.sounds import library
 from soundboard.engine import SR
 
 EXTRA = {

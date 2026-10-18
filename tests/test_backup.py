@@ -8,8 +8,9 @@ import numpy as np
 import pytest
 import soundfile as sf
 
-from soundboard import backup, library
-from soundboard.library import SR, Config, SoundMeta
+from soundboard import backup
+from soundboard.sounds import library
+from soundboard.sounds.library import SR, Config, SoundMeta
 
 
 def _tone(path, seconds=0.2, freq=440):

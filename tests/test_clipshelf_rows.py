@@ -7,7 +7,7 @@ from PySide6.QtCore import QRect, Qt
 from PySide6.QtTest import QTest
 from test_mainwindow import window  # noqa: F401
 
-from soundboard import clipshelf
+from soundboard.sounds import clipshelf
 from soundboard.engine import SR
 from soundboard.ui.clipshelf import length_text, when_text
 

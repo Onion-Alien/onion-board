@@ -26,19 +26,21 @@ from PySide6.QtWidgets import QApplication, QFileDialog, QMenu, QMessageBox
 from soundboard import (
     backup,
     bunny,
-    catswitch,
     errors,
-    library,
     otherboards,
     soundfx,
-    thumbs,
     usage,
+)
+from soundboard.sounds import (
+    catswitch,
+    library,
+    thumbs,
     videos,
 )
 from soundboard.online import ytdl
 from soundboard.win import winpath
 from soundboard.i18n import _, ngettext
-from soundboard.library import (
+from soundboard.sounds.library import (
     AUDIO_EXTS,
     PAD_COLORS,
     SoundMeta,
@@ -559,7 +561,7 @@ class ImportControl(Controller):
         mw.toast(msg, "warn" if skipped else "ok")
 
     def show_packs(self):
-        """The Free packs window (soundboard.packs): a pack it downloads is imported the
+        """The Free packs window (soundboard.sounds.packs): a pack it downloads is imported the
         way dropping its zip on the window is."""
         mw = self.mw
         from soundboard.ui.packsdialog import PacksDialog
@@ -833,7 +835,7 @@ class ImportControl(Controller):
             mw.tell(_("Import failed"), err, "error")
             return
         self._settle_hotkeys(res.sounds + pkg.restored, self._pack_name(pkg))
-        from soundboard.library import merge_tags
+        from soundboard.sounds.library import merge_tags
         cats = pkg.categories
         if pkg.is_pack and len({library.split_tag(t)[0].lower() for ps in pkg.sounds
                                 for t in clean_tags(ps.entry.get("tags"))}) > 1:
@@ -945,7 +947,7 @@ class ImportControl(Controller):
     @staticmethod
     def _pack_own_categories(pid: str) -> set[str]:
         """The categories a free pack comes with (lower case); {} for any other pack."""
-        from soundboard import packs
+        from soundboard.sounds import packs
         return {c.lower() for p in packs.built_in() if p.id == pid for c in p.categories}
 
     def _ungrouped_pack_sounds(self, pid: str) -> list[SoundMeta]:

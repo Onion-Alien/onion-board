@@ -28,7 +28,8 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
-from soundboard import backup, library, packs, updates  # noqa: E402
+from soundboard import backup, updates  # noqa: E402
+from soundboard.sounds import library, packs  # noqa: E402
 
 SAMPLE_S = 7.0   # a preview's sounds: at most this long,
 FADE_S = 1.0     # fading out over the last second

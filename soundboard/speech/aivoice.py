@@ -28,7 +28,7 @@ from collections.abc import Callable, Sequence
 
 import numpy as np
 
-from soundboard import library
+from soundboard.sounds import library
 from soundboard.online import net
 from soundboard.addons.modules import ModuleInfo
 from soundboard.speech import resample

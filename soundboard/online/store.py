@@ -22,7 +22,7 @@ from collections.abc import Callable
 from dataclasses import dataclass, field
 from pathlib import Path
 
-from soundboard import library
+from soundboard.sounds import library
 from soundboard.online import net, netlog
 from soundboard.i18n import _, ngettext
 
@@ -165,7 +165,7 @@ def parse(raw) -> tuple[list[Sound], bool]:
 def link_ok(url: str) -> bool:
     """A link the store keeps: https, on one of the video and sound sites the app knows
     (sourceinfo), never any other web address."""
-    from soundboard import sourceinfo
+    from soundboard.sounds import sourceinfo
     found = sourceinfo.site_of(url)
     return url.startswith("https://") and found is not None and found[0] != "web"
 

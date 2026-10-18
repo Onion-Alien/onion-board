@@ -10,7 +10,7 @@ from PySide6.QtWidgets import QApplication
 from test_mainwindow import window as main_window  # noqa: F401 - the real window, offscreen
 
 from soundboard import hangwatch, theme
-from soundboard.library import SoundMeta
+from soundboard.sounds.library import SoundMeta
 from soundboard.settings import SettingsDialog
 import pytest
 

@@ -439,7 +439,7 @@ def test_the_live_voice_helper_gets_the_voices_login(off, monkeypatch, tmp_path)
 
 
 def test_saved_switches_survive_load_and_unknown_keys_are_kept(app_dir):
-    from soundboard.library import Config
+    from soundboard.sounds.library import Config
     cfg = Config()
     cfg.net_off = ["radio", "a-newer-versions-switch"]
     cfg.net_offline = True

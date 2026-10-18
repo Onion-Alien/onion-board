@@ -13,7 +13,7 @@ from PySide6.QtWidgets import QApplication, QDialog
 from soundboard import __version__, engine, usage
 from soundboard.online import net
 from soundboard.control import winkeys
-from soundboard.library import Config, SoundMeta
+from soundboard.sounds.library import Config, SoundMeta
 from soundboard.ui import coach, firsttour
 from soundboard.ui import mainwindow as main
 from soundboard.ui import setupwizard

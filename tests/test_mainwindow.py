@@ -12,9 +12,10 @@ from PySide6.QtGui import QWheelEvent
 from PySide6.QtWidgets import (QApplication, QLabel, QMenu, QScrollArea, QSlider, QVBoxLayout,
                                QWidget)
 
-from soundboard import __version__, engine, library
+from soundboard import __version__, engine
+from soundboard.sounds import library
 from soundboard.control import winkeys
-from soundboard.library import SR, Config, SoundMeta
+from soundboard.sounds.library import SR, Config, SoundMeta
 from soundboard.ui import mainwindow as main
 from soundboard.ui import windowbuild
 from soundboard.ui.livedot import is_tab_live
@@ -1054,7 +1055,7 @@ def test_new_pads_never_flash_up_as_windows_of_their_own(qapp):
     up on the desktop for a moment as a little blank window (behind the splash)."""
     from PySide6.QtCore import QEvent, QObject
 
-    from soundboard.library import SoundMeta
+    from soundboard.sounds.library import SoundMeta
     from soundboard.ui.widgets import Pad, PadGrid
 
     flashed = []

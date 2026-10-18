@@ -10,7 +10,7 @@ import pytest
 import soundfile as sf
 from conftest import closed_port
 
-from soundboard import library
+from soundboard.sounds import library
 from soundboard.speech import customvoices, tts
 from soundboard.speech.customvoices import CustomVoice, VoiceSet
 from test_mainwindow import window  # noqa: F401  (the real MainWindow)

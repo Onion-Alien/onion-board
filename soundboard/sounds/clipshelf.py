@@ -21,7 +21,7 @@ from typing import ClassVar
 import numpy as np
 import soundfile as sf
 
-from soundboard import library
+from soundboard.sounds import library
 from soundboard.engine import SR
 
 log = logging.getLogger(__name__)

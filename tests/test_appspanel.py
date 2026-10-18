@@ -8,7 +8,7 @@ import pytest
 from soundboard import appaudio
 from soundboard.appaudio import App
 from soundboard.engine import Engine
-from soundboard.library import Config
+from soundboard.sounds.library import Config
 from soundboard.ui import appcapture, appspanel
 from soundboard.ui.appspanel import AppsTab
 from soundboard.ui.widgets import Meter

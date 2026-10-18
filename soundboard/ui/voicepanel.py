@@ -547,7 +547,7 @@ class VoicePanel(QWidget):
             metas = {}
 
         def load(sid: str):
-            from soundboard import library
+            from soundboard.sounds import library
             m = metas.get(sid)
             return library.load_sound(m) if m is not None else None
         self.backdrop.update(cfg, load)

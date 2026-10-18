@@ -5,8 +5,8 @@ from types import SimpleNamespace
 import pytest
 from PySide6.QtWidgets import QMessageBox
 
-from soundboard import library
-from soundboard.library import SUB_SEP, Config, SoundMeta
+from soundboard.sounds import library
+from soundboard.sounds.library import SUB_SEP, Config, SoundMeta
 from test_mainwindow import window as main_window  # noqa: F401  (the real MainWindow)
 
 

@@ -140,7 +140,7 @@ MIC_FAILS = ("unanswered", "no-start", "stuck", "silent", "no-helper", "no-mic",
 PRESS_MODES = ("overlap", "toggle", "solo", "queue")
 # the add-ons with install steps (their module.json id); any other is "other"
 ADDONS = ("ai-voices", "live-voice", "other")
-# the free sound packs (soundboard.packs BUILT_IN ids); any other is "other"
+# the free sound packs (soundboard.sounds.packs BUILT_IN ids); any other is "other"
 PACKS = ("streamer", "esports", "general", "podcast", "halloween", "gm-starter", "other")
 # the Live controls' tabs (ui/livesetups.py)
 LIVE_TABS = ("sounds", "radio", "apps")
@@ -573,7 +573,7 @@ def settle(cfg, now: float) -> None:
     if cfg.stats_sent or total_plays(cfg):
         born = cfg.stats_sent or now
         try:
-            from soundboard.library import APP_DIR
+            from soundboard.sounds.library import APP_DIR
             born = min(born, APP_DIR.stat().st_ctime)   # created, on Windows
         except (OSError, ImportError):
             pass

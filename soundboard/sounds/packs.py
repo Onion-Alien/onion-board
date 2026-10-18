@@ -25,7 +25,8 @@ from collections.abc import Callable
 from dataclasses import dataclass, field
 from pathlib import Path
 
-from soundboard import backup, library, updates
+from soundboard import backup, updates
+from soundboard.sounds import library
 from soundboard.online import net, netlog
 from soundboard.i18n import _
 

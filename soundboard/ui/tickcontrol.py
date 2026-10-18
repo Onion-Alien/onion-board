@@ -13,7 +13,7 @@ from typing import TYPE_CHECKING
 import numpy as np
 from shiboken6 import isValid
 
-from soundboard import thumbs
+from soundboard.sounds import thumbs
 from soundboard.control import winkeys
 from soundboard.groove import Groove
 from soundboard.sendfx import CEILING_DB

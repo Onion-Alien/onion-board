@@ -5,9 +5,10 @@ import numpy as np
 import pytest
 import soundfile as sf
 
-from soundboard import library, soundfx
+from soundboard.sounds import library
+from soundboard import soundfx
 from soundboard.engine import SR, Engine, loop_xf
-from soundboard.library import SoundMeta
+from soundboard.sounds.library import SoundMeta
 
 
 def sine(hz=440.0, seconds=1.0, amp=0.5):
@@ -370,7 +371,7 @@ def test_stretch_result_does_not_depend_on_the_chunk_size(chunk):
 def test_edit_dialog_colour_swatches_are_named_and_exclusive(qapp):
     """Each swatch says its colour (tooltip, screen reader) and is a checkable button
     in an exclusive group, so the chosen one reads as checked."""
-    from soundboard.library import PAD_COLORS
+    from soundboard.sounds.library import PAD_COLORS
     from soundboard.ui.dialogs import EditDialog
     from soundboard.control.winkeys import Hotkeys
     m = SoundMeta(id="a", name="Boom", file="x.wav", color=PAD_COLORS[2])

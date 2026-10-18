@@ -155,7 +155,7 @@ def isolate(conf: dict):
     sd._initialize = lambda: None
     sd._terminate = lambda: setattr(sd, "_initialized", 0)
 
-    from soundboard import library
+    from soundboard.sounds import library
     if not Path(library.APP_DIR).resolve().is_relative_to(profile):
         link.send("error", text=f"the app's data folder isn't in the run's profile: refusing "
                                 f"({library.APP_DIR})")
@@ -242,7 +242,7 @@ def isolate(conf: dict):
 
 
 def write_config(conf: dict):
-    from soundboard import library
+    from soundboard.sounds import library
     sounds = [library.SoundMeta(id=s["id"], name=s["name"], file=s["file"])
               for s in conf["sounds"]]
     c = library.Config(sounds=sounds)
@@ -429,7 +429,8 @@ class Child:
     # -- start
     def start_app(self):
         from soundboard import app as sbapp
-        from soundboard import applog, i18n, library
+        from soundboard import applog, i18n
+        from soundboard.sounds import library
         applog.setup(library.APP_DIR)
         sbapp.tune_runtime_for_audio()
         i18n.startup(library.APP_DIR)

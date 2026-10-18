@@ -5,7 +5,8 @@ sounds go."""
 import pytest
 from PySide6.QtWidgets import QMessageBox
 
-from soundboard import backup, library
+from soundboard import backup
+from soundboard.sounds import library
 from soundboard.otherboards import Entry, soundpad
 from test_mainwindow import window as main_window  # noqa: F401  (the real MainWindow)
 

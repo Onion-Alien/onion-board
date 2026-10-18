@@ -13,7 +13,7 @@ from test_triggers_module import make_module, zip_of
 
 from soundboard import updates
 from soundboard.addons import watchaddon
-from soundboard.library import SoundMeta
+from soundboard.sounds.library import SoundMeta
 from soundboard.ui import triggershost
 from soundboard.ui.livedot import is_tab_live
 from soundboard.ui.tabcontrol import TAB_INDEX
@@ -201,7 +201,7 @@ def test_the_window_loads_onion_watch_while_it_is_built(qapp, app_dir, monkeypat
 
     from soundboard import engine
     from soundboard.control import winkeys
-    from soundboard.library import Config
+    from soundboard.sounds.library import Config
     from soundboard.ui import mainwindow as main
     for name in ("set_main_device", "set_mon_device", "set_mic_device"):
         monkeypatch.setattr(engine.Engine, name, lambda self, n: None)
@@ -226,7 +226,7 @@ def watch_window(qapp, app_dir, monkeypatch, pkg, screen):
     """The real MainWindow with a made-up Onion Watch installed and `screen` saved."""
     from soundboard import engine
     from soundboard.control import winkeys
-    from soundboard.library import Config
+    from soundboard.sounds.library import Config
     from soundboard.ui import mainwindow as main
     for name in ("set_main_device", "set_mon_device", "set_mic_device"):
         monkeypatch.setattr(engine.Engine, name, lambda self, n: None)
@@ -290,7 +290,7 @@ def test_without_onion_watch_the_tab_is_not_shown_behind_the_loading_screen(
     """No add-on installed (Hoot's page): warm_triggers leaves the tabs alone."""
     from soundboard import engine
     from soundboard.control import winkeys
-    from soundboard.library import Config
+    from soundboard.sounds.library import Config
     from soundboard.ui import mainwindow as main
     for name in ("set_main_device", "set_mon_device", "set_mic_device"):
         monkeypatch.setattr(engine.Engine, name, lambda self, n: None)
@@ -646,7 +646,7 @@ class FakeTray:
 
 class FakeWindow:
     def __init__(self, headphones=True):
-        from soundboard.library import Config
+        from soundboard.sounds.library import Config
         self.cfg = Config()
         self.cfg.sounds = [SoundMeta(id="s1", name="Airhorn", file="a.wav", fingerprint="fp1")]
         self.audio = {"s1": np.zeros((10, 2), np.float32)}

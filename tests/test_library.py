@@ -4,8 +4,8 @@ from pathlib import Path
 import numpy as np
 import pytest
 
-from soundboard import library
-from soundboard.library import SR, Config, SoundMeta, level_gain, trim_silence
+from soundboard.sounds import library
+from soundboard.sounds.library import SR, Config, SoundMeta, level_gain, trim_silence
 
 
 def sine(db, seconds=2.0, hz=440):

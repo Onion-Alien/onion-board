@@ -13,7 +13,7 @@ from conftest import process_events
 from test_mainwindow import window as main_window  # noqa: F401  (the real MainWindow)
 
 from soundboard.online import net, store
-from soundboard.library import Config
+from soundboard.sounds.library import Config
 from soundboard.ui import storetab
 from soundboard.ui.tabcontrol import TAB_KEYS, rail_order
 

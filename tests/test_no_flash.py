@@ -4,7 +4,7 @@ import numpy as np
 from PySide6.QtCore import QEvent, QObject
 from PySide6.QtWidgets import QWidget
 
-from soundboard.library import SoundMeta
+from soundboard.sounds.library import SoundMeta
 from soundboard.ui import dialogs
 from soundboard.ui.appspanel import AppRow
 from soundboard.ui.widgets import Meter

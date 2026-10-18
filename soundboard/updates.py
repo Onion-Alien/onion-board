@@ -46,7 +46,7 @@ from pathlib import Path
 
 from soundboard import __version__
 from soundboard.online import net
-from soundboard.library import APP_DIR
+from soundboard.sounds.library import APP_DIR
 from soundboard import errors
 from soundboard.i18n import _
 

@@ -31,9 +31,10 @@ import uuid
 from dataclasses import dataclass, field, fields
 from pathlib import Path
 
-from soundboard import __version__, library, trash
+from soundboard import __version__, trash
+from soundboard.sounds import library
 from soundboard.i18n import _
-from soundboard.library import Config
+from soundboard.sounds.library import Config
 
 log = logging.getLogger(__name__)
 

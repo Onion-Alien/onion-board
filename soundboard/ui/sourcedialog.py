@@ -1,6 +1,6 @@
 """The pad menu's *Details* for a sound downloaded from YouTube, YouTube Music, TikTok
 or SoundCloud: its picture, title and channel, when it was uploaded and added, its
-length and views, and Open on YouTube / Copy link (soundboard.sourceinfo)."""
+length and views, and Open on YouTube / Copy link (soundboard.sounds.sourceinfo)."""
 from __future__ import annotations
 
 import html
@@ -10,7 +10,8 @@ from PySide6.QtGui import QPixmap
 from PySide6.QtWidgets import (QApplication, QDialog, QFrame, QGridLayout, QHBoxLayout,
                                QLabel, QMessageBox, QPushButton, QVBoxLayout)
 
-from soundboard import sourceinfo, theme, usage
+from soundboard.sounds import sourceinfo
+from soundboard import theme, usage
 from soundboard.i18n import _
 from soundboard.ui import busy, fit, icons
 

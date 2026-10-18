@@ -3,7 +3,8 @@ never mixed up with the mic test's recording), its spool, and the window."""
 import numpy as np
 from PySide6.QtWidgets import QApplication, QMessageBox
 
-from soundboard import library, recorder
+from soundboard.sounds import library
+from soundboard import recorder
 from soundboard.engine import SR, Engine
 from soundboard.recorder import MicTake
 from soundboard.ui import recordmic
@@ -238,7 +239,7 @@ def test_the_window_adds_a_recording_as_a_selected_pad(window, monkeypatch):  # 
 def test_a_recording_of_a_playing_pad_gets_its_picture(window, tmp_path):  # noqa: F811
     from PySide6.QtGui import QColor, QImage
 
-    from soundboard import thumbs
+    from soundboard.sounds import thumbs
     img = QImage(64, 64, QImage.Format_RGB32)
     img.fill(QColor("#00ff00"))
     src = window.meta("s0")
@@ -267,7 +268,7 @@ def test_a_recording_of_a_playing_pad_gets_its_picture(window, tmp_path):  # noq
 def test_the_main_window_names_the_playing_pads_picture(window, monkeypatch):  # noqa: F811
     from PySide6.QtGui import QColor, QImage
 
-    from soundboard import thumbs
+    from soundboard.sounds import thumbs
     img = QImage(8, 8, QImage.Format_RGB32)
     img.fill(QColor("#0000ff"))
     assert thumbs.set_image(window.meta("s0"), img)
@@ -412,7 +413,7 @@ def test_the_voice_tabs_record_button_opens_the_record_window(window):  # noqa: 
 
 
 def test_the_voice_tabs_record_keeps_it_in_recordings_not_sounds(window):  # noqa: F811
-    from soundboard.clipshelf import VoiceClip, clips_dir
+    from soundboard.sounds.clipshelf import VoiceClip, clips_dir
     recs = window.voice.recordings
     sounds = len(window.cfg.sounds)
     window.soundctl.record_dialog(quick=True)

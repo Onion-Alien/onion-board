@@ -3,8 +3,8 @@ foreground window, and the board following it."""
 import pytest
 
 from soundboard import backup
-from soundboard.catswitch import Switcher
-from soundboard.library import Config, clean_programs
+from soundboard.sounds.catswitch import Switcher
+from soundboard.sounds.library import Config, clean_programs
 
 from test_mainwindow import window  # noqa: F401  (the real MainWindow)
 
@@ -115,7 +115,7 @@ def test_rules_round_trip_through_save_and_load(app_dir):
 def test_old_settings_without_the_field_load(app_dir):
     import json
 
-    from soundboard import library
+    from soundboard.sounds import library
     library.CONFIG_PATH.parent.mkdir(parents=True, exist_ok=True)
     library.CONFIG_PATH.write_text(json.dumps({"version": 5, "categories": ["Game"]}),
                                    encoding="utf-8")

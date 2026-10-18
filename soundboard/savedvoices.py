@@ -23,7 +23,8 @@ import uuid
 import zlib
 from pathlib import Path
 
-from soundboard import library, trash, voicefx
+from soundboard.sounds import library
+from soundboard import trash, voicefx
 from soundboard.i18n import _
 
 log = logging.getLogger(__name__)
