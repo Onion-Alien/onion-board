@@ -53,7 +53,7 @@ def test_every_one_off_command_leaves_no_breadcrumb():
     # it's written (a one-off command there would leave a breadcrumb behind)
     src = (root / "soundboard" / "core" / "app.py").read_text(encoding="utf-8")
     body = src[src.index("\ndef main():"):]
-    early = body[:body.index("from soundboard import bootmark")]
+    early = body[:body.index("from soundboard.core import bootmark")]
     assert "ONE_OFF_COMMANDS" in early
     assert not re.findall(r'"--[a-z-]+"', early), re.findall(r'"--[a-z-]+"', early)
 

@@ -84,7 +84,7 @@ def test_imports_inside_functions_and_by_name_are_followed(tmp_path, monkeypatch
         (tmp_path / "tests" / f"{name}.py").write_text(text, encoding="utf-8")
     monkeypatch.setattr(pick_tests, "ROOT", tmp_path)
     monkeypatch.setattr(pick_tests, "TESTS", tmp_path / "tests")
-    assert pick_tests.pick(["soundboard/core/usage.py"]) == ["tests/test_local.py"]
+    assert pick_tests.pick(["soundboard/usage.py"]) == ["tests/test_local.py"]
     assert pick_tests.pick(["soundboard/theme.py"]) == [
         "tests/test_byname.py", "tests/test_method.py"]
     assert pick_tests.pick(["soundboard/lazy.py"]) == ["tests/test_byname.py"]
