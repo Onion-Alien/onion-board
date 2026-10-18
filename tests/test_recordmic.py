@@ -444,6 +444,7 @@ def test_recordings_play_for_me_through_mic_and_add_to_sounds(window, monkeypatc
     QApplication.processEvents()
     it = recs._items[c.id]
     recs.list.setCurrentItem(it)                                # picked: its buttons show
+    it.setSelected(True)   # (as a click does: current alone, from the focus, isn't picked)
     row = recs.row_actions.buttons
     assert recs.row_actions.isVisibleTo(recs) and recs._actions_item is it
     assert all(b.toolTip() and b.accessibleName() for b in row.values())
