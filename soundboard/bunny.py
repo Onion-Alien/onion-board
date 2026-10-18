@@ -256,30 +256,23 @@ def _arm(p: QPainter, arm, fur: QColor, ink: QPen):
     p.drawPath(_limb(a, c, b, r0, PAW_R))
 
 
-def _prop_arm(shoulder, paw):
-    """An arm reaching from `shoulder` to a prop at `paw`, the elbow sagging a little."""
-    mx, my = (shoulder[0] + paw[0]) / 2, (shoulder[1] + paw[1]) / 2
-    dx, dy = paw[0] - shoulder[0], paw[1] - shoulder[1]
-    d = math.hypot(dx, dy) or 1.0
-    nx, ny = -dy / d, dx / d
-    if ny < 0:
-        nx, ny = -nx, -ny
-    return (shoulder, (mx + nx * 3, my + ny * 3), paw, 4.4)
+def _prop_bend(i: int, paw):
+    """The elbow of arm `i` reaching from its shoulder to a prop at `paw`: out to his
+    side and sagging a little. The higher the paw (up by his face), the further out it
+    swings, so the arm shows beside his head instead of hiding under it."""
+    (sx, sy), out = SHOULDERS[i], 1 if i == 1 else -1
+    low = ((sx + paw[0]) / 2 + 3.5 * out, (sy + paw[1]) / 2 + 3.0)
+    return _lerp(low, (sx + 16 * out, sy + 4), max(0.0, min(1.0, (sy - paw[1]) / 20)))
 
 
 def _reach(p: QPainter, prop, fur: QColor, ink: QPen, head_xf: QTransform):
-    """The arms a prop takes (one or both), reaching out to it from behind his body."""
-    reach = PROP_PAWS.get(prop or "", (None, None))
-    for i in (0, 1):
-        if reach[i] is not None:
-            to = reach[i]
-            if prop == "headphones":   # (on the ear cup: it moves with his head)
-                q = head_xf.map(QPointF(*to))
-                to = (q.x(), q.y())
-            if prop == "headphones":   # up past his cheek, elbow out
-                _arm(p, ((62, 95), (85, 95), to, 5.4), fur, ink)
-            else:
-                _arm(p, _prop_arm((41, 97) if i == 0 else (59, 97), to), fur, ink)
+    """The arm up to his ear cup ("headphones"), from behind his body and head. Other
+    props' arms come from his shoulders in front of his body, like his free ones
+    (_paws)."""
+    if prop != "headphones":
+        return
+    q = head_xf.map(QPointF(*PROP_PAWS["headphones"][1]))   # (it moves with his head)
+    _arm(p, ((62, 95), (85, 95), (q.x(), q.y()), 5.4), fur, ink)   # up past his cheek
 
 
 def _wave_paw(wave: float):
@@ -289,27 +282,36 @@ def _wave_paw(wave: float):
 
 
 def _paws(p: QPainter, prop, sad: float, angry: float, paw_fur: QColor, ink: QPen,
-          sleeve: QColor | None = None, waving: bool = False):
+          sleeve: QColor | None = None, waving: bool = False, hold: tuple | None = None):
     """His arms, from the sides of his body to his paws: they bring the paws together
     under his chin as `sad` grows (hoping) and go on his hips, elbows out, when he's
-    cross (`angry`). An arm a prop takes isn't here: it's out holding it (_reach)."""
+    cross (`angry`). An arm a prop takes goes from his shoulder out to it, its paw left
+    to the prop (the one on his ear cup is _reach's)."""
     clasp = cross = 0.0
     if prop is None:
         cross = _smooth((angry - 0.35) / 0.4)
         clasp = _smooth((sad - 0.3) / 0.45) * (1 - cross)
     reach = PROP_PAWS.get(prop or "", (None, None))
+    if hold is not None and prop is None:   # (a skit's paws, holding its things)
+        reach = hold
     fur = sleeve or paw_fur
+    st = QPainterPathStroker()
+    st.setWidth(2 * ARM_R)
+    st.setCapStyle(Qt.PenCapStyle.RoundCap)
+    st.setJoinStyle(Qt.PenJoinStyle.RoundJoin)
     for i in (0, 1):
-        if reach[i] is not None or (waving and i == 1):
+        if prop == "headphones" and reach[i] is not None or (waving and i == 1):
+            continue
+        line = QPainterPath(QPointF(*SHOULDERS[i]))
+        if reach[i] is not None:   # out to the prop, which draws the paw holding it
+            line.quadTo(QPointF(*_prop_bend(i, reach[i])), QPointF(*reach[i]))
+            p.setPen(ink)
+            p.setBrush(fur)
+            p.drawPath(st.createStroke(line).simplified())
             continue
         (bx, by), (px, py) = (_lerp(_lerp(ARMS_REST[i][k], ARMS_HOPE[i][k], clasp),
                                     ARMS_CROSS[i][k], cross) for k in (0, 1))
-        line = QPainterPath(QPointF(*SHOULDERS[i]))
         line.quadTo(QPointF(bx, by), QPointF(px, py))
-        st = QPainterPathStroker()
-        st.setWidth(2 * ARM_R)
-        st.setCapStyle(Qt.PenCapStyle.RoundCap)
-        st.setJoinStyle(Qt.PenJoinStyle.RoundJoin)
         arm = st.createStroke(line).united(_oval(px, py, 2 * PAW_R, 2 * PAW_R)).simplified()
         p.setPen(ink)
         p.setBrush(fur)
@@ -421,7 +423,8 @@ def draw_bunny(p: QPainter, rect: QRectF, prop: str | None = None, *,
                nightcap: bool = False, robot: bool = False, smug: bool = False,
                outfit: tuple[str, ...] | None = None, led: float = 0.0,
                nod: float = 0.0, dip: float = 0.0, look: float = 0.0,
-               kit: dict | None = None, wave: float | None = None, kick: float = 0.0):
+               kit: dict | None = None, wave: float | None = None, kick: float = 0.0,
+               hold: tuple | None = None):
     """Draw Bun fitted (aspect kept, centred) into `rect`. The keywords pose Bun for
     animation (ui/bunnywidget.py): `blink` 0..1 closes the eyes, `mouth` 0..1 opens
     the mouth (talking), `ears` tilts both ears outward by that many degrees,
@@ -442,7 +445,9 @@ def draw_bunny(p: QPainter, rect: QRectF, prop: str | None = None, *,
     `kick` -1..1 moves his left foot (the viewer's right): back under him (-1), out in
     front, lifted, toes up (1): a sulky kick at the ground.
     `kit`: his look (bunnyfit.look: fur, floppy ears, extras, tail, eye / ear / nose
-    colours, markings, belly, pads; None: the current theme's)."""
+    colours, markings, belly, pads; None: the current theme's).
+    `hold` (left, right): canvas points where the caller draws his paws (a skit's, holding
+    something; None: that arm's free). Those arms reach there from his shoulders."""
     fit = () if robot else bunnyfit.outfit() if outfit is None else outfit
     if kit is None:
         kit = bunnyfit.look()
@@ -657,7 +662,8 @@ def draw_bunny(p: QPainter, rect: QRectF, prop: str | None = None, *,
     # round his neck goes over his head's chin, after it
     worn = tuple(n for n in body if n not in bunnyfit.NECK)
     bunnyfit.draw(p, worn, "face", ink, hats=not nightcap)
-    _paws(p, prop, sad, angry, fur, ink, None if robot else bunnyfit.sleeve(fit), waving)
+    _paws(p, prop, sad, angry, fur, ink, None if robot else bunnyfit.sleeve(fit), waving,
+          hold)
     p.save()
     head()
     bunnyfit.draw(p, fit_head, "back", ink)

@@ -1458,7 +1458,8 @@ class BunnyWidget(QWidget):
                        nod=pose["nod"] + pose.get("tilt", 0.0), dip=pose["dip"],
                        smug=pose["smug"],
                        outfit=pose["outfit"], look=pose.get("look", 0.0),
-                       kick=pose.get("kick", 0.0))
+                       kick=pose.get("kick", 0.0),
+                       hold=None if kit is None else bunskits.held_paws(kit))
             if kit is not None:
                 self._paint_kit(p, body, kit.front)
             p.restore()

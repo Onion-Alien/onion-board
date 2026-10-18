@@ -1,0 +1,1 @@
+- Bun's arm now comes from his shoulder when he holds something (the mic, the bat, the hammer, his idle skits' props), instead of poking out from behind his body or floating as a third paw.
