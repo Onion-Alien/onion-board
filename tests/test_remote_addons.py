@@ -1,9 +1,9 @@
-"""Remote add-ons (soundboard.addons.modules kind "remote", soundboard.ui.settings.remotehost), with a
-tiny add-on made for the test: found and loaded at start-up, its card on Settings →
-Remote, a broken one left out of Settings, and the lan server it gets from the
-host: its page with no key, the API with its key, only its actions, wrong-key
-lock-out, only local peers. A real server on a free 127.0.0.1 port stands in for the
-PC's address on the Wi-Fi."""
+"""Remote add-ons (soundboard.addons.modules kind "remote",
+soundboard.ui.settings.remotehost), with a tiny add-on made for the test: found and
+loaded at start-up, its card on Settings → Remote, a broken one left out of Settings,
+and the lan server it gets from the host: its page with no key, the API with its key,
+only its actions, wrong-key lock-out, only local peers. A real server on a free
+127.0.0.1 port stands in for the PC's address on the Wi-Fi."""
 import http.client
 import ipaddress
 import json

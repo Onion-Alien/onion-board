@@ -1039,7 +1039,7 @@ def test_update_check_keeps_focus_and_blocks_repeat_clicks(window, qapp, monkeyp
 @pytest.mark.parametrize("index", [0, 1])
 @pytest.mark.parametrize("error", [False, True])
 def test_downloader_actions_keep_focus_and_block_overlap(window, qapp, monkeypatch, index, error):  # noqa: F811
-    from soundboard.ui.settingspages import connection
+    from soundboard.ui.settings import connection
     monkeypatch.setattr(net, "allowed", lambda key: True)
     workers = []
 
@@ -1162,7 +1162,7 @@ def test_helper_lookup_finishing_after_window_closed(qapp):
 
     import shiboken6
 
-    from soundboard.ui.settingspages.privacy import PrivacyPage
+    from soundboard.ui.settings.privacy import PrivacyPage
     mw = QObject()
     shown, go = [], threading.Event()
     page = SimpleNamespace(mw=mw, _helpers_show=shown.append)

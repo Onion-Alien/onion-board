@@ -1,5 +1,5 @@
 """Settings window (a page inside the main window): the dialog, its categories and search,
-and the card helpers its pages share. The pages themselves are in ui/settingspages/."""
+and the card helpers its pages share. The pages themselves are in ui/settings/."""
 from __future__ import annotations
 
 import html
@@ -21,18 +21,17 @@ from soundboard.ui.bun import onionalien
 from soundboard.ui.kit import theme
 from soundboard.core import usage
 from soundboard.i18n import _
-from soundboard.ui.settingspages import Built, _button_row as _button_row
-from soundboard.ui.settingspages.help import HelpPage
-from soundboard.ui.settingspages.audio import AudioPage
-from soundboard.ui.settingspages.appearance import AppearancePage, ThemeCard, ThemeGrid as ThemeGrid
-from soundboard.ui.settingspages.keys import (KeysPage, HOTKEY_ACTIONS as HOTKEY_ACTIONS,
-                                              HotkeyDialog as HotkeyDialog,
-                                              pretty_key as pretty_key)
-from soundboard.ui.settingspages.general import GeneralPage
-from soundboard.ui.settingspages.connection import ConnectionPage
-from soundboard.ui.settingspages.privacy import PrivacyPage
-from soundboard.ui.settingspages.addons import AddonsPage
-from soundboard.ui.settingspages.heading import Heading, _BackArrow, _Mark
+from soundboard.ui.settings import Built, _button_row as _button_row
+from soundboard.ui.settings.help import HelpPage
+from soundboard.ui.settings.audio import AudioPage
+from soundboard.ui.settings.appearance import AppearancePage, ThemeCard, ThemeGrid as ThemeGrid
+from soundboard.ui.settings.keys import (KeysPage, HOTKEY_ACTIONS as HOTKEY_ACTIONS,
+                                         HotkeyDialog as HotkeyDialog, pretty_key as pretty_key)
+from soundboard.ui.settings.general import GeneralPage
+from soundboard.ui.settings.connection import ConnectionPage
+from soundboard.ui.settings.privacy import PrivacyPage
+from soundboard.ui.settings.addons import AddonsPage
+from soundboard.ui.settings.heading import Heading, _BackArrow, _Mark
 
 log = logging.getLogger(__name__)
 
@@ -84,7 +83,7 @@ class SettingsDialog(QDialog, Built):
         the first time it's shown. Building all twelve under the app's style sheet took
         a second or two on every click of the cog; the tests build them all at once."""
         super().__init__(mw)
-        # The pages (soundboard/ui/settingspages), before anything builds one.
+        # The pages (soundboard/ui/settings), before anything builds one.
         self.help = HelpPage(self)
         self.audio = AudioPage(self)
         self.appearance = AppearancePage(self)

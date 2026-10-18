@@ -176,7 +176,7 @@ def test_auto_ptt_goes_down_with_the_sound_not_on_the_next_tick(window, qapp, mo
 def test_the_overlay_page_names_its_hotkey(window, qapp):  # noqa: F811
     """Settings > Overlay is built after Hotkeys: its hotkey button still says the key
     (it was blank)."""
-    from soundboard.ui.settingspages.keys import pretty_key
+    from soundboard.ui.settings.keys import pretty_key
     window.cfg.overlay_hotkey = "alt+`"
     d = window.setctl.open_settings("hotkeys")
     d.show_page("overlay")

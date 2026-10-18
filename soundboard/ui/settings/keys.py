@@ -16,7 +16,7 @@ from soundboard.ui.sounds import overlay as ovl
 # menus use them without loading Settings); here for the page and older imports
 from soundboard.ui.kit.hotkeypick import (HOTKEY_ACTIONS, HOTKEY_GROUP_ICONS, HOTKEY_GROUPS,
                                           HotkeyDialog, pretty_key)
-from soundboard.ui.settingspages import Page, _button_row
+from soundboard.ui.settings import Page, _button_row
 from soundboard.ui.kit.wheelguard import no_wheel
 
 log = logging.getLogger(__name__)

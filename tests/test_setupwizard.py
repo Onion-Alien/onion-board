@@ -1359,7 +1359,7 @@ def test_the_first_launch_backdrop(qapp, app_dir, devices):
 
 
 def test_the_theme_grid_keeps_to_its_columns(qapp):
-    from soundboard.ui.settingspages.appearance import ThemeCard, ThemeGrid
+    from soundboard.ui.settings.appearance import ThemeCard, ThemeGrid
     cards = [ThemeCard(n) for n in setupwizard.look_themes()]
     grid = ThemeGrid(cards, max_columns=3)
     grid.resize(900, 400)   # room for five across

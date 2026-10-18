@@ -31,7 +31,7 @@ floating Bun: `in_background=True` keeps him moving behind a game), the empty bo
 card (`ui/voice/aivoicepanel.py`). `SetupShow` in the setup guide; `ScribeBunny` in the
 download bar (`ui/downloadbar.py`); static pictures in `ui/sounds/dialogs.py` and the smug box in
 `ui/mainwindow.py`; each theme's card in Settings > Appearance
-(`ui/settingspages/appearance.py`: Bun as he looks in that theme, drawn once per theme with
+(`ui/settings/appearance.py`: Bun as he looks in that theme, drawn once per theme with
 room above him for an upright ear or a tall hat; when the mouse comes onto a card he hops
 and waves, `wave_pose`, unless Windows animations are off). To find new ones: grep for `draw_bunny`, `BunnyWidget`, `bunny_pixmap`.
 

@@ -6,7 +6,7 @@ from PySide6.QtWidgets import QCheckBox, QComboBox, QGridLayout, QLabel, QPushBu
 
 from soundboard.i18n import _, ngettext
 from soundboard.ui.kit import busy, icons
-from soundboard.ui.settingspages import Page, _button_row
+from soundboard.ui.settings import Page, _button_row
 from soundboard.ui.kit.wheelguard import no_wheel
 
 

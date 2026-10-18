@@ -1249,7 +1249,7 @@ def test_packs_settings_pages_and_ytdlp_buttons_count_by_fixed_names():
     their key, yt-dlp's buttons by their job: every name is in FEATURES."""
     from soundboard.sounds import packs
     from soundboard.online import ytdl
-    from soundboard.ui.settingspages import connection
+    from soundboard.ui.settings import connection
     ids = {p.id for p in packs.built_in()}
     assert ids and ids <= set(usage.PACKS)
     assert {usage.pack_tag(i) for i in ids} == ids

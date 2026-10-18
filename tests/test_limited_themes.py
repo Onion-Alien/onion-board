@@ -57,7 +57,7 @@ def test_using_it_in_the_app_keeps_and_saves_it(window, monkeypatch):  # noqa: F
 
 
 def test_the_card_has_the_tag_and_says_until_when(qapp, monkeypatch):
-    from soundboard.ui.settingspages.appearance import ThemeCard, limited_tip
+    from soundboard.ui.settings.appearance import ThemeCard, limited_tip
     monkeypatch.setattr(theme, "kept", set())
     card, plain = ThemeCard("Halloween"), ThemeCard("Dark")
     assert card.toolTip() == limited_tip("Halloween") and "31" in card.toolTip()

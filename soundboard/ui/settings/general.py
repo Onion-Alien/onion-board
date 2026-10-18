@@ -8,7 +8,7 @@ from soundboard.mic import appsetup, profiles
 from soundboard.core import autostart
 from soundboard.i18n import _
 from soundboard.ui.kit import busy, icons
-from soundboard.ui.settingspages import Page
+from soundboard.ui.settings import Page
 from soundboard.ui.kit.wheelguard import no_wheel
 
 

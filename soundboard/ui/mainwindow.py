@@ -388,7 +388,7 @@ class MainWindow(QMainWindow):
     wordmark: QLabel
     ytresults: SearchResults
 
-    # ---- kept by Settings → Remote across openings (ui/settingspages/addons.py)
+    # ---- kept by Settings → Remote across openings (ui/settings/addons.py)
     pocket_card: Any
     pocket_checked: float
     pocket_offer: Any

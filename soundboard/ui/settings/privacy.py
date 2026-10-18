@@ -11,7 +11,7 @@ from shiboken6 import isValid as qt_valid
 
 from soundboard.i18n import _
 from soundboard.ui.kit import busy, icons
-from soundboard.ui.settingspages import Page, _button_row
+from soundboard.ui.settings import Page, _button_row
 from soundboard.ui.kit.wheelguard import no_wheel
 
 log = logging.getLogger(__name__)

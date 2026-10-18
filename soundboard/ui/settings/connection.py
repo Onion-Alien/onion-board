@@ -13,7 +13,7 @@ from soundboard.ui.kit import theme
 from soundboard.online import ytdl
 from soundboard.i18n import _
 from soundboard.ui.kit import busy
-from soundboard.ui.settingspages import Page
+from soundboard.ui.settings import Page
 from soundboard.ui.kit.wheelguard import no_wheel
 
 # the yt-dlp buttons' jobs (ytdl.update, reset, force_newest) as the count's names

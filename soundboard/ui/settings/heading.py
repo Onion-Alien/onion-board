@@ -9,7 +9,7 @@ from PySide6.QtWidgets import QLabel, QPushButton, QStyle, QStyleOptionButton, Q
 from shiboken6 import isValid as qt_valid
 
 from soundboard.ui.kit import icons
-from soundboard.ui.settingspages import Page
+from soundboard.ui.settings import Page
 
 
 def _ink_rows(img: QImage) -> float:

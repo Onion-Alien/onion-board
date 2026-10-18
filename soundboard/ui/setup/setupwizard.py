@@ -812,7 +812,7 @@ class SetupWizard(QDialog):
         """First launch only: the language, a theme, and starting with Windows."""
         from soundboard import i18n
         from soundboard.ui.settings.langpick import LangButton
-        from soundboard.ui.settingspages.appearance import ThemeCard, ThemeGrid
+        from soundboard.ui.settings.appearance import ThemeCard, ThemeGrid
         p = QWidget()
         v = QVBoxLayout(p)
         v.addLayout(_header(_("All set! Last thing: make it yours"),

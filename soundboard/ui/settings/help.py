@@ -7,7 +7,7 @@ from PySide6.QtWidgets import QHBoxLayout, QLabel, QPushButton, QVBoxLayout, QWi
 
 from soundboard.i18n import _, ngettext
 from soundboard.ui.kit import busy, icons
-from soundboard.ui.settingspages import Page, _button_row
+from soundboard.ui.settings import Page, _button_row
 
 
 # Plain words, not a contract: the LICENSE file is the real terms.
