@@ -33,8 +33,8 @@ from soundboard.ui.kit.panel import (EmptyList, RoundedFrame, VolumeControl, bar
                                      vsep)
 # the station list and its filters live in radiolist.py; their names stay importable here
 from soundboard.ui.radio.radiolist import (GENRE_LABELS, GENRES, LIST_MAX,  # noqa: F401
-                                     MAP_CACHE, QUALITIES, ROW_H, SORTS, StationList,
-                                     _FilterRow, _StationDelegate, in_genre)
+                                           MAP_CACHE, QUALITIES, ROW_H, SORTS, StationList,
+                                           _FilterRow, _StationDelegate, in_genre)
 from soundboard.ui.sounds.speedpitch import SpeedPitchButton
 from soundboard.ui.kit.widgets import paint_now_playing
 from soundboard.ui.kit.pixels import snap_to_pixels

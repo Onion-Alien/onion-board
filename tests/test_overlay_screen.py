@@ -69,7 +69,7 @@ def test_no_match_returns_none():
 from PySide6.QtCore import QSize  # noqa: E402
 
 from soundboard.ui.sounds.overlay import (OverlaySettings, find_screen, monitor_choices,  # noqa: E402
-                                   place, screen_key)
+                                          place, screen_key)
 
 
 def test_a_saved_monitor_is_found_by_key_then_by_a_unique_name():

@@ -38,10 +38,10 @@ from soundboard.ui.kit.widgets import InlineNameBox, widget_at
 from soundboard.ui.apps.appcapture import METER_MS, AppCapture
 # the cards and their helpers live in approw.py; their names stay importable from here
 from soundboard.ui.apps.approw import (APP_CATEGORIES, APP_DRAG_MIME,  # noqa: F401
-                                  CATEGORY_DRAG_MIME, HIDDEN_FULL_S, MAX_VOL, TO, TO_KEYS,
-                                  AppCategoryHeading, AppGrid, AppRow, ElidedLabel,
-                                  _Lister, _route, app_category, category_label,
-                                  is_path_key, path_key, saved_volume)
+                                       CATEGORY_DRAG_MIME, HIDDEN_FULL_S, MAX_VOL, TO, TO_KEYS,
+                                       AppCategoryHeading, AppGrid, AppRow, ElidedLabel,
+                                       _Lister, _route, app_category, category_label,
+                                       is_path_key, path_key, saved_volume)
 from soundboard.ui.bunnywidget import BunnyWidget
 from soundboard.ui.apps.clipeditor import WAVE_H
 from soundboard.ui.apps.clipshelf import ClipShelf
