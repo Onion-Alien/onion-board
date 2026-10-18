@@ -5,6 +5,8 @@
 //
 // What's synced is live at once and votes, reports and the owner's review work on it as
 // on any other sound; a rejected or reported one is never brought back by a later sync.
+// Anyone can put a sound on Myinstants, so a name with a link or one of the owner's blocked
+// words (words.js) is left out, as it would be from someone sharing it here.
 
 export const MYINSTANTS = "https://www.myinstants.com";
 // Myinstants' categories, and the store's own name for each
@@ -48,9 +50,10 @@ async function page(url, fetcher) {
 }
 
 // one cron run: the trending page (the store's Trending order), then the next page of
-// the cycle. `tools` = index.js's helpers (sha256, linkKey, cleanName, now, logAction).
+// the cycle. `tools` = index.js's helpers (sha256, linkKey, cleanName, now, logAction, refuse).
 export async function syncStep(env, tools, fetcher = fetch) {
-  const { sha256, linkKey, cleanName, now, logAction } = tools;
+  const { sha256, linkKey, cleanName, now, logAction, refuse } = tools;
+  const blocked = String(env.CHAT_BLOCK || "").split(",");
   const state = await env.DB.prepare("SELECT value FROM sync WHERE key = 'myinstants'").first();
   const [cursor, cycles] = (state?.value || "0:0").split(":").map(n => parseInt(n) || 0);
   const all = jobs();
@@ -65,7 +68,7 @@ export async function syncStep(env, tools, fetcher = fetch) {
     for (const [i, h] of hits.entries()) {
       const key = linkKey(h.link);
       const name = cleanName(h.title);
-      if (!key || !name) continue;
+      if (!key || !name || refuse(name, blocked)) continue;
       const pop = cat ? Math.max(0, 1000 - (rankFrom + i) * 5) : 0;
       stmts.push(env.DB.prepare(
         "INSERT INTO sounds (id, name, tags, ext, link, size, sha256, author, uploader, ip, " +

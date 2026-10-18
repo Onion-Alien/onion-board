@@ -3,7 +3,7 @@ import test from "node:test";
 import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import { DatabaseSync } from "node:sqlite";
-import worker, { prune, catCounts, overLimit } from "../src/index.js";
+import worker, { prune, catCounts, overLimit, addressKey } from "../src/index.js";
 import { jobs, parseMyinstants } from "../src/sync.js";
 import { audioType } from "../src/audio.js";
 
@@ -763,4 +763,114 @@ test("the free plan's daily limit used up: 503 'maintenance' with when it's back
   assert.equal(bug.body.error, "server");
   assert.ok(overLimit(new Error("KV get() limit exceeded for the day.")));
   assert.ok(!overLimit(new Error("network connection lost")));
+});
+
+// ------------------------------------------------------------------ abuse
+
+test("an IPv6 address counts as its /64 (its /48 for reports); IPv4 as itself", () => {
+  assert.equal(addressKey("1.2.3.4"), "1.2.3.4");
+  assert.equal(addressKey("2001:db8:1:2:aaaa::1"), "2001:db8:1:2::/64");
+  assert.equal(addressKey("2001:DB8:1:2:ffff:ffff:ffff:ffff"), "2001:db8:1:2::/64");
+  assert.equal(addressKey("2001:0db8:0001:0002::"), "2001:db8:1:2::/64");
+  assert.equal(addressKey("2001:db8::1"), "2001:db8:0:0::/64");
+  assert.equal(addressKey("::1"), "0:0:0:0::/64");
+  assert.equal(addressKey("fe80::1%eth0"), "fe80:0:0:0::/64");
+  assert.equal(addressKey("::ffff:1.2.3.4"), "1.2.3.4");
+  assert.equal(addressKey("2001:db8:1:2:3:4:5:6", 48), "2001:db8:1::/48");
+});
+
+test("new IPv6 addresses in one /64 don't get around the address limits", async () => {
+  const env = store();
+  const ip = i => `2001:db8:1:2::${(i + 1).toString(16)}`;
+  for (let i = 0; i < 20; i++)
+    assert.equal((await share(env, "boom", { install: INSTALL + i.toString(16).padStart(4, "0"), ip: ip(i) })).status, 201);
+  assert.equal((await share(env, "boom", { install: "f".repeat(24), ip: ip(99) })).status, 429);
+  assert.equal((await share(env, "boom", { install: "f".repeat(24), ip: "2001:db8:1:3::1" })).status, 201);
+});
+
+test("reports from one IPv6 /48 count once, so they can't take a sound off", async () => {
+  const env = store();
+  const id = await live(env);
+  for (const ip of ["2001:db8:1:1::1", "2001:db8:1:2::1", "2001:db8:1:ffff::1"])
+    await call(env, `/v1/sounds/${id}/report`, { method: "POST", json: { reason: "other" }, ip });
+  assert.equal(env.DB.rows("SELECT reports, status FROM sounds")[0].reports, 1);
+  assert.equal((await call(env, "/v1/sounds")).body.sounds.length, 1);
+  await call(env, `/v1/sounds/${id}/report`, { method: "POST", json: { reason: "other" }, ip: "2001:db8:2::1" });
+  await call(env, `/v1/sounds/${id}/report`, { method: "POST", json: { reason: "other" }, ip: "9.9.9.9" });
+  assert.equal((await call(env, "/v1/sounds")).body.sounds.length, 0);
+});
+
+test("a search reads what it finds, never the whole table; short words look at a bounded part", async () => {
+  const env = store();
+  await step(env);
+  await live(env, "Air horn");
+  const b = await live(env, "bruh moment");
+  const names = async q => (await call(env, "/v1/sounds" + q)).body.sounds.map(s => s.name).sort();
+  assert.deepEqual(await names("?q=orn"), ["Air horn"]);            // in the middle of a word
+  assert.deepEqual(await names("?q=BRUH"), ["Bruh & co", "bruh moment"]);
+  assert.deepEqual(await names("?q=bruh%20mo"), ["bruh moment"]);  // a short word with a long one
+  assert.deepEqual(await names("?q=oo"), ["ROBLOX oof", "VINE BOOM"]);   // only a short word
+  assert.deepEqual(await names('?q=%22bruh'), []);                  // quotes are just letters
+  assert.deepEqual(await names("?q=games"), ["Mario jump", "ROBLOX oof", "VINE BOOM"]);   // tags
+  // a rename is found under its new name only
+  await call(env, `/v1/admin/sounds/${b}`, { method: "POST", admin: true, json: { action: "rename", name: "huh moment" } });
+  assert.deepEqual(await names("?q=bruh"), ["Bruh & co"]);
+  assert.deepEqual(await names("?q=huh"), ["huh moment"]);
+  for (const q of ["?q=nothing", "?q=bruh&sort=new", "?q=oo&sort=trending&cat=games", "?q=a%20b"]) {
+    const from = env.DB.seen.length;
+    assert.equal((await call(env, "/v1/sounds" + q)).status, 200);
+    for (const [, p] of plans(env, from)) {
+      // a short word's look through part of the list: the part read through an index (LIMIT
+      // SHORT_SCAN), then only those rows gone through ("SCAN s" of the co-routine)
+      const part = p[0] === "CO-ROUTINE s";
+      if (part) assert.match(p[1], /^SEARCH s USING INDEX sounds_/, q);
+      assert.deepEqual(p.filter(d => /^SCAN (s|sounds)$/.test(d) && !part), [], q);
+    }
+  }
+});
+
+test("a sync step that reads the same sounds again doesn't rewrite their search rows", async () => {
+  const env = store();
+  await step(env);
+  const before = env.DB.rows("SELECT rowid, * FROM sounds_fts ORDER BY rowid");
+  env.DB.db.exec("UPDATE sync SET value = '0:0'");
+  const data = () => env.DB.rows("SELECT count(*) AS n, max(rowid) AS top FROM sounds_fts_data")[0];
+  const was = data();
+  await step(env);
+  assert.deepEqual(env.DB.rows("SELECT rowid, * FROM sounds_fts ORDER BY rowid"), before);
+  assert.deepEqual(data(), was);   // the index wasn't written to at all
+  assert.equal(before.length, env.DB.rows("SELECT count(*) AS n FROM sounds")[0].n);
+});
+
+test("lists page only so far down", async () => {
+  const env = store();
+  const from = env.DB.seen.length;
+  assert.equal((await call(env, "/v1/sounds?offset=999999")).status, 200);
+  assert.ok(env.DB.seen.slice(from).some(([, a]) => a.at(-1) === 2000));
+});
+
+test("list pages and files are rate limited per address (the READS binding)", async () => {
+  const keys = [];
+  const env = store({ READS: { async limit({ key }) { keys.push(key); return { success: keys.length <= 2 }; } } });
+  const id = await live(env);
+  assert.equal((await call(env, "/v1/sounds")).status, 200);
+  assert.equal((await call(env, `/v1/sounds/${id}/file`)).status, 200);
+  const r = await call(env, "/v1/sounds");
+  assert.equal(r.status, 429);
+  assert.equal(r.body.error, "slow down");
+  assert.equal((await call(env, `/v1/sounds/${id}/file`)).status, 429);
+  assert.match(keys[0], /^read:[0-9a-f]{64}$/);   // a salted hash, never the address
+  assert.match(keys[1], /^file:[0-9a-f]{64}$/);
+});
+
+test("a synced sound whose name has a blocked word or a link is left out", async () => {
+  const env = store({ CHAT_BLOCK: "oof" });
+  PAGES.games += button("spam", "free robux at scam.com");
+  try {
+    await step(env);
+  } finally {
+    PAGES.games = PAGES.games.replace(button("spam", "free robux at scam.com"), "");
+  }
+  const names = env.DB.rows("SELECT name FROM sounds ORDER BY name").map(r => r.name);
+  assert.deepEqual(names, ["Bruh & co", "Mario jump", "VINE BOOM"]);
 });

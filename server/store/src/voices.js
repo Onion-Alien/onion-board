@@ -18,6 +18,8 @@ const MAX_PARAMS = 24;
 const MAX_LIVE = 50000;              // a full store refuses more (D1's free plan is 5 GB)
 const SHARES_PER_DAY = 20;           // per install
 const SHARES_PER_IP_DAY = 40;
+const SHARES_PER_DAY_ALL = 300;      // from everyone: voices go live unchecked, so a flood of them
+                                     // (from many addresses) can't fill the store in a day
 const PAGE = 50;
 const KEY_RE = /^[a-z][a-z0-9_]{0,23}$/;
 const AI_ID_RE = /^[a-z0-9][a-z0-9-]{0,39}$/;
@@ -138,7 +140,10 @@ function shown(r) {
 export async function voicesRoute(req, env, url, p, t) {
   const m = req.method;
   let g;
-  if (p === "/v1/voices" && m === "GET") return list(url, req, env, t);
+  if (p === "/v1/voices" && m === "GET") {
+    await t.throttle(req, env, "read");
+    return list(url, req, env, t);
+  }
   if (p === "/v1/voices" && m === "POST") return share(req, env, t);
   if ((g = p.match(/^\/v1\/voices\/([0-9a-f]{12})\/vote$/)) && m === "POST")
     return t.vote(req, env, g[1], "voices");
@@ -178,26 +183,23 @@ async function list(url, req, env, t) {
     ? url.searchParams.get("sort") : "top";
   const kind = url.searchParams.get("kind") || "";
   const q = plain(url.searchParams.get("q"), 60).toLowerCase();
-  const offset = Math.max(0, Math.min(10000, parseInt(url.searchParams.get("offset")) || 0));
+  const offset = Math.max(0, Math.min(t.OFFSET_MAX, parseInt(url.searchParams.get("offset")) || 0));
   const voter = await t.installHash(req, env, false);
   const where = ["v.status = 'live'"];
   const args = [];
   if (KINDS.includes(kind)) { where.push("v.kind = ?"); args.push(kind); }
-  if (q) {
-    for (const word of q.split(" ").slice(0, 5)) {
-      where.push("(lower(v.name) LIKE ? ESCAPE '\\' OR v.tags LIKE ? ESCAPE '\\' " +
-                 "OR lower(v.about) LIKE ? ESCAPE '\\')");
-      const like = `%${word.replace(/[\\%_]/g, c => "\\" + c)}%`;
-      args.push(like, like, like);
-    }
-  }
+  const search = t.searchParts(q, "v", "voices_fts", ["lower(v.name)", "v.tags", "lower(v.about)"]);
   const order = sort === "new" ? "v.created DESC"
     : sort === "trending" ? "v.likes DESC, (v.up - v.down) DESC, v.created DESC"
     : "(v.up - v.down) DESC, v.up DESC, v.created DESC";   // each as an index in schema.sql
   const mine = voter ? ", (SELECT value FROM votes x WHERE x.sound = v.id AND x.voter = ?) AS mine" : "";
-  const rows = await env.DB.prepare(`SELECT v.*${mine} FROM voices v WHERE ${where.join(" AND ")} ` +
+  // only 1-2 letter words: matched in the first SHORT_SCAN of the list (index.js searchParts)
+  const from = search.bounded ? `(SELECT * FROM voices v WHERE ${where.join(" AND ")} ` +
+    `ORDER BY ${order} LIMIT ${t.SHORT_SCAN}) v` : "voices v";
+  const all = search.bounded ? search.where : [...where, ...search.where];
+  const rows = await env.DB.prepare(`SELECT v.*${mine} FROM ${from} WHERE ${all.join(" AND ")} ` +
                                     `ORDER BY ${order} LIMIT ? OFFSET ?`)
-    .bind(...(voter ? [voter] : []), ...args, PAGE + 1, offset).all();
+    .bind(...(voter ? [voter] : []), ...args, ...search.args, PAGE + 1, offset).all();
   const res = rows.results || [];
   return t.json({ voices: res.slice(0, PAGE).map(shown), more: res.length > PAGE });
 }
@@ -230,12 +232,15 @@ async function share(req, env, t) {
   const hash = await t.sha256(`voice:${kind}:${text}`);
   const same = await env.DB.prepare("SELECT id FROM voices WHERE sha256 = ?").bind(hash).first();
   if (same) return t.json({ error: "duplicate", id: same.id }, 409);
-  const live = (await env.DB.prepare("SELECT count(*) AS n FROM voices").first()).n;
+  // voices are never deleted (only hidden or removed), so the last rowid is how many there
+  // are, read from one row (counting them would read every one)
+  const live = (await env.DB.prepare("SELECT max(rowid) AS n FROM voices").first()).n || 0;
   if (live >= MAX_LIVE) t.fail("store full", 503);
   const uploader = await t.installHash(req, env);
   const ip = await t.ipHash(req, env);
   if (!await t.allow(env, "voice", uploader, SHARES_PER_DAY)
-      || !await t.allow(env, "voice-ip", ip, SHARES_PER_IP_DAY)) t.fail("slow down", 429);
+      || !await t.allow(env, "voice-ip", ip, SHARES_PER_IP_DAY)
+      || !await t.allow(env, "voice-all", "all", SHARES_PER_DAY_ALL)) t.fail("slow down", 429);
   const id = (await t.sha256(crypto.randomUUID())).slice(0, 12);
   await env.DB.prepare("INSERT INTO voices (id, kind, name, about, emoji, tags, data, sha256, " +
     "uploader, ip, created) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)")

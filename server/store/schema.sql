@@ -94,6 +94,22 @@ CREATE INDEX IF NOT EXISTS sounds_trend ON sounds (status, (hot + 40 * likes) DE
   (up - down) DESC, pop DESC);
 CREATE INDEX IF NOT EXISTS sounds_trend_cat ON sounds (status, cat, (hot + 40 * likes) DESC,
   (up - down) DESC, pop DESC);
+-- Search (index.js searchParts): every 3 letters of each sound's name and tags, so a search
+-- reads the rows it finds instead of every sound. A row's rowid is its sound's. Only a real
+-- change of name or tags rewrites it (a sync step sets the tags of every row it reads).
+-- A database made before this: run migrations/0003-search.sql once, after this file.
+CREATE VIRTUAL TABLE IF NOT EXISTS sounds_fts USING fts5(id UNINDEXED, name, tags,
+  tokenize = 'trigram');
+CREATE TRIGGER IF NOT EXISTS sounds_fts_add AFTER INSERT ON sounds BEGIN
+  INSERT INTO sounds_fts (rowid, id, name, tags) VALUES (new.rowid, new.id, new.name, new.tags);
+END;
+CREATE TRIGGER IF NOT EXISTS sounds_fts_edit AFTER UPDATE OF name, tags ON sounds
+  WHEN old.name IS NOT new.name OR old.tags IS NOT new.tags BEGIN
+  UPDATE sounds_fts SET name = new.name, tags = new.tags WHERE rowid = new.rowid;
+END;
+CREATE TRIGGER IF NOT EXISTS sounds_fts_drop AFTER DELETE ON sounds BEGIN
+  DELETE FROM sounds_fts WHERE rowid = old.rowid;
+END;
 -- the few sounds still fading from a site's trending page (sync.js)
 CREATE INDEX IF NOT EXISTS sounds_hot ON sounds (hot) WHERE hot > 0;
 CREATE INDEX IF NOT EXISTS sounds_actions_votes ON actions (sound, kind, at);
@@ -126,3 +142,18 @@ CREATE INDEX IF NOT EXISTS voices_top ON voices (status, (up - down) DESC, up DE
 CREATE INDEX IF NOT EXISTS voices_top_kind ON voices (status, kind, (up - down) DESC, up DESC, created DESC);
 CREATE INDEX IF NOT EXISTS voices_trend ON voices (status, likes DESC, (up - down) DESC, created DESC);
 CREATE INDEX IF NOT EXISTS voices_trend_kind ON voices (status, kind, likes DESC, (up - down) DESC, created DESC);
+-- search, as the sounds' (sounds_fts above): names, tags and abouts
+CREATE VIRTUAL TABLE IF NOT EXISTS voices_fts USING fts5(id UNINDEXED, name, tags, about,
+  tokenize = 'trigram');
+CREATE TRIGGER IF NOT EXISTS voices_fts_add AFTER INSERT ON voices BEGIN
+  INSERT INTO voices_fts (rowid, id, name, tags, about)
+    VALUES (new.rowid, new.id, new.name, new.tags, new.about);
+END;
+CREATE TRIGGER IF NOT EXISTS voices_fts_edit AFTER UPDATE OF name, tags, about ON voices
+  WHEN old.name IS NOT new.name OR old.tags IS NOT new.tags OR old.about IS NOT new.about BEGIN
+  UPDATE voices_fts SET name = new.name, tags = new.tags, about = new.about
+    WHERE rowid = new.rowid;
+END;
+CREATE TRIGGER IF NOT EXISTS voices_fts_drop AFTER DELETE ON voices BEGIN
+  DELETE FROM voices_fts WHERE rowid = old.rowid;
+END;

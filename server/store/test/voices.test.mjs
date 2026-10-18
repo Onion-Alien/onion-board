@@ -190,3 +190,38 @@ test("20 voices a day per install", async () => {
     assert.equal((await share(env, { ...VOICE, data: { e: { robot: { mix: i / 100 } } } })).status, 201);
   assert.equal((await share(env, { ...VOICE, data: { e: { robot: { mix: 0.99 } } } })).status, 429);
 });
+
+test("300 new voices a day from everyone, however many installs and addresses they come from", async () => {
+  const env = store();
+  env.DB.db.prepare("INSERT INTO counters (key, day, n) VALUES ('voice-all:all', ?, 299)")
+    .run(Math.floor(Date.now() / 86400000));
+  assert.equal((await share(env)).status, 201);
+  const next = await share(env, { ...VOICE, data: { e: { robot: { mix: 0.5 } } } },
+                          { install: "f".repeat(24), ip: "5.5.5.5" });
+  assert.equal(next.status, 429);
+  assert.equal(env.DB.rows("SELECT count(*) AS n FROM voices")[0].n, 1);
+});
+
+test("a full store is told from the last row, not by counting every voice", async () => {
+  const env = store();
+  env.DB.db.prepare("INSERT INTO voices (rowid, id, kind, name, data, sha256, uploader, ip, created) " +
+                    "VALUES (50000, 'aaaaaaaaaaaa', 'fx', 'x', '{}', 'h', 'u', 'i', 0)").run();
+  assert.equal((await share(env)).status, 503);
+});
+
+test("voice search finds part of a word in a name, tag or about, through its index", async () => {
+  const env = store();
+  const a = (await share(env)).body.id;   // "Squeaky robot", "Beep boop", tags robot, funny
+  const ids = async q => (await call(env, "/v1/voices?q=" + q)).body.voices.map(v => v.id);
+  for (const q of ["queak", "ROBOT", "boop", "unn", "ky", "squeaky%20ro"])
+    assert.deepEqual(await ids(q), [a], q);
+  assert.deepEqual(await ids("nothing"), []);
+  assert.equal((await call(env, "/v1/voices?offset=999999")).status, 200);
+});
+
+test("voice lists are rate limited per address", async () => {
+  let n = 0;
+  const env = store({ READS: { async limit() { return { success: ++n <= 1 }; } } });
+  assert.equal((await call(env, "/v1/voices")).status, 200);
+  assert.equal((await call(env, "/v1/voices")).status, 429);
+});
