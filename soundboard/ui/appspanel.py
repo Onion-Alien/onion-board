@@ -57,6 +57,7 @@ CARD_MIN_W = 300        # programs are cards, as many across as fit at this widt
 CARD_MAX_W = 900        # the Card size slider's widest: one big card across most windows
 NEW_CARDS = 1           # program cards made per go (see AppsTab._apply_listing)
 CARDS_GAP_MS = 6        # ...and the break between goes, for the audio thread
+BUN_REST_S = 30.0       # the empty page's Bun moves this long, then holds still until a sound
 
 
 class AppsTab(QWidget):
@@ -158,7 +159,7 @@ class AppsTab(QWidget):
                                lines=(_("play something?"), _("so quiet…"),
                                       _("music, please?")),
                                joy_lines=(_("hehe!"), _("yay!")), pong=True, naps=True,
-                               dances=True)
+                               dances=True, rest_after_s=BUN_REST_S)
         ev.addWidget(self.bun, 0, Qt.AlignmentFlag.AlignHCenter)
         self.empty_text = hint_label(_("Nothing is playing sound right now. Start some music, "
                                        "a video or a call and it'll show up here."))

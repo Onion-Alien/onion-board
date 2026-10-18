@@ -41,6 +41,12 @@ which also gives him even breathing room in a layout. The timer only runs while
 he's on screen, always at the same 60 fps (a slower idle pace made the bob judder
 next to the smooth blinks and ear flicks); Bun mode drops to 30 behind a game.
 
+`rest_after_s=N`: with nothing going on he only moves for N seconds after he's shown
+(or after the last sound, click or burst), then finishes what he's doing and holds
+still: the timer stops and the last pose stays, so an empty page costs nothing. A
+sound (`set_groove`), the mic (`set_level`) or a click wakes him; showing him again
+gives him another N seconds.
+
 Over the pose sits a springy layer (`_spring`, `springy`): his ears trail behind his
 hops and wobble as they settle, a fast move stretches him and a landing squashes him,
 then he jiggles back into shape.
@@ -342,7 +348,7 @@ class BunnyWidget(QWidget):
                  celebrate: bool = False, parent=None, *, sad: float = 0.0,
                  lines=(), hope_lines=(), joy_lines=(), pong: bool = False,
                  naps: bool = False, robot: bool = False, in_background: bool = False,
-                 dances: bool = False):
+                 dances: bool = False, rest_after_s: float | None = None):
         super().__init__(parent)
         if dances:
             BunnyWidget.dancers.add(self)
@@ -404,6 +410,10 @@ class BunnyWidget(QWidget):
         self._timer.setTimerType(Qt.TimerType.PreciseTimer)   # (even frames at 60 fps)
         self._timer.setInterval(FAST_MS)
         self._timer.timeout.connect(self._step)
+        self.rest_after_s = rest_after_s   # (see the module's notes)
+        self._rest_at = self._t0 + (rest_after_s or 0.0)   # settles down from then
+        self.resting = False            # holding still: the timer's off until a stir
+        self._still_at = 0.0            # ... and the moment his pose was kept
         if pong:
             self.challenge.connect(self._open_game)
         if in_background:
@@ -456,6 +466,8 @@ class BunnyWidget(QWidget):
     def set_level(self, level: float):
         """The live mic level, 0..1. Call it as often as you like (the wizard: 25/s)."""
         self._level = max(float(level), self._level * 0.8)
+        if self._level > TALK:
+            self.stir()
 
     def note_k(self) -> float:
         """How big his notes are, against the usual: they grow and shrink with him."""
@@ -465,9 +477,26 @@ class BunnyWidget(QWidget):
         """The song playing, as a groove.Groove (its beat and style), or None. He dances
         to it: on the beat, in the song's style (see `_moves`), notes flying on the beats."""
         self.groove = groove
+        if groove is not None:
+            self.stir()
+
+    def stir(self):
+        """Something happened (a sound, a click): with `rest_after_s` he moves again
+        and keeps moving for another rest_after_s seconds."""
+        if self.rest_after_s is None:
+            return
+        self._rest_at = time.monotonic() + self.rest_after_s
+        if self.resting:
+            self.resting = False
+            # (no begging for music the moment one starts: the beg held back waits)
+            self._next_beg = max(self._next_beg, self._rest_at - self.rest_after_s
+                                 + self._rng.uniform(3, 6))
+            if self.isVisible() and (self.in_background or appstate.active()):
+                self._resume()
 
     def burst(self, n: int = 6):
         """Throw a handful of notes out at once."""
+        self.stir()
         for _i in range(n):
             self._spawn(1.3)
 
@@ -514,6 +543,8 @@ class BunnyWidget(QWidget):
         self._say_until = now + 2.2
 
     def mousePressEvent(self, ev):
+        if ev.button() == Qt.MouseButton.LeftButton:
+            self.stir()
         if ev.button() == Qt.MouseButton.LeftButton and self.asleep:
             self.wake()
             self.clicked.emit()
@@ -584,6 +615,7 @@ class BunnyWidget(QWidget):
         """Start the building act (see the module docstring). Harmless if running."""
         if self.building:
             return
+        self.stir()
         self._act_kind = "build"
         self._act_t, self._blows = 0.0, 0
         self.celebrate = False
@@ -642,12 +674,17 @@ class BunnyWidget(QWidget):
 
     # ------------------------------------------------------------------ animation
     def showEvent(self, ev):
+        if self.rest_after_s is not None:   # shown again: another rest_after_s to move
+            self.resting = False
+            self._rest_at = time.monotonic() + self.rest_after_s
         # behind a game it waits until the app is back in front
         if self.in_background or appstate.active():
             self._resume()
         super().showEvent(ev)
 
     def _resume(self):
+        if self.resting:   # (back in front of a game: still until something stirs him)
+            return
         self._last = time.monotonic()
         self._timer.start(appstate.interval(FAST_MS, BACK_MS) if self.in_background
                           else FAST_MS)
@@ -854,6 +891,11 @@ class BunnyWidget(QWidget):
         target = 0.0 if self._hopeful or cheering or cross or shocked or dancing else self.sad
         rise = 5 if self._fail_t >= FAIL_DROP else 1.5   # the failure: ears drop at once
         self._sad += (target - self._sad) * min(1.0, dt * (8 if target < self._sad else rise))
+        settling = self.rest_after_s is not None and now >= self._rest_at
+        if settling:   # nothing new starts; what's going on plays out (_calm)
+            self._next_sigh = max(self._next_sigh, now + 1.0)
+            self._next_beg = max(self._next_beg, now + 1.0)
+            self._next_fidget = max(self._next_fidget, now + 1.0)
         if self._sad > 0.3 and now >= self._next_sigh:
             self._sigh_at = now
             self._next_sigh = now + self._rng.uniform(5, 9)
@@ -862,7 +904,7 @@ class BunnyWidget(QWidget):
         asleep = self.asleep
         if asleep:   # Zs drift up and off to the side of his head, growing as they go
             self._sad = 0.0
-            self._zzz_debt += dt
+            self._zzz_debt += 0.0 if settling else dt
             if self._zzz_debt >= ZZZ_EVERY:
                 self._zzz_debt = 0.0
                 r = self._bun_rect()
@@ -881,6 +923,26 @@ class BunnyWidget(QWidget):
         self._step_fidget(now)
         self._spring(now, dt)
         self.update()
+        if settling and self._calm(now):
+            self._timer.stop()   # (this frame is the one he keeps)
+            self.resting, self._still_at = True, now
+
+    def _calm(self, now: float) -> bool:
+        """Nothing on the go, so stopping here keeps a pose he could hold: no act,
+        dance, line, hop, blink, flick, sigh, fidget or skit, nothing in the air, and
+        the springy layer settled."""
+        def going(at: float, secs: float) -> bool:
+            return at >= 0 and now - at < secs
+        return not (
+            self.building or self._fail_t >= 0 or self._fin_t >= 0 or self._pop_t >= 0
+            or self.groove is not None or self._dance > 0.01 or self._level > TALK
+            or self._hopeful or self.say or self._angry > 0.05
+            or self.notes or self.puffs or self.junk or self.sparks or self.zzz
+            or self._fidget or self._skit is not None
+            or going(self._blink_at, BLINK_SHUT + BLINK_HOLD + BLINK_OPEN)
+            or going(self._flick_at, 0.5) or going(self._sigh_at, 1.6)
+            or going(self._beg_at, BEG) or going(self._joy_at, 1.9)   # (+ the wobble)
+            or going(self._kick_at, KICK_HOP) or abs(self._squash_s.v) > 0.05)
 
     def _step_groove(self, now: float, dt: float) -> bool:
         """Dancing to the song (set_groove): fades the dance in or out, follows the
@@ -1349,7 +1411,7 @@ class BunnyWidget(QWidget):
         p = QPainter(self)
         snap_to_pixels(p)
         p.setRenderHint(QPainter.RenderHint.Antialiasing)
-        now = time.monotonic()
+        now = self._still_at if self.resting else time.monotonic()   # (resting: as kept)
         pose = self.springy(self.pose(now))
         r = self._bun_rect()
         # soft shadow on the "floor", shrinking as he rises

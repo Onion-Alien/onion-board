@@ -715,3 +715,117 @@ def test_a_small_bun_widget_has_room_above_him_for_an_upright_ear(qapp):
     b.resize(b.sizeHint())
     assert b._bun_rect().top() >= 74 * ROOM_TOP / H + BOB_UP
     assert b.height() - b._bun_rect().bottom() >= 5   # (his shadow's room kept)
+
+
+def _still_bun(qapp, monkeypatch, **kw):
+    """A shown Bun with rest_after_s, in front, awake, on a pretend clock (b.clock)."""
+    from soundboard.ui import bunnywidget as bw
+    clock = _Clock()
+    monkeypatch.setattr(bw, "time", clock)
+    monkeypatch.setattr(bw, "local_hour", lambda: 12)
+    monkeypatch.setattr(bw.appstate, "active", lambda: True)
+    b = BunnyWidget(height=130, pad=18, sad=0.6, lines=("play?",), joy_lines=("yay",),
+                    pong=True, naps=True, dances=True, rest_after_s=30.0, **kw)
+    b.clock = clock
+    b.resize(b.sizeHint())
+    b.show()
+    qapp.processEvents()
+    return b
+
+
+def _tick(b, n=1):
+    for _ in range(n):
+        b.clock.now += 0.035
+        b._last = b.clock.now - 0.035
+        b._step()
+
+
+def _settle(qapp, b, secs=10.0):
+    """Frames until he rests (or `secs` of pretend time)."""
+    for _ in range(round(secs / 0.035)):
+        if b.resting:
+            return
+        _tick(b)
+
+
+def test_a_resting_bun_moves_for_a_while_then_holds_still(qapp, monkeypatch):
+    b = _still_bun(qapp, monkeypatch)
+    assert b._timer.isActive() and not b.resting   # shown: he moves
+    _tick(b, round(29 / 0.035))
+    assert not b.resting                           # ... the whole first 30 s
+    _settle(qapp, b)                               # 30 s on
+    assert b.resting and not b._timer.isActive()   # timer off
+    painted = []
+    monkeypatch.setattr(b, "update", lambda *a: painted.append(1))
+    for _ in range(20):
+        qapp.processEvents()
+    assert not painted                             # no repaints of his own
+    frozen = b.grab().toImage()
+    b.clock.now += 0.4
+    assert b.grab().toImage() == frozen            # a parent's repaint shows the kept pose
+    b.close()
+
+
+def test_a_sound_or_a_click_wakes_a_resting_bun(qapp, monkeypatch):
+    from PySide6.QtCore import QPoint, Qt
+    from PySide6.QtTest import QTest
+    b = _still_bun(qapp, monkeypatch)
+    b.clock.now = b._rest_at + 1
+    _settle(qapp, b)
+    assert b.resting
+    b.set_groove(None)                             # silence: still resting
+    assert b.resting and not b._timer.isActive()
+    b.set_groove(object())                         # a sound or the radio
+    assert not b.resting and b._timer.isActive()
+    assert b._rest_at > b.clock.now + 25      # ... and another 30 s after it
+    assert b._next_beg > b.clock.now + 2      # (not "music, please?" as it starts)
+    b.set_groove(None)
+    b.clock.now = b._rest_at + 1
+    _settle(qapp, b)
+    assert b.resting
+    QTest.mouseClick(b, Qt.MouseButton.LeftButton, pos=QPoint(b.width() // 2, b.height() // 2))
+    assert not b.resting and b._timer.isActive()   # a click: he hops (and moves again)
+    assert b._joy_at == b.clock.now
+    b.close()
+
+
+def test_showing_a_resting_bun_again_gives_him_another_stretch(qapp, monkeypatch):
+    b = _still_bun(qapp, monkeypatch)
+    b.clock.now = b._rest_at + 1
+    _settle(qapp, b)
+    assert b.resting
+    b.hide()
+    b.show()
+    qapp.processEvents()
+    assert not b.resting and b._timer.isActive()
+    assert b._rest_at > b.clock.now + 25
+    b.close()
+
+
+def test_a_resting_bun_waits_to_finish_what_hes_doing(qapp, monkeypatch):
+    b = _still_bun(qapp, monkeypatch)
+    b.clock.now = b._rest_at + 1
+    b._beg_at = b.clock.now                        # mid-beg: a line up, hopping,
+    b._say(b.lines, 2.0)
+    for _i in range(3):
+        b._spawn()                                 # ... notes in the air
+    _tick(b)
+    assert not b.resting                           # never frozen mid-move
+    _settle(qapp, b, 15)
+    assert b.resting and not b.notes and not b.say
+    assert b.clock.now - b._beg_at >= 2.8
+    b.close()
+
+
+def test_buns_without_rest_after_s_never_rest(qapp, monkeypatch):
+    b = _still_bun(qapp, monkeypatch)
+    b.rest_after_s = None
+    _tick(b, round(60 / 0.035))
+    assert not b.resting and b._timer.isActive()
+    b.close()
+
+def test_the_apps_tabs_empty_bun_rests_after_30_s():
+    import soundboard.ui.appspanel as ap
+    import inspect
+    assert ap.BUN_REST_S == 30.0
+    assert "rest_after_s=BUN_REST_S" in inspect.getsource(ap)
