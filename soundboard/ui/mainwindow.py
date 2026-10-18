@@ -76,7 +76,7 @@ from soundboard.ui.logowidget import glow_icon
 from soundboard.ui import sidebar
 from soundboard.ui.spacekey import SpaceKey
 from soundboard.ui.sounds.overlay import Overlay
-from soundboard.ui.appspanel import AppsTab
+from soundboard.ui.apps.appspanel import AppsTab
 from soundboard.ui.triggershost import BoardHost
 from soundboard.ui.triggerstab import TriggersTab
 from soundboard.ui.radiopanel import RadioOff, RadioTab
@@ -110,7 +110,7 @@ if TYPE_CHECKING:
                                    QStackedWidget, QVBoxLayout, QWidget)
     from soundboard.core import tips
     from soundboard.ui import moretabs
-    from soundboard.ui.appspanel import ElidedLabel
+    from soundboard.ui.apps.appspanel import ElidedLabel
     from soundboard.ui.destpanel import DestPanel, ModeButton
     from soundboard.ui.downloadbar import DownloadBar
     from soundboard.ui.dropveil import DropVeil
@@ -901,7 +901,7 @@ class MainWindow(QMainWindow):
             v.fx.chat_help.connect(lambda: self.statusctl.show_chat_guide("discord"))
             v.fx.hotkey_asked.connect(self.hkctl.set_voice_hotkey)
             v.share_asked.connect(self.share_voice)
-            from soundboard.ui.clipshelf import ClipShelf
+            from soundboard.ui.apps.clipshelf import ClipShelf
             recs = ClipShelf(self.engine, self.cfg, v, voice=True)
             recs.add_to_sounds.connect(self.soundctl.on_clip)
             recs.size_changed.connect(self._save_later)

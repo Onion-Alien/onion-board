@@ -10,7 +10,7 @@ from soundboard.sounds.library import Config, clean_setting
 from soundboard.settings import SettingsDialog
 from soundboard.ui import mainwindow as main
 from soundboard.ui import taboff
-from soundboard.ui.appspanel import AppsTab
+from soundboard.ui.apps.appspanel import AppsTab
 from soundboard.ui.radiopanel import RadioTab
 from soundboard.ui.storetab import StoreTab
 from soundboard.ui.tabcontrol import TAB_INDEX, TABS

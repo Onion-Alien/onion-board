@@ -827,7 +827,7 @@ def test_buns_without_rest_after_s_never_rest(qapp, monkeypatch):
     b.close()
 
 def test_the_apps_tabs_empty_bun_rests_after_30_s():
-    import soundboard.ui.appspanel as ap
+    import soundboard.ui.apps.appspanel as ap
     import inspect
     assert ap.BUN_REST_S == 30.0
     assert "rest_after_s=BUN_REST_S" in inspect.getsource(ap)

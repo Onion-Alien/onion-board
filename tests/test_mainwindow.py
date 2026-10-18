@@ -1026,7 +1026,7 @@ def test_ctrl_v_pastes_a_copied_picture_on_the_selected_pad(window):
 def test_ctrl_v_adds_a_clip_copied_in_the_clip_editor_as_a_sound(window):
     import numpy as np
 
-    from soundboard.ui import clipeditor
+    from soundboard.ui.apps import clipeditor
     n = len(window.cfg.sounds)
     clipeditor.set_clipboard(np.zeros((int(0.23 * 48000), 2), np.float32))   # even silence
     try:

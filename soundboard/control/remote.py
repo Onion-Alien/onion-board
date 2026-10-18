@@ -1210,7 +1210,7 @@ APPS_OFF = {"error": "the Apps tab is switched off in Onion Board's Settings > T
 
 
 def _apps_tab(mw: MainWindow):
-    from soundboard.ui.appspanel import AppsTab
+    from soundboard.ui.apps.appspanel import AppsTab
     a = getattr(mw, "apps", None)
     return a if isinstance(a, AppsTab) else None
 

@@ -1,5 +1,5 @@
 """The Apps tab's saved clips: what the clip editor's Save keeps, as a list under
-the cards (soundboard.ui.clipshelf) to play, rename, send, or add to your Sounds.
+the cards (soundboard.ui.apps.clipshelf) to play, rename, send, or add to your Sounds.
 
 Each clip is a FLAC in CLIPS_DIR with a row in its index.json (id, name, file,
 where it came from, its length, creation and last-use times). Deleting one takes

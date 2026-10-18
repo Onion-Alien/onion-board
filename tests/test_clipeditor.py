@@ -13,9 +13,9 @@ from soundboard.audio.appaudio import App
 from soundboard.sounds.clipedit import BIN
 from soundboard.audio.engine import SR, Engine
 from soundboard.sounds.library import Config
-from soundboard.ui import clipeditor
-from soundboard.ui.appspanel import AppsTab
-from soundboard.ui.clipeditor import ClipEditor, columns
+from soundboard.ui.apps import clipeditor
+from soundboard.ui.apps.appspanel import AppsTab
+from soundboard.ui.apps.clipeditor import ClipEditor, columns
 from soundboard.ui.kit.widgets import Meter
 from tests.test_appspanel import FakeCapture, music
 
@@ -682,7 +682,7 @@ def test_preview_and_copy_refresh_activity(tab, qapp):
 
 
 def test_saved_clips_fold_to_header_and_restore_search_and_height(tab, qapp):
-    from soundboard.ui.clipshelf import ClipShelf
+    from soundboard.ui.apps.clipshelf import ClipShelf
     saved(tab, qapp)
     sh = tab.shelf
     sh.resize_clips(200)
@@ -762,7 +762,7 @@ def test_card_sizes_wrap_readable_controls_without_overlap(tab, qapp, width):
 def test_the_waveform_is_drawn_on_a_fixed_scale():
     # not stretched to the loudest bit in view: Louder / Quieter show, near-silence
     # stays small, and nothing jumps as a loud bit scrolls out of a live view
-    from soundboard.ui.clipeditor import heights
+    from soundboard.ui.apps.clipeditor import heights
     h = heights(np.array([0.001, 0.1, 0.5, 1.0, 2.0], np.float32), 50.0)
     assert h[0] < 2 and h[1] < h[2] < h[3] == h[4] == 50.0
     assert h[1] > 50.0 / 4                       # -20 dB is still easy to see

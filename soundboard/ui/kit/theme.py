@@ -664,7 +664,7 @@ QHeaderView::section, QFrame#setcard QHeaderView::section { background:$btn; col
     padding:8px; border:none; border-bottom:1px solid $border; font-weight:600; }
 QTableCornerButton::section { background:$btn; border:none; }
 QTreeWidget#cliplist { background:$inset; color:$text; border:none; border-radius:8px;
-    padding:4px; outline:0; }   /* ui/clipshelf.py: rows are painted by ClipRowDelegate */
+    padding:4px; outline:0; }   /* ui/apps/clipshelf.py: rows are painted by ClipRowDelegate */
 QTreeWidget#cliplist::item, QTreeWidget#cliplist::item:hover,
 QTreeWidget#cliplist::item:selected { background:transparent; border:none; }
 QFrame#setcard QPlainTextEdit { background:$card; color:$text;

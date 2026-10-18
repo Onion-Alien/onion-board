@@ -25,8 +25,8 @@ from soundboard.ui.kit import theme
 from soundboard.sounds.clipshelf import Clip, Shelf, VoiceClip
 from soundboard.i18n import _, ngettext
 from soundboard.ui.kit import busy, icons
-from soundboard.ui import clipeditor
-from soundboard.ui.clipeditor import fmt
+from soundboard.ui.apps import clipeditor
+from soundboard.ui.apps.clipeditor import fmt
 from soundboard.ui.kit.panel import CONTROL_H, UndoBar, fold_button
 from soundboard.ui.kit.restyled import on_restyle
 from soundboard.audio.engine import SR

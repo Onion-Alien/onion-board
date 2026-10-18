@@ -694,7 +694,7 @@ class Child:
     def sc_apps_tab_wait(self):
         """The Apps tab stays open past the empty page Bun's moving time (not compared:
         it only gets apps_tab_rested past it)."""
-        from soundboard.ui import appspanel
+        from soundboard.ui.apps import appspanel
         rest = getattr(appspanel, "BUN_REST_S", 30.0)   # (main before it: 30 s too)
         self.run_for(max(0.0, rest + 3 - (time.perf_counter() - getattr(self, "_apps_at", 0))))
         bun = getattr(getattr(self.w, "apps", None), "bun", None)

@@ -7,7 +7,7 @@ waveform scrolls (newest on the right). The first press on it freezes what's
 there into a take to edit (soundboard.sounds.clipedit.Take); the program keeps being
 kept behind it, and **Live** goes back. Drag selects; Space plays the selection
 in your headphones; Ctrl+X / C / V, Delete, Ctrl+Z work as in any editor; Enter
-keeps it in the tab's Saved clips (soundboard.ui.clipshelf) and returns to live
+keeps it in the tab's Saved clips (soundboard.ui.apps.clipshelf) and returns to live
 capture. A copied bit also marks the system clipboard (MIME), so
 Ctrl+V on the Sounds tab adds it as a sound."""
 from __future__ import annotations

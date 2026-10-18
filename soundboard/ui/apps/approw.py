@@ -1,4 +1,4 @@
-"""The Apps tab's cards (ui/appspanel.py): one ``AppRow`` per program (icon and name,
+"""The Apps tab's cards (ui/apps/appspanel.py): one ``AppRow`` per program (icon and name,
 its level, Send, Record, the Clip editor's scissors, the window's eye, call / stream
 choice, volume), the category headings and the ``AppGrid`` that lays them out per
 category, the ``_Lister`` that reads the programs off the UI thread, and the small
@@ -26,9 +26,9 @@ from soundboard.sounds.clipedit import LiveBuffer
 from soundboard.i18n import _
 from soundboard.audio.recorder import ArmedRecorder
 from soundboard.ui.kit import icons
-from soundboard.ui.clipeditor import ClipEditor
+from soundboard.ui.apps.clipeditor import ClipEditor
 from soundboard.ui.kit.panel import CardGrid, HoverCard, VolumeControl, icon_button
-from soundboard.ui.windowview import WindowView
+from soundboard.ui.apps.windowview import WindowView
 from soundboard.ui.kit.wheelguard import no_wheel
 from soundboard.ui.kit.pixels import snap_to_pixels
 
@@ -779,7 +779,7 @@ class AppRow(HoverCard):
     def _show_card_menu(self, pos):
         menu = QMenu(self)
         parent = self.parentWidget()
-        from soundboard.ui.appspanel import AppsTab   # (it imports this module)
+        from soundboard.ui.apps.appspanel import AppsTab  # (it imports this module)
         while parent and not isinstance(parent, AppsTab):
             parent = parent.parentWidget()
         if parent:

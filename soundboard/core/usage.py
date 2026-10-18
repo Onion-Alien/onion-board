@@ -356,7 +356,7 @@ STEPS = ("added-sound", "played-sound", "sent-to-others",
          # a tab a new user starts without (+ More tabs, Settings > Tabs)
          "added-radio-tab", "added-apps-tab", "added-triggers-tab")
 ROUTES = ("cable", "device", "off", "mic")   # library.ROUTES
-# the Apps tab's own categories (ui/approw.py APP_CATEGORIES + "Other"): any other
+# the Apps tab's own categories (ui/apps/approw.py APP_CATEGORIES + "Other"): any other
 # name in Config.apps_categories is one the user made (counted as apps-own-categories)
 APPS_BUILT_IN = ("Browsers", "Music & media", "Calls & chat", "Games", "Other")
 # the feedback box's "What would you improve?" picks (ui/kit/feedbackdialog.py)
@@ -924,7 +924,7 @@ def _report_event(path: Path) -> str:
 
 def _error_tag(stack: str) -> str:
     """`/<type>@<deepest line><<its caller>~<raised in>`, e.g. `/TypeError@soundboard/
-    ui/appspanel.py:352<soundboard/ui/appspanel.py:380~enum.__or__`: like a freeze's,
+    ui/apps/appspanel.py:352<soundboard/ui/apps/appspanel.py:380~enum.__or__`: like a freeze's,
     the caller and the library function it was raised in tell apart errors that end on
     the same line. Each part only when the stack has it."""
     ours = _ours(stack)

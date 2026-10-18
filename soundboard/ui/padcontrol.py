@@ -29,7 +29,8 @@ from soundboard.sounds import library, sourceinfo, thumbs
 from soundboard.i18n import _, ngettext
 from soundboard.sounds.library import SoundMeta
 from soundboard.ui.kit.hotkeypick import pretty_key
-from soundboard.ui import clipeditor, responsive
+from soundboard.ui.apps import clipeditor
+from soundboard.ui import responsive
 from soundboard.ui.sounds import sourcedialog
 from soundboard.ui.kit import icons
 from soundboard.ui.controller import Controller

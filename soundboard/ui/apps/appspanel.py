@@ -4,18 +4,18 @@ stream output, like your sounds), without touching what any other program plays.
 Each program is a card: its level, a **Send** switch, its own volume and *Hear it
 myself*, and **Record**, which waits for the program to make a sound, records it
 until you click again and adds it to your Sounds as a pad. The scissors button
-beside Record folds out its *Clip editor* (soundboard.ui.clipeditor): opened, it
+beside Record folds out its *Clip editor* (soundboard.ui.apps.clipeditor): opened, it
 keeps the program's last minute as a live waveform to cut bits out of; closed,
 nothing of it runs. Its Save puts the bit in *Saved clips* under the cards
-(soundboard.ui.clipshelf), and its Big view button gives one card the whole tab.
+(soundboard.ui.apps.clipshelf), and its Big view button gives one card the whole tab.
 
 The capture is Windows' per-process loopback (soundboard.audio.appaudio), a *copy* of
 the program's audio: the program keeps playing on your speakers. Programs you
 switch on are remembered by their .exe and folder (path_key), and picked up again
 next time they run.
 
-The cards, their category headings and grid are in soundboard.ui.approw; the
-capture, Record and Clip editor half is soundboard.ui.appcapture (AppsTab.capctl).
+The cards, their category headings and grid are in soundboard.ui.apps.approw; the
+capture, Record and Clip editor half is soundboard.ui.apps.appcapture (AppsTab.capctl).
 """
 from __future__ import annotations
 
@@ -35,16 +35,16 @@ from soundboard.sounds import library
 from soundboard.i18n import _
 from soundboard.ui.kit import a11y, appstate, icons
 from soundboard.ui.kit.widgets import InlineNameBox, widget_at
-from soundboard.ui.appcapture import METER_MS, AppCapture
+from soundboard.ui.apps.appcapture import METER_MS, AppCapture
 # the cards and their helpers live in approw.py; their names stay importable from here
-from soundboard.ui.approw import (APP_CATEGORIES, APP_DRAG_MIME,  # noqa: F401
+from soundboard.ui.apps.approw import (APP_CATEGORIES, APP_DRAG_MIME,  # noqa: F401
                                   CATEGORY_DRAG_MIME, HIDDEN_FULL_S, MAX_VOL, TO, TO_KEYS,
                                   AppCategoryHeading, AppGrid, AppRow, ElidedLabel,
                                   _Lister, _route, app_category, category_label,
                                   is_path_key, path_key, saved_volume)
 from soundboard.ui.bunnywidget import BunnyWidget
-from soundboard.ui.clipeditor import WAVE_H
-from soundboard.ui.clipshelf import ClipShelf
+from soundboard.ui.apps.clipeditor import WAVE_H
+from soundboard.ui.apps.clipshelf import ClipShelf
 from soundboard.ui.kit.panel import UndoBar, ViewToggle, hint_label
 from soundboard.ui.responsive import FitWidth
 from soundboard.ui.sounds.speedpitch import SpeedPitchButton

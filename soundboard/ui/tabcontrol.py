@@ -18,7 +18,7 @@ from soundboard.core import usage
 from soundboard.i18n import _
 from soundboard.ui.kit import icons
 from soundboard.ui import taboff
-from soundboard.ui.appspanel import AppsTab
+from soundboard.ui.apps.appspanel import AppsTab
 from soundboard.ui.buncontrol import BUN_TIP
 from soundboard.ui.controller import Controller
 from soundboard.ui.livedot import set_tab_live

@@ -1,5 +1,5 @@
 """The Apps tab's window view: a small live picture of what a program shows, under
-its card's buttons, opened with the card's eye button (soundboard.ui.appspanel).
+its card's buttons, opened with the card's eye button (soundboard.ui.apps.appspanel).
 
 A worker thread finds the program's window and copies it (soundboard.win.winshot)
 about four times a second; the UI thread only turns the pixels into a picture.

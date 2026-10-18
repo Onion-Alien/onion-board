@@ -14,7 +14,8 @@ from PySide6.QtWidgets import (QLabel, QListWidget, QPushButton, QStackedWidget,
 
 from soundboard.ui.kit import theme
 from soundboard.speech import tts
-from soundboard.ui import appspanel, setupwizard
+from soundboard.ui.apps import appspanel
+from soundboard.ui import setupwizard
 from soundboard.ui.kit import busy
 from tests.conftest import process_events
 from tests.test_appspanel import FakeCapture, music, tab  # noqa: F401  (fixture)

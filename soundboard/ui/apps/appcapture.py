@@ -1,4 +1,4 @@
-"""The Apps tab's capture, recording and clip editor half (ui/appspanel.py): one
+"""The Apps tab's capture, recording and clip editor half (ui/apps/appspanel.py): one
 capture per program card, open while it's sent, recorded or its Clip editor listens;
 Record's waiting, length cap and saving to Saved clips; the Clip editor opening,
 closing and saving.
@@ -26,11 +26,11 @@ from soundboard.i18n import _
 from soundboard.sounds.library import MAX_SECONDS, trim_silence
 from soundboard.audio.recorder import ArmedRecorder
 from soundboard.ui.kit import appstate, busy
-from soundboard.ui.approw import AppRow, _route, is_path_key
-from soundboard.ui.clipeditor import ClipEditor
+from soundboard.ui.apps.approw import AppRow, _route, is_path_key
+from soundboard.ui.apps.clipeditor import ClipEditor
 
 if TYPE_CHECKING:
-    from soundboard.ui.appspanel import AppsTab
+    from soundboard.ui.apps.appspanel import AppsTab
 
 log = logging.getLogger(__name__)
 
