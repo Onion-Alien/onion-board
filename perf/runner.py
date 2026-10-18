@@ -28,12 +28,20 @@ BOARD_QUICK = ["idle_front", "idle_behind", "minimised", "tray", "shown_again",
 BOARD_FULL = BOARD_QUICK[:-1] + ["stereo_mic", "voice_heavy", "idle_end"]
 TRIGGERS = ["trig_idle_off", "trig_watch_hidden", "trig_tab_shown", "trig_tray_watching"]
 WATCH = ["ow_shown", "ow_tray", "ow_watching_tray"]
+# each tab left open: open_<tab> lets its first build and first seconds pass (not
+# compared), tab_<tab> measures it sitting there. idle_front first: right after start
+TAB_KEYS = ["sounds", "radio", "voice", "store", "setup", "settings", "apps_card"]
+BOARD_TABS = (["idle_front"] + [f"{p}_{k}" for k in TAB_KEYS for p in ("open", "tab")]
+              + ["open_sounds", "tab_sounds_behind", "idle_end"])
+TRIGGERS_TABS = ["open_triggers", "tab_triggers", "open_sounds", "tab_sounds"]
 
 TIERS = {
     "quick": {"secs": 4.0, "sounds": 20, "leak_iterations": 6, "trigger_counts": [50],
               "board": BOARD_QUICK, "timeout_s": 240},
     "full": {"secs": 8.0, "sounds": 100, "leak_iterations": 20, "trigger_counts": [0, 10, 50],
              "board": BOARD_FULL, "timeout_s": 600},
+    "tabs": {"secs": 9.0, "sounds": 20, "leak_iterations": 0, "trigger_counts": [50],
+             "board": BOARD_TABS, "triggers": TRIGGERS_TABS, "timeout_s": 360},
 }
 
 
@@ -389,7 +397,7 @@ def frozen(exe: Path, out: Path, timeout_s: float = 150) -> dict:
 
 def parse_args(argv=None):
     ap = argparse.ArgumentParser(prog="python -m perf", description=__doc__)
-    ap.add_argument("--tier", choices=("quick", "full", "soak", "frozen"), default="quick")
+    ap.add_argument("--tier", choices=("quick", "full", "tabs", "soak", "frozen"), default="quick")
     ap.add_argument("--out", type=Path, help="folder for the report, profiles and logs "
                     "(default: a new folder under %%TEMP%%\\onionboard-perf)")
     ap.add_argument("--watch-src", type=Path, help="an Onion Watch checkout: adds the Triggers "
@@ -462,7 +470,7 @@ def main(argv=None) -> int:
                                     for k, v in run.scenarios.items()})
         report["errors"] += info["errors"]
 
-    if args.tier in ("quick", "full"):
+    if args.tier in ("quick", "full", "tabs"):
         tier = TIERS[args.tier]
         if want("board"):
             add(*board_run("board", out, args, tier, hz, tier["board"]),
@@ -477,7 +485,8 @@ def main(argv=None) -> int:
                 zipf = None
             if zipf is not None and want("triggers"):
                 for n in tier["trigger_counts"]:
-                    add(*board_run(f"triggers-{n}", out, args, tier, hz, TRIGGERS,
+                    add(*board_run(f"triggers-{n}", out, args, tier, hz,
+                                   tier.get("triggers", TRIGGERS),
                                    watch_zip=zipf, triggers=n),
                         note=f"the board with the Onion Watch add-on built from {src.name}, "
                              f"{n} triggers, stand-in 1920x1080 screen")

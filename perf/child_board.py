@@ -213,6 +213,16 @@ def isolate(conf: dict):
     appaudio.default_output_name = lambda: None
     appaudio.endpoint_names = lambda kind: None
     appaudio.recording_apps = lambda device: []
+    # the Apps tab lists state["apps"] (made-up programs), never the PC's own
+    state["apps"] = []
+
+    def listed(strict=False, alive=None, meters=None):
+        if alive is not None:
+            alive.update({a.pid: a.exe.lower() for a in state["apps"]})
+        return list(state["apps"])
+    appaudio.list_apps = listed
+    appaudio._list_apps = lambda *a, **k: []
+    appaudio.running = lambda: {a.pid: a.exe.lower() for a in state["apps"]}
 
     from soundboard.style import owl
     owl.OwlWidget._mouse = lambda self: None   # the real cursor isn't over a hidden window
@@ -670,6 +680,53 @@ class Child:
         self._tab("sounds")
         self.run_for(self.secs)
 
+    # -- each tab left open (the tabs tier): open_<key> shows it and lets its first
+    # build and first seconds pass, tab_<key> measures it sitting there
+    SETTLE_S = 3.0
+
+    def _open_page(self, key: str) -> dict | None:
+        from soundboard.ui.tabcontrol import TAB_INDEX
+        w = self.w
+        if w.setctl.settings_open():
+            w.setctl.close_settings()
+            self.run_for(0.2)
+        self.foreground(True)
+        if key == "settings":
+            w.setctl.open_settings()
+        elif key == "apps_card":
+            # one program card (the way the owner usually has the tab): a quiet player
+            from soundboard import appaudio
+            self.state["apps"] = [appaudio.App(48_000, "fakeplayer.exe",
+                                               title="Fake player")]
+            self._tab("apps")
+        else:
+            i = TAB_INDEX[key]
+            if not w.tabs.isTabVisible(i) or (key == "triggers" and not self._panel()
+                                               and not self._load_trigger_tab()):
+                return {"skipped": True}
+            w.tabs.setCurrentIndex(i)
+        self.run_for(self.SETTLE_S)
+        return None
+
+    def _load_trigger_tab(self) -> bool:
+        try:
+            self.w.load_triggers()
+        except Exception:  # noqa: BLE001 - no add-on: that tab is skipped
+            return False
+        return self._panel() is not None
+
+    def _sit(self, key: str) -> dict:
+        self.run_for(self.secs)
+        out = {"page": key, "settings_open": self.w.setctl.settings_open()}
+        if key == "apps_card":
+            out["cards"] = len(getattr(self.w.apps, "rows", {}))
+        return out
+
+    def sc_tab_sounds_behind(self):
+        self.foreground(False)
+        self.run_for(self.secs)
+        self.foreground(True)
+
     def sc_stereo_mic(self):
         e = self.w.engine
         e.set_mic_device("Microphone (Fake Stereo Mic)")
@@ -784,6 +841,16 @@ class Child:
             tp.set_watching(False)
         self.run_for(0.3)
         return out
+
+
+def _tab_scenarios():
+    from perf.runner import TAB_KEYS
+    for key in [*TAB_KEYS, "triggers"]:
+        setattr(Child, f"sc_open_{key}", lambda self, k=key: self._open_page(k))
+        setattr(Child, f"sc_tab_{key}", lambda self, k=key: self._sit(k))
+
+
+_tab_scenarios()
 
 
 def main():
