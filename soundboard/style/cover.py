@@ -83,6 +83,7 @@ class Cover(QWidget):
         """Fade to the restyled window, then go."""
         self.raise_()
         if not animate():
+            self.hide()
             self.deleteLater()
             return
         effect = QGraphicsOpacityEffect(self)

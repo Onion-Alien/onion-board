@@ -218,7 +218,7 @@ def test_the_theme_cover_does_not_fade(qapp):
     cover._fade_in([c])
     assert c.k == 1.0   # (dimmed at once)
     c.uncover()
-    assert c._fade is None
+    assert c._fade is None and not c.isVisible()   # (gone at once)
     host.close()
     lite.set_on(False)
     assert cover.animate()
