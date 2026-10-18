@@ -1,7 +1,7 @@
 """Button click feedback: busy state, done flash, and back to normal."""
 from PySide6.QtWidgets import QPushButton
 
-from soundboard.ui import busy
+from soundboard.ui.kit import busy
 from tests.conftest import process_events
 
 
@@ -53,7 +53,7 @@ def test_a_done_label_is_never_cut_off(qapp):
     """A "✓ Stopped" stands in for the button's icon, and where the layout can't make
     room for it (a full header) it's just the tick, never "✓ Stoppe"."""
     from PySide6.QtWidgets import QHBoxLayout, QWidget
-    from soundboard.ui import icons
+    from soundboard.ui.kit import icons
     host = QWidget()
     lay = QHBoxLayout(host)
     btn = QPushButton("Stop all")

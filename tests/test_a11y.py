@@ -1,8 +1,8 @@
-"""Screen-reader names for icon-only controls (soundboard.ui.a11y)."""
+"""Screen-reader names for icon-only controls (soundboard.ui.kit.a11y)."""
 import pytest
 from PySide6.QtWidgets import QLineEdit, QPushButton, QSlider, QVBoxLayout, QWidget
 
-from soundboard.ui import a11y
+from soundboard.ui.kit import a11y
 from test_mainwindow import window as main_window  # noqa: F401  (the real MainWindow)
 
 

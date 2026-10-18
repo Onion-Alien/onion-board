@@ -19,7 +19,7 @@ sys.path.insert(0, str(ROOT))
 
 from PySide6.QtGui import QGuiApplication  # noqa: E402
 
-from soundboard import theme  # noqa: E402
+from soundboard.ui.kit import theme  # noqa: E402
 from soundboard.style import textures  # noqa: E402
 
 DATA = ROOT / "site" / "board-demo-data.js"

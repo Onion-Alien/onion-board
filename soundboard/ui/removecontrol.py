@@ -19,10 +19,10 @@ from soundboard.core import backup, trash
 from soundboard.sounds import library
 from soundboard.i18n import _, ngettext
 from soundboard.sounds.library import SoundMeta
-from soundboard.ui import toast as toastmod
-from soundboard.ui import worker
+from soundboard.ui.kit import toast as toastmod
+from soundboard.ui.kit import worker
 from soundboard.ui.controller import Controller
-from soundboard.ui.crashdialog import free_dialog
+from soundboard.ui.kit.crashdialog import free_dialog
 
 if TYPE_CHECKING:
     from soundboard.ui.mainwindow import MainWindow

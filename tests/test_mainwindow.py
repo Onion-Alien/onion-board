@@ -21,7 +21,7 @@ from soundboard.ui import mainwindow as main
 from soundboard.ui import windowbuild
 from soundboard.ui.livedot import is_tab_live
 from soundboard.ui.tabcontrol import TABS
-from soundboard.wheelguard import no_wheel
+from soundboard.ui.kit.wheelguard import no_wheel
 
 
 @pytest.fixture
@@ -460,7 +460,7 @@ def test_maximizing_doesnt_grow_what_the_window_needs(window, qapp):
 def test_flow_asks_for_its_lines_at_its_width_not_one_chip_a_line(qapp):
     from PySide6.QtWidgets import QPushButton, QWidget
 
-    from soundboard.ui.panel import Flow
+    from soundboard.ui.kit.panel import Flow
     box = QWidget()
     flow = Flow(box, gap=5)
     for i in range(12):
@@ -853,7 +853,7 @@ def test_the_mini_player_shows_the_pads_whatever_is_in_the_search_box(window, qa
     """A web search's words stay in the search box, which also filters the pads: the
     mini player (no search box) was blank. And a board with every pad filtered out
     says so instead of showing nothing."""
-    from soundboard.ui.widgets import PadGrid
+    from soundboard.ui.kit.widgets import PadGrid
 
     window.show()
     window.tabs.setCurrentWidget(window.apps)
@@ -882,7 +882,7 @@ def test_the_mini_player_shows_the_pads_whatever_is_in_the_search_box(window, qa
 @pytest.mark.parametrize("theme_name", ["Dark", "Retro 98"])
 def test_restoring_a_large_window_keeps_search_results(window, qapp, theme_name):
     """Maximize/restore must keep the full app and the selected search view."""
-    from soundboard import theme
+    from soundboard.ui.kit import theme
     from soundboard.online import ytdl
 
     old_theme = window.cfg.theme
@@ -923,8 +923,8 @@ def test_card_titles_and_the_typed_percent_fit_the_themes_font(qapp, theme_name)
     sheet: a title's second line lost its descenders, "1000 %" didn't fit Tahoma."""
     from PySide6.QtWidgets import QVBoxLayout, QWidget
 
-    from soundboard import theme
-    from soundboard.ui.panel import VolumeControl
+    from soundboard.ui.kit import theme
+    from soundboard.ui.kit.panel import VolumeControl
     from soundboard.ui.ytsearch import ClampLabel
 
     old = theme.current_name
@@ -1057,7 +1057,7 @@ def test_new_pads_never_flash_up_as_windows_of_their_own(qapp):
     from PySide6.QtCore import QEvent, QObject
 
     from soundboard.sounds.library import SoundMeta
-    from soundboard.ui.widgets import Pad, PadGrid
+    from soundboard.ui.kit.widgets import Pad, PadGrid
 
     flashed = []
 
@@ -1160,7 +1160,7 @@ def test_setup_not_done_yet_is_one_orange_step_not_red_crosses(window, monkeypat
     """Cable route, no cable, mic closed: the card's two lines say what's still to
     do in the warn colour; the red cross is for things that are wrong."""
     from soundboard.audio import engine as eng
-    from soundboard import theme
+    from soundboard.ui.kit import theme
     # the real device list: a PC with a virtual cable installed isn't "no cable"
     monkeypatch.setattr(eng, "virtual_outputs", lambda: [])
     w = window
@@ -1168,7 +1168,7 @@ def test_setup_not_done_yet_is_one_orange_step_not_red_crosses(window, monkeypat
     w.statusctl._update_flow()
     assert w.statusctl.setup_state == "missing"
     text = w.flow_mic.text() + w.flow_out.text()
-    from soundboard.ui import icons
+    from soundboard.ui.kit import icons
     dpr = w.flow_out.devicePixelRatioF()
     assert icons.inline("cross", theme.status("error"), dpr=dpr) not in text
     assert "after the setup below" in w.flow_mic.text()
@@ -1182,8 +1182,8 @@ def test_mic_card_status_uses_painted_marks_on_one_line(window, monkeypatch):
 
     from soundboard.mic import directmic as dm
     from soundboard.audio import engine as eng
-    from soundboard import theme
-    from soundboard.ui import icons
+    from soundboard.ui.kit import theme
+    from soundboard.ui.kit import icons
     w = window
     dead = {"on": True}
     monkeypatch.setattr(dm, "status", lambda name=None: "ready")
@@ -1211,8 +1211,8 @@ def test_mic_card_status_uses_painted_marks_on_one_line(window, monkeypatch):
 
 def test_sounds_toolbar_dropdown_menus_open_with_gap(window, qapp):
     """Dropdown menus on the sound page toolbar open with a short pixel gap from their button."""
-    from soundboard.ui.widgets import DropdownMenu
-    from soundboard.wheelguard import DROP_GAP
+    from soundboard.ui.kit.widgets import DropdownMenu
+    from soundboard.ui.kit.wheelguard import DROP_GAP
     w = window
     w.show()
     for _ in range(4):   # laid out first, as before any real click

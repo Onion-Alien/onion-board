@@ -3,7 +3,7 @@ fit_placeholder), and the Voice tab's Say bar makes room for its box."""
 from conftest import process_events
 from test_mainwindow import window  # noqa: F401  (the real MainWindow fixture)
 
-from soundboard.ui.widgets import fit_placeholder
+from soundboard.ui.kit.widgets import fit_placeholder
 
 
 def test_the_longest_hint_that_fits(qapp):

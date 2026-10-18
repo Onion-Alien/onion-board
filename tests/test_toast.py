@@ -1,4 +1,4 @@
-"""Toasts (ui/toast.py), the import's summary and See why (ui/importreport.py), and the
+"""Toasts (ui/kit/toast.py), the import's summary and See why (ui/importreport.py), and the
 drop veil (ui/dropveil.py)."""
 import numpy as np
 import pytest
@@ -8,7 +8,8 @@ from PySide6.QtWidgets import QApplication, QDialog, QPushButton, QWidget
 
 from conftest import process_events
 from soundboard.sounds.library import SR
-from soundboard.ui import busy, importreport, toast
+from soundboard.ui.kit import busy, toast
+from soundboard.ui import importreport
 from soundboard.ui.dropveil import label_for
 from test_mainwindow import window as main_window  # noqa: F401 - the real window, offscreen
 
@@ -349,7 +350,7 @@ def test_see_why_text_is_level_with_the_warning_icon(qapp):
     import os
     from pathlib import Path
     from PySide6.QtGui import QColor, QFont, QFontDatabase
-    from soundboard import theme
+    from soundboard.ui.kit import theme
 
     QFontDatabase.addApplicationFont(str(Path(os.environ["WINDIR"]) / "Fonts" / "segoeui.ttf"))
 

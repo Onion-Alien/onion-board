@@ -4,7 +4,7 @@ from test_mainwindow import window  # noqa: F401
 
 from soundboard.mic import directmic as dm
 from soundboard.audio import engine as eng
-from soundboard.ui.panel import EqPanel
+from soundboard.ui.kit.panel import EqPanel
 
 
 class _Stream:

@@ -13,7 +13,7 @@ import threading
 from collections.abc import Callable
 from typing import Any
 
-from soundboard.ui import busy
+from soundboard.ui.kit import busy
 
 log = logging.getLogger(__name__)
 

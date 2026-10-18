@@ -4,7 +4,7 @@ import pytest
 from PySide6.QtCore import Qt
 from PySide6.QtTest import QTest
 
-from soundboard.ui.panel import VolumeControl
+from soundboard.ui.kit.panel import VolumeControl
 
 
 @pytest.mark.parametrize("typed, pct", [("9999", 1000), ("5000", 1000), ("-50", 0),

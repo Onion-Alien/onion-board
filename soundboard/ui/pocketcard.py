@@ -14,7 +14,7 @@ from PySide6.QtCore import QEvent, QObject, QTimer
 from PySide6.QtWidgets import QVBoxLayout, QWidget
 
 from soundboard.i18n import _
-from soundboard.ui.panel import card, fold_button, hint_label
+from soundboard.ui.kit.panel import card, fold_button, hint_label
 
 if TYPE_CHECKING:
     from soundboard.ui.mainwindow import MainWindow

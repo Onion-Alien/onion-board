@@ -19,18 +19,18 @@ from PySide6.QtWidgets import (QApplication, QCheckBox, QComboBox, QGraphicsOpac
                                QLayout, QMenu, QPushButton, QSizePolicy, QVBoxLayout, QWidget)
 
 from soundboard.audio import appaudio
-from soundboard import theme
+from soundboard.ui.kit import theme
 from soundboard.core import usage
 from soundboard.win import exeicon
 from soundboard.sounds.clipedit import LiveBuffer
 from soundboard.i18n import _
 from soundboard.audio.recorder import ArmedRecorder
-from soundboard.ui import icons
+from soundboard.ui.kit import icons
 from soundboard.ui.clipeditor import ClipEditor
-from soundboard.ui.panel import CardGrid, HoverCard, VolumeControl, icon_button
+from soundboard.ui.kit.panel import CardGrid, HoverCard, VolumeControl, icon_button
 from soundboard.ui.windowview import WindowView
-from soundboard.wheelguard import no_wheel
-from soundboard.ui.pixels import snap_to_pixels
+from soundboard.ui.kit.wheelguard import no_wheel
+from soundboard.ui.kit.pixels import snap_to_pixels
 
 log = logging.getLogger(__name__)
 

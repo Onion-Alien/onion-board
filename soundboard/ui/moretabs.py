@@ -7,9 +7,9 @@ from PySide6.QtCore import QPoint, Qt, Signal
 from PySide6.QtWidgets import (QFrame, QHBoxLayout, QLabel, QMenu, QPushButton,
                                QVBoxLayout, QWidget, QWidgetAction)
 
-from soundboard import theme
+from soundboard.ui.kit import theme
 from soundboard.i18n import _
-from soundboard.ui import icons
+from soundboard.ui.kit import icons
 
 CARD_W = 400
 ICON = 40

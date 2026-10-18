@@ -26,9 +26,9 @@ from soundboard import voicefx
 from soundboard.sounds import library, videos
 from soundboard.i18n import _
 from soundboard.sounds.library import SoundMeta, cache_keep, duplicate, load_sound, prune_cache
-from soundboard.ui import worker
+from soundboard.ui.kit import worker
 from soundboard.ui.controller import Controller
-from soundboard.ui.crashdialog import free_dialog, rehome_crash_reports
+from soundboard.ui.kit.crashdialog import free_dialog, rehome_crash_reports
 from soundboard.ui.dialogs import EditDialog
 
 if TYPE_CHECKING:
@@ -365,7 +365,7 @@ class EditControl(Controller):
 
     def render_words(self, sid: str) -> str:
         """How far its render is, in words: "42%, about 1:10 left"."""
-        from soundboard.ui.widgets import fmt_time
+        from soundboard.ui.kit.widgets import fmt_time
         r = self.rendering(sid)
         if r is None:
             return ""

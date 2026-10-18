@@ -6,7 +6,7 @@ The site's own pictures (site/screenshots/*.png) are the Dark theme, and stay th
 search engines and link previews see. For each other theme in SITE_THEMES this writes
 the same pictures as WebP into site/screenshots/themes/<slug>/ (Onion Watch's into
 <slug>/watch/), then rewrites the switcher's menu between the <!-- themes --> markers in
-site/index.html with each theme's colours, straight from soundboard/theme.py.
+site/index.html with each theme's colours, straight from soundboard/ui/kit/theme.py.
 
 --watch-repo is an Onion Watch checkout: its scripts/screenshots.py shoots the Watch tab's
 pictures. Set ONIONBOARD_ONION_WATCH_ZIP (see screenshots.py) for the Triggers picture.
@@ -25,7 +25,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(ROOT))
 
-from soundboard import theme  # noqa: E402
+from soundboard.ui.kit import theme  # noqa: E402
 
 DEFAULT = "Dark"   # the site's own pictures: no copies, no colour overrides
 SITE_THEMES = ["Halloween", "Blood Moon", "Synthwave", "Hacker", "Ocean", "Light"]

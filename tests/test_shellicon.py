@@ -9,7 +9,7 @@ from PySide6.QtCore import QEvent
 from PySide6.QtGui import QImage
 
 from soundboard.audio import engine
-from soundboard import theme
+from soundboard.ui.kit import theme
 from soundboard.win import shellicon
 from soundboard.control import winkeys
 from soundboard.ui import mainwindow as main

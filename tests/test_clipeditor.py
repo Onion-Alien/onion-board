@@ -16,7 +16,7 @@ from soundboard.sounds.library import Config
 from soundboard.ui import clipeditor
 from soundboard.ui.appspanel import AppsTab
 from soundboard.ui.clipeditor import ClipEditor, columns
-from soundboard.ui.widgets import Meter
+from soundboard.ui.kit.widgets import Meter
 from tests.test_appspanel import FakeCapture, music
 
 
@@ -87,7 +87,7 @@ def opened(tab, qapp):
 
 def said(w, words: str) -> bool:
     """A corner card on ``w``'s window says ``words``."""
-    from soundboard.ui import toast
+    from soundboard.ui.kit import toast
     return any(words in t.text() for t in toast.shown(w))
 
 def test_folded_away_nothing_is_built_or_listening(tab, qapp):
@@ -716,7 +716,7 @@ def test_save_destination_is_explicit_and_show_clips_reveals_a_folded_shelf(tab,
     row.capture.sink(tone(1))
     row.editor.save()
     assert not tab.shelf.body.isVisible() and len(tab.shelf.shelf.clips) == 1
-    from soundboard.ui import toast
+    from soundboard.ui.kit import toast
     cards = [t for t in toast.shown(tab) if "Kept" in t.words()]
     assert cards and cards[-1].card.action.text() == "Show clips"
     cards[-1].card.action.click()

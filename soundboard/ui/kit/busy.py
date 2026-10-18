@@ -9,7 +9,7 @@
 - ``flash(btn, "✓ Copied")`` just swaps the label for a moment.
 - ``toast(window, "✓ Added 3 sounds")`` for a result that isn't about one button: a
   card in the bottom corner of the window (or of the dialog in front) for a few
-  seconds (``ui/toast.py``). A child widget, so it never takes focus from a game.
+  seconds (``ui/kit/toast.py``). A child widget, so it never takes focus from a game.
 """
 from __future__ import annotations
 
@@ -25,7 +25,7 @@ from shiboken6 import isValid as qt_valid
 
 from soundboard.core import errors
 from soundboard.i18n import _
-from soundboard.ui import toast as toastmod
+from soundboard.ui.kit import toast as toastmod
 
 FLASH_MS = 2200
 _IDLE = "_busy_idle_text"

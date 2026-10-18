@@ -11,10 +11,10 @@ from PySide6.QtWidgets import (QApplication, QDialog, QFrame, QGridLayout, QHBox
                                QLabel, QMessageBox, QPushButton, QVBoxLayout)
 
 from soundboard.sounds import sourceinfo
-from soundboard import theme
+from soundboard.ui.kit import theme
 from soundboard.core import usage
 from soundboard.i18n import _
-from soundboard.ui import busy, fit, icons
+from soundboard.ui.kit import busy, fit, icons
 
 PIC_W, PIC_H = 160, 90   # a video's 16:9 thumbnail
 
@@ -39,7 +39,7 @@ class SourceDialog(QDialog):
         super().__init__(parent, Qt.WindowType.Popup | Qt.WindowType.FramelessWindowHint)
         self.setProperty("popover", True)   # its edge (theme.py)
         usage.used("source-details")
-        fit.watch(self)   # grows to fit its text (ui/fit.py)
+        fit.watch(self)   # grows to fit its text (ui/kit/fit.py)
         self.meta = meta
         self.src = sourceinfo.clean(meta.source)
         site = sourceinfo.site_name(self.src)

@@ -12,9 +12,10 @@ from PySide6.QtGui import QMouseEvent, QStandardItem, QStandardItemModel
 from PySide6.QtWidgets import (QLabel, QListWidget, QPushButton, QStackedWidget,
                                QStyleOptionViewItem)
 
-from soundboard import theme
+from soundboard.ui.kit import theme
 from soundboard.speech import tts
-from soundboard.ui import appspanel, busy, setupwizard
+from soundboard.ui import appspanel, setupwizard
+from soundboard.ui.kit import busy
 from tests.conftest import process_events
 from tests.test_appspanel import FakeCapture, music, tab  # noqa: F401  (fixture)
 from tests.test_overlay import make  # noqa: F401  (fixture)
@@ -116,7 +117,7 @@ def test_restart_with_a_failed_reopen_ends_the_recording(tab, monkeypatch, tmp_p
 def test_a_pad_dropped_in_a_gap_goes_to_the_nearest_pad():
     from PySide6.QtCore import QPoint
 
-    from soundboard.ui.widgets import PadGrid
+    from soundboard.ui.kit.widgets import PadGrid
 
     class P:
         def __init__(self, r, shown=True):
@@ -208,7 +209,7 @@ def test_recolour_inline_with_tokens_sharing_a_hex(qapp, monkeypatch):
 
 # ---- EQ
 def test_flat_preset_and_curve_reset_turn_the_eq_off(qapp):
-    from soundboard.ui.panel import EQ_PRESETS, EqPanel
+    from soundboard.ui.kit.panel import EQ_PRESETS, EqPanel
     eq = EqPanel(False, "sounds", "Flat (off)", [0.0] * 7)
     other = next(n for n in EQ_PRESETS if n != "Flat (off)")
     seen = []

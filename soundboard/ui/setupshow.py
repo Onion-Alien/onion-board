@@ -23,11 +23,11 @@ from PySide6.QtCore import QPointF, QRectF, QSize, Qt, Signal
 from PySide6.QtGui import QColor, QPainter, QPen
 from PySide6.QtWidgets import QSizePolicy
 
-from soundboard import theme
+from soundboard.ui.kit import theme
 from soundboard.bunny import H, INK, STEEL, W, WOOD, WOOD_DARK, draw_bunny, sparkle
 from soundboard.ui.bunnywidget import NOTE_COLORS, SPARKLE_COLORS, BunnyWidget, _Note, paint_note
-from soundboard.ui import reveal
-from soundboard.ui.pixels import snap_to_pixels
+from soundboard.ui.kit import reveal
+from soundboard.ui.kit.pixels import snap_to_pixels
 
 # when each part of the show ends, in seconds from start()
 ROLL_END, DIZZY_END, TOOL_END = 1.1, 1.5, 2.4

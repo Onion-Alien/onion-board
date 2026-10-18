@@ -28,21 +28,21 @@ from PySide6.QtWidgets import (QBoxLayout, QFrame, QHBoxLayout, QLabel, QMenu,
 
 from soundboard.core import jobprogress, usage
 from soundboard.online import quality
-from soundboard import theme
+from soundboard.ui.kit import theme
 from soundboard.online import net, netlog, ytdl
 from soundboard.bunny import H as BUN_H
 from soundboard.bunny import W as BUN_W
-from soundboard.ui import busy, icons
+from soundboard.ui.kit import busy, icons
 from soundboard.ui.bunnywidget import BunnyWidget
 from soundboard.style.owl import H as OWL_H
 from soundboard.style.owl import W as OWL_W
 from soundboard.style.owl import OwlWidget
-from soundboard.ui.panel import CardGrid, Flow, HoverCard, RoundedFrame
+from soundboard.ui.kit.panel import CardGrid, Flow, HoverCard, RoundedFrame
 from soundboard.ui.responsive import FitWidth
-from soundboard.ui.widgets import LoadingBar, fmt_time, paint_now_playing
+from soundboard.ui.kit.widgets import LoadingBar, fmt_time, paint_now_playing
 from soundboard.core import errors
 from soundboard.i18n import _, ngettext
-from soundboard.ui.pixels import snap_to_pixels
+from soundboard.ui.kit.pixels import snap_to_pixels
 
 log = logging.getLogger(__name__)
 
@@ -893,7 +893,7 @@ class SearchResults(RoundedFrame):
         self.direct_btn.hide()
         mv.addWidget(self.direct_btn, 0, Qt.AlignmentFlag.AlignHCenter)
         # the search couldn't get through: sad Bun says so, with Try again
-        from soundboard.ui import oops
+        from soundboard.ui.kit import oops
         self.oops = oops.OopsPanel()
         self.oops.hide()
         mv.addWidget(self.oops, 0, Qt.AlignmentFlag.AlignHCenter)

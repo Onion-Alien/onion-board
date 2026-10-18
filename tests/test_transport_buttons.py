@@ -1,8 +1,8 @@
 """Tests for the modernized play/stop transport buttons and multi-theme support."""
 from PySide6.QtWidgets import QPushButton
 
-from soundboard import theme
-from soundboard.ui import icons
+from soundboard.ui.kit import theme
+from soundboard.ui.kit import icons
 
 
 def test_transport_icon_shapes(qapp):

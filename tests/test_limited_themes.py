@@ -4,7 +4,7 @@ import datetime
 
 from test_mainwindow import window  # noqa: F401  (the real MainWindow)
 
-from soundboard import theme
+from soundboard.ui.kit import theme
 
 DAY = datetime.timedelta(days=1)
 

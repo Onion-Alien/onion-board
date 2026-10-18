@@ -19,19 +19,21 @@ from PySide6.QtWidgets import (QButtonGroup, QFrame, QHBoxLayout, QLabel, QPushB
 from soundboard.addons import modules as mods
 from soundboard.core import langnames, usage
 from soundboard.mic import savedvoices, voicesetups
-from soundboard import theme, voicefx
+from soundboard.ui.kit import theme
+from soundboard import voicefx
 from soundboard.online import net
 from soundboard.speech import spoken, translation
 from soundboard.speech.aivoice import AiVoiceController
 from soundboard.speech.live import SpeechController
-from soundboard.ui import a11y, appstate, art, busy, icons
-from soundboard.ui.panel import Flow, card, hint_label, icon_button, section_label
+from soundboard.ui.kit import a11y, appstate, busy, icons
+from soundboard.ui import art
+from soundboard.ui.kit.panel import Flow, card, hint_label, icon_button, section_label
 from soundboard.ui.responsive import FitWidth
 from soundboard.ui.speechpanel import LIVE_MODULE, SpeechPanel
 from soundboard.ui.voicefxpanel import CUSTOM, EffectRow, VoiceFxPanel, on_top
 from soundboard.ui.voicestatus import VoiceStatusBar
 from soundboard.i18n import _
-from soundboard.ui.pixels import snap_to_pixels
+from soundboard.ui.kit.pixels import snap_to_pixels
 
 __all__ = ["VoicePanel", "VoiceFxPanel", "SpeechPanel", "EffectRow"]
 
@@ -325,7 +327,7 @@ class VoicePanel(QWidget):
         outer.insertWidget(0, self.speech.say_bar)   # on top: the bottom has the mixer
         # the voice is on but can't work (the mic won't open, an effect broke): sad Bun
         # says so across the top, with Try again (poll)
-        from soundboard.ui import oops
+        from soundboard.ui.kit import oops
         self.oops = oops.OopsPanel(compact=True)
         self.oops.show_problem("", "", self.try_again)
         self.oops.hide()

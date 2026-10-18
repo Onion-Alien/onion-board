@@ -19,7 +19,7 @@ from soundboard.core import errors, usage
 from soundboard.online import quality
 from soundboard.online import ffmpegget, net, netlog
 from soundboard.i18n import _
-from soundboard.ui import busy, icons, worker
+from soundboard.ui.kit import busy, icons, worker
 from soundboard.ui.controller import Controller
 
 if TYPE_CHECKING:

@@ -9,12 +9,12 @@ from PySide6.QtWidgets import (QCheckBox, QComboBox, QHBoxLayout, QLabel, QPushB
 from shiboken6 import isValid as qt_valid
 
 from soundboard.core import errors, usage
-from soundboard import theme
+from soundboard.ui.kit import theme
 from soundboard.online import ytdl
 from soundboard.i18n import _
-from soundboard.ui import busy
+from soundboard.ui.kit import busy
 from soundboard.ui.settingspages import Page
-from soundboard.wheelguard import no_wheel
+from soundboard.ui.kit.wheelguard import no_wheel
 
 # the yt-dlp buttons' jobs (ytdl.update, reset, force_newest) as the count's names
 YTDLP_COUNTS = {"update": "ytdlp-update", "reset": "ytdlp-reinstall",

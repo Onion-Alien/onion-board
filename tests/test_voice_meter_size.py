@@ -3,7 +3,8 @@ import pytest
 from PySide6.QtCore import QPoint, Qt
 from PySide6.QtWidgets import QBoxLayout
 
-from soundboard import i18n, theme
+from soundboard import i18n
+from soundboard.ui.kit import theme
 from soundboard.ui.voicestatus import VoiceStatusBar
 
 

@@ -8,7 +8,7 @@ from PySide6.QtGui import QIcon, QImage, QPainter, QPixmap
 from PySide6.QtWidgets import QLabel, QPushButton, QStyle, QStyleOptionButton, QWidget
 from shiboken6 import isValid as qt_valid
 
-from soundboard.ui import icons
+from soundboard.ui.kit import icons
 from soundboard.ui.settingspages import Page
 
 

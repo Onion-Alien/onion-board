@@ -21,14 +21,16 @@ from PySide6.QtWidgets import (QAbstractSpinBox, QApplication, QCheckBox, QDialo
                                QProgressBar, QPushButton, QVBoxLayout, QWidget)
 
 from soundboard.audio import livefx
-from soundboard import theme, voicefx
-from soundboard.ui import bunskits, fit, icons
+from soundboard.ui.kit import theme
+from soundboard import voicefx
+from soundboard.ui import bunskits
+from soundboard.ui.kit import fit, icons
 from soundboard.ui.bunnywidget import BunnyWidget
-from soundboard.ui.panel import Flow, hint_label, reset_button, section_label
+from soundboard.ui.kit.panel import Flow, hint_label, reset_button, section_label
 from soundboard.ui.voicefxpanel import ParamSlider
-from soundboard.ui.widgets import widget_at
+from soundboard.ui.kit.widgets import widget_at
 from soundboard.i18n import _
-from soundboard.ui.pixels import snap_to_pixels
+from soundboard.ui.kit.pixels import snap_to_pixels
 
 SPEED = voicefx.Param("speed", _("Speed"), 0.25, 2.0, 1.0, "x", 0.05)
 PITCH = voicefx.Param("pitch", _("Pitch"), -12, 12, 0, " st", 1)

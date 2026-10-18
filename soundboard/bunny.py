@@ -13,7 +13,7 @@ from PySide6.QtCore import QPointF, QRectF, Qt
 from PySide6.QtGui import (QColor, QImage, QPainter, QPainterPath, QPainterPathStroker,
                            QPen, QPixmap, QRadialGradient, QTransform)
 
-from soundboard import theme
+from soundboard.ui.kit import theme
 from soundboard.style import bunnyfit
 
 # drawn on a 100 x 120 canvas, scaled to the requested height

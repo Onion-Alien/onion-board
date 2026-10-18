@@ -7,7 +7,7 @@ from PySide6.QtWidgets import QWidget
 from soundboard.sounds.library import SoundMeta
 from soundboard.ui import dialogs
 from soundboard.ui.appspanel import AppRow
-from soundboard.ui.widgets import Meter
+from soundboard.ui.kit.widgets import Meter
 
 
 def windows_shown(qapp, build) -> list[str]:

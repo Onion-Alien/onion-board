@@ -9,9 +9,9 @@ from PySide6.QtTest import QSignalSpy
 from PySide6.QtWidgets import QStyle, QStyleOptionSlider
 from test_mainwindow import window  # noqa: F401
 
-from soundboard import theme
-from soundboard.ui.widgets import SeekSlider
-from soundboard.ui.panel import VolumeControl
+from soundboard.ui.kit import theme
+from soundboard.ui.kit.widgets import SeekSlider
+from soundboard.ui.kit.panel import VolumeControl
 
 
 def test_seek_bar_marks_the_start(qapp):

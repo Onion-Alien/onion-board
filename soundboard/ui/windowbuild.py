@@ -38,24 +38,26 @@ from PySide6.QtWidgets import (
 from soundboard.core import backup, usage
 from soundboard.mic import destination
 from soundboard.audio import engine
-from soundboard import otherboards, theme
+from soundboard import otherboards
+from soundboard.ui.kit import theme
 from soundboard.online import net
 from soundboard.control import remote
 from soundboard.i18n import _
 from soundboard.sounds.library import PAD_COLORS
-from soundboard.ui import a11y, alsosend, busy, icons, lite, sidebar, taboff
+from soundboard.ui.kit import a11y, busy, icons
+from soundboard.ui import alsosend, lite, sidebar, taboff
 from soundboard.ui.appspanel import ElidedLabel
 from soundboard.ui.buncontrol import BUN_TIP
 from soundboard.ui.controller import Controller
 from soundboard.ui.downloadbar import DownloadBar
 from soundboard.ui.dropveil import DropVeil
 from soundboard.ui.fitcontrol import BODY_SIDE, SEARCH_MIN_W
-from soundboard.ui.iconrow import CapIcon
+from soundboard.ui.kit.iconrow import CapIcon
 from soundboard.ui.linkbar import LinkBar
 from soundboard.ui.livedot import set_tint as set_live_tint
 from soundboard.ui.logowidget import LogoWidget
 from soundboard.ui.padbatch import PadSelection
-from soundboard.ui.panel import (
+from soundboard.ui.kit.panel import (
     ViewToggle,
     BAR_H,
     CONTROL_H,
@@ -75,14 +77,14 @@ from soundboard.ui.panel import (
     vsep,
 )
 from soundboard.ui.playbackcontrol import CHIPS_GAP
-from soundboard.ui.playbutton import PlayButton
+from soundboard.ui.kit.playbutton import PlayButton
 from soundboard.ui.setupshow import SetupShow
 from soundboard.ui.sidebar import SHUT_W, SideTabs
 from soundboard.ui.speedpitch import SpeedPitchButton
 from soundboard.ui.tabcontrol import TAB_INDEX, TAB_KEYS, TABS, rail_order
 from soundboard.ui import cableconfirm
-from soundboard.ui.glow import Glow
-from soundboard.ui.widgets import (
+from soundboard.ui.kit.glow import Glow
+from soundboard.ui.kit.widgets import (
     DropdownMenu,
     EdgeMatch,
     Meter,
@@ -94,7 +96,7 @@ from soundboard.ui.widgets import (
     fit_placeholder,
 )
 from soundboard.ui.ytsearch import SearchResults
-from soundboard.wheelguard import AppStyle, no_wheel
+from soundboard.ui.kit.wheelguard import AppStyle, no_wheel
 
 if TYPE_CHECKING:
     from soundboard.ui.mainwindow import MainWindow

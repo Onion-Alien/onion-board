@@ -201,7 +201,7 @@ def test_dialog_keeps_the_built_in_list_when_offline(qapp, served):
 def test_closing_the_dialog_before_the_list_arrives_is_quiet(qapp, monkeypatch):
     """Closed while a slow connection is still reading the list: the late result is
     dropped, nothing escapes the worker as a crash report."""
-    from soundboard.ui.crashdialog import free_dialog
+    from soundboard.ui.kit.crashdialog import free_dialog
     escaped = []
     monkeypatch.setattr(threading, "excepthook", lambda a: escaped.append(a.exc_value))
     monkeypatch.setattr(net, "allowed", lambda feature: True)

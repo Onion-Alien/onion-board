@@ -10,7 +10,7 @@ from PySide6.QtWidgets import QApplication
 from test_mainwindow import window as main_window  # noqa: F401 - the real window, offscreen
 
 from soundboard.core import hangwatch
-from soundboard import theme
+from soundboard.ui.kit import theme
 from soundboard.sounds.library import SoundMeta
 from soundboard.settings import SettingsDialog
 import pytest
@@ -280,7 +280,7 @@ def test_the_fade_out_paints_the_board_once_not_every_frame(settings, main_windo
     see-through cover (an opacity effect) made Qt paint every widget under it on each
     frame of the fade: ~18 paints of every pad per switch."""
     from soundboard.ui.themecover import ThemeCover
-    from soundboard.ui.widgets import Pad
+    from soundboard.ui.kit.widgets import Pad
 
     class Paints(QObject):
         n = 0

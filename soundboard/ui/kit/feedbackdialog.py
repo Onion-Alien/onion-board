@@ -17,7 +17,7 @@ import shiboken6
 from soundboard import __version__
 from soundboard.core import feedback, usage
 from soundboard.i18n import _
-from soundboard.ui import busy, fit, icons
+from soundboard.ui.kit import busy, fit, icons
 
 
 def picks() -> list[tuple[str, str]]:
@@ -70,7 +70,7 @@ def _title(text: str) -> QLabel:
 class FeedbackDialog(QDialog):
     def __init__(self, cfg, parent=None):
         super().__init__(parent)
-        fit.watch(self)   # grows to fit its text (ui/fit.py)
+        fit.watch(self)   # grows to fit its text (ui/kit/fit.py)
         self.cfg = cfg
         self.sent = False
         self.setWindowTitle(_("Send feedback"))

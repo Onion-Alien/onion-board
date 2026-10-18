@@ -17,7 +17,7 @@ import numpy as np
 import pytest
 
 from conftest import own_module, real_pc_timing, said
-from soundboard.ui import toast
+from soundboard.ui.kit import toast
 from soundboard.mic import directmic as dm
 from test_mainwindow import window  # noqa: F401  (fixture)
 
@@ -2786,7 +2786,7 @@ class _NoThread:
 
 
 def _no_threads(monkeypatch, run=False):
-    from soundboard.ui import worker
+    from soundboard.ui.kit import worker
     t = type("T", (_NoThread,), {"started": 0, "run": run})
     own_module(monkeypatch, worker, "threading", Thread=t)
     return t
@@ -2795,7 +2795,7 @@ def _no_threads(monkeypatch, run=False):
 def test_setting_up_the_mic_shows_it_and_takes_one_click(window, monkeypatch):  # noqa: F811
     """Clicking the one-click button: it says "Setting up…" and ignores more clicks
     until Windows has it running, instead of offering Repair again straight away."""
-    from soundboard.ui import busy
+    from soundboard.ui.kit import busy
     w = window
     _routes(w, monkeypatch, "missing")
     w.cfg.mic_device = "My mic"
@@ -2891,7 +2891,7 @@ def test_setting_up_the_mic_shows_no_device_error_for_the_audio_restart(window, 
 
 def test_turning_windows_down_lets_go_of_the_button(window, monkeypatch):  # noqa: F811
     from PySide6.QtWidgets import QMessageBox
-    from soundboard.ui import busy
+    from soundboard.ui.kit import busy
     w = window
     _routes(w, monkeypatch, "missing")
     w.cfg.mic_device = "My mic"
@@ -2973,7 +2973,7 @@ def test_redraws_never_look_for_the_cable_setup_on_the_ui_thread(window, monkeyp
 
 def test_removing_the_cable(window, monkeypatch):  # noqa: F811
     from soundboard.mic import cableremove
-    from soundboard.ui import busy
+    from soundboard.ui.kit import busy
     w = window
     _working_on_the_mic(w, monkeypatch)
     said = []
@@ -2996,7 +2996,7 @@ def test_a_worker_that_raises_still_clears_the_busy_state(window, monkeypatch): 
     their thread: the answer still comes back as a failure, so the button and the
     "already asking" flags go back instead of staying busy until a restart."""
     from soundboard.mic import cableremove
-    from soundboard.ui import busy
+    from soundboard.ui.kit import busy
     from soundboard.ui import mainwindow as mw
     w = window
     _working_on_the_mic(w, monkeypatch)
@@ -3097,7 +3097,7 @@ def test_no_done_when_windows_never_loads_it(window, monkeypatch):  # noqa: F811
 def test_bun_stays_on_while_it_starts(window, monkeypatch):  # noqa: F811
     """Bun's show ends by itself when nobody watches (another tab): coming back while
     it's still starting showed a clickable Repair beside "starting…"."""
-    from soundboard.ui import busy
+    from soundboard.ui.kit import busy
     w = window
     _routes(w, monkeypatch, "missing")
     w.cfg.mic_device = "My mic"
@@ -3500,7 +3500,7 @@ def test_a_helper_removed_meanwhile_is_noticed_when_the_window_comes_back(window
 
     from conftest import process_events
     from soundboard.mic import michelper
-    from soundboard.ui import appstate
+    from soundboard.ui.kit import appstate
     w = window
     _routes(w, monkeypatch, "missing")
     w.cfg.mic_device = "My mic"
@@ -3790,7 +3790,7 @@ def test_the_effect_reads_further_back_while_a_sound_plays(monkeypatch):
 def test_the_mic_box_flashes_when_it_starts_working(window, monkeypatch):  # noqa: F811
     """Set up and working: the box lights up and the "your mic works" box folds away,
     instead of boxes just vanishing (nobody could tell what had happened)."""
-    from soundboard.ui import reveal, toast
+    from soundboard.ui.kit import reveal, toast
     w = window
     _routes(w, monkeypatch, "missing")
     w.cfg.mic_device = "My mic"

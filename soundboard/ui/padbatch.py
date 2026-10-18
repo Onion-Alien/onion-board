@@ -18,8 +18,8 @@ from PySide6.QtWidgets import (QApplication, QColorDialog, QFrame, QHBoxLayout, 
 from soundboard.sounds import library
 from soundboard.core import usage
 from soundboard.sounds.library import MAX_FADE_S, PAD_COLORS, SoundMeta
-from soundboard.ui import icons
-from soundboard.ui.widgets import DropdownMenu
+from soundboard.ui.kit import icons
+from soundboard.ui.kit.widgets import DropdownMenu
 from soundboard.i18n import _, ngettext
 
 if TYPE_CHECKING:
@@ -353,7 +353,7 @@ class PadSelection(QObject):
         if self.picked:
             self.delete()
             return
-        from soundboard.ui.widgets import Pad
+        from soundboard.ui.kit.widgets import Pad
         f = self.mw.focusWidget()   # the window's, so it works before the window is active
         if isinstance(f, Pad):
             self.mw.rmctl.ask_remove([f.meta.id])

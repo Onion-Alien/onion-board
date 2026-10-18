@@ -15,7 +15,7 @@ from soundboard.online import net, ytdl
 from soundboard.audio.engine import SR
 from soundboard.i18n import _
 from soundboard.sounds.library import SoundMeta
-from soundboard.ui import busy, icons
+from soundboard.ui.kit import busy, icons
 from soundboard.ui.controller import Controller
 from soundboard.ui.linkbar import PLAY_ID as LINK_ID
 

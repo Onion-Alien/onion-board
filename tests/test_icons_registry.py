@@ -1,14 +1,14 @@
-"""The live-retheme registry in soundboard.ui.icons lets deleted widgets go."""
+"""The live-retheme registry in soundboard.ui.kit.icons lets deleted widgets go."""
 from PySide6.QtCore import QEvent
 from PySide6.QtWidgets import QLabel, QTabWidget, QWidget
 
-from soundboard.ui import icons
+from soundboard.ui.kit import icons
 
 
 def test_live_badge_draws_at_requested_screen_resolution(qapp):
     from PySide6.QtCore import QSize, Qt
     from PySide6.QtGui import QIcon, QPixmap
-    from soundboard import theme
+    from soundboard.ui.kit import theme
 
     requests = []
 

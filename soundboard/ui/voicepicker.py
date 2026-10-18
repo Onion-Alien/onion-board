@@ -18,8 +18,8 @@ from PySide6.QtWidgets import (QButtonGroup, QDialog, QGridLayout, QHBoxLayout, 
 
 from soundboard.audio import soundfx
 from soundboard.i18n import _
-from soundboard.ui import fit, icons
-from soundboard.ui.panel import Flow, card, hint_label
+from soundboard.ui.kit import fit, icons
+from soundboard.ui.kit.panel import Flow, card, hint_label
 from soundboard.ui.voicefxpanel import TILE_ART, TILE_MIN_W, VoiceTile
 
 COLS = 4

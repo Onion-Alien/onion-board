@@ -178,7 +178,7 @@ class ThumbBar:
             ctypes.windll.user32.DestroyIcon(wintypes.HICON(h))
 
     def buttons(self) -> list[THUMBBUTTON]:
-        from soundboard.ui import icons
+        from soundboard.ui.kit import icons
         light = light_windows()
         size = max(16, round(16 * self.window.devicePixelRatioF()))
         text = {**tips(), LIVE: live_tip(self.live)}

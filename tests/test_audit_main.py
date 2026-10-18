@@ -17,7 +17,7 @@ from soundboard.ui import chatguide, responsive
 from soundboard.ui import importcontrol, playbackcontrol
 from soundboard.ui.dialogs import EditDialog
 from soundboard.ui import mainwindow as main
-from soundboard.ui import worker
+from soundboard.ui.kit import worker
 from test_trim_updates_autostart import FakeReg
 
 import test_mainwindow

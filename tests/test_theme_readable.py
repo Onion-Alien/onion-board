@@ -5,8 +5,8 @@ from PySide6.QtCore import QSize
 from PySide6.QtGui import QColor, QIcon
 from PySide6.QtWidgets import QLabel, QPushButton
 
-from soundboard import theme
-from soundboard.ui import icons
+from soundboard.ui.kit import theme
+from soundboard.ui.kit import icons
 
 PICKED = ("", "#ff0000", "#808080", "#ffff00", "#00aa55", "#3355ff", "#ffffff", "#000000")
 

@@ -27,7 +27,7 @@ def test_show_pump_close(qapp):
 
 
 def test_splash_follows_the_saved_theme(qapp, tmp_path, monkeypatch):
-    from soundboard import theme
+    from soundboard.ui.kit import theme
     cfg = tmp_path / "config.json"
     cfg.write_text('{"theme": "Toxic"}', encoding="utf-8")
     monkeypatch.setattr(splash, "CONFIG", cfg)
@@ -146,7 +146,7 @@ def test_reduced_motion_keeps_bun_still(qapp, monkeypatch):
 def test_highlight_and_hop_travel_left_to_right(qapp, monkeypatch):
     from PySide6.QtGui import QColor
 
-    from soundboard import theme
+    from soundboard.ui.kit import theme
 
     monkeypatch.setattr(splash, "_animate", True)
     accent = QColor(theme.T["accent"])
@@ -169,7 +169,7 @@ def test_reduced_motion_moves_only_the_colour(qapp, monkeypatch):
     """Animation effects off: the highlight still walks, but no dot grows or hops."""
     from PySide6.QtGui import QColor
 
-    from soundboard import theme
+    from soundboard.ui.kit import theme
 
     monkeypatch.setattr(splash, "_animate", False)
     accent = QColor(theme.T["accent"])
@@ -259,7 +259,7 @@ def test_rare_odds_hold_over_millions_of_launches():
 def test_panel_has_the_themes_soft_glow(qapp, monkeypatch):
     """The panel isn't one flat colour: the theme's accent glows behind Bun and fades
     out lower down. High Contrast keeps its flat panel."""
-    from soundboard import theme
+    from soundboard.ui.kit import theme
     from soundboard.ui import splashacts
     monkeypatch.setattr(splash, "_show", splashacts.Show(act="hop"))
     try:

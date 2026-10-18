@@ -11,7 +11,7 @@ from PySide6.QtGui import QWheelEvent
 from soundboard.sounds import library
 from soundboard.sounds.library import Config, SoundMeta, sorted_sounds
 from soundboard.speech import tts
-from soundboard.ui.widgets import LIST_ROW_H, PAD_SHRINK, SLIM_PAD_H, Pad, pad_height
+from soundboard.ui.kit.widgets import LIST_ROW_H, PAD_SHRINK, SLIM_PAD_H, Pad, pad_height
 from test_mainwindow import window as main_window  # noqa: F401  (the real MainWindow)
 from tests.conftest import process_events
 
@@ -333,7 +333,7 @@ def test_save_as_sound_says_why_it_failed(speech, qapp, monkeypatch):
     p.clip_ready.connect(lambda data, name: got.append(name))
     p.speech.ed.setText("hi")
     p.speech.b_keep.click()
-    from soundboard.ui import toast
+    from soundboard.ui.kit import toast
 
     def said():
         return [t for t in toast.shown(p.speech) if "speech engine stopped" in t.text()]

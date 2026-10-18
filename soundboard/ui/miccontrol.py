@@ -17,13 +17,13 @@ from PySide6.QtCore import Qt, QTimer
 from PySide6.QtWidgets import QApplication, QMessageBox
 
 from soundboard.mic import directmic, michelper, voicesdk
-from soundboard import theme
+from soundboard.ui.kit import theme
 from soundboard.core import errors, usage
 from soundboard.online import net
 from soundboard.audio import engine as eng
 from soundboard.i18n import _
 from soundboard.sounds.library import RESOURCE_DIR
-from soundboard.ui import busy, icons, reveal, worker
+from soundboard.ui.kit import busy, icons, reveal, worker
 from soundboard.ui.controller import Controller
 from soundboard.ui.routecontrol import is_hands_free
 

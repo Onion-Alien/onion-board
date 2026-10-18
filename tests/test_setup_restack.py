@@ -10,7 +10,7 @@ from test_mainwindow import window  # noqa: F401
 
 from soundboard.mic import directmic as dm
 from soundboard.audio import engine as eng
-from soundboard.ui.widgets import take_out
+from soundboard.ui.kit.widgets import take_out
 
 
 def pump(n=6):

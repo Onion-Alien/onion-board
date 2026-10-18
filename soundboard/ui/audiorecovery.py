@@ -20,12 +20,12 @@ from PySide6.QtWidgets import (QApplication, QDialog, QFrame, QHBoxLayout, QLabe
 from shiboken6 import isValid as qt_valid
 
 from soundboard.mic import directmic, michelper
-from soundboard import theme
+from soundboard.ui.kit import theme
 from soundboard.core import errors, usage
 from soundboard.core.pollthread import PollThread
 from soundboard.i18n import _
-from soundboard.ui import busy, fit, icons
-from soundboard.ui.panel import Flow
+from soundboard.ui.kit import busy, fit, icons
+from soundboard.ui.kit.panel import Flow
 from soundboard.ui.setupshow import SetupShow
 
 log = logging.getLogger(__name__)

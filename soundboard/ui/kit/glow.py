@@ -11,7 +11,7 @@ from PySide6.QtCore import QEvent, QObject, QTimer
 from PySide6.QtGui import QColor
 from PySide6.QtWidgets import QAbstractButton, QGraphicsDropShadowEffect
 
-from soundboard import theme
+from soundboard.ui.kit import theme
 
 PERIOD_S = 2.4     # one breath
 TICK_MS = 66       # ~15 a second: enough for a slow glow, light on the UI thread
@@ -58,7 +58,7 @@ class Glow(QObject):
         self._sync_timer()
 
     def _sync_timer(self):
-        from soundboard.ui.toast import animations_on
+        from soundboard.ui.kit.toast import animations_on
         if self._on and self.button.isVisible() and animations_on():
             self._timer.start()
         else:

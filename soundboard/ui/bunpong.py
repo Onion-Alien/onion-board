@@ -27,13 +27,13 @@ from PySide6.QtWidgets import (QDialog, QFrame, QHBoxLayout, QLabel, QPushButton
                                QWidget)
 
 from soundboard.sounds import pongsounds
-from soundboard import theme
+from soundboard.ui.kit import theme
 from soundboard.core import usage
 from soundboard.bunny import INK, H, W, draw_bunny, sparkle
 from soundboard.i18n import _
-from soundboard.ui import appstate, fit, icons
-from soundboard.ui.panel import hint_label, icon_button
-from soundboard.ui.pixels import snap_to_pixels
+from soundboard.ui.kit import appstate, fit, icons
+from soundboard.ui.kit.panel import hint_label, icon_button
+from soundboard.ui.kit.pixels import snap_to_pixels
 
 TITLE_CSS = "font-size:17pt; font-weight:800;"   # as the guides' titles (setupwizard.py)
 BODY_CSS = "font-size:11pt;"

@@ -1,4 +1,4 @@
-"""Send feedback's "What would you improve?" box (ui/feedbackdialog.py) and what it
+"""Send feedback's "What would you improve?" box (ui/kit/feedbackdialog.py) and what it
 sends (usage.improve / other_tag)."""
 from types import SimpleNamespace
 
@@ -6,7 +6,7 @@ import pytest
 
 from soundboard import __version__
 from soundboard.core import feedback, usage
-from soundboard.ui import busy, feedbackdialog
+from soundboard.ui.kit import busy, feedbackdialog
 
 
 def test_other_tag_keeps_the_words_and_drops_anything_personal():

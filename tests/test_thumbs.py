@@ -8,7 +8,7 @@ from PySide6.QtGui import QColor, QImage
 from soundboard.sounds import library, thumbs
 from soundboard.online import net as thumbs_net
 from soundboard.sounds.library import SR, Config, SoundMeta
-from soundboard.ui.widgets import Pad, loudness, spectrum
+from soundboard.ui.kit.widgets import Pad, loudness, spectrum
 
 
 def make_image(path, w=800, h=450, color="#ff0000"):
@@ -133,7 +133,7 @@ def test_spectrum_of_silence_is_flat_and_it_shows_what_was_just_played():
 
 def _spectrum_one_band_at_a_time(data, frac, n):
     """The plain version of spectrum(): a loop over the bands (what it used to be)."""
-    from soundboard.ui.widgets import _FREQS, _HANN, FFT_N
+    from soundboard.ui.kit.widgets import _FREQS, _HANN, FFT_N
     pos = max(0, int(min(max(frac, 0.0), 1.0) * len(data)) - FFT_N)
     seg = data[pos:pos + FFT_N]
     if len(seg) < FFT_N:
@@ -451,7 +451,7 @@ def test_picture_from_a_link_goes_on_the_pad(qapp, window, tmp_path, monkeypatch
     d.apply()
     assert thumbs.Path(m.image).parent == library.THUMBS_DIR
 
-    from soundboard.ui import toast
+    from soundboard.ui.kit import toast
     d2 = EditDialog(window.meta("s1"), window.hotkeys, lambda *a: None, window)
     monkeypatch.setattr(QInputDialog, "getText", lambda *a, **k: ("https://ex.com/b", True))
     d2.btn_pic_link.click()

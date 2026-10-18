@@ -9,9 +9,9 @@ from PySide6.QtWidgets import (QAbstractButton, QApplication, QFrame, QPushButto
                                QVBoxLayout)
 from test_mainwindow import window as main_window  # noqa: F401 - the real window, offscreen
 
-from soundboard import theme
+from soundboard.ui.kit import theme
 from soundboard.settings import ThemeCard
-from soundboard.ui import icons
+from soundboard.ui.kit import icons
 
 
 @pytest.mark.parametrize("name", list(theme.THEMES))
@@ -125,7 +125,7 @@ def test_scroll_area_corner_is_not_drawn(qapp, name):
     from PySide6.QtCore import Qt
     from PySide6.QtWidgets import QScrollArea, QWidget
 
-    from soundboard.wheelguard import AppStyle
+    from soundboard.ui.kit.wheelguard import AppStyle
     old_sheet = qapp.styleSheet()
     qapp.setStyle(AppStyle("Fusion"))   # the app's own style (app.py)
     qapp.setStyleSheet(theme.stylesheet(name) + "QWidget#cornerholder { background:#ff00ff; }")
@@ -188,7 +188,7 @@ def test_switched_on_icon_buttons_in_a_card_show_their_icon(qapp, name):
     accent (Hacker's green, 1.4:1) instead of its red, and its red dot was 2.5:1 on
     Light's grey button."""
     from soundboard.online import store
-    from soundboard.ui import icons
+    from soundboard.ui.kit import icons
     from soundboard.ui.storetab import SoundRow
     old = dict(theme.T)
     theme.set_current(name)
@@ -250,7 +250,7 @@ def test_hovering_a_theme_card_makes_bun_wave(qapp, monkeypatch):
     from PySide6.QtCore import QPointF
     from PySide6.QtGui import QEnterEvent
 
-    from soundboard.ui import toast
+    from soundboard.ui.kit import toast
     from soundboard.ui.settingspages import appearance
 
     clock = [10.0]

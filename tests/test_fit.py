@@ -1,8 +1,8 @@
-"""Dialogs grow to fit their wrapped text (ui/fit.py) instead of clipping it."""
+"""Dialogs grow to fit their wrapped text (ui/kit/fit.py) instead of clipping it."""
 from PySide6.QtWidgets import QDialog, QLabel, QPushButton, QVBoxLayout
 
 from conftest import process_events
-from soundboard.ui import fit
+from soundboard.ui.kit import fit
 from test_setupwizard import devices, wizard  # noqa: F401  (fixtures)
 
 

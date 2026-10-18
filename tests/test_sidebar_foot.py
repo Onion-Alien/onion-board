@@ -162,7 +162,7 @@ def test_the_header_version_opens_whats_new_and_stop_all_has_its_own_icon(window
     window.tagline.clicked.emit()
     assert shown == [""]
     assert not window.stop_btn.icon().isNull()
-    from soundboard.ui import icons
+    from soundboard.ui.kit import icons
     assert "stop_all" in icons.SHAPES and icons.SHAPES["stop_all"] is not icons.SHAPES["stop"]
 
 
@@ -174,7 +174,7 @@ def test_an_open_tab_has_room_between_its_icon_and_its_name(qapp):
 
     from PySide6.QtGui import QColor, QFontDatabase, QIcon, QPixmap
 
-    from soundboard import theme
+    from soundboard.ui.kit import theme
     # the app's font: without it (CI has no font folder) the name is drawn as boxes,
     # and the test only passed by counting the open tab's accent edge as the icon
     if (font := Path(os.environ.get("WINDIR", "")) / "Fonts" / "segoeui.ttf").exists():
@@ -269,7 +269,7 @@ def test_the_help_onion_opens_its_menu_and_is_never_left_selected(window):  # no
 def test_a_small_chevron_has_a_solid_tip(qapp):
     """At 12 px (the sidebar card's ›) the tip fell between two pixel rows and came out
     a dim smudge: its corners are snapped to the pixel grid now."""
-    from soundboard.ui import icons
+    from soundboard.ui.kit import icons
     img = icons.pixmap("fold", 12, "#ffffff").toImage()
     tip_x = max(x for x in range(12) for y in range(12) if img.pixelColor(x, y).alpha() > 40)
     assert max(img.pixelColor(tip_x, y).alpha() for y in range(12)) > 200
@@ -281,7 +281,7 @@ def test_settings_showing_draws_its_cog_in_the_accent(window):  # noqa: F811
     from PySide6.QtCore import QSize
     from PySide6.QtGui import QColor, QIcon
 
-    from soundboard import theme
+    from soundboard.ui.kit import theme
     pm = window.gear.icon().pixmap(QSize(20, 20), QIcon.Normal, QIcon.On)
     img = pm.toImage()
     inked = [img.pixelColor(x, y) for x in range(20) for y in range(20)

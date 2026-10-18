@@ -21,9 +21,9 @@ from soundboard.core import errors, updates
 from soundboard.sounds import library, packs
 from soundboard.online import net
 from soundboard.audio.engine import SR
-from soundboard.ui import busy, fit, icons
-from soundboard.ui.panel import hint_label
-from soundboard.ui.widgets import take_out
+from soundboard.ui.kit import busy, fit, icons
+from soundboard.ui.kit.panel import hint_label
+from soundboard.ui.kit.widgets import take_out
 from soundboard.i18n import _, ngettext
 
 log = logging.getLogger(__name__)

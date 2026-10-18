@@ -28,7 +28,7 @@ def png_bytes(img) -> bytes:
 
 def main():
     _app = QGuiApplication(sys.argv)   # QPainter needs a live application object
-    from soundboard import theme
+    from soundboard.ui.kit import theme
     pngs = [png_bytes(theme.logo_image(s)) for s in SIZES]
     # ICO = header + one directory entry per size + PNG payloads (Vista+ format)
     out = struct.pack("<HHH", 0, 1, len(SIZES))

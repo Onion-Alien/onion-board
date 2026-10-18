@@ -277,7 +277,7 @@ def test_robo_bun_sparks_pulses_and_shorts_out(qapp):
 
 
 def test_robo_gadget_and_notes_read_on_dark_themes(qapp):
-    from soundboard import theme
+    from soundboard.ui.kit import theme
     from soundboard.bunny import GADGET
     from soundboard.ui.bunnywidget import NOTE_COLORS, _luma, note_colors
 
@@ -391,7 +391,7 @@ def test_ears_trail_behind_and_settle(qapp):
 
 
 def test_bun_mode_keeps_going_behind_a_game_at_a_slower_pace(qapp):
-    from soundboard.ui import appstate
+    from soundboard.ui.kit import appstate
     from soundboard.ui import bunnywidget as bw
     b = BunnyWidget("plug", in_background=True)
     b._resume()
@@ -527,7 +527,7 @@ def test_his_mouth_stays_shut_to_music_and_only_talks_to_speech(qapp, monkeypatc
 
 
 def test_every_themes_skit_plays_through_and_ends_clean(qapp, monkeypatch):
-    from soundboard import theme
+    from soundboard.ui.kit import theme
     from soundboard.ui import bunnywidget, bunskits
     clock = _Clock()
     monkeypatch.setattr(bunnywidget, "time", clock)
@@ -558,7 +558,7 @@ def test_every_themes_skit_plays_through_and_ends_clean(qapp, monkeypatch):
 
 
 def test_blood_moon_bun_bites_the_moon_and_its_cheese(qapp, monkeypatch):
-    from soundboard import theme
+    from soundboard.ui.kit import theme
     from soundboard.ui import bunnywidget, bunskits
     clock = _Clock()
     monkeypatch.setattr(bunnywidget, "time", clock)
@@ -677,7 +677,7 @@ def test_his_head_tilts_on_its_own_but_not_while_dancing(qapp):
 def test_pictures_of_bun_leave_room_for_an_upright_ear_and_a_wide_collar(qapp):
     """bunny_image's canvas cut the tip off an upright ear (Light) and the sides off
     Vampire's collar: they're inside the picture now, with clear edges."""
-    from soundboard import theme
+    from soundboard.ui.kit import theme
     from soundboard.bunny import bunny_image
 
     for name, edge in (("Light", "top"), ("Vampire", "sides")):
@@ -693,7 +693,7 @@ def test_pictures_of_bun_leave_room_for_an_upright_ear_and_a_wide_collar(qapp):
 
 def test_bits_of_bun_drawn_outside_draw_bunny_wear_his_theme_fur(qapp):
     """A skit's paw was always plain white fur, even on Mocha's brown Bun."""
-    from soundboard import theme
+    from soundboard.ui.kit import theme
     from soundboard.style import bunnyfit
     from soundboard.ui import bunskits
 
@@ -895,7 +895,8 @@ def test_a_sulking_bun_rests_with_his_foot_down(qapp, monkeypatch):
 
 
 def test_the_store_and_oops_buns_rest_after_30_s(qapp):
-    from soundboard.ui import oops, storelook
+    from soundboard.ui.kit import oops
+    from soundboard.ui import storelook
     bun = storelook.make_bun(72)
     assert bun.rest_after_s == storelook.BUN_REST_S == 30.0
     card = oops.OopsPanel()

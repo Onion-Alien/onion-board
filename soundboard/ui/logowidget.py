@@ -25,9 +25,10 @@ from PySide6.QtGui import (QColor, QIcon, QLinearGradient, QPainter, QPainterPat
                            QRadialGradient)
 from PySide6.QtWidgets import QWidget
 
-from soundboard import theme
-from soundboard.ui import appstate, lite
-from soundboard.ui.pixels import snap_to_pixels
+from soundboard.ui.kit import theme
+from soundboard.ui.kit import appstate
+from soundboard.ui import lite
+from soundboard.ui.kit.pixels import snap_to_pixels
 
 FLAME = QColor("#ff8a2b")
 EMBER_COLORS = ("#ffcf40", "#ff8a2b", "#ff5a36")

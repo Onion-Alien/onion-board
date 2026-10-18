@@ -51,12 +51,13 @@ from soundboard.sounds.library import (
     import_file,
     loose_sounds,
 )
-from soundboard.ui.hotkeypick import HOTKEY_ACTIONS, pretty_key
-from soundboard.ui import busy, importreport, taboff, worker
-from soundboard.ui import toast as toastmod
+from soundboard.ui.kit.hotkeypick import HOTKEY_ACTIONS, pretty_key
+from soundboard.ui.kit import busy, worker
+from soundboard.ui import importreport, taboff
+from soundboard.ui.kit import toast as toastmod
 from soundboard.ui.controller import Controller
-from soundboard.ui.crashdialog import free_dialog
-from soundboard.ui.widgets import expand_dropped
+from soundboard.ui.kit.crashdialog import free_dialog
+from soundboard.ui.kit.widgets import expand_dropped
 
 if TYPE_CHECKING:
     from soundboard.ui.mainwindow import MainWindow

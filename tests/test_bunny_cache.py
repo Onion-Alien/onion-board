@@ -5,7 +5,8 @@ import pytest
 from PySide6.QtCore import QRectF, Qt
 from PySide6.QtGui import QImage, QPainter
 
-from soundboard import bunny, theme
+from soundboard import bunny
+from soundboard.ui.kit import theme
 from soundboard.style import bunnyfit
 
 POSES = (

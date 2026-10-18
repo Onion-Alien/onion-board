@@ -10,8 +10,8 @@ from PySide6.QtWidgets import (QAbstractItemView, QCheckBox, QDialog, QFrame, QH
                                QVBoxLayout, QWidget)
 
 from soundboard.core import reset, trash
-from soundboard.ui import fit, icons
-from soundboard.ui.panel import hint_label, icon_label
+from soundboard.ui.kit import fit, icons
+from soundboard.ui.kit.panel import hint_label, icon_label
 from soundboard.i18n import _
 
 # (part, what it does) in the order the guide lists them

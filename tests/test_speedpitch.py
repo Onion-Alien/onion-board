@@ -66,7 +66,7 @@ def test_the_live_controls_button_has_a_name(qapp, what):
 
 
 def test_volume_control_restyles_only_when_its_colour_changes(qapp):
-    from soundboard.ui.panel import VolumeControl
+    from soundboard.ui.kit.panel import VolumeControl
     vc = VolumeControl(1.0)
     calls = _count_sheets(vc.spin)
     for v in range(20, 90, 5):                 # all under 100 %: the same look

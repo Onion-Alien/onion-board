@@ -1,8 +1,8 @@
 from PySide6.QtCore import QSize
 from PySide6.QtGui import QIcon
 
-from soundboard import theme
-from soundboard.ui import icons
+from soundboard.ui.kit import theme
+from soundboard.ui.kit import icons
 from soundboard.ui.ytsearch import SearchResults
 
 

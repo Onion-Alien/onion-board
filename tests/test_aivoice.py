@@ -505,7 +505,7 @@ def test_card_shows_robot_bunny_and_setup_stages_not_pip_output(qapp):
         p._on_install_line("failed (exit code 1)")
         p._on_install_done(False)
         assert not p.bun_robot.building and p.bun_robot.sad > 0.5
-        from soundboard.ui import toast
+        from soundboard.ui.kit import toast
         assert "exit code 1" in toast.shown(p)[-1].text() and p.lbl_install.isHidden()
         p._on_install_done(False, "network unreachable")
         assert "network unreachable" in toast.shown(p)[-1].text()
@@ -518,7 +518,8 @@ def test_ai_voice_download_keeps_its_button_visible_and_focused(qapp, monkeypatc
     from PySide6.QtCore import Qt
     from PySide6.QtTest import QTest
     from soundboard.online import net
-    from soundboard.ui import aivoicepanel, busy
+    from soundboard.ui import aivoicepanel
+    from soundboard.ui.kit import busy
     monkeypatch.setattr(net, "offline", lambda: False)
     p = aivoicepanel.AiVoicePanel(AiVoiceController(VoiceChain(), lambda e: None), {}, [])
     workers = []
@@ -545,7 +546,8 @@ def test_ai_voice_install_keeps_focus(qapp, tmp_path, monkeypatch):
     from PySide6.QtCore import Qt
     from PySide6.QtTest import QTest
     from soundboard.online import net
-    from soundboard.ui import aivoicepanel, busy
+    from soundboard.ui import aivoicepanel
+    from soundboard.ui.kit import busy
     monkeypatch.setattr(net, "offline", lambda: False)
     folder = tmp_path / "ai-voices"
     folder.mkdir()

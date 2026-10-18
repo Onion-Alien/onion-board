@@ -31,11 +31,12 @@ from PySide6.QtGui import (QColor, QCursor, QFont, QGuiApplication, QImage, QPai
                            QPainterPath, QPen, QRadialGradient)
 from PySide6.QtWidgets import QApplication, QWidget
 
-from soundboard import __version__, theme
+from soundboard import __version__
+from soundboard.ui.kit import theme
 from soundboard.bunny import sparkle
 from soundboard.i18n import _
 from soundboard.ui import splashacts
-from soundboard.ui.pixels import snap_to_pixels
+from soundboard.ui.kit.pixels import snap_to_pixels
 
 log = logging.getLogger(__name__)
 

@@ -4,7 +4,7 @@ from PySide6.QtCore import QUrl
 from PySide6.QtGui import QDesktopServices
 
 from soundboard.online import net
-from soundboard.ui import weblinks
+from soundboard.ui.kit import weblinks
 
 
 def _started(monkeypatch):

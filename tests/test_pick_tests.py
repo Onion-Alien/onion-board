@@ -74,10 +74,10 @@ def test_imports_inside_functions_and_by_name_are_followed(tmp_path, monkeypatch
     tests = {
         "test_local": "def test_it():\n    from soundboard import usage\n",
         "test_method": "class T:\n    def test_it(self):\n"
-                       "        import soundboard.theme\n",
+                       "        import soundboard.ui.kit.theme\n",
         "test_byname": "import importlib\n\n\ndef test_it():\n"
                        "    importlib.import_module('soundboard.lazy')\n"
-                       "    __import__('soundboard.theme')\n",
+                       "    __import__('soundboard.ui.kit.theme')\n",
         "test_other": "from soundboard import other\n",
     }
     for name, text in tests.items():
@@ -85,7 +85,7 @@ def test_imports_inside_functions_and_by_name_are_followed(tmp_path, monkeypatch
     monkeypatch.setattr(pick_tests, "ROOT", tmp_path)
     monkeypatch.setattr(pick_tests, "TESTS", tmp_path / "tests")
     assert pick_tests.pick(["soundboard/usage.py"]) == ["tests/test_local.py"]
-    assert pick_tests.pick(["soundboard/theme.py"]) == [
+    assert pick_tests.pick(["soundboard/ui/kit/theme.py"]) == [
         "tests/test_byname.py", "tests/test_method.py"]
     assert pick_tests.pick(["soundboard/lazy.py"]) == ["tests/test_byname.py"]
 

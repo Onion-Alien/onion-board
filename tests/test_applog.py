@@ -135,7 +135,7 @@ def test_thread_error_reaches_the_ui_thread(qapp, tmp_path, monkeypatch):
 def test_crash_dialog_copies_report(qapp, monkeypatch):
     from PySide6.QtGui import QGuiApplication
 
-    from soundboard.ui import crashdialog
+    from soundboard.ui.kit import crashdialog
     rep = applog.Report(title="ValueError: x", text="REPORT BODY")
     rep.extra.append("TypeError: y")
     opened = []
@@ -252,7 +252,7 @@ def test_a_fatal_repeat_is_still_reported(fresh):
 
 
 def test_see_report_lists_the_others_at_most_max_extra(fresh, qapp, monkeypatch):
-    from soundboard.ui import crashdialog
+    from soundboard.ui.kit import crashdialog
     monkeypatch.setattr(crashdialog, "CrashDialog", lambda rep, *_a, **_k: type(
         "D", (), {"show": lambda self: None, "raise_": lambda self: None})())
     for i in range(applog.MAX_EXTRA + 10):

@@ -14,10 +14,10 @@ from PySide6.QtWidgets import (QButtonGroup, QCheckBox, QComboBox, QDialog, QDia
 
 from soundboard.mic import destination, profiles, voicesdk
 from soundboard.mic.destination import CEILINGS, LOWCUTS, Dest
-from soundboard.ui import fit, icons
-from soundboard.ui.panel import (EmptyList, Flow, UndoBar, hint_label, icon_button,
-                                 info_button)
-from soundboard.wheelguard import no_wheel
+from soundboard.ui.kit import fit, icons
+from soundboard.ui.kit.panel import (EmptyList, Flow, UndoBar, hint_label, icon_button,
+                                     info_button)
+from soundboard.ui.kit.wheelguard import no_wheel
 from soundboard.i18n import _
 
 
@@ -164,7 +164,8 @@ class ModeButton(QPushButton):
         return profiles.current(_dest_cfg(self.mw)).key
 
     def refresh(self):
-        from soundboard.ui import icons, sidebar
+        from soundboard.ui.kit import icons
+        from soundboard.ui import sidebar
         d = _dest_cfg(self.mw)
         p = profiles.current(d)
         self.menu_.clear()

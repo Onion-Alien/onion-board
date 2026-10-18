@@ -1,7 +1,7 @@
 """Level meter colours stay stable around their warning thresholds."""
 import pytest
 
-from soundboard.ui.widgets import Meter
+from soundboard.ui.kit.widgets import Meter
 
 
 GREEN, YELLOW, RED = "#13ce66", "#ffb020", "#ff4d4f"

@@ -33,11 +33,11 @@ from PySide6.QtGui import (QColor, QFont, QFontMetrics, QGuiApplication, QPainte
 from PySide6.QtWidgets import QApplication, QWidget
 
 from soundboard.sounds import library
-from soundboard import theme
+from soundboard.ui.kit import theme
 from soundboard.control import winkeys
 from soundboard.i18n import _, ngettext
 from soundboard.ui import lite
-from soundboard.ui.pixels import snap_to_pixels
+from soundboard.ui.kit.pixels import snap_to_pixels
 
 log = logging.getLogger(__name__)
 

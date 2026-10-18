@@ -18,8 +18,8 @@ from PySide6.QtWidgets import (QFrame, QHBoxLayout, QLabel, QPushButton, QScroll
 from shiboken6 import isValid as qt_valid
 
 from soundboard.i18n import _
-from soundboard.ui import icons, panel
-from soundboard.ui.panel import icon_button
+from soundboard.ui.kit import icons, panel
+from soundboard.ui.kit.panel import icon_button
 
 POPUP_W = 400        # the list's card: narrow, a long name still fits most of itself
 POPUP_ROWS = 9       # rows shown before the list scrolls

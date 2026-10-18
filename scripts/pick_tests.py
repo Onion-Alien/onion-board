@@ -62,7 +62,7 @@ VAGUE_NAMES = {"__init__.py", "README.md", "LICENSE", ".gitignore", "requirement
 
 
 def module_name(rel: str) -> str:
-    """soundboard/ui/panel.py → soundboard.ui.panel; tests/ and scripts/ files go by
+    """soundboard/ui/kit/panel.py → soundboard.ui.kit.panel; tests/ and scripts/ files go by
     their bare name, as the tests import them (scripts/voicetests/game_roundtrip.py →
     game_roundtrip: its folder is put on sys.path)."""
     parts = list(Path(rel).with_suffix("").parts)
@@ -79,7 +79,7 @@ def imported_names(path: Path) -> set[str]:
     """Every module name the file imports anywhere (inside functions too, and by a
     plain string to importlib.import_module or __import__), with each package above
     it: `from soundboard.ui import panel` gives soundboard, soundboard.ui and
-    soundboard.ui.panel."""
+    soundboard.ui.kit.panel."""
     tree = ast.parse(path.read_text(encoding="utf-8"), str(path))
     own = module_name(path.relative_to(ROOT).as_posix()).split(".")
     if path.name != "__init__.py":

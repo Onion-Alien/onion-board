@@ -25,9 +25,9 @@ from PySide6.QtWidgets import (QAbstractItemView, QApplication, QButtonGroup, QC
                                QTableWidgetItem, QVBoxLayout, QWidget)
 
 from soundboard.online import netlog
-from soundboard import theme
-from soundboard.ui import busy, fit
-from soundboard.ui.panel import Flow, hint_label
+from soundboard.ui.kit import theme
+from soundboard.ui.kit import busy, fit
+from soundboard.ui.kit.panel import Flow, hint_label
 from soundboard.i18n import _, ngettext
 
 REFRESH_MS = 1000
@@ -447,7 +447,7 @@ class LogDialog(QDialog):
 
     def __init__(self, text: str, parent: QWidget | None = None):
         super().__init__(parent)
-        fit.watch(self)   # grows to fit its text (ui/fit.py)
+        fit.watch(self)   # grows to fit its text (ui/kit/fit.py)
         self.setWindowTitle(_("Network activity log (this run, not saved)"))
         self.resize(820, 520)
         v = QVBoxLayout(self)
@@ -481,7 +481,7 @@ class TotalsDialog(QDialog):
 
     def __init__(self, parent: QWidget | None = None):
         super().__init__(parent)
-        fit.watch(self)   # grows to fit its text (ui/fit.py)
+        fit.watch(self)   # grows to fit its text (ui/kit/fit.py)
         self.setWindowTitle(_("Network activity totals"))
         self.resize(820, 520)
         v = QVBoxLayout(self)

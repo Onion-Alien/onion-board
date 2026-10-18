@@ -27,12 +27,12 @@ from soundboard.sounds import catswitch, library
 from soundboard.core import usage
 from soundboard.i18n import _, ngettext
 from soundboard.sounds.library import SoundMeta
-from soundboard.ui.hotkeypick import pretty_key
-from soundboard.ui import icons
+from soundboard.ui.kit.hotkeypick import pretty_key
+from soundboard.ui.kit import icons
 from soundboard.ui.controller import Controller
 from soundboard.ui.padbatch import fill_colour_menu
-from soundboard.ui.panel import Flow
-from soundboard.ui.widgets import InlineNameBox
+from soundboard.ui.kit.panel import Flow
+from soundboard.ui.kit.widgets import InlineNameBox
 
 if TYPE_CHECKING:
     from soundboard.ui.mainwindow import MainWindow

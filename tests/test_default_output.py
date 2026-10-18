@@ -146,7 +146,7 @@ def test_rescan_runs_on_the_device_thread(window, monkeypatch, qapp):
     from PySide6.QtWidgets import QPushButton
 
     from conftest import process_events
-    from soundboard.ui import busy
+    from soundboard.ui.kit import busy
     devices_done(window)
     stuck, threads = threading.Event(), []
 

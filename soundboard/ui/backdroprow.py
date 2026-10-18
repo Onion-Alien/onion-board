@@ -19,8 +19,8 @@ from PySide6.QtWidgets import (QApplication, QDialog, QGridLayout, QHBoxLayout, 
 
 from soundboard import voicefx
 from soundboard.i18n import _
-from soundboard.ui import fit, icons
-from soundboard.ui.panel import hint_label, reset_button
+from soundboard.ui.kit import fit, icons
+from soundboard.ui.kit.panel import hint_label, reset_button
 from soundboard.ui.voicefxpanel import EffectRow, ParamSlider
 from soundboard.voicefx import Param, backdrop
 

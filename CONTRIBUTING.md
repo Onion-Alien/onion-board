@@ -87,7 +87,7 @@ privately, see [SECURITY.md](SECURITY.md)) and we'll rewrite the branch.
 - Audio callbacks never block and never take the engine lock (see
   [docs/CODE.md](docs/CODE.md) → *Audio notes*).
 - Disk, network, device and process calls never run on the Qt UI thread: run them on a
-  worker (`soundboard/ui/worker.py`) and only apply the answer on the UI thread. A
+  worker (`soundboard/ui/kit/worker.py`) and only apply the answer on the UI thread. A
   worker's answer checks its owner (a tab, a dialog) still exists before touching it.
 - For anything a user would notice, add a new file `changelog.d/<branch-name>.md` with
   your `- ` lines (see [changelog.d/README.md](changelog.d/README.md)). Don't edit

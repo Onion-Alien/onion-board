@@ -16,7 +16,8 @@ from PySide6.QtWidgets import QMenu
 from soundboard.online import net
 from soundboard.core import usage
 from soundboard.i18n import _
-from soundboard.ui import icons, taboff
+from soundboard.ui.kit import icons
+from soundboard.ui import taboff
 from soundboard.ui.appspanel import AppsTab
 from soundboard.ui.buncontrol import BUN_TIP
 from soundboard.ui.controller import Controller

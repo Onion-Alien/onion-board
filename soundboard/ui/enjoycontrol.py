@@ -20,7 +20,7 @@ from PySide6.QtWidgets import (QFrame, QHBoxLayout, QLabel, QPlainTextEdit, QPus
 
 from soundboard.core import enjoy, tips, usage
 from soundboard.i18n import _
-from soundboard.ui import busy, icons
+from soundboard.ui.kit import busy, icons
 from soundboard.ui.bunnywidget import BunnyWidget
 from soundboard.ui.controller import Controller
 

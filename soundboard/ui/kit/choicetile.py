@@ -13,9 +13,9 @@ from PySide6.QtCore import QPointF, QRectF, QSize, Qt
 from PySide6.QtGui import QColor, QFont, QFontMetrics, QPainter, QPainterPath, QPen
 from PySide6.QtWidgets import QAbstractButton, QRadioButton, QSizePolicy
 
-from soundboard import theme
-from soundboard.ui import icons
-from soundboard.ui.pixels import snap_to_pixels
+from soundboard.ui.kit import theme
+from soundboard.ui.kit import icons
+from soundboard.ui.kit.pixels import snap_to_pixels
 
 RADIUS = 12   # a card's corners
 HINT_PT = 8.5  # DESIGN.md Standard kit: Hint

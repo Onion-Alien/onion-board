@@ -132,7 +132,7 @@ def test_a_deleted_category_comes_back_with_undo(window, monkeypatch):
     """Deleting a category said nothing and had no way back: its toast's Undo brings
     it back in its place, with its sounds, colour and hotkey."""
     from PySide6.QtWidgets import QMessageBox
-    from soundboard.ui import toast
+    from soundboard.ui.kit import toast
     monkeypatch.setattr(QMessageBox, "question", lambda *a, **k: QMessageBox.Yes)
     window.catctl.new_category("s0", name="Memes")
     window.catctl.new_category("s1", name="Quotes")
@@ -181,7 +181,7 @@ def _loaded(window, qapp):
 
 
 def _undo_card(w):
-    from soundboard.ui import toast
+    from soundboard.ui.kit import toast
     return [t for t in toast.shown(w) if t.key == "undo-sounds"]
 
 
@@ -281,7 +281,7 @@ def test_a_zip_of_sounds_imports_like_dropped_files(window, qapp, tmp_path):
 
 
 def test_dropped_folders_open_up_into_sounds_and_zips(tmp_path):
-    from soundboard.ui.widgets import expand_dropped
+    from soundboard.ui.kit.widgets import expand_dropped
     d = tmp_path / "pack"
     (d / "sub").mkdir(parents=True)
     for n in ("a.mp3", "sub/b.wav", "c.zip", "notes.txt"):
@@ -349,7 +349,7 @@ def test_the_tray_menu_offers_the_discord_and_feedback(window, monkeypatch):
 
     from soundboard import __version__
     from soundboard.core import feedback
-    from soundboard.ui import busy
+    from soundboard.ui.kit import busy
     opened = []
     monkeypatch.setattr(busy.QDesktopServices, "openUrl", lambda u: opened.append(u.toString()))
     monkeypatch.setattr(QSystemTrayIcon, "isSystemTrayAvailable", staticmethod(lambda: True))

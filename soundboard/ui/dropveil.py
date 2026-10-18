@@ -15,10 +15,10 @@ from PySide6.QtCore import QEvent, QObject, QRectF, Qt, QTimer
 from PySide6.QtGui import QColor, QCursor, QDragEnterEvent, QFont, QFontMetrics, QPainter, QPen
 from PySide6.QtWidgets import QApplication, QWidget
 
-from soundboard import theme
+from soundboard.ui.kit import theme
 from soundboard.i18n import _, ngettext
-from soundboard.ui import icons
-from soundboard.ui.pixels import snap_to_pixels
+from soundboard.ui.kit import icons
+from soundboard.ui.kit.pixels import snap_to_pixels
 
 PICTURE_EXTS = {".png", ".jpg", ".jpeg", ".webp", ".gif", ".bmp", ".jfif"}
 

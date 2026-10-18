@@ -25,7 +25,8 @@ ROOT = Path(__file__).resolve().parents[2]
 
 TEST = '''\
 import pytest
-from soundboard import i18n, theme
+from soundboard import i18n
+from soundboard.ui.kit import theme
 from test_mainwindow import window as main_window  # noqa: F401
 
 TARGETS = {targets!r}

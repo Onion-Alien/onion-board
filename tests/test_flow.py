@@ -1,7 +1,7 @@
 from PySide6.QtWidgets import QPushButton, QWidget
 from shiboken6 import delete as qt_delete
 
-from soundboard.ui.panel import Flow
+from soundboard.ui.kit.panel import Flow
 
 
 def test_an_item_gone_on_the_qt_side_is_made_again_not_raised_on(qapp):

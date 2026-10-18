@@ -26,7 +26,7 @@ log = logging.getLogger(__name__)
 FILE = "source.json"
 
 # host -> (site key, the name shown: brand names, never translated). Keys with a
-# picture in ui/icons.py show it; the rest show a globe. Same sites as
+# picture in ui/kit/icons.py show it; the rest show a globe. Same sites as
 # library._SITES (the folder a download goes in).
 _SITES = {"music.youtube.com": ("ytmusic", "YouTube Music"),
           "youtube.com": ("youtube", "YouTube"), "youtu.be": ("youtube", "YouTube"),
@@ -157,7 +157,7 @@ def site_name(src: dict) -> str:
 
 
 def icon(src: dict) -> str:
-    """The ui/icons.py picture for the site: its own, else a globe."""
+    """The ui/kit/icons.py picture for the site: its own, else a globe."""
     key = src.get("site", "")
     return key if key in ("youtube", "ytmusic", "tiktok", "soundcloud", "myinstants") else "browser"
 

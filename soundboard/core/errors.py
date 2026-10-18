@@ -397,13 +397,13 @@ def linkify(label) -> None:
 
 def warn(parent, title: str, e: BaseException | str | None, before: str = "",
          after: str = "", where: str = "") -> None:
-    """An error toast (ui/toast.py) with the plain words, on ``parent``'s window; a
+    """An error toast (ui/kit/toast.py) with the plain words, on ``parent``'s window; a
     problem in the app gets a *Report it* button that opens the pre-filled issue in the
     browser."""
     from PySide6.QtCore import QUrl
     from PySide6.QtGui import QDesktopServices
 
-    from soundboard.ui import busy, toast
+    from soundboard.ui.kit import busy, toast
     p = describe(e)
     _count(p, e)
     action = None

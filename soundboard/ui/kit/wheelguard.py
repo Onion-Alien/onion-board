@@ -60,7 +60,7 @@ class AppStyle(QProxyStyle):
     def polish(self, arg):
         if not isinstance(arg, (QWidget, QApplication, QPalette)):
             # a dead layout item's wrapper still listed at the new widget's address
-            # (ui/widgets.py widget_at): Qt's own call must never raise from here
+            # (ui/kit/widgets.py widget_at): Qt's own call must never raise from here
             return
         super().polish(arg)
         if isinstance(arg, (QComboBox, QTabBar, QSlider)):

@@ -4,8 +4,8 @@ from PySide6.QtGui import QColor, QImage
 from PySide6.QtTest import QTest
 from PySide6.QtWidgets import QWidget
 
-from soundboard.ui import icons
-from soundboard.ui.playbutton import PlayButton
+from soundboard.ui.kit import icons
+from soundboard.ui.kit.playbutton import PlayButton
 
 
 def test_round_play_button_keeps_keyboard_mouse_and_disabled_behavior(qapp):

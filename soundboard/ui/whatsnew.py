@@ -11,10 +11,11 @@ from PySide6.QtGui import QDesktopServices, QFont
 from PySide6.QtWidgets import (QDialog, QFrame, QHBoxLayout, QLabel, QPushButton, QVBoxLayout,
                                QWidget)
 
-from soundboard import __version__, theme
+from soundboard import __version__
+from soundboard.ui.kit import theme
 from soundboard.core import feedback, updates
-from soundboard.ui import fit
-from soundboard.ui.panel import hint_label, icon_label
+from soundboard.ui.kit import fit
+from soundboard.ui.kit.panel import hint_label, icon_label
 from soundboard.i18n import _
 
 

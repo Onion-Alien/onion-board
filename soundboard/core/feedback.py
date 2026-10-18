@@ -19,7 +19,7 @@ ISSUE_URL = f"https://github.com/{REPO}/issues/new"
 
 def feedback_url(version: str, improve=()) -> str:
     """The form, with the version and the "What would you improve?" picks (the feedback
-    box, ui/feedbackdialog.py) as its hidden fields."""
+    box, ui/kit/feedbackdialog.py) as its hidden fields."""
     if FORM_URL:
         q = {"version": version, **({"improve": ",".join(improve)} if improve else {})}
         return f"{FORM_URL}?{urlencode(q)}"

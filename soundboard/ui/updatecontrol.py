@@ -24,9 +24,9 @@ from soundboard.online import net, netlog
 from soundboard.control import remote
 from soundboard.addons import watchaddon
 from soundboard.i18n import _
-from soundboard.ui import busy, worker
+from soundboard.ui.kit import busy, worker
 from soundboard.ui.controller import Controller
-from soundboard.ui.crashdialog import free_dialog
+from soundboard.ui.kit.crashdialog import free_dialog
 
 if TYPE_CHECKING:
     from soundboard.ui.mainwindow import MainWindow

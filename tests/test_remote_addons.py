@@ -364,7 +364,7 @@ def test_add_ons_card_checks_reinstalls_and_reports(qapp, window,  # noqa: F811
     from soundboard.sounds import library
     from soundboard.online import net
     from soundboard.addons import pocketaddon
-    from soundboard.ui import busy
+    from soundboard.ui.kit import busy
     base = library.APP_DIR / "modules"
     info = _module(base, pocketaddon.MODULE_ID, "pocket_addons_card_test", ADDON)
     monkeypatch.setattr(modules, "discover", lambda dirs=None: [modules._read(info.path)])

@@ -14,9 +14,9 @@ from PySide6.QtCore import QPoint, QSize, QTimer
 from PySide6.QtWidgets import QBoxLayout, QWidgetItem
 
 from soundboard.ui import responsive
-from soundboard.ui import toast as toastmod
+from soundboard.ui.kit import toast as toastmod
 from soundboard.ui.controller import Controller
-from soundboard.ui.widgets import SLIM_PAD_H, pad_height, take_out
+from soundboard.ui.kit.widgets import SLIM_PAD_H, pad_height, take_out
 
 if TYPE_CHECKING:
     from soundboard.ui.mainwindow import MainWindow

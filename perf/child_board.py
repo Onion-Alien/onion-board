@@ -341,7 +341,7 @@ class Child:
         from PySide6.QtCore import Qt
 
         from soundboard.style import appstate as kit_appstate
-        from soundboard.ui import appstate
+        from soundboard.ui.kit import appstate
         # (both: Hoot and the style kit ask their own)
         appstate.active = kit_appstate.active = (lambda: True) if front else (lambda: False)
         self.app.applicationStateChanged.emit(Qt.ApplicationActive if front
@@ -445,12 +445,12 @@ class Child:
                                                     listen_for_second_launch)
         claim_single_instance()
         app.instance_server = listen_for_second_launch(app, lambda: self.w)
-        from soundboard.ui import a11y, quietbox
+        from soundboard.ui.kit import a11y, quietbox
         quietbox.install(app)
         applog.ui_ready()
         app.setStyle("Fusion")
         a11y.install(app)
-        from soundboard import theme
+        from soundboard.ui.kit import theme
         app.setWindowIcon(theme.app_icon())
         if self.conf.get("real_window"):
             self._park_windows_off_screen()

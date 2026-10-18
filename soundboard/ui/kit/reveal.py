@@ -16,7 +16,7 @@ from PySide6.QtCore import QEasingCurve, QPointF, QRectF, Qt, QVariantAnimation
 from PySide6.QtGui import QColor, QLinearGradient, QPainter, QPainterPath, QPen
 from PySide6.QtWidgets import QGraphicsOpacityEffect, QWidget
 
-from soundboard import theme
+from soundboard.ui.kit import theme
 
 FOLD_MS = 340    # folding away or out, fade included
 FOLD_PART = 0.55  # of it, the height changing (the rest: fading)
@@ -25,7 +25,7 @@ MAX_H = 16777215  # Qt's QWIDGETSIZE_MAX: no maximum height
 
 
 def _animate() -> bool:
-    from soundboard.ui.toast import animations_on
+    from soundboard.ui.kit.toast import animations_on
     return animations_on()
 
 

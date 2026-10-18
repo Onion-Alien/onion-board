@@ -34,9 +34,9 @@ INPUT_MIN = 360     # an ask-for-a-name box's width
 
 
 def badge(name: str, tone: str, ratio: float = 1.0) -> QPixmap:
-    """`name` (ui/icons.py) in the theme's `tone` on a circle of the same tone, faint."""
-    from soundboard import theme
-    from soundboard.ui import icons
+    """`name` (ui/kit/icons.py) in the theme's `tone` on a circle of the same tone, faint."""
+    from soundboard.ui.kit import theme
+    from soundboard.ui.kit import icons
     col = QColor(theme.T.get(tone, tone))
     pm = QPixmap(round(BADGE * ratio), round(BADGE * ratio))
     pm.setDevicePixelRatio(ratio)
@@ -130,7 +130,7 @@ class _Filter(QObject):
 def install(app: QApplication) -> None:
     """Silence and restyle every Information/Warning/Question QMessageBox (and tidy
     every QInputDialog) the app shows from now on."""
-    from soundboard import theme
+    from soundboard.ui.kit import theme
     f = _Filter(app)
     app._quietbox_filter = f   # pyright: ignore[reportAttributeAccessIssue]  # kept alive with the app
     theme.app_filter(app, f)   # (sits out theme switches: no boxes made)

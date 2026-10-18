@@ -12,9 +12,9 @@ from shiboken6 import isValid as qt_valid
 
 from soundboard.core import errors
 from soundboard.i18n import _
-from soundboard.ui import busy, icons
+from soundboard.ui.kit import busy, icons
 from soundboard.ui.settingspages import Page, _button_row
-from soundboard.wheelguard import no_wheel
+from soundboard.ui.kit.wheelguard import no_wheel
 
 
 log = logging.getLogger(__name__)
@@ -49,7 +49,7 @@ class _AddonGrid(QWidget):
 
     def _place(self):
         g, cols = self.grid, self.cols
-        from soundboard.ui.widgets import take_out   # (it imports this module)
+        from soundboard.ui.kit.widgets import take_out  # (it imports this module)
         while g.count():
             take_out(g)
         for r in range(g.rowCount()):
@@ -789,7 +789,7 @@ class AddonsPage(Page):
 
     def _remote_easy_card(self):
         """The easy way in: the streamer guide, and a prompt for an AI assistant."""
-        from soundboard.ui.crashdialog import free_dialog
+        from soundboard.ui.kit.crashdialog import free_dialog
         from soundboard.ui.streamguide import StreamerGuide, copy_prompt
         mw = self.mw
         card, cv = self._card(_("Set it up the easy way"),

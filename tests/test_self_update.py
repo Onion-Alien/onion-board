@@ -5,7 +5,7 @@ import pytest
 from PySide6.QtWidgets import QMessageBox
 
 from conftest import process_events
-from soundboard.ui import toast
+from soundboard.ui.kit import toast
 from soundboard import __version__
 from soundboard.core import updates
 from test_mainwindow import window as main_window  # noqa: F401 - the real window, offscreen

@@ -11,8 +11,8 @@ from PySide6.QtWidgets import (QDialog, QGridLayout, QHBoxLayout, QLabel, QPushB
                                QVBoxLayout)
 
 from soundboard.i18n import _
-from soundboard.ui import fit
-from soundboard.ui.panel import hint_label
+from soundboard.ui.kit import fit
+from soundboard.ui.kit.panel import hint_label
 
 MIC, CABLE = 1, 2   # finished() codes past Rejected (0, = keep it)
 

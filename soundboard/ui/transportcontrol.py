@@ -15,10 +15,10 @@ from PySide6.QtCore import Qt, QTimer
 from soundboard.sounds import videos
 from soundboard.audio.engine import SR
 from soundboard.i18n import _
-from soundboard.ui import worker
+from soundboard.ui.kit import worker
 from soundboard.ui.controller import Controller
 from soundboard.ui.linkbar import PLAY_ID as LINK_ID
-from soundboard.ui.widgets import fmt_pos
+from soundboard.ui.kit.widgets import fmt_pos
 
 if TYPE_CHECKING:
     from soundboard.ui.mainwindow import MainWindow

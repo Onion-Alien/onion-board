@@ -10,7 +10,7 @@ from PySide6.QtWidgets import QDialog, QHBoxLayout, QLabel, QPushButton, QVBoxLa
 
 from soundboard.core import usage
 from soundboard.i18n import _
-from soundboard.ui import fit, icons
+from soundboard.ui.kit import fit, icons
 
 
 def ask(parent, install: Callable[[], None], use_mic: Callable[[], None],

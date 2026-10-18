@@ -8,7 +8,7 @@ from test_mainwindow import window  # noqa: F401  (the real MainWindow)
 
 from soundboard.control import adminfront
 from soundboard.core import autostart
-from soundboard.ui import toast
+from soundboard.ui.kit import toast
 
 
 def run_loop(monkeypatch, fronts, admins, fullscreen=lambda pid: True):

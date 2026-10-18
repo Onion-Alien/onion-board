@@ -7,9 +7,9 @@ from PySide6.QtCore import Qt
 from PySide6.QtWidgets import QDialog, QHBoxLayout, QLabel, QPushButton, QVBoxLayout
 
 from soundboard.control import midi, winkeys
-from soundboard import theme
+from soundboard.ui.kit import theme
 from soundboard.i18n import _
-from soundboard.ui import fit
+from soundboard.ui.kit import fit
 from soundboard.control.winkeys import Hotkeys
 
 
@@ -102,7 +102,7 @@ class HotkeyDialog(QDialog):
 
     def __init__(self, hotkeys: Hotkeys, parent=None, pads: bool = True):
         super().__init__(parent)
-        fit.watch(self)   # grows to fit its text (ui/fit.py)
+        fit.watch(self)   # grows to fit its text (ui/kit/fit.py)
         self.setWindowTitle(_("Set hotkey"))
         self.result_combo = None
         self._midi = hotkeys.midi if pads else None

@@ -104,7 +104,7 @@ def analyze(out: np.ndarray, out_rate: int, mic: np.ndarray | None, mic_rate: in
 
 def summary_html(r: dict, cable: str | None, mic_sent: bool = True) -> str:
     """`mic_sent` False = sounds-only mode: the voice isn't expected in the output."""
-    from soundboard import theme   # the current theme's readable green / red / amber
+    from soundboard.ui.kit import theme  # the current theme's readable green / red / amber
     ok, bad, warn = theme.status("ok"), theme.status("error"), theme.status("warn")
     lines = []
     if not mic_sent:

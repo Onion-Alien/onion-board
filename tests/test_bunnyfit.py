@@ -5,7 +5,8 @@ import math
 from PySide6.QtCore import QPointF, QRectF, Qt
 from PySide6.QtGui import QColor, QImage, QPainter
 
-from soundboard import bunny, theme
+from soundboard import bunny
+from soundboard.ui.kit import theme
 from soundboard.style import bunnyfit
 
 

@@ -228,11 +228,11 @@ def pytest_sessionfinish(session, exitstatus):
 def qapp():
     from PySide6.QtWidgets import QApplication
     app = QApplication.instance() or QApplication([])
-    from soundboard import wheelguard
+    from soundboard.ui.kit import wheelguard
     app.setStyle(wheelguard.AppStyle("Fusion"))   # as the app sets it (app.main)
     wheelguard.TIP_DELAY = 0   # tests ask for tooltips at once; test_tooltip_wait checks it
     if not app.styleSheet():   # the app's theme and font, as the window applies them:
-        from soundboard import theme   # without it a worker's first tests measured
+        from soundboard.ui.kit import theme  # without it a worker's first tests measured
         from soundboard.sounds.library import Config  # text in Qt's plain font, and the
         theme.apply(app, Config().theme)   # ones after a window in the app's
     if not hasattr(app, "_collector"):   # collects while a test spins the event loop
@@ -245,10 +245,23 @@ def qapp():
 def _limited_themes_on_offer(monkeypatch):
     """Today is pinned inside every limited-edition theme's offer, so the tests that
     go through every theme still find them once the real offer has ended."""
-    from soundboard import theme
+    from soundboard.ui.kit import theme
     if theme.LIMITED:
         day = min(theme.LIMITED.values())
         monkeypatch.setattr(theme, "_today", lambda: day)
+
+
+@pytest.fixture(autouse=True)
+def _splash_act_back_after():
+    """splash.show() picks this launch's act at random, now and then a rare one with a
+    taller card: a test that showed the splash puts the act before back, or the splash
+    tests after it in the same worker drew a rare launch's card."""
+    splash = sys.modules.get("soundboard.ui.splash")
+    before = None if splash is None else splash._show
+    yield
+    splash = sys.modules.get("soundboard.ui.splash")
+    if splash is not None:   # (first imported in the test: the module's own default)
+        splash._show = before if before is not None else splash.splashacts.Show()
 
 
 @pytest.fixture(autouse=True)
@@ -256,11 +269,11 @@ def _theme_back_after():
     """A test that switched the app's theme (Comic Sans, a highlight colour, textures)
     puts the one before back: the theme is the whole process's, and the tests after it
     that read it without a window of their own (theme.stylesheet(), T) drew in it."""
-    theme = sys.modules.get("soundboard.theme")
+    theme = sys.modules.get("soundboard.ui.kit.theme")
     before = None if theme is None else (theme.current_name, theme.live_override,
                                          theme.textures_on)
     yield
-    theme = sys.modules.get("soundboard.theme")
+    theme = sys.modules.get("soundboard.ui.kit.theme")
     if theme is None or before is None:
         return
     if (theme.current_name, theme.live_override, theme.textures_on) == before:
@@ -285,13 +298,13 @@ def _collect_on_the_main_thread():
 
 def said(w) -> str:
     """What the toasts up on window ``w`` say, oldest first, one a line."""
-    from soundboard.ui import toast
+    from soundboard.ui.kit import toast
     return "\n".join(t.text() for t in toast.shown(w))
 
 
 def unsay(w):
     """Take every toast on window ``w`` down at once."""
-    from soundboard.ui import toast
+    from soundboard.ui.kit import toast
     for t in toast.shown(w):
         t.dismiss()
 

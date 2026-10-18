@@ -3,7 +3,7 @@
 
     python scripts/check_code_doc.py      exit 1 and list them if not (CI's pick job)
 
-A row covers a module by its path (`soundboard/ui/busy.py`), by its folder
+A row covers a module by its path (`soundboard/ui/kit/busy.py`), by its folder
 (`soundboard/voicefx/`), or by its bare name after another path of the same folder in
 the row (`soundboard/otherboards/soundpad.py`, `resanance.py`). `__init__.py` files aren't listed.
 """

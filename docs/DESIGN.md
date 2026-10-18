@@ -328,7 +328,7 @@ These are the current reference points. Copy their structure before inventing a 
 | Setup guide (`ui/setupwizard.py`) | One question per step in a big title, a short plain explanation, choices as large icon rows, the mascot for warmth, one main button. |
 | Setup tab cards | A grid: your mic and Who's listening side by side in one row (always the same height, titles on one line), Devices and Connect your chat under your mic, Equalizer and volume under Who's listening. Every card open, built with `card()` (heading from `heading_row()`): they fit the screen, so nothing folds away. |
 | Left tab rail (`ui/sidebar.py`) | Icons only when closed, names when open, the selected tab a soft accent fill, settings at the foot. |
-| Send feedback box (`ui/feedbackdialog.py`) | The small-dialog pattern: title question, hint, tick boxes, buttons bottom-right with the main one first, a second page instead of a second dialog. |
+| Send feedback box (`ui/kit/feedbackdialog.py`) | The small-dialog pattern: title question, hint, tick boxes, buttons bottom-right with the main one first, a second page instead of a second dialog. |
 | Bottom strip / player bar | One slim bar: icon, slider, steady number. No boxes around each part. |
 
 ## 2. Layout
@@ -385,7 +385,7 @@ These are the current reference points. Copy their structure before inventing a 
   → "Sound like: Chipmunk"), not on a label that shows its whole text. A tooltip
   says something new (a size, what's kept, a shortcut) or isn't there
   (`icon_button(..., hover=False)`, `Switch(..., hover=False)`). Icons
-  come from the app's own painted set (`ui/icons.py`, `icons.set_icon`); add new ones
+  come from the app's own painted set (`ui/kit/icons.py`, `icons.set_icon`); add new ones
   there in the same style, never an image file.
 - **Keep words** on the main action of a card and on anything a new user must
   understand to get started.
@@ -413,7 +413,7 @@ These are the current reference points. Copy their structure before inventing a 
     (`OutputBlock._pin`: `ascent - capHeight / 2`), never a hand-tuned margin.
   - **Trailing controls** (a switch) centre on the title's first line; the title is
     pushed down so the two share a centre.
-  - **Card headings: build them with `card()` / `heading_row()`** (`ui/panel.py`),
+  - **Card headings: build them with `card()` / `heading_row()`** (`ui/kit/panel.py`),
     never a hand-made `QHBoxLayout`. This is the rule that broke most often: the ⓘ
     sat 1.5 px low and "Your mic" sat 6 px below "Who's listening" beside it,
     because each card built its own heading row (one centred its parts on the row's
@@ -477,7 +477,7 @@ three of these, and none of them is plain grey boxes of text:
   light top edge and a darker bottom edge (`POLISH_STYLE`). Don't override their
   background or add borders; nest an inner area in `card_hi` or `inset` (12 px corners
   outside, 8 px inside: inner corners are smaller than outer ones).
-- **A heading with an icon**: a painted icon (`ui/icons.py`) in front of the
+- **A heading with an icon**: a painted icon (`ui/kit/icons.py`) in front of the
   `QLabel#section` heading, an optional ⓘ at the end of the same line.
 - **Status as a pill**, not a sentence: a small rounded label in the tone colour
   ("On", "Ready", "Not set up") beside the heading, via `theme.set_tone`.
@@ -605,7 +605,7 @@ Never draw a fixed colour except a sound's own colour, the user's own highlight 
 - A left-aligned dialog footer, or more than one filled button in one place.
 - ALL CAPS headings, Title Case Buttons, long dashes.
 - A new bitmap icon, a new font, or a third-party widget library (Fluent, Material,
-  qt-material...). The app's look comes from `theme.py` and `ui/icons.py` only.
+  qt-material...). The app's look comes from `theme.py` and `ui/kit/icons.py` only.
 - A feature that hides or shows on a rule a user couldn't guess.
 - A button with more than three words, or a paragraph of how-to text on a card
   (icon + tooltip, or an ⓘ pop-up).
@@ -676,14 +676,14 @@ The rules above are Onion Board's take on what the big design systems agree on n
 
 | Piece | Code |
 | --- | --- |
-| Colour tokens, themes, the app style sheet, object names (`#card`, `#primary`, `#hint`, `#section`, `#danger`, `#chip`, `#pill`, `[quiet]`, `[busy]`, `[tone]`) | `soundboard/theme.py` |
-| Painted icons | `soundboard/ui/icons.py` |
-| Busy states, opening links, toasts | `soundboard/ui/busy.py` |
-| Dialogs that grow to fit their text | `soundboard/ui/fit.py` |
-| Wrapping button rows (`Flow`), undo bar, steady numbers | `soundboard/ui/panel.py`, `settings._button_row` |
+| Colour tokens, themes, the app style sheet, object names (`#card`, `#primary`, `#hint`, `#section`, `#danger`, `#chip`, `#pill`, `[quiet]`, `[busy]`, `[tone]`) | `soundboard/ui/kit/theme.py` |
+| Painted icons | `soundboard/ui/kit/icons.py` |
+| Busy states, opening links, toasts | `soundboard/ui/kit/busy.py` |
+| Dialogs that grow to fit their text | `soundboard/ui/kit/fit.py` |
+| Wrapping button rows (`Flow`), undo bar, steady numbers | `soundboard/ui/kit/panel.py`, `settings._button_row` |
 | Settings cards | `settings.SettingsDialog._card` |
 | Left tab rail | `soundboard/ui/sidebar.py` |
-| Wheel guard, dropdown widths, the gap under a dropdown | `soundboard/wheelguard.py` |
+| Wheel guard, dropdown widths, the gap under a dropdown | `soundboard/ui/kit/wheelguard.py` |
 
 ## 13. UI workflow for agents and reviewers
 

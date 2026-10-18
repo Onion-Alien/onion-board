@@ -16,7 +16,7 @@ from PySide6.QtCore import QBuffer, QByteArray, QPointF, QRectF, QSize, Qt
 from PySide6.QtGui import (QColor, QFont, QFontInfo, QFontMetricsF, QIcon, QIconEngine, QImage,
                            QPainter, QPainterPath, QPen, QPixmap, QTextDocument, QTransform)
 
-from soundboard import theme
+from soundboard.ui.kit import theme
 
 SIZES = (16, 20, 24, 32, 48)
 

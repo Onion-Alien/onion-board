@@ -1237,7 +1237,7 @@ def styled_after(app):
     """Build a lot of widgets with the app sheet off, then style them all at once: Qt
     re-applies an app-wide sheet to every widget added to a layout or tab, about half
     of a window's build. Widgets that measure text re-measure on StyleChange
-    (ui/restyled.py)."""
+    (ui/kit/restyled.py)."""
     css = app.styleSheet() if app is not None else ""
     if app is None or not css:
         yield

@@ -10,7 +10,7 @@ from PySide6.QtWidgets import QApplication, QToolTip
 
 from soundboard.sounds import library
 from soundboard.sounds.library import SoundMeta
-from soundboard.ui.widgets import Pad
+from soundboard.ui.kit.widgets import Pad
 
 
 def _pad(file: Path, state="ready", hover=True) -> Pad:

@@ -70,7 +70,7 @@ from PySide6.QtCore import QPointF, QRectF, QSize, Qt, QTimer, Signal
 from PySide6.QtGui import QColor, QFont, QImage, QPainter, QPainterPath, QPen
 from PySide6.QtWidgets import QSizePolicy, QWidget
 
-from soundboard import theme
+from soundboard.ui.kit import theme
 from soundboard.core import usage
 from soundboard.bunny import (
     FUR,
@@ -95,8 +95,9 @@ from soundboard.bunny import (
 )
 from soundboard.i18n import _
 from soundboard.style import bunnyfit, mascotlines
-from soundboard.ui import appstate, bunskits, lite
-from soundboard.ui.pixels import snap_to_pixels
+from soundboard.ui.kit import appstate
+from soundboard.ui import bunskits, lite
+from soundboard.ui.kit.pixels import snap_to_pixels
 
 log = logging.getLogger(__name__)
 

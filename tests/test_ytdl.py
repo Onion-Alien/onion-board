@@ -635,7 +635,7 @@ from test_mainwindow import window  # noqa: E402,F401  (the real MainWindow fixt
 def test_settings_ytdlp_row(qapp, window, monkeypatch):  # noqa: F811
     """Updates > Helper programs: yt-dlp's Update now says how it went on its row."""
     from soundboard.settings import SettingsDialog
-    from soundboard.ui import busy
+    from soundboard.ui.kit import busy
     monkeypatch.setattr(ytdl, "active_version", lambda: ("2026.8.19", False))
     monkeypatch.setattr(ytdl, "update", lambda: "Updated yt-dlp to 2099.1.1.")
     d = SettingsDialog(window, "updates")
@@ -654,7 +654,7 @@ def test_force_update_warns_first(qapp, window, monkeypatch):  # noqa: F811
     """Force update installs nothing until the warning's Install anyway; Cancel does
     nothing at all."""
     from soundboard.settings import SettingsDialog
-    from soundboard.ui import busy
+    from soundboard.ui.kit import busy
     calls = []
     monkeypatch.setattr(ytdl, "active_version", lambda: ("2026.8.19", False))
     monkeypatch.setattr(ytdl, "force_newest",
@@ -1301,7 +1301,7 @@ def test_result_counts_are_only_what_the_search_gave():
 
 
 def test_a_download_shows_its_progress_and_leaves_the_other_cards_free(qapp, monkeypatch):
-    from soundboard.ui import busy
+    from soundboard.ui.kit import busy
     from soundboard.i18n import _
     from soundboard.ui.ytsearch import SearchResults
     hits = [ytdl.Result(f"vid{i}xxxxxx", f"Song {i}", "c", 60, "myinstants",
@@ -1412,7 +1412,7 @@ def test_show_more_adds_the_next_page_under_the_cards_up_to_the_cap(qapp, monkey
 
 
 def test_open_results_follow_a_theme_switch(qapp):
-    from soundboard import theme
+    from soundboard.ui.kit import theme
     from soundboard.ui.ytsearch import SearchResults
     panel = SearchResults()
     panel.query = "x"

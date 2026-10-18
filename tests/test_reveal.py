@@ -2,7 +2,7 @@
 from PySide6.QtTest import QTest
 from PySide6.QtWidgets import QLabel, QVBoxLayout, QWidget
 
-from soundboard.ui import reveal, toast
+from soundboard.ui.kit import reveal, toast
 
 
 def _page(qapp):

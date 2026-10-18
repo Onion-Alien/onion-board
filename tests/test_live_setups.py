@@ -13,7 +13,7 @@ from soundboard.sounds import library
 from soundboard.mic import livesetup, voicesetups
 from soundboard.audio import renderworker
 from soundboard.sounds.library import SR
-from soundboard.ui import toast
+from soundboard.ui.kit import toast
 
 ROBOT = {"robot": {"on": True, "freq": 100, "noise": 0.2, "mix": 1}}
 BEAR = {"id": "bear", "name": "Bear", "pitch": 0.0}

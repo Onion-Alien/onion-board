@@ -49,7 +49,7 @@ def test_a_picture_from_a_file_goes_on_only_on_save(window, tmp_path, monkeypatc
 
 
 def test_an_unreadable_file_is_refused(window, tmp_path, monkeypatch):  # noqa: F811
-    from soundboard.ui import toast
+    from soundboard.ui.kit import toast
     bad = tmp_path / "x.png"
     bad.write_bytes(b"not a picture")
     monkeypatch.setattr(QFileDialog, "getOpenFileName", lambda *a, **k: (str(bad), ""))

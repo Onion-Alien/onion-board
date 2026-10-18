@@ -15,7 +15,7 @@ from PySide6.QtCore import QPointF, QRectF, Qt
 from PySide6.QtGui import (QColor, QFont, QIcon, QImage, QLinearGradient, QPainter, QPainterPath,
                            QPixmap)
 
-from soundboard.ui import icons
+from soundboard.ui.kit import icons
 
 ART_DIR = (Path(sys._MEIPASS) / "art" if hasattr(sys, "_MEIPASS")   # pyright: ignore[reportAttributeAccessIssue]
            else Path(__file__).resolve().parents[2] / "assets" / "art")

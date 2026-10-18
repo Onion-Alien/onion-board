@@ -2,7 +2,7 @@
 import pytest
 from PySide6.QtWidgets import QLineEdit
 
-from soundboard import theme
+from soundboard.ui.kit import theme
 
 
 @pytest.mark.parametrize("name", theme.THEMES)

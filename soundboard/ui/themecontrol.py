@@ -12,9 +12,10 @@ from PySide6.QtCore import QTimer
 from PySide6.QtWidgets import QApplication
 
 from soundboard.win import shellicon
-from soundboard import theme
+from soundboard.ui.kit import theme
 from soundboard.i18n import _
-from soundboard.ui import icons, lite, themecover
+from soundboard.ui.kit import icons
+from soundboard.ui import lite, themecover
 from soundboard.ui.controller import Controller
 from soundboard.ui.livedot import set_tint as set_live_tint
 from soundboard.ui.logowidget import glow_icon

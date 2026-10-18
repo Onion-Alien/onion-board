@@ -13,7 +13,7 @@ import sys
 from typing import TYPE_CHECKING
 
 from soundboard.core import errors
-from soundboard import theme
+from soundboard.ui.kit import theme
 from soundboard.control import remote
 from soundboard.i18n import _
 from soundboard.ui.controller import Controller

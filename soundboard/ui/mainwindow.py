@@ -17,7 +17,7 @@ from PySide6.QtCore import (QEvent, QObject, QPoint, QSignalBlocker,
 from PySide6.QtWidgets import (QApplication, QDialog, QMainWindow, QMenu, QMessageBox, QPushButton,
                                QSystemTrayIcon)
 
-from soundboard import theme
+from soundboard.ui.kit import theme
 from soundboard.online import ytworker
 from soundboard.audio.engine import SR, Engine
 from soundboard.core import exitwatch
@@ -34,8 +34,8 @@ from soundboard.win import shellicon, thumbbar
 from soundboard.addons import watchaddon
 from soundboard.audio.replay import InstantReplay
 from soundboard.sounds.library import Config, SoundMeta
-from soundboard.ui.crashdialog import free_dialog
-from soundboard.ui import restyled, worker
+from soundboard.ui.kit.crashdialog import free_dialog
+from soundboard.ui.kit import restyled, worker
 from soundboard.ui.ffmpegcontrol import FfmpegControl
 from soundboard.ui.netcontrol import NetControl
 from soundboard.ui.soundscontrol import SoundsControl
@@ -68,9 +68,9 @@ from soundboard.ui.alertcontrol import AlertControl
 from soundboard.ui.categorycontrol import CategoryControl
 from soundboard.ui.importcontrol import ImportControl
 from soundboard.ui.updatecontrol import UpdateControl
-from soundboard.ui import toast as toastmod
-from soundboard.ui import (a11y, appstate, busy, icons, lite, livesize, responsive,
-                           splash, taboff, tabtours)
+from soundboard.ui.kit import toast as toastmod
+from soundboard.ui.kit import a11y, appstate, busy, icons
+from soundboard.ui import lite, livesize, responsive, splash, taboff, tabtours
 from soundboard.ui.linkbar import PLAY_ID as LINK_ID
 from soundboard.ui.logowidget import glow_icon
 from soundboard.ui import sidebar
@@ -82,7 +82,7 @@ from soundboard.ui.triggerstab import TriggersTab
 from soundboard.ui.radiopanel import RadioOff, RadioTab
 from soundboard.ui.storetab import PREVIEW as STORE_PREVIEW, StoreTab
 from soundboard.ui.voicepanel import VoicePanel
-from soundboard.ui.widgets import (Meter, Pad, expand_dropped)
+from soundboard.ui.kit.widgets import Meter, Pad, expand_dropped
 from soundboard.control.winkeys import Hotkeys
 from soundboard.i18n import _
 
@@ -117,13 +117,13 @@ if TYPE_CHECKING:
     from soundboard.ui.linkbar import LinkBar
     from soundboard.ui.logowidget import LogoWidget
     from soundboard.ui.padbatch import PadSelection
-    from soundboard.ui.panel import EqPanel, Flow, TileRow, ViewToggle, VolumeControl
-    from soundboard.ui.playbutton import PlayButton
+    from soundboard.ui.kit.panel import EqPanel, Flow, TileRow, ViewToggle, VolumeControl
+    from soundboard.ui.kit.playbutton import PlayButton
     from soundboard.ui.setupshow import SetupShow
     from soundboard.ui.sidebar import SideTabs
     from soundboard.ui.speedpitch import SpeedPitchButton
-    from soundboard.ui.widgets import (DropdownMenu, EdgeMatch, NameAndSeek, PadGrid, SeekSlider,
-                                       WindowRoot)
+    from soundboard.ui.kit.widgets import (DropdownMenu, EdgeMatch, NameAndSeek, PadGrid,
+                                           SeekSlider, WindowRoot)
     from soundboard.ui.windowbuild import BannerButton, Pulse
     from soundboard.ui.ytsearch import SearchResults
 
@@ -163,7 +163,7 @@ class MainWindow(QMainWindow):
     apps: Any
     _attach_release: Any
     _attaching: bool
-    attach_glow: Any   # ui/glow.py Glow on btn_attach
+    attach_glow: Any   # ui/kit/glow.py Glow on btn_attach
     _banner_fx: QGraphicsOpacityEffect
     _body_lay: Any
     btn_about: QPushButton
@@ -173,7 +173,7 @@ class MainWindow(QMainWindow):
     btn_bin: QPushButton
     btn_cablefix: QPushButton
     _cable_started: bool   # Install the free virtual cable was clicked (check again shows)
-    install_glow: Any      # ui/glow.py Glow on btn_install (the mic route's main button)
+    install_glow: Any      # ui/kit/glow.py Glow on btn_install (the mic route's main button)
     ways_or: Any           # the "or" before the cable's buttons on the Setup tab
     btn_chat: QPushButton
     btn_check: QPushButton
@@ -828,7 +828,7 @@ class MainWindow(QMainWindow):
         return None if bar is None else bar.mapTo(self, QPoint(0, 0)).y()
 
     def toast_mode(self) -> str:
-        """How the corner cards show (ui/toast.py): as cards in the window; as icons on
+        """How the corner cards show (ui/kit/toast.py): as cards in the window; as icons on
         top of the mini player's pads; not at all in the mini player with no pads (a
         remote: errors wait for the window to grow)."""
         if not self.fitctl.is_mini():

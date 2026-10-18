@@ -10,13 +10,14 @@ from PySide6.QtWidgets import (QApplication, QBoxLayout, QCheckBox, QComboBox, Q
 from shiboken6 import isValid as qt_valid
 
 from soundboard.i18n import _
-from soundboard.ui import icons, overlay as ovl
-# the actions, how a combo reads and the key picker live in ui/hotkeypick.py (pads and
+from soundboard.ui.kit import icons
+from soundboard.ui import overlay as ovl
+# the actions, how a combo reads and the key picker live in ui/kit/hotkeypick.py (pads and
 # menus use them without loading Settings); here for the page and older imports
-from soundboard.ui.hotkeypick import (HOTKEY_ACTIONS, HOTKEY_GROUP_ICONS, HOTKEY_GROUPS,
-                                      HotkeyDialog, pretty_key)
+from soundboard.ui.kit.hotkeypick import (HOTKEY_ACTIONS, HOTKEY_GROUP_ICONS, HOTKEY_GROUPS,
+                                          HotkeyDialog, pretty_key)
 from soundboard.ui.settingspages import Page, _button_row
-from soundboard.wheelguard import no_wheel
+from soundboard.ui.kit.wheelguard import no_wheel
 
 log = logging.getLogger(__name__)
 
@@ -177,7 +178,7 @@ class KeysPage(Page):
                                       _("Auto-hide after")))
         row.addStretch(1)   # the choice right after its label, not at the card's far edge
         cv.addLayout(row)
-        from soundboard.ui.widgets import widget_at   # (it imports this module)
+        from soundboard.ui.kit.widgets import widget_at  # (it imports this module)
         toggle_only = widget_at(row, 1)
         assert toggle_only is not None
         self.dlg.ov_toggle_only = (after, toggle_only)

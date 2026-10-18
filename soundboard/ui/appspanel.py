@@ -29,12 +29,12 @@ from PySide6.QtWidgets import (QFrame, QHBoxLayout, QInputDialog, QLabel, QLayou
                                QPushButton, QScrollArea, QSlider, QVBoxLayout, QWidget)
 
 from soundboard.audio import appaudio
-from soundboard import theme
+from soundboard.ui.kit import theme
 from soundboard.core import trash, usage
 from soundboard.sounds import library
 from soundboard.i18n import _
-from soundboard.ui import a11y, appstate, icons
-from soundboard.ui.widgets import InlineNameBox, widget_at
+from soundboard.ui.kit import a11y, appstate, icons
+from soundboard.ui.kit.widgets import InlineNameBox, widget_at
 from soundboard.ui.appcapture import METER_MS, AppCapture
 # the cards and their helpers live in approw.py; their names stay importable from here
 from soundboard.ui.approw import (APP_CATEGORIES, APP_DRAG_MIME,  # noqa: F401
@@ -45,10 +45,10 @@ from soundboard.ui.approw import (APP_CATEGORIES, APP_DRAG_MIME,  # noqa: F401
 from soundboard.ui.bunnywidget import BunnyWidget
 from soundboard.ui.clipeditor import WAVE_H
 from soundboard.ui.clipshelf import ClipShelf
-from soundboard.ui.panel import UndoBar, ViewToggle, hint_label
+from soundboard.ui.kit.panel import UndoBar, ViewToggle, hint_label
 from soundboard.ui.responsive import FitWidth
 from soundboard.ui.speedpitch import SpeedPitchButton
-from soundboard.wheelguard import no_wheel
+from soundboard.ui.kit.wheelguard import no_wheel
 
 log = logging.getLogger(__name__)
 

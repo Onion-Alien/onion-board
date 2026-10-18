@@ -4,7 +4,7 @@ import logging
 import pytest
 from PySide6.QtCore import QObject, Signal
 
-from soundboard.ui import worker
+from soundboard.ui.kit import worker
 from tests.conftest import process_events
 
 

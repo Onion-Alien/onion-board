@@ -8,7 +8,7 @@ from PySide6.QtWidgets import (QApplication, QComboBox, QGridLayout, QHBoxLayout
                                QWidget)
 
 from soundboard.settings import SettingsDialog
-from soundboard.wheelguard import AppStyle
+from soundboard.ui.kit.wheelguard import AppStyle
 from test_mainwindow import window  # noqa: F401  (the real MainWindow fixture)
 
 CAP = AppStyle.COMBO_CAP
@@ -156,7 +156,7 @@ def test_a_freed_layout_item_never_reaches_polish(qapp):
     from PySide6.QtCore import QObject
     from PySide6.QtWidgets import QLabel, QWidgetItem
 
-    from soundboard.ui.widgets import widget_at
+    from soundboard.ui.kit.widgets import widget_at
 
     box = QWidget()
     row = QHBoxLayout(box)

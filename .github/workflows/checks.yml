@@ -142,7 +142,7 @@ jobs:
           # main after a merge); the nightly and a manual run always
           mic=true
           if [ "$changed" != ALL ] && ! grep -qE \
-              '^(native/directmic/|scripts/(build|check|fuzz)_directmic\.py|tests/test_directmic\.py|soundboard/directmic\.py|\.github/workflows/checks\.yml)' <<< "$changed"; then
+              '^(native/directmic/|scripts/(build|check|fuzz)_directmic\.py|tests/test_directmic\.py|soundboard/mic/directmic\.py|\.github/workflows/checks\.yml)' <<< "$changed"; then
             mic=false
           fi
           echo "mic=$mic" >> "$GITHUB_OUTPUT"

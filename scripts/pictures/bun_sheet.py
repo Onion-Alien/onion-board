@@ -26,7 +26,8 @@ from PySide6.QtGui import QColor, QFont, QImage, QPainter, QPixmap  # noqa: E402
 from PySide6.QtWidgets import QApplication  # noqa: E402
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
-from soundboard import bunny, theme  # noqa: E402
+from soundboard import bunny  # noqa: E402
+from soundboard.ui.kit import theme  # noqa: E402
 
 MIX = ["Royal", "Midnight", "Deep Fried", "Vampire", "Hacker", "Sunset", "Arctic",
        "Comic Sans", "Barbie", "Brainrot"]

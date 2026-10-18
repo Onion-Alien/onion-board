@@ -1217,7 +1217,7 @@ def test_tab_search_failure_says_so_and_can_be_retried(qapp, tab):
     tab.search.setText("nothing like this")
     tab._on_failed("search", "timed out")
     assert tab._results == []
-    from soundboard.ui import toast
+    from soundboard.ui.kit import toast
     assert "Search failed" in tab.list.empty_text()
     assert any("Enter" in t.text() and t.kind == "error" for t in toast.shown(tab))
     tab._search_now()                            # Enter: back to searching
@@ -1734,7 +1734,7 @@ def test_send_is_ringed_only_while_a_station_plays_to_just_you(qapp, tab, server
 
 
 def test_a_station_error_is_an_error_card_that_stays(tab):
-    from soundboard.ui import toast
+    from soundboard.ui.kit import toast
     tab._on_error(radio.station_off_air())
     [t] = [t for t in toast.shown(tab) if "isn't on the air" in t.words()]
     assert t.kind == "error"   # errors stay until closed

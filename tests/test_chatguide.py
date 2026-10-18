@@ -29,7 +29,7 @@ def test_discord_guide_says_studio_and_names_the_mic(wizard):
 def test_check_keeps_the_focus_on_its_button(wizard, monkeypatch):
     """Clicking Check Discord greys it out without setEnabled(False), which would move
     the keyboard focus to the next control; a second click while checking does nothing."""
-    from soundboard.ui import busy
+    from soundboard.ui.kit import busy
     w, wiz = wizard
     g = chatguide.DiscordGuide(wiz, w, "CABLE Output")
     starts = []

@@ -12,8 +12,8 @@ from PySide6.QtWidgets import (QAbstractItemView, QDialog, QDialogButtonBox, QHB
                                QVBoxLayout)
 
 from soundboard.core import trash
-from soundboard.ui import busy, fit, icons, toast
-from soundboard.ui.panel import EmptyList, hint_label
+from soundboard.ui.kit import busy, fit, icons, toast
+from soundboard.ui.kit.panel import EmptyList, hint_label
 from soundboard.i18n import _, ngettext
 
 
