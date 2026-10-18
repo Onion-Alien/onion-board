@@ -9,7 +9,7 @@ from PySide6.QtCore import QBuffer, QByteArray, QTimer
 from PySide6.QtGui import QImage
 
 from conftest import process_events
-from soundboard import quality
+from soundboard.online import quality
 from soundboard.online import ytdl
 from soundboard.ui import ytsearch
 

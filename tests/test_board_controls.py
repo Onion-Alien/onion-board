@@ -732,7 +732,7 @@ def test_pad_menu_has_the_sites_entries_only_for_downloads(window, monkeypatch):
     dialogs = []
     monkeypatch.setattr(sourcedialog.SourceDialog, "show",
                         lambda self: dialogs.append(self))
-    from soundboard import quality
+    from soundboard.online import quality
     monkeypatch.setattr(quality, "current", quality.Prefs(keep_source=False))
     shown = menu_pick(monkeypatch, ["Duplicate"])
     w.padctl.pad_menu("s0", None)

@@ -666,7 +666,7 @@ def features_now(cfg) -> list[str]:
         out.append("also-send")
     if not cfg.theme_texture:
         out.append("textures-off")
-    from soundboard import quality
+    from soundboard.online import quality
     if not quality.current.keep_source:
         out.append("source-off")
     if set(cfg.apps_categories or ()) - set(APPS_BUILT_IN):

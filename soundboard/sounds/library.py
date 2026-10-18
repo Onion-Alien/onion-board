@@ -496,7 +496,7 @@ class Config:
     bun: dict = field(default_factory=dict)        # Bun mode: on, size, pos (ui.bunmode)
     window_maximized: bool = False   # the window was maximised last time: it opens that way
     radio: dict = field(default_factory=dict)      # Radio tab: vol, monitor, favorites, last
-    data: dict = field(default_factory=dict)       # Settings > Data & quality (soundboard.quality)
+    data: dict = field(default_factory=dict)       # Settings > Data & quality (soundboard.online.quality)
     apps: dict = field(default_factory=dict)       # Apps tab: exe -> {vol, monitor, to, path}
     # Apps tab: a second program with the same .exe name in another folder, by its path
     # (appspanel.path_key) -> {vol, monitor, to, exe}. Its own key, so older versions
@@ -2212,7 +2212,7 @@ MP3_QUALITY = 0.2   # libsndfile's compression_level: 0 best .. 1 smallest
 
 
 def stored_ext() -> str:
-    from soundboard import quality
+    from soundboard.online import quality
     return ".mp3" if quality.current.save_format == "mp3" and _CAN_MP3 else ".flac"
 
 

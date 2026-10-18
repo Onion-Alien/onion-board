@@ -139,7 +139,7 @@ def clean(v) -> dict:
 def shown(meta) -> dict:
     """What the pad menu and Edit show for a sound: its cleaned source, or {} while
     Settings > Data & quality > Remember where it came from is off (kept, not shown)."""
-    from soundboard import quality
+    from soundboard.online import quality
     return clean(meta.source) if quality.current.keep_source else {}
 
 

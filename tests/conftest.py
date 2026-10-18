@@ -532,9 +532,9 @@ def _switches_back_on():
 
 @pytest.fixture(autouse=True)
 def _data_prefs_back_to_default(monkeypatch):
-    """Settings > Data & quality (soundboard.quality.current) is process-wide too: a
+    """Settings > Data & quality (soundboard.online.quality.current) is process-wide too: a
     test that turns on Low data mode doesn't leave the next one without thumbnails."""
-    quality = sys.modules.get("soundboard.quality")
+    quality = sys.modules.get("soundboard.online.quality")
     if quality is not None:
         monkeypatch.setattr(quality, "current", quality.Prefs())
 

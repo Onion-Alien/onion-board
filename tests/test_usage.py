@@ -980,7 +980,7 @@ def test_open_time_is_a_rough_bucket(seconds, b):
 
 
 def test_settings_that_are_set_count_every_day(monkeypatch):
-    from soundboard import quality
+    from soundboard.online import quality
     monkeypatch.setattr(quality, "current", quality.Prefs(keep_source=False))
     cfg = Config(sidebar_open=False, apps_categories=["Games", "Other", "Stream stuff"])
     assert {"source-off", "rail-shut", "apps-own-categories"} <= set(usage.features_now(cfg))

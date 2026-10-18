@@ -343,7 +343,7 @@ def test_search_thumbnails_through_the_proxy(qapp, sites, socks, monkeypatch):
     from PySide6.QtCore import QBuffer, QByteArray
     from PySide6.QtGui import QImage
 
-    from soundboard import quality
+    from soundboard.online import quality
     from soundboard.online import ytdl
     from soundboard.ui.ytsearch import ResultRow, SearchResults
     shown = []

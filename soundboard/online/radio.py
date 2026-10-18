@@ -48,7 +48,7 @@ from PySide6.QtMultimedia import QAudioBufferOutput, QAudioFormat, QMediaMetaDat
 from PySide6.QtNetwork import QNetworkAccessManager, QNetworkReply, QNetworkRequest
 
 from soundboard.sounds import library
-from soundboard import quality
+from soundboard.online import quality
 from soundboard.online import net, netlog
 from soundboard.i18n import _
 from soundboard.audio.engine import SR

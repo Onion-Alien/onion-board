@@ -25,7 +25,8 @@ from PySide6.QtCore import Qt, QTimer, Signal
 from PySide6.QtWidgets import QFrame, QHBoxLayout, QLabel, QPushButton
 
 from soundboard.sounds import library, sourceinfo, thumbs, videos
-from soundboard import quality, theme
+from soundboard.online import quality
+from soundboard import theme
 from soundboard.core import usage
 from soundboard.online import net, netlog, ytdl
 from soundboard.sounds.library import SR, decode_int16, fingerprint, import_file, site_folder

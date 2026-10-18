@@ -28,7 +28,7 @@ from soundboard.sounds import library
 from soundboard.control import remote
 from soundboard.online import ffmpegget, net, netlog, tor
 from soundboard.mic import profiles
-from soundboard import quality
+from soundboard.online import quality
 from soundboard.core import usage
 from soundboard.win import shellicon, thumbbar
 from soundboard.addons import watchaddon
