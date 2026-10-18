@@ -1568,7 +1568,7 @@ class BunnyWidget(QWidget):
         p.setRenderHint(QPainter.RenderHint.Antialiasing)
         now = self._still_at if self.resting else time.monotonic()   # (resting: as kept)
         dpr = p.deviceTransform().m11()   # (the screen's, or a grab's, pixels per px)
-        pose = self._held(self.springy(self.pose(now)), dpr)
+        pose = self.springy(self.pose(now))
         r = self._bun_rect()
         # soft shadow on the "floor", shrinking as he rises
         lift = max(0.0, -pose["dy"])
@@ -1596,8 +1596,10 @@ class BunnyWidget(QWidget):
             self._paint_kit(p, r, kit.behind)
         self._paint_build(p, body, r, pose)
         if pose["shown"]:
-            if HOLD and kit is None:
-                p.drawImage(QPointF(0, 0), self._picture(pose, body, dpr))
+            if HOLD and kit is None:   # (only he is kept: what's round him is this frame's)
+                held = self._held(pose, dpr)
+                p.drawImage(QPointF(0, 0), self._picture(
+                    held, r.translated(held["dx"], held["dy"]), dpr))
             else:
                 self._draw_bun(p, pose, body)
         if kit is not None:

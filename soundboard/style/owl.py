@@ -1187,9 +1187,6 @@ class OwlWidget(QWidget):
         p.setRenderHint(QPainter.RenderHint.Antialiasing)
         pose = self.pose()
         dpr = p.deviceTransform().m11()   # (the screen's, or a grab's, pixels per px)
-        held = self._held(pose, dpr)
-        if held is not pose:   # (what's round him is this frame's)
-            pose = {**held, **{k: pose[k] for k in EXTRAS if k in pose}}
         r = self._owl_rect()
         u = self.owl_h / H     # one canvas unit, px
         # a soft shadow on the floor, shrinking as he rises
@@ -1198,8 +1195,8 @@ class OwlWidget(QWidget):
         p.setPen(Qt.PenStyle.NoPen)
         p.setBrush(QColor(0, 0, 0, max(18, 60 - int(lift * 4))))
         p.drawEllipse(QRectF(r.center().x() - sw / 2, r.bottom() - 3, sw, 7))
-        if HOLD:
-            p.drawImage(QPointF(0, 0), self._picture(held, r, dpr))
+        if HOLD:   # (only he is kept: what's round him is this frame's)
+            p.drawImage(QPointF(0, 0), self._picture(self._held(pose, dpr), r, dpr))
         else:
             self._draw_owl(p, pose, r)
         body = r.translated(0, pose["dy"])
