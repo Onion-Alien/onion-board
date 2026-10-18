@@ -69,7 +69,7 @@ def test_doing_it_finishes_it(window, qapp, counted, monkeypatch):
     monkeypatch.setattr(type(window.radio), "is_active", lambda self: on["v"])
     assert open_tab(window, qapp, "radio")
     on["v"] = True
-    assert process_events(qapp, lambda: tabtours._current is None)
+    assert process_events(qapp, lambda: tabtours._current is None, 2)
     assert "tour-radio-done" in counted and tabtours.key("radio") in window.cfg.tips_seen
 
 
@@ -83,7 +83,7 @@ def test_the_rail_takes_no_click_meanwhile(window, qapp):
 def test_leaving_the_tab_brings_it_back_next_time(window, qapp):
     assert open_tab(window, qapp, "voice")
     window.tabs.setCurrentWidget(window.sounds_page)   # (a key, or the app itself)
-    assert process_events(qapp, lambda: tabtours._current is None)
+    assert process_events(qapp, lambda: tabtours._current is None, 2)
     assert tabtours.key("voice") not in window.cfg.tips_seen
     assert open_tab(window, qapp, "voice")
 
@@ -161,7 +161,7 @@ def test_try_again_on_the_red_card_runs_the_step_again(window, qapp):
     reloads = []
     tour.step.retry = lambda: reloads.append(1)
     window.radio._globe_error = "Can't reach the station list."
-    assert process_events(qapp, lambda: tour.failing)
+    assert process_events(qapp, lambda: tour.failing, 2)
     assert "Can't reach the station list." in tour.card.body.text()
     assert tour.card.title.text() == "The radio couldn't connect"
     window.radio._globe_error = ""
@@ -197,7 +197,7 @@ def test_an_error_logged_anywhere_shows_the_red_card(window, qapp):
     assert open_tab(window, qapp, "store")
     tour = tabtours._current
     logging.getLogger("soundboard.somewhere").error("it broke")
-    assert process_events(qapp, lambda: red_card(tour))
+    assert process_events(qapp, lambda: red_card(tour), 2)
     assert "Something went wrong." in tour.card.body.text()
 
 
@@ -216,7 +216,7 @@ def test_a_broken_step_lets_go(window, qapp):
     def boom():
         raise ValueError("bad step")
     tabtours._current.step.done = boom
-    assert process_events(qapp, lambda: tabtours._current is None)
+    assert process_events(qapp, lambda: tabtours._current is None, 2)
 
 
 def test_the_radio_one_rings_the_globe(window, qapp):
@@ -233,14 +233,14 @@ def test_no_station_list_shows_the_red_card(window, qapp):
     assert open_tab(window, qapp, "radio")
     tour = tabtours._current
     window.radio._globe_error = "Can't reach the station list."
-    assert process_events(qapp, lambda: red_card(tour))
+    assert process_events(qapp, lambda: red_card(tour), 2)
 
 
 def test_a_store_that_wont_list_shows_the_red_card(window, qapp):
     assert open_tab(window, qapp, "store")
     tour = tabtours._current
     window.store.failed = True
-    assert process_events(qapp, lambda: red_card(tour))
+    assert process_events(qapp, lambda: red_card(tour), 2)
     assert tour.card.title.text() == "The store couldn't load"
 
 
@@ -252,7 +252,7 @@ def test_apps_with_nothing_to_share_say_so_calmly(window, qapp, monkeypatch):
     tour = tabtours._current
     for r in window.apps.rows.values():
         r.hide()
-    assert process_events(qapp, lambda: tour.failing)
+    assert process_events(qapp, lambda: tour.failing, 3)
     c = tour.card
     assert not c.property("problem") and not c.btn_report.isVisibleTo(c) and c.bun.sad == 1.0
     assert c.title.text() == "Nothing to share yet"
@@ -266,7 +266,7 @@ def test_a_voice_that_cant_switch_on_shows_the_red_card(window, qapp, monkeypatc
     tour = tabtours._current
     monkeypatch.setattr(window.voice, "problem",
                         lambda: "Your mic couldn&#x27;t be opened: busy")
-    assert process_events(qapp, lambda: red_card(tour))
+    assert process_events(qapp, lambda: red_card(tour), 2)
     assert tour.card.title.text() == "Your voice couldn't be switched on"
     assert "Your mic couldn't be opened: busy" in tour.card.body.text()
 
@@ -308,8 +308,8 @@ def test_the_page_red_card_speaks_and_its_try_again_carries_on(window, qapp, mon
     tour = tabtours._current
     tab = window.store
     tab._problem("Couldn't open the store", "No connection.")
-    assert process_events(qapp, lambda: tour.failing and not tour.card.isVisible())
+    assert process_events(qapp, lambda: tour.failing and not tour.card.isVisible(), 2)
     monkeypatch.setattr(store, "browse", lambda *a, **k: ([], False))
     tab.oops.btn_retry.click()   # the page's own Try again
-    assert process_events(qapp, lambda: not tour.failing and tour.card.isVisible())
+    assert process_events(qapp, lambda: not tour.failing and tour.card.isVisible(), 3)
     assert not tour.ended and tour.card.title.text() == "Hear one, then add it"

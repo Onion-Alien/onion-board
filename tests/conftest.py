@@ -487,6 +487,20 @@ def _never_update_for_real(monkeypatch, tmp_path):
 
 
 @pytest.fixture(autouse=True)
+def _never_use_the_real_store(monkeypatch):
+    """No test reaches the real sound store (it has a daily allowance, and whether it was
+    up decided some tests): its address is a closed port here, so every call is refused
+    at once, as when offline. Tests fake store._request or net.urlopen for answers."""
+    global _STORE_PORT
+    from soundboard import store
+    _STORE_PORT = _STORE_PORT or closed_port()   # one for the whole run
+    monkeypatch.setattr(store, "BASE", f"http://127.0.0.1:{_STORE_PORT}")
+
+
+_STORE_PORT = 0
+
+
+@pytest.fixture(autouse=True)
 def _test_servers_stand_in_for_the_internet(monkeypatch, request):
     """The tests' radio stations and Radio Browser run on 127.0.0.x, standing in for
     internet hosts, so the relay's NEVER_THIS_PC refusal is off unless a test asks for
