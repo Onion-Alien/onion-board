@@ -6,6 +6,7 @@ different prop on each page) and by scripts/pictures/make_bunny.py for the insta
 """
 from __future__ import annotations
 
+import functools
 import math
 
 from PySide6.QtCore import QPointF, QRectF, Qt
@@ -62,6 +63,24 @@ PLANK_SPOT = QRectF(84, 91, 17, 18)
 BODY_PIECES = bunnyfit.NECK | {"sweater", "collar"}
 EYES = bunnyfit.EYES
 EYE_Y = bunnyfit.EYE_Y
+
+# The shapes that are the same from frame to frame (his ears at a fold, his tail, his
+# markings, his arms in a pose) are built once and reused: building them (QPainterPath
+# unions) was a good part of each frame. They're only ever drawn or combined into new
+# paths, never changed. False: every frame builds them fresh (the tests compare).
+CACHE = True
+
+
+def _kept(fn):
+    """fn, its results kept by its (hashable) arguments while CACHE is on."""
+    kept = functools.lru_cache(maxsize=512)(fn)
+
+    @functools.wraps(fn)
+    def get(*args):
+        return kept(*args) if CACHE else fn(*args)
+    # (a plain attribute on the function: pyright only knows functools.wraps's type)
+    get.cache_clear = kept.cache_clear  # pyright: ignore[reportAttributeAccessIssue]
+    return get
 
 
 def _ellipse(p: QPainter, cx, cy, w, h, fill, pen: QPen | None = None, angle=0.0):
@@ -124,6 +143,7 @@ REST_HINGE = 12.0  # ... bending a little below its middle, so a good bit stands
 DROOP = (11.0, 6.5)  # an upright ear's top curves out and down this far (ear frame)
 
 
+@_kept
 def _ear_shape(w: float, h: float) -> QPainterPath:
     """An ear in its own frame, centred and upright: narrow where it meets the head,
     fullest above the middle, a round tip."""
@@ -177,6 +197,50 @@ def _ear_pieces(w: float, h: float, bend: QTransform | None, hinge: float = EAR_
     return full.intersected(below), bend.map(full.intersected(above)).united(knee)
 
 
+@_kept
+def _ear(side: int, w: float, h: float, fold: float | None, hinge: float, chomp: bool,
+         droop: bool):
+    """An ear's two pieces as draw_bunny draws them (_ear_pieces): folded `fold` degrees
+    about `hinge` (None: straight), with a bite out of its outer edge (`chomp`) and its
+    standing part curved over (`droop`, _droop)."""
+    bite = None
+    if chomp:
+        bite = _oval(side * w * 0.5, -h * 0.17, 9, 8.5).united(
+            _oval(side * w * 0.55, -h * 0.02, 6.5, 6.5))
+    lower, flap = _ear_pieces(w, h, None if fold is None else _ear_bend(fold, hinge), hinge,
+                              bite)
+    if droop:
+        lower = _droop(side, h)(lower)
+    return lower, flap
+
+
+@_kept
+def _inner_ear(iw: float, ih: float, dx: float, dy: float, droop_side: int, h: float):
+    """The inner ear (its own frame), curved over with the ear (droop_side, else 0)."""
+    shape = QTransform().translate(dx, dy).map(_ear_shape(iw, ih))
+    return shape if not droop_side else _droop(droop_side, h)(shape)
+
+
+@_kept
+def _flap_inner(inner: tuple, fold: float, hinge: float) -> QPainterPath:
+    """The half of the inner ear (_inner_ear(*inner)) that folds over with the flap."""
+    top = QPainterPath()
+    top.addRect(QRectF(-30, -60, 60, 60 + hinge))
+    return _ear_bend(fold, hinge).map(_inner_ear(*inner).intersected(top))
+
+
+@_kept
+def _floppy_pink(ear: tuple, inner: tuple, w: float, hinge: float):
+    """A floppy ear's clip (both pieces, _ear(*ear)) and the pink inside it, up to the
+    bend (_inner_ear(*inner))."""
+    lower, flap = _ear(*ear)
+    assert flap is not None   # (a floppy ear is always folded)
+    top = QPainterPath()
+    top.addRect(QRectF(-30, hinge, 60, 60))
+    top.addEllipse(QRectF(-w * 0.25, hinge - w * 0.25, w * 0.5, w * 0.5))
+    return lower.united(flap), _inner_ear(*inner).intersected(top.simplified())
+
+
 def _stroke(p: QPainter, path: QPainterPath, col: QColor, width: float):
     p.setPen(QPen(col, width, Qt.PenStyle.SolidLine, Qt.PenCapStyle.RoundCap,
                   Qt.PenJoinStyle.RoundJoin))
@@ -224,6 +288,7 @@ def _bean(x, y, w, h, lean) -> QPainterPath:
     return QTransform().translate(x, y).rotate(lean).map(path)
 
 
+@_kept
 def _limb(a, c, b, r0: float, r1: float, n: int = 16) -> QPainterPath:
     """A tapered limb along the curve a -> b (bent towards c): r0 thick at a, r1 at b,
     round at both ends."""
@@ -295,24 +360,17 @@ def _paws(p: QPainter, prop, sad: float, angry: float, paw_fur: QColor, ink: QPe
     if hold is not None and prop is None:   # (a skit's paws, holding its things)
         reach = hold
     fur = sleeve or paw_fur
-    st = QPainterPathStroker()
-    st.setWidth(2 * ARM_R)
-    st.setCapStyle(Qt.PenCapStyle.RoundCap)
-    st.setJoinStyle(Qt.PenJoinStyle.RoundJoin)
     for i in (0, 1):
         if prop == "headphones" and reach[i] is not None or (waving and i == 1):
             continue
-        line = QPainterPath(QPointF(*SHOULDERS[i]))
         if reach[i] is not None:   # out to the prop, which draws the paw holding it
-            line.quadTo(QPointF(*_prop_bend(i, reach[i])), QPointF(*reach[i]))
             p.setPen(ink)
             p.setBrush(fur)
-            p.drawPath(st.createStroke(line).simplified())
+            p.drawPath(_arm_out(i, tuple(reach[i])))
             continue
         (bx, by), (px, py) = (_lerp(_lerp(ARMS_REST[i][k], ARMS_HOPE[i][k], clasp),
                                     ARMS_CROSS[i][k], cross) for k in (0, 1))
-        line.quadTo(QPointF(bx, by), QPointF(px, py))
-        arm = st.createStroke(line).united(_oval(px, py, 2 * PAW_R, 2 * PAW_R)).simplified()
+        arm = _arm_free(i, bx, by, px, py)
         p.setPen(ink)
         p.setBrush(fur)
         p.drawPath(arm)
@@ -320,6 +378,32 @@ def _paws(p: QPainter, prop, sad: float, angry: float, paw_fur: QColor, ink: QPe
             _ellipse(p, px, py, 2 * PAW_R, 2 * PAW_R, paw_fur, ink)
 
 
+def _arm_stroker() -> QPainterPathStroker:
+    st = QPainterPathStroker()
+    st.setWidth(2 * ARM_R)
+    st.setCapStyle(Qt.PenCapStyle.RoundCap)
+    st.setJoinStyle(Qt.PenJoinStyle.RoundJoin)
+    return st
+
+
+@_kept
+def _arm_out(i: int, paw: tuple) -> QPainterPath:
+    """Arm `i` from his shoulder out to a prop's paw (the prop draws the paw)."""
+    line = QPainterPath(QPointF(*SHOULDERS[i]))
+    line.quadTo(QPointF(*_prop_bend(i, paw)), QPointF(*paw))
+    return _arm_stroker().createStroke(line).simplified()
+
+
+@_kept
+def _arm_free(i: int, bx: float, by: float, px: float, py: float) -> QPainterPath:
+    """Arm `i` from his shoulder, bent at bx, by, to its round paw at px, py."""
+    line = QPainterPath(QPointF(*SHOULDERS[i]))
+    line.quadTo(QPointF(bx, by), QPointF(px, py))
+    return _arm_stroker().createStroke(line).united(
+        _oval(px, py, 2 * PAW_R, 2 * PAW_R)).simplified()
+
+
+@_kept
 def _tail_shape(style: str) -> QPainterPath:
     """His tail, peeking out behind his left haunch (bunnyfit.TAILS): a round puff, a
     big fluffy one with soft tufts, a long one swept out, a pointy tuft or a heart."""
@@ -349,6 +433,7 @@ def _tail_shape(style: str) -> QPainterPath:
     return _oval(24, 111, 12.5, 11.5)
 
 
+@_kept
 def _marks(pattern, part: str) -> QPainterPath:
     """His fur markings (bunnyfit.PATTERNS) on `part` ("head" or "body"), before
     they're clipped to it: a patch over his left eye (the viewer's right), round spots,
@@ -513,27 +598,22 @@ def draw_bunny(p: QPainter, rect: QRectF, prop: str | None = None, *,
         p.translate(cx, cy)   # from here on: the ear's own frame, centred, upright
         p.rotate(a)
         bend = _ear_bend(side * bent, hinge)
-        bite = None
-        if "chomp" in extras and side == upright[-1]:   # a bite out of the outer edge
-            bite = _oval(side * w * 0.5, -h * 0.17, 9, 8.5).united(
-                _oval(side * w * 0.55, -h * 0.02, 6.5, 6.5))
-        lower, flap = _ear_pieces(w, h, bend if bent > 0.5 else None, hinge, bite)
-        if droop is not None:
-            lower = droop(lower)
+        # (with "chomp", a bite out of the outer edge of his last upright ear)
+        ear = (side, w, h, side * bent if bent > 0.5 else None, hinge,
+               "chomp" in extras and side == upright[-1], droop is not None)
+        lower, flap = _ear(*ear)
         # how much of the inner ear the flap shows: a flap folded right over shows its
         # furry back; his floppy ear only bends, so its pink runs on to the tip
         inner_on = (1.0 if rest and bent < rest + 8 else   # his floppy ear: pink to the tip
                     0.0 if bent > 50 else max(0.0, 1 - bent / 50))
 
-        def inner(col, iw, ih, dx=0.0, dy=3.0, droop=droop if bent < 1 else None):
-            shape = QTransform().translate(dx, dy).map(_ear_shape(iw, ih))
-            return (shape if droop is None else droop(shape)), col
-
+        # the inner ear: (_inner_ear's arguments, its colour)
+        curl = side if droop is not None and bent < 1 else 0
         if robot:
-            parts = [inner(ROBOT_CYAN.lighter(100 + round(25 * led)), 8, h - 14),
-                     inner(ROBOT_CYAN_HI, 3, h - 22)]
+            parts = [((8, h - 14, 0.0, 3.0, curl, h), ROBOT_CYAN.lighter(100 + round(25 * led))),
+                     ((3, h - 22, 0.0, 3.0, curl, h), ROBOT_CYAN_HI)]
         else:
-            parts = [inner(ear_pink, w * 0.5, h - 16)]
+            parts = [((w * 0.5, h - 16, 0.0, 3.0, curl, h), ear_pink)]
         for piece, alpha in ((lower, 1.0), (flap, inner_on)):
             if piece is None:
                 continue
@@ -549,25 +629,21 @@ def draw_bunny(p: QPainter, rect: QRectF, prop: str | None = None, *,
                 _ellipse(p, 0, 2, 15, h - 4, halo)
             if alpha > 0:
                 p.setOpacity(p.opacity() * alpha)
-                for shape, col in parts:
-                    if piece is flap:   # (only the half that went over with it)
-                        top = QPainterPath()
-                        top.addRect(QRectF(-30, -60, 60, 60 + hinge))
-                        shape = bend.map(shape.intersected(top))
+                for shape, col in parts:   # (the flap: only the half that went over with it)
+                    shape = (_flap_inner(shape, side * bent, hinge) if piece is flap else
+                             _inner_ear(*shape))
                     p.setBrush(col)
                     p.drawPath(shape)
             p.restore()
         if flap is not None and not robot and bent < rest + 8:
             # his floppy ear bends out and back: the pink inside shows right up to the
             # bend, rounded off there
-            top = QPainterPath()
-            top.addRect(QRectF(-30, hinge, 60, 60))
-            top.addEllipse(QRectF(-w * 0.25, hinge - w * 0.25, w * 0.5, w * 0.5))
+            clip, pink = _floppy_pink(ear, parts[0][0], w, hinge)
             p.save()
-            p.setClipPath(lower.united(flap))
+            p.setClipPath(clip)
             p.setPen(Qt.PenStyle.NoPen)
             p.setBrush(ear_pink)
-            p.drawPath(parts[0][0].intersected(top.simplified()))
+            p.drawPath(pink)
             # and round the bend: a pink disc as wide as the inner ear there, so no
             # wedge of fur opens between the two halves' pink
             r = w * 0.24

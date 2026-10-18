@@ -368,3 +368,16 @@ def test_the_triggers_tabs_hoot_rests_after_30_s():
     from soundboard.ui import triggerstab
     assert triggerstab.HOOT_REST_S == 30.0
     assert "rest_after_s=lite.rest_s(HOOT_REST_S)" in inspect.getsource(triggerstab)
+
+
+
+def test_his_kept_shapes_are_the_ones_built_fresh(qapp):
+    """His outline, tufts, wings and face mask are built once and kept: the same
+    shapes as building them again."""
+    assert owl.body_path() is owl.body_path()
+    assert owl.body_path() == owl.body_path.__wrapped__()
+    assert owl._face_path() == owl._face_path.__wrapped__()
+    for sx in (-1, 1):
+        assert owl._wing(sx) == owl._wing.__wrapped__(sx)
+        for style in {k.get("tufts", "point") for k in owl.LOOKS.values()} | {"point"}:
+            assert owl._tuft(sx, style) == owl._tuft.__wrapped__(sx, style)

@@ -235,3 +235,62 @@ def test_engine_levels_the_voice_it_sends():
         sent.append(out.copy())
     y = np.concatenate(sent)
     assert _talk_db(y[SR * 2:]) > -36 + 10       # turned up (off, it stays where it was)
+
+
+# ------------------------------------------------- per-block shortcuts (same samples)
+
+def _talk_blocks(seed=4, n=300):
+    """A mic that talks, pauses and shouts now and then, as (BLOCK, 2) blocks."""
+    rng = np.random.default_rng(seed)
+    out = []
+    for i in range(n):
+        level = (0.002, 0.08, 0.6)[(i // 25) % 3 if i % 50 else 2]
+        out.append((rng.standard_normal((BLOCK, 2)) * level).astype(np.float32))
+    return out
+
+
+def test_limiter_at_rest_shortcut_gives_the_same_samples():
+    """At rest (gain 1, histories all 1s) the limiter skips re-checking them every
+    block: what comes out is what checking each block gives."""
+    fast, slow = Limiter(SR), Limiter(SR)
+    for i, x in enumerate(_talk_blocks()):
+        slow._open = False   # (checks its histories, as before the shortcut)
+        if i % 40 == 7:   # silence through the rest path too
+            a, b = fast.silence(BLOCK), slow.silence(BLOCK)
+            assert (a is None) == (b is None)
+            if a is None:
+                continue
+        else:
+            a, b = fast.process(x), slow.process(x)
+        assert np.array_equal(a, b), i
+        assert fast.env_db == slow.env_db and fast.reduction_db == slow.reduction_db
+
+
+def test_ducker_moves_the_same_whether_its_gain_is_used_or_not():
+    """The sounds bus is silence: Ducker.process(ramp=False) makes no gain array but
+    moves exactly as before, and a gain held still is the old ramp's value."""
+    a, b = Ducker(SR), Ducker(SR)
+    held = 0
+    for i, m in enumerate(_talk_blocks()):
+        ga = a.process(m, BLOCK, -12.0)
+        gb = b.process(m, BLOCK, -12.0, ramp=i % 3 != 0)
+        assert (a.gain_db, a.floor_db, a.held, a.talking) == (
+            b.gain_db, b.floor_db, b.held, b.talking)
+        if i % 3 == 0:
+            assert gb == 1.0
+        if isinstance(ga, np.ndarray) and ga.shape == (1, 1):
+            held += 1
+            old = (10 ** (np.linspace(a.gain_db, a.gain_db, BLOCK + 1)[1:] / 20)).astype(
+                np.float32)[:, None]
+            assert np.array_equal(np.broadcast_to(ga, old.shape), old)
+            mix = np.ones((BLOCK, 2), np.float32) * 0.3
+            assert np.array_equal(mix * ga, mix * old)
+    assert held > 10   # (it did hold down while talking)
+
+
+def test_mean_square_is_numpys_mean():
+    rng = np.random.default_rng(9)
+    for shape in ((480, 2), (441, 1), (7, 2), (1, 1)):
+        for _ in range(200):
+            x = (rng.standard_normal(shape) * rng.uniform(1e-5, 2)).astype(np.float32)
+            assert sendfx._mean_square(x) == float(np.mean(np.square(x, dtype=np.float64)))
