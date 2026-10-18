@@ -603,15 +603,21 @@ class VoicePanel(QWidget):
         return list(self._back) or ["fx"]
 
     def set_voices(self, on: bool):
-        """The Voices switch. Off: every voice goes off, remembered. On: exactly those
-        come back (nothing remembered: the voice changer with its picked voice)."""
+        """The Voices switch. Off: every voice goes off, remembered with the grey ones
+        already waiting. On: exactly those come back (nothing remembered: the voice
+        changer with its picked voice)."""
         self._switching = True
         try:
             if not on:
                 keys = self.on_keys()
                 if keys:                 # already all off: keep what's remembered
-                    self._back = keys
-                    self._back_lang = self.speech.cb_lang.currentData() or ""
+                    # the grey ones stay too (they were shown as coming back), except
+                    # a replacement for your voice the one that's on would push off
+                    other = {"ai": "speak", "speak": "ai"}
+                    self._back = [k for k in ORDER if k in keys or (
+                        k in self._back and other.get(k) not in keys)]
+                    if "lang" in keys:
+                        self._back_lang = self.speech.cb_lang.currentData() or ""
                 for k in keys:
                     self.stop_one(k)
             elif not self.voices_on():

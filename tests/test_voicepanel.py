@@ -128,6 +128,19 @@ def test_voices_switch_with_nothing_remembered_says_and_turns_on_the_picked_voic
     assert p.fx.btn_power.isChecked() and p.fx.preset == "Robot"
 
 
+def test_voices_switch_off_keeps_a_voice_greyed_by_its_chip(panel):
+    """A chip clicked off shows grey, "coming back": switching Voices OFF afterwards
+    must not forget it."""
+    p, _eng = panel
+    p.fx.pick("Robot")
+    p.speech.livevoice.b_live.setChecked(True)
+    p.bar.chips["fx"].click()             # Robot off, grey
+    p.bar.master.click()                  # everything else off too
+    assert p.bar.texts() == ["Mic unchanged. ON brings back:", "Robot", "Computer voice"]
+    p.bar.master.click()
+    assert p.on_keys() == ["fx", "speak"] and p.fx.preset == "Robot"
+
+
 def test_stop_all_remembers_for_the_voices_switch(panel):
     p, _eng = panel
     p.fx.pick("Robot")
