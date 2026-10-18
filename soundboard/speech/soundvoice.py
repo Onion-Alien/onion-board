@@ -37,7 +37,7 @@ class Unavailable(Exception):
 
 def module():
     """The installed AI voices add-on, ready to run, or None."""
-    from soundboard import modules
+    from soundboard.addons import modules
     for m in modules.discover():
         if (m.id == aivoice.MODULE_ID and not m.error and m.installed
                 and all((m.path / "model" / f).is_file() for f in MODEL_FILES)):

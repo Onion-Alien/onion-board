@@ -212,7 +212,7 @@ def test_join_the_discord_comes_first_and_only_opens_the_browser(window, monkeyp
 def test_onion_watch_can_be_removed_from_settings(window, monkeypatch):  # noqa: F811
     from types import SimpleNamespace
 
-    from soundboard import watchaddon
+    from soundboard.addons import watchaddon
     tab = window.triggers
     d = SettingsDialog(window, "help")
     assert not d.addon_remove.isVisibleTo(d) and "isn't installed" in d.addon_label.text()

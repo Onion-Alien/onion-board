@@ -10,7 +10,8 @@ from pathlib import Path
 import numpy as np
 import pytest
 
-from soundboard import aiaddon, modules, voicefx
+from soundboard.addons import aiaddon, modules
+from soundboard import voicefx
 from soundboard.speech import aivoice
 from soundboard.speech.aivoice import AiVoiceController, TalkGate, VoiceSource
 from soundboard.voicefx import VoiceChain

@@ -124,7 +124,7 @@ def install_onion_watch() -> bool:
     never reads the real one. False when there's no zip to install."""
     import importlib
 
-    from soundboard import modules, watchaddon
+    from soundboard.addons import modules, watchaddon
     z = watchaddon.local_zip()
     if z is None:
         return False

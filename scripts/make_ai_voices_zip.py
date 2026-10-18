@@ -1,4 +1,4 @@
-"""Pack the optional AI voices add-on for its GitHub release (soundboard/aiaddon.py).
+"""Pack the optional AI voices add-on for its GitHub release (soundboard/addons/aiaddon.py).
 
     python scripts/make_ai_voices_zip.py --model <folder from export_model.py> [--out dist]
 

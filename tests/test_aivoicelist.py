@@ -6,7 +6,7 @@ from pathlib import Path
 import numpy as np
 import pytest
 
-from soundboard import modules
+from soundboard.addons import modules
 from soundboard.speech import aipreview
 from soundboard.speech import aivoicelist as avl
 
@@ -215,7 +215,7 @@ def test_make_your_own_voice_from_two_others(qapp, app_dir):
 
 def ready_panel(app_dir, monkeypatch, settings=None):
     """The AI voices card with the add-on installed (yours: you can make voices)."""
-    from soundboard import aiaddon
+    from soundboard.addons import aiaddon
     from soundboard.speech.aivoice import AiVoiceController
     from soundboard.ui.aivoicepanel import AiVoicePanel
     from soundboard.voicefx import VoiceChain

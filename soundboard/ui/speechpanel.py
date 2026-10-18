@@ -21,7 +21,7 @@ from PySide6.QtWidgets import (QCheckBox, QComboBox, QDialog, QDialogButtonBox,
                                QLineEdit, QMessageBox, QPlainTextEdit, QPushButton,
                                QScrollArea, QSlider, QVBoxLayout, QWidget)
 
-from soundboard import modules as mods
+from soundboard.addons import modules as mods
 from soundboard import langnames, library, net, theme, usage
 from soundboard.speech import customvoices, spoken, translation, tts, winvoices
 from soundboard.speech.live import SpeechController, clean_settings

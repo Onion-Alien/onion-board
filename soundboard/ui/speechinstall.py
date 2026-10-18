@@ -16,7 +16,7 @@ from PySide6.QtCore import QObject, Qt, QTimer, Signal
 from PySide6.QtWidgets import QFrame, QHBoxLayout, QMessageBox, QPushButton, QVBoxLayout
 
 from soundboard import applog
-from soundboard import modules as mods
+from soundboard.addons import modules as mods
 from soundboard import langnames, net, netlog
 from soundboard.speech import translation, winvoices
 from soundboard.ui import busy, icons

@@ -1,4 +1,4 @@
-"""Getting Onion Watch (soundboard.watchaddon): its release is only trusted from its
+"""Getting Onion Watch (soundboard.addons.watchaddon): its release is only trusted from its
 own GitHub releases with a checksum, the download must match it, a local zip can
 stand in for GitHub, and updates are only looked for once it's installed. No
 network: GitHub's answers and the download are made up."""
@@ -8,7 +8,8 @@ import zipfile
 
 import pytest
 
-from soundboard import updates, watchaddon
+from soundboard import updates
+from soundboard.addons import watchaddon
 from test_triggers_module import make_module, zip_of
 
 ZIP_URL = watchaddon.DOWNLOADS + "v0.2.0/OnionWatch-module.zip"

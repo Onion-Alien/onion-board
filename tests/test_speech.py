@@ -12,7 +12,8 @@ from types import SimpleNamespace
 import numpy as np
 import pytest
 
-from soundboard import modules, voicefx
+from soundboard.addons import modules
+from soundboard import voicefx
 from soundboard.speech import protocol, service
 from soundboard.speech.live import SpeechController
 from soundboard.speech.service import ServiceHost

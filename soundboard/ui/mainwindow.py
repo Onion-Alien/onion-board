@@ -21,9 +21,8 @@ from soundboard import theme, ytworker
 from soundboard.engine import SR, Engine
 from soundboard import exitwatch
 from soundboard import (appaudio, autostart, howl, library, remote, reset, trash, voicesdk)
-from soundboard import (ffmpegget, net, netlog,
-                        profiles, quality, shellicon, thumbbar, tor,
-                        usage, watchaddon)
+from soundboard import (ffmpegget, net, netlog, profiles, quality, shellicon, thumbbar, tor, usage)
+from soundboard.addons import watchaddon
 from soundboard.replay import InstantReplay
 from soundboard.library import (Config,
                                 SoundMeta)
@@ -637,7 +636,7 @@ class MainWindow(QMainWindow):
         """The add-ons' compiled files (modules.precompile), written on a thread while
         nothing plays, so opening the Triggers tab doesn't skip a sound. Once per
         add-on version: after that it only checks they're there."""
-        from soundboard import modules
+        from soundboard.addons import modules
         engine = self.engine
         worker.run(lambda: modules.precompile(modules.discover(), engine.any_playing),
                    name="addon-precompile")
@@ -882,7 +881,7 @@ class MainWindow(QMainWindow):
             if key != "voice":
                 return taboff.TabOff()
             # effects add-ons still load: a sound's effects (Edit sound) use them too
-            from soundboard import modules
+            from soundboard.addons import modules
             modules.load_effects(modules.discover())
             return taboff.VoiceOff()
         if key == "voice":

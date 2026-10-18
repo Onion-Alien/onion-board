@@ -25,7 +25,7 @@ The kinds:
              `soundboard.speech.translation`), and the live-voice helper loads it.
              `language` is its code (de, es…), `language_name` its name.
 
-  "triggers" The Triggers tab (Onion Watch, soundboard.watchaddon). A Python
+  "triggers" The Triggers tab (Onion Watch, soundboard.addons.watchaddon). A Python
              package (`package`, a folder inside the module's) loaded into the app
              from the module's folder, and `entry`, a module in it whose
              `create(host)` makes the tab (or `create(host, parent)`, made on the
@@ -90,7 +90,7 @@ class ModuleError(Exception):
 def app_root() -> Path:
     if getattr(sys, "frozen", False):
         return Path(sys.executable).resolve().parent
-    return Path(__file__).resolve().parent.parent
+    return Path(__file__).resolve().parents[2]
 
 
 def search_dirs() -> list[Path]:

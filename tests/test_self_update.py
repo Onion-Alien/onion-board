@@ -70,7 +70,7 @@ def test_update_now_downloads_then_restarts_into_the_installer(window, boxes, qa
 
 def _launch_check(window, qapp, monkeypatch, rel):
     """The check as the app starts (check_updates(launch=True)) finding `rel`."""
-    from soundboard import watchaddon
+    from soundboard.addons import watchaddon
     monkeypatch.setattr(updates, "check", lambda cfg, force=False, launch=False: rel)
     monkeypatch.setattr(watchaddon, "check_update", lambda: None)
     window.updctl.check_updates(launch=True)
@@ -435,7 +435,7 @@ def test_hiding_the_banner_lasts_until_the_next_start(window, boxes):
 
 
 def test_an_urgent_onion_watch_fix_gets_the_banner_on_its_tab_only(window, monkeypatch):
-    from soundboard import watchaddon
+    from soundboard.addons import watchaddon
     calls = []
     monkeypatch.setattr(window.triggers, "offer_update", lambda o: calls.append(o))
     window.tabs.setCurrentIndex(0)                   # the Sounds tab

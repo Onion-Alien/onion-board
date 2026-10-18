@@ -197,7 +197,7 @@ def test_a_long_voice_job_finishing_after_the_tab_is_off(window, qapp, monkeypat
     report when it finishes."""
     import threading
 
-    from soundboard import aiaddon, modules
+    from soundboard.addons import aiaddon, modules
     from soundboard.speech import translation
     go = threading.Event()
     started = []
@@ -234,7 +234,8 @@ def test_an_ai_voices_download_that_fails_is_said_not_reported(window, qapp, mon
     saved as a crash report (2.0.2's error at updates.py:376)."""
     import threading
 
-    from soundboard import aiaddon, applog, updates
+    from soundboard.addons import aiaddon
+    from soundboard import applog, updates
     reported, ran = [], []
 
     def offline(*_a, **_k):
@@ -252,7 +253,7 @@ def test_an_ai_voices_download_that_fails_is_said_not_reported(window, qapp, mon
 def test_onion_watch_download_finishing_after_the_tab_is_off(window, qapp, monkeypatch):
     import threading
 
-    from soundboard import watchaddon
+    from soundboard.addons import watchaddon
     go, started = threading.Event(), []
 
     def slow(cancelled=None):
@@ -343,7 +344,7 @@ def fake_watch(app_dir, request):
     from test_triggers_module import make_module
     from test_triggerstab import PANEL
 
-    from soundboard import modules
+    from soundboard.addons import modules
     name = f"fakewatch_tabs_{abs(hash(request.node.name)) % 10**8}"
     make_module(app_dir / "modules" / "onion-watch", package=name, board=PANEL)
     yield name

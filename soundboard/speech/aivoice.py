@@ -29,7 +29,7 @@ from collections.abc import Callable, Sequence
 import numpy as np
 
 from soundboard import library, net
-from soundboard.modules import ModuleInfo
+from soundboard.addons.modules import ModuleInfo
 from soundboard.speech import resample
 from soundboard.speech.service import ServiceHost
 

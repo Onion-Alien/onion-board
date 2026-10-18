@@ -10,7 +10,8 @@ import time
 import numpy as np
 import pytest
 
-from soundboard import modules, voicefx
+from soundboard.addons import modules
+from soundboard import voicefx
 from soundboard.speech import protocol, service
 
 SR = 48000

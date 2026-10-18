@@ -4,7 +4,7 @@ nothing that isn't an add-on copy is touched."""
 import json
 import os
 
-from soundboard import modules
+from soundboard.addons import modules
 
 
 def _copy(folder, module_id, age, kind="remote"):

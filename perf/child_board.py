@@ -260,7 +260,7 @@ def write_config(conf: dict):
         c.screen = conf["triggers"]
     c.save()
     if conf.get("watch_zip"):
-        from soundboard import modules
+        from soundboard.addons import modules
         modules.install_zip(Path(conf["watch_zip"]), "onion-watch", "triggers",
                             library.APP_DIR / "modules")
 

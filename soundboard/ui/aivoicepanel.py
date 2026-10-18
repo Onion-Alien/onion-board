@@ -23,8 +23,9 @@ from PySide6.QtWidgets import (QBoxLayout, QButtonGroup, QCheckBox, QComboBox, Q
                                QGridLayout, QHBoxLayout, QLabel, QMenu, QPushButton,
                                QSlider, QVBoxLayout, QWidget)
 
-from soundboard import aiaddon, applog, errors, net, theme, updates, usage
-from soundboard import modules as mods
+from soundboard.addons import aiaddon
+from soundboard import applog, errors, net, theme, updates, usage
+from soundboard.addons import modules as mods
 from soundboard.i18n import _, ngettext
 from soundboard.speech import aivoice
 from soundboard.speech import aivoicelist as avl

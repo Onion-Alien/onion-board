@@ -197,9 +197,9 @@ class AddonsPage(Page):
         relay.done.connect(done)
         threading.Thread(target=ask, daemon=True, name="addon-check").start()
 
-    # ---- Onion Watch (the Triggers tab's add-on, soundboard.watchaddon)
+    # ---- Onion Watch (the Triggers tab's add-on, soundboard.addons.watchaddon)
     def _watch_block(self, grid):
-        from soundboard import watchaddon
+        from soundboard.addons import watchaddon
         status, b = self._addon_block(grid, "Onion Watch", _("the Triggers tab"))
         self.dlg.addon_label, self.dlg.addon_remove = status, b["remove"]
         self.dlg.watch_buttons = b
@@ -309,9 +309,10 @@ class AddonsPage(Page):
             btn.style().unpolish(btn)
             btn.style().polish(btn)
 
-    # ---- Onion Pocket (the phone remote, soundboard.pocketaddon)
+    # ---- Onion Pocket (the phone remote, soundboard.addons.pocketaddon)
     def _pocket_block(self, grid):
-        from soundboard import pocketaddon, updates
+        from soundboard.addons import pocketaddon
+        from soundboard import updates
         status, b = self._addon_block(grid, "Onion Pocket", _("your pads on your phone"))
         self.dlg.pocket_remove_addons = b["remove"]
         self.dlg.pocket_buttons = b
@@ -369,7 +370,8 @@ class AddonsPage(Page):
         """Get / reinstall / update Onion Pocket from the Add-ons card: downloads it
         (pocketaddon.get), the main window swaps it in for any running copy (paired
         phones stay), and its card on Settings → Remote is replaced by the new one's."""
-        from soundboard import netlog, pocketaddon
+        from soundboard import netlog
+        from soundboard.addons import pocketaddon
 
         class Relay(QObject):
             done = Signal(object)
@@ -540,10 +542,10 @@ class AddonsPage(Page):
         return card
 
     def _remote_addon_cards(self) -> list:
-        """The cards of the "remote" add-ons (soundboard.modules), e.g. Onion Pocket.
+        """The cards of the "remote" add-ons (soundboard.addons.modules), e.g. Onion Pocket.
         They're optional: one that's broken is left out (it's in the log), never an
         error box. Without a working Onion Pocket, a card offering to get it."""
-        from soundboard import pocketaddon
+        from soundboard.addons import pocketaddon
         out, have = [], set()
         for info, addon in getattr(getattr(self.mw, "remctl", None), "remote_addons", []):
             card = self._addon_card(info, addon)
@@ -562,13 +564,13 @@ class AddonsPage(Page):
     # ------------------------------------------------------------ Onion Pocket: remove
     def _pocket_info(self):
         """The installed Onion Pocket the app knows of (running or not), or None."""
-        from soundboard import pocketaddon
+        from soundboard.addons import pocketaddon
         return next((i for i, _a in getattr(getattr(self.mw, "remctl", None), "remote_addons", [])
                      if i.id == pocketaddon.MODULE_ID), None)
 
     def _pocket_remove_button(self, card, info):
         """*Remove Onion Pocket* at the foot of its own card on Settings → Remote."""
-        from soundboard import pocketaddon
+        from soundboard.addons import pocketaddon
         lay = card.layout()
         if lay is None or not pocketaddon.removable(info):
             return
@@ -605,7 +607,7 @@ class AddonsPage(Page):
         Settings → Remote turns back into *Get Onion Pocket*."""
         from PySide6.QtWidgets import QMessageBox
 
-        from soundboard import modules, pocketaddon
+        from soundboard.addons import modules, pocketaddon
         info = self._pocket_info()
         if info is None:
             return
@@ -643,13 +645,14 @@ class AddonsPage(Page):
             return None
 
     def _pocket_update(self, card, info):
-        """*Update Onion Pocket to X* on its card (soundboard.pocketaddon), once GitHub
+        """*Update Onion Pocket to X* on its card (soundboard.addons.pocketaddon), once GitHub
         says a newer one is out: asked on a thread when Settings → Remote opens, at most
         once an hour (the answer is kept on the main window). Clicking it downloads the
         new one, and the main window swaps it in for the running copy, settings and
         all; then its new card takes this one's place. Optional and quiet: if anything
         fails, the old copy keeps running and the button just says it didn't work."""
-        from soundboard import net, netlog, pocketaddon, updates
+        from soundboard import net, netlog, updates
+        from soundboard.addons import pocketaddon
         mw = self.mw
         lay = card.layout()
         if lay is None:
@@ -739,10 +742,11 @@ class AddonsPage(Page):
             threading.Thread(target=ask, daemon=True, name="onion-pocket-check").start()
 
     def _get_pocket_card(self):
-        """*Get Onion Pocket* (soundboard.pocketaddon): downloads, installs and starts
+        """*Get Onion Pocket* (soundboard.addons.pocketaddon): downloads, installs and starts
         it, then its own card takes this one's place. If that fails, this card just
         goes away; Onion Pocket is optional."""
-        from soundboard import netlog, pocketaddon
+        from soundboard import netlog
+        from soundboard.addons import pocketaddon
 
         class Relay(QObject):
             done = Signal(object)

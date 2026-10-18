@@ -11,7 +11,8 @@ import pytest
 from conftest import process_events
 from test_triggers_module import make_module, zip_of
 
-from soundboard import updates, watchaddon
+from soundboard import updates
+from soundboard.addons import watchaddon
 from soundboard.library import SoundMeta
 from soundboard.ui import triggershost
 from soundboard.ui.livedot import is_tab_live
@@ -93,7 +94,7 @@ class FakeHost:
 
 @pytest.fixture
 def pkg(request):
-    from soundboard import modules
+    from soundboard.addons import modules
     name = f"fakewatch_tab_{abs(hash(request.node.name)) % 10**8}"
     yield name
     modules._forget(name)
@@ -362,7 +363,7 @@ def test_an_add_on_that_can_is_made_on_the_tab_not_moved_in(qapp, tmp_path, pkg)
         "    MADE_ON.append(parent)\n"
         "    return Panel(host, parent)\n")
     make_module(tmp_path / "modules" / "onion-watch", package=pkg, board=board)
-    from soundboard import modules
+    from soundboard.addons import modules
     (info,) = modules.discover([tmp_path / "modules"])
     modules.load_package(info)
     import sys

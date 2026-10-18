@@ -1,5 +1,5 @@
 """The Triggers tab: plays a sound when something shows up in a game. The tab
-itself is the Onion Watch add-on (soundboard.watchaddon); this is Onion Board's
+itself is the Onion Watch add-on (soundboard.addons.watchaddon); this is Onion Board's
 side of it:
 
   * Until the add-on is installed, the tab is Hoot's card: what Onion Watch does
@@ -29,7 +29,8 @@ from PySide6.QtCore import QEvent, Qt, QTimer, Signal
 from PySide6.QtWidgets import (QBoxLayout, QHBoxLayout, QLabel, QMessageBox, QProgressBar,
                                QPushButton, QVBoxLayout, QWidget)
 
-from soundboard import modules, net, netlog, theme, updates, usage, watchaddon
+from soundboard.addons import modules, watchaddon
+from soundboard import net, netlog, theme, updates, usage
 from soundboard.i18n import _, ngettext
 from soundboard.ui import art, busy, icons, lite
 from soundboard.style.owl import OwlWidget

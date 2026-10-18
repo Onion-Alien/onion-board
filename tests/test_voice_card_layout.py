@@ -5,7 +5,7 @@ from PySide6.QtCore import QPoint, Qt
 from PySide6.QtWidgets import QLabel, QStyle, QStyleOptionButton
 
 from soundboard import theme
-from soundboard import modules
+from soundboard.addons import modules
 from soundboard.speech.aivoice import AiVoiceController
 from soundboard.speech import tts
 from soundboard.ui.aivoicepanel import AiVoicePanel

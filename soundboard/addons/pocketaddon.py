@@ -1,7 +1,7 @@
 """Onion Pocket, the "remote" add-on that puts your pads on your phone: its newest
 release, downloading it and installing it into %APPDATA%\\OnionBoard\\modules\\onion-pocket.
 
-The same path as Onion Watch (soundboard.watchaddon): nothing runs until the *Get
+The same path as Onion Watch (soundboard.addons.watchaddon): nothing runs until the *Get
 Onion Pocket* button on Settings → Remote is clicked; the zip comes only from the
 project's own github.com/…/releases/download/ link, over HTTPS, and is kept only if it
 matches the SHA-256 GitHub lists for it (updates.fetch); then it's checked and unpacked
@@ -30,8 +30,9 @@ from collections.abc import Callable
 from dataclasses import dataclass
 from pathlib import Path
 
-from soundboard import modules, net, updates
-from soundboard.modules import ModuleInfo
+from soundboard.addons import modules
+from soundboard import net, updates
+from soundboard.addons.modules import ModuleInfo
 
 log = logging.getLogger(__name__)
 

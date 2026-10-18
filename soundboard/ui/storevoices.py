@@ -88,7 +88,7 @@ class VoiceHooks:
         p = self.panel()
         if p is not None:
             return p.ai.module
-        from soundboard import aiaddon
+        from soundboard.addons import aiaddon
         return aiaddon.installed()
 
     def take(self, v: sv.Voice) -> str:

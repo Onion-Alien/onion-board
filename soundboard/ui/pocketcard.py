@@ -51,7 +51,7 @@ class PocketCard(QObject):
     # ------------------------------------------------------------------ the add-on
     def addon(self):
         """The running Onion Pocket's object, or None (not installed, or didn't start)."""
-        from soundboard import pocketaddon
+        from soundboard.addons import pocketaddon
         return next((a for i, a in getattr(getattr(self.mw, "remctl", None),
                                            "remote_addons", [])
                      if i.id == pocketaddon.MODULE_ID and a is not None), None)
