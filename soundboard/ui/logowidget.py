@@ -10,7 +10,8 @@ A click gives it a little wobble.
 It always paints in the current theme's accent colours, so theme switches recolour
 it on the next frame. The widget is a little bigger than the mark to leave room for
 the glow. The timer only runs while it's on screen, always at the same pace (a slower
-idle pace made the breathing judder next to the smooth sheen).
+idle pace made the breathing judder next to the smooth sheen). In lite mode (ui/lite.py)
+it's a still glow: no timer, no sheen, no embers (`lite_changed` after a switch).
 """
 from __future__ import annotations
 
@@ -25,7 +26,7 @@ from PySide6.QtGui import (QColor, QIcon, QLinearGradient, QPainter, QPainterPat
 from PySide6.QtWidgets import QWidget
 
 from soundboard import theme
-from soundboard.ui import appstate
+from soundboard.ui import appstate, lite
 from soundboard.ui.pixels import snap_to_pixels
 
 FLAME = QColor("#ff8a2b")
@@ -115,8 +116,18 @@ class LogoWidget(QWidget):
         super().showEvent(e)
 
     def _resume(self):
+        if lite.on():   # (still: one paint, no timer)
+            self._timer.stop()
+            self.level, self.embers, self.squish = 0.0, [], 0.0
+            self.update()
+            return
         self._last = time.monotonic()
         self._timer.start(FAST_MS)
+
+    def lite_changed(self):
+        """Lite mode went on or off: still now, or moving again (when it can be seen)."""
+        if lite.on() or (self.isVisible() and appstate.active()):
+            self._resume()
 
     def hideEvent(self, e):
         self._timer.stop()
@@ -159,7 +170,8 @@ class LogoWidget(QWidget):
 
     def paintEvent(self, _e):
         c1, c2 = theme.T["accent"], theme.T["accent2"]
-        t = time.monotonic() - self._t0
+        still = lite.on()
+        t = 0.0 if still else time.monotonic() - self._t0
         lv = self.level
         p = QPainter(self)
         snap_to_pixels(p)
@@ -174,7 +186,7 @@ class LogoWidget(QWidget):
             p.translate(-c, -(y0 + s))
 
         # glow: breathes at rest, flares and flickers warm with the sound
-        breathe = 0.5 + 0.5 * math.sin(t * 1.6)
+        breathe = 0.5 if still else 0.5 + 0.5 * math.sin(t * 1.6)
         flicker = 0.85 + 0.15 * math.sin(t * 23) * math.sin(t * 7.3) if lv > 0.05 else 1.0
         glow = _mix(QColor(c2), FLAME, lv * 1.4)
         alpha = min(255, int((70 + 60 * breathe + 170 * lv) * flicker))
@@ -193,7 +205,7 @@ class LogoWidget(QWidget):
 
         # sheen: a soft diagonal band sweeping across the tile now and then
         ph = (t % SHEEN_PERIOD) / SHEEN_TIME
-        if ph < 1.0:
+        if ph < 1.0 and not still:
             tile = QPainterPath()
             tile.addRoundedRect(QRectF(x0 + s * 0.04, y0 + s * 0.04, s * 0.92, s * 0.92),
                                 s * 0.26, s * 0.26)

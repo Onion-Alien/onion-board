@@ -475,6 +475,7 @@ def ui_scale_startup(app_dir: Path) -> int:
 
 LOAD_WAIT_S = 3.0    # longest the loading screen waits for the sounds (a big first load)
 PAINT_WAIT_S = 0.5   # ...and for Windows to put the window on screen for its first paint
+LITE_HINT_MS = 40_000     # a slower PC is told about lite mode this long after start
 TRAY_PRELOAD_MS = 20_000   # started into the tray: Settings and Edit sound built after this
 
 
@@ -708,6 +709,7 @@ def main():
         # the installer's "from Soundpad" box; with the setup guide up, run_setup
         # starts it once the guide is closed
         QTimer.singleShot(500, w.impctl.import_queued)
+        QTimer.singleShot(LITE_HINT_MS, w.themectl.suggest_lite)   # a slower PC: once
     QTimer.singleShot(600, w.updctl.after_update)   # "Updated to …" after an update restarted it
     # new versions (updates.py): unless unticked, as it starts (what that finds installs
     # itself) and then at most every hour (updates.EVERY_S), also for an app left

@@ -61,6 +61,7 @@ class Built:
     lang_dialog: Any
     lang_note: Any
     lang_restart: Any
+    lite_check: Any
     live_dot: Any
     live_green: Any
     look_box: Any

@@ -28,7 +28,7 @@ from soundboard.eq import response_db as eq_response
 from soundboard.engine import SR
 from soundboard.library import AUDIO_EXTS, SoundMeta
 from soundboard.ui.hotkeypick import pretty_key
-from soundboard.ui import icons
+from soundboard.ui import icons, lite
 from soundboard.ui.bunnywidget import BunnyWidget
 from soundboard.i18n import _
 from soundboard.ui.pixels import snap_to_pixels
@@ -1043,6 +1043,9 @@ class Pad(QAbstractButton):
     def _fade_hover(self, on: bool):
         self.hover = on
         self._hover_anim.stop()
+        if lite.on():   # (Lite mode: lit or not, no fade)
+            self._on_hover_k(1.0 if on else 0.0)
+            return
         self._hover_anim.setStartValue(self._hover_k)
         self._hover_anim.setEndValue(1.0 if on else 0.0)
         self._hover_anim.start()

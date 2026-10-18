@@ -17,6 +17,10 @@ from PySide6.QtWidgets import QWidget
 
 from soundboard import theme
 from soundboard.style import cover as kit
+from soundboard.ui import lite
+
+# Lite mode: the cover is up and gone without fading
+kit.animate = lambda: not lite.on()   # pyright: ignore[reportAttributeAccessIssue]
 
 BUNNY_H = 96
 

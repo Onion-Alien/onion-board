@@ -26,7 +26,8 @@ Useful flags: `--out DIR` (default: a new folder under `%TEMP%\onionboard-perf`)
 `--compare OLD\report.json` (adds a before → after column), `--budget FILE` /
 `--no-budget`, `--only board,triggers,watch`, `--env KEY=VALUE` (extra environment
 for the measured app, e.g. `OPENBLAS_NUM_THREADS=1`), `--no-event-counts` (leaves
-out the in-app paint/timer counter, which costs a little CPU itself).
+out the in-app paint/timer counter, which costs a little CPU itself). `--env PERF_LITE=1`
+measures with lite mode on (Settings > Appearance).
 
 Measure on a quiet PC: another test suite or a game running at the same time
 moves the CPU and audio-lateness numbers a lot. RAM, threads and handles are steady.

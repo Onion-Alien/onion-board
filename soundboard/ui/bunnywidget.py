@@ -45,7 +45,8 @@ next to the smooth blinks and ear flicks); Bun mode drops to 30 behind a game.
 (or after the last sound, click or burst), then finishes what he's doing and holds
 still: the timer stops and the last pose stays, so an empty page costs nothing. A
 sound (`set_groove`), the mic (`set_level`) or a click wakes him; showing him again
-gives him another N seconds.
+gives him another N seconds. In lite mode (ui/lite.py) every Bun rests like that after
+lite.REST_S (`_rest_s`), so he's a still picture until something happens.
 
 Over the pose sits a springy layer (`_spring`, `springy`): his ears trail behind his
 hops and wobble as they settle, a fast move stretches him and a landing squashes him,
@@ -58,6 +59,8 @@ import math
 import random
 import time
 import weakref
+
+import shiboken6
 
 from PySide6.QtCore import QPointF, QRectF, QSize, Qt, QTimer, Signal
 from PySide6.QtGui import QColor, QFont, QPainter, QPainterPath, QPen
@@ -87,7 +90,7 @@ from soundboard.bunny import (
 )
 from soundboard.i18n import _
 from soundboard.style import bunnyfit, mascotlines
-from soundboard.ui import appstate, bunskits
+from soundboard.ui import appstate, bunskits, lite
 from soundboard.ui.pixels import snap_to_pixels
 
 log = logging.getLogger(__name__)
@@ -343,6 +346,7 @@ class BunnyWidget(QWidget):
     # the ones made with dances=True: the main window's tick hands each one on screen
     # what's playing (set_groove), so he dances to any sound or the radio
     dancers: weakref.WeakSet = weakref.WeakSet()
+    alive: weakref.WeakSet = weakref.WeakSet()   # every one (lite mode on / off: lite_changed)
 
     def __init__(self, prop: str | None = None, height: int = 110, pad: int = 26,
                  celebrate: bool = False, parent=None, *, sad: float = 0.0,
@@ -350,6 +354,7 @@ class BunnyWidget(QWidget):
                  naps: bool = False, robot: bool = False, in_background: bool = False,
                  dances: bool = False, rest_after_s: float | None = None):
         super().__init__(parent)
+        BunnyWidget.alive.add(self)
         if dances:
             BunnyWidget.dancers.add(self)
         self.in_background = in_background   # keeps moving with a game in front (Bun mode)
@@ -411,7 +416,7 @@ class BunnyWidget(QWidget):
         self._timer.setInterval(FAST_MS)
         self._timer.timeout.connect(self._step)
         self.rest_after_s = rest_after_s   # (see the module's notes)
-        self._rest_at = self._t0 + (rest_after_s or 0.0)   # settles down from then
+        self._rest_at = self._t0 + (self._rest_s() or 0.0)   # settles down from then
         self.resting = False            # holding still: the timer's off until a stir
         self._still_at = 0.0            # ... and the moment his pose was kept
         if pong:
@@ -483,16 +488,37 @@ class BunnyWidget(QWidget):
     def stir(self):
         """Something happened (a sound, a click): with `rest_after_s` he moves again
         and keeps moving for another rest_after_s seconds."""
-        if self.rest_after_s is None:
+        rest = self._rest_s()
+        if rest is None:
             return
-        self._rest_at = time.monotonic() + self.rest_after_s
+        self._rest_at = time.monotonic() + rest
         if self.resting:
             self.resting = False
             # (no begging for music the moment one starts: the beg held back waits)
-            self._next_beg = max(self._next_beg, self._rest_at - self.rest_after_s
+            self._next_beg = max(self._next_beg, self._rest_at - rest
                                  + self._rng.uniform(3, 6))
             if self.isVisible() and (self.in_background or appstate.active()):
                 self._resume()
+
+    def _rest_s(self) -> float | None:
+        """How long he moves after a stir (None: always): rest_after_s, or shorter in
+        lite mode."""
+        return lite.rest_s(self.rest_after_s)
+
+    @classmethod
+    def lite_changed(cls):
+        """Lite mode went on (each one settles soon) or off (back to moving)."""
+        now = time.monotonic()
+        for b in list(cls.alive):
+            if not shiboken6.isValid(b):   # (Qt freed it; the wrapper's still about)
+                continue
+            rest = b._rest_s()
+            if rest is not None:
+                b._rest_at = min(b._rest_at, now + rest) if lite.on() else now + rest
+            if not lite.on() and b.resting:
+                b.resting = False
+                if b.isVisible() and (b.in_background or appstate.active()):
+                    b._resume()
 
     def burst(self, n: int = 6):
         """Throw a handful of notes out at once."""
@@ -674,9 +700,10 @@ class BunnyWidget(QWidget):
 
     # ------------------------------------------------------------------ animation
     def showEvent(self, ev):
-        if self.rest_after_s is not None:   # shown again: another rest_after_s to move
+        rest = self._rest_s()
+        if rest is not None:   # shown again: another rest_after_s to move
             self.resting = False
-            self._rest_at = time.monotonic() + self.rest_after_s
+            self._rest_at = time.monotonic() + rest
         # behind a game it waits until the app is back in front
         if self.in_background or appstate.active():
             self._resume()
@@ -864,7 +891,7 @@ class BunnyWidget(QWidget):
                 self._note_debt -= 1
                 self._spawn(max(0.3, loud))
         elif (self.prop == "headphones" and self.sad < 0.5   # sad: the music's gone
-              and not (self.rest_after_s is not None and now >= self._rest_at)):
+              and not (self._rest_s() is not None and now >= self._rest_at)):
             self._note_debt += dt * 0.7   # something's always playing in his headphones
             if self._note_debt >= 1:
                 self._note_debt = 0.0
@@ -892,7 +919,7 @@ class BunnyWidget(QWidget):
         target = 0.0 if self._hopeful or cheering or cross or shocked or dancing else self.sad
         rise = 5 if self._fail_t >= FAIL_DROP else 1.5   # the failure: ears drop at once
         self._sad += (target - self._sad) * min(1.0, dt * (8 if target < self._sad else rise))
-        settling = self.rest_after_s is not None and now >= self._rest_at
+        settling = self._rest_s() is not None and now >= self._rest_at
         if settling:   # nothing new starts; what's going on plays out (_calm)
             self._next_sigh = max(self._next_sigh, now + 1.0)
             self._next_beg = max(self._next_beg, now + 1.0)
