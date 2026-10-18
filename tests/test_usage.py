@@ -487,12 +487,28 @@ def test_an_error_says_its_caller_and_the_library_call_it_came_from(tmp_path):
     assert "private" not in usage._report_event(f)
 
 
+def test_every_file_of_ours_counts_as_ours():
+    """A problem report names the deepest of our own lines: every module of the package
+    has to match the rule, however many folders down it sits."""
+    from pathlib import Path
+
+    import soundboard
+    root = Path(soundboard.__file__).parent.parent
+    files = [p.relative_to(root).as_posix() for p in (root / "soundboard").rglob("*.py")]
+    assert files and not [f for f in files if not usage._OUR_FILE.fullmatch(f)]
+    assert not [f for f in files
+                if not usage._OUR_FRAME.search(f'  File "C:\\x\\{f}", line 1, in g')]
+
+
 def test_problem_events_keep_paths_outside_our_package_out(tmp_path):
     f = tmp_path / "crash-x.txt"
     # an odd install folder named soundboard: deeper than our package, so not sent
     f.write_text(_real_report("D:\\soundboard\\Python\\Lib\\json\\decoder.py"),
                  encoding="utf-8")
     assert usage._report_event(f) == "error/1.9.8/KeyError~decoder.f"   # its name only
+    f.write_text(_real_report("D:\\soundboard\\python\\lib\\json\\decoder.py"),
+                 encoding="utf-8")
+    assert usage._report_event(f) == "error/1.9.8/KeyError~decoder.f"   # lower case too
     f.write_text("Onion Board crash report\nVersion:  1.9.8\n\nError\n-----\nboom\n",
                  encoding="utf-8")
     assert usage._report_event(f) == "error/1.9.8"

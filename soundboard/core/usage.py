@@ -759,13 +759,13 @@ def tab_opened(cfg, key: str) -> None:
 
 # a stack line in a report: `File "...\soundboard\audio\engine.py", line 1090, in ...`; only
 # our own files count, named from the package folder down (never the folder above it)
-_OUR_FRAME = re.compile(r'^\s*File "(?:[^"]*[\\/])?(soundboard(?:[\\/][a-z0-9_]+)?'
+_OUR_FRAME = re.compile(r'^\s*File "(?:[^"]*[\\/])?(soundboard(?:[\\/][a-z0-9_]+){0,2}'
                         r'[\\/][a-z0-9_]+\.py)", line (\d+)', re.M)
 _ANY_FRAME = re.compile(r'^\s*File ".*", line \d+', re.M)
 _ERROR_TYPE = re.compile(r"([A-Za-z_][\w.]*)(?::|$)")
 # the same "our own file" rule as _OUR_FRAME, for a caught exception's traceback object
 # (warned): the package folder down, never the folders above it
-_OUR_FILE = re.compile(r"soundboard(?:[\\/][a-z0-9_]+)?[\\/][a-z0-9_]+\.py")
+_OUR_FILE = re.compile(r"soundboard(?:[\\/][a-z0-9_]+){0,2}[\\/][a-z0-9_]+\.py")
 
 
 def _ours(stack: str) -> list[str]:

@@ -345,7 +345,7 @@ def native_summary(native: str) -> tuple[str, str]:
     cur = re.search(r"^Current thread[^\n]*\n((?:[ \t]+[^\n]*\n?)*)", native, re.M)
     stack = cur.group(1) if cur else native
     where = ""
-    for f, line in re.findall(r'File "(?:[^"]*[\\/])?(soundboard(?:[\\/][a-z0-9_]+)?'
+    for f, line in re.findall(r'File "(?:[^"]*[\\/])?(soundboard(?:[\\/][a-z0-9_]+){0,2}'
                               r'[\\/][a-z0-9_]+\.py)", line (\d+)', stack):
         where = f"{f.replace(chr(92), '/')}:{line}"
         break   # newest first: the first of ours is the deepest

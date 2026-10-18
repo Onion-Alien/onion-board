@@ -61,6 +61,10 @@ def test_a_native_crash_names_the_error_and_our_deepest_line():
         "Windows fatal exception: code 0xc0000409\n\nCurrent thread 0x1 (most recent "
         "call first):\n  <no Python frame>\n") == ("fast-fail", "")
     assert exitwatch.native_summary("Fatal Python error: Aborted\n") == ("aborted", "")
+    # two folders down (the tabs' own folders) is still ours
+    assert exitwatch.native_summary(
+        _native(r"D:\Apps\OnionBoard\soundboard\ui\apps\appspanel.py")) == (
+        "access-violation", "soundboard/ui/apps/appspanel.py:1090")
 
 
 def _events(*items):
