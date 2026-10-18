@@ -426,6 +426,9 @@ def parse_args(argv=None):
                     "watch (default: all that apply)")
     ap.add_argument("--scenarios", default="", help="comma-separated: only these of the "
                     "tier's board scenarios, in the tier's order (e.g. dialogs,voice_preset)")
+    ap.add_argument("--sounds", type=int, help="the board's sounds at start (default: the tier's)")
+    ap.add_argument("--triggers", default="", help="comma-separated trigger counts for the "
+                    "triggers-N runs (default: the tier's, e.g. 0,10,50)")
     ap.add_argument("--env", action="append", default=[], metavar="KEY=VALUE",
                     help="extra environment for the measured app (e.g. OPENBLAS_NUM_THREADS=1)")
     args = ap.parse_args(argv)
@@ -491,7 +494,11 @@ def main(argv=None) -> int:
         report["errors"] += info["errors"]
 
     if args.tier in ("quick", "full", "tabs"):
-        tier = TIERS[args.tier]
+        tier = dict(TIERS[args.tier])
+        if args.sounds:
+            tier["sounds"] = args.sounds
+        if args.triggers:
+            tier["trigger_counts"] = [int(n) for n in args.triggers.split(",") if n.strip()]
         if want("board"):
             add(*board_run("board", out, args, tier, hz, pick(tier["board"], args.scenarios)),
                 note=f"{tier['sounds']} sounds, cable route, mono mic, offscreen"

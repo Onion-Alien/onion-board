@@ -25,7 +25,8 @@ From the repo folder:
 Useful flags: `--out DIR` (default: a new folder under `%TEMP%\onionboard-perf`),
 `--compare OLD\report.json` (adds a before → after column), `--scenarios dialogs,voice_preset`
 (only those of the tier's board scenarios, in the tier's order), `--budget FILE` /
-`--no-budget`, `--only board,triggers,watch`, `--env KEY=VALUE` (extra environment
+`--no-budget`, `--only board,triggers,watch`, `--sounds N` and `--triggers 0,50,200`
+(the board's sounds and the triggers-N runs instead of the tier's), `--env KEY=VALUE` (extra environment
 for the measured app, e.g. `OPENBLAS_NUM_THREADS=1`), `--no-event-counts` (leaves
 out the in-app paint/timer counter, which costs a little CPU itself). `--env PERF_LITE=1`
 measures with lite mode on (Settings > Appearance).
