@@ -425,7 +425,7 @@ def test_a_freeze_says_its_caller_what_it_waited_in_how_long_and_who_was_busy(tm
     f = tmp_path / "crash-x.txt"
     hog = ('Thread "radio" (12), 95% CPU:\n'
            '  File "soundboard\\threadnames.py", line 68, in named_run\n'
-           '  File "soundboard\\radio.py", line 400, in _decode\n'
+           '  File "soundboard\\online\\radio.py", line 400, in _decode\n'
            'Thread "calm" (13), 0% CPU:\n'
            '  File "soundboard\\engine.py", line 9, in _loop\n')
     _freeze(f, "42 s", 1, hog)
