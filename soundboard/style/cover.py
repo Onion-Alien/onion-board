@@ -58,16 +58,23 @@ class Cover(QWidget):
         self.mascot = mascot
         self.k = 0.0        # 0..1, how far the dimming and the mascot are in
         self.fresh: QPixmap | None = None   # the restyled window, while fading out
+        self.face = QPixmap()                # and the cover's own look, flattened
         self.left = 1.0     # 1..0, how much of the old picture is still over it
         self._fade: QVariantAnimation | None = None
 
     def paintEvent(self, _e):
         p = QPainter(self)
-        # opaque: the full picture goes down before snap_to_pixels, or its nudge leaves
-        # an edge row of whatever was on screen before
-        if self.fresh is not None:
+        if self.fresh is not None:   # fading out: the cover's look over the new window
             p.drawPixmap(self.rect(), self.fresh)
             p.setOpacity(self.left)
+            p.drawPixmap(self.rect(), self.face)
+        else:
+            self._paint(p)
+        p.end()
+
+    def _paint(self, p: QPainter):
+        # opaque: the full picture goes down before snap_to_pixels, or its nudge leaves
+        # an edge row of whatever was on screen before
         p.drawPixmap(self.rect(), self.still)
         if self.k > 0 and self.scrim is not None:
             c = QColor(self.scrim)
@@ -78,9 +85,8 @@ class Cover(QWidget):
             size = self.mascot.deviceIndependentSize()
             at = QRectF((self.width() - size.width()) / 2,
                         (self.height() - size.height()) / 2, size.width(), size.height())
-            p.setOpacity(self.k * self.left)
+            p.setOpacity(self.k)
             p.drawPixmap(at, self.mascot, QRectF(self.mascot.rect()))
-        p.end()
 
     def cover(self):
         """Up on screen now, and faded in, before the UI thread gets busy restyling.
@@ -98,6 +104,13 @@ class Cover(QWidget):
             return
         window = self.parentWidget()
         if window is not None:
+            # the cover as it looks now, flat (fading the dimming and the mascot on
+            # their own would tint the new window too), and the window under it
+            self.face = QPixmap(self.still.size())
+            self.face.setDevicePixelRatio(self.still.devicePixelRatio())
+            p = QPainter(self.face)
+            self._paint(p)
+            p.end()
             self.hide()
             self.fresh = window.grab()
             self.show()

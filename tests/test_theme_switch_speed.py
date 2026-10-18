@@ -309,3 +309,29 @@ def test_the_fade_out_paints_the_board_once_not_every_frame(settings, main_windo
         app.removeEventFilter(count)
         main_window.themectl.apply_theme(start)
     assert count.n <= 3 * pads
+
+
+def test_the_fade_out_is_the_dimmed_picture_crossfading_to_the_new_look(qapp):
+    """Half way, the old picture (dimming included) and the restyled window count
+    half each: the dimming fades with the picture, it doesn't tint the new look."""
+    from PySide6.QtWidgets import QWidget
+    from soundboard.style import cover
+    host = QWidget()
+    host.resize(80, 60)
+    host.setStyleSheet("background: #ff0000;")
+    host.show()
+    QApplication.processEvents()
+    c = cover.Cover(host, QColor("#000000"))
+    cover._fade_in([c])            # red, dimmed by black at SCRIM_ALPHA
+    host.setStyleSheet("background: #0000ff;")   # the restyle
+    c.uncover()
+    c._fade.pause()
+    c._fade.setCurrentTime(cover.FADE_MS // 2)   # InOutQuad: half way at half time
+    QApplication.processEvents()
+    px = c.grab().toImage().pixelColor(40, 30)
+    dim = 1 - cover.SCRIM_ALPHA / 255
+    assert abs(px.red() - 0.5 * 255 * dim) <= 3
+    assert abs(px.blue() - 0.5 * 255) <= 3
+    c._fade.stop()
+    host.close()
+    host.deleteLater()
