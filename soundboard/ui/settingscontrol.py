@@ -236,14 +236,22 @@ class SettingsControl(Controller):
         """Behind the loading screen: Settings (its first page) and an Edit sound are
         built now, so even the first click of the cog or Edit opens at once (each took
         100-300 ms to build); Settings' other pages follow one at a time once it's up."""
-        mw = self.mw
         self._prebuild_settings()
         remote.answer_waiting()   # a Stream Deck press meanwhile: between the two
-        if self._spare_editor is None and mw.cfg.sounds:
-            d = mw.editctl._new_editor(mw.cfg.sounds[0], "sound")
-            d.hide()
-            _polish(d)
-            self._spare_editor = d
+        self.prebuild_editor()
+
+    def prebuild_editor(self):
+        """A closed Edit sound made ahead (~250 ms, ~1 s on a slow laptop), unless one is
+        kept or open already (closing it keeps it), there's no sound to show, or the
+        window is going. Behind the loading screen, or the theme cover."""
+        mw = self.mw
+        if (self._spare_editor is not None or mw.editctl._editors or not mw.cfg.sounds
+                or getattr(mw, "_quitting", False) or not qt_valid(mw)):
+            return
+        d = mw.editctl._new_editor(mw.cfg.sounds[0], "sound")
+        d.hide()
+        _polish(d)
+        self._spare_editor = d
 
     def _prebuild_settings(self):
         """A closed Settings made ahead (its first page now, the rest one at a time),
@@ -314,7 +322,9 @@ class SettingsControl(Controller):
         QTimer.singleShot(60, self._preload_next_page)
 
     def _drop_spare_dialogs(self):
-        """The kept Edit sound and Settings go (a new theme: built again in it)."""
+        """The kept Edit sound and Settings go before a new theme (restyling them would
+        be wasted): the Edit sound is built again in it (prebuild_editor), Settings the
+        next time it opens."""
         for attr in ("_spare_editor", "_settings_kept"):
             d = getattr(self, attr, None)
             setattr(self, attr, None)
