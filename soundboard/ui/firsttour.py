@@ -17,10 +17,6 @@ only (Config.tips_seen); never with tutorials switched off (Config.tutorials_on)
 
 Anything going wrong (a search that can't get through, an error card, an error logged)
 ends it at once (coach.py): it never holds anyone on something that doesn't work.
-
-When the tour ends before they added anything (put off, failed, or the window went) and the
-board is still empty, a few starter sounds are added by themselves (soundboard/starter.py):
-the board never stays a bare page for someone who skipped it.
 """
 from __future__ import annotations
 
@@ -29,7 +25,7 @@ import logging
 from PySide6.QtCore import QRect
 from PySide6.QtWidgets import QApplication, QWidget
 
-from soundboard import net, starter, tips, usage
+from soundboard import net, tips, usage
 from soundboard.i18n import _
 from soundboard.ui import coach
 from soundboard.ui.ytsearch import SearchResults
@@ -166,12 +162,6 @@ class Tour(coach.Tour):
             usage.used("tour-skipped")
         elif how == "failed" and not self.added:
             usage.used("tour-failed")
-        try:
-            empty = not self.win.cfg.sounds
-        except RuntimeError:
-            return
-        if empty and not self.added:   # they didn't add anything: the board isn't left bare
-            starter.add_to(self.win)
 
     # ------------------------------------------------------------------ steps' parts
     def _quiet_bun(self):
