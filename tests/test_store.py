@@ -1,4 +1,4 @@
-"""The sound store (soundboard/online/store.py) and the Store tab (ui/storetab.py), against a
+"""The sound store (soundboard/online/store.py) and the Store tab (ui/store/storetab.py), against a
 fake store: no test goes online."""
 import io
 import json
@@ -14,7 +14,7 @@ from test_mainwindow import window as main_window  # noqa: F401  (the real MainW
 
 from soundboard.online import net, store
 from soundboard.sounds.library import Config
-from soundboard.ui import storetab
+from soundboard.ui.store import storetab
 from soundboard.ui.tabcontrol import TAB_KEYS, rail_order
 
 
@@ -705,7 +705,7 @@ def test_a_store_name_never_leaves_the_store_folder_or_hides_its_type(fake):
 def test_every_sound_gets_a_picture_from_its_name_tags_or_category():
     """The Store rows' tiles: a word in the name first, then the tags, then the category's
     picture, else a speaker; the same sound always gets the same colour."""
-    from soundboard.ui import storelook
+    from soundboard.ui.store import storelook
 
     def snd(**kw):
         return store.Sound(**{"id": "000000000001", "name": "Xyz", "ext": "wav", **kw})

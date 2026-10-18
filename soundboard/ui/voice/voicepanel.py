@@ -321,7 +321,7 @@ class VoicePanel(QWidget):
                                     import_code=self.fx.import_code)
         head.addWidget(self.setups_bar)
         self.fx.take_code = self.take_code   # a code with an AI voice or a setup in it
-        from soundboard.ui.storevoices import kind_name
+        from soundboard.ui.store.storevoices import kind_name
         self.setups_bar.share = lambda n: self.share_asked.emit(f"{kind_name('setup')}: {n}")
         self.fx.share_asked.connect(lambda n: self.share_asked.emit(f"{kind_name('fx')}: {n}"))
         outer.insertWidget(0, self.speech.say_bar)   # on top: the bottom has the mixer
@@ -436,7 +436,7 @@ class VoicePanel(QWidget):
         added to yours as a Store voice is. The name it got, "" if none."""
         from PySide6.QtWidgets import QMessageBox
 
-        from soundboard.ui.storevoices import VoiceHooks, meta_line
+        from soundboard.ui.store.storevoices import VoiceHooks, meta_line
         title = _("Import a voice code")
         ask = (_("Add “{name}”?", name=html.escape(v.name))
                + f"<br><br>{html.escape(meta_line(v))}"

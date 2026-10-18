@@ -602,7 +602,7 @@ QLabel#pill[tone="muted"] { border-color:$muted; }
 QLabel#pill[tone="ok"] { color:$live_text; border-color:$live_border; }
 QLabel#pill[tone="warn"] { color:$warn_text; border-color:$warn_text; }
 QLabel#pill[tone="error"] { color:$error_text; border-color:$error_text; }
-QLabel#pill[tone="beta"] { color:$bg; background:$ok_text; border-color:$ok_text; border-radius:7px; padding:1px 8px; font-weight:700; }   /* ui/storetab.py: the green Beta tag */
+QLabel#pill[tone="beta"] { color:$bg; background:$ok_text; border-color:$ok_text; border-radius:7px; padding:1px 8px; font-weight:700; }   /* ui/store/storetab.py: the green Beta tag */
 QPushButton#subchip { border-radius:11px; padding:2px 11px; min-height:18px; font-size:8.5pt;
     background:transparent; border:1px solid $border; color:$muted; }
 QPushButton#subchip:hover { color:$text; background:$btn_hover; }

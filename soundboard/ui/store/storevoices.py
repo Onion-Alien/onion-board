@@ -24,7 +24,7 @@ from soundboard.i18n import _
 from soundboard.speech import aivoicelist as avl
 from soundboard.ui.kit import busy, fit, icons
 from soundboard.ui.kit.panel import HoverCard
-from soundboard.ui.storetab import SoundRow
+from soundboard.ui.store.storetab import SoundRow
 
 if TYPE_CHECKING:
     from soundboard.ui.voice.voicepanel import VoicePanel
@@ -160,7 +160,7 @@ class ShareVoiceDialog(QDialog):
         self._sent.connect(self._on_sent)
         v = QVBoxLayout(self)
         v.setSpacing(8)
-        from soundboard.ui.storetab import _title
+        from soundboard.ui.store.storetab import _title
         v.addWidget(_title(_("Share a voice")))
         intro = QLabel(_("Anyone can find it under Store → Voices and add it to theirs. "
                          "Only its settings are shared, never your voice."))

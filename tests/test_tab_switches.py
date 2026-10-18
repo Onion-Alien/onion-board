@@ -12,7 +12,7 @@ from soundboard.ui import mainwindow as main
 from soundboard.ui import taboff
 from soundboard.ui.apps.appspanel import AppsTab
 from soundboard.ui.radio.radiopanel import RadioTab
-from soundboard.ui.storetab import StoreTab
+from soundboard.ui.store.storetab import StoreTab
 from soundboard.ui.tabcontrol import TAB_INDEX, TABS
 from soundboard.ui.triggerstab import TriggersTab
 from soundboard.ui.voice.voicepanel import VoicePanel

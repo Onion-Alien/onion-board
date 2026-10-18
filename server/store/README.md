@@ -1,6 +1,6 @@
 # The sound store's server
 
-The Store tab (`soundboard/online/store.py`, `soundboard/ui/storetab.py`) talks to this: a
+The Store tab (`soundboard/online/store.py`, `soundboard/ui/store/storetab.py`) talks to this: a
 [Cloudflare Worker](https://developers.cloudflare.com/workers/) with the sounds' files
 in Workers KV and the list, votes and reports in D1. Both fit Cloudflare's free plan,
 and neither needs a payment card on the account.

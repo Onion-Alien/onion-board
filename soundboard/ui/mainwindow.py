@@ -80,7 +80,7 @@ from soundboard.ui.apps.appspanel import AppsTab
 from soundboard.ui.triggershost import BoardHost
 from soundboard.ui.triggerstab import TriggersTab
 from soundboard.ui.radio.radiopanel import RadioOff, RadioTab
-from soundboard.ui.storetab import PREVIEW as STORE_PREVIEW, StoreTab
+from soundboard.ui.store.storetab import PREVIEW as STORE_PREVIEW, StoreTab
 from soundboard.ui.voice.voicepanel import VoicePanel
 from soundboard.ui.kit.widgets import Meter, Pad, expand_dropped
 from soundboard.control.winkeys import Hotkeys
@@ -936,7 +936,7 @@ class MainWindow(QMainWindow):
 
     def _voice_hooks(self):
         """What the Store's Voices use of the Voice tab (its lists of your voices)."""
-        from soundboard.ui.storevoices import VoiceHooks
+        from soundboard.ui.store.storevoices import VoiceHooks
         return VoiceHooks(lambda: (self.voice if isinstance(getattr(self, "voice", None),
                                                             VoicePanel) else None))
 
@@ -945,7 +945,7 @@ class MainWindow(QMainWindow):
         import html
 
         from soundboard.online import net, store
-        from soundboard.ui.storevoices import open_share
+        from soundboard.ui.store.storevoices import open_share
         if not net.allowed(store.FEATURE):
             busy.toast(self, html.escape(net.off_message(store.FEATURE)), "error")
             return

@@ -254,7 +254,7 @@ class PadControl(Controller):
                              sm)
             # the Store tab can take its link (only the link: whoever adds it downloads it)
             from soundboard.online import store
-            from soundboard.ui.storetab import StoreTab
+            from soundboard.ui.store.storetab import StoreTab
             if isinstance(mw.store, StoreTab) and store.link_ok(src["link"]):
                 a_src_share = add(("store",), _("Share to the store"),
                                   _("Share this link in the Community tab"), sm)

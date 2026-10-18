@@ -25,7 +25,7 @@ from soundboard.online import net, store
 from soundboard.audio.engine import SR
 from soundboard.i18n import _
 from soundboard.ui.kit import busy, fit, icons
-from soundboard.ui import storelook
+from soundboard.ui.store import storelook
 from soundboard.core.trash import ago
 from soundboard.ui.kit.panel import HoverCard, hint_label, icon_button, section_label
 from soundboard.ui.sounds.ytsearch import ClampLabel
@@ -721,7 +721,7 @@ class StoreTab(QWidget):
             self._fill_cats([])
             self._fetch_cats()
             return
-        from soundboard.ui.storevoices import kind_chips
+        from soundboard.ui.store.storevoices import kind_chips
         self._fill_cats([(key, text, storelook.KIND_ICON.get(key, storelook.ALL_ICON))
                          for key, text in kind_chips() if key])
         self._show_picked(self._kind)
@@ -864,7 +864,7 @@ class StoreTab(QWidget):
             self._clear()
         self._offset += len(found)
         from soundboard.online.storevoices import Voice
-        from soundboard.ui.storevoices import VoiceRow
+        from soundboard.ui.store.storevoices import VoiceRow
         for s in found:
             if isinstance(s, Voice):
                 r = VoiceRow(s, self)
@@ -1207,7 +1207,7 @@ class StoreTab(QWidget):
         if not net.allowed(store.FEATURE):
             busy.toast(self.window(), html.escape(net.off_message(store.FEATURE)), "error")
             return
-        from soundboard.ui.storevoices import open_share
+        from soundboard.ui.store.storevoices import open_share
         dlg = open_share(self, self.install(), self.voices, pick)
         if dlg is not None:
             dlg.accepted.connect(lambda: self._mode == "voices" and self.reload())

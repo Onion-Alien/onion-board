@@ -747,7 +747,7 @@ class Child:
     def sc_wait_store(self):
         """The Community tab stays open past its Bun's moving time (not compared: it's
         tab_store_rested past it)."""
-        from soundboard.ui import storelook
+        from soundboard.ui.store import storelook
         self.run_for(getattr(storelook, "BUN_REST_S", 30.0) + 2)
         bun = getattr(getattr(self.w, "store", None), "bun", None)
         return {"bun_resting": getattr(bun, "resting", None)}

@@ -896,7 +896,7 @@ def test_a_sulking_bun_rests_with_his_foot_down(qapp, monkeypatch):
 
 def test_the_store_and_oops_buns_rest_after_30_s(qapp):
     from soundboard.ui.kit import oops
-    from soundboard.ui import storelook
+    from soundboard.ui.store import storelook
     bun = storelook.make_bun(72)
     assert bun.rest_after_s == storelook.BUN_REST_S == 30.0
     card = oops.OopsPanel()

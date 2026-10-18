@@ -215,10 +215,10 @@ the launcher the shortcuts and PyInstaller use. The app is the `soundboard` pack
 | `soundboard/core/backup.py` | export / import of the board as a plain zip (JSON + original audio + pictures), sound packs and single sounds; see [BACKUP-FORMAT.md](BACKUP-FORMAT.md) |
 | `soundboard/sounds/packs.py` | free sound packs: the list (`packs/catalog.json` in this repo, with a built-in copy for offline) of ready-made boards in the backup format, added in one click; each pack's preview zip (`samples`) |
 | `soundboard/online/store.py` | the sound store (Store tab): the list, fetching a sound, votes, reports and uploads, talking to the project's own server (`server/store/`) |
-| `soundboard/ui/storetab.py` | the *Store* tab: free CC0 sounds to hear, add, vote on or report, and the *Share a sound* window |
-| `soundboard/ui/storelook.py` | the *Store* tab's pictures: a sound's emoji tile (from its name, tags and category; bars bounce while it plays), the banner with Bun |
+| `soundboard/ui/store/storetab.py` | the *Store* tab: free CC0 sounds to hear, add, vote on or report, and the *Share a sound* window |
+| `soundboard/ui/store/storelook.py` | the *Store* tab's pictures: a sound's emoji tile (from its name, tags and category; bars bounce while it plays), the banner with Bun |
 | `soundboard/online/storevoices.py` | the Store's community voices: packing your voice changer voices, AI voices and setups to share (settings only), checking every voice from the store again, taking one into your own lists, its *Hear it* sample, and share codes for any of them (`OB2-…`, read back through the same checks; old `OB1-…` voice codes still read) |
-| `soundboard/ui/storevoices.py` | the Store tab's *Voices*: a row per community voice and the *Share a voice* window |
+| `soundboard/ui/store/storevoices.py` | the Store tab's *Voices*: a row per community voice and the *Share a voice* window |
 | `server/store/` | the sound store's server: a Cloudflare Worker (`src/index.js`), its review page (`src/admin.js`) and database (`schema.sql`); its README says how to put it online |
 | `soundboard/ui/sounds/packsdialog.py` | the *Free sound packs* window (Sounds tab → Backup): the packs to add, a few of each one's sounds to hear first, and where to share your own |
 | `soundboard/otherboards/` | Import from another soundboard. `__init__.py`: what the readers share (Entry rows, the list of sources, the installer's queued-import note); only when the user asks (Backup menu, setup guide, the installer's boxes, or a dropped board file) |
