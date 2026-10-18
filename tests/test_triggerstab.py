@@ -1,5 +1,5 @@
 """The Triggers tab as Onion Board's side of the Onion Watch add-on
-(ui/triggerstab.py, ui/triggershost.py): Hoot and the download button until it's
+(ui/triggers/triggerstab.py, ui/triggers/triggershost.py): Hoot and the download button until it's
 installed (saying the triggers are kept), getting it loads it straight into the tab,
 a broken or unreachable one says why, an update is offered and needs a restart, and
 the board host plays, rings and adds sounds through the board. A made-up add-on and
@@ -14,11 +14,11 @@ from test_triggers_module import make_module, zip_of
 from soundboard.core import updates
 from soundboard.addons import watchaddon
 from soundboard.sounds.library import SoundMeta
-from soundboard.ui import triggershost
+from soundboard.ui.triggers import triggershost
 from soundboard.ui.livedot import is_tab_live
 from soundboard.ui.tabcontrol import TAB_INDEX
-from soundboard.ui.triggershost import BoardHost
-from soundboard.ui.triggerstab import TriggersTab
+from soundboard.ui.triggers.triggershost import BoardHost
+from soundboard.ui.triggers.triggerstab import TriggersTab
 
 PANEL = '''
 from PySide6.QtCore import Signal
@@ -134,7 +134,7 @@ def test_the_tab_itself_offers_it_no_window_pops_up(qapp, tmp_path, monkeypatch)
     window popping up on entering it and a lone button once that was closed."""
     from PySide6.QtWidgets import QDialog
 
-    from soundboard.ui import triggerstab
+    from soundboard.ui.triggers import triggerstab
     seen = []
     monkeypatch.setattr(triggerstab.usage, "used", seen.append)
     tab = TriggersTab(FakeHost(), [tmp_path / "modules"])
@@ -794,7 +794,7 @@ def test_addon_download_keeps_focus(qapp, tmp_path, monkeypatch):
 
     from soundboard.online import net
     from soundboard.ui.kit import busy
-    from soundboard.ui import triggerstab
+    from soundboard.ui.triggers import triggerstab
     monkeypatch.setattr(net, "allowed", lambda key: True)
     tab = TriggersTab(FakeHost(), [tmp_path / "modules"])
     workers = []

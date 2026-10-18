@@ -24,7 +24,7 @@ class FakeEngine:
 @pytest.fixture
 def panel(qapp, monkeypatch):
     monkeypatch.setattr(tts.SapiTTS, "warm_up", lambda self: ["Microsoft Zira Desktop"])
-    from soundboard.ui.voicepanel import VoicePanel
+    from soundboard.ui.voice.voicepanel import VoicePanel
     eng = FakeEngine()
     p = VoicePanel(eng, {"enabled": False, "effects": {}},
                    {"voice": "Microsoft Zira Desktop", "rate": 2})
@@ -216,7 +216,7 @@ def test_power_switch(panel):
 
 def test_saved_spec_loads_back(qapp, monkeypatch):
     monkeypatch.setattr(tts.SapiTTS, "warm_up", lambda self: [])
-    from soundboard.ui.voicepanel import VoiceFxPanel
+    from soundboard.ui.voice.voicepanel import VoiceFxPanel
     spec = {"enabled": True, "preset": "Custom",
             "effects": {"echo": {"on": True, "delay": 400, "feedback": 0.5, "mix": 0.2}}}
     fx = VoiceFxPanel(spec)
@@ -256,8 +256,8 @@ def test_everything_spoken_lands_in_the_log(panel, monkeypatch):
 
 def test_changer_starts_off_even_if_it_was_left_on(qapp, monkeypatch):
     monkeypatch.setattr(tts.SapiTTS, "warm_up", lambda self: [])
-    from soundboard.ui.voicefxpanel import POWER_TEXT
-    from soundboard.ui.voicepanel import VoicePanel
+    from soundboard.ui.voice.voicefxpanel import POWER_TEXT
+    from soundboard.ui.voice.voicepanel import VoicePanel
     p = VoicePanel(FakeEngine(), {"enabled": True, "preset": "Old telephone", "effects": {}}, {})
     try:
         assert not p.fx.btn_power.isChecked() and not p.chain.enabled
@@ -515,7 +515,7 @@ def test_a_live_voice_that_cant_load_turns_the_button_back_off(panel):
 def test_damaged_saved_settings_still_open_the_tab(qapp, monkeypatch, fx, speech):
     # a hand-edited config or an old backup used to stop the app starting at all
     monkeypatch.setattr(tts.SapiTTS, "warm_up", lambda self: ["Microsoft Zira Desktop"])
-    from soundboard.ui.voicepanel import VoicePanel
+    from soundboard.ui.voice.voicepanel import VoicePanel
     p = VoicePanel(FakeEngine(), fx, speech)
     try:
         assert process_events(qapp, lambda: p.speech.cb_voice.isEnabled())
@@ -532,7 +532,7 @@ def test_damaged_saved_settings_still_open_the_tab(qapp, monkeypatch, fx, speech
 
 def test_a_saved_voice_that_was_uninstalled_falls_back_to_the_default(qapp, monkeypatch):
     monkeypatch.setattr(tts.SapiTTS, "warm_up", lambda self: ["Microsoft Zira Desktop"])
-    from soundboard.ui.voicepanel import VoicePanel
+    from soundboard.ui.voice.voicepanel import VoicePanel
     p = VoicePanel(FakeEngine(), {}, {"voice": "Microsoft Gone Desktop"})
     try:
         s = p.speech
@@ -547,7 +547,7 @@ def test_a_saved_voice_that_was_uninstalled_falls_back_to_the_default(qapp, monk
 @pytest.mark.parametrize("q", [voicefx.Param("k", "K", 1, 1, 1),
                                voicefx.Param("k", "K", 0, 1, 0, "", 2)])
 def test_a_slider_with_no_room_to_move_doesnt_divide_by_zero(qapp, q):
-    from soundboard.ui.voicefxpanel import ParamSlider
+    from soundboard.ui.voice.voicefxpanel import ParamSlider
     s = ParamSlider(q, q.default)
     s.set_value(float("nan"))
     assert s.steps >= 1 and s.value() == q.lo
@@ -568,7 +568,7 @@ def test_an_add_on_with_a_bad_slider_is_reported_not_fatal(qapp, app_dir, monkey
         "    api.register_effect(E)\n", encoding="utf-8")
     monkeypatch.setattr(voicefx, "REGISTRY", dict(voicefx.REGISTRY))
     monkeypatch.setattr(tts.SapiTTS, "warm_up", lambda self: [])
-    from soundboard.ui.voicepanel import VoicePanel
+    from soundboard.ui.voice.voicepanel import VoicePanel
     p = VoicePanel(FakeEngine(), {}, {})
     try:
         m = next(m for m in p.modules if m.id == "stuck")
@@ -635,7 +635,7 @@ def test_nudging_a_preset_doesnt_replace_my_own_mix(panel):
 
 def test_my_own_mix_is_kept_across_restarts(qapp, monkeypatch):
     monkeypatch.setattr(tts.SapiTTS, "warm_up", lambda self: [])
-    from soundboard.ui.voicepanel import VoicePanel
+    from soundboard.ui.voice.voicepanel import VoicePanel
     mix = {"pitch": {"on": True, "semitones": 3.0}}
     p = VoicePanel(FakeEngine(), {"enabled": True, "preset": "Robot", "effects": {},
                                   "custom": mix}, {})
@@ -652,7 +652,7 @@ def test_voices_as_a_list(qapp, monkeypatch):
     monkeypatch.setattr(tts.SapiTTS, "warm_up", lambda self: [])
     from PySide6.QtWidgets import QWidget
 
-    from soundboard.ui.voicefxpanel import LIST_MIN_W, VoiceFxPanel
+    from soundboard.ui.voice.voicefxpanel import LIST_MIN_W, VoiceFxPanel
     holder = QWidget()
     fx = VoiceFxPanel({})
     fx.setParent(holder)
@@ -677,7 +677,7 @@ def test_voice_tiles_reflow_in_a_narrow_window(qapp, monkeypatch):
     monkeypatch.setattr(tts.SapiTTS, "warm_up", lambda self: [])
     from PySide6.QtWidgets import QWidget
 
-    from soundboard.ui.voicefxpanel import MAX_COLS, VoiceFxPanel
+    from soundboard.ui.voice.voicefxpanel import MAX_COLS, VoiceFxPanel
     holder = QWidget()                 # inside the tab, it gets the width there is
     fx = VoiceFxPanel({})
     fx.setParent(holder)
@@ -781,7 +781,7 @@ def test_random_voice_opens_fine_tune_with_what_it_set_lit_up(panel):
 
 
 def test_my_own_mix_is_the_last_tile_and_voices_have_pictures(panel):
-    from soundboard.ui import art
+    from soundboard.ui.voice import art
     p, _ = panel
     order = _grid_order(p.fx)
     assert order[-2:] == ["My own mix", "Random voice"]   # the die goes after the last card
@@ -809,7 +809,7 @@ def test_save_as_a_voice_makes_a_tile_that_comes_back(panel, monkeypatch, qapp):
     p.fx.pick("Squeaky")
     assert p.fx.spec()["effects"] == mine
     # a restart: the tile is there and still the one that's on
-    from soundboard.ui.voicepanel import VoiceFxPanel
+    from soundboard.ui.voice.voicepanel import VoiceFxPanel
     again = VoiceFxPanel(p.fx.spec())
     assert again.preset == "Squeaky" and "Squeaky" in again._tile
     again.deleteLater()
@@ -859,7 +859,7 @@ def test_delete_a_saved_voice_then_undo_or_bring_it_back(panel, monkeypatch):
     p.fx.delete_voice("One")
     p.fx.undo_bar.finish()
     assert not p.fx.btn_bin.isHidden()
-    from soundboard.ui import deleted
+    from soundboard.ui.sounds import deleted
     seen = []
 
     def fake_exec(dlg):
@@ -887,7 +887,7 @@ def test_tiles_reflow_with_saved_voices(qapp, app_dir, monkeypatch):
     from PySide6.QtWidgets import QWidget
 
     from soundboard.mic import savedvoices
-    from soundboard.ui.voicepanel import VoiceFxPanel
+    from soundboard.ui.voice.voicepanel import VoiceFxPanel
     store = savedvoices.Store()
     for n in ("A", "B"):
         store.put(n, {})
@@ -999,7 +999,7 @@ def test_add_ons_refresh_scans_the_disk_off_the_ui_thread(panel, qapp, monkeypat
     import threading
 
     from soundboard.ui.kit import busy
-    from soundboard.ui import voicepanel as vp
+    from soundboard.ui.voice import voicepanel as vp
     p, _ = panel
     real, where = vp.mods.discover, []
     monkeypatch.setattr(vp.mods, "discover",
@@ -1088,7 +1088,7 @@ def test_a_slider_step_lays_nothing_out_and_its_value_always_fits(panel, qapp):
 
 
 def test_every_value_a_slider_shows_fits_its_label(panel):
-    from soundboard.ui.voicefxpanel import param_text
+    from soundboard.ui.voice.voicefxpanel import param_text
     p, _ = panel
     p.show()
     for row in p.fx.rows.values():
@@ -1215,7 +1215,7 @@ def test_speak_in_starts_off_for_a_language_saved_switched_off(qapp, monkeypatch
     """A language saved switched off (or from before the switch) shows Don't
     translate, and is still remembered."""
     monkeypatch.setattr(tts.SapiTTS, "warm_up", lambda self: ["Microsoft Zira Desktop"])
-    from soundboard.ui.voicepanel import VoicePanel
+    from soundboard.ui.voice.voicepanel import VoicePanel
     p = VoicePanel(FakeEngine(), {"enabled": False, "effects": {}},
                    {"voice": "Microsoft Zira Desktop", "translate": "zh"})
     try:
@@ -1278,7 +1278,7 @@ def test_languages_tab_hides_when_speech_recognition_cant_hear_the_app(qapp, mon
     from soundboard import i18n
     monkeypatch.setattr(tts.SapiTTS, "warm_up", lambda self: ["Microsoft Zira Desktop"])
     monkeypatch.setattr(i18n, "current", lambda: "tlh")
-    from soundboard.ui.voicepanel import VoicePanel
+    from soundboard.ui.voice.voicepanel import VoicePanel
     p = VoicePanel(FakeEngine(), {"enabled": False, "effects": {}}, {"tab": "speak"})
     try:
         assert not p._tabs["speak"].isVisibleTo(p) and p.current_tab() == "fx"
@@ -1314,7 +1314,7 @@ def test_my_own_mix_opens_make_it_yours(panel):
 
 
 def test_make_it_yours_remembers_its_size(panel, qapp):
-    from soundboard.ui.voicepanel import VoiceFxPanel
+    from soundboard.ui.voice.voicepanel import VoiceFxPanel
     p, _ = panel
     seen = []
     p.fx.changed.connect(seen.append)
@@ -1412,7 +1412,7 @@ def test_make_it_yours_buttons_are_at_the_top(panel):
 
 def test_effect_cards_fold_and_stay_folded(qapp, monkeypatch):
     monkeypatch.setattr(tts.SapiTTS, "warm_up", lambda self: [])
-    from soundboard.ui.voicepanel import VoicePanel
+    from soundboard.ui.voice.voicepanel import VoicePanel
     p = VoicePanel(FakeEngine(), {}, {"folded": ["ai", "fx.echo"]})
     try:
         echo, radio = p.fx.rows["echo"], p.fx.rows["radio"]
@@ -1481,7 +1481,7 @@ def test_a_launch_with_the_same_windows_voices_starts_no_speech_helper(qapp, mon
     """The voice list is remembered with the Windows voices it was listed for: the
     next launch shows it without starting PowerShell (~2 s, 85 MB) just to list them."""
     from soundboard.speech import winvoices
-    from soundboard.ui.voicepanel import VoicePanel
+    from soundboard.ui.voice.voicepanel import VoicePanel
     fp = frozenset({"TTS_MS_EN-US_ZIRA_11.0", "TTS_MS_DE-DE_HEDDA_11.0"})
     monkeypatch.setattr(winvoices, "fingerprint", lambda: fp)
     started = []
@@ -1523,7 +1523,7 @@ def test_a_launch_with_the_same_windows_voices_starts_no_speech_helper(qapp, mon
 
 def test_other_windows_voices_list_them_again_and_remember_that(qapp, monkeypatch):
     from soundboard.speech import winvoices
-    from soundboard.ui.voicepanel import VoicePanel
+    from soundboard.ui.voice.voicepanel import VoicePanel
     fp = frozenset({"TTS_MS_EN-US_ZIRA_11.0", "TTS_MS_FR-FR_JULIE_11.0"})
     monkeypatch.setattr(winvoices, "fingerprint", lambda: fp)
 
@@ -1691,7 +1691,7 @@ def test_say_bar_has_no_volume_of_its_own(qapp, monkeypatch):
     the Say bar has no slider and an old saved gain no longer turns it down (it stays
     in the settings for older versions)."""
     from soundboard.ui.kit.panel import VolumeControl
-    from soundboard.ui.voicepanel import VoicePanel
+    from soundboard.ui.voice.voicepanel import VoicePanel
     monkeypatch.setattr(tts.SapiTTS, "warm_up", lambda self: ["Microsoft Zira Desktop"])
     p = VoicePanel(FakeEngine(), {"enabled": False, "effects": {}},
                    {"voice": "Microsoft Zira Desktop", "gain": 0.4})
@@ -1708,7 +1708,7 @@ def test_voice_reload_and_install_keep_focus(panel, qapp, monkeypatch):
     from PySide6.QtCore import Qt
     from PySide6.QtTest import QTest
     from soundboard.ui.kit import busy
-    from soundboard.ui import speechinstall
+    from soundboard.ui.voice import speechinstall
     p, _ = panel
     s = p.speech
     _chinese_without_a_voice(s, qapp)
@@ -1738,7 +1738,7 @@ def test_speech_install_and_cancel_keep_focus(panel, qapp, monkeypatch):
     from PySide6.QtCore import Qt
     from PySide6.QtTest import QTest
     from soundboard.ui.kit import busy
-    from soundboard.ui import speechinstall
+    from soundboard.ui.voice import speechinstall
     p, _ = panel
     s = p.speech
     assert process_events(qapp, lambda: not s.installs._loading())
@@ -1775,7 +1775,7 @@ def test_translation_download_keeps_focus(panel, qapp, monkeypatch):
     from soundboard.online import net
     from soundboard.speech import translation
     from soundboard.ui.kit import busy
-    from soundboard.ui import speechinstall
+    from soundboard.ui.voice import speechinstall
     monkeypatch.setattr(net, "allowed", lambda key: True)
     monkeypatch.setattr(net, "offline", lambda: False)
     p, _ = panel
@@ -1856,8 +1856,8 @@ def test_voice_groups_and_favorites(qapp, monkeypatch):
     order starred), is saved with the settings and comes back starred."""
     monkeypatch.setattr(tts.SapiTTS, "warm_up", lambda self: [])
     from soundboard import voicefx
-    from soundboard.ui.voicefxpanel import (CUSTOM, FAVS, MINE, VOICE_GROUPS,
-                                            VoiceFxPanel, voice_group)
+    from soundboard.ui.voice.voicefxpanel import (CUSTOM, FAVS, MINE, VOICE_GROUPS,
+                                                  VoiceFxPanel, voice_group)
     grouped = [n for _k, _t, names in VOICE_GROUPS for n in names]
     assert sorted(grouped) == sorted(voicefx.PRESETS)   # each preset once, none left out
     assert voice_group(CUSTOM) == MINE
@@ -1895,7 +1895,7 @@ def test_random_voice_turns_on_a_shown_voice_never_the_same_twice(panel):
         last = name
     assert len(seen) > 10
     fx.show_group("scary")                    # one group shown: picks from that group only
-    from soundboard.ui.voicefxpanel import voice_group
+    from soundboard.ui.voice.voicefxpanel import voice_group
     for _i in range(10):
         assert voice_group(fx.roll(rng)) == "scary"
     assert _grid_order(fx)[-1] == "Random voice"
@@ -1942,7 +1942,7 @@ def test_hear_it_plays_the_voice_in_the_headphones(panel, monkeypatch):
 
 
 def aipreview_text():
-    from soundboard.ui.aivoicebrowser import HEAR
+    from soundboard.ui.voice.aivoicebrowser import HEAR
     return HEAR
 
 
@@ -1961,7 +1961,7 @@ def test_hear_it_failing_says_why_and_comes_back(panel, monkeypatch):
     from PySide6.QtWidgets import QApplication
     assert process_events(QApplication.instance(), lambda: said)
     assert said and "no speech voice" in said[0]
-    from soundboard.ui.aivoicebrowser import HEAR
+    from soundboard.ui.voice.aivoicebrowser import HEAR
     assert p.fx.btn_sample.text() == HEAR and not p.fx._hearing
 
 
@@ -2014,7 +2014,7 @@ def test_a_saved_voice_named_like_a_ready_voice_gets_its_own_card(qapp, monkeypa
                                                           "effects": mine}]}),
                                   encoding="utf-8")
     monkeypatch.setattr(tts.SapiTTS, "warm_up", lambda self: ["Microsoft Zira Desktop"])
-    from soundboard.ui.voicepanel import VoicePanel
+    from soundboard.ui.voice.voicepanel import VoicePanel
     p = VoicePanel(FakeEngine(), {"enabled": False, "effects": {}},
                    {"voice": "Microsoft Zira Desktop", "rate": 2})
     assert p.fx.saved_names() == ["Chipmunk (2)"]

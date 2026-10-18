@@ -7,8 +7,8 @@ from PySide6.QtCore import Qt
 from PySide6.QtGui import QImage, QPainter
 
 from soundboard.addons import modules
-from soundboard.ui.triggershost import BoardHost
-from soundboard.ui.triggerstab import TriggersTab
+from soundboard.ui.triggers.triggershost import BoardHost
+from soundboard.ui.triggers.triggerstab import TriggersTab
 from test_mainwindow import window  # noqa: F401
 
 

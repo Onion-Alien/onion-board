@@ -1433,8 +1433,8 @@ def _tab_icon(name: str, tint: str | None, badge: bool = False) -> QIcon:
 
 
 def _make_tab_icon(name: str, tint: str | None, badge: bool = False) -> QIcon:
-    if name.startswith("art:"):   # a picture (ui/art.py): its own colours, whatever the tint
-        from soundboard.ui import art
+    if name.startswith("art:"):   # a picture (ui/voice/art.py): its own colours, whatever the tint
+        from soundboard.ui.voice import art
         ic = art.icon(name[4:]) or QIcon()
     elif tint is None:
         ic = icon(name, "muted", "accent")
@@ -1474,7 +1474,7 @@ def _with_badge(ic: QIcon) -> QIcon:
 
 def set_tab_icon(tabs, index: int, name: str, tint: str | None = None, badge: bool = False):
     """`tint` colours the icon in every state; None is the usual muted / accent.
-    "art:<key>" shows that picture from ui/art.py instead of a painted icon. `badge`
+    "art:<key>" shows that picture from ui/voice/art.py instead of a painted icon. `badge`
     adds the small "live" dot."""
     # on the bar itself: QTabWidget.setTabIcon also lays the whole widget out again and
     # repaints every page under it (the live badge did that to the whole board each

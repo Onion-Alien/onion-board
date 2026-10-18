@@ -1,4 +1,4 @@
-"""Toasts (ui/kit/toast.py), the import's summary and See why (ui/importreport.py), and the
+"""Toasts (ui/kit/toast.py), the import's summary and See why (ui/sounds/importreport.py), and the
 drop veil (ui/dropveil.py)."""
 import numpy as np
 import pytest
@@ -9,7 +9,7 @@ from PySide6.QtWidgets import QApplication, QDialog, QPushButton, QWidget
 from conftest import process_events
 from soundboard.sounds.library import SR
 from soundboard.ui.kit import busy, toast
-from soundboard.ui import importreport
+from soundboard.ui.sounds import importreport
 from soundboard.ui.dropveil import label_for
 from test_mainwindow import window as main_window  # noqa: F401 - the real window, offscreen
 

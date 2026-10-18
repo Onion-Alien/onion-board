@@ -50,7 +50,7 @@ def test_a_failed_search_shows_the_red_card_and_try_again_runs_it(qapp, monkeypa
     """The search can't get through: the red card says why, Try again searches the same
     words once more, and the results take its place."""
     from soundboard.online import ytdl
-    from soundboard.ui.ytsearch import SearchResults
+    from soundboard.ui.sounds.ytsearch import SearchResults
     calls = []
 
     def search(query, count=20, source="youtube", direct=False, start=1):
@@ -74,7 +74,7 @@ def test_a_site_thats_down_gets_no_restart_the_app_advice(qapp, monkeypatch):
     """The site answered 5xx: waiting fixes that, closing Onion Board doesn't, so the
     card says only the site's trouble and Try again (no "close and open it again")."""
     from soundboard.online import ytdl
-    from soundboard.ui.ytsearch import SearchResults
+    from soundboard.ui.sounds.ytsearch import SearchResults
     calls = []
 
     def search(query, count=20, source="youtube", direct=False, start=1):
@@ -97,7 +97,7 @@ def test_a_site_thats_down_gets_no_restart_the_app_advice(qapp, monkeypatch):
 
 def test_the_voice_strip_shows_while_the_voice_cant_work():
     """Logic only: problem() says why the voice that's on can't work, "" when it can."""
-    from soundboard.ui.voicepanel import VoicePanel
+    from soundboard.ui.voice.voicepanel import VoicePanel
 
     class Fake:
         def __init__(self):

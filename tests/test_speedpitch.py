@@ -9,7 +9,7 @@ def test_live_reset_has_a_large_target_and_clears_controls(qapp, what):
     from PySide6.QtTest import QTest
     from PySide6.QtWidgets import QPushButton
 
-    from soundboard.ui.speedpitch import SpeedPitchButton
+    from soundboard.ui.sounds.speedpitch import SpeedPitchButton
 
     button = SpeedPitchButton(what)
     try:
@@ -43,7 +43,7 @@ def _count_sheets(w):
 
 
 def test_speed_pitch_button_restyles_only_when_its_look_changes(qapp):
-    from soundboard.ui.speedpitch import SpeedPitchButton
+    from soundboard.ui.sounds.speedpitch import SpeedPitchButton
     b = SpeedPitchButton()
     calls = _count_sheets(b)
     s = b.speed.slider
@@ -60,7 +60,7 @@ def test_speed_pitch_button_restyles_only_when_its_look_changes(qapp):
 @pytest.mark.parametrize("what", ["sounds", "radio"])
 def test_the_live_controls_button_has_a_name(qapp, what):
     """Its text is the speed ("1x"): a screen reader said only that."""
-    from soundboard.ui.speedpitch import SpeedPitchButton
+    from soundboard.ui.sounds.speedpitch import SpeedPitchButton
     b = SpeedPitchButton(what)
     assert b.accessibleName() == "Live controls" and b.accessibleDescription() == b.toolTip()
 
@@ -80,7 +80,7 @@ def test_volume_control_restyles_only_when_its_colour_changes(qapp):
 def test_live_stream_button_has_no_speed(qapp):
     """The Radio and Apps tabs' button: pitch and effects only, a live stream can't
     be sped up."""
-    from soundboard.ui.speedpitch import SpeedPitchButton
+    from soundboard.ui.sounds.speedpitch import SpeedPitchButton
     b = SpeedPitchButton("radio")
     got = []
     b.changed.connect(lambda s, p, k: got.append((s, p)))
@@ -108,7 +108,7 @@ def test_live_controls_pop_up_beside_the_button_and_click_away(qapp, what):
     from PySide6.QtCore import Qt
     from PySide6.QtWidgets import QVBoxLayout, QWidget
 
-    from soundboard.ui.speedpitch import SpeedPitchButton
+    from soundboard.ui.sounds.speedpitch import SpeedPitchButton
 
     owner = QWidget()
     owner.setGeometry(30, 80, 760, 650)
@@ -150,7 +150,7 @@ def test_redline_starts_at_eight_times(qapp):
 
     from PySide6.QtGui import QColor
 
-    from soundboard.ui.speedpitch import RED, SpeedPitchButton
+    from soundboard.ui.sounds.speedpitch import RED, SpeedPitchButton
 
     button = SpeedPitchButton()
     button.set_redline(True)
@@ -181,7 +181,7 @@ def test_no_change_sits_mid_slider_on_lopsided_ranges(qapp):
     """1x speed and +0 dB bass sit in the middle like 0 st pitch does, though
     their ranges are lopsided (0.25x to 2x, -12 to +18 dB)."""
     from soundboard.audio import livefx
-    from soundboard.ui.speedpitch import SpeedPitchButton
+    from soundboard.ui.sounds.speedpitch import SpeedPitchButton
     b = SpeedPitchButton()
     for s in (b.speed, b.pitch, b.fx["bass"], b.fx["treble"]):
         sl = s.slider
@@ -204,7 +204,7 @@ def test_no_change_sits_mid_slider_on_lopsided_ranges(qapp):
 
 def test_the_values_can_be_typed(qapp):
     """The sliders had positions only: each value is a box you can type in too."""
-    from soundboard.ui.speedpitch import SpeedPitchButton, ValueBox
+    from soundboard.ui.sounds.speedpitch import SpeedPitchButton, ValueBox
     b = SpeedPitchButton()
     got = []
     b.fx_changed.connect(got.append)
@@ -225,7 +225,7 @@ def test_the_values_can_be_typed(qapp):
 def test_a_lit_preset_clicked_again_puts_the_knobs_back(qapp):
     """Clicked again, a lit preset turned every knob off, a tweak made before it too."""
     from soundboard.audio import livefx
-    from soundboard.ui.speedpitch import SpeedPitchButton
+    from soundboard.ui.sounds.speedpitch import SpeedPitchButton
     b = SpeedPitchButton()
     b.set_fx({"reverb": 0.3})
     name = next(n for n, a in livefx.PRESETS.items() if "reverb" not in a)
@@ -238,7 +238,7 @@ def test_a_lit_preset_clicked_again_puts_the_knobs_back(qapp):
 
 def test_my_setups_label_lines_up_with_its_chips(qapp):
     """"My setups" sat a few pixels below "No voice": the section label's top padding."""
-    from soundboard.ui.speedpitch import SpeedPitchButton
+    from soundboard.ui.sounds.speedpitch import SpeedPitchButton
     b = SpeedPitchButton()
     b.set_setups([], "")
     chip = b._setup_chips[""]

@@ -29,7 +29,9 @@ from soundboard.sounds import library, sourceinfo, thumbs
 from soundboard.i18n import _, ngettext
 from soundboard.sounds.library import SoundMeta
 from soundboard.ui.kit.hotkeypick import pretty_key
-from soundboard.ui import clipeditor, responsive, sourcedialog
+from soundboard.ui.apps import clipeditor
+from soundboard.ui import responsive
+from soundboard.ui.sounds import sourcedialog
 from soundboard.ui.kit import icons
 from soundboard.ui.controller import Controller
 from soundboard.ui.kit.panel import icon_label, steady_number
@@ -252,7 +254,7 @@ class PadControl(Controller):
                              sm)
             # the Store tab can take its link (only the link: whoever adds it downloads it)
             from soundboard.online import store
-            from soundboard.ui.storetab import StoreTab
+            from soundboard.ui.store.storetab import StoreTab
             if isinstance(mw.store, StoreTab) and store.link_ok(src["link"]):
                 a_src_share = add(("store",), _("Share to the store"),
                                   _("Share this link in the Community tab"), sm)

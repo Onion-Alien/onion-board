@@ -475,16 +475,29 @@ def test_an_error_says_its_caller_and_the_library_call_it_came_from(tmp_path):
     f = tmp_path / "crash-x.txt"
     f.write_text("Onion Board crash report\nVersion:  2.0.4\n\nError\n-----\n"
                  "Traceback (most recent call last):\n"
-                 '  File "C:\\x\\soundboard\\ui\\appspanel.py", line 380, in setGeometry\n'
+                 '  File "C:\\x\\soundboard\\ui\\apps\\appspanel.py", line 380, in setGeometry\n'
                  "    self._place(rect, True)\n"
-                 '  File "C:\\x\\soundboard\\ui\\appspanel.py", line 352, in _place\n'
+                 '  File "C:\\x\\soundboard\\ui\\apps\\appspanel.py", line 352, in _place\n'
                  "    item.setGeometry(QRect(x, y, w, h))\n"
                  '  File "C:\\Python\\Lib\\enum.py", line 1600, in __or__\n'
                  "    raise TypeError(private)\n"
                  "TypeError: D:/private/secret.wav\n", encoding="utf-8")
-    assert usage._report_event(f) == ("error/2.0.4/TypeError@soundboard/ui/appspanel.py:352"
-                                      "<soundboard/ui/appspanel.py:380~enum.__or__")
+    assert usage._report_event(f) == ("error/2.0.4/TypeError@soundboard/ui/apps/appspanel.py:352"
+                                      "<soundboard/ui/apps/appspanel.py:380~enum.__or__")
     assert "private" not in usage._report_event(f)
+
+
+def test_every_file_of_ours_counts_as_ours():
+    """A problem report names the deepest of our own lines: every module of the package
+    has to match the rule, however many folders down it sits."""
+    from pathlib import Path
+
+    import soundboard
+    root = Path(soundboard.__file__).parent.parent
+    files = [p.relative_to(root).as_posix() for p in (root / "soundboard").rglob("*.py")]
+    assert files and not [f for f in files if not usage._OUR_FILE.fullmatch(f)]
+    assert not [f for f in files
+                if not usage._OUR_FRAME.search(f'  File "C:\\x\\{f}", line 1, in g')]
 
 
 def test_problem_events_keep_paths_outside_our_package_out(tmp_path):
@@ -493,6 +506,9 @@ def test_problem_events_keep_paths_outside_our_package_out(tmp_path):
     f.write_text(_real_report("D:\\soundboard\\Python\\Lib\\json\\decoder.py"),
                  encoding="utf-8")
     assert usage._report_event(f) == "error/1.9.8/KeyError~decoder.f"   # its name only
+    f.write_text(_real_report("D:\\soundboard\\python\\lib\\json\\decoder.py"),
+                 encoding="utf-8")
+    assert usage._report_event(f) == "error/1.9.8/KeyError~decoder.f"   # lower case too
     f.write_text("Onion Board crash report\nVersion:  1.9.8\n\nError\n-----\nboom\n",
                  encoding="utf-8")
     assert usage._report_event(f) == "error/1.9.8"
@@ -831,7 +847,7 @@ def test_first_steps_obey_the_switch(sent):
 def test_the_triggers_tab_counts_its_features(sent):
     """The Onion Watch add-on passes its feature names through BoardHost.count: sent as
     used/triggers-<name>, anything else dropped."""
-    from soundboard.ui.triggershost import BoardHost
+    from soundboard.ui.triggers.triggershost import BoardHost
     host = BoardHost.__new__(BoardHost)    # count() needs nothing of the window
     host.count("mode-colour")
     host.count("pack-import")
@@ -991,7 +1007,7 @@ def test_settings_that_are_set_count_every_day(monkeypatch):
 
 
 def test_apps_built_in_categories_match_the_apps_tab():
-    from soundboard.ui.appspanel import APP_CATEGORIES
+    from soundboard.ui.apps.appspanel import APP_CATEGORIES
     assert set(usage.APPS_BUILT_IN) == {*APP_CATEGORIES, "Other"}
 
 
@@ -1057,7 +1073,7 @@ def test_voice_tabs_and_recovery_actions_match_the_ui():
 
     from soundboard.ui import audiorecovery
     assert set(audiorecovery.INSTALLS) <= set(usage.RECOVERY)
-    from soundboard.ui import voicepanel
+    from soundboard.ui.voice import voicepanel
     src = Path(voicepanel.__file__).read_text(encoding="utf-8")
     assert set(re.findall(r'self\._section\("([a-z]+)"', src)) == set(usage.VOICE_TABS)
 

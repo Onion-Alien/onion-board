@@ -1,10 +1,10 @@
-"""Optional artwork (ui/art.py): pictures are used when present, emoji / painted icons
+"""Optional artwork (ui/voice/art.py): pictures are used when present, emoji / painted icons
 when not, and the Voice tab shows the picture of whoever's talking for you."""
 import pytest
 from PySide6.QtGui import QColor, QImage
 
 from soundboard.speech import tts
-from soundboard.ui import art
+from soundboard.ui.voice import art
 
 
 def _png(folder, key, w=300, h=200):
@@ -72,7 +72,7 @@ class FakeEngine:
 def panel(qapp, art_dir, monkeypatch):
     monkeypatch.setattr(tts.SapiTTS, "warm_up", lambda self: ["Microsoft Zira Desktop"])
     _png(art_dir, "voice-robot")
-    from soundboard.ui.voicepanel import VoicePanel
+    from soundboard.ui.voice.voicepanel import VoicePanel
     p = VoicePanel(FakeEngine(), {"enabled": False, "effects": {}}, {"voice": ""})
     yield p
     p.shutdown()

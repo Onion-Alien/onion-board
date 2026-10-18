@@ -35,7 +35,8 @@ def click(pad, mods=Qt.NoModifier):
 def menu_shows(monkeypatch, look):
     """Menus open as a QMenu subclass that hands itself to `look` instead of blocking
     (Qt's own exec can't be patched on the class)."""
-    from soundboard.ui import categorycontrol, mainwindow, padbatch
+    from soundboard.ui import categorycontrol, mainwindow
+    from soundboard.ui.sounds import padbatch
 
     class Shown(QMenu):
         def exec(self, *a):
@@ -59,7 +60,7 @@ def test_bulk_colour_menu_marks_shared_value_and_applies_choice(window, colors):
     actions = [a for a in menu.actions() if not a.isSeparator()][:-1]   # minus Custom colour…
     assert all(action.isCheckable() for action in actions)
     # by name, not "#7c5cff"
-    from soundboard.ui.dialogs import COLOUR_NAMES
+    from soundboard.ui.sounds.dialogs import COLOUR_NAMES
     assert [a.text() for a in actions] == [COLOUR_NAMES[c] for c in PAD_COLORS]
     expected = [COLOUR_NAMES[colors[0]]] if colors[0] == colors[1] else []
     assert [action.text() for action in actions if action.isChecked()] == expected
@@ -79,7 +80,7 @@ def test_bulk_menu_starts_with_its_actions_not_a_blank_section(window, monkeypat
 def test_category_colour_menu_is_the_bulk_one_with_no_colour(window, monkeypatch):
     """A category tab's Colour menu: names and a real tick, like the bulk one (it had
     a "  âœ“" typed after the name and bold text)."""
-    from soundboard.ui.dialogs import COLOUR_NAMES
+    from soundboard.ui.sounds.dialogs import COLOUR_NAMES
     w = window
     w.cfg.categories = ["Memes"]
     w.cfg.category_colors["Memes"] = PAD_COLORS[2]

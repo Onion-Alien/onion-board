@@ -1,5 +1,5 @@
 """A small picture of a program's window, for the Apps tab's eye button
-(soundboard.ui.appspanel).
+(soundboard.ui.apps.appspanel).
 
 `find_window` picks the program's main window (visible, not owned by another, with
 a title; the biggest if it has several). `grab` copies it with PrintWindow and

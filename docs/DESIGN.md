@@ -376,7 +376,7 @@ These are the current reference points. Copy their structure before inventing a 
   `accent2` with a light top rim (`POLISH_STYLE`, `_accent_shades`), so don't give it
   its own `background`.
 - Destructive actions use `#danger`, and anything that removes something a person
-  made goes through Undo or the Recently deleted bin (`trash.py`, `ui/deleted.py`,
+  made goes through Undo or the Recently deleted bin (`trash.py`, `ui/sounds/deleted.py`,
   `panel.UndoBar`), not a one-click loss. Keep "are you sure?" for deleting for good.
 - **Icon-only buttons** wherever the picture says it (section 4). The words become
   the accessible name (`setAccessibleName`), and the tooltip only when the picture

@@ -4,7 +4,7 @@ from PySide6.QtCore import QEvent, QPointF, Qt
 from PySide6.QtGui import QMouseEvent
 
 from soundboard.audio.appaudio import App
-from soundboard.ui import appspanel, approw
+from soundboard.ui.apps import appspanel, approw
 from tests.test_appspanel import tab as app_tab_fixture
 
 

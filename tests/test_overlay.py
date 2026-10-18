@@ -6,8 +6,8 @@ import pytest
 from conftest import process_events
 from soundboard.control import winkeys
 from soundboard.sounds.library import Config, SoundMeta
-from soundboard.ui import overlay as ovl
-from soundboard.ui.overlay import Overlay, OverlaySettings
+from soundboard.ui.sounds import overlay as ovl
+from soundboard.ui.sounds.overlay import Overlay, OverlaySettings
 
 
 class Host:

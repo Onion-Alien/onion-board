@@ -8,8 +8,8 @@ from soundboard.ui.kit import theme
 from soundboard.addons import modules
 from soundboard.speech.aivoice import AiVoiceController
 from soundboard.speech import tts
-from soundboard.ui.aivoicepanel import AiVoicePanel
-from soundboard.ui.voicepanel import VoicePanel
+from soundboard.ui.voice.aivoicepanel import AiVoicePanel
+from soundboard.ui.voice.voicepanel import VoicePanel
 from soundboard.voicefx import VoiceChain
 from tests.test_voicepanel import FakeEngine
 
@@ -89,8 +89,8 @@ def test_ai_status_sits_over_the_voices_and_wraps(qapp, monkeypatch, tmp_path, w
     """The AI voices card's status (its switch is in the card's head, as the voice
     changer's): one line under the card's words, wrapping inside the card and above
     the voices; switched off, it goes."""
-    monkeypatch.setattr("soundboard.ui.aivoicepanel.model_downloaded", lambda m: True)
-    monkeypatch.setattr("soundboard.ui.aivoicepanel.read_voices", lambda m: [
+    monkeypatch.setattr("soundboard.ui.voice.aivoicepanel.model_downloaded", lambda m: True)
+    monkeypatch.setattr("soundboard.ui.voice.aivoicepanel.read_voices", lambda m: [
         {"id": "bear", "name": "Bear", "description": "A deep voice."}])
     module = modules.ModuleInfo("ai-voices", "AI voices", "1", "", "service", tmp_path)
     panel = AiVoicePanel(AiVoiceController(VoiceChain(), lambda ev: None), {}, [module])
@@ -171,7 +171,7 @@ def test_languages_card_reads_language_then_who_then_start(qapp, monkeypatch, tm
 
 
 def test_voice_changer_switch_heads_the_card_and_picked_bar_holds_actions(qapp):
-    from soundboard.ui.voicepanel import VoiceFxPanel
+    from soundboard.ui.voice.voicepanel import VoiceFxPanel
     panel = VoiceFxPanel({})
     try:
         # the switch goes in the card's title row (VoicePanel puts `head` there); the

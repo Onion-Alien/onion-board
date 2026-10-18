@@ -71,17 +71,17 @@ from soundboard.ui.updatecontrol import UpdateControl
 from soundboard.ui.kit import toast as toastmod
 from soundboard.ui.kit import a11y, appstate, busy, icons
 from soundboard.ui import lite, livesize, responsive, splash, taboff, tabtours
-from soundboard.ui.linkbar import PLAY_ID as LINK_ID
+from soundboard.ui.sounds.linkbar import PLAY_ID as LINK_ID
 from soundboard.ui.logowidget import glow_icon
 from soundboard.ui import sidebar
 from soundboard.ui.spacekey import SpaceKey
-from soundboard.ui.overlay import Overlay
-from soundboard.ui.appspanel import AppsTab
-from soundboard.ui.triggershost import BoardHost
-from soundboard.ui.triggerstab import TriggersTab
-from soundboard.ui.radiopanel import RadioOff, RadioTab
-from soundboard.ui.storetab import PREVIEW as STORE_PREVIEW, StoreTab
-from soundboard.ui.voicepanel import VoicePanel
+from soundboard.ui.sounds.overlay import Overlay
+from soundboard.ui.apps.appspanel import AppsTab
+from soundboard.ui.triggers.triggershost import BoardHost
+from soundboard.ui.triggers.triggerstab import TriggersTab
+from soundboard.ui.radio.radiopanel import RadioOff, RadioTab
+from soundboard.ui.store.storetab import PREVIEW as STORE_PREVIEW, StoreTab
+from soundboard.ui.voice.voicepanel import VoicePanel
 from soundboard.ui.kit.widgets import Meter, Pad, expand_dropped
 from soundboard.control.winkeys import Hotkeys
 from soundboard.i18n import _
@@ -110,22 +110,22 @@ if TYPE_CHECKING:
                                    QStackedWidget, QVBoxLayout, QWidget)
     from soundboard.core import tips
     from soundboard.ui import moretabs
-    from soundboard.ui.appspanel import ElidedLabel
+    from soundboard.ui.apps.appspanel import ElidedLabel
     from soundboard.ui.destpanel import DestPanel, ModeButton
     from soundboard.ui.downloadbar import DownloadBar
     from soundboard.ui.dropveil import DropVeil
-    from soundboard.ui.linkbar import LinkBar
+    from soundboard.ui.sounds.linkbar import LinkBar
     from soundboard.ui.logowidget import LogoWidget
-    from soundboard.ui.padbatch import PadSelection
+    from soundboard.ui.sounds.padbatch import PadSelection
     from soundboard.ui.kit.panel import EqPanel, Flow, TileRow, ViewToggle, VolumeControl
     from soundboard.ui.kit.playbutton import PlayButton
     from soundboard.ui.setupshow import SetupShow
     from soundboard.ui.sidebar import SideTabs
-    from soundboard.ui.speedpitch import SpeedPitchButton
+    from soundboard.ui.sounds.speedpitch import SpeedPitchButton
     from soundboard.ui.kit.widgets import (DropdownMenu, EdgeMatch, NameAndSeek, PadGrid,
                                            SeekSlider, WindowRoot)
     from soundboard.ui.windowbuild import BannerButton, Pulse
-    from soundboard.ui.ytsearch import SearchResults
+    from soundboard.ui.sounds.ytsearch import SearchResults
 
 class Bridge(QObject):
     loaded = Signal(str, object, str)          # id, data|None, error
@@ -551,7 +551,7 @@ class MainWindow(QMainWindow):
         with theme.styled_after(QApplication.instance()):
             self.builder._build_ui()
         restyled.again()   # what measured text, in the theme's fonts now
-        from soundboard.ui.livesetups import LiveSetups
+        from soundboard.ui.voice.livesetups import LiveSetups
         self.livesetups = LiveSetups(self)   # My setups in the three Live controls
         splash.pump()
         self.devctl._init_devices()
@@ -901,7 +901,7 @@ class MainWindow(QMainWindow):
             v.fx.chat_help.connect(lambda: self.statusctl.show_chat_guide("discord"))
             v.fx.hotkey_asked.connect(self.hkctl.set_voice_hotkey)
             v.share_asked.connect(self.share_voice)
-            from soundboard.ui.clipshelf import ClipShelf
+            from soundboard.ui.apps.clipshelf import ClipShelf
             recs = ClipShelf(self.engine, self.cfg, v, voice=True)
             recs.add_to_sounds.connect(self.soundctl.on_clip)
             recs.size_changed.connect(self._save_later)
@@ -936,7 +936,7 @@ class MainWindow(QMainWindow):
 
     def _voice_hooks(self):
         """What the Store's Voices use of the Voice tab (its lists of your voices)."""
-        from soundboard.ui.storevoices import VoiceHooks
+        from soundboard.ui.store.storevoices import VoiceHooks
         return VoiceHooks(lambda: (self.voice if isinstance(getattr(self, "voice", None),
                                                             VoicePanel) else None))
 
@@ -945,7 +945,7 @@ class MainWindow(QMainWindow):
         import html
 
         from soundboard.online import net, store
-        from soundboard.ui.storevoices import open_share
+        from soundboard.ui.store.storevoices import open_share
         if not net.allowed(store.FEATURE):
             busy.toast(self, html.escape(net.off_message(store.FEATURE)), "error")
             return

@@ -25,11 +25,11 @@ lines in the files below.
 `BunnyWidget` in the setup guide (`ui/setupwizard.py`, a prop per page), the chat guides
 (`ui/chatguide.py`, `ui/streamguide.py`), Bun mode (`ui/bunmode.py`, the window as a
 floating Bun: `in_background=True` keeps him moving behind a game), the empty board (`ui/kit/widgets.py`), the Apps tab
-(`ui/appspanel.py`, sad and begging; `rest_after_s=30`: still after 30 s with nothing playing, until a sound or a click), the Radio map (`ui/flatmap.py`), the YouTube search
-(`ui/ytsearch.py`), left of the Live controls title (`ui/speedpitch.py` `DjBunny`: his
+(`ui/apps/appspanel.py`, sad and begging; `rest_after_s=30`: still after 30 s with nothing playing, until a sound or a click), the Radio map (`ui/radio/flatmap.py`), the YouTube search
+(`ui/sounds/ytsearch.py`), left of the Live controls title (`ui/sounds/speedpitch.py` `DjBunny`: his
 `bunskits.mixing` act on a loop, tapping sound pads and scratching a record), the mic part update (`ui/micupdate.py`), the *Enjoying Onion Board?* bar (`ui/enjoycontrol.py`, holding up the `survey` clipboard) and Robo-Bun on the AI voice
-card (`ui/aivoicepanel.py`). `SetupShow` in the setup guide; `ScribeBunny` in the
-download bar (`ui/downloadbar.py`); static pictures in `ui/dialogs.py` and the smug box in
+card (`ui/voice/aivoicepanel.py`). `SetupShow` in the setup guide; `ScribeBunny` in the
+download bar (`ui/downloadbar.py`); static pictures in `ui/sounds/dialogs.py` and the smug box in
 `ui/mainwindow.py`; each theme's card in Settings > Appearance
 (`ui/settingspages/appearance.py`: Bun as he looks in that theme, drawn once per theme with
 room above him for an upright ear or a tall hat; when the mouse comes onto a card he hops

@@ -14,7 +14,8 @@ from PySide6.QtWidgets import (QLabel, QListWidget, QPushButton, QStackedWidget,
 
 from soundboard.ui.kit import theme
 from soundboard.speech import tts
-from soundboard.ui import appspanel, setupwizard
+from soundboard.ui.apps import appspanel
+from soundboard.ui import setupwizard
 from soundboard.ui.kit import busy
 from tests.conftest import process_events
 from tests.test_appspanel import FakeCapture, music, tab  # noqa: F401  (fixture)
@@ -26,7 +27,7 @@ from tests.test_voicepanel import FakeEngine
 @pytest.fixture
 def speech(qapp, monkeypatch):
     monkeypatch.setattr(tts.SapiTTS, "warm_up", lambda self: ["Microsoft Zira Desktop"])
-    from soundboard.ui.voicepanel import VoicePanel
+    from soundboard.ui.voice.voicepanel import VoicePanel
     p = VoicePanel(FakeEngine(), {}, {"voice": "Microsoft Zira Desktop"})
     yield p.speech
     p.shutdown()
@@ -64,7 +65,7 @@ def test_a_reload_asked_for_mid_load_runs_after_it(speech, qapp, monkeypatch):
 
 # ---- radio
 def test_double_click_on_the_station_badge_plays_and_on_the_star_stars(qapp):
-    from soundboard.ui.radiopanel import ROW_H, _StationDelegate
+    from soundboard.ui.radio.radiopanel import ROW_H, _StationDelegate
     calls = []
     lst = QListWidget()
     fake = SimpleNamespace(list=lst, _play_or_stop=lambda u: calls.append(("play", u)),

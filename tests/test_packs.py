@@ -13,7 +13,7 @@ import pytest
 from soundboard.core import backup, updates
 from soundboard.sounds import packs
 from soundboard.online import net
-from soundboard.ui import packsdialog
+from soundboard.ui.sounds import packsdialog
 from conftest import process_events
 from test_mainwindow import window as main_window  # noqa: F401 - the real window, offscreen
 from test_radio import wav_bytes

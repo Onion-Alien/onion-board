@@ -121,7 +121,7 @@ def test_map_names_sit_on_each_countrys_biggest_land(monkeypatch):
 
 
 def test_flat_map_fills_its_area_and_wraps_round_the_world(qapp):
-    from soundboard.ui.flatmap import LAT_BOTTOM, LAT_TOP, FlatMap
+    from soundboard.ui.radio.flatmap import LAT_BOTTOM, LAT_TOP, FlatMap
     m = FlatMap()
     m.resize(800, 600)                    # taller than the world at its width
     m.set_land([[(0, 0), (10, 0), (10, 10)]], [("Square", 6.7, 3.3, 10)])
@@ -144,7 +144,7 @@ def test_a_tile_dropped_half_drawn_leaves_its_painter_balanced(qapp):
     at a yield): the painter was ended with its save()s still open, and Qt warned
     "QPainter::end: Painter ended with 2 saved states"."""
     from PySide6.QtCore import qInstallMessageHandler
-    from soundboard.ui.flatmap import FlatMap
+    from soundboard.ui.radio.flatmap import FlatMap
     m = FlatMap()
     m.resize(800, 600)
     m.set_land([[(x, 0), (x + 5, 0), (x + 5, 5)] for x in range(-170, 170, 10)])
@@ -168,7 +168,7 @@ def test_flat_map_hovers_clicks_and_follows_the_playing_station(qapp):
     from PySide6.QtGui import QMouseEvent
     from PySide6.QtWidgets import QApplication
 
-    from soundboard.ui.flatmap import ZOOM_MAX, FlatMap
+    from soundboard.ui.radio.flatmap import ZOOM_MAX, FlatMap
     m = FlatMap()
     m.resize(720, 284)          # 2 px per degree
     pts = radio.globe_points([Station.from_api(api_station(i, geo_lat=10 * i, geo_long=20 * i,
@@ -206,7 +206,7 @@ def test_flat_map_moves_dots_apart_instead_of_covering(qapp):
     each its own dot to click; the busiest keeps the spot and a dot alone doesn't move."""
     pts = [{"id": f"s{i}", "la": 50.0, "lo": 10.0, "k": i} for i in range(20)]
     pts.append({"id": "alone", "la": 40.0, "lo": 0.0, "k": 5})
-    from soundboard.ui.flatmap import ROOM_PX, FlatMap
+    from soundboard.ui.radio.flatmap import ROOM_PX, FlatMap
     m = FlatMap()
     m.resize(400, 300)
     m.set_points(pts)
@@ -231,7 +231,7 @@ def test_flat_map_moves_dots_apart_instead_of_covering(qapp):
 def test_flat_map_popular_stations_glow_bigger(qapp):
     """The most played stations are big glowing dots, the more plays the bigger; the
     rest are all the same small dot."""
-    from soundboard.ui.flatmap import HOT_R, QUIET_R, FlatMap
+    from soundboard.ui.radio.flatmap import HOT_R, QUIET_R, FlatMap
     pts = [{"id": f"s{i}", "la": (i % 30) * 2.0, "lo": i // 30 * 2.0, "k": i % 7}
            for i in range(300)]
     pts += [{"id": "big", "la": -20.0, "lo": 50.0, "k": 4000},
@@ -347,8 +347,8 @@ def test_a_tie_between_spellings_picks_the_capitalised_one():
 
 
 def test_flat_map_names_towns_only_zoomed_in_and_only_in_view(qapp, monkeypatch):
-    from soundboard.ui import flatmap
-    from soundboard.ui.flatmap import FlatMap
+    from soundboard.ui.radio import flatmap
+    from soundboard.ui.radio.flatmap import FlatMap
     m = FlatMap()
     m.resize(720, 284)
     towns = [{"n": f"Town {i}", "la": 0.0, "lo": i * 3.0, "k": 100 - i} for i in range(60)]
@@ -375,8 +375,8 @@ def test_flat_map_draws_only_the_town_names_that_fit(qapp, monkeypatch):
     """Zooming past TOWN_ZOOM over Europe drew every town in view (hundreds), even the
     ones then skipped for overlapping: 80 ms in one paint, and the sound skipped. Only
     the names that fit are drawn, and new ones get a slice of a paint each."""
-    from soundboard.ui import flatmap
-    from soundboard.ui.flatmap import FlatMap
+    from soundboard.ui.radio import flatmap
+    from soundboard.ui.radio.flatmap import FlatMap
     m = FlatMap()
     m.resize(720, 400)
     towns = [{"n": f"Town {i}", "la": 50 + (i % 20) * 0.05, "lo": 10 + (i // 20) * 0.05,
@@ -1039,7 +1039,7 @@ class FakeMeter(QWidget):
 
 @pytest.fixture
 def tab(qapp, app_dir, server):
-    from soundboard.ui.radiopanel import RadioTab
+    from soundboard.ui.radio.radiopanel import RadioTab
     cfg = Config()
     cfg.radio = {"vol": 0.5}
     eng = FakeEngine()
@@ -1095,8 +1095,8 @@ def test_the_map_is_the_only_view_and_the_3d_globe_setting_moves_to_it(
     the setting says "flat", which every older version reads as the map too."""
     from PySide6.QtWidgets import QPushButton
 
-    from soundboard.ui.flatmap import FlatMap
-    from soundboard.ui.radiopanel import RadioTab
+    from soundboard.ui.radio.flatmap import FlatMap
+    from soundboard.ui.radio.radiopanel import RadioTab
     d = RadioDirectory(app_dir / "radio", bases=(server.base,))
     monkeypatch.setattr(d, "load_outlines", lambda: d.outlines_ready.emit([], []))   # offline
     cfg = Config()
@@ -1124,8 +1124,8 @@ def test_the_decoder_preloads_once_the_stations_are_up_not_at_start_up(
     but costs ~22 MB: only once the radio is used. And not while the tab first fills:
     Windows holds up every DLL load while one loads, and the map's first draw waited
     out the decoder's on a cold disk (a 14 s freeze)."""
-    from soundboard.ui import radiopanel
-    from soundboard.ui.radiopanel import RadioTab
+    from soundboard.ui.radio import radiopanel
+    from soundboard.ui.radio.radiopanel import RadioTab
     calls = []
     monkeypatch.setattr(radio, "preload_decoder", lambda: calls.append(1))
     monkeypatch.setattr(radiopanel, "PRELOAD_MS", 50)
@@ -1275,7 +1275,7 @@ def test_tab_keeps_a_directory_failure_up_until_a_reload_works(tab):
 
 
 def test_tab_filters_by_genre_country_and_quality(tab):
-    from soundboard.ui.radiopanel import in_genre
+    from soundboard.ui.radio.radiopanel import in_genre
     a, b, c = tab._globe_list[:3]
     b.tags, b.country, b.bitrate = ["deep house", "chillout"], "Germany", 256
     c.tags, c.bitrate = ["Classic Rock"], 320
@@ -1351,7 +1351,7 @@ def test_tab_play_stop_and_star_relabel_rows_without_rebuilding(tab, monkeypatch
 
 
 def test_station_rows_paint_without_making_fonts_each_time(tab, monkeypatch):
-    from soundboard.ui import radiolist
+    from soundboard.ui.radio import radiolist
     tab.list.resize(400, 300)
     tab.list.grab()
     made = []
@@ -1423,7 +1423,7 @@ def test_directory_fails_over_from_a_mirror_answering_junk(qapp, server, tmp_pat
 
 
 def test_tab_plays_fresh_directory_data_over_a_saved_favourite(qapp, app_dir, server):
-    from soundboard.ui.radiopanel import RadioTab
+    from soundboard.ui.radio.radiopanel import RadioTab
     old = Station.from_api(api_station(1, url_resolved="http://example.com/OLD.mp3"))
     cfg = Config()
     cfg.radio = {"favorites": [old.to_saved()]}
@@ -1458,7 +1458,7 @@ def test_filter_boxes_wrap_instead_of_cutting_their_words(qapp):
     from PySide6.QtCore import QRect
     from PySide6.QtWidgets import QComboBox
 
-    from soundboard.ui.radiopanel import QUALITIES, SORTS, _FilterRow
+    from soundboard.ui.radio.radiopanel import QUALITIES, SORTS, _FilterRow
     boxes = [QComboBox(), QComboBox(), QComboBox()]
     boxes[0].addItem("All countries")
     for label, _ in QUALITIES:
@@ -1487,7 +1487,7 @@ def test_filter_boxes_wrap_instead_of_cutting_their_words(qapp):
 
 
 def test_tab_radio_volume_zero_is_remembered(qapp, app_dir, server):
-    from soundboard.ui.radiopanel import RadioTab
+    from soundboard.ui.radio.radiopanel import RadioTab
     cfg = Config()
     d = RadioDirectory(app_dir / "radio", bases=(server.base,))
     t = RadioTab(FakeEngine(), cfg, lambda: None, FakeMeter, directory=d, globe=False)
@@ -1620,7 +1620,7 @@ def test_the_flat_map_keeps_its_picture_while_tabs_flick_and_lets_it_go_later(qa
     """1.8.0 let the drawn map go the moment the map hid and drew all of it again
     on the UI thread as it came back: flicking Sounds <-> Radio froze the app every
     time. Now the tiles are kept for FORGET_MS, and a redraw is a slice at a time."""
-    from soundboard.ui.flatmap import FlatMap
+    from soundboard.ui.radio.flatmap import FlatMap
     m = FlatMap()
     m.resize(400, 300)
     m.set_points([{"id": "a", "la": 50.0, "lo": 10.0, "k": 1}])
@@ -1676,7 +1676,7 @@ def test_the_first_station_asks_once_who_hears_it_and_remembers(qapp, tab, serve
     """Send used to start off on every launch with only a grey line saying so: people
     played a station, heard it themselves and thought it was broken. Now the first
     station asks once, the answer is kept, and the next start sends as chosen."""
-    from soundboard.ui.radiopanel import RadioTab
+    from soundboard.ui.radio.radiopanel import RadioTab
     s = tab._stations["uuid-0"]
     s.url = server.base + "/stream.wav"
     assert tab.ask_bar.isHidden() and "send" not in tab.cfg.radio

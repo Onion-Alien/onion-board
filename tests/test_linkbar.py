@@ -4,7 +4,7 @@ import numpy as np
 import pytest
 
 from soundboard.sounds.library import Config, SoundMeta
-from soundboard.ui.linkbar import LinkBar
+from soundboard.ui.sounds.linkbar import LinkBar
 
 
 def _fake_threads(monkeypatch, module, worker):
@@ -76,7 +76,7 @@ def test_the_added_audio_is_kept_for_play_only_while_its_link_shows(qapp):
 
 @pytest.mark.parametrize("first", ["add", "play"])
 def test_add_and_play_share_one_download(qapp, monkeypatch, tmp_path, first):
-    from soundboard.ui import linkbar
+    from soundboard.ui.sounds import linkbar
 
     bar, eng = _bar()
     data = np.zeros((480, 2), np.int16)
@@ -130,7 +130,7 @@ def test_failed_download_finishes_both_actions_without_retry(qapp, monkeypatch):
 
 
 def test_thumbnail_failure_does_not_fail_successful_import(qapp, monkeypatch, tmp_path):
-    from soundboard.ui import linkbar
+    from soundboard.ui.sounds import linkbar
 
     bar, eng = _bar()
     data = np.zeros((480, 2), np.int16)
@@ -156,7 +156,7 @@ OTHER = "https://www.youtube.com/watch?v=other"
 
 def _fake_start(bar, monkeypatch):
     """_start without a worker thread: the test sends the worker's messages itself."""
-    from soundboard.ui import linkbar
+    from soundboard.ui.sounds import linkbar
 
     class Worker:
         def __init__(self, *a, **kw):
@@ -186,7 +186,7 @@ def test_a_cancelled_play_never_plays_when_its_download_lands(qapp, monkeypatch,
 
 
 def test_a_new_play_waits_for_the_one_still_loading(qapp, monkeypatch, tmp_path):
-    from soundboard.ui import linkbar
+    from soundboard.ui.sounds import linkbar
 
     bar, eng = _bar()
     _fake_start(bar, monkeypatch)
@@ -233,7 +233,7 @@ def test_a_play_still_plays_after_another_card_is_queued_and_removed(qapp, monke
 
 
 def test_picks_queue_behind_an_add_and_a_full_queue_says_so(qapp, monkeypatch):
-    from soundboard.ui import linkbar
+    from soundboard.ui.sounds import linkbar
 
     bar, _eng = _bar()
     _fake_start(bar, monkeypatch)
@@ -255,7 +255,7 @@ def test_picks_queue_behind_an_add_and_a_full_queue_says_so(qapp, monkeypatch):
 
 
 def test_play_now_goes_before_adds_after_waiting_plays(qapp, monkeypatch):
-    from soundboard.ui import linkbar
+    from soundboard.ui.sounds import linkbar
 
     bar, _eng = _bar()
     _fake_start(bar, monkeypatch)
@@ -319,7 +319,7 @@ def test_add_with_save_video_says_why_no_video_was_kept(qapp, monkeypatch, tmp_p
     YouTube has none without ffmpeg to merge it): the sound is still added, and the bar
     says why there's no video, naming FFmpeg when that's what's missing."""
     from soundboard.sounds import library
-    from soundboard.ui import linkbar
+    from soundboard.ui.sounds import linkbar
 
     bar, eng = _bar()
     data = np.zeros((480, 2), np.int16)

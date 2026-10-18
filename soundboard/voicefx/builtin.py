@@ -1924,7 +1924,7 @@ def _allpass(x, xh, yh, g):
 
 # --------------------------------------------------------------------------- background
 
-# ---- the Effects pop-up's own copies (ui/effectspopup.py): on top of whatever voice
+# ---- the Effects pop-up's own copies (ui/voice/effectspopup.py): on top of whatever voice
 # is on, kept when you change voice. A voice's Robot or Echo is its own card in Edit
 # voice; these never show there, and run after the voice's effects
 @register

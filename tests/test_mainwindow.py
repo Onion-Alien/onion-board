@@ -213,7 +213,7 @@ def test_a_web_search_sound_gets_a_chip_and_the_player_follows_it(window, monkey
     only Stop all could reach it."""
     import numpy as np
 
-    from soundboard.ui.linkbar import PLAY_ID
+    from soundboard.ui.sounds.linkbar import PLAY_ID
     live = {"s0": (0.2, False)}
     monkeypatch.setattr(window.engine, "playing", lambda: dict(live))
     monkeypatch.setattr(window.engine, "stop", lambda sid: live.pop(sid, None))
@@ -239,7 +239,7 @@ def test_a_stopped_web_song_leaves_the_player(window, monkeypatch):
     stopped it and its name stayed in the player bar for good."""
     import numpy as np
 
-    from soundboard.ui.linkbar import PLAY_ID
+    from soundboard.ui.sounds.linkbar import PLAY_ID
     live = {}
     monkeypatch.setattr(window.engine, "playing", lambda: dict(live))
     monkeypatch.setattr(window.engine, "stop", lambda sid: live.pop(sid, None))
@@ -630,7 +630,7 @@ def test_sounds_tab_lights_up_while_a_sound_plays(window, monkeypatch):
     playing["__test__"] = (0.1, False)           # the mic test's playback isn't a sound
     window.tickctl.tick()
     assert not is_tab_live(tabs, i) and not tabs.tabToolTip(i).startswith("●")
-    from soundboard.ui.linkbar import PLAY_ID  # a web search's Play lights it too
+    from soundboard.ui.sounds.linkbar import PLAY_ID  # a web search's Play lights it too
     playing.clear()
     playing[PLAY_ID] = (0.1, False)
     window.tickctl.tick()
@@ -925,7 +925,7 @@ def test_card_titles_and_the_typed_percent_fit_the_themes_font(qapp, theme_name)
 
     from soundboard.ui.kit import theme
     from soundboard.ui.kit.panel import VolumeControl
-    from soundboard.ui.ytsearch import ClampLabel
+    from soundboard.ui.sounds.ytsearch import ClampLabel
 
     old = theme.current_name
     try:
@@ -1026,7 +1026,7 @@ def test_ctrl_v_pastes_a_copied_picture_on_the_selected_pad(window):
 def test_ctrl_v_adds_a_clip_copied_in_the_clip_editor_as_a_sound(window):
     import numpy as np
 
-    from soundboard.ui import clipeditor
+    from soundboard.ui.apps import clipeditor
     n = len(window.cfg.sounds)
     clipeditor.set_clipboard(np.zeros((int(0.23 * 48000), 2), np.float32))   # even silence
     try:
@@ -1106,7 +1106,7 @@ def test_the_mic_banner_and_a_row_of_playing_sounds_dont_force_the_mini_player(w
 def test_clamp_label_wraps_once_per_text_width_and_font(qapp):
     """Cards repaint on every hover and scroll: the wrapped lines are kept until the
     text, width or font changes."""
-    from soundboard.ui.ytsearch import ClampLabel
+    from soundboard.ui.sounds.ytsearch import ClampLabel
     lbl = ClampLabel("A title long enough to wrap " * 3)
     lbl.resize(160, lbl.height())
     lines = lbl._wrapped()

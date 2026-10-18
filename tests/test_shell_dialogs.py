@@ -361,7 +361,7 @@ def test_popups_inside_cards_keep_the_themes_background(qapp, box):
     from PySide6.QtGui import QColor
     from PySide6.QtWidgets import QComboBox, QFrame, QMenu, QVBoxLayout
 
-    from soundboard.ui.radiolist import StationList
+    from soundboard.ui.radio.radiolist import StationList
     try:
         for name in theme.THEMES:
             theme.apply(qapp, name)

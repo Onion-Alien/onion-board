@@ -1059,7 +1059,7 @@ def test_new_voices_keep_speech_about_as_loud(name):
 
 
 def test_every_preset_has_a_group_on_the_voice_tab():
-    from soundboard.ui.voicefxpanel import VOICE_GROUPS
+    from soundboard.ui.voice.voicefxpanel import VOICE_GROUPS
     grouped = [n for _k, _t, names in VOICE_GROUPS for n in names]
     assert sorted(grouped) == sorted(voicefx.PRESETS)   # each in one group, none left over
 

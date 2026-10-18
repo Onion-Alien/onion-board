@@ -15,7 +15,7 @@ from soundboard.i18n import _
 from soundboard.ui.kit import busy
 from soundboard.ui import sidebar
 from soundboard.ui.controller import Controller
-from soundboard.ui.radiopanel import RadioTab
+from soundboard.ui.radio.radiopanel import RadioTab
 from soundboard.ui.tabcontrol import TAB_INDEX
 from soundboard.ui.kit.widgets import fit_placeholder
 

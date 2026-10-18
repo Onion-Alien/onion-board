@@ -329,7 +329,7 @@ def test_get_and_remove_the_optional_addon(tmp_path, monkeypatch):
 # ---------------------------------------------------------------- the Voice tab card
 
 def test_card_offers_the_download_when_the_addon_isnt_there(qapp):
-    from soundboard.ui.aivoicepanel import AiVoicePanel
+    from soundboard.ui.voice.aivoicepanel import AiVoicePanel
     p = AiVoicePanel(AiVoiceController(VoiceChain(), lambda e: None), {}, [])
     try:
         assert not p.b_get.isHidden() and p.ready_box.isHidden()
@@ -340,7 +340,7 @@ def test_card_offers_the_download_when_the_addon_isnt_there(qapp):
 
 
 def test_card_lists_the_voices_once_installed(qapp, tmp_path, monkeypatch):
-    from soundboard.ui.aivoicepanel import AiVoicePanel
+    from soundboard.ui.voice.aivoicepanel import AiVoicePanel
     folder = tmp_path / "ai-voices"
     folder.mkdir()
     for f in ("module.json", "voices.json"):
@@ -390,7 +390,7 @@ def test_card_lists_the_voices_once_installed(qapp, tmp_path, monkeypatch):
 def test_card_tries_once_more_when_the_helper_never_calls_back(qapp, tmp_path, monkeypatch):
     """A helper that sat silent (no hello) gets one silent retry; a second silence,
     or one that connected and then failed, is shown."""
-    from soundboard.ui.aivoicepanel import AiVoicePanel
+    from soundboard.ui.voice.aivoicepanel import AiVoicePanel
     folder = tmp_path / "ai-voices"
     folder.mkdir()
     for f in ("module.json", "voices.json"):
@@ -427,7 +427,7 @@ def test_card_tries_once_more_when_the_helper_never_calls_back(qapp, tmp_path, m
 
 def test_ai_voice_and_the_computer_voice_take_turns(qapp, monkeypatch, app_dir):
     from soundboard.speech import tts
-    from soundboard.ui.voicepanel import VoicePanel
+    from soundboard.ui.voice.voicepanel import VoicePanel
     monkeypatch.setattr(tts.SapiTTS, "warm_up", lambda self: [])
 
     class Engine:
@@ -476,7 +476,7 @@ def test_voice_settings_are_queued_with_the_audio_not_sent_from_the_ui_thread():
 
 
 def test_card_shows_robot_bunny_and_setup_stages_not_pip_output(qapp):
-    from soundboard.ui.aivoicepanel import AiVoicePanel, install_step
+    from soundboard.ui.voice.aivoicepanel import AiVoicePanel, install_step
     pip_msg = ("Successfully installed flatbuffers-25.12.19 numpy-2.5.3 "
                "onnxruntime-1.30.0 packaging-26.3 protobuf-7.36.2")
     assert install_step(pip_msg) is None            # pip's chatter: the stage stays up
@@ -518,7 +518,7 @@ def test_ai_voice_download_keeps_its_button_visible_and_focused(qapp, monkeypatc
     from PySide6.QtCore import Qt
     from PySide6.QtTest import QTest
     from soundboard.online import net
-    from soundboard.ui import aivoicepanel
+    from soundboard.ui.voice import aivoicepanel
     from soundboard.ui.kit import busy
     monkeypatch.setattr(net, "offline", lambda: False)
     p = aivoicepanel.AiVoicePanel(AiVoiceController(VoiceChain(), lambda e: None), {}, [])
@@ -546,7 +546,7 @@ def test_ai_voice_install_keeps_focus(qapp, tmp_path, monkeypatch):
     from PySide6.QtCore import Qt
     from PySide6.QtTest import QTest
     from soundboard.online import net
-    from soundboard.ui import aivoicepanel
+    from soundboard.ui.voice import aivoicepanel
     from soundboard.ui.kit import busy
     monkeypatch.setattr(net, "offline", lambda: False)
     folder = tmp_path / "ai-voices"

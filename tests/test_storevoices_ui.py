@@ -1,4 +1,4 @@
-"""The Store tab's Voices (ui/storevoices.py) against a fake store: no test goes online."""
+"""The Store tab's Voices (ui/store/storevoices.py) against a fake store: no test goes online."""
 import json
 
 import numpy as np
@@ -11,8 +11,8 @@ from soundboard.online import store
 from soundboard.sounds.library import Config
 from soundboard.speech import aipreview
 from soundboard.speech import aivoicelist as avl
-from soundboard.ui import storetab
-from soundboard.ui.storevoices import ShareVoiceDialog, VoiceHooks, VoiceRow
+from soundboard.ui.store import storetab
+from soundboard.ui.store.storevoices import ShareVoiceDialog, VoiceHooks, VoiceRow
 
 
 def _voice(i, kind="fx", **kw):

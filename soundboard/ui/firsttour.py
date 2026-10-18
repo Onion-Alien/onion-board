@@ -29,7 +29,7 @@ from soundboard.online import net
 from soundboard.core import tips, usage
 from soundboard.i18n import _
 from soundboard.ui import coach
-from soundboard.ui.ytsearch import SearchResults
+from soundboard.ui.sounds.ytsearch import SearchResults
 
 log = logging.getLogger(__name__)
 

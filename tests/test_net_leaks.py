@@ -345,7 +345,7 @@ def test_search_thumbnails_through_the_proxy(qapp, sites, socks, monkeypatch):
 
     from soundboard.online import quality
     from soundboard.online import ytdl
-    from soundboard.ui.ytsearch import ResultRow, SearchResults
+    from soundboard.ui.sounds.ytsearch import ResultRow, SearchResults
     shown = []
     monkeypatch.setattr(ResultRow, "set_thumb", lambda row, pm: shown.append(pm.size().toTuple()))
     img = QImage(32, 18, QImage.Format_RGB32)

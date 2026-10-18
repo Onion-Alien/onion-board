@@ -16,7 +16,7 @@ from soundboard.audio import engine
 from soundboard.sounds import library, videos
 from soundboard.control import winkeys
 from soundboard.sounds.library import SR, Config, SoundMeta
-from soundboard.ui.videowindow import VideoWindow
+from soundboard.ui.sounds.videowindow import VideoWindow
 
 
 def _video(path):
@@ -200,7 +200,7 @@ def test_a_build_without_qt_video_still_starts_and_just_hides_the_button(window,
     real = builtins.__import__
 
     def no_video(name, *a, **k):
-        if name == "soundboard.ui.videowindow":
+        if name == "soundboard.ui.sounds.videowindow":
             raise ImportError("No module named 'PySide6.QtMultimediaWidgets'")
         return real(name, *a, **k)
 

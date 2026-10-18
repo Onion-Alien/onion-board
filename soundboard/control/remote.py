@@ -751,7 +751,7 @@ BAD_ON = {"error": "on= takes 1, 0 or toggle"}
 
 
 # An Onion Watch alarm rings its pad as the voice "<sound id>:ring:<trigger>"
-# (soundboard.ui.triggershost.RING): a phone or Stream Deck sees it as the pad playing.
+# (soundboard.ui.triggers.triggershost.RING): a phone or Stream Deck sees it as the pad playing.
 RING = ":ring:"
 
 
@@ -1095,7 +1095,7 @@ def live_state(mw: MainWindow) -> dict:
 
 def dispatch_live(mw: MainWindow, action: str, params: dict) -> tuple[int, object]:
     from soundboard.audio import livefx
-    from soundboard.ui import speedpitch as sp
+    from soundboard.ui.sounds import speedpitch as sp
     b = mw.speed_btn
     speed, pitch, keep = b.values()
     if action == "reset":
@@ -1210,7 +1210,7 @@ APPS_OFF = {"error": "the Apps tab is switched off in Onion Board's Settings > T
 
 
 def _apps_tab(mw: MainWindow):
-    from soundboard.ui.appspanel import AppsTab
+    from soundboard.ui.apps.appspanel import AppsTab
     a = getattr(mw, "apps", None)
     return a if isinstance(a, AppsTab) else None
 
@@ -1316,7 +1316,7 @@ VOICE_OFF = {"error": "the Voice tab is switched off in Onion Board's Settings >
 
 
 def _radio_tab(mw: MainWindow):
-    from soundboard.ui.radiopanel import RadioTab
+    from soundboard.ui.radio.radiopanel import RadioTab
     r = getattr(mw, "radio", None)
     return r if isinstance(r, RadioTab) else None
 

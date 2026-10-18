@@ -45,7 +45,7 @@ def test_hoot_says_his_lines_in_the_language_picked(qapp, monkeypatch):
 
 
 def test_board_hands_the_add_on_its_look():
-    from soundboard.ui.triggershost import BoardHost
+    from soundboard.ui.triggers.triggershost import BoardHost
     host = BoardHost.__new__(BoardHost)   # style() and kit() don't need the window
     was = theme.current_name
     try:

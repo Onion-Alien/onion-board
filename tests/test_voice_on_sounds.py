@@ -7,8 +7,8 @@ from soundboard.audio import soundfx
 from soundboard import voicefx
 from soundboard.mic import voicesetups
 from soundboard.speech import soundvoice
-from soundboard.ui.dialogs import EffectsPanel
-from soundboard.ui.voicepicker import ALL, FAVS, Catalog, VoicePicker, describe
+from soundboard.ui.sounds.dialogs import EffectsPanel
+from soundboard.ui.sounds.voicepicker import ALL, FAVS, Catalog, VoicePicker, describe
 
 ROBOT = {"robot": {"on": True, "freq": 100, "noise": 0.2, "mix": 1}}
 ECHO = {"echo": {"on": True, "delay": 200, "feedback": 0.3, "mix": 0.3}}
@@ -185,7 +185,7 @@ def test_a_setup_can_be_renamed_to_any_name_in_its_place(app_dir):
 def test_the_setup_menu_renames_and_says_when_the_name_is_taken(window, app_dir, monkeypatch):  # noqa: F811
     if not window.tabctl.tab_on("voice"):
         return
-    from soundboard.ui import voicesetupsbar
+    from soundboard.ui.voice import voicesetupsbar
     vp = window.voice
     vp.setups.put("Robo", {"fx": "Robot", "effects": ROBOT})
     vp.setups.put("Echo", {"effects": ECHO})

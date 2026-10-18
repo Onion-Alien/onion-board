@@ -570,7 +570,7 @@ def test_a_downloaded_copy_that_doesnt_import_falls_back_and_is_never_fetched_ag
 
 
 def test_link_bar_offers_to_update_the_downloader_and_tries_again(qapp, monkeypatch):
-    from soundboard.ui.linkbar import LinkBar
+    from soundboard.ui.sounds.linkbar import LinkBar
     calls, version = [], ["2026.8.19"]
 
     def fake_download(url, progress=None, auto_update=True):
@@ -600,7 +600,7 @@ def test_link_bar_offers_to_update_the_downloader_and_tries_again(qapp, monkeypa
 def test_link_bar_doesnt_offer_an_update_when_its_switched_off_or_a_site_refused(
         qapp, monkeypatch):
     from soundboard.online import net
-    from soundboard.ui.linkbar import LinkBar
+    from soundboard.ui.sounds.linkbar import LinkBar
     errors = [ytdl.FetchError("ERROR: Sign in to confirm you're not a bot")]
     monkeypatch.setattr(ytdl, "download_audio", lambda url, progress=None, auto_update=True:
                         (_ for _ in ()).throw(errors[0]))
@@ -1068,7 +1068,7 @@ def test_trending_reads_myinstants_trending_page(monkeypatch):
 
 def test_trending_shows_as_cards_under_its_heading(qapp, monkeypatch):
     from PySide6.QtWidgets import QMenu
-    from soundboard.ui.ytsearch import SearchResults
+    from soundboard.ui.sounds.ytsearch import SearchResults
     hits = [ytdl.Result(f"s{i}.mp3", f"Sound {i}", "Myinstants", 0, "myinstants",
                         f"https://www.myinstants.com/media/sounds/s{i}.mp3") for i in range(3)]
     asked = []
@@ -1109,7 +1109,7 @@ def test_trending_shows_as_cards_under_its_heading(qapp, monkeypatch):
 
 
 def test_results_spin_while_searching_and_offer_every_site(qapp, monkeypatch):
-    from soundboard.ui.ytsearch import SearchResults
+    from soundboard.ui.sounds.ytsearch import SearchResults
     gate = threading.Event()
     monkeypatch.setattr(ytdl, "search", lambda q, count=20, source="youtube": (
         gate.wait(5), [])[1])
@@ -1134,7 +1134,7 @@ def test_results_spin_while_searching_and_offer_every_site(qapp, monkeypatch):
 def test_searching_shows_a_centred_mascot_then_the_results(qapp, monkeypatch):
     from soundboard.ui.bunnywidget import BunnyWidget
     from soundboard.style.owl import OwlWidget
-    from soundboard.ui.ytsearch import SearchResults
+    from soundboard.ui.sounds.ytsearch import SearchResults
     gate = threading.Event()
     hit = ytdl.Result(id="x", title="Bruh", channel="c", seconds=3.0, source="myinstants")
     monkeypatch.setattr(ytdl, "search", lambda q, count=20, source="youtube": (
@@ -1283,7 +1283,7 @@ def test_add_on_a_second_result_while_one_downloads_adds_both(qapp, window, monk
 
 
 def test_result_counts_are_only_what_the_search_gave():
-    from soundboard.ui.ytsearch import fmt_count, stats_text
+    from soundboard.ui.sounds.ytsearch import fmt_count, stats_text
     yt = ytdl._youtube_hit({"id": "HEXWRTEbj1I", "title": "What Is Love",
                             "view_count": 497635348})
     assert (yt.views, yt.likes, yt.comments) == (497635348, None, None)
@@ -1303,7 +1303,7 @@ def test_result_counts_are_only_what_the_search_gave():
 def test_a_download_shows_its_progress_and_leaves_the_other_cards_free(qapp, monkeypatch):
     from soundboard.ui.kit import busy
     from soundboard.i18n import _
-    from soundboard.ui.ytsearch import SearchResults
+    from soundboard.ui.sounds.ytsearch import SearchResults
     hits = [ytdl.Result(f"vid{i}xxxxxx", f"Song {i}", "c", 60, "myinstants",
                         f"https://example.com/{i}.mp3") for i in range(3)]
     panel = SearchResults()
@@ -1357,7 +1357,7 @@ def test_download_progress_is_reported_at_most_ten_times_a_second():
 
 
 def test_a_pasted_link_shows_only_its_own_card(qapp, window, monkeypatch, tmp_path):  # noqa: F811
-    from soundboard.ui.ytsearch import ResultRow
+    from soundboard.ui.sounds.ytsearch import ResultRow
     fake_link_download(monkeypatch, tmp_path)
     hits = [ytdl.Result(f"id{i}", f"Hit {i}", "Chan", 3) for i in range(3)]
     monkeypatch.setattr(ytdl, "search", lambda q, **kw: hits)
@@ -1373,8 +1373,8 @@ def test_a_pasted_link_shows_only_its_own_card(qapp, window, monkeypatch, tmp_pa
 
 
 def test_show_more_adds_the_next_page_under_the_cards_up_to_the_cap(qapp, monkeypatch):
-    from soundboard.ui import ytsearch
-    from soundboard.ui.ytsearch import PAGE, SearchResults
+    from soundboard.ui.sounds import ytsearch
+    from soundboard.ui.sounds.ytsearch import PAGE, SearchResults
 
     asked = []
 
@@ -1413,7 +1413,7 @@ def test_show_more_adds_the_next_page_under_the_cards_up_to_the_cap(qapp, monkey
 
 def test_open_results_follow_a_theme_switch(qapp):
     from soundboard.ui.kit import theme
-    from soundboard.ui.ytsearch import SearchResults
+    from soundboard.ui.sounds.ytsearch import SearchResults
     panel = SearchResults()
     panel.query = "x"
     panel._on_done(0, [ytdl.Result("vid0xxxxxxx", "Song", "c", 60)], "")

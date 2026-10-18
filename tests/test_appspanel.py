@@ -9,8 +9,8 @@ from soundboard.audio import appaudio
 from soundboard.audio.appaudio import App
 from soundboard.audio.engine import Engine
 from soundboard.sounds.library import Config
-from soundboard.ui import appcapture, appspanel
-from soundboard.ui.appspanel import AppsTab
+from soundboard.ui.apps import appcapture, appspanel
+from soundboard.ui.apps.appspanel import AppsTab
 from soundboard.ui.kit.widgets import Meter
 
 
@@ -343,7 +343,7 @@ def test_a_capture_that_errors_says_so_and_stops_sending(tab):
 
 
 def test_cards_use_the_programs_own_name_and_keep_it_once_it_closes(qapp):
-    from soundboard.ui.appspanel import AppRow
+    from soundboard.ui.apps.appspanel import AppRow
     row = AppRow("vlc.exe", Meter)
     row.set_app(None)
     assert row.name.text() == "Vlc"                 # never seen: from the .exe
@@ -355,7 +355,7 @@ def test_cards_use_the_programs_own_name_and_keep_it_once_it_closes(qapp):
 
 
 def test_clearing_an_error_line_takes_the_red_off(qapp):
-    from soundboard.ui.appspanel import AppRow
+    from soundboard.ui.apps.appspanel import AppRow
     row = AppRow("music.exe", Meter)
     row.set_app(music())
     row.set_status("It failed", error=True)
@@ -866,7 +866,7 @@ def test_cards_tighten_when_narrow_and_keep_the_meter(qapp):
     order, so it fits; the level meter has its own line and stays."""
     from PySide6.QtWidgets import QWidget
 
-    from soundboard.ui.appspanel import AppRow
+    from soundboard.ui.apps.appspanel import AppRow
     holder = QWidget()                 # a card is always inside the list, never a window
     row = AppRow("music.exe", Meter)
     row.setParent(holder)
@@ -1029,7 +1029,7 @@ def test_forgetting_and_bringing_back_a_second_program_of_a_name(tab, monkeypatc
 
 def test_card_buttons_say_which_program_they_are_for(qapp):
     """A screen reader hears "Send Music", not three cards' worth of "Send"."""
-    from soundboard.ui.appspanel import AppRow
+    from soundboard.ui.apps.appspanel import AppRow
     row = AppRow("music.exe", Meter)
     assert row.btn_send.accessibleName() == "Send Music"
     row.set_app(music())
@@ -1094,7 +1094,7 @@ def test_card_menu_ticks_its_category_and_shows_ampersands(tab, monkeypatch):
     """The card menu's Categories: the current one ticked (it was greyed out), "Music &
     media" with its "&" (it showed "Music _media"), and Remove in the danger colour."""
     from PySide6.QtWidgets import QMenu
-    from soundboard.ui import approw
+    from soundboard.ui.apps import approw
     seen = []
 
     class Shown(QMenu):
@@ -1122,7 +1122,7 @@ def test_card_menu_has_a_keyboard_way(tab, monkeypatch):
     from PySide6.QtCore import Qt
     from PySide6.QtGui import QKeySequence, QShortcut
     from PySide6.QtWidgets import QMenu
-    from soundboard.ui import approw
+    from soundboard.ui.apps import approw
     seen = []
 
     class Shown(QMenu):

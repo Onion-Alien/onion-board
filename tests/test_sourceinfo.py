@@ -126,7 +126,7 @@ def test_a_sound_from_elsewhere_has_no_source(app_dir, tmp_path):
 
 
 def test_the_link_bar_keeps_the_source_on_the_new_sound(qapp, monkeypatch, tmp_path):
-    from soundboard.ui import linkbar
+    from soundboard.ui.sounds import linkbar
     dl = tmp_path / "dl"
     dl.mkdir()
     path = dl / "dQw4w9WgXcQ.wav"
@@ -154,7 +154,7 @@ def test_the_link_bar_keeps_the_source_on_the_new_sound(qapp, monkeypatch, tmp_p
 def test_details_box_shows_the_fields_and_opens_the_link(qapp, monkeypatch):
     from PySide6.QtWidgets import QLabel
     from soundboard.ui.kit import busy
-    from soundboard.ui import sourcedialog
+    from soundboard.ui.sounds import sourcedialog
     opened = []
     monkeypatch.setattr(busy, "open_url", lambda url, **kw: opened.append(url) or True)
     music = "https://music.youtube.com/watch?v=dQw4w9WgXcQ"
@@ -173,7 +173,7 @@ def test_switched_off_new_downloads_keep_nothing_and_old_info_stays(qapp, monkey
     """Settings > Data & quality > Remember where it came from, off: a new download
     keeps no source or text file; one kept before stays, just not shown."""
     from soundboard.online import quality
-    from soundboard.ui import linkbar
+    from soundboard.ui.sounds import linkbar
     monkeypatch.setattr(quality, "current", quality.Prefs(keep_source=False))
     old = SoundMeta(id="o", name="Old", file=str(tmp_path / "old.mp3"), source=dict(SRC))
     assert sourceinfo.shown(old) == {} and old.source == SRC
@@ -205,7 +205,7 @@ def test_switched_off_new_downloads_keep_nothing_and_old_info_stays(qapp, monkey
 def test_delete_info_asks_then_drops_the_info_and_its_text_file(qapp, monkeypatch, tmp_path,
                                                                 sure):
     from PySide6.QtWidgets import QMessageBox
-    from soundboard.ui import sourcedialog
+    from soundboard.ui.sounds import sourcedialog
     audio = tmp_path / "Song.mp3"
     audio.write_bytes(b"x")
     m = SoundMeta(id="a", name="Song", file=str(audio), source=dict(SRC))

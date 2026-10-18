@@ -365,7 +365,7 @@ def test_hoot_without_rest_after_s_never_rests(qapp, monkeypatch):
 def test_the_triggers_tabs_hoot_rests_after_30_s():
     import inspect
 
-    from soundboard.ui import triggerstab
+    from soundboard.ui.triggers import triggerstab
     assert triggerstab.HOOT_REST_S == 30.0
     assert "rest_after_s=lite.rest_s(HOOT_REST_S)" in inspect.getsource(triggerstab)
 

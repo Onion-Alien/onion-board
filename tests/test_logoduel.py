@@ -6,7 +6,7 @@ from PySide6.QtTest import QTest
 from PySide6.QtWidgets import QHBoxLayout, QVBoxLayout, QWidget
 
 from soundboard.ui.kit import theme
-from soundboard.ui import logoduel
+from soundboard.ui.triggers import logoduel
 from soundboard.ui.logowidget import LogoWidget
 
 

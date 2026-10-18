@@ -10,12 +10,12 @@ from soundboard.sounds.library import Config, clean_setting
 from soundboard.settings import SettingsDialog
 from soundboard.ui import mainwindow as main
 from soundboard.ui import taboff
-from soundboard.ui.appspanel import AppsTab
-from soundboard.ui.radiopanel import RadioTab
-from soundboard.ui.storetab import StoreTab
+from soundboard.ui.apps.appspanel import AppsTab
+from soundboard.ui.radio.radiopanel import RadioTab
+from soundboard.ui.store.storetab import StoreTab
 from soundboard.ui.tabcontrol import TAB_INDEX, TABS
-from soundboard.ui.triggerstab import TriggersTab
-from soundboard.ui.voicepanel import VoicePanel
+from soundboard.ui.triggers.triggerstab import TriggersTab
+from soundboard.ui.voice.voicepanel import VoicePanel
 
 REAL = {"radio": RadioTab, "apps": AppsTab, "triggers": TriggersTab, "voice": VoicePanel,
         "store": StoreTab}
@@ -360,10 +360,10 @@ def test_off_on_cycles_leave_nothing_behind(window, qapp, fake_watch):
     from PySide6.QtWidgets import QApplication
 
     from soundboard.online import net
-    from soundboard.ui.aivoicepanel import AiVoicePanel
-    from soundboard.ui.radiopanel import RadioOff
-    from soundboard.ui.triggershost import BoardHost
-    from soundboard.ui.voicepanel import SpeechPanel
+    from soundboard.ui.voice.aivoicepanel import AiVoicePanel
+    from soundboard.ui.radio.radiopanel import RadioOff
+    from soundboard.ui.triggers.triggershost import BoardHost
+    from soundboard.ui.voice.voicepanel import SpeechPanel
     from soundboard.voicefx import VoiceChain
     w = window
     counted = (*REAL.values(), BoardHost, VoiceChain, SpeechPanel, AiVoicePanel,

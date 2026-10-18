@@ -207,7 +207,7 @@ def test_no_voice_comes_with_a_background():
 
 @pytest.fixture
 def row(qapp):
-    from soundboard.ui.backdroprow import BackdropRow
+    from soundboard.ui.voice.backdroprow import BackdropRow
     sounds = [("s1", "Lofi beat", ["Music"]), ("s2", "Rain loop", []), ("s3", "Airhorn", ["Memes"])]
     r = BackdropRow(voicefx.REGISTRY["backdrop"], {"on": True, "rain": 0.5}, lambda: sounds)
     yield r
@@ -284,7 +284,7 @@ def test_load_puts_back_tweaks_and_sounds(row):
 def test_the_voice_panel_makes_loops_for_board_sounds(qapp, monkeypatch):
     from soundboard.sounds import library
     from soundboard.speech import tts
-    from soundboard.ui.voicepanel import VoicePanel
+    from soundboard.ui.voice.voicepanel import VoicePanel
     from tests.test_voicepanel import FakeEngine
     monkeypatch.setattr(tts.SapiTTS, "warm_up", lambda self: ["Microsoft Zira Desktop"])
     tone = np.full((SR, 2), 2000, np.int16)
@@ -326,7 +326,7 @@ def test_board_sound_rows_line_up_with_the_built_in_ones(row, qapp):
 
 def _voice_panel(monkeypatch):
     from soundboard.speech import tts
-    from soundboard.ui.voicepanel import VoicePanel
+    from soundboard.ui.voice.voicepanel import VoicePanel
     from tests.test_voicepanel import FakeEngine
     monkeypatch.setattr(tts.SapiTTS, "warm_up", lambda self: ["Microsoft Zira Desktop"])
     return VoicePanel(FakeEngine(), {"enabled": False, "effects": {}},
@@ -411,7 +411,7 @@ def test_a_background_sound_can_be_heard_before_adding_it(qapp, monkeypatch):
     """There was no way to hear Rain or Wind before keeping it: the ▶ dot inside its
     chip plays a few seconds in your own headphones (again: stops)."""
     from types import SimpleNamespace
-    from soundboard.ui import effectspopup
+    from soundboard.ui.voice import effectspopup
     p = _voice_panel(monkeypatch)
     try:
         fx = p.fx
@@ -439,7 +439,7 @@ def test_a_background_sound_can_be_heard_before_adding_it(qapp, monkeypatch):
 
 
 def test_effects_come_back_after_a_restart(qapp):
-    from soundboard.ui.voicefxpanel import VoiceFxPanel
+    from soundboard.ui.voice.voicefxpanel import VoiceFxPanel
     fx = VoiceFxPanel({"enabled": True, "preset": "Robot",
                        "effects": {"extra_radio": {"on": True, "drive": 12},
                                    "backdrop": {"on": True, "crowd": 0.3}}})
@@ -464,7 +464,7 @@ def test_the_extras_run_on_the_mic_after_the_voice():
 
 def _picked_bar(qapp):
     from PySide6.QtWidgets import QLayout
-    from soundboard.ui.voicefxpanel import VoiceFxPanel
+    from soundboard.ui.voice.voicefxpanel import VoiceFxPanel
     fx = VoiceFxPanel({"enabled": False, "effects": {}})
     fx.pick("Robot")
     fx.set_on_top("rain", 0.6)

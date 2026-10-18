@@ -698,7 +698,7 @@ def test_without_tor_only_when_asked(tor_mode, fake_ydl, monkeypatch):
 
 def test_link_bar_offers_without_tor_and_only_its_click_goes_direct(qapp, monkeypatch):
     from soundboard.sounds.library import Config
-    from soundboard.ui.linkbar import LinkBar
+    from soundboard.ui.sounds.linkbar import LinkBar
     calls = []
 
     def fake_download(url, progress=None, auto_update=True, direct=False):
@@ -720,7 +720,7 @@ def test_link_bar_offers_without_tor_and_only_its_click_goes_direct(qapp, monkey
 
 
 def test_search_offers_without_tor(qapp, monkeypatch):
-    from soundboard.ui.ytsearch import SearchResults
+    from soundboard.ui.sounds.ytsearch import SearchResults
     calls = []
 
     def fake_search(query, count=20, source="youtube", direct=False):

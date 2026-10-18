@@ -213,7 +213,7 @@ def test_the_theme_cover_does_not_fade(qapp):
 
 
 def test_overlay_shows_and_goes_at_once(qapp):
-    from soundboard.ui import overlay
+    from soundboard.ui.sounds import overlay
     from types import SimpleNamespace
     win = overlay.OverlayWindow(SimpleNamespace(s=SimpleNamespace(scale=100)))
     lite.set_on(True)

@@ -9,8 +9,8 @@ from PySide6.QtWidgets import QApplication, QPushButton
 
 from soundboard.online import ytdl
 from soundboard.audio.engine import SR
-from soundboard.ui.linkbar import PLAY_ID as LINK_ID
-from soundboard.ui.ytsearch import ResultRow
+from soundboard.ui.sounds.linkbar import PLAY_ID as LINK_ID
+from soundboard.ui.sounds.ytsearch import ResultRow
 from test_mainwindow import window as main_window  # noqa: F401 - the real window, offscreen
 
 

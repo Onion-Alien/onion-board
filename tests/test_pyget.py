@@ -193,7 +193,7 @@ def test_install_addon_from_the_installer(tmp_path, monkeypatch, capsys):
 
 def test_the_voice_cards_offer_repair_for_a_broken_addon(qapp, tmp_path):
     from soundboard.speech.aivoice import AiVoiceController
-    from soundboard.ui.aivoicepanel import AiVoicePanel
+    from soundboard.ui.voice.aivoicepanel import AiVoicePanel
     from soundboard.voicefx import VoiceChain
     m = service(tmp_path / "ai-voices")
     m.id = "ai-voices"

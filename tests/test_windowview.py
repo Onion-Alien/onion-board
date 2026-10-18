@@ -7,8 +7,8 @@ import pytest
 
 from soundboard.win import winshot
 from soundboard.audio.appaudio import App
-from soundboard.ui import windowview
-from soundboard.ui.appspanel import AppRow
+from soundboard.ui.apps import windowview
+from soundboard.ui.apps.appspanel import AppRow
 from soundboard.ui.kit.widgets import Meter
 
 

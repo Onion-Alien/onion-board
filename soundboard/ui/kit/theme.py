@@ -329,7 +329,7 @@ QFrame#chip QPushButton#chipname { font-weight:600; }
 QFrame#chip QPushButton#chipstop { border-radius:12px; padding:0; }
 QFrame#chip QPushButton#chipstop:hover { background:$danger_bg; }
 QLabel#iconlabel { background:transparent; }
-QFrame#card QLabel#sourcepic { background:$inset; border-radius:8px; }   /* ui/sourcedialog.py: no thumbnail */
+QFrame#card QLabel#sourcepic { background:$inset; border-radius:8px; }   /* ui/sounds/sourcedialog.py: no thumbnail */
 QPushButton#pill { border-radius:15px; padding:5px 14px; font-weight:600; }
 QPushButton#pill[state="ok"] { color:$live_text; background:transparent; }
 QPushButton#onair { border-radius:15px; padding:5px 14px; font-weight:700;
@@ -602,7 +602,7 @@ QLabel#pill[tone="muted"] { border-color:$muted; }
 QLabel#pill[tone="ok"] { color:$live_text; border-color:$live_border; }
 QLabel#pill[tone="warn"] { color:$warn_text; border-color:$warn_text; }
 QLabel#pill[tone="error"] { color:$error_text; border-color:$error_text; }
-QLabel#pill[tone="beta"] { color:$bg; background:$ok_text; border-color:$ok_text; border-radius:7px; padding:1px 8px; font-weight:700; }   /* ui/storetab.py: the green Beta tag */
+QLabel#pill[tone="beta"] { color:$bg; background:$ok_text; border-color:$ok_text; border-radius:7px; padding:1px 8px; font-weight:700; }   /* ui/store/storetab.py: the green Beta tag */
 QPushButton#subchip { border-radius:11px; padding:2px 11px; min-height:18px; font-size:8.5pt;
     background:transparent; border:1px solid $border; color:$muted; }
 QPushButton#subchip:hover { color:$text; background:$btn_hover; }
@@ -664,7 +664,7 @@ QHeaderView::section, QFrame#setcard QHeaderView::section { background:$btn; col
     padding:8px; border:none; border-bottom:1px solid $border; font-weight:600; }
 QTableCornerButton::section { background:$btn; border:none; }
 QTreeWidget#cliplist { background:$inset; color:$text; border:none; border-radius:8px;
-    padding:4px; outline:0; }   /* ui/clipshelf.py: rows are painted by ClipRowDelegate */
+    padding:4px; outline:0; }   /* ui/apps/clipshelf.py: rows are painted by ClipRowDelegate */
 QTreeWidget#cliplist::item, QTreeWidget#cliplist::item:hover,
 QTreeWidget#cliplist::item:selected { background:transparent; border:none; }
 QFrame#setcard QPlainTextEdit { background:$card; color:$text;

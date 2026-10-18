@@ -53,7 +53,8 @@ from soundboard.sounds.library import (
 )
 from soundboard.ui.kit.hotkeypick import HOTKEY_ACTIONS, pretty_key
 from soundboard.ui.kit import busy, worker
-from soundboard.ui import importreport, taboff
+from soundboard.ui.sounds import importreport
+from soundboard.ui import taboff
 from soundboard.ui.kit import toast as toastmod
 from soundboard.ui.controller import Controller
 from soundboard.ui.kit.crashdialog import free_dialog
@@ -567,7 +568,7 @@ class ImportControl(Controller):
         """The Free packs window (soundboard.sounds.packs): a pack it downloads is imported the
         way dropping its zip on the window is."""
         mw = self.mw
-        from soundboard.ui.packsdialog import PacksDialog
+        from soundboard.ui.sounds.packsdialog import PacksDialog
         usage.used("packs-opened")
         dlg = PacksDialog(self._pack_got, mw, play=self._pack_sample)
         dlg.exec()

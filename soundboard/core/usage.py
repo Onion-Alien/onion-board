@@ -126,7 +126,7 @@ _DL_HOSTS = (("youtube", ("youtube.com", "youtu.be", "youtube-nocookie.com")),
              ("instagram", ("instagram.com",)), ("x", ("x.com", "twitter.com")),
              ("reddit", ("reddit.com", "redd.it")), ("twitch", ("twitch.tv",)),
              ("myinstants", ("myinstants.com",)))
-# the Voice tab's tabs (ui/voicepanel.py VoicePanel._section keys)
+# the Voice tab's tabs (ui/voice/voicepanel.py VoicePanel._section keys)
 VOICE_TABS = ("fx", "ai", "speak", "addons")
 # Audio recovery's actions (ui/audiorecovery.py; "cleanup-none" counts as cleanup)
 RECOVERY = ("install", "repair", "update", "reinstall", "cleanup", "remove")
@@ -143,7 +143,7 @@ PRESS_MODES = ("overlap", "toggle", "solo", "queue")
 ADDONS = ("ai-voices", "live-voice", "other")
 # the free sound packs (soundboard.sounds.packs BUILT_IN ids); any other is "other"
 PACKS = ("streamer", "esports", "general", "podcast", "halloween", "gm-starter", "other")
-# the Live controls' tabs (ui/livesetups.py)
+# the Live controls' tabs (ui/voice/livesetups.py)
 LIVE_TABS = ("sounds", "radio", "apps")
 # Bun's games (ui/bunpong.py games()); any other is "other"
 BUN_GAMES = ("pong", "draw", "rps", "ttt", "other")
@@ -214,7 +214,7 @@ FEATURES = ("add-files", "youtube", "record", "clip", "clip-editor", "import-boa
             # before the end, won or lost; sleepy Bun woken
             "egg-pong-opened", "egg-pong-quit", "egg-pong-won", "egg-pong-lost",
             "egg-bun-woken",
-            # sounds fetched from a link or a web search (ui/linkbar.py): the site
+            # sounds fetched from a link or a web search (ui/sounds/linkbar.py): the site
             # (DL_SITES), a pasted link or a search pick, Add as sound or Play once, one
             # waiting in the queue, a pick already in the library, and the sites that
             # failed. Never the link, title or search words
@@ -356,7 +356,7 @@ STEPS = ("added-sound", "played-sound", "sent-to-others",
          # a tab a new user starts without (+ More tabs, Settings > Tabs)
          "added-radio-tab", "added-apps-tab", "added-triggers-tab")
 ROUTES = ("cable", "device", "off", "mic")   # library.ROUTES
-# the Apps tab's own categories (ui/approw.py APP_CATEGORIES + "Other"): any other
+# the Apps tab's own categories (ui/apps/approw.py APP_CATEGORIES + "Other"): any other
 # name in Config.apps_categories is one the user made (counted as apps-own-categories)
 APPS_BUILT_IN = ("Browsers", "Music & media", "Calls & chat", "Games", "Other")
 # the feedback box's "What would you improve?" picks (ui/kit/feedbackdialog.py)
@@ -516,7 +516,7 @@ def download_bucket(n: int) -> str:
 
 
 def downloaded(cfg, url: str, via: str, kind: str, ok: bool) -> None:
-    """A link or web-search pick finished (ui/linkbar.py): `via` "link" or "search",
+    """A link or web-search pick finished (ui/sounds/linkbar.py): `via` "link" or "search",
     `kind` "add" or "play". Counted as used() names, and one more for the next daily
     `downloads/` when it worked (only while the count is on, like open_tick)."""
     site = download_site(url)
@@ -759,13 +759,13 @@ def tab_opened(cfg, key: str) -> None:
 
 # a stack line in a report: `File "...\soundboard\audio\engine.py", line 1090, in ...`; only
 # our own files count, named from the package folder down (never the folder above it)
-_OUR_FRAME = re.compile(r'^\s*File "(?:[^"]*[\\/])?(soundboard(?:[\\/][a-z0-9_]+)?'
+_OUR_FRAME = re.compile(r'^\s*File "(?:[^"]*[\\/])?(soundboard(?:[\\/][a-z0-9_]+){0,2}'
                         r'[\\/][a-z0-9_]+\.py)", line (\d+)', re.M)
 _ANY_FRAME = re.compile(r'^\s*File ".*", line \d+', re.M)
 _ERROR_TYPE = re.compile(r"([A-Za-z_][\w.]*)(?::|$)")
 # the same "our own file" rule as _OUR_FRAME, for a caught exception's traceback object
 # (warned): the package folder down, never the folders above it
-_OUR_FILE = re.compile(r"soundboard(?:[\\/][a-z0-9_]+)?[\\/][a-z0-9_]+\.py")
+_OUR_FILE = re.compile(r"soundboard(?:[\\/][a-z0-9_]+){0,2}[\\/][a-z0-9_]+\.py")
 
 
 def _ours(stack: str) -> list[str]:
@@ -924,7 +924,7 @@ def _report_event(path: Path) -> str:
 
 def _error_tag(stack: str) -> str:
     """`/<type>@<deepest line><<its caller>~<raised in>`, e.g. `/TypeError@soundboard/
-    ui/appspanel.py:352<soundboard/ui/appspanel.py:380~enum.__or__`: like a freeze's,
+    ui/apps/appspanel.py:352<soundboard/ui/apps/appspanel.py:380~enum.__or__`: like a freeze's,
     the caller and the library function it was raised in tell apart errors that end on
     the same line. Each part only when the stack has it."""
     ours = _ours(stack)

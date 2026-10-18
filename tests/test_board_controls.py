@@ -208,7 +208,7 @@ def test_a_web_search_play_waits_for_your_sound_instead_of_playing_over_it(
     """Your sound plays, then a search result's Play: it goes in Up next (it used to
     play on top of the song), and starts once yours ends. A looping background
     sound doesn't hold it up. Skip starts it at once."""
-    from soundboard.ui import linkbar
+    from soundboard.ui.sounds import linkbar
 
     w = window
     monkeypatch.setattr(linkbar.busy, "toast", lambda *a, **kw: None)
@@ -654,7 +654,7 @@ def test_a_trigger_deleted_while_its_pad_waits_or_queues_never_starts_it(window,
     """A trigger's sound plays like its pad, with the pad's Wait first or Queue; stopping
     the trigger's tag (sound taken off it, trigger deleted) must stop those too."""
     from conftest import process_events
-    from soundboard.ui.triggershost import BoardHost
+    from soundboard.ui.triggers.triggershost import BoardHost
     w = window
     host = BoardHost(w)
     w.meta("s0").delay = 0.05
@@ -715,7 +715,7 @@ def test_pad_menu_has_the_sites_entries_only_for_downloads(window, monkeypatch):
     Details under the site's name; any other sound doesn't."""
     LINK = "https://www.youtube.com/watch?v=dQw4w9WgXcQ"
     from soundboard.ui.kit import busy
-    from soundboard.ui import sourcedialog
+    from soundboard.ui.sounds import sourcedialog
     w = window
     shown = menu_pick(monkeypatch, ["Duplicate"])
     monkeypatch.setattr(w.editctl, "duplicate_sound", lambda sid: None)

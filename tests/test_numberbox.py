@@ -6,7 +6,7 @@ from PySide6.QtCore import QPoint, Qt
 from PySide6.QtTest import QTest
 
 from soundboard.ui.kit import numberbox
-from soundboard.ui.speedpitch import SpeedPitchButton
+from soundboard.ui.sounds.speedpitch import SpeedPitchButton
 
 
 def _wait(qapp, ok, secs=3.0):

@@ -189,7 +189,7 @@ def test_switched_on_icon_buttons_in_a_card_show_their_icon(qapp, name):
     Light's grey button."""
     from soundboard.online import store
     from soundboard.ui.kit import icons
-    from soundboard.ui.storetab import SoundRow
+    from soundboard.ui.store.storetab import SoundRow
     old = dict(theme.T)
     theme.set_current(name)
     try:

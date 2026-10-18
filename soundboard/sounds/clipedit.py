@@ -2,7 +2,7 @@
 LISTEN_S seconds a program played (with a waveform summary kept as it fills), and
 the edits made to a take of it (cut, copy, paste, fade, louder / quieter,
 reverse) with undo. Audio is (n, 2) float32 at engine.SR throughout; positions
-are frames. The widget is soundboard.ui.clipeditor."""
+are frames. The widget is soundboard.ui.apps.clipeditor."""
 from __future__ import annotations
 
 import threading
