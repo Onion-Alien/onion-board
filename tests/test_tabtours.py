@@ -14,7 +14,7 @@ from soundboard.online import net
 from soundboard.control import winkeys
 from soundboard.sounds.library import Config, SoundMeta
 from soundboard.ui.setup import coach, firsttour, tabtours
-from soundboard.ui import mainwindow as main
+from soundboard.ui.window import mainwindow as main
 
 TAB_TOURS = True   # (conftest switches them off everywhere else)
 

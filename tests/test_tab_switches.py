@@ -1,5 +1,5 @@
 """Settings > Tabs: switching the Radio, Apps, Triggers, Voice and Store tabs off and on
-(Config.tabs_off, ui/taboff.py). A switched-off tab is hidden and never built."""
+(Config.tabs_off, ui/window/taboff.py). A switched-off tab is hidden and never built."""
 import pytest
 from conftest import process_events
 from PySide6.QtCore import QPoint, Qt
@@ -8,12 +8,12 @@ from test_mainwindow import window as main_window  # noqa: F401  (the real MainW
 from soundboard.control import remote
 from soundboard.sounds.library import Config, clean_setting
 from soundboard.ui.settings.settings import SettingsDialog
-from soundboard.ui import mainwindow as main
-from soundboard.ui import taboff
+from soundboard.ui.window import mainwindow as main
+from soundboard.ui.window import taboff
 from soundboard.ui.apps.appspanel import AppsTab
 from soundboard.ui.radio.radiopanel import RadioTab
 from soundboard.ui.store.storetab import StoreTab
-from soundboard.ui.tabcontrol import TAB_INDEX, TABS
+from soundboard.ui.window.tabcontrol import TAB_INDEX, TABS
 from soundboard.ui.triggers.triggerstab import TriggersTab
 from soundboard.ui.voice.voicepanel import VoicePanel
 
@@ -540,7 +540,7 @@ def test_more_tabs_counts_opened_added_and_closed(window, qapp, monkeypatch):
     seen.clear()
     menu.aboutToShow.emit()                  # a card picked: the menu hides first
     menu.aboutToHide.emit()
-    from soundboard.ui.moretabs import TabCard
+    from soundboard.ui.window.moretabs import TabCard
     [c for c in menu.findChildren(TabCard)][0].picked.emit()
     process_events(qapp, lambda: False, timeout=0.2)   # the closed check runs, and passes
     assert seen == ["more-tabs-opened", "more-tabs-added-radio"] and w.tabctl.tab_on("radio")
@@ -552,7 +552,7 @@ def test_more_tabs_counts_opened_added_and_closed(window, qapp, monkeypatch):
 def test_more_tabs_menu_opens_clear_of_its_button(window, qapp):
     """+ More tabs' menu opens beside the button on the rail, a few px clear of it, not
     down over the tabs (and with no menu arrow's room, the + is centred like the rest)."""
-    from soundboard.ui import moretabs
+    from soundboard.ui.window import moretabs
     w = window
     w.rail.set_open(False)   # the offscreen screen is small: room for the menu beside
     w.show()

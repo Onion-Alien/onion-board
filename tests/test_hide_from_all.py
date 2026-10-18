@@ -44,7 +44,7 @@ def _add_pack(w):
 
 def _pick(w, monkeypatch, text):
     """Right-click the Packs tab and pick `text` from its Advanced menu."""
-    from soundboard.ui import categorycontrol
+    from soundboard.ui.window import categorycontrol
 
     class Shown(QMenu):   # Qt's own exec can't be patched on the class
         def exec(self, *a):

@@ -28,7 +28,7 @@ from soundboard.speech.live import SpeechController
 from soundboard.ui.kit import a11y, appstate, busy, icons
 from soundboard.ui.voice import art
 from soundboard.ui.kit.panel import Flow, card, hint_label, icon_button, section_label
-from soundboard.ui.responsive import FitWidth
+from soundboard.ui.window.responsive import FitWidth
 from soundboard.ui.voice.speechpanel import LIVE_MODULE, SpeechPanel
 from soundboard.ui.voice.voicefxpanel import CUSTOM, EffectRow, VoiceFxPanel, on_top
 from soundboard.ui.voice.voicestatus import VoiceStatusBar
@@ -490,8 +490,8 @@ class VoicePanel(QWidget):
                 self.fx.set_device_delay(s * 1000 if isinstance(s, (int, float)) else None)
 
     def fit_steps(self):
-        """What the main window may hide here when it gets small (ui/responsive.py)."""
-        from soundboard.ui import responsive as r
+        """What the main window may hide here when it gets small (ui/window/responsive.py)."""
+        from soundboard.ui.window import responsive as r
         return [(50, "w", r.hide(self.speech.say_stop)),
                 # a short window: the picked voice's bar scrolls with the voices (still
                 # there, under them) rather than the window turning into the mini player

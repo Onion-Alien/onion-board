@@ -31,7 +31,7 @@ def test_an_empty_category_name_says_so(window, typed):
 
 
 def test_a_cancelled_box_says_nothing(window, monkeypatch):
-    from soundboard.ui import categorycontrol
+    from soundboard.ui.window import categorycontrol
     monkeypatch.setattr(categorycontrol.QInputDialog, "getText",
                         staticmethod(lambda *a, **k: ("", False)))
     assert window.catctl.new_category() == ""

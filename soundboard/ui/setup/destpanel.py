@@ -165,7 +165,7 @@ class ModeButton(QPushButton):
 
     def refresh(self):
         from soundboard.ui.kit import icons
-        from soundboard.ui import sidebar
+        from soundboard.ui.window import sidebar
         d = _dest_cfg(self.mw)
         p = profiles.current(d)
         self.menu_.clear()

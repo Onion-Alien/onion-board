@@ -2,7 +2,7 @@
 
 Getting a language's Windows voice, a translation model's download, and installing or
 updating speech recognition (the live-voice add-on). A QObject the panel owns, like
-ui/controller.py's: its workers' answers and its timer stop with the panel. It builds
+ui/window/controller.py's: its workers' answers and its timer stop with the panel. It builds
 the buttons it drives; the panel puts them in its layout.
 """
 from __future__ import annotations

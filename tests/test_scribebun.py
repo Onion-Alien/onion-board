@@ -75,7 +75,7 @@ def test_download_bar_first_line_lines_up(qapp):
     from PySide6.QtCore import QPoint
     from PySide6.QtGui import QFontMetricsF
 
-    from soundboard.ui.downloadbar import DownloadBar
+    from soundboard.ui.window.downloadbar import DownloadBar
     for mini in (False, True):
         bar = DownloadBar()
         bar.set_mini(mini)
@@ -127,7 +127,7 @@ def test_download_bar_gradient_follows_how_it_ended(qapp):
     """The banner's gradient: tinted green when added, red when it failed, back to the
     accent for the next pick; the outlined theme keeps it flat."""
     from soundboard.ui.kit import theme
-    from soundboard.ui.downloadbar import DownloadBar
+    from soundboard.ui.window.downloadbar import DownloadBar
     was = theme.current_name
     try:
         theme.apply(qapp, "Dark")
@@ -154,7 +154,7 @@ def test_download_bar_gradient_follows_how_it_ended(qapp):
 
 
 def test_download_bar_flags_how_it_ended(qapp):
-    from soundboard.ui.downloadbar import DownloadBar
+    from soundboard.ui.window.downloadbar import DownloadBar
     bar = DownloadBar()
     bar.resize(900, 80)
     for ok in (True, False):
@@ -184,7 +184,7 @@ def test_download_bar_flags_how_it_ended(qapp):
 
 
 def test_download_bar_waits_for_the_flash_then_moves_up(qapp):
-    from soundboard.ui.downloadbar import DownloadBar
+    from soundboard.ui.window.downloadbar import DownloadBar
     bar = DownloadBar()
     bar.resize(900, 80)
     a, b, c = (f"https://www.youtube.com/watch?v={x}" for x in "abc")
@@ -210,7 +210,7 @@ def test_download_bar_waits_for_the_flash_then_moves_up(qapp):
 def test_download_bar_last_pick_stays_ended_after_a_late_update(qapp, ok):
     """The last of three picks: once it shows ✓ (or ✗), a late "processing" or
     progress for it can't put it back to busy, and the banner still goes away."""
-    from soundboard.ui.downloadbar import DownloadBar
+    from soundboard.ui.window.downloadbar import DownloadBar
     bar = DownloadBar()
     bar.resize(900, 80)
     a, b, c = (f"https://www.youtube.com/watch?v={x}" for x in "abc")
@@ -246,7 +246,7 @@ def test_download_bar_last_pick_stays_ended_after_a_late_update(qapp, ok):
 
 
 def test_download_bar_failures_wait_for_retry(qapp):
-    from soundboard.ui.downloadbar import DownloadBar
+    from soundboard.ui.window.downloadbar import DownloadBar
     bar = DownloadBar()
     bar.resize(900, 80)
     asked = []
@@ -284,7 +284,7 @@ def test_download_bar_failures_wait_for_retry(qapp):
 
 
 def test_download_bar_cancel_is_not_a_failure(qapp):
-    from soundboard.ui.downloadbar import DownloadBar
+    from soundboard.ui.window.downloadbar import DownloadBar
     bar = DownloadBar()
     bar.resize(900, 80)
     a = "https://www.youtube.com/watch?v=a"
@@ -301,7 +301,7 @@ def test_download_bar_cancel_is_not_a_failure(qapp):
 
 
 def test_download_bar_in_a_narrow_window_drops_what_it_can(qapp):
-    from soundboard.ui.downloadbar import BAR_MIN_W, ROW_THUMB, THUMB_W, DownloadBar
+    from soundboard.ui.window.downloadbar import BAR_MIN_W, ROW_THUMB, THUMB_W, DownloadBar
     bar = DownloadBar()
     links = [f"https://www.youtube.com/watch?v={c}" for c in "abc"]
     bar.set_active(links[0], "A song with a long name", "add", None, "Someone", 90)
@@ -329,7 +329,7 @@ def test_download_bar_in_a_narrow_window_drops_what_it_can(qapp):
 def test_download_bar_folds_for_room(qapp):
     """The window's fitter folds the list to its running row, then to its summary
     line (with a thin bar), and opens it again: three states, no squashed steps."""
-    from soundboard.ui.downloadbar import DownloadBar
+    from soundboard.ui.window.downloadbar import DownloadBar
     bar = DownloadBar()
     links = [f"https://www.youtube.com/watch?v={c}" for c in "abc"]
     bar.set_active(links[0], "One", "add", None)
@@ -356,7 +356,7 @@ def test_download_bar_glow_follows_the_theme(qapp):
     """Full accent glow only where the theme's cards are its accent's colour; half
     elsewhere, and always half for the green and red endings."""
     from soundboard.ui.kit import theme
-    from soundboard.ui import downloadbar as db
+    from soundboard.ui.window import downloadbar as db
     was = theme.current_name
     try:
         for name, full in (("Lava", True), ("Ocean", True), ("Dark", False),

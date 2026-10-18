@@ -17,10 +17,10 @@ from soundboard.audio import engine
 from soundboard.sounds import library
 from soundboard.control import winkeys
 from soundboard.sounds.library import SR, Config, SoundMeta
-from soundboard.ui import mainwindow as main
-from soundboard.ui import windowbuild
-from soundboard.ui.livedot import is_tab_live
-from soundboard.ui.tabcontrol import TABS
+from soundboard.ui.window import mainwindow as main
+from soundboard.ui.window import windowbuild
+from soundboard.ui.window.livedot import is_tab_live
+from soundboard.ui.window.tabcontrol import TABS
 from soundboard.ui.kit.wheelguard import no_wheel
 
 
@@ -73,7 +73,7 @@ def test_triggers_timer_during_start_up(qapp, app_dir, monkeypatch):
                         lambda self: (calls.append(self), real(self)))
 
     building = []
-    from soundboard.ui.windowbuild import WindowBuilder
+    from soundboard.ui.window.windowbuild import WindowBuilder
     real_build = WindowBuilder._build_ui
     monkeypatch.setattr(WindowBuilder, "_build_ui",
                         lambda self: (building.append(self.mw), real_build(self))[1])
@@ -496,7 +496,7 @@ def test_saving_effects_again_stops_the_render_still_going(qapp, window, monkeyp
     m = window.meta("s0")
     before = len(window.audio["s0"])
     stopped = []
-    from soundboard.ui import editcontrol
+    from soundboard.ui.window import editcontrol
     real = editcontrol.load_sound
 
     def slow(meta, cancel=None, **_k):
@@ -834,7 +834,7 @@ def test_the_whole_window_comes_back_after_the_mini_player(window, qapp):
 def test_every_tab_stays_the_whole_window_down_to_the_mini_size(window, qapp):
     """The icon-only tabs' padding alone needed ~480 px, so a window the rest fits
     (480 px is a 600 px window at 125 %) turned into the mini player."""
-    from soundboard.ui.fitcontrol import MINI_SIZE
+    from soundboard.ui.window.fitcontrol import MINI_SIZE
 
     window.show()
     window.resize(1000, 700)
@@ -976,7 +976,7 @@ def test_the_mini_player_keeps_the_pads_while_one_row_fits(window, qapp):
 
 def test_the_window_shows_which_version_is_running(window, monkeypatch):
     from soundboard import __version__
-    from soundboard.ui import mainwindow
+    from soundboard.ui.window import mainwindow
     assert window.windowTitle() == "Onion Board"   # no version in the title bar
     # the rail: who made it and the version, no "from source"
     assert window.tagline.text() == f"by Onion Alien · v{__version__}"

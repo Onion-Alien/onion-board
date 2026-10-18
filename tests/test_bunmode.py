@@ -4,7 +4,7 @@ from PySide6.QtCore import QEvent, QPoint, QPointF, Qt
 from PySide6.QtGui import QMouseEvent, QWheelEvent
 
 from soundboard.ui.bun import bunmode
-from soundboard.ui.fitcontrol import MINI_SIZE
+from soundboard.ui.window.fitcontrol import MINI_SIZE
 from test_mainwindow import window as main_window  # noqa: F401  (the real MainWindow)
 
 
@@ -271,7 +271,7 @@ def test_mascots_on_screen_dance_to_the_radio(qapp):
 
     from soundboard.audio.groove import SR, Groove
     from soundboard.ui.bun.bunnywidget import BunnyWidget
-    from soundboard.ui.tickcontrol import TickControl
+    from soundboard.ui.window.tickcontrol import TickControl
     on = [True]
     eng = SimpleNamespace(radio_tap=None)
     mw = SimpleNamespace(engine=eng, radio=SimpleNamespace(is_active=lambda: on[0]),

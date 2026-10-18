@@ -456,7 +456,7 @@ class Child:
             self._park_windows_off_screen()
         if self.conf.get("event_counts", True):
             self.counts = Counts(app)
-        from soundboard.ui.mainwindow import MainWindow
+        from soundboard.ui.window.mainwindow import MainWindow
         self.w = w = MainWindow()
         app.aboutToQuit.connect(w.shutdown)
         if self.conf.get("real_window"):
@@ -683,7 +683,7 @@ class Child:
         self.run_for(0.3)
 
     def _tab(self, key: str):
-        from soundboard.ui.tabcontrol import TAB_INDEX
+        from soundboard.ui.window.tabcontrol import TAB_INDEX
         self.w.tabs.setCurrentIndex(TAB_INDEX[key])
 
     def sc_apps_tab_shown(self):
@@ -712,7 +712,7 @@ class Child:
     SETTLE_S = 3.0
 
     def _open_page(self, key: str) -> dict | None:
-        from soundboard.ui.tabcontrol import TAB_INDEX
+        from soundboard.ui.window.tabcontrol import TAB_INDEX
         w = self.w
         if w.bunctl.bun_up():   # (back from Bun mode first)
             w.bunctl.leave_bun_mode(False)

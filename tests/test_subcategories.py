@@ -75,7 +75,7 @@ def test_tidying_only_moves_the_packs_own_categories():
 
 def test_add_filter_rename_and_delete_a_subcategory(window, monkeypatch):
     w = window
-    monkeypatch.setattr("soundboard.ui.mainwindow.QMessageBox.question",
+    monkeypatch.setattr("soundboard.ui.window.mainwindow.QMessageBox.question",
                         lambda *a, **k: QMessageBox.StandardButton.Yes)
     w.catctl.new_category(name="Memes")
     w.meta("s0").tags = ["Memes"]
@@ -156,7 +156,7 @@ def test_deleting_a_category_takes_its_subcategories_with_it(window, monkeypatch
     w.catctl.new_category(name="Memes")
     w.meta("s0").tags = ["Memes"]
     w.catctl.new_subcategory("Memes", "s0", "Vine")
-    monkeypatch.setattr("soundboard.ui.mainwindow.QMessageBox.question",
+    monkeypatch.setattr("soundboard.ui.window.mainwindow.QMessageBox.question",
                         lambda *a, **k: QMessageBox.StandardButton.Yes)
     w.catctl.delete_category("Memes")
     assert w.cfg.subcategories == {} and w.meta("s0").tags == []
@@ -168,7 +168,7 @@ def test_the_window_starts_on_a_category_with_subcategories(qapp, app_dir, monke
     to line the toolbar up with a grid that wasn't there yet (2.1.0 start-up crash)."""
     from soundboard.audio import engine
     from soundboard.control import winkeys
-    from soundboard.ui import mainwindow as main
+    from soundboard.ui.window import mainwindow as main
     for name in ("set_main_device", "set_mon_device", "set_mic_device"):
         monkeypatch.setattr(engine.Engine, name, lambda self, n, _k=name: None)
     monkeypatch.setattr(winkeys.Hotkeys, "register", lambda self, m: None)

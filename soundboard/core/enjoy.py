@@ -4,7 +4,7 @@ It's due once the app has been open DAY_S or more on DAYS_NEEDED different days 
 in a row). usage.open_tick adds the open time, so it only counts while the usage count
 is on: with it off, the answer would go nowhere, so it's never asked. Asked once, ever:
 it's marked done the moment it shows, whether they answer, close it or quit. The bar
-itself is ui/enjoycontrol.py; the answers go out with usage.survey.
+itself is ui/window/enjoycontrol.py; the answers go out with usage.survey.
 Config: enjoy_days {"YYYY-MM-DD": seconds open} and enjoy_state ("" / "done")."""
 from __future__ import annotations
 

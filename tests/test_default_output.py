@@ -77,7 +77,7 @@ def test_the_default_when_the_app_starts(window, monkeypatch):
 def test_a_listed_device_that_wont_open_gets_a_rescan_with_backoff(window, monkeypatch, qapp):
     """Plugged in after the app started, or its format changed in Windows: PortAudio's
     old list can't open it, however often the engine retries."""
-    from soundboard.ui import devicecontrol
+    from soundboard.ui.window import devicecontrol
     from test_idle_cpu import recover
     scans = []
     monkeypatch.setattr(window.devctl, "_refresh_off_ui",
@@ -106,7 +106,7 @@ def test_a_listed_device_that_wont_open_gets_a_rescan_with_backoff(window, monke
 
 
 def test_picking_a_bluetooth_hands_free_mic_warns_about_call_quality(window, monkeypatch):
-    from soundboard.ui import routecontrol
+    from soundboard.ui.window import routecontrol
     monkeypatch.setattr(eng.Engine, "set_mic_device", lambda self, n: None)
     assert routecontrol.is_hands_free("Headset (WH-1000XM4 Hands-Free AG Audio)")
     assert not routecontrol.is_hands_free("Microphone (USB Mic)")

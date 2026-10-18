@@ -681,7 +681,7 @@ class TriggersTab(QWidget):
     BAR = ("cut", "paste", "add", "watch", "interval_label")   # icon only in this order
 
     def fit_steps(self):
-        """What the main window may squeeze here when it gets small (ui/responsive.py):
+        """What the main window may squeeze here when it gets small (ui/window/responsive.py):
         the hint at the top. It applies to the add-on's tab whenever it's in, also when
         it arrives later. The bottom bar's buttons go by the bar's own room (_fit_bar):
         as the window's steps they also lost their words when another tab was what
@@ -738,7 +738,7 @@ class TriggersTab(QWidget):
         return False
 
     def _apply_fit(self, key: str, compact: bool):
-        from soundboard.ui import responsive as r
+        from soundboard.ui.window import responsive as r
         parts = self.panel.fit_parts() if self.panel is not None else {}
         w = parts.get(key)
         if w is None:

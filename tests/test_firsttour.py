@@ -17,7 +17,7 @@ from soundboard.online import net
 from soundboard.control import winkeys
 from soundboard.sounds.library import Config, SoundMeta
 from soundboard.ui.setup import coach, firsttour
-from soundboard.ui import mainwindow as main
+from soundboard.ui.window import mainwindow as main
 from soundboard.ui.setup import setupwizard
 
 

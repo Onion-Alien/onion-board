@@ -15,7 +15,7 @@ from test_mainwindow import window as main_window  # noqa: F401  (the real MainW
 from soundboard.online import net, store
 from soundboard.sounds.library import Config
 from soundboard.ui.store import storetab
-from soundboard.ui.tabcontrol import TAB_KEYS, rail_order
+from soundboard.ui.window.tabcontrol import TAB_KEYS, rail_order
 
 
 def _sound(i, **kw):
@@ -422,7 +422,7 @@ def window(main_window):  # noqa: F811
 
 
 def test_store_tab_in_the_window(window, qapp, tmp_path):
-    from soundboard.ui.tabcontrol import TAB_INDEX
+    from soundboard.ui.window.tabcontrol import TAB_INDEX
     i = TAB_INDEX["store"]
     assert isinstance(window.store, storetab.StoreTab) and window.tabs.isTabVisible(i)
     order = [b.index for b in window.rail.buttons]
@@ -750,7 +750,7 @@ def test_a_refused_name_or_tags_says_so():
 def test_playing_a_link_keeps_the_rows_where_they_are(window, qapp, monkeypatch):
     """The download bar opening over the tabs for a played link pushed the list down: the
     row just clicked slid ~130 px away. The list scrolls by as much, so it stays put."""
-    from soundboard.ui.tabcontrol import TAB_INDEX
+    from soundboard.ui.window.tabcontrol import TAB_INDEX
     sounds = [_sound(i, ext="link", link=f"https://www.myinstants.com/en/instant/s{i}/")
               for i in range(1, 40)]
     monkeypatch.setattr(store, "_request", FakeStore(sounds))

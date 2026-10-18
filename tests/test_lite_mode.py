@@ -179,7 +179,7 @@ def test_pad_hover_has_no_fade(qapp):
 
 def test_mic_banner_does_not_pulse(qapp):
     from PySide6.QtWidgets import QGraphicsOpacityEffect, QWidget
-    from soundboard.ui.windowbuild import Pulse
+    from soundboard.ui.window.windowbuild import Pulse
     host = QWidget()
     fx = QGraphicsOpacityEffect(host)
     p = Pulse(fx, host)
@@ -196,7 +196,7 @@ def test_the_theme_cover_does_not_fade(qapp):
     from PySide6.QtGui import QColor
     from PySide6.QtWidgets import QWidget
     from soundboard.style import cover
-    from soundboard.ui import themecover  # noqa: F401  (plugs lite mode in)
+    from soundboard.ui.window import themecover  # noqa: F401  (plugs lite mode in)
     lite.set_on(True)
     assert not cover.animate()
     host = QWidget()

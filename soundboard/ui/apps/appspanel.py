@@ -46,7 +46,7 @@ from soundboard.ui.bun.bunnywidget import BunnyWidget
 from soundboard.ui.apps.clipeditor import WAVE_H
 from soundboard.ui.apps.clipshelf import ClipShelf
 from soundboard.ui.kit.panel import UndoBar, ViewToggle, hint_label
-from soundboard.ui.responsive import FitWidth
+from soundboard.ui.window.responsive import FitWidth
 from soundboard.ui.sounds.speedpitch import SpeedPitchButton
 from soundboard.ui.kit.wheelguard import no_wheel
 

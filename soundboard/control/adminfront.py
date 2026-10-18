@@ -4,7 +4,7 @@ hotkeys go quiet while one is in front, whichever way they're read (raw input,
 RegisterHotKey). The game still gets its keys: nothing is taken from it.
 
 This notices such a game coming to the front, so the window can say why the keys don't
-work there and offer to start the board again as admin (ui/hotkeycontrol.py), the way
+work there and offer to start the board again as admin (ui/window/hotkeycontrol.py), the way
 Microsoft's PowerToys does. Only full-screen admin windows count: Task Manager and an
 admin terminal are admin too, and nobody games in them. Nothing here reads keys."""
 from __future__ import annotations

@@ -8,8 +8,8 @@ from soundboard import __version__
 from soundboard.audio import engine
 from soundboard.control import winkeys
 from soundboard.sounds.library import Config
-from soundboard.ui import mainwindow as main
-from soundboard.ui.tabcontrol import TAB_INDEX
+from soundboard.ui.window import mainwindow as main
+from soundboard.ui.window.tabcontrol import TAB_INDEX
 
 
 def test_start_focus_is_the_open_tab_without_the_ring(qapp, app_dir, monkeypatch):

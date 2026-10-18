@@ -37,7 +37,7 @@ def test_every_code_path_it_names_exists():
     assert paths
     missing = sorted(p for p in paths if not (ROOT / p).exists())
     # files from UI work still in review are allowed while their PRs are open
-    pending = {"soundboard/ui/sidebar.py", "soundboard/ui/kit/feedbackdialog.py"}
+    pending = {"soundboard/ui/window/sidebar.py", "soundboard/ui/kit/feedbackdialog.py"}
     assert not [p for p in missing if p not in pending], missing
 
 

@@ -212,7 +212,7 @@ def test_behind_the_loading_screen_the_mark_comes_first(window, boxes, qapp, mon
 def test_nothing_new_or_slow_the_app_opens_as_usual(window, qapp, monkeypatch, installer):
     import threading
     from soundboard.ui.bun import splash
-    from soundboard.ui import updatecontrol
+    from soundboard.ui.window import updatecontrol
     said = []
     monkeypatch.setattr(splash, "set_status", lambda text="", progress=None:
                         said.append(text))
@@ -356,7 +356,7 @@ def test_cancel_stops_the_download(window, boxes, qapp, monkeypatch):
 
 
 def test_shut_the_update_is_one_rail_button(window, boxes):
-    from soundboard.ui import sidebar
+    from soundboard.ui.window import sidebar
     window.resize(1180, 720)
     window.show()
     window.updctl._on_update(_rel(), "", False)

@@ -301,7 +301,7 @@ class PrivacyPage(Page):
         if button is None or not qt_valid(button):
             return
         mw = self.mw
-        ff = getattr(mw, "ffctl", None)   # ui/ffmpegcontrol.py
+        ff = getattr(mw, "ffctl", None)   # ui/window/ffmpegcontrol.py
         h = ffmpegget.last()
         working = h is not None and h.state == ffmpegget.OK
         getting = getattr(ff, "getting", False)

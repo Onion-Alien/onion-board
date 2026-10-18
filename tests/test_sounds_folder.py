@@ -9,7 +9,7 @@ from test_mainwindow import window as main_window  # noqa: F401 - the real windo
 
 from soundboard.sounds import library
 from soundboard.sounds.library import SR, Config, SoundMeta
-from soundboard.ui import importcontrol
+from soundboard.ui.window import importcontrol
 
 
 @pytest.fixture

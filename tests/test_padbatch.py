@@ -35,7 +35,7 @@ def click(pad, mods=Qt.NoModifier):
 def menu_shows(monkeypatch, look):
     """Menus open as a QMenu subclass that hands itself to `look` instead of blocking
     (Qt's own exec can't be patched on the class)."""
-    from soundboard.ui import categorycontrol, mainwindow
+    from soundboard.ui.window import categorycontrol, mainwindow
     from soundboard.ui.sounds import padbatch
 
     class Shown(QMenu):

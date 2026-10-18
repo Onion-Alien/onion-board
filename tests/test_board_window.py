@@ -307,7 +307,7 @@ def test_a_maximised_window_stays_maximised(window, qapp):
     taskbar, the tray) maximised: it used to come back as a normal window both times."""
     from PySide6.QtCore import QEvent
     from soundboard.sounds.library import Config
-    from soundboard.ui import mainwindow
+    from soundboard.ui.window import mainwindow
     window.show()
     window.showMaximized()
     qapp.processEvents()

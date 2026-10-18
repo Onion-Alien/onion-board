@@ -335,7 +335,7 @@ gitleaks, ruff and pytest:
 - **On a PR**, pytest runs only the test files the change needs
   (`scripts/pick_tests.py`: tests that import a changed module or name a changed file;
   all of them when `conftest.py`, `pyproject.toml`, the requirements, the workflow or a
-  hub (`ui/mainwindow.py`, `engine.py`, `library.py`, `settings.py`) changes; none for
+  hub (`ui/window/mainwindow.py`, `engine.py`, `library.py`, `settings.py`) changes; none for
   a change no test is about, like the changelog). A newer push cancels the unfinished run.
 - **On main after a merge**, and when the workflow is run by hand on a branch: the
   whole suite.

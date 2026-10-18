@@ -420,7 +420,7 @@ def test_a_new_remote_key_says_made_only_once_it_is_saved(window, monkeypatch): 
     only once it's on disk. A failed save says so instead (after a restart the old key
     would be back, and a Stream Deck set up with the new one would stop working)."""
     from soundboard.sounds import library
-    from soundboard.ui import remoteaccess
+    from soundboard.ui.window import remoteaccess
     flashed, toasts, ui_saves = [], [], []
     monkeypatch.setattr(busy, "flash", lambda btn, text, ms=0: flashed.append(text))
     monkeypatch.setattr(busy, "toast", lambda w, text, kind="", *a, **k: toasts.append(kind))
@@ -446,7 +446,7 @@ def test_a_new_remote_key_says_made_only_once_it_is_saved(window, monkeypatch): 
 
 
 def test_about_shows_the_version_and_only_opens_pages(window, monkeypatch):  # noqa: F811
-    from soundboard.ui.mainwindow import version_text
+    from soundboard.ui.window.mainwindow import version_text
     opened = []
     monkeypatch.setattr(busy.QDesktopServices, "openUrl", lambda u: opened.append(u.toString()))
     d = SettingsDialog(window, "about")

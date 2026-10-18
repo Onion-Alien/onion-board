@@ -576,7 +576,7 @@ class SettingsDialog(QDialog, Built):
               "doesn't load at all, so nothing of it runs in the background. Switch it back on "
               "any time, here or with + More tabs after the tabs. Right-click a tab to hide it."),
             icon="sounds")
-        from soundboard.ui.tabcontrol import TAB_KEYS, TABS
+        from soundboard.ui.window.tabcontrol import TAB_KEYS, TABS
         self.tab_boxes: dict[str, QCheckBox] = {}
         for key, (text, _tip) in zip(TAB_KEYS, TABS):
             if key in self.TAB_HINTS:

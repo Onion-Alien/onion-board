@@ -40,10 +40,10 @@ from soundboard.audio import renderworker, soundfx
 from soundboard.sounds import library
 from soundboard.i18n import _
 from soundboard.ui.kit import worker
-from soundboard.ui.controller import Controller
+from soundboard.ui.window.controller import Controller
 
 if TYPE_CHECKING:
-    from soundboard.ui.mainwindow import MainWindow
+    from soundboard.ui.window.mainwindow import MainWindow
     from soundboard.ui.sounds.speedpitch import SpeedPitchButton
 
 log = logging.getLogger(__name__)

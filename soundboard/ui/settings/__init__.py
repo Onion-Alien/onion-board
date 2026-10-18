@@ -17,7 +17,7 @@ if TYPE_CHECKING:
     from PySide6.QtWidgets import QCheckBox, QWidget
 
     from soundboard.ui.settings.settings import SettingsDialog
-    from soundboard.ui.mainwindow import MainWindow
+    from soundboard.ui.window.mainwindow import MainWindow
 
 
 class Built:

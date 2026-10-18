@@ -1,5 +1,5 @@
 """Toasts (ui/kit/toast.py), the import's summary and See why (ui/sounds/importreport.py), and the
-drop veil (ui/dropveil.py)."""
+drop veil (ui/window/dropveil.py)."""
 import numpy as np
 import pytest
 import soundfile as sf
@@ -10,7 +10,7 @@ from conftest import process_events
 from soundboard.sounds.library import SR
 from soundboard.ui.kit import busy, toast
 from soundboard.ui.sounds import importreport
-from soundboard.ui.dropveil import label_for
+from soundboard.ui.window.dropveil import label_for
 from test_mainwindow import window as main_window  # noqa: F401 - the real window, offscreen
 
 
@@ -414,7 +414,7 @@ def test_a_big_import_shows_bun_and_closing_it_only_hides_it(main_window, qapp, 
     on; each sound is on the board (playable) before the import ends; the finished card
     with Undo still comes."""
     import threading
-    from soundboard.ui import importcontrol
+    from soundboard.ui.window import importcontrol
     w = main_window
     t = np.arange(SR // 10) / SR
     files = []
@@ -450,7 +450,7 @@ def test_a_big_import_shows_bun_and_closing_it_only_hides_it(main_window, qapp, 
 def test_stop_on_a_big_import_keeps_whats_in_and_skips_the_rest(main_window, qapp, tmp_path,  # noqa: F811
                                                                  monkeypatch):
     import threading
-    from soundboard.ui import importcontrol
+    from soundboard.ui.window import importcontrol
     w = main_window
     t = np.arange(SR // 10) / SR
     files = []
@@ -485,7 +485,7 @@ def test_one_slow_file_keeps_its_busy_card_until_its_in(main_window, qapp, tmp_p
                                                        monkeypatch):
     """A long file can take longer to read than a notice stays up: its card waits."""
     import threading
-    from soundboard.ui import importcontrol
+    from soundboard.ui.window import importcontrol
     w = main_window
     p = tmp_path / "Hour.wav"
     sf.write(p, np.zeros((SR // 10, 2)), SR)

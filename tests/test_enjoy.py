@@ -1,5 +1,5 @@
 """*Enjoying Onion Board?*: when it's due (enjoy.py), what it sends (usage.survey) and
-the bar (ui/enjoycontrol.py)."""
+the bar (ui/window/enjoycontrol.py)."""
 import time
 
 from conftest import own_module
@@ -132,7 +132,7 @@ def test_bar_x_closes_it_for_good(window, monkeypatch):  # noqa: F811
 
 
 def test_box_wraps_grows_and_enter_sends(window, monkeypatch):  # noqa: F811
-    from soundboard.ui import enjoycontrol
+    from soundboard.ui.window import enjoycontrol
     w, sent = window, []
     _ready(w, monkeypatch, sent)
     w.resize(1000, 640)

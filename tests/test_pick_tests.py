@@ -19,7 +19,7 @@ def test_a_change_no_test_is_about_runs_none():
 
 
 def test_a_module_runs_the_tests_that_import_it():
-    picked = pick_tests.pick(["soundboard/ui/sidebar.py"])
+    picked = pick_tests.pick(["soundboard/ui/window/sidebar.py"])
     assert "tests/test_sidebar_reorder.py" in picked
     assert "tests/test_dsp.py" not in picked
 
@@ -62,7 +62,7 @@ def test_a_hub_runs_them_all():
     # tests a change to one can break, so the whole suite runs
     for f in sorted(pick_tests.HUBS):
         assert pick_tests.pick([f]) == ["tests"], f
-    assert pick_tests.pick(["soundboard/ui/sidebar.py"]) != ["tests"]
+    assert pick_tests.pick(["soundboard/ui/window/sidebar.py"]) != ["tests"]
 
 
 def test_imports_inside_functions_and_by_name_are_followed(tmp_path, monkeypatch):

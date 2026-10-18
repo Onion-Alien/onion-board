@@ -5,8 +5,8 @@ from test_mainwindow import window  # noqa: F401  (the real MainWindow fixture)
 
 from soundboard.control import winkeys
 from soundboard.sounds.library import Config
-from soundboard.ui import hotkeycontrol, tickcontrol
-from soundboard.ui import mainwindow as main
+from soundboard.ui.window import hotkeycontrol, tickcontrol
+from soundboard.ui.window import mainwindow as main
 from soundboard.ui.sounds.dialogs import TabHelpPopup
 
 

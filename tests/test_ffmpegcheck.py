@@ -1,4 +1,4 @@
-"""The FFmpeg check (ui/ffmpegcontrol.py) and its bar: FFmpeg missing or broken is
+"""The FFmpeg check (ui/window/ffmpegcontrol.py) and its bar: FFmpeg missing or broken is
 got by itself once the window is up, with progress and Stop; when it can't be (Offline,
 its switch, Low data mode) or it failed, the bar says what stops working, with Fix it.
 Never the real ffmpeg, winget or a download."""
@@ -11,7 +11,7 @@ from conftest import process_events, said
 from soundboard.online import ffmpegget, net
 from soundboard.online import quality
 from soundboard.core import usage
-from soundboard.ui import ffmpegcontrol, mainwindow
+from soundboard.ui.window import ffmpegcontrol, mainwindow
 from test_mainwindow import window  # noqa: F401  (the real MainWindow fixture)
 
 OK = ffmpegget.Health(ffmpegget.OK, "9.0.1", "ffmpeg.exe")

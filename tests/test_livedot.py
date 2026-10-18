@@ -7,7 +7,7 @@ from PySide6.QtWidgets import QPushButton, QTabWidget, QWidget
 from soundboard.ui.kit import theme
 from soundboard.speech import tts
 from soundboard.ui.kit import icons
-from soundboard.ui.livedot import is_tab_live, live_color, set_tab_live, set_tint
+from soundboard.ui.window.livedot import is_tab_live, live_color, set_tab_live, set_tint
 
 
 def entries(tabs):

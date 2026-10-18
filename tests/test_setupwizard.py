@@ -9,7 +9,7 @@ from soundboard.audio import engine
 from soundboard.sounds import library
 from soundboard.control import winkeys
 from soundboard.sounds.library import Config
-from soundboard.ui import mainwindow as main
+from soundboard.ui.window import mainwindow as main
 from soundboard.ui.kit import busy
 from soundboard.ui.setup import setupwizard
 

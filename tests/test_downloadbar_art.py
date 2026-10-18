@@ -3,7 +3,7 @@ and the tick / ✗ flash lands on Bun, not on the picture."""
 from PySide6.QtGui import QColor, QPixmap
 
 from conftest import process_events
-from soundboard.ui.downloadbar import DownloadBar
+from soundboard.ui.window.downloadbar import DownloadBar
 
 
 def _bar(qapp):

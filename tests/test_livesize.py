@@ -1,5 +1,5 @@
 """Dragging the window's edge: each step fits with Qt's cached sizes, letting go fits
-once more measuring the whole window fresh (ui/livesize.py, Fitter.live)."""
+once more measuring the whole window fresh (ui/window/livesize.py, Fitter.live)."""
 import ctypes
 import sys
 
@@ -7,7 +7,7 @@ import pytest
 from PySide6.QtCore import QSize
 from PySide6.QtWidgets import QLayout
 
-from soundboard.ui import livesize, responsive
+from soundboard.ui.window import livesize, responsive
 from test_mainwindow import window  # noqa: F401 - the real window, offscreen
 from test_responsive import LONG, SHORT, header
 

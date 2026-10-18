@@ -95,7 +95,7 @@ def test_built_bar_keeps_its_words_with_triggers_coming_and_going(
     from soundboard.audio import engine
     from soundboard.control import winkeys
     from soundboard.sounds.library import Config
-    from soundboard.ui import mainwindow as main
+    from soundboard.ui.window import mainwindow as main
     for name in ("set_main_device", "set_mon_device", "set_mic_device"):
         monkeypatch.setattr(engine.Engine, name, lambda self, n: None)
     monkeypatch.setattr(winkeys.Hotkeys, "register", lambda self, m: None)

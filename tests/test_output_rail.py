@@ -315,7 +315,7 @@ def test_picked_but_failing_says_not_working(window, qapp, monkeypatch):  # noqa
 def test_full_card_only_when_every_line_fits(window, qapp):  # noqa: F811
     """Dragging the rail open, the small card stays until the rail snaps fully open:
     never a squeezed in-between card."""
-    from soundboard.ui.sidebar import OPEN_W, SHUT_W, SNAP_W
+    from soundboard.ui.window.sidebar import OPEN_W, SHUT_W, SNAP_W
     window.resize(1180, 720)
     window.show()
     window.cfg.route, window.cfg.main_device = "device", None

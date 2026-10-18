@@ -17,7 +17,7 @@ from soundboard.i18n import _
 from soundboard.ui.kit.panel import card, fold_button, hint_label
 
 if TYPE_CHECKING:
-    from soundboard.ui.mainwindow import MainWindow
+    from soundboard.ui.window.mainwindow import MainWindow
 
 log = logging.getLogger(__name__)
 

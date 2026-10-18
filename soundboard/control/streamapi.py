@@ -39,7 +39,7 @@ from PySide6.QtCore import QTimer
 from soundboard.core import usage
 
 if TYPE_CHECKING:
-    from soundboard.ui.mainwindow import MainWindow
+    from soundboard.ui.window.mainwindow import MainWindow
 
 STREAM_ACTIONS = ("chat", "chat_rules", "event", "alerts", "feed")
 FEED_MAX = 200          # entries the feed keeps

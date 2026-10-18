@@ -106,7 +106,7 @@ class HelpPage(Page):
     def _about_card(self):
         """The version (as the title bar shows it), and where the app and its licences
         live."""
-        from soundboard.ui.mainwindow import version_text
+        from soundboard.ui.window.mainwindow import version_text
         from soundboard.core.updates import REPO
         card, cv = self._card("Onion Board", icon="onion")
         ver = self.dlg.about_version = QLabel(_("Version {version}", version=version_text()))

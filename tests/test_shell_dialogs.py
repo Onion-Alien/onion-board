@@ -8,11 +8,11 @@ from soundboard.audio import engine
 from soundboard.ui.settings import settings
 from soundboard.ui.kit import theme
 from soundboard.control import winkeys
-from soundboard.ui import fitcontrol, settingscontrol
+from soundboard.ui.window import fitcontrol, settingscontrol
 from soundboard.ui.setup import setupwizard
-from soundboard.ui import mainwindow as main
-from soundboard.ui.livedot import set_tab_live
-from soundboard.ui.tabcontrol import TAB_INDEX
+from soundboard.ui.window import mainwindow as main
+from soundboard.ui.window.livedot import set_tab_live
+from soundboard.ui.window.tabcontrol import TAB_INDEX
 
 
 @pytest.fixture
