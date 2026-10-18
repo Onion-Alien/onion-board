@@ -39,3 +39,35 @@ def test_the_shipped_helper_is_listed_after_the_runtime_clean_up():
     text = (ROOT / "build.ps1").read_text(encoding="utf-8")
     assert "write_manifest" in text
     assert text.index("write_manifest") > text.index(r"scripts\vc_runtime.py dist\OnionBoard")
+
+
+def test_the_probe_lists_modules_that_need_what_the_helper_leaves_out(tmp_path):
+    """PyInstaller follows imports inside functions too: directmic's lazy ones put the
+    whole app in the helper. What can't load there (it needs numpy, Qt...) is left out."""
+    import subprocess
+    pkg = tmp_path / "soundboard"
+    (pkg / "ui").mkdir(parents=True)
+    (pkg / "__init__.py").write_text("")
+    (pkg / "fine.py").write_text("import json\n")
+    (pkg / "needsnumpy.py").write_text("import numpy\n")
+    (pkg / "viaother.py").write_text("from soundboard import needsnumpy\n")
+    (pkg / "lazy.py").write_text("def f():\n    import numpy\n")
+    (pkg / "ui" / "__init__.py").write_text("")
+    (pkg / "ui" / "window.py").write_text("from PySide6 import QtWidgets\n")
+    r = subprocess.run([sys.executable, "-c", bm.PROBE, *bm.EXCLUDE], cwd=tmp_path,
+                       capture_output=True, text=True, timeout=60, check=True)
+    assert r.stdout.split() == ["soundboard.needsnumpy", "soundboard.ui.window",
+                                "soundboard.viaother"]
+
+
+def test_the_build_stops_if_the_helper_itself_would_be_left_out(monkeypatch):
+    import subprocess
+
+    import pytest
+    monkeypatch.setattr(bm.subprocess, "run", lambda *a, **k: subprocess.CompletedProcess(
+        a, 0, "soundboard.ui.mainwindow\nsoundboard.appaudio\n", ""))
+    with pytest.raises(RuntimeError, match="soundboard.appaudio"):
+        bm.unloadable()
+    monkeypatch.setattr(bm.subprocess, "run", lambda *a, **k: subprocess.CompletedProcess(
+        a, 0, "soundboard.ui.mainwindow\n", ""))
+    assert bm.unloadable() == ["soundboard.ui.mainwindow"]

@@ -54,6 +54,10 @@ if ($LASTEXITCODE -ne 0) { throw "version_info.py failed" }
 # its FFTs with scipy.fft, and released Onion Watch up to 0.5.6 needs scipy.ndimage
 # too: without it their Triggers tab won't load (~1 MB; keep it while anyone may be
 # on 0.5.6). scipy's __init__ names every subpackage, so the rest is excluded by name.
+# The build's .venv has the dev tools too (requirements-dev.txt), and scipy's test
+# helpers import pytest (with pluggy, pygments, colorama...), cffi's compile-only shim
+# setuptools: about 600 modules nothing runs. Neither is a runtime need of scipy or cffi;
+# an import of one fails as it would on any PC without them.
 # Straight into my mic: the Windows audio effect (native\directmic), built with
 # MinGW-w64 (winget install BrechtSanders.WinLibs.POSIX.UCRT), bundled as directmic\.
 & $py scripts\build_directmic.py
@@ -96,6 +100,9 @@ try {
     --exclude-module scipy.sparse --exclude-module scipy.spatial `
     --exclude-module PySide6.QtWebEngineCore --exclude-module PySide6.QtWebEngineWidgets `
     --exclude-module PySide6.QtWebChannel --exclude-module PySide6.QtPdf `
+    --exclude-module pytest --exclude-module _pytest --exclude-module pluggy `
+    --exclude-module iniconfig --exclude-module pygments --exclude-module colorama `
+    --exclude-module setuptools --exclude-module _distutils_hack --exclude-module pkg_resources `
     --paths . `
     main.py
 } finally { $env:PATH = $fullPath }
@@ -177,6 +184,11 @@ if (-not $iscc) {
     Publish-Build
     exit 0
 }
+# Files with the same bytes as another (the mic helper's own Python, mostly) go into the
+# installer once; every copy still installs where it was. Written now, so the list
+# always matches dist\ (installer\OnionBoard.iss includes it).
+& $py scripts\installer_dupes.py dist\OnionBoard build\installer
+if ($LASTEXITCODE -ne 0) { throw "installer_dupes.py failed" }
 $version = & $py -c "import soundboard; print(soundboard.__version__)"
 & $iscc /Q "/DAppVersion=$version" installer\OnionBoard.iss
 if ($LASTEXITCODE -ne 0) { throw "Inno Setup failed" }
