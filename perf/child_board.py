@@ -424,6 +424,11 @@ class Child:
         loaded = self.run_until(lambda: not w.soundctl._load_thread.is_alive(), 60)
         if self.conf.get("watch_zip") and w.triggers.needed_now():
             self.run_until(lambda: not w.triggers.pending, 30)
+        # what soundboard.app.main builds behind the loading screen: Settings and a
+        # spare Edit sound, then their first show (without it every Edit measured a build)
+        w.setctl.preload_dialogs()
+        w.setctl.warm_settings()
+        w.setctl.warm_triggers()
         self.run_for(0.3)
         link.mark("ready", loaded=loaded, sounds=len(w.cfg.sounds),
                   watch=w.triggers.panel is not None)
@@ -537,19 +542,50 @@ class Child:
         return {"tab_open_ms": first}
 
     def sc_dialogs(self):
+        from PySide6.QtWidgets import QApplication
         w = self.w
         took = {}
-        for k in range(2):
-            self.close_dialogs_soon(500)
+        for k in range(2):   # Settings is a page in the window: opened, drawn, closed
             t0 = time.perf_counter()
             w.setctl.open_settings("privacy" if k == 0 else "devices")
+            QApplication.processEvents()
             took[f"settings_{k}"] = round(time.perf_counter() - t0, 2)
-        for k, sid in enumerate(self._sids()[:2]):
-            self.close_dialogs_soon(500)
+            self.run_for(0.3)
+            w.setctl.close_settings()
+            self.run_for(0.3)
+        sids = self._sids()
+        for k in range(2):   # Edit isn't modal: each one is shown, drawn, then closed
             t0 = time.perf_counter()
-            w.editctl.edit(sid)
+            d = w.editctl.edit(sids[k % len(sids)])
+            QApplication.processEvents()
             took[f"edit_{k}"] = round(time.perf_counter() - t0, 2)
+            self.run_for(0.3)
+            d.reject()
+            self.run_for(0.3)
+        # two at once: the second one has no spare to take, so it's built (~250 ms here)
+        first = w.editctl.edit(sids[0])
+        self.run_for(0.3)
+        t0 = time.perf_counter()
+        second = w.editctl.edit(sids[1 % len(sids)])
+        QApplication.processEvents()
+        took["edit_second_open"] = round(time.perf_counter() - t0, 2)
+        self.run_for(0.3)
+        for d in (second, first):
+            if d is not None:
+                d.reject()
         self.run_for(0.5)
+        # after a theme change (the spare is made again for the new theme)
+        was = w.cfg.theme
+        w.themectl.apply_theme("Light" if was != "Light" else "Dark")
+        self.run_for(1.0)
+        t0 = time.perf_counter()
+        d = w.editctl.edit(sids[0])
+        QApplication.processEvents()
+        took["edit_after_theme"] = round(time.perf_counter() - t0, 2)
+        self.run_for(0.3)
+        d.reject()
+        w.themectl.apply_theme(was)
+        self.run_for(1.0)
         return {"dialog_s": took}
 
     def sc_voice_preset(self, preset: str = "Robot"):

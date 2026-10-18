@@ -366,6 +366,30 @@ def test_settings_and_edit_built_behind_the_loading_screen(window, qapp):
     qapp.processEvents()
 
 
+def test_a_new_theme_builds_the_spare_edit_sound_again(window, qapp, monkeypatch):
+    """A new theme drops the made-ahead Edit sound (it was styled in the old one) and
+    builds it again under the theme cover: the next Edit opens it, not a new build (it
+    was left for the first click, ~1 s on a slow laptop). Not while one is open: that
+    one's kept when it closes."""
+    sc = window.setctl
+    sc.preload_dialogs()
+    old = sc._spare_editor
+    window.themectl.apply_theme("Light" if window.cfg.theme != "Light" else "Dark")
+    spare = sc._spare_editor
+    assert spare is not None and spare is not old
+    made = []
+    real = EditDialog.__init__
+    monkeypatch.setattr(EditDialog, "__init__",
+                        lambda self, *a, **k: made.append(a) or real(self, *a, **k))
+    d = window.editctl.edit(window.cfg.sounds[0].id)
+    assert d is spare and not made
+    sc.prebuild_editor()            # one's open: nothing more is built
+    assert sc._spare_editor is None and not made
+    d.reject()
+    qapp.processEvents()
+    assert sc._spare_editor is d
+
+
 def test_settings_made_ahead_again_after_a_page_it_cant_keep(window, qapp, monkeypatch):
     """About (or Updates, Help...) shows live state, so that Settings isn't kept when it
     closes: a new one is made ahead while nothing's going on, and the next open of the

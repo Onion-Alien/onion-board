@@ -35,9 +35,9 @@ class ThemeControl(Controller):
 
     def _apply_theme(self, name: str):
         mw = self.mw
+        mw.setctl._drop_spare_dialogs()
         mw.cfg.theme = theme.apply(QApplication.instance(), name)
         self.keep_limited()
-        mw.setctl._drop_spare_dialogs()
         icons.retheme()
         mw.radio.retheme()
         mw.apps.retheme()
@@ -54,6 +54,7 @@ class ThemeControl(Controller):
         mw.statusctl._update_status()   # the hints and flow, in this theme's status colours
         mw.rail.refresh_output()   # its status icon is a copy of the pill's: redrawn
         self._paint_logo()
+        mw.setctl.prebuild_editor()   # under the cover: the next Edit opens at once
         mw._save_later()
 
     def keep_limited(self, save: bool = True):
