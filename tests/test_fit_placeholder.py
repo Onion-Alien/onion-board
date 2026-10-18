@@ -10,9 +10,13 @@ def test_the_longest_hint_that_fits(qapp):
     from PySide6.QtWidgets import QLineEdit
     e = QLineEdit()
     e.show()
-    fit_placeholder(e, "Search sounds or paste a link", "Search sounds", "Search")
-    for width, hint in ((400, "Search sounds or paste a link"), (150, "Search sounds"),
-                        (90, "Search"), (30, "Search")):
+    hints = ("Search sounds or paste a link", "Search sounds", "Search")
+    fit_placeholder(e, *hints)
+    fm = e.fontMetrics()
+    full, mid, short = (fm.horizontalAdvance(h) for h in hints)
+    # (a box's padding is under 60 px: the widths are the words' own, any font)
+    for width, hint in ((full + 60, hints[0]), (mid + 60, hints[1]), (short + 60, hints[2]),
+                        (20, hints[2])):
         e.resize(width, 30)
         qapp.processEvents()
         assert e.placeholderText() == hint, width
