@@ -424,11 +424,23 @@ def parse_args(argv=None):
                     help="leave out the paint / timer counter (it costs a little CPU itself)")
     ap.add_argument("--only", default="", help="comma-separated runs to do: board, triggers, "
                     "watch (default: all that apply)")
+    ap.add_argument("--scenarios", default="", help="comma-separated: only these of the "
+                    "tier's board scenarios, in the tier's order (e.g. dialogs,voice_preset)")
     ap.add_argument("--env", action="append", default=[], metavar="KEY=VALUE",
                     help="extra environment for the measured app (e.g. OPENBLAS_NUM_THREADS=1)")
     args = ap.parse_args(argv)
     args.env = dict(e.split("=", 1) for e in args.env)
     return args
+
+
+def pick(names: list[str], wanted: str) -> list[str]:
+    """The scenarios of `names` that `wanted` (comma-separated) asks for, in their
+    order; all of them when it's empty. A name the tier hasn't got is an error."""
+    asked = [w.strip() for w in wanted.split(",") if w.strip()]
+    unknown = [w for w in asked if w not in names]
+    if unknown:
+        raise SystemExit(f"perf: no scenario {', '.join(unknown)} in this tier")
+    return [n for n in names if not asked or n in asked]
 
 
 def source_label() -> str:
@@ -481,7 +493,7 @@ def main(argv=None) -> int:
     if args.tier in ("quick", "full", "tabs"):
         tier = TIERS[args.tier]
         if want("board"):
-            add(*board_run("board", out, args, tier, hz, tier["board"]),
+            add(*board_run("board", out, args, tier, hz, pick(tier["board"], args.scenarios)),
                 note=f"{tier['sounds']} sounds, cable route, mono mic, offscreen"
                      + (" (real windows off-monitor)" if args.real_window else ""))
         if args.watch_src and (want("triggers") or want("watch")):

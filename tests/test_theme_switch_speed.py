@@ -273,3 +273,65 @@ def test_the_main_window_still_restyles_while_hidden(main_window):  # noqa: F811
         assert main_window.testAttribute(Qt.WidgetAttribute.WA_WState_Polished)
     finally:
         theme.apply(QApplication.instance(), start)
+
+
+def test_the_fade_out_paints_the_board_once_not_every_frame(settings, main_window):  # noqa: F811
+    """The cover fades out as two pictures, old over new, and stays opaque. A
+    see-through cover (an opacity effect) made Qt paint every widget under it on each
+    frame of the fade: ~18 paints of every pad per switch."""
+    from soundboard.ui.themecover import ThemeCover
+    from soundboard.ui.widgets import Pad
+
+    class Paints(QObject):
+        n = 0
+
+        def eventFilter(self, obj, ev):  # noqa: N802 - Qt API
+            if ev.type() == QEvent.Type.Paint and isinstance(obj, Pad):
+                self.n += 1
+            return False
+    main_window.tabs.setCurrentIndex(0)   # the Sounds tab
+    QApplication.processEvents()
+    pads = len([p for p in main_window.findChildren(Pad) if p.isVisible()])
+    assert pads > 10
+    count = Paints()
+    app = QApplication.instance()
+    start = theme.current_name
+    app.installEventFilter(count)
+    try:
+        main_window.themectl.apply_theme(_other(start))
+        end = time.monotonic() + 3
+        while main_window.findChildren(ThemeCover) and time.monotonic() < end:
+            QApplication.processEvents()
+            QApplication.sendPostedEvents(None, QEvent.Type.DeferredDelete)
+        QApplication.processEvents()
+        assert not main_window.findChildren(ThemeCover)
+    finally:
+        app.removeEventFilter(count)
+        main_window.themectl.apply_theme(start)
+    assert count.n <= 3 * pads
+
+
+def test_the_fade_out_is_the_dimmed_picture_crossfading_to_the_new_look(qapp):
+    """Half way, the old picture (dimming included) and the restyled window count
+    half each: the dimming fades with the picture, it doesn't tint the new look."""
+    from PySide6.QtWidgets import QWidget
+    from soundboard.style import cover
+    host = QWidget()
+    host.resize(80, 60)
+    host.setStyleSheet("background: #ff0000;")
+    host.show()
+    QApplication.processEvents()
+    c = cover.Cover(host, QColor("#000000"))
+    cover._fade_in([c])            # red, dimmed by black at SCRIM_ALPHA
+    host.setStyleSheet("background: #0000ff;")   # the restyle
+    c.uncover()
+    c._fade.pause()
+    c._fade.setCurrentTime(cover.FADE_MS // 2)   # InOutQuad: half way at half time
+    QApplication.processEvents()
+    px = c.grab().toImage().pixelColor(40, 30)
+    dim = 1 - cover.SCRIM_ALPHA / 255
+    assert abs(px.red() - 0.5 * 255 * dim) <= 3
+    assert abs(px.blue() - 0.5 * 255) <= 3
+    c._fade.stop()
+    host.close()
+    host.deleteLater()

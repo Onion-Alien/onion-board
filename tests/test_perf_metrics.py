@@ -113,3 +113,12 @@ def test_reads_this_process():
     assert s.threads >= 1 and s.handles > 10
     assert s.cycles > 0
     assert os.getpid() not in winproc.descendants(os.getpid())
+
+
+def test_scenarios_flag_picks_in_the_tiers_order():
+    from perf import runner
+    names = ["idle_front", "dialogs", "voice_preset", "idle_end"]
+    assert runner.pick(names, "") == names
+    assert runner.pick(names, "voice_preset, dialogs") == ["dialogs", "voice_preset"]
+    with pytest.raises(SystemExit):
+        runner.pick(names, "dialog")
