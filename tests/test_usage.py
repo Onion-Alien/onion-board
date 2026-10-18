@@ -1000,7 +1000,8 @@ def test_every_name_the_app_counts_is_in_features():
     dropped: catch the typo here."""
     import re
     from pathlib import Path
-    root = Path(usage.__file__).parent
+    import soundboard
+    root = Path(soundboard.__file__).parent
     names = set()
     for f in root.rglob("*.py"):
         names |= set(re.findall(r'usage\.used\("([a-z0-9-]+)"', f.read_text(encoding="utf-8")))
@@ -1024,7 +1025,8 @@ def test_every_name_in_a_used_call_is_in_features():
     and the f-string families' keys."""
     import re
     from pathlib import Path
-    root = Path(usage.__file__).parent
+    import soundboard
+    root = Path(soundboard.__file__).parent
     names = set()
     for f in root.rglob("*.py"):
         for call in re.findall(r'usage\.used\(((?:[^()]|\([^()]*\))*)\)',
@@ -1055,7 +1057,8 @@ def test_voice_tabs_and_recovery_actions_match_the_ui():
 
     from soundboard.ui import audiorecovery
     assert set(audiorecovery.INSTALLS) <= set(usage.RECOVERY)
-    src = (Path(usage.__file__).parent / "ui" / "voicepanel.py").read_text(encoding="utf-8")
+    from soundboard.ui import voicepanel
+    src = Path(voicepanel.__file__).read_text(encoding="utf-8")
     assert set(re.findall(r'self\._section\("([a-z]+)"', src)) == set(usage.VOICE_TABS)
 
 
@@ -1122,7 +1125,8 @@ def test_addon_installs_are_counted_by_a_fixed_name(monkeypatch):
     from pathlib import Path
 
     from soundboard.addons import modules
-    shipped = Path(usage.__file__).parent.parent / "modules"
+    import soundboard
+    shipped = Path(soundboard.__file__).parent.parent / "modules"
     with_steps = {m.id for m in modules.discover([shipped]) if m.install_steps}
     assert with_steps and with_steps <= set(usage.ADDONS)
     seen = []
@@ -1244,7 +1248,8 @@ def test_settings_pages_match_the_dialog():
     """A page added to Settings needs its name in SETTINGS_PAGES, or it's never counted."""
     import re
     from pathlib import Path
-    src = (Path(usage.__file__).parent / "settings.py").read_text(encoding="utf-8")
+    from soundboard import settings
+    src = Path(settings.__file__).read_text(encoding="utf-8")
     start = src.index("        pages = ((")
     block = src[start:src.index("        self.categories = QListWidget()", start)]
     keys = set(re.findall(r'\("([a-z]+)", _\(', block))
