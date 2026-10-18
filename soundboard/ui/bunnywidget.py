@@ -40,6 +40,10 @@ The widget is bigger than Bun himself so there's room around him for the notes,
 which also gives him even breathing room in a layout. The timer only runs while
 he's on screen, always at the same 60 fps (a slower idle pace made the bob judder
 next to the smooth blinks and ear flicks); Bun mode drops to 30 behind a game.
+Drawing him is most of a frame, and his idle sway moves him far less than a pixel a
+frame, so his picture is kept (`HOLD`): a frame shows it until some part of him has
+moved HOLD_PX, and a frame where nothing at all moved isn't painted. Notes, dust and
+his bubble still move every frame.
 
 `rest_after_s=N`: with nothing going on he only moves for N seconds after he's shown
 (or after the last sound, click or burst), then finishes what he's doing and holds
@@ -63,7 +67,7 @@ import weakref
 import shiboken6
 
 from PySide6.QtCore import QPointF, QRectF, QSize, Qt, QTimer, Signal
-from PySide6.QtGui import QColor, QFont, QPainter, QPainterPath, QPen
+from PySide6.QtGui import QColor, QFont, QImage, QPainter, QPainterPath, QPen
 from PySide6.QtWidgets import QSizePolicy, QWidget
 
 from soundboard import theme, usage
@@ -121,6 +125,24 @@ TALK = 0.008       # mic level that counts as talking (-42 dBFS; also the wizard
 LOUD = 0.25        # mic level that opens his mouth all the way (-12 dBFS)
 
 
+def _sway(pose: dict, key: str) -> float:
+    """A pose key as draw_bunny gets it (SWAY: how far it moves him)."""
+    if key == "nod":
+        return pose["nod"] + pose.get("tilt", 0.0)
+    if key == "angry":
+        return max(pose["angry"], pose["intense"])
+    return pose.get(key, 0.0)
+
+
+def _steps(pose: dict) -> tuple:
+    """Where draw_bunny switches a part on or off as a pose key passes a value: shut
+    eyes, the open mouth, his ears starting to fold, tears, the frown, cross brows, the
+    vein (the kept picture never stands in across one)."""
+    sad, angry = pose["sad"], _sway(pose, "angry")
+    return (pose["blink"] > 0.6, pose["mouth"] > 0.08, sad * 115 > 0.5, sad > 0.05,
+            sad > 0.5, angry > 0.05, angry > 0.4, angry > 0.5)
+
+
 def loudness(level: float) -> float:
     """A raw mic peak (0..1) as 0..1 on a dB scale, like the level bar: 0 at TALK,
     1 at LOUD. Speech peaks sit far below 1 in linear terms, so a linear scale left
@@ -141,6 +163,17 @@ SQUASH_SPRING = (300.0, 15.0)  # his body jiggles back after a squash or stretch
 STRETCH = 0.05     # how tall and thin a fast move makes him, per Bun-height a second
 SQUASH = 0.6       # how hard a change of direction (a landing) squashes him
 BOB_UP = 2.2      # his idle bob, px each way
+# His picture is kept between frames (`_held`, `_picture`) until some part of him has
+# moved HOLD_PX screen pixels: his idle bob and sway move far less than a pixel a frame,
+# so most frames show the same Bun, and redrawing him is most of a frame's cost. What's
+# round him (notes, dust, his bubble) still moves every frame. False: every frame draws
+# him fresh (the tests compare).
+HOLD = True
+HOLD_PX = 0.25
+# how far the furthest bit of him moves for one unit of each pose key, in canvas units
+# (100 x 120; ears and nod: per degree, from their pivots to his ear tips)
+SWAY = {"blink": 14.0, "mouth": 12.0, "ears": 1.2, "sad": 70.0, "angry": 40.0,
+        "swing": 50.0, "nod": 2.0, "dip": 1.0, "look": 1.6, "kick": 15.0}
 EAR_DRAG = 9.0     # how far his ears trail behind, degrees per Bun-height a second
 BUBBLE = QColor("#fffaf0")
 BEG = 2.8          # how long a begging line stays up, seconds
@@ -428,6 +461,10 @@ class BunnyWidget(QWidget):
         self._ears_s = _Spring()        # the springy layer (_spring): ears,
         self._squash_s = _Spring()      # ... squash and stretch,
         self._dy_last, self._vy = 0.0, 0.0   # ... and how fast he's moving up or down
+        self._kept_img: QImage | None = None   # his picture (_picture), kept while he's
+        self._kept_pose: dict | None = None    # ... this close to the pose it shows (_held)
+        self._kept_key: tuple = ()
+        self._painted_say = ""          # the bubble the last frame showed
         self.junk: list[_Junk] = []     # tossed out of the dust cloud, the hammer's head
         self.sparks: list[_Spark] = []
         self._junk_debt = 0.0
@@ -718,6 +755,7 @@ class BunnyWidget(QWidget):
 
     def hideEvent(self, ev):
         self._timer.stop()
+        self._kept_img = self._kept_pose = None
         if self._act_kind == "bat" and self.building:   # left the page mid-dare
             self.calm_down()
         self._level = 0.0
@@ -950,7 +988,8 @@ class BunnyWidget(QWidget):
             self._next_beg = now + BEG + self._rng.uniform(3, 6)
         self._step_fidget(now)
         self._spring(now, dt)
-        self.update()
+        if not self._still(now):
+            self.update()
         if settling and self._calm(now):
             self._timer.stop()   # (this frame is the one he keeps)
             self.resting, self._still_at = True, now
@@ -1437,11 +1476,98 @@ class BunnyWidget(QWidget):
         return self._with_kit(out, self._kit) if self._kit is not None else out
 
     # ------------------------------------------------------------------ paint
+    def _key(self, pose: dict, dpr: float) -> tuple:
+        """What has to be the same for his kept picture to stand in for `pose`."""
+        return (pose["shown"], pose["prop"], pose["smug"], pose["outfit"], self.asleep,
+                self.robot, _steps(pose), self.bun_h, self.size(), dpr, theme.current_name,
+                tuple(theme.T.items()))
+
+    def _moved(self, a: dict, b: dict, dpr: float) -> float:
+        """About how far (screen px) the bit of him that moved most moved from pose a
+        to pose b (a colour change: always too far)."""
+        if abs(a["alpha"] - b["alpha"]) > 0.5 / 255 or abs(a["led"] - b["led"]) > 0.5 / 255:
+            return math.inf
+        far = self.bun_h * 1.3   # (his ear tips, from his feet: the most a squash or lean moves)
+        px = max(abs(a["dx"] - b["dx"]), abs(a["dy"] - b["dy"]),
+                 far * abs(a["sx"] - b["sx"]), far * abs(a["sy"] - b["sy"]),
+                 far * math.radians(abs(a["angle"] - b["angle"])))
+        unit = self.bun_h / H
+        for k, n in SWAY.items():
+            px = max(px, unit * n * abs(_sway(a, k) - _sway(b, k)))
+        return px * dpr
+
+    def _held(self, pose: dict, dpr: float) -> dict:
+        """`pose`, or the pose his kept picture shows while he's moved less than
+        HOLD_PX from it (no skit on, nothing else about him changed); `dpr`: the
+        screen's (or picture's) pixels per px."""
+        kept = self._kept_pose
+        if (HOLD and kept is not None and self._kit is None
+                and self._kept_key == self._key(pose, dpr)
+                and self._moved(kept, pose, dpr) < HOLD_PX):
+            return kept
+        return pose
+
+    def _still(self, now: float) -> bool:
+        """The next frame would look just like the last one: his kept picture still
+        stands for him and nothing round him moves, so no repaint."""
+        if (not HOLD or self._kept_pose is None
+                or type(self).paintEvent is not BunnyWidget.paintEvent):   # (SetupShow)
+            return False
+        if (self.notes or self.puffs or self.zzz or self.junk or self.sparks
+                or self.celebrate or self.building or self._fail_t >= 0 or self._fin_t >= 0
+                or self._pop_t >= 0 or self.say != self._painted_say):
+            return False
+        pose = self.springy(self.pose(now))
+        return self._held(pose, self.devicePixelRatioF()) is self._kept_pose
+
+    def _picture(self, pose: dict, body: QRectF, dpr: float) -> QImage:
+        """Him in `pose` on a see-through picture the size of the widget, at the
+        screen's pixels: drawn once, then kept for the frames he hardly moves (_held)."""
+        if pose is self._kept_pose and self._kept_img is not None:
+            return self._kept_img
+        size = QSize(math.ceil(self.width() * dpr), math.ceil(self.height() * dpr))
+        img = self._kept_img
+        if img is None or img.size() != size:
+            img = QImage(size, QImage.Format.Format_ARGB32_Premultiplied)
+            img.setDevicePixelRatio(dpr)
+        img.fill(Qt.GlobalColor.transparent)
+        p = QPainter(img)
+        p.setRenderHint(QPainter.RenderHint.Antialiasing)
+        self._draw_bun(p, pose, body)
+        p.end()
+        self._kept_img, self._kept_pose, self._kept_key = img, pose, self._key(pose, dpr)
+        return img
+
+    def _draw_bun(self, p: QPainter, pose: dict, body: QRectF):
+        """Him (and what a skit puts in his paws) in `pose`, squashed, leaning and faded."""
+        kit = self._kit
+        p.save()
+        foot = QPointF(body.center().x(), body.bottom())
+        p.translate(foot)
+        p.rotate(pose["angle"])
+        p.scale(pose["sx"], pose["sy"])
+        p.translate(-foot)
+        p.setOpacity(pose["alpha"])
+        draw_bunny(p, body, pose["prop"],
+                   blink=pose["blink"], mouth=pose["mouth"], ears=pose["ears"],
+                   swing=pose["swing"], sad=pose["sad"],
+                   angry=max(pose["angry"], pose["intense"]),
+                   nightcap=self.asleep, robot=self.robot, led=pose["led"],
+                   nod=pose["nod"] + pose.get("tilt", 0.0), dip=pose["dip"],
+                   smug=pose["smug"],
+                   outfit=pose["outfit"], look=pose.get("look", 0.0),
+                   kick=pose.get("kick", 0.0),
+                   hold=None if kit is None else bunskits.held_paws(kit))
+        if kit is not None:
+            self._paint_kit(p, body, kit.front)
+        p.restore()
+
     def paintEvent(self, ev):
         p = QPainter(self)
         snap_to_pixels(p)
         p.setRenderHint(QPainter.RenderHint.Antialiasing)
         now = self._still_at if self.resting else time.monotonic()   # (resting: as kept)
+        dpr = p.deviceTransform().m11()   # (the screen's, or a grab's, pixels per px)
         pose = self.springy(self.pose(now))
         r = self._bun_rect()
         # soft shadow on the "floor", shrinking as he rises
@@ -1470,26 +1596,12 @@ class BunnyWidget(QWidget):
             self._paint_kit(p, r, kit.behind)
         self._paint_build(p, body, r, pose)
         if pose["shown"]:
-            p.save()
-            foot = QPointF(body.center().x(), body.bottom())
-            p.translate(foot)
-            p.rotate(pose["angle"])
-            p.scale(pose["sx"], pose["sy"])
-            p.translate(-foot)
-            p.setOpacity(pose["alpha"])
-            draw_bunny(p, body, pose["prop"],
-                       blink=pose["blink"], mouth=pose["mouth"], ears=pose["ears"],
-                       swing=pose["swing"], sad=pose["sad"],
-                       angry=max(pose["angry"], pose["intense"]),
-                       nightcap=self.asleep, robot=self.robot, led=pose["led"],
-                       nod=pose["nod"] + pose.get("tilt", 0.0), dip=pose["dip"],
-                       smug=pose["smug"],
-                       outfit=pose["outfit"], look=pose.get("look", 0.0),
-                       kick=pose.get("kick", 0.0),
-                       hold=None if kit is None else bunskits.held_paws(kit))
-            if kit is not None:
-                self._paint_kit(p, body, kit.front)
-            p.restore()
+            if HOLD and kit is None:   # (only he is kept: what's round him is this frame's)
+                held = self._held(pose, dpr)
+                p.drawImage(QPointF(0, 0), self._picture(
+                    held, r.translated(held["dx"], held["dy"]), dpr))
+            else:
+                self._draw_bun(p, pose, body)
         if kit is not None:
             self._paint_kit(p, r, kit.world)
         self._paint_screen(p, body, pose)
@@ -1514,6 +1626,7 @@ class BunnyWidget(QWidget):
         if kit is not None and kit.flash > 0:   # (Flashbang's skit)
             p.fillRect(self.rect(), QColor(255, 255, 255, round(215 * min(1.0, kit.flash))))
         p.end()
+        self._painted_say = self.say
 
     def _speaker(self, p: QPainter, spot: QRectF, parts: int, at: float, thump: float = 0.0):
         """The little speaker he builds, `parts` of it, on the canvas (each part springs

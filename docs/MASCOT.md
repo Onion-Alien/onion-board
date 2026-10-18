@@ -192,6 +192,11 @@ on two lines). `tests/test_mascotlines.py` checks every theme has them.
 
 **Anything that caches a picture of Bun must key it on `theme.current_name`** (his
 outfit and look), not only the accent colour: see `ScribeBunny._layer`.
+`BunnyWidget` and `OwlWidget` keep their last picture of him (`HOLD`, `_held`): it's
+reused until some part of him has moved `HOLD_PX` screen pixels (`SWAY` says how far
+each pose key moves him), and a frame where nothing moved isn't painted. A new pose key
+that moves him needs its entry in `SWAY` (or `_key`, for one that changes him outright),
+or he'll lag behind it; `tests/test_bunny_hold.py` checks the kept picture draws the same.
 
 ## Checking a change
 

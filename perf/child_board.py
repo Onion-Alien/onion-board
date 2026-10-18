@@ -691,12 +691,17 @@ class Child:
     def _open_page(self, key: str) -> dict | None:
         from soundboard.ui.tabcontrol import TAB_INDEX
         w = self.w
+        if w.bunctl.bun_up():   # (back from Bun mode first)
+            w.bunctl.leave_bun_mode(False)
+            self.run_for(0.2)
         if w.setctl.settings_open():
             w.setctl.close_settings()
             self.run_for(0.2)
         self.foreground(True)
         if key == "settings":
             w.setctl.open_settings()
+        elif key == "bunmode":   # the window goes, the floating Bun comes
+            w.bunctl.enter_bun_mode()
         elif key == "apps_card":
             # one program card (the way the owner usually has the tab): a quiet player
             from soundboard import appaudio
@@ -863,7 +868,7 @@ class Child:
 
 def _tab_scenarios():
     from perf.runner import TAB_KEYS
-    for key in [*TAB_KEYS, "store_rested", "triggers_rested"]:
+    for key in [*TAB_KEYS, "store_rested", "triggers_rested", "bunmode"]:
         setattr(Child, f"sc_open_{key}", lambda self, k=key: self._open_page(k))
         setattr(Child, f"sc_tab_{key}", lambda self, k=key: self._sit(k))
 
