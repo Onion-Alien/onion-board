@@ -178,7 +178,6 @@ FEATURES = ("add-files", "youtube", "record", "clip", "clip-editor", "import-boa
             *(f"tour-{t}-{k}" for t in ("radio", "apps", "triggers", "voice", "store")
               for k in ("shown", "done", "skipped", "failed")),
             "tours-quit",
-            "starter-sounds",
             # the Triggers tab's Get Onion Watch window: shown, Get clicked, closed
             "watch-prompt-shown", "watch-prompt-get", "watch-prompt-closed",
             # Get FFmpeg clicked / failed; a file that couldn't play without it
