@@ -751,7 +751,7 @@ BAD_ON = {"error": "on= takes 1, 0 or toggle"}
 
 
 # An Onion Watch alarm rings its pad as the voice "<sound id>:ring:<trigger>"
-# (soundboard.ui.triggershost.RING): a phone or Stream Deck sees it as the pad playing.
+# (soundboard.ui.triggers.triggershost.RING): a phone or Stream Deck sees it as the pad playing.
 RING = ":ring:"
 
 

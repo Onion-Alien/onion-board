@@ -159,7 +159,7 @@ def test_pause_on_sets_instead_of_flipping(qapp, window):
     assert d("pause", on="maybe") == (400, remote.BAD_ON)
 
 def test_a_ringing_watch_alarm_shows_as_its_pad_and_stops_with_it(qapp, window):
-    from soundboard.ui import triggershost
+    from soundboard.ui.triggers import triggershost
     assert remote.RING == triggershost.RING
     w = window
     ring = f"s0{remote.RING}trigger1"

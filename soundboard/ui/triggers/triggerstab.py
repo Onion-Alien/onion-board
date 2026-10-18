@@ -9,7 +9,7 @@ side of it:
     Triggers made before the add-on existed are kept in Config.screen meanwhile,
     and the tab says so.
   * Once it's loaded, the add-on's own tab (its create(host)), talking to the board
-    only through BoardHost (ui/triggershost.py), with a bar on top when a newer
+    only through BoardHost (ui/triggers/triggershost.py), with a bar on top when a newer
     Onion Watch is out (found by the app's daily update check).
 
 An add-on that fails to load shows Hoot again with why, and a button to get it
@@ -40,7 +40,7 @@ from soundboard.ui.kit import busy, icons
 from soundboard.style.owl import OwlWidget
 from soundboard.ui.kit.panel import Flow, HoverCard, ShownStack, hint_label
 from soundboard.ui.kit.widgets import LoadingBar
-from soundboard.ui.logoduel import LogoDuel
+from soundboard.ui.triggers.logoduel import LogoDuel
 from soundboard.core import errors
 
 log = logging.getLogger(__name__)

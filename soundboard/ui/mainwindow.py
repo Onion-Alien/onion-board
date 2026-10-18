@@ -77,8 +77,8 @@ from soundboard.ui import sidebar
 from soundboard.ui.spacekey import SpaceKey
 from soundboard.ui.sounds.overlay import Overlay
 from soundboard.ui.apps.appspanel import AppsTab
-from soundboard.ui.triggershost import BoardHost
-from soundboard.ui.triggerstab import TriggersTab
+from soundboard.ui.triggers.triggershost import BoardHost
+from soundboard.ui.triggers.triggerstab import TriggersTab
 from soundboard.ui.radio.radiopanel import RadioOff, RadioTab
 from soundboard.ui.store.storetab import PREVIEW as STORE_PREVIEW, StoreTab
 from soundboard.ui.voice.voicepanel import VoicePanel

@@ -831,7 +831,7 @@ def test_first_steps_obey_the_switch(sent):
 def test_the_triggers_tab_counts_its_features(sent):
     """The Onion Watch add-on passes its feature names through BoardHost.count: sent as
     used/triggers-<name>, anything else dropped."""
-    from soundboard.ui.triggershost import BoardHost
+    from soundboard.ui.triggers.triggershost import BoardHost
     host = BoardHost.__new__(BoardHost)    # count() needs nothing of the window
     host.count("mode-colour")
     host.count("pack-import")

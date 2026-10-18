@@ -18,7 +18,7 @@ from soundboard.i18n import _
 from soundboard.core.pollthread import PollThread
 from soundboard.ui.kit import busy
 from soundboard.ui.controller import Controller
-from soundboard.ui.triggerstab import TriggersTab
+from soundboard.ui.triggers.triggerstab import TriggersTab
 
 if TYPE_CHECKING:
     from soundboard.ui.mainwindow import MainWindow

@@ -654,7 +654,7 @@ def test_a_trigger_deleted_while_its_pad_waits_or_queues_never_starts_it(window,
     """A trigger's sound plays like its pad, with the pad's Wait first or Queue; stopping
     the trigger's tag (sound taken off it, trigger deleted) must stop those too."""
     from conftest import process_events
-    from soundboard.ui.triggershost import BoardHost
+    from soundboard.ui.triggers.triggershost import BoardHost
     w = window
     host = BoardHost(w)
     w.meta("s0").delay = 0.05

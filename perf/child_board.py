@@ -754,7 +754,7 @@ class Child:
 
     def sc_wait_triggers(self):
         """... and the Triggers tab past Hoot's (tab_triggers_rested)."""
-        from soundboard.ui import triggerstab
+        from soundboard.ui.triggers import triggerstab
         self.run_for(getattr(triggerstab, "HOOT_REST_S", 30.0) + 2)
         hoot = getattr(getattr(self.w, "triggers", None), "hoot", None)
         return {"hoot_resting": getattr(hoot, "resting", None)}

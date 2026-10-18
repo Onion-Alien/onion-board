@@ -44,8 +44,8 @@ module's `install.bat` or `pip install -r requirements.txt`).
 ### The Triggers tab (Onion Watch)
 
 The Triggers tab is the [Onion Watch](https://github.com/Onion-Alien/onion-watch)
-add-on, a separate project. Onion Board's side is `ui/triggerstab.py` (the tab, Hoot
-and the download), `ui/triggershost.py` (the host interface the add-on talks to;
+add-on, a separate project. Onion Board's side is `ui/triggers/triggerstab.py` (the tab, Hoot
+and the download), `ui/triggers/triggershost.py` (the host interface the add-on talks to;
 `modules.TRIGGERS_API` is the version of it this app can host) and `watchaddon.py`
 (its releases).
 
