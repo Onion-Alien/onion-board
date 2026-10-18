@@ -10,10 +10,11 @@ speechinstall.py).
 from __future__ import annotations
 
 import html
+import logging
 import threading
 import time
 
-from PySide6.QtCore import QSize, Qt, QTimer, Signal
+from PySide6.QtCore import QEvent, QSize, Qt, QTimer, Signal
 from PySide6.QtGui import QGuiApplication
 from PySide6.QtWidgets import (QCheckBox, QComboBox, QDialog, QDialogButtonBox,
                                QFormLayout, QFrame, QGridLayout, QHBoxLayout, QLabel,
@@ -29,11 +30,13 @@ from soundboard.ui.panel import bar, fold_button, hint_label, icon_label, sectio
 from soundboard.ui.restyled import measured, on_restyle
 from soundboard.ui.livevoice import MODELS, LiveVoice
 from soundboard.ui.speechinstall import SpeechInstalls
+from soundboard.ui.widgets import fit_placeholder
 from soundboard.wheelguard import no_wheel
 from soundboard import errors
 from soundboard.i18n import _, ngettext
 
 
+log = logging.getLogger(__name__)
 LIVE_MODULE = "live-voice"
 def default_speech_settings() -> dict:
     return {"voice": "", "rate": 0, "gain": 1.0, "model": "base.en", "language": "en",
@@ -312,7 +315,7 @@ class SpeechPanel(QWidget):
         self.say_bar, row = bar()
         row.addWidget(icon_label("speech", _("Or type a line and it's spoken in the voice")))
         self.ed = QLineEdit()
-        self.ed.setPlaceholderText(_("Type a line and press Enter"))
+        fit_placeholder(self.ed, _("Type a line and press Enter"), _("Type here"))
         self.ed.returnPressed.connect(self._say)
         self.ed.textEdited.connect(self._warm_for_a_line)
         row.addWidget(self.ed, 1)
@@ -333,6 +336,8 @@ class SpeechPanel(QWidget):
         row.addWidget(b_keep)
         row.addWidget(b_stop)
         self.say_stop = b_stop
+        b_keep.setAccessibleName(_("Save as sound"))
+        self.say_bar.installEventFilter(self)   # narrow: Save as sound goes down to its +
 
         self.cb_voice.currentIndexChanged.connect(self._voice_picked)
         for sig in (self.sl_rate.valueChanged,
@@ -399,6 +404,36 @@ class SpeechPanel(QWidget):
         self.ctl.say(text)
         self._log_said(text)
         self._last_said = text
+
+    def eventFilter(self, obj, e):   # noqa: N802 - Qt
+        try:
+            if obj is self.say_bar and e.type() in (QEvent.Type.Resize, QEvent.Type.Show,
+                                                    QEvent.Type.LayoutRequest):
+                self._fit_say_bar()
+        except Exception:  # noqa: BLE001 - never raise from a Qt override (AGENT-RULES)
+            log.exception("speech: say bar resize")
+        return super().eventFilter(obj, e)
+
+    def _fit_say_bar(self):
+        """Save as sound shows its words while the box beside it still has room for
+        "Type here"; narrower, just its + (the tooltip says the rest), so the box isn't
+        cut to its first letters."""
+        b, ed = self.b_keep, self.ed
+        word = _("Save as sound")
+        shown = b.text()
+        b.setText(word)
+        lay = self.say_bar.layout()
+        m = lay.contentsMargins()
+        others = sum(w.sizeHint().width() for w in (lay.itemAt(i).widget()
+                                                    for i in range(lay.count()))
+                     if w is not None and w is not ed and not w.isHidden())
+        gaps = lay.spacing() * max(lay.count() - 1, 0)
+        room = self.say_bar.width() - m.left() - m.right() - others - gaps
+        need = ed.fontMetrics().horizontalAdvance(_("Type here")) + 64
+        want = word if room >= need else ""
+        b.setText(shown)
+        if b.text() != want:   # changed only when it must (no resize loop)
+            b.setText(want)
 
     def _save_line(self):
         """Save as sound: the typed line (else the last one said) spoken into a pad."""

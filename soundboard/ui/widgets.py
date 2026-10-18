@@ -14,7 +14,8 @@ from PySide6.QtGui import (QColor, QDrag, QFont, QFontMetrics, QLinearGradient, 
 from PySide6.QtWidgets import (QAbstractButton, QAbstractSlider, QApplication, QComboBox,
                                QGridLayout, QLabel, QLineEdit, QMainWindow, QMenu, QTabBar,
                                QScrollArea,
-                               QSlider, QStackedWidget, QStyle, QStyleOptionSlider,
+                               QSlider, QStackedWidget, QStyle, QStyleOptionFrame,
+                               QStyleOptionSlider,
                                QTabWidget, QToolTip,
                                QVBoxLayout, QWidget)
 from shiboken6 import delete as qt_delete
@@ -67,6 +68,55 @@ def widget_at(layout, i: int):
     if type(layout).__module__.startswith("PySide6."):
         qt_invalidate(item)
     return w
+
+
+class _PlaceholderFit(QObject):
+    """fit_placeholder's resize watcher (one for the app)."""
+
+    def eventFilter(self, obj, e):   # noqa: N802 - Qt
+        try:
+            if e.type() in (QEvent.Type.Resize, QEvent.Type.FontChange,
+                            QEvent.Type.StyleChange):
+                _refit_placeholder(obj)
+        except Exception:  # noqa: BLE001 - never raise from a Qt override (AGENT-RULES)
+            pass
+        return False
+
+
+_placeholder_fit: _PlaceholderFit | None = None
+
+
+def fit_placeholder(edit: QLineEdit, *hints: str):
+    """The box's grey hint: the first of `hints` (longest first) that fits, else the
+    last ("Search"). Qt cut a long one to its first letters ("Sea…") in a narrow
+    window. Call it again to change the words."""
+    global _placeholder_fit
+    if _placeholder_fit is None:
+        _placeholder_fit = _PlaceholderFit(QApplication.instance())
+    if getattr(edit, "_placeholders", None) is None:
+        edit.installEventFilter(_placeholder_fit)
+    edit._placeholders = hints
+    _refit_placeholder(edit)
+
+
+def _refit_placeholder(edit: QLineEdit):
+    hints = getattr(edit, "_placeholders", ())
+    if not hints:
+        return
+    # the room for text: its contents less the icon buttons inside it (search, clear:
+    # the clear one keeps its place while the box is empty) and Qt's own 2 px a side
+    opt = QStyleOptionFrame()
+    edit.initStyleOption(opt)
+    room = edit.style().subElementRect(QStyle.SubElement.SE_LineEditContents, opt,
+                                       edit).width()
+    m = edit.textMargins()
+    room -= m.left() + m.right() + 8 + sum(
+        c.width() for c in edit.children()
+        if isinstance(c, QWidget) and c.metaObject().className() == "QLineEditIconButton")
+    fm = edit.fontMetrics()
+    text = next((h for h in hints if fm.horizontalAdvance(h) <= room), hints[-1])
+    if edit.placeholderText() != text:
+        edit.setPlaceholderText(text)
 
 
 class InlineNameBox(QLineEdit):
