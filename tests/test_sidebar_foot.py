@@ -287,3 +287,33 @@ def test_settings_showing_draws_its_cog_in_the_accent(window):  # noqa: F811
     inked = [img.pixelColor(x, y) for x in range(20) for y in range(20)
              if img.pixelColor(x, y).alpha() > 200]
     assert inked and inked[0].rgb() == QColor(theme.T["accent"]).rgb()
+
+
+def test_a_tab_switch_doesnt_lay_the_rail_out_again(window, monkeypatch):  # noqa: F811
+    """Switching tabs recomputed the audio status and laid the rail's status out again
+    (~15 ms of each switch on a slow laptop) though nothing on it changed: now only
+    Setup (whose hints those are) brings it up to date, and the same words put on a
+    status button again change nothing. New words still show."""
+    from soundboard.ui import sidebar
+    from soundboard.ui.tabcontrol import TAB_INDEX
+    window.resize(1200, 800)
+    window.show()
+    QApplication.processEvents()
+    status, shown = [], []
+    real_status, real_show = window.statusctl._update_status, SideRail.show_status
+    monkeypatch.setattr(window.statusctl, "_update_status",
+                        lambda: status.append(1) or real_status())
+    monkeypatch.setattr(SideRail, "show_status",
+                        lambda self, w: shown.append(w) or real_show(self, w))
+    for key in ("apps", "voice", "store", "sounds"):
+        window.tabs.setCurrentIndex(TAB_INDEX[key])
+        QApplication.processEvents()
+    assert not status and not shown
+    window.tabs.setCurrentIndex(TAB_INDEX["setup"])
+    QApplication.processEvents()
+    assert status and not shown        # the same words: the rail stays as it is
+    live = window.btn_air
+    text = live.property("railtext")
+    sidebar.put(live, "Something new")
+    assert shown == [live] and live.accessibleName() == "Something new"
+    sidebar.put(live, text)

@@ -675,7 +675,10 @@ class WindowBuilder(Controller):
         mw.tabs.currentChanged.connect(lambda _i: mw.fitctl._fit_dl_bar())
         mw.tabs.currentChanged.connect(mw.tabctl._count_tab)   # names only (usage.py)
         mw.tabctl._count_tab(mw.tabs.currentIndex())
-        mw.tabs.currentChanged.connect(lambda _i: mw.statusctl._update_status())
+        # Setup's hints and flow, fresh as it's opened (only there: on every tab it was
+        # ~4 ms here and ~15 on a slow laptop of each switch, for nothing that changed)
+        mw.tabs.currentChanged.connect(
+            lambda i: i == TAB_INDEX["setup"] and mw.statusctl._update_status())
         mw.tabs.currentChanged.connect(mw._focus_sounds_page)
         # an urgent Onion Watch fix's banner shows on the Triggers tab only
         mw.tabs.currentChanged.connect(

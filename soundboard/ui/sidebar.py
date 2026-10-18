@@ -250,14 +250,14 @@ def put(w: QPushButton, text: str, full: str = "", tip: str = ""):
     """What a status button on the rail (`status`: Live, Stop all, the setup pill…)
     says. Expanded rails show its label; collapsed rails show its icon. `full`
     (default `text`) is its name for a screen reader and the first line of its tip,
-    over `tip`."""
+    over `tip`. The same words again change nothing (the rail isn't laid out again)."""
     w.setProperty("railtext", text)
     w.setProperty("railfull", full or text)
     w.setProperty("railtip", tip)
     rail = w.parentWidget()
     while rail is not None and not isinstance(rail, SideRail):   # (in a see-through box)
         rail = rail.parentWidget()
-    if rail is not None:
+    if rail is not None and w.property("railshown") != [text, full or text, tip]:
         rail.show_status(w)
 
 
@@ -1757,6 +1757,7 @@ class SideRail(QFrame):
         """A status button as `put` left it, for the rail open or shut."""
         full, tip = w.property("railfull") or "", w.property("railtip") or ""
         text = w.property("railtext") or full
+        w.setProperty("railshown", [w.property("railtext"), full, w.property("railtip")])
         if w.objectName() == "modebtn":
             text = _("Listening: {mode}", mode=text)
         w.setText(self._fit(w, text) if self.is_open() and not self._small(w) else "")
