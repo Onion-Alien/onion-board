@@ -183,3 +183,20 @@ def test_the_overlay_page_names_its_hotkey(window, qapp):  # noqa: F811
     qapp.processEvents()
     buttons = d.hk_buttons["overlay_hotkey"]
     assert buttons and all(b.text() == pretty_key("alt+`") for b in buttons)
+
+
+def test_narrow_hotkey_rows_put_the_key_under_the_words(window, qapp):  # noqa: F811
+    """Settings > Hotkeys in a narrow window: each key button goes under its words (beside
+    them, the words got a word a line); wide, back beside them."""
+    from PySide6.QtWidgets import QApplication
+    window.show()
+    d = window.setctl.open_settings("hotkeys")
+    b = d.hk_buttons["stop_hotkey"][0] if "stop_hotkey" in d.hk_buttons \
+        else next(iter(d.hk_buttons.values()))[0]
+    for width, under in ((440, True), (1280, False)):
+        window.resize(width, 700)
+        for _ in range(20):
+            QApplication.processEvents()
+        row = b.parentWidget()
+        words = row.layout().itemAt(0).layout().itemAt(0).widget()
+        assert (b.y() > words.y() + words.height() - 1) == under, width

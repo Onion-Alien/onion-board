@@ -1,9 +1,12 @@
 """Settings → Hotkeys and Overlay: every global hotkey and the in-game overlay."""
 from __future__ import annotations
 
+import logging
+
 from PySide6.QtCore import Qt
-from PySide6.QtWidgets import (QApplication, QCheckBox, QComboBox, QGridLayout,
-                               QHBoxLayout, QLabel, QPushButton, QSlider, QVBoxLayout)
+from PySide6.QtWidgets import (QApplication, QBoxLayout, QCheckBox, QComboBox, QGridLayout,
+                               QHBoxLayout, QLabel, QPushButton, QSlider, QVBoxLayout,
+                               QWidget)
 from shiboken6 import isValid as qt_valid
 
 from soundboard.i18n import _
@@ -14,6 +17,8 @@ from soundboard.ui.hotkeypick import (HOTKEY_ACTIONS, HOTKEY_GROUP_ICONS, HOTKEY
                                       HotkeyDialog, pretty_key)
 from soundboard.ui.settingspages import Page, _button_row
 from soundboard.wheelguard import no_wheel
+
+log = logging.getLogger(__name__)
 
 __all__ = ["HOTKEY_ACTIONS", "HOTKEY_GROUP_ICONS", "HOTKEY_GROUPS", "HotkeyDialog", "KeysPage",
            "pretty_key"]
@@ -84,7 +89,8 @@ class KeysPage(Page):
         return w
 
     def _hk_row(self, lay, attr, label, desc):
-        row = QHBoxLayout()
+        holder = _HotkeyRow()
+        row = holder.row
         text = QVBoxLayout()
         text.setSpacing(0)
         t = QLabel(label)
@@ -102,14 +108,18 @@ class KeysPage(Page):
         # each row's buttons say which hotkey they're for (a screen reader read every
         # row as "Click to set" and "Clear")
         b.setAccessibleName(_("{label} hotkey", label=label))
-        row.addWidget(b)
+        keys = QHBoxLayout()   # the key and its ✕: beside the words, or under them narrow
+        keys.setSpacing(8)
+        keys.addWidget(b)
         x = QPushButton()
         x.setObjectName("small")
         icons.close_button(x, 24)
         x.setAccessibleName(_("Clear the {label} hotkey", label=label))
         x.clicked.connect(lambda __=False, a=attr: self._set_hk(a, ""))
-        row.addWidget(x)
-        lay.addLayout(row)
+        keys.addWidget(x)
+        keys.setAlignment(Qt.AlignmentFlag.AlignLeft)
+        row.addLayout(keys)
+        lay.addWidget(holder)
         self.dlg.hk_buttons.setdefault(attr, []).append(b)
 
     def _refresh_hk(self):
@@ -287,3 +297,28 @@ class KeysPage(Page):
     def _ov_sync(self):
         for wdg in getattr(self.dlg, "ov_toggle_only", ()):
             wdg.setEnabled(self.mw.overlay.s.mode == "toggle")   # hold mode: letting go hides
+
+
+class _HotkeyRow(QWidget):
+    """One hotkey's row: its name and what it does, then its key and ✕ beside them, or
+    under them in a narrow window (beside, the words got a word a line)."""
+
+    NARROW = 420   # px: under this the key goes under the words
+
+    def __init__(self):
+        super().__init__()
+        self.row = QBoxLayout(QBoxLayout.Direction.LeftToRight, self)
+        self.row.setContentsMargins(0, 0, 0, 0)
+        self.row.setSpacing(16)
+
+    def resizeEvent(self, e):   # noqa: N802 - Qt
+        super().resizeEvent(e)
+        try:
+            way = (QBoxLayout.Direction.TopToBottom if self.width() < self.NARROW
+                   else QBoxLayout.Direction.LeftToRight)
+            if self.row.direction() != way:   # (only when it changes: no resize loop)
+                self.row.setDirection(way)
+                # beside: a clear gap from the words; under: just below them
+                self.row.setSpacing(6 if way == QBoxLayout.Direction.TopToBottom else 16)
+        except Exception:  # noqa: BLE001 - never raise from a Qt override (AGENT-RULES)
+            log.exception("hotkey row: resize")
