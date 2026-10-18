@@ -700,24 +700,26 @@ class Child:
                                                title="Fake player")]
             self._tab("apps")
         else:
-            i = TAB_INDEX[key]
-            if not w.tabs.isTabVisible(i) or (key == "triggers" and not self._panel()
-                                               and not self._load_trigger_tab()):
+            i = TAB_INDEX[key]   # (Triggers without the add-on: Hoot's page)
+            if not w.tabs.isTabVisible(i):
                 return {"skipped": True}
             w.tabs.setCurrentIndex(i)
         self.run_for(self.SETTLE_S)
         return None
 
-    def _load_trigger_tab(self) -> bool:
-        try:
-            self.w.load_triggers()
-        except Exception:  # noqa: BLE001 - no add-on: that tab is skipped
-            return False
-        return self._panel() is not None
+    def sc_wait_store(self):
+        """The Community tab stays open past its Bun's moving time (not compared: it's
+        tab_store_rested past it)."""
+        from soundboard.ui import storelook
+        self.run_for(getattr(storelook, "BUN_REST_S", 30.0) + 2)
+        bun = getattr(getattr(self.w, "store", None), "bun", None)
+        return {"bun_resting": getattr(bun, "resting", None)}
 
     def _sit(self, key: str) -> dict:
         self.run_for(self.secs)
         out = {"page": key, "settings_open": self.w.setctl.settings_open()}
+        if key == "store_rested":
+            key = "store"
         if key == "apps_card":
             out["cards"] = len(getattr(self.w.apps, "rows", {}))
         return out
@@ -845,7 +847,7 @@ class Child:
 
 def _tab_scenarios():
     from perf.runner import TAB_KEYS
-    for key in [*TAB_KEYS, "triggers"]:
+    for key in [*TAB_KEYS, "triggers", "store_rested"]:
         setattr(Child, f"sc_open_{key}", lambda self, k=key: self._open_page(k))
         setattr(Child, f"sc_tab_{key}", lambda self, k=key: self._sit(k))
 
