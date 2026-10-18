@@ -10,7 +10,7 @@ A click gives it a little wobble.
 It always paints in the current theme's accent colours, so theme switches recolour
 it on the next frame. The widget is a little bigger than the mark to leave room for
 the glow. The timer only runs while it's on screen, always at the same pace (a slower
-idle pace made the breathing judder next to the smooth sheen). In lite mode (ui/lite.py)
+idle pace made the breathing judder next to the smooth sheen). In lite mode (ui/settings/lite.py)
 it's a still glow: no timer, no sheen, no embers (`lite_changed` after a switch).
 """
 from __future__ import annotations
@@ -27,7 +27,7 @@ from PySide6.QtWidgets import QWidget
 
 from soundboard.ui.kit import theme
 from soundboard.ui.kit import appstate
-from soundboard.ui import lite
+from soundboard.ui.settings import lite
 from soundboard.ui.kit.pixels import snap_to_pixels
 
 FLAME = QColor("#ff8a2b")

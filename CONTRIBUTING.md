@@ -67,7 +67,7 @@ in a later commit.
    internet goes in the table in [SECURITY.md](SECURITY.md#what-the-app-does-on-the-network)
    in the same PR. No telemetry beyond the opt-out anonymous usage count
    (`soundboard/core/usage.py`); anything new it sends goes in SECURITY.md's *The anonymous
-   usage count* and the app's own table of it (`ui/countdialog.py`) in the same PR.
+   usage count* and the app's own table of it (`ui/settings/countdialog.py`) in the same PR.
 8. **Loopback stays locked.** Local sockets bind to `127.0.0.1` only and must
    check a secret with `secrets.compare_digest`: a per-launch one, or, for the
    opt-in remote control API, the key shown in Settings. Never log the secret or

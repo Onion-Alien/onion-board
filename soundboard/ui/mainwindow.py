@@ -70,7 +70,8 @@ from soundboard.ui.importcontrol import ImportControl
 from soundboard.ui.updatecontrol import UpdateControl
 from soundboard.ui.kit import toast as toastmod
 from soundboard.ui.kit import a11y, appstate, busy, icons
-from soundboard.ui import lite, livesize, responsive, splash, taboff
+from soundboard.ui.settings import lite
+from soundboard.ui import livesize, responsive, splash, taboff
 from soundboard.ui.setup import tabtours
 from soundboard.ui.sounds.linkbar import PLAY_ID as LINK_ID
 from soundboard.ui.logowidget import glow_icon

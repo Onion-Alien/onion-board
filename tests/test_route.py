@@ -7,7 +7,7 @@ import pytest
 from soundboard.core import backup, reset
 from soundboard.audio import engine
 from soundboard.sounds.library import Config
-from soundboard.settings import SettingsDialog
+from soundboard.ui.settings.settings import SettingsDialog
 from soundboard.ui import mainwindow as main
 from soundboard.ui.setup import setupwizard
 from soundboard.ui.routecontrol import ROUTE_DEVICE
@@ -394,7 +394,7 @@ def test_also_send_is_kept_on_this_pc_and_reset_with_the_devices():
 
 
 def test_leaving_settings_on_a_new_non_cable_device_asks_once(win, monkeypatch):
-    from soundboard.ui import routewarn
+    from soundboard.ui.settings import routewarn
     assert routewarn.needs_warning("device", "Speakers", PHONES)
     assert not routewarn.needs_warning("device", CABLE, PHONES)   # a cable: fine
     assert not routewarn.needs_warning("device", "VoiceMeeter Input (VB-Audio)", PHONES)

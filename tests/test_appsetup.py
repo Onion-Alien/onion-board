@@ -4,7 +4,7 @@ import pytest
 
 from soundboard.mic import appsetup, profiles
 from soundboard.sounds.library import Config
-from soundboard.settings import SettingsDialog
+from soundboard.ui.settings.settings import SettingsDialog
 from soundboard.ui.kit import toast
 from test_mainwindow import window as main_window  # noqa: F401 - the real window, offscreen
 

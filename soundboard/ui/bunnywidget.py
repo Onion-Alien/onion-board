@@ -49,7 +49,7 @@ his bubble still move every frame.
 (or after the last sound, click or burst), then finishes what he's doing and holds
 still: the timer stops and the last pose stays, so an empty page costs nothing. A
 sound (`set_groove`), the mic (`set_level`) or a click wakes him; showing him again
-gives him another N seconds. In lite mode (ui/lite.py) every Bun rests like that after
+gives him another N seconds. In lite mode (ui/settings/lite.py) every Bun rests like that after
 lite.REST_S (`_rest_s`), so he's a still picture until something happens.
 
 Over the pose sits a springy layer (`_spring`, `springy`): his ears trail behind his
@@ -96,7 +96,8 @@ from soundboard.bunny import (
 from soundboard.i18n import _
 from soundboard.style import bunnyfit, mascotlines
 from soundboard.ui.kit import appstate
-from soundboard.ui import bunskits, lite
+from soundboard.ui import bunskits
+from soundboard.ui.settings import lite
 from soundboard.ui.kit.pixels import snap_to_pixels
 
 log = logging.getLogger(__name__)

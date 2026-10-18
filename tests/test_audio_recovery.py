@@ -7,7 +7,7 @@ from PySide6.QtCore import QEvent
 from PySide6.QtWidgets import QComboBox, QLabel, QPushButton
 
 from soundboard.mic import directmic as dm
-from soundboard.settings import SettingsDialog
+from soundboard.ui.settings.settings import SettingsDialog
 from soundboard.ui.setup.audiorecovery import RecoveryCard
 from test_mainwindow import window  # noqa: F401
 

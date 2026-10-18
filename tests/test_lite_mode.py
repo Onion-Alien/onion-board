@@ -1,4 +1,4 @@
-"""Lite mode (ui/lite.py): the setting, and that each thing it turns off really stops."""
+"""Lite mode (ui/settings/lite.py): the setting, and that each thing it turns off really stops."""
 import pytest
 
 from PySide6.QtCore import QAbstractAnimation
@@ -6,8 +6,8 @@ from PySide6.QtCore import QAbstractAnimation
 from conftest import said, unsay
 from soundboard.sounds import library
 from soundboard.ui.kit import theme
-from soundboard.settings import SettingsDialog
-from soundboard.ui import lite
+from soundboard.ui.settings.settings import SettingsDialog
+from soundboard.ui.settings import lite
 from soundboard.ui.kit import toast
 from test_bunnywidget import _Clock
 from test_mainwindow import window  # noqa: F401  (the real MainWindow fixture)

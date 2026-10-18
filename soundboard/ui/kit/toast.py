@@ -27,7 +27,7 @@ dialog in front. ``busy.toast`` is the same call; most code uses that.
 
 Child widgets of the window, never their own windows, so they never take focus from a
 game. Animations are skipped when Windows' "Animation effects" setting is off, and in
-lite mode (ui/lite.py).
+lite mode (ui/settings/lite.py).
 """
 from __future__ import annotations
 
@@ -48,7 +48,7 @@ from PySide6.QtWidgets import (QApplication, QDialog, QFrame, QGraphicsDropShado
 from soundboard.ui.kit import theme
 from soundboard.i18n import _
 from soundboard.ui.kit import icons
-from soundboard.ui import lite
+from soundboard.ui.settings import lite
 from soundboard.ui.kit.pixels import snap_to_pixels
 
 log = logging.getLogger(__name__)

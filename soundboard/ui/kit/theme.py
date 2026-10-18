@@ -300,7 +300,7 @@ QPushButton#railupdatecopy:focus { border-color:$accent; }
 QFrame#sidebar[compact="true"] QToolButton#railtab,
 QFrame#sidebar[compact="true"] QPushButton { padding-top:2px; padding-bottom:2px; }
 QPushButton#settings { padding:6px 14px; font-weight:600; }
-QPushButton#langbutton { padding-left:7px; }   /* ui/langpick.py: the round coin sits near its edge */
+QPushButton#langbutton { padding-left:7px; }   /* ui/settings/langpick.py: the round coin sits near its edge */
 QFrame#transport, QFrame#deck { background:$panel; border-radius:12px; }
 QDialog#transport { background:$panel; }
 QDialog[popover="true"] { background:$panel; border:1px solid $border; }

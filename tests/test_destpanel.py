@@ -3,7 +3,7 @@ from PySide6.QtWidgets import QApplication, QComboBox, QLabel
 
 from soundboard.mic import destination
 from soundboard.sounds.library import Config
-from soundboard.settings import SettingsDialog
+from soundboard.ui.settings.settings import SettingsDialog
 from soundboard.ui.setup.destpanel import CustomDestDialog, DestPanel, describe
 from test_mainwindow import window  # noqa: F401  (the real MainWindow fixture)
 

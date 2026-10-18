@@ -374,7 +374,7 @@ def test_tab_leaves_the_network_activity_table(qapp):
     from PySide6.QtTest import QTest
     from PySide6.QtWidgets import QLineEdit, QTableWidgetItem, QVBoxLayout, QWidget
 
-    from soundboard.ui.netactivity import ActivityTable
+    from soundboard.ui.settings.netactivity import ActivityTable
     host = QWidget()
     lay = QVBoxLayout(host)
     table = ActivityTable(["a", "b", "c", "d", "e", "f"], 1)

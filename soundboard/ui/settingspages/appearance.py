@@ -414,7 +414,7 @@ class AppearancePage(Page):
         return card
 
     def _lite_card(self) -> QFrame:
-        """Lite mode (ui/lite.py): calmer and lighter for slower PCs, applied at once."""
+        """Lite mode (ui/settings/lite.py): calmer and lighter for slower PCs, applied at once."""
         card, cv = self._card(_("Lite mode"),
                               _("For slower PCs: no animations, Bun holds still and the "
                                 "themes are plain. Everything still works."), icon="leaf")
@@ -508,7 +508,7 @@ class AppearancePage(Page):
             word = i18n.in_language(other, lambda: _("Language"))
             title = title if word == title else f"{title} · {word}"
         card, cv = self._card(title, icon="browser")
-        from soundboard.ui.langpick import LangButton
+        from soundboard.ui.settings.langpick import LangButton
         pick = LangButton()
         pick.setAccessibleName(_("Language"))
         pick.setToolTip(_("Pick the language Onion Board is shown in"))
@@ -547,7 +547,7 @@ class AppearancePage(Page):
             restart.setVisible(later)
 
         def open_picker():
-            from soundboard.ui.langpick import LanguageDialog
+            from soundboard.ui.settings.langpick import LanguageDialog
             if self.dlg.lang_dialog is not None and self.dlg.lang_dialog.isVisible():
                 return
             dlg = LanguageDialog(self.dlg, chosen())

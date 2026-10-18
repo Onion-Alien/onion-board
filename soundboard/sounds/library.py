@@ -423,7 +423,7 @@ class Config:
     # True = each theme's own pattern on the panels (new installs); False = Plain. Every
     # saved config has it, so changing this default only reaches new installs
     theme_texture: bool = True
-    # Lite mode (ui/lite.py): animations, Bun's idle moves and the textures off
+    # Lite mode (ui/settings/lite.py): animations, Bun's idle moves and the textures off
     lite_mode: bool = False
     lite_hint_done: bool = False   # a slower PC was told about lite mode once
     eq_enabled: bool = False
@@ -568,7 +568,7 @@ class Config:
     # "alerts": {type: [rule, ...]}, "alerts_on": bool}; set through /api/chat_rules
     # and /api/alerts
     api_stream: dict = field(default_factory=dict)
-    # "remote" add-ons' own settings (soundboard.ui.remotehost), by add-on id: Onion
+    # "remote" add-ons' own settings (soundboard.ui.settings.remotehost), by add-on id: Onion
     # Pocket's on / off, port and key
     remote_addons: dict = field(default_factory=dict)
     # Settings > Connection (soundboard.online.net): "direct", "proxy" through

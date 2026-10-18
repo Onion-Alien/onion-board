@@ -1,4 +1,4 @@
-"""The pages of the Settings window (soundboard.settings.SettingsDialog), one module each.
+"""The pages of the Settings window (soundboard.ui.settings.settings.SettingsDialog), one module each.
 
 Each page is a QObject the dialog owns (``SettingsDialog.<page>``), not a plain object: a
 timer or signal aimed at one of its methods then stops with the dialog (Qt drops a
@@ -15,7 +15,7 @@ from PySide6.QtCore import QObject
 if TYPE_CHECKING:
     from PySide6.QtWidgets import QCheckBox, QWidget
 
-    from soundboard.settings import SettingsDialog
+    from soundboard.ui.settings.settings import SettingsDialog
     from soundboard.ui.mainwindow import MainWindow
 
 

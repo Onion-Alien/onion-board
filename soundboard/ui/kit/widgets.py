@@ -31,7 +31,7 @@ from soundboard.audio.engine import SR
 from soundboard.sounds.library import AUDIO_EXTS, SoundMeta
 from soundboard.ui.kit.hotkeypick import pretty_key
 from soundboard.ui.kit import icons
-from soundboard.ui import lite
+from soundboard.ui.settings import lite
 from soundboard.ui.bunnywidget import BunnyWidget
 from soundboard.i18n import _
 from soundboard.ui.kit.pixels import snap_to_pixels

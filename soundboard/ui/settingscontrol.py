@@ -15,8 +15,8 @@ from shiboken6 import isValid as qt_valid
 
 from soundboard.control import remote
 from soundboard.audio.engine import is_virtual as is_virtual_cable
-from soundboard.settings import SettingsDialog
-from soundboard.ui import routewarn
+from soundboard.ui.settings.settings import SettingsDialog
+from soundboard.ui.settings import routewarn
 from soundboard.ui.controller import Controller
 from soundboard.ui.kit.crashdialog import free_dialog, rehome_crash_reports
 from soundboard.ui.sounds.dialogs import EditDialog

@@ -634,7 +634,7 @@ from test_mainwindow import window  # noqa: E402,F401  (the real MainWindow fixt
 
 def test_settings_ytdlp_row(qapp, window, monkeypatch):  # noqa: F811
     """Updates > Helper programs: yt-dlp's Update now says how it went on its row."""
-    from soundboard.settings import SettingsDialog
+    from soundboard.ui.settings.settings import SettingsDialog
     from soundboard.ui.kit import busy
     monkeypatch.setattr(ytdl, "active_version", lambda: ("2026.8.19", False))
     monkeypatch.setattr(ytdl, "update", lambda: "Updated yt-dlp to 2099.1.1.")
@@ -653,7 +653,7 @@ def test_settings_ytdlp_row(qapp, window, monkeypatch):  # noqa: F811
 def test_force_update_warns_first(qapp, window, monkeypatch):  # noqa: F811
     """Force update installs nothing until the warning's Install anyway; Cancel does
     nothing at all."""
-    from soundboard.settings import SettingsDialog
+    from soundboard.ui.settings.settings import SettingsDialog
     from soundboard.ui.kit import busy
     calls = []
     monkeypatch.setattr(ytdl, "active_version", lambda: ("2026.8.19", False))

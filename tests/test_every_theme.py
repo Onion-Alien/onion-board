@@ -10,7 +10,7 @@ from PySide6.QtWidgets import (QAbstractButton, QApplication, QFrame, QPushButto
 from test_mainwindow import window as main_window  # noqa: F401 - the real window, offscreen
 
 from soundboard.ui.kit import theme
-from soundboard.settings import ThemeCard
+from soundboard.ui.settings.settings import ThemeCard
 from soundboard.ui.kit import icons
 
 

@@ -336,7 +336,7 @@ class ConnectionPage(Page):
 
     def _activity_card(self):
         """Network activity: every connection the app has made (soundboard.online.netlog)."""
-        from soundboard.ui.netactivity import NetActivity
+        from soundboard.ui.settings.netactivity import NetActivity
         card, cv = self._card(_("Network activity"), icon="list")
         self.dlg.net_activity = NetActivity(card)
         cv.addWidget(self.dlg.net_activity)

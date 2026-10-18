@@ -811,7 +811,7 @@ class SetupWizard(QDialog):
     def _page_look(self) -> QWidget:
         """First launch only: the language, a theme, and starting with Windows."""
         from soundboard import i18n
-        from soundboard.ui.langpick import LangButton
+        from soundboard.ui.settings.langpick import LangButton
         from soundboard.ui.settingspages.appearance import ThemeCard, ThemeGrid
         p = QWidget()
         v = QVBoxLayout(p)
@@ -837,7 +837,7 @@ class SetupWizard(QDialog):
         cl.addWidget(self.lang_note)
 
         def open_picker():
-            from soundboard.ui.langpick import LanguageDialog
+            from soundboard.ui.settings.langpick import LanguageDialog
             dlg = LanguageDialog(self, code)
             dlg.setAttribute(Qt.WidgetAttribute.WA_DeleteOnClose)
             dlg.chosen.connect(self._pick_language)

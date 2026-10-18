@@ -473,7 +473,7 @@ def test_voices_say_queue_and_hear(qapp, window):
 def test_settings_key_show_says_hide_and_turning_off_hides_it(qapp, window):
     from PySide6.QtWidgets import QLineEdit, QPushButton
 
-    from soundboard.settings import SettingsDialog
+    from soundboard.ui.settings.settings import SettingsDialog
     w = window
     w.cfg.api_port = 0
     d = SettingsDialog(w, "remote")

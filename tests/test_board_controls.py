@@ -696,7 +696,7 @@ def menu_pick(monkeypatch, path):
 def test_pad_menu_is_short_grouped_and_shows_the_hotkey(window, monkeypatch):
     w = window
     shown = menu_pick(monkeypatch, ["Set hotkey"])
-    from soundboard.settings import HotkeyDialog
+    from soundboard.ui.settings.settings import HotkeyDialog
     monkeypatch.setattr(HotkeyDialog, "exec",
                         lambda self: setattr(self, "result_combo", "ctrl+alt+7") or True)
     w.padctl.pad_menu("s0", None)
@@ -852,7 +852,7 @@ def test_hotkeys_let_the_game_have_the_key_unless_turned_off(window, monkeypatch
     key (F1 does the game's F1 too). The overlay's keys are always taken while it's up."""
     from PySide6.QtWidgets import QCheckBox
 
-    from soundboard.settings import SettingsDialog
+    from soundboard.ui.settings.settings import SettingsDialog
     w = window
     seen = []
     monkeypatch.setattr(w.hotkeys, "register",
@@ -880,7 +880,7 @@ def test_the_hotkey_box_warns_about_a_bare_letter_only_when_games_lose_it(window
     from PySide6.QtGui import QKeyEvent
     from PySide6.QtWidgets import QApplication
 
-    from soundboard.settings import HotkeyDialog
+    from soundboard.ui.settings.settings import HotkeyDialog
     w = window
     monkeypatch.setattr(w.hotkeys, "register", lambda m: None)
 

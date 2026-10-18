@@ -12,7 +12,7 @@ from test_mainwindow import window as main_window  # noqa: F401 - the real windo
 from soundboard.core import hangwatch
 from soundboard.ui.kit import theme
 from soundboard.sounds.library import SoundMeta
-from soundboard.settings import SettingsDialog
+from soundboard.ui.settings.settings import SettingsDialog
 import pytest
 
 # ~0.5 s on a real PC. Hosted CI runners take 1.2-2.5 s for the same unchanged code

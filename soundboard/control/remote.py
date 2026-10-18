@@ -66,7 +66,7 @@ the URL wins); /api/event also reads the JSON Twitch EventSub, StreamElements,
 Streamlabs and Ko-fi send.
 
 The same server, given `lan=True`, is what "remote" add-ons such as Onion Pocket
-get (soundboard.ui.remotehost): it listens on this PC's address on the home network
+get (soundboard.ui.settings.remotehost): it listens on this PC's address on the home network
 instead, with the add-on's own key, a shorter list of actions, and a page served at
 / without a key (the page holds nothing; Onion Pocket hands the phone its key in the
 link's #fragment, which browsers never send). It answers only addresses on the local

@@ -5,7 +5,7 @@ from PySide6.QtCore import QEvent, QPoint, Qt
 from PySide6.QtTest import QTest
 
 from soundboard.audio import engine
-from soundboard import settings
+from soundboard.ui.settings import settings
 from soundboard.ui.kit import theme
 from soundboard.control import winkeys
 from soundboard.ui import fitcontrol, settingscontrol

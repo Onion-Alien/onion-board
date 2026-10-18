@@ -36,7 +36,7 @@ from soundboard.sounds import library
 from soundboard.ui.kit import theme
 from soundboard.control import winkeys
 from soundboard.i18n import _, ngettext
-from soundboard.ui import lite
+from soundboard.ui.settings import lite
 from soundboard.ui.kit.pixels import snap_to_pixels
 
 log = logging.getLogger(__name__)

@@ -8,7 +8,7 @@ from PySide6.QtCore import QEvent
 from PySide6.QtWidgets import (QAbstractScrollArea, QAbstractSlider, QAbstractSpinBox,
                                QApplication, QComboBox, QScrollBar, QWidget)
 
-from soundboard.settings import SettingsDialog
+from soundboard.ui.settings.settings import SettingsDialog
 from test_mainwindow import window  # noqa: F401  (the real MainWindow fixture)
 
 

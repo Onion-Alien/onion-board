@@ -92,12 +92,12 @@ class RemoteHost:
     # ------------------------------------------------------------------ Settings' look
     @staticmethod
     def card(title: str, hint: str = ""):
-        from soundboard.settings import SettingsDialog
+        from soundboard.ui.settings.settings import SettingsDialog
         return SettingsDialog._card(title, hint)
 
     @staticmethod
     def button_row():
-        from soundboard.settings import _button_row
+        from soundboard.ui.settings.settings import _button_row
         return _button_row()
 
     @staticmethod

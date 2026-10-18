@@ -195,7 +195,7 @@ class GeneralPage(Page):
         return card
 
     def _open_reset(self, points: bool):
-        from soundboard.ui.resetguide import ResetGuide, RestorePoints
+        from soundboard.ui.settings.resetguide import ResetGuide, RestorePoints
         (RestorePoints if points else ResetGuide)(self.mw, self.dlg).exec()
 
     # ------------------------------------------------------------------ backup

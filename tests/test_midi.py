@@ -2,7 +2,7 @@
 messages, which devices get opened, and pads firing / releasing hotkeys. A fake
 winmm backend stands in for real devices."""
 from soundboard.control import midi, winkeys
-from soundboard.settings import HotkeyDialog, pretty_key
+from soundboard.ui.settings.settings import HotkeyDialog, pretty_key
 
 
 class FakeWinMM:

@@ -46,7 +46,8 @@ from soundboard.i18n import _
 from soundboard.sounds.library import PAD_COLORS
 from soundboard.ui.kit import a11y, busy, icons
 from soundboard.ui.setup import alsosend
-from soundboard.ui import lite, sidebar, taboff
+from soundboard.ui.settings import lite
+from soundboard.ui import sidebar, taboff
 from soundboard.ui.apps.appspanel import ElidedLabel
 from soundboard.ui.buncontrol import BUN_TIP
 from soundboard.ui.controller import Controller

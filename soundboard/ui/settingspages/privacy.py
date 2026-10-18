@@ -648,7 +648,7 @@ class PrivacyPage(Page):
                                    force=h is not None and h.state == ffmpegget.OK)
 
     def _count_eye(self) -> QPushButton:
-        """Count me in's eye: opens the table of what it sends (ui/countdialog.py)."""
+        """Count me in's eye: opens the table of what it sends (ui/settings/countdialog.py)."""
         eye = QPushButton()
         eye.setObjectName("iconbutton")
         eye.setProperty("quiet", True)
@@ -657,7 +657,7 @@ class PrivacyPage(Page):
         eye.setAccessibleName(_("See what's sent"))
 
         def show():
-            from soundboard.ui import countdialog
+            from soundboard.ui.settings import countdialog
             self.dlg.count_dialog = countdialog.show(self.dlg)
         eye.clicked.connect(show)
         self.dlg.count_eye = eye

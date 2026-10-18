@@ -1264,7 +1264,7 @@ def test_settings_pages_match_the_dialog():
     """A page added to Settings needs its name in SETTINGS_PAGES, or it's never counted."""
     import re
     from pathlib import Path
-    from soundboard import settings
+    from soundboard.ui.settings import settings
     src = Path(settings.__file__).read_text(encoding="utf-8")
     start = src.index("        pages = ((")
     block = src[start:src.index("        self.categories = QListWidget()", start)]

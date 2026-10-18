@@ -5,7 +5,7 @@ from PySide6.QtTest import QTest
 from PySide6.QtWidgets import QDialog
 
 from soundboard import i18n
-from soundboard.ui.langpick import ROW_H, LanguageDialog, glyph
+from soundboard.ui.settings.langpick import ROW_H, LanguageDialog, glyph
 
 
 def test_a_tile_per_language_english_first_the_one_showing_ticked(qapp):
