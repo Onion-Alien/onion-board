@@ -676,7 +676,7 @@ class WindowBuilder(Controller):
         mw.tabs.currentChanged.connect(mw.tabctl._count_tab)   # names only (usage.py)
         mw.tabctl._count_tab(mw.tabs.currentIndex())
         # Setup's hints and flow, fresh as it's opened (only there: on every tab it was
-        # ~4 ms here and ~15 on a slow laptop of each switch, for nothing that changed)
+        # ~4 ms here and ~15 on a slower PC of each switch, for nothing that changed)
         mw.tabs.currentChanged.connect(
             lambda i: i == TAB_INDEX["setup"] and mw.statusctl._update_status())
         mw.tabs.currentChanged.connect(mw._focus_sounds_page)
