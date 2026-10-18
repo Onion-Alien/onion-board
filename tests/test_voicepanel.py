@@ -1940,3 +1940,63 @@ def test_a_saved_voice_named_like_a_ready_voice_gets_its_own_card(qapp, monkeypa
     assert p.fx.spec()["effects"]["pitch"]["semitones"] == -5.0
     p.fx._tile["Chipmunk"].click()
     assert p.fx.spec()["effects"]["pitch"]["semitones"] != -5.0
+
+
+def test_effect_cards_wait_for_edit_voice(qapp, monkeypatch):
+    """The ~20 effect cards only show in Edit voice: the panel starts without them
+    (a second of a slow PC's start) and builds them when that window first opens."""
+    monkeypatch.setattr(tts.SapiTTS, "warm_up", lambda self: [])
+    from soundboard.ui.voicefxpanel import EffectRow, VoiceFxPanel
+    fx = VoiceFxPanel({"enabled": True, "preset": "Robot", "effects": {}})
+    assert not fx._cards_built
+    # (the Background's card is the one made at once: the Effects pop-up sets it)
+    assert all(type(r).__name__ == "BackdropRow" for r in fx.findChildren(EffectRow))
+    fx.spec()
+    fx.pick("Deep voice")   # a voice hotkey: still no cards
+    assert not fx._cards_built
+    fx.open_tweak()
+    assert fx._cards_built
+    assert all(isinstance(r, EffectRow) for r in fx._effects.values())
+    fx.dlg.close()
+    fx.deleteLater()
+
+
+@pytest.mark.parametrize("how", ["saved", "preset", "random", "mix"])
+def test_effects_read_the_same_before_and_after_their_cards_are_built(qapp, monkeypatch, how):
+    """What the voice changer runs (spec) is the same whether the cards exist yet or
+    not: values sit on the sliders' steps either way."""
+    import random
+
+    monkeypatch.setattr(tts.SapiTTS, "warm_up", lambda self: [])
+    from soundboard.ui.voicefxpanel import VoiceFxPanel
+    odd = {"echo": {"on": True, "delay": 401.3, "feedback": 0.517, "mix": 0.2333},
+           "pitch": {"on": True, "semitones": 3.37, "mix": 0.91}}
+    fx = VoiceFxPanel({"enabled": True, "preset": "Custom", "effects": odd})
+    if how == "preset":
+        fx.pick("Robot")
+    elif how == "random":
+        monkeypatch.setattr(fx, "open_tweak", lambda: None)   # (it opens Edit voice)
+        fx.randomize(random.Random(7))
+    elif how == "mix":
+        fx.use_mix(odd)
+    assert not fx._cards_built
+    before = fx.spec()
+    fx._build_cards()
+    assert fx.spec() == before
+    fx.deleteLater()
+
+
+def test_card_values_match_the_real_sliders(qapp):
+    """card_value (an effect without its card) lands where a card's slider would."""
+    import random
+
+    from soundboard.ui.voicefxpanel import ParamSlider, card_value
+    rng = random.Random(3)
+    for cls in voicefx.REGISTRY.values():
+        for q in cls.params:
+            s = ParamSlider(q, q.default, compact=False)
+            for v in (q.lo, q.hi, q.default, q.lo - 1, q.hi + 1,
+                      *(rng.uniform(q.lo, q.hi) for _ in range(20))):
+                s.set_value(v)
+                assert card_value(q, v) == s.value(), (cls.type, q.key, v)
+            s.deleteLater()

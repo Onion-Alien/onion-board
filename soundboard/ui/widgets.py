@@ -26,7 +26,7 @@ from soundboard.eq import MAX_DB as EQ_MAX_DB
 from soundboard.eq import response_db as eq_response
 from soundboard.engine import SR
 from soundboard.library import AUDIO_EXTS, SoundMeta
-from soundboard.settings import pretty_key
+from soundboard.ui.hotkeypick import pretty_key
 from soundboard.ui import icons
 from soundboard.ui.bunnywidget import BunnyWidget
 from soundboard.i18n import _
