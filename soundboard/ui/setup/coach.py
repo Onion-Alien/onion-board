@@ -45,7 +45,7 @@ from PySide6.QtWidgets import (QApplication, QFrame, QGraphicsDropShadowEffect, 
 from soundboard.ui.kit import theme
 from soundboard.i18n import _
 from soundboard.ui.kit import oops, toast
-from soundboard.ui.bunnywidget import BunnyWidget
+from soundboard.ui.bun.bunnywidget import BunnyWidget
 
 log = logging.getLogger(__name__)
 

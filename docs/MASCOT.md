@@ -8,14 +8,14 @@ lines in the files below.
 
 | File | What it does |
 | --- | --- |
-| `soundboard/bunny.py` | `draw_bunny(p, rect, prop, **pose)`: one still picture of Bun on a 100 x 120 canvas. Everything else calls this. Also `bunny_image` / `bunny_pixmap` for static pictures (with `ROOM_TOP` above him and `ROOM_SIDE` either side: an upright ear and a wide collar reach past his canvas). |
+| `soundboard/ui/bun/bunny.py` | `draw_bunny(p, rect, prop, **pose)`: one still picture of Bun on a 100 x 120 canvas. Everything else calls this. Also `bunny_image` / `bunny_pixmap` for static pictures (with `ROOM_TOP` above him and `ROOM_SIDE` either side: an upright ear and a wide collar reach past his canvas). |
 | `soundboard/style/bunnyfit.py` | His outfit per theme (`OUTFITS`) and the pieces' drawing (`PIECES`), in layers `draw_bunny` calls between its own; his look per theme (`LOOKS`: fur, floppy ears, extras). |
-| `soundboard/ui/bunnywidget.py` | `BunnyWidget`: Bun alive. Bobs, blinks, flicks ears, idle fidgets (yawn, look round, foot tap), talks with the mic level, music notes, begging bubbles, naps, the click cheer, the build act (dives into a dust cloud, rummages, hammers a speaker together; the snap when it fails), Robo-Bun's version (gadget screen, sparks, LED pulse), the Pong dare (cross face, bat). Its `pose(now)` turns the clock into `draw_bunny`'s keywords plus his squash (`sx`, `sy`), lean (`angle`) and fade (`alpha`). |
+| `soundboard/ui/bun/bunnywidget.py` | `BunnyWidget`: Bun alive. Bobs, blinks, flicks ears, idle fidgets (yawn, look round, foot tap), talks with the mic level, music notes, begging bubbles, naps, the click cheer, the build act (dives into a dust cloud, rummages, hammers a speaker together; the snap when it fails), Robo-Bun's version (gadget screen, sparks, LED pulse), the Pong dare (cross face, bat). Its `pose(now)` turns the clock into `draw_bunny`'s keywords plus his squash (`sx`, `sy`), lean (`angle`) and fade (`alpha`). |
 | `soundboard/ui/setup/setupshow.py` | `SetupShow(BunnyWidget)`: the mic set-up show (toolbox, speaker parts popping on, progress dots). |
-| `soundboard/ui/scribebun.py` | `ScribeBunny`: the download bar's picture, Bun writing the tune on a scroll in a 56 x 59 slot. Caches pictures of him in `_layer`. |
-| `soundboard/ui/bunpong.py` | The Pong Easter egg; draws Bun with his bat (or the star when he wins). |
-| `soundboard/ui/splash.py` | The start-up splash: the panel, the name and the dots; Bun's part is `splashacts.py`. |
-| `soundboard/ui/splashacts.py` | Bun's start-up acts, one picked at random each launch (`pick`): headbang, karaoke, build, batting, party, sleepy (the favourite at night), Robo-Bun booting, plugging in his headphones, hop, drums, ear wiggle, peekaboo, spin. rare launches (`RARES`, rarest first): Golden Bun 1 in 50, Ice Bun 1 in 500, Galaxy Bun 1 in 5000 (planets orbit him), Rainbow Bun 1 in 50000 (his fur cycles the hues), each with a glowing border in its colour and its tier and drop rate (`Rare · 1/500`, tier names from `splash.tier_name`: Uncommon, Rare, Legendary, Super Rare) on a taller card under the dots; the season's pieces by month (`SEASONS`: October the Halloween hat and fangs, December the Santa hat); his goodbye wave as the window comes up. Every act reads in its first half second and loops; `still` is Bun at rest for Windows' Animation effects off. An act that hides part of him (peekaboo's hole) draws him on a picture first (`_bun_above`): `draw_bunny` sets clips of its own. |
+| `soundboard/ui/bun/scribebun.py` | `ScribeBunny`: the download bar's picture, Bun writing the tune on a scroll in a 56 x 59 slot. Caches pictures of him in `_layer`. |
+| `soundboard/ui/bun/bunpong.py` | The Pong Easter egg; draws Bun with his bat (or the star when he wins). |
+| `soundboard/ui/bun/splash.py` | The start-up splash: the panel, the name and the dots; Bun's part is `splashacts.py`. |
+| `soundboard/ui/bun/splashacts.py` | Bun's start-up acts, one picked at random each launch (`pick`): headbang, karaoke, build, batting, party, sleepy (the favourite at night), Robo-Bun booting, plugging in his headphones, hop, drums, ear wiggle, peekaboo, spin. rare launches (`RARES`, rarest first): Golden Bun 1 in 50, Ice Bun 1 in 500, Galaxy Bun 1 in 5000 (planets orbit him), Rainbow Bun 1 in 50000 (his fur cycles the hues), each with a glowing border in its colour and its tier and drop rate (`Rare · 1/500`, tier names from `splash.tier_name`: Uncommon, Rare, Legendary, Super Rare) on a taller card under the dots; the season's pieces by month (`SEASONS`: October the Halloween hat and fangs, December the Santa hat); his goodbye wave as the window comes up. Every act reads in its first half second and loops; `still` is Bun at rest for Windows' Animation effects off. An act that hides part of him (peekaboo's hole) draws him on a picture first (`_bun_above`): `draw_bunny` sets clips of its own. |
 | `scripts/pictures/make_bunny.py`, `scripts/pictures/make_favicon.py` | Installer art and icons: always plain Bun (`outfit=()`, `kit=VANILLA`). |
 | `scripts/pictures/bun_sheet.py` | Picture sheets for checking a change by eye (below). |
 | `scripts/pictures/site_mascots.py` | The website's Bun and Hoot: runs `draw_bunny` / `draw_owl` in each theme of the site's look switcher through a painter that writes SVG, into `site/index.html` (the parts the page moves in their own groups) and `site/home.css` (each look's colours). Rerun it after changing either drawing. |
@@ -23,7 +23,7 @@ lines in the files below.
 ## Every place he shows up
 
 `BunnyWidget` in the setup guide (`ui/setup/setupwizard.py`, a prop per page), the chat guides
-(`ui/setup/chatguide.py`, `ui/setup/streamguide.py`), Bun mode (`ui/bunmode.py`, the window as a
+(`ui/setup/chatguide.py`, `ui/setup/streamguide.py`), Bun mode (`ui/bun/bunmode.py`, the window as a
 floating Bun: `in_background=True` keeps him moving behind a game), the empty board (`ui/kit/widgets.py`), the Apps tab
 (`ui/apps/appspanel.py`, sad and begging; `rest_after_s=30`: still after 30 s with nothing playing, until a sound or a click), the Radio map (`ui/radio/flatmap.py`), the YouTube search
 (`ui/sounds/ytsearch.py`), left of the Live controls title (`ui/sounds/speedpitch.py` `DjBunny`: his
@@ -81,7 +81,7 @@ animation at once.
 
 ## Skits
 
-Now and then an idle `BunnyWidget` plays his theme's skit (`ui/bunskits.py`) instead of a
+Now and then an idle `BunnyWidget` plays his theme's skit (`ui/bun/bunskits.py`) instead of a
 fidget: everywhere he idles (the empty board, Bun mode, the YouTube search). A skit is a
 function of its time alone: it adds to his pose, hides the outfit pieces it moves and
 queues drawings behind him, with him (held things) or in front, on the canvas. No words

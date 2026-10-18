@@ -1,4 +1,4 @@
-"""Render the website's tab icons (Bun the mascot, from soundboard/bunny.py) into site/.
+"""Render the website's tab icons (Bun the mascot, from soundboard/ui/bun/bunny.py) into site/.
 
     .venv\\Scripts\\python scripts\\pictures\\make_favicon.py
 """
@@ -29,7 +29,7 @@ def png_bytes(img) -> bytes:
 
 def head(size: int, bg: QColor | None = None) -> QImage:
     """Bun's head centred in a size x size square, on `bg` (else transparent)."""
-    from soundboard.bunny import bunny_image
+    from soundboard.ui.bun.bunny import bunny_image
     big = bunny_image(1024, room=False)
     crop = big.copy(QRect(0, 0, big.width(), round(big.height() * HEAD)))
     img = QImage(size, size, QImage.Format_ARGB32_Premultiplied)

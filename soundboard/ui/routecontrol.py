@@ -12,7 +12,7 @@ from typing import TYPE_CHECKING
 from PySide6.QtWidgets import QCheckBox, QMessageBox
 
 from soundboard.audio import appaudio
-from soundboard import bunny
+from soundboard.ui.bun import bunny
 from soundboard.ui.kit import theme
 from soundboard.mic import directmic
 from soundboard.core import usage

@@ -1,4 +1,4 @@
-"""Bun, alive: the mascot from soundboard/bunny.py in a widget that animates.
+"""Bun, alive: the mascot from soundboard/ui/bun/bunny.py in a widget that animates.
 
 He bobs gently, blinks every few seconds and flicks an ear now and then. Feed him
 the mic level (`set_level`, 0..1) and he talks along: the mouth opens with your
@@ -26,7 +26,7 @@ to the beat.
 
 `pong=True` hides an Easter egg: poke him a few times quickly and he gets cross, and
 poke him `ANNOY_CLICKS` times and he storms off the same way, comes back with a
-baseball bat and challenges you to Pong (ui/bunpong.py) over the page.
+baseball bat and challenges you to Pong (ui/bun/bunpong.py) over the page.
 Closing the game calls `calm_down()`, and he's back to how he was.
 
 `sulk = True`: he's down and kicks at the ground, over and over, a puff of dust each
@@ -72,7 +72,7 @@ from PySide6.QtWidgets import QSizePolicy, QWidget
 
 from soundboard.ui.kit import theme
 from soundboard.core import usage
-from soundboard.bunny import (
+from soundboard.ui.bun.bunny import (
     FUR,
     GADGET_SCREEN,
     INK,
@@ -96,7 +96,7 @@ from soundboard.bunny import (
 from soundboard.i18n import _
 from soundboard.style import bunnyfit, mascotlines
 from soundboard.ui.kit import appstate
-from soundboard.ui import bunskits
+from soundboard.ui.bun import bunskits
 from soundboard.ui.settings import lite
 from soundboard.ui.kit.pixels import snap_to_pixels
 
@@ -664,7 +664,7 @@ class BunnyWidget(QWidget):
         self.junk.clear()
 
     def _open_game(self):
-        from soundboard.ui import bunpong   # only ever needed once someone finds it
+        from soundboard.ui.bun import bunpong  # only ever needed once someone finds it
         self.say = ""   # (his taunt would poke out from under the game)
         bunpong.open_for(self)
 

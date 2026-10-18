@@ -24,7 +24,7 @@ from soundboard.mic import directmic, discordcfg
 from soundboard.ui.kit import theme
 from soundboard.core.pollthread import PollThread
 from soundboard.ui.kit import busy, fit, icons
-from soundboard.ui.bunnywidget import BunnyWidget
+from soundboard.ui.bun.bunnywidget import BunnyWidget
 from soundboard.ui.kit.crashdialog import free_dialog
 from soundboard.core import errors
 from soundboard.i18n import _

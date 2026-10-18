@@ -15,7 +15,7 @@ from PySide6.QtGui import QColor, QFont, QFontMetricsF, QPainter
 from PySide6.QtWidgets import QGraphicsOpacityEffect, QWidget
 
 from soundboard.ui.kit import theme
-from soundboard.ui import splash
+from soundboard.ui.bun import splash
 from soundboard.ui.kit.toast import animations_on
 
 REVEAL_MS = 320   # the fade to the app once the guide is gone

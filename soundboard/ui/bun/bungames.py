@@ -9,9 +9,9 @@ from PySide6.QtCore import QPointF, QRectF, Qt
 from PySide6.QtGui import QColor, QLinearGradient, QPainter, QPainterPath, QPen, QRadialGradient
 
 from soundboard.ui.kit import theme
-from soundboard.bunny import INK
+from soundboard.ui.bun.bunny import INK
 from soundboard.i18n import _
-from soundboard.ui.bunpong import BUN_PINK, GO_KEYS, Game, _alpha, _mix
+from soundboard.ui.bun.bunpong import BUN_PINK, GO_KEYS, Game, _alpha, _mix
 
 NUM_KEYS = {getattr(Qt.Key, f"Key_{i}"): i - 1 for i in range(1, 10)}
 LEFT = (Qt.Key.Key_Left, Qt.Key.Key_A)

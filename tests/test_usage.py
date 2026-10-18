@@ -1130,7 +1130,7 @@ def test_views_hotkeys_leveler_and_sound_voices_count_every_day():
 
 
 def test_bun_games_are_counted_by_a_fixed_name():
-    from soundboard.ui import bunpong
+    from soundboard.ui.bun import bunpong
     assert set(bunpong.games()) <= set(usage.BUN_GAMES)
     assert usage.game_tag("ttt") == "ttt" and usage.game_tag("chess") == "other"
     assert all(f"egg-game-{g}" in usage.FEATURES for g in usage.BUN_GAMES)
@@ -1314,7 +1314,7 @@ def test_a_freeze_on_a_pc_short_of_memory_says_so(tmp_path):
 def test_a_rare_loading_screen_is_counted_by_its_tier(monkeypatch):
     """Golden, Ice, Galaxy and Rainbow Bun: each has its name in FEATURES (one per key of
     splashacts.RARES), and a launch that showed one notes it; a plain one notes none."""
-    from soundboard.ui import splash, splashacts
+    from soundboard.ui.bun import splash, splashacts
     assert tuple(splashacts.RARES) == ("rainbow", "galaxy", "ice", "gold")
     assert set(usage.SPLASH_RARES) == set(splashacts.RARES)
     assert {f"splash-{k}" for k in usage.SPLASH_RARES} <= set(usage.FEATURES)

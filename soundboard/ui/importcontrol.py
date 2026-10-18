@@ -28,10 +28,8 @@ from soundboard.core import (
     errors,
     usage,
 )
-from soundboard import (
-    bunny,
-    otherboards,
-)
+from soundboard.ui.bun import bunny
+from soundboard import otherboards
 from soundboard.audio import soundfx
 from soundboard.sounds import (
     catswitch,

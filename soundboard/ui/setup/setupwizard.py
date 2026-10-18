@@ -45,7 +45,7 @@ from soundboard.core.pollthread import PollThread
 from soundboard.ui.setup import cableconfirm
 from soundboard.ui.kit.glow import Glow
 from soundboard.ui.kit import busy, fit, icons, panel
-from soundboard.ui.bunnywidget import TALK, BunnyWidget
+from soundboard.ui.bun.bunnywidget import TALK, BunnyWidget
 from soundboard.ui.setup.setupshow import SetupShow
 from soundboard.ui.kit.choicetile import ChoiceTile, FoldPill
 from soundboard.core import errors

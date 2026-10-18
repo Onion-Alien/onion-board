@@ -1,6 +1,6 @@
 """What the song playing sounds like, as it plays: its beat and a guess at its style.
 
-Bun mode's Bun dances to it (ui/bunnywidget.py ``set_groove``): on the beat, and in a
+Bun mode's Bun dances to it (ui/bun/bunnywidget.py ``set_groove``): on the beat, and in a
 way that suits the song: he headbangs to rock, bounces fast to electronic music, nods
 to hip-hop, sways to something calm and talks along to someone speaking.
 

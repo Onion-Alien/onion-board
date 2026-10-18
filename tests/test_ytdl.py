@@ -1132,7 +1132,7 @@ def test_results_spin_while_searching_and_offer_every_site(qapp, monkeypatch):
 
 
 def test_searching_shows_a_centred_mascot_then_the_results(qapp, monkeypatch):
-    from soundboard.ui.bunnywidget import BunnyWidget
+    from soundboard.ui.bun.bunnywidget import BunnyWidget
     from soundboard.style.owl import OwlWidget
     from soundboard.ui.sounds.ytsearch import SearchResults
     gate = threading.Event()

@@ -57,7 +57,7 @@ from soundboard.ui.fitcontrol import BODY_SIDE, SEARCH_MIN_W
 from soundboard.ui.kit.iconrow import CapIcon
 from soundboard.ui.sounds.linkbar import LinkBar
 from soundboard.ui.livedot import set_tint as set_live_tint
-from soundboard.ui.logowidget import LogoWidget
+from soundboard.ui.bun.logowidget import LogoWidget
 from soundboard.ui.sounds.padbatch import PadSelection
 from soundboard.ui.kit.panel import (
     ViewToggle,

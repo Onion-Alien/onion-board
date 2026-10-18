@@ -71,10 +71,11 @@ from soundboard.ui.updatecontrol import UpdateControl
 from soundboard.ui.kit import toast as toastmod
 from soundboard.ui.kit import a11y, appstate, busy, icons
 from soundboard.ui.settings import lite
-from soundboard.ui import livesize, responsive, splash, taboff
+from soundboard.ui import livesize, responsive, taboff
+from soundboard.ui.bun import splash
 from soundboard.ui.setup import tabtours
 from soundboard.ui.sounds.linkbar import PLAY_ID as LINK_ID
-from soundboard.ui.logowidget import glow_icon
+from soundboard.ui.bun.logowidget import glow_icon
 from soundboard.ui import sidebar
 from soundboard.ui.spacekey import SpaceKey
 from soundboard.ui.sounds.overlay import Overlay
@@ -117,7 +118,7 @@ if TYPE_CHECKING:
     from soundboard.ui.downloadbar import DownloadBar
     from soundboard.ui.dropveil import DropVeil
     from soundboard.ui.sounds.linkbar import LinkBar
-    from soundboard.ui.logowidget import LogoWidget
+    from soundboard.ui.bun.logowidget import LogoWidget
     from soundboard.ui.sounds.padbatch import PadSelection
     from soundboard.ui.kit.panel import EqPanel, Flow, TileRow, ViewToggle, VolumeControl
     from soundboard.ui.kit.playbutton import PlayButton

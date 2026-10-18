@@ -1,4 +1,4 @@
-"""Bun mode in the main window: the window goes and a floating Bun (ui/bunmode.py) takes its
+"""Bun mode in the main window: the window goes and a floating Bun (ui/bun/bunmode.py) takes its
 place, Back brings the window back as it was, Open the full board brings the whole board,
 and Bun says the window's toasts while he's up. Starting as Bun when the app quit as Bun.
 
@@ -31,15 +31,15 @@ class BunControl(Controller):
 
     def __init__(self, mw: MainWindow):
         super().__init__(mw)
-        self.bun_mode = None   # Bun mode's floating Bun (ui/bunmode.py), once used
+        self.bun_mode = None   # Bun mode's floating Bun (ui/bun/bunmode.py), once used
 
     def bun_up(self) -> bool:
         return self.bun_mode is not None and self.bun_mode.isVisible()
 
     def enter_bun_mode(self):
-        """The window goes and a floating Bun takes its place (ui/bunmode.py)."""
+        """The window goes and a floating Bun takes its place (ui/bun/bunmode.py)."""
         mw = self.mw
-        from soundboard.ui.bunmode import BunMode
+        from soundboard.ui.bun.bunmode import BunMode
         if self.bun_mode is None:
             self.bun_mode = BunMode(mw)
             self.bun_mode.back.connect(lambda: self.leave_bun_mode(False))

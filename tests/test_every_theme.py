@@ -230,7 +230,7 @@ def test_switched_on_icon_buttons_in_a_card_show_their_icon(qapp, name):
 def test_each_theme_card_shows_bun_as_he_looks_in_that_theme(qapp):
     """The card's Bun is that theme's (headphones, outfit, look), not the current one's,
     drawing him leaves the current theme as it was, and an upright ear isn't cut off."""
-    from soundboard.bunny import ROOM_TOP, H
+    from soundboard.ui.bun.bunny import ROOM_TOP, H
     from soundboard.ui.settingspages import appearance
 
     before = dict(theme.T)

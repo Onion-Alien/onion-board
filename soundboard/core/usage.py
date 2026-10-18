@@ -145,9 +145,9 @@ ADDONS = ("ai-voices", "live-voice", "other")
 PACKS = ("streamer", "esports", "general", "podcast", "halloween", "gm-starter", "other")
 # the Live controls' tabs (ui/voice/livesetups.py)
 LIVE_TABS = ("sounds", "radio", "apps")
-# Bun's games (ui/bunpong.py games()); any other is "other"
+# Bun's games (ui/bun/bunpong.py games()); any other is "other"
 BUN_GAMES = ("pong", "draw", "rps", "ttt", "other")
-# the rare loading screens (ui/splashacts.py RARES' keys)
+# the rare loading screens (ui/bun/splashacts.py RARES' keys)
 SPLASH_RARES = ("gold", "ice", "galaxy", "rainbow")
 # Settings' pages (settings.SettingsDialog's page keys, without Show advanced)
 SETTINGS_PAGES = ("audio", "appearance", "hotkeys", "tabs", "general", "about",
@@ -197,7 +197,7 @@ FEATURES = ("add-files", "youtube", "record", "clip", "clip-editor", "import-boa
             # Settings' search box used, and a search that found nothing
             "settings-search", "settings-search-nothing",
             # the mini player's mic mute switch; the setup guide opened from Setup; the
-            # mini player turned into Bun (ui/bunmode.py)
+            # mini player turned into Bun (ui/bun/bunmode.py)
             "mini-mic-mute", "setup-guide-opened", "bun-mode",
             # the side rail: Ctrl+1-9 / Ctrl+Tab, the version clicked for What's new,
             # kept shut (features_now)
@@ -329,7 +329,7 @@ FEATURES = ("add-files", "youtube", "record", "clip", "clip-editor", "import-boa
             # command, an alert, a donation's alert (never who, what or how much)
             "remote-used-api", "remote-used-phone", "api-chat-rules", "api-alerts",
             "api-chat-command", "api-alert", "api-alert-donation",
-            # a rare loading screen came up (ui/splashacts.py RARES: Golden, Ice, Galaxy,
+            # a rare loading screen came up (ui/bun/splashacts.py RARES: Golden, Ice, Galaxy,
             # Rainbow Bun); Bun or Hoot clicked into saying a line
             *(f"splash-{k}" for k in SPLASH_RARES), "bun-talk", "hoot-talk",
             # a game run as admin in front with hotkeys set: the note, its Restart as admin

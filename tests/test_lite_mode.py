@@ -106,7 +106,7 @@ def test_a_fast_pc_is_not_told(window, monkeypatch):  # noqa: F811
 # ------------------------------------------------------------------ what stops
 
 def test_the_logo_holds_still(qapp, monkeypatch):
-    from soundboard.ui import logowidget
+    from soundboard.ui.bun import logowidget
     monkeypatch.setattr(logowidget.appstate, "active", lambda: True)
     w = logowidget.LogoWidget()
     w.show()
@@ -125,7 +125,7 @@ def test_the_logo_holds_still(qapp, monkeypatch):
 
 
 def _bun(qapp, monkeypatch, **kw):
-    from soundboard.ui import bunnywidget as bw
+    from soundboard.ui.bun import bunnywidget as bw
     clock = _Clock()
     monkeypatch.setattr(bw, "time", clock)
     monkeypatch.setattr(bw, "local_hour", lambda: 12)
@@ -229,7 +229,7 @@ def test_overlay_shows_and_goes_at_once(qapp):
 
 def test_switching_skips_a_bun_qt_already_freed(qapp):
     from PySide6.QtWidgets import QWidget
-    from soundboard.ui.bunnywidget import BunnyWidget
+    from soundboard.ui.bun.bunnywidget import BunnyWidget
     host = QWidget()
     b = BunnyWidget(height=60, pad=6, parent=host)
     host.deleteLater()   # (his page closed: Qt frees him, the wrapper stays in `alive`)

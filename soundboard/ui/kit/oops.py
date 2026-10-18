@@ -71,7 +71,7 @@ class OopsPanel(QFrame):
                  compact: bool = False):
         """`compact`: Bun beside the words, the words and buttons on the left, for a
         strip across a page (the Voice tab's) rather than a card in its middle."""
-        from soundboard.ui.bunnywidget import BunnyWidget
+        from soundboard.ui.bun.bunnywidget import BunnyWidget
         super().__init__(parent)
         self.setObjectName("oops")
         self.compact = compact

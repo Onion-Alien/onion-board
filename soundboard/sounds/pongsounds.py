@@ -1,4 +1,4 @@
-"""The sounds of Pong with Bun (ui/bunpong.py), made in code: no sound files.
+"""The sounds of Pong with Bun (ui/bun/bunpong.py), made in code: no sound files.
 
 Every hit is short and crisp, and the hits in a rally climb a major pentatonic scale
 one note at a time, so a long rally sounds like it's going somewhere. A hit off the
@@ -7,7 +7,7 @@ sound comes from the side of the court the ball is on. Each theme has its own st
 of sound (STYLES), like Bun's outfits: 8-bit blips for Retro 98, a wooden knock for
 Paper, and so on.
 
-`render(name, style, ...)` returns stereo float32 at engine.SR; ui/bunpong.py plays
+`render(name, style, ...)` returns stereo float32 at engine.SR; ui/bun/bunpong.py plays
 it in the headphones only (engine previews), never to the mic.
 """
 from __future__ import annotations
@@ -201,7 +201,7 @@ def render(name: str, style: str = "soft", *, rally: int = 0, pan: float = 0.0,
             last = i == 3
             m.add(tone(f, 0.5 if last else 0.2, 0.14, w, f2=f * 0.85 if last else 0.0,
                        lowpass=1800), 0, i * 0.2)
-    # ---- Bun's other games (ui/bungames.py)
+    # ---- Bun's other games (ui/bun/bungames.py)
     elif name == "heartbeat":   # quick draw's wait: lub-dub, `level` 0.. as it drags on
         f = 55 + 6 * min(level, 6)
         m.add(tone(f, 0.12, 0.3, f2=f * 0.7, lowpass=400))

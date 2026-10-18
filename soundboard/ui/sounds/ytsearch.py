@@ -30,10 +30,10 @@ from soundboard.core import jobprogress, usage
 from soundboard.online import quality
 from soundboard.ui.kit import theme
 from soundboard.online import net, netlog, ytdl
-from soundboard.bunny import H as BUN_H
-from soundboard.bunny import W as BUN_W
+from soundboard.ui.bun.bunny import H as BUN_H
+from soundboard.ui.bun.bunny import W as BUN_W
 from soundboard.ui.kit import busy, icons
-from soundboard.ui.bunnywidget import BunnyWidget
+from soundboard.ui.bun.bunnywidget import BunnyWidget
 from soundboard.style.owl import H as OWL_H
 from soundboard.style.owl import W as OWL_W
 from soundboard.style.owl import OwlWidget

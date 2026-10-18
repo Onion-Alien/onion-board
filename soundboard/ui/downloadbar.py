@@ -29,7 +29,7 @@ from soundboard.ui.kit import theme
 from soundboard.i18n import _, ngettext
 from soundboard.ui.kit import icons
 from soundboard.ui import responsive
-from soundboard.ui.scribebun import ScribeBunny
+from soundboard.ui.bun.scribebun import ScribeBunny
 from soundboard.ui.kit.widgets import fmt_time
 from soundboard.ui.kit.pixels import snap_to_pixels
 from soundboard.ui.kit.restyled import measured, on_restyle

@@ -246,19 +246,19 @@ the launcher the shortcuts and PyInstaller use. The app is the `soundboard` pack
 | `soundboard/ui/kit/oops.py` | The red "didn't work" card: sad Bun, what went wrong, what to do, Try again and Report a problem (search results, the store, the radio map, the voice tab) |
 | `soundboard/ui/setup/firsttour.py` | Bun's first-run tour of the empty board after that guide: the search box (or offline the Add button), the results, then "Nice" once a sound is added |
 | `soundboard/ui/setup/tabtours.py` | Each tab's quick how-to on its first visit (Radio, Apps, Triggers, Voice, Store); Settings > General > Show tutorials |
-| `soundboard/ui/bunnywidget.py` | Bun animated: bobs, blinks, talks along with your mic and throws music notes |
-| `soundboard/ui/onionalien.py` | the Onion Alien, the author's mascot, drawn in code like Bun and Hoot: he says the note on Settings > About in a speech bubble, typed out a letter at a time |
-| `soundboard/ui/bunmode.py` | Bun mode: the mini player as a floating Bun over everything, showing what the app is doing |
-| `soundboard/ui/scribebun.py` | Bun the scribe: the download banner's picture for a sound with no thumbnail, writing a well-known piece as sheet music on a scroll as the download comes in |
-| `soundboard/ui/bunpong.py` | the Easter egg: poke Bun enough and he challenges you to a game picked at random; Pong, the games' shared base and the dialog (its sounds: `pongsounds.py`) |
-| `soundboard/ui/bungames.py` | Bun's other Easter egg games: quick draw, rock paper scissors, tic-tac-toe |
+| `soundboard/ui/bun/bunnywidget.py` | Bun animated: bobs, blinks, talks along with your mic and throws music notes |
+| `soundboard/ui/bun/onionalien.py` | the Onion Alien, the author's mascot, drawn in code like Bun and Hoot: he says the note on Settings > About in a speech bubble, typed out a letter at a time |
+| `soundboard/ui/bun/bunmode.py` | Bun mode: the mini player as a floating Bun over everything, showing what the app is doing |
+| `soundboard/ui/bun/scribebun.py` | Bun the scribe: the download banner's picture for a sound with no thumbnail, writing a well-known piece as sheet music on a scroll as the download comes in |
+| `soundboard/ui/bun/bunpong.py` | the Easter egg: poke Bun enough and he challenges you to a game picked at random; Pong, the games' shared base and the dialog (its sounds: `pongsounds.py`) |
+| `soundboard/ui/bun/bungames.py` | Bun's other Easter egg games: quick draw, rock paper scissors, tic-tac-toe |
 | `soundboard/ui/kit/choicetile.py` | ChoiceTile (a choice as a fixed-size tile: icon, name, tick, optional level bar; the setup guide's devices) and FoldPill (a small pill that opens something under it) |
 | `soundboard/ui/setup/micupdate.py` | the offer to update the mic part: a card over the window a second after it opens; Windows is asked only after *Install update* |
 | `soundboard/ui/setup/setupshow.py` | Bun building your mic on the Setup tab while Onion Board goes onto it (Windows asking, then loading) |
 | `soundboard/ui/kit/reveal.py` | Boxes that fold away and out instead of blinking (the Setup tab's mic card), and the green flash when the mic starts working |
 | `soundboard/ui/setup/whatsnew.py` | the *What's new* window shown once after an update, with what the release added, a button to the settings it's about and a link to the Discord (`NOTES`, newest first: add one per release) |
-| `soundboard/ui/splash.py` | the start-up splash: Bun's act, the name and chasing dots mid-screen while a cold start loads |
-| `soundboard/ui/splashacts.py` | Bun's start-up acts (one picked at random each launch), rare Buns, the season's hat, his goodbye wave |
+| `soundboard/ui/bun/splash.py` | the start-up splash: Bun's act, the name and chasing dots mid-screen while a cold start loads |
+| `soundboard/ui/bun/splashacts.py` | Bun's start-up acts (one picked at random each launch), rare Buns, the season's hat, his goodbye wave |
 | `soundboard/ui/settings/langpick.py` | the language picker (Settings → Appearance → Language): a drop-down of languages, each with its letter coin and its own name, with a search |
 | `soundboard/ui/sidebar.py` | the tab rail down the main window's left: one icon per tab, opened out to show their names (the tab widget's own bar is hidden) |
 | `soundboard/ui/moretabs.py` | *+ More tabs*' dropdown: a card for each switched-off tab (its picture, what it's good for, Add) |
@@ -266,7 +266,7 @@ the launcher the shortcuts and PyInstaller use. The app is the `soundboard` pack
 | `soundboard/ui/livesize.py` | the window's edge being dragged (Windows' WM_ENTERSIZEMOVE / WM_EXITSIZEMOVE): each step fits with Qt's cached sizes, letting go measures it all fresh |
 | `soundboard/ui/livedot.py` | marks a tab whose feature is live (a highlight-coloured icon, with the rail's bar beside it, or a small dot), e.g. the Voice tab while your voice is being changed |
 | `soundboard/ui/kit/glow.py` | `Glow(button)`: a slow accent glow round the one button a step wants pressed (the setup card's mic button) |
-| `soundboard/ui/logowidget.py` | the header logo animated: a breathing glow and sheen, flaring with embers while sounds play |
+| `soundboard/ui/bun/logowidget.py` | the header logo animated: a breathing glow and sheen, flaring with embers while sounds play |
 | `soundboard/ui/triggers/logoduel.py` | a silent laser exchange between the Board and Watch logos when clicked on the Triggers tab |
 | `soundboard/ui/sounds/overlay.py` | the in-game overlay: a panel of pads that never takes focus, driven by number keys or clicks, on a chosen monitor and spot (or wherever it was dragged) |
 | `soundboard/ui/voice/voicepanel.py` | the Voice tab: lays out its cards and bottom bar, the add-ons list |
@@ -305,8 +305,8 @@ the launcher the shortcuts and PyInstaller use. The app is the `soundboard` pack
 | `soundboard/mic/voicesetups.py` | voice setups (a voice changer voice, an AI voice and a language under one name), in `%APPDATA%\OnionBoard\voice-setups.json` |
 | `soundboard/core/trash.py` | Recently deleted: removed sounds (files and pad) and forgotten programs, kept 30 days in `%APPDATA%\OnionBoard\deleted` so they can be brought back |
 | `soundboard/core/reset.py` | Settings → General → Reset: puts the parts picked (settings, hotkeys, sounds, the bin, programs, devices) back to the start at the next launch, after saving a restore point in `%APPDATA%\OnionBoard\restore-points` that undoes it |
-| `soundboard/bunny.py` | Bun the mascot, drawn in code (setup guide and installer art) |
-| `soundboard/ui/bunskits.py` | Bun's idle skits, one per theme outfit (Blood Moon's cheese moon, Retro 98's "deal with it" shades, ...) and juggling for the rest: functions of time that pose him and queue drawings, played by `BunnyWidget` now and then while he's idle |
+| `soundboard/ui/bun/bunny.py` | Bun the mascot, drawn in code (setup guide and installer art) |
+| `soundboard/ui/bun/bunskits.py` | Bun's idle skits, one per theme outfit (Blood Moon's cheese moon, Retro 98's "deal with it" shades, ...) and juggling for the rest: functions of time that pose him and queue drawings, played by `BunnyWidget` now and then while he's idle |
 | `soundboard/audio/groove.py` | what the playing song sounds like, from the stretch just played: its tempo, where the beats fall and a guess at its style (rock, electronic, hip-hop, calm, speech); Bun mode's Bun dances to it |
 | `soundboard/style/` | the style kit, shared with Onion Watch (which carries an exact copy; imports nothing else from the app, `tests/test_style_kit.py`): `palettes.py` (the themes' colours, `finish()` works out the derived tokens), `textures.py` (Textured's tiles), `bunnyfit.py` (Bun's outfit for each theme, drawn in layers by `bunny.py`; [MASCOT.md](MASCOT.md)), `owl.py` (Hoot, wearing the same outfits), `mascotlines.py` (what Bun and Hoot say when clicked, in each theme's character), `appstate.py` (`active`, `pause_in_background`, `snap_to_pixels`), `cover.py` (a still of a window, fading in and out over a theme switch: `ui/themecover.py` puts Bun on it), `hooks.py` (the current theme and translation, connected by `theme.py`) |
 | `soundboard/sounds/pongsounds.py` | the Pong game's sounds, made in code: hits that climb a scale through a rally, chimes, cheers; a style of sound per theme |
@@ -428,7 +428,7 @@ lists every page and box. In short:
 - Then it opens the app, whose setup guide puts the sounds straight into the mic.
   Uninstalling runs `--direct-mic remove` first (the mic put back as it was; Windows
   asks only if the effect is on a mic) and offers to remove VB-Cable.
-- The artwork is Bun, drawn by `soundboard/bunny.py` and rendered by
+- The artwork is Bun, drawn by `soundboard/ui/bun/bunny.py` and rendered by
   `scripts\pictures\make_bunny.py` (`--preview` writes a sheet of every pose).
 
 Settings live in `%APPDATA%\OnionBoard\` either way. Saving `config.json` keeps the

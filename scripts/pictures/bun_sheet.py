@@ -26,7 +26,7 @@ from PySide6.QtGui import QColor, QFont, QImage, QPainter, QPixmap  # noqa: E402
 from PySide6.QtWidgets import QApplication  # noqa: E402
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
-from soundboard import bunny  # noqa: E402
+from soundboard.ui.bun import bunny  # noqa: E402
 from soundboard.ui.kit import theme  # noqa: E402
 
 MIX = ["Royal", "Midnight", "Deep Fried", "Vampire", "Hacker", "Sunset", "Arctic",
@@ -143,7 +143,7 @@ def live(themes) -> QImage:
     clock = _Clock()
     real = time.monotonic
     time.monotonic = clock
-    from soundboard.ui import bunnywidget, scribebun
+    from soundboard.ui.bun import bunnywidget, scribebun
     from soundboard.ui.setup import setupshow
     bunnywidget.local_hour = lambda: 3   # inside his nap hours
     app = QApplication.instance()

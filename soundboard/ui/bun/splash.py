@@ -1,5 +1,5 @@
 """A small start-up panel in a soft glow of the theme's colours: Bun playing one of
-his acts (ui/splashacts.py, a different one picked at random each launch), the app name
+his acts (ui/bun/splashacts.py, a different one picked at random each launch), the app name
 and three chasing dots; as the window comes up he waves goodbye. The theme is read
 straight from config.json; the rest of the settings load later.
 
@@ -33,9 +33,9 @@ from PySide6.QtWidgets import QApplication, QWidget
 
 from soundboard import __version__
 from soundboard.ui.kit import theme
-from soundboard.bunny import sparkle
+from soundboard.ui.bun.bunny import sparkle
 from soundboard.i18n import _
-from soundboard.ui import splashacts
+from soundboard.ui.bun import splashacts
 from soundboard.ui.kit.pixels import snap_to_pixels
 
 log = logging.getLogger(__name__)

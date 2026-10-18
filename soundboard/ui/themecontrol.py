@@ -19,7 +19,7 @@ from soundboard.ui.settings import lite
 from soundboard.ui import themecover
 from soundboard.ui.controller import Controller
 from soundboard.ui.livedot import set_tint as set_live_tint
-from soundboard.ui.logowidget import glow_icon
+from soundboard.ui.bun.logowidget import glow_icon
 
 if TYPE_CHECKING:
     from soundboard.ui.mainwindow import MainWindow
@@ -100,7 +100,7 @@ class ThemeControl(Controller):
     def set_lite_mode(self, on: bool):
         """Lite mode (ui/settings/lite.py): animations, Bun's and the logo's idle moves and the
         textures off, at once; off again puts them back."""
-        from soundboard.ui.bunnywidget import BunnyWidget
+        from soundboard.ui.bun.bunnywidget import BunnyWidget
         mw = self.mw
         if on == lite.on():
             return

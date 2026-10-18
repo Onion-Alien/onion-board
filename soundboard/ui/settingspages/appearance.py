@@ -41,7 +41,7 @@ def _bun(name: str, dpr: float) -> QPixmap:
     with room above and beside him (bunny.bunny_image) so nothing on him is cut off."""
     key = (name, dpr)
     if key not in _buns:
-        from soundboard.bunny import bunny_pixmap
+        from soundboard.ui.bun.bunny import bunny_pixmap
         with theme.previewing(name):
             _buns[key] = bunny_pixmap(BUN_H, dpr=dpr)
     return _buns[key]
@@ -200,7 +200,7 @@ class ThemeCard(QPushButton):
         if pose is None:
             p.drawPixmap(QRectF(spot.left(), spot.bottom() - bh, bw, bh), bun, QRectF(bun.rect()))
         else:   # saying hello: drawn live in his theme
-            from soundboard.bunny import draw_bunny
+            from soundboard.ui.bun.bunny import draw_bunny
             with theme.previewing(self.name):
                 draw_bunny(p, spot.translated(0, -pose.pop("hop")), **pose)
         # name, in the theme's own font

@@ -24,8 +24,9 @@ from PySide6.QtGui import QColor, QPainter, QPen
 from PySide6.QtWidgets import QSizePolicy
 
 from soundboard.ui.kit import theme
-from soundboard.bunny import H, INK, STEEL, W, WOOD, WOOD_DARK, draw_bunny, sparkle
-from soundboard.ui.bunnywidget import NOTE_COLORS, SPARKLE_COLORS, BunnyWidget, _Note, paint_note
+from soundboard.ui.bun.bunny import H, INK, STEEL, W, WOOD, WOOD_DARK, draw_bunny, sparkle
+from soundboard.ui.bun.bunnywidget import (NOTE_COLORS, SPARKLE_COLORS, BunnyWidget, _Note,
+                                           paint_note)
 from soundboard.ui.kit import reveal
 from soundboard.ui.kit.pixels import snap_to_pixels
 

@@ -13,7 +13,7 @@ one pick hands over to the next without a jump. The timer only runs while a stat
 animating and the widget is on screen.
 
 Everything is drawn in this widget's own pixels (SLOT_W x SLOT_H), Bun himself scaled
-down with soundboard/bunny.py's draw_bunny.
+down with soundboard/ui/bun/bunny.py's draw_bunny.
 """
 from __future__ import annotations
 
@@ -28,7 +28,7 @@ from PySide6.QtGui import QColor, QPainter, QPainterPath, QPen, QPixmap
 from PySide6.QtWidgets import QSizePolicy, QWidget
 
 from soundboard.ui.kit import theme
-from soundboard.bunny import H, INK, W, WOOD, draw_bunny, look_colour, sparkle
+from soundboard.ui.bun.bunny import H, INK, W, WOOD, draw_bunny, look_colour, sparkle
 from soundboard.ui.kit.pixels import snap_to_pixels
 
 SLOT_W, SLOT_H = 56, 59          # about the old thumbnail's size: Bun's head over the scroll

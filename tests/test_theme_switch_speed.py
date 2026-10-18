@@ -152,7 +152,7 @@ def test_a_switch_shows_a_still_with_bun_then_fades_to_the_new_theme(settings, m
 def test_the_cover_shows_bun_in_the_theme_being_switched_to(main_window):  # noqa: F811
     """Bun and the dimming on the cover were drawn in the theme being left (his
     headphones in its accent): they're the new theme's, and the current one stays."""
-    from soundboard.bunny import bunny_image
+    from soundboard.ui.bun.bunny import bunny_image
     from soundboard.ui.themecover import BUNNY_H, ThemeCover
     old, new = "Dark", "Royal"   # different accents and bg, and Royal dresses Bun up
     theme.set_current(old)

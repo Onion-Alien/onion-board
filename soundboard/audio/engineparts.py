@@ -45,7 +45,7 @@ BUFFER = {"low": 0.15, "high": 0.25}
 # ...and for the mic: what's queued there is your voice's delay, so it stays short
 MIC_BUFFER = {"low": "low", "high": 0.04}
 # the app's own playback: the test recording, cue beeps, the setup wizard's tune, the
-# Pong game's sounds (ui/bunpong.py). With
+# Pong game's sounds (ui/bun/bunpong.py). With
 # previews ("<sid>:preview", "<sid>~fx:preview") they ignore the live speed / pitch
 FIXED_SIDS = frozenset({"__test__", "__cue__", "__setup__", "__check__", "__pong__"})
 

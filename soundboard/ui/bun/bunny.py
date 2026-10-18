@@ -55,7 +55,7 @@ ROBOT_CYAN_HI = QColor("#b0f4ff")
 ROBOT_CYAN_GLOW = QColor(0, 212, 255, 130)
 ROBOT_BOLT = QColor("#8e98ad")
 GADGET = QColor("#b9c2d4")
-# where things get built, on the 100 x 120 canvas (ui/bunnywidget.py draws the progress):
+# where things get built, on the 100 x 120 canvas (ui/bun/bunnywidget.py draws the progress):
 # the wrench prop's gadget screen, and the spot on the hammer's plank
 GADGET_SCREEN = QRectF(70, 109, 24, 6.5)
 PLANK_SPOT = QRectF(84, 91, 17, 18)
@@ -511,7 +511,7 @@ def draw_bunny(p: QPainter, rect: QRectF, prop: str | None = None, *,
                kit: dict | None = None, wave: float | None = None, kick: float = 0.0,
                hold: tuple | None = None):
     """Draw Bun fitted (aspect kept, centred) into `rect`. The keywords pose Bun for
-    animation (ui/bunnywidget.py): `blink` 0..1 closes the eyes, `mouth` 0..1 opens
+    animation (ui/bun/bunnywidget.py): `blink` 0..1 closes the eyes, `mouth` 0..1 opens
     the mouth (talking), `ears` tilts both ears outward by that many degrees,
     `swing` 0..1 brings the hammer down (0 = raised, 1 = striking the plank), and
     `sad` 0..1 worries his brows, wets his eyes, turns his smile down and brings his

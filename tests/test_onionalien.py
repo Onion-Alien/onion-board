@@ -5,7 +5,7 @@ from PySide6.QtCore import QPointF, Qt
 from PySide6.QtGui import QImage, QMouseEvent
 from PySide6.QtWidgets import QApplication
 
-from soundboard.ui.onionalien import AlienNote, alien_image
+from soundboard.ui.bun.onionalien import AlienNote, alien_image
 
 
 def paint(w):

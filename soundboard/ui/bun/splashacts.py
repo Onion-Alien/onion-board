@@ -1,4 +1,4 @@
-"""Bun's start-up acts: the splash (ui/splash.py) picks one at random on every launch
+"""Bun's start-up acts: the splash (ui/bun/splash.py) picks one at random on every launch
 and plays it on a loop until the window is up, then he waves goodbye (`goodbye`).
 
 Each act is a function of the time alone, drawing on Bun's own 100 x 120 canvas (his
@@ -25,7 +25,7 @@ from PySide6.QtCore import QPointF, QRectF, Qt
 from PySide6.QtGui import QColor, QImage, QPainter, QPainterPath, QPen
 
 from soundboard.ui.kit import theme
-from soundboard.bunny import PAW_R, draw_bunny, look_colour, music_note, sparkle
+from soundboard.ui.bun.bunny import PAW_R, draw_bunny, look_colour, music_note, sparkle
 from soundboard.style import bunnyfit
 
 NIGHT = (22, 5)         # from 22:00 to 05:00 he's mostly sleepy

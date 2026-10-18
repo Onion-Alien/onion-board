@@ -18,7 +18,7 @@ from soundboard.mic import michelper
 from soundboard.ui.kit import theme
 from soundboard.i18n import _
 from soundboard.ui.kit import icons
-from soundboard.ui.bunnywidget import BunnyWidget
+from soundboard.ui.bun.bunnywidget import BunnyWidget
 from soundboard.ui.kit.pixels import snap_to_pixels
 
 WIDTH = 460

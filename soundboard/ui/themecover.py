@@ -29,7 +29,7 @@ class ThemeCover(kit.Cover):
     def __init__(self, window: QWidget, name: str | None = None):
         # the theme being switched to (`name`; None: the current one), so the cover
         # already shows where it's going
-        from soundboard.bunny import bunny_pixmap
+        from soundboard.ui.bun.bunny import bunny_pixmap
         dpr = window.devicePixelRatioF() or 1.0
         with theme.previewing(name or theme.current_name):
             scrim = QColor(theme.T["bg"])

@@ -34,7 +34,7 @@ from soundboard.speech import aivoicelist as avl
 from soundboard.ui.voice import art
 from soundboard.ui.kit import busy, fit, icons
 from soundboard.ui.voice.aivoicebrowser import AiVoiceEditor, Previewer, hear_button
-from soundboard.ui.bunnywidget import BunnyWidget
+from soundboard.ui.bun.bunnywidget import BunnyWidget
 from soundboard.ui.voice.effectspopup import place_over
 from soundboard.ui.kit.panel import (Flow, UndoBar, ViewToggle, fold_button, hint_label,
                                      section_label)

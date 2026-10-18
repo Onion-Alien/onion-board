@@ -10,7 +10,7 @@ from PySide6.QtWidgets import QWidget
 
 from soundboard.ui.kit import theme
 from soundboard.ui.kit import appstate
-from soundboard.ui.splash import _animations_enabled
+from soundboard.ui.bun.splash import _animations_enabled
 
 FRAME_MS = 33
 SHOT_S = 0.48

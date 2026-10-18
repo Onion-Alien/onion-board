@@ -618,7 +618,7 @@ def main():
     server = listen_for_second_launch(app, lambda: holder.get("w"))
     app.instance_server = server   # pyright: ignore[reportAttributeAccessIssue]  # kept alive on the app
     from soundboard.core.autostart import TRAY_ARG
-    from soundboard.ui import splash
+    from soundboard.ui.bun import splash
     if TRAY_ARG not in sys.argv:   # a cold start can take seconds: show Bun meanwhile
         splash.show()
     from soundboard.online import ffmpegget

@@ -29,7 +29,7 @@ from PySide6.QtWidgets import (QDialog, QFrame, QHBoxLayout, QLabel, QPushButton
 from soundboard.sounds import pongsounds
 from soundboard.ui.kit import theme
 from soundboard.core import usage
-from soundboard.bunny import INK, H, W, draw_bunny, sparkle
+from soundboard.ui.bun.bunny import INK, H, W, draw_bunny, sparkle
 from soundboard.i18n import _
 from soundboard.ui.kit import appstate, fit, icons
 from soundboard.ui.kit.panel import hint_label, icon_button
@@ -814,7 +814,7 @@ class Court(Game):
 
 def games() -> dict[str, type[Game]]:
     """Every game Bun can pick, by name."""
-    from soundboard.ui import bungames
+    from soundboard.ui.bun import bungames
     return {"pong": Court, **bungames.GAMES}
 
 

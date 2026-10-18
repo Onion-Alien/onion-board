@@ -256,10 +256,10 @@ def _splash_act_back_after():
     """splash.show() picks this launch's act at random, now and then a rare one with a
     taller card: a test that showed the splash puts the act before back, or the splash
     tests after it in the same worker drew a rare launch's card."""
-    splash = sys.modules.get("soundboard.ui.splash")
+    splash = sys.modules.get("soundboard.ui.bun.splash")
     before = None if splash is None else splash._show
     yield
-    splash = sys.modules.get("soundboard.ui.splash")
+    splash = sys.modules.get("soundboard.ui.bun.splash")
     if splash is not None:   # (first imported in the test: the module's own default)
         splash._show = before if before is not None else splash.splashacts.Show()
 

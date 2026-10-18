@@ -23,9 +23,9 @@ from PySide6.QtWidgets import (QAbstractSpinBox, QApplication, QCheckBox, QDialo
 from soundboard.audio import livefx
 from soundboard.ui.kit import theme
 from soundboard import voicefx
-from soundboard.ui import bunskits
+from soundboard.ui.bun import bunskits
 from soundboard.ui.kit import fit, icons
-from soundboard.ui.bunnywidget import BunnyWidget
+from soundboard.ui.bun.bunnywidget import BunnyWidget
 from soundboard.ui.kit.panel import Flow, hint_label, reset_button, section_label
 from soundboard.ui.voice.voicefxpanel import ParamSlider
 from soundboard.ui.kit.widgets import widget_at

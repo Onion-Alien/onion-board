@@ -132,7 +132,7 @@ class UpdateControl(Controller):
         if not (cfg.update_check and cfg.update_auto and updates.can_install()
                 and net.allowed(updates.FEATURE)):
             return False
-        from soundboard.ui import splash
+        from soundboard.ui.bun import splash
         netlog.cause(updates.FEATURE, "Update check as the app starts")
         splash.set_status(_("Checking for updates…"))
         got: dict = {}
@@ -217,7 +217,7 @@ class UpdateControl(Controller):
         its own)."""
         import threading
 
-        from soundboard.ui import splash
+        from soundboard.ui.bun import splash
         t = threading.Thread(target=fn, daemon=True, name=name)
         t.start()
         while t.is_alive():

@@ -17,7 +17,7 @@ from shiboken6 import isValid as qt_valid
 
 
 from soundboard.ui.kit import busy, icons
-from soundboard.ui import onionalien
+from soundboard.ui.bun import onionalien
 from soundboard.ui.kit import theme
 from soundboard.core import usage
 from soundboard.i18n import _

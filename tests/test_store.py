@@ -328,7 +328,7 @@ def test_share_is_greyed_out_while_the_store_is_down(qapp, fake, monkeypatch):
 
 
 def test_bun_kicks_back_then_out_then_rests():
-    from soundboard.ui.bunnywidget import SULK_EVERY, sulk_kick
+    from soundboard.ui.bun.bunnywidget import SULK_EVERY, sulk_kick
     ks = [sulk_kick(SULK_EVERY * i / 100)[0] for i in range(100)]
     assert min(ks) < -0.5 and max(ks) > 0.95 and ks[-1] == 0.0
     assert ks.index(min(ks)) < ks.index(max(ks))   # draws back, then kicks

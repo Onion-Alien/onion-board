@@ -26,7 +26,7 @@ from PySide6.QtGui import (QColor, QFont, QPainter, QPainterPath, QPen, QPicture
                            QRadialGradient)
 
 from soundboard.ui.kit import theme
-from soundboard.bunny import INK, look_colour, music_note, sparkle
+from soundboard.ui.bun.bunny import INK, look_colour, music_note, sparkle
 from soundboard.style import bunnyfit
 
 Draw = Callable[[QPainter], None]

@@ -3,7 +3,7 @@ different one each download."""
 import pytest
 from PySide6.QtWidgets import QLabel
 
-from soundboard.ui import scribebun as sb
+from soundboard.ui.bun import scribebun as sb
 
 
 def test_enough_pieces_and_all_parse_and_fit():
@@ -395,7 +395,7 @@ def test_tab_leaves_the_network_activity_table(qapp):
 
 
 def test_bun_stays_after_a_download_and_unrolls_for_the_next(qapp):
-    from soundboard.ui.scribebun import HOP_S, OPEN_S, ScribeBunny
+    from soundboard.ui.bun.scribebun import HOP_S, OPEN_S, ScribeBunny
     b = ScribeBunny()
     b.reset()
     b.finish(True)
