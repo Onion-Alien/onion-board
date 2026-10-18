@@ -8,7 +8,8 @@ import pytest
 from PySide6.QtCore import QEvent
 from PySide6.QtGui import QImage
 
-from soundboard import engine, shellicon, theme, winkeys
+from soundboard import engine, shellicon, theme
+from soundboard.control import winkeys
 from soundboard.ui import mainwindow as main
 from soundboard.ui import setupwizard
 

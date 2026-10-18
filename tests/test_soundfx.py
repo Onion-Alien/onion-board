@@ -281,7 +281,7 @@ def test_live_pitch_on_the_sounds_bus(speed, keep, pitch, want):
 
 def test_edit_dialog_presets_apply_and_reset(qapp):
     from soundboard.ui.dialogs import EditDialog
-    from soundboard.winkeys import Hotkeys
+    from soundboard.control.winkeys import Hotkeys
     m = SoundMeta(id="a", name="Boom", file="x.wav")
     previews = []
     d = EditDialog(m, Hotkeys(), lambda *a: previews.append(a), tab="effects")
@@ -372,7 +372,7 @@ def test_edit_dialog_colour_swatches_are_named_and_exclusive(qapp):
     in an exclusive group, so the chosen one reads as checked."""
     from soundboard.library import PAD_COLORS
     from soundboard.ui.dialogs import EditDialog
-    from soundboard.winkeys import Hotkeys
+    from soundboard.control.winkeys import Hotkeys
     m = SoundMeta(id="a", name="Boom", file="x.wav", color=PAD_COLORS[2])
     d = EditDialog(m, Hotkeys(), lambda *a: None)
     assert d.swatch_group.exclusive()

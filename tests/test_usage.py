@@ -1265,7 +1265,7 @@ def test_background_hidden_categories_and_stream_api_count_every_day():
 
 
 def test_stream_api_counts_a_chat_command_and_an_alert_by_name(monkeypatch):
-    from soundboard import streamapi
+    from soundboard.control import streamapi
     monkeypatch.setattr(usage, "_used", set())
     mw = type("Window", (), {})()   # anything a weak reference can point at
     streamapi._log(mw, "chat", user="someone", command="tts", text="hi")

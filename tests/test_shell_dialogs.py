@@ -4,7 +4,8 @@ import pytest
 from PySide6.QtCore import QEvent, QPoint, Qt
 from PySide6.QtTest import QTest
 
-from soundboard import engine, settings, theme, winkeys
+from soundboard import engine, settings, theme
+from soundboard.control import winkeys
 from soundboard.ui import fitcontrol, settingscontrol, setupwizard
 from soundboard.ui import mainwindow as main
 from soundboard.ui.livedot import set_tab_live

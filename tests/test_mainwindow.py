@@ -12,7 +12,8 @@ from PySide6.QtGui import QWheelEvent
 from PySide6.QtWidgets import (QApplication, QLabel, QMenu, QScrollArea, QSlider, QVBoxLayout,
                                QWidget)
 
-from soundboard import __version__, engine, library, winkeys
+from soundboard import __version__, engine, library
+from soundboard.control import winkeys
 from soundboard.library import SR, Config, SoundMeta
 from soundboard.ui import mainwindow as main
 from soundboard.ui import windowbuild

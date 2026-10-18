@@ -26,7 +26,7 @@ import threading
 from PySide6.QtCore import QObject, Signal
 from PySide6.QtGui import QGuiApplication
 
-from soundboard import midi
+from soundboard.control import midi
 from soundboard.i18n import _
 
 log = logging.getLogger(__name__)
@@ -316,7 +316,7 @@ class Hotkeys(QObject):
     With `share` on (set it before `register`), keys are read from raw input instead,
     so the game in front still gets them; the combos in `grab` are always taken.
 
-    Combos starting `midi:` are MIDI pads (soundboard.midi), handled by `self.midi`.
+    Combos starting `midi:` are MIDI pads (soundboard.control.midi), handled by `self.midi`.
 
     `failed_changed(list)` is emitted (on the Qt thread) after every `register`
     with the combos another program already owns."""

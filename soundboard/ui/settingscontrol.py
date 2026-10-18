@@ -13,7 +13,7 @@ from PySide6.QtCore import QSize, Qt, QTimer
 from PySide6.QtWidgets import QApplication, QSizePolicy, QWidget
 from shiboken6 import isValid as qt_valid
 
-from soundboard import remote
+from soundboard.control import remote
 from soundboard.engine import is_virtual as is_virtual_cable
 from soundboard.settings import SettingsDialog
 from soundboard.ui import routewarn

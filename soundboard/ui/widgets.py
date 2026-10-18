@@ -22,7 +22,8 @@ from shiboken6 import delete as qt_delete
 from shiboken6 import invalidate as qt_invalidate
 from shiboken6 import isValid as qt_valid
 
-from soundboard import library, midi, theme, thumbs
+from soundboard import library, theme, thumbs
+from soundboard.control import midi
 from soundboard.eq import MAX_DB as EQ_MAX_DB
 from soundboard.eq import response_db as eq_response
 from soundboard.engine import SR

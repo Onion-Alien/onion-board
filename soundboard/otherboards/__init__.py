@@ -78,7 +78,7 @@ def found() -> list[Source]:
 def vk_hotkey(vk: int, ctrl=False, alt=False, shift=False, win=False) -> str:
     """A Windows virtual-key code + modifiers -> our 'ctrl+1' form; "" for none, a bare
     modifier, or a mouse button (not keys we can register)."""
-    from soundboard import winkeys   # Win32; only needed once there's a key
+    from soundboard.control import winkeys  # Win32; only needed once there's a key
     if not 0 < vk < 0xFF or vk in winkeys.MODIFIER_VKS or vk in (1, 2, 4, 5, 6):
         return ""
     flags = ((winkeys.MOD_CONTROL if ctrl else 0) | (winkeys.MOD_ALT if alt else 0)

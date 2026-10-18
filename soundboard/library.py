@@ -212,7 +212,7 @@ def clean_hotkey(combo: str, what: str) -> str:
     versions saved any text. It stays as written otherwise, for older versions."""
     if not combo:
         return ""
-    from soundboard import winkeys   # Win32; only needed once there's a key
+    from soundboard.control import winkeys  # Win32; only needed once there's a key
     if winkeys.check(combo)[1]:
         log.warning("dropped the hotkey %r of %s: no key can send it", combo[:80], what)
         return ""
@@ -557,11 +557,11 @@ class Config:
     # in memory, and the key saves them as a new pad
     replay_hotkey: str = ""
     replay_seconds: int = 30
-    # local control API for Stream Deck / scripts (soundboard.remote): off unless turned on
+    # local control API for Stream Deck / scripts (soundboard.control.remote): off unless turned on
     api_enabled: bool = False
     api_port: int = 7474
     api_token: str = ""
-    # the control API's chat commands and alerts (soundboard.streamapi): {"chat": {...},
+    # the control API's chat commands and alerts (soundboard.control.streamapi): {"chat": {...},
     # "alerts": {type: [rule, ...]}, "alerts_on": bool}; set through /api/chat_rules
     # and /api/alerts
     api_stream: dict = field(default_factory=dict)

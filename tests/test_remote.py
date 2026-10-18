@@ -1,4 +1,4 @@
-"""The local control API (soundboard.remote): a real server on a free 127.0.0.1 port,
+"""The local control API (soundboard.control.remote): a real server on a free 127.0.0.1 port,
 driven over HTTP while the Qt event loop answers."""
 import http.client
 import json
@@ -10,7 +10,7 @@ import numpy as np
 import pytest
 
 from conftest import process_events
-from soundboard import remote
+from soundboard.control import remote
 from test_mainwindow import window as main_window  # noqa: F401  (the real MainWindow)
 
 TOKEN = "test-token-123"

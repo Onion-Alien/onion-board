@@ -416,9 +416,9 @@ def _never_touch_the_real_mic(monkeypatch, tmp_path):
 @pytest.fixture(autouse=True)
 def _never_watch_the_real_front_window(monkeypatch):
     """No test looks at this PC's window in front for games run as admin
-    (soundboard.adminfront): a full-screen admin program here would put a notice in it.
+    (soundboard.control.adminfront): a full-screen admin program here would put a notice in it.
     tests/test_adminfront.py drives the check with fakes."""
-    from soundboard import adminfront
+    from soundboard.control import adminfront
     monkeypatch.setattr(adminfront.Watcher, "start", lambda self: False)
 
 
@@ -540,7 +540,7 @@ def _data_prefs_back_to_default(monkeypatch):
 
 
 class NoMidi:
-    """soundboard.midi's winmm backend with no devices: tests never open the
+    """soundboard.control.midi's winmm backend with no devices: tests never open the
     developer's real MIDI controllers (a DAW may be using them)."""
     def __init__(self):
         self.on_message = self.on_closed = lambda *_: None
@@ -577,7 +577,7 @@ def _never_look_at_the_real_foreground():
 
 @pytest.fixture(autouse=True)
 def _never_touch_real_midi(monkeypatch):
-    from soundboard import midi
+    from soundboard.control import midi
     monkeypatch.setattr(midi, "WinMM", NoMidi)
 
 
@@ -612,7 +612,7 @@ def own_time(monkeypatch, module, **fakes):
 
 def us_key_char(vk: int) -> str:
     """winkeys.key_char on a US keyboard layout, whatever layout this PC has."""
-    from soundboard import winkeys
+    from soundboard.control import winkeys
     us = {winkeys.VK[k]: k for k in (";", "=", ",", "-", ".", "/", "`", "[", "\\", "]", "'")}
     return us.get(vk) or (chr(vk) if 0x30 <= vk <= 0x5A else "")
 
@@ -621,7 +621,7 @@ def us_key_char(vk: int) -> str:
 def _us_keyboard_layout(monkeypatch):
     """Key labels and the overlay key's layout check read the PC's keyboard layout;
     tests see a US one wherever they run."""
-    from soundboard import winkeys
+    from soundboard.control import winkeys
     monkeypatch.setattr(winkeys, "key_char", us_key_char)
 
 

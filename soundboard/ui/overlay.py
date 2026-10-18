@@ -32,7 +32,8 @@ from PySide6.QtGui import (QColor, QFont, QFontMetrics, QGuiApplication, QPainte
                            QPen, QPixmap, QPolygonF)
 from PySide6.QtWidgets import QApplication, QWidget
 
-from soundboard import library, theme, winkeys
+from soundboard import library, theme
+from soundboard.control import winkeys
 from soundboard.i18n import _, ngettext
 from soundboard.ui import lite
 from soundboard.ui.pixels import snap_to_pixels

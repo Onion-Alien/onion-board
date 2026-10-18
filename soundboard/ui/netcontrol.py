@@ -9,7 +9,8 @@ from __future__ import annotations
 import html
 from typing import TYPE_CHECKING
 
-from soundboard import net, remote, tor
+from soundboard import net, tor
+from soundboard.control import remote
 from soundboard.i18n import _
 from soundboard.ui import busy, sidebar
 from soundboard.ui.controller import Controller

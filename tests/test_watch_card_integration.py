@@ -92,7 +92,8 @@ def test_built_bar_keeps_its_words_with_triggers_coming_and_going(
     switches, and go icon only only when the bar itself is narrow."""
     from PySide6.QtCore import QEvent
 
-    from soundboard import engine, winkeys
+    from soundboard import engine
+    from soundboard.control import winkeys
     from soundboard.library import Config
     from soundboard.ui import mainwindow as main
     for name in ("set_main_device", "set_mon_device", "set_mic_device"):

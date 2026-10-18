@@ -1,7 +1,7 @@
-"""MIDI pad controllers as hotkeys (soundboard.midi): the combo format, decoding the
+"""MIDI pad controllers as hotkeys (soundboard.control.midi): the combo format, decoding the
 messages, which devices get opened, and pads firing / releasing hotkeys. A fake
 winmm backend stands in for real devices."""
-from soundboard import midi, winkeys
+from soundboard.control import midi, winkeys
 from soundboard.settings import HotkeyDialog, pretty_key
 
 

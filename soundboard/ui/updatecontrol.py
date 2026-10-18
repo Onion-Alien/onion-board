@@ -19,7 +19,8 @@ from PySide6.QtGui import QDesktopServices
 from PySide6.QtWidgets import QApplication, QMessageBox, QSystemTrayIcon
 from shiboken6 import isValid as qt_valid
 
-from soundboard import errors, exitwatch, net, netlog, remote, updates, usage
+from soundboard import errors, exitwatch, net, netlog, updates, usage
+from soundboard.control import remote
 from soundboard.addons import watchaddon
 from soundboard.i18n import _
 from soundboard.ui import busy, worker

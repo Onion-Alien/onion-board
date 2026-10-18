@@ -1,6 +1,6 @@
 import pytest
 
-from soundboard import winkeys as wk
+from soundboard.control import winkeys as wk
 
 
 @pytest.mark.parametrize("combo, mods, vk", [
@@ -145,7 +145,7 @@ def test_bare_f12_is_watched_not_refused(qapp):
     """F12 alone can't be a RegisterHotKey, so it's watched: it works and isn't reported
     as taken (it used to warn on every start)."""
     from conftest import process_events
-    from soundboard import midi
+    from soundboard.control import midi
     from test_midi import FakeWinMM
     hk = wk.Hotkeys(midi.MidiIn(FakeWinMM([])))
     got = []

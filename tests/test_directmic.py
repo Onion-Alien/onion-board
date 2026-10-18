@@ -3239,7 +3239,8 @@ def test_window_starts_on_the_mic_with_the_cable_copy(qapp, app_dir, monkeypatch
     """A whole start-up on the mic route with the effect working and a cable there
     (an upgraded 1.9.0 cable config): no crash, live in the mic, the copy opened."""
     from soundboard import engine as eng
-    from soundboard import library, winkeys
+    from soundboard import library
+    from soundboard.control import winkeys
     from soundboard.ui import mainwindow as main
     monkeypatch.setattr(dm, "status", lambda name=None: "outdated")
     monkeypatch.setattr(eng, "virtual_outputs", lambda: [CABLE_IN])

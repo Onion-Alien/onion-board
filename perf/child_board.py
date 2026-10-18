@@ -181,11 +181,11 @@ def isolate(conf: dict):
     updates._get = updates._open = offline
     updates.start_install = no_admin
 
-    from soundboard import winkeys
+    from soundboard.control import winkeys
     winkeys.Hotkeys.register = lambda self, mapping: None   # no global hotkeys
     winkeys.press = lambda *a, **k: False                    # no key presses (push-to-talk)
 
-    from soundboard import midi
+    from soundboard.control import midi
 
     class NoMidi:
         def __init__(self):

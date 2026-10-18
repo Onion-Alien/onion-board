@@ -1552,10 +1552,10 @@ def test_saved_station_list_is_still_plain_json(tmp_path):
 
 
 def test_phone_remote_lists_searches_and_drives_the_radio(qapp, tab, server, monkeypatch):
-    """soundboard.remote's radio actions, on the tab itself: what a phone sees and does."""
+    """soundboard.control.remote's radio actions, on the tab itself: what a phone sees and does."""
     from types import SimpleNamespace
 
-    from soundboard import remote
+    from soundboard.control import remote
     played = []
     monkeypatch.setattr(tab.player, "play", lambda s: (played.append(s.uuid),
                                                       setattr(tab.player, "station", s)))

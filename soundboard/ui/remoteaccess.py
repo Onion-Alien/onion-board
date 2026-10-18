@@ -1,4 +1,4 @@
-"""Remote control in the main window: the local control API (soundboard.remote) started and
+"""Remote control in the main window: the local control API (soundboard.control.remote) started and
 stopped to match the settings, and the phone-remote add-ons (soundboard.addons.modules, e.g. Onion
 Pocket): starting them, loading a newly installed or updated one in place of the old,
 removing one, and stopping them all when the app quits.
@@ -12,7 +12,8 @@ import logging
 import sys
 from typing import TYPE_CHECKING
 
-from soundboard import errors, remote, theme
+from soundboard import errors, theme
+from soundboard.control import remote
 from soundboard.i18n import _
 from soundboard.ui.controller import Controller
 

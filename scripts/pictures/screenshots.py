@@ -39,7 +39,8 @@ import soundfile as sf  # noqa: E402
 from PySide6.QtCore import QEventLoop  # noqa: E402
 from PySide6.QtWidgets import QApplication  # noqa: E402
 
-from soundboard import appaudio, autostart, engine, library, tips, winkeys  # noqa: E402
+from soundboard import appaudio, autostart, engine, library, tips  # noqa: E402
+from soundboard.control import winkeys  # noqa: E402
 
 winkeys.key_char = conftest.us_key_char   # hotkeys drawn as on a US keyboard
 
