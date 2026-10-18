@@ -487,6 +487,31 @@ def _never_update_for_real(monkeypatch, tmp_path):
 
 
 @pytest.fixture(autouse=True)
+def _never_use_the_real_store(monkeypatch):
+    """No test reaches the real sound store (it has a daily allowance, and whether it was
+    up decided some tests): a call to it gets an empty store at once, never the network.
+    Tests that need other answers fake store._request or net.urlopen themselves."""
+    import io
+
+    from soundboard import net, store
+    real = net.urlopen
+
+    class Empty(io.BytesIO):
+        def __enter__(self):
+            return self
+
+        def __exit__(self, *_a):
+            return False
+
+    def urlopen(req, *a, **k):
+        if str(getattr(req, "full_url", req)).startswith(store.BASE):
+            return Empty(b'{"sounds": [], "voices": [], "categories": [], "links": [], '
+                         b'"more": false, "total": 0}')
+        return real(req, *a, **k)
+    monkeypatch.setattr(net, "urlopen", urlopen)
+
+
+@pytest.fixture(autouse=True)
 def _test_servers_stand_in_for_the_internet(monkeypatch, request):
     """The tests' radio stations and Radio Browser run on 127.0.0.x, standing in for
     internet hosts, so the relay's NEVER_THIS_PC refusal is off unless a test asks for
