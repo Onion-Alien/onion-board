@@ -524,7 +524,8 @@ backup is used, so the pad list is never silently reset.
 ### Voice background recordings
 
 The voice changer bundles seven CC0 loops in `assets/backgrounds/`, including the
-extra rain-on-a-window choice. `credits.json` carries source pages, creators,
+extra rain-on-a-window choice, as Ogg Vorbis (quality 5; each decodes to exactly the
+samples of the FLAC it was made from, so the baked-in loop seam stays put). `credits.json` carries source pages, creators,
 licenses and file hashes; the packaged third-party notices include these credits.
 `voicefx/backdrop.py` decodes and caches active loops on its worker, including
 neutral settings. The audio callback only reads the finished loops, and preview

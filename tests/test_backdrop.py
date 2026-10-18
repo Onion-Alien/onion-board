@@ -610,6 +610,20 @@ def test_every_background_has_a_verified_cc0_credit_and_build_data():
         assert hashlib.sha256(content).hexdigest() == credit["sha256"]
     root = Path(__file__).resolve().parents[1]
     assert 'assets\\backgrounds;backgrounds' in (root / "build.ps1").read_text("utf-8")
+    # every recording in the folder is a credited one (no FLAC left behind in the build)
+    audio = {p.name for p in backdrop.AUDIO_DIR.iterdir() if p.suffix not in (".json", ".md")}
+    assert audio == {c["file"] for c in credits}
+
+
+def test_every_bundled_loop_decodes_and_still_loops_without_a_click():
+    """The loops are Ogg Vorbis made from FLAC loops with the seam baked in: a lossy
+    encoder's start or end that drifted would click at every turn."""
+    backdrop.recording.cache_clear()
+    for layer in LAYERS:
+        x = backdrop.recording(layer)
+        assert x.ndim == 1 and len(x) >= 16 * backdrop.SR and np.isfinite(x).all()
+        step = float(np.percentile(np.abs(np.diff(x)), 99))
+        assert abs(float(x[0] - x[-1])) < step, layer   # the seam: no bigger than a usual step
 
 
 

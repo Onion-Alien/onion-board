@@ -1,6 +1,6 @@
 [
   {
-    "file": "space.flac",
+    "file": "space.ogg",
     "title": "ambient spacecraft hum by AlaskaRobotics",
     "creator": "AlaskaRobotics",
     "source": "https://freesound.org/people/AlaskaRobotics/sounds/221570/",
@@ -8,11 +8,12 @@
     "license_url": "https://creativecommons.org/publicdomain/zero/1.0/",
     "source_preview": "https://cdn.freesound.org/previews/221/221570_1282865-hq.mp3",
     "source_sha256": "76337bd695da54b95bbde2c18df40ed0afe328e1c61a6683f8f1584dc2e28941",
-    "sha256": "2d387490140d84d754e2da933886bd908f0deca502c158661da83dfbba1cf527",
-    "processing": "Excerpt, stereo averaged to mono, resampled to 48 kHz, DC removed, 1 s equal-power loop seam, gain adjusted, 16-bit FLAC encoded."
+    "sha256": "856ab31a200fdb9ff0acba7004527ea0944b5f569d60b6d0b9be78eaf4ce2951",
+    "processing": "Excerpt, stereo averaged to mono, resampled to 48 kHz, DC removed, 1 s equal-power loop seam, gain adjusted, 16-bit FLAC encoded, then Ogg Vorbis encoded from that FLAC (libvorbis quality 5, lossy).",
+    "flac_sha256": "2d387490140d84d754e2da933886bd908f0deca502c158661da83dfbba1cf527"
   },
   {
-    "file": "crowd.flac",
+    "file": "crowd.ogg",
     "title": "Large_crowd_medium_distance_stereo.wav by eguobyte",
     "creator": "eguobyte",
     "source": "https://freesound.org/people/eguobyte/sounds/360703/",
@@ -20,11 +21,12 @@
     "license_url": "https://creativecommons.org/publicdomain/zero/1.0/",
     "source_preview": "https://cdn.freesound.org/previews/360/360703_3471835-hq.mp3",
     "source_sha256": "168dadb9e2cb225a8cce41e73f5377e6721f4e31108508d3d4e3cc84cded87fd",
-    "sha256": "210456d87e4e6e006e34c51ba0d0accc5ad2a39773c6bc5a1809bcd0efb931e7",
-    "processing": "Excerpt, stereo averaged to mono, resampled to 48 kHz, DC removed, 1 s equal-power loop seam, gain adjusted, 16-bit FLAC encoded."
+    "sha256": "6ecc1792d875af01003ef0c924e8c192af3eb2d56546699d05c1868c65911d66",
+    "processing": "Excerpt, stereo averaged to mono, resampled to 48 kHz, DC removed, 1 s equal-power loop seam, gain adjusted, 16-bit FLAC encoded, then Ogg Vorbis encoded from that FLAC (libvorbis quality 5, lossy).",
+    "flac_sha256": "210456d87e4e6e006e34c51ba0d0accc5ad2a39773c6bc5a1809bcd0efb931e7"
   },
   {
-    "file": "rain.flac",
+    "file": "rain.ogg",
     "title": "Soft rain.WAV by barkenov",
     "creator": "barkenov",
     "source": "https://freesound.org/people/barkenov/sounds/640655/",
@@ -32,11 +34,12 @@
     "license_url": "https://creativecommons.org/publicdomain/zero/1.0/",
     "source_preview": "https://cdn.freesound.org/previews/640/640655_2414299-hq.mp3",
     "source_sha256": "f5e4d1958e192762dc35e535e79afd30755986e18e7edabade998d84d446e6b9",
-    "sha256": "e49c7f0d94058e74d1ecf39c5689c249283981d883d20fa2178d6910410fd04d",
-    "processing": "Excerpt, stereo averaged to mono, resampled to 48 kHz, DC removed, 1 s equal-power loop seam, gain adjusted, 16-bit FLAC encoded."
+    "sha256": "c8cc22b48e68390b6260275e1575f82ec890acea774e8028be3ae25f7c45dd0f",
+    "processing": "Excerpt, stereo averaged to mono, resampled to 48 kHz, DC removed, 1 s equal-power loop seam, gain adjusted, 16-bit FLAC encoded, then Ogg Vorbis encoded from that FLAC (libvorbis quality 5, lossy).",
+    "flac_sha256": "e49c7f0d94058e74d1ecf39c5689c249283981d883d20fa2178d6910410fd04d"
   },
   {
-    "file": "window.flac",
+    "file": "window.ogg",
     "title": "rain against window 2 by bastipictures",
     "creator": "bastipictures",
     "source": "https://freesound.org/people/bastipictures/sounds/243781/",
@@ -44,11 +47,12 @@
     "license_url": "https://creativecommons.org/publicdomain/zero/1.0/",
     "source_preview": "https://cdn.freesound.org/previews/243/243781_997601-hq.mp3",
     "source_sha256": "e75938ab97541cf681fd3bf27acf5de4215c6b22eea88b1d03050eb1e8d28e71",
-    "sha256": "1ddf81407bb2ffcd6e9f93cb688f1cdb33c4b36d8785c2fea2cf230ebae862a7",
-    "processing": "Excerpt, stereo averaged to mono, resampled to 48 kHz, DC removed, 1 s equal-power loop seam, gain adjusted, 16-bit FLAC encoded."
+    "sha256": "567cf407fb0f92c8ab69b6c5b75744fd656ec90cf6827755c0c1b3584eccf8e2",
+    "processing": "Excerpt, stereo averaged to mono, resampled to 48 kHz, DC removed, 1 s equal-power loop seam, gain adjusted, 16-bit FLAC encoded, then Ogg Vorbis encoded from that FLAC (libvorbis quality 5, lossy).",
+    "flac_sha256": "1ddf81407bb2ffcd6e9f93cb688f1cdb33c4b36d8785c2fea2cf230ebae862a7"
   },
   {
-    "file": "fire.flac",
+    "file": "fire.ogg",
     "title": "Fire crackling in fireplace by Davor",
     "creator": "Davor",
     "source": "https://freesound.org/people/Davor/sounds/382616/",
@@ -56,11 +60,12 @@
     "license_url": "https://creativecommons.org/publicdomain/zero/1.0/",
     "source_preview": "https://cdn.freesound.org/previews/382/382616_7094269-hq.mp3",
     "source_sha256": "1e470bafa4a1a44d143beb0ae65664e574fe01243d82901a8428b4e41251320e",
-    "sha256": "2ef5d37623f67c08eb360b2a51c4564ed6031f5c5bbbca08fb83c38d1ff74281",
-    "processing": "Excerpt, stereo averaged to mono, resampled to 48 kHz, DC removed, 1 s equal-power loop seam, gain adjusted, 16-bit FLAC encoded."
+    "sha256": "bf3aaac93659ee47d00f93d3fb76c21985315c26ae98c19235d647f3bea5c14c",
+    "processing": "Excerpt, stereo averaged to mono, resampled to 48 kHz, DC removed, 1 s equal-power loop seam, gain adjusted, 16-bit FLAC encoded, then Ogg Vorbis encoded from that FLAC (libvorbis quality 5, lossy).",
+    "flac_sha256": "2ef5d37623f67c08eb360b2a51c4564ed6031f5c5bbbca08fb83c38d1ff74281"
   },
   {
-    "file": "engine.flac",
+    "file": "engine.ogg",
     "title": "Marine diesel engine by AugustSandberg",
     "creator": "AugustSandberg",
     "source": "https://freesound.org/people/AugustSandberg/sounds/264864/",
@@ -68,11 +73,12 @@
     "license_url": "https://creativecommons.org/publicdomain/zero/1.0/",
     "source_preview": "https://cdn.freesound.org/previews/264/264864_1934171-hq.mp3",
     "source_sha256": "3010e85de70016fa4cb307da37e68b7f7a3466af76c74a8872b202807f907b2f",
-    "sha256": "0450a972564c2cc700ae14c7f10034556cd3e21f91a05f928672c90a07055201",
-    "processing": "Excerpt, stereo averaged to mono, resampled to 48 kHz, DC removed, 1 s equal-power loop seam, gain adjusted, 16-bit FLAC encoded."
+    "sha256": "7f75a3068ecf1a87fa618672ecc7b576ec523fecd2fe76ad279e2186212843aa",
+    "processing": "Excerpt, stereo averaged to mono, resampled to 48 kHz, DC removed, 1 s equal-power loop seam, gain adjusted, 16-bit FLAC encoded, then Ogg Vorbis encoded from that FLAC (libvorbis quality 5, lossy).",
+    "flac_sha256": "0450a972564c2cc700ae14c7f10034556cd3e21f91a05f928672c90a07055201"
   },
   {
-    "file": "wind.flac",
+    "file": "wind.ogg",
     "title": "Cold wind sound effect.wav",
     "creator": "yodaman170",
     "source": "https://freesound.org/people/yodaman170/sounds/620454/",
@@ -80,7 +86,8 @@
     "license_url": "https://creativecommons.org/publicdomain/zero/1.0/",
     "source_preview": "https://cdn.freesound.org/previews/620/620454_13690738-hq.mp3",
     "source_sha256": "07e914995f28092a3bca76d2f2eeceaee5ba23220b278df247fc7ebb526fc071",
-    "sha256": "2bb9759820242e57da894dc7f1cd198453b0960cc6b7df0fe2baf81e30db3ace",
-    "processing": "Excerpt, stereo averaged to mono, resampled to 48 kHz, DC removed, 1 s equal-power loop seam, gain adjusted, 16-bit FLAC encoded."
+    "sha256": "17ab40a2fab8b1722c8aacef8e40a7cf9534dc0d164c4b4ced06b88e1c80d34d",
+    "processing": "Excerpt, stereo averaged to mono, resampled to 48 kHz, DC removed, 1 s equal-power loop seam, gain adjusted, 16-bit FLAC encoded, then Ogg Vorbis encoded from that FLAC (libvorbis quality 5, lossy).",
+    "flac_sha256": "2bb9759820242e57da894dc7f1cd198453b0960cc6b7df0fe2baf81e30db3ace"
   }
 ]
