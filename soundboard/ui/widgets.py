@@ -93,14 +93,14 @@ def fit_placeholder(edit: QLineEdit, *hints: str):
     global _placeholder_fit
     if _placeholder_fit is None:
         _placeholder_fit = _PlaceholderFit(QApplication.instance())
-    if getattr(edit, "_placeholders", None) is None:
+    if edit.property("placeholders") is None:
         edit.installEventFilter(_placeholder_fit)
-    edit._placeholders = hints
+    edit.setProperty("placeholders", list(hints))
     _refit_placeholder(edit)
 
 
 def _refit_placeholder(edit: QLineEdit):
-    hints = getattr(edit, "_placeholders", ())
+    hints = edit.property("placeholders") or []
     if not hints:
         return
     # the room for text: its contents less the icon buttons inside it (search, clear:

@@ -423,9 +423,11 @@ class SpeechPanel(QWidget):
         shown = b.text()
         b.setText(word)
         lay = self.say_bar.layout()
+        if lay is None:
+            return
         m = lay.contentsMargins()
-        others = sum(w.sizeHint().width() for w in (lay.itemAt(i).widget()
-                                                    for i in range(lay.count()))
+        parts = [lay.itemAt(i) for i in range(lay.count())]
+        others = sum(w.sizeHint().width() for w in (it.widget() for it in parts if it)
                      if w is not None and w is not ed and not w.isHidden())
         gaps = lay.spacing() * max(lay.count() - 1, 0)
         room = self.say_bar.width() - m.left() - m.right() - others - gaps
