@@ -15,6 +15,7 @@ from soundboard.ui import busy, sidebar
 from soundboard.ui.controller import Controller
 from soundboard.ui.radiopanel import RadioTab
 from soundboard.ui.tabcontrol import TAB_INDEX
+from soundboard.ui.widgets import fit_placeholder
 
 if TYPE_CHECKING:
     from soundboard.ui.mainwindow import MainWindow
@@ -57,8 +58,11 @@ class NetControl(Controller):
         mw = self.mw
         online = mw.ytresults.available()
         mw.btn_yt.setVisible(online)
-        mw.search.setPlaceholderText(_("Search sounds or paste a link") if online else
-                                       _("Search your sounds"))
+        if online:
+            fit_placeholder(mw.search, _("Search sounds or paste a link"),
+                            _("Search sounds"), _("Search"))
+        else:
+            fit_placeholder(mw.search, _("Search your sounds"), _("Search"))
         mw.search.setToolTip(mw._search_tip if online else _("Type to filter your sounds"))
 
     def _cable_follow_switch(self):

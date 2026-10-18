@@ -28,7 +28,7 @@ from PySide6.QtWidgets import (
 from soundboard import library, sourceinfo, thumbs
 from soundboard.i18n import _, ngettext
 from soundboard.library import SoundMeta
-from soundboard.settings import pretty_key
+from soundboard.ui.hotkeypick import pretty_key
 from soundboard.ui import clipeditor, icons, responsive, sourcedialog
 from soundboard.ui.controller import Controller
 from soundboard.ui.panel import icon_label, steady_number

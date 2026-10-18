@@ -1603,7 +1603,7 @@ class VoiceFxPanel(QWidget):
     def _tile_menu(self, name: str, at):
         """A voice card's right-click menu: its hotkey, and for a saved voice rename,
         share and delete."""
-        from soundboard.settings import pretty_key
+        from soundboard.ui.hotkeypick import pretty_key
         m = QMenu(self)
         if self.play_sample is not None:
             m.addAction(icons.icon("headphones"), HEAR, lambda: self.hear(name))

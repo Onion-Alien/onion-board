@@ -421,7 +421,7 @@ class Child:
         app.hangwatch = HangWatch(parent=app)
         app.collector = UiCollector(parent=app)
         self.foreground(True)
-        loaded = self.run_until(lambda: not w._load_thread.is_alive(), 60)
+        loaded = self.run_until(lambda: not w.soundctl._load_thread.is_alive(), 60)
         if self.conf.get("watch_zip") and w.triggers.needed_now():
             self.run_until(lambda: not w.triggers.pending, 30)
         self.run_for(0.3)
@@ -475,9 +475,9 @@ class Child:
         files = self.conf["import_files"]
         before = len(w.cfg.sounds)
         t0 = time.perf_counter()
-        w.import_files(list(files))
+        w.impctl.import_files(list(files))
         ok = self.run_until(lambda: len(w.cfg.sounds) >= before + len(files)
-                            and not getattr(w, "_pending_imports", 0), 120, 0.1)
+                            and not getattr(w.impctl, "_pending_imports", 0), 120, 0.1)
         took = time.perf_counter() - t0
         self.run_for(0.5)
         w._save_now()
@@ -491,19 +491,19 @@ class Child:
     def sc_play_overlap(self):
         w = self.w
         for sid in self._sids()[:3]:
-            w.play(sid, now=True)
+            w.playctl.play(sid, now=True)
         self.run_for(self.secs)
-        w.stop_all()
+        w.playctl.stop_all()
         self.run_for(0.5)
 
     def sc_play_rapid(self):
         w = self.w
         sids = self._sids()
         for k in range(20):
-            w.play(sids[k % len(sids)], now=True)
+            w.playctl.play(sids[k % len(sids)], now=True)
             self.run_for(0.05)
         self.run_for(1.0)
-        w.stop_all()
+        w.playctl.stop_all()
         self.run_for(1.0)
 
     def sc_fx_preview(self):
@@ -511,10 +511,10 @@ class Child:
         w = self.w
         presets = [p for p in soundfx.PRESETS if p != "None (original)"]
         for k, sid in enumerate(self._sids()[:5]):
-            w.preview(sid, fx=soundfx.PRESETS[presets[k % len(presets)]])
+            w.playctl.preview(sid, fx=soundfx.PRESETS[presets[k % len(presets)]])
             self.run_for(0.8)
-        w.drop_preview()
-        w.stop_all()
+        w.playctl.drop_preview()
+        w.playctl.stop_all()
         self.run_for(1.0)
         held = sum(getattr(a, "nbytes", 0) for a in getattr(w, "_fx_cache", {}).values()) \
             if hasattr(w, "_fx_cache") else None
@@ -542,12 +542,12 @@ class Child:
         for k in range(2):
             self.close_dialogs_soon(500)
             t0 = time.perf_counter()
-            w.open_settings("privacy" if k == 0 else "devices")
+            w.setctl.open_settings("privacy" if k == 0 else "devices")
             took[f"settings_{k}"] = round(time.perf_counter() - t0, 2)
         for k, sid in enumerate(self._sids()[:2]):
             self.close_dialogs_soon(500)
             t0 = time.perf_counter()
-            w.edit(sid)
+            w.editctl.edit(sid)
             took[f"edit_{k}"] = round(time.perf_counter() - t0, 2)
         self.run_for(0.5)
         return {"dialog_s": took}
@@ -582,7 +582,7 @@ class Child:
         self.run_for(0.3)
 
     def _tab(self, key: str):
-        from soundboard.ui.mainwindow import TAB_INDEX
+        from soundboard.ui.tabcontrol import TAB_INDEX
         self.w.tabs.setCurrentIndex(TAB_INDEX[key])
 
     def sc_apps_tab_shown(self):
@@ -606,10 +606,10 @@ class Child:
     def sc_route_mic(self):
         w = self.w
         self.state["direct"] = "ready"
-        w.set_route("mic")
+        w.routectl.set_route("mic")
         self.run_for(self.secs)
         route = w.cfg.route
-        w.set_route("cable")
+        w.routectl.set_route("cable")
         self.state["direct"] = "missing"
         self.run_for(0.5)
         return {"route_was": route}
@@ -630,13 +630,13 @@ class Child:
                 self.iteration(0)
                 continue
             for sid in sids[i % len(sids):][:3]:
-                w.play(sid, now=True)
+                w.playctl.play(sid, now=True)
             self.run_for(0.3)
-            w.preview(sids[i % len(sids)], fx=fx)
+            w.playctl.preview(sids[i % len(sids)], fx=fx)
             self.run_for(0.4)
-            w.stop_all()
+            w.playctl.stop_all()
             self.close_dialogs_soon(250)
-            w.open_settings("privacy")
+            w.setctl.open_settings("privacy")
             for key in ("voice", "apps", "triggers", "sounds"):
                 self._tab(key)
                 self.run_for(0.12)

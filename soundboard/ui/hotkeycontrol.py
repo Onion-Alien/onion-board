@@ -21,7 +21,7 @@ from soundboard import adminfront, midi, theme, usage, winkeys
 from soundboard.engine import SR
 from soundboard.i18n import _, ngettext
 from soundboard.library import SoundMeta
-from soundboard.settings import HOTKEY_ACTIONS, HotkeyDialog, pretty_key
+from soundboard.ui.hotkeypick import HOTKEY_ACTIONS, HotkeyDialog, pretty_key
 from soundboard.ui import busy, icons
 from soundboard.ui.controller import Controller
 from soundboard.ui.crashdialog import free_dialog
