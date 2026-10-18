@@ -14,15 +14,14 @@ from typing import TYPE_CHECKING
 from PySide6.QtCore import Qt, Signal
 from PySide6.QtGui import QGuiApplication
 from PySide6.QtWidgets import (QComboBox, QDialog, QHBoxLayout, QLabel, QLineEdit,
-                               QPushButton, QSizePolicy, QVBoxLayout, QWidget)
+                               QPushButton, QVBoxLayout, QWidget)
 
 from soundboard import errors, savedvoices, store, storevoices as sv, usage, voicefx, voicesetups
 from soundboard.i18n import _
 from soundboard.speech import aivoicelist as avl
-from soundboard.ui import busy, fit, icons, storelook
-from soundboard.ui.panel import HoverCard, icon_button
-from soundboard.ui.storetab import ROW_MAX_W, SoundRow
-from soundboard.ui.ytsearch import ClampLabel
+from soundboard.ui import busy, fit, icons
+from soundboard.ui.panel import HoverCard
+from soundboard.ui.storetab import SoundRow
 
 if TYPE_CHECKING:
     from soundboard.ui.voicepanel import VoicePanel
@@ -60,60 +59,14 @@ def meta_line(v: sv.Voice) -> str:
 
 
 class VoiceRow(SoundRow):
-    """One community voice: hear it, vote on it, get it, or report it. (A SoundRow for
-    its votes and play button; its own picture, words and Get button.)"""
+    """One community voice's card: hear it, vote on it, get it, or report it (a sound's
+    card, with its own picture, second line and Get words)."""
 
     def __init__(self, v: sv.Voice, tab):   # noqa: D107 - not SoundRow's: no sound file
         HoverCard.__init__(self)
-        self.sound = v   # (the name the tab's vote and hear code read)
-        self.setMaximumWidth(ROW_MAX_W)
-        h = QHBoxLayout(self)
-        h.setContentsMargins(8, 8, 12, 8)
-        h.setSpacing(8)
-        # its picture, as a sound's: its emoji (else its kind's) on a coloured tile
-        self.tile = storelook.SoundTile(v, lambda: self.btn_play.click())
-        self.tile.setToolTip(_("Hear it (only you)"))
-        h.addWidget(self.tile)
-        self.btn_play = icon_button("play", _("Hear it (only you)"))
-        self.btn_play.setCheckable(True)
-        icons.set_icon(self.btn_play, "play", checked_color="accent")
-        self.btn_play.setFixedSize(32, 32)
-        self.btn_play.toggled.connect(lambda on: tab.hear(self, on))
-        h.addWidget(self.btn_play)
-        words = QVBoxLayout()
-        words.setSpacing(0)
-        shown = v.name   # (its one checked emoji is its picture)
-        self.name = ClampLabel(shown, lines=1)
-        self.name.set_full(shown, shown)
-        meta = meta_line(v)
-        self.meta = ClampLabel(meta, lines=1, bold=False)
-        self.meta.setObjectName("hint")
-        self.meta.set_full(meta, meta)
-        for lbl in (self.name, self.meta):   # (they paint their text: never markup)
-            lbl.setSizePolicy(QSizePolicy.Policy.Ignored, QSizePolicy.Policy.Preferred)
-            lbl.setMinimumWidth(40)
-        words.addWidget(self.name)
-        words.addWidget(self.meta)
-        h.addLayout(words, 1)
-        self.btn_up = self._vote_button("like", _("I like it"))
-        self.btn_up.clicked.connect(lambda: tab.vote(self, 1))
-        self.btn_down = self._vote_button("dislike", _("Not for me"))
-        self.btn_down.clicked.connect(lambda: tab.vote(self, -1))
-        h.addWidget(self.btn_up)
-        h.addWidget(self.btn_down)
-        self.btn_add = icon_button("plus", _("Add it to your voices"), quiet=False)
-        self.btn_add.setFixedSize(32, 32)
-        self.btn_add.clicked.connect(lambda: tab.add(self))
-        h.addWidget(self.btn_add)
-        self.btn_report = icon_button("flag", _("Report this voice"))
-        self.btn_report.clicked.connect(lambda: tab.report_menu(self))
-        h.addWidget(self.btn_report)
-        self.show_votes()
-
-    def playing_look(self, on: bool):
-        icons.set_icon(self.btn_play, "stop" if on else "play", checked_color="accent")
-        self.btn_play.setToolTip(_("Stop") if on else _("Hear it (only you)"))
-        self.tile.set_playing(on)
+        self._build(v, tab, meta_line(v), _("Hear it (only you)"), _("Add it to your voices"),
+                    _("Report this voice"))
+        self.btn_queue.hide()   # (a sample to you: nothing to wait for)
 
 
 class VoiceHooks:

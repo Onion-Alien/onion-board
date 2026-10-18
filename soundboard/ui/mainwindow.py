@@ -899,7 +899,8 @@ class MainWindow(QMainWindow):
         elif key == "store":
             v = StoreTab(self.cfg, lambda path: self.impctl.import_files([path]),
                          self._store_sample, lambda: self.setctl.open_settings("privacy"),
-                         self._save_later, self._store_link, self._voice_hooks())
+                         self._save_later, self._store_link, self._voice_hooks(),
+                         self._store_link_state)
             return v
         else:
             # the Onion Watch add-on, or Hoot and its download button until it's
@@ -930,13 +931,34 @@ class MainWindow(QMainWindow):
         open_share(self, install, self._voice_hooks(), pick)
 
     def _store_link(self, url: str, name: str, kind: str):
-        """A shared link in the Store tab: played once or added, downloaded from its
-        site the way a pasted link is (the download bar shows how far it is)."""
+        """A shared link in the Store tab: played now ("now"), played after what's
+        playing ("play") or added, downloaded from its site the way a pasted link is (the
+        download bar shows how far it is). "pause" (or resume) and "stop" are for it
+        while the player has it."""
+        if kind in ("pause", "stop"):
+            if self._store_link_state(url) in ("playing", "paused"):
+                if kind == "stop":
+                    self.playctl._stop_sound(LINK_ID)
+                else:
+                    st = self.engine.state(LINK_ID)
+                    self.engine.set_paused(LINK_ID, not (st and st[1]))
+                self.tickctl._wake()
+            return
         self.linkbar.open(url, name)
-        if kind == "play":
+        if kind == "now":
+            self.linkbar.play_now()
+        elif kind == "play":
             self.linkbar.play_once()
         else:
             self.linkbar.add()
+
+    def _store_link_state(self, url: str) -> str:
+        """A Store card's link in the player: "playing", "paused", "loading" (its Play's
+        download runs) or ""."""
+        lb = self.linkbar
+        if lb.playing_url == url and (st := self.engine.state(LINK_ID)) is not None:
+            return "paused" if st[1] else "playing"
+        return "loading" if lb._busy == "play" and lb._busy_url == url else ""
 
     def _store_sample(self, data, gain: float) -> bool:
         """The Store tab's "hear it first": to your headphones only (None stops it).
