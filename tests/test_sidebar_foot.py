@@ -257,7 +257,7 @@ def test_the_help_onion_opens_its_menu_and_is_never_left_selected(window):  # no
     window.btn_about.click()
     QApplication.processEvents()
     texts = [a.text() for a in window.about_menu.actions() if a.text()]
-    assert texts[:3] == ["Join the Discord", "Send feedback", "Report a problem"]
+    assert texts == ["Join the Discord", "Send feedback", "Report a problem"]
     assert not window.btn_about.isChecked()
     # up from the rail's foot, its edge over the onion's (down, it ran off the window)
     menu, onion = window.about_menu.geometry(), window.btn_about
