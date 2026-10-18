@@ -239,7 +239,8 @@ def test_card_shows_every_voice_as_a_card_under_its_kind(qapp, app_dir, monkeypa
         assert sorted(p._tile) == sorted(v["id"] for v in avl.BUILT_IN)
         assert p.picked_name.text() == "Titan"
         assert not any(b.isChecked() for b in p._tile.values())   # off: none lit up
-        assert p.lbl_about.text().startswith("Monster · Rumbling. Deeper than")
+        assert p.picked_name.toolTip().startswith("Monster · Rumbling. Deeper than")
+        assert p.picked.isHidden()                               # off: no voice bar
         assert p._tile["bear"].toolTip().startswith("Man · Very deep. ")
         assert p.b_edit.isHidden() and p.b_delete.isHidden()     # not one of yours
         p._cat_btns["women"].click()
@@ -247,7 +248,8 @@ def test_card_shows_every_voice_as_a_card_under_its_kind(qapp, app_dir, monkeypa
         order = sorted(shown(), key=lambda vid: (g.getItemPosition(g.indexOf(p._tile[vid]))))
         assert order == ["onyx", "ivy", "sage", "nana", "nova", "zoe", "pixie"]   # lowest first
         p._cat_btns["mine"].click()
-        assert shown() == [] and not p.no_mine.isHidden()
+        # none of yours yet: just the card that makes one
+        assert shown() == [] and not p.make_tile.isHidden()
         saved, starts = [], []
         p.changed.connect(saved.append)
         monkeypatch.setattr(p.ctl, "start", lambda m, voice, *a: starts.append(voice))
@@ -339,3 +341,44 @@ def test_a_built_in_voice_shows_its_picture_when_there_is_one(qapp, monkeypatch)
     assert aivoicepanel.voice_icon(by_id["bear"]) is pic
     assert aivoicepanel.voice_icon(by_id["nova"]) is not pic       # no picture: its emoji
     assert aivoicepanel.art_key(mine()) == "" and asked == ["ai-voice-bear", "ai-voice-nova"]
+
+
+def test_card_works_like_the_voice_changer(qapp, app_dir, monkeypatch):
+    """The voice changer's switch, cards-or-list and voice bar, with Edit voice's pitch
+    in a pop-up; the switch can't be turned on before the add-on is there."""
+    from soundboard.speech.aivoice import AiVoiceController
+    from soundboard.ui.aivoicepanel import AiVoicePanel
+    from soundboard.voicefx import VoiceChain
+    bare = AiVoicePanel(AiVoiceController(VoiceChain(), lambda e: None), {}, [])
+    try:
+        assert not bare.b_start.isEnabled() and bare.b_start.text() == "Off"
+        assert bare.b_start.toolTip() == bare.lbl_missing.text() != ""
+    finally:
+        bare.deleteLater()
+    p = ready_panel(app_dir, monkeypatch, {"voice": "bear"})
+    monkeypatch.setattr(p.ctl, "start", lambda m, voice, *a: None)
+    monkeypatch.setattr(p.ctl, "stop", lambda: None)
+    try:
+        assert p.b_start.isEnabled() and p.lbl_state.isHidden() and p.picked.isHidden()
+        p.b_start.setChecked(True)                    # the switch starts the picked voice
+        assert p.is_on() and p.b_start.text() == "On"
+        assert not p.picked.isHidden() and p.picked_name.text() == "Bear"
+        assert not p.lbl_state.isHidden()             # starting…: says so under the words
+        p.btn_tweak.click()                           # Edit voice: the pitch, in a pop-up
+        assert p.tweak_pop is not None and p.tweak_pop.isVisible()
+        assert p.chk_auto.window() is p.tweak_pop and p.sl_pitch.isVisible()
+        p.tweak_pop.close()
+        p.set_view("list")                            # the voice changer's list view
+        assert all(b.listed for b in p._tile.values()) and p.make_tile.listed
+        assert p.view_toggle.view() == "list"
+        p.b_start.setChecked(False)
+        assert not p.is_on() and p.b_start.text() == "Off"
+        assert p.picked.isHidden() and p.lbl_state.isHidden()
+        assert not any(b.isChecked() for b in p._tile.values())
+        p._tile["bear"].click()                       # a card: on with that voice
+        assert p.is_on() and p._tile["bear"].isChecked() and p.b_start.text() == "On"
+        p._tile["bear"].click()                       # the lit one again: off
+        assert not p.is_on() and not p._tile["bear"].isChecked()
+        assert p.b_start.text() == "Off" and p.picked.isHidden()
+    finally:
+        p.deleteLater()

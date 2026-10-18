@@ -15,7 +15,7 @@ from collections.abc import Callable
 import numpy as np
 
 from PySide6.QtCore import QEvent, QPointF, QRectF, QSize, Qt, QTimer, Signal
-from PySide6.QtGui import QColor, QGuiApplication, QIcon, QPainter
+from PySide6.QtGui import QColor, QFont, QGuiApplication, QIcon, QPainter
 from PySide6.QtWidgets import (QBoxLayout, QButtonGroup, QCheckBox, QDialog, QFrame, QGridLayout,
                                QHBoxLayout, QInputDialog, QLabel, QLineEdit, QMenu,
                                QMessageBox, QPushButton, QScrollArea, QSizePolicy,
@@ -597,6 +597,70 @@ ALL = ""
 STAR = 22   # px: the favorite star in a voice card's corner
 
 
+class BigSwitch(Switch):
+    """A card's main on/off: a big switch with ON or OFF written in it, next to the
+    card's name (the small one there was easy to miss). Its words are setText()'s,
+    drawn in capitals."""
+    PAD, H = 14, 34
+
+    def __init__(self, tip: str = ""):
+        super().__init__(tip, hover=False)
+        f = QFont(self.font())
+        f.setBold(True)
+        f.setPointSizeF(max(f.pointSizeF(), 9.0) + 1.5)
+        self.setFont(f)
+        self.setMinimumSize(0, 0)
+        self.setMaximumSize(16777215, 16777215)
+        self._fit()
+
+    def _fit(self):
+        fm = self.fontMetrics()
+        words = max(fm.horizontalAdvance(t.upper()) for t in (_("On"), _("Off")))
+        self.setFixedSize(words + 2 * self.PAD + self.H, self.H)
+
+    def sizeHint(self):
+        return self.size()
+
+    def changeEvent(self, e):
+        super().changeEvent(e)
+        if e.type() == QEvent.Type.FontChange:
+            self._fit()
+
+    def paintEvent(self, _e):
+        p = QPainter(self)
+        snap_to_pixels(p)
+        p.setRenderHint(QPainter.RenderHint.Antialiasing)
+        on = self.isChecked()
+        r = QRectF(self.rect()).adjusted(1, 1, -1, -1)
+        rad = r.height() / 2
+        track = QColor(theme.T["accent"] if on else theme.T["groove"])
+        if not self.isEnabled():
+            track.setAlpha(110)
+        p.setPen(Qt.PenStyle.NoPen)
+        p.setBrush(track)
+        p.drawRoundedRect(r, rad, rad)
+        d = r.height() - 8
+        x = r.right() - d - 4 if on else r.left() + 4
+        knob = QColor(theme.T["on_accent"] if on else theme.T["text"])
+        if not self.isEnabled():
+            knob.setAlpha(110)
+        p.setBrush(knob)
+        p.drawEllipse(QRectF(x, r.top() + 4, d, d))
+        # the word on the side the knob isn't
+        words = (QRectF(r.left() + self.PAD, r.top(), r.width() - d - 8 - self.PAD, r.height())
+                 if on else QRectF(r.left() + d + 8, r.top(), r.width() - d - 8 - self.PAD,
+                                   r.height()))
+        text = QColor(theme.T["on_accent"] if on else theme.T["text"])
+        if not self.isEnabled():
+            text.setAlpha(140)
+        p.setPen(text)
+        p.drawText(words, Qt.AlignmentFlag.AlignCenter, self.text().upper())
+        if self.hasFocus():
+            p.setBrush(Qt.BrushStyle.NoBrush)
+            p.setPen(QColor(theme.T["accent_hi"]))
+            p.drawRoundedRect(r, rad, rad)
+
+
 def voice_group(name: str) -> str:
     """The group a voice card goes under."""
     if name == CUSTOM or name not in voicefx.PRESETS:
@@ -752,18 +816,14 @@ class VoiceFxPanel(QWidget):
         self.title = section_label(_("Voice changer"))
         v.addWidget(self.title)
 
-        # ---- the switch: the Voice tab puts `head` in its card's title row, right
-        self.btn_power = Switch()
+        # ---- the big ON/OFF: the Voice tab puts `head` right after its card's name
+        self.btn_power = BigSwitch()
         self.btn_power.setChecked(spec["enabled"])
         self.btn_power.toggled.connect(self._on_power)
-        self.power_label = QLabel()
-        self.power_label.setObjectName("muted")
         self.head = QWidget()
         hh = QHBoxLayout(self.head)
         hh.setContentsMargins(0, 0, 0, 0)
-        hh.setSpacing(8)
         hh.addWidget(self.btn_power)
-        hh.addWidget(self.power_label)
         # your mic level is in the tab's status bar (ui/voicestatus.py), over every card
         # (to hear it: the mixer's "Hear what they hear", the one switch on every tab)
         v.addWidget(hint_label(_("Change your mic live for whoever you send sounds to (Discord, "
@@ -1421,6 +1481,14 @@ class VoiceFxPanel(QWidget):
             busy.toast(self._parent(), html.escape(
                 _("⚠ Couldn't play a sample: {error}", error=err)), "warn")
 
+    def _tile_clicked(self, name: str):
+        """A voice card: that voice, on. The one that's on already: the voice changer
+        off (a second click undoes the first, no hunting for the switch)."""
+        if self.btn_power.isChecked() and name == self._preset:
+            self.btn_power.setChecked(False)   # its toggled handler applies it
+            return
+        self.pick(name)
+
     def _make_tile(self, name: str, title: str, pic, line_icon: str) -> VoiceTile:
         """A checkable voice card: its picture (ui/art.py), else a line icon, with the
         name under it."""
@@ -1434,7 +1502,7 @@ class VoiceFxPanel(QWidget):
             b.setIcon(icons.icon(line_icon, "muted"))
         b.setIconSize(QSize(TILE_ART, TILE_ART))   # a line icon: as tall as a picture
         b.setCursor(Qt.CursorShape.PointingHandCursor)
-        b.clicked.connect(lambda __=False, n=name: self.pick(n))
+        b.clicked.connect(lambda __=False, n=name: self._tile_clicked(n))
         if name != CUSTOM:
             b.setContextMenuPolicy(Qt.ContextMenuPolicy.CustomContextMenu)
             b.customContextMenuRequested.connect(
@@ -1974,7 +2042,7 @@ class VoiceFxPanel(QWidget):
 
     def _refresh(self):
         on = self.btn_power.isChecked()
-        self.power_label.setText(_("On") if on else _("Off"))
+        self.btn_power.setText(_("On") if on else _("Off"))
         self.btn_power.setAccessibleName(POWER_TEXT[on])
         self._show_picked()
         self.tip.setVisible(self._tip_enabled)

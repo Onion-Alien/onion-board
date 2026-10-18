@@ -1520,7 +1520,6 @@
   "A text-to-speech server running on your PC. Most have an OpenAI-style address ending in /v1/audio/speech; one that takes the text in the address can use {text} in it instead.": "在您的 PC 上运行的文本转语音服务器。大多数都有一个以 /v1/audio/speech 结尾的 OpenAI 风格地址；接受地址中文本的可以使用{text}来代替。",
   "AI voices": "人工智能声音",
   "AI voices are an optional add-on (about 55 MB, the voice model and its runtime). Nothing is downloaded until you press Get AI voices.": "AI 语音是一个可选的附加组件（大约 55 MB，语音模型及其运行时）。在您按下“获取 AI 语音”之前，不会下载任何内容。",
-  "AI voices are installed. Pick a voice and press Start.": "安装了AI语音。选择一个声音并按开始。",
   "AI voices are removed.": "AI 语音被删除。",
   "AI voices aren't available to download yet (GitHub says it can't find it). Try again later.": "AI 语音尚无法下载（GitHub 表示找不到）。稍后再试。",
   "API key": "API密钥",
@@ -2292,8 +2291,6 @@
   "⚠ Couldn't play a sample: {error}": "⚠ 无法播放样本： {error}",
   "⚠ Couldn't start translating: {error}": "⚠ 无法开始翻译： {error}",
   "⚠ Install failed: {error}. Press it again to retry; if it keeps failing, run install.bat in the add-on's folder to see why.": "⚠ 安装失败： {error} 。再按一次重试；如果仍然失败，请运行附加组件文件夹中的 install.bat 以查看原因。",
-  "⚠ The AI voice stopped. Others now hear {backup}. Press Stop, then Start to try again.": "⚠ AI声音停止了。其他人现在听到{backup} 。按“停止”，然后按“开始”重试。",
-  "⚠ The AI voice stopped: {error}. Others now hear {backup}. Press Stop, then Start to try again.": "⚠ AI 声音停止： {error} 。其他人现在听到{backup} 。按“停止”，然后按“开始”重试。",
   "⚠ This PC is slow for AI voices: games may stutter. A voice changer preset (left) is much lighter.": "⚠ 这台电脑对于 AI 语音来说速度很慢：游戏可能会卡顿。变声器预设（左）要轻得多。",
   "⚠ Translating stopped: {error}": "⚠ 翻译停止： {error}",
   "⚠ Turned off after an error: {error}": "⚠ 出现错误后关闭： {error}",
@@ -2706,8 +2703,6 @@
   "Streaming": "直播",
   "What will you use Onion Board for?": "你打算用 Onion Board 做什么？",
   "Adds the <b>Apps</b> tab (send music or a game to your stream). The last step links the <b>Streamer guide</b> (Stream Deck keys, chat commands).": "添加<b>应用</b>标签页（把音乐或游戏声音送进直播）。最后一步附有<b>主播指南</b>的链接（Stream Deck 按键、聊天指令）。",
-  "Start AI voice": "启动AI语音",
-  "Stop AI voice": "停止AI语音",
   "Your words and tone, a different voice. Live on this PC.": "保留你的话语和语气，换一种声音。在这台电脑上实时转换。",
   "Mic on": "麦克风已开启",
   "Output": "输出",
@@ -3293,7 +3288,6 @@
   "The programs the app uses to download and play sounds. They update with the app, to the exact versions it was tested with. Only yt-dlp can update sooner, if you let it.": "应用用来下载和播放声音的程序。它们随应用一起更新，更新到应用测试过的确切版本。只有 yt-dlp 可以提前更新，前提是你允许。",
   "Used when Connection is set to Tor. It's up to date, and updates with the app.": "连接设为 Tor 时使用。它是最新的，并随应用一起更新。",
   "The downloader (yt-dlp) isn't installed, Settings → Updates → Helper programs → yt-dlp → Reinstall.": "下载器 (yt-dlp) 未安装，设置 → 更新 → 辅助程序 → yt-dlp → 重新安装。",
-  "No voices of your own yet: press Make your own voice below.": "还没有你自己的声音：按下方的“发出自己的声音”。",
   "Windows can't find <b>{mic}</b> right now. Plug it in, or switch it on if it's wireless. No mic at all? Use the <b>virtual cable</b> below: it works without one.": "Windows 现在找不到 <b>{mic}</b>。请插上，如果是无线的就打开它。根本没有麦克风？用下面的<b>虚拟音频线</b>：没有麦克风也能用。",
   "Your mic sends no sound right now (switched off, muted or no mic plugged in), so others hear only your sounds. Want them to hear you too? Turn it on or unmute it.": "你的麦克风现在没有发出任何声音（已关闭、已静音或没插麦克风），所以别人只听得到你的音效。想让他们也听到你？打开它或取消静音。",
   "A {language} computer voice, once it's on this PC (below).": "{language}电脑语音（装到这台电脑上之后，见下方）。",
@@ -4030,5 +4024,8 @@
   "Play it now": "立即播放",
   "Space or a double-click plays it for you, Enter plays it through your mic, Esc stops, F2 renames, right-click for more.": "按空格或双击只播给你听，按 Enter 通过麦克风播放，Esc 停止，F2 重命名，右键查看更多。",
   "Today {time}": "今天 {time}",
-  "Yesterday": "昨天"
+  "Yesterday": "昨天",
+  "AI voices are installed. Pick a voice to turn it on.": "AI 声音已安装。选一个声音即可打开。",
+  "⚠ The AI voice stopped. Others now hear {backup}. Switch it off and on again to try again.": "⚠ AI 声音已停止。其他人现在听到的是{backup}。关掉再打开即可重试。",
+  "⚠ The AI voice stopped: {error}. Others now hear {backup}. Switch it off and on again to try again.": "⚠ AI 声音已停止：{error}。其他人现在听到的是{backup}。关掉再打开即可重试。"
 }

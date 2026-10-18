@@ -1563,7 +1563,6 @@
   "A text-to-speech server running on your PC. Most have an OpenAI-style address ending in /v1/audio/speech; one that takes the text in the address can use {text} in it instead.": "Een tekst-naar-spraak-server die op uw pc draait. De meeste hebben een adres in OpenAI-stijl dat eindigt op /v1/audio/speech; iemand die de tekst in het adres overneemt, kan in plaats daarvan {text} erin gebruiken.",
   "AI voices": "AI-stemmen",
   "AI voices are an optional add-on (about 55 MB, the voice model and its runtime). Nothing is downloaded until you press Get AI voices.": "AI-stemmen zijn een optionele add-on (ongeveer 55 MB, het stemmodel en de looptijd ervan). Er wordt niets gedownload totdat u op AI-stemmen ophalen drukt.",
-  "AI voices are installed. Pick a voice and press Start.": "AI-stemmen zijn geïnstalleerd. Kies een stem en druk op Start.",
   "AI voices are removed.": "AI-stemmen zijn verwijderd.",
   "AI voices aren't available to download yet (GitHub says it can't find it). Try again later.": "AI-stemmen kunnen nog niet worden gedownload (GitHub zegt dat het deze niet kan vinden). Probeer het later opnieuw.",
   "API key": "API-sleutel",
@@ -2342,8 +2341,6 @@
   "⚠ Couldn't play a sample: {error}": "⚠ Kan een sample niet afspelen: {error}",
   "⚠ Couldn't start translating: {error}": "⚠ Kan niet beginnen met vertalen: {error}",
   "⚠ Install failed: {error}. Press it again to retry; if it keeps failing, run install.bat in the add-on's folder to see why.": "⚠ Installatie mislukt: {error} . Druk er nogmaals op om het opnieuw te proberen; als het blijft mislukken, voer dan install.bat uit in de map van de add-on om te zien waarom.",
-  "⚠ The AI voice stopped. Others now hear {backup}. Press Stop, then Start to try again.": "⚠ De AI-stem stopte. Anderen horen nu {backup} . Druk op Stop en vervolgens op Start om het opnieuw te proberen.",
-  "⚠ The AI voice stopped: {error}. Others now hear {backup}. Press Stop, then Start to try again.": "⚠ De AI-stem stopte: {error} . Anderen horen nu {backup} . Druk op Stop en vervolgens op Start om het opnieuw te proberen.",
   "⚠ This PC is slow for AI voices: games may stutter. A voice changer preset (left) is much lighter.": "⚠ Deze pc is traag voor AI-stemmen: games kunnen stotteren. Een vooraf ingestelde stemwisselaar (links) is veel lichter.",
   "⚠ Translating stopped: {error}": "⚠ Vertalen gestopt: {error}",
   "⚠ Turned off after an error: {error}": "⚠ Uitgeschakeld na een fout: {error}",
@@ -2768,8 +2765,6 @@
   "Streaming": "Streamen",
   "What will you use Onion Board for?": "Waarvoor ga je Onion Board gebruiken?",
   "Adds the <b>Apps</b> tab (send music or a game to your stream). The last step links the <b>Streamer guide</b> (Stream Deck keys, chat commands).": "Voegt het tabblad <b>Apps</b> toe (stuur muziek of een game naar je stream). De laatste stap linkt naar de <b>Streamer-gids</b> (Stream Deck-knoppen, chatcommando's).",
-  "Start AI voice": "Start de AI-stem",
-  "Stop AI voice": "Stop de AI-stem",
   "Your words and tone, a different voice. Live on this PC.": "Jouw woorden en toon, een andere stem. Live op deze pc.",
   "Mic on": "Microfoon aan",
   "Output": "Uitvoer",
@@ -3366,7 +3361,6 @@
   "The programs the app uses to download and play sounds. They update with the app, to the exact versions it was tested with. Only yt-dlp can update sooner, if you let it.": "De programma's die de app gebruikt om geluiden te downloaden en af te spelen. Ze worden bijgewerkt met de app, naar precies de versies waarmee die getest is. Alleen yt-dlp kan eerder bijwerken, als je dat toestaat.",
   "Used when Connection is set to Tor. It's up to date, and updates with the app.": "Gebruikt als Verbinding op Tor staat. Hij is up-to-date en wordt bijgewerkt met de app.",
   "The downloader (yt-dlp) isn't installed, Settings → Updates → Helper programs → yt-dlp → Reinstall.": "Het downloadprogramma (yt-dlp) is niet geïnstalleerd, Instellingen → Updates → Hulpprogramma's → yt-dlp → Opnieuw installeren.",
-  "No voices of your own yet: press Make your own voice below.": "Nog geen eigen stemmen: druk hieronder op ‘Maak je eigen stem’.",
   "Windows can't find <b>{mic}</b> right now. Plug it in, or switch it on if it's wireless. No mic at all? Use the <b>virtual cable</b> below: it works without one.": "Windows kan <b>{mic}</b> nu niet vinden. Sluit hem aan, of zet hem aan als hij draadloos is. Helemaal geen microfoon? Gebruik de <b>virtuele kabel</b> hieronder: die werkt zonder.",
   "Your mic sends no sound right now (switched off, muted or no mic plugged in), so others hear only your sounds. Want them to hear you too? Turn it on or unmute it.": "Je microfoon stuurt nu geen geluid (uit, gedempt of geen microfoon aangesloten), dus anderen horen alleen je geluiden. Wil je dat ze jou ook horen? Zet hem aan of zet het dempen uit.",
   "A {language} computer voice, once it's on this PC (below).": "Een computerstem in het {language}, zodra die op deze pc staat (hieronder).",
@@ -4109,5 +4103,8 @@
   "Play it now": "Nu afspelen",
   "Space or a double-click plays it for you, Enter plays it through your mic, Esc stops, F2 renames, right-click for more.": "Spatie of dubbelklik speelt het voor jou af, Enter speelt het af via je microfoon, Esc stopt, F2 hernoemt, rechtsklik voor meer.",
   "Today {time}": "Vandaag {time}",
-  "Yesterday": "Gisteren"
+  "Yesterday": "Gisteren",
+  "AI voices are installed. Pick a voice to turn it on.": "AI-stemmen zijn geïnstalleerd. Kies een stem om hem aan te zetten.",
+  "⚠ The AI voice stopped. Others now hear {backup}. Switch it off and on again to try again.": "⚠ De AI-stem is gestopt. Anderen horen nu {backup}. Zet hem uit en weer aan om het opnieuw te proberen.",
+  "⚠ The AI voice stopped: {error}. Others now hear {backup}. Switch it off and on again to try again.": "⚠ De AI-stem is gestopt: {error}. Anderen horen nu {backup}. Zet hem uit en weer aan om het opnieuw te proberen."
 }

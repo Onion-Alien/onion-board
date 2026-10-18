@@ -135,10 +135,10 @@ def test_power_switch(panel):
     p, _ = panel
     seen = []
     p.fx_changed.connect(seen.append)
-    assert not p.fx.btn_power.isChecked() and p.fx.power_label.text() == "Off"
+    assert not p.fx.btn_power.isChecked() and p.fx.btn_power.text() == "Off"
     assert "OFF" in p.fx.btn_power.accessibleName()
     p.fx.pick("Deep voice")                  # picking a voice turns it on
-    assert p.fx.btn_power.isChecked() and p.fx.power_label.text() == "On"
+    assert p.fx.btn_power.isChecked() and p.fx.btn_power.text() == "On"
     assert "ON" in p.fx.btn_power.accessibleName()
     assert p.fx._tile["Deep voice"].isChecked()
     p.fx.btn_power.setChecked(False)         # the switch turns it off, voice kept
@@ -1720,9 +1720,9 @@ def test_translation_download_keeps_focus(panel, qapp, monkeypatch):
 
 
 @pytest.mark.parametrize("width", [900, 1600])
-def test_ai_voice_list_keeps_its_height_when_the_description_wraps(panel, qapp, width):
-    """The picked voice's description wraps under its name: its height must be worked out
-    at its own width, or a two-line one is counted as one and squashes the voice cards."""
+def test_ai_voice_list_keeps_its_height_with_a_long_description(panel, qapp, width):
+    """A voice's long description is the tip of its card and of the voice bar's name (as
+    the voice changer's bar: the name only), so it never squashes the voice cards."""
     p, _eng = panel
     ai = p.ai
     about = "A light, high, young-sounding voice, good for cheerful characters. " * 6
@@ -1736,13 +1736,11 @@ def test_ai_voice_list_keeps_its_height_when_the_description_wraps(panel, qapp, 
     for _ in range(6):
         qapp.processEvents()
     ai._show_about()
-    lb = ai.lbl_about
-    process_events(qapp, lambda: lb.height() >= lb.heightForWidth(lb.width())
-                   and ai._tile["pixie"].height() >= ai._tile["pixie"].sizeHint().height(), 1.0)
-    lines = ai.lbl_about.heightForWidth(ai.lbl_about.width()) // ai.lbl_about.fontMetrics().height()
-    assert lines >= 2
-    assert ai.lbl_about.height() >= ai.lbl_about.heightForWidth(ai.lbl_about.width())
-    assert ai._tile["pixie"].height() >= ai._tile["pixie"].sizeHint().height()
+    tile = ai._tile["pixie"]
+    process_events(qapp, lambda: tile.height() >= tile.sizeHint().height(), 1.0)
+    assert ai.picked_name.text() == "Pixie" and about in ai.picked_name.toolTip()
+    assert about in tile.toolTip()
+    assert tile.height() >= tile.sizeHint().height()
 
 
 def test_stop_takes_the_picked_voice_bar_away_too(panel):
@@ -1940,3 +1938,53 @@ def test_a_saved_voice_named_like_a_ready_voice_gets_its_own_card(qapp, monkeypa
     assert p.fx.spec()["effects"]["pitch"]["semitones"] == -5.0
     p.fx._tile["Chipmunk"].click()
     assert p.fx.spec()["effects"]["pitch"]["semitones"] != -5.0
+
+
+def test_ai_voices_card_has_the_voice_changers_switch_bar_and_view(panel, qapp, monkeypatch):
+    """AI voices' card head is the voice changer's: its switch, no "On" pill; its voice
+    bar is pinned under the cards on its own tab; cards or a list is one setting."""
+    p, _eng = panel
+    p.resize(1000, 700)
+    p.show()
+    p.show_tab("ai")
+    qapp.processEvents()
+    assert p.ai.head.isVisibleTo(p) and p._states["ai"].isHidden()
+    outer = p.layout()
+    assert outer.indexOf(p.ai.picked) >= 0 and outer.indexOf(p.fx.picked) >= 0
+    # turned on (without the add-on's helper): its bar shows, on its tab only
+    p.ai.b_start.blockSignals(True)
+    p.ai.b_start.setChecked(True)
+    p.ai.b_start.blockSignals(False)
+    p.ai.show_picked_row()
+    p._emit_active()
+    assert p.ai.picked.isVisibleTo(p) and p._states["ai"].isHidden()
+    p.show_tab("fx")
+    assert not p.ai.picked.isVisibleTo(p)
+    p.show_tab("ai")
+    assert p.ai.picked.isVisibleTo(p)
+    p.ai.b_start.blockSignals(True)
+    p.ai.b_start.setChecked(False)
+    p.ai.b_start.blockSignals(False)
+    # the list view, switched on either card, is both cards' (and saved once)
+    saved = []
+    p.fx.view_toggle.changed.connect(saved.append)
+    p.ai.view_toggle.buttons["list"].click()
+    assert p.fx._listed and p.ai._listed and saved == ["list"]
+    p.fx.view_toggle.buttons["grid"].click()
+    assert not p.fx._listed and not p.ai._listed and p.ai.view_toggle.view() == "grid"
+    p.set_view("list")
+    assert p.fx._listed and p.ai._listed
+
+
+def test_clicking_the_lit_voice_again_turns_the_voice_changer_off(panel):
+    """A second click on the voice that's on turns it off; another voice switches."""
+    p, eng = panel
+    p.fx._tile["Robot"].click()
+    assert p.fx.btn_power.isChecked() and p.fx.btn_power.text() == "On"
+    p.fx._tile["Ghost"].click()                 # another one: switches, stays on
+    assert p.fx.btn_power.isChecked() and p.fx.preset == "Ghost"
+    p.fx._tile["Ghost"].click()                 # the lit one again: off
+    assert not p.fx.btn_power.isChecked() and p.fx.btn_power.text() == "Off"
+    assert not p.fx._tile["Ghost"].isChecked() and not eng.voice_chain.enabled
+    p.fx._tile["Ghost"].click()                 # and on again
+    assert p.fx.btn_power.isChecked() and eng.voice_chain.enabled

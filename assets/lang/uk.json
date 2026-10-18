@@ -1606,7 +1606,6 @@
   "A text-to-speech server running on your PC. Most have an OpenAI-style address ending in /v1/audio/speech; one that takes the text in the address can use {text} in it instead.": "Сервер синтезу мовлення, який працює на вашому ПК. Більшість із них мають адресу у стилі OpenAI, що закінчується на /v1/audio/speech; той, який приймає текст в адресі, може замість цього використовувати {text} .",
   "AI voices": "ШІ голоси",
   "AI voices are an optional add-on (about 55 MB, the voice model and its runtime). Nothing is downloaded until you press Get AI voices.": "Голоси ШІ є додатковим доповненням (приблизно 55 МБ, модель голосу та час виконання). Нічого не завантажується, доки ви не натиснете «Отримати голоси AI».",
-  "AI voices are installed. Pick a voice and press Start.": "Встановлені AI голоси. Виберіть голос і натисніть «Пуск».",
   "AI voices are removed.": "Голоси ШІ видалено.",
   "AI voices aren't available to download yet (GitHub says it can't find it). Try again later.": "Голоси ШІ поки що недоступні для завантаження (GitHub каже, що не може їх знайти). Повторіть спробу пізніше.",
   "API key": "Ключ API",
@@ -2392,8 +2391,6 @@
   "⚠ Couldn't play a sample: {error}": "⚠ Не вдалося відтворити зразок: {error}",
   "⚠ Couldn't start translating: {error}": "⚠ Не вдалося розпочати переклад: {error}",
   "⚠ Install failed: {error}. Press it again to retry; if it keeps failing, run install.bat in the add-on's folder to see why.": "⚠ Помилка встановлення: {error} . Натисніть її ще раз, щоб повторити спробу; якщо він продовжує виходити з ладу, запустіть install.bat у папці надбудови, щоб побачити причину.",
-  "⚠ The AI voice stopped. Others now hear {backup}. Press Stop, then Start to try again.": "⚠ Голос AI зупинився. Інші тепер чують {backup} . Щоб повторити спробу, натисніть «Стоп», а потім «Почати».",
-  "⚠ The AI voice stopped: {error}. Others now hear {backup}. Press Stop, then Start to try again.": "⚠ ШІ-голос зупинився: {error} . Інші тепер чують {backup} . Щоб повторити спробу, натисніть «Стоп», а потім «Почати».",
   "⚠ This PC is slow for AI voices: games may stutter. A voice changer preset (left) is much lighter.": "⚠ Цей ПК повільний для голосів ШІ: ігри можуть заїкатися. Попереднє налаштування зміни голосу (ліворуч) набагато легше.",
   "⚠ Translating stopped: {error}": "⚠ Переклад зупинено: {error}",
   "⚠ Turned off after an error: {error}": "⚠ Вимкнено після помилки: {error}",
@@ -2830,8 +2827,6 @@
   "Streaming": "Стрімінг",
   "What will you use Onion Board for?": "Для чого ти використовуватимеш Onion Board?",
   "Adds the <b>Apps</b> tab (send music or a game to your stream). The last step links the <b>Streamer guide</b> (Stream Deck keys, chat commands).": "Додає вкладку <b>Програми</b> (надсилай музику чи гру на стрим). На останньому кроці є посилання: <b>Керівництво по стримеру</b> (кнопки Stream Deck, команди в чаті).",
-  "Start AI voice": "Запустіть голос ШІ",
-  "Stop AI voice": "Зупиніть голос ШІ",
   "Your words and tone, a different voice. Live on this PC.": "Твої слова й інтонація, інший голос. Наживо на цьому ПК.",
   "Mic on": "Мікрофон увімкнено",
   "Output": "Вихід",
@@ -3439,7 +3434,6 @@
   "The programs the app uses to download and play sounds. They update with the app, to the exact versions it was tested with. Only yt-dlp can update sooner, if you let it.": "Програми, якими застосунок завантажує й відтворює звуки. Вони оновлюються разом із застосунком, саме до тих версій, з якими його перевіряли. Лише yt-dlp може оновитися раніше, якщо ти дозволиш.",
   "Used when Connection is set to Tor. It's up to date, and updates with the app.": "Використовується, коли в Підключенні вибрано Tor. Він актуальний і оновлюється разом із застосунком.",
   "The downloader (yt-dlp) isn't installed, Settings → Updates → Helper programs → yt-dlp → Reinstall.": "Завантажувач (yt-dlp) не встановлено, Налаштування → Оновлення → Допоміжні програми → yt-dlp → Перевстановити.",
-  "No voices of your own yet: press Make your own voice below.": "Власних голосів поки немає: натисни «Зробіть свій власний голос» нижче.",
   "Windows can't find <b>{mic}</b> right now. Plug it in, or switch it on if it's wireless. No mic at all? Use the <b>virtual cable</b> below: it works without one.": "Windows зараз не бачить <b>{mic}</b>. Під'єднай його або увімкни, якщо він бездротовий. Мікрофона немає взагалі? Скористайся <b>віртуальним кабелем</b> нижче: він працює і без мікрофона.",
   "Your mic sends no sound right now (switched off, muted or no mic plugged in), so others hear only your sounds. Want them to hear you too? Turn it on or unmute it.": "Твій мікрофон зараз не передає звуку (вимкнений, заглушений або не під'єднаний), тож інші чують лише твої звуки. Хочеш, щоб чули й тебе? Увімкни його або зніми заглушення.",
   "A {language} computer voice, once it's on this PC (below).": "Комп'ютерний голос ({language}), щойно він з'явиться на цьому ПК (нижче).",
@@ -4188,5 +4182,8 @@
   "Play it now": "Увімкнути зараз",
   "Space or a double-click plays it for you, Enter plays it through your mic, Esc stops, F2 renames, right-click for more.": "Пробіл або подвійний клік відтворює його тобі, Enter відтворює у твій мікрофон, Esc зупиняє, F2 перейменовує, правий клік покаже більше.",
   "Today {time}": "Сьогодні {time}",
-  "Yesterday": "Учора"
+  "Yesterday": "Учора",
+  "AI voices are installed. Pick a voice to turn it on.": "Голоси ШІ встановлено. Виберіть голос, щоб увімкнути його.",
+  "⚠ The AI voice stopped. Others now hear {backup}. Switch it off and on again to try again.": "⚠ Голос ШІ зупинився. Інші тепер чують {backup}. Вимкніть і знову увімкніть його, щоб спробувати ще раз.",
+  "⚠ The AI voice stopped: {error}. Others now hear {backup}. Switch it off and on again to try again.": "⚠ Голос ШІ зупинився: {error}. Інші тепер чують {backup}. Вимкніть і знову увімкніть його, щоб спробувати ще раз."
 }

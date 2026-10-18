@@ -1563,7 +1563,6 @@
   "A text-to-speech server running on your PC. Most have an OpenAI-style address ending in /v1/audio/speech; one that takes the text in the address can use {text} in it instead.": "Un serveur de synthèse vocale exécuté sur votre PC. La plupart ont une adresse de style OpenAI se terminant par /v1/audio/speech ; celui qui prend le texte de l'adresse peut y utiliser {text} à la place.",
   "AI voices": "Voix de l'IA",
   "AI voices are an optional add-on (about 55 MB, the voice model and its runtime). Nothing is downloaded until you press Get AI voices.": "Les voix AI sont un module complémentaire facultatif (environ 55 Mo, le modèle vocal et sa durée d'exécution). Rien n'est téléchargé jusqu'à ce que vous appuyiez sur Obtenir les voix AI.",
-  "AI voices are installed. Pick a voice and press Start.": "Les voix AI sont installées. Choisissez une voix et appuyez sur Démarrer.",
   "AI voices are removed.": "Les voix de l'IA sont supprimées.",
   "AI voices aren't available to download yet (GitHub says it can't find it). Try again later.": "Les voix de l'IA ne sont pas encore disponibles au téléchargement (GitHub dit qu'il ne les trouve pas). Réessayez plus tard.",
   "API key": "Clé API",
@@ -2342,8 +2341,6 @@
   "⚠ Couldn't play a sample: {error}": "⚠ Impossible de lire un extrait : {error}",
   "⚠ Couldn't start translating: {error}": "⚠ Impossible de commencer la traduction : {error}",
   "⚠ Install failed: {error}. Press it again to retry; if it keeps failing, run install.bat in the add-on's folder to see why.": "⚠ Échec de l'installation : {error} . Appuyez à nouveau pour réessayer ; s'il continue d'échouer, exécutez install.bat dans le dossier du module complémentaire pour voir pourquoi.",
-  "⚠ The AI voice stopped. Others now hear {backup}. Press Stop, then Start to try again.": "⚠ La voix de l'IA s'est arrêtée. D'autres entendent maintenant {backup} . Appuyez sur Stop, puis sur Start pour réessayer.",
-  "⚠ The AI voice stopped: {error}. Others now hear {backup}. Press Stop, then Start to try again.": "⚠ La voix de l'IA s'est arrêtée : {error} . D'autres entendent maintenant {backup} . Appuyez sur Stop, puis sur Start pour réessayer.",
   "⚠ This PC is slow for AI voices: games may stutter. A voice changer preset (left) is much lighter.": "⚠ Ce PC est lent pour les voix de l'IA : les jeux peuvent bégayer. Un préréglage de changeur de voix (à gauche) est beaucoup plus léger.",
   "⚠ Translating stopped: {error}": "⚠ Traduction arrêtée : {error}",
   "⚠ Turned off after an error: {error}": "⚠ Désactivé après une erreur : {error}",
@@ -2768,8 +2765,6 @@
   "Streaming": "Streaming",
   "What will you use Onion Board for?": "Tu vas utiliser Onion Board pour quoi ?",
   "Adds the <b>Apps</b> tab (send music or a game to your stream). The last step links the <b>Streamer guide</b> (Stream Deck keys, chat commands).": "Ajoute l'onglet <b>Applis</b> (envoie de la musique ou un jeu sur ton stream). La dernière étape mène au <b>Guide streamer</b> (touches Stream Deck, commandes du chat).",
-  "Start AI voice": "Démarrez la voix de l'IA",
-  "Stop AI voice": "Arrêtez la voix de l'IA",
   "Your words and tone, a different voice. Live on this PC.": "Tes mots et ton ton, une autre voix. En direct sur ce PC.",
   "Mic on": "Micro actif",
   "Output": "Sortie",
@@ -3366,7 +3361,6 @@
   "The programs the app uses to download and play sounds. They update with the app, to the exact versions it was tested with. Only yt-dlp can update sooner, if you let it.": "Les programmes que l'app utilise pour télécharger et jouer les sons. Ils se mettent à jour avec l'app, aux versions exactes avec lesquelles elle a été testée. Seul yt-dlp peut se mettre à jour plus tôt, si tu le permets.",
   "Used when Connection is set to Tor. It's up to date, and updates with the app.": "Utilisé quand Connexion est réglée sur Tor. Il est à jour et se met à jour avec l'app.",
   "The downloader (yt-dlp) isn't installed, Settings → Updates → Helper programs → yt-dlp → Reinstall.": "Le téléchargeur (yt-dlp) n'est pas installé, Paramètres → Mises à jour → Programmes d'appoint → yt-dlp → Réinstaller.",
-  "No voices of your own yet: press Make your own voice below.": "Pas encore de voix à toi : appuie sur « Faites votre propre voix » en dessous.",
   "Windows can't find <b>{mic}</b> right now. Plug it in, or switch it on if it's wireless. No mic at all? Use the <b>virtual cable</b> below: it works without one.": "Windows ne trouve pas <b>{mic}</b> pour l'instant. Branche-le, ou allume-le s'il est sans fil. Pas de micro du tout ? Utilise le <b>câble virtuel</b> ci-dessous : il marche sans micro.",
   "Your mic sends no sound right now (switched off, muted or no mic plugged in), so others hear only your sounds. Want them to hear you too? Turn it on or unmute it.": "Ton micro n'envoie aucun son pour l'instant (éteint, coupé ou aucun micro branché), donc les autres n'entendent que tes sons. Tu veux qu'ils t'entendent aussi ? Allume-le ou réactive-le.",
   "A {language} computer voice, once it's on this PC (below).": "Une voix d'ordinateur en {language}, une fois sur ce PC (en dessous).",
@@ -4109,5 +4103,8 @@
   "Play it now": "Le jouer maintenant",
   "Space or a double-click plays it for you, Enter plays it through your mic, Esc stops, F2 renames, right-click for more.": "Espace ou un double-clic le joue pour toi, Entrée le joue dans ton micro, Échap l'arrête, F2 le renomme, clic droit pour plus.",
   "Today {time}": "Aujourd'hui {time}",
-  "Yesterday": "Hier"
+  "Yesterday": "Hier",
+  "AI voices are installed. Pick a voice to turn it on.": "Les voix IA sont installées. Choisissez une voix pour l'activer.",
+  "⚠ The AI voice stopped. Others now hear {backup}. Switch it off and on again to try again.": "⚠ La voix IA s'est arrêtée. Les autres entendent maintenant {backup}. Désactivez-la puis réactivez-la pour réessayer.",
+  "⚠ The AI voice stopped: {error}. Others now hear {backup}. Switch it off and on again to try again.": "⚠ La voix IA s'est arrêtée : {error}. Les autres entendent maintenant {backup}. Désactivez-la puis réactivez-la pour réessayer."
 }

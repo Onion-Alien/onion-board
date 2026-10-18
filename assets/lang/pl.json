@@ -1606,7 +1606,6 @@
   "A text-to-speech server running on your PC. Most have an OpenAI-style address ending in /v1/audio/speech; one that takes the text in the address can use {text} in it instead.": "Serwer zamiany tekstu na mowę działający na Twoim komputerze. Większość ma adres w stylu OpenAI kończący się na /v1/audio/speech; ten, który pobiera tekst z adresu, może zamiast tego użyć w nim {text} .",
   "AI voices": "Głosy AI",
   "AI voices are an optional add-on (about 55 MB, the voice model and its runtime). Nothing is downloaded until you press Get AI voices.": "Głosy AI są opcjonalnym dodatkiem (około 55 MB, model głosu i czas jego działania). Nic nie zostanie pobrane, dopóki nie naciśniesz opcji Pobierz głosy AI.",
-  "AI voices are installed. Pick a voice and press Start.": "Zainstalowano głosy AI. Wybierz głos i naciśnij Start.",
   "AI voices are removed.": "Głosy AI zostały usunięte.",
   "AI voices aren't available to download yet (GitHub says it can't find it). Try again later.": "Głosy AI nie są jeszcze dostępne do pobrania (GitHub twierdzi, że nie może ich znaleźć). Spróbuj ponownie później.",
   "API key": "Klucz API",
@@ -2392,8 +2391,6 @@
   "⚠ Couldn't play a sample: {error}": "⚠ Nie można odtworzyć próbki: {error}",
   "⚠ Couldn't start translating: {error}": "⚠ Nie można rozpocząć tłumaczenia: {error}",
   "⚠ Install failed: {error}. Press it again to retry; if it keeps failing, run install.bat in the add-on's folder to see why.": "⚠ Instalacja nie powiodła się: {error} . Naciśnij go ponownie, aby spróbować ponownie; jeśli problem będzie się powtarzał, uruchom plik install.bat w folderze dodatku, aby zobaczyć przyczynę.",
-  "⚠ The AI voice stopped. Others now hear {backup}. Press Stop, then Start to try again.": "⚠ Głos AI ucichł. Inni słyszą teraz {backup} . Naciśnij Stop, a następnie Start, aby spróbować ponownie.",
-  "⚠ The AI voice stopped: {error}. Others now hear {backup}. Press Stop, then Start to try again.": "⚠ Głos AI zatrzymał się: {error} . Inni słyszą teraz {backup} . Naciśnij Stop, a następnie Start, aby spróbować ponownie.",
   "⚠ This PC is slow for AI voices: games may stutter. A voice changer preset (left) is much lighter.": "⚠ Ten komputer obsługuje głosy AI: gry mogą się zacinać. Wstępne ustawienie zmiany głosu (po lewej) jest znacznie lżejsze.",
   "⚠ Translating stopped: {error}": "⚠ Tłumaczenie zatrzymane: {error}",
   "⚠ Turned off after an error: {error}": "⚠ Wyłączono po błędzie: {error}",
@@ -2830,8 +2827,6 @@
   "Streaming": "Streamowanie",
   "What will you use Onion Board for?": "Do czego będziesz używać Onion Board?",
   "Adds the <b>Apps</b> tab (send music or a game to your stream). The last step links the <b>Streamer guide</b> (Stream Deck keys, chat commands).": "Dodaje zakładkę <b>Aplikacje</b> (wysyłaj muzykę lub grę na stream). Ostatni krok prowadzi do: <b>Przewodnik po streamerze</b> (klawisze Stream Decka, komendy na czacie).",
-  "Start AI voice": "Uruchom głos AI",
-  "Stop AI voice": "Zatrzymaj głos AI",
   "Your words and tone, a different voice. Live on this PC.": "Twoje słowa i ton, inny głos. Na żywo na tym komputerze.",
   "Mic on": "Mikrofon włączony",
   "Output": "Wyjście",
@@ -3439,7 +3434,6 @@
   "The programs the app uses to download and play sounds. They update with the app, to the exact versions it was tested with. Only yt-dlp can update sooner, if you let it.": "Programy, których aplikacja używa do pobierania i odtwarzania dźwięków. Aktualizują się razem z aplikacją, do dokładnie tych wersji, z którymi ją przetestowano. Tylko yt-dlp może zaktualizować się wcześniej, jeśli na to pozwolisz.",
   "Used when Connection is set to Tor. It's up to date, and updates with the app.": "Używany, gdy Połączenie jest ustawione na Tor. Jest aktualny i aktualizuje się razem z aplikacją.",
   "The downloader (yt-dlp) isn't installed, Settings → Updates → Helper programs → yt-dlp → Reinstall.": "Moduł pobierania (yt-dlp) nie jest zainstalowany, Ustawienia → Aktualizacje → Programy pomocnicze → yt-dlp → Zainstaluj ponownie.",
-  "No voices of your own yet: press Make your own voice below.": "Nie masz jeszcze własnych głosów: naciśnij „Stwórz własny głos” poniżej.",
   "Windows can't find <b>{mic}</b> right now. Plug it in, or switch it on if it's wireless. No mic at all? Use the <b>virtual cable</b> below: it works without one.": "Windows nie widzi teraz urządzenia <b>{mic}</b>. Podłącz je albo włącz, jeśli jest bezprzewodowe. Nie masz w ogóle mikrofonu? Użyj <b>wirtualnego kabla</b> poniżej: działa bez niego.",
   "Your mic sends no sound right now (switched off, muted or no mic plugged in), so others hear only your sounds. Want them to hear you too? Turn it on or unmute it.": "Twój mikrofon nie wysyła teraz dźwięku (wyłączony, wyciszony albo nie podłączono mikrofonu), więc inni słyszą tylko twoje dźwięki. Chcesz, żeby słyszeli też ciebie? Włącz go albo wyłącz wyciszenie.",
   "A {language} computer voice, once it's on this PC (below).": "Głos komputerowy ({language}), gdy będzie na tym PC (poniżej).",
@@ -4188,5 +4182,8 @@
   "Play it now": "Odtwórz teraz",
   "Space or a double-click plays it for you, Enter plays it through your mic, Esc stops, F2 renames, right-click for more.": "Spacja lub dwuklik odtwarza to dla ciebie, Enter odtwarza przez mikrofon, Esc zatrzymuje, F2 zmienia nazwę, prawy przycisk po więcej.",
   "Today {time}": "Dziś {time}",
-  "Yesterday": "Wczoraj"
+  "Yesterday": "Wczoraj",
+  "AI voices are installed. Pick a voice to turn it on.": "Głosy AI są zainstalowane. Wybierz głos, aby go włączyć.",
+  "⚠ The AI voice stopped. Others now hear {backup}. Switch it off and on again to try again.": "⚠ Głos AI się zatrzymał. Inni słyszą teraz {backup}. Wyłącz go i włącz ponownie, aby spróbować jeszcze raz.",
+  "⚠ The AI voice stopped: {error}. Others now hear {backup}. Switch it off and on again to try again.": "⚠ Głos AI się zatrzymał: {error}. Inni słyszą teraz {backup}. Wyłącz go i włącz ponownie, aby spróbować jeszcze raz."
 }

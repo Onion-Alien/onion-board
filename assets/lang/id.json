@@ -1520,7 +1520,6 @@
   "A text-to-speech server running on your PC. Most have an OpenAI-style address ending in /v1/audio/speech; one that takes the text in the address can use {text} in it instead.": "Server text-to-speech yang berjalan di PC Anda. Sebagian besar memiliki alamat bergaya OpenAI yang diakhiri dengan /v1/audio/speech; orang yang mengambil teks di alamatnya dapat menggunakan {text} di dalamnya.",
   "AI voices": "suara AI",
   "AI voices are an optional add-on (about 55 MB, the voice model and its runtime). Nothing is downloaded until you press Get AI voices.": "Suara AI adalah tambahan opsional (sekitar 55 MB, model suara dan waktu prosesnya). Tidak ada yang diunduh sampai Anda menekan Dapatkan suara AI.",
-  "AI voices are installed. Pick a voice and press Start.": "Suara AI dipasang. Pilih suara dan tekan Mulai.",
   "AI voices are removed.": "Suara AI dihapus.",
   "AI voices aren't available to download yet (GitHub says it can't find it). Try again later.": "Suara AI belum tersedia untuk diunduh (GitHub mengatakan tidak dapat menemukannya). Coba lagi nanti.",
   "API key": "Kunci API",
@@ -2292,8 +2291,6 @@
   "⚠ Couldn't play a sample: {error}": "⚠ Tidak dapat memutar sampel: {error}",
   "⚠ Couldn't start translating: {error}": "⚠ Tidak dapat mulai menerjemahkan: {error}",
   "⚠ Install failed: {error}. Press it again to retry; if it keeps failing, run install.bat in the add-on's folder to see why.": "⚠ Penginstalan gagal: {error} . Tekan lagi untuk mencoba lagi; jika terus gagal, jalankan install.bat di folder add-on untuk mengetahui alasannya.",
-  "⚠ The AI voice stopped. Others now hear {backup}. Press Stop, then Start to try again.": "⚠ Suara AI berhenti. Yang lain sekarang mendengar {backup} . Tekan Berhenti, lalu Mulai untuk mencoba lagi.",
-  "⚠ The AI voice stopped: {error}. Others now hear {backup}. Press Stop, then Start to try again.": "⚠ Suara AI berhenti: {error} . Yang lain sekarang mendengar {backup} . Tekan Berhenti, lalu Mulai untuk mencoba lagi.",
   "⚠ This PC is slow for AI voices: games may stutter. A voice changer preset (left) is much lighter.": "⚠ PC ini lambat untuk suara AI: game mungkin tersendat-sendat. Preset pengubah suara (kiri) jauh lebih ringan.",
   "⚠ Translating stopped: {error}": "⚠ Penerjemahan terhenti: {error}",
   "⚠ Turned off after an error: {error}": "⚠ Dimatikan setelah terjadi kesalahan: {error}",
@@ -2706,8 +2703,6 @@
   "Streaming": "Streaming",
   "What will you use Onion Board for?": "Mau pakai Onion Board untuk apa?",
   "Adds the <b>Apps</b> tab (send music or a game to your stream). The last step links the <b>Streamer guide</b> (Stream Deck keys, chat commands).": "Menambah tab <b>Aplikasi</b> (kirim musik atau game ke stream-mu). Langkah terakhir menautkan <b>Panduan streamer</b> (tombol Stream Deck, perintah chat).",
-  "Start AI voice": "Mulai suara AI",
-  "Stop AI voice": "Hentikan suara AI",
   "Your words and tone, a different voice. Live on this PC.": "Kata dan nada bicaramu, suara yang berbeda. Langsung di PC ini.",
   "Mic on": "Mik aktif",
   "Output": "Output",
@@ -3293,7 +3288,6 @@
   "The programs the app uses to download and play sounds. They update with the app, to the exact versions it was tested with. Only yt-dlp can update sooner, if you let it.": "Program yang dipakai aplikasi untuk mengunduh dan memutar suara. Semuanya diperbarui bersama aplikasi, ke versi persis yang dipakai saat aplikasi diuji. Hanya yt-dlp yang bisa diperbarui lebih awal, kalau kamu izinkan.",
   "Used when Connection is set to Tor. It's up to date, and updates with the app.": "Dipakai saat Koneksi diatur ke Tor. Sudah terbaru dan diperbarui bersama aplikasi.",
   "The downloader (yt-dlp) isn't installed, Settings → Updates → Helper programs → yt-dlp → Reinstall.": "Pengunduh (yt-dlp) belum terpasang, Pengaturan → Pembaruan → Program pembantu → yt-dlp → Instal ulang.",
-  "No voices of your own yet: press Make your own voice below.": "Belum ada suaramu sendiri: tekan “Ciptakan suaramu sendiri” di bawah.",
   "Windows can't find <b>{mic}</b> right now. Plug it in, or switch it on if it's wireless. No mic at all? Use the <b>virtual cable</b> below: it works without one.": "Windows tidak menemukan <b>{mic}</b> sekarang. Sambungkan, atau nyalakan kalau nirkabel. Tidak punya mik sama sekali? Pakai <b>kabel virtual</b> di bawah: bisa tanpa mik.",
   "Your mic sends no sound right now (switched off, muted or no mic plugged in), so others hear only your sounds. Want them to hear you too? Turn it on or unmute it.": "Mik kamu tidak mengirim suara sekarang (mati, dibisukan, atau tidak ada mik yang terpasang), jadi orang lain hanya mendengar suara-suaramu. Mau mereka juga mendengarmu? Nyalakan atau aktifkan suaranya.",
   "A {language} computer voice, once it's on this PC (below).": "Suara komputer {language}, setelah ada di PC ini (di bawah).",
@@ -4030,5 +4024,8 @@
   "Play it now": "Putar sekarang",
   "Space or a double-click plays it for you, Enter plays it through your mic, Esc stops, F2 renames, right-click for more.": "Spasi atau klik dua kali memutarnya untukmu, Enter memutarnya lewat mikmu, Esc menghentikan, F2 mengganti nama, klik kanan untuk lainnya.",
   "Today {time}": "Hari ini {time}",
-  "Yesterday": "Kemarin"
+  "Yesterday": "Kemarin",
+  "AI voices are installed. Pick a voice to turn it on.": "Suara AI sudah terpasang. Pilih suara untuk menyalakannya.",
+  "⚠ The AI voice stopped. Others now hear {backup}. Switch it off and on again to try again.": "⚠ Suara AI berhenti. Yang lain sekarang mendengar {backup}. Matikan lalu nyalakan lagi untuk mencoba lagi.",
+  "⚠ The AI voice stopped: {error}. Others now hear {backup}. Switch it off and on again to try again.": "⚠ Suara AI berhenti: {error}. Yang lain sekarang mendengar {backup}. Matikan lalu nyalakan lagi untuk mencoba lagi."
 }

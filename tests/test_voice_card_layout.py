@@ -85,7 +85,10 @@ def test_all_voice_card_arrows_keep_centered_content(qapp, monkeypatch, name):
 
 
 @pytest.mark.parametrize("width", [340, 580])
-def test_ai_action_precedes_choices_and_status_wraps(qapp, monkeypatch, tmp_path, width):
+def test_ai_status_sits_over_the_voices_and_wraps(qapp, monkeypatch, tmp_path, width):
+    """The AI voices card's status (its switch is in the card's head, as the voice
+    changer's): one line under the card's words, wrapping inside the card and above
+    the voices; switched off, it goes."""
     monkeypatch.setattr("soundboard.ui.aivoicepanel.model_downloaded", lambda m: True)
     monkeypatch.setattr("soundboard.ui.aivoicepanel.read_voices", lambda m: [
         {"id": "bear", "name": "Bear", "description": "A deep voice."}])
@@ -96,13 +99,14 @@ def test_ai_action_precedes_choices_and_status_wraps(qapp, monkeypatch, tmp_path
         panel._set_ui(True, "Starting: a built-in voice covers you until the AI voice is ready.")
         panel.show()
         qapp.processEvents()
-        box = panel.ready_box
-        assert at(panel.b_start, box).bottom() < at(panel._tile["bear"], box).top()
-        assert box.rect().contains(at(panel.lbl_state, box))
-        assert box.rect().contains(at(panel._tile["bear"], box))
-        panel._set_ui(False, "Ready")
-        assert not panel.b_start.isChecked()
-        assert panel.lbl_state.text() == "Ready"
+        state = at(panel.lbl_state, panel)
+        assert panel.rect().contains(state)
+        assert state.height() >= panel.lbl_state.heightForWidth(state.width())
+        assert state.bottom() < at(panel._tile["bear"], panel).top()
+        assert panel.rect().contains(at(panel._tile["bear"], panel))
+        panel._set_ui(False, "")
+        assert not panel.b_start.isChecked() and panel.b_start.text() == "Off"
+        assert panel.lbl_state.isHidden()
     finally:
         panel.shutdown()
         panel.close()

@@ -1563,7 +1563,6 @@
   "A text-to-speech server running on your PC. Most have an OpenAI-style address ending in /v1/audio/speech; one that takes the text in the address can use {text} in it instead.": "Bilgisayarınızda çalışan bir metinden konuşmaya sunucusu. Çoğunun /v1/audio/speech ile biten OpenAI tarzı bir adresi vardır; adresteki metni alan kişi onun yerine {text} kullanabilir.",
   "AI voices": "Yapay zeka sesleri",
   "AI voices are an optional add-on (about 55 MB, the voice model and its runtime). Nothing is downloaded until you press Get AI voices.": "Yapay zeka sesleri isteğe bağlı bir eklentidir (yaklaşık 55 MB, ses modeli ve çalışma süresi). AI seslerini al'a basana kadar hiçbir şey indirilmez.",
-  "AI voices are installed. Pick a voice and press Start.": "AI sesleri yüklü. Bir ses seçin ve Başlat'a basın.",
   "AI voices are removed.": "AI sesleri kaldırıldı.",
   "AI voices aren't available to download yet (GitHub says it can't find it). Try again later.": "Yapay zeka sesleri henüz indirilemiyor (GitHub bunu bulamadığını söylüyor). Daha sonra tekrar deneyin.",
   "API key": "API anahtarı",
@@ -2342,8 +2341,6 @@
   "⚠ Couldn't play a sample: {error}": "⚠ Örnek oynatılamadı: {error}",
   "⚠ Couldn't start translating: {error}": "⚠ Çeviri başlatılamadı: {error}",
   "⚠ Install failed: {error}. Press it again to retry; if it keeps failing, run install.bat in the add-on's folder to see why.": "⚠ Yükleme başarısız oldu: {error} . Yeniden denemek için tekrar basın; hata vermeye devam ederse nedenini görmek için eklentinin klasöründe install.bat komutunu çalıştırın.",
-  "⚠ The AI voice stopped. Others now hear {backup}. Press Stop, then Start to try again.": "⚠ AI sesi durdu. Diğerleri artık {backup} ifadesini duyuyor. Tekrar denemek için Durdur'a ve ardından Başlat'a basın.",
-  "⚠ The AI voice stopped: {error}. Others now hear {backup}. Press Stop, then Start to try again.": "⚠ AI sesi durdu: {error} . Diğerleri artık {backup} ifadesini duyuyor. Tekrar denemek için Durdur'a ve ardından Başlat'a basın.",
   "⚠ This PC is slow for AI voices: games may stutter. A voice changer preset (left) is much lighter.": "⚠ Bu bilgisayar AI sesleri için yavaştır: oyunlarda takılmalar olabilir. Ses değiştirici ön ayarı (solda) çok daha hafiftir.",
   "⚠ Translating stopped: {error}": "⚠ Çeviri durduruldu: {error}",
   "⚠ Turned off after an error: {error}": "⚠ Bir hatadan sonra kapatıldı: {error}",
@@ -2768,8 +2765,6 @@
   "Streaming": "Yayın",
   "What will you use Onion Board for?": "Onion Board'u ne için kullanacaksın?",
   "Adds the <b>Apps</b> tab (send music or a game to your stream). The last step links the <b>Streamer guide</b> (Stream Deck keys, chat commands).": "<b>Uygulamalar</b> sekmesini ekler (yayınına müzik ya da oyun sesi gönder). Son adımda <b>Yayıncı kılavuzu</b> bağlantısı var (Stream Deck tuşları, sohbet komutları).",
-  "Start AI voice": "AI sesini başlat",
-  "Stop AI voice": "AI sesini durdur",
   "Your words and tone, a different voice. Live on this PC.": "Sözlerin ve tonun, farklı bir ses. Bu bilgisayarda canlı olarak.",
   "Mic on": "Mikrofon açık",
   "Output": "Çıkış",
@@ -3366,7 +3361,6 @@
   "The programs the app uses to download and play sounds. They update with the app, to the exact versions it was tested with. Only yt-dlp can update sooner, if you let it.": "Uygulamanın ses indirmek ve çalmak için kullandığı programlar. Uygulamayla birlikte, test edildiği sürümlere güncellenirler. İzin verirsen yalnızca yt-dlp daha erken güncellenebilir.",
   "Used when Connection is set to Tor. It's up to date, and updates with the app.": "Bağlantı Tor olarak ayarlıyken kullanılır. Güncel ve uygulamayla birlikte güncellenir.",
   "The downloader (yt-dlp) isn't installed, Settings → Updates → Helper programs → yt-dlp → Reinstall.": "İndirici (yt-dlp) yüklü değil, Ayarlar → Güncellemeler → Yardımcı programlar → yt-dlp → Yeniden yükle.",
-  "No voices of your own yet: press Make your own voice below.": "Henüz kendi sesin yok: aşağıdaki “Kendi sesini yap” düğmesine bas.",
   "Windows can't find <b>{mic}</b> right now. Plug it in, or switch it on if it's wireless. No mic at all? Use the <b>virtual cable</b> below: it works without one.": "Windows şu an <b>{mic}</b> cihazını bulamıyor. Tak ya da kablosuzsa aç. Hiç mikrofonun yok mu? Aşağıdaki <b>sanal kabloyu</b> kullan: mikrofonsuz da çalışır.",
   "Your mic sends no sound right now (switched off, muted or no mic plugged in), so others hear only your sounds. Want them to hear you too? Turn it on or unmute it.": "Mikrofonun şu an hiç ses göndermiyor (kapalı, sessizde ya da takılı mikrofon yok), bu yüzden diğerleri yalnızca seslerini duyuyor. Seni de duysunlar mı? Aç ya da sesini aç.",
   "A {language} computer voice, once it's on this PC (below).": "Bir {language} bilgisayar sesi, bu bilgisayara yüklendiğinde (aşağıda).",
@@ -4109,5 +4103,8 @@
   "Play it now": "Şimdi çal",
   "Space or a double-click plays it for you, Enter plays it through your mic, Esc stops, F2 renames, right-click for more.": "Boşluk veya çift tık senin için çalar, Enter mikrofonundan çalar, Esc durdurur, F2 yeniden adlandırır, fazlası için sağ tıkla.",
   "Today {time}": "Bugün {time}",
-  "Yesterday": "Dün"
+  "Yesterday": "Dün",
+  "AI voices are installed. Pick a voice to turn it on.": "Yapay zekâ sesleri yüklendi. Açmak için bir ses seçin.",
+  "⚠ The AI voice stopped. Others now hear {backup}. Switch it off and on again to try again.": "⚠ Yapay zekâ sesi durdu. Diğerleri artık şunu duyuyor: {backup}. Yeniden denemek için kapatıp tekrar açın.",
+  "⚠ The AI voice stopped: {error}. Others now hear {backup}. Switch it off and on again to try again.": "⚠ Yapay zekâ sesi durdu: {error}. Diğerleri artık şunu duyuyor: {backup}. Yeniden denemek için kapatıp tekrar açın."
 }

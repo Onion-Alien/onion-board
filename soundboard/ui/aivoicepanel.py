@@ -1,10 +1,12 @@
-"""The Voice tab's AI voices card: pick a character, press Start, talk.
+"""The Voice tab's AI voices card: pick a character and talk.
 
 The add-on (modules/ai-voices) does the converting in its own process; this card
 installs it, starts and stops it (soundboard.speech.aivoice) and shows how it's
-doing. The voices are picture cards under chips, like the voice changer's: All (a
-heading per kind), Favorites, Men, Women, In between & fun, Mine. Under them the
-picked voice, with Hear it and Make your own voice (ui/aivoicebrowser.py). Settings
+doing. It looks and works as the voice changer's card: the same big ON/OFF switch
+next to its name, the same picture cards (or list) under chips: All (a heading per kind),
+Favorites, Men, Women, In between & fun, Mine. Picking one turns it on, and the voice
+that's on gets the same bar under the cards: Edit voice (its pitch), Make your own
+voice (ui/aivoicebrowser.py), Hear it. Settings
 are a plain dict (`changed`) the Voice tab keeps in the speech settings under "ai".
 """
 from __future__ import annotations
@@ -15,29 +17,30 @@ import logging
 import re
 import threading
 
-from PySide6.QtCore import QPoint, QSize, Qt, Signal
+from PySide6.QtCore import QEvent, QPoint, QSize, Qt, Signal
 from PySide6.QtGui import QFont, QIcon, QPainter, QPixmap
-from PySide6.QtWidgets import (QButtonGroup, QCheckBox, QComboBox, QDialog, QFrame,
+from PySide6.QtWidgets import (QBoxLayout, QButtonGroup, QCheckBox, QComboBox, QDialog, QFrame,
                                QGridLayout, QHBoxLayout, QLabel, QMenu, QPushButton,
                                QSlider, QVBoxLayout, QWidget)
 
-from soundboard import aiaddon, applog, errors, net, updates, usage
+from soundboard import aiaddon, applog, errors, net, theme, updates, usage
 from soundboard import modules as mods
 from soundboard.i18n import _, ngettext
 from soundboard.speech import aivoice
 from soundboard.speech import aivoicelist as avl
-from soundboard.ui import art, busy, icons
+from soundboard.ui import art, busy, fit, icons
 from soundboard.ui.aivoicebrowser import AiVoiceEditor, Previewer, hear_button
 from soundboard.ui.bunnywidget import BunnyWidget
-from soundboard.ui.panel import Flow, UndoBar, fold_button, hint_label, section_label
-from soundboard.ui.voicefxpanel import (MAX_COLS, PICKED_ART, TILE_ART, TILE_GAP,
-                                        TILE_MIN_W, VoiceTile)
+from soundboard.ui.effectspopup import place_over
+from soundboard.ui.panel import (Flow, UndoBar, ViewToggle, fold_button, hint_label,
+                                 section_label)
+from soundboard.ui.voicefxpanel import (LIST_MIN_W, MAX_COLS, PICKED_ART, TILE_ART, TILE_GAP,
+                                        TILE_MIN_W, BigSwitch, VoiceTile)
 from soundboard.ui.widgets import LoadingBar
 from soundboard.wheelguard import no_wheel
 
 log = logging.getLogger(__name__)
 
-IDLE = _("Ready")
 BACKUP_LABELS = [(_("A built-in voice (still hides yours)"), "voice"),
                  (_("My real voice"), "mic"), (_("Silence"), "mute")]
 # what others hear once the AI voice has stopped, by backup key ("Others now hear …")
@@ -46,6 +49,7 @@ BACKUP_HEARD = {"voice": _("a built-in voice (still hides yours)"),
 
 # the chips over the voice cards: All shows a heading per kind (avl.who), your own last
 ALL, FAVS, MINE = "", "favs", "mine"
+MAKE = "+make"   # the Make your own voice card's place among the voice ids
 KINDS = (("men", _("Men")), ("women", _("Women")), ("other", _("In between & fun")),
          (MINE, _("Mine")))
 
@@ -125,7 +129,33 @@ def install_step(line: str) -> str | None:
     return None
 
 
-BOX_MAX_W = 560   # px: the pitch box at its widest
+class EditPopup(QDialog):
+    """An AI voice's Edit voice: its pitch, over the voice bar's button (like the
+    voice changer's Effects pop-up)."""
+
+    def __init__(self, panel: AiVoicePanel):
+        # owned by the app's window: inside a card the theme makes every widget
+        # see-through (QFrame#card QWidget), a pop-up's background too
+        super().__init__(panel.window(), Qt.WindowType.Popup | Qt.WindowType.FramelessWindowHint)
+        fit.watch(self)
+        self.setProperty("popover", True)
+        self.setObjectName("transport")
+        self.setAccessibleName(_("Edit voice"))
+        v = QVBoxLayout(self)
+        v.setContentsMargins(16, 12, 16, 14)
+        v.setSpacing(10)
+        title = QLabel(_("Edit voice"))
+        title.setObjectName("section")
+        title.setProperty("head", True)
+        v.addWidget(title)
+        v.addWidget(panel.pitch_box)
+        panel.pitch_box.show()
+        self.setFixedWidth(400)
+
+    def open_for(self, under: QWidget):
+        self.adjustSize()
+        place_over(self, under)
+        self.show()
 
 
 class AiVoicePanel(QWidget):
@@ -168,35 +198,37 @@ class AiVoicePanel(QWidget):
         v.setSpacing(12)
         self.title = section_label(_("AI voices"))
         v.addWidget(self.title)
+
+        # ---- the big ON/OFF, as the voice changer's: the Voice tab puts `head` right
+        # after its card's name. Picking a voice turns it on too
+        self.b_start = BigSwitch(_("AI voices"))
+        self.b_start.setText(_("Off"))
+        self.b_start.toggled.connect(self._toggle)
+        self.head = QWidget()
+        hh = QHBoxLayout(self.head)
+        hh.setContentsMargins(0, 0, 0, 0)
+        hh.addWidget(self.b_start)
         self.intro = hint_label(_("Your words and tone, a different voice. Live on this PC."))
         self.intro.setToolTip(_("Talk, and others hear a different person: your words and "
                                  "tone, another voice, live. It runs on this PC (about one "
                                  "CPU core while you talk, nothing while you're quiet); what "
                                  "you say never leaves it."))
+        v.addWidget(self.intro)
+        # how it's doing while it's on (starting, who you sound like, a failure); empty
+        # and hidden while it's off
+        self.lbl_state = hint_label("")
+        self.lbl_state.setTextFormat(Qt.TextFormat.PlainText)
+        self.lbl_state.setMinimumWidth(0)
+        self.lbl_state.hide()
+        v.addWidget(self.lbl_state)
 
         self.ready_box = QWidget()
         rv = QVBoxLayout(self.ready_box)
         rv.setContentsMargins(0, 0, 0, 0)
         rv.setSpacing(12)
-        action = QHBoxLayout()
-        action.setSpacing(14)
-        self.b_start = QPushButton(_("Start AI voice"))
-        icons.set_icon(self.b_start, "mic", "on_accent", "on_accent")
-        self.b_start.setCheckable(True)
-        self.b_start.setMinimumHeight(40)
-        self.b_start.setObjectName("primary")
-        self.b_start.toggled.connect(self._toggle)
-        action.addWidget(self.b_start, 0, Qt.AlignmentFlag.AlignTop)
-        self.lbl_state = QLabel(IDLE)
-        self.lbl_state.setTextFormat(Qt.TextFormat.PlainText)
-        self.lbl_state.setObjectName("muted")
-        self.lbl_state.setWordWrap(True)
-        self.lbl_state.setMinimumWidth(0)
-        action.addWidget(self.lbl_state, 1)
-        rv.addLayout(action)
-        rv.addWidget(self.intro)
 
-        # ---- which voices show: All (a heading per kind), your favorites, one kind
+        # ---- which voices show: All (a heading per kind), your favorites, one kind;
+        # cards or a list at the right (the voice changer's switch, the same setting)
         favs = self.s.pop("favorites", None)   # kept here, added back by _emit
         self._favs: list[str] = list(favs) if isinstance(favs, list) else []
         self._group = ALL
@@ -218,7 +250,14 @@ class AiVoicePanel(QWidget):
             self._cat_btns[key] = b
             cflow.addWidget(b)
         self._cat_btns[ALL].setChecked(True)
-        rv.addWidget(self.cats)
+        self._listed = False
+        self.view_toggle = ViewToggle("grid", _("Voices"))
+        self.view_toggle.changed.connect(self.set_view)
+        chips = QHBoxLayout()
+        chips.setSpacing(12)
+        chips.addWidget(self.cats, 1)
+        chips.addWidget(self.view_toggle, 0, Qt.AlignmentFlag.AlignTop)
+        rv.addLayout(chips)
         self._heads: dict[str, QLabel] = {}
         for key, text in KINDS:
             lbl = QLabel(text)
@@ -228,58 +267,68 @@ class AiVoicePanel(QWidget):
         self.no_favs = hint_label(_("No favorites yet. Click the star in a voice's corner "
                                     "to keep it here."))
         self.no_favs.hide()
-        self.no_mine = hint_label(_("No voices of your own yet: press Make your own voice "
-                                    "below."))
-        self.no_mine.hide()
 
-        # ---- pick a voice: a card each, as many a row as the width holds
+        # ---- pick a voice: a card each, as many a row as the width holds; under Mine,
+        # after your own, a card that makes one (as the voice changer's My own mix)
         self._tile_grid = QGridLayout()
         self._tile_grid.setSpacing(TILE_GAP)
         self._tile_cols = 3
         self.tiles = QButtonGroup(self)
         self.tiles.setExclusive(True)
         self._tile: dict[str, VoiceTile] = {}
+        mt = self.make_tile = VoiceTile(_("Make your own voice"))
+        mt.setCheckable(False)
+        mt.star.hide()
+        mt.setIcon(icons.icon("plus", "muted"))
+        mt.setIconSize(QSize(TILE_ART, TILE_ART))
+        mt.setCursor(Qt.CursorShape.PointingHandCursor)
+        mt.clicked.connect(lambda: self.edit(None))
         rv.addLayout(self._tile_grid)
         rv.addWidget(self.no_favs)
-        rv.addWidget(self.no_mine)
         self.undo_bar = UndoBar(_("Bring the voice back"))
         rv.addWidget(self.undo_bar)
+        self.lbl_sample = QLabel("")
+        self.lbl_sample.setObjectName("muted")
+        self.lbl_sample.setWordWrap(True)
+        self.lbl_sample.hide()
+        rv.addWidget(self.lbl_sample)
+        v.addWidget(self.ready_box)
 
-        # ---- the voice you picked: what it is; under that Hear it, Make your own voice
-        # (and change or delete it, one of yours), on a line of their own
+        # ---- the voice that's on: the voice changer's bar (the Voice tab pins it under
+        # its scrolling cards). Its picture and name, then Edit voice (the pitch), Make
+        # your own voice, Hear it (and change or delete it, one of yours)
         self.picked = QFrame()
         self.picked.setObjectName("picked")
-        pv = QVBoxLayout(self.picked)
-        pv.setContentsMargins(12, 8, 12, 10)
-        pv.setSpacing(8)
+        self.picked_box = QBoxLayout(QBoxLayout.Direction.LeftToRight, self.picked)
+        self.picked_box.setContentsMargins(12, 8, 12, 8)
+        self.picked_box.setSpacing(10)
         ph = QHBoxLayout()
         ph.setSpacing(10)
-        pv.addLayout(ph)
+        self.picked_box.addLayout(ph, 1)
         self.picked_pic = QLabel()
         self.picked_pic.setFixedSize(PICKED_ART, PICKED_ART)
-        ph.addWidget(self.picked_pic, 0, Qt.AlignmentFlag.AlignTop)
-        words = QVBoxLayout()
-        words.setSpacing(2)
+        ph.addWidget(self.picked_pic)
         self.picked_name = QLabel()
         self.picked_name.setObjectName("pickedname")
         self.picked_name.setTextFormat(Qt.TextFormat.PlainText)
+        self.picked_name.setWordWrap(True)
         self.picked_name.setMinimumWidth(40)   # a long name gives way in a narrow window
-        words.addWidget(self.picked_name)
-        self.lbl_about = hint_label("")
-        self.lbl_about.setTextFormat(Qt.TextFormat.PlainText)
-        self.lbl_about.setMinimumWidth(40)
-        words.addWidget(self.lbl_about)
-        ph.addLayout(words, 1)
-        btns = QWidget()
-        bflow = Flow(btns, gap=6)
-        self.b_hear = hear_button()
-        self.b_hear.clicked.connect(lambda: (usage.used("ai-voice-hear"), self.previewer.hear(
-            self.b_hear, self._voice(), self._sampled, self._say)))
-        bflow.addWidget(self.b_hear)
+        ph.addWidget(self.picked_name, 1)
+        self._picked_btns = QWidget()
+        bflow = Flow(self._picked_btns, gap=10)
+        self.picked_box.addWidget(self._picked_btns, 1)   # the buttons start mid-bar
+        self.btn_tweak = QPushButton(_("Edit voice"))
+        icons.set_icon(self.btn_tweak, "sliders")
+        self.btn_tweak.clicked.connect(lambda: self.open_tweak())
+        bflow.addWidget(self.btn_tweak)
         self.b_make = QPushButton(_("Make your own voice"))
         icons.set_icon(self.b_make, "plus")
         self.b_make.clicked.connect(lambda: self.edit(None))
         bflow.addWidget(self.b_make)
+        self.b_hear = hear_button()
+        self.b_hear.clicked.connect(lambda: (usage.used("ai-voice-hear"), self.previewer.hear(
+            self.b_hear, self._voice(), self._sampled, self._say)))
+        bflow.addWidget(self.b_hear)
         self.b_edit = QPushButton()
         icons.set_icon(self.b_edit, "edit")
         self.b_edit.setToolTip(_("Change this voice"))
@@ -297,19 +346,15 @@ class AiVoicePanel(QWidget):
         icons.set_icon(self.b_bin, "trash", "muted", "text", size=12)
         self.b_bin.clicked.connect(self.show_deleted)
         bflow.addWidget(self.b_bin)
-        brow = QHBoxLayout()
-        brow.addSpacing(PICKED_ART + 10)   # under the name, not the picture
-        brow.addWidget(btns, 1)
-        pv.addLayout(brow)
-        rv.addWidget(self.picked)
-        self.lbl_sample = QLabel("")
-        self.lbl_sample.setObjectName("muted")
-        self.lbl_sample.setWordWrap(True)
-        self.lbl_sample.hide()
-        rv.addWidget(self.lbl_sample)
+        v.addWidget(self.picked)
+        self.picked.installEventFilter(self)   # (after its buttons: _fit_picked reads them)
+        self.picked.hide()                     # (only while it's on: show_picked_row)
 
-        # ---- how high: in its own inner area under the picked voice
-        grid = QGridLayout()
+        # ---- Edit voice's pop-up: how high (made with the panel, placed in the pop-up
+        # the first time it opens)
+        self.pitch_box = QWidget(self)
+        grid = QGridLayout(self.pitch_box)
+        grid.setContentsMargins(0, 0, 0, 0)
         grid.setHorizontalSpacing(12)
         grid.setVerticalSpacing(10)
         grid.addWidget(section_label(_("Pitch")), 0, 0)
@@ -331,19 +376,13 @@ class AiVoicePanel(QWidget):
         prow.addWidget(self.lbl_pitch)
         grid.addLayout(prow, 1, 0, 1, 2)
         grid.setColumnStretch(1, 1)
-        box = self.voicebox = QFrame()
-        box.setObjectName("voicebox")
-        box.setMaximumWidth(BOX_MAX_W)   # a slider, not a bar across the card
-        grid.setContentsMargins(14, 4, 14, 14)
-        box.setLayout(grid)
-        rv.addWidget(box)
-        v.addWidget(self.ready_box)
+        self.pitch_box.hide()
+        self.tweak_pop: EditPopup | None = None
 
         self.missing = QWidget()
         mv = QVBoxLayout(self.missing)
         mv.setContentsMargins(0, 0, 0, 0)
         mv.setSpacing(12)
-        mv.addWidget(hint_label(_("Your words and tone, a different voice. Live on this PC.")))
 
         setup_row = QHBoxLayout()
         setup_row.setSpacing(16)
@@ -392,6 +431,8 @@ class AiVoicePanel(QWidget):
         mv.addWidget(setup)
         v.addWidget(self.missing)
 
+        # ---- the add-on itself: what covers you if it stops, update, remove (there
+        # whether it's on or off: it's removed only while off)
         self.btn_opts = fold_button(_("More options"))
         v.addWidget(self.btn_opts, 0, Qt.AlignmentFlag.AlignLeft)
         self.opts = QWidget()
@@ -490,10 +531,16 @@ class AiVoicePanel(QWidget):
             self.b_install.setText(_("Repair") if fix else _("Install AI voices"))
             icons.set_icon(self.b_install, "reload" if fix else "plus")
         can_make = self.can_make()
-        self.b_make.setEnabled(can_make)
-        self.b_make.setToolTip(
-            _("Blend two voices and set how deep and how high it is") if can_make else
-            _("Only for AI voices installed with the Get AI voices button"))
+        tip = (_("Blend two voices and set how deep and how high it is") if can_make else
+               _("Only for AI voices installed with the Get AI voices button"))
+        for b in (self.b_make, self.make_tile):
+            b.setEnabled(can_make)
+            b.setToolTip(tip)
+        # the switch works once the voices are here; till then the card says what's
+        # missing (and it's off: nothing to start)
+        usable = (ok and not self._installing) or self.is_on()
+        self.b_start.setEnabled(usable)
+        self.b_start.setToolTip("" if usable else self.lbl_missing.text())
 
     # ------------------------------------------------------------ settings
     def _emit(self):
@@ -515,11 +562,13 @@ class AiVoicePanel(QWidget):
         tags = avl.tag_line(vo) if vo else ""
         text = str(vo.get("about") or vo.get("description") or "")
         self.picked_name.setText(str(vo.get("name", "")))
+        about = f"{tags}. {text}" if tags and text else tags or text
+        self.picked_name.setToolTip(about)
+        self.picked_pic.setToolTip(about)
         key = art_key(vo) if vo else ""
         pm = art.pixmap(key, PICKED_ART) if key else None
         self.picked_pic.setPixmap(pm or emoji_icon(str(vo.get("emoji") or ""), PICKED_ART)
                                   .pixmap(PICKED_ART, PICKED_ART))
-        self.lbl_about.setText(f"{tags}. {text}" if tags and text else tags or text)
         mine = avl.is_mine(vo)
         self.b_edit.setVisible(mine and self.can_make())
         self.b_delete.setVisible(mine)
@@ -528,6 +577,7 @@ class AiVoicePanel(QWidget):
         self.b_bin.setText(_("Recently deleted ({n})", n=n))
         self.b_bin.setVisible(n > 0)
         self._mark_tile()
+        self._fit_picked()
 
     def _mark_tile(self):
         """Light up the picked voice's card only while the AI voice is on (like the
@@ -554,13 +604,15 @@ class AiVoicePanel(QWidget):
         for vo in self.voices:
             vid = vo["id"]
             b = VoiceTile(vo["name"])
+            if self._listed:
+                b.set_listed(True)
             b.setIcon(voice_icon(vo))
             b.setIconSize(QSize(TILE_ART, TILE_ART))
             b.setCursor(Qt.CursorShape.PointingHandCursor)
             tags = avl.tag_line(vo)
             about = str(vo.get("about") or vo.get("description") or "")
             b.setToolTip(f"{tags}. {about}" if tags and about else tags or about)
-            b.clicked.connect(lambda __=False, i=vid: self.use(i))
+            b.clicked.connect(lambda __=False, i=vid: self._tile_clicked(i))
             b.star.setChecked(vid in self._favs)
             b.star.toggled.connect(lambda on, i=vid: self.set_favorite(i, on))
             if avl.is_mine(vo):
@@ -576,7 +628,7 @@ class AiVoicePanel(QWidget):
         """The cards the picked chip shows: All under a heading per kind (lowest voice
         first), else one kind (or your favorites, in the order you starred them)."""
         g, cols = self._tile_grid, self._tile_cols
-        for w in (*self._tile.values(), *self._heads.values()):
+        for w in (*self._tile.values(), *self._heads.values(), self.make_tile):
             g.removeWidget(w)
         by_id = {vo["id"]: vo for vo in self.voices if vo["id"] in self._tile}
         low_first = sorted(by_id.values(), key=lambda vo: vo.get("pitch_hz", 0))
@@ -588,6 +640,11 @@ class AiVoicePanel(QWidget):
             rows = [("", [i for i in self._favs if i in by_id])]
         else:
             rows = [("", [vo["id"] for vo in low_first if voice_kind(vo) == self._group])]
+        # Make your own voice: the last card under Mine (and in Mine), even with none yet
+        make = self._group in (ALL, MINE)
+        if make:
+            rows = [(k, ids + [MAKE] if k == MINE or self._group == MINE else ids)
+                    for k, ids in rows]
         shown: set[str] = set()
         r = 0
         for head, group in rows:
@@ -597,16 +654,16 @@ class AiVoicePanel(QWidget):
                 g.addWidget(self._heads[head], r, 0, 1, cols)
                 r += 1
             for i, vid in enumerate(group):
-                g.addWidget(self._tile[vid], r + i // cols, i % cols)
+                g.addWidget(self._tile.get(vid) or self.make_tile, r + i // cols, i % cols)
             r += (len(group) + cols - 1) // cols
             shown.update(group)
         for k, lbl in self._heads.items():
-            lbl.setVisible(self._group == ALL and any(voice_kind(by_id[i]) == k
-                                                      for i in shown))
+            lbl.setVisible(self._group == ALL and any(
+                (MINE if i == MAKE else voice_kind(by_id[i])) == k for i in shown))
         for vid, b in self._tile.items():
             b.setVisible(vid in shown)
+        self.make_tile.setVisible(make)
         self.no_favs.setVisible(self._group == FAVS and not shown)
-        self.no_mine.setVisible(self._group == MINE and not shown)
         for c in range(MAX_COLS):
             g.setColumnStretch(c, 1 if c < cols else 0)
 
@@ -645,10 +702,70 @@ class AiVoicePanel(QWidget):
 
     def _fit_width(self, width: int):
         """As many voice cards a row as the width holds, at least one."""
-        cols = max(1, min(MAX_COLS, (width + TILE_GAP) // (TILE_MIN_W + TILE_GAP)))
+        least = LIST_MIN_W if self._listed else TILE_MIN_W
+        cols = max(1, min(MAX_COLS, (width + TILE_GAP) // (least + TILE_GAP)))
         if cols != self._tile_cols:
             self._tile_cols = cols
             self._place_tiles()
+
+    def set_view(self, view: str):
+        """Picture cards, or a list (the voice changer's switch: the Voice tab keeps
+        the two the same)."""
+        self._listed = view == "list"
+        self.view_toggle.set_view(view)
+        for b in (*self._tile.values(), self.make_tile):
+            b.set_listed(self._listed)
+        self._tile_cols = 0   # refit for the new width a voice needs
+        self._fit_width(self.width())
+
+    # ------------------------------------------------------------ the voice bar
+    def show_picked_row(self, room: bool | None = None):
+        """The bar under the cards shows only while the AI voice is on, as the voice
+        changer's does. `room`: whether the Voice tab has a place for it now (its own
+        tab showing)."""
+        if room is not None:
+            self._picked_room = room
+        self.picked.setVisible(getattr(self, "_picked_room", True) and self.is_on())
+
+    def _fit_picked(self):
+        """The buttons beside the voice's name while they fit there, else on a line of
+        their own under it (where they wrap, narrow)."""
+        if not hasattr(self, "_picked_btns"):
+            return
+        box = self.picked_box
+        btns = [b for b in self._picked_btns.findChildren(QPushButton) if not b.isHidden()]
+        need = (sum(b.sizeHint().width() for b in btns) + 10 * max(0, len(btns) - 1))
+        m = box.contentsMargins()
+        line = self.picked.width() - m.left() - m.right()
+        beside = (line - PICKED_ART - min(self.picked_name.sizeHint().width(), 140)
+                  - 2 * box.spacing())
+        want = (QBoxLayout.Direction.LeftToRight if need <= beside
+                else QBoxLayout.Direction.TopToBottom)
+        if box.direction() != want:
+            box.setDirection(want)
+        # beside the name they keep one line (half the bar was too little for all of
+        # them, so they wrapped); under it they wrap when they must
+        self._picked_btns.setMinimumWidth(
+            need if want == QBoxLayout.Direction.LeftToRight else 0)
+
+    def eventFilter(self, obj, e):
+        if obj is self.picked and e.type() == QEvent.Type.Resize:
+            self._fit_picked()
+        return super().eventFilter(obj, e)
+
+    def open_tweak(self):
+        """Edit voice: the pitch, in a pop-up over the bar's button."""
+        if self.tweak_pop is None:
+            self.tweak_pop = EditPopup(self)
+        self.tweak_pop.open_for(self.btn_tweak)
+
+    def _tile_clicked(self, vid: str):
+        """A voice card: that voice, on; the one that's on already: off (as the voice
+        changer's cards)."""
+        if self.is_on() and vid == self.current_voice():
+            self.stop()
+            return
+        self.use(vid)
 
     def use(self, vid: str):
         """A card was clicked: that voice, on now (like the voice changer's cards)."""
@@ -665,7 +782,7 @@ class AiVoicePanel(QWidget):
         if self.ctl.running:
             self.ctl.set_voice(vid, self.s["pitch"])
             self._voice_name = self._voice().get("name", "")
-            self.lbl_state.setText(_("● switching to {voice}…", voice=self._voice_name))
+            self._state(_("● switching to {voice}…", voice=self._voice_name))
         self._emit()
 
     # ------------------------------------------------------------ your own voices
@@ -760,9 +877,9 @@ class AiVoicePanel(QWidget):
         self.s["backup"] = self.cb_backup.currentData() or "voice"
         self.ctl.set_backup(self.s["backup"])
         if self.status() == "failed":
-            self.lbl_state.setText(self.failure_text(getattr(self, "_failure_error", "")))
+            self._state(self.failure_text(getattr(self, "_failure_error", "")))
         elif self.status() == "starting":
-            self.lbl_state.setText(self._starting_text())
+            self._state(self._starting_text())
         self._emit()
 
     # ------------------------------------------------------------ start / stop
@@ -776,7 +893,7 @@ class AiVoicePanel(QWidget):
     def _toggle(self, on: bool):
         if on and not self.ctl.running:
             if self.module is None:
-                self._set_ui(False, IDLE)
+                self._set_ui(False, "")
                 return
             self._retried = False
             if not self._start_helper():
@@ -784,10 +901,11 @@ class AiVoicePanel(QWidget):
             self._voice_name = self._voice().get("name", "")
             usage.used("ai-voice")   # switched on (never which voice)
             self._set_ui(True, self._starting_text())
-        elif not on and self.ctl.running:
-            self.ctl.stop()
-            self._set_ui(False, IDLE)
-        self._mark_tile()   # (also when it had already stopped by itself)
+        elif not on:
+            if self.ctl.running:
+                self.ctl.stop()
+            self._set_ui(False, "")   # (also when it had already stopped by itself)
+        self._mark_tile()
 
     def _start_helper(self) -> bool:
         self._connected = False      # the helper said hello (it can still fail to load)
@@ -819,20 +937,29 @@ class AiVoicePanel(QWidget):
 
     def failure_text(self, error: str = "") -> str:
         error = error.strip().rstrip(".。")   # the sentence adds its own full stop
-        return (_("⚠ The AI voice stopped: {error}. Others now hear {backup}. Press Stop, "
-                  "then Start to try again.", error=error, backup=self.backup_heard()) if error else
-                _("⚠ The AI voice stopped. Others now hear {backup}. Press Stop, then Start "
-                  "to try again.", backup=self.backup_heard()))
+        return (_("⚠ The AI voice stopped: {error}. Others now hear {backup}. Switch it "
+                  "off and on again to try again.", error=error, backup=self.backup_heard())
+                if error else
+                _("⚠ The AI voice stopped. Others now hear {backup}. Switch it off and on "
+                  "again to try again.", backup=self.backup_heard()))
+
+    def _state(self, text: str):
+        """The line under the card's words: how it's doing while it's on."""
+        self.lbl_state.setText(text)
+        self.lbl_state.setVisible(bool(text))
+        theme.set_tone(self.lbl_state, "warn" if text.startswith("⚠") else "")
 
     def _set_ui(self, on: bool, state: str):
         self._status = "starting" if on else "off"
         self.b_start.blockSignals(True)
         self.b_start.setChecked(on)
         self.b_start.blockSignals(False)
-        self.b_start.setText(_("Stop AI voice") if on else _("Start AI voice"))
+        self.b_start.setText(_("On") if on else _("Off"))
         self._mark_tile()
         self.b_update.setEnabled(not on)
-        self.lbl_state.setText(state)
+        self._state(state)
+        self.show_picked_row()
+        self._refresh()   # (the switch: usable again once off)
         self.live_changed.emit(on)
 
     def _on_event(self, ev: dict):
@@ -841,7 +968,7 @@ class AiVoicePanel(QWidget):
         if t == "hello":
             self._connected = True
         elif t == "status":
-            self.lbl_state.setText(text)
+            self._state(text)
         elif t == "ready":
             self._status = "on"
             msg = (_("● you sound like {voice}", voice=self._voice_name) if self._voice_name
@@ -849,10 +976,10 @@ class AiVoicePanel(QWidget):
             if ev.get("slow"):
                 msg += " " + _("⚠ This PC is slow for AI voices: games may stutter. A voice "
                                "changer preset (left) is much lighter.")
-            self.lbl_state.setText(msg)
+            self._state(msg)
         elif t == "stats":
             cpu, ms = f"{float(ev.get('cpu', 0)):.0f}", f"{aivoice.LATENCY_S * 1000:.0f}"
-            self.lbl_state.setText(
+            self._state(
                 _("● you sound like {voice} · CPU {cpu}% · about {ms} ms behind you",
                   voice=self._voice_name, cpu=cpu, ms=ms) if self._voice_name else
                 _("● you sound like the voice · CPU {cpu}% · about {ms} ms behind you",
@@ -860,7 +987,7 @@ class AiVoicePanel(QWidget):
         elif t == "error":
             self._status = "failed"
             self._failure_error = text
-            self.lbl_state.setText(self.failure_text(text))
+            self._state(self.failure_text(text))
         elif (t == "stopped" and self.ctl.running and not self._connected
               and not self._retried and self.module is not None):
             # the helper never called back (once it sat silent for 30 s, then started
@@ -869,11 +996,11 @@ class AiVoicePanel(QWidget):
             log.warning("AI voice helper didn't connect (%s); trying once more", text)
             if self._start_helper():
                 self._status = "starting"
-                self.lbl_state.setText(self._starting_text(retry=True))
+                self._state(self._starting_text(retry=True))
         elif t == "stopped" and self.ctl.running:
             self._status = "failed"
             self._failure_error = text
-            self.lbl_state.setText(self.failure_text(text))
+            self._state(self.failure_text(text))
 
     # ------------------------------------------------------------ get / remove
     def _get(self):
@@ -937,7 +1064,7 @@ class AiVoicePanel(QWidget):
             return
         self._installing = True
         self._refresh()
-        for b in (self.b_install, self.b_update, self.b_start):
+        for b in (self.b_install, self.b_update):
             busy.set_busy(b, True)
         self.b_install.setText(_("Installing… (a few minutes)"))
         self._last_line = ""
@@ -969,7 +1096,7 @@ class AiVoicePanel(QWidget):
 
     def _on_install_done(self, ok: bool, err: str = ""):
         self._installing = False
-        for b in (self.b_install, self.b_update, self.b_start, self.b_get):
+        for b in (self.b_install, self.b_update, self.b_get):
             busy.set_busy(b, False)
         self.b_update.setEnabled(not self.ctl.running)
         self.b_install.setText(_("Install AI voices"))
@@ -981,7 +1108,7 @@ class AiVoicePanel(QWidget):
             self.lbl_install.hide()
             self.modules_changed.emit()     # a fresh download is a new module folder
             self._refresh()
-            busy.toast(self, _("AI voices are installed. Pick a voice and press Start."), "ok")
+            busy.toast(self, _("AI voices are installed. Pick a voice to turn it on."), "ok")
         else:
             self._refresh()                 # the buttons come back to try again
             last = self.lbl_install.text()

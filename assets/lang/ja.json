@@ -1520,7 +1520,6 @@
   "A text-to-speech server running on your PC. Most have an OpenAI-style address ending in /v1/audio/speech; one that takes the text in the address can use {text} in it instead.": "PC 上で実行されるテキスト読み上げサーバー。ほとんどのアドレスは、/v1/audio/speech で終わる OpenAI スタイルのアドレスを持っています。アドレス内のテキストを受け取るアドレスでは、代わりに{text}を使用できます。",
   "AI voices": "AIの声",
   "AI voices are an optional add-on (about 55 MB, the voice model and its runtime). Nothing is downloaded until you press Get AI voices.": "AI 音声はオプションのアドオンです (音声モデルとそのランタイムで約 55 MB)。 [AI 音声の取得] を押すまでは何もダウンロードされません。",
-  "AI voices are installed. Pick a voice and press Start.": "AI音声を搭載。音声を選択して「開始」を押します。",
   "AI voices are removed.": "AI音声は削除されています。",
   "AI voices aren't available to download yet (GitHub says it can't find it). Try again later.": "AI の音声はまだダウンロードできません (GitHub では見つからないとのことです)。後でもう一度試してください。",
   "API key": "APIキー",
@@ -2292,8 +2291,6 @@
   "⚠ Couldn't play a sample: {error}": "⚠ サンプルを再生できませんでした: {error}",
   "⚠ Couldn't start translating: {error}": "⚠ 翻訳を開始できませんでした: {error}",
   "⚠ Install failed: {error}. Press it again to retry; if it keeps failing, run install.bat in the add-on's folder to see why.": "⚠ インストールに失敗しました: {error} 。もう一度押すと再試行します。失敗し続ける場合は、アドオンのフォルダーにある install.bat を実行して理由を確認してください。",
-  "⚠ The AI voice stopped. Others now hear {backup}. Press Stop, then Start to try again.": "⚠AIの音声が止まりました。他の人には{backup}が聞こえるようになりました。 「停止」を押してから「開始」を押して、もう一度試してください。",
-  "⚠ The AI voice stopped: {error}. Others now hear {backup}. Press Stop, then Start to try again.": "⚠ AI 音声が停止しました: {error} 。他の人には{backup}が聞こえるようになりました。 「停止」を押してから「開始」を押して、もう一度試してください。",
   "⚠ This PC is slow for AI voices: games may stutter. A voice changer preset (left) is much lighter.": "⚠ この PC は AI 音声に対して遅いため、ゲームが途切れる可能性があります。ボイスチェンジャーのプリセット（左）はかなり軽いです。",
   "⚠ Translating stopped: {error}": "⚠ 翻訳が停止しました: {error}",
   "⚠ Turned off after an error: {error}": "⚠ エラー後にオフになりました: {error}",
@@ -2706,8 +2703,6 @@
   "Streaming": "配信",
   "What will you use Onion Board for?": "Onion Boardを何に使いますか？",
   "Adds the <b>Apps</b> tab (send music or a game to your stream). The last step links the <b>Streamer guide</b> (Stream Deck keys, chat commands).": "<b>アプリ</b>タブ（音楽やゲームの音を配信に送る）を追加します。最後のステップに<b>ストリーマーガイド</b>（Stream Deckのキー、チャットコマンド）へのリンクがあります。",
-  "Start AI voice": "AI音声を開始します",
-  "Stop AI voice": "AIの声を止める",
   "Your words and tone, a different voice. Live on this PC.": "言葉と話し方はそのまま、別の声に。このPCでリアルタイムに変換。",
   "Mic on": "マイクオン",
   "Output": "出力",
@@ -3293,7 +3288,6 @@
   "The programs the app uses to download and play sounds. They update with the app, to the exact versions it was tested with. Only yt-dlp can update sooner, if you let it.": "アプリがサウンドのダウンロードと再生に使うプログラムです。アプリと一緒に、テスト済みのバージョンへ更新されます。許可すれば、yt-dlpだけはそれより早く更新できます。",
   "Used when Connection is set to Tor. It's up to date, and updates with the app.": "接続がTorに設定されているときに使います。最新の状態で、アプリと一緒に更新されます。",
   "The downloader (yt-dlp) isn't installed, Settings → Updates → Helper programs → yt-dlp → Reinstall.": "ダウンローダー (yt-dlp) がインストールされていません。設定 → アップデート → 補助プログラム → yt-dlp → 再インストール。",
-  "No voices of your own yet: press Make your own voice below.": "自分のボイスはまだありません。下の「自分の声を作りましょう」を押してください。",
   "Windows can't find <b>{mic}</b> right now. Plug it in, or switch it on if it's wireless. No mic at all? Use the <b>virtual cable</b> below: it works without one.": "今は Windows が <b>{mic}</b> を見つけられません。接続するか、ワイヤレスなら電源を入れてください。マイクがまったくない場合は、下の<b>仮想ケーブル</b>を使ってください。マイクなしでも使えます。",
   "Your mic sends no sound right now (switched off, muted or no mic plugged in), so others hear only your sounds. Want them to hear you too? Turn it on or unmute it.": "今マイクから音が届いていません（電源オフ、ミュート、またはマイク未接続）。そのため、ほかの人にはサウンドだけが聞こえます。自分の声も届けたいときは、電源を入れるかミュートを解除してください。",
   "A {language} computer voice, once it's on this PC (below).": "{language}のコンピューター音声（このPCに入ったら使えます。下を参照）。",
@@ -4030,5 +4024,8 @@
   "Play it now": "今すぐ再生",
   "Space or a double-click plays it for you, Enter plays it through your mic, Esc stops, F2 renames, right-click for more.": "スペースかダブルクリックで自分だけに再生、Enter でマイクから再生、Esc で停止、F2 で名前を変更、右クリックでその他の操作。",
   "Today {time}": "今日 {time}",
-  "Yesterday": "昨日"
+  "Yesterday": "昨日",
+  "AI voices are installed. Pick a voice to turn it on.": "AI音声をインストールしました。声を選ぶとオンになります。",
+  "⚠ The AI voice stopped. Others now hear {backup}. Switch it off and on again to try again.": "⚠ AI音声が停止しました。他の人には{backup}が聞こえています。もう一度試すには、いったんオフにしてからオンに戻してください。",
+  "⚠ The AI voice stopped: {error}. Others now hear {backup}. Switch it off and on again to try again.": "⚠ AI音声が停止しました：{error}。他の人には{backup}が聞こえています。もう一度試すには、いったんオフにしてからオンに戻してください。"
 }

@@ -1559,7 +1559,6 @@
   "A text-to-speech server running on your PC. Most have an OpenAI-style address ending in /v1/audio/speech; one that takes the text in the address can use {text} in it instead.": "A számítógépen futó szövegfelolvasó szerver. A legtöbb OpenAI-stílusú címe /v1/audio/speech végződik; amelyik átveszi a cím szövegét, használhatja helyette {text} .",
   "AI voices": "AI hangok",
   "AI voices are an optional add-on (about 55 MB, the voice model and its runtime). Nothing is downloaded until you press Get AI voices.": "Az AI hangok opcionális kiegészítők (körülbelül 55 MB, a hangmodell és annak futásideje). Semmi sem töltődik le, amíg meg nem nyomja a Get AI voices gombot.",
-  "AI voices are installed. Pick a voice and press Start.": "Az AI hangok telepítve vannak. Válasszon ki egy hangot, és nyomja meg az Indítás gombot.",
   "AI voices are removed.": "Az AI-hangok eltávolítva.",
   "AI voices aren't available to download yet (GitHub says it can't find it). Try again later.": "Az AI-hangok még nem tölthetők le (a GitHub azt mondja, hogy nem találja). Próbálja újra később.",
   "API key": "API kulcs",
@@ -2342,8 +2341,6 @@
   "⚠ Couldn't play a sample: {error}": "⚠ Nem sikerült lejátszani egy mintát: {error}",
   "⚠ Couldn't start translating: {error}": "⚠ Nem sikerült elindítani a fordítást: {error}",
   "⚠ Install failed: {error}. Press it again to retry; if it keeps failing, run install.bat in the add-on's folder to see why.": "⚠ A telepítés sikertelen: {error} . Nyomja meg újra az újrapróbálkozáshoz; Ha továbbra is sikertelen, futtassa az install.bat fájlt a bővítmény mappájában, hogy megtudja, miért.",
-  "⚠ The AI voice stopped. Others now hear {backup}. Press Stop, then Start to try again.": "⚠ Az AI hangja elhallgatott. Mások most hallják {backup} . Nyomja meg a Stop, majd a Start gombot az újrapróbálkozáshoz.",
-  "⚠ The AI voice stopped: {error}. Others now hear {backup}. Press Stop, then Start to try again.": "⚠ Az AI hangja leállt: {error} . Mások most hallják {backup} . Nyomja meg a Stop, majd a Start gombot az újrapróbálkozáshoz.",
   "⚠ This PC is slow for AI voices: games may stutter. A voice changer preset (left) is much lighter.": "⚠ Ez a számítógép lassú a mesterséges intelligencia hangjaihoz: a játékok akadozhatnak. A hangváltó előre beállított (balra) sokkal könnyebb.",
   "⚠ Translating stopped: {error}": "⚠ A fordítás leállt: {error}",
   "⚠ Turned off after an error: {error}": "⚠ Hiba miatt kikapcsolva: {error}",
@@ -2768,8 +2765,6 @@
   "Streaming": "Streamelés",
   "What will you use Onion Board for?": "Mire fogod használni az Onion Boardot?",
   "Adds the <b>Apps</b> tab (send music or a game to your stream). The last step links the <b>Streamer guide</b> (Stream Deck keys, chat commands).": "Hozzáadja az <b>Appok</b> lapot (küldj zenét vagy játékot a streamedbe). Az utolsó lépés a <b>Streamer-útmutató</b> oldalra mutat (Stream Deck gombok, chatparancsok).",
-  "Start AI voice": "Indítsa el az AI hangot",
-  "Stop AI voice": "Állítsa le az AI hangját",
   "Your words and tone, a different voice. Live on this PC.": "A te szavaid és hanghordozásod, más hangon. Élőben ezen a gépen.",
   "Mic on": "Mikrofon bekapcsolva",
   "Output": "Kimenet",
@@ -3366,7 +3361,6 @@
   "The programs the app uses to download and play sounds. They update with the app, to the exact versions it was tested with. Only yt-dlp can update sooner, if you let it.": "A programok, amelyekkel az alkalmazás hangokat tölt le és játszik le. Az alkalmazással együtt frissülnek, pontosan azokra a verziókra, amelyekkel tesztelték. Csak a yt-dlp frissülhet hamarabb, ha engeded.",
   "Used when Connection is set to Tor. It's up to date, and updates with the app.": "Akkor használja, ha a Kapcsolat Torra van állítva. Naprakész, és az alkalmazással együtt frissül.",
   "The downloader (yt-dlp) isn't installed, Settings → Updates → Helper programs → yt-dlp → Reinstall.": "A letöltő (yt-dlp) nincs telepítve, Beállítások → Frissítések → Segédprogramok → yt-dlp → Újratelepítés.",
-  "No voices of your own yet: press Make your own voice below.": "Még nincs saját hangod: nyomd meg lent a „Hozd ki a saját hangod” gombot.",
   "Windows can't find <b>{mic}</b> right now. Plug it in, or switch it on if it's wireless. No mic at all? Use the <b>virtual cable</b> below: it works without one.": "A Windows most nem találja ezt: <b>{mic}</b>. Dugd be, vagy kapcsold be, ha vezeték nélküli. Egyáltalán nincs mikrofonod? Használd a lenti <b>virtuális kábelt</b>: mikrofon nélkül is működik.",
   "Your mic sends no sound right now (switched off, muted or no mic plugged in), so others hear only your sounds. Want them to hear you too? Turn it on or unmute it.": "A mikrofonod most nem küld hangot (ki van kapcsolva, le van némítva, vagy nincs bedugva mikrofon), így mások csak a hangjaidat hallják. Szeretnéd, hogy téged is halljanak? Kapcsold be, vagy oldd fel a némítást.",
   "A {language} computer voice, once it's on this PC (below).": "Egy {language} gépi hang, ha már ezen a gépen van (lent).",
@@ -4109,5 +4103,8 @@
   "Play it now": "Lejátszás most",
   "Space or a double-click plays it for you, Enter plays it through your mic, Esc stops, F2 renames, right-click for more.": "A szóköz vagy dupla kattintás neked játssza le, az Enter a mikrofonodon át, az Esc leállítja, az F2 átnevezi, jobb klikk a többihez.",
   "Today {time}": "Ma {time}",
-  "Yesterday": "Tegnap"
+  "Yesterday": "Tegnap",
+  "AI voices are installed. Pick a voice to turn it on.": "Az AI hangok telepítve vannak. Válassz egy hangot a bekapcsoláshoz.",
+  "⚠ The AI voice stopped. Others now hear {backup}. Switch it off and on again to try again.": "⚠ Az AI hang leállt. Mások most ezt hallják: {backup}. Kapcsold ki, majd újra be az újrapróbálkozáshoz.",
+  "⚠ The AI voice stopped: {error}. Others now hear {backup}. Switch it off and on again to try again.": "⚠ Az AI hang leállt: {error}. Mások most ezt hallják: {backup}. Kapcsold ki, majd újra be az újrapróbálkozáshoz."
 }
