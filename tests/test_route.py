@@ -9,7 +9,7 @@ from soundboard.audio import engine
 from soundboard.sounds.library import Config
 from soundboard.settings import SettingsDialog
 from soundboard.ui import mainwindow as main
-from soundboard.ui import setupwizard
+from soundboard.ui.setup import setupwizard
 from soundboard.ui.routecontrol import ROUTE_DEVICE
 from conftest import devices_done
 from test_setupwizard import devices, resume, wizard  # noqa: F401  (fake devices)

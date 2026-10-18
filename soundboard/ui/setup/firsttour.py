@@ -28,7 +28,7 @@ from PySide6.QtWidgets import QApplication, QWidget
 from soundboard.online import net
 from soundboard.core import tips, usage
 from soundboard.i18n import _
-from soundboard.ui import coach
+from soundboard.ui.setup import coach
 from soundboard.ui.sounds.ytsearch import SearchResults
 
 log = logging.getLogger(__name__)
@@ -69,7 +69,7 @@ def start(win) -> Tour | None:
             return None
     except RuntimeError:   # the window went meanwhile
         return None
-    from soundboard.ui import tabtours
+    from soundboard.ui.setup import tabtours
     tabtours.stop(win)   # (one tour at a time)
     cfg = win.cfg
     cfg.tips_seen = [*cfg.tips_seen, KEY, "search"]   # (the search tip says the same)

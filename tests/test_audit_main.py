@@ -13,7 +13,8 @@ from soundboard.audio import appaudio
 from soundboard.core import autostart
 from soundboard.sounds import library
 from soundboard.online import net
-from soundboard.ui import chatguide, responsive
+from soundboard.ui.setup import chatguide
+from soundboard.ui import responsive
 from soundboard.ui import importcontrol, playbackcontrol
 from soundboard.ui.sounds.dialogs import EditDialog
 from soundboard.ui import mainwindow as main

@@ -186,7 +186,7 @@ class EnjoyControl(Controller):
             return False
         if mw.overlay.is_open or tips.fullscreen_in_front():
             return False
-        from soundboard.ui import firsttour, tabtours
+        from soundboard.ui.setup import firsttour, tabtours
         if firsttour._current is not None or tabtours._current is not None:
             return False
         return not any(getattr(mw, n) is not self.bar and not getattr(mw, n).isHidden()

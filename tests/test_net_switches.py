@@ -184,7 +184,7 @@ def test_a_switched_off_site_is_refused_and_the_others_still_search(mode, sites,
 
 
 def test_setup_downloads_off_never_starts_the_cable_installer(monkeypatch):
-    from soundboard.ui import setupwizard
+    from soundboard.ui.setup import setupwizard
     net.configure_features(["setup_downloads"])
     monkeypatch.setattr(setupwizard.subprocess, "Popen", lambda *a, **k: pytest.fail("ran"))
     told = []

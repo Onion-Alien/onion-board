@@ -81,7 +81,7 @@ class MicControl(Controller):
             return
         self._mic_offered = True
         log.info("offering the newer mic part")
-        from soundboard.ui.micupdate import MicUpdateOffer
+        from soundboard.ui.setup.micupdate import MicUpdateOffer
         offer = self._mic_offer = MicUpdateOffer(mw)
         offer.accepted.connect(self._accept_mic_update)
         offer.finished.connect(self._mic_offer_closed)
@@ -425,7 +425,7 @@ class MicControl(Controller):
             QTimer.singleShot(int(mw.SETTLE_S * 1000) + 200, mw.statusctl._update_status)
             mw.cfg.route = "cable"   # so set_route() applies "mic" in full
             mw.routectl.set_route("mic", attached=True)
-            from soundboard.ui.setupwizard import SetupWizard
+            from soundboard.ui.setup.setupwizard import SetupWizard
             modal = QApplication.activeModalWidget()
             # said once it works (_update_flow), with the card turning green and Bun
             # cheering: said now, it came while the card still read "starting…" and Bun
@@ -462,7 +462,7 @@ class MicControl(Controller):
         """The status box's Reinstall / Remove: Settings' audio recovery, on this mic,
         after the same are-you-sure box."""
         mw = self.mw
-        from soundboard.ui import audiorecovery
+        from soundboard.ui.setup import audiorecovery
         recovery = audiorecovery.recovery_of(mw)
         if recovery.running or mw._attaching:
             return

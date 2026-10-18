@@ -11,7 +11,7 @@ from soundboard.control import winkeys
 from soundboard.sounds.library import Config
 from soundboard.ui import mainwindow as main
 from soundboard.ui.kit import busy
-from soundboard.ui import setupwizard
+from soundboard.ui.setup import setupwizard
 
 INS = ["Headset Mic (USB)", "Desk Mic", "CABLE Output (VB-Audio Virtual Cable)"]
 OUTS = ["Headphones (USB)", "Speakers", "CABLE Input (VB-Audio Virtual Cable)"]
@@ -1331,7 +1331,7 @@ def test_finish_turns_on_windows_startup_when_ticked(mic_wizard, monkeypatch):
 
 
 def test_the_first_launch_backdrop(qapp, app_dir, devices):
-    from soundboard.ui.setupbackdrop import Backdrop
+    from soundboard.ui.setup.setupbackdrop import Backdrop
     w = main.MainWindow()
     try:
         w.cfg.use_mode = ""   # the very first launch

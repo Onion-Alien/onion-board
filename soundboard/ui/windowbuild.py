@@ -45,7 +45,8 @@ from soundboard.control import remote
 from soundboard.i18n import _
 from soundboard.sounds.library import PAD_COLORS
 from soundboard.ui.kit import a11y, busy, icons
-from soundboard.ui import alsosend, lite, sidebar, taboff
+from soundboard.ui.setup import alsosend
+from soundboard.ui import lite, sidebar, taboff
 from soundboard.ui.apps.appspanel import ElidedLabel
 from soundboard.ui.buncontrol import BUN_TIP
 from soundboard.ui.controller import Controller
@@ -78,11 +79,11 @@ from soundboard.ui.kit.panel import (
 )
 from soundboard.ui.playbackcontrol import CHIPS_GAP
 from soundboard.ui.kit.playbutton import PlayButton
-from soundboard.ui.setupshow import SetupShow
+from soundboard.ui.setup.setupshow import SetupShow
 from soundboard.ui.sidebar import SHUT_W, SideTabs
 from soundboard.ui.sounds.speedpitch import SpeedPitchButton
 from soundboard.ui.tabcontrol import TAB_INDEX, TAB_KEYS, TABS, rail_order
-from soundboard.ui import cableconfirm
+from soundboard.ui.setup import cableconfirm
 from soundboard.ui.kit.glow import Glow
 from soundboard.ui.kit.widgets import (
     DropdownMenu,
@@ -335,7 +336,7 @@ class WindowBuilder(Controller):
         icons.set_icon(mw.btn_air, "live", "danger_text", "on_live", size=sidebar.ICON, gap=False)
         mw.set_sending(True)
         # Keep the mode controller for shared commands; its full picker lives on Setup.
-        from soundboard.ui.destpanel import ModeButton
+        from soundboard.ui.setup.destpanel import ModeButton
         mw.mode_btn = ModeButton(mw)
         mw.mode_btn.setParent(mw)
         mw.mode_btn.hide()
@@ -1511,7 +1512,7 @@ class WindowBuilder(Controller):
         top.addWidget(mw.card_meter, 0, Qt.AlignmentFlag.AlignVCenter)   # by its name
         top.addStretch(1)
         # working: a fresh copy or off, right here (Settings → Audio has every mic)
-        from soundboard.ui.audiorecovery import explanation
+        from soundboard.ui.setup.audiorecovery import explanation
         mw.btn_michange = QPushButton(_("Change mic"))
         mw.btn_michange.setProperty("quiet", True)
         mw.btn_michange.setToolTip(_("Put your sounds into another mic instead"))
@@ -1563,7 +1564,7 @@ class WindowBuilder(Controller):
         nh.addWidget(mw.mic_update_text, 1)
         mw.btn_micupdate = QPushButton(_("Update now"))
         mw.btn_micupdate.setObjectName("primary")
-        from soundboard.ui.micupdate import _shield
+        from soundboard.ui.setup.micupdate import _shield
         _shield(mw.btn_micupdate)
         mw.btn_micupdate.clicked.connect(mw.micctl._accept_mic_update)
         nh.addWidget(mw.btn_micupdate, 0, Qt.AlignmentFlag.AlignVCenter)
@@ -1780,7 +1781,7 @@ class WindowBuilder(Controller):
         av.addWidget(ref, 0, Qt.AlignmentFlag.AlignLeft)
 
         # ---- who's listening: shape the sounds for the voice chat on the other end
-        from soundboard.ui.destpanel import DestPanel
+        from soundboard.ui.setup.destpanel import DestPanel
         mw.dest_panel = DestPanel(mw)
         destcard, dv = card(_("Who's listening"), _("Where people hear you: a game, a voice "
                                                     "chat app, or a stream. Your sounds are "
@@ -1812,14 +1813,14 @@ class WindowBuilder(Controller):
         mw._setup_narrow = (howcard, destcard, devcard, helpcard, eqcard)
         # Onion Pocket, once it's installed: a card on the left, in Connect your chat's
         # place (that moves to the right, under the EQ). fitctl._place_pocket
-        from soundboard.ui.pocketcard import PocketCard
+        from soundboard.ui.setup.pocketcard import PocketCard
         mw.pocket_card = PocketCard(mw)
         mw._setup_cards = (howcard, devcard, helpcard, destcard, eqcard)
         mw._setup_stacked = None
         mw.fitctl._stack_setup(False)
         mw.on_eq(*mw.eq.state())   # push the saved EQ into the engine
         destination.apply(mw.cfg, mw.engine)   # ...and the destination mode (Who's listening)
-        from soundboard.ui.destpanel import apply_send
+        from soundboard.ui.setup.destpanel import apply_send
         apply_send(mw.cfg, mw.engine)          # ...and mono / ducking
         return page
 

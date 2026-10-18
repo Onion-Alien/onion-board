@@ -21,7 +21,7 @@ It never builds, tags, pushes or commits. After it: build, scan the installer on
 VirusTotal, then `scripts/docs.py --vt <sha256> N/N`. Scan the mic helper too
 (build\\michelper\\obmichelper\\obmichelper.exe): it is unsigned and runs as SYSTEM, and
 a scan of the installer doesn't always look inside it. A "What's new" note
-(soundboard/ui/whatsnew.py) is only for releases with something worth telling, and
+(soundboard/ui/setup/whatsnew.py) is only for releases with something worth telling, and
 its text is translated like any other, so it stays a hand-written step.
 """
 from __future__ import annotations

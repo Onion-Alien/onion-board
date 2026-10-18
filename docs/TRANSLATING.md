@@ -22,7 +22,7 @@ ngettext("{n} sound", "{n} sounds", n)
 - `ngettext(singular, plural, n)` for text with a number in it; `{n}` is filled in.
 - Don't wrap log messages, settings keys, the control API's JSON or file names. The
   changelog stays in English, and so do the older What's new notes
-  (`ui/whatsnew.py`); notes for 2.0 and later are wrapped.
+  (`ui/setup/whatsnew.py`); notes for 2.0 and later are wrapped.
 - Menus, pop-ups and text set later (status lines, toasts) don't show up in a
   screenshot sweep: check them in the code too.
 - Don't use `_` as a throwaway name (`path, _ = …`) in a function that calls `_()`:

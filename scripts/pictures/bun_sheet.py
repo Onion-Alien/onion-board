@@ -143,7 +143,8 @@ def live(themes) -> QImage:
     clock = _Clock()
     real = time.monotonic
     time.monotonic = clock
-    from soundboard.ui import bunnywidget, scribebun, setupshow
+    from soundboard.ui import bunnywidget, scribebun
+    from soundboard.ui.setup import setupshow
     bunnywidget.local_hour = lambda: 3   # inside his nap hours
     app = QApplication.instance()
 

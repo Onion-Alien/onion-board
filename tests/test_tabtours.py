@@ -1,4 +1,4 @@
-"""Each tab's first-visit how-to (ui/tabtours.py) on the real MainWindow offscreen: it
+"""Each tab's first-visit how-to (ui/setup/tabtours.py) on the real MainWindow offscreen: it
 starts the first time a tab opens, stays until the thing's done or put off, never
 comes back, and never with tutorials off or for someone updating from an older
 version."""
@@ -13,7 +13,7 @@ from soundboard.core import usage
 from soundboard.online import net
 from soundboard.control import winkeys
 from soundboard.sounds.library import Config, SoundMeta
-from soundboard.ui import coach, firsttour, tabtours
+from soundboard.ui.setup import coach, firsttour, tabtours
 from soundboard.ui import mainwindow as main
 
 TAB_TOURS = True   # (conftest switches them off everywhere else)

@@ -148,7 +148,7 @@ def test_x_on_a_running_program_takes_it_off_the_list_until_brought_back(apps_ta
     assert "music.exe" in tab.rows and tab.cfg.apps_hidden == []
 
 def test_a_removed_destination_mode_can_be_undone(window):  # noqa: F811
-    from soundboard.ui.destpanel import CustomDestDialog, DestPanel
+    from soundboard.ui.setup.destpanel import CustomDestDialog, DestPanel
     panel = DestPanel(window)
     dlg = CustomDestDialog(window, panel)
     dlg.add()

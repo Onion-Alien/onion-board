@@ -316,7 +316,7 @@ def test_setup_prompts_random_link_names_only_a_real_category(window):
 def test_streamer_guide_turns_it_on_and_copies_working_links(qapp, window):
     from PySide6.QtWidgets import QApplication
 
-    from soundboard.ui import streamguide
+    from soundboard.ui.setup import streamguide
     w = window
     w.cfg.api_port = 0
     g = streamguide.StreamerGuide(w, w)

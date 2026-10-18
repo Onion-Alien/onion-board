@@ -255,7 +255,7 @@ def main():
 
     from soundboard import __version__
     from soundboard.ui import mainwindow
-    from soundboard.ui.setupwizard import SetupWizard
+    from soundboard.ui.setup.setupwizard import SetupWizard
 
     mainwindow.version_text = lambda: __version__   # as the installed app shows it
 

@@ -13,7 +13,7 @@ from soundboard.ui.kit import theme
 from soundboard.win import shellicon
 from soundboard.control import winkeys
 from soundboard.ui import mainwindow as main
-from soundboard.ui import setupwizard
+from soundboard.ui.setup import setupwizard
 
 
 def test_ico_has_every_size_as_a_valid_png(qapp):

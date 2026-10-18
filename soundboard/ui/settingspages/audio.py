@@ -16,7 +16,7 @@ class AudioPage(Page):
     def _audio(self):
         w, v = self._page()
         v.addWidget(self._devices_card())
-        from soundboard.ui.audiorecovery import RecoveryCard
+        from soundboard.ui.setup.audiorecovery import RecoveryCard
         adv = self.dlg._advanced_only   # (Show advanced: the expert cards)
         v.addWidget(RecoveryCard(self.mw))   # (stays: it fixes the default, mic route)
         card, cv = self._card(_("Your mic"),
@@ -37,7 +37,7 @@ class AudioPage(Page):
                                 "out the exact voice chat by themselves; Clean sends them "
                                 "exactly as mixed; Advanced lets you pick it yourself."),
                               icon="ear")
-        from soundboard.ui.destpanel import DestPanel
+        from soundboard.ui.setup.destpanel import DestPanel
         dest = DestPanel(self.mw)
         dest.chk_gate.setText(_("Mute mic during sounds"))
         cv.addWidget(dest)
@@ -142,7 +142,7 @@ class AudioPage(Page):
             self.dlg.dev_combos.append((cb, src))
         grid.setColumnStretch(2, 1)   # the room past the boxes, not the boxes' column
         cv.addLayout(grid)
-        from soundboard.ui import alsosend   # (its panel import imports this module)
+        from soundboard.ui.setup import alsosend  # (its panel import imports this module)
         # once the grid is in the card: a row added before would be its own window
         alsosend.build(mw, grid, grid.rowCount(), icons_col=False)   # kept up to date by mw
         ref = QPushButton(_("Re-scan devices"))

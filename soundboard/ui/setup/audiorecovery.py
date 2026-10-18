@@ -7,7 +7,7 @@ with nothing behind a menu. A mic with the effect gets its fix (update, or repai
 when Windows took it off), a clean reinstall and remove; a mic without it gets install
 and a clean-up of anything a cut-off set-up left. The effect sits on one mic at a time
 (they'd share one ring), so installing it on another mic says it moves there. While a
-fix runs, the setup guide's show plays under the list (ui/setupshow.py: Bun builds a
+fix runs, the setup guide's show plays under the list (ui/setup/setupshow.py: Bun builds a
 speaker, then it thumps and he cheers, or it goes BOOM)."""
 from __future__ import annotations
 
@@ -26,7 +26,7 @@ from soundboard.core.pollthread import PollThread
 from soundboard.i18n import _
 from soundboard.ui.kit import busy, fit, icons
 from soundboard.ui.kit.panel import Flow
-from soundboard.ui.setupshow import SetupShow
+from soundboard.ui.setup.setupshow import SetupShow
 
 log = logging.getLogger(__name__)
 # the status look every 5 s while the page shows: one kept thread for every copy of the

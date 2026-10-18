@@ -8,7 +8,7 @@ import pytest
 from PySide6.QtWidgets import QApplication
 
 from soundboard.mic import discordcfg as dc
-from soundboard.ui import chatguide
+from soundboard.ui.setup import chatguide
 from conftest import process_events
 from test_discordcfg import folder, store
 from test_mainwindow import window as main_window  # noqa: F401 - the real window, offscreen

@@ -790,7 +790,7 @@ class AddonsPage(Page):
     def _remote_easy_card(self):
         """The easy way in: the streamer guide, and a prompt for an AI assistant."""
         from soundboard.ui.kit.crashdialog import free_dialog
-        from soundboard.ui.streamguide import StreamerGuide, copy_prompt
+        from soundboard.ui.setup.streamguide import StreamerGuide, copy_prompt
         mw = self.mw
         card, cv = self._card(_("Set it up the easy way"),
                               _("New to this? The streamer guide shows how to put your sounds on "

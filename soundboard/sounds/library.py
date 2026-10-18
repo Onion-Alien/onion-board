@@ -51,7 +51,7 @@ APP_DIR = winpath.usable_dir(Path(os.environ.get("APPDATA", Path.home())) / "Oni
 OLD_APP_DIR = winpath.usable_dir(Path(os.environ.get("APPDATA", Path.home())) / "Soundboard")
 SOUNDS_DIR = winpath.usable_dir(APP_DIR / "sounds")
 CACHE_DIR = winpath.usable_dir(APP_DIR / "cache")
-# the tabs with a quick how-to on their first visit (ui/tabtours.py)
+# the tabs with a quick how-to on their first visit (ui/setup/tabtours.py)
 TOUR_TABS = ("radio", "apps", "voice", "store")
 CACHE_GRACE_S = 600   # prune_cache leaves a new sound's cache this long (an import in flight)
 # cache files a delete was refused for (still mapped, see _unlink): not new imports, so
@@ -476,13 +476,13 @@ class Config:
     latency: str = "low"              # audio buffering: 'low' | 'high' (safer on flaky devices)
     setup_done: bool = False          # the quick-setup guide has been completed
     # what the quick-setup guide's first page was told the app is for (USES in
-    # ui/setupwizard.py). "" = not asked yet: only a brand-new install starts so
+    # ui/setup/setupwizard.py). "" = not asked yet: only a brand-new install starts so
     # (first_start), so the question comes once, on the first launch
     use_mode: str = "normal"
     # "Did you know?" tips (soundboard.core.tips): on / off, the ones shown, the day of the last
     tips_on: bool = True
     # each tab's quick how-to the first time it's opened, and the first-run tour
-    # (ui/tabtours.py, ui/firsttour.py); seen ones are in tips_seen
+    # (ui/setup/tabtours.py, ui/setup/firsttour.py); seen ones are in tips_seen
     tutorials_on: bool = True
     tips_seen: list = field(default_factory=list)
     tip_day: str = ""
@@ -526,7 +526,7 @@ class Config:
     # a new version found as the app starts installs itself (UpdateControl, "auto")
     update_auto: bool = True
     update_auto_tried: str = ""       # ...once per version: a failed one isn't retried
-    # the newest version whose What's new (ui/whatsnew.py) was shown; a first start has
+    # the newest version whose What's new (ui/setup/whatsnew.py) was shown; a first start has
     # nothing to catch up on, a config without it is from an older version
     whats_new_seen: str = __version__
     # the version that last moved an older mic part on by itself (ui: _auto_mic_update),

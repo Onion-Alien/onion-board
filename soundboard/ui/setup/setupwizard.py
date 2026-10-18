@@ -42,11 +42,11 @@ from soundboard.core import usage
 from soundboard.online import net
 from soundboard.sounds.library import RESOURCE_DIR
 from soundboard.core.pollthread import PollThread
-from soundboard.ui import cableconfirm
+from soundboard.ui.setup import cableconfirm
 from soundboard.ui.kit.glow import Glow
 from soundboard.ui.kit import busy, fit, icons, panel
 from soundboard.ui.bunnywidget import TALK, BunnyWidget
-from soundboard.ui.setupshow import SetupShow
+from soundboard.ui.setup.setupshow import SetupShow
 from soundboard.ui.kit.choicetile import ChoiceTile, FoldPill
 from soundboard.core import errors
 from soundboard.i18n import _
@@ -122,7 +122,7 @@ def launch_command() -> str:
     exe = Path(sys.executable)
     if (w := exe.with_name("pythonw.exe")).exists():
         exe = w
-    return f'"{exe}" "{Path(__file__).resolve().parents[2] / "main.py"}"'
+    return f'"{exe}" "{Path(__file__).resolve().parents[3] / "main.py"}"'
 
 
 def resume_after_restart(on: bool):
@@ -1518,7 +1518,7 @@ class SetupWizard(QDialog):
             self.win.devctl._reopen_devices()
         super().done(r)
         if tour:   # once the guide is gone (and the window has its devices back)
-            from soundboard.ui import firsttour
+            from soundboard.ui.setup import firsttour
             if firsttour.will_run(self.win):
                 # a first start opens on the Setup tab (nothing set up yet): the
                 # guide's done, so on to the board it's about
@@ -2119,7 +2119,7 @@ class SetupWizard(QDialog):
     def _show_live(self):
         """Discord's settings as read, in the tip's card: when there's an answer, it
         takes the place of the general tip (it says what to switch, or ✓)."""
-        from soundboard.ui import chatguide
+        from soundboard.ui.setup import chatguide
         found = self._discord_found
         text = (chatguide.settings_html(found, self._live_kept)
                 if found and self._live_kept is not None else "")
@@ -2134,13 +2134,13 @@ class SetupWizard(QDialog):
 
     def show_streamer_guide(self):
         from soundboard.ui.kit.crashdialog import free_dialog
-        from soundboard.ui.streamguide import StreamerGuide
+        from soundboard.ui.setup.streamguide import StreamerGuide
         g = StreamerGuide(self, self.win)
         g.exec()
         free_dialog(g)
 
     def show_guide(self, which: str):
-        from soundboard.ui.chatguide import show_guide
+        from soundboard.ui.setup.chatguide import show_guide
         show_guide(which, self, self.win, self._vm)
 
     def copy_name(self):

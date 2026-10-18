@@ -206,7 +206,7 @@ def _discord_warning():
 def test_the_offer_stands_down_while_the_discord_warning_shows(window, monkeypatch):
     """The warning (urgent bar) and 'Set up for it?' (setup bar) come from the same
     running Discord: show one, never both."""
-    from soundboard.ui import chatguide
+    from soundboard.ui.setup import chatguide
     monkeypatch.setattr(chatguide, "on_mic", lambda mw: True)
     window.cfg.dest = {"simple": "clean", "mode": "off"}
     window.alertctl._on_discord((_discord_warning(), ("sig",)))
@@ -217,7 +217,7 @@ def test_the_offer_stands_down_while_the_discord_warning_shows(window, monkeypat
 
 
 def test_the_discord_warning_takes_the_offer_down(window, monkeypatch):
-    from soundboard.ui import chatguide
+    from soundboard.ui.setup import chatguide
     monkeypatch.setattr(chatguide, "on_mic", lambda mw: True)
     window.cfg.dest = {"simple": "clean", "mode": "off"}
     hear(window, ("discord.exe", "discord", "Discord"))

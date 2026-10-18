@@ -823,9 +823,9 @@ def _ffmpeg_works(monkeypatch):
 
 @pytest.fixture(autouse=True)
 def _no_tab_tours(monkeypatch, request):
-    """A tab's first-visit how-to (ui/tabtours.py) dims the window and holds its clicks:
+    """A tab's first-visit how-to (ui/setup/tabtours.py) dims the window and holds its clicks:
     only the tests that set TAB_TOURS = True in their module get them."""
     if getattr(request.module, "TAB_TOURS", False):
         return
-    from soundboard.ui import tabtours
+    from soundboard.ui.setup import tabtours
     monkeypatch.setattr(tabtours, "maybe_start", lambda win: None)

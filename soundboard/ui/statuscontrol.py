@@ -396,7 +396,7 @@ class StatusControl(Controller):
             if look != mw._install_icon:
                 mw._install_icon = look
                 if look[0] == "shield":
-                    from soundboard.ui.micupdate import _shield
+                    from soundboard.ui.setup.micupdate import _shield
                     _shield(mw.btn_install)
                 else:
                     icons.set_icon(mw.btn_install, *look)
@@ -549,5 +549,5 @@ class StatusControl(Controller):
 
     def show_chat_guide(self, which: str):
         mw = self.mw
-        from soundboard.ui.chatguide import show_guide
+        from soundboard.ui.setup.chatguide import show_guide
         show_guide(which, mw, mw, self.virtual_mic or "CABLE Output")

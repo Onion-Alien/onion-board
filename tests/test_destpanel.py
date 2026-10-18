@@ -4,7 +4,7 @@ from PySide6.QtWidgets import QApplication, QComboBox, QLabel
 from soundboard.mic import destination
 from soundboard.sounds.library import Config
 from soundboard.settings import SettingsDialog
-from soundboard.ui.destpanel import CustomDestDialog, DestPanel, describe
+from soundboard.ui.setup.destpanel import CustomDestDialog, DestPanel, describe
 from test_mainwindow import window  # noqa: F401  (the real MainWindow fixture)
 
 
@@ -189,7 +189,7 @@ def test_mode_buttons_switch_and_show_what_they_do(window):  # noqa: F811
 
 def test_what_do_these_do_lists_every_mode(window):  # noqa: F811
     from soundboard.mic import profiles
-    from soundboard.ui.destpanel import ModesHelp
+    from soundboard.ui.setup.destpanel import ModesHelp
     window.dest_panel.buttons["voice"].click()
     dlg = ModesHelp(window)
     text = " ".join(lbl.text() for lbl in dlg.findChildren(QLabel))

@@ -64,14 +64,14 @@ def _steps(*items: str) -> str:
 
 
 def _header(title: str, body: QLabel, bun: BunnyWidget) -> QHBoxLayout:
-    from soundboard.ui.setupwizard import _header as header
+    from soundboard.ui.setup.setupwizard import _header as header
     return header(title, body, bun)
 
 
 def _bun(prop: str) -> BunnyWidget:
     """Bun beside a guide's intro, the setup guide's size: no taller than the words,
     so the steps start right under them."""
-    from soundboard.ui.setupwizard import BUN_H, BUN_PAD
+    from soundboard.ui.setup.setupwizard import BUN_H, BUN_PAD
     return BunnyWidget(prop, height=BUN_H, pad=BUN_PAD)
 
 
@@ -639,7 +639,7 @@ def show_guide(which: str, parent, mw, vm: str):
     if kept:
         vm = mw.cfg.mic_device or _("your mic")
     if which == "steam":
-        from soundboard.ui.setupwizard import SteamGuide
+        from soundboard.ui.setup.setupwizard import SteamGuide
         g = SteamGuide(parent, vm)
     elif which == "game":
         g = GameGuide(parent, mw, vm, kept)

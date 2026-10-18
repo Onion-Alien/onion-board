@@ -1,4 +1,4 @@
-"""The mic part's update offer (ui/micupdate.py, MicControl._offer_mic_update): shown
+"""The mic part's update offer (ui/setup/micupdate.py, MicControl._offer_mic_update): shown
 a moment after the window opens, never from the tray, once per version; Windows is
 only asked after Install update, and only if the update is still needed then."""
 import pytest
@@ -7,7 +7,7 @@ from PySide6.QtTest import QTest
 
 from soundboard.mic import directmic as dm
 from soundboard.ui import mainwindow as main
-from soundboard.ui import micupdate
+from soundboard.ui.setup import micupdate
 from test_mainwindow import window  # noqa: F401  (fixture)
 
 

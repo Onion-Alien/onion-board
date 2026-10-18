@@ -128,7 +128,7 @@ _DL_HOSTS = (("youtube", ("youtube.com", "youtu.be", "youtube-nocookie.com")),
              ("myinstants", ("myinstants.com",)))
 # the Voice tab's tabs (ui/voice/voicepanel.py VoicePanel._section keys)
 VOICE_TABS = ("fx", "ai", "speak", "addons")
-# Audio recovery's actions (ui/audiorecovery.py; "cleanup-none" counts as cleanup)
+# Audio recovery's actions (ui/setup/audiorecovery.py; "cleanup-none" counts as cleanup)
 RECOVERY = ("install", "repair", "update", "reinstall", "cleanup", "remove")
 # why a mic effect set-up failed, a click's or the repair-by-itself's (directmic.FAIL_KINDS:
 # the admin prompt unanswered, the step not starting or stopping half-way, a silent mic,
@@ -170,12 +170,12 @@ FEATURES = ("add-files", "youtube", "record", "clip", "clip-editor", "import-boa
             *(f"use-{k}" for k in ("normal", "streamer", "games", "all", "skipped")),
             # the setup guide closed on one of its device steps (where people give up),
             # its send step skipped, finished sending or not; Bun's first-run tour of the
-            # empty board shown, searched from, or skipped (ui/firsttour.py)
+            # empty board shown, searched from, or skipped (ui/setup/firsttour.py)
             *(f"setup-closed-{k}" for k in ("mic", "headphones", "send", "last")),
             "setup-skipped-send", "setup-finished", "setup-finished-not-sending",
             "tour-shown", "tour-searched", "tour-files", "tour-skipped", "tour-ignored",
             "tour-added", "tour-failed",
-            # a tab's first-visit how-to (ui/tabtours.py): shown, done, put off, or an
+            # a tab's first-visit how-to (ui/setup/tabtours.py): shown, done, put off, or an
             # error; two put off quickly, which switches the rest off
             *(f"tour-{t}-{k}" for t in ("radio", "apps", "triggers", "voice", "store")
               for k in ("shown", "done", "skipped", "failed")),

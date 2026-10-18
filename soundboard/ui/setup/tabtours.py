@@ -27,7 +27,7 @@ from soundboard.core import usage
 from soundboard.sounds.library import TOUR_TABS
 from soundboard.i18n import _
 from soundboard.ui.kit import busy
-from soundboard.ui import coach
+from soundboard.ui.setup import coach
 
 log = logging.getLogger(__name__)
 
@@ -84,7 +84,7 @@ def hook(win):
 def maybe_start(win) -> TabTour | None:
     """Start the open tab's tour, if it hasn't had one and nothing's in the way."""
     global _current
-    from soundboard.ui import firsttour
+    from soundboard.ui.setup import firsttour
     try:
         tab = _tab_of(win, win.tabs.currentWidget())
         if (not tab or _current is not None or firsttour._current is not None

@@ -224,7 +224,8 @@ def selftest() -> int:
         __import__(mod)
     from PySide6.QtMultimedia import QMediaPlayer
     _app = QApplication(sys.argv)   # kept until the checks below have run
-    from soundboard.ui import mainwindow, setupwizard  # noqa: F401
+    from soundboard.ui import mainwindow  # noqa: F401
+    from soundboard.ui.setup import setupwizard  # noqa: F401
     from soundboard.ui.kit import crashdialog  # noqa: F401
     from soundboard.audio import engine  # noqa: F401
     from soundboard.ui.kit import theme  # noqa: F401

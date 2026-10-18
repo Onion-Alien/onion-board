@@ -8,7 +8,8 @@ from soundboard.audio import engine
 from soundboard import settings
 from soundboard.ui.kit import theme
 from soundboard.control import winkeys
-from soundboard.ui import fitcontrol, settingscontrol, setupwizard
+from soundboard.ui import fitcontrol, settingscontrol
+from soundboard.ui.setup import setupwizard
 from soundboard.ui import mainwindow as main
 from soundboard.ui.livedot import set_tab_live
 from soundboard.ui.tabcontrol import TAB_INDEX

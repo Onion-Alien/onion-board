@@ -156,7 +156,7 @@ def test_ctrl_numbers_and_ctrl_tab_move_between_tabs(window):  # noqa: F811
 
 
 def test_the_header_version_opens_whats_new_and_stop_all_has_its_own_icon(window, monkeypatch):  # noqa: F811
-    from soundboard.ui import whatsnew
+    from soundboard.ui.setup import whatsnew
     shown = []
     monkeypatch.setattr(whatsnew.WhatsNewDialog, "exec", lambda self: shown.append(self.page))
     window.tagline.clicked.emit()

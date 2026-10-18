@@ -1071,7 +1071,7 @@ def test_voice_tabs_and_recovery_actions_match_the_ui():
     import re
     from pathlib import Path
 
-    from soundboard.ui import audiorecovery
+    from soundboard.ui.setup import audiorecovery
     assert set(audiorecovery.INSTALLS) <= set(usage.RECOVERY)
     from soundboard.ui.voice import voicepanel
     src = Path(voicepanel.__file__).read_text(encoding="utf-8")

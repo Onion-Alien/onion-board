@@ -6,7 +6,7 @@ import pytest
 from soundboard.audio import appaudio
 from soundboard.mic import cableformat
 from soundboard.sim import chatcheck
-from soundboard.ui import chatguide, setupwizard
+from soundboard.ui.setup import chatguide, setupwizard
 from tests import test_setupwizard as _sw
 from tests.conftest import process_events
 

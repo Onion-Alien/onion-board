@@ -1184,7 +1184,7 @@ def dispatch_mode(mw: MainWindow, params: dict) -> tuple[int, object]:
     destination mode, which is Advanced (or Clean, for Off). Both apply and save, and
     the Sounds tab's dropdown and the Setup tab's picker show it."""
     from soundboard.mic import destination, profiles
-    from soundboard.ui import destpanel
+    from soundboard.ui.setup import destpanel
     if "simple" in params:
         want = params["simple"].strip().lower()
         p = next((q for q in profiles.PROFILES if want in (q.key, q.label.lower())), None)
@@ -1292,7 +1292,7 @@ def dispatch_setups(mw: MainWindow, action: str, params: dict) -> tuple[int, obj
 def set_mic_gate(mw: MainWindow, on: bool):
     """Mute my mic while a sound plays: saved, on the engine, and the Who's listening
     boxes showing it."""
-    from soundboard.ui import destpanel
+    from soundboard.ui.setup import destpanel
     mw.cfg.mic_gate = on
     destpanel.apply_send(mw.cfg, mw.engine)
     for panel in mw.findChildren(destpanel.DestPanel):
