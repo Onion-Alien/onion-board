@@ -2672,13 +2672,7 @@
   "Remove the {n} sound from “{name}”?": [
     "Xóa âm thanh {n} khỏi “ {name} ”?"
   ],
-  "Voice changer: {voice}. Click to open it.": "Trình thay đổi giọng nói: {voice} . Nhấn vào đây để mở nó.",
-  "The computer voice ({voice}) speaks for you. Click to open it.": "Giọng nói máy tính ( {voice} ) nói thay bạn. Nhấn vào đây để mở nó.",
-  "What you say is said in {language}. Click to open it.": "Những gì bạn nói được nói bằng {language} . Nhấn vào đây để mở nó.",
-  "Voice effects off: mic unchanged": "Tắt hiệu ứng giọng nói: mic không thay đổi",
-  "Your mic voice is unchanged. Open Voice changer or AI voices below to choose a voice.": "Giọng mic của bạn không thay đổi. Mở Voice Changer hoặc AI Voices bên dưới để chọn giọng nói.",
   "AI voice off": "Tắt giọng nói AI",
-  "Click to open AI voices.": "Nhấp để mở giọng nói AI.",
   "AI voice: {voice}, starting.": "Giọng nói AI: {voice} , đang bắt đầu.",
   "AI voice: {voice}.": "Giọng nói AI: {voice} .",
   "No mic open": "Không mở mic",
@@ -3080,7 +3074,6 @@
   "It's installed, but your sounds go into your mic now. Use it if a game skips your mic, or remove it if nothing else needs it.": "Nó đã được cài, nhưng giờ âm thanh của bạn đi vào mic rồi. Dùng nó nếu một game bỏ qua mic của bạn, hoặc gỡ nó nếu không còn gì cần đến nó.",
   "⚠ Another sound already has this name.": "⚠ Đã có âm thanh khác mang tên này.",
   "Don't show this again": "Không hiện lại",
-  "Stop voice effects": "Dừng hiệu ứng giọng nói",
   "Hide this program's window": "Ẩn cửa sổ của chương trình này",
   "Looking for its window…": "Đang tìm cửa sổ…",
   "No window to show": "Không có cửa sổ để hiện",
@@ -4026,5 +4019,19 @@
   "Yesterday": "Hôm qua",
   "AI voices are installed. Pick a voice to turn it on.": "Đã cài đặt giọng AI. Chọn một giọng để bật.",
   "⚠ The AI voice stopped. Others now hear {backup}. Switch it off and on again to try again.": "⚠ Giọng AI đã dừng. Giờ những người khác nghe thấy {backup}. Tắt rồi bật lại để thử lại.",
-  "⚠ The AI voice stopped: {error}. Others now hear {backup}. Switch it off and on again to try again.": "⚠ Giọng AI đã dừng: {error}. Giờ những người khác nghe thấy {backup}. Tắt rồi bật lại để thử lại."
+  "⚠ The AI voice stopped: {error}. Others now hear {backup}. Switch it off and on again to try again.": "⚠ Giọng AI đã dừng: {error}. Giờ những người khác nghe thấy {backup}. Tắt rồi bật lại để thử lại.",
+  "All voices on / off": "Mọi tiếng nói bật / tắt",
+  "Click to turn it off. Right-click to open it.": "Bấm để tắt. Bấm chuột phải để mở.",
+  "Forget {thing}: Voices ON won't bring it back": "Quên {thing}: BẬT sẽ không mang nó lại",
+  "Mic unchanged. ON brings back:": "Mic không đổi. BẬT mang lại:",
+  "Mic unchanged. ON turns on:": "Mic không đổi. BẬT sẽ bật:",
+  "Nothing is changing your mic voice. Switch Voices ON, or click a grey voice, to turn it on.": "Không có gì đang đổi giọng mic của bạn. Gạt Tiếng nói sang BẬT, hoặc bấm vào một giọng màu xám để bật nó.",
+  "Off. Click to turn it back on. Right-click to open it.": "Đang tắt. Bấm để bật lại. Bấm chuột phải để mở.",
+  "The Voice tab's Voices switch: turns off everything changing your mic (the voice changer, the AI voice, the computer voice, translating), and the next press brings exactly those back.": "Công tắc Tiếng nói trên thẻ Giọng nói: tắt mọi thứ đang đổi mic của bạn (đổi giọng nói, giọng nói AI, giọng máy tính, dịch), và lần bấm sau mang lại đúng những thứ đó.",
+  "The computer voice ({voice}) speaks for you.": "Giọng máy tính ({voice}) nói thay bạn.",
+  "Turns off every voice changing your mic. Switching it on brings them back.": "Tắt mọi giọng đang đổi mic của bạn. Bật lại sẽ mang chúng trở lại.",
+  "Turns on: {voices}": "Sẽ bật: {voices}",
+  "Voice changer: {voice}.": "Đổi giọng nói: {voice}.",
+  "Voices on or off": "Tiếng nói bật hoặc tắt",
+  "What you say is said in {language}.": "Điều bạn nói được nói bằng {language}."
 }

@@ -27,8 +27,9 @@ def test_meter_uses_available_room_after_resizing(qapp, level):
             for _ in range(4):
                 qapp.processEvents()
             if width >= 800:
-                # Stop and Record reserve their own width beside the meter.
-                buttons = bar.stop_button.width() + bar.record_button.width()
+                # The Voices switch and Record reserve their own width beside the meter.
+                buttons = (bar.master.width() + bar.master_label.width()
+                           + bar.record_button.width())
                 assert bar.meter.width() >= (width - buttons) // 2
             assert bar.meter.geometry().right() < bar._mic.width()
             assert bar._right.geometry().right() < bar.width()
@@ -40,8 +41,9 @@ def test_meter_uses_available_room_after_resizing(qapp, level):
 def test_bar_keeps_its_height_when_chips_come_and_go(qapp):
     bar = VoiceStatusBar()
     bar.set_level(0.1)
-    # Enough room for the stop action, meter and both status chips on one line.
-    bar.resize(1368, 60)
+    # Enough room for the Voices switch and its name, the meter and both status chips
+    # on one line.
+    bar.resize(1440, 60)
     bar.show()
     try:
         heights = []
@@ -83,7 +85,7 @@ def test_many_chips_wrap_and_meter_recovers(qapp):
 
 
 @pytest.mark.parametrize("language", ["en", "de", "ar", "zh-CN"])
-def test_translated_mic_status_fits_with_stop_and_meter(qapp, language):
+def test_translated_mic_status_fits_with_the_voices_switch_and_meter(qapp, language):
     direction = qapp.layoutDirection()
     i18n.set_language(language)
     qapp.setLayoutDirection(Qt.RightToLeft if i18n.is_rtl(language) else Qt.LeftToRight)
@@ -100,12 +102,13 @@ def test_translated_mic_status_fits_with_stop_and_meter(qapp, language):
             text_width = label.fontMetrics().horizontalAdvance(label.text())
             assert text_width <= label.contentsRect().width()
             assert bar.meter.width() >= bar.meter.minimumWidth()
-            for widget in (bar.stop_button, bar.record_button, label, bar.meter):
+            for widget in (bar.master_label, bar.master, bar.record_button, label, bar.meter):
                 rect = widget.rect().translated(widget.mapTo(bar._mic, QPoint()))
                 assert bar._mic.rect().contains(rect)
-            assert not bar.stop_button.icon().isNull()
-            assert bar.stop_button.accessibleName() == i18n._("Stop voice effects")
-            assert bar.stop_button.text() == i18n._("Stop")
+            assert bar.master.accessibleName() == i18n._("Voices on or off")
+            assert bar.master_label.text() == i18n._("Voices")
+            words = bar.master_label.fontMetrics().horizontalAdvance(bar.master_label.text())
+            assert words <= bar.master_label.contentsRect().width()
     finally:
         bar.close()
         bar.deleteLater()

@@ -95,6 +95,25 @@ def test_mic_and_voice_changer_keys(window):
     assert power.isChecked() and w.voice.fx.preset != first
 
 
+def test_all_voices_key_pauses_and_brings_back_the_same_voice(window, monkeypatch):
+    """The All voices key is the Voice tab's Voices switch, from in a game."""
+    w = window
+    registered = []
+    monkeypatch.setattr(w.hotkeys, "register", lambda m: registered.append(dict(m)))
+    w.hkctl.set_global_hotkey("voices_hotkey", "f9")
+    assert registered[-1]["f9"] == "__voices__"
+    cues = []
+    monkeypatch.setattr(w.playctl, "cue", cues.append)
+    power = w.voice.fx.btn_power
+    w.voice.fx.pick("Robot")
+    w.hkctl.on_hotkey("__voices__")
+    assert not power.isChecked() and not w.voice.bar.master.isChecked()
+    w.hkctl.on_hotkey("__voices__")
+    assert power.isChecked() and w.voice.fx.preset == "Robot"
+    assert w.voice.bar.master.isChecked()
+    assert cues == ["stop", "start"]
+
+
 def test_all_hotkeys_off_leaves_only_its_own_key(window, monkeypatch, calls):
     w = window
     registered = []

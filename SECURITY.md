@@ -321,7 +321,9 @@ account or anything else about you.
     if you need it" box and its mic button (`setup-wait-note`, `cable-confirm`,
     `cable-confirm-mic`); the Voice tab saying no mic is open, a voice bar chip's close
     button, a background sound heard before adding it, the mini player's *Full board*
-    (`voice-no-mic`, `voice-chip-off`, `voice-background-hear`, `mini-full-board`); a
+    (`voice-no-mic`, `voice-chip-off`, `voice-background-hear`, `mini-full-board`); the
+    Voice tab's *Voices* switch and a voice bar chip clicked on or off (`voices-master`,
+    `voice-chip-toggle`); a
     deleted category's *Undo*, and the "you're muted" note on a sound and its *Go live*
     (`category-undo`, `muted-note`, `muted-go-live`: never which category or sound);
   - and every day they're set: *Remember where it came from* off, own Apps categories,

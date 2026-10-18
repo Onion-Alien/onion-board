@@ -2672,13 +2672,7 @@
   "Remove the {n} sound from “{name}”?": [
     "從「 {name} 」刪除{n}個聲音？"
   ],
-  "Voice changer: {voice}. Click to open it.": "變聲器： {voice} 。單擊將其打開。",
-  "The computer voice ({voice}) speaks for you. Click to open it.": "電腦聲音 ( {voice} ) 會為您說話。單擊將其打開。",
-  "What you say is said in {language}. Click to open it.": "你說的話是用{language}說的。單擊將其打開。",
-  "Voice effects off: mic unchanged": "語音效果關閉：麥克風不變",
-  "Your mic voice is unchanged. Open Voice changer or AI voices below to choose a voice.": "您的麥克風聲音沒有改變。開啟下面的語音轉換器或AI語音來選擇語音。",
   "AI voice off": "AI語音關閉",
-  "Click to open AI voices.": "點擊開啟AI語音。",
   "AI voice: {voice}, starting.": "AI語音： {voice} ，開始。",
   "AI voice: {voice}.": "AI語音： {voice} 。",
   "No mic open": "麥克風未開啟",
@@ -3080,7 +3074,6 @@
   "It's installed, but your sounds go into your mic now. Use it if a game skips your mic, or remove it if nothing else needs it.": "它已安裝，但你的聲音現在會進入麥克風。如果某個遊戲略過了你的麥克風就用它，如果沒有其他東西需要它就移除它。",
   "⚠ Another sound already has this name.": "⚠ 已有其他音效使用這個名稱。",
   "Don't show this again": "不再顯示",
-  "Stop voice effects": "停止語音效果",
   "Hide this program's window": "隱藏這個程式的視窗",
   "Looking for its window…": "正在尋找它的視窗…",
   "No window to show": "沒有可顯示的視窗",
@@ -4026,5 +4019,19 @@
   "Yesterday": "昨天",
   "AI voices are installed. Pick a voice to turn it on.": "AI 聲音已安裝。選一個聲音即可開啟。",
   "⚠ The AI voice stopped. Others now hear {backup}. Switch it off and on again to try again.": "⚠ AI 聲音已停止。其他人現在聽到的是{backup}。關掉再開啟即可重試。",
-  "⚠ The AI voice stopped: {error}. Others now hear {backup}. Switch it off and on again to try again.": "⚠ AI 聲音已停止：{error}。其他人現在聽到的是{backup}。關掉再開啟即可重試。"
+  "⚠ The AI voice stopped: {error}. Others now hear {backup}. Switch it off and on again to try again.": "⚠ AI 聲音已停止：{error}。其他人現在聽到的是{backup}。關掉再開啟即可重試。",
+  "All voices on / off": "所有語音 開啟 / 關閉",
+  "Click to turn it off. Right-click to open it.": "點一下關閉。按右鍵開啟。",
+  "Forget {thing}: Voices ON won't bring it back": "忘掉{thing}：開啟 不會再把它帶回來",
+  "Mic unchanged. ON brings back:": "麥克風未改變。開啟 會恢復：",
+  "Mic unchanged. ON turns on:": "麥克風未改變。開啟 會打開：",
+  "Nothing is changing your mic voice. Switch Voices ON, or click a grey voice, to turn it on.": "沒有任何東西在改變你的麥克風聲音。把語音切到 開啟，或點一下灰色的聲音來打開它。",
+  "Off. Click to turn it back on. Right-click to open it.": "已關閉。點一下重新打開。按右鍵開啟。",
+  "The Voice tab's Voices switch: turns off everything changing your mic (the voice changer, the AI voice, the computer voice, translating), and the next press brings exactly those back.": "語音分頁的語音開關：關閉所有改變你麥克風的東西（變聲器、AI語音、電腦語音、翻譯），再按一次就恢復完全相同的那些。",
+  "The computer voice ({voice}) speaks for you.": "電腦語音（{voice}）替你說話。",
+  "Turns off every voice changing your mic. Switching it on brings them back.": "關閉所有改變你麥克風的聲音。打開後會恢復。",
+  "Turns on: {voices}": "會打開：{voices}",
+  "Voice changer: {voice}.": "變聲器：{voice}。",
+  "Voices on or off": "語音開啟或關閉",
+  "What you say is said in {language}.": "你說的話會用{language}說出來。"
 }
