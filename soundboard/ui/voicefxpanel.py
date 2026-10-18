@@ -174,58 +174,6 @@ def _is_switch(q: voicefx.Param) -> bool:
     return q.lo == 0 and q.hi == 1 and q.step == 1
 
 
-# A setting's slider positions, as plain maths: ParamSlider moves by them, and an
-# effect whose card isn't built yet (_EffectState) keeps its values on the same steps.
-def slider_steps(q: voicefx.Param) -> int:
-    """Positions across a slider that isn't centred."""
-    return max(1, int(round((q.hi - q.lo) / q.step))) if q.step else 200
-
-
-def slider_half(q: voicefx.Param, centred: bool) -> int:
-    """Centred: positions in each half (the busier side's steps), else 0."""
-    if not (centred and q.lo < q.default < q.hi):
-        return 0
-    if not q.step:
-        return 100
-    return max(int(round((q.default - q.lo) / q.step)),
-               int(round((q.hi - q.default) / q.step)))
-
-
-def slider_pos(q: voicefx.Param, v: float, centred: bool = False) -> int:
-    """The slider position showing value `v` (clamped into the setting's range)."""
-    v = q.clamp(v)
-    half, steps = slider_half(q, centred), slider_steps(q)
-    if not half:
-        pos = (v - q.lo) / ((q.hi - q.lo) or 1.0) * steps
-    elif v <= q.default:
-        pos = (v - q.lo) / (q.default - q.lo) * half
-    else:
-        pos = half + (v - q.default) / (q.hi - q.default) * half
-    return min(max(int(round(pos)), 0), 2 * half if half else steps)
-
-
-def slider_value(q: voicefx.Param, pos: int, centred: bool = False) -> float:
-    """The value at slider position `pos`."""
-    half, steps = slider_half(q, centred), slider_steps(q)
-    if not half:
-        return q.lo + (q.hi - q.lo) * pos / steps
-    if pos <= half:
-        v = q.lo + (q.default - q.lo) * pos / half
-    else:
-        v = q.default + (q.hi - q.default) * (pos - half) / half
-    if q.step:   # a half with fewer steps than positions: snap to a real step
-        v = q.default + round((v - q.default) / q.step) * q.step
-    return q.clamp(round(v, 9))
-
-
-def card_value(q: voicefx.Param, v: float) -> float:
-    """`v` as an effect card's setting would hold it: on its slider's steps, or 0/1
-    for a switch."""
-    if _is_switch(q):
-        return 1.0 if q.clamp(v) >= 0.5 else 0.0
-    return slider_value(q, slider_pos(q, v))
-
-
 class _NotchSlider(QSlider):
     """A slider with a small notch across its groove at `notch` (a position), where
     the "no change" value sits; hidden while the handle covers it."""
@@ -348,11 +296,17 @@ class ParamSlider(QWidget):
 
     @staticmethod
     def _steps(q: voicefx.Param) -> int:
-        return slider_steps(q)
+        return max(1, int(round((q.hi - q.lo) / q.step))) if q.step else 200
 
     def _half(self) -> int:
         """Centred: positions in each half (the busier side's steps), else 0."""
-        return slider_half(self.q, self.centred)
+        q = self.q
+        if not (self.centred and q.lo < q.default < q.hi):
+            return 0
+        if not q.step:
+            return 100
+        return max(int(round((q.default - q.lo) / q.step)),
+                   int(round((q.hi - q.default) / q.step)))
 
     def _set_range(self):
         assert isinstance(self.slider, _NotchSlider)
@@ -364,7 +318,16 @@ class ParamSlider(QWidget):
         if self.switch is not None:
             return 1.0 if self.switch.isChecked() else 0.0
         assert self.slider is not None   # a switch or a slider
-        return slider_value(self.q, self.slider.value(), self.centred)
+        q, pos, half = self.q, self.slider.value(), self._half()
+        if not half:
+            return q.lo + (q.hi - q.lo) * pos / self.steps
+        if pos <= half:
+            v = q.lo + (q.default - q.lo) * pos / half
+        else:
+            v = q.default + (q.hi - q.default) * (pos - half) / half
+        if q.step:   # a half with fewer steps than positions: snap to a real step
+            v = q.default + round((v - q.default) / q.step) * q.step
+        return q.clamp(round(v, 9))
 
     def set_value(self, v: float):
         q = self.q
@@ -375,8 +338,15 @@ class ParamSlider(QWidget):
             self.switch.blockSignals(False)
             return
         assert self.slider is not None   # a switch or a slider
+        half = self._half()
+        if not half:
+            pos = (v - q.lo) / ((q.hi - q.lo) or 1.0) * self.steps
+        elif v <= q.default:
+            pos = (v - q.lo) / (q.default - q.lo) * half
+        else:
+            pos = half + (v - q.default) / (q.hi - q.default) * half
         self.slider.blockSignals(True)
-        self.slider.setValue(slider_pos(q, v, self.centred))
+        self.slider.setValue(int(round(pos)))
         self.slider.blockSignals(False)
         self._label()
 
@@ -570,9 +540,6 @@ class EffectRow(QFrame):
         self.load({"on": self.chk.isChecked()})
         self.changed.emit()
 
-    def is_on(self) -> bool:
-        return self.chk.isChecked()
-
     def state(self) -> dict:
         d = {"on": self.chk.isChecked()}
         d.update({s.q.key: s.value() for s in self.sliders})
@@ -599,50 +566,6 @@ class EffectRow(QFrame):
 
     def is_fresh(self) -> bool:
         return bool(self.property("fresh"))
-
-
-class _EffectState:
-    """An effect whose card isn't built yet: what its EffectRow would hold, as plain
-    data. The cards only show in Edit voice, so the panel keeps these until that
-    window first opens (building ~20 cards took a second of a slow PC's start), then
-    swaps each for its card (VoiceFxPanel._build_cards). Reading and setting it works
-    the same as the card: values land on the slider's steps, and "on" follows
-    EffectRow's __init__ and load()."""
-
-    def __init__(self, cls: type[voicefx.Effect], cfg: dict, hero: bool = False):
-        self.cls = cls
-        self.hero = hero
-        self._on = bool(cfg.get("on"))   # (as EffectRow.__init__: missing = off)
-        self._values = {q.key: card_value(q, cfg.get(q.key, q.default)) for q in cls.params}
-        self._folded = False
-        self._fresh = False
-        self.error = ""
-
-    def is_on(self) -> bool:
-        return self._on
-
-    def state(self) -> dict:
-        return {"on": self._on, **self._values}
-
-    def load(self, cfg: dict | None):
-        self._on = bool(cfg and cfg.get("on", True))   # (as EffectRow.load: missing = on)
-        self._values = {q.key: card_value(q, (cfg or {}).get(q.key, q.default))
-                        for q in self.cls.params}
-
-    def is_folded(self) -> bool:
-        return self._folded
-
-    def set_folded(self, folded: bool, asked: bool = False):
-        self._folded = folded
-
-    def set_error(self, msg: str):
-        self.error = msg
-
-    def set_fresh(self, on: bool):
-        self._fresh = on
-
-    def is_fresh(self) -> bool:
-        return self._fresh
 
 
 POWER_TEXT = {False: _("Voice changer is OFF"), True: _("Voice changer is ON")}
@@ -1130,10 +1053,7 @@ class VoiceFxPanel(QWidget):
         done.addWidget(btn_done)
         dv.addLayout(done)
 
-        # every effect: its card once Edit voice has been opened, else what the card
-        # would hold (_EffectState); `rows` builds the cards
-        self._effects: dict[str, EffectRow | _EffectState] = {}
-        self._cards_built = False
+        self.rows: dict[str, EffectRow] = {}
         self._spec_effects = dict(spec.get("effects", {}))
         # the Effects pop-up's extras that are on: {type: settings}
         self._extras: dict[str, dict] = {
@@ -1152,12 +1072,6 @@ class VoiceFxPanel(QWidget):
 
     # ------------------------------------------------------------------ public
     @property
-    def rows(self) -> dict[str, EffectRow]:
-        """Every effect's card (built now if Edit voice hasn't been opened yet)."""
-        self._build_cards()
-        return self._effects   # pyright: ignore[reportReturnType]  # all cards once built
-
-    @property
     def preset(self) -> str:
         return self._preset
 
@@ -1166,14 +1080,14 @@ class VoiceFxPanel(QWidget):
         mix is kept aside while a preset is on, and comes back with "My own mix"."""
         mine = self._mine()
         if mine and name != CUSTOM:
-            self._custom = {t: r.state() for t, r in self._effects.items()}
+            self._custom = {t: r.state() for t, r in self.rows.items()}
         self._preset = name
         self._clear_fresh()
         fx = voicefx.PRESETS.get(name)
         saved = self.store.voices.get(name)
         self._based_on = name if saved is not None else ""
         # (Clean up my mic is yours, not the voice's: it stays as it is)
-        rows = {t: r for t, r in self._effects.items() if t not in KEEP}
+        rows = {t: r for t, r in self.rows.items() if t not in KEEP}
         if fx is not None:
             self._own = False
             for t, r in rows.items():
@@ -1197,10 +1111,10 @@ class VoiceFxPanel(QWidget):
     def use_mix(self, effects: dict):
         """Turn the changer on with these effects as your own mix (a setup made from a
         voice that's gone since), without opening Edit voice."""
-        rows = {t: r for t, r in self._effects.items() if t not in KEEP}
+        rows = {t: r for t, r in self.rows.items() if t not in KEEP}
         for t, r in rows.items():
             r.load(effects.get(t))
-        self._custom = {t: r.state() for t, r in self._effects.items()}
+        self._custom = {t: r.state() for t, r in self.rows.items()}
         self._preset = CUSTOM
         self._own = True
         self._based_on = ""
@@ -1220,11 +1134,11 @@ class VoiceFxPanel(QWidget):
         """A random mix for the lols: the pitch moved well away from normal plus one
         or two other effects at random settings, as "My own mix"."""
         rng = rng or random.Random()
-        others = [t for t in self._effects if t != "pitch" and t not in KEEP]
+        others = [t for t in self.rows if t != "pitch" and t not in KEEP]
         chosen = set(rng.sample(others, min(len(others), rng.randint(1, 2))))
-        if "pitch" in self._effects:
+        if "pitch" in self.rows:
             chosen.add("pitch")
-        for t, r in self._effects.items():
+        for t, r in self.rows.items():
             if t in KEEP:
                 continue
             if t not in chosen:
@@ -1240,7 +1154,7 @@ class VoiceFxPanel(QWidget):
                 cfg["tune"] = rng.choice((0.0, 0.0, 1.0))   # sometimes autotuned
             r.load(cfg)
         self._own = True
-        self._custom = {t: r.state() for t, r in self._effects.items()}
+        self._custom = {t: r.state() for t, r in self.rows.items()}
         self._preset = CUSTOM
         self._based_on = ""
         self.btn_power.blockSignals(True)
@@ -1250,7 +1164,7 @@ class VoiceFxPanel(QWidget):
         self._emit()
         # show what it did: Edit voice opens with the effects it set lit up for a while
         self.open_tweak()
-        for t, r in self._effects.items():
+        for t, r in self.rows.items():
             r.set_fresh(t in chosen)
         self._fresh_timer.start(self.FRESH_MS)
         QTimer.singleShot(60, self._scroll_to_fresh)
@@ -1259,12 +1173,12 @@ class VoiceFxPanel(QWidget):
 
     def _clear_fresh(self):
         self._fresh_timer.stop()
-        for r in self._effects.values():
+        for r in self.rows.values():
             r.set_fresh(False)
 
     def _scroll_to_fresh(self):
         """Inside Edit voice, bring the lit-up effects into view."""
-        fresh = [r for r in self.rows.values() if r.is_fresh()]   # (shown: the cards are built)
+        fresh = [r for r in self.rows.values() if r.is_fresh()]
         if fresh:
             self._scroll.ensureWidgetVisible(fresh[-1], 0, 24)
             self._scroll.ensureWidgetVisible(fresh[0], 0, 24)
@@ -1275,7 +1189,7 @@ class VoiceFxPanel(QWidget):
     def _backdrop_row(self):
         """The Background's card (None before it's made, or an add-on took its place)."""
         from soundboard.ui.backdroprow import BackdropRow
-        row = self._effects.get("backdrop")
+        row = self.rows.get("backdrop")
         return row if isinstance(row, BackdropRow) else None
 
     def open_effects(self):
@@ -1364,7 +1278,6 @@ class VoiceFxPanel(QWidget):
 
     def open_tweak(self):
         """Show the Edit voice window (at the size you left it), or bring it up."""
-        self._build_cards()
         if not self.dlg.isVisible():
             # owned by the app's window, not this panel: inside a card the theme makes
             # every widget see-through (QFrame#card QWidget), the window included
@@ -1474,7 +1387,7 @@ class VoiceFxPanel(QWidget):
         if name in self.store.voices:
             fx = self.store.voices[name]
         elif name == self._preset or name == CUSTOM:
-            fx = {t: r.state() for t, r in self._effects.items()}
+            fx = {t: r.state() for t, r in self.rows.items()}
         else:
             fx = self._custom
         return {t: dict(cfg) for t, cfg in fx.items()
@@ -1666,7 +1579,7 @@ class VoiceFxPanel(QWidget):
         name = self._ask_name(_("Save as a voice"), suggestion)
         if not name:
             return
-        effects = {t: r.state() for t, r in self._effects.items()}
+        effects = {t: r.state() for t, r in self.rows.items()}
         if self._mine():
             self._custom = effects   # "My own mix" stays what it was too
         name = self.store.put(name, effects)
@@ -1833,7 +1746,7 @@ class VoiceFxPanel(QWidget):
         name = self.store.restore(item, item.index)
         # still sounding just like it (nothing touched since): it's the one that's on
         if was_on and self._preset == CUSTOM and \
-                {t: r.state() for t, r in self._effects.items()} == self.store.voices[name]:
+                {t: r.state() for t, r in self.rows.items()} == self.store.voices[name]:
             self._preset = name
         self._fill_saved()
         self._emit()
@@ -1870,8 +1783,8 @@ class VoiceFxPanel(QWidget):
         if not self.btn_power.isChecked():
             return 0.0
         total = 0.0
-        for t, r in self._effects.items():
-            if not r.is_on():
+        for t, r in self.rows.items():
+            if not r.chk.isChecked():
                 continue
             if r.cls.latency is voicefx.Effect.latency:
                 continue   # never delays the voice: no throwaway effect to ask (Robot's ~1 ms)
@@ -1921,62 +1834,32 @@ class VoiceFxPanel(QWidget):
         """Add cards for effect types registered since (modules loaded later)."""
         added = False
         for etype, cls in voicefx.REGISTRY.items():
-            if etype in self._effects or cls.extra:   # (the extras live in the Effects pop-up)
+            if etype in self.rows or cls.extra:   # (the extras live in the Effects pop-up)
                 continue
             cfg = self._spec_effects.get(etype)
             if cfg is None:
                 # mic clean-up starts on: it only makes changed voices sound better
                 cfg = {"on": True} if etype == "cleanup" else {}
             if etype == "backdrop":
-                # built at once: the voice bar's Effects pop-up shows and sets its layers
                 from soundboard.ui.backdroprow import BackdropRow
                 r = BackdropRow(cls, cfg, lambda: self.sound_list())
-                r.setParent(self.more)   # (placed in a column with the others)
-                self._wire_card(etype, r)
-            elif self._cards_built:
-                r = self._card(etype, EffectRow(cls, cfg, hero=etype in HERO))
             else:
-                r = _EffectState(cls, cfg, hero=etype in HERO)
-                r.set_folded(etype in self._folded_fx)
-            self._effects[etype] = r
+                r = EffectRow(cls, cfg, hero=etype in HERO)
+            r.changed.connect(lambda t=etype: self._edited(t))
+            r.set_folded(etype in self._folded_fx)
+            r.folded_changed.connect(lambda f, t=etype: self._card_folded(t, f))
+            r.reshaped.connect(self._reshape)
+            if etype in HERO:
+                self.hero_box.insertWidget(min(HERO.index(etype), self.hero_box.count()), r)
+            self.rows[etype] = r
             added = True
         if added:
             self._place_cards()
 
-    def _wire_card(self, etype: str, r: EffectRow):
-        r.set_folded(etype in self._folded_fx)
-        r.changed.connect(lambda t=etype: self._edited(t))
-        r.folded_changed.connect(lambda f, t=etype: self._card_folded(t, f))
-        r.reshaped.connect(self._reshape)
-
-    def _card(self, etype: str, r: EffectRow) -> EffectRow:
-        """A new effect card, wired up (and a top one put in its place)."""
-        self._wire_card(etype, r)
-        if etype in HERO:
-            self.hero_box.insertWidget(min(HERO.index(etype), self.hero_box.count()), r)
-        return r
-
-    def _build_cards(self):
-        """Turn every effect not built yet into its card, as it stands (settings, on,
-        folded, lit up, its error), in its place, once."""
-        if self._cards_built:
-            return
-        self._cards_built = True
-        for etype, st in list(self._effects.items()):
-            if not isinstance(st, _EffectState):
-                continue
-            r = EffectRow(st.cls, st.state(), hero=st.hero)
-            r.set_fresh(st.is_fresh())
-            if st.error:
-                r.set_error(st.error)
-            self._effects[etype] = self._card(etype, r)
-        self._placed = None
-        self._place_cards()
-
     def set_folded(self, types):
         """Fold these effects' cards (the rest open): what `folds_changed` said last time."""
         self._folded_fx = {t for t in types if isinstance(t, str)}
-        for t, r in self._effects.items():
+        for t, r in self.rows.items():
             r.set_folded(t in self._folded_fx)
 
     def _card_folded(self, etype: str, folded: bool):
@@ -1990,8 +1873,8 @@ class VoiceFxPanel(QWidget):
             grouped.update(types)
         out = []
         for title in self._groups:
-            types = dict(GROUPS).get(title) or [t for t in self._effects if t not in grouped]
-            out.append((title, [self._effects[t] for t in types if t in self._effects]))
+            types = dict(GROUPS).get(title) or [t for t in self.rows if t not in grouped]
+            out.append((title, [self.rows[t] for t in types if t in self.rows]))
         return out
 
     @staticmethod
@@ -2001,10 +1884,7 @@ class VoiceFxPanel(QWidget):
     def _place_cards(self):
         """The effect cards into the columns: one column with the group titles, or two
         with each card under whichever column is shorter so far (in reading order),
-        so a short card never leaves a hole beside a tall one. (Not before the cards
-        are built: Edit voice builds them when it first opens.)"""
-        if not self._cards_built:
-            return
+        so a short card never leaves a hole beside a tall one."""
         groups = self._ordered_cards()
         if self._fx_cols == 1:
             plan = [[w for title, cards in groups if cards
@@ -2045,7 +1925,7 @@ class VoiceFxPanel(QWidget):
         return self._preset == CUSTOM and (self._own or not made)
 
     def spec(self) -> dict:
-        effects = {t: r.state() for t, r in self._effects.items()}
+        effects = {t: r.state() for t, r in self.rows.items()}
         effects.update({t: dict(c) for t, c in self._extras.items()})
         return {"enabled": self.btn_power.isChecked(), "preset": self._preset,
                 "effects": effects,
@@ -2055,7 +1935,7 @@ class VoiceFxPanel(QWidget):
                    if self._dlg_size else {})}
 
     def show_errors(self, errors: dict[str, str]):
-        for t, r in self._effects.items():
+        for t, r in self.rows.items():
             r.set_error(errors.get(t, ""))
 
     # ------------------------------------------------------------------ internals
@@ -2069,7 +1949,7 @@ class VoiceFxPanel(QWidget):
 
     def _count_on(self) -> int:
         # the voice's own effects: what's on top of it is Effects' count
-        return sum(r.is_on() for t, r in self._effects.items()
+        return sum(r.chk.isChecked() for t, r in self.rows.items()
                    if t not in HERO and not on_top(t))
 
     def resizeEvent(self, e):
@@ -2147,7 +2027,7 @@ class VoiceFxPanel(QWidget):
             self._emit()
             return
         self._preset = CUSTOM
-        if not self.btn_power.isChecked() and any(r.is_on() for r in self._effects.values()):
+        if not self.btn_power.isChecked() and any(r.chk.isChecked() for r in self.rows.values()):
             self.btn_power.blockSignals(True)
             self.btn_power.setChecked(True)   # touching an effect means you want it on
             self.btn_power.blockSignals(False)

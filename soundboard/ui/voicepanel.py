@@ -525,9 +525,9 @@ class VoicePanel(QWidget):
 
     def board_changed(self):
         """Sounds were added, renamed or deleted: the Background's names and loops again."""
-        row = self.fx._backdrop_row()   # (not `rows`: that builds every card)
-        if row is not None:
-            row.refresh_names()
+        refresh = getattr(self.fx.rows.get("backdrop"), "refresh_names", None)
+        if refresh is not None:
+            refresh()
         self._update_backdrop(self.fx.spec())
 
     def _ai_changed(self, s: dict):
