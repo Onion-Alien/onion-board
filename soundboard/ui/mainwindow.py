@@ -62,7 +62,7 @@ from soundboard.ui.categorycontrol import CategoryControl
 from soundboard.ui.importcontrol import ImportControl
 from soundboard.ui.updatecontrol import UpdateControl
 from soundboard.ui import toast as toastmod
-from soundboard.ui import (a11y, appstate, busy, icons, livesize, responsive,
+from soundboard.ui import (a11y, appstate, busy, icons, lite, livesize, responsive,
                            splash, taboff, tabtours)
 from soundboard.ui.linkbar import PLAY_ID as LINK_ID
 from soundboard.ui.logowidget import glow_icon
@@ -456,9 +456,10 @@ class MainWindow(QMainWindow):
         tor.configure_from(self.cfg)   # Connection = Tor: starts when something goes online
         tor.qt_status().changed.connect(self.netctl._on_tor)
         app = QApplication.instance()
+        lite.set_on(self.cfg.lite_mode)   # (before anything that animates is built)
         # before the UI is built, so everything polishes in-theme
         if isinstance(app, QApplication):
-            theme.textures_on = self.cfg.theme_texture
+            theme.textures_on = self.cfg.theme_texture and not self.cfg.lite_mode
             kept = self.cfg.kept_themes if isinstance(self.cfg.kept_themes, list) else []
             theme.kept = {n for n in kept if isinstance(n, str)}   # (a hand-edited file)
             self.cfg.theme = theme.apply(app, self.cfg.theme, self.cfg.live_color)

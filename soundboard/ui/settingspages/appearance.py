@@ -307,8 +307,8 @@ class AppearancePage(Page):
             tv.addSpacing(8)
         look, lv = self._card(_("Look"), icon="image")
         lv.setSpacing(18)
-        for part in (self._highlight_card(), self._ui_scale_card(), self._live_tabs_card(),
-                     self._playing_background_card()):
+        for part in (self._lite_card(), self._highlight_card(), self._ui_scale_card(),
+                     self._live_tabs_card(), self._playing_background_card()):
             lv.addWidget(self._section(part))
         v.addWidget(self._look_box([(_("Themes"), themes), (_("Look"), look)]))
         v.addStretch(1)
@@ -410,6 +410,19 @@ class AppearancePage(Page):
         textured.toggled.connect(self.mw.themectl.set_theme_texture)
         self.dlg.texture_on, self.dlg.texture_off = textured, plain
         cv.addLayout(row)
+        return card
+
+    def _lite_card(self) -> QFrame:
+        """Lite mode (ui/lite.py): calmer and lighter for slower PCs, applied at once."""
+        card, cv = self._card(_("Lite mode"),
+                              _("For slower PCs: no animations, Bun holds still and the "
+                                "themes are plain. Everything still works."), icon="leaf")
+        on = QCheckBox(_("On"))
+        on.setAccessibleName(_("Lite mode"))
+        on.setChecked(self.mw.cfg.lite_mode)
+        on.toggled.connect(self.mw.themectl.set_lite_mode)
+        cv.addWidget(on)
+        self.dlg.lite_check = on
         return card
 
     def _ui_scale_card(self) -> QFrame:

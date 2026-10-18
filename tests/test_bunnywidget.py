@@ -26,7 +26,9 @@ def test_talking_opens_mouth_and_throws_notes(qapp):
     _run(qapp, b, 20, level=0.3)
     assert b.pose()["mouth"] > 0.2
     assert b.notes
-    _run(qapp, b, 80)
+    # (his level takes ~1.2 s to fall below talking and the last note lives up to
+    # 1.9 s more: 80 frames was ~7% too few, 100 (3.5 s) always does)
+    _run(qapp, b, 100)
     assert b.pose()["mouth"] < 0.05
     assert not b.notes   # they all floated off
 
@@ -865,9 +867,11 @@ def test_the_headphones_bun_stops_his_notes_and_rests(qapp, monkeypatch):
     held still (60 repaints a second of the whole banner, for as long as it's open)."""
     b = _still_kind(qapp, monkeypatch, "headphones")
     seen = 0
-    for _ in range(round(10 / 0.035)):   # (now and then: at one moment there may be none)
+    for _ in range(round(10 / 0.035)):
         _tick(b)
-        seen += bool(b.notes)
+        seen = max(seen, len(b.notes))
+    # (a note comes every ~1.4 s and lives a random 1.2-1.9 s: any one frame can
+    # fall in a gap between two, so look across the whole stretch)
     assert seen and not b.resting                   # his idle notes, while he moves
     b.clock.now = b._rest_at + 0.1
     _settle(qapp, b, 15)

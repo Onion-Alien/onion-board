@@ -1,6 +1,6 @@
 """The main window's look: applying a theme to the whole window (and what it built ahead of
-time), the Live colour, the background texture, the live tab's tint, and painting the
-onion logo.
+time), the Live colour, the background texture, lite mode, the live tab's tint, and painting
+the onion logo.
 
 MainWindow makes one ``ThemeControl`` (``MainWindow.themectl``); everything here runs on
 the UI thread."""
@@ -12,7 +12,8 @@ from PySide6.QtCore import QTimer
 from PySide6.QtWidgets import QApplication
 
 from soundboard import shellicon, theme
-from soundboard.ui import icons, themecover
+from soundboard.i18n import _
+from soundboard.ui import icons, lite, themecover
 from soundboard.ui.controller import Controller
 from soundboard.ui.livedot import set_tint as set_live_tint
 from soundboard.ui.logowidget import glow_icon
@@ -85,11 +86,49 @@ class ThemeControl(Controller):
     def set_theme_texture(self, on: bool):
         """Textured (each theme's own pattern on the panels) or Plain (flat panels)."""
         mw = self.mw
+        if on != mw.cfg.theme_texture:
+            mw.set_option("theme_texture", on)
+        on = on and not lite.on()   # (lite mode: kept for later, Plain till then)
         if on == theme.textures_on:
             return
-        mw.set_option("theme_texture", on)
         theme.textures_on = on
         self.apply_theme(mw.cfg.theme)
+
+    def set_lite_mode(self, on: bool):
+        """Lite mode (ui/lite.py): animations, Bun's and the logo's idle moves and the
+        textures off, at once; off again puts them back."""
+        from soundboard.ui.bunnywidget import BunnyWidget
+        mw = self.mw
+        if on == lite.on():
+            return
+        mw.set_option("lite_mode", on)
+        lite.set_on(on)
+        BunnyWidget.lite_changed()
+        mw.logo.lite_changed()
+        setctl = mw.setctl
+        for dlg in (setctl._settings_dlg, setctl._settings_kept):   # (switched from a toast)
+            box = getattr(dlg, "lite_check", None)
+            if box is not None and box.isChecked() != on:
+                box.blockSignals(True)
+                box.setChecked(on)
+                box.blockSignals(False)
+        textured = mw.cfg.theme_texture and not on
+        if textured != theme.textures_on:
+            theme.textures_on = textured
+            self.apply_theme(mw.cfg.theme)
+
+    def suggest_lite(self):
+        """A slower PC (lite.slow_pc): lite mode suggested once, in a toast with a
+        button. Never switched on without that click."""
+        mw = self.mw
+        c = mw.cfg
+        if c.lite_mode or c.lite_hint_done or not c.setup_done or not lite.slow_pc():
+            return
+        c.lite_hint_done = True
+        mw._save_later()
+        mw.toast(_("Onion Board can run lighter on this PC: Lite mode turns off the "
+                   "animations. It's in Settings > Appearance too."), ms=12_000,
+                 action=(_("Turn on"), lambda: self.set_lite_mode(True)))
 
     def set_live_tab_tint(self, on: bool):
         mw = self.mw

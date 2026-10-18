@@ -420,6 +420,9 @@ class Config:
     # True = each theme's own pattern on the panels (new installs); False = Plain. Every
     # saved config has it, so changing this default only reaches new installs
     theme_texture: bool = True
+    # Lite mode (ui/lite.py): animations, Bun's idle moves and the textures off
+    lite_mode: bool = False
+    lite_hint_done: bool = False   # a slower PC was told about lite mode once
     eq_enabled: bool = False
     eq_target: str = "voice"          # voice | sounds | all
     eq_preset: str = "Flat (off)"

@@ -34,6 +34,7 @@ from PySide6.QtWidgets import QApplication, QWidget
 
 from soundboard import library, theme, winkeys
 from soundboard.i18n import _, ngettext
+from soundboard.ui import lite
 from soundboard.ui.pixels import snap_to_pixels
 
 log = logging.getLogger(__name__)
@@ -678,6 +679,11 @@ class OverlayWindow(QWidget):
 
     def _animate(self, to: float, ms: int):
         self._fade.stop()
+        if lite.on():   # (Lite mode: there or gone at once)
+            self.setWindowOpacity(to)
+            if to == 0.0:
+                self.hide()
+            return
         self._fade.setDuration(ms)
         self._fade.setStartValue(self.windowOpacity())
         self._fade.setEndValue(to)

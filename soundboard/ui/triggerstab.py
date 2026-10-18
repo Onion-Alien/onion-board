@@ -31,7 +31,7 @@ from PySide6.QtWidgets import (QBoxLayout, QHBoxLayout, QLabel, QMessageBox, QPr
 
 from soundboard import modules, net, netlog, theme, updates, usage, watchaddon
 from soundboard.i18n import _, ngettext
-from soundboard.ui import art, busy, icons
+from soundboard.ui import art, busy, icons, lite
 from soundboard.style.owl import OwlWidget
 from soundboard.ui.panel import Flow, HoverCard, ShownStack, hint_label
 from soundboard.ui.widgets import LoadingBar
@@ -233,7 +233,7 @@ class TriggersTab(QWidget):
         # Enough room for Hoot's speech bubble without squeezing the card's text.
         side = 16
         self.hoot = OwlWidget(HOOT_PX, HOOT_BEGS, HOOT_JOY, left=side, right=side,
-                              dances=True, rest_after_s=HOOT_REST_S)
+                              dances=True, rest_after_s=lite.rest_s(HOOT_REST_S))
         self.hoot.clicked.connect(lambda: (usage.used("hoot-talk"),
                                            self.btn_get.setFocus(Qt.FocusReason.OtherFocusReason)))
         row.addWidget(self.hoot, 0, Qt.AlignmentFlag.AlignCenter)

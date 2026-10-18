@@ -4039,5 +4039,8 @@
   "Press <b>Next</b> for the last bit: your language and a look.": "按 <b>下一步</b> 进入最后一步：语言和外观。",
   "Start Onion Board when I sign in to Windows (quietly, in the tray)": "登录 Windows 时启动 Onion Board（安静地在托盘中）",
   "Tell Discord or your game": "告诉 Discord 或你的游戏",
-  "{n} more themes in Settings.": "设置中还有 {n} 个主题。"
+  "{n} more themes in Settings.": "设置中还有 {n} 个主题。",
+  "For slower PCs: no animations, Bun holds still and the themes are plain. Everything still works.": "适合较慢的电脑：没有动画，Bun 保持静止，主题变为纯色。所有功能照常可用。",
+  "Lite mode": "轻量模式",
+  "Onion Board can run lighter on this PC: Lite mode turns off the animations. It's in Settings > Appearance too.": "Onion Board 在这台电脑上可以更轻快：轻量模式会关闭动画。也可以在 设置 > 外观 里找到。"
 }
