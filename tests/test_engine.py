@@ -359,7 +359,7 @@ def test_aux_source_volume_on_air_and_removal():
 def test_a_sent_program_gets_its_bass_level_back_like_a_sound():
     """A mode's low cut takes a bass-heavy song's sub-bass: a pad is given that level
     back, and a program sent from the Apps tab now is too."""
-    from soundboard import destination
+    from soundboard.mic import destination
     e = engine_with("main")
     e.dest = destination.BUILTIN_BY_KEY["discord"]
     src = e.add_aux(("app", "music.exe"))
@@ -647,7 +647,7 @@ def test_eq_and_destination_drop_their_state_when_turned_off():
 def test_a_low_cut_gives_each_sound_back_its_own_sub_bass():
     """With a mode that cuts the sub-bass, a bass-heavy sound is turned up by what the
     cut takes from *it*; a sound with no sub-bass playing alongside isn't."""
-    from soundboard import destination
+    from soundboard.mic import destination
     t = np.arange(SR) / SR
     boom = np.stack([np.sin(2 * np.pi * 40 * t) * 0.3 + np.sin(2 * np.pi * 800 * t) * 0.1] * 2,
                     1).astype(np.float32)
@@ -995,7 +995,7 @@ def test_quiet_sounds_bus_skips_its_filters_then_wakes_for_a_sound(monkeypatch):
     """With nothing playing, the send stage stops filtering silence after QUIET_S (a
     voice chat mode cost ~1 ms of every 10 ms block on zeros); a sound brings it back
     at once, shaped as before."""
-    from soundboard import destination
+    from soundboard.mic import destination
     e = engine_with("main")
     e.dest = destination.BUILTIN_BY_KEY["discord"]
     calls = []
@@ -1081,7 +1081,7 @@ def test_whos_listening_shapes_what_is_sent_not_your_own_playback():
     """A mode's shaping (low cut, ceiling, mono) is for what others get: your
     headphones play the sounds as mixed, and hear the shaping only with Hear what
     they hear on."""
-    from soundboard import destination
+    from soundboard.mic import destination
     t = np.arange(SR) / SR
     song = np.stack([np.sin(2 * np.pi * 40 * t) * 0.3,             # sub-bass on the left,
                      np.sin(2 * np.pi * 9000 * t) * 0.3], 1)        # treble on the right

@@ -2,7 +2,7 @@
 and the cards are always open."""
 from test_mainwindow import window  # noqa: F401
 
-from soundboard import directmic as dm
+from soundboard.mic import directmic as dm
 from soundboard import engine as eng
 from soundboard.ui.panel import EqPanel
 

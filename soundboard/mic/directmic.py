@@ -76,7 +76,7 @@ if TYPE_CHECKING:
 else:
     try:
         import numpy as np
-    except ImportError:   # the mic helper (soundboard/michelper.py) ships without numpy:
+    except ImportError:   # the mic helper (soundboard/mic/michelper.py) ships without numpy:
         np = None         # it only runs the admin part, which never needs it
 
 from soundboard.i18n import _
@@ -180,7 +180,7 @@ def bundled_dll() -> Path:
     scripts/build_directmic.py built when run from source."""
     if getattr(sys, "frozen", False):
         return Path(getattr(sys, "_MEIPASS", Path(sys.executable).parent)) / "directmic" / DLL_NAME
-    return Path(__file__).resolve().parent.parent / "build" / "directmic" / DLL_NAME
+    return Path(__file__).resolve().parents[2] / "build" / "directmic" / DLL_NAME
 
 
 # ---------------------------------------------------------------------- the ring
@@ -1999,7 +1999,7 @@ def _take_off(only: str | None) -> int:
 
 def admin_remove_all() -> int:
     """The app is being uninstalled: the effect off every mic, then the mic helper."""
-    from soundboard import michelper
+    from soundboard.mic import michelper
     code = admin_uninstall()
     if code == 0 and not michelper.is_helper():
         michelper.remove_helper()   # (the helper removes itself after answering)
@@ -2091,7 +2091,7 @@ def cli(args: list[str]) -> int:
     `remove-all` (the mic helper, or Windows asks first) if Onion Board is on a mic or
     its helper (or any of it) is there at all. 0 when done. The app adds `--for <SID>`
     (the account that asked) to the steps that may set up the helper."""
-    from soundboard import michelper
+    from soundboard.mic import michelper
     user = None
     if len(args) >= 2 and args[-2] == michelper.FOR:
         user, args = args[-1], args[:-2]   # (install_helper checks it)
@@ -2199,7 +2199,7 @@ def _release(h):
 def relaunch_params(args: list[str]) -> str:
     parts = []
     if not getattr(sys, "frozen", False):
-        parts.append(f'"{Path(__file__).resolve().parent.parent / "main.py"}"')
+        parts.append(f'"{Path(__file__).resolve().parents[2] / "main.py"}"')
     return " ".join(parts + [FLAG] + args)
 
 
@@ -2210,7 +2210,7 @@ def _elevated(args: list[str], wait_s: float = 300.0, *,
     False: the app's own repair, which nobody clicked). Its exit code, or None if the
     prompt was turned down, not allowed, or it didn't finish. The audio stop/start and
     the dependent services can take a while on a slow PC, so allow generously."""
-    from soundboard import michelper
+    from soundboard.mic import michelper
     try:
         code = _via_helper(args, wait_s)
         if code is not None or not ask_windows:
@@ -2227,7 +2227,7 @@ def _elevated(args: list[str], wait_s: float = 300.0, *,
 def _helper_check(via: str = "check") -> bool:
     """michelper.ready() again, so michelper.will_ask() is current (on a worker).
     False if the check itself failed."""
-    from soundboard import michelper
+    from soundboard.mic import michelper
     try:
         michelper.ready(via=via)
         return True
@@ -2239,7 +2239,7 @@ def _helper_check(via: str = "check") -> bool:
 def _via_helper(args: list[str], wait_s: float) -> int | None:
     """`args` run by the mic helper, or None to ask Windows instead. Setting up needs a
     helper with this app's effect DLL; taking it off works with any helper."""
-    from soundboard import michelper
+    from soundboard.mic import michelper
     try:
         if not michelper.allowed(args):
             return None

@@ -166,7 +166,7 @@ super-low range (808s, bass-boosted) gains 4-9 dB. Through Dissonance the Unity 
 12 kHz ceiling measured the same as full band (−0.6 against −0.7 dB, spectral distance
 4.42 against 4.39), so one Unity mode covers Photon and Dissonance.
 
-**Suggesting the mode** (`soundboard/voicesdk.py`). A voice SDK ships as its own library
+**Suggesting the mode** (`soundboard/mic/voicesdk.py`). A voice SDK ships as its own library
 in the game's install folder, so the program in front is matched by its files: its
 exe path is read with `PROCESS_QUERY_LIMITED_INFORMATION` (what Task Manager uses;
 anti-cheat allows it), and its install folder (for an Unreal game, three levels above

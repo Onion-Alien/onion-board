@@ -1,4 +1,4 @@
-"""My setups in Live controls (ui.livesetups, soundboard.livesetup): a voice setup on
+"""My setups in Live controls (ui.livesetups, soundboard.mic.livesetup): a voice setup on
 every sound, the radio or the programs the Apps tab sends. The voice changer part is on
 at once; an AI voice is made first (sounds) or started first (streams), with a Cancel."""
 import sys
@@ -10,7 +10,8 @@ import numpy as np
 from test_mainwindow import window  # noqa: F401  (the real MainWindow)
 
 from soundboard.sounds import library
-from soundboard import livesetup, renderworker, voicesetups
+from soundboard.mic import livesetup, voicesetups
+from soundboard import renderworker
 from soundboard.sounds.library import SR
 from soundboard.ui import toast
 

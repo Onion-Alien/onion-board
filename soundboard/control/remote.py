@@ -1164,7 +1164,7 @@ def dispatch_live(mw: MainWindow, action: str, params: dict) -> tuple[int, objec
 # --------------------------------------------------------------------------- who's listening
 
 def mode_state(mw: MainWindow, full: bool = True) -> dict:
-    from soundboard import destination, profiles
+    from soundboard.mic import destination, profiles
     d = mw.cfg.dest if isinstance(mw.cfg.dest, dict) else {}
     now = destination.resolve(d)
     p = profiles.current(d)
@@ -1183,7 +1183,7 @@ def dispatch_mode(mw: MainWindow, params: dict) -> tuple[int, object]:
     """?simple= picks a simple mode (Game, Voice chat, Clean, Advanced); ?set= one exact
     destination mode, which is Advanced (or Clean, for Off). Both apply and save, and
     the Sounds tab's dropdown and the Setup tab's picker show it."""
-    from soundboard import destination, profiles
+    from soundboard.mic import destination, profiles
     from soundboard.ui import destpanel
     if "simple" in params:
         want = params["simple"].strip().lower()

@@ -4,7 +4,7 @@ from __future__ import annotations
 from PySide6.QtWidgets import (QCheckBox, QComboBox, QHBoxLayout, QLabel, QPushButton, QVBoxLayout,
                                QWidget)
 
-from soundboard import appsetup, profiles
+from soundboard.mic import appsetup, profiles
 from soundboard.core import autostart
 from soundboard.i18n import _
 from soundboard.ui import busy, icons
@@ -48,7 +48,7 @@ class GeneralPage(Page):
         return w
 
     def _app_setup_card(self):
-        """Set up for the app you're using (soundboard.appsetup): ask or not, and the
+        """Set up for the app you're using (soundboard.mic.appsetup): ask or not, and the
         apps remembered or never asked about."""
         card, cv = self._card(
             _("Set up for the app you're using"),

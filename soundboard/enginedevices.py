@@ -15,7 +15,7 @@ from typing import TYPE_CHECKING
 
 import sounddevice as sd
 
-from soundboard import directmic
+from soundboard.mic import directmic
 from soundboard.core import errors
 from soundboard.engineparts import (
     BUFFER, CH, MIC_BUFFER, RETRY_S, SR, STALL_S, DEVICES, StreamResampler, _holding_devices,
@@ -112,7 +112,7 @@ class EngineDevices:
         return s
 
     def _open_direct(self, callback):
-        """What others hear -> straight into the real mic (soundboard.directmic)."""
+        """What others hear -> straight into the real mic (soundboard.mic.directmic)."""
         try:
             s = directmic.DirectMicStream(callback, mic_callback=self._mic_direct,
                                           mic_stopped=self._mic_direct_stopped,

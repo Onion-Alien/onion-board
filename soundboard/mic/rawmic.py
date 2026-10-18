@@ -1,6 +1,6 @@
 """Apps that record the mic without going through Onion Board (straight into my mic).
 
-The mic effect (soundboard.directmic) runs on every stream Windows puts through the
+The mic effect (soundboard.mic.directmic) runs on every stream Windows puts through the
 mic's normal processing. An app that opens the mic in *raw* mode ("bypass system
 processing", Discord's Studio profile, some games' voice chat) skips every effect,
 ours too, so it hears the plain mic and none of the sounds.

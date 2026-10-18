@@ -5,7 +5,7 @@
 // that records it. Discord and games hear what Onion Board sends through the real mic:
 // no virtual cable, nothing to pick in the voice app.
 //
-// Board <-> effect: a small shared file (soundboard/directmic.py has the layout).
+// Board <-> effect: a small shared file (soundboard/mic/directmic.py has the layout).
 //  - The effect publishes the clean mic (after the mic's own effect, before anything
 //    of the board's) into a second ring. The board takes its mic from there, so its
 //    meter, mic check and voice changer never hear its own sounds coming back, and it
@@ -179,13 +179,13 @@ static const PROPERTYKEY PKEY_AudioEndpoint_GUID_ =
 
 // ------------------------------------------------------------------ this effect
 
-// {C55E76FE-6667-4828-81FD-05B393FD649E} (soundboard/directmic.py CLSID)
+// {C55E76FE-6667-4828-81FD-05B393FD649E} (soundboard/mic/directmic.py CLSID)
 static const CLSID CLSID_OnionMic =
     {0xc55e76fe, 0x6667, 0x4828, {0x81, 0xfd, 0x05, 0xb3, 0x93, 0xfd, 0x64, 0x9e}};
 static const wchar_t *STATE_KEY = L"SOFTWARE\\OnionBoard\\MicPlugin\\Endpoints";
 static const uint32_t EFFECT_VERSION = 5;        // directmic.EFFECT_VERSION
 
-// The shared ring file. soundboard/directmic.py writes the same layout and documents it.
+// The shared ring file. soundboard/mic/directmic.py writes the same layout and documents it.
 // Anyone signed in can write this file, so nothing read from it is trusted: sizes are
 // taken once, when it's opened, positions are masked, samples are checked.
 static const uint32_t RING_MAGIC = 0x434d424f;   // "OBMC"

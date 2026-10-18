@@ -17,7 +17,8 @@ from PySide6.QtWidgets import (QComboBox, QDialog, QHBoxLayout, QLabel, QLineEdi
                                QPushButton, QVBoxLayout, QWidget)
 
 from soundboard.core import errors, usage
-from soundboard import savedvoices, voicefx, voicesetups
+from soundboard.mic import savedvoices, voicesetups
+from soundboard import voicefx
 from soundboard.online import store, storevoices as sv
 from soundboard.i18n import _
 from soundboard.speech import aivoicelist as avl

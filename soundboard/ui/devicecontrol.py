@@ -14,7 +14,8 @@ from typing import TYPE_CHECKING
 
 from PySide6.QtCore import QTimer
 
-from soundboard import appaudio, directmic, theme
+from soundboard import appaudio, theme
+from soundboard.mic import directmic
 from soundboard import engine as eng
 from soundboard.engine import is_virtual as is_virtual_cable
 from soundboard.i18n import _, ngettext

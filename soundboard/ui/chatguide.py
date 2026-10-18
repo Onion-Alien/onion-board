@@ -20,7 +20,8 @@ from PySide6.QtWidgets import (QApplication, QDialog, QHBoxLayout, QLabel, QPush
                                QVBoxLayout)
 
 from soundboard.sim import chatcheck
-from soundboard import directmic, discordcfg, theme
+from soundboard.mic import directmic, discordcfg
+from soundboard import theme
 from soundboard.core.pollthread import PollThread
 from soundboard.ui import busy, fit, icons
 from soundboard.ui.bunnywidget import BunnyWidget
@@ -139,7 +140,7 @@ SETTING_FIXES = {
 
 
 def settings_html(found: list, kept: bool) -> str:
-    """Discord's own settings as read from its files (soundboard.discordcfg): a ✓, or
+    """Discord's own settings as read from its files (soundboard.mic.discordcfg): a ✓, or
     each one that's hurting your sounds and what to switch. '' when none was found."""
     if not found:
         return ""

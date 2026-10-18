@@ -4,7 +4,7 @@ mixing every block as before, and what comes out has to be the same samples."""
 import numpy as np
 import pytest
 
-from soundboard import destination
+from soundboard.mic import destination
 from soundboard.engine import SR, Engine
 from soundboard.sendfx import Limiter, SafetyLimiter
 

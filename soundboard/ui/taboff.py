@@ -10,7 +10,7 @@ from __future__ import annotations
 from PySide6.QtCore import QObject, Signal
 from PySide6.QtWidgets import QPushButton, QWidget
 
-from soundboard import savedvoices
+from soundboard.mic import savedvoices
 
 # the tabs that can be switched off, by key (the main window's attribute for each);
 # Sounds and Setup always stay. (Store is last in TAB_KEYS, so older

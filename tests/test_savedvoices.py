@@ -1,11 +1,11 @@
-"""Saved voices (soundboard.savedvoices): their own file, a bin, damaged files."""
+"""Saved voices (soundboard.mic.savedvoices): their own file, a bin, damaged files."""
 import json
 import time
 
 from soundboard.core import backup
-from soundboard import savedvoices
+from soundboard.mic import savedvoices
 from soundboard.sounds import library
-from soundboard.savedvoices import Store
+from soundboard.mic.savedvoices import Store
 
 ROBOT = {"pitch": {"on": True, "semitones": 4.0}, "echo": {"on": False}}
 

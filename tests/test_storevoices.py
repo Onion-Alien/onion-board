@@ -6,7 +6,8 @@ import random
 import numpy as np
 import pytest
 
-from soundboard import savedvoices, voicefx, voicesetups
+from soundboard.mic import savedvoices, voicesetups
+from soundboard import voicefx
 from soundboard.online import store, storevoices as sv
 from soundboard.speech import aipreview
 from soundboard.speech import aivoicelist as avl

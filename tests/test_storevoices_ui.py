@@ -6,7 +6,7 @@ import pytest
 from conftest import process_events
 from test_mainwindow import window as main_window  # noqa: F401  (the real MainWindow)
 
-from soundboard import savedvoices, voicesetups
+from soundboard.mic import savedvoices, voicesetups
 from soundboard.online import store
 from soundboard.sounds.library import Config
 from soundboard.speech import aipreview

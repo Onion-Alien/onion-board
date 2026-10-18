@@ -886,7 +886,7 @@ def test_rename_a_saved_voice(panel, monkeypatch):
 def test_tiles_reflow_with_saved_voices(qapp, app_dir, monkeypatch):
     from PySide6.QtWidgets import QWidget
 
-    from soundboard import savedvoices
+    from soundboard.mic import savedvoices
     from soundboard.ui.voicepanel import VoiceFxPanel
     store = savedvoices.Store()
     for n in ("A", "B"):
@@ -1366,7 +1366,7 @@ def test_importing_junk_says_why_and_adds_nothing(panel, monkeypatch):
     assert p.fx.import_code("OB1-not-a-real-code") == ""
     assert said and not p.fx.store.voices
     # a built-in voice's name gets "(shared)"; saying No adds nothing
-    from soundboard import savedvoices
+    from soundboard.mic import savedvoices
     code = savedvoices.share_code("Robot", {"robot": {"on": True}})
     monkeypatch.setattr(QMessageBox, "question", lambda *a: QMessageBox.No)
     assert p.fx.import_code(code) == "" and not p.fx.store.voices
@@ -2004,7 +2004,7 @@ def test_a_shared_setup_never_turns_on_your_own_voice_of_the_same_name(panel, mo
 def test_a_saved_voice_named_like_a_ready_voice_gets_its_own_card(qapp, monkeypatch):
     # a voices.json from before "Chipmunk" was a ready voice: its card is its own
     import json
-    from soundboard import savedvoices
+    from soundboard.mic import savedvoices
     mine = {"pitch": {"on": True, "semitones": -5.0}}
     savedvoices.path().parent.mkdir(parents=True, exist_ok=True)
     savedvoices.path().write_text(json.dumps({"voices": [{"name": "Chipmunk",

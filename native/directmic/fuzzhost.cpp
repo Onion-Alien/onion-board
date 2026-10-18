@@ -195,7 +195,7 @@ static bool writeRing(Layout &L, Mapped &m) {
     m.p = (uint8_t *)MapViewOfFile(m.map, FILE_MAP_ALL_ACCESS, 0, 0, 0);
     if (!m.p) return false;
     uint8_t *p = m.p;
-    // the header as soundboard/directmic.py writes it
+    // the header as soundboard/mic/directmic.py writes it
     if (L.size >= HEADER) {
         wr<uint32_t>(p, 0, MAGIC);
         wr<uint32_t>(p, 4, VERSION);

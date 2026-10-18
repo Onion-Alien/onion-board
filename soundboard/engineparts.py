@@ -19,7 +19,7 @@ from dataclasses import dataclass, field
 import numpy as np
 import soxr
 
-from soundboard import destination
+from soundboard.mic import destination
 from soundboard.dsp import hermite
 from soundboard.voicefx.builtin import PitchShift
 

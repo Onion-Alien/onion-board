@@ -1,6 +1,6 @@
 import numpy as np
 
-from soundboard.testcheck import analyze, summary_html
+from soundboard.mic.testcheck import analyze, summary_html
 
 RATE = 48000
 
