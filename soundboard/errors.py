@@ -217,7 +217,7 @@ def _os_error(e: OSError) -> str:
     if isinstance(e, TimeoutError):
         return _winerr(10060)
     if getattr(e, "winerror", None) == 448 and e.filename:
-        from soundboard import winpath
+        from soundboard.win import winpath
         if (link := winpath.first_link(e.filename)) is not None:
             return _("Windows won't follow the folder link “{link}” (it points to "
                      "“{target}”). Copy the file to a normal folder (like Desktop) and try "

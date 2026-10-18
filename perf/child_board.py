@@ -201,7 +201,8 @@ def isolate(conf: dict):
             pass
     midi.WinMM = NoMidi
 
-    from soundboard import autostart, cableformat, shellicon
+    from soundboard import autostart, cableformat
+    from soundboard.win import shellicon
     autostart.winreg = None
     shellicon.shortcut_folders = lambda: []
     cableformat.cable_ends = lambda names_hint=None: []

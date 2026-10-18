@@ -1072,7 +1072,7 @@ def test_program_icons_are_read_off_the_ui_thread(tab, monkeypatch):
     listing's thread reads them now, and a card only shows what was read."""
     from PySide6.QtGui import QImage
 
-    from soundboard import exeicon
+    from soundboard.win import exeicon
     read = []
 
     def load(paths):

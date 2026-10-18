@@ -17,7 +17,7 @@ import os
 import re
 from pathlib import Path
 
-from soundboard import winpath
+from soundboard.win import winpath
 
 NAME = "starting.txt"
 

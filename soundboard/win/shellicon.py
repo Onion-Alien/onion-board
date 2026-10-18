@@ -309,7 +309,7 @@ def is_ours(target: str, args: str, *, frozen: bool | None = None,
         return _norm(target) == _norm(exe or sys.executable)
     if Path(target).name.lower() not in ("python.exe", "pythonw.exe"):
         return False
-    main = main or str(Path(__file__).resolve().parent.parent / "main.py")
+    main = main or str(Path(__file__).resolve().parents[2] / "main.py")
     first = _first_arg(args)
     if not first:
         return False

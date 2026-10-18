@@ -6,7 +6,7 @@ import sys
 import pytest
 from test_mainwindow import window  # noqa: F401
 
-from soundboard import thumbbar
+from soundboard.win import thumbbar
 
 
 def test_offscreen_never_listens(qapp):

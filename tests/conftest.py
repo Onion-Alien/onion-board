@@ -464,7 +464,7 @@ def _never_count_for_real(monkeypatch):
 def _never_touch_real_shortcuts(monkeypatch):
     """The theme re-icons the app's Desktop / Start menu shortcuts: never the
     developer's real ones (offscreen already skips it; this is the second lock)."""
-    from soundboard import shellicon
+    from soundboard.win import shellicon
     monkeypatch.setattr(shellicon, "shortcut_folders", lambda: [])
 
 

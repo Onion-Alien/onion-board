@@ -34,9 +34,9 @@ from soundboard import (
     thumbs,
     usage,
     videos,
-    winpath,
     ytdl,
 )
+from soundboard.win import winpath
 from soundboard.i18n import _, ngettext
 from soundboard.library import (
     AUDIO_EXTS,

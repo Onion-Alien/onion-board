@@ -7,7 +7,8 @@ import numpy as np
 import pytest
 import soundfile as sf
 
-from soundboard import errors, library, winpath
+from soundboard import errors, library
+from soundboard.win import winpath
 
 pytestmark = pytest.mark.skipif(sys.platform != "win32", reason="Windows junctions")
 

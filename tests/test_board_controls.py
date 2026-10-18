@@ -13,7 +13,8 @@ from PySide6.QtWidgets import QApplication, QLabel, QPushButton
 from soundboard import voicefx
 
 from soundboard.ui import responsive, toast
-from soundboard import backup, thumbbar
+from soundboard import backup
+from soundboard.win import thumbbar
 from soundboard.library import Config, SoundMeta
 from soundboard.ui.widgets import Pad
 from test_mainwindow import window as main_window  # noqa: F401  (the real MainWindow)
