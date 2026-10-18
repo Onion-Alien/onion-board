@@ -829,3 +829,16 @@ def test_the_apps_tabs_empty_bun_rests_after_30_s():
     import inspect
     assert ap.BUN_REST_S == 30.0
     assert "rest_after_s=BUN_REST_S" in inspect.getsource(ap)
+
+
+def test_a_skit_paw_gets_his_arm_on_its_side_instead_of_a_third_paw(qapp):
+    """A skit's paw held his prop with no arm while both arms still rested at his
+    sides: held_paws hands draw_bunny where it is, so that arm reaches out to it."""
+    from soundboard.ui import bunskits
+
+    kit = bunskits.Kit()
+    kit.front.append(lambda p: bunskits.paw(p, 78, 96))
+    assert bunskits.held_paws(kit) == (None, (78.0, 96.0))
+    kit.front.append(lambda p: bunskits.paw(p, 24, 96))
+    assert bunskits.held_paws(kit) == ((24.0, 96.0), (78.0, 96.0))
+    assert bunskits.held_paws(bunskits.Kit()) is None
