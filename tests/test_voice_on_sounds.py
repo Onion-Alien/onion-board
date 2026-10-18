@@ -194,3 +194,19 @@ def test_the_setup_menu_renames_and_says_when_the_name_is_taken(window, app_dir,
     assert list(vp.setups.setups) == ["Robo", "Echo"] and "Echo" in vp.setups_bar.note.text()
     vp.setups_bar._rename("Robo")
     assert list(vp.setups.setups) == ["My robot", "Echo"] and "My robot" in vp.setups_bar.buttons
+
+
+def test_the_voice_tabs_and_my_setups_scroll_away_with_the_card(window, qapp):  # noqa: F811
+    """On a short window the voice list had a sliver: the part tabs and My setups were
+    pinned above it. They're the top of the scrolling part now; the Say bar and the
+    bottom bar stay."""
+    from tests.conftest import process_events
+    w = window
+    w.show()
+    w.tabs.setCurrentWidget(w.voice)
+    w.resize(900, 640)
+    process_events(qapp, lambda: False, 0.3)
+    v = w.voice
+    page = v._scroll.widget()
+    assert page.isAncestorOf(v.setups_bar) and page.isAncestorOf(v._tabs["fx"])
+    assert not page.isAncestorOf(v.speech.say_bar) and not page.isAncestorOf(v.bar)
