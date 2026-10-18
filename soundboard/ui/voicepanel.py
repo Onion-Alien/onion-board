@@ -210,8 +210,9 @@ class VoicePanel(QWidget):
         pv.setContentsMargins(0, 4, 8, 12)   # left edge in line with the download bar
         pv.setSpacing(12)
         # a row of tabs, one card under it: the voice changer, AI voices, another
-        # language, custom voices, add-ons (they wrap onto two lines when narrow)
-        # pinned above the scrolling card (like the Say bar), never scrolled away
+        # language, custom voices, add-ons (they wrap onto two lines when narrow).
+        # They and My setups scroll away with the card: pinned above it, on a short
+        # window they left the voices a sliver (the Say bar and the bottom bar stay)
         tab_row = QWidget()
         self._tab_flow = Flow(tab_row, gap=8)
         self._tab_group = QButtonGroup(self)
@@ -219,6 +220,10 @@ class VoicePanel(QWidget):
         self._tabs: dict[str, QPushButton] = {}
         self._cards: dict[str, QFrame] = {}
         self._states: dict[str, QLabel] = {}
+        head = self._head = QVBoxLayout()   # the tabs, then My setups (placed below)
+        head.setContentsMargins(0, 0, 0, 0)
+        head.setSpacing(8)
+        pv.addLayout(head)
         self._card_box = QVBoxLayout()
         self._card_box.setContentsMargins(0, 0, 0, 0)
         pv.addLayout(self._card_box)
@@ -239,17 +244,16 @@ class VoicePanel(QWidget):
         # setups (they looked like one row of the same buttons)
         tab_head = QWidget()
         th = QVBoxLayout(tab_head)
-        th.setContentsMargins(0, 0, 8, 0)
+        th.setContentsMargins(0, 0, 0, 0)
         th.setSpacing(8)
         th.addWidget(tab_row)
         rule = QFrame()
         rule.setObjectName("voicetabrule")
         rule.setFixedHeight(1)
         th.addWidget(rule)
-        outer.addWidget(tab_head)
+        head.addWidget(tab_head)
         # My setups: under the tabs, so it's there whichever part is showing
-        self.setups = voicesetups.Store()
-        self._setups_at = outer.count()   # placed once the panels below are made
+        self.setups = voicesetups.Store()   # (its bar is placed once the panels are made)
         outer.addWidget(scroll, 1)
 
         # the voice changer. It always starts off (the voice you picked is kept):
@@ -303,7 +307,7 @@ class VoicePanel(QWidget):
                                     self.setup_icon, self.setup_words,
                                     copy_code=self.copy_setup_code,
                                     import_code=self.fx.import_code)
-        outer.insertWidget(self._setups_at, self.setups_bar)
+        head.addWidget(self.setups_bar)
         self.fx.take_code = self.take_code   # a code with an AI voice or a setup in it
         from soundboard.ui.storevoices import kind_name
         self.setups_bar.share = lambda n: self.share_asked.emit(f"{kind_name('setup')}: {n}")
