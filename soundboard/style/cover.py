@@ -6,7 +6,10 @@ busy PC), and a frame painted part way through showed the app half styled. So th
 window shows a picture of itself, dimming with the app's mascot in the middle until
 the new look is in, then fades to it. The UI thread is about to be busy restyling, so
 the fade in is painted by hand, a few frames before the restyle starts; the fade out
-is an animation once the event loop is back. A `plain` cover (the highlight colour:
+is an animation once the event loop is back. It stays opaque all the way: a picture of
+the restyled window is taken once and the old one fades over it, because a see-through
+cover (an opacity effect) made Qt paint every widget under it again on each frame
+(~18 paints of every pad per switch). A `plain` cover (the highlight colour:
 a quick restyle) has no dimming and no mascot, just the blend. The cover is a child
 of the window: no window of its own appears.
 
@@ -19,9 +22,9 @@ from __future__ import annotations
 
 import time
 
-from PySide6.QtCore import QEasingCurve, QPropertyAnimation, QRectF, Qt
+from PySide6.QtCore import QEasingCurve, QRectF, Qt, QVariantAnimation
 from PySide6.QtGui import QColor, QPainter, QPixmap
-from PySide6.QtWidgets import QGraphicsOpacityEffect, QWidget
+from PySide6.QtWidgets import QWidget
 
 from .appstate import snap_to_pixels
 
@@ -54,12 +57,17 @@ class Cover(QWidget):
             self.scrim.setAlpha(SCRIM_ALPHA)
         self.mascot = mascot
         self.k = 0.0        # 0..1, how far the dimming and the mascot are in
-        self._fade: QPropertyAnimation | None = None
+        self.fresh: QPixmap | None = None   # the restyled window, while fading out
+        self.left = 1.0     # 1..0, how much of the old picture is still over it
+        self._fade: QVariantAnimation | None = None
 
     def paintEvent(self, _e):
         p = QPainter(self)
         # opaque: the full picture goes down before snap_to_pixels, or its nudge leaves
         # an edge row of whatever was on screen before
+        if self.fresh is not None:
+            p.drawPixmap(self.rect(), self.fresh)
+            p.setOpacity(self.left)
         p.drawPixmap(self.rect(), self.still)
         if self.k > 0 and self.scrim is not None:
             c = QColor(self.scrim)
@@ -70,7 +78,7 @@ class Cover(QWidget):
             size = self.mascot.deviceIndependentSize()
             at = QRectF((self.width() - size.width()) / 2,
                         (self.height() - size.height()) / 2, size.width(), size.height())
-            p.setOpacity(self.k)
+            p.setOpacity(self.k * self.left)
             p.drawPixmap(at, self.mascot, QRectF(self.mascot.rect()))
         p.end()
 
@@ -80,21 +88,31 @@ class Cover(QWidget):
         _fade_in([self])
 
     def uncover(self):
-        """Fade to the restyled window, then go."""
+        """Fade to the restyled window, then go: its picture is taken once (the cover
+        out of the way for it) and the old one fades over it, so the widgets under
+        the cover are painted once, not on every frame of the fade."""
         self.raise_()
         if not animate():
             self.hide()
             self.deleteLater()
             return
-        effect = QGraphicsOpacityEffect(self)
-        self.setGraphicsEffect(effect)
-        fade = self._fade = QPropertyAnimation(effect, b"opacity", self)
+        window = self.parentWidget()
+        if window is not None:
+            self.hide()
+            self.fresh = window.grab()
+            self.show()
+        fade = self._fade = QVariantAnimation(self)
         fade.setDuration(FADE_MS)
         fade.setStartValue(1.0)
         fade.setEndValue(0.0)
         fade.setEasingCurve(QEasingCurve.Type.InOutQuad)
+        fade.valueChanged.connect(self._fading)
         fade.finished.connect(self.deleteLater)
         fade.start()
+
+    def _fading(self, v):
+        self.left = float(v)
+        self.update()
 
 
 def _fade_in(covers: list[Cover]):

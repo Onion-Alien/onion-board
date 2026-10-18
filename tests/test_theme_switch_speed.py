@@ -273,3 +273,39 @@ def test_the_main_window_still_restyles_while_hidden(main_window):  # noqa: F811
         assert main_window.testAttribute(Qt.WidgetAttribute.WA_WState_Polished)
     finally:
         theme.apply(QApplication.instance(), start)
+
+
+def test_the_fade_out_paints_the_board_once_not_every_frame(settings, main_window):  # noqa: F811
+    """The cover fades out as two pictures, old over new, and stays opaque. A
+    see-through cover (an opacity effect) made Qt paint every widget under it on each
+    frame of the fade: ~18 paints of every pad per switch."""
+    from soundboard.ui.themecover import ThemeCover
+    from soundboard.ui.widgets import Pad
+
+    class Paints(QObject):
+        n = 0
+
+        def eventFilter(self, obj, ev):  # noqa: N802 - Qt API
+            if ev.type() == QEvent.Type.Paint and isinstance(obj, Pad):
+                self.n += 1
+            return False
+    main_window.tabs.setCurrentIndex(0)   # the Sounds tab
+    QApplication.processEvents()
+    pads = len([p for p in main_window.findChildren(Pad) if p.isVisible()])
+    assert pads > 10
+    count = Paints()
+    app = QApplication.instance()
+    start = theme.current_name
+    app.installEventFilter(count)
+    try:
+        main_window.themectl.apply_theme(_other(start))
+        end = time.monotonic() + 3
+        while main_window.findChildren(ThemeCover) and time.monotonic() < end:
+            QApplication.processEvents()
+            QApplication.sendPostedEvents(None, QEvent.Type.DeferredDelete)
+        QApplication.processEvents()
+        assert not main_window.findChildren(ThemeCover)
+    finally:
+        app.removeEventFilter(count)
+        main_window.themectl.apply_theme(start)
+    assert count.n <= 3 * pads

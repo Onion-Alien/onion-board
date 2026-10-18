@@ -645,6 +645,11 @@ class Child:
         d.reject()
         w.themectl.apply_theme(was)
         self.run_for(1.0)
+        # the spare Edit made again after the switch (themecontrol.SPARE_AFTER_MS): it's
+        # this scenario's, and left to the next one it looked like the voice changer's
+        # UI cost (~1 s on a slower PC)
+        self.run_until(lambda: w.setctl._spare_editor is not None, 5.0)
+        self.run_for(0.2)
         return {"dialog_s": took}
 
     def sc_voice_preset(self, preset: str = "Robot"):

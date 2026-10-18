@@ -13,6 +13,7 @@ space. The presets at the bottom are built from these building blocks.
 from __future__ import annotations
 
 import collections
+import math
 from typing import TYPE_CHECKING
 
 import numpy as np
@@ -349,6 +350,7 @@ class Cleanup(Effect):
         self.held = 0.0
         self.g = 1.0
         self.stft: _Stage | None = None
+        self._layout: dict[int, tuple] = {}     # block size -> the gate's pieces
         self.noise: np.ndarray | None = None   # the noise's power per frequency
         self.prev_gain: np.ndarray | None = None
         self.creep = 1.0
@@ -361,27 +363,37 @@ class Cleanup(Effect):
     def _gate(self, x, rate):
         """Downward expander, decided per 2.5 ms piece and ramped sample by sample."""
         strength = self.p["gate"]
-        n, sub = len(x), self.sub
-        pieces = max(1, n // sub)
-        edges = np.linspace(0, n, pieces + 1).astype(int)
-        lv = np.array([np.sqrt(np.mean(x[a:b] ** 2) + 1e-12)
-                       for a, b in zip(edges[:-1], edges[1:])])
-        db = 20 * np.log10(lv)
+        n = len(x)
+        lay = self._layout.get(n)
+        if lay is None:   # the block size's pieces, worked out once (it rarely changes)
+            if len(self._layout) > 8:
+                self._layout.clear()
+            pieces = max(1, n // self.sub)
+            edges = np.linspace(0, n, pieces + 1).astype(int)
+            lay = self._layout[n] = (pieces, edges, np.diff(edges).tolist(), np.arange(n),
+                                     np.concatenate([[-1], edges[1:] - 1]))
+        pieces, edges, sizes, at, knots = lay
+        if n % pieces == 0:   # (the usual block: equal pieces, one call for them all)
+            lv = np.sqrt(np.mean((x * x).reshape(pieces, -1), axis=1) + 1e-12)
+        else:
+            lv = np.array([np.sqrt(np.mean(x[a:b] ** 2) + 1e-12)
+                           for a, b in zip(edges[:-1], edges[1:])])
+        db = (20 * np.log10(lv)).tolist()
         dt = n / rate
         # the noise floor: the quietest moment of the last FLOOR_S (between words you
         # always drop to the room's noise), so it learns a noisy room straight away
         # and follows it if it gets louder or quieter
-        self.mins.append((dt, max(float(db.min()), -90.0)))
+        self.mins.append((dt, max(min(db), -90.0)))
         span = sum(t for t, _ in self.mins)
         while len(self.mins) > 1 and span - self.mins[0][0] >= self.FLOOR_S:
             span -= self.mins.pop(0)[0]
         self.floor_db = min(min(m for _, m in self.mins), -38.0)
         open_at, close_at = max(self.floor_db + 9, -60), max(self.floor_db + 5, -64)
         closed_g = 10 ** (-30 * strength / 20)
-        gains = np.empty(pieces)
-        g = self.g
-        for i, d in enumerate(db):
-            piece = (edges[i + 1] - edges[i]) / rate
+        gains = np.empty(pieces + 1)
+        gains[0] = g = self.g
+        for i, d in enumerate(db):   # (plain floats: numpy scalars cost more here)
+            piece = sizes[i] / rate
             if d > open_at:
                 self.open, self.held = True, 0.0
             elif self.open and d < close_at:
@@ -390,9 +402,9 @@ class Cleanup(Effect):
                     self.open = False
             target = 1.0 if self.open else closed_g
             tau = 0.002 if target > g else 0.06
-            g = target + (g - target) * np.exp(-piece / tau)
-            gains[i] = g
-        ramp = np.interp(np.arange(n), np.r_[-1, edges[1:] - 1], np.r_[self.g, gains])
+            g = target + (g - target) * math.exp(-piece / tau)
+            gains[i + 1] = g
+        ramp = np.interp(at, knots, gains)
         self.g = float(g)
         return (x * ramp).astype(F32)
 
@@ -402,25 +414,33 @@ class Cleanup(Effect):
         noise = self.noise
         if noise is None:   # start low: what you say first mustn't count as noise
             noise = power.mean(axis=0) * 1e-3 + 1e-12
-        frame_db = 10 * np.log10(power.mean(axis=1) + 1e-20)
-        out = np.empty_like(spec)
+        frame_db = (10 * np.log10(power.mean(axis=1) + 1e-20)).tolist()
         over = 1.0 + strength            # subtract a bit more than the estimate
         floor = 10 ** (-18 * strength / 20)
+        gated = self.p["gate"] > 0 and not self.open
+        # the noise estimate goes frame by frame (each frame's decision needs the one
+        # before); the gains are then worked out for all the frames at once
+        noises = np.empty_like(power)
         for f in range(len(spec)):
-            noise_db = 10 * np.log10(noise.mean() + 1e-20)
-            gated = self.p["gate"] > 0 and not self.open
+            noise_db = 10 * math.log10(float(noise.mean()) + 1e-20)
             if gated or frame_db[f] < noise_db + 3:   # quiet: learn the noise
                 noise = 0.9 * noise + 0.1 * power[f]
             else:   # creeps up (~3 dB/s), so a louder room is learned even mid-talk
-                noise *= self.creep
-            self.noise = noise
-            g = np.maximum(1 - over * noise / (power[f] + 1e-20), floor)
-            g = np.convolve(g, (0.25, 0.5, 0.25), "same")     # less "musical noise"
-            if self.prev_gain is not None:
-                g = np.maximum(g, 0.6 * self.prev_gain)      # fades out, never snaps
-            self.prev_gain = g
-            out[f] = spec[f] * g
-        return out
+                noise = noise * self.creep
+            noises[f] = noise
+        self.noise = noise
+        g = np.maximum(1 - over * noises / (power + 1e-20), floor)
+        sm = 0.5 * g                     # (0.25, 0.5, 0.25) along frequency, zeros past
+        sm[:, 1:] += 0.25 * g[:, :-1]    # the ends: less "musical noise"
+        sm[:, :-1] += 0.25 * g[:, 1:]
+        prev = self.prev_gain
+        for f in range(len(sm)):
+            if prev is not None:
+                np.maximum(sm[f], 0.6 * prev, out=sm[f])   # fades out, never snaps
+            prev = sm[f]
+        if len(sm):
+            self.prev_gain = sm[-1].copy()
+        return spec * sm
 
     def run(self, x, rate):
         y = self.hp.run(x, "hp", lambda: butter(2, 80, btype="high", fs=rate).astype(F32))
@@ -921,18 +941,44 @@ class Robot(Effect):
         self.state = None        # the bank's memory, for (voice, carrier)
         self.env_sos = butter(1, self.ENV_HZ, btype="low", fs=rate).astype(F32)
         self.env_zi = np.zeros((1, 2 * self.BANDS, 2), F32)
-        self.harmonics = np.arange(1, int(hi / self.params[0].lo) + 1, dtype=np.float64)
+        self.tables: dict[int, np.ndarray] = {}   # harmonics -> one cycle of the buzz
         self.phase = 0.0
         self.rng = np.random.default_rng(1)
         self.tracker: _PitchTracker | None = None
         self.f = float(self.p["freq"])
 
+    TABLE = 16384  # samples in a cycle of the buzz, read with linear interpolation: its
+                   # top harmonic (187 at 40 Hz) gets 88 samples a cycle, ~-95 dB off
+
+    def _table(self, k: int) -> np.ndarray:
+        """One cycle of the band-limited saw with harmonics 1..k, sum sin(j x) / j * 2/pi,
+        made by an inverse FFT (~50 us) the first time a pitch needs that many, with
+        its first sample repeated at the end for the interpolation. Summing k sines
+        for every sample of every block (k is 75 at 100 Hz) was most of the effect.
+        Kept as float32 (64 KB each); follow-my-pitch uses a handful of them."""
+        t = self.tables.get(k)
+        if t is None:
+            n = self.TABLE
+            spec = np.zeros(n // 2 + 1, np.complex128)
+            j = np.arange(1, k + 1)
+            spec[1:k + 1] = -0.5j * n / j * (2 / np.pi)
+            cyc = np.fft.irfft(spec, n)
+            t = np.append(cyc, cyc[0]).astype(F32)
+            if len(self.tables) >= 16:   # follow-my-pitch walks the notes: a few in use
+                self.tables.clear()
+            self.tables[k] = t
+        return t
+
     def _carrier(self, n: int, rate: int) -> np.ndarray:
         f, nz = self.f, self.p["noise"]
-        k = self.harmonics[: int(min(self.HI_HZ, rate * 0.42) / f)]
+        k = int(min(self.HI_HZ, rate * 0.42) / f)
         ph = self.phase + 2 * np.pi * f / rate * np.arange(1, n + 1)
         self.phase = float(ph[-1] % (2 * np.pi))
-        saw = (np.sin(np.outer(k, ph)) / k[:, None]).sum(0) * (2 / np.pi)   # band-limited
+        pos = np.mod(ph, 2 * np.pi) * (self.TABLE / (2 * np.pi))
+        i = pos.astype(np.intp)
+        np.minimum(i, self.TABLE - 1, out=i)   # (2*pi itself after rounding)
+        t = self._table(k)
+        saw = t[i] + (t[i + 1] - t[i]) * (pos - i)                  # band-limited
         noise = self.rng.standard_normal(n) * 0.35
         return (saw * (1 - nz) + noise * nz).astype(F32)
 

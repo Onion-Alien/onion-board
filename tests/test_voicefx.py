@@ -1099,3 +1099,59 @@ def test_wobble_goes_deep_enough_to_sway_a_semitone():
     per = np.diff(z[::2]) / SR
     f = 1 / per
     assert f.max() / f.min() > 2 ** (2 / 12)            # at least two semitones top to bottom
+
+
+def test_robot_buzz_from_its_table_is_the_summed_saw():
+    """The buzz is read from one cycle made ahead, no longer summed from its 75 sines
+    every block: what comes out is the same band-limited saw (within -90 dB)."""
+    for freq, follow in ((100, 0), (40, 0), (400, 0), (110, 1)):
+        fast = voicefx.REGISTRY["robot"](SR, {"freq": freq, "noise": 0, "follow": follow})
+        fast.f = float(freq)
+        got = np.concatenate([fast._carrier(480, SR) for _ in range(20)])
+        n = np.arange(1, len(got) + 1)
+        ph = 2 * np.pi * freq / SR * n
+        k = np.arange(1, int(min(fast.HI_HZ, SR * 0.42) / freq) + 1)[:, None]
+        want = (np.sin(k * ph) / k).sum(0) * (2 / np.pi)
+        assert np.max(np.abs(got - want)) < 3e-4 * np.max(np.abs(want))
+
+
+def _dehiss_one_frame_at_a_time(c, spec):
+    """Clean up's hiss removal as it was written first, a frame at a time."""
+    strength = c.p["hiss"]
+    power = (spec.real ** 2 + spec.imag ** 2).astype(np.float64)
+    noise = c.noise
+    if noise is None:
+        noise = power.mean(axis=0) * 1e-3 + 1e-12
+    frame_db = 10 * np.log10(power.mean(axis=1) + 1e-20)
+    out = np.empty_like(spec)
+    over, floor = 1.0 + strength, 10 ** (-18 * strength / 20)
+    for f in range(len(spec)):
+        noise_db = 10 * np.log10(noise.mean() + 1e-20)
+        if (c.p["gate"] > 0 and not c.open) or frame_db[f] < noise_db + 3:
+            noise = 0.9 * noise + 0.1 * power[f]
+        else:
+            noise = noise * c.creep
+        c.noise = noise
+        g = np.maximum(1 - over * noise / (power[f] + 1e-20), floor)
+        g = np.convolve(g, (0.25, 0.5, 0.25), "same")
+        if c.prev_gain is not None:
+            g = np.maximum(g, 0.6 * c.prev_gain)
+        c.prev_gain = g
+        out[f] = spec[f] * g
+    return out
+
+
+def test_hiss_removal_all_frames_at_once_matches_one_at_a_time():
+    rng = np.random.default_rng(3)
+    a, b = (voicefx.REGISTRY["cleanup"](SR, {}) for _ in range(2))
+    for c in (a, b):
+        c.creep = 1.001
+    for block in range(12):   # quiet frames (learning) and loud ones (creeping)
+        frames = rng.integers(1, 6)
+        level = 0.01 if block % 3 else 3.0
+        spec = (rng.standard_normal((frames, 257)) + 1j * rng.standard_normal((frames, 257)))
+        spec = (spec * level).astype(np.complex64)
+        a.open = b.open = block % 2 == 0
+        got, want = a._dehiss(spec), _dehiss_one_frame_at_a_time(b, spec)
+        np.testing.assert_allclose(got, want, rtol=1e-5, atol=1e-9)
+        np.testing.assert_allclose(a.noise, b.noise, rtol=1e-9)
