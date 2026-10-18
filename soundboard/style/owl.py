@@ -49,6 +49,16 @@ FPS = 30
 FAST_MS = 1000 // FPS
 NEAR = 2.2           # the mouse this close (owl heights from his face): he perks up
 REST_PEEK_MS = 250   # resting: how often he checks for the mouse coming near
+# His picture is kept between frames (OwlWidget._held) until some part of him has moved
+# HOLD_PX screen pixels: his sway moves far less than a pixel a frame, and redrawing him
+# is most of a frame's cost. False: every frame draws him fresh (the tests compare).
+HOLD = True
+HOLD_PX = 0.25
+# how far the furthest bit of him moves for one unit of each pose key, in canvas units
+# (100 x 120; tufts: per degree)
+SWAY = {"look": 8.0, "look_y": 8.0, "blink": 24.0, "sad": 30.0, "tufts": 0.6,
+        "clasp": 40.0, "flap": 40.0, "plead": 20.0, "tear": 40.0, "beak": 15.0}
+EXTRAS = ("puff", "ask", "zzz", "startle", "joy")   # drawn round him, fresh every frame
 
 # each theme's own Hoot, like Bun's (bunnyfit.LOOKS): his feathers ("feather"; "wing":
 # the darker wings and shading, None: a shade of the feathers), the colour low in his eyes
@@ -730,6 +740,10 @@ class OwlWidget(QWidget):
         self._sprung = False       # (the springs start where the pose is)
         self._dy_last = 0.0
         self._vy = 0.0
+        self._kept_img: QImage | None = None   # his picture (_picture), kept while he's
+        self._kept_pose: dict | None = None    # ... this close to the pose it shows (_held)
+        self._kept_key: tuple = ()
+        self._painted_say = ""     # the bubble the last frame showed
         self._timer = QTimer(self)
         self._timer.setInterval(FAST_MS)
         self._timer.timeout.connect(self._tick)
@@ -768,6 +782,7 @@ class OwlWidget(QWidget):
 
     def hideEvent(self, ev):
         self._pause()
+        self._kept_img = self._kept_pose = None
         super().hideEvent(ev)
 
     def stir(self):
@@ -851,7 +866,8 @@ class OwlWidget(QWidget):
         now = time.monotonic()
         self.step(min(0.1, now - self._last))
         self._last = now
-        self.update()   # always 30 fps: a slower idle pace made the sway judder
+        if not self._still():   # (30 fps: a slower idle pace made the sway judder)
+            self.update()
         if self.rest_after_s is not None and self.t >= self._rest_t and self._calm():
             self._timer.stop()   # (this frame is the one he keeps)
             self.resting = True
@@ -1095,11 +1111,81 @@ class OwlWidget(QWidget):
                 "flap": max(-0.2, min(1.3, self._wing_s.x))}
 
     # ------------------------------------------------------------------ paint
+    def _key(self, dpr: float) -> tuple:
+        """What has to be the same for his kept picture to stand in for a pose."""
+        return (self.owl_h, self.size(), dpr, hooks.theme_name(),
+                tuple(hooks.palette().items()))
+
+    def _moved(self, a: dict, b: dict, dpr: float) -> float:
+        """About how far (screen px) the bit of him that moved most moved from pose a
+        to pose b."""
+        far = self.owl_h * 1.2   # (his tufts, from his feet: the most a squash or sway moves)
+        px = max(abs(a["dy"] - b["dy"]), far * abs(a["sx"] - b["sx"]),
+                 far * abs(a["sy"] - b["sy"]), far * math.radians(abs(a["rot"] - b["rot"])))
+        unit = self.owl_h / H
+        for k, n in SWAY.items():
+            px = max(px, unit * n * abs(a[k] - b[k]))
+        return px * dpr
+
+    def _held(self, pose: dict, dpr: float) -> dict:
+        """`pose`, or the pose his kept picture shows while he's moved less than
+        HOLD_PX from it; `dpr`: the screen's (or picture's) pixels per px."""
+        kept = self._kept_pose
+        if (HOLD and kept is not None and self._kept_key == self._key(dpr)
+                and self._moved(kept, pose, dpr) < HOLD_PX):
+            return kept
+        return pose
+
+    def _still(self) -> bool:
+        """The next frame would look just like the last one: his kept picture still
+        stands for him and nothing round him moves, so no repaint."""
+        if not HOLD or self._kept_pose is None or self.say != self._painted_say:
+            return False
+        pose = self.pose()
+        return (not any(k in pose for k in EXTRAS)
+                and self._held(pose, self.devicePixelRatioF()) is self._kept_pose)
+
+    def _picture(self, pose: dict, r: QRectF, dpr: float) -> QImage:
+        """Him in `pose` on a see-through picture the size of the widget, at the
+        screen's pixels: drawn once, then kept for the frames he hardly moves (_held)."""
+        if pose is self._kept_pose and self._kept_img is not None:
+            return self._kept_img
+        size = QSize(math.ceil(self.width() * dpr), math.ceil(self.height() * dpr))
+        img = self._kept_img
+        if img is None or img.size() != size:
+            img = QImage(size, QImage.Format.Format_ARGB32_Premultiplied)
+            img.setDevicePixelRatio(dpr)
+        img.fill(Qt.GlobalColor.transparent)
+        p = QPainter(img)
+        p.setRenderHint(QPainter.RenderHint.Antialiasing)
+        self._draw_owl(p, pose, r)
+        p.end()
+        self._kept_img, self._kept_pose, self._kept_key = img, pose, self._key(dpr)
+        return img
+
+    def _draw_owl(self, p: QPainter, pose: dict, r: QRectF):
+        """Him in `pose`, swaying and squashed about his feet."""
+        p.save()
+        foot = QPointF(r.center().x(), r.bottom())
+        p.translate(foot)
+        p.rotate(pose["rot"])
+        p.scale(pose["sx"], pose["sy"])   # squash and stretch, about his feet
+        p.translate(-foot)
+        draw_owl(p, r.translated(0, pose["dy"]), pose["look"], look_y=pose["look_y"],
+                 blink=pose["blink"], sad=pose["sad"], tufts=pose["tufts"],
+                 clasp=pose["clasp"], flap=pose["flap"], plead=pose["plead"],
+                 tear=pose["tear"], beak=pose["beak"])
+        p.restore()
+
     def paintEvent(self, ev):
         p = QPainter(self)
         snap_to_pixels(p)
         p.setRenderHint(QPainter.RenderHint.Antialiasing)
         pose = self.pose()
+        dpr = p.deviceTransform().m11()   # (the screen's, or a grab's, pixels per px)
+        held = self._held(pose, dpr)
+        if held is not pose:   # (what's round him is this frame's)
+            pose = {**held, **{k: pose[k] for k in EXTRAS if k in pose}}
         r = self._owl_rect()
         u = self.owl_h / H     # one canvas unit, px
         # a soft shadow on the floor, shrinking as he rises
@@ -1108,18 +1194,11 @@ class OwlWidget(QWidget):
         p.setPen(Qt.PenStyle.NoPen)
         p.setBrush(QColor(0, 0, 0, max(18, 60 - int(lift * 4))))
         p.drawEllipse(QRectF(r.center().x() - sw / 2, r.bottom() - 3, sw, 7))
-        # sway about his feet
-        p.save()
-        foot = QPointF(r.center().x(), r.bottom())
-        p.translate(foot)
-        p.rotate(pose["rot"])
-        p.scale(pose["sx"], pose["sy"])   # squash and stretch, about his feet
-        p.translate(-foot)
+        if HOLD:
+            p.drawImage(QPointF(0, 0), self._picture(held, r, dpr))
+        else:
+            self._draw_owl(p, pose, r)
         body = r.translated(0, pose["dy"])
-        draw_owl(p, body, pose["look"], look_y=pose["look_y"], blink=pose["blink"],
-                 sad=pose["sad"], tufts=pose["tufts"], clasp=pose["clasp"],
-                 flap=pose["flap"], plead=pose["plead"], tear=pose["tear"], beak=pose["beak"])
-        p.restore()
         head = QPointF(body.center().x(), body.top() + 18 * u)
         if "puff" in pose:
             k = pose["puff"]
@@ -1162,6 +1241,7 @@ class OwlWidget(QWidget):
         if self.say:
             self._bubble(p, self.say, body)
         p.end()
+        self._painted_say = self.say
 
     def _text(self, p: QPainter, text: str, x: float, y: float, px: float, col: QColor):
         if px < 1:

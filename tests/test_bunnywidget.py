@@ -864,8 +864,11 @@ def test_the_headphones_bun_stops_his_notes_and_rests(qapp, monkeypatch):
     """The Community tab's Bun: notes float out of his headphones nonstop, so he never
     held still (60 repaints a second of the whole banner, for as long as it's open)."""
     b = _still_kind(qapp, monkeypatch, "headphones")
-    _tick(b, round(10 / 0.035))
-    assert b.notes and not b.resting                # his idle notes, while he moves
+    seen = 0
+    for _ in range(round(10 / 0.035)):   # (now and then: at one moment there may be none)
+        _tick(b)
+        seen += bool(b.notes)
+    assert seen and not b.resting                   # his idle notes, while he moves
     b.clock.now = b._rest_at + 0.1
     _settle(qapp, b, 15)
     assert b.resting and not b._timer.isActive() and not b.notes
