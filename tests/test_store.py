@@ -722,3 +722,30 @@ def test_a_refused_name_or_tags_says_so():
     said = store._why(422, "not allowed")
     assert "name" in said and "links" in said
     assert said != store._why(500, "")
+
+
+def test_playing_a_link_keeps_the_rows_where_they_are(window, qapp, monkeypatch):
+    """The download bar opening over the tabs for a played link pushed the list down: the
+    row just clicked slid ~130 px away. The list scrolls by as much, so it stays put."""
+    from soundboard.ui.tabcontrol import TAB_INDEX
+    sounds = [_sound(i, ext="link", link=f"https://www.myinstants.com/en/instant/s{i}/")
+              for i in range(1, 40)]
+    monkeypatch.setattr(store, "_request", FakeStore(sounds))
+    w = window
+    w.show()
+    w.resize(1400, 900)
+    w.tabs.setCurrentIndex(TAB_INDEX["store"])
+    st = w.store
+    st.reload()
+    assert _wait(qapp, lambda: len(st._rows) > 20)
+    process_events(qapp, lambda: False, 0.3)
+    sb = st.list_area.verticalScrollBar()
+    sb.setValue(sb.maximum() // 2)
+    process_events(qapp, lambda: False, 0.2)
+    rows = [r for r in st._rows if r.visibleRegion().boundingRect().height() > 30]
+    row = rows[len(rows) // 2]
+    y = row.mapTo(w, row.rect().topLeft()).y()
+    row.btn_play.click()
+    assert _wait(qapp, lambda: w.download_bar.isVisible())
+    process_events(qapp, lambda: False, 0.5)
+    assert abs(row.mapTo(w, row.rect().topLeft()).y() - y) <= 2

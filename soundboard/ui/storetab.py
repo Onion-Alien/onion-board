@@ -443,7 +443,20 @@ class StoreTab(QWidget):
     def eventFilter(self, obj, e):
         if e.type() == QEvent.Type.Resize and obj is self.list_area.viewport():
             self._fit_columns()
+            self._hold_rows()
         return super().eventFilter(obj, e)
+
+    def _hold_rows(self):
+        """The rows stay where they are on screen when something above the tab comes or
+        goes: the download bar opening for a played link pushed the list down, so the row
+        just clicked slid away (it looked like a jump back up the list)."""
+        vp = self.list_area.viewport()
+        top = vp.mapTo(self.window(), QPoint(0, 0)).y()
+        was, self._list_top = getattr(self, "_list_top", None), top
+        if was is not None and top != was and self.isVisible():
+            sb = self.list_area.verticalScrollBar()
+            sb.setMaximum(max(sb.maximum(), sb.value() + top - was))   # (its range catches up)
+            sb.setValue(sb.value() + top - was)
 
     def _toolbar_parts(self) -> list[QWidget]:
         return [w for w in (self.modes_box, self.search, self.cat_pick, self.btn_share,
