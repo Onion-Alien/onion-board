@@ -16,6 +16,8 @@ none of which this app touches. This removes what the app never loads:
 - Qt's translations (the app has its own)
 - `opengl32sw.dll`: the software OpenGL fallback. Widgets draw with the CPU, so it
   never loads.
+- sounddevice's PortAudio builds for other systems (32-bit and ARM64 Windows, macOS):
+  the x64 one (and its ASIO twin) stays
 
 Usage: python scripts/prune_build.py dist/OnionBoard [--dry-run]
 Exit 1 if a kept file imports a DLL that would be missing afterwards, so a change in
@@ -47,6 +49,12 @@ DROP_FILES = ("opengl32sw.dll", "QtWebEngineProcess.exe", "pyside6qml.abi3.dll")
 DROP_DIRS = ("resources", "translations/qtwebengine_locales")
 # the FFmpeg libraries are kept only if the multimedia plugin still imports them
 DLL_CANDIDATES = ("qt6", "av", "sw")
+# sounddevice ships PortAudio for every system; on Windows it loads the one for the
+# Python it runs in (sysconfig's platform: win-amd64 here, x64 only), -asio when
+# SD_ENABLE_ASIO is set. The 32-bit, ARM64 and macOS builds never load.
+PORTAUDIO = "_internal/_sounddevice_data/portaudio-binaries"
+DROP_PORTAUDIO = ("libportaudio.dylib", "libportaudio32bit.dll", "libportaudio32bit-asio.dll",
+                  "libportaudioarm64.dll", "libportaudioarm64-asio.dll")
 
 
 def _imports_pefile(path: Path) -> list[str]:
@@ -106,6 +114,7 @@ def plan(app_dir: Path, imports_of: Callable[[Path], list[str]] = _imports_pefil
         if p.name not in KEEP_PLATFORMS:
             drop.append(p)
     drop += list((qt / "translations").glob("*.qm"))
+    drop += [app_dir / PORTAUDIO / n for n in DROP_PORTAUDIO if (app_dir / PORTAUDIO / n).exists()]
 
     # 3. DLLs nothing left behind imports
     dropped = {p.resolve() for p in drop}

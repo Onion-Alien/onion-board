@@ -142,7 +142,12 @@ Type: files; Name: "{app}\{#AppExeName}.exe.old*"
 Source: "..\dist\OnionBoard\_internal\*.dll"; DestDir: "{app}\_internal"; Flags: ignoreversion
 Source: "..\dist\OnionBoard\_internal\*.pyd"; DestDir: "{app}\_internal"; Flags: ignoreversion
 Source: "..\dist\OnionBoard\_internal\base_library.zip"; DestDir: "{app}\_internal"; Flags: ignoreversion
-Source: "..\dist\OnionBoard\*"; DestDir: "{app}"; Flags: ignoreversion recursesubdirs createallsubdirs; Excludes: "\{#AppExeName}.exe,\_internal\*.dll,\_internal\*.pyd,\_internal\base_library.zip"
+; Files with the same bytes as another (mostly the mic helper's own copy of Python) are
+; stored once: scripts\installer_dupes.py gives each copy an entry of its own naming the
+; file kept, which MergeDuplicateFiles stores once, and lists it in DupExcludes for the
+; entry below to skip. Every file still lands where it was. build.ps1 writes the list.
+#include "..\build\installer\dupes.iss"
+Source: "..\dist\OnionBoard\*"; DestDir: "{app}"; Flags: ignoreversion recursesubdirs createallsubdirs; Excludes: "\{#AppExeName}.exe,\_internal\*.dll,\_internal\*.pyd,\_internal\base_library.zip{#DupExcludes}"
 Source: "..\dist\OnionBoard\{#AppExeName}.exe"; DestDir: "{app}"; Flags: ignoreversion; BeforeInstall: MoveOldExeAside
 #endif
 ; The cable step runs first, before the files above are copied (see CurStepChanged), so it

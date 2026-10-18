@@ -74,6 +74,26 @@ def test_plan_keeps_what_is_reachable_and_drops_the_rest(tmp_path):
         assert keep not in names, keep
 
 
+def test_only_portaudio_builds_for_other_systems_go(tmp_path):
+    """sounddevice picks its PortAudio by the Python it runs in: the x64 build (and its
+    ASIO twin, for SD_ENABLE_ASIO) must stay, the 32-bit, ARM64 and macOS ones go."""
+    import platform
+    import sysconfig
+    app = make_tree(tmp_path)
+    pa = app / pb.PORTAUDIO
+    pa.mkdir(parents=True)
+    every = ("libportaudio64bit.dll", "libportaudio64bit-asio.dll", *pb.DROP_PORTAUDIO)
+    for n in every:
+        (pa / n).write_bytes(b"x")
+    drop, _problems = pb.plan(app, imports_of=fake_imports)
+    assert {p.name for p in drop if p.parent == pa} == set(pb.DROP_PORTAUDIO)
+    # what sounddevice loads in this Python, by its own rule
+    plat = sysconfig.get_platform()
+    suffix = "arm64" if "arm64" in plat or "aarch64" in plat else platform.architecture()[0]
+    for n in (f"libportaudio{suffix}.dll", f"libportaudio{suffix}-asio.dll"):
+        assert n not in pb.DROP_PORTAUDIO
+
+
 def test_plan_reports_a_kept_file_that_would_lose_an_import(tmp_path):
     app = make_tree(tmp_path)
     # a DLL slated for removal by name that a kept module still needs

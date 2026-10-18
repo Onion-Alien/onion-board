@@ -27,6 +27,44 @@ EXCLUDE = ("numpy", "PySide6", "shiboken6", "scipy", "sounddevice", "soundfile",
 # reinstalled over it, a PyInstaller upgrade) counts as stock: that works for any
 # PyInstaller version, where a list of stock hashes would go stale at the next upgrade.
 MARKER = "compiled-here.txt"
+# What the helper runs: never left out (the build stops if one can't load without EXCLUDE)
+NEEDS = ("soundboard.michelper", "soundboard.directmic", "soundboard.appaudio")
+# Imports every module of the soundboard package with EXCLUDE refused, as in the helper,
+# and prints those that fail. PyInstaller follows imports inside functions too, so
+# directmic's lazy `engine` and `appaudio` (applog -> the crash dialog -> all of the UI)
+# put the whole app in the helper: 276 modules, 6 MB, of which 18 can load there.
+PROBE = """
+import importlib, pathlib, sys
+EXCLUDE = set(sys.argv[1:])
+class Refuse:
+    def find_spec(self, name, path=None, target=None):
+        if name.partition(".")[0] in EXCLUDE:
+            raise ImportError(name)
+sys.meta_path.insert(0, Refuse())
+for p in sorted(pathlib.Path("soundboard").rglob("*.py")):
+    parts = p.with_suffix("").parts
+    name = ".".join(parts[:-1] if parts[-1] == "__init__" else parts)
+    try:
+        importlib.import_module(name)
+    except ImportError:
+        print(name)
+"""
+
+
+def unloadable() -> list[str]:
+    """The soundboard modules that can't be imported without EXCLUDE: in the helper an
+    import of one raises ImportError whether it's bundled or not, so it's left out (with
+    what only it imports). Every other module the helper reaches still ships."""
+    r = subprocess.run([sys.executable, "-c", PROBE, *EXCLUDE], cwd=ROOT, text=True,
+                       capture_output=True, timeout=300,
+                       env={**os.environ, "QT_QPA_PLATFORM": "offscreen"})
+    if r.returncode:
+        raise RuntimeError(f"probing the helper's imports failed:\n{r.stderr}")
+    dead = r.stdout.split()
+    if wrong := [m for m in NEEDS if m in dead]:
+        raise RuntimeError(f"{', '.join(wrong)} can't load without {', '.join(EXCLUDE)}: "
+                           "the helper needs it")
+    return dead
 BOOTLOADERS = ("run.exe", "runw.exe")
 
 
@@ -89,7 +127,7 @@ def build(clean: bool = False) -> int:
                 "--version-file", str(version_file()),
                 "--icon", str(ROOT / "assets" / "onionboard.ico"),
                 "--add-binary", f"{DLL}{os.pathsep}directmic", "--paths", str(ROOT)]
-    for mod in EXCLUDE:
+    for mod in (*EXCLUDE, *unloadable()):
         spec_cmd += ["--exclude-module", mod]
     # PyInstaller finds DLLs on PATH too: only Windows' own (as build.ps1 does)
     env = {**os.environ, "PATH": os.pathsep.join(
@@ -124,6 +162,14 @@ def build(clean: bool = False) -> int:
                        creationflags=0x08000000)  # CREATE_NO_WINDOW
     if r.returncode:
         print(f"the built mic helper failed its self-test ({r.returncode})", file=sys.stderr)
+        return 1
+    # appaudio is imported only on the way (a mic's silence check): the self-test
+    # doesn't reach it, so look in the archive for what the helper runs
+    from PyInstaller.archive.readers import CArchiveReader
+    have = CArchiveReader(str(folder / "obmichelper.pkg")).open_embedded_archive(
+        "PYZ.pyz").toc
+    if missing := [m for m in NEEDS if m not in have]:
+        print(f"the built mic helper lacks {', '.join(missing)}", file=sys.stderr)
         return 1
     (folder / michelper.STAMP).write_text(michelper.make_stamp(DLL), encoding="ascii")
     michelper.write_manifest(folder)   # last: it lists the stamp too

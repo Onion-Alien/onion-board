@@ -227,13 +227,16 @@ app at start with "The specified procedure could not be found"; it also deletes 
 ICU DLL another program on PATH slipped in, as Qt uses Windows' own; PyInstaller
 itself runs with only Windows' folders on PATH),
 `scripts\prune_build.py` (removes the parts of Qt the app never loads — QML, 3D,
-charts, the web engine, unused image formats, translations — by walking the DLL import tables; the
-build fails if a kept file would lose an import), `OnionBoard.exe --selftest` (the
+charts, the web engine, unused image formats, translations — by walking the DLL import tables, and
+sounddevice's PortAudio builds for other systems; the build fails if a kept file would lose
+an import), `OnionBoard.exe --selftest` (the
 trimmed app loads Qt, Multimedia and the audio stack headless, no window
 or device), licence files,
 the add-ons in `modules\` copied into `dist\OnionBoard\modules\` (all but
 `ai-voices`, which has its own release), `scripts\pictures\make_bunny.py` (renders the installer artwork
-`installer\wizard*.bmp`, gitignored), then `ISCC` with `/DAppVersion` taken from
+`installer\wizard*.bmp`, gitignored), `scripts\installer_dupes.py` (files with the
+same bytes as another, mostly the mic helper's own Python, go into the installer once;
+every copy still installs where it was), then `ISCC` with `/DAppVersion` taken from
 `soundboard/__init__.py`. Bump `__version__` there for a release.
 
 **When to build.** Not to try a change: `scripts\run.bat` runs from source. Build for a
