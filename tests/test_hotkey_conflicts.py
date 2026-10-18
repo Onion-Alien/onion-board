@@ -171,3 +171,15 @@ def test_auto_ptt_goes_down_with_the_sound_not_on_the_next_tick(window, qapp, mo
     monkeypatch.setattr(window.engine, "main_stream", _Out())
     window.playctl.play("s0")
     assert keys == [("press", "v")] and window._ptt_held == "v"
+
+
+def test_the_overlay_page_names_its_hotkey(window, qapp):  # noqa: F811
+    """Settings > Overlay is built after Hotkeys: its hotkey button still says the key
+    (it was blank)."""
+    from soundboard.ui.settingspages.keys import pretty_key
+    window.cfg.overlay_hotkey = "alt+`"
+    d = window.setctl.open_settings("hotkeys")
+    d.show_page("overlay")
+    qapp.processEvents()
+    buttons = d.hk_buttons["overlay_hotkey"]
+    assert buttons and all(b.text() == pretty_key("alt+`") for b in buttons)
