@@ -28,7 +28,7 @@ def run(mod: str, **env) -> list[str]:
 
 
 @pytest.mark.windows   # starts the app in a child process
-@pytest.mark.parametrize("entry", ["main", "soundboard.core.app", "soundboard.directmic"])
+@pytest.mark.parametrize("entry", ["main", "soundboard.core.app", "soundboard.mic.directmic"])
 def test_starting_the_app_caps_the_maths_threads(entry):
     # main.py (the shortcuts, the frozen exe), python -m soundboard, the admin helpers
     assert run(entry) == [soundboard.BLAS_THREADS, "1"]

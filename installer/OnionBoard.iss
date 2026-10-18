@@ -12,7 +12,7 @@
 ;     since the app never starts it while offline)
 ;   - a "Pick what you want" page of checkboxes:
 ;       * the free VB-Cable virtual cable, unticked: sounds go straight into the mic
-;         by default (soundboard/directmic.py, set up by the app's Quick setup), and
+;         by default (soundboard/mic/directmic.py, set up by the app's Quick setup), and
 ;         the cable is only the fallback way (downloaded from vb-audio.com,
 ;         signature-checked by install-vbcable.ps1; Windows asks "Yes" once)
 ;       * FFmpeg for m4a / aac / video files (via winget; hidden when ffmpeg is
@@ -1009,7 +1009,7 @@ begin
   Result := CableNeedsRestart;
 end;
 
-// Straight into my mic's effect still on a mic (soundboard/directmic.py's notes)
+// Straight into my mic's effect still on a mic (soundboard/mic/directmic.py's notes)
 function MicEffectLeft: Boolean;
 var
   Root: Integer;

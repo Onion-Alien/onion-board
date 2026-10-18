@@ -6,7 +6,8 @@ import time
 from conftest import process_events
 from test_mainwindow import window  # noqa: F401 - the real window, offscreen
 
-from soundboard import appaudio, directmic
+from soundboard import appaudio
+from soundboard.mic import directmic
 from soundboard.ui import tickcontrol, windowbuild
 
 

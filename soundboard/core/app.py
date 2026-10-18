@@ -535,7 +535,7 @@ def _selftest_addon_cmd(rest: list[str]) -> int:
 # tests/test_bootmark.py checks both, so add a new one-off command here, never as its
 # own `if` in main().
 def _discord_restore_cmd(rest):
-    from soundboard import discordtalk
+    from soundboard.mic import discordtalk
     return discordtalk.cli(rest)
 
 

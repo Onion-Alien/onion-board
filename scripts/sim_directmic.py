@@ -1,6 +1,6 @@
 """Simulate the mic effect's admin install / uninstall and hammer it with failures.
 
-Runs the real `soundboard/directmic.py` code (admin_install / admin_uninstall /
+Runs the real `soundboard/mic/directmic.py` code (admin_install / admin_uninstall /
 _install_endpoint / _uninstall_endpoint) against the fake registry from
 `tests/test_directmic.py`, killing it at every single registry write, and checks the
 invariants: a mic always ends up exactly as it started, one mic that won't go back
@@ -10,7 +10,7 @@ real registry, audio devices or mic.
     .venv\\Scripts\\python scripts\\sim_directmic.py
 
 Exit 0 = every scenario passed, 1 = something failed (printed). Run it after changing
-the mic effect's admin install/uninstall or the ring layout (soundboard/directmic.py),
+the mic effect's admin install/uninstall or the ring layout (soundboard/mic/directmic.py),
 before opening the PR: the pytest suite covers the normal paths, this covers the ones
 cut off half-way (a crash, a reboot) that are hard to reach by hand.
 """
@@ -25,7 +25,7 @@ ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(ROOT))
 sys.path.insert(0, str(ROOT / "tests"))
 
-import soundboard.directmic as dm   # noqa: E402
+import soundboard.mic.directmic as dm   # noqa: E402
 import test_directmic as t          # noqa: E402
 
 FAILS: list[str] = []
@@ -91,14 +91,14 @@ def nonempty(reg):
     return {k: dict(v) for k, v in reg.keys.items() if v}
 
 
-# A stand-in for the helper's task (soundboard/michelper.py serve()), as its own
+# A stand-in for the helper's task (soundboard/mic/michelper.py serve()), as its own
 # process on a temporary queue: it stops dead at STOP (the parent kills it there) and
 # logs each admin step it would have run.
 HELPER = """\
 import sys, time
 from pathlib import Path
 sys.path.insert(0, {root!r})
-from soundboard import michelper as mh
+from soundboard.mic import michelper as mh
 queue, stop = Path(sys.argv[1]), sys.argv[2]
 mh.queue_dir = lambda: queue
 
@@ -139,7 +139,7 @@ def helper_kills():
     import subprocess
     import time
 
-    from soundboard import michelper as mh
+    from soundboard.mic import michelper as mh
     guid = "{11111111-2222-3333-4444-555555555555}"
     saved = mh.queue_dir, mh._schtasks, mh.STALE_S, mh.START_S
     mh.STALE_S, mh.START_S = 2.0, 5.0

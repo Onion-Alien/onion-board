@@ -24,7 +24,8 @@ from PySide6.QtWidgets import (QBoxLayout, QButtonGroup, QCheckBox, QDialog, QFr
 from shiboken6 import isValid as qt_valid
 
 from soundboard.core import errors, usage
-from soundboard import savedvoices, theme, voicefx
+from soundboard.mic import savedvoices
+from soundboard import theme, voicefx
 from soundboard.speech import aipreview
 from soundboard.ui import art, busy, icons
 from soundboard.ui.aivoicebrowser import HEAR, MAKING, hear_button
@@ -793,7 +794,7 @@ class VoiceFxPanel(QWidget):
                  play_sample: Callable[[np.ndarray], object] | None = None):
         super().__init__()
         # your saved voices (Fine-tune -> "Save as a voice"): their own file, see
-        # soundboard.savedvoices
+        # soundboard.mic.savedvoices
         self.store = store if store is not None else savedvoices.Store()
         # the board's sounds for the Background card's "Add a sound from my board":
         # [(id, name, categories)], set by the main window

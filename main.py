@@ -12,8 +12,8 @@ if __name__ == "__main__" and sys.argv[1:2] == ["--firewall-rule"]:
     sys.exit(cli(sys.argv[2:]))
 
 if __name__ == "__main__" and sys.argv[1:2] == ["--direct-mic"]:
-    # the admin copy that installs / removes the mic effect (soundboard.directmic), no app
-    from soundboard.directmic import cli as direct_mic_cli
+    # the admin copy that installs / removes the mic effect (soundboard.mic.directmic), no app
+    from soundboard.mic.directmic import cli as direct_mic_cli
     sys.exit(direct_mic_cli(sys.argv[2:]))
 
 if __name__ == "__main__" and sys.argv[1:2] == ["--ytdl-worker"]:

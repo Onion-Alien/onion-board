@@ -1,5 +1,5 @@
 // The sound store's server: a Cloudflare Worker with the sounds' files in Workers KV
-// and the list, votes and reports in D1 (both on the free plan, no card needed). Onion Board's Store tab (soundboard/store.py) talks
+// and the list, votes and reports in D1 (both on the free plan, no card needed). Onion Board's Store tab (soundboard/online/store.py) talks
 // to the /v1 routes; the owner approves uploads on /admin.
 //
 // Nothing here knows who anyone is. The app sends a random install id it made itself
@@ -29,7 +29,7 @@ const PENDING_CAP = 1000;            // a full review queue refuses new uploads
 const PENDING_BYTES = 300 << 20;     // ... and so do 300 MB of waiting files (KV's free plan holds 1 GB)
 const AGREEMENT = "own-cc0-v1";      // the version of the upload agreement accepted
 const LINK_AGREEMENT = "link-v1";    // a shared link: only the link is kept
-// the sites a link may point at (as the app's soundboard/sourceinfo.py): never a file host
+// the sites a link may point at (as the app's soundboard/sounds/sourceinfo.py): never a file host
 const LINK_SITES = ["youtube.com", "youtu.be", "music.youtube.com", "tiktok.com",
   "soundcloud.com", "instagram.com", "twitter.com", "x.com", "reddit.com", "twitch.tv",
   "vimeo.com", "bandcamp.com", "myinstants.com", "streamable.com", "dailymotion.com"];

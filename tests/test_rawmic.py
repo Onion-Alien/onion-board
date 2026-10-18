@@ -1,4 +1,4 @@
-"""Apps recording the mic without Onion Board (soundboard.rawmic): the count check, and
+"""Apps recording the mic without Onion Board (soundboard.mic.rawmic): the count check, and
 its line on the real MainWindow's urgent bar (offscreen). Windows isn't asked: the
 session list and the effect's stream count are fed in."""
 import threading
@@ -6,7 +6,7 @@ from types import SimpleNamespace
 
 import pytest
 
-from soundboard import rawmic
+from soundboard.mic import rawmic
 from soundboard.appaudio import App
 from test_mainwindow import window as main_window  # noqa: F401 - the real window, offscreen
 

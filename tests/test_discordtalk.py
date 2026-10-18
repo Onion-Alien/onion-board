@@ -1,4 +1,4 @@
-"""Putting Discord back the way you talk on quit (soundboard.discordtalk): LevelDB's log
+"""Putting Discord back the way you talk on quit (soundboard.mic.discordtalk): LevelDB's log
 format, the write into a fake Discord folder (never the real one: conftest), what's put
 back and when nothing is touched, and the board remembering how you talk."""
 import json
@@ -6,8 +6,8 @@ import struct
 
 import pytest
 
-from soundboard import discordcfg as dc
-from soundboard import discordtalk as dt
+from soundboard.mic import discordcfg as dc
+from soundboard.mic import discordtalk as dt
 from test_mainwindow import window  # noqa: F401 - the real window, offscreen
 
 SOUND = {"activeInputProfile": "CUSTOM", "noiseCancellation": False,

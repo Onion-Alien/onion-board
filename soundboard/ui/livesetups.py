@@ -1,10 +1,10 @@
-"""My setups in Live controls: a voice setup (soundboard.voicesetups) on every sound, on
+"""My setups in Live controls: a voice setup (soundboard.mic.voicesetups) on every sound, on
 the radio or on the programs the Apps tab sends.
 
 Its voice changer part is live, so it's on at once. Its AI voice takes a while:
 
 - the radio and programs are held back (silence) while the AI voice's helper starts,
-  then go on in the new voice (soundboard.livesetup.StreamVoice);
+  then go on in the new voice (soundboard.mic.livesetup.StreamVoice);
 - a sound is made again in the AI voice before it plays (its own effects kept, a
   render cached like Edit sound's: renderworker), one sound at a time. A sound that
   was playing pauses meanwhile and goes on from the same place.
@@ -35,7 +35,8 @@ from PySide6.QtCore import QTimer, Signal
 from PySide6.QtWidgets import QMessageBox
 
 from soundboard.core import errors, langnames, usage
-from soundboard import livesetup, renderworker, soundfx, voicesetups
+from soundboard.mic import livesetup, voicesetups
+from soundboard import renderworker, soundfx
 from soundboard.sounds import library
 from soundboard.i18n import _
 from soundboard.ui import worker

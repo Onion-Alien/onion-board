@@ -551,7 +551,7 @@ settings stay in
 ## What *Straight into my mic* changes on your PC
 
 Sounds reach Discord and games through your own mic by default: a small Windows audio
-effect (`native/directmic/obmic.cpp`, built from source with the app; `soundboard/directmic.py`)
+effect (`native/directmic/obmic.cpp`, built from source with the app; `soundboard/mic/directmic.py`)
 mixes them into the mic. It's the one part of the app that needs admin, and it never
 goes online.
 

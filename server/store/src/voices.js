@@ -5,7 +5,7 @@
 // that safe is that nothing sent is ever kept as sent: every field is checked against
 // what the app can use and the voice is rebuilt from those checked fields alone
 // (unknown keys dropped, every number finite and bounded, names one plain line of
-// text). The app checks it all again when it takes a voice in (soundboard/storevoices.py).
+// text). The app checks it all again when it takes a voice in (soundboard/online/storevoices.py).
 // Enough reports from different addresses hide one until the owner looks at it.
 
 export const KINDS = ["fx", "ai", "setup"];

@@ -1,4 +1,4 @@
-"""The mic helper (soundboard/michelper.py): the admin steps of the mic effect without
+"""The mic helper (soundboard/mic/michelper.py): the admin steps of the mic effect without
 Windows' prompt each time. Nothing here touches Task Scheduler or Program Files: the
 conftest guard points the helper's folders into tmp_path and fails any schtasks call."""
 from __future__ import annotations
@@ -15,8 +15,8 @@ from pathlib import Path
 
 import pytest
 
-from soundboard import directmic as dm
-from soundboard import michelper as mh
+from soundboard.mic import directmic as dm
+from soundboard.mic import michelper as mh
 
 GUID = "{0f1e2d3c-4b5a-6978-8796-a5b4c3d2e1f0}"
 SID = "S-1-5-21-1111111111-2222222222-3333333333-1001"
@@ -40,7 +40,9 @@ ADMIN_DIGEST = {3: "89146326524eb7d36f3526e5f7b561046e846aa1ef2afccecba4c37132f4
                13: "2b9a8b2aa795c38c77edac07e71c306a9011b81e2df7e37c9137d5699167b47c",
                14: "d4c592e4156e26c16ab50fa4674833da0e125264091e8ac31bc52c69abec9c3b",
                15: "ea2dc4a0f029bf08234ab38dbcd610cff162e69fa15c42aabdb293dc3f368abd",
-               16: "c2e3bd02588321330f74c7c4acb0281c939fbaafde9e5821279f9b9e355d1fd0"}
+               # 16 again when the modules moved into soundboard/mic/: only import paths
+               # and comments changed, so installed helpers needn't update (no UAC prompt)
+               16: "87b27454c47ca0169def26818f4ed3be117eb6ef69f19c99f4e323dc2d54d823"}
 
 
 def _queue():
@@ -697,7 +699,7 @@ def test_admin_logs_stay_small(tmp_path, monkeypatch):
     dm.log_to(path)
     try:
         for i in range(200):
-            logging.getLogger("soundboard.directmic").warning("line %d %s", i, "x" * 40)
+            logging.getLogger("soundboard.mic.directmic").warning("line %d %s", i, "x" * 40)
     finally:
         for h in root.handlers:
             h.close()
@@ -726,7 +728,7 @@ def test_the_admin_part_runs_without_numpy():
     helper that failed with "No module named 'numpy'", so a mic left silent was never
     restarted again)."""
     code = ("import sys; sys.modules['numpy'] = None\n"
-            "from soundboard import directmic as dm, michelper as mh\n"
+            "from soundboard.mic import directmic as dm, michelper as mh\n"
             "assert dm.np is None and len(dm.new_ring_bytes()) == dm.FILE_BYTES\n"
             "assert mh.allowed(['uninstall'])\n"
             "from soundboard import appaudio\n"
@@ -746,10 +748,10 @@ def test_ring_bytes_match_the_layout():
 
 
 def admin_source_digest() -> str:
-    src = (ROOT / "soundboard" / "directmic.py").read_text(encoding="utf-8")
+    src = (ROOT / "soundboard" / "mic" / "directmic.py").read_text(encoding="utf-8")
     rule = "# " + "-" * 70 + " "
     start, end = src.index(rule + "admin part"), src.index(rule + "the app's side")
-    helper = (ROOT / "soundboard" / "michelper.py").read_text(encoding="utf-8")
+    helper = (ROOT / "soundboard" / "mic" / "michelper.py").read_text(encoding="utf-8")
     text = (src[start:end] + helper).replace("\r\n", "\n")
     return hashlib.sha256(text.encode()).hexdigest()
 
@@ -958,7 +960,7 @@ def test_a_tampered_bundled_build_is_refused(helper_setup, caplog):
     step itself still worked (through Windows' prompt)."""
     calls, _registered = helper_setup
     (mh.bundled_helper() / mh.EXE_NAME).write_bytes(b"MZ evil")
-    with caplog.at_level(logging.WARNING, logger="soundboard.michelper"):
+    with caplog.at_level(logging.WARNING, logger="soundboard.mic.michelper"):
         assert not mh.install_helper()
     assert "manifest" in caplog.text
     assert not (mh.helper_dir() / mh.EXE_NAME).exists() and "/create" not in calls

@@ -60,7 +60,7 @@ def test_setup_wizard_last_page_text_is_not_squashed(qapp, wizard):  # noqa: F81
 
 
 def test_setup_wizard_last_page_fits_straight_into_the_mic(qapp, wizard, monkeypatch):  # noqa: F811
-    from soundboard import directmic
+    from soundboard.mic import directmic
     w, wiz = wizard
     w.cfg.route = "mic"
     monkeypatch.setattr(directmic, "status", lambda name=None: "ready")

@@ -18,7 +18,8 @@ from PySide6.QtWidgets import (QButtonGroup, QFrame, QHBoxLayout, QLabel, QPushB
 
 from soundboard.addons import modules as mods
 from soundboard.core import langnames, usage
-from soundboard import savedvoices, theme, voicefx, voicesetups
+from soundboard.mic import savedvoices, voicesetups
+from soundboard import theme, voicefx
 from soundboard.online import net
 from soundboard.speech import spoken, translation
 from soundboard.speech.aivoice import AiVoiceController

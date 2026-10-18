@@ -95,7 +95,7 @@ def test_a_working_cable_offers_the_mic_as_a_plain_option(wizard, monkeypatch):
     # "Installed and connected" with the big set-up button under it read as "set it up
     # again"; and a mic set-up that failed still ended Bun's show as a win (the cable
     # worked)
-    from soundboard import directmic
+    from soundboard.mic import directmic
     w, wiz = wizard
     wiz.show()
     wiz.go(2)
@@ -114,7 +114,7 @@ def test_a_working_cable_offers_the_mic_as_a_plain_option(wizard, monkeypatch):
 def test_mic_already_set_up_is_used_not_offered_again(wizard, monkeypatch):
     # on the cable with the mic effect already working: the page said "Installed and
     # connected" and offered to set the mic up again
-    from soundboard import directmic
+    from soundboard.mic import directmic
     w, wiz = wizard
     monkeypatch.setattr(directmic, "status", lambda name=None: "ready")
     asked = []
@@ -524,7 +524,7 @@ def mic_wizard(qapp, app_dir, devices, monkeypatch):
 
 
 def test_new_users_are_offered_their_mic_first(mic_wizard, monkeypatch):
-    from soundboard import directmic
+    from soundboard.mic import directmic
     w, wiz = mic_wizard
     assert w.cfg.route == "mic"
     wiz.go(wiz.base + 2)
@@ -564,7 +564,7 @@ def test_next_on_the_send_step_puts_the_sounds_in_the_mic(mic_wizard, monkeypatc
 
 
 def test_a_repair_is_offered_as_one(mic_wizard, monkeypatch):
-    from soundboard import directmic
+    from soundboard.mic import directmic
     _, wiz = mic_wizard
     monkeypatch.setattr(directmic, "status", lambda name=None: "wiped")
     wiz.go(wiz.base + 2)
@@ -603,7 +603,7 @@ def test_a_mic_set_up_finishing_after_the_guide_closed_is_ignored(qapp, app_dir,
 
 
 def test_mic_attach_plays_show_in_wizard_without_blocking_buttons(mic_wizard, monkeypatch):
-    from soundboard import directmic
+    from soundboard.mic import directmic
     w, wiz = mic_wizard
     wiz.show()
     wiz.go(wiz.base + 2)
@@ -676,7 +676,7 @@ def test_the_real_mic_set_up_holds_the_guide_until_it_ends(mic_wizard, qapp, mon
     let it go), then success or failure. All the while Back, Next, Esc and the X
     do nothing; once it ends, either way, they all work again."""
     import threading
-    from soundboard import directmic
+    from soundboard.mic import directmic
     w, wiz = mic_wizard
     release = threading.Event()
 
@@ -756,7 +756,7 @@ def test_back_and_next_never_stretch_the_guide(mic_wizard, qapp):
 def test_a_fold_shut_again_puts_the_guide_back(mic_wizard, qapp, monkeypatch):
     """Near the screen's bottom, opening the Discord tip moves the guide up to fit;
     shutting it puts it back where it was (it walked up the screen click by click)."""
-    from soundboard import directmic
+    from soundboard.mic import directmic
     from soundboard.ui import fit
     monkeypatch.setattr(directmic, "works", lambda *a: True)
     w, wiz = mic_wizard
@@ -793,7 +793,7 @@ def test_a_fold_shut_again_puts_the_guide_back(mic_wizard, qapp, monkeypatch):
 def test_other_ways_card_explains_and_works(mic_wizard, monkeypatch):
     """On the mic: the cable and another device are optional, in their own card with
     what each is for; Pick a device opens the device list in its place."""
-    from soundboard import directmic
+    from soundboard.mic import directmic
     w, wiz = mic_wizard
     monkeypatch.setattr(directmic, "status", lambda name=None: "ready")
     wiz.go(wiz.base + 2)
@@ -816,7 +816,7 @@ def test_switching_off_a_working_driver_asks_first(mic_wizard, monkeypatch):
     Tell us why opens the feedback box, Use the cable switches."""
     from PySide6.QtCore import Qt
     from PySide6.QtTest import QTest
-    from soundboard import directmic
+    from soundboard.mic import directmic
     from soundboard.ui import feedbackdialog
     w, wiz = mic_wizard
     monkeypatch.setattr(directmic, "status", lambda name=None: "ready")
@@ -839,7 +839,7 @@ def test_switching_off_a_working_driver_asks_first(mic_wizard, monkeypatch):
 
 
 def test_cable_without_a_working_driver_isnt_questioned(mic_wizard, monkeypatch):
-    from soundboard import directmic
+    from soundboard.mic import directmic
     w, wiz = mic_wizard
     monkeypatch.setattr(directmic, "status", lambda name=None: "missing")
     wiz.go(wiz.base + 2)
@@ -848,7 +848,7 @@ def test_cable_without_a_working_driver_isnt_questioned(mic_wizard, monkeypatch)
 
 
 def test_status_card_says_each_state_plainly(mic_wizard, monkeypatch):
-    from soundboard import directmic
+    from soundboard.mic import directmic
     _, wiz = mic_wizard
     state = {"s": "missing"}
     monkeypatch.setattr(directmic, "status", lambda name=None: state["s"])
@@ -866,7 +866,7 @@ def test_discord_tip_folds_away(mic_wizard, monkeypatch):
     """On the mic, Discord needs nothing picked, but its noise filter (on by default)
     wipes sounds out: its tip starts open under its heading, which shuts it. On the
     cable Discord's steps are needed, so nothing folds."""
-    from soundboard import directmic
+    from soundboard.mic import directmic
     w, wiz = mic_wizard
     monkeypatch.setattr(directmic, "status", lambda name=None: "ready")
     wiz.go(wiz.base + 3)
@@ -887,7 +887,7 @@ def test_discord_tip_folds_away(mic_wizard, monkeypatch):
 
 def test_discord_pill_is_only_as_wide_as_its_words(mic_wizard, monkeypatch):
     from PySide6.QtWidgets import QSizePolicy
-    from soundboard import directmic
+    from soundboard.mic import directmic
     _, wiz = mic_wizard
     monkeypatch.setattr(directmic, "status", lambda name=None: "ready")
     wiz.show()
@@ -917,7 +917,7 @@ def test_cards_line_up_with_back_and_next(mic_wizard, monkeypatch, qapp):
     """The cards' and tiles' edges are Back's left and Next's right (the pages used
     to add their own inset: everything sat 9 px in from the buttons)."""
     from PySide6.QtCore import QPoint
-    from soundboard import directmic
+    from soundboard.mic import directmic
     _, wiz = mic_wizard
     monkeypatch.setattr(directmic, "status", lambda name=None: "ready")
     wiz.show()
@@ -985,7 +985,7 @@ def test_test_sound_card_and_a_lone_option_span_the_page(mic_wizard, monkeypatch
     """The test sound's card is the page's width (it ended at a spot nothing lined up
     with), and with the device list open the cable's tile fills the optional card's
     row instead of sitting at half width beside a hole."""
-    from soundboard import directmic
+    from soundboard.mic import directmic
     _, wiz = mic_wizard
     monkeypatch.setattr(directmic, "status", lambda name=None: "ready")
     wiz.show()
@@ -1185,7 +1185,7 @@ def test_last_step_never_shows_an_empty_box(wizard, devices, monkeypatch, route,
                                             mic_state, cable):
     """The last step's Discord card shows only with something in it (it was an empty
     box between the words and the closing line when the mic wasn't set up yet)."""
-    from soundboard import directmic
+    from soundboard.mic import directmic
     w, wiz = wizard
     devices["cable"] = cable
     monkeypatch.setattr(directmic, "status", lambda name=None: mic_state)
@@ -1205,7 +1205,7 @@ def test_last_step_never_shows_an_empty_box(wizard, devices, monkeypatch, route,
 def test_the_send_step_says_the_mic_works_before_what_is_missing(mic_wizard, monkeypatch):
     """Step 1 heard you; the send step, not set up, says the mic works (green) above
     "Your sounds aren't in your mic yet", so it can't read as the mic breaking."""
-    from soundboard import directmic
+    from soundboard.mic import directmic
 
     class _S:
         def stop(self):
@@ -1231,7 +1231,7 @@ def test_discord_reads_keep_one_thread(mic_wizard, monkeypatch, qapp):
     import threading
 
     from conftest import process_events
-    from soundboard import discordcfg
+    from soundboard.mic import discordcfg
     _, wiz = mic_wizard
     threads = []
     monkeypatch.setattr(discordcfg, "signature",

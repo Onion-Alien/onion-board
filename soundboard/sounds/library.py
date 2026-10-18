@@ -173,7 +173,7 @@ TOR_BRIDGES = ("", "snowflake", "obfs4")   # soundboard.online.tor.BRIDGES
 #   device - any output picked by hand (Voicemeeter, a mixer, a second sound card, a
 #            device OBS captures): no cable needed, and none is picked in its place
 #   off    - nowhere: sounds play in your headphones (and the stream output) only
-#   mic    - straight into your real mic (the mic effect, soundboard.directmic): Discord
+#   mic    - straight into your real mic (the mic effect, soundboard.mic.directmic): Discord
 #            and games keep their normal mic, no cable. New users start with it
 #            (Config.first_start); the cable is the fallback.
 ROUTES = ("cable", "device", "off", "mic")
@@ -270,7 +270,7 @@ def clean_setting(k: str, v):
                 for g in v):
             return None
         return [min(max(float(g), -EQ_MAX_DB), EQ_MAX_DB) for g in v]
-    if k == "dest":   # {"mode": key, "custom": [mode dicts]} (soundboard.destination)
+    if k == "dest":   # {"mode": key, "custom": [mode dicts]} (soundboard.mic.destination)
         v = dict(v)
         if not isinstance(v.get("mode", ""), str):
             v.pop("mode")
@@ -429,7 +429,7 @@ class Config:
     eq_target: str = "voice"          # voice | sounds | all
     eq_preset: str = "Flat (off)"
     eq_gains: list[float] = field(default_factory=lambda: [0.0] * 7)
-    dest: dict = field(default_factory=dict)   # who's listening (soundboard.destination)
+    dest: dict = field(default_factory=dict)   # who's listening (soundboard.mic.destination)
     send_mono: bool = True    # phase-aware mono for the send device (sendfx.SmartMono)
     duck_db: float = -12.0    # lower the sounds this much while you talk; 0 = off
     duck_on: bool = False     # ducking was switched on once for older settings (from_raw)
@@ -486,7 +486,7 @@ class Config:
     tips_seen: list = field(default_factory=list)
     tip_day: str = ""
     voice_discord_tip_shown: bool = False   # "Got it" on the voice changer's Studio notice
-    # set up for the app you're using (soundboard.appsetup): ask, apps {exe: simple mode},
+    # set up for the app you're using (soundboard.mic.appsetup): ask, apps {exe: simple mode},
     # never [exe]. Older versions keep it untouched
     app_setup: dict = field(default_factory=dict)
     voice_fx: dict = field(default_factory=dict)   # voice changer (see ui.voicepanel)

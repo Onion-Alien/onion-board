@@ -16,7 +16,8 @@ from typing import TYPE_CHECKING
 from PySide6.QtCore import Qt, QTimer
 from PySide6.QtWidgets import QApplication, QMessageBox
 
-from soundboard import directmic, michelper, theme, voicesdk
+from soundboard.mic import directmic, michelper, voicesdk
+from soundboard import theme
 from soundboard.core import errors, usage
 from soundboard.online import net
 from soundboard import engine as eng
@@ -116,7 +117,7 @@ class MicControl(Controller):
     @staticmethod
     def _cable_ends(main: str | None, vm: str | None) -> list:
         """The ends of the cable `main` -> `vm` with their formats (a COM call: any thread)."""
-        from soundboard import cableformat
+        from soundboard.mic import cableformat
         try:
             return cableformat.pair(cableformat.cable_ends(), main, vm) if vm else []
         except Exception:  # noqa: BLE001 - only a hint
@@ -132,7 +133,7 @@ class MicControl(Controller):
     def fix_cable_format(self, quiet: bool = False) -> bool:
         """Put both ends of the cable on 48 kHz, then reopen the streams at the new rate."""
         mw = self.mw
-        from soundboard import cableformat
+        from soundboard.mic import cableformat
         self._check_cable_format()
         if not self.cable_bad:
             return True
@@ -567,7 +568,7 @@ class MicControl(Controller):
         mw = self.mw
         if mw._vb_setup_asking:
             return
-        from soundboard import cableremove
+        from soundboard.mic import cableremove
         mw._vb_setup_asking = True
         worker.run(lambda: cableremove.setup_exe() is not None, mw.cable_setup_found,
                    "cable-setup", error=False, owner=mw)
@@ -585,7 +586,7 @@ class MicControl(Controller):
         mw = self.mw
         if busy.is_busy(mw.btn_rmcable):
             return
-        from soundboard import cableremove
+        from soundboard.mic import cableremove
         self._rmcable_release = busy.hold(mw.btn_rmcable,
                                           _("Removing… click Yes when Windows asks"))
         worker.run(lambda: cableremove.remove() or "", mw.cable_removed, "cable-remove",

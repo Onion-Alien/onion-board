@@ -1,7 +1,7 @@
 """Who's listening (on the Setup tab, and in Settings -> Audio): the simple modes
-(Game, Voice chat, Clean, Advanced: soundboard.profiles) that pick the destination
+(Game, Voice chat, Clean, Advanced: soundboard.mic.profiles) that pick the destination
 mode shaping the sounds bus for the voice chat on the other end
-(soundboard.destination), Advanced's full picker, and an editor for custom modes
+(soundboard.mic.destination), Advanced's full picker, and an editor for custom modes
 (describe any other codec by the same knobs)."""
 from __future__ import annotations
 
@@ -12,8 +12,8 @@ from PySide6.QtWidgets import (QButtonGroup, QCheckBox, QComboBox, QDialog, QDia
                                QFormLayout, QFrame, QHBoxLayout, QLabel, QLineEdit, QMenu,
                                QPushButton, QSlider, QVBoxLayout, QWidget)
 
-from soundboard import destination, profiles, voicesdk
-from soundboard.destination import CEILINGS, LOWCUTS, Dest
+from soundboard.mic import destination, profiles, voicesdk
+from soundboard.mic.destination import CEILINGS, LOWCUTS, Dest
 from soundboard.ui import fit, icons
 from soundboard.ui.panel import (EmptyList, Flow, UndoBar, hint_label, icon_button,
                                  info_button)

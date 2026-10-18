@@ -1,7 +1,7 @@
 import numpy as np
 
-from soundboard import destination
-from soundboard.destination import BUILTIN, OFF, Dest, Processor, all_modes, resolve
+from soundboard.mic import destination
+from soundboard.mic.destination import BUILTIN, OFF, Dest, Processor, all_modes, resolve
 
 RATE = 48000
 
@@ -205,7 +205,7 @@ def test_one_mode_per_voice_engine_and_old_keys_still_resolve():
         assert d.note and len(d.label) <= 40, d.key
     assert {d.key: d.ceiling for d in BUILTIN if d.ceiling} == {
         "steam": 12000, "unity": 12000, "game_lo": 8000}
-    from soundboard import voicesdk
+    from soundboard.mic import voicesdk
     assert set(voicesdk.SIGNATURES.values()) <= set(destination.BUILTIN_BY_KEY)
     assert set(voicesdk.NAMES) <= set(destination.BUILTIN_BY_KEY)
     assert {k for k, _ in voicesdk.VOICE_APPS.values()} <= set(destination.BUILTIN_BY_KEY)

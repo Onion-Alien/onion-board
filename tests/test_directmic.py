@@ -1,4 +1,4 @@
-"""Straight into my mic (soundboard.directmic + native/directmic/obmic.cpp).
+"""Straight into my mic (soundboard.mic.directmic + native/directmic/obmic.cpp).
 
 The end-to-end tests run the real mic effect DLL in testhost.exe (built by
 scripts/build_directmic.py --testhost), which loads it the way Windows' audio engine
@@ -18,7 +18,7 @@ import pytest
 
 from conftest import own_module, real_pc_timing, said
 from soundboard.ui import toast
-from soundboard import directmic as dm
+from soundboard.mic import directmic as dm
 from test_mainwindow import window  # noqa: F401  (fixture)
 
 _REAL_ELEVATED = dm._elevated   # (before the conftest guard replaces it)
@@ -2079,7 +2079,7 @@ def test_same_dll(tmp_path):
 
 
 def test_uninstaller_asks_nothing_when_nothing_is_installed(monkeypatch):
-    from soundboard import michelper
+    from soundboard.mic import michelper
     monkeypatch.setattr(dm, "anything_installed", lambda: False)
     monkeypatch.setattr(michelper, "leftover", lambda: False)   # no helper either
     assert dm.cli(["remove"]) == 0   # (_elevated would raise: the conftest guard)
@@ -2354,7 +2354,7 @@ def test_who_is_listening_looks_at_the_mic_itself(window, monkeypatch):  # noqa:
 
 
 def test_listeners_look_at_every_device_given():
-    from soundboard import voicesdk
+    from soundboard.mic import voicesdk
 
     class A:
         def __init__(self, exe):
@@ -2627,7 +2627,7 @@ def test_install_says_what_happened_to_the_prompt(monkeypatch, code):
     monkeypatch.setattr(dm, "_elevated", lambda *a, **k: code)
     assert dm.install_on(GUID) == dm.unfinished()
     assert dm.uninstall() == dm.unfinished() and dm.cleanup(GUID) == dm.unfinished()
-    from soundboard import cableremove
+    from soundboard.mic import cableremove
     monkeypatch.setattr(cableremove, "setup_exe", lambda: Path("x.exe"))
     monkeypatch.setattr(dm, "run_elevated", lambda *a, **k: code)
     assert cableremove.remove() == dm.unfinished()
@@ -2904,7 +2904,7 @@ def test_turning_windows_down_lets_go_of_the_button(window, monkeypatch):  # noq
 
 def _working_on_the_mic(w, monkeypatch, cables=(CABLE_IN,), vbcable=True):
     from pathlib import Path
-    from soundboard import cableremove
+    from soundboard.mic import cableremove
     _routes(w, monkeypatch, "ready", cables)
     monkeypatch.setattr(w.engine, "main_stream", object())
     monkeypatch.setattr(w.micctl, "_direct_not_running", lambda: False)
@@ -2946,7 +2946,7 @@ def test_redraws_never_look_for_the_cable_setup_on_the_ui_thread(window, monkeyp
     from PySide6.QtWidgets import QApplication
 
     from conftest import process_events
-    from soundboard import cableremove
+    from soundboard.mic import cableremove
     w = window
     _working_on_the_mic(w, monkeypatch)
     gate, asked = threading.Event(), []
@@ -2972,7 +2972,7 @@ def test_redraws_never_look_for_the_cable_setup_on_the_ui_thread(window, monkeyp
 
 
 def test_removing_the_cable(window, monkeypatch):  # noqa: F811
-    from soundboard import cableremove
+    from soundboard.mic import cableremove
     from soundboard.ui import busy
     w = window
     _working_on_the_mic(w, monkeypatch)
@@ -2995,7 +2995,7 @@ def test_a_worker_that_raises_still_clears_the_busy_state(window, monkeypatch): 
     """VB-Audio's uninstaller, the cable's set-up lookup or the mic set-up raising on
     their thread: the answer still comes back as a failure, so the button and the
     "already asking" flags go back instead of staying busy until a restart."""
-    from soundboard import cableremove
+    from soundboard.mic import cableremove
     from soundboard.ui import busy
     from soundboard.ui import mainwindow as mw
     w = window
@@ -3029,7 +3029,7 @@ def test_a_removed_cable_is_never_sent_to(window, monkeypatch):  # noqa: F811
     """Removed: Windows lists the cable until a restart, but it won't open. "Use the
     virtual cable instead" switched to it anyway: sounds went nowhere and the mic had
     to be set up again."""
-    from soundboard import cableremove
+    from soundboard.mic import cableremove
     w = window
     _working_on_the_mic(w, monkeypatch)
     said = []
@@ -3126,7 +3126,7 @@ def test_no_cable_or_speaker_hint_on_the_mic(window, monkeypatch, state):  # noq
 
 
 def test_cable_remover_finds_vb_audios_setup(tmp_path, monkeypatch):
-    from soundboard import cableremove
+    from soundboard.mic import cableremove
     monkeypatch.setenv("ProgramFiles", str(tmp_path))
     monkeypatch.setenv("ProgramFiles(x86)", str(tmp_path / "x86"))
     assert cableremove.setup_exe() is None
@@ -3321,7 +3321,7 @@ def test_a_held_old_copy_goes_at_the_next_restart(monkeypatch, tmp_path):
 
 def _helper(monkeypatch, ready):
     """michelper.ready()'s last answer, as the window's check on a thread left it."""
-    from soundboard import michelper
+    from soundboard.mic import michelper
     state = (michelper.HelperState() if ready is None
              else michelper.HelperState({True: ready, False: ready}, "test"))
     monkeypatch.setattr(michelper, "state", state)
@@ -3499,7 +3499,7 @@ def test_a_helper_removed_meanwhile_is_noticed_when_the_window_comes_back(window
     from PySide6.QtWidgets import QApplication
 
     from conftest import process_events
-    from soundboard import michelper
+    from soundboard.mic import michelper
     from soundboard.ui import appstate
     w = window
     _routes(w, monkeypatch, "missing")
@@ -3535,7 +3535,7 @@ def test_a_failing_helper_check_backs_off(window, monkeypatch):  # noqa: F811
     from PySide6.QtWidgets import QApplication
 
     from conftest import process_events
-    from soundboard import michelper
+    from soundboard.mic import michelper
     from soundboard.ui import miccontrol
     w = window
     _routes(w, monkeypatch, "missing")

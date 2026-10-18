@@ -84,7 +84,7 @@ the speakers or headphones (set `ONIONBOARD_TEST_REAL_AUDIO=1` to
 opt out).
 They're safe to run while someone is using the PC.
 
-**The mic effect** (`native/directmic/`, `soundboard/directmic.py`) has checks of its
+**The mic effect** (`native/directmic/`, `soundboard/mic/directmic.py`) has checks of its
 own. CI's `mic-effect` job runs the first three on a PR that touches the effect:
 
 | Command | What it checks |

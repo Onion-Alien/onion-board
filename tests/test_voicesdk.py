@@ -1,4 +1,4 @@
-"""Voice engine detection (soundboard.voicesdk): made-up install folders, no real
+"""Voice engine detection (soundboard.mic.voicesdk): made-up install folders, no real
 games or processes."""
 import threading
 import time
@@ -6,7 +6,7 @@ from pathlib import Path
 
 import pytest
 
-from soundboard import voicesdk
+from soundboard.mic import voicesdk
 
 
 def _touch(root: Path, *rel: str) -> None:

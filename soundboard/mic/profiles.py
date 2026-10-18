@@ -1,7 +1,7 @@
 """The simple sound modes over Who's listening: Game, Voice chat, Clean and Advanced.
 
-Each simple mode is a family of destination modes (soundboard.destination) and picks
-the one that suits from what the app can see (soundboard.voicesdk): the voice engine
+Each simple mode is a family of destination modes (soundboard.mic.destination) and picks
+the one that suits from what the app can see (soundboard.mic.voicesdk): the voice engine
 of the game in front, the program listening to the virtual cable. Advanced is the
 full list, picked by hand, as before.
 
@@ -19,7 +19,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 
-from soundboard import destination
+from soundboard.mic import destination
 from soundboard import i18n
 from soundboard.i18n import _
 

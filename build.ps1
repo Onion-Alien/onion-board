@@ -62,7 +62,7 @@ if ($LASTEXITCODE -ne 0) { throw "version_info.py failed" }
 # MinGW-w64 (winget install BrechtSanders.WinLibs.POSIX.UCRT), bundled as directmic\.
 & $py scripts\build_directmic.py
 if ($LASTEXITCODE -ne 0) { throw "build_directmic.py failed (is MinGW-w64's g++ installed?)" }
-# Its mic helper (soundboard\michelper.py): the admin part alone, frozen with the effect
+# Its mic helper (soundboard\mic\michelper.py): the admin part alone, frozen with the effect
 # DLL, so after the first admin prompt the app sets the effect up without asking.
 & $py scripts\build_michelper.py @cleanArg
 if ($LASTEXITCODE -ne 0) { throw "build_michelper.py failed" }
@@ -114,7 +114,7 @@ if ($LASTEXITCODE -ne 0) { throw "PyInstaller failed" }
 & $py scripts\vc_runtime.py dist\OnionBoard
 if ($LASTEXITCODE -ne 0) { throw "vc_runtime.py failed" }
 # ...which can swap a runtime DLL in the bundled mic helper too: list its files again,
-# as shipped (soundboard\michelper.py install_helper refuses a build that doesn't match)
+# as shipped (soundboard\mic\michelper.py install_helper refuses a build that doesn't match)
 & $py -c "import sys; from pathlib import Path; sys.path.insert(0, '.'); from soundboard import michelper; michelper.write_manifest(Path(r'dist\OnionBoard\_internal\michelper'))"
 if ($LASTEXITCODE -ne 0) { throw "listing the mic helper's files failed" }
 

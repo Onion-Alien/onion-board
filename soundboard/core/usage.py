@@ -699,7 +699,7 @@ def features_now(cfg) -> list[str]:
         out.append("sound-voice")
     if any(v.get("ai") for v in voices):
         out.append("sound-ai-voice")
-    from soundboard import michelper
+    from soundboard.mic import michelper
     if cfg.route == "mic" and michelper.known():   # its last check's answer, no new one
         out.append("mic-helper")
     return out
@@ -898,7 +898,7 @@ def _error_type(stack: str) -> str:
 def _report_event(path: Path) -> str:
     """`crash/1.9.6`, `error/1.9.6` or `freeze/1.9.6` for a saved report (applog.py),
     then where it happened when the stack shows it: `error/1.9.6/KeyError@
-    soundboard/engine.py:1090`, `freeze/1.9.6@soundboard/directmic.py:184` (a freeze
+    soundboard/engine.py:1090`, `freeze/1.9.6@soundboard/mic/directmic.py:184` (a freeze
     with more: _freeze_tag)."""
     try:
         with open(path, encoding="utf-8", errors="replace") as f:

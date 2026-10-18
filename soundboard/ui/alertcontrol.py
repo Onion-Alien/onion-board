@@ -11,7 +11,8 @@ import logging
 import time
 from typing import TYPE_CHECKING
 
-from soundboard import appaudio, directmic, discordcfg, rawmic
+from soundboard import appaudio
+from soundboard.mic import directmic, discordcfg, rawmic
 from soundboard.core import updates
 from soundboard.i18n import _
 from soundboard.core.pollthread import PollThread
@@ -53,7 +54,7 @@ DISCORD_QUIT_S = 4.0   # the longest quitting waits for Discord's settings to be
 def _talk_snapshots(found: list, seen: set) -> dict:
     """{Discord folder: discordtalk.snapshot} for each client seen for the first time
     while set for talking (any thread: reads its files)."""
-    from soundboard import discordtalk
+    from soundboard.mic import discordtalk
     out = {}
     for d, name in discordcfg.CLIENTS:
         s = next((x for x in found if x.client == name), None)
@@ -257,7 +258,7 @@ class AlertControl(Controller):
             return
         import threading
 
-        from soundboard import discordtalk
+        from soundboard.mic import discordtalk
         from soundboard.sounds.library import APP_DIR
         saved = dict(cfg.discord_talk)
         out: list = []

@@ -1,8 +1,8 @@
-"""Set up for the app you're using (soundboard.appsetup): the rules, and the bar in the
+"""Set up for the app you're using (soundboard.mic.appsetup): the rules, and the bar in the
 real MainWindow (offscreen). Nothing is really listened to: the detectors are stubs."""
 import pytest
 
-from soundboard import appsetup, profiles
+from soundboard.mic import appsetup, profiles
 from soundboard.sounds.library import Config
 from soundboard.settings import SettingsDialog
 from soundboard.ui import toast
@@ -196,7 +196,7 @@ def test_the_voice_poll_feeds_it(window):
 
 def _discord_warning():
     """Discord's Advanced Voice Activity: a problem the urgent bar names (VAD)."""
-    from soundboard import discordcfg
+    from soundboard.mic import discordcfg
     return [discordcfg.parse({"default": {
         "activeInputProfile": "CUSTOM", "noiseCancellation": False,
         "echoCancellation": False, "automaticGainControl": False,

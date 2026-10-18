@@ -1,4 +1,4 @@
-"""A voice setup (soundboard.voicesetups) on what plays, from Live controls: the sounds,
+"""A voice setup (soundboard.mic.voicesetups) on what plays, from Live controls: the sounds,
 the radio or the programs the Apps tab sends. Nothing here touches Qt.
 
 A setup has up to three parts. Its voice changer voice runs live, so it's on at once.

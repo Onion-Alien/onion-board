@@ -1,4 +1,4 @@
-"""The mic helper: the mic effect (soundboard/directmic.py) put on or taken off a mic
+"""The mic helper: the mic effect (soundboard/mic/directmic.py) put on or taken off a mic
 without Windows' admin prompt every time.
 
 Putting the effect on a mic needs admin (the mic's settings belong to Windows, and its
@@ -88,7 +88,7 @@ def helper_exe() -> Path:
 
 
 def queue_dir() -> Path:
-    from soundboard import directmic
+    from soundboard.mic import directmic
     return directmic.data_dir().parent / "MicHelper"
 
 
@@ -105,7 +105,7 @@ def bundled_helper() -> Path:
     scripts/build_michelper.py built when run from source."""
     if getattr(sys, "frozen", False):
         return Path(getattr(sys, "_MEIPASS", Path(sys.executable).parent)) / "michelper"
-    return Path(__file__).resolve().parent.parent / "build" / "michelper" / "obmichelper"
+    return Path(__file__).resolve().parents[2] / "build" / "michelper" / "obmichelper"
 
 
 def is_helper() -> bool:
@@ -611,7 +611,7 @@ def serve(run=None) -> int:
     """The helper (as SYSTEM, started by the task): do every request there is, then
     exit. `run`: the admin command runner (directmic.cli)."""
     if run is None:
-        from soundboard import directmic
+        from soundboard.mic import directmic
         run = directmic.cli
     _prune(time.time())
     for _round in range(50):   # (requests keep coming: the task's next run takes them)
@@ -760,7 +760,7 @@ def _queue_sddl(sids: str | list[str]) -> str:
     """requests: the accounts `sids` make files there, and each changes (and deletes)
     only its own (CREATOR OWNER), nothing else; the rest of the queue is admins'
     (users read)."""
-    from soundboard import directmic as dm
+    from soundboard.mic import directmic as dm
     return dm._BASE_SDDL + "".join(f"(A;;{dm._FOLDER_WRITE};;;{s})" for s in _sids(sids)) \
         + f"(A;OICIIO;{dm._MODIFY};;;CO)"
 
@@ -886,7 +886,7 @@ def install_helper(user: str | None = None) -> bool:
     `--for`: checked here) or else the account running this, and every account it was
     set up for before. False (logged) when this copy has no helper build or it
     couldn't: the mic effect works anyway, with Windows' prompt each time."""
-    from soundboard import directmic as dm
+    from soundboard.mic import directmic as dm
     src = bundled_helper()
     if is_helper() or not (src / EXE_NAME).is_file() or _read_stamp(src) is None:
         return False
@@ -944,7 +944,7 @@ def install_helper(user: str | None = None) -> bool:
 def remove_helper():
     """Take the helper away (the app is being uninstalled): its task and files now;
     files in use (the helper removing itself runs from them) at the next restart."""
-    from soundboard import directmic
+    from soundboard.mic import directmic
     _schtasks("/delete", "/tn", TASK, "/f")
     for d in (*_helper_dirs(), queue_dir()):
         if d.exists():
@@ -956,11 +956,11 @@ def main(argv: list[str]) -> int:
     """obmichelper.exe: `--serve` (the task), or `--selftest` (scripts/build_michelper.py:
     the build loads the admin part and carries its effect DLL; 0 if so)."""
     if argv == ["--selftest"]:
-        from soundboard import directmic
+        from soundboard.mic import directmic
         return 0 if directmic.bundled_dll().is_file() and is_helper() else 3
     if argv != [SERVE]:
         return 2
-    from soundboard import directmic
+    from soundboard.mic import directmic
     directmic.secure_data_dirs()   # before anything is written under ProgramData
     directmic.log_to(directmic.data_dir().parent / "michelper.log")
     try:

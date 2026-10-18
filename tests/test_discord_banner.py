@@ -1,4 +1,4 @@
-"""Discord's own settings wiping out sounds (soundboard.discordcfg): the urgent bar in
+"""Discord's own settings wiping out sounds (soundboard.mic.discordcfg): the urgent bar in
 the real MainWindow (offscreen) and the Discord guide's advice on the mic vs the cable.
 Discord isn't really read: a fake store sits in the test's own folder."""
 import threading
@@ -7,7 +7,7 @@ import time
 import pytest
 from PySide6.QtWidgets import QApplication
 
-from soundboard import discordcfg as dc
+from soundboard.mic import discordcfg as dc
 from soundboard.ui import chatguide
 from conftest import process_events
 from test_discordcfg import folder, store

@@ -381,9 +381,9 @@ def test_problem_events_say_where_in_our_code_never_the_message(tmp_path):
                  "What it was doing\n-----------------\n"
                  '  File "main.py", line 22, in <module>\n'
                  '  File "soundboard\\ui\\mainwindow.py", line 5898, in tick\n'
-                 '  File "soundboard\\directmic.py", line 184, in make_ring\n'
+                 '  File "soundboard\\mic\\directmic.py", line 184, in make_ring\n'
                  '  File "pathlib\\_local.py", line 515, in stat\n', encoding="utf-8")
-    assert usage._report_event(f) == ("freeze/1.9.7@soundboard/directmic.py:184"
+    assert usage._report_event(f) == ("freeze/1.9.7@soundboard/mic/directmic.py:184"
                                       "<soundboard/ui/mainwindow.py:5898~_local.stat")
 
 
@@ -415,7 +415,7 @@ def _freeze(f, lasted, window_cpu, others, inner='  File "threading.py", line 35
                  "What it was doing\n-----------------\n"
                  '  File "D:\\private\\code\\soundboard\\ui\\mainwindow.py", line 50, in tick\n'
                  '  File "soundboard\\core\\threadnames.py", line 70, in named_start\n'
-                 '  File "soundboard\\voicesdk.py", line 80, in listen\n' + inner
+                 '  File "soundboard\\mic\\voicesdk.py", line 80, in listen\n' + inner
                  + (f"\nWindow CPU: {window_cpu}%\n" if window_cpu is not None else "")
                  + "\nOther threads\n-------------\n" + others, encoding="utf-8")
 
@@ -432,7 +432,7 @@ def test_a_freeze_says_its_caller_what_it_waited_in_how_long_and_who_was_busy(tm
            '  File "soundboard\\engine.py", line 9, in _loop\n')
     _freeze(f, "42 s", 1, hog)
     assert usage._report_event(f) == (
-        "freeze/1.9.28@soundboard/voicesdk.py:80<soundboard/ui/mainwindow.py:50"
+        "freeze/1.9.28@soundboard/mic/voicesdk.py:80<soundboard/ui/mainwindow.py:50"
         "~threading.wait/lasted-30s-2m/busy-thread@soundboard/online/radio.py:400")
     _freeze(f, "7 s", 100, hog)
     assert usage._report_event(f).endswith("/lasted-under-10s/busy-window")
@@ -441,14 +441,14 @@ def test_a_freeze_says_its_caller_what_it_waited_in_how_long_and_who_was_busy(tm
     assert usage._report_event(f).endswith("~threading.wait/never-ended/idle")
     # stuck in our own line (time.sleep has no frame): no library part
     _freeze(f, "12 s", 0, "", inner="")
-    assert usage._report_event(f) == ("freeze/1.9.28@soundboard/voicesdk.py:80"
+    assert usage._report_event(f) == ("freeze/1.9.28@soundboard/mic/voicesdk.py:80"
                                       "<soundboard/ui/mainwindow.py:50/lasted-10-30s/idle")
     # the whole app was held up, not the window alone (hangwatch.ALL_HELD_NOTE)
     _freeze(f, "12 s", 0, "", inner="\n(every thread was held up, this watch too)\n")
     assert usage._report_event(f).endswith("/all-held/lasted-10-30s/idle")
     # an older report (no Lasted / CPU lines): only what it has
     _freeze(f, "", None, hog)
-    assert usage._report_event(f) == ("freeze/1.9.28@soundboard/voicesdk.py:80"
+    assert usage._report_event(f) == ("freeze/1.9.28@soundboard/mic/voicesdk.py:80"
                                       "<soundboard/ui/mainwindow.py:50~threading.wait")
     assert "private" not in usage._report_event(f)
 
@@ -1045,7 +1045,7 @@ def test_every_name_in_a_used_call_is_in_features():
 
 
 def test_mic_effect_failure_words_match_directmic():
-    from soundboard import directmic
+    from soundboard.mic import directmic
     assert usage.MIC_FAILS == directmic.FAIL_KINDS
     # a translated message is never matched: plain text is "code-other"
     assert directmic.fail_kind(directmic.unfinished()) == "code-other"
@@ -1063,7 +1063,7 @@ def test_voice_tabs_and_recovery_actions_match_the_ui():
 
 
 def test_network_background_and_helper_settings_count_every_day(monkeypatch):
-    from soundboard import michelper
+    from soundboard.mic import michelper
     monkeypatch.setattr(michelper, "known", lambda same_dll=True: True)
     cfg = Config(net_mode="tor", net_offline=True, playing_background=True, route="mic")
     got = set(usage.features_now(cfg))

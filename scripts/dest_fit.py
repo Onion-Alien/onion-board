@@ -5,7 +5,7 @@ against every game profile.
     python scripts/dest_fit.py --library --level        # your own sounds
     python scripts/dest_fit.py --profiles photon fivem_radio --json fit.json
 
-Each sound goes: the mode (soundboard.destination, as the engine runs it) -> the
+Each sound goes: the mode (soundboard.mic.destination, as the engine runs it) -> the
 send stage (phase-aware mono + limiter) -> the game's own cleanup and voice gate
 (codec_bench --defaults) -> its codec -> its proximity / radio model at close
 range. Every mode changes the sound on purpose (harmonics for the bass the chat
@@ -40,7 +40,7 @@ if str(ROOT) not in sys.path:
 import codec_bench as cb  # noqa: E402  (same folder: its sources and the chat's defaults)
 from soundboard.sim import codecsim, proxsim  # noqa: E402
 from soundboard.sim.codecsim import PROFILES, analyze, roundtrip  # noqa: E402
-from soundboard.destination import BUILTIN, Processor, cut_shares, makeup  # noqa: E402
+from soundboard.mic.destination import BUILTIN, Processor, cut_shares, makeup  # noqa: E402
 from soundboard.sendfx import Limiter, SmartMono  # noqa: E402
 
 SR = codecsim.SR

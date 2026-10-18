@@ -32,7 +32,7 @@ import sys
 import time
 from pathlib import Path
 
-from soundboard import discordcfg
+from soundboard.mic import discordcfg
 
 log = logging.getLogger(__name__)
 
@@ -479,7 +479,7 @@ def start_helper(app_dir: Path, saved: dict, pending: list[str]) -> bool:
         if getattr(sys, "frozen", False):
             cmd = [sys.executable, ARG]
         else:
-            main = Path(__file__).resolve().parent.parent / "main.py"
+            main = Path(__file__).resolve().parents[2] / "main.py"
             exe = Path(sys.executable)
             pyw = exe.with_name("pythonw.exe")
             cmd = [str(pyw if pyw.is_file() else exe), str(main), ARG]

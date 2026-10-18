@@ -8,7 +8,7 @@ import logging
 import os
 from pathlib import Path
 
-from soundboard import directmic
+from soundboard.mic import directmic
 from soundboard.i18n import _
 
 log = logging.getLogger(__name__)

@@ -387,9 +387,9 @@ def _keep_the_test_logging():
 
 @pytest.fixture(autouse=True)
 def _never_touch_the_real_mic(monkeypatch, tmp_path):
-    """Straight into my mic (soundboard.directmic): no test writes the real shared file
+    """Straight into my mic (soundboard.mic.directmic): no test writes the real shared file
     the mic effect reads, runs the admin step, or sees this PC's own install or mics."""
-    from soundboard import directmic
+    from soundboard.mic import directmic
 
     def no_admin(*_a, **_k):
         raise AssertionError("a test tried to run the mic effect's admin step")
@@ -399,8 +399,8 @@ def _never_touch_the_real_mic(monkeypatch, tmp_path):
     monkeypatch.setattr(directmic, "installed_on", lambda: [])
     monkeypatch.setattr(directmic, "capture_endpoints", lambda: [])   # nor this PC's mics
     monkeypatch.setattr(directmic, "_mic_is_silent", lambda guid: None)   # nor listens to one
-    # nor its mic helper (soundboard.michelper): no real Program Files, task or queue
-    from soundboard import michelper
+    # nor its mic helper (soundboard.mic.michelper): no real Program Files, task or queue
+    from soundboard.mic import michelper
 
     def no_task(*_a, **_k):
         raise AssertionError("a test tried to use Windows' Task Scheduler")
@@ -424,11 +424,11 @@ def _never_watch_the_real_front_window(monkeypatch):
 
 @pytest.fixture(autouse=True)
 def _never_read_the_real_discord(monkeypatch, tmp_path):
-    """Discord's voice settings (soundboard.discordcfg) come from an empty folder: the
+    """Discord's voice settings (soundboard.mic.discordcfg) come from an empty folder: the
     developer's own Discord must not put a banner in a test or a screenshot. Tests
     write a fake store under discordcfg._appdata() when they need one. Nor is it ever
     written to (discordtalk), and no Discord helper process is started."""
-    from soundboard import discordcfg, discordtalk
+    from soundboard.mic import discordcfg, discordtalk
     root = tmp_path / "guard" / "discord-appdata"
     monkeypatch.setattr(discordcfg, "_appdata", lambda: root)
     monkeypatch.setattr(discordtalk, "start_helper", lambda *a, **k: False)
@@ -557,10 +557,11 @@ class NoMidi:
 
 @pytest.fixture(autouse=True, scope="session")
 def _never_look_at_the_real_foreground():
-    """The main window asks which game is in front (soundboard.voicesdk) to suggest a
+    """The main window asks which game is in front (soundboard.mic.voicesdk) to suggest a
     Who's listening mode: in tests nothing is, whatever the developer is playing.
     For the whole session: test windows outlive their test, timers and all."""
-    from soundboard import appaudio, voicesdk
+    from soundboard import appaudio
+    from soundboard.mic import voicesdk
     with pytest.MonkeyPatch.context() as mp:
         mp.setattr(voicesdk, "foreground_process", lambda: (0, ""))
         # ...nor whether it fills the screen (no tip during a game, soundboard.core.tips)
@@ -675,7 +676,7 @@ def _no_blocking_message_boxes(monkeypatch):
 def _never_change_real_device_formats(monkeypatch):
     """The cable check reads and sets Windows device formats. Tests see a cable that's
     already fine and can never change a real device's format."""
-    from soundboard import cableformat
+    from soundboard.mic import cableformat
     monkeypatch.setattr(cableformat, "cable_ends", lambda names_hint=None: [])
     monkeypatch.setattr(cableformat, "set_rate", lambda end, rate=cableformat.RATE: False)
 
