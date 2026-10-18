@@ -15,7 +15,7 @@ import subprocess
 import numpy as np
 
 from soundboard import errors, net
-from soundboard.modules import ModuleInfo
+from soundboard.addons.modules import ModuleInfo
 
 log = logging.getLogger(__name__)
 

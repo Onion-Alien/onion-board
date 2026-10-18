@@ -1,4 +1,4 @@
-"""Onion Board as the host of a "remote" add-on (soundboard.modules), such as Onion
+"""Onion Board as the host of a "remote" add-on (soundboard.addons.modules), such as Onion
 Pocket (modules/onion-pocket, the pads on your phone): the one interface it talks to,
 version REMOTE_API. The add-on's `create(host)` returns an object with `card(parent)`,
 its card on Settings → Remote, and `stop()`, called when the app closes.
@@ -30,7 +30,7 @@ import html
 import logging
 
 from soundboard import remote
-from soundboard.modules import REMOTE_API
+from soundboard.addons.modules import REMOTE_API
 
 log = logging.getLogger(__name__)
 

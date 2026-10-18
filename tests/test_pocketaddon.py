@@ -1,4 +1,4 @@
-"""Getting Onion Pocket (soundboard.pocketaddon) and its card on Settings → Remote. It's
+"""Getting Onion Pocket (soundboard.addons.pocketaddon) and its card on Settings → Remote. It's
 optional: when getting it fails, or the installed copy is broken, the card just isn't
 there; never an error box, never a stopped app. No network: a local zip stands in for
 GitHub, and failures are made up."""
@@ -9,7 +9,8 @@ from PySide6.QtWidgets import QLabel, QPushButton
 from shiboken6 import isValid as qt_valid
 
 from conftest import process_events
-from soundboard import modules, net, pocketaddon, updates
+from soundboard.addons import modules, pocketaddon
+from soundboard import net, updates
 from soundboard.settings import SettingsDialog
 from test_mainwindow import window  # noqa: F401  (the real MainWindow fixture)
 from test_remote_addons import ADDON, _module

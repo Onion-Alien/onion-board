@@ -16,7 +16,7 @@ from PySide6.QtGui import QColor, QLinearGradient, QPainter
 from PySide6.QtWidgets import (QButtonGroup, QFrame, QHBoxLayout, QLabel, QPushButton,
                                QScrollArea, QVBoxLayout, QWidget)
 
-from soundboard import modules as mods
+from soundboard.addons import modules as mods
 from soundboard import langnames, net, savedvoices, theme, usage, voicefx, voicesetups
 from soundboard.speech import spoken, translation
 from soundboard.speech.aivoice import AiVoiceController

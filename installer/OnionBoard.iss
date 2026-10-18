@@ -128,7 +128,7 @@ Type: filesandordirs; Name: "{app}\_internal"
 Type: files; Name: "{app}\{#AppExeName}.exe.old*"
 
 [Files]
-; Includes the add-ons in {app}\modules (build.ps1 copies them in; see soundboard/modules.py).
+; Includes the add-ons in {app}\modules (build.ps1 copies them in; see soundboard/addons/modules.py).
 ; live-voice's own .venv is made later, by the "livevoice" task or the Voice tab's button.
 #ifndef PREVIEW
 ; In this order, for an app started while the files are replaced (a double-click during

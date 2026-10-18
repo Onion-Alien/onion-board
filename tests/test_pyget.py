@@ -9,7 +9,8 @@ from pathlib import Path
 
 import pytest
 
-from soundboard import modules, net, pyget
+from soundboard.addons import modules
+from soundboard import net, pyget
 
 
 def service(path: Path) -> modules.ModuleInfo:

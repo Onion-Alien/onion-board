@@ -166,7 +166,7 @@ def packs_dedupe():
 
 def modules_prune():
     """Leftover add-on copies (modules.prune_leftovers), off the UI thread."""
-    from soundboard import modules
+    from soundboard.addons import modules
     try:
         modules.prune_leftovers()
     except Exception:  # noqa: BLE001 - tidying up must never hurt the running app
@@ -263,12 +263,13 @@ def get_tor() -> int:
 
 def install_addon(module_id: str) -> int:
     """`OnionBoard.exe --install-addon live-voice`: the installer's live voice box. Runs
-    the add-on's install (soundboard.modules.install, the same as the Voice tab's
+    the add-on's install (soundboard.addons.modules.install, the same as the Voice tab's
     Install button), getting a Python for it first when the PC has no good one
     (soundboard.pyget), the way the saved Connection setting says. No window. Returns
     0 when it's set up (already, or now), 1 if it couldn't be."""
     applog.setup(APP_DIR)
-    from soundboard import library, modules, net, tor
+    from soundboard import library, net, tor
+    from soundboard.addons import modules
     info = next((m for m in modules.discover() if m.id == module_id), None)
     if info is None or info.error:
         print(f"FAIL: no usable add-on {module_id!r}", file=sys.stderr)
@@ -411,7 +412,8 @@ def selftest_addon(path: str) -> int:
 def _selftest_addon_in(path, tmp) -> int:
     import importlib
 
-    from soundboard import modules, theme
+    from soundboard.addons import modules
+    from soundboard import theme
     info = modules.install_zip(path, "onion-watch", "triggers", tmp / "modules")
     entry = modules.load_package(info)
 

@@ -1118,7 +1118,7 @@ def test_addon_installs_are_counted_by_a_fixed_name(monkeypatch):
     """An add-on's install, failure and Repair: its id from ADDONS, anything else "other"."""
     from pathlib import Path
 
-    from soundboard import modules
+    from soundboard.addons import modules
     shipped = Path(usage.__file__).parent.parent / "modules"
     with_steps = {m.id for m in modules.discover([shipped]) if m.install_steps}
     assert with_steps and with_steps <= set(usage.ADDONS)

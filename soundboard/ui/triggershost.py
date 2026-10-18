@@ -25,7 +25,7 @@ from pathlib import Path
 
 from soundboard import library, theme
 from soundboard.i18n import _
-from soundboard.modules import TRIGGERS_API
+from soundboard.addons.modules import TRIGGERS_API
 
 log = logging.getLogger(__name__)
 

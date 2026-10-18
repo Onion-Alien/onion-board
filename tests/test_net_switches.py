@@ -18,7 +18,8 @@ import pytest
 
 from conftest import process_events
 from fakeproxy import Socks5, no_leaks
-from soundboard import modules, net, updates
+from soundboard.addons import modules
+from soundboard import net, updates
 from soundboard.engine import SR
 from test_net_leaks import REAL_GET, REAL_OPEN, NAMES, Sites
 from test_radio import wav_bytes
@@ -94,7 +95,7 @@ def try_app_update(sites, mode, monkeypatch):
 
 
 def try_addons(sites, mode, monkeypatch):
-    from soundboard import watchaddon
+    from soundboard.addons import watchaddon
     monkeypatch.setattr(watchaddon, "API", url(sites, mode, "api.github", "/watch/latest"))
     monkeypatch.setattr(watchaddon, "installed", lambda dirs=None: types.SimpleNamespace(
         version="0.1.0"))

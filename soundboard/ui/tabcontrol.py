@@ -100,7 +100,7 @@ class TabControl(Controller):
             has = getattr(mw.triggers, "has_addon", None)   # (switched off: a stand-in)
             if has is not None:
                 return not has()
-            from soundboard import watchaddon
+            from soundboard.addons import watchaddon
             return watchaddon.installed() is None and watchaddon.local_zip() is None
         return False
 

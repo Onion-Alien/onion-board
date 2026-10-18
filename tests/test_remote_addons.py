@@ -1,4 +1,4 @@
-"""Remote add-ons (soundboard.modules kind "remote", soundboard.ui.remotehost), with a
+"""Remote add-ons (soundboard.addons.modules kind "remote", soundboard.ui.remotehost), with a
 tiny add-on made for the test: found and loaded at start-up, its card on Settings →
 Remote, a broken one left out of Settings, and the lan server it gets from the
 host: its page with no key, the API with its key, only its actions, wrong-key
@@ -13,7 +13,8 @@ import pytest
 from PySide6.QtWidgets import QLabel
 
 from conftest import process_events, said
-from soundboard import backup, modules, remote
+from soundboard import backup, remote
+from soundboard.addons import modules
 from soundboard.settings import SettingsDialog
 from soundboard.ui.remotehost import RemoteHost
 from test_mainwindow import window  # noqa: F401  (the real MainWindow fixture)
@@ -328,7 +329,8 @@ def test_onion_pocket_can_be_removed_from_its_card_and_add_ons(qapp, window,  # 
     back into *Get Onion Pocket*."""
     from PySide6.QtWidgets import QMessageBox
 
-    from soundboard import library, pocketaddon
+    from soundboard import library
+    from soundboard.addons import pocketaddon
     base = library.APP_DIR / "modules"
     info = _module(base, pocketaddon.MODULE_ID, "pocket_remove_test_addon", ADDON)
     monkeypatch.setattr(modules, "discover", lambda dirs=None: [modules._read(info.path)])
@@ -357,7 +359,8 @@ def test_add_ons_card_checks_reinstalls_and_reports(qapp, window,  # noqa: F811
     Update to X when GitHub has a newer one, Reinstall swaps in a fresh copy, and
     Report a problem opens a bug report naming the add-on and its version."""
 
-    from soundboard import feedback, library, net, pocketaddon
+    from soundboard import feedback, library, net
+    from soundboard.addons import pocketaddon
     from soundboard.ui import busy
     base = library.APP_DIR / "modules"
     info = _module(base, pocketaddon.MODULE_ID, "pocket_addons_card_test", ADDON)

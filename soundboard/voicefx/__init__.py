@@ -6,7 +6,7 @@ changed voice. The chain runs on the mono mic signal and returns stereo.
 
 Effects are classes registered by type id. The built-in ones live in
 `voicefx.builtin`; downloadable modules add more through the same `register()`
-(see `soundboard.modules`). Each effect declares its parameters so the UI can
+(see `soundboard.addons.modules`). Each effect declares its parameters so the UI can
 draw sliders for effects it has never heard of.
 
 Thread safety follows the engine's rule: the audio thread never takes a lock. The

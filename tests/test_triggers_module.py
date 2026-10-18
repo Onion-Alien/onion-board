@@ -1,4 +1,4 @@
-"""The "triggers" add-on kind (soundboard.modules): its module.json is checked (the
+"""The "triggers" add-on kind (soundboard.addons.modules): its module.json is checked (the
 host interface version above all), its package is loaded from the module's own
 folder once per run, and a module zip is installed only if it stays inside its
 own folder, replacing the old copy only once the new one is known to be good.
@@ -10,8 +10,8 @@ from pathlib import Path
 
 import pytest
 
-from soundboard import modules
-from soundboard.modules import ModuleError
+from soundboard.addons import modules
+from soundboard.addons.modules import ModuleError
 
 
 def make_module(folder, *, package="fakewatch", version="1.0", api=1, entry=None,
@@ -274,7 +274,7 @@ def test_an_add_on_gets_its_compiled_files_once_and_only_while_nothing_plays(tmp
     def wait():
         waits.append(1)
         return next(playing, False)
-    import soundboard.modules as mod
+    import soundboard.addons.modules as mod
     sleep, mod.time.sleep = mod.time.sleep, lambda s: None
     try:
         assert modules.precompile([m], wait) == 2   # __init__ and board

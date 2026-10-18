@@ -1,5 +1,5 @@
 """Remote control in the main window: the local control API (soundboard.remote) started and
-stopped to match the settings, and the phone-remote add-ons (soundboard.modules, e.g. Onion
+stopped to match the settings, and the phone-remote add-ons (soundboard.addons.modules, e.g. Onion
 Pocket): starting them, loading a newly installed or updated one in place of the old,
 removing one, and stopping them all when the app quits.
 
@@ -40,17 +40,17 @@ class RemoteAccess(Controller):
         return err
 
     def _load_remote_addons(self) -> list:
-        """[(ModuleInfo, add-on or None)] for every "remote" add-on (soundboard.modules),
+        """[(ModuleInfo, add-on or None)] for every "remote" add-on (soundboard.addons.modules),
         e.g. Onion Pocket. One that fails is noted on its info (and the log;
         Settings → Remote leaves it out) and never stops the app."""
-        from soundboard import modules
+        from soundboard.addons import modules
         return [(info, self._start_remote_addon(info))
                 for info in modules.discover() if info.kind == "remote"]
 
     def _start_remote_addon(self, info):
         """The add-on's object, or None (the reason noted on `info`)."""
         mw = self.mw
-        from soundboard import modules
+        from soundboard.addons import modules
         from soundboard.ui.remotehost import RemoteHost
         if info.error:
             return None
@@ -70,7 +70,7 @@ class RemoteAccess(Controller):
         Config.remote_addons are the board's and stay as they are. If the new one
         doesn't start, the old one is started again and stays. The add-on's object,
         or None."""
-        from soundboard import modules
+        from soundboard.addons import modules
         old = next(((i, a) for i, a in self.remote_addons if i.id == info.id), None)
         saved = {}
         if old is not None and old[1] is not None:
@@ -107,7 +107,7 @@ class RemoteAccess(Controller):
         modules folder in %APPDATA%) deleted and its package forgotten. Its settings
         in Config.remote_addons stay, for when it's got again. If the folder can't be
         deleted, it's started again. Raises modules.ModuleError."""
-        from soundboard import modules
+        from soundboard.addons import modules
         cur = next(((i, a) for i, a in self.remote_addons if i.id == info.id), None)
         if cur is not None and cur[1] is not None:
             try:

@@ -24,8 +24,9 @@ from collections.abc import Callable
 from dataclasses import dataclass
 from pathlib import Path
 
-from soundboard import modules, net, updates
-from soundboard.modules import ModuleInfo
+from soundboard.addons import modules
+from soundboard import net, updates
+from soundboard.addons.modules import ModuleInfo
 from soundboard import errors
 from soundboard.i18n import _
 

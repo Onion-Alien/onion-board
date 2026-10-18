@@ -453,7 +453,7 @@ def test_new_voice_is_used_mid_talk_without_a_restart(panel, qapp, monkeypatch):
 
 def test_update_shows_progress_and_blocks_a_second_install(panel, qapp, monkeypatch):
     from soundboard import applog
-    from soundboard import modules as mods
+    from soundboard.addons import modules as mods
     p, _ = panel
     s = p.speech
     if s.module is None:

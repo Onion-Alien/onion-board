@@ -133,7 +133,7 @@ def test_update_check_and_download(sites, socks, guard, monkeypatch):
 
 
 def test_add_on_release_check(sites, socks, guard, monkeypatch, app_dir):
-    from soundboard import watchaddon
+    from soundboard.addons import watchaddon
     monkeypatch.setattr(updates, "_get", REAL_GET)
     sites.routes["/watch/latest"] = (json.dumps({"tag_name": "v1.0.0", "assets": []}).encode(),
                                      "application/json")
@@ -200,7 +200,7 @@ def test_a_custom_voice_server_on_this_pc_stays_direct(sites, socks, guard):
 
 def test_ai_voices_and_onion_pocket_release_checks(sites, socks, guard, monkeypatch,
                                                    app_dir):
-    from soundboard import aiaddon, pocketaddon
+    from soundboard.addons import aiaddon, pocketaddon
     monkeypatch.setattr(updates, "_get", REAL_GET)
     for mod, path in ((aiaddon, "/ai/release"), (pocketaddon, "/pocket/latest")):
         sites.routes[path] = (json.dumps({"name": "x 1.0.0", "tag_name": "v1.0.0",
