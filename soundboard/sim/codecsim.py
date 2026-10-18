@@ -44,11 +44,11 @@ class Profile:
     note: str = ""
     cbr: bool = False      # constant bitrate (Mumble, FiveM) instead of Opus' default VBR
     # the mic cleanup the chat runs with its defaults (codec_bench --defaults): stage
-    # names from soundboard.realproc (the real libraries) or soundboard.chatsim (models)
+    # names from soundboard.sim.realproc (the real libraries) or soundboard.sim.chatsim (models)
     cleanup: tuple[str, ...] = ()
     gate_db: float | None = None   # voice activation threshold (10 ms RMS), None = push-to-talk
     gate_hang_s: float = 0.2
-    proximity: str = ""    # listener side: a soundboard.proxsim "model[:variant]" ("" = none)
+    proximity: str = ""    # listener side: a soundboard.sim.proxsim "model[:variant]" ("" = none)
     games: str = ""        # what uses it
     confidence: str = "measured"   # measured / sourced / estimate
 

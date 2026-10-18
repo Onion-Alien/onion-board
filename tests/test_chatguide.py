@@ -3,7 +3,8 @@ capture) and the cable-format fix on the Setup tab. Offscreen, fake devices."""
 import numpy as np
 import pytest
 
-from soundboard import appaudio, cableformat, chatcheck
+from soundboard import appaudio, cableformat
+from soundboard.sim import chatcheck
 from soundboard.ui import chatguide, setupwizard
 from tests import test_setupwizard as _sw
 from tests.conftest import process_events

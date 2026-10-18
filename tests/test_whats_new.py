@@ -101,7 +101,8 @@ def test_an_update_never_opens_the_setup_guide_again(qapp, app_dir, monkeypatch)
     """Set up on an older version (the guide finished while sending didn't work yet,
     so setup_done stayed off): after the update the app opens on What's new, not on
     the setup guide."""
-    from soundboard import engine, winkeys
+    from soundboard import engine
+    from soundboard.control import winkeys
     from soundboard.ui import mainwindow as main
     for name in ("set_main_device", "set_mon_device", "set_mic_device"):
         monkeypatch.setattr(engine.Engine, name, lambda self, n, _k=name: None)

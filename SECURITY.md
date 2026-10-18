@@ -26,7 +26,7 @@ In scope, for example:
 - Anything reaching the local control API (Settings → Remote → *Remote
   control*, off by default) without its key, from another machine, or through a
   web page (e.g. DNS rebinding), or making it do more than the actions `/api/help`
-  lists (`ENDPOINTS` in `soundboard/remote.py`).
+  lists (`ENDPOINTS` in `soundboard/control/remote.py`).
 - The phone remote's server (Onion Pocket, off by default) answering without its key,
   from outside the local network, or doing more than the actions it lists.
 - The installer or `installer/install-vbcable.ps1` running something that isn't what it

@@ -93,7 +93,8 @@ def test_the_control_api_explains_in_english_whatever_the_language():
     control API's JSON is never translated. The UI's own line follows the language."""
     from types import SimpleNamespace
 
-    from soundboard import i18n, remote
+    from soundboard import i18n
+    from soundboard.control import remote
     from soundboard.i18n import _
     try:
         i18n.set_language("de")

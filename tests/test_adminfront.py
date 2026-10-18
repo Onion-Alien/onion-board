@@ -1,4 +1,4 @@
-"""Games run as admin (soundboard.adminfront): Windows keeps their keys from the board,
+"""Games run as admin (soundboard.control.adminfront): Windows keeps their keys from the board,
 so a full-screen admin window in front gets a notice with Restart as admin."""
 import os
 
@@ -6,7 +6,8 @@ from conftest import process_events, said
 from PySide6.QtWidgets import QApplication
 from test_mainwindow import window  # noqa: F401  (the real MainWindow)
 
-from soundboard import adminfront, autostart
+from soundboard.control import adminfront
+from soundboard import autostart
 from soundboard.ui import toast
 
 

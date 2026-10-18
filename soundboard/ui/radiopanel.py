@@ -609,7 +609,7 @@ class RadioTab(QWidget):
 
     # ------------------------------------------------------------------ a phone's lists
     def phone_list(self, which: str, query: str = "") -> tuple[list[Station], bool, str]:
-        """(stations, still loading, error) for a phone remote (soundboard.remote): the
+        """(stations, still loading, error) for a phone remote (soundboard.control.remote): the
         popular, favourite or recent stations, or a search. A search answers with the
         known stations that match at once and asks the directory too; asking again
         brings the stations found online. It has its own directory, so it never

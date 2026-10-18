@@ -1,4 +1,4 @@
-"""The control API's streamer endpoints (soundboard.streamapi): chat commands, alerts
+"""The control API's streamer endpoints (soundboard.control.streamapi): chat commands, alerts
 from bots and donation sites, the feed; and the endpoints for the newer features."""
 import http.client
 import json
@@ -8,7 +8,7 @@ import numpy as np
 import pytest
 
 from conftest import process_events
-from soundboard import remote, streamapi
+from soundboard.control import remote, streamapi
 from test_mainwindow import window as main_window  # noqa: F401  (the real MainWindow)
 
 TOKEN = "test-token-123"

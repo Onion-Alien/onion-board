@@ -26,7 +26,7 @@ from soundboard.ui.panel import (EqPanel, hint_label, icon_button, reset_button,
 from soundboard.ui.trim import TrimPanel
 from soundboard.ui.voicefxpanel import EffectRow, ParamSlider
 from soundboard.wheelguard import no_wheel
-from soundboard.winkeys import Hotkeys
+from soundboard.control.winkeys import Hotkeys
 from soundboard.i18n import _
 
 log = logging.getLogger(__name__)

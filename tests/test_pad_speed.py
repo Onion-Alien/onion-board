@@ -10,7 +10,8 @@ from PySide6.QtCore import QPointF, Qt
 from PySide6.QtGui import QColor, QImage
 from PySide6.QtTest import QTest
 
-from soundboard import midi, thumbs
+from soundboard.control import midi
+from soundboard import thumbs
 from soundboard.library import SoundMeta
 from soundboard.ui import widgets
 from soundboard.ui.widgets import Pad, PadGrid

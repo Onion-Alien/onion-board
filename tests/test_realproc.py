@@ -1,9 +1,9 @@
-"""The real voice-processing libraries (soundboard.realproc). They live in the bench
+"""The real voice-processing libraries (soundboard.sim.realproc). They live in the bench
 environment only (requirements-bench.txt); in the app's environment these skip."""
 import numpy as np
 import pytest
 
-from soundboard import codecsim, realproc
+from soundboard.sim import codecsim, realproc
 
 SR = realproc.SR
 

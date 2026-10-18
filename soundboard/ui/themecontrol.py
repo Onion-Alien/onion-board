@@ -11,7 +11,8 @@ from typing import TYPE_CHECKING
 from PySide6.QtCore import QTimer
 from PySide6.QtWidgets import QApplication
 
-from soundboard import shellicon, theme
+from soundboard.win import shellicon
+from soundboard import theme
 from soundboard.i18n import _
 from soundboard.ui import icons, lite, themecover
 from soundboard.ui.controller import Controller

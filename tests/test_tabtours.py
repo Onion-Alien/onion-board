@@ -7,7 +7,8 @@ from conftest import process_events
 from PySide6.QtCore import QEvent, QPoint, Qt
 from PySide6.QtTest import QTest
 
-from soundboard import __version__, engine, net, usage, winkeys
+from soundboard import __version__, engine, net, usage
+from soundboard.control import winkeys
 from soundboard.library import Config, SoundMeta
 from soundboard.ui import coach, firsttour, tabtours
 from soundboard.ui import mainwindow as main

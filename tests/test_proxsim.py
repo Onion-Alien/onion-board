@@ -1,12 +1,12 @@
-"""Proximity chat models (soundboard.proxsim) and the game profiles that use them."""
+"""Proximity chat models (soundboard.sim.proxsim) and the game profiles that use them."""
 import sys
 from pathlib import Path
 
 import numpy as np
 import pytest
 
-from soundboard import chatsim, codecsim, proxsim, realproc
-from soundboard.codecsim import PROFILES, analyze, pink_noise
+from soundboard.sim import chatsim, codecsim, proxsim, realproc
+from soundboard.sim.codecsim import PROFILES, analyze, pink_noise
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "scripts" / "voicetests"))
 

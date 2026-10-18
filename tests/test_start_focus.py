@@ -4,7 +4,8 @@ were pressed: the Sounds button got the ring while another tab was open, so it l
 like a second selected tab."""
 from PySide6.QtCore import QEvent
 
-from soundboard import __version__, engine, winkeys
+from soundboard import __version__, engine
+from soundboard.control import winkeys
 from soundboard.library import Config
 from soundboard.ui import mainwindow as main
 from soundboard.ui.tabcontrol import TAB_INDEX

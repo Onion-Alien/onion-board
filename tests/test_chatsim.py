@@ -4,7 +4,7 @@ stage keeps the listener's decoder from clipping and mono from cancelling."""
 import numpy as np
 import pytest
 
-from soundboard import chatcheck, chatsim, codecsim
+from soundboard.sim import chatcheck, chatsim, codecsim
 from soundboard.engine import soft_limit
 from soundboard.sendfx import Limiter, SmartMono
 

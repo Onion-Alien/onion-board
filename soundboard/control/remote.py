@@ -58,7 +58,7 @@ Every endpoint takes GET or POST and answers JSON (ENDPOINTS below is the list;
     /api/mic_gate[?on=…]         mute my mic while a sound plays
     /api/chat, /api/chat_rules, /api/event, /api/alerts, /api/feed
                                  chat commands, alerts and donations from a streaming
-                                 bot (soundboard.streamapi)
+                                 bot (soundboard.control.streamapi)
     /api/help                    this list
 
 A POST may carry its values as a JSON object or a form instead of in the URL (a key in
@@ -117,7 +117,8 @@ from urllib.parse import parse_qs, urlsplit
 
 from PySide6.QtCore import QCoreApplication, QEvent, QObject, Qt, QTimer, Signal
 
-from soundboard import errors, netcategory, streamapi, usage
+from soundboard import errors, netcategory, usage
+from soundboard.control import streamapi
 from soundboard.pollthread import PollThread
 from soundboard.i18n import _
 

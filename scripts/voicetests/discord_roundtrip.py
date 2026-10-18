@@ -38,7 +38,8 @@ import soundfile as sf
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
 
-from soundboard import appaudio, codecsim, destination  # noqa: E402
+from soundboard import appaudio, destination  # noqa: E402
+from soundboard.sim import codecsim  # noqa: E402
 from soundboard.engine import Engine  # noqa: E402
 from soundboard.library import _ffmpeg, level_gain  # noqa: E402
 

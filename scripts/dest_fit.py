@@ -38,8 +38,8 @@ if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
 import codec_bench as cb  # noqa: E402  (same folder: its sources and the chat's defaults)
-from soundboard import codecsim, proxsim  # noqa: E402
-from soundboard.codecsim import PROFILES, analyze, roundtrip  # noqa: E402
+from soundboard.sim import codecsim, proxsim  # noqa: E402
+from soundboard.sim.codecsim import PROFILES, analyze, roundtrip  # noqa: E402
 from soundboard.destination import BUILTIN, Processor, cut_shares, makeup  # noqa: E402
 from soundboard.sendfx import Limiter, SmartMono  # noqa: E402
 

@@ -5,7 +5,7 @@ import time
 
 import pytest
 
-from soundboard import winshot
+from soundboard.win import winshot
 from soundboard.appaudio import App
 from soundboard.ui import windowview
 from soundboard.ui.appspanel import AppRow

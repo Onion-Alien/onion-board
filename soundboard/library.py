@@ -34,7 +34,8 @@ import numpy as np
 import soundfile as sf
 import soxr
 
-from soundboard import __version__, mapped, sourceinfo, winpath
+from soundboard import __version__, mapped, sourceinfo
+from soundboard.win import winpath
 from soundboard.engine import SR
 from soundboard.eq import BANDS as EQ_BANDS
 from soundboard.eq import MAX_DB as EQ_MAX_DB
@@ -42,7 +43,7 @@ from soundboard.i18n import _, ngettext
 
 log = logging.getLogger(__name__)
 
-# usable_dir: spelled out through any folder link Windows won't follow (soundboard.winpath)
+# usable_dir: spelled out through any folder link Windows won't follow (soundboard.win.winpath)
 APP_DIR = winpath.usable_dir(Path(os.environ.get("APPDATA", Path.home())) / "OnionBoard")
 # from when this app was called Soundboard; see migrate_from_soundboard() below
 OLD_APP_DIR = winpath.usable_dir(Path(os.environ.get("APPDATA", Path.home())) / "Soundboard")
@@ -212,7 +213,7 @@ def clean_hotkey(combo: str, what: str) -> str:
     versions saved any text. It stays as written otherwise, for older versions."""
     if not combo:
         return ""
-    from soundboard import winkeys   # Win32; only needed once there's a key
+    from soundboard.control import winkeys  # Win32; only needed once there's a key
     if winkeys.check(combo)[1]:
         log.warning("dropped the hotkey %r of %s: no key can send it", combo[:80], what)
         return ""
@@ -557,11 +558,11 @@ class Config:
     # in memory, and the key saves them as a new pad
     replay_hotkey: str = ""
     replay_seconds: int = 30
-    # local control API for Stream Deck / scripts (soundboard.remote): off unless turned on
+    # local control API for Stream Deck / scripts (soundboard.control.remote): off unless turned on
     api_enabled: bool = False
     api_port: int = 7474
     api_token: str = ""
-    # the control API's chat commands and alerts (soundboard.streamapi): {"chat": {...},
+    # the control API's chat commands and alerts (soundboard.control.streamapi): {"chat": {...},
     # "alerts": {type: [rule, ...]}, "alerts_on": bool}; set through /api/chat_rules
     # and /api/alerts
     api_stream: dict = field(default_factory=dict)

@@ -1,4 +1,4 @@
-"""The control API's streamer endpoints (soundboard.remote hands them over): chat
+"""The control API's streamer endpoints (soundboard.control.remote hands them over): chat
 commands, alerts (follows, subs, bits, raids, donations, channel points, TikTok gifts…)
 and a feed of what they did.
 
@@ -169,7 +169,7 @@ def _number(v: str, lo: float, hi: float) -> float | None:
 
 
 def set_chat_rules(mw: MainWindow, params: dict) -> tuple[int, object]:
-    from soundboard import remote
+    from soundboard.control import remote
     if (params.get("reset") or "").strip() not in ("", "0"):
         _stream(mw).pop("chat", None)
         mw._save_later()
@@ -248,7 +248,7 @@ def alerts_answer(mw: MainWindow) -> dict:
 
 
 def set_alerts(mw: MainWindow, params: dict) -> tuple[int, object]:
-    from soundboard import remote
+    from soundboard.control import remote
     kind = canonical(params.get("type") or "")
     if not kind:
         if "type" in params:
@@ -292,7 +292,7 @@ def set_alerts(mw: MainWindow, params: dict) -> tuple[int, object]:
 def _rule_from(mw: MainWindow, params: dict, rule: dict) -> tuple[int, object] | None:
     """Fill `rule` from params' sound / category / say / voice / voice_seconds / on,
     each checked. An error answer, or None."""
-    from soundboard import remote
+    from soundboard.control import remote
     if "sound" in params:
         name = params["sound"].strip()
         if name and _sound_named(mw, name) is None:
@@ -354,7 +354,8 @@ def _sound_named(mw: MainWindow, name: str, pool=None):
 
 
 def _voice_named(mw: MainWindow, name: str) -> str | None:
-    from soundboard import remote, voicefx
+    from soundboard.control import remote
+    from soundboard import voicefx
     want = name.strip().casefold()
     names = remote.voice_names(mw)
     return next((n for n in names if want in (n.casefold(), voicefx.shown(n).casefold())),
@@ -394,7 +395,7 @@ def _play(mw: MainWindow, m) -> tuple[int, dict]:
 
 
 def _say(mw: MainWindow, text: str) -> tuple[int, dict]:
-    from soundboard import remote
+    from soundboard.control import remote
     if not mw.tabctl.tab_on("voice"):
         return 409, remote.VOICE_OFF
     remote._voice_tab(mw).speech.say_line(text)
@@ -404,7 +405,7 @@ def _say(mw: MainWindow, text: str) -> tuple[int, dict]:
 def voice_for(mw: MainWindow, name: str, seconds: float) -> dict:
     """Turn the voice changer on with `name`; after `seconds` (0: never) put back what
     was on before, unless something else changed the voice meanwhile."""
-    from soundboard import remote
+    from soundboard.control import remote
     fx = remote._voice_tab(mw).fx
     st = state(mw)
     was_on, was = fx.btn_power.isChecked(), fx.preset
@@ -483,7 +484,7 @@ def _allowed(rules: dict, what: str, rank: int) -> bool:
 
 def chat(mw: MainWindow, params: dict) -> tuple[int, object]:
     """One chat line: a command, or (with tts on) read out."""
-    from soundboard import remote
+    from soundboard.control import remote
     rules = chat_rules(mw)
     user = " ".join(str(params.get("user") or params.get("username") or params.get("name")
                         or "someone").split())[:40] or "someone"
@@ -780,7 +781,7 @@ def event(mw: MainWindow, params: dict) -> tuple[int, object]:
 
 
 def _run_rule(mw: MainWindow, rule: dict, ev: dict) -> tuple[int, object]:
-    from soundboard import remote
+    from soundboard.control import remote
     rules = chat_rules(mw)
     msg = clean_text(ev["message"], rules) if ev["message"] else ""
     values = {**ev, "message": msg or "", "user": clean_text(ev["user"], rules) or "someone",

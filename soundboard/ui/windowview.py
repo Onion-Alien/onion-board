@@ -1,7 +1,7 @@
 """The Apps tab's window view: a small live picture of what a program shows, under
 its card's buttons, opened with the card's eye button (soundboard.ui.appspanel).
 
-A worker thread finds the program's window and copies it (soundboard.winshot)
+A worker thread finds the program's window and copies it (soundboard.win.winshot)
 about four times a second; the UI thread only turns the pixels into a picture.
 It runs while the view is open and on screen, including while another app has
 focus. Minimized sources keep their last picture with a paused message.
@@ -16,7 +16,7 @@ from PySide6.QtCore import QEvent, QObject, QSize, Qt, Signal
 from PySide6.QtGui import QImage, QPixmap
 from PySide6.QtWidgets import QLabel, QPushButton, QSizePolicy, QVBoxLayout, QWidget
 
-from soundboard import winshot
+from soundboard.win import winshot
 from soundboard.i18n import _
 
 log = logging.getLogger(__name__)

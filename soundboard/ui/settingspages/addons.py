@@ -420,10 +420,10 @@ class AddonsPage(Page):
 
     # ------------------------------------------------------------------ remote control
     def _remote_card(self):
-        """The local control API (soundboard.remote): on / off, port, key."""
+        """The local control API (soundboard.control.remote): on / off, port, key."""
         from PySide6.QtWidgets import QApplication, QLineEdit, QSpinBox
 
-        from soundboard import remote
+        from soundboard.control import remote
         mw, cfg = self.mw, self.mw.cfg
         card, cv = self._card(_("Remote control (Stream Deck, scripts)"),
                               _("Lets programs on this PC play your sounds: a Stream Deck (its "

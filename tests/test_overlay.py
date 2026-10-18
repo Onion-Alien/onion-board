@@ -4,7 +4,7 @@ hotkey is registered."""
 import pytest
 
 from conftest import process_events
-from soundboard import winkeys
+from soundboard.control import winkeys
 from soundboard.library import Config, SoundMeta
 from soundboard.ui import overlay as ovl
 from soundboard.ui.overlay import Overlay, OverlaySettings

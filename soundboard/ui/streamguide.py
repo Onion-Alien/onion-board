@@ -1,5 +1,5 @@
 """Remote control for streamers, the easy way: a step-by-step guide to wiring a
-Stream Deck, channel points and chat commands to the control API (soundboard.remote),
+Stream Deck, channel points and chat commands to the control API (soundboard.control.remote),
 with the links ready to copy, and a ready-made message for an AI assistant (ChatGPT,
 Claude, …) that knows the API, the port and the person's own sounds, so it can walk
 them through whatever tools they use.
@@ -13,7 +13,8 @@ from PySide6.QtCore import Qt
 from PySide6.QtWidgets import (QApplication, QComboBox, QDialog, QFrame, QHBoxLayout,
                                QPushButton, QScrollArea, QVBoxLayout, QWidget)
 
-from soundboard import remote, theme
+from soundboard.control import remote
+from soundboard import theme
 from soundboard.ui import busy, fit, icons
 from soundboard.ui.chatguide import _bun, _header, _label
 from soundboard.i18n import _

@@ -6,10 +6,11 @@ from __future__ import annotations
 from PySide6.QtCore import Qt
 from PySide6.QtWidgets import QDialog, QHBoxLayout, QLabel, QPushButton, QVBoxLayout
 
-from soundboard import midi, theme, winkeys
+from soundboard.control import midi, winkeys
+from soundboard import theme
 from soundboard.i18n import _
 from soundboard.ui import fit
-from soundboard.winkeys import Hotkeys
+from soundboard.control.winkeys import Hotkeys
 
 
 # Global hotkey actions: (config attribute, action id, label, what it does).

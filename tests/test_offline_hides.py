@@ -174,7 +174,7 @@ def test_on_air_card_says_proxy_and_tor(window, monkeypatch):  # noqa: F811
 
 
 def test_on_air_card_says_a_remote_listens(window, monkeypatch):  # noqa: F811
-    from soundboard import remote
+    from soundboard.control import remote
 
     ctl = remote.RemoteControl(lambda a, p: (200, {}), window)
     try:

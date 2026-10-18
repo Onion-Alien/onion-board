@@ -13,7 +13,8 @@ import pytest
 from PySide6.QtWidgets import QLabel
 
 from conftest import process_events, said
-from soundboard import backup, remote
+from soundboard import backup
+from soundboard.control import remote
 from soundboard.addons import modules
 from soundboard.settings import SettingsDialog
 from soundboard.ui.remotehost import RemoteHost

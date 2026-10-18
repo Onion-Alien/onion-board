@@ -131,6 +131,6 @@ def test_hiss_estimate_creeps_about_3_db_a_second_at_any_rate():
 
 @pytest.mark.skipif(sys.platform != "win32", reason="SendInput is Windows")
 def test_win_menu_printscreen_numlock_are_extended_keys():
-    from soundboard import winkeys as wk
+    from soundboard.control import winkeys as wk
     for vk in (0x5B, 0x5C, 0x5D, 0x2C, 0x90):
         assert wk.key_input(vk, up=False).ki.dwFlags & wk.KEYEVENTF_EXTENDEDKEY

@@ -12,7 +12,8 @@ from typing import TYPE_CHECKING
 from PySide6.QtCore import QRect, QSize, Qt, QTimer
 from PySide6.QtWidgets import QApplication
 
-from soundboard import usage, winkeys
+from soundboard import usage
+from soundboard.control import winkeys
 from soundboard.i18n import _
 from soundboard.ui.controller import Controller
 

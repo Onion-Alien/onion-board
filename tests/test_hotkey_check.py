@@ -7,7 +7,8 @@ import logging
 import pytest
 from test_mainwindow import window  # noqa: F401  (the real MainWindow fixture)
 
-from soundboard import backup, library, winkeys
+from soundboard import backup, library
+from soundboard.control import winkeys
 from soundboard.library import Config, SoundMeta
 
 LONG = "ctrl+alt+" * 33 + "a"   # 298 characters

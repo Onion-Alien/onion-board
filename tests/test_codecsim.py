@@ -1,8 +1,8 @@
 import numpy as np
 import pytest
 
-from soundboard import codecsim
-from soundboard.codecsim import (PROFILES, align, analyze, mono_loss_db, multitone, pink_noise,
+from soundboard.sim import codecsim
+from soundboard.sim.codecsim import (PROFILES, align, analyze, mono_loss_db, multitone, pink_noise,
                                  roundtrip, speech_like)
 
 RATE = 48000

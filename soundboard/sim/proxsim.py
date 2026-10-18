@@ -1,7 +1,7 @@
 """Proximity chat, simulated: what the listener's game does to our voice *after* the
 codec, in games where you're heard as a sound in the world.
 
-Development tool, like soundboard.codecsim. Every model follows the game's or
+Development tool, like soundboard.sim.codecsim. Every model follows the game's or
 voice SDK's published / decompiled defaults (the numbers are cited on each); none of
 them is measured. Distances are in the game's own units (metres, blocks).
 

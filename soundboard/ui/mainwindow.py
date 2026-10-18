@@ -20,8 +20,10 @@ from PySide6.QtWidgets import (QApplication, QDialog, QMainWindow, QMenu, QMessa
 from soundboard import theme, ytworker
 from soundboard.engine import SR, Engine
 from soundboard import exitwatch
-from soundboard import (appaudio, autostart, howl, library, remote, reset, trash, voicesdk)
-from soundboard import (ffmpegget, net, netlog, profiles, quality, shellicon, thumbbar, tor, usage)
+from soundboard import appaudio, autostart, howl, library, reset, trash, voicesdk
+from soundboard.control import remote
+from soundboard import ffmpegget, net, netlog, profiles, quality, tor, usage
+from soundboard.win import shellicon, thumbbar
 from soundboard.addons import watchaddon
 from soundboard.replay import InstantReplay
 from soundboard.library import (Config,
@@ -75,7 +77,7 @@ from soundboard.ui.radiopanel import RadioOff, RadioTab
 from soundboard.ui.storetab import PREVIEW as STORE_PREVIEW, StoreTab
 from soundboard.ui.voicepanel import VoicePanel
 from soundboard.ui.widgets import (Meter, Pad, expand_dropped)
-from soundboard.winkeys import Hotkeys
+from soundboard.control.winkeys import Hotkeys
 from soundboard.i18n import _
 
 log = logging.getLogger(__name__)

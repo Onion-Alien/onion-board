@@ -17,7 +17,8 @@ from typing import TYPE_CHECKING
 from PySide6.QtCore import Signal
 from PySide6.QtWidgets import QMenu
 
-from soundboard import adminfront, midi, theme, usage, winkeys
+from soundboard.control import adminfront, midi, winkeys
+from soundboard import theme, usage
 from soundboard.engine import SR
 from soundboard.i18n import _, ngettext
 from soundboard.library import SoundMeta

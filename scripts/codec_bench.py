@@ -26,13 +26,13 @@ distance ("dist": frame by frame how different it sounds, lower is better; unlik
 the band columns it hears noise fill and warble) and how much the listener's
 decoder clips ("clip%"). --send runs the app's send stage (phase-aware mono +
 limiter) first; --processing adds the voice chat's own mic cleanup
-(soundboard.chatsim) before the codec, the way it is when it's left on; its
+(soundboard.sim.chatsim) before the codec, the way it is when it's left on; its
 webrtc_* and rnnoise stages run the real libraries instead of the models
-(soundboard.realproc, which needs the bench environment: requirements-bench.txt).
+(soundboard.sim.realproc, which needs the bench environment: requirements-bench.txt).
 --defaults instead runs each profile's own cleanup and voice gate, as the game
 ships it (outside the bench environment the real stages fall back to chatsim's
 models, and the run says so). --at puts the listener that far away in the
-proximity-chat profiles (soundboard.proxsim); --situation picks a listening
+proximity-chat profiles (soundboard.sim.proxsim); --situation picks a listening
 situation (behind a wall, over a radio) for every profile.
 Needs ffmpeg with libopus, the same ffmpeg the importer uses for m4a / video.
 """
@@ -49,10 +49,10 @@ ROOT = Path(__file__).resolve().parent.parent
 if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
-from soundboard import codecsim  # noqa: E402
-from soundboard.codecsim import (BANDS, PROFILES, SIGNALS, analyze, band_label,  # noqa: E402
+from soundboard.sim import codecsim  # noqa: E402
+from soundboard.sim.codecsim import (BANDS, PROFILES, SIGNALS, analyze, band_label,  # noqa: E402
                                  mono_loss_db, roundtrip)
-from soundboard import chatsim, proxsim, realproc  # noqa: E402
+from soundboard.sim import chatsim, proxsim, realproc  # noqa: E402
 from soundboard.destination import BUILTIN_BY_KEY, Processor, cut_shares, makeup  # noqa: E402
 from soundboard.sendfx import Limiter, SmartMono  # noqa: E402
 

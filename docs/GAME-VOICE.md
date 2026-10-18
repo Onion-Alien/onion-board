@@ -1,6 +1,6 @@
 # What game voice chat does to your sounds
 
-Reference for the bench profiles in `soundboard/codecsim.py` (`scripts/codec_bench.py
+Reference for the bench profiles in `soundboard/sim/codecsim.py` (`scripts/codec_bench.py
 --list` prints them) and what the bench found. Discord was measured in a real call
 (`scripts/voicetests/discord_roundtrip.py`); the game profiles come from each stack's source
 code or SDK docs where those are public, and are marked *estimate* where not.
@@ -23,7 +23,7 @@ code or SDK docs where those are public, and are marked *estimate* where not.
 | TeamSpeak | TeamSpeak 3 / 5 | Opus Voice q6 (28.7 kbps) | noise removal + AGC | [codec table](https://teamspeakdocs.github.io/ClientSDK/client_html/ar01s14.html) |
 
 Lethal Company's occlusion and walkie-talkie filters come from its decompiled
-`OccludeAudio.cs` / `StartOfRound.cs`; `soundboard/proxsim.py` has the numbers.
+`OccludeAudio.cs` / `StartOfRound.cs`; `soundboard/sim/proxsim.py` has the numbers.
 
 ## What the bench found (2026-09)
 

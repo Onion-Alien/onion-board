@@ -7,7 +7,7 @@ What the host gives it:
 
   settings / save()   its own settings, kept in Config.remote_addons[<its id>]: on
                       this PC only, never in a backup (they hold keys)
-  actions             every control API action (soundboard.remote.ACTIONS)
+  actions             every control API action (soundboard.control.remote.ACTIONS)
   server(actions, page, name)
                       a control API server for other devices on the home network
                       (RemoteControl with lan=True: local peers only, wrong keys
@@ -20,7 +20,7 @@ What the host gives it:
                       which names Onion Board (soundboard.firewall). Waits; True if
                       added. Newer than REMOTE_API 1's first hosts: check for it
   signed_requests     True: its server takes X-Sig, a signature made with the key,
-                      so a phone page needn't send the key itself (soundboard.remote)
+                      so a phone page needn't send the key itself (soundboard.control.remote)
   card(), button_row(), flash(), icon(), no_wheel()
                       Settings' own look, so the add-on's card matches the rest
 """
@@ -29,7 +29,7 @@ from __future__ import annotations
 import html
 import logging
 
-from soundboard import remote
+from soundboard.control import remote
 from soundboard.addons.modules import REMOTE_API
 
 log = logging.getLogger(__name__)
