@@ -18,7 +18,7 @@ from pathlib import Path
 
 import numpy as np
 
-from soundboard import destination
+from soundboard.mic import destination
 
 log = logging.getLogger(__name__)
 

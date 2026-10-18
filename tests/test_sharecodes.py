@@ -1,12 +1,13 @@
-"""Share codes for saved voices (soundboard.savedvoices.share_code / read_code)."""
+"""Share codes for saved voices (soundboard.mic.savedvoices.share_code / read_code)."""
 import base64
 import json
 import zlib
 
 import pytest
 
-from soundboard import savedvoices, voicefx
-from soundboard.savedvoices import CodeError, read_code, share_code
+from soundboard.mic import savedvoices
+from soundboard import voicefx
+from soundboard.mic.savedvoices import CodeError, read_code, share_code
 
 VOICE = {"pitch": {"on": True, "semitones": 7.5, "mix": 1.0},
          "echo": {"on": True, "delay": 250.0, "mix": 0.3},

@@ -16,7 +16,8 @@ from typing import TYPE_CHECKING
 
 from PySide6.QtCore import QTimer
 
-from soundboard import appsetup, destination, i18n, profiles, voicesdk
+from soundboard.mic import appsetup, destination, profiles, voicesdk
+from soundboard import i18n
 from soundboard import engine as eng
 from soundboard.i18n import _
 from soundboard.ui.controller import Controller
@@ -79,7 +80,7 @@ class AppSetupControl(Controller):
     def _poll_voice(self):
         """Which Who's listening mode suits: the program recording the cable's far end
         (voicesdk.Listeners), else the voice engine of the game in front. The simple
-        modes (soundboard.profiles) pick within their family from all of it; in
+        modes (soundboard.mic.profiles) pick within their family from all of it; in
         Advanced, *Pick the mode by itself* switches to the one suggested."""
         mw = self.mw
         key = mw.voice_watch.poll() if mw.voice_watch is not None else None

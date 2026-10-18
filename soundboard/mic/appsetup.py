@@ -1,6 +1,6 @@
 """Set up for the app you're using: when a voice chat app or a game starts listening
 to you, a slim bar asks once "Looks like you're using Discord. Set up for it?".
-*Set up* switches to the simple mode that suits it (soundboard.profiles) and
+*Set up* switches to the simple mode that suits it (soundboard.mic.profiles) and
 remembers the app; the next time it shows up, the board switches by itself (with
 Undo). *Not now* asks again next start; ✕ never asks about that app again.
 
@@ -16,7 +16,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 
-from soundboard import profiles
+from soundboard.mic import profiles
 
 # an app counts as gone (and is new again when it comes back) after this long unseen:
 # Discord and games stop recording for a moment now and then

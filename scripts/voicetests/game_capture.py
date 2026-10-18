@@ -43,7 +43,8 @@ import soxr
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
 
-from soundboard import appaudio, cableformat  # noqa: E402
+from soundboard import appaudio  # noqa: E402
+from soundboard.mic import cableformat  # noqa: E402
 from soundboard.sim import codecsim  # noqa: E402
 from soundboard.appaudio import GUID, Com, ComError, _co_init, _device_name, _enumerator  # noqa: E402
 

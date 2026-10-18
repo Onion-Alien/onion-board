@@ -14,7 +14,8 @@ from PySide6.QtGui import QColor, QLinearGradient, QPainter, QPainterPath
 from PySide6.QtWidgets import (QFrame, QGraphicsDropShadowEffect, QHBoxLayout, QLabel,
                                QPushButton, QStyle, QVBoxLayout, QWidget)
 
-from soundboard import michelper, theme
+from soundboard.mic import michelper
+from soundboard import theme
 from soundboard.i18n import _
 from soundboard.ui import icons
 from soundboard.ui.bunnywidget import BunnyWidget

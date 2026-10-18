@@ -1179,7 +1179,7 @@ def test_mic_card_status_uses_painted_marks_on_one_line(window, monkeypatch):
     ✓ / ✗), and "not running" fits beside "Into your mic" at 1180x720."""
     from PySide6.QtWidgets import QApplication
 
-    from soundboard import directmic as dm
+    from soundboard.mic import directmic as dm
     from soundboard import engine as eng
     from soundboard import theme
     from soundboard.ui import icons

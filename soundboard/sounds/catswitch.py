@@ -11,7 +11,7 @@ from __future__ import annotations
 import os
 from dataclasses import dataclass
 
-from soundboard import voicesdk
+from soundboard.mic import voicesdk
 
 POLL_MS = 1000
 

@@ -3,7 +3,7 @@ from PySide6.QtCore import Qt
 from PySide6.QtWidgets import QApplication
 from test_mainwindow import window  # noqa: F401
 
-from soundboard import directmic as dm
+from soundboard.mic import directmic as dm
 from soundboard import engine as eng
 
 

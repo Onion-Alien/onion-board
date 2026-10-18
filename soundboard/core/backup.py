@@ -36,7 +36,8 @@ from pathlib import Path, PurePosixPath
 
 import soundfile as sf
 
-from soundboard import __version__, savedvoices, voicefx
+from soundboard import __version__, voicefx
+from soundboard.mic import savedvoices
 from soundboard.sounds import library, videos
 from soundboard.sounds.library import (AUDIO_EXTS, Config, SoundMeta, clean_fade,
                                        clean_setting, clean_tags, fits_type)

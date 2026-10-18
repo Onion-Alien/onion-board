@@ -1,8 +1,8 @@
-"""Build the mic helper (soundboard/michelper.py) into build/michelper/obmichelper/:
+"""Build the mic helper (soundboard/mic/michelper.py) into build/michelper/obmichelper/:
 obmichelper.exe, a small PyInstaller build of the mic effect's admin part only (no Qt,
 no numpy), with its own copy of the effect DLL and stamp.txt saying which. build.ps1
 runs it after scripts/build_directmic.py and bundles the folder with the app as
-michelper\\; from source, soundboard.michelper finds it here.
+michelper\\; from source, soundboard.mic.michelper finds it here.
 
 Usage: python scripts/build_michelper.py [--clean]
 """
@@ -28,7 +28,7 @@ EXCLUDE = ("numpy", "PySide6", "shiboken6", "scipy", "sounddevice", "soundfile",
 # PyInstaller version, where a list of stock hashes would go stale at the next upgrade.
 MARKER = "compiled-here.txt"
 # What the helper runs: never left out (the build stops if one can't load without EXCLUDE)
-NEEDS = ("soundboard.michelper", "soundboard.directmic", "soundboard.appaudio")
+NEEDS = ("soundboard.mic.michelper", "soundboard.mic.directmic", "soundboard.appaudio")
 # Imports every module of the soundboard package with EXCLUDE refused, as in the helper,
 # and prints those that fail. PyInstaller follows imports inside functions too, so
 # directmic's lazy `engine` and `appaudio` (applog -> the crash dialog -> all of the UI)
@@ -117,7 +117,7 @@ def build(clean: bool = False) -> int:
               " scanners flag as a false positive. Run scripts/build_bootloader.ps1 for a"
               " clean build (needs MinGW-w64's gcc).", file=sys.stderr)
     sys.path.insert(0, str(ROOT))
-    from soundboard import michelper
+    from soundboard.mic import michelper
     # --console, not --windowed: a windowed build still drew a couple of antivirus false
     # positives on VirusTotal where a console one is clean. No window is shown either way
     # -- the helper only ever runs as a hidden SYSTEM scheduled task (see michelper.py),
@@ -133,7 +133,7 @@ def build(clean: bool = False) -> int:
     env = {**os.environ, "PATH": os.pathsep.join(
         str(Path(os.environ.get("SystemRoot", r"C:\Windows")) / p)
         for p in ("System32", "", r"System32\Wbem"))}
-    r = subprocess.run([*spec_cmd, str(ROOT / "soundboard" / "michelper.py")], cwd=ROOT,
+    r = subprocess.run([*spec_cmd, str(ROOT / "soundboard" / "mic" / "michelper.py")], cwd=ROOT,
                        env=env, stdout=subprocess.DEVNULL)
     if r.returncode:
         return r.returncode

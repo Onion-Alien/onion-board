@@ -104,13 +104,13 @@ def fake_machine(tmp: Path):
         setattr(engine.Engine, setter, lambda self, n, _a=attr: setattr(self, _a, _Stream()))
     # straight into the mic, set up and live (the website shows it working, not this
     # PC's own state): on the made-up mic, its effect running, nothing to fix
-    from soundboard import directmic
+    from soundboard.mic import directmic
     directmic.status = lambda mic_name=None: "ready"
     directmic.installed_on = lambda: ["{demo}"]
     directmic.endpoint_for = lambda name: "{demo}"
     engine.Engine.effect_alive = lambda self: True
     # this PC's own Discord settings stay out too (a warning bar would show them)
-    from soundboard import discordcfg
+    from soundboard.mic import discordcfg
     discordcfg.read = lambda appdata=None: []
     discordcfg.signature = lambda appdata=None: ()
     engine.Engine.direct_apps = lambda self: 2

@@ -38,7 +38,8 @@ from typing import Any
 import numpy as np
 import sounddevice as sd
 
-from soundboard import destination, directmic, livefx, mapped
+from soundboard.mic import destination, directmic
+from soundboard import livefx, mapped
 from soundboard.howl import HowlGuard
 from soundboard.dsp import hermite
 from soundboard.eq import EQ
@@ -328,7 +329,7 @@ class Engine(EngineTakes, EngineDevices, SoundCache):
         self.apps_pitch = 0.0
         self.apps_fx: dict = {}
         self._lpitch: dict[tuple[str, str], LivePitch] = {}
-        # a voice setup from Live controls (soundboard.livesetup): its voice changer
+        # a voice setup from Live controls (soundboard.mic.livesetup): its voice changer
         # live on the sounds (one chain per output), the whole setup where the radio and
         # each captured program come in (one StreamVoice each)
         self.sound_voice: dict = {}   # a VoiceChain spec, {} = none
@@ -339,7 +340,7 @@ class Engine(EngineTakes, EngineDevices, SoundCache):
         self._aux_voice: dict = {}   # aux key -> livesetup.StreamVoice
 
         self.main_stream = self.mon_stream = self.mic_stream = self.obs_stream = None
-        # "straight into my mic" (soundboard.directmic): what others hear goes into the
+        # "straight into my mic" (soundboard.mic.directmic): what others hear goes into the
         # real mic inside Windows. The board's mic is then the clean mic the effect hands
         # over (never its own sounds coming back), and the send mix runs on its clock.
         self.main_direct = False
@@ -582,7 +583,7 @@ class Engine(EngineTakes, EngineDevices, SoundCache):
                 sv.stop()
             return
         if sv is None:
-            from soundboard.livesetup import StreamVoice
+            from soundboard.mic.livesetup import StreamVoice
             sv = self._aux_voice[key] = StreamVoice(on_event)
         sv.set_setup(setup, module, lang)
 
@@ -1065,7 +1066,7 @@ class Engine(EngineTakes, EngineDevices, SoundCache):
         return d.lowcut if d is not None else 0
 
     def _dest(self, out: str, x: np.ndarray) -> np.ndarray:
-        """Shape the sounds bus for whoever is listening (soundboard.destination)."""
+        """Shape the sounds bus for whoever is listening (soundboard.mic.destination)."""
         d = self.dest
         if d is None:
             self._dests.pop(out, None)   # start fresh when it's turned back on

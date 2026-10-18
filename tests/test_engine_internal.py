@@ -5,7 +5,7 @@ import numpy as np
 import pytest
 
 from soundboard.engine import SR, Engine, is_fixed
-from soundboard.testcheck import analyze, summary_html
+from soundboard.mic.testcheck import analyze, summary_html
 from soundboard.voicefx import VoiceChain
 
 

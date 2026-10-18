@@ -196,7 +196,7 @@ class EditControl(Controller):
                                                  for f in soundvoice.MODEL_FILES)
             cat.ai_favs = list(getattr(ai, "_favs", []))
             cat.star_ai = ai.set_favorite
-        from soundboard import voicesetups
+        from soundboard.mic import voicesetups
         cat.setups = [(n, voicesetups.sound_voice(s)) for n, s in self._setups().setups.items()
                       if voicesetups.sound_voice(s)]   # (a language alone: not for sounds yet)
         return cat
@@ -208,7 +208,7 @@ class EditControl(Controller):
         if mw.tabctl.tab_on("voice") and getattr(mw.voice, "setups", None) is not None:
             return mw.voice.setups
         if self._setup_store is None:
-            from soundboard import voicesetups
+            from soundboard.mic import voicesetups
             self._setup_store = voicesetups.Store()
         return self._setup_store
 

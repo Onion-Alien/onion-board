@@ -21,12 +21,14 @@ from soundboard import theme
 from soundboard.online import ytworker
 from soundboard.engine import SR, Engine
 from soundboard.core import exitwatch
-from soundboard import appaudio, howl, voicesdk
+from soundboard import appaudio, howl
+from soundboard.mic import voicesdk
 from soundboard.core import autostart, reset, trash
 from soundboard.sounds import library
 from soundboard.control import remote
 from soundboard.online import ffmpegget, net, netlog, tor
-from soundboard import profiles, quality
+from soundboard.mic import profiles
+from soundboard import quality
 from soundboard.core import usage
 from soundboard.win import shellicon, thumbbar
 from soundboard.addons import watchaddon
@@ -94,7 +96,7 @@ RAW_POLL_MS = 2000       # how often the apps recording the mic are counted (raw
 TLS_WARM_MS = 2500     # Qt's TLS is set up this long after the start (_warm_tls)
 TIP_DELAY_MS = 8000    # the first tip waits this long after the start
 FF_CHECK_MS = 1500     # the FFmpeg check's answer is taken this long after the start
-VOICE_POLL_MS = 3000  # how often the game in front is looked at (soundboard.voicesdk)
+VOICE_POLL_MS = 3000  # how often the game in front is looked at (soundboard.mic.voicesdk)
 
 
 # the colour wrapper old status-line texts carry (MainWindow.say drops it)

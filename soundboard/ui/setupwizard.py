@@ -33,7 +33,7 @@ from PySide6.QtWidgets import (QApplication, QButtonGroup, QCheckBox, QDialog, Q
                                QPushButton, QScrollArea, QVBoxLayout, QWidget)
 
 from soundboard.core import autostart
-from soundboard import directmic, discordcfg, michelper
+from soundboard.mic import directmic, discordcfg, michelper
 from soundboard import engine as eng
 from soundboard import theme
 from soundboard.engine import SR

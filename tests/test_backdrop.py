@@ -6,7 +6,8 @@ from types import SimpleNamespace
 import numpy as np
 import pytest
 
-from soundboard import savedvoices, voicefx
+from soundboard.mic import savedvoices
+from soundboard import voicefx
 from soundboard.voicefx import backdrop
 from tests.conftest import process_events
 

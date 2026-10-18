@@ -18,8 +18,8 @@ from pathlib import Path
 
 import pytest
 
-from soundboard import directmic as dm
-from soundboard import michelper as mh
+from soundboard.mic import directmic as dm
+from soundboard.mic import michelper as mh
 
 REAL_SCHTASKS = mh._schtasks   # (the conftest guard replaces it in every test)
 ROOT = Path(__file__).resolve().parent.parent
@@ -34,7 +34,7 @@ SERVE = """\
 import sys, time
 from pathlib import Path
 sys.path.insert(0, {root!r})
-from soundboard import michelper as mh
+from soundboard.mic import michelper as mh
 queue = Path(sys.argv[1])
 mh.queue_dir = lambda: queue
 

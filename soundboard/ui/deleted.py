@@ -1,5 +1,5 @@
 """The "Recently deleted" window: what's in the bin (soundboard.core.trash, or another bin
-shaped like it, such as the saved voices' in soundboard.savedvoices), newest first,
+shaped like it, such as the saved voices' in soundboard.mic.savedvoices), newest first,
 with Bring back and Delete for good."""
 from __future__ import annotations
 

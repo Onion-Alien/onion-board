@@ -1,7 +1,7 @@
-"""The simple sound modes (soundboard.profiles): which one a config is in, and which
+"""The simple sound modes (soundboard.mic.profiles): which one a config is in, and which
 destination mode each picks from what's seen."""
-from soundboard import profiles
-from soundboard.profiles import ADVANCED, CLEAN, GAME, VOICE, Hint
+from soundboard.mic import profiles
+from soundboard.mic.profiles import ADVANCED, CLEAN, GAME, VOICE, Hint
 
 
 def test_old_configs_land_in_the_matching_simple_mode():

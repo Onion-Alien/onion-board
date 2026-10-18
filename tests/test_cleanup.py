@@ -11,7 +11,7 @@ pytestmark = pytest.mark.skipif(sys.platform != "win32", reason="Windows only")
 
 if sys.platform == "win32":
     from soundboard.core import cleanup
-    from soundboard import directmic as dm, michelper
+    from soundboard.mic import directmic as dm, michelper
 
 
 def _app(d):

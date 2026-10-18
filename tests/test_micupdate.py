@@ -5,7 +5,7 @@ import pytest
 from PySide6.QtCore import Qt
 from PySide6.QtTest import QTest
 
-from soundboard import directmic as dm
+from soundboard.mic import directmic as dm
 from soundboard.ui import mainwindow as main
 from soundboard.ui import micupdate
 from test_mainwindow import window  # noqa: F401  (fixture)

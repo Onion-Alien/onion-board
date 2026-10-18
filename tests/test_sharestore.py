@@ -5,7 +5,7 @@ import os
 
 import numpy as np
 
-from soundboard import destination, sharestore
+from soundboard.mic import destination, sharestore
 from soundboard import engine as eng
 from soundboard.engine import SR, Engine
 

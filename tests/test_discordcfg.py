@@ -1,8 +1,8 @@
-"""Reading Discord's own voice settings (soundboard.discordcfg) from a fake LevelDB
+"""Reading Discord's own voice settings (soundboard.mic.discordcfg) from a fake LevelDB
 folder, and what counts as a problem on the mic vs the virtual cable."""
 import json
 
-from soundboard import discordcfg as dc
+from soundboard.mic import discordcfg as dc
 
 DEFAULTS = {"mode": "VOICE_ACTIVITY", "echoCancellation": True, "noiseSuppression": False,
             "automaticGainControl": True, "noiseCancellation": True,

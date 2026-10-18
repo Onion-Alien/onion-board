@@ -161,7 +161,7 @@ def isolate(conf: dict):
                                 f"({library.APP_DIR})")
         link.hard_exit(3)
 
-    from soundboard import directmic
+    from soundboard.mic import directmic
     mic_dir = profile / "Mic"
     mic_dir.mkdir(parents=True, exist_ok=True)
     directmic.data_dir = lambda: mic_dir
@@ -202,14 +202,15 @@ def isolate(conf: dict):
     midi.WinMM = NoMidi
 
     from soundboard.core import autostart
-    from soundboard import cableformat
+    from soundboard.mic import cableformat
     from soundboard.win import shellicon
     autostart.winreg = None
     shellicon.shortcut_folders = lambda: []
     cableformat.cable_ends = lambda names_hint=None: []
     cableformat.set_rate = lambda end, rate=None: False
 
-    from soundboard import appaudio, voicesdk
+    from soundboard import appaudio
+    from soundboard.mic import voicesdk
     from soundboard.core import tips
     voicesdk.foreground_process = lambda: (0, "")
     tips.fullscreen_in_front = lambda: False

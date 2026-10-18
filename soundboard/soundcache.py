@@ -16,7 +16,8 @@ from collections import OrderedDict
 import numpy as np
 import soxr
 
-from soundboard import destination, mapped, sharestore
+from soundboard.mic import destination, sharestore
+from soundboard import mapped
 from soundboard.engineparts import I16_SCALE, SR
 
 # the engine's logger, as before the move (log lines and filters keep their name)

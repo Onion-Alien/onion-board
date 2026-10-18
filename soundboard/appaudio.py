@@ -33,7 +33,7 @@ if typing.TYPE_CHECKING:
 else:
     try:
         import numpy as np
-    except ImportError:   # the mic helper (soundboard/michelper.py) ships without numpy:
+    except ImportError:   # the mic helper (soundboard/mic/michelper.py) ships without numpy:
         np = None         # it only uses mic_is_silent(), which never needs it
 
 from soundboard.core import errors

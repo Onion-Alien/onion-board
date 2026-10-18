@@ -19,7 +19,8 @@ from PySide6.QtWidgets import (QApplication, QDialog, QFrame, QHBoxLayout, QLabe
                                QVBoxLayout)
 from shiboken6 import isValid as qt_valid
 
-from soundboard import directmic, michelper, theme
+from soundboard.mic import directmic, michelper
+from soundboard import theme
 from soundboard.core import errors, usage
 from soundboard.core.pollthread import PollThread
 from soundboard.i18n import _

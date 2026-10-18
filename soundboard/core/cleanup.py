@@ -192,7 +192,7 @@ def _key_exists(hive, path: str) -> bool:
 
 def mics_with_effect() -> list[str]:
     """Every mic (unplugged ones too) the effect is on, by the notes or in a slot."""
-    from soundboard import directmic as dm
+    from soundboard.mic import directmic as dm
     guids = list(dm.installed_on())
     try:
         with winreg.OpenKey(winreg.HKEY_LOCAL_MACHINE, dm.CAPTURE_KEY) as root:
@@ -212,7 +212,7 @@ def mics_with_effect() -> list[str]:
 
 
 def _mic_name(guid: str) -> str:
-    from soundboard import directmic as dm
+    from soundboard.mic import directmic as dm
     for e in dm.capture_endpoints():
         if e["guid"] == guid:
             return e["name"] + ("" if e["active"] else " (unplugged)")
@@ -221,7 +221,7 @@ def _mic_name(guid: str) -> str:
 
 def machine_items() -> list[str]:
     """What the admin part would remove, in words; [] if nothing."""
-    from soundboard import directmic as dm, michelper
+    from soundboard.mic import directmic as dm, michelper
     items = [f"The mic effect on: {_mic_name(g)}" for g in mics_with_effect()]
     if not items and dm.anything_installed():
         items.append("The mic effect's files and registration (on no mic)")
@@ -254,7 +254,7 @@ def user_items(remove_sounds: bool) -> list[str]:
 def _remove(path: Path) -> bool:
     """Delete a file or folder; True if it's gone now (else it goes at the next restart
     when we're admin)."""
-    from soundboard import directmic as dm
+    from soundboard.mic import directmic as dm
     if not path.exists():
         return True
     try:
@@ -322,7 +322,7 @@ def _process_paths() -> list[tuple[int, str]]:
 def close_apps(dirs: list[Path]):
     """Stop Onion Board if it's running from one of `dirs` (only those: another
     program called Soundboard.exe is left alone), so its files can go."""
-    from soundboard import michelper
+    from soundboard.mic import michelper
     dirs = [*dirs, michelper.helper_dir()]
     for pid, exe in _process_paths():
         p = Path(exe)
@@ -337,7 +337,7 @@ def admin_part() -> int:
     """Elevated: the mic effect, the mic helper, and everything machine-wide. 0 when
     done, RESTART when a file in use goes at the next restart, 1 if the mic effect
     couldn't come off (its notes are kept, so running this again can finish)."""
-    from soundboard import directmic as dm, michelper
+    from soundboard.mic import directmic as dm, michelper
     dm._enable_privileges("SeBackupPrivilege", "SeRestorePrivilege")
     machine_dirs = install_dirs((winreg.HKEY_LOCAL_MACHINE,))
     close_apps(machine_dirs)

@@ -1,7 +1,7 @@
 """Settings → Audio → Who's listening, and the custom-mode editor."""
 from PySide6.QtWidgets import QApplication, QComboBox, QLabel
 
-from soundboard import destination
+from soundboard.mic import destination
 from soundboard.sounds.library import Config
 from soundboard.settings import SettingsDialog
 from soundboard.ui.destpanel import CustomDestDialog, DestPanel, describe
@@ -188,7 +188,7 @@ def test_mode_buttons_switch_and_show_what_they_do(window):  # noqa: F811
 
 
 def test_what_do_these_do_lists_every_mode(window):  # noqa: F811
-    from soundboard import profiles
+    from soundboard.mic import profiles
     from soundboard.ui.destpanel import ModesHelp
     window.dest_panel.buttons["voice"].click()
     dlg = ModesHelp(window)
@@ -364,5 +364,5 @@ def test_mode_buttons_pick_with_arrow_keys(window, qapp):  # noqa: F811
 
 
 def profiles_key(mw) -> str:
-    from soundboard import profiles
+    from soundboard.mic import profiles
     return profiles.current(mw.cfg.dest).key
