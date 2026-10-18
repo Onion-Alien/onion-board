@@ -280,9 +280,7 @@ def test_mono_and_stereo_mics_go_out_the_same_as_before(monkeypatch):
     from soundboard import engine as eng
     from soundboard.engineparts import finite, peak
 
-    def run(ch, merged):
-        if not merged:
-            monkeypatch.setattr(eng, "finite_peak", lambda x: peak(finite(x)))
+    def run(ch):
         e = Engine()
         e.main_stream, e.mon_stream = FakeStream(), FakeStream()
         rng = np.random.default_rng(ch)
@@ -298,10 +296,11 @@ def test_mono_and_stereo_mics_go_out_the_same_as_before(monkeypatch):
             e._main(buf, N)
             sent.append(buf)
             levels.append((e.level_mic, e.level_main))
-        monkeypatch.undo()
         return np.concatenate(sent), levels
 
     for ch in (1, 2):
-        a, la = run(ch, True)
-        b, lb = run(ch, False)
+        a, la = run(ch)
+        with monkeypatch.context() as mp:   # the separate passes, as before
+            mp.setattr(eng, "finite_peak", lambda x: peak(finite(x)))
+            b, lb = run(ch)
         assert np.array_equal(a, b) and la == lb and np.isfinite(a).all()
