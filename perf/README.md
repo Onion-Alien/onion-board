@@ -67,7 +67,7 @@ on it or runs it.
 |---|---|
 | cold_start | process start → window ready with the sounds loaded |
 | idle_front / idle_behind | idle on the Sounds tab, in front / behind another program |
-| minimised, tray, shown_again | the window minimised, hidden in the tray, shown again |
+| minimised, tray, shown_again | the window minimised, hidden in the tray, shown again (`first_paint_ms`: one paint of the whole window) |
 | import_sounds | imports 8 short and 2 long (150 s) generated sounds; disk writes |
 | play_overlap, play_rapid | 3 sounds at once; 20 rapid hotkey-style plays |
 | fx_preview | effects preview on 5 pads (checks the preview cache lets go) |
@@ -78,7 +78,8 @@ on it or runs it.
 | apps_tab_shown / _wait / _rested / _left | the Apps tab's live meters (and the empty page's Bun); _wait keeps it open until he's had his 30 s, _rested measures after that; then back to Sounds |
 | route_mic | sending through the mic effect instead of the cable |
 | leak_loop | plays, preview, Settings, tab switches, pad rebuild: 5 warm-up rounds (things built once, ~40 MB), then N measured; growth per loop of private MB, handles, threads, Python and Qt objects. Private MB steps up now and then as the heap settles (~0.1-0.3 MB a round on average); a steady climb in handles or object counts is the real sign of a leak |
-| idle_end | tray idle at the end: does it settle back down? |
+| idle_end | tray idle at the end: does it settle back down? `memory_parts`: MB of sounds in RAM / mapped, resampled copies, pictures, Python |
+| tray_rested, shown_after_rest | in the tray until the app gave its memory back (`soundboard/memtrim.py`, ~30 s): RAM (WS) should fall to a few tens of MB; then shown again, `first_paint_ms` with the pages read back |
 
 With `--watch-src` (an Onion Watch checkout; its add-on zip is built with that
 checkout's `scripts/build_module.py`): `triggers-N/…` runs the board with the

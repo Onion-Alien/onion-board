@@ -13,6 +13,7 @@ from typing import TYPE_CHECKING
 import numpy as np
 from shiboken6 import isValid
 
+from soundboard import memtrim
 from soundboard.sounds import thumbs
 from soundboard.control import winkeys
 from soundboard.groove import Groove
@@ -48,6 +49,8 @@ class TickControl(Controller):
         self._talk_until = 0.0            # "hearing you" indicator holds until this time
         self._talk_shown: bool | None = None
         self.groove = Groove()            # what plays, for the mascots on screen (_dance)
+        self._tray_since: float | None = None   # hidden or minimised then (_give_back)
+        self._given_back = False          # ...and memory was given back since
 
     def _tick_pace(self) -> int:
         mw = self.mw
@@ -86,6 +89,10 @@ class TickControl(Controller):
         mw = self.mw
         live = mw.isVisible() and not mw.isMinimized()
         was, mw._ui_live = mw._ui_live, live
+        if live:
+            self._tray_since, self._given_back = None, False
+        elif self._tray_since is None and not self._given_back:
+            self._tray_since = time.monotonic()
         # the mic-check banner pulses only while it can be seen, in front
         mw._pulse.set_live(live and appstate.active())
         pace = self._tick_pace()
@@ -139,6 +146,8 @@ class TickControl(Controller):
                 paused for sid, (_p, paused) in playing.items()
                 if sid in mw._meta or sid == LINK_ID)))
         self._tick_busy = self._busy(playing)
+        if self._tray_since is not None and now - self._tray_since > memtrim.AFTER_S:
+            self._give_back(playing)
         pace = self._tick_pace()
         if mw.timer.interval() != pace:
             mw.timer.start(pace)
@@ -161,6 +170,16 @@ class TickControl(Controller):
         e.level_mic *= 0.9
 
         self._sync_ptt()
+
+    def _give_back(self, playing):
+        """In the tray or minimised a while: memory back to Windows (memtrim), once
+        each time, when nothing plays (the audio thread would read the pages back)."""
+        mw = self.mw
+        if (any(not paused for _p, paused in playing.values()) or mw.radio.is_active()
+                or mw.engine.aux):
+            return   # try again on a later tick
+        self._tray_since, self._given_back = None, True
+        memtrim.release()
 
     def _dance(self, playing, now: float):
         """The mascots on screen (Bun on an empty page, Hoot) dance to what plays: the

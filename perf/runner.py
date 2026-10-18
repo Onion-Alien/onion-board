@@ -24,8 +24,10 @@ BOARD_QUICK = ["idle_front", "idle_behind", "minimised", "tray", "shown_again",
                "import_sounds", "play_overlap", "play_rapid", "fx_preview", "tabs_tour",
                "dialogs", "voice_preset", "mic_check_front", "mic_check_behind",
                "apps_tab_shown", "apps_tab_wait",
-               "apps_tab_rested", "apps_tab_left", "route_mic", "leak_loop", "idle_end"]
-BOARD_FULL = BOARD_QUICK[:-1] + ["stereo_mic", "voice_heavy", "idle_end"]
+               "apps_tab_rested", "apps_tab_left", "route_mic", "leak_loop", "idle_end",
+               "tray_rested", "shown_after_rest"]
+BOARD_FULL = BOARD_QUICK[:-3] + ["stereo_mic", "voice_heavy", "idle_end", "tray_rested",
+                                 "shown_after_rest"]
 TRIGGERS = ["trig_idle_off", "trig_watch_hidden", "trig_tab_shown", "trig_tray_watching"]
 WATCH = ["ow_shown", "ow_tray", "ow_watching_tray"]
 # each tab left open: open_<tab> lets its first build and first seconds pass (not
