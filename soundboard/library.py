@@ -534,6 +534,7 @@ class Config:
     vol_down_hotkey: str = ""         # sounds 10 % quieter
     mic_hotkey: str = ""              # send my mic on / off
     voice_hotkey: str = ""            # the voice changer on / off
+    voices_hotkey: str = ""           # every voice off (remembered) / back on (Voice tab)
     voice_hold_hotkey: str = ""       # the voice changer on only while held
     voice_random_hotkey: str = ""     # a random voice from the Voice tab's cards
     hotkeys_off_hotkey: str = ""      # every other hotkey off / on (this one keeps working)

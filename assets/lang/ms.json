@@ -2672,13 +2672,7 @@
   "Remove the {n} sound from “{name}”?": [
     "Alih keluar bunyi {n} daripada “ {name} ”?"
   ],
-  "Voice changer: {voice}. Click to open it.": "Penukar suara: {voice} . Klik untuk membukanya.",
-  "The computer voice ({voice}) speaks for you. Click to open it.": "Suara komputer ( {voice} ) bercakap untuk anda. Klik untuk membukanya.",
-  "What you say is said in {language}. Click to open it.": "Apa yang anda katakan dikatakan dalam {language} . Klik untuk membukanya.",
-  "Voice effects off: mic unchanged": "Kesan suara dimatikan: mikrofon tidak berubah",
-  "Your mic voice is unchanged. Open Voice changer or AI voices below to choose a voice.": "Suara mikrofon anda tidak berubah. Buka Voice changer atau suara AI di bawah untuk memilih suara.",
   "AI voice off": "Suara AI dimatikan",
-  "Click to open AI voices.": "Klik untuk membuka suara AI.",
   "AI voice: {voice}, starting.": "Suara AI: {voice} , bermula.",
   "AI voice: {voice}.": "Suara AI: {voice} .",
   "No mic open": "Tiada mikrofon terbuka",
@@ -3080,7 +3074,6 @@
   "It's installed, but your sounds go into your mic now. Use it if a game skips your mic, or remove it if nothing else needs it.": "Ia sudah dipasang, tetapi bunyi anda kini masuk ke mikrofon anda. Gunakannya jika permainan melangkau mikrofon anda, atau buangnya jika tiada lagi yang memerlukannya.",
   "⚠ Another sound already has this name.": "⚠ Bunyi lain sudah menggunakan nama ini.",
   "Don't show this again": "Jangan tunjukkan lagi",
-  "Stop voice effects": "Hentikan kesan suara",
   "Hide this program's window": "Sembunyikan tetingkap program ini",
   "Looking for its window…": "Mencari tetingkapnya…",
   "No window to show": "Tiada tetingkap untuk ditunjukkan",
@@ -4026,5 +4019,19 @@
   "Yesterday": "Semalam",
   "AI voices are installed. Pick a voice to turn it on.": "Suara AI sudah dipasang. Pilih suara untuk menghidupkannya.",
   "⚠ The AI voice stopped. Others now hear {backup}. Switch it off and on again to try again.": "⚠ Suara AI berhenti. Orang lain kini mendengar {backup}. Matikan dan hidupkan semula untuk mencuba lagi.",
-  "⚠ The AI voice stopped: {error}. Others now hear {backup}. Switch it off and on again to try again.": "⚠ Suara AI berhenti: {error}. Orang lain kini mendengar {backup}. Matikan dan hidupkan semula untuk mencuba lagi."
+  "⚠ The AI voice stopped: {error}. Others now hear {backup}. Switch it off and on again to try again.": "⚠ Suara AI berhenti: {error}. Orang lain kini mendengar {backup}. Matikan dan hidupkan semula untuk mencuba lagi.",
+  "All voices on / off": "Semua suara hidup / mati",
+  "Click to turn it off. Right-click to open it.": "Klik untuk mematikannya. Klik kanan untuk membukanya.",
+  "Forget {thing}: Voices ON won't bring it back": "Lupakan {thing}: HIDUP tidak akan membawanya kembali",
+  "Mic unchanged. ON brings back:": "Mik tidak berubah. HIDUP membawa kembali:",
+  "Mic unchanged. ON turns on:": "Mik tidak berubah. HIDUP menghidupkan:",
+  "Nothing is changing your mic voice. Switch Voices ON, or click a grey voice, to turn it on.": "Tiada apa yang mengubah suara mik anda. Hidupkan Suara, atau klik suara kelabu, untuk menghidupkannya.",
+  "Off. Click to turn it back on. Right-click to open it.": "Mati. Klik untuk menghidupkannya semula. Klik kanan untuk membukanya.",
+  "The Voice tab's Voices switch: turns off everything changing your mic (the voice changer, the AI voice, the computer voice, translating), and the next press brings exactly those back.": "Suis Suara di tab Suara: mematikan semua yang mengubah mik anda (penukar suara, suara AI, suara komputer, terjemahan), dan tekanan seterusnya membawa kembali tepat semua itu.",
+  "The computer voice ({voice}) speaks for you.": "Suara komputer ({voice}) bercakap untuk anda.",
+  "Turns off every voice changing your mic. Switching it on brings them back.": "Mematikan setiap suara yang mengubah mik anda. Menghidupkannya membawa semuanya kembali.",
+  "Turns on: {voices}": "Menghidupkan: {voices}",
+  "Voice changer: {voice}.": "Penukar suara: {voice}.",
+  "Voices on or off": "Suara hidup atau mati",
+  "What you say is said in {language}.": "Apa yang anda katakan disebut dalam {language}."
 }

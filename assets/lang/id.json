@@ -2672,13 +2672,7 @@
   "Remove the {n} sound from “{name}”?": [
     "Hapus bunyi {n} dari “ {name} ”?"
   ],
-  "Voice changer: {voice}. Click to open it.": "Pengubah suara: {voice} . Klik untuk membukanya.",
-  "The computer voice ({voice}) speaks for you. Click to open it.": "Suara komputer ( {voice} ) berbicara mewakili Anda. Klik untuk membukanya.",
-  "What you say is said in {language}. Click to open it.": "Apa yang Anda ucapkan disampaikan dalam {language} . Klik untuk membukanya.",
-  "Voice effects off: mic unchanged": "Efek suara mati: mikrofon tidak berubah",
-  "Your mic voice is unchanged. Open Voice changer or AI voices below to choose a voice.": "Suara mikrofon Anda tidak berubah. Buka Pengubah suara atau suara AI di bawah untuk memilih suara.",
   "AI voice off": "Suara AI mati",
-  "Click to open AI voices.": "Klik untuk membuka suara AI.",
   "AI voice: {voice}, starting.": "Suara AI: {voice} , dimulai.",
   "AI voice: {voice}.": "Suara AI: {voice} .",
   "No mic open": "Tidak ada mikrofon yang terbuka",
@@ -3080,7 +3074,6 @@
   "It's installed, but your sounds go into your mic now. Use it if a game skips your mic, or remove it if nothing else needs it.": "Sudah terpasang, tapi suaramu sekarang masuk ke mikmu. Pakai kalau ada game yang melewati mikmu, atau hapus kalau tidak ada lagi yang membutuhkannya.",
   "⚠ Another sound already has this name.": "⚠ Suara lain sudah memakai nama ini.",
   "Don't show this again": "Jangan tampilkan lagi",
-  "Stop voice effects": "Hentikan efek suara",
   "Hide this program's window": "Sembunyikan jendela program ini",
   "Looking for its window…": "Mencari jendelanya…",
   "No window to show": "Tidak ada jendela untuk ditampilkan",
@@ -4026,5 +4019,19 @@
   "Yesterday": "Kemarin",
   "AI voices are installed. Pick a voice to turn it on.": "Suara AI sudah terpasang. Pilih suara untuk menyalakannya.",
   "⚠ The AI voice stopped. Others now hear {backup}. Switch it off and on again to try again.": "⚠ Suara AI berhenti. Yang lain sekarang mendengar {backup}. Matikan lalu nyalakan lagi untuk mencoba lagi.",
-  "⚠ The AI voice stopped: {error}. Others now hear {backup}. Switch it off and on again to try again.": "⚠ Suara AI berhenti: {error}. Yang lain sekarang mendengar {backup}. Matikan lalu nyalakan lagi untuk mencoba lagi."
+  "⚠ The AI voice stopped: {error}. Others now hear {backup}. Switch it off and on again to try again.": "⚠ Suara AI berhenti: {error}. Yang lain sekarang mendengar {backup}. Matikan lalu nyalakan lagi untuk mencoba lagi.",
+  "All voices on / off": "Semua suara nyala / mati",
+  "Click to turn it off. Right-click to open it.": "Klik untuk mematikannya. Klik kanan untuk membukanya.",
+  "Forget {thing}: Voices ON won't bring it back": "Lupakan {thing}: NYALA tidak akan mengembalikannya",
+  "Mic unchanged. ON brings back:": "Mik tidak berubah. NYALA mengembalikan:",
+  "Mic unchanged. ON turns on:": "Mik tidak berubah. NYALA menyalakan:",
+  "Nothing is changing your mic voice. Switch Voices ON, or click a grey voice, to turn it on.": "Tidak ada yang mengubah suara mikmu. Nyalakan Suara, atau klik suara abu-abu, untuk menyalakannya.",
+  "Off. Click to turn it back on. Right-click to open it.": "Mati. Klik untuk menyalakannya lagi. Klik kanan untuk membukanya.",
+  "The Voice tab's Voices switch: turns off everything changing your mic (the voice changer, the AI voice, the computer voice, translating), and the next press brings exactly those back.": "Sakelar Suara di tab Suara: mematikan semua yang mengubah mikmu (pengubah suara, suara AI, suara komputer, terjemahan), dan tekanan berikutnya mengembalikan persis semuanya.",
+  "The computer voice ({voice}) speaks for you.": "Suara komputer ({voice}) berbicara untukmu.",
+  "Turns off every voice changing your mic. Switching it on brings them back.": "Mematikan setiap suara yang mengubah mikmu. Menyalakannya mengembalikan semuanya.",
+  "Turns on: {voices}": "Menyalakan: {voices}",
+  "Voice changer: {voice}.": "Pengubah suara: {voice}.",
+  "Voices on or off": "Suara nyala atau mati",
+  "What you say is said in {language}.": "Yang kamu katakan diucapkan dalam {language}."
 }

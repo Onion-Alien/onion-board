@@ -151,6 +151,7 @@ class CardBadge(QWidget):
 
 CARD_ICONS = {"fx": "voice", "ai": "wave", "speak": "browser", "addons": "puzzle"}
 TAB_KEYS = tuple(CARD_ICONS)   # the Voice tab's own tabs, in order
+ORDER = ("fx", "ai", "speak", "lang")   # the status bar's chips, as the sound goes through
 TAB_NAMES = {"fx": lambda: _("Voice changer"), "ai": lambda: _("AI voices"),
              "speak": lambda: _("Languages"), "addons": lambda: _("Add-ons")}
 
@@ -190,9 +191,15 @@ class VoicePanel(QWidget):
         # what's on and your mic level, whatever's folded or scrolled away: at the
         # bottom, just above the mixer (added below, after the cards; the Say bar on top)
         self.bar = VoiceStatusBar()
+        # what Voices ON (or a grey chip's click) brings back, in the bar's order, and
+        # the language that was being spoken in ("lang")
+        self._back: list[str] = []
+        self._back_lang = ""
+        self._switching = False          # set_voices / toggle_one at work (_update_bar)
         self.bar.open_card.connect(self._open_card)
-        self.bar.stop_button.clicked.connect(self.stop_all)
-        self.bar.turn_off.connect(lambda k: (usage.used("voice-chip-off"), self.stop_one(k)))
+        self.bar.master_toggled.connect(self._master_flipped)
+        self.bar.toggle.connect(self.toggle_one)
+        self.bar.turn_off.connect(lambda k: (usage.used("voice-chip-off"), self.forget_one(k)))
         scroll = self._scroll = QScrollArea()
         scroll.setWidgetResizable(True)
         scroll.setFrameShape(QFrame.Shape.NoFrame)
@@ -566,15 +573,114 @@ class VoicePanel(QWidget):
 
     def stop_all(self):
         """The window's Stop all: the typed line stops and every voice goes off (the
-        voice changer, the AI voice and the computer voice)."""
+        voice changer, the AI voice, the computer voice and translating). What was on
+        is remembered: Voices ON brings it back."""
         self.controller.stop_speaking()
-        self.ai.stop()
-        self.speech.livevoice.b_live.setChecked(False)
-        self.fx.btn_power.setChecked(False)   # its toggled handler applies it
-        self.speech.stop_translating()
+        self.set_voices(False)
+        self.speech.stop_translating()   # a language picked but not ready yet goes too
+
+    def on_keys(self) -> list[str]:
+        """What's changing your mic now, in the bar's order: "fx", "ai", "speak",
+        "lang"."""
+        keys = []
+        if self.fx.btn_power.isChecked():
+            keys.append("fx")
+        if self.ai.is_on():
+            keys.append("ai")
+        if self.speech.livevoice.b_live.isChecked():
+            keys.append("speak")
+        if spoken.heard() and self.speech.translating() is not None:   # else no Languages tab
+            keys.append("lang")
+        return keys
+
+    def voices_on(self) -> bool:
+        """The Voices switch's state: something here is changing your mic."""
+        return bool(self.on_keys())
+
+    def back_keys(self) -> list[str]:
+        """What Voices ON would turn on: what it turned off, else the voice changer
+        with the voice picked on it."""
+        return list(self._back) or ["fx"]
+
+    def set_voices(self, on: bool):
+        """The Voices switch. Off: every voice goes off, remembered with the grey ones
+        already waiting. On: exactly those come back (nothing remembered: the voice
+        changer with its picked voice)."""
+        self._switching = True
+        try:
+            if not on:
+                keys = self.on_keys()
+                if keys:                 # already all off: keep what's remembered
+                    # the grey ones stay too (they were shown as coming back), except
+                    # a replacement for your voice the one that's on would push off
+                    other = {"ai": "speak", "speak": "ai"}
+                    self._back = [k for k in ORDER if k in keys or (
+                        k in self._back and other.get(k) not in keys)]
+                    if "lang" in keys:
+                        self._back_lang = self.speech.cb_lang.currentData() or ""
+                for k in keys:
+                    self.stop_one(k)
+            elif not self.voices_on():
+                keys = self.back_keys()
+                self._back = []
+                for k in keys:
+                    self._turn_on(k)
+        finally:
+            self._switching = False
+        self._update_heads()
+
+    def toggle_voices(self) -> bool:
+        """The Voices hotkey: flips the switch. True when voices are on now."""
+        self.set_voices(not self.voices_on())
+        return self.voices_on()
+
+    def _master_flipped(self, on: bool):
+        usage.used("voices-master")
+        self.set_voices(on)
+
+    def _turn_on(self, key: str):
+        if key == "fx":
+            self.fx.btn_power.setChecked(True)   # its toggled handler applies it
+        elif key == "ai":
+            self.ai.b_start.setChecked(True)
+        elif key == "speak":
+            self.speech.livevoice.b_live.setChecked(True)
+        elif key == "lang" and self._back_lang:
+            i = self.speech.cb_lang.findData(self._back_lang)
+            if i > 0:                    # (its language may have been removed since)
+                self.speech.cb_lang.setCurrentIndex(i)
+
+    def toggle_one(self, key: str):
+        """A status bar chip clicked: that one goes off (remembered, its chip stays
+        grey), or a grey one comes back on."""
+        usage.used("voice-chip-toggle")
+        before = self.on_keys()
+        self._switching = True
+        try:
+            if key in before:
+                if key == "lang":
+                    self._back_lang = self.speech.cb_lang.currentData() or ""
+                self._back = [k for k in ORDER if k == key or k in self._back]
+                self.stop_one(key)
+            else:
+                self._back = [k for k in self._back if k != key]
+                self._turn_on(key)
+                # one replacement for your voice at a time: the one it pushed off goes grey
+                pushed = [k for k in before if k not in self.on_keys()]
+                self._back = [k for k in ORDER if k in self._back or k in pushed]
+        finally:
+            self._switching = False
+        self._update_heads()
+
+    def forget_one(self, key: str):
+        """A chip's ✕: that one goes off, and Voices ON won't bring it back."""
+        self._back = [k for k in self._back if k != key]
+        if key in self.on_keys():
+            self.stop_one(key)
+        self._update_heads()
 
     def stop_one(self, key: str):
-        """A status bar chip's ✕: just that one goes off, the others stay on."""
+        """Just that one goes off, the others stay on."""
         if key == "fx":
             self.fx.btn_power.setChecked(False)   # its toggled handler applies it
         elif key == "ai":
@@ -710,41 +816,81 @@ class VoicePanel(QWidget):
             return
         # short: a picture and a name; the full words are the chip's tip
         items = []
-        if self.fx.btn_power.isChecked():
-            name = self.fx.preset
-            shown = _("My own mix") if name == CUSTOM else voicefx.shown(name)
-            pic = art.icon(art.voice_key(name)) if name != CUSTOM else None
+        on = self.on_keys()
+        # turned on again some other way (its card): it's no longer waiting to come back
+        # (not while the switch or a chip turns them on and off one by one)
+        if not self._switching:
+            self._back = [k for k in self._back if k not in on]
+        click_off = _("Click to turn it off. Right-click to open it.")
+        if "fx" in on:
+            shown, pic = self._fx_shown()
             items.append(("fx", shown, "on", "voice" if pic is None else "", pic,
-                          _("Voice changer: {voice}. Click to open it.", voice=shown)))
+                          _("Voice changer: {voice}.", voice=shown) + " " + click_off))
         if self.ai.is_on():
             st, title = self.ai.status(), self.ai.voice_title()
             if st == "failed":
                 items.append(("ai", _("AI voice off"), "warn", "warn", None,
-                              self.ai.failure_text() + " " + _("Click to open AI voices.")))
+                              self.ai.failure_text() + " " + click_off))
             else:
                 items.append(("ai", title + ("…" if st == "starting" else ""), "on", "wave",
                               None, (_("AI voice: {voice}, starting.", voice=title)
                                      if st == "starting" else
                                      _("AI voice: {voice}.", voice=title)) + " "
-                              + _("Click to open AI voices.")))
-        if self.speech.livevoice.b_live.isChecked():
-            # which voice: a custom one may be a voice server on this PC (a web address)
-            cb = self.speech.cb_voice
-            who = cb.currentText() if cb.currentData() else _("Computer voice")
+                              + click_off))
+        if "speak" in on:
+            who = self._speak_shown()
             items.append(("speak", who, "on", "speech", None,
-                          _("The computer voice ({voice}) speaks for you. Click to open it.",
-                            voice=who)))
-        m = self.speech.translating() if spoken.heard() else None   # else no Languages tab
+                          _("The computer voice ({voice}) speaks for you.", voice=who)
+                          + " " + click_off))
+        m = self.speech.translating() if "lang" in on else None
         if m is not None:
             lang = langnames.of(m)
             items.append(("lang", lang, "on", "browser", None,
-                          _("What you say is said in {language}. Click to open it.",
-                            language=lang)))
-        if not items:
-            items.append(("none", _("Voice effects off: mic unchanged"), "off", "mic", None,
-                          _("Your mic voice is unchanged. Open Voice changer or AI voices "
-                            "below to choose a voice.")))
+                          _("What you say is said in {language}.", language=lang)
+                          + " " + click_off))
+        # grey: what Voices ON brings back (a click brings just that one back)
+        if not on:
+            items.append(("none", _("Mic unchanged. ON brings back:") if self._back else
+                          _("Mic unchanged. ON turns on:"), "off", "mic", None,
+                          _("Nothing is changing your mic voice. Switch Voices ON, or "
+                            "click a grey voice, to turn it on.")))
+        click_on = _("Off. Click to turn it back on. Right-click to open it.")
+        for k in (self.back_keys() if not on else self._back):
+            if k == "fx":
+                shown, pic = self._fx_shown()
+                items.append(("fx", shown, "off", "voice" if pic is None else "", pic,
+                              _("Voice changer: {voice}.", voice=shown) + " " + click_on,
+                              bool(self._back)))   # the voice it'd turn on anyway: no ✕
+            elif k == "ai":
+                title = self.ai.voice_title()
+                items.append(("ai", title, "off", "wave", None,
+                              _("AI voice: {voice}.", voice=title) + " " + click_on))
+            elif k == "speak":
+                who = self._speak_shown()
+                items.append(("speak", who, "off", "speech", None,
+                              _("The computer voice ({voice}) speaks for you.", voice=who)
+                              + " " + click_on))
+            elif k == "lang" and self._back_lang and spoken.heard():
+                lang = langnames.name(self._back_lang, self._back_lang)
+                items.append(("lang", lang, "off", "browser", None,
+                              _("What you say is said in {language}.", language=lang)
+                              + " " + click_on))
         self.bar.set_items(items)
+        names = ", ".join(it[1] for it in items if it[2] == "off" and it[0] != "none")
+        self.bar.set_master(bool(on), (
+            _("Turns off every voice changing your mic. Switching it on brings them back.")
+            if on else _("Turns on: {voices}", voices=names)))
+
+    def _fx_shown(self) -> tuple:
+        """The voice changer's voice for a chip: its short name and its picture."""
+        name = self.fx.preset
+        shown = _("My own mix") if name == CUSTOM else voicefx.shown(name)
+        return shown, art.icon(art.voice_key(name)) if name != CUSTOM else None
+
+    def _speak_shown(self) -> str:
+        # which voice: a custom one may be a voice server on this PC (a web address)
+        cb = self.speech.cb_voice
+        return cb.currentText() if cb.currentData() else _("Computer voice")
 
     def _open_card(self, key: str):
         """A status bar chip: show its tab, from the top."""

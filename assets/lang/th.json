@@ -2672,13 +2672,7 @@
   "Remove the {n} sound from “{name}”?": [
     "ลบเสียง {n} ออกจาก “ {name} ” หรือไม่"
   ],
-  "Voice changer: {voice}. Click to open it.": "โปรแกรมเปลี่ยนเสียง: {voice} . คลิกเพื่อเปิด",
-  "The computer voice ({voice}) speaks for you. Click to open it.": "เสียงคอมพิวเตอร์ ( {voice} ) พูดแทนคุณ คลิกเพื่อเปิด",
-  "What you say is said in {language}. Click to open it.": "สิ่งที่คุณพูดเป็นภาษา {language} คลิกเพื่อเปิด",
-  "Voice effects off: mic unchanged": "ปิดเอฟเฟกต์เสียง: ไมค์ไม่เปลี่ยนแปลง",
-  "Your mic voice is unchanged. Open Voice changer or AI voices below to choose a voice.": "เสียงไมค์ของคุณไม่เปลี่ยนแปลง เปิดโปรแกรมเปลี่ยนเสียงหรือเสียง AI ด้านล่างเพื่อเลือกเสียง",
   "AI voice off": "เสียง AI ปิดอยู่",
-  "Click to open AI voices.": "คลิกเพื่อเปิดเสียง AI",
   "AI voice: {voice}, starting.": "เสียง AI: {voice} กำลังเริ่มต้น",
   "AI voice: {voice}.": "เสียง AI: {voice}",
   "No mic open": "ไม่มีไมค์เปิด",
@@ -3080,7 +3074,6 @@
   "It's installed, but your sounds go into your mic now. Use it if a game skips your mic, or remove it if nothing else needs it.": "ติดตั้งไว้แล้ว แต่ตอนนี้เสียงของคุณเข้าไมค์แล้ว ใช้มันถ้าเกมข้ามไมค์ของคุณ หรือลบออกถ้าไม่มีอะไรต้องใช้มันแล้ว",
   "⚠ Another sound already has this name.": "⚠ มีเสียงอื่นใช้ชื่อนี้อยู่แล้ว",
   "Don't show this again": "ไม่ต้องแสดงอีก",
-  "Stop voice effects": "หยุดเอฟเฟกต์เสียง",
   "Hide this program's window": "ซ่อนหน้าต่างของโปรแกรมนี้",
   "Looking for its window…": "กำลังหาหน้าต่าง…",
   "No window to show": "ไม่มีหน้าต่างให้แสดง",
@@ -4026,5 +4019,19 @@
   "Yesterday": "เมื่อวาน",
   "AI voices are installed. Pick a voice to turn it on.": "ติดตั้งเสียง AI แล้ว เลือกเสียงเพื่อเปิดใช้งาน",
   "⚠ The AI voice stopped. Others now hear {backup}. Switch it off and on again to try again.": "⚠ เสียง AI หยุดทำงาน ตอนนี้คนอื่นได้ยิน {backup} ปิดแล้วเปิดใหม่อีกครั้งเพื่อลองใหม่",
-  "⚠ The AI voice stopped: {error}. Others now hear {backup}. Switch it off and on again to try again.": "⚠ เสียง AI หยุดทำงาน: {error} ตอนนี้คนอื่นได้ยิน {backup} ปิดแล้วเปิดใหม่อีกครั้งเพื่อลองใหม่"
+  "⚠ The AI voice stopped: {error}. Others now hear {backup}. Switch it off and on again to try again.": "⚠ เสียง AI หยุดทำงาน: {error} ตอนนี้คนอื่นได้ยิน {backup} ปิดแล้วเปิดใหม่อีกครั้งเพื่อลองใหม่",
+  "All voices on / off": "เสียงทั้งหมด เปิด / ปิด",
+  "Click to turn it off. Right-click to open it.": "คลิกเพื่อปิด คลิกขวาเพื่อเปิดการ์ด",
+  "Forget {thing}: Voices ON won't bring it back": "ลืม {thing}: เปิด จะไม่นำกลับมา",
+  "Mic unchanged. ON brings back:": "ไมค์ไม่เปลี่ยน เปิด จะนำกลับมา:",
+  "Mic unchanged. ON turns on:": "ไมค์ไม่เปลี่ยน เปิด จะเปิด:",
+  "Nothing is changing your mic voice. Switch Voices ON, or click a grey voice, to turn it on.": "ไม่มีอะไรเปลี่ยนเสียงไมค์ของคุณ เปิด เสียง หรือคลิกเสียงสีเทาเพื่อเปิด",
+  "Off. Click to turn it back on. Right-click to open it.": "ปิดอยู่ คลิกเพื่อเปิดอีกครั้ง คลิกขวาเพื่อเปิดการ์ด",
+  "The Voice tab's Voices switch: turns off everything changing your mic (the voice changer, the AI voice, the computer voice, translating), and the next press brings exactly those back.": "สวิตช์ เสียง ในแท็บเสียง: ปิดทุกอย่างที่เปลี่ยนไมค์ของคุณ (โปรแกรมเปลี่ยนเสียง เสียง AI เสียงคอมพิวเตอร์ การแปล) และกดครั้งถัดไปจะนำกลับมาแบบเดิมทุกอย่าง",
+  "The computer voice ({voice}) speaks for you.": "เสียงคอมพิวเตอร์ ({voice}) พูดแทนคุณ",
+  "Turns off every voice changing your mic. Switching it on brings them back.": "ปิดทุกเสียงที่เปลี่ยนไมค์ของคุณ เปิดอีกครั้งจะนำกลับมา",
+  "Turns on: {voices}": "จะเปิด: {voices}",
+  "Voice changer: {voice}.": "โปรแกรมเปลี่ยนเสียง: {voice}",
+  "Voices on or off": "เสียง เปิด หรือ ปิด",
+  "What you say is said in {language}.": "สิ่งที่คุณพูดจะพูดเป็นภาษา{language}"
 }

@@ -45,6 +45,10 @@ HOTKEY_GROUPS = [
          _("Others hear your voice with the sounds, or only the sounds.")),
         ("voice_hotkey", "__voice__", _("Voice changer on / off"),
          _("Turns the voice changer on with the voice picked on the Voice tab, or off.")),
+        ("voices_hotkey", "__voices__", _("All voices on / off"),
+         _("The Voice tab's Voices switch: turns off everything changing your mic (the "
+           "voice changer, the AI voice, the computer voice, translating), and the next "
+           "press brings exactly those back.")),
         ("voice_hold_hotkey", "__voicehold__", _("Change my voice while held"),
          _("The voice changer is on only while you hold this key down.")),
         ("voice_random_hotkey", "__voicerandom__", _("Random voice"),

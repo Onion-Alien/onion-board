@@ -2672,13 +2672,7 @@
   "Remove the {n} sound from “{name}”?": [
     "「 {name} 」から{n}音を削除しますか?"
   ],
-  "Voice changer: {voice}. Click to open it.": "ボイスチェンジャー: {voice} 。クリックして開きます。",
-  "The computer voice ({voice}) speaks for you. Click to open it.": "コンピューターの音声 ( {voice} ) があなたの代わりに話します。クリックして開きます。",
-  "What you say is said in {language}. Click to open it.": "あなたが言ったことは{language}で言われています。クリックして開きます。",
-  "Voice effects off: mic unchanged": "音声エフェクトはオフ：マイクは変更されません",
-  "Your mic voice is unchanged. Open Voice changer or AI voices below to choose a voice.": "マイクの声は変わりません。以下のボイスチェンジャーまたは AI 音声を開いて音声を選択します。",
   "AI voice off": "AI音声オフ",
-  "Click to open AI voices.": "クリックすると AI 音声が開きます。",
   "AI voice: {voice}, starting.": "AI 音声: {voice} 、開始します。",
   "AI voice: {voice}.": "AI 音声: {voice} 。",
   "No mic open": "マイクが開いていません",
@@ -3080,7 +3074,6 @@
   "It's installed, but your sounds go into your mic now. Use it if a game skips your mic, or remove it if nothing else needs it.": "インストール済みですが、今はサウンドがマイクに流れています。ゲームがマイクを通さないときに使うか、ほかに使うものがなければ削除してください。",
   "⚠ Another sound already has this name.": "⚠ 同じ名前のサウンドがすでにあります。",
   "Don't show this again": "今後表示しない",
-  "Stop voice effects": "音声エフェクトを停止",
   "Hide this program's window": "このプログラムのウィンドウを隠す",
   "Looking for its window…": "ウィンドウを探しています…",
   "No window to show": "表示するウィンドウがありません",
@@ -4026,5 +4019,19 @@
   "Yesterday": "昨日",
   "AI voices are installed. Pick a voice to turn it on.": "AI音声をインストールしました。声を選ぶとオンになります。",
   "⚠ The AI voice stopped. Others now hear {backup}. Switch it off and on again to try again.": "⚠ AI音声が停止しました。他の人には{backup}が聞こえています。もう一度試すには、いったんオフにしてからオンに戻してください。",
-  "⚠ The AI voice stopped: {error}. Others now hear {backup}. Switch it off and on again to try again.": "⚠ AI音声が停止しました：{error}。他の人には{backup}が聞こえています。もう一度試すには、いったんオフにしてからオンに戻してください。"
+  "⚠ The AI voice stopped: {error}. Others now hear {backup}. Switch it off and on again to try again.": "⚠ AI音声が停止しました：{error}。他の人には{backup}が聞こえています。もう一度試すには、いったんオフにしてからオンに戻してください。",
+  "All voices on / off": "すべての声 オン / オフ",
+  "Click to turn it off. Right-click to open it.": "クリックでオフ。右クリックで開きます。",
+  "Forget {thing}: Voices ON won't bring it back": "{thing} を忘れる: オン にしても戻りません",
+  "Mic unchanged. ON brings back:": "マイクはそのまま。オン で戻るもの:",
+  "Mic unchanged. ON turns on:": "マイクはそのまま。オン でオンになるもの:",
+  "Nothing is changing your mic voice. Switch Voices ON, or click a grey voice, to turn it on.": "マイクの声を変えているものはありません。声を オン にするか、グレーの声をクリックするとオンになります。",
+  "Off. Click to turn it back on. Right-click to open it.": "オフ。クリックで再びオン。右クリックで開きます。",
+  "The Voice tab's Voices switch: turns off everything changing your mic (the voice changer, the AI voice, the computer voice, translating), and the next press brings exactly those back.": "声タブの「声」スイッチ: マイクを変えるものをすべてオフにし(ボイスチェンジャー、AI 音声、コンピューターの声、翻訳)、次に押すとまったく同じものが戻ります。",
+  "The computer voice ({voice}) speaks for you.": "コンピューターの声 ({voice}) が代わりに話します。",
+  "Turns off every voice changing your mic. Switching it on brings them back.": "マイクを変えている声をすべてオフにします。オンにすると元に戻ります。",
+  "Turns on: {voices}": "オンにするもの: {voices}",
+  "Voice changer: {voice}.": "ボイスチェンジャー: {voice}。",
+  "Voices on or off": "声 オン / オフ",
+  "What you say is said in {language}.": "話した内容は {language} で話されます。"
 }

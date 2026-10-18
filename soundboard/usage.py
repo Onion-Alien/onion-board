@@ -343,6 +343,8 @@ FEATURES = ("add-files", "youtube", "record", "clip", "clip-editor", "import-boa
             "setup-wait-note", "cable-confirm", "cable-confirm-mic",
             # the Voice tab saying no mic is open; one voice bar chip's close button
             "voice-no-mic", "voice-chip-off",
+            # the Voice tab's Voices ON / OFF switch; a voice bar chip clicked on or off
+            "voices-master", "voice-chip-toggle",
             # a background sound's ▶ heard before adding it; the mini player's Full board
             "voice-background-hear", "mini-full-board",
             # a deleted category's Undo; a sound played while muted (the note), its Go live

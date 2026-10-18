@@ -372,6 +372,8 @@ class HotkeyControl(Controller):
             self._set_voice(on)
             # the Voice tab switched off: nothing went on, so no "on" beep either
             mw.playctl.cue("fail" if not mw.tabctl.tab_on("voice") else "start" if on else "stop")
+        elif action == "__voices__":
+            self.toggle_voices()
         elif action == "__voicehold__":
             if self._voice_was is None and mw.tabctl.tab_on("voice"):
                 self._voice_was = mw.voice.fx.btn_power.isChecked()
@@ -424,6 +426,16 @@ class HotkeyControl(Controller):
             return
         self._voice_was = None
         mw.playctl.cue("start" if fx.roll() else "fail")
+
+    def toggle_voices(self):
+        """The All voices key: the Voice tab's Voices switch, from anywhere."""
+        mw = self.mw
+        if not mw.tabctl.tab_on("voice"):
+            mw.playctl.cue("fail")
+            mw.toast(_("The Voice tab is switched off (Settings > Tabs)."), "warn")
+            return
+        self._voice_was = None   # a held voice key lets go of nothing now
+        mw.playctl.cue("start" if mw.voice.toggle_voices() else "stop")
 
     def _set_voice(self, on: bool):
         """The voice changer's big ON / OFF switch, from a hotkey."""
