@@ -232,6 +232,12 @@ class RecordDialog(QDialog):
         self._show_state()
 
     # ------------------------------------------------------------------ state
+    def quick_start(self) -> bool:
+        """The Voice tab's Record: your voice, changed while the voice changer is on,
+        recording at once."""
+        (self.opt_fx if self._voice_on() else self.opt_raw).setChecked(True)
+        return self.start()
+
     def from_playing(self) -> bool:
         """Recording what's playing, not the mic."""
         return self.opt_play.isChecked()

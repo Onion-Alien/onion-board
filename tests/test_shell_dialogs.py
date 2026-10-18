@@ -365,7 +365,8 @@ def test_popups_inside_cards_keep_the_themes_background(qapp, box):
             f = QFrame()
             f.setObjectName(box)
             if box == "stations":
-                f.setStyleSheet(StationList._PANEL_STYLE.substitute(theme.T))
+                f.setStyleSheet(StationList._PANEL_STYLE.substitute(
+                    theme.T, fill=theme.accent_fill()))
             cb = QComboBox()
             cb.addItems(["Off", "Discord", "Vivox"])
             QVBoxLayout(f).addWidget(cb)

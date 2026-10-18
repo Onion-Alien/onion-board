@@ -9,7 +9,8 @@ import soundfile as sf
 from conftest import said, unsay
 from PySide6.QtCore import QPoint, QPointF, Qt
 from PySide6.QtGui import QWheelEvent
-from PySide6.QtWidgets import QApplication, QLabel, QScrollArea, QSlider, QVBoxLayout, QWidget
+from PySide6.QtWidgets import (QApplication, QLabel, QMenu, QScrollArea, QSlider, QVBoxLayout,
+                               QWidget)
 
 from soundboard import __version__, engine, library, winkeys
 from soundboard.library import SR, Config, SoundMeta
@@ -1554,8 +1555,11 @@ def test_add_is_a_menu_of_every_way_in(window, monkeypatch):
     menu = window.btn_add.menu()
     assert menu is not None
     assert [a.text() for a in menu.actions()] == [
-        _("Sound files"), _("A whole folder"), _("Record"), _("From a link"),
-        _("Free sound packs")]
+        _("Sound files"), _("A whole folder"), _("Record"), _("From a link")]
+    # Free sound packs is in the Library menu only, not in two places
+    lib = [act.text() for m in window.findChildren(QMenu) if m is not menu
+           for act in m.actions()]
+    assert lib.count(_("Free sound packs")) == 1
     shown = []
     monkeypatch.setattr(window.searchctl, "_show_link", lambda: shown.append(window.search.text()))
     QApplication.clipboard().setText("https://www.youtube.com/watch?v=abc")

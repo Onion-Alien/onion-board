@@ -14,8 +14,9 @@ import math
 import threading
 import time
 import uuid
-from dataclasses import asdict, dataclass
+from dataclasses import asdict, dataclass, field
 from pathlib import Path
+from typing import ClassVar
 
 import numpy as np
 import soundfile as sf
@@ -29,23 +30,43 @@ KEEP_DAYS = 7
 DAY = 24 * 60 * 60
 
 
-def clips_dir() -> Path:
-    return library.APP_DIR / "clips"
+PEAKS = 48   # bars in a clip's waveform picture
+
+
+def clips_dir(folder: str = "clips") -> Path:
+    return library.APP_DIR / folder
+
+
+def peaks_of(data: np.ndarray, n: int = PEAKS) -> list[float]:
+    """A clip's waveform picture: n loudness bars from 0 to 1 (the loudest is 1),
+    small enough to keep in the index."""
+    a = np.abs(np.asarray(data, np.float32))
+    if a.ndim == 2:
+        a = a.max(axis=1)
+    if not len(a):
+        return []
+    bars = np.array([part.max() if len(part) else 0.0 for part in np.array_split(a, n)])
+    top = float(bars.max())
+    if top <= 1e-6:
+        return [0.0] * n
+    return [round(float(v), 2) for v in (bars / top) ** 0.7]   # quiet parts stay visible
 
 
 @dataclass
 class Clip:
     id: str
     name: str
-    file: str            # the FLAC's name inside clips_dir()
+    file: str            # the FLAC's name inside its folder
     src: str = ""        # the program it was cut from
     seconds: float = 0.0
     made: float = 0.0    # time.time()
     last_used: float = 0.0
+    peaks: list[float] = field(default_factory=list)   # its waveform picture (peaks_of)
+    folder: ClassVar[str] = "clips"   # where its kind lives (not saved in the index)
 
     @property
     def path(self) -> Path:
-        return clips_dir() / self.file
+        return clips_dir(self.folder) / self.file
 
     def audio(self) -> np.ndarray:
         data, sr = sf.read(str(self.path), dtype="float32", always_2d=True)
@@ -59,10 +80,16 @@ class Clip:
         return np.ascontiguousarray(data[:, :2])
 
 
-class Shelf:
-    """The saved clips, newest first."""
+class VoiceClip(Clip):
+    """The Voice tab's recordings: the same list, a folder of their own."""
+    folder: ClassVar[str] = "voice-clips"
 
-    def __init__(self):
+
+class Shelf:
+    """The saved clips, newest first. `kind`: Clip (the Apps tab's) or VoiceClip."""
+
+    def __init__(self, kind: type[Clip] = Clip):
+        self.kind = kind
         self.clips: list[Clip] = []
         self._lock = threading.RLock()
         self._dirty = False
@@ -70,7 +97,7 @@ class Shelf:
         self.load()
 
     def _index(self) -> Path:
-        return clips_dir() / "index.json"
+        return clips_dir(self.kind.folder) / "index.json"
 
     def load(self):
         self.clips = []
@@ -84,7 +111,10 @@ class Shelf:
         known = {f.name for f in Clip.__dataclass_fields__.values()}
         for r in rows if isinstance(rows, list) else []:
             if isinstance(r, dict) and r.get("id") and r.get("file"):
-                c = Clip(**{k: v for k, v in r.items() if k in known})
+                c = self.kind(**{k: v for k, v in r.items() if k in known})
+                if not (isinstance(c.peaks, list)
+                        and all(isinstance(v, (int, float)) for v in c.peaks)):
+                    c.peaks = []   # a damaged picture: drawn again from the audio
                 if c.path.is_file():
                     # Earlier versions did not track activity. Give their clips a
                     # full retention period rather than guessing when they were used.
@@ -102,7 +132,7 @@ class Shelf:
         """Files no clip points at (deleted ones, from an earlier run) go."""
         keep = {c.file for c in self.clips}
         try:
-            for f in clips_dir().glob("*.flac"):
+            for f in clips_dir(self.kind.folder).glob("*.flac"):
                 if f.name not in keep:
                     f.unlink(missing_ok=True)
         except OSError:
@@ -110,7 +140,7 @@ class Shelf:
 
     def save(self):
         with self._lock:
-            d = clips_dir()
+            d = clips_dir(self.kind.folder)
             d.mkdir(parents=True, exist_ok=True)
             tmp = d / "index.json.tmp"
             tmp.write_text(json.dumps([asdict(c) for c in self.clips], indent=1), "utf-8")
@@ -118,17 +148,38 @@ class Shelf:
             self._dirty = False
 
     def add(self, data: np.ndarray, name: str, src: str = "") -> Clip:
-        d = clips_dir()
+        d = clips_dir(self.kind.folder)
         d.mkdir(parents=True, exist_ok=True)
         cid = uuid.uuid4().hex[:10]
         now = time.time()
-        c = Clip(id=cid, name=name.strip()[:60] or "Clip", file=f"{cid}.flac", src=src,
-                 seconds=len(data) / SR, made=now, last_used=now)
+        c = self.kind(id=cid, name=name.strip()[:60] or "Clip", file=f"{cid}.flac", src=src,
+                 seconds=len(data) / SR, made=now, last_used=now, peaks=peaks_of(data))
         sf.write(str(c.path), np.asarray(data, np.float32), SR, subtype="PCM_16")
         with self._lock:
             self.clips.insert(0, c)
             self.save()
         return c
+
+    def fill_peaks(self, limit: int = 50) -> int:
+        """Waveform pictures for clips saved before there were any (newest first, at
+        most `limit` a call). Runs on a worker: reads their audio. Kept in memory; the
+        next save writes them. Returns how many it drew."""
+        done = 0
+        for c in self.snapshot():
+            if done >= limit:
+                break
+            if c.peaks:
+                continue
+            try:
+                peaks = peaks_of(c.audio())
+            except Exception as e:  # noqa: BLE001 - a missing or damaged file: no picture
+                log.debug("no waveform for clip %s: %s", c.file, e)
+                peaks = [0.0] * PEAKS
+            with self._lock:
+                c.peaks = peaks
+                self._dirty = True
+            done += 1
+        return done
 
     def get(self, cid: str) -> Clip | None:
         with self._lock:

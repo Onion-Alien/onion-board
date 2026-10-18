@@ -20,6 +20,7 @@ from soundboard.ui.widgets import Meter, widget_at
 GAP = 16            # between the mic half and the chips, side by side
 ROW_H = 28          # every chip, label and the mic row: the bar never changes height
 STOP_H = 36         # the Stop button, bigger than the chips beside it
+METER_MIN = 80      # the mic meter's narrowest, unless the bar is too tight for it
 X_SIDE = 18         # a chip's ✕, inside its right end
 
 
@@ -89,7 +90,7 @@ class VoiceStatusBar(QFrame):
         mic = self._mic = QWidget()
         mic.setObjectName("voicebarpart")      # no fill of its own: the bar's shows
         mic.setFixedHeight(STOP_H)
-        mh = QHBoxLayout(mic)
+        mh = self._mic_row = QHBoxLayout(mic)
         mh.setContentsMargins(0, 0, 0, 0)
         mh.setSpacing(8)
         # a big red Stop with its word: the one way out of every voice at once, it
@@ -102,14 +103,26 @@ class VoiceStatusBar(QFrame):
         self.stop_button.setMinimumWidth(STOP_H * 2)
         icons.set_icon(self.stop_button, "stop", "danger_text", size=18)
         mh.addWidget(self.stop_button)
+        # quick record: opens Record a sound already recording your voice (as others
+        # hear it while the voice changer is on); Save keeps it in the tab's Recordings
+        self.record_button = QPushButton(_("Record"))
+        self.record_button.setToolTip(_("Record your voice as others hear it. It goes in "
+                                        "Recordings, above"))
+        self.record_button.setAccessibleName(_("Record"))
+        self.record_button.setCursor(Qt.CursorShape.PointingHandCursor)
+        self.record_button.setFixedHeight(STOP_H)
+        icons.set_icon(self.record_button, "record", "danger_text", size=16)
+        mh.addWidget(self.record_button)
         self.mic_icon = icon_label("mic", _("Your mic level"))
         mh.addWidget(self.mic_icon)
         self.lbl_mic = QLabel(_("No mic open"))   # only then: the icon says the rest
         self.lbl_mic.setObjectName("voicebarlabel")
         self.lbl_mic.hide()
+        # never squeezed (its words would be cut): the meter beside it gives way
+        self.lbl_mic.setSizePolicy(QSizePolicy.Policy.Fixed, QSizePolicy.Policy.Preferred)
         mh.addWidget(self.lbl_mic)
         self.meter = Meter()
-        self.meter.setMinimumWidth(80)
+        self.meter.setMinimumWidth(METER_MIN)
         mh.addWidget(self.meter, 1)
         box.addWidget(mic, 1)
 
@@ -186,17 +199,49 @@ class VoiceStatusBar(QFrame):
         super().resizeEvent(e)
         self._fit()
 
+    def _mic_min(self) -> int:
+        """The mic row's narrowest: Stop, Record, the icon and label whole, the meter
+        at its minimum."""
+        parts = [w for i in range(self._mic_row.count())
+                 if (w := widget_at(self._mic_row, i)) is not None and not w.isHidden()]
+        return (sum(max(w.sizeHint().width(), w.minimumWidth()) for w in parts
+                    if w is not self.meter)
+                + self.meter.minimumWidth() + self._mic_row.spacing() * (len(parts) - 1))
+
     def _fit(self):
         m = self._box.contentsMargins()
         room = self.width() - m.left() - m.right()
+        # "No mic open" whole, its padding included (a label's size hint can miss the
+        # theme's padding right after a theme change, and the words got cut)
+        lbl = self.lbl_mic
+        pad = lbl.contentsMargins()
+        lbl.setMinimumWidth(lbl.fontMetrics().horizontalAdvance(lbl.text()) + pad.left()
+                            + pad.right() + 2 * lbl.margin() + 1)
+        # Record goes down to its dot when Stop, Record and the mic row can't all fit
+        # (a long "No mic open" in some languages was cut off)
+        rec, word = self.record_button, _("Record")
+        shown = rec.text()
+        rec.setText(word)                  # measured with its word...
+        fits = self._mic_min() <= room
+        rec.setText(shown)
+        if (word if fits else "") != shown:   # ...changed only when it must (no loop)
+            rec.setText(word if fits else "")
+        # still too tight (a wide theme font, a long language): the meter gives way
+        # before the "No mic open" words get cut
+        self.meter.setMinimumWidth(METER_MIN)
+        over = self._mic_min() - room
+        if over > 0:
+            self.meter.setMinimumWidth(max(METER_MIN // 3, METER_MIN - over))
         line = sum(w.sizeHint().width() + 6 for w in self._row_widgets())   # one line
         # Keep at least half the bar beside Stop for the meter. If the status chips
         # would squeeze it below that, put them underneath instead. (Half the whole
         # bar, Stop included, sent two chips with their close buttons under the meter
         # on a window that had room for them.)
-        mic_labels = self._mic.minimumSizeHint().width() - self.meter.minimumWidth()
-        meter = (self.width() - self.stop_button.width() + 1) // 2
+        mic_labels = (self._mic_row.sizeHint().width()
+                      - self.meter.sizeHint().width())
+        meter = (self.width() - self.stop_button.width() - self.record_button.width() + 1) // 2
         need = max(160, meter + mic_labels) + GAP + line
+        need = max(need, self._mic_min() + GAP + line)   # never squeeze the mic row
         d = QBoxLayout.Direction.LeftToRight if room >= need else QBoxLayout.Direction.TopToBottom
         # beside the meter the chips keep to one line; under it they wrap
         self._right.setMinimumWidth(line if d == QBoxLayout.Direction.LeftToRight else 0)

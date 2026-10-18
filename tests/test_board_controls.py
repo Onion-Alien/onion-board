@@ -8,7 +8,7 @@ import pytest
 import numpy as np
 from PySide6.QtCore import QPointF, Qt
 from PySide6.QtGui import QMouseEvent
-from PySide6.QtWidgets import QApplication, QPushButton
+from PySide6.QtWidgets import QApplication, QLabel, QPushButton
 
 from soundboard import voicefx
 
@@ -570,6 +570,62 @@ def test_up_next_is_one_chip_whose_list_reaches_every_queued_sound(window, monke
     pop.clear.click()                                              # Clear: all of them
     assert w.playctl._queue == [] and not pop.isVisible()
     assert w._up_next_chip is None and set(w.engine.playing()) == {"s0"}
+
+
+def up_next_rows(w):
+    pop = w._up_next_popup
+    return [r for r in (pop.rows_v.itemAt(i).widget() for i in range(pop.rows_v.count()))
+            if r is not None]
+
+
+def test_an_up_next_rows_play_plays_it_now_and_the_rest_keep_waiting(window, monkeypatch):
+    """Ten waiting and you want the 9th now: its ▶ starts it, the others stay in order."""
+    w = window
+    w.resize(1200, 760)
+    w.show()
+    played = []
+    playing(monkeypatch, w, ["s0"])
+    monkeypatch.setattr(w.playctl, "play", lambda sid, now=False: played.append(sid))
+    w.playctl._queue = ["s0"] * 8 + ["s1", "s0"]
+    w.playctl._update_chips(w.engine.playing())
+    w._up_next_chip.click()
+    ninth = up_next_rows(w)[8]
+    btn = [b for b in ninth.findChildren(QPushButton) if b.toolTip() == "Play it now"][0]
+    btn.click()
+    btn.click()                               # a double click: the list moved, nothing more
+    assert played == ["s1"] and w.playctl._queue == ["s0"] * 9
+
+
+def test_an_up_next_row_dragged_by_its_grip_moves_in_the_queue(window, monkeypatch):
+    from PySide6.QtCore import QPoint
+    from PySide6.QtTest import QTest
+    w = window
+    w.resize(1200, 760)
+    w.show()
+    playing(monkeypatch, w, ["s0"])
+    w.playctl._queue = ["s0", "s0", "s1"]
+    w.playctl._update_chips(w.engine.playing())
+    w._up_next_chip.click()
+    QApplication.processEvents()
+    rows = up_next_rows(w)
+    grip = rows[2].findChildren(QLabel)[0]
+    assert grip.toolTip() == "Drag to change the order"
+    QTest.mousePress(grip, Qt.MouseButton.LeftButton, pos=QPoint(4, 4))
+    top = rows[0].mapToGlobal(QPoint(4, 2))
+    QTest.mouseMove(grip, grip.mapFromGlobal(top))
+    w._up_next_popup._drag_move(top)   # (offscreen: a move without buttons isn't sent)
+    assert up_next_rows(w)[0] is rows[2]   # it moved as the mouse went
+    QTest.mouseRelease(grip, Qt.MouseButton.LeftButton, pos=grip.mapFromGlobal(top))
+    assert w.playctl._queue == ["s1", "s0", "s0"]
+
+
+def test_a_link_song_moves_and_plays_now_only_among_link_songs(window):
+    w = window
+    bar = w.linkbar
+    bar._up_next = [("A", None, 1.0, "a"), ("B", None, 1.0, "b"), ("C", None, 1.0, "c")]
+    assert bar.move_up_next(2, 0, ("A", "B", "C")) and bar.up_next() == ["C", "A", "B"]
+    assert not bar.move_up_next(0, 2, ("A", "B", "C"))   # out of date: nothing
+    assert not bar.move_up_next(0, 5) and bar.up_next() == ["C", "A", "B"]
 
 
 def test_a_trigger_deleted_while_its_pad_waits_or_queues_never_starts_it(window, monkeypatch,

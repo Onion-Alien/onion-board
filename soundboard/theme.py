@@ -194,7 +194,10 @@ QPushButton#primary { background:$accent; border:none; color:$on_accent; font-we
 QPushButton[guide="true"] { font-size:11pt; padding:9px 20px; border-radius:10px; }
 QPushButton#primary:hover { background:$accent_hover; }
 QPushButton#primary:focus { border:1px solid $text_hi; }
-QWidget#storebar QPushButton#primary:disabled { background:$btn; color:$muted; }   /* the store's down */
+/* the store's down: grey, one edge colour all round (the accent's lit top edge on grey
+   looked cut off) */
+QWidget#storebar QPushButton#primary:disabled { background:$btn; color:$muted;
+    border-color:$border; }
 QFrame#soundstoolbar { background:$panel; background-image:none; border:none;
     border-radius:12px; }
 QFrame#soundstoolbar QLabel, QFrame#soundstoolbar QSlider { background:transparent; }
@@ -226,9 +229,10 @@ QPushButton#danger[quiet="true"]:hover { background:$danger_bg; }
 QPushButton#danger:focus { border-color:$accent; }
 QPushButton#danger[mini="true"] { padding:0 6px; }   /* the mini player's "■ All": fits its narrowest row */
 QPushButton#small, QPushButton#danger[small="true"] { padding:2px 8px; font-size:8pt; }
-QPushButton#backhome { background:$btn; border:1px solid $border; color:$text_hi;
-    font-weight:600; font-size:10pt; padding:6px 14px 6px 10px; border-radius:8px; }
-QPushButton#backhome:hover { background:$btn_hover; border-color:$border_hi; }
+QPushButton#backhome { background:$danger_bg; border:2px solid $danger_text; color:$danger_text;
+    font-weight:600; font-size:10pt; padding:5px 13px 5px 9px; border-radius:8px;
+    margin:5px; }   /* room for the glow ytsearch.BackHome paints around it */
+QPushButton#backhome:hover { background:$danger_hover; }
 QPushButton#tabinfo { padding:0; border-radius:8px; background:transparent; border:1px solid transparent; }
 QPushButton#tabinfo:hover { background:$btn_hover; border-color:$border_hi; }
 QPushButton#tabinfo:pressed { background:$btn_press; border-color:$border_hi; }
@@ -659,6 +663,10 @@ QHeaderView, QFrame#setcard QHeaderView { background:$btn; color:$text; }
 QHeaderView::section, QFrame#setcard QHeaderView::section { background:$btn; color:$text;
     padding:8px; border:none; border-bottom:1px solid $border; font-weight:600; }
 QTableCornerButton::section { background:$btn; border:none; }
+QTreeWidget#cliplist { background:$inset; color:$text; border:none; border-radius:8px;
+    padding:4px; outline:0; }   /* ui/clipshelf.py: rows are painted by ClipRowDelegate */
+QTreeWidget#cliplist::item, QTreeWidget#cliplist::item:hover,
+QTreeWidget#cliplist::item:selected { background:transparent; border:none; }
 QFrame#setcard QPlainTextEdit { background:$card; color:$text;
     border:1px solid transparent; border-radius:6px; padding:8px;
     selection-background-color:$btn_press; selection-color:$text_hi; }
@@ -754,6 +762,23 @@ QPushButton#transport_play:hover:!disabled {
     background:qlineargradient(x1:0, y1:0, x2:1, y2:1, stop:0 $accent_top_hi,
         stop:0.3 $accent_hover, stop:1 $accent_end_hi); }
 QPushButton#transport_play:pressed:!disabled { background:$accent_press; }
+/* every accent-filled on-state (tabs, mode tiles, chips) gets the main button's gloss */
+QPushButton:checked, QFrame#card QPushButton:checked, QFrame#setcard QPushButton:checked,
+QFrame#viewtoggle QPushButton#viewbtn:checked,
+QFrame#soundstoolbar QFrame#viewtoggle QPushButton#viewbtn:checked,
+QPushButton#chipplay[playing="true"], QPushButton#voicetile:checked,
+QFrame#card QToolButton#voicetile:checked, QWidget#setupsbar QPushButton#voicecat:checked,
+QFrame#card QPushButton#voicecat:checked, QPushButton#voicetab:checked,
+QPushButton#subchip:checked {
+    background:qlineargradient(x1:0, y1:0, x2:1, y2:1, stop:0 $accent_top, stop:0.3 $accent,
+        stop:1 $accent_end); }
+QPushButton:checked:hover, QPushButton#voicetile:checked:hover,
+QFrame#card QToolButton#voicetile:checked:hover,
+QWidget#setupsbar QPushButton#voicecat:checked:hover,
+QFrame#card QPushButton#voicecat:checked:hover, QPushButton#voicetab:checked:hover,
+QPushButton#subchip:checked:hover {
+    background:qlineargradient(x1:0, y1:0, x2:1, y2:1, stop:0 $accent_top_hi,
+        stop:0.3 $accent_hover, stop:1 $accent_end_hi); }
 QPushButton#onair:checked, QPushButton#power:checked, QFrame#card QPushButton#power:checked,
 QFrame#setcard QPushButton#power:checked, QPushButton#live:checked,
 QFrame#card QPushButton#live:checked {

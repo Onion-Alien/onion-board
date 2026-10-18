@@ -31,7 +31,7 @@ from PySide6.QtWidgets import (QFrame, QHBoxLayout, QInputDialog, QLabel, QLayou
 from soundboard import appaudio, library, theme, trash, usage
 from soundboard.i18n import _
 from soundboard.ui import a11y, appstate, icons
-from soundboard.ui.widgets import widget_at
+from soundboard.ui.widgets import InlineNameBox, widget_at
 from soundboard.ui.appcapture import METER_MS, AppCapture
 # the cards and their helpers live in approw.py; their names stay importable from here
 from soundboard.ui.approw import (APP_CATEGORIES, APP_DRAG_MIME,  # noqa: F401
@@ -111,7 +111,10 @@ class AppsTab(QWidget):
         self.btn_add_cat.setCursor(Qt.CursorShape.PointingHandCursor)
         self.btn_add_cat.setToolTip(_("New category"))
         icons.set_icon(self.btn_add_cat, "plus", size=12)
-        self.btn_add_cat.clicked.connect(self._prompt_new_category)
+        # the name is typed right where the button is (no pop-up)
+        self.cat_name_box = InlineNameBox(self.btn_add_cat, _("New category"))
+        self.cat_name_box.named.connect(self._add_category)
+        toolbar.addWidget(self.cat_name_box)
         toolbar.addWidget(self.btn_add_cat)
         toolbar.addStretch(1)
         self.view_toggle = ViewToggle(cfg.app_view, _("Apps"))
@@ -261,9 +264,8 @@ class AppsTab(QWidget):
         heading.rename_requested.connect(self._on_rename_category)
         heading.delete_requested.connect(self._on_delete_category)
 
-    def _prompt_new_category(self):
-        name, ok = QInputDialog.getText(self, _("New category"), _("Name:"))
-        name = (library.clean_tags([name]) or [""])[0] if ok else ""
+    def _add_category(self, typed: str):
+        name = (library.clean_tags([typed]) or [""])[0]
         if not name or self._category_taken(name):
             return
         usage.used("apps-category-added")

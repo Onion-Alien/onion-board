@@ -1,0 +1,1 @@
+- Make Reset bigger and easier to click in Live controls on the Sounds, Radio and Apps tabs.

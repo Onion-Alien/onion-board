@@ -71,7 +71,12 @@ def test_resets_are_one_family(window):  # noqa: F811
     pop = window.speed_btn.pop
     resets = [b for b in pop.findChildren(QPushButton) if b.text() == "Reset"]
     assert len(resets) == 1
-    _assert_reset(resets[0])
+    # Live controls has a larger Reset target than the inline effect links.
+    live_reset = resets[0]
+    assert live_reset.objectName() == "liveReset"
+    assert live_reset.minimumWidth() >= 96 and live_reset.minimumHeight() >= 36
+    assert not live_reset.icon().isNull()
+    assert live_reset.toolTip()
     rows = window.voice.fx.findChildren(EffectRow) or window.voice.findChildren(EffectRow)
     assert rows
     _assert_reset(rows[0].btn_reset)

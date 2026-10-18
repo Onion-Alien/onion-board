@@ -28,7 +28,6 @@ from PySide6.QtWidgets import (
     QScrollArea,
     QSizePolicy,
     QSlider,
-    QSpacerItem,
     QStyle,
     QStyleOptionButton,
     QStylePainter,
@@ -955,16 +954,9 @@ class WindowBuilder(Controller):
         mw.voice_only.setSizePolicy(QSizePolicy.Policy.Fixed, QSizePolicy.Policy.Fixed)
         mw.voice_only.hide()
         row.addWidget(mw.voice_only)
-        # its right end in line with the seek slider's above (EdgeMatch)
-        meter_pad = QSpacerItem(0, 0, QSizePolicy.Policy.Fixed, QSizePolicy.Policy.Minimum)
-        row.addItem(meter_pad)
-
-        def set_meter_pad(px: int, row=row):
-            meter_pad.changeSize(px, 0, QSizePolicy.Policy.Fixed, QSizePolicy.Policy.Minimum)
-            row.invalidate()
-
+        # Only the seek slider trims itself; matching must not resize this row.
         mw._bar_edges = EdgeMatch(mw.seek, mw._name_seek.set_pad_right,
-                                  mw.out_meter, set_meter_pad)
+                                  mw.out_meter)
         mw.btn_check = QPushButton(_("Hear what they hear"))
         mw.btn_check.setObjectName("miccheck")
         # its name by hand: a narrow window blanks the words (on_mic_check keeps it)
@@ -1012,7 +1004,7 @@ class WindowBuilder(Controller):
         add = mw.btn_add = QPushButton(_("Add"))
         # flat like the rest of the toolbar; the accent colour marks it as the main one
         add.setObjectName("soundadd")
-        add.setToolTip(_("Add sounds: files, a folder, a recording, a link or a free pack "
+        add.setToolTip(_("Add sounds: files, a folder, a recording or a link "
                          "(or drag files onto the window)"))
         icons.set_icon(add, "music", "accent", size=18)
         am = mw._add_menu = DropdownMenu(add)
@@ -1020,7 +1012,7 @@ class WindowBuilder(Controller):
         icons.set_icon(am.addAction(_("A whole folder"), mw.impctl.add_folder_dialog), "folder")
         icons.set_icon(am.addAction(_("Record"), mw.soundctl.record_dialog), "mic")
         icons.set_icon(am.addAction(_("From a link"), mw.impctl.add_from_link), "link")
-        icons.set_icon(am.addAction(_("Free sound packs"), mw.impctl.show_packs), "download")
+        # (Free sound packs lives in the Library menu, once)
         add.setMenu(am)
         add.setProperty("toolbarMenu", True)
         mw.search = QLineEdit()

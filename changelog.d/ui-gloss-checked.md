@@ -1,0 +1,1 @@
+- Selected tabs, mode tiles, filter chips and on-state buttons now have the same glossy finish as the main buttons.

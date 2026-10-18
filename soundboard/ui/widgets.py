@@ -12,7 +12,7 @@ from PySide6.QtCore import (QEasingCurve, QEvent, QMimeData, QObject, QPoint, QP
 from PySide6.QtGui import (QColor, QDrag, QFont, QFontMetrics, QLinearGradient, QPainter,
                            QPainterPath, QPen, QPixmap)
 from PySide6.QtWidgets import (QAbstractButton, QAbstractSlider, QApplication, QComboBox,
-                               QGridLayout, QLabel, QMainWindow, QMenu, QTabBar,
+                               QGridLayout, QLabel, QLineEdit, QMainWindow, QMenu, QTabBar,
                                QScrollArea,
                                QSlider, QStackedWidget, QStyle, QStyleOptionSlider,
                                QTabWidget, QToolTip,
@@ -67,6 +67,61 @@ def widget_at(layout, i: int):
     if type(layout).__module__.startswith("PySide6."):
         qt_invalidate(item)
     return w
+
+
+class InlineNameBox(QLineEdit):
+    """A name box that takes a "+" button's place when it's clicked, so a new
+    category is named right where it will show (no pop-up). Enter, or clicking away
+    with something typed, sends `named`; Esc or an empty box puts the button back.
+    Add it to the layout just before `button`."""
+
+    named = Signal(str)
+
+    def __init__(self, button: QAbstractButton, placeholder: str, width: int = 170,
+                 max_len: int = library.CATEGORY_MAX, parent: QWidget | None = None):
+        super().__init__(parent)
+        self.button = button
+        self.setAccessibleName(placeholder)
+        self.setPlaceholderText(placeholder)
+        self.setMaxLength(max_len)
+        self.setFixedWidth(width)
+        self.hide()
+        button.clicked.connect(self.start)
+
+    def start(self):
+        self.clear()
+        self.button.hide()
+        self.show()
+        self.setFocus(Qt.FocusReason.OtherFocusReason)
+
+    def _finish(self, text: str | None):
+        if not self.isVisible():   # already closed (hiding it moves the focus out)
+            return
+        self.hide()
+        self.button.show()
+        if text is not None and text.strip():
+            self.named.emit(text)
+
+    def event(self, e):
+        # Esc and Enter belong to the box while it's open, not to the window's shortcuts
+        if e.type() == QEvent.Type.ShortcutOverride and e.key() in (
+                Qt.Key.Key_Escape, Qt.Key.Key_Return, Qt.Key.Key_Enter):
+            e.accept()
+            return True
+        return super().event(e)
+
+    def keyPressEvent(self, e):
+        if e.key() == Qt.Key.Key_Escape:
+            self._finish(None)
+        elif e.key() in (Qt.Key.Key_Return, Qt.Key.Key_Enter):
+            self._finish(self.text())
+        else:
+            super().keyPressEvent(e)
+
+    def focusOutEvent(self, e):
+        super().focusOutEvent(e)
+        if e.reason() != Qt.FocusReason.PopupFocusReason:   # its own right-click menu
+            self._finish(self.text())
 
 
 class DropdownMenu(QMenu):
@@ -322,18 +377,21 @@ class SeekSlider(CrispSlider):
 
 
 class EdgeMatch(QObject):
-    """Lines up the right ends of two bars in different rows (the player's seek
-    slider and the "What others hear" meter): the one that reaches further gives up
-    the difference through its ``set_pad`` callable, so the two end in one line. Only
-    while both show, left to right, and the difference is small (a narrow window
-    lays the rows out differently: a big gap there looked worse)."""
+    """Trim the seek slider to the output meter's end when they are close.
+
+    Only the manually placed slider gives up space. Changing a spacer in the
+    meter's layout feeds back into that row's minimum width; at its limit the
+    added space cannot shrink the meter, so matching again adds more space until
+    MAX removes it and the cycle starts over.
+    """
 
     MAX = 24
 
-    def __init__(self, a: QWidget, pad_a, b: QWidget, pad_b):
+    def __init__(self, a: QWidget, pad_a, b: QWidget):
         super().__init__(a)
-        self._bars = ((a, pad_a), (b, pad_b))
-        self._pads = [0, 0]
+        self._bars = (a, b)
+        self._set_pad = pad_a
+        self._pad = 0
         self._queued = False
         for w in (a, b):
             w.installEventFilter(self)
@@ -347,22 +405,19 @@ class EdgeMatch(QObject):
 
     def match(self):
         self._queued = False
-        bars = [w for w, _ in self._bars]
+        bars = self._bars
         if not all(qt_valid(w) for w in bars):
             return
-        pads = [0, 0]
+        pad = 0
         win = bars[0].window()
         if (all(w.isVisible() and w.isLeftToRight() and w.window() is win for w in bars)):
-            # where each would end with no pad
-            ends = [w.mapTo(win, QPoint(w.width(), 0)).x() + p
-                    for w, p in zip(bars, self._pads)]
-            give = [e - min(ends) for e in ends]
-            if max(give) <= self.MAX:
-                pads = give
-        for i, (_w, set_pad) in enumerate(self._bars):
-            if pads[i] != self._pads[i]:
-                self._pads[i] = pads[i]
-                set_pad(pads[i])
+            ends = [w.mapTo(win, QPoint(w.width(), 0)).x() for w in bars]
+            give = ends[0] + self._pad - ends[1]
+            if 0 <= give <= self.MAX:
+                pad = give
+        if pad != self._pad:
+            self._pad = pad
+            self._set_pad(pad)
 
 
 class NameAndSeek(QWidget):

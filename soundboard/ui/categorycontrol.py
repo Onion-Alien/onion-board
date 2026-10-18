@@ -31,6 +31,7 @@ from soundboard.ui import icons
 from soundboard.ui.controller import Controller
 from soundboard.ui.padbatch import fill_colour_menu
 from soundboard.ui.panel import Flow
+from soundboard.ui.widgets import InlineNameBox
 
 if TYPE_CHECKING:
     from soundboard.ui.mainwindow import MainWindow
@@ -98,7 +99,10 @@ class CategoryControl(Controller):
         add.setToolTip(_("New category (a page of pads). Right-click a pad to put it in one; "
                          "right-click a category to rename or delete it."))
         icons.set_icon(add, "plus", size=12)
-        add.clicked.connect(lambda: self.new_category())
+        # the box the name is typed into, right where the new tab will show
+        box = self.cat_name_box = InlineNameBox(add, _("New category"))
+        box.named.connect(lambda text: self.new_category(name=text))
+        h.addWidget(box, 0, Qt.AlignmentFlag.AlignVCenter)
         h.addWidget(add, 0, Qt.AlignmentFlag.AlignVCenter)
         h.addStretch(1)
         self.btn_cat_add = add
@@ -149,10 +153,15 @@ class CategoryControl(Controller):
             b.setContextMenuPolicy(Qt.ContextMenuPolicy.CustomContextMenu)
             b.customContextMenuRequested.connect(
                 lambda pos, sub=sub, b=b: self._subcategory_menu(sub, b.mapToGlobal(pos)))
-        add = chip(_("+ Subcategory"), "")
-        add.setCheckable(False)
+        add = QPushButton(_("+ Subcategory"))
+        add.setObjectName("subchip")
         add.setProperty("add", True)
-        add.clicked.connect(lambda: self.new_subcategory(cat))
+        add.setCursor(Qt.CursorShape.PointingHandCursor)
+        # the name is typed where the new chip will show
+        box = self.sub_name_box = InlineNameBox(add, _("New subcategory"), width=150)
+        box.named.connect(lambda text: self.new_subcategory(cat, name=text))
+        flow.addWidget(box)
+        flow.addWidget(add)
 
     def set_subcategory(self, sub: str):
         """Show only one subcategory of the category showing ("" = all of it)."""

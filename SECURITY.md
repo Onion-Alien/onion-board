@@ -297,7 +297,8 @@ account or anything else about you.
     `live-setup-language`, `live-setup-said-no`, `live-setup-cancel`: never the
     setup's name or the language); a Voice tab setup
     saved or renamed (`used/voice-setup-saved`, `voice-setup-renamed`); the *Up next*
-    list opened and cleared (`used/upnext-opened`, `upnext-cleared`); the Live switch's
+    list opened and cleared, a row played now or dragged (`used/upnext-opened`,
+    `upnext-cleared`, `upnext-play-now`, `upnext-reordered`); the Live switch's
     "muted a long time" ring shown (`used/muted-ring`); the tray's Voice changer menu
     used (`used/tray-voice-toggle`, `tray-voice-pick`: never which voice); *What's new*
     shown after an update and its Settings button (`used/whats-new-shown`,

@@ -266,6 +266,7 @@ the launcher the shortcuts and PyInstaller use. The app is the `soundboard` pack
 | `soundboard/ui/livedot.py` | marks a tab whose feature is live (a highlight-coloured icon, with the rail's bar beside it, or a small dot), e.g. the Voice tab while your voice is being changed |
 | `soundboard/ui/glow.py` | `Glow(button)`: a slow accent glow round the one button a step wants pressed (the setup card's mic button) |
 | `soundboard/ui/logowidget.py` | the header logo animated: a breathing glow and sheen, flaring with embers while sounds play |
+| `soundboard/ui/logoduel.py` | a silent laser exchange between the Board and Watch logos when clicked on the Triggers tab |
 | `soundboard/ui/overlay.py` | the in-game overlay: a panel of pads that never takes focus, driven by number keys or clicks, on a chosen monitor and spot (or wherever it was dragged) |
 | `soundboard/ui/voicepanel.py` | the Voice tab: lays out its cards and bottom bar, the add-ons list |
 | `soundboard/ui/voicefxpanel.py` | the Voice tab's voice changer card: voice tiles, effect rows and their sliders |
@@ -349,8 +350,8 @@ the launcher the shortcuts and PyInstaller use. The app is the `soundboard` pack
 | `soundboard/ui/flatmap.py` | the Radio tab's world map, painted by Qt (no web engine) |
 | `soundboard/ui/appstate.py` | stops decorative animations (logo, mascots, live dot) while another program is in front |
 | `soundboard/ui/clipeditor.py` | the Apps tab's clip editor, folded away under each card until opened: the live waveform of the program's last minute, drag to select, preview in headphones, Save to clips, the Edit menu and its keys |
-| `soundboard/ui/clipshelf.py` | the Apps tab's *Saved clips* list: search, app/day groups, creation dates, batched rows and background inactivity cleanup; double-click plays, F2 renames, right-click adds to Sounds / sends / copies / deletes (Undo bar) |
-| `soundboard/clipshelf.py` | saved clip FLACs and their `index.json` in `%APPDATA%\OnionBoard\clips`; creation and last-use times, seven-day retention, bulk deletion and restoration; cleanup files go after Undo expires, manual deletions on the next start |
+| `soundboard/ui/clipshelf.py` | the Apps tab's *Saved clips* and the Voice tab's *Recordings* (one widget): rows painted by `ClipRowDelegate` (round play button, name, where · when, waveform that fills as it plays, Live pill, length), one set of row buttons (through mic, add to Sounds, more) that follows the hovered or picked row; search, app/day groups, batched rows, background inactivity cleanup and waveform drawing; Space / double-click plays, Enter sends, Esc stops, F2 renames, Del deletes (Undo bar) |
+| `soundboard/clipshelf.py` | saved clip FLACs and their `index.json` in `%APPDATA%\OnionBoard\clips` (Recordings: `voice-clips`); creation and last-use times, 48-bar waveform `peaks` (drawn on save, `fill_peaks` for older clips), seven-day retention, bulk deletion and restoration; cleanup files go after Undo expires, manual deletions on the next start |
 | `soundboard/clipedit.py` | the clip editor without the window: `LiveBuffer` (the last minute and its waveform, filled on the capture thread) and `Take` (cut, paste, fades, gain, reverse, with undo capped by memory) |
 | `soundboard/recorder.py` | the Radio tab's clip recorder: a rolling last-15-seconds buffer plus a recording spooled to disk; `MicTake`, a mic (or what's-playing) recording spooled the same way (Record a sound) |
 | `soundboard/mapped.py` | long sounds stay on disk: decoded cache files over ~30 s (or past a RAM budget) are memory-mapped, and warmed (first second read, the next two minutes prefetched) before they play; the engine keeps the minutes ahead prefetched while they play |
