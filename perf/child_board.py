@@ -515,7 +515,19 @@ class Child:
     def sc_shown_again(self):
         self.w.show()
         self.foreground(True)
+        extra = {"first_paint_ms": self.first_paint_ms()}
         self.run_for(1.0)
+        return extra
+
+    def first_paint_ms(self) -> float:
+        """How long the whole window takes to paint once (a grab), in ms."""
+        t0 = time.perf_counter()
+        self.w.grab()
+        return round((time.perf_counter() - t0) * 1000, 1)
+
+    def sc_shown_after_rest(self):
+        """Shown again after tray_rested gave its memory back: pages read back."""
+        return self.sc_shown_again()
 
     def sc_import_sounds(self):
         w = self.w
@@ -818,6 +830,47 @@ class Child:
     def sc_idle_end(self):
         self.w.hide()
         self.run_for(self.secs)
+        return {"memory_parts": self.memory_parts()}
+
+    def sc_tray_rested(self):
+        """In the tray past memtrim.AFTER_S: memory given back to Windows."""
+        self.w.hide()
+        tick = self.w.tickctl
+        try:
+            from soundboard import memtrim
+            self.run_until(lambda: getattr(tick, "_given_back", False),
+                           memtrim.AFTER_S + 5, 0.25)
+        except ImportError:   # (a checkout from before it)
+            self.run_for(35.0)
+        self.run_for(self.secs)
+        return {"memory_parts": self.memory_parts()}
+
+    def memory_parts(self) -> dict:
+        """Where the RAM goes, in MB: the sounds' audio read into RAM and on disk
+        (mapped), the engine's resampled copies, the pads' pictures, and Python's own
+        objects."""
+        import sys as _sys
+
+        import numpy as np
+
+        from soundboard import mapped, thumbs
+        mb = 1 << 20
+        w = self.w
+        in_ram = on_disk = 0
+        for a in getattr(w, "audio", {}).values():
+            if isinstance(a, np.ndarray):
+                if mapped.is_mapped(a):
+                    on_disk += a.nbytes
+                else:
+                    in_ram += a.nbytes
+        return {
+            "sounds_in_ram": round(in_ram / mb, 1),
+            "sounds_mapped": round(on_disk / mb, 1),
+            "resampled": round(getattr(w.engine, "_cache_bytes", 0) / mb, 1),
+            "pictures": round((thumbs._bytes + thumbs._fitted_bytes) / mb, 1),
+            "python_blocks": round(_sys.getallocatedblocks() * 64 / mb, 1),
+            "py_objects": len(gc.get_objects()),
+        }
 
     # -- triggers (the Onion Watch add-on)
     def _panel(self):

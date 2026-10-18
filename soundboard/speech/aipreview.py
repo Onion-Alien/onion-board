@@ -11,6 +11,7 @@ from __future__ import annotations
 import json
 import logging
 import subprocess
+from collections import OrderedDict
 
 import numpy as np
 
@@ -41,7 +42,18 @@ sys.stdout.buffer.write(np.concatenate(out).astype(np.float32).tobytes())
 """
 
 _sample: np.ndarray | None = None
-_cache: dict[str, np.ndarray] = {}
+# the samples made, newest last: ~1.5 MB each, and the voice changer's Hear it makes
+# one for every mix of settings tried, so only the last KEEP stay
+_cache: OrderedDict[str, np.ndarray] = OrderedDict()
+KEEP = 16
+
+
+def _keep(k: str, y: np.ndarray) -> np.ndarray:
+    _cache[k] = y
+    _cache.move_to_end(k)
+    while len(_cache) > KEEP:
+        _cache.popitem(last=False)
+    return y
 
 
 class PreviewError(RuntimeError):
@@ -116,8 +128,8 @@ def fx_sample(effects: dict) -> np.ndarray:
         peak = float(np.max(np.abs(y))) if len(y) else 0.0
         if peak > 0.8:
             y = y * (0.8 / peak)
-        _cache[k] = np.ascontiguousarray(np.stack([y, y], axis=1), np.float32)
-    return _cache[k]
+        return _keep(k, np.ascontiguousarray(np.stack([y, y], axis=1), np.float32))
+    return _keep(k, _cache[k])
 
 
 def make(module: ModuleInfo, voice: dict) -> np.ndarray:
@@ -130,5 +142,5 @@ def make(module: ModuleInfo, voice: dict) -> np.ndarray:
         peak = float(np.max(np.abs(y))) if len(y) else 0.0
         if peak > 0.8:
             y = y * (0.8 / peak)
-        _cache[k] = np.ascontiguousarray(np.stack([y, y], axis=1), np.float32)
-    return _cache[k]
+        return _keep(k, np.ascontiguousarray(np.stack([y, y], axis=1), np.float32))
+    return _keep(k, _cache[k])

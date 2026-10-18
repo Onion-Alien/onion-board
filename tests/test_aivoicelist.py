@@ -1,5 +1,6 @@
 """AI voices to pick from: the built-in list, writing it and your own voices into the
 installed add-on, your own voices' file and bin, samples, and the All voices window."""
+from collections import OrderedDict
 import json
 from pathlib import Path
 
@@ -151,7 +152,7 @@ def test_a_damaged_file_is_set_aside_not_overwritten(app_dir):
 
 def test_samples_are_made_once_per_sound(monkeypatch):
     calls = []
-    monkeypatch.setattr(aipreview, "_cache", {})
+    monkeypatch.setattr(aipreview, "_cache", OrderedDict())
     monkeypatch.setattr(aipreview, "sample", lambda: np.zeros(16000, np.float32))
 
     def render(module, voice, mono16):

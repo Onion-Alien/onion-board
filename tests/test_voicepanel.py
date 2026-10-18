@@ -1,4 +1,5 @@
 """The Voice panel, offscreen: presets reach the chain, settings round-trip."""
+from collections import OrderedDict
 import numpy as np
 import pytest
 from PySide6.QtCore import QPoint
@@ -1922,7 +1923,7 @@ def test_hear_it_plays_the_voice_in_the_headphones(panel, monkeypatch):
     t = np.arange(16000) / 16000
     monkeypatch.setattr(aipreview, "sample", lambda: (0.5 * np.sin(2 * np.pi * 150 * t))
                         .astype(np.float32))
-    monkeypatch.setattr(aipreview, "_cache", {})
+    monkeypatch.setattr(aipreview, "_cache", OrderedDict())
     fx = p.fx
     fx.pick("Chipmunk")
     assert fx.btn_sample.isVisibleTo(fx.picked)
@@ -1952,7 +1953,7 @@ def test_hear_it_failing_says_why_and_comes_back(panel, monkeypatch):
     def fail():
         raise aipreview.PreviewError("no speech voice")
     monkeypatch.setattr(aipreview, "sample", fail)
-    monkeypatch.setattr(aipreview, "_cache", {})
+    monkeypatch.setattr(aipreview, "_cache", OrderedDict())
     p.fx.hear("Robot")
     from PySide6.QtWidgets import QApplication
     assert process_events(QApplication.instance(), lambda: said)
