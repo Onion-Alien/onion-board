@@ -74,7 +74,7 @@ on it or runs it.
 | dialogs | Settings twice and two Edit dialogs |
 | voice_preset (+ voice_heavy, stereo_mic in full) | the voice changer on and off |
 | mic_check_front / _behind | the mic check banner on, in front and behind |
-| apps_tab_shown / _left | the Apps tab's live meters, then back to Sounds |
+| apps_tab_shown / _wait / _rested / _left | the Apps tab's live meters (and the empty page's Bun); _wait keeps it open until he's had his 30 s, _rested measures after that; then back to Sounds |
 | route_mic | sending through the mic effect instead of the cable |
 | leak_loop | plays, preview, Settings, tab switches, pad rebuild: 5 warm-up rounds (things built once, ~40 MB), then N measured; growth per loop of private MB, handles, threads, Python and Qt objects. Private MB steps up now and then as the heap settles (~0.1-0.3 MB a round on average); a steady climb in handles or object counts is the real sign of a leak |
 | idle_end | tray idle at the end: does it settle back down? |
