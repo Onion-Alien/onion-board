@@ -134,6 +134,15 @@ def _sway(pose: dict, key: str) -> float:
     return pose.get(key, 0.0)
 
 
+def _steps(pose: dict) -> tuple:
+    """Where draw_bunny switches a part on or off as a pose key passes a value: shut
+    eyes, the open mouth, his ears starting to fold, tears, the frown, cross brows, the
+    vein (the kept picture never stands in across one)."""
+    sad, angry = pose["sad"], _sway(pose, "angry")
+    return (pose["blink"] > 0.6, pose["mouth"] > 0.08, sad * 115 > 0.5, sad > 0.05,
+            sad > 0.5, angry > 0.05, angry > 0.4, angry > 0.5)
+
+
 def loudness(level: float) -> float:
     """A raw mic peak (0..1) as 0..1 on a dB scale, like the level bar: 0 at TALK,
     1 at LOUD. Speech peaks sit far below 1 in linear terms, so a linear scale left
@@ -1470,7 +1479,7 @@ class BunnyWidget(QWidget):
     def _key(self, pose: dict, dpr: float) -> tuple:
         """What has to be the same for his kept picture to stand in for `pose`."""
         return (pose["shown"], pose["prop"], pose["smug"], pose["outfit"], self.asleep,
-                self.robot, self.bun_h, self.size(), dpr, theme.current_name,
+                self.robot, _steps(pose), self.bun_h, self.size(), dpr, theme.current_name,
                 tuple(theme.T.items()))
 
     def _moved(self, a: dict, b: dict, dpr: float) -> float:

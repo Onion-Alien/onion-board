@@ -1111,10 +1111,14 @@ class OwlWidget(QWidget):
                 "flap": max(-0.2, min(1.3, self._wing_s.x))}
 
     # ------------------------------------------------------------------ paint
-    def _key(self, dpr: float) -> tuple:
-        """What has to be the same for his kept picture to stand in for a pose."""
-        return (self.owl_h, self.size(), dpr, hooks.theme_name(),
-                tuple(hooks.palette().items()))
+    def _key(self, pose: dict, dpr: float) -> tuple:
+        """What has to be the same for his kept picture to stand in for `pose`: where
+        draw_owl switches a part on or off (shut eyes, a lid, the open beak, puppy
+        eyes, tears), his size, the theme."""
+        return (pose["blink"] > 0.6, pose["blink"] > 0.01,
+                pose["flap"] > 0.3 or pose["beak"] > 0.3, pose["plead"] > 0.05,
+                pose["sad"] > 0.05, 0 < pose["tear"] < 1, self.owl_h, self.size(), dpr,
+                hooks.theme_name(), tuple(hooks.palette().items()))
 
     def _moved(self, a: dict, b: dict, dpr: float) -> float:
         """About how far (screen px) the bit of him that moved most moved from pose a
@@ -1131,7 +1135,7 @@ class OwlWidget(QWidget):
         """`pose`, or the pose his kept picture shows while he's moved less than
         HOLD_PX from it; `dpr`: the screen's (or picture's) pixels per px."""
         kept = self._kept_pose
-        if (HOLD and kept is not None and self._kept_key == self._key(dpr)
+        if (HOLD and kept is not None and self._kept_key == self._key(pose, dpr)
                 and self._moved(kept, pose, dpr) < HOLD_PX):
             return kept
         return pose
@@ -1160,7 +1164,7 @@ class OwlWidget(QWidget):
         p.setRenderHint(QPainter.RenderHint.Antialiasing)
         self._draw_owl(p, pose, r)
         p.end()
-        self._kept_img, self._kept_pose, self._kept_key = img, pose, self._key(dpr)
+        self._kept_img, self._kept_pose, self._kept_key = img, pose, self._key(pose, dpr)
         return img
 
     def _draw_owl(self, p: QPainter, pose: dict, r: QRectF):

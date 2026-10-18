@@ -109,6 +109,12 @@ def test_his_picture_is_kept_only_while_he_hardly_moves(qapp, clock):
     assert b._held({**pose, "dy": pose["dy"] + 0.1}, 3.0) is not kept   # (a sharper screen)
     assert b._held({**pose, "alpha": 0.99}, 1.0) is not kept           # (a fade)
     assert b._held({**pose, "prop": "mic"}, 1.0) is not kept
+    # a hair's change that switches a part on (the frown at sad 0.5): never held across
+    sad = {**pose, "sad": 0.4999}
+    b._kept_pose, b._kept_key = sad, b._key(sad, 1.0)
+    assert b._held({**sad, "sad": 0.49995}, 1.0) is sad
+    assert b._held({**sad, "sad": 0.5001}, 1.0) is not sad
+    b._kept_pose, b._kept_key = kept, b._key(kept, 1.0)
     theme.set_current("Ocean")
     assert b._held(pose, 1.0) is not kept   # (another outfit)
     b.close()
