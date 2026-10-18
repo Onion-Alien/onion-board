@@ -4112,5 +4112,6 @@
   "Turns on: {voices}": "Slår på: {voices}",
   "Voice changer: {voice}.": "Röstvändare: {voice}.",
   "Voices on or off": "Röster på eller av",
-  "What you say is said in {language}.": "Det du säger sägs på {language}."
+  "What you say is said in {language}.": "Det du säger sägs på {language}.",
+  "Onion Board closed unexpectedly, so it started again.": "Onion Board stängdes oväntat, så det startade igen."
 }

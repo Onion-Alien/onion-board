@@ -4033,5 +4033,6 @@
   "Turns on: {voices}": "會打開：{voices}",
   "Voice changer: {voice}.": "變聲器：{voice}。",
   "Voices on or off": "語音開啟或關閉",
-  "What you say is said in {language}.": "你說的話會用{language}說出來。"
+  "What you say is said in {language}.": "你說的話會用{language}說出來。",
+  "Onion Board closed unexpectedly, so it started again.": "Onion Board 意外關閉，已重新啟動。"
 }

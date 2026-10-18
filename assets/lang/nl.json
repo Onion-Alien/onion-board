@@ -4112,5 +4112,6 @@
   "Turns on: {voices}": "Zet aan: {voices}",
   "Voice changer: {voice}.": "Stemverander: {voice}.",
   "Voices on or off": "Stemmen aan of uit",
-  "What you say is said in {language}.": "Wat je zegt, wordt in het {language} gezegd."
+  "What you say is said in {language}.": "Wat je zegt, wordt in het {language} gezegd.",
+  "Onion Board closed unexpectedly, so it started again.": "Onion Board werd onverwacht gesloten en is daarom opnieuw gestart."
 }

@@ -4112,5 +4112,6 @@
   "Turns on: {voices}": "Включва: {voices}",
   "Voice changer: {voice}.": "Промяна на гласа: {voice}.",
   "Voices on or off": "Гласове вкл. или изкл.",
-  "What you say is said in {language}.": "Това, което казваш, се казва на {language}."
+  "What you say is said in {language}.": "Това, което казваш, се казва на {language}.",
+  "Onion Board closed unexpectedly, so it started again.": "Onion Board се затвори неочаквано, затова се стартира отново."
 }

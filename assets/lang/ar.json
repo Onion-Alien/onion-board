@@ -4428,5 +4428,6 @@
   "Turns on: {voices}": "يشغّل: {voices}",
   "Voice changer: {voice}.": "مغير الصوت: {voice}.",
   "Voices on or off": "الأصوات تشغيل أو إيقاف",
-  "What you say is said in {language}.": "ما تقوله يُقال بـ{language}."
+  "What you say is said in {language}.": "ما تقوله يُقال بـ{language}.",
+  "Onion Board closed unexpectedly, so it started again.": "أُغلق Onion Board بشكل غير متوقع، لذا فُتح من جديد."
 }

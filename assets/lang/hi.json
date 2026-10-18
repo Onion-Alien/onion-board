@@ -4112,5 +4112,6 @@
   "Turns on: {voices}": "चालू करता है: {voices}",
   "Voice changer: {voice}.": "आवाज परिवर्तक: {voice}।",
   "Voices on or off": "आवाज़ें चालू या बंद",
-  "What you say is said in {language}.": "आप जो कहते हैं वह {language} में कहा जाता है।"
+  "What you say is said in {language}.": "आप जो कहते हैं वह {language} में कहा जाता है।",
+  "Onion Board closed unexpectedly, so it started again.": "Onion Board अचानक बंद हो गया, इसलिए यह फिर से शुरू हुआ।"
 }

@@ -4112,5 +4112,6 @@
   "Turns on: {voices}": "Ανοίγει: {voices}",
   "Voice changer: {voice}.": "Αλλαγη φωνης: {voice}.",
   "Voices on or off": "Φωνές ανοιχτές ή κλειστές",
-  "What you say is said in {language}.": "Ό,τι λες ακούγεται στα {language}."
+  "What you say is said in {language}.": "Ό,τι λες ακούγεται στα {language}.",
+  "Onion Board closed unexpectedly, so it started again.": "Το Onion Board έκλεισε απροσδόκητα, οπότε ξεκίνησε ξανά."
 }

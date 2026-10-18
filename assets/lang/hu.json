@@ -4112,5 +4112,6 @@
   "Turns on: {voices}": "Bekapcsolja: {voices}",
   "Voice changer: {voice}.": "Hangváltó: {voice}.",
   "Voices on or off": "Beszédhangok be vagy ki",
-  "What you say is said in {language}.": "Amit mondasz, {language} nyelven hangzik el."
+  "What you say is said in {language}.": "Amit mondasz, {language} nyelven hangzik el.",
+  "Onion Board closed unexpectedly, so it started again.": "Az Onion Board váratlanul bezárult, ezért újraindult."
 }

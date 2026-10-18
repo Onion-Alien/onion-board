@@ -4033,5 +4033,6 @@
   "Turns on: {voices}": "オンにするもの: {voices}",
   "Voice changer: {voice}.": "ボイスチェンジャー: {voice}。",
   "Voices on or off": "声 オン / オフ",
-  "What you say is said in {language}.": "話した内容は {language} で話されます。"
+  "What you say is said in {language}.": "話した内容は {language} で話されます。",
+  "Onion Board closed unexpectedly, so it started again.": "Onion Board が予期せず終了したため、再起動しました。"
 }
