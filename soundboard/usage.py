@@ -64,7 +64,7 @@ Nothing else: no name, sounds, settings, devices, games or IP address in the mes
 keep or look up).
 
 On unless switched off: the installer's "Count me in" box, or Settings > Privacy &
-security > Usage count (soundboard.net, so it also obeys Offline mode, a proxy and
+security > Usage count (soundboard.online.net, so it also obeys Offline mode, a proxy and
 Tor). Copies from before it existed start with it off: they were installed as an app
 that sent nothing. A copy running from source never sends anything, and neither does
 one on a PC with ONIONBOARD_NO_STATS set (the developer's own PCs and test VMs:
@@ -84,11 +84,12 @@ import urllib.request
 import uuid
 from pathlib import Path
 
-from soundboard import __version__, enjoy, net, netlog
+from soundboard import __version__, enjoy
+from soundboard.online import net, netlog
 
 log = logging.getLogger(__name__)
 
-FEATURE = "usage_stats"   # its switch in Settings > Privacy & security (soundboard.net)
+FEATURE = "usage_stats"   # its switch in Settings > Privacy & security (soundboard.online.net)
 ENDPOINT = "https://onionalien.goatcounter.com/api/v0/count"
 # a key that can only add counts (GoatCounter's "Record pageviews" permission), not
 # read or change anything; "" sends nothing
@@ -139,7 +140,7 @@ MIC_FAILS = ("unanswered", "no-start", "stuck", "silent", "no-helper", "no-mic",
 PRESS_MODES = ("overlap", "toggle", "solo", "queue")
 # the add-ons with install steps (their module.json id); any other is "other"
 ADDONS = ("ai-voices", "live-voice", "other")
-# the free sound packs (soundboard.packs BUILT_IN ids); any other is "other"
+# the free sound packs (soundboard.sounds.packs BUILT_IN ids); any other is "other"
 PACKS = ("streamer", "esports", "general", "podcast", "halloween", "gm-starter", "other")
 # the Live controls' tabs (ui/livesetups.py)
 LIVE_TABS = ("sounds", "radio", "apps")
@@ -257,7 +258,7 @@ FEATURES = ("add-files", "youtube", "record", "clip", "clip-editor", "import-boa
             "pause", "stop-all", "taskbar-buttons",
             *(f"press-{k}" for k in PRESS_MODES),
             # an add-on with install steps (ADDONS) set up or failing to, Repair, and a
-            # Python got for it (soundboard.pyget) or that failing
+            # Python got for it (soundboard.online.pyget) or that failing
             *(f"addon-installed-{k}" for k in ADDONS), *(f"addon-failed-{k}" for k in ADDONS),
             "addon-repaired", "addon-got-python", "addon-python-failed",
             # a restore point saved before an update; a restore point put back
@@ -572,7 +573,7 @@ def settle(cfg, now: float) -> None:
     if cfg.stats_sent or total_plays(cfg):
         born = cfg.stats_sent or now
         try:
-            from soundboard.library import APP_DIR
+            from soundboard.sounds.library import APP_DIR
             born = min(born, APP_DIR.stat().st_ctime)   # created, on Windows
         except (OSError, ImportError):
             pass

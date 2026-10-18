@@ -17,7 +17,8 @@ import time
 
 import numpy as np
 
-from soundboard import library, net
+from soundboard.sounds import library
+from soundboard.online import net
 from soundboard.speech import aivoice, resample
 from soundboard.speech.service import QUEUE_BLOCKS, ServiceHost
 

@@ -17,7 +17,7 @@ def app_dir(tmp_path, monkeypatch):
 def _native(stack_file=r"D:\Apps\OnionBoard\soundboard\engine.py"):
     return ("Windows fatal exception: access violation\n\n"
             "Thread 0x0000aaaa (most recent call first):\n"
-            '  File "soundboard\\radio.py", line 12 in run\n\n'
+            '  File "soundboard\\online\\radio.py", line 12 in run\n\n'
             "Current thread 0x0000bbbb (most recent call first):\n"
             '  File "PySide6\\QtCore.py", line 3 in exec\n'
             f'  File "{stack_file}", line 1090 in _callback\n'
@@ -182,7 +182,7 @@ def test_a_native_error_that_was_caught_is_cleared_at_the_next_heartbeat(app_dir
 _COM = ("Windows fatal exception: code 0x8001010d\n\n"
         "Thread 0x00004bbc (most recent call first):\n"
         '  File "threading.py", line 359 in wait\n'
-        '  File "soundboard\\thumbs.py", line 259 in _read_loop\n')
+        '  File "soundboard\\sounds\\thumbs.py", line 259 in _read_loop\n')
 
 
 def test_a_harmless_windows_code_is_not_a_warning_or_a_crash(app_dir, caplog):

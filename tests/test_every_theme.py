@@ -187,7 +187,7 @@ def test_switched_on_icon_buttons_in_a_card_show_their_icon(qapp, name):
     Amber Terminal. An app row's Record, switched on, drew its white dot on the card's
     accent (Hacker's green, 1.4:1) instead of its red, and its red dot was 2.5:1 on
     Light's grey button."""
-    from soundboard import store
+    from soundboard.online import store
     from soundboard.ui import icons
     from soundboard.ui.storetab import SoundRow
     old = dict(theme.T)

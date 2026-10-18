@@ -17,7 +17,7 @@ What the host gives it:
   allow_firewall(name, port)
                       Windows Firewall rule `name` for `port` and this app, Private
                       networks and local subnet only, after Windows' admin prompt,
-                      which names Onion Board (soundboard.firewall). Waits; True if
+                      which names Onion Board (soundboard.online.firewall). Waits; True if
                       added. Newer than REMOTE_API 1's first hosts: check for it
   signed_requests     True: its server takes X-Sig, a signature made with the key,
                       so a phone page needn't send the key itself (soundboard.control.remote)
@@ -86,7 +86,7 @@ class RemoteHost:
 
     @staticmethod
     def allow_firewall(name: str, port: int) -> bool:
-        from soundboard import firewall
+        from soundboard.online import firewall
         return firewall.allow(name, port)
 
     # ------------------------------------------------------------------ Settings' look

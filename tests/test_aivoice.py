@@ -517,7 +517,7 @@ def test_card_shows_robot_bunny_and_setup_stages_not_pip_output(qapp):
 def test_ai_voice_download_keeps_its_button_visible_and_focused(qapp, monkeypatch):
     from PySide6.QtCore import Qt
     from PySide6.QtTest import QTest
-    from soundboard import net
+    from soundboard.online import net
     from soundboard.ui import aivoicepanel, busy
     monkeypatch.setattr(net, "offline", lambda: False)
     p = aivoicepanel.AiVoicePanel(AiVoiceController(VoiceChain(), lambda e: None), {}, [])
@@ -544,7 +544,7 @@ def test_ai_voice_download_keeps_its_button_visible_and_focused(qapp, monkeypatc
 def test_ai_voice_install_keeps_focus(qapp, tmp_path, monkeypatch):
     from PySide6.QtCore import Qt
     from PySide6.QtTest import QTest
-    from soundboard import net
+    from soundboard.online import net
     from soundboard.ui import aivoicepanel, busy
     monkeypatch.setattr(net, "offline", lambda: False)
     folder = tmp_path / "ai-voices"

@@ -12,7 +12,8 @@ from PySide6.QtCore import QRectF, QSize, Qt, QTimer
 from PySide6.QtGui import QColor, QFont, QLinearGradient, QPainter, QPainterPath
 from PySide6.QtWidgets import QFrame, QSizePolicy, QWidget
 
-from soundboard import store, theme
+from soundboard.online import store
+from soundboard import theme
 
 if TYPE_CHECKING:
     from soundboard.ui.bunnywidget import BunnyWidget

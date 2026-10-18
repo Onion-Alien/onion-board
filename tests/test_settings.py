@@ -10,7 +10,7 @@ from PySide6.QtTest import QTest
 from PySide6.QtWidgets import QApplication, QFrame, QLabel, QPushButton, QScrollArea, QWidget
 
 from conftest import process_events
-from soundboard import net
+from soundboard.online import net
 from soundboard.settings import SettingsDialog, ThemeCard
 from soundboard.ui import busy
 from test_mainwindow import window  # noqa: F401  (the real MainWindow fixture)
@@ -24,7 +24,7 @@ def test_saved_clip_retention_setting_persists(window, qapp):  # noqa: F811
     d.keep_clips.click()
     assert window.cfg.app_clips_keep_forever
     window.cfg.save()
-    from soundboard.library import Config
+    from soundboard.sounds.library import Config
     assert Config.load().app_clips_keep_forever
     d.keep_clips.click()
     assert not window.cfg.app_clips_keep_forever
@@ -118,7 +118,7 @@ def size_settings(win, qapp, d, width, height):
 def test_the_cog_builds_only_the_page_it_opens_and_the_rest_when_shown(window):  # noqa: F811
     """Building all twelve pages under the app's style sheet took a second or two on
     every click of the cog: the window builds the others when they're first picked."""
-    from soundboard import net
+    from soundboard.online import net
     net.configure_features(["app_update"], False)   # its button is on a page built later
     with windows_shown() as shown:
         d = SettingsDialog(window, "audio", lazy=True)
@@ -237,7 +237,7 @@ def test_onion_watch_can_be_removed_from_settings(window, monkeypatch):  # noqa:
 
 
 def test_connection_choice_applies_at_once_and_fails_closed(window, qapp, monkeypatch):  # noqa: F811
-    from soundboard import net
+    from soundboard.online import net
     monkeypatch.setattr(window, "_save_later", lambda: None)
     d = SettingsDialog(window, "privacy")
     try:
@@ -342,7 +342,7 @@ def test_theme_previews_reflow_when_settings_is_resized(window, qapp):  # noqa: 
 
 def test_each_switch_writes_its_setting_and_applies_at_once(window, monkeypatch):  # noqa: F811
     """Settings > Privacy & security: one switch per feature (and per sound site),
-    saved in net_off and applied to soundboard.net straight away; sub-options grey out
+    saved in net_off and applied to soundboard.online.net straight away; sub-options grey out
     under a switch that's off, and Offline mode hides everything under it."""
     monkeypatch.setattr(window, "_save_later", lambda: None)
     monkeypatch.setattr(window.updctl, "check_updates", lambda *a, **k: None)
@@ -418,7 +418,7 @@ def test_a_new_remote_key_says_made_only_once_it_is_saved(window, monkeypatch): 
     """New key: saved on the saver's thread, never cfg.save() on the UI thread; "made"
     only once it's on disk. A failed save says so instead (after a restart the old key
     would be back, and a Stream Deck set up with the new one would stop working)."""
-    from soundboard import library
+    from soundboard.sounds import library
     from soundboard.ui import remoteaccess
     flashed, toasts, ui_saves = [], [], []
     monkeypatch.setattr(busy, "flash", lambda btn, text, ms=0: flashed.append(text))
@@ -479,7 +479,8 @@ def test_live_tabs_is_a_tab_of_the_look_box_tint_or_dot(window, qapp):  # noqa: 
 def test_theme_style_switches_textured_and_plain(window, qapp):  # noqa: F811
     """Textured (a new install's default) puts the theme's pattern on; Plain leaves the
     panels flat."""
-    from soundboard import library, theme
+    from soundboard.sounds import library
+    from soundboard import theme
     assert library.Config().theme_texture is True
     window.themectl.apply_theme("Amber Terminal")
     d = SettingsDialog(window, "appearance")
@@ -495,7 +496,7 @@ def test_theme_style_switches_textured_and_plain(window, qapp):  # noqa: F811
 
 def test_a_saved_plain_choice_stays_plain():
     """Only new installs get Textured: a config that says Plain keeps it."""
-    from soundboard import library
+    from soundboard.sounds import library
     assert library.Config.from_raw({"theme_texture": False}).theme_texture is False
     assert library.Config.from_raw({}).theme_texture is True
 
@@ -1179,7 +1180,7 @@ def test_downloads_card_shows_each_helper_program(window, qapp, monkeypatch, tmp
     Update Tor doing what the Updates and Connection pages do. Offline mode hides those."""
     import threading
 
-    from soundboard import jsengine, tor, torget, ytdl
+    from soundboard.online import jsengine, tor, torget, ytdl
     off_ui = []
 
     def version():

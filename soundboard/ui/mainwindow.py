@@ -17,17 +17,19 @@ from PySide6.QtCore import (QEvent, QObject, QPoint, QSignalBlocker,
 from PySide6.QtWidgets import (QApplication, QDialog, QMainWindow, QMenu, QMessageBox, QPushButton,
                                QSystemTrayIcon)
 
-from soundboard import theme, ytworker
+from soundboard import theme
+from soundboard.online import ytworker
 from soundboard.engine import SR, Engine
 from soundboard import exitwatch
-from soundboard import appaudio, autostart, howl, library, reset, trash, voicesdk
+from soundboard import appaudio, autostart, howl, reset, trash, voicesdk
+from soundboard.sounds import library
 from soundboard.control import remote
-from soundboard import ffmpegget, net, netlog, profiles, quality, tor, usage
+from soundboard.online import ffmpegget, net, netlog, tor
+from soundboard import profiles, quality, usage
 from soundboard.win import shellicon, thumbbar
 from soundboard.addons import watchaddon
 from soundboard.replay import InstantReplay
-from soundboard.library import (Config,
-                                SoundMeta)
+from soundboard.sounds.library import Config, SoundMeta
 from soundboard.ui.crashdialog import free_dialog
 from soundboard.ui import restyled, worker
 from soundboard.ui.ffmpegcontrol import FfmpegControl
@@ -938,7 +940,7 @@ class MainWindow(QMainWindow):
         """The Voice tab's "Share to the store…": the Share a voice window on that voice."""
         import html
 
-        from soundboard import net, store
+        from soundboard.online import net, store
         from soundboard.ui.storevoices import open_share
         if not net.allowed(store.FEATURE):
             busy.toast(self, html.escape(net.off_message(store.FEATURE)), "error")

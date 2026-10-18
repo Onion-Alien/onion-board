@@ -16,10 +16,11 @@ from typing import TYPE_CHECKING
 from PySide6.QtCore import QTimer
 from PySide6.QtWidgets import QInputDialog
 
-from soundboard import errors, library, thumbs, trash, usage
+from soundboard import errors, trash, usage
+from soundboard.sounds import library, thumbs
 from soundboard.engine import SR
 from soundboard.i18n import _
-from soundboard.library import (
+from soundboard.sounds.library import (
     PAD_COLORS,
     SoundMeta,
     cache_keep,

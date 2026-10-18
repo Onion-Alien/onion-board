@@ -22,12 +22,13 @@ from collections.abc import Callable
 from dataclasses import dataclass, field
 from pathlib import Path
 
-from soundboard import library, net, netlog
+from soundboard.sounds import library
+from soundboard.online import net, netlog
 from soundboard.i18n import _, ngettext
 
 log = logging.getLogger(__name__)
 
-FEATURE = "sound_store"   # its switch in Settings > Privacy & security (soundboard.net)
+FEATURE = "sound_store"   # its switch in Settings > Privacy & security (soundboard.online.net)
 BASE = "https://onion-board-store.onion-alien.workers.dev"
 AGREEMENT = "own-cc0-v1"    # the upload agreement's version (the server checks it)
 LINK_AGREEMENT = "link-v1"  # sharing a link: only the link is kept
@@ -164,7 +165,7 @@ def parse(raw) -> tuple[list[Sound], bool]:
 def link_ok(url: str) -> bool:
     """A link the store keeps: https, on one of the video and sound sites the app knows
     (sourceinfo), never any other web address."""
-    from soundboard import sourceinfo
+    from soundboard.sounds import sourceinfo
     found = sourceinfo.site_of(url)
     return url.startswith("https://") and found is not None and found[0] != "web"
 

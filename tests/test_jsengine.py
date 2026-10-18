@@ -1,9 +1,9 @@
-"""The JavaScript engine yt-dlp gets for YouTube's player challenge (soundboard.jsengine)."""
+"""The JavaScript engine yt-dlp gets for YouTube's player challenge (soundboard.online.jsengine)."""
 from __future__ import annotations
 
 import pytest
 
-from soundboard import jsengine, ytdl
+from soundboard.online import jsengine, ytdl
 
 
 @pytest.fixture

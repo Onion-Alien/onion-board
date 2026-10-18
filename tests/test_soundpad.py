@@ -9,9 +9,10 @@ import soundfile as sf
 from PySide6.QtWidgets import QMessageBox
 
 from conftest import process_events
-from soundboard import library, otherboards
+from soundboard.sounds import library
+from soundboard import otherboards
 from soundboard.otherboards import soundpad
-from soundboard.library import SR
+from soundboard.sounds.library import SR
 from test_mainwindow import window as main_window  # noqa: F401 - the real window, offscreen
 
 

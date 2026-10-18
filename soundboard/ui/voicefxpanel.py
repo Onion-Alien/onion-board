@@ -1734,7 +1734,7 @@ class VoiceFxPanel(QWidget):
                                             QLineEdit.EchoMode.Normal, "")
             if not ok:   # OK on an empty box gets read_code's "There's no code there."
                 return ""
-        from soundboard import storevoices
+        from soundboard.online import storevoices
         try:
             v, notes = storevoices.read_code(text)
         except savedvoices.CodeError as e:

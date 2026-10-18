@@ -280,7 +280,7 @@ def test_modules_imported_before_the_language_is_picked_translate_on_use():
                          cwd=root, env=env, timeout=120)
     assert out.returncode == 0, out.stderr
     mods = out.stdout.split()
-    assert "soundboard.library" in mods and "soundboard.errors" in mods   # it found them
+    assert "soundboard.sounds.library" in mods and "soundboard.errors" in mods   # it found them
     bad = {}
     for name in mods:
         path = root / Path(*name.split("."))
@@ -448,7 +448,7 @@ def test_offer_is_windows_language_when_shipped_and_not_showing(langs, monkeypat
 
 
 def test_the_picked_language_is_saved_where_startup_reads_it(langs, app_dir, monkeypatch):
-    from soundboard.library import Config
+    from soundboard.sounds.library import Config
     monkeypatch.delenv("ONIONBOARD_LANG", raising=False)
     Config(language="de").save()
     assert i18n.startup(app_dir) == "de"

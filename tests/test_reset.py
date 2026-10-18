@@ -7,8 +7,9 @@ from PySide6.QtCore import Qt
 from PySide6.QtWidgets import QPushButton
 from test_mainwindow import window  # noqa: F401 - the real MainWindow, offscreen
 
-from soundboard import library, reset, trash
-from soundboard.library import Config, SoundMeta
+from soundboard.sounds import library
+from soundboard import reset, trash
+from soundboard.sounds.library import Config, SoundMeta
 
 
 def _board(app_dir) -> Config:

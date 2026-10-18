@@ -2,7 +2,8 @@
 import json
 import time
 
-from soundboard import backup, library, savedvoices
+from soundboard import backup, savedvoices
+from soundboard.sounds import library
 from soundboard.savedvoices import Store
 
 ROBOT = {"pitch": {"on": True, "semitones": 4.0}, "echo": {"on": False}}

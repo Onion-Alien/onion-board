@@ -10,8 +10,8 @@ import numpy as np
 import soundfile as sf
 
 from soundboard.engine import SR, resample
-from soundboard import library
-from soundboard.library import MAX_SECONDS
+from soundboard.sounds import library
+from soundboard.sounds.library import MAX_SECONDS
 from soundboard.sendfx import Ducker
 
 log = logging.getLogger(__name__)

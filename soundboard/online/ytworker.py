@@ -77,7 +77,7 @@ class RemoteError(Exception):
 def _command() -> list[str]:
     if getattr(sys, "frozen", False):
         return [sys.executable, ARG]
-    main = Path(__file__).resolve().parent.parent / "main.py"
+    main = Path(__file__).resolve().parents[2] / "main.py"
     return [sys.executable, str(main), ARG]
 
 
@@ -418,7 +418,7 @@ def child_main() -> int:
     conn = Client(addr, authkey=bytes.fromhex(key))
     quiet = logging.getLogger("ytdl-helper")
     quiet.disabled = True
-    from soundboard import ytdl
+    from soundboard.online import ytdl
     with ytdl._ydl() as yt_dlp:   # imported once, up front: a search needn't wait for it
         pass
     while conn.poll(IDLE_S):

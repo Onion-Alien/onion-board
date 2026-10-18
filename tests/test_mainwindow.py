@@ -12,9 +12,10 @@ from PySide6.QtGui import QWheelEvent
 from PySide6.QtWidgets import (QApplication, QLabel, QMenu, QScrollArea, QSlider, QVBoxLayout,
                                QWidget)
 
-from soundboard import __version__, engine, library
+from soundboard import __version__, engine
+from soundboard.sounds import library
 from soundboard.control import winkeys
-from soundboard.library import SR, Config, SoundMeta
+from soundboard.sounds.library import SR, Config, SoundMeta
 from soundboard.ui import mainwindow as main
 from soundboard.ui import windowbuild
 from soundboard.ui.livedot import is_tab_live
@@ -880,7 +881,8 @@ def test_the_mini_player_shows_the_pads_whatever_is_in_the_search_box(window, qa
 @pytest.mark.parametrize("theme_name", ["Dark", "Retro 98"])
 def test_restoring_a_large_window_keeps_search_results(window, qapp, theme_name):
     """Maximize/restore must keep the full app and the selected search view."""
-    from soundboard import theme, ytdl
+    from soundboard import theme
+    from soundboard.online import ytdl
 
     old_theme = window.cfg.theme
     try:
@@ -1053,7 +1055,7 @@ def test_new_pads_never_flash_up_as_windows_of_their_own(qapp):
     up on the desktop for a moment as a little blank window (behind the splash)."""
     from PySide6.QtCore import QEvent, QObject
 
-    from soundboard.library import SoundMeta
+    from soundboard.sounds.library import SoundMeta
     from soundboard.ui.widgets import Pad, PadGrid
 
     flashed = []
@@ -1574,7 +1576,7 @@ def test_add_is_a_menu_of_every_way_in(window, monkeypatch):
 
 def test_a_link_pasted_in_offline_mode_says_why_nothing_happens(window, monkeypatch):
     """Offline, a pasted link showed nothing at all: now one note names Offline mode."""
-    from soundboard import net
+    from soundboard.online import net
     said = []
     monkeypatch.setattr(window, "toast", lambda text, *a, **k: said.append(text))
     window.show()                            # offscreen: nothing appears

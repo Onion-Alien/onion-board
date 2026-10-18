@@ -33,7 +33,7 @@ _NO_WINDOW = getattr(subprocess, "CREATE_NO_WINDOW", 0)
 # the frozen app's _internal folder (build.ps1 bundles qjs\ there); from source, where
 # scripts/fetch_qjs.py leaves it (a source run without it simply goes without QuickJS)
 QJS_DIR = (Path(sys._MEIPASS) / "qjs" if hasattr(sys, "_MEIPASS")   # pyright: ignore[reportAttributeAccessIssue]
-           else Path(__file__).resolve().parent.parent / "build" / "qjs")
+           else Path(__file__).resolve().parents[2] / "build" / "qjs")
 
 
 @dataclass(frozen=True)

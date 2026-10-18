@@ -55,8 +55,10 @@ from collections.abc import Callable
 from dataclasses import dataclass
 from pathlib import Path
 
-from soundboard import jsengine, library, net, quality, sourceinfo, updates, ytworker
-from soundboard.library import MAX_SECONDS
+from soundboard.online import jsengine, net, ytworker
+from soundboard.sounds import library, sourceinfo
+from soundboard import quality, updates
+from soundboard.sounds.library import MAX_SECONDS
 from soundboard import errors
 from soundboard.i18n import _
 
@@ -132,7 +134,7 @@ class SwitchedOff(DownloadError):
     & security: nothing was looked up or sent. The message says so."""
 
 
-FEATURE = "sounds_web"           # soundboard.net's switch for all of this
+FEATURE = "sounds_web"           # soundboard.online.net's switch for all of this
 UPDATE_FEATURE = "ytdlp_update"  # ...and for updating yt-dlp (the list + PyPI)
 
 
@@ -212,7 +214,7 @@ def _over_tor[T](fn: Callable[[], T], target: str) -> T:
     that."""
     if net.mode() != net.TOR:
         return fn()
-    from soundboard import tor
+    from soundboard.online import tor
     for attempt in range(TOR_TRIES + 1):
         try:
             return fn()
@@ -1122,7 +1124,7 @@ def _opts(dest: Path | None = None, progress=None, thumbnail: bool = False,
         "format": quality.current.audio_format(),   # Settings > Data & quality
         "outtmpl": str((dest or Path(tempfile.gettempdir())) / "%(id)s.%(ext)s"),
         "noplaylist": True,            # a video in a playlist: just that video
-        "writethumbnail": thumbnail,   # the pad's picture (soundboard.thumbs)
+        "writethumbnail": thumbnail,   # the pad's picture (soundboard.sounds.thumbs)
         "quiet": True,
         "no_warnings": True,
         "noprogress": True,

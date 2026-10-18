@@ -23,7 +23,8 @@ import logging
 from collections.abc import Callable
 from pathlib import Path
 
-from soundboard import library, theme
+from soundboard.sounds import library
+from soundboard import theme
 from soundboard.i18n import _
 from soundboard.addons.modules import TRIGGERS_API
 

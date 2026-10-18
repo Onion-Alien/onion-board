@@ -5,8 +5,8 @@ import threading
 
 import numpy as np
 
-from soundboard import clipedit
-from soundboard.clipedit import BIN, LiveBuffer, Take, bin_peaks
+from soundboard.sounds import clipedit
+from soundboard.sounds.clipedit import BIN, LiveBuffer, Take, bin_peaks
 from soundboard.engine import SR
 
 

@@ -8,8 +8,8 @@ from PySide6.QtCore import QEvent, QPoint
 from PySide6.QtGui import QHelpEvent
 from PySide6.QtWidgets import QApplication, QToolTip
 
-from soundboard import library
-from soundboard.library import SoundMeta
+from soundboard.sounds import library
+from soundboard.sounds.library import SoundMeta
 from soundboard.ui.widgets import Pad
 
 

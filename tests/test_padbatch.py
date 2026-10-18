@@ -7,7 +7,7 @@ from PySide6.QtGui import QAccessible, QColor, QKeyEvent, QMouseEvent
 from PySide6.QtWidgets import QApplication, QColorDialog, QMenu
 
 from soundboard.i18n import _
-from soundboard.library import PAD_COLORS, SoundMeta
+from soundboard.sounds.library import PAD_COLORS, SoundMeta
 from soundboard.ui.widgets import Pad
 from test_mainwindow import window as main_window  # noqa: F401  (the real MainWindow)
 

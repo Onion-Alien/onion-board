@@ -5,8 +5,8 @@ import json
 import threading
 import time
 
-from soundboard import library
-from soundboard.library import Config
+from soundboard.sounds import library
+from soundboard.sounds.library import Config
 
 
 def _on_disk() -> dict:

@@ -1,4 +1,4 @@
-"""The Store tab: free sounds anyone can add to their board (soundboard.store), the best
+"""The Store tab: free sounds anyone can add to their board (soundboard.online.store), the best
 voted first, in categories, and a way to share your own. Sounds the server brings in from
 Myinstants are links like any shared one: played and added from that site.
 
@@ -18,7 +18,9 @@ from PySide6.QtWidgets import (QCheckBox, QComboBox, QDialog, QFileDialog, QGrid
                                QHBoxLayout, QLabel, QLineEdit, QMenu, QPushButton, QScrollArea,
                                QSizePolicy, QStackedWidget, QVBoxLayout, QWidget)
 
-from soundboard import errors, library, net, store, usage, wheelguard
+from soundboard import errors, usage, wheelguard
+from soundboard.sounds import library
+from soundboard.online import net, store
 from soundboard.engine import SR
 from soundboard.i18n import _
 from soundboard.ui import busy, fit, icons, storelook
@@ -43,7 +45,7 @@ def meta_line(s: store.Sound) -> str:
     """"by Onion Board · tavern, music", "Shared by a player", for a shared link
     "YouTube link · Shared by a player", and for one the server brought in
     "From Myinstants" (its category has a column of its own)."""
-    from soundboard import sourceinfo
+    from soundboard.sounds import sourceinfo
     site = sourceinfo.site_of(s.link) if s.is_link else None
     if s.source and site:
         return _("From {site}", site=site[1])
@@ -827,7 +829,7 @@ class StoreTab(QWidget):
         def run():
             try:
                 if voices:
-                    from soundboard import storevoices
+                    from soundboard.online import storevoices
                     found, more = storevoices.browse(install, kind, sort, query, offset)
                 else:
                     found, more = store.browse(install, sort, query, offset, cat)
@@ -859,7 +861,7 @@ class StoreTab(QWidget):
         if replace:
             self._clear()
         self._offset += len(found)
-        from soundboard.storevoices import Voice
+        from soundboard.online.storevoices import Voice
         from soundboard.ui.storevoices import VoiceRow
         for s in found:
             if isinstance(s, Voice):
@@ -976,7 +978,7 @@ class StoreTab(QWidget):
 
     @staticmethod
     def _is_voice(row) -> bool:
-        from soundboard.storevoices import Voice
+        from soundboard.online.storevoices import Voice
         return isinstance(row.sound, Voice)
 
     def _hear_voice(self, row: SoundRow):
@@ -986,7 +988,7 @@ class StoreTab(QWidget):
         module = self.voices.ai_module() if self.voices is not None else None
 
         def run():
-            from soundboard import storevoices
+            from soundboard.online import storevoices
             try:
                 data, left_out = storevoices.preview(v, module)
                 busy.emit(self._decoded, row, (data, left_out), 1.0, serial)
@@ -1128,7 +1130,7 @@ class StoreTab(QWidget):
         def run():
             try:
                 if self._is_voice(row):
-                    from soundboard import storevoices
+                    from soundboard.online import storevoices
                     busy.emit(self._voted, row, storevoices.vote(install, s.id, value), "")
                 else:
                     busy.emit(self._voted, row, store.vote(install, s.id, value), "")
@@ -1170,7 +1172,7 @@ class StoreTab(QWidget):
         def run():
             try:
                 if voice:
-                    from soundboard import storevoices
+                    from soundboard.online import storevoices
                     storevoices.report(install, s.id, reason)
                 else:
                     store.report(install, s.id, reason)

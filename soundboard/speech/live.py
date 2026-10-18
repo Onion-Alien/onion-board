@@ -23,7 +23,8 @@ from typing import TYPE_CHECKING
 
 import numpy as np
 
-from soundboard import library, net
+from soundboard.sounds import library
+from soundboard.online import net
 from soundboard.addons.modules import ModuleInfo
 from soundboard.speech.customvoices import VoiceSet
 from soundboard.speech.service import ServiceHost
@@ -127,7 +128,7 @@ class SpeechController:
                    replace: bool | None = None):
         """`replace`: mute your real voice (None: the mute_real_voice setting)."""
         self.stop_live()
-        from soundboard import netlog
+        from soundboard.online import netlog
         netlog.cause("voices", f"You started live voice ({module.name}): it may fetch "
                                "its speech model")
         holder: list[ServiceHost] = []

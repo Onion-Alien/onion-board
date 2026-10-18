@@ -15,7 +15,8 @@ from collections import OrderedDict
 
 import numpy as np
 
-from soundboard import errors, net
+from soundboard import errors
+from soundboard.online import net
 from soundboard.addons.modules import ModuleInfo
 
 log = logging.getLogger(__name__)

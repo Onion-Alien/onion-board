@@ -21,7 +21,8 @@ import time
 import uuid
 from pathlib import Path
 
-from soundboard import library, trash
+from soundboard.sounds import library
+from soundboard import trash
 
 log = logging.getLogger(__name__)
 

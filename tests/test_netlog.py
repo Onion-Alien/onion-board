@@ -1,4 +1,4 @@
-"""soundboard.netlog (Settings > Connection > Network activity): every connection the
+"""soundboard.online.netlog (Settings > Connection > Network activity): every connection the
 app makes is listed, with its feature, route and bytes; refused ones as blocked; never
 a password or the relay's secret; and the view shows them simply or in detail."""
 import time
@@ -7,7 +7,7 @@ import urllib.error
 import pytest
 
 from fakeproxy import Socks5
-from soundboard import net, netlog
+from soundboard.online import net, netlog
 from test_net import F, dead_port, login, relay_auth, relay_get, relay_request
 from test_net import site, socks  # noqa: F401  (fixtures)
 
@@ -256,7 +256,7 @@ def test_the_view_updates_its_rows_in_place(qapp):
 def test_radio_switched_off_lists_what_it_refused(qapp, tmp_path):
     """Radio's own gates (a station, a directory lookup) refuse before any connection
     is tried: each is still listed as blocked, with the switch's message."""
-    from soundboard.radio import RadioDirectory, RadioPlayer, Station
+    from soundboard.online.radio import RadioDirectory, RadioPlayer, Station
     net.configure_features([], offline=True)
     errors, fails = [], []
     p = RadioPlayer()

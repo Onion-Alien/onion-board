@@ -7,7 +7,7 @@ from PySide6.QtCore import QEvent
 from PySide6.QtWidgets import QApplication, QDialog, QPushButton, QWidget
 
 from conftest import process_events
-from soundboard.library import SR
+from soundboard.sounds.library import SR
 from soundboard.ui import busy, importreport, toast
 from soundboard.ui.dropveil import label_for
 from test_mainwindow import window as main_window  # noqa: F401 - the real window, offscreen

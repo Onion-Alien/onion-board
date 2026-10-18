@@ -17,7 +17,8 @@ from PySide6.QtWidgets import QFrame, QHBoxLayout, QMessageBox, QPushButton, QVB
 
 from soundboard import applog
 from soundboard.addons import modules as mods
-from soundboard import langnames, net, netlog
+from soundboard import langnames
+from soundboard.online import net, netlog
 from soundboard.speech import translation, winvoices
 from soundboard.ui import busy, icons
 from soundboard.ui.panel import hint_label, icon_button
@@ -350,7 +351,7 @@ class SpeechInstalls(QObject):
             self.lbl_missing.setText(_(
                 "The live-voice add-on is missing from this copy of Onion Board. Run the "
                 "installer again (it comes with every install), then press Refresh below."))
-        elif m.broken:   # the Python it was set up with is gone (soundboard.pyget)
+        elif m.broken:   # the Python it was set up with is gone (soundboard.online.pyget)
             self.lbl_missing.setText(_("Speech recognition stopped working: the Python it "
                                        "was set up with is gone from this PC. Press Repair "
                                        "to set it up again."))

@@ -34,8 +34,8 @@ from typing import TYPE_CHECKING
 from PySide6.QtCore import QTimer, Signal
 from PySide6.QtWidgets import QMessageBox
 
-from soundboard import (errors, langnames, library, livesetup, renderworker, soundfx,
-                        usage, voicesetups)
+from soundboard import errors, langnames, livesetup, renderworker, soundfx, usage, voicesetups
+from soundboard.sounds import library
 from soundboard.i18n import _
 from soundboard.ui import worker
 from soundboard.ui.controller import Controller

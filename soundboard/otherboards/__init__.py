@@ -12,7 +12,7 @@ from collections.abc import Callable
 from dataclasses import dataclass, field
 from pathlib import Path
 
-from soundboard.library import AUDIO_EXTS
+from soundboard.sounds.library import AUDIO_EXTS
 
 # left in our app folder by the installer's "Bring my sounds over from …" boxes, one
 # source key per line, for the app's first start to do (ui.mainwindow import_queued)

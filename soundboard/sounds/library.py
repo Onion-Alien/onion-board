@@ -34,7 +34,8 @@ import numpy as np
 import soundfile as sf
 import soxr
 
-from soundboard import __version__, mapped, sourceinfo
+from soundboard import __version__, mapped
+from soundboard.sounds import sourceinfo
 from soundboard.win import winpath
 from soundboard.engine import SR
 from soundboard.eq import BANDS as EQ_BANDS
@@ -55,7 +56,7 @@ CACHE_GRACE_S = 600   # prune_cache leaves a new sound's cache this long (an imp
 # cache files a delete was refused for (still mapped, see _unlink): not new imports, so
 # prune_cache retries them at once instead of after CACHE_GRACE_S
 _refused: set[Path] = set()
-THUMBS_DIR = winpath.usable_dir(APP_DIR / "thumbs")   # pad pictures (soundboard.thumbs)
+THUMBS_DIR = winpath.usable_dir(APP_DIR / "thumbs")   # pad pictures (soundboard.sounds.thumbs)
 CONFIG_PATH = APP_DIR / "config.json"
 # privacy.json beside config.json: a copy of the Privacy & security settings: a version
 # from before them drops them when it saves, and the next newer start takes them back
@@ -74,7 +75,7 @@ ROTATE_EVERY_S = 3600   # ...at most once an hour (the first change of a session
 # where install-vbcable.ps1 lives: installer/ in a source checkout, or the frozen
 # app's _internal folder (PyInstaller's _MEIPASS; build.ps1 bundles it at its root)
 RESOURCE_DIR = (Path(sys._MEIPASS) if hasattr(sys, "_MEIPASS")   # pyright: ignore[reportAttributeAccessIssue]
-                else Path(__file__).resolve().parent.parent / "installer")
+                else Path(__file__).resolve().parents[2] / "installer")
 
 AUDIO_EXTS = {".wav", ".mp3", ".ogg", ".flac", ".opus", ".m4a", ".aac", ".wma",
               ".aiff", ".aif", ".webm", ".mp4", ".mkv", ".mov"}
@@ -165,8 +166,8 @@ VOLUME_MAX = 10.0             # the mixer's volume boxes take up to 1000 %
 PAD_WIDTH_RANGE = (110, 240)  # the Sounds tab's pad-size slider
 # settings shown on a control with a fixed range: a value from a hand-edited config or
 # someone's backup is brought into it (Qt raises OverflowError on one past an int)
-NET_MODES = ("direct", "proxy", "tor")   # soundboard.net.MODES
-TOR_BRIDGES = ("", "snowflake", "obfs4")   # soundboard.tor.BRIDGES
+NET_MODES = ("direct", "proxy", "tor")   # soundboard.online.net.MODES
+TOR_BRIDGES = ("", "snowflake", "obfs4")   # soundboard.online.tor.BRIDGES
 # where what others hear goes (Config.route; Setup -> Devices -> Send my sounds to):
 #   cable  - a virtual cable, whose other end Discord / the game uses as its mic
 #   device - any output picked by hand (Voicemeeter, a mixer, a second sound card, a
@@ -462,7 +463,7 @@ class Config:
     # Settings > Tabs: the tabs switched off ("radio", "apps", "triggers", "voice"), gone
     # from the window and never built (a new user starts with BASIC_TABS_OFF)
     tabs_off: list[str] = field(default_factory=list)
-    # the Store tab's random id for this install (soundboard.store: one vote per sound);
+    # the Store tab's random id for this install (soundboard.online.store: one vote per sound);
     # "" until the store is first used
     store_id: str = ""
     # the Chat tab's rules version this user accepted, from 2.3.0 and 2.3.1 (the tab is gone
@@ -549,7 +550,7 @@ class Config:
                                       # saved configs keep theirs)
     category_hotkeys: dict = field(default_factory=dict)   # category -> its random-sound key
     voice_hotkeys: dict = field(default_factory=dict)      # voice name -> the key that picks it
-    # Switch category when a program is in front (soundboard.catswitch): {"game.exe":
+    # Switch category when a program is in front (soundboard.sounds.catswitch): {"game.exe":
     # category}, set by the user from a category's menu; and the switch for all of it
     category_programs: dict = field(default_factory=dict)
     category_programs_on: bool = True
@@ -569,15 +570,15 @@ class Config:
     # "remote" add-ons' own settings (soundboard.ui.remotehost), by add-on id: Onion
     # Pocket's on / off, port and key
     remote_addons: dict = field(default_factory=dict)
-    # Settings > Connection (soundboard.net): "direct", "proxy" through
-    # net_proxy (socks5h://host:port or http://host:port), or "tor" (soundboard.tor)
+    # Settings > Connection (soundboard.online.net): "direct", "proxy" through
+    # net_proxy (socks5h://host:port or http://host:port), or "tor" (soundboard.online.tor)
     net_mode: str = "direct"
     net_proxy: str = ""
-    # Settings > Privacy & security, the switches (soundboard.net.FEATURES): the
+    # Settings > Privacy & security, the switches (soundboard.online.net.FEATURES): the
     # features switched off (opt-out: everything's on by default), and Offline mode
     net_off: list[str] = field(default_factory=list)
     net_offline: bool = False
-    # Network activity's "Keep a history" (soundboard.netlog.keep): off = memory only
+    # Network activity's "Keep a history" (soundboard.online.netlog.keep): off = memory only
     netlog_keep: bool = False
     # "Keep an app log" (soundboard.applog.keep): off = onionboard.log isn't written
     app_log: bool = True

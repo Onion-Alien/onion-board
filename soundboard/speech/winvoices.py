@@ -18,7 +18,7 @@ import subprocess
 import tempfile
 from pathlib import Path
 
-from soundboard import net
+from soundboard.online import net
 from soundboard import errors
 
 INSTALL_TIMEOUT_S = 30 * 60      # a slow Windows Update download

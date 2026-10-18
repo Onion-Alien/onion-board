@@ -20,7 +20,7 @@ import threading
 import time
 from pathlib import Path
 
-from soundboard import library
+from soundboard.sounds import library
 
 log = logging.getLogger(__name__)
 

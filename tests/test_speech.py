@@ -400,7 +400,7 @@ def test_typed_text_is_spoken_in_order_as_a_sound():
 
 
 def test_live_voice_speaks_what_the_module_heard(tmp_path, monkeypatch):
-    from soundboard import library
+    from soundboard.sounds import library
     monkeypatch.setattr(library, "APP_DIR", tmp_path)
     events = []
     c, eng = controller(events)
@@ -891,7 +891,7 @@ class _Endless:
 
 
 def test_an_endless_download_is_cut_off_at_the_cap(tmp_path, monkeypatch):
-    from soundboard import net
+    from soundboard.online import net
     from soundboard.speech import translation
     info = translation_info(tmp_path, "0" * 64, 100_000)    # listed 100 kB: cap 150 kB
     reply = _Endless()
@@ -903,7 +903,7 @@ def test_an_endless_download_is_cut_off_at_the_cap(tmp_path, monkeypatch):
 
 
 def test_a_listed_size_over_the_cap_is_refused_before_reading(tmp_path, monkeypatch):
-    from soundboard import net
+    from soundboard.online import net
     from soundboard.speech import translation
     info = translation_info(tmp_path, "0" * 64, 0)          # no size listed: 300 MB cap
     assert translation.max_bytes(info) == translation.DEFAULT_CAP
@@ -916,7 +916,7 @@ def test_a_listed_size_over_the_cap_is_refused_before_reading(tmp_path, monkeypa
 
 
 def test_live_voice_speaks_the_translation_in_the_languages_voice(tmp_path, monkeypatch):
-    from soundboard import library
+    from soundboard.sounds import library
     monkeypatch.setattr(library, "APP_DIR", tmp_path)
     events = []
     c, eng = controller(events)

@@ -1,4 +1,4 @@
-"""A Python for the add-ons (soundboard.pyget): which one is used, getting python.org's
+"""A Python for the add-ons (soundboard.online.pyget): which one is used, getting python.org's
 own copy into the add-on's folder, and repairing an add-on whose Python has gone."""
 import hashlib
 import io
@@ -10,7 +10,7 @@ from pathlib import Path
 import pytest
 
 from soundboard.addons import modules
-from soundboard import net, pyget
+from soundboard.online import net, pyget
 
 
 def service(path: Path) -> modules.ModuleInfo:

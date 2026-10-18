@@ -10,8 +10,10 @@ from types import SimpleNamespace
 
 import pytest
 
-from soundboard import __version__, app, applog, library, net, reset, usage
-from soundboard.library import Config
+from soundboard import __version__, app, applog, reset, usage
+from soundboard.sounds import library
+from soundboard.online import net
+from soundboard.sounds.library import Config
 from test_mainwindow import window  # noqa: F401 - the real window, offscreen
 
 
@@ -424,13 +426,13 @@ def test_a_freeze_says_its_caller_what_it_waited_in_how_long_and_who_was_busy(tm
     f = tmp_path / "crash-x.txt"
     hog = ('Thread "radio" (12), 95% CPU:\n'
            '  File "soundboard\\threadnames.py", line 68, in named_run\n'
-           '  File "soundboard\\radio.py", line 400, in _decode\n'
+           '  File "soundboard\\online\\radio.py", line 400, in _decode\n'
            'Thread "calm" (13), 0% CPU:\n'
            '  File "soundboard\\engine.py", line 9, in _loop\n')
     _freeze(f, "42 s", 1, hog)
     assert usage._report_event(f) == (
         "freeze/1.9.28@soundboard/voicesdk.py:80<soundboard/ui/mainwindow.py:50"
-        "~threading.wait/lasted-30s-2m/busy-thread@soundboard/radio.py:400")
+        "~threading.wait/lasted-30s-2m/busy-thread@soundboard/online/radio.py:400")
     _freeze(f, "7 s", 100, hog)
     assert usage._report_event(f).endswith("/lasted-under-10s/busy-window")
     _freeze(f, "still frozen", 0, 'Thread "calm" (13), 2% CPU:\n'
@@ -1135,7 +1137,7 @@ def test_addon_installs_are_counted_by_a_fixed_name(monkeypatch):
 
 
 def test_getting_python_for_an_addon_is_counted(monkeypatch, tmp_path):
-    from soundboard import pyget
+    from soundboard.online import pyget
     seen = []
     monkeypatch.setattr(usage, "used", seen.append)
     monkeypatch.setattr(sys, "frozen", True, raising=False)
@@ -1224,7 +1226,8 @@ def test_ffmpeg_recovery_doesnt_track_while_the_count_is_off(sent, monkeypatch, 
 def test_packs_settings_pages_and_ytdlp_buttons_count_by_fixed_names():
     """Free packs by their built-in id (a newer one is "other"), Settings' pages by
     their key, yt-dlp's buttons by their job: every name is in FEATURES."""
-    from soundboard import packs, ytdl
+    from soundboard.sounds import packs
+    from soundboard.online import ytdl
     from soundboard.ui.settingspages import connection
     ids = {p.id for p in packs.built_in()}
     assert ids and ids <= set(usage.PACKS)

@@ -8,7 +8,8 @@ from PySide6.QtWidgets import (QCheckBox, QComboBox, QHBoxLayout, QLabel, QPushB
                                QWidget)
 from shiboken6 import isValid as qt_valid
 
-from soundboard import errors, theme, usage, ytdl
+from soundboard import errors, theme, usage
+from soundboard.online import ytdl
 from soundboard.i18n import _
 from soundboard.ui import busy
 from soundboard.ui.settingspages import Page
@@ -41,12 +42,12 @@ class ConnectionPage(Page):
 
     def _connection_card(self):
         """Connection: Direct, through a proxy, or through the app's own Tor
-        (soundboard.net, soundboard.tor). Applies at once; a proxy or Tor that can't be
-        reached makes requests fail, never go direct."""
+        (soundboard.online.net, soundboard.online.tor). Applies at once; a proxy or Tor
+        that can't be reached makes requests fail, never go direct."""
         from PySide6.QtWidgets import QButtonGroup, QLineEdit, QRadioButton
 
 
-        from soundboard import net, tor, torget
+        from soundboard.online import net, tor, torget
         cfg = self.mw.cfg
         card, cv = self._card(
             _("Connection"),
@@ -65,7 +66,7 @@ class ConnectionPage(Page):
         for b in (direct, via, use_tor):
             group.addButton(b)
             row.addWidget(b)
-        # ---- Get Tor: the app doesn't ship it (soundboard.torget). Right after the
+        # ---- Get Tor: the app doesn't ship it (soundboard.online.torget). Right after the
         # Tor choice it greys out, with its note on the line below
         get = QPushButton(_("Get Tor"))
         get.setProperty("tip", _("Download Tor {version} from the Tor Project "
@@ -264,7 +265,7 @@ class ConnectionPage(Page):
             relay.done.connect(finish)
 
             def run():
-                from soundboard import netlog
+                from soundboard.online import netlog
                 netlog.cause(net.TEST, "You clicked Test (Settings > Connection)")
                 try:
                     msg = net.test(text)
@@ -291,12 +292,12 @@ class ConnectionPage(Page):
         return card
 
     def _tor_get(self, button: QPushButton, progress, done, where: str):
-        """Download Tor (soundboard.torget) on a worker, `button` busy meanwhile: Get Tor
+        """Download Tor (soundboard.online.torget) on a worker, `button` busy meanwhile: Get Tor
         here and Update Tor on Data & quality. `progress(text)` gets how far it is,
         `done(error)` an empty error when it worked; both on the UI thread."""
         import logging
 
-        from soundboard import tor, torget
+        from soundboard.online import tor, torget
         release = busy.hold(button, _("Downloading…"))
         relay = _ProgressRelay(self.mw)   # outlives this window if it's closed meanwhile
 
@@ -315,7 +316,7 @@ class ConnectionPage(Page):
             done(err)   # then the clicked one says how it went
 
         def work():
-            from soundboard import netlog
+            from soundboard.online import netlog
             netlog.cause(torget.FEATURE, f"You clicked to download Tor ({where})")
             try:
                 # a running Tor may have carried the download: stopped before its
@@ -333,7 +334,7 @@ class ConnectionPage(Page):
         threading.Thread(target=work, daemon=True, name="tor-get").start()
 
     def _activity_card(self):
-        """Network activity: every connection the app has made (soundboard.netlog)."""
+        """Network activity: every connection the app has made (soundboard.online.netlog)."""
         from soundboard.ui.netactivity import NetActivity
         card, cv = self._card(_("Network activity"), icon="list")
         self.dlg.net_activity = NetActivity(card)
@@ -359,7 +360,8 @@ class ConnectionPage(Page):
         applog.keep(on)
 
     def _set_netlog_keep(self, on: bool):
-        from soundboard import library, netlog
+        from soundboard.sounds import library
+        from soundboard.online import netlog
         self.mw.set_option("netlog_keep", on)
         netlog.keep(library.APP_DIR / netlog.FILE_NAME if on else None)
         self.dlg.net_activity.refresh(force=True)
@@ -471,7 +473,7 @@ class ConnectionPage(Page):
         buttons = self._ytdlp_buttons()
         if any(busy.is_busy(b) or not b.isEnabled() for b in buttons):
             return
-        from soundboard import netlog
+        from soundboard.online import netlog
         netlog.cause(ytdl.UPDATE_FEATURE, f"You clicked {button} ({where})"
                      if button else "You asked to update the downloader")
         for b in buttons:
@@ -503,7 +505,7 @@ class ConnectionPage(Page):
     def _net_sync(self):
         """Grey out what's under a switch that's off (everything, in Offline mode), and
         the buttons on other pages that would go online for it."""
-        from soundboard import net, torget
+        from soundboard.online import net, torget
         body = getattr(self.dlg, "_net_body", None)   # None until its page is first shown
         if body is not None:
             if not qt_valid(body):

@@ -233,7 +233,7 @@ def qapp():
     wheelguard.TIP_DELAY = 0   # tests ask for tooltips at once; test_tooltip_wait checks it
     if not app.styleSheet():   # the app's theme and font, as the window applies them:
         from soundboard import theme   # without it a worker's first tests measured
-        from soundboard.library import Config   # text in Qt's plain font, and the
+        from soundboard.sounds.library import Config  # text in Qt's plain font, and the
         theme.apply(app, Config().theme)   # ones after a window in the app's
     if not hasattr(app, "_collector"):   # collects while a test spins the event loop
         from soundboard.uigc import UiCollector
@@ -318,7 +318,7 @@ def devices_done(win, timeout=8.0):
 @pytest.fixture
 def app_dir(tmp_path, monkeypatch):
     """Point library's config/sounds paths at a temp folder."""
-    from soundboard import library
+    from soundboard.sounds import library
     monkeypatch.setattr(library, "APP_DIR", tmp_path)
     monkeypatch.setattr(library, "SOUNDS_DIR", tmp_path / "sounds")
     monkeypatch.setattr(library, "CACHE_DIR", tmp_path / "cache")
@@ -341,7 +341,7 @@ def _temp_files_in_the_tests_folder(monkeypatch, tmp_path):
 @pytest.fixture(autouse=True)
 def _never_touch_real_appdata(monkeypatch, tmp_path):
     """Any test that forgets `app_dir` still can't write into %APPDATA%\\OnionBoard."""
-    from soundboard import library
+    from soundboard.sounds import library
     monkeypatch.setattr(library, "USE_RECYCLE_BIN", False)   # removed test files: just deleted
     real = library.APP_DIR.parent   # read once: the loop re-points APP_DIR itself
     for name in ("APP_DIR", "OLD_APP_DIR", "SOUNDS_DIR", "CACHE_DIR", "THUMBS_DIR",
@@ -439,7 +439,7 @@ def _pictures_load_at_once(monkeypatch):
     """Pad pictures are read on a worker thread in the app (thumbs.LOAD_ASYNC); tests
     that check pictures and their caches get them at once, so a grab shows them. The
     tests of the worker itself turn it back on."""
-    from soundboard import thumbs
+    from soundboard.sounds import thumbs
     monkeypatch.setattr(thumbs, "LOAD_ASYNC", False, raising=False)
 
 
@@ -493,7 +493,7 @@ def _never_use_the_real_store(monkeypatch):
     Tests that need other answers fake store._request or net.urlopen themselves."""
     import io
 
-    from soundboard import net, store
+    from soundboard.online import net, store
     real = net.urlopen
 
     class Empty(io.BytesIO):
@@ -517,16 +517,16 @@ def _test_servers_stand_in_for_the_internet(monkeypatch, request):
     internet hosts, so the relay's NEVER_THIS_PC refusal is off unless a test asks for
     it with @pytest.mark.real_this_pc."""
     if request.node.get_closest_marker("real_this_pc") is None:
-        from soundboard import net
+        from soundboard.online import net
         monkeypatch.setattr(net, "NEVER_THIS_PC", frozenset())
 
 
 @pytest.fixture(autouse=True)
 def _switches_back_on():
-    """Settings > Privacy & security's switches (soundboard.net) are process-wide: a
+    """Settings > Privacy & security's switches (soundboard.online.net) are process-wide: a
     test that switches something off doesn't leave it off for the next one."""
     yield
-    from soundboard import net
+    from soundboard.online import net
     net.configure_features()
 
 
@@ -705,7 +705,7 @@ def _no_windows_speech(request, monkeypatch):
 # after the test as the app stops it when the tab goes: freed while that thread was
 # still handing it something, it crashed the test worker a few tests later (access
 # violation / abort, about 1 run in 100). (module, class, method that stops it)
-_STOP_AFTER_TEST = (("soundboard.radio", "RadioPlayer", "shutdown"),
+_STOP_AFTER_TEST = (("soundboard.online.radio", "RadioPlayer", "shutdown"),
                     ("soundboard.ui.approw", "_Lister", "stop"))
 
 
@@ -788,7 +788,7 @@ def _ffmpeg_works(monkeypatch):
     ffmpeg: it works, version 7.1. And no test ever runs the real winget or downloads
     FFmpeg: both steps of ffmpegget.fix fail at once unless a test fakes them. Tests of
     a missing or broken one patch ``ffmpegget.check`` / ``ffmpegget._check`` themselves."""
-    from soundboard import ffmpegget
+    from soundboard.online import ffmpegget
     works = ffmpegget.Health(ffmpegget.OK, "7.1", "ffmpeg.exe")
 
     def check():

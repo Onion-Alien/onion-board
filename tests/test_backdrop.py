@@ -115,7 +115,7 @@ def test_saved_settings_keep_tweaks_and_sounds_and_drop_damage():
 
 
 def test_a_saved_voice_keeps_its_background(tmp_path, monkeypatch):
-    from soundboard import library
+    from soundboard.sounds import library
     monkeypatch.setattr(library, "APP_DIR", tmp_path)
     st = savedvoices.Store()
     effects = {"backdrop": {"on": True, "fire": 0.5,
@@ -281,7 +281,7 @@ def test_load_puts_back_tweaks_and_sounds(row):
 
 
 def test_the_voice_panel_makes_loops_for_board_sounds(qapp, monkeypatch):
-    from soundboard import library
+    from soundboard.sounds import library
     from soundboard.speech import tts
     from soundboard.ui.voicepanel import VoicePanel
     from tests.test_voicepanel import FakeEngine

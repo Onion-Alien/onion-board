@@ -6,7 +6,7 @@ from conftest import own_module
 from test_mainwindow import window  # noqa: F401  (the real MainWindow)
 
 from soundboard import enjoy, usage
-from soundboard.library import Config
+from soundboard.sounds.library import Config
 
 DAY = 86400.0
 NOON = time.mktime((2026, 10, 1, 12, 0, 0, 0, 0, -1))

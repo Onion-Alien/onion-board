@@ -11,8 +11,8 @@ from PySide6.QtGui import QColor, QImage
 from PySide6.QtTest import QTest
 
 from soundboard.control import midi
-from soundboard import thumbs
-from soundboard.library import SoundMeta
+from soundboard.sounds import thumbs
+from soundboard.sounds.library import SoundMeta
 from soundboard.ui import widgets
 from soundboard.ui.widgets import Pad, PadGrid
 
@@ -501,7 +501,7 @@ def test_dragging_a_pad_to_a_new_place_lays_the_grid_out_once(window, monkeypatc
 def test_saving_stores_library_files_by_name(app_dir):
     """The library folder's files are kept by name (the folder can move), others in
     full; worked out once per path, not on every save."""
-    from soundboard import library
+    from soundboard.sounds import library
     inside = str(library.SOUNDS_DIR / "a.wav")
     pic = str(library.THUMBS_DIR / "a.png")
     sounds = [SoundMeta(id="a", name="A", file=inside, image=pic),

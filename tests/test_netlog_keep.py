@@ -1,4 +1,4 @@
-"""Network activity's "Keep a history between starts" (soundboard.netlog.keep, config
+"""Network activity's "Keep a history between starts" (soundboard.online.netlog.keep, config
 netlog_keep, `OnionBoard.exe --keep-netlog` and the installer's box): off, nothing is
 written; on, each connection is saved as it ends and the next start lists it again;
 unticking deletes the file, Clear empties it. No network: entries are made by hand.
@@ -11,7 +11,9 @@ from pathlib import Path
 
 import pytest
 
-from soundboard import app, applog, library, net, netlog
+from soundboard import app, applog
+from soundboard.sounds import library
+from soundboard.online import net, netlog
 
 
 @pytest.fixture(autouse=True)

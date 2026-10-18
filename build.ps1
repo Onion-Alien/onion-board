@@ -68,7 +68,7 @@ if ($LASTEXITCODE -ne 0) { throw "build_directmic.py failed (is MinGW-w64's g++ 
 if ($LASTEXITCODE -ne 0) { throw "build_michelper.py failed" }
 # YouTube's player challenge needs a JavaScript engine and most PCs have none: QuickJS,
 # fetched from its pinned release and SHA-256-checked (the repo has no binaries),
-# bundled as qjs\ with its licence (soundboard\jsengine.py).
+# bundled as qjs\ with its licence (soundboard\online\jsengine.py).
 & $py scripts\fetch_qjs.py build\qjs
 if ($LASTEXITCODE -ne 0) { throw "fetch_qjs.py failed" }
 # PyInstaller looks for the DLLs it bundles on PATH too, so a folder there with another

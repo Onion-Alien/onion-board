@@ -1,4 +1,4 @@
-"""soundboard.net: proxy addresses, SOCKS5 / HTTP CONNECT, failing closed, loopback
+"""soundboard.online.net: proxy addresses, SOCKS5 / HTTP CONNECT, failing closed, loopback
 staying direct, the relay and its secret, and applying a change at once."""
 import base64
 import http.server
@@ -13,7 +13,7 @@ import pytest
 
 from conftest import closed_port, ipv4_only
 from fakeproxy import HttpConnect, Socks5, no_leaks
-from soundboard import net
+from soundboard.online import net
 
 ROUTER, NAS = "192.168.1.1", "10.0.0.5"  # sensitive-scan: allow (test address)
 F = "app_update"   # the feature these tests' requests are for (any switched-on one)

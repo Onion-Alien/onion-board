@@ -47,7 +47,9 @@ from PySide6.QtCore import QObject, Qt, QTimer, QUrl, Signal
 from PySide6.QtMultimedia import QAudioBufferOutput, QAudioFormat, QMediaMetaData, QMediaPlayer
 from PySide6.QtNetwork import QNetworkAccessManager, QNetworkReply, QNetworkRequest
 
-from soundboard import library, net, netlog, quality
+from soundboard.sounds import library
+from soundboard import quality
+from soundboard.online import net, netlog
 from soundboard.i18n import _
 from soundboard.engine import SR
 
@@ -65,7 +67,7 @@ SEARCH_MAX_CHARS = 80
 CACHE_S = 24 * 3600        # how long the map's station list is reused
 TIMEOUT_MS = 15000
 USER_AGENT = "OnionBoard"   # Radio Browser asks apps to name themselves; no version
-FEATURE = "radio"           # its switch in Settings > Privacy & security (soundboard.net)
+FEATURE = "radio"           # its switch in Settings > Privacy & security (soundboard.online.net)
 RETRIES = 3                # a dropped stream is reopened this many times in a row
 CONNECT_S = 20.0           # a station that sends no audio this long after opening is dead
 STALL_S = 8.0              # ...and one that goes quiet this long while playing is reopened
@@ -82,7 +84,7 @@ TOR_CONNECT_S = 60.0
 # The map's outlines ship with the app: assets/radio in a source checkout, radio/ in the
 # frozen app (build.ps1 bundles it). Nothing is fetched from a CDN.
 ASSET_DIR = (Path(sys._MEIPASS) / "radio" if hasattr(sys, "_MEIPASS")   # pyright: ignore[reportAttributeAccessIssue]
-             else Path(__file__).resolve().parent.parent / "assets" / "radio")
+             else Path(__file__).resolve().parents[2] / "assets" / "radio")
 # Natural Earth country outlines (public domain): the map's land, where its names go
 COUNTRIES = "ne_110m_admin_0_countries.geojson"
 COUNTRIES_SRI = "sha384-hAVr+/g2HDlVDeHrAVqTIQV3tH1JE5AbtuvCSCcoeG+ZDteCU2XGaE5yLDiLP9m5"
@@ -1270,7 +1272,7 @@ class RadioPlayer(QObject):
 
 
 def _tor_ready() -> bool:
-    from soundboard import tor
+    from soundboard.online import tor
     return tor.manager().state == tor.READY
 
 

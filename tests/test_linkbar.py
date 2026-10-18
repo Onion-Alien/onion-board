@@ -3,7 +3,7 @@ must let go of it with the link, and never do the song-sized maths on the UI thr
 import numpy as np
 import pytest
 
-from soundboard.library import Config, SoundMeta
+from soundboard.sounds.library import Config, SoundMeta
 from soundboard.ui.linkbar import LinkBar
 
 
@@ -318,7 +318,7 @@ def test_add_with_save_video_says_why_no_video_was_kept(qapp, monkeypatch, tmp_p
     """Also save the video, but the download is only the sound (SoundCloud has no video;
     YouTube has none without ffmpeg to merge it): the sound is still added, and the bar
     says why there's no video, naming FFmpeg when that's what's missing."""
-    from soundboard import library
+    from soundboard.sounds import library
     from soundboard.ui import linkbar
 
     bar, eng = _bar()
@@ -347,7 +347,7 @@ def test_add_with_save_video_says_why_no_video_was_kept(qapp, monkeypatch, tmp_p
 def test_the_switched_off_line_follows_the_switches(qapp):
     """Offline mode's line stayed up after Offline mode was switched off and only the
     sounds switch was: the line is redone whenever a switch changes."""
-    from soundboard import net
+    from soundboard.online import net
     try:
         net.configure_features(offline=True)
         bar, __ = _bar()

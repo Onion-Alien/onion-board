@@ -4,7 +4,7 @@ MainWindow on Qt's offscreen platform, no hotkeys registered)."""
 from test_mainwindow import window  # noqa: F401  (the real MainWindow fixture)
 
 from soundboard.control import winkeys
-from soundboard.library import Config
+from soundboard.sounds.library import Config
 from soundboard.ui import hotkeycontrol, tickcontrol
 from soundboard.ui import mainwindow as main
 from soundboard.ui.dialogs import TabHelpPopup

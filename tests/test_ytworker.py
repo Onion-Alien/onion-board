@@ -1,4 +1,4 @@
-"""soundboard.ytworker: yt-dlp in a helper process, off the audio callbacks' GIL."""
+"""soundboard.online.ytworker: yt-dlp in a helper process, off the audio callbacks' GIL."""
 import sys
 import threading
 import time
@@ -6,7 +6,7 @@ from contextlib import nullcontext
 
 import pytest
 
-from soundboard import ytdl, ytworker
+from soundboard.online import ytdl, ytworker
 
 
 @pytest.fixture
@@ -206,7 +206,7 @@ def test_a_download_that_goes_quiet_after_starting_is_stuck_sooner():
 
 def test_a_stalled_helper_download_says_it_stopped_moving(monkeypatch):
     def run(*a, **kw):
-        raise ytworker.RemoteError("soundboard.ytworker.Stalled", "no new data for 60 s")
+        raise ytworker.RemoteError("soundboard.online.ytworker.Stalled", "no new data for 60 s")
     monkeypatch.setattr(ytworker, "run", run)
     with pytest.raises(ytdl.FetchError, match="stopped moving"):
         ytdl._run_helper("https://www.youtube.com/watch?v=x", {}, None)
@@ -281,7 +281,7 @@ def test_a_search_failing_with_kept_settings_is_done_again_the_old_way(search_yd
 
 
 def test_youtube_settings_are_kept_in_direct_mode_only(monkeypatch):
-    from soundboard import net
+    from soundboard.online import net
     keeps = []
     monkeypatch.setattr(ytdl, "_gate", lambda source: "sounds_web")
     monkeypatch.setattr(ytdl, "_over_tor", lambda fn, site: fn())

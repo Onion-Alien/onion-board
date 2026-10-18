@@ -15,8 +15,9 @@ from PySide6.QtGui import (QActionGroup, QColor, QIcon, QKeySequence, QPainter, 
 from PySide6.QtWidgets import (QApplication, QColorDialog, QFrame, QHBoxLayout, QInputDialog,
                                QLabel, QMenu, QPushButton, QWidget)
 
-from soundboard import library, usage
-from soundboard.library import MAX_FADE_S, PAD_COLORS, SoundMeta
+from soundboard.sounds import library
+from soundboard import usage
+from soundboard.sounds.library import MAX_FADE_S, PAD_COLORS, SoundMeta
 from soundboard.ui import icons
 from soundboard.ui.widgets import DropdownMenu
 from soundboard.i18n import _, ngettext

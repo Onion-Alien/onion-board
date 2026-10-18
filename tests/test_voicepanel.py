@@ -1770,7 +1770,7 @@ def test_speech_install_and_cancel_keep_focus(panel, qapp, monkeypatch):
 def test_translation_download_keeps_focus(panel, qapp, monkeypatch):
     from PySide6.QtCore import Qt
     from PySide6.QtTest import QTest
-    from soundboard import net
+    from soundboard.online import net
     from soundboard.speech import translation
     from soundboard.ui import busy, speechinstall
     monkeypatch.setattr(net, "allowed", lambda key: True)

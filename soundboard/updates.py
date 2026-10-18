@@ -44,8 +44,9 @@ from dataclasses import dataclass
 from datetime import datetime
 from pathlib import Path
 
-from soundboard import __version__, net
-from soundboard.library import APP_DIR
+from soundboard import __version__
+from soundboard.online import net
+from soundboard.sounds.library import APP_DIR
 from soundboard import errors
 from soundboard.i18n import _
 
@@ -71,7 +72,7 @@ LIMIT = 1 << 20          # the API's answer is a few KB
 MAX_SIZE = 400 << 20     # the installer is ~180 MB
 CHUNK = 1 << 20
 SHA_RE = re.compile(r"[0-9a-f]{64}")
-FEATURE = "app_update"   # its switch in Settings > Privacy & security (soundboard.net)
+FEATURE = "app_update"   # its switch in Settings > Privacy & security (soundboard.online.net)
 # set by check(): the newest release is still settling, ask again in this many seconds
 # (the app's own timer only asks every EVERY_S); 0 = nothing to ask again for
 recheck_s = 0.0
@@ -350,7 +351,7 @@ def fetch(url: str, sha256: str, dest: Path, trusted: tuple[str, ...], max_size:
     and never more than `max_size` bytes (`what` it is, for the message: "installer",
     "add-on", or anything else for a plain file). A file
     already there with the right checksum isn't fetched again. `feature` is whose
-    download it is (soundboard.net). Raises UpdateError with a message for the user.
+    download it is (soundboard.online.net). Raises UpdateError with a message for the user.
     Call off the UI thread."""
     if what == "installer":
         no_file = _("there's no installer here the app can check")
@@ -438,7 +439,7 @@ def installer_env(env: dict[str, str] | None = None,
             env[path_key] = os.pathsep.join(
                 p for p in env[path_key].split(os.pathsep) if not inside(p))
     env["PYINSTALLER_RESET_ENVIRONMENT"] = "1"
-    # the app's relay (soundboard.net) closes with it: the user's own proxy settings
+    # the app's relay (soundboard.online.net) closes with it: the user's own proxy settings
     return net.own_env(env)
 
 

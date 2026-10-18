@@ -1,5 +1,5 @@
 """The *Free sound packs* window (Sounds tab → Backup): ready-made boards anyone can
-add in one click (soundboard.packs), a few of each pack's sounds to try first (to your
+add in one click (soundboard.sounds.packs), a few of each pack's sounds to try first (to your
 headphones only), and where to share one of your own."""
 from __future__ import annotations
 
@@ -17,7 +17,9 @@ from PySide6.QtWidgets import (QDialog, QDialogButtonBox, QFrame, QGridLayout, Q
                                QLabel, QPushButton, QScrollArea, QSizePolicy, QVBoxLayout,
                                QWidget)
 
-from soundboard import errors, library, net, packs, updates
+from soundboard import errors, updates
+from soundboard.sounds import library, packs
+from soundboard.online import net
 from soundboard.engine import SR
 from soundboard.ui import busy, fit, icons
 from soundboard.ui.panel import hint_label

@@ -14,7 +14,8 @@ import time
 import pytest
 
 from fakeproxy import Socks5
-from soundboard import net, tor, torget, updates
+from soundboard.online import net, tor, torget
+from soundboard import updates
 from test_tor import FakeTor, _wait, fake_tor  # noqa: F401 - fake_tor is a fixture
 from test_torget import Response, make_tarball, served  # noqa: F401 - served is a fixture
 
@@ -329,7 +330,7 @@ def test_a_name_that_answers_differently_the_second_time_stays_out(monkeypatch):
 def test_a_station_that_rebinds_after_the_radio_check_is_refused(monkeypatch):
     import base64
 
-    from soundboard import radio
+    from soundboard.online import radio
     real, answers = socket.getaddrinfo, iter(["93.184.216.34", ROUTER])
 
     def gai(host, *a, **k):

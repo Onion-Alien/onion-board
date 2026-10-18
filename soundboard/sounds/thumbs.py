@@ -30,9 +30,9 @@ from PySide6.QtCore import QObject, Qt, Signal
 from PySide6.QtGui import QColor, QImage, QLinearGradient, QPainter, QPainterPath, QPixmap
 from shiboken6 import isValid as qt_valid
 
-from soundboard import library
+from soundboard.sounds import library
 from soundboard.i18n import _
-from soundboard.library import SoundMeta
+from soundboard.sounds.library import SoundMeta
 
 log = logging.getLogger(__name__)
 
@@ -148,7 +148,7 @@ def link_picture(page: str, base: str) -> str:
 def _get(url: str) -> tuple[bytes, str]:
     """`url`'s answer, under the switch of the site it's on (ytdl.site_feature: a
     YouTube picture is YouTube's, whatever page named it)."""
-    from soundboard import net, ytdl
+    from soundboard.online import net, ytdl
     req = urllib.request.Request(url, headers=_HEADERS)
     with net.urlopen(req, timeout=20, feature=ytdl.site_feature(url)) as r:
         body = r.read(MAX_LINK_BYTES + 1)
@@ -162,7 +162,8 @@ def fetch(url: str) -> QImage:
     """The picture at a link: an image's own address, or a web page (a YouTube video,
     a post…) whose preview picture is taken. Blocks (call it off the UI thread);
     raises LinkError, or net.FeatureOff when links are switched off."""
-    from soundboard import errors, net, netlog, ytdl
+    from soundboard import errors
+    from soundboard.online import net, netlog, ytdl
     url = url.strip()
     if url and "://" not in url:
         url = "https://" + url

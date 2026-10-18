@@ -15,7 +15,8 @@ from PySide6.QtCore import Qt
 from PySide6.QtWidgets import QFrame, QHBoxLayout, QLabel, QPushButton
 from shiboken6 import isValid as qt_valid
 
-from soundboard import errors, ffmpegget, net, netlog, quality, usage
+from soundboard import errors, quality, usage
+from soundboard.online import ffmpegget, net, netlog
 from soundboard.i18n import _
 from soundboard.ui import busy, icons, worker
 from soundboard.ui.controller import Controller

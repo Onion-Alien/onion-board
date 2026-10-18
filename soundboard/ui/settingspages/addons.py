@@ -134,7 +134,7 @@ class AddonsPage(Page):
         """Offline mode on an add-on's row (after its refresh): Check for updates and
         Reinstall go; not installed, with nothing on this PC to install it from, the
         whole row goes. The Add-ons card goes when no row is left."""
-        from soundboard import net
+        from soundboard.online import net
         if not net.offline():
             row = True
         else:
@@ -163,7 +163,8 @@ class AddonsPage(Page):
     def _addon_check(self, btn, feature: str, latest, newer_than: str, on_offer):
         """Check for updates: asks GitHub on a thread (`latest()` -> offer or None);
         a newer one calls `on_offer(offer)`, else the button says it's up to date."""
-        from soundboard import net, netlog, updates
+        from soundboard.online import net, netlog
+        from soundboard import updates
         if not net.allowed(feature):
             busy.toast(self.dlg, html.escape(_("Add-on downloads are off (Privacy)")), "warn")
             return
@@ -370,7 +371,7 @@ class AddonsPage(Page):
         """Get / reinstall / update Onion Pocket from the Add-ons card: downloads it
         (pocketaddon.get), the main window swaps it in for any running copy (paired
         phones stay), and its card on Settings → Remote is replaced by the new one's."""
-        from soundboard import netlog
+        from soundboard.online import netlog
         from soundboard.addons import pocketaddon
 
         class Relay(QObject):
@@ -651,7 +652,8 @@ class AddonsPage(Page):
         new one, and the main window swaps it in for the running copy, settings and
         all; then its new card takes this one's place. Optional and quiet: if anything
         fails, the old copy keeps running and the button just says it didn't work."""
-        from soundboard import net, netlog, updates
+        from soundboard.online import net, netlog
+        from soundboard import updates
         from soundboard.addons import pocketaddon
         mw = self.mw
         lay = card.layout()
@@ -745,7 +747,7 @@ class AddonsPage(Page):
         """*Get Onion Pocket* (soundboard.addons.pocketaddon): downloads, installs and starts
         it, then its own card takes this one's place. If that fails, this card just
         goes away; Onion Pocket is optional."""
-        from soundboard import netlog
+        from soundboard.online import netlog
         from soundboard.addons import pocketaddon
 
         class Relay(QObject):

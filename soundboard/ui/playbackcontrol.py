@@ -15,10 +15,11 @@ from PySide6.QtCore import Qt, QTimer
 from PySide6.QtWidgets import QApplication, QFrame, QHBoxLayout, QLabel, QPushButton
 from shiboken6 import isValid as qt_valid
 
-from soundboard import library, soundfx, theme, usage
+from soundboard.sounds import library
+from soundboard import soundfx, theme, usage
 from soundboard.engine import SR
 from soundboard.i18n import _
-from soundboard.library import PRESS_MODE, load_original
+from soundboard.sounds.library import PRESS_MODE, load_original
 from soundboard.shuffle import ShuffleBag
 from soundboard.ui import icons, sidebar, worker
 from soundboard.ui.controller import Controller

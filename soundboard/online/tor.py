@@ -1,10 +1,10 @@
 """The app's own Tor (Settings > Connection > Tor).
 
-tor.exe (the Tor Expert Bundle, which the app doesn't ship: soundboard.torget downloads
+tor.exe (the Tor Expert Bundle, which the app doesn't ship: soundboard.online.torget downloads
 it into %APPDATA%\\OnionBoard\\tor\\bin when the user presses Get Tor or ticks the
 installer's box; from source, scripts/fetch_tor.py's vendor/tor works too) runs only
 while the Connection setting is Tor and something has needed the network. It's a
-SOCKS proxy on 127.0.0.1 that soundboard.net hands every connection to
+SOCKS proxy on 127.0.0.1 that soundboard.online.net hands every connection to
 (net.set_tor_gate); until Tor has finished connecting ("bootstrapping") a connection
 waits, then fails. Nothing ever goes direct instead.
 
@@ -38,7 +38,8 @@ from collections import deque
 from collections.abc import Callable
 from pathlib import Path
 
-from soundboard import library, net, torget
+from soundboard.sounds import library
+from soundboard.online import net, torget
 from soundboard import errors
 from soundboard.i18n import _
 
@@ -74,7 +75,7 @@ def bundle_dirs() -> list[Path]:
     vendor/tor from scripts/fetch_tor.py."""
     dirs = [torget.bin_dir()]
     if not hasattr(sys, "_MEIPASS"):
-        dirs.append(Path(__file__).resolve().parent.parent / "vendor" / "tor")
+        dirs.append(Path(__file__).resolve().parents[2] / "vendor" / "tor")
     return dirs
 
 
@@ -785,7 +786,7 @@ _tor: Tor | None = None
 
 
 def manager() -> Tor:
-    """The app's Tor, created on first use and plugged into soundboard.net."""
+    """The app's Tor, created on first use and plugged into soundboard.online.net."""
     global _tor
     if _tor is None:
         _tor = Tor()

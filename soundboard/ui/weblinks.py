@@ -17,7 +17,7 @@ import sys
 from PySide6.QtCore import QObject, QUrl, Slot
 from PySide6.QtGui import QDesktopServices
 
-from soundboard import net
+from soundboard.online import net
 
 log = logging.getLogger(__name__)
 

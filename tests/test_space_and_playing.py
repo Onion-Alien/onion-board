@@ -7,7 +7,7 @@ from PySide6.QtGui import QFocusEvent, QKeyEvent
 from PySide6.QtTest import QTest
 from PySide6.QtWidgets import QApplication, QPushButton
 
-from soundboard import ytdl
+from soundboard.online import ytdl
 from soundboard.engine import SR
 from soundboard.ui.linkbar import PLAY_ID as LINK_ID
 from soundboard.ui.ytsearch import ResultRow

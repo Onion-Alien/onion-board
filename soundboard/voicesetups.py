@@ -21,7 +21,8 @@ import os
 from collections.abc import Callable
 from pathlib import Path
 
-from soundboard import library, soundfx
+from soundboard.sounds import library
+from soundboard import soundfx
 
 log = logging.getLogger(__name__)
 

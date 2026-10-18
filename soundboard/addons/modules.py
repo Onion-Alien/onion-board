@@ -67,7 +67,8 @@ from dataclasses import dataclass, field
 from pathlib import Path, PurePosixPath
 
 from soundboard import voicefx
-from soundboard import library, net
+from soundboard.sounds import library
+from soundboard.online import net
 from soundboard import errors
 from soundboard.i18n import _, ngettext
 
@@ -144,7 +145,7 @@ class ModuleInfo:
     def broken(self) -> bool:
         """A service set up once whose environment can't start any more: the Python it
         was made from is gone (uninstalled, or upgraded into another folder). Its
-        install, run again, repairs it (soundboard.pyget)."""
+        install, run again, repairs it (soundboard.online.pyget)."""
         venv = self.path / ".venv"
         if self.kind != "service" or not (venv / "Scripts" / "python.exe").exists():
             return False
@@ -576,7 +577,7 @@ def _job_for(p: subprocess.Popen):
     """A job object holding `p` and whatever it starts (Windows), or None."""
     if os.name != "nt":
         return None
-    from soundboard.tor import JobObject
+    from soundboard.online.tor import JobObject
     job = None
     try:
         job = JobObject()
@@ -633,10 +634,10 @@ def _install(info: ModuleInfo, on_line: Callable[[str], object],
     if not net.allowed("addons"):
         on_line(net.off_message("addons"))
         return False
-    from soundboard import netlog
+    from soundboard.online import netlog
     netlog.cause("addons", f"You installed or updated the {netlog.quoted(info.name)} "
                            "add-on")
-    from soundboard import pyget
+    from soundboard.online import pyget
     if info.broken:   # its Python is gone: a new environment, made from one that's there
         log.info("module %s: its environment's Python is gone; making it again", info.id)
         shutil.rmtree(info.path / ".venv", ignore_errors=True)

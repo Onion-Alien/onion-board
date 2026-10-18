@@ -18,9 +18,9 @@ import pytest
 import soundfile as sf
 
 from conftest import process_events
-from soundboard import net, ytdl
+from soundboard.online import net, ytdl
 from soundboard.engine import SR
-from soundboard.library import Config
+from soundboard.sounds.library import Config
 from PySide6.QtWidgets import QLabel, QPushButton
 
 
@@ -599,7 +599,7 @@ def test_link_bar_offers_to_update_the_downloader_and_tries_again(qapp, monkeypa
 
 def test_link_bar_doesnt_offer_an_update_when_its_switched_off_or_a_site_refused(
         qapp, monkeypatch):
-    from soundboard import net
+    from soundboard.online import net
     from soundboard.ui.linkbar import LinkBar
     errors = [ytdl.FetchError("ERROR: Sign in to confirm you're not a bot")]
     monkeypatch.setattr(ytdl, "download_audio", lambda url, progress=None, auto_update=True:
@@ -923,7 +923,7 @@ def test_enter_searches_youtube_and_a_result_plays_through_the_link_bar(
     ("", False),
 ])
 def test_web_url_lets_only_http_links_through(url, ok):
-    from soundboard import net
+    from soundboard.online import net
     assert bool(net.web_url(url)) is ok
 
 
@@ -944,7 +944,7 @@ def test_search_thumbnails_obey_the_switch_of_the_site_they_are_on(qapp, window,
                                                                    monkeypatch):
     """A thumbnail goes out under its own server's site switch: with YouTube off (and
     other links on), i.ytimg.com isn't asked, even for a result from another site."""
-    from soundboard import net
+    from soundboard.online import net
     asked = no_thumbnail_fetch(monkeypatch, window)
     yt = ytdl.Result("HEXWRTEbj1I", "What Is Love", "Haddaway", 241)   # i.ytimg.com
     page = ytdl.Result("y", "Page", "page", 3, source="generic",
@@ -1038,7 +1038,7 @@ def test_search_myinstants_reads_the_buttons_and_downloads_the_mp3(monkeypatch, 
     path, title = ytdl.download_audio(r[0].url, dest=tmp_path)   # no yt-dlp involved
     assert path == tmp_path / "vine-boom.mp3" and path.read_bytes() == b"ID3mp3"
     assert title == "Vine boom"
-    from soundboard import sourceinfo   # the pad menu's Open on Myinstants
+    from soundboard.sounds import sourceinfo  # the pad menu's Open on Myinstants
     assert sourceinfo.read_from(tmp_path)["link"] == r[0].url
 
 

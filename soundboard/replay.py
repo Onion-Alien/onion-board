@@ -18,7 +18,7 @@ import numpy as np
 from PySide6.QtCore import QObject, QTimer, Signal
 
 from soundboard import appaudio
-from soundboard.library import trim_silence
+from soundboard.sounds.library import trim_silence
 from soundboard.recorder import Recorder
 
 log = logging.getLogger(__name__)

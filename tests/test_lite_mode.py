@@ -4,7 +4,8 @@ import pytest
 from PySide6.QtCore import QAbstractAnimation
 
 from conftest import said, unsay
-from soundboard import library, theme
+from soundboard.sounds import library
+from soundboard import theme
 from soundboard.settings import SettingsDialog
 from soundboard.ui import lite, toast
 from test_bunnywidget import _Clock
@@ -164,7 +165,7 @@ def test_bun_who_never_rests_holds_still_in_lite_mode(qapp, monkeypatch):
 
 
 def test_pad_hover_has_no_fade(qapp):
-    from soundboard.library import SoundMeta
+    from soundboard.sounds.library import SoundMeta
     from soundboard.ui.widgets import Pad
     pad = Pad(SoundMeta(id="a", name="a", file="a.wav"), 150)
     lite.set_on(True)

@@ -20,10 +20,10 @@ from PySide6.QtCore import QTimer
 from PySide6.QtWidgets import QWidget
 
 from conftest import closed_port, process_events
-from soundboard import radio
+from soundboard.online import radio
 from soundboard.engine import SR, Engine
-from soundboard.library import Config
-from soundboard.radio import RadioDirectory, RadioPlayer, Station
+from soundboard.sounds.library import Config
+from soundboard.online.radio import RadioDirectory, RadioPlayer, Station
 
 
 def api_station(i, **kw):
@@ -718,7 +718,7 @@ LET_GO_IN_REPLY = r"""
 import os, sys
 sys.path.insert(0, os.getcwd())
 from PySide6.QtCore import QCoreApplication, QTimer
-from soundboard.radio import RadioDirectory
+from soundboard.online.radio import RadioDirectory
 
 app = QCoreApplication([])
 d = RadioDirectory(sys.argv[1], bases=(sys.argv[2],))
@@ -1529,7 +1529,7 @@ def test_the_dice_plays_any_popular_station_whatever_the_filters(tab, monkeypatc
 def test_loads_gently_reads_what_json_loads_reads():
     """The directory's answers are decoded an element at a time (one json.loads of
     the station list held the GIL long enough to stutter the audio)."""
-    from soundboard.radio import loads_gently
+    from soundboard.online.radio import loads_gently
     big = json.dumps([api_station(i) for i in range(50)])
     for text in (big, "[]", "{}", ' [1, 2 ,3] ', '{"a": [1, {"b": [2]}], "c": "x"}',
                  '"s"', "3.5", "null", '[{"k": [1,2]}, [], {}]', '{"time": 1.0, "stations": []}'):

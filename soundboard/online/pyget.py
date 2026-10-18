@@ -39,7 +39,8 @@ import zipfile
 from collections.abc import Callable
 from pathlib import Path, PurePosixPath
 
-from soundboard import errors, net
+from soundboard import errors
+from soundboard.online import net
 from soundboard.i18n import _
 
 log = logging.getLogger(__name__)

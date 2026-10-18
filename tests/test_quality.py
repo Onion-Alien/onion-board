@@ -2,7 +2,9 @@
 import pytest
 from PySide6.QtWidgets import QCheckBox, QComboBox, QLabel
 
-from soundboard import library, quality, radio, ytdl
+from soundboard.sounds import library
+from soundboard import quality
+from soundboard.online import radio, ytdl
 from soundboard.settings import SettingsDialog
 from test_mainwindow import window  # noqa: F401  (the real MainWindow fixture)
 
@@ -156,7 +158,7 @@ def test_settings_page_picks_the_save_format(window):  # noqa: F811
 
 def _ff(monkeypatch, state, why=""):
     """The FFmpeg check (MainWindow.check_ffmpeg) found ``state``."""
-    from soundboard import ffmpegget
+    from soundboard.online import ffmpegget
     h = ffmpegget.Health(state, "9.0.1" if state == ffmpegget.OK else "", why=why)
     monkeypatch.setattr(ffmpegget, "_last", h)
     return h
@@ -169,7 +171,7 @@ def _data_page(window):  # noqa: F811
 
 
 def test_settings_always_shows_ffmpeg_and_what_to_do(window, monkeypatch):  # noqa: F811
-    from soundboard import ffmpegget
+    from soundboard.online import ffmpegget
     d = None
     for state, pill, button in ((ffmpegget.OK, "Working: version 9.0.1", "Reinstall"),
                                 (ffmpegget.MISSING, "Missing", "Get FFmpeg"),
@@ -184,7 +186,7 @@ def test_settings_always_shows_ffmpeg_and_what_to_do(window, monkeypatch):  # no
 
 
 def test_settings_says_why_it_wasnt_got_but_still_offers_it(window, monkeypatch):  # noqa: F811
-    from soundboard import ffmpegget, net
+    from soundboard.online import ffmpegget, net
     _ff(monkeypatch, ffmpegget.MISSING)
     net.configure_features(["ffmpeg_download"])
     d = _data_page(window)
@@ -196,7 +198,7 @@ def test_settings_says_why_it_wasnt_got_but_still_offers_it(window, monkeypatch)
 
 def test_settings_checks_ffmpeg_when_nobody_has_yet(window, qapp):  # noqa: F811
     from conftest import process_events
-    from soundboard import ffmpegget
+    from soundboard.online import ffmpegget
     assert ffmpegget.last() is None
     d = _data_page(window)
     process_events(qapp, lambda: d.ff_state.text() not in ("", "Checking…"))
@@ -204,7 +206,7 @@ def test_settings_checks_ffmpeg_when_nobody_has_yet(window, qapp):  # noqa: F811
 
 
 def test_settings_follows_the_download_and_a_fix(window, monkeypatch):  # noqa: F811
-    from soundboard import ffmpegget
+    from soundboard.online import ffmpegget
     _ff(monkeypatch, ffmpegget.MISSING)
     window.setctl.open_settings("data")   # its video hint follows FFmpeg too
     d = _data_page(window)                # FFmpeg's row: Updates > Helper programs
@@ -221,7 +223,7 @@ def test_settings_follows_the_download_and_a_fix(window, monkeypatch):  # noqa: 
 
 
 def test_updates_shows_ffmpeg_working_when_opened_first(window, monkeypatch):  # noqa: F811
-    from soundboard import ffmpegget
+    from soundboard.online import ffmpegget
     _ff(monkeypatch, ffmpegget.OK)
     d = _data_page(window)   # straight to Updates: Data & quality never built
     assert d.ff_state.text() == "Working: version 9.0.1" and d.btn_ffmpeg.text() == "Reinstall"

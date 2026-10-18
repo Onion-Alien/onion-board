@@ -1,4 +1,4 @@
-"""Checking, getting and repairing FFmpeg (soundboard.ffmpegget): the check behind the
+"""Checking, getting and repairing FFmpeg (soundboard.online.ffmpegget): the check behind the
 loading screen, getting it by itself, the bar's Fix it and Settings > Data & quality.
 No test runs the real ffmpeg or winget, or downloads anything (conftest blocks them)."""
 import hashlib
@@ -9,7 +9,8 @@ import zipfile
 
 import pytest
 
-from soundboard import ffmpegget, library, net
+from soundboard.online import ffmpegget, net
+from soundboard.sounds import library
 
 # the real steps, before conftest's _ffmpeg_works blocks them for every test
 REAL = {name: getattr(ffmpegget, name)

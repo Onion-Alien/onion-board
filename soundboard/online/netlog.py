@@ -1,7 +1,7 @@
 """Network activity (Settings > Connection): every connection the app makes, so you
 can check for yourself where it goes.
 
-soundboard.net records here, so nothing that goes online is missed: urlopen() (the
+soundboard.online.net records here, so nothing that goes online is missed: urlopen() (the
 app's own requests) and the relay (FFmpeg, Qt, yt-dlp and the programs the app
 starts) both make their connections with net.connect(). Each entry says which
 feature asked, the server and port, the route (direct, the proxy, Tor or this PC),
@@ -411,7 +411,7 @@ def _remove(path: Path) -> None:
 
 def feature_label(feature: str) -> str:
     """What a feature key is for, in words (in the language picked)."""
-    from soundboard import net
+    from soundboard.online import net
     if feature == net.TEST:
         return _("Proxy test button")
     main, __, sub = feature.partition(".")

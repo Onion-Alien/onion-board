@@ -350,7 +350,8 @@ def test_app_commands_under_test_never_log_into_the_real_app_folder():
     in the real app folder (%APPDATA%), and every later test's lines went there."""
     import os
 
-    from soundboard import app, library, updates
+    from soundboard import app, updates
+    from soundboard.sounds import library
     real = Path(os.environ.get("APPDATA", Path.home())) / "OnionBoard"
     for d in (app.APP_DIR, updates.APP_DIR, library.APP_DIR):
         assert not Path(d).is_relative_to(real), d

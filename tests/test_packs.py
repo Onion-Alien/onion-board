@@ -1,4 +1,4 @@
-"""Free sound packs (soundboard.packs, the Free packs window): the list, the checked
+"""Free sound packs (soundboard.sounds.packs, the Free packs window): the list, the checked
 download, its switch, and a pack landing on the board. No real network: net.urlopen
 is a stand-in."""
 import hashlib
@@ -10,7 +10,9 @@ import zipfile
 
 import pytest
 
-from soundboard import backup, net, packs, updates
+from soundboard import backup, updates
+from soundboard.sounds import packs
+from soundboard.online import net
 from soundboard.ui import packsdialog
 from conftest import process_events
 from test_mainwindow import window as main_window  # noqa: F401 - the real window, offscreen

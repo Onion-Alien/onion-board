@@ -430,7 +430,7 @@ class AppearancePage(Page):
         scaling. Qt sizes the app only as it starts (app.ui_scale_startup), so a new
         size offers a restart, like the language."""
         import os
-        from soundboard.library import UI_SCALES
+        from soundboard.sounds.library import UI_SCALES
         card, cv = self._card(_("Interface size"),
                               _("Makes everything in Onion Board bigger or smaller: text, "
                                 "buttons and pads."), icon="expand")
