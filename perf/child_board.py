@@ -262,15 +262,18 @@ class Counts:
 
     def __init__(self, app):
         from PySide6.QtCore import QEvent, QObject
+        from collections import Counter
         paint, timer = QEvent.Paint, QEvent.Timer
         self.paints = self.timers = 0
-        counts = self
+        self.by_class: Counter[str] = Counter()   # paints per widget class (the top ones
+        counts = self                             # say what keeps repainting)
 
         class F(QObject):
             def eventFilter(self, obj, ev):
                 t = ev.type()
                 if t == paint:
                     counts.paints += 1
+                    counts.by_class[type(obj).__name__] += 1
                 elif t == timer:
                     counts.timers += 1
                 return False
@@ -279,6 +282,7 @@ class Counts:
 
     def reset(self):
         self.paints = self.timers = 0
+        self.by_class.clear()
 
 
 class Child:
@@ -344,6 +348,8 @@ class Child:
         if self.counts is not None:
             d["paints_per_s"] = round(self.counts.paints / wall, 1)
             d["timers_per_s"] = round(self.counts.timers / wall, 1)
+            d["paints_by_class"] = {k: round(n / wall, 1)
+                                    for k, n in self.counts.by_class.most_common(8)}
         d["streams"] = fakeaudio.summaries()
         if self.w is not None:
             eng = getattr(self.w, "engine", None)
@@ -368,6 +374,13 @@ class Child:
         link.mark("start", name=name, thread_names=self.thread_names())
         t0 = time.perf_counter()
         extra = None
+        # --env PERF_CPROFILE=idle_front,dialogs: those scenarios' UI-thread Python
+        # profile (top by own time) goes to logs/cprofile-<name>.txt
+        prof = None
+        if name in os.environ.get("PERF_CPROFILE", "").split(","):
+            import cProfile
+            prof = cProfile.Profile()
+            prof.enable()
         try:
             extra = fn()
         except Exception as e:  # noqa: BLE001 - one broken scenario mustn't end the run
@@ -375,8 +388,22 @@ class Child:
             self.errors.append(f"{name}: {type(e).__name__}: {e}")
             link.send("error", text=f"{name}: {traceback.format_exc()[-1500:]}")
         wall = time.perf_counter() - t0
+        if prof is not None:
+            prof.disable()
+            self._write_profile(name, prof)
         link.mark("end", name=name)
         self.stats(name, wall, extra)
+
+    def _write_profile(self, name: str, prof):
+        import io
+        import pstats
+        logs = Path(self.conf["profile"]).parent.parent / "logs"
+        logs.mkdir(parents=True, exist_ok=True)
+        buf = io.StringIO()
+        st = pstats.Stats(prof, stream=buf)
+        st.sort_stats("tottime").print_stats(40)
+        st.sort_stats("cumulative").print_stats(40)
+        (logs / f"cprofile-{name}.txt").write_text(buf.getvalue(), encoding="utf-8")
 
     def iteration(self, i: int, **extra):
         from PySide6.QtCore import QObject
