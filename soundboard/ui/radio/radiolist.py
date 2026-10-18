@@ -1,4 +1,4 @@
-"""The Radio tab's station list (ui/radiopanel.py): the Popular / Favorites / Recent
+"""The Radio tab's station list (ui/radio/radiopanel.py): the Popular / Favorites / Recent
 switch, the genre chips, the country / quality / sort boxes and their filters, and
 the list itself, painted row by row (``_StationDelegate``).
 
@@ -28,7 +28,7 @@ from soundboard.ui.kit.panel import EmptyList, RoundedFrame
 from soundboard.ui.kit.widgets import paint_now_playing, take_out
 
 if TYPE_CHECKING:
-    from soundboard.ui.radiopanel import RadioTab
+    from soundboard.ui.radio.radiopanel import RadioTab
 
 LIST_MAX = 300             # rows shown at once
 ROW_H = 54

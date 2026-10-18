@@ -380,7 +380,7 @@ def test_each_switch_writes_its_setting_and_applies_at_once(window, monkeypatch)
 
 
 def test_switching_radio_off_swaps_the_tab_and_stops_a_station(window, monkeypatch):  # noqa: F811
-    from soundboard.ui.radiopanel import RadioOff, RadioTab
+    from soundboard.ui.radio.radiopanel import RadioOff, RadioTab
     stopped = []
     monkeypatch.setattr(window.radio, "is_active", lambda: True)
     monkeypatch.setattr(window.radio, "shutdown", lambda: stopped.append(1))

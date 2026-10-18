@@ -1,8 +1,8 @@
 """The Radio tab: internet radio from all over the world, picked on a world map or
 by searching, played through the engine so it can go out to others like your
 sounds do (Send). The directory and player are in radio.py; the map, painted by
-Qt itself, is ui/flatmap.py; the station list and its filters are
-ui/radiolist.py (RadioTab.listctl).
+Qt itself, is ui/radio/flatmap.py; the station list and its filters are
+ui/radio/radiolist.py (RadioTab.listctl).
 
 Nothing touches the network until the tab is first opened.
 """
@@ -32,7 +32,7 @@ from soundboard.ui.kit import appstate, busy, icons
 from soundboard.ui.kit.panel import (EmptyList, RoundedFrame, VolumeControl, bar, icon_label,
                                      vsep)
 # the station list and its filters live in radiolist.py; their names stay importable here
-from soundboard.ui.radiolist import (GENRE_LABELS, GENRES, LIST_MAX,  # noqa: F401
+from soundboard.ui.radio.radiolist import (GENRE_LABELS, GENRES, LIST_MAX,  # noqa: F401
                                      MAP_CACHE, QUALITIES, ROW_H, SORTS, StationList,
                                      _FilterRow, _StationDelegate, in_genre)
 from soundboard.ui.sounds.speedpitch import SpeedPitchButton
@@ -433,7 +433,7 @@ class RadioTab(QWidget):
     def _make_flat(self):
         if self.flat is not None:
             return   # start()'s queued call after the map was already made: never two
-        from soundboard.ui.flatmap import FlatMap
+        from soundboard.ui.radio.flatmap import FlatMap
         self.flat = FlatMap()
         self.flat.clicked.connect(self._on_globe_click)
         self.flat.retry.connect(self._reload)

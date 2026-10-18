@@ -16,7 +16,7 @@ audio to the UI thread as 48 kHz stereo float, which goes into the engine
 (`Engine.feed_radio`) like an app's captured audio (Apps tab), so it can go out
 with your sounds.
 
-The map is painted by Qt (ui/flatmap.py). Its country outlines ship with the app
+The map is painted by Qt (ui/radio/flatmap.py). Its country outlines ship with the app
 (ASSET_DIR), so opening it contacts nobody: no CDN learns who opened the Radio tab.
 (Up to 1.9.7 an "HD" button swapped in a 3D globe, globe.gl in a web view. It went:
 the web engine cost ~200 MB of the install, forced GPU drawing on every window and

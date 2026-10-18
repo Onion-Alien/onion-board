@@ -10,8 +10,8 @@ import pytest
 
 from conftest import process_events, real_pc_timing
 from soundboard.online import radio
-from soundboard.ui import flatmap
-from soundboard.ui.flatmap import LAND_PART, FlatMap
+from soundboard.ui.radio import flatmap
+from soundboard.ui.radio.flatmap import LAND_PART, FlatMap
 
 
 def outlines():
@@ -378,7 +378,7 @@ def test_a_new_zoom_shows_all_at_once_never_tile_by_tile(qapp):
 
 
 def test_bun_waits_on_the_map_and_the_first_stations_pop_in(qapp):
-    from soundboard.ui import flatmap
+    from soundboard.ui.radio import flatmap
     m = FlatMap()
     m.resize(600, 400)
     m.show()
@@ -410,7 +410,7 @@ def test_the_country_names_show_before_the_dots(qapp):
     """The dots popped in over a map with no names, and the names came only once
     they were all in. Now the names come first (even when the stations beat the land
     in), and the dots after."""
-    from soundboard.ui import flatmap
+    from soundboard.ui.radio import flatmap
     rings, labels = outlines()
     m = FlatMap()
     m.resize(600, 400)
@@ -439,7 +439,7 @@ def test_the_dots_done_popping_in_are_drawn_once(qapp):
     """Every frame of the pop-in drew all ~3000 dots again (4-7 ms of draw calls each
     16 ms, the most as the last ones came in) and the sound playing skipped. A dot
     done growing goes into a picture kept for the view, drawn once."""
-    from soundboard.ui import flatmap
+    from soundboard.ui.radio import flatmap
     m = FlatMap()
     m.resize(600, 400)
     m.show()

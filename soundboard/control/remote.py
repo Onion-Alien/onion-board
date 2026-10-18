@@ -1316,7 +1316,7 @@ VOICE_OFF = {"error": "the Voice tab is switched off in Onion Board's Settings >
 
 
 def _radio_tab(mw: MainWindow):
-    from soundboard.ui.radiopanel import RadioTab
+    from soundboard.ui.radio.radiopanel import RadioTab
     r = getattr(mw, "radio", None)
     return r if isinstance(r, RadioTab) else None
 

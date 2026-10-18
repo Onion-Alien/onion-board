@@ -65,7 +65,7 @@ def test_a_reload_asked_for_mid_load_runs_after_it(speech, qapp, monkeypatch):
 
 # ---- radio
 def test_double_click_on_the_station_badge_plays_and_on_the_star_stars(qapp):
-    from soundboard.ui.radiopanel import ROW_H, _StationDelegate
+    from soundboard.ui.radio.radiopanel import ROW_H, _StationDelegate
     calls = []
     lst = QListWidget()
     fake = SimpleNamespace(list=lst, _play_or_stop=lambda u: calls.append(("play", u)),

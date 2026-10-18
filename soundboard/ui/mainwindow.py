@@ -79,7 +79,7 @@ from soundboard.ui.sounds.overlay import Overlay
 from soundboard.ui.apps.appspanel import AppsTab
 from soundboard.ui.triggershost import BoardHost
 from soundboard.ui.triggerstab import TriggersTab
-from soundboard.ui.radiopanel import RadioOff, RadioTab
+from soundboard.ui.radio.radiopanel import RadioOff, RadioTab
 from soundboard.ui.storetab import PREVIEW as STORE_PREVIEW, StoreTab
 from soundboard.ui.voice.voicepanel import VoicePanel
 from soundboard.ui.kit.widgets import Meter, Pad, expand_dropped
