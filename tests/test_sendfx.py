@@ -5,7 +5,8 @@ of it on the cable (and on your headphones only in 'hear what they hear')."""
 import numpy as np
 import pytest
 
-from soundboard import codecsim, sendfx
+from soundboard.sim import codecsim
+from soundboard import sendfx
 from soundboard.sendfx import Ducker, Limiter, SmartMono
 from tests.test_engine import engine_with
 

@@ -1,7 +1,7 @@
 """The last stage before the send device (a virtual cable or any other output):
 what makes a mix survive voice chat.
 
-Measured with the codec bench (soundboard.codecsim) and the voice chat check:
+Measured with the codec bench (soundboard.sim.codecsim) and the voice chat check:
 
   Limiter    Opus puts peaks back up to ~2.5 dB above what went in (more on a
              brick-walled master), and the listener's decoder clips them. A

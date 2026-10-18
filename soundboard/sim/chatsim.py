@@ -1,9 +1,9 @@
 """Voice-chat mic processing, simulated: what Discord or a game does to our sounds
 *before* the codec, when its voice cleanup is left on.
 
-Development tool, like soundboard.codecsim: the bench runs sounds through it to
+Development tool, like soundboard.sim.codecsim: the bench runs sounds through it to
 put numbers on the damage, and the tests use it to check that the Discord check
-(soundboard.chatcheck) recognises each kind. The models follow the classic
+(soundboard.sim.chatcheck) recognises each kind. The models follow the classic
 designs these services build on (WebRTC's noise suppressor, gain controller and
 voice-activity gate), not any one product's exact tuning:
 

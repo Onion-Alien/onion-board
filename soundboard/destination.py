@@ -1,6 +1,6 @@
 """Destination modes: shape the sounds bus for whoever is listening.
 
-The codec bench (soundboard.codecsim) measured what voice chat does to what
+The codec bench (soundboard.sim.codecsim) measured what voice chat does to what
 we send. Every engine captures its mic in mono and high-passes it: Discord at
 ~94 Hz, Vivox at ~80 Hz with a slow tail to ~150 Hz, WebRTC's cleanup (Epic
 Online Services, browsers) around 80 Hz, Opus' own voice mode on top. Steam

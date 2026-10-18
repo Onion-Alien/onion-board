@@ -1,7 +1,7 @@
 """Voice-chat mic processing, the real code: what a game's voice stack does to our
 sounds before its codec, using the actual libraries instead of chatsim's models.
 
-Development tool, like soundboard.codecsim and soundboard.chatsim; nothing here runs
+Development tool, like soundboard.sim.codecsim and soundboard.sim.chatsim; nothing here runs
 in the app, and neither library ships with it. Install them into a separate bench
 environment (requirements-bench.txt):
 

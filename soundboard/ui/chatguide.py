@@ -1,6 +1,6 @@
 """Voice chat guides: the settings in Discord / a game that decide whether your
 sounds come through clean, and the Discord check that listens to what Discord
-really does to them (soundboard.chatcheck).
+really does to them (soundboard.sim.chatcheck).
 
 Discord and game voice chats run the mic through noise suppression, a gain
 control and a voice-activity gate that are built for speech: they treat music as
@@ -19,7 +19,8 @@ from PySide6.QtCore import QObject, Qt, QTimer, Signal
 from PySide6.QtWidgets import (QApplication, QDialog, QHBoxLayout, QLabel, QPushButton,
                                QVBoxLayout)
 
-from soundboard import chatcheck, directmic, discordcfg, theme
+from soundboard.sim import chatcheck
+from soundboard import directmic, discordcfg, theme
 from soundboard.pollthread import PollThread
 from soundboard.ui import busy, fit, icons
 from soundboard.ui.bunnywidget import BunnyWidget

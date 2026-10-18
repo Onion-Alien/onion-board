@@ -3,7 +3,7 @@ and a clean path is called clean."""
 import numpy as np
 import pytest
 
-from soundboard import chatcheck as cc
+from soundboard.sim import chatcheck as cc
 
 SR = cc.SR
 
@@ -103,7 +103,7 @@ def test_other_voices_in_the_playback_dont_break_it(sig):
 
 def test_opus_alone_is_not_flagged(sig):
     # if the Mic Test round-trips through the codec, that's not a setting to fix
-    from soundboard import codecsim
+    from soundboard.sim import codecsim
     if codecsim.available() is None:
         pytest.skip("ffmpeg with libopus not installed")
     for key in ("discord", "discord_low"):
