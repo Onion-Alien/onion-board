@@ -4119,5 +4119,6 @@
   "Press <b>Next</b> for the last bit: your language and a look.": "Drück <b>Weiter</b> für den letzten Teil: deine Sprache und ein Look.",
   "Start Onion Board when I sign in to Windows (quietly, in the tray)": "Onion Board beim Anmelden bei Windows starten (leise, im Infobereich)",
   "Tell Discord or your game": "Sag es Discord oder deinem Spiel",
-  "{n} more themes in Settings.": "{n} weitere Themes in den Einstellungen."
+  "{n} more themes in Settings.": "{n} weitere Themes in den Einstellungen.",
+  "Onion Board closed unexpectedly, so it started again.": "Onion Board wurde unerwartet geschlossen und hat sich deshalb neu gestartet."
 }

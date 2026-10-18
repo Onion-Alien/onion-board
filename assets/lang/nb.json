@@ -4119,5 +4119,6 @@
   "Press <b>Next</b> for the last bit: your language and a look.": "Trykk <b>Neste</b> for det siste: språket ditt og et utseende.",
   "Start Onion Board when I sign in to Windows (quietly, in the tray)": "Start Onion Board når jeg logger på Windows (stille, i systemstatusfeltet)",
   "Tell Discord or your game": "Si fra til Discord eller spillet ditt",
-  "{n} more themes in Settings.": "{n} flere temaer i Innstillinger."
+  "{n} more themes in Settings.": "{n} flere temaer i Innstillinger.",
+  "Onion Board closed unexpectedly, so it started again.": "Onion Board ble lukket uventet, så det startet på nytt."
 }

@@ -4435,5 +4435,6 @@
   "Press <b>Next</b> for the last bit: your language and a look.": "اضغط <b>التالي</b> للجزء الأخير: لغتك ومظهرك.",
   "Start Onion Board when I sign in to Windows (quietly, in the tray)": "شغّل Onion Board عند تسجيل الدخول إلى Windows (بهدوء، في الدرج)",
   "Tell Discord or your game": "أخبر Discord أو لعبتك",
-  "{n} more themes in Settings.": "مظاهر أخرى في الإعدادات: {n}"
+  "{n} more themes in Settings.": "مظاهر أخرى في الإعدادات: {n}",
+  "Onion Board closed unexpectedly, so it started again.": "أُغلق Onion Board بشكل غير متوقع، لذا فُتح من جديد."
 }

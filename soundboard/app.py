@@ -50,7 +50,8 @@ def tune_runtime_for_audio():
     gc.set_threshold(50_000, 20, 20)
 
 
-RESTART_ONLY_FOR_UPDATES = 1 | 2 | 8   # RESTART_NO_CRASH | NO_HANG | NO_REBOOT
+RESTART_FLAGS = 8   # RESTART_NO_REBOOT: after a crash, a hang or an update, not a reboot
+RESTARTED_ARG = "--restarted"   # on the line Windows starts it again with
 
 
 def restart_cmdline(argv: list[str], frozen: bool) -> str:
@@ -64,19 +65,19 @@ def restart_cmdline(argv: list[str], frozen: bool) -> str:
     if "--restart-after" in args:
         i = args.index("--restart-after")
         del args[i:i + 2]
-    args = [a for a in args if a not in (TRAY_ARG, "--resume-setup")]
-    return subprocess.list2cmdline(args)
+    args = [a for a in args if a not in (TRAY_ARG, "--resume-setup", RESTARTED_ARG)]
+    return subprocess.list2cmdline([*args, RESTARTED_ARG])
 
 
 def register_restart():
-    """Ask Windows to start the app again when an installer closes it to update it
-    (Inno Setup's CloseApplications restarts the apps that asked: an update or a
-    reinstall run while the app was open used to leave it closed, which looked like a
-    crash). Not after a crash, a hang or a reboot."""
+    """Ask Windows to start the app again when it ends without being quit: an installer
+    closing it to update it (Inno Setup's CloseApplications restarts the apps that
+    asked), a crash, or Windows closing it as Not Responding. Windows only does it for a
+    run of 60 s or more, so a crash at start can't loop. Not after a reboot."""
     try:
         ctypes.windll.kernel32.RegisterApplicationRestart(
             ctypes.c_wchar_p(restart_cmdline(sys.argv, getattr(sys, "frozen", False))),
-            RESTART_ONLY_FOR_UPDATES)
+            RESTART_FLAGS)
     except Exception:  # noqa: BLE001 - only a nicety
         log.debug("RegisterApplicationRestart failed", exc_info=True)
 
@@ -691,6 +692,10 @@ def main():
         QTimer.singleShot(400, lambda: w.run_setup(resumed=True))
     elif not w.cfg.setup_done:   # first launch: the setup wizard
         QTimer.singleShot(400, w.run_setup)
+    if unclean and RESTARTED_ARG in sys.argv:   # Windows started it again after a crash
+        from soundboard.i18n import _
+        QTimer.singleShot(900, lambda: w.toast(
+            _("Onion Board closed unexpectedly, so it started again."), "warn"))
     if reset_note:
         QTimer.singleShot(900, lambda: w.toast(reset_note, "ok" if reset.last_ok else "warn"))
     QTimer.singleShot(30_000, lambda: start_ytdlp_check(w.cfg))

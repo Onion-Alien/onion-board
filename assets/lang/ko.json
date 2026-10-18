@@ -4040,5 +4040,6 @@
   "Press <b>Next</b> for the last bit: your language and a look.": "<b>다음</b>을 눌러 마지막 단계로: 언어와 모습.",
   "Start Onion Board when I sign in to Windows (quietly, in the tray)": "Windows에 로그인하면 Onion Board 시작 (조용히, 트레이에서)",
   "Tell Discord or your game": "Discord 또는 게임에 알리기",
-  "{n} more themes in Settings.": "설정에 테마가 {n}개 더 있어요."
+  "{n} more themes in Settings.": "설정에 테마가 {n}개 더 있어요.",
+  "Onion Board closed unexpectedly, so it started again.": "Onion Board가 예기치 않게 종료되어 다시 시작했습니다."
 }

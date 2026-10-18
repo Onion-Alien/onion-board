@@ -72,10 +72,11 @@ def comes_to_front(argv: list[str], show_requested: bool) -> bool:
     """Whether the main window takes the focus once it first shows. Yes on a normal
     start (the installer's "Open Onion Board now", a shortcut): the splash never takes
     the focus, so without this the window lands behind the browser. Not when started
-    with Windows (--tray), where a game may be in front, unless someone launched it
-    again meanwhile (that copy already let us take the focus)."""
+    with Windows (--tray) or started again by Windows after a crash or an update
+    (--restarted), where a game may be in front, unless someone launched it again
+    meanwhile (that copy already let us take the focus)."""
     from soundboard.autostart import TRAY_ARG
-    return TRAY_ARG not in argv or show_requested
+    return not ({TRAY_ARG, "--restarted"} & set(argv)) or show_requested
 
 
 def bring_to_front(w):

@@ -1,5 +1,6 @@
-"""app.register_restart: an installer that closes the app to update it (Inno Setup's
-CloseApplications) starts it again, instead of leaving it closed like a crash."""
+"""app.register_restart: Windows starts the app again after an installer closed it to
+update it (Inno Setup's CloseApplications), a crash or a Not Responding close, marked
+--restarted so it comes back without taking the focus."""
 import os
 import subprocess
 import sys
@@ -16,13 +17,17 @@ ROOT = Path(__file__).resolve().parent.parent
 def test_frozen_keeps_args_but_drops_the_one_off_ones():
     argv = [r"C:\Apps\OnionBoard.exe", "--tray", "--restart-after", "123",
             "--resume-setup", "--x", "a b"]
-    assert restart_cmdline(argv, frozen=True) == '--x "a b"'
+    assert restart_cmdline(argv, frozen=True) == '--x "a b" --restarted'
 
 
 def test_source_run_names_the_script_by_full_path(tmp_path, monkeypatch):
     monkeypatch.chdir(tmp_path)
     assert restart_cmdline(["main.py", "--tray"], frozen=False) == \
-        subprocess.list2cmdline([str(tmp_path / "main.py")])
+        subprocess.list2cmdline([str(tmp_path / "main.py"), "--restarted"])
+
+
+def test_restarted_twice_is_marked_once():
+    assert restart_cmdline(["ob.exe", "--restarted"], frozen=True) == "--restarted"
 
 
 @pytest.mark.windows   # PowerShell and RegisterApplicationRestart
@@ -49,6 +54,6 @@ def test_windows_accepts_the_registration():
                          text=True, timeout=60, env={**os.environ, "PYTHONPATH": str(ROOT)})
     hr, flags, line = out.stdout.strip().split("|")
     assert hr == "0", out.stderr
-    assert int(flags) == 1 | 2 | 8   # only for updates: not after a crash, hang or reboot
-    assert "--tray" not in line   # comes back on screen
+    assert int(flags) == 8   # after a crash, a hang or an update: only not a reboot
+    assert "--tray" not in line and line.endswith("--restarted")   # back on screen
 

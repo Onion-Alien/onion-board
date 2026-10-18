@@ -4040,5 +4040,6 @@
   "Press <b>Next</b> for the last bit: your language and a look.": "按 <b>下一步</b> 進入最後一步：語言和外觀。",
   "Start Onion Board when I sign in to Windows (quietly, in the tray)": "登入 Windows 時啟動 Onion Board（安靜地在系統匣中）",
   "Tell Discord or your game": "告訴 Discord 或你的遊戲",
-  "{n} more themes in Settings.": "設定中還有 {n} 個主題。"
+  "{n} more themes in Settings.": "設定中還有 {n} 個主題。",
+  "Onion Board closed unexpectedly, so it started again.": "Onion Board 意外關閉，已重新啟動。"
 }

@@ -4119,5 +4119,6 @@
   "Press <b>Next</b> for the last bit: your language and a look.": "Paina <b>Seuraava</b> viimeiseen osaan: kieli ja ulkoasu.",
   "Start Onion Board when I sign in to Windows (quietly, in the tray)": "Käynnistä Onion Board, kun kirjaudun Windowsiin (hiljaa, ilmoitusalueelle)",
   "Tell Discord or your game": "Kerro Discordille tai pelillesi",
-  "{n} more themes in Settings.": "Lisää teemoja asetuksissa: {n}"
+  "{n} more themes in Settings.": "Lisää teemoja asetuksissa: {n}",
+  "Onion Board closed unexpectedly, so it started again.": "Onion Board sulkeutui odottamatta, joten se käynnistyi uudelleen."
 }

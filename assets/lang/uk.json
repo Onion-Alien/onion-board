@@ -4198,5 +4198,6 @@
   "Press <b>Next</b> for the last bit: your language and a look.": "Натисни <b>Далі</b> для останнього кроку: мова й вигляд.",
   "Start Onion Board when I sign in to Windows (quietly, in the tray)": "Запускати Onion Board під час входу в Windows (тихо, у треї)",
   "Tell Discord or your game": "Повідом Discord або гру",
-  "{n} more themes in Settings.": "Ще теми в налаштуваннях: {n}"
+  "{n} more themes in Settings.": "Ще теми в налаштуваннях: {n}",
+  "Onion Board closed unexpectedly, so it started again.": "Onion Board неочікувано закрився, тому запустився знову."
 }

@@ -4119,5 +4119,6 @@
   "Press <b>Next</b> for the last bit: your language and a look.": "Nyomd meg a <b>Tovább</b> gombot az utolsó részhez: nyelv és megjelenés.",
   "Start Onion Board when I sign in to Windows (quietly, in the tray)": "Az Onion Board indítása a Windowsba való bejelentkezéskor (csendben, a tálcán)",
   "Tell Discord or your game": "Szólj a Discordnak vagy a játékodnak",
-  "{n} more themes in Settings.": "További témák a Beállításokban: {n}"
+  "{n} more themes in Settings.": "További témák a Beállításokban: {n}",
+  "Onion Board closed unexpectedly, so it started again.": "Az Onion Board váratlanul bezárult, ezért újraindult."
 }
